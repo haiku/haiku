@@ -13,6 +13,9 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
 
+Includes [ FGristFiles HTML5HWInterface.cpp HTML5DrawingEngine.cpp CanvasMessage.cpp ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
 StaticLibrary libashtml5.a :
 	base64.cpp
 

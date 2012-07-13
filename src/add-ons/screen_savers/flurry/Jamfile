@@ -9,18 +9,25 @@ if $(HAIKU_GCC_VERSION[1]) < 3 {
 
 AddResources Message : Flurry.rdef ;
 
-ScreenSaver Flurry :
+local sources =
 	Flurry.cpp
 	Smoke.cpp
 	Spark.cpp
 	Star.cpp
 	Texture.cpp
-	:
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+	# Dependency needed to trigger downloading/unzipping the package before
+	# compiling the files.
+
+ScreenSaver Flurry :
+	$(sources) :
 	be screensaver GL libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 ;
 
 DoCatalogs Flurry :
 	x-vnd.Haiku-Flurry
 	:
-	Flurry.cpp	
+	$(sources)
 ;

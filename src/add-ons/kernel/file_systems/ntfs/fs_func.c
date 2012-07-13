@@ -49,6 +49,23 @@ typedef struct identify_cookie {
 } identify_cookie;
 
 
+static bool
+is_device_read_only(const char *device)
+{
+	bool isReadOnly = false;
+	device_geometry geometry;
+	int fd = open(device, O_RDONLY | O_NOCACHE);
+	if (fd < 0)
+		return false;
+
+	if (ioctl(fd, B_GET_GEOMETRY, &geometry) == 0)
+		isReadOnly = geometry.read_only;
+
+	close(fd);
+	return isReadOnly;
+}
+
+
 static status_t
 get_node_type(ntfs_inode* ni, int* _type)
 {
@@ -234,12 +251,12 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		"true"), "true") == 0;
 	unload_driver_settings(handle);
 
-	if (ns->ro || (flags & B_MOUNT_READ_ONLY) != 0) {
+	if (ns->ro || (flags & B_MOUNT_READ_ONLY) != 0
+		|| is_device_read_only(device)) {
 		mountFlags |= MS_RDONLY;
 		ns->flags |= B_FS_IS_READONLY;
 	}
 
-	// TODO: this does not take read-only volumes into account!
 	ns->ntvol = utils_mount_volume(device, mountFlags, true);
 	if (ns->ntvol != NULL)
 		result = B_NO_ERROR;

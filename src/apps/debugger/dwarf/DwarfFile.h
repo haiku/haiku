@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_FILE_H
@@ -112,7 +113,17 @@ private:
 
 			status_t			_ParseLineInfo(CompilationUnit* unit);
 
-			status_t			_ParseCIE(CompilationUnit* unit,
+			status_t			_UnwindCallFrame(bool usingEHFrameSection,
+									CompilationUnit* unit,
+									DIESubprogram* subprogramEntry,
+									target_addr_t location,
+									const DwarfTargetInterface* inputInterface,
+									DwarfTargetInterface* outputInterface,
+									target_addr_t& _framePointer);
+
+			status_t			_ParseCIE(ElfSection* debugFrameSection,
+									bool usingEHFrameSection,
+									CompilationUnit* unit,
 									CfaContext& context, off_t cieOffset,
 									CIEAugmentation& cieAugmentation);
 			status_t			_ParseFrameInfoInstructions(
@@ -151,14 +162,13 @@ private:
 			ElfSection*			fDebugRangesSection;
 			ElfSection*			fDebugLineSection;
 			ElfSection*			fDebugFrameSection;
+			ElfSection*			fEHFrameSection;
 			ElfSection*			fDebugLocationSection;
 			ElfSection*			fDebugPublicTypesSection;
 			AbbreviationTableList fAbbreviationTables;
 			DebugInfoEntryFactory fDebugInfoFactory;
 			CompilationUnitList	fCompilationUnits;
 			CompilationUnit*	fCurrentCompilationUnit;
-			bool				fUsingEHFrameSection;
-			bool				fGCC4EHFrameSection;
 			bool				fFinished;
 			status_t			fFinishError;
 };

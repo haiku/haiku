@@ -7,10 +7,12 @@
 
 #include <Bitmap.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Clipboard.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <LayoutUtils.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -26,6 +28,10 @@
 #include "BrowsingHistory.h"
 #include "IconButton.h"
 #include "TextViewCompleter.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "URL Bar"
 
 
 class URLChoice : public BAutoCompleter::Choice {
@@ -235,10 +241,14 @@ URLInputGroup::URLTextView::MouseDown(BPoint where)
 			be_clipboard->Unlock();
 		}
 
-		BMenuItem* cutItem = new BMenuItem("Cut", new BMessage(B_CUT));
-		BMenuItem* copyItem = new BMenuItem("Copy", new BMessage(B_COPY));
-		BMenuItem* pasteItem = new BMenuItem("Paste", new BMessage(B_PASTE));
-		BMenuItem* clearItem = new BMenuItem("Clear", new BMessage(MSG_CLEAR));
+		BMenuItem* cutItem = new BMenuItem(B_TRANSLATE("Cut"),
+			new BMessage(B_CUT));
+		BMenuItem* copyItem = new BMenuItem(B_TRANSLATE("Copy"),
+			new BMessage(B_COPY));
+		BMenuItem* pasteItem = new BMenuItem(B_TRANSLATE("Paste"),
+			new BMessage(B_PASTE));
+		BMenuItem* clearItem = new BMenuItem(B_TRANSLATE("Clear"),
+			new BMessage(MSG_CLEAR));
 		cutItem->SetEnabled(canCutOrCopy);
 		copyItem->SetEnabled(canCutOrCopy);
 		pasteItem->SetEnabled(canPaste);
@@ -362,8 +372,8 @@ URLInputGroup::URLTextView::InsertText(const char* inText, int32 inLength,
 		baseUrlEnd = TextLength();
 	BFont font;
 	GetFont(&font);
-	const rgb_color black = (rgb_color){ 0, 0, 0, 255 };
-	const rgb_color gray = (rgb_color){ 60, 60, 60, 255 };
+	const rgb_color black = (rgb_color) { 0, 0, 0, 255 };
+	const rgb_color gray = (rgb_color) { 60, 60, 60, 255 };
 	if (baseUrlStart > 0)
 		SetFontAndColor(0, baseUrlStart - 1, &font, B_FONT_ALL, &gray);
 	if (baseUrlEnd > baseUrlStart) {

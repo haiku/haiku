@@ -128,14 +128,14 @@ Depends LocaleKit :
 	LocaleKitTests
 ;
 
-# Prepare the optional build features before parsing the Jamfile tree.
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalBuildFeatures ] ;
-
 # Add optional packages given via HAIKU_ADD_OPTIONAL_PACKAGES.
 if $(HAIKU_ADD_OPTIONAL_PACKAGES) {
 	AddOptionalHaikuImagePackages
 		[ FSplitString $(HAIKU_ADD_OPTIONAL_PACKAGES) : / ] ;
 }
+
+# Prepare the optional build features before parsing the Jamfile tree.
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalBuildFeatures ] ;
 
 # Include packages that are required by all images.
 AddOptionalHaikuImagePackages MandatoryPackages ;

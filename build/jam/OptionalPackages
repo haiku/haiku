@@ -1843,18 +1843,34 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 }
 
 
+# WebKit
+if [ IsOptionalHaikuImagePackageAdded WebKit ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package WebKit available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
+		Echo "No optional package WebKit available for gcc2" ;
+	} else {
+		InstallOptionalHaikuImagePackage $(HAIKU_WEBKIT_FILE)
+			: $(baseURL)/$(HAIKU_WEBKIT_FILE)
+			: common ;
+	}
+}
+
+
 # WebPositive
 if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package WebPositive available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
-		Echo "No optional package WebPositive available for gcc2" ;
-	} else {
-		InstallOptionalHaikuImagePackage
-			WebPositive-gcc4-x86-r586-2012-03-31.zip
-			: $(baseURL)/WebPositive-gcc4-x86-r586-2012-03-31.zip ;
-		AddSymlinkToHaikuImage home config settings deskbar Applications
-			: /boot/apps/WebPositive/WebPositive ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 {
+		if ! $(isHybridBuild) {
+			Echo "No optional package WebPositive available for gcc2" ;
+		} else {
+			Echo "WebPositive will be compiled by gcc4 inside $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)" ;
+		}
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		AddFilesToHaikuHybridImage apps : WebPositive ;
+		AddSymlinkToHaikuHybridImage home config settings deskbar Applications
+			: /boot/apps/WebPositive ;
 	}
 }
 

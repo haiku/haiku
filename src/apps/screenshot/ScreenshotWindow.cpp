@@ -41,7 +41,6 @@
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
 
-#include "PreviewView.h"
 #include "Utility.h"
 
 
@@ -174,11 +173,13 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 
 	BMenuField* menuLocation = new BMenuField(B_TRANSLATE("Save in:"),
 		fOutputPathMenu);
+	menuLocation->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fTranslatorMenu = new BMenu(B_TRANSLATE("Please select"));
 	_SetupTranslatorMenu();
 	BMenuField* menuFormat = new BMenuField(B_TRANSLATE("Save as:"),
 		fTranslatorMenu);
+	menuFormat->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BButton* showSettings =  new BButton("", B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
 			new BMessage(kSettings));
@@ -193,12 +194,13 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	const float kSpacing = be_control_look->DefaultItemSpacing();
 	const float kLabelSpacing = be_control_look->DefaultLabelSpacing();
 
-	fPreview = new PreviewView();
+	fPreview = new BView("preview", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
+	BBox *previewBox = new BBox(B_FANCY_BORDER, fPreview);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(kSpacing)
 		.AddGroup(B_HORIZONTAL, kSpacing)
-			.Add(fPreview)
+			.Add(previewBox)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fActiveWindow)
 				.Add(fWindowBorder)

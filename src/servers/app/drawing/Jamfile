@@ -12,6 +12,9 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
 
+Includes [ FGristFiles DrawingEngine.cpp ]
+	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+
 StaticLibrary libasdrawing.a :
 	AccelerantBuffer.cpp
 	AccelerantHWInterface.cpp

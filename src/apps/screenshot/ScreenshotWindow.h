@@ -26,7 +26,6 @@ class BPath;
 class BTextControl;
 class BTextView;
 
-class PreviewView;
 class Utility;
 
 
@@ -58,7 +57,7 @@ private:
 
 	const	Utility&		fUtility;
 
-			PreviewView*	fPreview;
+			BView*			fPreview;
 			BCheckBox*		fActiveWindow;
 			BTextControl*	fDelayControl;
 			BCheckBox*		fWindowBorder;
