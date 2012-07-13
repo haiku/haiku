@@ -7,6 +7,7 @@
 #include "fssh.h"
 
 #include "command_checkfs.h"
+#include "command_resizefs.h"
 
 
 namespace FSShell {
@@ -17,6 +18,8 @@ register_additional_commands()
 {
 	CommandManager::Default()->AddCommand(command_checkfs, "checkfs",
 		"check file system");
+	CommandManager::Default()->AddCommand(command_resizefs, "resizefs",
+		"resize file system");
 }
 
 

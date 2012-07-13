@@ -766,6 +766,18 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 
 			return volume->WriteSuperBlock();
 		}
+		case BFS_IOCTL_RESIZE:
+		{
+			if (bufferLength != sizeof(uint64))
+				return B_BAD_VALUE;
+
+			uint64 size;
+			if (user_memcpy((uint8*)&size, buffer, sizeof(uint64)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			ResizeVisitor resizer(volume);
+			return resizer.Resize(size, -1);
+		}
 
 #ifdef DEBUG_FRAGMENTER
 		case 56741:

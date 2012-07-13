@@ -98,4 +98,10 @@ struct check_control {
 #define BFS_IOCTL_CHECK_MAGIC	'BChk'
 
 
+/* A "back door" to side-step the regular resize interface, primarily for
+ * testing with bfs_shell. The parameter is a uint64 with the desired size.
+ */
+#define BFS_IOCTL_RESIZE		14205
+
+
 #endif	/* BFS_CONTROL_H */

@@ -71,6 +71,7 @@ BuildPlatformMain <build>bfs_shell
 	:
 	additional_commands.cpp
 	command_checkfs.cpp
+	command_resizefs.cpp
 	:
 	<build>bfs.o
 	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
