@@ -78,7 +78,8 @@ KernelMergeObject kernel_arch_x86.o :
 CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
 
 # We need to specify the dependency on the generated syscalls file explicitly.
-Includes [ FGristFiles arch_interrupts.S arch_x86.S x86_signals.cpp ]
+Includes [ FGristFiles arch_interrupts.S arch_x86.S x86_signals.cpp
+		x86_signals_asm.S ]
 	: <syscalls>syscall_numbers.h ;
 Includes [ FGristFiles arch_interrupts.S ]
 	: <syscalls>syscall_table.h ;
