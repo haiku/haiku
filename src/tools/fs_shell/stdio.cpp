@@ -49,3 +49,24 @@ fssh_vsnprintf(char *string, fssh_size_t size, char const *format, va_list ap)
 {
 	return vsnprintf(string, size, format, ap);
 }
+
+
+int
+fssh_sscanf(char const *str, char const *format, ...)
+{
+	va_list args;
+	va_start(args, format);
+
+	int result = vsscanf(str, format, args);
+
+	va_end(args);
+
+	return result;
+}
+
+
+int
+fssh_vsscanf(char const *str, char const *format, va_list ap)
+{
+	return vsscanf(str, format, ap);
+}
