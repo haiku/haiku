@@ -825,8 +825,12 @@ DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
 	DebugInfoEntry* entry;
 	status_t error = fDebugInfoFactory.CreateDebugInfoEntry(
 		abbreviationEntry.Tag(), entry);
-	if (error != B_OK)
+	if (error != B_OK) {
+		WARNING("Failed to generate entry for tag %lu, code %lu\n",
+			abbreviationEntry.Tag(), code);
 		return error;
+	}
+
 	ObjectDeleter<DebugInfoEntry> entryDeleter(entry);
 
 	TRACE_DIE("%*sentry %p at %lld: %lu, tag: %s (%lu), children: %d\n",
