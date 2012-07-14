@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -214,7 +214,7 @@ AcpiNsDumpRootDevices (
         return;
     }
 
-    Status = AcpiGetHandle (NULL, ACPI_NS_SYSTEM_BUS, &SysBusHandle);
+    Status = AcpiGetHandle (NULL, METHOD_NAME__SB_, &SysBusHandle);
     if (ACPI_FAILURE (Status))
     {
         return;

@@ -1,14 +1,14 @@
-/******************************************************************************
+/*******************************************************************************
  *
- * Name: acefi.h - OS specific defines, etc.
+ * Module Name: utexcep - Exception code support
  *
- *****************************************************************************/
+ ******************************************************************************/
 
 /******************************************************************************
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,35 +113,134 @@
  *
  *****************************************************************************/
 
-#ifndef __ACEFI_H__
-#define __ACEFI_H__
 
-#include <efi.h>
-#include <efistdarg.h>
-#include <efilib.h>
+#define __UTEXCEP_C__
+
+#define ACPI_DEFINE_EXCEPTION_TABLE
+#include "acpi.h"
+#include "accommon.h"
 
 
-/* _int64 works for both IA32 and IA64 */
+#define _COMPONENT          ACPI_UTILITIES
+        ACPI_MODULE_NAME    ("utexcep")
 
-#define COMPILER_DEPENDENT_INT64   __int64
-#define COMPILER_DEPENDENT_UINT64  unsigned __int64
 
-/*
- * Calling conventions:
+/*******************************************************************************
  *
- * ACPI_SYSTEM_XFACE        - Interfaces to host OS (handlers, threads)
- * ACPI_EXTERNAL_XFACE      - External ACPI interfaces
- * ACPI_INTERNAL_XFACE      - Internal ACPI interfaces
- * ACPI_INTERNAL_VAR_XFACE  - Internal variable-parameter list interfaces
- */
-#define ACPI_SYSTEM_XFACE
-#define ACPI_EXTERNAL_XFACE
-#define ACPI_INTERNAL_XFACE
-#define ACPI_INTERNAL_VAR_XFACE
+ * FUNCTION:    AcpiFormatException
+ *
+ * PARAMETERS:  Status              - The ACPI_STATUS code to be formatted
+ *
+ * RETURN:      A string containing the exception text. A valid pointer is
+ *              always returned.
+ *
+ * DESCRIPTION: This function translates an ACPI exception into an ASCII
+ *              string. Returns "unknown status" string for invalid codes.
+ *
+ ******************************************************************************/
 
-/* warn C4142: redefinition of type */
+const char *
+AcpiFormatException (
+    ACPI_STATUS             Status)
+{
+    const char              *Exception = NULL;
 
-#pragma warning(disable:4142)
+
+    ACPI_FUNCTION_ENTRY ();
 
 
-#endif /* __ACEFI_H__ */
+    Exception = AcpiUtValidateException (Status);
+    if (!Exception)
+    {
+        /* Exception code was not recognized */
+
+        ACPI_ERROR ((AE_INFO,
+            "Unknown exception code: 0x%8.8X", Status));
+
+        Exception = "UNKNOWN_STATUS_CODE";
+    }
+
+    return (ACPI_CAST_PTR (const char, Exception));
+}
+
+ACPI_EXPORT_SYMBOL (AcpiFormatException)
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtValidateException
+ *
+ * PARAMETERS:  Status              - The ACPI_STATUS code to be formatted
+ *
+ * RETURN:      A string containing the exception text. NULL if exception is
+ *              not valid.
+ *
+ * DESCRIPTION: This function validates and translates an ACPI exception into
+ *              an ASCII string.
+ *
+ ******************************************************************************/
+
+const char *
+AcpiUtValidateException (
+    ACPI_STATUS             Status)
+{
+    UINT32                  SubStatus;
+    const char              *Exception = NULL;
+
+
+    ACPI_FUNCTION_ENTRY ();
+
+
+    /*
+     * Status is composed of two parts, a "type" and an actual code
+     */
+    SubStatus = (Status & ~AE_CODE_MASK);
+
+    switch (Status & AE_CODE_MASK)
+    {
+    case AE_CODE_ENVIRONMENTAL:
+
+        if (SubStatus <= AE_CODE_ENV_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Env [SubStatus];
+        }
+        break;
+
+    case AE_CODE_PROGRAMMER:
+
+        if (SubStatus <= AE_CODE_PGM_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Pgm [SubStatus];
+        }
+        break;
+
+    case AE_CODE_ACPI_TABLES:
+
+        if (SubStatus <= AE_CODE_TBL_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Tbl [SubStatus];
+        }
+        break;
+
+    case AE_CODE_AML:
+
+        if (SubStatus <= AE_CODE_AML_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Aml [SubStatus];
+        }
+        break;
+
+    case AE_CODE_CONTROL:
+
+        if (SubStatus <= AE_CODE_CTRL_MAX)
+        {
+            Exception = AcpiGbl_ExceptionNames_Ctrl [SubStatus];
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return (ACPI_CAST_PTR (const char, Exception));
+}

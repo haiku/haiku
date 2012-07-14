@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -239,7 +239,7 @@ AcpiUtDeleteInternalObj (
     case ACPI_TYPE_PROCESSOR:
     case ACPI_TYPE_THERMAL:
 
-        /* Walk the notify handler list for this object */
+        /* Walk the address handler list for this object */
 
         HandlerDesc = Object->CommonNotify.Handler;
         while (HandlerDesc)
@@ -306,6 +306,16 @@ AcpiUtDeleteInternalObj (
 
         ACPI_DEBUG_PRINT ((ACPI_DB_ALLOCATIONS,
             "***** Region %p\n", Object));
+
+        /*
+         * Update AddressRange list. However, only permanent regions
+         * are installed in this list. (Not created within a method)
+         */
+        if (!(Object->Region.Node->Flags & ANOBJ_TEMPORARY))
+        {
+            AcpiUtRemoveAddressRange (Object->Region.SpaceId,
+                Object->Region.Node);
+        }
 
         SecondDesc = AcpiNsGetSecondaryObject (Object);
         if (SecondDesc)
@@ -585,6 +595,7 @@ AcpiUtUpdateObjectReference (
     ACPI_STATUS             Status = AE_OK;
     ACPI_GENERIC_STATE      *StateList = NULL;
     ACPI_OPERAND_OBJECT     *NextObject = NULL;
+    ACPI_OPERAND_OBJECT     *PrevObject;
     ACPI_GENERIC_STATE      *State;
     UINT32                  i;
 
@@ -614,10 +625,20 @@ AcpiUtUpdateObjectReference (
         case ACPI_TYPE_POWER:
         case ACPI_TYPE_THERMAL:
 
-            /* Update the notify objects for these types (if present) */
-
-            AcpiUtUpdateRefCount (Object->CommonNotify.SystemNotify, Action);
-            AcpiUtUpdateRefCount (Object->CommonNotify.DeviceNotify, Action);
+            /*
+             * Update the notify objects for these types (if present)
+             * Two lists, system and device notify handlers.
+             */
+            for (i = 0; i < ACPI_NUM_NOTIFY_TYPES; i++)
+            {
+                PrevObject = Object->CommonNotify.NotifyList[i];
+                while (PrevObject)
+                {
+                    NextObject = PrevObject->Notify.Next[i];
+                    AcpiUtUpdateRefCount (PrevObject, Action);
+                    PrevObject = NextObject;
+                }
+            }
             break;
 
         case ACPI_TYPE_PACKAGE:

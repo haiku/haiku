@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -122,6 +122,7 @@
 #define _COMPONENT          ACPI_EVENTS
         ACPI_MODULE_NAME    ("evgpeinit")
 
+#if (!ACPI_REDUCED_HARDWARE) /* Entire module */
 
 /*
  * Note: History of _PRW support in ACPICA
@@ -529,3 +530,5 @@ AcpiEvMatchGpeMethod (
         Name, GpeNumber));
     return_ACPI_STATUS (AE_OK);
 }
+
+#endif /* !ACPI_REDUCED_HARDWARE */

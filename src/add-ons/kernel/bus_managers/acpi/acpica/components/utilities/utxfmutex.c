@@ -1,14 +1,14 @@
-/******************************************************************************
+/*******************************************************************************
  *
- * Name: acmsvc.h - VC specific defines, etc.
+ * Module Name: utxfmutex - external AML mutex access functions
  *
- *****************************************************************************/
+ ******************************************************************************/
 
 /******************************************************************************
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,109 +113,173 @@
  *
  *****************************************************************************/
 
-#ifndef __ACMSVC_H__
-#define __ACMSVC_H__
+#define __UTXFMUTEX_C__
+
+#include "acpi.h"
+#include "accommon.h"
+#include "acnamesp.h"
 
 
-/*
- * Map low I/O functions for MS. This allows us to disable MS language
- * extensions for maximum portability.
- */
-#define open            _open
-#define read            _read
-#define write           _write
-#define close           _close
-#define stat            _stat
-#define fstat           _fstat
-#define mkdir           _mkdir
-#define strlwr          _strlwr
-#define O_RDONLY        _O_RDONLY
-#define O_BINARY        _O_BINARY
-#define O_CREAT         _O_CREAT
-#define O_WRONLY        _O_WRONLY
-#define O_TRUNC         _O_TRUNC
-#define S_IREAD         _S_IREAD
-#define S_IWRITE        _S_IWRITE
-#define S_IFDIR         _S_IFDIR
+#define _COMPONENT          ACPI_UTILITIES
+        ACPI_MODULE_NAME    ("utxfmutex")
 
-/* Eliminate warnings for "old" (non-secure) versions of clib functions */
 
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+/* Local prototypes */
 
-/* Eliminate warnings for POSIX clib function names (open, write, etc.) */
+static ACPI_STATUS
+AcpiUtGetMutexObject (
+    ACPI_HANDLE             Handle,
+    ACPI_STRING             Pathname,
+    ACPI_OPERAND_OBJECT     **RetObj);
 
-#ifndef _CRT_NONSTDC_NO_DEPRECATE
-#define _CRT_NONSTDC_NO_DEPRECATE
-#endif
 
-#define COMPILER_DEPENDENT_INT64    __int64
-#define COMPILER_DEPENDENT_UINT64   unsigned __int64
-#define ACPI_INLINE                 __inline
-
-/*
- * Calling conventions:
+/*******************************************************************************
  *
- * ACPI_SYSTEM_XFACE        - Interfaces to host OS (handlers, threads)
- * ACPI_EXTERNAL_XFACE      - External ACPI interfaces
- * ACPI_INTERNAL_XFACE      - Internal ACPI interfaces
- * ACPI_INTERNAL_VAR_XFACE  - Internal variable-parameter list interfaces
- */
-#define ACPI_SYSTEM_XFACE           __cdecl
-#define ACPI_EXTERNAL_XFACE
-#define ACPI_INTERNAL_XFACE
-#define ACPI_INTERNAL_VAR_XFACE     __cdecl
+ * FUNCTION:    AcpiUtGetMutexObject
+ *
+ * PARAMETERS:  Handle              - Mutex or prefix handle (optional)
+ *              Pathname            - Mutex pathname (optional)
+ *              RetObj              - Where the mutex object is returned
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Get an AML mutex object. The mutex node is pointed to by
+ *              Handle:Pathname. Either Handle or Pathname can be NULL, but
+ *              not both.
+ *
+ ******************************************************************************/
 
-#ifndef _LINT
-/*
- * Math helper functions
- */
-#define ACPI_DIV_64_BY_32(n_hi, n_lo, d32, q32, r32) \
-{                           \
-    __asm mov    edx, n_hi  \
-    __asm mov    eax, n_lo  \
-    __asm div    d32        \
-    __asm mov    q32, eax   \
-    __asm mov    r32, edx   \
+static ACPI_STATUS
+AcpiUtGetMutexObject (
+    ACPI_HANDLE             Handle,
+    ACPI_STRING             Pathname,
+    ACPI_OPERAND_OBJECT     **RetObj)
+{
+    ACPI_NAMESPACE_NODE     *MutexNode;
+    ACPI_OPERAND_OBJECT     *MutexObj;
+    ACPI_STATUS             Status;
+
+
+    /* Parameter validation */
+
+    if (!RetObj || (!Handle && !Pathname))
+    {
+        return (AE_BAD_PARAMETER);
+    }
+
+    /* Get a the namespace node for the mutex */
+
+    MutexNode = Handle;
+    if (Pathname != NULL)
+    {
+        Status = AcpiGetHandle (Handle, Pathname,
+            ACPI_CAST_PTR (ACPI_HANDLE, &MutexNode));
+        if (ACPI_FAILURE (Status))
+        {
+            return (Status);
+        }
+    }
+
+    /* Ensure that we actually have a Mutex object */
+
+    if (!MutexNode ||
+        (MutexNode->Type != ACPI_TYPE_MUTEX))
+    {
+        return (AE_TYPE);
+    }
+
+    /* Get the low-level mutex object */
+
+    MutexObj = AcpiNsGetAttachedObject (MutexNode);
+    if (!MutexObj)
+    {
+        return (AE_NULL_OBJECT);
+    }
+
+    *RetObj = MutexObj;
+    return (AE_OK);
 }
 
-#define ACPI_SHIFT_RIGHT_64(n_hi, n_lo) \
-{                           \
-    __asm shr    n_hi, 1    \
-    __asm rcr    n_lo, 1    \
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiAcquireMutex
+ *
+ * PARAMETERS:  Handle              - Mutex or prefix handle (optional)
+ *              Pathname            - Mutex pathname (optional)
+ *              Timeout             - Max time to wait for the lock (millisec)
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Acquire an AML mutex. This is a device driver interface to
+ *              AML mutex objects, and allows for transaction locking between
+ *              drivers and AML code. The mutex node is pointed to by
+ *              Handle:Pathname. Either Handle or Pathname can be NULL, but
+ *              not both.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiAcquireMutex (
+    ACPI_HANDLE             Handle,
+    ACPI_STRING             Pathname,
+    UINT16                  Timeout)
+{
+    ACPI_STATUS             Status;
+    ACPI_OPERAND_OBJECT     *MutexObj;
+
+
+    /* Get the low-level mutex associated with Handle:Pathname */
+
+    Status = AcpiUtGetMutexObject (Handle, Pathname, &MutexObj);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
+
+    /* Acquire the OS mutex */
+
+    Status = AcpiOsAcquireMutex (MutexObj->Mutex.OsMutex, Timeout);
+    return (Status);
 }
-#else
 
-/* Fake versions to make lint happy */
 
-#define ACPI_DIV_64_BY_32(n_hi, n_lo, d32, q32, r32) \
-{                           \
-    q32 = n_hi / d32;       \
-    r32 = n_lo / d32;       \
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiReleaseMutex
+ *
+ * PARAMETERS:  Handle              - Mutex or prefix handle (optional)
+ *              Pathname            - Mutex pathname (optional)
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Release an AML mutex. This is a device driver interface to
+ *              AML mutex objects, and allows for transaction locking between
+ *              drivers and AML code. The mutex node is pointed to by
+ *              Handle:Pathname. Either Handle or Pathname can be NULL, but
+ *              not both.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiReleaseMutex (
+    ACPI_HANDLE             Handle,
+    ACPI_STRING             Pathname)
+{
+    ACPI_STATUS             Status;
+    ACPI_OPERAND_OBJECT     *MutexObj;
+
+
+    /* Get the low-level mutex associated with Handle:Pathname */
+
+    Status = AcpiUtGetMutexObject (Handle, Pathname, &MutexObj);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
+
+    /* Release the OS mutex */
+
+    AcpiOsReleaseMutex (MutexObj->Mutex.OsMutex);
+    return (AE_OK);
 }
-
-#define ACPI_SHIFT_RIGHT_64(n_hi, n_lo) \
-{                           \
-    n_hi >>= 1;    \
-    n_lo >>= 1;    \
-}
-#endif
-
-/* warn C4100: unreferenced formal parameter */
-#pragma warning(disable:4100)
-
-/* warn C4127: conditional expression is constant */
-#pragma warning(disable:4127)
-
-/* warn C4706: assignment within conditional expression */
-#pragma warning(disable:4706)
-
-/* warn C4131: uses old-style declarator (iASL compiler only) */
-#pragma warning(disable:4131)
-
-#if _MSC_VER > 1200 /* Versions above VC++ 6 */
-#pragma warning( disable : 4295 ) /* needed for acpredef.h array */
-#endif
-
-#endif /* __ACMSVC_H__ */

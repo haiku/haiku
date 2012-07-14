@@ -582,7 +582,7 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,off_t pos,
 				ERROR("%s - ntfs_attr_pwrite returned less bytes than "
 					"requested.\n", __FUNCTION__);
 			if (bytesWritten <= 0) {
-				ERROR(("%s - ntfs_attr_pwrite()<=0\n", __FUNCTION__));
+				ERROR("%s - ntfs_attr_pwrite()<=0\n", __FUNCTION__);
 				*_length = 0;
 				result = EINVAL;
 				goto exit;

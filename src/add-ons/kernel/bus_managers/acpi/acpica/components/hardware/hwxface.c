@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -226,12 +226,6 @@ AcpiRead (
         return (Status);
     }
 
-    Width = Reg->BitWidth;
-    if (Width == 64)
-    {
-        Width = 32; /* Break into two 32-bit transfers */
-    }
-
     /* Initialize entire 64-bit return value to zero */
 
     *ReturnValue = 0;
@@ -244,28 +238,20 @@ AcpiRead (
     if (Reg->SpaceId == ACPI_ADR_SPACE_SYSTEM_MEMORY)
     {
         Status = AcpiOsReadMemory ((ACPI_PHYSICAL_ADDRESS)
-                    Address, &Value, Width);
+                    Address, ReturnValue, Reg->BitWidth);
         if (ACPI_FAILURE (Status))
         {
             return (Status);
         }
-        *ReturnValue = Value;
-
-        if (Reg->BitWidth == 64)
-        {
-            /* Read the top 32 bits */
-
-            Status = AcpiOsReadMemory ((ACPI_PHYSICAL_ADDRESS)
-                        (Address + 4), &Value, 32);
-            if (ACPI_FAILURE (Status))
-            {
-                return (Status);
-            }
-            *ReturnValue |= ((UINT64) Value << 32);
-        }
     }
     else /* ACPI_ADR_SPACE_SYSTEM_IO, validated earlier */
     {
+        Width = Reg->BitWidth;
+        if (Width == 64)
+        {
+            Width = 32; /* Break into two 32-bit transfers */
+        }
+
         Status = AcpiHwReadPort ((ACPI_IO_ADDRESS)
                     Address, &Value, Width);
         if (ACPI_FAILURE (Status))
@@ -334,12 +320,6 @@ AcpiWrite (
         return (Status);
     }
 
-    Width = Reg->BitWidth;
-    if (Width == 64)
-    {
-        Width = 32; /* Break into two 32-bit transfers */
-    }
-
     /*
      * Two address spaces supported: Memory or IO. PCI_Config is
      * not supported here because the GAS structure is insufficient
@@ -347,24 +327,20 @@ AcpiWrite (
     if (Reg->SpaceId == ACPI_ADR_SPACE_SYSTEM_MEMORY)
     {
         Status = AcpiOsWriteMemory ((ACPI_PHYSICAL_ADDRESS)
-                    Address, ACPI_LODWORD (Value), Width);
+                    Address, Value, Reg->BitWidth);
         if (ACPI_FAILURE (Status))
         {
             return (Status);
         }
-
-        if (Reg->BitWidth == 64)
-        {
-            Status = AcpiOsWriteMemory ((ACPI_PHYSICAL_ADDRESS)
-                        (Address + 4), ACPI_HIDWORD (Value), 32);
-            if (ACPI_FAILURE (Status))
-            {
-                return (Status);
-            }
-        }
     }
     else /* ACPI_ADR_SPACE_SYSTEM_IO, validated earlier */
     {
+        Width = Reg->BitWidth;
+        if (Width == 64)
+        {
+            Width = 32; /* Break into two 32-bit transfers */
+        }
+
         Status = AcpiHwWritePort ((ACPI_IO_ADDRESS)
                     Address, ACPI_LODWORD (Value), Width);
         if (ACPI_FAILURE (Status))
@@ -395,6 +371,7 @@ AcpiWrite (
 ACPI_EXPORT_SYMBOL (AcpiWrite)
 
 
+#if (!ACPI_REDUCED_HARDWARE)
 /*******************************************************************************
  *
  * FUNCTION:    AcpiReadBitRegister
@@ -576,6 +553,8 @@ UnlockAndExit:
 }
 
 ACPI_EXPORT_SYMBOL (AcpiWriteBitRegister)
+
+#endif /* !ACPI_REDUCED_HARDWARE */
 
 
 /*******************************************************************************

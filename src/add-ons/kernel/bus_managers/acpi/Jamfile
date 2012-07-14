@@ -45,7 +45,7 @@ local events_src =
 	evxfgpe.c
 	evxfregn.c
 	;
-	
+
 local executer_src =
 	exconfig.c
 	exconvrt.c
@@ -75,6 +75,7 @@ local executer_src =
 
 local hardware_src =
 	hwacpi.c
+	hwesleep.c
 	hwgpe.c
 	hwpci.c
 	hwregs.c
@@ -82,7 +83,8 @@ local hardware_src =
 	hwtimer.c
 	hwvalid.c
 	hwxface.c
-;
+	hwxfsleep.c
+	;
 
 local namespace_src =
 	nsaccess.c
@@ -129,6 +131,7 @@ local resources_src =
 	rslist.c
 	rsmemory.c
 	rsmisc.c
+	rsserial.c
 	rsutils.c
 	rsxface.c
 	;
@@ -139,10 +142,12 @@ local tables_src =
 	tbinstal.c
 	tbutils.c
 	tbxface.c
+	tbxfload.c
 	tbxfroot.c
 	;
 
 local utilities_src =
+	utaddress.c
 	utalloc.c
 	utcache.c
 	utclib.c
@@ -151,6 +156,7 @@ local utilities_src =
 	utdebug.c
 	utdelete.c
 	uteval.c
+	utexcep.c
 	utglobal.c
 	utids.c
 	utinit.c
@@ -165,6 +171,7 @@ local utilities_src =
 	uttrack.c
 	utxface.c
 	utxferror.c
+	utxfmutex.c
 	;
 
 StaticLibrary libacpi_ca.a :

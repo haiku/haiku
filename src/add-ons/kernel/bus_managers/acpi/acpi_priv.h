@@ -135,7 +135,7 @@ typedef struct acpi_root_info {
 
 	status_t	(*prepare_sleep_state)(uint8 state, void (*wakeFunc)(void),
 					size_t size);
-	status_t	(*enter_sleep_state)(uint8 state);
+	status_t	(*enter_sleep_state)(uint8 state, uint8 flags);
 	status_t	(*reboot)(void);
 
 	/* Table Access */
@@ -218,7 +218,7 @@ status_t set_current_resources(acpi_handle busDeviceHandle,
 	acpi_data* buffer);
 
 status_t prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size);
-status_t enter_sleep_state(uint8 state);
+status_t enter_sleep_state(uint8 state, uint8 flags);
 
 status_t reboot(void);
 

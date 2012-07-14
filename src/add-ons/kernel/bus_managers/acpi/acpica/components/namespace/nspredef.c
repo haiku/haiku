@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -737,6 +737,7 @@ AcpiNsCheckPackage (
     case ACPI_PTYPE2_FIXED:
     case ACPI_PTYPE2_MIN:
     case ACPI_PTYPE2_COUNT:
+    case ACPI_PTYPE2_FIX_VAR:
 
         /*
          * These types all return a single Package that consists of a
@@ -752,7 +753,7 @@ AcpiNsCheckPackage (
         {
             /* Create the new outer package and populate it */
 
-            Status = AcpiNsRepairPackageList (Data, ReturnObjectPtr);
+            Status = AcpiNsWrapWithPackage (Data, ReturnObject, ReturnObjectPtr);
             if (ACPI_FAILURE (Status))
             {
                 return (Status);
@@ -872,6 +873,29 @@ AcpiNsCheckPackageList (
                         Package->RetInfo.Count1,
                         Package->RetInfo.ObjectType2,
                         Package->RetInfo.Count2, 0);
+            if (ACPI_FAILURE (Status))
+            {
+                return (Status);
+            }
+            break;
+
+
+        case ACPI_PTYPE2_FIX_VAR:
+            /*
+             * Each subpackage has a fixed number of elements and an
+             * optional element
+             */
+            ExpectedCount = Package->RetInfo.Count1 + Package->RetInfo.Count2;
+            if (SubPackage->Package.Count < ExpectedCount)
+            {
+                goto PackageTooSmall;
+            }
+
+            Status = AcpiNsCheckPackageElements (Data, SubElements,
+                        Package->RetInfo.ObjectType1,
+                        Package->RetInfo.Count1,
+                        Package->RetInfo.ObjectType2,
+                        SubPackage->Package.Count - Package->RetInfo.Count1, 0);
             if (ACPI_FAILURE (Status))
             {
                 return (Status);

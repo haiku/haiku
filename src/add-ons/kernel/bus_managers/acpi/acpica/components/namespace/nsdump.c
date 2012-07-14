@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -343,7 +343,21 @@ AcpiNsDumpOneObject (
 
         if (!ObjDesc)
         {
-            /* No attached object, we are done */
+            /* No attached object. Some types should always have an object */
+
+            switch (Type)
+            {
+            case ACPI_TYPE_INTEGER:
+            case ACPI_TYPE_PACKAGE:
+            case ACPI_TYPE_BUFFER:
+            case ACPI_TYPE_STRING:
+            case ACPI_TYPE_METHOD:
+                AcpiOsPrintf ("<No attached object>");
+                break;
+
+            default:
+                break;
+            }
 
             AcpiOsPrintf ("\n");
             return (AE_OK);

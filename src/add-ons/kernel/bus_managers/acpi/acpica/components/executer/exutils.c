@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -193,7 +193,7 @@ AcpiExEnterInterpreter (
  *
  * DESCRIPTION: Reacquire the interpreter execution region from within the
  *              interpreter code. Failure to enter the interpreter region is a
- *              fatal system error. Used in  conjuction with
+ *              fatal system error. Used in conjunction with
  *              RelinquishInterpreter
  *
  ******************************************************************************/
@@ -570,5 +570,35 @@ AcpiExIntegerToString (
         OutString[Count-1] = (char) ('0' + Remainder);\
     }
 }
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiIsValidSpaceId
+ *
+ * PARAMETERS:  SpaceId             - ID to be validated
+ *
+ * RETURN:      TRUE if valid/supported ID.
+ *
+ * DESCRIPTION: Validate an operation region SpaceID.
+ *
+ ******************************************************************************/
+
+BOOLEAN
+AcpiIsValidSpaceId (
+    UINT8                   SpaceId)
+{
+
+    if ((SpaceId >= ACPI_NUM_PREDEFINED_REGIONS) &&
+        (SpaceId < ACPI_USER_REGION_BEGIN) &&
+        (SpaceId != ACPI_ADR_SPACE_DATA_TABLE) &&
+        (SpaceId != ACPI_ADR_SPACE_FIXED_HARDWARE))
+    {
+        return (FALSE);
+    }
+
+    return (TRUE);
+}
+
 
 #endif

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -346,8 +346,8 @@
 #define ACPI_INSERT_BITS(Target, Mask, Source)          Target = ((Target & (~(Mask))) | (Source & Mask))
 
 /*
- * An ACPI_NAMESPACE_NODE can appear in some contexts
- * where a pointer to an ACPI_OPERAND_OBJECT can also
+ * An object of type ACPI_NAMESPACE_NODE can appear in some contexts
+ * where a pointer to an object of type ACPI_OPERAND_OBJECT can also
  * appear. This macro is used to distinguish them.
  *
  * The "Descriptor" field is the first field in both structures.
@@ -500,7 +500,6 @@
 
 #endif /* ACPI_SIMPLE_RETURN_MACROS */
 
-
 /* Conditional execution */
 
 #define ACPI_DEBUG_EXEC(a)              a
@@ -548,6 +547,14 @@
 #define return_PTR(s)                   return(s)
 
 #endif /* ACPI_DEBUG_OUTPUT */
+
+
+#if (!ACPI_REDUCED_HARDWARE)
+#define ACPI_HW_OPTIONAL_FUNCTION(addr)     addr
+#else
+#define ACPI_HW_OPTIONAL_FUNCTION(addr)     NULL
+#endif
+
 
 /*
  * Some code only gets executed when the debugger is built in.

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -438,7 +438,7 @@ AcpiUtCreateStringObject (
  *
  * RETURN:      TRUE if object is valid, FALSE otherwise
  *
- * DESCRIPTION: Validate a pointer to be an ACPI_OPERAND_OBJECT
+ * DESCRIPTION: Validate a pointer to be of type ACPI_OPERAND_OBJECT
  *
  ******************************************************************************/
 
@@ -464,7 +464,7 @@ AcpiUtValidInternalObject (
     {
     case ACPI_DESC_TYPE_OPERAND:
 
-        /* The object appears to be a valid ACPI_OPERAND_OBJECT  */
+        /* The object appears to be a valid ACPI_OPERAND_OBJECT */
 
         return (TRUE);
 
@@ -545,7 +545,7 @@ AcpiUtDeleteObjectDesc (
     ACPI_FUNCTION_TRACE_PTR (UtDeleteObjectDesc, Object);
 
 
-    /* Object must be an ACPI_OPERAND_OBJECT  */
+    /* Object must be of type ACPI_OPERAND_OBJECT */
 
     if (ACPI_GET_DESCRIPTOR_TYPE (Object) != ACPI_DESC_TYPE_OPERAND)
     {

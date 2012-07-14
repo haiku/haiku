@@ -130,7 +130,7 @@ BStringField::SetString(const char* val)
 	fString = val;
 	fClippedString = "";
 	fWidth = 0;
-} 
+}
 
 
 const char*
@@ -158,7 +158,7 @@ void
 BStringField::SetClippedString(const char* val)
 {
 	fClippedString = val;
-} 
+}
 
 
 const char*
@@ -184,15 +184,17 @@ BStringColumn::DrawField(BField* _field, BRect rect, BView* parent)
 {
 	float width = rect.Width() - (2 * kTEXT_MARGIN);
 	BStringField* field = static_cast<BStringField*>(_field);
+	bool clipNeeded = width < field->Width();
 
-	if (width != field->Width()) {
+	if (clipNeeded) {
 		BString out_string(field->String());
 
 		parent->TruncateString(&out_string, fTruncate, width + 2);
 		field->SetClippedString(out_string.String());
 		field->SetWidth(width);
 	}
-	DrawString(field->ClippedString(), parent, rect);
+
+	DrawString(clipNeeded ? field->ClippedString() : field->String(), parent, rect);
 }
 
 
@@ -256,7 +258,7 @@ void
 BDateField::SetClippedString(const char* val)
 {
 	fClippedString = val;
-} 
+}
 
 
 const char*
@@ -643,7 +645,7 @@ BBitmapColumn::CompareFields(BField* /*field1*/, BField* /*field2*/)
 }
 
 
-bool 
+bool
 BBitmapColumn::AcceptsField(const BField *field) const
 {
 	return static_cast<bool>(dynamic_cast<const BBitmapField*>(field));

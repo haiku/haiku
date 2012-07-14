@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -252,7 +252,7 @@ AcpiExLoadTableOp (
     ACPI_FUNCTION_TRACE (ExLoadTableOp);
 
 
-    /* Validate lengths for the SignatureString, OEMIDString, OEMTableID */
+    /* Validate lengths for the Signature, OemId, and OemTableId strings */
 
     if ((Operand[0]->String.Length > ACPI_NAME_SIZE) ||
         (Operand[1]->String.Length > ACPI_OEM_ID_SIZE) ||
@@ -407,7 +407,7 @@ AcpiExRegionRead (
 
     for (i = 0; i < Length; i++)
     {
-        Status = AcpiEvAddressSpaceDispatch (ObjDesc, ACPI_READ,
+        Status = AcpiEvAddressSpaceDispatch (ObjDesc, NULL, ACPI_READ,
                     RegionOffset, 8, &Value);
         if (ACPI_FAILURE (Status))
         {

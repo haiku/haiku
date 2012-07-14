@@ -307,6 +307,31 @@ AcpiOsTableOverride(ACPI_TABLE_HEADER *existingTable,
 
 /******************************************************************************
  *
+ * FUNCTION:    AcpiOsPhysicalTableOverride
+ *
+ * PARAMETERS:  existingTable       - Header of current table (probably firmware)
+ *              newAddress          - Where new table address is returned
+ *                                    (Physical address)
+ *              newTableLength      - Where new table length is returned
+ *
+ * RETURN:      Status, address/length of new table. Null pointer returned
+ *              if no table is available to override.
+ *
+ * DESCRIPTION: Returns AE_SUPPORT, function not used in user space.
+ *
+ *****************************************************************************/
+
+ACPI_STATUS
+AcpiOsPhysicalTableOverride(ACPI_TABLE_HEADER *existingTable,
+	ACPI_PHYSICAL_ADDRESS *newAddress, UINT32 *newTableLength)
+{
+	DEBUG_FUNCTION();
+    return (AE_SUPPORT);
+}
+
+
+/******************************************************************************
+ *
  * FUNCTION:    AcpiOsRedirectOutput
  *
  * PARAMETERS:  destination         - An open file handle/pointer
@@ -363,7 +388,6 @@ void
 AcpiOsVprintf(const char *fmt, va_list args)
 {
 #ifndef _KERNEL_MODE
-	INT32 count = 0;
 	UINT8 flags;
 
 	flags = AcpiGbl_DbOutputFlags;
@@ -371,7 +395,7 @@ AcpiOsVprintf(const char *fmt, va_list args)
 		// Output is directable to either a file (if open) or the console
 		if (AcpiGbl_DebugFile) {
 			// Output file is open, send the output there
-			count = vfprintf(AcpiGbl_DebugFile, fmt, args);
+			vfprintf(AcpiGbl_DebugFile, fmt, args);
 		} else {
 			// No redirection, send output to console (once only!)
 			flags |= ACPI_DB_CONSOLE_OUTPUT;
@@ -379,7 +403,7 @@ AcpiOsVprintf(const char *fmt, va_list args)
 	}
 
 	if (flags & ACPI_DB_CONSOLE_OUTPUT) {
-		count = vfprintf(AcpiGbl_OutputFile, fmt, args);
+		vfprintf(AcpiGbl_OutputFile, fmt, args);
     }
 #else
 	static char outputBuffer[1024];
@@ -1018,7 +1042,7 @@ AcpiOsWritePort(ACPI_IO_ADDRESS address, UINT32 value, UINT32 width)
  *
  *****************************************************************************/
 ACPI_STATUS
-AcpiOsReadMemory(ACPI_PHYSICAL_ADDRESS address, UINT32 *value, UINT32 width)
+AcpiOsReadMemory(ACPI_PHYSICAL_ADDRESS address, UINT64 *value, UINT32 width)
 {
 #ifdef _KERNEL_MODE
 	if (vm_memcpy_from_physical(value, (addr_t)address, width / 8, false)
@@ -1046,7 +1070,7 @@ AcpiOsReadMemory(ACPI_PHYSICAL_ADDRESS address, UINT32 *value, UINT32 width)
  *
  *****************************************************************************/
 ACPI_STATUS
-AcpiOsWriteMemory(ACPI_PHYSICAL_ADDRESS address, UINT32 value, UINT32 width)
+AcpiOsWriteMemory(ACPI_PHYSICAL_ADDRESS address, UINT64 value, UINT32 width)
 {
 #ifdef _KERNEL_MODE
 	if (vm_memcpy_to_physical((addr_t)address, &value, width / 8, false)
@@ -1301,3 +1325,22 @@ AcpiOsReleaseMutex(ACPI_MUTEX handle)
 	mutex_unlock(handle);
 }
 
+
+/******************************************************************************
+ *
+ * FUNCTION:    AcpiOsWaitEventsComplete
+ *
+ * PARAMETERS:  None
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Wait for all asynchronous events to complete. This
+ *              implementation does nothing.
+ *
+ *****************************************************************************/
+void
+AcpiOsWaitEventsComplete()
+{
+    //TODO: FreeBSD See description.
+    return;
+}

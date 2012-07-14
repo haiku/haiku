@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -180,9 +180,9 @@
 #endif
 
 #ifdef ACPI_HELP_APP
-#define ACPI_DEBUG_OUTPUT
 #define ACPI_APPLICATION
 #define ACPI_SINGLE_THREADED
+#define ACPI_NO_ERROR_MESSAGES
 #endif
 
 /* Linkable ACPICA library */
@@ -225,9 +225,6 @@
 #elif defined(__NetBSD__)
 #include "acnetbsd.h"
 
-#elif (defined(__BEOS__) || defined(__HAIKU__))
-#include "achaiku.h"
-
 #elif defined(__sun)
 #include "acsolaris.h"
 
@@ -254,6 +251,9 @@
 
 #elif defined(_AED_EFI)
 #include "acefi.h"
+
+#elif defined(__HAIKU__)
+#include "achaiku.h"
 
 #else
 

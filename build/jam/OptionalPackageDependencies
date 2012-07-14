@@ -35,7 +35,7 @@ OptionalPackageDependencies SDLLibs : XiphLibs libmad libmikmod Libmng libmodplu
 OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
 OptionalPackageDependencies Transmission : LibEvent Curl OpenSSL LibIconv ;
 OptionalPackageDependencies Vim : GetText LibIconv ;
-OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite WebPositiveBookmarks ;
+OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite WebKit WebPositiveBookmarks ;
 OptionalPackageDependencies wpa_supplicant : OpenSSL ;
 OptionalPackageDependencies XZ-Utils : Tar ;
 

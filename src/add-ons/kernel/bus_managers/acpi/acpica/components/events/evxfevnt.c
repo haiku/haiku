@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,6 +124,7 @@
         ACPI_MODULE_NAME    ("evxfevnt")
 
 
+#if (!ACPI_REDUCED_HARDWARE) /* Entire module */
 /*******************************************************************************
  *
  * FUNCTION:    AcpiEnable
@@ -449,4 +450,4 @@ AcpiGetEventStatus (
 
 ACPI_EXPORT_SYMBOL (AcpiGetEventStatus)
 
-
+#endif /* !ACPI_REDUCED_HARDWARE */

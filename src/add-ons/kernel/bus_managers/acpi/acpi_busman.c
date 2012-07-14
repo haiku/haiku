@@ -670,13 +670,13 @@ prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 
 
 status_t
-enter_sleep_state(uint8 state)
+enter_sleep_state(uint8 state, uint8 flags)
 {
 	ACPI_STATUS status;
 
-	TRACE("enter_sleep_state %d\n", state);
+	TRACE("enter_sleep_state %d with flags %d\n", state, flags);
 
-	status = AcpiEnterSleepState(state);
+	status = AcpiEnterSleepState(state, flags);
 	if (status != AE_OK)
 		return B_ERROR;
 

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +118,7 @@
 
 
 extern const UINT8                      AcpiGbl_ResourceAmlSizes[];
+extern const UINT8                      AcpiGbl_ResourceAmlSerialBusSizes[];
 
 /* Strings used by the disassembler and debugger resource dump routines */
 
@@ -141,6 +142,22 @@ extern const char                       *AcpiGbl_SizDecode[];
 extern const char                       *AcpiGbl_TrsDecode[];
 extern const char                       *AcpiGbl_TtpDecode[];
 extern const char                       *AcpiGbl_TypDecode[];
+extern const char                       *AcpiGbl_PpcDecode[];
+extern const char                       *AcpiGbl_IorDecode[];
+extern const char                       *AcpiGbl_DtsDecode[];
+extern const char                       *AcpiGbl_CtDecode[];
+extern const char                       *AcpiGbl_SbtDecode[];
+extern const char                       *AcpiGbl_AmDecode[];
+extern const char                       *AcpiGbl_SmDecode[];
+extern const char                       *AcpiGbl_WmDecode[];
+extern const char                       *AcpiGbl_CphDecode[];
+extern const char                       *AcpiGbl_CpoDecode[];
+extern const char                       *AcpiGbl_DpDecode[];
+extern const char                       *AcpiGbl_EdDecode[];
+extern const char                       *AcpiGbl_BpbDecode[];
+extern const char                       *AcpiGbl_SbDecode[];
+extern const char                       *AcpiGbl_FcDecode[];
+extern const char                       *AcpiGbl_PtDecode[];
 #endif
 
 /* Types for Resource descriptor entries */
@@ -184,7 +201,6 @@ typedef struct acpi_pkg_info
 #define DB_WORD_DISPLAY     2
 #define DB_DWORD_DISPLAY    4
 #define DB_QWORD_DISPLAY    8
-
 
 /*
  * utglobal - Global data structures and procedures
@@ -485,7 +501,7 @@ AcpiUtDumpBuffer (
     UINT8                   *Buffer,
     UINT32                  Count,
     UINT32                  Display,
-    UINT32                  componentId);
+    UINT32                  ComponentId);
 
 void
 AcpiUtDumpBuffer2 (
@@ -759,6 +775,10 @@ AcpiUtShortDivide (
 /*
  * utmisc
  */
+void
+UtConvertBackslashes (
+    char                    *Pathname);
+
 const char *
 AcpiUtValidateException (
     ACPI_STATUS             Status);
@@ -793,6 +813,11 @@ AcpiUtStrupr (
 void
 AcpiUtStrlwr (
     char                    *SrcString);
+
+int
+AcpiUtStricmp (
+    char                    *String1,
+    char                    *String2);
 
 void
 AcpiUtPrintString (
@@ -969,6 +994,31 @@ AcpiUtCreateList (
 
 #endif /* ACPI_DBG_TRACK_ALLOCATIONS */
 
+/*
+ * utaddress - address range check
+ */
+ACPI_STATUS
+AcpiUtAddAddressRange (
+    ACPI_ADR_SPACE_TYPE     SpaceId,
+    ACPI_PHYSICAL_ADDRESS   Address,
+    UINT32                  Length,
+    ACPI_NAMESPACE_NODE     *RegionNode);
+
+void
+AcpiUtRemoveAddressRange (
+    ACPI_ADR_SPACE_TYPE     SpaceId,
+    ACPI_NAMESPACE_NODE     *RegionNode);
+
+UINT32
+AcpiUtCheckAddressRange (
+    ACPI_ADR_SPACE_TYPE     SpaceId,
+    ACPI_PHYSICAL_ADDRESS   Address,
+    UINT32                  Length,
+    BOOLEAN                 Warn);
+
+void
+AcpiUtDeleteAddressLists (
+    void);
 
 /*
  * utxferror - various error/warning output functions

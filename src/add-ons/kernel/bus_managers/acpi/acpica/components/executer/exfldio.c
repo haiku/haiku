@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2011, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -170,6 +170,7 @@ AcpiExSetupRegion (
 {
     ACPI_STATUS             Status = AE_OK;
     ACPI_OPERAND_OBJECT     *RgnDesc;
+    UINT8                   SpaceId;
 
 
     ACPI_FUNCTION_TRACE_U32 (ExSetupRegion, FieldDatumByteOffset);
@@ -188,6 +189,16 @@ AcpiExSetupRegion (
         return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
     }
 
+    SpaceId = RgnDesc->Region.SpaceId;
+
+    /* Validate the Space ID */
+
+    if (!AcpiIsValidSpaceId (SpaceId))
+    {
+        ACPI_ERROR ((AE_INFO, "Invalid/unknown Address Space ID: 0x%2.2X", SpaceId));
+        return_ACPI_STATUS (AE_AML_INVALID_SPACE_ID);
+    }
+
     /*
      * If the Region Address and Length have not been previously evaluated,
      * evaluate them now and save the results.
@@ -202,11 +213,12 @@ AcpiExSetupRegion (
     }
 
     /*
-     * Exit now for SMBus or IPMI address space, it has a non-linear
+     * Exit now for SMBus, GSBus or IPMI address space, it has a non-linear
      * address space and the request cannot be directly validated
      */
-    if (RgnDesc->Region.SpaceId == ACPI_ADR_SPACE_SMBUS ||
-        RgnDesc->Region.SpaceId == ACPI_ADR_SPACE_IPMI)
+    if (SpaceId == ACPI_ADR_SPACE_SMBUS ||
+        SpaceId == ACPI_ADR_SPACE_GSBUS ||
+        SpaceId == ACPI_ADR_SPACE_IPMI)
     {
         /* SMBus or IPMI has a non-linear address space */
 
@@ -362,7 +374,8 @@ AcpiExAccessRegion (
 
     /* Invoke the appropriate AddressSpace/OpRegion handler */
 
-    Status = AcpiEvAddressSpaceDispatch (RgnDesc, Function, RegionOffset,
+    Status = AcpiEvAddressSpaceDispatch (RgnDesc, ObjDesc,
+                Function, RegionOffset,
                 ACPI_MUL_8 (ObjDesc->CommonField.AccessByteWidth), Value);
 
     if (ACPI_FAILURE (Status))
@@ -425,6 +438,11 @@ AcpiExRegisterOverflow (
          * The Value is larger than the maximum value that can fit into
          * the register.
          */
+        ACPI_ERROR ((AE_INFO,
+            "Index value 0x%8.8X%8.8X overflows field width 0x%X",
+            ACPI_FORMAT_UINT64 (Value),
+            ObjDesc->CommonField.BitLength));
+
         return (TRUE);
     }
 
