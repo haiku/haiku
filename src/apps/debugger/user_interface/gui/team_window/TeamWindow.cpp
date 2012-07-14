@@ -238,6 +238,7 @@ TeamWindow::MessageReceived(BMessage* message)
 		{
 			_SaveInspectorSettings(CurrentMessage());
 			fInspectorWindow = NULL;
+			break;
 
 		}
 		case B_REFS_RECEIVED:
