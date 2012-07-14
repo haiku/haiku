@@ -22,59 +22,56 @@
 #include "PoorManAdvancedView.h"
 
 
-
-
-class PoorManPreferencesWindow: public BWindow
-{
-private:
-
-				PoorManView	*	prefView;
-				PoorManView	*	buttonView;
-
-				// ------------------------------------------------
-				// Tabs
-				BTabView	*	prefTabView;
-				BTab		*	siteTab;
-				BTab		*	loggingTab;
-				BTab		*	advancedTab;
-				// Tab Views
-				PoorManSiteView		*	siteView;
-				PoorManLoggingView	*	loggingView;
-				PoorManAdvancedView	*	advancedView;
-
-				// ------------------------------------------------
-				// Buttons
-				BButton		*	cancelButton;
-				BButton		*	doneButton;
-
-				// ------------------------------------------------
-				// FilePanels
-				BFilePanel	*	webDirFilePanel;
-				BFilePanel	*	logFilePanel;
-
-
-				// ------------------------------------------------
-				// temporary preference variables used to save and
-				// set the application to
-				// site tab
-				char		web_directory[B_FILE_NAME_LENGTH];
-				char		index_file_name[64];
-				bool		send_dir;
-				// logging tab
-				bool		log_to_console;
-				bool		log_to_file;
-				char		log_file_name[B_FILE_NAME_LENGTH];
-				// advanced tab
-				int32		max_connections;
+class PoorManPreferencesWindow: public BWindow {
 public:
-				PoorManPreferencesWindow(BRect frame, char * name);
-				~PoorManPreferencesWindow();
+							PoorManPreferencesWindow(BRect frame, char* name);
+							~PoorManPreferencesWindow();
 
-virtual	void	MessageReceived(BMessage * message);
+	virtual	void			MessageReceived(BMessage* message);
 
-		void	ShowWebDirFilePanel();
-		void	SelectWebDir(BMessage * message);
-		void	CreateLogFile(BMessage * message);
+			void			ShowWebDirFilePanel();
+			void			SelectWebDir(BMessage* message);
+			void			CreateLogFile(BMessage* message);
+
+private:
+			PoorManView*	fPrefView;
+			PoorManView*	fButtonView;
+
+			// ------------------------------------------------
+			// Tabs
+			BTabView*		fPrefTabView;
+			BTab*			fSiteTab;
+			BTab*			fLoggingTab;
+			BTab*			fAdvancedTab;
+			// Tab Views
+			PoorManSiteView*		fSiteView;
+			PoorManLoggingView*		fLoggingView;
+			PoorManAdvancedView*	fAdvancedView;
+
+			// ------------------------------------------------
+			// Buttons
+			BButton*		fCancelButton;
+			BButton*		fDoneButton;
+
+			// ------------------------------------------------
+			// FilePanels
+			BFilePanel*		fWebDirFilePanel;
+			BFilePanel*		fLogFilePanel;
+
+
+				// ------------------------------------------------
+			// temporary preference variables used to save and
+			// set the application to
+			// site tab
+			char			fWebDirectory[B_FILE_NAME_LENGTH];
+			char			fIndexFileName[64];
+			bool			fSendDir;
+			// logging tab
+			bool			flogToConsole;
+			bool			fLogToFile;
+			char			fLogFileName[B_FILE_NAME_LENGTH];
+			// advanced tab
+			int32			fMaxConnections;
 };
 
 #endif

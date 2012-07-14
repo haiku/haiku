@@ -11,31 +11,19 @@
 #include <stdio.h>
 
 
-StatusSlider::StatusSlider   (BRect frame,
-				const char *name,
-				const char *label,
-				char *statusPrefix,
-				BMessage *message,
-				int32 minValue,
-				int32 maxValue)
-			
-			:	BSlider(frame,
-						name,
-						label,
-						message,
-						minValue,
-						maxValue
-						), 
-				StatusPrefix(statusPrefix)
+StatusSlider::StatusSlider(const char* name, const char* label,
+	char* statusPrefix, BMessage* message, int32 minValue, int32 maxValue)
+	:
+	BSlider(name, label, message, minValue, maxValue, B_HORIZONTAL), 
+	fStatusPrefix(statusPrefix)
 {
-	temp = str; 
+	fTemp = fStr; 
 }
 				
 const char*
 StatusSlider::UpdateText() const
 {
-	
-	sprintf(temp, "%ld %s", Value(), StatusPrefix);
-	
-	return temp;
+	sprintf(fTemp, "%ld %s", Value(), fStatusPrefix);
+
+	return fTemp;
 }
