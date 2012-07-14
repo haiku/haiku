@@ -51,16 +51,6 @@ arch_commpage_init_post_cpus(void)
 }
 
 
-void
-arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
-	void (*function)(void*), void* parameter)
-{
-	// To be implemented in asm, not here.
-
-	function(parameter);
-}
-
-
 // The software breakpoint instruction (int3).
 const uint8 kX86SoftwareBreakpoint[1] = { 0xcc };
 
