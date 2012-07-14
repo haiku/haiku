@@ -251,9 +251,6 @@ InspectorWindow::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
-		{
-			break;
-		}
 		default:
 		{
 			BWindow::MessageReceived(msg);
