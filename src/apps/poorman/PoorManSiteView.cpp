@@ -6,7 +6,7 @@
  */
  
 #include <Box.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 
 #include "constants.h"
 #include "PoorManSiteView.h"
@@ -24,7 +24,7 @@ PoorManSiteView::PoorManSiteView(const char* name)
 	// Web Site Location BBox
 	BBox* webSiteLocation = new BBox("Web Location");
 	webSiteLocation->SetLabel(STR_BBX_LOCATION);
-	
+
 	// Web Site Options BBox
 	BBox* webSiteOptions = new BBox("Web Options");
 	webSiteOptions->SetLabel(STR_BBX_OPTIONS);
@@ -47,22 +47,32 @@ PoorManSiteView::PoorManSiteView(const char* name)
 	fIndexFileName = new BTextControl("Index File Name", STR_TXT_INDEX, NULL);
 	SetIndexFileName(win->IndexFileName());
 	
-	webSiteOptions->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-			.Add(fSendDir)
-			.AddGlue())
-		.SetInsets(5, 5, 5, 5));
 	
-	webSiteLocation->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(fWebDir)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-			.AddGlue()
-			.Add(fSelectWebDir))
-		.Add(fIndexFileName)
-		.SetInsets(5, 5, 5, 5));
+	BGroupLayout* webSiteLocationLayout = new BGroupLayout(B_VERTICAL, 0);
+	webSiteLocation->SetLayout(webSiteLocationLayout);
 	
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(webSiteLocation)
-		.Add(webSiteOptions)
-		.SetInsets(5, 5, 5, 5));
+	BGroupLayout* webSiteOptionsLayout = new BGroupLayout(B_VERTICAL, 0);
+	webSiteOptions->SetLayout(webSiteOptionsLayout);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_ITEM_INSETS)
+		.AddGroup(webSiteLocationLayout)
+			.SetInsets(B_USE_ITEM_INSETS)
+			.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+				.SetInsets(0, B_USE_ITEM_INSETS, 0, 0)
+				.AddTextControl(fWebDir, 0, 0, B_ALIGN_LEFT, 1, 2)
+				.Add(fSelectWebDir, 2, 1)
+				.AddTextControl(fIndexFileName, 0, 2, B_ALIGN_LEFT, 1, 2)
+				.SetColumnWeight(1, 10.f)
+				.End()
+			.End()
+		.AddGroup(webSiteOptionsLayout)
+			.SetInsets(B_USE_ITEM_INSETS)
+			.AddStrut(B_USE_ITEM_SPACING)
+			.AddGroup(B_HORIZONTAL)
+				.SetInsets(0)
+				.Add(fSendDir)
+				.AddGlue()
+				.End()
+			.AddGlue();
 }

@@ -7,7 +7,7 @@
  
 #include <Box.h>
 #include <Catalog.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 
 #include "constants.h"
@@ -26,8 +26,6 @@ PoorManLoggingView::PoorManLoggingView(const char* name)
 {
 	PoorManWindow* win;
 	win = ((PoorManApplication*)be_app)->GetPoorManWindow();
-	
-	SetLayout(new BGroupLayout(B_VERTICAL));
 	
 	BBox* consoleLogging = new BBox(B_TRANSLATE("Console Logging"));
 	consoleLogging->SetLabel(STR_BBX_CONSOLE_LOGGING);
@@ -57,24 +55,28 @@ PoorManLoggingView::PoorManLoggingView(const char* name)
 	fCreateLogFile = new BButton(B_TRANSLATE("Create Log File"),
 		STR_BTN_CREATE_LOG_FILE, new BMessage(MSG_PREF_LOG_BTN_CREATE_FILE));
 
-	consoleLogging->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-			.Add(fLogConsole)
-			.AddGlue())
-		.SetInsets(5, 5, 5, 5));
-		
-	fileLogging->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-			.Add(fLogFile)
-			.AddGlue())
-		.Add(fLogFileName)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-			.AddGlue()
-			.Add(fCreateLogFile))
-		.SetInsets(5, 5, 5, 5));
+	BGroupLayout* consoleLoggingLayout = new BGroupLayout(B_VERTICAL, 0);
+	consoleLogging->SetLayout(consoleLoggingLayout);
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(consoleLogging)
-		.Add(fileLogging)
-		.SetInsets(5, 5, 5, 5));
+	BGroupLayout* fileLoggingLayout = new BGroupLayout(B_VERTICAL,
+		B_USE_SMALL_SPACING);
+	fileLogging->SetLayout(fileLoggingLayout);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_ITEM_INSETS)
+		.AddGroup(consoleLoggingLayout)
+			.SetInsets(B_USE_ITEM_INSETS)
+			.AddGroup(B_HORIZONTAL)
+				.SetInsets(0, B_USE_ITEM_INSETS, 0, 0)
+				.Add(fLogConsole)
+				.AddGlue()
+				.End()
+			.End()
+		.AddGroup(fileLoggingLayout)
+			.SetInsets(B_USE_ITEM_INSETS)
+			.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+				.SetInsets(0, B_USE_ITEM_INSETS, 0, 0)
+				.Add(fLogFile, 0, 0)
+				.AddTextControl(fLogFileName, 0, 1, B_ALIGN_LEFT, 1, 2)
+				.Add(fCreateLogFile, 2, 2);
 }

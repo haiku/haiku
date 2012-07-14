@@ -9,10 +9,8 @@
 #include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
-#include <GroupLayoutBuilder.h>
-#include <GroupView.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
-#include <SpaceLayoutItem.h>
 #include <Window.h>
 
 #include "constants.h"
@@ -32,8 +30,6 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 	fWebDirFilePanel(NULL),
 	fLogFilePanel(NULL)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	fCancelButton = new BButton("Cancel Button", B_TRANSLATE("Cancel"),
 		new BMessage(MSG_PREF_BTN_CANCEL));
 	fDoneButton = new BButton("Done Button", B_TRANSLATE("Done"),
@@ -80,13 +76,14 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 	change_title = fLogFilePanel->Window();
 	change_title->SetTitle(STR_FILEPANEL_CREATE_LOG_FILE);
 	
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_WINDOW_INSETS)
 		.Add(fPrefTabView)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(fCancelButton)
-			.Add(fDoneButton))
-		.SetInsets(5, 5, 5, 5));
+			.Add(fDoneButton);
 }
 
 

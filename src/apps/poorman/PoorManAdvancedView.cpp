@@ -7,7 +7,7 @@
 
 #include <Box.h>
 #include <Catalog.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 
 #include "constants.h"
@@ -27,8 +27,6 @@ PoorManAdvancedView::PoorManAdvancedView(const char* name)
 	PoorManWindow* win;
 	win = ((PoorManApplication*)be_app)->GetPoorManWindow();
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	BBox* connectionOptions = new BBox(B_TRANSLATE("Connections"));
 	connectionOptions->SetLabel(STR_BBX_CONNECTION);
 
@@ -40,14 +38,18 @@ PoorManAdvancedView::PoorManAdvancedView(const char* name)
 	fMaxConnections->SetLimitLabels("1", "200");
 	SetMaxSimutaneousConnections(win->MaxConnections());
 	
-	connectionOptions->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(fMaxConnections)
-		.SetInsets(5, 5, 5, 5));
-		
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(connectionOptions)
+
+	BGroupLayout* connectionOptionsLayout = new BGroupLayout(B_VERTICAL, 0);
+	connectionOptions->SetLayout(connectionOptionsLayout);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.AddGroup(connectionOptionsLayout)
+			.SetInsets(B_USE_ITEM_INSETS)
+			.AddStrut(B_USE_ITEM_SPACING)
+			.Add(fMaxConnections)
+			.End()
 		.AddGlue()
-		.SetInsets(5, 5, 5, 5));
+		.SetInsets(B_USE_ITEM_INSETS);
 }
 
 void

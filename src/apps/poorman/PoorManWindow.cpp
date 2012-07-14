@@ -17,7 +17,7 @@
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -73,8 +73,6 @@ PoorManWindow::PoorManWindow(BRect frame)
 	SetSizeLimits(318, 1600, 53, 1200); 
 	// limit the size of the size of the window
 	
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	// -----------------------------------------------------------------
 	// Three Labels 
 	
@@ -137,18 +135,21 @@ PoorManWindow::PoorManWindow(BRect frame)
 	change_title = fSaveConsoleSelectionFilePanel->Window();
 	change_title->SetTitle(STR_FILEPANEL_SAVE_CONSOLE_SELECTION);
 	
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0)
 		.Add(fFileMenuBar)
-		.Add(BGroupLayoutBuilder(B_VERTICAL, 5)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+			.SetInsets(B_USE_WINDOW_INSETS)
+			.AddGroup(B_HORIZONTAL)
 				.Add(fStatusView)
 				.AddGlue()
-				.Add(fHitsView))
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+				.Add(fHitsView)
+				.End()
+			.AddGroup(B_HORIZONTAL)
 				.Add(fDirView)
-				.AddGlue())
-			.Add(fScrollView)
-		.SetInsets(10, 10, 10, 10)));
+				.AddGlue()
+				.End()
+			.Add(fScrollView);
 	
 	pthread_rwlock_init(&fLogFileLock, NULL);
 }
