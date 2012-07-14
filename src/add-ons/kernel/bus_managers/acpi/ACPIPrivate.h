@@ -3,8 +3,8 @@
  * Copyright 2006, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef __ACPI_PRIV_H__
-#define __ACPI_PRIV_H__
+#ifndef _ACPI_PRIVATE_H
+#define _ACPI_PRIVATE_H
 
 
 #include <sys/cdefs.h>
@@ -227,4 +227,4 @@ status_t get_table(const char* signature, uint32 instance, void** tableHeader);
 __END_DECLS
 
 
-#endif	/* __ACPI_PRIV_H__ */
+#endif	/* _ACPI_PRIVATE_H */
