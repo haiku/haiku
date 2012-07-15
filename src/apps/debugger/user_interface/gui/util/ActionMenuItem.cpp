@@ -38,6 +38,7 @@ ActionMenuItem::~ActionMenuItem()
 void
 ActionMenuItem::PrepareToShow(BLooper* parentLooper, BHandler* targetHandler)
 {
+	SetTarget(targetHandler);
 }
 
 
