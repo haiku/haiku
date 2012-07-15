@@ -11,6 +11,7 @@
 #include "table/TreeTable.h"
 
 
+class ActionMenuItem;
 class CpuState;
 class SettingsMenu;
 class StackFrame;
@@ -61,6 +62,7 @@ private:
 			class VariableTableModel;
 			class ContextMenu;
 			class TableCellContextMenuTracker;
+			typedef BObjectList<ActionMenuItem> ContextActionList;
 
 private:
 			void				_Init();

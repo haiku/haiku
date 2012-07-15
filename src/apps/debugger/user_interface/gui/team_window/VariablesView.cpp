@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +19,7 @@
 
 #include "table/TableColumns.h"
 
+#include "ActionMenuItem.h"
 #include "Architecture.h"
 #include "FunctionID.h"
 #include "FunctionInstance.h"
@@ -487,7 +488,9 @@ public:
 	}
 
 	status_t Init(Settings* rendererSettings,
-		SettingsMenu* rendererSettingsMenu)
+		SettingsMenu* rendererSettingsMenu,
+		ContextActionList* preSettingsActions = NULL,
+		ContextActionList* postSettingsActions = NULL)
 	{
 		fRendererSettings = rendererSettings;
 		fRendererSettings->AcquireReference();
@@ -500,9 +503,22 @@ public:
 		if (fContextMenu == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = fRendererSettingsMenu->AddToMenu(fContextMenu, 0);
+		status_t error = B_OK;
+		if (preSettingsActions != NULL) {
+			error = _AddActionItems(preSettingsActions);
+			if (error != B_OK)
+				return error;
+		}
+
+		error = fRendererSettingsMenu->AddToMenu(fContextMenu, 0);
 		if (error != B_OK)
 			return error;
+
+		if (postSettingsActions != NULL) {
+			error = _AddActionItems(postSettingsActions);
+			if (error != B_OK)
+				return error;
+		}
 
 		AutoLocker<Settings> settingsLocker(fRendererSettings);
 		fRendererSettings->AddListener(this);
@@ -515,6 +531,13 @@ public:
 	void ShowMenu(BPoint screenWhere)
 	{
 		fRendererSettingsMenu->PrepareToShow(fParentLooper);
+
+		for (int32 i = 0; i < fContextMenu->CountItems(); i++) {
+			ActionMenuItem* item = dynamic_cast<ActionMenuItem*>(
+				fContextMenu->ItemAt(i));
+			if (item != NULL)
+				item->PrepareToShow(fParentLooper, fContextMenu);
+		}
 
 		fMenuPreparedToShow = true;
 
@@ -529,6 +552,15 @@ public:
 
 		if (fMenuPreparedToShow) {
 			stillActive = fRendererSettingsMenu->Finish(fParentLooper, force);
+			for (int32 i = 0; i < fContextMenu->CountItems(); i++) {
+				ActionMenuItem* item = dynamic_cast<ActionMenuItem*>(
+					fContextMenu->ItemAt(i));
+				if (item != NULL) {
+					stillActive |= item->Finish(fParentLooper, fContextMenu,
+						force);
+				}
+			}
+
 			fMenuPreparedToShow = stillActive;
 		}
 
@@ -557,6 +589,24 @@ private:
 			|| fParent.SendMessage(&message) != B_OK) {
 			fNode->ReleaseReference();
 		}
+	}
+
+	status_t _AddActionItems(ContextActionList* actions)
+	{
+		if (fContextMenu == NULL)
+			return B_BAD_VALUE;
+
+		int32 index = fContextMenu->CountItems();
+		for (int32 i = 0; ActionMenuItem* item = actions->ItemAt(i); i++) {
+			if (!fContextMenu->AddItem(item, index + i)) {
+				for (i--; i >= 0; i--)
+					fContextMenu->RemoveItem(fContextMenu->ItemAt(index + i));
+
+				return B_NO_MEMORY;
+			}
+		}
+
+		return B_OK;
 	}
 
 private:
