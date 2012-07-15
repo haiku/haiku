@@ -2697,6 +2697,7 @@ DebugInfoEntryFactory::CreateDebugInfoEntry(uint16 tag, DebugInfoEntry*& _entry)
 			entry = new(std::nothrow) DIESharedType;
 			break;
 		default:
+			return B_ENTRY_NOT_FOUND;
 			break;
 	}
 

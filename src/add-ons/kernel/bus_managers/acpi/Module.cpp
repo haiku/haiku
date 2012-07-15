@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "acpi_priv.h"
+#include "ACPIPrivate.h"
 
 #include <dpc.h>
 #include <PCI.h>
@@ -126,7 +126,7 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 static status_t
 acpi_module_register_child_devices(void* cookie)
 {
-	device_node* node = cookie;
+	device_node* node = (device_node*)cookie;
 
 	status_t status = gDeviceManager->publish_device(node, "acpi/namespace",
 		ACPI_NS_DUMP_DEVICE_MODULE_NAME);

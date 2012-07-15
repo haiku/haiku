@@ -200,12 +200,12 @@ SEARCH on [ FGristFiles $(tables_src) ] = [ FDirName $(HAIKU_TOP) src add-ons ke
 SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components utilities ] ;
 
 KernelAddon acpi :
-	oshaiku.cpp
-	acpi_busman.c
-	acpi_module.c
-	acpi_device.c
-	acpi_ns_dump.cpp
-	acpi_embedded_controller.cpp
+	ACPICAHaiku.cpp
+	BusManager.cpp
+	Module.cpp
+	Device.cpp
+	NamespaceDump.cpp
+	EmbeddedController.cpp
 	SmallResourceData.cpp
 	:
 	libacpi_ca.a

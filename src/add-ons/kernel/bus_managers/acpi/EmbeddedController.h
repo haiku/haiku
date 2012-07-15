@@ -44,7 +44,7 @@ extern "C" {
 #	include "accommon.h"
 #	include "acnamesp.h"
 #	include "actypes.h"
-#	include "acpi_priv.h"
+#	include "ACPIPrivate.h"
 }
 
 

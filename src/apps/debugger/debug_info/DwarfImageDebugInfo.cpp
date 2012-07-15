@@ -693,10 +693,12 @@ DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 	int32 statementLine = -1;
 	int32 statementColumn = -1;
 	while (program.GetNextRow(state)) {
-		bool isOurFile = state.file == fileIndex;
+		// skip statements of other files
+		if (state.file != fileIndex)
+			continue;
 
 		if (statementAddress != 0
-			&& (!isOurFile || state.isStatement || state.isSequenceEnd)) {
+			&& (state.isStatement || state.isSequenceEnd)) {
 			target_addr_t endAddress = state.address;
 			if (address >= statementAddress && address < endAddress) {
 				ContiguousStatement* statement = new(std::nothrow)
@@ -713,10 +715,6 @@ DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 
 			statementAddress = 0;
 		}
-
-		// skip statements of other files
-		if (!isOurFile)
-			continue;
 
 		if (state.isStatement) {
 			statementAddress = state.address;

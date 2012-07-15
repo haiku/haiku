@@ -28,7 +28,7 @@
  */
 
 
-#include "acpi_embedded_controller.h"
+#include "EmbeddedController.h"
 
 #include <kernel.h>
 #include <stdio.h>
@@ -555,7 +555,7 @@ EcGpeQueryHandler(void* context)
 	if (status != B_OK) {
 		TRACE("evaluation of query method %s failed\n", qxx);
 	}
-	
+
     // Reenable runtime GPE if its execution was deferred.
 	if (sci_enqueued) {
 		status = sc->ec_acpi_module->finish_gpe(sc->ec_gpehandle, sc->ec_gpebit);
