@@ -200,6 +200,7 @@ Application Debugger :
 	VariablesView.cpp
 
 	# user_interface/gui/util
+	ActionMenuItem.cpp
 	GUISettingsUtils.cpp
 	SettingsMenu.cpp
 	TargetAddressTableColumn.cpp
