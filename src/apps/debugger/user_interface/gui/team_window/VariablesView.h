@@ -68,8 +68,9 @@ private:
 			void				_Init();
 
 			void				_RequestNodeValue(ModelNode* node);
+			status_t			_GetContextActionsForNode(ModelNode* node,
+									ContextActionList* actions);
 			void				_FinishContextMenu(bool force);
-
 			void				_SaveViewState() const;
 			void				_RestoreViewState();
 			status_t			_AddViewStateDescendentNodeInfos(
