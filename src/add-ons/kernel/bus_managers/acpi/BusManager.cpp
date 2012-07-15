@@ -678,7 +678,10 @@ enter_sleep_state(uint8 state, uint8 flags)
 
 	TRACE("enter_sleep_state %d with flags %d\n", state, flags);
 
+	cpu_status cpu = disable_interrupts();
 	status = AcpiEnterSleepState(state, flags);
+	restore_interrupts(cpu);
+	panic("AcpiEnterSleepState should not return.");
 	if (status != AE_OK)
 		return B_ERROR;
 
