@@ -145,6 +145,93 @@ scale2x(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight,
 }
 
 
+static void
+scale3x(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight,
+	int32 srcBPR, int32 dstBPR)
+{
+	/*
+	 * This implements the AdvanceMAME Scale3x algorithm found on:
+	 * http://scale2x.sourceforge.net/
+	 * 
+	 * It is an incredibly simple and powerful image tripling routine that does
+	 * an astonishing job of tripling game graphic data while interpolating out
+	 * the jaggies.
+	 *
+	 * Derived from the (public domain) SDL version of the library by Pete
+	 * Shinners
+	 */
+
+	// Assume that both src and dst are 4 BPP (B_RGBA32)
+	for(int32 y = 0; y < srcHeight; ++y)
+	{
+		for(int32 x = 0; x < srcWidth; ++x)
+		{
+			uint32 a = *(uint32*)(srcBits + (MAX(0, y - 1) * srcBPR)
+				+ (4 * MAX(0, x - 1)));
+			uint32 b = *(uint32*)(srcBits + (MAX(0, y - 1) * srcBPR)
+				+ (4 * x));
+			uint32 c = *(uint32*)(srcBits + (MAX(0, y - 1) * srcBPR)
+				+ (4 * MIN(srcWidth - 1, x + 1)));
+			uint32 d = *(uint32*)(srcBits + (y * srcBPR)
+				+ (4 * MAX(0, x - 1)));
+			uint32 e = *(uint32*)(srcBits + (y * srcBPR)
+				+ (4 * x));
+			uint32 f = *(uint32*)(srcBits + (y * srcBPR)
+				+ (4 * MIN(srcWidth - 1,x + 1)));
+			uint32 g = *(uint32*)(srcBits + (MIN(srcHeight - 1, y + 1)
+				* srcBPR) + (4 * MAX(0, x - 1)));
+			uint32 h = *(uint32*)(srcBits + (MIN(srcHeight - 1, y + 1)
+				* srcBPR) + (4 * x));
+			uint32 i = *(uint32*)(srcBits + (MIN(srcHeight - 1, y + 1)
+				* srcBPR) + (4 * MIN(srcWidth - 1, x + 1)));
+
+			uint32 e0 = d == b && b != f && d != h ? d : e;
+			uint32 e1 = (d == b && b != f && d != h && e != c)
+				|| (b == f && b != d && f != h && e != a) ? b : e;
+			uint32 e2 = b == f && b != d && f != h ? f : e;
+			uint32 e3 = (d == b && b != f && d != h && e != g)
+				|| (d == b && b != f && d != h && e != a) ? d : e;
+			uint32 e4 = e;
+			uint32 e5 = (b == f && b != d && f != h && e != i)
+				|| (h == f && d != h && b != f && e != c) ? f : e;
+			uint32 e6 = d == h && d != b && h != f ? d : e;
+			uint32 e7 = (d == h && d != b && h != f && e != i)
+				|| (h == f && d != h && b != f && e != g) ? h : e;
+			uint32 e8 = h == f && d != h && b != f ? f : e;
+
+			*(uint32*)(dstBits + y * 3 * dstBPR + x * 3 * 4) = e0;
+			*(uint32*)(dstBits + y * 3 * dstBPR + (x * 3 + 1) * 4) = e1;
+			*(uint32*)(dstBits + y * 3 * dstBPR + (x * 3 + 2) * 4) = e2;
+			*(uint32*)(dstBits + (y * 3 + 1) * dstBPR + x * 3 * 4) = e3;
+			*(uint32*)(dstBits + (y * 3 + 1) * dstBPR + (x * 3 + 1) * 4) = e4;
+			*(uint32*)(dstBits + (y * 3 + 1) * dstBPR + (x * 3 + 2) * 4) = e5;
+			*(uint32*)(dstBits + (y * 3 + 2) * dstBPR + x * 3 * 4) = e6;
+			*(uint32*)(dstBits + (y * 3 + 2) * dstBPR + (x * 3 + 1) * 4) = e7;
+			*(uint32*)(dstBits + (y * 3 + 2) * dstBPR + (x * 3 + 2) * 4) = e8;
+		}
+	}
+}
+
+
+static void
+scale4x(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight,
+	int32 srcBPR, int32 dstBPR)
+{
+	// scale4x is just scale2x twice
+	BBitmap* tmp = new BBitmap(BRect(0, 0, srcWidth * 2 - 1,
+		srcHeight * 2 - 1), B_RGBA32);
+	uint8* tmpBits = (uint8*)tmp->Bits();
+	int32 tmpBPR = tmp->BytesPerRow();
+
+	scale2x(srcBits, tmpBits, srcWidth, srcHeight, srcBPR, tmpBPR);
+	scale2x(tmpBits, dstBits, srcWidth * 2, srcHeight * 2, tmpBPR, dstBPR);
+
+	delete tmp;
+}
+
+
+
+
 //	#pragma mark -
 
 
@@ -535,6 +622,24 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 			uint8* convertedBits = (uint8*)converted->Bits();
 			int32 convertedBPR = converted->BytesPerRow();
 			scale2x(convertedBits, dst, width, height, convertedBPR, dstBPR);
+			delete converted;
+		} else if (dstWidth == 3 * width && dstHeight == 3 * height) {
+			// scale using the scale3x algorithm
+			BBitmap* converted = new BBitmap(BRect(0, 0, width - 1, height - 1),
+				result->ColorSpace());
+			converted->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
+			uint8* convertedBits = (uint8*)converted->Bits();
+			int32 convertedBPR = converted->BytesPerRow();
+			scale3x(convertedBits, dst, width, height, convertedBPR, dstBPR);
+			delete converted;
+		} else if (dstWidth == 4 * width && dstHeight == 4 * height) {
+			// scale using the scale4x algorithm
+			BBitmap* converted = new BBitmap(BRect(0, 0, width - 1, height - 1),
+				result->ColorSpace());
+			converted->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
+			uint8* convertedBits = (uint8*)converted->Bits();
+			int32 convertedBPR = converted->BytesPerRow();
+			scale4x(convertedBits, dst, width, height, convertedBPR, dstBPR);
 			delete converted;
 		} else {
 			// bilinear scaling

@@ -2171,6 +2171,12 @@ BPoseView::MessageReceived(BMessage* message)
 						case 64:
 							fViewState->SetIconSize(48);
 							break;
+						case 96:
+							fViewState->SetIconSize(64);
+							break;
+						case 128:
+							fViewState->SetIconSize(96);
+							break;
 					}
 				} else if (scale == 1 && (int32)IconSizeInt() != 128) {
 					switch ((int32)IconSizeInt()) {
@@ -2183,11 +2189,17 @@ BPoseView::MessageReceived(BMessage* message)
 						case 48:
 							fViewState->SetIconSize(64);
 							break;
+						case 64:
+							fViewState->SetIconSize(96);
+							break;
+						case 96:
+							fViewState->SetIconSize(128);
+							break;
 					}
 				}
 			} else {
 				int32 iconSize = fViewState->LastIconSize();
-				if (iconSize < 32 || iconSize > 64) {
+				if (iconSize < 32 || iconSize > 128) {
 					// uninitialized last icon size?
 					iconSize = 32;
 				}
