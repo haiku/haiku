@@ -14,28 +14,54 @@
 #include <CheckBox.h>
 
 
-class PoorManLoggingView: public BView
-{
+class PoorManLoggingView: public BView {
 public:
-				PoorManLoggingView(BRect, const char *name);
+							PoorManLoggingView(const char* name);
 				
-		void	SetLogConsoleValue(bool state) {if (state) logConsole->SetValue(B_CONTROL_ON); 
-												else logConsole->SetValue(B_CONTROL_OFF); }
-		bool	LogConsoleValue() { return (logConsole->Value() == B_CONTROL_ON) ? true : false; }
-		void	SetLogFileValue(bool state) {if (state) logFile->SetValue(B_CONTROL_ON); 
-												else logFile->SetValue(B_CONTROL_OFF); }
-		bool	LogFileValue() { return (logFile->Value() == B_CONTROL_ON) ? true : false; }
-const	char *	LogFileName() { return logFileName->Text(); }
-		void	SetLogFileName(const char * log) { logFileName->SetText(log); }
-private:
-		// Logging Tab
+	void SetLogConsoleValue(bool state)
+	{
+		if (state)
+			fLogConsole->SetValue(B_CONTROL_ON);
+		else
+			fLogConsole->SetValue(B_CONTROL_OFF);
+	}
 
+	bool LogConsoleValue()
+	{
+		return (fLogConsole->Value() == B_CONTROL_ON);
+	}
+	
+	void SetLogFileValue(bool state)
+	{
+		if (state)
+			fLogFile->SetValue(B_CONTROL_ON); 
+		else
+			fLogFile->SetValue(B_CONTROL_OFF);
+	}
+
+	bool LogFileValue()
+	{
+		return (fLogFile->Value() == B_CONTROL_ON);
+	}
+
+	const char* LogFileName()
+	{
+		return fLogFileName->Text();
+	}
+
+	void SetLogFileName(const char* log)
+	{
+		fLogFileName->SetText(log);
+	}
+
+private:
+			// Logging Tab
 			// Console Logging
-			BCheckBox		*	logConsole;
+			BCheckBox*		fLogConsole;
 			// File Logging
-			BCheckBox		*	logFile;
-			BTextControl	*	logFileName;
-			BButton			*	createLogFile;
+			BCheckBox*		fLogFile;
+			BTextControl*	fLogFileName;
+			BButton	*		fCreateLogFile;
 };
 
 #endif

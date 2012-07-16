@@ -17,18 +17,18 @@
 
 /*
  *
- * In FreeBSD hz holds the count of how often the thread scheduler is invoked
- * per second. Moreover this is the rate at which FreeBSD can generate callouts
- * (kind of timeout mechanism).
- * For FreeBSD 8 this is typically 1000 times per second. This value is defined
- * in a file called subr_param.c
+ * The rate at which FreeBSD can generate callouts (kind of timeout mechanism).
+ * For FreeBSD 8 this is typically 1000 times per second (100 for ARM).
+ * This value is defined in a file called subr_param.c
  *
- * For Haiku this value is much higher, due to using another timeout scheduling
- * mechanism, which has a resolution of 1 MHz. So hz for Haiku is set to
- * 1000000. Suffixing LL prevents integer overflows during calculations.
+ * WHile Haiku can have a much higher granularity, it is not a good idea to have
+ * this since FreeBSD tries to do certain tasks based on ticks, for instance
+ * autonegotiation and wlan scanning.
+ * Suffixing LL prevents integer overflows during calculations.
  * as it defines a long long constant.*/
-#define hz	1000000LL
+#define hz	1000LL
 
+#define ticks_to_usecs(t) (1000000*((bigtime_t)t) / hz)
 
 typedef void (*system_init_func_t)(void *);
 

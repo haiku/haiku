@@ -26,23 +26,24 @@ static inline int32
 color_which_to_index(color_which which)
 {
 	// NOTE: this must be kept in sync with InterfaceDefs.h color_which!
-	if (which <= B_WINDOW_INACTIVE_BORDER_COLOR)
+	if (which <= B_CONTROL_MARK_COLOR)
 		return which - 1;
 	if (which >= B_SUCCESS_COLOR && which <= B_FAILURE_COLOR)
-		return which - B_SUCCESS_COLOR + B_WINDOW_INACTIVE_BORDER_COLOR;
+		return which - B_SUCCESS_COLOR + B_CONTROL_MARK_COLOR;
 
 	return -1;
 }
+
 
 static inline color_which
 index_to_color_which(int32 index)
 {
 	if (index >= 0 && index < kNumColors) {
-		if ((color_which)index < B_WINDOW_INACTIVE_BORDER_COLOR)
+		if ((color_which)index < B_CONTROL_MARK_COLOR)
 			return (color_which)(index + 1);
 		else {
 			return (color_which)(index + B_SUCCESS_COLOR
-			  - B_WINDOW_INACTIVE_BORDER_COLOR);
+			  - B_CONTROL_MARK_COLOR);
 		}
 	}
 

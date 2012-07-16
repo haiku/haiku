@@ -13,21 +13,21 @@
 #include <Slider.h>
 
 
-class StatusSlider: public BSlider
-{
+class StatusSlider: public BSlider {
 public:
-		StatusSlider(BRect frame, 
-					const char *name, 
-					const char *label,
-					char *statusPrefix, 
-					BMessage *message,
-					int32 minValue,
-					int32 maxValue);
-virtual const char*	UpdateText() const;
+							StatusSlider(const char* name,
+								const char* label,
+								char* statusPrefix, 
+								BMessage* message,
+								int32 minValue,
+								int32 maxValue);
+
+	virtual const char*	UpdateText() const;
+
 private:
-	char *	StatusPrefix;
-	char *	temp;
-	char 	str[128];
+			char*			fStatusPrefix;
+			char*			fTemp;
+			char 			fStr[128];
 };
 
 #endif

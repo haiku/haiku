@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +19,7 @@
 
 #include "table/TableColumns.h"
 
+#include "ActionMenuItem.h"
 #include "Architecture.h"
 #include "FunctionID.h"
 #include "FunctionInstance.h"
@@ -36,6 +37,7 @@
 #include "Value.h"
 #include "ValueHandler.h"
 #include "ValueHandlerRoster.h"
+#include "ValueLocation.h"
 #include "ValueNode.h"
 #include "ValueNodeContainer.h"
 #include "Variable.h"
@@ -487,34 +489,77 @@ public:
 	}
 
 	status_t Init(Settings* rendererSettings,
-		SettingsMenu* rendererSettingsMenu)
+		SettingsMenu* rendererSettingsMenu,
+		ContextActionList* preSettingsActions = NULL,
+		ContextActionList* postSettingsActions = NULL)
 	{
-		fRendererSettings = rendererSettings;
-		fRendererSettings->AcquireReference();
+		if (rendererSettings == NULL && preSettingsActions == NULL
+			&& postSettingsActions == NULL) {
+			return B_BAD_VALUE;
+		}
 
-		fRendererSettingsMenu = rendererSettingsMenu;
-		fRendererSettingsMenu->AcquireReference();
+		if (rendererSettings != NULL) {
+			fRendererSettings = rendererSettings;
+			fRendererSettings->AcquireReference();
+
+
+			fRendererSettingsMenu = rendererSettingsMenu;
+			fRendererSettingsMenu->AcquireReference();
+		}
 
 		fContextMenu = new(std::nothrow) ContextMenu(fParent,
 			"table cell settings popup");
 		if (fContextMenu == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = fRendererSettingsMenu->AddToMenu(fContextMenu, 0);
-		if (error != B_OK)
-			return error;
+		status_t error = B_OK;
+		if (preSettingsActions != NULL
+			&& preSettingsActions->CountItems() > 0) {
+			error = _AddActionItems(preSettingsActions);
+			if (error != B_OK)
+				return error;
 
-		AutoLocker<Settings> settingsLocker(fRendererSettings);
-		fRendererSettings->AddListener(this);
+			if (fRendererSettingsMenu != NULL || postSettingsActions != NULL)
+				fContextMenu->AddSeparatorItem();
+		}
 
-		fRendererMenuAdded = true;
+		if (fRendererSettingsMenu != NULL) {
+			error = fRendererSettingsMenu->AddToMenu(fContextMenu,
+				fContextMenu->CountItems());
+			if (error != B_OK)
+				return error;
+
+			if (postSettingsActions != NULL)
+				fContextMenu->AddSeparatorItem();
+		}
+
+		if (postSettingsActions != NULL) {
+			error = _AddActionItems(postSettingsActions);
+			if (error != B_OK)
+				return error;
+
+		}
+
+		if (fRendererSettings != NULL) {
+			AutoLocker<Settings> settingsLocker(fRendererSettings);
+			fRendererSettings->AddListener(this);
+			fRendererMenuAdded = true;
+		}
 
 		return B_OK;
 	}
 
 	void ShowMenu(BPoint screenWhere)
 	{
-		fRendererSettingsMenu->PrepareToShow(fParentLooper);
+		if (fRendererMenuAdded)
+			fRendererSettingsMenu->PrepareToShow(fParentLooper);
+
+		for (int32 i = 0; i < fContextMenu->CountItems(); i++) {
+			ActionMenuItem* item = dynamic_cast<ActionMenuItem*>(
+				fContextMenu->ItemAt(i));
+			if (item != NULL)
+				item->PrepareToShow(fParentLooper, fParent.Target(NULL));
+		}
 
 		fMenuPreparedToShow = true;
 
@@ -528,7 +573,18 @@ public:
 		bool stillActive = false;
 
 		if (fMenuPreparedToShow) {
-			stillActive = fRendererSettingsMenu->Finish(fParentLooper, force);
+			if (fRendererMenuAdded)
+				stillActive = fRendererSettingsMenu->Finish(fParentLooper,
+					force);
+			for (int32 i = 0; i < fContextMenu->CountItems(); i++) {
+				ActionMenuItem* item = dynamic_cast<ActionMenuItem*>(
+					fContextMenu->ItemAt(i));
+				if (item != NULL) {
+					stillActive |= item->Finish(fParentLooper,
+						fParent.Target(NULL), force);
+				}
+			}
+
 			fMenuPreparedToShow = stillActive;
 		}
 
@@ -557,6 +613,24 @@ private:
 			|| fParent.SendMessage(&message) != B_OK) {
 			fNode->ReleaseReference();
 		}
+	}
+
+	status_t _AddActionItems(ContextActionList* actions)
+	{
+		if (fContextMenu == NULL)
+			return B_BAD_VALUE;
+
+		int32 index = fContextMenu->CountItems();
+		for (int32 i = 0; ActionMenuItem* item = actions->ItemAt(i); i++) {
+			if (!fContextMenu->AddItem(item, index + i)) {
+				for (i--; i >= 0; i--)
+					fContextMenu->RemoveItem(fContextMenu->ItemAt(index + i));
+
+				return B_NO_MEMORY;
+			}
+		}
+
+		return B_OK;
 	}
 
 private:
@@ -1412,6 +1486,15 @@ void
 VariablesView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_SHOW_INSPECTOR_WINDOW:
+		{
+			// TODO: it'd probably be more ideal to extend the context
+			// action mechanism to allow one to specify an explicit
+			// target for each action rather than them all defaulting
+			// to targetting here.
+			Looper()->PostMessage(message);
+			break;
+		}
 		case MSG_VALUE_NODE_CHANGED:
 		{
 			ValueNodeChild* nodeChild;
@@ -1594,25 +1677,39 @@ VariablesView::TreeTableCellMouseDown(TreeTable* table,
 	if (node == NULL)
 		return;
 
+	Settings* settings = NULL;
+	SettingsMenu* settingsMenu = NULL;
+	BReference<SettingsMenu> settingsMenuReference;
+	status_t error = B_OK;
 	TableCellValueRenderer* cellRenderer = node->TableCellRenderer();
-	if (cellRenderer == NULL)
-		return;
-
-	Settings* settings = cellRenderer->GetSettings();
-	if (settings == NULL)
-		return;
-
-	SettingsMenu* settingsMenu;
-	status_t error = node->GetValueHandler()->CreateTableCellValueSettingsMenu(
-		node->GetValue(), settings, settingsMenu);
-	BReference<SettingsMenu> settingsMenuReference(settingsMenu, true);
-	if (error != B_OK)
-		return;
+	if (cellRenderer != NULL) {
+		settings = cellRenderer->GetSettings();
+		if (settings != NULL) {
+			error = node->GetValueHandler()
+				->CreateTableCellValueSettingsMenu(node->GetValue(), settings,
+					settingsMenu);
+			settingsMenuReference.SetTo(settingsMenu, true);
+			if (error != B_OK)
+				return;
+		}
+	}
 
 	TableCellContextMenuTracker* tracker = new(std::nothrow)
 		TableCellContextMenuTracker(node, Looper(), this);
 	BReference<TableCellContextMenuTracker> trackerReference(tracker);
-	if (tracker == NULL || tracker->Init(settings, settingsMenu) != B_OK)
+
+	ContextActionList* preActionList = new(std::nothrow) ContextActionList;
+	if (preActionList == NULL)
+		return;
+
+	BPrivate::ObjectDeleter<ContextActionList> preActionListDeleter(
+		preActionList);
+
+	error = _GetContextActionsForNode(node, preActionList);
+	if (error != B_OK)
+		return;
+
+	if (tracker == NULL || tracker->Init(settings, settingsMenu, preActionList) != B_OK)
 		return;
 
 	fTableCellContextMenuTracker = trackerReference.Detach();
@@ -1676,6 +1773,39 @@ VariablesView::_RequestNodeValue(ModelNode* node)
 	// request resolution of the value
 	fListener->ValueNodeValueRequested(fStackFrame->GetCpuState(), container,
 		valueNode);
+}
+
+
+status_t
+VariablesView::_GetContextActionsForNode(ModelNode* node,
+	ContextActionList* actions)
+{
+	ValueLocation* location = node->NodeChild()->Location();
+
+	// if the location's stored somewhere other than in memory,
+	// then we won't be able to inspect it this way.
+	if (location->PieceAt(0).type != VALUE_PIECE_LOCATION_MEMORY)
+		return B_OK;
+
+	BMessage* message = new BMessage(MSG_SHOW_INSPECTOR_WINDOW);
+	if (message == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<BMessage> messageDeleter(message);
+	message->AddUInt64("address", location->PieceAt(0).address);
+
+	ActionMenuItem* item = new(std::nothrow) ActionMenuItem("Inspect",
+		message);
+	if (item == NULL)
+		return B_NO_MEMORY;
+
+	messageDeleter.Detach();
+	ObjectDeleter<ActionMenuItem> actionDeleter(item);
+	if (!actions->AddItem(item))
+		return B_NO_MEMORY;
+
+	actionDeleter.Detach();
+	return B_OK;
 }
 
 

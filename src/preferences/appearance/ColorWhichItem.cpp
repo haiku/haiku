@@ -40,18 +40,22 @@ ColorWhichItem::DrawItem(BView *owner, BRect frame, bool complete)
 		owner->FillRect(frame);
 	}
 
-	rgb_color black = {0, 0, 0, 255};
+	rgb_color border = (rgb_color){ 184, 184, 184, 255 };
 
 	BRect colorRect(frame);
 	colorRect.InsetBy(2, 2);
 	colorRect.right = colorRect.left + colorRect.Height();
 	owner->SetHighColor(fColor);
 	owner->FillRect(colorRect);
-	owner->SetHighColor(black);
+	owner->SetHighColor(border);
 	owner->StrokeRect(colorRect);
 
 	owner->MovePenTo(frame.left + colorRect.Width() + 8, frame.top
 		+ BaselineOffset());
+
+	// TODO: Don't hardcode black here, calculate based on background
+	// color or use B_CONTROL_TEXT_COLOR constant.
+	rgb_color black = (rgb_color){ 0, 0, 0, 255 };
 
 	if (!IsEnabled())
 		owner->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));

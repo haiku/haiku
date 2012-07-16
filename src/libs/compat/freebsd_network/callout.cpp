@@ -62,9 +62,9 @@ callout_thread(void* /*data*/)
 
 					if (mutex != NULL)
 						mtx_lock(mutex);
-				
+
 					c->c_func(c->c_arg);
-				
+
 					if (mutex != NULL)
 						mtx_unlock(mutex);
 
@@ -116,7 +116,7 @@ init_callout(void)
 	}
 
 	sThread = spawn_kernel_thread(callout_thread, "fbsd callout",
-		B_URGENT_DISPLAY_PRIORITY, NULL);
+		B_DISPLAY_PRIORITY, NULL);
 	if (sThread < 0) {
 		status = sThread;
 		goto err2;

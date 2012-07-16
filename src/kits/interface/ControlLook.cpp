@@ -3197,10 +3197,7 @@ BControlLook::_RadioButtonAndCheckBoxMarkColor(const rgb_color& base,
 		return false;
 	}
 
-	// TODO: Get from UI settings
-	color.red = 27;
-	color.green = 82;
-	color.blue = 140;
+	color = ui_color(B_CONTROL_MARK_COLOR);
 
 	float mix = 1.0;
 

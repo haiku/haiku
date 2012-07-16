@@ -73,14 +73,24 @@ CStringValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	if (dynamic_cast<AddressType*>(fType) != NULL) {
 		error = valueLoader->LoadValue(location, valueType, false,
 			addressData);
+		if (error != B_OK)
+			return error;
 	} else {
 		addressData.SetTo(location->PieceAt(0).address);
 		maxSize = dynamic_cast<ArrayType*>(fType)
 			->DimensionAt(0)->CountElements();
 	}
 
-	if (error != B_OK)
-		return error;
+	ValuePieceLocation piece;
+	piece.SetToMemory(addressData.ToUInt64());
+
+	ValueLocation* stringLocation = new(std::nothrow) ValueLocation(
+		valueLoader->GetArchitecture()->IsBigEndian(), piece);
+
+	if (stringLocation == NULL)
+		return B_NO_MEMORY;
+
+	BReference<ValueLocation> locationReference(stringLocation, true);
 
 	error = valueLoader->LoadStringValue(addressData, maxSize, valueData);
 	if (error != B_OK)
@@ -91,8 +101,8 @@ CStringValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	if (value == NULL)
 		return B_NO_MEMORY;
 
-	location->AcquireReference();
-	_location = location;
+	NodeChild()->SetLocation(stringLocation, B_OK);
+	_location = locationReference.Detach();
 	_value = value;
 	return B_OK;
 }
