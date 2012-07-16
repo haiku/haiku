@@ -18,23 +18,41 @@ class PoorManLoggingView: public BView {
 public:
 							PoorManLoggingView(const char* name);
 				
-			void			SetLogConsoleValue(bool state)
-								{ if (state)
-									fLogConsole->SetValue(B_CONTROL_ON);
-									else fLogConsole->SetValue(B_CONTROL_OFF); }
-			bool			LogConsoleValue()
-								{ return (fLogConsole->Value() == B_CONTROL_ON)
-									? true : false; }
-			void			SetLogFileValue(bool state)
-								{ if (state) fLogFile->SetValue(B_CONTROL_ON); 
-									else fLogFile->SetValue(B_CONTROL_OFF); }
-			bool			LogFileValue()
-								{ return (fLogFile->Value() == B_CONTROL_ON)
-									? true : false; }
-			const char*		LogFileName()
-								{ return fLogFileName->Text(); }
-			void			SetLogFileName(const char* log)
-								{ fLogFileName->SetText(log); }
+	void SetLogConsoleValue(bool state)
+	{
+		if (state)
+			fLogConsole->SetValue(B_CONTROL_ON);
+		else
+			fLogConsole->SetValue(B_CONTROL_OFF);
+	}
+
+	bool LogConsoleValue()
+	{
+		return (fLogConsole->Value() == B_CONTROL_ON);
+	}
+	
+	void SetLogFileValue(bool state)
+	{
+		if (state)
+			fLogFile->SetValue(B_CONTROL_ON); 
+		else
+			fLogFile->SetValue(B_CONTROL_OFF);
+	}
+
+	bool LogFileValue()
+	{
+		return (fLogFile->Value() == B_CONTROL_ON);
+	}
+
+	const char* LogFileName()
+	{
+		return fLogFileName->Text();
+	}
+
+	void SetLogFileName(const char* log)
+	{
+		fLogFileName->SetText(log);
+	}
 
 private:
 			// Logging Tab

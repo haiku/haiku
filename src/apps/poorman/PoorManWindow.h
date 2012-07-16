@@ -60,35 +60,75 @@ public:
 	// -------------------------------------------	
 	// Preferences and Settings
 		// Site Tab		
-			bool			DirListFlag()
-								{ return fDirListFlag; }
-			void			SetDirListFlag(bool flag)
-								{ fDirListFlag = flag; }
-			const char*		IndexFileName()
-								{ return fIndexFileName.String(); }
-			void			SetIndexFileName(const char* str)
-								{ fIndexFileName.SetTo(str); }
-			const char*		WebDir()
-								{ return fWebDirectory.String(); }
-			void			SetWebDir(const char* str)
-								{ fWebDirectory.SetTo(str); }
-		// Logging Tab
-			bool			LogConsoleFlag()
-								{ return fLogConsoleFlag; }
-			void			SetLogConsoleFlag(bool flag)
-								{ fLogConsoleFlag = flag; }
-			bool			LogFileFlag()
-								{ return fLogFileFlag; }
-			void			SetLogFileFlag(bool flag)
-								{ fLogFileFlag = flag; }
-			const char*		LogPath()
-								{ return fLogPath.String(); }
-			void			SetLogPath(const char* str);
-		// Advanced Tab
-			int16			MaxConnections()
-								{ return fMaxConnections; }
-			void			SetMaxConnections(int16 num)
-								{ fMaxConnections = num;  }
+	bool DirListFlag()
+	{
+		return fDirListFlag;
+	}
+
+	void SetDirListFlag(bool flag)
+	{
+		fDirListFlag = flag;
+	}
+
+	const char* IndexFileName()
+	{
+		return fIndexFileName.String();
+	}
+
+	void SetIndexFileName(const char* str)
+	{
+		fIndexFileName.SetTo(str);
+	}
+
+	const char*	WebDir()
+	{
+		return fWebDirectory.String();
+	}
+
+	void SetWebDir(const char* str)
+	{
+		fWebDirectory.SetTo(str);
+	}
+
+	// Logging Tab
+
+	bool LogConsoleFlag()
+	{
+		return fLogConsoleFlag;
+	}
+
+	void SetLogConsoleFlag(bool flag)
+	{
+ 		fLogConsoleFlag = flag;
+	}
+
+	bool LogFileFlag()
+	{
+		return fLogFileFlag;
+	}
+
+	void SetLogFileFlag(bool flag)
+	{
+		fLogFileFlag = flag;
+	}
+
+	const char* LogPath()
+	{
+		return fLogPath.String();
+	}
+
+			void SetLogPath(const char* str);
+
+	// Advanced Tab
+	int16 MaxConnections()
+	{
+ 		return fMaxConnections;
+	}
+
+	void SetMaxConnections(int16 num)
+	{
+		fMaxConnections = num;
+	}
 
 private:
 	// -------------------------------------------

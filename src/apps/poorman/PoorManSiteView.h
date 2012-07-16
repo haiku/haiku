@@ -18,20 +18,38 @@ class PoorManSiteView: public BView {
 public:
 							PoorManSiteView(const char *name);
 
-			void			SetSendDirValue(bool state)
-								{ if (state) fSendDir->SetValue(B_CONTROL_ON);
-									else fSendDir->SetValue(B_CONTROL_OFF); }
-			bool			SendDirValue()
-								{ return (fSendDir->Value() == B_CONTROL_ON)
-									? true : false; }
-			const char*		IndexFileName()
-								{ return fIndexFileName->Text(); }
-			void			SetIndexFileName(const char* name)
-								{ fIndexFileName->SetText(name); }
-			const char*		WebDir()
-								{ return fWebDir->Text(); }
-			void			SetWebDir(const char* dir)
-								{ fWebDir->SetText(dir); }
+	void SetSendDirValue(bool state)
+	{
+		if (state)
+			fSendDir->SetValue(B_CONTROL_ON);
+		else
+			fSendDir->SetValue(B_CONTROL_OFF);
+	}
+
+	bool SendDirValue()
+	{
+		return (fSendDir->Value() == B_CONTROL_ON);
+	}
+
+	const char* IndexFileName()
+	{
+		return fIndexFileName->Text();
+	}
+
+	void SetIndexFileName(const char* name)
+	{
+		fIndexFileName->SetText(name);
+	}
+
+	const char* WebDir()
+	{
+		return fWebDir->Text();
+	}
+
+	void SetWebDir(const char* dir)
+	{
+		fWebDir->SetText(dir);
+	}
 
 private:
 		// Site Tab
