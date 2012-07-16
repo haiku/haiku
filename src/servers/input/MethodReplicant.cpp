@@ -43,16 +43,6 @@ MethodReplicant::MethodReplicant(const char* signature)
 		kRemoteColorSpace);
 	fSegments->SetBits(kRemoteBits, kRemoteWidth * kRemoteHeight, 0,
 		kRemoteColorSpace);
-	// Background Color
-
-	// add dragger
-	BRect rect(Bounds());
-	rect.left = rect.right - 7.0;
-	rect.top = rect.bottom - 7.0;
-	BDragger* dragger = new BDragger(rect, this,
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	dragger->SetViewColor(B_TRANSPARENT_32_BIT);
-	AddChild(dragger);
 
 	ASSERT(signature != NULL);
 	fSignature = strdup(signature);
