@@ -12,9 +12,6 @@ extern "C" {
 #include "Condvar.h"
 
 
-#define ticks_to_usecs(t) (1000000*((bigtime_t)t) / hz)
-
-
 void
 conditionInit(struct cv* variable, const char* description)
 {
@@ -23,7 +20,7 @@ conditionInit(struct cv* variable, const char* description)
 
 
 void
-conditionPublish(struct cv* variable, const void* waitChannel, 
+conditionPublish(struct cv* variable, const void* waitChannel,
 	const char* description)
 {
 	variable->condition.Publish(waitChannel, description);
