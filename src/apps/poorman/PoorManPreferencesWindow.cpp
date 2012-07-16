@@ -142,12 +142,15 @@ PoorManPreferencesWindow::MessageReceived(BMessage* message)
 				Quit();
 			break;
 		case MSG_PREF_SITE_BTN_SELECT:
+		{
 			// Select the Web Directory, root directory to look in.
 			fWebDirFilePanel->SetTarget(this);
-			fWebDirFilePanel->SetMessage(new BMessage(MSG_FILE_PANEL_SELECT_WEB_DIR));
+			BMessage webDirSelectedMsg(MSG_FILE_PANEL_SELECT_WEB_DIR);
+			fWebDirFilePanel->SetMessage(&webDirSelectedMsg);
 			if (!fWebDirFilePanel->IsShowing())
 				fWebDirFilePanel->Show();
 			break;
+		}
 		case MSG_FILE_PANEL_SELECT_WEB_DIR:
 			// handle the open BMessage from the Select Web Directory File Panel
 			PRINT(("Select Web Directory:\n"));
@@ -177,13 +180,10 @@ void
 PoorManPreferencesWindow::SelectWebDir(BMessage* message)
 {
 	entry_ref	ref;
-	const char* name;
 	BPath		path;
 	BEntry		entry;
 
-	if (message->FindRef("refs", &ref) != B_OK
-		|| message->FindString("name", &name) != B_OK
-		|| entry.SetTo(&ref) != B_OK) {
+	if (message->FindRef("refs", &ref) != B_OK || entry.SetTo(&ref) != B_OK) {
 		return;
 	}
 	entry.GetPath(&path);
