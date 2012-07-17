@@ -13,6 +13,7 @@
 
 #include <Looper.h>
 #include <PopUpMenu.h>
+#include <ToolTip.h>
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
@@ -345,7 +346,8 @@ protected:
 // #pragma mark - VariableTableModel
 
 
-class VariablesView::VariableTableModel : public TreeTableModel {
+class VariablesView::VariableTableModel : public TreeTableModel,
+	public TreeTableToolTipProvider {
 public:
 								VariableTableModel();
 								~VariableTableModel();
@@ -378,6 +380,10 @@ public:
 
 			void				NotifyNodeChanged(ModelNode* node);
 			void				NotifyNodeHidden(ModelNode* node);
+
+	virtual	bool				GetToolTipForTablePath(
+									const TreeTablePath& path,
+									int32 columnIndex, BToolTip** _tip);
 
 private:
 			struct NodeHashDefinition {
@@ -1159,6 +1165,45 @@ VariablesView::VariableTableModel::NotifyNodeHidden(ModelNode* node)
 }
 
 
+bool
+VariablesView::VariableTableModel::GetToolTipForTablePath(
+	const TreeTablePath& path, int32 columnIndex, BToolTip** _tip)
+{
+	ModelNode* node = (ModelNode*)NodeForPath(path);
+	if (node == NULL)
+		return false;
+
+	if (node->NodeChild()->LocationResolutionState() != B_OK)
+		return false;
+
+	ValueLocation* location = node->NodeChild()->Location();
+	BString tipData("Location piece(s):");
+	for (int32 i = 0; i < location->CountPieces(); i++) {
+		ValuePieceLocation piece = location->PieceAt(i);
+		BString pieceData;
+		switch (piece.type) {
+		case VALUE_PIECE_LOCATION_MEMORY:
+			pieceData.SetToFormat("\n\t(%ld): Address: 0x%llx",
+				i, piece.address);
+			break;
+		case VALUE_PIECE_LOCATION_REGISTER:
+			pieceData.SetToFormat("\n\t(%ld): Register (%lu)",
+				i, piece.reg);
+			break;
+		default:
+			break;
+		}
+		tipData	+= pieceData;
+	}
+
+	*_tip = new(std::nothrow) BTextToolTip(tipData);
+	if (*_tip == NULL)
+		return false;
+
+	return true;
+}
+
+
 status_t
 VariablesView::VariableTableModel::_AddNode(Variable* variable,
 	ModelNode* parent, ValueNodeChild* nodeChild, bool isPresentationNode,
@@ -1734,6 +1779,7 @@ VariablesView::_Init()
 	if (fVariableTableModel->Init() != B_OK)
 		throw std::bad_alloc();
 	fVariableTable->SetTreeTableModel(fVariableTableModel);
+	fVariableTable->SetToolTipProvider(fVariableTableModel);
 
 	fContainerListener = new ContainerListener(this);
 	fVariableTableModel->SetContainerListener(fContainerListener);
