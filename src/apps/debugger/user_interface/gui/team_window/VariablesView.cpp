@@ -314,10 +314,12 @@ protected:
 					targetView);
 				return;
 			}
+		} else if (value.Type() == B_STRING_TYPE) {
+			fField.SetString(value.ToString());
+		} else {
+			// fall back to drawing an empty string
+			fField.SetString("");
 		}
-
-		// fall back to drawing an empty string
-		fField.SetString("");
 		fField.SetWidth(Width());
 		fColumn.DrawField(&fField, rect, targetView);
 	}
@@ -1112,8 +1114,29 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 			_value.SetTo(node->Name(), B_VARIANT_DONT_COPY_DATA);
 			return true;
 		case 1:
-			if (node->GetValue() == NULL)
+			if (node->GetValue() == NULL) {
+				ValueLocation* location = node->NodeChild()->Location();
+				if (location == NULL)
+					return false;
+
+				Type* nodeChildRawType = node->NodeChild()->Node()->GetType()
+					->ResolveRawType(false);
+				if (nodeChildRawType->Kind() == TYPE_COMPOUND)
+				{
+					if (location->CountPieces() > 1)
+						return false;
+
+					BString data;
+					ValuePieceLocation piece = location->PieceAt(0);
+					if (piece.type != VALUE_PIECE_LOCATION_MEMORY)
+						return false;
+
+					data.SetToFormat("[@ 0x%llx]", piece.address);
+					_value.SetTo(data);
+					return true;
+				}
 				return false;
+			}
 
 			_value.SetTo(node, VALUE_NODE_TYPE);
 			return true;
@@ -1178,28 +1201,34 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 		return false;
 
 	ValueLocation* location = node->NodeChild()->Location();
-	BString tipData("Location piece(s):");
+	BString tipData;
 	for (int32 i = 0; i < location->CountPieces(); i++) {
 		ValuePieceLocation piece = location->PieceAt(i);
 		BString pieceData;
 		switch (piece.type) {
-		case VALUE_PIECE_LOCATION_MEMORY:
-			pieceData.SetToFormat("\n\t(%ld): Address: 0x%llx, Size: "
-				"%lld bytes", i, piece.address, piece.size);
-			break;
-		case VALUE_PIECE_LOCATION_REGISTER:
-		{
-			Architecture* architecture = fThread->GetTeam()->GetArchitecture();
-			pieceData.SetToFormat("\n\t(%ld): Register (%s)",
-				i, architecture->Registers()[piece.reg].Name());
+			case VALUE_PIECE_LOCATION_MEMORY:
+				pieceData.SetToFormat("(%ld): Address: 0x%llx, Size: "
+					"%lld bytes", i, piece.address, piece.size);
+				break;
+			case VALUE_PIECE_LOCATION_REGISTER:
+			{
+				Architecture* architecture = fThread->GetTeam()->GetArchitecture();
+				pieceData.SetToFormat("(%ld): Register (%s)",
+					i, architecture->Registers()[piece.reg].Name());
 
-			break;
+				break;
+			}
+			default:
+				break;
 		}
-		default:
-			break;
-		}
+
 		tipData	+= pieceData;
+		if (i < location->CountPieces() - 1)
+			tipData += "\n";
 	}
+
+	if (tipData.IsEmpty())
+		return false;
 
 	*_tip = new(std::nothrow) BTextToolTip(tipData);
 	if (*_tip == NULL)
