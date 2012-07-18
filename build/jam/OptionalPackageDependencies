@@ -20,6 +20,7 @@ OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
 OptionalPackageDependencies GitDoc : Man Git ;
 OptionalPackageDependencies ICU-devel : DevelopmentBase ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
+OptionalPackageDependencies LibXML2 : XZ-Utils ;
 OptionalPackageDependencies Man : Groff ;
 OptionalPackageDependencies Tar : LibIconv ;
 OptionalPackageDependencies Python : Bzip ;
