@@ -4,8 +4,10 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 
 KernelAddon nfs4 :
+	CacheRevalidator.cpp
 	Cookie.cpp
 	Connection.cpp
+	DirectoryCache.cpp
 	FileInfo.cpp
 	FileSystem.cpp
 	IdMap.cpp

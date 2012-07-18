@@ -21,7 +21,8 @@
 
 Inode::Inode()
 	:
-	fAttrCacheExpire(0)
+	fAttrCacheExpire(0),
+	fCache(NULL)
 {
 	mutex_init(&fAttrCacheLock, NULL);
 }
@@ -80,6 +81,9 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 		// FATTR4_TYPE is mandatory
 		inode->fType = values[0].fData.fValue32;
 
+		if (inode->fType == NF4DIR)
+			inode->fCache = new DirectoryCache(inode);
+
 		// FATTR4_FSID is mandatory
 		FileSystemId* fsid =
 			reinterpret_cast<FileSystemId*>(values[1].fData.fPointer);
@@ -99,7 +103,47 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 
 Inode::~Inode()
 {
+	delete fCache;
 	mutex_destroy(&fAttrCacheLock);
+}
+
+
+status_t
+Inode::GetChangeInfo(uint64* change)
+{
+	do {
+		RPC::Server* serv = fFileSystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fInfo.fHandle);
+
+		Attribute attr[] = { FATTR4_CHANGE };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		if (_HandleErrors(reply.NFS4Error(), serv))
+			continue;
+
+		reply.PutFH();
+
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK || count < 1)
+			return result;
+
+		// FATTR4_CHANGE is mandatory
+		*change = values[0].fData.fValue64;
+		delete[] values;
+
+		return B_OK;
+	} while (true);
 }
 
 
@@ -121,6 +165,9 @@ Inode::LookUp(const char* name, ino_t* id)
 
 		req.PutFH(fInfo.fHandle);
 
+		Attribute dirAttr[] = { FATTR4_CHANGE };
+		req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
+
 		if (!strcmp(name, ".."))
 			req.LookUpUp();
 		else
@@ -141,6 +188,16 @@ Inode::LookUp(const char* name, ino_t* id)
 			continue;
 
 		reply.PutFH();
+
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
+
+		uint64 change = values[0].fData.fValue64;
+		delete[] values;
+
 		if (!strcmp(name, ".."))
 			result = reply.LookUpUp();
 		else
@@ -151,8 +208,6 @@ Inode::LookUp(const char* name, ino_t* id)
 		FileHandle fh;
 		reply.GetFH(&fh);
 
-		AttrValue* values;
-		uint32 count;
 		result = reply.GetAttr(&values, &count);
 		if (result != B_OK)
 			return result;
@@ -193,6 +248,20 @@ Inode::LookUp(const char* name, ino_t* id)
 		fi.fPath = path;
 
 		fFileSystem->InoIdMap()->AddEntry(fi, *id);
+
+		fFileSystem->Revalidator().Lock();
+		if (fCache->Lock() != B_OK) {
+			fCache->ResetAndLock();
+			fCache->SetChangeInfo(change);
+		} else {
+			fFileSystem->Revalidator().RemoveDirectory(fCache);
+			fCache->ValidateChangeInfo(change);
+		}
+
+		fCache->AddEntry(name, *id);
+		fFileSystem->Revalidator().AddDirectory(fCache);
+		fCache->Unlock();
+		fFileSystem->Revalidator().Unlock();
 
 		return B_OK;
 	} while (true);
@@ -294,6 +363,8 @@ Inode::Remove(const char* name, FileType type)
 		reply.PutFH();
 		result = reply.Remove();
 
+		// remove entry
+
 		fFileSystem->Root()->MakeInfoInvalid();
 
 		return result;
@@ -344,7 +415,11 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 		reply.SaveFH();
 		reply.PutFH();
 
-		return reply.Rename();
+		result = reply.Rename();
+
+		// remove entry
+
+		return result;
 	} while (true);
 }
 

@@ -528,6 +528,12 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		current++;
 	}
 
+	if (sIsAttrSet(FATTR4_CHANGE, bitmap, bcount)) {
+		values[current].fAttribute = FATTR4_CHANGE;
+		values[current].fData.fValue64 = stream.GetUHyper();
+		current++;
+	}
+
 	if (sIsAttrSet(FATTR4_SIZE, bitmap, bcount)) {
 		values[current].fAttribute = FATTR4_SIZE;
 		values[current].fData.fValue64 = stream.GetUHyper();

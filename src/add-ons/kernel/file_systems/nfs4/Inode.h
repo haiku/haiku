@@ -30,6 +30,8 @@ public:
 	inline			const char*	Name() const;
 	inline			FileSystem*	GetFileSystem() const;
 
+					status_t	GetChangeInfo(uint64* change);
+
 					status_t	LookUp(const char* name, ino_t* id);
 
 					status_t	CreateLink(const char* name, const char* path,
@@ -99,6 +101,8 @@ protected:
 
 					FileInfo	fInfo;
 					FileSystem*	fFileSystem;
+
+					DirectoryCache*	fCache;
 };
 
 

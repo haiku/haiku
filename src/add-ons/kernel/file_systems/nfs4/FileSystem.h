@@ -9,6 +9,7 @@
 #define FILESYSTEM_H
 
 
+#include "CacheRevalidator.h"
 #include "InodeIdMap.h"
 #include "NFS4Defs.h"
 #include "NFS4Server.h"
@@ -34,6 +35,8 @@ public:
 			void				AddOpenFile(OpenFileCookie* cookie);
 			void				RemoveOpenFile(OpenFileCookie* cookie);
 
+	inline	CacheRevalidator&	Revalidator();
+
 	inline	bool				IsAttrSupported(Attribute attr) const;
 	inline	uint32				ExpireType() const;
 
@@ -52,6 +55,8 @@ public:
 			FileSystem*			fPrev;
 private:
 								FileSystem();
+
+			CacheRevalidator	fCacheRevalidator;
 
 			OpenFileCookie*		fOpenFiles;
 			uint32				fOpenCount;
@@ -72,6 +77,13 @@ private:
 
 			InodeIdMap			fInoIdMap;
 };
+
+
+inline CacheRevalidator&
+FileSystem::Revalidator()
+{
+	return fCacheRevalidator;
+}
 
 
 inline RootInode*
