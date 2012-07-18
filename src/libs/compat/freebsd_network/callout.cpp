@@ -172,7 +172,7 @@ callout_init_mtx(struct callout *c, struct mtx *mtx, int flags)
 
 
 int
-callout_reset(struct callout *c, int when, void (*func)(void *), void *arg)
+callout_reset(struct callout *c, int ticks, void (*func)(void *), void *arg)
 {
 	int canceled = callout_stop(c);
 
@@ -183,12 +183,12 @@ callout_reset(struct callout *c, int when, void (*func)(void *), void *arg)
 
 	TRACE("callout_reset %p, func %p, arg %p\n", c, c->c_func, c->c_arg);
 
-	if (when >= 0) {
+	if (ticks >= 0) {
 		// reschedule or add this timer
 		if (c->due <= 0)
 			list_add_item(&sTimers, c);
 
-		c->due = system_time() + when;
+		c->due = system_time() + ticks_to_usecs(ticks);
 
 		// notify timer about the change if necessary
 		if (sTimeout > c->due)
@@ -200,9 +200,9 @@ callout_reset(struct callout *c, int when, void (*func)(void *), void *arg)
 
 
 int
-callout_schedule(struct callout *callout, int toTicks)
+callout_schedule(struct callout *callout, int ticks)
 {
-	return callout_reset(callout, toTicks, callout->c_func, callout->c_arg);
+	return callout_reset(callout, ticks, callout->c_func, callout->c_arg);
 }
 
 
