@@ -1206,12 +1206,12 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				libxml2-2.8.0-x86-gcc4-2012-06-18.zip
-				: $(baseURL)/libxml2-2.8.0-x86-gcc4-2012-06-18.zip ;
+				libxml2-2.8.0-x86-gcc4-2012-07-18.zip
+				: $(baseURL)/libxml2-2.8.0-x86-gcc4-2012-07-18.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				libxml2-2.8.0-x86-gcc2-2012-06-21.zip
-				: $(baseURL)/libxml2-2.8.0-x86-gcc2-2012-06-21.zip ;
+				libxml2-2.8.0-x86-gcc2-2012-07-17.zip
+				: $(baseURL)/libxml2-2.8.0-x86-gcc2-2012-07-17.zip ;
 		}
 	}
 }
