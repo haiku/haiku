@@ -26,6 +26,7 @@
 #include "FunctionInstance.h"
 #include "GUISettingsUtils.h"
 #include "MessageCodes.h"
+#include "Register.h"
 #include "SettingsMenu.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
@@ -1183,13 +1184,17 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 		BString pieceData;
 		switch (piece.type) {
 		case VALUE_PIECE_LOCATION_MEMORY:
-			pieceData.SetToFormat("\n\t(%ld): Address: 0x%llx",
-				i, piece.address);
+			pieceData.SetToFormat("\n\t(%ld): Address: 0x%llx, Size: "
+				"%lld bytes", i, piece.address, piece.size);
 			break;
 		case VALUE_PIECE_LOCATION_REGISTER:
-			pieceData.SetToFormat("\n\t(%ld): Register (%lu)",
-				i, piece.reg);
+		{
+			Architecture* architecture = fThread->GetTeam()->GetArchitecture();
+			pieceData.SetToFormat("\n\t(%ld): Register (%s)",
+				i, architecture->Registers()[piece.reg].Name());
+
 			break;
+		}
 		default:
 			break;
 		}
