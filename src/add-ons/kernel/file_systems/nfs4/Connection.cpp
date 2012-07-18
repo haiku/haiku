@@ -68,6 +68,7 @@ ServerAddress::ResolveName(const char* name, ServerAddress* address)
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	if (inet_aton(name, &addr.sin_addr) == 1) {
+		addr.sin_len = sizeof(addr);
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(NFS4_PORT);
 
@@ -201,7 +202,6 @@ ConnectionPacket::Send(const void* buffer, uint32 size)
 	status_t result = send(fSocket, buffer,  size, 0);
 	if (result < 0)
 		return errno;
-
 	return B_OK;
 }
 
@@ -394,7 +394,7 @@ Connection::Connect()
 	}
 
 	status_t result = connect(fSocket, &address, addressSize);
-	if (result < 0) {
+	if (result != 0) {
 		result = errno;
 		close(fSocket);
 		return result;
