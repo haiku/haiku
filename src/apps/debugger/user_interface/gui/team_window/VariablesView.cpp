@@ -13,6 +13,7 @@
 
 #include <Looper.h>
 #include <PopUpMenu.h>
+#include <ToolTip.h>
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
@@ -25,6 +26,7 @@
 #include "FunctionInstance.h"
 #include "GUISettingsUtils.h"
 #include "MessageCodes.h"
+#include "Register.h"
 #include "SettingsMenu.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
@@ -312,10 +314,12 @@ protected:
 					targetView);
 				return;
 			}
+		} else if (value.Type() == B_STRING_TYPE) {
+			fField.SetString(value.ToString());
+		} else {
+			// fall back to drawing an empty string
+			fField.SetString("");
 		}
-
-		// fall back to drawing an empty string
-		fField.SetString("");
 		fField.SetWidth(Width());
 		fColumn.DrawField(&fField, rect, targetView);
 	}
@@ -345,7 +349,8 @@ protected:
 // #pragma mark - VariableTableModel
 
 
-class VariablesView::VariableTableModel : public TreeTableModel {
+class VariablesView::VariableTableModel : public TreeTableModel,
+	public TreeTableToolTipProvider {
 public:
 								VariableTableModel();
 								~VariableTableModel();
@@ -378,6 +383,10 @@ public:
 
 			void				NotifyNodeChanged(ModelNode* node);
 			void				NotifyNodeHidden(ModelNode* node);
+
+	virtual	bool				GetToolTipForTablePath(
+									const TreeTablePath& path,
+									int32 columnIndex, BToolTip** _tip);
 
 private:
 			struct NodeHashDefinition {
@@ -1105,8 +1114,29 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 			_value.SetTo(node->Name(), B_VARIANT_DONT_COPY_DATA);
 			return true;
 		case 1:
-			if (node->GetValue() == NULL)
+			if (node->GetValue() == NULL) {
+				ValueLocation* location = node->NodeChild()->Location();
+				if (location == NULL)
+					return false;
+
+				Type* nodeChildRawType = node->NodeChild()->Node()->GetType()
+					->ResolveRawType(false);
+				if (nodeChildRawType->Kind() == TYPE_COMPOUND)
+				{
+					if (location->CountPieces() > 1)
+						return false;
+
+					BString data;
+					ValuePieceLocation piece = location->PieceAt(0);
+					if (piece.type != VALUE_PIECE_LOCATION_MEMORY)
+						return false;
+
+					data.SetToFormat("[@ 0x%llx]", piece.address);
+					_value.SetTo(data);
+					return true;
+				}
 				return false;
+			}
 
 			_value.SetTo(node, VALUE_NODE_TYPE);
 			return true;
@@ -1156,6 +1186,55 @@ void
 VariablesView::VariableTableModel::NotifyNodeHidden(ModelNode* node)
 {
 	fContainerListener->ModelNodeHidden(node);
+}
+
+
+bool
+VariablesView::VariableTableModel::GetToolTipForTablePath(
+	const TreeTablePath& path, int32 columnIndex, BToolTip** _tip)
+{
+	ModelNode* node = (ModelNode*)NodeForPath(path);
+	if (node == NULL)
+		return false;
+
+	if (node->NodeChild()->LocationResolutionState() != B_OK)
+		return false;
+
+	ValueLocation* location = node->NodeChild()->Location();
+	BString tipData;
+	for (int32 i = 0; i < location->CountPieces(); i++) {
+		ValuePieceLocation piece = location->PieceAt(i);
+		BString pieceData;
+		switch (piece.type) {
+			case VALUE_PIECE_LOCATION_MEMORY:
+				pieceData.SetToFormat("(%ld): Address: 0x%llx, Size: "
+					"%lld bytes", i, piece.address, piece.size);
+				break;
+			case VALUE_PIECE_LOCATION_REGISTER:
+			{
+				Architecture* architecture = fThread->GetTeam()->GetArchitecture();
+				pieceData.SetToFormat("(%ld): Register (%s)",
+					i, architecture->Registers()[piece.reg].Name());
+
+				break;
+			}
+			default:
+				break;
+		}
+
+		tipData	+= pieceData;
+		if (i < location->CountPieces() - 1)
+			tipData += "\n";
+	}
+
+	if (tipData.IsEmpty())
+		return false;
+
+	*_tip = new(std::nothrow) BTextToolTip(tipData);
+	if (*_tip == NULL)
+		return false;
+
+	return true;
 }
 
 
@@ -1734,6 +1813,7 @@ VariablesView::_Init()
 	if (fVariableTableModel->Init() != B_OK)
 		throw std::bad_alloc();
 	fVariableTable->SetTreeTableModel(fVariableTableModel);
+	fVariableTable->SetToolTipProvider(fVariableTableModel);
 
 	fContainerListener = new ContainerListener(this);
 	fVariableTableModel->SetContainerListener(fContainerListener);

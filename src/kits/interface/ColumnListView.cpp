@@ -3512,8 +3512,11 @@ OutlineView::MouseDown(BPoint position)
 			fCurrentRow = new_row;
 			fCurrentField = new_field;
 			fCurrentCode = B_INSIDE_VIEW;
+			BMessage* message = Window()->CurrentMessage();
+			int32 buttons = 1;
+			message->FindInt32("buttons", &buttons);
 			fCurrentColumn->MouseDown(fMasterView, fCurrentRow,
-				fCurrentField, fFieldRect, position, 1);
+				fCurrentField, fFieldRect, position, buttons);
 		}
 
 		if (!fEditMode) {
@@ -4090,6 +4093,16 @@ OutlineView::RemoveRow(BRow* row)
 	fItemsHeight -= subTreeHeight;
 
 	FixScrollBar(false);
+	int32 indent = 0;
+	float top = 0.0;
+	if (FindRow(fVisibleRect.top, &indent, &top) == NULL && ScrollBar(B_VERTICAL) != NULL) {
+		// after removing this row, no rows are actually visible any more,
+		// force a scroll to make them visible again
+		if (fItemsHeight > fVisibleRect.Height())
+			ScrollBy(0.0, fItemsHeight - fVisibleRect.Height() - Bounds().top);
+		else
+			ScrollBy(0.0, -Bounds().top);
+	}
 	if (parentRow != NULL) {
 		parentRow->fChildList->RemoveItem(row);
 		if (parentRow->fChildList->CountItems() == 0) {
@@ -4294,7 +4307,7 @@ OutlineView::FixScrollBar(bool scrollToFit)
 			float maxScrollBarValue = fItemsHeight - fVisibleRect.Height();
 			vScrollBar->SetProportion(fVisibleRect.Height() / fItemsHeight);
 
-			// If the user is scrolled down too far when makes the range smaller, the list
+			// If the user is scrolled down too far when making the range smaller, the list
 			// will jump suddenly, which is undesirable.  In this case, don't fix the scroll
 			// bar here. In ScrollTo, it checks to see if this has occured, and will
 			// fix the scroll bars sneakily if the user has scrolled up far enough.
