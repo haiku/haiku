@@ -126,15 +126,15 @@ ReplyInterpreter::Close()
 
 
 status_t
-ReplyInterpreter::Create()
+ReplyInterpreter::Create(uint64* before, uint64* after, bool& atomic)
 {
 	status_t res = _OperationError(OpCreate);
 	if (res != B_OK)
 		return res;
 
-	fReply->Stream().GetBoolean();
-	fReply->Stream().GetUHyper();
-	fReply->Stream().GetUHyper();
+	atomic = fReply->Stream().GetBoolean();
+	*before = fReply->Stream().GetUHyper();
+	*after = fReply->Stream().GetUHyper();
 	uint32 count = fReply->Stream().GetUInt();
 	for (uint32 i; i < count; i++)
 		fReply->Stream().GetUInt();
@@ -187,15 +187,15 @@ ReplyInterpreter::GetFH(FileHandle* fh)
 
 
 status_t
-ReplyInterpreter::Link()
+ReplyInterpreter::Link(uint64* before, uint64* after, bool& atomic)
 {
 	status_t res = _OperationError(OpLink);
 	if (res != B_OK)
 		return res;
 
-	fReply->Stream().GetBoolean();
-	fReply->Stream().GetUHyper();
-	fReply->Stream().GetUHyper();
+	atomic = fReply->Stream().GetBoolean();
+	*before = fReply->Stream().GetUHyper();
+	*after = fReply->Stream().GetUHyper();
 
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }
@@ -369,35 +369,35 @@ ReplyInterpreter::ReadLink(void* buffer, uint32* size, uint32 maxSize)
 
 
 status_t
-ReplyInterpreter::Remove()
+ReplyInterpreter::Remove(uint64* before, uint64* after, bool& atomic)
 {
 	status_t res = _OperationError(OpRemove);
 	if (res != B_OK)
 		return res;
 
-	fReply->Stream().GetBoolean();
-	fReply->Stream().GetUHyper();
-	fReply->Stream().GetUHyper();
+	atomic = fReply->Stream().GetBoolean();
+	*before = fReply->Stream().GetUHyper();
+	*after = fReply->Stream().GetUHyper();
 
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }
 
 
 status_t
-ReplyInterpreter::Rename()
+ReplyInterpreter::Rename(uint64* fromBefore, uint64* fromAfter,
+	bool& fromAtomic, uint64* toBefore, uint64* toAfter, bool& toAtomic)
 {
 	status_t res = _OperationError(OpRename);
 	if (res != B_OK)
 		return res;
 
-	fReply->Stream().GetBoolean();
-	fReply->Stream().GetUHyper();
-	fReply->Stream().GetUHyper();
+	fromAtomic = fReply->Stream().GetBoolean();
+	*fromBefore = fReply->Stream().GetUHyper();
+	*fromAfter = fReply->Stream().GetUHyper();
 
-	fReply->Stream().GetBoolean();
-	fReply->Stream().GetUHyper();
-	fReply->Stream().GetUHyper();
-
+	toAtomic = fReply->Stream().GetBoolean();
+	*toBefore = fReply->Stream().GetUHyper();
+	*toAfter = fReply->Stream().GetUHyper();
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }
 

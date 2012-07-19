@@ -67,7 +67,23 @@ Inode::CreateDir(const char* name, int mode)
 
 		reply.PutFH();
 
-		return reply.Create();
+		uint64 before, after;
+		bool atomic;
+		result = reply.Create(&before, &after, atomic);
+
+		fFileSystem->Root()->MakeInfoInvalid();
+
+		if (fCache->Lock() == B_OK) {
+			if (atomic && fCache->ChangeInfo() == before) {
+				// TODO: update cache
+				//fCache->AddEntry(name, );
+				fCache->SetChangeInfo(after);
+			} else if (fCache->ChangeInfo() != before)
+				fCache->Trash();
+			fCache->Unlock();
+		}
+
+		return result;
 	} while (true);
 }
 

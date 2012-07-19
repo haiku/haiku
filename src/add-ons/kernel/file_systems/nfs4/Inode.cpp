@@ -304,7 +304,23 @@ Inode::Link(Inode* dir, const char* name)
 		reply.SaveFH();
 		reply.PutFH();
 
-		return reply.Link();
+		uint64 before, after;
+		bool atomic;
+		result = reply.Link(&before, &after, atomic);
+		if (result != B_OK)
+			return result;
+
+		if (fCache->Lock() == B_OK) {
+			if (atomic && fCache->ChangeInfo() == before) {
+				// TODO: update cache
+				//fCache->AddEntry(name, );
+				fCache->SetChangeInfo(after);
+			} else if (fCache->ChangeInfo() != before)
+				fCache->Trash();
+			fCache->Unlock();
+		}
+
+		return B_OK;
 	} while (true);
 }
 
@@ -361,9 +377,19 @@ Inode::Remove(const char* name, FileType type)
 			return result;
 
 		reply.PutFH();
-		result = reply.Remove();
 
-		// remove entry
+		uint64 before, after;
+		bool atomic;
+		result = reply.Remove(&before, &after, atomic);
+
+		if (fCache->Lock() == B_OK) {
+			if (atomic && fCache->ChangeInfo() == before) {
+				fCache->RemoveEntry(name);
+				fCache->SetChangeInfo(after);
+			} else if (fCache->ChangeInfo() != before)
+				fCache->Trash();
+			fCache->Unlock();
+		}
 
 		fFileSystem->Root()->MakeInfoInvalid();
 
@@ -415,9 +441,29 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 		reply.SaveFH();
 		reply.PutFH();
 
-		result = reply.Rename();
+		uint64 fromBefore, fromAfter, toBefore, toAfter;
+		bool fromAtomic, toAtomic;
+		result = reply.Rename(&fromBefore, &fromAfter, fromAtomic, &toBefore,
+			&toAfter, toAtomic);
 
-		// remove entry
+		if (from->fCache->Lock() == B_OK) {
+			if (fromAtomic && from->fCache->ChangeInfo() == fromBefore) {
+				from->fCache->RemoveEntry(fromName);
+				from->fCache->SetChangeInfo(fromAfter);
+			} else if (from->fCache->ChangeInfo() != fromBefore)
+				from->fCache->Trash();
+			from->fCache->Unlock();
+		}
+
+		if (to->fCache->Lock() == B_OK) {
+			if (toAtomic && to->fCache->ChangeInfo() == toBefore) {
+				// TODO: update cache
+				//fCache->AddEntry(toName, );
+				to->fCache->SetChangeInfo(toAfter);
+			} else if (to->fCache->ChangeInfo() != toBefore)
+				to->fCache->Trash();
+			to->fCache->Unlock();
+		};
 
 		return result;
 	} while (true);
@@ -474,9 +520,21 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 
 		reply.PutFH();
 
-		result = reply.Create();
+		uint64 before, after;
+		bool atomic;
+		result = reply.Create(&before, &after, atomic);
 
 		fFileSystem->Root()->MakeInfoInvalid();
+
+		if (fCache->Lock() == B_OK) {
+			if (atomic && fCache->ChangeInfo() == before) {
+				// TODO: update cache
+				//fCache->AddEntry(name, );
+				fCache->SetChangeInfo(after);
+			} else if (fCache->ChangeInfo() != before)
+				fCache->Trash();
+			fCache->Unlock();
+		}
 
 		return result;
 	} while (true);

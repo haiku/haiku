@@ -69,10 +69,10 @@ public:
 
 			status_t	Access(uint32* supported, uint32* allowed);
 			status_t	Close();
-			status_t	Create();
+			status_t	Create(uint64* before, uint64* after, bool& atomic);
 			status_t	GetAttr(AttrValue** attrs, uint32* count);
 			status_t	GetFH(FileHandle* fh);
-			status_t	Link();
+			status_t	Link(uint64* before, uint64* after, bool& atomic);
 			status_t	Lock(LockInfo* linfo);
 			status_t 	LockT(uint64* pos, uint64* len, LockType* type);
 			status_t	LockU(LockInfo* linfo);
@@ -87,8 +87,10 @@ public:
 			status_t	ReadDir(uint64* cookie, uint64* cookieVerf,
 							DirEntry** dirents, uint32* count, bool* eof);
 			status_t	ReadLink(void* buffer, uint32* size, uint32 maxSize);
-			status_t	Remove();
-			status_t	Rename();
+			status_t	Remove(uint64* before, uint64* after, bool& atomic);
+			status_t	Rename(uint64* fromBefore, uint64* fromAfter,
+							bool& fromAtomic, uint64* toBefore, uint64* toAfter,
+							bool& toAtomic);
 	inline	status_t	Renew();
 	inline	status_t	SaveFH();
 			status_t	SetAttr();
