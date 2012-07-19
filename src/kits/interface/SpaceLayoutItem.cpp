@@ -9,6 +9,7 @@
 
 #include <new>
 
+#include <ControlLook.h>
 #include <Message.h>
 
 
@@ -18,6 +19,13 @@ namespace {
 	const char* const kAlignmentField = "BSpaceLayoutItem:alignment";
 	const char* const kFrameField = "BSpaceLayoutItem:frame";
 	const char* const kVisibleField = "BSpaceLayoutItem:visible";
+
+	BSize& ComposeSpacingInPlace(BSize& size)
+	{
+		size.width = BControlLook::ComposeSpacing(size.width);
+		size.height = BControlLook::ComposeSpacing(size.height);
+		return size;
+	}
 }
 
 
@@ -25,9 +33,9 @@ BSpaceLayoutItem::BSpaceLayoutItem(BSize minSize, BSize maxSize,
 	BSize preferredSize, BAlignment alignment)
 	:
 	fFrame(),
-	fMinSize(minSize),
-	fMaxSize(maxSize),
-	fPreferredSize(preferredSize),
+	fMinSize(ComposeSpacingInPlace(minSize)),
+	fMaxSize(ComposeSpacingInPlace(maxSize)),
+	fPreferredSize(ComposeSpacingInPlace(preferredSize)),
 	fAlignment(alignment),
 	fVisible(true)
 {

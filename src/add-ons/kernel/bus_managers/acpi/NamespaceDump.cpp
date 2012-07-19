@@ -1,5 +1,5 @@
 /* ++++++++++
-	ACPI namespace dump. 
+	ACPI namespace dump.
 	Nothing special here, just tree enumeration and type identification.
 +++++ */
 
@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "acpi_priv.h"
+#include "ACPIPrivate.h"
 
 #include <util/kernel_cpp.h>
 #include <util/ring_buffer.h>
@@ -17,7 +17,7 @@
 class RingBuffer {
 public:
 	RingBuffer(size_t size = 1024);
-	~RingBuffer();	
+	~RingBuffer();
 	size_t Read(void *buffer, ssize_t length);
 	size_t Write(const void *buffer, ssize_t length);
 	size_t WritableAmount() const;
@@ -60,18 +60,18 @@ make_space(acpi_ns_device_info *device, size_t space)
 		}
 		snooze(10000);
 
-		if (!device->buffer->Lock()) 
+		if (!device->buffer->Lock())
 			return false;
-		
+
 	} while (device->buffer->WritableAmount() < space);
-	
+
 	return true;
-} 
+}
 
 
 
-static void 
-dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting) 
+static void
+dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 {
 	char result[255];
 	char output[320];
@@ -79,13 +79,13 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 	char hid[16] = "";
 	int i;
 	size_t written = 0;
-	for (i = 0; i < indenting; i++) 
+	for (i = 0; i < indenting; i++)
 		strlcat(tabs, "|    ", sizeof(tabs));
 
 	strlcat(tabs, "|--- ", sizeof(tabs));
 
 	int depth = sizeof(char) * 5 * indenting + sizeof(char); // index into result where the device name will be.
-	
+
 	void *counter = NULL;
 	while (device->acpi->get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
 		uint32 type = device->acpi->get_object_type(result);
@@ -142,13 +142,13 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 		written = 0;
 		RingBuffer &ringBuffer = *device->buffer;
 		size_t toWrite = strlen(output);
-		
+
 		if (toWrite <= 0)
 			break;
 
 		strlcat(output, "\n", sizeof(output));
 		toWrite++;
-		if (!ringBuffer.Lock()) 
+		if (!ringBuffer.Lock())
 			break;
 
 		if (ringBuffer.WritableAmount() < toWrite &&

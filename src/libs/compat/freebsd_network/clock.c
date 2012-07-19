@@ -5,10 +5,7 @@
 
 
 #include "device.h"
-
-
-#define CONVERT_HZ_TO_USECS(hertz) (1000000LL / (hertz))
-#define FREEBSD_CLOCK_FREQUENCY_IN_HZ 1000
+#include "kernel.h"
 
 
 int ticks;
@@ -27,24 +24,15 @@ hardClock(timer* hardClockTimer)
 
 
 /*!
- * Initialization of the hardclock timer.
- *
- * Note: We are not using the FreeBSD variable hz as the invocation frequency
- * as it is the case in FreeBSD's hardclock function. This is due to lower
- * system load. The hz (see compat/sys/kernel.h) variable in the compat layer is
- * set to 1000000 Hz, whereas it is usually set to 1000 Hz for FreeBSD.
+ * Initialization of the hardclock timer which ticks according to hz defined in
+ * compat/sys/kernel.h.
  */
 status_t
 init_hard_clock()
 {
-	status_t status;
-
 	ticks = 0;
-	status = add_timer(&sHardClockTimer, hardClock,
-		CONVERT_HZ_TO_USECS(FREEBSD_CLOCK_FREQUENCY_IN_HZ),
+	return add_timer(&sHardClockTimer, hardClock, ticks_to_usecs(1),
 		B_PERIODIC_TIMER);
-
-	return status;
 }
 
 

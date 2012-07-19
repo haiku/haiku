@@ -1268,7 +1268,7 @@ BlockWriter::_BlockDone(cached_block* block, hash_iterator* iterator)
 			fDeletedTransaction = true;
 		}
 	}
-	if (block->transaction == NULL && block->ref_count == 0) {
+	if (block->transaction == NULL && block->ref_count == 0 && !block->unused) {
 		// the block is no longer used
 		block->unused = true;
 		fCache->unused_blocks.Add(block);
@@ -1761,7 +1761,9 @@ put_cached_block(block_cache* cache, cached_block* block)
 			cache->RemoveBlock(block);
 		} else {
 			// put this block in the list of unused blocks
+			ASSERT(!block->unused);
 			block->unused = true;
+
 			ASSERT(block->original_data == NULL
 				&& block->parent_data == NULL);
 			cache->unused_blocks.Add(block);

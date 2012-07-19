@@ -109,6 +109,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fStepOverButton(NULL),
 	fStepIntoButton(NULL),
 	fStepOutButton(NULL),
+	fInspectorWindow(NULL),
 	fSourceLocatePanel(NULL)
 {
 	fTeam->Lock();
@@ -217,26 +218,33 @@ TeamWindow::MessageReceived(BMessage* message)
 		{
 			if (fInspectorWindow) {
 				fInspectorWindow->Activate(true);
-				break;
+			} else {
+				try {
+					fInspectorWindow = InspectorWindow::Create(fTeam,
+						fListener, this);
+					if (fInspectorWindow != NULL) {
+						BMessage settings;
+						fInspectorWindow->LoadSettings(fUISettings);
+						fInspectorWindow->Show();
+					}
+	           	} catch (...) {
+	           		// TODO: notify user
+	           	}
 			}
 
-			try {
-				fInspectorWindow = InspectorWindow::Create(fTeam, fListener,
-					this);
-				if (fInspectorWindow != NULL) {
-					BMessage settings;
-					fInspectorWindow->LoadSettings(fUISettings);
-					fInspectorWindow->Show();
-				}
-           	} catch (...) {
-           		// TODO: notify user
-           	}
+			target_addr_t address;
+			if (message->FindUInt64("address", &address) == B_OK) {
+				BMessage addressMessage(MSG_INSPECT_ADDRESS);
+				addressMessage.AddUInt64("address", address);
+				fInspectorWindow->PostMessage(&addressMessage);
+			}
            	break;
 		}
 		case MSG_INSPECTOR_WINDOW_CLOSED:
 		{
 			_SaveInspectorSettings(CurrentMessage());
 			fInspectorWindow = NULL;
+			break;
 
 		}
 		case B_REFS_RECEIVED:

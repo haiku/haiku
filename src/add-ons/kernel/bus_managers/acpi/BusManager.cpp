@@ -20,11 +20,13 @@
 
 #include <safemode.h>
 
+extern "C" {
 #include "acpi.h"
 #include "accommon.h"
 #include "acdisasm.h"
 #include "acnamesp.h"
-#include "acpi_priv.h"
+}
+#include "ACPIPrivate.h"
 
 //#define TRACE_ACPI_BUS
 #ifdef TRACE_ACPI_BUS
@@ -384,7 +386,7 @@ status_t
 install_fixed_event_handler(uint32 event, interrupt_handler* handler,
 	void *data)
 {
-	return AcpiInstallFixedEventHandler(event, (void*)handler, data) == AE_OK
+	return AcpiInstallFixedEventHandler(event, (ACPI_EVENT_HANDLER)handler, data) == AE_OK
 		? B_OK : B_ERROR;
 }
 
@@ -392,7 +394,7 @@ install_fixed_event_handler(uint32 event, interrupt_handler* handler,
 status_t
 remove_fixed_event_handler(uint32 event, interrupt_handler* handler)
 {
-	return AcpiRemoveFixedEventHandler(event, (void*)handler) == AE_OK
+	return AcpiRemoveFixedEventHandler(event, (ACPI_EVENT_HANDLER)handler) == AE_OK
 		? B_OK : B_ERROR;
 }
 
@@ -441,7 +443,7 @@ get_device(const char* hid, uint32 index, char* result, size_t resultLength)
 	char *buffer = NULL;
 
 	TRACE("get_device %s, index %ld\n", hid, index);
-	status = AcpiGetDevices((ACPI_STRING)hid, (void*)&get_device_by_hid_callback,
+	status = AcpiGetDevices((ACPI_STRING)hid, (ACPI_WALK_CALLBACK)&get_device_by_hid_callback,
 		counter, (void**)&buffer);
 	if (status != AE_OK || buffer == NULL)
 		return B_ENTRY_NOT_FOUND;
@@ -523,7 +525,7 @@ get_object(const char* path, acpi_object_type** _returnValue)
 
 	status = AcpiEvaluateObject(handle, NULL, NULL, &buffer);
 
-	*_returnValue = buffer.Pointer;
+	*_returnValue = (acpi_object_type*)buffer.Pointer;
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -545,7 +547,7 @@ get_object_typed(const char* path, acpi_object_type** _returnValue,
 
 	status = AcpiEvaluateObjectTyped(handle, NULL, NULL, &buffer, objectType);
 
-	*_returnValue = buffer.Pointer;
+	*_returnValue = (acpi_object_type*)buffer.Pointer;
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -642,7 +644,7 @@ prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 		status_t status;
 
 		// Note: The supplied code must already be locked into memory.
-		status = get_memory_map(wakeFunc, size, &wakeVector, 1);
+		status = get_memory_map((const void*)wakeFunc, size, &wakeVector, 1);
 		if (status != B_OK)
 			return status;
 
@@ -676,7 +678,10 @@ enter_sleep_state(uint8 state, uint8 flags)
 
 	TRACE("enter_sleep_state %d with flags %d\n", state, flags);
 
+	cpu_status cpu = disable_interrupts();
 	status = AcpiEnterSleepState(state, flags);
+	restore_interrupts(cpu);
+	panic("AcpiEnterSleepState should not return.");
 	if (status != AE_OK)
 		return B_ERROR;
 

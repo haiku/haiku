@@ -13,16 +13,17 @@
 #include "StatusSlider.h"
 
 
-class PoorManAdvancedView: public BView
-{
+class PoorManAdvancedView: public BView {
 public:
-				PoorManAdvancedView(BRect, const char *name);
-		int32	MaxSimultaneousConnections() { return maxConnections->Value(); }
-		void	SetMaxSimutaneousConnections(int32 num);
+							PoorManAdvancedView(const char *name);
+
+			int32			MaxSimultaneousConnections()
+								{ return fMaxConnections->Value(); }
+			void			SetMaxSimutaneousConnections(int32 num);
 private:
-		// Advanced Tab
+			// Advanced Tab
 			// Connections Options
-			StatusSlider	*	maxConnections;
+			StatusSlider*	fMaxConnections;
 };
 
 #endif

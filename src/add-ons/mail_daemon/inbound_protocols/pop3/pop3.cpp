@@ -112,6 +112,9 @@ POP3Protocol::Connect()
 status_t
 POP3Protocol::Disconnect()
 {
+	if (fServerConnection == NULL)
+		return B_OK;
+
 	SendCommand("QUIT" CRLF);
 
 	fServerConnection->Disconnect();
