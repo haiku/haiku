@@ -2877,6 +2877,8 @@ cache_abort_transaction(void* _cache, int32 id)
 		block->transaction_next = NULL;
 		block->transaction = NULL;
 		block->discard = false;
+		if (block->previous_transaction == NULL)
+			block->is_dirty = false;
 	}
 
 	hash_remove(cache->transaction_hash, transaction);
@@ -3028,17 +3030,24 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 		next = block->transaction_next;
 
 		if (block->parent_data == NULL) {
-			// the parent transaction didn't change the block, but the sub
-			// transaction did - we need to revert from the original data
+			// The parent transaction didn't change the block, but the sub
+			// transaction did - we need to revert to the original data.
+			// The block is no longer part of the transaction
 			ASSERT(block->original_data != NULL);
 			memcpy(block->current_data, block->original_data,
 				cache->block_size);
+			block->transaction_next = NULL;
+			block->transaction = NULL;
+			if (block->previous_transaction == NULL)
+				block->is_dirty = false;
 		} else if (block->parent_data != block->current_data) {
-			// the block has been changed and must be restored
+			// The block has been changed and must be restored - the block
+			// is still dirty and part of the transaction
 			TRACE(("cache_abort_sub_transaction(id = %ld): restored contents "
 				"of block %Ld\n", transaction->id, block->block_number));
 			memcpy(block->current_data, block->parent_data, cache->block_size);
 			cache->Free(block->parent_data);
+			// The block stays dirty
 		}
 
 		block->parent_data = NULL;
