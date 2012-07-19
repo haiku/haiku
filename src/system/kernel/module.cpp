@@ -1100,7 +1100,7 @@ register_preloaded_module_image(struct preloaded_image* image)
 	int32 index = 0;
 
 	TRACE(("register_preloaded_module_image(image = %p, name = \"%s\")\n",
-		image, image->name));
+		image, image->name.Pointer()));
 
 	image->is_module = false;
 

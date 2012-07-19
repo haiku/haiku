@@ -709,7 +709,7 @@ static status_t
 elf_parse_dynamic_section(struct elf_image_info *image)
 {
 	elf_dyn *d;
-	int32 neededOffset = -1;
+	ssize_t neededOffset = -1;
 
 	TRACE(("top of elf_parse_dynamic_section\n"));
 
@@ -1139,7 +1139,7 @@ unload_elf_image(struct elf_image_info *image)
 	if (atomic_add(&image->ref_count, -1) > 1)
 		return;
 
-	TRACE(("unload image %ld, %s\n", image->id, image->name));
+	TRACE(("unload image %" B_PRId32 ", %s\n", image->id, image->name));
 
 	unregister_elf_image(image);
 	delete_elf_image(image);
@@ -1228,7 +1228,7 @@ load_elf_symbol_table(int fd, struct elf_image_info *image)
 		goto error3;
 	}
 
-	TRACE(("loaded debug %ld symbols\n", numSymbols));
+	TRACE(("loaded %" B_PRId32 " debug symbols\n", numSymbols));
 
 	// insert tables into image
 	image->debug_symbols = symbolTable;
@@ -1904,9 +1904,9 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 			B_PAGE_SIZE);
 		if (programHeaders[i].p_flags & PF_WRITE) {
 			// rw/data segment
-			uint32 memUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+			size_t memUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
 				+ programHeaders[i].p_memsz;
-			uint32 fileUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+			size_t fileUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
 				+ programHeaders[i].p_filesz;
 
 			memUpperBound = ROUNDUP(memUpperBound, B_PAGE_SIZE);
@@ -2151,7 +2151,7 @@ load_kernel_add_on(const char *path)
 		char regionName[B_OS_NAME_LENGTH];
 		elf_region *region;
 
-		TRACE(("looking at program header %ld\n", i));
+		TRACE(("looking at program header %" B_PRId32 "\n", i));
 
 		switch (programHeaders[i].p_type) {
 			case PT_LOAD:
