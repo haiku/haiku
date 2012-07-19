@@ -3512,8 +3512,11 @@ OutlineView::MouseDown(BPoint position)
 			fCurrentRow = new_row;
 			fCurrentField = new_field;
 			fCurrentCode = B_INSIDE_VIEW;
+			BMessage* message = Window()->CurrentMessage();
+			int32 buttons = 1;
+			message->FindInt32("buttons", &buttons);
 			fCurrentColumn->MouseDown(fMasterView, fCurrentRow,
-				fCurrentField, fFieldRect, position, 1);
+				fCurrentField, fFieldRect, position, buttons);
 		}
 
 		if (!fEditMode) {
