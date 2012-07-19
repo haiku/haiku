@@ -356,6 +356,7 @@ if $(HAIKU_GCC_VERSION[1]) >= 4 {
 
 HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 HAIKU_KERNEL_PIC_LINKFLAGS = ;
+HAIKU_KERNEL_ADDON_LINKFLAGS = ;
 
 switch $(HAIKU_ARCH) {
 	case ppc :
@@ -389,13 +390,16 @@ switch $(HAIKU_ARCH) {
 	case x86_64 :
 	{
 		# Kernel lives in the top 2GB of the address space, use kernel code
-		# model. Also disable the red zone, which cannot be used in kernel
-		# code due to interrupts.
-		HAIKU_KERNEL_CCFLAGS += -mcmodel=kernel -mno-red-zone
-			-fno-omit-frame-pointer ;
-		HAIKU_KERNEL_C++FLAGS += -mcmodel=kernel -mno-red-zone
-			-fno-omit-frame-pointer ;
+		# model.
+		HAIKU_KERNEL_PIC_CCFLAGS += -mcmodel=kernel ;
+
+		# Disable the red zone, which cannot be used in kernel code due to
+		# interrupts, and always enable the frame pointer so stack traces are
+		# correct.
+		HAIKU_KERNEL_CCFLAGS += -mno-red-zone -fno-omit-frame-pointer ;
+		HAIKU_KERNEL_C++FLAGS += -mno-red-zone -fno-omit-frame-pointer ;
 		HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
+		HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
 
 		# Bootloader is 32-bit.
 		HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
@@ -984,7 +988,7 @@ if $(TARGET_PLATFORM) != haiku {
 local buildVars =
 	ARCH CPU GCC_VERSION KERNEL_ARCH
 
-	AR CC C++ LD OBJCOPY RANLIB
+	AR CC C++ LD OBJCOPY RANLIB ELFEDIT
 
 	INCLUDES_SEPARATOR LOCAL_INCLUDES_OPTION SYSTEM_INCLUDES_OPTION
 
@@ -993,7 +997,7 @@ local buildVars =
 	KERNEL_DEFINES
 
 	KERNEL_CCFLAGS KERNEL_C++FLAGS
-	KERNEL_PIC_CCFLAGS KERNEL_PIC_LINKFLAGS
+	KERNEL_PIC_CCFLAGS KERNEL_PIC_LINKFLAGS KERNEL_ADDON_LINKFLAGS
 	BOOT_CCFLAGS BOOT_C++FLAGS BOOT_LINKFLAGS
 	WARNING_CCFLAGS WARNING_C++FLAGS
 

@@ -77,6 +77,24 @@ actions KernelLd bind VERSION_SCRIPT
 		--version-script=$(VERSION_SCRIPT)
 }
 
+rule KernelSo target : source
+{
+	# KernelSo <target> : <source>
+
+	Depends $(target) : <build>copyattr $(source) ;
+
+	MakeLocateDebug $(1) ;
+	KernelSo1 $(target) : <build>copyattr $(source) ;
+}
+
+actions KernelSo1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+
+	$(2[1]) --data $(2[2]) $(1) &&
+	$(HAIKU_ELFEDIT) --output-type dyn $(1)
+}
+
 rule KernelAddon
 {
 	# KernelAddon <name> : <sources> : <static-libraries> : <res> ;
@@ -117,7 +135,7 @@ rule KernelAddon
 	# compile and link
 	SetupKernel $(sources) : $(TARGET_KERNEL_PIC_FLAGS) : false ;
 	local linkFlags = -nostdlib -Xlinker --no-undefined
-		-Xlinker -soname=\"$(target:G=)\" ;
+		-Xlinker -soname=\"$(target:G=)\" $(TARGET_KERNEL_ADDON_LINKFLAGS) ;
 	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ] $(linkFlags) ;
 	Main $(target) : $(sources) ;
 	LinkAgainst $(target) : $(libs) $(kernel) ;

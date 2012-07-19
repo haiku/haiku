@@ -344,6 +344,7 @@ set_default_value HAIKU_CC			gcc
 set_default_value HAIKU_LD			ld
 set_default_value HAIKU_OBJCOPY		objcopy
 set_default_value HAIKU_RANLIB		ranlib
+set_default_value HAIKU_ELFEDIT		elfedit
 set_default_value HAIKU_YASM		yasm
 set_default_value HAIKU_CPPFLAGS	""
 set_default_value HAIKU_CCFLAGS		""
@@ -510,6 +511,7 @@ if [ -n "$crossToolsPrefix" ]; then
 	get_build_tool_path LD ld
 	get_build_tool_path OBJCOPY objcopy
 	get_build_tool_path RANLIB ranlib
+	get_build_tool_path ELFEDIT elfedit
 fi
 
 # prepare gcc settings
@@ -570,6 +572,7 @@ HAIKU_CC					?= ${HAIKU_CC} ;
 HAIKU_LD					?= ${HAIKU_LD} ;
 HAIKU_OBJCOPY				?= ${HAIKU_OBJCOPY} ;
 HAIKU_RANLIB				?= ${HAIKU_RANLIB} ;
+HAIKU_ELFEDIT				?= ${HAIKU_ELFEDIT} ;
 HAIKU_YASM					?= ${HAIKU_YASM} ;
 HAIKU_CPPFLAGS				?= ${HAIKU_CPPFLAGS} ;
 HAIKU_CCFLAGS				?= ${HAIKU_CCFLAGS} ;

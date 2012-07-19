@@ -52,7 +52,10 @@ SYSTEM_ADD_ONS_BUS_MANAGERS = $(X86_ONLY)acpi $(ATA_ONLY)ata config_manager dpc 
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 
 
-if $(TARGET_ARCH) != x86_64 {
+if $(TARGET_ARCH) = x86_64 {
+	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
+		: dpc ;
+} else {
 	# modules
 	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
 		: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
@@ -121,7 +124,11 @@ if $(NET_BOOT) = 1 {
 }
 
 # boot module links
-if $(TARGET_ARCH) != x86_64 {
+if $(TARGET_ARCH) = x86_64 {
+	AddBootModuleSymlinksToFloppyBootArchive
+		dpc
+	;
+} else {
 	AddBootModuleSymlinksToFloppyBootArchive
 		$(SYSTEM_ADD_ONS_BUS_MANAGERS)
 		$(PPC_ONLY)openpic

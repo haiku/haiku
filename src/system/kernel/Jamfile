@@ -134,37 +134,47 @@ KernelLd kernel_$(TARGET_ARCH) :
 	:
 ;
 
-KernelLd kernel.so :
-	kernel_cache.o
-	kernel_core.o
-	kernel_debug.o
-	kernel_device_manager.o
-	kernel_disk_device_manager.o
-	kernel_fs.o
-	kernel_messaging.o
-	kernel_posix.o
-	kernel_slab.o
-	kernel_util.o
-	kernel_vm.o
+if $(HAIKU_ARCH) = x86_64 {
+	# Cannot relink everything as a shared object on x86_64 as shared library
+	# code is required to be position-independent. Instead create a copy of the
+	# executable kernel image and change the ELF header type to DYN. A bit of
+	# a hack, but avoids having to recompile a PIC copy of the kernel code.
+	# kernel.so is only used when linking modules to provide symbol information,
+	# this is sufficient for that purpose.
+	KernelSo kernel.so : kernel_$(TARGET_ARCH) ;
+} else {
+	KernelLd kernel.so :
+		kernel_cache.o
+		kernel_core.o
+		kernel_debug.o
+		kernel_device_manager.o
+		kernel_disk_device_manager.o
+		kernel_fs.o
+		kernel_messaging.o
+		kernel_posix.o
+		kernel_slab.o
+		kernel_util.o
+		kernel_vm.o
 
-	kernel_arch_$(TARGET_KERNEL_ARCH).o
-	kernel_platform_$(TARGET_BOOT_PLATFORM).o
+		kernel_arch_$(TARGET_KERNEL_ARCH).o
+		kernel_platform_$(TARGET_BOOT_PLATFORM).o
 
-	linkhack.so
+		linkhack.so
 
-	# kernel libroot parts
-	kernel_os_main.o
-	kernel_os_arch_$(TARGET_ARCH).o
-	kernel_lib_posix.o
-	kernel_lib_posix_arch_$(TARGET_ARCH).o
-	kernel_misc.o
+		# kernel libroot parts
+		kernel_os_main.o
+		kernel_os_arch_$(TARGET_ARCH).o
+		kernel_lib_posix.o
+		kernel_lib_posix_arch_$(TARGET_ARCH).o
+		kernel_misc.o
 
-	$(HAIKU_STATIC_LIBSUPC++)
+		$(HAIKU_STATIC_LIBSUPC++)
 
-	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
-	: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
-	  $(TARGET_KERNEL_PIC_LINKFLAGS)
-;
+		: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
+		: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
+		  $(TARGET_KERNEL_PIC_LINKFLAGS)
+	;
+}
 
 NotFile kernel ;
 Depends kernel : kernel_$(TARGET_ARCH) ;
