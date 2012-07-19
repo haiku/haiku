@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STRING_H_
