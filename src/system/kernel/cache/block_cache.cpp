@@ -89,7 +89,17 @@ struct cached_block {
 	bool			busy_reading_waiters : 1;
 	bool			busy_writing_waiters : 1;
 	cache_transaction* transaction;
+		// This is the current active transaction, if any, the block is
+		// currently in (meaning was changed as a part of it).
 	cache_transaction* previous_transaction;
+		// This is set to the last transaction that was ended containing this
+		// block. In this case, the block has not yet written back yet, and
+		// the changed data is either in current_data, or original_data -- the
+		// latter if the block is already being part of another transaction.
+		// There can only be one previous transaction, so when the active
+		// transaction ends, the changes of the previous transaction have to
+		// be written back before that transaction becomes the next previous
+		// transaction.
 
 	bool CanBeWritten() const;
 	int32 LastAccess() const
@@ -1189,7 +1199,7 @@ BlockWriter::WriteBlock(block_cache* cache, cached_block* block)
 void*
 BlockWriter::_Data(cached_block* block) const
 {
-	return block->previous_transaction && block->original_data
+	return block->previous_transaction != NULL && block->original_data != NULL
 		? block->original_data : block->current_data;
 		// We first need to write back changes from previous transactions
 }
