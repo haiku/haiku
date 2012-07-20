@@ -118,9 +118,6 @@ private:
 			BPoint				fScrollOffsetStart;
 
 			uint32				fMouseFilterMode;
-
-			BBitmap*			fOffsreenBitmap;
-			BView*				fOffsreenView;
 };
 
 #endif // CANVAS_VIEW_H
