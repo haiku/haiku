@@ -281,6 +281,10 @@ Inode::Link(Inode* dir, const char* name)
 		req.PutFH(dir->fInfo.fHandle);
 		req.Link(name);
 
+		req.LookUp(name);
+		Attribute attr[] = { FATTR4_FILEID };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
 		status_t result = request.Send();
 		if (result != B_OK)
 			return result;
@@ -310,10 +314,27 @@ Inode::Link(Inode* dir, const char* name)
 		if (result != B_OK)
 			return result;
 
+		result = reply.LookUp();
+		if (result != B_OK)
+			return result;
+
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
+
+		uint32 fileID;
+		if (count == 0)
+			fileID = fFileSystem->AllocFileId();
+		else
+			fileID = values[1].fData.fValue64;
+
+		fFileSystem->Root()->MakeInfoInvalid();
+
 		if (fCache->Lock() == B_OK) {
 			if (atomic && fCache->ChangeInfo() == before) {
-				// TODO: update cache
-				//fCache->AddEntry(name, );
+				fCache->AddEntry(name, fileID, true);
 				fCache->SetChangeInfo(after);
 			} else if (fCache->ChangeInfo() != before)
 				fCache->Trash();
@@ -418,6 +439,10 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 		req.PutFH(to->fInfo.fHandle);
 		req.Rename(fromName, toName);
 
+		Attribute attr[] = { FATTR4_FILEID };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		req.LookUp(toName);
+
 		status_t result = request.Send();
 		if (result != B_OK)
 			return result;
@@ -445,6 +470,26 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 		bool fromAtomic, toAtomic;
 		result = reply.Rename(&fromBefore, &fromAfter, fromAtomic, &toBefore,
 			&toAfter, toAtomic);
+		if (result != B_OK)
+			return result;
+
+		result = reply.LookUp();
+		if (result != B_OK)
+			return result;
+
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
+
+		uint32 fileID;
+		if (count == 0)
+			fileID = from->fFileSystem->AllocFileId();
+		else
+			fileID = values[1].fData.fValue64;
+
+		from->fFileSystem->Root()->MakeInfoInvalid();
 
 		if (from->fCache->Lock() == B_OK) {
 			if (fromAtomic && from->fCache->ChangeInfo() == fromBefore) {
@@ -457,15 +502,14 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 
 		if (to->fCache->Lock() == B_OK) {
 			if (toAtomic && to->fCache->ChangeInfo() == toBefore) {
-				// TODO: update cache
-				//fCache->AddEntry(toName, );
+				to->fCache->AddEntry(toName, fileID, true);
 				to->fCache->SetChangeInfo(toAfter);
 			} else if (to->fCache->ChangeInfo() != toBefore)
 				to->fCache->Trash();
 			to->fCache->Unlock();
-		};
+		}
 
-		return result;
+		return B_OK;
 	} while (true);
 }
 
@@ -505,6 +549,9 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 
 		req.Create(NF4LNK, name, cattr, i, path);
 
+		Attribute attr[] = { FATTR4_FILEID };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
 		status_t result = request.Send();
 		if (result != B_OK)
 			return result;
@@ -523,20 +570,33 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 		uint64 before, after;
 		bool atomic;
 		result = reply.Create(&before, &after, atomic);
+		if (result != B_OK)
+			return result;
+
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
+
+		uint32 fileID;
+		if (count == 0)
+			fileID = fFileSystem->AllocFileId();
+		else
+			fileID = values[1].fData.fValue64;
 
 		fFileSystem->Root()->MakeInfoInvalid();
 
 		if (fCache->Lock() == B_OK) {
 			if (atomic && fCache->ChangeInfo() == before) {
-				// TODO: update cache
-				//fCache->AddEntry(name, );
+				fCache->AddEntry(name, fileID, true);
 				fCache->SetChangeInfo(after);
 			} else if (fCache->ChangeInfo() != before)
 				fCache->Trash();
 			fCache->Unlock();
 		}
 
-		return result;
+		return B_OK;
 	} while (true);
 }
 

@@ -46,7 +46,8 @@ public:
 			void			ResetAndLock();
 			void			Trash();
 
-			status_t		AddEntry(const char* name, ino_t node);
+			status_t		AddEntry(const char* name, ino_t node,
+								bool created = false);
 			void			RemoveEntry(const char* name);
 
 			void			SetSnapshot(DirectoryCacheSnapshot* snapshot);
@@ -68,7 +69,6 @@ private:
 			SinglyLinkedList<NameCacheEntry>	fNameCache;
 
 			DirectoryCacheSnapshot*	fDirectoryCache;
-			//mutex			fDirectoryCacheLock;
 
 			Inode*			fInode;
 

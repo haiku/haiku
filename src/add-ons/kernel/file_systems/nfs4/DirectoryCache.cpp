@@ -87,9 +87,9 @@ DirectoryCache::Trash()
 	fTrashed = true;
 }
 
-// TODO: separate AddEntry() for Name and Directory Cache are needed
+
 status_t
-DirectoryCache::AddEntry(const char* name, ino_t node)
+DirectoryCache::AddEntry(const char* name, ino_t node, bool created)
 {
 	NameCacheEntry* entry = new(std::nothrow) NameCacheEntry(name, node);
 	if (entry == NULL)
@@ -100,6 +100,19 @@ DirectoryCache::AddEntry(const char* name, ino_t node)
 	}
 
 	fNameCache.Add(entry);
+
+	if (created && fDirectoryCache != NULL) {
+		MutexLocker _(fDirectoryCache->fLock);
+		NameCacheEntry* entry = new(std::nothrow) NameCacheEntry(name, node);
+		if (entry == NULL)
+			return B_NO_MEMORY;
+		if (entry->fName == NULL) {
+			delete entry;
+			return B_NO_MEMORY;
+		}
+
+		fDirectoryCache->fEntries.Add(entry);
+	}
 
 	return entry_cache_add(fInode->GetFileSystem()->DevId(), fInode->ID(), name,
 		node);

@@ -52,6 +52,9 @@ Inode::CreateDir(const char* name, int mode)
 
 		req.Create(NF4DIR, name, cattr, i);
 
+		Attribute attr[] = { FATTR4_FILEID };
+		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
 		status_t result = request.Send();
 		if (result != B_OK)
 			return result;
@@ -70,20 +73,33 @@ Inode::CreateDir(const char* name, int mode)
 		uint64 before, after;
 		bool atomic;
 		result = reply.Create(&before, &after, atomic);
+		if (result != B_OK)
+			return result;
+
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
+
+		uint32 fileID;
+		if (count == 0)
+			fileID = fFileSystem->AllocFileId();
+		else
+			fileID = values[1].fData.fValue64;
 
 		fFileSystem->Root()->MakeInfoInvalid();
 
 		if (fCache->Lock() == B_OK) {
 			if (atomic && fCache->ChangeInfo() == before) {
-				// TODO: update cache
-				//fCache->AddEntry(name, );
+				fCache->AddEntry(name, fileID, true);
 				fCache->SetChangeInfo(after);
 			} else if (fCache->ChangeInfo() != before)
 				fCache->Trash();
 			fCache->Unlock();
 		}
 
-		return result;
+		return B_OK;
 	} while (true);
 }
 
