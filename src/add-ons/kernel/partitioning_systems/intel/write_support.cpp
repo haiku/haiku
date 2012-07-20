@@ -679,7 +679,8 @@ get_partitionable_spaces(partition_data* partition,
 	if (positions)
 		delete[] positions;
 
-	TRACE(("intel: get_partitionable_spaces - found: %ld\n", actualCount));
+	TRACE(("intel: get_partitionable_spaces - found: %" B_PRId32 "\n",
+		actualCount));
 
 	*_actualCount = actualCount;
 
@@ -752,8 +753,8 @@ status_t
 pm_shadow_changed(partition_data* partition, partition_data* child,
 	uint32 operation)
 {
-	TRACE(("intel: pm_shadow_changed(%p, %p, %lu)\n", partition, child,
-		operation));
+	TRACE(("intel: pm_shadow_changed(%p, %p, %" B_PRIu32 ")\n", partition,
+		child, operation));
 
 	switch (operation) {
 		case B_PARTITION_SHADOW:
@@ -763,14 +764,16 @@ pm_shadow_changed(partition_data* partition, partition_data* child,
 				partition->id);
 			if (!physicalPartition) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW): no "
-					"physical partition with ID %ld\n", partition->id);
+					"physical partition with ID %" B_PRId32 "\n",
+					partition->id);
 				return B_ERROR;
 			}
 
 			// clone the map
 			if (!physicalPartition->content_cookie) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW): no "
-					"content cookie, physical partition: %ld\n", partition->id);
+					"content cookie, physical partition: %" B_PRId32 "\n",
+					partition->id);
 				return B_ERROR;
 			}
 
@@ -796,13 +799,14 @@ pm_shadow_changed(partition_data* partition, partition_data* child,
 			partition_data* physical = get_partition(child->id);
 			if (!physical) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW_CHILD): "
-					"no physical partition with ID %ld\n", child->id);
+					"no physical partition with ID %" B_PRId32 "\n", child->id);
 				return B_ERROR;
 			}
 
 			if (!physical->cookie) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW_CHILD): "
-					"no cookie, physical partition: %ld\n", child->id);
+					"no cookie, physical partition: %" B_PRId32 "\n",
+					child->id);
 				return B_ERROR;
 			}
 
@@ -811,7 +815,7 @@ pm_shadow_changed(partition_data* partition, partition_data* child,
 
 			if (!partition->content_cookie) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW_CHILD): "
-					"no content cookie, physical partition: %ld\n",
+					"no content cookie, physical partition: %" B_PRId32 "\n",
 					partition->id);
 				return B_ERROR;
 			}
@@ -823,8 +827,8 @@ pm_shadow_changed(partition_data* partition, partition_data* child,
 
 			if (!primary || primary->IsEmpty()) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW_CHILD): "
-					"partition %ld is empty, primary index: %ld\n", child->id,
-					index);
+					"partition %" B_PRId32 " is empty, primary index: "
+					"%" B_PRId32 "\n", child->id, index);
 				return B_BAD_VALUE;
 			}
 
@@ -849,7 +853,8 @@ pm_shadow_changed(partition_data* partition, partition_data* child,
 		{
 			if (!partition->content_cookie) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_CREATE_CHILD): "
-					"no content cookie, partition: %ld\n", partition->id);
+					"no content cookie, partition: %" B_PRId32 "\n",
+					partition->id);
 				return B_ERROR;
 			}
 
@@ -867,7 +872,8 @@ pm_shadow_changed(partition_data* partition, partition_data* child,
 
 			if (!primary) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_CREATE_CHILD): "
-					"no empty primary slot, partition: %ld\n", partition->id);
+					"no empty primary slot, partition: %" B_PRId32 "\n",
+					partition->id);
 				return B_ERROR;
 			}
 
@@ -876,7 +882,8 @@ pm_shadow_changed(partition_data* partition, partition_data* child,
 			type.SetType(child->type);
 			if (!type.IsValid()) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_CREATE_CHILD): "
-					"invalid partition type, partition: %ld\n", partition->id);
+					"invalid partition type, partition: %" B_PRId32 "\n",
+					partition->id);
 				return B_ERROR;
 			}
 
@@ -1065,7 +1072,7 @@ move_block(int fd, off_t fromOffset, off_t toOffset, uint8* buffer, int32 size)
 		error = errno;
 		if (error == B_OK)
 			error = B_IO_ERROR;
-		TRACE(("intel: move_block(): reading failed: %lx\n", error));
+		TRACE(("intel: move_block(): reading failed: %" B_PRIx32 "\n", error));
 		return error;
 	}
 
@@ -1074,7 +1081,7 @@ move_block(int fd, off_t fromOffset, off_t toOffset, uint8* buffer, int32 size)
 		error = errno;
 		if (error == B_OK)
 			error = B_IO_ERROR;
-		TRACE(("intel: move_block(): writing failed: %lx\n", error));
+		TRACE(("intel: move_block(): writing failed: %" B_PRIx32 "\n", error));
 	}
 
 	return error;
@@ -1520,9 +1527,9 @@ ep_is_sub_system_for(partition_data* partition)
 	if (partition == NULL)
 		return false;
 
-	TRACE(("intel: ep_is_sub_system_for(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
+	TRACE(("intel: ep_is_sub_system_for(%" B_PRId32 ": %" B_PRId64 ", "
+		"%" B_PRId64 ", %" B_PRId32 ", %s)\n", partition->id, partition->offset,
+		partition->size, partition->block_size, partition->content_type));
 
 	// Intel Extended Partition can live in child partition of Intel Partition
 	// Map
@@ -2280,8 +2287,8 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 			if (get_partition_from_offset_ep(partition, next->Offset(),
 				&nextSibling)) {
 				char buffer[128];
-				sprintf(buffer, "active %s ;\npartition_table_offset %lld ;\n",
-					next->Active() ? "true" : "false",
+				sprintf(buffer, "active %s ;\npartition_table_offset %" B_PRId64
+					" ;\n", next->Active() ? "true" : "false",
 					next->PartitionTableOffset());
 				nextSibling->parameters = strdup(buffer);
 			}

@@ -99,7 +99,7 @@ get_type_for_content_type(const char* contentType, char* type)
 static status_t
 pm_std_ops(int32 op, ...)
 {
-	TRACE(("intel: pm_std_ops(0x%lx)\n", op));
+	TRACE(("intel: pm_std_ops(0x%" B_PRIx32 ")\n", op));
 	switch(op) {
 		case B_MODULE_INIT:
 		case B_MODULE_UNINIT:
@@ -117,9 +117,9 @@ pm_identify_partition(int fd, partition_data* partition, void** cookie)
 	if (fd < 0 || !partition || !cookie)
 		return -1;
 
-	TRACE(("intel: pm_identify_partition(%d, %ld: %lld, %lld, %ld)\n", fd,
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size));
+	TRACE(("intel: pm_identify_partition(%d, %" B_PRId32 ": %" B_PRId64 ", "
+		"%" B_PRId64 ", %" B_PRId32 ")\n", fd, partition->id, partition->offset,
+		partition->size, partition->block_size));
 	// reject extended partitions
 	if (partition->type
 		&& !strcmp(partition->type, kPartitionTypeIntelExtended)) {
@@ -182,9 +182,9 @@ pm_scan_partition(int fd, partition_data* partition, void* cookie)
 	if (fd < 0 || !partition || !cookie)
 		return B_ERROR;
 
-	TRACE(("intel: pm_scan_partition(%d, %ld: %lld, %lld, %ld)\n", fd,
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size));
+	TRACE(("intel: pm_scan_partition(%d, %" B_PRId32 ": %" B_PRId64 ", "
+		"%" B_PRId64 ", %" B_PRId32 ")\n", fd, partition->id, partition->offset,
+		partition->size, partition->block_size));
 
 	PartitionMapCookie* map = (PartitionMapCookie*)cookie;
 	// fill in the partition_data structure
@@ -287,7 +287,7 @@ pm_free_partition_content_cookie(partition_data* partition)
 static status_t
 ep_std_ops(int32 op, ...)
 {
-	TRACE(("intel: ep_std_ops(0x%lx)\n", op));
+	TRACE(("intel: ep_std_ops(0x%" B_PRIx32 ")\n", op));
 	switch(op) {
 		case B_MODULE_INIT:
 		case B_MODULE_UNINIT:
@@ -305,8 +305,9 @@ ep_identify_partition(int fd, partition_data* partition, void** cookie)
 	if (fd < 0 || !partition || !cookie || !partition->cookie)
 		return -1;
 
-	TRACE(("intel: ep_identify_partition(%d, %lld, %lld, %ld)\n", fd,
-		   partition->offset, partition->size, partition->block_size));
+	TRACE(("intel: ep_identify_partition(%d, %" B_PRId64 ", %" B_PRId64 ", "
+		"%" B_PRId32 ")\n", fd, partition->offset, partition->size,
+		partition->block_size));
 
 	// our parent must be a intel partition map partition and we must have
 	// extended partition type
@@ -333,8 +334,9 @@ ep_scan_partition(int fd, partition_data* partition, void* cookie)
 	if (fd < 0 || !partition || !partition->cookie)
 		return B_ERROR;
 
-	TRACE(("intel: ep_scan_partition(%d, %lld, %lld, %ld)\n", fd,
-		partition->offset, partition->size, partition->block_size));
+	TRACE(("intel: ep_scan_partition(%d, %" B_PRId64 ", %" B_PRId64 ", "
+		"%" B_PRId32 ")\n", fd, partition->offset, partition->size,
+		partition->block_size));
 
 	partition_data* parent = get_parent_partition(partition->id);
 	if (!parent)
@@ -373,7 +375,7 @@ ep_scan_partition(int fd, partition_data* partition, void* cookie)
 
 		// parameters
 		char buffer[128];
-		sprintf(buffer, "active %s ;\npartition_table_offset %lld ;\n",
+		sprintf(buffer, "active %s ;\npartition_table_offset %" B_PRId64 " ;\n",
 			logical->Active() ? "true" : "false",
 			logical->PartitionTableOffset());
 		child->parameters = strdup(buffer);
