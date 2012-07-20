@@ -140,13 +140,12 @@ Job::SetWaitStatus(job_wait_status status)
 {
 	fWaitStatus = status;
 	switch (fWaitStatus) {
-	case JOB_DEPENDENCY_ACTIVE:
-		fState = JOB_STATE_WAITING;
-		break;
-	default:
-		fState = JOB_STATE_ACTIVE;
-		break;
-
+		case JOB_DEPENDENCY_ACTIVE:
+			fState = JOB_STATE_WAITING;
+			break;
+		default:
+			fState = JOB_STATE_ACTIVE;
+			break;
 	}
 }
 
