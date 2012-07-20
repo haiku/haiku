@@ -34,41 +34,41 @@ typedef struct disk_identifier {
 	union {
 		struct {
 			uint16		base_address;
-		} legacy;
+		} _PACKED legacy;
 		struct {
 			uint8		bus;
 			uint8		slot;
 			uint8		function;
-		} pci;
+		} _PACKED pci;
 	} bus;
 	union {
 		struct {
 			bool		master;
-		} ata;
+		} _PACKED ata;
 		struct {
 			bool		master;
 			uint8		logical_unit;
-		} atapi;
+		} _PACKED atapi;
 		struct {
 			uint8		logical_unit;
-		} scsi;
+		} _PACKED scsi;
 		struct {
 			uint8		tbd;
-		} usb;
+		} _PACKED usb;
 		struct {
 			uint64		guid;
-		} firewire;
+		} _PACKED firewire;
 		struct {
 			uint64		wwd;
-		} fibre;
+		} _PACKED fibre;
 		struct {
 			off_t		size;
 			struct {
 				off_t	offset;
 				uint32	sum;
-			} check_sums[NUM_DISK_CHECK_SUMS];
-		} unknown;
+			} _PACKED check_sums[NUM_DISK_CHECK_SUMS];
+		} _PACKED unknown;
 	} device;
-} disk_identifier;
+} _PACKED disk_identifier;
 
 #endif	/* KERNEL_BOOT_DISK_IDENTIFIER_H */
