@@ -54,13 +54,32 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 
 if $(TARGET_ARCH) = x86_64 {
 	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
-		: config_manager dpc pci ;
+		: ata config_manager dpc pci scsi ;
+	AddFilesToFloppyBootArchive system add-ons kernel busses ata
+		: generic_ide_pci ;
+	AddFilesToFloppyBootArchive system add-ons kernel file_systems
+		: iso9660 attribute_overlay write_overlay ;
+	AddFilesToFloppyBootArchive system add-ons kernel generic
+		: ata_adapter locked_pool scsi_periph ;
+	AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
+		: intel session ;
+
+	AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
 } else {
 	# modules
 	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
 		: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
-	AddFilesToFloppyBootArchive system add-ons kernel busses ide
-		: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211 ;
+
+	if $(HAIKU_ATA_STACK) = 1 {
+		AddFilesToFloppyBootArchive system add-ons kernel busses ata
+			: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+				it8211 ;
+	} else {
+		AddFilesToFloppyBootArchive system add-ons kernel busses ide
+			: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+				it8211 ;
+	}
+
 	AddFilesToFloppyBootArchive system add-ons kernel busses scsi
 		: ahci ;
 	AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
@@ -126,7 +145,9 @@ if $(NET_BOOT) = 1 {
 # boot module links
 if $(TARGET_ARCH) = x86_64 {
 	AddBootModuleSymlinksToFloppyBootArchive
-		dpc config_manager pci
+		ata dpc config_manager pci scsi ata_adapter locked_pool scsi_periph
+		generic_ide_pci scsi_cd scsi_disk intel session iso9660
+		attribute_overlay write_overlay
 	;
 } else {
 	AddBootModuleSymlinksToFloppyBootArchive
