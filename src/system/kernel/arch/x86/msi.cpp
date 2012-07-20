@@ -17,6 +17,10 @@ static bool sMSISupported = false;
 void
 msi_init()
 {
+#ifdef __x86_64__
+	// TODO x86_64.
+	return;
+#endif
 	if (!apic_available()) {
 		dprintf("disabling msi due to missing apic\n");
 		return;

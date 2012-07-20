@@ -237,8 +237,8 @@ arch_int_init_io(kernel_args* args)
 	// TODO x86_64
 #ifndef __x86_64__
 	ioapic_init(args);
-	msi_init();
 #endif
+	msi_init();
 	return B_OK;
 }
 

@@ -54,7 +54,6 @@ if $(TARGET_ARCH) = x86_64 {
 		arch_user_debugger.cpp
 		ioapic.cpp
 		irq_routing_table.cpp
-		msi.cpp
 		syscall.S
 		x86_signals.cpp
 		x86_signals_asm.S
@@ -90,6 +89,7 @@ local archGenericSources =
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
 	apic.cpp
+	msi.cpp
 	pic.cpp
 
 	# paging
