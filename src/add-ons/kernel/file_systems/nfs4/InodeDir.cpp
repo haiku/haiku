@@ -122,6 +122,7 @@ Inode::OpenDir(OpenDirCookie* cookie)
 			return B_PERMISSION_DENIED;
 
 		cookie->fFileSystem = fFileSystem;
+		cookie->fSpecial = 0;
 		cookie->fSnapshot = NULL;
 		cookie->fCurrent = NULL;
 		cookie->fEOF = false;
@@ -334,30 +335,6 @@ Inode::_GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 	return B_OK;
 }
 
-/*
-	if (cookie->fCookie == 0 && cookie->fCookieVerf == 2 && count < *_count) {
-		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
-
-		_FillDirEntry(de, fInfo.fFileId, ".", pos, size);
-
-		pos += de->d_reclen;
-		count++;
-		cookie->fCookieVerf--;
-	}
-
-	if (cookie->fCookie == 0 && cookie->fCookieVerf == 1 && count < *_count) {
-		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
-		
-		if (strcmp(fInfo.fName, "/"))
-			_ReadDirUp(de, pos, size);
-		else
-			_FillDirEntry(de, _FileIdToInoT(fInfo.fFileId), "..", pos, size);
-
-		pos += de->d_reclen;
-		count++;
-		cookie->fCookieVerf--;
-	}
-*/
 
 status_t
 Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
@@ -397,11 +374,46 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 
 	char* buffer = reinterpret_cast<char*>(_buffer);
 	uint32 pos = 0;
+	uint32 i = 0;
+	bool overflow = false;
+
+	if (cookie->fSpecial == 0 && i < *_count) {
+		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
+
+		status_t result;
+		result = _FillDirEntry(de, fInfo.fFileId, ".", pos, size);
+
+		if (result == B_BUFFER_OVERFLOW)
+			overflow = true;
+		else if (result == B_OK) {
+			pos += de->d_reclen;
+			i++;
+			cookie->fSpecial++;
+		} else
+			return result;
+	}
+
+	if (cookie->fSpecial == 1 && i < *_count) {
+		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
+		
+		status_t result;
+		if (strcmp(fInfo.fName, "/"))
+			result = _ReadDirUp(de, pos, size);
+		else
+			result = _FillDirEntry(de, _FileIdToInoT(fInfo.fFileId), "..", pos, size);
+
+		if (result == B_BUFFER_OVERFLOW)
+			overflow = true;
+		else if (result == B_OK) {
+			pos += de->d_reclen;
+			i++;
+			cookie->fSpecial++;
+		} else
+			return result;
+	}
 
 	MutexLocker _(cookie->fSnapshot->fLock);
-	uint32 i;
-	bool overflow = false;
-	for (i = 0; i < *_count; i++) {
+	for (; !overflow && i < *_count; i++) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 
 		if (cookie->fCurrent == NULL)

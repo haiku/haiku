@@ -106,6 +106,7 @@ private:
 };
 
 struct OpenDirCookie : public Cookie {
+			int							fSpecial;
 			DirectoryCacheSnapshot*		fSnapshot;
 			NameCacheEntry*				fCurrent;
 			bool						fEOF;
