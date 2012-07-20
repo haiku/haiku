@@ -350,7 +350,7 @@ display_io(int argc, char **argv)
 			if (i != 0)
 				kprintf("\n");
 
-			kprintf("[0x%lx]  ", address + i * itemSize);
+			kprintf("[0x%" B_PRIx32 "]  ", address + i * itemSize);
 
 			if (num > displayWidth) {
 				// make sure the spacing in the last line is correct
@@ -362,13 +362,13 @@ display_io(int argc, char **argv)
 
 		switch (itemSize) {
 			case 1:
-				kprintf(" %02x", pci_read_io_8(address + i * itemSize));
+				kprintf(" %02" B_PRIx8, pci_read_io_8(address + i * itemSize));
 				break;
 			case 2:
-				kprintf(" %04x", pci_read_io_16(address + i * itemSize));
+				kprintf(" %04" B_PRIx16, pci_read_io_16(address + i * itemSize));
 				break;
 			case 4:
-				kprintf(" %08lx", pci_read_io_32(address + i * itemSize));
+				kprintf(" %08" B_PRIx32, pci_read_io_32(address + i * itemSize));
 				break;
 		}
 	}
@@ -569,7 +569,7 @@ PCI::~PCI()
 status_t
 PCI::_CreateVirtualBus(int domain, uint8 bus, uint8 *virtualBus)
 {
-#if defined(__INTEL__)
+#if defined(__INTEL__) || defined(__x86_64__)
 
 	// IA32 doesn't use domains
 	if (domain)
@@ -607,7 +607,7 @@ PCI::_CreateVirtualBus(int domain, uint8 bus, uint8 *virtualBus)
 status_t
 PCI::ResolveVirtualBus(uint8 virtualBus, int *domain, uint8 *bus)
 {
-#if defined(__INTEL__)
+#if defined(__INTEL__) || defined(__x86_64__)
 
 	// IA32 doesn't use domains
 	*bus = virtualBus;
@@ -739,8 +739,11 @@ PCI::_EnumerateBus(int domain, uint8 bus, uint8 *subordinateBus)
 			if (baseClass != PCI_bridge || subClass != PCI_pci)
 				continue;
 
-			TRACE(("PCI: found PCI-PCI bridge: domain %u, bus %u, dev %u, func %u\n", domain, bus, dev, function));
-			TRACE(("PCI: original settings: pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+			TRACE(("PCI: found PCI-PCI bridge: domain %u, bus %u, dev %u, func %u\n",
+				domain, bus, dev, function));
+			TRACE(("PCI: original settings: pcicmd %04" B_PRIx32 ", primary-bus "
+				"%" B_PRIu32 ", secondary-bus %" B_PRIu32 ", subordinate-bus "
+				"%" B_PRIu32 "\n",
 				ReadConfig(domain, bus, dev, function, PCI_command, 2),
 				ReadConfig(domain, bus, dev, function, PCI_primary_bus, 1),
 				ReadConfig(domain, bus, dev, function, PCI_secondary_bus, 1),
@@ -758,7 +761,9 @@ PCI::_EnumerateBus(int domain, uint8 bus, uint8 *subordinateBus)
 			WriteConfig(domain, bus, dev, function, PCI_secondary_bus, 1, 0);
 			WriteConfig(domain, bus, dev, function, PCI_subordinate_bus, 1, 0);
 
-			TRACE(("PCI: disabled settings: pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+			TRACE(("PCI: disabled settings: pcicmd %04" B_PRIx32 ", primary-bus "
+				"%" B_PRIu32 ", secondary-bus %" B_PRIu32 ", subordinate-bus "
+				"%" B_PRIu32 "\n",
 				ReadConfig(domain, bus, dev, function, PCI_command, 2),
 				ReadConfig(domain, bus, dev, function, PCI_primary_bus, 1),
 				ReadConfig(domain, bus, dev, function, PCI_secondary_bus, 1),
@@ -803,7 +808,9 @@ PCI::_EnumerateBus(int domain, uint8 bus, uint8 *subordinateBus)
 			pcicmd |= PCI_command_io | PCI_command_memory | PCI_command_master;
 			WriteConfig(domain, bus, dev, function, PCI_command, 2, pcicmd);
 
-			TRACE(("PCI: probing settings: pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+			TRACE(("PCI: probing settings: pcicmd %04" B_PRIx32 ", primary-bus "
+				"%" B_PRIu32 ", secondary-bus %" B_PRIu32 ", subordinate-bus "
+				"%" B_PRIu32 "\n",
 				ReadConfig(domain, bus, dev, function, PCI_command, 2),
 				ReadConfig(domain, bus, dev, function, PCI_primary_bus, 1),
 				ReadConfig(domain, bus, dev, function, PCI_secondary_bus, 1),
@@ -815,7 +822,9 @@ PCI::_EnumerateBus(int domain, uint8 bus, uint8 *subordinateBus)
 			// close Scheunentor
 			WriteConfig(domain, bus, dev, function, PCI_subordinate_bus, 1, lastUsedBusNumber);
 
-			TRACE(("PCI: configured settings: pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+			TRACE(("PCI: configured settings: pcicmd %04" B_PRIx32 ", primary-bus "
+				"%" B_PRIu32 ", secondary-bus %" B_PRIu32 ", subordinate-bus "
+				"%" B_PRIu32 "\n",
 				ReadConfig(domain, bus, dev, function, PCI_command, 2),
 				ReadConfig(domain, bus, dev, function, PCI_primary_bus, 1),
 				ReadConfig(domain, bus, dev, function, PCI_secondary_bus, 1),
@@ -1236,11 +1245,11 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
 				PCI_command, 2, pcicmd);
 
-			dev->info.u.h0.rom_base = (ulong)pci_ram_address(
-				(void *)dev->info.u.h0.rom_base_pci);
+			dev->info.u.h0.rom_base = (addr_t)pci_ram_address(
+				(void *)(addr_t)dev->info.u.h0.rom_base_pci);
 			for (int i = 0; i < 6; i++) {
-				dev->info.u.h0.base_registers[i] = (ulong)pci_ram_address(
-					(void *)dev->info.u.h0.base_registers_pci[i]);
+				dev->info.u.h0.base_registers[i] = (addr_t)pci_ram_address(
+					(void *)(addr_t)dev->info.u.h0.base_registers_pci[i]);
 			}
 
 			dev->info.u.h0.cardbus_cis = ReadConfig(dev->domain, dev->bus,
@@ -1282,11 +1291,11 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
 				PCI_command, 2, pcicmd);
 
-			dev->info.u.h1.rom_base = (ulong)pci_ram_address(
-				(void *)dev->info.u.h1.rom_base_pci);
+			dev->info.u.h1.rom_base = (addr_t)pci_ram_address(
+				(void *)(addr_t)dev->info.u.h1.rom_base_pci);
 			for (int i = 0; i < 2; i++) {
-				dev->info.u.h1.base_registers[i] = (ulong)pci_ram_address(
-					(void *)dev->info.u.h1.base_registers_pci[i]);
+				dev->info.u.h1.base_registers[i] = (addr_t)pci_ram_address(
+					(void *)(addr_t)dev->info.u.h1.base_registers_pci[i]);
 			}
 
 			dev->info.u.h1.primary_bus = ReadConfig(dev->domain, dev->bus,
@@ -1397,7 +1406,7 @@ PCI::_RefreshDeviceInfo(PCIBus *bus)
 	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
 		_ReadBasicInfo(dev);
 		_ReadHeaderInfo(dev);
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 		pci_read_arch_info(dev);
 #endif
 		if (dev->child)

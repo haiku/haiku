@@ -54,7 +54,7 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 
 if $(TARGET_ARCH) = x86_64 {
 	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
-		: dpc ;
+		: config_manager dpc pci ;
 } else {
 	# modules
 	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
@@ -126,7 +126,7 @@ if $(NET_BOOT) = 1 {
 # boot module links
 if $(TARGET_ARCH) = x86_64 {
 	AddBootModuleSymlinksToFloppyBootArchive
-		dpc
+		dpc config_manager pci
 	;
 } else {
 	AddBootModuleSymlinksToFloppyBootArchive

@@ -89,7 +89,7 @@ module_info *modules[] = {
 	(module_info *)&gPCIRootModule,
 	(module_info *)&gPCIDeviceModule,
 	(module_info *)&gPCILegacyDriverModule,
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 	// add platforms when they provide an arch specific module
 	(module_info *)&gPCIArchModule,
 #endif
