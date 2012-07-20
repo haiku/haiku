@@ -372,7 +372,11 @@ IconEditorApp::_RestoreSettings()
 		// Compensate offset for next window...
 		fLastWindowFrame.OffsetBy(-kWindowOffset, -kWindowOffset);
 	}
-	settings.FindMessage("window settings", &fLastWindowSettings);
+	BMessage lastSettings;
+	if (settings.FindMessage("window settings", &lastSettings)
+		== B_OK) {
+		fLastWindowSettings = lastSettings;
+	}
 
 	int32 mode;
 	if (settings.FindInt32("export mode", &mode) >= B_OK)
