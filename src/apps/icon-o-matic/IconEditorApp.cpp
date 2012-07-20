@@ -13,12 +13,12 @@
 #include <Alert.h>
 #include <Catalog.h>
 #include <FilePanel.h>
+#include <FindDirectory.h>
 #include <IconEditorProtocol.h>
 #include <Locale.h>
 #include <Message.h>
 #include <Mime.h>
 #include <Path.h>
-#include <storage/FindDirectory.h>
 
 #include "support_settings.h"
 
@@ -331,7 +331,7 @@ IconEditorApp::_LastFilePath(path_kind which)
 				path = fLastOpenPath.String();
 			break;
 	}
-	if (!path) {
+	if (path == NULL) {
 
 		BPath homePath;
 		if (find_directory(B_USER_DIRECTORY, &homePath) == B_OK)

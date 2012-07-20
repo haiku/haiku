@@ -16,6 +16,7 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <FilePanel.h>
+#include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
@@ -30,8 +31,6 @@
 #include <Slider.h>
 #include <StringView.h>
 #include <TextControl.h>
-
-#include <storage/FindDirectory.h>
 
 #include "MediaFileInfoView.h"
 #include "MediaFileListView.h"
