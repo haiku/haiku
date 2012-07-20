@@ -367,7 +367,7 @@ scsi_check_enqueue_request(scsi_ccb *request)
 
 		if (request->sort >= 0) {
 			device->last_sort = request->sort;
-			SHOW_FLOW(1, "%Ld", device->last_sort);
+			SHOW_FLOW(1, "%" B_PRId64, device->last_sort);
 		}
 
 		execute = true;
@@ -618,7 +618,7 @@ scsi_check_exec_service(scsi_bus_info *bus)
 
 		if (request->sort >= 0) {
 			device->last_sort = request->sort;
-			SHOW_FLOW(1, "%Ld", device->last_sort);
+			SHOW_FLOW(1, "%" B_PRId64, device->last_sort);
 		}
 
 		RELEASE_BEN(&bus->mutex);

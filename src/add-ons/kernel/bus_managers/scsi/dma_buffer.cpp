@@ -51,7 +51,7 @@ is_sg_list_dma_safe(scsi_ccb *request)
 	}
 
 	// if there are no further restrictions - be happy
-	if (dma_boundary == ~0UL && alignment == 0 && max_sg_block_size == 0)
+	if (dma_boundary == ~(uint32)0 && alignment == 0 && max_sg_block_size == 0)
 		return true;
 
 	// argh - controller is a bit picky, so make sure he likes us

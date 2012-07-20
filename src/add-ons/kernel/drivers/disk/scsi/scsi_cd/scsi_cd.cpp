@@ -184,8 +184,8 @@ test_capacity(cd_driver_info *info)
 	}
 
 	if (info->capacity != info->original_capacity) {
-		dprintf("scsi_cd: adjusted capacity from %llu to %llu blocks.\n",
-			info->original_capacity, info->capacity);
+		dprintf("scsi_cd: adjusted capacity from %" B_PRIu64 " to %" B_PRIu64
+			" blocks.\n", info->original_capacity, info->capacity);
 	}
 
 	return B_OK;
@@ -981,7 +981,8 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 		}
 
 		if (info->block_size != 0) {
-			dprintf("old %ld, new %ld\n", info->block_size, blockSize);
+			dprintf("old %" B_PRId32 ", new %" B_PRId32 "\n", info->block_size,
+				blockSize);
 			panic("updating DMAResource not yet implemented...");
 		}
 

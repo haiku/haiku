@@ -92,7 +92,8 @@ periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 		blockSize = 0;
 	}
 
-	SHOW_FLOW(3, "capacity = %lld, block_size = %ld", capacity, blockSize);
+	SHOW_FLOW(3, "capacity = %" B_PRId64 ", block_size = %" B_PRId32, capacity,
+		blockSize);
 
 	device->block_size = blockSize;
 

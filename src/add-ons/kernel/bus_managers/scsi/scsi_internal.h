@@ -121,21 +121,21 @@ typedef struct scsi_bus_info {
 typedef struct dma_buffer {
 	area_id area;			// area of DMA buffer
 	uchar *address;			// address of DMA buffer
-	uint32 size;			// size of DMA buffer
+	size_t size;			// size of DMA buffer
 	area_id sg_list_area;	// area of S/G list
 	physical_entry *sg_list;	// address of S/G list
-	uint32 sg_count;			// number of entries in S/G list
+	size_t sg_count;			// number of entries in S/G list
 	bool inuse;				// true, if in use
 	bigtime_t last_use;		// timestamp of last usage
 
 	area_id sg_orig;					// area of S/G list to original data
 	physical_entry *sg_list_orig;		// S/G list to original data
-	uint32 sg_count_max_orig;			// maximum size (in entries)
-	uint32 sg_count_orig;				// current size (in entries)
+	size_t sg_count_max_orig;			// maximum size (in entries)
+	size_t sg_count_orig;				// current size (in entries)
 
 	uchar *orig_data;					// pointer to original data
 	const physical_entry *orig_sg_list;	// original S/G list
-	uint32 orig_sg_count;				// size of original S/G list
+	size_t orig_sg_count;				// size of original S/G list
 } dma_buffer;
 
 

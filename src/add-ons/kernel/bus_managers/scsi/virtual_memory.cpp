@@ -56,8 +56,8 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 		range_start = (char *)vec->iov_base + vec_offset;
 		range_len = std::min(vec->iov_len - vec_offset, left_len);
 
-		SHOW_FLOW( 3, "range_start=%x, range_len=%x",
-			(int)range_start, (int)range_len );
+		SHOW_FLOW( 3, "range_start=%" B_PRIxADDR ", range_len=%" B_PRIxSIZE,
+			(addr_t)range_start, range_len );
 
 		vec_offset = 0;
 

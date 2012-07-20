@@ -417,7 +417,8 @@ das_set_capacity(das_driver_info* info, uint64 capacity, uint32 blockSize)
 
 	if (info->block_size != blockSize) {
 		if (info->block_size != 0) {
-			dprintf("old %ld, new %ld\n", info->block_size, blockSize);
+			dprintf("old %" B_PRId32 ", new %" B_PRId32 "\n", info->block_size,
+				blockSize);
 			panic("updating DMAResource not yet implemented...");
 		}
 

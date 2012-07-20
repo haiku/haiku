@@ -574,7 +574,7 @@ ATADevice::Configure()
 status_t
 ATADevice::Identify()
 {
-	snprintf(fDebugContext, sizeof(fDebugContext), "%s %lu-%u",
+	snprintf(fDebugContext, sizeof(fDebugContext), "%s %" B_PRIu32 "-%u",
 		IsATAPI() ? "pi" : "", fChannel->ChannelID(), fIndex);
 
 	ATARequest request(false);

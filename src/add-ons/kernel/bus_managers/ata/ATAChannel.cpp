@@ -29,7 +29,7 @@ ATAChannel::ATAChannel(device_node *node)
 
 	gDeviceManager->get_attr_uint32(node, ATA_CHANNEL_ID_ITEM, &fChannelID,
 		true);
-	snprintf(fDebugContext, sizeof(fDebugContext), " %lu", fChannelID);
+	snprintf(fDebugContext, sizeof(fDebugContext), " %" B_PRIu32, fChannelID);
 
 	if (fUseDMA) {
 		void *settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
@@ -879,7 +879,7 @@ ATAChannel::_FlushAndWait(bigtime_t waitTime)
 status_t
 ATAChannel::_ReadPIOBlock(ATARequest *request, size_t length)
 {
-	uint32 transferred = 0;
+	size_t transferred = 0;
 	status_t result = _TransferPIOBlock(request, length, &transferred);
 	request->CCB()->data_resid -= transferred;
 
