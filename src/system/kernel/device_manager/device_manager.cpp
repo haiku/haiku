@@ -1513,7 +1513,7 @@ device_node::_AddPath(Stack<KPath*>& stack, const char* basePath,
 	if (status == B_OK)
 		status = stack.Push(path);
 
-	TRACE(("  add path: \"%s\", %ld\n", path->Path(), status));
+	TRACE(("  add path: \"%s\", %" B_PRId32 "\n", path->Path(), status));
 
 	if (status != B_OK)
 		delete path;

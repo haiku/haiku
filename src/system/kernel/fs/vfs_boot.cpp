@@ -194,8 +194,8 @@ DiskBootMethod::IsBootDevice(KDiskDevice* device, bool strict)
 		return false;
 	}
 
-	TRACE(("boot device: bus %ld, device %ld\n", disk->bus_type,
-		disk->device_type));
+	TRACE(("boot device: bus %" B_PRId32 ", device %" B_PRId32 "\n",
+		disk->bus_type, disk->device_type));
 
 	// Assume that CD boots only happen off removable media.
 	if (fMethod == BOOT_METHOD_CD && !device->IsRemovable())
