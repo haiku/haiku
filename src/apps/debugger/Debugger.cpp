@@ -56,7 +56,7 @@ static const char* kUsage =
 	"\n"
 	"Options:\n"
 	"  -h, --help    - Print this usage info and exit.\n"
-	"  -c, --cli     - Use command line user interface (not yet implemented)\n"
+	"  -c, --cli     - Use command line user interface\n"
 ;
 
 
@@ -397,7 +397,8 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	start_team_debugger(team, &fSettingsManager, this, thread, stopInMain);
+	start_team_debugger(team, &fSettingsManager, this, thread, stopInMain,
+		options.useCLI);
 }
 
 
@@ -481,6 +482,7 @@ Debugger::_FindTeamDebugger(team_id teamID) const
 
 // #pragma mark -
 
+
 int
 main(int argc, const char* const* argv)
 {
@@ -493,20 +495,15 @@ main(int argc, const char* const* argv)
 	Options options;
 	parse_arguments(argc, argv, false, options);
 
-	if (options.useCLI) {
-		// TODO: implement
-		fprintf(stderr, "Error: Command line interface unimplemented\n");
+	Debugger app;
+	status_t error = app.Init();
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Failed to init application: %s\n",
+			strerror(error));
 		return 1;
-	} else {
-		Debugger app;
-		status_t error = app.Init();
-		if (error != B_OK) {
-			fprintf(stderr, "Error: Failed to init application: %s\n",
-				strerror(error));
-			return 1;
-		}
-
-		app.Run();
 	}
+
+	app.Run();
+
 	return 0;
 }
