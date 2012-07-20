@@ -2812,13 +2812,8 @@ BMenu::_ChooseTrigger(const char* title, int32& index, uint32& trigger,
 void
 BMenu::_UpdateWindowViewSize(const bool &move)
 {
-	if (dynamic_cast<BMenuBar*>(this) != NULL) {
-		BScrollMenu* scrollMenu = dynamic_cast<BScrollMenu*>(Parent());
-		if (scrollMenu != NULL)
-			scrollMenu->ResizeTo(Bounds().Width(), Bounds().Height());
-
+	if (dynamic_cast<BMenuBar*>(this) != NULL)
 		return;
-	}
 
 	BMenuWindow* window = static_cast<BMenuWindow*>(Window());
 	if (window == NULL)

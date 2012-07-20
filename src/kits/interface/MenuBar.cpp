@@ -18,7 +18,7 @@
 #include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuItem.h>
-#include <ScrollMenu.h>
+#include <MenuScrollView.h>
 #include <Window.h>
 
 #include <AppMisc.h>
@@ -329,36 +329,7 @@ BMenuBar::Draw(BRect updateRect)
 void
 BMenuBar::MessageReceived(BMessage* msg)
 {
-	switch (msg->what) {
-		case B_MOUSE_WHEEL_CHANGED:
-		{
-			float deltaY = 0;
-			msg->FindFloat("be:wheel_delta_y", &deltaY);
-			if (deltaY == 0)
-				return;
-
-			BScrollMenu* scrollMenu = dynamic_cast<BScrollMenu*>(Parent());
-			if (scrollMenu == NULL)
-				return;
-
-			float largeStep;
-			float smallStep;
-			scrollMenu->GetSteps(&smallStep, &largeStep);
-
-			// pressing the option/command/control key scrolls faster
-			if (modifiers() & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY))
-				deltaY *= largeStep;
-			else
-				deltaY *= smallStep;
-
-			scrollMenu->TryScrollBy(deltaY);
-			break;
-		}
-
-		default:
-			BMenu::MessageReceived(msg);
-			break;
-	}
+	BMenu::MessageReceived(msg);
 }
 
 

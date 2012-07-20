@@ -7,8 +7,8 @@
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		John Scipione (jscipione@gmail.com)
  */
-#ifndef SCROLL_MENU_H
-#define SCROLL_MENU_H
+#ifndef MENU_SCROLL_VIEW_H
+#define MENU_SCROLL_VIEW_H
 
 
 #include <View.h>
@@ -18,10 +18,10 @@ class BMenu;
 class BMenuScroller;
 
 
-class BScrollMenu : public BView {
+class BMenuScrollView : public BView {
 public:
-								BScrollMenu(BMenu* menu);
-	virtual						~BScrollMenu();
+								BMenuScrollView(BMenu* menu);
+	virtual						~BMenuScrollView();
 
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
@@ -52,4 +52,4 @@ private:
 };
 
 
-#endif	// SCROLL_MENU_H
+#endif	// MENU_SCROLL_VIEW_H

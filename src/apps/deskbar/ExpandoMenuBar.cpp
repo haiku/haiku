@@ -45,7 +45,7 @@ All rights reserved.
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <ScrollMenu.h>
+#include <MenuScrollView.h>
 
 #include "icons.h"
 
@@ -194,6 +194,10 @@ TExpandoMenuBar::AttachedToWindow()
 		ResizeTo(itemWidth, 0);
 	}
 
+	BMenuScrollView* scrollMenu = dynamic_cast<BMenuScrollView*>(Parent());
+	if (scrollMenu != NULL)
+		scrollMenu->ResizeTo(Bounds().Width(), Bounds().Height());
+
 	if (fVertical) {
 		sDoMonitor = true;
 		sMonThread = spawn_thread(monitor_team_windows,
@@ -260,6 +264,32 @@ TExpandoMenuBar::MessageReceived(BMessage* message)
 			message->FindString("name", &name);
 
 			AddTeam(teams, icon, strdup(name), strdup(signature));
+			break;
+		}
+
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			float deltaY = 0;
+			message->FindFloat("be:wheel_delta_y", &deltaY);
+			if (deltaY == 0)
+				return;
+
+			BMenuScrollView* scrollMenu
+				= dynamic_cast<BMenuScrollView*>(Parent());
+			if (scrollMenu == NULL)
+				return;
+
+			float largeStep;
+			float smallStep;
+			scrollMenu->GetSteps(&smallStep, &largeStep);
+
+			// pressing the option/command/control key scrolls faster
+			if (modifiers() & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY))
+				deltaY *= largeStep;
+			else
+				deltaY *= smallStep;
+
+			scrollMenu->TryScrollBy(deltaY);
 			break;
 		}
 
@@ -396,6 +426,14 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 	if (message == NULL) {
 		// force a cleanup
 		_FinishedDrag();
+
+		// check for scrolling menu
+		BMenuScrollView* scrollMenu = dynamic_cast<BMenuScrollView*>(Parent());
+		if (scrollMenu != NULL) {
+			BPoint screenLocation = ConvertToScreen(where);
+			while(scrollMenu->CheckForScrolling(screenLocation))
+				TExpandoMenuBar::MouseMoved(where, code, message);
+		}
 
 		switch (code) {
 			case B_ENTERED_VIEW:
@@ -611,10 +649,9 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	if (fVertical) {
 		if (item && fShowTeamExpander && fExpandNewTeams)
 			item->ToggleExpandState(false);
+	}
 
-		fBarView->SizeWindow(BScreen(Window()).Frame());
-	} else
-		CheckItemSizes(1);
+	SizeWindow(1);
 
 	Window()->UpdateIfNeeded();
 }
@@ -656,14 +693,7 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 
 				RemoveItem(i);
 
-				if (fVertical) {
-					// instead of resizing the window here and there in the
-					// code the resize method will be centered in one place
-					// thus, the same behavior (good or bad) will be used
-					// whereever window sizing is done
-					fBarView->SizeWindow(BScreen(Window()).Frame());
-				} else
-					CheckItemSizes(-1);
+				SizeWindow(-1);
 
 				Window()->UpdateIfNeeded();
 
@@ -803,7 +833,7 @@ TExpandoMenuBar::CheckForSizeOverrun()
 		return;
 	}
 
-	BScrollMenu* scrollMenu = dynamic_cast<BScrollMenu*>(Parent());
+	BMenuScrollView* scrollMenu = dynamic_cast<BMenuScrollView*>(Parent());
 	if (scrollMenu == NULL)
 		return;
 
@@ -818,12 +848,20 @@ TExpandoMenuBar::CheckForSizeOverrun()
 
 
 void
-TExpandoMenuBar::SizeWindow()
+TExpandoMenuBar::SizeWindow(int32 delta)
 {
+	BMenuScrollView* scrollMenu = dynamic_cast<BMenuScrollView*>(Parent());
+	if (scrollMenu != NULL)
+		scrollMenu->ResizeTo(Bounds().Width(), Bounds().Height());
+
+	// instead of resizing the window here and there in the
+	// code the resize method will be centered in one place
+	// thus, the same behavior (good or bad) will be used
+	// wherever window sizing is done
 	if (fVertical)
 		fBarView->SizeWindow(BScreen(Window()).Frame());
 	else
-		CheckItemSizes(1);
+		CheckItemSizes(delta);
 }
 
 
@@ -928,7 +966,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 			if (itemModified || resize) {
 				teamMenu->Invalidate();
 				if (resize)
-					teamMenu->SizeWindow();
+					teamMenu->SizeWindow(1);
 			}
 
 			teamMenu->Window()->Unlock();

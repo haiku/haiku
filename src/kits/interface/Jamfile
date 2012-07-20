@@ -82,6 +82,7 @@ MergeObject <libbe>interface_kit.o :
 	MenuField.cpp
 	MenuItem.cpp
 	MenuPrivate.cpp
+	MenuScrollView.cpp
 	MenuWindow.cpp
 	OptionControl.cpp
 	OptionPopUp.cpp
@@ -101,7 +102,6 @@ MergeObject <libbe>interface_kit.o :
 	RegionSupport.cpp
 	Screen.cpp
 	ScrollBar.cpp
-	ScrollMenu.cpp
 	ScrollView.cpp
 	SeparatorItem.cpp
 	SeparatorView.cpp

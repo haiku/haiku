@@ -82,7 +82,7 @@ class TExpandoMenuBar : public BMenuBar {
 
 		menu_layout MenuLayout() const;
 
-		void SizeWindow();
+		void SizeWindow(int32 delta);
 		void CheckForSizeOverrun();
 
 	private:

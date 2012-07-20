@@ -48,7 +48,7 @@ All rights reserved.
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <ScrollMenu.h>
+#include <MenuScrollView.h>
 #include <String.h>
 
 #include "icons.h"
@@ -131,7 +131,7 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		uint32 state, float)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
-	fBarScrollMenu(NULL),
+	fMenuScrollView(NULL),
 	fBarMenuBar(NULL),
 	fExpando(NULL),
 	fTrayLocation(1),
@@ -443,11 +443,11 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 void
 TBarView::PlaceApplicationBar()
 {
-	if (fBarScrollMenu != NULL) {
-		fBarScrollMenu->RemoveSelf();
-		delete fBarScrollMenu;
+	if (fMenuScrollView != NULL) {
+		fMenuScrollView->RemoveSelf();
+		delete fMenuScrollView;
 			// Also deletes fExpando
-		fBarScrollMenu = NULL;
+		fMenuScrollView = NULL;
 		fExpando = NULL;
 	} else if (fExpando != NULL) {
 		fExpando->RemoveSelf();
@@ -488,12 +488,9 @@ TBarView::PlaceApplicationBar()
 	fExpando = new TExpandoMenuBar(this, expandoFrame, "ExpandoMenuBar",
 		fVertical, !hideLabels && fState != kFullState);
 
-	if (fVertical) {
-		fBarScrollMenu = new BScrollMenu(fExpando);
-		AddChild(fBarScrollMenu);
-//printf("fExpando bottom: %f, fBarScrollMenu bottom: %f\n", fExpando->Frame().bottom, fBarScrollMenu->Frame().bottom);
-	} else
-		AddChild(fExpando);
+	fMenuScrollView = new BMenuScrollView(fExpando);
+	AddChild(fMenuScrollView);
+//printf("fExpando bottom: %f, fMenuScrollView bottom: %f\n", fExpando->Frame().bottom, fMenuScrollView->Frame().bottom);
 
 	if (fVertical)
 		ExpandItems();
@@ -530,7 +527,7 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 		} else if (fState == kExpandoState) {
 			if (fVertical) {
 				// top left or right
-				windowHeight = fBarScrollMenu->Frame().bottom;
+				windowHeight = fMenuScrollView->Frame().bottom;
 			} else {
 				// top or bottom, full
 				fExpando->CheckItemSizes(0);
@@ -557,8 +554,14 @@ TBarView::SizeWindow(BRect screenFrame)
 	float windowWidth, windowHeight;
 	GetPreferredWindowSize(screenFrame, &windowWidth, &windowHeight);
 	Window()->ResizeTo(windowWidth, windowHeight);
-	if (fExpando)
+
+	if (fExpando != NULL) {
+		if (fMenuScrollView != NULL) {
+			fMenuScrollView->ResizeTo(fExpando->Bounds().Width(),
+				fExpando->Bounds().Height());
+		}
 		fExpando->CheckForSizeOverrun();
+	}
 }
 
 
@@ -687,7 +690,7 @@ TBarView::ExpandItems()
 	// Clean up the expanded items list
 	RemoveExpandedItems();
 
-	fExpando->SizeWindow();
+	fExpando->SizeWindow(1);
 }
 
 

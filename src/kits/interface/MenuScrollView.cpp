@@ -9,7 +9,7 @@
  */
 
 
-#include <ScrollMenu.h>
+#include <MenuScrollView.h>
 
 #include <ControlLook.h>
 #include <Debug.h>
@@ -22,8 +22,7 @@
 #include <MenuPrivate.h>
 
 
-const char* kEmptyMenuLabel = "<empty>";
-const int kDefaultScrollStep = 19;
+const int kDefaultScrollStep = 8;
 const int kScrollerHeight = 12;
 
 
@@ -161,7 +160,7 @@ BMenuDownScroller::Draw(BRect updateRect)
 //	#pragma mark -
 
 
-BScrollMenu::BScrollMenu(BMenu *menu)
+BMenuScrollView::BMenuScrollView(BMenu *menu)
 	:
 	BView("menu scroll view", B_WILL_DRAW | B_FRAME_EVENTS),
 	fMenu(menu),
@@ -172,7 +171,7 @@ BScrollMenu::BScrollMenu(BMenu *menu)
 }
 
 
-BScrollMenu::~BScrollMenu()
+BMenuScrollView::~BMenuScrollView()
 {
 	if (fMenu != NULL) {
 		fMenu->RemoveSelf();
@@ -195,7 +194,7 @@ BScrollMenu::~BScrollMenu()
 
 
 void
-BScrollMenu::AttachedToWindow()
+BMenuScrollView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
@@ -204,7 +203,7 @@ BScrollMenu::AttachedToWindow()
 
 	AddChild(fMenu);
 
-	// Move the scroll menu into the right position
+	// Move the scroll menu into position
 	MoveTo(fMenu->Frame().LeftTop());
 
 	BFont font;
@@ -214,7 +213,7 @@ BScrollMenu::AttachedToWindow()
 
 
 void
-BScrollMenu::DetachedFromWindow()
+BMenuScrollView::DetachedFromWindow()
 {
 	BView::DetachedFromWindow();
 
@@ -230,7 +229,7 @@ BScrollMenu::DetachedFromWindow()
 
 
 void
-BScrollMenu::Draw(BRect updateRect)
+BMenuScrollView::Draw(BRect updateRect)
 {
 	if (be_control_look != NULL)
 		return;
@@ -246,7 +245,7 @@ BScrollMenu::Draw(BRect updateRect)
 
 
 void
-BScrollMenu::FrameResized(float newWidth, float newHeight)
+BMenuScrollView::FrameResized(float newWidth, float newHeight)
 {
 	BView::FrameResized(newWidth, newHeight);
 
@@ -260,7 +259,7 @@ BScrollMenu::FrameResized(float newWidth, float newHeight)
 
 
 void
-BScrollMenu::AttachScrollers()
+BMenuScrollView::AttachScrollers()
 {
 	if (fMenu == NULL)
 		return;
@@ -297,7 +296,7 @@ BScrollMenu::AttachScrollers()
 
 
 void
-BScrollMenu::DetachScrollers()
+BMenuScrollView::DetachScrollers()
 {
 	if (!HasScrollers())
 		return;
@@ -327,21 +326,21 @@ BScrollMenu::DetachScrollers()
 
 
 bool
-BScrollMenu::HasScrollers() const
+BMenuScrollView::HasScrollers() const
 {
 	return fMenu != NULL && fUpperScroller != NULL && fLowerScroller != NULL;
 }
 
 
 void
-BScrollMenu::SetSmallStep(float step)
+BMenuScrollView::SetSmallStep(float step)
 {
 	fScrollStep = step;
 }
 
 
 void
-BScrollMenu::GetSteps(float* _smallStep, float* _largeStep) const
+BMenuScrollView::GetSteps(float* _smallStep, float* _largeStep) const
 {
 	if (_smallStep != NULL)
 		*_smallStep = fScrollStep;
@@ -355,7 +354,7 @@ BScrollMenu::GetSteps(float* _smallStep, float* _largeStep) const
 
 
 bool
-BScrollMenu::CheckForScrolling(const BPoint &cursor)
+BMenuScrollView::CheckForScrolling(const BPoint &cursor)
 {
 	if (!HasScrollers())
 		return false;
@@ -365,7 +364,7 @@ BScrollMenu::CheckForScrolling(const BPoint &cursor)
 
 
 bool
-BScrollMenu::TryScrollBy(const float& step)
+BMenuScrollView::TryScrollBy(const float& step)
 {
 	if (!HasScrollers())
 		return false;
@@ -376,7 +375,7 @@ BScrollMenu::TryScrollBy(const float& step)
 
 
 bool
-BScrollMenu::_Scroll(const BPoint& where)
+BMenuScrollView::_Scroll(const BPoint& where)
 {
 	ASSERT((fLowerScroller != NULL));
 	ASSERT((fUpperScroller != NULL));
@@ -405,7 +404,7 @@ BScrollMenu::_Scroll(const BPoint& where)
 
 
 void
-BScrollMenu::_ScrollBy(const float& step)
+BMenuScrollView::_ScrollBy(const float& step)
 {
 	if (step > 0) {
 		if (fValue == 0)
@@ -420,6 +419,7 @@ BScrollMenu::_ScrollBy(const float& step)
 			fMenu->ScrollBy(0, step);
 			fValue += step;
 		}
+		fMenu->Invalidate();
 	} else if (step < 0) {
 		if (fValue == fLimit)
 			fLowerScroller->SetEnabled(true);
@@ -432,5 +432,6 @@ BScrollMenu::_ScrollBy(const float& step)
 			fMenu->ScrollBy(0, step);
 			fValue += step;
 		}
+		fMenu->Invalidate();
 	}
 }
