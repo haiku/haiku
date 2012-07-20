@@ -233,3 +233,10 @@ OpenFileCookie::_ReleaseLockOwner(LockOwner* owner)
 	return reply.ReleaseLockOwner();
 }
 
+
+OpenDirCookie::~OpenDirCookie()
+{
+	if (fSnapshot != NULL)
+		fSnapshot->ReleaseReference();
+}
+

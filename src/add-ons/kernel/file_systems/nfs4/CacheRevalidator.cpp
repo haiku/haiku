@@ -85,7 +85,8 @@ CacheRevalidator::_DirectoryCacheRevalidator()
 			continue;
 		}
 
-		current->Lock();
+		if (current->Lock() != B_OK)
+			continue;
 
 		if (current->ExpireTime() > system_time()) {
 			current->Unlock();

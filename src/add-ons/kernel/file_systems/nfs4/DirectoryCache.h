@@ -12,6 +12,7 @@
 #include <lock.h>
 #include <SupportDefs.h>
 #include <util/DoublyLinkedList.h>
+#include <util/KernelReferenceable.h>
 #include <util/SinglyLinkedList.h>
 
 
@@ -21,8 +22,18 @@ struct NameCacheEntry :
 	public SinglyLinkedListLinkImpl<NameCacheEntry> {
 			ino_t			fNode;
 			const char*		fName;
+
+							NameCacheEntry(const char* name, ino_t node);
+							~NameCacheEntry();
 };
 
+struct DirectoryCacheSnapshot : public KernelReferenceable {
+	SinglyLinkedList<NameCacheEntry>	fEntries;
+	mutex								fLock;
+
+										DirectoryCacheSnapshot();
+										~DirectoryCacheSnapshot();
+};
 
 class DirectoryCache : public DoublyLinkedListLinkImpl<DirectoryCache> {
 public:
@@ -38,6 +49,9 @@ public:
 			status_t		AddEntry(const char* name, ino_t node);
 			void			RemoveEntry(const char* name);
 
+			void			SetSnapshot(DirectoryCacheSnapshot* snapshot);
+	inline	DirectoryCacheSnapshot* GetSnapshot();
+
 	inline	SinglyLinkedList<NameCacheEntry>&	EntriesList();
 
 			status_t		Revalidate();
@@ -52,6 +66,9 @@ public:
 	static	const bigtime_t	kExpirationTime		= 5000000;
 private:
 			SinglyLinkedList<NameCacheEntry>	fNameCache;
+
+			DirectoryCacheSnapshot*	fDirectoryCache;
+			//mutex			fDirectoryCacheLock;
 
 			Inode*			fInode;
 
@@ -82,7 +99,14 @@ DirectoryCache::Unlock()
 }
 
 
-inline	SinglyLinkedList<NameCacheEntry>&
+inline DirectoryCacheSnapshot*
+DirectoryCache::GetSnapshot()
+{
+	return fDirectoryCache;
+}
+
+
+inline SinglyLinkedList<NameCacheEntry>&
 DirectoryCache::EntriesList()
 {
 	return fNameCache;
@@ -94,8 +118,10 @@ DirectoryCache::ValidateChangeInfo(uint64 change)
 {
 	if (fTrashed || change != fChange) {
 		Trash();
-		change = fChange;
+		fChange = change;
 		fExpireTime = system_time() + kExpirationTime;
+		fTrashed = false;
+
 		return B_ERROR;
 	}
 

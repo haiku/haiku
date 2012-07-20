@@ -14,8 +14,41 @@
 #include "Inode.h"
 
 
+
+NameCacheEntry::NameCacheEntry(const char* name, ino_t node)
+	:
+	fNode(node),
+	fName(strdup(name))
+{
+}
+
+
+NameCacheEntry::~NameCacheEntry()
+{
+	free(const_cast<char*>(fName));
+}
+
+
+DirectoryCacheSnapshot::DirectoryCacheSnapshot()
+{
+	mutex_init(&fLock, NULL);
+}
+
+
+DirectoryCacheSnapshot::~DirectoryCacheSnapshot()
+{
+	while (!fEntries.IsEmpty()) {
+		NameCacheEntry* current = fEntries.RemoveHead();
+		delete current;
+	}
+
+	mutex_destroy(&fLock);
+}
+
+
 DirectoryCache::DirectoryCache(Inode* inode)
 	:
+	fDirectoryCache(NULL),
 	fInode(inode),
 	fTrashed(true)
 {
@@ -46,27 +79,26 @@ DirectoryCache::Trash()
 		NameCacheEntry* current = fNameCache.RemoveHead();
 		entry_cache_remove(fInode->GetFileSystem()->DevId(), fInode->ID(),
 			current->fName);
-		free(const_cast<char*>(current->fName));
 		delete current;
 	}
+
+	SetSnapshot(NULL);
 
 	fTrashed = true;
 }
 
-
+// TODO: separate AddEntry() for Name and Directory Cache are needed
 status_t
 DirectoryCache::AddEntry(const char* name, ino_t node)
 {
-	NameCacheEntry* entry = new(std::nothrow) NameCacheEntry;
+	NameCacheEntry* entry = new(std::nothrow) NameCacheEntry(name, node);
 	if (entry == NULL)
 		return B_NO_MEMORY;
-
-	entry->fName = strdup(name);
 	if (entry->fName == NULL) {
 		delete entry;
 		return B_NO_MEMORY;
 	}
-	entry->fNode = node;
+
 	fNameCache.Add(entry);
 
 	return entry_cache_add(fInode->GetFileSystem()->DevId(), fInode->ID(), name,
@@ -82,10 +114,8 @@ DirectoryCache::RemoveEntry(const char* name)
 	NameCacheEntry* current = iterator.Next();
 	while (current != NULL) {
 		if (strcmp(current->fName, name) == 0) {
-			free(const_cast<char*>(current->fName));
-			delete current;
-
 			fNameCache.Remove(previous, current);
+			delete current;
 			break;
 		}
 
@@ -93,7 +123,33 @@ DirectoryCache::RemoveEntry(const char* name)
 		current = iterator.Next();
 	}
 
+	if (fDirectoryCache != NULL) {
+		MutexLocker _(fDirectoryCache->fLock);
+		iterator = fDirectoryCache->fEntries.GetIterator();
+		previous = NULL;
+		current = iterator.Next();
+		while (current != NULL) {
+			if (strcmp(current->fName, name) == 0) {
+				fDirectoryCache->fEntries.Remove(previous, current);
+				delete current;
+				break;
+			}
+
+			previous = current;
+			current = iterator.Next();
+		}
+	}
+
 	entry_cache_remove(fInode->GetFileSystem()->DevId(), fInode->ID(), name);
+}
+
+
+void
+DirectoryCache::SetSnapshot(DirectoryCacheSnapshot* snapshot)
+{
+	if (fDirectoryCache != NULL)
+		fDirectoryCache->ReleaseReference();
+	fDirectoryCache = snapshot;
 }
 
 

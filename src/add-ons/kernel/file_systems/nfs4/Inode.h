@@ -81,11 +81,16 @@ protected:
 									OpenFileCookie* cookie);
 
 					status_t	_ReadDirOnce(DirEntry** dirents, uint32* count,
-									OpenDirCookie* cookie, bool* eof);
+									OpenDirCookie* cookie, bool* eof,
+									uint64* change, uint64* dirCookie,
+									uint64* dirCookieVerf);
 					status_t	_FillDirEntry(struct dirent* de, ino_t id,
 									const char* name, uint32 pos, uint32 size);
 					status_t	_ReadDirUp(struct dirent* de, uint32 pos,
 									uint32 size);
+					status_t	_GetDirSnapshot(DirectoryCacheSnapshot**
+									_snapshot, OpenDirCookie* cookie,
+									uint64* _change);
 
 	static inline	status_t	_CheckLockType(short ltype, uint32 mode);
 

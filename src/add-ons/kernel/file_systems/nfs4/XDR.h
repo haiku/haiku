@@ -39,6 +39,8 @@ public:
 							ReadStream(void* buffer, uint32 size);
 	virtual					~ReadStream();
 
+	inline	void			SetPosition(Position position);
+
 	inline	int				Size() const;
 
 			int32			GetInt();
@@ -105,6 +107,13 @@ inline Stream::Position
 Stream::Current() const
 {
 	return fPosition;
+}
+
+
+inline void
+ReadStream::SetPosition(Position position)
+{
+	fPosition = position;
 }
 
 

@@ -122,8 +122,9 @@ Inode::OpenDir(OpenDirCookie* cookie)
 			return B_PERMISSION_DENIED;
 
 		cookie->fFileSystem = fFileSystem;
-		cookie->fCookie = 0;
-		cookie->fCookieVerf = 2;
+		cookie->fSnapshot = NULL;
+		cookie->fCurrent = NULL;
+		cookie->fEOF = false;
 
 		fFileSystem->Root()->MakeInfoInvalid();
 
@@ -134,7 +135,7 @@ Inode::OpenDir(OpenDirCookie* cookie)
 
 status_t
 Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
-	bool* eof)
+	bool* eof, uint64* change, uint64* dirCookie, uint64* dirCookieVerf)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
@@ -143,9 +144,15 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 
 		req.PutFH(fInfo.fHandle);
 
+		Attribute dirAttr[] = { FATTR4_CHANGE };
+		if (*change == 0)
+			req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
+
 		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
-		req.ReadDir(*count, cookie->fCookie, cookie->fCookieVerf, attr,
+		req.ReadDir(*count, *dirCookie, *dirCookieVerf, attr,
 			sizeof(attr) / sizeof(Attribute));
+
+		req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
 
 		status_t result = request.Send(cookie);
 		if (result != B_OK)
@@ -157,8 +164,39 @@ Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 			continue;
 
 		reply.PutFH();
-		return reply.ReadDir(&cookie->fCookie, &cookie->fCookieVerf, dirents,
+
+		AttrValue* before = NULL;
+		uint32 attrCount;
+		if (*change == 0) {
+			result = reply.GetAttr(&before, &attrCount);
+			if (result != B_OK)
+				return result;
+		}
+
+		result = reply.ReadDir(dirCookie, dirCookieVerf, dirents,
 			count, eof);
+		if (result != B_OK) {
+			delete[] before;
+			return result;
+		}
+
+		AttrValue* after;
+		result = reply.GetAttr(&after, &attrCount);
+		if (result != B_OK) {
+			delete[] before;
+			return result;
+		}
+
+		if (*change == 0 && before[0].fData.fValue64 == after[0].fData.fValue64
+			|| *change == after[0].fData.fValue64)
+			*change = after[0].fData.fValue64;
+		else
+			return B_ERROR;
+
+		delete[] before;
+		delete[] after;
+
+		return B_OK;
 	} while (true);
 }
 
@@ -236,23 +274,67 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 	} while (true);
 }
 
-// TODO: Currently inode numbers returned by ReadDir are virtually random.
-// Apparently Haiku does not use that information (contrary to inode number
-// returned by LookUp) so fixing it can wait until directory caches are
-// implemented.
-// When directories are cached client should store inode numbers it assigned
-// to directroy entries and use them consequently.
+
 status_t
-Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
-	OpenDirCookie* cookie)
+Inode::_GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
+	OpenDirCookie* cookie, uint64* _change)
 {
-	uint32 count = 0;
-	uint32 pos = 0;
-	uint32 this_count;
+	DirectoryCacheSnapshot* snapshot = new DirectoryCacheSnapshot;
+	if (snapshot == NULL)
+		return B_NO_MEMORY;
+
+	uint64 change = 0;
+	uint64 dirCookie = 0;
+	uint64 dirCookieVerf = 0;
 	bool eof = false;
 
-	char* buffer = reinterpret_cast<char*>(_buffer);
+	while (!eof) {
+		uint32 count;
+		DirEntry* dirents;
 
+		status_t result = _ReadDirOnce(&dirents, &count, cookie, &eof, &change,
+			&dirCookie, &dirCookieVerf);
+		if (result != B_OK) {
+			delete snapshot;
+			return result;
+		}
+
+		uint32 i;
+		for (i = 0; i < count; i++) {
+
+			// FATTR4_FSID is mandatory
+			void* data = dirents[i].fAttrs[0].fData.fPointer;
+			FileSystemId* fsid = reinterpret_cast<FileSystemId*>(data);
+			if (*fsid != fFileSystem->FsId())
+				continue;
+
+			ino_t id;
+			if (dirents[i].fAttrCount == 2)
+				id = _FileIdToInoT(dirents[i].fAttrs[1].fData.fValue64);
+			else
+				id = _FileIdToInoT(fFileSystem->AllocFileId());
+	
+			NameCacheEntry* entry = new NameCacheEntry(dirents[i].fName, id);
+			if (entry == NULL || entry->fName == NULL) {
+				if (entry->fName == NULL)
+					delete entry;
+				delete snapshot;
+				delete[] dirents;
+				return B_NO_MEMORY;
+			}
+			snapshot->fEntries.Add(entry);
+		}
+
+		delete[] dirents;
+	}
+
+	*_snapshot = snapshot;
+	*_change = change;
+
+	return B_OK;
+}
+
+/*
 	if (cookie->fCookie == 0 && cookie->fCookieVerf == 2 && count < *_count) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 
@@ -275,51 +357,79 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 		count++;
 		cookie->fCookieVerf--;
 	}
+*/
 
-	bool overflow = false;
-	while (count < *_count && !eof) {
-		this_count = *_count - count;
-		DirEntry* dirents;
-
-		status_t result = _ReadDirOnce(&dirents, &this_count, cookie, &eof);
-		if (result != B_OK)
-			return result;
-
-		uint32 i, entries = 0;
-		for (i = 0; i < min_c(this_count, *_count - count); i++) {
-			struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
-
-			// FATTR4_FSID is mandatory
-			void* data = dirents[i].fAttrs[0].fData.fPointer;
-			FileSystemId* fsid = reinterpret_cast<FileSystemId*>(data);
-			if (*fsid != fFileSystem->FsId())
-				continue;
-
-			ino_t id;
-			if (dirents[i].fAttrCount == 2)
-				id = _FileIdToInoT(dirents[i].fAttrs[1].fData.fValue64);
-			else
-				id = _FileIdToInoT(fFileSystem->AllocFileId());
-
-			const char* name = dirents[i].fName;
-			if (_FillDirEntry(de, id, name, pos, size) == B_BUFFER_OVERFLOW) {
-				eof = true;
-				overflow = true;
-				break;
-			}
-
-			pos += de->d_reclen;
-			entries++;
-		}
-		delete[] dirents;
-		count += entries;
+status_t
+Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
+	OpenDirCookie* cookie)
+{
+	if (cookie->fEOF) {
+		*_count = 0;
+		return B_OK;
 	}
 
-	if (count == 0 && overflow)
+	status_t result;
+	if (cookie->fSnapshot == NULL) {
+		fFileSystem->Revalidator().Lock();
+		if (fCache->Lock() != B_OK) {
+			fCache->ResetAndLock();
+		} else {
+			fFileSystem->Revalidator().RemoveDirectory(fCache);
+		}
+
+		cookie->fSnapshot = fCache->GetSnapshot();
+		if (cookie->fSnapshot == NULL) {
+			uint64 change;
+			result = _GetDirSnapshot(&cookie->fSnapshot, cookie, &change);
+			if (result != B_OK) {
+				fCache->Unlock();
+				fFileSystem->Revalidator().Unlock();
+				return result;
+			}
+			fCache->ValidateChangeInfo(change);
+			fCache->SetSnapshot(cookie->fSnapshot);
+		}
+		cookie->fSnapshot->AcquireReference();
+		fFileSystem->Revalidator().AddDirectory(fCache);
+		fCache->Unlock();
+		fFileSystem->Revalidator().Unlock();
+	}
+
+	char* buffer = reinterpret_cast<char*>(_buffer);
+	uint32 pos = 0;
+
+	MutexLocker _(cookie->fSnapshot->fLock);
+	uint32 i;
+	bool overflow = false;
+	for (i = 0; i < *_count; i++) {
+		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
+
+		if (cookie->fCurrent == NULL)
+			cookie->fCurrent = cookie->fSnapshot->fEntries.Head();
+		else {
+			cookie->fCurrent
+				= cookie->fSnapshot->fEntries.GetNext(cookie->fCurrent);
+		}
+
+		if (cookie->fCurrent == NULL) {
+			cookie->fEOF = true;
+			break;
+		}
+
+		if (_FillDirEntry(de, cookie->fCurrent->fNode, cookie->fCurrent->fName,
+			pos, size) == B_BUFFER_OVERFLOW) {
+			overflow = true;
+			break;
+		}
+
+		pos += de->d_reclen;
+	}
+
+	if (i == 0 && overflow)
 		return B_BUFFER_OVERFLOW;
 
-	*_count = count;
-	
+	*_count = i;
+
 	return B_OK;
 }
 

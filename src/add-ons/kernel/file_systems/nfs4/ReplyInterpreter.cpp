@@ -326,12 +326,33 @@ ReplyInterpreter::ReadDir(uint64* cookie, uint64* cookieVerf,
 
 	bool isNext;
 	uint32 count = 0;
-	DirEntry* entries = new(std::nothrow) DirEntry[*_count];
+
+	// TODO: using  list instead of array would make this much more elegant
+	// and efficient
+	XDR::Stream::Position dataStart = fReply->Stream().Current();
+	isNext = fReply->Stream().GetBoolean();
+	while (isNext) {
+		fReply->Stream().GetUHyper();
+
+		free(fReply->Stream().GetString());
+		AttrValue* values;
+		uint32 attrCount;
+		_DecodeAttrs(fReply->Stream(), &values,	&attrCount);
+		delete[] values;
+
+		count++;
+
+		isNext = fReply->Stream().GetBoolean();
+	}
+
+	DirEntry* entries = new(std::nothrow) DirEntry[count];
 	if (entries == NULL)
 		return B_NO_MEMORY;
 
+	count = 0;
+	fReply->Stream().SetPosition(dataStart);
 	isNext = fReply->Stream().GetBoolean();
-	while (isNext && count < *_count) {
+	while (isNext) {
 		*cookie = fReply->Stream().GetUHyper();
 
 		entries[count].fName = fReply->Stream().GetString();
