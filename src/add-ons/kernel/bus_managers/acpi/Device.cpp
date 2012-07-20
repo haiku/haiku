@@ -9,8 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "acpi_priv.h"
+#include "ACPIPrivate.h"
+extern "C" {
 #include "acpi.h"
+}
 
 
 static status_t
@@ -43,17 +45,17 @@ acpi_remove_address_space_handler(acpi_device device, uint32 spaceId,
 {
 	return remove_address_space_handler(device->handle, spaceId, handler);
 }
-					
 
-static uint32 
+
+static uint32
 acpi_get_object_type(acpi_device device)
 {
 	return device->type;
 }
 
 
-static status_t 
-acpi_get_object(acpi_device device, const char *path, acpi_object_type **return_value) 
+static status_t
+acpi_get_object(acpi_device device, const char *path, acpi_object_type **return_value)
 {
 	if (path) {
 		char objname[255];
@@ -64,9 +66,9 @@ acpi_get_object(acpi_device device, const char *path, acpi_object_type **return_
 }
 
 
-static status_t 
+static status_t
 acpi_evaluate_method(acpi_device device, const char *method,
-	acpi_objects *args, acpi_data *returnValue) 
+	acpi_objects *args, acpi_data *returnValue)
 {
 	return evaluate_method(device->handle, method, args, returnValue);
 }
@@ -77,19 +79,17 @@ acpi_device_init_driver(device_node *node, void **cookie)
 {
 	ACPI_HANDLE handle;
 	const char *path;
-	acpi_device_cookie *device;
-	status_t status = B_OK;
 	uint32 type;
-	
+
 	if (gDeviceManager->get_attr_uint32(node, ACPI_DEVICE_TYPE_ITEM, &type, false) != B_OK)
 		return B_ERROR;
 	if (gDeviceManager->get_attr_string(node, ACPI_DEVICE_PATH_ITEM, &path, false) != B_OK)
 		return B_ERROR;
-	
-	device = malloc(sizeof(*device));
+
+	acpi_device_cookie *device = (acpi_device_cookie*)malloc(sizeof(*device));
 	if (device == NULL)
 		return B_NO_MEMORY;
-	
+
 	memset(device, 0, sizeof(*device));
 
 	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK) {
@@ -102,20 +102,17 @@ acpi_device_init_driver(device_node *node, void **cookie)
 	device->type = type;
 	device->node = node;
 
-	snprintf(device->name, sizeof(device->name), "acpi_device %s", 
-		path);
-	
+	snprintf(device->name, sizeof(device->name), "acpi_device %s", path);
 	*cookie = device;
-
-	return status;
+	return B_OK;
 }
 
 
 static void
 acpi_device_uninit_driver(void *cookie)
 {
-	acpi_device_cookie *device = cookie;
-	
+	acpi_device_cookie *device = (acpi_device_cookie*)cookie;
+
 	free(device->path);
 	free(device);
 }
@@ -133,7 +130,7 @@ acpi_device_std_ops(int32 op, ...)
 	return B_BAD_VALUE;
 }
 
-					
+
 acpi_device_module_info gACPIDeviceModule = {
 	{
 		{

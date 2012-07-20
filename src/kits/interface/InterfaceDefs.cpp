@@ -96,6 +96,7 @@ static const rgb_color _kDefaultColors[kNumColors] = {
 	{80, 80, 80, 255},		// B_WINDOW_INACTIVE_TEXT_COLOR
 	{224, 224, 224, 255},	// B_WINDOW_BORDER_COLOR
 	{232, 232, 232, 255},	// B_WINDOW_INACTIVE_BORDER_COLOR
+	{27, 82, 140, 255},     // B_CONTROL_MARK_COLOR
 	// 100...
 	{0, 255, 0, 255},		// B_SUCCESS_COLOR
 	{255, 0, 0, 255},		// B_FAILURE_COLOR

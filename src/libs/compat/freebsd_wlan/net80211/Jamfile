@@ -11,9 +11,9 @@ UsePrivateKernelHeaders ;
 Includes [ FGristFiles kernel_c++_structs.h ]
 	: <src!system!kernel>kernel_c++_struct_sizes.h ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 IEEE80211_DEBUG=1 ]
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
 	-Wno-format -Wno-unused -Wno-uninitialized ;
-SubDirC++Flags [ FDefines _KERNEL=1 FBSD_DRIVER=1 IEEE80211_DEBUG=1 ]
+SubDirC++Flags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
 	-Wno-format -Wno-unused -Wno-uninitialized ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) .. crypto rijndael ] ;

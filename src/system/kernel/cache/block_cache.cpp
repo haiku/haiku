@@ -89,7 +89,17 @@ struct cached_block {
 	bool			busy_reading_waiters : 1;
 	bool			busy_writing_waiters : 1;
 	cache_transaction* transaction;
+		// This is the current active transaction, if any, the block is
+		// currently in (meaning was changed as a part of it).
 	cache_transaction* previous_transaction;
+		// This is set to the last transaction that was ended containing this
+		// block. In this case, the block has not yet written back yet, and
+		// the changed data is either in current_data, or original_data -- the
+		// latter if the block is already being part of another transaction.
+		// There can only be one previous transaction, so when the active
+		// transaction ends, the changes of the previous transaction have to
+		// be written back before that transaction becomes the next previous
+		// transaction.
 
 	bool CanBeWritten() const;
 	int32 LastAccess() const
@@ -1189,7 +1199,7 @@ BlockWriter::WriteBlock(block_cache* cache, cached_block* block)
 void*
 BlockWriter::_Data(cached_block* block) const
 {
-	return block->previous_transaction && block->original_data
+	return block->previous_transaction != NULL && block->original_data != NULL
 		? block->original_data : block->current_data;
 		// We first need to write back changes from previous transactions
 }
@@ -1268,7 +1278,7 @@ BlockWriter::_BlockDone(cached_block* block, hash_iterator* iterator)
 			fDeletedTransaction = true;
 		}
 	}
-	if (block->transaction == NULL && block->ref_count == 0) {
+	if (block->transaction == NULL && block->ref_count == 0 && !block->unused) {
 		// the block is no longer used
 		block->unused = true;
 		fCache->unused_blocks.Add(block);
@@ -1761,7 +1771,9 @@ put_cached_block(block_cache* cache, cached_block* block)
 			cache->RemoveBlock(block);
 		} else {
 			// put this block in the list of unused blocks
+			ASSERT(!block->unused);
 			block->unused = true;
+
 			ASSERT(block->original_data == NULL
 				&& block->parent_data == NULL);
 			cache->unused_blocks.Add(block);
@@ -2868,6 +2880,8 @@ cache_abort_transaction(void* _cache, int32 id)
 		block->transaction_next = NULL;
 		block->transaction = NULL;
 		block->discard = false;
+		if (block->previous_transaction == NULL)
+			block->is_dirty = false;
 	}
 
 	hash_remove(cache->transaction_hash, transaction);
@@ -3019,17 +3033,24 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 		next = block->transaction_next;
 
 		if (block->parent_data == NULL) {
-			// the parent transaction didn't change the block, but the sub
-			// transaction did - we need to revert from the original data
+			// The parent transaction didn't change the block, but the sub
+			// transaction did - we need to revert to the original data.
+			// The block is no longer part of the transaction
 			ASSERT(block->original_data != NULL);
 			memcpy(block->current_data, block->original_data,
 				cache->block_size);
+			block->transaction_next = NULL;
+			block->transaction = NULL;
+			if (block->previous_transaction == NULL)
+				block->is_dirty = false;
 		} else if (block->parent_data != block->current_data) {
-			// the block has been changed and must be restored
+			// The block has been changed and must be restored - the block
+			// is still dirty and part of the transaction
 			TRACE(("cache_abort_sub_transaction(id = %" B_PRId32 "): restored contents "
 				"of block %" B_PRIdOFF "\n", transaction->id, block->block_number));
 			memcpy(block->current_data, block->parent_data, cache->block_size);
 			cache->Free(block->parent_data);
+			// The block stays dirty
 		}
 
 		block->parent_data = NULL;

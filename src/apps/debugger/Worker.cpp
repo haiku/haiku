@@ -1,4 +1,5 @@
 /*
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -138,6 +139,14 @@ void
 Job::SetWaitStatus(job_wait_status status)
 {
 	fWaitStatus = status;
+	switch (fWaitStatus) {
+		case JOB_DEPENDENCY_ACTIVE:
+			fState = JOB_STATE_WAITING;
+			break;
+		default:
+			fState = JOB_STATE_ACTIVE;
+			break;
+	}
 }
 
 
@@ -346,18 +355,6 @@ Worker::WaitForJob(Job* waitingJob, const JobKey& key)
 	waitingJob->SetDependency(job);
 	job->DependentJobs().Add(waitingJob);
 
-	// TODO: Continuations would be nice. For the time being we have to use
-	// recursion. Disadvantages are that we'll use more stack and that aborting
-	// a job waiting for a dependency won't abort the job before the dependency
-	// is done.
-	locker.Unlock();
-	_ProcessJobs(waitingJob);
-	locker.Lock();
-
-	// ignore the actual wait status when the game is over anyway
-	if (fTerminating || waitingJob->State() == JOB_STATE_ABORTED)
-		return JOB_DEPENDENCY_ABORTED;
-
 	return waitingJob->WaitStatus();
 }
 
@@ -372,7 +369,7 @@ Worker::_WorkerLoopEntry(void* data)
 status_t
 Worker::_WorkerLoop()
 {
-	_ProcessJobs(NULL);
+	_ProcessJobs();
 
 	// clean up aborted jobs
 	AutoLocker<Worker> locker(this);
@@ -384,7 +381,7 @@ Worker::_WorkerLoop()
 
 
 void
-Worker::_ProcessJobs(Job* waitingJob)
+Worker::_ProcessJobs()
 {
 	while (true) {
 		AutoLocker<Worker> locker(this);
@@ -395,8 +392,10 @@ Worker::_ProcessJobs(Job* waitingJob)
 
 			status_t error = acquire_sem(fWorkToDoSem);
 			if (error != B_OK) {
-				if (error == B_INTERRUPTED)
+				if (error == B_INTERRUPTED) {
+					locker.Lock();
 					continue;
+				}
 				break;
 			}
 
@@ -404,12 +403,8 @@ Worker::_ProcessJobs(Job* waitingJob)
 		}
 
 		// clean up aborted jobs
-		while (Job* job = fAbortedJobs.RemoveHead()) {
+		while (Job* job = fAbortedJobs.RemoveHead())
 			_FinishJob(job);
-
-			if (waitingJob != NULL && waitingJob->State() != JOB_STATE_WAITING)
-				break;
-		}
 
 		// process the next job
 		if (Job* job = fUnscheduledJobs.RemoveHead()) {
@@ -422,12 +417,10 @@ Worker::_ProcessJobs(Job* waitingJob)
 			if (job->State() == JOB_STATE_ACTIVE) {
 				job->SetState(
 					error == B_OK ? JOB_STATE_SUCCEEDED : JOB_STATE_FAILED);
-			}
+			} else if (job->State() == JOB_STATE_WAITING)
+				continue;
 
 			_FinishJob(job);
-
-			if (waitingJob != NULL && waitingJob->State() != JOB_STATE_WAITING)
-				break;
 		}
 	}
 }
@@ -492,7 +485,10 @@ Worker::_FinishJob(Job* job)
 		while (Job* dependentJob = job->DependentJobs().RemoveHead()) {
 			dependentJob->SetDependency(NULL);
 			dependentJob->SetWaitStatus(waitStatus);
+			fUnscheduledJobs.Add(dependentJob);
 		}
+
+		release_sem(fWorkToDoSem);
 	}
 
 	if (job->State() != JOB_STATE_ABORTED)

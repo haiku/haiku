@@ -409,12 +409,12 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 		Echo "No optional package CDRecord available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			cdrtools-3.01a06-x86-gcc4-2012-06-19.zip
-			: $(baseURL)/cdrtools-3.01a06-x86-gcc4-2012-06-19.zip ;
+			cdrtools-3.01a07-x86-gcc4-2012-06-19.zip
+			: $(baseURL)/cdrtools-3.01a07-x86-gcc4-2012-07-19.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			cdrtools-3.01a06-x86-gcc2-2012-06-20.zip
-			: $(baseURL)/cdrtools-3.01a06-x86-gcc2-2012-06-20.zip ;
+			cdrtools-3.01a07-x86-gcc2-2012-07-19-r2.zip
+			: $(baseURL)/cdrtools-3.01a07-x86-gcc2-2012-07-19-r2.zip ;
 	}
 }
 
@@ -475,13 +475,13 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				cmake-2.8.4-r1a3-x86-gcc4-2011-05-23.zip
-				: $(baseURL)/cmake-2.8.4-r1a3-x86-gcc4-2011-05-23.zip
+				cmake-2.8.5-x86-gcc4-2012-07-18.zip
+				: $(baseURL)/cmake-2.8.5-x86-gcc4-2012-07-18.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				cmake-2.8.4-r1a3-x86-gcc2-2011-05-19.zip
-				: $(baseURL)/cmake-2.8.4-r1a3-x86-gcc2-2011-05-19.zip
+				cmake-2.8.5-x86-gcc2-2012-07-16.zip
+				: $(baseURL)/cmake-2.8.5-x86-gcc2-2012-07-16.zip
 				: : true ;
 		}
 	}
@@ -1206,12 +1206,12 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				libxml2-2.8.0-x86-gcc4-2012-06-18.zip
-				: $(baseURL)/libxml2-2.8.0-x86-gcc4-2012-06-18.zip ;
+				libxml2-2.8.0-x86-gcc4-2012-07-18.zip
+				: $(baseURL)/libxml2-2.8.0-x86-gcc4-2012-07-18.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				libxml2-2.8.0-x86-gcc2-2012-06-21.zip
-				: $(baseURL)/libxml2-2.8.0-x86-gcc2-2012-06-21.zip ;
+				libxml2-2.8.0-x86-gcc2-2012-07-17.zip
+				: $(baseURL)/libxml2-2.8.0-x86-gcc2-2012-07-17.zip ;
 		}
 	}
 }
@@ -1986,8 +1986,8 @@ if [ IsOptionalHaikuImagePackageAdded XZ-Utils ] {
 		Echo "No optional package XZ-Utils available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			xz-utils-5.0.1-r1a3-x86-gcc4-2011-05-24.zip
-			: $(baseURL)/xz-utils-5.0.1-r1a3-x86-gcc4-2011-05-24.zip ;
+			xz-utils-5.0.1-x86-gcc4-2012-07-18.zip
+			: $(baseURL)/xz-utils-5.0.1-x86-gcc4-2012-07-18.zip ;
 		AddExpanderRuleToHaikuImage "application/x-xz" : .tar.xz
 			: "tar -Jtvf \\0045s"
 			: "tar -Jxvf \\0045s"

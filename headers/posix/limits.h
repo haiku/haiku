@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012 Haiku Inc. All rights reserved.
+ * Copyright 2001-2012 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LIBC_LIMITS_H_

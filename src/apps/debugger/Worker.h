@@ -182,7 +182,7 @@ private:
 	static	status_t			_WorkerLoopEntry(void* data);
 			status_t			_WorkerLoop();
 
-			void				_ProcessJobs(Job* waitingJob);
+			void				_ProcessJobs();
 			void				_AbortJob(Job* job, bool removeFromTable);
 			void				_FinishJob(Job* job);
 

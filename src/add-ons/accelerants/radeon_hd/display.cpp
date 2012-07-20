@@ -257,6 +257,12 @@ detect_displays()
 		if (displayIndex >= MAX_DISPLAY)
 			continue;
 
+		if (gConnector[id]->type == VIDEO_CONNECTOR_9DIN) {
+			TRACE("%s: Skipping 9DIN connector (not yet supported)\n",
+				__func__);
+			continue;
+		}
+
 		// TODO: As DP aux transactions don't work yet, just use LVDS as a hack
 		#if 0
 		if (gConnector[id]->encoderExternal.isDPBridge == true) {
@@ -310,9 +316,11 @@ detect_displays()
 					TRACE("%s: connector %" B_PRIu32 " has digital EDID "
 						"and is not a analog encoder.\n", __func__, id);
 				} else {
-					// ???, shouldn't happen... I think.
-					TRACE("%s: Warning: connector %" B_PRIu32 " has neither "
-						"digital EDID nor is an analog encoder?\n",
+					// This generally means the monitor is of poor design
+					// Since we *know* there is no load on the analog encoder
+					// we assume that it is a digital display.
+					TRACE("%s: Warning: monitor on connector %" B_PRIu32 " has "
+						"false digital EDID flag and unloaded analog encoder!\n",
 						__func__, id);
 				}
 			}

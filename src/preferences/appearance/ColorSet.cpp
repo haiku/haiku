@@ -34,6 +34,7 @@ static ColorDescription sColorDescriptionTable[] =
 	{ B_CONTROL_TEXT_COLOR, B_TRANSLATE_MARK("Control text") },
 	{ B_CONTROL_BORDER_COLOR, B_TRANSLATE_MARK("Control border") },
 	{ B_CONTROL_HIGHLIGHT_COLOR, B_TRANSLATE_MARK("Control highlight") },
+	{ B_CONTROL_MARK_COLOR, B_TRANSLATE_MARK("Control mark") },
 	{ B_NAVIGATION_BASE_COLOR, B_TRANSLATE_MARK("Navigation base") },
 	{ B_NAVIGATION_PULSE_COLOR, B_TRANSLATE_MARK("Navigation pulse") },
 	{ B_SHINE_COLOR, B_TRANSLATE_MARK("Shine") },

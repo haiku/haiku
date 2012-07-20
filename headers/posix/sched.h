@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 Haiku Inc. All rights reserved.
+ * Copyright 2008-2012 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _SCHED_H_

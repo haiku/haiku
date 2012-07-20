@@ -43,6 +43,7 @@ static struct option const kLongOptions[] = {
 	I(control_text_color, B_CONTROL_TEXT_COLOR),
 	I(control_border_color, B_CONTROL_BORDER_COLOR),
 	I(control_highlight_color, B_CONTROL_HIGHLIGHT_COLOR),
+	I(control_mark_color, B_CONTROL_MARK_COLOR)
 	I(navigation_base_color, B_NAVIGATION_BASE_COLOR),
 	I(navigation_pulse_color, B_NAVIGATION_PULSE_COLOR),
 	I(shine_color, B_SHINE_COLOR),

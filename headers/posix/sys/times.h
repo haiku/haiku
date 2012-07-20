@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_TIMES_H
@@ -21,6 +21,6 @@ extern
 #ifdef __cplusplus
 "C"
 #endif
-clock_t times(struct tms *tms); 
+clock_t times(struct tms *tms);
 
 #endif	/* _SYS_TIMES_H */

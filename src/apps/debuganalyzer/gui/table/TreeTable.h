@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TREE_TABLE_H
@@ -122,6 +123,17 @@ private:
 };
 
 
+class TreeTableToolTipProvider {
+public:
+	virtual						~TreeTableToolTipProvider();
+
+	virtual	bool				GetToolTipForTablePath(
+									const TreeTablePath& path,
+									int32 columnIndex, BToolTip** _tip) = 0;
+									// columnIndex can be -1, if not in a column
+};
+
+
 class TreeTableListener {
 public:
 	virtual						~TreeTableListener();
@@ -157,6 +169,11 @@ public:
 			bool				SetTreeTableModel(TreeTableModel* model);
 			TreeTableModel*		GetTreeTableModel() const	{ return fModel; }
 
+			void				SetToolTipProvider(
+									TreeTableToolTipProvider* toolTipProvider);
+			TreeTableToolTipProvider* ToolTipProvider() const
+									{ return fToolTipProvider; }
+
 			TreeTableSelectionModel* SelectionModel();
 
 			void				SelectNode(const TreeTablePath& path,
@@ -177,6 +194,8 @@ public:
 									TreeTableListener* listener);
 
 protected:
+	virtual bool				GetToolTipAt(BPoint point, BToolTip** _tip);
+
 	virtual	void				SelectionChanged();
 
 	virtual	AbstractColumn*		CreateColumn(TableColumn* column);
@@ -226,6 +245,7 @@ private:
 
 private:
 			TreeTableModel*		fModel;
+			TreeTableToolTipProvider* fToolTipProvider;
 			TreeTableNode*		fRootNode;
 			TreeTableSelectionModel fSelectionModel;
 			ListenerList		fListeners;

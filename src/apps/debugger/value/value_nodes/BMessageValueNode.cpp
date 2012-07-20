@@ -281,6 +281,9 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	uint8* messageBuffer = new(std::nothrow) uint8[totalSize];
 	if (messageBuffer == NULL)
 		return B_NO_MEMORY;
+
+	ArrayDeleter<uint8> deleter(messageBuffer);
+
 	memset(messageBuffer, 0, totalSize);
 	memcpy(messageBuffer, fHeader, sizeof(BMessage::message_header));
 	uint8* tempBuffer = messageBuffer + sizeof(BMessage::message_header);
@@ -313,7 +316,6 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	}
 
 	error = fMessage.Unflatten((const char*)messageBuffer);
-	delete[] messageBuffer;
 	if (error != B_OK)
 		return error;
 
