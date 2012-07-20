@@ -89,7 +89,7 @@ remove_dir_contents(Path& path, bool force, bool removeAttributes)
 {
 	// open the dir
 	DIR* dir = opendir(path.GetPath());
-	if (dir < 0) {
+	if (dir == NULL) {
 		fprintf(stderr, "Error: Failed to open dir \"%s\": %s\n",
 			path.GetPath(), strerror(errno));
 		return;
