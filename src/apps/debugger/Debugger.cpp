@@ -88,6 +88,13 @@ struct Options {
 };
 
 
+struct DebuggedProgramInfo {
+	team_id		team;
+	thread_id	thread;
+	bool		stopInMain;
+};
+
+
 static bool
 parse_arguments(int argc, const char* const* argv, bool noOutput,
 	Options& options)
@@ -174,25 +181,104 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 	return true;
 }
 
+static status_t
+global_init()
+{
+	status_t error = TypeHandlerRoster::CreateDefault();
+	if (error != B_OK)
+		return error;
 
+	error = ValueHandlerRoster::CreateDefault();
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
+}
+
+
+/**
+ * Finds or runs the program to debug, depending on the command line options.
+ * @param options The parsed command line options.
+ * @param _info The info for the program to fill in. Will only be filled in
+ *		  if successful.
+ * @return \c true, if the program has been found or ran.
+ */
+static bool
+get_debugged_program(const Options& options, DebuggedProgramInfo& _info)
+{
+	team_id team = options.team;
+	thread_id thread = options.thread;
+	bool stopInMain = false;
+
+	// If command line arguments were given, start the program.
+	if (options.commandLineArgc > 0) {
+		printf("loading program: \"%s\" ...\n", options.commandLineArgv[0]);
+		// TODO: What about the CWD?
+		thread = load_program(options.commandLineArgv,
+			options.commandLineArgc, false);
+		if (thread < 0) {
+			// TODO: Notify the user!
+			fprintf(stderr, "Error: Failed to load program \"%s\": %s\n",
+				options.commandLineArgv[0], strerror(thread));
+			return false;
+		}
+
+		team = thread;
+			// main thread ID == team ID
+		stopInMain = true;
+	}
+
+	// no parameters given, prompt the user to attach to a team
+	if (team < 0 && thread < 0)
+		return false;
+
+	// no team, but a thread -- get team
+	if (team < 0) {
+		printf("no team yet, getting thread info...\n");
+		thread_info threadInfo;
+		status_t error = get_thread_info(thread, &threadInfo);
+		if (error != B_OK) {
+			// TODO: Notify the user!
+			fprintf(stderr, "Error: Failed to get info for thread \"%ld\": "
+				"%s\n", thread, strerror(error));
+			return false;
+		}
+
+		team = threadInfo.team;
+	}
+	printf("team: %ld, thread: %ld\n", team, thread);
+
+	_info.team = team;
+	_info.thread = thread;
+	_info.stopInMain = stopInMain;
+	return true;
+}
+
+
+/**
+ * Creates a TeamDebugger for the given team. If userInterface is given,
+ * that user interface is used (the caller retains its reference), otherwise
+ * a graphical user interface is created.
+ */
 static TeamDebugger*
 start_team_debugger(team_id teamID, SettingsManager* settingsManager,
 	TeamDebugger::Listener* listener, thread_id threadID = -1,
-	bool stopInMain = false, bool useCLI = false)
+	bool stopInMain = false, UserInterface* userInterface = NULL)
 {
 	if (teamID < 0)
 		return NULL;
 
-	UserInterface* userInterface = useCLI
-		? (UserInterface*)new(std::nothrow)	CommandLineUserInterface
-		: (UserInterface*)new(std::nothrow)	GraphicalUserInterface;
-
+	BReference<UserInterface> userInterfaceReference;
 	if (userInterface == NULL) {
-		// TODO: Notify the user!
-		fprintf(stderr, "Error: Out of memory!\n");
-		return NULL;
+		userInterface = new(std::nothrow) GraphicalUserInterface;
+		if (userInterface == NULL) {
+			// TODO: Notify the user!
+			fprintf(stderr, "Error: Out of memory!\n");
+			return NULL;
+		}
+
+		userInterfaceReference.SetTo(userInterface, true);
 	}
-	BReference<UserInterface> userInterfaceReference(userInterface, true);
 
 	status_t error = B_NO_MEMORY;
 
@@ -212,6 +298,7 @@ start_team_debugger(team_id teamID, SettingsManager* settingsManager,
 
 	return debugger;
 }
+
 
 // #pragma mark - Debugger application class
 
@@ -247,6 +334,26 @@ private:
 };
 
 
+// #pragma mark - CliDebugger
+
+
+class CliDebugger : private TeamDebugger::Listener {
+public:
+								CliDebugger();
+								~CliDebugger();
+
+			bool				Run(const Options& options);
+
+private:
+	// TeamDebugger::Listener
+	virtual void 				TeamDebuggerStarted(TeamDebugger* debugger);
+	virtual void 				TeamDebuggerQuit(TeamDebugger* debugger);
+};
+
+
+// #pragma mark - Debugger application class
+
+
 Debugger::Debugger()
 	:
 	BApplication(kDebuggerSignature),
@@ -266,11 +373,7 @@ Debugger::~Debugger()
 status_t
 Debugger::Init()
 {
-	status_t error = TypeHandlerRoster::CreateDefault();
-	if (error != B_OK)
-		return error;
-
-	error = ValueHandlerRoster::CreateDefault();
+	status_t error = global_init();
 	if (error != B_OK)
 		return error;
 
@@ -348,61 +451,20 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	team_id team = options.team;
-	thread_id thread = options.thread;
-	bool stopInMain = false;
-
-	// If command line arguments were given, start the program.
-	if (options.commandLineArgc > 0) {
-		printf("loading program: \"%s\" ...\n", options.commandLineArgv[0]);
-		// TODO: What about the CWD?
-		thread = load_program(options.commandLineArgv,
-			options.commandLineArgc, false);
-		if (thread < 0) {
-			// TODO: Notify the user!
-			fprintf(stderr, "Error: Failed to load program \"%s\": %s\n",
-				options.commandLineArgv[0], strerror(thread));
-			return;
-		}
-
-		team = thread;
-			// main thread ID == team ID
-		stopInMain = true;
-	}
-
-	// no parameters given, prompt the user to attach to a team
-	if (team < 0 && thread < 0)
+	DebuggedProgramInfo programInfo;
+	if (!get_debugged_program(options, programInfo))
 		return;
 
-	// If we've got
-	if (team < 0) {
-		printf("no team yet, getting thread info...\n");
-		thread_info threadInfo;
-		status_t error = get_thread_info(thread, &threadInfo);
-		if (error != B_OK) {
-			// TODO: Notify the user!
-			fprintf(stderr, "Error: Failed to get info for thread \"%ld\": "
-				"%s\n", thread, strerror(error));
-			return;
-		}
-
-		team = threadInfo.team;
-	}
-	printf("team: %ld, thread: %ld\n", team, thread);
-
-	TeamDebugger* debugger = _FindTeamDebugger(team);
+	TeamDebugger* debugger = _FindTeamDebugger(programInfo.team);
 	if (debugger != NULL) {
-		printf("There's already a debugger for team: %ld\n", team);
+		printf("There's already a debugger for team: %ld\n", programInfo.team);
 		debugger->Activate();
 		return;
 	}
 
-	start_team_debugger(team, &fSettingsManager, this, thread, stopInMain,
-		options.useCLI);
+	start_team_debugger(programInfo.team, &fSettingsManager, this,
+		programInfo.thread, programInfo.stopInMain);
 }
-
-
-// TeamDebugger::Listener
 
 
 void
@@ -480,6 +542,76 @@ Debugger::_FindTeamDebugger(team_id teamID) const
 }
 
 
+// #pragma mark - CliDebugger
+
+
+CliDebugger::CliDebugger()
+{
+}
+
+
+CliDebugger::~CliDebugger()
+{
+}
+
+
+bool
+CliDebugger::Run(const Options& options)
+{
+	// initialize global objects and settings manager
+	status_t error = global_init();
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Global initialization failed: %s\n",
+			strerror(error));
+		return false;
+	}
+
+	SettingsManager settingsManager;
+	error = settingsManager.Init();
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Settings manager initialization failed: "
+			"%s\n", strerror(error));
+		return false;
+	}
+
+	// create the command line UI
+	CommandLineUserInterface* userInterface
+		= new(std::nothrow) CommandLineUserInterface;
+	if (userInterface == NULL) {
+		fprintf(stderr, "Error: Out of memory!\n");
+		return false;
+	}
+	BReference<UserInterface> userInterfaceReference(userInterface, true);
+
+	// get/run the program to be debugged and start the team debugger
+	DebuggedProgramInfo programInfo;
+	if (!get_debugged_program(options, programInfo))
+		return false;
+
+	if (start_team_debugger(programInfo.team, &settingsManager, this,
+			programInfo.thread, programInfo.stopInMain, userInterface)
+			== NULL) {
+		return false;
+	}
+
+	userInterface->Run();
+
+	return true;
+}
+
+
+void
+CliDebugger::TeamDebuggerStarted(TeamDebugger* debugger)
+{
+}
+
+
+void
+CliDebugger::TeamDebuggerQuit(TeamDebugger* debugger)
+{
+}
+
+
 // #pragma mark -
 
 
@@ -494,6 +626,11 @@ main(int argc, const char* const* argv)
 
 	Options options;
 	parse_arguments(argc, argv, false, options);
+
+	if (options.useCLI) {
+		CliDebugger debugger;
+		return debugger.Run(options) ? 0 : 1;
+	}
 
 	Debugger app;
 	status_t error = app.Init();

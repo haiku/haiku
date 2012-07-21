@@ -96,10 +96,11 @@ private:
 
 CommandLineUserInterface::CommandLineUserInterface()
 	:
-	fThread(-1),
 	fTeam(NULL),
 	fListener(NULL),
 	fCommands(20, true),
+	fShowSemaphore(-1),
+	fShown(false),
 	fTerminating(false)
 {
 }
@@ -107,6 +108,8 @@ CommandLineUserInterface::CommandLineUserInterface()
 
 CommandLineUserInterface::~CommandLineUserInterface()
 {
+	if (fShowSemaphore >= 0)
+		delete_sem(fShowSemaphore);
 }
 
 
@@ -127,9 +130,9 @@ CommandLineUserInterface::Init(Team* team, UserInterfaceListener* listener)
 	if (error != B_OK)
 		return error;
 
-	fThread = spawn_thread(&_InputLoopEntry, "CLI", B_NORMAL_PRIORITY, this);
-	if (fThread < 0)
-		return fThread;
+	fShowSemaphore = create_sem(0, "show CLI");
+	if (fShowSemaphore < 0)
+		return fShowSemaphore;
 
 	return B_OK;
 }
@@ -138,7 +141,8 @@ CommandLineUserInterface::Init(Team* team, UserInterfaceListener* listener)
 void
 CommandLineUserInterface::Show()
 {
-	resume_thread(fThread);
+	fShown = true;
+	release_sem(fShowSemaphore);
 }
 
 
@@ -146,8 +150,18 @@ void
 CommandLineUserInterface::Terminate()
 {
 	fTerminating = true;
-	// TODO: Signal the thread so it wakes up!
-	wait_for_thread(fThread, NULL);
+
+	if (fShown) {
+		// TODO: Signal the thread so it wakes up!
+
+		// Wait for input loop to finish.
+		while (acquire_sem(fShowSemaphore) == B_INTERRUPTED) {
+		}
+	} else {
+		// The main thread will still be blocked in Run(). Unblock it.
+		delete_sem(fShowSemaphore);
+		fShowSemaphore = -1;
+	}
 }
 
 
@@ -178,6 +192,25 @@ CommandLineUserInterface::SynchronouslyAskUser(const char* title,
 	const char* choice3)
 {
 	return 0;
+}
+
+
+void
+CommandLineUserInterface::Run()
+{
+	// Wait for the Show() semaphore to be released.
+	status_t error;
+	do {
+		error = acquire_sem(fShowSemaphore);
+	} while (error == B_INTERRUPTED);
+
+	if (error != B_OK)
+		return;
+
+	_InputLoop();
+
+	// Release the Show() semaphore to signal Terminate().
+	release_sem(fShowSemaphore);
 }
 
 

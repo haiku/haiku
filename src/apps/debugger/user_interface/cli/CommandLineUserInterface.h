@@ -40,6 +40,11 @@ public:
 									const char* message, const char* choice1,
 									const char* choice2, const char* choice3);
 
+			void				Run();
+									// Called by the main thread, when
+									// everything has been set up. Enters the
+									// input loop.
+
 private:
 			struct CommandEntry;
 			typedef BObjectList<CommandEntry> CommandList;
@@ -63,10 +68,11 @@ private:
 			void				_PrintHelp();
 
 private:
-			thread_id			fThread;
 			Team*				fTeam;
 			UserInterfaceListener* fListener;
 			CommandList			fCommands;
+			sem_id				fShowSemaphore;
+			bool				fShown;
 			bool				fTerminating;
 };
 
