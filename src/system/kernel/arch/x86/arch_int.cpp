@@ -25,6 +25,7 @@
 #include <arch/x86/apic.h>
 #include <arch/x86/descriptors.h>
 #include <arch/x86/msi.h>
+#include <arch/x86/vm86.h>
 
 #include <stdio.h>
 
@@ -41,11 +42,176 @@
 #endif
 
 
+static const char *kInterruptNames[] = {
+	/*  0 */ "Divide Error Exception",
+	/*  1 */ "Debug Exception",
+	/*  2 */ "NMI Interrupt",
+	/*  3 */ "Breakpoint Exception",
+	/*  4 */ "Overflow Exception",
+	/*  5 */ "BOUND Range Exceeded Exception",
+	/*  6 */ "Invalid Opcode Exception",
+	/*  7 */ "Device Not Available Exception",
+	/*  8 */ "Double Fault Exception",
+	/*  9 */ "Coprocessor Segment Overrun",
+	/* 10 */ "Invalid TSS Exception",
+	/* 11 */ "Segment Not Present",
+	/* 12 */ "Stack Fault Exception",
+	/* 13 */ "General Protection Exception",
+	/* 14 */ "Page-Fault Exception",
+	/* 15 */ "-",
+	/* 16 */ "x87 FPU Floating-Point Error",
+	/* 17 */ "Alignment Check Exception",
+	/* 18 */ "Machine-Check Exception",
+	/* 19 */ "SIMD Floating-Point Exception",
+};
+static const int kInterruptNameCount = 20;
+
 static const interrupt_controller* sCurrentPIC = NULL;
 
 
+static const char*
+exception_name(int number, char* buffer, int32 bufferSize)
+{
+	if (number >= 0 && number < kInterruptNameCount)
+		return kInterruptNames[number];
+
+	snprintf(buffer, bufferSize, "exception %d", number);
+	return buffer;
+}
+
+
 void
-hardware_interrupt(struct iframe* frame)
+x86_invalid_exception(iframe* frame)
+{
+	Thread* thread = thread_get_current_thread();
+	char name[32];
+	panic("unhandled trap 0x%lx (%s) at ip 0x%lx, thread %" B_PRId32 "!\n",
+		frame->vector, exception_name(frame->vector, name, sizeof(name)),
+		frame->ip, thread ? thread->id : -1);
+}
+
+
+void
+x86_fatal_exception(iframe* frame)
+{
+	char name[32];
+	panic("Fatal exception \"%s\" occurred! Error code: 0x%lx\n",
+		exception_name(frame->vector, name, sizeof(name)), frame->error_code);
+}
+
+
+void
+x86_unexpected_exception(iframe* frame)
+{
+	debug_exception_type type;
+	uint32 signalNumber;
+	int32 signalCode;
+	addr_t signalAddress = 0;
+	int32 signalError = B_ERROR;
+
+#ifndef __x86_64__
+	if (IFRAME_IS_VM86(frame)) {
+		x86_vm86_return((vm86_iframe*)frame, (frame->vector == 13) ?
+			B_OK : B_ERROR);
+		// won't get here
+	}
+#endif
+
+	switch (frame->vector) {
+		case 0:		// Divide Error Exception (#DE)
+			type = B_DIVIDE_ERROR;
+			signalNumber = SIGFPE;
+			signalCode = FPE_INTDIV;
+			signalAddress = frame->ip;
+			break;
+
+		case 4:		// Overflow Exception (#OF)
+			type = B_OVERFLOW_EXCEPTION;
+			signalNumber = SIGFPE;
+			signalCode = FPE_INTOVF;
+			signalAddress = frame->ip;
+			break;
+
+		case 5:		// BOUND Range Exceeded Exception (#BR)
+			type = B_BOUNDS_CHECK_EXCEPTION;
+			signalNumber = SIGTRAP;
+			signalCode = SI_USER;
+			break;
+
+		case 6:		// Invalid Opcode Exception (#UD)
+			type = B_INVALID_OPCODE_EXCEPTION;
+			signalNumber = SIGILL;
+			signalCode = ILL_ILLOPC;
+			signalAddress = frame->ip;
+			break;
+
+		case 13: 	// General Protection Exception (#GP)
+			type = B_GENERAL_PROTECTION_FAULT;
+			signalNumber = SIGILL;
+			signalCode = ILL_PRVOPC;	// or ILL_PRVREG
+			signalAddress = frame->ip;
+			break;
+
+		case 16: 	// x87 FPU Floating-Point Error (#MF)
+			type = B_FLOATING_POINT_EXCEPTION;
+			signalNumber = SIGFPE;
+			signalCode = FPE_FLTDIV;
+				// TODO: Determine the correct cause via the FPU status
+				// register!
+			signalAddress = frame->ip;
+			break;
+
+		case 17: 	// Alignment Check Exception (#AC)
+			type = B_ALIGNMENT_EXCEPTION;
+			signalNumber = SIGBUS;
+			signalCode = BUS_ADRALN;
+			// TODO: Also get the address (from where?). Since we don't enable
+			// alignment checking this exception should never happen, though.
+			signalError = EFAULT;
+			break;
+
+		case 19: 	// SIMD Floating-Point Exception (#XF)
+			type = B_FLOATING_POINT_EXCEPTION;
+			signalNumber = SIGFPE;
+			signalCode = FPE_FLTDIV;
+				// TODO: Determine the correct cause via the MXCSR register!
+			signalAddress = frame->ip;
+			break;
+
+		default:
+			x86_invalid_exception(frame);
+			return;
+	}
+
+	if (IFRAME_IS_USER(frame)) {
+		struct sigaction action;
+		Thread* thread = thread_get_current_thread();
+
+		enable_interrupts();
+
+		// If the thread has a signal handler for the signal, we simply send it
+		// the signal. Otherwise we notify the user debugger first.
+		if ((sigaction(signalNumber, NULL, &action) == 0
+				&& action.sa_handler != SIG_DFL
+				&& action.sa_handler != SIG_IGN)
+			|| user_debug_exception_occurred(type, signalNumber)) {
+			Signal signal(signalNumber, signalCode, signalError,
+				thread->team->id);
+			signal.SetAddress((void*)signalAddress);
+			send_signal_to_thread(thread, signal, 0);
+		}
+	} else {
+		char name[32];
+		panic("Unexpected exception \"%s\" occurred in kernel mode! "
+			"Error code: 0x%lx\n",
+			exception_name(frame->vector, name, sizeof(name)),
+			frame->error_code);
+	}
+}
+
+
+void
+x86_hardware_interrupt(struct iframe* frame)
 {
 	int32 vector = frame->vector - ARCH_INTERRUPT_BASE;
 	bool levelTriggered = false;

@@ -6,7 +6,6 @@
 
 #include <int.h>
 
-#include <string.h>
 #include <stdio.h>
 
 #include <boot/kernel_args.h>
@@ -22,78 +21,12 @@
 typedef void interrupt_handler_function(iframe* frame);
 
 
-static const char* kInterruptNames[] = {
-	/*  0 */ "Divide Error Exception",
-	/*  1 */ "Debug Exception",
-	/*  2 */ "NMI Interrupt",
-	/*  3 */ "Breakpoint Exception",
-	/*  4 */ "Overflow Exception",
-	/*  5 */ "BOUND Range Exceeded Exception",
-	/*  6 */ "Invalid Opcode Exception",
-	/*  7 */ "Device Not Available Exception",
-	/*  8 */ "Double Fault Exception",
-	/*  9 */ "Coprocessor Segment Overrun",
-	/* 10 */ "Invalid TSS Exception",
-	/* 11 */ "Segment Not Present",
-	/* 12 */ "Stack Fault Exception",
-	/* 13 */ "General Protection Exception",
-	/* 14 */ "Page-Fault Exception",
-	/* 15 */ "-",
-	/* 16 */ "x87 FPU Floating-Point Error",
-	/* 17 */ "Alignment Check Exception",
-	/* 18 */ "Machine-Check Exception",
-	/* 19 */ "SIMD Floating-Point Exception",
-};
-
 static const uint32 kInterruptHandlerTableSize = 256;
 
 static interrupt_descriptor* sIDT;
 interrupt_handler_function* gInterruptHandlerTable[kInterruptHandlerTableSize];
 
 extern uint8 isr_array[kInterruptHandlerTableSize][16];
-extern void hardware_interrupt(struct iframe* frame);
-
-
-static const char*
-exception_name(uint64 number, char* buffer, size_t bufferSize)
-{
-	if (number >= 0
-			&& number < (sizeof(kInterruptNames) / sizeof(kInterruptNames[0])))
-		return kInterruptNames[number];
-
-	snprintf(buffer, bufferSize, "exception %lu", number);
-	return buffer;
-}
-
-
-static void
-invalid_exception(iframe* frame)
-{
-	char name[32];
-	panic("unhandled trap %#lx (%s) at ip %#lx\n",
-		frame->vector, exception_name(frame->vector, name, sizeof(name)),
-		frame->ip);
-}
-
-
-static void
-fatal_exception(iframe* frame)
-{
-	char name[32];
-	panic("fatal exception %#lx (%s) at ip %#lx, error code %#lx\n",
-		frame->vector, exception_name(frame->vector, name, sizeof(name)),
-		frame->ip, frame->error_code);
-}
-
-
-static void
-unexpected_exception(iframe* frame)
-{
-	char name[32];
-	panic("fatal exception %#lx (%s) at ip %#lx, error code %#lx\n",
-		frame->vector, exception_name(frame->vector, name, sizeof(name)),
-		frame->ip, frame->error_code);
-}
 
 
 /*!	Returns the virtual IDT address for CPU \a cpu. */
@@ -134,31 +67,31 @@ arch_int_init(kernel_args* args)
 
 	// Initialize the interrupt handler table.
 	for (uint32 i = 0; i < ARCH_INTERRUPT_BASE; i++)
-		table[i] = invalid_exception;
+		table[i] = x86_invalid_exception;
 	for (uint32 i = ARCH_INTERRUPT_BASE; i < kInterruptHandlerTableSize; i++)
-		table[i] = hardware_interrupt;
+		table[i] = x86_hardware_interrupt;
 
-	table[0]  = unexpected_exception;	// Divide Error Exception (#DE)
+	table[0]  = x86_unexpected_exception;	// Divide Error Exception (#DE)
 	//table[1]  = x86_handle_debug_exception; // Debug Exception (#DB)
-	table[1]  = unexpected_exception;
-	table[2]  = fatal_exception;		// NMI Interrupt
+	table[1]  = x86_unexpected_exception;
+	table[2]  = x86_fatal_exception;		// NMI Interrupt
 	//table[3]  = x86_handle_breakpoint_exception; // Breakpoint Exception (#BP)
-	table[3]  = unexpected_exception;
-	table[4]  = unexpected_exception;	// Overflow Exception (#OF)
-	table[5]  = unexpected_exception;	// BOUND Range Exceeded Exception (#BR)
-	table[6]  = unexpected_exception;	// Invalid Opcode Exception (#UD)
-	table[7]  = fatal_exception;		// Device Not Available Exception (#NM)
-	table[8]  = fatal_exception;		// Double Fault Exception (#DF)
-	table[9]  = fatal_exception;		// Coprocessor Segment Overrun
-	table[10] = fatal_exception;		// Invalid TSS Exception (#TS)
-	table[11] = fatal_exception;		// Segment Not Present (#NP)
-	table[12] = fatal_exception;		// Stack Fault Exception (#SS)
-	table[13] = unexpected_exception;	// General Protection Exception (#GP)
+	table[3]  = x86_unexpected_exception;
+	table[4]  = x86_unexpected_exception;	// Overflow Exception (#OF)
+	table[5]  = x86_unexpected_exception;	// BOUND Range Exceeded Exception (#BR)
+	table[6]  = x86_unexpected_exception;	// Invalid Opcode Exception (#UD)
+	table[7]  = x86_fatal_exception;		// Device Not Available Exception (#NM)
+	table[8]  = x86_fatal_exception;		// Double Fault Exception (#DF)
+	table[9]  = x86_fatal_exception;		// Coprocessor Segment Overrun
+	table[10] = x86_fatal_exception;		// Invalid TSS Exception (#TS)
+	table[11] = x86_fatal_exception;		// Segment Not Present (#NP)
+	table[12] = x86_fatal_exception;		// Stack Fault Exception (#SS)
+	table[13] = x86_unexpected_exception;	// General Protection Exception (#GP)
 	table[14] = x86_page_fault_exception;	// Page-Fault Exception (#PF)
-	table[16] = unexpected_exception;	// x87 FPU Floating-Point Error (#MF)
-	table[17] = unexpected_exception;	// Alignment Check Exception (#AC)
-	table[18] = fatal_exception;		// Machine-Check Exception (#MC)
-	table[19] = unexpected_exception;	// SIMD Floating-Point Exception (#XF)
+	table[16] = x86_unexpected_exception;	// x87 FPU Floating-Point Error (#MF)
+	table[17] = x86_unexpected_exception;	// Alignment Check Exception (#AC)
+	table[18] = x86_fatal_exception;		// Machine-Check Exception (#MC)
+	table[19] = x86_unexpected_exception;	// SIMD Floating-Point Exception (#XF)
 
 	// Load the IDT.
 	gdt_idt_descr idtr = {

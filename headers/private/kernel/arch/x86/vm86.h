@@ -5,6 +5,9 @@
 #ifndef _VM86_H
 #define _VM86_H
 
+
+#ifndef __x86_64__
+
 #include <OS.h>
 #include <arch/x86/arch_cpu.h>
 
@@ -33,6 +36,7 @@ status_t vm86_do_int(struct vm86_state *state, uint8 vec);
 }
 #endif
 
+#endif
 #endif
 
 
