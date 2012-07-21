@@ -16,17 +16,17 @@
 class BLayout;
 class BMenu;
 class BMenuScroller;
+class BPoint;
 
 
 class BMenuScrollView : public BView {
 public:
-								BMenuScrollView(BMenu* menu);
+								BMenuScrollView(BRect frame, BMenu* menu);
 	virtual						~BMenuScrollView();
 
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
-	virtual	void				Draw(BRect updateRect);
-	virtual	void				FrameResized(float newWidth, float newHeight);
+	virtual	void				MouseDown(BPoint where);
 
 				void			AttachScrollers();
 				void			DetachScrollers();
@@ -34,6 +34,7 @@ public:
 
 				void			SetSmallStep(float step);
 				void			GetSteps(float* _smallStep, float* _largeStep) const;
+
 				bool			CheckForScrolling(const BPoint& cursor);
 				bool			TryScrollBy(const float& step);
 

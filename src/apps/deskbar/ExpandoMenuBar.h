@@ -83,7 +83,7 @@ class TExpandoMenuBar : public BMenuBar {
 		menu_layout MenuLayout() const;
 
 		void SizeWindow(int32 delta);
-		void CheckForSizeOverrun();
+		bool CheckForSizeOverrun();
 
 	private:
 		static int CompareByName(const void* first, const void* second);
@@ -98,7 +98,6 @@ class TExpandoMenuBar : public BMenuBar {
 		bool fVertical : 1;
 		bool fOverflow : 1;
 		bool fDrawLabel : 1;
-		bool fIsScrolling : 1;
 		bool fShowTeamExpander : 1;
 		bool fExpandNewTeams : 1;
 

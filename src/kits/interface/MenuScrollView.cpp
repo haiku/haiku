@@ -14,15 +14,13 @@
 #include <ControlLook.h>
 #include <Debug.h>
 #include <InterfaceDefs.h>
-#include <Layout.h>
-#include <GroupLayout.h>
 #include <Menu.h>
+#include <Point.h>
 #include <Screen.h>
+#include <Window.h>
 
-#include <MenuPrivate.h>
 
-
-const int kDefaultScrollStep = 8;
+const int kDefaultScrollStep = 19;
 const int kScrollerHeight = 12;
 
 
@@ -160,9 +158,9 @@ BMenuDownScroller::Draw(BRect updateRect)
 //	#pragma mark -
 
 
-BMenuScrollView::BMenuScrollView(BMenu *menu)
+BMenuScrollView::BMenuScrollView(BRect frame, BMenu* menu)
 	:
-	BView("menu scroll view", B_WILL_DRAW | B_FRAME_EVENTS),
+	BView(frame, "menu scroll view", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
 	fMenu(menu),
 	fUpperScroller(NULL),
 	fLowerScroller(NULL),
@@ -201,14 +199,9 @@ BMenuScrollView::AttachedToWindow()
 	if (fMenu == NULL)
 		return;
 
+	fMenu->MoveTo(0, 0);
+
 	AddChild(fMenu);
-
-	// Move the scroll menu into position
-	MoveTo(fMenu->Frame().LeftTop());
-
-	BFont font;
-	fMenu->GetFont(&font);
-	SetFont(&font);
 }
 
 
@@ -229,33 +222,13 @@ BMenuScrollView::DetachedFromWindow()
 
 
 void
-BMenuScrollView::Draw(BRect updateRect)
+BMenuScrollView::MouseDown(BPoint where)
 {
-	if (be_control_look != NULL)
-		return;
-
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-	BRect bounds(Bounds());
-
-	StrokeLine(BPoint(bounds.right, bounds.top),
-		BPoint(bounds.right, bounds.bottom - 1));
-	StrokeLine(BPoint(bounds.left + 1, bounds.bottom),
-		BPoint(bounds.right, bounds.bottom));
+	
 }
 
 
-void
-BMenuScrollView::FrameResized(float newWidth, float newHeight)
-{
-	BView::FrameResized(newWidth, newHeight);
-
-	if (fMenu != NULL) {
-		if (HasScrollers())
-			fMenu->MoveTo(0, kScrollerHeight);
-		else
-			fMenu->MoveTo(0, 0);
-	}
-}
+//	#pragma mark -
 
 
 void
@@ -268,7 +241,8 @@ BMenuScrollView::AttachScrollers()
 	BRect screenFrame = (BScreen(Window())).Frame();
 
 	if (HasScrollers()) {
-		fLimit = Frame().bottom + 2 * kScrollerHeight - screenFrame.bottom;
+		fLimit = Window()->Frame().bottom + 2 * kScrollerHeight
+			- screenFrame.bottom;
 		return;
 	}
 
@@ -280,6 +254,8 @@ BMenuScrollView::AttachScrollers()
 		AddChild(fUpperScroller, fMenu);
 	}
 
+	fMenu->MoveBy(0, kScrollerHeight);
+
 	if (fLowerScroller == NULL) {
 		fLowerScroller = new BMenuDownScroller(
 			BRect(0, frame.bottom - kScrollerHeight + 1, frame.right,
@@ -290,7 +266,8 @@ BMenuScrollView::AttachScrollers()
 	fUpperScroller->SetEnabled(false);
 	fLowerScroller->SetEnabled(true);
 
-	fLimit = Frame().bottom + 2 * kScrollerHeight - screenFrame.bottom;
+	fLimit = Window()->Frame().bottom + 2 * kScrollerHeight
+		- screenFrame.bottom;
 	fValue = 0;
 }
 
@@ -317,9 +294,7 @@ BMenuScrollView::DetachScrollers()
 		// We don't remember the position where the last scrolling
 		// ended, so scroll back to the beginning.
 		fMenu->ScrollTo(0, 0);
-		// Since the scrollers were removed move back up.
-		//fMenu->ResizeBy(0, 2 * kScrollerHeight);
-		//fMenu->MoveBy(0, -kScrollerHeight);
+		fMenu->MoveBy(0, -kScrollerHeight);
 		fValue = 0;
 	}
 }

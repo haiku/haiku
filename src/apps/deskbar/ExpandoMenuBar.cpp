@@ -83,7 +83,6 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 	fVertical(vertical),
 	fOverflow(false),
 	fDrawLabel(drawLabel),
-	fIsScrolling(false),
 	fShowTeamExpander(static_cast<TBarApp*>(be_app)->Settings()->superExpando),
 	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
 	fDeskbarMenuWidth(kDefaultDeskbarMenuWidth),
@@ -193,10 +192,6 @@ TExpandoMenuBar::AttachedToWindow()
 		// weird value - we just override it again
 		ResizeTo(itemWidth, 0);
 	}
-
-	BMenuScrollView* scrollMenu = dynamic_cast<BMenuScrollView*>(Parent());
-	if (scrollMenu != NULL)
-		scrollMenu->ResizeTo(Bounds().Width(), Bounds().Height());
 
 	if (fVertical) {
 		sDoMonitor = true;
@@ -426,14 +421,6 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 	if (message == NULL) {
 		// force a cleanup
 		_FinishedDrag();
-
-		// check for scrolling menu
-		BMenuScrollView* scrollMenu = dynamic_cast<BMenuScrollView*>(Parent());
-		if (scrollMenu != NULL) {
-			BPoint screenLocation = ConvertToScreen(where);
-			while(scrollMenu->CheckForScrolling(screenLocation))
-				TExpandoMenuBar::MouseMoved(where, code, message);
-		}
 
 		switch (code) {
 			case B_ENTERED_VIEW:
@@ -825,35 +812,20 @@ TExpandoMenuBar::DrawBackground(BRect)
 /*!	Something to help determine if we are showing too many apps
 	need to add in scrolling functionality.
 */
-void
+bool
 TExpandoMenuBar::CheckForSizeOverrun()
 {
-	if (!fVertical) {
-		fIsScrolling = false;
-		return;
-	}
-
-	BMenuScrollView* scrollMenu = dynamic_cast<BMenuScrollView*>(Parent());
-	if (scrollMenu == NULL)
-		return;
+	if (!fVertical)
+		return false;
 
 	BRect screenFrame = (BScreen(Window())).Frame();
-	fIsScrolling = Window()->Frame().bottom > screenFrame.bottom;
-
-	if (fIsScrolling)
-		scrollMenu->AttachScrollers();
-	else
-		scrollMenu->DetachScrollers();
+	return Window()->Frame().bottom > screenFrame.bottom;
 }
 
 
 void
 TExpandoMenuBar::SizeWindow(int32 delta)
 {
-	BMenuScrollView* scrollMenu = dynamic_cast<BMenuScrollView*>(Parent());
-	if (scrollMenu != NULL)
-		scrollMenu->ResizeTo(Bounds().Width(), Bounds().Height());
-
 	// instead of resizing the window here and there in the
 	// code the resize method will be centered in one place
 	// thus, the same behavior (good or bad) will be used
