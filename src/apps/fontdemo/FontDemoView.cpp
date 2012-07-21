@@ -20,6 +20,8 @@
 #include <Message.h>
 #include <Shape.h>
 
+#include <utf8_functions.h>
+
 #include "messages.h"
 
 #undef B_TRANSLATION_CONTEXT
@@ -99,7 +101,7 @@ FontDemoView::_DrawView(BView* view)
 
 	view->SetFont(&fFont, B_FONT_ALL);
 
-	const size_t size = strlen(fString);
+	const size_t size = UTF8CountChars(fString, -1);
 	BRect boundBoxes[size];
 
 	if (OutLineLevel())
@@ -137,6 +139,8 @@ FontDemoView::_DrawView(BView* view)
 
 	fBoxRegion.MakeEmpty();
 
+	char *tmpString = fString;
+	
 	for (size_t i = 0; i < size; i++) {
 		xCoordArray[i] = 0.0f;
 		yCoordArray[i] = 0.0f;
@@ -159,7 +163,10 @@ FontDemoView::_DrawView(BView* view)
 		} else {
 			view->SetHighColor(0, 0, 0);
 			view->SetDrawingMode(fDrawingMode);
-			view->DrawChar(fString[i], BPoint(xCoordArray[i], yCoordArray[i]));
+			int32 length = UTF8NextCharLen(tmpString);
+			view->DrawString(tmpString, length,
+				BPoint(xCoordArray[i], yCoordArray[i]));
+			tmpString += length;
 		}
 
 		if (BoundingBoxes() && !OutLineLevel()) {
