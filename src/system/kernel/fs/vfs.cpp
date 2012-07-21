@@ -5917,7 +5917,7 @@ common_ioctl(struct file_descriptor* descriptor, ulong op, void* buffer,
 
 
 static status_t
-common_fcntl(int fd, int op, uint32 argument, bool kernel)
+common_fcntl(int fd, int op, size_t argument, bool kernel)
 {
 	struct flock flock;
 
@@ -5934,10 +5934,9 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 	status_t status = B_OK;
 
 	if (op == F_SETLK || op == F_SETLKW || op == F_GETLK) {
-		// TODO: x86_64 needs ulong argument here.
 		if (descriptor->type != FDTYPE_FILE)
 			status = B_BAD_VALUE;
-		else if (user_memcpy(&flock, (struct flock*)((ulong)argument),
+		else if (user_memcpy(&flock, (struct flock*)argument,
 				sizeof(struct flock)) != B_OK)
 			status = B_BAD_ADDRESS;
 
@@ -6019,8 +6018,7 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 				status = get_advisory_lock(vnode, &flock);
 				if (status == B_OK) {
 					// copy back flock structure
-					// TODO: x86_64
-					status = user_memcpy((struct flock*)((ulong)argument), &flock,
+					status = user_memcpy((struct flock*)argument, &flock,
 						sizeof(struct flock));
 				}
 			} else
@@ -8087,7 +8085,7 @@ _kern_open_dir(int fd, const char* path)
 
 
 status_t
-_kern_fcntl(int fd, int op, uint32 argument)
+_kern_fcntl(int fd, int op, size_t argument)
 {
 	return common_fcntl(fd, op, argument, true);
 }
@@ -8901,7 +8899,7 @@ _user_open_parent_dir(int fd, char* userName, size_t nameLength)
 
 
 status_t
-_user_fcntl(int fd, int op, uint32 argument)
+_user_fcntl(int fd, int op, size_t argument)
 {
 	status_t status = common_fcntl(fd, op, argument, false);
 	if (op == F_SETLKW)
