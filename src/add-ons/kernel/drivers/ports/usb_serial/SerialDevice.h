@@ -4,11 +4,23 @@
  *
  * Copyright (c) 2003 by Siarzhuk Zharski <imker@gmx.li>
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 #ifndef _USB_DEVICE_H_
 #define _USB_DEVICE_H_
 
+
 #include "Driver.h"
+
+
+struct usb_serial_device {
+	uint32      vendorID;
+	uint32      productID;
+	const char* deviceName;
+};
+
 
 class SerialDevice {
 public:

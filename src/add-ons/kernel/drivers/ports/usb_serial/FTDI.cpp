@@ -4,9 +4,15 @@
  *
  * Copyright (c) 2003 by Siarzhuk Zharski <imker@gmx.li>
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
+
+
 #include "FTDI.h"
 #include "FTDIRegs.h"
+
 
 FTDIDevice::FTDIDevice(usb_device device, uint16 vendorID, uint16 productID,
 	const char *description)
@@ -46,7 +52,7 @@ FTDIDevice::AddDevice(const usb_configuration_info *config)
 		}
 
 		if (pipesSet >= 3) {
-			if (ProductID() == PRODUCT_FTDI_8U100AX)
+			if (ProductID() == 0x8372) // AU100AX
 				fHeaderLength = 1;
 			else
 				fHeaderLength = 0;
@@ -84,7 +90,8 @@ FTDIDevice::SetLineCoding(usb_cdc_line_coding *lineCoding)
 		lineCoding->databits);
 
 	int32 rate = 0;
-	if (ProductID() == PRODUCT_FTDI_8U100AX) {
+	if (ProductID() == 0x8372) {
+		// AU100AX
 		switch (lineCoding->speed) {
 			case 300: rate = ftdi_sio_b300; break;
 			case 600: rate = ftdi_sio_b600; break;
