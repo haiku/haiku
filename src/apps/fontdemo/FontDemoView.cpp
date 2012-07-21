@@ -30,7 +30,6 @@ FontDemoView::FontDemoView(BRect rect)
 	: BView(rect, "FontDemoView", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
 	fBitmap(NULL),
 	fBufferView(NULL),
-	fString(NULL),
 	fFontSize(50.0),
 	fSpacing(0.0),
 	fOutLineLevel(0),
@@ -51,7 +50,6 @@ FontDemoView::FontDemoView(BRect rect)
 
 FontDemoView::~FontDemoView()
 {
-	free(fString);
 	free(fShapes);
 
 	fBitmap->Lock();
@@ -100,8 +98,7 @@ FontDemoView::_DrawView(BView* view)
 
 	view->SetFont(&fFont, B_FONT_ALL);
 
-	BString tmpString(fString);
-	const size_t size = tmpString.CountChars();
+	const size_t size = fString.CountChars();
 	BRect boundBoxes[size];
 
 	if (OutLineLevel())
@@ -118,8 +115,8 @@ FontDemoView::_DrawView(BView* view)
 		escapeDeltas[j].space = 0.0f;
 	}
 */
-	fFont.GetEdges(fString, size, edgeInfo);
-	fFont.GetEscapements(fString, size, /*escapeDeltas,*/ escapementArray);
+	fFont.GetEdges(fString.String(), size, edgeInfo);
+	fFont.GetEscapements(fString.String(), size, /*escapeDeltas,*/ escapementArray);
 
 	font_height fh;
 	fFont.GetHeight(&fh);
@@ -162,7 +159,7 @@ FontDemoView::_DrawView(BView* view)
 			view->SetHighColor(0, 0, 0);
 			view->SetDrawingMode(fDrawingMode);
 			int32 charLength;
-			const char* charAt = tmpString.CharAt(i, &charLength);
+			const char* charAt = fString.CharAt(i, &charLength);
 			view->DrawString(charAt, charLength,
 				BPoint(xCoordArray[i], yCoordArray[i]));
 		}
@@ -192,7 +189,7 @@ FontDemoView::MessageReceived(BMessage* msg)
 	switch (msg->what) {
 		case TEXT_CHANGED_MSG:
 		{
-			const char* text = NULL;
+			BString text;
 			if (msg->FindString("_text", &text) == B_OK) {
 				SetString(text);
 				Invalidate(/*&fBoxRegion*/);
@@ -358,16 +355,15 @@ FontDemoView::MessageReceived(BMessage* msg)
 
 
 void
-FontDemoView::SetString(const char* string)
+FontDemoView::SetString(BString string)
 {
-	free(fString);
-	fString = strdup(string);
+	fString = string;
 	free(fShapes);
 	_AddShapes(fString);
 }
 
 
-const char*
+BString
 FontDemoView::String() const
 {
 	return fString;
@@ -424,10 +420,10 @@ FontDemoView::SetOutlineLevel(int8 outline)
 
 
 void
-FontDemoView::_AddShapes(const char* string)
+FontDemoView::_AddShapes(BString string)
 {
-	const size_t size = strlen(string);
-	fShapes = (BShape**)malloc(sizeof(BShape*)*size);
+	const size_t size = string.CountChars();
+	fShapes = (BShape**)malloc(sizeof(BShape*) * size);
 
 	for (size_t i = 0; i < size; i++) {
 		fShapes[i] = new BShape();
@@ -461,4 +457,3 @@ FontDemoView::_NewBitmap(BRect rect)
 		fBitmap = NULL;
 	}
 }
-
