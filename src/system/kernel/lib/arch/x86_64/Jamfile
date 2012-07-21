@@ -1,5 +1,9 @@
 SubDir HAIKU_TOP src system kernel lib arch x86_64 ;
 
+# find the generated asm_offsets.h
+SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) system kernel arch
+	$(TARGET_KERNEL_ARCH) ] ;
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 local librootSources = [ FDirName $(HAIKU_TOP) src system libroot ] ;
@@ -24,7 +28,12 @@ KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	kernel_longjmp_return.c
 	kernel_setjmp_save_sigs.c
 
-	arch_string.cpp
+	arch_string.S
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
+
+# Explicitly tell the build system that arch_string.S includes the generated
+# asm_offsets.h.
+Includes [ FGristFiles arch_string.S ]
+	: <src!system!kernel!arch!x86>asm_offsets.h ;

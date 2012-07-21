@@ -113,15 +113,12 @@ extern int memcpy_generic_end;
 extern "C" void memset_generic(void* dest, int value, size_t count);
 extern int memset_generic_end;
 
-// TODO x86_64
-#ifndef __x86_64__
 x86_optimized_functions gOptimizedFunctions = {
 	memcpy_generic,
 	&memcpy_generic_end,
 	memset_generic,
 	&memset_generic_end
 };
-#endif
 
 
 static status_t
