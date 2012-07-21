@@ -183,7 +183,7 @@ fs_readdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 	TRACE("fs_readdir - ENTER (sizeof(buf)=%d, bufsize=%d, num=%d\n",
 		sizeof(buf), bufsize, *num);
 
-	if (!ns || !node || !cookie || !num || bufsize < sizeof(buf)) {
+	if (!ns || !node || !cookie || !num || bufsize < sizeof(*buf)) {
 	 	result = EINVAL;
 		goto exit;
 	}

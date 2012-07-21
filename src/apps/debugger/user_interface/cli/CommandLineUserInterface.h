@@ -1,12 +1,19 @@
 /*
  * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef COMMAND_LINE_USER_INTERFACE_H
 #define COMMAND_LINE_USER_INTERFACE_H
 
 
+#include <ObjectList.h>
+#include <String.h>
+
 #include "UserInterface.h"
+
+
+class CliCommand;
 
 
 class CommandLineUserInterface : public UserInterface {
@@ -33,6 +40,40 @@ public:
 									const char* message, const char* choice1,
 									const char* choice2, const char* choice3);
 
+			void				Run();
+									// Called by the main thread, when
+									// everything has been set up. Enters the
+									// input loop.
+
+private:
+			struct CommandEntry;
+			typedef BObjectList<CommandEntry> CommandList;
+
+			struct HelpCommand;
+			struct QuitCommand;
+
+			// GCC 2 support
+			friend struct HelpCommand;
+			friend struct QuitCommand;
+
+private:
+	static	status_t			_InputLoopEntry(void* data);
+			status_t			_InputLoop();
+
+			status_t			_RegisterCommands();
+			bool				_RegisterCommand(const BString& name,
+									CliCommand* command);
+			void				_ExecuteCommand(int argc,
+									const char* const* argv);
+			void				_PrintHelp();
+
+private:
+			Team*				fTeam;
+			UserInterfaceListener* fListener;
+			CommandList			fCommands;
+			sem_id				fShowSemaphore;
+			bool				fShown;
+			bool				fTerminating;
 };
 
 

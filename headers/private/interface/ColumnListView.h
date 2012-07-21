@@ -385,9 +385,8 @@ protected:
 	virtual	void				DoLayout();
 
 private:
-			void				_Init(bool showHorizontalScrollbar);
+			void				_Init();
 			void				_GetChildViewRects(const BRect& bounds,
-									bool showHorizontalScrollBar,
 									BRect& titleRect, BRect& outlineRect,
 									BRect& vScrollBarRect,
 									BRect& hScrollBarRect);
@@ -404,6 +403,7 @@ private:
 			bool				fSortingEnabled;
 			float				fLatchWidth;
 			border_style		fBorderStyle;
+			bool				fShowingHorizontalScrollBar;
 };
 
 #endif // _COLUMN_LIST_VIEW_H

@@ -215,7 +215,7 @@ void
 openlog_team(const char *ident, int options, int facility)
 {
 	if (ident != NULL)
-		strcpy(sTeamContext.ident, ident);
+		strlcpy(sTeamContext.ident, ident, sizeof(sTeamContext.ident));
 
 	sTeamContext.options = options;
 	sTeamContext.facility = SYSLOG_FACILITY(facility);

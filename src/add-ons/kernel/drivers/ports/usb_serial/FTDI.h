@@ -4,16 +4,24 @@
  *
  * Copyright (c) 2003 by Siarzhuk Zharski <imker@gmx.li>
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 #ifndef _USB_FTDI_H_
 #define _USB_FTDI_H_
 
+
 #include "SerialDevice.h"
 
+
 /* supported vendor and product ids */
-#define VENDOR_FTDI				0x0403
-#define PRODUCT_FTDI_8U100AX	0x8372
-#define PRODUCT_FTDI_8U232AM	0x6001
+#define VENDOR_FTDI		0x0403
+
+const usb_serial_device kFTDIDevices[] = {
+	{VENDOR_FTDI, 0x8372, "FTDI 8U100AX serial converter"},
+	{VENDOR_FTDI, 0x6001, "FTDI 8U232AM serial converter"}
+};
 
 #define FTDI_BUFFER_SIZE		64
 
@@ -39,5 +47,6 @@ private:
 		uint8					fStatusMSR;
 		uint8					fStatusLSR;
 };
+
 
 #endif //_USB_FTDI_H_

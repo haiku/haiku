@@ -169,11 +169,12 @@ Application Debugger :
 	# user_interface
 	UserInterface.cpp
 
+	# user_interface/cli
+	CliCommand.cpp
+	CommandLineUserInterface.cpp
+
 	# user_interface/gui
 	GraphicalUserInterface.cpp
-
-	# user_interface/cli
-	CommandLineUserInterface.cpp
 
 	# user_interface/gui/model
 	VariablesViewState.cpp
