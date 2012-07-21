@@ -5,7 +5,8 @@
 
 
 #include "device.h"
-#include "kernel.h"
+
+#include <compat/sys/kernel.h>
 
 
 int ticks;
