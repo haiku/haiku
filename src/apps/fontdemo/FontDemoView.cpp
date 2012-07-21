@@ -19,8 +19,7 @@
 #include <Font.h>
 #include <Message.h>
 #include <Shape.h>
-
-#include <utf8_functions.h>
+#include <String.h>
 
 #include "messages.h"
 
@@ -101,7 +100,8 @@ FontDemoView::_DrawView(BView* view)
 
 	view->SetFont(&fFont, B_FONT_ALL);
 
-	const size_t size = UTF8CountChars(fString, -1);
+	BString tmpString(fString);
+	const size_t size = tmpString.CountChars();
 	BRect boundBoxes[size];
 
 	if (OutLineLevel())
@@ -138,8 +138,6 @@ FontDemoView::_DrawView(BView* view)
 	// region area instead of the whole view.
 
 	fBoxRegion.MakeEmpty();
-
-	char *tmpString = fString;
 	
 	for (size_t i = 0; i < size; i++) {
 		xCoordArray[i] = 0.0f;
@@ -163,10 +161,10 @@ FontDemoView::_DrawView(BView* view)
 		} else {
 			view->SetHighColor(0, 0, 0);
 			view->SetDrawingMode(fDrawingMode);
-			int32 length = UTF8NextCharLen(tmpString);
-			view->DrawString(tmpString, length,
+			int32 charLength;
+			const char* charAt = tmpString.CharAt(i, &charLength);
+			view->DrawString(charAt, charLength,
 				BPoint(xCoordArray[i], yCoordArray[i]));
-			tmpString += length;
 		}
 
 		if (BoundingBoxes() && !OutLineLevel()) {
