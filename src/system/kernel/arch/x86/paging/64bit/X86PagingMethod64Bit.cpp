@@ -131,7 +131,8 @@ X86PagingMethod64Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 
 		SetTableEntry(pdpte, (physicalPageDir & X86_64_PDPTE_ADDRESS_MASK)
 			| X86_64_PDPTE_PRESENT
-			| X86_64_PDPTE_WRITABLE);
+			| X86_64_PDPTE_WRITABLE
+			| X86_64_PDPTE_USER);
 
 		// Map it and zero it.
 		virtualPageDir = (uint64*)fKernelPhysicalPageMapper->GetPageTableAt(
@@ -154,7 +155,8 @@ X86PagingMethod64Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 
 		SetTableEntry(pde, (physicalPageTable & X86_64_PDE_ADDRESS_MASK)
 			| X86_64_PDE_PRESENT
-			| X86_64_PDE_WRITABLE);
+			| X86_64_PDE_WRITABLE
+			| X86_64_PDE_USER);
 
 		// Map it and zero it.
 		virtualPageTable = (uint64*)fKernelPhysicalPageMapper->GetPageTableAt(
@@ -222,7 +224,7 @@ X86PagingMethod64Bit::PageTableForAddress(uint64* virtualPML4,
 		SetTableEntry(pml4e, (physicalPDPT & X86_64_PML4E_ADDRESS_MASK)
 			| X86_64_PML4E_PRESENT
 			| X86_64_PML4E_WRITABLE
-			| (isKernel ? 0 : X86_64_PML4E_USER));
+			| X86_64_PML4E_USER);
 
 		mapCount++;
 	}
@@ -252,7 +254,7 @@ X86PagingMethod64Bit::PageTableForAddress(uint64* virtualPML4,
 		SetTableEntry(pdpte, (physicalPageDir & X86_64_PDPTE_ADDRESS_MASK)
 			| X86_64_PDPTE_PRESENT
 			| X86_64_PDPTE_WRITABLE
-			| (isKernel ? 0 : X86_64_PDPTE_USER));
+			| X86_64_PDPTE_USER);
 
 		mapCount++;
 	}
@@ -282,7 +284,7 @@ X86PagingMethod64Bit::PageTableForAddress(uint64* virtualPML4,
 		SetTableEntry(pde, (physicalPageTable & X86_64_PDE_ADDRESS_MASK)
 			| X86_64_PDE_PRESENT
 			| X86_64_PDE_WRITABLE
-			| (isKernel ? 0 : X86_64_PDE_USER));
+			| X86_64_PDE_USER);
 
 		mapCount++;
 	}

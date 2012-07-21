@@ -27,7 +27,7 @@
 #include "mmu.h"
 
 
-static const uint64 kTableMappingFlags = 0x3;
+static const uint64 kTableMappingFlags = 0x7;
 static const uint64 kLargePageMappingFlags = 0x183;
 static const uint64 kPageMappingFlags = 0x103;
 	// Global, R/W, Present

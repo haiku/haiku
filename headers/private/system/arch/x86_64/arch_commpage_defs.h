@@ -9,7 +9,9 @@
 #	error Must not be included directly. Include <commpage_defs.h> instead!
 #endif
 
-// FIXME: correct address
-#define ARCH_USER_COMMPAGE_ADDR (0xffff0000)
+#define COMMPAGE_ENTRY_X86_MEMCPY	(COMMPAGE_ENTRY_FIRST_ARCH_SPECIFIC + 0)
+#define COMMPAGE_ENTRY_X86_MEMSET	(COMMPAGE_ENTRY_FIRST_ARCH_SPECIFIC + 1)
+
+#define ARCH_USER_COMMPAGE_ADDR (0xffffffffffff0000)
 
 #endif	/* _SYSTEM_ARCH_x86_64_COMMPAGE_DEFS_H */

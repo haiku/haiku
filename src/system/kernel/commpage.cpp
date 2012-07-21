@@ -32,7 +32,8 @@ allocate_commpage_entry(int entry, size_t size)
 	sFreeCommPageSpace = ALIGN_ENTRY((addr_t)sFreeCommPageSpace + size);
 	sCommPageAddress[entry] = (addr_t)sUserCommPageAddress
 		+ ((addr_t)space - (addr_t)sCommPageAddress);
-dprintf("allocate_commpage_entry(%d, %lu) -> %p\n", entry, size, (void*)sCommPageAddress[entry]);
+	dprintf("allocate_commpage_entry(%d, %lu) -> %p\n", entry, size,
+		(void*)sCommPageAddress[entry]);
 	return space;
 }
 

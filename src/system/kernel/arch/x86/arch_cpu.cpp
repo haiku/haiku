@@ -922,8 +922,6 @@ arch_cpu_init_post_modules(kernel_args* args)
 		call_all_cpus(&init_mtrrs, NULL);
 	}
 
-	// TODO x86_64
-#ifndef __x86_64__
 	// get optimized functions from the CPU module
 	if (sCpuModule != NULL && sCpuModule->get_optimized_functions != NULL) {
 		x86_optimized_functions functions;
@@ -960,7 +958,7 @@ arch_cpu_init_post_modules(kernel_args* args)
 	elf_add_memory_image_symbol(image, "commpage_memset",
 		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_MEMSET], memsetLen,
 		B_SYMBOL_TYPE_TEXT);
-#endif
+
 	return B_OK;
 }
 

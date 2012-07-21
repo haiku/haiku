@@ -463,7 +463,7 @@ dump_symbols(int argc, char **argv)
 
 	// dump symbols
 
-	kprintf("Symbols of image %" B_PRId32 "\"%s\":\n", image->id, image->name);
+	kprintf("Symbols of image %" B_PRId32 " \"%s\":\n", image->id, image->name);
 	kprintf("%-*s Type       Size Name\n", B_PRINTF_POINTER_WIDTH, "Address");
 
 	if (image->num_debug_symbols > 0) {
