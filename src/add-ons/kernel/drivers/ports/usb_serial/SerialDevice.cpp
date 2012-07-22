@@ -18,6 +18,7 @@
 #include "ACM.h"
 #include "FTDI.h"
 #include "KLSI.h"
+#include "Option.h"
 #include "Prolific.h"
 #include "Silicon.h"
 
@@ -758,6 +759,20 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 				kSiliconDevices[i].deviceName);
 		}
 	}
+
+	#if 0
+	// Not yet working
+
+	// Option Serial Device
+	for (uint32 i = 0; i < sizeof(kOptionDevices)
+		/ sizeof(kOptionDevices[0]); i++) {
+		if (vendorID == kOptionDevices[i].vendorID
+			&& productID == kOptionDevices[i].productID) {
+			 return new(std::nothrow) OptionDevice(device, vendorID, productID,
+				kOptionDevices[i].deviceName);
+		}
+	}
+	#endif
 
 	// Otherwise, return standard ACM device
 	return new(std::nothrow) ACMDevice(device, vendorID, productID,
