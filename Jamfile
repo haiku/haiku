@@ -173,7 +173,11 @@ SubDir HAIKU_TOP ;
 UserBuildConfigRulePostBuildTargets	;
 
 # specify the Haiku image and network boot archive contents
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
+if $(TARGET_ARCH) = x86_64 {
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) Haiku64Image ] ;
+} else {
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
+}
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) NetBootArchive ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) FloppyBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootImage ] ;
