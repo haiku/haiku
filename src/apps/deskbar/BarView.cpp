@@ -254,18 +254,18 @@ TBarView::MessageReceived(BMessage* message)
 void
 TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	desk_settings* settings = ((TBarApp*)be_app)->Settings();
-	bool alwaysOnTop = settings->alwaysOnTop;
-	bool autoRaise = settings->autoRaise;
-	bool autoHide = settings->autoHide;
-
-	if (DragRegion()->IsDragging()) {
-		DragRegion()->MouseMoved(where, transit, dragMessage);
+	if (fDragRegion->IsDragging()) {
+		fDragRegion->MouseMoved(where, transit, dragMessage);
 		return;
 	}
 
 	if (transit == B_ENTERED_VIEW && EventMask() == 0)
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	bool alwaysOnTop = settings->alwaysOnTop;
+	bool autoRaise = settings->autoRaise;
+	bool autoHide = settings->autoHide;
 
 	if (!autoRaise && !autoHide) {
 		if (transit == B_EXITED_VIEW || transit == B_OUTSIDE_VIEW)
@@ -324,8 +324,7 @@ TBarView::MouseDown(BPoint where)
 		if ((modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY
 					| B_SHIFT_KEY)) == (B_CONTROL_KEY | B_COMMAND_KEY)) {
 			// The window key was pressed - enter dragging code
-			DragRegion()->MouseDown(
-				DragRegion()->DragRegion().LeftTop());
+			fDragRegion->MouseDown(fDragRegion->DragRegion().LeftTop());
 			return;
 		}
 	} else {
@@ -504,7 +503,7 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 	float windowHeight = 0;
 	float windowWidth = sMinimumWindowWidth;
 	bool setToHiddenSize = ((TBarApp*)be_app)->Settings()->autoHide
-		&& IsHidden() && !DragRegion()->IsDragging();
+		&& IsHidden() && !fDragRegion->IsDragging();
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 
 	if (setToHiddenSize) {
