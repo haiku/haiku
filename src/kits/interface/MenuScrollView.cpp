@@ -164,7 +164,9 @@ BMenuScrollView::BMenuScrollView(BRect frame, BMenu* menu)
 	fMenu(menu),
 	fUpperScroller(NULL),
 	fLowerScroller(NULL),
-	fScrollStep(kDefaultScrollStep)
+	fScrollStep(kDefaultScrollStep),
+	fValue(0),
+	fLimit(0)
 {
 }
 
@@ -279,8 +281,8 @@ BMenuScrollView::DetachScrollers()
 	if (fMenu) {
 		// We don't remember the position where the last scrolling
 		// ended, so scroll back to the beginning.
-		fMenu->ScrollTo(0, 0);
 		fMenu->MoveBy(0, -kScrollerHeight);
+		fMenu->ScrollTo(0, 0);
 		fValue = 0;
 	}
 }
