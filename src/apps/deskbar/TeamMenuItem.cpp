@@ -559,7 +559,7 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 				sub->SetExpanded(true, myindex + childIndex);
 
 				if (resizeWindow)
-					parent->SizeWindow(1);
+					parent->SizeWindow(-1);
 			}
 		}
 	} else {

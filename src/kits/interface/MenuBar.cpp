@@ -18,7 +18,6 @@
 #include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuItem.h>
-#include <MenuScrollView.h>
 #include <Window.h>
 
 #include <AppMisc.h>

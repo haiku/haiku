@@ -171,12 +171,6 @@ BMenuScrollView::BMenuScrollView(BRect frame, BMenu* menu)
 
 BMenuScrollView::~BMenuScrollView()
 {
-	if (fMenu != NULL) {
-		fMenu->RemoveSelf();
-		delete fMenu;
-		fMenu = NULL;
-	}
-
 	if (fUpperScroller != NULL) {
 		fUpperScroller->RemoveSelf();
 		delete fUpperScroller;
@@ -199,9 +193,8 @@ BMenuScrollView::AttachedToWindow()
 	if (fMenu == NULL)
 		return;
 
-	fMenu->MoveTo(0, 0);
-
 	AddChild(fMenu);
+	fMenu->MoveTo(0, 0);
 }
 
 
@@ -218,13 +211,6 @@ BMenuScrollView::DetachedFromWindow()
 
 	if (fLowerScroller != NULL)
 		fLowerScroller->RemoveSelf();
-}
-
-
-void
-BMenuScrollView::MouseDown(BPoint where)
-{
-	
 }
 
 

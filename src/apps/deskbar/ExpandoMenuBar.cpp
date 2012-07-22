@@ -42,10 +42,10 @@ All rights reserved.
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Debug.h>
+#include <MenuScrollView.h>
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <MenuScrollView.h>
 
 #include "icons.h"
 

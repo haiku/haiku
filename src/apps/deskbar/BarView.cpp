@@ -358,7 +358,7 @@ TBarView::PlaceDeskbarMenu()
 	// top or bottom expando mode has Be menu built in for tracking
 	// only for vertical mini or expanded
 	// mini mode will have team menu added as part of BarMenuBar
-	if (fVertical && !fBarMenuBar) {
+	if (fVertical && fBarMenuBar == NULL) {
 		// create the Be menu
 		BRect mbarFrame(Bounds());
 		mbarFrame.bottom = mbarFrame.top + kMenuBarHeight;
@@ -443,19 +443,17 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 void
 TBarView::PlaceApplicationBar()
 {
-	if (fExpando != NULL)
+	if (fExpando != NULL) {
 		SaveExpandedItems();
+		fExpando->RemoveSelf();
+		delete fExpando;
+		fExpando = NULL;
+	}
 
 	if (fMenuScrollView != NULL) {
 		fMenuScrollView->RemoveSelf();
 		delete fMenuScrollView;
-			// Also deletes fExpando
 		fMenuScrollView = NULL;
-		fExpando = NULL;
-	} else if (fExpando != NULL) {
-		fExpando->RemoveSelf();
-		delete fExpando;
-		fExpando = NULL;
 	}
 
 	BRect screenFrame = (BScreen(Window())).Frame();
@@ -467,8 +465,8 @@ TBarView::PlaceApplicationBar()
 		return;
 	}
 
-	BRect menuScrollFrame(0, 0, 0, 0);
 	BRect expandoFrame(0, 0, 0, 0);
+	BRect menuScrollFrame(0, 0, 0, 0);
 	if (fVertical) {
 		// top left/right
 		if (fTrayLocation != 0)

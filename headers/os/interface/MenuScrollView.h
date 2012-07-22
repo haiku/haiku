@@ -26,7 +26,6 @@ public:
 
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
-	virtual	void				MouseDown(BPoint where);
 
 				void			AttachScrollers();
 				void			DetachScrollers();
