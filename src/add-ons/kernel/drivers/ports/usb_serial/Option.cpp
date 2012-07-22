@@ -24,6 +24,7 @@ OptionDevice::AddDevice(const usb_configuration_info *config)
 {
 	TRACE_FUNCALLS("> OptionDevice::AddDevice(%08x, %08x)\n", this, config);
 
+	int portsFound = 0;
 	if (config->interface_count > 0) {
 		for (size_t index = 0; index < config->interface_count; index++) {
 			usb_interface_info *interface = config->interface[index].active;
@@ -61,17 +62,26 @@ OptionDevice::AddDevice(const usb_configuration_info *config)
 			if (txEndpointID < 0 || rxEndpointID < 0 || irEndpointID < 0)
 				continue;
 
-			TRACE("> OptionDevice::%s: found at interface %d\n", __func__,
+			TRACE("> OptionDevice::%s: found port at interface %d\n", __func__,
 				index);
+			portsFound++;
+
 			usb_endpoint_info *irEndpoint = &interface->endpoint[irEndpointID];
 			usb_endpoint_info *txEndpoint = &interface->endpoint[txEndpointID];
 			usb_endpoint_info *rxEndpoint = &interface->endpoint[rxEndpointID];
 			SetControlPipe(irEndpoint->handle);
 			SetReadPipe(rxEndpoint->handle);
 			SetWritePipe(txEndpoint->handle);
+		}
 
-			// We accept the first found serial interface
-			// TODO: We should set each matching interface up (can be > 1)
+		// TODO: We need to handle multiple ports
+		// We use the last found serial port for now
+		if (portsFound > 0) {
+			if (portsFound > 1) {
+				TRACE_ALWAYS("> OptionDevice::%s: Warning: Found more than one "
+					"serial port on this device (%d). Only the last one is "
+					"is used.\n", __func__, portsFound);
+			}
 			return B_OK;
 		}
 	}

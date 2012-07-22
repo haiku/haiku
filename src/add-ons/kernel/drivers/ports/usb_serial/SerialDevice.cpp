@@ -760,9 +760,6 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 		}
 	}
 
-	#if 0
-	// Not yet working
-
 	// Option Serial Device
 	for (uint32 i = 0; i < sizeof(kOptionDevices)
 		/ sizeof(kOptionDevices[0]); i++) {
@@ -772,7 +769,6 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 				kOptionDevices[i].deviceName);
 		}
 	}
-	#endif
 
 	// Otherwise, return standard ACM device
 	return new(std::nothrow) ACMDevice(device, vendorID, productID,
