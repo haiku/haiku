@@ -1083,15 +1083,15 @@ void
 Journal::Dump()
 {
 	kprintf("Journal %p\n", this);
-	kprintf("  log start:            %ld\n", fVolume->LogStart());
-	kprintf("  log end:              %ld\n", fVolume->LogEnd());
+	kprintf("  log start:            %" B_PRId32 "\n", fVolume->LogStart());
+	kprintf("  log end:              %" B_PRId32 "\n", fVolume->LogEnd());
 	kprintf("  owner:                %p\n", fOwner);
-	kprintf("  log size:             %lu\n", fLogSize);
-	kprintf("  max transaction size: %lu\n", fMaxTransactionSize);
-	kprintf("  used:                 %lu\n", fUsed);
-	kprintf("  unwritten:            %ld\n", fUnwrittenTransactions);
-	kprintf("  timestamp:            %lld\n", fTimestamp);
-	kprintf("  transaction ID:       %ld\n", fTransactionID);
+	kprintf("  log size:             %" B_PRIu32 "\n", fLogSize);
+	kprintf("  max transaction size: %" B_PRIu32 "\n", fMaxTransactionSize);
+	kprintf("  used:                 %" B_PRIu32 "\n", fUsed);
+	kprintf("  unwritten:            %" B_PRId32 "\n", fUnwrittenTransactions);
+	kprintf("  timestamp:            %" B_PRId64 "\n", fTimestamp);
+	kprintf("  transaction ID:       %" B_PRId32 "\n", fTransactionID);
 	kprintf("  has subtransaction:   %d\n", fHasSubtransaction);
 	kprintf("  separate sub-trans.:  %d\n", fSeparateSubTransactions);
 	kprintf("entries:\n");
@@ -1102,8 +1102,8 @@ Journal::Dump()
 	while (iterator.HasNext()) {
 		LogEntry* entry = iterator.Next();
 
-		kprintf("  %p %6ld %6lu %6lu\n", entry, entry->TransactionID(),
-			entry->Start(), entry->Length());
+		kprintf("  %p %6" B_PRId32 " %6" B_PRIu32 " %6" B_PRIu32 "\n", entry,
+			entry->TransactionID(), entry->Start(), entry->Length());
 	}
 }
 

@@ -58,7 +58,7 @@ if $(TARGET_ARCH) = x86_64 {
 	AddFilesToFloppyBootArchive system add-ons kernel busses ata
 		: generic_ide_pci ;
 	AddFilesToFloppyBootArchive system add-ons kernel file_systems
-		: iso9660 attribute_overlay write_overlay ;
+		: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 	AddFilesToFloppyBootArchive system add-ons kernel generic
 		: ata_adapter locked_pool scsi_periph ;
 	AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
@@ -148,8 +148,8 @@ if $(NET_BOOT) = 1 {
 if $(TARGET_ARCH) = x86_64 {
 	AddBootModuleSymlinksToFloppyBootArchive
 		ata dpc config_manager pci scsi ata_adapter locked_pool scsi_periph
-		generic_x86 generic_ide_pci scsi_cd scsi_disk intel session iso9660
-		attribute_overlay write_overlay
+		generic_x86 generic_ide_pci scsi_cd scsi_disk intel session
+		$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
 	;
 } else {
 	AddBootModuleSymlinksToFloppyBootArchive

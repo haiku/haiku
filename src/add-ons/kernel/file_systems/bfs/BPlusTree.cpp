@@ -767,7 +767,7 @@ BPlusTree::Validate(bool repair, bool& _errorsFound)
 			fHeader.MaxNumberOfLevels());
 	}
 
-	if (check.VisitedCount() != fHeader.MaximumSize() / fNodeSize) {
+	if ((off_t)check.VisitedCount() != fHeader.MaximumSize() / fNodeSize) {
 		dprintf("inode %" B_PRIdOFF ": visited %" B_PRIuSIZE " from %" B_PRIdOFF
 			" nodes.\n", fStream->ID(), check.VisitedCount(),
 			fHeader.MaximumSize() / fNodeSize);
@@ -791,7 +791,7 @@ BPlusTree::MakeEmpty()
 
 	header->max_number_of_levels = HOST_ENDIAN_TO_BFS_INT32(1);
 	header->root_node_pointer = HOST_ENDIAN_TO_BFS_INT64(NodeSize());
-	if (fStream->Size() > NodeSize() * 2)
+	if (fStream->Size() > (off_t)NodeSize() * 2)
 		header->free_node_pointer = HOST_ENDIAN_TO_BFS_INT64(2 * NodeSize());
 	else {
 		header->free_node_pointer
@@ -812,10 +812,10 @@ BPlusTree::MakeEmpty()
 			offset += NodeSize()) {
 		bplustree_node* node = cached.SetToWritable(transaction, offset, false);
 		if (node == NULL) {
-			dprintf("--> could not open %lld\n", offset);
+			dprintf("--> could not open %" B_PRIdOFF "\n", offset);
 			return B_IO_ERROR;
 		}
-		if (offset < fStream->Size() - NodeSize())
+		if (offset < fStream->Size() - (off_t)NodeSize())
 			node->left_link = HOST_ENDIAN_TO_BFS_INT64(offset + NodeSize());
 		else
 			node->left_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
@@ -2910,8 +2910,8 @@ bplustree_node::CheckIntegrity(uint32 nodeSize) const
 			return B_BAD_DATA;
 		}
 		if (Values()[i] == -1) {
-			dprintf("invalid node %p, value %d: %lld: values corrupted\n",
-				this, (int)i, Values()[i]);
+			dprintf("invalid node %p, value %d: %" B_PRIdOFF ": values "
+				"corrupted\n", this, (int)i, Values()[i]);
 			return B_BAD_DATA;
 		}
 	}

@@ -2131,8 +2131,8 @@ BlockAllocator::_AddInodeToIndex(Inode* inode)
 void
 BlockAllocator::Dump(int32 index)
 {
-	kprintf("allocation groups: %ld (base %p)\n", fNumGroups, fGroups);
-	kprintf("blocks per group: %ld\n", fBlocksPerGroup);
+	kprintf("allocation groups: %" B_PRId32 " (base %p)\n", fNumGroups, fGroups);
+	kprintf("blocks per group: %" B_PRId32 "\n", fBlocksPerGroup);
 
 	for (int32 i = 0; i < fNumGroups; i++) {
 		if (index != -1 && i != index)
@@ -2140,15 +2140,15 @@ BlockAllocator::Dump(int32 index)
 
 		AllocationGroup& group = fGroups[i];
 
-		kprintf("[%3ld] num bits:       %lu  (%p)\n", i, group.NumBits(),
-			&group);
-		kprintf("      num blocks:     %lu\n", group.NumBlocks());
-		kprintf("      start:          %ld\n", group.Start());
-		kprintf("      first free:     %ld\n", group.fFirstFree);
-		kprintf("      largest start:  %ld%s\n", group.fLargestStart,
+		kprintf("[%3" B_PRId32 "] num bits:       %" B_PRIu32 "  (%p)\n", i,
+			group.NumBits(), &group);
+		kprintf("      num blocks:     %" B_PRIu32 "\n", group.NumBlocks());
+		kprintf("      start:          %" B_PRId32 "\n", group.Start());
+		kprintf("      first free:     %" B_PRId32 "\n", group.fFirstFree);
+		kprintf("      largest start:  %" B_PRId32 "%s\n", group.fLargestStart,
 			group.fLargestValid ? "" : "  (invalid)");
-		kprintf("      largest length: %ld\n", group.fLargestLength);
-		kprintf("      free bits:      %ld\n", group.fFreeBits);
+		kprintf("      largest length: %" B_PRId32 "\n", group.fLargestLength);
+		kprintf("      free bits:      %" B_PRId32 "\n", group.fFreeBits);
 	}
 }
 
