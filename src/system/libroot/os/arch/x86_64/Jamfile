@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src system libroot os arch x86_64 ;
+
+UsePrivateKernelHeaders ;
+	# TODO: Replace by "UsePrivateHeaders libroot" after resolving the TODO in
+	# time.c!
+UsePrivateSystemHeaders ;
+
+MergeObject os_arch_$(TARGET_ARCH).o :
+	atomic.S
+	byteorder.S
+	get_stack_frame.S
+	system_info.cpp
+	system_time_asm.S
+	thread.cpp
+	time.cpp
+	tls.cpp
+;
