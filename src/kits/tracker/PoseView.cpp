@@ -5323,6 +5323,7 @@ BPoseView::EntryMoved(const BMessage *message)
 				ReadPoseInfo(pose->TargetModel(), &poseInfo);
 				if (!ShouldShowPose(pose->TargetModel(), &poseInfo))
 					return DeletePose(&itemNode, pose, index);
+				return true;
 			}
 
 			BPoint loc(0, index * fListElemHeight);
@@ -5354,7 +5355,6 @@ BPoseView::EntryMoved(const BMessage *message)
 		return DeletePose(&itemNode);
 	else if (dirNode.node == thisDirNode.node)
 		EntryCreated(&dirNode, &itemNode, name);
-
 	return true;
 }
 
