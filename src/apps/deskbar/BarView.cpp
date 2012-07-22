@@ -113,14 +113,15 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 		switch (message->what) {
 			case B_MOUSE_DOWN:
 				fBarView->MouseDown(where);
-			break;
+				break;
 
 			case B_MOUSE_MOVED:
 				fBarView->MouseMoved(where, transit, dragMessage);
-			break;
+				break;
 		}
 
-		delete dragMessage;
+		if (message->HasMessage("be:drag_message"))
+			delete dragMessage;
 	}
 
 	return B_DISPATCH_MESSAGE;
