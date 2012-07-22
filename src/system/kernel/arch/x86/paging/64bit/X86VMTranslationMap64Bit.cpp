@@ -46,7 +46,68 @@ X86VMTranslationMap64Bit::~X86VMTranslationMap64Bit()
 {
 	TRACE("X86VMTranslationMap64Bit::~X86VMTranslationMap64Bit()\n");
 
-	panic("X86VMTranslationMap64Bit::~X86VMTranslationMap64Bit: TODO");
+	if (fPagingStructures == NULL)
+		return;
+
+	if (fPageMapper != NULL) {
+		phys_addr_t address;
+		vm_page* page;
+
+		// Free all structures in the bottom half of the PML4 (user memory).
+		uint64* virtualPML4 = fPagingStructures->VirtualPML4();
+		for (uint32 i = 0; i < 256; i++) {
+			if ((virtualPML4[i] & X86_64_PML4E_PRESENT) == 0)
+				continue;
+
+			uint64* virtualPDPT = (uint64*)fPageMapper->GetPageTableAt(
+				virtualPML4[i] & X86_64_PML4E_ADDRESS_MASK);
+			for (uint32 j = 0; j < 512; j++) {
+				if ((virtualPDPT[j] & X86_64_PDPTE_PRESENT) == 0)
+					continue;
+
+				uint64* virtualPageDir = (uint64*)fPageMapper->GetPageTableAt(
+					virtualPDPT[j] & X86_64_PDPTE_ADDRESS_MASK);
+				for (uint32 k = 0; k < 512; k++) {
+					if ((virtualPageDir[k] & X86_64_PDE_PRESENT) == 0)
+						continue;
+
+					address = virtualPageDir[k] & X86_64_PDE_ADDRESS_MASK;
+					page = vm_lookup_page(address / B_PAGE_SIZE);
+					if (page == NULL) {
+						panic("page table %u %u %u on invalid page %#"
+							B_PRIxPHYSADDR "\n", i, j, k, address);
+					}
+
+					DEBUG_PAGE_ACCESS_START(page);
+					vm_page_set_state(page, PAGE_STATE_FREE);
+				}
+
+				address = virtualPDPT[j] & X86_64_PDPTE_ADDRESS_MASK;
+				page = vm_lookup_page(address / B_PAGE_SIZE);
+				if (page == NULL) {
+					panic("page directory %u %u on invalid page %#"
+						B_PRIxPHYSADDR "\n", i, j, address);
+				}
+
+				DEBUG_PAGE_ACCESS_START(page);
+				vm_page_set_state(page, PAGE_STATE_FREE);
+			}
+
+			address = virtualPML4[i] & X86_64_PML4E_ADDRESS_MASK;
+			page = vm_lookup_page(address / B_PAGE_SIZE);
+			if (page == NULL) {
+				panic("PDPT %u on invalid page %#" B_PRIxPHYSADDR "\n", i,
+					address);
+			}
+
+			DEBUG_PAGE_ACCESS_START(page);
+			vm_page_set_state(page, PAGE_STATE_FREE);
+		}
+
+		fPageMapper->Delete();
+	}
+
+	fPagingStructures->RemoveReference();
 }
 
 
@@ -71,7 +132,34 @@ X86VMTranslationMap64Bit::Init(bool kernel)
 		fPagingStructures->Init(method->KernelVirtualPML4(),
 			method->KernelPhysicalPML4());
 	} else {
-		panic("X86VMTranslationMap64Bit::Init(): TODO");
+		// Allocate a physical page mapper.
+		status_t error = method->PhysicalPageMapper()
+			->CreateTranslationMapPhysicalPageMapper(&fPageMapper);
+		if (error != B_OK)
+			return error;
+
+		// Assuming that only the top 2 PML4 entries are occupied for the
+		// kernel.
+		STATIC_ASSERT(KERNEL_PMAP_BASE == 0xffffff0000000000);
+		STATIC_ASSERT(KERNEL_BASE == 0xffffff8000000000);
+
+		// Allocate and clear the PML4.
+		uint64* virtualPML4 = (uint64*)memalign(B_PAGE_SIZE, B_PAGE_SIZE);
+		if (virtualPML4 == NULL)
+			return B_NO_MEMORY;
+		memset(virtualPML4, 0, B_PAGE_SIZE);
+
+		// Copy the top 2 PML4 entries.
+		virtualPML4[510] = method->KernelVirtualPML4()[510];
+		virtualPML4[511] = method->KernelVirtualPML4()[511];
+
+		// Look up the PML4 physical address.
+		phys_addr_t physicalPML4;
+		vm_get_page_mapping(VMAddressSpace::KernelID(), (addr_t)virtualPML4,
+			&physicalPML4);
+
+		// Initialize the paging structures.
+		fPagingStructures->Init(virtualPML4, physicalPML4);
 	}
 
 	return B_OK;
