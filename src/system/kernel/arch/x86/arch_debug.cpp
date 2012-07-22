@@ -321,8 +321,39 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 	// arguments. Maybe we need DWARF support in the kernel debugger. For now
 	// just print out the function signature without the argument values.
 
-	// TODO x86_64.
-	return B_NOT_SUPPORTED;
+	static const size_t kBufferSize = 256;
+	char* buffer = (char*)debug_malloc(kBufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	bool isObjectMethod;
+	const char* name = debug_demangle_symbol(symbol, buffer, kBufferSize,
+		&isObjectMethod);
+	if (name == NULL) {
+		debug_free(buffer);
+		return B_ERROR;
+	}
+
+	kprintf("<%s> %s(", image, name);
+
+	size_t length;
+	int32 type, i = 0;
+	uint32 cookie = 0;
+	while (debug_get_next_demangled_argument(&cookie, symbol, buffer,
+			kBufferSize, &type, &length) == B_OK) {
+		if (i++ > 0)
+			kprintf(", ");
+
+		if (buffer[0])
+			kprintf("%s", buffer);
+		else
+			kprintf("???");
+	}
+
+	debug_free(buffer);
+
+	kprintf(")");
+	return B_OK;
 }
 
 
@@ -360,10 +391,10 @@ print_stack_frame(Thread* thread, addr_t ip, addr_t bp, addr_t nextBp,
 
 		if (!exactMatch || !demangle || status != B_OK) {
 			if (symbol != NULL) {
-				kprintf("<%s>:%s%s", image, symbol,
+				kprintf("<%s> %s%s", image, symbol,
 					exactMatch ? "" : " (nearest)");
 			} else
-				kprintf("<%s@%p>:unknown", image, (void*)baseAddress);
+				kprintf("<%s@%p> <unknown>", image, (void*)baseAddress);
 		}
 
 		kprintf(" + %#04lx\n", ip - baseAddress);
