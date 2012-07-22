@@ -64,8 +64,8 @@ OptionDevice::AddDevice(const usb_configuration_info *config)
 			TRACE("> OptionDevice::%s: found at interface %d\n", __func__,
 				index);
 			usb_endpoint_info *irEndpoint = &interface->endpoint[irEndpointID];
-			usb_endpoint_info *txEndpoint = &interface->endpoint[irEndpointID];
-			usb_endpoint_info *rxEndpoint = &interface->endpoint[irEndpointID];
+			usb_endpoint_info *txEndpoint = &interface->endpoint[txEndpointID];
+			usb_endpoint_info *rxEndpoint = &interface->endpoint[rxEndpointID];
 			SetControlPipe(irEndpoint->handle);
 			SetReadPipe(rxEndpoint->handle);
 			SetWritePipe(txEndpoint->handle);
