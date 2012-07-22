@@ -120,8 +120,7 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 				break;
 		}
 
-		if (message->HasMessage("be:drag_message"))
-			delete dragMessage;
+		delete dragMessage;
 	}
 
 	return B_DISPATCH_MESSAGE;
