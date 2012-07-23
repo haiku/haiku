@@ -169,7 +169,8 @@ class BContainerWindow : public BWindow {
 			bool createNew = false, bool createFolder = true);
 
 		// add-on iteration
-		void EachAddon(bool(*)(const Model *, const char *, uint32 shortcut, bool primary, void *), void *);
+		void EachAddon(bool(*)(const Model *, const char *, uint32 shortcut,
+			bool primary, void *), void *, BObjectList<BString> &);
 
 		BPopUpMenu *ContextMenu();
 
@@ -233,6 +234,7 @@ class BContainerWindow : public BWindow {
 		virtual	void SetUpDiskMenu(BMenu *);
 
 		virtual	void BuildAddOnMenu(BMenu *);
+		void BuildMimeTypeList(BObjectList<BString>& mimeTypes);
 
 		enum UpdateMenuContext {
 			kMenuBarContext,
@@ -249,7 +251,7 @@ class BContainerWindow : public BWindow {
 			const char *);
 
 		bool EachAddon(BPath &path, bool(*)(const Model *, const char *, uint32, bool, void *),
-			BObjectList<Model> *, void *);
+			BObjectList<Model> *, void *, BObjectList<BString> &);
 		void LoadAddOn(BMessage *);
 
 		BPopUpMenu *fFileContextMenu;

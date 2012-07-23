@@ -204,7 +204,11 @@ BDeskWindow::MenusBeginning()
 		AddOneShortcutParams params;
 		params.window = this;
 		params.currentAddonShortcuts = &fCurrentAddonShortcuts;
-		EachAddon(&AddOneShortcut, &params);
+
+		BObjectList<BString> mimeTypes(10, true);
+		BuildMimeTypeList(mimeTypes);
+
+		EachAddon(&AddOneShortcut, &params, mimeTypes);
 	}
 }
 

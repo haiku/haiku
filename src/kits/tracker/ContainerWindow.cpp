@@ -130,7 +130,6 @@ class DraggableContainerIcon : public BView {
 struct AddOneAddonParams {
 	BObjectList<BMenuItem> *primaryList;
 	BObjectList<BMenuItem> *secondaryList;
-	BObjectList<BString> *mimeTypes;
 };
 
 struct StaggerOneParams {
@@ -2814,33 +2813,33 @@ BContainerWindow::AddTrashContextMenus(BMenu *menu)
 
 void
 BContainerWindow::EachAddon(bool (*eachAddon)(const Model *, const char *,
-	uint32 shortcut, bool primary, void *context), void *passThru)
+	uint32 shortcut, bool primary, void *context), void *passThru,
+	BObjectList<BString> &mimeTypes)
 {
 	BObjectList<Model> uniqueList(10, true);
 	BPath path;
 	bool bail = false;
 	if (find_directory(B_BEOS_ADDONS_DIRECTORY, &path) == B_OK)
-		bail = EachAddon(path, eachAddon, &uniqueList, passThru);
+		bail = EachAddon(path, eachAddon, &uniqueList, passThru, mimeTypes);
 
 	if (!bail && find_directory(B_USER_ADDONS_DIRECTORY, &path) == B_OK)
-		bail = EachAddon(path, eachAddon, &uniqueList, passThru);
+		bail = EachAddon(path, eachAddon, &uniqueList, passThru, mimeTypes);
 
 	if (!bail && find_directory(B_COMMON_ADDONS_DIRECTORY, &path) == B_OK)
-		EachAddon(path, eachAddon, &uniqueList, passThru);
+		EachAddon(path, eachAddon, &uniqueList, passThru, mimeTypes);
 }
 
 
 bool
 BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model *,
 	const char *, uint32 shortcut, bool primary, void *),
-	BObjectList<Model> *uniqueList, void *params)
+	BObjectList<Model> *uniqueList, void *params,
+	BObjectList<BString> &mimeTypes)
 {
 	path.Append("Tracker");
 
 	BDirectory dir;
 	BEntry entry;
-	
-	BObjectList<BString> *mimeTypes = ((AddOneAddonParams *)params)->mimeTypes;
 
 	if (dir.SetTo(path.Path()) != B_OK)
 		return false;
@@ -2866,7 +2865,7 @@ BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model *,
 
 		bool primary = false;
 
-		if (mimeTypes->CountItems()) {
+		if (mimeTypes.CountItems()) {
 			BFile file(&entry, B_READ_ONLY);
 			if (file.InitCheck() == B_OK) {
 				BAppFileInfo info(&file);
@@ -2884,8 +2883,8 @@ BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model *,
 
 					// check all supported types if it has some set
 					if (!secondary) {
-						for (int32 i = mimeTypes->CountItems(); !primary && i-- > 0;) {
-							BString *type = mimeTypes->ItemAt(i);
+						for (int32 i = mimeTypes.CountItems(); !primary && i-- > 0;) {
+							BString *type = mimeTypes.ItemAt(i);
 							if (info.IsSupportedType(type->String())) {
 								BMimeType mimeType(type->String());
 								if (info.Supports(&mimeType))
@@ -2924,6 +2923,32 @@ BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model *,
 
 
 void
+BContainerWindow::BuildMimeTypeList(BObjectList<BString> &mimeTypes)
+{
+	int32 count = PoseView()->SelectionList()->CountItems();
+	if (!count) {
+		// just add the type of the current directory
+		AddMimeTypeString(mimeTypes, TargetModel());
+	} else {
+		_UpdateSelectionMIMEInfo();
+		for (int32 index = 0; index < count; index++) {
+			BPose *pose = PoseView()->SelectionList()->ItemAt(index);
+			AddMimeTypeString(mimeTypes, pose->TargetModel());
+			// If it's a symlink, resolves it and add the Target's MimeType
+			if (pose->TargetModel()->IsSymLink()) {
+				Model* resolved = new Model(
+					pose->TargetModel()->EntryRef(), true, true);
+				if (resolved->InitCheck() == B_OK) {
+					AddMimeTypeString(mimeTypes, resolved);
+				}
+				delete resolved;
+			}
+		}
+	}
+}
+
+
+void
 BContainerWindow::BuildAddOnMenu(BMenu *menu)
 {
 	BMenuItem* item = menu->FindItem(B_TRANSLATE("Add-ons"));
@@ -2952,44 +2977,21 @@ BContainerWindow::BuildAddOnMenu(BMenu *menu)
 
 	BObjectList<BMenuItem> primaryList;
 	BObjectList<BMenuItem> secondaryList;
+	BObjectList<BString> mimeTypes(10, true);
+	BuildMimeTypeList(mimeTypes);
 
 	AddOneAddonParams params;
 	params.primaryList = &primaryList;
 	params.secondaryList = &secondaryList;
 
 	// build a list of the MIME types of the selected items
-	BObjectList<BString> mimeTypes(10, true);
 
-	int32 count = PoseView()->SelectionList()->CountItems();
-	if (!count) {
-		// just add the type of the current directory
-		AddMimeTypeString(mimeTypes, TargetModel());
-	} else {
-		_UpdateSelectionMIMEInfo();
-		for (int32 index = 0; index < count; index++) {
-			BPose *pose = PoseView()->SelectionList()->ItemAt(index);
-			
-			AddMimeTypeString(mimeTypes, pose->TargetModel());
-			// If it's a symlink, resolves it and add the Target's MimeType
-			if (pose->TargetModel()->IsSymLink()) {
-				Model* resolved = new Model(
-					pose->TargetModel()->EntryRef(), true, true);
-				if (resolved->InitCheck() == B_OK) {
-					AddMimeTypeString(mimeTypes, resolved);
-				}
-				delete resolved;
-			}
-		}
-	}
-
-	params.mimeTypes = &mimeTypes;
-
-	EachAddon(AddOneAddon, &params);
+	EachAddon(AddOneAddon, &params, mimeTypes);
 
 	primaryList.SortItems(CompareLabels);
 	secondaryList.SortItems(CompareLabels);
 
-	count = primaryList.CountItems();
+	int32 count = primaryList.CountItems();
 	for (int32 index = 0; index < count; index++)
 		menu->AddItem(primaryList.ItemAt(index));
 
