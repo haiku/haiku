@@ -149,6 +149,24 @@ const BPoint kTransparentDragThreshold(256, 192);
 	// if larger in any direction
 
 
+struct attr_column_relation {
+	uint32 	attrHash;
+	int32	fieldMask;
+};
+
+
+static struct attr_column_relation attributes[] = {
+	{ AttrHashString(kAttrStatModified, B_TIME_TYPE),
+		B_STAT_MODIFICATION_TIME },
+	{ AttrHashString(kAttrStatSize, B_OFF_T_TYPE),
+		B_STAT_SIZE },
+	{ AttrHashString(kAttrStatCreated, B_TIME_TYPE),
+		B_STAT_CREATION_TIME },
+	{ AttrHashString(kAttrStatMode, B_STRING_TYPE),
+		B_STAT_MODE }
+};
+
+
 struct AddPosesResult {
 	~AddPosesResult();
 	void ReleaseModels();
@@ -5359,12 +5377,6 @@ BPoseView::EntryMoved(const BMessage *message)
 }
 
 
-struct attrColumnRelation {
-	uint32 	attrHash;
-	int32	fieldMask;
-};
-
-
 bool
 BPoseView::AttributeChanged(const BMessage *message)
 {
@@ -5454,23 +5466,11 @@ BPoseView::AttributeChanged(const BMessage *message)
 			if (message->FindInt32("fields", &fields) != B_OK)
 				return true;
 
-			static struct attrColumnRelation attributs[] = {
-				{ AttrHashString(kAttrStatModified, B_TIME_TYPE),
-					B_STAT_MODIFICATION_TIME },
-				{ AttrHashString(kAttrStatSize, B_OFF_T_TYPE),
-					B_STAT_SIZE },
-				{ AttrHashString(kAttrStatCreated, B_TIME_TYPE),
-					B_STAT_CREATION_TIME },
-				{ AttrHashString(kAttrStatMode, B_STRING_TYPE),
-					B_STAT_MODE }
-			};
-
-			for (int32 i = sizeof(attributs) / sizeof(attrColumnRelation);
+			for (int32 i = sizeof(attributes) / sizeof(attr_column_relation);
 				i--;) {
-				if (attributs[i].attrHash == PrimarySort()
-					|| attributs[i].attrHash == SecondarySort()) {
-
-					if (fields & attributs[i].fieldMask) {
+				if (attributes[i].attrHash == PrimarySort()
+					|| attributes[i].attrHash == SecondarySort()) {
+					if ((fields & attributes[i].fieldMask) != 0) {
 						_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
 						if (fFiltering && visible)
 							_CheckPoseSortOrder(fFilteredPoseList, pose, index);
