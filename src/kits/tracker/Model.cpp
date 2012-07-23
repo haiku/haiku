@@ -1178,18 +1178,11 @@ bool
 Model::Mimeset(bool force)
 {
 	BString oldType = MimeType();
-	ModelNodeLazyOpener opener(this);
 	BPath path;
 	GetPath(&path);
-	if (force) {
-		if (opener.OpenNode(true) != B_OK)
-			return false;
 
-		Node()->RemoveAttr(kAttrMIMEType);
-		update_mime_info(path.Path(), 0, 1, 1);
-	} else
-		update_mime_info(path.Path(), 0, 1, 0);
-
+	update_mime_info(path.Path(), 0, 1, force ? 2 : 0);
+	
 	AttrChanged(0);
 
 	return !oldType.ICompare(MimeType());

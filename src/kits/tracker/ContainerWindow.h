@@ -303,6 +303,8 @@ class BContainerWindow : public BWindow {
 
 		friend int32 show_context_menu(void*);
 		friend class BackgroundView;
+
+		void _UpdateSelectionMIMEInfo();
 };
 
 class WindowStateNodeOpener {

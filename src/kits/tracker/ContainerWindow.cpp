@@ -318,12 +318,7 @@ static void
 AddMimeTypeString(BObjectList<BString> &list, Model *model)
 {
 	BString *mimeType = new BString(model->MimeType());
-	if (!mimeType->Length() || !mimeType->ICompare(B_FILE_MIMETYPE)) {
-		// if model is of unknown type, try mimeseting it first
-		model->Mimeset(true);
-		mimeType->SetTo(model->MimeType());
-	}
-
+	
 	if (mimeType->Length()) {
 		// only add the type if it's not already there
 		for (int32 i = list.CountItems(); i-- > 0;) {
@@ -2975,6 +2970,8 @@ BContainerWindow::BuildAddOnMenu(BMenu *menu)
 			break;
 		delete item;
 	}
+	
+	_UpdateSelectionMIMEInfo();
 
 	BObjectList<BMenuItem> primaryList;
 	BObjectList<BMenuItem> secondaryList;
@@ -3138,6 +3135,29 @@ BContainerWindow::LoadAddOn(BMessage *message)
 
 	LaunchInNewThread("Add-on", B_NORMAL_PRIORITY, &AddOnThread, refs, addonRef,
 		*TargetModel()->EntryRef());
+}
+
+
+void
+BContainerWindow::_UpdateSelectionMIMEInfo()
+{
+	BPose* pose;
+	int32 index = 0;
+	while ((pose = PoseView()->SelectionList()->ItemAt(index++)) != NULL) {
+		BString mimeType(pose->TargetModel()->MimeType());
+		if (!mimeType.Length() || mimeType.ICompare(B_FILE_MIMETYPE) == 0) {
+			pose->TargetModel()->Mimeset(true);
+			if (pose->TargetModel()->IsSymLink()) {
+				Model* resolved = new Model(pose->TargetModel()->EntryRef(), true, true);
+				if (resolved->InitCheck() == B_OK) {
+					mimeType.SetTo(resolved->MimeType());
+					if (!mimeType.Length() || mimeType.ICompare(B_FILE_MIMETYPE) == 0)
+						resolved->Mimeset(true);
+				}
+				delete resolved;
+			}
+		}
+	}
 }
 
 
