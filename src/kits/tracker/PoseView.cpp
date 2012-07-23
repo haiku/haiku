@@ -8941,7 +8941,7 @@ BPoseView::SortPoses()
 	if (fFiltering) {
 		poses = reinterpret_cast<BPose **>(
 			PoseList::Private(fFilteredPoseList).AsBList()->Items());
-		std::stable_sort(poses, &poses[fPoseList->CountItems()],
+		std::stable_sort(poses, &poses[fFilteredPoseList->CountItems()],
 			PoseComparator(this));
 	}
 }
