@@ -6,7 +6,25 @@
 #define CLI_CONTEXT_H
 
 
+class Team;
+class UserInterfaceListener;
+
+
 class CliContext {
+public:
+								CliContext();
+
+			void				Init(Team* team,
+									UserInterfaceListener* listener);
+
+			Team*				GetTeam() const	{ return fTeam; }
+
+			void				QuitSession();
+
+
+private:
+			Team*				fTeam;
+			UserInterfaceListener* fListener;
 };
 
 

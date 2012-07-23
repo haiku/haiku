@@ -100,8 +100,6 @@ private:
 
 CommandLineUserInterface::CommandLineUserInterface()
 	:
-	fTeam(NULL),
-	fListener(NULL),
 	fCommands(20, true),
 	fShowSemaphore(-1),
 	fShown(false),
@@ -127,8 +125,7 @@ CommandLineUserInterface::ID() const
 status_t
 CommandLineUserInterface::Init(Team* team, UserInterfaceListener* listener)
 {
-	fTeam = team;
-	fListener = listener;
+	fContext.Init(team, listener);
 
 	status_t error = _RegisterCommands();
 	if (error != B_OK)
@@ -318,8 +315,7 @@ CommandLineUserInterface::_ExecuteCommand(int argc, const char* const* argv)
 		return;
 	}
 
-	CliContext context;
-	firstEntry->Command()->Execute(argc, argv, context);
+	firstEntry->Command()->Execute(argc, argv, fContext);
 }
 
 

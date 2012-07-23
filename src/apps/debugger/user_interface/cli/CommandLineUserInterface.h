@@ -10,6 +10,7 @@
 #include <ObjectList.h>
 #include <String.h>
 
+#include "CliContext.h"
 #include "UserInterface.h"
 
 
@@ -68,8 +69,7 @@ private:
 			void				_PrintHelp();
 
 private:
-			Team*				fTeam;
-			UserInterfaceListener* fListener;
+			CliContext			fContext;
 			CommandList			fCommands;
 			sem_id				fShowSemaphore;
 			bool				fShown;
