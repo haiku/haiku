@@ -155,7 +155,7 @@ struct attr_column_relation {
 };
 
 
-static struct attr_column_relation attributes[] = {
+static struct attr_column_relation sAttrColumnMap[] = {
 	{ AttrHashString(kAttrStatModified, B_TIME_TYPE),
 		B_STAT_MODIFICATION_TIME },
 	{ AttrHashString(kAttrStatSize, B_OFF_T_TYPE),
@@ -5466,11 +5466,11 @@ BPoseView::AttributeChanged(const BMessage *message)
 			if (message->FindInt32("fields", &fields) != B_OK)
 				return true;
 
-			for (int32 i = sizeof(attributes) / sizeof(attr_column_relation);
+			for (int i = sizeof(sAttrColumnMap) / sizeof(attr_column_relation);
 				i--;) {
-				if (attributes[i].attrHash == PrimarySort()
-					|| attributes[i].attrHash == SecondarySort()) {
-					if ((fields & attributes[i].fieldMask) != 0) {
+				if (sAttrColumnMap[i].attrHash == PrimarySort()
+					|| sAttrColumnMap[i].attrHash == SecondarySort()) {
+					if ((fields & sAttrColumnMap[i].fieldMask) != 0) {
 						_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
 						if (fFiltering && visible)
 							_CheckPoseSortOrder(fFilteredPoseList, pose, index);

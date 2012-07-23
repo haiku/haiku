@@ -130,6 +130,7 @@ class DraggableContainerIcon : public BView {
 struct AddOneAddonParams {
 	BObjectList<BMenuItem> *primaryList;
 	BObjectList<BMenuItem> *secondaryList;
+	BObjectList<BString> *mimeTypes;
 };
 
 struct StaggerOneParams {
@@ -2838,33 +2839,11 @@ BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model *,
 
 	BDirectory dir;
 	BEntry entry;
+	
+	BObjectList<BString> *mimeTypes = ((AddOneAddonParams *)params)->mimeTypes;
 
 	if (dir.SetTo(path.Path()) != B_OK)
 		return false;
-
-	// build a list of the MIME types of the selected items
-
-	BObjectList<BString> mimeTypes(10, true);
-
-	int32 count = PoseView()->SelectionList()->CountItems();
-	if (!count) {
-		// just add the type of the current directory
-		AddMimeTypeString(mimeTypes, TargetModel());
-	} else {
-		for (int32 index = 0; index < count; index++) {
-			BPose *pose = PoseView()->SelectionList()->ItemAt(index);
-			AddMimeTypeString(mimeTypes, pose->TargetModel());
-			// If it's a symlink, resolves it and add the Target's MimeType
-			if (pose->TargetModel()->IsSymLink()) {
-				Model* resolved = new Model(
-					pose->TargetModel()->EntryRef(), true, true);
-				if (resolved->InitCheck() == B_OK) {
-					AddMimeTypeString(mimeTypes, resolved);
-				}
-				delete resolved;
-			}
-		}
-	}
 
 	dir.Rewind();
 	while (dir.GetNextEntry(&entry) == B_OK) {
@@ -2887,7 +2866,7 @@ BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model *,
 
 		bool primary = false;
 
-		if (mimeTypes.CountItems()) {
+		if (mimeTypes->CountItems()) {
 			BFile file(&entry, B_READ_ONLY);
 			if (file.InitCheck() == B_OK) {
 				BAppFileInfo info(&file);
@@ -2905,8 +2884,8 @@ BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model *,
 
 					// check all supported types if it has some set
 					if (!secondary) {
-						for (int32 i = mimeTypes.CountItems(); !primary && i-- > 0;) {
-							BString *type = mimeTypes.ItemAt(i);
+						for (int32 i = mimeTypes->CountItems(); !primary && i-- > 0;) {
+							BString *type = mimeTypes->ItemAt(i);
 							if (info.IsSupportedType(type->String())) {
 								BMimeType mimeType(type->String());
 								if (info.Supports(&mimeType))
@@ -2970,8 +2949,6 @@ BContainerWindow::BuildAddOnMenu(BMenu *menu)
 			break;
 		delete item;
 	}
-	
-	_UpdateSelectionMIMEInfo();
 
 	BObjectList<BMenuItem> primaryList;
 	BObjectList<BMenuItem> secondaryList;
@@ -2980,12 +2957,39 @@ BContainerWindow::BuildAddOnMenu(BMenu *menu)
 	params.primaryList = &primaryList;
 	params.secondaryList = &secondaryList;
 
+	// build a list of the MIME types of the selected items
+	BObjectList<BString> mimeTypes(10, true);
+
+	int32 count = PoseView()->SelectionList()->CountItems();
+	if (!count) {
+		// just add the type of the current directory
+		AddMimeTypeString(mimeTypes, TargetModel());
+	} else {
+		_UpdateSelectionMIMEInfo();
+		for (int32 index = 0; index < count; index++) {
+			BPose *pose = PoseView()->SelectionList()->ItemAt(index);
+			
+			AddMimeTypeString(mimeTypes, pose->TargetModel());
+			// If it's a symlink, resolves it and add the Target's MimeType
+			if (pose->TargetModel()->IsSymLink()) {
+				Model* resolved = new Model(
+					pose->TargetModel()->EntryRef(), true, true);
+				if (resolved->InitCheck() == B_OK) {
+					AddMimeTypeString(mimeTypes, resolved);
+				}
+				delete resolved;
+			}
+		}
+	}
+
+	params.mimeTypes = &mimeTypes;
+
 	EachAddon(AddOneAddon, &params);
 
 	primaryList.SortItems(CompareLabels);
 	secondaryList.SortItems(CompareLabels);
 
-	int32 count = primaryList.CountItems();
+	count = primaryList.CountItems();
 	for (int32 index = 0; index < count; index++)
 		menu->AddItem(primaryList.ItemAt(index));
 

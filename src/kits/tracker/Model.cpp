@@ -883,6 +883,8 @@ Model::AttrChanged(const char *attrName)
 	if (!attrName
 		|| strcmp(attrName, kAttrMIMEType) == 0
 		|| strcmp(attrName, kAttrPreferredApp) == 0) {
+		ModelNodeLazyOpener opener(this);
+		opener.OpenNode();
 		char mimeString[B_MIME_TYPE_LENGTH];
 		BNodeInfo info(fNode);
 		if (info.GetType(mimeString) != B_OK)
