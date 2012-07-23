@@ -18,8 +18,8 @@
 #include <AutoDeleter.h>
 #include <Referenceable.h>
 
-#include "CliCommand.h"
 #include "CliContext.h"
+#include "CliQuitCommand.h"
 
 
 // #pragma mark - CommandEntry
@@ -65,29 +65,6 @@ struct CommandLineUserInterface::HelpCommand : CliCommand {
 	virtual void Execute(int argc, const char* const* argv, CliContext& context)
 	{
 		fUserInterface->_PrintHelp();
-	}
-
-private:
-	CommandLineUserInterface* fUserInterface;
-};
-
-
-// #pragma mark - HelpCommand
-
-
-struct CommandLineUserInterface::QuitCommand : CliCommand {
-	QuitCommand(CommandLineUserInterface* userInterface)
-		:
-		CliCommand("quit Debugger",
-			"%s\n"
-			"Quits Debugger."),
-		fUserInterface(userInterface)
-	{
-	}
-
-	virtual void Execute(int argc, const char* const* argv, CliContext& context)
-	{
-		fUserInterface->fListener->UserInterfaceQuitRequested();
 	}
 
 private:
@@ -266,7 +243,7 @@ status_t
 CommandLineUserInterface::_RegisterCommands()
 {
 	if (_RegisterCommand("help", new(std::nothrow) HelpCommand(this)) &&
-		_RegisterCommand("quit", new(std::nothrow) QuitCommand(this))) {
+		_RegisterCommand("quit", new(std::nothrow) CliQuitCommand)) {
 		return B_OK;
 	}
 

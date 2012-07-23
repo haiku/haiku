@@ -51,11 +51,9 @@ private:
 			typedef BObjectList<CommandEntry> CommandList;
 
 			struct HelpCommand;
-			struct QuitCommand;
 
 			// GCC 2 support
 			friend struct HelpCommand;
-			friend struct QuitCommand;
 
 private:
 	static	status_t			_InputLoopEntry(void* data);
