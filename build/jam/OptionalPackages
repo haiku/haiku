@@ -1065,8 +1065,8 @@ if [ IsOptionalHaikuImagePackageAdded HGrep ] {
 		Echo "No optional package HGrep available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			hgrep-1.0-x86-gcc2-2012-07-23.zip
-			: $(baseURL)/hgrep-1.0-x86-gcc2-2012-07-23.zip ;
+			hgrep-1.0.1-x86-gcc2-2012-07-23.zip
+			: $(baseURL)/hgrep-1.0.1-x86-gcc2-2012-07-23.zip ;
 	}
 }
 
