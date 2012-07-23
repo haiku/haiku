@@ -69,6 +69,8 @@ const int32 kDefaultRecentAppCount = 10;
 
 const int32 kMenuTrackMargin = 20;
 
+const uint32 kUpdateOrientation = 'UpOr';
+
 
 class BarViewMessageFilter : public BMessageFilter
 {
@@ -102,7 +104,7 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 	if (message->what == B_MOUSE_DOWN || message->what == B_MOUSE_MOVED) {
 		BPoint where = message->FindPoint("be:view_where");
 		uint32 transit = message->FindInt32("be:transit");
-		BMessage *dragMessage = NULL;
+		BMessage* dragMessage = NULL;
 		if (message->HasMessage("be:drag_message")) {
 			dragMessage = new BMessage();
 			message->FindMessage("be:drag_message", dragMessage);
@@ -111,11 +113,11 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 		switch (message->what) {
 			case B_MOUSE_DOWN:
 				fBarView->MouseDown(where);
-			break;
+				break;
 
 			case B_MOUSE_MOVED:
 				fBarView->MouseMoved(where, transit, dragMessage);
-			break;
+				break;
 		}
 
 		delete dragMessage;
@@ -140,7 +142,8 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	fCachedTypesList(NULL),
 	fMaxRecentDocs(kDefaultRecentDocCount),
 	fMaxRecentApps(kDefaultRecentAppCount),
-	fLastDragItem(NULL)
+	fLastDragItem(NULL),
+	fMouseFilter(NULL)
 {
 	fReplicantTray = new TReplicantTray(this, fVertical);
 	fDragRegion = new TDragRegion(this, fReplicantTray);
@@ -167,7 +170,8 @@ TBarView::AttachedToWindow()
 	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	SetFont(be_plain_font);
 
-	Window()->AddCommonFilter(new BarViewMessageFilter(this));
+	fMouseFilter = new BarViewMessageFilter(this);
+	Window()->AddCommonFilter(fMouseFilter);
 
 	UpdatePlacement();
 
@@ -180,6 +184,9 @@ TBarView::AttachedToWindow()
 void
 TBarView::DetachedFromWindow()
 {
+	Window()->RemoveCommonFilter(fMouseFilter);
+	delete fMouseFilter;
+	fMouseFilter = NULL;
 	delete fTrackingHookData.fDragMessage;
 	fTrackingHookData.fDragMessage = NULL;
 }
@@ -232,6 +239,12 @@ TBarView::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kUpdateOrientation:
+		{
+			_ChangeState(message);
+			break;
+		}
+
 		default:
 			BView::MessageReceived(message);
 	}
@@ -241,18 +254,18 @@ TBarView::MessageReceived(BMessage* message)
 void
 TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	desk_settings* settings = ((TBarApp*)be_app)->Settings();
-	bool alwaysOnTop = settings->alwaysOnTop;
-	bool autoRaise = settings->autoRaise;
-	bool autoHide = settings->autoHide;
-
-	if (DragRegion()->IsDragging()) {
-		DragRegion()->MouseMoved(where, transit, dragMessage);
+	if (fDragRegion->IsDragging()) {
+		fDragRegion->MouseMoved(where, transit, dragMessage);
 		return;
 	}
 
 	if (transit == B_ENTERED_VIEW && EventMask() == 0)
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	bool alwaysOnTop = settings->alwaysOnTop;
+	bool autoRaise = settings->autoRaise;
+	bool autoHide = settings->autoHide;
 
 	if (!autoRaise && !autoHide) {
 		if (transit == B_EXITED_VIEW || transit == B_OUTSIDE_VIEW)
@@ -311,8 +324,7 @@ TBarView::MouseDown(BPoint where)
 		if ((modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY
 					| B_SHIFT_KEY)) == (B_CONTROL_KEY | B_COMMAND_KEY)) {
 			// The window key was pressed - enter dragging code
-			DragRegion()->MouseDown(
-				DragRegion()->DragRegion().LeftTop());
+			fDragRegion->MouseDown(fDragRegion->DragRegion().LeftTop());
 			return;
 		}
 	} else {
@@ -491,7 +503,7 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 	float windowHeight = 0;
 	float windowWidth = sMinimumWindowWidth;
 	bool setToHiddenSize = ((TBarApp*)be_app)->Settings()->autoHide
-		&& IsHidden() && !DragRegion()->IsDragging();
+		&& IsHidden() && !fDragRegion->IsDragging();
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 
 	if (setToHiddenSize) {
@@ -588,25 +600,19 @@ TBarView::UpdatePlacement()
 
 
 void
-TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
+TBarView::ChangeState(int32 state, bool vertical, bool left, bool top,
+	bool async)
 {
-	bool vertSwap = (fVertical != vertical);
-	bool leftSwap = (fLeft != left);
-	bool stateChanged = (fState != state);
+	BMessage message(kUpdateOrientation);
+	message.AddInt32("state", state);
+	message.AddBool("vertical", vertical);
+	message.AddBool("left", left);
+	message.AddBool("top", top);
 
-	fState = state;
-	fVertical = vertical;
-	fLeft = left;
-	fTop = top;
-
-	// Send a message to the preferences window to let it know to enable
-	// or disable preference items
-	if (stateChanged || vertSwap)
-		be_app->PostMessage(kStateChanged);
-
-	PlaceDeskbarMenu();
-	PlaceTray(vertSwap, leftSwap);
-	PlaceApplicationBar();
+	if (async)
+		BMessenger(this).SendMessage(&message);
+	else
+		_ChangeState(&message);
 }
 
 
@@ -674,6 +680,34 @@ TBarView::ExpandItems()
 	RemoveExpandedItems();
 
 	fExpando->SizeWindow();
+}
+
+
+void
+TBarView::_ChangeState(BMessage* message)
+{
+	int32 state = message->FindInt32("state");
+	bool vertical = message->FindBool("vertical");
+	bool left = message->FindBool("left");
+	bool top = message->FindBool("top");
+
+	bool vertSwap = (fVertical != vertical);
+	bool leftSwap = (fLeft != left);
+	bool stateChanged = (fState != state);
+
+	fState = state;
+	fVertical = vertical;
+	fLeft = left;
+	fTop = top;
+
+	// Send a message to the preferences window to let it know to enable
+	// or disable preference items
+	if (stateChanged || vertSwap)
+		be_app->PostMessage(kStateChanged);
+
+	PlaceDeskbarMenu();
+	PlaceTray(vertSwap, leftSwap);
+	PlaceApplicationBar();
 }
 
 

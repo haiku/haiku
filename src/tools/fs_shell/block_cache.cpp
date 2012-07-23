@@ -927,7 +927,7 @@ write_cached_block(block_cache* cache, cached_block* block,
 			}
 		}
 	}
-	if (block->transaction == NULL && block->ref_count == 0) {
+	if (block->transaction == NULL && block->ref_count == 0 && !block->unused) {
 		// the block is no longer used
 		block->unused = true;
 		cache->unused_blocks.Add(block);

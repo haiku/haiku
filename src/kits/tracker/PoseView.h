@@ -520,7 +520,8 @@ class BPoseView : public BView {
 		void DrawViewCommon(const BRect &updateRect);
 
 		// pose list handling
-		int32 BSearchList(PoseList *poseList, const BPose *, int32 *index);
+		int32 BSearchList(PoseList *poseList, const BPose *, int32 *index,
+			int32 oldIndex);
 		void InsertPoseAfter(BPose *pose, int32 *index, int32 orientation,
 			BRect *invalidRect);
 			// does a CopyBits to scroll poses making room for a new pose,

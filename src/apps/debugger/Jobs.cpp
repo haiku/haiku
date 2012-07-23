@@ -1,4 +1,5 @@
 /*
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -523,6 +524,9 @@ ResolveValueNodeValueJob::_ResolveNodeValue()
 				fValueNode, fValueNode->Name().String(), parentNode);
 			return error;
 		}
+
+		if (State() == JOB_STATE_WAITING)
+			return B_OK;
 	}
 
 	// resolve the node child location, if necessary
@@ -629,6 +633,8 @@ ResolveValueNodeValueJob::_ResolveParentNodeValue(ValueNode* parentNode)
 			// "Not found" can happen due to a race condition between
 			// unlocking the worker and starting to wait.
 			break;
+		case JOB_DEPENDENCY_ACTIVE:
+			return B_OK;
 		case JOB_DEPENDENCY_FAILED:
 		case JOB_DEPENDENCY_ABORTED:
 		default:

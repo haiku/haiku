@@ -15,6 +15,7 @@ UsePrivateHeaders kernel libroot ;
 StaticLibrary libshared.a :
 	AboutMenuItem.cpp
 	AboutWindow.cpp
+	ArgumentVector.cpp
 	CalendarView.cpp
 	ColorQuantizer.cpp
 	CommandPipe.cpp

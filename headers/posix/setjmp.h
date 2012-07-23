@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010 Haiku Inc.
+ * Copyright 2004-2012 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SETJMP_H_

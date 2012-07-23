@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_SOCKET_H
@@ -47,7 +47,7 @@ typedef uint32_t socklen_t;
 #define SOCK_MISC	255
 
 /* Socket options for SOL_SOCKET level */
-#define	SOL_SOCKET		-1		
+#define	SOL_SOCKET		-1
 
 #define SO_ACCEPTCONN	0x00000001	/* socket has had listen() */
 #define SO_BROADCAST	0x00000002	/* permit sending of broadcast msgs */
@@ -85,7 +85,7 @@ struct linger {
 };
 
 struct sockaddr {
-	uint8_t		sa_len;	
+	uint8_t		sa_len;
 	uint8_t		sa_family;
 	uint8_t		sa_data[30];
 };

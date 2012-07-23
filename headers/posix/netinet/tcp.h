@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2006-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NETINET_TCP_H
@@ -15,7 +15,7 @@ struct tcphdr {
 	uint16_t	th_dport;	/* destination port */
 	uint32_t	th_seq;
 	uint32_t	th_ack;
-	
+
 #if BIG_ENDIAN
 	uint8_t		th_off : 4;	/* data offset */
 	uint8_t		th_x2 : 4;	/* unused */

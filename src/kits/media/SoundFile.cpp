@@ -361,8 +361,11 @@ BSoundFile::_ref_to_file(const entry_ref *ref)
 		raw = &mf.u.raw_audio;
 	}
 
-	if (raw == NULL)
+	if (raw == NULL) {
+		delete media;
+		delete file;
 		return B_ERROR;
+	}
 
 	fSamplingRate = (int)raw->frame_rate;
 	fChannelCount = raw->channel_count;

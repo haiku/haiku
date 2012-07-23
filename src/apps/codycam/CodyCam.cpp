@@ -7,6 +7,7 @@
 #include <Alert.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
@@ -22,8 +23,6 @@
 #include <TextControl.h>
 #include <TimeSource.h>
 #include <TranslationKit.h>
-
-#include <storage/FindDirectory.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "CodyCam"

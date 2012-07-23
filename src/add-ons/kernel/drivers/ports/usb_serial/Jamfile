@@ -14,6 +14,7 @@ KernelAddon usb_serial :
 	ACM.cpp
 	FTDI.cpp
 	KLSI.cpp
+	Option.cpp
 	Prolific.cpp
 	Silicon.cpp
 ;

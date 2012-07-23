@@ -149,6 +149,24 @@ const BPoint kTransparentDragThreshold(256, 192);
 	// if larger in any direction
 
 
+struct attr_column_relation {
+	uint32 	attrHash;
+	int32	fieldMask;
+};
+
+
+static struct attr_column_relation sAttrColumnMap[] = {
+	{ AttrHashString(kAttrStatModified, B_TIME_TYPE),
+		B_STAT_MODIFICATION_TIME },
+	{ AttrHashString(kAttrStatSize, B_OFF_T_TYPE),
+		B_STAT_SIZE },
+	{ AttrHashString(kAttrStatCreated, B_TIME_TYPE),
+		B_STAT_CREATION_TIME },
+	{ AttrHashString(kAttrStatMode, B_STRING_TYPE),
+		B_STAT_MODE }
+};
+
+
 struct AddPosesResult {
 	~AddPosesResult();
 	void ReleaseModels();
@@ -1674,7 +1692,7 @@ BPoseView::AddPoseToList(PoseList *list, bool visibleList, bool insertionSort,
 	bool needToDraw = true;
 
 	if (insertionSort && list->CountItems()) {
-		int32 orientation = BSearchList(list, pose, &poseIndex);
+		int32 orientation = BSearchList(list, pose, &poseIndex, 0);
 
 		if (orientation == kInsertAfter)
 			poseIndex++;
@@ -5323,6 +5341,7 @@ BPoseView::EntryMoved(const BMessage *message)
 				ReadPoseInfo(pose->TargetModel(), &poseInfo);
 				if (!ShouldShowPose(pose->TargetModel(), &poseInfo))
 					return DeletePose(&itemNode, pose, index);
+				return true;
 			}
 
 			BPoint loc(0, index * fListElemHeight);
@@ -5354,7 +5373,6 @@ BPoseView::EntryMoved(const BMessage *message)
 		return DeletePose(&itemNode);
 	else if (dirNode.node == thisDirNode.node)
 		EntryCreated(&dirNode, &itemNode, name);
-
 	return true;
 }
 
@@ -5430,7 +5448,6 @@ BPoseView::AttributeChanged(const BMessage *message)
 			return false;
 		}
 
-		uint32 attrHash;
 		if (attrName) {
 			// rebuild the MIME type list, if the MIME type has changed
 			if (strcmp(attrName, kAttrMIMEType) == 0)
@@ -5438,14 +5455,29 @@ BPoseView::AttributeChanged(const BMessage *message)
 
 			// note: the following code is wrong, because this sort of hashing
 			// may overlap and we get aliasing
-			attrHash = AttrHashString(attrName, info.type);
-		}
+			uint32 attrHash = AttrHashString(attrName, info.type);
+			if (attrHash == PrimarySort() || attrHash == SecondarySort()) {
+				_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
+				if (fFiltering && visible)
+					_CheckPoseSortOrder(fFilteredPoseList, pose, index);
+			}
+		} else {
+			int32 fields;
+			if (message->FindInt32("fields", &fields) != B_OK)
+				return true;
 
-		if (!attrName || attrHash == PrimarySort()
-			|| attrHash == SecondarySort()) {
-			_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
-			if (fFiltering && visible)
-				_CheckPoseSortOrder(fFilteredPoseList, pose, index);
+			for (int i = sizeof(sAttrColumnMap) / sizeof(attr_column_relation);
+				i--;) {
+				if (sAttrColumnMap[i].attrHash == PrimarySort()
+					|| sAttrColumnMap[i].attrHash == SecondarySort()) {
+					if ((fields & sAttrColumnMap[i].fieldMask) != 0) {
+						_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
+						if (fFiltering && visible)
+							_CheckPoseSortOrder(fFilteredPoseList, pose, index);
+						return true;
+					}
+				}
+			}
 		}
 	} else {
 		// we received an attr changed notification for a zombie model, it means
@@ -8667,7 +8699,7 @@ BPoseView::_CheckPoseSortOrder(PoseList *poseList, BPose *pose, int32 oldIndex)
 	// take pose out of list for BSearch
 	poseList->RemoveItemAt(oldIndex);
 	int32 afterIndex;
-	int32 orientation = BSearchList(poseList, pose, &afterIndex);
+	int32 orientation = BSearchList(poseList, pose, &afterIndex, oldIndex);
 
 	int32 newIndex;
 	if (orientation == kInsertAtFront)
@@ -8777,19 +8809,33 @@ BSearch(PoseList *table, const BPose* key, BPoseView *view,
 
 int32
 BPoseView::BSearchList(PoseList *poseList, const BPose *pose,
-	int32 *resultingIndex)
+	int32 *resultingIndex, int32 oldIndex)
 {
 	// check to see if insertion should be at beginning of list
 	const BPose *firstPose = poseList->FirstItem();
 	if (!firstPose)
-		return kInsertAtFront;
-
-	if (PoseCompareAddWidget(pose, firstPose, this) <= 0) {
+		return kInsertAtFront; 
+	
+	if (PoseCompareAddWidget(pose, firstPose, this) < 0) {
 		*resultingIndex = 0;
 		return kInsertAtFront;
 	}
 
 	int32 count = poseList->CountItems();
+
+	// look if old position is still ok, by comparing to siblings
+	bool valid = oldIndex > 0 && oldIndex < count - 1;
+	valid = valid && PoseCompareAddWidget(pose,
+		poseList->ItemAt(oldIndex - 1), this) >= 0;
+	// the current item is gone, so not oldIndex+1
+	valid = valid && PoseCompareAddWidget(pose,
+		poseList->ItemAt(oldIndex), this) <= 0;
+
+	if (valid) {
+		*resultingIndex = oldIndex - 1;
+		return kInsertAfter;
+	}
+	
 	*resultingIndex = count - 1;
 
 	const BPose *searchResult = BSearch(poseList, pose, this,
