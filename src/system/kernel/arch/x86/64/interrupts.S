@@ -10,6 +10,8 @@
 #include <arch/x86/arch_cpu.h>
 
 #include "asm_offsets.h"
+#include "syscall_numbers.h"
+#include "syscall_table.h"
 
 
 // Push the remainder of the interrupt frame onto the stack.
@@ -127,10 +129,14 @@ FUNCTION(int_bottom):
 	// Frame pointer is the iframe.
 	movq	%rsp, %rbp
 
+	// TODO: Kernel entry work.
+
 	// Call the interrupt handler.
 	movq	%rsp, %rdi
 	movq	IFRAME_vector(%rsp), %rax
 	call	*gInterruptHandlerTable(, %rax, 8)
+
+	// TODO: Kernel exit work.
 
 	// Restore the saved registers.
 	RESTORE_IFRAME()
@@ -143,6 +149,73 @@ FUNCTION(int_bottom):
 	swapgs
 2:	iretq
 FUNCTION_END(int_bottom)
+
+
+// SYSCALL entry point.
+FUNCTION(x86_64_syscall_entry):
+	// Upon entry, RSP still points at the user stack.  Load the kernel GS
+	// segment base address, which points at the current thread's arch_thread
+	// structure. This contains our kernel stack pointer and a temporary
+	// scratch space to store the user stack pointer in before we can push it
+	// to the stack.
+	swapgs
+	movq	%rsp, %gs:ARCH_THREAD_user_rsp
+	movq	%gs:ARCH_THREAD_syscall_rsp, %rsp
+
+	// Set up an iframe on the stack (R11 = saved RFLAGS, RCX = saved RIP).
+	push	$USER_DATA_SEG				// ss
+	push	%gs:ARCH_THREAD_user_rsp	// rsp
+	push	%r11						// flags
+	push	$USER_CODE_SEG				// cs
+	push	%rcx						// ip
+	push	$0							// error_code
+	push	$0							// vector
+	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_SYSCALL)
+
+	// Frame pointer is the iframe.
+	movq	%rsp, %rbp
+
+	// TODO: Kernel entry work.
+
+	// Check whether the syscall number is valid.
+	cmp		$SYSCALL_COUNT, %rax
+	jae		.Lbad_syscall_number
+
+	// Get the system call table entry. Note I'm hardcoding the shift because
+	// sizeof(syscall_info) is 16 and scale factors of 16 aren't supported,
+	// so can't just do leaq kSyscallInfos(, %rax, SYSCALL_INFO_sizeof).
+	shl		$4, %rax
+	leaq	kSyscallInfos(, %rax, 1), %r12
+
+	// Move 4th argument to the correct register, it is put in R10 as RCX is
+	// used by SYSCALL.
+	movq	%r10, %rcx
+
+	// TODO: > 6 arguments.
+
+	// No longer need interrupts disabled.
+	sti
+
+	// Call the function and save its return value.
+	call	*SYSCALL_INFO_function(%r12)
+	movq	%rax, IFRAME_ax(%rsp)
+
+	cli
+.Lbad_syscall_number:
+	// TODO: Kernel exit work, check for canonical return address, syscall restart.
+
+	// Restore the iframe and RCX/R11 for SYSRET.
+	RESTORE_IFRAME()
+	addq	$16, %rsp
+	pop		%rcx
+	addq	$8, %rsp
+	pop		%r11
+	pop		%rsp
+
+	// Restore previous GS base and return.
+	swapgs
+	sysretq
+FUNCTION_END(x86_64_syscall_entry)
 
 
 /*!	\fn void x86_return_to_userland(iframe* frame)
@@ -158,5 +231,14 @@ FUNCTION_END(int_bottom)
 	\param frame The iframe defining the userland environment.
 */
 FUNCTION(x86_return_to_userland):
-	ud2a
+	movq	%rdi, %rbp
+	movq	%rbp, %rsp
+
+	// TODO: Kernel exit work.
+
+	// Restore the frame and return.
+	RESTORE_IFRAME()
+	addq	$16, %rsp
+	swapgs
+	iretq
 FUNCTION_END(x86_return_to_userland)

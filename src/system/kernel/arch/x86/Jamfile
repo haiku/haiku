@@ -25,6 +25,8 @@ if $(TARGET_ARCH) = x86_64 {
 		int.cpp
 		interrupts.S
 		stubs.cpp
+		signals.cpp
+		syscalls.cpp
 		thread.cpp
 
 		# paging
@@ -47,17 +49,16 @@ if $(TARGET_ARCH) = x86_64 {
 		cpuid.S
 		int.cpp
 		interrupts.S
+		signals.cpp
+		signals_asm.S
+		syscalls.cpp
+		syscalls_asm.S
 		thread.cpp
 		vm86.cpp
 
-		arch_commpage.cpp
 		arch_user_debugger.cpp
 		ioapic.cpp
 		irq_routing_table.cpp
-		syscall.S
-		x86_signals.cpp
-		x86_signals_asm.S
-		x86_syscalls.cpp
 
 		# paging
 		x86_physical_page_mapper_large_memory.cpp
@@ -76,6 +77,7 @@ if $(TARGET_ARCH) = x86_64 {
 
 local archGenericSources =
 	arch_cpu.cpp
+	arch_commpage.cpp
 	arch_debug.cpp
 	arch_debug_console.cpp
 	arch_elf.cpp
@@ -114,8 +116,7 @@ KernelMergeObject kernel_arch_x86.o :
 CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
 
 # We need to specify the dependency on the generated syscalls file explicitly.
-Includes [ FGristFiles arch_interrupts.S arch_x86.S x86_signals.cpp
-		x86_signals_asm.S ]
+Includes [ FGristFiles interrupts.S arch.S signals.cpp signals_asm.S ]
 	: <syscalls>syscall_numbers.h ;
-Includes [ FGristFiles arch_interrupts.S ]
+Includes [ FGristFiles interrupts.S ]
 	: <syscalls>syscall_table.h ;

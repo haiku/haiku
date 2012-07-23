@@ -22,7 +22,7 @@ status_t
 arch_commpage_init_post_cpus(void)
 {
 	// select the optimum syscall mechanism and patch the commpage
-	x86_initialize_commpage_syscall();
+	x86_initialize_syscall();
 
 	// initialize the signal handler code in the commpage
 	x86_initialize_commpage_signal_handler();

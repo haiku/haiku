@@ -37,20 +37,6 @@
 #include <arch/elf.h>
 
 
-status_t
-arch_commpage_init(void)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_commpage_init_post_cpus(void)
-{
-	return B_OK;
-}
-
-
 // The software breakpoint instruction (int3).
 const uint8 kX86SoftwareBreakpoint[1] = { 0xcc };
 

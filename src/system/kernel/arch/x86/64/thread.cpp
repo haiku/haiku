@@ -94,6 +94,9 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 	TRACE("arch_thread_init_kthread_stack: stack top %p, function %p, data: "
 		"%p\n", _stackTop, function, data);
 
+	// Save the stack top for system call entry.
+	thread->arch_info.syscall_rsp = stackTop;
+
 	// x86_64 uses registers for argument passing, first argument in RDI,
 	// however we don't save RDI on every context switch (there is no need
 	// for us to: it is not callee-save, and only contains the first argument
@@ -148,8 +151,46 @@ status_t
 arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	void* args2)
 {
-	panic("arch_thread_enter_userspace: TODO\n");
-	return B_ERROR;
+	addr_t stackTop = thread->user_stack_base + thread->user_stack_size;
+
+	TRACE("arch_thread_enter_userspace: entry %#lx, args %p %p, "
+		"stackTop %#lx\n", entry, args1, args2, stackTop);
+
+	// Copy the little stub that calls exit_thread() when the thread entry
+	// function returns.
+	// TODO: This will become a problem later if we want to support execute
+	// disable, the stack shouldn't really be executable.
+	size_t codeSize = (addr_t)x86_end_userspace_thread_exit
+		- (addr_t)x86_userspace_thread_exit;
+	stackTop -= codeSize;
+	if (user_memcpy((void*)stackTop, (const void*)&x86_userspace_thread_exit,
+			codeSize) != B_OK)
+		return B_BAD_ADDRESS;
+
+	// Copy the address of the stub to the top of the stack to act as the
+	// return address.
+	addr_t codeAddr = stackTop;
+	stackTop -= sizeof(codeAddr);
+	if (user_memcpy((void*)stackTop, (const void*)&codeAddr, sizeof(codeAddr))
+			!= B_OK)
+		return B_BAD_ADDRESS;
+
+	// Prepare the user iframe.
+	iframe frame = {};
+	frame.type = IFRAME_TYPE_SYSCALL;
+	frame.si = (uint64)args2;
+	frame.di = (uint64)args1;
+	frame.ip = entry;
+	frame.cs = USER_CODE_SEG;
+	frame.flags = X86_EFLAGS_RESERVED1 | X86_EFLAGS_INTERRUPT
+		| (3 << X86_EFLAGS_IO_PRIVILEG_LEVEL_SHIFT);
+	frame.sp = stackTop;
+	frame.ss = USER_DATA_SEG;
+
+	// Return to userland. Never returns.
+	x86_initial_return_to_userland(thread, &frame);
+
+	return B_OK;
 }
 
 

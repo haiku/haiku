@@ -76,7 +76,7 @@ init_amd_syscall_registers(void* dummy, int cpuNum)
 
 
 void
-x86_initialize_commpage_syscall(void)
+x86_initialize_syscall(void)
 {
 	void* syscallCode = (void *)&_user_syscall_int;
 	void* syscallCodeEnd = &_user_syscall_int_end;

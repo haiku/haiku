@@ -13,6 +13,7 @@
 #include <asm_defs.h>
 
 #include "asm_offsets.h"
+#include "syscall_numbers.h"
 
 
 .text
@@ -115,6 +116,17 @@ FUNCTION(x86_swap_pgdir):
 	movq	%rdi, %cr3
 	ret
 FUNCTION_END(x86_swap_pgdir)
+
+
+/* thread exit stub - copied to the userspace stack in arch_thread_enter_uspace() */
+.align 8
+FUNCTION(x86_userspace_thread_exit):
+	movq	%rax, %rdi
+	movq	$SYSCALL_EXIT_THREAD, %rax
+	syscall
+.align 8
+FUNCTION_END(x86_userspace_thread_exit)
+SYMBOL(x86_end_userspace_thread_exit):
 
 
 null_idt_descr:
