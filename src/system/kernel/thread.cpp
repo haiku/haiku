@@ -1889,8 +1889,8 @@ thread_exit(void)
 	struct thread_debug_info debugInfo;
 	team_id teamID = team->id;
 
-	TRACE(("thread %ld exiting w/return code %#lx\n", thread->id,
-		thread->exit.status));
+	TRACE(("thread %" B_PRId32 " exiting w/return code %#" B_PRIx32 "\n",
+		thread->id, thread->exit.status));
 
 	if (!are_interrupts_enabled())
 		panic("thread_exit() called with interrupts disabled!\n");
@@ -2095,7 +2095,8 @@ thread_exit(void)
 			kernelTeam->Unlock();
 		}
 
-		TRACE(("thread_exit: thread %ld now a kernel thread!\n", thread->id));
+		TRACE(("thread_exit: thread %" B_PRId32 " now a kernel thread!\n",
+			thread->id));
 	}
 
 	free(threadDeathEntry);
@@ -2232,7 +2233,7 @@ thread_at_kernel_entry(bigtime_t now)
 {
 	Thread *thread = thread_get_current_thread();
 
-	TRACE(("thread_at_kernel_entry: entry thread %ld\n", thread->id));
+	TRACE(("thread_at_kernel_entry: entry thread %" B_PRId32 "\n", thread->id));
 
 	// track user time
 	SpinLocker threadTimeLocker(thread->time_lock);
@@ -2255,7 +2256,7 @@ thread_at_kernel_exit(void)
 {
 	Thread *thread = thread_get_current_thread();
 
-	TRACE(("thread_at_kernel_exit: exit thread %ld\n", thread->id));
+	TRACE(("thread_at_kernel_exit: exit thread %" B_PRId32 "\n", thread->id));
 
 	handle_signals(thread);
 
@@ -2279,7 +2280,8 @@ thread_at_kernel_exit_no_signals(void)
 {
 	Thread *thread = thread_get_current_thread();
 
-	TRACE(("thread_at_kernel_exit_no_signals: exit thread %ld\n", thread->id));
+	TRACE(("thread_at_kernel_exit_no_signals: exit thread %" B_PRId32 "\n",
+		thread->id));
 
 	// track kernel time
 	bigtime_t now = system_time();

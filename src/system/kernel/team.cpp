@@ -976,7 +976,7 @@ ProcessGroup::ProcessGroup(pid_t id)
 
 ProcessGroup::~ProcessGroup()
 {
-	TRACE(("ProcessGroup::~ProcessGroup(): id = %ld\n", group->id));
+	TRACE(("ProcessGroup::~ProcessGroup(): id = %" B_PRId32 "\n", id));
 
 	// If the group is in the orphaned check list, remove it.
 	MutexLocker orphanedCheckLocker(sOrphanedCheckLock);
@@ -1482,7 +1482,8 @@ team_create_thread_start_internal(void* args)
 	team = thread->team;
 	cache_node_launched(teamArgs->arg_count, teamArgs->flat_args);
 
-	TRACE(("team_create_thread_start: entry thread %ld\n", thread->id));
+	TRACE(("team_create_thread_start: entry thread %" B_PRId32 "\n",
+		thread->id));
 
 	// Main stack area layout is currently as follows (starting from 0):
 	//
@@ -1604,8 +1605,8 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	const char* path = flatArgs[0];
 
-	TRACE(("load_image_internal: name '%s', args = %p, argCount = %ld\n",
-		path, flatArgs, argCount));
+	TRACE(("load_image_internal: name '%s', args = %p, argCount = %" B_PRId32
+		"\n", path, flatArgs, argCount));
 
 	// cut the path from the main thread name
 	const char* threadName = strrchr(path, '/');
@@ -1804,8 +1805,9 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	const char* threadName;
 	thread_id nubThreadID = -1;
 
-	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %ld\n",
-		path, argCount, envCount, team->id));
+	TRACE(("exec_team(path = \"%s\", argc = %" B_PRId32 ", envCount = %"
+		B_PRId32 "): team %" B_PRId32 "\n", path, argCount, envCount,
+		team->id));
 
 	T(ExecTeam(path, argCount, flatArgs, envCount, flatArgs + argCount + 1));
 
@@ -1942,7 +1944,7 @@ fork_team(void)
 	status_t status;
 	int32 cookie;
 
-	TRACE(("fork_team(): team %ld\n", parentTeam->id));
+	TRACE(("fork_team(): team %" B_PRId32 "\n", parentTeam->id));
 
 	if (parentTeam == team_get_kernel_team())
 		return B_NOT_ALLOWED;
@@ -2304,7 +2306,8 @@ wait_for_child(pid_t child, uint32 flags, siginfo_t& _info)
 	struct job_control_entry* freeDeathEntry = NULL;
 	status_t status = B_OK;
 
-	TRACE(("wait_for_child(child = %ld, flags = %ld)\n", child, flags));
+	TRACE(("wait_for_child(child = %" B_PRId32 ", flags = %" B_PRId32 ")\n",
+		child, flags));
 
 	T(WaitForChild(child, flags));
 
@@ -4078,7 +4081,7 @@ _user_load_image(const char* const* userFlatArgs, size_t flatArgsSize,
 	int32 argCount, int32 envCount, int32 priority, uint32 flags,
 	port_id errorPort, uint32 errorToken)
 {
-	TRACE(("_user_load_image: argc = %ld\n", argCount));
+	TRACE(("_user_load_image: argc = %" B_PRId32 "\n", argCount));
 
 	if (argCount < 1)
 		return B_BAD_VALUE;
