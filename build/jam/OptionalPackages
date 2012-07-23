@@ -53,8 +53,10 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	GitDoc					- documentation for the distributed version control system
 #	GPerf					- the perfect hash function generator.
 #	Groff					- text formatter used for man pages
+#	HGrep					- header grep tool
 #	ICU-devel				- the headers and lib-links for ICU (for development)
 #	KeymapSwitcher			- Easy to use keymap switcher
+#	LGrep					- Library Grep tool
 #	LibEvent				- An event notification library
 #	LibIconv				- text encoding conversion library
 #	LibLayout				- GCC2 package needed by some BeOS apps to compile
@@ -1057,6 +1059,18 @@ if [ IsOptionalHaikuImagePackageAdded Groff ] {
 }
 
 
+# HGgrep
+if [ IsOptionalHaikuImagePackageAdded HGrep ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package HGrep available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			hgrep-1.0-x86-gcc2-2012-07-23.zip
+			: $(baseURL)/hgrep-1.0-x86-gcc2-2012-07-23.zip ;
+	}
+}
+
+
 # ICU
 if [ IsOptionalHaikuImagePackageAdded ICU ] {
 	if $(TARGET_ARCH) != x86 {
@@ -1128,6 +1142,18 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Preferences
 			: /boot/common/bin/KeymapSwitcher ;
+	}
+}
+
+
+# LGrep
+if [ IsOptionalHaikuImagePackageAdded LGrep ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package LGrep available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			lgrep-1.0-x86-gcc2-2012-07-23.zip
+			: $(baseURL)/lgrep-1.0-x86-gcc2-2012-07-23.zip ;
 	}
 }
 
