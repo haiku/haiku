@@ -124,7 +124,7 @@ layoutT layout[] = {
 	{ 1, 1, 1 },
 	{ 5, 1, 5 },	// 1
 	{ 3, 1, 4 },	// 2
-	{ 1, 1, 1 },
+	{ 2, 1, 3 },
 	{ 2, 0, 3 },	// 4
 	{ 1, 1, 1 },
 	{ 1, 1, 1 },
@@ -542,16 +542,17 @@ ProcessController::DoDraw(bool force)
 	float right = left + gCPUcount * (barWidth + layout[gCPUcount].cpu_inter)
 		- layout[gCPUcount].cpu_inter; // right of CPU frame...
 	if (force && Parent()) {
-		SetHighColor(Parent()->ViewColor ());
+		SetHighColor(Parent()->ViewColor());
 		FillRect(BRect(right + 1, top - 1, right + 2, bottom + 1));
 	}
 
 	if (force) {
 		SetHighColor(frame_color);
 		StrokeRect(BRect(left - 1, top - 1, right, bottom + 1));
-		if (gCPUcount == 2) {
-			StrokeLine(BPoint(left + barWidth, top), BPoint(left + barWidth,
-				bottom));
+		if (gCPUcount > 1 && layout[gCPUcount].cpu_inter == 1) {
+			for (int x = 1; x < gCPUcount; x++)
+				StrokeLine(BPoint(left + x * barWidth + x - 1, top),
+					BPoint(left + x * barWidth + x - 1, bottom));
 		}
 	}
 	float leftMem = bounds.Width() - layout[gCPUcount].mem_width;
@@ -592,9 +593,9 @@ ProcessController::DoDraw(bool force)
 		fLastBarHeight[x] = barHeight;
 	}
 
-	float rightMem = bounds.Width () - 1;
+	float rightMem = bounds.Width() - 1;
 	float rem = fMemoryUsage * (h + 1);
-	float barHeight = floorf (rem);
+	float barHeight = floorf(rem);
 	rem -= barHeight;
 
 	rgb_color used_memory_color;
