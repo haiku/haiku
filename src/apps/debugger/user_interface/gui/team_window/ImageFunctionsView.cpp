@@ -16,7 +16,7 @@
 #include "table/TableColumns.h"
 
 #include "FunctionInstance.h"
-#include "GUISettingsUtils.h"
+#include "GuiSettingsUtils.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
@@ -398,7 +398,7 @@ ImageFunctionsView::LoadSettings(const BMessage& settings)
 {
 	BMessage tableSettings;
 	if (settings.FindMessage("functionsTable", &tableSettings) == B_OK) {
-		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
 			fFunctionsTable);
 	}
 }
@@ -410,7 +410,7 @@ ImageFunctionsView::SaveSettings(BMessage& settings)
 	settings.MakeEmpty();
 
 	BMessage tableSettings;
-	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
 		fFunctionsTable);
 	if (result == B_OK)
 		result = settings.AddMessage("functionsTable", &tableSettings);

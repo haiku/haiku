@@ -19,7 +19,7 @@ class FunctionInstance;
 class Image;
 class StackFrame;
 class Team;
-class TeamUISettings;
+class TeamUiSettings;
 class Thread;
 class TypeComponentPath;
 class UserBreakpoint;
@@ -49,9 +49,9 @@ public:
 									// shut down the UI *now* -- no more user
 									// feedback
 
-	virtual status_t			LoadSettings(const TeamUISettings* settings)
+	virtual status_t			LoadSettings(const TeamUiSettings* settings)
 									= 0;
-	virtual status_t			SaveSettings(TeamUISettings*& settings)
+	virtual status_t			SaveSettings(TeamUiSettings*& settings)
 									const = 0;
 
 	virtual	void				NotifyUser(const char* title,

@@ -12,23 +12,23 @@
 #include <ObjectList.h>
 
 #include "Setting.h"
-#include "TeamUISettings.h"
+#include "TeamUiSettings.h"
 
 
-class GUITeamUISettings : public TeamUISettings {
+class GuiTeamUiSettings : public TeamUiSettings {
 public:
-								GUITeamUISettings();
-								GUITeamUISettings(const char* settingsID);
-								GUITeamUISettings(const GUITeamUISettings&
+								GuiTeamUiSettings();
+								GuiTeamUiSettings(const char* settingsID);
+								GuiTeamUiSettings(const GuiTeamUiSettings&
 									other);
 									// throws std::bad_alloc
-								~GUITeamUISettings();
+								~GuiTeamUiSettings();
 
 	virtual team_ui_settings_type Type() const;
 	virtual	const char*			ID() const;
 	virtual	status_t			SetTo(const BMessage& archive);
 	virtual	status_t			WriteTo(BMessage& archive) const;
-	virtual TeamUISettings*		Clone() const;
+	virtual TeamUiSettings*		Clone() const;
 
 			bool				AddSettings(const char* settingID,
 									const BMessage& data);
@@ -37,12 +37,12 @@ public:
 
 			const BMessage&		Values() const;
 
-			GUITeamUISettings&	operator=(const GUITeamUISettings& other);
+			GuiTeamUiSettings&	operator=(const GuiTeamUiSettings& other);
 									// throws std::bad_alloc
 
 private:
 
-			status_t			_SetTo(const GUITeamUISettings& other);
+			status_t			_SetTo(const GuiTeamUiSettings& other);
 			void				_Unset();
 
 			BMessage			fValues;

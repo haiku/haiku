@@ -4,52 +4,52 @@
  */
 
 
-#include "GUITeamUISettings.h"
+#include "GuiTeamUiSettings.h"
 
 #include <Message.h>
 
 
-GUITeamUISettings::GUITeamUISettings()
+GuiTeamUiSettings::GuiTeamUiSettings()
 {
 }
 
 
-GUITeamUISettings::GUITeamUISettings(const char* settingsID)
+GuiTeamUiSettings::GuiTeamUiSettings(const char* settingsID)
 	:
 	fID(settingsID)
 {
 }
 
 
-GUITeamUISettings::GUITeamUISettings(const GUITeamUISettings& other)
+GuiTeamUiSettings::GuiTeamUiSettings(const GuiTeamUiSettings& other)
 {
 	if (_SetTo(other) != B_OK)
 		throw std::bad_alloc();
 }
 
 
-GUITeamUISettings::~GUITeamUISettings()
+GuiTeamUiSettings::~GuiTeamUiSettings()
 {
 	_Unset();
 }
 
 
 team_ui_settings_type
-GUITeamUISettings::Type() const
+GuiTeamUiSettings::Type() const
 {
 	return TEAM_UI_SETTINGS_TYPE_GUI;
 }
 
 
 const char*
-GUITeamUISettings::ID() const
+GuiTeamUiSettings::ID() const
 {
 	return fID.String();
 }
 
 
 status_t
-GUITeamUISettings::SetTo(const BMessage& archive)
+GuiTeamUiSettings::SetTo(const BMessage& archive)
 {
 	status_t error = archive.FindString("ID", &fID);
 	if (error != B_OK)
@@ -62,7 +62,7 @@ GUITeamUISettings::SetTo(const BMessage& archive)
 
 
 status_t
-GUITeamUISettings::WriteTo(BMessage& archive) const
+GuiTeamUiSettings::WriteTo(BMessage& archive) const
 {
 	archive.MakeEmpty();
 	status_t error = archive.AddString("ID", fID);
@@ -79,10 +79,10 @@ GUITeamUISettings::WriteTo(BMessage& archive) const
 }
 
 
-TeamUISettings*
-GUITeamUISettings::Clone() const
+TeamUiSettings*
+GuiTeamUiSettings::Clone() const
 {
-	GUITeamUISettings* settings = new(std::nothrow) GUITeamUISettings(fID);
+	GuiTeamUiSettings* settings = new(std::nothrow) GuiTeamUiSettings(fID);
 
 	if (settings == NULL)
 		return NULL;
@@ -97,7 +97,7 @@ GUITeamUISettings::Clone() const
 
 
 bool
-GUITeamUISettings::AddSettings(const char* settingID, const BMessage& data)
+GuiTeamUiSettings::AddSettings(const char* settingID, const BMessage& data)
 {
 	fValues.RemoveName(settingID);
 
@@ -106,21 +106,21 @@ GUITeamUISettings::AddSettings(const char* settingID, const BMessage& data)
 
 
 status_t
-GUITeamUISettings::Settings(const char* settingID, BMessage &data) const
+GuiTeamUiSettings::Settings(const char* settingID, BMessage &data) const
 {
 	return fValues.FindMessage(settingID, &data);
 }
 
 
 const BMessage&
-GUITeamUISettings::Values() const
+GuiTeamUiSettings::Values() const
 {
 	return fValues;
 }
 
 
-GUITeamUISettings&
-GUITeamUISettings::operator=(const GUITeamUISettings& other)
+GuiTeamUiSettings&
+GuiTeamUiSettings::operator=(const GuiTeamUiSettings& other)
 {
 	if (_SetTo(other) != B_OK)
 		throw std::bad_alloc();
@@ -130,7 +130,7 @@ GUITeamUISettings::operator=(const GUITeamUISettings& other)
 
 
 status_t
-GUITeamUISettings::_SetTo(const GUITeamUISettings& other)
+GuiTeamUiSettings::_SetTo(const GuiTeamUiSettings& other)
 {
 	_Unset();
 
@@ -143,7 +143,7 @@ GUITeamUISettings::_SetTo(const GUITeamUISettings& other)
 
 
 void
-GUITeamUISettings::_Unset()
+GuiTeamUiSettings::_Unset()
 {
 	fID.Truncate(0);
 

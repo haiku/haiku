@@ -4,7 +4,7 @@
  */
 
 
-#include "GUISettingsUtils.h"
+#include "GuiSettingsUtils.h"
 
 #include <Message.h>
 #include <SplitView.h>
@@ -13,7 +13,7 @@
 
 
 /*static*/ status_t
-GUISettingsUtils::ArchiveSplitView(BMessage& settings, BSplitView* view)
+GuiSettingsUtils::ArchiveSplitView(BMessage& settings, BSplitView* view)
 {
 	settings.MakeEmpty();
 	for (int32 i = 0; i < view->CountItems(); i++) {
@@ -29,7 +29,7 @@ GUISettingsUtils::ArchiveSplitView(BMessage& settings, BSplitView* view)
 
 
 /*static*/ void
-GUISettingsUtils::UnarchiveSplitView(const BMessage& settings,
+GuiSettingsUtils::UnarchiveSplitView(const BMessage& settings,
 	BSplitView* view)
 {
 	for (int32 i = 0; i < view->CountItems(); i++) {
@@ -45,7 +45,7 @@ GUISettingsUtils::UnarchiveSplitView(const BMessage& settings,
 
 
 /*static*/ status_t
-GUISettingsUtils::ArchiveTableSettings(BMessage& settings,
+GuiSettingsUtils::ArchiveTableSettings(BMessage& settings,
 	AbstractTable* table)
 {
 	settings.MakeEmpty();
@@ -56,7 +56,7 @@ GUISettingsUtils::ArchiveTableSettings(BMessage& settings,
 
 
 /*static*/ void
-GUISettingsUtils::UnarchiveTableSettings(const BMessage& settings,
+GuiSettingsUtils::UnarchiveTableSettings(const BMessage& settings,
 	AbstractTable* table)
 {
 	BMessage settingsCopy(settings);

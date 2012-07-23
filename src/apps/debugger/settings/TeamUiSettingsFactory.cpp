@@ -2,36 +2,37 @@
  * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
- 
-#include "TeamUISettingsFactory.h"
+
+
+#include "TeamUiSettingsFactory.h"
 
 #include <Message.h>
 
-#include "GUITeamUISettings.h"
+#include "GuiTeamUiSettings.h"
 
 
-TeamUISettingsFactory::TeamUISettingsFactory()
+TeamUiSettingsFactory::TeamUiSettingsFactory()
 {
 }
 
 
-TeamUISettingsFactory::~TeamUISettingsFactory()
+TeamUiSettingsFactory::~TeamUiSettingsFactory()
 {
 }
 
 
 status_t
-TeamUISettingsFactory::Create(const BMessage& archive, TeamUISettings*& 
-	settings)
+TeamUiSettingsFactory::Create(const BMessage& archive,
+	TeamUiSettings*& settings)
 {
 	int32 type;
 	status_t error = archive.FindInt32("type", &type);
 	if (error != B_OK)
 		return error;
-	
+
 	switch (type) {
 		case TEAM_UI_SETTINGS_TYPE_GUI:
-			settings = new(std::nothrow) GUITeamUISettings();
+			settings = new(std::nothrow) GuiTeamUiSettings();
 			if (settings == NULL)
 				return B_NO_MEMORY;
 
@@ -42,7 +43,7 @@ TeamUISettingsFactory::Create(const BMessage& archive, TeamUISettings*&
 				return error;
 			}
 			break;
-			
+
 		case TEAM_UI_SETTINGS_TYPE_CLI:
 			// TODO: implement once we have a CLI interface
 			// (and corresponding settings)
@@ -51,6 +52,6 @@ TeamUISettingsFactory::Create(const BMessage& archive, TeamUISettings*&
 		default:
 			return B_BAD_DATA;
 	}
-	
+
 	return B_OK;
 }

@@ -40,7 +40,7 @@
 #include "TeamMemoryBlock.h"
 #include "TeamMemoryBlockManager.h"
 #include "TeamSettings.h"
-#include "TeamUISettings.h"
+#include "TeamUiSettings.h"
 #include "Tracing.h"
 #include "ValueNode.h"
 #include "ValueNodeContainer.h"
@@ -1408,7 +1408,7 @@ TeamDebugger::_LoadSettings()
 			breakpointSetting->IsEnabled());
 	}
 
-	const TeamUISettings* uiSettings = fTeamSettings.UISettingFor(
+	const TeamUiSettings* uiSettings = fTeamSettings.UiSettingFor(
 		fUserInterface->ID());
 	if (uiSettings != NULL)
 			fUserInterface->LoadSettings(uiSettings);
@@ -1424,19 +1424,19 @@ TeamDebugger::_SaveSettings()
 	if (settings.SetTo(fTeam) != B_OK)
 		return;
 
-	TeamUISettings* uiSettings = NULL;
+	TeamUiSettings* uiSettings = NULL;
 	if (fUserInterface->SaveSettings(uiSettings) != B_OK)
 		return;
 	if (uiSettings != NULL)
-		settings.AddUISettings(uiSettings);
+		settings.AddUiSettings(uiSettings);
 
 	// preserve the UI settings from our cached copy.
-	for (int32 i = 0; i < fTeamSettings.CountUISettings(); i++) {
-		const TeamUISettings* oldUISettings = fTeamSettings.UISettingAt(i);
-		if (strcmp(oldUISettings->ID(), fUserInterface->ID()) != 0) {
-			TeamUISettings* clonedSettings = oldUISettings->Clone();
+	for (int32 i = 0; i < fTeamSettings.CountUiSettings(); i++) {
+		const TeamUiSettings* oldUiSettings = fTeamSettings.UiSettingAt(i);
+		if (strcmp(oldUiSettings->ID(), fUserInterface->ID()) != 0) {
+			TeamUiSettings* clonedSettings = oldUiSettings->Clone();
 			if (clonedSettings != NULL)
-				settings.AddUISettings(clonedSettings);
+				settings.AddUiSettings(clonedSettings);
 		}
 	}
 	locker.Unlock();

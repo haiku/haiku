@@ -16,7 +16,7 @@
 #include "table/TableColumns.h"
 
 #include "FunctionInstance.h"
-#include "GUISettingsUtils.h"
+#include "GuiSettingsUtils.h"
 #include "Image.h"
 #include "StackTrace.h"
 #include "TargetAddressTableColumn.h"
@@ -203,7 +203,7 @@ StackTraceView::LoadSettings(const BMessage& settings)
 {
 	BMessage tableSettings;
 	if (settings.FindMessage("framesTable", &tableSettings) == B_OK) {
-		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
 			fFramesTable);
 	}
 }
@@ -215,7 +215,7 @@ StackTraceView::SaveSettings(BMessage& settings)
 	settings.MakeEmpty();
 
 	BMessage tableSettings;
-	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
 		fFramesTable);
 	if (result == B_OK)
 		result = settings.AddMessage("framesTable", &tableSettings);

@@ -16,7 +16,7 @@
 #include <ObjectList.h>
 #include <ToolTip.h>
 
-#include "GUISettingsUtils.h"
+#include "GuiSettingsUtils.h"
 #include "table/TableColumns.h"
 #include "UiUtils.h"
 
@@ -289,7 +289,7 @@ ThreadListView::LoadSettings(const BMessage& settings)
 {
 	BMessage tableSettings;
 	if (settings.FindMessage("threadsTable", &tableSettings) == B_OK) {
-		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
 			fThreadsTable);
 	}
 }
@@ -301,7 +301,7 @@ ThreadListView::SaveSettings(BMessage& settings)
 	settings.MakeEmpty();
 
 	BMessage tableSettings;
-	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
 		fThreadsTable);
 	if (result == B_OK)
 		result = settings.AddMessage("threadsTable", &tableSettings);

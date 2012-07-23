@@ -145,14 +145,14 @@ CommandLineUserInterface::Terminate()
 
 
 status_t
-CommandLineUserInterface::LoadSettings(const TeamUISettings* settings)
+CommandLineUserInterface::LoadSettings(const TeamUiSettings* settings)
 {
 	return B_OK;
 }
 
 
 status_t
-CommandLineUserInterface::SaveSettings(TeamUISettings*& settings) const
+CommandLineUserInterface::SaveSettings(TeamUiSettings*& settings) const
 {
 	return B_OK;
 }
