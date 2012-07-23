@@ -117,6 +117,7 @@ const int32 kMaxAddPosesChunk = 50;
 const uint32 kMsgMouseDragged = 'Mdrg';
 const uint32 kMsgMouseLongDown = 'Mold';
 
+const int32 kRoomForLine = 2;
 
 namespace BPrivate {
 extern bool delete_point(void *);
@@ -478,7 +479,7 @@ BPoseView::AddColumnList(BObjectList<BColumn> *list)
 			column->SetOffset(nextLeftEdge);
 		}
 
-		nextLeftEdge = column->Offset() + column->Width()
+		nextLeftEdge = column->Offset() + column->Width() - kRoomForLine / 2.0f
 			+ kTitleColumnExtraMargin;
 		fColumnList->AddItem(column);
 
@@ -8312,9 +8313,6 @@ BPoseView::RecalcExtent()
 	for (int32 index = 0; index < count; index++)
 		AddToExtent(fPoseList->ItemAt(index)->CalcRect(this));
 }
-
-
-const int32 kRoomForLine = 2;
 
 
 BRect
