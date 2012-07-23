@@ -6,6 +6,9 @@ C++FLAGS += -Werror ;
 UsePrivateHeaders app debug interface kernel shared libroot ;
 UsePrivateSystemHeaders ;
 
+# Use gdb's readline. It would be better to use an optional build feature.
+UseHeaders [ FDirName $(HAIKU_TOP) src bin gdb ] : true ;
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
@@ -273,9 +276,14 @@ Application Debugger :
 	<bin>debug_utils.a
 	libcolumnlistview.a
 	libshared.a
+	libshared.a
+	libexpression_parser.a
+	libmapm.a
+	<gdb>libreadline.a
+	libtermcap.a
 
 	$(TARGET_LIBSTDC++)
-	be tracker libdebug.so libshared.a libexpression_parser.a libmapm.a
+	be tracker libdebug.so
 
 	: Debugger.rdef
 ;

@@ -11,7 +11,11 @@
 
 #include <algorithm>
 
+#include <readline/history.h>
+#include <readline/readline.h>
+
 #include <ArgumentVector.h>
+#include <AutoDeleter.h>
 #include <Referenceable.h>
 
 #include "CliCommand.h"
@@ -226,16 +230,15 @@ CommandLineUserInterface::_InputLoop()
 {
 	while (!fTerminating) {
 		// read a command line
-		printf("debugger> ");
-		fflush(stdout);
-		char buffer[256];
-		if (fgets(buffer, sizeof(buffer), stdin) == NULL)
+		char* line = readline("debugger> ");
+		if (line == NULL)
 			break;
+		MemoryDeleter lineDeleter(line);
 
 		// parse the command line
 		ArgumentVector args;
 		const char* parseErrorLocation;
-		switch (args.Parse(buffer, &parseErrorLocation)) {
+		switch (args.Parse(line, &parseErrorLocation)) {
 			case ArgumentVector::NO_ERROR:
 				break;
 			case ArgumentVector::NO_MEMORY:
@@ -243,7 +246,7 @@ CommandLineUserInterface::_InputLoop()
 				continue;
 			case ArgumentVector::UNTERMINATED_QUOTED_STRING:
 				printf("Parse error: Unterminated quoted string starting at "
-					"character %zu.\n", parseErrorLocation - buffer + 1);
+					"character %zu.\n", parseErrorLocation - line + 1);
 				continue;
 			case ArgumentVector::TRAILING_BACKSPACE:
 				printf("Parse error: trailing backspace.\n");
@@ -252,6 +255,8 @@ CommandLineUserInterface::_InputLoop()
 
 		if (args.ArgumentCount() == 0)
 			continue;
+
+		add_history(line);
 
 		_ExecuteCommand(args.ArgumentCount(), args.Arguments());
 	}
