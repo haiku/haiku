@@ -176,6 +176,7 @@ Application Debugger :
 	# user_interface/cli
 	CliCommand.cpp
 	CliContext.cpp
+	CliThreadsCommand.cpp
 	CliQuitCommand.cpp
 	CommandLineUserInterface.cpp
 

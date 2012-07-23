@@ -20,6 +20,7 @@
 
 #include "CliContext.h"
 #include "CliQuitCommand.h"
+#include "CliThreadsCommand.h"
 
 
 // #pragma mark - CommandEntry
@@ -243,7 +244,8 @@ status_t
 CommandLineUserInterface::_RegisterCommands()
 {
 	if (_RegisterCommand("help", new(std::nothrow) HelpCommand(this)) &&
-		_RegisterCommand("quit", new(std::nothrow) CliQuitCommand)) {
+		_RegisterCommand("quit", new(std::nothrow) CliQuitCommand) &&
+		_RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)) {
 		return B_OK;
 	}
 
