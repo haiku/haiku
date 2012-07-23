@@ -2013,7 +2013,7 @@ BlockAllocator::_CheckInodeBlocks(Inode* inode, const char* name)
 					fCheckCookie->control.stats.double_indirect_block_runs++;
 					fCheckCookie->control.stats.blocks_in_double_indirect
 						+= runs[index % runsPerBlock].Length();
-				} while ((++index % runsPerArray) != 0);
+				} while ((++index % runsPerBlock) != 0);
 			}
 
 			fCheckCookie->control.stats.double_indirect_array_blocks++;
