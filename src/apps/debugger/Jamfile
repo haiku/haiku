@@ -30,6 +30,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value type_handlers ] ;
@@ -220,6 +221,9 @@ Application Debugger :
 	TableCellStringRenderer.cpp
 	TableCellValueRenderer.cpp
 	TableCellValueRendererUtils.cpp
+
+	# user_interface/util
+	UiUtils.cpp
 
 	# util
 	ArchivingUtils.cpp

@@ -18,6 +18,7 @@
 
 #include "GUISettingsUtils.h"
 #include "table/TableColumns.h"
+#include "UiUtils.h"
 
 
 enum {
@@ -114,35 +115,10 @@ public:
 				return true;
 			case 1:
 			{
-				switch (thread->State()) {
-					case THREAD_STATE_RUNNING:
-						value.SetTo("Running", B_VARIANT_DONT_COPY_DATA);
-						return true;
-					case THREAD_STATE_STOPPED:
-						break;
-					case THREAD_STATE_UNKNOWN:
-					default:
-						value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
-						return true;
-				}
-
-				// thread is stopped -- get the reason
-				switch (thread->StoppedReason()) {
-					case THREAD_STOPPED_DEBUGGER_CALL:
-						value.SetTo("Call", B_VARIANT_DONT_COPY_DATA);
-						return true;
-					case THREAD_STOPPED_EXCEPTION:
-						value.SetTo("Exception", B_VARIANT_DONT_COPY_DATA);
-						return true;
-					case THREAD_STOPPED_BREAKPOINT:
-					case THREAD_STOPPED_WATCHPOINT:
-					case THREAD_STOPPED_SINGLE_STEP:
-					case THREAD_STOPPED_DEBUGGED:
-					case THREAD_STOPPED_UNKNOWN:
-					default:
-						value.SetTo("Debugged", B_VARIANT_DONT_COPY_DATA);
-						return true;
-				}
+				const char* string = UiUtils::ThreadStateToString(
+					thread->State(), thread->StoppedReason());
+				value.SetTo(string, B_VARIANT_DONT_COPY_DATA);
+				return true;
 			}
 			case 2:
 				value.SetTo(thread->Name(), B_VARIANT_DONT_COPY_DATA);
