@@ -6929,10 +6929,11 @@ BPoseView::MouseUp(BPoint where)
 
 	int32 index;
 	BPose* pose = FindPose(where, &index);
-	if (pose != NULL && fAllowPoseEditing)
+	uint32 lastButtons = Window()->CurrentMessage()->FindInt32("last_buttons");
+	if (pose != NULL && fAllowPoseEditing && !fTrackRightMouseUp)
 		pose->MouseUp(BPoint(0, index * fListElemHeight), this, where, index);
 
-	uint32 lastButtons = Window()->CurrentMessage()->FindInt32("last_buttons");
+
 		// this handy field has been added by the tracking filter.
 		// we need lastButtons for right button mouse-up tracking,
 		// because there's currently no way to know wich buttons were
