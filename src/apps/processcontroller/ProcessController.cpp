@@ -772,28 +772,30 @@ thread_popup(void *arg)
 
 	addtopbottom(new BSeparatorItem());
 
-	int32 cookie = 0;
-	image_info info;
-	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
-		if (info.type == B_APP_IMAGE) {
-			// only show the Live in Deskbar item if a) we're running in
-			// deskbar itself, or b) we're running in PC's team.
-			if (strstr(info.name, "Deskbar") == NULL
-				&& strstr(info.name, "ProcessController") == NULL) {
-				break;
-			}
-
-			if (be_roster->IsRunning(kDeskbarSig)) {
-				item = new BMenuItem(B_TRANSLATE("Live in the Deskbar"),
-				new BMessage('AlDb'));
-				BDeskbar deskbar;
-				item->SetMarked(gInDeskbar
-					|| deskbar.HasItem(kDeskbarItemName));
-				item->SetTarget(gPCView);
-				addtopbottom(item);
-				addtopbottom(new BSeparatorItem ());
+	bool showLiveInDeskbarItem = gInDeskbar;
+	if (!showLiveInDeskbarItem) {
+		int32 cookie = 0;
+		image_info info;
+		while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+			if (info.type == B_APP_IMAGE) {
+				// only show the Live in Deskbar item if a) we're running in
+				// deskbar itself, or b) we're running in PC's team.
+				if (strstr(info.name, "ProcessController") != NULL) {
+					showLiveInDeskbarItem = true;
+					break;
+				}
 			}
 		}
+	}
+
+	if (showLiveInDeskbarItem && be_roster->IsRunning(kDeskbarSig)) {
+		item = new BMenuItem(B_TRANSLATE("Live in the Deskbar"),
+			new BMessage('AlDb'));
+		BDeskbar deskbar;
+		item->SetMarked(gInDeskbar || deskbar.HasItem(kDeskbarItemName));
+		item->SetTarget(gPCView);
+		addtopbottom(item);
+		addtopbottom(new BSeparatorItem ());
 	}
 
 
