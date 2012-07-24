@@ -118,6 +118,7 @@ NotificationsView::NotificationsView()
 		.End()
 		.Add(fApplications)
 		.Add(fNotifications)
+		.SetInsets(inset, inset, inset, inset)
 	);
 }
 

@@ -65,6 +65,7 @@ DisplayView::DisplayView(SettingsHost* host)
 		.Add(fIconSizeField->CreateLabelLayoutItem(), 0, 1)
 		.Add(fIconSizeField->CreateMenuBarLayoutItem(), 1, 1)
 		.Add(BSpaceLayoutItem::CreateGlue(), 0, 2, 2, 1)
+		.SetInsets(inset, inset, inset, inset)
 	);
 }
 
