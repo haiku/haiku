@@ -3,11 +3,9 @@ SubDir HAIKU_TOP src apps debugger ;
 CCFLAGS +=  -Werror ;
 C++FLAGS += -Werror ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UsePrivateHeaders app debug interface kernel shared libroot ;
 UsePrivateSystemHeaders ;
-
-# Use gdb's readline. It would be better to use an optional build feature.
-UseHeaders [ FDirName $(HAIKU_TOP) src bin gdb ] : true ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
@@ -286,11 +284,11 @@ Application Debugger :
 	libshared.a
 	libexpression_parser.a
 	libmapm.a
-	<gdb>libreadline.a
+	libedit.a
 	libtermcap.a
 
 	$(TARGET_LIBSTDC++)
-	be tracker libdebug.so
+	be tracker libbsd.so libdebug.so
 
 	: Debugger.rdef
 ;

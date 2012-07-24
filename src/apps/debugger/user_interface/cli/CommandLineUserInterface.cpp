@@ -11,9 +11,6 @@
 
 #include <algorithm>
 
-#include <readline/history.h>
-#include <readline/readline.h>
-
 #include <ArgumentVector.h>
 #include <AutoDeleter.h>
 #include <Referenceable.h>
@@ -21,6 +18,13 @@
 #include "CliContext.h"
 #include "CliQuitCommand.h"
 #include "CliThreadsCommand.h"
+
+
+static const char*
+get_prompt(EditLine* editLine)
+{
+	return "debugger> ";
+}
 
 
 // #pragma mark - CommandEntry
@@ -79,6 +83,8 @@ private:
 CommandLineUserInterface::CommandLineUserInterface()
 	:
 	fCommands(20, true),
+	fEditLine(NULL),
+	fHistory(NULL),
 	fShowSemaphore(-1),
 	fShown(false),
 	fTerminating(false)
@@ -90,6 +96,12 @@ CommandLineUserInterface::~CommandLineUserInterface()
 {
 	if (fShowSemaphore >= 0)
 		delete_sem(fShowSemaphore);
+
+	if (fEditLine != NULL)
+		el_end(fEditLine);
+
+	if (fHistory != NULL)
+		history_end(fHistory);
 }
 
 
@@ -112,6 +124,21 @@ CommandLineUserInterface::Init(Team* team, UserInterfaceListener* listener)
 	fShowSemaphore = create_sem(0, "show CLI");
 	if (fShowSemaphore < 0)
 		return fShowSemaphore;
+
+	fEditLine = el_init("Debugger", stdin, stdout, stderr);
+	if (fEditLine == NULL)
+		return B_ERROR;
+
+	fHistory = history_init();
+	if (fHistory == NULL)
+		return B_ERROR;
+
+	HistEvent historyEvent;
+	history(fHistory, &historyEvent, H_SETSIZE, 100);
+
+	el_set(fEditLine, EL_HIST, &history, fHistory);
+	el_set(fEditLine, EL_EDITOR, "emacs");
+	el_set(fEditLine, EL_PROMPT, &get_prompt);
 
 	return B_OK;
 }
@@ -140,6 +167,16 @@ CommandLineUserInterface::Terminate()
 		// The main thread will still be blocked in Run(). Unblock it.
 		delete_sem(fShowSemaphore);
 		fShowSemaphore = -1;
+	}
+
+	if (fEditLine != NULL) {
+		el_end(fEditLine);
+		fEditLine = NULL;
+	}
+
+	if (fHistory != NULL) {
+		history_end(fHistory);
+		fHistory = NULL;
 	}
 }
 
@@ -205,10 +242,10 @@ CommandLineUserInterface::_InputLoop()
 {
 	while (!fTerminating) {
 		// read a command line
-		char* line = readline("debugger> ");
+		int count;
+		const char* line = el_gets(fEditLine, &count);
 		if (line == NULL)
 			break;
-		MemoryDeleter lineDeleter(line);
 
 		// parse the command line
 		ArgumentVector args;
@@ -231,8 +268,11 @@ CommandLineUserInterface::_InputLoop()
 		if (args.ArgumentCount() == 0)
 			continue;
 
-		add_history(line);
+		// add line to history
+		HistEvent historyEvent;
+		history(fHistory, &historyEvent, H_ENTER, line);
 
+		// execute command
 		_ExecuteCommand(args.ArgumentCount(), args.Arguments());
 	}
 

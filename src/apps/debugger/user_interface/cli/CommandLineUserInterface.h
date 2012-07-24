@@ -7,6 +7,10 @@
 #define COMMAND_LINE_USER_INTERFACE_H
 
 
+#include <sys/cdefs.h>
+	// Needed in histedit.h.
+#include <histedit.h>
+
 #include <ObjectList.h>
 #include <String.h>
 
@@ -69,6 +73,8 @@ private:
 private:
 			CliContext			fContext;
 			CommandList			fCommands;
+			EditLine*			fEditLine;
+			History*			fHistory;
 			sem_id				fShowSemaphore;
 			bool				fShown;
 			bool				fTerminating;
