@@ -36,12 +36,12 @@ get_program_path()
 static int32
 count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 {
-	struct Elf32_Phdr* pheaders;
+	elf_phdr* pheaders;
 	int32 count = 0;
 	int i;
 
 	for (i = 0; i < phnum; i++) {
-		pheaders = (struct Elf32_Phdr*)(buff + i * phentsize);
+		pheaders = (elf_phdr*)(buff + i * phentsize);
 
 		switch (pheaders->p_type) {
 			case PT_NULL:
@@ -78,7 +78,7 @@ count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 				// we don't use it
 				break;
 			default:
-				FATAL("%s: Unhandled pheader type in count 0x%lx\n",
+				FATAL("%s: Unhandled pheader type in count 0x%" B_PRIx32 "\n",
 					imagePath, pheaders->p_type);
 				return B_BAD_DATA;
 		}
@@ -91,13 +91,13 @@ count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 static status_t
 parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 {
-	struct Elf32_Phdr* pheader;
+	elf_phdr* pheader;
 	int regcount;
 	int i;
 
 	regcount = 0;
 	for (i = 0; i < phnum; i++) {
-		pheader = (struct Elf32_Phdr*)(buff + i * phentsize);
+		pheader = (elf_phdr*)(buff + i * phentsize);
 
 		switch (pheader->p_type) {
 			case PT_NULL:
@@ -194,7 +194,7 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 				// we don't use it
 				break;
 			default:
-				FATAL("%s: Unhandled pheader type in parse 0x%lx\n",
+				FATAL("%s: Unhandled pheader type in parse 0x%" B_PRIx32 "\n",
 					image->path, pheader->p_type);
 				return B_BAD_DATA;
 		}
@@ -227,7 +227,7 @@ assert_dynamic_loadable(image_t* image)
 static bool
 parse_dynamic_segment(image_t* image)
 {
-	struct Elf32_Dyn* d;
+	elf_dyn* d;
 	int i;
 	int sonameOffset = -1;
 
@@ -235,7 +235,7 @@ parse_dynamic_segment(image_t* image)
 	image->syms = 0;
 	image->strtab = 0;
 
-	d = (struct Elf32_Dyn*)image->dynamic_ptr;
+	d = (elf_dyn*)image->dynamic_ptr;
 	if (!d)
 		return true;
 
@@ -253,18 +253,18 @@ parse_dynamic_segment(image_t* image)
 					= (char*)(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_SYMTAB:
-				image->syms = (struct Elf32_Sym*)
+				image->syms = (elf_sym*)
 					(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_REL:
-				image->rel = (struct Elf32_Rel*)
+				image->rel = (elf_rel*)
 					(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_RELSZ:
 				image->rel_len = d[i].d_un.d_val;
 				break;
 			case DT_RELA:
-				image->rela = (struct Elf32_Rela*)
+				image->rela = (elf_rela*)
 					(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_RELASZ:
@@ -272,7 +272,7 @@ parse_dynamic_segment(image_t* image)
 				break;
 			case DT_JMPREL:
 				// procedure linkage table relocations
-				image->pltrel = (struct Elf32_Rel*)
+				image->pltrel = (elf_rel*)
 					(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_PLTRELSZ:
@@ -290,18 +290,18 @@ parse_dynamic_segment(image_t* image)
 				sonameOffset = d[i].d_un.d_val;
 				break;
 			case DT_VERSYM:
-				image->symbol_versions = (Elf32_Versym*)
+				image->symbol_versions = (elf_versym*)
 					(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_VERDEF:
-				image->version_definitions = (Elf32_Verdef*)
+				image->version_definitions = (elf_verdef*)
 					(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_VERDEFNUM:
 				image->num_version_definitions = d[i].d_un.d_val;
 				break;
 			case DT_VERNEED:
-				image->needed_versions = (Elf32_Verneed*)
+				image->needed_versions = (elf_verneed*)
 					(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_VERNEEDNUM:
@@ -350,19 +350,19 @@ parse_dynamic_segment(image_t* image)
 
 
 status_t
-parse_elf_header(struct Elf32_Ehdr* eheader, int32* _pheaderSize,
+parse_elf_header(elf_ehdr* eheader, int32* _pheaderSize,
 	int32* _sheaderSize)
 {
 	if (memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
 		return B_NOT_AN_EXECUTABLE;
 
-	if (eheader->e_ident[4] != ELFCLASS32)
+	if (eheader->e_ident[4] != ELF_CLASS)
 		return B_NOT_AN_EXECUTABLE;
 
 	if (eheader->e_phoff == 0)
 		return B_NOT_AN_EXECUTABLE;
 
-	if (eheader->e_phentsize < sizeof(struct Elf32_Phdr))
+	if (eheader->e_phentsize < sizeof(elf_phdr))
 		return B_NOT_AN_EXECUTABLE;
 
 	*_pheaderSize = eheader->e_phentsize * eheader->e_phnum;
@@ -389,7 +389,7 @@ load_image(char const* name, image_type type, const char* rpath,
 	status_t status;
 	int fd;
 
-	struct Elf32_Ehdr eheader;
+	elf_ehdr eheader;
 
 	// Have we already loaded that image? Don't check for add-ons -- we always
 	// reload them.
@@ -480,8 +480,8 @@ load_image(char const* name, image_type type, const char* rpath,
 	numRegions = count_regions(path, pheaderBuffer, eheader.e_phnum,
 		eheader.e_phentsize);
 	if (numRegions <= 0) {
-		FATAL("%s: Troubles parsing Program headers, numRegions = %ld\n",
-			path, numRegions);
+		FATAL("%s: Troubles parsing Program headers, numRegions = %" B_PRId32
+			"\n", path, numRegions);
 		status = B_BAD_DATA;
 		goto err1;
 	}

@@ -50,7 +50,7 @@ update_image_id(image_t* image)
 		}
 	}
 
-	FATAL("Could not update image ID %ld after fork()!\n", image->id);
+	FATAL("Could not update image ID %" B_PRId32 " after fork()!\n", image->id);
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -330,7 +330,7 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 	for (uint32 i = 0; i < image->num_regions; i++) {
 		char regionName[B_OS_NAME_LENGTH];
 
-		snprintf(regionName, sizeof(regionName), "%s_seg%lu%s",
+		snprintf(regionName, sizeof(regionName), "%s_seg%" B_PRIu32 "%s",
 			baseName, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
 		get_image_region_load_address(image, i,

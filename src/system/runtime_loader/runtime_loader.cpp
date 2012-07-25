@@ -9,7 +9,6 @@
 
 #include "runtime_loader_private.h"
 
-#include <elf32.h>
 #include <syscalls.h>
 #include <user_runtime.h>
 
@@ -348,7 +347,7 @@ test_executable(const char *name, char *invoker)
 			status = B_OK;
 		}
 	} else if (status == B_OK) {
-		struct Elf32_Ehdr *elfHeader = (struct Elf32_Ehdr *)buffer;
+		elf_ehdr *elfHeader = (elf_ehdr *)buffer;
 		if (elfHeader->e_entry == 0) {
 			// we don't like to open shared libraries
 			status = B_NOT_AN_EXECUTABLE;

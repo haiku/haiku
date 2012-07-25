@@ -26,7 +26,7 @@ assert_defined_image_version(image_t* dependentImage, image_t* image,
 	}
 
 	// iterate through the defined versions to find the given one
-	Elf32_Verdef* definition = image->version_definitions;
+	elf_verdef* definition = image->version_definitions;
 	for (uint32 i = 0; i < image->num_version_definitions; i++) {
 		uint32 versionIndex = VER_NDX(definition->vd_ndx);
 		elf_version_info& info = image->versions[versionIndex];
@@ -36,8 +36,7 @@ assert_defined_image_version(image_t* dependentImage, image_t* image,
 			return B_OK;
 		}
 
-		definition = (Elf32_Verdef*)
-			((uint8*)definition + definition->vd_next);
+		definition = (elf_verdef*)((uint8*)definition + definition->vd_next);
 	}
 
 	// version not found -- fail, if not weak
@@ -63,7 +62,7 @@ init_image_version_infos(image_t* image)
 	uint32 maxIndex = 0;
 
 	if (image->version_definitions != NULL) {
-		Elf32_Verdef* definition = image->version_definitions;
+		elf_verdef* definition = image->version_definitions;
 		for (uint32 i = 0; i < image->num_version_definitions; i++) {
 			if (definition->vd_version != 1) {
 				FATAL("%s: Unsupported version definition revision: %u\n",
@@ -75,13 +74,13 @@ init_image_version_infos(image_t* image)
 			if (versionIndex > maxIndex)
 				maxIndex = versionIndex;
 
-			definition = (Elf32_Verdef*)
-				((uint8*)definition	+ definition->vd_next);
+			definition = (elf_verdef*)
+				((uint8*)definition + definition->vd_next);
 		}
 	}
 
 	if (image->needed_versions != NULL) {
-		Elf32_Verneed* needed = image->needed_versions;
+		elf_verneed* needed = image->needed_versions;
 		for (uint32 i = 0; i < image->num_needed_versions; i++) {
 			if (needed->vn_version != 1) {
 				FATAL("%s: Unsupported version needed revision: %u\n",
@@ -89,17 +88,17 @@ init_image_version_infos(image_t* image)
 				return B_BAD_VALUE;
 			}
 
-			Elf32_Vernaux* vernaux
-				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+			elf_vernaux* vernaux
+				= (elf_vernaux*)((uint8*)needed + needed->vn_aux);
 			for (uint32 k = 0; k < needed->vn_cnt; k++) {
 				uint32 versionIndex = VER_NDX(vernaux->vna_other);
 				if (versionIndex > maxIndex)
 					maxIndex = versionIndex;
 
-				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+				vernaux = (elf_vernaux*)((uint8*)vernaux + vernaux->vna_next);
 			}
 
-			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+			needed = (elf_verneed*)((uint8*)needed + needed->vn_next);
 		}
 	}
 
@@ -119,12 +118,12 @@ init_image_version_infos(image_t* image)
 
 	// version definitions
 	if (image->version_definitions != NULL) {
-		Elf32_Verdef* definition = image->version_definitions;
+		elf_verdef* definition = image->version_definitions;
 		for (uint32 i = 0; i < image->num_version_definitions; i++) {
 			if (definition->vd_cnt > 0
 				&& (definition->vd_flags & VER_FLG_BASE) == 0) {
-				Elf32_Verdaux* verdaux
-					= (Elf32_Verdaux*)((uint8*)definition + definition->vd_aux);
+				elf_verdaux* verdaux
+					= (elf_verdaux*)((uint8*)definition + definition->vd_aux);
 
 				uint32 versionIndex = VER_NDX(definition->vd_ndx);
 				elf_version_info& info = image->versions[versionIndex];
@@ -133,19 +132,19 @@ init_image_version_infos(image_t* image)
 				info.file_name = NULL;
 			}
 
-			definition = (Elf32_Verdef*)
+			definition = (elf_verdef*)
 				((uint8*)definition + definition->vd_next);
 		}
 	}
 
 	// needed versions
 	if (image->needed_versions != NULL) {
-		Elf32_Verneed* needed = image->needed_versions;
+		elf_verneed* needed = image->needed_versions;
 		for (uint32 i = 0; i < image->num_needed_versions; i++) {
 			const char* fileName = STRING(image, needed->vn_file);
 
-			Elf32_Vernaux* vernaux
-				= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+			elf_vernaux* vernaux
+				= (elf_vernaux*)((uint8*)needed + needed->vn_aux);
 			for (uint32 k = 0; k < needed->vn_cnt; k++) {
 				uint32 versionIndex = VER_NDX(vernaux->vna_other);
 				elf_version_info& info = image->versions[versionIndex];
@@ -153,10 +152,10 @@ init_image_version_infos(image_t* image)
 				info.name = STRING(image, vernaux->vna_name);
 				info.file_name = fileName;
 
-				vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+				vernaux = (elf_vernaux*)((uint8*)vernaux + vernaux->vna_next);
 			}
 
-			needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+			needed = (elf_verneed*)((uint8*)needed + needed->vn_next);
 		}
 	}
 
@@ -170,7 +169,7 @@ check_needed_image_versions(image_t* image)
 	if (image->needed_versions == NULL)
 		return B_OK;
 
-	Elf32_Verneed* needed = image->needed_versions;
+	elf_verneed* needed = image->needed_versions;
 	for (uint32 i = 0; i < image->num_needed_versions; i++) {
 		const char* fileName = STRING(image, needed->vn_file);
 		image_t* dependency = find_loaded_image_by_name(fileName,
@@ -183,8 +182,8 @@ check_needed_image_versions(image_t* image)
 			return B_FILE_NOT_FOUND;
 		}
 
-		Elf32_Vernaux* vernaux
-			= (Elf32_Vernaux*)((uint8*)needed + needed->vn_aux);
+		elf_vernaux* vernaux
+			= (elf_vernaux*)((uint8*)needed + needed->vn_aux);
 		for (uint32 k = 0; k < needed->vn_cnt; k++) {
 			uint32 versionIndex = VER_NDX(vernaux->vna_other);
 			elf_version_info& info = image->versions[versionIndex];
@@ -194,10 +193,10 @@ check_needed_image_versions(image_t* image)
 			if (error != B_OK)
 				return error;
 
-			vernaux = (Elf32_Vernaux*)((uint8*)vernaux + vernaux->vna_next);
+			vernaux = (elf_vernaux*)((uint8*)vernaux + vernaux->vna_next);
 		}
 
-		needed = (Elf32_Verneed*)((uint8*)needed + needed->vn_next);
+		needed = (elf_verneed*)((uint8*)needed + needed->vn_next);
 	}
 
 	return B_OK;
