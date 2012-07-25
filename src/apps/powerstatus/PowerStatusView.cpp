@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -419,6 +419,10 @@ PowerStatusView::FromMessage(const BMessage* archive)
 		fShowStatusIcon = value;
 	if (archive->FindBool("show time", &value) == B_OK)
 		fShowTime = value;
+	
+	//Incase we have a bad saving and none are showed..
+	if (!fShowLabel && !fShowStatusIcon)
+		fShowLabel = true;
 
 	int32 intValue;
 	if (archive->FindInt32("battery id", &intValue) == B_OK)
@@ -539,7 +543,11 @@ PowerStatusReplicant::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgToggleLabel:
-			fShowLabel = !fShowLabel;
+			if (fShowStatusIcon)
+				fShowLabel = !fShowLabel;
+			else
+				fShowLabel = true;
+				
 			Update(true);
 			break;
 
@@ -549,7 +557,11 @@ PowerStatusReplicant::MessageReceived(BMessage *message)
 			break;
 
 		case kMsgToggleStatusIcon:
-			fShowStatusIcon = !fShowStatusIcon;
+			if (fShowLabel)
+				fShowStatusIcon = !fShowStatusIcon;
+			else
+				fShowStatusIcon = true;
+
 			Update(true);
 			break;
 
