@@ -52,6 +52,7 @@ Inode::CreateDir(const char* name, int mode)
 
 		req.Create(NF4DIR, name, cattr, i);
 
+		req.GetFH();
 		Attribute attr[] = { FATTR4_FILEID };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
@@ -76,6 +77,11 @@ Inode::CreateDir(const char* name, int mode)
 		if (result != B_OK)
 			return result;
 
+		FileHandle handle;
+		result = reply.GetFH(&handle);
+		if (result != B_OK)
+			return result;
+
 		AttrValue* values;
 		uint32 count;
 		result = reply.GetAttr(&values, &count);
@@ -86,9 +92,11 @@ Inode::CreateDir(const char* name, int mode)
 		if (count == 0)
 			fileID = fFileSystem->AllocFileId();
 		else
-			fileID = values[1].fData.fValue64;
+			fileID = values[0].fData.fValue64;
 
-		fFileSystem->Root()->MakeInfoInvalid();
+		result = _ChildAdded(name, fileID, handle);
+		if (result != B_OK)
+			return B_OK;
 
 		if (fCache->Lock() == B_OK) {
 			if (atomic && fCache->ChangeInfo() == before) {

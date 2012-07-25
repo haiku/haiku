@@ -135,8 +135,9 @@ ReplyInterpreter::Create(uint64* before, uint64* after, bool& atomic)
 	atomic = fReply->Stream().GetBoolean();
 	*before = fReply->Stream().GetUHyper();
 	*after = fReply->Stream().GetUHyper();
+
 	uint32 count = fReply->Stream().GetUInt();
-	for (uint32 i; i < count; i++)
+	for (uint32 i = 0; i < count; i++)
 		fReply->Stream().GetUInt();
 
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
@@ -252,7 +253,8 @@ ReplyInterpreter::LockU(LockInfo* linfo)
 
 
 status_t
-ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm)
+ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm, uint64* _before,
+	uint64* _after, bool* _atomic)
 {
 	status_t res = _OperationError(OpOpen);
 	if (res != B_OK)
@@ -264,9 +266,15 @@ ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm)
 	id[2] = fReply->Stream().GetUInt();
 
 	// change info
-	fReply->Stream().GetBoolean();
-	fReply->Stream().GetUHyper();
-	fReply->Stream().GetUHyper();
+	bool atomic = fReply->Stream().GetBoolean();
+	if (_atomic != NULL)
+		*_atomic = atomic;
+	uint64 before = fReply->Stream().GetUHyper();
+	if (_before != NULL)
+		*_before = before;
+	uint64 after = fReply->Stream().GetUHyper();
+	if (_after != NULL)
+		*_after = after;
 
 	uint32 flags = fReply->Stream().GetUInt();
 	*confirm = (flags & OPEN4_RESULT_CONFIRM) == OPEN4_RESULT_CONFIRM;

@@ -229,25 +229,9 @@ Inode::LookUp(const char* name, ino_t* id)
 
 		*id = _FileIdToInoT(fileId);
 
-		FileInfo fi;
-		fi.fFileId = fileId;
-		fi.fHandle = fh;
-		fi.fParent = fInfo.fHandle;
-		fi.fName = strdup(name);
-		if (fi.fName == NULL)
-			return B_NO_MEMORY;
-
-		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-			strlen(fInfo.fPath)));
-		if (path == NULL)
-			return B_NO_MEMORY;
-
-		strcpy(path, fInfo.fPath);
-		strcat(path, "/");
-		strcat(path, name);
-		fi.fPath = path;
-
-		fFileSystem->InoIdMap()->AddEntry(fi, *id);
+		result = _ChildAdded(name, fileId, fh);
+		if (result != B_OK)
+			return result;
 
 		fFileSystem->Revalidator().Lock();
 		if (fCache->Lock() != B_OK) {
@@ -281,10 +265,6 @@ Inode::Link(Inode* dir, const char* name)
 		req.PutFH(dir->fInfo.fHandle);
 		req.Link(name);
 
-		req.LookUp(name);
-		Attribute attr[] = { FATTR4_FILEID };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-
 		status_t result = request.Send();
 		if (result != B_OK)
 			return result;
@@ -314,31 +294,35 @@ Inode::Link(Inode* dir, const char* name)
 		if (result != B_OK)
 			return result;
 
-		result = reply.LookUp();
-		if (result != B_OK)
-			return result;
-
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
-
-		uint32 fileID;
-		if (count == 0)
-			fileID = fFileSystem->AllocFileId();
-		else
-			fileID = values[1].fData.fValue64;
-
 		fFileSystem->Root()->MakeInfoInvalid();
 
-		if (fCache->Lock() == B_OK) {
-			if (atomic && fCache->ChangeInfo() == before) {
-				fCache->AddEntry(name, fileID, true);
-				fCache->SetChangeInfo(after);
-			} else if (fCache->ChangeInfo() != before)
-				fCache->Trash();
-			fCache->Unlock();
+		FileInfo fi = fInfo;
+		fi.fParent = dir->fInfo.fHandle;
+		free(const_cast<char*>(fi.fName));
+		fi.fName = strdup(name);
+		if (fi.fName == NULL)
+			return B_NO_MEMORY;
+
+		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
+			strlen(fInfo.fPath)));
+		if (path == NULL)
+			return B_NO_MEMORY;
+
+		strcpy(path, dir->fInfo.fPath);
+		strcat(path, "/");
+		strcat(path, name);
+		free(const_cast<char*>(fi.fPath));
+		fi.fPath = path;
+
+		fFileSystem->InoIdMap()->AddEntry(fi, fInfo.fFileId);
+
+		if (dir->fCache->Lock() == B_OK) {
+			if (atomic && dir->fCache->ChangeInfo() == before) {
+				dir->fCache->AddEntry(name, fInfo.fFileId, true);
+				dir->fCache->SetChangeInfo(after);
+			} else if (dir->fCache->ChangeInfo() != before)
+				dir->fCache->Trash();
+			dir->fCache->Unlock();
 		}
 
 		return B_OK;
@@ -549,6 +533,7 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 
 		req.Create(NF4LNK, name, cattr, i, path);
 
+		req.GetFH();
 		Attribute attr[] = { FATTR4_FILEID };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
@@ -573,6 +558,9 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 		if (result != B_OK)
 			return result;
 
+		FileHandle handle;
+		reply.GetFH(&handle);
+
 		AttrValue* values;
 		uint32 count;
 		result = reply.GetAttr(&values, &count);
@@ -583,9 +571,13 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 		if (count == 0)
 			fileID = fFileSystem->AllocFileId();
 		else
-			fileID = values[1].fData.fValue64;
+			fileID = values[0].fData.fValue64;
 
 		fFileSystem->Root()->MakeInfoInvalid();
+
+		result = _ChildAdded(name, fileID, handle);
+		if (result != B_OK)
+			return B_OK;
 
 		if (fCache->Lock() == B_OK) {
 			if (atomic && fCache->ChangeInfo() == before) {
@@ -1308,5 +1300,33 @@ Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		default:
 			return false;
 	}
+}
+
+
+status_t
+Inode::_ChildAdded(const char* name, uint64 fileID,
+	const FileHandle& fileHandle)
+{
+	fFileSystem->Root()->MakeInfoInvalid();
+
+	FileInfo fi;
+	fi.fFileId = fileID;
+	fi.fHandle = fileHandle;
+	fi.fParent = fInfo.fHandle;
+	fi.fName = strdup(name);
+	if (fi.fName == NULL)
+		return B_NO_MEMORY;
+
+	char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
+		strlen(fInfo.fPath)));
+	if (path == NULL)
+		return B_NO_MEMORY;
+
+	strcpy(path, fInfo.fPath);
+	strcat(path, "/");
+	strcat(path, name);
+	fi.fPath = path;
+
+	return fFileSystem->InoIdMap()->AddEntry(fi, _FileIdToInoT(fileID));
 }
 

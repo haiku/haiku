@@ -92,6 +92,9 @@ protected:
 									_snapshot, OpenDirCookie* cookie,
 									uint64* _change);
 
+					status_t	_ChildAdded(const char* name, uint64 fileID,
+									const FileHandle& fileHandle);
+
 	static inline	status_t	_CheckLockType(short ltype, uint32 mode);
 
 	static inline	ino_t		_FileIdToInoT(uint64 fileid);

@@ -132,7 +132,14 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 			continue;
 
 		reply.PutFH();
-		reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
+
+		bool atomic;
+		uint64 before, after;
+		result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm,
+			&before, &after, &atomic);
+		if (result != B_OK)
+			return result;
+
 		reply.GetFH(&fh);
 
 		uint64 fileId;
@@ -143,7 +150,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 			if (result != B_OK)
 				return result;
 
-			fileId = values[1].fData.fValue64;
+			fileId = values[0].fData.fValue64;
 
 			delete[] values;
 		} else
@@ -165,6 +172,15 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		fi.fPath = path;
 
 		fFileSystem->InoIdMap()->AddEntry(fi, *id);
+
+		if (fCache->Lock() == B_OK) {
+			if (atomic && fCache->ChangeInfo() == before) {
+				fCache->AddEntry(name, fileId, true);
+				fCache->SetChangeInfo(after);
+			} else if (fCache->ChangeInfo() != before)
+				fCache->Trash();
+			fCache->Unlock();
+		}
 
 		cookie->fFileSystem = fFileSystem;
 		cookie->fInfo = fi;
