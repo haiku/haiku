@@ -862,7 +862,8 @@ StyledEditWindow::Print(const char* documentName)
 	int32 currentLine = 0;
 	while (currentLine < linesInDocument) {
 		float currentHeight = 0;
-		while (currentHeight < printableRect.Height() && currentLine < linesInDocument) {
+		while (currentHeight < printableRect.Height() && currentLine
+				< linesInDocument) {
 			currentHeight += fTextView->LineHeight(currentLine);
 			if (currentHeight < printableRect.Height())
 				currentLine++;
@@ -1027,8 +1028,8 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		new BMessage(MENU_NEW), 'N'));
 	menuItem->SetTarget(be_app);
 
-	menu->AddItem(menuItem = new BMenuItem(fRecentMenu =
-		new BMenu(B_TRANSLATE("Open" B_UTF8_ELLIPSIS)),
+	menu->AddItem(menuItem = new BMenuItem(fRecentMenu
+		= new BMenu(B_TRANSLATE("Open" B_UTF8_ELLIPSIS)),
 			new BMessage(MENU_OPEN)));
 	menuItem->SetShortcut('O', 0);
 	menuItem->SetTarget(be_app);
@@ -1042,8 +1043,8 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	menuItem->SetShortcut('S', B_SHIFT_KEY);
 	menuItem->SetEnabled(true);
 
-	menu->AddItem(fRevertItem =
-		new BMenuItem(B_TRANSLATE("Revert to saved" B_UTF8_ELLIPSIS),
+	menu->AddItem(fRevertItem
+		= new BMenuItem(B_TRANSLATE("Revert to saved" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_REVERT)));
 	fRevertItem->SetEnabled(false);
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
@@ -1505,7 +1506,7 @@ StyledEditWindow::_ReplaceAll(BString findThis, BString replaceWith,
 	fTextView->SetSuppressChanges(true);
 	
 	// start from the beginning of text
-	fTextView->Select(0,0);
+	fTextView->Select(0, 0);
 		
 	int32 start, finish;
 

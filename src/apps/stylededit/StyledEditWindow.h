@@ -118,17 +118,17 @@ private:
 			BString				fReplaceString;
 
 			// undo modes
-			bool	 			fUndoFlag;   // we just did an undo action
-			bool				fCanUndo;    // we can do an undo action next
-			bool 				fRedoFlag;   // we just did a redo action
-			bool				fCanRedo;    // we can do a redo action next
+			bool				fUndoFlag;	// we just did an undo action
+			bool				fCanUndo;	// we can do an undo action next
+			bool 				fRedoFlag;	// we just did a redo action
+			bool				fCanRedo;	// we can do a redo action next
 
 			// clean modes
 			bool				fUndoCleans;
 				// an undo action will put us in a clean state
 			bool				fRedoCleans;
 				// a redo action will put us in a clean state
-			bool				fClean;      // we are in a clean state
+			bool				fClean;		// we are in a clean state
 
 			bool				fCaseSensitive;
 			bool				fWrapAround;

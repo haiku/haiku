@@ -20,8 +20,9 @@ class BTextControl;
 
 class FindWindow : public BWindow {
 	public:
-						FindWindow(BRect frame, BHandler* handler, BString *searchString,
-							bool caseState, bool wrapState, bool backState);
+						FindWindow(BRect frame, BHandler* handler,
+							BString* searchString, bool caseState,
+							bool wrapState, bool backState);
 
 		virtual void	MessageReceived(BMessage* message);
 		virtual void	DispatchMessage(BMessage* message, BHandler* handler);

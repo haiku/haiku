@@ -23,12 +23,12 @@ class BTextControl;
 
 class ReplaceWindow : public BWindow {
 	public:
-						ReplaceWindow(BRect frame, BHandler *_handler,
-							BString *searchString, BString *replaceString,
+						ReplaceWindow(BRect frame, BHandler* _handler,
+							BString* searchString, BString* replaceString,
 							bool caseState, bool wrapState, bool backState);
 
 		virtual void	MessageReceived(BMessage* message);
-		virtual void	DispatchMessage(BMessage* message, BHandler *handler);
+		virtual void	DispatchMessage(BMessage* message, BHandler* handler);
 
 	private:
 		void 			_SendMessage(uint32 what);
