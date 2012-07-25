@@ -58,14 +58,15 @@ dummy()
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, dx);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, di);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, si);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, r8);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, r9);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, r10);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, vector);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, ip);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, flags);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, user_sp);
-#ifdef __INTEL__
+#ifdef __x86_64__
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, r8);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, r9);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, r10);
+#else
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, orig_eax);
 
 	// struct vm86_iframe
