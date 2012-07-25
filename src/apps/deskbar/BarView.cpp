@@ -349,6 +349,7 @@ TBarView::MouseDown(BPoint where)
 void
 TBarView::PlaceDeskbarMenu()
 {
+	// top or bottom, full
 	if (!fVertical && fBarMenuBar != NULL) {
 		fBarMenuBar->RemoveSelf();
 		delete fBarMenuBar;

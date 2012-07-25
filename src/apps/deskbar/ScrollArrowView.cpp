@@ -125,8 +125,12 @@ UpScrollArrow::MouseDown(BPoint where)
 	if (!IsEnabled())
 		return;
 
-	dynamic_cast<TScrollArrowView*>(Parent())->ScrollBy(-kDefaultScrollStep);
-	snooze(5000);
+	TScrollArrowView* parent = dynamic_cast<TScrollArrowView*>(Parent());
+
+	if (parent != NULL) {
+		parent->ScrollBy(-kDefaultScrollStep);
+		snooze(5000);
+	}
 }
 
 
@@ -177,8 +181,10 @@ DownScrollArrow::MouseDown(BPoint where)
 	TScrollArrowView* grandparent
 		= dynamic_cast<TScrollArrowView*>(Parent()->Parent());
 
-	grandparent->ScrollBy(kDefaultScrollStep);
-	snooze(5000);
+	if (grandparent != NULL) {
+		grandparent->ScrollBy(kDefaultScrollStep);
+		snooze(5000);
+	}
 }
 
 
