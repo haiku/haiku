@@ -11,7 +11,7 @@
 
 #include <lock.h>
 #include <util/AutoLock.h>
-#include <util/DoublyLinkedQueue.h>
+#include <util/DoublyLinkedList.h>
 
 #include "DirectoryCache.h"
 
@@ -37,7 +37,7 @@ private:
 			bool			fThreadCancel;
 			sem_id			fWaitCancel;
 
-			DoublyLinkedQueue<DirectoryCache>	fDirectoryCaches;
+			DoublyLinkedList<DirectoryCache>	fDirectoryCaches;
 			mutex			fDirectoryCachesLock;
 };
 
@@ -58,7 +58,7 @@ CacheRevalidator::Unlock()
 inline void
 CacheRevalidator::AddDirectory(DirectoryCache* cache)
 {
-	fDirectoryCaches.Add(cache);
+	fDirectoryCaches.InsertAfter(fDirectoryCaches.Tail(), cache);
 }
 
 
