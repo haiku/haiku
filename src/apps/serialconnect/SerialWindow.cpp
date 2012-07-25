@@ -12,21 +12,22 @@
 #include <MenuItem.h>
 #include <SerialPort.h>
 
+#include "SerialApp.h"
 #include "TermView.h"
 
 
 SerialWindow::SerialWindow()
 	:
 	BWindow(BRect(100, 100, 400, 400), SerialWindow::kWindowTitle,
-		B_DOCUMENT_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
+		B_DOCUMENT_WINDOW, B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL, 0.0f));
 
 	BMenuBar* menuBar = new BMenuBar("menuBar");
-	TermView* termView = new TermView();
+	fTermView = new TermView();
 
 	AddChild(menuBar);
-	AddChild(termView);
+	AddChild(fTermView);
 
 	BMenu* connectionMenu = new BMenu("Connections");
 	BMenu* editMenu = new BMenu("Edit");
@@ -48,7 +49,9 @@ SerialWindow::SerialWindow()
 		char buffer[256];
 		serialPort.GetDeviceName(i, buffer, 256);
 
-		BMenuItem* portItem = new BMenuItem(buffer, NULL);
+		BMessage* message = new BMessage(kMsgOpenPort);
+		message->AddString("port name", buffer);
+		BMenuItem* portItem = new BMenuItem(buffer, message);
 
 		connect->AddItem(portItem);
 	}
@@ -112,6 +115,30 @@ SerialWindow::SerialWindow()
 	flowControl->AddItem(noFlow);
 
 	CenterOnScreen();
+}
+
+
+void SerialWindow::MessageReceived(BMessage* message)
+{
+	switch(message->what)
+	{
+		case kMsgDataRead:
+		{
+			const char* bytes;
+			ssize_t length;
+			message->FindData("data", B_RAW_TYPE, &(const void*)bytes, &length);
+			fTermView->PushBytes(bytes, length);
+			break;
+		}
+		case kMsgOpenPort:
+		{
+			// Forward message to application
+			be_app->PostMessage(message);
+			break;
+		}
+		default:
+			BWindow::MessageReceived(message);
+	}
 }
 
 

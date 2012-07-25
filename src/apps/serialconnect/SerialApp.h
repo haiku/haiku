@@ -19,17 +19,19 @@ class SerialApp: public BApplication
 		void MessageReceived(BMessage* message);
 
 	private:
-		BSerialPort serialPort;
-		static status_t PollSerial(void*);
-
-		sem_id serialLock;
+		BSerialPort fSerialPort;
+		sem_id fSerialLock;
 		SerialWindow* fWindow;
+
+		static status_t PollSerial(void*);
 
 		static const char* kApplicationSignature;
 };
 
+
 enum messageConstants {
-	kMsgOpenPort = 'open',
-	kMsgDataRead = 'dare',
+	kMsgOpenPort  = 'open',
+	kMsgDataRead  = 'dare',
+	kMsgDataWrite = 'dawr',
 };
 

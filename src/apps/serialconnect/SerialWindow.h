@@ -7,11 +7,18 @@
 #include <Window.h>
 
 
+class TermView;
+
+
 class SerialWindow: public BWindow
 {
 	public:
 		SerialWindow::SerialWindow();
 
+		void MessageReceived(BMessage* message);
+
 	private:
+		TermView* fTermView;
+
 		static const char* kWindowTitle;
 };

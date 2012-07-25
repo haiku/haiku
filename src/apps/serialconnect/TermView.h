@@ -16,12 +16,19 @@ class TermView: public BView
 		TermView();
 		~TermView();
 
+		void AttachedToWindow();
 		void Draw(BRect updateRect);
+		void GetPreferredSize(float* width, float* height);
+		void KeyDown(const char* bytes, int32 numBytes);
+		void PushBytes(const char* bytes, const size_t length);
 		
 	private:
 		VTermRect PixelsToGlyphs(BRect pixels) const;
 		BRect GlyphsToPixels(const VTermRect& glyphs) const;
 		BRect GlyphsToPixels(const int width, const int height) const;
+		void Damage(VTermRect rect);
+
+		static int Damage(VTermRect rect, void* user);
 
 	private:
 		VTerm* fTerm;
