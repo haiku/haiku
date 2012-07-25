@@ -1408,7 +1408,7 @@ StyledEditWindow::_RevertToSaved()
 
 bool
 StyledEditWindow::_Search(BString string, bool caseSensitive, bool wrap,
-	bool backSearch)
+	bool backSearch, bool scrollToOccurence)
 {
 	int32 start;
 	int32 finish;
@@ -1450,7 +1450,9 @@ StyledEditWindow::_Search(BString string, bool caseSensitive, bool wrap,
 	if (start != B_ERROR) {
 		finish = start + length;
 		fTextView->Select(start, finish);
-		fTextView->ScrollToSelection();
+		
+		if (scrollToOccurence)
+			fTextView->ScrollToSelection();
 		return true;
 	}
 
@@ -1501,17 +1503,28 @@ StyledEditWindow::_ReplaceAll(BString findThis, BString replaceWith,
 {
 	bool first = true;
 	fTextView->SetSuppressChanges(true);
-	while (_Search(findThis, caseSensitive, true, false)) {
+	
+	// start from the beginning of text
+	fTextView->Select(0,0);
+		
+	int32 start, finish;
+
+	// iterate occurences of findThis without wrapping around
+	while (_Search(findThis, caseSensitive, false, false, false)) {
 		if (first) {
 			_UpdateCleanUndoRedoSaveRevert();
 			first = false;
 		}
-		int32 start, finish;
+		
 		fTextView->GetSelection(&start, &finish);
-
 		fTextView->Delete(start, start + findThis.Length());
 		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
+		
+		// advance the caret behind the inserted text
+		start += replaceWith.Length();
+		fTextView->Select(start, start);
 	}
+	fTextView->ScrollToSelection();
 	fTextView->SetSuppressChanges(false);
 }
 

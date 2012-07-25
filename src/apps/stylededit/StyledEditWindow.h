@@ -57,7 +57,8 @@ private:
 			status_t			_LoadFile(entry_ref* ref);
 			void				_RevertToSaved();
 			bool				_Search(BString searchFor, bool caseSensitive,
-									bool wrap, bool backSearch);
+									bool wrap, bool backSearch,
+									bool scrollToOccurence = true);
 			void				_FindSelection();
 			bool				_Replace(BString findThis, BString replaceWith,
 									bool caseSensitive, bool wrap,
