@@ -62,7 +62,7 @@ public:
 
 ScrollArrow::ScrollArrow(BRect frame)
 	:
-	BView(frame, "menu scroll arrow", 0, B_WILL_DRAW | B_FRAME_EVENTS),
+	BView(frame, "menu scroll arrow", B_FOLLOW_NONE, B_WILL_DRAW),
 	fEnabled(false)
 {
 	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
@@ -174,7 +174,10 @@ DownScrollArrow::MouseDown(BPoint where)
 	if (!IsEnabled())
 		return;
 
-	dynamic_cast<TScrollArrowView*>(Parent())->ScrollBy(kDefaultScrollStep);
+	TScrollArrowView* grandparent
+		= dynamic_cast<TScrollArrowView*>(Parent()->Parent());
+
+	grandparent->ScrollBy(kDefaultScrollStep);
 	snooze(5000);
 }
 
@@ -266,14 +269,14 @@ TScrollArrowView::AttachScrollers()
 		AddChild(fUpperScrollArrow);
 	}
 
-	fMenu->MoveBy(0, kScrollerHeight);
-
 	if (fLowerScrollArrow == NULL) {
 		fLowerScrollArrow = new DownScrollArrow(
-			BRect(0, frame.bottom - kScrollerHeight + 1, frame.right,
-				frame.bottom));
-		AddChild(fLowerScrollArrow, fMenu);
+			BRect(0, frame.bottom - 2 * kScrollerHeight + 1, frame.right,
+				frame.bottom - kScrollerHeight));
+		fMenu->AddChild(fLowerScrollArrow);
 	}
+
+	fMenu->MoveBy(0, kScrollerHeight);
 
 	fUpperScrollArrow->SetEnabled(false);
 	fLowerScrollArrow->SetEnabled(true);
@@ -353,64 +356,27 @@ TScrollArrowView::ScrollBy(const float& step)
 		if (fValue + step >= fLimit) {
 			// If we reached the limit, only scroll to the end
 			fMenu->ScrollBy(0, fLimit - fValue);
-			fValue = fLimit;
+			fLowerScrollArrow->MoveBy(0, fLimit - fValue);
 			fLowerScrollArrow->SetEnabled(false);
+			fValue = fLimit;
 		} else {
 			fMenu->ScrollBy(0, step);
+			fLowerScrollArrow->MoveBy(0, step);
 			fValue += step;
 		}
-		fMenu->Invalidate();
 	} else if (step < 0) {
 		if (fValue == fLimit)
 			fLowerScrollArrow->SetEnabled(true);
 
 		if (fValue + step <= 0) {
 			fMenu->ScrollBy(0, -fValue);
-			fValue = 0;
+			fLowerScrollArrow->MoveBy(0, -fValue);
 			fUpperScrollArrow->SetEnabled(false);
+			fValue = 0;
 		} else {
 			fMenu->ScrollBy(0, step);
+			fLowerScrollArrow->MoveBy(0, step);
 			fValue += step;
 		}
-		fMenu->Invalidate();
 	}
-}
-
-
-bool
-TScrollArrowView::CheckForScrolling(const BPoint &cursor)
-{
-	if (!HasScrollers())
-		return false;
-
-	return _Scroll(cursor);
-}
-
-
-bool
-TScrollArrowView::_Scroll(const BPoint& where)
-{
-	ASSERT((fLowerScrollArrow != NULL));
-	ASSERT((fUpperScrollArrow != NULL));
-
-	const BPoint cursor = ConvertFromScreen(where);
-	const BRect &lowerFrame = fLowerScrollArrow->Frame();
-	const BRect &upperFrame = fUpperScrollArrow->Frame();
-
-	int32 delta = 0;
-	if (fLowerScrollArrow->IsEnabled() && lowerFrame.Contains(cursor))
-		delta = 1;
-	else if (fUpperScrollArrow->IsEnabled() && upperFrame.Contains(cursor))
-		delta = -1;
-
-	if (delta == 0)
-		return false;
-
-	float smallStep;
-	GetSteps(&smallStep, NULL);
-	ScrollBy(smallStep * delta);
-
-	snooze(5000);
-
-	return true;
 }

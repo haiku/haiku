@@ -33,12 +33,7 @@ public:
 
 				void			SetSmallStep(float step);
 				void			GetSteps(float* _smallStep, float* _largeStep) const;
-
-				bool			CheckForScrolling(const BPoint& cursor);
 				void			ScrollBy(const float& step);
-
-protected:
-				bool			_Scroll(const BPoint& cursor);
 
 private:
 				BMenu*			fMenu;
