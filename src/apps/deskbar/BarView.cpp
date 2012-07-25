@@ -48,7 +48,6 @@ All rights reserved.
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <MenuScrollView.h>
 #include <String.h>
 
 #include "icons.h"
@@ -60,6 +59,7 @@ All rights reserved.
 #include "ExpandoMenuBar.h"
 #include "FSUtils.h"
 #include "ResourceSet.h"
+#include "ScrollArrowView.h"
 #include "StatusView.h"
 #include "TeamMenuItem.h"
 
@@ -131,7 +131,7 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		uint32 state, float)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
-	fMenuScrollView(NULL),
+	fScrollArrowView(NULL),
 	fBarMenuBar(NULL),
 	fExpando(NULL),
 	fTrayLocation(1),
@@ -450,10 +450,10 @@ TBarView::PlaceApplicationBar()
 		fExpando = NULL;
 	}
 
-	if (fMenuScrollView != NULL) {
-		fMenuScrollView->RemoveSelf();
-		delete fMenuScrollView;
-		fMenuScrollView = NULL;
+	if (fScrollArrowView != NULL) {
+		fScrollArrowView->RemoveSelf();
+		delete fScrollArrowView;
+		fScrollArrowView = NULL;
 	}
 
 	BRect screenFrame = (BScreen(Window())).Frame();
@@ -500,8 +500,8 @@ TBarView::PlaceApplicationBar()
 	fExpando = new TExpandoMenuBar(this, expandoFrame, "ExpandoMenuBar",
 		fVertical, !hideLabels && fState != kFullState);
 
-	fMenuScrollView = new BMenuScrollView(menuScrollFrame, fExpando);
-	AddChild(fMenuScrollView);
+	fScrollArrowView = new TScrollArrowView(menuScrollFrame, fExpando);
+	AddChild(fScrollArrowView);
 
 	if (fVertical)
 		ExpandItems();
@@ -573,9 +573,9 @@ TBarView::SizeWindow(BRect screenFrame)
 
 	if (fExpando != NULL) {
 		if (fExpando->CheckForSizeOverrun())
-			fMenuScrollView->AttachScrollers();
+			fScrollArrowView->AttachScrollers();
 		else
-			fMenuScrollView->DetachScrollers();
+			fScrollArrowView->DetachScrollers();
 	}
 }
 

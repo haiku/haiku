@@ -82,7 +82,6 @@ MergeObject <libbe>interface_kit.o :
 	MenuField.cpp
 	MenuItem.cpp
 	MenuPrivate.cpp
-	MenuScrollView.cpp
 	MenuWindow.cpp
 	OptionControl.cpp
 	OptionPopUp.cpp

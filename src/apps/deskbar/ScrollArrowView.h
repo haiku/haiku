@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2012, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,22 +7,22 @@
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		John Scipione (jscipione@gmail.com)
  */
-#ifndef MENU_SCROLL_VIEW_H
-#define MENU_SCROLL_VIEW_H
+#ifndef SCROLL_ARROW_VIEW_H
+#define SCROLL_ARROW_VIEW_H
 
 
 #include <View.h>
 
 class BLayout;
 class BMenu;
-class BMenuScroller;
+class ScrollArrow;
 class BPoint;
 
 
-class BMenuScrollView : public BView {
+class TScrollArrowView : public BView {
 public:
-								BMenuScrollView(BRect frame, BMenu* menu);
-	virtual						~BMenuScrollView();
+								TScrollArrowView(BRect frame, BMenu* menu);
+	virtual						~TScrollArrowView();
 
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
@@ -35,16 +35,15 @@ public:
 				void			GetSteps(float* _smallStep, float* _largeStep) const;
 
 				bool			CheckForScrolling(const BPoint& cursor);
-				bool			TryScrollBy(const float& step);
+				void			ScrollBy(const float& step);
 
 protected:
 				bool			_Scroll(const BPoint& cursor);
-				void			_ScrollBy(const float& step);
 
 private:
 				BMenu*			fMenu;
-				BMenuScroller*	fUpperScroller;
-				BMenuScroller*	fLowerScroller;
+				ScrollArrow*	fUpperScrollArrow;
+				ScrollArrow*	fLowerScrollArrow;
 
 				float			fScrollStep;
 				float			fValue;
@@ -52,4 +51,4 @@ private:
 };
 
 
-#endif	// MENU_SCROLL_VIEW_H
+#endif	// SCROLL_ARROW_VIEW_H

@@ -28,6 +28,7 @@ Application Deskbar :
 	DeskbarUtils.cpp
 	ExpandoMenuBar.cpp
 	PreferencesWindow.cpp
+	ScrollArrowView.cpp
 	ShowHideMenuItem.cpp
 	StatusView.cpp
 	StatusViewShelf.cpp

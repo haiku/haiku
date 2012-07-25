@@ -42,7 +42,6 @@ All rights reserved.
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Debug.h>
-#include <MenuScrollView.h>
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -56,6 +55,7 @@ All rights reserved.
 #include "DeskbarMenu.h"
 #include "DeskbarUtils.h"
 #include "ResourceSet.h"
+#include "ScrollArrowView.h"
 #include "ShowHideMenuItem.h"
 #include "StatusView.h"
 #include "TeamMenuItem.h"
@@ -269,8 +269,8 @@ TExpandoMenuBar::MessageReceived(BMessage* message)
 			if (deltaY == 0)
 				return;
 
-			BMenuScrollView* scrollMenu
-				= dynamic_cast<BMenuScrollView*>(Parent());
+			TScrollArrowView* scrollMenu
+				= dynamic_cast<TScrollArrowView*>(Parent());
 			if (scrollMenu == NULL)
 				return;
 
@@ -284,7 +284,7 @@ TExpandoMenuBar::MessageReceived(BMessage* message)
 			else
 				deltaY *= smallStep;
 
-			scrollMenu->TryScrollBy(deltaY);
+			scrollMenu->ScrollBy(deltaY);
 			break;
 		}
 
