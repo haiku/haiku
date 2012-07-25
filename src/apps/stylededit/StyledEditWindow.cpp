@@ -1481,7 +1481,8 @@ StyledEditWindow::_Replace(BString findThis, BString replaceWith,
 	bool caseSensitive, bool wrap, bool backSearch)
 {
 	if (_Search(findThis, caseSensitive, wrap, backSearch)) {
-		int32 start, finish;
+		int32 start;
+		int32 finish;
 		fTextView->GetSelection(&start, &finish);
 
 		_UpdateCleanUndoRedoSaveRevert();
@@ -1507,8 +1508,6 @@ StyledEditWindow::_ReplaceAll(BString findThis, BString replaceWith,
 	
 	// start from the beginning of text
 	fTextView->Select(0, 0);
-		
-	int32 start, finish;
 
 	// iterate occurences of findThis without wrapping around
 	while (_Search(findThis, caseSensitive, false, false, false)) {
@@ -1516,7 +1515,9 @@ StyledEditWindow::_ReplaceAll(BString findThis, BString replaceWith,
 			_UpdateCleanUndoRedoSaveRevert();
 			first = false;
 		}
-		
+		int32 start;
+		int32 finish;
+				
 		fTextView->GetSelection(&start, &finish);
 		fTextView->Delete(start, start + findThis.Length());
 		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
