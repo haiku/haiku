@@ -6,8 +6,11 @@
 
 #include <asm_defs.h>
 
+#include <thread_types.h>
+
 #include <arch/x86/descriptors.h>
 #include <arch/x86/arch_cpu.h>
+#include <arch/x86/arch_kernel.h>
 
 #include "asm_offsets.h"
 #include "syscall_numbers.h"
@@ -50,7 +53,73 @@
 	pop		%rdx;						\
 	pop		%rcx;						\
 	pop		%rbx;						\
-	pop		%rax;
+	pop		%rax;						\
+	addq	$16, %rsp;
+
+
+// The macros below require R12 to contain the current thread pointer. R12 is
+// callee-save so will be preserved through all function calls and only needs
+// to be obtained once. R13 is used to store the system call start time, will
+// also be preserved.
+
+#define LOCK_THREAD_TIME()										\
+	leaq	THREAD_time_lock(%r12), %rdi;						\
+	call	acquire_spinlock;
+
+#define UNLOCK_THREAD_TIME()									\
+	leaq	THREAD_time_lock(%r12), %rdi;						\
+	call	release_spinlock;									\
+
+#define UPDATE_THREAD_USER_TIME()								\
+	LOCK_THREAD_TIME()											\
+																\
+	call	system_time;										\
+																\
+	/* Preserve system_time for post syscall debug */			\
+	movq	%rax, %r13;											\
+																\
+	/* thread->user_time += now - thread->last_time; */			\
+	subq	THREAD_last_time(%r12), %rax;						\
+	addq	%rax, THREAD_user_time(%r12);						\
+																\
+	/* thread->last_time = now; */								\
+	movq	%r13, THREAD_last_time(%r12);						\
+																\
+	/* thread->in_kernel = true; */								\
+	movb	$1, THREAD_in_kernel(%r12);							\
+																\
+	UNLOCK_THREAD_TIME()
+
+#define UPDATE_THREAD_KERNEL_TIME()								\
+	LOCK_THREAD_TIME()											\
+																\
+	call	system_time;										\
+	movq	%rax, %r13;											\
+																\
+	/* thread->kernel_time += now - thread->last_time; */		\
+	subq	THREAD_last_time(%r12), %rax;						\
+	addq	%rax, THREAD_kernel_time(%r12);						\
+																\
+	/* thread->last_time = now; */								\
+	movq	%r13, THREAD_last_time(%r12);						\
+																\
+	/* thread->in_kernel = false; */							\
+	movb	$0, THREAD_in_kernel(%r12);							\
+																\
+	UNLOCK_THREAD_TIME()
+
+// TODO
+#if 0
+#define STOP_USER_DEBUGGING()									\
+	testl	$(THREAD_FLAGS_BREAKPOINTS_INSTALLED				\
+			| THREAD_FLAGS_SINGLE_STEP), THREAD_flags(%r12);	\
+	jz		1f;													\
+	call	x86_exit_user_debug_at_kernel_entry;				\
+  1:
+#else
+#define STOP_USER_DEBUGGING()	
+#endif
+
 
 // The following code defines the interrupt service routines for all 256
 // interrupts. It creates a block of handlers, each 16 bytes, that the IDT
@@ -115,12 +184,11 @@ SYMBOL(isr_array):
 
 
 // Common interrupt handling code.
-FUNCTION(int_bottom):
-	// If coming from user-mode, need to load the kernel GS segment base.
+STATIC_FUNCTION(int_bottom):
+	// Coming from user-mode requires special handling.
 	testl	$3, 24(%rsp)
-	jz		1f
-	swapgs
-1:
+	jnz		int_bottom_user
+
 	// Push the rest of the interrupt frame to the stack.
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
 
@@ -129,26 +197,101 @@ FUNCTION(int_bottom):
 	// Frame pointer is the iframe.
 	movq	%rsp, %rbp
 
-	// TODO: Kernel entry work.
+	// Set the RF (resume flag) in RFLAGS. This prevents an instruction
+	// breakpoint on the instruction we're returning to to trigger a debug
+	// exception.
+	orq		$X86_EFLAGS_RESUME, IFRAME_flags(%rbp)
 
 	// Call the interrupt handler.
 	movq	%rsp, %rdi
 	movq	IFRAME_vector(%rsp), %rax
 	call	*gInterruptHandlerTable(, %rax, 8)
 
-	// TODO: Kernel exit work.
+	// Restore the saved registers.
+	RESTORE_IFRAME()
+
+	iretq
+FUNCTION_END(int_bottom)
+
+
+// Handler for an interrupt that occurred in user-mode.
+STATIC_FUNCTION(int_bottom_user):
+	// Load the kerrnel GS segment base.
+	swapgs
+
+	// Push the rest of the interrupt frame to the stack.
+	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
+
+	cld
+
+	// Frame pointer is the iframe.
+	movq	%rsp, %rbp
+
+	// Set the RF (resume flag) in RFLAGS. This prevents an instruction
+	// breakpoint on the instruction we're returning to to trigger a debug
+	// exception.
+	orq		$X86_EFLAGS_RESUME, IFRAME_flags(%rbp)
+
+	// Get thread pointer.
+	movq	%gs:0, %r12
+
+	STOP_USER_DEBUGGING()
+	UPDATE_THREAD_USER_TIME()
+
+	// Call the interrupt handler.
+	movq	%rsp, %rdi
+	movq	IFRAME_vector(%rsp), %rax
+	call	*gInterruptHandlerTable(, %rax, 8)
+
+	// If there are no signals pending or we're not debugging, we can avoid
+	// most of the work here, just need to update the kernel time.
+	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
+			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
+			, THREAD_flags(%r12)
+	jnz		.Lkernel_exit_work
+
+	cli
+
+	UPDATE_THREAD_KERNEL_TIME()
 
 	// Restore the saved registers.
 	RESTORE_IFRAME()
 
-	// Get rid of the error code and interrupt number, restore the previous
-	// GS base if returning to user-mode, and return.
-	addq	$16, %rsp
-	testl	$3, 8(%rsp)
-	jz		2f
+	// Restore the previous GS base and return.
 	swapgs
-2:	iretq
-FUNCTION_END(int_bottom)
+	iretq
+
+.Lkernel_exit_work:
+	// Slow path for return to userland.
+
+	// Do we need to handle signals?
+	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD) \
+			, THREAD_flags(%r12)
+	jnz		.Lkernel_exit_handle_signals
+	cli
+	call	thread_at_kernel_exit_no_signals
+
+.Lkernel_exit_work_done:
+	// Install breakpoints, if defined. TODO
+	//testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
+	//jz	1f
+	//movq	%rbp, %rdi
+	//call	x86_init_user_debug_at_kernel_exit
+//1:
+	// Restore the saved registers.
+	RESTORE_IFRAME()
+
+	// Restore the previous GS base and return.
+	swapgs
+	iretq
+
+.Lkernel_exit_handle_signals:
+	// thread_at_kernel_exit requires interrupts to be enabled, it will disable
+	// them after.
+	sti
+	call	thread_at_kernel_exit
+	jmp		.Lkernel_exit_work_done
+FUNCTION_END(int_bottom_user)
 
 
 // SYSCALL entry point.
@@ -172,41 +315,94 @@ FUNCTION(x86_64_syscall_entry):
 	push	$0							// vector
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_SYSCALL)
 
+	cld
+
 	// Frame pointer is the iframe.
 	movq	%rsp, %rbp
 
-	// TODO: Kernel entry work.
+	// Preserve call number (R14 is callee-save), get thread pointer.
+	movq	%rax, %r14
+	movq	%gs:0, %r12
+
+	STOP_USER_DEBUGGING()
+	UPDATE_THREAD_USER_TIME()
+
+	// No longer need interrupts disabled.
+	sti
 
 	// Check whether the syscall number is valid.
-	cmp		$SYSCALL_COUNT, %rax
+	cmpq	$SYSCALL_COUNT, %r14
 	jae		.Lbad_syscall_number
 
 	// Get the system call table entry. Note I'm hardcoding the shift because
 	// sizeof(syscall_info) is 16 and scale factors of 16 aren't supported,
 	// so can't just do leaq kSyscallInfos(, %rax, SYSCALL_INFO_sizeof).
-	shl		$4, %rax
-	leaq	kSyscallInfos(, %rax, 1), %r12
+	shlq	$4, %r14
+	leaq	kSyscallInfos(, %r14, 1), %rax
 
-	// Move 4th argument to the correct register, it is put in R10 as RCX is
-	// used by SYSCALL.
-	movq	%r10, %rcx
+	// Check the number of call arguments, greater than 6 (6 * 8 = 48) requires
+	// a stack copy.
+	movq	SYSCALL_INFO_parameter_size(%rax), %rcx
+	cmpq	$48, %rcx
+	ja		.Lsyscall_stack_args
 
-	// TODO: > 6 arguments.
+	// Restore the arguments from the iframe. UPDATE_THREAD_USER_TIME() makes
+	// 2 function calls which means they may have been overwritten. Note that
+	// argument 4 is in R10 on the frame rather than RCX as RCX is used by
+	// SYSCALL.
+	movq	IFRAME_di(%rbp), %rdi
+	movq	IFRAME_si(%rbp), %rsi
+	movq	IFRAME_dx(%rbp), %rdx
+	movq	IFRAME_r10(%rbp), %rcx
+	movq	IFRAME_r8(%rbp), %r8
+	movq	IFRAME_r9(%rbp), %r9
 
-	// No longer need interrupts disabled.
-	sti
+	// TODO: pre-syscall tracing/debug
 
 	// Call the function and save its return value.
-	call	*SYSCALL_INFO_function(%r12)
-	movq	%rax, IFRAME_ax(%rsp)
+	call	*SYSCALL_INFO_function(%rax)
+	movq	%rax, IFRAME_ax(%rbp)
+
+	// TODO: post-syscall tracing
+
+.Lbad_syscall_number:
+.Lsyscall_return:
+	// Clear the restarted flag.
+	testl	$THREAD_FLAGS_SYSCALL_RESTARTED, THREAD_flags(%r12)
+	jz		2f
+1:
+    movl	THREAD_flags(%r12), %eax
+	movl	%eax, %edx
+    andl	$~THREAD_FLAGS_SYSCALL_RESTARTED, %edx
+    lock
+    cmpxchgl	%edx, THREAD_flags(%r12)
+    jnz		1b
+2:
+	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
+			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
+			| THREAD_FLAGS_RESTART_SYSCALL) \
+			, THREAD_flags(%r12)
+	jnz		.Lpost_syscall_work
 
 	cli
-.Lbad_syscall_number:
-	// TODO: Kernel exit work, check for canonical return address, syscall restart.
+
+	UPDATE_THREAD_KERNEL_TIME()
+
+	// If the return address is not canonical, return using the IRET path.
+	// On Intel's implementation of SYSRET, the canonical address check for the
+	// return address is performed before the switch to user mode, so a fault
+	// for a non-canonical address will be triggered in kernel mode. However, by
+	// then we will have switched onto the user stack meaning the kernel could
+	// be tricked into executing with the user RSP. Using IRET will handle
+	// non-canonical addresses properly.
+	movq	IFRAME_user_sp(%rsp), %rax
+	sarq	$47, %rax
+	incl	%eax
+	cmpl	$1, %eax
+	ja		.Liret
 
 	// Restore the iframe and RCX/R11 for SYSRET.
 	RESTORE_IFRAME()
-	addq	$16, %rsp
 	pop		%rcx
 	addq	$8, %rsp
 	pop		%r11
@@ -215,6 +411,96 @@ FUNCTION(x86_64_syscall_entry):
 	// Restore previous GS base and return.
 	swapgs
 	sysretq
+
+.Lpost_syscall_work:
+	// TODO: post-syscall debugging
+
+	// Do we need to handle signals?
+	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD) \
+			, THREAD_flags(%r12)
+	jnz		.Lpost_syscall_handle_signals
+	cli
+	call	thread_at_kernel_exit_no_signals
+
+.Lpost_syscall_work_done:
+	// Handle syscall restarting.
+	testl	$THREAD_FLAGS_RESTART_SYSCALL, THREAD_flags(%r12)
+	jz		1f
+	movq	%rsp, %rdi
+	call	x86_restart_syscall
+1:
+	// Install breakpoints, if defined. TODO
+	//testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
+	//jz	.Liret
+	//movq	%rbp, %rdi
+	//call	x86_init_user_debug_at_kernel_exit
+
+	// On this return path it is possible that the frame has been modified,
+	// for example to execute a signal handler. In this case it is safer to
+	// return via IRET.
+
+.Liret:
+	// Restore the saved registers.
+	RESTORE_IFRAME()
+
+	// Restore the previous GS base and return.
+	swapgs
+	iretq
+
+.Lpost_syscall_handle_signals:
+	call	thread_at_kernel_exit
+	jmp		.Lpost_syscall_work_done
+
+.Lsyscall_stack_args:
+	// Some arguments are on the stack, work out what we need to copy. 6
+	// arguments (48 bytes) are already in registers.
+	// RAX = syscall table entry address, RCX = argument size.
+	subq	$48, %rcx
+
+	// Get the address to copy from.
+	movq	IFRAME_user_sp(%rbp), %rsi
+	addq	$8, %rsi
+	movabs	$(USER_BASE + USER_SIZE), %rdx
+	cmp		%rdx, %rsi
+	jae		.Lbad_syscall_args
+
+	// Make space on the stack.
+	subq	%rcx, %rsp
+	movq	%rsp, %rdi
+
+	// Set a fault handler.
+	movq	$.Lbad_syscall_args, THREAD_fault_handler(%r12)
+
+	// Copy them by quadwords.
+	shrq	$3, %rcx
+	rep
+	movsq
+	movq	$0, THREAD_fault_handler(%r12)
+
+	// Restore the register arguments from the iframe.
+	movq	IFRAME_di(%rbp), %rdi
+	movq	IFRAME_si(%rbp), %rsi
+	movq	IFRAME_dx(%rbp), %rdx
+	movq	IFRAME_r10(%rbp), %rcx
+	movq	IFRAME_r8(%rbp), %r8
+	movq	IFRAME_r9(%rbp), %r9
+
+	// TODO: pre-syscall tracing/debug
+
+	// Call the function and save its return value.
+	call	*SYSCALL_INFO_function(%rax)
+	movq	%rax, IFRAME_ax(%rbp)
+
+	// TODO: post-syscall tracing
+
+	// Restore the original stack pointer and return.
+	movq	%rbp, %rsp
+	jmp		.Lsyscall_return
+
+.Lbad_syscall_args:
+	movq	$0, THREAD_fault_handler(%r12)
+	movq	%rbp, %rsp
+	jmp		.Lsyscall_return
 FUNCTION_END(x86_64_syscall_entry)
 
 
@@ -234,11 +520,18 @@ FUNCTION(x86_return_to_userland):
 	movq	%rdi, %rbp
 	movq	%rbp, %rsp
 
-	// TODO: Kernel exit work.
+	// Perform kernel exit work.
+	movq	%gs:0, %r12
+	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
+			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
+			, THREAD_flags(%r12)
+	jnz		.Lkernel_exit_work
+
+	// update the thread's kernel time and return
+	UPDATE_THREAD_KERNEL_TIME()
 
 	// Restore the frame and return.
 	RESTORE_IFRAME()
-	addq	$16, %rsp
 	swapgs
 	iretq
 FUNCTION_END(x86_return_to_userland)

@@ -43,6 +43,13 @@ static arch_thread sInitialState;
 
 
 void
+x86_restart_syscall(iframe* frame)
+{
+	panic("x86_restart_syscall: TODO");
+}
+
+
+void
 x86_set_tls_context(Thread* thread)
 {
 
@@ -95,7 +102,7 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 		"%p\n", _stackTop, function, data);
 
 	// Save the stack top for system call entry.
-	thread->arch_info.syscall_rsp = stackTop;
+	thread->arch_info.syscall_rsp = (uint64*)thread->kernel_stack_top;
 
 	// x86_64 uses registers for argument passing, first argument in RDI,
 	// however we don't save RDI on every context switch (there is no need
