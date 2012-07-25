@@ -9,7 +9,7 @@
  */
 
 
-#include "ScrollArrowView.h"
+#include "InlineScrollView.h"
 
 #include <ControlLook.h>
 #include <Debug.h>
@@ -125,7 +125,7 @@ UpScrollArrow::MouseDown(BPoint where)
 	if (!IsEnabled())
 		return;
 
-	TScrollArrowView* parent = dynamic_cast<TScrollArrowView*>(Parent());
+	TInlineScrollView* parent = dynamic_cast<TInlineScrollView*>(Parent());
 
 	if (parent != NULL) {
 		parent->ScrollBy(-kDefaultScrollStep);
@@ -178,8 +178,8 @@ DownScrollArrow::MouseDown(BPoint where)
 	if (!IsEnabled())
 		return;
 
-	TScrollArrowView* grandparent
-		= dynamic_cast<TScrollArrowView*>(Parent()->Parent());
+	TInlineScrollView* grandparent
+		= dynamic_cast<TInlineScrollView*>(Parent()->Parent());
 
 	if (grandparent != NULL) {
 		grandparent->ScrollBy(kDefaultScrollStep);
@@ -191,10 +191,10 @@ DownScrollArrow::MouseDown(BPoint where)
 //	#pragma mark -
 
 
-TScrollArrowView::TScrollArrowView(BRect frame, BMenu* menu)
+TInlineScrollView::TInlineScrollView(BRect frame, BView* target)
 	:
-	BView(frame, "menu scroll view", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
-	fMenu(menu),
+	BView(frame, "inline scroll view", B_FOLLOW_NONE, 0),
+	fTarget(target),
 	fUpperScrollArrow(NULL),
 	fLowerScrollArrow(NULL),
 	fScrollStep(kDefaultScrollStep),
@@ -204,7 +204,7 @@ TScrollArrowView::TScrollArrowView(BRect frame, BMenu* menu)
 }
 
 
-TScrollArrowView::~TScrollArrowView()
+TInlineScrollView::~TInlineScrollView()
 {
 	if (fUpperScrollArrow != NULL) {
 		fUpperScrollArrow->RemoveSelf();
@@ -221,25 +221,25 @@ TScrollArrowView::~TScrollArrowView()
 
 
 void
-TScrollArrowView::AttachedToWindow()
+TInlineScrollView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	if (fMenu == NULL)
+	if (fTarget == NULL)
 		return;
 
-	AddChild(fMenu);
-	fMenu->MoveTo(0, 0);
+	AddChild(fTarget);
+	fTarget->MoveTo(0, 0);
 }
 
 
 void
-TScrollArrowView::DetachedFromWindow()
+TInlineScrollView::DetachedFromWindow()
 {
 	BView::DetachedFromWindow();
 
-	if (fMenu != NULL)
-		fMenu->RemoveSelf();
+	if (fTarget != NULL)
+		fTarget->RemoveSelf();
 
 	if (fUpperScrollArrow != NULL)
 		fUpperScrollArrow->RemoveSelf();
@@ -253,9 +253,9 @@ TScrollArrowView::DetachedFromWindow()
 
 
 void
-TScrollArrowView::AttachScrollers()
+TInlineScrollView::AttachScrollers()
 {
-	if (fMenu == NULL)
+	if (fTarget == NULL)
 		return;
 
 	BRect frame = Bounds();
@@ -267,7 +267,7 @@ TScrollArrowView::AttachScrollers()
 		return;
 	}
 
-	fMenu->MakeFocus(true);
+	fTarget->MakeFocus(true);
 
 	if (fUpperScrollArrow == NULL) {
 		fUpperScrollArrow = new UpScrollArrow(
@@ -279,10 +279,10 @@ TScrollArrowView::AttachScrollers()
 		fLowerScrollArrow = new DownScrollArrow(
 			BRect(0, frame.bottom - 2 * kScrollerHeight + 1, frame.right,
 				frame.bottom - kScrollerHeight));
-		fMenu->AddChild(fLowerScrollArrow);
+		fTarget->AddChild(fLowerScrollArrow);
 	}
 
-	fMenu->MoveBy(0, kScrollerHeight);
+	fTarget->MoveBy(0, kScrollerHeight);
 
 	fUpperScrollArrow->SetEnabled(false);
 	fLowerScrollArrow->SetEnabled(true);
@@ -294,7 +294,7 @@ TScrollArrowView::AttachScrollers()
 
 
 void
-TScrollArrowView::DetachScrollers()
+TInlineScrollView::DetachScrollers()
 {
 	if (!HasScrollers())
 		return;
@@ -311,38 +311,38 @@ TScrollArrowView::DetachScrollers()
 		fUpperScrollArrow = NULL;
 	}
 
-	if (fMenu) {
+	if (fTarget) {
 		// We don't remember the position where the last scrolling
 		// ended, so scroll back to the beginning.
-		fMenu->MoveBy(0, -kScrollerHeight);
-		fMenu->ScrollTo(0, 0);
+		fTarget->MoveBy(0, -kScrollerHeight);
+		fTarget->ScrollTo(0, 0);
 		fValue = 0;
 	}
 }
 
 
 bool
-TScrollArrowView::HasScrollers() const
+TInlineScrollView::HasScrollers() const
 {
-	return fMenu != NULL && fUpperScrollArrow != NULL && fLowerScrollArrow != NULL;
+	return fTarget != NULL && fUpperScrollArrow != NULL && fLowerScrollArrow != NULL;
 }
 
 
 void
-TScrollArrowView::SetSmallStep(float step)
+TInlineScrollView::SetSmallStep(float step)
 {
 	fScrollStep = step;
 }
 
 
 void
-TScrollArrowView::GetSteps(float* _smallStep, float* _largeStep) const
+TInlineScrollView::GetSteps(float* _smallStep, float* _largeStep) const
 {
 	if (_smallStep != NULL)
 		*_smallStep = fScrollStep;
 	if (_largeStep != NULL) {
-		if (fMenu != NULL)
-			*_largeStep = fMenu->Frame().Height() - fScrollStep;
+		if (fTarget != NULL)
+			*_largeStep = fTarget->Frame().Height() - fScrollStep;
 		else
 			*_largeStep = fScrollStep * 2;
 	}
@@ -350,7 +350,7 @@ TScrollArrowView::GetSteps(float* _smallStep, float* _largeStep) const
 
 
 void
-TScrollArrowView::ScrollBy(const float& step)
+TInlineScrollView::ScrollBy(const float& step)
 {
 	if (!HasScrollers())
 		return;
@@ -361,12 +361,12 @@ TScrollArrowView::ScrollBy(const float& step)
 
 		if (fValue + step >= fLimit) {
 			// If we reached the limit, only scroll to the end
-			fMenu->ScrollBy(0, fLimit - fValue);
+			fTarget->ScrollBy(0, fLimit - fValue);
 			fLowerScrollArrow->MoveBy(0, fLimit - fValue);
 			fLowerScrollArrow->SetEnabled(false);
 			fValue = fLimit;
 		} else {
-			fMenu->ScrollBy(0, step);
+			fTarget->ScrollBy(0, step);
 			fLowerScrollArrow->MoveBy(0, step);
 			fValue += step;
 		}
@@ -375,12 +375,12 @@ TScrollArrowView::ScrollBy(const float& step)
 			fLowerScrollArrow->SetEnabled(true);
 
 		if (fValue + step <= 0) {
-			fMenu->ScrollBy(0, -fValue);
+			fTarget->ScrollBy(0, -fValue);
 			fLowerScrollArrow->MoveBy(0, -fValue);
 			fUpperScrollArrow->SetEnabled(false);
 			fValue = 0;
 		} else {
-			fMenu->ScrollBy(0, step);
+			fTarget->ScrollBy(0, step);
 			fLowerScrollArrow->MoveBy(0, step);
 			fValue += step;
 		}

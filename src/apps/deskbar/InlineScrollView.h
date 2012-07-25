@@ -7,22 +7,21 @@
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		John Scipione (jscipione@gmail.com)
  */
-#ifndef SCROLL_ARROW_VIEW_H
-#define SCROLL_ARROW_VIEW_H
+#ifndef INLINE_SCROLL_VIEW_H
+#define INLINE_SCROLL_VIEW_H
 
 
 #include <View.h>
 
 class BLayout;
-class BMenu;
 class ScrollArrow;
 class BPoint;
 
 
-class TScrollArrowView : public BView {
+class TInlineScrollView : public BView {
 public:
-								TScrollArrowView(BRect frame, BMenu* menu);
-	virtual						~TScrollArrowView();
+								TInlineScrollView(BRect frame, BView* target);
+	virtual						~TInlineScrollView();
 
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
@@ -36,7 +35,7 @@ public:
 				void			ScrollBy(const float& step);
 
 private:
-				BMenu*			fMenu;
+				BView*			fTarget;
 				ScrollArrow*	fUpperScrollArrow;
 				ScrollArrow*	fLowerScrollArrow;
 
@@ -46,4 +45,4 @@ private:
 };
 
 
-#endif	// SCROLL_ARROW_VIEW_H
+#endif	// INLINE_SCROLL_VIEW_H

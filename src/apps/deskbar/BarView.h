@@ -70,7 +70,7 @@ class TBarMenuBar;
 class TExpandoMenuBar;
 class TReplicantTray;
 class TDragRegion;
-class TScrollArrowView;
+class TInlineScrollView;
 class TTeamMenuItem;
 
 
@@ -168,7 +168,7 @@ class TBarView : public BView {
 		void ExpandItems();
 		void _ChangeState(BMessage* message);
 
-		TScrollArrowView* fScrollArrowView;
+		TInlineScrollView* fInlineScrollView;
 		TBarMenuBar* fBarMenuBar;
 		TExpandoMenuBar* fExpando;
 

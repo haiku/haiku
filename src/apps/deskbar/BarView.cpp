@@ -58,8 +58,8 @@ All rights reserved.
 #include "DeskbarUtils.h"
 #include "ExpandoMenuBar.h"
 #include "FSUtils.h"
+#include "InlineScrollView.h"
 #include "ResourceSet.h"
-#include "ScrollArrowView.h"
 #include "StatusView.h"
 #include "TeamMenuItem.h"
 
@@ -131,7 +131,7 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		uint32 state, float)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
-	fScrollArrowView(NULL),
+	fInlineScrollView(NULL),
 	fBarMenuBar(NULL),
 	fExpando(NULL),
 	fTrayLocation(1),
@@ -444,8 +444,8 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 void
 TBarView::PlaceApplicationBar()
 {
-	if (fScrollArrowView != NULL)
-		fScrollArrowView->DetachScrollers();
+	if (fInlineScrollView != NULL)
+		fInlineScrollView->DetachScrollers();
 
 	if (fExpando != NULL) {
 		SaveExpandedItems();
@@ -454,10 +454,10 @@ TBarView::PlaceApplicationBar()
 		fExpando = NULL;
 	}
 
-	if (fScrollArrowView != NULL) {
-		fScrollArrowView->RemoveSelf();
-		delete fScrollArrowView;
-		fScrollArrowView = NULL;
+	if (fInlineScrollView != NULL) {
+		fInlineScrollView->RemoveSelf();
+		delete fInlineScrollView;
+		fInlineScrollView = NULL;
 	}
 
 	BRect screenFrame = (BScreen(Window())).Frame();
@@ -504,8 +504,8 @@ TBarView::PlaceApplicationBar()
 	fExpando = new TExpandoMenuBar(this, expandoFrame, "ExpandoMenuBar",
 		fVertical, !hideLabels && fState != kFullState);
 
-	fScrollArrowView = new TScrollArrowView(menuScrollFrame, fExpando);
-	AddChild(fScrollArrowView);
+	fInlineScrollView = new TInlineScrollView(menuScrollFrame, fExpando);
+	AddChild(fInlineScrollView);
 
 	if (fVertical)
 		ExpandItems();
@@ -577,9 +577,9 @@ TBarView::SizeWindow(BRect screenFrame)
 
 	if (fExpando != NULL) {
 		if (fExpando->CheckForSizeOverrun())
-			fScrollArrowView->AttachScrollers();
+			fInlineScrollView->AttachScrollers();
 		else
-			fScrollArrowView->DetachScrollers();
+			fInlineScrollView->DetachScrollers();
 	}
 }
 

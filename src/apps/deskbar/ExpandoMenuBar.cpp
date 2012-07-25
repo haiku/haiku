@@ -54,8 +54,8 @@ All rights reserved.
 #include "BarWindow.h"
 #include "DeskbarMenu.h"
 #include "DeskbarUtils.h"
+#include "InlineScrollView.h"
 #include "ResourceSet.h"
-#include "ScrollArrowView.h"
 #include "ShowHideMenuItem.h"
 #include "StatusView.h"
 #include "TeamMenuItem.h"
@@ -269,14 +269,14 @@ TExpandoMenuBar::MessageReceived(BMessage* message)
 			if (deltaY == 0)
 				return;
 
-			TScrollArrowView* scrollMenu
-				= dynamic_cast<TScrollArrowView*>(Parent());
-			if (scrollMenu == NULL)
+			TInlineScrollView* scrollView
+				= dynamic_cast<TInlineScrollView*>(Parent());
+			if (scrollView == NULL)
 				return;
 
 			float largeStep;
 			float smallStep;
-			scrollMenu->GetSteps(&smallStep, &largeStep);
+			scrollView->GetSteps(&smallStep, &largeStep);
 
 			// pressing the option/command/control key scrolls faster
 			if (modifiers() & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY))
@@ -284,7 +284,7 @@ TExpandoMenuBar::MessageReceived(BMessage* message)
 			else
 				deltaY *= smallStep;
 
-			scrollMenu->ScrollBy(deltaY);
+			scrollView->ScrollBy(deltaY);
 			break;
 		}
 
