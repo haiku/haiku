@@ -13,7 +13,7 @@ class TermView;
 class SerialWindow: public BWindow
 {
 	public:
-		SerialWindow::SerialWindow();
+		SerialWindow();
 
 		void MessageReceived(BMessage* message);
 

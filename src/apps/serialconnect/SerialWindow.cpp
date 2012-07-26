@@ -128,7 +128,7 @@ void SerialWindow::MessageReceived(BMessage* message)
 		{
 			const char* bytes;
 			ssize_t length;
-			message->FindData("data", B_RAW_TYPE, &(const void*)bytes, &length);
+			message->FindData("data", B_RAW_TYPE, (const void**)&bytes, &length);
 			fTermView->PushBytes(bytes, length);
 			break;
 		}

@@ -54,7 +54,7 @@ void SerialApp::MessageReceived(BMessage* message)
 			const char* bytes;
 			ssize_t size;
 
-			message->FindData("data", B_RAW_TYPE, &(const void*)bytes, &size);
+			message->FindData("data", B_RAW_TYPE, (const void**)&bytes, &size);
 			fSerialPort.Write(bytes, size);
 		}
 		default:
@@ -85,6 +85,9 @@ status_t SerialApp::PollSerial(void*)
 			be_app_messenger.SendMessage(serialData);
 		}
 	}
+	
+	// Should not reach this line anyway...
+	return B_OK;
 }
 
 const char* SerialApp::kApplicationSignature
