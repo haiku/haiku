@@ -69,3 +69,9 @@ Application WebPositive :
 	:
 	WebPositive.rdef
 ;
+
+DoCatalogs WebPositive :
+	x-vnd.Haiku-WebPositive
+	:
+        $(sources)
+;
