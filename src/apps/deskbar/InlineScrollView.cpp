@@ -21,7 +21,7 @@
 
 
 const int kDefaultScrollStep = 19;
-const int kScrollerHeight = 12;
+const int kScrollerDimension = 12;
 
 
 class ScrollArrow : public BView {
@@ -51,6 +51,26 @@ class DownScrollArrow : public ScrollArrow {
 public:
 							DownScrollArrow(BRect frame);
 	virtual					~DownScrollArrow();
+
+	virtual	void			Draw(BRect updateRect);
+	virtual	void			MouseDown(BPoint where);
+};
+
+
+class LeftScrollArrow : public ScrollArrow {
+public:
+							LeftScrollArrow(BRect frame);
+	virtual					~LeftScrollArrow();
+
+	virtual	void			Draw(BRect updateRect);
+	virtual	void			MouseDown(BPoint where);
+};
+
+
+class RightScrollArrow : public ScrollArrow {
+public:
+							RightScrollArrow(BRect frame);
+	virtual					~RightScrollArrow();
 
 	virtual	void			Draw(BRect updateRect);
 	virtual	void			MouseDown(BPoint where);
@@ -102,7 +122,6 @@ UpScrollArrow::Draw(BRect updateRect)
 {
 	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 
-	// Draw the upper arrow.
 	if (IsEnabled())
 		SetHighColor(0, 0, 0);
 	else {
@@ -113,9 +132,9 @@ UpScrollArrow::Draw(BRect updateRect)
 	FillRect(Bounds(), B_SOLID_LOW);
 
 	float middle = Bounds().right / 2;
-	FillTriangle(BPoint(middle, (kScrollerHeight / 2) - 3),
-		BPoint(middle + 5, (kScrollerHeight / 2) + 2),
-		BPoint(middle - 5, (kScrollerHeight / 2) + 2));
+	FillTriangle(BPoint(middle, (kScrollerDimension / 2) - 3),
+		BPoint(middle + 5, (kScrollerDimension / 2) + 2),
+		BPoint(middle - 5, (kScrollerDimension / 2) + 2));
 }
 
 
@@ -154,7 +173,6 @@ DownScrollArrow::Draw(BRect updateRect)
 {
 	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 
-	// Draw the lower arrow.
 	if (IsEnabled())
 		SetHighColor(0, 0, 0);
 	else {
@@ -166,9 +184,9 @@ DownScrollArrow::Draw(BRect updateRect)
 	FillRect(frame, B_SOLID_LOW);
 
 	float middle = Bounds().right / 2;
-	FillTriangle(BPoint(middle, frame.bottom - (kScrollerHeight / 2) + 3),
-		BPoint(middle + 5, frame.bottom - (kScrollerHeight / 2) - 2),
-		BPoint(middle - 5, frame.bottom - (kScrollerHeight / 2) - 2));
+	FillTriangle(BPoint(middle, frame.bottom - (kScrollerDimension / 2) + 3),
+		BPoint(middle + 5, frame.bottom - (kScrollerDimension / 2) - 2),
+		BPoint(middle - 5, frame.bottom - (kScrollerDimension / 2) - 2));
 }
 
 
@@ -191,7 +209,112 @@ DownScrollArrow::MouseDown(BPoint where)
 //	#pragma mark -
 
 
-TInlineScrollView::TInlineScrollView(BRect frame, BView* target)
+LeftScrollArrow::LeftScrollArrow(BRect frame)
+	:
+	ScrollArrow(frame)
+{
+}
+
+
+LeftScrollArrow::~LeftScrollArrow()
+{
+}
+
+
+void
+LeftScrollArrow::Draw(BRect updateRect)
+{
+	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+
+	if (IsEnabled())
+		SetHighColor(0, 0, 0);
+	else {
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+			B_DARKEN_2_TINT));
+	}
+
+	FillRect(Bounds(), B_SOLID_LOW);
+
+	float middle = Bounds().bottom / 2;
+	FillTriangle(BPoint((kScrollerDimension / 2) - 3, middle),
+		BPoint((kScrollerDimension / 2) + 2, middle + 5),
+		BPoint((kScrollerDimension / 2) + 2, middle - 5));
+}
+
+
+void
+LeftScrollArrow::MouseDown(BPoint where)
+{
+	if (!IsEnabled())
+		return;
+
+	TInlineScrollView* parent = dynamic_cast<TInlineScrollView*>(Parent());
+
+	if (parent != NULL) {
+		parent->ScrollBy(-kDefaultScrollStep);
+		snooze(5000);
+	}
+}
+
+
+//	#pragma mark -
+
+
+RightScrollArrow::RightScrollArrow(BRect frame)
+	:
+	ScrollArrow(frame)
+{
+}
+
+
+RightScrollArrow::~RightScrollArrow()
+{
+}
+
+
+void
+RightScrollArrow::Draw(BRect updateRect)
+{
+	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+
+	if (IsEnabled())
+		SetHighColor(0, 0, 0);
+	else {
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+			B_DARKEN_2_TINT));
+	}
+
+	BRect frame = Bounds();
+	FillRect(frame, B_SOLID_LOW);
+
+	float middle = Bounds().bottom / 2;
+	FillTriangle(BPoint(frame.bottom - (kScrollerDimension / 2) + 3, middle),
+		BPoint(frame.bottom - (kScrollerDimension / 2) - 2, middle + 5),
+		BPoint(frame.bottom - (kScrollerDimension / 2) - 2, middle - 5));
+}
+
+
+void
+RightScrollArrow::MouseDown(BPoint where)
+{
+	if (!IsEnabled())
+		return;
+
+	TInlineScrollView* grandparent
+		= dynamic_cast<TInlineScrollView*>(Parent()->Parent());
+
+	if (grandparent != NULL) {
+		grandparent->ScrollBy(kDefaultScrollStep);
+		snooze(5000);
+	}
+}
+
+
+//	#pragma mark -
+
+
+TInlineScrollView::TInlineScrollView(BRect frame, BView* target,
+	enum orientation orientation)
 	:
 	BView(frame, "inline scroll view", B_FOLLOW_NONE, 0),
 	fTarget(target),
@@ -262,7 +385,7 @@ TInlineScrollView::AttachScrollers()
 	BRect screenFrame = (BScreen(Window())).Frame();
 
 	if (HasScrollers()) {
-		fLimit = Window()->Frame().bottom + 2 * kScrollerHeight
+		fLimit = fTarget->Frame().bottom + 2 * kScrollerDimension
 			- screenFrame.bottom;
 		return;
 	}
@@ -271,23 +394,23 @@ TInlineScrollView::AttachScrollers()
 
 	if (fUpperScrollArrow == NULL) {
 		fUpperScrollArrow = new UpScrollArrow(
-			BRect(0, 0, frame.right, kScrollerHeight - 1));
+			BRect(0, 0, frame.right, kScrollerDimension - 1));
 		AddChild(fUpperScrollArrow);
 	}
 
 	if (fLowerScrollArrow == NULL) {
 		fLowerScrollArrow = new DownScrollArrow(
-			BRect(0, frame.bottom - 2 * kScrollerHeight + 1, frame.right,
-				frame.bottom - kScrollerHeight));
+			BRect(0, frame.bottom - 2 * kScrollerDimension + 1, frame.right,
+				frame.bottom - kScrollerDimension));
 		fTarget->AddChild(fLowerScrollArrow);
 	}
 
-	fTarget->MoveBy(0, kScrollerHeight);
+	fTarget->MoveBy(0, kScrollerDimension);
 
 	fUpperScrollArrow->SetEnabled(false);
 	fLowerScrollArrow->SetEnabled(true);
 
-	fLimit = Window()->Frame().bottom + 2 * kScrollerHeight
+	fLimit = fTarget->Frame().bottom + 2 * kScrollerDimension
 		- screenFrame.bottom;
 	fValue = 0;
 }
@@ -314,7 +437,7 @@ TInlineScrollView::DetachScrollers()
 	if (fTarget) {
 		// We don't remember the position where the last scrolling
 		// ended, so scroll back to the beginning.
-		fTarget->MoveBy(0, -kScrollerHeight);
+		fTarget->MoveBy(0, -kScrollerDimension);
 		fTarget->ScrollTo(0, 0);
 		fValue = 0;
 	}
