@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	607764928
+1	finnish	x-vnd.Haiku-MediaPlayer	2389197979
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -70,6 +70,7 @@ Select all	MediaPlayer-PlaylistWindow		Valitse kaikki
 Move Entry	MediaPlayer-MovePLItemsCmd		Siirrä kappale
 Open	MediaPlayer-PlaylistWindow		Avaa
 Stop playing.	MediaPlayer-Main		Lopeta soittaminen.
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa ’%filename’ ei voitu avata.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Virhe:
 Audio	MediaPlayer-InfoWin		Ääni
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Sisäinen virhe (vääränmuotoinen viesti). Soittoluettelon tallentaminen epäonnistui.

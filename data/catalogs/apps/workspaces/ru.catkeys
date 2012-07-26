@@ -1,12 +1,14 @@
-1	russian	x-vnd.Be-WORK	932379173
+1	russian	x-vnd.Be-WORK	4170489135
 Invalid argument: %s\n	Workspaces		Неверный аргумент: %s\n
 Quit	Workspaces		Выход
 Workspaces	System name		Рабочие столы
 Change workspace count…	Workspaces		Изменить количество столов…
+Remove replicant	Workspaces		Удалить репликант
 About Workspaces…	Workspaces		О программе…
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\n\nразработал %1 и %2.\n\nCopyright %3, Haiku.\n\nДля отправки окна в фон используйте клавишу Windows.\nДля активации окна используйте клавишу Ctrl.\n
 Show window border	Workspaces		Показывать рамку окна
 Auto-raise	Workspaces		Всплывать при наведении
 OK	Workspaces		ОК
 Always on top	Workspaces		Всегда сверху
+Live in the Deskbar	Workspaces		Жить в Deskbar
 Show window tab	Workspaces		Показывать заголовок окна

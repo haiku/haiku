@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3695303004
+1	german	x-vnd.Haiku-libtracker	3778030996
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -171,7 +171,6 @@ Edit favorites…	FilePanelPriv		Favoriten bearbeiten…
 Create relative link	ContainerWindow		Relative Verknüpfung erstellen
 Copy	ContainerWindow		Kopieren
 Size	PoseView		Größe
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Wird der Benutzer-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten. Um ihn und seine Inhalte dennoch %toDoAction, Shift-Taste gedrückt halten und \"%toConfirmAction\" klicken.
 Location	OpenWithWindow		Ort
 Force identify	ContainerWindow		Identifizierung erzwingen
 Duplicate	ContainerWindow		Duplizieren
@@ -195,7 +194,6 @@ New	DeskWindow		Neu
 Open	InfoWindow		Öffnen
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Alle ersetzen
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Die Anwendung \"%appname\" unterstützt den Typ des zu öffnenden Dokuments nicht. Soll dennoch fortgefahren werden? Wenn die Anwendung den Typ eigentlich unterstützen müsste, sollte deren Autor gebeten werden, diesen Typ zur Liste der unterstützten Dokumente hinzuzufügen.
 Preparing to restore items…	StatusWindow		Wiederherstellen wird vorbereitet…
 Replace other file	WidgetAttributeText		Andere Datei ersetzen
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Einige der ausgewählten Objekte können nicht in den Papierkorb verschoben werden. Sollen sie stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
@@ -220,7 +218,6 @@ Name	PoseView		Name
 Group	FilePermissionsView		Gruppe
 Version:	InfoWindow		Version:
 Created:	InfoWindow		Erstellt:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Wird der MIME-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten! Um ihn dennoch %toDoAction, \"%toConfirmAction\" klicken.
 \nShould this be fixed?	FSUtils		\nSoll das behoben werden?
 Copying: 	StatusWindow		Kopieren:
 Capacity:	InfoWindow		Kapazität:
@@ -280,7 +277,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Umbenennen
 Paused: click to resume or stop	StatusWindow		Pausiert: Klicken zum Fortfahren oder Abbrechen
 Preferred for %type	OpenWithWindow		Bevorzugt für %type
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Wird der Allgemein-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten! Um ihn dennoch %toDoAction, Shift-Taste gedrückt halten und \"%toConfirmAction\" klicken.
 There was an error deleting \"%name\":\n\t%error	FSUtils		Fehler beim Löschen von \"%name\":\n\t%error
 Paste	FilePanelPriv		Einfügen
 Copy more	ContainerWindow		Mehr kopieren
@@ -407,7 +403,6 @@ Select…	FilePanelPriv		Auswählen…
 Don't move files to Trash	SettingsView		Dateien nicht in den Papierkorb verschieben
 There was an error resolving the link.	Tracker		Fehler beim Auflösen der Verknüpfung.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Der System-Ordner oder seine Inhalte sollen %ifYouDoAction werden. Dadurch kann %osName nicht mehr gestartet werden! Um ihn oder seine Inhalte dennoch %toDoAction, Shift-Taste gedrückt halten und \"%toConfirmAction\" klicken.
 You can't move or copy the trash.	FSUtils		Der Papierkorb kann nicht verschoben oder kopiert werden.
 ends with	SelectionWindow		endet mit
 Volume icons	TrackerSettingsWindow		Datenträger-Icons
@@ -429,7 +424,6 @@ Modified	ContainerWindow		Geändert
 Edit Query template	FindPanel		Query-Vorlage bearbeiten
 Prompt	FSUtils		Nachfragen
 Edit query	ContainerWindow		Query bearbeiten
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Wird der Konfigurations-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten! Um ihn dennoch %toDoAction, \"%toConfirmAction\" klicken.
 Find…	ContainerWindow		Suchen…
 Create a Query	FindPanel		Query erstellen
 Move to Trash	FSUtils		In Papierkorb verschieben
@@ -448,7 +442,6 @@ Mount	ContainerWindow		Einhängen
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used benutzt -- %free frei)
 Cancel	FSClipBoard		Abbrechen
 Cut more	ContainerWindow		Mehr ausschneiden
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Wird der Settings-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten! Um ihn dennoch %toDoAction, \"%toConfirmAction\" klicken.
 Deleting: 	StatusWindow		Löschen:
 Empty Trash	InfoWindow		Papierkorb leeren
 Add	FindPanel		Hinzu

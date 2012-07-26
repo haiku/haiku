@@ -1,4 +1,7 @@
-1	russian	x-vnd.Haiku-DeskCalc	2021462472
+1	russian	x-vnd.Haiku-DeskCalc	1916192649
+Compact	CalcView		Компактный
+Scientific	CalcView		Научный
 DeskCalc	System name		Калькулятор
+Basic	CalcView		Простой
 Enable Num Lock on startup	CalcView		Включать Num Lock при запуске
 Audio Feedback	CalcView		Звуковая реакция

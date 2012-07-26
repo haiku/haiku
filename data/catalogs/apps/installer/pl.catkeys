@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Installer	2099988747
+1	polish	x-vnd.Haiku-Installer	2066726304
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Więc za innymi wpisami na samym dole pliku, dodaj coś podobnego do tych linii:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Na pewno chcesz przerwać instalację i uruchomić ponownie system?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -12,6 +12,7 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		Z GRUBem jest: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Zatrzymaj
 Install progress:  	InstallerWindow		Postęp instalacji:  
+2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Rozpoczęcie instalacji.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		To wciąż oprogramowanie w wersji alpha! Oznacza to, że występuje wysokie ryzyko utraty danych. Rób częste kopie zapasowe! Zostałeś ostrzeżony.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Czy na pewno chcesz przerwać  instalację?
@@ -37,6 +38,7 @@ Boot sector successfully written.	InstallProgress		Sektor rozruchowy został pom
 Performing installation.	InstallProgress		Wykonywanie instalacji.
 scanning…	InstallerWindow		skanowanie…
 Set up boot menu	InstallerWindow		Konfiguruj menu rozruchu
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (od os-prober v1.44)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Pierwsza partycja logiczna ma zawsze numer \"4\", niezależnie od liczby partycji podstawowych.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Sposób nazewnictwa GRUBa to wciąż: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <twój ulubiony edytor tekstu> /boot/grub/menu.lst\n\n
@@ -48,6 +50,7 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Dysk docelowy może nie mieć wystarczającej ilości wolnego miejsca. Proszę wybrać inny dysk lub odznaczyć pakiety dodatkowe.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Proszę zamknąć Menedżer Rozruchu i DriveSetup przed zamknięciem okna Instalatora.
 Scanning for disks…	InstallerWindow		Skanowanie w poszukiwaniu dysków…
+2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Dysk nie może zostać zamontowany. Proszę spróbować wybrać inny dysk.
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n

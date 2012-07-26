@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3695303004
+1	lithuanian	x-vnd.Haiku-libtracker	3778030996
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -171,7 +171,6 @@ Edit favorites…	FilePanelPriv		Tvarkyti parankinius…
 Create relative link	ContainerWindow		Kurti santykinę nuorodą
 Copy	ContainerWindow		Kopijuoti
 Size	PoseView		Dydis
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction Namų aplanką, „%osName“ elgesys taps nenuspėjamas! Ar tikrai to norite? Jeigu vis tiek norite %toDoAction Namų aplanką, spustelėkite mygtuką „%toConfirmAction“, laikydami nuspaustą Lyg2 klavišą.
 Location	OpenWithWindow		Vieta
 Force identify	ContainerWindow		Priverstinai atpažinti
 Duplicate	ContainerWindow		Dubliuoti
@@ -195,7 +194,6 @@ New	DeskWindow		Naujas
 Open	InfoWindow		Atverti
 64 x 64	ContainerWindow		64×64
 Replace all	FSUtils		Pakeisti visus
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Programa „%appname“ nepalaiko bandomo atverti dokumento tipo. Ar tikrai norite tęsti? Jeigu tikrai žinote, jog ši programa palaiko šio tipo dokumentus, galbūt Jums vertėtų susisiekti su programos leidėju ir paprašyti, kad šis papildytų programos deklaruojamą ja leidžiamų atverti dokumentų tipų sąrašą, įtraukdamas į jį šio dokumento tipą.
 Preparing to restore items…	StatusWindow		Ruošiamasi atkurti objektus…
 Replace other file	WidgetAttributeText		Pakeisti kitą failą
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Kai kurių pažymėtų elementų išmesti Šiukšlinėn negalima. Ar norite vietoje to juos pašalinti? Neužmirškite, jog šis veiksmas negrįžtamas!
@@ -220,7 +218,6 @@ Name	PoseView		Vardas
 Group	FilePermissionsView		Grupė
 Version:	InfoWindow		Versija:
 Created:	InfoWindow		Sukūrimo data:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction MIME nuostatas, „%osName“ elgesys taps nenuspėjamas! Ar tikrai to norite? Jeigu vis tiek norite %toDoAction MIME nuostatas, spustelėkite mygtuką „%toConfirmAction“.
 \nShould this be fixed?	FSUtils		\nAr pašalinti šį nesklandumą?
 Copying: 	StatusWindow		Kopijuojama:
 Capacity:	InfoWindow		Talpa:
@@ -280,7 +277,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Pervardinti
 Paused: click to resume or stop	StatusWindow		Pristabdyta. Galite pratęsti arba nutraukti
 Preferred for %type	OpenWithWindow		Numatytoji %type objektams
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction aplanką „Bendra“, „%osName“ elgesys taps nenuspėjamas! Ar tikrai to norite? Jeigu vis tiek norite %toDoAction aplanką „Bendra“, spustelėkite mygtuką „%toConfirmAction“, laikydami nuspaustą Lyg2 klavišą.
 There was an error deleting \"%name\":\n\t%error	FSUtils		Šalinant „%name“ įvyko klaida:\n\t%error
 Paste	FilePanelPriv		Įdėti
 Copy more	ContainerWindow		Kopijuoti dar
@@ -407,7 +403,6 @@ Select…	FilePanelPriv		Pažymėti…
 Don't move files to Trash	SettingsView		Šiukšlinėn objektų nemesti
 There was an error resolving the link.	Tracker		Nustatant nuorodos tikslą, įvyko klaida.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction Sistemos aplanką, „%osName“ elgesys taps nenuspėjamas! Ar tikrai to norite? Jeigu vis tiek norite %toDoAction Sistemos aplanką, spustelėkite mygtuką „%toConfirmAction“, laikydami nuspaustą Lyg2 klavišą.
 You can't move or copy the trash.	FSUtils		Šiukšlinės negalima nei perkelti, nei nukopijuoti.
 ends with	SelectionWindow		baigiasi
 Volume icons	TrackerSettingsWindow		Tomų piktogramos
@@ -429,7 +424,6 @@ Modified	ContainerWindow		Modifikavimo data
 Edit Query template	FindPanel		Taisyti užklausos šabloną
 Prompt	FSUtils		Klausti
 Edit query	ContainerWindow		Taisyti užklausą
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction Konfigūracijos aplanką, „%osName“ elgesys taps nenuspėjamas! Ar tikrai to norite? Jeigu vis tiek norite %toDoAction Konfigūracijos aplanką, spustelėkite mygtuką „%toConfirmAction“.
 Find…	ContainerWindow		Ieškti…
 Create a Query	FindPanel		Kurti užklausą
 Move to Trash	FSUtils		Išmesti Šiukšlinėn
@@ -448,7 +442,6 @@ Mount	ContainerWindow		Prijungti
 %capacity (%used used -- %free free)	InfoWindow		%capacity (užpildyta %used, laisva %free)
 Cancel	FSClipBoard		Atsisakyti
 Cut more	ContainerWindow		Iškirpti dar
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction Nuostatų aplanką, „%osName“ elgesys taps nenuspėjamas! Ar tikrai to norite? Jeigu vis tiek norite %toDoAction Nuostatų aplanką, spustelėkite mygtuką „%toConfirmAction“.
 Deleting: 	StatusWindow		Šalinama:
 Empty Trash	InfoWindow		Ištuštinti šiukšlinę
 Add	FindPanel		Pridėti

@@ -1,16 +1,22 @@
-1	russian	x-vnd.Haiku-SoundRecorder	4189888707
+1	russian	x-vnd.Haiku-SoundRecorder	2149017672
 Loop	RecorderWindow		Закольцевать
 Cannot find default audio hardware	RecorderWindow		Не найдено аудио оборудование
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Не найден временный файл, созданный для хранения новой записи
+Sample size:	RecorderWindow		Размер сэмпла:
 Nothing to play	RecorderWindow		Нечего играть
+Duration: 	RecorderWindow		Продолжительность: 
 Some of the files don't appear to be audio files	RecorderWindow		Некоторые из файлов не являются аудио файлами
 File info	RecorderWindow		Информация о файле:
 Drop files here	SoundListView		Перенесите сюда файлы
 Input	RecorderWindow		Вход
 Stop	RecorderWindow		Стоп
+Format:	RecorderWindow		Формат:
 Sound List	RecorderWindow		Список звуков
+Compression: 	RecorderWindow		Сжатие: 
 Rewind	RecorderWindow		Перемотка
+Sample rate:	RecorderWindow		Частота дискретизации:
 Invalid audio files	RecorderWindow		Неверные аудио файлы
+ seconds	RecorderWindow		 секунд
 OK	RecorderWindow		ОК
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Невозможно открыть временный файл, созданный для хранения новой записи
 None of the files appear to be audio files	RecorderWindow		Ни один из файлов не является файлом аудио
@@ -18,11 +24,14 @@ Input:	RecorderWindow		Звуковой вход:
 Forward	RecorderWindow		Вперед
 Play	RecorderWindow		Играть
 SoundRecorder	System name		Звукозапись
+Channels:	RecorderWindow		Каналы:
+ bits	RecorderWindow		 бит
 None	RecorderWindow		Нет
 Record	RecorderWindow		Запись
 Sample size: 	RecorderWindow		Размер сэмпла: 
 Cannot recognize this file as a media file	RecorderWindow		Не удается распознать файл как файл медиа
 Format: 	RecorderWindow		Формат: 
+File name: 	RecorderWindow		Имя файла: 
 Cannot connect to the selected sound input	RecorderWindow		Невозможно подключиться к выбранному звуковому входу
 Cannot get the file to play	RecorderWindow		Невозможно воспроизвести файл
 Cannot record a sound that long	RecorderWindow		Невозможно записать звук такой длины

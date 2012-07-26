@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	3343389761
+1	english	x-vnd.Haiku-libtracker	2125023871
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -185,7 +185,6 @@ New	DeskWindow		新建
 Open	InfoWindow		打开
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		替换所有
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		\"%appname\" 程序不支持即将打开的文档类型。您确定要继续吗？如果您知道，此文件支持该文档类型，您应该联系程序发行商，并要求他们更新程序以支持您的文档类型。
 Preparing to restore items…	StatusWindow		准备恢复项目...
 Replace other file	WidgetAttributeText		替换其他文件
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		某些选中项目无法移动到垃圾箱。您希望删除它们吗？（该操作将无法恢复。）

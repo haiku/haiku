@@ -1,9 +1,10 @@
-1	polish	x-vnd.Be-TSKB	359782181
+1	polish	x-vnd.Be-TSKB	3726855474
 Power off	DeskbarMenu		Wyłącz komputer
 Show day of week	PreferencesWindow		Pokaż dzień tygodnia
 Edit menu…	PreferencesWindow		Edytuj zawartość menu…
 Applications	PreferencesWindow		Lista aplikacji
 Time preferences…	TimeView		Ustawienia czasu...
+About Haiku	DeskbarMenu		O Haiku
 Recent documents:	PreferencesWindow		Ostatnio przeglądane dokumenty:
 Recent applications	DeskbarMenu		Ostatnio uruchomione aplikacje
 Sort running applications	PreferencesWindow		Sortuj uruchomione aplikacje alfabetycznie

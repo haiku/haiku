@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	520218895
+1	hindi	x-vnd.Haiku-libtracker	602946887
 common	B_COMMON_DIRECTORY		सामान्य
 OK	WidgetAttributeText		ठीक है
 Icon view	VolumeWindow		चिह्न दृश्य
@@ -165,7 +165,6 @@ Edit favorites…	FilePanelPriv		फेवरिट संपादित कर
 Create relative link	ContainerWindow		संबंधित लिंक बनाएँ
 Copy	ContainerWindow		अनुकृति बनाना
 Size	PoseView		आकार
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction होम फोल्डर, %osName ठीक से नहीं पेश आएगी! क्या आप पक्का से यह करना चाहते हैं? To %toDoAction होम फोल्डर किसी भी तरह, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".   
 Location	OpenWithWindow		स्थान
 Force identify	ContainerWindow		फोर्स पहचाने
 Duplicate	ContainerWindow		नकल
@@ -189,7 +188,6 @@ New	DeskWindow		नया
 Open	InfoWindow		खोलें
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		सभी बदलें
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		\ अनुप्रयोग "% \ APPNAME" आप  जिस दस्तावेज़ के प्रकार के बारे में खोलने के लिए कर रहे हैं यह का समर्थन नहीं करता. क्या आप आगे बढ़ना चाहते हैं? यदि आप जानते हैं कि आवेदन दस्तावेज़ प्रकार का समर्थन करता है, तो आप आवेदन के प्रकाशक से संपर्क करें और उन्हें अपने अपने रूप में समर्थित दस्तावेज़ के प्रकार सूची आवेदन अद्यतन करने के लिए पूछना चाहिए.
 Preparing to restore items…	StatusWindow		आइटम बहाल की तैयारी ...
 Replace other file	WidgetAttributeText		अन्य फ़ाइल बदलें
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		चयनित आइटम में से कुछ रद्दी में स्थानांतरित नहीं किया जा सकता है. क्या आप के बजाय उन्हें मिटाना चाहते हैं? (यह आपरेशन किया जाना है. नहीं लौट सकते हैं)
@@ -214,7 +212,6 @@ Name	PoseView		नाम
 Group	FilePermissionsView		समूह
 Version:	InfoWindow		संस्करण:
 Created:	InfoWindow		बनाया गया:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction मिमे सेत्तिंग्स, %osName ठीक से नहीं पेश आएगी! क्या आप पक्का से यह करना चाहते हैं? To %toDoAction माईम फोल्डर किसी भी तरह, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
 \nShould this be fixed?	FSUtils		क्या
 Copying: 	StatusWindow		प्रतिलिपि बनाई जा रही: 
 Capacity:	InfoWindow		क्षमता:
@@ -273,7 +270,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	फिर स�
 Paused: click to resume or stop	StatusWindow		रुका हुआ: क्लिक करें फिर से शुरू या बंद करने के लिए
 Preferred for %type	OpenWithWindow		के लिए पसंदीदा %type
 GiB	WidgetAttributeText		गीबाइट्स
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction कोम्मन फोल्डर, %osName ठीक से नहीं पेश आएगी! क्या आप पक्का से यह करना चाहते हैं? To %toDoAction कॉमन फोल्डर किसी भी तरह, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
 There was an error deleting \"%name\":\n\t%error	FSUtils		वहाँ एक को हटाने में त्रुटि \"%name\":\n\t%error
 Paste	FilePanelPriv		चिपकाएँ
 Copy more	ContainerWindow		और अधिक प्रति करें 
@@ -400,7 +396,6 @@ Select…	FilePanelPriv		चुनें ...
 Don't move files to Trash	SettingsView		रद्दी में फाइलों मत डालें
 There was an error resolving the link.	Tracker		एक कड़ी को हल करने में त्रुटि हुई.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction सिस्टम फोल्डर या फिर उसके कंटेंट्स, आप उससे बूट नहीं कर पाएंगे %osName! क्या आप यह करना चाहते है? के लिए %toDoAction सिस्टम फोल्डर या फिर उसके कंटेंट्स केसे भी, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
 You can't move or copy the trash.	FSUtils		आप रद्दी को कॉपी या स्थानांतरित नहीं कर सकते हैं.
 ends with	SelectionWindow		के साथ समाप्त होता है
 Volume icons	TrackerSettingsWindow		मात्रा प्रतीक
@@ -422,7 +417,6 @@ Modified	ContainerWindow		संशोधित किया गया
 Edit Query template	FindPanel		प्रश्न आकार पट्ट संपादित करें
 Prompt	FSUtils		शीघ्र
 Edit query	ContainerWindow		प्रश्न संपादित करें
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction कॉन्फिग फोल्डर, आप उससे बूट नहीं कर पाएंगे %osName! क्या आप यह करना चाहते है? के लिए %toDoAction कॉन्फिग फोल्डर या फिर उसके कंटेंट्स केसे भी, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
 Find…	ContainerWindow		खोजें...
 Create a Query	FindPanel		प्रश्न बनाये
 Move to Trash	FSUtils		रद्दी मे ले जाएँ
@@ -441,7 +435,6 @@ Mount	ContainerWindow		चिपकाना
 %capacity (%used used -- %free free)	InfoWindow		%क्षमता
 Cancel	FSClipBoard		रद्द करें
 Cut more	ContainerWindow		और अधिक काटे
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		अगर आप %ifYouDoAction कोम्मन फोल्डर, %osName ठीक से नहीं पेश आएगी! क्या आप पक्का से यह करना चाहते हैं? To %toDoAction सेटिंग्स फोल्डर किसी भी तरह, Shift पकड़ कर रखें और क्लिक करें \"%toConfirmAction\".
 Deleting: 	StatusWindow		हटा रहा है
 Empty Trash	InfoWindow		रद्दी खाली करें
 Add	FindPanel		जोड़े

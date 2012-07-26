@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	4074946557
+1	japanese	x-vnd.Haiku-libtracker	4157674549
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -167,7 +167,6 @@ Edit favorites…	FilePanelPriv		お気に入りの編集…
 Create relative link	ContainerWindow		相対リンクを作成
 Copy	ContainerWindow		コピー
 Size	PoseView		サイズ
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		ホームフォルダーを%ifYouDoActionすると、%osName は正しく動かなくなるかもしれません。本当に行いますか? どうしてもホームフォルダーを%toDoActionするには、シフトキーを押したまま、\"%toConfirmAction\" をクリックしてください。
 Location	OpenWithWindow		場所
 Force identify	ContainerWindow		ファイル形式を判別
 Duplicate	ContainerWindow		複製
@@ -191,7 +190,6 @@ New	DeskWindow		新規作成
 Open	InfoWindow		開く
 64 x 64	ContainerWindow		64 × 64
 Replace all	FSUtils		すべて置換
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\" は開こうとしているドキュメントの形式をサポートしていません。進めても良いですか? アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
 Preparing to restore items…	StatusWindow		復元の準備をしています…
 Replace other file	WidgetAttributeText		既存の項目を置き換える
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		いくつかの選択項目はごみ箱に捨てられません。完全に削除してもよろしいですか？元に戻せませんので、ご注意ください。
@@ -216,7 +214,6 @@ Name	PoseView		名前
 Group	FilePermissionsView		グループ
 Version:	InfoWindow		バージョン：
 Created:	InfoWindow		作成日時：
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		mime 設定を%ifYouDoActionすると、%osName は正しく動かなくなるかもしれません。本当に行いますか? どうしても mime 設定を%toDoActionするには、\"%toConfirmAction\" をクリックしてください。
 \nShould this be fixed?	FSUtils		\n修復しますか？
 Copying: 	StatusWindow		コピー中：
 Capacity:	InfoWindow		容量：
@@ -275,7 +272,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	名前の変更
 Paused: click to resume or stop	StatusWindow		一時停止中：クリックで動作の再開また中断をしてください 
 Preferred for %type	OpenWithWindow		%type対応優先アプリ
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		common フォルダーを%ifYouDoActionすると、%osName は正しく動かなくなるかもしれません。本当に行いますか? どうしても common フォルダーを%toDoActionするには、シフトキーを押したまま、\"%toConfirmAction\" をクリックしてください。
 There was an error deleting \"%name\":\n\t%error	FSUtils		\"%name\" の移動中にエラーが発生しました：\n\t%error
 Paste	FilePanelPriv		貼り付け
 Copy more	ContainerWindow		さらにコピー
@@ -402,7 +398,6 @@ Select…	FilePanelPriv		選択…
 Don't move files to Trash	SettingsView		ごみ箱を経由せずに削除する
 There was an error resolving the link.	Tracker		リンクの解釈に失敗しました。
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/秒
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		システムフォルダーやその内容を%ifYouDoActionすると、%osName は起動しなくなるでしょう。本当に行いますか? どうしてもシステムフォルダーやその内容を%toDoActionするには、シフトキーを押したまま、\"%toConfirmAction\" をクリックしてください。
 You can't move or copy the trash.	FSUtils		ごみ箱の移動やコピーはできません。
 ends with	SelectionWindow		指定文字列で終わる
 Volume icons	TrackerSettingsWindow		ディスクアイコン
@@ -424,7 +419,6 @@ Modified	ContainerWindow		更新日時
 Edit Query template	FindPanel		クエリテンプレートを編集
 Prompt	FSUtils		プロンプト
 Edit query	ContainerWindow		クエリを編集
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		config フォルダーを%ifYouDoActionすると、%osName は正しく動かなくなるかもしれません。本当に行いますか? どうしても config フォルダーを%toDoActionするには、シフトキーを押したまま、\"%toConfirmAction\" をクリックしてください。
 Find…	ContainerWindow		検索…
 Create a Query	FindPanel		クエリを作成
 Move to Trash	FSUtils		ごみ箱に移動
@@ -443,7 +437,6 @@ Mount	ContainerWindow		マウント
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 使用中 -- %free 使用可能)
 Cancel	FSClipBoard		中止
 Cut more	ContainerWindow		さらに切り取る
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		settings フォルダーを%ifYouDoActionすると、%osName は正しく動かなくなるかもしれません。本当に行いますか? どうしても settings フォルダーを%toDoActionするには、シフトキーを押したまま、\"%toConfirmAction\" をクリックしてください。
 Deleting: 	StatusWindow		削除中：
 Empty Trash	InfoWindow		ごみ箱を空にする
 Add	FindPanel		追加

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PoorMan	995747556
+1	russian	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Расположение сайта
 Error Server	PoorMan		Ошибка сервера
 Settings…	PoorMan		Настройки…
@@ -8,7 +8,7 @@ Hits: %lu	PoorMan		Посещений: %lu
 Web folder:	PoorMan		Веб-папка:
 Default	PoorMan		По умолчанию
 Save log console selection	PoorMan		Сохранить выделенную часть лога консоли
-Run server	PoorMan		Запустиь сервер
+Run server	PoorMan		Запустить сервер
 PoorMan settings	PoorMan		Настройки PoorMan
 Clear hit counter	PoorMan		Очистить счетчик посещений
 Copy	PoorMan		Копировать
@@ -24,13 +24,17 @@ Advanced	PoorMan		Дополнительно
 OK	PoorMan		ОК
 Status: Stopped	PoorMan		Статус: остановлен
 Dir Created	PoorMan		Создана директория
+Log to file	PoorMan		Сохранять лог в файл
 Quit	PoorMan		Выход
 Hits: 0	PoorMan		Посещений: 0
 Save log console	PoorMan		Сохранить лог консоли
 Edit	PoorMan		Изменить
+Create Log File	PoorMan		Создать лог файл
+Log to console	PoorMan		Выводить лог в консоль
 Directory: (none)	PoorMan		Директория: (отсутствует)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Пожалуйста, выберите папку для публикации.\n\nPoorMan может создать папку по умолчанию public_html в вашей домашней папке.\nИли вы можете выбрать любую другую папку.
 Log To Console	PoorMan		Выводить лог в консоль
+Connections	PoorMan		Соединения
 Status: Running	PoorMan		Статус: работает
 connections	PoorMan		соединения
 Controls	PoorMan		Управление
@@ -38,6 +42,7 @@ Send file listing if there's no start page	PoorMan		Отобразить спи�
 Error Dir	PoorMan		Ошибка директории
 Select all	PoorMan		Выделить всё
 File	PoorMan		Файл
+File Logging	PoorMan		Логирование в файл
 Save console selections as…	PoorMan		Сохранить выделение консоли как…
 File logging	PoorMan		Логирование в файл
 Select web folder	PoorMan		Выбрать папку для публикации
@@ -53,6 +58,7 @@ Create log file	PoorMan		Создать лог файл…
 Starting up... 	PoorMan		Запуск... 
 Site	PoorMan		Сайт
 Cancel	PoorMan		Отмена
+Console logging	PoorMan		Логирование в консоль
 Cannot start the server	PoorMan		Не удалось запустить сервер
 Select	PoorMan		Выбрать
 Save console as…	PoorMan		Сохранить содержимое консоли как…

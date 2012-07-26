@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	607764928
+1	polish	x-vnd.Haiku-MediaPlayer	2389197979
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -70,6 +70,7 @@ Select all	MediaPlayer-PlaylistWindow		Zaznacz wszystko
 Move Entry	MediaPlayer-MovePLItemsCmd		Przeniesienie wpisu
 Open	MediaPlayer-PlaylistWindow		Otwórz
 Stop playing.	MediaPlayer-Main		Zatrzymaj odtwarzanie.
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Plik '%filename' nie może być otwarty.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Błąd: 
 Audio	MediaPlayer-InfoWin		Dźwięk
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Błąd wewnętrzny (nieprawidłowa wiadomość). Zapisywanie listy odtwarzania nie powiodło się.

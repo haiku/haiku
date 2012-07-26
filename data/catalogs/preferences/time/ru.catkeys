@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-Time	472387788
+1	russian	x-vnd.Haiku-Time	3249243267
+GMT (UNIX compatible)	Time		По Гринвичу (совместимо с UNIX)
 OK	Time		ОК
 Asia	Time		Азия
 \nNow: 	Time		\nСейчас: 
@@ -13,6 +14,7 @@ Pacific	Time		Тихий океан
 Add	Time		Добавить
 Date and time	Time		Дата и время
 about	Time		о программе
+Local time (Windows compatible)	Time		Местное время (совместимо с Windows)
 Message receiving failed	Time		Не удалось получить данные
 Set time zone	Time		Установить часовой пояс
 Waiting for answer failed	Time		Истекло время ожидания
@@ -28,6 +30,7 @@ Time	System name		Время
 America	Time		Америка
 Reset	Time		Сбросить
 Synchronize at boot	Time		Синхронизировать при загрузке
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Время, разработан:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсе права защищены 2004-2012, Haiku.
 Received invalid time	Time		Получено неверное время
 Antarctica	Time		Антарктида
 The following error occured while synchronizing:r\n%s: %s	Time		При синхронизации произошла следующая ошибка:r\n%s: %s

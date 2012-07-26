@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	2326864078
+1	russian	x-vnd.haiku-icon_o_matic	4233739176
 Select All	Icon-O-Matic-PathManipulator		Выделить всё
 Add Style	Icon-O-Matic-AddStylesCmd		Добавить стиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Цвет (#%02x%02x%02x)
@@ -117,6 +117,7 @@ Gradient	Icon-O-Matic-StyleTypes		Градиент
 Min LOD	Icon-O-Matic-PropertyNames		Мин. LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрибут BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Инвертировать выделение
+Drop shapes	Icon-O-Matic-ShapesList		Удалить формы
 Export as…	Icon-O-Matic-Menu-File		Экспортировать как…
 Transformation	Transformation		Изменение
 Click on an object in	Empty property list - 1st line		Нажмите на объект в
@@ -158,6 +159,7 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Выровнять по сетке
 Remove	Icon-O-Matic-ShapesList		Удалить
 Yes	Icon-O-Matic-StyledTextImport		Да
 Transformation	Icon-O-Matic-TransformersList		Изменение
+Save image	Icon-O-Matic-SavePanel		Сохранить изображение
 Add Styles	Icon-O-Matic-AddStylesCmd		Добавить стили
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Удалить точки
 Format	Icon-O-Matic-SavePanel		Формат

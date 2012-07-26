@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DiskProbe	2706202187
+1	russian	x-vnd.Haiku-DiskProbe	2306672993
 File offset: 	ProbeView		Смещение файла: 
 %ld (native)	ProbeView		%ld (родной)
 64 bit unsigned value:	TypeEditors		64-х битное беззнаковое значение:
@@ -59,6 +59,7 @@ Boolean value:	TypeEditors		Булевое значение:
 8 bit palette	TypeEditors		8 битная палитра
 Fit	ProbeView	Size of fonts, fits to available room	Подгонять
 Probe device	OpenWindow		Исследовать устройство
+ (native)	ProbeView		 (нативный)
 Unknown format	TypeEditors		Неизвестный формат
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шестнадцатеричный
 MIME type:	TypeEditors		MIME тип:

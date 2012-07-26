@@ -1,10 +1,11 @@
-1	russian	x-vnd.Be-MAIL	1799353819
+1	russian	x-vnd.Be-MAIL	2834665561
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
 Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
 An error occurred trying to save the attachment.	Mail		Произошла ошибка при попытке сохранить вложение.
 Copy to new	Mail		Копировать в новое
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Оставить как 'New'
 Edit	Mail		Изменить
 Print	Mail		Печать
 <none>	Mail		<пусто>
@@ -62,12 +63,15 @@ Print…	Mail		Печать…
 Warn unencodable:	Mail		Предупреждать о невозможности декодировать:
 Quit	Mail		Выход
 %n - Full name	Mail		%n - Полное имя
+ Read 	Mail		 Прочитанным 
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Корзина
 Default account:	Mail		Аккаунт по умолчанию:
 Size:	Mail		Размер:
 Account from mail	Mail		Использовать аккаунт из письма
 Edit signatures…	Mail		Изменить подписи…
 New	Mail		Новое
+Attachments: 	Mail		Вложения: 
 On	Mail		Включить
 Set to %s	Mail		Пометить как %s
 Forward	Mail		Переслать

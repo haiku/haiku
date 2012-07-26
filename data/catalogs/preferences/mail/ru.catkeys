@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Mail	3957822883
+1	russian	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Проверка почты
 Settings	Config Window		Настройки
 Never	Config Window	show status window	никогда
@@ -6,6 +6,7 @@ Only when dial-up is connected	Config Window		Только при наличии
 While sending and receiving	Config Window		во время отправки и получения
 days	Config Window		дней
 Incoming	Config Window		Входящие
+Server name:	E-Mail		Имя сервера:
 OK	Config Window		ОК
 Start mail services on startup	Config Window		Запускать почтовые службы при загрузке
 E-mail address:	E-Mail		E-mail адрес:

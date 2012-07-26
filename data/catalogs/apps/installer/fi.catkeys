@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	2099988747
+1	finnish	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Joten lisää muiden valikkorivien alapuolelle tiedoston loppuun joitakin seuraavanlaisia rivejä:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Oletko varma, että haluat keskeyttää asennuksen ja käynnistää järjestelmän uudelleen?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -12,6 +12,7 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		GRUB-ohjelmalla se on: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Pysäytä
 Install progress:  	InstallerWindow		Asennuksen eteneminen:  
+2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Aloitetaan asennus.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Tämä on alfa-laatuinen ohjelmisto! Se tarkoittaa, että on olemassa korkea riski menettää tärkeitä tietoja. Tee usein varmuuskopioita! Sinua on varoitettu.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Oletko varma, että haluat keskeyttää asentamisen?
@@ -37,6 +38,7 @@ Boot sector successfully written.	InstallProgress		Alkulataussektori kirjoitetti
 Performing installation.	InstallProgress		Suoritetaan asennus.
 scanning…	InstallerWindow		etsitään…
 Set up boot menu	InstallerWindow		Aseta alkulatausvalikko
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (sitten os-prober v1.44)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Ensimmäisellä loogisella osiolla on numero ”4”, riippumatta ensisijaisten osioiden lukumäärästä.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUB:in nimeämiskaava on yhä: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <suosikkieditorisi nimi> /boot/grub/menu.lst\n\n
@@ -48,6 +50,7 @@ README	InstallerApp		LUEMINUT
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Kohdelevyllä ei ehkä ole riittävästi tilaa. Yritä valita eri levy tai älä valitse valinnaisten alkioiden asentamista.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sulje ensin Alkulataushallinta- ja Levyasema-asetusikkunat ennen asennusohjelman ikkunan sulkemista.
 Scanning for disks…	InstallerWindow		Etsitään levyjä…
+2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Levyä ei voitu liittää. Valitse eri levy.
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry ”Haiku Alfa” {\n
@@ -67,6 +70,7 @@ Installer	System name		Asennusohjelma
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Et voi asentaa levyn sisältö itseensä. Valitse eri levy.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		”n” on osionumero, joka GRUB 2 -ohjelmassa alkaa numerosta ”1”\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Alkaen os-prober-ohjelman versiosta v1.44 (esim.: Ubuntussa 11.04 tai myöhäisemmissä versioissa), Haiku-käyttöjärjestelmän tunnistaminen onnistuu ilman pulmia. Avaa Pääteikkuna Haikun lisäämiseksi GRUB-valikkoon ja kirjoita:\n\n
 Quit DriveSetup	InstallerWindow		Poistu Levyasema-asetuksista
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		”N” on kiintolevynumero, alkaen numerosta ”0”.\n
 Hide optional packages	InstallerWindow		Piilota valinnaiset pakkaukset
@@ -109,6 +113,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Oletko varma, että haluat pysäyttää asennuksen?
 Onto:	InstallerWindow		Kohteeseen:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sulje Alkulataushallintaikkuna ennen Asennusohjelmaikkunan sulkemista.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kun alkulataat Haikun onnistuneesti ensimmäisen kerran, lue varmuuden vuoksi \"Tervetuloa\" ja \"Käyttäjäopas\" -asiakirjamme. Niihin löytyy linkit työpöydältä ja WebPositive-selaimen kirjanmerkeistä.\n\n
 Tools	InstallerWindow		Työkalut
 The mount point could not be retrieved.	InstallProgress		Liittämispistettä ei voitu noutaa.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Kohdetaltio ei ole tyhjä. Oletko varma, että haluat asentaa siitä huolimatta?\n\nHuomaa: ’system’-kansio on oleva puhdas kopio lähdetaltiolta, kaikki muut kansiot yhdistetään, kun taas tiedostot ja linkit, jotka esiintyvät sekä lähde- että kohdetaltiolla korvataan lähdetaltion versiolla.

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Devices	2473502333
+1	russian	x-vnd.Haiku-Devices	865240481
 Manufacturer	DeviceSCSI		Производитель
 Order by:	DevicesView		Сортировать по:
 ACPI controller	Device		Контроллер ACPI
@@ -13,6 +13,7 @@ Computer	Device		Компьютер
 Unknown device	Device		Неизвестное устройство
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Информация о классе:\t\t\t\t: %classInfo%
 Processor	DeviceSCSI		Процессор
+RBC	DeviceSCSI		RBC
 Detailed	DevicesView		Подробности
 Category	DevicesView		категориям
 Quit	DevicesView		Выход
@@ -53,8 +54,10 @@ Basic information	DevicesView		Основная информация
 PCI Information	DevicePCI		PCI информация 
 Manufacturer:	Device		Производитель:
 ACPI bus	DevicesView		Шина ACPI
+Changer	DeviceSCSI		Changer
 ACPI System Bus	DeviceACPI		Системная шина ACPI
 Devices	System name		Устройства
+Worm	DeviceSCSI		Worm
 Multimedia controller	Device		Мультимедийный контроллер
 Unknown	DevicePCI		Неизвестное
 Device name:	Device		Название устройства:
@@ -73,6 +76,7 @@ Manufacturer	DevicePCI		Производитель
 Intelligent controller	Device		Интеллектуальный контроллер
 Satellite communications controller	Device		Контроллер спутниковой связи
 SCSI Information	DeviceSCSI		SCSI информация
+Enclosure	DeviceSCSI		Enclosure
 Array	DeviceSCSI		Массив
 Bridge	Device		Мост
 Refresh devices	DevicesView		Обновить список устройств

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	3603368351
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	3686096343
 common	B_COMMON_DIRECTORY		felles
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvisning
@@ -167,7 +167,6 @@ Edit favorites…	FilePanelPriv		Rediger favoritter
 Create relative link	ContainerWindow		Lag relativ lenke
 Copy	ContainerWindow		Kopier
 Size	PoseView		Størrelse
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Dersom du gjennomfører %ifYouDoAction hjemmemappe, %osName kan opptre seg unormalt! Er du sikker på at du vil gjennomføre dette? For å %toDoAction hjemmemappe allikevel, hold ned shift tast og klikk \"%toConfirmAction\".
 Location	OpenWithWindow		Sted
 Force identify	ContainerWindow		Tving identifisering
 Duplicate	ContainerWindow		Dupliser
@@ -191,7 +190,6 @@ New	DeskWindow		Ny
 Open	InfoWindow		Åpne
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Erstatt alle
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Programmet \"%appname\" støtter ikke den dokumenttypen du er i ferd med å åpne. Er du sikker på at du vil fortsette? Hvis du er sikker på at programmet støtter dokumenttypen bør du kontakte utgiveren av programmet og be dem om å oppdatere programmet til å oppgi  at dokumenttypen er støttet.
 Preparing to restore items…	StatusWindow		Forbereder gjenoppretting av oppføringer...
 Replace other file	WidgetAttributeText		Erstatt annen fil
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Noen av de valgte oppføringene kan ikke flyttes til søppelkurven. Ønsker du å slette dem i stedet? (Denne operasjonen kan ikke angres.)
@@ -216,7 +214,6 @@ Name	PoseView		Navn
 Group	FilePermissionsView		Gruppe
 Version:	InfoWindow		Versjon:
 Created:	InfoWindow		Opprettet:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Dersom du gjennomfører %ifYouDoAction  mime settingene, %osName kan opptre seg unormalt! Er du sikker på at du vil gjennomføre dette? For å %toDoAction mime settingsene alikevel, klikk \"%toConfirmAction\".
 \nShould this be fixed?	FSUtils		\nSkal dette repareres?
 Copying: 	StatusWindow		Kopierer:
 Capacity:	InfoWindow		Kapasitet:
@@ -275,7 +272,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Gi nytt navn
 Paused: click to resume or stop	StatusWindow		Pauset: klikk for å fortsette eller stoppe
 Preferred for %type	OpenWithWindow		Foretrukket for %type
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Dersom du gjennomfører %ifYouDoAction felles mappen, %osName kan opptre seg unormalt! Er du sikker på at du vil gjennomføre dette? For å %toDoAction felles mappe, hold ned shift tast og klikk \"%toConfirmAction\".
 There was an error deleting \"%name\":\n\t%error	FSUtils		Det oppsto en feil ved sletting av \"%name\":\n\t%error
 Paste	FilePanelPriv		Lim inn
 Copy more	ContainerWindow		Kopier flere
@@ -401,7 +397,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Kunne ikke oppda
 Select…	FilePanelPriv		Velg...
 Don't move files to Trash	SettingsView		Ikke flytt filer til søppelkurven.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Dersom du gjennomfører %ifYouDoAction system mappen eller dens innhold, vil du ikke kunne starte %osName! Are you sure you want to do this? For å %toDoAction system mappe, hold ned shift tast og klikk \"%toConfirmAction\".
 You can't move or copy the trash.	FSUtils		Du kan ikke flytte eller kopiere søppelkurven.
 ends with	SelectionWindow		slutter med
 Volume icons	TrackerSettingsWindow		Volumikoner
@@ -422,7 +417,6 @@ less than	FindPanel		mindre enn
 Modified	ContainerWindow		Endret
 Edit Query template	FindPanel		Rediger mal for spørringer
 Edit query	ContainerWindow		Rediger spørring
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Dersom du gjennomfører %ifYouDoAction config mappen, %osName kan opptre seg unormalt! Er du sikker på at du vil gjennomføre dette? For å %toDoAction config mappen uansett, klikk \"%toConfirmAction\".
 Find…	ContainerWindow		Finn...
 Create a Query	FindPanel		Opprett en spørring
 Move to Trash	FSUtils		Flytt til søppelkurven
@@ -441,7 +435,6 @@ Mount	ContainerWindow		Monter
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used brukt -- %free ledig)
 Cancel	FSClipBoard		Avbryt
 Cut more	ContainerWindow		Klipp mer
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Dersom du gjennomfører %ifYouDoAction settings mappen, %osName kan opptre seg unormalt! Er du sikker på at du vil gjennomføre dette? For å %toDoAction settings mappen uansett, klikk \"%toConfirmAction\".
 Deleting: 	StatusWindow		Sletter:
 Empty Trash	InfoWindow		Tøm søppelkurven
 Add	FindPanel		Legg til

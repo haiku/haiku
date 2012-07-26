@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-About	2392344107
+1	russian	x-vnd.Haiku-About	4105576244
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 BSD (4-clause)	AboutView		4-пунктовая BSD
 %ld Processors:	AboutView		Процессоров: %ld
@@ -37,7 +38,9 @@ Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Все пр
 \nCopyrights\n\n	AboutView		\nАвторские права\n\n
 Current maintainers:\n	AboutView		Текущие разработчики:\n
 Time running:	AboutView		Время работы:
+Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Содержит программное обеспечение из проекта FreeBSD, выпущен под лицензией BSD:\ncal, ftpd, ping, telnet, telnetd, tracerout\nВсе права защищены © 1994-2008 Проект FreeBSD.
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Все права защищены © 2010-2011 Google Inc.
 About this system	AboutWindow		Об этой системе
 Version:	AboutView		Версия:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Все права защищены © 1994-2008 Xiph.Org.
