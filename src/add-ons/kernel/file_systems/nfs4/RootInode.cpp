@@ -16,7 +16,8 @@
 
 RootInode::RootInode()
 	:
-	fInfoCacheExpire(0)
+	fInfoCacheExpire(0),
+	fIOSize(0)
 {
 	mutex_init(&fInfoCacheLock, NULL);
 }
@@ -90,29 +91,30 @@ RootInode::_UpdateInfo(bool force)
 			next++;
 		}
 
-		uint64 io_size = LONGLONG_MAX;
+		uint64 ioSize = LONGLONG_MAX;
 		if (count >= next && values[next].fAttribute == FATTR4_MAXREAD) {
-			io_size = min_c(io_size, values[next].fData.fValue64);
+			ioSize = min_c(ioSize, values[next].fData.fValue64);
 			next++;
 		}
 
 		if (count >= next && values[next].fAttribute == FATTR4_MAXWRITE) {
-			io_size = min_c(io_size, values[next].fData.fValue64);
+			ioSize = min_c(ioSize, values[next].fData.fValue64);
 			next++;
 		}
 
-		if (io_size == LONGLONG_MAX)
-			io_size = 32768;
-		fInfoCache.io_size = io_size;
-		fInfoCache.block_size = io_size;
+		if (ioSize == LONGLONG_MAX)
+			ioSize = 32768;
+		fInfoCache.io_size = ioSize;
+		fInfoCache.block_size = ioSize;
+		fIOSize = ioSize;
 
 		if (count >= next && values[next].fAttribute == FATTR4_SPACE_FREE) {
-			fInfoCache.free_blocks = values[next].fData.fValue64 / io_size;
+			fInfoCache.free_blocks = values[next].fData.fValue64 / ioSize;
 			next++;
 		}
 
 		if (count >= next && values[next].fAttribute == FATTR4_SPACE_TOTAL) {
-			fInfoCache.total_blocks = values[next].fData.fValue64 / io_size;
+			fInfoCache.total_blocks = values[next].fData.fValue64 / ioSize;
 			next++;
 		}
 

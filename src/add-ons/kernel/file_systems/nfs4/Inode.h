@@ -30,6 +30,8 @@ public:
 	inline			const char*	Name() const;
 	inline			FileSystem*	GetFileSystem() const;
 
+	inline			void*		FileCache();
+
 					status_t	GetChangeInfo(uint64* change);
 
 					status_t	LookUp(const char* name, ino_t* id);
@@ -52,7 +54,7 @@ public:
 					status_t	Open(int mode, OpenFileCookie* cookie);
 					status_t	Close(OpenFileCookie* cookie);
 					status_t	Read(OpenFileCookie* cookie, off_t pos,
-									void* buffer, size_t* length);
+									void* buffer, size_t* length, bool* eof);
 					status_t	Write(OpenFileCookie* cookie, off_t pos,
 									const void* buffer, size_t *_length);
 
@@ -111,6 +113,7 @@ protected:
 					FileSystem*	fFileSystem;
 
 					DirectoryCache*	fCache;
+					void*		fFileCache;
 };
 
 
@@ -150,6 +153,13 @@ inline FileSystem*
 Inode::GetFileSystem() const
 {
 	return fFileSystem;
+}
+
+
+inline void*
+Inode::FileCache()
+{
+	return fFileCache;
 }
 
 

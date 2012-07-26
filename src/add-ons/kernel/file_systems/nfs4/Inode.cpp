@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <fs_cache.h>
 #include <NodeMonitor.h>
 
 #include "IdMap.h"
@@ -22,7 +23,8 @@
 Inode::Inode()
 	:
 	fAttrCacheExpire(0),
-	fCache(NULL)
+	fCache(NULL),
+	fFileCache(NULL)
 {
 	mutex_init(&fAttrCacheLock, NULL);
 }
@@ -43,6 +45,7 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 	inode->fInfo = fi;
 	inode->fFileSystem = fs;
 
+	uint64 size;
 	do {
 		RPC::Server* serv = fs->Server();
 		Request request(serv);
@@ -50,7 +53,8 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 
 		req.PutFH(inode->fInfo.fHandle);
 
-		Attribute attr[] = { FATTR4_TYPE, FATTR4_FSID, FATTR4_FILEID };
+		Attribute attr[] = { FATTR4_TYPE, FATTR4_SIZE, FATTR4_FSID,
+			FATTR4_FILEID };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 		status_t result = request.Send();
@@ -67,14 +71,14 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 		AttrValue* values;
 		uint32 count;
 		result = reply.GetAttr(&values, &count);
-		if (result != B_OK || count < 2)
+		if (result != B_OK || count < 3)
 			return result;
 
 		if (fi.fFileId == 0) {
-			if (count < 3 || values[2].fAttribute != FATTR4_FILEID)
+			if (count < 4 || values[3].fAttribute != FATTR4_FILEID)
 				inode->fInfo.fFileId = fs->AllocFileId();
 			else
-				inode->fInfo.fFileId = values[2].fData.fValue64;
+				inode->fInfo.fFileId = values[3].fData.fValue64;
 		} else
 			inode->fInfo.fFileId = fi.fFileId;
 
@@ -84,9 +88,12 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 		if (inode->fType == NF4DIR)
 			inode->fCache = new DirectoryCache(inode);
 
+		// FATTR4_SIZE is mandatory
+		size = values[1].fData.fValue64;
+
 		// FATTR4_FSID is mandatory
 		FileSystemId* fsid =
-			reinterpret_cast<FileSystemId*>(values[1].fData.fPointer);
+			reinterpret_cast<FileSystemId*>(values[2].fData.fPointer);
 		if (*fsid != fs->FsId()) {
 			delete[] values;
 			return B_ENTRY_NOT_FOUND;
@@ -96,13 +103,21 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 
 		*_inode = inode;
 
-		return B_OK;
+		break;
 	} while (true);
+
+	if (inode->fType == NF4REG)
+		inode->fFileCache = file_cache_create(fs->DevId(), inode->ID(), size);
+
+	return B_OK;
 }
 
 
 Inode::~Inode()
 {
+	if (fFileCache != NULL)
+		file_cache_delete(fFileCache);
+
 	delete fCache;
 	mutex_destroy(&fAttrCacheLock);
 }

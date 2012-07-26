@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 
+#include <fs_cache.h>
 #include <fs_interface.h>
 
 #include "Connection.h"
@@ -213,6 +214,59 @@ nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 
 
 static status_t
+nfs4_read_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
+	const iovec* vecs, size_t count, size_t* _numBytes)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+
+	status_t result;
+	bool eof = false;
+	for (size_t i = 0; i < count && !eof; i++) {
+		size_t bytesLeft = vecs[i].iov_len;
+		char* buffer = reinterpret_cast<char*>(vecs[i].iov_base);
+
+		do {
+			size_t bytesRead = bytesLeft;
+			result = inode->Read(cookie, pos, buffer, &bytesRead, &eof);
+			if (result != B_OK)
+				return result;
+
+			pos += bytesRead;
+			buffer += bytesRead;
+			bytesLeft -= bytesRead;
+		} while (bytesLeft > 0 && !eof);
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+nfs4_write_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
+	const iovec* vecs, size_t count, size_t* _numBytes)
+{
+	return B_OK;
+}
+
+
+static status_t
+nfs4_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
+{
+	// no asynchronous calls yet
+	return B_UNSUPPORTED;
+}
+
+
+static status_t
+nfs4_get_file_map(fs_volume* volume, fs_vnode* vnode, off_t _offset,
+	size_t size, struct file_io_vec* vecs, size_t* _count)
+{
+	return B_ERROR;
+}
+
+
+static status_t
 nfs4_set_flags(fs_volume* volume, fs_vnode* vnode, void* _cookie, int flags)
 {
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
@@ -224,7 +278,7 @@ nfs4_set_flags(fs_volume* volume, fs_vnode* vnode, void* _cookie, int flags)
 static status_t
 nfs4_fsync(fs_volume* volume, fs_vnode* vnode)
 {
-	// Currently, there is no cache and all writes are FILE_SYNC4
+	// Currently all writes are FILE_SYNC4
 	return B_OK;
 }
 
@@ -378,7 +432,7 @@ nfs4_free_cookie(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 
 
 static status_t
-nfs4_read(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
+nfs4_read(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos,
 	void* buffer, size_t* length)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
@@ -389,15 +443,13 @@ nfs4_read(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	if (inode->Type() == S_IFLNK)
 		return B_BAD_VALUE;
 
-	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
-
-	return inode->Read(cookie, pos, buffer, length);
+	return file_cache_read(inode->FileCache(), cookie, pos, buffer, length);
 }
 
 
 static status_t
 nfs4_write(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
-	const void* buffer, size_t* length)
+	const void* _buffer, size_t* length)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
 
@@ -409,7 +461,40 @@ nfs4_write(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
 
-	return inode->Write(cookie, pos, buffer, length);
+	struct stat stat;
+	status_t result = inode->Stat(&stat);
+	if (result != B_OK)
+		return result;
+
+	uint64 fileSize = max_c(stat.st_size, pos + *length);
+	result = file_cache_set_size(inode->FileCache(), fileSize);
+	if (result != B_OK)
+		return result;
+
+	result = file_cache_write(inode->FileCache(), cookie, pos, _buffer,
+		length);
+	if (result != B_OK)
+		return result;
+
+	uint32 ioSize = inode->GetFileSystem()->Root()->IOSize();
+	size_t bytesLeft = *length;
+	const char* buffer = reinterpret_cast<const char*>(_buffer);
+	do {
+		size_t bytesWritten = min_c(ioSize, bytesLeft);
+		result = inode->Write(cookie, pos, buffer, &bytesWritten);
+		if (result != B_OK)
+			break;
+
+		bytesLeft -= bytesWritten;
+		pos += bytesWritten;
+		buffer += bytesWritten;
+	} while (bytesLeft > 0);
+
+	if (bytesLeft == *length)
+		return result;
+
+	*length = *length - bytesLeft;
+	return B_OK;
 }
 
 
@@ -582,13 +667,13 @@ fs_vnode_ops gNFSv4VnodeOps = {
 
 	/* VM file access */
 	NULL,	// can_page()
-	NULL,	// read_pages()
-	NULL,	// write_pages()
+	nfs4_read_pages,
+	nfs4_write_pages,
 
-	NULL,	// io()
+	nfs4_io,
 	NULL,	// cancel_io()
 
-	NULL,	// get_file_map()
+	nfs4_get_file_map,
 
 	NULL,	// ioctl()
 	nfs4_set_flags,

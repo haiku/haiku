@@ -22,6 +22,8 @@ public:
 			status_t			ReadInfo(struct fs_info* info);
 	inline	void				MakeInfoInvalid();
 
+	inline	uint32				IOSize();
+
 			bool				ProbeMigration();
 			status_t			GetLocations(AttrValue** attr);
 
@@ -29,6 +31,8 @@ private:
 			struct fs_info		fInfoCache;
 			mutex				fInfoCacheLock;
 			time_t				fInfoCacheExpire;
+
+			uint32				fIOSize;
 
 			status_t			_UpdateInfo(bool force = false);
 
@@ -39,6 +43,15 @@ inline void
 RootInode::MakeInfoInvalid()
 {
 	fInfoCacheExpire = 0;
+}
+
+
+inline uint32
+RootInode::IOSize()
+{
+	if (fIOSize == 0)
+		_UpdateInfo(true);
+	return fIOSize;
 }
 
 

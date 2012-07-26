@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include <fs_cache.h>
 #include <NodeMonitor.h>
 
 #include "IdMap.h"
@@ -330,13 +331,14 @@ Inode::Close(OpenFileCookie* cookie)
 
 
 status_t
-Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
+Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length,
+	bool* eof)
 {
-	bool eof = false;
+	*eof = false;
 	uint32 size = 0;
 	uint32 len = 0;
 
-	while (size < *_length && !eof) {
+	while (size < *_length && !*eof) {
 		do {
 			RPC::Server* serv = fFileSystem->Server();
 			Request request(serv);
@@ -357,7 +359,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 			reply.PutFH();
 			result = reply.Read(reinterpret_cast<char*>(buffer) + size, &len,
-						&eof);
+						eof);
 			if (result != B_OK)
 				return result;
 
