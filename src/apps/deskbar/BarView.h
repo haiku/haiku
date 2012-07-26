@@ -148,6 +148,8 @@ class TBarView : public BView {
 		void PositionWindow(BRect screenFrame);
 		void AddExpandedItem(const char* signature);
 
+		void CheckForScrolling();
+
 		TExpandoMenuBar* ExpandoMenuBar() const;
 		TBarMenuBar* BarMenuBar() const;
 		TDragRegion* DragRegion() const { return fDragRegion; }

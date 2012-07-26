@@ -21,6 +21,7 @@ class BPoint;
 class TInlineScrollView : public BView {
 public:
 								TInlineScrollView(BRect frame, BView* target,
+									float beginLimit, float endLimit,
 									enum orientation orientation = B_VERTICAL);
 	virtual						~TInlineScrollView();
 
@@ -37,12 +38,17 @@ public:
 
 private:
 				BView*			fTarget;
-				ScrollArrow*	fUpperScrollArrow;
-				ScrollArrow*	fLowerScrollArrow;
+				ScrollArrow*	fBeginScrollArrow;
+				ScrollArrow*	fEndScrollArrow;
 
 				float			fScrollStep;
-				float			fValue;
-				float			fLimit;
+				float			fScrollValue;
+				float			fScrollLimit;
+
+				float			fBeginLimit;
+				float			fEndLimit;
+
+				int32			fOrientation;
 };
 
 

@@ -734,6 +734,9 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 	if (newWidth > maxContentWidth)
 		newWidth = maxContentWidth;
 
+	if (newWidth < iconOnlyWidth)
+		newWidth = iconOnlyWidth;
+
 	if (reset) {
 		SetMaxContentWidth(newWidth);
 		if (newWidth == maxContentWidth)
@@ -755,6 +758,8 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 		Invalidate();
 		Window()->UpdateIfNeeded();
 	}
+
+	fBarView->CheckForScrolling();
 }
 
 
@@ -815,11 +820,12 @@ TExpandoMenuBar::DrawBackground(BRect)
 bool
 TExpandoMenuBar::CheckForSizeOverrun()
 {
-	if (!fVertical)
-		return false;
-
 	BRect screenFrame = (BScreen(Window())).Frame();
-	return Window()->Frame().bottom > screenFrame.bottom;
+
+	if (fVertical)
+		return Window()->Frame().bottom > screenFrame.bottom;
+	else
+		return Frame().right > fBarView->DragRegion()->Frame().left;
 }
 
 

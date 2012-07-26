@@ -288,9 +288,9 @@ RightScrollArrow::Draw(BRect updateRect)
 	FillRect(frame, B_SOLID_LOW);
 
 	float middle = Bounds().bottom / 2;
-	FillTriangle(BPoint(frame.bottom - (kScrollerDimension / 2) + 3, middle),
-		BPoint(frame.bottom - (kScrollerDimension / 2) - 2, middle + 5),
-		BPoint(frame.bottom - (kScrollerDimension / 2) - 2, middle - 5));
+	FillTriangle(BPoint(kScrollerDimension / 2 + 3, middle),
+		BPoint(kScrollerDimension / 2 - 2, middle + 5),
+		BPoint(kScrollerDimension / 2 - 2, middle - 5));
 }
 
 
@@ -314,31 +314,34 @@ RightScrollArrow::MouseDown(BPoint where)
 
 
 TInlineScrollView::TInlineScrollView(BRect frame, BView* target,
-	enum orientation orientation)
+	float beginLimit, float endLimit, enum orientation orientation)
 	:
 	BView(frame, "inline scroll view", B_FOLLOW_NONE, 0),
 	fTarget(target),
-	fUpperScrollArrow(NULL),
-	fLowerScrollArrow(NULL),
+	fBeginScrollArrow(NULL),
+	fEndScrollArrow(NULL),
 	fScrollStep(kDefaultScrollStep),
-	fValue(0),
-	fLimit(0)
+	fScrollValue(0),
+	fScrollLimit(0),
+	fBeginLimit(beginLimit),
+	fEndLimit(endLimit),
+	fOrientation(orientation)
 {
 }
 
 
 TInlineScrollView::~TInlineScrollView()
 {
-	if (fUpperScrollArrow != NULL) {
-		fUpperScrollArrow->RemoveSelf();
-		delete fUpperScrollArrow;
-		fUpperScrollArrow = NULL;
+	if (fBeginScrollArrow != NULL) {
+		fBeginScrollArrow->RemoveSelf();
+		delete fBeginScrollArrow;
+		fBeginScrollArrow = NULL;
 	}
 
-	if (fLowerScrollArrow != NULL) {
-		fLowerScrollArrow->RemoveSelf();
-		delete fLowerScrollArrow;
-		fLowerScrollArrow = NULL;
+	if (fEndScrollArrow != NULL) {
+		fEndScrollArrow->RemoveSelf();
+		delete fEndScrollArrow;
+		fEndScrollArrow = NULL;
 	}
 }
 
@@ -364,11 +367,11 @@ TInlineScrollView::DetachedFromWindow()
 	if (fTarget != NULL)
 		fTarget->RemoveSelf();
 
-	if (fUpperScrollArrow != NULL)
-		fUpperScrollArrow->RemoveSelf();
+	if (fBeginScrollArrow != NULL)
+		fBeginScrollArrow->RemoveSelf();
 
-	if (fLowerScrollArrow != NULL)
-		fLowerScrollArrow->RemoveSelf();
+	if (fEndScrollArrow != NULL)
+		fEndScrollArrow->RemoveSelf();
 }
 
 
@@ -382,37 +385,64 @@ TInlineScrollView::AttachScrollers()
 		return;
 
 	BRect frame = Bounds();
-	BRect screenFrame = (BScreen(Window())).Frame();
 
 	if (HasScrollers()) {
-		fLimit = fTarget->Frame().bottom + 2 * kScrollerDimension
-			- screenFrame.bottom;
+		if (fOrientation == B_VERTICAL) {
+			fScrollLimit = Window()->Frame().bottom + 2 * kScrollerDimension
+				- fEndLimit;
+		} else {
+			fScrollLimit = fTarget->Frame().right + 2 * kScrollerDimension
+				- fEndLimit;
+		}
 		return;
 	}
 
 	fTarget->MakeFocus(true);
 
-	if (fUpperScrollArrow == NULL) {
-		fUpperScrollArrow = new UpScrollArrow(
-			BRect(0, 0, frame.right, kScrollerDimension - 1));
-		AddChild(fUpperScrollArrow);
+	if (fOrientation == B_VERTICAL) {
+		if (fBeginScrollArrow == NULL) {
+			fBeginScrollArrow = new UpScrollArrow(
+				BRect(frame.left, frame.top, frame.right,
+					kScrollerDimension - 1));
+			AddChild(fBeginScrollArrow);
+		}
+
+		if (fEndScrollArrow == NULL) {
+			fEndScrollArrow = new DownScrollArrow(
+				BRect(0, frame.bottom - 2 * kScrollerDimension + 1, frame.right,
+					frame.bottom - kScrollerDimension));
+			fTarget->AddChild(fEndScrollArrow);
+		}
+
+		fTarget->MoveBy(0, kScrollerDimension);
+
+		fScrollLimit = Window()->Frame().bottom + 2 * kScrollerDimension
+			- fEndLimit;
+	} else {
+		if (fBeginScrollArrow == NULL) {
+			fBeginScrollArrow = new LeftScrollArrow(
+				BRect(frame.left, frame.top,
+					frame.left + kScrollerDimension - 1, frame.bottom));
+			AddChild(fBeginScrollArrow);
+		}
+
+		if (fEndScrollArrow == NULL) {
+			fEndScrollArrow = new RightScrollArrow(
+				BRect(frame.right - 2 * kScrollerDimension + 1, frame.top,
+					frame.right, frame.bottom));
+			fTarget->AddChild(fEndScrollArrow);
+		}
+
+		fTarget->MoveBy(kScrollerDimension, 0);
+
+		fScrollLimit = fTarget->Frame().right + 2 * kScrollerDimension
+			- fEndLimit;
 	}
 
-	if (fLowerScrollArrow == NULL) {
-		fLowerScrollArrow = new DownScrollArrow(
-			BRect(0, frame.bottom - 2 * kScrollerDimension + 1, frame.right,
-				frame.bottom - kScrollerDimension));
-		fTarget->AddChild(fLowerScrollArrow);
-	}
+	fBeginScrollArrow->SetEnabled(false);
+	fEndScrollArrow->SetEnabled(true);
 
-	fTarget->MoveBy(0, kScrollerDimension);
-
-	fUpperScrollArrow->SetEnabled(false);
-	fLowerScrollArrow->SetEnabled(true);
-
-	fLimit = fTarget->Frame().bottom + 2 * kScrollerDimension
-		- screenFrame.bottom;
-	fValue = 0;
+	fScrollValue = 0;
 }
 
 
@@ -422,24 +452,28 @@ TInlineScrollView::DetachScrollers()
 	if (!HasScrollers())
 		return;
 
-	if (fLowerScrollArrow) {
-		fLowerScrollArrow->RemoveSelf();
-		delete fLowerScrollArrow;
-		fLowerScrollArrow = NULL;
+	if (fEndScrollArrow) {
+		fEndScrollArrow->RemoveSelf();
+		delete fEndScrollArrow;
+		fEndScrollArrow = NULL;
 	}
 
-	if (fUpperScrollArrow) {
-		fUpperScrollArrow->RemoveSelf();
-		delete fUpperScrollArrow;
-		fUpperScrollArrow = NULL;
+	if (fBeginScrollArrow) {
+		fBeginScrollArrow->RemoveSelf();
+		delete fBeginScrollArrow;
+		fBeginScrollArrow = NULL;
 	}
 
 	if (fTarget) {
 		// We don't remember the position where the last scrolling
 		// ended, so scroll back to the beginning.
-		fTarget->MoveBy(0, -kScrollerDimension);
+		if (fOrientation == B_VERTICAL)
+			fTarget->MoveBy(0, -kScrollerDimension);
+		else
+			fTarget->MoveBy(-kScrollerDimension, 0);
+
 		fTarget->ScrollTo(0, 0);
-		fValue = 0;
+		fScrollValue = 0;
 	}
 }
 
@@ -447,7 +481,7 @@ TInlineScrollView::DetachScrollers()
 bool
 TInlineScrollView::HasScrollers() const
 {
-	return fTarget != NULL && fUpperScrollArrow != NULL && fLowerScrollArrow != NULL;
+	return fTarget != NULL && fBeginScrollArrow != NULL && fEndScrollArrow != NULL;
 }
 
 
@@ -479,33 +513,55 @@ TInlineScrollView::ScrollBy(const float& step)
 		return;
 
 	if (step > 0) {
-		if (fValue == 0)
-			fUpperScrollArrow->SetEnabled(true);
+		if (fScrollValue == 0)
+			fBeginScrollArrow->SetEnabled(true);
 
-		if (fValue + step >= fLimit) {
+		if (fScrollValue + step >= fScrollLimit) {
 			// If we reached the limit, only scroll to the end
-			fTarget->ScrollBy(0, fLimit - fValue);
-			fLowerScrollArrow->MoveBy(0, fLimit - fValue);
-			fLowerScrollArrow->SetEnabled(false);
-			fValue = fLimit;
+			if (fOrientation == B_VERTICAL) {
+				fTarget->ScrollBy(0, fScrollLimit - fScrollValue);
+				fEndScrollArrow->MoveBy(0, fScrollLimit - fScrollValue);
+			} else {
+				fTarget->ScrollBy(fScrollLimit - fScrollValue, 0);
+				fEndScrollArrow->MoveBy(fScrollLimit - fScrollValue, 0);
+			}
+			fEndScrollArrow->SetEnabled(false);
+			fScrollValue = fScrollLimit;
 		} else {
-			fTarget->ScrollBy(0, step);
-			fLowerScrollArrow->MoveBy(0, step);
-			fValue += step;
+			if (fOrientation == B_VERTICAL) {
+				fTarget->ScrollBy(0, step);
+				fEndScrollArrow->MoveBy(0, step);
+			} else {
+				fTarget->ScrollBy(step, 0);
+				fEndScrollArrow->MoveBy(step, 0);
+			}
+			fScrollValue += step;
 		}
 	} else if (step < 0) {
-		if (fValue == fLimit)
-			fLowerScrollArrow->SetEnabled(true);
+		if (fScrollValue == fScrollLimit)
+			fEndScrollArrow->SetEnabled(true);
 
-		if (fValue + step <= 0) {
-			fTarget->ScrollBy(0, -fValue);
-			fLowerScrollArrow->MoveBy(0, -fValue);
-			fUpperScrollArrow->SetEnabled(false);
-			fValue = 0;
+		if (fScrollValue + step <= 0) {
+			if (fOrientation == B_VERTICAL) {
+				fTarget->ScrollBy(0, -fScrollValue);
+				fEndScrollArrow->MoveBy(0, -fScrollValue);
+			} else {
+				fTarget->ScrollBy(-fScrollValue, 0);
+				fEndScrollArrow->MoveBy(-fScrollValue, 0);
+			}
+			fBeginScrollArrow->SetEnabled(false);
+			fScrollValue = 0;
 		} else {
-			fTarget->ScrollBy(0, step);
-			fLowerScrollArrow->MoveBy(0, step);
-			fValue += step;
+			if (fOrientation == B_VERTICAL) {
+				fTarget->ScrollBy(0, step);
+				fEndScrollArrow->MoveBy(0, step);
+			} else {
+				fTarget->ScrollBy(step, 0);
+				fEndScrollArrow->MoveBy(step, 0);
+			}
+			fScrollValue += step;
 		}
 	}
+
+	//fTarget->Invalidate();
 }

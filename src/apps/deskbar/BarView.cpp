@@ -504,7 +504,10 @@ TBarView::PlaceApplicationBar()
 	fExpando = new TExpandoMenuBar(this, expandoFrame, "ExpandoMenuBar",
 		fVertical, !hideLabels && fState != kFullState);
 
-	fInlineScrollView = new TInlineScrollView(menuScrollFrame, fExpando);
+	fInlineScrollView = new TInlineScrollView(menuScrollFrame, fExpando,
+		fVertical ? expandoFrame.top : expandoFrame.left,
+		fVertical ? screenFrame.bottom : expandoFrame.right,
+		fVertical ? B_VERTICAL : B_HORIZONTAL);
 	AddChild(fInlineScrollView);
 
 	if (fVertical)
@@ -575,12 +578,7 @@ TBarView::SizeWindow(BRect screenFrame)
 	GetPreferredWindowSize(screenFrame, &windowWidth, &windowHeight);
 	Window()->ResizeTo(windowWidth, windowHeight);
 
-	if (fExpando != NULL) {
-		if (fExpando->CheckForSizeOverrun())
-			fInlineScrollView->AttachScrollers();
-		else
-			fInlineScrollView->DetachScrollers();
-	}
+	CheckForScrolling();
 }
 
 
@@ -604,6 +602,18 @@ TBarView::PositionWindow(BRect screenFrame)
 		moveLoc.y = screenFrame.bottom - windowHeight;
 
 	Window()->MoveTo(moveLoc);
+}
+
+
+void
+TBarView::CheckForScrolling()
+{
+	if (fExpando != NULL) {
+		if (fExpando->CheckForSizeOverrun())
+			fInlineScrollView->AttachScrollers();
+		else
+			fInlineScrollView->DetachScrollers();
+	}
 }
 
 
