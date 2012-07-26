@@ -54,6 +54,8 @@ SerialWindow::SerialWindow()
 		BMenuItem* portItem = new BMenuItem(buffer, message);
 
 		connect->AddItem(portItem);
+
+		portItem->SetTarget(be_app);
 	}
 
 #if SUPPORTS_MODEM
@@ -128,12 +130,6 @@ void SerialWindow::MessageReceived(BMessage* message)
 			ssize_t length;
 			message->FindData("data", B_RAW_TYPE, &(const void*)bytes, &length);
 			fTermView->PushBytes(bytes, length);
-			break;
-		}
-		case kMsgOpenPort:
-		{
-			// Forward message to application
-			be_app->PostMessage(message);
 			break;
 		}
 		default:

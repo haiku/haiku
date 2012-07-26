@@ -21,7 +21,7 @@ TermView::TermView()
 	GetFontHeight(&height);
 	fFontHeight = height.ascent + height.descent + height.leading;
 	fFontWidth = be_fixed_font->StringWidth("X");
-	fTerm = vterm_new(kDefaultWidth, kDefaultHeight);
+	fTerm = vterm_new(kDefaultHeight, kDefaultWidth);
 
 	vterm_parser_set_utf8(fTerm, 1);
 
@@ -52,20 +52,34 @@ void TermView::Draw(BRect updateRect)
 	VTermPos pos;
 	font_height height;
 	GetFontHeight(&height);
-	MovePenTo(kBorderSpacing, height.ascent + kBorderSpacing);
-	for (pos.row = updatedChars.start_row; pos.row < updatedChars.end_row;
-			pos.row++)
-	{
+	for (pos.row = updatedChars.start_row; pos.row <= updatedChars.end_row;
+			pos.row++) {
+		float x = updatedChars.start_col * fFontWidth + kBorderSpacing;
+		float y = pos.row * fFontHeight + height.ascent + kBorderSpacing;
+		MovePenTo(x, y);
+
 		for (pos.col = updatedChars.start_col;
-				pos.col < updatedChars.end_col; pos.col++)
-		{
-			VTermScreenCell cell;
-			vterm_screen_get_cell(fTermScreen, pos, &cell);
+				pos.col <= updatedChars.end_col;) {
+			if (pos.col < 0 || pos.row < 0 || pos.col >= kDefaultWidth 
+					|| pos.row >= kDefaultHeight) {
+				DrawString(" ");
+				pos.col ++;
+			} else {
+				VTermScreenCell cell;
+				vterm_screen_get_cell(fTermScreen, pos, &cell);
 
-			char buffer[6];
-			wcstombs(buffer, (wchar_t*)cell.chars, 6);
+				if (cell.chars[0] == 0) {
+					DrawString(" ");
+					pos.col ++;
+				} else {
+					char buffer[VTERM_MAX_CHARS_PER_CELL];
+					wcstombs(buffer, (wchar_t*)cell.chars,
+						VTERM_MAX_CHARS_PER_CELL);
 
-			DrawString(buffer);
+					DrawString(buffer);
+					pos.col += cell.width;
+				}
+			}
 		}
 	}
 }
@@ -74,9 +88,9 @@ void TermView::Draw(BRect updateRect)
 void TermView::GetPreferredSize(float* width, float* height)
 {
 	if (width != NULL)
-		*width = kDefaultWidth * fFontWidth;
+		*width = kDefaultWidth * fFontWidth + 2 * kBorderSpacing;
 	if (height != NULL)
-		*height = kDefaultHeight * fFontHeight;
+		*height = kDefaultHeight * fFontHeight + 2 * kBorderSpacing;
 }
 
 
@@ -103,7 +117,7 @@ VTermRect TermView::PixelsToGlyphs(BRect pixels) const
 	rect.end_col = (int)ceil(pixels.right / fFontWidth);
 	rect.start_row = (int)floor(pixels.top / fFontHeight);
 	rect.end_row = (int)ceil(pixels.bottom / fFontHeight);
-
+/*
 	printf(
 		"TOP %d ch < %f px\n"
 		"BTM %d ch < %f px\n"
@@ -114,7 +128,7 @@ VTermRect TermView::PixelsToGlyphs(BRect pixels) const
 		rect.start_col, pixels.left,
 		rect.end_col, pixels.right
 	);
-
+*/
 	return rect;
 }
 
@@ -128,7 +142,7 @@ BRect TermView::GlyphsToPixels(const VTermRect& glyphs) const
 	rect.right = glyphs.end_col * fFontWidth;
 
 	rect.OffsetBy(kBorderSpacing, kBorderSpacing);
-
+/*
 	printf(
 		"TOP %d ch > %f px (%f)\n"
 		"BTM %d ch > %f px\n"
@@ -139,7 +153,7 @@ BRect TermView::GlyphsToPixels(const VTermRect& glyphs) const
 		glyphs.start_col, rect.left, fFontWidth,
 		glyphs.end_col, rect.right
 	);
-
+*/
 	return rect;
 }
 
