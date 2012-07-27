@@ -323,7 +323,7 @@ Inode::Close(OpenFileCookie* cookie)
 		if (result != B_OK)
 			return result;
 
-		return B_OK;
+		break;
 	} while (true);
 
 	return B_OK;
@@ -450,6 +450,7 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 
 	*_length = size;
 
+	fAttrCache.st_size = max_c(fAttrCache.st_size, *_length + pos);
 	fFileSystem->Root()->MakeInfoInvalid();
 
 	return B_OK;

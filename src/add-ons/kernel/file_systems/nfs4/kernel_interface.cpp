@@ -246,6 +246,53 @@ static status_t
 nfs4_write_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	const iovec* vecs, size_t count, size_t* _numBytes)
 {
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	bool freeCookie = false;
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+
+	if (cookie == NULL) {
+		cookie = new OpenFileCookie;
+		if (cookie == NULL)
+			return B_NO_MEMORY;
+
+		status_t result = inode->Open(O_WRONLY, cookie);
+		if (result != B_OK) {
+			delete cookie;
+			return result;
+		}
+
+		freeCookie = true;
+	}
+
+	status_t result;
+	uint32 ioSize = inode->GetFileSystem()->Root()->IOSize();
+	for (size_t i = 0; i < count; i++) {
+		size_t bytesLeft = vecs[i].iov_len;
+		char* buffer = reinterpret_cast<char*>(vecs[i].iov_base);
+
+		do {
+			size_t bytesWritten = min_c(ioSize, bytesLeft);
+
+			result = inode->Write(cookie, pos, buffer, &bytesWritten);
+			if (result != B_OK) {
+				if (freeCookie) {
+					inode->Close(cookie);
+					delete cookie;
+				}
+				return result;
+			}
+
+			bytesLeft -= bytesWritten;
+			pos += bytesWritten;
+			buffer += bytesWritten;
+		} while (bytesLeft > 0);
+	}
+
+	if (freeCookie) {
+		inode->Close(cookie);
+		delete cookie;
+	}
+
 	return B_OK;
 }
 
@@ -278,8 +325,8 @@ nfs4_set_flags(fs_volume* volume, fs_vnode* vnode, void* _cookie, int flags)
 static status_t
 nfs4_fsync(fs_volume* volume, fs_vnode* vnode)
 {
-	// Currently all writes are FILE_SYNC4
-	return B_OK;
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	return file_cache_sync(inode->FileCache());
 }
 
 
@@ -424,6 +471,7 @@ nfs4_free_cookie(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 		return B_OK;
 
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+	file_cache_sync(inode->FileCache());
 	inode->Close(cookie);
 	delete cookie;
 
@@ -471,30 +519,7 @@ nfs4_write(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	if (result != B_OK)
 		return result;
 
-	result = file_cache_write(inode->FileCache(), cookie, pos, _buffer,
-		length);
-	if (result != B_OK)
-		return result;
-
-	uint32 ioSize = inode->GetFileSystem()->Root()->IOSize();
-	size_t bytesLeft = *length;
-	const char* buffer = reinterpret_cast<const char*>(_buffer);
-	do {
-		size_t bytesWritten = min_c(ioSize, bytesLeft);
-		result = inode->Write(cookie, pos, buffer, &bytesWritten);
-		if (result != B_OK)
-			break;
-
-		bytesLeft -= bytesWritten;
-		pos += bytesWritten;
-		buffer += bytesWritten;
-	} while (bytesLeft > 0);
-
-	if (bytesLeft == *length)
-		return result;
-
-	*length = *length - bytesLeft;
-	return B_OK;
+	return file_cache_write(inode->FileCache(), cookie, pos, _buffer, length);
 }
 
 
