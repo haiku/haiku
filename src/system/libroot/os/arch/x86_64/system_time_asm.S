@@ -20,8 +20,8 @@
 
 
 FUNCTION(__x86_setup_system_time):
-	movq	%rdi, cv_factor
-	movq	%rsi, cv_factor_nsecs
+	movq	%rdi, cv_factor(%rip)
+	movq	%rsi, cv_factor_nsecs(%rip)
 	ret
 FUNCTION_END(__x86_setup_system_time)
 
@@ -31,7 +31,7 @@ FUNCTION(system_time):
 	// (rdtsc * cv_factor) >> 32.
 	// Factor is pre-shifted left by 32 bits.
 
-	movq	cv_factor, %rcx
+	movq	cv_factor(%rip), %rcx
 
 	// Load 64-bit TSC into %eax (low), %edx (high).
 	rdtsc
@@ -56,7 +56,7 @@ FUNCTION(system_time_nsecs):
 	// Factor has not been pre-shifted here, otherwise we may lose the upper
 	// 32 bits.
 
-	movq	cv_factor_nsecs, %rcx
+	movq	cv_factor_nsecs(%rip), %rcx
 
 	// Load 64-bit TSC into %eax (low), %edx (high).
 	rdtsc

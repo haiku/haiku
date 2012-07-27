@@ -24,7 +24,7 @@ FUNCTION(_longjmp):
 	push	%rax
 
 	// __longjmp_return restores the signal mask and sets the return value.
-	call	__longjmp_return
+	call	__longjmp_return@PLT
 	ret
 FUNCTION_END(siglongjmp)
 

@@ -24,7 +24,7 @@ FUNCTION(sigsetjmp):
 	movq	%r15, JMP_REGS_R15(%rdi)
 
 	// __setjmp_save_sigs handles signal mask and return value.
-	jmp		__setjmp_save_sigs
+	jmp		__setjmp_save_sigs@PLT
 FUNCTION_END(setjmp)
 
 
@@ -32,7 +32,7 @@ FUNCTION_END(setjmp)
 FUNCTION(setjmp):
 	// Jump to sigsetjmp with a zero saveMask.
 	xorl	%esi, %esi
-	jmp		sigsetjmp
+	jmp		sigsetjmp@PLT
 FUNCTION_END(setjmp)
 
 
