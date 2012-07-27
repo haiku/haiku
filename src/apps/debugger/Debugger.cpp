@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -24,6 +24,7 @@
 #include "GraphicalUserInterface.h"
 #include "MessageCodes.h"
 #include "SettingsManager.h"
+#include "SignalSet.h"
 #include "TeamDebugger.h"
 #include "TeamsWindow.h"
 #include "TypeHandlerRoster.h"
@@ -558,6 +559,11 @@ CliDebugger::~CliDebugger()
 bool
 CliDebugger::Run(const Options& options)
 {
+	// Block SIGINT, in this thread so all threads created by it inherit the
+	// a block mask with the signal blocked. In the input loop the signal will
+	// be unblocked again.
+	SignalSet(SIGINT).BlockInCurrentThread();
+
 	// initialize global objects and settings manager
 	status_t error = global_init();
 	if (error != B_OK) {
