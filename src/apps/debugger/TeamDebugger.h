@@ -69,7 +69,8 @@ private:
 									UserBreakpoint* breakpoint);
 	virtual void				InspectRequested(target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
-	virtual	bool				UserInterfaceQuitRequested();
+	virtual	bool				UserInterfaceQuitRequested(
+									QuitOption quitOption);
 
 	// JobListener
 	virtual	void				JobDone(Job* job);

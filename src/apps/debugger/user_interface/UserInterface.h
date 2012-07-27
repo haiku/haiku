@@ -61,10 +61,19 @@ public:
 									const char* message, const char* choice1,
 									const char* choice2, const char* choice3)
 									= 0;
+									// returns -1, if not implemented or user
+									// cannot be asked
 };
 
 
 class UserInterfaceListener {
+public:
+	enum QuitOption {
+		QUIT_OPTION_ASK_USER,
+		QUIT_OPTION_ASK_KILL_TEAM,
+		QUIT_OPTION_ASK_RESUME_TEAM
+	};
+
 public:
 	virtual						~UserInterfaceListener();
 
@@ -95,7 +104,9 @@ public:
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener) = 0;
 
-	virtual	bool				UserInterfaceQuitRequested() = 0;
+	virtual	bool				UserInterfaceQuitRequested(
+									QuitOption quitOption
+										= QUIT_OPTION_ASK_USER) = 0;
 };
 
 

@@ -207,7 +207,7 @@ CommandLineUserInterface::SynchronouslyAskUser(const char* title,
 	const char* message, const char* choice1, const char* choice2,
 	const char* choice3)
 {
-	return 0;
+	return -1;
 }
 
 
