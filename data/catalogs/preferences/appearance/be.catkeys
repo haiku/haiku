@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Appearance	3882211276
+1	belarusian	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Просты шрыфт:
 Control highlight	Colors tab		Выдзяленне кнопак
 Control border	Colors tab		Аблямоўка кнопак
@@ -27,9 +27,11 @@ Window border	Colors tab		Мяжа вакна
 Window tab text	Colors tab		Тэкст загалоўку акна
 Document text	Colors tab		Тэкст дакументу
 Navigation pulse	Colors tab		Колер падсветкі навігацыі
+Window decorator:	DecorSettingsView		Дэкаратар вокнаў:
 Selected menu item text	Colors tab		Тэкст пазначанага пункту меню
 Menu background	Colors tab		Фон меню
 OK	DecorSettingsView		Так
+Control mark	Colors tab		Адзнакі кнопак
 Size:	Font Selection view		Памер:
 Panel background	Colors tab		Фон панэлі
 Menu font:	Font view		Шрыфт меню:
@@ -50,6 +52,7 @@ LCD subpixel	AntialiasingSettingsView		Субпіксельнае (LCD)
 Selected menu item border	Colors tab		Аблямоўка пазначанага пункту меню
 Strong	AntialiasingSettingsView		Жырны
 Panel text	Colors tab		Тэкст панэлі
+Decorators	APRWindow		Дэкаратары
 Monospaced fonts only	AntialiasingSettingsView		Толькі монашырынныя шрыфты
 Antialiasing menu	AntialiasingSettingsView		Меню згладжвання
 Fonts	APRWindow		Шрыфты

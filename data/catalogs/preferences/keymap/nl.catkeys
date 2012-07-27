@@ -1,12 +1,16 @@
-1	dutch; flemish	x-vnd.Haiku-Keymap	140876782
+1	dutch; flemish	x-vnd.Haiku-Keymap	247520798
+Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Herstellen
 Tilde trigger	Keymap window		Tilde-activeerder
 Grave trigger	Keymap window		Accent grave-activeerder
+Role	Modifier keys window	As in the role of a modifier key	Rol
 Select dead keys	Keymap window		Selecteer dode toetsen
+Cancel	Modifier keys window		Annuleren
 Quit	Keymap window		Afsluiten
 Switch shortcut keys to Haiku mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Haiku-modus
 Circumflex trigger	Keymap window		Circumflex-activeerder
 Diaeresis trigger	Keymap window		Trema-activeerder
+Disabled	Modifier keys window	Do nothing	Uitgeschakeld
 Open…	Keymap window		Openen...
 System:	Keymap window		Systeem:
 Switch shortcut keys	Keymap window		Snelkoppelingstoetsen omschakelen

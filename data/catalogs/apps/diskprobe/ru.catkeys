@@ -59,7 +59,7 @@ Boolean value:	TypeEditors		Булевое значение:
 8 bit palette	TypeEditors		8 битная палитра
 Fit	ProbeView	Size of fonts, fits to available room	Подгонять
 Probe device	OpenWindow		Исследовать устройство
- (native)	ProbeView		 (нативный)
+ (native)	ProbeView		 (родной)
 Unknown format	TypeEditors		Неизвестный формат
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шестнадцатеричный
 MIME type:	TypeEditors		MIME тип:

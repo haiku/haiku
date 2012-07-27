@@ -7,13 +7,13 @@ Identify	ContainerWindow		ファイル形式を判別
 Warning space color	SettingsView		空き容量警告の色
 Close	VolumeWindow		閉じる
 Open	OpenWithWindow		開く
-Tracker status	StatusWindow		Trackerの動作状況
+Tracker status	StatusWindow		Tracker の動作状況
 Eject when unmounting	AutoMounterSettings		マウント解除時メディアを取り出す
 Window	ContainerWindow		ウィンドウ
-Decrease size	ContainerWindow		サイズを縮小
+Decrease size	ContainerWindow		サイズを小さく
 Mini icon view	VolumeWindow		ミニアイコン表示
 You must have at least one attribute showing.	PoseView		最低一つの属性を表示する必要があります。
-Permissions	InfoWindow		アクセス許可
+Permissions	InfoWindow		アクセス権
 Invert selection	VolumeWindow		選択範囲を反転
 Recent documents	FavoritesMenu		最近開いたドキュメント
 Modified	QueryPoseView		更新日時
@@ -69,8 +69,8 @@ Mount server error	AutoMounterSettings		マウントサーバーエラー
 Search	FindPanel		検索
 Preparing to empty Trash…	StatusWindow		ごみ箱を空にする準備をしています…
 Disks	Model		ディスク
-Create link	ContainerWindow		指定先にリンクを作成
-Decrease size	DeskWindow		サイズを縮小
+Create link	ContainerWindow		リンクの作成
+Decrease size	DeskWindow		サイズを小さく
 Size	ContainerWindow		サイズ
 All disks	AutoMounterSettings		全パーティション
 Would you like to find some other suitable application?	FSUtils		他に適切なアプリケーションを検索しますか？
@@ -99,7 +99,7 @@ rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner 
 You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダーをリンクまたはファイルと置き換えることはできません。
 Show space bars on volumes	SettingsView		ディスクの容量グラフを表示する
 Invert selection	ContainerWindow		選択範囲を反転
-Increase size	DeskWindow		サイズを拡大
+Increase size	DeskWindow		サイズを大きく
 Resize to fit	ContainerWindow		最適な表示サイズに変更
 %Ld bytes	WidgetAttributeText		%Ld バイト
 Add printer…	ContainerWindow		プリンターの追加…

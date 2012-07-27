@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-About	3434348710
+1	belarusian	x-vnd.Haiku-About	519561637
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Аўтарскае права © 1999-2010 by the authors of Gutenprint. Правы захаваныя.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (асабіста за ядро NewOS)\n
 BSD (4-clause)	AboutView		BSD (4 часткі)
@@ -11,6 +11,7 @@ The Haiku-Ports team\n	AboutView		Каманда Haiku-Ports\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Аўтарскае права © 1998-2003 Daniel Veillard. Правы захаваныя.
 %d MiB used (%d%%)	AboutView		%d MiB выкарыстана (%d%%)
 Website, marketing & documentation:\n	AboutView		Web-сайт, маркетынг і дакументацыя:\n
+GNU LGPL v2.1	AboutView		GNU LGPL v2.1
 AboutSystem	System name		Пра Сістэму
 MIT (no promotion)	AboutView		MIT (без рэкламы)
 Copyright © 2003 Peter Hanappe and others.	AboutView		Аўтарскае права © 2003 Peter Hanappe і іншыя.
@@ -39,6 +40,7 @@ Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Аўтарс
 %.2f GHz	AboutView		%.2f ГГц
 Memory:	AboutView		Памяць:
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Аўтарскае права © 1996-1997 Jeff Prosise. Правы захаваныя.
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Аўтарскае права © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.
 Past maintainers:\n	AboutView		Былыя дагляднікі:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nАсабістыя падзякі:\n

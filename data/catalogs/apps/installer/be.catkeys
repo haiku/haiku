@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Installer	3440510165
+1	belarusian	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Дадайце ў канец кожнага з ніжэйшых запісаў меню нешта падобнае да гэтага:
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Сапраўды спыніць усталёўку і перазагрузіць сістэму?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -38,6 +38,7 @@ Boot sector successfully written.	InstallProgress		Загрузачны сект
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
 scanning…	InstallerWindow		сканіраванне...
 Set up boot menu	InstallerWindow		Наладзіць меню запуску
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (пачынаючы з os-prober v1.44)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Першы лагічны падзел заўсёды пад нумарам \"4\", нягледзячы на нумары асноўных падзелаў.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Для GRUB схема імёнаў тая ж: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <пажаданы рэдактар> /boot/grub/menu.lst\n\n
@@ -69,6 +70,7 @@ Installer	System name		Усталёўшчык
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Вы не можаце капіяваць файлы на зыходны дыск. Выберыце, калі ласка, іншы.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" - нумар падзелу, у GRUB 2 пачынаецца з \"1\"\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Пачынаючы з os-prober v1.44 (т.б. Ubuntu 11.04 ці пазней), Haiku павінна падтрымлівацца штатна. Каб дадаць Haiku у меню GRUB, адкрыйце Тэрмінал і ўвядзіце:\n\n
 Quit DriveSetup	InstallerWindow		Выйсці з DriveSetup
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" - нумар дыска, пачынаецца з \"0\".\n
 Hide optional packages	InstallerWindow		Схаваць дадатковыя пакункі
@@ -111,6 +113,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Сапраўды астанавіць усталёўку?
 Onto:	InstallerWindow		На:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Калі ласка, закрыйце Boot Manager перад закрыццём Усталёўшчыка.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)  Пасля першай паспяховай загрузкі Haiku, азнаёмцеся, калі ласка з дакументацыей ў \"Welcome\" і \"Userguide\" файлах. Спасылі на іх знаходзяцца на рабочым стале і ў закладках WebPositive.\n\n
 Tools	InstallerWindow		Прылады
 The mount point could not be retrieved.	InstallProgress		Не ўдалося атрымаць пункт мантавання.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Дыск прызначэння не пусты. Сапраўды жадаеце усталяваць туды?\n\nЗаметка: каталог 'system' будзе поўнай копіяй каталога з крыніцы, усе іншыя каталогі будуць сумешчаны, існуючыя файлы будуць замененыя на версіі з крыніцы.
