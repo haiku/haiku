@@ -1,0 +1,10 @@
+1	russian	x-vnd.Haiku-NewMailNotification	3801190717
+%num new message	filter		%num новое сообщение
+%num new messages	filter		%num новых сообщений
+Keyboard LEDs	ConfigView		Клавиатурные светодиоды
+You have %num new message for %name.	filter		У вас есть %num новое сообщение для %name.
+Log window	ConfigView		Окно журнала
+Central beep	ConfigView		Центральный звуковой сигнал
+Beep	ConfigView		Звуковой сигнал
+Method:	ConfigView		Метод:
+Alert	ConfigView		Оповещение
