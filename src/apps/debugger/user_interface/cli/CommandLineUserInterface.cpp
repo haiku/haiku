@@ -20,11 +20,7 @@
 #include "CliThreadsCommand.h"
 
 
-static const char*
-get_prompt(EditLine* editLine)
-{
-	return "debugger> ";
-}
+static const char* kDebuggerPrompt = "debugger> ";
 
 
 // #pragma mark - CommandEntry
@@ -83,8 +79,6 @@ private:
 CommandLineUserInterface::CommandLineUserInterface()
 	:
 	fCommands(20, true),
-	fEditLine(NULL),
-	fHistory(NULL),
 	fShowSemaphore(-1),
 	fShown(false),
 	fTerminating(false)
@@ -96,12 +90,6 @@ CommandLineUserInterface::~CommandLineUserInterface()
 {
 	if (fShowSemaphore >= 0)
 		delete_sem(fShowSemaphore);
-
-	if (fEditLine != NULL)
-		el_end(fEditLine);
-
-	if (fHistory != NULL)
-		history_end(fHistory);
 }
 
 
@@ -115,30 +103,17 @@ CommandLineUserInterface::ID() const
 status_t
 CommandLineUserInterface::Init(Team* team, UserInterfaceListener* listener)
 {
-	fContext.Init(team, listener);
+	status_t error = fContext.Init(team, listener);
+	if (error != B_OK)
+		return error;
 
-	status_t error = _RegisterCommands();
+	error = _RegisterCommands();
 	if (error != B_OK)
 		return error;
 
 	fShowSemaphore = create_sem(0, "show CLI");
 	if (fShowSemaphore < 0)
 		return fShowSemaphore;
-
-	fEditLine = el_init("Debugger", stdin, stdout, stderr);
-	if (fEditLine == NULL)
-		return B_ERROR;
-
-	fHistory = history_init();
-	if (fHistory == NULL)
-		return B_ERROR;
-
-	HistEvent historyEvent;
-	history(fHistory, &historyEvent, H_SETSIZE, 100);
-
-	el_set(fEditLine, EL_HIST, &history, fHistory);
-	el_set(fEditLine, EL_EDITOR, "emacs");
-	el_set(fEditLine, EL_PROMPT, &get_prompt);
 
 	return B_OK;
 }
@@ -158,7 +133,7 @@ CommandLineUserInterface::Terminate()
 	fTerminating = true;
 
 	if (fShown) {
-		// TODO: Signal the thread so it wakes up!
+		fContext.Terminating();
 
 		// Wait for input loop to finish.
 		while (acquire_sem(fShowSemaphore) == B_INTERRUPTED) {
@@ -169,15 +144,7 @@ CommandLineUserInterface::Terminate()
 		fShowSemaphore = -1;
 	}
 
-	if (fEditLine != NULL) {
-		el_end(fEditLine);
-		fEditLine = NULL;
-	}
-
-	if (fHistory != NULL) {
-		history_end(fHistory);
-		fHistory = NULL;
-	}
+	fContext.Cleanup();
 }
 
 
@@ -241,9 +208,11 @@ status_t
 CommandLineUserInterface::_InputLoop()
 {
 	while (!fTerminating) {
+		// Wait for a thread or Ctrl-C.
+		fContext.WaitForThreadOrUser();
+
 		// read a command line
-		int count;
-		const char* line = el_gets(fEditLine, &count);
+		const char* line = fContext.PromptUser(kDebuggerPrompt);
 		if (line == NULL)
 			break;
 
@@ -269,8 +238,7 @@ CommandLineUserInterface::_InputLoop()
 			continue;
 
 		// add line to history
-		HistEvent historyEvent;
-		history(fHistory, &historyEvent, H_ENTER, line);
+		fContext.AddLineToInputHistory(line);
 
 		// execute command
 		_ExecuteCommand(args.ArgumentCount(), args.Arguments());
