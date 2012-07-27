@@ -20,8 +20,8 @@ class UndoItem {
 		virtual status_t Undo() = 0;
 		virtual status_t Redo() = 0;
 
-		virtual void UpdateEntry(BEntry */*entry*/, const char */*name*/) {}
-			// updates the name of the target from the source entry "entry" 
+		virtual void UpdateEntry(BEntry* /*entry*/, const char* /*name*/) {}
+			// updates the name of the target from the source entry "entry"
 };
 
 static BObjectList<UndoItem> sUndoList, sRedoList;
@@ -29,13 +29,13 @@ static BLocker sLock("undo");
 
 class UndoItemCopy : public UndoItem {
 	public:
-		UndoItemCopy(BObjectList<entry_ref> *sourceList, BDirectory &target,
-			BList *pointList, uint32 moveMode);
+		UndoItemCopy(BObjectList<entry_ref>* sourceList, BDirectory &target,
+			BList* pointList, uint32 moveMode);
 		virtual ~UndoItemCopy();
 
 		virtual status_t Undo();
 		virtual status_t Redo();
-		virtual void UpdateEntry(BEntry *entry, const char *name);
+		virtual void UpdateEntry(BEntry* entry, const char* name);
 
 	private:
 		BObjectList<entry_ref> fSourceList;
@@ -44,12 +44,13 @@ class UndoItemCopy : public UndoItem {
 		uint32		fMoveMode;
 };
 
+
 class UndoItemMove : public UndoItem {
 	public:
 		/** source - list of file(s) that were moved.  Assumes ownership.
 		 *	origfolder - location it was moved from
 		 */
-		UndoItemMove(BObjectList<entry_ref> *sourceList, BDirectory &target, BList *pointList);
+		UndoItemMove(BObjectList<entry_ref>* sourceList, BDirectory &target, BList* pointList);
 		virtual ~UndoItemMove();
 
 		virtual status_t Undo();
@@ -59,6 +60,7 @@ class UndoItemMove : public UndoItem {
 		BObjectList<entry_ref> fSourceList;
 		entry_ref	fSourceRef, fTargetRef;
 };
+
 
 class UndoItemFolder : public UndoItem {
 	public:
@@ -77,22 +79,24 @@ class UndoItemFolder : public UndoItem {
 		entry_ref	fRef;
 };
 
+
 class UndoItemRename : public UndoItem {
 	public:
 		UndoItemRename(const entry_ref &origRef, const entry_ref &ref);
-		UndoItemRename(const BEntry &entry, const char *newName);
+		UndoItemRename(const BEntry &entry, const char* newName);
 		virtual ~UndoItemRename();
 
 		virtual status_t Undo();
 		virtual status_t Redo();
 
 	private:
-		entry_ref	fRef, fOrigRef;	
+		entry_ref	fRef, fOrigRef;
 };
+
 
 class UndoItemRenameVolume : public UndoItem {
 	public:
-		UndoItemRenameVolume(BVolume &volume, const char *newName);
+		UndoItemRenameVolume(BVolume &volume, const char* newName);
 		virtual ~UndoItemRenameVolume();
 
 		virtual status_t Undo();
@@ -115,18 +119,18 @@ ChangeListSource(BObjectList<entry_ref> &list, BEntry &entry)
 		return B_ERROR;
 
 	for (int32 index = 0; index < list.CountItems(); index++) {
-		entry_ref *ref = list.ItemAt(index);
+		entry_ref* ref = list.ItemAt(index);
 
 		ref->device = source.device;
 		ref->directory = source.node;
 	}
 
-	return B_OK;	
+	return B_OK;
 }
 
 
 static void
-AddUndoItem(UndoItem *item)
+AddUndoItem(UndoItem* item)
 {
 	BAutolock locker(sLock);
 
@@ -149,15 +153,15 @@ Undo::~Undo()
 }
 
 
-void 
-Undo::UpdateEntry(BEntry *entry, const char *destName)
+void
+Undo::UpdateEntry(BEntry* entry, const char* destName)
 {
 	if (fUndo != NULL)
 		fUndo->UpdateEntry(entry, destName);
 }
 
 
-void 
+void
 Undo::Remove()
 {
 	delete fUndo;
@@ -165,8 +169,8 @@ Undo::Remove()
 }
 
 
-MoveCopyUndo::MoveCopyUndo(BObjectList<entry_ref> *sourceList, BDirectory &dest,
-	BList *pointList, uint32 moveMode)
+MoveCopyUndo::MoveCopyUndo(BObjectList<entry_ref>* sourceList, BDirectory &dest,
+	BList* pointList, uint32 moveMode)
 {
 	if (moveMode == kMoveSelectionTo)
 		fUndo = new UndoItemMove(sourceList, dest, pointList);
@@ -181,13 +185,13 @@ NewFolderUndo::NewFolderUndo(const entry_ref &ref)
 }
 
 
-RenameUndo::RenameUndo(BEntry &entry, const char *newName)
+RenameUndo::RenameUndo(BEntry &entry, const char* newName)
 {
 	fUndo = new UndoItemRename(entry, newName);
 }
 
 
-RenameVolumeUndo::RenameVolumeUndo(BVolume &volume, const char *newName)
+RenameVolumeUndo::RenameVolumeUndo(BVolume &volume, const char* newName)
 {
 	fUndo = new UndoItemRenameVolume(volume, newName);
 }
@@ -196,8 +200,8 @@ RenameVolumeUndo::RenameVolumeUndo(BVolume &volume, const char *newName)
 //	#pragma mark -
 
 
-UndoItemCopy::UndoItemCopy(BObjectList<entry_ref> *sourceList, BDirectory &target,
-	BList */*pointList*/, uint32 moveMode)
+UndoItemCopy::UndoItemCopy(BObjectList<entry_ref>* sourceList, BDirectory &target,
+	BList* /*pointList*/, uint32 moveMode)
 	:
 	fSourceList(*sourceList),
 	fTargetList(*sourceList),
@@ -239,15 +243,15 @@ UndoItemCopy::Redo()
 }
 
 
-void 
-UndoItemCopy::UpdateEntry(BEntry *entry, const char *name)
+void
+UndoItemCopy::UpdateEntry(BEntry* entry, const char* name)
 {
 	entry_ref changedRef;
 	if (entry->GetRef(&changedRef) != B_OK)
 		return;
 
 	for (int32 index = 0; index < fSourceList.CountItems(); index++) {
-		entry_ref *ref = fSourceList.ItemAt(index);
+		entry_ref* ref = fSourceList.ItemAt(index);
 		if (changedRef != *ref)
 			continue;
 
@@ -260,8 +264,8 @@ UndoItemCopy::UpdateEntry(BEntry *entry, const char *name)
 //	#pragma mark -
 
 
-UndoItemMove::UndoItemMove(BObjectList<entry_ref> *sourceList, BDirectory &target,
-	BList */*pointList*/)
+UndoItemMove::UndoItemMove(BObjectList<entry_ref>* sourceList, BDirectory &target,
+	BList* /*pointList*/)
 	:
 	fSourceList(*sourceList)
 {
@@ -284,7 +288,7 @@ UndoItemMove::~UndoItemMove()
 status_t
 UndoItemMove::Undo()
 {
-	BObjectList<entry_ref> *list = new BObjectList<entry_ref>(fSourceList);
+	BObjectList<entry_ref>* list = new BObjectList<entry_ref>(fSourceList);
 	BEntry entry(&fTargetRef);
 	ChangeListSource(*list, entry);
 
@@ -347,7 +351,7 @@ UndoItemRename::UndoItemRename(const entry_ref &origRef, const entry_ref &ref)
 }
 
 
-UndoItemRename::UndoItemRename(const BEntry &entry, const char *newName)
+UndoItemRename::UndoItemRename(const BEntry &entry, const char* newName)
 {
 	entry.GetRef(&fOrigRef);
 
@@ -380,12 +384,12 @@ UndoItemRename::Redo()
 //	#pragma mark -
 
 
-UndoItemRenameVolume::UndoItemRenameVolume(BVolume &volume, const char *newName)
+UndoItemRenameVolume::UndoItemRenameVolume(BVolume &volume, const char* newName)
 	:
 	fVolume(volume),
 	fNewName(newName)
 {
-	char *buffer = fOldName.LockBuffer(B_FILE_NAME_LENGTH);
+	char* buffer = fOldName.LockBuffer(B_FILE_NAME_LENGTH);
 	if (buffer != NULL) {
 		fVolume.GetName(buffer);
 		fOldName.UnlockBuffer();
@@ -420,7 +424,7 @@ FSUndo()
 {
 	BAutolock locker(sLock);
 
-	UndoItem *undoItem = sUndoList.FirstItem();
+	UndoItem* undoItem = sUndoList.FirstItem();
 	if (undoItem == NULL)
 		return;
 
@@ -441,7 +445,7 @@ FSRedo()
 {
 	BAutolock locker(sLock);
 
-	UndoItem *undoItem = sRedoList.FirstItem();
+	UndoItem* undoItem = sRedoList.FirstItem();
 	if (undoItem == NULL)
 		return;
 

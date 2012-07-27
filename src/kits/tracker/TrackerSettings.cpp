@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "TrackerSettings.h"
 
 #include <Debug.h>
@@ -42,7 +43,7 @@ All rights reserved.
 
 class TTrackerState : public Settings {
 	public:
-		static TTrackerState *Get();
+		static TTrackerState* Get();
 		void Release();
 
 		void LoadSettingsIfNeeded();
@@ -57,32 +58,32 @@ class TTrackerState : public Settings {
 		static void InitIfNeeded();
 		TTrackerState(const TTrackerState&);
 
-		BooleanValueSetting *fShowDisksIcon;
-		BooleanValueSetting *fMountVolumesOntoDesktop;
-		BooleanValueSetting *fDesktopFilePanelRoot;
-		BooleanValueSetting *fMountSharedVolumesOntoDesktop;
-		BooleanValueSetting *fEjectWhenUnmounting;
+		BooleanValueSetting* fShowDisksIcon;
+		BooleanValueSetting* fMountVolumesOntoDesktop;
+		BooleanValueSetting* fDesktopFilePanelRoot;
+		BooleanValueSetting* fMountSharedVolumesOntoDesktop;
+		BooleanValueSetting* fEjectWhenUnmounting;
 
-		BooleanValueSetting *fShowFullPathInTitleBar;
-		BooleanValueSetting *fSingleWindowBrowse;
-		BooleanValueSetting *fShowNavigator;
-		BooleanValueSetting *fShowSelectionWhenInactive;
-		BooleanValueSetting *fTransparentSelection;
-		BooleanValueSetting *fSortFolderNamesFirst;
-		BooleanValueSetting *fHideDotFiles;
-		BooleanValueSetting *fTypeAheadFiltering;
+		BooleanValueSetting* fShowFullPathInTitleBar;
+		BooleanValueSetting* fSingleWindowBrowse;
+		BooleanValueSetting* fShowNavigator;
+		BooleanValueSetting* fShowSelectionWhenInactive;
+		BooleanValueSetting* fTransparentSelection;
+		BooleanValueSetting* fSortFolderNamesFirst;
+		BooleanValueSetting* fHideDotFiles;
+		BooleanValueSetting* fTypeAheadFiltering;
 
-		ScalarValueSetting *fRecentApplicationsCount;
-		ScalarValueSetting *fRecentDocumentsCount;
-		ScalarValueSetting *fRecentFoldersCount;
+		ScalarValueSetting* fRecentApplicationsCount;
+		ScalarValueSetting* fRecentDocumentsCount;
+		ScalarValueSetting* fRecentFoldersCount;
 
-		BooleanValueSetting *fShowVolumeSpaceBar;
-		HexScalarValueSetting *fUsedSpaceColor;
-		HexScalarValueSetting *fFreeSpaceColor;
-		HexScalarValueSetting *fWarningSpaceColor;
+		BooleanValueSetting* fShowVolumeSpaceBar;
+		HexScalarValueSetting* fUsedSpaceColor;
+		HexScalarValueSetting* fFreeSpaceColor;
+		HexScalarValueSetting* fWarningSpaceColor;
 
-		BooleanValueSetting *fDontMoveFilesToTrash;
-		BooleanValueSetting *fAskBeforeDeleteFile;
+		BooleanValueSetting* fDontMoveFilesToTrash;
+		BooleanValueSetting* fAskBeforeDeleteFile;
 
 		Benaphore fInitLock;
 		bool fInited;
@@ -455,7 +456,7 @@ TrackerSettings::SetShowNavigator(bool enabled)
 
 
 void
-TrackerSettings::RecentCounts(int32 *applications, int32 *documents, int32 *folders)
+TrackerSettings::RecentCounts(int32* applications, int32* documents, int32* folders)
 {
 	if (applications)
 		*applications = gTrackerState.fRecentApplicationsCount->Value();
@@ -513,4 +514,3 @@ TrackerSettings::SetAskBeforeDeleteFile(bool enabled)
 {
 	gTrackerState.fAskBeforeDeleteFile->SetValue(enabled);
 }
-

@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include <Debug.h>
 #include <AppDefs.h>
 #include <InterfaceDefs.h>
@@ -47,38 +48,38 @@ All rights reserved.
 #include <stdlib.h>
 
 
-const char *kColumnVersionName = "BColumn:version";
-const char *kColumnTitleName = "BColumn:fTitle";
-const char *kColumnOffsetName = "BColumn:fOffset";
-const char *kColumnWidthName = "BColumn:fWidth";
-const char *kColumnAlignmentName = "BColumn:fAlignment";
-const char *kColumnAttrName = "BColumn:fAttrName";
-const char *kColumnAttrHashName = "BColumn:fAttrHash";
-const char *kColumnAttrTypeName = "BColumn:fAttrType";
-const char *kColumnDisplayAsName = "BColumn:fDisplayAs";
-const char *kColumnStatFieldName = "BColumn:fStatField";
-const char *kColumnEditableName = "BColumn:fEditable";
+const char* kColumnVersionName = "BColumn:version";
+const char* kColumnTitleName = "BColumn:fTitle";
+const char* kColumnOffsetName = "BColumn:fOffset";
+const char* kColumnWidthName = "BColumn:fWidth";
+const char* kColumnAlignmentName = "BColumn:fAlignment";
+const char* kColumnAttrName = "BColumn:fAttrName";
+const char* kColumnAttrHashName = "BColumn:fAttrHash";
+const char* kColumnAttrTypeName = "BColumn:fAttrType";
+const char* kColumnDisplayAsName = "BColumn:fDisplayAs";
+const char* kColumnStatFieldName = "BColumn:fStatField";
+const char* kColumnEditableName = "BColumn:fEditable";
 
-const char *kViewStateVersionName = "ViewState:version";
-const char *kViewStateViewModeName = "ViewState:fViewMode";
-const char *kViewStateLastIconModeName = "ViewState:fLastIconMode";
-const char *kViewStateListOriginName = "ViewState:fListOrigin";
-const char *kViewStateIconOriginName = "ViewState:fIconOrigin";
-const char *kViewStatePrimarySortAttrName = "ViewState:fPrimarySortAttr";
-const char *kViewStatePrimarySortTypeName = "ViewState:fPrimarySortType";
-const char *kViewStateSecondarySortAttrName = "ViewState:fSecondarySortAttr";
-const char *kViewStateSecondarySortTypeName = "ViewState:fSecondarySortType";
-const char *kViewStateReverseSortName = "ViewState:fReverseSort";
-const char *kViewStateIconSizeName = "ViewState:fIconSize";
-const char *kViewStateLastIconSizeName = "ViewState:fLastIconSize";
+const char* kViewStateVersionName = "ViewState:version";
+const char* kViewStateViewModeName = "ViewState:fViewMode";
+const char* kViewStateLastIconModeName = "ViewState:fLastIconMode";
+const char* kViewStateListOriginName = "ViewState:fListOrigin";
+const char* kViewStateIconOriginName = "ViewState:fIconOrigin";
+const char* kViewStatePrimarySortAttrName = "ViewState:fPrimarySortAttr";
+const char* kViewStatePrimarySortTypeName = "ViewState:fPrimarySortType";
+const char* kViewStateSecondarySortAttrName = "ViewState:fSecondarySortAttr";
+const char* kViewStateSecondarySortTypeName = "ViewState:fSecondarySortType";
+const char* kViewStateReverseSortName = "ViewState:fReverseSort";
+const char* kViewStateIconSizeName = "ViewState:fIconSize";
+const char* kViewStateLastIconSizeName = "ViewState:fLastIconSize";
 
 
 static const int32 kColumnStateMinArchiveVersion = 21;
 	// bump version when layout changes
 
 
-BColumn::BColumn(const char *title, float offset, float width,
-	alignment align, const char *attributeName, uint32 attrType,
+BColumn::BColumn(const char* title, float offset, float width,
+	alignment align, const char* attributeName, uint32 attrType,
 	const char* displayAs, bool statField, bool editable)
 {
 	_Init(title, offset, width, align, attributeName, attrType, displayAs,
@@ -86,8 +87,8 @@ BColumn::BColumn(const char *title, float offset, float width,
 }
 
 
-BColumn::BColumn(const char *title, float offset, float width,
-	alignment align, const char *attributeName, uint32 attrType,
+BColumn::BColumn(const char* title, float offset, float width,
+	alignment align, const char* attributeName, uint32 attrType,
 	bool statField, bool editable)
 {
 	_Init(title, offset, width, align, attributeName, attrType, NULL,
@@ -100,7 +101,7 @@ BColumn::~BColumn()
 }
 
 
-BColumn::BColumn(BMallocIO *stream, int32 version, bool endianSwap)
+BColumn::BColumn(BMallocIO* stream, int32 version, bool endianSwap)
 {
 	StringFromStream(&fTitle, stream, endianSwap);
 	stream->Read(&fOffset, sizeof(float));
@@ -131,10 +132,10 @@ BColumn::BColumn(const BMessage &message, int32 index)
 	message.FindString(kColumnTitleName, index, &fTitle);
 	message.FindFloat(kColumnOffsetName, index, &fOffset);
 	message.FindFloat(kColumnWidthName, index, &fWidth);
-	message.FindInt32(kColumnAlignmentName, index, (int32 *)&fAlignment);
+	message.FindInt32(kColumnAlignmentName, index, (int32*)&fAlignment);
 	message.FindString(kColumnAttrName, index, &fAttrName);
-	message.FindInt32(kColumnAttrHashName, index, (int32 *)&fAttrHash);
-	message.FindInt32(kColumnAttrTypeName, index, (int32 *)&fAttrType);
+	message.FindInt32(kColumnAttrHashName, index, (int32*)&fAttrHash);
+	message.FindInt32(kColumnAttrTypeName, index, (int32*)&fAttrType);
 	message.FindString(kColumnDisplayAsName, index, &fDisplayAs);
 	message.FindBool(kColumnStatFieldName, index, &fStatField);
 	message.FindBool(kColumnEditableName, index, &fEditable);
@@ -142,8 +143,8 @@ BColumn::BColumn(const BMessage &message, int32 index)
 
 
 void
-BColumn::_Init(const char *title, float offset, float width,
-	alignment align, const char *attributeName, uint32 attrType,
+BColumn::_Init(const char* title, float offset, float width,
+	alignment align, const char* attributeName, uint32 attrType,
 	const char* displayAs, bool statField, bool editable)
 {
 	fTitle = title;
@@ -159,8 +160,8 @@ BColumn::_Init(const char *title, float offset, float width,
 }
 
 
-BColumn *
-BColumn::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
+BColumn*
+BColumn::InstantiateFromStream(BMallocIO* stream, bool endianSwap)
 {
 	// compare stream header in canonical form
 
@@ -185,7 +186,7 @@ BColumn::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 }
 
 
-BColumn *
+BColumn*
 BColumn::InstantiateFromMessage(const BMessage &message, int32 index)
 {
 	int32 version = kColumnStateArchiveVersion;
@@ -202,7 +203,7 @@ BColumn::InstantiateFromMessage(const BMessage &message, int32 index)
 
 
 void
-BColumn::ArchiveToStream(BMallocIO *stream) const
+BColumn::ArchiveToStream(BMallocIO* stream) const
 {
 	// write class identifier and version info
 	uint32 key = AttrHashString("BColumn", B_OBJECT_TYPE);
@@ -245,7 +246,7 @@ BColumn::ArchiveToMessage(BMessage &message) const
 
 
 BColumn *
-BColumn::_Sanitize(BColumn *column)
+BColumn::_Sanitize(BColumn* column)
 {
 	if (column == NULL)
 		return NULL;
@@ -283,7 +284,7 @@ BViewState::BViewState()
 }
 
 
-BViewState::BViewState(BMallocIO *stream, bool endianSwap)
+BViewState::BViewState(BMallocIO* stream, bool endianSwap)
 {
 	_Init();
 	stream->Read(&fViewMode, sizeof(uint32));
@@ -322,20 +323,20 @@ BViewState::BViewState(BMallocIO *stream, bool endianSwap)
 BViewState::BViewState(const BMessage &message)
 {
 	_Init();
-	message.FindInt32(kViewStateViewModeName, (int32 *)&fViewMode);
-	message.FindInt32(kViewStateLastIconModeName, (int32 *)&fLastIconMode);
-	message.FindInt32(kViewStateLastIconSizeName,(int32 *)&fLastIconSize);
-	message.FindInt32(kViewStateIconSizeName, (int32 *)&fIconSize);
+	message.FindInt32(kViewStateViewModeName, (int32*)&fViewMode);
+	message.FindInt32(kViewStateLastIconModeName, (int32*)&fLastIconMode);
+	message.FindInt32(kViewStateLastIconSizeName,(int32*)&fLastIconSize);
+	message.FindInt32(kViewStateIconSizeName, (int32*)&fIconSize);
 	message.FindPoint(kViewStateListOriginName, &fListOrigin);
 	message.FindPoint(kViewStateIconOriginName, &fIconOrigin);
 	message.FindInt32(kViewStatePrimarySortAttrName,
-		(int32 *)&fPrimarySortAttr);
+		(int32*)&fPrimarySortAttr);
 	message.FindInt32(kViewStatePrimarySortTypeName,
-		(int32 *)&fPrimarySortType);
+		(int32*)&fPrimarySortType);
 	message.FindInt32(kViewStateSecondarySortAttrName,
-		(int32 *)&fSecondarySortAttr);
+		(int32*)&fSecondarySortAttr);
 	message.FindInt32(kViewStateSecondarySortTypeName,
-		(int32 *)&fSecondarySortType);
+		(int32*)&fSecondarySortType);
 	message.FindBool(kViewStateReverseSortName, &fReverseSort);
 
 	_StorePreviousState();
@@ -344,7 +345,7 @@ BViewState::BViewState(const BMessage &message)
 
 
 void
-BViewState::ArchiveToStream(BMallocIO *stream) const
+BViewState::ArchiveToStream(BMallocIO* stream) const
 {
 	// write class identifier and verison info
 	uint32 key = AttrHashString("BViewState", B_OBJECT_TYPE);
@@ -391,8 +392,8 @@ BViewState::ArchiveToMessage(BMessage &message) const
 }
 
 
-BViewState *
-BViewState::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
+BViewState*
+BViewState::InstantiateFromStream(BMallocIO* stream, bool endianSwap)
 {
 	// compare stream header in canonical form
 	uint32 key = AttrHashString("BViewState", B_OBJECT_TYPE);
@@ -410,7 +411,7 @@ BViewState::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 }
 
 
-BViewState *
+BViewState*
 BViewState::InstantiateFromMessage(const BMessage &message)
 {
 	int32 version = kViewStateArchiveVersion;
@@ -460,8 +461,8 @@ BViewState::_StorePreviousState()
 }
 
 
-BViewState *
-BViewState::_Sanitize(BViewState *state, bool fixOnly)
+BViewState*
+BViewState::_Sanitize(BViewState* state, bool fixOnly)
 {
 	if (state == NULL)
 		return NULL;
@@ -508,4 +509,3 @@ BViewState::_Sanitize(BViewState *state, bool fixOnly)
 
 	return state;
 }
-

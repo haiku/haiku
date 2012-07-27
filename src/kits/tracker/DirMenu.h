@@ -31,12 +31,13 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef DIR_MENU_H
 #define DIR_MENU_H
 
+
 #include <PopUpMenu.h>
 #include <String.h>
+
 
 class MenuBar;
 
@@ -44,28 +45,29 @@ namespace BPrivate {
 
 class BDirMenu : public BPopUpMenu {
 public:
-	BDirMenu(BMenuBar *, BMessenger target, uint32 command,
-		const char *entryName = 0);
+	BDirMenu(BMenuBar*, BMessenger target, uint32 command,
+		const char* entryName = 0);
 	virtual ~BDirMenu();
 
-	void Populate(const BEntry *startDir, BWindow *originatingWindow,
+	void Populate(const BEntry* startDir, BWindow* originatingWindow,
 		bool includeStartDir = false, bool select = false, bool reverse = false,
 		bool addShortcuts = false, bool navMenuEntries = false);
-	void AddItemToDirMenu(const BEntry *, BWindow *originatingWindow,
+	void AddItemToDirMenu(const BEntry*, BWindow* originatingWindow,
 		bool atEnd, bool addShortcuts, bool navMenuEntries = false);
 	void AddDisksIconToMenu(bool reverse = false);
 
-	void SetMenuBar(BMenuBar *);
+	void SetMenuBar(BMenuBar*);
 
 private:
 	BMessenger fTarget;
-	BMenuBar *fMenuBar;
+	BMenuBar* fMenuBar;
 	uint32 fCommand;
 	BString fEntryName;
 };
 
+
 inline void
-BDirMenu::SetMenuBar(BMenuBar *bar)
+BDirMenu::SetMenuBar(BMenuBar* bar)
 {
 	fMenuBar = bar;
 }

@@ -34,49 +34,51 @@ All rights reserved.
 	
 //	DesktopPoseView adds support for displaying integrated desktops
 //	from multiple volumes to BPoseView
-
 #ifndef	_DESKTOP_POSE_VIEW_H
 #define _DESKTOP_POSE_VIEW_H
 
+
 #include "EntryIterator.h"
 #include "PoseView.h"
+
 
 namespace BPrivate {
 
 class DesktopPoseView : public BPoseView {
 	// overrides BPoseView to add desktop-view specific code
 public:
-	DesktopPoseView(Model *, BRect, uint32 viewMode, uint32 resizeMask = B_FOLLOW_ALL);
+	DesktopPoseView(Model*, BRect, uint32 viewMode,
+		uint32 resizeMask = B_FOLLOW_ALL);
 
-	static EntryListBase *InitDesktopDirentIterator(BPoseView *, const entry_ref *);
+	static EntryListBase* InitDesktopDirentIterator(BPoseView*,
+		const entry_ref*);
 
 	void ShowVolumes(bool visible, bool showShared);
-	
+
 	void StartSettingsWatch();
 	void StopSettingsWatch();
-	
-	virtual bool AddPosesThreadValid(const entry_ref *) const;	
+
+	virtual bool AddPosesThreadValid(const entry_ref*) const;
 	virtual void AddPosesCompleted();
-		
+
 protected:
-	virtual EntryListBase *InitDirentIterator(const entry_ref *);
-	virtual bool FSNotification(const BMessage *);
+	virtual EntryListBase* InitDirentIterator(const entry_ref*);
+	virtual bool FSNotification(const BMessage*);
 
 	virtual bool IsDesktopView() const;
 
-	virtual bool Represents(const node_ref *) const;
-	virtual bool Represents(const entry_ref *) const;
+	virtual bool Represents(const node_ref*) const;
+	virtual bool Represents(const entry_ref*) const;
 
-	void AdaptToVolumeChange(BMessage *);
-	void AdaptToDesktopIntegrationChange(BMessage *);
+	void AdaptToVolumeChange(BMessage*);
+	void AdaptToDesktopIntegrationChange(BMessage*);
 
 private:
 	typedef BPoseView _inherited;
-
 };
 
 
-inline bool 
+inline bool
 DesktopPoseView::IsDesktopView() const
 {
 	return true;

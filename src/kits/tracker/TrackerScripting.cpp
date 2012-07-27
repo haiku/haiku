@@ -50,7 +50,7 @@ doo Tracker create Folder to '/boot/home/Desktop/hello'
 ToDo:
 Create file: on a "Tracker" "File" "B_CREATE_PROPERTY" "name"
 Create query: on a "Tracker" "Query" "B_CREATE_PROPERTY" "name"
-Open a folder: Tracker Execute "Folder" bla 
+Open a folder: Tracker Execute "Folder" bla
 Find a window for a path
 
 #endif
@@ -98,21 +98,21 @@ const property_info kTrackerPropertyList[] = {
 
 
 status_t
-TTracker::GetSupportedSuites(BMessage *data)
+TTracker::GetSupportedSuites(BMessage* data)
 {
 	data->AddString("suites", kTrackerSuites);
-	BPropertyInfo propertyInfo(const_cast<property_info *>(kTrackerPropertyList));
+	BPropertyInfo propertyInfo(const_cast<property_info*>(kTrackerPropertyList));
 	data->AddFlat("messages", &propertyInfo);
 
 	return _inherited::GetSupportedSuites(data);
 }
 
 
-BHandler *
-TTracker::ResolveSpecifier(BMessage *message, int32 index,
-	BMessage *specifier, int32 form, const char *property)
+BHandler*
+TTracker::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 form, const char* property)
 {
-	BPropertyInfo propertyInfo(const_cast<property_info *>(kTrackerPropertyList));
+	BPropertyInfo propertyInfo(const_cast<property_info*>(kTrackerPropertyList));
 
 	int32 result = propertyInfo.FindMatch(message, index, specifier, form, property);
 	if (result < 0) {
@@ -126,7 +126,7 @@ TTracker::ResolveSpecifier(BMessage *message, int32 index,
 
 
 bool
-TTracker::HandleScriptingMessage(BMessage *message)
+TTracker::HandleScriptingMessage(BMessage* message)
 {
 	if (message->what != B_GET_PROPERTY
 		&& message->what != B_SET_PROPERTY
@@ -138,7 +138,7 @@ TTracker::HandleScriptingMessage(BMessage *message)
 
 	// dispatch scripting messages
 	BMessage reply(B_REPLY);
-	const char *property = 0;
+	const char* property = 0;
 	bool handled = false;
 
 	int32 index = 0;
@@ -148,7 +148,7 @@ TTracker::HandleScriptingMessage(BMessage *message)
 	status_t result = message->GetCurrentSpecifier(&index, &specifier,
 		&form, &property);
 
-	if (result != B_OK || index == -1) 
+	if (result != B_OK || index == -1)
 		return false;
 
 	ASSERT(property);
@@ -179,17 +179,18 @@ TTracker::HandleScriptingMessage(BMessage *message)
 			break;
 	}
 
-	if (handled) 
+	if (handled) {
 		// done handling message, send a reply
 		message->SendReply(&reply);
+	}
 
 	return handled;
 }
 
 
 bool
-TTracker::CreateProperty(BMessage *message, BMessage *, int32 form,
-	const char *property, BMessage *reply)
+TTracker::CreateProperty(BMessage* message, BMessage* , int32 form,
+	const char* property, BMessage* reply)
 {
 	bool handled = false;
 	status_t error = B_OK;
@@ -203,7 +204,7 @@ TTracker::CreateProperty(BMessage *message, BMessage *, int32 form,
 			message->FindRef("data", index, &ref) == B_OK; index++) {
 
 			BEntry entry(&ref);
-			if (!entry.Exists()) 
+			if (!entry.Exists())
 				error = FSCreateNewFolder(&ref);
 
 			if (error != B_OK)
@@ -221,8 +222,8 @@ TTracker::CreateProperty(BMessage *message, BMessage *, int32 form,
 
 
 bool
-TTracker::DeleteProperty(BMessage */*specifier*/, int32 form,
-	const char *property, BMessage */*reply*/)
+TTracker::DeleteProperty(BMessage* /*specifier*/, int32 form,
+	const char* property, BMessage* /*reply*/)
 {
 	if (strcmp(property, kPropertyTrash) == 0) {
 		// deleting on a selection is handled as removing a part of the selection
@@ -237,54 +238,54 @@ TTracker::DeleteProperty(BMessage */*specifier*/, int32 form,
 		return true;
 
 	}
-	return false;		
+	return false;
 }
 
-#else	/* _SUPPORTS_FEATURE_SCRIPTING */
+#else	// _SUPPORTS_FEATURE_SCRIPTING
 
 status_t
-TTracker::GetSupportedSuites(BMessage */*data*/)
+TTracker::GetSupportedSuites(BMessage* /*data*/)
 {
 	return B_UNSUPPORTED;
 }
 
 
-BHandler *
-TTracker::ResolveSpecifier(BMessage */*message*/,
-	int32 /*index*/, BMessage */*specifier*/,
-	int32 /*form*/, const char */*property*/)
+BHandler*
+TTracker::ResolveSpecifier(BMessage* /*message*/,
+	int32 /*index*/, BMessage* /*specifier*/,
+	int32 /*form*/, const char* /*property*/)
 {
 	return NULL;
 }
 
 
 bool
-TTracker::HandleScriptingMessage(BMessage */*message*/)
+TTracker::HandleScriptingMessage(BMessage* /*message*/)
 {
 	return false;
 }
 
 
 bool
-TTracker::CreateProperty(BMessage */*message*/, BMessage *, int32 /*form*/,
-	const char */*property*/, BMessage */*reply*/)
+TTracker::CreateProperty(BMessage* /*message*/, BMessage*, int32 /*form*/,
+	const char* /*property*/, BMessage* /*reply*/)
 {
 	return false;
 }
 
 
 bool
-TTracker::DeleteProperty(BMessage */*specifier*/, int32 /*form*/,
-	const char */*property*/, BMessage *)
+TTracker::DeleteProperty(BMessage* /*specifier*/, int32 /*form*/,
+	const char* /*property*/, BMessage*)
 {
 	return false;
 }
 
-#endif	/* _SUPPORTS_FEATURE_SCRIPTING */
+#endif	// _SUPPORTS_FEATURE_SCRIPTING
 
 
 bool
-TTracker::ExecuteProperty(BMessage *, int32 form, const char *property, BMessage *)
+TTracker::ExecuteProperty(BMessage*, int32 form, const char* property, BMessage*)
 {
 	if (strcmp(property, kPropertyPreferences) == 0) {
 		
@@ -301,22 +302,21 @@ TTracker::ExecuteProperty(BMessage *, int32 form, const char *property, BMessage
 
 
 bool
-TTracker::CountProperty(BMessage *, int32, const char *, BMessage *)
+TTracker::CountProperty(BMessage*, int32, const char*, BMessage*)
 {
-	return false;		
+	return false;
 }
 
 
 bool
-TTracker::GetProperty(BMessage *, int32, const char *,	BMessage *)
+TTracker::GetProperty(BMessage*, int32, const char*, BMessage*)
 {
-	return false;		
+	return false;
 }
 
 
 bool
-TTracker::SetProperty(BMessage *, BMessage *, int32, const char *, BMessage *)
+TTracker::SetProperty(BMessage*, BMessage*, int32, const char*, BMessage*)
 {
-	return false;		
+	return false;
 }
-

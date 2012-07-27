@@ -48,7 +48,7 @@ All rights reserved.
 #endif
 
 
-BImageResources::BImageResources(void *memAddr)
+BImageResources::BImageResources(void* memAddr)
 {
 	image_id image = find_image(memAddr);
 	image_info info;
@@ -71,7 +71,7 @@ BImageResources::~BImageResources()
 }
 
 
-const BResources *
+const BResources*
 BImageResources::ViewResources() const
 {
 	if (fLock.Lock() != B_OK)
@@ -81,7 +81,7 @@ BImageResources::ViewResources() const
 }
 
 
-BResources *
+BResources*
 BImageResources::ViewResources()
 {
 	if (fLock.Lock() != B_OK)
@@ -92,7 +92,7 @@ BImageResources::ViewResources()
 
 
 status_t
-BImageResources::FinishResources(BResources *res) const
+BImageResources::FinishResources(BResources* res) const
 {
 	ASSERT(res == &fResources);
 	if (res != &fResources)
@@ -103,8 +103,8 @@ BImageResources::FinishResources(BResources *res) const
 }
 
 
-const void *
-BImageResources::LoadResource(type_code type, int32 id, size_t *out_size) const
+const void*
+BImageResources::LoadResource(type_code type, int32 id, size_t* out_size) const
 {
 	// Serialize execution.
 	// Looks like BResources is not really thread safe. We should
@@ -116,12 +116,12 @@ BImageResources::LoadResource(type_code type, int32 id, size_t *out_size) const
 	// Return the resource.  Because we never change the BResources
 	// object, the returned data will not change until TTracker is
 	// destroyed.
-	return const_cast<BResources *>(&fResources)->LoadResource(type, id, out_size);
+	return const_cast<BResources*>(&fResources)->LoadResource(type, id, out_size);
 }
 
 
-const void *
-BImageResources::LoadResource(type_code type, const char *name, size_t *out_size) const
+const void*
+BImageResources::LoadResource(type_code type, const char* name, size_t* out_size) const
 {
 	// Serialize execution.
 	BAutolock lock(fLock);
@@ -131,15 +131,15 @@ BImageResources::LoadResource(type_code type, const char *name, size_t *out_size
 	// Return the resource.  Because we never change the BResources
 	// object, the returned data will not change until TTracker is
 	// destroyed.
-	return const_cast<BResources *>(&fResources)->LoadResource(type, name, out_size);
+	return const_cast<BResources*>(&fResources)->LoadResource(type, name, out_size);
 }
 
 
 status_t
-BImageResources::GetIconResource(int32 id, icon_size size, BBitmap *dest) const
+BImageResources::GetIconResource(int32 id, icon_size size, BBitmap* dest) const
 {
 	size_t length = 0;
-	const void *data;
+	const void* data;
 
 #ifdef __HAIKU__
 	// try to load vector icon
@@ -194,27 +194,30 @@ BImageResources::GetIconResource(int32 id, const uint8** iconData,
 
 
 image_id
-BImageResources::find_image(void *memAddr) const
+BImageResources::find_image(void* memAddr) const
 {
 	image_info info;
 	int32 cookie = 0;
 	while (get_next_image_info(0, &cookie, &info) == B_OK)
-		if ((info.text <= memAddr && (((uint8 *)info.text)+info.text_size) > memAddr)
-			||(info.data <= memAddr && (((uint8 *)info.data)+info.data_size) > memAddr))
+		if ((info.text <= memAddr
+			&& (((uint8*)info.text)+info.text_size) > memAddr)
+				|| (info.data <= memAddr
+				&& (((uint8*)info.data)+info.data_size) > memAddr)) {
 			// Found the image.
 			return info.id;
+		}
 
 	return -1;
 }
 
 
 status_t
-BImageResources::GetBitmapResource(type_code type, int32 id, BBitmap **out) const
+BImageResources::GetBitmapResource(type_code type, int32 id, BBitmap** out) const
 {
 	*out = NULL;
 
 	size_t len = 0;
-	const void *data = LoadResource(type, id, &len);
+	const void* data = LoadResource(type, id, &len);
 
 	if (data == NULL) {
 		TRESPASS();
@@ -245,7 +248,7 @@ BImageResources::GetBitmapResource(type_code type, int32 id, BBitmap **out) cons
 
 
 static BLocker resLock;
-static BImageResources *resources = NULL;
+static BImageResources* resources = NULL;
 
 // This class is used as a static instance to delete the resources
 // global object when the image is getting unloaded.
@@ -265,7 +268,7 @@ namespace BPrivate {
 static _TTrackerCleanupResources CleanupResources;
 
 
-BImageResources *GetTrackerResources()
+BImageResources* GetTrackerResources()
 {
 	if (!resources) {
 		BAutolock lock(&resLock);

@@ -31,12 +31,13 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-#ifndef	_LOCKING_LIST_H
+#ifndef _LOCKING_LIST_H
 #define _LOCKING_LIST_H
+
 
 #include <Locker.h>
 #include "ObjectList.h"
+
 
 namespace BPrivate {
 
@@ -57,36 +58,39 @@ private:
 	BLocker lock;
 };
 
+
 template<class T>
 LockingList<T>::LockingList(int32 itemsPerBlock, bool owning)
 	:	BObjectList<T>(itemsPerBlock, owning)
 {
 }
 
+
 template<class T>
-bool 
+bool
 LockingList<T>::Lock()
 {
 	return lock.Lock();
 }
 
+
 template<class T>
-void 
+void
 LockingList<T>::Unlock()
 {
 	lock.Unlock();
 }
 
+
 template<class T>
-bool 
+bool
 LockingList<T>::IsLocked() const
 {
 	return lock.IsLocked();
 }
 
-
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// _LOCKING_LIST_H

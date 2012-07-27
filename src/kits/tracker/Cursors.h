@@ -8,6 +8,7 @@
 #ifndef CURSORS_H
 #define CURSORS_H
 
+
 // Exported with Wonderbrush from haiku/data/artwork/cursors/Overlays_Tracker
 // TODO: Don't use these, there are new cursors, which you can use by ID.
 // (Except for the kMoveCursor, which has different meaning here.)

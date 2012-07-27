@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef FS_CLIPBOARD_H
 #define FS_CLIPBOARD_H
+
 
 #include <Looper.h>
 #include "Model.h"
@@ -50,6 +50,7 @@ typedef struct {
 } TClipboardNodeRef;
 const int32 T_CLIPBOARD_NODE = 'TCNR';
 
+
 class BClipboardRefsWatcher : public BLooper {
 	public:
 		BClipboardRefsWatcher();
@@ -57,16 +58,16 @@ class BClipboardRefsWatcher : public BLooper {
 
 		void AddToNotifyList(BMessenger target);
 		void RemoveFromNotifyList(BMessenger target);
-		void AddNode(const node_ref *node);
-		void RemoveNode(node_ref *node, bool removeFromClipboard = false);
+		void AddNode(const node_ref* node);
+		void RemoveNode(node_ref* node, bool removeFromClipboard = false);
 		void RemoveNodesByDevice(dev_t device);
-		void UpdateNode(node_ref *node, entry_ref *ref);
+		void UpdateNode(node_ref* node, entry_ref* ref);
 		void Clear();
-//		void UpdatePoseViews(bool clearClipboard, const node_ref *node);
-		void UpdatePoseViews(BMessage *reportMessage);
+//		void UpdatePoseViews(bool clearClipboard, const node_ref* node);
+		void UpdatePoseViews(BMessage* reportMessage);
 
 	protected:
-		virtual	void MessageReceived(BMessage *);
+		virtual	void MessageReceived(BMessage*);
 
 	private:
 		bool fRefsInClipboard;
@@ -86,10 +87,10 @@ void FSClipboardStartWatch(BMessenger target);
 void FSClipboardStopWatch(BMessenger target);
 
 void FSClipboardClear();
-uint32 FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode, bool clearClipboard);
-uint32 FSClipboardRemovePoses(const node_ref *directory, PoseList *list);
-bool FSClipboardPaste(Model *model, uint32 linksMode = 0);
-void FSClipboardRemove(Model *model);
-uint32 FSClipboardFindNodeMode(Model *model, bool autoLock, bool updateRefIfNeeded);
+uint32 FSClipboardAddPoses(const node_ref* directory, PoseList* list, uint32 moveMode, bool clearClipboard);
+uint32 FSClipboardRemovePoses(const node_ref* directory, PoseList* list);
+bool FSClipboardPaste(Model* model, uint32 linksMode = 0);
+void FSClipboardRemove(Model* model);
+uint32 FSClipboardFindNodeMode(Model* model, bool autoLock, bool updateRefIfNeeded);
 
-#endif	/* FS_CLIPBOARD_H */
+#endif	// FS_CLIPBOARD_H

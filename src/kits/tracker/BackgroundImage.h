@@ -31,15 +31,16 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//  Classes used for setting up and managing background images
-//
-
 #ifndef __BACKGROUND_IMAGE__
 #define __BACKGROUND_IMAGE__
 
+
+//  Classes used for setting up and managing background images
+
+
 #include <String.h>
 #include "ObjectList.h"
+
 
 class BNode;
 class BView;
@@ -50,12 +51,12 @@ namespace BPrivate {
 class BackgroundImage;
 class BPoseView;
 
-extern const char *kBackgroundImageInfo;
-extern const char *kBackgroundImageInfoOffset;
-extern const char *kBackgroundImageInfoTextOutline;
-extern const char *kBackgroundImageInfoMode;
-extern const char *kBackgroundImageInfoWorkspaces;
-extern const char *kBackgroundImageInfoPath;
+extern const char* kBackgroundImageInfo;
+extern const char* kBackgroundImageInfoOffset;
+extern const char* kBackgroundImageInfoTextOutline;
+extern const char* kBackgroundImageInfoMode;
+extern const char* kBackgroundImageInfoWorkspaces;
+extern const char* kBackgroundImageInfoPath;
 
 const uint32 kRestoreBackgroundImage = 'Tbgr';
 
@@ -76,44 +77,44 @@ public:
 	class BackgroundImageInfo {
 		// element of the per-workspace list
 	public:
-		BackgroundImageInfo(uint32 workspace, BBitmap *bitmap, Mode mode, BPoint offset,
+		BackgroundImageInfo(uint32 workspace, BBitmap* bitmap, Mode mode, BPoint offset,
 			bool textWidgetOutline);
 		~BackgroundImageInfo();
 
 		uint32 fWorkspace;
-		BBitmap *fBitmap;
+		BBitmap* fBitmap;
 		Mode fMode;
 		BPoint fOffset;
 		bool fTextWidgetOutline;
 	};
 
-	static BackgroundImage *GetBackgroundImage(const BNode *node,
+	static BackgroundImage* GetBackgroundImage(const BNode* node,
 		bool isDesktop);
 		// create a BackgroundImage object by reading it from a node
 	virtual ~BackgroundImage();
 
-	void Show(BView *view, int32 workspace);
+	void Show(BView* view, int32 workspace);
 		// display the right background for a given workspace
 	void Remove();
 		// remove the background from it's current view
 
-	void WorkspaceActivated(BView *view, int32 workspace, bool state);
+	void WorkspaceActivated(BView* view, int32 workspace, bool state);
 		// respond to a workspace change
 	void ScreenChanged(BRect rect, color_space space);
 		// respond to a screen size change
-	static BackgroundImage *Refresh(BackgroundImage *oldBackgroundImage,
-		const BNode *fromNode, bool desktop, BPoseView *poseView);
+	static BackgroundImage* Refresh(BackgroundImage* oldBackgroundImage,
+		const BNode* fromNode, bool desktop, BPoseView* poseView);
 		// respond to a background image setting change
 	
 private:
-	BackgroundImageInfo *ImageInfoForWorkspace(int32) const;
-	void Show(BackgroundImageInfo *, BView *view);
+	BackgroundImageInfo* ImageInfoForWorkspace(int32) const;
+	void Show(BackgroundImageInfo*, BView* view);
 
-	BackgroundImage(const BNode *, bool);
+	BackgroundImage(const BNode*, bool);
 		// no public constructor, GetBackgroundImage factory function is
 		// used instead
 
-	void Add(BackgroundImageInfo *);
+	void Add(BackgroundImageInfo*);
 
 	float BRectRatio(BRect rect);
 	float BRectHorizontalOverlap(BRect hostRect, BRect resizedRect);
@@ -121,12 +122,11 @@ private:
 
 	bool fIsDesktop;
 	BNode fDefinedByNode;
-	BView *fView;
-	BackgroundImageInfo *fShowingBitmap;
+	BView* fView;
+	BackgroundImageInfo* fShowingBitmap;
 
 	BObjectList<BackgroundImageInfo> fBitmapForWorkspaceList;
 };
-
 
 } // namespace BPrivate
 

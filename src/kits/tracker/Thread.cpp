@@ -32,10 +32,12 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "Thread.h"
 #include "FunctionObject.h"
 
-SimpleThread::SimpleThread(int32 priority, const char *name)
+
+SimpleThread::SimpleThread(int32 priority, const char* name)
 	:	fScanThread(-1),
 		fPriority(priority),
 		fName(name)
@@ -45,40 +47,45 @@ SimpleThread::SimpleThread(int32 priority, const char *name)
 
 SimpleThread::~SimpleThread()
 {
-	if (fScanThread > 0 && fScanThread != find_thread(NULL)) 
+	if (fScanThread > 0 && fScanThread != find_thread(NULL)) {
 		// kill the thread if it is not the one we are running in
 		kill_thread(fScanThread);
+	}
 }
 
-void 
+
+void
 SimpleThread::Go()
 {
-	fScanThread = spawn_thread(SimpleThread::RunBinder, fName ? fName : "TrackerTaskLoop",
-		fPriority, this);
+	fScanThread = spawn_thread(SimpleThread::RunBinder,
+		fName ? fName : "TrackerTaskLoop", fPriority, this);
 	resume_thread(fScanThread);
 }
 
-status_t 
-SimpleThread::RunBinder(void *castToThis)
+
+status_t
+SimpleThread::RunBinder(void* castToThis)
 {
-	SimpleThread *self = static_cast<SimpleThread *>(castToThis);
+	SimpleThread* self = static_cast<SimpleThread*>(castToThis);
 	self->Run();
 	return B_OK;
 }
 
-void 
-Thread::Launch(FunctionObject *functor, int32 priority, const char *name)
+
+void
+Thread::Launch(FunctionObject* functor, int32 priority, const char* name)
 {
 	new Thread(functor, priority, name);
 }
 
 
-Thread::Thread(FunctionObject *functor, int32 priority, const char *name)
+Thread::Thread(FunctionObject* functor, int32 priority, const char* name)
 	:	SimpleThread(priority, name),
 		fFunctor(functor)
 {
 	Go();
 }
+
 
 Thread::~Thread()
 {
@@ -86,7 +93,7 @@ Thread::~Thread()
 }
 
 
-void 
+void
 Thread::Run()
 {
 	(*fFunctor)();
@@ -94,18 +101,19 @@ Thread::Run()
 		// commit suicide
 }
 
-void 
-ThreadSequence::Launch(BObjectList<FunctionObject> *list, bool async, int32 priority)
+
+void
+ThreadSequence::Launch(BObjectList<FunctionObject>* list, bool async, int32 priority)
 {
-	if (!async)
+	if (!async) {
 		// if not async, don't even create a thread, just do it right away
 		Run(list);
-	else
+	} else
 		new ThreadSequence(list, priority);
 }
 
 
-ThreadSequence::ThreadSequence(BObjectList<FunctionObject> *list, int32 priority)
+ThreadSequence::ThreadSequence(BObjectList<FunctionObject>* list, int32 priority)
 	:	SimpleThread(priority),
  		fFunctorList(list)
 {
@@ -118,15 +126,17 @@ ThreadSequence::~ThreadSequence()
 	delete fFunctorList;
 }
 
-void 
-ThreadSequence::Run(BObjectList<FunctionObject> *list)
+
+void
+ThreadSequence::Run(BObjectList<FunctionObject>* list)
 {
 	int32 count = list->CountItems();
 	for (int32 index = 0; index < count; index++)
 		(*list->ItemAt(index))();
 }
 
-void 
+
+void
 ThreadSequence::Run()
 {
 	Run(fFunctorList);

@@ -79,11 +79,11 @@ All rights reserved.
 #include <string.h>
 
 
-const char *kDefaultFilePanelTemplate = "FilePanelSettings";
+const char* kDefaultFilePanelTemplate = "FilePanelSettings";
 
 
 static uint32
-GetLinkFlavor(const Model *model, bool resolve = true)
+GetLinkFlavor(const Model* model, bool resolve = true)
 {
 	if (model && model->IsSymLink()) {
 		if (!resolve)
@@ -101,17 +101,17 @@ GetLinkFlavor(const Model *model, bool resolve = true)
 
 
 static filter_result
-key_down_filter(BMessage *message, BHandler **handler, BMessageFilter *filter)
+key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 {
-	TFilePanel *panel = dynamic_cast<TFilePanel *>(filter->Looper());
+	TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
 	ASSERT(panel);
-	BPoseView *view = panel->PoseView();
+	BPoseView* view = panel->PoseView();
 
 	if (panel->TrackingMenu())
 		return B_DISPATCH_MESSAGE;
 
 	uchar key;
-	if (message->FindInt8("byte", (int8 *)&key) != B_OK)
+	if (message->FindInt8("byte", (int8*)&key) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
 	int32 modifier = 0;
@@ -141,9 +141,9 @@ key_down_filter(BMessage *message, BHandler **handler, BMessageFilter *filter)
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FilePanelPriv"
 
-TFilePanel::TFilePanel(file_panel_mode mode, BMessenger *target,
-		const BEntry *startDir, uint32 nodeFlavors, bool multipleSelection,
-		BMessage *message, BRefFilter *filter, uint32 containerWindowFlags,
+TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
+		const BEntry* startDir, uint32 nodeFlavors, bool multipleSelection,
+		BMessage* message, BRefFilter* filter, uint32 containerWindowFlags,
 		window_look look, window_feel feel, bool hideWhenDone)
 	: BContainerWindow(0, containerWindowFlags, look, feel, 0, B_CURRENT_WORKSPACE),
 	fDirMenu(NULL),
@@ -181,7 +181,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger *target,
 		= BLocaleRoster::Default()->IsFilesystemTranslationPreferred();
 
 	// check for legal starting directory
-	Model *model = new Model();
+	Model* model = new Model();
 	bool useRoot = true;
 
 	if (startDir) {
@@ -246,9 +246,9 @@ TFilePanel::~TFilePanel()
 
 
 filter_result
-TFilePanel::MessageDropFilter(BMessage *message, BHandler **, BMessageFilter *filter)
+TFilePanel::MessageDropFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 {
-	TFilePanel *panel = dynamic_cast<TFilePanel *>(filter->Looper());
+	TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
 	if (panel == NULL || !message->WasDropped())
 		return B_SKIP_MESSAGE;
 
@@ -300,8 +300,8 @@ TFilePanel::MessageDropFilter(BMessage *message, BHandler **, BMessageFilter *fi
 
 		panel->fTaskLoop->RunLater(NewMemberFunctionObjectWithResult
 			(&TFilePanel::SelectChildInParent, panel,
-			const_cast<const entry_ref *>(&ref),
-			const_cast<const node_ref *>(&child)),
+			const_cast<const entry_ref*>(&ref),
+			const_cast<const node_ref*>(&child)),
 			ref == *panel->TargetModel()->EntryRef() ? 0 : 100000, 200000, 5000000);
 				// if the target directory is already current, we won't
 				// delay the initial selection try
@@ -318,20 +318,20 @@ TFilePanel::MessageDropFilter(BMessage *message, BHandler **, BMessageFilter *fi
 
 
 filter_result
-TFilePanel::FSFilter(BMessage *message, BHandler **, BMessageFilter *filter)
+TFilePanel::FSFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 {
 	switch (message->FindInt32("opcode")) {
 		case B_ENTRY_MOVED:
 			{
 				node_ref itemNode;
 				node_ref dirNode;
-				TFilePanel *panel = dynamic_cast<TFilePanel *>(filter->Looper());
+				TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
 
 				message->FindInt32("device", &dirNode.device);
 				itemNode.device = dirNode.device;
-				message->FindInt64("to directory", (int64 *)&dirNode.node);
-				message->FindInt64("node", (int64 *)&itemNode.node);
-				const char *name;
+				message->FindInt64("to directory", (int64*)&dirNode.node);
+				message->FindInt64("node", (int64*)&itemNode.node);
+				const char* name;
 				if (message->FindString("name", &name) != B_OK)
 					break;
 
@@ -347,9 +347,9 @@ TFilePanel::FSFilter(BMessage *message, BHandler **, BMessageFilter *filter)
 		case B_ENTRY_REMOVED:
 			{
 				node_ref itemNode;
-				TFilePanel *panel = dynamic_cast<TFilePanel *>(filter->Looper());
+				TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
 				message->FindInt32("device", &itemNode.device);
-				message->FindInt64("node", (int64 *)&itemNode.node);
+				message->FindInt64("node", (int64*)&itemNode.node);
 
 				// if folder we're watching is deleted, switch to root
 				// or Desktop
@@ -379,7 +379,7 @@ TFilePanel::FSFilter(BMessage *message, BHandler **, BMessageFilter *filter)
 
 
 void
-TFilePanel::DispatchMessage(BMessage *message, BHandler *handler)
+TFilePanel::DispatchMessage(BMessage* message, BHandler* handler)
 {
 	_inherited::DispatchMessage(message, handler);
 	if (message->what == B_KEY_DOWN || message->what == B_MOUSE_DOWN)
@@ -387,11 +387,11 @@ TFilePanel::DispatchMessage(BMessage *message, BHandler *handler)
 }
 
 
-BFilePanelPoseView *
+BFilePanelPoseView*
 TFilePanel::PoseView() const
 {
-	ASSERT(dynamic_cast<BFilePanelPoseView *>(fPoseView));
-	return static_cast<BFilePanelPoseView *>(fPoseView);
+	ASSERT(dynamic_cast<BFilePanelPoseView*>(fPoseView));
+	return static_cast<BFilePanelPoseView*>(fPoseView);
 }
 
 
@@ -421,7 +421,7 @@ TFilePanel::QuitRequested()
 }
 
 
-BRefFilter *
+BRefFilter*
 TFilePanel::Filter() const
 {
 	return fPoseView->RefFilter();
@@ -436,7 +436,7 @@ TFilePanel::SetTarget(BMessenger target)
 
 
 void
-TFilePanel::SetMessage(BMessage *message)
+TFilePanel::SetMessage(BMessage* message)
 {
 	delete fMessage;
 	fMessage = new BMessage(*message);
@@ -444,7 +444,7 @@ TFilePanel::SetMessage(BMessage *message)
 
 
 void
-TFilePanel::SetRefFilter(BRefFilter *filter)
+TFilePanel::SetRefFilter(BRefFilter* filter)
 {
 	if (!filter)
 		return;
@@ -452,7 +452,7 @@ TFilePanel::SetRefFilter(BRefFilter *filter)
 	fPoseView->SetRefFilter(filter);
 	fPoseView->CommitActivePose();
 	fPoseView->Refresh();
-	FavoritesMenu* menu = dynamic_cast<FavoritesMenu *>
+	FavoritesMenu* menu = dynamic_cast<FavoritesMenu*>
 		(fMenuBar->FindItem(B_TRANSLATE("Favorites"))->Submenu());
 	if (menu)
 		menu->SetRefFilter(filter);
@@ -460,7 +460,7 @@ TFilePanel::SetRefFilter(BRefFilter *filter)
 
 
 void
-TFilePanel::SetTo(const entry_ref *ref)
+TFilePanel::SetTo(const entry_ref* ref)
 {
 	if (!ref)
 		return;
@@ -493,7 +493,7 @@ TFilePanel::Rewind()
 
 
 void
-TFilePanel::SetClientObject(BFilePanel *panel)
+TFilePanel::SetClientObject(BFilePanel* panel)
 {
 	fClientObject = panel;
 }
@@ -503,12 +503,12 @@ void
 TFilePanel::AdjustButton()
 {
 	// adjust button state
-	BButton *button = dynamic_cast<BButton *>(FindView("default button"));
+	BButton* button = dynamic_cast<BButton*>(FindView("default button"));
 	if (!button)
 		return;
 
-	BTextControl *textControl = dynamic_cast<BTextControl *>(FindView("text view"));
-	BObjectList<BPose> *selectionList = fPoseView->SelectionList();
+	BTextControl* textControl = dynamic_cast<BTextControl*>(FindView("text view"));
+	BObjectList<BPose>* selectionList = fPoseView->SelectionList();
 	BString buttonText = fButtonText;
 	bool enabled = false;
 
@@ -517,7 +517,7 @@ TFilePanel::AdjustButton()
 		if (fPoseView->IsFocus()) {
 			fPoseView->ShowSelection(true);
 			if (selectionList->CountItems() == 1) {
-				Model *model = selectionList->FirstItem()->TargetModel();
+				Model* model = selectionList->FirstItem()->TargetModel();
 				if (model->ResolveIfLink()->IsDirectory()) {
 					enabled = true;
 					buttonText = B_TRANSLATE("Open");
@@ -536,7 +536,7 @@ TFilePanel::AdjustButton()
 
 			// go through selection list looking at content
 			for (int32 index = 0; index < count; index++) {
-				Model *model = selectionList->ItemAt(index)->TargetModel();
+				Model* model = selectionList->ItemAt(index)->TargetModel();
 
 				uint32 modelFlavor = GetLinkFlavor(model, false);
 				uint32 linkFlavor = GetLinkFlavor(model, true);
@@ -573,12 +573,12 @@ TFilePanel::SelectionChanged()
 
 
 status_t
-TFilePanel::GetNextEntryRef(entry_ref *ref)
+TFilePanel::GetNextEntryRef(entry_ref* ref)
 {
 	if (!ref)
 		return B_ERROR;
 
-	BPose *pose = fPoseView->SelectionList()->ItemAt(fSelectionIterator++);
+	BPose* pose = fPoseView->SelectionList()->ItemAt(fSelectionIterator++);
 	if (!pose)
 		return B_ERROR;
 
@@ -587,15 +587,15 @@ TFilePanel::GetNextEntryRef(entry_ref *ref)
 }
 
 
-BPoseView *
-TFilePanel::NewPoseView(Model *model, BRect rect, uint32)
+BPoseView*
+TFilePanel::NewPoseView(Model* model, BRect rect, uint32)
 {
 	return new BFilePanelPoseView(model, rect);
 }
 
 
 void
-TFilePanel::Init(const BMessage *)
+TFilePanel::Init(const BMessage*)
 {
 	BRect windRect(Bounds());
 	AddChild(fBackView = new BackgroundView(windRect));
@@ -628,7 +628,7 @@ TFilePanel::Init(const BMessage *)
 
 	item = fMenuBar->FindItem(B_TRANSLATE("File"));
 	if (item) {
-		BMenu *menu = item->Submenu();
+		BMenu* menu = item->Submenu();
 		if (menu) {
 			item = menu->FindItem(kOpenSelection);
 			if (item && menu->RemoveItem(item))
@@ -753,7 +753,7 @@ TFilePanel::Init(const BMessage *)
 	float default_width = be_plain_font->StringWidth(fButtonText.String()) + 20;
 	rect.left = (default_width > 75) ? (rect.right - default_width) : (rect.right - 75);
 
-	BButton *default_button = new BButton(rect, "default button", fButtonText.String(),
+	BButton* default_button = new BButton(rect, "default button", fButtonText.String(),
 		new BMessage(kDefaultButton), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
 	fBackView->AddChild(default_button);
 
@@ -836,13 +836,13 @@ TFilePanel::SaveState(BMessage &message) const
 
 
 void
-TFilePanel::RestoreWindowState(AttributeStreamNode *node)
+TFilePanel::RestoreWindowState(AttributeStreamNode* node)
 {
 	SetSizeLimits(360, 10000, 200, 10000);
 	if (!node)
 		return;
 
-	const char *rectAttributeName = kAttrWindowFrame;
+	const char* rectAttributeName = kAttrWindowFrame;
 	BRect frame(Frame());
 	if (node->Read(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame)
 		== sizeof(BRect)) {
@@ -867,7 +867,7 @@ TFilePanel::RestoreWindowState(const BMessage &message)
 
 
 void
-TFilePanel::AddFileContextMenus(BMenu *menu)
+TFilePanel::AddFileContextMenus(BMenu* menu)
 {
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"),
 		new BMessage(kGetInfo), 'I'));
@@ -889,7 +889,7 @@ TFilePanel::AddFileContextMenus(BMenu *menu)
 
 
 void
-TFilePanel::AddVolumeContextMenus(BMenu *menu)
+TFilePanel::AddVolumeContextMenus(BMenu* menu)
 {
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Open"),
 		new BMessage(kOpenSelection), 'O'));
@@ -908,7 +908,7 @@ TFilePanel::AddVolumeContextMenus(BMenu *menu)
 
 
 void
-TFilePanel::AddWindowContextMenus(BMenu *menu)
+TFilePanel::AddWindowContextMenus(BMenu* menu)
 {
 	BMenuItem* item = new BMenuItem(B_TRANSLATE("New folder"),
 		new BMessage(kNewFolder), 'N');
@@ -944,7 +944,7 @@ TFilePanel::AddWindowContextMenus(BMenu *menu)
 
 
 void
-TFilePanel::AddDropContextMenus(BMenu *)
+TFilePanel::AddDropContextMenus(BMenu*)
 {
 }
 
@@ -975,7 +975,7 @@ TFilePanel::MenusEnded()
 
 
 void
-TFilePanel::ShowContextMenu(BPoint point, const entry_ref *ref, BView *view)
+TFilePanel::ShowContextMenu(BPoint point, const entry_ref* ref, BView* view)
 {
 	EnableNamedMenuItem(fWindowContextMenu, kNewFolder, !TargetModel()->IsRoot());
 	EnableNamedMenuItem(fWindowContextMenu, kOpenParentDir, !TargetModel()->IsRoot());
@@ -986,19 +986,19 @@ TFilePanel::ShowContextMenu(BPoint point, const entry_ref *ref, BView *view)
 
 
 void
-TFilePanel::SetupNavigationMenu(const entry_ref *, BMenu *)
+TFilePanel::SetupNavigationMenu(const entry_ref*, BMenu*)
 {
 	// do nothing here so nav menu doesn't get added
 }
 
 
 void
-TFilePanel::SetButtonLabel(file_panel_button selector, const char *text)
+TFilePanel::SetButtonLabel(file_panel_button selector, const char* text)
 {
 	switch (selector) {
 		case B_CANCEL_BUTTON:
 			{
-				BButton *button = dynamic_cast<BButton *>(FindView("cancel button"));
+				BButton* button = dynamic_cast<BButton*>(FindView("cancel button"));
 				if (!button)
 					break;
 
@@ -1016,7 +1016,7 @@ TFilePanel::SetButtonLabel(file_panel_button selector, const char *text)
 			{
 				fButtonText = text;
 				float delta = 0;
-				BButton *button = dynamic_cast<BButton *>(FindView("default button"));
+				BButton* button = dynamic_cast<BButton*>(FindView("default button"));
 				if (button) {
 					float old_width = button->StringWidth(button->Label());
 					button->SetLabel(text);
@@ -1028,7 +1028,7 @@ TFilePanel::SetButtonLabel(file_panel_button selector, const char *text)
 				}
 
 				// now must move cancel button
-				button = dynamic_cast<BButton *>(FindView("cancel button"));
+				button = dynamic_cast<BButton*>(FindView("cancel button"));
 				if (button)
 					button->MoveBy(delta, 0);
 			}
@@ -1038,19 +1038,19 @@ TFilePanel::SetButtonLabel(file_panel_button selector, const char *text)
 
 
 void
-TFilePanel::SetSaveText(const char *text)
+TFilePanel::SetSaveText(const char* text)
 {
 	if (!text)
 		return;
 
-	BTextControl *textControl = dynamic_cast<BTextControl *>(FindView("text view"));
+	BTextControl* textControl = dynamic_cast<BTextControl*>(FindView("text view"));
 	textControl->SetText(text);
 	textControl->TextView()->SelectAll();
 }
 
 
 void
-TFilePanel::MessageReceived(BMessage *message)
+TFilePanel::MessageReceived(BMessage* message)
 {
 	entry_ref ref;
 
@@ -1075,7 +1075,7 @@ TFilePanel::MessageReceived(BMessage *message)
 						// Otherwise, we have a file or a link to a file.
 						// AdjustButton has already tested the flavor;
 						// all we have to do is see if the button is enabled.
-						BButton *button = dynamic_cast<BButton *>(FindView("default button"));
+						BButton* button = dynamic_cast<BButton*>(FindView("default button"));
 						if (!button)
 							break;
 
@@ -1199,7 +1199,7 @@ TFilePanel::MessageReceived(BMessage *message)
 			if (fIsSavePanel) {
 				if (PoseView()->IsFocus()
 					&& PoseView()->SelectionList()->CountItems() == 1) {
-					Model *model = (PoseView()->SelectionList()->FirstItem())->TargetModel();
+					Model* model = (PoseView()->SelectionList()->FirstItem())->TargetModel();
 					if (model->ResolveIfLink()->IsDirectory()) {
 						PoseView()->CommitActivePose();
 						PoseView()->OpenSelection();
@@ -1239,11 +1239,11 @@ TFilePanel::MessageReceived(BMessage *message)
 void
 TFilePanel::OpenDirectory()
 {
-	BObjectList<BPose> *list = PoseView()->SelectionList();
+	BObjectList<BPose>* list = PoseView()->SelectionList();
 	if (list->CountItems() != 1)
 		return;
 
-	Model *model = list->FirstItem()->TargetModel();
+	Model* model = list->FirstItem()->TargetModel();
 	if (model->ResolveIfLink()->IsDirectory()) {
 		BMessage message(B_REFS_RECEIVED);
 		message.AddRef("refs", model->EntryRef());
@@ -1280,7 +1280,7 @@ TFilePanel::OpenParent()
 		// shows up
 		fTaskLoop->RunLater(NewMemberFunctionObjectWithResult
 			(&TFilePanel::SelectChildInParent, this,
-			const_cast<const entry_ref *>(&ref),
+			const_cast<const entry_ref*>(&ref),
 			oldModel.NodeRef()), 100000, 200000, 5000000);
 	}
 }
@@ -1334,7 +1334,7 @@ TFilePanel::SwitchDirToDesktopIfNeeded(entry_ref &ref)
 
 
 bool
-TFilePanel::SelectChildInParent(const entry_ref *, const node_ref *child)
+TFilePanel::SelectChildInParent(const entry_ref*, const node_ref* child)
 {
 	AutoLock<TFilePanel> lock(this);
 
@@ -1342,7 +1342,7 @@ TFilePanel::SelectChildInParent(const entry_ref *, const node_ref *child)
 		return false;
 
 	int32 index;
-	BPose *pose = PoseView()->FindPose(child, &index);
+	BPose* pose = PoseView()->FindPose(child, &index);
 	if (!pose)
 		return false;
 
@@ -1355,10 +1355,10 @@ TFilePanel::SelectChildInParent(const entry_ref *, const node_ref *child)
 
 
 int32
-TFilePanel::ShowCenteredAlert(const char *text, const char *button1,
-	const char *button2, const char *button3)
+TFilePanel::ShowCenteredAlert(const char* text, const char* button1,
+	const char* button2, const char* button3)
 {
-	BAlert *alert = new BAlert("", text, button1, button2, button3,
+	BAlert* alert = new BAlert("", text, button1, button2, button3,
 		B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 	alert->MoveTo(Frame().left + 10, Frame().top + 10);
 
@@ -1447,7 +1447,7 @@ TFilePanel::HandleSaveButton()
 
 
 void
-TFilePanel::OpenSelectionCommon(BMessage *openMessage)
+TFilePanel::OpenSelectionCommon(BMessage* openMessage)
 {
 	if (!openMessage->HasRef("refs"))
 		return;
@@ -1483,12 +1483,12 @@ void
 TFilePanel::HandleOpenButton()
 {
 	PoseView()->CommitActivePose();
-	BObjectList<BPose> *selection = PoseView()->SelectionList();
+	BObjectList<BPose>* selection = PoseView()->SelectionList();
 
 	// if we have only one directory and we're not opening dirs, enter.
 	if ((fNodeFlavors & B_DIRECTORY_NODE) == 0
 		&& selection->CountItems() == 1) {
-		Model *model = selection->FirstItem()->TargetModel();
+		Model* model = selection->FirstItem()->TargetModel();
 
 		if (model->IsDirectory()
 			|| (model->IsSymLink() && !(fNodeFlavors & B_SYMLINK_NODE)
@@ -1507,7 +1507,7 @@ TFilePanel::HandleOpenButton()
 		BMessage message(*fMessage);
 		// go through selection and add appropriate items
 		for (int32 index = 0; index < selection->CountItems(); index++) {
-			Model *model = selection->ItemAt(index)->TargetModel();
+			Model* model = selection->ItemAt(index)->TargetModel();
 
 			if (((fNodeFlavors & B_DIRECTORY_NODE) != 0
 					&& model->ResolveIfLink()->IsDirectory())
@@ -1522,7 +1522,7 @@ TFilePanel::HandleOpenButton()
 
 
 void
-TFilePanel::SwitchDirMenuTo(const entry_ref *ref)
+TFilePanel::SwitchDirMenuTo(const entry_ref* ref)
 {
 	BEntry entry(ref);
 	for (int32 index = fDirMenu->CountItems() - 1; index >= 0; index--)
@@ -1531,7 +1531,7 @@ TFilePanel::SwitchDirMenuTo(const entry_ref *ref)
 	fDirMenuField->MenuBar()->RemoveItem((int32)0);
 	fDirMenu->Populate(&entry, 0, true, true, false, true);
 
-	ModelMenuItem *item = dynamic_cast<ModelMenuItem *>(
+	ModelMenuItem* item = dynamic_cast<ModelMenuItem*>(
 		fDirMenuField->MenuBar()->ItemAt(0));
 	ASSERT(item);
 	item->SetEntry(&entry);
@@ -1550,7 +1550,7 @@ TFilePanel::WindowActivated(bool active)
 //	#pragma mark -
 
 
-BFilePanelPoseView::BFilePanelPoseView(Model *model, BRect frame, uint32 resizeMask)
+BFilePanelPoseView::BFilePanelPoseView(Model* model, BRect frame, uint32 resizeMask)
 	: BPoseView(model, frame, kListMode, resizeMask),
 	fIsDesktop(model->IsDesktop())
 {
@@ -1580,7 +1580,7 @@ BFilePanelPoseView::StopWatching()
 
 
 bool
-BFilePanelPoseView::FSNotification(const BMessage *message)
+BFilePanelPoseView::FSNotification(const BMessage* message)
 {
 	if (IsDesktopView()) {
 		// Pretty much copied straight from DesktopPoseView.  Would be better
@@ -1613,7 +1613,7 @@ BFilePanelPoseView::FSNotification(const BMessage *message)
 
 
 void
-BFilePanelPoseView::RestoreState(AttributeStreamNode *node)
+BFilePanelPoseView::RestoreState(AttributeStreamNode* node)
 {
 	_inherited::RestoreState(node);
 	fViewState->SetViewMode(kListMode);
@@ -1628,13 +1628,13 @@ BFilePanelPoseView::RestoreState(const BMessage &message)
 
 
 void
-BFilePanelPoseView::SavePoseLocations(BRect *)
+BFilePanelPoseView::SavePoseLocations(BRect*)
 {
 }
 
 
-EntryListBase *
-BFilePanelPoseView::InitDirentIterator(const entry_ref *ref)
+EntryListBase*
+BFilePanelPoseView::InitDirentIterator(const entry_ref* ref)
 {
 	if (IsDesktopView())
 		return DesktopPoseView::InitDesktopDirentIterator(this, ref);
@@ -1677,14 +1677,14 @@ BFilePanelPoseView::ShowVolumes(bool visible, bool showShared)
 	}
 
 
-	TFilePanel *filepanel = dynamic_cast<TFilePanel*>(Window());
+	TFilePanel* filepanel = dynamic_cast<TFilePanel*>(Window());
 	if (filepanel)
 		filepanel->SetTo(TargetModel()->EntryRef());
 }
 
 
 void
-BFilePanelPoseView::AdaptToVolumeChange(BMessage *message)
+BFilePanelPoseView::AdaptToVolumeChange(BMessage* message)
 {
 	bool showDisksIcon;
 	bool mountVolumesOnDesktop;
@@ -1719,7 +1719,7 @@ BFilePanelPoseView::AdaptToVolumeChange(BMessage *message)
 
 
 void
-BFilePanelPoseView::AdaptToDesktopIntegrationChange(BMessage *message)
+BFilePanelPoseView::AdaptToDesktopIntegrationChange(BMessage* message)
 {
 	bool mountVolumesOnDesktop = true;
 	bool mountSharedVolumesOntoDesktop = true;
@@ -1730,4 +1730,3 @@ BFilePanelPoseView::AdaptToDesktopIntegrationChange(BMessage *message)
 	ShowVolumes(false, mountSharedVolumesOntoDesktop);
 	ShowVolumes(mountVolumesOnDesktop, mountSharedVolumesOntoDesktop);
 }
-

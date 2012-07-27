@@ -31,24 +31,25 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef SLOW_CONTEXT_POPUP_H
 #define SLOW_CONTEXT_POPUP_H
 
+
 #include <PopUpMenu.h>
 #include "NavMenu.h"
+
 
 namespace BPrivate {
 
 class BSlowContextMenu : public BPopUpMenu {
 public:
-	BSlowContextMenu(const char *title);
-	virtual ~BSlowContextMenu();
+				BSlowContextMenu(const char* title);
+	virtual		~BSlowContextMenu();
 
 	virtual	void AttachedToWindow();
 	virtual	void DetachedFromWindow();
-			
-	void SetNavDir(const entry_ref *);
+
+	void SetNavDir(const entry_ref*);
 	
 	void ClearMenu();
 	
@@ -58,53 +59,53 @@ public:
 
 	void SetTarget(const BMessenger &);
 	const BMessenger Target() const;
-	
-	void SetTypesList(const BObjectList<BString> *list);
-	const BObjectList<BString> *TypesList() const;	
-		
-	static ModelMenuItem *NewModelItem(Model *, const BMessage *, const BMessenger &,
-		bool suppressFolderHierarchy=false, BContainerWindow * = NULL,
-		const BObjectList<BString> *typeslist = NULL,
-		TrackingHookData *hook = NULL);
-	
-	TrackingHookData *InitTrackingHook(bool (*)(BMenu *, void *),
-		const BMessenger *target, const BMessage *dragMessage);
+
+	void SetTypesList(const BObjectList<BString>* list);
+	const BObjectList<BString>* TypesList() const;
+
+	static ModelMenuItem* NewModelItem(Model*, const BMessage*, const BMessenger&,
+		bool suppressFolderHierarchy = false, BContainerWindow* = NULL,
+		const BObjectList<BString>* typeslist = NULL,
+		TrackingHookData* hook = NULL);
+
+	TrackingHookData* InitTrackingHook(bool (*)(BMenu*, void*),
+		const BMessenger* target, const BMessage* dragMessage);
 
 	const bool IsShowing() const;
-		
+
 protected:
 	virtual bool AddDynamicItem(add_state state);
 	virtual bool StartBuildingItemList();
 	virtual bool AddNextItem();
-	virtual void DoneBuildingItemList();	
+	virtual void DoneBuildingItemList();
 	virtual void ClearMenuBuildingState();
 
 	void BuildVolumeMenu();
-	
-	void AddOneItem(Model *);
+
+	void AddOneItem(Model*);
 	void AddRootItemsIfNeeded();
 	void AddTrashItem();
-	static void SetTrackingHookDeep(BMenu *, bool (*)(BMenu *, void *), void *);
-	
+	static void SetTrackingHookDeep(BMenu*, bool (*)(BMenu*, void*), void*);
+
 	bool fMenuBuilt;
 
-private:	
+private:
 	entry_ref fNavDir;
 	BMessage fMessage;
 	BMessenger fMessenger;
-	BWindow *fParentWindow;
-	
+	BWindow* fParentWindow;
+
 	// menu building state
 	bool fVolsOnly;
-	BObjectList<BMenuItem> *fItemList;
-	EntryListBase *fContainer;
+	BObjectList<BMenuItem>* fItemList;
+	EntryListBase* fContainer;
 	bool fIteratingDesktop;
 
-	const BObjectList<BString> *fTypesList;
-	
+	const BObjectList<BString>* fTypesList;
+
 	TrackingHookData fTrackingHook;
 	bool fIsShowing;
-		//	see note in AttachedToWindow
+		// see note in AttachedToWindow
 };
 
 
@@ -112,11 +113,13 @@ private:
 
 using namespace BPrivate;
 
-inline const BObjectList<BString> *
+
+inline const BObjectList<BString>*
 BSlowContextMenu::TypesList() const
 {
 	return fTypesList;
 }
+
 
 inline const BMessenger
 BSlowContextMenu::Target() const
@@ -124,10 +127,11 @@ BSlowContextMenu::Target() const
 	return fMessenger;
 }
 
+
 inline const bool
 BSlowContextMenu::IsShowing() const
 {
 	return fIsShowing;
 }
 
-#endif
+#endif	// SLOW_CONTEXT_POPUP_H

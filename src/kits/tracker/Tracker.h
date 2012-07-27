@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
+#ifndef _TRACKER_H
+#define _TRACKER_H
 
-#ifndef	_TRACKER_H
-#define	_TRACKER_H
 
 #include <Application.h>
 #include <Resources.h>
@@ -83,25 +83,25 @@ class TTracker : public BApplication {
 		virtual void Quit();
 		virtual bool QuitRequested();
 		virtual void ReadyToRun();
-		virtual void MessageReceived(BMessage *);
+		virtual void MessageReceived(BMessage*);
 		virtual void Pulse();
-		virtual void RefsReceived(BMessage *);
-		virtual void ArgvReceived(int32 argc, char **argv);
+		virtual void RefsReceived(BMessage*);
+		virtual void ArgvReceived(int32 argc, char** argv);
 
-		MimeTypeList *MimeTypes() const;
+		MimeTypeList* MimeTypes() const;
 			// list of mime types that have a description and do not have
 			// themselves as a preferred handler (case of applications)
 
 		bool TrashFull() const;
-		bool IsTrashNode(const node_ref *) const;
-		bool InTrashNode(const entry_ref *) const;
+		bool IsTrashNode(const node_ref*) const;
+		bool InTrashNode(const entry_ref*) const;
 
-		void CloseParentWaitingForChildSoon(const entry_ref *child,
-				const node_ref *parent);
+		void CloseParentWaitingForChildSoon(const entry_ref* child,
+				const node_ref* parent);
 			// closes parent, waits for child to open first
 
-		void SelectChildInParentSoon(const entry_ref *child,
-				const node_ref *parent);
+		void SelectChildInParentSoon(const entry_ref* child,
+				const node_ref* parent);
 			// waits till child shows up in parent and selects it
 
 		void SelectPoseAtLocationSoon(node_ref parent, BPoint location);
@@ -113,19 +113,19 @@ class TTracker : public BApplication {
 			kRunOpenWithWindow
 		};
 
-		bool EntryHasWindowOpen(const entry_ref *);
+		bool EntryHasWindowOpen(const entry_ref*);
 			// return true if there is an open window for an entry
 
 		status_t NeedMoreNodeMonitors();
 			// call if ran out of node monitors to allocate more
 			// return false if already using all we can get
-		static status_t WatchNode(const node_ref *, uint32 flags,
+		static status_t WatchNode(const node_ref*, uint32 flags,
 					BMessenger target);
 			// cover call for watch_node; if first watch_node fails,
 			// tries bumping the node monitor limit and calls watch_node
 			// again
 
-		TaskLoop *MainTaskLoop() const;
+		TaskLoop* MainTaskLoop() const;
 		BMessenger MountServer() const;
 
 		bool QueryActiveForDevice(dev_t);
@@ -137,45 +137,45 @@ class TTracker : public BApplication {
 
 		void ShowSettingsWindow();
 
-		BContainerWindow *FindContainerWindow(const node_ref *, int32 number = 0) const;
-		BContainerWindow *FindContainerWindow(const entry_ref *, int32 number = 0) const;
-		BContainerWindow *FindParentContainerWindow(const entry_ref *) const;
+		BContainerWindow* FindContainerWindow(const node_ref*, int32 number = 0) const;
+		BContainerWindow* FindContainerWindow(const entry_ref*, int32 number = 0) const;
+		BContainerWindow* FindParentContainerWindow(const entry_ref*) const;
 			// right now works just on plain windows, not on query windows
 
-		BClipboardRefsWatcher *ClipboardRefsWatcher() const;
+		BClipboardRefsWatcher* ClipboardRefsWatcher() const;
 
 	protected:
 		// scripting
-		virtual BHandler *ResolveSpecifier(BMessage *, int32, BMessage *,
-					int32, const char *);
-		virtual status_t GetSupportedSuites(BMessage *);
+		virtual BHandler* ResolveSpecifier(BMessage*, int32, BMessage*,
+			int32, const char*);
+		virtual status_t GetSupportedSuites(BMessage*);
 
-		bool HandleScriptingMessage(BMessage *);
+		bool HandleScriptingMessage(BMessage*);
 
-		bool ExecuteProperty(BMessage *, int32, const char *, BMessage *);
-		bool CreateProperty(BMessage *, BMessage *, int32, const char *,
-				BMessage *);
-		bool DeleteProperty(BMessage *, int32,
-				const char *, BMessage *);
-		bool CountProperty(BMessage *, int32, const char *, BMessage *);
-		bool GetProperty(BMessage *, int32, const char *, BMessage *);
-		bool SetProperty(BMessage *, BMessage *, int32, const char *, BMessage *);
+		bool ExecuteProperty(BMessage*, int32, const char*, BMessage*);
+		bool CreateProperty(BMessage*, BMessage*, int32, const char*,
+				BMessage*);
+		bool DeleteProperty(BMessage*, int32,
+				const char*, BMessage*);
+		bool CountProperty(BMessage*, int32, const char*, BMessage*);
+		bool GetProperty(BMessage*, int32, const char*, BMessage*);
+		bool SetProperty(BMessage*, BMessage*, int32, const char*, BMessage*);
 
 	private:
 		// callbacks for ChildParentSoon calls
-		bool CloseParentWaitingForChild(const entry_ref *child,
-				const node_ref *parent);
-		bool LaunchAndCloseParentIfOK(const entry_ref *launchThis,
-				const node_ref *closeThis, const BMessage *messageToBundle);
-		bool SelectChildInParent(const entry_ref *child,
-				const node_ref *parent);
+		bool CloseParentWaitingForChild(const entry_ref* child,
+				const node_ref* parent);
+		bool LaunchAndCloseParentIfOK(const entry_ref* launchThis,
+				const node_ref* closeThis, const BMessage* messageToBundle);
+		bool SelectChildInParent(const entry_ref* child,
+				const node_ref* parent);
 		void SelectPoseAtLocationInParent(node_ref parent, BPoint location);
-		bool CloseParentWindowCommon(BContainerWindow *);
+		bool CloseParentWindowCommon(BContainerWindow*);
 
 		void InitMimeTypes();
-		bool InstallMimeIfNeeded(const char *type, int32 bitsID,
-				const char *shortDescription, const char *longDescription,
-				const char *preferredAppSignature, uint32 forceMask = 0);
+		bool InstallMimeIfNeeded(const char* type, int32 bitsID,
+				const char* shortDescription, const char* longDescription,
+				const char* preferredAppSignature, uint32 forceMask = 0);
 			// used by InitMimeTypes - checks if a metamime of a given <type> is
 			// installed and if it has all the specified attributes; if not, the
 			// whole mime type is installed and all attributes are set; nulls can
@@ -190,47 +190,48 @@ class TTracker : public BApplication {
 		void InstallIndices(dev_t);
 
 		void CloseAllWindows();
-		void CloseWindowAndChildren(const node_ref *);
+		void CloseWindowAndChildren(const node_ref*);
 		void CloseAllInWorkspace();
 		void OpenInfoWindows(BMessage*);
-		void MoveRefsToTrash(const BMessage *);
-		void OpenContainerWindow(Model *, BMessage *refsList = NULL,
-				OpenSelector openSelector = kOpen, uint32 openFlags = 0,
-				bool checkAlreadyOpen = true, const BMessage *stateMessage = NULL);
+		void MoveRefsToTrash(const BMessage*);
+		void OpenContainerWindow(Model*, BMessage* refsList = NULL,
+			OpenSelector openSelector = kOpen, uint32 openFlags = 0,
+			bool checkAlreadyOpen = true, const BMessage* stateMessage = NULL);
 			// pass either a Model or a list of entries to open
 		void _OpenPreviouslyOpenedWindows(const char* pathFilter = NULL);
 
-		void SetDefaultPrinter(const BMessage *);
-		void EditQueries(const BMessage *);
+		void SetDefaultPrinter(const BMessage*);
+		void EditQueries(const BMessage*);
 
-		BInfoWindow *FindInfoWindow(const node_ref *) const;
+		BInfoWindow* FindInfoWindow(const node_ref*) const;
 
-		BDeskWindow *GetDeskWindow() const;
+		BDeskWindow* GetDeskWindow() const;
 
-		status_t OpenRef(const entry_ref *, const node_ref *nodeToClose = NULL,
-				const node_ref *nodeToSelect = NULL, OpenSelector selector = kOpen,
-				const BMessage *messageToBundle = NULL);
+		status_t OpenRef(const entry_ref*, const node_ref* nodeToClose = NULL,
+				const node_ref* nodeToSelect = NULL, OpenSelector selector = kOpen,
+				const BMessage* messageToBundle = NULL);
 
-		MimeTypeList *fMimeTypeList;
-		WindowList fWindowList;
-		BClipboardRefsWatcher *fClipboardRefsWatcher;
-		BTrashWatcher *fTrashWatcher;
-		TaskLoop *fTaskLoop;
-		int32 fNodeMonitorCount;
+		MimeTypeList*			fMimeTypeList;
+		WindowList				fWindowList;
+		BClipboardRefsWatcher*	fClipboardRefsWatcher;
+		BTrashWatcher*			fTrashWatcher;
+		TaskLoop*				fTaskLoop;
+		int32 					fNodeMonitorCount;
 
-		TrackerSettingsWindow *fSettingsWindow;
+		TrackerSettingsWindow*	fSettingsWindow;
 
 		typedef BApplication _inherited;
 };
 
 
-inline TaskLoop *
+inline TaskLoop*
 TTracker::MainTaskLoop() const
 {
 	return fTaskLoop;
 }
 
-inline BClipboardRefsWatcher *
+
+inline BClipboardRefsWatcher*
 TTracker::ClipboardRefsWatcher() const
 {
 	return fClipboardRefsWatcher;
@@ -240,4 +241,4 @@ TTracker::ClipboardRefsWatcher() const
 
 using namespace BPrivate;
 
-#endif	/* _TRACKER_H */
+#endif	// _TRACKER_H

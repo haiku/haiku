@@ -34,10 +34,12 @@ All rights reserved.
 #ifndef _NAVIGATOR_H_
 #define _NAVIGATOR_H_
 
+
 #include "Model.h"
 
 #include <PictureButton.h>
 #include <View.h>
+
 
 class BTextControl;
 class BEntry;
@@ -59,18 +61,19 @@ enum NavigationAction
 	kNavigatorCommandLocation = 'NVLC'
 };
 
+
 // Custom BPictureButton which takes
 // bitmap resource IDs as arguments
 class BNavigatorButton : public BPictureButton {
 public:
-	BNavigatorButton(BRect rect, const char *name, BMessage *message, int32 resIDon,
+	BNavigatorButton(BRect rect, const char* name, BMessage* message, int32 resIDon,
 		int32 resIDoff, int32 resIDdisabled);
 					 
 	~BNavigatorButton();
 	
 	virtual	void AttachedToWindow();
 
-	void SetPicture(BBitmap *, bool enabled, bool on);
+	void SetPicture(BBitmap*, bool enabled, bool on);
 
 private:
 	int32 fResIDOn;
@@ -78,36 +81,37 @@ private:
 	int32 fResIDDisabled;
 };
 
+
 class BNavigator : public BView {
 public:
-	BNavigator(const Model *model, BRect rect, uint32 resizeMask = B_FOLLOW_LEFT_RIGHT);
+	BNavigator(const Model* model, BRect rect,
+		uint32 resizeMask = B_FOLLOW_LEFT_RIGHT);
 	~BNavigator();
-			
-	void UpdateLocation(const Model *newmodel, int32 action);
+
+	void UpdateLocation(const Model* newmodel, int32 action);
 
 	static float CalcNavigatorHeight(void);
 
-	BContainerWindow *Window() const;
+	BContainerWindow* Window() const;
 
 protected:
 	virtual void Draw(BRect rect);
-	virtual void MessageReceived(BMessage *msg);
+	virtual void MessageReceived(BMessage* msg);
 	virtual void AttachedToWindow();
-		
+
 	void GoForward(bool option); // is option key held down?
 	void GoBackward(bool option);
 	void GoUp(bool option);
-	void SendNavigationMessage(NavigationAction, BEntry *, bool option);
-	
+	void SendNavigationMessage(NavigationAction, BEntry*, bool option);
+
 	void GoTo();
 
 private:
-
-	BPath fPath;
-	BNavigatorButton *fBack;
-	BNavigatorButton *fForw;
-	BNavigatorButton *fUp;
-	BTextControl *fLocation;
+	BPath				fPath;
+	BNavigatorButton*	fBack;
+	BNavigatorButton*	fForw;
+	BNavigatorButton*	fUp;
+	BTextControl*		fLocation;
 
 	BObjectList<BPath> fBackHistory;
 	BObjectList<BPath> fForwHistory;
@@ -115,11 +119,12 @@ private:
 	typedef BView _inherited;
 };
 
+
 inline
-BContainerWindow *
+BContainerWindow*
 BNavigator::Window() const
 {
-	return dynamic_cast<BContainerWindow *>(_inherited::Window());
+	return dynamic_cast<BContainerWindow*>(_inherited::Window());
 }
 
 
@@ -127,4 +132,4 @@ BNavigator::Window() const
 
 using namespace BPrivate;
 
-#endif
+#endif	// _NAVIGATOR_H_

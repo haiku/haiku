@@ -44,7 +44,7 @@ All rights reserved.
 #include "ObjectList.h"
 
 
-TWalkerWrapper::TWalkerWrapper(BTrackerPrivate::TWalker *walker)
+TWalkerWrapper::TWalkerWrapper(BTrackerPrivate::TWalker* walker)
 	:
 	fWalker(walker),
 	fStatus(B_OK)
@@ -66,7 +66,7 @@ TWalkerWrapper::InitCheck() const
 
 
 status_t
-TWalkerWrapper::GetNextEntry(BEntry *entry, bool traverse)
+TWalkerWrapper::GetNextEntry(BEntry* entry, bool traverse)
 {
 	fStatus = fWalker->GetNextEntry(entry, traverse);
 	return fStatus;
@@ -74,7 +74,7 @@ TWalkerWrapper::GetNextEntry(BEntry *entry, bool traverse)
 
 
 status_t
-TWalkerWrapper::GetNextRef(entry_ref *ref)
+TWalkerWrapper::GetNextRef(entry_ref* ref)
 {
 	fStatus = fWalker->GetNextRef(ref);
 	return fStatus;
@@ -82,7 +82,7 @@ TWalkerWrapper::GetNextRef(entry_ref *ref)
 
 
 int32
-TWalkerWrapper::GetNextDirents(struct dirent *buffer, size_t length,
+TWalkerWrapper::GetNextDirents(struct dirent* buffer, size_t length,
 	int32 count)
 {
 	int32 result = fWalker->GetNextDirents(buffer, length, count);
@@ -121,17 +121,17 @@ EntryListBase::InitCheck() const
 }
 
 
-dirent *
-EntryListBase::Next(dirent *ent)
+dirent*
+EntryListBase::Next(dirent* ent)
 {
-	return (dirent *)((char *)ent + ent->d_reclen);
+	return (dirent*)((char*)ent + ent->d_reclen);
 }
 
 
 //	#pragma mark -
 
 
-CachedEntryIterator::CachedEntryIterator(BEntryList *iterator, int32 numEntries,
+CachedEntryIterator::CachedEntryIterator(BEntryList* iterator, int32 numEntries,
 		bool sortInodes)
 	:
 	fIterator(iterator),
@@ -158,7 +158,7 @@ CachedEntryIterator::~CachedEntryIterator()
 
 
 status_t
-CachedEntryIterator::GetNextEntry(BEntry *result, bool traverse)
+CachedEntryIterator::GetNextEntry(BEntry* result, bool traverse)
 {
 	ASSERT(!fDirentBuffer);
 	ASSERT(!fEntryRefBuffer);
@@ -191,7 +191,7 @@ CachedEntryIterator::GetNextEntry(BEntry *result, bool traverse)
 
 
 status_t
-CachedEntryIterator::GetNextRef(entry_ref *ref)
+CachedEntryIterator::GetNextRef(entry_ref* ref)
 {
 	ASSERT(!fDirentBuffer);
 	ASSERT(!fEntryBuffer);
@@ -223,7 +223,7 @@ CachedEntryIterator::GetNextRef(entry_ref *ref)
 
 
 /*static*/ int
-CachedEntryIterator::_CompareInodes(const dirent *ent1, const dirent *ent2)
+CachedEntryIterator::_CompareInodes(const dirent* ent1, const dirent* ent2)
 {
 	if (ent1->d_ino < ent2->d_ino)
 		return -1;
@@ -235,12 +235,12 @@ CachedEntryIterator::_CompareInodes(const dirent *ent1, const dirent *ent2)
 
 
 int32
-CachedEntryIterator::GetNextDirents(struct dirent *ent, size_t size,
+CachedEntryIterator::GetNextDirents(struct dirent* ent, size_t size,
 	int32 count)
 {
 	ASSERT(!fEntryRefBuffer);
 	if (!fDirentBuffer) {
-		fDirentBuffer = (dirent *)malloc(kDirentBufferSize);
+		fDirentBuffer = (dirent*)malloc(kDirentBufferSize);
 		ASSERT(fIndex == 0 && fNumEntries == 0);
 		ASSERT(size > sizeof(dirent) + B_FILE_NAME_LENGTH);
 	}
@@ -272,7 +272,7 @@ CachedEntryIterator::GetNextDirents(struct dirent *ent, size_t size,
 			}
 
 			fCurrentDirent
-				= (dirent *)((char *)fCurrentDirent + currentDirentSize);
+				= (dirent*)((char*)fCurrentDirent + currentDirentSize);
 		}
 		fCurrentDirent = fDirentBuffer;
 		if (fSortInodes) {
@@ -307,7 +307,7 @@ CachedEntryIterator::GetNextDirents(struct dirent *ent, size_t size,
 	memcpy(ent, fCurrentDirent, currentDirentSize);
 
 	if (!fSortInodes)
-		fCurrentDirent = (dirent *)((char *)fCurrentDirent + currentDirentSize);
+		fCurrentDirent = (dirent*)((char*)fCurrentDirent + currentDirentSize);
 
 	return 1;
 }
@@ -336,7 +336,7 @@ CachedEntryIterator::CountEntries()
 
 
 void
-CachedEntryIterator::SetTo(BEntryList *iterator)
+CachedEntryIterator::SetTo(BEntryList* iterator)
 {
 	fIndex = 0;
 	fNumEntries = 0;
@@ -374,7 +374,7 @@ DirectoryEntryList::DirectoryEntryList(const BDirectory &dir)
 
 
 status_t
-DirectoryEntryList::GetNextEntry(BEntry *entry, bool traverse)
+DirectoryEntryList::GetNextEntry(BEntry* entry, bool traverse)
 {
 	fStatus = fDir.GetNextEntry(entry, traverse);
 	return fStatus;
@@ -382,7 +382,7 @@ DirectoryEntryList::GetNextEntry(BEntry *entry, bool traverse)
 
 
 status_t
-DirectoryEntryList::GetNextRef(entry_ref *ref)
+DirectoryEntryList::GetNextRef(entry_ref* ref)
 {
 	fStatus = fDir.GetNextRef(ref);
 	return fStatus;
@@ -390,7 +390,7 @@ DirectoryEntryList::GetNextRef(entry_ref *ref)
 
 
 int32
-DirectoryEntryList::GetNextDirents(struct dirent *buffer, size_t length,
+DirectoryEntryList::GetNextDirents(struct dirent* buffer, size_t length,
 	int32 count)
 {
 	fStatus = fDir.GetNextDirents(buffer, length, count);
@@ -429,8 +429,8 @@ EntryIteratorList::~EntryIteratorList()
 	int32 count = fList.CountItems();
 	for (;count; count--) {
 		// workaround for BEntryList not having a proper destructor
-		BEntryList *entry = fList.RemoveItemAt(count - 1);
-		EntryListBase *fixedEntry = dynamic_cast<EntryListBase *>(entry);
+		BEntryList* entry = fList.RemoveItemAt(count - 1);
+		EntryListBase* fixedEntry = dynamic_cast<EntryListBase*>(entry);
 
 		if (fixedEntry)
 			delete fixedEntry;
@@ -441,14 +441,14 @@ EntryIteratorList::~EntryIteratorList()
 
 
 void
-EntryIteratorList::AddItem(BEntryList *walker)
+EntryIteratorList::AddItem(BEntryList* walker)
 {
 	fList.AddItem(walker);
 }
 
 
 status_t
-EntryIteratorList::GetNextEntry(BEntry *entry, bool traverse)
+EntryIteratorList::GetNextEntry(BEntry* entry, bool traverse)
 {
 	while (true) {
 		if (fCurrentIndex >= fList.CountItems()) {
@@ -467,7 +467,7 @@ EntryIteratorList::GetNextEntry(BEntry *entry, bool traverse)
 
 
 status_t
-EntryIteratorList::GetNextRef(entry_ref *ref)
+EntryIteratorList::GetNextRef(entry_ref* ref)
 {
 	while (true) {
 		if (fCurrentIndex >= fList.CountItems()) {
@@ -486,7 +486,7 @@ EntryIteratorList::GetNextRef(entry_ref *ref)
 
 
 int32
-EntryIteratorList::GetNextDirents(struct dirent *buffer, size_t length,
+EntryIteratorList::GetNextDirents(struct dirent* buffer, size_t length,
 	int32 count)
 {
 	int32 result = 0;
@@ -546,8 +546,7 @@ CachedEntryIteratorList::CachedEntryIteratorList(bool sortInodes)
 
 
 void
-CachedEntryIteratorList::AddItem(BEntryList *walker)
+CachedEntryIteratorList::AddItem(BEntryList* walker)
 {
 	fIteratorList.AddItem(walker);
 }
-

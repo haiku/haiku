@@ -31,7 +31,6 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef	_FIND_PANEL_H
 #define _FIND_PANEL_H
 
@@ -40,12 +39,12 @@ All rights reserved.
 #include <Window.h>
 #include <View.h>
 
-
 #include "DialogPane.h"
 #include "ObjectList.h"
 #include "MimeTypeList.h"
 #include "Utilities.h"
 #include "NodeWalker.h"
+
 
 class BFilePanel;
 class BQuery;
@@ -74,7 +73,7 @@ const uint32 kRemoveItem = 'Frem';
 #ifdef _IMPEXP_TRACKER
 _IMPEXP_TRACKER
 #endif
-BMenu *TrackerBuildRecentFindItemsMenu(const char *title);
+BMenu* TrackerBuildRecentFindItemsMenu(const char* title);
 
 struct MoreOptionsStruct {
 	bool showMoreOptions;
@@ -110,62 +109,62 @@ struct MoreOptionsStruct {
 			reserved8(0)
 		{}
 
-	static void EndianSwap(void *castToThis);
+	static void EndianSwap(void* castToThis);
 
-	static void SetQueryTemporary(BNode *, bool on);
-	static bool QueryTemporary(const BNode *);
+	static void SetQueryTemporary(BNode*, bool on);
+	static bool QueryTemporary(const BNode*);
 };
 
 
 class FindWindow : public BWindow {
 	public:
-		FindWindow(const entry_ref *ref = NULL,
+		FindWindow(const entry_ref* ref = NULL,
 			bool editIfTemplateOnly = false);
 		virtual ~FindWindow();
 
-		FindPanel *BackgroundView() const
+		FindPanel* BackgroundView() const
 			{ return fBackground; }
 
-		BNode *QueryNode() const
+		BNode* QueryNode() const
 			{ return fFile; }
 
-		const char *QueryName() const;
+		const char* QueryName() const;
 			// reads in the query name from either a saved name in a template or
 			// form a saved query name
 
-		static bool IsQueryTemplate(BNode *file);
+		static bool IsQueryTemplate(BNode* file);
 
 	protected:
-		virtual	void MessageReceived(BMessage *message);
+		virtual	void MessageReceived(BMessage* message);
 
 	private:
-		static BFile *TryOpening(const entry_ref *ref);
+		static BFile* TryOpening(const entry_ref* ref);
 		static void GetDefaultQuery(BEntry &entry);
 			// when opening an empty panel, use the default query to set the panel up
-		void SaveQueryAttributes(BNode *file, bool templateQuery);
+		void SaveQueryAttributes(BNode* file, bool templateQuery);
 
 		void Find();
 			// retrieve the results
 		void Save();
 			// save the contents of the find window into the query file
 
-		void SwitchToTemplate(const entry_ref *);
+		void SwitchToTemplate(const entry_ref*);
 		bool FindSaveCommon(bool find);
 
-		status_t SaveQueryAsAttributes(BNode *, BEntry *, bool queryTemplate,
-			const BMessage *oldAttributes = 0, const BPoint *oldLocation = 0);
+		status_t SaveQueryAsAttributes(BNode*, BEntry*, bool queryTemplate,
+			const BMessage* oldAttributes = 0, const BPoint* oldLocation = 0);
 
 		void GetDefaultName(BString &);
 		void GetPredicateString(BString &, bool &dynamicDate);
 			// dynamic date is a date such as 'today'
 
-		BFile *fFile;
+		BFile* fFile;
 		entry_ref fRef;
 		bool fFromTemplate;
 		bool fEditTemplateOnly;
-		FindPanel *fBackground;
+		FindPanel* fBackground;
 		mutable BString fQueryNameFromTemplate;
-		BFilePanel *fSaveAsTemplatePanel;
+		BFilePanel* fSaveAsTemplatePanel;
 
 		typedef BWindow _inherited;
 };
@@ -173,45 +172,45 @@ class FindWindow : public BWindow {
 
 class FindPanel : public BView {
 	public:
-		FindPanel(BRect, BFile *, FindWindow *parent, bool fromTemplate,
+		FindPanel(BRect, BFile*, FindWindow* parent, bool fromTemplate,
 			bool editTemplateOnly);
 		virtual ~FindPanel();
 
 		virtual	void AttachedToWindow();
 		virtual	void MessageReceived(BMessage*);
 
-		void BuildAttrQuery(BQuery *, bool &dynamicDate) const;
-		BPopUpMenu *MimeTypeMenu() const
+		void BuildAttrQuery(BQuery*, bool &dynamicDate) const;
+		BPopUpMenu* MimeTypeMenu() const
 			{ return fMimeTypeMenu; }
-		BMenuItem *CurrentMimeType(const char **type = NULL) const;
-		status_t SetCurrentMimeType(BMenuItem *item);
-		status_t SetCurrentMimeType(const char *label);
+		BMenuItem* CurrentMimeType(const char** type = NULL) const;
+		status_t SetCurrentMimeType(BMenuItem* item);
+		status_t SetCurrentMimeType(const char* label);
 
-		BPopUpMenu *VolMenu() const
+		BPopUpMenu* VolMenu() const
 			{ return fVolMenu; }
 		uint32 Mode() const
 			{ return fMode; }
 
-		static BRect InitialViewSize(const BNode *);
+		static BRect InitialViewSize(const BNode*);
 			// used when showing window, does not account for more options,
 			// those if used will force a resize later
 
-		static uint32 InitialMode(const BNode *entry);
-		void SaveWindowState(BNode *, bool editTemplate);
+		static uint32 InitialMode(const BNode* entry);
+		void SaveWindowState(BNode*, bool editTemplate);
 
-		void SwitchToTemplate(const BNode *);
+		void SwitchToTemplate(const BNode*);
 
-		void GetByAttrPredicate(BQuery *, bool &dynamicDate) const;
+		void GetByAttrPredicate(BQuery*, bool &dynamicDate) const;
 			// build up a query from by-attribute items
 		void GetByNamePredicate(BQuery *) const;
 			// build up a simple query from the name we are searching for
 
 		void GetDefaultName(BString &) const;
-		const char *UserSpecifiedName() const;
+		const char* UserSpecifiedName() const;
 			// name filled out in the query name text field
 
-		static void AddRecentQueries(BMenu *, bool addSaveAsItem,
-			const BMessenger *target, uint32 what);
+		static void AddRecentQueries(BMenu*, bool addSaveAsItem,
+			const BMessenger* target, uint32 what);
 			// populate the recent query menu with query templates and recent
 			// queries
 
@@ -223,9 +222,9 @@ class FindPanel : public BView {
 
 		void AddMimeTypesToMenu();
 			// populates the type menu
-		static bool AddOneMimeTypeToMenu(const ShortMimeInfo *, void *);
+		static bool AddOneMimeTypeToMenu(const ShortMimeInfo*, void*);
 
-		void AddVolumes(BMenu *);
+		void AddVolumes(BMenu*);
 			// populates the volume menu
 		void ShowVolumeMenuLabel();
 
@@ -236,10 +235,10 @@ class FindPanel : public BView {
 		void AddFirstAttr();
 
 		// panel building/restoring calls
-		void RestoreWindowState(const BNode *);
-		void RestoreMimeTypeMenuSelection(const BNode *);
-		void AddByAttributeItems(const BNode *);
-		void ResizeAttributeBox(const BNode *);
+		void RestoreWindowState(const BNode*);
+		void RestoreMimeTypeMenuSelection(const BNode*);
+		void AddByAttributeItems(const BNode*);
+		void ResizeAttributeBox(const BNode*);
 		void RemoveByAttributeItems();
 		void RemoveAttrViewItems();
 		void ShowOrHideMimeTypeMenu();
@@ -247,35 +246,35 @@ class FindPanel : public BView {
 
 		void ShowOrHideMoreOptions(bool show);
 			// fMode gets set by this and the call relies on it being up-to-date
-		static int32 InitialAttrCount(const BNode *);
-		void FillCurrentQueryName(BTextControl *, FindWindow *);
+		static int32 InitialAttrCount(const BNode*);
+		void FillCurrentQueryName(BTextControl*, FindWindow*);
 		void AddByNameOrFormulaItems();
-		void AddOneAttributeItem(BBox *box, BRect);
-		void SetUpAddRemoveButtons(BBox *box);
+		void AddOneAttributeItem(BBox* box, BRect);
+		void SetUpAddRemoveButtons(BBox* box);
 
 		void SwitchMode(uint32);
 			// go from search by name to search by attribute, etc.
 
-		void PushMimeType(BQuery *query) const;
+		void PushMimeType(BQuery* query) const;
 
-		void SaveAsQueryOrTemplate(const entry_ref *, const char *, bool queryTemplate);
+		void SaveAsQueryOrTemplate(const entry_ref*, const char*, bool queryTemplate);
 
 		uint32 fMode;
 		BObjectList<TAttrView> fAttrViewList;
-		BPopUpMenu *fMimeTypeMenu;
-		BMenuField *fMimeTypeField;
-		BPopUpMenu *fVolMenu;
-		BPopUpMenu *fSearchModeMenu;
-		BPopUpMenu *fRecentQueries;
-		DialogPane *fMoreOptionsPane;
-		BTextControl *fQueryName;
+		BPopUpMenu* fMimeTypeMenu;
+		BMenuField* fMimeTypeField;
+		BPopUpMenu* fVolMenu;
+		BPopUpMenu* fSearchModeMenu;
+		BPopUpMenu* fRecentQueries;
+		DialogPane* fMoreOptionsPane;
+		BTextControl* fQueryName;
 		BString fInitialQueryName;
 
-		BCheckBox *fTemporaryCheck;
-		BCheckBox *fSearchTrashCheck;
+		BCheckBox* fTemporaryCheck;
+		BCheckBox* fSearchTrashCheck;
 
-		PaneSwitch *fLatch;
-		DraggableIcon *fDraggableIcon;
+		PaneSwitch* fLatch;
+		DraggableIcon* fDraggableIcon;
 
 		typedef BView _inherited;
 
@@ -292,10 +291,10 @@ class TAttrView : public BView {
 		virtual void AttachedToWindow();
 
 		void RestoreState(const BMessage &settings, int32 index);
-		void SaveState(BMessage *settings, int32 index);
+		void SaveState(BMessage* settings, int32 index);
 
 		virtual	void Draw(BRect updateRect);
-		virtual	void MessageReceived(BMessage *message);
+		virtual	void MessageReceived(BMessage* message);
 
 		void AddLogicMenu(bool selectAnd = true);
 		void RemoveLogicMenu();
@@ -305,11 +304,11 @@ class TAttrView : public BView {
 		void GetDefaultName(BString &result) const;
 
 	private:
-		void AddAttributes(BMenu *menu, const BMimeType &type);
-		void AddMimeTypeAttrs(BMenu *menu);
+		void AddAttributes(BMenu* menu, const BMimeType &type);
+		void AddMimeTypeAttrs(BMenu* menu);
 
-		BMenuField *fMenuField;
-		BTextControl *fTextControl;
+		BMenuField* fMenuField;
+		BTextControl* fTextControl;
 
 		typedef BView _inherited;
 };
@@ -340,16 +339,16 @@ class DeleteTransientQueriesTask {
 		void Initialize();
 		bool GetSome();
 
-		bool ProcessOneRef(Model *);
+		bool ProcessOneRef(Model*);
 
 	private:
-		BTrackerPrivate::TNodeWalker *fWalker;
+		BTrackerPrivate::TNodeWalker* fWalker;
 };
 
 
 class RecentFindItemsMenu : public BMenu {
 	public:
-		RecentFindItemsMenu(const char *title, const BMessenger *target, uint32 what);
+		RecentFindItemsMenu(const char* title, const BMessenger* target, uint32 what);
 
 	protected:
 		virtual void AttachedToWindow();
@@ -363,12 +362,12 @@ class RecentFindItemsMenu : public BMenu {
 class DraggableQueryIcon : public DraggableIcon {
 	// query/query template drag&drop helper
 	public:
-		DraggableQueryIcon(BRect frame, const char *name, const BMessage *message,
+		DraggableQueryIcon(BRect frame, const char* name, const BMessage* message,
 			BMessenger target, uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW);
 
 	protected:
-		virtual bool DragStarted(BMessage *);
+		virtual bool DragStarted(BMessage*);
 };
 
 } // namespace BPrivate

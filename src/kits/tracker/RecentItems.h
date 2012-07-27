@@ -31,19 +31,20 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef __RECENT_ITEMS_LIST__
 #define __RECENT_ITEMS_LIST__
+
+
+// BRecentItemsList classes allow creating an entire menu with
+// recent files, folders, apps. If the user wishes to add items to
+// their own menu, they can instead use the GetNextMenuItem call to
+// get one menu at a time to add it to their app.
+
 
 #include <Entry.h>
 #include <Message.h>
 #include <String.h>
 
-/* BRecentItemsList classes allow creating an entire menu with
- * recent files, folders, apps. If the user wishes to add items to
- * their own menu, they can instead use the GetNextMenuItem call to
- * get one menu at a time to add it to their app.
- */
 
 class BMenuItem;
 class BMenu;
@@ -51,29 +52,27 @@ class BMenu;
 class BRecentItemsList {
 public:
 	BRecentItemsList(int32 maxItems, bool navMenuFolders);
-		/* if <navMenuFolders> passed, folder items get NavMenu-style
-		 * subdirectories attached to them
-		 */
+		// if <navMenuFolders> passed, folder items get NavMenu-style
+		// subdirectories attached to them
 
 	virtual ~BRecentItemsList() {}
-	
-	virtual void Rewind();
-		/* resets the iteration */
-	
-	virtual BMenuItem *GetNextMenuItem(const BMessage *fileOpenMessage = NULL,
-		const BMessage *containerOpenMessage = NULL,
-		BHandler *target = NULL, entry_ref *currentItemRef = NULL);
-		/* if <fileOpenMessage> specified, the item for a file gets a copy with
-		 * the item ref attached as "refs", otherwise a default B_REFS_RECEIVED
-		 * message message gets attached
-		 * if <containerOpenMessage> specified, the item for a folder, volume or query
-		 * gets a copy with the item ref attached as "refs", otherwise a default
-		 * B_REFS_RECEIVED message message gets attached
-		 * if <currentItemRef> gets passed, the caller gets to look at the
-		 * entry_ref corresponding to the item
-		 */
 
-	virtual status_t GetNextRef(entry_ref *);
+	virtual void Rewind();
+		// resets the iteration
+
+	virtual BMenuItem* GetNextMenuItem(const BMessage* fileOpenMessage = NULL,
+		const BMessage* containerOpenMessage = NULL,
+		BHandler* target = NULL, entry_ref* currentItemRef = NULL);
+		// if <fileOpenMessage> specified, the item for a file gets a copy with
+		// the item ref attached as "refs", otherwise a default B_REFS_RECEIVED
+		// message message gets attached
+		// if <containerOpenMessage> specified, the item for a folder, volume or query
+		// gets a copy with the item ref attached as "refs", otherwise a default
+		// B_REFS_RECEIVED message message gets attached
+		// if <currentItemRef> gets passed, the caller gets to look at the
+		// entry_ref corresponding to the item
+
+	virtual status_t GetNextRef(entry_ref*);
 
 protected:
 	BMessage fItems;
@@ -82,7 +81,6 @@ protected:
 	bool fNavMenuFolders;
 
 private:
-
 	virtual	void _r1();
 	virtual	void _r2();
 	virtual	void _r3();
@@ -94,39 +92,38 @@ private:
 	virtual	void _r9();
 	virtual	void _r10();
 
-	uint32 _reserved[20];
+			uint32 _reserved[20];
 };
+
 
 class BRecentFilesList : public BRecentItemsList {
 public:
-
-	/* use one of the two constructors to set up next item iteration */
+	// use one of the two constructors to set up next item iteration
 	BRecentFilesList(int32 maxItems = 10, bool navMenuFolders = false,
-		const char *ofType = NULL, const char *openedByAppSig = NULL);
-	BRecentFilesList(int32 maxItems, bool navMenuFolders, const char *ofTypeList[],
-		int32 ofTypeListCount, const char *openedByAppSig = NULL);	
+		const char* ofType = NULL, const char* openedByAppSig = NULL);
+	BRecentFilesList(int32 maxItems, bool navMenuFolders, const char* ofTypeList[],
+		int32 ofTypeListCount, const char* openedByAppSig = NULL);	
 	virtual ~BRecentFilesList();
 
-	/* use one of the two NewFileListMenu calls to get an entire menu */
-	static BMenu *NewFileListMenu(const char *title,
-		BMessage *openFileMessage = NULL, BMessage *openFolderMessage = NULL,
-		BHandler *target = NULL,
+	// use one of the two NewFileListMenu calls to get an entire menu
+	static BMenu* NewFileListMenu(const char* title,
+		BMessage* openFileMessage = NULL, BMessage* openFolderMessage = NULL,
+		BHandler* target = NULL,
 		int32 maxItems = 10, bool navMenuFolders = false,
-		const char *ofType = NULL, const char *openedByAppSig = NULL);
+		const char* ofType = NULL, const char* openedByAppSig = NULL);
 
-	static BMenu *NewFileListMenu(const char *title,
-		BMessage *openFileMessage, BMessage *openFolderMessage,
-		BHandler *target,
+	static BMenu* NewFileListMenu(const char* title,
+		BMessage* openFileMessage, BMessage* openFolderMessage,
+		BHandler* target,
 		int32 maxItems, bool navMenuFolders,
-		const char *ofTypeList[], int32 ofTypeListCount,
-		const char *openedByAppSig);
+		const char* ofTypeList[], int32 ofTypeListCount,
+		const char* openedByAppSig);
 
-	virtual status_t GetNextRef(entry_ref *);
+	virtual status_t GetNextRef(entry_ref*);
 
 protected:
-	
 	BString fType;
-	char **fTypes;
+	char** fTypes;
 	int32 fTypeCount;
 	BString fAppSig;
 
@@ -142,24 +139,25 @@ private:
 	virtual	void _r19();
 	virtual	void _r110();
 
-	uint32 _reserved[20];	
+			uint32 _reserved[20];
 };
+
 
 class BRecentFoldersList : public BRecentItemsList {
 public:
-	/* use the constructor to set up next item iteration */
+	// use the constructor to set up next item iteration
 	BRecentFoldersList(int32 maxItems, bool navMenuFolders = false,
-		const char *openedByAppSig = NULL);
+		const char* openedByAppSig = NULL);
 
-	/* use NewFolderListMenu to get an entire menu */
-	static BMenu *NewFolderListMenu(const char *title,
-		BMessage *openMessage = NULL, BHandler *target = NULL,
+	// use NewFolderListMenu to get an entire menu
+	static BMenu* NewFolderListMenu(const char* title,
+		BMessage* openMessage = NULL, BHandler* target = NULL,
 		int32 maxItems = 10, bool navMenuFolders = false,
-		const char *openedByAppSig = NULL);
+		const char* openedByAppSig = NULL);
 
-	virtual status_t GetNextRef(entry_ref *);
+	virtual status_t GetNextRef(entry_ref*);
 
-protected:	
+protected:
 	BString fAppSig;
 
 private:
@@ -174,20 +172,21 @@ private:
 	virtual	void _r29();
 	virtual	void _r210();
 
-	uint32 _reserved[20];
+			uint32 _reserved[20];
 };
+
 
 class BRecentAppsList : public BRecentItemsList {
 public:
-	/* use the constructor to set up next item iteration */
+	// use the constructor to set up next item iteration
 	BRecentAppsList(int32 maxItems);
 
-	/* use NewFolderListMenu to get an entire menu */
-	static BMenu *NewAppListMenu(const char *title,
-		BMessage *openMessage = NULL, BHandler *target = NULL,
+	// use NewFolderListMenu to get an entire menu
+	static BMenu* NewAppListMenu(const char* title,
+		BMessage* openMessage = NULL, BHandler* target = NULL,
 		int32 maxItems = 10);
 
-	virtual status_t GetNextRef(entry_ref *);
+	virtual status_t GetNextRef(entry_ref*);
 
 private:
 	virtual	void _r31();
@@ -201,7 +200,7 @@ private:
 	virtual	void _r39();
 	virtual	void _r310();
 
-	uint32 _reserved[20];
+			uint32 _reserved[20];
 };
 
-#endif
+#endif	// __RECENT_ITEMS_LIST__

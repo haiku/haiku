@@ -61,6 +61,7 @@ All rights reserved.
 // ALTERED VERSION: Adapted to ANSI C and C++ for the OpenTracker
 // project (www.opentracker.org), Jul 11, 2000.
 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -68,6 +69,7 @@ All rights reserved.
 #include <Errors.h>
 
 #include "RegExp.h"
+
 
 // The first byte of the regexp internal "program" is actually this magic
 // number; the start node begins in the second byte.
@@ -105,7 +107,7 @@ const uint8 kRegExpMagic = 0234;
 // because of operator precedence.)  The operand of some types of node is
 // a literal string; for others, it is a node leading into a sub-FSM.  In
 // particular, the operand of a kRegExpBranch node is the first node of the branch.
-// (NB this is *not* a tree structure:  the tail of the branch connects
+// (NB this is* not* a tree structure:  the tail of the branch connects
 // to the thing following the set of kRegExpBranches.)  The opcodes are:
 //
 
@@ -161,7 +163,7 @@ enum {
 // but allows patterns to get big without disasters.
 //
 
-const char *kMeta = "^$.[()|?+*\\";
+const char* kMeta = "^$.[()|?+*\\";
 const int32 kMaxSize = 32767L;		// Probably could be 65535L.
 
 // Flags to be passed up and down:
@@ -172,7 +174,7 @@ enum {
 	kWorst = 0	// Worst case.
 };
 
-const char *kRegExpErrorStringArray[] = {
+const char* kRegExpErrorStringArray[] = {
 	"Unmatched parenthesis.",
 	"Expression too long.",
 	"Too many parenthesis.",
@@ -200,12 +202,14 @@ RegExp::RegExp()
 {
 }
 
-RegExp::RegExp(const char *pattern)
+
+RegExp::RegExp(const char* pattern)
 	:	fError(B_OK),
 		fRegExp(NULL)
 {
 	fRegExp = Compile(pattern);
 }
+
 
 RegExp::RegExp(const BString &pattern)
 	:	fError(B_OK),
@@ -214,11 +218,11 @@ RegExp::RegExp(const BString &pattern)
 	fRegExp = Compile(pattern.String());
 }
 
+
 RegExp::~RegExp()
 {
 	free(fRegExp);
 }
-
 
 
 status_t
@@ -227,14 +231,16 @@ RegExp::InitCheck() const
 	return fError;
 }
 
+
 status_t
-RegExp::SetTo(const char *pattern)
+RegExp::SetTo(const char* pattern)
 {
 	fError = B_OK;
 	free(fRegExp);
 	fRegExp = Compile(pattern);
 	return fError;
 }
+
 
 status_t
 RegExp::SetTo(const BString &pattern)
@@ -245,14 +251,16 @@ RegExp::SetTo(const BString &pattern)
 	return fError;
 }
 
+
 bool
-RegExp::Matches(const char *string) const
+RegExp::Matches(const char* string) const
 {
 	if (!fRegExp || !string)
 		return false;
 
 	return RunMatcher(fRegExp, string) == 1;
 }
+
 
 bool
 RegExp::Matches(const BString &string) const
@@ -278,13 +286,12 @@ RegExp::Matches(const BString &string) const
 //
 // Beware that the optimization-preparation code in here knows about some
 // of the structure of the compiled regexp.
-
-regexp *
-RegExp::Compile(const char *exp)
+regexp*
+RegExp::Compile(const char* exp)
 {
-	regexp *r;
-	const char *scan;
-	const char *longest;
+	regexp* r;
+	const char* scan;
+	const char* longest;
 	int32 len;
 	int32 flags;
 
@@ -308,8 +315,8 @@ RegExp::Compile(const char *exp)
 		return NULL;
 	}
 
-	// Allocate space.
-	r = (regexp *)malloc(sizeof(regexp) + fCodeSize);
+	r = (regexp*)malloc(sizeof(regexp) + fCodeSize);
+		// Allocate space
 
 	if (!r) {
 		SetError(B_NO_MEMORY);
@@ -331,8 +338,10 @@ RegExp::Compile(const char *exp)
 	r->reganch = 0;
 	r->regmust = NULL;
 	r->regmlen = 0;
-	scan = r->program + 1;			// First kRegExpBranch.
-	if (*Next((char *)scan) == kRegExpEnd) {		// Only one top-level choice.
+	scan = r->program + 1;
+		// First kRegExpBranch.
+	if (*Next((char*)scan) == kRegExpEnd) {
+		// Only one top-level choice.
 		scan = Operand(scan);
 
 		// Starting-point info.
@@ -341,18 +350,16 @@ RegExp::Compile(const char *exp)
 		else if (*scan == kRegExpBol)
 			r->reganch++;
 
-		//
 		// If there's something expensive in the r.e., find the
 		// longest literal string that must appear and make it the
 		// regmust.  Resolve ties in favor of later strings, since
 		// the regstart check works with the beginning of the r.e.
 		// and avoiding duplication strengthens checking.  Not a
 		// strong reason, but sufficient in the absence of others.
-		//
 		if (flags&kSPStart) {
 			longest = NULL;
 			len = 0;
-			for (; scan != NULL; scan = Next((char *)scan))
+			for (; scan != NULL; scan = Next((char*)scan))
 				if (*scan == kRegExpExactly && (int32)strlen(Operand(scan)) >= len) {
 					longest = Operand(scan);
 					len = (int32)strlen(Operand(scan));
@@ -365,13 +372,15 @@ RegExp::Compile(const char *exp)
 	return r;
 }
 
-regexp *
+
+regexp*
 RegExp::Expression() const
 {
 	return fRegExp;
 }
 
-const char *
+
+const char*
 RegExp::ErrorString() const
 {
 	if (fError >= REGEXP_UNMATCHED_PARENTHESIS
@@ -398,12 +407,12 @@ RegExp::SetError(status_t error) const
 // is a trifle forced, but the need to tie the tails of the branches to what
 // follows makes it hard to avoid.
 //
-char *
-RegExp::Reg(int32 paren, int32 *flagp)
+char*
+RegExp::Reg(int32 paren, int32* flagp)
 {
-	char *ret;
-	char *br;
-	char *ender;
+	char* ret;
+	char* br;
+	char* ender;
 	int32 parno = 0;
 	int32 flags;
 
@@ -469,17 +478,18 @@ RegExp::Reg(int32 paren, int32 *flagp)
 	return ret;
 }
 
+
 //
 // - Branch - one alternative of an | operator
 //
 // Implements the concatenation operator.
 //
-char *
-RegExp::Branch(int32 *flagp)
+char*
+RegExp::Branch(int32* flagp)
 {
-	char *ret;
-	char *chain;
-	char *latest;
+	char* ret;
+	char* chain;
+	char* latest;
 	int32 flags;
 
 	*flagp = kWorst;		// Tentatively.
@@ -505,6 +515,7 @@ RegExp::Branch(int32 *flagp)
 	return ret;
 }
 
+
 //
 // - Piece - something followed by possible [*+?]
 //
@@ -514,12 +525,12 @@ RegExp::Branch(int32 *flagp)
 // It might seem that this node could be dispensed with entirely, but the
 // endmarker role is not redundant.
 //
-char *
-RegExp::Piece(int32 *flagp)
+char*
+RegExp::Piece(int32* flagp)
 {
-	char *ret;
+	char* ret;
 	char op;
-	char *next;
+	char* next;
 	int32 flags;
 
 	ret = Atom(&flags);
@@ -572,6 +583,7 @@ RegExp::Piece(int32 *flagp)
 	return ret;
 }
 
+
 //
 // - Atom - the lowest level
 //
@@ -580,10 +592,10 @@ RegExp::Piece(int32 *flagp)
 // faster to run.  Backslashed characters are exceptions, each becoming a
 // separate node; the code is simpler that way and it's not worth fixing.
 //
-char *
-RegExp::Atom(int32 *flagp)
+char*
+RegExp::Atom(int32* flagp)
 {
-	char *ret;
+	char* ret;
 	int32 flags;
 
 	*flagp = kWorst;		// Tentatively.
@@ -695,14 +707,15 @@ RegExp::Atom(int32 *flagp)
 	return ret;
 }
 
+
 //
 // - Node - emit a node
 //
-char *			// Location.
+char*			// Location.
 RegExp::Node(char op)
 {
-	char *ret;
-	char *ptr;
+	char* ret;
+	char* ptr;
 
 	ret = fCodeEmitPointer;
 	if (ret == &fDummy) {
@@ -719,6 +732,7 @@ RegExp::Node(char op)
 	return ret;
 }
 
+
 //
 // - Char - emit (if appropriate) a byte of code
 //
@@ -731,17 +745,18 @@ RegExp::Char(char b)
 		fCodeSize++;
 }
 
+
 //
 // - Insert - insert an operator in front of already-emitted operand
 //
 // Means relocating the operand.
 //
 void
-RegExp::Insert(char op, char *opnd)
+RegExp::Insert(char op, char* opnd)
 {
-	char *src;
-	char *dst;
-	char *place;
+	char* src;
+	char* dst;
+	char* place;
 
 	if (fCodeEmitPointer == &fDummy) {
 		fCodeSize += 3;
@@ -760,14 +775,15 @@ RegExp::Insert(char op, char *opnd)
 	*place++ = '\0';
 }
 
+
 //
 // - Tail - set the next-pointer at the end of a node chain
 //
 void
-RegExp::Tail(char *p, char *val)
+RegExp::Tail(char* p, char* val)
 {
-	char *scan;
-	char *temp;
+	char* scan;
+	char* temp;
 	int32 offset;
 
 	if (p == &fDummy)
@@ -791,11 +807,12 @@ RegExp::Tail(char *p, char *val)
 	scan[2] = (char)(offset & 0377);
 }
 
+
 //
 // - OpTail - Tail on operand of first argument; nop if operandless
 //
 void
-RegExp::OpTail(char *p, char *val)
+RegExp::OpTail(char* p, char* val)
 {
 	// "Operandless" and "op != kRegExpBranch" are synonymous in practice.
 	if (p == NULL || p == &fDummy || *p != kRegExpBranch)
@@ -807,13 +824,14 @@ RegExp::OpTail(char *p, char *val)
 // RunMatcher and friends
 //
 
+
 //
 // - RunMatcher - match a regexp against a string
 //
 int32
-RegExp::RunMatcher(regexp *prog, const char *string) const
+RegExp::RunMatcher(regexp* prog, const char* string) const
 {
-	const char *s;
+	const char* s;
 
 	// Be paranoid...
 	if (prog == NULL || string == NULL) {
@@ -866,11 +884,12 @@ RegExp::RunMatcher(regexp *prog, const char *string) const
 	return 0;
 }
 
+
 //
 // - Try - try match at specific point
 //
 int32			// 0 failure, 1 success
-RegExp::Try(regexp *prog, const char *string) const
+RegExp::Try(regexp* prog, const char* string) const
 {
 	int32 i;
 	const char **sp;
@@ -894,6 +913,7 @@ RegExp::Try(regexp *prog, const char *string) const
 		return 0;
 }
 
+
 //
 // - Match - main matching routine
 //
@@ -905,10 +925,10 @@ RegExp::Try(regexp *prog, const char *string) const
 // by recursion.
 ///
 int32			// 0 failure, 1 success
-RegExp::Match(const char *prog) const
+RegExp::Match(const char* prog) const
 {
-	const char *scan;	// Current node.
-	const char *next;		// Next node.
+	const char* scan;	// Current node.
+	const char* next;		// Next node.
 
 	scan = prog;
 #ifdef DEBUG
@@ -938,7 +958,7 @@ RegExp::Match(const char *prog) const
 				break;
 			case kRegExpExactly:
 				{
-					const char *opnd = Operand(scan);
+					const char* opnd = Operand(scan);
 					// Inline the first character, for speed.
 					if (*opnd != *fStringInputPointer)
 						return 0;
@@ -977,7 +997,7 @@ RegExp::Match(const char *prog) const
 			case kRegExpOpen + 9:
 				{
 					int32 no;
-					const char *save;
+					const char* save;
 
 					no = *scan - kRegExpOpen;
 					save = fStringInputPointer;
@@ -1006,7 +1026,7 @@ RegExp::Match(const char *prog) const
 			case kRegExpClose + 9:
 				{
 					int32 no;
-					const char *save;
+					const char* save;
 
 					no = *scan - kRegExpClose;
 					save = fStringInputPointer;
@@ -1026,7 +1046,7 @@ RegExp::Match(const char *prog) const
 				break;
 			case kRegExpBranch:
 				{
-					const char *save;
+					const char* save;
 
 					if (*next != kRegExpBranch)		// No choice.
 						next = Operand(scan);	// Avoid recursion.
@@ -1048,7 +1068,7 @@ RegExp::Match(const char *prog) const
 				{
 					char nextch;
 					int32 no;
-					const char *save;
+					const char* save;
 					int32 min;
 
 					//
@@ -1092,15 +1112,16 @@ RegExp::Match(const char *prog) const
 	return 0;
 }
 
+
 //
 // - Repeat - repeatedly match something simple, report how many
 //
 int32
-RegExp::Repeat(const char *p) const
+RegExp::Repeat(const char* p) const
 {
 	int32 count = 0;
-	const char *scan;
-	const char *opnd;
+	const char* scan;
+	const char* opnd;
 
 	scan = fStringInputPointer;
 	opnd = Operand(p);
@@ -1141,11 +1162,12 @@ RegExp::Repeat(const char *p) const
 	return count;
 }
 
+
 //
 // - Next - dig the "next" pointer out of a node
 //
-char *
-RegExp::Next(char *p)
+char*
+RegExp::Next(char* p)
 {
 	int32 offset;
 
@@ -1162,8 +1184,9 @@ RegExp::Next(char *p)
 		return p + offset;
 }
 
-const char *
-RegExp::Next(const char *p) const
+
+const char*
+RegExp::Next(const char* p) const
 {
 	int32 offset;
 
@@ -1179,24 +1202,28 @@ RegExp::Next(const char *p) const
 	else
 		return p + offset;
 }
+
 
 inline int32
-RegExp::UCharAt(const char *p) const
+RegExp::UCharAt(const char* p) const
 {
 	return (int32)*(unsigned char *)p;
 }
 
-inline char *
+
+inline char*
 RegExp::Operand(char* p) const
 {
 	return p + 3;
 }
 
-inline const char *
+
+inline const char*
 RegExp::Operand(const char* p) const
 {
 	return p + 3;
 }
+
 
 inline bool
 RegExp::IsMult(char c) const
@@ -1207,15 +1234,16 @@ RegExp::IsMult(char c) const
 
 #ifdef DEBUG
 
+
 //
 // - Dump - dump a regexp onto stdout in vaguely comprehensible form
 //
 void
 RegExp::Dump()
 {
-	const char *s;
+	const char* s;
 	char op = kRegExpExactly;	// Arbitrary non-kRegExpEnd op.
-	const char *next;
+	const char* next;
 
 	s = fRegExp->program + 1;
 	while (op != kRegExpEnd) {	// While that wasn't kRegExpEnd last time...
@@ -1248,13 +1276,14 @@ RegExp::Dump()
 	printf("\n");
 }
 
+
 //
 // - Prop - printable representation of opcode
 //
-char *
-RegExp::Prop(const char *op) const
+char*
+RegExp::Prop(const char* op) const
 {
-	const char *p = NULL;
+	const char* p = NULL;
 	static char buf[50];
 
 	(void) strcpy(buf, ":");
@@ -1331,8 +1360,9 @@ RegExp::Prop(const char *op) const
 	return buf;
 }
 
+
 void
-RegExp::RegExpError(const char *) const
+RegExp::RegExpError(const char*) const
 {
 	// does nothing now, perhaps it should printf?
 }

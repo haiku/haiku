@@ -51,10 +51,10 @@ All rights reserved.
 #include "Tracker.h"
 
 
-NodePreloader *
-NodePreloader::InstallNodePreloader(const char *name, BLooper *host)
+NodePreloader*
+NodePreloader::InstallNodePreloader(const char* name, BLooper* host)
 {
-	NodePreloader *result = new NodePreloader(name);
+	NodePreloader* result = new NodePreloader(name);
 	{
 		AutoLock<BLooper> lock(host);
 		if (!lock)
@@ -66,7 +66,7 @@ NodePreloader::InstallNodePreloader(const char *name, BLooper *host)
 }
 
 
-NodePreloader::NodePreloader(const char *name)
+NodePreloader::NodePreloader(const char* name)
 	:	BHandler(name),
 		fModelList(20, true),
 		fQuitRequested(false)
@@ -82,7 +82,7 @@ NodePreloader::~NodePreloader()
 }
 
 
-void 
+void
 NodePreloader::Run()
 {
 	fLock.Lock();
@@ -90,72 +90,74 @@ NodePreloader::Run()
 }
 
 
-Model *
+Model*
 NodePreloader::FindModel(node_ref itemNode) const
 {
 	for (int32 count = fModelList.CountItems() - 1; count >= 0; count--) {
-		Model *model = fModelList.ItemAt(count);
-		if (*model->NodeRef() == itemNode) 
+		Model* model = fModelList.ItemAt(count);
+		if (*model->NodeRef() == itemNode)
 			return model;
 	}
 	return NULL;
 }
 
 
-void 
-NodePreloader::MessageReceived(BMessage *message)
+void
+NodePreloader::MessageReceived(BMessage* message)
 {
 	// respond to node monitor notifications
 	
 	node_ref itemNode;
 	switch (message->what) {
 		case B_NODE_MONITOR:
+		{
 			switch (message->FindInt32("opcode")) {
 				case B_ENTRY_REMOVED:
-					{
-						AutoLock<Benaphore> locker(fLock);
-						message->FindInt32("device", &itemNode.device);
-						message->FindInt64("node", &itemNode.node);
-						Model *model = FindModel(itemNode);
-						if (!model)
-							break;
-//						PRINT(("preloader removing file %s\n", model->Name()));
-						IconCache::sIconCache->Removing(model);
-						fModelList.RemoveItem(model);
+				{
+					AutoLock<Benaphore> locker(fLock);
+					message->FindInt32("device", &itemNode.device);
+					message->FindInt64("node", &itemNode.node);
+					Model* model = FindModel(itemNode);
+					if (!model)
 						break;
-					}
+					//PRINT(("preloader removing file %s\n", model->Name()));
+					IconCache::sIconCache->Removing(model);
+					fModelList.RemoveItem(model);
+					break;
+				}
 
 				case B_ATTR_CHANGED:
 				case B_STAT_CHANGED:
-					{
-						AutoLock<Benaphore> locker(fLock);
-						message->FindInt32("device", &itemNode.device);
-						message->FindInt64("node", &itemNode.node);
+				{
+					AutoLock<Benaphore> locker(fLock);
+					message->FindInt32("device", &itemNode.device);
+					message->FindInt64("node", &itemNode.node);
 
-						const char *attrName;
-						message->FindString("attr", &attrName);
-						Model *model = FindModel(itemNode);
-						if (!model)
-							break;
-						BModelOpener opener(model);
-						IconCache::sIconCache->IconChanged(model->ResolveIfLink());
-//						PRINT(("preloader updating file %s\n", model->Name()));
+					const char* attrName;
+					message->FindString("attr", &attrName);
+					Model* model = FindModel(itemNode);
+					if (!model)
 						break;
-					}
+					BModelOpener opener(model);
+					IconCache::sIconCache->IconChanged(model->ResolveIfLink());
+					//PRINT(("preloader updating file %s\n", model->Name()));
+					break;
+				}
 			}
 			break;
+		}
 
 		default:
 			_inherited::MessageReceived(message);
-			break;	
+			break;
 	}
 }
 
 
-void 
-NodePreloader::PreloadOne(const char *dirPath)
+void
+NodePreloader::PreloadOne(const char* dirPath)
 {
-//	PRINT(("preloading directory %s\n", dirPath));
+	//PRINT(("preloading directory %s\n", dirPath));
 	BDirectory dir(dirPath);
 	if (!dir.InitCheck() == B_OK)
 		return;
@@ -177,7 +179,7 @@ NodePreloader::PreloadOne(const char *dirPath)
 			// only interrested in files
 			continue;
 
-		Model *model = new Model(&ref, true);
+		Model* model = new Model(&ref, true);
 		if (model->InitCheck() == B_OK && model->IconFrom() == kUnknownSource) {
 			TTracker::WatchNode(model->NodeRef(), B_WATCH_STAT
 				| B_WATCH_ATTR, this);
@@ -187,11 +189,10 @@ NodePreloader::PreloadOne(const char *dirPath)
 		} else
 			delete model;
 	}
-	
 }
 
 
-void 
+void
 NodePreloader::Preload()
 {
 	for (int32 count = 100; count >= 0; count--) {
@@ -211,11 +212,10 @@ NodePreloader::Preload()
 
 	ASSERT(fLock.IsLocked());
 	BPath path;
-	if (find_directory(B_BEOS_APPS_DIRECTORY, &path) == B_OK) 
+	if (find_directory(B_BEOS_APPS_DIRECTORY, &path) == B_OK)
 		PreloadOne(path.Path());
 	if (find_directory(B_BEOS_PREFERENCES_DIRECTORY, &path) == B_OK)
 		PreloadOne(path.Path());
-	
+
 	fLock.Unlock();
 }
-

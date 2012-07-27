@@ -31,13 +31,14 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _DIALOG_PANE_
 #define _DIALOG_PANE_
+
 
 #include <Control.h>
 
 #include "ObjectList.h"
+
 
 namespace BPrivate {
 
@@ -50,6 +51,7 @@ public:
 			void				RemoveAll(BView* fromParent);
 			void				AddAll(BView* toParent);
 };
+
 
 class DialogPane : public BView {
 	// dialog with collapsible panes
@@ -101,7 +103,7 @@ private:
 };
 
 
-inline int32 
+inline int32
 DialogPane::Mode() const
 {
 	return fMode;
@@ -113,7 +115,7 @@ public:
 								PaneSwitch(BRect frame, const char* name,
 									bool leftAligned = true,
 									uint32 resizeMask
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 
 								PaneSwitch(const char* name,

@@ -31,15 +31,16 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-#ifndef	_POSE_H
+#ifndef _POSE_H
 #define _POSE_H
+
 
 #include <Region.h>
 
 #include "TextWidget.h"
 #include "Model.h"
 #include "Utilities.h"
+
 
 namespace BPrivate {
 
@@ -54,28 +55,28 @@ enum {
 
 class BPose {
 	public:
-		BPose(Model *adopt, BPoseView *, uint32 clipboardMode, bool selected = false);
+		BPose(Model* adopt, BPoseView*, uint32 clipboardMode, bool selected = false);
 		virtual ~BPose();
 
-		BTextWidget *AddWidget(BPoseView *, BColumn *);
-		BTextWidget *AddWidget(BPoseView *, BColumn *, ModelNodeLazyOpener &opener);
-		void RemoveWidget(BPoseView *, BColumn *);
-		void SetLocation(BPoint, const BPoseView *);
-		void MoveTo(BPoint, BPoseView *, bool inval = true);
+		BTextWidget* AddWidget(BPoseView*, BColumn*);
+		BTextWidget* AddWidget(BPoseView*, BColumn*, ModelNodeLazyOpener &opener);
+		void RemoveWidget(BPoseView*, BColumn*);
+		void SetLocation(BPoint, const BPoseView*);
+		void MoveTo(BPoint, BPoseView*, bool inval = true);
 
-		void Draw(BRect poseRect, const BRect& updateRect, BPoseView *,
+		void Draw(BRect poseRect, const BRect& updateRect, BPoseView*,
 			bool fullDraw = true);
-		void Draw(BRect poseRect, const BRect& updateRect, BPoseView *,
-			BView *drawView, bool fullDraw, BPoint offset, bool selected);
-		void DeselectWithoutErasingBackground(BRect rect, BPoseView *poseView);
+		void Draw(BRect poseRect, const BRect& updateRect, BPoseView*,
+			BView* drawView, bool fullDraw, BPoint offset, bool selected);
+		void DeselectWithoutErasingBackground(BRect rect, BPoseView* poseView);
 			// special purpose draw call for deselecting over a textured
 			// background
 
-		void DrawBar(BPoint where,BView *view,icon_size kind);
+		void DrawBar(BPoint where, BView* view, icon_size kind);
 
-		void DrawIcon(BPoint, BView *, icon_size, bool direct, bool drawUnselected = false);
-		void DrawToggleSwitch(BRect, BPoseView *);
-		void MouseUp(BPoint poseLoc, BPoseView *, BPoint where, int32 index);
+		void DrawIcon(BPoint, BView*, icon_size, bool direct, bool drawUnselected = false);
+		void DrawToggleSwitch(BRect, BPoseView*);
+		void MouseUp(BPoint poseLoc, BPoseView*, BPoint where, int32 index);
 		Model* TargetModel() const;
 		Model* ResolvedModel() const;
 		void Select(bool selected);
@@ -83,35 +84,35 @@ class BPose {
 			// Rename to IsHighlighted
 		bigtime_t SelectionTime() const;
 
-		BTextWidget *ActiveWidget() const;
-		BTextWidget *WidgetFor(uint32 hashAttr, int32 *index = 0) const;
-		BTextWidget *WidgetFor(BColumn *column, BPoseView *poseView, ModelNodeLazyOpener &opener,
-				int32 *index = NULL);
+		BTextWidget* ActiveWidget() const;
+		BTextWidget* WidgetFor(uint32 hashAttr, int32* index = 0) const;
+		BTextWidget* WidgetFor(BColumn* column, BPoseView* poseView,
+			ModelNodeLazyOpener &opener, int32* index = NULL);
 			// adds the widget if needed
 
-		bool PointInPose(BPoint poseLoc, const BPoseView *, BPoint where,
-				BTextWidget ** = NULL) const;
-		bool PointInPose(const BPoseView *, BPoint where) const ;
-		BRect CalcRect(BPoint loc, const BPoseView *,
+		bool PointInPose(BPoint poseLoc, const BPoseView*, BPoint where,
+				BTextWidget** = NULL) const;
+		bool PointInPose(const BPoseView*, BPoint where) const;
+		BRect CalcRect(BPoint loc, const BPoseView*,
 			bool minimal_rect = false) const;
-		BRect CalcRect(const BPoseView *) const;
-		void UpdateAllWidgets(int32 poseIndex, BPoint poseLoc, BPoseView *);
-		void UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
+		BRect CalcRect(const BPoseView*) const;
+		void UpdateAllWidgets(int32 poseIndex, BPoint poseLoc, BPoseView*);
+		void UpdateWidgetAndModel(Model* resolvedModel, const char* attrName,
 				uint32 attrType, int32 poseIndex, BPoint poseLoc,
-				BPoseView *view, bool visible);
-		bool UpdateVolumeSpaceBar(BVolume *volume);
-		void UpdateIcon(BPoint poseLoc, BPoseView *);
+				BPoseView* view, bool visible);
+		bool UpdateVolumeSpaceBar(BVolume* volume);
+		void UpdateIcon(BPoint poseLoc, BPoseView*);
 
-		//void UpdateFixedSymlink(BPoint poseLoc, BPoseView *);	
-		void UpdateBrokenSymLink(BPoint poseLoc, BPoseView *);	
-		void UpdateWasBrokenSymlink(BPoint poseLoc, BPoseView *poseView);
+		//void UpdateFixedSymlink(BPoint poseLoc, BPoseView*);
+		void UpdateBrokenSymLink(BPoint poseLoc, BPoseView*);
+		void UpdateWasBrokenSymlink(BPoint poseLoc, BPoseView* poseView);
 
-		void Commit(bool saveChanges, BPoint loc, BPoseView *, int32 index);
-		void EditFirstWidget(BPoint poseLoc, BPoseView *);
-		void EditNextWidget(BPoseView *);
-		void EditPreviousWidget(BPoseView *);
+		void Commit(bool saveChanges, BPoint loc, BPoseView*, int32 index);
+		void EditFirstWidget(BPoint poseLoc, BPoseView*);
+		void EditNextWidget(BPoseView*);
+		void EditPreviousWidget(BPoseView*);
 
-		BPoint Location(const BPoseView *poseView) const;
+		BPoint Location(const BPoseView* poseView) const;
 		bool DelayedEdit() const;
 		void SetDelayedEdit(bool delay);
 		bool ListModeInited() const;
@@ -129,12 +130,12 @@ class BPose {
 #endif
 
 	private:
-		static bool _PeriodicUpdateCallback(BPose *pose, void *cookie);
-		void EditPreviousNextWidgetCommon(BPoseView *poseView, bool next);
-		void CreateWidgets(BPoseView *);
+		static bool _PeriodicUpdateCallback(BPose* pose, void* cookie);
+		void EditPreviousNextWidgetCommon(BPoseView* poseView, bool next);
+		void CreateWidgets(BPoseView*);
 		bool TestLargeIconPixel(BPoint) const;
 
-		Model *fModel;
+		Model* fModel;
 		BObjectList<BTextWidget> fWidgetList;
 		BPoint fLocation;
 
@@ -152,14 +153,14 @@ class BPose {
 };
 
 
-inline Model *
+inline Model*
 BPose::TargetModel() const
 {
 	return fModel;
 }
 
 
-inline Model *
+inline Model*
 BPose::ResolvedModel() const
 {
 	return fModel->IsSymLink() ?
@@ -233,16 +234,16 @@ BPose::HasLocation() const
 
 
 inline void
-BPose::Draw(BRect poseRect, const BRect& updateRect, BPoseView *view,
+BPose::Draw(BRect poseRect, const BRect& updateRect, BPoseView* view,
 	bool fullDraw)
 {
-	Draw(poseRect, updateRect, view, (BView *)view, fullDraw, BPoint(0, 0),
+	Draw(poseRect, updateRect, view, (BView*)view, fullDraw, BPoint(0, 0),
 		IsSelected());
 }
 
 
 inline uint32
-BPose::ClipboardMode()	const
+BPose::ClipboardMode() const
 {
 	return fClipboardMode;
 }
@@ -258,4 +259,4 @@ BPose::SetClipboardMode(uint32 clipboardMode)
 
 using namespace BPrivate;
 
-#endif
+#endif	// _POSE_H

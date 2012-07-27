@@ -34,15 +34,17 @@ All rights reserved.
 
 // defines the status area drawn in the bottom left corner of a Tracker window
 
+
 #include <Button.h>
 #include <Screen.h>
 
 #include "OverrideAlert.h"
 
-OverrideAlert::OverrideAlert(const char *title, const char *text,
-	const char *button1, uint32 modifiers1,
-	const char *button2, uint32 modifiers2,
-	const char *button3, uint32 modifiers3,
+
+OverrideAlert::OverrideAlert(const char* title, const char* text,
+	const char* button1, uint32 modifiers1,
+	const char* button2, uint32 modifiers2,
+	const char* button3, uint32 modifiers3,
 	button_width width, alert_type type)
 	:	BAlert(title, text, button1, button2, button3, width, type),
 		fCurModifiers(0)
@@ -56,10 +58,11 @@ OverrideAlert::OverrideAlert(const char *title, const char *text,
 	MoveTo(where.x, where.y);
 }
 
-OverrideAlert::OverrideAlert(const char *title, const char *text,
-	const char *button1, uint32 modifiers1,
-	const char *button2, uint32 modifiers2,
-	const char *button3, uint32 modifiers3,
+
+OverrideAlert::OverrideAlert(const char* title, const char* text,
+	const char* button1, uint32 modifiers1,
+	const char* button2, uint32 modifiers2,
+	const char* button3, uint32 modifiers3,
 	button_width width, button_spacing spacing, alert_type type)
 	:	BAlert(title, text, button1, button2, button3, width, spacing, type),
 		fCurModifiers(0)
@@ -73,22 +76,25 @@ OverrideAlert::OverrideAlert(const char *title, const char *text,
 	MoveTo(where.x, where.y);
 }
 
+
 OverrideAlert::~OverrideAlert()
 {
 }
 
+
 void
-OverrideAlert::DispatchMessage(BMessage *message, BHandler *handler)
+OverrideAlert::DispatchMessage(BMessage* message, BHandler* handler)
 {
 	if (message->what == B_KEY_DOWN || message->what == B_KEY_UP
 		|| message->what == B_UNMAPPED_KEY_DOWN
 		|| message->what == B_UNMAPPED_KEY_UP) {
 		uint32 modifiers;
-		if (message->FindInt32("modifiers", (int32 *)&modifiers) == B_OK) 
+		if (message->FindInt32("modifiers", (int32*)&modifiers) == B_OK) 
 			UpdateButtons(modifiers);
 	}
 	BAlert::DispatchMessage(message, handler);
 }
+
 
 BPoint
 OverrideAlert::OverPosition(float width, float height)
@@ -96,7 +102,7 @@ OverrideAlert::OverPosition(float width, float height)
 	// This positions the alert window like a normal alert, put
 	// places it on top of the calling window if possible.
 	
-	BWindow *window = dynamic_cast<BWindow *>(BLooper::LooperForThread(find_thread(NULL)));
+	BWindow* window = dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
 	BRect screenFrame;
 	BRect desirableRect;
 	screenFrame = BScreen(window).Frame();
@@ -133,6 +139,7 @@ OverrideAlert::OverPosition(float width, float height)
 	return desirableRect.LeftTop();
 }
 
+
 void
 OverrideAlert::UpdateButtons(uint32 modifiers, bool force)
 {
@@ -141,7 +148,7 @@ OverrideAlert::UpdateButtons(uint32 modifiers, bool force)
 	
 	fCurModifiers = modifiers;
 	for (int32 i = 0; i < 3; i++) {
-		BButton *button = ButtonAt(i);
+		BButton* button = ButtonAt(i);
 		if (button)
 			button->SetEnabled(((fButtonModifiers[i] & fCurModifiers) == fButtonModifiers[i]));
 	}

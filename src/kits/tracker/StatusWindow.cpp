@@ -86,7 +86,7 @@ public:
 
 
 namespace BPrivate {
-BStatusWindow *gStatusWindow = NULL;
+BStatusWindow* gStatusWindow = NULL;
 }
 
 
@@ -246,7 +246,7 @@ BStatusWindow::CreateStatusItem(thread_id thread, StatusWindowState type)
 		AutoLock<BLooper> lock(be_app);
 		int32 count = be_app->CountWindows();
 		for (int32 index = 0; index < count; index++) {
-			if (dynamic_cast<BDeskWindow *>(be_app->WindowAt(index))
+			if (dynamic_cast<BDeskWindow*>(be_app->WindowAt(index))
 				&& be_app->WindowAt(index)->IsActive()) {
 				desktopActive = true;
 				break;
@@ -842,7 +842,7 @@ BStatusView::AttachedToWindow()
 
 
 void
-BStatusView::MessageReceived(BMessage *message)
+BStatusView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kPauseButton:
@@ -888,7 +888,7 @@ BStatusView::MessageReceived(BMessage *message)
 
 
 void
-BStatusView::UpdateStatus(const char *curItem, off_t itemSize, bool optional)
+BStatusView::UpdateStatus(const char* curItem, off_t itemSize, bool optional)
 {
 	if (!fShowCount) {
 		fStatusBar->Update((float)fItemSize / fTotalSize);
@@ -911,7 +911,7 @@ BStatusView::UpdateStatus(const char *curItem, off_t itemSize, bool optional)
 			buffer <<  fCurItem << " ";
 
 			// if we don't have curItem, take the one from the stash
-			const char *statusItem = curItem != NULL
+			const char* statusItem = curItem != NULL
 				? curItem : fPendingStatusString;
 
 			fStatusBar->Update((float)fItemSize / fTotalSize, statusItem,

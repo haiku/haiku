@@ -31,37 +31,38 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
+
 
 #include <String.h>
 #include "SettingsHandler.h"
 
+
 namespace BPrivate {
 
-extern Settings *settings;
+extern Settings* settings;
 
 class StringValueSetting : public SettingsArgvDispatcher {
 	// simple string setting
 public:
-	StringValueSetting(const char *name, const char *defaultValue, 
-		const char *valueExpectedErrorString,
-		const char *wrongValueErrorString);
+	StringValueSetting(const char* name, const char* defaultValue,
+		const char* valueExpectedErrorString,
+		const char* wrongValueErrorString);
 
 	virtual ~StringValueSetting();
 
-	void ValueChanged(const char *newValue);
-	const char *Value() const;
-	virtual const char *Handle(const char *const *argv);	
+	void ValueChanged(const char* newValue);
+	const char* Value() const;
+	virtual const char* Handle(const char* const *argv);
 
 protected:
-	virtual void SaveSettingValue(Settings *);
+	virtual void SaveSettingValue(Settings*);
 	virtual bool NeedsSaving() const;
 
-	const char *fDefaultValue;
-	const char *fValueExpectedErrorString;
-	const char *fWrongValueErrorString;
+	const char* fDefaultValue;
+	const char* fValueExpectedErrorString;
+	const char* fWrongValueErrorString;
 	BString fValue;
 };
 
@@ -69,31 +70,31 @@ class EnumeratedStringValueSetting : public StringValueSetting {
 	// string setting, values that do not match string enumeration
 	// are rejected
 public:
-	EnumeratedStringValueSetting(const char *name, const char *defaultValue, 
-		const char *const *values, const char *valueExpectedErrorString,
-		const char *wrongValueErrorString);
+	EnumeratedStringValueSetting(const char* name, const char* defaultValue,
+		const char* const* values, const char* valueExpectedErrorString,
+		const char* wrongValueErrorString);
 
-	void ValueChanged(const char *newValue);
-	virtual const char *Handle(const char *const *argv);	
+	void ValueChanged(const char* newValue);
+	virtual const char* Handle(const char* const *argv);
 
 protected:
-	const char *const *fValues;
+	const char* const* fValues;
 };
 
 class ScalarValueSetting : public SettingsArgvDispatcher {
 	// simple int32 setting
 public:
-	ScalarValueSetting(const char *name, int32 defaultValue,
-		const char *valueExpectedErrorString, const char *wrongValueErrorString,
+	ScalarValueSetting(const char* name, int32 defaultValue,
+		const char* valueExpectedErrorString, const char* wrongValueErrorString,
 		int32 min = LONG_MIN, int32 max = LONG_MAX);
 
 	void ValueChanged(int32 newValue);
 	int32 Value() const;
-	void GetValueAsString(char *) const;
-	virtual const char *Handle(const char *const *argv);	
+	void GetValueAsString(char*) const;
+	virtual const char* Handle(const char* const *argv);
 
 protected:
-	virtual void SaveSettingValue(Settings *);
+	virtual void SaveSettingValue(Settings*);
 	virtual bool NeedsSaving() const;
 
 	int32 fDefaultValue;
@@ -101,38 +102,38 @@ protected:
 	int32 fMax;
 	int32 fMin;
 
-	const char *fValueExpectedErrorString;
-	const char *fWrongValueErrorString;
+	const char* fValueExpectedErrorString;
+	const char* fWrongValueErrorString;
 };
 
 class HexScalarValueSetting : public ScalarValueSetting {
 	// hexadecimal int32 setting
 public:
-	HexScalarValueSetting(const char *name, int32 defaultValue,
-		const char *valueExpectedErrorString, const char *wrongValueErrorString,
+	HexScalarValueSetting(const char* name, int32 defaultValue,
+		const char* valueExpectedErrorString, const char* wrongValueErrorString,
 		int32 min = LONG_MIN, int32 max = LONG_MAX);
 
-	void GetValueAsString(char *buffer) const;
+	void GetValueAsString(char* buffer) const;
 
 protected:
-	virtual void SaveSettingValue(Settings *settings);
+	virtual void SaveSettingValue(Settings* settings);
 };
 
 class BooleanValueSetting : public ScalarValueSetting {
 	// on-off setting
 public:
-	BooleanValueSetting(const char *name, bool defaultValue);
+	BooleanValueSetting(const char* name, bool defaultValue);
 
 	bool Value() const;
 	void SetValue(bool value);
-	virtual const char *Handle(const char *const *argv);	
+	virtual const char* Handle(const char* const *argv);
 
 protected:
-	virtual void SaveSettingValue(Settings *);
+	virtual void SaveSettingValue(Settings*);
 };
 
 }
 
 using namespace BPrivate;
 
-#endif	/* _SETTINGS_H_ */
+#endif	// _SETTINGS_H_

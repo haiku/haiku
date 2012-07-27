@@ -31,9 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-#ifndef	_TRACKER_SETTINGS_H
-#define	_TRACKER_SETTINGS_H
+#ifndef _TRACKER_SETTINGS_H
+#define _TRACKER_SETTINGS_H
 
 
 #include "Utilities.h"
@@ -51,7 +50,7 @@ enum FormatSeparator {
 		kDotSeparator,
 		kSeparatorsEnd
 };
-	
+
 enum DateOrder {
 		kYMDFormat,
 		kDMYFormat,
@@ -60,12 +59,11 @@ enum DateOrder {
 };
 
 
-
 class TrackerSettings {
 	public:
 		TrackerSettings();
 
-		//TTrackerState *Settings() const { return fSettings; }
+		//TTrackerState* Settings() const { return fSettings; }
 		void SaveSettings(bool onlyIfNonDefault = true);
 
 		bool ShowDisksIcon();
@@ -101,17 +99,18 @@ class TrackerSettings {
 		void SetShowSelectionWhenInactive(bool);
 		bool TransparentSelection();
 		void SetTransparentSelection(bool);
-	
+
 		bool SingleWindowBrowse();
 		void SetSingleWindowBrowse(bool);
 		bool ShowNavigator();
 		void SetShowNavigator(bool);
-	
-		void RecentCounts(int32 *applications, int32 *documents, int32 *folders);
+
+		void RecentCounts(int32* applications, int32* documents,
+			int32* folders);
 		void SetRecentApplicationsCount(int32);
 		void SetRecentDocumentsCount(int32);
 		void SetRecentFoldersCount(int32);
-	
+
 		FormatSeparator TimeFormatSeparator();
 		void SetTimeFormatSeparator(FormatSeparator);
 		DateOrder DateOrderFormat();
@@ -125,9 +124,9 @@ class TrackerSettings {
 		void SetAskBeforeDeleteFile(bool);
 
 	private:
-		//TTrackerState *fSettings;
+		//TTrackerState* fSettings;
 };
 
 } // namespace BPrivate
 
-#endif	/* _TRACKER_SETTINGS_H */
+#endif	// _TRACKER_SETTINGS_H

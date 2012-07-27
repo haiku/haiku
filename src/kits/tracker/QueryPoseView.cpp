@@ -31,6 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
+
+
 #include "QueryPoseView.h"
 
 #include <new>
@@ -69,7 +71,7 @@ using std::nothrow;
 // query results and add/remove appropriately. Right now only moving to
 // Trash is supported
 
-BQueryPoseView::BQueryPoseView(Model *model, BRect frame, uint32 resizeMask)
+BQueryPoseView::BQueryPoseView(Model* model, BRect frame, uint32 resizeMask)
 	:	BPoseView(model, frame, kListMode, resizeMask),
 		fShowResultsFromTrash(false),
 		fQueryList(NULL),
@@ -85,8 +87,8 @@ BQueryPoseView::~BQueryPoseView()
 }
 
 
-void 
-BQueryPoseView::MessageReceived(BMessage *message)
+void
+BQueryPoseView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kFSClipboardChanges:
@@ -103,7 +105,7 @@ BQueryPoseView::MessageReceived(BMessage *message)
 }
 
 
-void 
+void
 BQueryPoseView::EditQueries()
 {
 	BMessage message(kEditQuery);
@@ -139,15 +141,15 @@ BQueryPoseView::AttachedToWindow()
 }
 
 
-void 
-BQueryPoseView::RestoreState(AttributeStreamNode *node)
+void
+BQueryPoseView::RestoreState(AttributeStreamNode* node)
 {
 	_inherited::RestoreState(node);
 	fViewState->SetViewMode(kListMode);
 }
 
 
-void 
+void
 BQueryPoseView::RestoreState(const BMessage &message)
 {
 	_inherited::RestoreState(message);
@@ -155,25 +157,25 @@ BQueryPoseView::RestoreState(const BMessage &message)
 }
 
 
-void 
-BQueryPoseView::SavePoseLocations(BRect *)
+void
+BQueryPoseView::SavePoseLocations(BRect*)
 {
 }
 
 
-void 
+void
 BQueryPoseView::SetViewMode(uint32)
 {
 }
 
 
-void 
+void
 BQueryPoseView::OpenParent()
 {
 }
 
 
-void 
+void
 BQueryPoseView::Refresh()
 {
 	PRINT(("refreshing dynamic date query\n"));
@@ -182,7 +184,7 @@ BQueryPoseView::Refresh()
 	fAddPosesThreads.clear();
 	delete fQueryListContainer;
 	fQueryListContainer = NULL;
-	
+
 	fCreateOldPoseList = true;
 	AddPoses(TargetModel());
 	TargetModel()->CloseNode();
@@ -193,22 +195,22 @@ BQueryPoseView::Refresh()
 
 
 bool
-BQueryPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
+BQueryPoseView::ShouldShowPose(const Model* model, const PoseInfo* poseInfo)
 {
 	// add_poses, etc. filter
 	ASSERT(TargetModel());
 
 	if (!fShowResultsFromTrash
-		&& dynamic_cast<TTracker *>(be_app)->InTrashNode(model->EntryRef()))
+		&& dynamic_cast<TTracker*>(be_app)->InTrashNode(model->EntryRef()))
 		return false;
 
 	bool result = _inherited::ShouldShowPose(model, poseInfo);
 
-	PoseList *oldPoseList = fQueryListContainer->OldPoseList();
+	PoseList* oldPoseList = fQueryListContainer->OldPoseList();
 	if (result && oldPoseList) {
 		// pose will get added - remove it from the old pose list
 		// because it is supposed to be showing
-		BPose *pose = oldPoseList->FindPose(model);
+		BPose* pose = oldPoseList->FindPose(model);
 		if (pose)
 			oldPoseList->RemoveItem(pose);
 	}
@@ -216,16 +218,16 @@ BQueryPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
 }
 
 
-void 
+void
 BQueryPoseView::AddPosesCompleted()
 {
 	ASSERT(Window()->IsLocked());
 
-	PoseList *oldPoseList = fQueryListContainer->OldPoseList();
+	PoseList* oldPoseList = fQueryListContainer->OldPoseList();
 	if (oldPoseList) {
 		int32 count = oldPoseList->CountItems();
 		for (int32 index = count - 1; index >= 0; index--) {
-			BPose *pose = oldPoseList->ItemAt(index);
+			BPose* pose = oldPoseList->ItemAt(index);
 			DeletePose(pose->TargetModel()->NodeRef());
 		}
 		fQueryListContainer->ClearOldPoseList();
@@ -238,22 +240,22 @@ BQueryPoseView::AddPosesCompleted()
 // When using dynamic dates, such as "today", need to refresh the query
 // window every now and then
 
-EntryListBase *
-BQueryPoseView::InitDirentIterator(const entry_ref *ref)
+EntryListBase*
+BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 {
 	BEntry entry(ref);
-	if (entry.InitCheck() != B_OK) 
+	if (entry.InitCheck() != B_OK)
 		return NULL;
 
 	Model sourceModel(&entry, true);
-	if (sourceModel.InitCheck() != B_OK) 
+	if (sourceModel.InitCheck() != B_OK)
 		return NULL;
 
 	ASSERT(sourceModel.IsQuery());
 
 	// old pose list is used for finding poses that no longer match a
 	// dynamic date query during a Refresh call
-	PoseList *oldPoseList = NULL;
+	PoseList* oldPoseList = NULL;
 	if (fCreateOldPoseList) {
 		oldPoseList = new PoseList(10, false);
 		oldPoseList->AddList(fPoseList);
@@ -280,30 +282,33 @@ BQueryPoseView::InitDirentIterator(const entry_ref *ref)
 		// calculate the time to trigger the query refresh - next midnight
 		time_t now = time(0);
 
-		time_t nextMidnight = now + 60 * 60 * 24; // move ahead by a day
+		time_t nextMidnight = now + 60 * 60 * 24;
+			// move ahead by a day
 		tm timeData;
 		localtime_r(&nextMidnight, &timeData);
 		timeData.tm_sec = 0;
 		timeData.tm_min = 0;
 		timeData.tm_hour = 0;
-		nextMidnight = mktime(&timeData);	
+		nextMidnight = mktime(&timeData);
 
-		time_t nextHour = now + 60 * 60; // move ahead by a hour
+		time_t nextHour = now + 60 * 60;
+			// move ahead by a hour
 		localtime_r(&nextHour, &timeData);
 		timeData.tm_sec = 0;
 		timeData.tm_min = 0;
-		nextHour = mktime(&timeData);	
+		nextHour = mktime(&timeData);
 
 		PRINT(("%ld minutes, %ld seconds till next hour\n", (nextHour - now) / 60,
 			(nextHour - now) % 60));
 
-		time_t nextMinute = now + 60;	// move ahead by a minute
+		time_t nextMinute = now + 60;
+			// move ahead by a minute
 		localtime_r(&nextMinute, &timeData);
 		timeData.tm_sec = 0;
-		nextMinute = mktime(&timeData);	
-		
+		nextMinute = mktime(&timeData);
+
 		PRINT(("%ld seconds till next minute\n", nextMinute - now));
-		
+
 		bigtime_t delta;
 		if (fQueryListContainer->DynamicDateRefreshEveryMinute())
 			delta = nextMinute - now;
@@ -330,11 +335,11 @@ BQueryPoseView::InitDirentIterator(const entry_ref *ref)
 		PRINT(("next refresh in %ld hours, %ld minutes, %ld seconds\n",
 			refreshInHours, refreshInMinutes, refreshInSeconds));
 #endif
-		
+
 		// bump up to microseconds
 		delta *=  1000000;
 
-		TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 		ASSERT(tracker);
 		tracker->MainTaskLoop()->RunLater(
 			NewLockingMemberFunctionObject(&BQueryPoseView::Refresh, this), delta);
@@ -344,34 +349,35 @@ BQueryPoseView::InitDirentIterator(const entry_ref *ref)
 }
 
 
-uint32 
+uint32
 BQueryPoseView::WatchNewNodeMask()
 {
 	return B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR;
 }
 
 
-const char *
+const char*
 BQueryPoseView::SearchForType() const
 {
 	if (!fSearchForMimeType.Length()) {
 		BModelOpener opener(TargetModel());
 		BString buffer;
 		attr_info attrInfo;
+
 		// read the type of files we are looking for
 		status_t status = TargetModel()->Node()->GetAttrInfo(kAttrQueryInitialMime, &attrInfo);
-		if (status == B_OK) 
+		if (status == B_OK)
 			TargetModel()->Node()->ReadAttrString(kAttrQueryInitialMime, &buffer);
-		
+
 		if (buffer.Length()) {
-			TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+			TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 			if (tracker) {
-				const ShortMimeInfo *info = tracker->MimeTypes()->FindMimeType(buffer.String());
-				if (info) 
+				const ShortMimeInfo* info = tracker->MimeTypes()->FindMimeType(buffer.String());
+				if (info)
 					fSearchForMimeType = info->InternalName();
-				
 			}
 		}
+
 		if (!fSearchForMimeType.Length())
 			fSearchForMimeType = B_FILE_MIMETYPE;
 	}
@@ -380,11 +386,11 @@ BQueryPoseView::SearchForType() const
 }
 
 
-bool 
+bool
 BQueryPoseView::ActiveOnDevice(dev_t device) const
 {
 	int32 count = fQueryList->CountItems();
-	for (int32 index = 0; index < count; index++) 
+	for (int32 index = 0; index < count; index++)
 		if (fQueryList->ItemAt(index)->TargetDevice() == device)
 			return true;
 
@@ -395,8 +401,8 @@ BQueryPoseView::ActiveOnDevice(dev_t device) const
 //	#pragma mark -
 
 
-QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *target,
-	PoseList *oldPoseList)
+QueryEntryListCollection::QueryEntryListCollection(Model* model, BHandler* target,
+	PoseList* oldPoseList)
 	:	fQueryListRep(new QueryListRep(new BObjectList<BQuery>(5, true)))
 {
 	Rewind();
@@ -410,7 +416,7 @@ QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *targe
 
 	// read the actual query string
 	fStatus = model->Node()->GetAttrInfo(kAttrQueryString, &info);
-	if (fStatus != B_OK) 
+	if (fStatus != B_OK)
 		return;
 
 	BString buffer;
@@ -426,11 +432,12 @@ QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *targe
 	MoreOptionsStruct saveMoreOptions;
 	if (ReadAttr(model->Node(), kAttrQueryMoreOptions, kAttrQueryMoreOptionsForeign,
 		B_RAW_TYPE, 0, &saveMoreOptions, sizeof(MoreOptionsStruct),
-		&MoreOptionsStruct::EndianSwap) != kReadAttrFailed) 
+		&MoreOptionsStruct::EndianSwap) != kReadAttrFailed) {
 		fQueryListRep->fShowResultsFromTrash = saveMoreOptions.searchTrash;
-	
+	}
+
 	fStatus = query.SetPredicate(buffer.String());
-	
+
 	fQueryListRep->fOldPoseList = oldPoseList;
 	fQueryListRep->fDynamicDateQuery = false;
 
@@ -438,8 +445,9 @@ QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *targe
 	fQueryListRep->fRefreshEveryMinute = false;
 
 	if (model->Node()->ReadAttr(kAttrDynamicDateQuery, B_BOOL_TYPE, 0,
-		&fQueryListRep->fDynamicDateQuery, sizeof(bool)) != sizeof(bool)) 
+			&fQueryListRep->fDynamicDateQuery, sizeof(bool)) != sizeof(bool)) {
 		fQueryListRep->fDynamicDateQuery = false;
+	}
 
 	if (fQueryListRep->fDynamicDateQuery) {
 		// only refresh every minute on debug builds
@@ -453,7 +461,7 @@ QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *targe
 		fQueryListRep->fRefreshEveryMinute = false;
 #endif
 	}
-	
+
 	if (fStatus != B_OK)
 		return;
 
@@ -462,11 +470,11 @@ QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *targe
 
 	// get volumes to perform query on
 	if (model->Node()->GetAttrInfo(kAttrQueryVolume, &info) == B_OK) {
-		char *buffer = NULL;
+		char* buffer = NULL;
 
-		if ((buffer = (char *)malloc((size_t)info.size)) != NULL
+		if ((buffer = (char*)malloc((size_t)info.size)) != NULL
 			&& model->Node()->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0, buffer,
-					(size_t)info.size) == info.size) {
+				(size_t)info.size) == info.size) {
 
 			BMessage message;
 			if (message.Unflatten(buffer) == B_OK) {
@@ -478,16 +486,17 @@ QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *targe
 					if (result == B_OK) {
 						// start the query on this volume
 						result = FetchOneQuery(&query, target,
-							fQueryListRep->fQueryList, &volume); 
+							fQueryListRep->fQueryList, &volume);
 						if (result != B_OK)
 							continue;
 
 						searchAllVolumes = false;
-					} else if (result != B_DEV_BAD_DRIVE_NUM)
+					} else if (result != B_DEV_BAD_DRIVE_NUM) {
 						// if B_DEV_BAD_DRIVE_NUM, the volume just isn't mounted this
 						// time around, keep looking for more
 						// if other error, bail
 						break;
+					}
 				}
 			}
 		}
@@ -503,7 +512,8 @@ QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *targe
 		roster.Rewind();
 		while (roster.GetNextVolume(&volume) == B_OK)
 			if (volume.IsPersistent() && volume.KnowsQuery()) {
-				result = FetchOneQuery(&query, target, fQueryListRep->fQueryList, &volume); 
+				result = FetchOneQuery(&query, target,
+					fQueryListRep->fQueryList, &volume);
 				if (result != B_OK)
 					continue;
 			}
@@ -515,28 +525,29 @@ QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *targe
 
 
 status_t
-QueryEntryListCollection::FetchOneQuery(const BQuery *copyThis,
-	BHandler *target, BObjectList<BQuery> *list, BVolume *volume)
+QueryEntryListCollection::FetchOneQuery(const BQuery* copyThis,
+	BHandler* target, BObjectList<BQuery>* list, BVolume* volume)
 {
-	BQuery *query = new (nothrow) BQuery;
+	BQuery* query = new (nothrow) BQuery;
 	if (query == NULL)
 		return B_NO_MEMORY;
+
 	// have to fake a copy constructor here because BQuery doesn't have
 	// a copy constructor
-
 	BString buffer;
-	const_cast<BQuery *>(copyThis)->GetPredicate(&buffer);
+	const_cast<BQuery*>(copyThis)->GetPredicate(&buffer);
 	query->SetPredicate(buffer.String());
 
 	query->SetTarget(BMessenger(target));
 	query->SetVolume(volume);
-	
+
 	status_t result = query->Fetch();
 	if (result != B_OK) {
 		PRINT(("fetch error %s\n", strerror(result)));
 		delete query;
 		return result;
 	}
+
 	list->AddItem(query);
 
 	return B_OK;
@@ -545,12 +556,12 @@ QueryEntryListCollection::FetchOneQuery(const BQuery *copyThis,
 
 QueryEntryListCollection::~QueryEntryListCollection()
 {
-	if (fQueryListRep->CloseQueryList()) 
+	if (fQueryListRep->CloseQueryList())
 		delete fQueryListRep;
 }
 
 
-QueryEntryListCollection *
+QueryEntryListCollection*
 QueryEntryListCollection::Clone()
 {
 	fQueryListRep->OpenQueryList();
@@ -567,7 +578,7 @@ QueryEntryListCollection::QueryEntryListCollection(
 }
 
 
-void 
+void
 QueryEntryListCollection::ClearOldPoseList()
 {
 	delete fQueryListRep->fOldPoseList;
@@ -575,8 +586,8 @@ QueryEntryListCollection::ClearOldPoseList()
 }
 
 
-status_t 
-QueryEntryListCollection::GetNextEntry(BEntry *entry, bool traverse)
+status_t
+QueryEntryListCollection::GetNextEntry(BEntry* entry, bool traverse)
 {
 	status_t result = B_ERROR;
 	
@@ -592,8 +603,8 @@ QueryEntryListCollection::GetNextEntry(BEntry *entry, bool traverse)
 }
 
 
-int32 
-QueryEntryListCollection::GetNextDirents(struct dirent *buffer, size_t length,
+int32
+QueryEntryListCollection::GetNextDirents(struct dirent* buffer, size_t length,
 	int32 count)
 {
 	int32 result = 0;
@@ -611,8 +622,8 @@ QueryEntryListCollection::GetNextDirents(struct dirent *buffer, size_t length,
 }
 
 
-status_t 
-QueryEntryListCollection::GetNextRef(entry_ref *ref)
+status_t
+QueryEntryListCollection::GetNextRef(entry_ref* ref)
 {
 	status_t result = B_ERROR;
 	
@@ -630,7 +641,7 @@ QueryEntryListCollection::GetNextRef(entry_ref *ref)
 }
 
 
-status_t 
+status_t
 QueryEntryListCollection::Rewind()
 {
 	fQueryListRep->fQueryListIndex = 0;
@@ -639,37 +650,36 @@ QueryEntryListCollection::Rewind()
 }
 
 
-int32 
+int32
 QueryEntryListCollection::CountEntries()
 {
 	return 0;
 }
 
 
-bool 
+bool
 QueryEntryListCollection::ShowResultsFromTrash() const
 {
 	return fQueryListRep->fShowResultsFromTrash;
 }
 
 
-bool 
+bool
 QueryEntryListCollection::DynamicDateQuery() const
 {
 	return fQueryListRep->fDynamicDateQuery;
 }
 
 
-bool 
+bool
 QueryEntryListCollection::DynamicDateRefreshEveryHour() const
 {
 	return fQueryListRep->fRefreshEveryHour;
 }
 
 
-bool 
+bool
 QueryEntryListCollection::DynamicDateRefreshEveryMinute() const
 {
 	return fQueryListRep->fRefreshEveryMinute;
 }
-

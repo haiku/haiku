@@ -70,11 +70,11 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 
 	AddToSubset(fParentWindow);
 
-	BView *backgroundView = new BView(Bounds(), "bgView", B_FOLLOW_ALL, B_WILL_DRAW);
+	BView* backgroundView = new BView(Bounds(), "bgView", B_FOLLOW_ALL, B_WILL_DRAW);
 	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(backgroundView);
 
-	BMenu *menu = new BPopUpMenu("");
+	BMenu* menu = new BPopUpMenu("");
 	menu->AddItem(new BMenuItem(B_TRANSLATE("starts with"),	NULL));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("ends with"), NULL));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("contains"), NULL));
@@ -188,7 +188,7 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 
 
 void
-SelectionWindow::MessageReceived(BMessage *message)
+SelectionWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kSelectButtonPressed:
@@ -200,7 +200,7 @@ SelectionWindow::MessageReceived(BMessage *message)
 				// (Hide is synhcronous, while PostMessage is not.)
 				// See PoseView::SelectMatchingEntries().
 
-			BMessage *selectionInfo = new BMessage(kSelectMatchingEntries);
+			BMessage* selectionInfo = new BMessage(kSelectMatchingEntries);
 			selectionInfo->AddInt32("ExpressionType", ExpressionType());
 			BString expression;
 			Expression(expression);
@@ -256,7 +256,7 @@ SelectionWindow::ExpressionType() const
 	if (!fMatchingTypeMenuField->LockLooper())
 		return kNone;
 
-	BMenuItem *item = fMatchingTypeMenuField->Menu()->FindMarked();
+	BMenuItem* item = fMatchingTypeMenuField->Menu()->FindMarked();
 	if (!item) {
 		fMatchingTypeMenuField->UnlockLooper();
 		return kNone;

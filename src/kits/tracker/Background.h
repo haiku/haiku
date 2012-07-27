@@ -68,4 +68,4 @@ enum {
 const int32 B_RESTORE_BACKGROUND_IMAGE = 'Tbgr';	// force a Tracker window to
 													// use a new background image
 
-#endif /* _TRACKER_BACKGROUND_H */
+#endif // _TRACKER_BACKGROUND_H

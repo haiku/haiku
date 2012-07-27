@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef WALKER_H
 #define WALKER_H
+
 
 #ifndef _BE_BUILD_H
 #include <BeBuild.h>
@@ -48,8 +48,8 @@ All rights reserved.
 
 #include "ObjectList.h"
 
-namespace BTrackerPrivate {
 
+namespace BTrackerPrivate {
 
 class TWalker : public BEntryList {
 	// adds a virtual destructor that is severely missing in BEntryList
@@ -58,40 +58,41 @@ class TWalker : public BEntryList {
 public:
 	virtual ~TWalker();
 	
-	virtual	status_t GetNextEntry(BEntry *, bool traverse = false) = 0;
-	virtual	status_t GetNextRef(entry_ref *) = 0;
-	virtual	int32 GetNextDirents(struct dirent *, size_t,
+	virtual	status_t GetNextEntry(BEntry*, bool traverse = false) = 0;
+	virtual	status_t GetNextRef(entry_ref*) = 0;
+	virtual	int32 GetNextDirents(struct dirent*, size_t,
 		int32 count = INT_MAX) = 0;
 	virtual	status_t Rewind() = 0;
 	virtual	int32 CountEntries() = 0;
 };
+
 
 class TNodeWalker : public TWalker {
 // TNodeWalker supports iterating a single volume, starting from a specified
 // entry; if passed a non-directory entry it returns just that one entry
 public:
 	TNodeWalker(bool includeTopDirectory);
-	TNodeWalker(const char *path, bool includeTopDirectory);
-	TNodeWalker(const entry_ref *ref, bool includeTopDirectory);
-	TNodeWalker(const BDirectory *dir, bool includeTopDirectory);
+	TNodeWalker(const char* path, bool includeTopDirectory);
+	TNodeWalker(const entry_ref* ref, bool includeTopDirectory);
+	TNodeWalker(const BDirectory* dir, bool includeTopDirectory);
 	virtual ~TNodeWalker();
 
 	// Backwards compatibility with Tracker compiled for R5 (remove when this
 	// gets integrated into the official release).
 	TNodeWalker();
-	TNodeWalker(const char *path);
-	TNodeWalker(const entry_ref *ref);
-	TNodeWalker(const BDirectory *dir);
+	TNodeWalker(const char* path);
+	TNodeWalker(const entry_ref* ref);
+	TNodeWalker(const BDirectory* dir);
 						
-	virtual	status_t GetNextEntry(BEntry *, bool traverse = false);
-	virtual	status_t GetNextRef(entry_ref *);
-	virtual	int32 GetNextDirents(struct dirent *, size_t,
+	virtual	status_t GetNextEntry(BEntry*, bool traverse = false);
+	virtual	status_t GetNextRef(entry_ref*);
+	virtual	int32 GetNextDirents(struct dirent*, size_t,
 		int32 count = INT_MAX);
 	virtual	status_t Rewind();
 
 protected:
 	status_t PopDirCommon();
-	void PushDirCommon(const entry_ref *);
+	void PushDirCommon(const entry_ref*);
 
 private:
 	virtual	int32 CountEntries();
@@ -100,16 +101,17 @@ private:
 protected:
 	BObjectList<BDirectory> fDirs;
 	int32 fTopIndex;
-	BDirectory *fTopDir;
+	BDirectory* fTopDir;
 	bool fIncludeTopDir;
 	bool fOriginalIncludeTopDir;
-		
-private:		
-	BEntry *fJustFile;
+
+private:
+	BEntry* fJustFile;
 	BDirectory fOriginalDirCopy;
-	BEntry *fOriginalJustFile;
+	BEntry* fOriginalJustFile;
 		// keep around to support Rewind
 };
+
 
 class TVolWalker : public TNodeWalker {
 // TNodeWalker supports iterating over all the mounted volumes;
@@ -119,15 +121,15 @@ public:
 		bool includeTopDirectory = true);
 	virtual ~TVolWalker();
 
-	virtual	status_t GetNextEntry(BEntry *, bool traverse = false);
-	virtual	status_t GetNextRef(entry_ref *);
-	virtual	int32 GetNextDirents(struct dirent *, size_t,
+	virtual status_t GetNextEntry(BEntry*, bool traverse = false);
+	virtual status_t GetNextRef(entry_ref*);
+	virtual int32 GetNextDirents(struct dirent*, size_t,
 		int32 count = INT_MAX);
-	virtual	status_t Rewind();
+	virtual status_t Rewind();
 	
-	virtual	status_t NextVolume();
+	virtual status_t NextVolume();
 		// skips to the next volume
-		// Note: it would be cool to return const BVolume *
+		// Note: it would be cool to return const BVolume*
 		// that way a subclass could implement a volume filter -
 		// it would just override, call inherited for as long as there
 		// are volumes and it does not like them
@@ -139,19 +141,20 @@ private:
 	BVolume fVol;
 	bool fKnowsAttr;
 	bool fWritable;
-		
+
 	typedef	TNodeWalker _inherited;
 };
 
+
 class TQueryWalker : public TWalker {
 public:
-	TQueryWalker(const char *predicate);
+	TQueryWalker(const char* predicate);
 	virtual ~TQueryWalker();
 	
 	// Does an in-fix walk of all entries
-	virtual	status_t GetNextEntry(BEntry *, bool traverse = false);
-	virtual	status_t GetNextRef(entry_ref *);
-	virtual	int32 GetNextDirents(struct dirent *, size_t,
+	virtual status_t GetNextEntry(BEntry*, bool traverse = false);
+	virtual status_t GetNextRef(entry_ref*);
+	virtual int32 GetNextDirents(struct dirent*, size_t,
 		int32 count = INT_MAX);
 	
 	virtual	status_t NextVolume();
@@ -159,16 +162,16 @@ public:
 	virtual	status_t Rewind();
 
 private:
-	virtual	int32 CountEntries();
+	virtual int32 CountEntries();
 	// can't count
 	
 	BQuery fQuery;
 	BVolumeRoster fVolRoster;
 	BVolume fVol;
 	bigtime_t fTime;
-	const char *fPredicate;
+	const char* fPredicate;
 
-	typedef	TQueryWalker _inherited;
+	typedef TQueryWalker _inherited;
 };
 
 }	// namespace BTrackerPrivate

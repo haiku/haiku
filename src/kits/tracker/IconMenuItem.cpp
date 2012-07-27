@@ -43,7 +43,7 @@ All rights reserved.
 
 
 static void
-DimmedIconBlitter(BView *view, BPoint where, BBitmap *bitmap, void *)
+DimmedIconBlitter(BView* view, BPoint where, BBitmap* bitmap, void*)
 {
 	if (bitmap->ColorSpace() == B_RGBA32) {
 		rgb_color oldHighColor = view->HighColor();
@@ -63,8 +63,8 @@ DimmedIconBlitter(BView *view, BPoint where, BBitmap *bitmap, void *)
 //	#pragma mark -
 
 
-ModelMenuItem::ModelMenuItem(const Model *model, const char *title,
-		BMessage *message, char shortcut, uint32 modifiers,
+ModelMenuItem::ModelMenuItem(const Model* model, const char* title,
+		BMessage* message, char shortcut, uint32 modifiers,
 		bool drawText, bool extraPad)
 	: BMenuItem(title, message, shortcut, modifiers),
 	fModel(*model),
@@ -88,7 +88,7 @@ ModelMenuItem::ModelMenuItem(const Model *model, const char *title,
 }
 
 
-ModelMenuItem::ModelMenuItem(const Model *model, BMenu *menu, bool drawText,
+ModelMenuItem::ModelMenuItem(const Model* model, BMenu* menu, bool drawText,
 	bool extraPad)
 	:	BMenuItem(menu),
 		fModel(*model),
@@ -109,7 +109,7 @@ ModelMenuItem::~ModelMenuItem()
 
 
 status_t
-ModelMenuItem::SetEntry(const BEntry *entry)
+ModelMenuItem::SetEntry(const BEntry* entry)
 {
 	return fModel.SetTo(entry);
 }
@@ -171,7 +171,7 @@ ModelMenuItem::DrawIcon()
 
 
 void
-ModelMenuItem::GetContentSize(float *width, float *height)
+ModelMenuItem::GetContentSize(float* width, float* height)
 {
 	_inherited::GetContentSize(width, height);
 	fHeightDelta = 16 - *height;
@@ -182,7 +182,7 @@ ModelMenuItem::GetContentSize(float *width, float *height)
 
 
 status_t
-ModelMenuItem::Invoke(BMessage *message)
+ModelMenuItem::Invoke(BMessage* message)
 {
 	if (!Menu())
 		return B_ERROR;
@@ -219,7 +219,7 @@ ModelMenuItem::Invoke(BMessage *message)
 	It's used for example in the "Copy To" menu to indicate some special
 	folders like the parent folder.
 */
-SpecialModelMenuItem::SpecialModelMenuItem(const Model *model, BMenu *menu)
+SpecialModelMenuItem::SpecialModelMenuItem(const Model* model, BMenu* menu)
 	: ModelMenuItem(model, menu)
 {
 }
@@ -247,7 +247,7 @@ SpecialModelMenuItem::DrawContent()
 	A menu item that draws an icon alongside the label.
 	It's currently used in the mount and new file template menus.
 */
-IconMenuItem::IconMenuItem(const char *label, BMessage *message, BBitmap *icon)
+IconMenuItem::IconMenuItem(const char* label, BMessage* message, BBitmap* icon)
 	: PositionPassingMenuItem(label, message),
 	fDeviceIcon(icon),
 	fHeightDelta(0)
@@ -258,8 +258,8 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message, BBitmap *icon)
 }
 
 
-IconMenuItem::IconMenuItem(const char *label, BMessage *message,
-		const BNodeInfo *nodeInfo, icon_size which)
+IconMenuItem::IconMenuItem(const char* label, BMessage* message,
+		const BNodeInfo* nodeInfo, icon_size which)
 	: PositionPassingMenuItem(label, message),
 	fDeviceIcon(NULL),
 	fHeightDelta(0)
@@ -283,8 +283,8 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 }
 
 
-IconMenuItem::IconMenuItem(const char *label, BMessage *message,
-		const char *iconType, icon_size which)
+IconMenuItem::IconMenuItem(const char* label, BMessage* message,
+		const char* iconType, icon_size which)
 	: PositionPassingMenuItem(label, message),
 	fDeviceIcon(NULL),
 	fHeightDelta(0)
@@ -311,8 +311,8 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 }
 
 
-IconMenuItem::IconMenuItem(BMenu *submenu, BMessage *message,
-		const char *iconType, icon_size which)
+IconMenuItem::IconMenuItem(BMenu* submenu, BMessage* message,
+		const char* iconType, icon_size which)
 	: PositionPassingMenuItem(submenu, message),
 	fDeviceIcon(NULL),
 	fHeightDelta(0)
@@ -346,7 +346,7 @@ IconMenuItem::~IconMenuItem()
 
 
 void
-IconMenuItem::GetContentSize(float *width, float *height)
+IconMenuItem::GetContentSize(float* width, float* height)
 {
 	_inherited::GetContentSize(width, height);
 

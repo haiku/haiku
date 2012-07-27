@@ -31,24 +31,26 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef __SLOW_MENU__
 #define __SLOW_MENU__
 
-#include <Menu.h>
-#include <MenuItem.h>
-#include <Debug.h>
 
 // SlowMenu is a convenience class that makes it easier to
 // use the AddDynamicItem callback to implement a menu that can
 // checks periodically between creating new items and quits
 // early if needed
 
+
+#include <Menu.h>
+#include <MenuItem.h>
+#include <Debug.h>
+
+
 namespace BPrivate {
 
 class BSlowMenu : public BMenu {
 	public:
-		BSlowMenu(const char *title, menu_layout layout = B_ITEMS_IN_COLUMN);
+		BSlowMenu(const char* title, menu_layout layout = B_ITEMS_IN_COLUMN);
 
 	protected:
 		virtual bool StartBuildingItemList();
@@ -73,4 +75,4 @@ class BSlowMenu : public BMenu {
 
 using namespace BPrivate;
 
-#endif	/* __SLOW_MENU__ */
+#endif	// __SLOW_MENU__

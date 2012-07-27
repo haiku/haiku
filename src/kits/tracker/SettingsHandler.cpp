@@ -49,7 +49,7 @@ All rights reserved.
 
 #include "SettingsHandler.h"
 
-ArgvParser::ArgvParser(const char *name)
+ArgvParser::ArgvParser(const char* name)
 	:	fFile(0),
 		fBuffer(NULL),
 		fPos(-1),
@@ -84,7 +84,8 @@ ArgvParser::~ArgvParser()
 		fclose(fFile);
 }
 
-void 
+
+void
 ArgvParser::MakeArgvEmpty()
 {
 	// done with current argv, free it up
@@ -94,13 +95,14 @@ ArgvParser::MakeArgvEmpty()
 	fArgc = 0;
 }
 
-status_t 
-ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void *passThru)
+
+status_t
+ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void* passThru)
 {
 	if (fArgc) {
 		NextArgv();
 		fCurrentArgv[fArgc] = 0;
-		const char *result = (argvHandlerFunc)(fArgc, fCurrentArgv, passThru);
+		const char* result = (argvHandlerFunc)(fArgc, fCurrentArgv, passThru);
 		if (result)
 			printf("File %s; Line %ld # %s", fFileName, fLineNo, result);
 		MakeArgvEmpty();
@@ -111,7 +113,8 @@ ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void *passThru)
 	return B_OK;
 }
 
-void 
+
+void
 ArgvParser::NextArgv()
 {
 	if (fSawBackslash) {
@@ -128,7 +131,8 @@ ArgvParser::NextArgv()
 	fArgc++;
 }
 
-void 
+
+void
 ArgvParser::NextArgvIfNotEmpty()
 {
 	if (!fSawBackslash && fCurrentArgsPos < 0)
@@ -137,7 +141,8 @@ ArgvParser::NextArgvIfNotEmpty()
 	NextArgv();
 }
 
-char 
+
+char
 ArgvParser::GetCh()
 {
 	if (fPos < 0 || fBuffer[fPos] == 0) {
@@ -150,15 +155,19 @@ ArgvParser::GetCh()
 	return fBuffer[fPos++];
 }
 
-status_t 
-ArgvParser::EachArgv(const char *name, ArgvHandler argvHandlerFunc, void *passThru)
+
+status_t
+ArgvParser::EachArgv(const char* name, ArgvHandler argvHandlerFunc,
+	void* passThru)
 {
 	ArgvParser parser(name);
 	return parser.EachArgvPrivate(name, argvHandlerFunc, passThru);
 }
 
-status_t 
-ArgvParser::EachArgvPrivate(const char *name, ArgvHandler argvHandlerFunc, void *passThru)
+
+status_t
+ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
+	void* passThru)
 {
 	status_t result;
 
@@ -183,17 +192,19 @@ ArgvParser::EachArgvPrivate(const char *name, ArgvHandler argvHandlerFunc, void 
 				result = B_ERROR;
 				break;
 			}
-			fLineNo++; 
+
+			fLineNo++;
 			if (fSawBackslash) {
 				fSawBackslash = false;
 				continue;
 			}
+
 			// end of line, flush all argv
 			result = SendArgv(argvHandlerFunc, passThru);
 
 			continue;
 		}
-		
+
 		if (fEatComment)
 			continue;
 
@@ -241,13 +252,14 @@ ArgvParser::EachArgvPrivate(const char *name, ArgvHandler argvHandlerFunc, void 
 }
 
 
-SettingsArgvDispatcher::SettingsArgvDispatcher(const char *name)
+SettingsArgvDispatcher::SettingsArgvDispatcher(const char* name)
 	:	name(name)
 {
 }
 
-void 
-SettingsArgvDispatcher::SaveSettings(Settings *settings, bool onlyIfNonDefault)
+
+void
+SettingsArgvDispatcher::SaveSettings(Settings* settings, bool onlyIfNonDefault)
 {
 	if (!onlyIfNonDefault || NeedsSaving()) {
 		settings->Write("%s ", Name());
@@ -256,8 +268,9 @@ SettingsArgvDispatcher::SaveSettings(Settings *settings, bool onlyIfNonDefault)
 	}
 }
 
-bool 
-SettingsArgvDispatcher::HandleRectValue(BRect &result, const char *const *argv,
+
+bool
+SettingsArgvDispatcher::HandleRectValue(BRect &result, const char* const* argv,
 	bool printError)
 {
 	if (!*argv) {
@@ -266,35 +279,41 @@ SettingsArgvDispatcher::HandleRectValue(BRect &result, const char *const *argv,
 		return false;
 	}
 	result.left = atoi(*argv);
+
 	if (!*++argv) {
 		if (printError)
 			printf("rect top expected");
 		return false;
 	}
 	result.top = atoi(*argv);
+
 	if (!*++argv) {
 		if (printError)
 			printf("rect right expected");
 		return false;
 	}
 	result.right = atoi(*argv);
+
 	if (!*++argv) {
 		if (printError)
 			printf("rect bottom expected");
 		return false;
 	}
 	result.bottom = atoi(*argv);
+
 	return true;
 }
 
-void 
-SettingsArgvDispatcher::WriteRectValue(Settings *setting, BRect rect)
+
+void
+SettingsArgvDispatcher::WriteRectValue(Settings* setting, BRect rect)
 {
 	setting->Write("%d %d %d %d", (int32)rect.left, (int32)rect.top,
 		(int32)rect.right, (int32)rect.bottom);
 }
 
-Settings::Settings(const char *filename, const char *settingsDirName)
+
+Settings::Settings(const char* filename, const char* settingsDirName)
 	:	fFileName(filename),
 		fSettingsDir(settingsDirName),
 		fList(0),
@@ -302,7 +321,8 @@ Settings::Settings(const char *filename, const char *settingsDirName)
 		fListSize(30),
 		fCurrentSettings(0)
 {
-	fList = (SettingsArgvDispatcher **)calloc((size_t)fListSize, sizeof(SettingsArgvDispatcher *));
+	fList = (SettingsArgvDispatcher**)calloc((size_t)fListSize,
+		sizeof(SettingsArgvDispatcher*));
 }
 
 
@@ -310,25 +330,27 @@ Settings::~Settings()
 {
 	for (int32 index = 0; index < fCount; index++)
 		delete fList[index];
-	
+
 	free(fList);
 }
 
 
-const char *
-Settings::ParseUserSettings(int, const char *const *argv, void *castToThis)
+const char*
+Settings::ParseUserSettings(int, const char* const* argv, void* castToThis)
 {
 	if (!*argv)
 		return 0;
 	
-	SettingsArgvDispatcher *handler = ((Settings *)castToThis)->Find(*argv);
+	SettingsArgvDispatcher* handler = ((Settings*)castToThis)->Find(*argv);
 	if (!handler)
 		return "unknown command";
+
 	return handler->Handle(argv);
 }
 
-bool 
-Settings::Add(SettingsArgvDispatcher *setting)
+
+bool
+Settings::Add(SettingsArgvDispatcher* setting)
 {
 	// check for uniqueness
 	if (Find(setting->Name()))
@@ -336,15 +358,16 @@ Settings::Add(SettingsArgvDispatcher *setting)
 
 	if (fCount >= fListSize) {
 		fListSize += 30;
-		fList = (SettingsArgvDispatcher **)realloc(fList,
-			fListSize * sizeof(SettingsArgvDispatcher *));
+		fList = (SettingsArgvDispatcher**)realloc(fList,
+			fListSize * sizeof(SettingsArgvDispatcher*));
 	}
 	fList[fCount++] = setting;
 	return true;
 }
 
-SettingsArgvDispatcher *
-Settings::Find(const char *name)
+
+SettingsArgvDispatcher*
+Settings::Find(const char* name)
 {
 	for (int32 index = 0; index < fCount; index++)
 		if (strcmp(name, fList[index]->Name()) == 0)
@@ -353,7 +376,8 @@ Settings::Find(const char *name)
 	return NULL;
 }
 
-void 
+
+void
 Settings::TryReadingSettings()
 {
 	BPath prefsPath;
@@ -366,14 +390,16 @@ Settings::TryReadingSettings()
 	}
 }
 
-void 
+
+void
 Settings::SaveSettings(bool onlyIfNonDefault)
 {
 	SaveCurrentSettings(onlyIfNonDefault);
 }
 
-void 
-Settings::MakeSettingsDirectory(BDirectory *resultingSettingsDir)
+
+void
+Settings::MakeSettingsDirectory(BDirectory* resultingSettingsDir)
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
@@ -382,10 +408,10 @@ Settings::MakeSettingsDirectory(BDirectory *resultingSettingsDir)
 	// make sure there is a directory
 	// mkdir() will only make one leaf at a time, unfortunately
 	path.Append(fSettingsDir);
-	char * ptr = (char *)alloca(strlen(path.Path()) + 1);
+	char* ptr = (char *)alloca(strlen(path.Path()) + 1);
 	strcpy(ptr, path.Path());
-	char * end = ptr+strlen(ptr);
-	char * mid = ptr+1;
+	char* end = ptr+strlen(ptr);
+	char* mid = ptr+1;
 	while (mid < end) {
 		mid = strchr(mid, '/');
 		if (!mid) break;
@@ -398,7 +424,8 @@ Settings::MakeSettingsDirectory(BDirectory *resultingSettingsDir)
 	resultingSettingsDir->SetTo(path.Path());
 }
 
-void 
+
+void
 Settings::SaveCurrentSettings(bool onlyIfNonDefault)
 {
 	BDirectory settingsDir;
@@ -406,24 +433,25 @@ Settings::SaveCurrentSettings(bool onlyIfNonDefault)
 
 	if (settingsDir.InitCheck() != B_OK)
 		return;
-	
+
 	// nuke old settings
 	BEntry entry(&settingsDir, fFileName);
 	entry.Remove();
-	
+
 	BFile prefs(&entry, O_RDWR | O_CREAT);
 	if (prefs.InitCheck() != B_OK)
 		return;
 
 	fCurrentSettings = &prefs;
-	for (int32 index = 0; index < fCount; index++) 
+	for (int32 index = 0; index < fCount; index++)
 		fList[index]->SaveSettings(this, onlyIfNonDefault);
 
 	fCurrentSettings = NULL;
 }
 
-void 
-Settings::Write(const char *format, ...)
+
+void
+Settings::Write(const char* format, ...)
 {
 	va_list args;
 
@@ -432,8 +460,9 @@ Settings::Write(const char *format, ...)
 	va_end(args);
 }
 
-void 
-Settings::VSWrite(const char *format, va_list arg)
+
+void
+Settings::VSWrite(const char* format, va_list arg)
 {
 	char fBuffer[2048];
 	vsprintf(fBuffer, format, arg);

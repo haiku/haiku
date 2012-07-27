@@ -31,19 +31,21 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
+#ifndef __ENTRY_ITERATOR__
+#define __ENTRY_ITERATOR__
+
 
 //  A lot of the code in here wouldn't be needed if the destructor
 //  for BEntryList was virtual
 
-// ToDo:
-// get rid of all BEntryList API's in here, replace them with EntryListBase ones
+// TODO: get rid of all BEntryList API's in here, replace them with
+//       EntryListBase ones
 
-#ifndef __ENTRY_ITERATOR__
-#define __ENTRY_ITERATOR__
 
 #include <Directory.h>
 #include "ObjectList.h"
 #include "NodeWalker.h"
+
 
 namespace BPrivate {
 
@@ -55,40 +57,43 @@ public:
 
 	virtual status_t InitCheck() const;
 
-	virtual status_t GetNextEntry(BEntry *entry, bool traverse = false) = 0;
-	virtual status_t GetNextRef(entry_ref *ref) = 0;
-	virtual int32 GetNextDirents(struct dirent *buffer, size_t length,
+	virtual status_t GetNextEntry(BEntry* entry, bool traverse = false) = 0;
+	virtual status_t GetNextRef(entry_ref* ref) = 0;
+	virtual int32 GetNextDirents(struct dirent* buffer, size_t length,
 		int32 count = INT_MAX) = 0;
 
 	virtual status_t Rewind() = 0;
 	virtual int32 CountEntries() = 0;
 
-	static dirent *Next(dirent *);
+	static dirent* Next(dirent*);
 
 protected:
 	status_t fStatus;
 };
 
+
 class TWalkerWrapper : public EntryListBase {
 	// this is to be able to use TWalker polymorfically as BEntryListBase
 public:
-	TWalkerWrapper(BTrackerPrivate::TWalker *walker);
+	TWalkerWrapper(BTrackerPrivate::TWalker* walker);
 	virtual ~TWalkerWrapper();
 
 	virtual status_t InitCheck() const;
-	virtual status_t GetNextEntry(BEntry *entry, bool traverse = false);
-	virtual status_t GetNextRef(entry_ref *ref);
-	virtual int32 GetNextDirents(struct dirent *buffer, size_t length,
+	virtual status_t GetNextEntry(BEntry* entry, bool traverse = false);
+	virtual status_t GetNextRef(entry_ref* ref);
+	virtual int32 GetNextDirents(struct dirent* buffer, size_t length,
 		int32 count = INT_MAX);
 	virtual status_t Rewind();
 	virtual int32 CountEntries();
 
 protected:
-	BTrackerPrivate::TWalker *fWalker;
+	BTrackerPrivate::TWalker* fWalker;
 	status_t fStatus;
 };
 
+
 const int32 kDirentBufferSize = 10 * 1024;
+
 
 class CachedEntryIterator : public EntryListBase {
 public:
@@ -100,46 +105,47 @@ public:
 	// better performance over just using the order in which they show up using
 	// the default BEntryList iterator subclass
 
-	CachedEntryIterator(BEntryList *iterator, int32 numEntries,
+	CachedEntryIterator(BEntryList* iterator, int32 numEntries,
 		bool sortInodes = false);
 		// CachedEntryIterator does not get to own the <iterator>
 	virtual ~CachedEntryIterator();
 
-	virtual status_t GetNextEntry(BEntry *entry, bool traverse = false);
-	virtual status_t GetNextRef(entry_ref *ref);
-	virtual int32 GetNextDirents(struct dirent *buffer, size_t length,
+	virtual status_t GetNextEntry(BEntry* entry, bool traverse = false);
+	virtual status_t GetNextRef(entry_ref* ref);
+	virtual int32 GetNextDirents(struct dirent* buffer, size_t length,
 		int32 count = INT_MAX);
 
 	virtual status_t Rewind();
 	virtual int32 CountEntries();
 
-	virtual void SetTo(BEntryList *iterator);
+	virtual void SetTo(BEntryList* iterator);
 		// CachedEntryIterator does not get to own the <iterator>
 
 private:
-	static int _CompareInodes(const dirent *ent1, const dirent *ent2);
+	static int _CompareInodes(const dirent* ent1, const dirent* ent2);
 
-	BEntryList *fIterator;
-	entry_ref *fEntryRefBuffer;
+	BEntryList* fIterator;
+	entry_ref* fEntryRefBuffer;
 	int32 fCacheSize;
 	int32 fNumEntries;
 	int32 fIndex;
 
-	dirent *fDirentBuffer;
-	dirent *fCurrentDirent;
+	dirent* fDirentBuffer;
+	dirent* fCurrentDirent;
 	bool fSortInodes;
-	BObjectList<dirent> *fSortedList;
+	BObjectList<dirent>* fSortedList;
 
-	BEntry *fEntryBuffer;
+	BEntry* fEntryBuffer;
 };
+
 
 class DirectoryEntryList : public EntryListBase {
 public:
 	DirectoryEntryList(const BDirectory &);
 
-	virtual status_t GetNextEntry(BEntry *entry, bool traverse = false);
-	virtual status_t GetNextRef(entry_ref *ref);
-	virtual int32 GetNextDirents(struct dirent *buffer, size_t length,
+	virtual status_t GetNextEntry(BEntry* entry, bool traverse = false);
+	virtual status_t GetNextRef(entry_ref* ref);
+	virtual int32 GetNextDirents(struct dirent* buffer, size_t length,
 		int32 count = INT_MAX);
 
 	virtual status_t Rewind();
@@ -148,6 +154,7 @@ public:
 private:
 	BDirectory fDir;
 };
+
 
 class CachedDirectoryEntryList : public CachedEntryIterator {
 	// this class is to work around not being able to delete
@@ -161,6 +168,7 @@ private:
 	BDirectory fDir;
 };
 
+
 class EntryIteratorList : public EntryListBase {
 	// This wraps up several BEntryList style iterators and
 	// iterates them all, going from one to the other as it finishes
@@ -169,12 +177,12 @@ public:
 	EntryIteratorList();
 	virtual ~EntryIteratorList();
 
-	void AddItem(BEntryList *);
+	void AddItem(BEntryList*);
 		// list gets to own walkers
 
-	virtual status_t GetNextEntry(BEntry *entry, bool traverse = false);
-	virtual status_t GetNextRef(entry_ref *ref);
-	virtual int32 GetNextDirents(struct dirent *buffer, size_t length,
+	virtual status_t GetNextEntry(BEntry* entry, bool traverse = false);
+	virtual status_t GetNextRef(entry_ref* ref);
+	virtual int32 GetNextDirents(struct dirent* buffer, size_t length,
 		int32 count = INT_MAX);
 
 	virtual status_t Rewind();
@@ -185,10 +193,11 @@ protected:
 	int32 fCurrentIndex;
 };
 
+
 class CachedEntryIteratorList : public CachedEntryIterator {
 public:
 	CachedEntryIteratorList(bool sortInodes = true);
-	void AddItem(BEntryList *list);
+	void AddItem(BEntryList* list);
 
 protected:
 	EntryIteratorList fIteratorList;

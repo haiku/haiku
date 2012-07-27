@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef TRACKER_SETTINGS_WINDOW_H
 #define TRACKER_SETTINGS_WINDOW_H
+
 
 #include <Box.h>
 #include <Button.h>
@@ -51,12 +51,11 @@ class TrackerSettingsWindow : public BWindow {
 		TrackerSettingsWindow();
 
 		bool QuitRequested();
-		void MessageReceived(BMessage *message);
+		void MessageReceived(BMessage* message);
 		void Show();
 
-
 	private:
-		SettingsView *_ViewAt(int32 i);
+		SettingsView* _ViewAt(int32 i);
 
 		void _HandleChangedContents();
 		void _HandlePressedDefaultsButton();
@@ -64,10 +63,10 @@ class TrackerSettingsWindow : public BWindow {
 		void _HandleChangedSettingsView();
 		void _UpdateButtons();
 
-		BListView *fSettingsTypeListView;
-		BBox *fSettingsContainerBox;
-		BButton *fDefaultsButton;
-		BButton *fRevertButton;
+		BListView*	fSettingsTypeListView;
+		BBox*		fSettingsContainerBox;
+		BButton*	fDefaultsButton;
+		BButton*	fRevertButton;
 
 		typedef BWindow _inherited;
 };

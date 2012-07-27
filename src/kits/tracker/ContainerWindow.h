@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-#ifndef	_CONTAINER_WINDOW_H
+#ifndef _CONTAINER_WINDOW_H
 #define _CONTAINER_WINDOW_H
+
 
 #include <Window.h>
 
@@ -58,7 +58,7 @@ class SelectionWindow;
 
 #define kDefaultFolderTemplate "DefaultFolderTemplate"
 
-extern const char *kAddOnsMenuName;
+extern const char* kAddOnsMenuName;
 
 const window_feel kPrivateDesktopWindowFeel = window_feel(1024);
 const window_look kPrivateDesktopWindowLook = window_look(4);
@@ -74,7 +74,7 @@ enum {
 
 class BContainerWindow : public BWindow {
 	public:
-		BContainerWindow(LockingList<BWindow> *windowList,
+		BContainerWindow(LockingList<BWindow>* windowList,
 			uint32 containerWindowFlags,
 			window_look look = B_DOCUMENT_WINDOW_LOOK,
 			window_feel feel = B_NORMAL_WINDOW_FEEL,
@@ -83,7 +83,7 @@ class BContainerWindow : public BWindow {
 
 		virtual ~BContainerWindow();
 
-		virtual void Init(const BMessage *message = NULL);
+		virtual void Init(const BMessage* message = NULL);
 
 		static BRect InitialWindowRect(window_feel);
 
@@ -91,15 +91,15 @@ class BContainerWindow : public BWindow {
 		virtual void Quit();
 		virtual bool QuitRequested();
 
-		virtual void UpdateIfTrash(Model *);
+		virtual void UpdateIfTrash(Model*);
 
-		virtual	void CreatePoseView(Model *);
+		virtual	void CreatePoseView(Model*);
 
-		virtual	void ShowContextMenu(BPoint, const entry_ref *, BView *);
+		virtual	void ShowContextMenu(BPoint, const entry_ref*, BView*);
 		virtual	uint32 ShowDropContextMenu(BPoint);
 		virtual	void MenusBeginning();
 		virtual	void MenusEnded();
-		virtual	void MessageReceived(BMessage *);
+		virtual	void MessageReceived(BMessage*);
 		virtual	void FrameResized(float, float);
 		virtual	void FrameMoved(BPoint);
 		virtual	void Zoom(BPoint, float, float);
@@ -116,14 +116,14 @@ class BContainerWindow : public BWindow {
 		bool InTrash() const;
 		bool IsPrintersDir() const;
 
-		virtual bool IsShowing(const node_ref *) const;
-		virtual bool IsShowing(const entry_ref *) const;
+		virtual bool IsShowing(const node_ref*) const;
+		virtual bool IsShowing(const entry_ref*) const;
 
 		void ResizeToFit();
 
-		Model *TargetModel() const;
-		BPoseView *PoseView() const;
-		BNavigator *Navigator() const;
+		Model* TargetModel() const;
+		BPoseView* PoseView() const;
+		BNavigator* Navigator() const;
 
 		virtual	void SelectionChanged();
 		virtual void ViewModeChanged(uint32 oldMode, uint32 newMode);
@@ -141,44 +141,44 @@ class BContainerWindow : public BWindow {
 
 		void UpdateBackgroundImage();
 
-		static status_t GetLayoutState(BNode *, BMessage *);
-		static status_t SetLayoutState(BNode *, const BMessage *);
+		static status_t GetLayoutState(BNode*, BMessage*);
+		static status_t SetLayoutState(BNode*, const BMessage*);
 			// calls for inheriting window size, attribute layout, etc.
 			// deprecated
 
-		virtual	void AddMimeTypesToMenu(BMenu *);
+		virtual	void AddMimeTypesToMenu(BMenu*);
 		void AddMimeTypesToMenu();
-		virtual	void MarkAttributeMenu(BMenu *);
+		virtual	void MarkAttributeMenu(BMenu*);
 		void MarkAttributeMenu();
-		void MarkArrangeByMenu(BMenu *);
-		BMenuItem *NewAttributeMenuItem(const char *label, const char *name,
+		void MarkArrangeByMenu(BMenu*);
+		BMenuItem* NewAttributeMenuItem(const char* label, const char* name,
 			int32 type, float width, int32 align, bool editable, bool statField);
-		BMenuItem *NewAttributeMenuItem(const char *label, const char *name,
+		BMenuItem* NewAttributeMenuItem(const char* label, const char* name,
 			int32 type, const char* displayAs, float width, int32 align,
 			bool editable, bool statField);
-		virtual	void NewAttributeMenu(BMenu *);
+		virtual	void NewAttributeMenu(BMenu*);
 
 		void HideAttributeMenu();
 		void ShowAttributeMenu();
-		PiggybackTaskLoop *DelayedTaskLoop();
+		PiggybackTaskLoop* DelayedTaskLoop();
 			// use for RunLater queueing
 		void PulseTaskLoop();
 			// called by some view that has pulse, either BackgroundView or BPoseView
 
-		static bool DefaultStateSourceNode(const char *name, BNode *result,
+		static bool DefaultStateSourceNode(const char* name, BNode* result,
 			bool createNew = false, bool createFolder = true);
 
 		// add-on iteration
-		void EachAddon(bool(*)(const Model *, const char *, uint32 shortcut,
-			bool primary, void *), void *, BObjectList<BString> &);
+		void EachAddon(bool (*)(const Model*, const char*, uint32 shortcut,
+			bool primary, void*), void*, BObjectList<BString> &);
 
-		BPopUpMenu *ContextMenu();
+		BPopUpMenu* ContextMenu();
 
 		// drag&drop support
-		status_t DragStart(const BMessage *);
+		status_t DragStart(const BMessage*);
 		void DragStop();
 		bool Dragging() const;
-		BMessage *DragMessage() const;
+		BMessage* DragMessage() const;
 
 		void ShowSelectionWindow();
 
@@ -189,14 +189,14 @@ class BContainerWindow : public BWindow {
 		bool IsPathWatchingEnabled(void) const;
 
 	protected:
-		virtual BPoseView *NewPoseView(Model *, BRect, uint32);
+		virtual BPoseView* NewPoseView(Model*, BRect, uint32);
 			// instantiate a different flavor of BPoseView for different
 			// ContainerWindows
 
-		virtual void RestoreWindowState(AttributeStreamNode *);
+		virtual void RestoreWindowState(AttributeStreamNode*);
 		virtual void RestoreWindowState(const BMessage &);
-		virtual void SaveWindowState(AttributeStreamNode *);
-		virtual void SaveWindowState(BMessage &) const;
+		virtual void SaveWindowState(AttributeStreamNode*);
+		virtual void SaveWindowState(BMessage&) const;
 
 		virtual bool NeedsDefaultStateSetup();
 		virtual void SetUpDefaultState();
@@ -206,34 +206,34 @@ class BContainerWindow : public BWindow {
 		virtual	void AddMenus();
 		virtual void AddShortcuts();
 			// add equivalents of the menu shortcuts to the menuless desktop window
-		virtual	void AddFileMenu(BMenu *menu);
-		virtual	void AddWindowMenu(BMenu *menu);
+		virtual	void AddFileMenu(BMenu* menu);
+		virtual	void AddWindowMenu(BMenu* menu);
 
 		virtual void AddContextMenus();
 
-		virtual	void AddFileContextMenus(BMenu *);
-		virtual	void AddWindowContextMenus(BMenu *);
-		virtual	void AddVolumeContextMenus(BMenu *);
-		virtual	void AddDropContextMenus(BMenu *);
-		virtual void AddTrashContextMenus(BMenu *);
+		virtual	void AddFileContextMenus(BMenu*);
+		virtual	void AddWindowContextMenus(BMenu*);
+		virtual	void AddVolumeContextMenus(BMenu*);
+		virtual	void AddDropContextMenus(BMenu*);
+		virtual void AddTrashContextMenus(BMenu*);
 
 		virtual void RepopulateMenus();
-		void PopulateArrangeByMenu(BMenu* );
+		void PopulateArrangeByMenu(BMenu*);
 
-		virtual	void SetCutItem(BMenu *);
-		virtual	void SetCopyItem(BMenu *);
-		virtual	void SetPasteItem(BMenu *);
-		virtual	void SetArrangeMenu(BMenu *);
-		virtual void SetCloseItem(BMenu *);
-		virtual	void SetupNavigationMenu(const entry_ref *, BMenu *);
-		virtual	void SetupMoveCopyMenus(const entry_ref *, BMenu *);
-		virtual	void PopulateMoveCopyNavMenu(BNavMenu *, uint32, const entry_ref *, bool);
+		virtual	void SetCutItem(BMenu*);
+		virtual	void SetCopyItem(BMenu*);
+		virtual	void SetPasteItem(BMenu*);
+		virtual	void SetArrangeMenu(BMenu*);
+		virtual void SetCloseItem(BMenu*);
+		virtual	void SetupNavigationMenu(const entry_ref*, BMenu*);
+		virtual	void SetupMoveCopyMenus(const entry_ref*, BMenu*);
+		virtual	void PopulateMoveCopyNavMenu(BNavMenu*, uint32, const entry_ref*, bool);
 
-		virtual	void SetupOpenWithMenu(BMenu *);
-		virtual	void SetUpEditQueryItem(BMenu *);
-		virtual	void SetUpDiskMenu(BMenu *);
+		virtual	void SetupOpenWithMenu(BMenu*);
+		virtual	void SetUpEditQueryItem(BMenu*);
+		virtual	void SetUpDiskMenu(BMenu*);
 
-		virtual	void BuildAddOnMenu(BMenu *);
+		virtual	void BuildAddOnMenu(BMenu*);
 		void BuildMimeTypeList(BObjectList<BString>& mimeTypes);
 
 		enum UpdateMenuContext {
@@ -242,48 +242,48 @@ class BContainerWindow : public BWindow {
 			kWindowPopUpContext
 		};
 
-		virtual void UpdateMenu(BMenu *menu, UpdateMenuContext context);
+		virtual void UpdateMenu(BMenu* menu, UpdateMenuContext context);
 
 		BMenu* AddMimeMenu(const BMimeType& mimeType, bool isSuperType,
 			BMenu* menu, int32 start);
 
-		BHandler *ResolveSpecifier(BMessage *, int32, BMessage *, int32,
-			const char *);
+		BHandler* ResolveSpecifier(BMessage*, int32, BMessage*, int32,
+			const char*);
 
-		bool EachAddon(BPath &path, bool(*)(const Model *, const char *, uint32, bool, void *),
-			BObjectList<Model> *, void *, BObjectList<BString> &);
-		void LoadAddOn(BMessage *);
+		bool EachAddon(BPath &path, bool(*)(const Model*, const char*, uint32, bool, void*),
+			BObjectList<Model>*, void*, BObjectList<BString> &);
+		void LoadAddOn(BMessage*);
 
-		BPopUpMenu *fFileContextMenu;
-		BPopUpMenu *fWindowContextMenu;
-		BPopUpMenu *fDropContextMenu;
-		BPopUpMenu *fVolumeContextMenu;
-		BPopUpMenu *fTrashContextMenu;
-		BSlowContextMenu *fDragContextMenu;
-		BMenuItem *fMoveToItem;
-		BMenuItem *fCopyToItem;
-		BMenuItem *fCreateLinkItem;
-		BMenuItem *fOpenWithItem;
-		ModelMenuItem *fNavigationItem;
-		BMenuBar *fMenuBar;
-		BNavigator *fNavigator;
-		BPoseView *fPoseView;
-		LockingList<BWindow> *fWindowList;
-		BMenu *fAttrMenu;
-		BMenu *fWindowMenu;
-		BMenu *fFileMenu;
-		BMenu *fArrangeByMenu;
+		BPopUpMenu* fFileContextMenu;
+		BPopUpMenu* fWindowContextMenu;
+		BPopUpMenu* fDropContextMenu;
+		BPopUpMenu* fVolumeContextMenu;
+		BPopUpMenu* fTrashContextMenu;
+		BSlowContextMenu* fDragContextMenu;
+		BMenuItem* fMoveToItem;
+		BMenuItem* fCopyToItem;
+		BMenuItem* fCreateLinkItem;
+		BMenuItem* fOpenWithItem;
+		ModelMenuItem* fNavigationItem;
+		BMenuBar* fMenuBar;
+		BNavigator* fNavigator;
+		BPoseView* fPoseView;
+		LockingList<BWindow>* fWindowList;
+		BMenu* fAttrMenu;
+		BMenu* fWindowMenu;
+		BMenu* fFileMenu;
+		BMenu* fArrangeByMenu;
 
-		SelectionWindow *fSelectionWindow;
+		SelectionWindow* fSelectionWindow;
 
-		PiggybackTaskLoop *fTaskLoop;
+		PiggybackTaskLoop* fTaskLoop;
 
 		bool fIsTrash;
 		bool fInTrash;
 		bool fIsPrinters;
 
 		uint32 fContainerWindowFlags;
-		BackgroundImage *fBackgroundImage;
+		BackgroundImage* fBackgroundImage;
 
 	private:
 		BRect fSavedZoomRect;
@@ -291,9 +291,9 @@ class BContainerWindow : public BWindow {
 
 		static BRect sNewWindRect;
 
-		BPopUpMenu *fContextMenu;
-		BMessage *fDragMessage;
-		BObjectList<BString> *fCachedTypesList;
+		BPopUpMenu* fContextMenu;
+		BMessage* fDragMessage;
+		BObjectList<BString>* fCachedTypesList;
 		bool fWaitingForRefs;
 
 		bool fStateNeedsSaving;
@@ -316,20 +316,20 @@ class WindowStateNodeOpener {
 	// setter calls used when no attributes can be read from a node and defaults
 	// are to be substituted
 	public:
-		WindowStateNodeOpener(BContainerWindow *window, bool forWriting);
+		WindowStateNodeOpener(BContainerWindow* window, bool forWriting);
 		virtual ~WindowStateNodeOpener();
 
-		void SetTo(const BDirectory *);
-		void SetTo(const BEntry *entry, bool forWriting);
-		void SetTo(Model *, bool forWriting);
+		void SetTo(const BDirectory*);
+		void SetTo(const BEntry* entry, bool forWriting);
+		void SetTo(Model*, bool forWriting);
 
-		AttributeStreamNode *StreamNode() const;
-		BNode *Node() const;
+		AttributeStreamNode* StreamNode() const;
+		BNode* Node() const;
 
 	private:
-		ModelNodeLazyOpener *fModelOpener;
-		BNode *fNode;
-		AttributeStreamNode *fStreamNode;
+		ModelNodeLazyOpener* fModelOpener;
+		BNode* fNode;
+		AttributeStreamNode* fStreamNode;
 };
 
 class BackgroundView : public BView {
@@ -350,17 +350,17 @@ class BackgroundView : public BView {
 		typedef BView _inherited;
 };
 
-int CompareLabels(const BMenuItem *, const BMenuItem *);
+int CompareLabels(const BMenuItem*, const BMenuItem*);
 
 // inlines ---------
 
-inline BNavigator *
+inline BNavigator*
 BContainerWindow::Navigator() const
 {
 	return fNavigator;
 }
 
-inline BPoseView *
+inline BPoseView*
 BContainerWindow::PoseView() const
 {
 	return fPoseView;
@@ -385,12 +385,12 @@ BContainerWindow::IsPrintersDir() const
 }
 
 inline void
-BContainerWindow::SetUpDiskMenu(BMenu *)
+BContainerWindow::SetUpDiskMenu(BMenu*)
 {
 	// nothing at this level
 }
 
-inline BPopUpMenu *
+inline BPopUpMenu*
 BContainerWindow::ContextMenu()
 {
 	return fContextMenu;
@@ -402,7 +402,7 @@ BContainerWindow::Dragging() const
 	return fDragMessage && fCachedTypesList;
 }
 
-inline BMessage *
+inline BMessage*
 BContainerWindow::DragMessage() const
 {
 	return fDragMessage;
@@ -428,8 +428,8 @@ BContainerWindow::IsPathWatchingEnabled() const
 	return fIsWatchingPath;
 }
 
-filter_result ActivateWindowFilter(BMessage *message, BHandler **target,
-	BMessageFilter *messageFilter);
+filter_result ActivateWindowFilter(BMessage* message, BHandler**target,
+	BMessageFilter* messageFilter);
 
 } // namespace BPrivate
 

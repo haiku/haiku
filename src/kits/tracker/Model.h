@@ -31,11 +31,12 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
+#ifndef _NU_MODEL_H
+#define _NU_MODEL_H
+
 
 //	Dedicated to BModel
 
-#ifndef	_NU_MODEL_H
-#define _NU_MODEL_H
 
 #include <AppFileInfo.h>
 #include <Debug.h>
@@ -76,24 +77,24 @@ class Model {
 	public:
 		Model();
 		Model(const Model &);
-		Model(const BEntry *entry, bool open = false, bool writable = false);
-		Model(const entry_ref *, bool traverse = false, bool open = false,
+		Model(const BEntry* entry, bool open = false, bool writable = false);
+		Model(const entry_ref*, bool traverse = false, bool open = false,
 			bool writable = false);
-		Model(const node_ref *dirNode, const node_ref *node, const char *name,
+		Model(const node_ref* dirNode, const node_ref* node, const char* name,
 			bool open = false, bool writable = false);
 		~Model();
 
-		Model& operator=(const Model &);
+		Model& operator=(const Model&);
 
 		status_t InitCheck() const;
 
-		status_t SetTo(const BEntry *, bool open = false, bool writable = false);
-		status_t SetTo(const entry_ref *, bool traverse = false, bool open = false,
+		status_t SetTo(const BEntry*, bool open = false, bool writable = false);
+		status_t SetTo(const entry_ref*, bool traverse = false, bool open = false,
 			bool writable = false);
-		status_t SetTo(const node_ref *dirNode, const node_ref *node, const char *name,
+		status_t SetTo(const node_ref* dirNode, const node_ref* node, const char* name,
 			bool open = false, bool writable = false);
 
-		int CompareFolderNamesFirst(const Model *compareModel) const;
+		int CompareFolderNamesFirst(const Model* compareModel) const;
 
 		// node management
 		status_t OpenNode(bool writable = false);
@@ -107,20 +108,20 @@ class Model {
 			// real, starts by rereading the stat structure
 
 		// basic getters
-		const char *Name() const;
-		const entry_ref *EntryRef() const;
-		const node_ref *NodeRef() const;
-		const StatStruct *StatBuf() const;
+		const char* Name() const;
+		const entry_ref* EntryRef() const;
+		const node_ref* NodeRef() const;
+		const StatStruct* StatBuf() const;
 
-		BNode *Node() const;
+		BNode* Node() const;
 			// returns null if not Open
-		void GetPath(BPath *) const;
-		void GetEntry(BEntry *) const;
+		void GetPath(BPath*) const;
+		void GetEntry(BEntry*) const;
 
-		const char *MimeType() const;
-		const char *PreferredAppSignature() const;
+		const char* MimeType() const;
+		const char* PreferredAppSignature() const;
 			// only not-null if not default for type and not self for app
-		void SetPreferredAppSignature(const char *);
+		void SetPreferredAppSignature(const char*);
 
 		void GetPreferredAppForBrokenSymLink(BString &result);
 			// special purpose call - if a symlink is unresolvable, it makes sense
@@ -149,36 +150,36 @@ class Model {
 			// a new icon
 
 		// symlink handling calls, mainly used by the IconCache
-		const Model *ResolveIfLink() const;
-		Model *ResolveIfLink();
+		const Model* ResolveIfLink() const;
+		Model* ResolveIfLink();
 			// works on anything
-		Model *LinkTo() const;
+		Model* LinkTo() const;
 			// fast, works only on symlinks
-		void SetLinkTo(Model *);
+		void SetLinkTo(Model*);
 
 		status_t GetLongVersionString(BString &, version_kind);
 		status_t GetVersionString(BString &, version_kind);
-		status_t AttrAsString(BString &, int64 *value, const char *attributeName,
+		status_t AttrAsString(BString &, int64* value, const char* attributeName,
 			uint32 attributeType);
 
 		// Node monitor update call
-		void UpdateEntryRef(const node_ref *dirRef, const char *name);
-		bool AttrChanged(const char *);
+		void UpdateEntryRef(const node_ref* dirRef, const char* name);
+		bool AttrChanged(const char*);
 			// returns true if pose needs to update it's icon, etc.
 			// pass null to force full update
 		bool StatChanged();
 			// returns true if pose needs to update it's icon
 
-		status_t WatchVolumeAndMountPoint(uint32, BHandler *);
+		status_t WatchVolumeAndMountPoint(uint32, BHandler*);
 			// correctly handles boot volume name watching
 
-		bool IsDropTarget(const Model *forDocument = 0,
+		bool IsDropTarget(const Model* forDocument = 0,
 			bool traverse = false) const;
 			// if nonzero <forDocument> passed, mime info is used to
 			// resolve if document can be opened
 			// if zero, all executables, directories and volumes pass
 			// if traverse, dereference symlinks
-		bool IsDropTargetForList(const BObjectList<BString> *list) const;
+		bool IsDropTargetForList(const BObjectList<BString>* list) const;
 			// <list> contains mime types of all documents about to be handled
 			// by model
 
@@ -188,19 +189,19 @@ class Model {
 	#endif
 
 		bool IsSuperHandler() const;
-		int32 SupportsMimeType(const char *type, const BObjectList<BString> *list,
+		int32 SupportsMimeType(const char* type, const BObjectList<BString>* list,
 			bool exactReason = false) const;
 			// pass in one string in <type> or a bunch in <list>
 			// if <exactReason> false, returns as soon as it figures out that
 			// app supports a given type, if true, returns an exact reason
 
 		// get rid of this??
-		ssize_t WriteAttr(const char *attr, type_code type, off_t,
-			const void *buffer, size_t );
+		ssize_t WriteAttr(const char* attr, type_code type, off_t,
+			const void* buffer, size_t );
 			// cover call, creates a writable node and writes out attributes
 			// into it; work around for file nodes not being writeable
-		ssize_t WriteAttrKillForeign(const char *attr, const char *foreignAttr,
-			type_code type, off_t, const void *buffer, size_t);
+		ssize_t WriteAttrKillForeign(const char* attr, const char* foreignAttr,
+			type_code type, off_t, const void* buffer, size_t);
 
 		bool Mimeset(bool force);
 			// returns true if mime type changed
@@ -214,8 +215,8 @@ class Model {
 		void DeletePreferredAppVolumeNameLinkTo();
 		void CacheLocalizedName();
 
-		status_t FetchOneQuery(const BQuery *, BHandler *target,
-			BObjectList<BQuery>*, BVolume *);
+		status_t FetchOneQuery(const BQuery*, BHandler* target,
+			BObjectList<BQuery>*, BVolume*);
 
 		enum CanHandleResult {
 			kCanHandle,
@@ -245,15 +246,15 @@ class Model {
 
 		// bit of overloading hackery here to save on footprint
 		union {
-			char *fPreferredAppName;	// used if we are neither a volume nor a symlink
-			char *fVolumeName;			// used if we are a volume
-			Model *fLinkTo;				// used if we are a symlink
+			char* fPreferredAppName;	// used if we are neither a volume nor a symlink
+			char* fVolumeName;			// used if we are a volume
+			Model* fLinkTo;				// used if we are a symlink
 		};
 
 		uint8 fBaseType;
 		uint8 fIconFrom;
 		bool fWritable;
-		BNode *fNode;
+		BNode* fNode;
 		status_t fStatus;
 		BString fLocalizedName;
 		bool fHasLocalizedName;
@@ -266,17 +267,17 @@ class ModelNodeLazyOpener {
 	public:
 		// consider failing when open does not succeed
 
-		ModelNodeLazyOpener(Model *model, bool writable = false, bool openLater = true);
+		ModelNodeLazyOpener(Model* model, bool writable = false, bool openLater = true);
 		~ModelNodeLazyOpener();
 
 		bool IsOpen() const;
 		bool IsOpenForWriting() const;
 		bool IsOpen(bool forWriting) const;
-		Model *TargetModel() const;
+		Model* TargetModel() const;
 		status_t OpenNode(bool writable = false);
 
 	private:
-		Model *fModel;
+		Model* fModel;
 		bool fWasOpen;
 		bool fWasOpenForWriting;
 };
@@ -284,7 +285,7 @@ class ModelNodeLazyOpener {
 // handy flavors of openers
 class BModelOpener : public ModelNodeLazyOpener {
 	public:
-		BModelOpener(Model *model)
+		BModelOpener(Model* model)
 		:	ModelNodeLazyOpener(model, false, false)
 		{
 		}
@@ -292,7 +293,7 @@ class BModelOpener : public ModelNodeLazyOpener {
 
 class BModelWriteOpener : public ModelNodeLazyOpener {
 	public:
-		BModelWriteOpener(Model *model)
+		BModelWriteOpener(Model* model)
 		:	ModelNodeLazyOpener(model, true, false)
 		{
 		}
@@ -310,36 +311,36 @@ void InitOpenModelDumping();
 
 // inlines follow -----------------------------------
 
-inline const char *
+inline const char*
 Model::MimeType() const
 {
 	return fMimeType.String();
 }
 
 
-inline const entry_ref *
+inline const entry_ref*
 Model::EntryRef() const
 {
 	return &fEntryRef;
 }
 
 
-inline const node_ref *
+inline const node_ref*
 Model::NodeRef() const
 {
 	// the stat structure begins with a node_ref
-	return (node_ref *)&fStatBuf;
+	return (node_ref*)&fStatBuf;
 }
 
 
-inline BNode *
+inline BNode*
 Model::Node() const
 {
 	return fNode;
 }
 
 
-inline const StatStruct *
+inline const StatStruct*
 Model::StatBuf() const
 {
 	return &fStatBuf;
@@ -360,7 +361,7 @@ Model::SetIconFrom(IconSource from)
 }
 
 
-inline Model *
+inline Model*
 Model::LinkTo() const
 {
 	ASSERT(IsSymLink());
@@ -462,7 +463,7 @@ Model::HasLocalizedName() const
 
 
 inline
-ModelNodeLazyOpener::ModelNodeLazyOpener(Model *model, bool writable, bool openLater)
+ModelNodeLazyOpener::ModelNodeLazyOpener(Model* model, bool writable, bool openLater)
 	:	fModel(model),
 		fWasOpen(model->IsNodeOpen()),
 		fWasOpenForWriting(model->IsNodeOpenForWriting())
@@ -505,7 +506,7 @@ ModelNodeLazyOpener::IsOpen(bool forWriting) const
 }
 
 
-inline Model *
+inline Model*
 ModelNodeLazyOpener::TargetModel() const
 {
 	return fModel;
@@ -524,8 +525,6 @@ ModelNodeLazyOpener::OpenNode(bool writable)
 	return B_OK;
 }
 
-
 } // namespace BPrivate
 
-
-#endif
+#endif	// _NU_MODEL_H

@@ -32,10 +32,12 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include <FilePanel.h>
 
 #include "FilePanelPriv.h"
 #include "RecentItems.h"
+
 
 // FBC fluff, stick it here to not pollute real .cpp files
 
@@ -100,10 +102,10 @@ __10BFilePanel15file_panel_modeP10BMessengerP9entry_refUlbP8BMessageP10BRefFilte
 #elif __MWERKS__
 __ct__10BFilePanelF15file_panel_modeP10BMessengerP9entry_refUlbP8BMessageP10BRefFilterbb
 #endif
-(void *self,
-	file_panel_mode mode, BMessenger *target,
-	entry_ref *ref, uint32 nodeFlavors, bool multipleSelection,
-	BMessage *message, BRefFilter *filter, bool modal,
+(void* self,
+	file_panel_mode mode, BMessenger* target,
+	entry_ref* ref, uint32 nodeFlavors, bool multipleSelection,
+	BMessage* message, BRefFilter* filter, bool modal,
 	bool hideWhenDone)
 {
 	return new (self) BFilePanel(mode, target, ref, nodeFlavors,
@@ -117,7 +119,7 @@ SetPanelDirectory__10BFilePanelP10BDirectory
 #elif __MWERKS__
 SetPanelDirectory__10BFilePanelFP10BDirectory
 #endif
-(BFilePanel *self, BDirectory *d)
+(BFilePanel* self, BDirectory* d)
 {
 	self->SetPanelDirectory(d);
 }
@@ -128,7 +130,7 @@ SetPanelDirectory__10BFilePanelP6BEntry
 #elif __MWERKS__
 SetPanelDirectory__10BFilePanelFP6BEntry
 #endif
-(BFilePanel *self, BEntry *e)
+(BFilePanel* self, BEntry* e)
 {
 	self->SetPanelDirectory(e);
 }
@@ -139,7 +141,7 @@ SetPanelDirectory__10BFilePanelP9entry_ref
 #elif __MWERKS__
 SetPanelDirectory__10BFilePanelFP9entry_ref
 #endif
-(BFilePanel *self, entry_ref *r)
+(BFilePanel* self, entry_ref* r)
 {
 	self->SetPanelDirectory(r);
 }

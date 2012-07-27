@@ -46,21 +46,21 @@ const int32 kColumnStateArchiveVersion = 22;
 
 class BColumn {
 	public:
-		BColumn(const char *title, float offset, float width,
-			alignment align, const char *attributeName, uint32 attrType,
+		BColumn(const char* title, float offset, float width,
+			alignment align, const char* attributeName, uint32 attrType,
 			const char* displayAs, bool statField, bool editable);
-		BColumn(const char *title, float offset, float width,
-			alignment align, const char *attributeName, uint32 attrType,
+		BColumn(const char* title, float offset, float width,
+			alignment align, const char* attributeName, uint32 attrType,
 			bool statField, bool editable);
 		~BColumn();
 
-		BColumn(BMallocIO *stream, int32 version, bool endianSwap = false);
+		BColumn(BMallocIO* stream, int32 version, bool endianSwap = false);
 		BColumn(const BMessage &, int32 index = 0);
-		static BColumn *InstantiateFromStream(BMallocIO *stream,
+		static BColumn* InstantiateFromStream(BMallocIO* stream,
 			bool endianSwap = false);
-		static BColumn *InstantiateFromMessage(const BMessage &archive,
+		static BColumn* InstantiateFromMessage(const BMessage &archive,
 			int32 index = 0);
-		void ArchiveToStream(BMallocIO *stream) const;
+		void ArchiveToStream(BMallocIO* stream) const;
 		void ArchiveToMessage(BMessage &) const;
 
 		const char* Title() const;
@@ -78,8 +78,8 @@ class BColumn {
 		void 		SetWidth(float);
 
 	private:
-		void _Init(const char *title, float offset, float width,
-			alignment align, const char *attributeName, uint32 attrType,
+		void _Init(const char* title, float offset, float width,
+			alignment align, const char* attributeName, uint32 attrType,
 			const char* displayAs, bool statField, bool editable);
 		static BColumn* _Sanitize(BColumn* column);
 
@@ -103,11 +103,11 @@ class BViewState {
 	public:
 		BViewState();
 
-		BViewState(BMallocIO *stream, bool endianSwap = false);
+		BViewState(BMallocIO* stream, bool endianSwap = false);
 		BViewState(const BMessage &message);
-		static BViewState *InstantiateFromStream(BMallocIO *stream, bool endianSwap = false);
-		static BViewState *InstantiateFromMessage(const BMessage &message);
-		void ArchiveToStream(BMallocIO *stream) const;
+		static BViewState* InstantiateFromStream(BMallocIO* stream, bool endianSwap = false);
+		static BViewState* InstantiateFromMessage(const BMessage &message);
+		void ArchiveToStream(BMallocIO* stream) const;
 		void ArchiveToMessage(BMessage &message) const;
 
 		uint32 ViewMode() const;
@@ -137,38 +137,38 @@ class BViewState {
 		bool StateNeedsSaving();
 
 	private:
-		static BViewState *_Sanitize(BViewState *state, bool fixOnly = false);
+		static BViewState* _Sanitize(BViewState* state, bool fixOnly = false);
 
-		uint32 fViewMode;
-		uint32 fLastIconMode;
-		uint32 fIconSize;
-		uint32 fLastIconSize;
-		BPoint fListOrigin;
-		BPoint fIconOrigin;
-		uint32 fPrimarySortAttr;
-		uint32 fSecondarySortAttr;
-		uint32 fPrimarySortType;
-		uint32 fSecondarySortType;
-		bool fReverseSort;
+		uint32	fViewMode;
+		uint32	fLastIconMode;
+		uint32	fIconSize;
+		uint32	fLastIconSize;
+		BPoint	fListOrigin;
+		BPoint	fIconOrigin;
+		uint32	fPrimarySortAttr;
+		uint32	fSecondarySortAttr;
+		uint32	fPrimarySortType;
+		uint32	fSecondarySortType;
+		bool	fReverseSort;
 		
 		void _Init();
 		void _StorePreviousState();
 		
-		uint32 	fPreviousViewMode;
-		uint32 	fPreviousLastIconMode;
-		uint32 	fPreviousIconSize;
-		uint32 	fPreviousLastIconSize;
-		BPoint 	fPreviousListOrigin;
-		BPoint 	fPreviousIconOrigin;
-		uint32 	fPreviousPrimarySortAttr;
-		uint32 	fPreviousSecondarySortAttr;
-		uint32 	fPreviousPrimarySortType;
-		uint32 	fPreviousSecondarySortType;
-		bool 	fPreviousReverseSort;		
+		uint32	fPreviousViewMode;
+		uint32	fPreviousLastIconMode;
+		uint32	fPreviousIconSize;
+		uint32	fPreviousLastIconSize;
+		BPoint	fPreviousListOrigin;
+		BPoint	fPreviousIconOrigin;
+		uint32	fPreviousPrimarySortAttr;
+		uint32	fPreviousSecondarySortAttr;
+		uint32	fPreviousPrimarySortType;
+		uint32	fPreviousSecondarySortType;
+		bool	fPreviousReverseSort;
 };
 
 
-inline const char *
+inline const char*
 BColumn::Title() const
 {
 	return fTitle.String();
@@ -196,7 +196,7 @@ BColumn::Alignment() const
 }
 
 
-inline const char *
+inline const char*
 BColumn::AttrName() const
 {
 	return fAttrName.String();
@@ -217,7 +217,7 @@ BColumn::AttrType() const
 }
 
 
-inline const char *
+inline const char*
 BColumn::DisplayAs() const
 {
 	return fDisplayAs.String();
@@ -422,4 +422,4 @@ BViewState::StateNeedsSaving()
 
 using namespace BPrivate;
 
-#endif
+#endif	// _VIEW_STATE_H

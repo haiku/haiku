@@ -59,30 +59,30 @@ ShortMimeInfo::ShortMimeInfo(const BMimeType &mimeType)
 }
 
 
-ShortMimeInfo::ShortMimeInfo(const char *shortDescription)
+ShortMimeInfo::ShortMimeInfo(const char* shortDescription)
 	:	fShortDescription(shortDescription)
 {
 }
 
-const char *
+const char*
 ShortMimeInfo::InternalName() const
 {
 	return fPrivateName.String();
 }
 
-const char *
+const char*
 ShortMimeInfo::ShortDescription() const
 {
 	return fShortDescription.String();
 }
 
-int 
-ShortMimeInfo::CompareShortDescription(const ShortMimeInfo *a, const ShortMimeInfo *b)
+int
+ShortMimeInfo::CompareShortDescription(const ShortMimeInfo* a, const ShortMimeInfo* b)
 {
 	return a->fShortDescription.ICompare(b->fShortDescription);
 }
 
-bool 
+bool
 ShortMimeInfo::IsCommonMimeType() const
 {
 	return fCommonMimeType;
@@ -103,24 +103,24 @@ MimeTypeList::MimeTypeList()
 }
 
 static int
-MatchOneShortDescription(const ShortMimeInfo *a, const ShortMimeInfo *b)
+MatchOneShortDescription(const ShortMimeInfo* a, const ShortMimeInfo* b)
 {
 	return strcasecmp(a->ShortDescription(), b->ShortDescription());
 }
 
-const ShortMimeInfo *
-MimeTypeList::FindMimeType(const char *shortDescription) const
+const ShortMimeInfo*
+MimeTypeList::FindMimeType(const char* shortDescription) const
 {
 	ShortMimeInfo tmp(shortDescription);
-	const ShortMimeInfo *result = fCommonMimeList.BinarySearch(tmp,
+	const ShortMimeInfo* result = fCommonMimeList.BinarySearch(tmp,
 		&MatchOneShortDescription);
 
 	return result;
 }
 
-const ShortMimeInfo *
-MimeTypeList::EachCommonType(bool (*func)(const ShortMimeInfo *, void *),
-	void *state) const
+const ShortMimeInfo*
+MimeTypeList::EachCommonType(bool (*func)(const ShortMimeInfo*, void*),
+	void* state) const
 {
 	AutoLock<Benaphore> locker(fLock);
 	int32 count = fCommonMimeList.CountItems();
@@ -131,7 +131,7 @@ MimeTypeList::EachCommonType(bool (*func)(const ShortMimeInfo *, void *),
 	return NULL;
 }
 
-void 
+void
 MimeTypeList::Build()
 {
 	ASSERT(fLock.IsLocked());
@@ -144,7 +144,7 @@ MimeTypeList::Build()
 	message.GetInfo("types", &type, &count);
 
 	for (int32 index = 0; index < count; index++) {
-		const char *str;
+		const char* str;
 		if (message.FindString("types", index, &str) != B_OK)
 			continue;
 
@@ -152,9 +152,9 @@ MimeTypeList::Build()
 		if (mimetype.InitCheck() != B_OK)
 			continue;
 
-		ShortMimeInfo *mimeInfo = new ShortMimeInfo(mimetype);
+		ShortMimeInfo* mimeInfo = new ShortMimeInfo(mimetype);
 		fMimeList.AddItem(mimeInfo);
-		if (mimeInfo->IsCommonMimeType()) 
+		if (mimeInfo->IsCommonMimeType())
 			fCommonMimeList.AddItem(mimeInfo);
 	}
 	fCommonMimeList.SortItems(&ShortMimeInfo::CompareShortDescription);

@@ -31,14 +31,15 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-#ifndef	_QUERY_POSE_VIEW_H
+#ifndef _QUERY_POSE_VIEW_H
 #define _QUERY_POSE_VIEW_H
 
-class BQuery;
 
 #include "EntryIterator.h"
 #include "PoseView.h"
+
+
+class BQuery;
 
 namespace BPrivate {
 
@@ -47,13 +48,13 @@ class QueryEntryListCollection;
 
 class BQueryPoseView : public BPoseView {
 public:
-	BQueryPoseView(Model *, BRect, uint32 resizeMask = B_FOLLOW_ALL);
+	BQueryPoseView(Model*, BRect, uint32 resizeMask = B_FOLLOW_ALL);
 	virtual ~BQueryPoseView();
-	
-	virtual void MessageReceived(BMessage *message);
 
-	const char *SearchForType() const;
-	BQueryContainerWindow *ContainerWindow() const;
+	virtual void MessageReceived(BMessage* message);
+
+	const char* SearchForType() const;
+	BQueryContainerWindow* ContainerWindow() const;
 	bool ActiveOnDevice(dev_t) const;
 
 	void Refresh();
@@ -64,16 +65,16 @@ public:
 
 protected:
 	virtual void AttachedToWindow();
-	virtual void RestoreState(AttributeStreamNode *);
-	virtual void RestoreState(const BMessage &);
-	virtual void SavePoseLocations(BRect * = NULL);
+	virtual void RestoreState(AttributeStreamNode*);
+	virtual void RestoreState(const BMessage&);
+	virtual void SavePoseLocations(BRect* = NULL);
 	virtual void SetUpDefaultColumnsIfNeeded();
 	virtual void SetViewMode(uint32);
 	virtual void OpenParent();
 	virtual void EditQueries();
-	virtual EntryListBase *InitDirentIterator(const entry_ref *);
+	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 	virtual uint32 WatchNewNodeMask();
-	virtual bool ShouldShowPose(const Model *, const PoseInfo *);
+	virtual bool ShouldShowPose(const Model*, const PoseInfo*);
 	virtual void AddPosesCompleted();
 
 private:
@@ -84,9 +85,9 @@ private:
 	bool fShowResultsFromTrash;
 	mutable BString fSearchForMimeType;
 
-	BObjectList<BQuery> *fQueryList;
-	QueryEntryListCollection *fQueryListContainer;
-	
+	BObjectList<BQuery>* fQueryList;
+	QueryEntryListCollection* fQueryListContainer;
+
 	bool fCreateOldPoseList;
 
 	typedef BPoseView _inherited;
@@ -98,36 +99,35 @@ class QueryEntryListCollection : public EntryListBase {
 	// PoseView, allowing PoseView to have an arbitrary collection of
 	// elements that behave as an EntryList
 	// For now just manage a list of BQueries
-	
 
 	class QueryListRep {
 	public:
-		QueryListRep(BObjectList<BQuery> *queryList)
+		QueryListRep(BObjectList<BQuery>* queryList)
 			:	fQueryList(queryList),
 				fRefCount(0),
 				fShowResultsFromTrash(0),
 				fOldPoseList(NULL)
 			{}
-	
+
 		~QueryListRep()
 			{
 				ASSERT(fRefCount <= 0);
 				delete fQueryList;
 				delete fOldPoseList;
 			}
-	
-		BObjectList<BQuery> *OpenQueryList()
+
+		BObjectList<BQuery>* OpenQueryList()
 			{
 				fRefCount++;
 				return fQueryList;
 			}
-	
+
 		bool CloseQueryList()
-			{
-				return atomic_add(&fRefCount, -1) == 0;
-			}
-	
-		BObjectList<BQuery> *fQueryList;
+		{
+			return atomic_add(&fRefCount, -1) == 0;
+		}
+
+		BObjectList<BQuery>* fQueryList;
 		int32 fRefCount;
 		bool fShowResultsFromTrash;
 		int32 fQueryListIndex;
@@ -135,30 +135,29 @@ class QueryEntryListCollection : public EntryListBase {
 		bool fRefreshEveryHour;
 		bool fRefreshEveryMinute;
 
-		PoseList *fOldPoseList;
+		PoseList* fOldPoseList;
 			// when doing a Refresh, this list is used to detect poses that
 			// are no longer a part of a fDynamicDateQuery and need to be removed
 	};
 
 public:
-
-	QueryEntryListCollection(Model *, BHandler * = NULL, PoseList *oldPoseList = NULL);
+	QueryEntryListCollection(Model*, BHandler* = NULL, PoseList* oldPoseList = NULL);
 	virtual ~QueryEntryListCollection();
 
-	QueryEntryListCollection *Clone();
+	QueryEntryListCollection* Clone();
 
-	BObjectList<BQuery> *QueryList() const
+	BObjectList<BQuery>* QueryList() const
 		{ return fQueryListRep->fQueryList; }
 
-	PoseList *OldPoseList() const
+	PoseList* OldPoseList() const
 		{ return fQueryListRep->fOldPoseList; }
 	void ClearOldPoseList();
-	
-	virtual status_t GetNextEntry(BEntry *entry, bool traverse = false);
-	virtual status_t GetNextRef(entry_ref *ref);
-	virtual int32 GetNextDirents(struct dirent *buffer, size_t length,
+
+	virtual status_t GetNextEntry(BEntry* entry, bool traverse = false);
+	virtual status_t GetNextRef(entry_ref* ref);
+	virtual int32 GetNextDirents(struct dirent* buffer, size_t length,
 		int32 count = INT_MAX);
-	
+
 	virtual status_t Rewind();
 	virtual int32 CountEntries();
 
@@ -166,18 +165,18 @@ public:
 	bool DynamicDateQuery() const;
 	bool DynamicDateRefreshEveryHour() const;
 	bool DynamicDateRefreshEveryMinute() const;
-	
-private:
-	QueryEntryListCollection(const QueryEntryListCollection &);
-		// only to be used by the Clone routine
-	status_t FetchOneQuery(const BQuery *, BHandler *target,
-		BObjectList<BQuery> *, BVolume *);
 
-	QueryListRep *fQueryListRep;
+private:
+	QueryEntryListCollection(const QueryEntryListCollection&);
+		// only to be used by the Clone routine
+	status_t FetchOneQuery(const BQuery*, BHandler* target,
+		BObjectList<BQuery>*, BVolume*);
+
+	QueryListRep* fQueryListRep;
 };
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// _QUERY_POSE_VIEW_H

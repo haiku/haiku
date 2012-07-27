@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
+#ifndef FS_UTILS_H
+#define FS_UTILS_H
 
-#ifndef	FS_UTILS_H
-#define	FS_UTILS_H
 
 #include <FindDirectory.h>
 #include <List.h>
@@ -44,6 +44,7 @@ All rights reserved.
 
 #include "Model.h"
 #include "ObjectList.h"
+
 
 // Note - APIs/code in FSUtils.h and FSUtils.cpp is slated for a major cleanup
 // 	-- in other words, you will find a lot of ugly cruft in here
@@ -97,7 +98,7 @@ public:
 									bool srcIsDir, bool dstIsDir);
 
 	//! Override to prevent copying of a given file or directory
-	virtual	bool				SkipEntry(const BEntry *, bool file);
+	virtual	bool				SkipEntry(const BEntry*, bool file);
 
 	//! During a file copy, this is called every time a chunk of data
 	// is copied.  Users may override to keep a running checksum.
@@ -128,17 +129,17 @@ public:
 									const entry_ref* destDir = NULL,
 									bool showCount = true);
 
-	virtual	bool				FileError(const char *message,
-									const char *name, status_t error,
+	virtual	bool				FileError(const char* message,
+									const char* name, status_t error,
 									bool allowContinue);
 
-	virtual	void				UpdateStatus(const char *name,
+	virtual	void				UpdateStatus(const char* name,
 									const entry_ref& ref, int32 count,
 									bool optional = false);
 
 	virtual	bool				CheckUserCanceled();
 
-	virtual	bool				SkipAttribute(const char *attributeName);
+	virtual	bool				SkipAttribute(const char* attributeName);
 
 
 	// One can specify an entry_ref list with the source entries. This will
@@ -162,54 +163,54 @@ private:
 #ifndef _IMPEXP_TRACKER
 #define _IMPEXP_TRACKER
 #endif
-_IMPEXP_TRACKER status_t FSCopyAttributesAndStats(BNode *, BNode *);
+_IMPEXP_TRACKER status_t FSCopyAttributesAndStats(BNode*, BNode*);
 
-_IMPEXP_TRACKER void FSDuplicate(BObjectList<entry_ref> *srcList, BList *pointList);
-_IMPEXP_TRACKER void FSMoveToFolder(BObjectList<entry_ref> *srcList, BEntry *, uint32 moveMode,
-	BList *pointList = NULL);
-_IMPEXP_TRACKER void FSMakeOriginalName(char *name, BDirectory *destDir, const char *suffix);
-_IMPEXP_TRACKER bool FSIsTrashDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsPrintersDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsDeskDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsHomeDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsRootDir(const BEntry *);
-_IMPEXP_TRACKER void FSMoveToTrash(BObjectList<entry_ref> *srcList, BList *pointList = NULL,
+_IMPEXP_TRACKER void FSDuplicate(BObjectList<entry_ref>* srcList, BList* pointList);
+_IMPEXP_TRACKER void FSMoveToFolder(BObjectList<entry_ref>* srcList, BEntry*, uint32 moveMode,
+	BList* pointList = NULL);
+_IMPEXP_TRACKER void FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix);
+_IMPEXP_TRACKER bool FSIsTrashDir(const BEntry*);
+_IMPEXP_TRACKER bool FSIsPrintersDir(const BEntry*);
+_IMPEXP_TRACKER bool FSIsDeskDir(const BEntry*);
+_IMPEXP_TRACKER bool FSIsHomeDir(const BEntry*);
+_IMPEXP_TRACKER bool FSIsRootDir(const BEntry*);
+_IMPEXP_TRACKER void FSMoveToTrash(BObjectList<entry_ref>* srcList, BList* pointList = NULL,
 	bool async = true);
 	// Deprecated
 
-void FSDeleteRefList(BObjectList<entry_ref> *, bool, bool confirm = true);
-void FSDelete(entry_ref *, bool, bool confirm = true);
-void FSRestoreRefList(BObjectList<entry_ref> *list, bool async);
+void FSDeleteRefList(BObjectList<entry_ref>*, bool, bool confirm = true);
+void FSDelete(entry_ref*, bool, bool confirm = true);
+void FSRestoreRefList(BObjectList<entry_ref>* list, bool async);
 
-_IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref *application, const BMessage *refsReceived,
+_IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref* application, const BMessage* refsReceived,
 	bool async, bool openWithOK);
 	// Preferred way of launching; only pass an actual application in <application>, not
 	// a document; to open documents with the preferred app, pase 0 in <application> and
 	// stuff all the document refs into <refsReceived>
 	// Consider having silent mode that does not show alerts, just returns error code
 
-_IMPEXP_TRACKER status_t FSOpenWith(BMessage *listOfRefs);
+_IMPEXP_TRACKER status_t FSOpenWith(BMessage* listOfRefs);
 	// runs the Open With window; pas a list of refs
 
 _IMPEXP_TRACKER void FSEmptyTrash();
-_IMPEXP_TRACKER status_t FSCreateNewFolderIn(const node_ref *destDir, entry_ref *newRef,
-	node_ref *new_node);
+_IMPEXP_TRACKER status_t FSCreateNewFolderIn(const node_ref* destDir, entry_ref* newRef,
+	node_ref* new_node);
 _IMPEXP_TRACKER void FSCreateTrashDirs();
-_IMPEXP_TRACKER status_t FSGetTrashDir(BDirectory *trashDir, dev_t volume);
-_IMPEXP_TRACKER status_t FSGetDeskDir(BDirectory *deskDir);
-_IMPEXP_TRACKER status_t FSRecursiveCalcSize(BInfoWindow *,
-	CopyLoopControl* loopControl, BDirectory *, off_t *runningSize,
-	int32 *fileCount, int32 *dirCount);
+_IMPEXP_TRACKER status_t FSGetTrashDir(BDirectory* trashDir, dev_t volume);
+_IMPEXP_TRACKER status_t FSGetDeskDir(BDirectory* deskDir);
+_IMPEXP_TRACKER status_t FSRecursiveCalcSize(BInfoWindow*,
+	CopyLoopControl* loopControl, BDirectory*, off_t* runningSize,
+	int32* fileCount, int32* dirCount);
 
-bool FSInTrashDir(const entry_ref *);
+bool FSInTrashDir(const entry_ref*);
 
 // doesn't need to be exported
-bool FSGetPoseLocation(const BNode *node, BPoint *point);
-status_t FSSetPoseLocation(BEntry *entry, BPoint point);
-status_t FSSetPoseLocation(ino_t destDirInode, BNode *destNode, BPoint point);
-status_t FSGetBootDeskDir(BDirectory *deskDir);
+bool FSGetPoseLocation(const BNode* node, BPoint* point);
+status_t FSSetPoseLocation(BEntry* entry, BPoint point);
+status_t FSSetPoseLocation(ino_t destDirInode, BNode* destNode, BPoint point);
+status_t FSGetBootDeskDir(BDirectory* deskDir);
 
-status_t FSGetOriginalPath(BEntry *entry, BPath *path);
+status_t FSGetOriginalPath(BEntry* entry, BPath* path);
 
 enum ReadAttrResult {
 	kReadAttrFailed,
@@ -217,48 +218,48 @@ enum ReadAttrResult {
 	kReadAttrForeignOK
 };
 
-ReadAttrResult ReadAttr(const BNode *, const char *hostAttrName, const char *foreignAttrName,
-	type_code , off_t , void *, size_t , void (*swapFunc)(void *) = 0,
+ReadAttrResult ReadAttr(const BNode*, const char* hostAttrName, const char* foreignAttrName,
+	type_code , off_t , void*, size_t , void (*swapFunc)(void*) = 0,
 	bool isForeign = false);
 	// Endian swapping ReadAttr call; endianness is determined by trying first the
 	// native attribute name, then the foreign one; an endian swapping function can
 	// be passed, if null data won't be swapped; if <isForeign> set the foreign endianness
 	// will be read directly without first trying the native one
 
-ReadAttrResult GetAttrInfo(const BNode *, const char *hostAttrName, const char *foreignAttrName,
-	type_code * = NULL, size_t * = NULL);
+ReadAttrResult GetAttrInfo(const BNode*, const char* hostAttrName, const char* foreignAttrName,
+	type_code* = NULL, size_t* = NULL);
 
-status_t FSCreateNewFolder(const entry_ref *);
-status_t FSRecursiveCreateFolder(const char *path);
-void FSMakeOriginalName(BString &name, const BDirectory *destDir, const char *suffix = 0);
+status_t FSCreateNewFolder(const entry_ref*);
+status_t FSRecursiveCreateFolder(const char* path);
+void FSMakeOriginalName(BString &name, const BDirectory* destDir, const char* suffix = 0);
 
-status_t TrackerLaunch(const entry_ref *app, bool async);
-status_t TrackerLaunch(const BMessage *refs, bool async, bool okToRunOpenWith = true);
-status_t TrackerLaunch(const entry_ref *app, const BMessage *refs, bool async,
+status_t TrackerLaunch(const entry_ref* app, bool async);
+status_t TrackerLaunch(const BMessage* refs, bool async, bool okToRunOpenWith = true);
+status_t TrackerLaunch(const entry_ref* app, const BMessage* refs, bool async,
 	bool okToRunOpenWith = true);
-status_t LaunchBrokenLink(const char *, const BMessage *);
+status_t LaunchBrokenLink(const char*, const BMessage*);
 
-status_t FSFindTrackerSettingsDir(BPath *, bool autoCreate = true);
+status_t FSFindTrackerSettingsDir(BPath*, bool autoCreate = true);
 
-bool FSIsDeskDir(const BEntry *);
+bool FSIsDeskDir(const BEntry*);
 
 // two separate ifYouDoAction and toDoAction versions are needed for localization
 // purposes. The first one is used in "If you do action ..." sentence,
 // the second one in the "To do action" sentence.
-bool ConfirmChangeIfWellKnownDirectory(const BEntry *entry,
-	const char *ifYouDoAction, const char *toDoAction,
-	const char *toConfirmAction, bool dontAsk = false,
-	int32 *confirmedAlready = NULL);
+bool ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
+	const char* ifYouDoAction, const char* toDoAction,
+	const char* toConfirmAction, bool dontAsk = false,
+	int32* confirmedAlready = NULL);
 
-bool CheckDevicesEqual(const entry_ref *entry, const Model *targetModel);
+bool CheckDevicesEqual(const entry_ref* entry, const Model* targetModel);
 
 // Deprecated calls use newer calls above instead
-_IMPEXP_TRACKER void FSLaunchItem(const entry_ref *, BMessage * = NULL, int32 workspace = -1);
-_IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref *, BMessage *,
+_IMPEXP_TRACKER void FSLaunchItem(const entry_ref*, BMessage* = NULL, int32 workspace = -1);
+_IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref*, BMessage*,
 	int32 workspace, bool asynch);
-_IMPEXP_TRACKER void FSOpenWithDocuments(const entry_ref *executableToLaunch,
-	BMessage *documentEntryRefs);
-_IMPEXP_TRACKER status_t FSLaunchUsing(const entry_ref *ref, BMessage *listOfRefs);
+_IMPEXP_TRACKER void FSOpenWithDocuments(const entry_ref* executableToLaunch,
+	BMessage* documentEntryRefs);
+_IMPEXP_TRACKER status_t FSLaunchUsing(const entry_ref* ref, BMessage* listOfRefs);
 
 
 // some extra directory_which values
@@ -278,7 +279,7 @@ class WellKnowEntryList {
 	// system hierarchy
 	public:
 		struct WellKnownEntry {
-			WellKnownEntry(const node_ref *node, directory_which which, const char *name)
+			WellKnownEntry(const node_ref* node, directory_which which, const char* name)
 				:
 				node(*node),
 				which(which),
@@ -304,20 +305,20 @@ class WellKnowEntryList {
 			BString name;
 		};
 
-		static directory_which Match(const node_ref *);
-		static const WellKnownEntry *MatchEntry(const node_ref *);
+		static directory_which Match(const node_ref*);
+		static const WellKnownEntry* MatchEntry(const node_ref*);
 		static void Quit();
 
 	private:
-		const WellKnownEntry *MatchEntryCommon(const node_ref *);
+		const WellKnownEntry* MatchEntryCommon(const node_ref*);
 		WellKnowEntryList();
-		void AddOne(directory_which, const char *name);
-		void AddOne(directory_which, const char *path, const char *name);
-		void AddOne(directory_which, directory_which base, const char *extension,
-			const char *name);
+		void AddOne(directory_which, const char* name);
+		void AddOne(directory_which, const char* path, const char* name);
+		void AddOne(directory_which, directory_which base, const char* extension,
+			const char* name);
 
 		std::vector<WellKnownEntry> entries;
-		static WellKnowEntryList *self;
+		static WellKnowEntryList* self;
 };
 
 #if B_BEOS_VERSION_DANO
@@ -328,4 +329,4 @@ class WellKnowEntryList {
 
 using namespace BPrivate;
 
-#endif	/* FS_UTILS_H */
+#endif	// FS_UTILS_H

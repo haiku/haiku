@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include <Debug.h>
 
 #include <string.h>
@@ -40,12 +41,13 @@ All rights reserved.
 
 #include "TrackerSettings.h"
 
-Settings *settings = NULL;
+
+Settings* settings = NULL;
 
 // generic setting handler classes
 
-StringValueSetting::StringValueSetting(const char *name, const char *defaultValue,
-	const char *valueExpectedErrorString, const char *wrongValueErrorString)
+StringValueSetting::StringValueSetting(const char* name, const char* defaultValue,
+	const char* valueExpectedErrorString, const char* wrongValueErrorString)
 	:	SettingsArgvDispatcher(name),
 		fDefaultValue(defaultValue),
 		fValueExpectedErrorString(valueExpectedErrorString),
@@ -54,57 +56,67 @@ StringValueSetting::StringValueSetting(const char *name, const char *defaultValu
 {
 }
 
+
 StringValueSetting::~StringValueSetting()
 {
 }
 
-void 
-StringValueSetting::ValueChanged(const char *newValue)
+
+void
+StringValueSetting::ValueChanged(const char* newValue)
 {
 	fValue = newValue;
 }
 
-const char *
+
+const char*
 StringValueSetting::Value() const
 {
 	return fValue.String();
 }
 
-void 
-StringValueSetting::SaveSettingValue(Settings *settings)
+
+void
+StringValueSetting::SaveSettingValue(Settings* settings)
 {
 	settings->Write("\"%s\"", fValue.String());
 }
 
-bool 
+
+bool
 StringValueSetting::NeedsSaving() const
 {
 	// needs saving if different than default
 	return fValue != fDefaultValue;
 }
 
-const char *
-StringValueSetting::Handle(const char *const *argv)
+
+const char*
+StringValueSetting::Handle(const char* const* argv)
 {
-	if (!*++argv) 
+	if (!*++argv)
 		return fValueExpectedErrorString;
 	
-	ValueChanged(*argv);	
+	ValueChanged(*argv);
 	return 0;
 }
 
+
 //	#pragma mark -
 
-EnumeratedStringValueSetting::EnumeratedStringValueSetting(const char *name,
-	const char *defaultValue, const char *const *values, const char *valueExpectedErrorString,
-	const char *wrongValueErrorString)
-	:	StringValueSetting(name, defaultValue, valueExpectedErrorString, wrongValueErrorString),
+
+EnumeratedStringValueSetting::EnumeratedStringValueSetting(const char* name,
+	const char* defaultValue, const char* const* values,
+	const char* valueExpectedErrorString, const char* wrongValueErrorString)
+	:	StringValueSetting(name, defaultValue, valueExpectedErrorString,
+			wrongValueErrorString),
 		fValues(values)
 {
 }
 
-void 
-EnumeratedStringValueSetting::ValueChanged(const char *newValue)
+
+void
+EnumeratedStringValueSetting::ValueChanged(const char* newValue)
 {
 #if DEBUG
 	// must be one of the enumerated values
@@ -112,8 +124,10 @@ EnumeratedStringValueSetting::ValueChanged(const char *newValue)
 	for (int32 index = 0; ; index++) {
 		if (!fValues[index])
 			break;
-		if (strcmp(fValues[index], newValue) != 0) 
+
+		if (strcmp(fValues[index], newValue) != 0)
 			continue;
+
 		found = true;
 		break;
 	}
@@ -122,33 +136,38 @@ EnumeratedStringValueSetting::ValueChanged(const char *newValue)
 	StringValueSetting::ValueChanged(newValue);
 }
 
-const char *
-EnumeratedStringValueSetting::Handle(const char *const *argv)
+
+const char*
+EnumeratedStringValueSetting::Handle(const char* const* argv)
 {
-	if (!*++argv) 
+	if (!*++argv)
 		return fValueExpectedErrorString;
 
 	bool found = false;
 	for (int32 index = 0; ; index++) {
 		if (!fValues[index])
 			break;
-		if (strcmp(fValues[index], *argv) != 0) 
+
+		if (strcmp(fValues[index], *argv) != 0)
 			continue;
+
 		found = true;
 		break;
-	}	
-				
+	}
+
 	if (!found)
 		return fWrongValueErrorString;
-	
-	ValueChanged(*argv);	
+
+	ValueChanged(*argv);
 	return 0;
 }
 
+
 //	#pragma mark -
 
-ScalarValueSetting::ScalarValueSetting(const char *name, int32 defaultValue,
-	const char *valueExpectedErrorString, const char *wrongValueErrorString,
+
+ScalarValueSetting::ScalarValueSetting(const char* name, int32 defaultValue,
+	const char* valueExpectedErrorString, const char* wrongValueErrorString,
 	int32 min, int32 max)
 	:	SettingsArgvDispatcher(name),
 		fDefaultValue(defaultValue),
@@ -160,7 +179,8 @@ ScalarValueSetting::ScalarValueSetting(const char *name, int32 defaultValue,
 {
 }
 
-void 
+
+void
 ScalarValueSetting::ValueChanged(int32 newValue)
 {
 	ASSERT(newValue > fMin);
@@ -168,22 +188,25 @@ ScalarValueSetting::ValueChanged(int32 newValue)
 	fValue = newValue;
 }
 
+
 int32
 ScalarValueSetting::Value() const
 {
 	return fValue;
 }
 
-void 
-ScalarValueSetting::GetValueAsString(char *buffer) const
+
+void
+ScalarValueSetting::GetValueAsString(char* buffer) const
 {
 	sprintf(buffer, "%ld", fValue);
 }
 
-const char *
-ScalarValueSetting::Handle(const char *const *argv)
+
+const char*
+ScalarValueSetting::Handle(const char* const* argv)
 {
-	if (!*++argv) 
+	if (!*++argv)
 		return fValueExpectedErrorString;
 
 	int32 newValue;
@@ -194,68 +217,79 @@ ScalarValueSetting::Handle(const char *const *argv)
 
 	if (newValue < fMin || newValue > fMax)
 		return fWrongValueErrorString;
-	
-	fValue = newValue;	
+
+	fValue = newValue;
 	return NULL;
 }
 
-void 
-ScalarValueSetting::SaveSettingValue(Settings *settings)
+
+void
+ScalarValueSetting::SaveSettingValue(Settings* settings)
 {
 	settings->Write("%ld", fValue);
 }
 
-bool 
+
+bool
 ScalarValueSetting::NeedsSaving() const
 {
 	return fValue != fDefaultValue;
 }
 
+
 //	#pragma mark -
 
-HexScalarValueSetting::HexScalarValueSetting(const char *name, int32 defaultValue,
-	const char *valueExpectedErrorString, const char *wrongValueErrorString,
+
+HexScalarValueSetting::HexScalarValueSetting(const char* name, int32 defaultValue,
+	const char* valueExpectedErrorString, const char* wrongValueErrorString,
 	int32 min, int32 max)
 		:	ScalarValueSetting(name, defaultValue, valueExpectedErrorString,
 					wrongValueErrorString, min, max)
 {
 }
 
-void 
-HexScalarValueSetting::GetValueAsString(char *buffer) const
+
+void
+HexScalarValueSetting::GetValueAsString(char* buffer) const
 {
 	sprintf(buffer, "0x%08lx", fValue);
 }
 
-void 
-HexScalarValueSetting::SaveSettingValue(Settings *settings)
+
+void
+HexScalarValueSetting::SaveSettingValue(Settings* settings)
 {
 	settings->Write("0x%08lx", fValue);
 }
 
+
 //	#pragma mark -
 
-BooleanValueSetting::BooleanValueSetting(const char *name, bool defaultValue)
+
+BooleanValueSetting::BooleanValueSetting(const char* name, bool defaultValue)
 	:	ScalarValueSetting(name, defaultValue, 0, 0)
 {
 }
 
-bool 
+
+bool
 BooleanValueSetting::Value() const
 {
 	return fValue != 0;
 }
 
+
 void
 BooleanValueSetting::SetValue(bool value)
 {
-	fValue = value;	
+	fValue = value;
 }
 
-const char *
-BooleanValueSetting::Handle(const char *const *argv)
+
+const char*
+BooleanValueSetting::Handle(const char* const* argv)
 {
-	if (!*++argv) 
+	if (!*++argv)
 		return "on or off expected";
 
 	if (strcmp(*argv, "on") == 0)
@@ -268,9 +302,9 @@ BooleanValueSetting::Handle(const char *const *argv)
 	return 0;
 }
 
-void 
-BooleanValueSetting::SaveSettingValue(Settings *settings)
+
+void
+BooleanValueSetting::SaveSettingValue(Settings* settings)
 {
 	settings->Write(fValue ? "on" : "off");
 }
-

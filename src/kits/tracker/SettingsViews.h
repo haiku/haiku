@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _SETTINGS_VIEWS
 #define _SETTINGS_VIEWS
+
 
 #include <CheckBox.h>
 #include <GroupView.h>
@@ -42,6 +42,7 @@ All rights reserved.
 #include <ColorControl.h>
 
 #include "TrackerSettings.h"
+
 
 const uint32 kSettingsContentsModified = 'Scmo';
 
@@ -72,7 +73,7 @@ class DesktopSettingsView : public SettingsView {
 	public:
 		DesktopSettingsView();
 
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 		virtual void AttachedToWindow();
 
 		virtual void SetDefaults();
@@ -85,11 +86,11 @@ class DesktopSettingsView : public SettingsView {
 	private:
 		void _SendNotices();
 
-		BRadioButton *fShowDisksIconRadioButton;
-		BRadioButton *fMountVolumesOntoDesktopRadioButton;
-		BCheckBox *fMountSharedVolumesOntoDesktopCheckBox;
-		BCheckBox *fIntegrateNonBootBeOSDesktopsCheckBox;
-		BButton *fMountButton;
+		BRadioButton*	fShowDisksIconRadioButton;
+		BRadioButton*	fMountVolumesOntoDesktopRadioButton;
+		BCheckBox*		fMountSharedVolumesOntoDesktopCheckBox;
+		BCheckBox*		fIntegrateNonBootBeOSDesktopsCheckBox;
+		BButton*		fMountButton;
 
 		bool fShowDisksIcon;
 		bool fMountVolumesOntoDesktop;
@@ -104,7 +105,7 @@ class WindowsSettingsView : public SettingsView {
 	public:
 		WindowsSettingsView();
 
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 		virtual void AttachedToWindow();
 
 		virtual void SetDefaults();
@@ -115,13 +116,13 @@ class WindowsSettingsView : public SettingsView {
 		virtual bool IsRevertable() const;
 
 	private:
-		BCheckBox *fShowFullPathInTitleBarCheckBox;
-		BCheckBox *fSingleWindowBrowseCheckBox;
-		BCheckBox *fShowNavigatorCheckBox;
-		BCheckBox *fShowSelectionWhenInactiveCheckBox;
-		BCheckBox *fOutlineSelectionCheckBox;
-		BCheckBox *fSortFolderNamesFirstCheckBox;
-		BCheckBox *fTypeAheadFilteringCheckBox;
+		BCheckBox* fShowFullPathInTitleBarCheckBox;
+		BCheckBox* fSingleWindowBrowseCheckBox;
+		BCheckBox* fShowNavigatorCheckBox;
+		BCheckBox* fShowSelectionWhenInactiveCheckBox;
+		BCheckBox* fOutlineSelectionCheckBox;
+		BCheckBox* fSortFolderNamesFirstCheckBox;
+		BCheckBox* fTypeAheadFilteringCheckBox;
 
 		bool fShowFullPathInTitleBar;
 		bool fSingleWindowBrowse;
@@ -138,7 +139,7 @@ class SpaceBarSettingsView : public SettingsView {
 		SpaceBarSettingsView();
 		virtual ~SpaceBarSettingsView();
 
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 		virtual void AttachedToWindow();
 
 		virtual void SetDefaults();
@@ -149,9 +150,9 @@ class SpaceBarSettingsView : public SettingsView {
 		virtual bool IsRevertable() const;
 
 	private:
-		BCheckBox		*fSpaceBarShowCheckBox;
-		BColorControl	*fColorControl;
-		BMenuField		*fColorPicker;
+		BCheckBox*		fSpaceBarShowCheckBox;
+		BColorControl*	fColorControl;
+		BMenuField*		fColorPicker;
 		int32			fCurrentColor;
 
 		bool			fSpaceBarShow;
@@ -162,11 +163,12 @@ class SpaceBarSettingsView : public SettingsView {
 		typedef SettingsView _inherited;
 };
 
+
 class TrashSettingsView : public SettingsView {
 	public:
 		TrashSettingsView();
 
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 		virtual void AttachedToWindow();
 
 		virtual void SetDefaults();
@@ -179,8 +181,8 @@ class TrashSettingsView : public SettingsView {
 	private:
 		void _SendNotices();
 
-		BCheckBox *fDontMoveFilesToTrashCheckBox;
-		BCheckBox *fAskBeforeDeleteFileCheckBox;
+		BCheckBox* fDontMoveFilesToTrashCheckBox;
+		BCheckBox* fAskBeforeDeleteFileCheckBox;
 
 		bool fDontMoveFilesToTrash;
 		bool fAskBeforeDeleteFile;

@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _COMMANDS_H
 #define _COMMANDS_H
+
 
 #include "PublicCommands.h"
 

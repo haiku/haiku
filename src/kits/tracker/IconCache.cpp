@@ -128,24 +128,24 @@ IconCacheEntry::~IconCacheEntry()
 
 
 void
-IconCacheEntry::SetAliasFor(const SharedIconCache *sharedCache,
-	const SharedCacheEntry *entry)
+IconCacheEntry::SetAliasFor(const SharedIconCache* sharedCache,
+	const SharedCacheEntry* entry)
 {
 	sharedCache->SetAliasFor(this, entry);
 	ASSERT(fAliasForIndex >= 0);
 }
 
 
-IconCacheEntry *
-IconCacheEntry::ResolveIfAlias(const SharedIconCache *sharedCache)
+IconCacheEntry*
+IconCacheEntry::ResolveIfAlias(const SharedIconCache* sharedCache)
 {
 	return sharedCache->ResolveIfAlias(this);
 }
 
 
-IconCacheEntry *
-IconCacheEntry::ResolveIfAlias(const SharedIconCache *sharedCache,
-	IconCacheEntry *entry)
+IconCacheEntry*
+IconCacheEntry::ResolveIfAlias(const SharedIconCache* sharedCache,
+	IconCacheEntry* entry)
 {
 	if (!entry)
 		return NULL;
@@ -188,7 +188,7 @@ IconCacheEntry::HaveIconBitmap(IconDrawMode mode, icon_size size) const
 }
 
 
-BBitmap *
+BBitmap*
 IconCacheEntry::IconForMode(IconDrawMode mode, icon_size size) const
 {
 	ASSERT(mode == kSelected || mode == kNormalIcon);
@@ -213,11 +213,11 @@ bool
 IconCacheEntry::IconHitTest(BPoint where, IconDrawMode mode, icon_size size) const
 {
 	ASSERT(where.x < size && where.y < size);
-	BBitmap *bitmap = IconForMode(mode, size);
+	BBitmap* bitmap = IconForMode(mode, size);
 	if (!bitmap)
 		return false;
 
-	uchar *bits = (uchar *)bitmap->Bits();
+	uchar* bits = (uchar*)bitmap->Bits();
 	ASSERT(bits);
 
 	BRect bounds(bitmap->Bounds());
@@ -241,9 +241,9 @@ IconCacheEntry::IconHitTest(BPoint where, IconDrawMode mode, icon_size size) con
 }
 
 
-BBitmap *
-IconCacheEntry::ConstructBitmap(BBitmap *constructFrom, IconDrawMode requestedMode,
-	IconDrawMode constructFromMode, icon_size size, LazyBitmapAllocator *lazyBitmap)
+BBitmap*
+IconCacheEntry::ConstructBitmap(BBitmap* constructFrom, IconDrawMode requestedMode,
+	IconDrawMode constructFromMode, icon_size size, LazyBitmapAllocator* lazyBitmap)
 {
 	ASSERT(requestedMode == kSelected && constructFromMode == kNormalIcon);
 		// for now
@@ -254,11 +254,11 @@ IconCacheEntry::ConstructBitmap(BBitmap *constructFrom, IconDrawMode requestedMo
 }
 
 
-BBitmap *
+BBitmap*
 IconCacheEntry::ConstructBitmap(IconDrawMode requestedMode, icon_size size,
-	LazyBitmapAllocator *lazyBitmap)
+	LazyBitmapAllocator* lazyBitmap)
 {
-	BBitmap *source = (size == B_MINI_ICON) ? fMiniIcon : fLargeIcon;
+	BBitmap* source = (size == B_MINI_ICON) ? fMiniIcon : fLargeIcon;
 	ASSERT(source);
 	return ConstructBitmap(source, requestedMode, kNormalIcon, size, lazyBitmap);
 }
@@ -278,7 +278,7 @@ IconCacheEntry::AlternateModeForIconConstructing(IconDrawMode requestedMode,
 
 
 void
-IconCacheEntry::SetIcon(BBitmap *bitmap, IconDrawMode mode, icon_size size,
+IconCacheEntry::SetIcon(BBitmap* bitmap, IconDrawMode mode, icon_size size,
 	bool /*create*/)
 {
 	if (mode == kNormalIcon) {
@@ -311,10 +311,10 @@ IconCache::IconCache()
 // icon is not available
 // for now the code only looks for normal icons, selected icons are auto-generated
 
-IconCacheEntry *
-IconCache::GetIconForPreferredApp(const char *fileTypeSignature,
-	const char *preferredApp, IconDrawMode mode, icon_size size,
-	LazyBitmapAllocator *lazyBitmap, IconCacheEntry *entry)
+IconCacheEntry*
+IconCache::GetIconForPreferredApp(const char* fileTypeSignature,
+	const char* preferredApp, IconDrawMode mode, icon_size size,
+	LazyBitmapAllocator* lazyBitmap, IconCacheEntry* entry)
 {
 	ASSERT(fSharedCache.IsLocked());
 
@@ -346,7 +346,7 @@ IconCache::GetIconForPreferredApp(const char *fileTypeSignature,
 			size) != B_OK)
 			return NULL;
 
-		BBitmap *bitmap = lazyBitmap->Adopt();
+		BBitmap* bitmap = lazyBitmap->Adopt();
 		if (!entry) {
 			PRINT_ADD_ITEM(("File %s; Line %d # adding entry for preferredApp %s, type %s\n",
 				__FILE__, __LINE__, preferredApp, fileTypeSignature));
@@ -365,9 +365,9 @@ IconCache::GetIconForPreferredApp(const char *fileTypeSignature,
 }
 
 
-IconCacheEntry *
-IconCache::GetIconFromMetaMime(const char *fileType, IconDrawMode mode,
-	icon_size size, LazyBitmapAllocator *lazyBitmap, IconCacheEntry *entry)
+IconCacheEntry*
+IconCache::GetIconFromMetaMime(const char* fileType, IconDrawMode mode,
+	icon_size size, LazyBitmapAllocator* lazyBitmap, IconCacheEntry* entry)
 {
 	ASSERT(fSharedCache.IsLocked());
 
@@ -393,12 +393,12 @@ IconCache::GetIconFromMetaMime(const char *fileType, IconDrawMode mode,
 			if (mime.GetPreferredApp(preferredAppSig) != B_OK)
 				return NULL;
 
-			SharedCacheEntry *aliasTo = NULL;
+			SharedCacheEntry* aliasTo = NULL;
 			if (entry)
-				aliasTo = (SharedCacheEntry *)entry->ResolveIfAlias(&fSharedCache);
+				aliasTo = (SharedCacheEntry*)entry->ResolveIfAlias(&fSharedCache);
 
 			// look for icon defined by preferred app from metamime
-			aliasTo = (SharedCacheEntry *)GetIconForPreferredApp(fileType,
+			aliasTo = (SharedCacheEntry*)GetIconForPreferredApp(fileType,
 				preferredAppSig, mode, size, lazyBitmap, aliasTo);
 
 			if (aliasTo == NULL)
@@ -417,7 +417,7 @@ IconCache::GetIconFromMetaMime(const char *fileType, IconDrawMode mode,
 		}
 
 		// at this point, we've found an icon for the MIME type
-		BBitmap *bitmap = lazyBitmap->Adopt();
+		BBitmap* bitmap = lazyBitmap->Adopt();
 		if (!entry) {
 			PRINT_ADD_ITEM(("File %s; Line %d # adding entry for type %s\n",
 				__FILE__, __LINE__, fileType));
@@ -443,17 +443,17 @@ IconCache::GetIconFromMetaMime(const char *fileType, IconDrawMode mode,
 }
 
 
-IconCacheEntry *
-IconCache::GetIconFromFileTypes(ModelNodeLazyOpener *modelOpener,
+IconCacheEntry*
+IconCache::GetIconFromFileTypes(ModelNodeLazyOpener* modelOpener,
 	IconSource &source, IconDrawMode mode, icon_size size,
-	LazyBitmapAllocator *lazyBitmap, IconCacheEntry *entry)
+	LazyBitmapAllocator* lazyBitmap, IconCacheEntry* entry)
 {
 	ASSERT(fSharedCache.IsLocked());
 	// use file types to get the icon
-	Model *model = modelOpener->TargetModel();
+	Model* model = modelOpener->TargetModel();
 
-	const char *fileType = model->MimeType();
-	const char *nodePreferredApp = model->PreferredAppSignature();
+	const char* fileType = model->MimeType();
+	const char* nodePreferredApp = model->PreferredAppSignature();
 	if (source == kUnknownSource || source == kUnknownNotFromNode
 		|| source == kPreferredAppForNode) {
 
@@ -483,7 +483,7 @@ IconCache::GetIconFromFileTypes(ModelNodeLazyOpener *modelOpener,
 		if (!mime.IsSupertypeOnly()) {
 			BMimeType superType;
 			mime.GetSupertype(&superType);
-			const char *superTypeFileType = superType.Type();
+			const char* superTypeFileType = superType.Type();
 			if (superTypeFileType)
 				entry = GetIconFromMetaMime(superTypeFileType, mode, size,
 					lazyBitmap, entry);
@@ -505,9 +505,9 @@ IconCache::GetIconFromFileTypes(ModelNodeLazyOpener *modelOpener,
 
 			PRINT_ADD_ITEM(("File %s; Line %d # adding entry as alias for preferredApp %s, type %s\n",
 				__FILE__, __LINE__, nodePreferredApp, fileType));
-			IconCacheEntry *aliasedEntry = fSharedCache.AddItem((SharedCacheEntry **)&entry,
+			IconCacheEntry* aliasedEntry = fSharedCache.AddItem((SharedCacheEntry**)&entry,
 				fileType, nodePreferredApp);
-			aliasedEntry->SetAliasFor(&fSharedCache, (SharedCacheEntry *)entry);
+			aliasedEntry->SetAliasFor(&fSharedCache, (SharedCacheEntry*)entry);
 				// OK to cast here, have a runtime check
 			source = kPreferredAppForNode;
 				// set source as preferred for node, so that next time we get a hit in
@@ -523,17 +523,17 @@ IconCache::GetIconFromFileTypes(ModelNodeLazyOpener *modelOpener,
 	return entry;
 }
 
-IconCacheEntry *
-IconCache::GetVolumeIcon(AutoLock<SimpleIconCache> *nodeCacheLocker,
-	AutoLock<SimpleIconCache> *sharedCacheLocker,
-	AutoLock<SimpleIconCache> **resultingOpenCache,
-	Model *model, IconSource &source,
-	IconDrawMode mode, icon_size size, LazyBitmapAllocator *lazyBitmap)
+IconCacheEntry*
+IconCache::GetVolumeIcon(AutoLock<SimpleIconCache>*nodeCacheLocker,
+	AutoLock<SimpleIconCache>* sharedCacheLocker,
+	AutoLock<SimpleIconCache>** resultingOpenCache,
+	Model* model, IconSource &source,
+	IconDrawMode mode, icon_size size, LazyBitmapAllocator* lazyBitmap)
 {
 	*resultingOpenCache = nodeCacheLocker;
 	nodeCacheLocker->Lock();
 
-	IconCacheEntry *entry = 0;
+	IconCacheEntry* entry = 0;
 	if (source != kUnknownSource) {
 		// cached in the node cache
 		entry = fNodeCache.FindItem(model->NodeRef());
@@ -560,7 +560,7 @@ IconCache::GetVolumeIcon(AutoLock<SimpleIconCache> *nodeCacheLocker,
 
 		if (volume.IsShared()) {
 			// Check if it's a network share and give it a special icon
-			BBitmap *bitmap = lazyBitmap->Get();
+			BBitmap* bitmap = lazyBitmap->Get();
 			GetTrackerResources()->GetIconResource(R_ShareIcon, size, bitmap);
 			if (!entry) {
 				PRINT_ADD_ITEM(("File %s; Line %d # adding entry for model %s\n",
@@ -570,7 +570,7 @@ IconCache::GetVolumeIcon(AutoLock<SimpleIconCache> *nodeCacheLocker,
 			entry->SetIcon(lazyBitmap->Adopt(), kNormalIcon, size);
 		} else if (volume.GetIcon(lazyBitmap->Get(), size) == B_OK) {
 			// Ask the device for an icon
-			BBitmap *bitmap = lazyBitmap->Adopt();
+			BBitmap* bitmap = lazyBitmap->Adopt();
 			ASSERT(bitmap);
 			if (!entry) {
 				PRINT_ADD_ITEM(("File %s; Line %d # adding entry for model %s\n",
@@ -599,12 +599,12 @@ IconCache::GetVolumeIcon(AutoLock<SimpleIconCache> *nodeCacheLocker,
 }
 
 
-IconCacheEntry *
-IconCache::GetRootIcon(AutoLock<SimpleIconCache> *,
-	AutoLock<SimpleIconCache> *sharedCacheLocker,
-	AutoLock<SimpleIconCache> **resultingOpenCache,
-	Model *, IconSource &source, IconDrawMode mode,
-	icon_size size, LazyBitmapAllocator *lazyBitmap)
+IconCacheEntry*
+IconCache::GetRootIcon(AutoLock<SimpleIconCache>*,
+	AutoLock<SimpleIconCache>* sharedCacheLocker,
+	AutoLock<SimpleIconCache>** resultingOpenCache,
+	Model*, IconSource &source, IconDrawMode mode,
+	icon_size size, LazyBitmapAllocator* lazyBitmap)
 {
 	*resultingOpenCache = sharedCacheLocker;
 	(*resultingOpenCache)->Lock();
@@ -614,19 +614,19 @@ IconCache::GetRootIcon(AutoLock<SimpleIconCache> *,
 }
 
 
-IconCacheEntry *
-IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache> *,
-	AutoLock<SimpleIconCache> *sharedCacheLocker,
-	AutoLock<SimpleIconCache> **resultingOpenCache,
-	Model *model, IconSource &source, IconDrawMode mode, icon_size size,
-	LazyBitmapAllocator *lazyBitmap)
+IconCacheEntry*
+IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache>*,
+	AutoLock<SimpleIconCache>* sharedCacheLocker,
+	AutoLock<SimpleIconCache>** resultingOpenCache,
+	Model* model, IconSource &source, IconDrawMode mode, icon_size size,
+	LazyBitmapAllocator* lazyBitmap)
 {
-	const WellKnowEntryList::WellKnownEntry *wellKnownEntry
+	const WellKnowEntryList::WellKnownEntry* wellKnownEntry
 		= WellKnowEntryList::MatchEntry(model->NodeRef());
 	if (!wellKnownEntry)
 		return NULL;
 
-	IconCacheEntry *entry = NULL;
+	IconCacheEntry* entry = NULL;
 
 	BString type("tracker/active_");
 	type += wellKnownEntry->name;
@@ -709,7 +709,7 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache> *,
 
 		entry = fSharedCache.AddItem(type.String());
 
-		BBitmap *bitmap = lazyBitmap->Get();
+		BBitmap* bitmap = lazyBitmap->Get();
 		GetTrackerResources()->GetIconResource(resid, size, bitmap);
 		entry->SetIcon(lazyBitmap->Adopt(), kNormalIcon, size);
 	}
@@ -725,13 +725,13 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache> *,
 }
 
 
-IconCacheEntry *
-IconCache::GetNodeIcon(ModelNodeLazyOpener *modelOpener,
-	AutoLock<SimpleIconCache> *nodeCacheLocker,
-	AutoLock<SimpleIconCache> **resultingOpenCache,
-	Model *model, IconSource &source,
+IconCacheEntry*
+IconCache::GetNodeIcon(ModelNodeLazyOpener* modelOpener,
+	AutoLock<SimpleIconCache>* nodeCacheLocker,
+	AutoLock<SimpleIconCache>** resultingOpenCache,
+	Model* model, IconSource &source,
 	IconDrawMode mode, icon_size size,
-	LazyBitmapAllocator *lazyBitmap, IconCacheEntry *entry, bool permanent)
+	LazyBitmapAllocator* lazyBitmap, IconCacheEntry* entry, bool permanent)
 {
 	*resultingOpenCache = nodeCacheLocker;
 	(*resultingOpenCache)->Lock();
@@ -740,13 +740,13 @@ IconCache::GetNodeIcon(ModelNodeLazyOpener *modelOpener,
 	if (!entry || !entry->HaveIconBitmap(NORMAL_ICON_ONLY, size)) {
 		modelOpener->OpenNode();
 
-		BFile *file = NULL;
+		BFile* file = NULL;
 
 		// if we are dealing with an application, use the BAppFileInfo
 		// superset of node; this makes GetIcon grab the proper icon for
 		// an app
 		if (model->IsExecutable())
-			file = dynamic_cast<BFile *>(model->Node());
+			file = dynamic_cast<BFile*>(model->Node());
 
 		PRINT_DISK_HITS(("File %s; Line %d # hitting disk for node %s\n",
 			__FILE__, __LINE__, model->Name()));
@@ -760,7 +760,7 @@ IconCache::GetNodeIcon(ModelNodeLazyOpener *modelOpener,
 		if (result == B_OK) {
 			// node has it's own icon, use it
 
-			BBitmap *bitmap = lazyBitmap->Adopt();
+			BBitmap* bitmap = lazyBitmap->Adopt();
 			PRINT_ADD_ITEM(("File %s; Line %d # adding entry for model %s\n",
 				__FILE__, __LINE__, model->Name()));
 			entry = fNodeCache.AddItem(model->NodeRef(), permanent);
@@ -788,12 +788,12 @@ IconCache::GetNodeIcon(ModelNodeLazyOpener *modelOpener,
 }
 
 
-IconCacheEntry *
-IconCache::GetGenericIcon(AutoLock<SimpleIconCache> *sharedCacheLocker,
-	AutoLock<SimpleIconCache> **resultingOpenCache,
-	Model *model, IconSource &source,
+IconCacheEntry*
+IconCache::GetGenericIcon(AutoLock<SimpleIconCache>* sharedCacheLocker,
+	AutoLock<SimpleIconCache>** resultingOpenCache,
+	Model* model, IconSource &source,
 	IconDrawMode mode, icon_size size,
-	LazyBitmapAllocator *lazyBitmap, IconCacheEntry *entry)
+	LazyBitmapAllocator* lazyBitmap, IconCacheEntry* entry)
 {
 	*resultingOpenCache = sharedCacheLocker;
 	(*resultingOpenCache)->Lock();
@@ -809,10 +809,10 @@ IconCache::GetGenericIcon(AutoLock<SimpleIconCache> *sharedCacheLocker,
 	PRINT_ADD_ITEM(("File %s; Line %d # adding entry for preferredApp %s, type %s\n",
 		__FILE__, __LINE__, model->PreferredAppSignature(),
 		model->MimeType()));
-	IconCacheEntry *aliasedEntry = fSharedCache.AddItem(
-		(SharedCacheEntry **)&entry, model->MimeType(),
+	IconCacheEntry* aliasedEntry = fSharedCache.AddItem(
+		(SharedCacheEntry**)&entry, model->MimeType(),
 		model->PreferredAppSignature());
-	aliasedEntry->SetAliasFor(&fSharedCache, (SharedCacheEntry *)entry);
+	aliasedEntry->SetAliasFor(&fSharedCache, (SharedCacheEntry*)entry);
 
 	source = kMetaMime;
 
@@ -821,11 +821,11 @@ IconCache::GetGenericIcon(AutoLock<SimpleIconCache> *sharedCacheLocker,
 }
 
 
-IconCacheEntry *
-IconCache::GetFallbackIcon(AutoLock<SimpleIconCache> *sharedCacheLocker,
-	AutoLock<SimpleIconCache> **resultingOpenCache,
-	Model *model, IconDrawMode mode, icon_size size,
-	LazyBitmapAllocator *lazyBitmap, IconCacheEntry *entry)
+IconCacheEntry*
+IconCache::GetFallbackIcon(AutoLock<SimpleIconCache>* sharedCacheLocker,
+	AutoLock<SimpleIconCache>** resultingOpenCache,
+	Model* model, IconDrawMode mode, icon_size size,
+	LazyBitmapAllocator* lazyBitmap, IconCacheEntry* entry)
 {
 	*resultingOpenCache = sharedCacheLocker;
 	(*resultingOpenCache)->Lock();
@@ -833,7 +833,7 @@ IconCache::GetFallbackIcon(AutoLock<SimpleIconCache> *sharedCacheLocker,
 	entry = fSharedCache.AddItem(model->MimeType(),
 		model->PreferredAppSignature());
 
-	BBitmap *bitmap = lazyBitmap->Get();
+	BBitmap* bitmap = lazyBitmap->Get();
 	GetTrackerResources()->GetIconResource(R_FileIcon, size, bitmap);
 	entry->SetIcon(lazyBitmap->Adopt(), kNormalIcon, size);
 
@@ -847,16 +847,16 @@ IconCache::GetFallbackIcon(AutoLock<SimpleIconCache> *sharedCacheLocker,
 }
 
 
-IconCacheEntry *
-IconCache::Preload(AutoLock<SimpleIconCache> *nodeCacheLocker,
-	AutoLock<SimpleIconCache> *sharedCacheLocker,
-	AutoLock<SimpleIconCache> **resultingCache,
-	Model *model, IconDrawMode mode, icon_size size,
+IconCacheEntry*
+IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
+	AutoLock<SimpleIconCache>* sharedCacheLocker,
+	AutoLock<SimpleIconCache>** resultingCache,
+	Model* model, IconDrawMode mode, icon_size size,
 	bool permanent)
 {
-	IconCacheEntry *entry = NULL;
+	IconCacheEntry* entry = NULL;
 
-	AutoLock<SimpleIconCache> *resultingOpenCache = NULL;
+	AutoLock<SimpleIconCache>* resultingOpenCache = NULL;
 		// resultingOpenCache is the locker that points to the cache that
 		// ended with a hit and will be used for the drawing
 
@@ -1031,7 +1031,7 @@ IconCache::Preload(AutoLock<SimpleIconCache> *nodeCacheLocker,
 
 
 void
-IconCache::Draw(Model *model, BView *view, BPoint where, IconDrawMode mode,
+IconCache::Draw(Model* model, BView* view, BPoint where, IconDrawMode mode,
 	icon_size size, bool async)
 {
 	// the following does not actually lock the caches, we are using the
@@ -1040,8 +1040,8 @@ IconCache::Draw(Model *model, BView *view, BPoint where, IconDrawMode mode,
 	AutoLock<SimpleIconCache> nodeCacheLocker(&fNodeCache, false);
 	AutoLock<SimpleIconCache> sharedCacheLocker(&fSharedCache, false);
 
-	AutoLock<SimpleIconCache> *resultingCacheLocker;
-	IconCacheEntry *entry = Preload(&nodeCacheLocker, &sharedCacheLocker,
+	AutoLock<SimpleIconCache>* resultingCacheLocker;
+	IconCacheEntry* entry = Preload(&nodeCacheLocker, &sharedCacheLocker,
 		&resultingCacheLocker, model, mode, size, false);
 		// Preload finds/creates the appropriate entry, locking down the
 		// cache it is in and returns the whole state back to here
@@ -1061,15 +1061,15 @@ IconCache::Draw(Model *model, BView *view, BPoint where, IconDrawMode mode,
 
 
 void
-IconCache::SyncDraw(Model *model, BView *view, BPoint where, IconDrawMode mode,
-	icon_size size, void (*blitFunc)(BView *, BPoint, BBitmap *, void *),
-	void *passThruState)
+IconCache::SyncDraw(Model* model, BView* view, BPoint where, IconDrawMode mode,
+	icon_size size, void (*blitFunc)(BView*, BPoint, BBitmap*, void*),
+	void* passThruState)
 {
 	AutoLock<SimpleIconCache> nodeCacheLocker(&fNodeCache, false);
 	AutoLock<SimpleIconCache> sharedCacheLocker(&fSharedCache, false);
 
-	AutoLock<SimpleIconCache> *resultingCacheLocker;
-	IconCacheEntry *entry = Preload(&nodeCacheLocker, &sharedCacheLocker,
+	AutoLock<SimpleIconCache>* resultingCacheLocker;
+	IconCacheEntry* entry = Preload(&nodeCacheLocker, &sharedCacheLocker,
 		&resultingCacheLocker, model, mode, size, false);
 
 	if (!entry)
@@ -1083,7 +1083,7 @@ IconCache::SyncDraw(Model *model, BView *view, BPoint where, IconDrawMode mode,
 
 
 void
-IconCache::Preload(Model *model, IconDrawMode mode, icon_size size, bool permanent)
+IconCache::Preload(Model* model, IconDrawMode mode, icon_size size, bool permanent)
 {
 	AutoLock<SimpleIconCache> nodeCacheLocker(&fNodeCache, false);
 	AutoLock<SimpleIconCache> sharedCacheLocker(&fSharedCache, false);
@@ -1093,7 +1093,7 @@ IconCache::Preload(Model *model, IconDrawMode mode, icon_size size, bool permane
 
 
 status_t
-IconCache::Preload(const char *fileType, IconDrawMode mode, icon_size size)
+IconCache::Preload(const char* fileType, IconDrawMode mode, icon_size size)
 {
 	AutoLock<SimpleIconCache> sharedCacheLocker(&fSharedCache);
 	LazyBitmapAllocator lazyBitmap(size);
@@ -1105,7 +1105,7 @@ IconCache::Preload(const char *fileType, IconDrawMode mode, icon_size size)
 		return result;
 
 	// try getting the icon from the preferred app for the signature
-	IconCacheEntry *entry = GetIconForPreferredApp(fileType, preferredAppSig,
+	IconCacheEntry* entry = GetIconForPreferredApp(fileType, preferredAppSig,
 		mode, size, &lazyBitmap, 0);
 	if (entry)
 		return B_OK;
@@ -1117,7 +1117,7 @@ IconCache::Preload(const char *fileType, IconDrawMode mode, icon_size size)
 		return result;
 
 	entry = fSharedCache.AddItem(fileType);
-	BBitmap *bitmap = lazyBitmap.Adopt();
+	BBitmap* bitmap = lazyBitmap.Adopt();
 	entry->SetIcon(bitmap, kNormalIcon, size);
 	if (mode != kNormalIcon) {
 		entry->ConstructBitmap(mode, size, &lazyBitmap);
@@ -1129,7 +1129,7 @@ IconCache::Preload(const char *fileType, IconDrawMode mode, icon_size size)
 
 
 void
-IconCache::Deleting(const Model *model)
+IconCache::Deleting(const Model* model)
 {
 	AutoLock<SimpleIconCache> lock(&fNodeCache);
 
@@ -1141,7 +1141,7 @@ IconCache::Deleting(const Model *model)
 
 
 void
-IconCache::Removing(const Model *model)
+IconCache::Removing(const Model* model)
 {
 	AutoLock<SimpleIconCache> lock(&fNodeCache);
 
@@ -1151,7 +1151,7 @@ IconCache::Removing(const Model *model)
 
 
 void
-IconCache::Deleting(const BView *view)
+IconCache::Deleting(const BView* view)
 {
 	AutoLock<SimpleIconCache> lock(&fNodeCache);
 	fNodeCache.Deleting(view);
@@ -1159,7 +1159,7 @@ IconCache::Deleting(const BView *view)
 
 
 void
-IconCache::IconChanged(Model *model)
+IconCache::IconChanged(Model* model)
 {
 	AutoLock<SimpleIconCache> lock(&fNodeCache);
 
@@ -1171,16 +1171,16 @@ IconCache::IconChanged(Model *model)
 
 
 void
-IconCache::IconChanged(const char *mimeType, const char *appSignature)
+IconCache::IconChanged(const char* mimeType, const char* appSignature)
 {
 	AutoLock<SimpleIconCache> sharedLock(&fSharedCache);
-	SharedCacheEntry *entry = fSharedCache.FindItem(mimeType, appSignature);
+	SharedCacheEntry* entry = fSharedCache.FindItem(mimeType, appSignature);
 	if (!entry)
 		return;
 
 	AutoLock<SimpleIconCache> nodeLock(&fNodeCache);
 
-	entry = (SharedCacheEntry *)fSharedCache.ResolveIfAlias(entry);
+	entry = (SharedCacheEntry*)fSharedCache.ResolveIfAlias(entry);
 	ASSERT(entry);
 	int32 index = fSharedCache.EntryIndex(entry);
 
@@ -1191,9 +1191,9 @@ IconCache::IconChanged(const char *mimeType, const char *appSignature)
 }
 
 
-BBitmap *
-IconCache::MakeSelectedIcon(const BBitmap *normal, icon_size size,
-	LazyBitmapAllocator *lazyBitmap)
+BBitmap*
+IconCache::MakeSelectedIcon(const BBitmap* normal, icon_size size,
+	LazyBitmapAllocator* lazyBitmap)
 {
 	return MakeTransformedIcon(normal, size, fHiliteTable, lazyBitmap);
 }
@@ -1201,7 +1201,7 @@ IconCache::MakeSelectedIcon(const BBitmap *normal, icon_size size,
 #if xDEBUG
 
 static void
-DumpBitmap(const BBitmap *bitmap)
+DumpBitmap(const BBitmap* bitmap)
 {
 	if (!bitmap){
 		printf("NULL bitmap passed to DumpBitmap\n");
@@ -1212,7 +1212,7 @@ DumpBitmap(const BBitmap *bitmap)
 	printf("data length %ld \n", length);
 
 	int32 columns = (int32)bitmap->Bounds().Width() + 1;
-	const unsigned char *bitPtr = (const unsigned char *)bitmap->Bits();
+	const unsigned char* bitPtr = (const unsigned char*)bitmap->Bits();
 	for (; length >= 0; length--) {
 		for (int32 columnIndex = 0; columnIndex < columns;
 			columnIndex++, length--)
@@ -1242,7 +1242,7 @@ IconCache::InitHiliteTable()
 }
 
 
-BBitmap *
+BBitmap*
 IconCache::MakeTransformedIcon(const BBitmap* source, icon_size /*size*/,
 	int32 colorTransformTable[], LazyBitmapAllocator* lazyBitmap)
 {
@@ -1306,15 +1306,15 @@ IconCache::MakeTransformedIcon(const BBitmap* source, icon_size /*size*/,
 
 
 bool
-IconCache::IconHitTest(BPoint where, const Model *model, IconDrawMode mode,
+IconCache::IconHitTest(BPoint where, const Model* model, IconDrawMode mode,
 	icon_size size)
 {
 	AutoLock<SimpleIconCache> nodeCacheLocker(&fNodeCache, false);
 	AutoLock<SimpleIconCache> sharedCacheLocker(&fSharedCache, false);
 
-	AutoLock<SimpleIconCache> *resultingCacheLocker;
-	IconCacheEntry *entry = Preload(&nodeCacheLocker, &sharedCacheLocker,
-		&resultingCacheLocker, const_cast<Model *>(model), mode, size, false);
+	AutoLock<SimpleIconCache>* resultingCacheLocker;
+	IconCacheEntry* entry = Preload(&nodeCacheLocker, &sharedCacheLocker,
+		&resultingCacheLocker, const_cast<Model*>(model), mode, size, false);
 		// Preload finds/creates the appropriate entry, locking down the
 		// cache it is in and returns the whole state back to here
 
@@ -1326,7 +1326,7 @@ IconCache::IconHitTest(BPoint where, const Model *model, IconDrawMode mode,
 
 
 void
-IconCacheEntry::RetireIcons(BObjectList<BBitmap> *retiredBitmapList)
+IconCacheEntry::RetireIcons(BObjectList<BBitmap>* retiredBitmapList)
 {
 	if (fLargeIcon) {
 		retiredBitmapList->AddItem(fLargeIcon);
@@ -1379,31 +1379,31 @@ SharedIconCache::SharedIconCache()
 
 
 void
-SharedIconCache::Draw(IconCacheEntry *entry, BView *view, BPoint where,
+SharedIconCache::Draw(IconCacheEntry* entry, BView* view, BPoint where,
 	IconDrawMode mode, icon_size size, bool async)
 {
-	((SharedCacheEntry *)entry)->Draw(view, where, mode, size, async);
+	((SharedCacheEntry*)entry)->Draw(view, where, mode, size, async);
 }
 
 
 void
-SharedIconCache::Draw(IconCacheEntry *entry, BView *view, BPoint where,
-	IconDrawMode mode, icon_size size, void (*blitFunc)(BView *, BPoint,
-	BBitmap *, void *), void *passThruState)
+SharedIconCache::Draw(IconCacheEntry* entry, BView* view, BPoint where,
+	IconDrawMode mode, icon_size size, void (*blitFunc)(BView*, BPoint,
+	BBitmap*, void*), void* passThruState)
 {
-	((SharedCacheEntry *)entry)->Draw(view, where, mode, size,
+	((SharedCacheEntry*)entry)->Draw(view, where, mode, size,
 		blitFunc, passThruState);
 }
 
 
-SharedCacheEntry *
-SharedIconCache::FindItem(const char *fileType, const char *appSignature) const
+SharedCacheEntry*
+SharedIconCache::FindItem(const char* fileType, const char* appSignature) const
 {
 	ASSERT(fileType);
 	if (!fileType)
 		fileType = B_FILE_MIMETYPE;
 
-	SharedCacheEntry *result = fHashTable.FindFirst(SharedCacheEntry::Hash(fileType,
+	SharedCacheEntry* result = fHashTable.FindFirst(SharedCacheEntry::Hash(fileType,
 		appSignature));
 
 	if (!result)
@@ -1416,30 +1416,30 @@ SharedIconCache::FindItem(const char *fileType, const char *appSignature) const
 		if (result->fNext < 0)
 			break;
 
-		result = const_cast<SharedCacheEntry *>(&fElementArray.At(result->fNext));
+		result = const_cast<SharedCacheEntry*>(&fElementArray.At(result->fNext));
 	}
 
 	return NULL;
 }
 
 
-SharedCacheEntry *
-SharedIconCache::AddItem(const char *fileType, const char *appSignature)
+SharedCacheEntry*
+SharedIconCache::AddItem(const char* fileType, const char* appSignature)
 {
 	ASSERT(fileType);
 	if (!fileType)
 		fileType = B_FILE_MIMETYPE;
 
-	SharedCacheEntry *result = fHashTable.Add(SharedCacheEntry::Hash(fileType,
+	SharedCacheEntry* result = fHashTable.Add(SharedCacheEntry::Hash(fileType,
 		appSignature));
 	result->SetTo(fileType, appSignature);
 	return result;
 }
 
 
-SharedCacheEntry *
-SharedIconCache::AddItem(SharedCacheEntry **outstandingEntry, const char *fileType,
-	const char *appSignature)
+SharedCacheEntry*
+SharedIconCache::AddItem(SharedCacheEntry** outstandingEntry, const char* fileType,
+	const char* appSignature)
 {
 	int32 entryToken = fHashTable.ElementIndex(*outstandingEntry);
 	ASSERT(entryToken >= 0);
@@ -1448,7 +1448,7 @@ SharedIconCache::AddItem(SharedCacheEntry **outstandingEntry, const char *fileTy
 	if (!fileType)
 		fileType = B_FILE_MIMETYPE;
 
-	SharedCacheEntry *result = fHashTable.Add(SharedCacheEntry::Hash(fileType,
+	SharedCacheEntry* result = fHashTable.Add(SharedCacheEntry::Hash(fileType,
 		appSignature));
 	result->SetTo(fileType, appSignature);
 	*outstandingEntry = fHashTable.ElementAt(entryToken);
@@ -1458,7 +1458,7 @@ SharedIconCache::AddItem(SharedCacheEntry **outstandingEntry, const char *fileTy
 
 
 void
-SharedIconCache::IconChanged(SharedCacheEntry *entry)
+SharedIconCache::IconChanged(SharedCacheEntry* entry)
 {
 	// by now there should be no aliases to entry, just remove entry
 	// itself
@@ -1473,7 +1473,7 @@ SharedIconCache::RemoveAliasesTo(int32 aliasIndex)
 {
 	int32 count = fHashTable.VectorSize();
 	for (int32 index = 0; index < count; index++) {
-		SharedCacheEntry *entry = fHashTable.ElementAt(index);
+		SharedCacheEntry* entry = fHashTable.ElementAt(index);
 		if (entry->fAliasForIndex == aliasIndex)
 			fHashTable.Remove(entry);
 	}
@@ -1481,7 +1481,7 @@ SharedIconCache::RemoveAliasesTo(int32 aliasIndex)
 
 
 void
-SharedIconCache::SetAliasFor(IconCacheEntry *alias, const SharedCacheEntry *original) const
+SharedIconCache::SetAliasFor(IconCacheEntry* alias, const SharedCacheEntry* original) const
 {
 	alias->fAliasForIndex = fHashTable.ElementIndex(original);
 }
@@ -1493,7 +1493,7 @@ SharedCacheEntry::SharedCacheEntry()
 }
 
 
-SharedCacheEntry::SharedCacheEntry(const char *fileType, const char *appSignature)
+SharedCacheEntry::SharedCacheEntry(const char* fileType, const char* appSignature)
 	:	fNext(-1),
 		fFileType(fileType),
 		fAppSignature(appSignature)
@@ -1529,10 +1529,10 @@ SharedCacheEntry::Draw(BView* view, BPoint where, IconDrawMode mode, icon_size s
 
 
 void
-SharedCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size size,
-	void (*blitFunc)(BView *, BPoint ,BBitmap *, void *), void *passThruState)
+SharedCacheEntry::Draw(BView* view, BPoint where, IconDrawMode mode, icon_size size,
+	void (*blitFunc)(BView*, BPoint, BBitmap*, void*), void* passThruState)
 {
-	BBitmap *bitmap = IconForMode(mode, size);
+	BBitmap* bitmap = IconForMode(mode, size);
 	if (!bitmap)
 		return;
 
@@ -1548,7 +1548,7 @@ SharedCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size s
 
 
 uint32
-SharedCacheEntry::Hash(const char *fileType, const char *appSignature)
+SharedCacheEntry::Hash(const char* fileType, const char* appSignature)
 {
 	uint32 hash = HashString(fileType, 0);
 	if (appSignature && appSignature[0])
@@ -1577,7 +1577,7 @@ SharedCacheEntry::operator==(const SharedCacheEntry &entry) const
 
 
 void
-SharedCacheEntry::SetTo(const char *fileType, const char *appSignature)
+SharedCacheEntry::SetTo(const char* fileType, const char* appSignature)
 {
 	fFileType = fileType;
 	fAppSignature = appSignature;
@@ -1590,7 +1590,7 @@ SharedCacheEntryArray::SharedCacheEntryArray(int32 initialSize)
 }
 
 
-SharedCacheEntry *
+SharedCacheEntry*
 SharedCacheEntryArray::Add()
 {
 	return OpenHashElementArray<SharedCacheEntry>::Add();
@@ -1607,7 +1607,7 @@ NodeCacheEntry::NodeCacheEntry(bool permanent)
 }
 
 
-NodeCacheEntry::NodeCacheEntry(const node_ref *node, bool permanent)
+NodeCacheEntry::NodeCacheEntry(const node_ref* node, bool permanent)
 	:	fNext(-1),
 		fRef(*node),
 		fPermanent(permanent)
@@ -1616,10 +1616,10 @@ NodeCacheEntry::NodeCacheEntry(const node_ref *node, bool permanent)
 
 
 void
-NodeCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size size,
+NodeCacheEntry::Draw(BView* view, BPoint where, IconDrawMode mode, icon_size size,
 	bool async)
 {
-	BBitmap *bitmap = IconForMode(mode, size);
+	BBitmap* bitmap = IconForMode(mode, size);
 	if (!bitmap)
 		return;
 
@@ -1646,10 +1646,10 @@ NodeCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size siz
 
 
 void
-NodeCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size size,
-	void (*blitFunc)(BView *, BPoint ,BBitmap *, void *), void *passThruState)
+NodeCacheEntry::Draw(BView* view, BPoint where, IconDrawMode mode, icon_size size,
+	void (*blitFunc)(BView*, BPoint, BBitmap*, void*), void* passThruState)
 {
-	BBitmap *bitmap = IconForMode(mode, size);
+	BBitmap* bitmap = IconForMode(mode, size);
 	if (!bitmap)
 		return;
 
@@ -1664,7 +1664,7 @@ NodeCacheEntry::Draw(BView *view, BPoint where, IconDrawMode mode, icon_size siz
 }
 
 
-const node_ref *
+const node_ref*
 NodeCacheEntry::Node() const
 {
 	return &fRef;
@@ -1679,10 +1679,10 @@ NodeCacheEntry::Hash() const
 
 
 uint32
-NodeCacheEntry::Hash(const node_ref *node)
+NodeCacheEntry::Hash(const node_ref* node)
 {
-	return node->device ^ ((uint32 *)&node->node)[0]
-		^ ((uint32 *)&node->node)[1];
+	return node->device ^ ((uint32*)&node->node)[0]
+		^ ((uint32*)&node->node)[1];
 }
 
 
@@ -1694,7 +1694,7 @@ NodeCacheEntry::operator==(const NodeCacheEntry &entry) const
 
 
 void
-NodeCacheEntry::SetTo(const node_ref *node)
+NodeCacheEntry::SetTo(const node_ref* node)
 {
 	fRef = *node;
 }
@@ -1733,28 +1733,28 @@ NodeIconCache::NodeIconCache()
 
 
 void
-NodeIconCache::Draw(IconCacheEntry *entry, BView *view, BPoint where,
+NodeIconCache::Draw(IconCacheEntry* entry, BView* view, BPoint where,
 	IconDrawMode mode, icon_size size, bool async)
 {
 
-	((NodeCacheEntry *)entry)->Draw(view, where, mode, size, async);
+	((NodeCacheEntry*)entry)->Draw(view, where, mode, size, async);
 }
 
 
 void
-NodeIconCache::Draw(IconCacheEntry *entry, BView *view, BPoint where,
-	IconDrawMode mode, icon_size size, void (*blitFunc)(BView *, BPoint,
-	BBitmap *, void *), void *passThruState)
+NodeIconCache::Draw(IconCacheEntry* entry, BView* view, BPoint where,
+	IconDrawMode mode, icon_size size, void (*blitFunc)(BView*, BPoint,
+	BBitmap*, void*), void* passThruState)
 {
-	((NodeCacheEntry *)entry)->Draw(view, where, mode, size,
+	((NodeCacheEntry*)entry)->Draw(view, where, mode, size,
 		blitFunc, passThruState);
 }
 
 
-NodeCacheEntry *
-NodeIconCache::FindItem(const node_ref *node) const
+NodeCacheEntry*
+NodeIconCache::FindItem(const node_ref* node) const
 {
-	NodeCacheEntry *result = fHashTable.FindFirst(NodeCacheEntry::Hash(node));
+	NodeCacheEntry* result = fHashTable.FindFirst(NodeCacheEntry::Hash(node));
 
 	if (!result)
 		return NULL;
@@ -1766,17 +1766,17 @@ NodeIconCache::FindItem(const node_ref *node) const
 		if (result->fNext < 0)
 			break;
 
-		result = const_cast<NodeCacheEntry *>(&fElementArray.At(result->fNext));
+		result = const_cast<NodeCacheEntry*>(&fElementArray.At(result->fNext));
 	}
 
 	return NULL;
 }
 
 
-NodeCacheEntry *
-NodeIconCache::AddItem(const node_ref *node, bool permanent)
+NodeCacheEntry*
+NodeIconCache::AddItem(const node_ref* node, bool permanent)
 {
-	NodeCacheEntry *result = fHashTable.Add(NodeCacheEntry::Hash(node));
+	NodeCacheEntry* result = fHashTable.Add(NodeCacheEntry::Hash(node));
 	result->SetTo(node);
 	if (permanent)
 		result->MakePermanent();
@@ -1785,12 +1785,12 @@ NodeIconCache::AddItem(const node_ref *node, bool permanent)
 }
 
 
-NodeCacheEntry *
-NodeIconCache::AddItem(NodeCacheEntry **outstandingEntry, const node_ref *node)
+NodeCacheEntry*
+NodeIconCache::AddItem(NodeCacheEntry** outstandingEntry, const node_ref* node)
 {
 	int32 entryToken = fHashTable.ElementIndex(*outstandingEntry);
 
-	NodeCacheEntry *result = fHashTable.Add(NodeCacheEntry::Hash(node));
+	NodeCacheEntry* result = fHashTable.Add(NodeCacheEntry::Hash(node));
 	result->SetTo(node);
 	*outstandingEntry = fHashTable.ElementAt(entryToken);
 
@@ -1799,9 +1799,9 @@ NodeIconCache::AddItem(NodeCacheEntry **outstandingEntry, const node_ref *node)
 
 
 void
-NodeIconCache::Deleting(const node_ref *node)
+NodeIconCache::Deleting(const node_ref* node)
 {
-	NodeCacheEntry *entry = FindItem(node);
+	NodeCacheEntry* entry = FindItem(node);
 	ASSERT(entry);
 	if (!entry || entry->Permanent())
 		return;
@@ -1811,9 +1811,9 @@ NodeIconCache::Deleting(const node_ref *node)
 
 
 void
-NodeIconCache::Removing(const node_ref *node)
+NodeIconCache::Removing(const node_ref* node)
 {
-	NodeCacheEntry *entry = FindItem(node);
+	NodeCacheEntry* entry = FindItem(node);
 	ASSERT(entry);
 	if (!entry)
 		return;
@@ -1823,7 +1823,7 @@ NodeIconCache::Removing(const node_ref *node)
 
 
 void
-NodeIconCache::Deleting(const BView *)
+NodeIconCache::Deleting(const BView*)
 {
 #ifdef NODE_CACHE_ASYNC_DRAWS
 	TRESPASS();
@@ -1832,7 +1832,7 @@ NodeIconCache::Deleting(const BView *)
 
 
 void
-NodeIconCache::IconChanged(const Model *model)
+NodeIconCache::IconChanged(const Model* model)
 {
 	Deleting(model->NodeRef());
 }
@@ -1843,7 +1843,7 @@ NodeIconCache::RemoveAliasesTo(int32 aliasIndex)
 {
 	int32 count = fHashTable.VectorSize();
 	for (int32 index = 0; index < count; index++) {
-		NodeCacheEntry *entry = fHashTable.ElementAt(index);
+		NodeCacheEntry* entry = fHashTable.ElementAt(index);
 		if (entry->fAliasForIndex == aliasIndex)
 			fHashTable.Remove(entry);
 	}
@@ -1859,7 +1859,7 @@ NodeCacheEntryArray::NodeCacheEntryArray(int32 initialSize)
 }
 
 
-NodeCacheEntry *
+NodeCacheEntry*
 NodeCacheEntryArray::Add()
 {
 	return OpenHashElementArray<NodeCacheEntry>::Add();
@@ -1869,14 +1869,14 @@ NodeCacheEntryArray::Add()
 //	#pragma mark -
 
 
-SimpleIconCache::SimpleIconCache(const char *name)
+SimpleIconCache::SimpleIconCache(const char* name)
 	:	fLock(name)
 {
 }
 
 
 void
-SimpleIconCache::Draw(IconCacheEntry *, BView *, BPoint, IconDrawMode ,
+SimpleIconCache::Draw(IconCacheEntry*, BView*, BPoint, IconDrawMode ,
 	icon_size , bool )
 {
 	TRESPASS();
@@ -1885,8 +1885,8 @@ SimpleIconCache::Draw(IconCacheEntry *, BView *, BPoint, IconDrawMode ,
 
 
 void
-SimpleIconCache::Draw(IconCacheEntry *, BView *, BPoint, IconDrawMode, icon_size,
-	void(*)(BView *, BPoint, BBitmap *, void *), void *)
+SimpleIconCache::Draw(IconCacheEntry*, BView*, BPoint, IconDrawMode, icon_size,
+	void(*)(BView*, BPoint, BBitmap*, void*), void*)
 {
 	TRESPASS();
 	// pure virtual, do nothing
@@ -1934,7 +1934,7 @@ LazyBitmapAllocator::~LazyBitmapAllocator()
 }
 
 
-BBitmap *
+BBitmap*
 LazyBitmapAllocator::Get()
 {
 	if (!fBitmap)
@@ -1944,16 +1944,16 @@ LazyBitmapAllocator::Get()
 }
 
 
-BBitmap *
+BBitmap*
 LazyBitmapAllocator::Adopt()
 {
 	if (!fBitmap)
 		Get();
 
-	BBitmap *result = fBitmap;
+	BBitmap* result = fBitmap;
 	fBitmap = NULL;
 	return result;
 }
 
 
-IconCache *IconCache::sIconCache;
+IconCache* IconCache::sIconCache;

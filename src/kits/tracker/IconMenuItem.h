@@ -31,17 +31,19 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
+#ifndef ICON_MENU_ITEM_H
+#define ICON_MENU_ITEM_H
+
 
 // Menu item class with small icons.
 
-#ifndef	ICON_MENU_ITEM_H
-#define ICON_MENU_ITEM_H
 
 #include <MenuItem.h>
 #include "Model.h"
 #include "Utilities.h"
-class BNodeInfo;
 
+
+class BNodeInfo;
 
 namespace BPrivate {
 
@@ -49,19 +51,19 @@ const bigtime_t kSynchMenuInvokeTimeout = 5000000;
 
 class IconMenuItem : public PositionPassingMenuItem {
 	public:
-		IconMenuItem(const char *label, BMessage *message, BBitmap *icon);
-		IconMenuItem(const char *label, BMessage *message, const char *iconType,
+		IconMenuItem(const char* label, BMessage* message, BBitmap* icon);
+		IconMenuItem(const char* label, BMessage* message, const char* iconType,
 			icon_size which);
-		IconMenuItem(const char *label, BMessage *message,
-			const BNodeInfo *nodeInfo, icon_size which);
-		IconMenuItem(BMenu *, BMessage *, const char *iconType, icon_size which);
+		IconMenuItem(const char* label, BMessage* message,
+			const BNodeInfo* nodeInfo, icon_size which);
+		IconMenuItem(BMenu*, BMessage*, const char* iconType, icon_size which);
 		virtual ~IconMenuItem();
 
-		virtual void GetContentSize(float *width, float *height);	
+		virtual void GetContentSize(float* width, float* height);
 		virtual void DrawContent();
 
 	private:
-		BBitmap *fDeviceIcon;
+		BBitmap* fDeviceIcon;
 		float fHeightDelta;
 
 		typedef BMenuItem _inherited;
@@ -70,20 +72,20 @@ class IconMenuItem : public PositionPassingMenuItem {
 
 class ModelMenuItem : public BMenuItem {
 	public:
-		ModelMenuItem(const Model *, const char *title, BMessage *, char shortcut = '\0',
+		ModelMenuItem(const Model*, const char* title, BMessage*, char shortcut = '\0',
 			uint32 modifiers = 0, bool drawText = true, bool extraPad = false);
-		ModelMenuItem(const Model *, BMenu *, bool drawText = true, bool extraPad = false);
+		ModelMenuItem(const Model*, BMenu*, bool drawText = true, bool extraPad = false);
 		virtual ~ModelMenuItem();
 
-		virtual	status_t SetEntry(const BEntry *);
+		virtual	status_t SetEntry(const BEntry*);
 		virtual	void DrawContent();
 		virtual	void Highlight(bool isHighlighted);
-		virtual	void GetContentSize(float *width, float *height);
+		virtual	void GetContentSize(float* width, float* height);
 
-		const Model *TargetModel() const;
+		const Model* TargetModel() const;
 
 	protected:
-		virtual status_t Invoke(BMessage * = NULL);
+		virtual status_t Invoke(BMessage* = NULL);
 			// overriden to support B_OPTION_KEY
 
 	private:
@@ -98,7 +100,7 @@ class ModelMenuItem : public BMenuItem {
 };
 
 
-inline const Model *
+inline const Model*
 ModelMenuItem::TargetModel() const
 {
 	 return &fModel;
@@ -107,7 +109,7 @@ ModelMenuItem::TargetModel() const
 
 class SpecialModelMenuItem : public ModelMenuItem {
 	public:
-		SpecialModelMenuItem(const Model *model, BMenu *menu);
+		SpecialModelMenuItem(const Model* model, BMenu* menu);
 
 		virtual	void DrawContent();
 

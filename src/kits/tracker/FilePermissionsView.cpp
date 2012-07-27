@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "FilePermissionsView.h"
 
 #include <stdio.h>
@@ -50,7 +51,7 @@ const uint32 kNewGroupEntered = 'nwgr';
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FilePermissionsView"
 
-FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
+FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	:	BView(rect, "FilePermissionsView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
 		fModel(model)
 {
@@ -58,7 +59,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 	const float kColumnLabelMiddle = 77, kColumnLabelTop = 6, kColumnLabelSpacing = 37,
 		kColumnLabelBottom = 20, kColumnLabelWidth = 35, kAttribFontHeight = 10;
 
-	BStringView *strView;
+	BStringView* strView;
 
 	strView = new BStringView(BRect(kColumnLabelMiddle - kColumnLabelWidth / 2,
 		kColumnLabelTop, kColumnLabelMiddle + kColumnLabelWidth / 2, kColumnLabelBottom),
@@ -116,7 +117,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 		kHorizontalSpacing = kColumnLabelSpacing, kVerticalSpacing = kRowLabelVerticalSpacing,
 		kCheckBoxWidth = 18, kCheckBoxHeight = 18;
 
-	FocusCheckBox **checkBoxArray[3][3] = {
+	FocusCheckBox** checkBoxArray[3][3] = {
 		{ &fReadUserCheckBox, &fReadGroupCheckBox, &fReadOtherCheckBox },
 		{ &fWriteUserCheckBox, &fWriteGroupCheckBox, &fWriteOtherCheckBox },
 		{ &fExecuteUserCheckBox, &fExecuteGroupCheckBox, &fExecuteOtherCheckBox }};
@@ -172,7 +173,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 
 
 void
-FilePermissionsView::ModelChanged(Model *model)
+FilePermissionsView::ModelChanged(Model* model)
 {
 	fModel = model;
 
@@ -270,7 +271,7 @@ FilePermissionsView::ModelChanged(Model *model)
 
 
 void
-FilePermissionsView::MessageReceived(BMessage *message)
+FilePermissionsView::MessageReceived(BMessage* message)
 {
 	switch(message->what) {
 		case kPermissionsChanged:
@@ -358,4 +359,3 @@ FilePermissionsView::AttachedToWindow()
 	fOwnerTextControl->SetTarget(this);
 	fGroupTextControl->SetTarget(this);
 }
-

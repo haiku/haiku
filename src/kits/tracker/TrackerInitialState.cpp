@@ -36,6 +36,7 @@ All rights reserved.
 // add code to initialize a subset of the mime database, including
 // important sniffer rules
 
+
 #include <Alert.h>
 #include <Catalog.h>
 #include <Directory.h>
@@ -62,6 +63,7 @@ All rights reserved.
 #include "QueryContainerWindow.h"
 #include "Tracker.h"
 
+
 enum {
 	kForceLargeIcon = 0x1,
 	kForceMiniIcon = 0x2,
@@ -71,23 +73,23 @@ enum {
 };
 
 
-const char *kAttrName = "META:name";
-const char *kAttrCompany = "META:company";
-const char *kAttrAddress = "META:address";
-const char *kAttrCity = "META:city";
-const char *kAttrState = "META:state";
-const char *kAttrZip = "META:zip";
-const char *kAttrCountry = "META:country";
-const char *kAttrHomePhone = "META:hphone";
-const char *kAttrWorkPhone = "META:wphone";
-const char *kAttrFax = "META:fax";
-const char *kAttrEmail = "META:email";
-const char *kAttrURL = "META:url";
-const char *kAttrGroup = "META:group";
-const char *kAttrNickname = "META:nickname";
+const char* kAttrName = "META:name";
+const char* kAttrCompany = "META:company";
+const char* kAttrAddress = "META:address";
+const char* kAttrCity = "META:city";
+const char* kAttrState = "META:state";
+const char* kAttrZip = "META:zip";
+const char* kAttrCountry = "META:country";
+const char* kAttrHomePhone = "META:hphone";
+const char* kAttrWorkPhone = "META:wphone";
+const char* kAttrFax = "META:fax";
+const char* kAttrEmail = "META:email";
+const char* kAttrURL = "META:url";
+const char* kAttrGroup = "META:group";
+const char* kAttrNickname = "META:nickname";
 
-const char *kNetPositiveSignature = "application/x-vnd.Be-NPOS";
-const char *kPeopleSignature = "application/x-vnd.Be-PEPL";
+const char* kNetPositiveSignature = "application/x-vnd.Be-NPOS";
+const char* kPeopleSignature = "application/x-vnd.Be-PEPL";
 
 // the following templates are in big endian and we rely on the Tracker
 // translation support to swap them on little endian machines
@@ -102,13 +104,15 @@ const int32 kDefaultQueryTemplateCount = 3;
 const AttributeTemplate kDefaultQueryTemplate[] =
 	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/application_octet-stream */
 {
-	{		 /* default frame */
+	{
+		// default frame
 		kAttrWindowFrame,
 		B_RECT_TYPE,
 		16,
-		(const char *)&kDefaultFrame
+		(const char*)&kDefaultFrame
 	},
-	{		 /* attr: _trk/viewstate */
+	{
+		// attr: _trk/viewstate
 		kAttrViewState_be,
 		B_RAW_TYPE,
 		49,
@@ -116,7 +120,8 @@ const AttributeTemplate kDefaultQueryTemplate[] =
 		"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000\000"
 		"\000\000\000\000\000\000"
 	},
-	{		 /* attr: _trk/columns */
+	{
+		// attr: _trk/columns
 		kAttrColumns_be,
 		B_RAW_TYPE,
 		223,
@@ -135,13 +140,15 @@ const AttributeTemplate kDefaultQueryTemplate[] =
 const AttributeTemplate kBookmarkQueryTemplate[] =
 	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/application_x-vnd.Be-bookmark */
 {
-	{		 /* default frame */
+	{
+		// default frame
 		kAttrWindowFrame,
 		B_RECT_TYPE,
 		16,
-		(const char *)&kDefaultFrame
+		(const char*)&kDefaultFrame
 	},
-	{		 /* attr: _trk/viewstate */
+	{
+		// attr: _trk/viewstate
 		kAttrViewState_be,
 		B_RAW_TYPE,
 		49,
@@ -149,7 +156,8 @@ const AttributeTemplate kBookmarkQueryTemplate[] =
 		"\000\000\000\000\000\000\000\000\000\000w\373\175RCSTR\000\000\000"
 		"\000\000\000\000\000\000"
 	},
-	{		 /* attr: _trk/columns */
+	{
+		// attr: _trk/columns
 		kAttrColumns_be,
 		B_RAW_TYPE,
 		163,
@@ -166,13 +174,15 @@ const AttributeTemplate kBookmarkQueryTemplate[] =
 const AttributeTemplate kPersonQueryTemplate[] =
 	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/application_x-vnd.Be-bookmark */
 {
-	{		 /* default frame */
+	{
+		// default frame
 		kAttrWindowFrame,
 		B_RECT_TYPE,
 		16,
-		(const char *)&kDefaultFrame
+		(const char*)&kDefaultFrame
 	},
-	{		 /* attr: _trk/viewstate */
+	{
+		// attr: _trk/viewstate
 		kAttrViewState_be,
 		B_RAW_TYPE,
 		49,
@@ -180,7 +190,8 @@ const AttributeTemplate kPersonQueryTemplate[] =
 		"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000\000"
 		"\000\000\000\000\000\000"
 	},
-	{		 /* attr: _trk/columns */
+	{
+		// attr: _trk/columns
 		kAttrColumns_be,
 		B_RAW_TYPE,
 		230,
@@ -199,13 +210,15 @@ const AttributeTemplate kPersonQueryTemplate[] =
 const AttributeTemplate kEmailQueryTemplate[] =
 	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/text_x-email */
 {
-	{		 /* default frame */
+	{
+		// default frame
 		kAttrWindowFrame,
 		B_RECT_TYPE,
 		16,
-		(const char *)&kDefaultFrame
+		(const char*)&kDefaultFrame
 	},
-	{		 /* attr: _trk/viewstate */
+	{
+		// attr: _trk/viewstate
 		kAttrViewState_be,
 		B_RAW_TYPE,
 		49,
@@ -213,7 +226,8 @@ const AttributeTemplate kEmailQueryTemplate[] =
 		"\000\000\000\000\000\000\000\000\000\000\366_\377ETIME\000\000\000"
 		"\000\000\000\000\000\000"
 	},
-	{		 /* attr: _trk/columns */
+	{
+		// attr: _trk/columns
 		kAttrColumns_be,
 		B_RAW_TYPE,
 		222,
@@ -234,10 +248,10 @@ namespace BPrivate {
 
 class ExtraAttributeLazyInstaller {
 public:
-	ExtraAttributeLazyInstaller(const char *type);
+	ExtraAttributeLazyInstaller(const char* type);
 	~ExtraAttributeLazyInstaller();
 
-	bool AddExtraAttribute(const char *publicName, const char *name,
+	bool AddExtraAttribute(const char* publicName, const char* name,
 		uint32 type, bool viewable, bool editable, float width,
 		int32 alignment, bool extra);
 
@@ -251,7 +265,7 @@ public:
 }	// namespace BPrivate
 
 
-ExtraAttributeLazyInstaller::ExtraAttributeLazyInstaller(const char *type)
+ExtraAttributeLazyInstaller::ExtraAttributeLazyInstaller(const char* type)
 	:
 	fMimeType(type),
 	fDirty(false)
@@ -269,12 +283,12 @@ ExtraAttributeLazyInstaller::~ExtraAttributeLazyInstaller()
 
 
 bool
-ExtraAttributeLazyInstaller::AddExtraAttribute(const char *publicName,
-	const char *name, uint32 type, bool viewable, bool editable, float width,
+ExtraAttributeLazyInstaller::AddExtraAttribute(const char* publicName,
+	const char* name, uint32 type, bool viewable, bool editable, float width,
 	int32 alignment, bool extra)
 {
 	for (int32 index = 0; ; index++) {
-		const char *oldPublicName;
+		const char* oldPublicName;
 		if (fExtraAttrs.FindString("attr:public_name", index, &oldPublicName) != B_OK)
 			break;
 
@@ -317,7 +331,7 @@ InstallTemporaryBackgroundImages(BNode* node, BMessage* message)
 
 
 static void
-AddTemporaryBackgroundImages(BMessage *message, const char *imagePath,
+AddTemporaryBackgroundImages(BMessage* message, const char* imagePath,
 	BackgroundImage::Mode mode, BPoint offset, uint32 workspaces,
 	bool textWidgetOutlines)
 {
@@ -336,9 +350,9 @@ AddTemporaryBackgroundImages(BMessage *message, const char *imagePath,
 #define B_TRANSLATION_CONTEXT "TrackerInitialState"
 
 bool
-TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
-	const char *shortDescription, const char *longDescription,
-	const char *preferredAppSignature, uint32 forceMask)
+TTracker::InstallMimeIfNeeded(const char* type, int32 bitsID,
+	const char* shortDescription, const char* longDescription,
+	const char* preferredAppSignature, uint32 forceMask)
 {
 	// used by InitMimeTypes - checks if a metamime of a given <type> is
 	// installed and if it has all the specified attributes; if not, the
