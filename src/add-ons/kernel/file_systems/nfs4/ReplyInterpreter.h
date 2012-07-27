@@ -69,6 +69,7 @@ public:
 
 			status_t	Access(uint32* supported, uint32* allowed);
 			status_t	Close();
+			status_t	Commit();
 			status_t	Create(uint64* before, uint64* after, bool& atomic);
 			status_t	GetAttr(AttrValue** attrs, uint32* count);
 			status_t	GetFH(FileHandle* fh);

@@ -33,6 +33,7 @@ public:
 			status_t				Access();
 			status_t				Close(uint32 seq, const uint32* id,
 										uint32 stateSeq);
+			status_t				Commit(uint64 offset, uint32 count);
 			status_t				Create(FileType type, const char* name,
 										AttrValue* attr, uint32 count,
 										const char* path = NULL);

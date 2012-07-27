@@ -472,6 +472,7 @@ nfs4_free_cookie(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
 	file_cache_sync(inode->FileCache());
+	inode->Commit();
 	inode->Close(cookie);
 	delete cookie;
 

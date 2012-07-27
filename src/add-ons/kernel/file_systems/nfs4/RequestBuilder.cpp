@@ -90,6 +90,24 @@ RequestBuilder::Close(uint32 seq, const uint32* id, uint32 stateSeq)
 
 
 status_t
+RequestBuilder::Commit(uint64 offset, uint32 count)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpCommit);
+	fRequest->Stream().AddUHyper(offset);
+	fRequest->Stream().AddUInt(count);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::Create(FileType type, const char* name, AttrValue* attr,
 	uint32 count, const char* path)
 {
@@ -729,7 +747,7 @@ RequestBuilder::Write(const uint32* id, uint32 stateSeq, const void* buffer,
 	fRequest->Stream().AddUInt(id[1]);
 	fRequest->Stream().AddUInt(id[2]);
 	fRequest->Stream().AddUHyper(pos);
-	fRequest->Stream().AddInt(FILE_SYNC4);
+	fRequest->Stream().AddInt(UNSTABLE4);
 	fRequest->Stream().AddOpaque(buffer, len);
 
 	fOpCount++;

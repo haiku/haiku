@@ -126,6 +126,19 @@ ReplyInterpreter::Close()
 
 
 status_t
+ReplyInterpreter::Commit()
+{
+	status_t res = _OperationError(OpCommit);
+	if (res != B_OK)
+		return res;
+
+	fReply->Stream().GetOpaque(NULL);
+
+	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
 ReplyInterpreter::Create(uint64* before, uint64* after, bool& atomic)
 {
 	status_t res = _OperationError(OpCreate);

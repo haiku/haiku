@@ -456,3 +456,29 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 	return B_OK;
 }
 
+
+status_t
+Inode::Commit()
+{
+	do {
+		RPC::Server* serv = fFileSystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fInfo.fHandle);
+		req.Commit(0, 0);
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		if (_HandleErrors(reply.NFS4Error(), serv))
+			continue;
+
+		reply.PutFH();
+		return reply.Commit();
+	} while (true);
+}
+
