@@ -261,6 +261,14 @@ TeamMonitorWindow::~TeamMonitorWindow()
 
 
 void
+TeamMonitorWindow::Show()
+{
+	fListView->MakeFocus();
+	BWindow::Show();
+}
+
+
+void
 TeamMonitorWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
@@ -416,8 +424,6 @@ TeamMonitorWindow::UpdateList()
 	}
 
 	fRestartButton->SetEnabled(!desktopRunning);
-
-	fListView->MakeFocus();
 }
 
 

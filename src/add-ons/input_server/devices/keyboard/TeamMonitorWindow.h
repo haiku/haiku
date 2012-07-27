@@ -27,6 +27,7 @@ public:
 	virtual					~TeamMonitorWindow();
 
 	virtual void			MessageReceived(BMessage* message);
+	virtual void			Show();
 	virtual bool			QuitRequested();
 
 			void			Enable();
