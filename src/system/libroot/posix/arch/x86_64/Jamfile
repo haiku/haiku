@@ -8,7 +8,7 @@ local genericSources =
 ;
 
 MergeObject posix_arch_$(TARGET_ARCH).o :
-	#fenv.c
+	fenv.c
 	sigsetjmp.S
 	siglongjmp.S
 
