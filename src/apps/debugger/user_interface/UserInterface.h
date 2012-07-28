@@ -68,11 +68,11 @@ public:
 
 class UserInterfaceListener {
 public:
-	enum QuitOption {
-		QUIT_OPTION_ASK_USER,
-		QUIT_OPTION_ASK_KILL_TEAM,
-		QUIT_OPTION_ASK_RESUME_TEAM
-	};
+			enum QuitOption {
+				QUIT_OPTION_ASK_USER,
+				QUIT_OPTION_ASK_KILL_TEAM,
+				QUIT_OPTION_ASK_RESUME_TEAM
+			};
 
 public:
 	virtual						~UserInterfaceListener();
