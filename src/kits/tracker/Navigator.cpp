@@ -58,8 +58,8 @@ static const int32 kMaxHistory = 32;
 static BPicture sPicture;
 
 
-BNavigatorButton::BNavigatorButton(BRect rect, const char* name, BMessage* message,
-	int32 resIDon, int32 resIDoff, int32 resIDdisabled)
+BNavigatorButton::BNavigatorButton(BRect rect, const char* name,
+	BMessage* message, int32 resIDon, int32 resIDoff, int32 resIDdisabled)
 	:	BPictureButton(rect, name, &sPicture, &sPicture, message),
 		fResIDOn(resIDon),
 		fResIDOff(resIDoff),
@@ -81,17 +81,20 @@ void
 BNavigatorButton::AttachedToWindow()
 {
 	BBitmap* bmpOn = 0;
-	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, fResIDOn, &bmpOn);
+	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, fResIDOn,
+		&bmpOn);
 	SetPicture(bmpOn, true, true);
 	delete bmpOn;
 	
 	BBitmap* bmpOff = 0;
-	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, fResIDOff, &bmpOff);
+	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, fResIDOff,
+		&bmpOff);
 	SetPicture(bmpOff, true, false);
 	delete bmpOff;
 
 	BBitmap* bmpDisabled = 0;
-	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, fResIDDisabled, &bmpDisabled);
+	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, fResIDDisabled,
+		&bmpDisabled);
 	SetPicture(bmpDisabled, false, false);
 	SetPicture(bmpDisabled, false, true);
 	delete bmpDisabled;
@@ -197,8 +200,10 @@ BNavigator::Draw(BRect)
 	// Draws a beveled smooth border
 	BeginLineArray(4);
 	AddLine(Bounds().LeftTop(), Bounds().RightTop(), shineColor);
-	AddLine(Bounds().LeftTop(), Bounds().LeftBottom() - BPoint(0, 1), shineColor);
-	AddLine(Bounds().LeftBottom() - BPoint(-1, 1), Bounds().RightBottom() - BPoint(0, 1), halfDarkColor);
+	AddLine(Bounds().LeftTop(), Bounds().LeftBottom() - BPoint(0, 1),
+		shineColor);
+	AddLine(Bounds().LeftBottom() - BPoint(-1, 1),
+		Bounds().RightBottom() - BPoint(0, 1), halfDarkColor);
 	AddLine(Bounds().LeftBottom(), Bounds().RightBottom(), darkColor);
 	EndLineArray();
 }
@@ -275,14 +280,17 @@ BNavigator::GoUp(bool option)
 	BEntry entry;
 	if (entry.SetTo(fPath.Path()) == B_OK) {
 		BEntry parentEntry;
-		if (entry.GetParent(&parentEntry) == B_OK && !FSIsDeskDir(&parentEntry))
+		if (entry.GetParent(&parentEntry) == B_OK
+			&& !FSIsDeskDir(&parentEntry)) {
 			SendNavigationMessage(kActionUp, &parentEntry, option);
+		}
 	}
 }
 
 
 void
-BNavigator::SendNavigationMessage(NavigationAction action, BEntry* entry, bool option)
+BNavigator::SendNavigationMessage(NavigationAction action, BEntry* entry,
+	bool option)
 {
 	entry_ref ref;
 
@@ -298,26 +306,33 @@ BNavigator::SendNavigationMessage(NavigationAction action, BEntry* entry, bool o
 		else
 			nodeRef = NULL;
 		
-		// if the option key was held down, open in new window (send message to be_app)
-		// otherwise send message to this window. TTracker (be_app) understands nodeRefToSlection,
-		// BContainerWindow doesn't, so we have to select the item manually
+		// if the option key was held down, open in new window (send message
+		// to be_app) otherwise send message to this window. TTracker
+		// (be_app) understands nodeRefToSlection, BContainerWindow doesn't,
+		// so we have to select the item manually
 		if (option) {
 			message.what = B_REFS_RECEIVED;
-			if (nodeRef)
-				message.AddData("nodeRefToSelect", B_RAW_TYPE, nodeRef, sizeof(node_ref));
+			if (nodeRef) {
+				message.AddData("nodeRefToSelect", B_RAW_TYPE, nodeRef,
+					sizeof(node_ref));
+			}
 			be_app->PostMessage(&message);
 		} else {
 			message.what = kSwitchDirectory;
 			Window()->PostMessage(&message);
 			UnlockLooper();
-				// This is to prevent a dead-lock situation. SelectChildInParentSoon()
-				// eventually locks the TaskLoop::fLock. Later, when StandAloneTaskLoop::Run()
-				// runs, it also locks TaskLoop::fLock and subsequently locks this window's looper.
-				// Therefore we can't call SelectChildInParentSoon with our Looper locked,
-				// because we would get different orders of locking (thus the risk of dead-locking).
+				// This is to prevent a dead-lock situation.
+				// SelectChildInParentSoon() eventually locks the
+				// TaskLoop::fLock. Later, when StandAloneTaskLoop::Run()
+				// runs, it also locks TaskLoop::fLock and subsequently
+				// locks this window's looper. Therefore we can't call
+				// SelectChildInParentSoon with our Looper locked,
+				// because we would get different orders of locking
+				// (thus the risk of dead-locking).
 				//
-				// Todo: Change the locking behaviour of StandAloneTaskLoop::Run() and sub-
-				// sequently called functions.
+				// Todo: Change the locking behaviour of
+				// StandAloneTaskLoop::Run() and subsequently called
+				// functions.
 			if (nodeRef)
 				dynamic_cast<TTracker*>(be_app)->SelectChildInParentSoon(&ref, nodeRef);
 			LockLooper();
@@ -387,7 +402,8 @@ BNavigator::UpdateLocation(const Model* newmodel, int32 action)
 	BEntry entry;
 	if (entry.SetTo(fPath.Path()) == B_OK) {
 		BEntry parentEntry;
-		fUp->SetEnabled(entry.GetParent(&parentEntry) == B_OK && !FSIsDeskDir(&parentEntry));
+		fUp->SetEnabled(entry.GetParent(&parentEntry) == B_OK
+			&& !FSIsDeskDir(&parentEntry));
 	}
 
 	// Enable history buttons if history contains something

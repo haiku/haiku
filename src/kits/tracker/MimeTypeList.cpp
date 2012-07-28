@@ -77,7 +77,8 @@ ShortMimeInfo::ShortDescription() const
 }
 
 int
-ShortMimeInfo::CompareShortDescription(const ShortMimeInfo* a, const ShortMimeInfo* b)
+ShortMimeInfo::CompareShortDescription(const ShortMimeInfo* a,
+	const ShortMimeInfo* b)
 {
 	return a->fShortDescription.ICompare(b->fShortDescription);
 }
@@ -160,5 +161,3 @@ MimeTypeList::Build()
 	fCommonMimeList.SortItems(&ShortMimeInfo::CompareShortDescription);
 	fLock.Unlock();
 }
-
-

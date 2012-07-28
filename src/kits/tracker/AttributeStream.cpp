@@ -156,8 +156,8 @@ AttributeStreamNode::Contains(const char* name, uint32 type)
 
 
 off_t
-AttributeStreamNode::Read(const char* name, const char* foreignName, uint32 type,
-	off_t size, void* buffer, void (*swapFunc)(void*))
+AttributeStreamNode::Read(const char* name, const char* foreignName,
+	uint32 type, off_t size, void* buffer, void (*swapFunc)(void*))
 {
 	if (!fReadFrom)
 		return 0;
@@ -288,8 +288,8 @@ AttributeStreamFileNode::Contains(const char* name, uint32 type)
 
 
 off_t
-AttributeStreamFileNode::Read(const char* name, const char* foreignName, uint32 type,
-	off_t size, void* buffer, void (*swapFunc)(void*))
+AttributeStreamFileNode::Read(const char* name, const char* foreignName,
+	uint32 type, off_t size, void* buffer, void (*swapFunc)(void*))
 {
 	if (name && fNode->ReadAttr(name, type, 0, buffer, (size_t)size) == size)
 		return size;
@@ -306,8 +306,8 @@ AttributeStreamFileNode::Read(const char* name, const char* foreignName, uint32 
 
 
 off_t
-AttributeStreamFileNode::Write(const char* name, const char* foreignName, uint32 type,
-	off_t size, const void* buffer)
+AttributeStreamFileNode::Write(const char* name, const char* foreignName,
+	uint32 type, off_t size, const void* buffer)
 {
 	ASSERT(fNode);
 	ASSERT(dynamic_cast<BNode*>(fNode));
@@ -659,8 +659,8 @@ AttributeStreamFilterNode::Contains(const char* name, uint32 type)
 
 
 off_t
-AttributeStreamFilterNode::Read(const char* name, const char* foreignName, uint32 type,
-	off_t size, void* buffer, void (*swapFunc)(void*))
+AttributeStreamFilterNode::Read(const char* name, const char* foreignName,
+	uint32 type, off_t size, void* buffer, void (*swapFunc)(void*))
 {
 	if (!fReadFrom)
 		return 0;
@@ -673,8 +673,8 @@ AttributeStreamFilterNode::Read(const char* name, const char* foreignName, uint3
 
 
 off_t
-AttributeStreamFilterNode::Write(const char* name, const char* foreignName, uint32 type,
-	off_t size,	const void* buffer)
+AttributeStreamFilterNode::Write(const char* name, const char* foreignName,
+	uint32 type, off_t size, const void* buffer)
 {
 	if (!fWriteTo)
 		return 0;
@@ -693,7 +693,7 @@ NamesToAcceptAttrFilter::NamesToAcceptAttrFilter(const char** nameList)
 
 
 bool
-NamesToAcceptAttrFilter::Reject(const char* name, uint32 , off_t )
+NamesToAcceptAttrFilter::Reject(const char* name, uint32, off_t)
 {
 	for (int32 index = 0; ;index++) {
 		if (!fNameList[index])

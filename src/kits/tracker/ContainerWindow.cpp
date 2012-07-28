@@ -110,12 +110,14 @@ namespace BPrivate {
 
 class DraggableContainerIcon : public BView {
 	public:
-		DraggableContainerIcon(BRect rect, const char* name, uint32 resizeMask);
+		DraggableContainerIcon(BRect rect, const char* name,
+			uint32 resizeMask);
 
 		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint where);
 		virtual void MouseUp(BPoint where);
-		virtual void MouseMoved(BPoint point, uint32 /*transit*/, const BMessage* message);
+		virtual void MouseMoved(BPoint point, uint32 /*transit*/,
+			const BMessage* message);
 		virtual void FrameMoved(BPoint newLocation);
 		virtual void Draw(BRect updateRect);
 
@@ -215,7 +217,8 @@ CompareLabels(const BMenuItem* item1, const BMenuItem* item2)
 
 
 static bool
-AddOneAddon(const Model* model, const char* name, uint32 shortcut, bool primary, void* context)
+AddOneAddon(const Model* model, const char* name, uint32 shortcut,
+	bool primary, void* context)
 {
 	AddOneAddonParams* params = (AddOneAddonParams*)context;
 
@@ -249,14 +252,16 @@ AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref dirRef)
 		image_id addonImage = load_add_on(path.Path());
 		if (addonImage >= 0) {
 			void (*processRefs)(entry_ref, BMessage*, void*);
-			result = get_image_symbol(addonImage, "process_refs", 2, (void**)&processRefs);
+			result = get_image_symbol(addonImage, "process_refs", 2,
+				(void**)&processRefs);
 
 #ifndef __INTEL__
 			if (result < 0) {
 				PRINT(("trying old legacy ppc signature\n"));
 				// try old-style addon signature
 				result = get_image_symbol(addonImage,
-					"process_refs__F9entry_refP8BMessagePv", 2, (void**)&processRefs);
+					"process_refs__F9entry_refP8BMessagePv", 2,
+					(void**)&processRefs);
 			}
 #endif
 
@@ -279,8 +284,8 @@ AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref dirRef)
 	buffer.ReplaceFirst("%error", strerror(result));
 	buffer.ReplaceFirst("%name", addonRef.name);
 
-	BAlert* alert = new BAlert("", buffer.String(),	B_TRANSLATE("Cancel"), 0, 0,
-		B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	BAlert* alert = new BAlert("", buffer.String(), B_TRANSLATE("Cancel"),
+		0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 	alert->SetShortcut(0, B_ESCAPE);
 	alert->Go();
 
@@ -946,10 +951,12 @@ BContainerWindow::Init(const BMessage* message)
 			float iconSize = fMenuBar->Bounds().Height() - 2;
 			if (iconSize < 16)
 				iconSize = 16;
-			float iconPosY = 1 + (fMenuBar->Bounds().Height() - 2 - iconSize) / 2;
-			BView* icon = new DraggableContainerIcon(BRect(Bounds().Width() - 4 - iconSize + 1,
-					iconPosY, Bounds().Width() - 4, iconPosY + iconSize - 1),
-				"ThisContainer", B_FOLLOW_RIGHT);
+			float iconPosY = 1 + (fMenuBar->Bounds().Height() - 2
+				- iconSize) / 2;
+			BView* icon = new DraggableContainerIcon(BRect(Bounds().Width()
+					- 4 - iconSize + 1, iconPosY, Bounds().Width() - 4,
+					iconPosY + iconSize - 1), "ThisContainer",
+				B_FOLLOW_RIGHT);
 			fMenuBar->AddChild(icon);
 		}
 	} else {
@@ -958,11 +965,12 @@ BContainerWindow::Init(const BMessage* message)
 	}
 
 	AddContextMenus();
-	AddShortcut('T', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kDelete), PoseView());
+	AddShortcut('T', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kDelete),
+		PoseView());
 	AddShortcut('K', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kCleanupAll),
 		PoseView());
-	AddShortcut('Q', B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_CONTROL_KEY,
-		new BMessage(kQuitTracker));
+	AddShortcut('Q', B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY
+		| B_CONTROL_KEY, new BMessage(kQuitTracker));
 
 	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, new BMessage(kOpenSelection),
 		PoseView());
@@ -971,9 +979,12 @@ BContainerWindow::Init(const BMessage* message)
 
 #if DEBUG
 	// add some debugging shortcuts
-	AddShortcut('D', B_COMMAND_KEY | B_CONTROL_KEY, new BMessage('dbug'), PoseView());
-	AddShortcut('C', B_COMMAND_KEY | B_CONTROL_KEY, new BMessage('dpcc'), PoseView());
-	AddShortcut('F', B_COMMAND_KEY | B_CONTROL_KEY, new BMessage('dpfl'), PoseView());
+	AddShortcut('D', B_COMMAND_KEY | B_CONTROL_KEY, new BMessage('dbug'),
+		PoseView());
+	AddShortcut('C', B_COMMAND_KEY | B_CONTROL_KEY, new BMessage('dpcc'),
+		PoseView());
+	AddShortcut('F', B_COMMAND_KEY | B_CONTROL_KEY, new BMessage('dpfl'),
+		PoseView());
 	AddShortcut('F', B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY,
 		new BMessage('dpfL'), PoseView());
 #endif
@@ -1007,7 +1018,8 @@ BContainerWindow::Init(const BMessage* message)
 void
 BContainerWindow::RestoreState()
 {
-	SetSizeLimits(kContainerWidthMinLimit, 10000, kContainerWindowHeightLimit, 10000);
+	SetSizeLimits(kContainerWidthMinLimit, 10000,
+		kContainerWindowHeightLimit, 10000);
 
 	UpdateTitle();
 
@@ -1022,7 +1034,8 @@ BContainerWindow::RestoreState()
 void
 BContainerWindow::RestoreState(const BMessage &message)
 {
-	SetSizeLimits(kContainerWidthMinLimit, 10000, kContainerWindowHeightLimit, 10000);
+	SetSizeLimits(kContainerWidthMinLimit, 10000,
+		kContainerWindowHeightLimit, 10000);
 
 	UpdateTitle();
 
@@ -1057,7 +1070,8 @@ BContainerWindow::RestoreStateCommon()
 	if (!fBackgroundImage && !isDesktop
 		&& DefaultStateSourceNode(kDefaultFolderTemplate, &defaultingNode))
 		// look for background image info in the source for defaults
-		fBackgroundImage = BackgroundImage::GetBackgroundImage(&defaultingNode, isDesktop);
+		fBackgroundImage
+			= BackgroundImage::GetBackgroundImage(&defaultingNode, isDesktop);
 }
 
 
@@ -1075,7 +1089,8 @@ BContainerWindow::UpdateTitle()
 		SetTitle(TargetModel()->Name());
 
 	if (Navigator())
-		Navigator()->UpdateLocation(PoseView()->TargetModel(), kActionUpdatePath);
+		Navigator()->UpdateLocation(PoseView()->TargetModel(),
+			kActionUpdatePath);
 }
 
 
@@ -1121,7 +1136,8 @@ BContainerWindow::FrameResized(float, float)
 		if (offsetY < 0 && PoseView()->Bounds().bottom > extent.bottom
 			&& Bounds().Height() > fPreviousBounds.Height())
 			scroll.y
-				= max_c(fPreviousBounds.Height() - Bounds().Height(), offsetY);
+				= max_c(fPreviousBounds.Height() - Bounds().Height(),
+					offsetY);
 
 		if (scroll != B_ORIGIN)
 			PoseView()->ScrollBy(scroll.x, scroll.y);
@@ -1154,7 +1170,8 @@ BContainerWindow::ViewModeChanged(uint32 oldMode, uint32 newMode)
 {
 	BView* view = FindView("MenuBar");
 	if (view != NULL) {
-		// make sure the draggable icon hides if it doesn't have space left anymore
+		// make sure the draggable icon hides if it doesn't
+		// have space left anymore
 		view = view->FindView("ThisContainer");
 		if (view != NULL)
 			view->FrameMoved(view->Frame().LeftTop());
@@ -1248,8 +1265,10 @@ BContainerWindow::GetLayoutState(BNode* node, BMessage* message)
 			continue;
 
 		char* buffer = new char[info.size];
-		if (node->ReadAttr(attrName, info.type, 0, buffer, (size_t)info.size) == info.size)
+		if (node->ReadAttr(attrName, info.type, 0, buffer,
+				(size_t)info.size) == info.size) {
 			message->AddData(attrName, info.type, buffer, (ssize_t)info.size);
+		}
 		delete [] buffer;
 	}
 	return B_OK;

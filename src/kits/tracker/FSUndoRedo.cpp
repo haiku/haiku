@@ -50,7 +50,8 @@ class UndoItemMove : public UndoItem {
 		/** source - list of file(s) that were moved.  Assumes ownership.
 		 *	origfolder - location it was moved from
 		 */
-		UndoItemMove(BObjectList<entry_ref>* sourceList, BDirectory &target, BList* pointList);
+		UndoItemMove(BObjectList<entry_ref>* sourceList, BDirectory &target,
+			BList* pointList);
 		virtual ~UndoItemMove();
 
 		virtual status_t Undo();
@@ -72,10 +73,12 @@ class UndoItemFolder : public UndoItem {
 		virtual status_t Redo();
 
 	private:
-		/* this ref has two different meanings in the different states of this object:
-			- Undo() - fRef indicates the folder that was created via FSCreateNewFolderIn(...)
-			- Redo() - fRef indicates the folder in which FSCreateNewFolderIn() should be performed
-		*/
+		// this ref has two different meanings in the different states of
+		// this object:
+		//  - Undo() - fRef indicates the folder that was created via
+		//    FSCreateNewFolderIn(...)
+		//  - Redo() - fRef indicates the folder in which
+		//    FSCreateNewFolderIn() should be performed
 		entry_ref	fRef;
 };
 
@@ -169,8 +172,8 @@ Undo::Remove()
 }
 
 
-MoveCopyUndo::MoveCopyUndo(BObjectList<entry_ref>* sourceList, BDirectory &dest,
-	BList* pointList, uint32 moveMode)
+MoveCopyUndo::MoveCopyUndo(BObjectList<entry_ref>* sourceList,
+	BDirectory &dest, BList* pointList, uint32 moveMode)
 {
 	if (moveMode == kMoveSelectionTo)
 		fUndo = new UndoItemMove(sourceList, dest, pointList);
@@ -200,8 +203,8 @@ RenameVolumeUndo::RenameVolumeUndo(BVolume &volume, const char* newName)
 //	#pragma mark -
 
 
-UndoItemCopy::UndoItemCopy(BObjectList<entry_ref>* sourceList, BDirectory &target,
-	BList* /*pointList*/, uint32 moveMode)
+UndoItemCopy::UndoItemCopy(BObjectList<entry_ref>* sourceList,
+	BDirectory &target, BList* /*pointList*/, uint32 moveMode)
 	:
 	fSourceList(*sourceList),
 	fTargetList(*sourceList),
@@ -264,8 +267,8 @@ UndoItemCopy::UpdateEntry(BEntry* entry, const char* name)
 //	#pragma mark -
 
 
-UndoItemMove::UndoItemMove(BObjectList<entry_ref>* sourceList, BDirectory &target,
-	BList* /*pointList*/)
+UndoItemMove::UndoItemMove(BObjectList<entry_ref>* sourceList,
+	BDirectory &target, BList* /*pointList*/)
 	:
 	fSourceList(*sourceList)
 {
@@ -293,7 +296,8 @@ UndoItemMove::Undo()
 	ChangeListSource(*list, entry);
 
 	// FSMoveToFolder() owns its arguments
-	FSMoveToFolder(list, new BEntry(&fSourceRef), FSUndoMoveMode(kMoveSelectionTo), NULL);
+	FSMoveToFolder(list, new BEntry(&fSourceRef),
+		FSUndoMoveMode(kMoveSelectionTo), NULL);
 
 	return B_OK;
 }
@@ -303,8 +307,8 @@ status_t
 UndoItemMove::Redo()
 {
 	// FSMoveToFolder() owns its arguments
-	FSMoveToFolder(new BObjectList<entry_ref>(fSourceList), new BEntry(&fTargetRef),
-		FSUndoMoveMode(kMoveSelectionTo), NULL);
+	FSMoveToFolder(new BObjectList<entry_ref>(fSourceList),
+		new BEntry(&fTargetRef), FSUndoMoveMode(kMoveSelectionTo), NULL);
 
 	return B_OK;
 }

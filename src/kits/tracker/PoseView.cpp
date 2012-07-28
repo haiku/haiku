@@ -203,7 +203,8 @@ PoseCompareAddWidget(const BPose* p1, const BPose* p2, BPoseView* view);
 // #pragma mark -
 
 
-BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode, uint32 resizeMask)
+BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode,
+	uint32 resizeMask)
 	: BView(bounds, "PoseView", resizeMask, B_WILL_DRAW | B_PULSE_NEEDED),
 	fIsDrawingSelectionRect(false),
 	fHScrollBar(NULL),
@@ -265,7 +266,8 @@ BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fDeskbarFrame(0, 0, -1, -1)
 {
 	fViewState->SetViewMode(viewMode);
-	fShowSelectionWhenInactive = TrackerSettings().ShowSelectionWhenInactive();
+	fShowSelectionWhenInactive
+		= TrackerSettings().ShowSelectionWhenInactive();
 	fTransparentSelection = TrackerSettings().TransparentSelection();
 	fFilterStrings.AddItem(new BString(""));
 }
@@ -400,7 +402,8 @@ BPoseView::RestoreColumnState(AttributeStreamNode* node)
 		}
 
 		if (size > 0 && size < 10000) {
-			// check for invalid sizes here to protect against munged attributes
+			// check for invalid sizes here to protect against
+			// munged attributes
 			char* buffer = new char[size];
 			off_t result = node->Read(name, 0, B_RAW_TYPE, size, buffer);
 			if (result) {
@@ -468,7 +471,8 @@ BPoseView::AddColumnList(BObjectList<BColumn>* list)
 	list->SortItems(&CompareColumns);
 
 	float nextLeftEdge = 0;
-	for (int32 columIndex = 0; columIndex < list->CountItems(); columIndex++) {
+	for (int32 columIndex = 0; columIndex < list->CountItems();
+			columIndex++) {
 		BColumn* column = list->ItemAt(columIndex);
 
 		// Make sure that columns don't overlap
@@ -477,12 +481,14 @@ BPoseView::AddColumnList(BObjectList<BColumn>* list)
 			column->SetOffset(nextLeftEdge);
 		}
 
-		nextLeftEdge = column->Offset() + column->Width() - kRoomForLine / 2.0f
-			+ kTitleColumnExtraMargin;
+		nextLeftEdge = column->Offset() + column->Width()
+			- kRoomForLine / 2.0f + kTitleColumnExtraMargin;
 		fColumnList->AddItem(column);
 
-		if (!IsWatchingDateFormatChange() && column->AttrType() == B_TIME_TYPE)
+		if (!IsWatchingDateFormatChange()
+			&& column->AttrType() == B_TIME_TYPE) {
 			StartWatchDateFormatChange();
+		}
 	}
 }
 
@@ -514,15 +520,17 @@ BPoseView::RestoreState(AttributeStreamNode* node)
 		}
 
 		if (size > 0 && size < 10000) {
-			// check for invalid sizes here to protect against munged attributes
+			// check for invalid sizes here to protect against
+			// munged attributes
 			char* buffer = new char[size];
 			off_t result = node->Read(name, 0, B_RAW_TYPE, size, buffer);
 			if (result) {
 				BMallocIO stream;
 				stream.WriteAt(0, buffer, size);
 				stream.Seek(0, SEEK_SET);
-				BViewState* viewstate = BViewState::InstantiateFromStream(&stream,
-					wrongEndianness);
+				BViewState* viewstate
+					= BViewState::InstantiateFromStream(&stream,
+						wrongEndianness);
 				if (viewstate) {
 					delete fViewState;
 					fViewState = viewstate;
@@ -805,25 +813,28 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 						// nuke opposite endianness
 						dir.RemoveAttr(poseInfoAttrForeign);
 
-					if (!isTrash && desktop && dir.WriteAttr(kAttrExtendedDisksPoseInfo,
-						B_RAW_TYPE, 0,
-						extendedPoseInfo, extendedPoseInfoSize)
-							== (ssize_t)extendedPoseInfoSize)
+					if (!isTrash && desktop
+						&& dir.WriteAttr(kAttrExtendedDisksPoseInfo,
+						B_RAW_TYPE, 0, extendedPoseInfo, extendedPoseInfoSize)
+							== (ssize_t)extendedPoseInfoSize) {
 						// nuke opposite endianness
 						dir.RemoveAttr(kAttrExtendedDisksPoseInfoForegin);
+					}
 				}
 			} else {
-				model->WriteAttrKillForeign(kAttrPoseInfo, kAttrPoseInfoForeign,
-					B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo));
+				model->WriteAttrKillForeign(kAttrPoseInfo,
+					kAttrPoseInfoForeign, B_RAW_TYPE, 0, &poseInfo,
+					sizeof(poseInfo));
 
 				if (desktop) {
 					model->WriteAttrKillForeign(kAttrExtendedPoseInfo,
 						kAttrExtendedPoseInfoForegin,
-						B_RAW_TYPE, 0, extendedPoseInfo, extendedPoseInfoSize);
+						B_RAW_TYPE, 0, extendedPoseInfo,
+						extendedPoseInfoSize);
 				}
 			}
 
-			delete [] (char*)extendedPoseInfo;
+			delete[] (char*)extendedPoseInfo;
 				// TODO: fix up this mess
 		}
 	}
@@ -935,15 +946,19 @@ BPoseView::AttachedToWindow()
 	if (fIsDesktopWindow)
 		AddFilter(new TPoseViewFilter(this));
 
-	AddFilter(new ShortcutFilter(B_RETURN, B_OPTION_KEY, kOpenSelection, this));
-		// add Option-Return as a shortcut filter because AddShortcut doesn't allow
-		// us to have shortcuts without Command yet
+	AddFilter(new ShortcutFilter(B_RETURN, B_OPTION_KEY, kOpenSelection,
+		this));
+		// add Option-Return as a shortcut filter because AddShortcut
+		// doesn't allow us to have shortcuts without Command yet
 	AddFilter(new ShortcutFilter(B_ESCAPE, 0, B_CANCEL, this));
 		// Escape key, used to abort an on-going clipboard cut or filtering
-	AddFilter(new ShortcutFilter(B_ESCAPE, B_SHIFT_KEY, kCancelSelectionToClipboard, this));
-		// Escape + SHIFT will remove current selection from clipboard, or all poses from current folder if 0 selected
+	AddFilter(new ShortcutFilter(B_ESCAPE, B_SHIFT_KEY,
+		kCancelSelectionToClipboard, this));
+		// Escape + SHIFT will remove current selection from clipboard,
+		// or all poses from current folder if 0 selected
 
-	AddFilter(new LongAndDragTrackingFilter(kMsgMouseLongDown, kMsgMouseDragged));
+	AddFilter(new LongAndDragTrackingFilter(kMsgMouseLongDown,
+		kMsgMouseDragged));
 
 	fLastLeftTop = LeftTop();
 	BFont font(be_plain_font);
@@ -954,7 +969,8 @@ BPoseView::AttachedToWindow()
 	// static - init just once
 	if (sFontHeight == -1) {
 		font.GetHeight(&sFontInfo);
-		sFontHeight = sFontInfo.ascent + sFontInfo.descent + sFontInfo.leading;
+		sFontHeight = sFontInfo.ascent + sFontInfo.descent
+			+ sFontInfo.leading;
 	}
 
 	if (TTracker* app = dynamic_cast<TTracker*>(be_app)) {
@@ -981,7 +997,8 @@ BPoseView::SetIconPoseHeight()
 
 		case kMiniIconMode:
 			fViewState->SetIconSize(B_MINI_ICON);
-			fIconPoseHeight = ceilf(sFontHeight < IconSizeInt() ? IconSizeInt() : sFontHeight + 1);
+			fIconPoseHeight = ceilf(sFontHeight <
+				IconSizeInt() ? IconSizeInt() : sFontHeight + 1);
 			break;
 
 		default:
@@ -1263,7 +1280,7 @@ BPoseView::AddPosesTask(void* castToParams)
 {
 	// AddPosesTask reeds a bunch of models and passes them off to
 	// the pose placing and drawing routine.
-	//
+
 	AddPosesParams* params = (AddPosesParams*)castToParams;
 	BMessenger target(params->target);
 	entry_ref ref(params->ref);
@@ -1318,8 +1335,9 @@ BPoseView::AddPosesTask(void* castToParams)
 			node_ref itemNode;
 
 			posesResult->fModels[modelChunkIndex] = 0;
-				// ToDo - redo this so that modelChunkIndex increments right before
-				// a new model is added to the array; start with modelChunkIndex = -1
+				// ToDo - redo this so that modelChunkIndex increments
+				// right before a new model is added to the array;
+				// start with modelChunkIndex = -1
 
 			int32 count = container->GetNextDirents(eptr, 1024, 1);
 			if (count <= 0 && !modelChunkIndex)
@@ -1328,9 +1346,11 @@ BPoseView::AddPosesTask(void* castToParams)
 			if (count) {
 				ASSERT(count == 1);
 
-				if ((!hideDotFiles && (!strcmp(eptr->d_name, ".") || !strcmp(eptr->d_name, "..")))
-					|| (hideDotFiles && eptr->d_name[0] == '.'))
+				if ((!hideDotFiles && (!strcmp(eptr->d_name, ".")
+					|| !strcmp(eptr->d_name, "..")))
+					|| (hideDotFiles && eptr->d_name[0] == '.')) {
 					continue;
+				}
 
 				dirNode.device = eptr->d_pdev;
 				dirNode.node = eptr->d_pino;

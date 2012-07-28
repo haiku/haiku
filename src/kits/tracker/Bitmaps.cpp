@@ -104,7 +104,8 @@ BImageResources::FinishResources(BResources* res) const
 
 
 const void*
-BImageResources::LoadResource(type_code type, int32 id, size_t* out_size) const
+BImageResources::LoadResource(type_code type, int32 id,
+	size_t* out_size) const
 {
 	// Serialize execution.
 	// Looks like BResources is not really thread safe. We should
@@ -116,12 +117,14 @@ BImageResources::LoadResource(type_code type, int32 id, size_t* out_size) const
 	// Return the resource.  Because we never change the BResources
 	// object, the returned data will not change until TTracker is
 	// destroyed.
-	return const_cast<BResources*>(&fResources)->LoadResource(type, id, out_size);
+	return const_cast<BResources*>(&fResources)->LoadResource(type, id,
+		out_size);
 }
 
 
 const void*
-BImageResources::LoadResource(type_code type, const char* name, size_t* out_size) const
+BImageResources::LoadResource(type_code type, const char* name,
+	size_t* out_size) const
 {
 	// Serialize execution.
 	BAutolock lock(fLock);
@@ -131,12 +134,14 @@ BImageResources::LoadResource(type_code type, const char* name, size_t* out_size
 	// Return the resource.  Because we never change the BResources
 	// object, the returned data will not change until TTracker is
 	// destroyed.
-	return const_cast<BResources*>(&fResources)->LoadResource(type, name, out_size);
+	return const_cast<BResources*>(&fResources)->LoadResource(type, name,
+		out_size);
 }
 
 
 status_t
-BImageResources::GetIconResource(int32 id, icon_size size, BBitmap* dest) const
+BImageResources::GetIconResource(int32 id, icon_size size,
+	BBitmap* dest) const
 {
 	size_t length = 0;
 	const void* data;
@@ -144,8 +149,10 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap* dest) const
 #ifdef __HAIKU__
 	// try to load vector icon
 	data = LoadResource(B_VECTOR_ICON_TYPE, id, &length);
-	if (data != NULL && BIconUtils::GetVectorIcon((uint8*)data, length, dest) == B_OK)
+	if (data != NULL
+		&& BIconUtils::GetVectorIcon((uint8*)data, length, dest) == B_OK) {
 		return B_OK;
+	}
 #endif
 
 	// fall back to R5 icon
@@ -155,7 +162,8 @@ BImageResources::GetIconResource(int32 id, icon_size size, BBitmap* dest) const
 	length = 0;
 	data = LoadResource(size == B_LARGE_ICON ? 'ICON' : 'MICN', id, &length);
 
-	if (data == NULL || length != (size_t)(size == B_LARGE_ICON ? 1024 : 256)) {
+	if (data == NULL
+		|| length != (size_t)(size == B_LARGE_ICON ? 1024 : 256)) {
 		TRESPASS();
 		return B_ERROR;
 	}
@@ -212,7 +220,8 @@ BImageResources::find_image(void* memAddr) const
 
 
 status_t
-BImageResources::GetBitmapResource(type_code type, int32 id, BBitmap** out) const
+BImageResources::GetBitmapResource(type_code type, int32 id,
+	BBitmap** out) const
 {
 	*out = NULL;
 

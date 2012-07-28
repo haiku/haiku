@@ -71,7 +71,7 @@ BackgroundImage::GetBackgroundImage(const BNode* node, bool isDesktop)
 		return NULL;
 
 	BMessage container;
-	char* buffer = new char [info.size];
+	char* buffer = new char[info.size];
 
 	status_t error = node->ReadAttr(kBackgroundImageInfo, info.type, 0, buffer, (size_t)info.size);
 	if (error == info.size)
@@ -104,14 +104,16 @@ BackgroundImage::GetBackgroundImage(const BNode* node, bool isDesktop)
 			be_control_look->SetBackgroundInfo(container);
 		}
 
-		container.FindInt32(kBackgroundImageInfoWorkspaces, index, (int32*)&workspaces);
+		container.FindInt32(kBackgroundImageInfoWorkspaces, index,
+			(int32*)&workspaces);
 		container.FindInt32(kBackgroundImageInfoMode, index, (int32*)&mode);
-		container.FindBool(kBackgroundImageInfoTextOutline, index, &textWidgetLabelOutline);
+		container.FindBool(kBackgroundImageInfoTextOutline, index,
+			&textWidgetLabelOutline);
 		container.FindPoint(kBackgroundImageInfoOffset, index, &offset);
 
 		BackgroundImage::BackgroundImageInfo* imageInfo = new
-			BackgroundImage::BackgroundImageInfo(workspaces, bitmap, mode, offset,
-				textWidgetLabelOutline);
+			BackgroundImage::BackgroundImageInfo(workspaces, bitmap, mode,
+				offset, textWidgetLabelOutline);
 
 		if (!result)
 			result = new BackgroundImage(node, isDesktop);

@@ -101,8 +101,9 @@ OverrideAlert::OverPosition(float width, float height)
 {
 	// This positions the alert window like a normal alert, put
 	// places it on top of the calling window if possible.
-	
-	BWindow* window = dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
+
+	BWindow* window
+		= dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
 	BRect screenFrame;
 	BRect desirableRect;
 	screenFrame = BScreen(window).Frame();
@@ -149,7 +150,9 @@ OverrideAlert::UpdateButtons(uint32 modifiers, bool force)
 	fCurModifiers = modifiers;
 	for (int32 i = 0; i < 3; i++) {
 		BButton* button = ButtonAt(i);
-		if (button)
-			button->SetEnabled(((fButtonModifiers[i] & fCurModifiers) == fButtonModifiers[i]));
+		if (button) {
+			button->SetEnabled(((fButtonModifiers[i] & fCurModifiers)
+				== fButtonModifiers[i]));
+		}
 	}
 }

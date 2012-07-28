@@ -73,7 +73,8 @@ public:
 
 template<class EachParam1>
 void
-EachPoseAndModel(PoseList* list, void (*eachFunction)(BPose*, Model*, EachParam1),
+EachPoseAndModel(PoseList* list,
+	void (*eachFunction)(BPose*, Model*, EachParam1),
 	EachParam1 eachParam1)
 {
 	for (int32 index = list->CountItems() - 1; index >= 0; index--) {
@@ -87,8 +88,9 @@ EachPoseAndModel(PoseList* list, void (*eachFunction)(BPose*, Model*, EachParam1
 
 template<class EachParam1>
 void
-EachPoseAndModel(PoseList* list, void (*eachFunction)(BPose*, Model*, int32 ,
-	EachParam1), EachParam1 eachParam1)
+EachPoseAndModel(PoseList* list,
+	void (*eachFunction)(BPose*, Model*, int32, EachParam1),
+	EachParam1 eachParam1)
 {
 	for (int32 index = list->CountItems() - 1; index >= 0; index--) {
 		BPose* pose = list->ItemAt(index);
@@ -101,8 +103,9 @@ EachPoseAndModel(PoseList* list, void (*eachFunction)(BPose*, Model*, int32 ,
 
 template<class EachParam1, class EachParam2>
 void
-EachPoseAndModel(PoseList* list, void (*eachFunction)(BPose*, Model*, EachParam1,
-	EachParam2), EachParam1 eachParam1, EachParam2 eachParam2)
+EachPoseAndModel(PoseList* list,
+	void (*eachFunction)(BPose*, Model*, EachParam1, EachParam2),
+	EachParam1 eachParam1, EachParam2 eachParam2)
 {
 	for (int32 index = list->CountItems() - 1; index >= 0; index--) {
 		BPose* pose = list->ItemAt(index);
@@ -114,8 +117,9 @@ EachPoseAndModel(PoseList* list, void (*eachFunction)(BPose*, Model*, EachParam1
 
 template<class EachParam1, class EachParam2>
 void
-EachPoseAndModel(PoseList* list, void (*eachFunction)(BPose*, Model*, int32,
-	EachParam1, EachParam2), EachParam1 eachParam1, EachParam2 eachParam2)
+EachPoseAndModel(PoseList* list,
+	void (*eachFunction)(BPose*, Model*, int32, EachParam1, EachParam2),
+	EachParam1 eachParam1, EachParam2 eachParam2)
 {
 	for (int32 index = list->CountItems() - 1; index >= 0; index--) {
 		BPose* pose = list->ItemAt(index);
@@ -127,8 +131,8 @@ EachPoseAndModel(PoseList* list, void (*eachFunction)(BPose*, Model*, int32,
 
 template<class EachParam1>
 void
-EachPoseAndResolvedModel(PoseList* list, void (*eachFunction)(BPose*, Model*, EachParam1),
-	EachParam1 eachParam1)
+EachPoseAndResolvedModel(PoseList* list,
+	void (*eachFunction)(BPose*, Model*, EachParam1), EachParam1 eachParam1)
 {
 	for (int32 index = list->CountItems() - 1; index >= 0; index--) {
 		BPose* pose = list->ItemAt(index);
@@ -140,8 +144,9 @@ EachPoseAndResolvedModel(PoseList* list, void (*eachFunction)(BPose*, Model*, Ea
 
 template<class EachParam1>
 void
-EachPoseAndResolvedModel(PoseList* list, void (*eachFunction)(BPose*, Model*, int32 ,
-	EachParam1), EachParam1 eachParam1)
+EachPoseAndResolvedModel(PoseList* list,
+	void (*eachFunction)(BPose*, Model*, int32 , EachParam1),
+	EachParam1 eachParam1)
 {
 	for (int32 index = list->CountItems() - 1; index >= 0; index--) {
 		BPose* pose = list->ItemAt(index);
@@ -153,8 +158,9 @@ EachPoseAndResolvedModel(PoseList* list, void (*eachFunction)(BPose*, Model*, in
 
 template<class EachParam1, class EachParam2>
 void
-EachPoseAndResolvedModel(PoseList* list, void (*eachFunction)(BPose*, Model*, EachParam1,
-	EachParam2), EachParam1 eachParam1, EachParam2 eachParam2)
+EachPoseAndResolvedModel(PoseList* list,
+	void (*eachFunction)(BPose*, Model*, EachParam1, EachParam2),
+	EachParam1 eachParam1, EachParam2 eachParam2)
 {
 	for (int32 index = list->CountItems() - 1; index >= 0; index--) {
 		BPose* pose = list->ItemAt(index);
@@ -166,8 +172,9 @@ EachPoseAndResolvedModel(PoseList* list, void (*eachFunction)(BPose*, Model*, Ea
 
 template<class EachParam1, class EachParam2>
 void
-EachPoseAndResolvedModel(PoseList* list, void (*eachFunction)(BPose*, Model*, int32,
-	EachParam1, EachParam2), EachParam1 eachParam1, EachParam2 eachParam2)
+EachPoseAndResolvedModel(PoseList* list,
+	void (*eachFunction)(BPose*, Model*, int32, EachParam1, EachParam2),
+	EachParam1 eachParam1, EachParam2 eachParam2)
 {
 	for (int32 index = list->CountItems() - 1; index >= 0; index--) {
 		BPose* pose = list->ItemAt(index);

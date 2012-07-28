@@ -1433,8 +1433,8 @@ SearchForSignatureEntryList::Relation(const BMessage* entriesToOpen,
 
 void
 SearchForSignatureEntryList::RelationDescription(const BMessage* entriesToOpen,
-	const Model* applicationModel, BString* description, const entry_ref* preferredApp,
-	const entry_ref* preferredAppForFile)
+	const Model* applicationModel, BString* description,
+	const entry_ref* preferredApp, const entry_ref* preferredAppForFile)
 {
 	for (int32 index = 0; ;index++) {
 		entry_ref ref;
@@ -1482,10 +1482,11 @@ SearchForSignatureEntryList::RelationDescription(const BMessage* entriesToOpen,
 			{
 				mimeType.SetTo(model.MimeType());
 
-				if (preferredApp && *applicationModel->EntryRef() == *preferredApp)
+				if (preferredApp
+					&& *applicationModel->EntryRef() == *preferredApp) {
 					// application matches cached preferred app, we are done
 					description->SetTo(B_TRANSLATE("Preferred for %type"));
-				else
+				} else
 					description->SetTo(B_TRANSLATE("Handles %type"));
 
 				char shortDescription[256];
@@ -1543,7 +1544,9 @@ SearchForSignatureEntryList::CanOpenWithFilter(const Model* appModel,
 			BEntry entry2(&trackerInfo.ref);
 			entry2.GetPath(&path2);
 
-			PRINT(("filtering out %s, sig %s, active Tracker at %s, result %s, refName %s\n",
+			PRINT(
+				("filtering out %s, sig %s, active Tracker at %s, "
+				 "result %s, refName %s\n",
 				path.Path(), signature, path2.Path(), strerror(result),
 				trackerInfo.ref.name));
 #endif
@@ -1583,7 +1586,8 @@ SearchForSignatureEntryList::CanOpenWithFilter(const Model* appModel,
 		return false;
 	}
 
-	if (relation != kNoRelation && relation != kSuperhandler && !fGenericFilesOnly) {
+	if (relation != kNoRelation && relation != kSuperhandler
+		&& !fGenericFilesOnly) {
 		// we hit at least one app that is not a superhandler and
 		// handles the document
 		fFoundOneNonSuperHandler = true;
@@ -1614,7 +1618,8 @@ ConditionalAllAppsIterator::Instantiate()
 	BString lookForAppsPredicate;
 	lookForAppsPredicate << "(" << kAttrAppSignature << " = \"*\" ) && ( "
 		<< kAttrMIMEType << " = " << B_APP_MIME_TYPE << " ) ";
-	fWalker = new BTrackerPrivate::TQueryWalker(lookForAppsPredicate.String());
+	fWalker
+		= new BTrackerPrivate::TQueryWalker(lookForAppsPredicate.String());
 }
 
 
@@ -1647,8 +1652,8 @@ ConditionalAllAppsIterator::GetNextRef(entry_ref* ref)
 
 
 int32
-ConditionalAllAppsIterator::GetNextDirents(struct dirent* buffer, size_t length,
-	int32 count)
+ConditionalAllAppsIterator::GetNextDirents(struct dirent* buffer,
+	size_t length, int32 count)
 {
 	if (!Iterate())
 		return 0;

@@ -114,11 +114,11 @@ public:
 	virtual off_t Contains(const char*, uint32);
 		// returns size of attribute if found
 
-	virtual off_t Read(const char* name, const char* foreignName, uint32 type, off_t size,
-		void* buffer, void (*swapFunc)(void*) = 0);
+	virtual off_t Read(const char* name, const char* foreignName,
+		uint32 type, off_t size, void* buffer, void (*swapFunc)(void*) = 0);
 		// read from this node
-	virtual off_t Write(const char* name, const char* foreignName, uint32 type, off_t size,
-		const void* buffer);
+	virtual off_t Write(const char* name, const char* foreignName,
+		uint32 type, off_t size, const void* buffer);
 		// write to this node
 
 	// work calls
@@ -307,22 +307,25 @@ private:
 class SelectiveAttributeTransformer : public AttributeStreamNode {
 	// node applies a transformation on specified attributes
 public:
-	SelectiveAttributeTransformer(const char* attributeName, bool (*)(const char*,
-		uint32 , off_t , void*, void*), void* params);
+	SelectiveAttributeTransformer(const char* attributeName,
+		bool (*)(const char*, uint32 , off_t , void*, void*), void* params);
 	virtual ~SelectiveAttributeTransformer();
 
-	virtual off_t Read(const char* name, const char* foreignName, uint32 type, off_t size,
-		void* buffer, void (*swapFunc)(void*) = 0);
+	virtual off_t Read(const char* name, const char* foreignName, uint32 type,
+		off_t size, void* buffer, void (*swapFunc)(void*) = 0);
 
 	virtual void Rewind();
 
 protected:
-	virtual bool WillTransform(const char* name, uint32 type, off_t size, const char* data) const;
+	virtual bool WillTransform(const char* name, uint32 type, off_t size,
+		const char* data) const;
 		// override to implement filtering; should only return true if transformation will
 		// occur
-	virtual char* CopyAndApplyTransformer(const char* name, uint32 type, off_t size, const char* data);
+	virtual char* CopyAndApplyTransformer(const char* name, uint32 type,
+		off_t size, const char* data);
 		// makes a copy of data
-	virtual bool ApplyTransformer(const char* name, uint32 type, off_t size, char* data);
+	virtual bool ApplyTransformer(const char* name, uint32 type, off_t size,
+		char* data);
 		// transforms in place
 	virtual const AttributeInfo* Next();
 	virtual const char* Get();
@@ -342,7 +345,8 @@ private:
 template <class Type>
 class AttributeStreamConstValue : public AttributeStreamNode {
 public:
-	AttributeStreamConstValue(const char* name, uint32 attributeType, Type value);
+	AttributeStreamConstValue(const char* name, uint32 attributeType,
+		Type value);
 
 protected:
 	virtual bool CanFeed() const { return true; }

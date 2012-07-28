@@ -88,11 +88,12 @@ class Model {
 
 		status_t InitCheck() const;
 
-		status_t SetTo(const BEntry*, bool open = false, bool writable = false);
-		status_t SetTo(const entry_ref*, bool traverse = false, bool open = false,
+		status_t SetTo(const BEntry*, bool open = false,
 			bool writable = false);
-		status_t SetTo(const node_ref* dirNode, const node_ref* node, const char* name,
+		status_t SetTo(const entry_ref*, bool traverse = false,
 			bool open = false, bool writable = false);
+		status_t SetTo(const node_ref* dirNode, const node_ref* node,
+			const char* name, bool open = false, bool writable = false);
 
 		int CompareFolderNamesFirst(const Model* compareModel) const;
 
@@ -124,9 +125,9 @@ class Model {
 		void SetPreferredAppSignature(const char*);
 
 		void GetPreferredAppForBrokenSymLink(BString &result);
-			// special purpose call - if a symlink is unresolvable, it makes sense
-			// to be able to get at it's preferred handler which may be different
-			// from the Tracker. Used by the network neighborhood.
+			// special purpose call - if a symlink is unresolvable, it makes
+			// sense to be able to get at it's preferred handler which may be
+			// different from the Tracker. Used by the network neighborhood.
 
 		// type getters
 		bool IsFile() const;
@@ -159,8 +160,8 @@ class Model {
 
 		status_t GetLongVersionString(BString &, version_kind);
 		status_t GetVersionString(BString &, version_kind);
-		status_t AttrAsString(BString &, int64* value, const char* attributeName,
-			uint32 attributeType);
+		status_t AttrAsString(BString &, int64* value,
+			const char* attributeName, uint32 attributeType);
 
 		// Node monitor update call
 		void UpdateEntryRef(const node_ref* dirRef, const char* name);
@@ -189,8 +190,8 @@ class Model {
 	#endif
 
 		bool IsSuperHandler() const;
-		int32 SupportsMimeType(const char* type, const BObjectList<BString>* list,
-			bool exactReason = false) const;
+		int32 SupportsMimeType(const char* type,
+			const BObjectList<BString>* list, bool exactReason = false) const;
 			// pass in one string in <type> or a bunch in <list>
 			// if <exactReason> false, returns as soon as it figures out that
 			// app supports a given type, if true, returns an exact reason
@@ -200,8 +201,9 @@ class Model {
 			const void* buffer, size_t );
 			// cover call, creates a writable node and writes out attributes
 			// into it; work around for file nodes not being writeable
-		ssize_t WriteAttrKillForeign(const char* attr, const char* foreignAttr,
-			type_code type, off_t, const void* buffer, size_t);
+		ssize_t WriteAttrKillForeign(const char* attr,
+			const char* foreignAttr, type_code type, off_t,
+			const void* buffer, size_t);
 
 		bool Mimeset(bool force);
 			// returns true if mime type changed
@@ -242,11 +244,13 @@ class Model {
 
 		entry_ref fEntryRef;
 		StatStruct fStatBuf;
-		BString fMimeType;		// should use string that may be shared for common types
+		BString fMimeType;
+			// should use string that may be shared for common types
 
 		// bit of overloading hackery here to save on footprint
 		union {
-			char* fPreferredAppName;	// used if we are neither a volume nor a symlink
+			char* fPreferredAppName;	// used if we are neither a volume
+										// nor a symlink
 			char* fVolumeName;			// used if we are a volume
 			Model* fLinkTo;				// used if we are a symlink
 		};
@@ -267,7 +271,8 @@ class ModelNodeLazyOpener {
 	public:
 		// consider failing when open does not succeed
 
-		ModelNodeLazyOpener(Model* model, bool writable = false, bool openLater = true);
+		ModelNodeLazyOpener(Model* model, bool writable = false,
+			bool openLater = true);
 		~ModelNodeLazyOpener();
 
 		bool IsOpen() const;
@@ -463,7 +468,8 @@ Model::HasLocalizedName() const
 
 
 inline
-ModelNodeLazyOpener::ModelNodeLazyOpener(Model* model, bool writable, bool openLater)
+ModelNodeLazyOpener::ModelNodeLazyOpener(Model* model, bool writable,
+	bool openLater)
 	:	fModel(model),
 		fWasOpen(model->IsNodeOpen()),
 		fWasOpenForWriting(model->IsNodeOpenForWriting())
