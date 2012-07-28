@@ -366,16 +366,19 @@ BNavigator::UpdateLocation(const Model* newmodel, int32 action)
 		case kActionBackward:
 			fForwHistory.AddItem(fBackHistory.RemoveItemAt(fBackHistory.CountItems()-1));
 			break;
+
 		case kActionForward:
 			fBackHistory.AddItem(fForwHistory.RemoveItemAt(fForwHistory.CountItems()-1));
 			break;
+
 		case kActionUpdatePath:
 			break;
+
 		default:
 			fForwHistory.MakeEmpty();
 			fBackHistory.AddItem(new BPath(fPath));
 
-			for (; fBackHistory.CountItems() > kMaxHistory;)
+			while (fBackHistory.CountItems() > kMaxHistory)
 				fBackHistory.RemoveItem(fBackHistory.FirstItem(), true);
 			break;
 	}
