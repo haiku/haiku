@@ -594,13 +594,19 @@ CliDebugger::Run(const Options& options)
 	if (!get_debugged_program(options, programInfo))
 		return false;
 
-	if (start_team_debugger(programInfo.team, &settingsManager, this,
-			programInfo.thread, programInfo.stopInMain, userInterface)
-			== NULL) {
+	TeamDebugger* teamDebugger = start_team_debugger(programInfo.team,
+		&settingsManager, this, programInfo.thread, programInfo.stopInMain,
+		userInterface);
+	if (teamDebugger == NULL)
 		return false;
-	}
 
+	thread_id teamDebuggerThread = teamDebugger->Thread();
+
+	// run the input loop
 	userInterface->Run();
+
+	// wait for the team debugger thread to terminate
+	wait_for_thread(teamDebuggerThread, NULL);
 
 	return true;
 }
