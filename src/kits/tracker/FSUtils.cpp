@@ -2798,7 +2798,7 @@ empty_trash(void*)
 	}
 
 	if (err != B_OK && err != kTrashCanceled && err != kUserCanceled) {
-		(new BAlert("", B_TRANSLATE("Error emptying Trash!"),
+		(new BAlert("", B_TRANSLATE("Error emptying Trash"),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT))->Go();
 	}
