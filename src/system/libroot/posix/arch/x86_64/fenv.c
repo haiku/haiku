@@ -41,9 +41,6 @@ const fenv_t __fe_dfl_env = {
 	__INITIAL_MXCSR__
 };
 
-extern inline int feclearexcept(int __excepts);
-extern inline int fegetexceptflag(fexcept_t *__flagp, int __excepts);
-
 int
 fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
@@ -71,10 +68,6 @@ feraiseexcept(int excepts)
 	__fwait();
 	return (0);
 }
-
-extern inline int fetestexcept(int __excepts);
-extern inline int fegetround(void);
-extern inline int fesetround(int __round);
 
 int
 fegetenv(fenv_t *envp)
@@ -104,8 +97,6 @@ feholdexcept(fenv_t *envp)
 	__ldmxcsr(mxcsr);
 	return (0);
 }
-
-extern inline int fesetenv(const fenv_t *__envp);
 
 int
 feupdateenv(const fenv_t *envp)
