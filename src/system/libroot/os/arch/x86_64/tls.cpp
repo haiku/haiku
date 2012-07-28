@@ -18,33 +18,37 @@
 #include <assert.h>
 
 
+static int32 gNextSlot = TLS_FIRST_FREE_SLOT;
+static void* gSlots[TLS_MAX_KEYS];
+
+
 int32
 tls_allocate(void)
 {
-	assert(0 && "tls_allocate: not implemented");
-	return 0;
+	int32 next = atomic_add(&gNextSlot, 1);
+	if (next >= TLS_MAX_KEYS)
+		return B_NO_MEMORY;
+
+	return next;
 }
 
 
 void*
 tls_get(int32 index)
 {
-	assert(0 && "tls_get: not implemented");
-	return NULL;
+	return gSlots[index];
 }
 
 
 void**
 tls_address(int32 index)
 {
-	assert(0 && "tls_address: not implemented");
-	return NULL;
+	return &gSlots[index];
 }
 
 
 void
 tls_set(int32 index, void* value)
 {
-	assert(0 && "tls_set: not implemented");
+	gSlots[index] = value;
 }
-
