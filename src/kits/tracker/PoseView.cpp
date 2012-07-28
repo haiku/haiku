@@ -6913,8 +6913,7 @@ BPoseView::MouseDown(BPoint where)
 	uint32 buttons = (uint32)window->CurrentMessage()->FindInt32("buttons");
 	uint32 modifs = modifiers();
 
-	if (buttons == B_SECONDARY_MOUSE_BUTTON)
-		fTrackRightMouseUp = true;
+	fTrackRightMouseUp = (buttons == B_SECONDARY_MOUSE_BUTTON);
 
 	bool extendSelection = (modifs & B_COMMAND_KEY) && fMultipleSelection;
 
@@ -6925,7 +6924,7 @@ BPoseView::MouseDown(BPoint where)
 	if (pose) {
 		AddRemoveSelectionRange(where, extendSelection, pose);
 
-		if (!extendSelection && WasDoubleClick(pose, where)) {
+		if (!extendSelection && !fTrackRightMouseUp && WasDoubleClick(pose, where)) {
 			// special handling for Path field double-clicks
 			if (!WasClickInPath(pose, index, where))
 				OpenSelection(pose, &index);
