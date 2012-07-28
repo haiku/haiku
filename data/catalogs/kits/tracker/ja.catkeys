@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	4157674549
+1	japanese	x-vnd.Haiku-libtracker	2795444721
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -19,6 +19,7 @@ Recent documents	FavoritesMenu		最近開いたドキュメント
 Modified	QueryPoseView		更新日時
 Created	ContainerWindow		作成日時
 Error %error loading add-On %name.	ContainerWindow		%nameアドオンの読み込み中に%errorエラーが発生
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		settings  フォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります!\n\n本当に続けますか?
 contains	SelectionWindow		含む
 Sorry, you can't save things at the root of your system.	FilePanelPriv		システムのルートフォルダーに保存は許可されていません。
 Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示する
@@ -86,6 +87,7 @@ Cut	FilePanelPriv		切り取り
 Replace	FilePanelPriv		置換
 Select all	VolumeWindow		すべて選択
 Opens with:	InfoWindow		アプリケーション：
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		MIME 設定を%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります!\n\n本当に続けますか?
 Open	ContainerWindow		開く
 Error calculating folder size.	InfoWindow		フォルダーサイズの計算中にエラー発生。
 New folder	FilePanelPriv		新規フォルダー
@@ -114,6 +116,7 @@ Move to Trash	ContainerWindow		ごみ箱に捨てる
 Move to	ContainerWindow		指定先に移動
 Create %s clipping	PoseView		%s クリップを作成
 Set new link target	InfoWindow		リンク先を変更
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		システムフォルダーおよびその中身を%ifYouDoActionした場合、%osName が起動しなくなります!\n\n本当に続けますか?\n\nそれでもシステムフォルダーまたはその中身の%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Save as Query template:	FindPanel		クエリ雛型として保存する：
 Cancel	FSUtils		中止
 move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	移動
@@ -136,6 +139,7 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		ア�
 Sorry, saving more than one item is not allowed.	FilePanelPriv		2 項目以上は保存できません。
 Searching for disks to mount…	StatusWindow		マウントできるディスクを探しています…
 New folder	FSUtils		新規フォルダー
+If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		common フォルダーおよびその中身を%ifYouDoActionした場合、%osName が起動しなくなります!\n\n本当に続けますか?\n \n それでも common フォルダーまたはその中身の%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Free space color	SettingsView		空き容量の色
 Cut	ContainerWindow		切り取り
 Remove	FindPanel		削除
@@ -244,6 +248,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 Cancel	ContainerWindow		中止
 Only the boot disk	AutoMounterSettings		起動ディスクのみ
 Trash	TrackerSettingsWindow		ごみ箱
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		config フォルダーを%ifYouDoAction した場合、%osName が正常に動作しなくなる可能性があります!\n\n本当に続けますか?
 Unmount	ContainerWindow		マウント解除
 Copy layout	ContainerWindow		レイアウトをコピー
 label too long	PoseView		ラベルが長すぎます
@@ -329,6 +334,7 @@ Handles any file	OpenWithWindow		すべてのファイルに対応
 Get info	FilePanelPriv		詳細情報…
 32 x 32	DeskWindow		32 × 32
 Cancel	FilePanelPriv		中止
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\"  は開こうとしているドキュメントタイプをサポートしていません。\n本当に進めても良いですか?\n\n アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
 Disks	DirMenu		ディスク
 New folder %ld	FSUtils		新規フォルダー %ld 
 All BeOS disks	AutoMounterSettings		全 BFS パーティション
@@ -366,6 +372,7 @@ Preferences…	ContainerWindow		設定…
 Move	PoseView		移動
 Open and make preferred	OpenWithWindow		関連づけて開く
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除してもよろしいですか？削除した項目は復元できませんので、ご注意ください。
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		ホームフォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります!\n\n本当に続けますか?\n\nそれでもホームフォルダーの%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Add-ons	DeskWindow		アドオン
 Name	FindPanel		名前
 And	FindPanel		かつ

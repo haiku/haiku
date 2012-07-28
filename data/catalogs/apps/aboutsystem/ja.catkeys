@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	2330231195
+1	japanese	x-vnd.Haiku-About	519561637
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprintの著者たち. All rights reserved.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n
 BSD (4-clause)	AboutView		BSD (4条項)
@@ -40,6 +40,7 @@ Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright ©
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		メモリー：
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. All rights reserved.
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. このソフトウェアの一部はIndependent JPEG Groupの著作物に基づいています.
 Past maintainers:\n	AboutView		過去のメンテナー\n
 \n\nSpecial thanks to:\n	AboutView		\n\n下記の協力者の方々に深く感謝します：\n
