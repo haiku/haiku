@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	859055013
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2160148895
 common	B_COMMON_DIRECTORY		κοινό
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
@@ -165,7 +165,6 @@ Edit favorites…	FilePanelPriv		Επεξεργασία αγαπημένων...
 Create relative link	ContainerWindow		Δημιουργία συγγενικού συνδέσμου
 Copy	ContainerWindow		Αντιγραφή
 Size	PoseView		Μέγεθος
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Εάν %ifYouDoAction στον αρχικό κατάλογο, το %osName μπορεί να μην συμπεριφερθεί σωστά! Είστε βέβαιος ότι θέλετε να το κάνετε αυτό; Για να %toDoAction στον αρχικό κατάλογο ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο \"%toConfirmAction\".
 Location	OpenWithWindow		Τοποθεσία
 Force identify	ContainerWindow		Εξαναγκασμός αναγνώρισης
 Duplicate	ContainerWindow		Διπλότυπο
@@ -213,7 +212,6 @@ Name	PoseView		Όνομα
 Group	FilePermissionsView		Ομάδα
 Version:	InfoWindow		Έκδοση
 Created:	InfoWindow		Δημιουργήθηκε:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Εάν %ifYouDoAction στις απλές ρυθμίσεις, το %osName μπορεί να μην συμπεριφερθεί σωστά! Είστε βέβαιος ότι θέλετε να το κάνετε αυτό; Για να %toDoAction στις απλές ρυθμίσεις ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο \"toConfirmAction% \".
 \nShould this be fixed?	FSUtils		\nΠρέπει αυτό να διορθωθεί;
 Copying: 	StatusWindow		Αντιγραφή:
 Capacity:	InfoWindow		Χωρητικότητα:
@@ -271,7 +269,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Μετονομ�
 Paused: click to resume or stop	StatusWindow		Σταματημένο: κάντε κλικ για συνέχεια ή διακοπή
 Preferred for %type	OpenWithWindow		Προτινόμενο για %type
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Εάν %ifYouDoAction στον κοινό φάκελο, το %osName μπορεί να μην συμπεριφερθεί σωστά! Είστε βέβαιος ότι θέλετε να το κάνετε αυτό; Για να %toDoAction στον κοινό φάκελο ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο \"toConfirmAction% \".
 There was an error deleting \"%name\":\n\t%error	FSUtils		Υπήρξε κάποιο σφάλμα κατά τη διαγραφή \"%name\":\n\t%error
 Paste	FilePanelPriv		Επικόλληση
 Copy more	ContainerWindow		Αντιγραφή κι άλλων
@@ -396,7 +393,6 @@ Select…	FilePanelPriv		Επιλογή...
 Don't move files to Trash	SettingsView		Να μη μετακινόυνται αρχεία στα απορρίματα
 There was an error resolving the link.	Tracker		Υπήρξε κάποιο σφάλμα κατά την επίλυση του συνδέσμου.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Εάν %ifYouDoAction στο φάκελο συστήματος, το %osName μπορεί να μην συμπεριφερθεί σωστά! Είστε βέβαιος ότι θέλετε να το κάνετε αυτό; Για να %toDoAction στο φάκελο συστήματος ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο \"toConfirmAction% \".
 You can't move or copy the trash.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στο καλάθι αχρήστων.
 ends with	SelectionWindow		τελειώνει με
 Volume icons	TrackerSettingsWindow		Εικονίδια τόμου
@@ -418,7 +414,6 @@ Modified	ContainerWindow		Τροποποιήθηκε
 Edit Query template	FindPanel		Επεξεργασία προτύπου ερωτήματος
 Prompt	FSUtils		Προτροπή
 Edit query	ContainerWindow		Επεξεργασία ερωτήματος
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Εάν %ifYouDoAction στο φάκελο διαμόρφωσης, το %osName μπορεί να μην συμπεριφερθεί σωστά! Είστε βέβαιος ότι θέλετε να το κάνετε αυτό; Για να %toDoAction στο φάκελο φάκελο διαμόρφωσης ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο \"toConfirmAction% \".
 Find…	ContainerWindow		Εύρεση...
 Create a Query	FindPanel		Δημιούργησε ένα ερώτημα
 Move to Trash	FSUtils		Μεταφορά στο Καλάθι αχρήστων
@@ -437,7 +432,6 @@ Mount	ContainerWindow		Προσάρτηση
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used  χρησιμοποιημένα -- %free fελεύθερα)
 Cancel	FSClipBoard		Άκυρο
 Cut more	ContainerWindow		Αποκοπή περισσότερων
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Εάν %ifYouDoAction στο φάκελο ρυθμίσεων, το %osName μπορεί να μην συμπεριφερθεί σωστά! Είστε βέβαιος ότι θέλετε να το κάνετε αυτό; Για να %toDoAction στο φάκελο ρυθμίσεων ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο \"toConfirmAction% \".
 Deleting: 	StatusWindow		Διαγραφή:
 Empty Trash	InfoWindow		Άδειασμα κάδου
 Add	FindPanel		Προσθήκη

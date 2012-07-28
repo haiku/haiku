@@ -31,14 +31,15 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef __FAVORITES_MENU__
 #define __FAVORITES_MENU__
+
 
 #include <vector>
 
 #include "NavMenu.h"
 #include "ObjectList.h"
+
 
 class BRefFilter;
 
@@ -48,28 +49,29 @@ class EntryListBase;
 
 #define kGoDirectory "Tracker/Go"
 
+
 class FavoritesMenu : public BSlowMenu {
 	// FavoritesMenu is used in the FilePanel -
 	// displays recent files, recent folders and favorites items
 	public:
-		FavoritesMenu(const char *title, BMessage *openFolderMessage,
-			BMessage *openFileMessage, const BMessenger &,
-			bool isSavePanel, BRefFilter *filter = NULL);
+		FavoritesMenu(const char* title, BMessage* openFolderMessage,
+			BMessage* openFileMessage, const BMessenger &,
+			bool isSavePanel, BRefFilter* filter = NULL);
 		virtual ~FavoritesMenu();
 		
-		void SetRefFilter(BRefFilter *filter);
+		void SetRefFilter(BRefFilter* filter);
 
 	private:
 		// override the necessary SlowMenu hooks
 		virtual bool StartBuildingItemList();
 		virtual bool AddNextItem();
-		virtual void DoneBuildingItemList();	
+		virtual void DoneBuildingItemList();
 		virtual void ClearMenuBuildingState();
 				
-		bool ShouldShowModel(const Model *model);
+		bool ShouldShowModel(const Model* model);
 		
-		BMessage *fOpenFolderMessage;
-		BMessage *fOpenFileMessage;
+		BMessage* fOpenFolderMessage;
+		BMessage* fOpenFileMessage;
 		BMessenger fTarget;
 
 		enum State {
@@ -89,12 +91,12 @@ class FavoritesMenu : public BSlowMenu {
 			// next inserted item
 		BMessage fItems;
 
-		EntryListBase *fContainer;
-		BObjectList<BMenuItem> *fItemList;
+		EntryListBase* fContainer;
+		BObjectList<BMenuItem>* fItemList;
 		int32 fInitialItemCount;
 		std::vector<entry_ref> fUniqueRefCheck;
 		bool fIsSavePanel;
-		BRefFilter *fRefFilter;
+		BRefFilter* fRefFilter;
 
 		typedef BSlowMenu _inherited;
 };
@@ -106,22 +108,23 @@ enum recent_type {
 	kRecentFolders = 2
 };
 
+
 class RecentsMenu : public BNavMenu {
 	public:
-		RecentsMenu(const char *name,int32 which,uint32 what,BHandler *target);
+		RecentsMenu(const char* name,int32 which,uint32 what,BHandler* target);
 
 		void			DetachedFromWindow();
 
-		int32			RecentsCount();	
+		int32			RecentsCount();
 
-	private:		
+	private:
 		virtual	bool	StartBuildingItemList();
 		virtual	bool	AddNextItem();
 				bool	AddRecents(int32 count);
-		virtual	void	DoneBuildingItemList();	
+		virtual	void	DoneBuildingItemList();
 		virtual	void	ClearMenuBuildingState();
 
-	private:		
+	private:
 		int32			fWhich;
 		int32			fRecentsCount;
 

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	2099988747
+1	russian	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Поэтому в самом конце файла /boot/grub/menu.lst добавьте что-то вроде этого:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Вы уверены, что хотите прервать установку и перезагрузить компьютер?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -12,6 +12,7 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		В GRUB это: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Остановить
 Install progress:  	InstallerWindow		Прогресс установки: 
+2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Запуск установки.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Это программное обеспечение пока еще находится в состоянии альфа качества! Это значит, что есть большой риск потери данных. Чаще делайте резервные копии! Мы вас предупредили.\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Вы уверены, что хотите  прервать установку
@@ -37,6 +38,7 @@ Boot sector successfully written.	InstallProgress		Загрузочный сек
 Performing installation.	InstallProgress		Выполняется установка.
 scanning…	InstallerWindow		сканирование…
 Set up boot menu	InstallerWindow		Установить загрузочное меню
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (начиная с os-prober v1.44)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Первый логический (расширенный) раздел всегда имеет номер \"4\", вне зависимости от количества первичных разделов.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Схема именования GRUB по-прежнему такая: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <ваш текстовый редактор> /boot/grub/menu.lst\n\n
@@ -48,6 +50,7 @@ README	InstallerApp		Cопроводительная инструкция
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		На выбранном диске недостаточно места. Попробуйте выбрать другой диск или не устанавливайте опциональные пакеты.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Пожалуйста, закройте Менеджер загрузки и Разметки диска перед закрытием окна установщика.
 Scanning for disks…	InstallerWindow		Сканирование дисков…
+2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Диск не может быть подключен. Пожалуйста, выберите другой диск.
 ?? of ??	InstallerWindow	Unknown progress	?? из ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -67,6 +70,7 @@ Installer	System name		Установщик
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Вы не можете установить содержимое диска на тот же самый диск. Пожалуйста, выберите другой диск.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" это номер раздела, который в GRUB 2 начинается с \"1\"\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Начиная с os-prober v1.44 (т.е. в Ubuntu 11.04 и старше), Haiku должна распознаваться из коробки. Чтобы добавить Haiku в меню GRUB, откройте Терминал и введите:\n\n
 Quit DriveSetup	InstallerWindow		Закройте Разметку диска
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" это номер жесткого диска, начинающийся с \"0\".\n\
 Hide optional packages	InstallerWindow		Скрыть опциональные пакеты
@@ -109,6 +113,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Вы уверены, что хотите прервать установку?
 Onto:	InstallerWindow		На диск:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте Менеджер Загрузки перед закрытием окна установщика.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Когда вы первый раз успешно загрузитесь в установленную Haiku, не забудьте прочесть нашу документацию, доступную в файлах \"Welcome\" и  \"Userguide\". Ссылки на них находятся на рабочем столе и в закладках WebPositive.\n
 Tools	InstallerWindow		Инструменты
 The mount point could not be retrieved.	InstallProgress		Невозможно определить точку подключения.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Выбранный диск не является пустым.\nВы уверены, что хотите продолжить?\n\nВнимание: Папка 'system' будет полностью перезаписана, все остальные папки будут объединены, а файлы и папки, которые существуют на обоих носителях будут перезаписаны с установочного диска.

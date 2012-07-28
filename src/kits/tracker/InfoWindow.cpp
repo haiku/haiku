@@ -95,10 +95,10 @@ enum track_state {
 
 class TrackingView : public BControl {
 	public:
-		TrackingView(BRect, const char *str, BMessage *message);
+		TrackingView(BRect, const char* str, BMessage* message);
 
 		virtual void MouseDown(BPoint);
-		virtual void MouseMoved(BPoint, uint32 transit, const BMessage *message);
+		virtual void MouseMoved(BPoint, uint32 transit, const BMessage* message);
 		virtual void MouseUp(BPoint);
 		virtual void Draw(BRect);
 
@@ -109,33 +109,33 @@ class TrackingView : public BControl {
 
 class AttributeView : public BView {
 	public:
-		AttributeView(BRect, Model *);
+		AttributeView(BRect, Model*);
 		~AttributeView();
 
-		void ModelChanged(Model *, BMessage *);
-		void ReLinkTargetModel(Model *);
+		void ModelChanged(Model*, BMessage*);
+		void ReLinkTargetModel(Model*);
 		void BeginEditingTitle();
 		void FinishEditingTitle(bool);
 		float CurrentFontHeight(float size = -1);
 
-		BTextView *TextView() const { return fTitleEditView; }
+		BTextView* TextView() const { return fTitleEditView; }
 
-		static filter_result TextViewFilter(BMessage *, BHandler **, BMessageFilter *);
+		static filter_result TextViewFilter(BMessage*, BHandler**, BMessageFilter*);
 
 		off_t LastSize() const;
 		void SetLastSize(off_t);
 
-		void SetSizeStr(const char *);
+		void SetSizeStr(const char*);
 
-		status_t BuildContextMenu(BMenu *parent);
+		status_t BuildContextMenu(BMenu* parent);
 
 		void SetPermissionsSwitchState(int32 state);
 
 	protected:
 		virtual void MouseDown(BPoint);
-		virtual void MouseMoved(BPoint, uint32, const BMessage *);
+		virtual void MouseMoved(BPoint, uint32, const BMessage*);
 		virtual void MouseUp(BPoint);
-		virtual void MessageReceived(BMessage *);
+		virtual void MessageReceived(BMessage*);
 		virtual void AttachedToWindow();
 		virtual void Draw(BRect);
 		virtual void Pulse();
@@ -143,7 +143,7 @@ class AttributeView : public BView {
 		virtual void WindowActivated(bool);
 
 	private:
-		void InitStrings(const Model *);
+		void InitStrings(const Model*);
 		void CheckAndSetSize();
 		void OpenLinkSource();
 		void OpenLinkTarget();
@@ -168,20 +168,20 @@ class AttributeView : public BView {
 		BPoint fClickPoint;
 		float fDivider;
 
-		BMenuField *fPreferredAppMenu;
-		Model *fModel;
-		Model *fIconModel;
-		BBitmap *fIcon;
+		BMenuField* fPreferredAppMenu;
+		Model* fModel;
+		Model* fIconModel;
+		BBitmap* fIcon;
 		bool fMouseDown;
 		bool fDragging;
 		bool fDoubleClick;
 		track_state fTrackingState;
 		bool fIsDropTarget;
-		BTextView *fTitleEditView;
-		PaneSwitch *fPermissionsSwitch;
-		BWindow *fPathWindow;
-		BWindow *fLinkWindow;
-		BWindow *fDescWindow;
+		BTextView* fTitleEditView;
+		PaneSwitch* fPermissionsSwitch;
+		BWindow* fPathWindow;
+		BWindow* fLinkWindow;
+		BWindow* fDescWindow;
 
 		typedef BView _inherited;
 };
@@ -222,7 +222,7 @@ const uint32 kPaneSwitchOpen = 2;
 
 
 static void
-OpenParentAndSelectOriginal(const entry_ref *ref)
+OpenParentAndSelectOriginal(const entry_ref* ref)
 {
 	BEntry entry(ref);
 	node_ref node;
@@ -241,9 +241,9 @@ OpenParentAndSelectOriginal(const entry_ref *ref)
 }
 
 
-static BWindow *
-OpenToolTipWindow(BScreen& screen, BRect rect, const char *name,
-	const char *string, BMessenger target, BMessage *message)
+static BWindow*
+OpenToolTipWindow(BScreen& screen, BRect rect, const char* name,
+	const char* string, BMessenger target, BMessage* message)
 {
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
@@ -257,13 +257,13 @@ OpenToolTipWindow(BScreen& screen, BRect rect, const char *name,
 	else if (rect.right > screen.Frame().right)
 		rect.OffsetBy(screen.Frame().right - rect.right, 0);
 
-	BWindow *window = new BWindow(rect, name, B_BORDERED_WINDOW_LOOK,
+	BWindow* window = new BWindow(rect, name, B_BORDERED_WINDOW_LOOK,
 		B_FLOATING_ALL_WINDOW_FEEL,
 		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
 		| B_NOT_RESIZABLE | B_AVOID_FOCUS | B_NO_WORKSPACE_ACTIVATION
 		| B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS);
 
-	TrackingView *trackingView = new TrackingView(window->Bounds(),
+	TrackingView* trackingView = new TrackingView(window->Bounds(),
 		string, message);
 	trackingView->SetTarget(target);
 	window->AddChild(trackingView);
@@ -278,7 +278,7 @@ OpenToolTipWindow(BScreen& screen, BRect rect, const char *name,
 //	#pragma mark -
 
 
-BInfoWindow::BInfoWindow(Model *model, int32 group_index, LockingList<BWindow> *list)
+BInfoWindow::BInfoWindow(Model* model, int32 group_index, LockingList<BWindow>* list)
 	: BWindow(BInfoWindow::InfoWindowRect(false),
 		"InfoWindow", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_CURRENT_WORKSPACE),
@@ -344,7 +344,7 @@ BInfoWindow::Quit()
 
 
 bool
-BInfoWindow::IsShowing(const node_ref *node) const
+BInfoWindow::IsShowing(const node_ref* node) const
 {
 	return *TargetModel()->NodeRef() == *node;
 }
@@ -409,7 +409,7 @@ BInfoWindow::Show()
 
 
 void
-BInfoWindow::MessageReceived(BMessage *message)
+BInfoWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kRestoreState:
@@ -701,9 +701,9 @@ BInfoWindow::GetSizeString(BString &result, off_t size, int32 fileCount)
 
 
 int32
-BInfoWindow::CalcSize(void *castToWindow)
+BInfoWindow::CalcSize(void* castToWindow)
 {
-	BInfoWindow *window = static_cast<BInfoWindow *>(castToWindow);
+	BInfoWindow* window = static_cast<BInfoWindow*>(castToWindow);
 	BDirectory dir(window->TargetModel()->EntryRef());
 	BDirectory trashDir;
 	FSGetTrashDir(&trashDir, window->TargetModel()->EntryRef()->device);
@@ -782,16 +782,16 @@ BInfoWindow::CalcSize(void *castToWindow)
 
 
 void
-BInfoWindow::SetSizeStr(const char *sizeStr)
+BInfoWindow::SetSizeStr(const char* sizeStr)
 {
-	AttributeView *view = dynamic_cast<AttributeView *>(FindView("attr_view"));
+	AttributeView* view = dynamic_cast<AttributeView *>(FindView("attr_view"));
 	if (view)
 		view->SetSizeStr(sizeStr);
 }
 
 
 void
-BInfoWindow::OpenFilePanel(const entry_ref *ref)
+BInfoWindow::OpenFilePanel(const entry_ref* ref)
 {
 	// Open a file dialog box to allow the user to select a new target
 	// for the sym link
@@ -825,7 +825,7 @@ BInfoWindow::OpenFilePanel(const entry_ref *ref)
 //	#pragma mark -
 
 
-AttributeView::AttributeView(BRect rect, Model *model)
+AttributeView::AttributeView(BRect rect, Model* model)
 	: BView(rect, "attr_view", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_PULSE_NEEDED),
 	fDivider(0),
 	fPreferredAppMenu(NULL),
@@ -847,7 +847,7 @@ AttributeView::AttributeView(BRect rect, Model *model)
 	// If the model is a symlink, then we deference the model to
 	// get the targets icon
 	if (fModel->IsSymLink()) {
-		Model *resolvedModel = new Model(model->EntryRef(), true, true);
+		Model* resolvedModel = new Model(model->EntryRef(), true, true);
 		if (resolvedModel->InitCheck() == B_OK)
 			fIconModel = resolvedModel;
 		// broken link, just show the symlink
@@ -919,7 +919,7 @@ AttributeView::AttributeView(BRect rect, Model *model)
 			mime.GetSupportingApps(&supportingAppList);
 
 			// Add the default menu item and set it to marked
-			BMenuItem *result;
+			BMenuItem* result;
 			result = new BMenuItem(B_TRANSLATE("Default application"),
 				new BMessage(kSetPreferredApp));
 			result->SetTarget(this);
@@ -927,7 +927,7 @@ AttributeView::AttributeView(BRect rect, Model *model)
 			result->SetMarked(true);
 
 			for (int32 index = 0; ; index++) {
-				const char *signature;
+				const char* signature;
 				if (supportingAppList.FindString("applications", index, &signature) != B_OK)
 					break;
 
@@ -935,7 +935,7 @@ AttributeView::AttributeView(BRect rect, Model *model)
 				if (index == 0)
 					fPreferredAppMenu->Menu()->AddSeparatorItem();
 
-				BMessage *itemMessage = new BMessage(kSetPreferredApp);
+				BMessage* itemMessage = new BMessage(kSetPreferredApp);
 				itemMessage->AddString("signature", signature);
 
 				status_t err = B_ERROR;
@@ -988,7 +988,7 @@ AttributeView::~AttributeView()
 
 
 void
-AttributeView::InitStrings(const Model *model)
+AttributeView::InitStrings(const Model* model)
 {
 	BMimeType mime;
 	char kind[B_MIME_TYPE_LENGTH];
@@ -1076,7 +1076,7 @@ AttributeView::Pulse()
 
 
 void
-AttributeView::ModelChanged(Model *model, BMessage *message)
+AttributeView::ModelChanged(Model* model, BMessage* message)
 {
 	BRect drawBounds(Bounds());
 	drawBounds.left = fDivider;
@@ -1090,7 +1090,7 @@ AttributeView::ModelChanged(Model *model, BMessage *message)
 			message->FindInt64("to directory", &dirNode.node);
 			message->FindInt64("node", &itemNode.node);
 
-			const char *name;
+			const char* name;
 			if (message->FindString("name", &name) != B_OK)
 				return;
 
@@ -1136,7 +1136,7 @@ AttributeView::ModelChanged(Model *model, BMessage *message)
 		case B_ATTR_CHANGED:
 		{
 			// watch for icon updates
-			const char *attrName;
+			const char* attrName;
 			if (message->FindString("attr", &attrName) == B_OK) {
 				if (strcmp(attrName, kAttrLargeIcon) == 0
 					|| strcmp(attrName, kAttrIcon) == 0) {
@@ -1169,7 +1169,7 @@ AttributeView::ModelChanged(Model *model, BMessage *message)
 	if (fModel->IsSymLink()) {
 		// if we are looking at a symlink, deference the model and look at the
 		// target
-		Model *resolvedModel = new Model(model->EntryRef(), true, true);
+		Model* resolvedModel = new Model(model->EntryRef(), true, true);
 		if (resolvedModel->InitCheck() == B_OK) {
 			if (fIconModel != fModel)
 				delete fIconModel;
@@ -1194,11 +1194,11 @@ AttributeView::ModelChanged(Model *model, BMessage *message)
 // would be nice)
 
 void
-AttributeView::ReLinkTargetModel(Model *model)
+AttributeView::ReLinkTargetModel(Model* model)
 {
 	fModel = model;
 	if (fModel->IsSymLink()) {
-		Model *resolvedModel = new Model(model->EntryRef(), true, true);
+		Model* resolvedModel = new Model(model->EntryRef(), true, true);
 		if (resolvedModel->InitCheck() == B_OK) {
 			if (fIconModel != fModel)
 				delete fIconModel;
@@ -1252,10 +1252,10 @@ AttributeView::MouseDown(BPoint point)
 			fTrackingState = no_track;
 	} else if (fIconRect.Contains(point)) {
 		uint32 buttons;
-		Window()->CurrentMessage()->FindInt32("buttons", (int32 *)&buttons);
+		Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 		if (((modifiers() & B_CONTROL_KEY) != 0) || (buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
 			// Show contextual menu
-			BPopUpMenu *contextMenu = new BPopUpMenu("FileContext", false, false);
+			BPopUpMenu* contextMenu = new BPopUpMenu("FileContext", false, false);
 			if (contextMenu) {
 				BuildContextMenu(contextMenu);
 				contextMenu->SetAsyncAutoDestruct(true);
@@ -1278,7 +1278,7 @@ AttributeView::MouseDown(BPoint point)
 					int32 clickCount;
 					Window()->CurrentMessage()->FindInt32("clicks", &clickCount);
 
-					// This checks the *previous* click point
+					// This checks the* previous* click point
 					if (clickCount == 2) {
 						offsetPoint.x = fClickPoint.x - fIconRect.left;
 						offsetPoint.y = fClickPoint.y - fIconRect.top;
@@ -1296,7 +1296,7 @@ AttributeView::MouseDown(BPoint point)
 
 
 void
-AttributeView::MouseMoved(BPoint point, uint32, const BMessage *message)
+AttributeView::MouseMoved(BPoint point, uint32, const BMessage* message)
 {
 	// Highlight Drag target
 	if (message	&& message->ReturnAddress() != BMessenger(this)
@@ -1344,9 +1344,9 @@ AttributeView::MouseMoved(BPoint point, uint32, const BMessage *message)
 				float height = CurrentFontHeight(kAttribFontHeight) + fIconRect.Height() + 8;
 				BRect rect(0, 0, min_c(fIconRect.Width()
 					+ font.StringWidth(fModel->Name()) + 4, fIconRect.Width() * 3), height);
-				BBitmap *dragBitmap = new BBitmap(rect, B_RGBA32, true);
+				BBitmap* dragBitmap = new BBitmap(rect, B_RGBA32, true);
 				dragBitmap->Lock();
-				BView *view = new BView(dragBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
+				BView* view = new BView(dragBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
 				dragBitmap->AddChild(view);
 				view->SetOrigin(0, 0);
 				BRect clipRect(view->Bounds());
@@ -1486,7 +1486,7 @@ AttributeView::OpenLinkTarget()
 	}
 	if (entry.InitCheck() != B_OK || !entry.Exists()) {
 		// Open a file dialog panel to allow the user to relink.
-		BInfoWindow *window = dynamic_cast<BInfoWindow *>(Window());
+		BInfoWindow* window = dynamic_cast<BInfoWindow*>(Window());
 		if (window)
 			window->OpenFilePanel(fModel->EntryRef());
 	} else {
@@ -1512,7 +1512,7 @@ AttributeView::MouseUp(BPoint point)
 	} else if ((fTrackingState == icon_track || fTrackingState == open_only_track)
 		&& fIconRect.Contains(point)) {
 		// If it was a double click, then tell Tracker to open the item
-		// The CurrentMessage() here does *not* have a "clicks" field,
+		// The CurrentMessage() here does* not* have a "clicks" field,
 		// which is why we are tracking the clicks with this temp var
 		if (fDoubleClick){
 			// Double click, launch.
@@ -1600,7 +1600,7 @@ AttributeView::CheckAndSetSize()
 
 
 void
-AttributeView::MessageReceived(BMessage *message)
+AttributeView::MessageReceived(BMessage* message)
 {
 	if (message->WasDropped()
 		&& message->what == B_SIMPLE_DATA
@@ -1618,7 +1618,7 @@ AttributeView::MessageReceived(BMessage *message)
 			BNode node(fModel->EntryRef());
 			BNodeInfo nodeInfo(&node);
 
-			const char *newSignature;
+			const char* newSignature;
 			if (message->FindString("signature", &newSignature) != B_OK)
 				newSignature = NULL;
 
@@ -1891,7 +1891,7 @@ AttributeView::BeginEditingTitle()
 	fTitleEditView->AddFilter(
 		new BMessageFilter(B_KEY_DOWN, AttributeView::TextViewFilter));
 
-	BScrollView *scrollView = new BScrollView("BorderView", fTitleEditView,
+	BScrollView* scrollView = new BScrollView("BorderView", fTitleEditView,
 		0, 0, false, false, B_PLAIN_BORDER);
 	AddChild(scrollView);
 	fTitleEditView->SelectAll();
@@ -1909,7 +1909,7 @@ AttributeView::FinishEditingTitle(bool commit)
 
 	bool reopen = false;
 
-	const char *text = fTitleEditView->Text();
+	const char* text = fTitleEditView->Text();
 	uint32 length = strlen(text);
 	if (commit && strcmp(text, fModel->Name()) != 0 && length < B_FILE_NAME_LENGTH) {
 		BEntry entry(fModel->EntryRef());
@@ -1949,7 +1949,7 @@ AttributeView::FinishEditingTitle(bool commit)
 	}
 
 	// Remove view
-	BView *scrollView = fTitleEditView->Parent();
+	BView* scrollView = fTitleEditView->Parent();
 	RemoveChild(scrollView);
 	delete scrollView;
 	fTitleEditView = NULL;
@@ -2008,7 +2008,7 @@ AttributeView::CurrentFontHeight(float size)
 
 
 status_t
-AttributeView::BuildContextMenu(BMenu *parent)
+AttributeView::BuildContextMenu(BMenu* parent)
 {
 	// Add navigation menu if this is not a symlink
 	// Symlink's to directories are OK however!
@@ -2027,14 +2027,14 @@ AttributeView::BuildContextMenu(BMenu *parent)
 		} else if (model.IsDirectory() || model.IsVolume())
 			navigate = true;
 	}
-	ModelMenuItem *navigationItem = NULL;
+	ModelMenuItem* navigationItem = NULL;
 	if (navigate) {
 		navigationItem = new ModelMenuItem(new Model(model),
 			new BNavMenu(model.Name(), B_REFS_RECEIVED, be_app, Window()));
 
 		// setup a navigation menu item which will dynamically load items
 		// as menu items are traversed
-		BNavMenu *navMenu = dynamic_cast<BNavMenu *>(navigationItem->Submenu());
+		BNavMenu* navMenu = dynamic_cast<BNavMenu*>(navigationItem->Submenu());
 		navMenu->SetNavDir(&ref);
 		navigationItem->SetLabel(model.Name());
 		navigationItem->SetEntry(&entry);
@@ -2042,7 +2042,7 @@ AttributeView::BuildContextMenu(BMenu *parent)
 		parent->AddItem(navigationItem, 0);
 		parent->AddItem(new BSeparatorItem(), 1);
 
-		BMessage *message = new BMessage(B_REFS_RECEIVED);
+		BMessage* message = new BMessage(B_REFS_RECEIVED);
 		message->AddRef("refs", &ref);
 		navigationItem->SetMessage(message);
 		navigationItem->SetTarget(be_app);
@@ -2079,7 +2079,7 @@ AttributeView::BuildContextMenu(BMenu *parent)
 		parent->AddItem(new BMenuItem(B_TRANSLATE("Empty Trash"),
 			new BMessage(kEmptyTrash)));
 
-	BMenuItem *sizeItem = NULL;
+	BMenuItem* sizeItem = NULL;
 	if (model.IsDirectory() && !model.IsVolume() && !model.IsRoot())  {
 		parent->AddItem(sizeItem = new BMenuItem(B_TRANSLATE("Recalculate folder size"),
 			new BMessage(kRecalculateSize)));
@@ -2116,11 +2116,11 @@ AttributeView::SetPermissionsSwitchState(int32 state)
 
 
 filter_result
-AttributeView::TextViewFilter(BMessage *message, BHandler **, BMessageFilter *filter)
+AttributeView::TextViewFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 {
 	uchar key;
-	AttributeView *attribView = static_cast<AttributeView *>(
-		static_cast<BWindow *>(filter->Looper())->FindView("attr_view"));
+	AttributeView* attribView = static_cast<AttributeView*>(
+		static_cast<BWindow*>(filter->Looper())->FindView("attr_view"));
 
 	// Adjust the size of the text rect
 	BRect nuRect(attribView->TextView()->TextRect());
@@ -2129,7 +2129,7 @@ AttributeView::TextViewFilter(BMessage *message, BHandler **, BMessageFilter *fi
 
 	// Make sure the cursor is in view
 	attribView->TextView()->ScrollToSelection();
-	if (message->FindInt8("byte", (int8 *)&key) != B_OK)
+	if (message->FindInt8("byte", (int8*)&key) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
 	if (key == B_RETURN || key == B_ESCAPE) {
@@ -2156,7 +2156,7 @@ AttributeView::SetLastSize(off_t lastSize)
 
 
 void
-AttributeView::SetSizeStr(const char *sizeStr)
+AttributeView::SetSizeStr(const char* sizeStr)
 {
 	fSizeStr = sizeStr;
 
@@ -2170,7 +2170,7 @@ AttributeView::SetSizeStr(const char *sizeStr)
 //	#pragma mark -
 
 
-TrackingView::TrackingView(BRect frame, const char *str, BMessage *message)
+TrackingView::TrackingView(BRect frame, const char* str, BMessage* message)
 	: BControl(frame, "trackingView", str, message, B_FOLLOW_ALL, B_WILL_DRAW),
 	fMouseDown(false),
 	fMouseInView(false)
@@ -2192,7 +2192,7 @@ TrackingView::MouseDown(BPoint)
 
 
 void
-TrackingView::MouseMoved(BPoint, uint32 transit, const BMessage *)
+TrackingView::MouseMoved(BPoint, uint32 transit, const BMessage*)
 {
 	if ((transit == B_ENTERED_VIEW || transit == B_EXITED_VIEW) && fMouseDown)
 		InvertRect(Bounds());
@@ -2231,4 +2231,3 @@ TrackingView::Draw(BRect)
 
 	DrawString(Label(), BPoint(3, Bounds().Height() - fontHeight.descent));
 }
-

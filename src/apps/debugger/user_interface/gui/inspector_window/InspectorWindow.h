@@ -16,7 +16,7 @@ class BButton;
 class BMenuField;
 class BMessenger;
 class BTextControl;
-class GUITeamUISettings;
+class GuiTeamUiSettings;
 class MemoryView;
 class Team;
 class UserInterfaceListener;
@@ -41,7 +41,7 @@ public:
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
 
 			status_t			LoadSettings(
-									const GUITeamUISettings& settings);
+									const GuiTeamUiSettings& settings);
 			status_t			SaveSettings(
 									BMessage& settings);
 private:

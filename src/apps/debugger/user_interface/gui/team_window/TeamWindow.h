@@ -12,7 +12,7 @@
 
 #include "BreakpointsView.h"
 #include "Function.h"
-#include "GUITeamUISettings.h"
+#include "GuiTeamUiSettings.h"
 #include "ImageFunctionsView.h"
 #include "ImageListView.h"
 #include "SourceView.h"
@@ -59,9 +59,9 @@ public:
 	virtual	bool				QuitRequested();
 
 			status_t			LoadSettings(
-									const GUITeamUISettings* settings);
+									const GuiTeamUiSettings* settings);
 			status_t			SaveSettings(
-									GUITeamUISettings* settings);
+									GuiTeamUiSettings* settings);
 
 
 private:
@@ -179,7 +179,7 @@ private:
 			BSplitView*			fImageSplitView;
 			BSplitView*			fThreadSplitView;
 			InspectorWindow*	fInspectorWindow;
-			GUITeamUISettings	fUISettings;
+			GuiTeamUiSettings	fUiSettings;
 			BFilePanel*			fSourceLocatePanel;
 };
 

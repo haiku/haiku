@@ -300,7 +300,7 @@ BCountView::Draw(BRect updateRect)
 void
 BCountView::MouseDown(BPoint)
 {
-	BContainerWindow *window = dynamic_cast<BContainerWindow *>(Window());
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
 	window->Activate();
 	window->UpdateIfNeeded();
 
@@ -308,7 +308,7 @@ BCountView::MouseDown(BPoint)
 		return;
 
 	if (!window->TargetModel()->IsRoot()) {
-		BDirMenu *menu = new BDirMenu(NULL, be_app, B_REFS_RECEIVED);
+		BDirMenu* menu = new BDirMenu(NULL, be_app, B_REFS_RECEIVED);
 		BEntry entry;
 		if (entry.SetTo(window->TargetModel()->EntryRef()) == B_OK)
 			menu->Populate(&entry, Window(), false, false, true, false, true);
@@ -340,14 +340,14 @@ BCountView::AttachedToWindow()
 
 
 void
-BCountView::SetTypeAhead(const char *string)
+BCountView::SetTypeAhead(const char* string)
 {
 	fTypeAheadString = string;
 	Invalidate();
 }
 
 
-const char *
+const char*
 BCountView::TypeAhead() const
 {
 	return fTypeAheadString.String();
@@ -362,7 +362,7 @@ BCountView::IsTypingAhead() const
 
 
 void
-BCountView::AddFilterCharacter(const char *character)
+BCountView::AddFilterCharacter(const char* character)
 {
 	fFilterString.AppendChars(character, 1);
 	Invalidate();
@@ -385,7 +385,7 @@ BCountView::CancelFilter()
 }
 
 
-const char *
+const char*
 BCountView::Filter() const
 {
 	return fFilterString.String();

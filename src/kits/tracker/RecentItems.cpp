@@ -49,8 +49,8 @@ All rights reserved.
 
 class RecentItemsMenu : public BSlowMenu {
 public:
-	RecentItemsMenu(const char *title, BMessage *openMessage,
-		BHandler *itemTarget, int32 maxItems)
+	RecentItemsMenu(const char* title, BMessage* openMessage,
+		BHandler* itemTarget, int32 maxItems)
 		:	BSlowMenu(title),
 			fTargetMesage(openMessage),
 			fItemTarget(itemTarget),
@@ -64,14 +64,14 @@ public:
 	virtual void ClearMenuBuildingState();
 
 protected:
-	virtual const BMessage *FileMessage()
+	virtual const BMessage* FileMessage()
 		{ return fTargetMesage; }
-	virtual const BMessage *ContainerMessage()
+	virtual const BMessage* ContainerMessage()
 		{ return fTargetMesage; }
 
-	BRecentItemsList *fTterator;
-	BMessage *fTargetMesage;
-	BHandler *fItemTarget;
+	BRecentItemsList* fTterator;
+	BMessage* fTargetMesage;
+	BHandler* fItemTarget;
 	int32 fCount;
 	int32 fSanityCount;
 	int32 fMaxCount;
@@ -80,39 +80,39 @@ protected:
 
 class RecentFilesMenu : public RecentItemsMenu {
 public:
-	RecentFilesMenu(const char *title, BMessage *openFileMessage,
-		BMessage *openFolderMessage, BHandler *target,
-		int32 maxItems, bool navMenuFolders, const char *ofType,
-		const char *openedByAppSig);
+	RecentFilesMenu(const char* title, BMessage* openFileMessage,
+		BMessage* openFolderMessage, BHandler* target,
+		int32 maxItems, bool navMenuFolders, const char* ofType,
+		const char* openedByAppSig);
 
-	RecentFilesMenu(const char *title, BMessage *openFileMessage,
-		BMessage *openFolderMessage, BHandler *target,
-		int32 maxItems, bool navMenuFolders, const char *ofTypeList[],
-		int32 ofTypeListCount, const char *openedByAppSig);
+	RecentFilesMenu(const char* title, BMessage* openFileMessage,
+		BMessage* openFolderMessage, BHandler* target,
+		int32 maxItems, bool navMenuFolders, const char* ofTypeList[],
+		int32 ofTypeListCount, const char* openedByAppSig);
 
 	virtual ~RecentFilesMenu();
 
 protected:
-	virtual const BMessage *ContainerMessage()
+	virtual const BMessage* ContainerMessage()
 		{ return openFolderMessage; }
 
 private:
-	BMessage *openFolderMessage;
+	BMessage* openFolderMessage;
 };
 
 
 class RecentFoldersMenu : public RecentItemsMenu {
 public:
-	RecentFoldersMenu(const char *title, BMessage *openMessage,
-		BHandler *target, int32 maxItems, bool navMenuFolders,
-		const char *openedByAppSig);
+	RecentFoldersMenu(const char* title, BMessage* openMessage,
+		BHandler* target, int32 maxItems, bool navMenuFolders,
+		const char* openedByAppSig);
 };
 
 
 class RecentAppsMenu : public RecentItemsMenu {
 public:
-	RecentAppsMenu(const char *title, BMessage *openMessage,
-		BHandler *target, int32 maxItems);
+	RecentAppsMenu(const char* title, BMessage* openMessage,
+		BHandler* target, int32 maxItems);
 };
 
 
@@ -129,7 +129,7 @@ RecentItemsMenu::~RecentItemsMenu()
 bool
 RecentItemsMenu::AddNextItem()
 {
-	BMenuItem *item = fTterator->GetNextMenuItem(FileMessage(),
+	BMenuItem* item = fTterator->GetNextMenuItem(FileMessage(),
 		ContainerMessage(), fItemTarget);
 
 	if (item) {
@@ -171,9 +171,9 @@ RecentItemsMenu::ClearMenuBuildingState()
 // #pragma mark -
 
 
-RecentFilesMenu::RecentFilesMenu(const char *title, BMessage *openFileMessage,
-	BMessage *openFolderMessage, BHandler *target, int32 maxItems,
-	bool navMenuFolders, const char *ofType, const char *openedByAppSig)
+RecentFilesMenu::RecentFilesMenu(const char* title, BMessage* openFileMessage,
+	BMessage* openFolderMessage, BHandler* target, int32 maxItems,
+	bool navMenuFolders, const char* ofType, const char* openedByAppSig)
 	:
 	RecentItemsMenu(title, openFileMessage, target, maxItems),
 	openFolderMessage(openFolderMessage)
@@ -183,10 +183,10 @@ RecentFilesMenu::RecentFilesMenu(const char *title, BMessage *openFileMessage,
 }
 
 
-RecentFilesMenu::RecentFilesMenu(const char *title, BMessage *openFileMessage,
-	BMessage *openFolderMessage, BHandler *target, int32 maxItems,
-	bool navMenuFolders, const char *ofTypeList[], int32 ofTypeListCount,
-	const char *openedByAppSig)
+RecentFilesMenu::RecentFilesMenu(const char* title, BMessage* openFileMessage,
+	BMessage* openFolderMessage, BHandler* target, int32 maxItems,
+	bool navMenuFolders, const char* ofTypeList[], int32 ofTypeListCount,
+	const char* openedByAppSig)
 	:
 	RecentItemsMenu(title, openFileMessage, target, maxItems),
 	openFolderMessage(openFolderMessage)
@@ -205,9 +205,9 @@ RecentFilesMenu::~RecentFilesMenu()
 // #pragma mark -
 
 
-RecentFoldersMenu::RecentFoldersMenu(const char *title, BMessage *openMessage,
-	BHandler *target, int32 maxItems, bool navMenuFolders,
-	const char *openedByAppSig)
+RecentFoldersMenu::RecentFoldersMenu(const char* title, BMessage* openMessage,
+	BHandler* target, int32 maxItems, bool navMenuFolders,
+	const char* openedByAppSig)
 	:
 	RecentItemsMenu(title, openMessage, target, maxItems)
 {
@@ -219,8 +219,8 @@ RecentFoldersMenu::RecentFoldersMenu(const char *title, BMessage *openMessage,
 // #pragma mark -
 
 
-RecentAppsMenu::RecentAppsMenu(const char *title, BMessage *openMessage,
-	BHandler *target, int32 maxItems)
+RecentAppsMenu::RecentAppsMenu(const char* title, BMessage* openMessage,
+	BHandler* target, int32 maxItems)
 	:	RecentItemsMenu(title, openMessage, target, maxItems)
 {
 	fTterator = new BRecentAppsList(maxItems);
@@ -249,10 +249,10 @@ BRecentItemsList::Rewind()
 }
 
 
-BMenuItem *
-BRecentItemsList::GetNextMenuItem(const BMessage *fileOpenInvokeMessage,
-	const BMessage *containerOpenInvokeMessage, BHandler *target,
-	entry_ref *currentItemRef)
+BMenuItem*
+BRecentItemsList::GetNextMenuItem(const BMessage* fileOpenInvokeMessage,
+	const BMessage* containerOpenInvokeMessage, BHandler* target,
+	entry_ref* currentItemRef)
 {
 	entry_ref ref;
 	if (GetNextRef(&ref) != B_OK)
@@ -265,8 +265,8 @@ BRecentItemsList::GetNextMenuItem(const BMessage *fileOpenInvokeMessage,
 	bool container = false;
 	if (model.IsSymLink()) {
 
-		Model *newResolvedModel = NULL;
-		Model *result = model.LinkTo();
+		Model* newResolvedModel = NULL;
+		Model* result = model.LinkTo();
 
 		if (!result) {
 			newResolvedModel = new Model(model.EntryRef(), true, true);
@@ -305,7 +305,7 @@ BRecentItemsList::GetNextMenuItem(const BMessage *fileOpenInvokeMessage,
 	if (currentItemRef)
 		*currentItemRef = ref;
 
-	BMessage *message;
+	BMessage* message;
 	if (container && containerOpenInvokeMessage)
 		message = new BMessage(*containerOpenInvokeMessage);
 	else if (!container && fileOpenInvokeMessage)
@@ -320,12 +320,12 @@ BRecentItemsList::GetNextMenuItem(const BMessage *fileOpenInvokeMessage,
 	be_plain_font->TruncateString(&truncatedString, B_TRUNCATE_END,
 		BNavMenu::GetMaxMenuWidth());
 
-	ModelMenuItem *item = NULL;
+	ModelMenuItem* item = NULL;
 	if (!container || !fNavMenuFolders)
 		item = new ModelMenuItem(&model, truncatedString.String(), message);
 	else {
 		// add another nav menu item if it's a directory
-		BNavMenu *menu = new BNavMenu(truncatedString.String(), message->what,
+		BNavMenu* menu = new BNavMenu(truncatedString.String(), message->what,
 			target, 0);
 
 		menu->SetNavDir(&ref);
@@ -341,7 +341,7 @@ BRecentItemsList::GetNextMenuItem(const BMessage *fileOpenInvokeMessage,
 
 
 status_t
-BRecentItemsList::GetNextRef(entry_ref *result)
+BRecentItemsList::GetNextRef(entry_ref* result)
 {
 	return fItems.FindRef("refs", fIndex++, result);
 }
@@ -351,7 +351,7 @@ BRecentItemsList::GetNextRef(entry_ref *result)
 
 
 BRecentFilesList::BRecentFilesList(int32 maxItems, bool navMenuFolders,
-	const char *ofType, const char *openedByAppSig)
+	const char* ofType, const char* openedByAppSig)
 	:
 	BRecentItemsList(maxItems, navMenuFolders),
 	fType(ofType),
@@ -363,7 +363,7 @@ BRecentFilesList::BRecentFilesList(int32 maxItems, bool navMenuFolders,
 
 
 BRecentFilesList::BRecentFilesList(int32 maxItems, bool navMenuFolders,
-	const char *ofTypeList[], int32 ofTypeListCount, const char *openedByAppSig)
+	const char* ofTypeList[], int32 ofTypeListCount, const char* openedByAppSig)
 	:
 	BRecentItemsList(maxItems, navMenuFolders),
 	fType(NULL),
@@ -390,13 +390,13 @@ BRecentFilesList::~BRecentFilesList()
 
 
 status_t
-BRecentFilesList::GetNextRef(entry_ref *ref)
+BRecentFilesList::GetNextRef(entry_ref* ref)
 {
 	if (fIndex == 0) {
 		// Lazy roster Get
 		if (fTypes)
 			BRoster().GetRecentDocuments(&fItems, fMaxItems,
-				const_cast<const char **>(fTypes),
+				const_cast<const char**>(fTypes),
 				fTypeCount, fAppSig.Length() ? fAppSig.String() : NULL);
 		else
 			BRoster().GetRecentDocuments(&fItems, fMaxItems,
@@ -408,22 +408,22 @@ BRecentFilesList::GetNextRef(entry_ref *ref)
 }
 
 
-BMenu *
-BRecentFilesList::NewFileListMenu(const char *title,
-	BMessage *openFileMessage, BMessage *openFolderMessage,
-	BHandler *target, int32 maxItems, bool navMenuFolders, const char *ofType,
-	const char *openedByAppSig)
+BMenu*
+BRecentFilesList::NewFileListMenu(const char* title,
+	BMessage* openFileMessage, BMessage* openFolderMessage,
+	BHandler* target, int32 maxItems, bool navMenuFolders, const char* ofType,
+	const char* openedByAppSig)
 {
 	return new RecentFilesMenu(title, openFileMessage,
 		openFolderMessage, target, maxItems, navMenuFolders, ofType, openedByAppSig);
 }
 
 
-BMenu *
-BRecentFilesList::NewFileListMenu(const char *title,
-	BMessage *openFileMessage, BMessage *openFolderMessage,
-	BHandler *target, int32 maxItems, bool navMenuFolders, const char *ofTypeList[],
-	int32 ofTypeListCount, const char *openedByAppSig)
+BMenu*
+BRecentFilesList::NewFileListMenu(const char* title,
+	BMessage* openFileMessage, BMessage* openFolderMessage,
+	BHandler* target, int32 maxItems, bool navMenuFolders, const char* ofTypeList[],
+	int32 ofTypeListCount, const char* openedByAppSig)
 {
 	return new RecentFilesMenu(title, openFileMessage,
 		openFolderMessage, target, maxItems, navMenuFolders, ofTypeList,
@@ -434,10 +434,10 @@ BRecentFilesList::NewFileListMenu(const char *title,
 // #pragma mark -
 
 
-BMenu *
-BRecentFoldersList::NewFolderListMenu(const char *title,
-	BMessage *openMessage, BHandler *target, int32 maxItems,
-	bool navMenuFolders, const char *openedByAppSig)
+BMenu*
+BRecentFoldersList::NewFolderListMenu(const char* title,
+	BMessage* openMessage, BHandler* target, int32 maxItems,
+	bool navMenuFolders, const char* openedByAppSig)
 {
 	return new RecentFoldersMenu(title, openMessage, target, maxItems,
 		navMenuFolders, openedByAppSig);
@@ -445,7 +445,7 @@ BRecentFoldersList::NewFolderListMenu(const char *title,
 
 
 BRecentFoldersList::BRecentFoldersList(int32 maxItems, bool navMenuFolders,
-	const char *openedByAppSig)
+	const char* openedByAppSig)
 	:
 	BRecentItemsList(maxItems, navMenuFolders),
 	fAppSig(openedByAppSig)
@@ -454,7 +454,7 @@ BRecentFoldersList::BRecentFoldersList(int32 maxItems, bool navMenuFolders,
 
 
 status_t
-BRecentFoldersList::GetNextRef(entry_ref *ref)
+BRecentFoldersList::GetNextRef(entry_ref* ref)
 {
 	if (fIndex == 0) {
 		// Lazy roster Get
@@ -477,7 +477,7 @@ BRecentAppsList::BRecentAppsList(int32 maxItems)
 
 
 status_t
-BRecentAppsList::GetNextRef(entry_ref *ref)
+BRecentAppsList::GetNextRef(entry_ref* ref)
 {
 	if (fIndex == 0) {
 		// Lazy roster Get
@@ -487,9 +487,9 @@ BRecentAppsList::GetNextRef(entry_ref *ref)
 }
 
 
-BMenu *
-BRecentAppsList::NewAppListMenu(const char *title, BMessage *openMessage,
-	 BHandler *target, int32 maxItems)
+BMenu*
+BRecentAppsList::NewAppListMenu(const char* title, BMessage* openMessage,
+	 BHandler* target, int32 maxItems)
 {
 	return new RecentAppsMenu(title, openMessage, target, maxItems);
 }

@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-screenshot	1697748405
+1	russian	x-vnd.haiku-screenshot	1721618877
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Рабочий стол
 Include window border	ScreenshotWindow		Включая заголовок окна
@@ -9,6 +9,7 @@ Cancel	ScreenshotWindow		Отмена
 Name:	ScreenshotWindow		Имя:
 Choose folder	ScreenshotWindow		Выбрать папку
 Save	ScreenshotWindow		Сохранить
+Overwrite	ScreenshotWindow		Перезаписать
 Choose folder...	ScreenshotWindow		Выбрать папку…
 Please select	ScreenshotWindow		Пожалуйста выберите
 Save as:	ScreenshotWindow		Сохранить как:

@@ -31,7 +31,6 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _UTILITIES_H
 #define _UTILITIES_H
 
@@ -104,23 +103,23 @@ class PeriodicUpdatePoses {
 		PeriodicUpdatePoses();
 		~PeriodicUpdatePoses();
 
-		typedef bool (*PeriodicUpdateCallback)(BPose *pose, void *cookie);
+		typedef bool (*PeriodicUpdateCallback)(BPose* pose, void* cookie);
 
-		void AddPose(BPose *pose, BPoseView *poseView,
-			PeriodicUpdateCallback callback, void *cookie);
-		bool RemovePose(BPose *pose, void **cookie);
+		void AddPose(BPose* pose, BPoseView* poseView,
+			PeriodicUpdateCallback callback, void* cookie);
+		bool RemovePose(BPose* pose, void** cookie);
 
 		void DoPeriodicUpdate(bool forceRedraw);
 
 	private:
 		struct periodic_pose {
-			BPose					*pose;
-			BPoseView				*pose_view;
+			BPose*					pose;
+			BPoseView*				pose_view;
 			PeriodicUpdateCallback	callback;
-			void					*cookie;
+			void*					cookie;
 		};
 
-		Benaphore *fLock;
+		Benaphore* fLock;
 		BObjectList<periodic_pose> fPoseList;
 };
 
@@ -131,7 +130,7 @@ extern PeriodicUpdatePoses gPeriodicUpdatePoses;
 // disk, defining the node's position and visibility
 class PoseInfo {
 	public:
-		static void EndianSwap(void *castToThis);
+		static void EndianSwap(void* castToThis);
 		void PrintToStream();
 
 		bool fInvisible;
@@ -158,7 +157,7 @@ class ExtendedPoseInfo {
 		BPoint LocationForFrame(BRect) const;
 		bool SetLocationForFrame(BPoint, BRect);
 
-		static void EndianSwap(void *castToThis);
+		static void EndianSwap(void* castToThis);
 		void PrintToStream();
 
 		uint32 fWorkspaces;
@@ -183,15 +182,15 @@ class ExtendedPoseInfo {
 };
 
 // misc functions
-void DisallowMetaKeys(BTextView *);
-void DisallowFilenameKeys(BTextView *);
+void DisallowMetaKeys(BTextView*);
+void DisallowFilenameKeys(BTextView*);
 
 
-bool ValidateStream(BMallocIO *, uint32, int32 version);
+bool ValidateStream(BMallocIO*, uint32, int32 version);
 
 
-uint32 HashString(const char *string, uint32 seed);
-uint32 AttrHashString(const char *string, uint32 type);
+uint32 HashString(const char* string, uint32 seed);
+uint32 AttrHashString(const char* string, uint32 type);
 
 
 class OffscreenBitmap {
@@ -201,33 +200,33 @@ class OffscreenBitmap {
 		OffscreenBitmap();
 		~OffscreenBitmap();
 
-		BView *BeginUsing(BRect bounds);
+		BView* BeginUsing(BRect bounds);
 		void DoneUsing();
-		BBitmap *Bitmap() const;
+		BBitmap* Bitmap() const;
 			// blit this to your view when you are done rendering
-		BView *View() const;
+		BView* View() const;
 			// use this to render your image
 
 	private:
 		void NewBitmap(BRect frame);
-		BBitmap *fBitmap;
+		BBitmap* fBitmap;
 };
 
 
 // bitmap functions
-extern void FadeRGBA32Horizontal(uint32 *bits, int32 width, int32 height, int32 from, int32 to);
-extern void FadeRGBA32Vertical(uint32 *bits, int32 width, int32 height, int32 from, int32 to);
+extern void FadeRGBA32Horizontal(uint32* bits, int32 width, int32 height, int32 from, int32 to);
+extern void FadeRGBA32Vertical(uint32* bits, int32 width, int32 height, int32 from, int32 to);
 
 
 class FlickerFreeStringView : public BStringView {
 	// Adds support for offscreen bitmap drawing for string views that update often
 	// this would be better implemented as an option of BStringView
 	public:
-		FlickerFreeStringView(BRect bounds, const char *name,
-			const char *text, uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		FlickerFreeStringView(BRect bounds, const char* name,
+			const char* text, uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW);
-		FlickerFreeStringView(BRect bounds, const char *name,
-			const char *text, BBitmap *existingOffscreen,
+		FlickerFreeStringView(BRect bounds, const char* name,
+			const char* text, BBitmap* existingOffscreen,
 			uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW);
 		virtual ~FlickerFreeStringView();
@@ -237,10 +236,10 @@ class FlickerFreeStringView : public BStringView {
 		virtual void SetLowColor(rgb_color);
 
 	private:
-		OffscreenBitmap *fBitmap;
+		OffscreenBitmap* fBitmap;
 		rgb_color fViewColor;
 		rgb_color fLowColor;
-		BBitmap *fOrigBitmap;
+		BBitmap* fOrigBitmap;
 
 		typedef BStringView _inherited;
 };
@@ -249,8 +248,8 @@ class FlickerFreeStringView : public BStringView {
 class DraggableIcon : public BView {
 	// used to determine a save location for a file
 	public:
-		DraggableIcon(BRect, const char *, const char *mimeType, icon_size,
-			const BMessage *, BMessenger,
+		DraggableIcon(BRect, const char*, const char* mimeType, icon_size,
+			const BMessage*, BMessenger,
 			uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW);
 		virtual ~DraggableIcon();
@@ -263,10 +262,10 @@ class DraggableIcon : public BView {
 		virtual void MouseDown(BPoint);
 		virtual void Draw(BRect);
 
-		virtual bool DragStarted(BMessage *dragMessage);
+		virtual bool DragStarted(BMessage* dragMessage);
 
 	protected:
-		BBitmap *fBitmap;
+		BBitmap* fBitmap;
 		BMessage fMessage;
 		BMessenger fTarget;
 };
@@ -274,13 +273,13 @@ class DraggableIcon : public BView {
 
 class PositionPassingMenuItem : public BMenuItem {
 	public:
-		PositionPassingMenuItem(const char *title, BMessage *, char shortcut = 0,
+		PositionPassingMenuItem(const char* title, BMessage*, char shortcut = 0,
 			uint32 modifiers = 0);
 
-		PositionPassingMenuItem(BMenu *, BMessage *);
+		PositionPassingMenuItem(BMenu*, BMessage*);
 
 	protected:
-		virtual status_t Invoke(BMessage * = 0);
+		virtual status_t Invoke(BMessage* = 0);
 			// appends the invoke location for NewFolder, etc. to use
 
 	private:
@@ -291,7 +290,7 @@ class PositionPassingMenuItem : public BMenuItem {
 class Benaphore {
 	// aka benaphore
 	public:
-		Benaphore(const char *name = "Light Lock")
+		Benaphore(const char* name = "Light Lock")
 		:	fSemaphore(create_sem(0, name)),
 			fCount(1)
 		{
@@ -329,21 +328,21 @@ class Benaphore {
 
 class SeparatorLine : public BView {
 	public:
-		SeparatorLine(BPoint , float , bool vertical, const char *name = "");
-		virtual	void Draw(BRect bounds);
+		SeparatorLine(BPoint, float, bool vertical, const char* name = "");
+		virtual void Draw(BRect bounds);
 };
 
 
 class TitledSeparatorItem : public BMenuItem {
 	public:
-		TitledSeparatorItem(const char *);
+		TitledSeparatorItem(const char*);
 		virtual ~TitledSeparatorItem();
 
 		virtual void SetEnabled(bool state);
 
 	protected:
-		virtual	void GetContentSize(float *width, float *height);
-		virtual	void Draw();
+		virtual void GetContentSize(float* width, float* height);
+		virtual void Draw();
 
 	private:
 		typedef BMenuItem _inherited;
@@ -352,7 +351,7 @@ class TitledSeparatorItem : public BMenuItem {
 
 class LooperAutoLocker {
 	public:
-		LooperAutoLocker(BHandler *handler)
+		LooperAutoLocker(BHandler* handler)
 		:	fHandler(handler),
 			fHasLock(handler->LockLooper())
 		{
@@ -375,7 +374,7 @@ class LooperAutoLocker {
 		}
 
 	private:
-		BHandler *fHandler;
+		BHandler* fHandler;
 		bool fHasLock;
 };
 
@@ -383,10 +382,10 @@ class LooperAutoLocker {
 class MessengerAutoLocker {
 	// move this into AutoLock.h
 	public:
-		MessengerAutoLocker(BMessenger *messenger)
+		MessengerAutoLocker(BMessenger* messenger)
 			:	fMessenger(messenger),
 				fHasLock(messenger->LockTarget())
-		{ }
+		{}
 
 		~MessengerAutoLocker()
 		{
@@ -406,7 +405,7 @@ class MessengerAutoLocker {
 		void Unlock()
 		{
 			if (fHasLock) {
-				BLooper *looper;
+				BLooper* looper;
 				fMessenger->Target(&looper);
 				if (looper)
 					looper->Unlock();
@@ -415,7 +414,7 @@ class MessengerAutoLocker {
 		}
 
 	private:
-		BMessenger *fMessenger;
+		BMessenger* fMessenger;
 		bool fHasLock;
 };
 
@@ -423,54 +422,54 @@ class MessengerAutoLocker {
 class ShortcutFilter : public BMessageFilter {
 	public:
 		ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
-			uint32 shortcutWhat, BHandler *target);
+			uint32 shortcutWhat, BHandler* target);
 
 	protected:
-		filter_result Filter(BMessage *, BHandler **);
+		filter_result Filter(BMessage*, BHandler**);
 
 	private:
 		uint32 fShortcutKey;
 		uint32 fShortcutModifier;
 		uint32 fShortcutWhat;
-		BHandler *fTarget;
+		BHandler* fTarget;
 };
 
 // iterates over all the refs in a message
-entry_ref *EachEntryRef(BMessage *, entry_ref *(*)(entry_ref *, void *),
-	void *passThru = 0);
-const entry_ref *EachEntryRef(const BMessage *,
-	const entry_ref *(*)(const entry_ref *, void *), void *passThru = 0);
+entry_ref* EachEntryRef(BMessage*, entry_ref* (*)(entry_ref*, void*),
+	void* passThru = 0);
+const entry_ref* EachEntryRef(const BMessage*,
+	const entry_ref* (*)(const entry_ref*, void*), void* passThru = 0);
 
-entry_ref *EachEntryRef(BMessage *, entry_ref *(*)(entry_ref *, void *),
-	void *passThru, int32 maxCount);
-const entry_ref *EachEntryRef(const BMessage *,
-	const entry_ref *(*)(const entry_ref *, void *), void *passThru, int32 maxCount);
+entry_ref* EachEntryRef(BMessage*, entry_ref* (*)(entry_ref*, void*),
+	void* passThru, int32 maxCount);
+const entry_ref* EachEntryRef(const BMessage*,
+	const entry_ref* (*)(const entry_ref*, void*), void* passThru, int32 maxCount);
 
 
-bool ContainsEntryRef(const BMessage *, const entry_ref *);
-int32 CountRefs(const BMessage *);
+bool ContainsEntryRef(const BMessage*, const entry_ref*);
+int32 CountRefs(const BMessage*);
 
-BMenuItem *EachMenuItem(BMenu *menu, bool recursive, BMenuItem *(*func)(BMenuItem *));
-const BMenuItem *EachMenuItem(const BMenu *menu, bool recursive,
-	BMenuItem *(*func)(const BMenuItem *));
+BMenuItem* EachMenuItem(BMenu* menu, bool recursive, BMenuItem* (*func)(BMenuItem*));
+const BMenuItem* EachMenuItem(const BMenu* menu, bool recursive,
+	BMenuItem* (*func)(const BMenuItem*));
 
-int64 StringToScalar(const char *text);
+int64 StringToScalar(const char* text);
 	// string to num, understands kB, MB, etc.
 
 // misc calls
-void EmbedUniqueVolumeInfo(BMessage *, const BVolume *);
-status_t MatchArchivedVolume(BVolume *, const BMessage *, int32 index = 0);
-void TruncateLeaf(BString *string);
+void EmbedUniqueVolumeInfo(BMessage*, const BVolume*);
+status_t MatchArchivedVolume(BVolume*, const BMessage*, int32 index = 0);
+void TruncateLeaf(BString* string);
 
-void StringFromStream(BString *, BMallocIO *, bool endianSwap = false);
-void StringToStream(const BString *, BMallocIO *);
-int32 ArchiveSize(const BString *);
+void StringFromStream(BString*, BMallocIO*, bool endianSwap = false);
+void StringToStream(const BString*, BMallocIO*);
+int32 ArchiveSize(const BString*);
 
-extern void EnableNamedMenuItem(BMenu *menu, const char *itemName, bool on);
-extern void MarkNamedMenuItem(BMenu *menu, const char *itemName, bool on);
-extern void EnableNamedMenuItem(BMenu *menu, uint32 commandName, bool on);
-extern void MarkNamedMenuItem(BMenu *menu, uint32 commandName, bool on);
-extern void DeleteSubmenu(BMenuItem *submenuItem);
+extern void EnableNamedMenuItem(BMenu* menu, const char* itemName, bool on);
+extern void MarkNamedMenuItem(BMenu* menu, const char* itemName, bool on);
+extern void EnableNamedMenuItem(BMenu* menu, uint32 commandName, bool on);
+extern void MarkNamedMenuItem(BMenu* menu, uint32 commandName, bool on);
+extern void DeleteSubmenu(BMenuItem* submenuItem);
 
 extern bool BootedInSafeMode();
 
@@ -478,8 +477,8 @@ extern bool BootedInSafeMode();
 #if B_BEOS_VERSION <= B_BEOS_VERSION_MAUI && !defined(__HAIKU__)
 
 // Should be in kits
-bool operator==(const rgb_color &, const rgb_color &);
-bool operator!=(const rgb_color &, const rgb_color &);
+bool operator==(const rgb_color&, const rgb_color&);
+bool operator!=(const rgb_color&, const rgb_color&);
 
 #endif
 
@@ -499,10 +498,11 @@ void PrintToStream(rgb_color color);
 
 template <class InitCheckable>
 void
-ThrowOnInitCheckError(InitCheckable *item)
+ThrowOnInitCheckError(InitCheckable* item)
 {
 	if (!item)
 		throw (status_t)B_ERROR;
+
 	status_t error = item->InitCheck();
 	if (error != B_OK)
 		throw (status_t)error;
@@ -518,52 +518,57 @@ ThrowOnInitCheckError(InitCheckable *item)
 #define ThrowOnErrorWithMessage(error, debugStr) _ThrowOnError(error, debugStr, __FILE__, __LINE__)
 #endif
 
-void _ThrowOnError(status_t, const char *, int32);
-void _ThrowIfNotSize(ssize_t, const char *, int32);
-void _ThrowOnError(status_t, const char *debugStr, const char *, int32);
+void _ThrowOnError(status_t, const char*, int32);
+void _ThrowIfNotSize(ssize_t, const char*, int32);
+void _ThrowOnError(status_t, const char* debugStr, const char*, int32);
 
 // stub calls that work around BAppFile info inefficiency
-status_t GetAppSignatureFromAttr(BFile *, char *);
-status_t GetAppIconFromAttr(BFile *, BBitmap *, icon_size);
-status_t GetFileIconFromAttr(BNode *, BBitmap *, icon_size);
+status_t GetAppSignatureFromAttr(BFile*, char*);
+status_t GetAppIconFromAttr(BFile*, BBitmap*, icon_size);
+status_t GetFileIconFromAttr(BNode*, BBitmap*, icon_size);
 
 // debugging
-void HexDump(const void *buffer, int32 length);
+void HexDump(const void* buffer, int32 length);
 
 #if xDEBUG
 
 inline void
-PrintRefToStream(const entry_ref *ref, const char *trailer = "\n")
+PrintRefToStream(const entry_ref* ref, const char* trailer = "\n")
 {
-	if (!ref) {
+	if (ref == NULL) {
 		PRINT(("NULL entry_ref%s", trailer));
 		return;
 	}
+
 	BPath path;
 	BEntry entry(ref);
 	entry.GetPath(&path);
 	PRINT(("%s%s", path.Path(), trailer));
 }
 
+
 inline void
-PrintEntryToStream(const BEntry *entry, const char *trailer = "\n")
+PrintEntryToStream(const BEntry* entry, const char* trailer = "\n")
 {
-	if (!entry) {
+	if (entry == NULL) {
 		PRINT(("NULL entry%s", trailer));
 		return;
 	}
+
 	BPath path;
 	entry->GetPath(&path);
 	PRINT(("%s%s", path.Path(), trailer));
 }
 
+
 inline void
-PrintDirToStream(const BDirectory *dir, const char *trailer = "\n")
+PrintDirToStream(const BDirectory* dir, const char* trailer = "\n")
 {
-	if (!dir) {
+	if (dir == NULL) {
 		PRINT(("NULL entry_ref%s", trailer));
 		return;
 	}
+
 	BPath path;
 	BEntry entry;
 	dir->GetEntry(&entry);
@@ -573,20 +578,20 @@ PrintDirToStream(const BDirectory *dir, const char *trailer = "\n")
 
 #else
 
-inline void PrintRefToStream(const entry_ref *, const char * = 0) {}
-inline void PrintEntryToStream(const BEntry *, const char * = 0) {}
-inline void PrintDirToStream(const BDirectory *, const char * = 0) {}
+inline void PrintRefToStream(const entry_ref*, const char* = 0) {}
+inline void PrintEntryToStream(const BEntry*, const char* = 0) {}
+inline void PrintDirToStream(const BDirectory*, const char* = 0) {}
 
 #endif
 
 #ifdef xDEBUG
 
-	extern FILE *logFile;
+	extern FILE* logFile;
 
-	inline void PrintToLogFile(const char *fmt, ...)
+	inline void PrintToLogFile(const char* format, ...)
 	{
-    	va_list ap;
-        va_start(ap, fmt);
+		va_list ap;
+		va_start(ap, fmt);
 		vfprintf(logFile, fmt, ap);
 		va_end(ap);
 	}
@@ -606,7 +611,7 @@ inline void PrintDirToStream(const BDirectory *, const char * = 0) {}
 
 #else
 
-	#define WRITELOG(_ARGS_)
+#define WRITELOG(_ARGS_)
 
 #endif
 
@@ -621,14 +626,16 @@ inline NewType assert_cast(OldType castedPointer) {
 // B_SWAP_INT32 have broken signedness, simple cover calls to fix that
 // should fix up in ByteOrder.h
 
-inline int32 SwapInt32(int32 value) { return (int32)B_SWAP_INT32((uint32)value); }
+inline int32 SwapInt32(int32 value)
+	{ return (int32)B_SWAP_INT32((uint32)value); }
 inline uint32 SwapUInt32(uint32 value) { return B_SWAP_INT32(value); }
-inline int64 SwapInt64(int64 value) { return (int64)B_SWAP_INT64((uint64)value); }
+inline int64 SwapInt64(int64 value)
+	{ return (int64)B_SWAP_INT64((uint64)value); }
 inline uint64 SwapUInt64(uint64 value) { return B_SWAP_INT64(value); }
 
 
 extern const float kExactMatchScore;
-float ComputeTypeAheadScore(const char *text, const char *match,
+float ComputeTypeAheadScore(const char* text, const char* match,
 	bool wordMode = false);
 
 } // namespace BPrivate

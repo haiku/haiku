@@ -41,54 +41,60 @@ All rights reserved.
 #include "Pose.h"
 
 
-BPose *
-PoseList::FindPose(const node_ref *node, int32 *resultingIndex) const
+BPose*
+PoseList::FindPose(const node_ref* node, int32* resultingIndex) const
 {
 	int32 count = CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BPose *pose = ItemAt(index);
+		BPose* pose = ItemAt(index);
 		ASSERT(pose->TargetModel());
 		if (*pose->TargetModel()->NodeRef() == *node) {
 			if (resultingIndex)
 				*resultingIndex = index;
+
 			return pose;
 		}
 	}
 	return NULL;
 }
 
-BPose *
-PoseList::FindPose(const entry_ref *entry, int32 *resultingIndex) const
+
+BPose*
+PoseList::FindPose(const entry_ref* entry, int32* resultingIndex) const
 {
 	int32 count = CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BPose *pose = ItemAt(index);
+		BPose* pose = ItemAt(index);
 		ASSERT(pose->TargetModel());
 		if (*pose->TargetModel()->EntryRef() == *entry) {
 			if (resultingIndex)
 				*resultingIndex = index;
+
 			return pose;
 		}
 	}
 	return NULL;
 }
 
-BPose *
-PoseList::FindPose(const Model *model, int32 *resultingIndex) const
+
+BPose*
+PoseList::FindPose(const Model* model, int32* resultingIndex) const
 {
 	return FindPose(model->NodeRef(), resultingIndex);
 }
 
-BPose *
-PoseList::DeepFindPose(const node_ref *node, int32 *resultingIndex) const
+
+BPose*
+PoseList::DeepFindPose(const node_ref* node, int32* resultingIndex) const
 {
 	int32 count = CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BPose *pose = ItemAt(index);
-		Model *model = pose->TargetModel();
+		BPose* pose = ItemAt(index);
+		Model* model = pose->TargetModel();
 		if (*model->NodeRef() == *node) {
 			if (resultingIndex)
 				*resultingIndex = index;
+
 			return pose;
 		}
 		// if model is a symlink, try matching node with the target
@@ -98,6 +104,7 @@ PoseList::DeepFindPose(const node_ref *node, int32 *resultingIndex) const
 			if (model && *model->NodeRef() == *node) {
 				if (resultingIndex)
 					*resultingIndex = index;
+
 				return pose;
 			}
 		}

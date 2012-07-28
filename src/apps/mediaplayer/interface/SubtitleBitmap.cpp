@@ -316,7 +316,7 @@ parse_text(const BString& string, BTextView* textView, const BFont& font,
 
 	// Cleanup states in case the input text had non-matching tags.
 	while (state->previous != NULL) {
-		ParseState* oldState = state->previous;
+		ParseState* oldState = state;
 		state = state->previous;
 		delete oldState;
 	}

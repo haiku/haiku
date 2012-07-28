@@ -32,10 +32,12 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "AttributeStream.h"
 
 #include <Debug.h>
 #include <Node.h>
+
 
 // ToDo:
 // lazy Rewind from Drive, only if data is available
@@ -49,14 +51,15 @@ AttributeInfo::AttributeInfo(const AttributeInfo &cloneThis)
 {
 }
 
-AttributeInfo::AttributeInfo(const char *name, attr_info info)
+
+AttributeInfo::AttributeInfo(const char* name, attr_info info)
 	:	fName(name),
 		fInfo(info)
 {
 }
 
 
-AttributeInfo::AttributeInfo(const char *name, uint32 type, off_t size)
+AttributeInfo::AttributeInfo(const char* name, uint32 type, off_t size)
 	:	fName(name)
 {
 	fInfo.size = size;
@@ -64,7 +67,7 @@ AttributeInfo::AttributeInfo(const char *name, uint32 type, off_t size)
 }
 
 
-const char *
+const char*
 AttributeInfo::Name() const
 {
 	return fName.String();
@@ -91,14 +94,14 @@ AttributeInfo::SetTo(const AttributeInfo &attr)
 }
 
 void
-AttributeInfo::SetTo(const char *name, attr_info info)
+AttributeInfo::SetTo(const char* name, attr_info info)
 {
 	fName = name;
 	fInfo = info;
 }
 
 void
-AttributeInfo::SetTo(const char *name, uint32 type, off_t size)
+AttributeInfo::SetTo(const char* name, uint32 type, off_t size)
 {
 	fName = name;
 	fInfo.type = type;
@@ -118,7 +121,7 @@ AttributeStreamNode::~AttributeStreamNode()
 	Detach();
 }
 
-AttributeStreamNode &
+AttributeStreamNode&
 AttributeStreamNode::operator<<(AttributeStreamNode &source)
 {
 	fReadFrom = &source;
@@ -143,7 +146,7 @@ AttributeStreamFileNode::MakeEmpty()
 }
 
 off_t
-AttributeStreamNode::Contains(const char *name, uint32 type)
+AttributeStreamNode::Contains(const char* name, uint32 type)
 {
 	if (!fReadFrom)
 		return 0;
@@ -153,8 +156,8 @@ AttributeStreamNode::Contains(const char *name, uint32 type)
 
 
 off_t
-AttributeStreamNode::Read(const char *name, const char *foreignName, uint32 type,
-	off_t size, void *buffer, void (*swapFunc)(void *))
+AttributeStreamNode::Read(const char* name, const char* foreignName, uint32 type,
+	off_t size, void* buffer, void (*swapFunc)(void*))
 {
 	if (!fReadFrom)
 		return 0;
@@ -162,15 +165,17 @@ AttributeStreamNode::Read(const char *name, const char *foreignName, uint32 type
 	return fReadFrom->Read(name, foreignName, type, size, buffer, swapFunc);
 }
 
+
 off_t
-AttributeStreamNode::Write(const char *name, const char *foreignName, uint32 type,
-	off_t size, const void *buffer)
+AttributeStreamNode::Write(const char* name, const char* foreignName, uint32 type,
+	off_t size, const void* buffer)
 {
 	if (!fWriteTo)
 		return 0;
 
 	return fWriteTo->Write(name, foreignName, type, size, buffer);
 }
+
 
 bool
 AttributeStreamNode::Drive()
@@ -183,7 +188,8 @@ AttributeStreamNode::Drive()
 	return true;
 }
 
-const AttributeInfo *
+
+const AttributeInfo*
 AttributeStreamNode::Next()
 {
 	if (fReadFrom)
@@ -192,7 +198,8 @@ AttributeStreamNode::Next()
 	return NULL;
 }
 
-const char *
+
+const char*
 AttributeStreamNode::Get()
 {
 	ASSERT(fReadFrom);
@@ -202,12 +209,14 @@ AttributeStreamNode::Get()
 	return fReadFrom->Get();
 }
 
+
 bool
-AttributeStreamNode::Fill(char *buffer) const
+AttributeStreamNode::Fill(char* buffer) const
 {
 	ASSERT(fReadFrom);
 	return fReadFrom->Fill(buffer);
 }
+
 
 bool
 AttributeStreamNode::Start()
@@ -219,11 +228,12 @@ AttributeStreamNode::Start()
 	return fWriteTo->Start();
 }
 
+
 void
 AttributeStreamNode::Detach()
 {
-	AttributeStreamNode *tmpFrom = fReadFrom;
-	AttributeStreamNode *tmpTo = fWriteTo;
+	AttributeStreamNode* tmpFrom = fReadFrom;
+	AttributeStreamNode* tmpTo = fWriteTo;
 	fReadFrom = NULL;
 	fWriteTo = NULL;
 
@@ -240,11 +250,12 @@ AttributeStreamFileNode::AttributeStreamFileNode()
 }
 
 
-AttributeStreamFileNode::AttributeStreamFileNode(BNode *node)
+AttributeStreamFileNode::AttributeStreamFileNode(BNode* node)
 	:	fNode(node)
 {
 	ASSERT(fNode);
 }
+
 
 void
 AttributeStreamFileNode::Rewind()
@@ -253,15 +264,16 @@ AttributeStreamFileNode::Rewind()
 	fNode->RewindAttrs();
 }
 
+
 void
-AttributeStreamFileNode::SetTo(BNode *node)
+AttributeStreamFileNode::SetTo(BNode* node)
 {
 	fNode = node;
 }
 
 
 off_t
-AttributeStreamFileNode::Contains(const char *name, uint32 type)
+AttributeStreamFileNode::Contains(const char* name, uint32 type)
 {
 	ASSERT(fNode);
 	attr_info info;
@@ -274,9 +286,10 @@ AttributeStreamFileNode::Contains(const char *name, uint32 type)
 	return info.size;
 }
 
+
 off_t
-AttributeStreamFileNode::Read(const char *name, const char *foreignName, uint32 type,
-	off_t size, void *buffer, void (*swapFunc)(void *))
+AttributeStreamFileNode::Read(const char* name, const char* foreignName, uint32 type,
+	off_t size, void* buffer, void (*swapFunc)(void*))
 {
 	if (name && fNode->ReadAttr(name, type, 0, buffer, (size_t)size) == size)
 		return size;
@@ -291,12 +304,13 @@ AttributeStreamFileNode::Read(const char *name, const char *foreignName, uint32 
 	return 0;
 }
 
+
 off_t
-AttributeStreamFileNode::Write(const char *name, const char *foreignName, uint32 type,
-	off_t size, const void *buffer)
+AttributeStreamFileNode::Write(const char* name, const char* foreignName, uint32 type,
+	off_t size, const void* buffer)
 {
 	ASSERT(fNode);
-	ASSERT(dynamic_cast<BNode *>(fNode));
+	ASSERT(dynamic_cast<BNode*>(fNode));
 	off_t result = fNode->WriteAttr(name, type, 0, buffer, (size_t)size);
 	if (result == size && foreignName)
 		// the write operation worked fine, remove the foreign attribute
@@ -306,6 +320,7 @@ AttributeStreamFileNode::Write(const char *name, const char *foreignName, uint32
 	return result;
 }
 
+
 bool
 AttributeStreamFileNode::Drive()
 {
@@ -313,9 +328,9 @@ AttributeStreamFileNode::Drive()
 	if (!_inherited::Drive())
 		return false;
 
-	const AttributeInfo *attr;
+	const AttributeInfo* attr;
 	while ((attr = fReadFrom->Next()) != 0) {
-		const char *data = fReadFrom->Get();
+		const char* data = fReadFrom->Get();
 		off_t result = fNode->WriteAttr(attr->Name(), attr->Type(), 0,
 			data, (size_t)attr->Size());
 		if (result < attr->Size())
@@ -324,7 +339,8 @@ AttributeStreamFileNode::Drive()
 	return true;
 }
 
-const char *
+
+const char*
 AttributeStreamFileNode::Get()
 {
 	ASSERT(fNode);
@@ -332,15 +348,17 @@ AttributeStreamFileNode::Get()
 	return NULL;
 }
 
+
 bool
-AttributeStreamFileNode::Fill(char *buffer) const
+AttributeStreamFileNode::Fill(char* buffer) const
 {
 	ASSERT(fNode);
 	return fNode->ReadAttr(fCurrentAttr.Name(), fCurrentAttr.Type(), 0, buffer,
 		(size_t)fCurrentAttr.Size()) == (ssize_t)fCurrentAttr.Size();
 }
 
-const AttributeInfo *
+
+const AttributeInfo*
 AttributeStreamFileNode::Next()
 {
 	ASSERT(fNode);
@@ -364,11 +382,13 @@ AttributeStreamMemoryNode::AttributeStreamMemoryNode()
 {
 }
 
+
 void
 AttributeStreamMemoryNode::MakeEmpty()
 {
 	fAttributes.MakeEmpty();
 }
+
 
 void
 AttributeStreamMemoryNode::Rewind()
@@ -377,8 +397,9 @@ AttributeStreamMemoryNode::Rewind()
 	fCurrentIndex = -1;
 }
 
+
 int32
-AttributeStreamMemoryNode::Find(const char *name, uint32 type) const
+AttributeStreamMemoryNode::Find(const char* name, uint32 type) const
 {
 	int32 count = fAttributes.CountItems();
 	for (int32 index = 0; index < count; index++)
@@ -389,8 +410,9 @@ AttributeStreamMemoryNode::Find(const char *name, uint32 type) const
 	return -1;
 }
 
+
 off_t
-AttributeStreamMemoryNode::Contains(const char *name, uint32 type)
+AttributeStreamMemoryNode::Contains(const char* name, uint32 type)
 {
 	int32 index = Find(name, type);
 	if (index < 0)
@@ -400,13 +422,13 @@ AttributeStreamMemoryNode::Contains(const char *name, uint32 type)
 
 
 off_t
-AttributeStreamMemoryNode::Read(const char *name, const char *DEBUG_ONLY(foreignName),
-	uint32 type, off_t bufferSize, void *buffer, void (*DEBUG_ONLY(swapFunc))(void *))
+AttributeStreamMemoryNode::Read(const char* name, const char* DEBUG_ONLY(foreignName),
+	uint32 type, off_t bufferSize, void* buffer, void (*DEBUG_ONLY(swapFunc))(void*))
 {
 	ASSERT(!foreignName);
 	ASSERT(!swapFunc);
 
-	AttrNode *attrNode = NULL;
+	AttrNode* attrNode = NULL;
 
 	int32 index = Find(name, type);
 	if (index < 0) {
@@ -429,17 +451,19 @@ AttributeStreamMemoryNode::Read(const char *name, const char *DEBUG_ONLY(foreign
 	return attrNode->fAttr.Size();
 }
 
+
 off_t
-AttributeStreamMemoryNode::Write(const char *name, const char *, uint32 type,
-	off_t size,	const void *buffer)
+AttributeStreamMemoryNode::Write(const char* name, const char*, uint32 type,
+	off_t size, const void* buffer)
 {
-	char *newBuffer = new char[size];
+	char* newBuffer = new char[size];
 	memcpy(newBuffer, buffer, (size_t)size);
 
-	AttrNode *attrNode = new AttrNode(name, type, size, newBuffer);
+	AttrNode* attrNode = new AttrNode(name, type, size, newBuffer);
 	fAttributes.AddItem(attrNode);
 	return size;
 }
+
 
 bool
 AttributeStreamMemoryNode::Drive()
@@ -453,35 +477,37 @@ AttributeStreamMemoryNode::Drive()
 	return true;
 }
 
-AttributeStreamMemoryNode::AttrNode *
-AttributeStreamMemoryNode::BufferingGet(const char *name, uint32 type, off_t size)
+
+AttributeStreamMemoryNode::AttrNode*
+AttributeStreamMemoryNode::BufferingGet(const char* name, uint32 type, off_t size)
 {
-	char *newBuffer = new char[size];
+	char* newBuffer = new char[size];
 	if (!fReadFrom->Fill(newBuffer)) {
 		delete[] newBuffer;
 		return NULL;
 	}
 
-	AttrNode *attrNode = new AttrNode(name, type, size, newBuffer);
+	AttrNode* attrNode = new AttrNode(name, type, size, newBuffer);
 	fAttributes.AddItem(attrNode);
 	return fAttributes.LastItem();
 }
 
 
-AttributeStreamMemoryNode::AttrNode *
+AttributeStreamMemoryNode::AttrNode*
 AttributeStreamMemoryNode::BufferingGet()
 {
 	if (!fReadFrom)
 		return NULL;
 
-	const AttributeInfo *attr = fReadFrom->Next();
+	const AttributeInfo* attr = fReadFrom->Next();
 	if (!attr)
 		return NULL;
 
 	return BufferingGet(attr->Name(), attr->Type(), attr->Size());
 }
 
-const AttributeInfo *
+
+const AttributeInfo*
 AttributeStreamMemoryNode::Next()
 {
 	if (fReadFrom)
@@ -495,15 +521,17 @@ AttributeStreamMemoryNode::Next()
 	return &fAttributes.ItemAt(++fCurrentIndex)->fAttr;
 }
 
-const char *
+
+const char*
 AttributeStreamMemoryNode::Get()
 {
 	ASSERT(fCurrentIndex < fAttributes.CountItems());
 	return fAttributes.ItemAt(fCurrentIndex)->fData;
 }
 
+
 bool
-AttributeStreamMemoryNode::Fill(char *buffer) const
+AttributeStreamMemoryNode::Fill(char* buffer) const
 {
 	ASSERT(fCurrentIndex < fAttributes.CountItems());
 	memcpy(buffer, fAttributes.ItemAt(fCurrentIndex)->fData,
@@ -513,16 +541,17 @@ AttributeStreamMemoryNode::Fill(char *buffer) const
 }
 
 
-AttributeStreamTemplateNode::AttributeStreamTemplateNode(const AttributeTemplate *
-	attrTemplates, int32 count)
+AttributeStreamTemplateNode::AttributeStreamTemplateNode(
+	const AttributeTemplate* attrTemplates, int32 count)
 	:	fAttributes(attrTemplates),
 		fCurrentIndex(-1),
 		fCount(count)
 {
 }
 
+
 off_t
-AttributeStreamTemplateNode::Contains(const char *name, uint32 type)
+AttributeStreamTemplateNode::Contains(const char* name, uint32 type)
 {
 	int32 index = Find(name, type);
 	if (index < 0)
@@ -531,13 +560,15 @@ AttributeStreamTemplateNode::Contains(const char *name, uint32 type)
 	return fAttributes[index].fSize;
 }
 
+
 void
 AttributeStreamTemplateNode::Rewind()
 {
 	fCurrentIndex = -1;
 }
 
-const AttributeInfo *
+
+const AttributeInfo*
 AttributeStreamTemplateNode::Next()
 {
 	if (fCurrentIndex + 1 >= fCount)
@@ -546,53 +577,62 @@ AttributeStreamTemplateNode::Next()
 	++fCurrentIndex;
 
 	fCurrentAttr.SetTo(fAttributes[fCurrentIndex].fAttributeName,
-		fAttributes[fCurrentIndex].fAttributeType, fAttributes[fCurrentIndex].fSize);
+		fAttributes[fCurrentIndex].fAttributeType,
+		fAttributes[fCurrentIndex].fSize);
 
 	return &fCurrentAttr;
 }
 
-const char *
+
+const char*
 AttributeStreamTemplateNode::Get()
 {
 	ASSERT(fCurrentIndex < fCount);
 	return fAttributes[fCurrentIndex].fBits;
 }
 
+
 bool
-AttributeStreamTemplateNode::Fill(char *buffer) const
+AttributeStreamTemplateNode::Fill(char* buffer) const
 {
 	ASSERT(fCurrentIndex < fCount);
-	memcpy(buffer, fAttributes[fCurrentIndex].fBits, (size_t)fAttributes[fCurrentIndex].fSize);
+	memcpy(buffer, fAttributes[fCurrentIndex].fBits,
+		(size_t)fAttributes[fCurrentIndex].fSize);
 
 	return true;
 }
 
+
 int32
-AttributeStreamTemplateNode::Find(const char *name, uint32 type) const
+AttributeStreamTemplateNode::Find(const char* name, uint32 type) const
 {
-	for (int32 index = 0; index < fCount; index++)
+	for (int32 index = 0; index < fCount; index++) {
 		if (fAttributes[index].fAttributeType == type &&
-			strcmp(name, fAttributes[index].fAttributeName) == 0)
+			strcmp(name, fAttributes[index].fAttributeName) == 0) {
 			return index;
+		}
+	}
 
 	return -1;
 }
 
+
 bool
-AttributeStreamFilterNode::Reject(const char *, uint32 , off_t )
+AttributeStreamFilterNode::Reject(const char*, uint32, off_t)
 {
 	// simple pass everything filter
 	return false;
 }
 
-const AttributeInfo *
+
+const AttributeInfo*
 AttributeStreamFilterNode::Next()
 {
 	if (!fReadFrom)
 		return NULL;
 
 	for (;;) {
-		const AttributeInfo *attr = fReadFrom->Next();
+		const AttributeInfo* attr = fReadFrom->Next();
 		if (!attr)
 			break;
 
@@ -602,8 +642,9 @@ AttributeStreamFilterNode::Next()
 	return NULL;
 }
 
+
 off_t
-AttributeStreamFilterNode::Contains(const char *name, uint32 type)
+AttributeStreamFilterNode::Contains(const char* name, uint32 type)
 {
 	if (!fReadFrom)
 		return 0;
@@ -616,9 +657,10 @@ AttributeStreamFilterNode::Contains(const char *name, uint32 type)
 	return 0;
 }
 
+
 off_t
-AttributeStreamFilterNode::Read(const char *name, const char *foreignName, uint32 type,
-	off_t size,	void *buffer, void (*swapFunc)(void *))
+AttributeStreamFilterNode::Read(const char* name, const char* foreignName, uint32 type,
+	off_t size, void* buffer, void (*swapFunc)(void*))
 {
 	if (!fReadFrom)
 		return 0;
@@ -629,9 +671,10 @@ AttributeStreamFilterNode::Read(const char *name, const char *foreignName, uint3
 	return 0;
 }
 
+
 off_t
-AttributeStreamFilterNode::Write(const char *name, const char *foreignName, uint32 type,
-	off_t size,	const void *buffer)
+AttributeStreamFilterNode::Write(const char* name, const char* foreignName, uint32 type,
+	off_t size,	const void* buffer)
 {
 	if (!fWriteTo)
 		return 0;
@@ -643,30 +686,34 @@ AttributeStreamFilterNode::Write(const char *name, const char *foreignName, uint
 }
 
 
-NamesToAcceptAttrFilter::NamesToAcceptAttrFilter(const char **nameList)
+NamesToAcceptAttrFilter::NamesToAcceptAttrFilter(const char** nameList)
 	:	fNameList(nameList)
 {
 }
 
+
 bool
-NamesToAcceptAttrFilter::Reject(const char *name, uint32 , off_t )
+NamesToAcceptAttrFilter::Reject(const char* name, uint32 , off_t )
 {
 	for (int32 index = 0; ;index++) {
 		if (!fNameList[index])
 			break;
 
 		if (strcmp(name, fNameList[index]) == 0) {
-//			PRINT(("filter passing through %s\n", name));
+			//PRINT(("filter passing through %s\n", name));
 			return false;
 		}
 	}
-//	PRINT(("filter rejecting %s\n", name));
+
+	//PRINT(("filter rejecting %s\n", name));
 	return true;
 }
 
 
-SelectiveAttributeTransformer::SelectiveAttributeTransformer(const char *attributeName,
-	bool (*transformFunc)(const char * , uint32 , off_t, void *, void *), void *params)
+SelectiveAttributeTransformer::SelectiveAttributeTransformer(
+	const char* attributeName,
+	bool (*transformFunc)(const char* , uint32 , off_t, void*, void*),
+	void* params)
 	:	fAttributeNameToTransform(attributeName),
 		fTransformFunc(transformFunc),
 		fTransformParams(params),
@@ -677,54 +724,62 @@ SelectiveAttributeTransformer::SelectiveAttributeTransformer(const char *attribu
 
 SelectiveAttributeTransformer::~SelectiveAttributeTransformer()
 {
-	for (int32 index = fTransformedBuffers.CountItems() - 1; index >= 0; index--)
+	for (int32 index = fTransformedBuffers.CountItems() - 1; index >= 0;
+			index--) {
 		delete [] fTransformedBuffers.ItemAt(index);
+	}
 }
+
 
 void
 SelectiveAttributeTransformer::Rewind()
 {
-	for (int32 index = fTransformedBuffers.CountItems() - 1; index >= 0; index--)
+	for (int32 index = fTransformedBuffers.CountItems() - 1; index >= 0;
+			index--) {
 		delete [] fTransformedBuffers.ItemAt(index);
+	}
 
 	fTransformedBuffers.MakeEmpty();
 }
 
 
 off_t
-SelectiveAttributeTransformer::Read(const char *name, const char *foreignName,
-	uint32 type, off_t size, void *buffer, void (*swapFunc)(void *))
+SelectiveAttributeTransformer::Read(const char* name, const char* foreignName,
+	uint32 type, off_t size, void* buffer, void (*swapFunc)(void*))
 {
 	if (!fReadFrom)
 		return 0;
 
-	off_t result = fReadFrom->Read(name, foreignName, type, size, buffer, swapFunc);
+	off_t result = fReadFrom->Read(name, foreignName, type, size, buffer,
+		swapFunc);
 
-	if (WillTransform(name, type, size, (const char *)buffer))
-		ApplyTransformer(name, type, size, (char *)buffer);
+	if (WillTransform(name, type, size, (const char*)buffer))
+		ApplyTransformer(name, type, size, (char*)buffer);
 
 	return result;
 }
 
+
 bool
-SelectiveAttributeTransformer::WillTransform(const char *name, uint32 , off_t ,
-	const char *) const
+SelectiveAttributeTransformer::WillTransform(const char* name, uint32, off_t,
+	const char*) const
 {
 	return strcmp(name, fAttributeNameToTransform) == 0;
 }
 
+
 bool
-SelectiveAttributeTransformer::ApplyTransformer(const char *name, uint32 type, off_t size,
-	char *data)
+SelectiveAttributeTransformer::ApplyTransformer(const char* name, uint32 type,
+	off_t size, char* data)
 {
 	return (fTransformFunc)(name, type, size, data, fTransformParams);
 }
 
-char *
-SelectiveAttributeTransformer::CopyAndApplyTransformer(const char *name, uint32 type,
-	off_t size, const char *data)
+char*
+SelectiveAttributeTransformer::CopyAndApplyTransformer(const char* name,
+	uint32 type, off_t size, const char* data)
 {
-	char *result = NULL;
+	char* result = NULL;
 	if (data) {
 		result = new char[size];
 		memcpy(result, data, (size_t)size);
@@ -734,13 +789,15 @@ SelectiveAttributeTransformer::CopyAndApplyTransformer(const char *name, uint32 
 		delete [] result;
 		return NULL;
 	}
+
 	return result;
 }
 
-const AttributeInfo *
+
+const AttributeInfo*
 SelectiveAttributeTransformer::Next()
 {
-	const AttributeInfo *result = fReadFrom->Next();
+	const AttributeInfo* result = fReadFrom->Next();
 	if (!result)
 		return NULL;
 
@@ -748,19 +805,22 @@ SelectiveAttributeTransformer::Next()
 	return result;
 }
 
-const char *
+
+const char*
 SelectiveAttributeTransformer::Get()
 {
 	if (!fReadFrom)
 		return NULL;
 
-	const char *result = fReadFrom->Get();
+	const char* result = fReadFrom->Get();
 
-	if (!WillTransform(fCurrentAttr.Name(), fCurrentAttr.Type(), fCurrentAttr.Size(), result))
+	if (!WillTransform(fCurrentAttr.Name(), fCurrentAttr.Type(),
+			fCurrentAttr.Size(), result)) {
 		return result;
+	}
 
-	char *transformedData = CopyAndApplyTransformer(fCurrentAttr.Name(), fCurrentAttr.Type(),
-		fCurrentAttr.Size(), result);
+	char* transformedData = CopyAndApplyTransformer(fCurrentAttr.Name(),
+		fCurrentAttr.Type(), fCurrentAttr.Size(), result);
 
 	// enlist for proper disposal when our job is done
 	if (transformedData) {

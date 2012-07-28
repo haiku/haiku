@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	1271117245
+1	japanese	x-vnd.Haiku-MediaPlayer	3052550296
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 %d kHz	MediaPlayer-InfoWin		%d kHz
@@ -69,6 +69,7 @@ Select all	MediaPlayer-PlaylistWindow		すべて選択
 Move Entry	MediaPlayer-MovePLItemsCmd		項目の移動
 Open	MediaPlayer-PlaylistWindow		開く
 Stop playing.	MediaPlayer-Main		再生を停止
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		ファイル'%filename'を開けませんでした。\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		エラー:
 Audio	MediaPlayer-InfoWin		オーディオ
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (不正なメッセージ)。プレイリストの保存に失敗しました。

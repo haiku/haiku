@@ -30,7 +30,8 @@
 using namespace BPrivate;
 
 
-StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds, BHandler *handler)
+StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds,
+	BHandler* handler)
 	: BTextView(viewFrame, "textview", textBounds, 
 		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW)
 { 
@@ -162,7 +163,7 @@ StyledEditView::GetEncoding() const
 
 	const BCharacterSet* set = 
 		BCharacterSetRoster::FindCharacterSetByName(fEncoding.String());
-	if(set != NULL)
+	if (set != NULL)
 		return set->GetFontID();
 
 	return 0;
@@ -181,8 +182,8 @@ StyledEditView::DeleteText(int32 start, int32 finish)
 
 
 void
-StyledEditView::InsertText(const char *text, int32 length, int32 offset,
-	const text_run_array *runs)
+StyledEditView::InsertText(const char* text, int32 length, int32 offset,
+	const text_run_array* runs)
 {
 	if (!fSuppressChanges)
 		fMessenger->SendMessage(TEXT_CHANGED);

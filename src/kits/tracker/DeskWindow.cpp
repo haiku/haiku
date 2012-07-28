@@ -60,12 +60,12 @@ All rights reserved.
 #include "TemplatesMenu.h"
 
 
-const char *kShelfPath = "tracker_shelf";
+const char* kShelfPath = "tracker_shelf";
 	// replicant support
 
 
 static void
-WatchAddOnDir(directory_which dirName, BDeskWindow *window)
+WatchAddOnDir(directory_which dirName, BDeskWindow* window)
 {
 	BPath path;
 	if (find_directory(dirName, &path) == B_OK) {
@@ -79,19 +79,19 @@ WatchAddOnDir(directory_which dirName, BDeskWindow *window)
 
 
 struct AddOneShortcutParams {
-	BDeskWindow *window;
-	std::set<uint32> *currentAddonShortcuts;
+	BDeskWindow* window;
+	std::set<uint32>* currentAddonShortcuts;
 };
 
 static bool
-AddOneShortcut(const Model *model, const char *, uint32 shortcut, bool /*primary*/, void *context)
+AddOneShortcut(const Model* model, const char*, uint32 shortcut, bool /*primary*/, void* context)
 {
 	if (!shortcut)
 		// no shortcut, bail
 		return false;
 
-	AddOneShortcutParams *params = (AddOneShortcutParams *)context;
-	BMessage *runAddon = new BMessage(kLoadAddOn);
+	AddOneShortcutParams* params = (AddOneShortcutParams*)context;
+	BMessage* runAddon = new BMessage(kLoadAddOn);
 	runAddon->AddRef("refs", model->EntryRef());
 
 	params->window->AddShortcut(shortcut, B_OPTION_KEY | B_COMMAND_KEY,
@@ -108,7 +108,7 @@ AddOneShortcut(const Model *model, const char *, uint32 shortcut, bool /*primary
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DeskWindow"
 
-BDeskWindow::BDeskWindow(LockingList<BWindow> *windowList)
+BDeskWindow::BDeskWindow(LockingList<BWindow>* windowList)
 	:
 	BContainerWindow(windowList, 0, kPrivateDesktopWindowLook,
 		kPrivateDesktopWindowFeel, B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK
@@ -149,7 +149,7 @@ BDeskWindow::~BDeskWindow()
 
 
 void
-BDeskWindow::Init(const BMessage *)
+BDeskWindow::Init(const BMessage*)
 {
 	//
 	//	Set the size of the screen before calling the container window's
@@ -204,7 +204,11 @@ BDeskWindow::MenusBeginning()
 		AddOneShortcutParams params;
 		params.window = this;
 		params.currentAddonShortcuts = &fCurrentAddonShortcuts;
-		EachAddon(&AddOneShortcut, &params);
+
+		BObjectList<BString> mimeTypes(10, true);
+		BuildMimeTypeList(mimeTypes);
+
+		EachAddon(&AddOneShortcut, &params, mimeTypes);
 	}
 }
 
@@ -216,7 +220,7 @@ BDeskWindow::Quit()
 		// this duplicates BContainerWindow::Quit because
 		// fNavigationItem can be part of fTrashContextMenu
 		// and would get deleted with it
-		BMenu *menu = fNavigationItem->Menu();
+		BMenu* menu = fNavigationItem->Menu();
 		if (menu)
 			menu->RemoveItem(fNavigationItem);
 		delete fNavigationItem;
@@ -231,15 +235,15 @@ BDeskWindow::Quit()
 }
 
 
-BPoseView *
-BDeskWindow::NewPoseView(Model *model, BRect rect, uint32 viewMode)
+BPoseView*
+BDeskWindow::NewPoseView(Model* model, BRect rect, uint32 viewMode)
 {
 	return new DesktopPoseView(model, rect, viewMode);
 }
 
 
 void
-BDeskWindow::CreatePoseView(Model *model)
+BDeskWindow::CreatePoseView(Model* model)
 {
 	fPoseView = NewPoseView(model, Bounds(), kIconMode);
 	fPoseView->SetIconMapping(false);
@@ -268,7 +272,7 @@ BDeskWindow::CreatePoseView(Model *model)
 
 
 void
-BDeskWindow::AddWindowContextMenus(BMenu *menu)
+BDeskWindow::AddWindowContextMenus(BMenu* menu)
 {
 	TemplatesMenu* tempateMenu = new TemplatesMenu(PoseView(),
 		B_TRANSLATE("New"));
@@ -440,14 +444,14 @@ BDeskWindow::ShouldAddContainerView() const
 
 
 void
-BDeskWindow::MessageReceived(BMessage *message)
+BDeskWindow::MessageReceived(BMessage* message)
 {
 	if (message->WasDropped()) {
-		const rgb_color *color;
+		const rgb_color* color;
 		int32 size;
 		// handle "roColour"-style color drops
 		if (message->FindData("RGBColor", 'RGBC',
-			(const void **)&color, &size) == B_OK) {
+			(const void**)&color, &size) == B_OK) {
 			BScreen(this).SetDesktopColor(*color);
 			fPoseView->SetViewColor(*color);
 			fPoseView->SetLowColor(*color);

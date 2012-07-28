@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	3695303004
+1	polish	x-vnd.Haiku-libtracker	3778030996
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -171,7 +171,6 @@ Edit favorites…	FilePanelPriv		Edytuj ulubione…
 Create relative link	ContainerWindow		Utwórz wględny skrót
 Copy	ContainerWindow		Kopiuj
 Size	PoseView		Rozmiar
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction katalogu domowego, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction katalogu domowego mimo wszystko, przytrzymaj klawisz Shift i kliknij \"%toConfirmAction\".
 Location	OpenWithWindow		Lokacja
 Force identify	ContainerWindow		Identyfikuj
 Duplicate	ContainerWindow		Zduplikuj
@@ -195,7 +194,6 @@ New	DeskWindow		Nowy
 Open	InfoWindow		Otwórz
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Zastąp wszystko
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Aplikacja \"%appname\" nie obsługuje typu pliku który masz zamiar otworzyć. Jesteś pewien, że chcesz kontynuować? Jeśli wiesz, że aplikacja obsługuje ten typ plików, skontaktuj się z pomocą techniczną i poinformuj o zaistniałej sytuacji.
 Preparing to restore items…	StatusWindow		Przygotowanie do odzyskania elementów…
 Replace other file	WidgetAttributeText		Zastąp pozostałe pliki
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Część zaznaczonych plików nie może zostać przeniesiona do kosza. Czy chcesz je usunąć zamiast tego? (Ta operacja nie może zostać cofnięta)
@@ -220,7 +218,6 @@ Name	PoseView		Nazwa
 Group	FilePermissionsView		Grupa
 Version:	InfoWindow		Wersja:
 Created:	InfoWindow		Stworzono:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction typ mime, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction typ mime mimo wszystko kliknij \"%toConfirmAction\".
 \nShould this be fixed?	FSUtils		\nCzy naprawić to?
 Copying: 	StatusWindow		Kopiowanie: 
 Capacity:	InfoWindow		Pojemność:
@@ -280,7 +277,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Zmiana nazwy
 Paused: click to resume or stop	StatusWindow		Pauza: kliknij by kontynuować lub zatrzymać
 Preferred for %type	OpenWithWindow		Preferowane dla %type
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction katalog common, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction katalog common mimo wszystko, przytrzymaj klawisz Shift i kliknij \"%toConfirmAction\".
 There was an error deleting \"%name\":\n\t%error	FSUtils		Pojawił się błąd przy usuwaniu \"%name\":\n\t%error
 Paste	FilePanelPriv		Wklej
 Copy more	ContainerWindow		Kopiuj więcej
@@ -407,7 +403,6 @@ Select…	FilePanelPriv		Wybierz…
 Don't move files to Trash	SettingsView		Nie przenoś plików do kosza
 There was an error resolving the link.	Tracker		Pojawił się problem przy przetwarzaniu skrótu.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction folder systemowy lub jego zawartość, nie będziesz mógł uruchomić %osName! Czy na pewno chcesz to zrobić? Aby %toDoAction katalogu domowego mimo wszystko, przytrzymaj klawisz Shift i kliknij \"%toConfirmAction\".
 You can't move or copy the trash.	FSUtils		nie możesz przenieść ani skopiować kosza.
 ends with	SelectionWindow		kończy się na
 Volume icons	TrackerSettingsWindow		Ikony dysków
@@ -429,7 +424,6 @@ Modified	ContainerWindow		Zmodyfikowane
 Edit Query template	FindPanel		Edytuj szablon Zapytania
 Prompt	FSUtils		Ostrzegaj
 Edit query	ContainerWindow		Edytuj zapytanie
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction katalog config, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction katalog config mimo wszystko, kliknij  \"%toConfirmAction\".
 Find…	ContainerWindow		Znajdź…
 Create a Query	FindPanel		Stwórz zapytanie
 Move to Trash	FSUtils		Przenieś do kosza
@@ -448,7 +442,6 @@ Mount	ContainerWindow		Zamontuj
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used zajęte -- %free wolne)
 Cancel	FSClipBoard		Anuluj
 Cut more	ContainerWindow		Wytnij więcej
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Jeśli %ifYouDoAction katalog settings, %osName może nie zachowywać się poprawnie! Czy na pewno chcesz to zrobić? Aby %toDoAction katalog config mimo wszystko, kliknij \"%toConfirmAction\".
 Deleting: 	StatusWindow		Usuwanie: 
 Empty Trash	InfoWindow		Opróżnij kosz
 Add	FindPanel		Dodaj

@@ -2384,7 +2384,8 @@ vfs_fs_vnode_to_node_ref(void *_vnode, fssh_mount_id *_mountID,
  */
 
 fssh_status_t
-vfs_lookup_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID, void **_vnode)
+vfs_lookup_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID,
+	struct vnode **_vnode)
 {
 	fssh_mutex_lock(&sVnodeMutex);
 	struct vnode *vnode = lookup_vnode(mountID, vnodeID);

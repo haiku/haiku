@@ -1,9 +1,11 @@
-1	german	x-vnd.Be-TSKB	359782181
+1	german	x-vnd.Be-TSKB	3197510812
 Power off	DeskbarMenu		Ausschalten
 Show day of week	PreferencesWindow		Wochentag anzeigen
 Edit menu…	PreferencesWindow		Menü bearbeiten…
+Suspend	DeskbarMenu		Ruhezustand
 Applications	PreferencesWindow		Anwendungen
 Time preferences…	TimeView		Datum & Zeit Einstellungen…
+About Haiku	DeskbarMenu		Über Haiku
 Recent documents:	PreferencesWindow		Letzte Dokumente:
 Recent applications	DeskbarMenu		Letzte Anwendungen
 Sort running applications	PreferencesWindow		Laufende Anwendungen sortieren

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3695303004
+1	finnish	x-vnd.Haiku-libtracker	3778030996
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -171,7 +171,6 @@ Edit favorites…	FilePanelPriv		Muokkaa suosikkeja...
 Create relative link	ContainerWindow		Luo suhteellinen linkki
 Copy	ContainerWindow		Kopioi
 Size	PoseView		Koko
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction kotikansiolle, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction kotikansiolle, pidä vaihtonäppäin alhaalla ja napsauta painiketta \"%toConfirmAction\".
 Location	OpenWithWindow		Sijainti
 Force identify	ContainerWindow		Pakota tunnistus
 Duplicate	ContainerWindow		Kaksoiskappale
@@ -195,7 +194,6 @@ New	DeskWindow		Uusi
 Open	InfoWindow		Avaa
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Korvaa kaikki
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Sovellus ”%appname” ei tue sen tyyppistä asiakirjaa, jota olet avaamassa. Oletko varma, että haluat jatkaa? Jos tiedät, että sovellus tukee dokumenttityyppiä, sinun pitäisi ottaa yhteyttä sovelluksen julkaisijaan ja pyytää heitä päivittämään dokumenttisi tyyppi tuettujen tyyppien luetteloon.
 Preparing to restore items…	StatusWindow		Valmistaudutaan palauttamaan kohteita...
 Replace other file	WidgetAttributeText		Korvaa muu tiedosto
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Joitakin valittuja kohteita ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voi palauttaa.)
@@ -220,7 +218,6 @@ Name	PoseView		Nimi
 Group	FilePermissionsView		Ryhmä
 Version:	InfoWindow		Versio:
 Created:	InfoWindow		Luotu:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction mime-asetuksille, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction mime-asetuksille, napsauta painiketta \"%toConfirmAction\".
 \nShould this be fixed?	FSUtils		\nPitäisikö tämä korjata?
 Copying: 	StatusWindow		Kopioidaan:
 Capacity:	InfoWindow		Kapasiteetti:
@@ -280,7 +277,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Nimeä uudellee
 Paused: click to resume or stop	StatusWindow		Keskeytetty: napsauta painiketta resume tai stop
 Preferred for %type	OpenWithWindow		Ensisijainen tyypille %type
 GiB	WidgetAttributeText		gibitavua
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction yhteiskansiolle, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction yhteiskansiolle, pidä vaihtonäppäin alhaalla ja napsauta painiketta \"%toConfirmAction\".
 There was an error deleting \"%name\":\n\t%error	FSUtils		Kohdetta ”%name” poistettaessa tapahtui virhe:\n\t%error
 Paste	FilePanelPriv		Liitä
 Copy more	ContainerWindow		Kopioi lisää
@@ -407,7 +403,6 @@ Select…	FilePanelPriv		Valitse...
 Don't move files to Trash	SettingsView		Älä siirrä tiedostoja roskakoriin
 There was an error resolving the link.	Tracker		Virhe linkin ratkaisemisessa.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction järjestelmäkansiolle tai sen sisällölle, %osName ei ehkä alkulataa enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction järjestelmäkansiolle tai sen sisällölle, pidä vaihtonäppäin alhaalla ja napsauta painiketta \"%toConfirmAction\".
 You can't move or copy the trash.	FSUtils		Et voi siirtää tai kopioida roskakoriin.
 ends with	SelectionWindow		loppuu kohteella
 Volume icons	TrackerSettingsWindow		Taltiokuvakkeet
@@ -429,7 +424,6 @@ Modified	ContainerWindow		Muokattu
 Edit Query template	FindPanel		Muokkaa kyselymallinnetta
 Prompt	FSUtils		Kehoite
 Edit query	ContainerWindow		Muokkaa kyselyä
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction konfigurointikansiolle, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction konfigurointikansiolle, napsauta painiketta \"%toConfirmAction\".
 Find…	ContainerWindow		Etsi...
 Create a Query	FindPanel		Lue kysely
 Move to Trash	FSUtils		Siirrä roskakoriin
@@ -448,7 +442,6 @@ Mount	ContainerWindow		Liitä
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used käytetty -- %free vapaana)
 Cancel	FSClipBoard		Peru
 Cut more	ContainerWindow		Leikkaa lisää
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Jos teet toiminnon %ifYouDoAction asetuskansiolle, %osName ei ehkä toimi enää oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %toDoAction asetuskansiolle, napsauta painiketta \"%toConfirmAction\".
 Deleting: 	StatusWindow		Poistetaan:
 Empty Trash	InfoWindow		Tyhjennä roskakori
 Add	FindPanel		Lisää

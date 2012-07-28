@@ -16,7 +16,7 @@
 #include <AutoLocker.h>
 #include <ObjectList.h>
 
-#include "GUISettingsUtils.h"
+#include "GuiSettingsUtils.h"
 #include "table/TableColumns.h"
 #include "Tracing.h"
 
@@ -231,7 +231,7 @@ ImageListView::LoadSettings(const BMessage& settings)
 {
 	BMessage tableSettings;
 	if (settings.FindMessage("imagesTable", &tableSettings) == B_OK) {
-		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
 			fImagesTable);
 	}
 }
@@ -243,7 +243,7 @@ ImageListView::SaveSettings(BMessage& settings)
 	settings.MakeEmpty();
 
 	BMessage tableSettings;
-	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
 		fImagesTable);
 	if (result == B_OK)
 		result = settings.AddMessage("imagesTable", &tableSettings);

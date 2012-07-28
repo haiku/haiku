@@ -65,7 +65,7 @@ All rights reserved.
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "SlowContextPopup"
 
-BSlowContextMenu::BSlowContextMenu(const char *title)
+BSlowContextMenu::BSlowContextMenu(const char* title)
 	:	BPopUpMenu(title, false, false),
 		fMenuBuilt(false),
 		fMessage(B_REFS_RECEIVED),
@@ -130,7 +130,7 @@ BSlowContextMenu::DetachedFromWindow()
 
 
 void
-BSlowContextMenu::SetNavDir(const entry_ref *ref)
+BSlowContextMenu::SetNavDir(const entry_ref* ref)
 {
 	ForceRebuild();
 		// reset the slow menu building mechanism so we can add more stuff
@@ -139,7 +139,7 @@ BSlowContextMenu::SetNavDir(const entry_ref *ref)
 }
 
 
-void 
+void
 BSlowContextMenu::ForceRebuild()
 {
 	ClearMenuBuildingState();
@@ -147,7 +147,7 @@ BSlowContextMenu::ForceRebuild()
 }
 
 
-bool 
+bool
 BSlowContextMenu::NeedsToRebuild() const
 {
 	return !fMenuBuilt;
@@ -178,10 +178,12 @@ BSlowContextMenu::ClearMenuBuildingState()
 	}
 }
 
+
 const int32 kItemsToAddChunk = 20;
 const bigtime_t kMaxTimeBuildingMenu = 200000;
 
-bool 
+
+bool
 BSlowContextMenu::AddDynamicItem(add_state state)
 {
 	if (fMenuBuilt)
@@ -218,12 +220,13 @@ BSlowContextMenu::AddDynamicItem(add_state state)
 bool
 BSlowContextMenu::StartBuildingItemList()
 {
-	//	return false when done building
+	// return false when done building
 	BEntry entry;
 
 	if (fNavDir.device < 0 || entry.SetTo(&fNavDir) != B_OK
-		|| !entry.Exists()) 
+		|| !entry.Exists()) {
 		return false;
+	}
 
 	fIteratingDesktop = false;
 	
@@ -236,13 +239,13 @@ BSlowContextMenu::StartBuildingItemList()
 
 	if (fVolsOnly)
 		return true;
-		
+
 	Model startModel(&entry, true);
 	if (startModel.InitCheck() == B_OK) {
 		if (!startModel.IsContainer())
 			return false;
 
-		if (startModel.IsQuery()) 
+		if (startModel.IsQuery())
 			fContainer = new QueryEntryListCollection(&startModel);
 		else if (startModel.IsDesktop()) {
 			fIteratingDesktop = true;
@@ -250,10 +253,11 @@ BSlowContextMenu::StartBuildingItemList()
 				startModel.EntryRef());
 			AddRootItemsIfNeeded();
 			AddTrashItem();
-		} else
-			fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory *>
+		} else {
+			fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>
 				(startModel.Node()));
-		
+		}
+
 		if (fContainer->InitCheck() != B_OK)
 			return false;
 
@@ -338,24 +342,24 @@ BSlowContextMenu::AddNextItem()
 }
 
 
-void 
-BSlowContextMenu::AddOneItem(Model *model)
+void
+BSlowContextMenu::AddOneItem(Model* model)
 {
-	BMenuItem *item = NewModelItem(model, &fMessage, fMessenger, false,
-		dynamic_cast<BContainerWindow *>(fParentWindow) ?
-		dynamic_cast<BContainerWindow *>(fParentWindow) : 0,
+	BMenuItem* item = NewModelItem(model, &fMessage, fMessenger, false,
+		dynamic_cast<BContainerWindow*>(fParentWindow) ?
+		dynamic_cast<BContainerWindow*>(fParentWindow) : 0,
 		fTypesList, &fTrackingHook);
 
-	if (item) 
+	if (item)
 		fItemList->AddItem(item);
 }
 
 
-ModelMenuItem * 
-BSlowContextMenu::NewModelItem(Model *model, const BMessage *invokeMessage,
+ModelMenuItem*
+BSlowContextMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 	const BMessenger &target, bool suppressFolderHierarchy,
-	BContainerWindow *parentWindow, const BObjectList<BString> *typeslist,
-	TrackingHookData *hook)
+	BContainerWindow* parentWindow, const BObjectList<BString>* typeslist,
+	TrackingHookData* hook)
 {
 	if (model->InitCheck() != B_OK)
 		return NULL;
@@ -364,8 +368,8 @@ BSlowContextMenu::NewModelItem(Model *model, const BMessage *invokeMessage,
 	bool container = false;
 	if (model->IsSymLink()) {
 	
-		Model *newResolvedModel = NULL;
-		Model *result = model->LinkTo();
+		Model* newResolvedModel = NULL;
+		Model* result = model->LinkTo();
 
 		if (!result) {
 			newResolvedModel = new Model(model->EntryRef(), true, true);
@@ -401,7 +405,7 @@ BSlowContextMenu::NewModelItem(Model *model, const BMessage *invokeMessage,
 		container = model->IsContainer();
 	}
 
-	BMessage *message = new BMessage(*invokeMessage);
+	BMessage* message = new BMessage(*invokeMessage);
 	message->AddRef("refs", model->EntryRef());
 
 	// Truncate the name if necessary
@@ -409,13 +413,13 @@ BSlowContextMenu::NewModelItem(Model *model, const BMessage *invokeMessage,
 	be_plain_font->TruncateString(&truncatedString, B_TRUNCATE_END,
 		BNavMenu::GetMaxMenuWidth());
 
-	ModelMenuItem *item = NULL;
+	ModelMenuItem* item = NULL;
 	if (!container || suppressFolderHierarchy) {
 		item = new ModelMenuItem(model, truncatedString.String(), message);
 		if (invokeMessage->what != B_REFS_RECEIVED)
 			item->SetEnabled(false);
 	} else {
-		BNavMenu *menu = new BNavMenu(truncatedString.String(),
+		BNavMenu* menu = new BNavMenu(truncatedString.String(),
 			invokeMessage->what, target, parentWindow, typeslist);
 		
 		menu->SetNavDir(&ref);
@@ -448,13 +452,13 @@ BSlowContextMenu::BuildVolumeMenu()
 			BEntry entry;
 			startDir.GetEntry(&entry);
 
-			Model *model = new Model(&entry);
+			Model* model = new Model(&entry);
 			if (model->InitCheck() != B_OK) {
 				delete model;
 				continue;
 			}
 			
-			BNavMenu *menu = new BNavMenu(model->Name(), fMessage.what,
+			BNavMenu* menu = new BNavMenu(model->Name(), fMessage.what,
 				fMessenger, fParentWindow, fTypesList);
 
 			menu->SetNavDir(model->EntryRef());
@@ -463,8 +467,8 @@ BSlowContextMenu::BuildVolumeMenu()
 
 			ASSERT(menu->Name());
 
-			ModelMenuItem *item = new ModelMenuItem(model, menu);
-			BMessage *message = new BMessage(fMessage);
+			ModelMenuItem* item = new ModelMenuItem(model, menu);
+			BMessage* message = new BMessage(fMessage);
 
 			message->AddRef("refs", model->EntryRef());
 			item->SetMessage(message);
@@ -485,7 +489,7 @@ BSlowContextMenu::DoneBuildingItemList()
 		fItemList->SortItems(&BNavMenu::CompareOne);
 
 	int32 count = fItemList->CountItems();
-	for (int32 index = 0; index < count; index++) 
+	for (int32 index = 0; index < count; index++)
 		AddItem(fItemList->ItemAt(index));
 
 	fItemList->MakeEmpty();
@@ -501,7 +505,7 @@ BSlowContextMenu::DoneBuildingItemList()
 
 
 void
-BSlowContextMenu::SetTypesList(const BObjectList<BString> *list)
+BSlowContextMenu::SetTypesList(const BObjectList<BString>* list)
 {
 	fTypesList = list;
 }
@@ -514,9 +518,9 @@ BSlowContextMenu::SetTarget(const BMessenger &target)
 }
 
 
-TrackingHookData *
-BSlowContextMenu::InitTrackingHook(bool (*hook)(BMenu *, void *), const BMessenger *target,
-	const BMessage *dragMessage)
+TrackingHookData*
+BSlowContextMenu::InitTrackingHook(bool (*hook)(BMenu*, void*), const BMessenger* target,
+	const BMessage* dragMessage)
 {
 	fTrackingHook.fTrackingHook = hook;
 	if (target)
@@ -527,17 +531,17 @@ BSlowContextMenu::InitTrackingHook(bool (*hook)(BMenu *, void *), const BMesseng
 }
 
 
-void 
-BSlowContextMenu::SetTrackingHookDeep(BMenu *menu, bool (*func)(BMenu *, void *), void *state)
+void
+BSlowContextMenu::SetTrackingHookDeep(BMenu* menu, bool (*func)(BMenu*, void*), void* state)
 {
 	menu->SetTrackingHook(func, state);
 	int32 count = menu->CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BMenuItem *item = menu->ItemAt(index);
+		BMenuItem* item = menu->ItemAt(index);
 		if (!item)
 			continue;
 
-		BMenu *submenu = item->Submenu();
+		BMenu* submenu = item->Submenu();
 		if (submenu)
 			SetTrackingHookDeep(submenu, func, state);
 	}

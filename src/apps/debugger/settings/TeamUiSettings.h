@@ -18,17 +18,17 @@ enum team_ui_settings_type {
 };
 
 
-class TeamUISettings {
+class TeamUiSettings {
 public:
-								TeamUISettings();
-	virtual						~TeamUISettings();
+								TeamUiSettings();
+	virtual						~TeamUiSettings();
 
 	virtual team_ui_settings_type Type() const = 0;
 	virtual	const char*			ID() const = 0;
 	virtual	status_t			SetTo(const BMessage& archive) = 0;
 	virtual	status_t			WriteTo(BMessage& archive) const = 0;
 	
-	virtual TeamUISettings*		Clone() const = 0;
+	virtual TeamUiSettings*		Clone() const = 0;
 									// throws std::bad_alloc
 
 };

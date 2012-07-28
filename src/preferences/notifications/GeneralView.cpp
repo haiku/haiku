@@ -107,7 +107,7 @@ GeneralView::GeneralView(SettingsHost* host)
 				.End()
 			.End()
 		.End()
-
+		.SetInsets(inset, inset, inset, inset)
 		.AddGlue()
 	);
 }

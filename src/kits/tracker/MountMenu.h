@@ -31,18 +31,19 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef MOUNTMENU_H
 #define MOUNTMENU_H
 
+
 #include <Menu.h>
+
 
 namespace BPrivate {
 
 class MountMenu : public BMenu {
 public:
 
-	MountMenu(const char *);
+	MountMenu(const char*);
 
 protected:
 
@@ -54,4 +55,4 @@ protected:
 
 using namespace BPrivate;
 
-#endif
+#endif	// MOUNTMENU_H

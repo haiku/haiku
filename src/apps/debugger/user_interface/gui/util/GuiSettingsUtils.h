@@ -14,7 +14,7 @@ class BMessage;
 class BSplitView;
 
 
-class GUISettingsUtils {
+class GuiSettingsUtils {
 public:
 
 	static 	status_t			ArchiveSplitView(BMessage& settings,

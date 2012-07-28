@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include <Application.h>
 #include <Catalog.h>
 #include <FindDirectory.h>
@@ -59,21 +60,22 @@ All rights reserved.
 
 namespace BPrivate {
 
-const char *kTemplatesDirectory = "Tracker/Tracker New Templates";
+const char* kTemplatesDirectory = "Tracker/Tracker New Templates";
 
+} // namespace BPrivate
 
-}
-
-TemplatesMenu::TemplatesMenu(const BMessenger &target, const char *label)
+TemplatesMenu::TemplatesMenu(const BMessenger &target, const char* label)
 	:	BMenu(label),
 		fTarget(target),
 		fOpenItem(NULL)
 {
 }
 
+
 TemplatesMenu::~TemplatesMenu()
 {
 }
+
 
 void
 TemplatesMenu::AttachedToWindow()
@@ -83,14 +85,17 @@ TemplatesMenu::AttachedToWindow()
 	SetTargetForItems(fTarget);
 }
 
+
 status_t
-TemplatesMenu::SetTargetForItems(BHandler *target)
+TemplatesMenu::SetTargetForItems(BHandler* target)
 {
 	status_t result = BMenu::SetTargetForItems(target);
 	if (fOpenItem)
 		fOpenItem->SetTarget(be_app_messenger);
+
 	return result;
 }
+
 
 status_t
 TemplatesMenu::SetTargetForItems(BMessenger messenger)
@@ -98,14 +103,17 @@ TemplatesMenu::SetTargetForItems(BMessenger messenger)
 	status_t result = BMenu::SetTargetForItems(messenger);
 	if (fOpenItem)
 		fOpenItem->SetTarget(be_app_messenger);
+
 	return result;
 }
+
 
 void
 TemplatesMenu::UpdateMenuState()
 {
 	BuildMenu(false);
 }
+
 
 bool
 TemplatesMenu::BuildMenu(bool addItems)
@@ -127,9 +135,9 @@ TemplatesMenu::BuildMenu(bool addItems)
 	find_directory (B_USER_SETTINGS_DIRECTORY, &path, true);
 	path.Append(kTemplatesDirectory);
 	mkdir(path.Path(), 0777);
-	
+
 	count = 0;
-	
+
 	BEntry entry;
 	BDirectory templatesDir(path.Path());
 	while (templatesDir.GetNextEntry(&entry) == B_OK) {
@@ -140,48 +148,46 @@ TemplatesMenu::BuildMenu(bool addItems)
 		if (nodeInfo.InitCheck() == B_OK) {
 			char mimeType[B_MIME_TYPE_LENGTH];
 			nodeInfo.GetType(mimeType);
-			
+
 			BMimeType mime(mimeType);
 			if (mime.IsValid()) {
-			
 				if (count == 0)
 					AddSeparatorItem();
-				
+
 				count++;
-				
+
 				// If not adding items, we are just seeing if there
 				// are any to list.  So if we find one, immediately
 				// bail and return the result.
 				if (!addItems)
 					break;
-					
+
 				entry_ref ref;
 				entry.GetRef(&ref);
 	
-				BMessage *message = new BMessage(kNewEntryFromTemplate);
+				BMessage* message = new BMessage(kNewEntryFromTemplate);
 				message->AddRef("refs_template", &ref);
 				message->AddString("name", fileName);
 				AddItem(new IconMenuItem(fileName, message, &nodeInfo, B_MINI_ICON));
 			}
-			
 		}
 	}
-	
+
 	AddSeparatorItem();
-	
+
 	// This is the message sent to open the templates folder.
-	BMessage *message = new BMessage(B_REFS_RECEIVED);
+	BMessage* message = new BMessage(B_REFS_RECEIVED);
 	entry_ref dirRef;
 	if (templatesDir.GetEntry(&entry) == B_OK)
 		entry.GetRef(&dirRef);
 	message->AddRef("refs", &dirRef);
-	
+
 	// Add item to show templates folder.
 	fOpenItem =	new BMenuItem(B_TRANSLATE("Edit templates" B_UTF8_ELLIPSIS),
 			message);
 	AddItem(fOpenItem);
 	if (dirRef == entry_ref())
 		fOpenItem->SetEnabled(false);
-	
+
 	return count > 0;
 }

@@ -15,7 +15,7 @@
 #include <ObjectList.h>
 
 #include "FunctionID.h"
-#include "GUISettingsUtils.h"
+#include "GuiSettingsUtils.h"
 #include "LocatableFile.h"
 #include "table/TableColumns.h"
 #include "Team.h"
@@ -241,7 +241,7 @@ BreakpointListView::LoadSettings(const BMessage& settings)
 {
 	BMessage tableSettings;
 	if (settings.FindMessage("breakpointsTable", &tableSettings) == B_OK) {
-		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
 			fBreakpointsTable);
 	}
 }
@@ -253,7 +253,7 @@ BreakpointListView::SaveSettings(BMessage& settings)
 	settings.MakeEmpty();
 
 	BMessage tableSettings;
-	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
 		fBreakpointsTable);
 	if (result == B_OK)
 		result = settings.AddMessage("breakpointsTable", &tableSettings);

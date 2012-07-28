@@ -342,6 +342,38 @@ if $(TARGET_ARCH) = x86 {
 }
 
 
+# MikMod
+local mikmodBaseURL = http://haiku-files.org/files/optional-packages/lib ;
+if $(TARGET_ARCH) = x86 {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_MIKMOD_FILE = libmikmod-3.1.11-r1a3-x86-gcc4-2011-05-26.zip ;
+	} else {
+		HAIKU_MIKMOD_FILE = libmikmod-3.1.11-r1a3-x86-gcc2-2011-05-19.zip ;
+	}
+
+	local mikmodZipFile = [ DownloadFile $(HAIKU_MIKMOD_FILE)
+		: $(mikmodBaseURL)/$(HAIKU_MIKMOD_FILE) ] ;
+
+	HAIKU_MIKMOD_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_MIKMOD_FILE:B) ] ;
+
+	HAIKU_MIKMOD_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_MIKMOD_DIR)
+		: common/include/ : $(mikmodZipFile) : extracted-mikmod ] ;
+
+	HAIKU_MIKMOD_LIBS = [ ExtractArchive $(HAIKU_MIKMOD_DIR)
+		:
+		common/lib/libmikmod.a
+		: $(mikmodZipFile)
+		: extracted-ffmpeg ] ;
+	Depends $(HAIKU_MIKMOD_LIBS) : $(HAIKU_MIKMOD_HEADERS_DEPENDENCY) ;
+
+	HAIKU_MIKMOD_HEADERS = [ FDirName $(HAIKU_MIKMOD_DIR) common include ] ;
+
+} else {
+	Echo "MikMod support not available on $(TARGET_ARCH)" ;
+}
+
+
 # Freetype
 local freetypeBaseURL = $(baseURL)/lib ;
 if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {

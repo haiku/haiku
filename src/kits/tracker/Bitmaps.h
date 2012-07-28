@@ -31,7 +31,6 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef __BITS__
 #define __BITS__
 
@@ -43,31 +42,32 @@ All rights reserved.
 
 #include "TrackerIcons.h"
 
+
 class BBitmap;
 
 namespace BPrivate {
 
 class BImageResources
 {
-	// convenience class for accessing 
+	// convenience class for accessing
 public:
-	BImageResources(void *memAddr);
+	BImageResources(void* memAddr);
 	~BImageResources();
-	
-	BResources *ViewResources();
-	const BResources *ViewResources() const;
-	
-	status_t FinishResources(BResources *) const;
-	
-	const void *LoadResource(type_code type, int32 id,
-		size_t *outSize) const;
-	const void *LoadResource(type_code type, const char *name,
-		size_t *outSize) const;
+
+	BResources* ViewResources();
+	const BResources* ViewResources() const;
+
+	status_t FinishResources(BResources*) const;
+
+	const void* LoadResource(type_code type, int32 id,
+		size_t* outSize) const;
+	const void* LoadResource(type_code type, const char* name,
+		size_t* outSize) const;
 		// load a resource from the Tracker executable, just like the
 		// corresponding functions in BResources.  These methods are
 		// thread-safe.
-	
-	status_t GetIconResource(int32 id, icon_size size, BBitmap *dest) const;
+
+	status_t GetIconResource(int32 id, icon_size size, BBitmap* dest) const;
 		// this is a wrapper around LoadResource(), for retrieving
 		// B_LARGE_ICON and B_MINI_ICON ('ICON' and 'MICN' respectively)
 		// resources.  this does sanity checking on the found data,
@@ -78,7 +78,7 @@ public:
 		// this is a wrapper around LoadResource(), for retrieving
 		// the vector icon data
 
- 	status_t GetBitmapResource(type_code type, int32 id, BBitmap **out) const;
+ 	status_t GetBitmapResource(type_code type, int32 id, BBitmap** out) const;
  		// this is a wrapper around LoadResource(), for retrieving
  		// arbitrary bitmaps.  the resource with the given type and
  		// id is looked up, and a BBitmap created from it and returned
@@ -86,19 +86,19 @@ public:
  		// that is an archived bitmap object.
 
 private:
-	image_id find_image(void *memAddr) const;
+	image_id find_image(void* memAddr) const;
 	
 	mutable BLocker fLock;
 	BResources fResources;
 };
 
- 		
 
 extern
 #ifdef _IMPEXP_TRACKER
 _IMPEXP_TRACKER
 #endif
 BImageResources* GetTrackerResources();
+
 
 } // namespace BPrivate
 

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4130438504
+1	russian	x-vnd.Haiku-libtracker	3778030996
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -19,6 +19,7 @@ Invert selection	VolumeWindow		Инвертировать
 Recent documents	FavoritesMenu		Недавние документы
 Modified	QueryPoseView		Изменён
 Created	ContainerWindow		Создан
+Error %error loading add-On %name.	ContainerWindow		Ошибка %error при запуске дополнения %name.
 contains	SelectionWindow		содержит
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Извините, сохранение объектов в корневой папке системы невозможно.
 Show shared volumes on Desktop	SettingsView		Показывать значки общих дисков
@@ -46,7 +47,9 @@ Select all	ContainerWindow		Выделить все
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Извините, но атрибут 'Character' не может хранить многобайтовый глиф.
 Clean up	DeskWindow		Выстроить
 You cannot copy or move the root directory.	FSUtils		Вы не можете перемещать или копировать корневую папку.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed из %TotalSize, %BytesPerSecond/с
 Invert selection	FilePanelPriv		Инвертировать
+Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Переименовать
 save text	FilePanelPriv		сохранить текст
 Select all	FilePanelPriv		Выделить все
 Link to:	InfoWindow		Ссылка на:
@@ -74,6 +77,7 @@ Decrease size	DeskWindow		Уменьшить размер
 Size	ContainerWindow		Размер
 All disks	AutoMounterSettings		Все диски
 Would you like to find some other suitable application?	FSUtils		Хотите найти какое-нибудь другое подходящее приложение?
+Finish: %time - %finishtime left	StatusWindow		Окончание: %time - осталось %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствуют библиотеки: %library). \n
 no items	CountView		нет объектов
 Ignore case	SelectionWindow		Игнорировать регистр
@@ -94,6 +98,7 @@ Add-ons	VolumeWindow		Дополнения
 Sorry, you can't copy items to the Trash.	PoseView		Извините, но вы не можете копировать объекты в корзину.
 List view	VolumeWindow		Список
 matches wildcard expression	SelectionWindow		совпадает с шаблонным выражением
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	переименуете
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Невозможно заменить папку или символическую ссылку файлом.
 Show space bars on volumes	SettingsView		Показывать индикаторы занятого места
 Invert selection	ContainerWindow		Инвертировать
@@ -104,6 +109,7 @@ Add printer…	ContainerWindow		Добавить принтер…
 Open	VolumeWindow		Открыть
 New folder	ContainerWindow		Новая папка
 Kind	ContainerWindow		Тип
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	переименовать
 home	B_USER_DIRECTORY		Домашняя
 Select…	ContainerWindow		Выделить…
 Copy to	ContainerWindow		Копировать в
@@ -114,6 +120,7 @@ Set new link target	InfoWindow		Изменить цель ссылки
 Save as Query template:	FindPanel		Сохранить запрос как шаблон:
 preferences	B_PREFERENCES_DIRECTORY		Настройки
 Cancel	FSUtils		Отмена
+move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	переместить
 Edit name	ContainerWindow		Переименовать
 Show volumes on Desktop	SettingsView		Показывать значки разделов
 KiB	WidgetAttributeText		Кбайт
@@ -126,6 +133,7 @@ OK	TrackerInitialState		ОК
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Невозможно открыть \"%name\". Файл ошибочно помечен как исполняемый. 
 Add-ons	ContainerWindow		Дополнения
 Edit templates…	TemplatesMenu		Изменить шаблоны…
+Finish: %time - Over %finishtime left	StatusWindow		Окончание: %time - Осталось более %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Объект с именем \"%name\" уже существует в этой папке. Заменить его ссылкой, которую вы создаёте?"
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Извините, но на принимающем разделе недостаточно свободного места для копирования выделенных файлов.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (%error). 
@@ -186,7 +194,6 @@ New	DeskWindow		Создать
 Open	InfoWindow		Открыть
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Заменить все
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Программа \"%appname\" не поддерживает открытие документов данного типа. Вы действительно хотите открыть документ в ней? Если вы знаете, что программа поддерживает этот тип документов, то вы должны связаться с разработчиком программы и просить его обновить список типов, поддерживаемых программой.
 Preparing to restore items…	StatusWindow		Подготовка к восстановлению файлов…
 Replace other file	WidgetAttributeText		Заменить существующий файл
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Некоторые из выбранных объектов не могут быть перемещены в корзину. Хотите ли вы вместо этого удалить эти объекты? (Эту операцию будет невозможно отменить)
@@ -197,6 +204,7 @@ Could not find application \"%appname\"	OpenWithWindow		Невозможно н�
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбранный объект не может быть перемещён в корзину. Хотите ли вы вместо этого удалить его? (Эту операцию будет невозможно отменить)
 Invert	SelectionWindow		Инвертировать
 Save Query as template…	FindPanel		Сохранить запрос как шаблон…
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	переименуете
 Find	FindPanel		Найти
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Переместить
 Get info	ContainerWindow		Информация
@@ -244,6 +252,7 @@ Trash	TrackerSettingsWindow		Корзина
 Unmount	ContainerWindow		Отключить
 Copy layout	ContainerWindow		Копировать вид папки
 label too long	PoseView		слишком длинное имя
+Finish: %time	StatusWindow		Осталось: %time
 Cancel	Tracker		Отмена
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Извините, но вы не можете изменить этот атрибут.
 Name	ContainerWindow		Имя
@@ -264,6 +273,7 @@ Unknown	WidgetAttributeText		Неизвестно
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" (Отсутствует символ: %symbol). \n
 by name	FindPanel		по имени
 Creating links: 	StatusWindow		Создание ссылок: 
+Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Переименовать
 Paused: click to resume or stop	StatusWindow		Пауза: нажмите повторно для продолжения
 Preferred for %type	OpenWithWindow		Предпочтительный для %type
 GiB	WidgetAttributeText		Гбайт
@@ -286,6 +296,7 @@ Previously mounted disks	AutoMounterSettings		Подключенные ране�
 %Ld B	WidgetAttributeText		%Ld байт
 copying	FSUtils		копируемый
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании папки \"%name\":\n\t%error\n\nВы хотите продолжить?
+move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	Переместите
 Show Disks icon	SettingsView		Показывать значок дисков
 Mount	VolumeWindow		Подключить
 Cancel	PoseView		Отмена
@@ -301,6 +312,7 @@ Permissions	ContainerWindow		Права
 moving	FSUtils		перемещаемый
 Identify	InfoWindow		Опознать
 Recent folders	ContainerWindow		Недавнюю папку
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	переименовать
 Close all	ContainerWindow		Закрыть все
 Include trash	FindPanel		Включая корзину
 Query template	FindPanel		Шаблон запроса

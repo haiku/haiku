@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -49,7 +50,7 @@ All rights reserved.
 
 
 int32
-CalcFreeSpace(BVolume *volume)
+CalcFreeSpace(BVolume* volume)
 {
 	off_t capacity = volume->Capacity();
 	if (capacity == 0)
@@ -68,8 +69,7 @@ CalcFreeSpace(BVolume *volume)
 // symlink pose uses the resolved model to retrieve the icon, if not broken
 // everything else, like the attributes, etc. is retrieved directly from the
 // symlink itself
-
-BPose::BPose(Model *model, BPoseView *view, uint32 clipboardMode, bool selected)
+BPose::BPose(Model* model, BPoseView* view, uint32 clipboardMode, bool selected)
 	:	fModel(model),
 		fWidgetList(4, true),
 		fClipboardMode(clipboardMode),
@@ -88,13 +88,13 @@ BPose::BPose(Model *model, BPoseView *view, uint32 clipboardMode, bool selected)
 	if (model->IsVolume()) {
 		fs_info info;
 		dev_t device = model->NodeRef()->device;
-		BVolume *volume = new BVolume(device);
+		BVolume* volume = new BVolume(device);
 		if (volume->InitCheck() == B_OK
 			&& fs_stat_dev(device, &info) == B_OK) {
 			// Philosophy here:
 			// Bars go on all read/write volumes
 			// Exceptions: Not on CDDA
-			if (strcmp(info.fsh_name,"cdda") != 0 
+			if (strcmp(info.fsh_name,"cdda") != 0
 				&& !volume->IsReadOnly()) {
 				// The volume is ok and we want space bars on it
 				gPeriodicUpdatePoses.AddPose(this, view,
@@ -113,8 +113,8 @@ BPose::~BPose()
 {
 	if (fModel->IsVolume()) {
 		// we might be registered for periodic updates
-		BVolume *volume = NULL;
-		if (gPeriodicUpdatePoses.RemovePose(this, (void **)&volume))
+		BVolume* volume = NULL;
+		if (gPeriodicUpdatePoses.RemovePose(this, (void**)&volume))
 			delete volume;
 	}
 
@@ -123,10 +123,10 @@ BPose::~BPose()
 
 
 void
-BPose::CreateWidgets(BPoseView *poseView)
+BPose::CreateWidgets(BPoseView* poseView)
 {
 	for (int32 index = 0; ; index++) {
-		BColumn *column = poseView->ColumnAt(index);
+		BColumn* column = poseView->ColumnAt(index);
 		if (!column)
 			break;
 		fWidgetList.AddItem(new BTextWidget(fModel, column, poseView));
@@ -134,48 +134,48 @@ BPose::CreateWidgets(BPoseView *poseView)
 }
 
 
-BTextWidget *
-BPose::AddWidget(BPoseView *poseView, BColumn *column)
+BTextWidget*
+BPose::AddWidget(BPoseView* poseView, BColumn* column)
 {
 	BModelOpener opener(fModel);
 	if (fModel->InitCheck() != B_OK)
 		return NULL;
 		
-	BTextWidget *widget = new BTextWidget(fModel, column, poseView);
+	BTextWidget* widget = new BTextWidget(fModel, column, poseView);
 	fWidgetList.AddItem(widget);
 	return widget;
 }
 
 
-BTextWidget *
-BPose::AddWidget(BPoseView *poseView, BColumn *column, ModelNodeLazyOpener &opener)
+BTextWidget*
+BPose::AddWidget(BPoseView* poseView, BColumn* column, ModelNodeLazyOpener &opener)
 {
 	opener.OpenNode();
 	if (fModel->InitCheck() != B_OK)
 		return NULL;
 	
-	BTextWidget *widget = new BTextWidget(fModel, column, poseView);
+	BTextWidget* widget = new BTextWidget(fModel, column, poseView);
 	fWidgetList.AddItem(widget);
 	return widget;
 }
 
 
 void
-BPose::RemoveWidget(BPoseView *, BColumn *column)
+BPose::RemoveWidget(BPoseView*, BColumn* column)
 {
 	int32 index;
-	BTextWidget *widget = WidgetFor(column->AttrHash(), &index);
-	if (widget) 
+	BTextWidget* widget = WidgetFor(column->AttrHash(), &index);
+	if (widget)
 		delete fWidgetList.RemoveItemAt(index);
 }
 
 
 void
-BPose::Commit(bool saveChanges, BPoint loc, BPoseView *poseView, int32 poseIndex)
+BPose::Commit(bool saveChanges, BPoint loc, BPoseView* poseView, int32 poseIndex)
 {
 	int32 count = fWidgetList.CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BTextWidget *widget = fWidgetList.ItemAt(index);
+		BTextWidget* widget = fWidgetList.ItemAt(index);
 		if (widget->IsActive()) {
 			widget->StopEdit(saveChanges, loc, poseView, this, poseIndex);
 			break;
@@ -185,7 +185,7 @@ BPose::Commit(bool saveChanges, BPoint loc, BPoseView *poseView, int32 poseIndex
 
 
 inline bool
-OneMouseUp(BTextWidget *widget, BPose *pose, BPoseView *poseView, BColumn *column,
+OneMouseUp(BTextWidget* widget, BPose* pose, BPoseView* poseView, BColumn* column,
 	BPoint poseLoc, BPoint where)
 {
 	BRect rect;
@@ -203,22 +203,22 @@ OneMouseUp(BTextWidget *widget, BPose *pose, BPoseView *poseView, BColumn *colum
 
 
 void
-BPose::MouseUp(BPoint poseLoc, BPoseView *poseView, BPoint where, int32)
+BPose::MouseUp(BPoint poseLoc, BPoseView* poseView, BPoint where, int32)
 {
 	WhileEachTextWidget(this, poseView, OneMouseUp, poseLoc, where);
 }
 
 
 inline void
-OneCheckAndUpdate(BTextWidget *widget, BPose *, BPoseView *poseView,
-	BColumn *column, BPoint poseLoc)
+OneCheckAndUpdate(BTextWidget* widget, BPose*, BPoseView* poseView,
+	BColumn* column, BPoint poseLoc)
 {
 	widget->CheckAndUpdate(poseLoc, column, poseView, true);
 }
 
 
 void
-BPose::UpdateAllWidgets(int32, BPoint poseLoc, BPoseView *poseView)
+BPose::UpdateAllWidgets(int32, BPoint poseLoc, BPoseView* poseView)
 {
 	if (poseView->ViewMode() != kListMode)
 		poseLoc = Location(poseView);
@@ -229,8 +229,8 @@ BPose::UpdateAllWidgets(int32, BPoint poseLoc, BPoseView *poseView)
 
 
 void
-BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
-	uint32 attrType, int32, BPoint poseLoc, BPoseView *poseView, bool visible)
+BPose::UpdateWidgetAndModel(Model* resolvedModel, const char* attrName,
+	uint32 attrType, int32, BPoint poseLoc, BPoseView* poseView, bool visible)
 {
 	if (poseView->ViewMode() != kListMode)
 		poseLoc = Location(poseView);
@@ -245,18 +245,18 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 		// ToDo: the following code is wrong, because this sort of hashing
 		// may overlap and we get aliasing
 		uint32 attrHash = AttrHashString(attrName, attrType);
-		BTextWidget *widget = WidgetFor(attrHash);
+		BTextWidget* widget = WidgetFor(attrHash);
 		if (widget) {
-			BColumn *column = poseView->ColumnFor(attrHash);
-			if (column) 
+			BColumn* column = poseView->ColumnFor(attrHash);
+			if (column)
 				widget->CheckAndUpdate(poseLoc, column, poseView, visible);
 		} else if (attrType == 0) {
 			// attribute got likely removed, so let's search the
 			// column for the matching attribute name
 			int32 count = fWidgetList.CountItems();
 			for (int32 i = 0; i < count; i++) {
-				BTextWidget *widget = fWidgetList.ItemAt(i);
-				BColumn *column = poseView->ColumnFor(widget->AttrHash());
+				BTextWidget* widget = fWidgetList.ItemAt(i);
+				BColumn* column = poseView->ColumnFor(widget->AttrHash());
 				if (column != NULL && !strcmp(column->AttrName(), attrName)) {
 					widget->CheckAndUpdate(poseLoc, column, poseView, visible);
 					break;
@@ -277,13 +277,13 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 
 		// distribute stat changes
 		for (int32 index = 0; ; index++) {
-			BColumn *column = poseView->ColumnAt(index);
+			BColumn* column = poseView->ColumnAt(index);
 			if (!column)
 				break;
 
 			if (column->StatField()) {
-				BTextWidget *widget = WidgetFor(column->AttrHash());
-				if (widget) 
+				BTextWidget* widget = WidgetFor(column->AttrHash());
+				if (widget)
 					widget->CheckAndUpdate(poseLoc, column, poseView, visible);
 			}
 		}
@@ -292,14 +292,14 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 
 
 bool
-BPose::_PeriodicUpdateCallback(BPose *pose, void *cookie)
+BPose::_PeriodicUpdateCallback(BPose* pose, void* cookie)
 {
-	return pose->UpdateVolumeSpaceBar((BVolume *)cookie);
+	return pose->UpdateVolumeSpaceBar((BVolume*)cookie);
 }
 
 
 bool
-BPose::UpdateVolumeSpaceBar(BVolume *volume)
+BPose::UpdateVolumeSpaceBar(BVolume* volume)
 {
 	bool enabled = TrackerSettings().ShowVolumeSpaceBar();
 	if (!enabled) {
@@ -319,12 +319,12 @@ BPose::UpdateVolumeSpaceBar(BVolume *volume)
 
 		return true;
 	}
-	return false;		
+	return false;
 }
 
 
 void
-BPose::UpdateIcon(BPoint poseLoc, BPoseView *poseView)
+BPose::UpdateIcon(BPoint poseLoc, BPoseView* poseView)
 {
 	IconCache::sIconCache->IconChanged(ResolvedModel());
 
@@ -348,8 +348,8 @@ BPose::UpdateIcon(BPoint poseLoc, BPoseView *poseView)
 }
 
 
-void 
-BPose::UpdateBrokenSymLink(BPoint poseLoc, BPoseView *poseView)
+void
+BPose::UpdateBrokenSymLink(BPoint poseLoc, BPoseView* poseView)
 {
 	ASSERT(TargetModel()->IsSymLink());
 	ASSERT(!TargetModel()->LinkTo());
@@ -357,8 +357,8 @@ BPose::UpdateBrokenSymLink(BPoint poseLoc, BPoseView *poseView)
 }
 
 
-void 
-BPose::UpdateWasBrokenSymlink(BPoint poseLoc, BPoseView *poseView)
+void
+BPose::UpdateWasBrokenSymlink(BPoint poseLoc, BPoseView* poseView)
 {
 	if (!fModel->IsSymLink())
 		return;
@@ -376,12 +376,12 @@ BPose::UpdateWasBrokenSymlink(BPoint poseLoc, BPoseView *poseView)
 
 
 void
-BPose::EditFirstWidget(BPoint poseLoc, BPoseView *poseView)
+BPose::EditFirstWidget(BPoint poseLoc, BPoseView* poseView)
 {
 	// find first editable widget
-	BColumn *column;
+	BColumn* column;
 	for (int32 i = 0;(column = poseView->ColumnAt(i)) != NULL;i++) {
-		BTextWidget *widget = WidgetFor(column->AttrHash());
+		BTextWidget* widget = WidgetFor(column->AttrHash());
 
 		if (widget && widget->IsEditable()) {
 			BRect bounds;
@@ -399,16 +399,16 @@ BPose::EditFirstWidget(BPoint poseLoc, BPoseView *poseView)
 
 
 void
-BPose::EditPreviousNextWidgetCommon(BPoseView *poseView, bool next)
+BPose::EditPreviousNextWidgetCommon(BPoseView* poseView, bool next)
 {
 	bool found = false;
 	int32 delta = next ? 1 : -1;
 	for (int32 index = next ? 0 : poseView->CountColumns() - 1; ; index += delta) {
-		BColumn *column = poseView->ColumnAt(index);
+		BColumn* column = poseView->ColumnAt(index);
 		if (!column)
 			break;
 
-		BTextWidget *widget = WidgetFor(column->AttrHash());
+		BTextWidget* widget = WidgetFor(column->AttrHash());
 		if (widget && widget->IsActive()) {
 			poseView->CommitActivePose();
 			found = true;
@@ -419,7 +419,7 @@ BPose::EditPreviousNextWidgetCommon(BPoseView *poseView, bool next)
 			BRect bounds;
 			if (poseView->ViewMode() == kListMode) {
 				int32 poseIndex = poseView->IndexOfPose(this);
-				BPoint poseLoc(0, poseIndex * poseView->ListElemHeight());
+				BPoint poseLoc(0, poseIndex* poseView->ListElemHeight());
 				bounds = widget->CalcRect(poseLoc, column, poseView);
 			} else
 				bounds = widget->CalcRect(Location(poseView), 0, poseView);
@@ -432,21 +432,21 @@ BPose::EditPreviousNextWidgetCommon(BPoseView *poseView, bool next)
 
 
 void
-BPose::EditNextWidget(BPoseView *poseView)
+BPose::EditNextWidget(BPoseView* poseView)
 {
 	EditPreviousNextWidgetCommon(poseView, true);
 }
 
 
 void
-BPose::EditPreviousWidget(BPoseView *poseView)
+BPose::EditPreviousWidget(BPoseView* poseView)
 {
 	EditPreviousNextWidgetCommon(poseView, false);
 }
 
 
 bool
-BPose::PointInPose(const BPoseView *poseView, BPoint where) const 
+BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 {
 	ASSERT(poseView->ViewMode() != kListMode);
 
@@ -464,11 +464,11 @@ BPose::PointInPose(const BPoseView *poseView, BPoint where) const
 													  kNormalIcon,
 													  poseView->IconSize());
 
-		BTextWidget *widget = WidgetFor(poseView->FirstColumn()->AttrHash());
+		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 		if (widget) {
 			float textWidth = ceilf(widget->TextWidth(poseView) + 1);
 			rect.left += (poseView->IconSizeInt() - textWidth) / 2;
-			rect.right = rect.left + textWidth; 
+			rect.right = rect.left + textWidth;
 		}
 
 		rect.top = location.y + poseView->IconSizeInt();
@@ -481,7 +481,7 @@ BPose::PointInPose(const BPoseView *poseView, BPoint where) const
 	BRect rect(location, location);
 	rect.right += B_MINI_ICON + kMiniIconSeparator;
 	rect.bottom += poseView->IconPoseHeight();
-	BTextWidget *widget = WidgetFor(poseView->FirstColumn()->AttrHash());
+	BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 	if (widget)
 		rect.right += ceil(widget->TextWidth(poseView) + 1);
 	
@@ -490,8 +490,8 @@ BPose::PointInPose(const BPoseView *poseView, BPoint where) const
 
 
 bool
-BPose::PointInPose(BPoint loc, const BPoseView *poseView, BPoint where,
-	BTextWidget **hitWidget) const
+BPose::PointInPose(BPoint loc, const BPoseView* poseView, BPoint where,
+	BTextWidget** hitWidget) const
 {
 	if (hitWidget)
 		*hitWidget = NULL;
@@ -506,10 +506,10 @@ BPose::PointInPose(BPoint loc, const BPoseView *poseView, BPoint where,
 		return true;
 
 	for (int32 index = 0; ; index++) {
-		BColumn *column = poseView->ColumnAt(index);
+		BColumn* column = poseView->ColumnAt(index);
 		if (!column)
 			break;
-		BTextWidget *widget = WidgetFor(column->AttrHash());
+		BTextWidget* widget = WidgetFor(column->AttrHash());
 		if (widget && widget->CalcClickRect(loc, column, poseView).Contains(where)) {
 			if (hitWidget)
 				*hitWidget = widget;
@@ -522,7 +522,7 @@ BPose::PointInPose(BPoint loc, const BPoseView *poseView, BPoint where,
 
 
 void
-BPose::Draw(BRect rect, const BRect& updateRect, BPoseView *poseView, BView *drawView,
+BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* drawView,
 	bool fullDraw, BPoint offset, bool selected)
 {
 	// If the background wasn't cleared and Draw() is not called after
@@ -559,12 +559,12 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView *poseView, BView *dra
 			columnsToDraw = poseView->CountColumns();
 		
 		for (int32 index = 0; index < columnsToDraw; index++) {
-			BColumn *column = poseView->ColumnAt(index);
+			BColumn* column = poseView->ColumnAt(index);
 			if (!column)
 				break;
 			
 			// if widget doesn't exist, create it
-			BTextWidget *widget = WidgetFor(column, poseView, modelOpener);
+			BTextWidget* widget = WidgetFor(column, poseView, modelOpener);
 			
 			if (widget && widget->IsVisible()) {
 				BRect widgetRect(widget->ColumnRect(rect.LeftTop(), column,
@@ -618,11 +618,11 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView *poseView, BView *dra
 		DrawIcon(iconOrigin, drawView, poseView->IconSize(), directDraw,
 			!windowActive && !showSelectionWhenInactive);
 		
-		BColumn *column = poseView->FirstColumn();
+		BColumn* column = poseView->FirstColumn();
 		if (!column)
 			return;
 		
-		BTextWidget *widget = WidgetFor(column, poseView, modelOpener);
+		BTextWidget* widget = WidgetFor(column, poseView, modelOpener);
 		if (!widget || !widget->IsVisible())
 			return;
 
@@ -659,7 +659,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView *poseView, BView *dra
 
 
 void
-BPose::DeselectWithoutErasingBackground(BRect, BPoseView *poseView)
+BPose::DeselectWithoutErasingBackground(BRect, BPoseView* poseView)
 {
 	ASSERT(poseView->ViewMode() != kListMode);
 	ASSERT(!IsSelected());
@@ -672,11 +672,11 @@ BPose::DeselectWithoutErasingBackground(BRect, BPoseView *poseView)
 	else
 		UpdateIcon(location, poseView);
 
-	BColumn *column = poseView->FirstColumn();
+	BColumn* column = poseView->FirstColumn();
 	if (!column)
 		return;
 	
-	BTextWidget *widget = WidgetFor(column->AttrHash());
+	BTextWidget* widget = WidgetFor(column->AttrHash());
 	if (!widget || !widget->IsVisible())
 		return;
 
@@ -686,7 +686,7 @@ BPose::DeselectWithoutErasingBackground(BRect, BPoseView *poseView)
 
 
 void
-BPose::MoveTo(BPoint point, BPoseView *poseView, bool inval)
+BPose::MoveTo(BPoint point, BPoseView* poseView, bool inval)
 {
 	point.x = floorf(point.x);
 	point.y = floorf(point.y);
@@ -704,7 +704,7 @@ BPose::MoveTo(BPoint point, BPoseView *poseView, bool inval)
 
 	// might need to move a text view if we're active
 	if (poseView->ActivePose() == this) {
-		BView *border_view = poseView->FindView("BorderView");
+		BView* border_view = poseView->FindView("BorderView");
 		if (border_view)
 			border_view->MoveBy(point.x - oldLocation.x, point.y - oldLocation.y);
 	}
@@ -726,11 +726,11 @@ BPose::MoveTo(BPoint point, BPoseView *poseView, bool inval)
 }
 
 
-BTextWidget *
+BTextWidget*
 BPose::ActiveWidget() const
 {
 	for (int32 i = fWidgetList.CountItems(); i-- > 0;) {
-		BTextWidget *widget = fWidgetList.ItemAt(i);
+		BTextWidget* widget = fWidgetList.ItemAt(i);
 		if (widget->IsActive())
 			return widget;
 	}
@@ -738,12 +738,12 @@ BPose::ActiveWidget() const
 }
 
 
-BTextWidget *
-BPose::WidgetFor(uint32 attr, int32 *index) const 
+BTextWidget*
+BPose::WidgetFor(uint32 attr, int32* index) const
 {
 	int32 count = fWidgetList.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		BTextWidget *widget = fWidgetList.ItemAt(i);
+		BTextWidget* widget = fWidgetList.ItemAt(i);
 		if (widget->AttrHash() == attr) {
 			if (index)
 				*index = i;
@@ -755,11 +755,11 @@ BPose::WidgetFor(uint32 attr, int32 *index) const
 }
 
 
-BTextWidget *
-BPose::WidgetFor(BColumn *column, BPoseView *poseView, ModelNodeLazyOpener &opener,
-	int32 *index)
+BTextWidget*
+BPose::WidgetFor(BColumn* column, BPoseView* poseView, ModelNodeLazyOpener &opener,
+	int32* index)
 {
-	BTextWidget *widget = WidgetFor(column->AttrHash(), index);
+	BTextWidget* widget = WidgetFor(column->AttrHash(), index);
 	if (!widget)
 		widget = AddWidget(poseView, column, opener);
 
@@ -767,18 +767,17 @@ BPose::WidgetFor(BColumn *column, BPoseView *poseView, ModelNodeLazyOpener &open
 }
 
 
-/* deprecated */
+// the following method is deprecated
 bool
 BPose::TestLargeIconPixel(BPoint point) const
 {
 	return IconCache::sIconCache->IconHitTest(point, ResolvedModel(),
 		kNormalIcon, B_LARGE_ICON);
 }
-/* deprecated */
 
 
 void
-BPose::DrawIcon(BPoint where, BView *view, icon_size kind, bool direct, bool drawUnselected)
+BPose::DrawIcon(BPoint where, BView* view, icon_size kind, bool direct, bool drawUnselected)
 {
 	if (fClipboardMode == kMoveSelectionTo) {
 		view->SetDrawingMode(B_OP_ALPHA);
@@ -795,8 +794,8 @@ BPose::DrawIcon(BPoint where, BView *view, icon_size kind, bool direct, bool dra
 }
 
 
-void 
-BPose::DrawBar(BPoint where,BView *view,icon_size kind)
+void
+BPose::DrawBar(BPoint where,BView* view,icon_size kind)
 {
 	view->PushState();
 
@@ -813,7 +812,7 @@ BPose::DrawBar(BPoint where,BView *view,icon_size kind)
 		barHeight = size - 4 - 2 * yOffset;
 	}
 
-	// the black shadowed line 
+	// the black shadowed line
 	view->SetHighColor(32, 32, 32, 92);
 	view->MovePenTo(BPoint(where.x + size, where.y + 1 + yOffset));
 	view->StrokeLine(BPoint(where.x + size, where.y + size - yOffset));
@@ -855,14 +854,14 @@ BPose::DrawBar(BPoint where,BView *view,icon_size kind)
 
 
 void
-BPose::DrawToggleSwitch(BRect, BPoseView *)
+BPose::DrawToggleSwitch(BRect, BPoseView*)
 {
 	return;
 }
 
 
 BPoint
-BPose::Location(const BPoseView *poseView) const
+BPose::Location(const BPoseView* poseView) const
 {
 	float scale = 1.0;
 	if (poseView->ViewMode() == kIconMode)
@@ -873,7 +872,7 @@ BPose::Location(const BPoseView *poseView) const
 
 
 void
-BPose::SetLocation(BPoint point, const BPoseView *poseView)
+BPose::SetLocation(BPoint point, const BPoseView* poseView)
 {
 	float scale = 1.0;
 	if (poseView->ViewMode() == kIconMode)
@@ -887,11 +886,11 @@ debugger("BPose::SetLocation() - infinite location");
 
 
 BRect
-BPose::CalcRect(BPoint loc, const BPoseView *poseView, bool minimalRect) const
+BPose::CalcRect(BPoint loc, const BPoseView* poseView, bool minimalRect) const
 {
 	ASSERT(poseView->ViewMode() == kListMode);
 
-	BColumn *column = poseView->LastColumn();
+	BColumn* column = poseView->LastColumn();
 	BRect rect;
 	rect.left = loc.x;
 	rect.top = loc.y;
@@ -899,8 +898,8 @@ BPose::CalcRect(BPoint loc, const BPoseView *poseView, bool minimalRect) const
 	rect.bottom = rect.top + poseView->ListElemHeight();
 
 	if (minimalRect) {
-		BTextWidget *widget = WidgetFor(poseView->FirstColumn()->AttrHash());
-		if (widget) 
+		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
+		if (widget)
 			rect.right = widget->CalcRect(loc, poseView->FirstColumn(), poseView).right;
 	}
 
@@ -909,7 +908,7 @@ BPose::CalcRect(BPoint loc, const BPoseView *poseView, bool minimalRect) const
 
 
 BRect
-BPose::CalcRect(const BPoseView *poseView) const
+BPose::CalcRect(const BPoseView* poseView) const
 {
 	ASSERT(poseView->ViewMode() != kListMode);
 
@@ -919,12 +918,12 @@ BPose::CalcRect(const BPoseView *poseView) const
 		rect.left = location.x;
 		rect.right = rect.left + poseView->IconSizeInt();
 
-		BTextWidget *widget = WidgetFor(poseView->FirstColumn()->AttrHash());
+		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 		if (widget) {
 			float textWidth = ceilf(widget->TextWidth(poseView) + 1);
 			if (textWidth > poseView->IconSizeInt()) {
 				rect.left += (poseView->IconSizeInt() - textWidth) / 2;
-				rect.right = rect.left + textWidth; 
+				rect.right = rect.left + textWidth;
 			}
 		}
 
@@ -936,7 +935,7 @@ BPose::CalcRect(const BPoseView *poseView) const
 		rect.top = location.y;
 		rect.right = rect.left + B_MINI_ICON + kMiniIconSeparator;
 		rect.bottom = rect.top + poseView->IconPoseHeight();
-		BTextWidget *widget = WidgetFor(poseView->FirstColumn()->AttrHash());
+		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 		if (widget)
 			rect.right += ceil(widget->TextWidth(poseView) + 1);
 	}

@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-3DRendering	1539891217
+1	russian	x-vnd.Haiku-3DRendering	1725618140
 List stack size:	Capabilities		Размер стека списка:
 Information	InfoView		Информация
 Max. clipping planes:	Capabilities		Максимальное количество отсечений:
+GL version:	InfoView		Версия GL:
 Max. texture units:	Capabilities		Максимальное количество текстурных блоков:
 Renderer name:	InfoView		Название рендера:
 Vendor name:	InfoView		Имя поставщика:
@@ -19,6 +20,7 @@ GLUT API version:	InfoView		Версия GLUT API:
 Texture stack size:	Capabilities		Размер стека текстуры:
 Max. evaluators equation order:	Capabilities		Максимальный оценочный блок команд:
 Max. 3D texture size:	Capabilities		Максимальный размер 3D текстуры:
+3D Rendering	System name		3D Отрисовка
 Capabilities	Capabilities		Возможности
 Max. recommended index elements:	Capabilities		Максимальное рекомендованное количество индексов:
 Available	Extensions		Доступно

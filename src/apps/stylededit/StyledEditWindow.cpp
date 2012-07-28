@@ -862,7 +862,8 @@ StyledEditWindow::Print(const char* documentName)
 	int32 currentLine = 0;
 	while (currentLine < linesInDocument) {
 		float currentHeight = 0;
-		while (currentHeight < printableRect.Height() && currentLine < linesInDocument) {
+		while (currentHeight < printableRect.Height() && currentLine
+				< linesInDocument) {
 			currentHeight += fTextView->LineHeight(currentLine);
 			if (currentHeight < printableRect.Height())
 				currentLine++;
@@ -1027,8 +1028,8 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		new BMessage(MENU_NEW), 'N'));
 	menuItem->SetTarget(be_app);
 
-	menu->AddItem(menuItem = new BMenuItem(fRecentMenu =
-		new BMenu(B_TRANSLATE("Open" B_UTF8_ELLIPSIS)),
+	menu->AddItem(menuItem = new BMenuItem(fRecentMenu
+		= new BMenu(B_TRANSLATE("Open" B_UTF8_ELLIPSIS)),
 			new BMessage(MENU_OPEN)));
 	menuItem->SetShortcut('O', 0);
 	menuItem->SetTarget(be_app);
@@ -1042,8 +1043,8 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	menuItem->SetShortcut('S', B_SHIFT_KEY);
 	menuItem->SetEnabled(true);
 
-	menu->AddItem(fRevertItem =
-		new BMenuItem(B_TRANSLATE("Revert to saved" B_UTF8_ELLIPSIS),
+	menu->AddItem(fRevertItem
+		= new BMenuItem(B_TRANSLATE("Revert to saved" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_REVERT)));
 	fRevertItem->SetEnabled(false);
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
@@ -1408,7 +1409,7 @@ StyledEditWindow::_RevertToSaved()
 
 bool
 StyledEditWindow::_Search(BString string, bool caseSensitive, bool wrap,
-	bool backSearch)
+	bool backSearch, bool scrollToOccurence)
 {
 	int32 start;
 	int32 finish;
@@ -1450,7 +1451,9 @@ StyledEditWindow::_Search(BString string, bool caseSensitive, bool wrap,
 	if (start != B_ERROR) {
 		finish = start + length;
 		fTextView->Select(start, finish);
-		fTextView->ScrollToSelection();
+		
+		if (scrollToOccurence)
+			fTextView->ScrollToSelection();
 		return true;
 	}
 
@@ -1478,7 +1481,8 @@ StyledEditWindow::_Replace(BString findThis, BString replaceWith,
 	bool caseSensitive, bool wrap, bool backSearch)
 {
 	if (_Search(findThis, caseSensitive, wrap, backSearch)) {
-		int32 start, finish;
+		int32 start;
+		int32 finish;
 		fTextView->GetSelection(&start, &finish);
 
 		_UpdateCleanUndoRedoSaveRevert();
@@ -1501,17 +1505,28 @@ StyledEditWindow::_ReplaceAll(BString findThis, BString replaceWith,
 {
 	bool first = true;
 	fTextView->SetSuppressChanges(true);
-	while (_Search(findThis, caseSensitive, true, false)) {
+	
+	// start from the beginning of text
+	fTextView->Select(0, 0);
+
+	// iterate occurences of findThis without wrapping around
+	while (_Search(findThis, caseSensitive, false, false, false)) {
 		if (first) {
 			_UpdateCleanUndoRedoSaveRevert();
 			first = false;
 		}
-		int32 start, finish;
+		int32 start;
+		int32 finish;
+				
 		fTextView->GetSelection(&start, &finish);
-
 		fTextView->Delete(start, start + findThis.Length());
 		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
+		
+		// advance the caret behind the inserted text
+		start += replaceWith.Length();
+		fTextView->Select(start, start);
 	}
+	fTextView->ScrollToSelection();
 	fTextView->SetSuppressChanges(false);
 }
 

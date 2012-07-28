@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src apps serialconnect ;
+
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src apps serialconnect libvterm include ] ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps serialconnect libvterm src ] ;
+
+Application SerialConnect :
+	SerialApp.cpp
+	SerialWindow.cpp
+	TermView.cpp
+	encoding.c
+	input.c
+	parser.c
+	pen.c
+	screen.c
+	state.c
+	unicode.c
+	vterm.c
+	: be device $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+;
+

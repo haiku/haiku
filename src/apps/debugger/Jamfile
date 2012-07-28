@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src apps debugger ;
 CCFLAGS +=  -Werror ;
 C++FLAGS += -Werror ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UsePrivateHeaders app debug interface kernel shared libroot ;
 UsePrivateSystemHeaders ;
 
@@ -27,6 +28,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value type_handlers ] ;
@@ -141,11 +143,11 @@ Application Debugger :
 
 	# settings
 	BreakpointSetting.cpp
-	GUITeamUISettings.cpp
+	GuiTeamUiSettings.cpp
 	SettingsManager.cpp
 	TeamSettings.cpp
-	TeamUISettings.cpp
-	TeamUISettingsFactory.cpp
+	TeamUiSettings.cpp
+	TeamUiSettingsFactory.cpp
 
 	# settings/generic
 	Setting.cpp
@@ -171,6 +173,9 @@ Application Debugger :
 
 	# user_interface/cli
 	CliCommand.cpp
+	CliContext.cpp
+	CliThreadsCommand.cpp
+	CliQuitCommand.cpp
 	CommandLineUserInterface.cpp
 
 	# user_interface/gui
@@ -202,7 +207,7 @@ Application Debugger :
 
 	# user_interface/gui/util
 	ActionMenuItem.cpp
-	GUISettingsUtils.cpp
+	GuiSettingsUtils.cpp
 	SettingsMenu.cpp
 	TargetAddressTableColumn.cpp
 
@@ -215,6 +220,9 @@ Application Debugger :
 	TableCellStringRenderer.cpp
 	TableCellValueRenderer.cpp
 	TableCellValueRendererUtils.cpp
+
+	# user_interface/util
+	UiUtils.cpp
 
 	# util
 	ArchivingUtils.cpp
@@ -273,9 +281,14 @@ Application Debugger :
 	<bin>debug_utils.a
 	libcolumnlistview.a
 	libshared.a
+	libshared.a
+	libexpression_parser.a
+	libmapm.a
+	libedit.a
+	libtermcap.a
 
 	$(TARGET_LIBSTDC++)
-	be tracker libdebug.so libshared.a libexpression_parser.a libmapm.a
+	be tracker libbsd.so libdebug.so
 
 	: Debugger.rdef
 ;

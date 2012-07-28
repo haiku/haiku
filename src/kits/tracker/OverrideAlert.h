@@ -31,7 +31,6 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _OVERRIDE_ALERT_H
 #define _OVERRIDE_ALERT_H
 
@@ -45,33 +44,35 @@ All rights reserved.
 // This allows it to work when confirming rename operations with
 // Focus Follows Mouse turned on.
 
+
 #include <Alert.h>
+
 
 namespace BPrivate {
 
 class OverrideAlert : public BAlert {
 public:
-	OverrideAlert(const char *title, const char *text,
-		const char *button1, uint32 modifiers1,
-		const char *button2, uint32 modifiers2,
-		const char *button3, uint32 modifiers3,
+	OverrideAlert(const char* title, const char* text,
+		const char* button1, uint32 modifiers1,
+		const char* button2, uint32 modifiers2,
+		const char* button3, uint32 modifiers3,
 		button_width width = B_WIDTH_AS_USUAL,
 		alert_type type = B_INFO_ALERT);
-	OverrideAlert(const char *title, const char *text,
-		const char *button1, uint32 modifiers1,
-		const char *button2, uint32 modifiers2,
-		const char *button3, uint32 modifiers3,
+	OverrideAlert(const char* title, const char* text,
+		const char* button1, uint32 modifiers1,
+		const char* button2, uint32 modifiers2,
+		const char* button3, uint32 modifiers3,
 		button_width width, button_spacing spacing,
 		alert_type type = B_INFO_ALERT);
 	virtual ~OverrideAlert();
 
-	virtual void DispatchMessage(BMessage *, BHandler *);
+	virtual void DispatchMessage(BMessage*, BHandler*);
 
 	static BPoint OverPosition(float width, float height);
 
 private:
 	void UpdateButtons(uint32 modifiers, bool force = false);
-	
+
 	uint32 fCurModifiers;
 	uint32 fButtonModifiers[3];
 };
@@ -80,4 +81,4 @@ private:
 
 using namespace BPrivate;
 
-#endif
+#endif	// _OVERRIDE_ALERT_H

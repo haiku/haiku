@@ -31,12 +31,13 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-#ifndef	_TRASH_WATCHER_H
+#ifndef _TRASH_WATCHER_H
 #define _TRASH_WATCHER_H
+
 
 #include <Looper.h>
 #include "ObjectList.h"
+
 
 namespace BPrivate {
 
@@ -48,10 +49,10 @@ public:
 	virtual ~BTrashWatcher();
 
 	bool CheckTrashDirs();
-	bool IsTrashNode(const node_ref *) const;
+	bool IsTrashNode(const node_ref*) const;
 
 protected:
-	virtual	void MessageReceived(BMessage *);
+	virtual	void MessageReceived(BMessage*);
 	
 private:
 	void WatchTrashDirs();
@@ -67,4 +68,4 @@ private:
 
 using namespace BPrivate;
 
-#endif
+#endif	// _TRASH_WATCHER_H

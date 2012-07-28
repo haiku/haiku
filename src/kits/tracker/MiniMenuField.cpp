@@ -32,13 +32,15 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include <PopUpMenu.h>
 #include <Window.h>
 
 #include "MiniMenuField.h"
 #include "Utilities.h"
 
-MiniMenuField::MiniMenuField(BRect frame, const char *name, BPopUpMenu *menu,
+
+MiniMenuField::MiniMenuField(BRect frame, const char* name, BPopUpMenu* menu,
 	uint32 resizeFlags, uint32 flags)
 	:	BView(frame, name, resizeFlags, flags),
 		fMenu(menu)
@@ -46,12 +48,14 @@ MiniMenuField::MiniMenuField(BRect frame, const char *name, BPopUpMenu *menu,
 	SetFont(be_plain_font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
 }
 
+
 MiniMenuField::~MiniMenuField()
 {
 	delete fMenu;
 }
 
-void 
+
+void
 MiniMenuField::AttachedToWindow()
 {
 	if (Parent()) {
@@ -61,16 +65,18 @@ MiniMenuField::AttachedToWindow()
 	SetHighColor(0, 0, 0);
 }
 
-void 
+
+void
 MiniMenuField::MakeFocus(bool on)
 {
 	Invalidate();
 	BView::MakeFocus(on);
 }
 
+
 void
-MiniMenuField::KeyDown(const char *bytes, int32 numBytes)
-{	
+MiniMenuField::KeyDown(const char* bytes, int32 numBytes)
+{
 	switch (bytes[0]) {
 		case B_SPACE:
 		case B_DOWN_ARROW:
@@ -85,7 +91,8 @@ MiniMenuField::KeyDown(const char *bytes, int32 numBytes)
 	}
 }
 
-void 
+
+void
 MiniMenuField::Draw(BRect)
 {
 	BRect bounds(Bounds());
@@ -103,16 +110,16 @@ MiniMenuField::Draw(BRect)
 	
 	// draw frame and shadow
 	BeginLineArray(10);
-	AddLine(rect.RightTop(), rect.RightBottom(), darkest); 
-	AddLine(rect.RightBottom(), rect.LeftBottom(), darkest); 
-	AddLine(rect.LeftBottom(), rect.LeftTop(), medium); 
+	AddLine(rect.RightTop(), rect.RightBottom(), darkest);
+	AddLine(rect.RightBottom(), rect.LeftBottom(), darkest);
+	AddLine(rect.LeftBottom(), rect.LeftTop(), medium);
 	AddLine(rect.LeftTop(), rect.RightTop(), medium);
-	AddLine(bounds.LeftBottom() + BPoint(2, 0), bounds.RightBottom(), dark); 
-	AddLine(bounds.RightTop() + BPoint(0, 1), bounds.RightBottom(), dark); 
+	AddLine(bounds.LeftBottom() + BPoint(2, 0), bounds.RightBottom(), dark);
+	AddLine(bounds.RightTop() + BPoint(0, 1), bounds.RightBottom(), dark);
 	rect.InsetBy(1, 1);
-	AddLine(rect.RightTop(), rect.RightBottom(), medium); 
-	AddLine(rect.RightBottom(), rect.LeftBottom(), medium); 
-	AddLine(rect.LeftBottom(), rect.LeftTop(), light); 
+	AddLine(rect.RightTop(), rect.RightBottom(), medium);
+	AddLine(rect.RightBottom(), rect.LeftBottom(), medium);
+	AddLine(rect.LeftBottom(), rect.LeftTop(), light);
 	AddLine(rect.LeftTop(), rect.RightTop(), light);
 
 	EndLineArray();
@@ -123,16 +130,16 @@ MiniMenuField::Draw(BRect)
 	const rgb_color middleColor = {150, 150, 150, 255};
 
 	BeginLineArray(5);
-	AddLine(BPoint(rect.left + 3, rect.top + 1), 
+	AddLine(BPoint(rect.left + 3, rect.top + 1),
 		BPoint(rect.left + 3, rect.top + 7), outlineColor);
-	AddLine(BPoint(rect.left + 3, rect.top + 1), 
+	AddLine(BPoint(rect.left + 3, rect.top + 1),
 		BPoint(rect.left + 6, rect.top + 4), outlineColor);
-	AddLine(BPoint(rect.left + 6, rect.top + 4), 
+	AddLine(BPoint(rect.left + 6, rect.top + 4),
 		BPoint(rect.left + 3, rect.top + 7), outlineColor);
-		
-	AddLine(BPoint(rect.left + 4, rect.top + 3), 
+
+	AddLine(BPoint(rect.left + 4, rect.top + 3),
 		BPoint(rect.left + 4, rect.top + 5), middleColor);
-	AddLine(BPoint(rect.left + 5, rect.top + 4), 
+	AddLine(BPoint(rect.left + 5, rect.top + 4),
 		BPoint(rect.left + 5, rect.top + 4), middleColor);
 	EndLineArray();
 
@@ -151,10 +158,10 @@ MiniMenuField::Draw(BRect)
 	AddLine(BPoint(bounds.left, bounds.bottom),
 		BPoint(bounds.left, bounds.top), focused ? markColor : viewColor);
 	EndLineArray();
-
 }
 
-void 
+
+void
 MiniMenuField::MouseDown(BPoint)
 {
 	fMenu->Go(ConvertToScreen(BPoint(4, 4)), true);

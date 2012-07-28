@@ -42,34 +42,34 @@ All rights reserved.
 //  aliasing after a deletion, etc.
 //
 //  The node preloader knows which icons to preload
-
 #ifndef __NODE_CACHE_PRELOADER__
 #define __NODE_CACHE_PRELOADER__
+
 
 #include <Handler.h>
 
 #include "ObjectList.h"
 #include "Model.h"
 
+
 namespace BPrivate {
 
 class NodePreloader : public BHandler {
 public:
-	static NodePreloader *InstallNodePreloader(const char *name, BLooper *host);
+	static NodePreloader* InstallNodePreloader(const char* name, BLooper* host);
 	virtual ~NodePreloader();
 
 protected:
-	NodePreloader(const char *name);
-	virtual void MessageReceived(BMessage *);
+	NodePreloader(const char* name);
+	virtual void MessageReceived(BMessage*);
 
 	void Run();
 
 private:
-	void PreloadOne(const char *dirPath);
+	void PreloadOne(const char* dirPath);
 	virtual void Preload();
 		// for now just preload apps and prefs
-	Model *FindModel(node_ref) const;
-
+	Model* FindModel(node_ref) const;
 
 	BObjectList<Model> fModelList;
 	Benaphore fLock;
@@ -82,4 +82,4 @@ private:
 
 using namespace BPrivate;
 
-#endif
+#endif	// __NODE_CACHE_PRELOADER__

@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-#ifndef	_SELECTION_WINDOW_H
+#ifndef _SELECTION_WINDOW_H
 #define _SELECTION_WINDOW_H
+
 
 #include <Button.h>
 #include <CheckBox.h>
@@ -44,32 +44,33 @@ All rights reserved.
 
 #include "TrackerString.h"
 
+
 namespace BPrivate {
 
 class BContainerWindow;
 
 class SelectionWindow : public BWindow {
 public:
-	SelectionWindow(BContainerWindow *);
+	SelectionWindow(BContainerWindow*);
 
-	void MessageReceived(BMessage *);
+	void MessageReceived(BMessage*);
 	bool QuitRequested();
-	
+
 	void MoveCloseToMouse();
-		
+
 	TrackerStringExpressionType ExpressionType() const;
 	void Expression(BString &result) const;
 	bool IgnoreCase() const;
 	bool Invert() const;
-	
-private:
-	BContainerWindow *fParentWindow;
 
-	BMenuField *fMatchingTypeMenuField;
-	BTextControl *fExpressionTextControl;
-	BCheckBox *fInverseCheckBox;
-	BCheckBox *fIgnoreCaseCheckBox;
-	BButton *fSelectButton;
+private:
+	BContainerWindow* fParentWindow;
+
+	BMenuField* fMatchingTypeMenuField;
+	BTextControl* fExpressionTextControl;
+	BCheckBox* fInverseCheckBox;
+	BCheckBox* fIgnoreCaseCheckBox;
+	BButton* fSelectButton;
 
 	typedef BWindow _inherited;
 };
@@ -78,4 +79,4 @@ private:
 
 using namespace BPrivate;
 
-#endif
+#endif	// _SELECTION_WINDOW_H

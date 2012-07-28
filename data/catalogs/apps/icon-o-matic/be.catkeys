@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	3736361491
+1	belarusian	x-vnd.haiku-icon_o_matic	4233739176
 Select All	Icon-O-Matic-PathManipulator		Выбраць Усё
 Add Style	Icon-O-Matic-AddStylesCmd		Дадаць Стыль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колер (#%02x%02x%02x)
@@ -117,6 +117,7 @@ Gradient	Icon-O-Matic-StyleTypes		Градыентны
 Min LOD	Icon-O-Matic-PropertyNames		Мін. LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрыбут BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Інвертаваць выдзяленне
+Drop shapes	Icon-O-Matic-ShapesList		Падаючыя формы
 Export as…	Icon-O-Matic-Menu-File		Экспартаваць як...
 Transformation	Transformation		Трансфармацыя
 Click on an object in	Empty property list - 1st line		Клікніце па аб'екце у

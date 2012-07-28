@@ -31,6 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
+#ifndef _REG_EXP_H
+#define _REG_EXP_H
 
 
 // This code is based on regexp.c, v.1.3 by Henry Spencer:
@@ -62,12 +64,12 @@ All rights reserved.
 // ALTERED VERSION: Adapted to ANSI C and C++ for the OpenTracker
 // project (www.opentracker.org), Jul 11, 2000.
 
-#ifndef _REG_EXP_H
-#define _REG_EXP_H
 
 #include <String.h>
 
+
 namespace BPrivate {
+
 
 enum {
 	REGEXP_UNMATCHED_PARENTHESIS = B_ERRORS_END,
@@ -90,21 +92,21 @@ enum {
 const int32 kSubExpressionMax = 10;
 
 struct regexp {
-	const char *startp[kSubExpressionMax];
-	const char *endp[kSubExpressionMax];
-	char regstart;		/* Internal use only. See RegExp.cpp for details. */
-	char reganch;		/* Internal use only. */
-	const char *regmust;/* Internal use only. */
-	int regmlen;		/* Internal use only. */
-	char program[1];	/* Unwarranted chumminess with compiler. */
+	const char* startp[kSubExpressionMax];
+	const char* endp[kSubExpressionMax];
+	char regstart;		// Internal use only. See RegExp.cpp for details.
+	char reganch;		// Internal use only.
+	const char* regmust;// Internal use only.
+	int regmlen;		// Internal use only.
+	char program[1];	// Unwarranted chumminess with compiler.
 };
 
-class RegExp {
 
+class RegExp {
 public:
 	RegExp();
-	RegExp(const char *);
-	RegExp(const BString &);
+	RegExp(const char*);
+	RegExp(const BString&);
 	~RegExp();
 	
 	status_t InitCheck() const;
@@ -112,73 +114,73 @@ public:
 	status_t SetTo(const char*);
 	status_t SetTo(const BString &);
 	
-	bool Matches(const char *string) const;
+	bool Matches(const char* string) const;
 	bool Matches(const BString &) const;
 
-	int32 RunMatcher(regexp *, const char *) const;
-	regexp *Compile(const char *);
-	regexp *Expression() const;
-	const char *ErrorString() const;
+	int32 RunMatcher(regexp*, const char*) const;
+	regexp* Compile(const char*);
+	regexp* Expression() const;
+	const char* ErrorString() const;
 
 #ifdef DEBUG
 	void Dump();
 #endif
 
 private:
-
 	void SetError(status_t error) const;
 
 	// Working functions for Compile():
-	char *Reg(int32, int32 *);
-	char *Branch(int32 *);
-	char *Piece(int32 *);
-	char *Atom(int32 *);
-	char *Node(char);
-	char *Next(char *);
-	const char *Next(const char *) const;
+	char* Reg(int32, int32*);
+	char* Branch(int32*);
+	char* Piece(int32*);
+	char* Atom(int32*);
+	char* Node(char);
+	char* Next(char*);
+	const char* Next(const char*) const;
 	void Char(char);
-	void Insert(char, char *);
-	void Tail(char *, char *);
-	void OpTail(char *, char *);
+	void Insert(char, char*);
+	void Tail(char*, char*);
+	void OpTail(char*, char*);
 
 	// Working functions for RunMatcher():
-	int32 Try(regexp *, const char *) const;
-	int32 Match(const char *) const;
-	int32 Repeat(const char *) const;
+	int32 Try(regexp*, const char*) const;
+	int32 Match(const char*) const;
+	int32 Repeat(const char*) const;
 
 	// Utility functions:
 #ifdef DEBUG
-	char *Prop(const char *) const;
-	void RegExpError(const char *) const;
+	char* Prop(const char*) const;
+	void RegExpError(const char*) const;
 #endif
-	inline int32 UCharAt(const char *p) const;
-	inline char *Operand(char* p) const;
-	inline const char *Operand(const char* p) const;
+	inline int32 UCharAt(const char* p) const;
+	inline char* Operand(char* p) const;
+	inline const char* Operand(const char* p) const;
 	inline bool	IsMult(char c) const;
 
 // --------- Variables -------------
 
 	mutable status_t fError;
-	regexp *fRegExp;
+	regexp* fRegExp;
 
 	// Work variables for Compile().
-
-	const char *fInputScanPointer;
-	int32 fParenthesisCount;		
+	const char* fInputScanPointer;
+	int32 fParenthesisCount;
 	char fDummy;
-	char *fCodeEmitPointer;		// &fDummy = don't.
-	long fCodeSize;		
+	char* fCodeEmitPointer;
+		// &fDummy = don't.
+	long fCodeSize;
 
 	// Work variables for RunMatcher().
-
-	mutable const char *fStringInputPointer;
-	mutable const char *fRegBol;	// Beginning of input, for ^ check.
-	mutable const char **fStartPArrayPointer;
-	mutable const char **fEndPArrayPointer;
+	mutable const char* fStringInputPointer;
+	mutable const char* fRegBol;
+		// Beginning of input, for ^ check.
+	mutable const char** fStartPArrayPointer;
+	mutable const char** fEndPArrayPointer;
 };
+
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// _REG_EXP_H

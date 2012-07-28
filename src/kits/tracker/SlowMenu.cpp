@@ -32,18 +32,22 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "SlowMenu.h"
 
-BSlowMenu::BSlowMenu(const char *title, menu_layout layout)
+
+BSlowMenu::BSlowMenu(const char* title, menu_layout layout)
 	:	BMenu(title, layout),
 		fMenuBuilt(false)
 {
 }
 
+
 const int32 kItemsToAddChunk = 20;
 const bigtime_t kMaxTimeBuildingMenu = 200000;
 
-bool 
+
+bool
 BSlowMenu::AddDynamicItem(add_state state)
 {
 	if (fMenuBuilt)
@@ -68,39 +72,45 @@ BSlowMenu::AddDynamicItem(add_state state)
 			return false;
 				// done with menu, don't call again
 		}
-		if (system_time() > timeToBail)
-			// we have been in here long enough, come back later
+
+		if (system_time() > timeToBail) {
+			// we've been in here long enough, come back later
 			break;
+		}
 	}
 
-	return true;	// call me again, got more to show
+	return true;
+		// call me again, got more to show
 }
 
-bool 
+
+bool
 BSlowMenu::StartBuildingItemList()
 {
 	return true;
 }
 
-bool 
+
+bool
 BSlowMenu::AddNextItem()
 {
 	TRESPASS();
-	// pure virtual, shouldn't be here
+		// pure virtual, shouldn't be here
 	return true;
 }
 
-void 
+
+void
 BSlowMenu::DoneBuildingItemList()
 {
 	TRESPASS();
-	// pure virtual, shouldn't be here
+		// pure virtual, shouldn't be here
 }
 
-void 
+
+void
 BSlowMenu::ClearMenuBuildingState()
 {
 	TRESPASS();
-	// pure virtual, shouldn't be here
+		// pure virtual, shouldn't be here
 }
-

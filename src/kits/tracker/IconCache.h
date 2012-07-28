@@ -31,12 +31,13 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//	Icon cache is used for drawing node icons; it caches icons
-//	and reuses them for successive draws
-
 #ifndef __NU_ICON_CACHE__
 #define __NU_ICON_CACHE__
+
+
+// Icon cache is used for drawing node icons; it caches icons
+// and reuses them for successive draws
+
 
 #include <Bitmap.h>
 #include <Mime.h>
@@ -46,6 +47,7 @@ All rights reserved.
 #include "ObjectList.h"
 #include "OpenHashTable.h"
 #include "Utilities.h"
+
 
 // Icon cache splits icons into two caches - the shared cache, likely to get the
 // most hits and the node cache. Every icon that is found in a mime based
@@ -89,6 +91,7 @@ enum IconDrawMode {
 	kDimmedIcon
 };
 
+
 #define NORMAL_ICON_ONLY kNormalIcon
 	// replace use of these defines with mode once the respective getters
 	// can get non-plain icons
@@ -110,6 +113,7 @@ enum IconSource {
 	kNode
 };
 
+
 class IconCacheEntry {
 	// aliased entries don't own their icons, just point
 	// to some other entry that does
@@ -122,46 +126,46 @@ public:
 	IconCacheEntry();
 	~IconCacheEntry();
 	
-	void SetAliasFor(const SharedIconCache *, const SharedCacheEntry *);
-	static IconCacheEntry *ResolveIfAlias(const SharedIconCache *, IconCacheEntry *);
-	IconCacheEntry *ResolveIfAlias(const SharedIconCache *);
+	void SetAliasFor(const SharedIconCache*, const SharedCacheEntry*);
+	static IconCacheEntry* ResolveIfAlias(const SharedIconCache*, IconCacheEntry*);
+	IconCacheEntry* ResolveIfAlias(const SharedIconCache*);
 	
-	void SetIcon(BBitmap *bitmap, IconDrawMode mode, icon_size size,
+	void SetIcon(BBitmap* bitmap, IconDrawMode mode, icon_size size,
 		bool create = false);
 	
 	bool HaveIconBitmap(IconDrawMode mode, icon_size size) const;
 	bool CanConstructBitmap(IconDrawMode mode, icon_size size) const;
 	static bool AlternateModeForIconConstructing(IconDrawMode requestedMode,
 		IconDrawMode &alternate, icon_size size);
-	BBitmap *ConstructBitmap(BBitmap *constructFrom, IconDrawMode requestedMode,
+	BBitmap* ConstructBitmap(BBitmap* constructFrom, IconDrawMode requestedMode,
 		IconDrawMode constructFromMode, icon_size size,
-		LazyBitmapAllocator *);
-	BBitmap *ConstructBitmap(IconDrawMode requestedMode, icon_size size,
-		LazyBitmapAllocator *);
-		// same as above, always uses normal icon as source	
+		LazyBitmapAllocator*);
+	BBitmap* ConstructBitmap(IconDrawMode requestedMode, icon_size size,
+		LazyBitmapAllocator*);
+		// same as above, always uses normal icon as source
 
 	bool IconHitTest(BPoint, IconDrawMode, icon_size) const;
 		// given a point, returns true if a non-transparent pixel was hit
 
-	void RetireIcons(BObjectList<BBitmap> *retiredBitmapList);
+	void RetireIcons(BObjectList<BBitmap>* retiredBitmapList);
 		// can't just delete icons, they may be still drawing
 		// async; instead, put them on the retired list and
 		// only delete the list if it grows too much, way after
 		// the icon finishes drawing
-		// 
+		//
 		// This could fail if we retire a lot of icons (10 * 1024)
 		// while we are drawing them, shouldn't be a practical problem
 
 protected:
 
-	BBitmap *IconForMode(IconDrawMode mode, icon_size size) const;
-	void SetIconForMode(BBitmap *bitmap, IconDrawMode mode, icon_size size);
+	BBitmap* IconForMode(IconDrawMode mode, icon_size size) const;
+	void SetIconForMode(BBitmap* bitmap, IconDrawMode mode, icon_size size);
 
 	// list of most common icons
-	BBitmap *fLargeIcon;
-	BBitmap *fMiniIcon;
-	BBitmap *fHilitedLargeIcon;
-	BBitmap *fHilitedMiniIcon;
+	BBitmap* fLargeIcon;
+	BBitmap* fMiniIcon;
+	BBitmap* fHilitedLargeIcon;
+	BBitmap* fHilitedMiniIcon;
 	int32 fAliasForIndex;
 	
 	// list of other icon kinds would be added here
@@ -170,15 +174,17 @@ protected:
 	friend class NodeIconCache;
 };
 
+
 class SimpleIconCache {
 public:
-	SimpleIconCache(const char *);
+	SimpleIconCache(const char*);
 	virtual ~SimpleIconCache() {}
 
-	virtual void Draw(IconCacheEntry *, BView *, BPoint, IconDrawMode mode,
+	virtual void Draw(IconCacheEntry*, BView*, BPoint, IconDrawMode mode,
 		icon_size size, bool async = false) = 0;
-	virtual void Draw(IconCacheEntry *, BView *, BPoint , IconDrawMode ,
-		icon_size , void (*)(BView *, BPoint, BBitmap *, void *), void * = NULL) = 0;
+	virtual void Draw(IconCacheEntry*, BView*, BPoint, IconDrawMode,
+		icon_size, void (*)(BView*, BPoint, BBitmap*, void*),
+		void* = NULL) = 0;
 
 	bool Lock();
 	void Unlock();
@@ -188,25 +194,26 @@ private:
 	Benaphore fLock;
 };
 
+
 class SharedCacheEntry : public IconCacheEntry {
 public:
 	SharedCacheEntry();
-	SharedCacheEntry(const char *fileType, const char *appSignature = 0);
+	SharedCacheEntry(const char* fileType, const char* appSignature = 0);
 
-	void Draw(BView *, BPoint, IconDrawMode mode, icon_size size,
+	void Draw(BView*, BPoint, IconDrawMode mode, icon_size size,
 		bool async = false);
 
-	void Draw(BView *, BPoint , IconDrawMode , icon_size ,
-		void (*)(BView *, BPoint, BBitmap *, void *), void * = NULL);
+	void Draw(BView*, BPoint, IconDrawMode, icon_size,
+		void (*)(BView*, BPoint, BBitmap*, void*), void* = NULL);
 
-	const char *FileType() const;
-	const char *AppSignature() const;
+	const char* FileType() const;
+	const char* AppSignature() const;
 	
 	// hash table support
 	uint32 Hash() const;
-	static uint32 Hash(const char *fileType, const char *appSignature = 0);
+	static uint32 Hash(const char* fileType, const char* appSignature = 0);
 	bool operator==(const SharedCacheEntry &) const;
-	void SetTo(const char *fileType, const char *appSignature = 0);
+	void SetTo(const char* fileType, const char* appSignature = 0);
 
 	int32 fNext;
 private:
@@ -216,35 +223,37 @@ private:
 	friend class SharedIconCache;
 };
 
+
 class SharedCacheEntryArray : public OpenHashElementArray<SharedCacheEntry> {
 	// SharedIconCache stores all it's elements in this array
 public:
 	SharedCacheEntryArray(int32 initialSize);
-	SharedCacheEntry *Add();
+	SharedCacheEntry* Add();
 };
+
 
 class SharedIconCache : public SimpleIconCache {
 	// SharedIconCache is used for icons that come from the mime database
 public:
 	SharedIconCache();
 
-	virtual void Draw(IconCacheEntry *, BView *, BPoint, IconDrawMode mode,
+	virtual void Draw(IconCacheEntry*, BView*, BPoint, IconDrawMode mode,
 		icon_size size, bool async = false);
-	virtual void Draw(IconCacheEntry *, BView *, BPoint , IconDrawMode ,
-		icon_size , void (*)(BView *, BPoint, BBitmap *, void *), void * = NULL);
+	virtual void Draw(IconCacheEntry*, BView*, BPoint, IconDrawMode,
+		icon_size, void (*)(BView*, BPoint, BBitmap*, void*), void* = NULL);
 
-	SharedCacheEntry *FindItem(const char *fileType, const char *appSignature = 0)
+	SharedCacheEntry* FindItem(const char* fileType, const char* appSignature = 0)
 		const;
-	SharedCacheEntry *AddItem(const char *fileType, const char *appSignature = 0);
-	SharedCacheEntry *AddItem(SharedCacheEntry **outstandingEntry, const char *fileType,
-		const char *appSignature = 0);
+	SharedCacheEntry* AddItem(const char* fileType, const char* appSignature = 0);
+	SharedCacheEntry* AddItem(SharedCacheEntry** outstandingEntry, const char* fileType,
+		const char* appSignature = 0);
 		// same as previous AddItem, updates the pointer to outstandingEntry, because
 		// adding to the hash table makes any pending pointer invalid
-	void IconChanged(SharedCacheEntry *);
+	void IconChanged(SharedCacheEntry*);
 
-	void SetAliasFor(IconCacheEntry *alias, const SharedCacheEntry *original) const;
-	IconCacheEntry *ResolveIfAlias(IconCacheEntry *entry) const;
-	int32 EntryIndex(const SharedCacheEntry *entry) const;
+	void SetAliasFor(IconCacheEntry* alias, const SharedCacheEntry* original) const;
+	IconCacheEntry* ResolveIfAlias(IconCacheEntry* entry) const;
+	int32 EntryIndex(const SharedCacheEntry* entry) const;
 
 	void RemoveAliasesTo(int32 index);
 
@@ -257,22 +266,23 @@ private:
 		// and wait for the next sync to delete them
 };
 
+
 class NodeCacheEntry : public IconCacheEntry {
 public:
 	NodeCacheEntry(bool permanent = false);
-	NodeCacheEntry(const node_ref *, bool permanent = false);
-	void Draw(BView *, BPoint, IconDrawMode mode, icon_size size,
+	NodeCacheEntry(const node_ref*, bool permanent = false);
+	void Draw(BView*, BPoint, IconDrawMode mode, icon_size size,
 		bool async = false);
 	
-	void Draw(BView *, BPoint , IconDrawMode , icon_size ,
-		void (*)(BView *, BPoint, BBitmap *, void *), void * = NULL);
+	void Draw(BView*, BPoint, IconDrawMode, icon_size,
+		void (*)(BView*, BPoint, BBitmap*, void*), void* = NULL);
 
-	const node_ref *Node() const;
+	const node_ref* Node() const;
 	
 	uint32 Hash() const;
-	static uint32 Hash(const node_ref *);
-	bool operator==(const NodeCacheEntry &) const;
-	void SetTo(const node_ref *);
+	static uint32 Hash(const node_ref*);
+	bool operator==(const NodeCacheEntry&) const;
+	void SetTo(const node_ref*);
 	void MakePermanent();
 	bool Permanent() const;
 	
@@ -285,35 +295,37 @@ private:
 	friend class NodeIconCache;
 };
 
+
 class NodeCacheEntryArray : public OpenHashElementArray<NodeCacheEntry> {
 	// NodeIconCache stores all it's elements in this array
 public:
 	NodeCacheEntryArray(int32 initialSize);
-	NodeCacheEntry *Add();
+	NodeCacheEntry* Add();
 };
+
 
 class NodeIconCache : public SimpleIconCache {
 	// NodeIconCache is used for nodes that define their own icons
 public:
 	NodeIconCache();
 
-	virtual void Draw(IconCacheEntry *, BView *, BPoint, IconDrawMode ,
-		icon_size , bool async = false);
+	virtual void Draw(IconCacheEntry*, BView*, BPoint, IconDrawMode,
+		icon_size, bool async = false);
 
-	virtual void Draw(IconCacheEntry *, BView *, BPoint , IconDrawMode ,
-		icon_size , void (*)(BView *, BPoint, BBitmap *, void *), void * = 0);
+	virtual void Draw(IconCacheEntry*, BView*, BPoint, IconDrawMode,
+		icon_size, void (*)(BView*, BPoint, BBitmap*, void*), void* = 0);
 
-	NodeCacheEntry *FindItem(const node_ref *) const;
-	NodeCacheEntry *AddItem(const node_ref *, bool permanent = false);
-	NodeCacheEntry *AddItem(NodeCacheEntry **outstandingEntry, const node_ref *);
+	NodeCacheEntry* FindItem(const node_ref*) const;
+	NodeCacheEntry* AddItem(const node_ref*, bool permanent = false);
+	NodeCacheEntry* AddItem(NodeCacheEntry** outstandingEntry, const node_ref*);
 		// same as previous AddItem, updates the pointer to outstandingEntry, because
 		// adding to the hash table makes any pending pointer invalid
-	void Deleting(const node_ref *);
+	void Deleting(const node_ref*);
 		// model for this node is getting deleted (not necessarily the node itself)
-	void Removing(const node_ref *);
+	void Removing(const node_ref*);
 		// used by permanent NodeIconCache entries, when an entry gets deleted
-	void Deleting(const BView *);
-	void IconChanged(const Model *);
+	void Deleting(const BView*);
+	void IconChanged(const Model*);
 
 
 	void RemoveAliasesTo(int32 index);
@@ -323,20 +335,22 @@ private:
 	NodeCacheEntryArray fElementArray;
 };
 
+
 const int32 kColorTransformTableSize = 256;
+
 
 class IconCache {
 public:
 	IconCache();
 	
-	void Draw(Model *, BView *, BPoint where, IconDrawMode mode,
+	void Draw(Model*, BView*, BPoint where, IconDrawMode mode,
 		icon_size size, bool async = false);
 		// draw an icon for a model, load the icon from the appropriate
 		// location if not cached already
 
-	void SyncDraw(Model *, BView *, BPoint , IconDrawMode ,
-		icon_size , void (*)(BView *, BPoint, BBitmap *, void *), 
-		void *passThruState = 0);
+	void SyncDraw(Model*, BView*, BPoint, IconDrawMode,
+		icon_size, void (*)(BView*, BPoint, BBitmap*, void*),
+		void* passThruState = 0);
 		// draw an icon for a model, load the icon from the appropriate
 		// location if not cached already; only works for sync draws,
 		// once the call returns, the bitmap may be deleted
@@ -344,92 +358,91 @@ public:
 	// preload calls used to ensure successive cache hit for the respective
 	// icon, used for common tracker types, etc; Not calling these should only
 	// cause a slowdown
-	void Preload(Model *, IconDrawMode mode, icon_size size, bool permanent = false);
-	status_t Preload(const char *mimeType, IconDrawMode mode, icon_size size);
+	void Preload(Model*, IconDrawMode mode, icon_size size,
+		bool permanent = false);
+	status_t Preload(const char* mimeType, IconDrawMode mode, icon_size size);
 
-	void Deleting(const Model *);
-		// hook to manage unloading icons for nodes that are going away 
-	void Removing(const Model *model);
+	void Deleting(const Model*);
+		// hook to manage unloading icons for nodes that are going away
+	void Removing(const Model* model);
 		// used by permanent NodeIconCache entries, when an entry gets
 		// deleted
-	void Deleting(const BView *);
+	void Deleting(const BView*);
 		// hook to manage deleting draw view caches for views that are
 		// going away
 	
 	// icon changed calls, used when a node or a file type has an icon changed
 	// the icons for the node/file type will be flushed and re-cached during
 	// the next draw
-	void IconChanged(Model *);
-	void IconChanged(const char *mimeType, const char *appSignature);
+	void IconChanged(Model*);
+	void IconChanged(const char* mimeType, const char* appSignature);
 	
-	bool IsIconFrom(const Model *, const char *mimeType,
-		const char *appSignature) const;
+	bool IsIconFrom(const Model*, const char* mimeType,
+		const char* appSignature) const;
 		// called when metamime database changed to figure out which models
 		// to redraw
 
-	bool IconHitTest(BPoint, const Model *, IconDrawMode , icon_size );
+	bool IconHitTest(BPoint, const Model*, IconDrawMode, icon_size);
 
 	// utility calls for building specialized icons
-	BBitmap *MakeSelectedIcon(const BBitmap *normal, icon_size,
-		LazyBitmapAllocator *);
-	
-	
+	BBitmap* MakeSelectedIcon(const BBitmap* normal, icon_size,
+		LazyBitmapAllocator*);
+
 	static bool NeedsDeletionNotification(IconSource);
 
-	static IconCache *sIconCache;
+	static IconCache* sIconCache;
 
 private:
-	
 	// shared calls
-	IconCacheEntry *Preload(AutoLock<SimpleIconCache> *nodeCache,
-		AutoLock<SimpleIconCache> *sharedCache,
-		AutoLock<SimpleIconCache> **resultingLockedCache,
-		Model *, IconDrawMode mode, icon_size size, bool permanent);
+	IconCacheEntry* Preload(AutoLock<SimpleIconCache>* nodeCache,
+		AutoLock<SimpleIconCache>* sharedCache,
+		AutoLock<SimpleIconCache>** resultingLockedCache,
+		Model*, IconDrawMode mode, icon_size size, bool permanent);
 		// preload uses lazy locking, returning the cache we decided
 		// to use to get the icon
 		// <resultingLockedCache> may be null if we don't care
 
 	// shared mime-based icon retrieval calls
-	IconCacheEntry *GetIconForPreferredApp(const char *mimeTypeSignature,
-		const char *preferredApp, IconDrawMode mode, icon_size size,
-		 LazyBitmapAllocator *, IconCacheEntry *);
-	IconCacheEntry *GetIconFromFileTypes(ModelNodeLazyOpener *, IconSource &source,
-		IconDrawMode mode, icon_size size, LazyBitmapAllocator *,
-		IconCacheEntry *);
-	IconCacheEntry *GetIconFromMetaMime(const char *fileType, IconDrawMode mode,
-		icon_size size, LazyBitmapAllocator *,
-		IconCacheEntry *);
-	IconCacheEntry *GetVolumeIcon(AutoLock<SimpleIconCache> *nodeCache,
-		AutoLock<SimpleIconCache> *sharedCache,
-		AutoLock<SimpleIconCache> **resultingLockedCache,
-		Model *, IconSource &, IconDrawMode mode,
-		icon_size size, LazyBitmapAllocator *);
-	IconCacheEntry *GetRootIcon(AutoLock<SimpleIconCache> *nodeCache,
-		AutoLock<SimpleIconCache> *sharedCache,
-		AutoLock<SimpleIconCache> **resultingLockedCache,
-		Model *, IconSource &, IconDrawMode mode,
-		icon_size size, LazyBitmapAllocator *);
-	IconCacheEntry *GetWellKnownIcon(AutoLock<SimpleIconCache> *nodeCache,
-		AutoLock<SimpleIconCache> *sharedCache,
-		AutoLock<SimpleIconCache> **resultingLockedCache,
-		Model *, IconSource &, IconDrawMode mode,
-		icon_size size, LazyBitmapAllocator *);
-	IconCacheEntry *GetNodeIcon(ModelNodeLazyOpener *,
-		AutoLock<SimpleIconCache> *nodeCache,
-		AutoLock<SimpleIconCache> **resultingLockedCache,
-		Model *, IconSource &, IconDrawMode mode,
-		icon_size size, LazyBitmapAllocator *, IconCacheEntry *, bool permanent);
-	IconCacheEntry *GetGenericIcon(AutoLock<SimpleIconCache> *sharedCache,
-		AutoLock<SimpleIconCache> **resultingLockedCache,
-		Model *, IconSource &, IconDrawMode mode,
-		icon_size size, LazyBitmapAllocator *, IconCacheEntry *);
-	IconCacheEntry *GetFallbackIcon(AutoLock<SimpleIconCache> *sharedCacheLocker,
-		AutoLock<SimpleIconCache> **resultingOpenCache,
-		Model *model, IconDrawMode mode, icon_size size,
-		LazyBitmapAllocator *lazyBitmap, IconCacheEntry *entry);
+	IconCacheEntry* GetIconForPreferredApp(const char* mimeTypeSignature,
+		const char* preferredApp, IconDrawMode mode, icon_size size,
+		 LazyBitmapAllocator*, IconCacheEntry*);
+	IconCacheEntry* GetIconFromFileTypes(ModelNodeLazyOpener*, IconSource &source,
+		IconDrawMode mode, icon_size size, LazyBitmapAllocator*,
+		IconCacheEntry*);
+	IconCacheEntry* GetIconFromMetaMime(const char* fileType, IconDrawMode mode,
+		icon_size size, LazyBitmapAllocator*,
+		IconCacheEntry*);
+	IconCacheEntry* GetVolumeIcon(AutoLock<SimpleIconCache>* nodeCache,
+		AutoLock<SimpleIconCache>* sharedCache,
+		AutoLock<SimpleIconCache>** resultingLockedCache,
+		Model*, IconSource&, IconDrawMode mode,
+		icon_size size, LazyBitmapAllocator*);
+	IconCacheEntry* GetRootIcon(AutoLock<SimpleIconCache>* nodeCache,
+		AutoLock<SimpleIconCache>* sharedCache,
+		AutoLock<SimpleIconCache>** resultingLockedCache,
+		Model*, IconSource&, IconDrawMode mode,
+		icon_size size, LazyBitmapAllocator*);
+	IconCacheEntry* GetWellKnownIcon(AutoLock<SimpleIconCache> *nodeCache,
+		AutoLock<SimpleIconCache>* sharedCache,
+		AutoLock<SimpleIconCache>** resultingLockedCache,
+		Model*, IconSource&, IconDrawMode mode,
+		icon_size size, LazyBitmapAllocator*);
+	IconCacheEntry* GetNodeIcon(ModelNodeLazyOpener *,
+		AutoLock<SimpleIconCache>* nodeCache,
+		AutoLock<SimpleIconCache>** resultingLockedCache,
+		Model*, IconSource&, IconDrawMode mode,
+		icon_size size, LazyBitmapAllocator*, IconCacheEntry*, bool permanent);
+	IconCacheEntry* GetGenericIcon(AutoLock<SimpleIconCache>* sharedCache,
+		AutoLock<SimpleIconCache>** resultingLockedCache,
+		Model*, IconSource&, IconDrawMode mode,
+		icon_size size, LazyBitmapAllocator*, IconCacheEntry*);
+	IconCacheEntry* GetFallbackIcon(AutoLock<SimpleIconCache>* sharedCacheLocker,
+		AutoLock<SimpleIconCache>** resultingOpenCache,
+		Model* model, IconDrawMode mode, icon_size size,
+		LazyBitmapAllocator* lazyBitmap, IconCacheEntry* entry);
 
-	BBitmap *MakeTransformedIcon(const BBitmap *, icon_size,
-		int32 colorTransformTable [], LazyBitmapAllocator *);
+	BBitmap* MakeTransformedIcon(const BBitmap*, icon_size,
+		int32 colorTransformTable [], LazyBitmapAllocator*);
 
 	NodeIconCache fNodeCache;
 	SharedIconCache fSharedCache;
@@ -451,37 +464,41 @@ public:
 		bool preallocate = false);
 	~LazyBitmapAllocator();
 
-	BBitmap *Get();
-	BBitmap *Adopt();
+	BBitmap* Get();
+	BBitmap* Adopt();
 
 private:
-	BBitmap *fBitmap;
+	BBitmap* fBitmap;
 	icon_size fSize;
 	color_space fColorSpace;
 };
 
-// nothing but inlines after here
 
-inline const char *
+// inlines follow
+
+inline const char*
 SharedCacheEntry::FileType() const
 {
 	return fFileType.String();
 }
 
-inline const char *
+
+inline const char*
 SharedCacheEntry::AppSignature() const
 {
 	return fAppSignature.String();
 }
 
-inline bool 
+
+inline bool
 IconCache::NeedsDeletionNotification(IconSource from)
 {
 	return from == kNode;
 }
 
-inline IconCacheEntry *
-SharedIconCache::ResolveIfAlias(IconCacheEntry *entry) const
+
+inline IconCacheEntry*
+SharedIconCache::ResolveIfAlias(IconCacheEntry* entry) const
 {
 	if (entry->fAliasForIndex < 0)
 		return entry;
@@ -489,8 +506,9 @@ SharedIconCache::ResolveIfAlias(IconCacheEntry *entry) const
 	return fHashTable.ElementAt(entry->fAliasForIndex);
 }
 
-inline int32 
-SharedIconCache::EntryIndex(const SharedCacheEntry *entry) const
+
+inline int32
+SharedIconCache::EntryIndex(const SharedCacheEntry* entry) const
 {
 	return fHashTable.ElementIndex(entry);
 }

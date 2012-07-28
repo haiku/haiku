@@ -61,8 +61,8 @@ class AddMenuItemVisitor : public BDiskDeviceVisitor {
 		AddMenuItemVisitor(BMenu* menu);
 		virtual ~AddMenuItemVisitor();
 
-		virtual bool Visit(BDiskDevice *device);
-		virtual bool Visit(BPartition *partition, int32 level);
+		virtual bool Visit(BDiskDevice* device);
+		virtual bool Visit(BPartition* partition, int32 level);
 
 	private:
 		BMenu* fMenu;
@@ -82,14 +82,14 @@ AddMenuItemVisitor::~AddMenuItemVisitor()
 
 
 bool
-AddMenuItemVisitor::Visit(BDiskDevice *device)
+AddMenuItemVisitor::Visit(BDiskDevice* device)
 {
 	return Visit(device, 0);
 }
 
 
 bool
-AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
+AddMenuItemVisitor::Visit(BPartition* partition, int32 level)
 {
 	if (!partition->ContainsFileSystem())
 		return false;
@@ -99,7 +99,7 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 	if (name.Length() == 0) {
 		name = partition->Name();
 		if (name.Length() == 0) {
-			const char *type = partition->ContentType();
+			const char* type = partition->ContentType();
 			if (type == NULL)
 				return false;
 
@@ -119,19 +119,19 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 	}
 
 	// get icon
-	BBitmap *icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
+	BBitmap* icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
 		B_RGBA32);
 	if (partition->GetIcon(icon, B_MINI_ICON) != B_OK) {
 		delete icon;
 		icon = NULL;
 	}
 
-	BMessage *message = new BMessage(partition->IsMounted() ?
+	BMessage* message = new BMessage(partition->IsMounted() ?
 		kUnmountVolume : kMountVolume);
 	message->AddInt32("id", partition->ID());
 
 	// TODO: for now, until we actually have disk device icons
-	BMenuItem *item;
+	BMenuItem* item;
 	if (icon != NULL)
 		item = new IconMenuItem(name.String(), message, icon);
 	else
@@ -159,7 +159,7 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MountMenu"
 
-MountMenu::MountMenu(const char *name)
+MountMenu::MountMenu(const char* name)
 	: BMenu(name)
 {
 	SetFont(be_plain_font);
@@ -171,7 +171,7 @@ MountMenu::AddDynamicItem(add_state)
 {
 	// remove old items
 	for (;;) {
-		BMenuItem *item = RemoveItem(0L);
+		BMenuItem* item = RemoveItem(0L);
 		if (item == NULL)
 			break;
 		delete item;
@@ -192,7 +192,7 @@ MountMenu::AddDynamicItem(add_state)
 	BVolume volume;
 	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
 		if (volume.IsShared()) {
-			BBitmap *icon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
+			BBitmap* icon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 			fs_info info;
 			if (fs_stat_dev(volume.Device(), &info) != B_OK) {
 				PRINT(("Cannot get mount menu item icon; bad device ID\n"));
@@ -203,12 +203,12 @@ MountMenu::AddDynamicItem(add_state)
 			if (get_device_icon(info.device_name, icon->Bits(), B_MINI_ICON) != B_OK)
 				GetTrackerResources()->GetIconResource(R_ShareIcon, B_MINI_ICON, icon);
 
-			BMessage *message = new BMessage(kUnmountVolume);
+			BMessage* message = new BMessage(kUnmountVolume);
 			message->AddInt32("device_id", volume.Device());
 			char volumeName[B_FILE_NAME_LENGTH];
 			volume.GetName(volumeName);
 
-			BMenuItem *item = new IconMenuItem(volumeName, message, icon);
+			BMenuItem* item = new IconMenuItem(volumeName, message, icon);
 			item->SetMarked(true);
 			AddItem(item);
 		}

@@ -124,7 +124,7 @@ layoutT layout[] = {
 	{ 1, 1, 1 },
 	{ 5, 1, 5 },	// 1
 	{ 3, 1, 4 },	// 2
-	{ 1, 1, 1 },
+	{ 2, 1, 3 },
 	{ 2, 0, 3 },	// 4
 	{ 1, 1, 1 },
 	{ 1, 1, 1 },
@@ -542,16 +542,17 @@ ProcessController::DoDraw(bool force)
 	float right = left + gCPUcount * (barWidth + layout[gCPUcount].cpu_inter)
 		- layout[gCPUcount].cpu_inter; // right of CPU frame...
 	if (force && Parent()) {
-		SetHighColor(Parent()->ViewColor ());
+		SetHighColor(Parent()->ViewColor());
 		FillRect(BRect(right + 1, top - 1, right + 2, bottom + 1));
 	}
 
 	if (force) {
 		SetHighColor(frame_color);
 		StrokeRect(BRect(left - 1, top - 1, right, bottom + 1));
-		if (gCPUcount == 2) {
-			StrokeLine(BPoint(left + barWidth, top), BPoint(left + barWidth,
-				bottom));
+		if (gCPUcount > 1 && layout[gCPUcount].cpu_inter == 1) {
+			for (int x = 1; x < gCPUcount; x++)
+				StrokeLine(BPoint(left + x * barWidth + x - 1, top),
+					BPoint(left + x * barWidth + x - 1, bottom));
 		}
 	}
 	float leftMem = bounds.Width() - layout[gCPUcount].mem_width;
@@ -592,9 +593,9 @@ ProcessController::DoDraw(bool force)
 		fLastBarHeight[x] = barHeight;
 	}
 
-	float rightMem = bounds.Width () - 1;
+	float rightMem = bounds.Width() - 1;
 	float rem = fMemoryUsage * (h + 1);
-	float barHeight = floorf (rem);
+	float barHeight = floorf(rem);
 	rem -= barHeight;
 
 	rgb_color used_memory_color;
@@ -771,15 +772,32 @@ thread_popup(void *arg)
 
 	addtopbottom(new BSeparatorItem());
 
-	if (be_roster->IsRunning(kDeskbarSig)) {
+	bool showLiveInDeskbarItem = gInDeskbar;
+	if (!showLiveInDeskbarItem) {
+		int32 cookie = 0;
+		image_info info;
+		while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+			if (info.type == B_APP_IMAGE) {
+				// only show the Live in Deskbar item if a) we're running in
+				// deskbar itself, or b) we're running in PC's team.
+				if (strstr(info.name, "ProcessController") != NULL) {
+					showLiveInDeskbarItem = true;
+					break;
+				}
+			}
+		}
+	}
+
+	if (showLiveInDeskbarItem && be_roster->IsRunning(kDeskbarSig)) {
 		item = new BMenuItem(B_TRANSLATE("Live in the Deskbar"),
-		new BMessage('AlDb'));
+			new BMessage('AlDb'));
 		BDeskbar deskbar;
 		item->SetMarked(gInDeskbar || deskbar.HasItem(kDeskbarItemName));
 		item->SetTarget(gPCView);
 		addtopbottom(item);
 		addtopbottom(new BSeparatorItem ());
 	}
+
 
 	item = new IconMenuItem(gPCView->fProcessControllerIcon,
 	B_TRANSLATE("About ProcessController"B_UTF8_ELLIPSIS),

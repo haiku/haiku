@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	3736361491
+1	finnish	x-vnd.haiku-icon_o_matic	4233739176
 Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
 Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
@@ -117,6 +117,7 @@ Gradient	Icon-O-Matic-StyleTypes		Kaltevuus
 Min LOD	Icon-O-Matic-PropertyNames		Minimi LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON -attribuutti
 Invert selection	Icon-O-Matic-Properties		Käännä valinta
+Drop shapes	Icon-O-Matic-ShapesList		Pudota hahmot
 Export as…	Icon-O-Matic-Menu-File		Vie nimellä...
 Transformation	Transformation		Muodonmuutos
 Click on an object in	Empty property list - 1st line		Napsauta objektia kohteessa

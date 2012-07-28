@@ -1,13 +1,19 @@
-1	russian	x-vnd.Haiku-MediaPlayer	4123753294
+1	russian	x-vnd.Haiku-MediaPlayer	3699683348
+raw audio	MediaPlayer-InfoWin		raw аудио
+Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
+%d kHz	MediaPlayer-InfoWin		%d кГц
 Stream settings	MediaPlayer-Main		Настройки потока
 <unknown>	PlaylistItem-album		<неизвестно>
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабировать кнопки управления в полноэкранном режиме
 Video	MediaPlayer-InfoWin		Видео
 Subtitle size:	MediaPlayer-SettingsWindow		Размер субтитров:
 Save Playlist	MediaPlayer-PlaylistWindow		Сохранить плейлист
+<no media>	MediaPlayer-InfoWin		<нет данных>
+(not supported)	MediaPlayer-InfoWin		(не поддерживается)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ни один из файлов, которые вы хотели проиграть, не является медиа файлом.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка сохранения плейлиста.\n\nОшибка: 
+%.3f kHz	MediaPlayer-InfoWin		%.3f кГц
 New player…	MediaPlayer-Main		Новый плеер…
 100% scale	MediaPlayer-Main		Масштаб 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Расположение субтитров:
@@ -32,8 +38,10 @@ Close window after playing audio	MediaPlayer-SettingsWindow		Закрыть ок
 Full volume	MediaPlayer-SettingsWindow		На полной громкости
 Drop files to play	MediaPlayer-Main		Перетащите файлы для проигрывания
 TogglePlaying	MediaPlayer-Main		Переключить воспроизведение
+Copyright	MediaPlayer-InfoWin		Авторские права
 Cancel	MediaPlayer-SettingsWindow		Отмена
 Loop audio	MediaPlayer-SettingsWindow		Зацикливать аудио
+Container	MediaPlayer-InfoWin		Контейнер
 Nothing to Play	MediaPlayer-Main		Нечего проигрывать
 Muted	MediaPlayer-SettingsWindow		Без звука
 Quit	MediaPlayer-Main		Выход
@@ -90,6 +98,7 @@ Play	MediaPlayer-Main		Играть
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Удалить записи в корзину
 200% scale	MediaPlayer-Main		Масштаб 200%
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Похоже, что медиа сервер не запущен\nВы хотите его запустить?
+Duration	MediaPlayer-InfoWin		Длительность
 Aspect ratio	MediaPlayer-Main		Соотношение сторон
 Error: 	MediaPlayer-Main		Ошибка: 
 Large	MediaPlayer-SettingsWindow		крупный
@@ -104,6 +113,7 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Переместить в кор�
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Выключить звук
 Toggle pause/play.	MediaPlayer-Main		Переключить паузу/проигрывание.
+min	MediaPlayer-InfoWin	Minutes	мин
 Small	MediaPlayer-SettingsWindow		маленький
 Randomize	MediaPlayer-PlaylistWindow		Перемешать
 Off	Subtitles menu		Выключить
@@ -125,7 +135,10 @@ Always on top	MediaPlayer-Main		Всегда сверху
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Переместить запись в корзину
 Save	MediaPlayer-Main		Сохранить
 <nothing to undo>	MediaPlayer-PlaylistWindow		<нечего отменять>
+Mono	MediaPlayer-InfoWin		Моно
+File info	MediaPlayer-InfoWin		Информация о файле
 Save	MediaPlayer-PlaylistWindow		Сохранить
+%d Bit	MediaPlayer-InfoWin		%d Бит
 Remove	MediaPlayer-PlaylistWindow		Удалить
 Full screen	MediaPlayer-Main		На весь экран
 Open file…	MediaPlayer-Main		Открыть файл…

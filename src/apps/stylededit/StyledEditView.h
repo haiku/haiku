@@ -23,14 +23,14 @@ class BPositionIO;
 class StyledEditView : public BTextView {
 	public:
 						StyledEditView(BRect viewframe, BRect textframe,
-							BHandler *handler);
+							BHandler* handler);
 		virtual			~StyledEditView();
 
 		virtual void	Select(int32 start, int32 finish);
 		virtual void	DeleteText(int32 start, int32 finish);
 		virtual void	FrameResized(float width, float height);
-		virtual void	InsertText(const char *text, int32 length, int32 offset,
-							const text_run_array *runs = NULL);
+		virtual void	InsertText(const char* text, int32 length, int32 offset,
+							const text_run_array* runs = NULL);
 
 		void		Reset();
 		void		SetSuppressChanges(bool suppressChanges);

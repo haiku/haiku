@@ -67,9 +67,9 @@ static const rgb_color kDefaultWarningSpaceColor = {203, 0, 0, kSpaceBarAlpha};
 
 
 static void
-send_bool_notices(uint32 what, const char *name, bool value)
+send_bool_notices(uint32 what, const char* name, bool value)
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 
@@ -220,9 +220,9 @@ DesktopSettingsView::AttachedToWindow()
 
 
 void
-DesktopSettingsView::MessageReceived(BMessage *message)
+DesktopSettingsView::MessageReceived(BMessage* message)
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 
@@ -345,7 +345,7 @@ DesktopSettingsView::Revert()
 void
 DesktopSettingsView::_SendNotices()
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 
@@ -467,9 +467,9 @@ WindowsSettingsView::AttachedToWindow()
 
 
 void
-WindowsSettingsView::MessageReceived(BMessage *message)
+WindowsSettingsView::MessageReceived(BMessage* message)
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 	TrackerSettings settings;
@@ -545,7 +545,7 @@ WindowsSettingsView::MessageReceived(BMessage *message)
 void
 WindowsSettingsView::SetDefaults()
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 
@@ -605,7 +605,7 @@ WindowsSettingsView::IsDefaultable() const
 void
 WindowsSettingsView::Revert()
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 
@@ -757,9 +757,9 @@ SpaceBarSettingsView::AttachedToWindow()
 
 
 void
-SpaceBarSettingsView::MessageReceived(BMessage *message)
+SpaceBarSettingsView::MessageReceived(BMessage* message)
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 	TrackerSettings settings;
@@ -823,7 +823,7 @@ SpaceBarSettingsView::MessageReceived(BMessage *message)
 void
 SpaceBarSettingsView::SetDefaults()
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 
@@ -862,7 +862,7 @@ SpaceBarSettingsView::IsDefaultable() const
 void
 SpaceBarSettingsView::Revert()
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 
@@ -969,9 +969,9 @@ TrashSettingsView::AttachedToWindow()
 
 
 void
-TrashSettingsView::MessageReceived(BMessage *message)
+TrashSettingsView::MessageReceived(BMessage* message)
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 	TrackerSettings settings;
@@ -1037,7 +1037,7 @@ TrashSettingsView::Revert()
 void
 TrashSettingsView::_SendNotices()
 {
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	if (!tracker)
 		return;
 

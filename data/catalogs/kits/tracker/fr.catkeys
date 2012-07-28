@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1951892978
+1	french	x-vnd.Haiku-libtracker	733527088
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -190,7 +190,6 @@ New	DeskWindow		Nouveau
 Open	InfoWindow		Ouvrir
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Remplacer tout
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		L'application « %appname » ne supporte pas le type de document que vous êtes sur le point d'ouvrir. Êtes vous sûr de vouloir continuer ? Si vous savez que l'application prend en charge ce type de document, vous devriez contacter son éditeur pour lui demander de mettre à jour l'application afin d'ajouter le type de votre document à la liste de ceux pris en charge.
 Preparing to restore items…	StatusWindow		Restauration des éléments en préparation...
 Replace other file	WidgetAttributeText		Remplacer un autre fichier
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Certains des éléments sélectionnés ne peuvent pas être envoyés à la Corbeille. Voulez vous les supprimer ? (Cette opération est irrémédiable.)

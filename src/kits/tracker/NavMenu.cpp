@@ -128,7 +128,7 @@ SpringLoadedFolderCompareMessages(const BMessage* incoming,
 
 void
 SpringLoadedFolderSetMenuStates(const BMenu* menu,
-	const BObjectList<BString> *typeslist)
+	const BObjectList<BString>* typeslist)
 {
 	if (!menu || !typeslist)
 		return;
@@ -139,7 +139,7 @@ SpringLoadedFolderSetMenuStates(const BMenu* menu,
 	//		set the enabled state of the item
 	int32 count = menu->CountItems();
 	for (int32 index = 0 ; index < count ; index++) {
-		ModelMenuItem* item = dynamic_cast<ModelMenuItem *>(menu->ItemAt(index));
+		ModelMenuItem* item = dynamic_cast<ModelMenuItem*>(menu->ItemAt(index));
 		if (!item)
 			continue;
 
@@ -177,7 +177,7 @@ SpringLoadedFolderSetMenuStates(const BMenu* menu,
 
 void
 SpringLoadedFolderAddUniqueTypeToList(entry_ref* ref,
-	BObjectList<BString> *typeslist)
+	BObjectList<BString>* typeslist)
 {
 	if (!ref || !typeslist)
 		return;
@@ -221,17 +221,17 @@ SpringLoadedFolderAddUniqueTypeToList(entry_ref* ref,
 
 
 void
-SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage* *message,
-	BObjectList<BString> **typeslist)
+SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage** message,
+	BObjectList<BString>** typeslist)
 {
 	if (!incoming)
 		return;
 
-	delete *message;
-	delete *typeslist;
+	delete* message;
+	delete* typeslist;
 
 	BMessage* localMessage = new BMessage(*incoming);
-	BObjectList<BString> *localTypesList = new BObjectList<BString>(10, true);
+	BObjectList<BString>* localTypesList = new BObjectList<BString>(10, true);
 
 	for (int32 index = 0; incoming->HasRef("refs", index); index++) {
 		entry_ref ref;
@@ -255,7 +255,7 @@ SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage* *message,
 #define B_TRANSLATION_CONTEXT "NavMenu"
 
 BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
-	BWindow* parentWindow, const BObjectList<BString> *list)
+	BWindow* parentWindow, const BObjectList<BString>* list)
 	:	BSlowMenu(title),
 		fMessage(message),
 		fMessenger(target, target->Looper()),
@@ -272,7 +272,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 	// add the parent window to the invocation message so that it
 	// can be closed if option modifier held down during invocation
 	BContainerWindow* originatingWindow =
-		dynamic_cast<BContainerWindow *>(fParentWindow);
+		dynamic_cast<BContainerWindow*>(fParentWindow);
 	if (originatingWindow)
 		fMessage.AddData("nodeRefsToClose", B_RAW_TYPE,
 			originatingWindow->TargetModel()->NodeRef(), sizeof (node_ref));
@@ -284,7 +284,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 
 BNavMenu::BNavMenu(const char* title, uint32 message,
 	const BMessenger& messenger, BWindow* parentWindow,
-	const BObjectList<BString> *list)
+	const BObjectList<BString>* list)
 	:	BSlowMenu(title),
 		fMessage(message),
 		fMessenger(messenger),
@@ -301,7 +301,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message,
 	// add the parent window to the invocation message so that it
 	// can be closed if option modifier held down during invocation
 	BContainerWindow* originatingWindow =
-		dynamic_cast<BContainerWindow *>(fParentWindow);
+		dynamic_cast<BContainerWindow*>(fParentWindow);
 	if (originatingWindow)
 		fMessage.AddData("nodeRefsToClose", B_RAW_TYPE,
 			originatingWindow->TargetModel()->NodeRef(), sizeof (node_ref));
@@ -443,11 +443,11 @@ BNavMenu::StartBuildingItemList()
 			BDirectory trashDir;
 
 			if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK)
-				dynamic_cast<EntryIteratorList *>(fContainer)->
+				dynamic_cast<EntryIteratorList*>(fContainer)->
 					AddItem(new DirectoryEntryList(trashDir));
 		}
 	} else
-		fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory *>
+		fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>
 			(startModel.Node()));
 
 	if (fContainer == NULL || fContainer->InitCheck() != B_OK)
@@ -549,7 +549,7 @@ void
 BNavMenu::AddOneItem(Model* model)
 {
 	BMenuItem* item = NewModelItem(model, &fMessage, fMessenger, false,
-		dynamic_cast<BContainerWindow *>(fParentWindow),
+		dynamic_cast<BContainerWindow*>(fParentWindow),
 		fTypesList, &fTrackingHook);
 
 	if (item)
@@ -560,7 +560,7 @@ BNavMenu::AddOneItem(Model* model)
 ModelMenuItem*
 BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 	const BMessenger& target, bool suppressFolderHierarchy,
-	BContainerWindow* parentWindow, const BObjectList<BString> *typeslist,
+	BContainerWindow* parentWindow, const BObjectList<BString>* typeslist,
 	TrackingHookData* hook)
 {
 	if (model->InitCheck() != B_OK)
@@ -691,8 +691,8 @@ BNavMenu::BuildVolumeMenu()
 int
 BNavMenu::CompareFolderNamesFirstOne(const BMenuItem* i1, const BMenuItem* i2)
 {
-	const ModelMenuItem* item1 = dynamic_cast<const ModelMenuItem *>(i1);
-	const ModelMenuItem* item2 = dynamic_cast<const ModelMenuItem *>(i2);
+	const ModelMenuItem* item1 = dynamic_cast<const ModelMenuItem*>(i1);
+	const ModelMenuItem* item2 = dynamic_cast<const ModelMenuItem*>(i2);
 
 	if (item1 != NULL && item2 != NULL)
 		return item1->TargetModel()->CompareFolderNamesFirst(item2->TargetModel());
@@ -812,13 +812,13 @@ BNavMenu::SetShowParent(bool show)
 
 
 void
-BNavMenu::SetTypesList(const BObjectList<BString> *list)
+BNavMenu::SetTypesList(const BObjectList<BString>* list)
 {
 	fTypesList = list;
 }
 
 
-const BObjectList<BString> *
+const BObjectList<BString>*
 BNavMenu::TypesList() const
 {
 	return fTypesList;
@@ -868,4 +868,3 @@ BNavMenu::SetTrackingHookDeep(BMenu* menu, bool (*func)(BMenu*, void*),
 			SetTrackingHookDeep(submenu, func, state);
 	}
 }
-

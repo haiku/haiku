@@ -12,10 +12,15 @@
 #include <algorithm>
 
 #include <ArgumentVector.h>
+#include <AutoDeleter.h>
 #include <Referenceable.h>
 
-#include "CliCommand.h"
 #include "CliContext.h"
+#include "CliQuitCommand.h"
+#include "CliThreadsCommand.h"
+
+
+static const char* kDebuggerPrompt = "debugger> ";
 
 
 // #pragma mark - CommandEntry
@@ -68,36 +73,11 @@ private:
 };
 
 
-// #pragma mark - HelpCommand
-
-
-struct CommandLineUserInterface::QuitCommand : CliCommand {
-	QuitCommand(CommandLineUserInterface* userInterface)
-		:
-		CliCommand("quit Debugger",
-			"%s\n"
-			"Quits Debugger."),
-		fUserInterface(userInterface)
-	{
-	}
-
-	virtual void Execute(int argc, const char* const* argv, CliContext& context)
-	{
-		fUserInterface->fListener->UserInterfaceQuitRequested();
-	}
-
-private:
-	CommandLineUserInterface* fUserInterface;
-};
-
-
 // #pragma mark - CommandLineUserInterface
 
 
 CommandLineUserInterface::CommandLineUserInterface()
 	:
-	fTeam(NULL),
-	fListener(NULL),
 	fCommands(20, true),
 	fShowSemaphore(-1),
 	fShown(false),
@@ -123,10 +103,11 @@ CommandLineUserInterface::ID() const
 status_t
 CommandLineUserInterface::Init(Team* team, UserInterfaceListener* listener)
 {
-	fTeam = team;
-	fListener = listener;
+	status_t error = fContext.Init(team, listener);
+	if (error != B_OK)
+		return error;
 
-	status_t error = _RegisterCommands();
+	error = _RegisterCommands();
 	if (error != B_OK)
 		return error;
 
@@ -152,7 +133,7 @@ CommandLineUserInterface::Terminate()
 	fTerminating = true;
 
 	if (fShown) {
-		// TODO: Signal the thread so it wakes up!
+		fContext.Terminating();
 
 		// Wait for input loop to finish.
 		while (acquire_sem(fShowSemaphore) == B_INTERRUPTED) {
@@ -162,18 +143,20 @@ CommandLineUserInterface::Terminate()
 		delete_sem(fShowSemaphore);
 		fShowSemaphore = -1;
 	}
+
+	fContext.Cleanup();
 }
 
 
 status_t
-CommandLineUserInterface::LoadSettings(const TeamUISettings* settings)
+CommandLineUserInterface::LoadSettings(const TeamUiSettings* settings)
 {
 	return B_OK;
 }
 
 
 status_t
-CommandLineUserInterface::SaveSettings(TeamUISettings*& settings) const
+CommandLineUserInterface::SaveSettings(TeamUiSettings*& settings) const
 {
 	return B_OK;
 }
@@ -191,7 +174,7 @@ CommandLineUserInterface::SynchronouslyAskUser(const char* title,
 	const char* message, const char* choice1, const char* choice2,
 	const char* choice3)
 {
-	return 0;
+	return -1;
 }
 
 
@@ -225,17 +208,18 @@ status_t
 CommandLineUserInterface::_InputLoop()
 {
 	while (!fTerminating) {
+		// Wait for a thread or Ctrl-C.
+		fContext.WaitForThreadOrUser();
+
 		// read a command line
-		printf("debugger> ");
-		fflush(stdout);
-		char buffer[256];
-		if (fgets(buffer, sizeof(buffer), stdin) == NULL)
+		const char* line = fContext.PromptUser(kDebuggerPrompt);
+		if (line == NULL)
 			break;
 
 		// parse the command line
 		ArgumentVector args;
 		const char* parseErrorLocation;
-		switch (args.Parse(buffer, &parseErrorLocation)) {
+		switch (args.Parse(line, &parseErrorLocation)) {
 			case ArgumentVector::NO_ERROR:
 				break;
 			case ArgumentVector::NO_MEMORY:
@@ -243,7 +227,7 @@ CommandLineUserInterface::_InputLoop()
 				continue;
 			case ArgumentVector::UNTERMINATED_QUOTED_STRING:
 				printf("Parse error: Unterminated quoted string starting at "
-					"character %zu.\n", parseErrorLocation - buffer + 1);
+					"character %zu.\n", parseErrorLocation - line + 1);
 				continue;
 			case ArgumentVector::TRAILING_BACKSPACE:
 				printf("Parse error: trailing backspace.\n");
@@ -253,6 +237,10 @@ CommandLineUserInterface::_InputLoop()
 		if (args.ArgumentCount() == 0)
 			continue;
 
+		// add line to history
+		fContext.AddLineToInputHistory(line);
+
+		// execute command
 		_ExecuteCommand(args.ArgumentCount(), args.Arguments());
 	}
 
@@ -264,7 +252,8 @@ status_t
 CommandLineUserInterface::_RegisterCommands()
 {
 	if (_RegisterCommand("help", new(std::nothrow) HelpCommand(this)) &&
-		_RegisterCommand("quit", new(std::nothrow) QuitCommand(this))) {
+		_RegisterCommand("quit", new(std::nothrow) CliQuitCommand) &&
+		_RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)) {
 		return B_OK;
 	}
 
@@ -313,8 +302,7 @@ CommandLineUserInterface::_ExecuteCommand(int argc, const char* const* argv)
 		return;
 	}
 
-	CliContext context;
-	firstEntry->Command()->Execute(argc, argv, context);
+	firstEntry->Command()->Execute(argc, argv, fContext);
 }
 
 

@@ -10,6 +10,7 @@
 
 #include "GLifeConfig.h"
 
+#include <Catalog.h>
 #include <GroupLayoutBuilder.h>
 #include <Slider.h>
 #include <stdio.h>
@@ -18,6 +19,9 @@
 #include <View.h>
 
 #include "GLifeState.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "GLife ScreenSaver"
 
 
 // ------------------------------------------------------
@@ -32,23 +36,24 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 
 	// Info text
 	BStringView* name = new BStringView(frame, B_EMPTY_STRING,
-		"OpenGL \"Game of Life\"", B_FOLLOW_LEFT);
+		B_TRANSLATE("OpenGL \"Game of Life\""), B_FOLLOW_LEFT);
 	BStringView* author = new BStringView(frame, B_EMPTY_STRING,
-		"by Aaron Hill", B_FOLLOW_LEFT);
+		B_TRANSLATE("by Aaron Hill"), B_FOLLOW_LEFT);
 
 	// Sliders
 	fGridDelay = new BSlider(frame, "GridDelay",
-		"Grid Life Delay: ",
+		B_TRANSLATE("Grid Life Delay: "),
 		new BMessage(kGridDelay),
 		0, 4, B_BLOCK_THUMB);
 
 	fGridDelay->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fGridDelay->SetLimitLabels("None", "4x");
+	fGridDelay->SetLimitLabels(B_TRANSLATE("None"), B_TRANSLATE_COMMENT("4x", 
+			"This is a factor: the x represents 'times'"));
 	fGridDelay->SetValue(pglsState->GridDelay());
 	fGridDelay->SetHashMarkCount(5);
 
 	fGridBorder = new BSlider(frame, "GridBorder",
-		"Grid Border: ",
+		B_TRANSLATE("Grid Border: "),
 		new BMessage(kGridBorder),
 		0, 10, B_BLOCK_THUMB);
 
@@ -58,7 +63,7 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 	fGridBorder->SetHashMarkCount(11);
 
 	fGridWidth = new BSlider(frame, "GridWidth",
-		"Grid Width: ",
+		B_TRANSLATE("Grid Width: "),
 		new BMessage(kGridWidth),
 		10, 100, B_BLOCK_THUMB);
 
@@ -68,7 +73,7 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 	fGridWidth->SetHashMarkCount(10);
 
 	fGridHeight = new BSlider(frame, "GridHeight",
-		"Grid Height: ",
+		B_TRANSLATE("Grid Height: "),
 		new BMessage(kGridHeight),
 		10, 100, B_BLOCK_THUMB);
 
@@ -121,22 +126,26 @@ void
 GLifeConfig::_UpdateLabels()
 {
 	char newLabel[64];
-	snprintf(newLabel, sizeof(newLabel), "Grid Width: %li",
+	snprintf(newLabel, sizeof(newLabel), B_TRANSLATE("Grid Width: %li"),
 		fGridWidth->Value());
 	fGridWidth->SetLabel(newLabel);
-	snprintf(newLabel, sizeof(newLabel), "Grid Height: %li",
+	snprintf(newLabel, sizeof(newLabel), B_TRANSLATE("Grid Height: %li"),
 		fGridHeight->Value());
 	fGridHeight->SetLabel(newLabel);
-	snprintf(newLabel, sizeof(newLabel), "Grid Border: %li",
+	snprintf(newLabel, sizeof(newLabel), B_TRANSLATE("Grid Border: %li"),
 		fGridBorder->Value());
 	fGridBorder->SetLabel(newLabel);
 
 	char delay[16];
 	if (fGridDelay->Value() <= 0)
-		sprintf(delay, "none");
-	else
-		sprintf(delay, "%" B_PRId32 "x", fGridDelay->Value());
-	snprintf(newLabel, sizeof(newLabel), "Grid Life Delay: %s", delay);
+		sprintf(delay, B_TRANSLATE("none"));
+	else {
+		sprintf(delay, "%" B_PRId32, fGridDelay->Value());
+		sprintf(delay, B_TRANSLATE_COMMENT("%sx", 
+				"This is a factor: the x represents 'times'"), delay);
+	}
+	snprintf(newLabel, sizeof(newLabel), B_TRANSLATE("Grid Life Delay: %s"), 
+		delay);
 	fGridDelay->SetLabel(newLabel);
 }
 

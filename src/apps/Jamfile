@@ -50,6 +50,7 @@ HaikuSubInclude readonlybootprompt ;
 HaikuSubInclude remotedesktop ;
 HaikuSubInclude resedit ;
 HaikuSubInclude screenshot ;
+HaikuSubInclude serialconnect ;
 HaikuSubInclude showimage ;
 HaikuSubInclude soundrecorder ;
 HaikuSubInclude stylededit ;

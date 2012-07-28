@@ -2129,4 +2129,3 @@ VersionAttributeText::ReadValue(BString* result)
 	}
 	*result = "-";
 }
-

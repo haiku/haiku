@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-Appearance	4135695718
+1	russian	x-vnd.Haiku-Appearance	1557879521
+Plain font:	Font view		Простой шрифт:
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
 Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
@@ -12,6 +13,7 @@ Off	AntialiasingSettingsView		Выключить
 Choose Decorator	DecorSettingsView		Выберите декоратор
 Success	Colors tab		Успех
 Inactive window tab text	Colors tab		Текст заголовка неактивного окна
+About Decorator	DecorSettingsView		Об этом декораторе
 Failure	Colors tab		Неудача
 Hinting menu	AntialiasingSettingsView		Корректировка (хинтинг)
 Document background	Colors tab		Фон документа
@@ -21,25 +23,36 @@ Tooltip background	Colors tab		Фон подсказки
 Selected menu item background	Colors tab		Фон выбранного пункта меню
 Antialiasing	APRWindow		Сглаживание
 Navigation base	Colors tab		Основа навигации
+Window border	Colors tab		Рамка окна
 Window tab text	Colors tab		Текст заголовка окна
 Document text	Colors tab		Текст документа
 Navigation pulse	Colors tab		Навигационная пульсация
+Window decorator:	DecorSettingsView		Оконный декоратор:
 Selected menu item text	Colors tab		Текст выделенного пункта меню
 Menu background	Colors tab		Фон меню
 OK	DecorSettingsView		ОК
+Size:	Font Selection view		Размер:
 Panel background	Colors tab		Фон панели
+Menu font:	Font view		Шрифт меню:
 Colors	APRWindow		Цвета
 Control background	Colors tab		Фон элемента
 Inactive window tab	Colors tab		Заголовок неактивного окна
 Appearance	System name		Внешний вид
+Fixed font:	Font view		Моноширинный шрифт:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Фильтрация цветных краев:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпиксельное сглаживание в комбинации с уточнением глифов недоступно в этой сборке Haiku во избежание возможных патентных проблем. Для включения этой возможности вам придется собрать Haiku самостоятельно, включив особые опции в заголовке конфигурации libfreetype.
 Control text	Colors tab		Текст элемента
 Tooltip text	Colors tab		Текст подсказки
+Bold font:	Font view		Жирный шрифт:
+Inactive window border	Colors tab		Рамка неактивного окна
 Menu item text	Colors tab		Текст пункта меню
 LCD subpixel	AntialiasingSettingsView		Субпиксельное сглаживание
 Selected menu item border	Colors tab		Рамка выделенного пункта меню
 Strong	AntialiasingSettingsView		Сильная
 Panel text	Colors tab		Текст панели
+Decorators	APRWindow		Декораторы
 Monospaced fonts only	AntialiasingSettingsView		Только моноширинные шрифты
 Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
+Fonts	APRWindow		Шрифты
 Glyph hinting:	AntialiasingSettingsView		Уточнение:

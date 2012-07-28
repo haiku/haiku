@@ -32,7 +32,7 @@
 using namespace BPrivate;
 
 
-BRect gWindowRect(7-15, 26-15, 507, 426);
+BRect gWindowRect(7 - 15, 26 - 15, 507, 426);
 
 
 namespace
@@ -117,8 +117,8 @@ StyledEditApp::StyledEditApp()
 				name.Append(mime);
 				name.Append(")");
 			}
-			BMenuItem* item =
-				new BMenuItem(name.String(), new BMessage(OPEN_AS_ENCODING));
+			BMenuItem* item
+				= new BMenuItem(name.String(), new BMessage(OPEN_AS_ENCODING));
 			item->SetTarget(this);
 			fOpenPanelEncodingMenu->AddItem(item);
 			if (charset.GetFontID() == fOpenAsEncoding)

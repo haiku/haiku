@@ -1483,7 +1483,7 @@ TDragRegion::SwitchModeForRect(BPoint mouse, BRect rect,
 		return true;
 	}
 
-	fBarView->ChangeState(newState, newVertical, newLeft, newTop);
+	fBarView->ChangeState(newState, newVertical, newLeft, newTop, true);
 	return true;
 }
 

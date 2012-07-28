@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	386826896
+1	russian	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Распаковать
 Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
 Set destination…	ExpanderMenu		Путь для извлечения…
@@ -6,6 +6,7 @@ Use:	ExpanderPreferences		Использовать:
 File expanded	ExpanderWindow		Файл распакован
 The destination is read only.	ExpanderWindow		Путь назначения доступен только для чтения.
 Expander: Open	ExpanderWindow		Распаковщик: Открыть
+ is not supported	ExpanderWindow		 не поддерживается
 Expander settings	ExpanderPreferences		Настройки извлечения
 Select current	DirectoryFilePanel		Выбрать текущий
 Source	ExpanderWindow		Источник
@@ -15,8 +16,11 @@ Cancel	ExpanderWindow		Отмена
 Automatically expand files	ExpanderPreferences		Автоматически распаковывать файлы
 Creating listing for '%s'	ExpanderWindow		Создается список файлов для '%s'
 Continue	ExpanderWindow		Продолжить
+Destination folder	ExpanderPreferences		Путь для извлечения
 The destination folder does not exist.	ExpanderWindow		Папка назначения не существует.
+Other	ExpanderPreferences		Другое
 Cancel	ExpanderPreferences		Отмена
+Expansion	ExpanderPreferences		Извлечение
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Вы уверены, что хотите остановить распаковку этого\nархива? Некоторые файлы могли быть извлечены не полностью.
 Select	DirectoryFilePanel		Выбрать
 Same directory as source (archive) file	ExpanderPreferences		Использовать ту же папку где находится архив

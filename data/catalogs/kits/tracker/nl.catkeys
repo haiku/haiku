@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	3121200791
+1	dutch; flemish	x-vnd.Haiku-libtracker	3203928783
 common	B_COMMON_DIRECTORY		algemeen
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
@@ -168,7 +168,6 @@ Edit favorites…	FilePanelPriv		Favorieten bewerken...
 Create relative link	ContainerWindow		Maak een relatieve link
 Copy	ContainerWindow		Kopiëren
 Size	PoseView		Grootte
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Als je de gebruikersmap %ifYouDoAction, kan het zijn dat %osName niet meer correct functioneert! Ben je zeker dat je dit wilt doen? Om de gebruikersmap toch te %toDoAction, druk de Shifttoets in en klik op \"%toConfirmAction\".
 Location	OpenWithWindow		Locatie
 Force identify	ContainerWindow		Forceer identificatie
 Duplicate	ContainerWindow		Dupliceer
@@ -192,7 +191,6 @@ New	DeskWindow		Nieuw
 Open	InfoWindow		Openen
 64 x 64	ContainerWindow		64 x64
 Replace all	FSUtils		Alles vervangen
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Het documenttype dat u wilt openen, wordt niet ondersteund door het programma \"%appname\". Bent u zeker dat u verder wilt gaan? Als u zeker weet dat de toepassing het documenttype ondersteunt, kun u contact opnemen met de uitgever van de toepassing met de vraag of ze hun toepassing zodanig willen bijwerken dat dit documenttype opgenomen wordt in de lijst van ondersteunde documenttypen.
 Preparing to restore items…	StatusWindow		Herstel van items wordt voorbereid...
 Replace other file	WidgetAttributeText		Ander bestand vervangen
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Sommige van de geselecteerde items kunnen niet naar de prullenbak verplaatst worden. Wilt u ze in plaats daarvan verwijderen? (Deze actie kan niet ongedaan gemaakt worden.)
@@ -217,7 +215,6 @@ Name	PoseView		Naam
 Group	FilePermissionsView		Groep
 Version:	InfoWindow		Versie:
 Created:	InfoWindow		Gemaakt:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Als je de mime-instellingen %ifYouDoAction, kan het zijn dat %osName niet meer correct functioneert! Ben je zeker dat je dit wilt doen? Om de mime-instellingen toch te %toDoAction, klik \"%toConfirmAction\".
 \nShould this be fixed?	FSUtils		\nMoet dit opgelost worden?
 Copying: 	StatusWindow		Aan het kopiëren:
 Capacity:	InfoWindow		Capaciteit:
@@ -276,7 +273,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Hernoemen
 Paused: click to resume or stop	StatusWindow		Gepauzeerd: klik om te hervatten of te stoppen
 Preferred for %type	OpenWithWindow		Geschikt voor %type
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Als je de algemene map %ifYouDoAction, kan het zijn dat %osName niet meer correct functioneert! Ben je zeker dat je dit wilt doen? Om de algemene map toch te %toDoAction, houd de Shifttoets ingedrukt en klik op \"%toConfirmAction\".
 There was an error deleting \"%name\":\n\t%error	FSUtils		Er is een fout opgetreden bij het verwijderen van \"%name\":\n\t%error
 Paste	FilePanelPriv		Plakken
 Copy more	ContainerWindow		Meer kopiëren
@@ -403,7 +399,6 @@ Select…	FilePanelPriv		Selecteren...
 Don't move files to Trash	SettingsView		Verplaats geen bestanden naar de prullenbak
 There was an error resolving the link.	Tracker		Er is een fout opgetreden bij het toekennen van de link.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Als je de systeemmap of haar inhoud %ifYouDoAction, zul je niet meer in staat zijn om %osName op te starten! Ben je zeker dat je dit wilt doen? Om de systeemmap of haar inhoud toch te %toDoAction, houd de Shifttoets ingedrukt en klik op \"%toConfirmAction\".
 You can't move or copy the trash.	FSUtils		U kunt de prullenbak niet verplaatsen of kopiëren.
 ends with	SelectionWindow		eindigt met
 Volume icons	TrackerSettingsWindow		Gegevensdrager-iconen
@@ -425,7 +420,6 @@ Modified	ContainerWindow		Gewijzigd
 Edit Query template	FindPanel		Zoekopdracht-sjabloon aanpassen
 Prompt	FSUtils		Bevestigen
 Edit query	ContainerWindow		Zoekopdracht aanpassen
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Als je de configuratiemap %ifYouDoAction, kan het zijn dat %osName niet meer correct functioneert! Ben je zeker dat je dit wilt doen? Om de configuratiemap toch te %toDoAction, klik op \"%toConfirmAction\".
 Find…	ContainerWindow		Zoeken...
 Create a Query	FindPanel		Maak een Zoekopdracht
 Move to Trash	FSUtils		Verplaats naar Prullenbak
@@ -444,7 +438,6 @@ Mount	ContainerWindow		Betrekken
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used gebruikt -- %free vrij)
 Cancel	FSClipBoard		Annuleren
 Cut more	ContainerWindow		Knip meer
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Als je de instellingenmap %ifYouDoAction, kan het zijn dat %osName niet meer correct functioneert! Ben je zeker dat je dit wilt doen? Om de instellingenmap toch te %toDoAction, klik \"%toConfirmAction\".
 Deleting: 	StatusWindow		Verwijdert:
 Empty Trash	InfoWindow		Prullenbak leegmaken:
 Add	FindPanel		Toevoegen

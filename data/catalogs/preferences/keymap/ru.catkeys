@@ -1,23 +1,38 @@
-1	russian	x-vnd.Haiku-Keymap	140876782
+1	russian	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Вернуть
 Tilde trigger	Keymap window		Тильда
 Grave trigger	Keymap window		Апостроф
+Role	Modifier keys window	As in the role of a modifier key	Роль
 Select dead keys	Keymap window		Выбор мертвых клавиш
+Cancel	Modifier keys window		Отмена
 Quit	Keymap window		Выйти
 Switch shortcut keys to Haiku mode	Keymap window		Переключить раскладку в режим Haiku
 Circumflex trigger	Keymap window		Циркумфлекс
 Diaeresis trigger	Keymap window		Диерезис
+Disabled	Modifier keys window	Do nothing	Отключено 
 Open…	Keymap window		Открыть…
 System:	Keymap window		Системные:
+Set modifier keys…	Keymap window		Назначить клавиши-модификаторы…
+Option:	Modifier keys window	Option key role name	Option:
 Switch shortcut keys	Keymap window		Переключение горячих клавиш
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавиша Shift
 User:	Keymap window		Пользовательские:
+Key	Modifier keys window	As in a computer keyboard key	Клавиша
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавиша Ctrl
+Control:	Modifier keys window	Control key role name	Control:
 Sample and clipboard:	Keymap window		Пример и буфер обмена:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клавиша Alt/Opt
 Layout	Keymap window		Макет
 Switch shortcut keys to Windows/Linux mode	Keymap window		Переключить раскладку в режим Windows/Linux
 Revert	Keymap window		Вернуть
+Command:	Modifier keys window	Command key role name	Command:
 Save as…	Keymap window		Сохранить как…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Клавиша Win/Cmd
 File	Keymap window		Файл
 (Current)	Keymap window		(Текущая)
 Font	Keymap window		Шрифт
 Keymap	System name		Раскладка
+Set modifier keys	Modifier keys window		Назначить клавиши-модификаторы
+Modifier keys	Modifier keys window		Клавиши-модификаторы
 Acute trigger	Keymap window		Аксант эгю

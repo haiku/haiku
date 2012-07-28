@@ -31,11 +31,12 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef __PUBLIC_COMMANDS__
 #define __PUBLIC_COMMANDS__
 
+
 #include <SupportDefs.h>
+
 
 // commands that may be issued to the tracker by other apps using messengers
 namespace BPrivate {
@@ -56,4 +57,4 @@ const uint32 kFSClipboardChanges = 'TCch';
 
 using namespace BPrivate;
 
-#endif	/* __PUBLIC_COMMANDS__ */
+#endif	// __PUBLIC_COMMANDS__

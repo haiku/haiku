@@ -40,7 +40,7 @@
 #include "TeamMemoryBlock.h"
 #include "TeamMemoryBlockManager.h"
 #include "TeamSettings.h"
-#include "TeamUISettings.h"
+#include "TeamUiSettings.h"
 #include "Tracing.h"
 #include "ValueNode.h"
 #include "ValueNodeContainer.h"
@@ -707,37 +707,54 @@ TeamDebugger::InspectRequested(target_addr_t address,
 
 
 bool
-TeamDebugger::UserInterfaceQuitRequested()
+TeamDebugger::UserInterfaceQuitRequested(QuitOption quitOption)
 {
-	AutoLocker< ::Team> locker(fTeam);
-	BString name(fTeam->Name());
-	locker.Unlock();
+	bool askUser = false;
+	switch (quitOption) {
+		case QUIT_OPTION_ASK_USER:
+			askUser = true;
+			break;
 
-	BString message;
-	message << "What shall be done about the debugged team '";
-	message << name;
-	message << "'?";
-
-	name.Remove(0, name.FindLast('/') + 1);
-
-	BString killLabel("Kill ");
-	killLabel << name;
-
-	BString resumeLabel("Resume ");
-	resumeLabel << name;
-
-	int32 choice = fUserInterface->SynchronouslyAskUser("Quit Debugger",
-		message, killLabel, "Cancel", resumeLabel);
-
-	switch (choice) {
-		case 0:
+		case QUIT_OPTION_ASK_KILL_TEAM:
 			fKillTeamOnQuit = true;
 			break;
-		case 1:
-			return false;
-		case 2:
-			// Detach from the team and resume and stopped threads.
+
+		case QUIT_OPTION_ASK_RESUME_TEAM:
 			break;
+	}
+
+	if (askUser) {
+		AutoLocker< ::Team> locker(fTeam);
+		BString name(fTeam->Name());
+		locker.Unlock();
+
+		BString message;
+		message << "What shall be done about the debugged team '";
+		message << name;
+		message << "'?";
+
+		name.Remove(0, name.FindLast('/') + 1);
+
+		BString killLabel("Kill ");
+		killLabel << name;
+
+		BString resumeLabel("Resume ");
+		resumeLabel << name;
+
+		int32 choice = fUserInterface->SynchronouslyAskUser("Quit Debugger",
+			message, killLabel, "Cancel", resumeLabel);
+
+		switch (choice) {
+			case 0:
+				fKillTeamOnQuit = true;
+				break;
+			case 1:
+			case -1:
+				return false;
+			case 2:
+				// Detach from the team and resume and stopped threads.
+				break;
+		}
 	}
 
 	PostMessage(B_QUIT_REQUESTED);
@@ -1408,7 +1425,7 @@ TeamDebugger::_LoadSettings()
 			breakpointSetting->IsEnabled());
 	}
 
-	const TeamUISettings* uiSettings = fTeamSettings.UISettingFor(
+	const TeamUiSettings* uiSettings = fTeamSettings.UiSettingFor(
 		fUserInterface->ID());
 	if (uiSettings != NULL)
 			fUserInterface->LoadSettings(uiSettings);
@@ -1424,19 +1441,19 @@ TeamDebugger::_SaveSettings()
 	if (settings.SetTo(fTeam) != B_OK)
 		return;
 
-	TeamUISettings* uiSettings = NULL;
+	TeamUiSettings* uiSettings = NULL;
 	if (fUserInterface->SaveSettings(uiSettings) != B_OK)
 		return;
 	if (uiSettings != NULL)
-		settings.AddUISettings(uiSettings);
+		settings.AddUiSettings(uiSettings);
 
 	// preserve the UI settings from our cached copy.
-	for (int32 i = 0; i < fTeamSettings.CountUISettings(); i++) {
-		const TeamUISettings* oldUISettings = fTeamSettings.UISettingAt(i);
-		if (strcmp(oldUISettings->ID(), fUserInterface->ID()) != 0) {
-			TeamUISettings* clonedSettings = oldUISettings->Clone();
+	for (int32 i = 0; i < fTeamSettings.CountUiSettings(); i++) {
+		const TeamUiSettings* oldUiSettings = fTeamSettings.UiSettingAt(i);
+		if (strcmp(oldUiSettings->ID(), fUserInterface->ID()) != 0) {
+			TeamUiSettings* clonedSettings = oldUiSettings->Clone();
 			if (clonedSettings != NULL)
-				settings.AddUISettings(clonedSettings);
+				settings.AddUiSettings(clonedSettings);
 		}
 	}
 	locker.Unlock();

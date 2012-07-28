@@ -16,7 +16,7 @@
 
 #include "Architecture.h"
 #include "CpuState.h"
-#include "GUISettingsUtils.h"
+#include "GuiSettingsUtils.h"
 #include "Register.h"
 
 
@@ -233,7 +233,7 @@ RegistersView::LoadSettings(const BMessage& settings)
 {
 	BMessage tableSettings;
 	if (settings.FindMessage("registerTable", &tableSettings) == B_OK) {
-		GUISettingsUtils::UnarchiveTableSettings(tableSettings,
+		GuiSettingsUtils::UnarchiveTableSettings(tableSettings,
 			fRegisterTable);
 	}
 }
@@ -245,7 +245,7 @@ RegistersView::SaveSettings(BMessage& settings)
 	settings.MakeEmpty();
 
 	BMessage tableSettings;
-	status_t result = GUISettingsUtils::ArchiveTableSettings(tableSettings,
+	status_t result = GuiSettingsUtils::ArchiveTableSettings(tableSettings,
 		fRegisterTable);
 	if (result == B_OK)
 		result = settings.AddMessage("registerTable", &tableSettings);

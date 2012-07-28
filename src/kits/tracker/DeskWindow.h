@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef	_DESK_WINDOW_H
 #define _DESK_WINDOW_H
+
 
 #include <Shelf.h>
 #include <set>
@@ -41,28 +41,29 @@ All rights reserved.
 #include "ContainerWindow.h"
 #include "DesktopPoseView.h"
 
+
 class BPopUpMenu;
 
 namespace BPrivate {
 
 class BDeskWindow : public BContainerWindow {
 public:
-	BDeskWindow(LockingList<BWindow> *windowList);
+	BDeskWindow(LockingList<BWindow>* windowList);
 	virtual ~BDeskWindow();
 
-	virtual	void Init(const BMessage *message = NULL);
+	virtual	void Init(const BMessage* message = NULL);
 
 	virtual	void Show();
 	virtual	void Quit();
 	virtual	void ScreenChanged(BRect, color_space);
 
-	virtual	void CreatePoseView(Model *);
+	virtual	void CreatePoseView(Model*);
 
 	virtual	bool ShouldAddMenus() const;
 	virtual	bool ShouldAddScrollBars() const;
 	virtual	bool ShouldAddContainerView() const;
 
-	DesktopPoseView *PoseView() const;
+	DesktopPoseView* PoseView() const;
 
 	void UpdateDesktopBackgroundImages();
 		// Desktop window has special background image handling
@@ -70,17 +71,17 @@ public:
 	void SaveDesktopPoseLocations();
 	
 protected:
-	virtual	void AddWindowContextMenus(BMenu *);
-	virtual BPoseView *NewPoseView(Model *, BRect, uint32);
+	virtual	void AddWindowContextMenus(BMenu*);
+	virtual BPoseView* NewPoseView(Model*, BRect, uint32);
 
 	virtual void WorkspaceActivated(int32, bool);
 	virtual	void MenusBeginning();
-	virtual void MessageReceived(BMessage *);
+	virtual void MessageReceived(BMessage*);
 
 private:
-	BShelf *fDeskShelf;
+	BShelf* fDeskShelf;
 		// shelf for replicant support
-	BPopUpMenu *fTrashContextMenu;
+	BPopUpMenu* fTrashContextMenu;
 
 	BRect fOldFrame;
 	
@@ -95,10 +96,11 @@ private:
 	typedef BContainerWindow _inherited;
 };
 
-inline DesktopPoseView *
+
+inline DesktopPoseView*
 BDeskWindow::PoseView() const
 {
-	return dynamic_cast<DesktopPoseView *>(_inherited::PoseView());
+	return dynamic_cast<DesktopPoseView*>(_inherited::PoseView());
 }
 
 } // namespace BPrivate

@@ -90,7 +90,8 @@ class TBarView : public BView {
 
 		void SaveSettings();
 		void UpdatePlacement();
-		void ChangeState(int32 state, bool vertical, bool left, bool top);
+		void ChangeState(int32 state, bool vertical, bool left, bool top,
+			bool aSync = false);
 		void RaiseDeskbar(bool raise);
 		void HideDeskbar(bool hide);
 
@@ -165,6 +166,7 @@ class TBarView : public BView {
 		void SaveExpandedItems();
 		void RemoveExpandedItems();
 		void ExpandItems();
+		void _ChangeState(BMessage* message);
 
 		TBarMenuBar* fBarMenuBar;
 		TExpandoMenuBar* fExpando;
@@ -190,6 +192,7 @@ class TBarView : public BView {
 
 		TTeamMenuItem* fLastDragItem;
 		BList fExpandedItems;
+		BMessageFilter* fMouseFilter;
 };
 
 

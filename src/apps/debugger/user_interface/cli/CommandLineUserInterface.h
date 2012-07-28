@@ -10,6 +10,7 @@
 #include <ObjectList.h>
 #include <String.h>
 
+#include "CliContext.h"
 #include "UserInterface.h"
 
 
@@ -30,8 +31,8 @@ public:
 									// shut down the UI *now* -- no more user
 									// feedback
 
-	virtual status_t			LoadSettings(const TeamUISettings* settings);
-	virtual status_t			SaveSettings(TeamUISettings*& settings)	const;
+	virtual status_t			LoadSettings(const TeamUiSettings* settings);
+	virtual status_t			SaveSettings(TeamUiSettings*& settings)	const;
 
 	virtual	void				NotifyUser(const char* title,
 									const char* message,
@@ -50,11 +51,9 @@ private:
 			typedef BObjectList<CommandEntry> CommandList;
 
 			struct HelpCommand;
-			struct QuitCommand;
 
 			// GCC 2 support
 			friend struct HelpCommand;
-			friend struct QuitCommand;
 
 private:
 	static	status_t			_InputLoopEntry(void* data);
@@ -68,12 +67,11 @@ private:
 			void				_PrintHelp();
 
 private:
-			Team*				fTeam;
-			UserInterfaceListener* fListener;
+			CliContext			fContext;
 			CommandList			fCommands;
 			sem_id				fShowSemaphore;
 			bool				fShown;
-			bool				fTerminating;
+	volatile bool				fTerminating;
 };
 
 

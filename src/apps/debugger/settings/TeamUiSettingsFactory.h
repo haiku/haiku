@@ -10,15 +10,15 @@
 
 
 class BMessage;
-class TeamUISettings;
+class TeamUiSettings;
 
-class TeamUISettingsFactory {
+class TeamUiSettingsFactory {
 public:
-								TeamUISettingsFactory();
-								~TeamUISettingsFactory();
+								TeamUiSettingsFactory();
+								~TeamUiSettingsFactory();
 						
 	static	status_t			Create(const BMessage& archive,
-									TeamUISettings*& settings);
+									TeamUiSettings*& settings);
 };
 
 #endif // TEAM_UI_SETTINGS_FACTORY_H

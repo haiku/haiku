@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -102,7 +102,7 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 				type)) {
 				DIEType* baseType = type;
 				while ((modifiedType = dynamic_cast<DIEModifiedType*>(
-					baseType)) != NULL && modifiedType->GetType() != NULL) {
+					baseType)) != NULL) {
 					switch (modifiedType->Tag()) {
 						case DW_TAG_pointer_type:
 							modifier.Prepend("*");
@@ -122,7 +122,13 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 				type = baseType;
 			}
 
-			GetFullyQualifiedDIEName(type, paramName);
+			// if the parameter has no type associated,
+			// then it's the unspecified type.
+			if (type == NULL)
+				paramName = "void";
+			else
+				GetFullyQualifiedDIEName(type, paramName);
+
 			if (modifier.Length() > 0) {
 				if (modifier[modifier.Length() - 1] == ' ')
 					modifier.Truncate(modifier.Length() - 1);

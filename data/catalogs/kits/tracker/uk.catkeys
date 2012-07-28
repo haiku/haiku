@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2162044751
+1	ukrainian	x-vnd.Haiku-libtracker	2244772743
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
@@ -167,7 +167,6 @@ Edit favorites…	FilePanelPriv		Редагувати вибране…
 Create relative link	ContainerWindow		Створити відносне посилання
 Copy	ContainerWindow		Копіювати
 Size	PoseView		Розмір
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction теку home, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction домашню теку, клацніть \"%toConfirmAction\", утримуючи натиснутим Shift.
 Location	OpenWithWindow		Розташування
 Force identify	ContainerWindow		Ідентифікувати примусово
 Duplicate	ContainerWindow		Дублювати
@@ -191,7 +190,6 @@ New	DeskWindow		Новий
 Open	InfoWindow		Відкрити
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Замінити все
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Програма \"%appname\" не підтримує тип документу який ви хочете відкрити. Ви впевнені що хочете продовжити? Якщо ви знаєте що додаток підтримує тип документу, вам потрібно зконтактуватися з його розробниками  і запитати про обновлення списку документів що він  підтримує.
 Preparing to restore items…	StatusWindow		Підготовка до відновлення елементів…
 Replace other file	WidgetAttributeText		Замінити інший файл
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені до корзини. Можливо ви хочете видалити їх все одно? (Операція необоротна.)
@@ -216,7 +214,6 @@ Name	PoseView		Ім'я
 Group	FilePermissionsView		Група
 Version:	InfoWindow		Версія:
 Created:	InfoWindow		Створений:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction параметри MIME, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction параметри MIME, клацніть \"%toConfirmAction\".
 \nShould this be fixed?	FSUtils		\nЧи треба це виправити?
 Copying: 	StatusWindow		Копіювання:
 Capacity:	InfoWindow		Ємність:
@@ -275,7 +272,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Перейме�
 Paused: click to resume or stop	StatusWindow		Зупинено: натисніть щоб відновити або зупинити
 Preferred for %type	OpenWithWindow		 Бажаний для %type
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction теку common, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction спільну теку, клацніть \"%toConfirmAction\", утримуючи натиснутим Shift.
 There was an error deleting \"%name\":\n\t%error	FSUtils		Виникла помилка при видаленні \"%name\":\n\t%error
 Paste	FilePanelPriv		Вставити
 Copy more	ContainerWindow		Копіювати ще
@@ -402,7 +398,6 @@ Select…	FilePanelPriv		Вибрати…
 Don't move files to Trash	SettingsView		Не переміщайте файли до Кошика
 There was an error resolving the link.	Tracker		Виникла проблема відтворення посилання.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction  теку system або її вміст, ви не зможете завантажити %osName! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction системну теку або ї вміст, клацніть \"%toConfirmAction\", утримуючи натиснутим Shift.
 You can't move or copy the trash.	FSUtils		Ви не можете копіювати або переміщати Кошик.
 ends with	SelectionWindow		закінчити з
 Volume icons	TrackerSettingsWindow		Іконки томів
@@ -424,7 +419,6 @@ Modified	ContainerWindow		Змінений
 Edit Query template	FindPanel		Редагувати запит шаблону
 Prompt	FSUtils		Підказка
 Edit query	ContainerWindow		Редагувати запит
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction теку config, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction теку конфігурації, клацніть \"%toConfirmAction\".
 Find…	ContainerWindow		Знайти…
 Create a Query	FindPanel		Створити запит
 Move to Trash	FSUtils		Перемістити до Кошика
@@ -443,7 +437,6 @@ Mount	ContainerWindow		Підмонтувати
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used викор. -- %free вільно)
 Cancel	FSClipBoard		Відмінити
 Cut more	ContainerWindow		Вирізати ще
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction теку settings, %osName може працювати неправильно! Ви впевнені, що хочете це зробити? Щоб все одно %toDoAction теку параметрів, клацніть \"%toConfirmAction\".
 Deleting: 	StatusWindow		Видалення: 
 Empty Trash	InfoWindow		Очистити Кошик
 Add	FindPanel		Додати

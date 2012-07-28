@@ -18,6 +18,7 @@
 #include "ACM.h"
 #include "FTDI.h"
 #include "KLSI.h"
+#include "Option.h"
 #include "Prolific.h"
 #include "Silicon.h"
 
@@ -724,7 +725,7 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 		/ sizeof(kFTDIDevices[0]); i++) {
 		if (vendorID == kFTDIDevices[i].vendorID
 			&& productID == kFTDIDevices[i].productID) {
-			 return new(std::nothrow) FTDIDevice(device, vendorID, productID,
+			return new(std::nothrow) FTDIDevice(device, vendorID, productID,
 				kFTDIDevices[i].deviceName);
 		}
 	}
@@ -734,7 +735,7 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 		/ sizeof(kKLSIDevices[0]); i++) {
 		if (vendorID == kKLSIDevices[i].vendorID
 			&& productID == kKLSIDevices[i].productID) {
-			 return new(std::nothrow) KLSIDevice(device, vendorID, productID,
+			return new(std::nothrow) KLSIDevice(device, vendorID, productID,
 				kKLSIDevices[i].deviceName);
 		}
 	}
@@ -744,7 +745,7 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 		/ sizeof(kProlificDevices[0]); i++) {
 		if (vendorID == kProlificDevices[i].vendorID
 			&& productID == kProlificDevices[i].productID) {
-			 return new(std::nothrow) ProlificDevice(device, vendorID, productID,
+			return new(std::nothrow) ProlificDevice(device, vendorID, productID,
 				kProlificDevices[i].deviceName);
 		}
 	}
@@ -754,8 +755,18 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 		/ sizeof(kSiliconDevices[0]); i++) {
 		if (vendorID == kSiliconDevices[i].vendorID
 			&& productID == kSiliconDevices[i].productID) {
-			 return new(std::nothrow) SiliconDevice(device, vendorID, productID,
+			return new(std::nothrow) SiliconDevice(device, vendorID, productID,
 				kSiliconDevices[i].deviceName);
+		}
+	}
+
+	// Option Serial Device
+	for (uint32 i = 0; i < sizeof(kOptionDevices)
+		/ sizeof(kOptionDevices[0]); i++) {
+		if (vendorID == kOptionDevices[i].vendorID
+			&& productID == kOptionDevices[i].productID) {
+			return new(std::nothrow) OptionDevice(device, vendorID, productID,
+				kOptionDevices[i].deviceName);
 		}
 	}
 

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaConverter	3564609505
+1	russian	x-vnd.Haiku-MediaConverter	296071315
 Video using parameters form settings	MediaConverter		Видео использует параметры из настроек
 Video encoding:	MediaConverter		Кодирование видео:
 No audio	Audio codecs list		Без аудио
@@ -21,6 +21,7 @@ Low	MediaConverter		Низкое
 Conversion completed	MediaConverter		Конвертация завершена
 Audio:	MediaConverter-FileInfo		Аудио:
 OK	MediaConverter-FileInfo		ОК
+ seconds	MediaFileInfo		 секунд
 Source files	MediaConverter		Исходящие файлы
 Cancelling	MediaConverter		Отменяется
 %d byte 	MediaFileInfo		%d байт

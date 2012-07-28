@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	3968420507
+1	slovak	x-vnd.Haiku-libtracker	4051148499
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -170,7 +170,6 @@ Edit favorites…	FilePanelPriv		Upraviť obľúbené…
 Create relative link	ContainerWindow		Vytvoriť relatívny odkaz
 Copy	ContainerWindow		Kopírovať
 Size	PoseView		Veľkosť
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction domovský priečinok, %osName sa nemusí správať korektne! Ste si istý, že to chcete? Ak chcete napriek tomu %toDoAction domovský priečinok, podržte kláves Shift a kliknite na „%toConfirmAction“.
 Location	OpenWithWindow		Umiestnenie
 Force identify	ContainerWindow		Vynútiť identifikáciu
 Duplicate	ContainerWindow		Duplikovať
@@ -194,7 +193,6 @@ New	DeskWindow		Nový
 Open	InfoWindow		Otvoriť
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Nahradiť všetky
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Aplikácia „%appname“ nepodporuje typ dokumentu, ktorý sa pokúšate otvoriť. Ste si istý, že chcete pokračovať? Ak viete, že aplikácia tento typ dokumentu podporuje, mali by ste kontaktovať dodávateľa aplikácie a požiadať ho, aby aktualizoval aplikáciu, aby uvádzala tento typ dokumentu ako podporovaný.
 Preparing to restore items…	StatusWindow		Prebieha príprava na obnovenie položiek…
 Replace other file	WidgetAttributeText		Nahradiť iný súbor
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Niektoré z vybraných položiek nemožno presunúť do Koša. Chcete ich namiesto toho zmazať? (Túto operáciu nemožno vrátiť.)
@@ -219,7 +217,6 @@ Name	PoseView		Názov
 Group	FilePermissionsView		Skupina
 Version:	InfoWindow		Verzia:
 Created:	InfoWindow		Vytvorené:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction nastavenia MIME, %osName sa nemusí správať korektne! Ste si istý, že to chcete? Ak chcete napriek tomu %toDoAction nastavenia MIME, kliknite na „%toConfirmAction“.
 \nShould this be fixed?	FSUtils		\nMalo by sa to opraviť?
 Copying: 	StatusWindow		Kopíruje sa: 
 Capacity:	InfoWindow		Kapacita:
@@ -279,7 +276,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Premenovať
 Paused: click to resume or stop	StatusWindow		Pozastavené: kliknutím môžete pokračovať alebo zastaviť
 Preferred for %type	OpenWithWindow		Preferovaná pre %type
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction spoločný priečinok, %osName sa nemusí správať korektne! Ste si istý, že to chcete? Ak chcete napriek tomu %toDoAction spoločný priečinok, podržte kláves Shift a kliknite na „%toConfirmAction“.
 There was an error deleting \"%name\":\n\t%error	FSUtils		Vyskytla sa chyba pri mazaní „%name“:\n\t%error
 Paste	FilePanelPriv		Vložiť
 Copy more	ContainerWindow		Kopírovať viac
@@ -406,7 +402,6 @@ Select…	FilePanelPriv		Vybrať…
 Don't move files to Trash	SettingsView		Nepresúvať súbory do Koša
 There was an error resolving the link.	Tracker		Vyskytla sa chyba pri preklade odkazu.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction systémový priečinok, %osName sa nemusí správať korektne! Ste si istý, že to chcete? Ak chcete napriek tomu %toDoAction systémový priečinok alebo jeho obsah, podržte kláves Shift a kliknite na „%toConfirmAction“.
 You can't move or copy the trash.	FSUtils		Nemôžete presunúť alebo skopírovať Kôš.
 ends with	SelectionWindow		končí
 Volume icons	TrackerSettingsWindow		Ikony zväzkov
@@ -428,7 +423,6 @@ Modified	ContainerWindow		Zmenené
 Edit Query template	FindPanel		Upraviť šablónu Požiadavky
 Prompt	FSUtils		Výzva
 Edit query	ContainerWindow		Upraviť Požiadavku
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction konfiguračný priečinok, %osName sa nemusí správať korektne! Ste si istý, že to chcete? Ak chcete napriek tomu %toDoAction konfiguračný priečinok, kliknite na „%toConfirmAction“.
 Find…	ContainerWindow		Nájsť…
 Create a Query	FindPanel		Vytvoriť Požiadavku
 Move to Trash	FSUtils		Presunúť do Koša
@@ -447,7 +441,6 @@ Mount	ContainerWindow		Pripojiť
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used využité -- %free voľné)
 Cancel	FSClipBoard		Zrušiť
 Cut more	ContainerWindow		Vystrihnúť viac
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction priečinok nastavení, %osName sa nemusí správať korektne! Ste si istý, že to chcete? Ak chcete napriek tomu %toDoAction priečinok nastavení, kliknite na „%toConfirmAction“.
 Deleting: 	StatusWindow		Maže sa: 
 Empty Trash	InfoWindow		Vyprázdniť Kôš
 Add	FindPanel		Pridať

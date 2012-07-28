@@ -4,14 +4,14 @@
  */
 
 
-#include "TeamUISettings.h"
+#include "TeamUiSettings.h"
 
 
-TeamUISettings::TeamUISettings()
+TeamUiSettings::TeamUiSettings()
 {
 }
 
 
-TeamUISettings::~TeamUISettings()
+TeamUiSettings::~TeamUiSettings()
 {
 }

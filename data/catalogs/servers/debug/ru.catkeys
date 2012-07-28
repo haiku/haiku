@@ -1,0 +1,4 @@
+1	russian	x-vnd.Haiku-debug_server	1035915338
+OK	DebugServer		ОК
+Debug	DebugServer		Отладить
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Программа:\n\n      %app\n\nобнаружила ошибку, которая мешает продолжению её работы. Haiku завершит эту программу и немного приберется за ней.

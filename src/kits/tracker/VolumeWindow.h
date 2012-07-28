@@ -31,24 +31,28 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-#ifndef	_VOLUME_WINDOW_H
+#ifndef _VOLUME_WINDOW_H
 #define _VOLUME_WINDOW_H
 
+
+// The volume window displays the virtual file system root with
+// all mounted volumes. Does not show up unless the corresponding Tracker
+// setting is enabled
+
+
 #include "ContainerWindow.h"
+
 
 namespace BPrivate {
 
 class BVolumeWindow : public BContainerWindow {
-	// The volume window displays the virtual file system root with
-	// all mounted volumes. Does not show up unless the corresponding Tracker
-	// setting is enabled
 	public:
-		BVolumeWindow(LockingList<BWindow> *windowList, uint32 containerWindowFlags);
+		BVolumeWindow(LockingList<BWindow>* windowList,
+			uint32 containerWindowFlags);
 
 	protected:
-		virtual	void AddFileMenu(BMenu *menu);
-		virtual	void AddWindowContextMenus(BMenu *);
+		virtual void AddFileMenu(BMenu* menu);
+		virtual void AddWindowContextMenus(BMenu*);
 
 		virtual void MenusBeginning();
 
@@ -60,4 +64,4 @@ class BVolumeWindow : public BContainerWindow {
 
 using namespace BPrivate;
 
-#endif
+#endif	// _VOLUME_WINDOW_H

@@ -1,9 +1,11 @@
-1	japanese	x-vnd.Be-TSKB	359782181
+1	japanese	x-vnd.Be-TSKB	3197510812
 Power off	DeskbarMenu		電源を切る
 Show day of week	PreferencesWindow		曜日を表示する
 Edit menu…	PreferencesWindow		メニューの編集…
+Suspend	DeskbarMenu		サスペンド
 Applications	PreferencesWindow		アプリケーション
 Time preferences…	TimeView		日付と時刻の設定…
+About Haiku	DeskbarMenu		Haiku について
 Recent documents:	PreferencesWindow		最近使ったドキュメント
 Recent applications	DeskbarMenu		最近使ったアプリケーション
 Sort running applications	PreferencesWindow		実行中のアプリケーションを名前順に並び換える
