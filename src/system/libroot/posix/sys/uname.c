@@ -41,7 +41,7 @@ uname(struct utsname *info)
 	strlcat(info->version, systemInfo.kernel_build_date, sizeof(info->version));
 	strlcat(info->version, " ", sizeof(info->version));
 	strlcat(info->version, systemInfo.kernel_build_time, sizeof(info->version));
-	snprintf(info->release, sizeof(info->release), "%lld",
+	snprintf(info->release, sizeof(info->release), "%" B_PRId64,
 		systemInfo.kernel_version);
 
 	// TODO: make this better

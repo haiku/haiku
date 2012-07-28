@@ -95,7 +95,7 @@ message_to_console(syslog_context *context, const char *text, va_list args)
 	if (context->ident[0])
 		fprintf(stderr, "'%s' ", context->ident);
 	if (context->options & LOG_PID)
-		fprintf(stderr, "[%ld] ", find_thread(NULL));
+		fprintf(stderr, "[%" B_PRId32 "] ", find_thread(NULL));
 
 	vfprintf(stderr, text, args);
 	fputc('\n', stderr);

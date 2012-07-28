@@ -76,8 +76,9 @@ init_after_fork(void)
 	sHeapArea = area_for((void*)sFreeHeapBase);
 	if (sHeapArea < 0) {
 		// Where is it gone?
-		debug_printf("hoard: init_after_fork(): thread %ld, Heap area not "
-			"found! Base address: %p\n", find_thread(NULL), sHeapBase);
+		debug_printf("hoard: init_after_fork(): thread %" B_PRId32 ", Heap "
+			"area not found! Base address: %p\n", find_thread(NULL),
+			sHeapBase);
 		exit(1);
 	}
 }
