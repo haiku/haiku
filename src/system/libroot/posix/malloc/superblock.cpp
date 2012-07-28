@@ -67,7 +67,7 @@ superblock::superblock(int numBlocks,	// The number of blocks in the sb.
 	// and insert the block pointers into the linked list.
 	for (int i = 0; i < _numBlocks; i++) {
 		// Make sure the block is on a double-word boundary.
-		assert(((unsigned int)b & hoardHeap::ALIGNMENT_MASK) == 0);
+		assert(((unsigned long)b & hoardHeap::ALIGNMENT_MASK) == 0);
 		new(b) block(this);
 		assert(b->getSuperblock() == this);
 		b->setNext(_freeList);

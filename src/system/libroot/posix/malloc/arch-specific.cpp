@@ -179,7 +179,7 @@ hoardSbrk(long size)
 
 		if (chunk->size > (size_t)size + sizeof(free_chunk)) {
 			// divide this chunk into smaller bits
-			uint32 newSize = chunk->size - size;
+			size_t newSize = chunk->size - size;
 			free_chunk *next = chunk->next;
 
 			chunk = (free_chunk *)((addr_t)chunk + size);
