@@ -23,8 +23,16 @@
 #include "runtime_loader_private.h"
 
 
-#define RLD_PROGRAM_BASE 0x00200000
-	/* keep in sync with app ldscript */
+// keep in sync with app ldscript
+#ifdef __x86_64__
+	// runtime_loader potentially occupies 0x200000 - 0x600000 due to large
+	// page segment alignment.
+#	define RLD_PROGRAM_BASE	0x600000
+#	define MAX_PAGE_SIZE	0x200000
+#else
+#	define RLD_PROGRAM_BASE	0x200000
+#	define MAX_PAGE_SIZE	B_PAGE_SIZE
+#endif
 
 
 bool gInvalidImageIDs;
@@ -319,7 +327,7 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 
 	// Check whether the segments have an unreasonable amount of unused space
 	// inbetween.
-	if (reservedSize > length + 8 * 1024)
+	if (reservedSize > length + MAX_PAGE_SIZE * 2)
 		return B_BAD_DATA;
 
 	// reserve that space and allocate the areas from that one

@@ -19,7 +19,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 	IDE_ONLY = "" ;
 }
 
-SYSTEM_BIN = ;
+SYSTEM_BIN = bash ;
 
 SYSTEM_APPS = ;
 
@@ -27,7 +27,7 @@ SYSTEM_PREFERENCES = ;
 
 SYSTEM_DEMOS = ;
 
-SYSTEM_LIBS = ;
+SYSTEM_LIBS = libroot.so ;
 
 PRIVATE_SYSTEM_LIBS = ;
 
@@ -74,13 +74,13 @@ AddLibrariesToHaikuHybridImage system lib
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
 
 # apps
-#AddFilesToHaikuImage system				: runtime_loader ;
+AddFilesToHaikuImage system				: runtime_loader ;
 AddFilesToHaikuImage system bin			: $(SYSTEM_BIN) ;
 AddFilesToHaikuImage system apps		: $(SYSTEM_APPS) ;
 AddFilesToHaikuImage system preferences	: $(SYSTEM_PREFERENCES) ;
 AddFilesToHaikuImage system demos		: $(SYSTEM_DEMOS) ;
 
-#AddSymlinkToHaikuImage system bin : bash : sh ;
+AddSymlinkToHaikuImage system bin : bash : sh ;
 #AddSymlinkToHaikuImage system bin : less : more ;
 #AddSymlinkToHaikuImage system bin : gzip : gunzip ;
 #AddSymlinkToHaikuImage system bin : gzip : zcat ;
