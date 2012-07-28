@@ -46,8 +46,9 @@ Settings* settings = NULL;
 
 // generic setting handler classes
 
-StringValueSetting::StringValueSetting(const char* name, const char* defaultValue,
-	const char* valueExpectedErrorString, const char* wrongValueErrorString)
+StringValueSetting::StringValueSetting(const char* name,
+	const char* defaultValue, const char* valueExpectedErrorString,
+	const char* wrongValueErrorString)
 	:	SettingsArgvDispatcher(name),
 		fDefaultValue(defaultValue),
 		fValueExpectedErrorString(valueExpectedErrorString),
@@ -240,9 +241,9 @@ ScalarValueSetting::NeedsSaving() const
 //	#pragma mark -
 
 
-HexScalarValueSetting::HexScalarValueSetting(const char* name, int32 defaultValue,
-	const char* valueExpectedErrorString, const char* wrongValueErrorString,
-	int32 min, int32 max)
+HexScalarValueSetting::HexScalarValueSetting(const char* name,
+	int32 defaultValue, const char* valueExpectedErrorString,
+	const char* wrongValueErrorString, int32 min, int32 max)
 		:	ScalarValueSetting(name, defaultValue, valueExpectedErrorString,
 					wrongValueErrorString, min, max)
 {

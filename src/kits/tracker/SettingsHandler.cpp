@@ -188,7 +188,8 @@ ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 			// handle new line
 			fEatComment = false;
 			if (!fSawBackslash && (fInDoubleQuote || fInSingleQuote)) {
-				printf("File %s ; Line %ld # unterminated quote\n", name, fLineNo);
+				printf("File %s ; Line %ld # unterminated quote\n", name,
+					fLineNo);
 				result = B_ERROR;
 				break;
 			}
@@ -211,7 +212,8 @@ ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 		if (!fSawBackslash) {
 			if (!fInDoubleQuote && !fInSingleQuote) {
 				if (ch == ';') {
-					// semicolon is a command separator, pass on the whole argv
+					// semicolon is a command separator, pass on
+					// the whole argv
 					result = SendArgv(argvHandlerFunc, passThru);
 					if (result != B_OK)
 						break;
@@ -259,7 +261,8 @@ SettingsArgvDispatcher::SettingsArgvDispatcher(const char* name)
 
 
 void
-SettingsArgvDispatcher::SaveSettings(Settings* settings, bool onlyIfNonDefault)
+SettingsArgvDispatcher::SaveSettings(Settings* settings,
+	bool onlyIfNonDefault)
 {
 	if (!onlyIfNonDefault || NeedsSaving()) {
 		settings->Write("%s ", Name());
@@ -270,8 +273,8 @@ SettingsArgvDispatcher::SaveSettings(Settings* settings, bool onlyIfNonDefault)
 
 
 bool
-SettingsArgvDispatcher::HandleRectValue(BRect &result, const char* const* argv,
-	bool printError)
+SettingsArgvDispatcher::HandleRectValue(BRect &result,
+	const char* const* argv, bool printError)
 {
 	if (!*argv) {
 		if (printError)
@@ -340,7 +343,7 @@ Settings::ParseUserSettings(int, const char* const* argv, void* castToThis)
 {
 	if (!*argv)
 		return 0;
-	
+
 	SettingsArgvDispatcher* handler = ((Settings*)castToThis)->Find(*argv);
 	if (!handler)
 		return "unknown command";

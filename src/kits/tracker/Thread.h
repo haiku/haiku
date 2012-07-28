@@ -95,9 +95,11 @@ private:
 
 // would use SingleParamFunctionObjectWithResult, except mwcc won't handle this
 template <class Param1>
-class SingleParamFunctionObjectWorkaround : public FunctionObjectWithResult<status_t> {
+class SingleParamFunctionObjectWorkaround : public
+	FunctionObjectWithResult<status_t> {
 public:
-	SingleParamFunctionObjectWorkaround(status_t (*function)(Param1), Param1 param1)
+	SingleParamFunctionObjectWorkaround(
+		status_t (*function)(Param1), Param1 param1)
 		:	fFunction(function),
 			fParam1(param1)
 		{
@@ -115,7 +117,8 @@ private:
 };
 
 template <class T>
-class SimpleMemberFunctionObjectWorkaround : public FunctionObjectWithResult<status_t> {
+class SimpleMemberFunctionObjectWorkaround : public
+	FunctionObjectWithResult<status_t> {
 public:
 	SimpleMemberFunctionObjectWorkaround(status_t (T::*function)(), T* onThis)
 		:	fFunction(function),
@@ -135,7 +138,8 @@ private:
 
 
 template <class Param1, class Param2>
-class TwoParamFunctionObjectWorkaround : public FunctionObjectWithResult<status_t>  {
+class TwoParamFunctionObjectWorkaround : public
+	FunctionObjectWithResult<status_t>  {
 public:
 	TwoParamFunctionObjectWorkaround(status_t (*callThis)(Param1, Param2),
 		Param1 param1, Param2 param2)
@@ -158,9 +162,11 @@ private:
 
 
 template <class Param1, class Param2, class Param3>
-class ThreeParamFunctionObjectWorkaround : public FunctionObjectWithResult<status_t>  {
+class ThreeParamFunctionObjectWorkaround : public
+	FunctionObjectWithResult<status_t>  {
 public:
-	ThreeParamFunctionObjectWorkaround(status_t (*callThis)(Param1, Param2, Param3),
+	ThreeParamFunctionObjectWorkaround(
+		status_t (*callThis)(Param1, Param2, Param3),
 		Param1 param1, Param2 param2, Param3 param3)
 		:	function(callThis),
 			fParam1(param1),
@@ -183,9 +189,11 @@ private:
 
 
 template <class Param1, class Param2, class Param3, class Param4>
-class FourParamFunctionObjectWorkaround : public FunctionObjectWithResult<status_t>  {
+class FourParamFunctionObjectWorkaround : public
+	FunctionObjectWithResult<status_t>  {
 public:
-	FourParamFunctionObjectWorkaround(status_t (*callThis)(Param1, Param2, Param3, Param4),
+	FourParamFunctionObjectWorkaround(
+		status_t (*callThis)(Param1, Param2, Param3, Param4),
 		Param1 param1, Param2 param2, Param3 param3, Param4 param4)
 		:	function(callThis),
 			fParam1(param1),
@@ -267,7 +275,8 @@ template<class View>
 class MouseDownThread {
 public:
 	static void TrackMouse(View* view, void (View::*)(BPoint),
-		void (View::*)(BPoint, uint32) = 0, bigtime_t pressingPeriod = 100000);
+		void (View::*)(BPoint, uint32) = 0,
+		bigtime_t pressingPeriod = 100000);
 
 protected:
 	MouseDownThread(View* view, void (View::*)(BPoint),

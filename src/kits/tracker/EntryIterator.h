@@ -102,8 +102,8 @@ public:
 	//
 	// each chunk of iterators in the cache are then returned in an order,
 	// sorted by their i-node number -- this turns out to give quite a bit
-	// better performance over just using the order in which they show up using
-	// the default BEntryList iterator subclass
+	// better performance over just using the order in which they show up
+	// using the default BEntryList iterator subclass
 
 	CachedEntryIterator(BEntryList* iterator, int32 numEntries,
 		bool sortInodes = false);

@@ -261,7 +261,8 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		oldPoseList->AddList(fPoseList);
 	}
 
-	fQueryListContainer = new QueryEntryListCollection(&sourceModel, this, oldPoseList);
+	fQueryListContainer = new QueryEntryListCollection(&sourceModel, this,
+		oldPoseList);
 	fCreateOldPoseList = false;
 	
 	if (fQueryListContainer->InitCheck() != B_OK) {
@@ -298,8 +299,8 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		timeData.tm_min = 0;
 		nextHour = mktime(&timeData);
 
-		PRINT(("%ld minutes, %ld seconds till next hour\n", (nextHour - now) / 60,
-			(nextHour - now) % 60));
+		PRINT(("%ld minutes, %ld seconds till next hour\n",
+			(nextHour - now) / 60, (nextHour - now) % 60));
 
 		time_t nextMinute = now + 60;
 			// move ahead by a minute
@@ -342,7 +343,8 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 		ASSERT(tracker);
 		tracker->MainTaskLoop()->RunLater(
-			NewLockingMemberFunctionObject(&BQueryPoseView::Refresh, this), delta);
+			NewLockingMemberFunctionObject(&BQueryPoseView::Refresh, this),
+			delta);
 	}
 	
 	return fQueryListContainer->Clone();
@@ -365,14 +367,19 @@ BQueryPoseView::SearchForType() const
 		attr_info attrInfo;
 
 		// read the type of files we are looking for
-		status_t status = TargetModel()->Node()->GetAttrInfo(kAttrQueryInitialMime, &attrInfo);
-		if (status == B_OK)
-			TargetModel()->Node()->ReadAttrString(kAttrQueryInitialMime, &buffer);
+		status_t status
+			= TargetModel()->Node()->GetAttrInfo(kAttrQueryInitialMime,
+				&attrInfo);
+		if (status == B_OK) {
+			TargetModel()->Node()->ReadAttrString(kAttrQueryInitialMime,
+				&buffer);
+		}
 
 		if (buffer.Length()) {
 			TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 			if (tracker) {
-				const ShortMimeInfo* info = tracker->MimeTypes()->FindMimeType(buffer.String());
+				const ShortMimeInfo* info
+					= tracker->MimeTypes()->FindMimeType(buffer.String());
 				if (info)
 					fSearchForMimeType = info->InternalName();
 			}
@@ -401,8 +408,8 @@ BQueryPoseView::ActiveOnDevice(dev_t device) const
 //	#pragma mark -
 
 
-QueryEntryListCollection::QueryEntryListCollection(Model* model, BHandler* target,
-	PoseList* oldPoseList)
+QueryEntryListCollection::QueryEntryListCollection(Model* model,
+	BHandler* target, PoseList* oldPoseList)
 	:	fQueryListRep(new QueryListRep(new BObjectList<BQuery>(5, true)))
 {
 	Rewind();
@@ -421,7 +428,8 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model, BHandler* targe
 
 	BString buffer;
 	if (model->Node()->ReadAttr(kAttrQueryString, B_STRING_TYPE, 0,
-		buffer.LockBuffer((int32)info.size), (size_t)info.size) != info.size) {
+		buffer.LockBuffer((int32)info.size),
+			(size_t)info.size) != info.size) {
 		fStatus = B_ERROR;
 		return;
 	}
@@ -430,9 +438,10 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model, BHandler* targe
 
 	// read the extra options
 	MoreOptionsStruct saveMoreOptions;
-	if (ReadAttr(model->Node(), kAttrQueryMoreOptions, kAttrQueryMoreOptionsForeign,
-		B_RAW_TYPE, 0, &saveMoreOptions, sizeof(MoreOptionsStruct),
-		&MoreOptionsStruct::EndianSwap) != kReadAttrFailed) {
+	if (ReadAttr(model->Node(), kAttrQueryMoreOptions,
+			kAttrQueryMoreOptionsForeign, B_RAW_TYPE, 0, &saveMoreOptions,
+			sizeof(MoreOptionsStruct),
+			&MoreOptionsStruct::EndianSwap) != kReadAttrFailed) {
 		fQueryListRep->fShowResultsFromTrash = saveMoreOptions.searchTrash;
 	}
 
@@ -445,7 +454,8 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model, BHandler* targe
 	fQueryListRep->fRefreshEveryMinute = false;
 
 	if (model->Node()->ReadAttr(kAttrDynamicDateQuery, B_BOOL_TYPE, 0,
-			&fQueryListRep->fDynamicDateQuery, sizeof(bool)) != sizeof(bool)) {
+			&fQueryListRep->fDynamicDateQuery,
+			sizeof(bool)) != sizeof(bool)) {
 		fQueryListRep->fDynamicDateQuery = false;
 	}
 
@@ -473,15 +483,16 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model, BHandler* targe
 		char* buffer = NULL;
 
 		if ((buffer = (char*)malloc((size_t)info.size)) != NULL
-			&& model->Node()->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0, buffer,
-				(size_t)info.size) == info.size) {
+			&& model->Node()->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0,
+				buffer, (size_t)info.size) == info.size) {
 
 			BMessage message;
 			if (message.Unflatten(buffer) == B_OK) {
 				for (int32 index = 0; ;index++) {
 					ASSERT(index < 100);
 					BVolume volume;
-						// match a volume with the info embedded in the message
+						// match a volume with the info embedded in
+						// the message
 					result = MatchArchivedVolume(&volume, &message, index);
 					if (result == B_OK) {
 						// start the query on this volume
@@ -492,8 +503,8 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model, BHandler* targe
 
 						searchAllVolumes = false;
 					} else if (result != B_DEV_BAD_DRIVE_NUM) {
-						// if B_DEV_BAD_DRIVE_NUM, the volume just isn't mounted this
-						// time around, keep looking for more
+						// if B_DEV_BAD_DRIVE_NUM, the volume just isn't
+						// mounted this time around, keep looking for more
 						// if other error, bail
 						break;
 					}
@@ -594,8 +605,9 @@ QueryEntryListCollection::GetNextEntry(BEntry* entry, bool traverse)
 	for (int32 count = fQueryListRep->fQueryList->CountItems();
 		fQueryListRep->fQueryListIndex < count;
 		fQueryListRep->fQueryListIndex++) {
-		result = fQueryListRep->fQueryList->ItemAt(fQueryListRep->fQueryListIndex)
-			->GetNextEntry(entry, traverse);
+		result = fQueryListRep->fQueryList->
+			ItemAt(fQueryListRep->fQueryListIndex)
+				->GetNextEntry(entry, traverse);
 		if (result == B_OK)
 			break;
 	}
@@ -613,8 +625,9 @@ QueryEntryListCollection::GetNextDirents(struct dirent* buffer, size_t length,
 		fQueryListRep->fQueryListIndex < queryCount;
 		fQueryListRep->fQueryListIndex++) {
 
-		result = fQueryListRep->fQueryList->ItemAt(fQueryListRep->fQueryListIndex)
-			->GetNextDirents(buffer, length, count);
+		result = fQueryListRep->fQueryList->
+			ItemAt(fQueryListRep->fQueryListIndex)->GetNextDirents(buffer,
+				length, count);
 		if (result > 0)
 			break;
 	}
@@ -631,8 +644,8 @@ QueryEntryListCollection::GetNextRef(entry_ref* ref)
 		fQueryListRep->fQueryListIndex < count;
 		fQueryListRep->fQueryListIndex++) {
 
-		result = fQueryListRep->fQueryList->ItemAt(fQueryListRep->fQueryListIndex)
-			->GetNextRef(ref);
+		result = fQueryListRep->fQueryList->
+			ItemAt(fQueryListRep->fQueryListIndex)->GetNextRef(ref);
 		if (result == B_OK)
 			break;
 	}

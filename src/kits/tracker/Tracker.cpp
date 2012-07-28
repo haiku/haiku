@@ -160,8 +160,8 @@ InitIconPreloader()
 	if (IconCache::sIconCache != NULL)
 		return;
 
-	// only start the node preloader if its Tracker or the Deskbar itself - don't
-	// start it for file panels
+	// only start the node preloader if its Tracker or the Deskbar itself,
+	// don't start it for file panels
 
 	bool preload = dynamic_cast<TTracker*>(be_app) != NULL;
 	if (!preload) {
@@ -171,8 +171,11 @@ InitIconPreloader()
 			&& !strcmp(info.signature, kDeskbarSignature))
 			preload = true;
 	}
-	if (preload)
-		gPreloader = NodePreloader::InstallNodePreloader("NodePreloader", be_app);
+
+	if (preload) {
+		gPreloader = NodePreloader::InstallNodePreloader("NodePreloader",
+			be_app);
+	}
 
 	IconCache::sIconCache = new IconCache();
 
@@ -245,7 +248,8 @@ TTracker::TTracker()
 	SetMallocLeakChecking(true);
 #endif
 
-	//This is how often it should update the free space bar on the volume icons
+	// This is how often it should update the free space bar on the
+	// volume icons
 	SetPulseRate(1000000);
 
 	gLaunchLooper = new LaunchLooper();
@@ -302,25 +306,33 @@ TTracker::QuitRequested()
 					BEntry entry;
 					BPath path;
 					const entry_ref* ref = window->TargetModel()->EntryRef();
-					if (entry.SetTo(ref) == B_OK && entry.GetPath(&path) == B_OK) {
-						int8 flags = window->IsMinimized() ? kOpenWindowMinimized : kOpenWindowNoFlags;
-						uint32 deviceFlags = GetVolumeFlags(window->TargetModel());
+					if (entry.SetTo(ref) == B_OK
+						&& entry.GetPath(&path) == B_OK) {
+						int8 flags = window->IsMinimized()
+							? kOpenWindowMinimized : kOpenWindowNoFlags;
+						uint32 deviceFlags
+							= GetVolumeFlags(window->TargetModel());
 
 						// save state for every window which is
 						//	a) already open on another workspace
 						//	b) on a volume not capable of writing attributes
 						if (window != FindContainerWindow(ref)
-							|| (deviceFlags & (B_FS_HAS_ATTR | B_FS_IS_READONLY)) != B_FS_HAS_ATTR) {
+							|| (deviceFlags
+								& (B_FS_HAS_ATTR | B_FS_IS_READONLY))
+									!= B_FS_HAS_ATTR) {
 							BMessage stateMessage;
 							window->SaveState(stateMessage);
 							window->SetSaveStateEnabled(false);
-								// This is to prevent its state to be saved to the node when closed.
+								// This is to prevent its state to be saved
+								// to the node when closed.
 							message.AddMessage("window state", &stateMessage);
 							flags |= kOpenWindowHasState;
 						}
 						const char* target;
 						bool pathAlreadyExists = false;
-						for (int32 index = 0;message.FindString("paths", index, &target) == B_OK;index++) {
+						for (int32 index = 0;
+								message.FindString("paths", index, &target)
+									== B_OK; index++) {
 							if (!strcmp(target,path.Path())) {
 								pathAlreadyExists = true;
 								break;
@@ -345,7 +357,8 @@ TTracker::QuitRequested()
 			size_t size = (size_t)message.FlattenedSize();
 			char* buffer = new char[size];
 			message.Flatten(buffer, (ssize_t)size);
-			deskDir.WriteAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer, size);
+			deskDir.WriteAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer,
+				size);
 			delete [] buffer;
 		} else
 			deskDir.RemoveAttr(kAttrOpenWindows);
@@ -446,8 +459,8 @@ TTracker::MessageReceived(BMessage* message)
 			// Someone (probably the deskbar) has requested a list of
 			// mountable volumes.
 			BMessage reply;
-			AutoMounterLoop()->EachMountableItemAndFloppy(&AddMountableItemToMessage,
-			  &reply);
+			AutoMounterLoop()->EachMountableItemAndFloppy(
+				&AddMountableItemToMessage, &reply);
 			message->SendReply(&reply);
 			break;
 		}
@@ -550,7 +563,8 @@ TTracker::SetDefaultPrinter(const BMessage* message)
 	if (count <= 0)
 		return;
 
-	//	will make the first item the default printer, disregards any other files
+	// will make the first item the default printer, disregards any
+	// other files
 	entry_ref ref;
 	ASSERT(message->FindRef("refs", 0, &ref) == B_OK);
 	if (message->FindRef("refs", 0, &ref) != B_OK)
@@ -610,10 +624,12 @@ TTracker::MoveRefsToTrash(const BMessage* message)
 
 
 template <class T, class FT>
-class EntryAndNodeDoSoonWithMessageFunctor : public FunctionObjectWithResult<bool> {
+class EntryAndNodeDoSoonWithMessageFunctor : public
+	FunctionObjectWithResult<bool> {
 public:
-	EntryAndNodeDoSoonWithMessageFunctor(FT func, T* target, const entry_ref* child,
-		const node_ref* parent, const BMessage* message)
+	EntryAndNodeDoSoonWithMessageFunctor(FT func, T* target,
+		const entry_ref* child, const node_ref* parent,
+		const BMessage* message)
 		:	fFunc(func),
 			fTarget(target),
 			fNode(*parent),
@@ -625,8 +641,10 @@ public:
 		}
 
 	virtual ~EntryAndNodeDoSoonWithMessageFunctor() {}
-	virtual void operator()()
-		{ result = (fTarget->*fFunc)(&fEntry, &fNode, fSendMessage ? &fMessage : NULL); }
+	virtual void operator()() {
+		result = (fTarget->*fFunc)(&fEntry, &fNode,
+			fSendMessage ? &fMessage : NULL);
+	}
 
 protected:
 	FT fFunc;
@@ -651,8 +669,8 @@ TTracker::LaunchAndCloseParentIfOK(const entry_ref* launchThis,
 	// synchronous launch, we are already in our own thread
 	if (TrackerLaunch(&refsReceived, false) == B_OK) {
 		// if launched fine, close parent window in a bit
-		fTaskLoop->RunLater(NewMemberFunctionObject(&TTracker::CloseParent, this, *closeThis),
-			1000000);
+		fTaskLoop->RunLater(NewMemberFunctionObject(&TTracker::CloseParent,
+			this, *closeThis), 1000000);
 	}
 	return false;
 }
@@ -674,15 +692,18 @@ TTracker::OpenRef(const entry_ref* ref, const node_ref* nodeToClose,
 		model = new Model(ref, false);
 		if (model->IsSymLink() && !model->LinkTo()) {
 			model->GetPreferredAppForBrokenSymLink(brokenLinkPreferredApp);
-			if (brokenLinkPreferredApp.Length() && brokenLinkPreferredApp != kTrackerSignature)
+			if (brokenLinkPreferredApp.Length()
+				&& brokenLinkPreferredApp != kTrackerSignature) {
 				brokenLinkWithSpecificHandler = true;
+			}
 		}
 
 		if (!brokenLinkWithSpecificHandler) {
 			delete model;
 			BAlert* alert = new BAlert("",
 				B_TRANSLATE("There was an error resolving the link."),
-				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
+					B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->Go();
 			return result;
@@ -715,7 +736,8 @@ TTracker::OpenRef(const entry_ref* ref, const node_ref* nodeToClose,
 
 	if (openAsContainer || selector == kRunOpenWithWindow) {
 		// special case opening plain folders, queries or using open with
-		OpenContainerWindow(model, 0, selector, kRestoreDecor);	// window adopts model
+		OpenContainerWindow(model, 0, selector, kRestoreDecor);
+			// window adopts model
 		if (nodeToClose)
 			CloseParentWaitingForChildSoon(ref, nodeToClose);
 	} else if (model->IsQueryTemplate()) {
@@ -742,8 +764,9 @@ TTracker::OpenRef(const entry_ref* ref, const node_ref* nodeToClose,
 			}
 			refsReceived.AddRef("refs", ref);
 			if (brokenLinkWithSpecificHandler)
-				// This cruft is to support a hacky workaround for double-clicking
-				// broken refs for cifs; should get fixed in R5
+				// This cruft is to support a hacky workaround for
+				// double-clicking broken refs for cifs; should get fixed
+				// in R5
 				LaunchBrokenLink(brokenLinkPreferredApp.String(), &refsReceived);
 			else
 				TrackerLaunch(&refsReceived, true);
@@ -778,60 +801,62 @@ TTracker::RefsReceived(BMessage* message)
 			break;
 
 		case kOpenWith:
+		{
+			// Open With resulted in passing refs and a handler,
+			// open the files with the handling app
+			message->RemoveName("handler");
+
+			// have to find out if handling app is the Tracker
+			// if it is, just pass it to the active Tracker,
+			// no matter which Tracker was chosen to handle the refs
+			char signature[B_MIME_TYPE_LENGTH];
+			signature[0] = '\0';
 			{
-				// Open With resulted in passing refs and a handler, open the files
-				// with the handling app
-				message->RemoveName("handler");
-
-				// have to find out if handling app is the Tracker
-				// if it is, just pass it to the active Tracker, no matter which Tracker
-				// was chosen to handle the refs
-				char signature[B_MIME_TYPE_LENGTH];
-				signature[0] = '\0';
-				{
-					BFile handlingNode(&handlingApp, O_RDONLY);
-					BAppFileInfo appInfo(&handlingNode);
-					appInfo.GetSignature(signature);
-				}
-
-				if (strcasecmp(signature, kTrackerSignature) != 0) {
-					// handling app not Tracker, pass entries to the apps RefsReceived
-					TrackerLaunch(&handlingApp, message, true);
-					break;
-				}
-				// fall thru, opening refs by the Tracker, as if they were double clicked
+				BFile handlingNode(&handlingApp, O_RDONLY);
+				BAppFileInfo appInfo(&handlingNode);
+				appInfo.GetSignature(signature);
 			}
 
-		case kOpen:
-			{
-				// copy over "Poses" messenger so that refs received recipients know
-				// where the open came from
-				BMessage* bundleThis = NULL;
-				BMessenger messenger;
-				if (message->FindMessenger("TrackerViewToken", &messenger) == B_OK) {
-					bundleThis = new BMessage();
-					bundleThis->AddMessenger("TrackerViewToken", messenger);
-				}
-
-				for (int32 index = 0; index < count; index++) {
-					entry_ref ref;
-					message->FindRef("refs", index, &ref);
-
-					const node_ref* nodeToClose = NULL;
-					const node_ref* nodeToSelect = NULL;
-					ssize_t numBytes;
-
-					message->FindData("nodeRefsToClose", B_RAW_TYPE, index,
-						(const void**)&nodeToClose, &numBytes);
-					message->FindData("nodeRefToSelect", B_RAW_TYPE, index,
-						(const void**)&nodeToSelect, &numBytes);
-
-					OpenRef(&ref, nodeToClose, nodeToSelect, selector, bundleThis);
-				}
-
-				delete bundleThis;
+			if (strcasecmp(signature, kTrackerSignature) != 0) {
+				// handling app not Tracker, pass entries to the apps
+				// RefsReceived
+				TrackerLaunch(&handlingApp, message, true);
 				break;
 			}
+		}	// fall thru, opening refs by the Tracker as if they were
+			// double-clicked
+		case kOpen:
+		{
+			// copy over "Poses" messenger so that refs received
+			// recipients know where the open came from
+			BMessage* bundleThis = NULL;
+			BMessenger messenger;
+			if (message->FindMessenger("TrackerViewToken", &messenger)
+					== B_OK) {
+				bundleThis = new BMessage();
+				bundleThis->AddMessenger("TrackerViewToken", messenger);
+			}
+
+			for (int32 index = 0; index < count; index++) {
+				entry_ref ref;
+				message->FindRef("refs", index, &ref);
+
+				const node_ref* nodeToClose = NULL;
+				const node_ref* nodeToSelect = NULL;
+				ssize_t numBytes;
+
+				message->FindData("nodeRefsToClose", B_RAW_TYPE, index,
+					(const void**)&nodeToClose, &numBytes);
+				message->FindData("nodeRefToSelect", B_RAW_TYPE, index,
+					(const void**)&nodeToSelect, &numBytes);
+
+				OpenRef(&ref, nodeToClose, nodeToSelect, selector,
+					bundleThis);
+			}
+
+			delete bundleThis;
+			break;
+		}
 	}
 }
 
@@ -1104,8 +1129,8 @@ TTracker::QueryActiveForDevice(dev_t device)
 void
 TTracker::CloseActiveQueryWindows(dev_t device)
 {
-	// used when trying to unmount a volume - an active query would prevent that from
-	// happening
+	// used when trying to unmount a volume - an active query would prevent
+	// that from happening
 	bool closed = false;
 	AutoLock<WindowList> lock(fWindowList);
 	for (int32 index = fWindowList.CountItems(); index >= 0; index--) {
@@ -1136,7 +1161,8 @@ TTracker::SaveAllPoseLocations()
 	int32 numWindows = fWindowList.CountItems();
 	for (int32 windowIndex = 0; windowIndex < numWindows; windowIndex++) {
 		BContainerWindow* window
-			= dynamic_cast<BContainerWindow*>(fWindowList.ItemAt(windowIndex));
+			= dynamic_cast<BContainerWindow*>
+				(fWindowList.ItemAt(windowIndex));
 
 		if (window) {
 			AutoLock<BWindow> lock(window);
@@ -1281,9 +1307,10 @@ TTracker::_OpenPreviouslyOpenedWindows(const char* pathFilter)
 				BMessage state;
 				bool restoreStateFromMessage = false;
 				if ((flags & kOpenWindowHasState) != 0
-					&& message.FindMessage("window state", stateMessageCounter++,
-							&state) == B_OK)
+					&& message.FindMessage("window state",
+						stateMessageCounter++, &state) == B_OK) {
 					restoreStateFromMessage = true;
+				}
 
 				if (restoreStateFromMessage) {
 					OpenContainerWindow(model, 0, kOpen, kRestoreWorkspace
@@ -1356,7 +1383,8 @@ TTracker::ReadyToRun()
 					message.AddInt32("opcode", B_ENTRY_CREATED);
 					message.AddInt32("device", model.NodeRef()->device);
 					message.AddInt64("node", model.NodeRef()->node);
-					message.AddInt64("directory", model.EntryRef()->directory);
+					message.AddInt64("directory",
+						model.EntryRef()->directory);
 					message.AddString("name", model.EntryRef()->name);
 					deskWindow->PostMessage(&message, deskWindow->PoseView());
 				}
@@ -1426,9 +1454,10 @@ TTracker::CloseParentWaitingForChild(const entry_ref* child,
 	AutoLock<WindowList> lock(&fWindowList);
 
 	BContainerWindow* parentWindow = FindContainerWindow(parent);
-	if (!parentWindow)
+	if (!parentWindow) {
 		// parent window already closed, give up
 		return true;
+	}
 
 	// If child is a symbolic link, dereference it, so that
 	// FindContainerWindow will succeed.

@@ -48,7 +48,8 @@ static void MakeNodeFromName(node_ref* node, char* name);
 static inline void MakeRefName(char* refName, const node_ref* node);
 static inline void MakeModeName(char* modeName, const node_ref* node);
 static inline void MakeModeNameFromRefName(char* modeName, char* refName);
-static inline bool CompareModeAndRefName(const char* modeName, const char* refName);
+static inline bool CompareModeAndRefName(const char* modeName,
+	const char* refName);
 
 /*
 static bool
@@ -130,8 +131,10 @@ FSClipboardHasRefs()
 			uint32 type;
 			int32 count;
 			if (clip->GetInfo(B_REF_TYPE, 0, &refName, &type, &count) == B_OK
-				&& clip->GetInfo(B_INT32_TYPE, 0, &modeName, &type, &count) == B_OK)
+				&& clip->GetInfo(B_INT32_TYPE, 0, &modeName, &type, &count)
+					== B_OK) {
 				result = CompareModeAndRefName(modeName, refName);
+			}
 		}
 		be_clipboard->Unlock();
 	}
@@ -145,8 +148,8 @@ FSClipboardStartWatch(BMessenger target)
 	if (dynamic_cast<TTracker*>(be_app) != NULL)
 		((TTracker*)be_app)->ClipboardRefsWatcher()->AddToNotifyList(target);
 	else {
-		// this code is used by external apps using objects using FSClipboard functions
-		// i.e: applications using FilePanel
+		// this code is used by external apps using objects using FSClipboard
+		// functions, i.e. applications using FilePanel
 		BMessenger messenger(kTrackerSignature);
 		if (messenger.IsValid()) {
 			BMessage message(kStartWatchClipboardRefs);
@@ -163,8 +166,8 @@ FSClipboardStopWatch(BMessenger target)
 	if (dynamic_cast<TTracker*>(be_app) != NULL)
 		((TTracker*)be_app)->ClipboardRefsWatcher()->AddToNotifyList(target);
 	else {
-		// this code is used by external apps using objects using FSClipboard functions
-		// i.e: applications using FilePanel
+		// this code is used by external apps using objects using FSClipboard
+		// functions, i.e. applications using FilePanel
 		BMessenger messenger(kTrackerSignature);
 		if (messenger.IsValid()) {
 			BMessage message(kStopWatchClipboardRefs);
@@ -333,7 +336,8 @@ FSClipboardRemovePoses(const node_ref* directory, PoseList* list)
 			MakeRefName(refName, &clipNode.node);
 			MakeModeName(modeName);
 
-			if (clip->RemoveName(refName) == B_OK && clip->RemoveName(modeName)) {
+			if (clip->RemoveName(refName) == B_OK
+				&& clip->RemoveName(modeName)) {
 				updateMessage.AddData("tcnode", T_CLIPBOARD_NODE, &clipNode,
 					sizeof(TClipboardNodeRef), true, listCount);
 				refsRemoved++;
@@ -353,7 +357,6 @@ FSClipboardRemovePoses(const node_ref* directory, PoseList* list)
 /** Pastes entries from the clipboard to the target model's directory.
  *	Updates moveModes and notifies listeners if necessary.
  */
-
 bool
 FSClipboardPaste(Model* model, uint32 linksMode)
 {
@@ -588,7 +591,8 @@ FSClipboardRemove(Model* model)
 		report->AddInt32("device", ref->device);
 		report->AddInt64("directory", ref->directory);
 		report->AddBool("clearClipboard", false);
-		report->AddData("tcnode", T_CLIPBOARD_NODE, &tcnode, sizeof(tcnode), true);
+		report->AddData("tcnode", T_CLIPBOARD_NODE, &tcnode, sizeof(tcnode),
+			true);
 		messenger.SendMessage(report);
 		delete report;
 	}
@@ -624,7 +628,8 @@ BClipboardRefsWatcher::AddToNotifyList(BMessenger target)
 		BMessenger* messenger;
 		bool found = false;
 
-		for (int32 index = 0;(messenger = fNotifyList.ItemAt(index)) != NULL; index++) {
+		for (int32 index = 0; (messenger = fNotifyList.ItemAt(index)) != NULL;
+				index++) {
 			if (*messenger == target) {
 				found = true;
 				break;
@@ -644,7 +649,8 @@ BClipboardRefsWatcher::RemoveFromNotifyList(BMessenger target)
 	if (Lock()) {
 		BMessenger* messenger;
 
-		for (int32 index = 0;(messenger = fNotifyList.ItemAt(index)) != NULL; index++) {
+		for (int32 index = 0; (messenger = fNotifyList.ItemAt(index)) != NULL;
+				index++) {
 			if (*messenger == target) {
 				delete fNotifyList.RemoveItemAt(index);
 				break;
@@ -802,7 +808,8 @@ BClipboardRefsWatcher::UpdatePoseViews(BMessage* reportMessage)
 		int32 index = 0;
 		TClipboardNodeRef* tcnode = NULL;
 		ssize_t size;
-		while (reportMessage->FindData("tcnode", T_CLIPBOARD_NODE, index, (const void**)&tcnode, &size) == B_OK) {
+		while (reportMessage->FindData("tcnode", T_CLIPBOARD_NODE, index,
+				(const void**)&tcnode, &size) == B_OK) {
 			if (tcnode->moveMode == kDelete) {
 				watch_node(&tcnode->node, B_STOP_WATCHING, this);
 			} else {

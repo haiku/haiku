@@ -63,12 +63,12 @@ public:
 	virtual BMenuItem* GetNextMenuItem(const BMessage* fileOpenMessage = NULL,
 		const BMessage* containerOpenMessage = NULL,
 		BHandler* target = NULL, entry_ref* currentItemRef = NULL);
-		// if <fileOpenMessage> specified, the item for a file gets a copy with
-		// the item ref attached as "refs", otherwise a default B_REFS_RECEIVED
-		// message message gets attached
-		// if <containerOpenMessage> specified, the item for a folder, volume or query
-		// gets a copy with the item ref attached as "refs", otherwise a default
+		// if <fileOpenMessage> specified, the item for a file gets a copy
+		// with the item ref attached as "refs", otherwise a default
 		// B_REFS_RECEIVED message message gets attached
+		// if <containerOpenMessage> specified, the item for a folder, volume
+		// or query gets a copy with the item ref attached as "refs",
+		// otherwise a default B_REFS_RECEIVED message message gets attached
 		// if <currentItemRef> gets passed, the caller gets to look at the
 		// entry_ref corresponding to the item
 
@@ -101,8 +101,9 @@ public:
 	// use one of the two constructors to set up next item iteration
 	BRecentFilesList(int32 maxItems = 10, bool navMenuFolders = false,
 		const char* ofType = NULL, const char* openedByAppSig = NULL);
-	BRecentFilesList(int32 maxItems, bool navMenuFolders, const char* ofTypeList[],
-		int32 ofTypeListCount, const char* openedByAppSig = NULL);	
+	BRecentFilesList(int32 maxItems, bool navMenuFolders,
+		const char* ofTypeList[], int32 ofTypeListCount,
+		const char* openedByAppSig = NULL);	
 	virtual ~BRecentFilesList();
 
 	// use one of the two NewFileListMenu calls to get an entire menu

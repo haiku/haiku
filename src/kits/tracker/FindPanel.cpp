@@ -334,7 +334,8 @@ void
 FindWindow::GetPredicateString(BString &predicate, bool &dynamicDate)
 {
 	BQuery query;
-	BTextControl* textControl = dynamic_cast<BTextControl*>(FindView("TextControl"));
+	BTextControl* textControl
+		= dynamic_cast<BTextControl*>(FindView("TextControl"));
 	switch (fBackground->Mode()) {
 		case kByNameItem:
 			fBackground->GetByNamePredicate(&query);
@@ -374,8 +375,8 @@ FindWindow::GetDefaultName(BString &result)
 void
 FindWindow::SaveQueryAttributes(BNode* file, bool queryTemplate)
 {
-	ThrowOnError( BNodeInfo(file).SetType(
-		queryTemplate ? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE) );
+	ThrowOnError(BNodeInfo(file).SetType(
+		queryTemplate ? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE));
 
 	// save date/time info for recent query support and transient query killer
 	int32 currentTime = (int32)time(0);
@@ -387,8 +388,9 @@ FindWindow::SaveQueryAttributes(BNode* file, bool queryTemplate)
 
 
 status_t
-FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate,
-	const BMessage* oldAttributes, const BPoint* oldLocation)
+FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
+	bool queryTemplate, const BMessage* oldAttributes,
+	const BPoint* oldLocation)
 {
 	if (oldAttributes)
 		// revive old window settings
@@ -613,7 +615,8 @@ FindWindow::MessageReceived(BMessage* message)
 				bool queryTemplate;
 				if (message->FindString("name", &name) == B_OK
 					&& message->FindRef("directory", &dir) == B_OK
-					&& message->FindBool("template", &queryTemplate) == B_OK) {
+					&& message->FindBool("template", &queryTemplate)
+						== B_OK) {
 					delete fFile;
 					fFile = NULL;
 					BDirectory directory(&dir);
@@ -623,7 +626,8 @@ FindWindow::MessageReceived(BMessage* message)
 					fFile = TryOpening(&tmpRef);
 					if (fFile) {
 						fRef = tmpRef;
-						SaveQueryAsAttributes(fFile, &entry, queryTemplate, 0, 0);
+						SaveQueryAsAttributes(fFile, &entry, queryTemplate,
+							0, 0);
 							// try to save whatever state we aleady have
 							// to the new query so that if the user
 							// opens it before runing it from the find panel,
@@ -705,7 +709,8 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 	rect.right = rect.left + 150;
 	fMimeTypeField = new BMenuField(rect, "MimeTypeMenu", "", fMimeTypeMenu);
 	fMimeTypeField->SetDivider(0.0f);
-	fMimeTypeField->MenuItem()->SetLabel(B_TRANSLATE("All files and folders"));
+	fMimeTypeField->MenuItem()->SetLabel(
+		B_TRANSLATE("All files and folders"));
 	AddChild(fMimeTypeField);
 
 	// add popup for search criteria
@@ -731,7 +736,7 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 	rect.right = bounds.right - 15;
 	rect.left = rect.right - 100;
 	fVolMenu = new BPopUpMenu("", false, false);	// don't radioMode
-	menuField = new BMenuField(rect, "", B_TRANSLATE("On"),	fVolMenu);
+	menuField = new BMenuField(rect, "", B_TRANSLATE("On"), fVolMenu);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 8);
 	AddChild(menuField);
 	AddVolumes(fVolMenu);
@@ -853,12 +858,14 @@ FindPanel::AttachedToWindow()
 
 	if (!Window()->CurrentFocus()) {
 		// try to pick a good focus if we restore to one already
-		BTextControl* textControl = dynamic_cast<BTextControl*>(FindView("TextControl"));
+		BTextControl* textControl
+			= dynamic_cast<BTextControl*>(FindView("TextControl"));
 		if (!textControl) {
 			// pick the last text control in the attribute view
 			BString title("TextEntry");
 			title << (fAttrViewList.CountItems() - 1);
-			textControl = dynamic_cast<BTextControl*>(FindView(title.String()));
+			textControl
+				= dynamic_cast<BTextControl*>(FindView(title.String()));
 		}
 		if (textControl)
 			textControl->MakeFocus();
@@ -982,7 +989,7 @@ FindPanel::ShowVolumeMenuLabel()
 
 	if (countSelected == 0) {
 		// no disk selected, for now revert to search all disks
-		// TODO:
+		// ToDo:
 		// show no disks here and add a check that will not let the
 		// query go if the user doesn't pick at least one
 		fVolMenu->ItemAt(0)->SetMarked(true);
@@ -1295,7 +1302,8 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 				case B_FLOAT_TYPE:
 				{
 					float floatVal;
-					sscanf(textControl->TextView()->Text(), "%f", &floatVal);
+					sscanf(textControl->TextView()->Text(), "%f",
+						&floatVal);
 					query->PushFloat(floatVal);
 					break;
 				}
@@ -1303,7 +1311,8 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 				case B_DOUBLE_TYPE:
 				{
 					double doubleVal;
-					sscanf(textControl->TextView()->Text(), "%lf", &doubleVal);
+					sscanf(textControl->TextView()->Text(), "%lf",
+						&doubleVal);
 					query->PushDouble(doubleVal);
 					break;
 				}
@@ -1428,7 +1437,7 @@ FindPanel::GetByNamePredicate(BQuery* query) const
 	query->PushString(textControl->TextView()->Text(), true);
 
 	if (strstr(textControl->TextView()->Text(), "*")) {
-		// assume pattern is a regular expression and try doing an exact match
+		// assume pattern is a regular expression, try doing an exact match
 		query->PushOp(B_EQ);
 	} else
 		query->PushOp(B_CONTAINS);
@@ -1452,6 +1461,7 @@ FindPanel::SwitchMode(uint32 mode)
 
 	switch (mode) {
 		case kByFormulaItem:
+		{
 			if (oldMode == kByAttributeItem || oldMode == kByNameItem) {
 				BQuery query;
 				if (oldMode == kByAttributeItem) {
@@ -1462,56 +1472,54 @@ FindPanel::SwitchMode(uint32 mode)
 
 				query.GetPredicate(&buffer);
 			}
-			// fall thru
-
+		} // fall thru
 		case kByNameItem:
-			{
-				fMode = mode;
-				Window()->ResizeTo(Window()->Frame().Width(),
-					ViewHeightForMode(mode, fLatch->Value() != 0));
-				BRect bounds(Bounds());
-				bounds.InsetBy(15, 30);
-				bounds.bottom -= 10;
-				if (fLatch->Value())
-					bounds.bottom -= kMoreOptionsDelta;
-				box->ResizeTo(bounds.Width(), BoxHeightForMode(mode,
-					fLatch->Value() != 0));
+		{
+			fMode = mode;
+			Window()->ResizeTo(Window()->Frame().Width(),
+				ViewHeightForMode(mode, fLatch->Value() != 0));
+			BRect bounds(Bounds());
+			bounds.InsetBy(15, 30);
+			bounds.bottom -= 10;
+			if (fLatch->Value())
+				bounds.bottom -= kMoreOptionsDelta;
+			box->ResizeTo(bounds.Width(), BoxHeightForMode(mode,
+				fLatch->Value() != 0));
 
-				RemoveByAttributeItems();
-				ShowOrHideMimeTypeMenu();
-				AddByNameOrFormulaItems();
+			RemoveByAttributeItems();
+			ShowOrHideMimeTypeMenu();
+			AddByNameOrFormulaItems();
 
-				if (buffer.Length()) {
-					ASSERT(mode == kByFormulaItem
-						|| oldMode == kByAttributeItem);
-					BTextControl* textControl = dynamic_cast<BTextControl*>
-						(FindView("TextControl"));
-					textControl->SetText(buffer.String());
-				}
-				break;
+			if (buffer.Length()) {
+				ASSERT(mode == kByFormulaItem
+					|| oldMode == kByAttributeItem);
+				BTextControl* textControl
+					= dynamic_cast<BTextControl*>(FindView("TextControl"));
+				textControl->SetText(buffer.String());
 			}
+			break;
+		}
 
 		case kByAttributeItem:
-			{
-				fMode = mode;
-				box->ResizeTo(box->Bounds().Width(),
-					BoxHeightForMode(mode, fLatch->Value() != 0));
+		{
+			fMode = mode;
+			box->ResizeTo(box->Bounds().Width(),
+				BoxHeightForMode(mode, fLatch->Value() != 0));
 
-				Window()->ResizeTo(Window()->Frame().Width(),
-					ViewHeightForMode(mode, fLatch->Value() != 0));
+			Window()->ResizeTo(Window()->Frame().Width(),
+				ViewHeightForMode(mode, fLatch->Value() != 0));
 
-				BTextControl* textControl = dynamic_cast<BTextControl*>
-					(FindView("TextControl"));
-
-				if (textControl) {
-					textControl->RemoveSelf();
-					delete textControl;
-				}
-
-				ShowOrHideMimeTypeMenu();
-				AddAttrView();
-				break;
+			BTextControl* textControl
+				= dynamic_cast<BTextControl*>(FindView("TextControl"));
+			if (textControl) {
+				textControl->RemoveSelf();
+				delete textControl;
 			}
+
+			ShowOrHideMimeTypeMenu();
+			AddAttrView();
+			break;
+		}
 	}
 }
 
@@ -2206,8 +2214,8 @@ FindPanel::RestoreWindowState(const BNode* node)
 		FillCurrentQueryName(fQueryName, dynamic_cast<FindWindow*>(Window()));
 
 		// set modification message after checking the temporary check box,
-		// and filling out the text control so that we do not
-		// always trigger clearing of the temporary check box.
+		// and filling out the text control so that we do not always trigger
+		// clearing of the temporary check box.
 		fQueryName->SetModificationMessage(
 			new BMessage(kNameModifiedMessage));
 	}
@@ -2227,8 +2235,8 @@ FindPanel::RestoreWindowState(const BNode* node)
 					BVolume volume;
 						// match a volume with the info embedded in
 						// the message
-					status_t result = MatchArchivedVolume(&volume, &message,
-						index);
+					status_t result
+						= MatchArchivedVolume(&volume, &message, index);
 					if (result == B_OK) {
 						char name[256];
 						volume.GetName(name);

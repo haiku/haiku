@@ -135,12 +135,12 @@ class PoseInfo {
 
 		bool fInvisible;
 		ino_t fInitedDirectory;
-			// for a location to be valid, fInitedDirectory has to contain the inode
-			// of the items parent directory
-			// This makes it impossible to for instance zip up files and extract
-			// them in the same location. This should probably be reworked -- Tracker
-			// could say strip the file location attributes when dropping files into
-			// a closed folder
+			// For a location to be valid, fInitedDirectory has to contain
+			// the inode of the items parent directory. This makes it
+			// impossible to for instance zip up files and extract them in
+			// the same location. This should probably be reworked.
+			// Tracker could strip the file location attributes when dropping
+			// files into a closed folder.
 		BPoint fLocation;
 };
 
@@ -214,13 +214,15 @@ class OffscreenBitmap {
 
 
 // bitmap functions
-extern void FadeRGBA32Horizontal(uint32* bits, int32 width, int32 height, int32 from, int32 to);
-extern void FadeRGBA32Vertical(uint32* bits, int32 width, int32 height, int32 from, int32 to);
+extern void FadeRGBA32Horizontal(uint32* bits, int32 width, int32 height,
+	int32 from, int32 to);
+extern void FadeRGBA32Vertical(uint32* bits, int32 width, int32 height,
+	int32 from, int32 to);
 
 
 class FlickerFreeStringView : public BStringView {
-	// Adds support for offscreen bitmap drawing for string views that update often
-	// this would be better implemented as an option of BStringView
+	// adds support for offscreen bitmap drawing for string views that update
+	// often this would be better implemented as an option of BStringView
 	public:
 		FlickerFreeStringView(BRect bounds, const char* name,
 			const char* text, uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
@@ -273,8 +275,8 @@ class DraggableIcon : public BView {
 
 class PositionPassingMenuItem : public BMenuItem {
 	public:
-		PositionPassingMenuItem(const char* title, BMessage*, char shortcut = 0,
-			uint32 modifiers = 0);
+		PositionPassingMenuItem(const char* title, BMessage*,
+			char shortcut = 0, uint32 modifiers = 0);
 
 		PositionPassingMenuItem(BMenu*, BMessage*);
 
@@ -443,13 +445,15 @@ const entry_ref* EachEntryRef(const BMessage*,
 entry_ref* EachEntryRef(BMessage*, entry_ref* (*)(entry_ref*, void*),
 	void* passThru, int32 maxCount);
 const entry_ref* EachEntryRef(const BMessage*,
-	const entry_ref* (*)(const entry_ref*, void*), void* passThru, int32 maxCount);
+	const entry_ref* (*)(const entry_ref*, void*), void* passThru,
+	int32 maxCount);
 
 
 bool ContainsEntryRef(const BMessage*, const entry_ref*);
 int32 CountRefs(const BMessage*);
 
-BMenuItem* EachMenuItem(BMenu* menu, bool recursive, BMenuItem* (*func)(BMenuItem*));
+BMenuItem* EachMenuItem(BMenu* menu, bool recursive,
+	BMenuItem* (*func)(BMenuItem*));
 const BMenuItem* EachMenuItem(const BMenu* menu, bool recursive,
 	BMenuItem* (*func)(const BMenuItem*));
 

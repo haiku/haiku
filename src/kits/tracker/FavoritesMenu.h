@@ -111,7 +111,8 @@ enum recent_type {
 
 class RecentsMenu : public BNavMenu {
 	public:
-		RecentsMenu(const char* name,int32 which,uint32 what,BHandler* target);
+		RecentsMenu(const char* name, int32 which, uint32 what,
+			BHandler* target);
 
 		void			DetachedFromWindow();
 

@@ -55,7 +55,8 @@ class AttributeView;
 
 class BInfoWindow : public BWindow {
 	public:
-		BInfoWindow(Model*, int32 groupIndex, LockingList<BWindow>* list = NULL);
+		BInfoWindow(Model*, int32 groupIndex,
+			LockingList<BWindow>* list = NULL);
 		~BInfoWindow();
 
 		virtual bool IsShowing(const node_ref*) const;
@@ -64,7 +65,8 @@ class BInfoWindow : public BWindow {
 		bool StopCalc();
 		void OpenFilePanel(const entry_ref*);
 
-		static void GetSizeString(BString &result, off_t size, int32 fileCount);
+		static void GetSizeString(BString &result, off_t size,
+			int32 fileCount);
 
 	protected:
 		virtual void Quit();

@@ -48,7 +48,8 @@ DelayedTask::~DelayedTask()
 {
 }
 
-OneShotDelayedTask::OneShotDelayedTask(FunctionObject* functor, bigtime_t delay)
+OneShotDelayedTask::OneShotDelayedTask(FunctionObject* functor,
+	bigtime_t delay)
 	:	DelayedTask(delay),
 		fFunctor(functor)
 {
@@ -293,8 +294,9 @@ TaskLoop::RunWhenIdle(FunctionObjectWithResult<bool>* functor,
 class AccumulatedOneShotDelayedTask : public OneShotDelayedTask {
 	// supports accumulating functors
 public:
-	AccumulatedOneShotDelayedTask(AccumulatingFunctionObject* functor, bigtime_t delay,
-		bigtime_t maxAccumulatingTime = 0, int32 maxAccumulateCount = 0)
+	AccumulatedOneShotDelayedTask(AccumulatingFunctionObject* functor,
+		bigtime_t delay, bigtime_t maxAccumulatingTime = 0,
+		int32 maxAccumulateCount = 0)
 		:	OneShotDelayedTask(functor, delay),
 			maxAccumulateCount(maxAccumulateCount),
 			accumulateCount(1),
@@ -308,19 +310,24 @@ public:
 				// don't accumulate if too may accumulated already
 				return false;
 
-			if (maxAccumulatingTime && system_time() > initialTime + maxAccumulatingTime)
+			if (maxAccumulatingTime && system_time() > initialTime
+					+ maxAccumulatingTime) {
 				// don't accumulate if too late past initial task
 				return false;
+			}
 
-			return static_cast<AccumulatingFunctionObject*>(fFunctor)->CanAccumulate(accumulateThis);
+			return static_cast<AccumulatingFunctionObject*>(fFunctor)->
+				CanAccumulate(accumulateThis);
 		}
 
-	virtual void Accumulate(AccumulatingFunctionObject* accumulateThis, bigtime_t delay)
+	virtual void Accumulate(AccumulatingFunctionObject* accumulateThis,
+		bigtime_t delay)
 		{
 			fRunAfter = system_time() + delay;
 				// reset fRunAfter
 			accumulateCount++;
-			static_cast<AccumulatingFunctionObject*>(fFunctor)->Accumulate(accumulateThis);
+			static_cast<AccumulatingFunctionObject*>(fFunctor)->
+				Accumulate(accumulateThis);
 		}
 
 private:
@@ -331,8 +338,8 @@ private:
 };
 
 void
-TaskLoop::AccumulatedRunLater(AccumulatingFunctionObject* functor, bigtime_t delay,
-	bigtime_t maxAccumulatingTime, int32 maxAccumulateCount)
+TaskLoop::AccumulatedRunLater(AccumulatingFunctionObject* functor,
+	bigtime_t delay, bigtime_t maxAccumulatingTime, int32 maxAccumulateCount)
 {
 	AutoLock<BLocker> autoLock(&fLock);
 	if (!autoLock.IsLocked()) {
@@ -351,8 +358,8 @@ TaskLoop::AccumulatedRunLater(AccumulatingFunctionObject* functor, bigtime_t del
 			return;
 		}
 	}
-	RunLater(new AccumulatedOneShotDelayedTask(functor, delay, maxAccumulatingTime,
-		maxAccumulateCount));
+	RunLater(new AccumulatedOneShotDelayedTask(functor, delay,
+		maxAccumulatingTime, maxAccumulateCount));
 }
 
 
@@ -479,8 +486,8 @@ StandAloneTaskLoop::StartPulsingIfNeeded()
 	ASSERT(fLock.IsLocked());
 	if (fScanThread < 0) {
 		// no loop thread yet, spawn one
-		fScanThread = spawn_thread(StandAloneTaskLoop::RunBinder, "TrackerTaskLoop",
-			B_LOW_PRIORITY, this);
+		fScanThread = spawn_thread(StandAloneTaskLoop::RunBinder,
+			"TrackerTaskLoop", B_LOW_PRIORITY, this);
 		resume_thread(fScanThread);
 	}
 }

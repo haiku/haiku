@@ -242,7 +242,8 @@ BCountView::Draw(BRect updateRect)
 
 	if (IsTypingAhead()) {
 		// use a muted gray for the typeahead
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT));
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DARKEN_4_TINT));
 	} else
 		SetHighColor(0, 0, 0);
 
@@ -263,7 +264,8 @@ BCountView::Draw(BRect updateRect)
 		bounds.top--;
 
 		AddLine(bounds.LeftTop(), bounds.RightTop(), shadow);
-		AddLine(BPoint(bounds.right, bounds.top + 2), bounds.RightBottom(), lightShadow);
+		AddLine(BPoint(bounds.right, bounds.top + 2), bounds.RightBottom(),
+			lightShadow);
 		AddLine(bounds.LeftBottom(), bounds.RightBottom(), lightShadow);
 	}
 
@@ -282,8 +284,10 @@ BCountView::Draw(BRect updateRect)
 
 	barberPoleRect.InsetBy(1, 1);
 
-	BRect destRect(fBarberPoleMap ? fBarberPoleMap->Bounds() : BRect(0, 0, 0, 0));
-	destRect.OffsetTo(barberPoleRect.LeftTop() - BPoint(0, fLastBarberPoleOffset));
+	BRect destRect(fBarberPoleMap
+		? fBarberPoleMap->Bounds() : BRect(0, 0, 0, 0));
+	destRect.OffsetTo(barberPoleRect.LeftTop()
+		- BPoint(0, fLastBarberPoleOffset));
 	fLastBarberPoleOffset -= 1;
 	if (fLastBarberPoleOffset < 0)
 		fLastBarberPoleOffset = 5;

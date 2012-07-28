@@ -167,7 +167,8 @@ public:
 	void SetIsDesktop(bool);
 
 protected:
-	// don't do any volume watching and memtamime watching in file panels for now
+	// don't do any volume watching and memtamime watching in file panels
+	// for now
 	virtual	void StartWatching();
 	virtual	void StopWatching();
 

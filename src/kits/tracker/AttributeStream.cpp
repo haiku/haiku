@@ -167,8 +167,8 @@ AttributeStreamNode::Read(const char* name, const char* foreignName,
 
 
 off_t
-AttributeStreamNode::Write(const char* name, const char* foreignName, uint32 type,
-	off_t size, const void* buffer)
+AttributeStreamNode::Write(const char* name, const char* foreignName,
+	uint32 type, off_t size, const void* buffer)
 {
 	if (!fWriteTo)
 		return 0;
@@ -295,7 +295,8 @@ AttributeStreamFileNode::Read(const char* name, const char* foreignName,
 		return size;
 
 	// didn't find the attribute under the native name, try the foreign name
-	if (foreignName && fNode->ReadAttr(foreignName, type, 0, buffer, (size_t)size) == size) {
+	if (foreignName && fNode->ReadAttr(foreignName, type, 0, buffer,
+			(size_t)size) == size) {
 		// foreign attribute, swap the data
 		if (swapFunc)
 			(swapFunc)(buffer);
@@ -353,8 +354,8 @@ bool
 AttributeStreamFileNode::Fill(char* buffer) const
 {
 	ASSERT(fNode);
-	return fNode->ReadAttr(fCurrentAttr.Name(), fCurrentAttr.Type(), 0, buffer,
-		(size_t)fCurrentAttr.Size()) == (ssize_t)fCurrentAttr.Size();
+	return fNode->ReadAttr(fCurrentAttr.Name(), fCurrentAttr.Type(), 0,
+		buffer, (size_t)fCurrentAttr.Size()) == (ssize_t)fCurrentAttr.Size();
 }
 
 
@@ -422,8 +423,9 @@ AttributeStreamMemoryNode::Contains(const char* name, uint32 type)
 
 
 off_t
-AttributeStreamMemoryNode::Read(const char* name, const char* DEBUG_ONLY(foreignName),
-	uint32 type, off_t bufferSize, void* buffer, void (*DEBUG_ONLY(swapFunc))(void*))
+AttributeStreamMemoryNode::Read(const char* name,
+	const char* DEBUG_ONLY(foreignName), uint32 type, off_t bufferSize,
+	void* buffer, void (*DEBUG_ONLY(swapFunc))(void*))
 {
 	ASSERT(!foreignName);
 	ASSERT(!swapFunc);
@@ -479,7 +481,8 @@ AttributeStreamMemoryNode::Drive()
 
 
 AttributeStreamMemoryNode::AttrNode*
-AttributeStreamMemoryNode::BufferingGet(const char* name, uint32 type, off_t size)
+AttributeStreamMemoryNode::BufferingGet(const char* name, uint32 type,
+	off_t size)
 {
 	char* newBuffer = new char[size];
 	if (!fReadFrom->Fill(newBuffer)) {
@@ -665,8 +668,10 @@ AttributeStreamFilterNode::Read(const char* name, const char* foreignName,
 	if (!fReadFrom)
 		return 0;
 
-	if (!Reject(name, type, size))
-		return fReadFrom->Read(name, foreignName, type, size, buffer, swapFunc);
+	if (!Reject(name, type, size)) {
+		return fReadFrom->Read(name, foreignName, type, size, buffer,
+			swapFunc);
+	}
 
 	return 0;
 }

@@ -168,7 +168,8 @@ TemplatesMenu::BuildMenu(bool addItems)
 				BMessage* message = new BMessage(kNewEntryFromTemplate);
 				message->AddRef("refs_template", &ref);
 				message->AddString("name", fileName);
-				AddItem(new IconMenuItem(fileName, message, &nodeInfo, B_MINI_ICON));
+				AddItem(new IconMenuItem(fileName, message, &nodeInfo,
+					B_MINI_ICON));
 			}
 		}
 	}

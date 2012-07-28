@@ -74,9 +74,11 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	BWindow(BRect(80, 80, 450, 350), B_TRANSLATE("Tracker preferences"),
 		B_TITLED_WINDOW, B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
 		| B_NO_WORKSPACE_ACTIVATION	| B_NOT_ANCHORED_ON_ACTIVATE
-		| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+		| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	fSettingsTypeListView = new BListView("List View", B_SINGLE_SELECTION_LIST);
+	fSettingsTypeListView = new BListView("List View",
+		B_SINGLE_SELECTION_LIST);
 
 	BScrollView* scrollView = new BScrollView("scrollview",
 		fSettingsTypeListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
@@ -90,7 +92,7 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	fRevertButton->SetEnabled(false);
 
 	fSettingsContainerBox = new BBox("SettingsContainerBox");
-	
+
 	const float spacing = be_control_look->DefaultItemSpacing();
 
 	BLayoutBuilder::Group<>(this)
@@ -113,8 +115,8 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 		new WindowsSettingsView()));
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Trash"),
 		new TrashSettingsView()));
-	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Volume icons"),
-		new SpaceBarSettingsView()));
+	fSettingsTypeListView->AddItem(new SettingsItem(
+		B_TRANSLATE("Volume icons"), new SpaceBarSettingsView()));
 
 	// constraint the listview width so that the longest item fits
 	float width = 0;
@@ -123,7 +125,8 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	fSettingsTypeListView->SetExplicitMinSize(BSize(width, 0));
 	fSettingsTypeListView->SetExplicitMaxSize(BSize(width, B_SIZE_UNLIMITED));
 
-	fSettingsTypeListView->SetSelectionMessage(new BMessage(kSettingsViewChanged));
+	fSettingsTypeListView->SetSelectionMessage(
+		new BMessage(kSettingsViewChanged));
 	fSettingsTypeListView->Select(0);
 }
 
@@ -201,7 +204,8 @@ TrackerSettingsWindow::_ViewAt(int32 i)
 	if (!Lock())
 		return NULL;
 		
-	SettingsItem* item = dynamic_cast<SettingsItem*>(fSettingsTypeListView->ItemAt(i));
+	SettingsItem* item = dynamic_cast<SettingsItem*>
+		(fSettingsTypeListView->ItemAt(i));
 	
 	Unlock();
 	
@@ -278,7 +282,8 @@ TrackerSettingsWindow::_HandleChangedSettingsView()
 		oldView->RemoveSelf();
 
 	SettingsItem* selectedItem =
-		dynamic_cast<SettingsItem*>(fSettingsTypeListView->ItemAt(currentSelection));
+		dynamic_cast<SettingsItem*>
+			(fSettingsTypeListView->ItemAt(currentSelection));
 
 	if (selectedItem) {
 		fSettingsContainerBox->SetLabel(selectedItem->Text());

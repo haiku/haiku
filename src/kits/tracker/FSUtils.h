@@ -87,7 +87,7 @@ public:
 				kReplace,		// remove entry before copying new one
 				kMerge			// for folders: leave existing folder, update
 								// contents leaving nonconflicting items
-								// for files: save original attributes on file.
+								// for files: save original attributes on file
 			};
 
 	//! Override to always overwrite, never overwrite, let user decide,

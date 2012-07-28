@@ -78,7 +78,8 @@ class BContainerWindow : public BWindow {
 			uint32 containerWindowFlags,
 			window_look look = B_DOCUMENT_WINDOW_LOOK,
 			window_feel feel = B_NORMAL_WINDOW_FEEL,
-			uint32 flags = B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION,
+			uint32 flags = B_WILL_ACCEPT_FIRST_CLICK
+				| B_NO_WORKSPACE_ACTIVATION,
 			uint32 workspace = B_CURRENT_WORKSPACE);
 
 		virtual ~BContainerWindow();
@@ -152,7 +153,8 @@ class BContainerWindow : public BWindow {
 		void MarkAttributeMenu();
 		void MarkArrangeByMenu(BMenu*);
 		BMenuItem* NewAttributeMenuItem(const char* label, const char* name,
-			int32 type, float width, int32 align, bool editable, bool statField);
+			int32 type, float width, int32 align, bool editable,
+			bool statField);
 		BMenuItem* NewAttributeMenuItem(const char* label, const char* name,
 			int32 type, const char* displayAs, float width, int32 align,
 			bool editable, bool statField);
@@ -163,7 +165,8 @@ class BContainerWindow : public BWindow {
 		PiggybackTaskLoop* DelayedTaskLoop();
 			// use for RunLater queueing
 		void PulseTaskLoop();
-			// called by some view that has pulse, either BackgroundView or BPoseView
+			// called by some view that has pulse, either BackgroundView
+			// or BPoseView
 
 		static bool DefaultStateSourceNode(const char* name, BNode* result,
 			bool createNew = false, bool createFolder = true);
@@ -205,7 +208,8 @@ class BContainerWindow : public BWindow {
 
 		virtual	void AddMenus();
 		virtual void AddShortcuts();
-			// add equivalents of the menu shortcuts to the menuless desktop window
+			// add equivalents of the menu shortcuts to the menuless
+			// desktop window
 		virtual	void AddFileMenu(BMenu* menu);
 		virtual	void AddWindowMenu(BMenu* menu);
 
@@ -227,7 +231,8 @@ class BContainerWindow : public BWindow {
 		virtual void SetCloseItem(BMenu*);
 		virtual	void SetupNavigationMenu(const entry_ref*, BMenu*);
 		virtual	void SetupMoveCopyMenus(const entry_ref*, BMenu*);
-		virtual	void PopulateMoveCopyNavMenu(BNavMenu*, uint32, const entry_ref*, bool);
+		virtual	void PopulateMoveCopyNavMenu(BNavMenu*, uint32,
+			const entry_ref*, bool);
 
 		virtual	void SetupOpenWithMenu(BMenu*);
 		virtual	void SetUpEditQueryItem(BMenu*);
@@ -250,7 +255,8 @@ class BContainerWindow : public BWindow {
 		BHandler* ResolveSpecifier(BMessage*, int32, BMessage*, int32,
 			const char*);
 
-		bool EachAddon(BPath &path, bool(*)(const Model*, const char*, uint32, bool, void*),
+		bool EachAddon(BPath &path,
+			bool (*)(const Model*, const char*, uint32, bool, void*),
 			BObjectList<Model>*, void*, BObjectList<BString> &);
 		void LoadAddOn(BMessage*);
 
@@ -313,8 +319,8 @@ class WindowStateNodeOpener {
 	// this class manages opening and closing the proper node for
 	// state restoring / saving; the constructor knows how to decide whether
 	// to use a special directory for root, etc.
-	// setter calls used when no attributes can be read from a node and defaults
-	// are to be substituted
+	// setter calls used when no attributes can be read from a node and
+	// defaults are to be substituted
 	public:
 		WindowStateNodeOpener(BContainerWindow* window, bool forWriting);
 		virtual ~WindowStateNodeOpener();
@@ -428,7 +434,7 @@ BContainerWindow::IsPathWatchingEnabled() const
 	return fIsWatchingPath;
 }
 
-filter_result ActivateWindowFilter(BMessage* message, BHandler**target,
+filter_result ActivateWindowFilter(BMessage* message, BHandler** target,
 	BMessageFilter* messageFilter);
 
 } // namespace BPrivate

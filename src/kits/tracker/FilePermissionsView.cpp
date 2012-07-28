@@ -56,30 +56,41 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 		fModel(model)
 {
 	// Constants for the column labels: "User", "Group" and "Other".
-	const float kColumnLabelMiddle = 77, kColumnLabelTop = 6, kColumnLabelSpacing = 37,
-		kColumnLabelBottom = 20, kColumnLabelWidth = 35, kAttribFontHeight = 10;
+	const float kColumnLabelMiddle = 77, kColumnLabelTop = 6,
+		kColumnLabelSpacing = 37, kColumnLabelBottom = 20,
+		kColumnLabelWidth = 35, kAttribFontHeight = 10;
 
 	BStringView* strView;
 
-	strView = new BStringView(BRect(kColumnLabelMiddle - kColumnLabelWidth / 2,
-		kColumnLabelTop, kColumnLabelMiddle + kColumnLabelWidth / 2, kColumnLabelBottom),
+	strView = new BStringView(
+		BRect(kColumnLabelMiddle - kColumnLabelWidth / 2,
+			kColumnLabelTop,
+			kColumnLabelMiddle + kColumnLabelWidth / 2,
+			kColumnLabelBottom),
 		"", B_TRANSLATE("Owner"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
 
-	strView = new BStringView(BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
-		+ kColumnLabelSpacing, kColumnLabelTop,
-		kColumnLabelMiddle + kColumnLabelWidth / 2 + kColumnLabelSpacing,
-		kColumnLabelBottom), "", B_TRANSLATE("Group"));
+	strView = new BStringView(
+		BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
+				+ kColumnLabelSpacing,
+			kColumnLabelTop,
+			kColumnLabelMiddle + kColumnLabelWidth / 2 + kColumnLabelSpacing,
+			kColumnLabelBottom),
+		"", B_TRANSLATE("Group"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
 
-	strView = new BStringView(BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
-		+ 2 * kColumnLabelSpacing, kColumnLabelTop,
-		kColumnLabelMiddle + kColumnLabelWidth / 2 + 2 * kColumnLabelSpacing,
-		kColumnLabelBottom), "", B_TRANSLATE("Other"));
+	strView = new BStringView(
+		BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
+				+ 2 * kColumnLabelSpacing,
+			kColumnLabelTop,
+			kColumnLabelMiddle + kColumnLabelWidth / 2
+				+ 2 * kColumnLabelSpacing,
+			kColumnLabelBottom),
+		"", B_TRANSLATE("Other"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
@@ -89,53 +100,69 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 		kRowLabelVerticalSpacing = 18, kRowLabelRight = kColumnLabelMiddle
 		- kColumnLabelWidth / 2 - 5, kRowLabelHeight = 14;
 
-	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop, kRowLabelRight,
-		kRowLabelTop + kRowLabelHeight),
+	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop,
+			kRowLabelRight, kRowLabelTop + kRowLabelHeight),
 		"", B_TRANSLATE("Read"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_RIGHT);
 	strView->SetFontSize(kAttribFontHeight);
 
 	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop
-		+ kRowLabelVerticalSpacing, kRowLabelRight, kRowLabelTop
-		+ kRowLabelVerticalSpacing + kRowLabelHeight),
+			+ kRowLabelVerticalSpacing, kRowLabelRight, kRowLabelTop
+			+ kRowLabelVerticalSpacing + kRowLabelHeight),
 		"", B_TRANSLATE("Write"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_RIGHT);
 	strView->SetFontSize(kAttribFontHeight);
 
 	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop
-		+ 2 * kRowLabelVerticalSpacing, kRowLabelRight, kRowLabelTop
-		+ 2 * kRowLabelVerticalSpacing + kRowLabelHeight),
+			+ 2 * kRowLabelVerticalSpacing, kRowLabelRight, kRowLabelTop
+			+ 2 * kRowLabelVerticalSpacing + kRowLabelHeight),
 		"", B_TRANSLATE("Execute"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_RIGHT);
 	strView->SetFontSize(kAttribFontHeight);
 
 	// Constants for the 3x3 check box array.
-	const float kLeftMargin = kRowLabelRight + 15, kTopMargin = kRowLabelTop - 2,
-		kHorizontalSpacing = kColumnLabelSpacing, kVerticalSpacing = kRowLabelVerticalSpacing,
+	const float kLeftMargin = kRowLabelRight + 15,
+		kTopMargin = kRowLabelTop - 2,
+		kHorizontalSpacing = kColumnLabelSpacing,
+		kVerticalSpacing = kRowLabelVerticalSpacing,
 		kCheckBoxWidth = 18, kCheckBoxHeight = 18;
 
 	FocusCheckBox** checkBoxArray[3][3] = {
-		{ &fReadUserCheckBox, &fReadGroupCheckBox, &fReadOtherCheckBox },
-		{ &fWriteUserCheckBox, &fWriteGroupCheckBox, &fWriteOtherCheckBox },
-		{ &fExecuteUserCheckBox, &fExecuteGroupCheckBox, &fExecuteOtherCheckBox }};
+		{
+			&fReadUserCheckBox,
+			&fReadGroupCheckBox,
+			&fReadOtherCheckBox
+		},
+		{
+			&fWriteUserCheckBox,
+			&fWriteGroupCheckBox,
+			&fWriteOtherCheckBox
+		},
+		{
+			&fExecuteUserCheckBox,
+			&fExecuteGroupCheckBox,
+			&fExecuteOtherCheckBox
+		}
+	};
 
 	for (int32 x = 0; x < 3; x++) {
 		for (int32 y = 0; y < 3; y++) {
 			*checkBoxArray[y][x] =
 				new FocusCheckBox(BRect(kLeftMargin + kHorizontalSpacing * x,
-					kTopMargin + kVerticalSpacing * y,
-					kLeftMargin + kHorizontalSpacing * x + kCheckBoxWidth,
-					kTopMargin + kVerticalSpacing * y + kCheckBoxHeight),
-					"", "",	new BMessage(kPermissionsChanged));
+						kTopMargin + kVerticalSpacing * y,
+						kLeftMargin + kHorizontalSpacing * x + kCheckBoxWidth,
+						kTopMargin + kVerticalSpacing * y + kCheckBoxHeight),
+					"", "", new BMessage(kPermissionsChanged));
 			AddChild(*checkBoxArray[y][x]);
 		}
 	}
 
 	const float kTextControlLeft = 170, kTextControlRight = 270,
-		kTextControlTop = kColumnLabelTop, kTextControlHeight = 14, kTextControlSpacing = 16;
+		kTextControlTop = kColumnLabelTop, kTextControlHeight = 14,
+		kTextControlSpacing = 16;
 
 	strView = new BStringView(BRect(kTextControlLeft, kTextControlTop,
 		kTextControlRight, kTextControlTop + kTextControlHeight), "",
@@ -144,25 +171,30 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	strView->SetFontSize(kAttribFontHeight);
 	AddChild(strView);
 
-	fOwnerTextControl = new BTextControl(BRect(kTextControlLeft, kTextControlTop - 2
-		+ kTextControlSpacing, kTextControlRight, kTextControlTop + kTextControlHeight - 2
-		+ kTextControlSpacing), "",	"", "", new BMessage(kNewOwnerEntered));
+	fOwnerTextControl = new BTextControl(
+		BRect(kTextControlLeft,
+			kTextControlTop - 2 + kTextControlSpacing,
+			kTextControlRight,
+			kTextControlTop + kTextControlHeight - 2 + kTextControlSpacing),
+		"", "", "", new BMessage(kNewOwnerEntered));
 	fOwnerTextControl->SetDivider(0);
 	AddChild(fOwnerTextControl);
 
 	strView = new BStringView(BRect(kTextControlLeft,
-		kTextControlTop + 5 + 2 * kTextControlSpacing,
-		kTextControlRight,
-		kTextControlTop + 2 + 2 * kTextControlSpacing + kTextControlHeight),
+			kTextControlTop + 5 + 2 * kTextControlSpacing,
+			kTextControlRight,
+			kTextControlTop + 2 + 2 * kTextControlSpacing
+				+ kTextControlHeight),
 		"", B_TRANSLATE("Group"));
 	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
 	AddChild(strView);
 
-	fGroupTextControl = new BTextControl(BRect(kTextControlLeft, kTextControlTop
-		+ 3 * kTextControlSpacing, kTextControlRight, kTextControlTop
-		+ 3 * kTextControlSpacing + kTextControlHeight), "", "", "",
-		new BMessage(kNewGroupEntered));
+	fGroupTextControl = new BTextControl(BRect(kTextControlLeft,
+			kTextControlTop + 3 * kTextControlSpacing,
+			kTextControlRight,
+			kTextControlTop + 3 * kTextControlSpacing + kTextControlHeight),
+		"", "", "", new BMessage(kNewGroupEntered));
 	fGroupTextControl->SetDivider(0);
 	AddChild(fGroupTextControl);
 
@@ -277,7 +309,8 @@ FilePermissionsView::MessageReceived(BMessage* message)
 		case kPermissionsChanged:
 			if (fModel != NULL) {
 				mode_t newPermissions = 0;
-				newPermissions = (mode_t)((fReadUserCheckBox->Value() ? S_IRUSR : 0)
+				newPermissions
+					= (mode_t)((fReadUserCheckBox->Value() ? S_IRUSR : 0)
 					| (fReadGroupCheckBox->Value() ? S_IRGRP : 0)
 					| (fReadOtherCheckBox->Value() ? S_IROTH : 0)
 

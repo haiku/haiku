@@ -52,7 +52,8 @@ public:
 	void Draw(BRect widgetRect, BRect widgetTextRect, float width, BPoseView*,
 		bool selected, uint32 clipboardMode);
 	void Draw(BRect widgetRect, BRect widgetTextRect, float width, BPoseView*,
-		BView* drawView, bool selected, uint32 clipboardMode, BPoint offset, bool direct);
+		BView* drawView, bool selected, uint32 clipboardMode, BPoint offset,
+		bool direct);
 		// second call is used for offscreen drawing, where PoseView
 		// and current drawing view are different
 
@@ -72,7 +73,8 @@ public:
 		// we can invalidate properly
 		
 	void StartEdit(BRect bounds, BPoseView*, BPose*);
-	void StopEdit(bool saveChanges, BPoint loc, BPoseView*, BPose*, int32 index);
+	void StopEdit(bool saveChanges, BPoint loc, BPoseView*, BPose*,
+		int32 index);
 
 	void SelectAll(BPoseView* view);
 	void CheckAndUpdate(BPoint, const BColumn*, BPoseView*, bool visible);

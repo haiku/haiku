@@ -66,7 +66,8 @@ class BSlowMenu : public BMenu {
 
 	protected:
 		virtual bool AddDynamicItem(add_state state);
-			// this is the callback from BMenu, you shouldn't need to override this
+			// this is the callback from BMenu, you shouldn't need to
+			// override this
 
 		bool fMenuBuilt;
 };

@@ -63,8 +63,9 @@ public:
 	void SetTypesList(const BObjectList<BString>* list);
 	const BObjectList<BString>* TypesList() const;
 
-	static ModelMenuItem* NewModelItem(Model*, const BMessage*, const BMessenger&,
-		bool suppressFolderHierarchy = false, BContainerWindow* = NULL,
+	static ModelMenuItem* NewModelItem(Model*, const BMessage*,
+		const BMessenger&, bool suppressFolderHierarchy = false,
+		BContainerWindow* = NULL,
 		const BObjectList<BString>* typeslist = NULL,
 		TrackingHookData* hook = NULL);
 

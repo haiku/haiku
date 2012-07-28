@@ -239,8 +239,8 @@ UndoItemCopy::Undo()
 status_t
 UndoItemCopy::Redo()
 {
-	FSMoveToFolder(new BObjectList<entry_ref>(fSourceList), new BEntry(&fTargetRef),
-		FSUndoMoveMode(fMoveMode), NULL);
+	FSMoveToFolder(new BObjectList<entry_ref>(fSourceList),
+		new BEntry(&fTargetRef), FSUndoMoveMode(fMoveMode), NULL);
 
 	return B_OK;
 }
@@ -388,7 +388,8 @@ UndoItemRename::Redo()
 //	#pragma mark -
 
 
-UndoItemRenameVolume::UndoItemRenameVolume(BVolume &volume, const char* newName)
+UndoItemRenameVolume::UndoItemRenameVolume(BVolume &volume,
+		const char* newName)
 	:
 	fVolume(volume),
 	fNewName(newName)

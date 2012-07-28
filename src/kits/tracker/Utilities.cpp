@@ -261,7 +261,8 @@ PoseInfo::EndianSwap(void* castToThis)
 void
 PoseInfo::PrintToStream()
 {
-	PRINT(("%s, inode:%Lx, location %f %f\n", fInvisible ? "hidden" : "visible",
+	PRINT(("%s, inode:%Lx, location %f %f\n",
+		fInvisible ? "hidden" : "visible",
 		fInitedDirectory, fLocation.x, fLocation.y));
 }
 
@@ -286,7 +287,8 @@ ExtendedPoseInfo::Size(int32 count)
 size_t
 ExtendedPoseInfo::SizeWithHeadroom() const
 {
-	return sizeof(ExtendedPoseInfo) + (fNumFrames + 1) * sizeof(FrameLocation);
+	return sizeof(ExtendedPoseInfo) + (fNumFrames + 1)
+		* sizeof(FrameLocation);
 }
 
 
@@ -545,9 +547,9 @@ FadeRGBA32Vertical(uint32* bits, int32 width, int32 height, int32 from,
 // #pragma mark -
 
 
-DraggableIcon::DraggableIcon(BRect rect, const char* name, const char* mimeType,
-		icon_size size, const BMessage* message, BMessenger target,
-		uint32 resizeMask, uint32 flags)
+DraggableIcon::DraggableIcon(BRect rect, const char* name,
+		const char* mimeType, icon_size size, const BMessage* message,
+		BMessenger target, uint32 resizeMask, uint32 flags)
 	:
 	BView(rect, name, resizeMask, flags),
 	fMessage(*message),

@@ -109,10 +109,13 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 		if (!includeStartEntry) {
 			BDirectory parent;
 			BDirectory dir(&entry);
-			// if we're at the root directory skip "mnt" and go straight to "/"
-			if (!showDesktop && dir.InitCheck() == B_OK && dir.IsRootDirectory())
+
+			if (!showDesktop && dir.InitCheck() == B_OK
+				&& dir.IsRootDirectory()) {
+				// if we're at the root directory skip "mnt" and
+				// go straight to "/"
 				parent.SetTo("/");
-			else
+			} else
 				entry.GetParent(&parent);
 
 			parent.GetEntry(&entry);
@@ -137,10 +140,11 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 
 			bool hitRoot = false;
 
-			// if we're at the root directory skip "mnt" and go straight to "/"
 			BDirectory dir(&entry);
 			if (!showDesktop && dir.InitCheck() == B_OK
 				&& dir.IsRootDirectory()) {
+				// if we're at the root directory skip "mnt" and
+				// go straight to "/"
 				hitRoot = true;
 				parent.SetTo("/");
 			}
@@ -161,7 +165,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 			if (result == kReadAttrFailed || !info.fInvisible
 				|| (showDesktop && desktopEntry == entry)) {
 				AddItemToDirMenu(&entry, originatingWindow, reverse,
-								 addShortcuts, navMenuEntries);
+					addShortcuts, navMenuEntries);
 			}
 
 			if (hitRoot) {
@@ -213,12 +217,12 @@ BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* originatingWindow,
 	BContainerWindow* window = originatingWindow ?
 		dynamic_cast<BContainerWindow*>(originatingWindow) : 0;
 	if (window)
-		message->AddData("nodeRefsToClose", B_RAW_TYPE, window->TargetModel()->NodeRef(),
-			sizeof (node_ref));
+		message->AddData("nodeRefsToClose", B_RAW_TYPE,
+			window->TargetModel()->NodeRef(), sizeof (node_ref));
 	ModelMenuItem* item;
 	if (navMenuEntries) {
-		BNavMenu* subMenu = new BNavMenu(model.Name(), B_REFS_RECEIVED, fTarget,
-			window);
+		BNavMenu* subMenu = new BNavMenu(model.Name(), B_REFS_RECEIVED,
+			fTarget, window);
 		entry_ref ref;
 		entry->GetRef(&ref);
 		subMenu->SetNavDir(&ref);
@@ -244,7 +248,8 @@ BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* originatingWindow,
 	item->SetTarget(fTarget);
 
 	if (fMenuBar) {
-		ModelMenuItem* menu = dynamic_cast<ModelMenuItem*>(fMenuBar->ItemAt(0));
+		ModelMenuItem* menu
+			= dynamic_cast<ModelMenuItem*>(fMenuBar->ItemAt(0));
 		if (menu) {
 			ThrowOnError(menu->SetEntry(entry));
 			item->SetMarked(true);

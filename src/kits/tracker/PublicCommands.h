@@ -46,12 +46,15 @@ const uint32 kSaveButton = 'Tsav';
 const uint32 kShowSplash = 'Spls';
 
 const uint32 kStartWatchClipboardRefs = 'TCbw';
-	// StartWatching() clipboard changes. Changes will be sent to given BMessenger "target"
+	// StartWatching() clipboard changes. Changes will be sent to given
+	// BMessenger "target"
 const uint32 kStopWatchClipboardRefs = 'TCfw';
 	// StopWatching() given BMessenger "target"
 const uint32 kFSClipboardChanges = 'TCch';
-	// Used by FSClipboard functions which change refs in clipboard and are used outside Tracker (like BFilePanel called in another app)
-	// Contains movemodes named as in FSClipboard operations and in Clipboard (look into FSClipboard files)
+	// Used by FSClipboard functions which change refs in clipboard and are
+	// used outside Tracker (like BFilePanel called in another app)
+	// Contains movemodes named as in FSClipboard operations and in Clipboard
+	// (look into FSClipboard files)
 
 } // namespace BPrivate
 

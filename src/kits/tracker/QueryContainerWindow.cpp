@@ -101,8 +101,8 @@ BQueryContainerWindow::AddWindowMenu(BMenu* menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem(B_TRANSLATE("Select all"),	new BMessage(B_SELECT_ALL),
-		'A');
+	item = new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(B_SELECT_ALL), 'A');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
@@ -111,8 +111,8 @@ BQueryContainerWindow::AddWindowMenu(BMenu* menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem(B_TRANSLATE("Close"), new BMessage(B_QUIT_REQUESTED),
-		'W');
+	item = new BMenuItem(B_TRANSLATE("Close"),
+		new BMessage(B_QUIT_REQUESTED), 'W');
 	item->SetTarget(this);
 	menu->AddItem(item);
 }
@@ -161,9 +161,11 @@ BQueryContainerWindow::SetUpDefaultState()
 
 	defaultStatePath += sanitizedType;
 
-	PRINT(("looking for default query state at %s\n", defaultStatePath.String()));
+	PRINT(("looking for default query state at %s\n",
+		defaultStatePath.String()));
 
-	if (!DefaultStateSourceNode(defaultStatePath.String(), &defaultingNode, false)) {
+	if (!DefaultStateSourceNode(defaultStatePath.String(), &defaultingNode,
+			false)) {
 		TRACE();
 		return;
 	}

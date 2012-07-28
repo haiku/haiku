@@ -84,7 +84,8 @@ struct AddOneShortcutParams {
 };
 
 static bool
-AddOneShortcut(const Model* model, const char*, uint32 shortcut, bool /*primary*/, void* context)
+AddOneShortcut(const Model* model, const char*, uint32 shortcut,
+	bool /*primary*/, void* context)
 {
 	if (!shortcut)
 		// no shortcut, bail
@@ -151,11 +152,10 @@ BDeskWindow::~BDeskWindow()
 void
 BDeskWindow::Init(const BMessage*)
 {
-	//
-	//	Set the size of the screen before calling the container window's
-	//	Init() because it will add volume poses to this window and
-	// 	they will be clipped otherwise
-	//
+	// Set the size of the screen before calling the container window's
+	// Init() because it will add volume poses to this window and
+	// they will be clipped otherwise
+
 	BScreen screen(this);
 	fOldFrame = screen.Frame();
 
@@ -347,8 +347,8 @@ BDeskWindow::AddWindowContextMenus(BMenu* menu)
 	menu->AddItem(pasteItem);
 	menu->AddSeparatorItem();
 #endif
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Clean up"), new BMessage(kCleanup),
-		'K'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Clean up"),
+		new BMessage(kCleanup), 'K'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
 		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
@@ -470,4 +470,3 @@ BDeskWindow::MessageReceived(BMessage* message)
 			break;
 	}
 }
-

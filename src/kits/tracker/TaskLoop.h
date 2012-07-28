@@ -35,8 +35,8 @@ All rights reserved.
 #define __TASK_LOOP__
 
 
-//	Delayed Tasks, Periodic Delayed Tasks, Periodic Delayed Tasks with timeout,
-//	Run when idle tasks, accumulating delayed tasks
+// Delayed Tasks, Periodic Delayed Tasks, Periodic Delayed Tasks with timeout,
+// Run when idle tasks, accumulating delayed tasks
 
 
 #include <Locker.h>
@@ -46,7 +46,6 @@ All rights reserved.
 
 
 namespace BPrivate {
-
 
 // Task flavors
 
@@ -110,8 +109,8 @@ protected:
 // until functor returns true
 class RunWhenIdleTask : public PeriodicDelayedTask {
 public:
-	RunWhenIdleTask(FunctionObjectWithResult<bool>* functor, bigtime_t initialDelay,
-		bigtime_t idleFor, bigtime_t heartBeat);
+	RunWhenIdleTask(FunctionObjectWithResult<bool>* functor,
+		bigtime_t initialDelay, bigtime_t idleFor, bigtime_t heartBeat);
 	virtual ~RunWhenIdleTask();
 
 	virtual bool RunIfNeeded(bigtime_t currentTime);
@@ -255,7 +254,6 @@ DelayedTask::RunAfterTime() const
 {
 	return fRunAfter;
 }
-
 
 } // namespace BPrivate
 

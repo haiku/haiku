@@ -39,13 +39,13 @@ All rights reserved.
 //
 // 	destinationNode << transformer << buffer << filter << sourceNode
 //
-//	transformer may for instance perform endian-swapping or offsetting of a B_RECT attribute
-//	filter may withold certain attributes
-//	buffer is a memory allocated snapshot of attributes, may be repeatedly streamed into
+//	transformer may for instance perform endian-swapping or offsetting of
+//	a B_RECT attribute filter may withold certain attributes buffer is a
+//	memory allocated snapshot of attributes, may be repeatedly streamed into
 //	other files, buffers
 //
-//	In addition to the whacky (but usefull) << syntax, calls like Read, Write are also
-//	available
+//	In addition to the whacky (but usefull) << syntax, calls like Read, Write
+//	are also available
 #ifndef __ATTRIBUTE_STREAM__
 #define __ATTRIBUTE_STREAM__
 
@@ -104,7 +104,8 @@ public:
 		// any data it has, gets, transforms, doesn't filter out
 		//
 		// under the hood sets up streaming into the next node; hooking
-		// up source and destination, forces the stream head to start streaming
+		// up source and destination, forces the stream head to start
+		// streaming
 
 	virtual void Rewind();
 		// get ready to start all over again
@@ -128,14 +129,13 @@ public:
 	virtual const AttributeInfo* Next();
 		// give me the next attribute in the stream
 	virtual const char* Get();
-		// give me the data of the attribute in the stream that was just returned
-		// by Next
-		// assumes there is a buffering node somewhere on the way to
-		// the source, from which the resulting buffer is borrowed
+		// give me the data of the attribute in the stream that was just
+		// returned by Next assumes there is a buffering node somewhere on the
+		// way to the source, from which the resulting buffer is borrowed
 	virtual bool Fill(char* buffer) const;
-		// fill the buffer with data of the attribute in the stream that was just returned
-		// by next
-		// <buffer> is big enough to hold the entire attribute data
+		// fill the buffer with data of the attribute in the stream that was
+		// just returned by next <buffer> is big enough to hold the entire
+		// attribute data
 
 	virtual bool CanFeed() const { return false; }
 		// return true if can work as a source for the entire stream
@@ -199,10 +199,10 @@ public:
 
 	virtual void MakeEmpty();
 	virtual off_t Contains(const char* name, uint32 type);
-	virtual off_t Read(const char* name, const char* foreignName, uint32 type, off_t size,
-		void* buffer, void (*swapFunc)(void*) = 0);
-	virtual off_t Write(const char* name, const char* foreignName, uint32 type, off_t size,
-		const void* buffer);
+	virtual off_t Read(const char* name, const char* foreignName,
+		uint32 type, off_t size, void* buffer, void (*swapFunc)(void*) = 0);
+	virtual off_t Write(const char* name, const char* foreignName,
+		uint32 type, off_t size, const void* buffer);
 
 protected:
 	virtual bool CanFeed() const { return true; }
@@ -275,10 +275,10 @@ public:
 	AttributeStreamFilterNode()
 		{}
 	virtual off_t Contains(const char* name, uint32 type);
-	virtual off_t Read(const char* name, const char* foreignName, uint32 type, off_t size,
-		void* buffer, void (*swapFunc)(void*) = 0);
-	virtual off_t Write(const char* name, const char* foreignName, uint32 type, off_t size,
-		const void* buffer);
+	virtual off_t Read(const char* name, const char* foreignName,
+		uint32 type, off_t size, void* buffer, void (*swapFunc)(void*) = 0);
+	virtual off_t Write(const char* name, const char* foreignName,
+		uint32 type, off_t size, const void* buffer);
 
 protected:
 	virtual bool Reject(const char* name, uint32 type, off_t size);
@@ -319,8 +319,8 @@ public:
 protected:
 	virtual bool WillTransform(const char* name, uint32 type, off_t size,
 		const char* data) const;
-		// override to implement filtering; should only return true if transformation will
-		// occur
+		// override to implement filtering, should only return true if
+		// transformation will occur
 	virtual char* CopyAndApplyTransformer(const char* name, uint32 type,
 		off_t size, const char* data);
 		// makes a copy of data

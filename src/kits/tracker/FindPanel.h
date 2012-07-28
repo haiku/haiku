@@ -129,8 +129,8 @@ class FindWindow : public BWindow {
 			{ return fFile; }
 
 		const char* QueryName() const;
-			// reads in the query name from either a saved name in a template or
-			// form a saved query name
+			// reads in the query name from either a saved name in a template
+			// or form a saved query name
 
 		static bool IsQueryTemplate(BNode* file);
 
@@ -140,7 +140,8 @@ class FindWindow : public BWindow {
 	private:
 		static BFile* TryOpening(const entry_ref* ref);
 		static void GetDefaultQuery(BEntry &entry);
-			// when opening an empty panel, use the default query to set the panel up
+			// when opening an empty panel, use the default query to set the
+			// panel up
 		void SaveQueryAttributes(BNode* file, bool templateQuery);
 
 		void Find();
@@ -242,10 +243,12 @@ class FindPanel : public BView {
 		void RemoveByAttributeItems();
 		void RemoveAttrViewItems();
 		void ShowOrHideMimeTypeMenu();
-			// MimeTypeWindow is only shown in kByNameItem and kByAttributeItem modes
+			// MimeTypeWindow is only shown in kByNameItem and
+			// kByAttributeItem modes
 
 		void ShowOrHideMoreOptions(bool show);
-			// fMode gets set by this and the call relies on it being up-to-date
+			// fMode gets set by this and the call relies on it being
+			// up-to-date
 		static int32 InitialAttrCount(const BNode*);
 		void FillCurrentQueryName(BTextControl*, FindWindow*);
 		void AddByNameOrFormulaItems();
@@ -348,7 +351,8 @@ class DeleteTransientQueriesTask {
 
 class RecentFindItemsMenu : public BMenu {
 	public:
-		RecentFindItemsMenu(const char* title, const BMessenger* target, uint32 what);
+		RecentFindItemsMenu(const char* title, const BMessenger* target,
+			uint32 what);
 
 	protected:
 		virtual void AttachedToWindow();
@@ -362,8 +366,9 @@ class RecentFindItemsMenu : public BMenu {
 class DraggableQueryIcon : public DraggableIcon {
 	// query/query template drag&drop helper
 	public:
-		DraggableQueryIcon(BRect frame, const char* name, const BMessage* message,
-			BMessenger target, uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		DraggableQueryIcon(BRect frame, const char* name,
+			const BMessage* message, BMessenger target,
+			uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW);
 
 	protected:
