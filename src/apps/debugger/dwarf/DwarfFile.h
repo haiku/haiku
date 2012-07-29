@@ -150,12 +150,18 @@ private:
 									const void*& _expression,
 									off_t& _length) const;
 
+			status_t			_LocateDebugInfo();
+			status_t			_GetDebugInfoPath(const char* fileName,
+									BString& _infoPath);
+
 private:
 			friend class 		DwarfFile::ExpressionEvaluationContext;
 
 private:
 			char*				fName;
+			char*				fAlternateName;
 			ElfFile*			fElfFile;
+			ElfFile*			fAlternateElfFile;
 			ElfSection*			fDebugInfoSection;
 			ElfSection*			fDebugAbbrevSection;
 			ElfSection*			fDebugStringSection;
