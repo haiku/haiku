@@ -127,7 +127,7 @@ _BMCMenuBar_::AttachedToWindow()
 	if (Parent() != NULL)
 		SetLowColor(Parent()->LowColor());
 	else
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
 }
 
 
@@ -136,7 +136,7 @@ _BMCMenuBar_::Draw(BRect updateRect)
 {
 	if (be_control_look != NULL) {
 		BRect rect(Bounds());
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 		uint32 flags = 0;
 		if (!IsEnabled())
 			flags |= BControlLook::B_DISABLED;
