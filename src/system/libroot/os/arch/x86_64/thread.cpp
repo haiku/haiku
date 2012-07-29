@@ -11,8 +11,12 @@
 thread_id
 find_thread(const char* name)
 {
-	// TODO x86_64: x86 is doing some TLS thing here. Should that be done here
-	// too?
+	if (!name) {
+		thread_id thread;
+		__asm__ __volatile__ ("movq %%fs:8, %%rax" : "=a" (thread));
+		return thread;
+	}
+
 	return _kern_find_thread(name);
 }
 

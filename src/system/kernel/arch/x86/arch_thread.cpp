@@ -18,6 +18,7 @@
 #include <int.h>
 #include <team.h>
 #include <thread.h>
+#include <tls.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
@@ -195,6 +196,29 @@ status_t
 arch_team_init_team_struct(Team* p, bool kernel)
 {
 	return B_OK;
+}
+
+
+/*!	Initializes the user-space TLS local storage pointer in
+	the thread structure, and the reserved TLS slots.
+	
+	Is called from _create_user_thread_kentry().
+*/
+status_t
+arch_thread_init_tls(Thread* thread)
+{
+	size_t tls[TLS_USER_THREAD_SLOT + 1];
+
+	thread->user_local_storage = thread->user_stack_base
+		+ thread->user_stack_size;
+
+	// initialize default TLS fields
+	memset(tls, 0, sizeof(tls));
+	tls[TLS_BASE_ADDRESS_SLOT] = thread->user_local_storage;
+	tls[TLS_THREAD_ID_SLOT] = thread->id;
+	tls[TLS_USER_THREAD_SLOT] = (addr_t)thread->user_thread;
+
+	return user_memcpy((void*)thread->user_local_storage, tls, sizeof(tls));
 }
 
 

@@ -52,7 +52,8 @@ x86_restart_syscall(iframe* frame)
 void
 x86_set_tls_context(Thread* thread)
 {
-
+	// Set FS segment base address to the TLS segment.
+	x86_write_msr(IA32_MSR_FS_BASE, thread->user_local_storage);
 }
 
 
@@ -124,19 +125,6 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 
 	// Save the stack position.
 	thread->arch_info.current_stack = stackTop;
-}
-
-
-/*!	Initializes the user-space TLS local storage pointer in
-	the thread structure, and the reserved TLS slots.
-	
-	Is called from _create_user_thread_kentry().
-*/
-status_t
-arch_thread_init_tls(Thread* thread)
-{
-	dprintf("arch_thread_init_tls: TODO\n");
-	return B_OK;
 }
 
 

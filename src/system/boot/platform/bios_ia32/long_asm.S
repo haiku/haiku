@@ -65,6 +65,7 @@ FUNCTION(long_enter_kernel):
 	// Set data segments.
 	mov		$KERNEL_DATA_SEG, %ax
 	mov		%ax, %ss
+	xor		%ax, %ax
 	mov		%ax, %ds
 	mov		%ax, %es
 	mov		%ax, %fs
