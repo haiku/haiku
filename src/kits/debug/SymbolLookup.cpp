@@ -86,7 +86,7 @@ RemoteMemoryAccessor::Init()
 
 	// get a list of the team's areas
 	area_info areaInfo;
-	int32 cookie = 0;
+	ssize_t cookie = 0;
 	status_t error;
 	while ((error = get_next_area_info(fTeam, &cookie, &areaInfo)) == B_OK) {
 		TRACE(("area %ld: address: %p, size: %ld, name: %s\n", areaInfo.area,

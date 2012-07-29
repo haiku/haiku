@@ -5750,7 +5750,7 @@ _get_area_info(area_id id, area_info* info, size_t size)
 
 
 status_t
-_get_next_area_info(team_id team, int32* cookie, area_info* info, size_t size)
+_get_next_area_info(team_id team, ssize_t* cookie, area_info* info, size_t size)
 {
 	addr_t nextBase = *(addr_t*)cookie;
 
@@ -5779,8 +5779,7 @@ _get_next_area_info(team_id team, int32* cookie, area_info* info, size_t size)
 	}
 
 	fill_area_info(area, info, size);
-	*cookie = (int32)(area->Base());
-		// TODO: Not 64 bit safe!
+	*cookie = (ssize_t)(area->Base());
 
 	return B_OK;
 }
@@ -5987,13 +5986,13 @@ _user_get_area_info(area_id area, area_info* userInfo)
 
 
 status_t
-_user_get_next_area_info(team_id team, int32* userCookie, area_info* userInfo)
+_user_get_next_area_info(team_id team, ssize_t* userCookie, area_info* userInfo)
 {
-	int32 cookie;
+	ssize_t cookie;
 
 	if (!IS_USER_ADDRESS(userCookie)
 		|| !IS_USER_ADDRESS(userInfo)
-		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
+		|| user_memcpy(&cookie, userCookie, sizeof(ssize_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	area_info info;
@@ -6004,7 +6003,7 @@ _user_get_next_area_info(team_id team, int32* userCookie, area_info* userInfo)
 
 	//info.protection &= B_USER_PROTECTION;
 
-	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK
+	if (user_memcpy(userCookie, &cookie, sizeof(ssize_t)) < B_OK
 		|| user_memcpy(userInfo, &info, sizeof(area_info)) < B_OK)
 		return B_BAD_ADDRESS;
 

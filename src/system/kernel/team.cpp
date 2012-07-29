@@ -1942,7 +1942,8 @@ fork_team(void)
 	struct area_info info;
 	thread_id threadID;
 	status_t status;
-	int32 cookie;
+	ssize_t areaCookie;
+	int32 imageCookie;
 
 	TRACE(("fork_team(): team %" B_PRId32 "\n", parentTeam->id));
 
@@ -2030,8 +2031,8 @@ fork_team(void)
 	// TODO: should be able to handle stack areas differently (ie. don't have
 	// them copy-on-write)
 
-	cookie = 0;
-	while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+	areaCookie = 0;
+	while (get_next_area_info(B_CURRENT_TEAM, &areaCookie, &info) == B_OK) {
 		if (info.area == parentTeam->user_data_area) {
 			// don't clone the user area; just create a new one
 			status = create_team_user_data(team);
@@ -2077,8 +2078,9 @@ fork_team(void)
 
 	// copy image list
 	image_info imageInfo;
-	cookie = 0;
-	while (get_next_image_info(parentTeam->id, &cookie, &imageInfo) == B_OK) {
+	imageCookie = 0;
+	while (get_next_image_info(parentTeam->id, &imageCookie, &imageInfo)
+			== B_OK) {
 		image_id image = register_image(team, &imageInfo, sizeof(imageInfo));
 		if (image < 0)
 			goto err5;

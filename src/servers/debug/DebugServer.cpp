@@ -734,7 +734,7 @@ TeamDebugHandler::_LookupSymbolAddress(
 		// lookup failed: find area containing the IP
 		bool useAreaInfo = false;
 		area_info info;
-		int32 cookie = 0;
+		ssize_t cookie = 0;
 		while (get_next_area_info(fTeam, &cookie, &info) == B_OK) {
 			if ((addr_t)info.address <= (addr_t)address
 				&& (addr_t)info.address + info.size > (addr_t)address) {

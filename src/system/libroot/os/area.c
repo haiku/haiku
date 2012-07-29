@@ -70,7 +70,7 @@ _get_area_info(area_id id, area_info *areaInfo, size_t size)
 
 
 status_t
-_get_next_area_info(team_id team, int32 *cookie, area_info *areaInfo, size_t size)
+_get_next_area_info(team_id team, ssize_t *cookie, area_info *areaInfo, size_t size)
 {
 	// size is not yet used, but may, if area_info changes
 	(void)size;

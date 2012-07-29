@@ -411,7 +411,7 @@ extern status_t		_kern_delete_area(area_id area);
 extern area_id		_kern_area_for(void *address);
 extern area_id		_kern_find_area(const char *name);
 extern status_t		_kern_get_area_info(area_id area, area_info *info);
-extern status_t		_kern_get_next_area_info(team_id team, int32 *cookie,
+extern status_t		_kern_get_next_area_info(team_id team, ssize_t *cookie,
 						area_info *info);
 extern status_t		_kern_resize_area(area_id area, size_t newSize);
 extern area_id		_kern_transfer_area(area_id area, void **_address,

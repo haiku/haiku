@@ -96,7 +96,7 @@ extern status_t		set_area_protection(area_id id, uint32 newProtection);
 
 /* system private, use macros instead */
 extern status_t		_get_area_info(area_id id, area_info *areaInfo, size_t size);
-extern status_t		_get_next_area_info(team_id team, int32 *cookie,
+extern status_t		_get_next_area_info(team_id team, ssize_t *cookie,
 						area_info *areaInfo, size_t size);
 
 #define get_area_info(id, areaInfo) \
