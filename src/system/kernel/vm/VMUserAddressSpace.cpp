@@ -461,8 +461,8 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 	bool foundSpot = false;
 
 	TRACE(("VMUserAddressSpace::_InsertAreaSlot: address space %p, start "
-		"0x%lx, size %ld, end 0x%lx, addressSpec %ld, area %p\n", this, start,
-		size, end, addressSpec, area));
+		"0x%lx, size %ld, end 0x%lx, addressSpec %" B_PRIu32 ", area %p\n",
+		this, start, size, end, addressSpec, area));
 
 	// do some sanity checking
 	if (start < fBase || size == 0 || end > fEndAddress
@@ -514,8 +514,8 @@ second_chance:
 			// find a hole big enough for a new area
 			if (last == NULL) {
 				// see if we can build it at the beginning of the virtual map
-				addr_t alignedBase = ROUNDUP(fBase, alignment);
-				if (is_valid_spot(fBase, alignedBase, size,
+				addr_t alignedBase = ROUNDUP(start, alignment);
+				if (is_valid_spot(start, alignedBase, size,
 						next == NULL ? end : next->Base())) {
 					foundSpot = true;
 					area->SetBase(alignedBase);
