@@ -46,7 +46,7 @@ scale_bilinear(uint8* bits, int32 srcWidth, int32 srcHeight, int32 dstWidth,
 	for (int32 x = 0; x < srcWidth; x++) {
 		uint8* d = dst;
 		for (int32 y = dstHeight - 1; y >= 0; y--) {
-			int32 lineF = y * 256 * (srcHeight - 1) / (dstHeight - 1);
+			int32 lineF = (y << 8) * (srcHeight - 1) / (dstHeight - 1);
 			int32 lineI = lineF >> 8;
 			uint8 weight = (uint8)(lineF & 0xff);
 			uint8* s1 = bits + lineI * bpr + 4 * x;
@@ -76,7 +76,7 @@ scale_bilinear(uint8* bits, int32 srcWidth, int32 srcHeight, int32 dstWidth,
 	for (int32 y = 0; y < dstWidth; y++) {
 		uint8* d = dst;
 		for (int32 x = dstWidth - 1; x >= 0; x--) {
-			int32 columnF = x * 256 * (srcWidth - 1) / (dstWidth - 1);
+			int32 columnF = (x << 8) * (srcWidth - 1) / (dstWidth - 1);
 			int32 columnI = columnF >> 8;
 			uint8 weight = (uint8)(columnF & 0xff);
 			uint8* s1 = bits + y * bpr + 4 * columnI;
@@ -162,10 +162,8 @@ scale3x(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight,
 	 */
 
 	// Assume that both src and dst are 4 BPP (B_RGBA32)
-	for(int32 y = 0; y < srcHeight; ++y)
-	{
-		for(int32 x = 0; x < srcWidth; ++x)
-		{
+	for(int32 y = 0; y < srcHeight; ++y) {
+		for(int32 x = 0; x < srcWidth; ++x) {
 			uint32 a = *(uint32*)(srcBits + (MAX(0, y - 1) * srcBPR)
 				+ (4 * MAX(0, x - 1)));
 			uint32 b = *(uint32*)(srcBits + (MAX(0, y - 1) * srcBPR)
@@ -563,12 +561,17 @@ status_t
 BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 	uint32 srcBPR, BBitmap* result)
 {
-	if (!src || !result || srcBPR == 0)
+	if (src == NULL || result == NULL || srcBPR == 0)
 		return B_BAD_VALUE;
 
 	status_t ret = result->InitCheck();
 	if (ret < B_OK)
 		return ret;
+
+	if (result->ColorSpace() != B_RGBA32 && result->ColorSpace() != B_RGB32) {
+		// TODO: support other color spaces
+		return B_BAD_VALUE;
+	}
 
 	uint32 dstWidth = result->Bounds().IntegerWidth() + 1;
 	uint32 dstHeight = result->Bounds().IntegerHeight() + 1;
@@ -578,15 +581,12 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 		return B_ERROR;
 	}
 
-	if (result->ColorSpace() != B_RGBA32 && result->ColorSpace() != B_RGB32) {
-		// TODO: support other color spaces
-		return B_BAD_VALUE;
-	}
-
 	uint8* dst = (uint8*)result->Bits();
 	uint32 dstBPR = result->BytesPerRow();
 
 	const rgb_color* colorMap = system_colors()->color_list;
+	if (colorMap == NULL)
+		return B_NO_INIT;
 
 	const uint8* srcStart = src;
 	uint8* dstStart = dst;
@@ -594,14 +594,12 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 	for (uint32 y = 0; y < height; y++) {
 		uint32* d = (uint32*)dst;
 		const uint8* s = src;
-		for (uint32 x = 0; x < width; x++) {
+		for (uint32 x = 0; x < width; x++, s++, d++) {
 			const rgb_color c = colorMap[*s];
-			uint8 alpha = 255;
+			uint8 alpha = 0xff;
 			if (*s == B_TRANSPARENT_MAGIC_CMAP8)
 				alpha = 0;
 			*d = (alpha << 24) | (c.red << 16) | (c.green << 8) | (c.blue);
-			s++;
-			d++;
 		}
 		src += srcBPR;
 		dst += dstBPR;
@@ -611,13 +609,10 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 	src = srcStart;
 	dst = dstStart;
 
-	if (dstWidth == width && dstHeight == height) {
-		// No scaling, just convert to B_RGBA32
-		result->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
-	} else if (dstWidth == dstHeight && dstWidth == 2 * width
-			|| dstWidth == 3 * width
-			|| dstWidth == 4 * width) {
-		// we can do some special convertions here
+	if ((dstWidth == 2 * width && dstHeight == 2 * height)
+		|| (dstWidth == 3 * width && dstHeight == 3 * height)
+		|| (dstWidth == 4 * width && dstHeight == 4 * height)) {
+		// we can do some special scaling here
 
 		// first convert to B_RGBA32
 		BBitmap* converted
@@ -628,13 +623,12 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 		int32 convertedBPR = converted->BytesPerRow();
 
 		// scale using the scale2x/scale3x/scale4x algorithm
-		if (dstWidth == 2 * width && dstHeight == 2 * height) {
+		if (dstWidth == 2 * width && dstHeight == 2 * height)
 			scale2x(convertedBits, dst, width, height, convertedBPR, dstBPR);
-		} else if (dstWidth == 3 * width && dstHeight == 3 * height) {
+		else if (dstWidth == 3 * width && dstHeight == 3 * height)
 			scale3x(convertedBits, dst, width, height, convertedBPR, dstBPR);
-		} else if (dstWidth == 4 * width && dstHeight == 4 * height) {
+		else if (dstWidth == 4 * width && dstHeight == 4 * height)
 			scale4x(convertedBits, dst, width, height, convertedBPR, dstBPR);
-		}
 
 		// cleanup
 		delete converted;
@@ -683,8 +677,9 @@ memset(result->Bits(), 255, result->BitsLength());
 	uint32 dstBPR = result->BytesPerRow();
 
 	const color_map* colorMap = system_colors();
-	if (!colorMap)
+	if (colorMap == NULL)
 		return B_NO_INIT;
+
 	uint16 index;
 
 	for (uint32 y = 0; y < height; y++) {
