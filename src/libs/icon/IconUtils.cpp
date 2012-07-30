@@ -162,8 +162,8 @@ scale3x(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight,
 	 */
 
 	// Assume that both src and dst are 4 BPP (B_RGBA32)
-	for(int32 y = 0; y < srcHeight; ++y) {
-		for(int32 x = 0; x < srcWidth; ++x) {
+	for (int32 y = 0; y < srcHeight; ++y) {
+		for (int32 x = 0; x < srcWidth; ++x) {
 			uint32 a = *(uint32*)(srcBits + (MAX(0, y - 1) * srcBPR)
 				+ (4 * MAX(0, x - 1)));
 			uint32 b = *(uint32*)(srcBits + (MAX(0, y - 1) * srcBPR)
