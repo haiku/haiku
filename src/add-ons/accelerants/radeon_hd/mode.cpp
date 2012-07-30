@@ -219,10 +219,14 @@ radeon_set_display_mode(display_mode* mode)
 	}
 
 	// for debugging
-	TRACE("D1CRTC_STATUS        Value: 0x%X\n", Read32(CRT, D1CRTC_STATUS));
-	TRACE("D2CRTC_STATUS        Value: 0x%X\n", Read32(CRT, D2CRTC_STATUS));
-	TRACE("D1CRTC_CONTROL       Value: 0x%X\n", Read32(CRT, D1CRTC_CONTROL));
-	TRACE("D2CRTC_CONTROL       Value: 0x%X\n", Read32(CRT, D2CRTC_CONTROL));
+	TRACE("D1CRTC_STATUS        Value: 0x%X\n",
+		Read32(CRT, AVIVO_D1CRTC_STATUS));
+	TRACE("D2CRTC_STATUS        Value: 0x%X\n",
+		Read32(CRT, AVIVO_D2CRTC_STATUS));
+	TRACE("D1CRTC_CONTROL       Value: 0x%X\n",
+		Read32(CRT, AVIVO_D1CRTC_CONTROL));
+	TRACE("D2CRTC_CONTROL       Value: 0x%X\n",
+		Read32(CRT, AVIVO_D2CRTC_CONTROL));
 	TRACE("D1GRPH_ENABLE        Value: 0x%X\n",
 		Read32(CRT, AVIVO_D1GRPH_ENABLE));
 	TRACE("D2GRPH_ENABLE        Value: 0x%X\n",

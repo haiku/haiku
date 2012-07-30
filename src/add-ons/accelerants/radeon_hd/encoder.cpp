@@ -1013,7 +1013,7 @@ encoder_dac_load_detect(uint32 connectorIndex)
 			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CRT1_SUPPORT);
 		atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-		uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+		uint32 biosScratch0 = Read32(OUT, R600_SCRATCH_REG0);
 
 		if ((biosScratch0 & ATOM_S0_CRT1_MASK) != 0)
 			return true;
@@ -1023,7 +1023,7 @@ encoder_dac_load_detect(uint32 connectorIndex)
 			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CRT2_SUPPORT);
 		atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-		uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+		uint32 biosScratch0 = Read32(OUT, R600_SCRATCH_REG0);
 
 		if ((biosScratch0 & ATOM_S0_CRT2_MASK) != 0)
 			return true;
@@ -1035,7 +1035,7 @@ encoder_dac_load_detect(uint32 connectorIndex)
 			args.sDacload.ucMisc = DAC_LOAD_MISC_YPrPb;
 		atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-		uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+		uint32 biosScratch0 = Read32(OUT, R600_SCRATCH_REG0);
 
 		if ((biosScratch0 & (ATOM_S0_CV_MASK | ATOM_S0_CV_MASK_A)) != 0)
 			return true;
@@ -1047,7 +1047,7 @@ encoder_dac_load_detect(uint32 connectorIndex)
 			args.sDacload.ucMisc = DAC_LOAD_MISC_YPrPb;
 		atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-		uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+		uint32 biosScratch0 = Read32(OUT, R600_SCRATCH_REG0);
 
 		if ((biosScratch0
 			& (ATOM_S0_TV1_COMPOSITE | ATOM_S0_TV1_COMPOSITE_A)) != 0) {
@@ -1076,7 +1076,7 @@ encoder_dig_load_detect(uint32 connectorIndex)
 	encoder_external_setup(connectorIndex,
 		EXTERNAL_ENCODER_ACTION_V3_DACLOAD_DETECTION);
 
-	uint32 biosScratch0 = Read32(OUT, R600_BIOS_0_SCRATCH);
+	uint32 biosScratch0 = Read32(OUT, R600_SCRATCH_REG0);
 
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
@@ -1465,7 +1465,7 @@ encoder_crtc_scratch(uint8 crtcID)
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	// TODO: r500
-	uint32 biosScratch3 = Read32(OUT, R600_BIOS_3_SCRATCH);
+	uint32 biosScratch3 = Read32(OUT, R600_SCRATCH_REG3);
 
 	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 		biosScratch3 &= ~ATOM_S3_TV1_CRTC_ACTIVE;
@@ -1501,7 +1501,7 @@ encoder_crtc_scratch(uint8 crtcID)
 	}
 
 	// TODO: r500
-	Write32(OUT, R600_BIOS_3_SCRATCH, biosScratch3);
+	Write32(OUT, R600_SCRATCH_REG3, biosScratch3);
 }
 
 
@@ -1514,7 +1514,7 @@ encoder_dpms_scratch(uint8 crtcID, bool power)
 	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	// TODO: r500
-	uint32 biosScratch2 = Read32(OUT, R600_BIOS_2_SCRATCH);
+	uint32 biosScratch2 = Read32(OUT, R600_SCRATCH_REG2);
 
 	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 		if (power == true)
@@ -1576,7 +1576,7 @@ encoder_dpms_scratch(uint8 crtcID, bool power)
 		else
 			biosScratch2 |= ATOM_S2_DFP5_DPMS_STATE;
 	}
-	Write32(OUT, R600_BIOS_2_SCRATCH, biosScratch2);
+	Write32(OUT, R600_SCRATCH_REG2, biosScratch2);
 }
 
 
@@ -1800,7 +1800,7 @@ void
 encoder_output_lock(bool lock)
 {
 	TRACE("%s: %s\n", __func__, lock ? "true" : "false");
-	uint32 biosScratch6 = Read32(OUT, R600_BIOS_6_SCRATCH);
+	uint32 biosScratch6 = Read32(OUT, R600_SCRATCH_REG6);
 
 	if (lock) {
 		biosScratch6 |= ATOM_S6_CRITICAL_STATE;
@@ -1810,7 +1810,7 @@ encoder_output_lock(bool lock)
 		biosScratch6 |= ATOM_S6_ACC_MODE;
 	}
 
-	Write32(OUT, R600_BIOS_6_SCRATCH, biosScratch6);
+	Write32(OUT, R600_SCRATCH_REG6, biosScratch6);
 }
 
 

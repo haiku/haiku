@@ -28,6 +28,22 @@
 #define R700_H
 
 
+/* Scratch Registers */
+#define	R700_SCRATCH_REG0					0x8500
+#define	R700_SCRATCH_REG1					0x8504
+#define	R700_SCRATCH_REG2					0x8508
+#define	R700_SCRATCH_REG3					0x850C
+#define	R700_SCRATCH_REG4					0x8510
+#define	R700_SCRATCH_REG5					0x8514
+#define	R700_SCRATCH_REG6					0x8518
+#define	R700_SCRATCH_REG7					0x851C
+#define	R700_SCRATCH_UMSK					0x8540
+#define	R700_SCRATCH_ADDR					0x8544
+
+/* CRT controler register offset */
+#define R700_CRTC0_REGISTER_OFFSET			0x0
+#define R700_CRTC1_REGISTER_OFFSET			0x800
+
 #define R700_MAX_SH_GPRS				256
 #define R700_MAX_TEMP_GPRS				16
 #define R700_MAX_SH_THREADS				256
@@ -196,17 +212,6 @@
 #define R700_PA_SC_MODE_CNTL					0x28A4C
 #define	R700_PA_SC_MULTI_CHIP_CNTL				0x8B20
 #define		R700_SC_EARLYZ_TILE_FIFO_SIZE(x)	((x) << 20)
-
-#define	R700_SCRATCH_REG0						0x8500
-#define	R700_SCRATCH_REG1						0x8504
-#define	R700_SCRATCH_REG2						0x8508
-#define	R700_SCRATCH_REG3						0x850C
-#define	R700_SCRATCH_REG4						0x8510
-#define	R700_SCRATCH_REG5						0x8514
-#define	R700_SCRATCH_REG6						0x8518
-#define	R700_SCRATCH_REG7						0x851C
-#define	R700_SCRATCH_UMSK						0x8540
-#define	R700_SCRATCH_ADDR						0x8544
 
 #if 0
 #define	SMX_DC_CTL0					0xA020

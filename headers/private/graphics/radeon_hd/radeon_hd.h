@@ -14,8 +14,8 @@
 
 #include "radeon_reg.h"
 
-#include "avivo.h"
-#include "r500_reg.h"
+//#include "r500_reg.h"  // Not used atm
+#include "avivo_reg.h"
 #include "r600_reg.h"
 #include "r700_reg.h"
 #include "evergreen_reg.h"

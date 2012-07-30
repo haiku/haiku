@@ -166,50 +166,50 @@ void
 radeon_gpu_mc_halt(gpu_state* gpuState)
 {
 	// Backup current memory controller state
-	gpuState->d1vgaControl = Read32(OUT, D1VGA_CONTROL);
-	gpuState->d2vgaControl = Read32(OUT, D2VGA_CONTROL);
-	gpuState->vgaRenderControl = Read32(OUT, VGA_RENDER_CONTROL);
-	gpuState->vgaHdpControl = Read32(OUT, VGA_HDP_CONTROL);
-	gpuState->d1crtcControl = Read32(OUT, D1CRTC_CONTROL);
-	gpuState->d2crtcControl = Read32(OUT, D2CRTC_CONTROL);
+	gpuState->d1vgaControl = Read32(OUT, AVIVO_D1VGA_CONTROL);
+	gpuState->d2vgaControl = Read32(OUT, AVIVO_D2VGA_CONTROL);
+	gpuState->vgaRenderControl = Read32(OUT, AVIVO_VGA_RENDER_CONTROL);
+	gpuState->vgaHdpControl = Read32(OUT, AVIVO_VGA_HDP_CONTROL);
+	gpuState->d1crtcControl = Read32(OUT, AVIVO_D1CRTC_CONTROL);
+	gpuState->d2crtcControl = Read32(OUT, AVIVO_D2CRTC_CONTROL);
 
 	// halt all memory controller actions
-	Write32(OUT, VGA_RENDER_CONTROL, 0);
-	Write32(OUT, D1CRTC_UPDATE_LOCK, 1);
-	Write32(OUT, D2CRTC_UPDATE_LOCK, 1);
-	Write32(OUT, D1CRTC_CONTROL, 0);
-	Write32(OUT, D2CRTC_CONTROL, 0);
-	Write32(OUT, D1CRTC_UPDATE_LOCK, 0);
-	Write32(OUT, D2CRTC_UPDATE_LOCK, 0);
-	Write32(OUT, D1VGA_CONTROL, 0);
-	Write32(OUT, D2VGA_CONTROL, 0);
+	Write32(OUT, AVIVO_VGA_RENDER_CONTROL, 0);
+	Write32(OUT, AVIVO_D1CRTC_UPDATE_LOCK, 1);
+	Write32(OUT, AVIVO_D2CRTC_UPDATE_LOCK, 1);
+	Write32(OUT, AVIVO_D1CRTC_CONTROL, 0);
+	Write32(OUT, AVIVO_D2CRTC_CONTROL, 0);
+	Write32(OUT, AVIVO_D1CRTC_UPDATE_LOCK, 0);
+	Write32(OUT, AVIVO_D2CRTC_UPDATE_LOCK, 0);
+	Write32(OUT, AVIVO_D1VGA_CONTROL, 0);
+	Write32(OUT, AVIVO_D2VGA_CONTROL, 0);
 }
 
 
 void
 radeon_gpu_mc_resume(gpu_state* gpuState)
 {
-	Write32(OUT, D1GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
-	Write32(OUT, D1GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
-	Write32(OUT, D2GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
-	Write32(OUT, D2GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
+	Write32(OUT, AVIVO_D1GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
+	Write32(OUT, AVIVO_D1GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
+	Write32(OUT, AVIVO_D2GRPH_PRIMARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
+	Write32(OUT, AVIVO_D2GRPH_SECONDARY_SURFACE_ADDRESS, gInfo->fb.vramStart);
 	// TODO: Evergreen high surface addresses?
-	Write32(OUT, VGA_MEMORY_BASE_ADDRESS, gInfo->fb.vramStart);
+	Write32(OUT, AVIVO_VGA_MEMORY_BASE_ADDRESS, gInfo->fb.vramStart);
 
 	// Unlock host access
-	Write32(OUT, VGA_HDP_CONTROL, gpuState->vgaHdpControl);
+	Write32(OUT, AVIVO_VGA_HDP_CONTROL, gpuState->vgaHdpControl);
 	snooze(1);
 
 	// Restore memory controller state
-	Write32(OUT, D1VGA_CONTROL, gpuState->d1vgaControl);
-	Write32(OUT, D2VGA_CONTROL, gpuState->d2vgaControl);
-	Write32(OUT, D1CRTC_UPDATE_LOCK, 1);
-	Write32(OUT, D2CRTC_UPDATE_LOCK, 1);
-	Write32(OUT, D1CRTC_CONTROL, gpuState->d1crtcControl);
-	Write32(OUT, D2CRTC_CONTROL, gpuState->d2crtcControl);
-	Write32(OUT, D1CRTC_UPDATE_LOCK, 0);
-	Write32(OUT, D2CRTC_UPDATE_LOCK, 0);
-	Write32(OUT, VGA_RENDER_CONTROL, gpuState->vgaRenderControl);
+	Write32(OUT, AVIVO_D1VGA_CONTROL, gpuState->d1vgaControl);
+	Write32(OUT, AVIVO_D2VGA_CONTROL, gpuState->d2vgaControl);
+	Write32(OUT, AVIVO_D1CRTC_UPDATE_LOCK, 1);
+	Write32(OUT, AVIVO_D2CRTC_UPDATE_LOCK, 1);
+	Write32(OUT, AVIVO_D1CRTC_CONTROL, gpuState->d1crtcControl);
+	Write32(OUT, AVIVO_D2CRTC_CONTROL, gpuState->d2crtcControl);
+	Write32(OUT, AVIVO_D1CRTC_UPDATE_LOCK, 0);
+	Write32(OUT, AVIVO_D2CRTC_UPDATE_LOCK, 0);
+	Write32(OUT, AVIVO_VGA_RENDER_CONTROL, gpuState->vgaRenderControl);
 }
 
 
@@ -331,7 +331,7 @@ radeon_gpu_mc_setup_r700()
 	if (radeon_gpu_mc_idlewait() != B_OK)
 		ERROR("%s: Modifying non-idle memory controller!\n", __func__);
 
-	Write32(OUT, VGA_HDP_CONTROL, VGA_MEMORY_DISABLE);
+	Write32(OUT, AVIVO_VGA_HDP_CONTROL, AVIVO_VGA_MEMORY_DISABLE);
 
 	// TODO: Memory Controller AGP
 	Write32(OUT, R700_MC_VM_SYSTEM_APERTURE_LOW_ADDR,
@@ -391,7 +391,7 @@ radeon_gpu_mc_setup_evergreen()
 	if (radeon_gpu_mc_idlewait() != B_OK)
 		ERROR("%s: Modifying non-idle memory controller!\n", __func__);
 
-	Write32(OUT, VGA_HDP_CONTROL, VGA_MEMORY_DISABLE);
+	Write32(OUT, AVIVO_VGA_HDP_CONTROL, AVIVO_VGA_MEMORY_DISABLE);
 
 	// TODO: Memory Controller AGP
 	Write32(OUT, EVERGREEN_MC_VM_SYSTEM_APERTURE_LOW_ADDR,

@@ -260,7 +260,7 @@ radeon_hd_getbios_ni(radeon_info &info)
 	write32(info.registers + AVIVO_D1VGA_CONTROL, (d1vga_control
 		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
 			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
-	write32(info.registers + D2VGA_CONTROL, (d2vga_control
+	write32(info.registers + AVIVO_D2VGA_CONTROL, (d2vga_control
 		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
 			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
 	write32(info.registers + AVIVO_VGA_RENDER_CONTROL,
@@ -332,7 +332,7 @@ radeon_hd_getbios_r700(radeon_info &info)
 	write32(info.registers + AVIVO_D1VGA_CONTROL, (d1vga_control
 		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
 			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
-	write32(info.registers + D2VGA_CONTROL, (d2vga_control
+	write32(info.registers + AVIVO_D2VGA_CONTROL, (d2vga_control
 		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
 			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
 	write32(info.registers + AVIVO_VGA_RENDER_CONTROL,
@@ -416,7 +416,7 @@ radeon_hd_getbios_r600(radeon_info &info)
 	write32(info.registers + AVIVO_D1VGA_CONTROL, (d1vga_control
 		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
 			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
-	write32(info.registers + D2VGA_CONTROL, (d2vga_control
+	write32(info.registers + AVIVO_D2VGA_CONTROL, (d2vga_control
 		& ~(AVIVO_DVGA_CONTROL_MODE_ENABLE
 			| AVIVO_DVGA_CONTROL_TIMING_SELECT)));
 	write32(info.registers + AVIVO_VGA_RENDER_CONTROL,
