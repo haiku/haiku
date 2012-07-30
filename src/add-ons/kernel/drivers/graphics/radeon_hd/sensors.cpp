@@ -26,7 +26,17 @@ radeon_thermal_query(radeon_info &info)
 	uint32 rawTemp = 0;
 	int32 finalTemp = 0;
 
-	if (info.chipsetID == RADEON_JUNIPER) {
+	if (info.chipsetID >= RADEON_LOMBOK) {
+		rawTemp = (read32(SI_CG_MULT_THERMAL_STATUS) & SI_CTF_TEMP_MASK)
+			>> SI_CTF_TEMP_SHIFT;
+
+		if (rawTemp & 0x200)
+			finalTemp = 255;
+		else
+			finalTemp = rawTemp & 0x1ff;
+
+		return finalTemp * 1000;
+	} else if (info.chipsetID == RADEON_JUNIPER) {
 		uint32 offset = (read32(info.registers + EVERGREEN_CG_THERMAL_CTRL)
 			& EVERGREEN_TOFFSET_MASK) >> EVERGREEN_TOFFSET_SHIFT;
 		rawTemp = (read32(info.registers + EVERGREEN_CG_TS0_STATUS)
