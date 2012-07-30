@@ -329,6 +329,8 @@ fi	# ! updateOnly
 # add the concatenated copyrights as an attribute to AboutSystem
 
 if [ ! $updateOnly ]; then
+# TODO x86_64: temporary hack, AboutSystem doesn't exist yet.
+if [ -f $outputDir/objects/haiku/*/*/apps/aboutsystem/AboutSystem ]; then
 	if [ -f $copyrightsFile ]; then
 		copyrightAttrs=$tmpDir/copyrightAttrs
 		$rmAttrs -f $copyrightAttrs
@@ -336,6 +338,7 @@ if [ ! $updateOnly ]; then
 		$addattr -f $copyrightsFile COPYRIGHTS $copyrightAttrs
 		$copyAttrs ${sPrefix}$copyrightAttrs ${tPrefix}system/apps/AboutSystem
 	fi
+fi
 fi
 
 if [ $isCD ]; then

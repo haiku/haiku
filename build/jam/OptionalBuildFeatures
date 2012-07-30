@@ -69,12 +69,16 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 HAIKU_ICU_GCC_2_PACKAGE = icu-4.8.1-x86-gcc2-2011-11-02a.zip ;
 HAIKU_ICU_GCC_4_PACKAGE = icu-4.8.1-x86-gcc4-2011-11-02.zip ;
 HAIKU_ICU_PPC_PACKAGE = icu-4.8.1-ppc-2011-08-20.zip ;
+HAIKU_ICU_X86_64_PACKAGE = icu-4.8.1.1-x86_64-2012-07-30.zip ;
 
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 	local icu_package ;
 	if $(TARGET_ARCH) = ppc {
 		icu_package = $(HAIKU_ICU_PPC_PACKAGE) ;
 		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-ppc-2011-12-19.zip ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		icu_package = $(HAIKU_ICU_X86_64_PACKAGE) ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86_64-2012-07-30.zip ;
 	} else if $(HAIKU_GCC_VERSION[1]) = 2 {
 		icu_package = $(HAIKU_ICU_GCC_2_PACKAGE) ;
 		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86-gcc2-2011-12-20.zip ;
