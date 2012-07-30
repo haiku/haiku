@@ -511,7 +511,11 @@ if [ -n "$crossToolsPrefix" ]; then
 	get_build_tool_path LD ld
 	get_build_tool_path OBJCOPY objcopy
 	get_build_tool_path RANLIB ranlib
-	get_build_tool_path ELFEDIT elfedit
+	case $HAIKU_GCC_RAW_VERSION in
+		4.*)
+			get_build_tool_path ELFEDIT elfedit
+		;;
+	esac
 fi
 
 # prepare gcc settings
