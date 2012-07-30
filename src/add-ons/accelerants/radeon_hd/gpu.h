@@ -14,12 +14,6 @@
 #include <video_configuration.h>
 
 
-#define HDP_REG_COHERENCY_FLUSH_CNTL 0x54A0
-#define HDP_NONSURFACE_BASE			0x2C04
-#define HDP_NONSURFACE_INFO			0x2C08
-#define HDP_NONSURFACE_SIZE			0x2C0C
-
-
 // GPU Control registers. These are combined as
 // the registers exist on all models, some flags
 // are different though and are commented as such

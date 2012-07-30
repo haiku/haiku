@@ -116,13 +116,13 @@ init_registers(register_info* regs, uint8 crtcID)
 				offset = R600_CRTC0_REGISTER_OFFSET;
 				regs->vgaControl = AVIVO_D1VGA_CONTROL;
 				regs->grphPrimarySurfaceAddrHigh
-					= D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
+					= R700_D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
 				break;
 			case 1:
 				offset = R600_CRTC1_REGISTER_OFFSET;
 				regs->vgaControl = AVIVO_D2VGA_CONTROL;
 				regs->grphPrimarySurfaceAddrHigh
-					= D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
+					= R700_D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH;
 				break;
 			default:
 				ERROR("%s: Unknown CRTC %" B_PRIu32 "\n",
@@ -137,9 +137,9 @@ init_registers(register_info* regs, uint8 crtcID)
 		regs->grphSwapControl = D1GRPH_SWAP_CNTL + offset;
 
 		regs->grphPrimarySurfaceAddr
-			= D1GRPH_PRIMARY_SURFACE_ADDRESS + offset;
+			= R700_D1GRPH_PRIMARY_SURFACE_ADDRESS + offset;
 		regs->grphSecondarySurfaceAddr
-			= D1GRPH_SECONDARY_SURFACE_ADDRESS + offset;
+			= R700_D1GRPH_SECONDARY_SURFACE_ADDRESS + offset;
 
 		regs->grphPitch = AVIVO_D1GRPH_PITCH + offset;
 		regs->grphSurfaceOffsetX = AVIVO_D1GRPH_SURFACE_OFFSET_X + offset;

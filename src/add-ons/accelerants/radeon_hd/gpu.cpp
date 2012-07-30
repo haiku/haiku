@@ -262,7 +262,7 @@ radeon_gpu_mc_setup_r600()
 		Write32(OUT, (0x2c20 + j), 0x00000000);
 		Write32(OUT, (0x2c24 + j), 0x00000000);
 	}
-	Write32(OUT, HDP_REG_COHERENCY_FLUSH_CNTL, 0);
+	Write32(OUT, R600_HDP_REG_COHERENCY_FLUSH_CNTL, 0);
 
 	// idle the memory controller
 	struct gpu_state gpuState;
@@ -282,9 +282,9 @@ radeon_gpu_mc_setup_r600()
 	tmp |= ((gInfo->fb.vramStart >> 24) & 0xFFFF);
 
 	Write32(OUT, R600_MC_VM_FB_LOCATION, tmp);
-	Write32(OUT, HDP_NONSURFACE_BASE, (gInfo->fb.vramStart >> 8));
-	Write32(OUT, HDP_NONSURFACE_INFO, (2 << 7));
-	Write32(OUT, HDP_NONSURFACE_SIZE, 0x3FFFFFFF);
+	Write32(OUT, R600_HDP_NONSURFACE_BASE, (gInfo->fb.vramStart >> 8));
+	Write32(OUT, R600_HDP_NONSURFACE_INFO, (2 << 7));
+	Write32(OUT, R600_HDP_NONSURFACE_SIZE, 0x3FFFFFFF);
 
 	// is AGP?
 	//	Write32(OUT, R600_MC_VM_AGP_TOP, gInfo->fb.gartEnd >> 22);
@@ -322,7 +322,7 @@ radeon_gpu_mc_setup_r700()
 	}
 
 	// On r7xx read from HDP_DEBUG1 vs write HDP_REG_COHERENCY_FLUSH_CNTL
-	Read32(OUT, HDP_DEBUG1);
+	Read32(OUT, R700_HDP_DEBUG1);
 
 	// idle the memory controller
 	struct gpu_state gpuState;
@@ -344,9 +344,9 @@ radeon_gpu_mc_setup_r700()
 	tmp |= ((gInfo->fb.vramStart >> 24) & 0xFFFF);
 
 	Write32(OUT, R700_MC_VM_FB_LOCATION, tmp);
-	Write32(OUT, HDP_NONSURFACE_BASE, (gInfo->fb.vramStart >> 8));
-	Write32(OUT, HDP_NONSURFACE_INFO, (2 << 7));
-	Write32(OUT, HDP_NONSURFACE_SIZE, 0x3FFFFFFF);
+	Write32(OUT, R700_HDP_NONSURFACE_BASE, (gInfo->fb.vramStart >> 8));
+	Write32(OUT, R700_HDP_NONSURFACE_INFO, (2 << 7));
+	Write32(OUT, R700_HDP_NONSURFACE_SIZE, 0x3FFFFFFF);
 
 	// is AGP?
 	//	Write32(OUT, R700_MC_VM_AGP_TOP, gInfo->fb.gartEnd >> 22);
@@ -382,7 +382,7 @@ radeon_gpu_mc_setup_evergreen()
 		Write32(OUT, (0x2c20 + j), 0x00000000);
 		Write32(OUT, (0x2c24 + j), 0x00000000);
 	}
-	Write32(OUT, HDP_REG_COHERENCY_FLUSH_CNTL, 0);
+	Write32(OUT, EVERGREEN_HDP_REG_COHERENCY_FLUSH_CNTL, 0);
 
 	// idle the memory controller
 	struct gpu_state gpuState;
@@ -415,9 +415,9 @@ radeon_gpu_mc_setup_evergreen()
 	tmp |= ((gInfo->fb.vramStart >> 24) & 0xFFFF);
 
 	Write32(OUT, EVERGREEN_MC_VM_FB_LOCATION, tmp);
-	Write32(OUT, HDP_NONSURFACE_BASE, (gInfo->fb.vramStart >> 8));
-	Write32(OUT, HDP_NONSURFACE_INFO, (2 << 7) | (1 << 30));
-	Write32(OUT, HDP_NONSURFACE_SIZE, 0x3FFFFFFF);
+	Write32(OUT, EVERGREEN_HDP_NONSURFACE_BASE, (gInfo->fb.vramStart >> 8));
+	Write32(OUT, EVERGREEN_HDP_NONSURFACE_INFO, (2 << 7) | (1 << 30));
+	Write32(OUT, EVERGREEN_HDP_NONSURFACE_SIZE, 0x3FFFFFFF);
 
 	// is AGP?
 	//	Write32(OUT, EVERGREEN_MC_VM_AGP_TOP, gInfo->fb.gartEnd >> 16);
