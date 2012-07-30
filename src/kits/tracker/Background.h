@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef	_TRACKER_BACKGROUND_H
 #define	_TRACKER_BACKGROUND_H
+
 
 #include <SupportDefs.h>
 
@@ -45,12 +45,18 @@ All rights reserved.
 /*----------------------------------------------------------------*/
 /*-----  Tracker background BMessage entries  --------------------*/
 
-#define B_BACKGROUND_IMAGE			"be:bgndimginfopath"		// string path
-#define B_BACKGROUND_MODE			"be:bgndimginfomode"		// int32, the enum below
-#define B_BACKGROUND_ORIGIN			"be:bgndimginfooffset"		// BPoint
-#define B_BACKGROUND_TEXT_OUTLINE	"be:bgndimginfoerasetext"	// bool
-	// NOTE: the actual attribute name is kept for backwards compatible settings
-#define B_BACKGROUND_WORKSPACES		"be:bgndimginfoworkspaces"	// uint32
+#define B_BACKGROUND_IMAGE			"be:bgndimginfopath"
+	// string path
+#define B_BACKGROUND_MODE			"be:bgndimginfomode"
+	// int32, the enum below
+#define B_BACKGROUND_ORIGIN			"be:bgndimginfooffset"
+	// BPoint
+#define B_BACKGROUND_TEXT_OUTLINE	"be:bgndimginfoerasetext"
+	// bool
+	// NOTE: the actual attribute name is kept for backwards
+	//       compatible settings
+#define B_BACKGROUND_WORKSPACES		"be:bgndimginfoworkspaces"
+	// uint32
 
 /*----------------------------------------------------------------*/
 /*-----  Background mode values  ---------------------------------*/
@@ -65,7 +71,7 @@ enum {
 /*----------------------------------------------------------------*/
 /*----------------------------------------------------------------*/
 
-const int32 B_RESTORE_BACKGROUND_IMAGE = 'Tbgr';	// force a Tracker window to
-													// use a new background image
+const int32 B_RESTORE_BACKGROUND_IMAGE = 'Tbgr';
+	// force a Tracker window to use a new background image
 
 #endif // _TRACKER_BACKGROUND_H

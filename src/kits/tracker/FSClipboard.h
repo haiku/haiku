@@ -67,7 +67,7 @@ class BClipboardRefsWatcher : public BLooper {
 		void UpdatePoseViews(BMessage* reportMessage);
 
 	protected:
-		virtual	void MessageReceived(BMessage*);
+		virtual void MessageReceived(BMessage*);
 
 	private:
 		bool fRefsInClipboard;
@@ -87,10 +87,12 @@ void FSClipboardStartWatch(BMessenger target);
 void FSClipboardStopWatch(BMessenger target);
 
 void FSClipboardClear();
-uint32 FSClipboardAddPoses(const node_ref* directory, PoseList* list, uint32 moveMode, bool clearClipboard);
+uint32 FSClipboardAddPoses(const node_ref* directory, PoseList* list,
+	uint32 moveMode, bool clearClipboard);
 uint32 FSClipboardRemovePoses(const node_ref* directory, PoseList* list);
 bool FSClipboardPaste(Model* model, uint32 linksMode = 0);
 void FSClipboardRemove(Model* model);
-uint32 FSClipboardFindNodeMode(Model* model, bool autoLock, bool updateRefIfNeeded);
+uint32 FSClipboardFindNodeMode(Model* model, bool autoLock,
+	bool updateRefIfNeeded);
 
 #endif	// FS_CLIPBOARD_H

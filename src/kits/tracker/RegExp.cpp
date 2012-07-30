@@ -90,9 +90,9 @@ const uint8 kRegExpMagic = 0234;
 // of lines that cannot possibly match.  The regmust tests are costly enough
 // that Compile() supplies a regmust only if the r.e. contains something
 // potentially expensive (at present, the only such thing detected is * or +
-// at the start of the r.e., which can involve a lot of backup).  Regmlen is
-// supplied because the test in RunMatcher() needs it and Compile() is computing
-// it anyway.
+// at the start of the r.e., which can involve a lot of backup). Regmlen is
+// supplied because the test in RunMatcher() needs it and Compile() is
+// computing it anyway.
 //
 //
 //
@@ -100,15 +100,16 @@ const uint8 kRegExpMagic = 0234;
 // of a nondeterministic finite-state machine (aka syntax charts or
 // "railroad normal form" in parsing technology).  Each node is an opcode
 // plus a "next" pointer, possibly plus an operand.  "Next" pointers of
-// all nodes except kRegExpBranch implement concatenation; a "next" pointer with
-// a kRegExpBranch on both ends of it is connecting two alternatives.  (Here we
-// have one of the subtle syntax dependencies:  an individual kRegExpBranch (as
-// opposed to a collection of them) is never concatenated with anything
-// because of operator precedence.)  The operand of some types of node is
-// a literal string; for others, it is a node leading into a sub-FSM.  In
-// particular, the operand of a kRegExpBranch node is the first node of the branch.
-// (NB this is* not* a tree structure:  the tail of the branch connects
-// to the thing following the set of kRegExpBranches.)  The opcodes are:
+// all nodes except kRegExpBranch implement concatenation; a "next" pointer
+// with a kRegExpBranch on both ends of it is connecting two alternatives.
+// (Here we have one of the subtle syntax dependencies:  an individual
+// kRegExpBranch (as opposed to a collection of them) is never concatenated
+// with anything because of operator precedence.)  The operand of some types
+// of node is a literal string; for others, it is a node leading into a
+// sub-FSM. In particular, the operand of a kRegExpBranch node is the first
+// node of the branch. (NB this is* not* a tree structure:  the tail of the
+// branch connects to the thing following the set of kRegExpBranches). 
+// The opcodes are:
 //
 
 // definition	number	opnd?	meaning
@@ -133,21 +134,21 @@ enum {
 //
 // Opcode notes:
 //
-// kRegExpBranch	The set of branches constituting a single choice are hooked
-//		together with their "next" pointers, since precedence prevents
+// kRegExpBranch	The set of branches constituting a single choice are
+//		hooked together with their "next" pointers, since precedence prevents
 //		anything being concatenated to any individual branch.  The
 //		"next" pointer of the last kRegExpBranch in a choice points to the
 //		thing following the whole choice.  This is also where the
 //		final "next" pointer of each individual branch points; each
 //		branch starts with the operand node of a kRegExpBranch node.
 //
-// kRegExpBack		Normal "next" pointers all implicitly point forward; kRegExpBack
-//		exists to make loop structures possible.
+// kRegExpBack		Normal "next" pointers all implicitly point forward;
+//		kRegExpBack exists to make loop structures possible.
 //
-// kRegExpStar,kRegExpPlus	'?', and complex '*' and '+', are implemented as circular
-//		kRegExpBranch structures using kRegExpBack.  Simple cases (one character
-//		per match) are implemented with kRegExpStar and kRegExpPlus for speed
-//		and to minimize recursive plunges.
+// kRegExpStar,kRegExpPlus	'?', and complex '*' and '+', are implemented as
+//		circular kRegExpBranch structures using kRegExpBack.  Simple cases
+//		(one character per match) are implemented with kRegExpStar and
+//		kRegExpPlus for speed and to minimize recursive plunges.
 //
 // kRegExpOpen,kRegExpClose	...are numbered at compile time.
 //
@@ -164,7 +165,8 @@ enum {
 //
 
 const char* kMeta = "^$.[()|?+*\\";
-const int32 kMaxSize = 32767L;		// Probably could be 65535L.
+const int32 kMaxSize = 32767L;
+	// Probably could be 65535L.
 
 // Flags to be passed up and down:
 enum {
@@ -360,7 +362,8 @@ RegExp::Compile(const char* exp)
 			longest = NULL;
 			len = 0;
 			for (; scan != NULL; scan = Next((char*)scan))
-				if (*scan == kRegExpExactly && (int32)strlen(Operand(scan)) >= len) {
+				if (*scan == kRegExpExactly
+					&& (int32)strlen(Operand(scan)) >= len) {
 					longest = Operand(scan);
 					len = (int32)strlen(Operand(scan));
 				}
@@ -520,10 +523,10 @@ RegExp::Branch(int32* flagp)
 // - Piece - something followed by possible [*+?]
 //
 // Note that the branching code sequences used for ? and the general cases
-// of * and + are somewhat optimized:  they use the same kRegExpNothing node as
-// both the endmarker for their branch list and the body of the last branch.
-// It might seem that this node could be dispensed with entirely, but the
-// endmarker role is not redundant.
+// of * and + are somewhat optimized:  they use the same kRegExpNothing node
+// as both the endmarker for their branch list and the body of the last
+// branch. It might seem that this node could be dispensed with entirely,
+// but the endmarker role is not redundant.
 //
 char*
 RegExp::Piece(int32* flagp)
@@ -623,12 +626,14 @@ RegExp::Atom(int32* flagp)
 					ret = Node(kRegExpAnyOf);
 				if (*fInputScanPointer == ']' || *fInputScanPointer == '-')
 					Char(*fInputScanPointer++);
-				while (*fInputScanPointer != '\0' && *fInputScanPointer != ']') {
+				while (*fInputScanPointer != '\0'
+					&& *fInputScanPointer != ']') {
 					if (*fInputScanPointer == '-') {
 						fInputScanPointer++;
-						if (*fInputScanPointer == ']' || *fInputScanPointer == '\0')
+						if (*fInputScanPointer == ']'
+							|| *fInputScanPointer == '\0') {
 							Char('-');
-						else {
+						} else {
 							cclass = UCharAt(fInputScanPointer - 2) + 1;
 							classend = UCharAt(fInputScanPointer);
 							if (cclass > classend + 1) {
@@ -678,30 +683,34 @@ RegExp::Atom(int32* flagp)
 			*flagp |= kHasWidth|kSimple;
 			break;
 		default:
-			{
-				int32 len;
-				char ender;
+		{
+			int32 len;
+			char ender;
 
-				fInputScanPointer--;
-				len = (int32)strcspn(fInputScanPointer, kMeta);
-				if (len <= 0) {
-					SetError(REGEXP_INTERNAL_ERROR);
-					return NULL;
-				}
-				ender = *(fInputScanPointer + len);
-				if (len > 1 && IsMult(ender))
-					len--;		// Back off clear of ?+* operand.
-				*flagp |= kHasWidth;
-				if (len == 1)
-					*flagp |= kSimple;
-				ret = Node(kRegExpExactly);
-				while (len > 0) {
-					Char(*fInputScanPointer++);
-					len--;
-				}
-				Char('\0');
+			fInputScanPointer--;
+			len = (int32)strcspn(fInputScanPointer, kMeta);
+			if (len <= 0) {
+				SetError(REGEXP_INTERNAL_ERROR);
+				return NULL;
 			}
+
+			ender = *(fInputScanPointer + len);
+			if (len > 1 && IsMult(ender))
+				len--;		// Back off clear of ?+* operand.
+
+			*flagp |= kHasWidth;
+			if (len == 1)
+				*flagp |= kSimple;
+
+			ret = Node(kRegExpExactly);
+			while (len > 0) {
+				Char(*fInputScanPointer++);
+				len--;
+			}
+
+			Char('\0');
 			break;
+		}
 	}
 
 	return ret;
@@ -964,8 +973,10 @@ RegExp::Match(const char* prog) const
 						return 0;
 
 					uint32 len = strlen(opnd);
-					if (len > 1 && strncmp(opnd, fStringInputPointer, len) != 0)
+					if (len > 1
+						&& strncmp(opnd, fStringInputPointer, len) != 0) {
 						return 0;
+					}
 
 					fStringInputPointer += len;
 				}
@@ -1255,7 +1266,8 @@ RegExp::Dump()
 		else
 			printf("(%ld)", (s - fRegExp->program) + (next - s));
 		s += 3;
-		if (op == kRegExpAnyOf || op == kRegExpAnyBut || op == kRegExpExactly) {
+		if (op == kRegExpAnyOf || op == kRegExpAnyBut
+			|| op == kRegExpExactly) {
 			// Literal string, where present.
 			while (*s != '\0') {
 				putchar(*s);

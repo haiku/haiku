@@ -443,43 +443,34 @@ BMenuItem::DrawContent()
 void
 BMenuItem::Draw()
 {
+	rgb_color lowColor = fSuper->LowColor();
+
 	bool enabled = IsEnabled();
 	bool selected = IsSelected();
-
-	rgb_color noTint = fSuper->LowColor();
-	rgb_color bgColor = noTint;
 
 	// set low color and fill background if selected
 	bool activated = selected && (enabled || Submenu())
 		/*&& fSuper->fRedrawAfterSticky*/;
 	if (activated) {
-		bgColor = tint_color(bgColor, B_DARKEN_3_TINT);
 		if (be_control_look != NULL) {
 			BRect rect = Frame();
 			be_control_look->DrawMenuItemBackground(fSuper, rect, rect,
-				noTint, BControlLook::B_ACTIVATED);
+				ui_color(B_MENU_SELECTED_BACKGROUND_COLOR),
+				BControlLook::B_ACTIVATED);
 		} else {
-			fSuper->SetLowColor(bgColor);
+			fSuper->SetLowColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
 			fSuper->FillRect(Frame(), B_SOLID_LOW);
 		}
-	} else {
-		fSuper->SetLowColor(bgColor);
 	}
 
 	// set high color
-	if (be_control_look != NULL) {
-		if (enabled) {
-			fSuper->SetHighColor(tint_color(fSuper->LowColor(),
-				B_DARKEN_MAX_TINT));
-		} else {
-			fSuper->SetHighColor(tint_color(fSuper->LowColor(),
-				B_DISABLED_LABEL_TINT));
-		}
-	} else {
-		if (enabled)
-			fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
-		else
-			fSuper->SetHighColor(tint_color(bgColor, B_DISABLED_LABEL_TINT));
+	if (activated)
+		fSuper->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+	else if (enabled)
+		fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+	else {
+		// TODO: Use a lighten tint if the menu uses a dark background
+		fSuper->SetHighColor(tint_color(lowColor, B_DISABLED_LABEL_TINT));
 	}
 
 	// draw content
@@ -490,16 +481,16 @@ BMenuItem::Draw()
 	const menu_layout layout = MenuPrivate(fSuper).Layout();
 	if (layout == B_ITEMS_IN_COLUMN) {
 		if (IsMarked())
-			_DrawMarkSymbol(bgColor);
+			_DrawMarkSymbol();
 
 		if (fShortcutChar)
 			_DrawShortcutSymbol();
 
 		if (Submenu())
-			_DrawSubmenuSymbol(bgColor);
+			_DrawSubmenuSymbol();
 	}
 
-	fSuper->SetLowColor(noTint);
+	fSuper->SetLowColor(lowColor);
 }
 
 
@@ -682,7 +673,7 @@ BMenuItem::Select(bool selected)
 
 
 void
-BMenuItem::_DrawMarkSymbol(rgb_color bgColor)
+BMenuItem::_DrawMarkSymbol()
 {
 	fSuper->PushState();
 
@@ -710,7 +701,6 @@ BMenuItem::_DrawMarkSymbol(rgb_color bgColor)
 	arrowShape.LineTo(BPoint(center.x + size, center.y - size));
 
 	fSuper->SetDrawingMode(B_OP_OVER);
-	fSuper->SetHighColor(tint_color(bgColor, B_DARKEN_MAX_TINT));
 	fSuper->SetPenSize(2.0);
 	// NOTE: StrokeShape() offsets the shape by the current pen position,
 	// it is not documented in the BeBook, but it is true!
@@ -742,6 +732,8 @@ BMenuItem::_DrawShortcutSymbol()
 	where.y += (fBounds.Height() - 11) / 2 - 1;
 	where.x -= 4;
 
+	// TODO: It would be nice to draw these taking into account the text (low)
+	// color.
 	if (fModifiers & B_COMMAND_KEY) {
 		const BBitmap *command = MenuPrivate::MenuItemCommand();
 		const BRect &rect = command->Bounds();
@@ -773,7 +765,7 @@ BMenuItem::_DrawShortcutSymbol()
 
 
 void
-BMenuItem::_DrawSubmenuSymbol(rgb_color bgColor)
+BMenuItem::_DrawSubmenuSymbol()
 {
 	fSuper->PushState();
 
@@ -802,7 +794,6 @@ BMenuItem::_DrawSubmenuSymbol(rgb_color bgColor)
 	arrowShape.LineTo(BPoint(center.x - hSize, center.y + size));
 
 	fSuper->SetDrawingMode(B_OP_OVER);
-	fSuper->SetHighColor(tint_color(bgColor, B_DARKEN_MAX_TINT));
 	fSuper->SetPenSize(ceilf(size * 0.4));
 	// NOTE: StrokeShape() offsets the shape by the current pen position,
 	// it is not documented in the BeBook, but it is true!

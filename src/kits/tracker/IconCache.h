@@ -49,13 +49,13 @@ All rights reserved.
 #include "Utilities.h"
 
 
-// Icon cache splits icons into two caches - the shared cache, likely to get the
-// most hits and the node cache. Every icon that is found in a mime based
-// structure goes into the shared cache, only files that have their own private
-// icon use the node cache;
-// Entries are only deleted from the shared cache if an icon for a mime type changes,
-// this makes async icon drawing easier. Node cache deletes it's entries whenever a
-// file gets deleted.
+// Icon cache splits icons into two caches - the shared cache, likely to
+// get the most hits and the node cache. Every icon that is found in a
+// mime-based structure goes into the shared cache, only files that have
+// their own private icon use the node cache;
+// Entries are only deleted from the shared cache if an icon for a mime type
+// changes, this makes async icon drawing easier. Node cache deletes it's
+// entries whenever a file gets deleted.
 
 // if a view ever uses the cache to draw in async mode, it needs to call
 // it when it is being destroyed
@@ -100,13 +100,14 @@ enum IconDrawMode {
 // Where did an icon come from
 enum IconSource {
 	kUnknownSource,
-	kUnknownNotFromNode,	// icon origin not known but determined not to be from
-							// the node itself
-	kTrackerDefault,		// file has no type, Tracker provides generic, folder,
-							// symlink or app
+	kUnknownNotFromNode,	// icon origin not known but determined not
+							// to be from the node itself
+	kTrackerDefault,		// file has no type, Tracker provides generic,
+							// folder, symlink or app
 	kTrackerSupplied,		// home directory, boot volume, trash, etc.
 	kMetaMime,				// from BMimeType
-	kPreferredAppForType,	// have a preferred application for a type, has an icon
+	kPreferredAppForType,	// have a preferred application for a type,
+							// has an icon
 	kPreferredAppForNode,	// have a preferred application for this node,
 							// has an icon
 	kVolume,
@@ -117,17 +118,18 @@ enum IconSource {
 class IconCacheEntry {
 	// aliased entries don't own their icons, just point
 	// to some other entry that does
-	
+
 	// This is used for icons that are defined by a preferred app for
 	// a metamime, types that do not have an icon get to point to
 	// generic, etc.
-	
+
 public:
 	IconCacheEntry();
 	~IconCacheEntry();
 	
 	void SetAliasFor(const SharedIconCache*, const SharedCacheEntry*);
-	static IconCacheEntry* ResolveIfAlias(const SharedIconCache*, IconCacheEntry*);
+	static IconCacheEntry* ResolveIfAlias(const SharedIconCache*,
+		IconCacheEntry*);
 	IconCacheEntry* ResolveIfAlias(const SharedIconCache*);
 	
 	void SetIcon(BBitmap* bitmap, IconDrawMode mode, icon_size size,
@@ -137,9 +139,9 @@ public:
 	bool CanConstructBitmap(IconDrawMode mode, icon_size size) const;
 	static bool AlternateModeForIconConstructing(IconDrawMode requestedMode,
 		IconDrawMode &alternate, icon_size size);
-	BBitmap* ConstructBitmap(BBitmap* constructFrom, IconDrawMode requestedMode,
-		IconDrawMode constructFromMode, icon_size size,
-		LazyBitmapAllocator*);
+	BBitmap* ConstructBitmap(BBitmap* constructFrom,
+		IconDrawMode requestedMode, IconDrawMode constructFromMode,
+		icon_size size, LazyBitmapAllocator*);
 	BBitmap* ConstructBitmap(IconDrawMode requestedMode, icon_size size,
 		LazyBitmapAllocator*);
 		// same as above, always uses normal icon as source
@@ -242,16 +244,18 @@ public:
 	virtual void Draw(IconCacheEntry*, BView*, BPoint, IconDrawMode,
 		icon_size, void (*)(BView*, BPoint, BBitmap*, void*), void* = NULL);
 
-	SharedCacheEntry* FindItem(const char* fileType, const char* appSignature = 0)
-		const;
-	SharedCacheEntry* AddItem(const char* fileType, const char* appSignature = 0);
-	SharedCacheEntry* AddItem(SharedCacheEntry** outstandingEntry, const char* fileType,
+	SharedCacheEntry* FindItem(const char* fileType,
+		const char* appSignature = 0) const;
+	SharedCacheEntry* AddItem(const char* fileType,
 		const char* appSignature = 0);
-		// same as previous AddItem, updates the pointer to outstandingEntry, because
-		// adding to the hash table makes any pending pointer invalid
+	SharedCacheEntry* AddItem(SharedCacheEntry** outstandingEntry,
+		const char* fileType, const char* appSignature = 0);
+		// same as previous AddItem, updates the pointer to outstandingEntry,
+		// because adding to the hash table makes any pending pointer invalid
 	void IconChanged(SharedCacheEntry*);
 
-	void SetAliasFor(IconCacheEntry* alias, const SharedCacheEntry* original) const;
+	void SetAliasFor(IconCacheEntry* alias,
+		const SharedCacheEntry* original) const;
 	IconCacheEntry* ResolveIfAlias(IconCacheEntry* entry) const;
 	int32 EntryIndex(const SharedCacheEntry* entry) const;
 
@@ -261,9 +265,9 @@ private:
 	OpenHashTable<SharedCacheEntry, SharedCacheEntryArray> fHashTable;
 	SharedCacheEntryArray fElementArray;
 	BObjectList<BBitmap> fRetiredBitmaps;
-		// icons are drawn asynchronously, can't just delete them
-		// right away, instead have to place them onto the retired bitmap list
-		// and wait for the next sync to delete them
+		// icons are drawn asynchronously, can't just delete them right away,
+		// instead have to place them onto the retired bitmap list and wait
+		// for the next sync to delete them
 };
 
 
@@ -317,11 +321,13 @@ public:
 
 	NodeCacheEntry* FindItem(const node_ref*) const;
 	NodeCacheEntry* AddItem(const node_ref*, bool permanent = false);
-	NodeCacheEntry* AddItem(NodeCacheEntry** outstandingEntry, const node_ref*);
-		// same as previous AddItem, updates the pointer to outstandingEntry, because
-		// adding to the hash table makes any pending pointer invalid
+	NodeCacheEntry* AddItem(NodeCacheEntry** outstandingEntry,
+		const node_ref*);
+		// same as previous AddItem, updates the pointer to outstandingEntry,
+		// because adding to the hash table makes any pending pointer invalid
 	void Deleting(const node_ref*);
-		// model for this node is getting deleted (not necessarily the node itself)
+		// model for this node is getting deleted
+		// (not necessarily the node itself)
 	void Removing(const node_ref*);
 		// used by permanent NodeIconCache entries, when an entry gets deleted
 	void Deleting(const BView*);
@@ -406,11 +412,11 @@ private:
 	IconCacheEntry* GetIconForPreferredApp(const char* mimeTypeSignature,
 		const char* preferredApp, IconDrawMode mode, icon_size size,
 		 LazyBitmapAllocator*, IconCacheEntry*);
-	IconCacheEntry* GetIconFromFileTypes(ModelNodeLazyOpener*, IconSource &source,
+	IconCacheEntry* GetIconFromFileTypes(ModelNodeLazyOpener*,
+		IconSource &source, IconDrawMode mode, icon_size size,
+		LazyBitmapAllocator*, IconCacheEntry*);
+	IconCacheEntry* GetIconFromMetaMime(const char* fileType,
 		IconDrawMode mode, icon_size size, LazyBitmapAllocator*,
-		IconCacheEntry*);
-	IconCacheEntry* GetIconFromMetaMime(const char* fileType, IconDrawMode mode,
-		icon_size size, LazyBitmapAllocator*,
 		IconCacheEntry*);
 	IconCacheEntry* GetVolumeIcon(AutoLock<SimpleIconCache>* nodeCache,
 		AutoLock<SimpleIconCache>* sharedCache,
@@ -431,12 +437,14 @@ private:
 		AutoLock<SimpleIconCache>* nodeCache,
 		AutoLock<SimpleIconCache>** resultingLockedCache,
 		Model*, IconSource&, IconDrawMode mode,
-		icon_size size, LazyBitmapAllocator*, IconCacheEntry*, bool permanent);
+		icon_size size, LazyBitmapAllocator*, IconCacheEntry*,
+		bool permanent);
 	IconCacheEntry* GetGenericIcon(AutoLock<SimpleIconCache>* sharedCache,
 		AutoLock<SimpleIconCache>** resultingLockedCache,
 		Model*, IconSource&, IconDrawMode mode,
 		icon_size size, LazyBitmapAllocator*, IconCacheEntry*);
-	IconCacheEntry* GetFallbackIcon(AutoLock<SimpleIconCache>* sharedCacheLocker,
+	IconCacheEntry* GetFallbackIcon(
+		AutoLock<SimpleIconCache>* sharedCacheLocker,
 		AutoLock<SimpleIconCache>** resultingOpenCache,
 		Model* model, IconDrawMode mode, icon_size size,
 		LazyBitmapAllocator* lazyBitmap, IconCacheEntry* entry);

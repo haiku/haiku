@@ -84,7 +84,8 @@ struct AddOneShortcutParams {
 };
 
 static bool
-AddOneShortcut(const Model* model, const char*, uint32 shortcut, bool /*primary*/, void* context)
+AddOneShortcut(const Model* model, const char*, uint32 shortcut,
+	bool /*primary*/, void* context)
 {
 	if (!shortcut)
 		// no shortcut, bail
@@ -151,11 +152,10 @@ BDeskWindow::~BDeskWindow()
 void
 BDeskWindow::Init(const BMessage*)
 {
-	//
-	//	Set the size of the screen before calling the container window's
-	//	Init() because it will add volume poses to this window and
-	// 	they will be clipped otherwise
-	//
+	// Set the size of the screen before calling the container window's
+	// Init() because it will add volume poses to this window and
+	// they will be clipped otherwise
+
 	BScreen screen(this);
 	fOldFrame = screen.Frame();
 
@@ -313,6 +313,20 @@ BDeskWindow::AddWindowContextMenus(BMenu* menu)
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
+	message = new BMessage(kIconMode);
+	message->AddInt32("size", 96);
+	item = new BMenuItem(B_TRANSLATE("96 x 96"), message);
+	item->SetMarked(PoseView()->IconSizeInt() == 96);
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
+	message = new BMessage(kIconMode);
+	message->AddInt32("size", 128);
+	item = new BMenuItem(B_TRANSLATE("128 x 128"), message);
+	item->SetMarked(PoseView()->IconSizeInt() == 128);
+	item->SetTarget(PoseView());
+	iconSizeMenu->AddItem(item);
+
 	iconSizeMenu->AddSeparatorItem();
 
 	message = new BMessage(kIconMode);
@@ -347,8 +361,8 @@ BDeskWindow::AddWindowContextMenus(BMenu* menu)
 	menu->AddItem(pasteItem);
 	menu->AddSeparatorItem();
 #endif
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Clean up"), new BMessage(kCleanup),
-		'K'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Clean up"),
+		new BMessage(kCleanup), 'K'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
 		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
@@ -470,4 +484,3 @@ BDeskWindow::MessageReceived(BMessage* message)
 			break;
 	}
 }
-

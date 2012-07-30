@@ -137,8 +137,10 @@ class TTracker : public BApplication {
 
 		void ShowSettingsWindow();
 
-		BContainerWindow* FindContainerWindow(const node_ref*, int32 number = 0) const;
-		BContainerWindow* FindContainerWindow(const entry_ref*, int32 number = 0) const;
+		BContainerWindow* FindContainerWindow(const node_ref*,
+			int32 number = 0) const;
+		BContainerWindow* FindContainerWindow(const entry_ref*,
+			int32 number = 0) const;
 		BContainerWindow* FindParentContainerWindow(const entry_ref*) const;
 			// right now works just on plain windows, not on query windows
 
@@ -176,12 +178,12 @@ class TTracker : public BApplication {
 		bool InstallMimeIfNeeded(const char* type, int32 bitsID,
 				const char* shortDescription, const char* longDescription,
 				const char* preferredAppSignature, uint32 forceMask = 0);
-			// used by InitMimeTypes - checks if a metamime of a given <type> is
-			// installed and if it has all the specified attributes; if not, the
-			// whole mime type is installed and all attributes are set; nulls can
-			// be passed for attributes that don't matter; returns true if anything
-			// had to be changed
-			// <forceMask> can be used to forcibly set a metamime attribute, even if it exists
+			// used by InitMimeTypes - checks if a metamime of a given <type>
+			// is installed and if it has all the specified attributes;
+			// if not, the whole mime type is installed and all attributes
+			// are set; nulls can be passed for attributes that don't matter;
+			// returns true if anything had to be changed <forceMask> can be
+			// used to forcibly set a metamime attribute, even if it exists
 
 		void InstallDefaultTemplates();
 		void InstallTemporaryBackgroundImages();
@@ -196,7 +198,8 @@ class TTracker : public BApplication {
 		void MoveRefsToTrash(const BMessage*);
 		void OpenContainerWindow(Model*, BMessage* refsList = NULL,
 			OpenSelector openSelector = kOpen, uint32 openFlags = 0,
-			bool checkAlreadyOpen = true, const BMessage* stateMessage = NULL);
+			bool checkAlreadyOpen = true,
+			const BMessage* stateMessage = NULL);
 			// pass either a Model or a list of entries to open
 		void _OpenPreviouslyOpenedWindows(const char* pathFilter = NULL);
 
@@ -208,7 +211,8 @@ class TTracker : public BApplication {
 		BDeskWindow* GetDeskWindow() const;
 
 		status_t OpenRef(const entry_ref*, const node_ref* nodeToClose = NULL,
-				const node_ref* nodeToSelect = NULL, OpenSelector selector = kOpen,
+				const node_ref* nodeToSelect = NULL,
+				OpenSelector selector = kOpen,
 				const BMessage* messageToBundle = NULL);
 
 		MimeTypeList*			fMimeTypeList;

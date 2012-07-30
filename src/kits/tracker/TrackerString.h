@@ -147,7 +147,8 @@ TrackerString::ConditionalToLower(char c, bool caseSensitivity) const
 
 
 inline bool
-TrackerString::CharsAreEqual(char char1, char char2, bool caseSensitivity) const
+TrackerString::CharsAreEqual(char char1, char char2,
+	bool caseSensitivity) const
 {
 	return ConditionalToLower(char1, caseSensitivity)
 		== ConditionalToLower(char2, caseSensitivity);

@@ -21,7 +21,7 @@
 
 Resampler::Resampler(uint32 src_format, uint32 dst_format)
 	:
-	fFunc(&Resampler::no_conversion)
+	fFunc(0)
 {
 	if (dst_format == media_raw_audio_format::B_AUDIO_FLOAT) {
 		switch (src_format) {
@@ -81,7 +81,7 @@ Resampler::~Resampler()
 status_t
 Resampler::InitCheck() const
 {
-	return fFunc != &Resampler::no_conversion ? B_OK : B_ERROR;
+	return fFunc != 0 ? B_OK : B_ERROR;
 }
 
 

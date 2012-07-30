@@ -59,11 +59,14 @@ static const float kIndentSpacing = 12.0f;
 
 //TODO: defaults should be set in one place only (TrackerSettings.cpp) while
 //		being accessible from here.
-//      What about adding DefaultValue(), IsDefault() etc... methods to xxxValueSetting ?
+//		What about adding DefaultValue(), IsDefault() etc... methods to
+//		xxxValueSetting ?
 static const uint8 kSpaceBarAlpha = 192;
 static const rgb_color kDefaultUsedSpaceColor = {0, 203, 0, kSpaceBarAlpha};
-static const rgb_color kDefaultFreeSpaceColor = {255, 255, 255, kSpaceBarAlpha};
-static const rgb_color kDefaultWarningSpaceColor = {203, 0, 0, kSpaceBarAlpha};
+static const rgb_color kDefaultFreeSpaceColor
+	= {255, 255, 255, kSpaceBarAlpha};
+static const rgb_color kDefaultWarningSpaceColor
+	= {203, 0, 0, kSpaceBarAlpha};
 
 
 static void
@@ -370,10 +373,13 @@ DesktopSettingsView::ShowCurrentSettings()
 	TrackerSettings settings;
 
 	fShowDisksIconRadioButton->SetValue(settings.ShowDisksIcon());
-	fMountVolumesOntoDesktopRadioButton->SetValue(settings.MountVolumesOntoDesktop());
+	fMountVolumesOntoDesktopRadioButton->SetValue(
+		settings.MountVolumesOntoDesktop());
 
-	fMountSharedVolumesOntoDesktopCheckBox->SetValue(settings.MountSharedVolumesOntoDesktop());
-	fMountSharedVolumesOntoDesktopCheckBox->SetEnabled(settings.MountVolumesOntoDesktop());
+	fMountSharedVolumesOntoDesktopCheckBox->SetValue(
+		settings.MountSharedVolumesOntoDesktop());
+	fMountSharedVolumesOntoDesktopCheckBox->SetEnabled(
+		settings.MountVolumesOntoDesktop());
 }
 
 
@@ -476,19 +482,22 @@ WindowsSettingsView::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case kWindowsShowFullPathChanged:
-			settings.SetShowFullPathInTitleBar(fShowFullPathInTitleBarCheckBox->Value() == 1);
+			settings.SetShowFullPathInTitleBar(
+				fShowFullPathInTitleBarCheckBox->Value() == 1);
 			tracker->SendNotices(kWindowsShowFullPathChanged);
 			Window()->PostMessage(kSettingsContentsModified);
 			break;
 
 		case kSingleWindowBrowseChanged:
-			settings.SetSingleWindowBrowse(fSingleWindowBrowseCheckBox->Value() == 1);
+			settings.SetSingleWindowBrowse(
+				fSingleWindowBrowseCheckBox->Value() == 1);
 			if (fSingleWindowBrowseCheckBox->Value() == 0) {
 				fShowNavigatorCheckBox->SetEnabled(false);
 				settings.SetShowNavigator(0);
 			} else {
 				fShowNavigatorCheckBox->SetEnabled(true);
-				settings.SetShowNavigator(fShowNavigatorCheckBox->Value() != 0);
+				settings.SetShowNavigator(
+					fShowNavigatorCheckBox->Value() != 0);
 			}
 			tracker->SendNotices(kShowNavigatorChanged);
 			tracker->SendNotices(kSingleWindowBrowseChanged);
@@ -516,10 +525,12 @@ WindowsSettingsView::MessageReceived(BMessage* message)
 
 		case kSortFolderNamesFirstChanged:
 		{
-			settings.SetSortFolderNamesFirst(fSortFolderNamesFirstCheckBox->Value() == 1);
+			settings.SetSortFolderNamesFirst(
+				fSortFolderNamesFirstCheckBox->Value() == 1);
 
 			// Make the notification message and send it to the tracker:
-			send_bool_notices(kSortFolderNamesFirstChanged, "SortFolderNamesFirst",
+			send_bool_notices(kSortFolderNamesFirstChanged,
+				"SortFolderNamesFirst",
 				fSortFolderNamesFirstCheckBox->Value() == 1);
 
 			Window()->PostMessage(kSettingsContentsModified);
@@ -528,8 +539,10 @@ WindowsSettingsView::MessageReceived(BMessage* message)
 
 		case kTypeAheadFilteringChanged:
 		{
-			settings.SetTypeAheadFiltering(fTypeAheadFilteringCheckBox->Value() == 1);
-			send_bool_notices(kTypeAheadFilteringChanged, "TypeAheadFiltering",
+			settings.SetTypeAheadFiltering(
+				fTypeAheadFilteringCheckBox->Value() == 1);
+			send_bool_notices(kTypeAheadFilteringChanged,
+				"TypeAheadFiltering",
 				fTypeAheadFilteringCheckBox->Value() == 1);
 			Window()->PostMessage(kSettingsContentsModified);
 			break;
@@ -653,7 +666,8 @@ WindowsSettingsView::ShowCurrentSettings()
 {
 	TrackerSettings settings;
 
-	fShowFullPathInTitleBarCheckBox->SetValue(settings.ShowFullPathInTitleBar());
+	fShowFullPathInTitleBarCheckBox->SetValue(
+		settings.ShowFullPathInTitleBar());
 	fSingleWindowBrowseCheckBox->SetValue(settings.SingleWindowBrowse());
 	fShowNavigatorCheckBox->SetEnabled(settings.SingleWindowBrowse());
 	fShowNavigatorCheckBox->SetValue(settings.ShowNavigator());
@@ -722,9 +736,10 @@ SpaceBarSettingsView::SpaceBarSettingsView()
 	BBox* box = new BBox("box");
 	box->SetLabel(fColorPicker = new BMenuField("menu", NULL, menu));
 
-	fColorControl = new BColorControl(BPoint(8, fColorPicker->Bounds().Height()
-			+ 8 + kItemExtraSpacing),
-		B_CELLS_16x16, 1, "SpaceColorControl", new BMessage(kSpaceBarColorChanged));
+	fColorControl = new BColorControl(BPoint(8,
+			fColorPicker->Bounds().Height() + 8 + kItemExtraSpacing),
+		B_CELLS_16x16, 1, "SpaceColorControl",
+		new BMessage(kSpaceBarColorChanged));
 	fColorControl->SetValue(TrackerSettings().UsedSpaceColor());
 	box->AddChild(fColorControl);
 
@@ -767,7 +782,8 @@ SpaceBarSettingsView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kUpdateVolumeSpaceBar:
 		{
-			settings.SetShowVolumeSpaceBar(fSpaceBarShowCheckBox->Value() == 1);
+			settings.SetShowVolumeSpaceBar(
+				fSpaceBarShowCheckBox->Value() == 1);
 			Window()->PostMessage(kSettingsContentsModified);
 			tracker->PostMessage(kShowVolumeSpaceBar);
 			break;
@@ -794,7 +810,8 @@ SpaceBarSettingsView::MessageReceived(BMessage* message)
 		{
 			rgb_color color = fColorControl->ValueAsColor();
 			color.alpha = kSpaceBarAlpha;
-				//alpha is ignored by BColorControl but is checked in equalities
+				// alpha is ignored by BColorControl but is checked
+				// in equalities
 
 			switch (fCurrentColor) {
 				case 0:
@@ -870,7 +887,8 @@ SpaceBarSettingsView::Revert()
 
 	if (settings.ShowVolumeSpaceBar() != fSpaceBarShow) {
 		settings.SetShowVolumeSpaceBar(fSpaceBarShow);
-		send_bool_notices(kShowVolumeSpaceBar, "ShowVolumeSpaceBar", fSpaceBarShow);
+		send_bool_notices(kShowVolumeSpaceBar, "ShowVolumeSpaceBar",
+			fSpaceBarShow);
 	}
 
 	if (settings.UsedSpaceColor() != fUsedSpaceColor
@@ -978,14 +996,16 @@ TrashSettingsView::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case kDontMoveFilesToTrashChanged:
-			settings.SetDontMoveFilesToTrash(fDontMoveFilesToTrashCheckBox->Value() == 1);
+			settings.SetDontMoveFilesToTrash(
+				fDontMoveFilesToTrashCheckBox->Value() == 1);
 
 			tracker->SendNotices(kDontMoveFilesToTrashChanged);
 			Window()->PostMessage(kSettingsContentsModified);
 			break;
 
 		case kAskBeforeDeleteFileChanged:
-			settings.SetAskBeforeDeleteFile(fAskBeforeDeleteFileCheckBox->Value() == 1);
+			settings.SetAskBeforeDeleteFile(
+				fAskBeforeDeleteFileCheckBox->Value() == 1);
 
 			tracker->SendNotices(kAskBeforeDeleteFileChanged);
 			Window()->PostMessage(kSettingsContentsModified);
@@ -1069,7 +1089,9 @@ TrashSettingsView::RecordRevertSettings()
 bool
 TrashSettingsView::IsRevertable() const
 {
-	return fDontMoveFilesToTrash != (fDontMoveFilesToTrashCheckBox->Value() > 0)
-		|| fAskBeforeDeleteFile != (fAskBeforeDeleteFileCheckBox->Value() > 0);
+	return fDontMoveFilesToTrash
+			!= (fDontMoveFilesToTrashCheckBox->Value() > 0)
+		|| fAskBeforeDeleteFile
+			!= (fAskBeforeDeleteFileCheckBox->Value() > 0);
 }
 

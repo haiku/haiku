@@ -77,8 +77,8 @@ class WidgetAttributeText {
 			// override to define a compare of two different attributes for
 			// sorting
 
-		static WidgetAttributeText* NewWidgetText(const Model*, const BColumn*,
-			const BPoseView*);
+		static WidgetAttributeText* NewWidgetText(const Model*,
+			const BColumn*, const BPoseView*);
 			// WidgetAttributeText factory
 			// call this to make the right WidgetAttributeText type for a
 			// given column
@@ -462,7 +462,8 @@ class AppShortVersionAttributeText : public VersionAttributeText {
 
 class SystemShortVersionAttributeText : public VersionAttributeText {
 	public:
-		SystemShortVersionAttributeText(const Model* model, const BColumn* column)
+		SystemShortVersionAttributeText(const Model* model,
+			const BColumn* column)
 			:	VersionAttributeText(model, column, false)
 		{
 		}
@@ -471,8 +472,8 @@ class SystemShortVersionAttributeText : public VersionAttributeText {
 } // namespace BPrivate
 
 
-extern status_t TimeFormat(BString &string, int32 index, FormatSeparator format,
-	DateOrder order, bool clockIs24Hour);
+extern status_t TimeFormat(BString &string, int32 index,
+	FormatSeparator format, DateOrder order, bool clockIs24Hour);
 
 using namespace BPrivate;
 

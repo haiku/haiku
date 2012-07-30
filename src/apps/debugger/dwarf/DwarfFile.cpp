@@ -11,6 +11,9 @@
 #include <new>
 
 #include <AutoDeleter.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <Path.h>
 
 #include "AttributeClasses.h"
 #include "AttributeValue.h"
@@ -25,6 +28,30 @@
 #include "TargetAddressRangeList.h"
 #include "Tracing.h"
 #include "Variant.h"
+
+
+// #pragma mark - AutoSectionPutter
+
+
+class AutoSectionPutter {
+public:
+	AutoSectionPutter(ElfFile* elfFile, ElfSection* elfSection)
+		:
+		fElfFile(elfFile),
+		fElfSection(elfSection)
+	{
+	}
+
+	~AutoSectionPutter()
+	{
+		if (fElfSection != NULL)
+			fElfFile->PutSection(fElfSection);
+	}
+
+private:
+	ElfFile*			fElfFile;
+	ElfSection*			fElfSection;
+};
 
 
 // #pragma mark - ExpressionEvaluationContext
@@ -281,7 +308,9 @@ private:
 DwarfFile::DwarfFile()
 	:
 	fName(NULL),
+	fAlternateName(NULL),
 	fElfFile(NULL),
+	fAlternateElfFile(NULL),
 	fDebugInfoSection(NULL),
 	fDebugAbbrevSection(NULL),
 	fDebugStringSection(NULL),
@@ -305,19 +334,24 @@ DwarfFile::~DwarfFile()
 		delete table;
 
 	if (fElfFile != NULL) {
-		fElfFile->PutSection(fDebugInfoSection);
-		fElfFile->PutSection(fDebugAbbrevSection);
-		fElfFile->PutSection(fDebugStringSection);
-		fElfFile->PutSection(fDebugRangesSection);
-		fElfFile->PutSection(fDebugLineSection);
-		fElfFile->PutSection(fDebugFrameSection);
+		ElfFile* debugInfoFile = fAlternateElfFile != NULL
+			? fAlternateElfFile : fElfFile;
+
+		debugInfoFile->PutSection(fDebugInfoSection);
+		debugInfoFile->PutSection(fDebugAbbrevSection);
+		debugInfoFile->PutSection(fDebugStringSection);
+		debugInfoFile->PutSection(fDebugRangesSection);
+		debugInfoFile->PutSection(fDebugLineSection);
+		debugInfoFile->PutSection(fDebugFrameSection);
 		fElfFile->PutSection(fEHFrameSection);
-		fElfFile->PutSection(fDebugLocationSection);
-		fElfFile->PutSection(fDebugPublicTypesSection);
+		debugInfoFile->PutSection(fDebugLocationSection);
+		debugInfoFile->PutSection(fDebugPublicTypesSection);
 		delete fElfFile;
+		delete fAlternateElfFile;
 	}
 
 	free(fName);
+	free(fAlternateName);
 }
 
 
@@ -337,23 +371,24 @@ DwarfFile::Load(const char* fileName)
 	if (error != B_OK)
 		return error;
 
-	// get the interesting sections
-	fDebugInfoSection = fElfFile->GetSection(".debug_info");
-	fDebugAbbrevSection = fElfFile->GetSection(".debug_abbrev");
-	if (fDebugInfoSection == NULL || fDebugAbbrevSection == NULL) {
-		WARNING("DwarfManager::File::Load(\"%s\"): no "
-			".debug_info or .debug_abbrev.\n", fileName);
-		return B_ERROR;
-	}
+	error = _LocateDebugInfo();
+	if (error != B_OK)
+		return error;
+
+	ElfFile* debugInfoFile = fAlternateElfFile != NULL
+		? fAlternateElfFile : fElfFile;
 
 	// non mandatory sections
-	fDebugStringSection = fElfFile->GetSection(".debug_str");
-	fDebugRangesSection = fElfFile->GetSection(".debug_ranges");
-	fDebugLineSection = fElfFile->GetSection(".debug_line");
-	fDebugFrameSection = fElfFile->GetSection(".debug_frame");
+	fDebugStringSection = debugInfoFile->GetSection(".debug_str");
+	fDebugRangesSection = debugInfoFile->GetSection(".debug_ranges");
+	fDebugLineSection = debugInfoFile->GetSection(".debug_line");
+	fDebugFrameSection = debugInfoFile->GetSection(".debug_frame");
+	// .eh_frame doesn't appear to get copied into separate debug
+	// info files properly, therefore always use it off the main
+	// executable image
 	fEHFrameSection = fElfFile->GetSection(".eh_frame");
-	fDebugLocationSection = fElfFile->GetSection(".debug_loc");
-	fDebugPublicTypesSection = fElfFile->GetSection(".debug_pubtypes");
+	fDebugLocationSection = debugInfoFile->GetSection(".debug_loc");
+	fDebugPublicTypesSection = debugInfoFile->GetSection(".debug_pubtypes");
 
 	// iterate through the debug info section
 	DataReader dataReader(fDebugInfoSection->Data(),
@@ -2224,3 +2259,107 @@ DwarfFile::_FindLocationExpression(CompilationUnit* unit, uint64 offset,
 		}
 	}
 }
+
+
+status_t
+DwarfFile::_LocateDebugInfo()
+{
+	ElfFile* debugInfoFile = fElfFile;
+	ElfSection* debugLinkSection = fElfFile->GetSection(".gnu_debuglink");
+	if (debugLinkSection != NULL) {
+		AutoSectionPutter putter(fElfFile, debugLinkSection);
+
+		// the file specifies a debug link, look at its target instead
+		// for debug information.
+		// Format: null-terminated filename, as many 0 padding bytes as
+		// needed to reach the next 32-bit address boundary, followed
+		// by a 32-bit CRC
+
+		BString debugPath;
+		status_t result = _GetDebugInfoPath(
+			(const char*)debugLinkSection->Data(), debugPath);
+		if (result != B_OK)
+			return result;
+
+		fAlternateName = strdup(debugPath.String());
+
+		if (fAlternateName == NULL)
+			return B_NO_MEMORY;
+
+/*
+		// TODO: validate CRC
+		int32 debugCRC = *(int32*)((char*)debugLinkSection->Data()
+			+ debugLinkSection->Size() - sizeof(int32));
+*/
+		fAlternateElfFile = new(std::nothrow) ElfFile;
+		if (fAlternateElfFile == NULL)
+			return B_NO_MEMORY;
+
+		result = fAlternateElfFile->Init(fAlternateName);
+		if (result != B_OK)
+			return result;
+
+		debugInfoFile = fAlternateElfFile;
+	}
+
+	// get the interesting sections
+	fDebugInfoSection = debugInfoFile->GetSection(".debug_info");
+	fDebugAbbrevSection = debugInfoFile->GetSection(".debug_abbrev");
+	if (fDebugInfoSection == NULL || fDebugAbbrevSection == NULL) {
+		WARNING("DwarfManager::File::Load(\"%s\"): no "
+			".debug_info or .debug_abbrev.\n", fName);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DwarfFile::_GetDebugInfoPath(const char* debugFileName, BString& _infoPath)
+{
+	const directory_which dirLocations[] = { B_USER_CONFIG_DIRECTORY,
+		B_COMMON_DIRECTORY, B_SYSTEM_DIRECTORY };
+
+	// first, see if we have a relative match to our local directory
+	BPath basePath;
+	status_t result = basePath.SetTo(fName);
+	if (result != B_OK)
+		return result;
+	basePath.GetParent(&basePath);
+	if (strcmp(basePath.Leaf(), "lib") == 0 || strcmp(basePath.Leaf(),
+			"add-ons") == 0) {
+		_infoPath.SetToFormat("%s/../debug/%s", basePath.Path(),
+			debugFileName);
+	} else
+		_infoPath.SetToFormat("%s/debug/%s", basePath.Path(), debugFileName);
+
+	BEntry entry(_infoPath.String());
+	result = entry.InitCheck();
+	if (result != B_OK && result != B_ENTRY_NOT_FOUND)
+		return result;
+	if (entry.Exists())
+		return B_OK;
+
+	// See if our image is in any of the system locations.
+	// if so, look for its debug info in the corresponding location.
+	for (uint16 i = 0; i < sizeof(dirLocations) / sizeof(directory_which);
+		i++) {
+		result = find_directory(dirLocations[i], &basePath);
+		if (result != B_OK)
+			return result;
+
+		if (strncmp(fName, basePath.Path(), strlen(basePath.Path())) == 0) {
+			_infoPath.SetToFormat("%s/develop/debug/%s", basePath.Path(),
+				debugFileName);
+			entry.SetTo(_infoPath.String());
+			result = entry.InitCheck();
+			if (result != B_OK && result != B_ENTRY_NOT_FOUND)
+				return result;
+			return entry.Exists() ? B_OK : B_ENTRY_NOT_FOUND;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+

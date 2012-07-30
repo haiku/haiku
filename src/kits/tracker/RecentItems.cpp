@@ -363,7 +363,8 @@ BRecentFilesList::BRecentFilesList(int32 maxItems, bool navMenuFolders,
 
 
 BRecentFilesList::BRecentFilesList(int32 maxItems, bool navMenuFolders,
-	const char* ofTypeList[], int32 ofTypeListCount, const char* openedByAppSig)
+	const char* ofTypeList[], int32 ofTypeListCount,
+	const char* openedByAppSig)
 	:
 	BRecentItemsList(maxItems, navMenuFolders),
 	fType(NULL),
@@ -415,15 +416,17 @@ BRecentFilesList::NewFileListMenu(const char* title,
 	const char* openedByAppSig)
 {
 	return new RecentFilesMenu(title, openFileMessage,
-		openFolderMessage, target, maxItems, navMenuFolders, ofType, openedByAppSig);
+		openFolderMessage, target, maxItems, navMenuFolders, ofType,
+		openedByAppSig);
 }
 
 
 BMenu*
 BRecentFilesList::NewFileListMenu(const char* title,
 	BMessage* openFileMessage, BMessage* openFolderMessage,
-	BHandler* target, int32 maxItems, bool navMenuFolders, const char* ofTypeList[],
-	int32 ofTypeListCount, const char* openedByAppSig)
+	BHandler* target, int32 maxItems, bool navMenuFolders,
+	const char* ofTypeList[], int32 ofTypeListCount,
+	const char* openedByAppSig)
 {
 	return new RecentFilesMenu(title, openFileMessage,
 		openFolderMessage, target, maxItems, navMenuFolders, ofTypeList,

@@ -148,8 +148,8 @@ TruncFileSizeBase(BString* result, int64 value, const View* view, float width)
 		}
 	}
 
-	return TruncStringBase(result, buffer, (ssize_t)strlen(buffer), view, width,
-		(uint32)B_TRUNCATE_END);
+	return TruncStringBase(result, buffer, (ssize_t)strlen(buffer), view,
+		width, (uint32)B_TRUNCATE_END);
 }
 
 
@@ -420,7 +420,8 @@ WidgetAttributeText::AttrAsString(const Model* model, BString* result,
 				BPath path;
 				BString tmp;
 
-				if (entry.InitCheck() == B_OK && entry.GetPath(&path) == B_OK) {
+				if (entry.InitCheck() == B_OK
+					&& entry.GetPath(&path) == B_OK) {
 					tmp = path.Path();
 					TruncateLeaf(&tmp);
 				} else
@@ -683,7 +684,8 @@ OriginalPathAttributeText::ReadValue(BString* result)
 // #pragma mark -
 
 
-KindAttributeText::KindAttributeText(const Model* model, const BColumn* column)
+KindAttributeText::KindAttributeText(const Model* model,
+		const BColumn* column)
 	:
 	StringAttributeText(model, column)
 {
@@ -711,7 +713,8 @@ KindAttributeText::ReadValue(BString* result)
 // #pragma mark -
 
 
-NameAttributeText::NameAttributeText(const Model* model, const BColumn* column)
+NameAttributeText::NameAttributeText(const Model* model,
+		const BColumn* column)
 	:
 	StringAttributeText(model, column)
 {
@@ -1037,7 +1040,8 @@ GroupAttributeText::ReadValue(BString* result)
 #endif  // OWNER_GROUP_ATTRIBUTES
 
 
-ModeAttributeText::ModeAttributeText(const Model* model, const BColumn* column)
+ModeAttributeText::ModeAttributeText(const Model* model,
+	const BColumn* column)
 	:
 	StringAttributeText(model, column)
 {
@@ -1079,7 +1083,8 @@ ModeAttributeText::ReadValue(BString* result)
 //	#pragma mark -
 
 
-SizeAttributeText::SizeAttributeText(const Model* model, const BColumn* column)
+SizeAttributeText::SizeAttributeText(const Model* model,
+	const BColumn* column)
 	:
 	ScalarAttributeText(model, column)
 {
@@ -1134,7 +1139,8 @@ SizeAttributeText::PreferredWidth(const BPoseView* pose) const
 // #pragma mark - time related
 
 
-TimeAttributeText::TimeAttributeText(const Model* model, const BColumn* column)
+TimeAttributeText::TimeAttributeText(const Model* model,
+	const BColumn* column)
 	:
 	ScalarAttributeText(model, column)
 {
@@ -1186,8 +1192,8 @@ CreationTimeAttributeText::ReadValue()
 }
 
 
-ModificationTimeAttributeText::ModificationTimeAttributeText(const Model* model,
-	const BColumn* column)
+ModificationTimeAttributeText::ModificationTimeAttributeText(
+	const Model* model, const BColumn* column)
 	:
 	TimeAttributeText(model, column)
 {
@@ -1292,13 +1298,15 @@ GenericAttributeText::ReadValue(BString* result)
 			// with a type, depending on the bytes that could be read
 			attr_info info;
 			GenericValueStruct tmp;
-			if (fModel->Node()->GetAttrInfo(fColumn->AttrName(), &info) == B_OK) {
+			if (fModel->Node()->GetAttrInfo(fColumn->AttrName(), &info)
+					== B_OK) {
 				if (info.size && info.size <= sizeof(int64)) {
 					length = fModel->Node()->ReadAttr(fColumn->AttrName(),
 						fColumn->AttrType(), 0, &tmp, (size_t)info.size);
 				}
 
-				// We used tmp as a block of memory, now set the correct fValue:
+				// We used tmp as a block of memory, now set the
+				// correct fValue:
 
 				if (length == info.size) {
 					if (fColumn->AttrType() == B_FLOAT_TYPE
@@ -1321,7 +1329,7 @@ GenericAttributeText::ReadValue(BString* result)
 					} else {
 						// handle the standard data types
 						switch (info.size) {
-							case sizeof(char):	// Takes care of bool, too.
+							case sizeof(char):	// Takes care of bool too.
 								fValueIsDefined = true;
 								fValue.int8t = tmp.int8t;
 								break;
@@ -1331,12 +1339,12 @@ GenericAttributeText::ReadValue(BString* result)
 								fValue.int16t = tmp.int16t;
 								break;
 
-							case sizeof(int32):	// Takes care of time_t, too.
+							case sizeof(int32):	// Takes care of time_t too.
 								fValueIsDefined = true;
 								fValue.int32t = tmp.int32t;
 								break;
 
-							case sizeof(int64):	// Taked care of off_t, too.
+							case sizeof(int64):	// Takes care of off_t too.
 								fValueIsDefined = true;
 								fValue.int64t = tmp.int64t;
 								break;

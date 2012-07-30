@@ -58,7 +58,8 @@ class TGroupedMenu : public BMenu {
 
 	private:
 		friend class TMenuItemGroup;
-		void AddGroupItem(TMenuItemGroup* group, BMenuItem* item, int32 atIndex);
+		void AddGroupItem(TMenuItemGroup* group, BMenuItem* item,
+			int32 atIndex);
 		void RemoveGroupItem(TMenuItemGroup* group, BMenuItem* item);
 
 	private:

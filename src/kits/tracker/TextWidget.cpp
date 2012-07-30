@@ -91,7 +91,8 @@ BTextWidget::Compare(const BTextWidget& with, BPoseView* view) const
 const char*
 BTextWidget::Text(const BPoseView* view) const
 {
-	StringAttributeText* textAttribute = dynamic_cast<StringAttributeText*>(fText);
+	StringAttributeText* textAttribute
+		= dynamic_cast<StringAttributeText*>(fText);
 	if (textAttribute == NULL)
 		return NULL;
 
@@ -146,7 +147,8 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 				break;
 
 			case B_ALIGN_CENTER:
-				result.left = poseLoc.x + (column->Width() / 2) - (textWidth / 2);
+				result.left = poseLoc.x + (column->Width() / 2)
+					- (textWidth / 2);
 				if (result.left < 0)
 					result.left = 0;
 				result.right = result.left + textWidth + 1;
@@ -277,8 +279,8 @@ TextViewFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 	if (message->FindInt8("byte", (int8*)&key) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
-	BPoseView* poseView = dynamic_cast<BContainerWindow*>(filter->Looper())->
-		PoseView();
+	BPoseView* poseView = dynamic_cast<BContainerWindow*>(
+		filter->Looper())->PoseView();
 
 	if (key == B_RETURN || key == B_ESCAPE) {
 		poseView->CommitActivePose(key == B_RETURN);
@@ -302,7 +304,8 @@ TextViewFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 	// find the text editing view
 	BView* scrollView = poseView->FindView("BorderView");
 	if (scrollView != NULL) {
-		BTextView* textView = dynamic_cast<BTextView*>(scrollView->FindView("WidgetTextView"));
+		BTextView* textView = dynamic_cast<BTextView*>(
+			scrollView->FindView("WidgetTextView"));
 		if (textView != NULL) {
 			BRect rect = scrollView->Frame();
 
@@ -343,8 +346,8 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 
 	BFont font;
 	view->GetFont(&font);
-	BTextView* textView = new BTextView(rect, "WidgetTextView", textRect, &font, 0,
-		B_FOLLOW_ALL, B_WILL_DRAW);
+	BTextView* textView = new BTextView(rect, "WidgetTextView", textRect,
+		&font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
 
 	textView->SetWordWrap(false);
 	DisallowMetaKeys(textView);
@@ -375,8 +378,8 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	textView->MoveTo(rect.LeftTop());
 	textView->ResizeTo(rect.Width(), rect.Height());
 
-	BScrollView* scrollView = new BScrollView("BorderView", textView, 0, 0, false,
-		false, B_PLAIN_BORDER);
+	BScrollView* scrollView = new BScrollView("BorderView", textView, 0, 0,
+		false, false, B_PLAIN_BORDER);
 	view->AddChild(scrollView);
 
 	// configure text view
@@ -406,9 +409,10 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 
 	ASSERT(view->Window());	// how can I not have a Window here???
 
-	if (view->Window())
+	if (view->Window()) {
 		// force immediate redraw so TextView appears instantly
 		view->Window()->UpdateIfNeeded();
+	}
 }
 
 
@@ -422,7 +426,8 @@ BTextWidget::StopEdit(bool saveChanges, BPoint poseLoc, BPoseView* view,
 	if (!scrollView)
 		return;
 
-	BTextView* textView = dynamic_cast<BTextView*>(scrollView->FindView("WidgetTextView"));
+	BTextView* textView = dynamic_cast<BTextView*>(
+		scrollView->FindView("WidgetTextView"));
 	ASSERT(textView);
 	if (!textView)
 		return;
@@ -454,8 +459,8 @@ BTextWidget::StopEdit(bool saveChanges, BPoint poseLoc, BPoseView* view,
 
 
 void
-BTextWidget::CheckAndUpdate(BPoint loc, const BColumn* column, BPoseView* view,
-	bool visible)
+BTextWidget::CheckAndUpdate(BPoint loc, const BColumn* column,
+	BPoseView* view, bool visible)
 {
 	BRect oldRect;
 	if (view->ViewMode() != kListMode)
@@ -474,7 +479,8 @@ BTextWidget::CheckAndUpdate(BPoint loc, const BColumn* column, BPoseView* view,
 void
 BTextWidget::SelectAll(BPoseView* view)
 {
-	BTextView* text = dynamic_cast<BTextView*>(view->FindView("WidgetTextView"));
+	BTextView* text = dynamic_cast<BTextView*>(
+		view->FindView("WidgetTextView"));
 	if (text)
 		text->SelectAll();
 }
@@ -482,7 +488,8 @@ BTextWidget::SelectAll(BPoseView* view)
 
 void
 BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
-	BView* drawView, bool selected, uint32 clipboardMode, BPoint offset, bool direct)
+	BView* drawView, bool selected, uint32 clipboardMode, BPoint offset,
+	bool direct)
 {
 	textRect.OffsetBy(offset);
 

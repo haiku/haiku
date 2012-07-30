@@ -103,7 +103,8 @@ Thread::Run()
 
 
 void
-ThreadSequence::Launch(BObjectList<FunctionObject>* list, bool async, int32 priority)
+ThreadSequence::Launch(BObjectList<FunctionObject>* list, bool async,
+	int32 priority)
 {
 	if (!async) {
 		// if not async, don't even create a thread, just do it right away
@@ -113,7 +114,8 @@ ThreadSequence::Launch(BObjectList<FunctionObject>* list, bool async, int32 prio
 }
 
 
-ThreadSequence::ThreadSequence(BObjectList<FunctionObject>* list, int32 priority)
+ThreadSequence::ThreadSequence(BObjectList<FunctionObject>* list,
+	int32 priority)
 	:	SimpleThread(priority),
  		fFunctorList(list)
 {

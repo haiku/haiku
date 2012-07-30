@@ -77,8 +77,8 @@ public:
 	class BackgroundImageInfo {
 		// element of the per-workspace list
 	public:
-		BackgroundImageInfo(uint32 workspace, BBitmap* bitmap, Mode mode, BPoint offset,
-			bool textWidgetOutline);
+		BackgroundImageInfo(uint32 workspace, BBitmap* bitmap, Mode mode,
+			BPoint offset, bool textWidgetOutline);
 		~BackgroundImageInfo();
 
 		uint32 fWorkspace;
@@ -105,7 +105,7 @@ public:
 	static BackgroundImage* Refresh(BackgroundImage* oldBackgroundImage,
 		const BNode* fromNode, bool desktop, BPoseView* poseView);
 		// respond to a background image setting change
-	
+
 private:
 	BackgroundImageInfo* ImageInfoForWorkspace(int32) const;
 	void Show(BackgroundImageInfo*, BView* view);

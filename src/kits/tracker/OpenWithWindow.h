@@ -91,23 +91,26 @@ class SearchForSignatureEntryList : public EntryListBase {
 		void TrySettingPreferredAppForFile(const entry_ref*);
 
 		int32 Relation(const BMessage* entriesToOpen, const Model*) const;
-			// returns the reason why an application is shown in Open With window
+			// returns the reason why an application is shown in
+			// Open With window
 		void RelationDescription(const BMessage* entriesToOpen, const Model*,
 			BString*) const;
-			// returns a string describing why application handles files to open
+			// returns a string describing why application handles files
+			// to open
 
 		static int32 Relation(const BMessage* entriesToOpen,
 			const Model*, const entry_ref* preferredApp,
 			const entry_ref* preferredAppForFile);
-			// returns the reason why an application is shown in Open With window
-			// static version, needs the preferred app for preformance
+			// returns the reason why an application is shown in Open With
+			// window static version, needs the preferred app for preformance
 		static void RelationDescription(const BMessage* entriesToOpen,
 			const Model*, BString*, const entry_ref* preferredApp,
 			const entry_ref* preferredAppForFile);
-			// returns a string describing why application handles files to open
+			// returns a string describing why application handles files
+			// to open
 
-		bool CanOpenWithFilter(const Model* appModel, const BMessage* entriesToOpen,
-			const entry_ref* preferredApp);
+		bool CanOpenWithFilter(const Model* appModel,
+			const BMessage* entriesToOpen, const entry_ref* preferredApp);
 
 		void NonGenericFileFound();
 		bool GenericFilesOnly() const;
@@ -116,7 +119,8 @@ class SearchForSignatureEntryList : public EntryListBase {
 
 	private:
 		static int32 Relation(const Model* node, const Model* app);
-			// returns the reason why an application is shown in Open With window
+			// returns the reason why an application is shown in
+			// Open With window
 
 		CachedEntryIteratorList* fIteratorList;
 		BObjectList<BString> fSignatures;
@@ -152,7 +156,8 @@ class OpenWithContainerWindow : public BContainerWindow {
 		OpenWithPoseView* PoseView() const;
 
 	protected:
-		virtual BPoseView* NewPoseView(Model* model, BRect rect, uint32 viewMode);
+		virtual BPoseView* NewPoseView(Model* model, BRect rect,
+			uint32 viewMode);
 
 		virtual	bool ShouldAddMenus() const;
 		virtual	void ShowContextMenu(BPoint, const entry_ref*, BView*);
@@ -176,10 +181,12 @@ class OpenWithContainerWindow : public BContainerWindow {
 		void OpenWithSelection();
 			// open entries with the selected app
 		void MakeDefaultAndOpen();
-			// open entries with the selected app and make it the default handler
+			// open entries with the selected app and make it
+			// the default handler
 
 	private:
-		static filter_result KeyDownFilter(BMessage*, BHandler**, BMessageFilter*);
+		static filter_result KeyDownFilter(BMessage*, BHandler**,
+			BMessageFilter*);
 
 		BMessage* fEntriesToOpen;
 		BButton* fLaunchButton;
@@ -198,16 +205,19 @@ class OpenWithPoseView : public BPoseView {
 			// open entries with the selected app
 
 		int32 OpenWithRelation(const Model*) const;
-			// returns the reason why an application is shown in Open With window
+			// returns the reason why an application is shown in
+			// Open With window
 		void OpenWithRelationDescription(const Model*, BString*) const;
-			// returns a string describing why application handles files to open
+			// returns a string describing why application handles files
+			// to open
 
 		OpenWithContainerWindow* ContainerWindow() const;
 
 		virtual bool AddPosesThreadValid(const entry_ref*) const;
 
 	protected:
-		// don't do any volume watching and memtamime watching in open with panels for now
+		// don't do any volume watching and memtamime watching in open with
+		// panels for now
 		virtual void InitialStartWatching() {}
 		virtual void FinalStopWatching() {}
 
@@ -225,18 +235,22 @@ class OpenWithPoseView : public BPoseView {
 		virtual void SavePoseLocations(BRect* = NULL);
 		virtual void MoveSelectionToTrash(bool selectNext = true);
 		virtual void MoveSelectionTo(BPoint, BPoint, BContainerWindow*);
-		virtual void MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
-			bool forceCopy, bool create_link = false);
+		virtual void MoveSelectionInto(Model* destFolder,
+			BContainerWindow* srcWindow, bool forceCopy,
+			bool create_link = false);
 		virtual bool HandleMessageDropped(BMessage*);
-		virtual bool CanHandleDragSelection(const Model*, const BMessage*, bool);
+		virtual bool CanHandleDragSelection(const Model*, const BMessage*,
+			bool);
 
 		virtual bool Represents(const node_ref*) const;
 		virtual bool Represents(const entry_ref*) const;
 
-		virtual void CreatePoses(Model** models, PoseInfo* poseInfoArray, int32 count,
-			BPose** resultingPoses, bool insertionSort = true, int32* lastPoseIndexPtr = NULL,
-			BRect* boundsPtr = NULL, bool forceDraw = false);
-			// override to add selecting the default handling app for selection
+		virtual void CreatePoses(Model** models, PoseInfo* poseInfoArray,
+			int32 count, BPose** resultingPoses, bool insertionSort = true,
+			int32* lastPoseIndexPtr = NULL, BRect* boundsPtr = NULL,
+			bool forceDraw = false);
+			// override to add selecting the default handling app
+			// for selection
 
 		virtual bool ShouldShowPose(const Model*, const PoseInfo*);
 
@@ -260,7 +274,8 @@ class RelationCachingModelProxy {
 		RelationCachingModelProxy(Model* model);
 		~RelationCachingModelProxy();
 
-		int32 Relation(SearchForSignatureEntryList* iterator, BMessage* entries) const;
+		int32 Relation(SearchForSignatureEntryList* iterator,
+			BMessage* entries) const;
 
 		Model* fModel;
 		mutable int32 fRelation;

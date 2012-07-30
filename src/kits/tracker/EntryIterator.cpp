@@ -131,8 +131,8 @@ EntryListBase::Next(dirent* ent)
 //	#pragma mark -
 
 
-CachedEntryIterator::CachedEntryIterator(BEntryList* iterator, int32 numEntries,
-		bool sortInodes)
+CachedEntryIterator::CachedEntryIterator(BEntryList* iterator,
+		int32 numEntries, bool sortInodes)
 	:
 	fIterator(iterator),
 	fEntryRefBuffer(NULL),
@@ -265,7 +265,8 @@ CachedEntryIterator::GetNextDirents(struct dirent* ent, size_t size,
 			bufferRemain -= currentDirentSize;
 			ASSERT(bufferRemain >= 0);
 
-			if ((size_t)bufferRemain < (sizeof(dirent) + B_FILE_NAME_LENGTH)) {
+			if ((size_t)bufferRemain
+					< (sizeof(dirent) + B_FILE_NAME_LENGTH)) {
 				// cant fit a big entryRef in the buffer, just bail
 				// and start from scratch
 				break;

@@ -270,8 +270,8 @@ Model::SetTo(const entry_ref* newRef, bool traverse, bool open, bool writable)
 
 
 status_t
-Model::SetTo(const node_ref* dirNode, const node_ref* nodeRef, const char* name,
-	bool open, bool writable)
+Model::SetTo(const node_ref* dirNode, const node_ref* nodeRef,
+	const char* name, bool open, bool writable)
 {
 	delete fNode;
 	fNode = NULL;
@@ -425,7 +425,8 @@ Model::OpenNodeCommon(bool writable)
 		case kQueryTemplateNode:
 			// open or reopen
 			delete fNode;
-			fNode = new BFile(&fEntryRef, (uint32)(writable ? O_RDWR : O_RDONLY));
+			fNode = new BFile(&fEntryRef,
+				(uint32)(writable ? O_RDWR : O_RDONLY));
 			break;
 
 		case kDirectoryNode:
@@ -455,11 +456,12 @@ Model::OpenNodeCommon(bool writable)
 			PrintToStream();
 #endif
 			TRESPASS();
-				// this can only happen if GetStat failed before, in which case
-				// we shouldn't be here
-			// ToDo: Obviously, we can also be here if the type could not be determined,
-			// for example for block devices (so the TRESPASS() macro shouldn't be
-			// used here)!
+				// this can only happen if GetStat failed before,
+				// in which case we shouldn't be here
+
+			// ToDo: Obviously, we can also be here if the type could not
+			// be determined, for example for block devices (so the TRESPASS()
+			// macro shouldn't be used here)!
 			return fStatus = B_ERROR;
 	}
 
@@ -598,11 +600,12 @@ Model::FinishSettingUpType()
 		&& fBaseType != kLinkNode
 		&& !CheckNodeIconHintPrivate(fNode, dynamic_cast<TTracker*>(be_app) == NULL)
 		&& !HasVectorIconHint(fNode)) {
-			// when checking for the node icon hint, if we are libtracker, only check
-			// for small icons - checking for the large icons is a little more
-			// work for the filesystem and this will speed up the test.
-			// This makes node icons only work if there is a small and a large node
-			// icon on a file - for libtracker that is not a problem though
+			// when checking for the node icon hint, if we are libtracker,
+			// only check for small icons - checking for the large icons
+			// is a little more work for the filesystem and this will
+			// speed up the test. This makes node icons only work if there
+			// is a small and a large node icon on a file - for libtracker
+			// that is not a problem though
 		fIconFrom = kUnknownNotFromNode;
 	}
 
@@ -648,9 +651,11 @@ Model::FinishSettingUpType()
 					fMimeType = mimeString;
 
 				if (fIconFrom == kUnknownNotFromNode
-					&& WellKnowEntryList::Match(NodeRef()) > (directory_which)-1)
+					&& WellKnowEntryList::Match(NodeRef())
+						> (directory_which)-1) {
 					// one of home, beos, system, boot, etc.
 					fIconFrom = kTrackerSupplied;
+				}
 			}
 			break;
 
@@ -695,9 +700,8 @@ Model::FinishSettingUpType()
 		case kExecutableNode:
 			if (IsNodeOpen()) {
 				char signature[B_MIME_TYPE_LENGTH];
-				if (GetAppSignatureFromAttr(dynamic_cast<BFile*>(fNode), signature)
-					== B_OK) {
-
+				if (GetAppSignatureFromAttr(dynamic_cast<BFile*>(fNode),
+						signature) == B_OK) {
 					if (fPreferredAppName)
 						DeletePreferredAppVolumeNameLinkTo();
 
@@ -706,7 +710,8 @@ Model::FinishSettingUpType()
 				}
 			}
 			if (!fMimeType.Length())
-				fMimeType = B_APP_MIME_TYPE;	// should use a shared string here
+				fMimeType = B_APP_MIME_TYPE;
+					// should use a shared string here
 			break;
 
 		default:
@@ -728,7 +733,8 @@ Model::ResetIconFrom()
 	// mirror the logic from FinishSettingUpType
 	if ((fBaseType == kDirectoryNode || fBaseType == kVolumeNode
 		|| fBaseType == kTrashNode || fBaseType == kDesktopNode)
-		&& !CheckNodeIconHintPrivate(fNode, dynamic_cast<TTracker*>(be_app) == NULL)) {
+		&& !CheckNodeIconHintPrivate(fNode,
+			dynamic_cast<TTracker*>(be_app) == NULL)) {
 		if (WellKnowEntryList::Match(NodeRef()) > (directory_which)-1) {
 			fIconFrom = kTrackerSupplied;
 			return;
@@ -813,7 +819,8 @@ Model::GetPreferredAppForBrokenSymLink(BString &result)
 
 	BModelOpener opener(this);
 	BNodeInfo info(fNode);
-	status_t error = info.GetPreferredApp(result.LockBuffer(B_MIME_TYPE_LENGTH));
+	status_t error
+		= info.GetPreferredApp(result.LockBuffer(B_MIME_TYPE_LENGTH));
 	result.UnlockBuffer();
 
 	if (error != B_OK)
@@ -1078,9 +1085,10 @@ Model::SupportsMimeType(const char* type, const BObjectList<BString>* list,
 		const char* mimeSignature;
 		int32 bufferLength;
 
-		if (message.FindData("types", 'CSTR', index, (const void**)&mimeSignature,
-			&bufferLength))
+		if (message.FindData("types", 'CSTR', index,
+				(const void**)&mimeSignature, &bufferLength)) {
 			return result;
+		}
 
 		if (IsSuperHandlerSignature(mimeSignature)) {
 			if (!exactReason)
@@ -1098,7 +1106,8 @@ Model::SupportsMimeType(const char* type, const BObjectList<BString>* list,
 		} else
 			match = WhileEachListItem(const_cast<BObjectList<BString>*>(list),
 				MatchMimeTypeString, mimeSignature);
-				// const_cast shouldnt be here, have to have it until MW cleans up
+				// const_cast shouldnt be here, have to have it until
+				// MW cleans up
 
 		if (match == kMatch)
 			// supports the actual type, it can't get any better
@@ -1150,9 +1159,10 @@ Model::IsSuperHandler() const
 		const char* mimeSignature;
 		int32 bufferLength;
 
-		if (message.FindData("types", 'CSTR', index, (const void**)&mimeSignature,
-			&bufferLength))
+		if (message.FindData("types", 'CSTR', index,
+			(const void**)&mimeSignature, &bufferLength)) {
 			return false;
+		}
 
 		if (IsSuperHandlerSignature(mimeSignature))
 			return true;
@@ -1261,7 +1271,8 @@ Model::GetVersionString(BString &result, version_kind kind)
 		return error;
 
 	char vstr[32];
-	sprintf(vstr, "%ld.%ld.%ld", version.major, version.middle, version.minor);
+	sprintf(vstr, "%ld.%ld.%ld", version.major, version.middle,
+		version.minor);
 	result = vstr;
 	return B_OK;
 }
@@ -1271,8 +1282,8 @@ Model::GetVersionString(BString &result, version_kind kind)
 void
 Model::PrintToStream(int32 level, bool deep)
 {
-	PRINT(("model name %s, entry name %s, inode %" B_PRIdINO ", dev %" B_PRIdDEV
-		", directory inode %" B_PRIdINO "\n",
+	PRINT(("model name %s, entry name %s, inode %" B_PRIdINO ", dev %"
+		B_PRIdDEV ", directory inode %" B_PRIdINO "\n",
 		Name() ? Name() : "**empty name**",
 		EntryRef()->name ? EntryRef()->name : "**empty ref name**",
 		NodeRef()->node,
@@ -1324,8 +1335,10 @@ Model::PrintToStream(int32 level, bool deep)
 	if (level < 1)
 		return;
 
-	if (!IsVolume())
-		PRINT(("preferred app %s\n", fPreferredAppName ? fPreferredAppName : ""));
+	if (!IsVolume()) {
+		PRINT(("preferred app %s\n",
+			fPreferredAppName ? fPreferredAppName : ""));
+	}
 
 	PRINT(("icon from: "));
 	switch (IconFrom()) {
@@ -1426,8 +1439,9 @@ Model::TrackIconSource(icon_size size)
 			BMimeType preferredAppType(preferredApp);
 			err = preferredAppType.GetIconForType(MimeType(), &bitmap, size);
 			if (err == B_OK) {
-				PRINT(("track icon - got icon for type %s from preferred app %s for file\n",
-					MimeType(), preferredApp));
+				PRINT(
+					("track icon - got icon for type %s from preferred "
+					 "app %s for file\n", MimeType(), preferredApp));
 				return;
 			}
 		}
@@ -1453,12 +1467,14 @@ Model::TrackIconSource(icon_size size)
 		err = preferredAppType.GetIconForType(MimeType(), &bitmap, size);
 		if (err == B_OK) {
 			// the preferred app knew icon to use for the type, we are done
-			PRINT(("track icon - signature %s, got icon from preferred app %s\n",
-				MimeType(), preferredApp));
+			PRINT(
+				("track icon - signature %s, got icon from preferred "
+				 "app %s\n", MimeType(), preferredApp));
 			return;
 		}
-		PRINT(("track icon - signature %s, preferred app %s, no icon, error %s\n",
-			MimeType(), preferredApp, strerror(err)));
+		PRINT(
+			("track icon - signature %s, preferred app %s, no icon, "
+			 "error %s\n", MimeType(), preferredApp, strerror(err)));
 	}
 }
 

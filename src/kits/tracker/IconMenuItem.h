@@ -52,11 +52,12 @@ const bigtime_t kSynchMenuInvokeTimeout = 5000000;
 class IconMenuItem : public PositionPassingMenuItem {
 	public:
 		IconMenuItem(const char* label, BMessage* message, BBitmap* icon);
-		IconMenuItem(const char* label, BMessage* message, const char* iconType,
-			icon_size which);
+		IconMenuItem(const char* label, BMessage* message,
+			const char* iconType, icon_size which);
 		IconMenuItem(const char* label, BMessage* message,
 			const BNodeInfo* nodeInfo, icon_size which);
-		IconMenuItem(BMenu*, BMessage*, const char* iconType, icon_size which);
+		IconMenuItem(BMenu*, BMessage*, const char* iconType,
+			icon_size which);
 		virtual ~IconMenuItem();
 
 		virtual void GetContentSize(float* width, float* height);
@@ -72,9 +73,11 @@ class IconMenuItem : public PositionPassingMenuItem {
 
 class ModelMenuItem : public BMenuItem {
 	public:
-		ModelMenuItem(const Model*, const char* title, BMessage*, char shortcut = '\0',
-			uint32 modifiers = 0, bool drawText = true, bool extraPad = false);
-		ModelMenuItem(const Model*, BMenu*, bool drawText = true, bool extraPad = false);
+		ModelMenuItem(const Model*, const char* title, BMessage*,
+			char shortcut = '\0', uint32 modifiers = 0,
+			bool drawText = true, bool extraPad = false);
+		ModelMenuItem(const Model*, BMenu*, bool drawText = true,
+			bool extraPad = false);
 		virtual ~ModelMenuItem();
 
 		virtual	status_t SetEntry(const BEntry*);

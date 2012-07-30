@@ -86,9 +86,10 @@ private:
 	BRect fOldFrame;
 	
 	// in the desktop window addon shortcuts have to be added by AddShortcut
-	// and we don't always get the MenusBeginning call to check for new addons/update the
-	// shortcuts -- instead we need to node monitor the addon directory and keep
-	// a dirty flag that triggers shortcut re-installing 
+	// and we don't always get the MenusBeginning call to check for new
+	// addons/update the shortcuts -- instead we need to node monitor the
+	// addon directory and keep a dirty flag that triggers shortcut
+	// reinstallation
 	bool fShouldUpdateAddonShortcuts;
 	std::set<uint32> fCurrentAddonShortcuts;
 		// keeps track of which shortcuts are installed for Tracker addons

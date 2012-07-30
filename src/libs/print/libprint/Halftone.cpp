@@ -79,13 +79,13 @@ Halftone::Halftone(color_space colorSpace, double gamma, double min,
 	}
 
 	switch (colorSpace) {
-		case B_RGB32:
-		case B_RGB32_BIG:
-			fDither = &Halftone::DitherRGB32;
-			break;
-		default:
-			fDither = &Halftone::DitherNone;
-			break;
+	case B_RGB32:
+	case B_RGB32_BIG:
+		fDither = &Halftone::DitherRGB32;
+		break;
+	default:
+		fDither = NULL;
+		break;
 	}
 }
 
@@ -364,3 +364,4 @@ Halftone::DitherFloydSteinberg(uchar *destination, const uchar* source0,
 		*destination = ConvertUsingBlackValue(cur);
 	}
 }
+

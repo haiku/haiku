@@ -326,22 +326,22 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 		fDaysInHistoryMenuControl->TextView()->DisallowChar(i);
 
 	fShowTabsIfOnlyOnePage = new BCheckBox("show tabs if only one page",
-		B_TRANSLATE("Show tabs if only one page is open."),
+		B_TRANSLATE("Show tabs if only one page is open"),
 		new BMessage(MSG_TAB_DISPLAY_BEHAVIOR_CHANGED));
 	fShowTabsIfOnlyOnePage->SetValue(B_CONTROL_ON);
 
 	fAutoHideInterfaceInFullscreenMode = new BCheckBox("auto-hide interface",
-		B_TRANSLATE("Auto-hide interface in fullscreen mode."),
+		B_TRANSLATE("Auto-hide interface in full screen mode"),
 		new BMessage(MSG_AUTO_HIDE_INTERFACE_BEHAVIOR_CHANGED));
 	fAutoHideInterfaceInFullscreenMode->SetValue(B_CONTROL_OFF);
 
 	fAutoHidePointer = new BCheckBox("auto-hide pointer",
-		B_TRANSLATE("Auto-hide mouse pointer."),
+		B_TRANSLATE("Auto-hide mouse pointer"),
 		new BMessage(MSG_AUTO_HIDE_POINTER_BEHAVIOR_CHANGED));
 	fAutoHidePointer->SetValue(B_CONTROL_OFF);
 
 	fShowHomeButton = new BCheckBox("show home button",
-		B_TRANSLATE("Show Home Button"),
+		B_TRANSLATE("Show home button"),
 		new BMessage(MSG_SHOW_HOME_BUTTON_CHANGED));
 	fShowHomeButton->SetValue(B_CONTROL_ON);
 
@@ -445,7 +445,7 @@ BView*
 SettingsWindow::_CreateProxyPage(float spacing)
 {
 	fUseProxyCheckBox = new BCheckBox("use proxy",
-		B_TRANSLATE("Use proxy server to connect to the internet."),
+		B_TRANSLATE("Use proxy server to connect to the internet"),
 		new BMessage(MSG_USE_PROXY_CHANGED));
 	fUseProxyCheckBox->SetValue(B_CONTROL_ON);
 

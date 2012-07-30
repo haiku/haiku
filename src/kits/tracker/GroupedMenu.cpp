@@ -176,8 +176,10 @@ TGroupedMenu::TGroupedMenu(const char* name)
 TGroupedMenu::~TGroupedMenu()
 {
 	TMenuItemGroup* group;
-	while ((group = static_cast<TMenuItemGroup*>(fGroups.RemoveItem(0L))) != NULL)
+	while ((group = static_cast<TMenuItemGroup*>(fGroups.RemoveItem(0L)))
+			!= NULL) {
 		delete group;
+	}
 }
 
 
@@ -247,7 +249,8 @@ TGroupedMenu::CountGroups()
 
 
 void
-TGroupedMenu::AddGroupItem(TMenuItemGroup* group, BMenuItem* item, int32 atIndex)
+TGroupedMenu::AddGroupItem(TMenuItemGroup* group, BMenuItem* item,
+	int32 atIndex)
 {
 	int32 groupIndex = fGroups.IndexOf(group);
 	bool addSeparator = false;
@@ -257,7 +260,8 @@ TGroupedMenu::AddGroupItem(TMenuItemGroup* group, BMenuItem* item, int32 atIndex
 		if (groupIndex > 0) {
 			// add this group after an existing one
 			TMenuItemGroup* previous = GroupAt(groupIndex - 1);
-			group->fFirstItemIndex = previous->fFirstItemIndex + previous->fItemsTotal;
+			group->fFirstItemIndex = previous->fFirstItemIndex
+				+ previous->fItemsTotal;
 			addSeparator = true;
 		} else {
 			// this is the first group
@@ -283,7 +287,8 @@ TGroupedMenu::AddGroupItem(TMenuItemGroup* group, BMenuItem* item, int32 atIndex
 
 	// insert item for real
 
-	AddItem(item, atIndex + group->fFirstItemIndex + (group->HasSeparator() ? 1 : 0));
+	AddItem(item,
+		atIndex + group->fFirstItemIndex + (group->HasSeparator() ? 1 : 0));
 
 	// move the groups after this one
 
@@ -320,4 +325,3 @@ TGroupedMenu::RemoveGroupItem(TMenuItemGroup* group, BMenuItem* item)
 		group->fFirstItemIndex -= removedSeparator ? 2 : 1;
 	}
 }
-

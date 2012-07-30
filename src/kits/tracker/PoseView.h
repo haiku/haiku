@@ -104,7 +104,8 @@ const uint32 kCheckTypeahead = 'Tcty';
 
 class BPoseView : public BView {
 	public:
-		BPoseView(Model*, BRect, uint32 viewMode, uint32 resizeMask = B_FOLLOW_ALL);
+		BPoseView(Model*, BRect, uint32 viewMode,
+			uint32 resizeMask = B_FOLLOW_ALL);
 		virtual ~BPoseView();
 
 		// setup, teardown
@@ -113,8 +114,8 @@ class BPoseView : public BView {
 		void InitCommon();
 		virtual	void DetachedFromWindow();
 
-		// Returns true if for instance, node ref is a remote desktop directory and
-		// this is a desktop pose view.
+		// Returns true if for instance, node ref is a remote desktop
+		// directory and this is a desktop pose view.
 		virtual bool Represents(const node_ref*) const;
 		virtual bool Represents(const entry_ref*) const;
 
@@ -151,9 +152,9 @@ class BPoseView : public BView {
 	 	virtual void SwitchDir(const entry_ref*,
 	 		AttributeStreamNode* node = NULL);
 
-		// in the rare cases where a pose view needs to be explicitly refreshed
-		// (for instance in a query window with a dynamic date query), this is
-		// used
+		// in the rare cases where a pose view needs to be explicitly
+		// refreshed (for instance in a query window with a dynamic
+		// date query), this is used
 		virtual void Refresh();
 
 		// callbacks
@@ -228,7 +229,8 @@ class BPoseView : public BView {
 		icon_size IconSize() const;
 
 		BRect Extent() const;
-		void GetLayoutInfo(uint32 viewMode, BPoint* grid, BPoint* offset) const;
+		void GetLayoutInfo(uint32 viewMode, BPoint* grid,
+			BPoint* offset) const;
 
 		int32 CountItems() const;
 		void UpdateCount();
@@ -250,8 +252,8 @@ class BPoseView : public BView {
 		BPoint ResizeColumn(BColumn*, float, float* lastLineDrawPos = NULL,
 			void (*drawLineFunc)(BPoseView*, BPoint, BPoint) = 0,
 			void (*undrawLineFunc)(BPoseView*, BPoint, BPoint) = 0);
-			// returns the bottom right of the last pose drawn or bottom right of
-			// bounds
+			// returns the bottom right of the last pose drawn or
+			// the bottom right of bounds
 
 		BColumn* ColumnAt(int32 index) const;
 		BColumn* ColumnFor(uint32 attribute_hash) const;
@@ -265,14 +267,16 @@ class BPoseView : public BView {
 		BPose* PoseAtIndex(int32 index) const;
 
 		BPose* FindPose(BPoint where, int32* index = NULL) const;
-			// return pose at location h, v (search list starting from bottom so
-			// drawing and hit detection reflect the same pose ordering)
+			// return pose at location h, v (search list starting from
+			// bottom so drawing and hit detection reflect the same pose
+			// ordering)
 		BPose* FindPose(const Model*, int32* index = NULL) const;
 		BPose* FindPose(const node_ref*, int32* index = NULL) const;
 		BPose* FindPose(const entry_ref*, int32* index = NULL) const;
-		BPose* FindPose(const entry_ref*, int32 specifierForm, int32* index) const;
-			// special form of FindPose used for scripting, <specifierForm> may
-			// ask for previous or next pose
+		BPose* FindPose(const entry_ref*, int32 specifierForm,
+			int32* index) const;
+			// special form of FindPose used for scripting,
+			// <specifierForm> may ask for previous or next pose
 		BPose* DeepFindPose(const node_ref* node, int32* index = NULL) const;
 			// same as FindPose, node can be a target of the actual
 			// pose if the pose is a symlink
@@ -284,17 +288,22 @@ class BPoseView : public BView {
 		void UnmountSelectedVolumes();
 		virtual void OpenParent();
 
-		virtual void OpenSelection(BPose* clicked_pose = NULL, int32* index = NULL);
-		void OpenSelectionUsing(BPose* clicked_pose = NULL, int32* index = NULL);
+		virtual void OpenSelection(BPose* clicked_pose = NULL,
+			int32* index = NULL);
+		void OpenSelectionUsing(BPose* clicked_pose = NULL,
+			int32* index = NULL);
 			// launches the open with window
 		virtual void MoveSelectionTo(BPoint, BPoint, BContainerWindow*);
-		void DuplicateSelection(BPoint* dropStart = NULL, BPoint* dropEnd = NULL);
+		void DuplicateSelection(BPoint* dropStart = NULL,
+			BPoint* dropEnd = NULL);
 
-		// Move to trash calls try to select the next pose in the view when they
-		// are dones
+		// Move to trash calls try to select the next pose in the view
+		// when they are dones
 		virtual void MoveSelectionToTrash(bool selectNext = true);
-		virtual void DeleteSelection(bool selectNext = true, bool askUser = true);
-		virtual void MoveEntryToTrash(const entry_ref*, bool selectNext = true);
+		virtual void DeleteSelection(bool selectNext = true,
+			bool askUser = true);
+		virtual void MoveEntryToTrash(const entry_ref*,
+			bool selectNext = true);
 
 		void RestoreSelectionFromTrash(bool selectNext = true);
 
@@ -306,7 +315,8 @@ class BPoseView : public BView {
 		void ShowSelectionWindow();
 		void ClearSelection();
 		void ShowSelection(bool);
-		void AddRemovePoseFromSelection(BPose* pose, int32 index, bool select);
+		void AddRemovePoseFromSelection(BPose* pose, int32 index,
+			bool select);
 
 		BLooper* SelectionHandler();
 		void SetSelectionHandler(BLooper*);
@@ -339,7 +349,8 @@ class BPoseView : public BView {
 		inline bool HasPosesInClipboard();
 		inline void SetHasPosesInClipboard(bool hasPoses);
 		void SetPosesClipboardMode(uint32 clipboardMode);
-		void UpdatePosesClipboardModeFromClipboard(BMessage* clipboardReport = NULL);
+		void UpdatePosesClipboardModeFromClipboard(
+			BMessage* clipboardReport = NULL);
 
 		// filtering
 		void SetRefFilter(BRefFilter*);
@@ -353,21 +364,25 @@ class BPoseView : public BView {
 
 		// drag&drop handling
 		virtual bool HandleMessageDropped(BMessage*);
-		static bool HandleDropCommon(BMessage* dragMessage, Model* target, BPose*,
-			BView* view, BPoint dropPt);
+		static bool HandleDropCommon(BMessage* dragMessage, Model* target,
+			BPose*, BView* view, BPoint dropPt);
 			// used by pose views and info windows
 		static bool CanHandleDragSelection(const Model* target,
 			const BMessage* dragMessage, bool ignoreTypes);
 		virtual	void DragSelectedPoses(const BPose* clickedPose, BPoint);
 
 		void MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
-			bool forceCopy, bool forceMove = false, bool createLink = false, bool relativeLink = false);
-		static void MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
-			BContainerWindow* destWindow, uint32 buttons, BPoint loc,
-			bool forceCopy, bool forceMove = false, bool createLink = false, bool relativeLink = false,
-			BPoint clickPt = BPoint(0, 0), bool pinToGrid = false);
+			bool forceCopy, bool forceMove = false, bool createLink = false,
+			bool relativeLink = false);
+		static void MoveSelectionInto(Model* destFolder,
+			BContainerWindow* srcWindow, BContainerWindow* destWindow,
+			uint32 buttons, BPoint loc, bool forceCopy,
+			bool forceMove = false, bool createLink = false,
+			bool relativeLink = false, BPoint clickPt = BPoint(0, 0),
+			bool pinToGrid = false);
 
-		bool UpdateDropTarget(BPoint, const BMessage*, bool trackingContextMenu);
+		bool UpdateDropTarget(BPoint, const BMessage*,
+			bool trackingContextMenu);
 			// return true if drop target changed
 		void HiliteDropTarget(bool hiliteState);
 
@@ -390,7 +405,8 @@ class BPoseView : public BView {
 			// easy to have the right StringWidth picked up by
 			// template instantiation, as used by WidgetAttributeText
 
-		// show/hide barberpole while a background task is filling up the view, etc.
+		// show/hide barberpole while a background task is filling
+		// up the view, etc.
 		void ShowBarberPole();
 		void HideBarberPole();
 
@@ -423,7 +439,8 @@ class BPoseView : public BView {
 			// create a new folder, optionally specify a location
 
 		void NewFileFromTemplate(const BMessage*);
-			// create a new file based on a template, optionally specify a location
+			// create a new file based on a template, optionally specify
+			// a location
 
 		void ShowContextMenu(BPoint);
 
@@ -434,7 +451,8 @@ class BPoseView : public BView {
 		bool GetProperty(BMessage*, int32, const char*, BMessage*);
 		bool CreateProperty(BMessage* message, BMessage* specifier, int32,
 			const char*, BMessage* reply);
-		bool ExecuteProperty(BMessage* specifier, int32, const char*, BMessage* reply);
+		bool ExecuteProperty(BMessage* specifier, int32, const char*,
+			BMessage* reply);
 		bool CountProperty(BMessage*, int32, const char*, BMessage*);
 		bool DeleteProperty(BMessage*, int32, const char*, BMessage*);
 
@@ -448,16 +466,18 @@ class BPoseView : public BView {
 		void _CheckPoseSortOrder(PoseList* list, BPose*, int32 index);
 
 		// pose creation
-		BPose* EntryCreated(const node_ref*, const node_ref*, const char*, int32* index = 0);
+		BPose* EntryCreated(const node_ref*, const node_ref*, const char*,
+			int32* index = 0);
 
-		void AddPoseToList(PoseList* list, bool visibleList, bool insertionSort,
-			BPose* pose, BRect&viewBounds, float&listViewScrollBy,
-			bool forceDraw, int32* indexPtr = NULL);
+		void AddPoseToList(PoseList* list, bool visibleList,
+			bool insertionSort, BPose* pose, BRect&viewBounds,
+			float& listViewScrollBy, bool forceDraw, int32* indexPtr = NULL);
 		BPose* CreatePose(Model*, PoseInfo*, bool insertionSort = true,
 			int32* index = 0, BRect* boundsPtr = 0, bool forceDraw = true);
-		virtual void CreatePoses(Model**models, PoseInfo* poseInfoArray, int32 count,
-			BPose**resultingPoses, bool insertionSort = true, int32* lastPoseIndexPtr = 0,
-			BRect* boundsPtr = 0, bool forceDraw = false);
+		virtual void CreatePoses(Model**models, PoseInfo* poseInfoArray,
+			int32 count, BPose** resultingPoses, bool insertionSort = true,
+			int32* lastPoseIndexPtr = 0, BRect* boundsPtr = 0,
+			bool forceDraw = false);
 		virtual bool ShouldShowPose(const Model*, const PoseInfo*);
 			// filter, subclasses override to control which poses show up
 			// subclasses should always call inherited
@@ -468,28 +488,29 @@ class BPoseView : public BView {
 		virtual bool AddPosesThreadValid(const entry_ref*) const;
 			// verifies whether or not the current set of AddPoses threads
 			// are valid and allowed to be adding poses -- returns false
-			// in the case where the directory has been switched while populating
-			// the view
+			// in the case where the directory has been switched while
+			// populating the view
 
 		virtual void AddPoses(Model* model = NULL);
-			// if <model> is zero, PoseView has other means of iterating through all
-			// the entries thaat it adds
+			// if <model> is zero, PoseView has other means of iterating
+			// through all the entries thaat it adds
 
 		virtual void AddRootPoses(bool watchIndividually, bool mountShared);
-			// watchIndividually is used when placing a volume pose onto the Desktop
-			// where unlike in the Root window it will not be watched by the folder
-			// representing root. If set, each volume will therefore be watched
-			// individually
+			// watchIndividually is used when placing a volume pose onto
+			// the Desktop where unlike in the Root window it will not be
+			// watched by the folder representing root. If set, each volume
+			// will therefore be watched individually
 		virtual void RemoveRootPoses();
 		virtual void AddTrashPoses();
 
-		virtual bool DeletePose(const node_ref*, BPose* pose = NULL, int32 index = 0);
-		virtual void DeleteSymLinkPoseTarget(const node_ref* itemNode, BPose* pose,
-			int32 index);
+		virtual bool DeletePose(const node_ref*, BPose* pose = NULL,
+			int32 index = 0);
+		virtual void DeleteSymLinkPoseTarget(const node_ref* itemNode,
+			BPose* pose, int32 index);
 			// the pose itself wasn't deleted but it's target node was - the
 			// pose must be a symlink
-		static void PoseHandleDeviceUnmounted(BPose* pose, Model* model, int32 index,
-			BPoseView* poseView, dev_t device);
+		static void PoseHandleDeviceUnmounted(BPose* pose, Model* model,
+			int32 index, BPoseView* poseView, dev_t device);
 		static void RemoveNonBootDesktopModels(BPose*, Model* model, int32,
 			BPoseView* poseView, dev_t);
 
@@ -497,7 +518,8 @@ class BPoseView : public BView {
 		void CheckAutoPlacedPoses();
 			// find poses that need placing and place them in a new spot
 		void PlacePose(BPose*, BRect&);
-			// find a new place for a pose, starting at fHintLocation and place it
+			// find a new place for a pose, starting at fHintLocation
+			// and place it
 		bool IsValidLocation(const BPose* pose);
 		bool IsValidLocation(const BRect& rect);
 		status_t GetDeskbarFrame(BRect* frame);
@@ -539,14 +561,15 @@ class BPoseView : public BView {
 		virtual void StopWatching();
 
 		status_t WatchNewNode(const node_ref* item);
-			// the above would ideally be the only call of these three and it would
-			// be a virtual, overriding the specific watch mask in query pose view, etc.
-			// however we need to call WatchNewNode from inside AddPosesTask while
-			// the window is unlocked - we have to use the static and a cached
-			// messenger and masks.
+			// the above would ideally be the only call of these three and
+			// it would be a virtual, overriding the specific watch mask in
+			// query pose view, etc. however we need to call WatchNewNode
+			// from inside AddPosesTask while the window is unlocked - we
+			// have to use the static and a cached messenger and masks.
 		static status_t WatchNewNode(const node_ref*, uint32, BMessenger);
 		virtual uint32 WatchNewNodeMask();
-			// override to change different watch modes for query pose view, etc.
+			// override to change different watch modes for query pose
+			// view, etc.
 
 		// drag&drop handling
 		static bool EachItemInDraggedSelection(const BMessage* message,
@@ -556,21 +579,25 @@ class BPoseView : public BView {
 			// window of the current drag message; locks the window
 			// add const version
 		BRect GetDragRect(int32 clickedPoseIndex);
-		BBitmap* MakeDragBitmap(BRect dragRect, BPoint clickedPoint, int32 clickedPoseIndex, BPoint&offset);
-		static bool FindDragNDropAction(const BMessage* dragMessage, bool&canCopy,
-			bool&canMove, bool&canLink, bool&canErase);
+		BBitmap* MakeDragBitmap(BRect dragRect, BPoint clickedPoint,
+			int32 clickedPoseIndex, BPoint&offset);
+		static bool FindDragNDropAction(const BMessage* dragMessage,
+			bool&canCopy, bool&canMove, bool&canLink, bool&canErase);
 
 		static bool CanTrashForeignDrag(const Model*);
 		static bool CanCopyOrMoveForeignDrag(const Model*, const BMessage*);
-		static bool DragSelectionContains(const BPose* target, const BMessage* dragMessage);
+		static bool DragSelectionContains(const BPose* target,
+			const BMessage* dragMessage);
 		static status_t CreateClippingFile(BPoseView* poseView, BFile&result,
-			char* resultingName, BDirectory* dir, BMessage* message, const char* fallbackName,
-			bool setLocation = false, BPoint dropPoint = BPoint(0, 0));
+			char* resultingName, BDirectory* dir, BMessage* message,
+			const char* fallbackName, bool setLocation = false,
+			BPoint dropPoint = BPoint(0, 0));
 
 		// opening files, lanunching
 		void OpenSelectionCommon(BPose*, int32*, bool);
 			// used by OpenSelection and OpenSelectionUsing
-		static void LaunchAppWithSelection(Model*, const BMessage*, bool checkTypes = true);
+		static void LaunchAppWithSelection(Model*, const BMessage*,
+			bool checkTypes = true);
 
 		// node monitoring calls
 		virtual bool EntryMoved(const BMessage*);
@@ -585,7 +612,8 @@ class BPoseView : public BView {
 		// selection
 		void SelectPosesListMode(BRect, BList**);
 		void SelectPosesIconMode(BRect, BList**);
-		void AddRemoveSelectionRange(BPoint where, bool extendSelection, BPose*);
+		void AddRemoveSelectionRange(BPoint where, bool extendSelection,
+			BPose*);
 
 		void _BeginSelectionRect(const BPoint& point, bool extendSelection);
 		void _UpdateSelectionRect(const BPoint& point);
@@ -637,10 +665,11 @@ class BPoseView : public BView {
 		PoseList* CurrentPoseList() const;
 
 		// misc
-		BList* GetDropPointList(BPoint dropPoint, BPoint startPoint, const PoseList*,
-			bool sourceInListMode, bool dropOnGrid) const;
+		BList* GetDropPointList(BPoint dropPoint, BPoint startPoint,
+			const PoseList*, bool sourceInListMode, bool dropOnGrid) const;
 		void SendSelectionAsRefs(uint32 what, bool onlyQueries = false);
-		void MoveListToTrash(BObjectList<entry_ref>*, bool selectNext, bool deleteDirectly);
+		void MoveListToTrash(BObjectList<entry_ref>*, bool selectNext,
+			bool deleteDirectly);
 		void Delete(BObjectList<entry_ref>*, bool selectNext, bool askUser);
 		void Delete(const entry_ref&ref, bool selectNext, bool askUser);
 		void RestoreItemsFromTrash(BObjectList<entry_ref>*, bool selectNext);
@@ -779,9 +808,12 @@ class TPoseViewFilter : public BMessageFilter {
 
 
 extern bool
-ClearViewOriginOne(const char* name, uint32 type, off_t size, void* data, void* params);
+ClearViewOriginOne(const char* name, uint32 type, off_t size, void* data,
+	void* params);
+
 
 // inlines follow
+
 
 inline BContainerWindow*
 BPoseView::ContainerWindow() const
@@ -789,11 +821,13 @@ BPoseView::ContainerWindow() const
 	return dynamic_cast<BContainerWindow*>(Window());
 }
 
+
 inline Model*
 BPoseView::TargetModel() const
 {
 	return fModel;
 }
+
 
 inline float
 BPoseView::ListElemHeight() const
@@ -801,11 +835,13 @@ BPoseView::ListElemHeight() const
 	return fListElemHeight;
 }
 
+
 inline float
 BPoseView::IconPoseHeight() const
 {
 	return fIconPoseHeight;
 }
+
 
 inline uint32
 BPoseView::IconSizeInt() const
@@ -813,11 +849,13 @@ BPoseView::IconSizeInt() const
 	return fViewState->IconSize();
 }
 
+
 inline icon_size
 BPoseView::IconSize() const
 {
 	return (icon_size)fViewState->IconSize();
 }
+
 
 inline PoseList*
 BPoseView::SelectionList() const
@@ -825,11 +863,13 @@ BPoseView::SelectionList() const
 	return fSelectionList;
 }
 
+
 inline BObjectList<BString>*
 BPoseView::MimeTypesInSelection()
 {
 	return&fMimeTypesInSelectionCache;
 }
+
 
 inline BHScrollBar*
 BPoseView::HScrollBar() const
@@ -837,11 +877,13 @@ BPoseView::HScrollBar() const
 	return fHScrollBar;
 }
 
+
 inline BScrollBar*
 BPoseView::VScrollBar() const
 {
 	return fVScrollBar;
 }
+
 
 inline BCountView*
 BPoseView::CountView() const
@@ -849,11 +891,13 @@ BPoseView::CountView() const
 	return fCountView;
 }
 
+
 inline bool
 BPoseView::StateNeedsSaving()
 {
 	return fStateNeedsSaving || fViewState->StateNeedsSaving();
 }
+
 
 inline uint32
 BPoseView::ViewMode() const
@@ -861,11 +905,13 @@ BPoseView::ViewMode() const
 	return fViewState->ViewMode();
 }
 
+
 inline font_height
 BPoseView::FontInfo() const
 {
 	return sFontInfo;
 }
+
 
 inline float
 BPoseView::FontHeight() const
@@ -873,11 +919,13 @@ BPoseView::FontHeight() const
 	return sFontHeight;
 }
 
+
 inline BPose*
 BPoseView::ActivePose() const
 {
 	return fActivePose;
 }
+
 
 inline void
 BPoseView::DisableSaveLocation()
@@ -885,11 +933,13 @@ BPoseView::DisableSaveLocation()
 	fSavePoseLocations = false;
 }
 
+
 inline bool
 BPoseView::IsFilePanel() const
 {
 	return false;
 }
+
 
 inline bool
 BPoseView::IsDesktopWindow() const
@@ -897,11 +947,13 @@ BPoseView::IsDesktopWindow() const
 	return fIsDesktopWindow;
 }
 
+
 inline bool
 BPoseView::IsDesktopView() const
 {
 	return false;
 }
+
 
 inline uint32
 BPoseView::PrimarySort() const
@@ -909,11 +961,13 @@ BPoseView::PrimarySort() const
 	return fViewState->PrimarySort();
 }
 
+
 inline uint32
 BPoseView::PrimarySortType() const
 {
 	return fViewState->PrimarySortType();
 }
+
 
 inline uint32
 BPoseView::SecondarySort() const
@@ -921,11 +975,13 @@ BPoseView::SecondarySort() const
 	return fViewState->SecondarySort();
 }
 
+
 inline uint32
 BPoseView::SecondarySortType() const
 {
 	return fViewState->SecondarySortType();
 }
+
 
 inline bool
 BPoseView::ReverseSort() const
@@ -933,11 +989,13 @@ BPoseView::ReverseSort() const
 	return fViewState->ReverseSort();
 }
 
+
 inline void
 BPoseView::SetShowHideSelection(bool on)
 {
 	fShowHideSelection = on;
 }
+
 
 inline void
 BPoseView::SetIconMapping(bool on)
@@ -945,11 +1003,13 @@ BPoseView::SetIconMapping(bool on)
 	fOkToMapIcons = on;
 }
 
+
 inline void
 BPoseView::AddToExtent(const BRect&rect)
 {
 	fExtent = fExtent | rect;
 }
+
 
 inline void
 BPoseView::ClearExtent()
@@ -957,11 +1017,13 @@ BPoseView::ClearExtent()
 	fExtent.Set(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
 }
 
+
 inline int32
 BPoseView::CountColumns() const
 {
 	return fColumnList->CountItems();
 }
+
 
 inline int32
 BPoseView::IndexOfColumn(const BColumn* column) const
@@ -969,11 +1031,13 @@ BPoseView::IndexOfColumn(const BColumn* column) const
 	return fColumnList->IndexOf(const_cast<BColumn*>(column));
 }
 
+
 inline int32
 BPoseView::IndexOfPose(const BPose* pose) const
 {
 	return CurrentPoseList()->IndexOf(pose);
 }
+
 
 inline BPose*
 BPoseView::PoseAtIndex(int32 index) const
@@ -981,11 +1045,13 @@ BPoseView::PoseAtIndex(int32 index) const
 	return CurrentPoseList()->ItemAt(index);
 }
 
+
 inline BColumn*
 BPoseView::ColumnAt(int32 index) const
 {
 	return fColumnList->ItemAt(index);
 }
+
 
 inline BColumn*
 BPoseView::FirstColumn() const
@@ -993,11 +1059,13 @@ BPoseView::FirstColumn() const
 	return fColumnList->FirstItem();
 }
 
+
 inline BColumn*
 BPoseView::LastColumn() const
 {
 	return fColumnList->LastItem();
 }
+
 
 inline int32
 BPoseView::CountItems() const
@@ -1012,11 +1080,13 @@ BPoseView::SetMultipleSelection(bool state)
 	fMultipleSelection = state;
 }
 
+
 inline void
 BPoseView::SetSelectionChangedHook(bool state)
 {
 	fSelectionChangedHook = state;
 }
+
 
 inline void
 BPoseView::SetAutoScroll(bool state)
@@ -1024,11 +1094,13 @@ BPoseView::SetAutoScroll(bool state)
 	fShouldAutoScroll = state;
 }
 
+
 inline void
 BPoseView::SetPoseEditing(bool state)
 {
 	fAllowPoseEditing = state;
 }
+
 
 inline void
 BPoseView::SetDragEnabled(bool state)
@@ -1036,11 +1108,13 @@ BPoseView::SetDragEnabled(bool state)
 	fDragEnabled = state;
 }
 
+
 inline void
 BPoseView::SetDropEnabled(bool state)
 {
 	fDropEnabled = state;
 }
+
 
 inline void
 BPoseView::SetSelectionRectEnabled(bool state)
@@ -1048,11 +1122,13 @@ BPoseView::SetSelectionRectEnabled(bool state)
 	fSelectionRectEnabled = state;
 }
 
+
 inline void
 BPoseView::SetAlwaysAutoPlace(bool state)
 {
 	fAlwaysAutoPlace = state;
 }
+
 
 inline void
 BPoseView::SetEnsurePosesVisible(bool state)
@@ -1060,11 +1136,13 @@ BPoseView::SetEnsurePosesVisible(bool state)
 	fEnsurePosesVisible = state;
 }
 
+
 inline void
 BPoseView::SetSelectionHandler(BLooper* looper)
 {
 	fSelectionHandler = looper;
 }
+
 
 inline void
 BPoseView::SetRefFilter(BRefFilter* filter)
@@ -1072,11 +1150,13 @@ BPoseView::SetRefFilter(BRefFilter* filter)
 	fRefFilter = filter;
 }
 
+
 inline BRefFilter*
 BPoseView::RefFilter() const
 {
 	return fRefFilter;
 }
+
 
 inline void
 BHScrollBar::SetTitleView(BView* view)
@@ -1084,17 +1164,20 @@ BHScrollBar::SetTitleView(BView* view)
 	fTitleView = view;
 }
 
+
 inline BPose*
 BPoseView::FindPose(const Model* model, int32* index) const
 {
 	return CurrentPoseList()->FindPose(model, index);
 }
 
+
 inline BPose*
 BPoseView::FindPose(const node_ref* node, int32* index) const
 {
 	return CurrentPoseList()->FindPose(node, index);
 }
+
 
 inline BPose*
 BPoseView::FindPose(const entry_ref* entry, int32* index) const

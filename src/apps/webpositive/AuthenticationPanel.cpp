@@ -53,7 +53,7 @@ static const uint32 kHidePassword = 'hdpw';
 AuthenticationPanel::AuthenticationPanel(BRect parentFrame)
 	:
 	BWindow(BRect(-1000, -1000, -900, -900),
-		B_TRANSLATE("Authentication Required"), B_TITLED_WINDOW_LOOK,
+		B_TRANSLATE("Authentication required"), B_TITLED_WINDOW_LOOK,
 		B_MODAL_APP_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE
 			| B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE | B_AUTO_UPDATE_SIZE_LIMITS),
 	m_parentWindowFrame(parentFrame),

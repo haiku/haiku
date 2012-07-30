@@ -105,7 +105,8 @@ class BViewState {
 
 		BViewState(BMallocIO* stream, bool endianSwap = false);
 		BViewState(const BMessage &message);
-		static BViewState* InstantiateFromStream(BMallocIO* stream, bool endianSwap = false);
+		static BViewState* InstantiateFromStream(BMallocIO* stream,
+			bool endianSwap = false);
 		static BViewState* InstantiateFromMessage(const BMessage &message);
 		void ArchiveToStream(BMallocIO* stream) const;
 		void ArchiveToMessage(BMessage &message) const;

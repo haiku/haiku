@@ -122,7 +122,8 @@ protected:
 	virtual	void WindowActivated(bool state);
 
 	static	filter_result FSFilter(BMessage*, BHandler**, BMessageFilter*);
-	static	filter_result MessageDropFilter(BMessage*, BHandler**, BMessageFilter*);
+	static	filter_result MessageDropFilter(BMessage*, BHandler**,
+		BMessageFilter*);
 
 			int32 ShowCenteredAlert(const char* text, const char* button1,
 				const char* button2 = NULL, const char* button3 = NULL);
@@ -166,7 +167,8 @@ public:
 	void SetIsDesktop(bool);
 
 protected:
-	// don't do any volume watching and memtamime watching in file panels for now
+	// don't do any volume watching and memtamime watching in file panels
+	// for now
 	virtual	void StartWatching();
 	virtual	void StopWatching();
 

@@ -50,7 +50,8 @@ namespace BPrivate {
 
 class Settings;
 
-typedef const char* (*ArgvHandler)(int argc, const char* const *argv, void* params);
+typedef const char* (*ArgvHandler)(int argc, const char* const *argv,
+	void* params);
 	// return 0 or error string if parsing failed
 
 const int32 kBufferSize = 1024;
@@ -117,7 +118,8 @@ public:
 		// return a pointer to an error message or null if parsed OK
 
 	// some handy reader/writer calls
-	bool HandleRectValue(BRect&, const char* const *argv, bool printError = true);
+	bool HandleRectValue(BRect&, const char* const *argv,
+		bool printError = true);
 	void WriteRectValue(Settings*, BRect);
 
 protected:

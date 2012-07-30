@@ -54,7 +54,8 @@ All rights reserved.
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "VolumeWindow"
 
-BVolumeWindow::BVolumeWindow(LockingList<BWindow>* windowList, uint32 openFlags)
+BVolumeWindow::BVolumeWindow(LockingList<BWindow>* windowList,
+		uint32 openFlags)
 	:	BContainerWindow(windowList, openFlags)
 {
 }
@@ -75,7 +76,8 @@ BVolumeWindow::MenusBeginning()
 
 	int32 count = PoseView()->SelectionList()->CountItems();
 	for (int32 index = 0; index < count; index++) {
-		Model* model = PoseView()->SelectionList()->ItemAt(index)->TargetModel();
+		Model* model
+			= PoseView()->SelectionList()->ItemAt(index)->TargetModel();
 		if (model->IsVolume()) {
 			BVolume volume;
 			volume.SetTo(model->NodeRef()->device);

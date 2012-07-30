@@ -56,7 +56,8 @@ CalcFreeSpace(BVolume* volume)
 	if (capacity == 0)
 		return 100;
 
-	int32 percent = static_cast<int32>(volume->FreeBytes() / (capacity / 100));
+	int32 percent
+		= static_cast<int32>(volume->FreeBytes() / (capacity / 100));
 
 	// warn below 20 MB of free space (if this is less than 10% of free space)
 	if (volume->FreeBytes() < 20 * 1024 * 1024 && percent < 10)
@@ -69,7 +70,8 @@ CalcFreeSpace(BVolume* volume)
 // symlink pose uses the resolved model to retrieve the icon, if not broken
 // everything else, like the attributes, etc. is retrieved directly from the
 // symlink itself
-BPose::BPose(Model* model, BPoseView* view, uint32 clipboardMode, bool selected)
+BPose::BPose(Model* model, BPoseView* view, uint32 clipboardMode,
+	bool selected)
 	:	fModel(model),
 		fWidgetList(4, true),
 		fClipboardMode(clipboardMode),
@@ -148,7 +150,8 @@ BPose::AddWidget(BPoseView* poseView, BColumn* column)
 
 
 BTextWidget*
-BPose::AddWidget(BPoseView* poseView, BColumn* column, ModelNodeLazyOpener &opener)
+BPose::AddWidget(BPoseView* poseView, BColumn* column,
+	ModelNodeLazyOpener &opener)
 {
 	opener.OpenNode();
 	if (fModel->InitCheck() != B_OK)
@@ -171,7 +174,8 @@ BPose::RemoveWidget(BPoseView*, BColumn* column)
 
 
 void
-BPose::Commit(bool saveChanges, BPoint loc, BPoseView* poseView, int32 poseIndex)
+BPose::Commit(bool saveChanges, BPoint loc, BPoseView* poseView,
+	int32 poseIndex)
 {
 	int32 count = fWidgetList.CountItems();
 	for (int32 index = 0; index < count; index++) {
@@ -185,8 +189,8 @@ BPose::Commit(bool saveChanges, BPoint loc, BPoseView* poseView, int32 poseIndex
 
 
 inline bool
-OneMouseUp(BTextWidget* widget, BPose* pose, BPoseView* poseView, BColumn* column,
-	BPoint poseLoc, BPoint where)
+OneMouseUp(BTextWidget* widget, BPose* pose, BPoseView* poseView,
+	BColumn* column, BPoint poseLoc, BPoint where)
 {
 	BRect rect;
 	if (poseView->ViewMode() == kListMode)
@@ -258,7 +262,8 @@ BPose::UpdateWidgetAndModel(Model* resolvedModel, const char* attrName,
 				BTextWidget* widget = fWidgetList.ItemAt(i);
 				BColumn* column = poseView->ColumnFor(widget->AttrHash());
 				if (column != NULL && !strcmp(column->AttrName(), attrName)) {
-					widget->CheckAndUpdate(poseLoc, column, poseView, visible);
+					widget->CheckAndUpdate(poseLoc, column, poseView,
+						visible);
 					break;
 				}
 			}
@@ -283,8 +288,10 @@ BPose::UpdateWidgetAndModel(Model* resolvedModel, const char* attrName,
 
 			if (column->StatField()) {
 				BTextWidget* widget = WidgetFor(column->AttrHash());
-				if (widget)
-					widget->CheckAndUpdate(poseLoc, column, poseView, visible);
+				if (widget) {
+					widget->CheckAndUpdate(poseLoc, column, poseView,
+						visible);
+				}
 			}
 		}
 	}
@@ -403,7 +410,8 @@ BPose::EditPreviousNextWidgetCommon(BPoseView* poseView, bool next)
 {
 	bool found = false;
 	int32 delta = next ? 1 : -1;
-	for (int32 index = next ? 0 : poseView->CountColumns() - 1; ; index += delta) {
+	for (int32 index = next ? 0 : poseView->CountColumns() - 1; ;
+			index += delta) {
 		BColumn* column = poseView->ColumnAt(index);
 		if (!column)
 			break;
@@ -510,7 +518,8 @@ BPose::PointInPose(BPoint loc, const BPoseView* poseView, BPoint where,
 		if (!column)
 			break;
 		BTextWidget* widget = WidgetFor(column->AttrHash());
-		if (widget && widget->CalcClickRect(loc, column, poseView).Contains(where)) {
+		if (widget
+			&& widget->CalcClickRect(loc, column, poseView).Contains(where)) {
 			if (hitWidget)
 				*hitWidget = widget;
 			return true;
@@ -522,8 +531,8 @@ BPose::PointInPose(BPoint loc, const BPoseView* poseView, BPoint where,
 
 
 void
-BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* drawView,
-	bool fullDraw, BPoint offset, bool selected)
+BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
+	BView* drawView, bool fullDraw, BPoint offset, bool selected)
 {
 	// If the background wasn't cleared and Draw() is not called after
 	// having edited a name or similar (with fullDraw)
@@ -549,8 +558,8 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 		iconRect.top = iconRect.bottom - size;
 		if (updateRect.Intersects(iconRect)) {
 			iconRect.OffsetBy(offset);
-			DrawIcon(iconRect.LeftTop(), drawView, poseView->IconSize(), directDraw,
-				!windowActive && !showSelectionWhenInactive);
+			DrawIcon(iconRect.LeftTop(), drawView, poseView->IconSize(),
+				directDraw, !windowActive && !showSelectionWhenInactive);
 		}
 		
 		// draw text
@@ -571,8 +580,8 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 					poseView));
 				
 				if (updateRect.Intersects(widgetRect)) {
-					BRect widgetTextRect(widget->CalcRect(rect.LeftTop(), column,
-						poseView));
+					BRect widgetTextRect(widget->CalcRect(rect.LeftTop(),
+						column, poseView));
 					
 					bool selectDuringDraw = directDraw && selected
 						&& windowActive;
@@ -583,12 +592,15 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 						drawView->SetLowColor(0, 0, 0);
 					}
 					
-					if (index == 0)
-						widget->Draw(widgetRect, widgetTextRect, column->Width(),
-							poseView, drawView, selected, fClipboardMode, offset, directDraw);
-					else
+					if (index == 0) {
+						widget->Draw(widgetRect, widgetTextRect,
+							column->Width(), poseView, drawView, selected,
+							fClipboardMode, offset, directDraw);
+					} else {
 						widget->Draw(widgetTextRect, widgetTextRect, column->Width(),
-							poseView, drawView, false, fClipboardMode, offset, directDraw);
+							poseView, drawView, false, fClipboardMode,
+							offset, directDraw);
+					}
 					
 					if (index == 0 && selectDuringDraw)
 						drawView->PopState();
@@ -596,7 +608,8 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView, BView* dra
 						if (windowActive || isDrawingSelectionRect) {
 							widgetTextRect.OffsetBy(offset);
 							drawView->InvertRect(widgetTextRect);
-						} else if (!windowActive && showSelectionWhenInactive) {
+						} else if (!windowActive
+							&& showSelectionWhenInactive) {
 							widgetTextRect.OffsetBy(offset);
 							drawView->PushState();
 							drawView->SetDrawingMode(B_OP_BLEND);
@@ -705,8 +718,10 @@ BPose::MoveTo(BPoint point, BPoseView* poseView, bool inval)
 	// might need to move a text view if we're active
 	if (poseView->ActivePose() == this) {
 		BView* border_view = poseView->FindView("BorderView");
-		if (border_view)
-			border_view->MoveBy(point.x - oldLocation.x, point.y - oldLocation.y);
+		if (border_view) {
+			border_view->MoveBy(point.x - oldLocation.x,
+				point.y - oldLocation.y);
+		}
 	}
 
 	float scale = 1.0;
@@ -756,8 +771,8 @@ BPose::WidgetFor(uint32 attr, int32* index) const
 
 
 BTextWidget*
-BPose::WidgetFor(BColumn* column, BPoseView* poseView, ModelNodeLazyOpener &opener,
-	int32* index)
+BPose::WidgetFor(BColumn* column, BPoseView* poseView,
+	ModelNodeLazyOpener &opener, int32* index)
 {
 	BTextWidget* widget = WidgetFor(column->AttrHash(), index);
 	if (!widget)
@@ -777,17 +792,20 @@ BPose::TestLargeIconPixel(BPoint point) const
 
 
 void
-BPose::DrawIcon(BPoint where, BView* view, icon_size kind, bool direct, bool drawUnselected)
+BPose::DrawIcon(BPoint where, BView* view, icon_size kind, bool direct,
+	bool drawUnselected)
 {
 	if (fClipboardMode == kMoveSelectionTo) {
 		view->SetDrawingMode(B_OP_ALPHA);
-		view->SetHighColor(0, 0, 0, 64);	// set the level of transparency
+		view->SetHighColor(0, 0, 0, 64);
+			// set the level of transparency
 		view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 	} else if (direct)
 		view->SetDrawingMode(B_OP_OVER);
 
 	IconCache::sIconCache->Draw(ResolvedModel(), view, where,
-		fIsSelected && !drawUnselected ? kSelectedIcon : kNormalIcon, kind, true);
+		fIsSelected && !drawUnselected ? kSelectedIcon : kNormalIcon, kind,
+			true);
 
 	if (fPercent != -1)
 		DrawBar(where, view, kind);
@@ -816,7 +834,8 @@ BPose::DrawBar(BPoint where,BView* view,icon_size kind)
 	view->SetHighColor(32, 32, 32, 92);
 	view->MovePenTo(BPoint(where.x + size, where.y + 1 + yOffset));
 	view->StrokeLine(BPoint(where.x + size, where.y + size - yOffset));
-	view->StrokeLine(BPoint(where.x + size - barWidth + 1, where.y + size - yOffset));
+	view->StrokeLine(BPoint(where.x + size - barWidth + 1,
+		where.y + size - yOffset));
 
 	view->SetDrawingMode(B_OP_ALPHA);
 
@@ -846,7 +865,9 @@ BPose::DrawBar(BPoint where,BView* view,icon_size kind)
 	// the used space bar
 	bar.top = bar.bottom + 1;
 	bar.bottom = rect.bottom;
-	view->SetHighColor(fPercent < -1 ? TrackerSettings().WarningSpaceColor() : TrackerSettings().UsedSpaceColor());
+	view->SetHighColor(fPercent < -1
+		? TrackerSettings().WarningSpaceColor()
+		: TrackerSettings().UsedSpaceColor());
 	view->FillRect(bar);
 
 	view->PopState();
@@ -899,8 +920,10 @@ BPose::CalcRect(BPoint loc, const BPoseView* poseView, bool minimalRect) const
 
 	if (minimalRect) {
 		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
-		if (widget)
-			rect.right = widget->CalcRect(loc, poseView->FirstColumn(), poseView).right;
+		if (widget) {
+			rect.right = widget->CalcRect(loc, poseView->FirstColumn(),
+				poseView).right;
+		}
 	}
 
 	return rect;

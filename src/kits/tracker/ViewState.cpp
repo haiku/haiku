@@ -475,12 +475,12 @@ BViewState::_Sanitize(BViewState* state, bool fixOnly)
 	}
 	if (state->fIconSize < 16)
 		state->fIconSize = 16;
-	if (state->fIconSize > 64)
-		state->fIconSize = 64;
+	if (state->fIconSize > 128)
+		state->fIconSize = 128;
 	if (state->fLastIconSize < 16)
 		state->fLastIconSize = 16;
-	if (state->fLastIconSize > 64)
-		state->fLastIconSize = 64;
+	if (state->fLastIconSize > 128)
+		state->fLastIconSize = 128;
 
 	if (fixOnly)
 		return state;

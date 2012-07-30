@@ -137,11 +137,13 @@ class QueryEntryListCollection : public EntryListBase {
 
 		PoseList* fOldPoseList;
 			// when doing a Refresh, this list is used to detect poses that
-			// are no longer a part of a fDynamicDateQuery and need to be removed
+			// are no longer a part of a fDynamicDateQuery and need to be
+			// removed
 	};
 
 public:
-	QueryEntryListCollection(Model*, BHandler* = NULL, PoseList* oldPoseList = NULL);
+	QueryEntryListCollection(Model*, BHandler* = NULL,
+		PoseList* oldPoseList = NULL);
 	virtual ~QueryEntryListCollection();
 
 	QueryEntryListCollection* Clone();

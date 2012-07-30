@@ -252,9 +252,11 @@ private:
 
 
 template <class Result, class Param1, class Param2, class Param3>
-class ThreeParamFunctionObjectWithResult : public FunctionObjectWithResult<Result> {
+class ThreeParamFunctionObjectWithResult : public
+	FunctionObjectWithResult<Result> {
 public:
-	ThreeParamFunctionObjectWithResult(Result (*callThis)(Param1, Param2, Param3),
+	ThreeParamFunctionObjectWithResult(
+		Result (*callThis)(Param1, Param2, Param3),
 		Param1 p1, Param2 p2, Param3 p3)
 		:	function(callThis),
 			p1(p1),
@@ -300,10 +302,13 @@ private:
 };
 
 
-template <class Result, class Param1, class Param2, class Param3, class Param4>
-class FourParamFunctionObjectWithResult : public FunctionObjectWithResult<Result>  {
+template <class Result, class Param1, class Param2, class Param3,
+	class Param4>
+class FourParamFunctionObjectWithResult : public
+	FunctionObjectWithResult<Result>  {
 public:
-	FourParamFunctionObjectWithResult(Result (*callThis)(Param1, Param2, Param3, Param4),
+	FourParamFunctionObjectWithResult(
+		Result (*callThis)(Param1, Param2, Param3, Param4),
 		Param1 p1, Param2 p2, Param3 p3, Param4 p4)
 		:	function(callThis),
 			p1(p1),
@@ -369,7 +374,8 @@ private:
 
 
 template<class T, class R>
-class PlainMemberFunctionObjectWithResult : public FunctionObjectWithResult<R> {
+class PlainMemberFunctionObjectWithResult : public
+	FunctionObjectWithResult<R> {
 public:
 	PlainMemberFunctionObjectWithResult(R (T::*function)(), T* onThis)
 		:	function(function),
@@ -390,7 +396,8 @@ private:
 template<class T, class Param1>
 class SingleParamMemberFunctionObject : public FunctionObject {
 public:
-	SingleParamMemberFunctionObject(void (T::*function)(Param1), T* onThis, Param1 p1)
+	SingleParamMemberFunctionObject(void (T::*function)(Param1),
+		T* onThis, Param1 p1)
 		:	function(function),
 			target(onThis),
 			p1(p1)
@@ -410,8 +417,8 @@ private:
 template<class T, class Param1, class Param2>
 class TwoParamMemberFunctionObject : public FunctionObject {
 public:
-	TwoParamMemberFunctionObject(void (T::*function)(Param1, Param2), T* onThis,
-		Param1 p1, Param2 p2)
+	TwoParamMemberFunctionObject(void (T::*function)(Param1, Param2),
+		T* onThis, Param1 p1, Param2 p2)
 		:	function(function),
 			target(onThis),
 			p1(p1),
@@ -432,10 +439,11 @@ protected:
 
 
 template<class T, class R, class Param1>
-class SingleParamMemberFunctionObjectWithResult : public FunctionObjectWithResult<R> {
+class SingleParamMemberFunctionObjectWithResult : public
+	FunctionObjectWithResult<R> {
 public:
-	SingleParamMemberFunctionObjectWithResult(R (T::*function)(Param1), T* onThis,
-		Param1 p1)
+	SingleParamMemberFunctionObjectWithResult(R (T::*function)(Param1),
+		T* onThis, Param1 p1)
 		:	function(function),
 			target(onThis),
 			p1(p1)
@@ -443,7 +451,8 @@ public:
 		}
 
 	virtual void operator()()
-		{ FunctionObjectWithResult<R>::result = (target->*function)(p1.Pass()); }
+		{ FunctionObjectWithResult<R>::result
+			= (target->*function)(p1.Pass()); }
 
 protected:
 	R (T::*function)(Param1);
@@ -453,10 +462,11 @@ protected:
 
 
 template<class T, class R, class Param1, class Param2>
-class TwoParamMemberFunctionObjectWithResult : public FunctionObjectWithResult<R> {
+class TwoParamMemberFunctionObjectWithResult : public
+	FunctionObjectWithResult<R> {
 public:
-	TwoParamMemberFunctionObjectWithResult(R (T::*function)(Param1, Param2), T* onThis,
-		Param1 p1, Param2 p2)
+	TwoParamMemberFunctionObjectWithResult(R (T::*function)(Param1, Param2),
+		T* onThis, Param1 p1, Param2 p2)
 		:	function(function),
 			target(onThis),
 			p1(p1),
@@ -505,7 +515,8 @@ ThreeParamFunctionObject<Param1, Param2, Param3>*
 NewFunctionObject(void (*function)(Param1, Param2, Param3),
 	Param1 p1, Param2 p2, Param3 p3)
 {
-	return new ThreeParamFunctionObject<Param1, Param2, Param3>(function, p1, p2, p3);
+	return new ThreeParamFunctionObject<Param1, Param2, Param3>
+		(function, p1, p2, p3);
 }
 
 
@@ -521,7 +532,8 @@ template<class T, class Param1>
 SingleParamMemberFunctionObject<T, Param1>*
 NewMemberFunctionObject(void (T::*function)(Param1), T* onThis, Param1 p1)
 {
-	return new SingleParamMemberFunctionObject<T, Param1>(function, onThis, p1);
+	return new SingleParamMemberFunctionObject<T, Param1>
+		(function, onThis, p1);
 }
 
 
@@ -530,8 +542,8 @@ TwoParamMemberFunctionObject<T, Param1, Param2>*
 NewMemberFunctionObject(void (T::*function)(Param1, Param2), T* onThis,
 		Param1 p1, Param2 p2)
 {
-	return new TwoParamMemberFunctionObject<T, Param1, Param2>(function, onThis,
-		p1, p2);
+	return new TwoParamMemberFunctionObject<T, Param1, Param2>
+		(function, onThis, p1, p2);
 }
 
 
@@ -550,7 +562,8 @@ PlainLockingMemberFunctionObject<HandlerOrSubclass>*
 NewLockingMemberFunctionObject(void (HandlerOrSubclass::*function)(),
 	HandlerOrSubclass* onThis)
 {
-	return new PlainLockingMemberFunctionObject<HandlerOrSubclass>(function, onThis);
+	return new PlainLockingMemberFunctionObject<HandlerOrSubclass>
+		(function, onThis);
 }
 
 } // namespace BPrivate

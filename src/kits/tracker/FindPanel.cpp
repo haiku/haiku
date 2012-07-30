@@ -106,7 +106,8 @@ namespace BPrivate {
 
 class MostUsedNames {
 	public:
-		MostUsedNames(const char* fileName, const char* directory, int32 maxCount = 5);
+		MostUsedNames(const char* fileName, const char* directory,
+			int32 maxCount = 5);
 		~MostUsedNames();
 
 		bool ObtainList(BList* list);
@@ -175,8 +176,8 @@ MoreOptionsStruct::QueryTemporary(const BNode* node)
 
 FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 	:
-	BWindow(kInitialRect, B_TRANSLATE("Find"), B_TITLED_WINDOW, B_NOT_RESIZABLE
-		| B_NOT_ZOOMABLE),
+	BWindow(kInitialRect, B_TRANSLATE("Find"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
 	fFile(TryOpening(newRef)),
 	fFromTemplate(false),
 	fEditTemplateOnly(false),
@@ -218,7 +219,8 @@ FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 
 	fFromTemplate = IsQueryTemplate(fFile);
 
-	fBackground = new FindPanel(Bounds(), fFile, this, fFromTemplate, fEditTemplateOnly);
+	fBackground = new FindPanel(Bounds(), fFile, this, fFromTemplate, 
+		fEditTemplateOnly);
 	AddChild(fBackground);
 }
 
@@ -292,8 +294,10 @@ const char*
 FindWindow::QueryName() const
 {
 	if (fFromTemplate) {
-		if (!fQueryNameFromTemplate.Length())
-			fFile->ReadAttrString(kAttrQueryTemplateName, &fQueryNameFromTemplate);
+		if (!fQueryNameFromTemplate.Length()) {
+			fFile->ReadAttrString(kAttrQueryTemplateName,
+				&fQueryNameFromTemplate);
+		}
 
 		return fQueryNameFromTemplate.String();
 	}
@@ -330,7 +334,8 @@ void
 FindWindow::GetPredicateString(BString &predicate, bool &dynamicDate)
 {
 	BQuery query;
-	BTextControl* textControl = dynamic_cast<BTextControl*>(FindView("TextControl"));
+	BTextControl* textControl
+		= dynamic_cast<BTextControl*>(FindView("TextControl"));
 	switch (fBackground->Mode()) {
 		case kByNameItem:
 			fBackground->GetByNamePredicate(&query);
@@ -370,20 +375,22 @@ FindWindow::GetDefaultName(BString &result)
 void
 FindWindow::SaveQueryAttributes(BNode* file, bool queryTemplate)
 {
-	ThrowOnError( BNodeInfo(file).SetType(
-		queryTemplate ? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE) );
+	ThrowOnError(BNodeInfo(file).SetType(
+		queryTemplate ? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE));
 
 	// save date/time info for recent query support and transient query killer
 	int32 currentTime = (int32)time(0);
-	file->WriteAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &currentTime, sizeof(int32));
+	file->WriteAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &currentTime,
+		sizeof(int32));
 	int32 tmp = 1;
 	file->WriteAttr("_trk/recentQuery", B_INT32_TYPE, 0, &tmp, sizeof(int32));
 }
 
 
 status_t
-FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate,
-	const BMessage* oldAttributes, const BPoint* oldLocation)
+FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
+	bool queryTemplate, const BMessage* oldAttributes,
+	const BPoint* oldLocation)
 {
 	if (oldAttributes)
 		// revive old window settings
@@ -393,7 +400,8 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate
 		// and the file's location
 		FSSetPoseLocation(entry, *oldLocation);
 
-	BNodeInfo(file).SetType(queryTemplate ? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE);
+	BNodeInfo(file).SetType(queryTemplate
+		? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE);
 
 	BString predicate;
 	bool dynamicDate;
@@ -509,7 +517,8 @@ FindWindow::Find()
 	}
 
 	int32 currentTime = (int32)time(0);
-	fFile->WriteAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &currentTime, sizeof(int32));
+	fFile->WriteAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &currentTime,
+		sizeof(int32));
 
 	// tell the tracker about it
 	BMessage message(B_REFS_RECEIVED);
@@ -606,7 +615,8 @@ FindWindow::MessageReceived(BMessage* message)
 				bool queryTemplate;
 				if (message->FindString("name", &name) == B_OK
 					&& message->FindRef("directory", &dir) == B_OK
-					&& message->FindBool("template", &queryTemplate) == B_OK) {
+					&& message->FindBool("template", &queryTemplate)
+						== B_OK) {
 					delete fFile;
 					fFile = NULL;
 					BDirectory directory(&dir);
@@ -616,7 +626,8 @@ FindWindow::MessageReceived(BMessage* message)
 					fFile = TryOpening(&tmpRef);
 					if (fFile) {
 						fRef = tmpRef;
-						SaveQueryAsAttributes(fFile, &entry, queryTemplate, 0, 0);
+						SaveQueryAsAttributes(fFile, &entry, queryTemplate,
+							0, 0);
 							// try to save whatever state we aleady have
 							// to the new query so that if the user
 							// opens it before runing it from the find panel,
@@ -683,7 +694,8 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 
 	BMessenger self(this);
 	fRecentQueries = new BPopUpMenu("RecentQueries");
-	FindPanel::AddRecentQueries(fRecentQueries,	true, &self, kSwitchToQueryTemplate);
+	FindPanel::AddRecentQueries(fRecentQueries,	true, &self,
+		kSwitchToQueryTemplate);
 
 	AddChild(new MiniMenuField(rect, "RecentQueries", fRecentQueries));
 
@@ -697,7 +709,8 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 	rect.right = rect.left + 150;
 	fMimeTypeField = new BMenuField(rect, "MimeTypeMenu", "", fMimeTypeMenu);
 	fMimeTypeField->SetDivider(0.0f);
-	fMimeTypeField->MenuItem()->SetLabel(B_TRANSLATE("All files and folders"));
+	fMimeTypeField->MenuItem()->SetLabel(
+		B_TRANSLATE("All files and folders"));
 	AddChild(fMimeTypeField);
 
 	// add popup for search criteria
@@ -723,7 +736,7 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 	rect.right = bounds.right - 15;
 	rect.left = rect.right - 100;
 	fVolMenu = new BPopUpMenu("", false, false);	// don't radioMode
-	menuField = new BMenuField(rect, "", B_TRANSLATE("On"),	fVolMenu);
+	menuField = new BMenuField(rect, "", B_TRANSLATE("On"), fVolMenu);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 8);
 	AddChild(menuField);
 	AddVolumes(fVolMenu);
@@ -741,8 +754,8 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 			B_TRANSLATE_NOCOLLECT(kDragNDropActionSpecifiers[1]));
 
 		BMessenger self(this);
-		fDraggableIcon = new DraggableQueryIcon(DraggableIcon::PreferredRect(draggableIconOrigin,
-			B_LARGE_ICON), "saveHere", &dragNDropMessage,
+		fDraggableIcon = new DraggableQueryIcon(DraggableIcon::PreferredRect(
+			draggableIconOrigin, B_LARGE_ICON), "saveHere", &dragNDropMessage,
 			self, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 		AddChild(fDraggableIcon);
 	}
@@ -769,8 +782,8 @@ FindPanel::FindPanel(BRect frame, BFile* node, FindWindow* parent,
 	rect = expandedBounds;
 	rect.right = rect.left + 200;
 	rect.bottom = rect.top + 20;;
-	fQueryName = new BTextControl(rect, "queryName", B_TRANSLATE("Query name:"),
-		"", 0);
+	fQueryName = new BTextControl(rect, "queryName",
+		B_TRANSLATE("Query name:"), "", 0);
 	fQueryName->SetDivider(fQueryName->StringWidth(fQueryName->Label()) + 5);
 	fMoreOptionsPane->AddItem(fQueryName, 1);
 	FillCurrentQueryName(fQueryName, parent);
@@ -838,19 +851,21 @@ FindPanel::AttachedToWindow()
 	fQueryName->SetTarget(this);
 	fLatch->SetTarget(fMoreOptionsPane);
 	RestoreMimeTypeMenuSelection(node);
-		// preselect the mime we used the last time
-		// have to do it here because AddByAttributeItems will build different
-		// menus based on which mime type is preselected
+		// preselect the mime we used the last time have to do it here
+		// because AddByAttributeItems will build different menus based
+		// on which mime type is preselected
 	RestoreWindowState(node);
 
 	if (!Window()->CurrentFocus()) {
 		// try to pick a good focus if we restore to one already
-		BTextControl* textControl = dynamic_cast<BTextControl*>(FindView("TextControl"));
+		BTextControl* textControl
+			= dynamic_cast<BTextControl*>(FindView("TextControl"));
 		if (!textControl) {
 			// pick the last text control in the attribute view
 			BString title("TextEntry");
 			title << (fAttrViewList.CountItems() - 1);
-			textControl = dynamic_cast<BTextControl*>(FindView(title.String()));
+			textControl
+				= dynamic_cast<BTextControl*>(FindView(title.String()));
 		}
 		if (textControl)
 			textControl->MakeFocus();
@@ -971,6 +986,7 @@ FindPanel::ShowVolumeMenuLabel()
 			tmpItem = item;
 		}
 	}
+
 	if (countSelected == 0) {
 		// no disk selected, for now revert to search all disks
 		// ToDo:
@@ -997,51 +1013,49 @@ FindPanel::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case kVolumeItem:
-			{
-				// volume changed
-				BMenuItem* invokedItem;
-				dev_t dev;
-				if (message->FindPointer("source", (void**)&invokedItem) != B_OK)
-					return;
+		{
+			// volume changed
+			BMenuItem* invokedItem;
+			dev_t dev;
+			if (message->FindPointer("source", (void**)&invokedItem) != B_OK)
+				return;
 
-				if (message->FindInt32("device", &dev) != B_OK)
-					break;
+			if (message->FindInt32("device", &dev) != B_OK)
+				break;
 
-				BMenu* menu = invokedItem->Menu();
-				ASSERT(menu);
+			BMenu* menu = invokedItem->Menu();
+			ASSERT(menu);
 
-				if (dev == -1) {
+			if (dev == -1) {
+				// all disks selected, uncheck everything else
+				int32 count = menu->CountItems();
+				for (int32 index = 2; index < count; index++)
+					menu->ItemAt(index)->SetMarked(false);
 
-					// all disks selected, uncheck everything else
-					int32 count = menu->CountItems();
-					for (int32 index = 2; index < count; index++)
-						menu->ItemAt(index)->SetMarked(false);
+				// make all disks the title and check it
+				PopUpMenuSetTitle(menu, menu->ItemAt(0)->Label());
+				menu->ItemAt(0)->SetMarked(true);
+			} else {
+				// a specific volume selected, unmark "all disks"
+				menu->ItemAt(0)->SetMarked(false);
 
-					// make all disks the title and check it
-					PopUpMenuSetTitle(menu, menu->ItemAt(0)->Label());
-					menu->ItemAt(0)->SetMarked(true);
+				// toggle mark on invoked item
+				int32 count = menu->CountItems();
+				for (int32 index = 2; index < count; index++) {
+					BMenuItem* item = menu->ItemAt(index);
 
-				} else {
-					// a specific volume selected, unmark "all disks"
-					menu->ItemAt(0)->SetMarked(false);
-
-					// toggle mark on invoked item
-					int32 count = menu->CountItems();
-					for (int32 index = 2; index < count; index++) {
-						BMenuItem* item = menu->ItemAt(index);
-
-						if (invokedItem == item) {
-							// we just selected this
-							bool wasMarked = item->IsMarked();
-							item->SetMarked(!wasMarked);
-						}
+					if (invokedItem == item) {
+						// we just selected this
+						bool wasMarked = item->IsMarked();
+						item->SetMarked(!wasMarked);
 					}
 				}
-				// make sure the right label is showing
-				ShowVolumeMenuLabel();
-
-				break;
 			}
+			// make sure the right label is showing
+			ShowVolumeMenuLabel();
+
+			break;
+		}
 
 		case kByAttributeItem:
 		case kByNameItem:
@@ -1058,34 +1072,35 @@ FindPanel::MessageReceived(BMessage* message)
 			break;
 
 		case kMIMETypeItem:
-			{
-				BMenuItem* item;
-				if (message->FindPointer("source", (void**)&item) == B_OK) {
-					// don't add the "All files and folders" to the list
-					if (fMimeTypeMenu->IndexOf(item) != 0)
-						gMostUsedMimeTypes.AddName(item->Label());
+		{
+			BMenuItem* item;
+			if (message->FindPointer("source", (void**)&item) == B_OK) {
+				// don't add the "All files and folders" to the list
+				if (fMimeTypeMenu->IndexOf(item) != 0)
+					gMostUsedMimeTypes.AddName(item->Label());
 
-					SetCurrentMimeType(item);
-				}
-
-				// mime type switched
-				if (fMode != kByAttributeItem)
-					break;
-
-				// the attributes for this type may be different, rip out the existing ones
-				RemoveAttrViewItems();
-
-				Window()->ResizeTo(Window()->Frame().Width(),
-					ViewHeightForMode(kByAttributeItem, fLatch->Value() != 0));
-
-				BBox* box = dynamic_cast<BBox*>(FindView("Box"));
-				ASSERT(box);
-				box->ResizeTo(box->Bounds().Width(),
-					BoxHeightForMode(kByAttributeItem, fLatch->Value() != 0));
-
-				AddAttrView();
-				break;
+				SetCurrentMimeType(item);
 			}
+
+			// mime type switched
+			if (fMode != kByAttributeItem)
+				break;
+
+			// the attributes for this type may be different,
+			// rip out the existing ones
+			RemoveAttrViewItems();
+
+			Window()->ResizeTo(Window()->Frame().Width(),
+				ViewHeightForMode(kByAttributeItem, fLatch->Value() != 0));
+
+			BBox* box = dynamic_cast<BBox*>(FindView("Box"));
+			ASSERT(box);
+			box->ResizeTo(box->Bounds().Width(),
+				BoxHeightForMode(kByAttributeItem, fLatch->Value() != 0));
+
+			AddAttrView();
+			break;
+		}
 
 		case kNameModifiedMessage:
 			// the query name was edited, make the query permanent
@@ -1093,67 +1108,74 @@ FindPanel::MessageReceived(BMessage* message)
 			break;
 
 		case B_SAVE_REQUESTED:
-			{
-				// finish saving query template from a SaveAs panel
-				entry_ref ref;
-				status_t error = message->FindRef("refs", &ref);
+		{
+			// finish saving query template from a SaveAs panel
+			entry_ref ref;
+			status_t error = message->FindRef("refs", &ref);
 
+			if (error == B_OK) {
+				// direct entry selected, convert to parent dir and name
+				BEntry entry(&ref);
+				error = entry.GetParent(&entry);
 				if (error == B_OK) {
-					// direct entry selected, convert to parent dir and name
-					BEntry entry(&ref);
-					error = entry.GetParent(&entry);
-					if (error == B_OK) {
-						entry.GetRef(&dir);
-						name = ref.name;
-					}
-				} else {
-					// parent dir and name selected
-					error = message->FindRef("directory", &dir);
-					if (error == B_OK)
-						error = message->FindString("name", &name);
+					entry.GetRef(&dir);
+					name = ref.name;
 				}
+			} else {
+				// parent dir and name selected
+				error = message->FindRef("directory", &dir);
 				if (error == B_OK)
-					SaveAsQueryOrTemplate(&dir, name, true);
+					error = message->FindString("name", &name);
 			}
+
+			if (error == B_OK)
+				SaveAsQueryOrTemplate(&dir, name, true);
+
 			break;
+		}
 
 		case B_COPY_TARGET:
-			{
-				// finish drag&drop
-				const char* str;
-				const char* mimeType = NULL;
-				const char* actionSpecifier = NULL;
-				if (message->FindString("be:types", &str) == B_OK
-					&& strcasecmp(str, B_FILE_MIME_TYPE) == 0
-					&& (message->FindString("be:actionspecifier", &actionSpecifier) == B_OK
-						|| message->FindString("be:filetypes", &mimeType) == B_OK)
-					&& message->FindString("name", &name) == B_OK
-					&& message->FindRef("directory", &dir) == B_OK) {
+		{
+			// finish drag&drop
+			const char* str;
+			const char* mimeType = NULL;
+			const char* actionSpecifier = NULL;
 
-					bool query = false;
-					bool queryTemplate = false;
+			if (message->FindString("be:types", &str) == B_OK
+				&& strcasecmp(str, B_FILE_MIME_TYPE) == 0
+				&& (message->FindString("be:actionspecifier",
+						&actionSpecifier) == B_OK
+					|| message->FindString("be:filetypes", &mimeType) == B_OK)
+				&& message->FindString("name", &name) == B_OK
+				&& message->FindRef("directory", &dir) == B_OK) {
 
-					if (actionSpecifier
-						&& strcasecmp(actionSpecifier,
-							B_TRANSLATE_NOCOLLECT(
-								kDragNDropActionSpecifiers[0])) == 0) {
-						query = true;
-					} else if (actionSpecifier
-						&& strcasecmp(actionSpecifier,
-							B_TRANSLATE_NOCOLLECT(
-								kDragNDropActionSpecifiers[1])) == 0) {
-						queryTemplate = true;
-					} else if (mimeType && strcasecmp(mimeType,
-							kDragNDropTypes[0]) == 0) {
-						query = true;
-					} else if (mimeType && strcasecmp(mimeType, kDragNDropTypes[1]) == 0)
-						queryTemplate = true;
+				bool query = false;
+				bool queryTemplate = false;
 
-					if (query || queryTemplate)
-						SaveAsQueryOrTemplate(&dir, name, queryTemplate);
+				if (actionSpecifier
+					&& strcasecmp(actionSpecifier,
+						B_TRANSLATE_NOCOLLECT(
+							kDragNDropActionSpecifiers[0])) == 0) {
+					query = true;
+				} else if (actionSpecifier
+					&& strcasecmp(actionSpecifier,
+						B_TRANSLATE_NOCOLLECT(
+							kDragNDropActionSpecifiers[1])) == 0) {
+					queryTemplate = true;
+				} else if (mimeType && strcasecmp(mimeType,
+						kDragNDropTypes[0]) == 0) {
+					query = true;
+				} else if (mimeType && strcasecmp(mimeType,
+					kDragNDropTypes[1]) == 0) {
+					queryTemplate = true;
 				}
+
+				if (query || queryTemplate)
+					SaveAsQueryOrTemplate(&dir, name, queryTemplate);
 			}
+
 			break;
+		}
 
 		default:
 			_inherited::MessageReceived(message);
@@ -1163,11 +1185,13 @@ FindPanel::MessageReceived(BMessage* message)
 
 
 void
-FindPanel::SaveAsQueryOrTemplate(const entry_ref* dir, const char* name, bool queryTemplate)
+FindPanel::SaveAsQueryOrTemplate(const entry_ref* dir, const char* name,
+	bool queryTemplate)
 {
 	BDirectory directory(dir);
 	BFile file(&directory, name, O_RDWR | O_CREAT | O_TRUNC);
-	BNodeInfo(&file).SetType(queryTemplate ? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE);
+	BNodeInfo(&file).SetType(queryTemplate
+		? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE);
 
 	BMessage attach(kAttachFile);
 	attach.AddRef("directory", dir);
@@ -1194,7 +1218,8 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 		if (!textControl)
 			return;
 
-		BMenuField* menuField = dynamic_cast<BMenuField*>(view->FindView("MenuField"));
+		BMenuField* menuField
+			= dynamic_cast<BMenuField*>(view->FindView("MenuField"));
 		if (!menuField)
 			return;
 
@@ -1218,78 +1243,87 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 					break;
 
 				case B_TIME_TYPE:
-					{
-						int flags = 0;
-						DEBUG_ONLY(time_t result =)
-						parsedate_etc(textControl->TextView()->Text(), -1, &flags);
-						dynamicDate = (flags & PARSEDATE_RELATIVE_TIME) != 0;
-						PRINT(("parsedate_etc - date is %srelative, %"
-							B_PRIdTIME "\n",
-							dynamicDate ? "" : "not ", result));
+				{
+					int flags = 0;
+					DEBUG_ONLY(time_t result =)
+					parsedate_etc(textControl->TextView()->Text(), -1,
+						&flags);
+					dynamicDate = (flags & PARSEDATE_RELATIVE_TIME) != 0;
+					PRINT(("parsedate_etc - date is %srelative, %"
+						B_PRIdTIME "\n",
+						dynamicDate ? "" : "not ", result));
 
-						query->PushDate(textControl->TextView()->Text());
-					}
+					query->PushDate(textControl->TextView()->Text());
 					break;
+				}
 
 				case B_BOOL_TYPE:
-					{
-						uint32 value;
-						if (strcasecmp(textControl->TextView()->Text(), "true") == 0)
-							value = 1;
-						else if (strcasecmp(textControl->TextView()->Text(), "true") == 0)
-							value = 1;
-						else
-							value = (uint32)atoi(textControl->TextView()->Text());
+				{
+					uint32 value;
+					if (strcasecmp(textControl->TextView()->Text(),
+							"true") == 0) {
+						value = 1;
+					} else if (strcasecmp(textControl->TextView()->Text(),
+							"true") == 0) {
+						value = 1;
+					} else
+						value = (uint32)atoi(textControl->TextView()->Text());
 
-						value %= 2;
-						query->PushUInt32(value);
-					}
+					value %= 2;
+					query->PushUInt32(value);
 					break;
+				}
 
 				case B_UINT8_TYPE:
 				case B_UINT16_TYPE:
 				case B_UINT32_TYPE:
-					query->PushUInt32((uint32)StringToScalar(textControl->TextView()->Text()));
+					query->PushUInt32((uint32)StringToScalar(
+						textControl->TextView()->Text()));
 					break;
 
 				case B_INT8_TYPE:
 				case B_INT16_TYPE:
 				case B_INT32_TYPE:
-					query->PushInt32((int32)StringToScalar(textControl->TextView()->Text()));
+					query->PushInt32((int32)StringToScalar(
+						textControl->TextView()->Text()));
 					break;
 
 				case B_UINT64_TYPE:
-					query->PushUInt64((uint64)StringToScalar(textControl->TextView()->Text()));
+					query->PushUInt64((uint64)StringToScalar(
+						textControl->TextView()->Text()));
 					break;
 
 				case B_OFF_T_TYPE:
 				case B_INT64_TYPE:
-					query->PushInt64(StringToScalar(textControl->TextView()->Text()));
+					query->PushInt64(StringToScalar(
+						textControl->TextView()->Text()));
 					break;
 
 				case B_FLOAT_TYPE:
-					{
-						float floatVal;
-						sscanf(textControl->TextView()->Text(), "%f", &floatVal);
-						query->PushFloat(floatVal);
-					}
+				{
+					float floatVal;
+					sscanf(textControl->TextView()->Text(), "%f",
+						&floatVal);
+					query->PushFloat(floatVal);
 					break;
+				}
 
 				case B_DOUBLE_TYPE:
-					{
-						double doubleVal;
-						sscanf(textControl->TextView()->Text(), "%lf", &doubleVal);
-						query->PushDouble(doubleVal);
-					}
+				{
+					double doubleVal;
+					sscanf(textControl->TextView()->Text(), "%lf",
+						&doubleVal);
+					query->PushDouble(doubleVal);
 					break;
-
+				}
 			}
 		}
 
 		query_op theOperator;
 		BMenuItem* operatorItem = item->Submenu()->FindMarked();
 		if (operatorItem && operatorItem->Message() != NULL) {
-			operatorItem->Message()->FindInt32("operator", (int32*)&theOperator);
+			operatorItem->Message()->FindInt32("operator",
+				(int32*)&theOperator);
 			query->PushOp(theOperator);
 		} else
 			query->PushOp(B_EQ);
@@ -1297,7 +1331,8 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 		// add logic based on selection in Logic menufield
 		if (index > 0) {
 			TAttrView* prevView = fAttrViewList.ItemAt(index - 1);
-			menuField = dynamic_cast<BMenuField*>(prevView->FindView("Logic"));
+			menuField
+				= dynamic_cast<BMenuField*>(prevView->FindView("Logic"));
 			if (menuField) {
 				item = menuField->Menu()->FindMarked();
 				if (item) {
@@ -1348,7 +1383,8 @@ FindPanel::GetByAttrPredicate(BQuery* query, bool &dynamicDate) const
 void
 FindPanel::GetDefaultName(BString &result) const
 {
-	BTextControl* textControl = dynamic_cast<BTextControl*>(FindView("TextControl"));
+	BTextControl* textControl
+		= dynamic_cast<BTextControl*>(FindView("TextControl"));
 	switch (Mode()) {
 		case kByNameItem:
 			result.SetTo(B_TRANSLATE_COMMENT("Name = %name",
@@ -1393,16 +1429,17 @@ void
 FindPanel::GetByNamePredicate(BQuery* query) const
 {
 	ASSERT(Mode() == (int32)kByNameItem);
-	BTextControl* textControl = dynamic_cast<BTextControl*>(FindView("TextControl"));
+	BTextControl* textControl
+		= dynamic_cast<BTextControl*>(FindView("TextControl"));
 	ASSERT(textControl);
 
 	query->PushAttr("name");
 	query->PushString(textControl->TextView()->Text(), true);
 
-	if (strstr(textControl->TextView()->Text(), "*"))
-		// assume pattern is a regular expression and try doing an exact match
+	if (strstr(textControl->TextView()->Text(), "*")) {
+		// assume pattern is a regular expression, try doing an exact match
 		query->PushOp(B_EQ);
-	else
+	} else
 		query->PushOp(B_CONTAINS);
 
 	PushMimeType(query);
@@ -1424,6 +1461,7 @@ FindPanel::SwitchMode(uint32 mode)
 
 	switch (mode) {
 		case kByFormulaItem:
+		{
 			if (oldMode == kByAttributeItem || oldMode == kByNameItem) {
 				BQuery query;
 				if (oldMode == kByAttributeItem) {
@@ -1434,54 +1472,54 @@ FindPanel::SwitchMode(uint32 mode)
 
 				query.GetPredicate(&buffer);
 			}
-			// fall thru
-
+		} // fall thru
 		case kByNameItem:
-			{
-				fMode = mode;
-				Window()->ResizeTo(Window()->Frame().Width(),
-					ViewHeightForMode(mode, fLatch->Value() != 0));
-				BRect bounds(Bounds());
-				bounds.InsetBy(15, 30);
-				bounds.bottom -= 10;
-				if (fLatch->Value())
-					bounds.bottom -= kMoreOptionsDelta;
-				box->ResizeTo(bounds.Width(), BoxHeightForMode(mode, fLatch->Value() != 0));
+		{
+			fMode = mode;
+			Window()->ResizeTo(Window()->Frame().Width(),
+				ViewHeightForMode(mode, fLatch->Value() != 0));
+			BRect bounds(Bounds());
+			bounds.InsetBy(15, 30);
+			bounds.bottom -= 10;
+			if (fLatch->Value())
+				bounds.bottom -= kMoreOptionsDelta;
+			box->ResizeTo(bounds.Width(), BoxHeightForMode(mode,
+				fLatch->Value() != 0));
 
-				RemoveByAttributeItems();
-				ShowOrHideMimeTypeMenu();
-				AddByNameOrFormulaItems();
+			RemoveByAttributeItems();
+			ShowOrHideMimeTypeMenu();
+			AddByNameOrFormulaItems();
 
-				if (buffer.Length()) {
-					ASSERT(mode == kByFormulaItem || oldMode == kByAttributeItem);
-					BTextControl* textControl = dynamic_cast<BTextControl*>
-						(FindView("TextControl"));
-					textControl->SetText(buffer.String());
-				}
-				break;
+			if (buffer.Length()) {
+				ASSERT(mode == kByFormulaItem
+					|| oldMode == kByAttributeItem);
+				BTextControl* textControl
+					= dynamic_cast<BTextControl*>(FindView("TextControl"));
+				textControl->SetText(buffer.String());
 			}
+			break;
+		}
 
 		case kByAttributeItem:
-			{
-				fMode = mode;
-				box->ResizeTo(box->Bounds().Width(),
-					BoxHeightForMode(mode, fLatch->Value() != 0));
+		{
+			fMode = mode;
+			box->ResizeTo(box->Bounds().Width(),
+				BoxHeightForMode(mode, fLatch->Value() != 0));
 
-				Window()->ResizeTo(Window()->Frame().Width(),
-					ViewHeightForMode(mode, fLatch->Value() != 0));
+			Window()->ResizeTo(Window()->Frame().Width(),
+				ViewHeightForMode(mode, fLatch->Value() != 0));
 
-				BTextControl* textControl = dynamic_cast<BTextControl*>
-					(FindView("TextControl"));
-
-				if (textControl) {
-					textControl->RemoveSelf();
-					delete textControl;
-				}
-
-				ShowOrHideMimeTypeMenu();
-				AddAttrView();
-				break;
+			BTextControl* textControl
+				= dynamic_cast<BTextControl*>(FindView("TextControl"));
+			if (textControl) {
+				textControl->RemoveSelf();
+				delete textControl;
 			}
+
+			ShowOrHideMimeTypeMenu();
+			AddAttrView();
+			break;
+		}
 	}
 }
 
@@ -1492,9 +1530,11 @@ FindPanel::CurrentMimeType(const char** type) const
 	// search for marked item in the list
 	BMenuItem* item = MimeTypeMenu()->FindMarked();
 
-	// if it's one of the most used items, ignore it
-	if (item != NULL && MimeTypeMenu()->IndexOf(item) != 0 && item->Submenu() == NULL)
+	if (item != NULL && MimeTypeMenu()->IndexOf(item) != 0
+		&& item->Submenu() == NULL) {
+		// if it's one of the most used items, ignore it
 		item = NULL;
+	}
 
 	if (item == NULL) {
 		for (int32 index = MimeTypeMenu()->CountItems(); index-- > 0;) {
@@ -1536,7 +1576,7 @@ FindPanel::SetCurrentMimeType(BMenuItem* item)
 		fMimeTypeField->MenuItem()->SetLabel(item->Label());
 
 		BMenuItem* search;
-		for (int32 i = 2;(search = MimeTypeMenu()->ItemAt(i)) != NULL;i++) {
+		for (int32 i = 2; (search = MimeTypeMenu()->ItemAt(i)) != NULL; i++) {
 			if (item == search || !search->Label())
 				continue;
 			if (!strcmp(item->Label(),search->Label())) {
@@ -1583,12 +1623,14 @@ FindPanel::SetCurrentMimeType(const char* label)
 		if (submenu != NULL && !found) {
 			for (int32 subIndex = submenu->CountItems(); subIndex-- > 0;) {
 				BMenuItem* subItem = submenu->ItemAt(subIndex);
-				if (subItem->Label() != NULL && !strcmp(label, subItem->Label())) {
+				if (subItem->Label() != NULL
+					&& !strcmp(label, subItem->Label())) {
 					subItem->SetMarked(true);
 					found = true;
 				}
 			}
 		}
+
 		if (item->Label() != NULL && !strcmp(label, item->Label())) {
 			item->SetMarked(true);
 			return B_OK;
@@ -1615,8 +1657,9 @@ FindPanel::AddOneMimeTypeToMenu(const ShortMimeInfo* info, void* castToMenu)
 		BMessage* msg = new BMessage(kMIMETypeItem);
 		msg->AddString("mimetype", info->InternalName());
 
-		superItem->Submenu()->AddItem(new IconMenuItem(info->ShortDescription(),
-			msg, info->InternalName(), B_MINI_ICON));
+		superItem->Submenu()->AddItem(new IconMenuItem(
+			info->ShortDescription(), msg, info->InternalName(),
+			B_MINI_ICON));
 	}
 
 	return false;
@@ -1628,8 +1671,8 @@ FindPanel::AddMimeTypesToMenu()
 {
 	BMessage* itemMessage = new BMessage(kMIMETypeItem);
 	itemMessage->AddString("mimetype", kAllMimeTypes);
-	MimeTypeMenu()->AddItem(new BMenuItem(B_TRANSLATE("All files and folders"),
-		itemMessage));
+	MimeTypeMenu()->AddItem(
+		new BMenuItem(B_TRANSLATE("All files and folders"), itemMessage));
 	MimeTypeMenu()->AddSeparatorItem();
 	MimeTypeMenu()->ItemAt(0)->SetMarked(true);
 
@@ -1777,8 +1820,8 @@ AddOneRecentItem(const entry_ref* ref, void* castToParams)
 
 
 void
-FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem, const BMessenger* target,
-	uint32 what)
+FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
+	const BMessenger* target, uint32 what)
 {
 	BObjectList<entry_ref> templates(10, true);
 	BObjectList<EntryWithDate> recentQueries(10, true);
@@ -1788,7 +1831,8 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem, const BMessenger* t
 	BVolume volume;
 	roster.Rewind();
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		if (volume.IsPersistent() && volume.KnowsQuery() && volume.KnowsAttr()) {
+		if (volume.IsPersistent() && volume.KnowsQuery()
+			&& volume.KnowsAttr()) {
 
 			BQuery query;
 			query.SetVolume(&volume);
@@ -2046,9 +2090,11 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 	saveMoreOptions.searchTrash = fSearchTrashCheck->Value() != 0;
 	saveMoreOptions.temporary = fTemporaryCheck->Value() != 0;
 
-	if (node->WriteAttr(kAttrQueryMoreOptions, B_RAW_TYPE, 0, &saveMoreOptions,
-		sizeof(saveMoreOptions)) == sizeof(saveMoreOptions))
+	if (node->WriteAttr(kAttrQueryMoreOptions, B_RAW_TYPE, 0,
+		&saveMoreOptions,
+		sizeof(saveMoreOptions)) == sizeof(saveMoreOptions)) {
 		node->RemoveAttr(kAttrQueryMoreOptionsForeign);
+	}
 
 	if (editTemplate) {
 		if (UserSpecifiedName()) {
@@ -2059,36 +2105,37 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 
 	switch (Mode()) {
 		case kByAttributeItem:
-			{
-				BMessage message;
-				int32 count = fAttrViewList.CountItems();
-				node->WriteAttr(kAttrQueryInitialNumAttrs, B_INT32_TYPE, 0,
-					&count, sizeof(int32));
+		{
+			BMessage message;
+			int32 count = fAttrViewList.CountItems();
+			node->WriteAttr(kAttrQueryInitialNumAttrs, B_INT32_TYPE, 0,
+				&count, sizeof(int32));
 
-				for (int32 index = 0; index < count; index++)
-					fAttrViewList.ItemAt(index)->SaveState(&message, index);
+			for (int32 index = 0; index < count; index++)
+				fAttrViewList.ItemAt(index)->SaveState(&message, index);
 
-				ssize_t size = message.FlattenedSize();
-				char* buffer = new char[size];
-				status_t result = message.Flatten(buffer, size);
-				if (result == B_OK) {
-					node->WriteAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
-						buffer, (size_t)size);
-				}
-				delete [] buffer;
+			ssize_t size = message.FlattenedSize();
+			char* buffer = new char[size];
+			status_t result = message.Flatten(buffer, size);
+			if (result == B_OK) {
+				node->WriteAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
+					buffer, (size_t)size);
 			}
+
+			delete[] buffer;
 			break;
+		}
 
 		case kByNameItem:
 		case kByFormulaItem:
-			{
-				BTextControl* textControl = dynamic_cast<BTextControl*>
-					(FindView("TextControl"));
-				ASSERT(textControl);
-				BString formula(textControl->TextView()->Text());
-				node->WriteAttrString(kAttrQueryInitialString, &formula);
-				break;
-			}
+		{
+			BTextControl* textControl = dynamic_cast<BTextControl*>
+				(FindView("TextControl"));
+			ASSERT(textControl);
+			BString formula(textControl->TextView()->Text());
+			node->WriteAttrString(kAttrQueryInitialString, &formula);
+			break;
+		}
 	}
 }
 
@@ -2167,9 +2214,10 @@ FindPanel::RestoreWindowState(const BNode* node)
 		FillCurrentQueryName(fQueryName, dynamic_cast<FindWindow*>(Window()));
 
 		// set modification message after checking the temporary check box,
-		// and filling out the text control so that we do not
-		// always trigger clearing of the temporary check box.
-		fQueryName->SetModificationMessage(new BMessage(kNameModifiedMessage));
+		// and filling out the text control so that we do not always trigger
+		// clearing of the temporary check box.
+		fQueryName->SetModificationMessage(
+			new BMessage(kNameModifiedMessage));
 	}
 
 	// get volumes to perform query on
@@ -2178,23 +2226,25 @@ FindPanel::RestoreWindowState(const BNode* node)
 	attr_info info;
 	if (node->GetAttrInfo(kAttrQueryVolume, &info) == B_OK) {
 		char* buffer = new char[info.size];
-		if (node->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0, buffer, (size_t)info.size)
-			== info.size) {
+		if (node->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0, buffer,
+				(size_t)info.size) == info.size) {
 			BMessage message;
 			if (message.Unflatten(buffer) == B_OK) {
 				for (int32 index = 0; ;index++) {
 					ASSERT(index < 100);
 					BVolume volume;
-						// match a volume with the info embedded in the message
-					status_t result = MatchArchivedVolume(&volume, &message, index);
+						// match a volume with the info embedded in
+						// the message
+					status_t result
+						= MatchArchivedVolume(&volume, &message, index);
 					if (result == B_OK) {
 						char name[256];
 						volume.GetName(name);
 						SelectItemWithLabel(fVolMenu, name);
 						searchAllVolumes = false;
 					} else if (result != B_DEV_BAD_DRIVE_NUM)
-						// if B_DEV_BAD_DRIVE_NUM, the volume just isn't mounted this
-						// time around, keep looking for more
+						// if B_DEV_BAD_DRIVE_NUM, the volume just isn't
+						// mounted this time around, keep looking for more
 						// if other error, bail
 						break;
 				}
@@ -2208,37 +2258,40 @@ FindPanel::RestoreWindowState(const BNode* node)
 
 	switch (Mode()) {
 		case kByAttributeItem:
-			{
-				int32 count = InitialAttrCount(node);
+		{
+			int32 count = InitialAttrCount(node);
 
-				attr_info info;
-				if (node->GetAttrInfo(kAttrQueryInitialAttrs, &info) != B_OK)
-					break;
-				char* buffer = new char[info.size];
-				if (node->ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0, buffer, (size_t)info.size)
-					== info.size) {
-					BMessage message;
-					if (message.Unflatten(buffer) == B_OK)
-						for (int32 index = 0; index < count; index++)
-							fAttrViewList.ItemAt(index)->RestoreState(message, index);
-				}
-				delete [] buffer;
+			attr_info info;
+			if (node->GetAttrInfo(kAttrQueryInitialAttrs, &info) != B_OK)
 				break;
+			char* buffer = new char[info.size];
+			if (node->ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
+					buffer, (size_t)info.size) == info.size) {
+				BMessage message;
+				if (message.Unflatten(buffer) == B_OK)
+					for (int32 index = 0; index < count; index++) {
+						fAttrViewList.ItemAt(index)->RestoreState(message,
+							index);
+					}
 			}
+			delete[] buffer;
+			break;
+		}
 
 		case kByNameItem:
 		case kByFormulaItem:
-			{
-				BString buffer;
-				if (node->ReadAttrString(kAttrQueryInitialString, &buffer) == B_OK) {
-					BTextControl* textControl = dynamic_cast<BTextControl*>
-						(FindView("TextControl"));
-					ASSERT(textControl);
+		{
+			BString buffer;
+			if (node->ReadAttrString(kAttrQueryInitialString, &buffer)
+					== B_OK) {
+				BTextControl* textControl = dynamic_cast<BTextControl*>
+					(FindView("TextControl"));
+				ASSERT(textControl);
 
-					textControl->TextView()->SetText(buffer.String());
-				}
+				textControl->TextView()->SetText(buffer.String());
 			}
 			break;
+		}
 	}
 
 	// try to restore focus and possibly text selection
@@ -2304,7 +2357,8 @@ FindPanel::AddByNameOrFormulaItems()
 
 	BRect bounds(box->Bounds());
 	bounds.InsetBy(10, 10);
-	BTextControl* textControl = new BTextControl(bounds, "TextControl", "", "", NULL);
+	BTextControl* textControl = new BTextControl(bounds, "TextControl",
+		"", "", NULL);
 	textControl->SetDivider(0.0f);
 	box->AddChild(textControl);
 	textControl->MakeFocus();
@@ -2353,7 +2407,8 @@ FindPanel::RemoveByAttributeItems()
 void
 FindPanel::ShowOrHideMimeTypeMenu()
 {
-	BMenuField* menuField = dynamic_cast<BMenuField*>(FindView("MimeTypeMenu"));
+	BMenuField* menuField
+		= dynamic_cast<BMenuField*>(FindView("MimeTypeMenu"));
 	if (Mode() == (int32)kByFormulaItem && !menuField->IsHidden())
 		menuField->Hide();
 	else if (menuField->IsHidden())
@@ -2398,8 +2453,8 @@ TAttrView::TAttrView(BRect frame, int32 index)
 	for (int32 i = 0; i < 5; i++) {
 		message = new BMessage(kAttributeItem);
 		message->AddInt32("operator", operators[i]);
-		submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[i]),
-			message));
+		submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(
+			operatorLabels[i]), message));
 	}
 
 	// mark first item
@@ -2464,7 +2519,7 @@ TAttrView::TAttrView(BRect frame, int32 index)
 	AddChild(fTextControl);
 
 	AddChild(fMenuField);
-	// add attributes from currently selected mimetype
+		// add attributes from currently selected mimetype
 }
 
 
@@ -2558,7 +2613,8 @@ TAttrView::SaveState(BMessage* message, int32)
 	if (field) {
 		BMenuItem* item = field->Menu()->FindMarked();
 		ASSERT(item);
-		message->AddInt32("logicalRelation", item ? field->Menu()->IndexOf(item) : 0);
+		message->AddInt32("logicalRelation",
+			item ? field->Menu()->IndexOf(item) : 0);
 	}
 }
 
@@ -2618,7 +2674,8 @@ TAttrView::Draw(BRect)
 		// draws the is/contains, etc. string
 		bounds.left -= (width + 10);
 		bounds.bottom -= 6;
-		DrawString(item->Submenu()->FindMarked()->Label(), bounds.LeftBottom());
+		DrawString(item->Submenu()->FindMarked()->Label(),
+			bounds.LeftBottom());
 	}
 }
 
@@ -2677,15 +2734,19 @@ TAttrView::AddAttributes(BMenu* menu, const BMimeType &mimeType)
 	// go through each field in meta mime and add it to a menu
 	for (int32 index = 0; ; index++) {
 		const char* publicName;
-		if (attributeMessage.FindString("attr:public_name", index, &publicName) != B_OK)
+		if (attributeMessage.FindString("attr:public_name", index,
+				&publicName) != B_OK) {
 			break;
+		}
 
 		if (!attributeMessage.FindBool("attr:viewable"))
 			continue;
 
 		const char* attributeName;
-		if (attributeMessage.FindString("attr:name", index, &attributeName) != B_OK)
+		if (attributeMessage.FindString("attr:name", index, &attributeName)
+				!= B_OK) {
 			continue;
+		}
 
 		int32 type;
 		if (attributeMessage.FindInt32("attr:type", index, &type) != B_OK)
@@ -2714,7 +2775,8 @@ TAttrView::AddAttributes(BMenu* menu, const BMimeType &mimeType)
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_NE);
-				submenu->AddItem(new BMenuItem(B_TRANSLATE("is not"), message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("is not"),
+					message));
 				submenu->SetTargetForItems(this);
 
 				message = new BMessage(kAttributeItem);
@@ -2942,12 +3004,14 @@ DeleteTransientQueriesTask::ProcessOneRef(Model* model)
 	ASSERT(dynamic_cast<TTracker*>(be_app));
 
 	// check that it is not showing
-	if (dynamic_cast<TTracker*>(be_app)->EntryHasWindowOpen(model->EntryRef())) {
+	if (dynamic_cast<TTracker*>(be_app)->EntryHasWindowOpen(
+			model->EntryRef())) {
 		PRINT(("query %s, showing, can't delete\n", model->Name()));
 		return false;
 	}
 
-	PRINT(("query %s, old, temporary, not shownig - deleting\n", model->Name()));
+	PRINT(("query %s, old, temporary, not shownig - deleting\n",
+		model->Name()));
 	BEntry entry(model->EntryRef());
 	entry.Remove();
 
@@ -2993,8 +3057,8 @@ DeleteTransientQueriesTask::StartUpTransientQueryCleaner()
 //	#pragma mark -
 
 
-RecentFindItemsMenu::RecentFindItemsMenu(const char* title, const BMessenger* target,
-	uint32 what)
+RecentFindItemsMenu::RecentFindItemsMenu(const char* title,
+	const BMessenger* target, uint32 what)
 	:	BMenu(title, B_ITEMS_IN_COLUMN),
 		fTarget(*target),
 		fWhat(what)
@@ -3029,7 +3093,8 @@ TrackerBuildRecentFindItemsMenu(const char* title)
 
 
 DraggableQueryIcon::DraggableQueryIcon(BRect frame, const char* name,
-	const BMessage* message, BMessenger messenger, uint32 resizeFlags, uint32 flags)
+	const BMessage* message, BMessenger messenger, uint32 resizeFlags,
+		uint32 flags)
 	:	DraggableIcon(frame, name, B_QUERY_MIMETYPE, B_LARGE_ICON,
 			message, messenger, resizeFlags, flags)
 {
@@ -3056,7 +3121,8 @@ DraggableQueryIcon::DragStarted(BMessage* dragMessage)
 //	#pragma mark -
 
 
-MostUsedNames::MostUsedNames(const char* fileName, const char* directory, int32 maxCount)
+MostUsedNames::MostUsedNames(const char* fileName, const char* directory,
+	int32 maxCount)
 	:
 	fFileName(fileName),
 	fDirectory(directory),
@@ -3157,7 +3223,8 @@ MostUsedNames::AddName(const char* name)
 	list_entry* entry = NULL;
 
 	if (fList.CountItems() > fCount * 2) {
-		entry = static_cast<list_entry*>(fList.RemoveItem(fList.CountItems() - 1));
+		entry = static_cast<list_entry*>(
+			fList.RemoveItem(fList.CountItems() - 1));
 
 		// is this the name we want to add here?
 		if (strcmp(name, entry->name)) {
@@ -3169,9 +3236,12 @@ MostUsedNames::AddName(const char* name)
 	}
 
 	if (entry == NULL) {
-		for (int32 i = 0; (entry = static_cast<list_entry*>(fList.ItemAt(i))) != NULL; i++)
+		for (int32 i = 0;
+				(entry = static_cast<list_entry*>(fList.ItemAt(i))) != NULL;
+				i++) {
 			if (!strcmp(entry->name, name))
 				break;
+		}
 	}
 
 	if (entry == NULL) {

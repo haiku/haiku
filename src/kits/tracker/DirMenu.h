@@ -50,8 +50,9 @@ public:
 	virtual ~BDirMenu();
 
 	void Populate(const BEntry* startDir, BWindow* originatingWindow,
-		bool includeStartDir = false, bool select = false, bool reverse = false,
-		bool addShortcuts = false, bool navMenuEntries = false);
+		bool includeStartDir = false, bool select = false,
+		bool reverse = false, bool addShortcuts = false,
+		bool navMenuEntries = false);
 	void AddItemToDirMenu(const BEntry*, BWindow* originatingWindow,
 		bool atEnd, bool addShortcuts, bool navMenuEntries = false);
 	void AddDisksIconToMenu(bool reverse = false);

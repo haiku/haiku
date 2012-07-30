@@ -63,14 +63,16 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 	fParentWindow(window)
 {
 	if (window->Feel() & kPrivateDesktopWindowFeel) {
-		// The window will not show up if we have B_FLOATING_SUBSET_WINDOW_FEEL
-		// and use it with the desktop window since it's never in front.
+		// The window will not show up if we have
+		// B_FLOATING_SUBSET_WINDOW_FEEL and use it with the desktop window
+		// since it's never in front.
 		SetFeel(B_NORMAL_WINDOW_FEEL);
 	}
 
 	AddToSubset(fParentWindow);
 
-	BView* backgroundView = new BView(Bounds(), "bgView", B_FOLLOW_ALL, B_WILL_DRAW);
+	BView* backgroundView = new BView(Bounds(), "bgView", B_FOLLOW_ALL,
+		B_WILL_DRAW);
 	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(backgroundView);
 
@@ -88,24 +90,25 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 		// Set wildcard matching to default.
 
 	// Set up the menu field
-	fMatchingTypeMenuField = new BMenuField(BRect(7, 6, Bounds().right - 5, 0),
-		NULL, B_TRANSLATE("Name"), menu);
+	fMatchingTypeMenuField = new BMenuField(BRect(7, 6,
+		Bounds().right - 5, 0), NULL, B_TRANSLATE("Name"), menu);
 	backgroundView->AddChild(fMatchingTypeMenuField);
 	fMatchingTypeMenuField->SetDivider(fMatchingTypeMenuField->StringWidth(
 		B_TRANSLATE("Name")) + 8);
 	fMatchingTypeMenuField->ResizeToPreferred();
 
 	// Set up the expression text control
-	fExpressionTextControl = new BTextControl(BRect(7, fMatchingTypeMenuField->
-		Bounds().bottom + 11, Bounds().right - 6, 0), NULL, NULL, NULL, NULL,
-		B_FOLLOW_LEFT_RIGHT);
+	fExpressionTextControl = new BTextControl(BRect(7,
+			fMatchingTypeMenuField->Bounds().bottom + 11,
+			Bounds().right - 6, 0),
+		NULL, NULL, NULL, NULL, B_FOLLOW_LEFT_RIGHT);
 	backgroundView->AddChild(fExpressionTextControl);
 	fExpressionTextControl->ResizeToPreferred();
 	fExpressionTextControl->MakeFocus(true);
 
 	// Set up the Invert checkbox
 	fInverseCheckBox = new BCheckBox(
-		BRect(7, fExpressionTextControl->Frame().bottom + 6, 6, 6),	NULL,
+		BRect(7, fExpressionTextControl->Frame().bottom + 6, 6, 6), NULL,
 		B_TRANSLATE("Invert"), NULL);
 	backgroundView->AddChild(fInverseCheckBox);
 	fInverseCheckBox->ResizeToPreferred();
@@ -113,15 +116,16 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 	// Set up the Ignore Case checkbox
 	fIgnoreCaseCheckBox = new BCheckBox(
 		BRect(fInverseCheckBox->Frame().right + 10,
-		fInverseCheckBox->Frame().top, 6, 6), NULL,	B_TRANSLATE("Ignore case"),
-		NULL);
+			fInverseCheckBox->Frame().top, 6, 6),
+		NULL, B_TRANSLATE("Ignore case"), NULL);
 	fIgnoreCaseCheckBox->SetValue(1);
 	backgroundView->AddChild(fIgnoreCaseCheckBox);
 	fIgnoreCaseCheckBox->ResizeToPreferred();
 
 	// Set up the Select button
-	fSelectButton = new BButton(BRect(0, 0, 5, 5), NULL, B_TRANSLATE("Select"),
-		new BMessage(kSelectButtonPressed), B_FOLLOW_RIGHT);
+	fSelectButton = new BButton(BRect(0, 0, 5, 5), NULL,
+		B_TRANSLATE("Select"), new BMessage(kSelectButtonPressed),
+		B_FOLLOW_RIGHT);
 
 	backgroundView->AddChild(fSelectButton);
 	fSelectButton->ResizeToPreferred();
@@ -138,16 +142,19 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 	// Center the checkboxes vertically to the button
 	float topMiddleButton =
 		(fSelectButton->Bounds().Height() / 2 -
-		(fh.ascent + fh.descent + fh.leading + 4) / 2) + fSelectButton->Frame().top;
+		(fh.ascent + fh.descent + fh.leading + 4) / 2)
+		+ fSelectButton->Frame().top;
 	fInverseCheckBox->MoveTo(fInverseCheckBox->Frame().left, topMiddleButton);
 	fIgnoreCaseCheckBox->MoveTo(fIgnoreCaseCheckBox->Frame().left,
 		topMiddleButton);
 
-	float bottomMinWidth = 32 + fSelectButton->Bounds().Width() +
-		fInverseCheckBox->Bounds().Width() + fIgnoreCaseCheckBox->Bounds().Width();
+	float bottomMinWidth = 32 + fSelectButton->Bounds().Width()
+		+ fInverseCheckBox->Bounds().Width()
+		+ fIgnoreCaseCheckBox->Bounds().Width();
 	float topMinWidth = be_plain_font->StringWidth(
 		B_TRANSLATE("Name matches wildcard expression:###"));
-	float minWidth = bottomMinWidth > topMinWidth ? bottomMinWidth : topMinWidth;
+	float minWidth = bottomMinWidth > topMinWidth
+		? bottomMinWidth : topMinWidth;
 
 	class EscapeFilter : public BMessageFilter {
 	public:
@@ -240,7 +247,8 @@ SelectionWindow::MoveCloseToMouse()
 
 	// ... unless that's outside of the current screen size:
 	BScreen screen;
-	windowPosition.x = MAX(20, MIN(screen.Frame().right - 20 - Frame().Width(),
+	windowPosition.x
+		= MAX(20, MIN(screen.Frame().right - 20 - Frame().Width(),
 		windowPosition.x));
 	windowPosition.y = MAX(20,
 		MIN(screen.Frame().bottom - 20 - Frame().Height(), windowPosition.y));

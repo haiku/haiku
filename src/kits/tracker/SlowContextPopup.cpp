@@ -90,26 +90,26 @@ BSlowContextMenu::~BSlowContextMenu()
 void
 BSlowContextMenu::AttachedToWindow()
 {
-	//	showing flag is set immediately as
-	//	it may take a while to build the menu's
-	//	contents.
+	// showing flag is set immediately as
+	// it may take a while to build the menu's
+	// contents.
 	//
-	//	it should get set only once when Go is called
-	//	and will get reset in DetachedFromWindow
+	// it should get set only once when Go is called
+	// and will get reset in DetachedFromWindow
 	//
-	//	this flag is used in ContainerWindow::ShowContextMenu
-	//	to determine whether we should show this menu, and
-	//	the only reason we need to do this is because this
-	//	menu is spawned ::Go as an asynchronous menu, which
-	//	is done because we will deadlock if the target's
-	//	window is open...  so there
+	// this flag is used in ContainerWindow::ShowContextMenu
+	// to determine whether we should show this menu, and
+	// the only reason we need to do this is because this
+	// menu is spawned ::Go as an asynchronous menu, which
+	// is done because we will deadlock if the target's
+	// window is open...  so there
 	fIsShowing = true;
 
 	BPopUpMenu::AttachedToWindow();
 
 	SpringLoadedFolderSetMenuStates(this, fTypesList);
 
-	//	allow an opportunity to reset the target for each of the items
+	// allow an opportunity to reset the target for each of the items
 	SetTargetForItems(Target());
 }
 
@@ -117,14 +117,14 @@ BSlowContextMenu::AttachedToWindow()
 void
 BSlowContextMenu::DetachedFromWindow()
 {
-	//	see note above in AttachedToWindow
+	// see note above in AttachedToWindow
 	fIsShowing = false;
-	//	does this need to set this to null?
-	//	the parent, handling dnd should set this
-	//	appropriately
+	// does this need to set this to null?
+	// the parent, handling dnd should set this
+	// appropriately
 	//
-	//	if this changes, BeMenu and RecentsMenu
-	//	in Deskbar should also change
+	// if this changes, BeMenu and RecentsMenu
+	// in Deskbar should also change
 	fTypesList = NULL;
 }
 
@@ -462,8 +462,8 @@ BSlowContextMenu::BuildVolumeMenu()
 				fMessenger, fParentWindow, fTypesList);
 
 			menu->SetNavDir(model->EntryRef());
-			menu->InitTrackingHook(fTrackingHook.fTrackingHook, &(fTrackingHook.fTarget),
-				fTrackingHook.fDragMessage);
+			menu->InitTrackingHook(fTrackingHook.fTrackingHook,
+				&(fTrackingHook.fTarget), fTrackingHook.fDragMessage);
 
 			ASSERT(menu->Name());
 
@@ -519,8 +519,8 @@ BSlowContextMenu::SetTarget(const BMessenger &target)
 
 
 TrackingHookData*
-BSlowContextMenu::InitTrackingHook(bool (*hook)(BMenu*, void*), const BMessenger* target,
-	const BMessage* dragMessage)
+BSlowContextMenu::InitTrackingHook(bool (*hook)(BMenu*, void*),
+	const BMessenger* target, const BMessage* dragMessage)
 {
 	fTrackingHook.fTrackingHook = hook;
 	if (target)
@@ -532,7 +532,8 @@ BSlowContextMenu::InitTrackingHook(bool (*hook)(BMenu*, void*), const BMessenger
 
 
 void
-BSlowContextMenu::SetTrackingHookDeep(BMenu* menu, bool (*func)(BMenu*, void*), void* state)
+BSlowContextMenu::SetTrackingHookDeep(BMenu* menu,
+	bool (*func)(BMenu*, void*), void* state)
 {
 	menu->SetTrackingHook(func, state);
 	int32 count = menu->CountItems();

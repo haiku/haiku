@@ -130,11 +130,18 @@ copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 
 # configure gcc
 cd $gccObjDir
+case `uname` in
+	Darwin)
+		# GCC 2 compiled for x86_64 OS X is broken, compile for i386.
+		export CC="gcc -arch i386"
+	;;
+esac
 CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" $buildToolsDir/gcc/configure \
 	--prefix=$installDir \
 	--target=i586-pc-haiku --disable-nls --enable-shared=yes \
 	--enable-languages=c,c++ --with-headers=$tmpIncludeDir \
 	--with-libs=$tmpLibDir || exit 1
+unset CC
 
 # hack the Makefile to avoid trouble with stuff we don't need anyway
 sedExpr=

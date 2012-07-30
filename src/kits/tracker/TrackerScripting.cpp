@@ -101,7 +101,8 @@ status_t
 TTracker::GetSupportedSuites(BMessage* data)
 {
 	data->AddString("suites", kTrackerSuites);
-	BPropertyInfo propertyInfo(const_cast<property_info*>(kTrackerPropertyList));
+	BPropertyInfo propertyInfo(const_cast<property_info*>
+		(kTrackerPropertyList));
 	data->AddFlat("messages", &propertyInfo);
 
 	return _inherited::GetSupportedSuites(data);
@@ -112,9 +113,11 @@ BHandler*
 TTracker::ResolveSpecifier(BMessage* message, int32 index,
 	BMessage* specifier, int32 form, const char* property)
 {
-	BPropertyInfo propertyInfo(const_cast<property_info*>(kTrackerPropertyList));
+	BPropertyInfo propertyInfo(const_cast<property_info*>
+		(kTrackerPropertyList));
 
-	int32 result = propertyInfo.FindMatch(message, index, specifier, form, property);
+	int32 result = propertyInfo.FindMatch(message, index, specifier, form,
+		property);
 	if (result < 0) {
 		//PRINT(("FindMatch result %d %s\n", result, strerror(result)));
 		return _inherited::ResolveSpecifier(message, index, specifier,
@@ -155,7 +158,8 @@ TTracker::HandleScriptingMessage(BMessage* message)
 
 	switch (message->what) {
 		case B_CREATE_PROPERTY:
-			handled = CreateProperty(message, &specifier, form, property, &reply);
+			handled = CreateProperty(message, &specifier, form, property,
+				&reply);
 			break;
 
 		case B_GET_PROPERTY:
@@ -163,7 +167,8 @@ TTracker::HandleScriptingMessage(BMessage* message)
 			break;
 
 		case B_SET_PROPERTY:
-			handled = SetProperty(message, &specifier, form, property, &reply);
+			handled = SetProperty(message, &specifier, form, property,
+				&reply);
 			break;
 
 		case B_COUNT_PROPERTIES:
@@ -189,7 +194,7 @@ TTracker::HandleScriptingMessage(BMessage* message)
 
 
 bool
-TTracker::CreateProperty(BMessage* message, BMessage* , int32 form,
+TTracker::CreateProperty(BMessage* message, BMessage*, int32 form,
 	const char* property, BMessage* reply)
 {
 	bool handled = false;
@@ -226,8 +231,8 @@ TTracker::DeleteProperty(BMessage* /*specifier*/, int32 form,
 	const char* property, BMessage* /*reply*/)
 {
 	if (strcmp(property, kPropertyTrash) == 0) {
-		// deleting on a selection is handled as removing a part of the selection
-		// not to be confused with deleting a selected item
+		// deleting on a selection is handled as removing a part of the
+		// selection not to be confused with deleting a selected item
 
 		if (form != B_DIRECT_SPECIFIER)
 			// only support direct specifier

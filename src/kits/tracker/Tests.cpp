@@ -184,7 +184,8 @@ IconSpewer::DrawSomeNew()
 	}
 
 	if (numDrawn) {
-		sprintf(buffer, "average draw time %Ld us per icon", watch.ElapsedTime() / numDrawn);
+		sprintf(buffer, "average draw time %Ld us per icon",
+			watch.ElapsedTime() / numDrawn);
 		view->DrawString(buffer, BPoint(20, bounds.bottom - 30));
 	}
 
@@ -204,8 +205,9 @@ IconSpewer::DrawSomeNew()
 			if (model.IsDirectory())
 				entry.GetPath(&currentPath);
 
-			IconCache::sIconCache->Draw(&model, view, BPoint(column * (kIconSize + 2),
-				row * (kIconSize + 2)), kNormalIcon, kIconSize, true);
+			IconCache::sIconCache->Draw(&model, view,
+				BPoint(column * (kIconSize + 2), row * (kIconSize + 2)),
+				kNormalIcon, kIconSize, true);
 			target->Unlock();
 			numDrawn++;
 		}
@@ -239,7 +241,8 @@ IconSpewer::DrawSomeOld()
 		view->DrawString(buffer, BPoint(20, bounds.bottom - 20));
 	}
 	if (numDrawn) {
-		sprintf(buffer, "average draw time %Ld us per icon", watch.ElapsedTime() / numDrawn);
+		sprintf(buffer, "average draw time %Ld us per icon",
+			watch.ElapsedTime() / numDrawn);
 		view->DrawString(buffer, BPoint(20, bounds.bottom - 30));
 	}
 	sprintf(buffer, "directory: %s", currentPath.Path());
@@ -259,7 +262,8 @@ IconSpewer::DrawSomeOld()
 				entry.GetPath(&currentPath);
 
 			BIconCache::LockIconCache();
-			BIconCache* iconCache = BIconCache::GetIconCache(&model, kIconSize);
+			BIconCache* iconCache
+				= BIconCache::GetIconCache(&model, kIconSize);
 			iconCache->Draw(view, BPoint(column * (kIconSize + 2),
 				row * (kIconSize + 2)), B_NORMAL_ICON, kIconSize, true);
 			BIconCache::UnlockIconCache();
@@ -310,8 +314,8 @@ IconSpewer::NextRef()
 
 
 IconTestWindow::IconTestWindow()
-	:	BWindow(BRect(100, 100, 500, 600), "icon cache test", B_TITLED_WINDOW_LOOK,
-			B_NORMAL_WINDOW_FEEL, 0),
+	:	BWindow(BRect(100, 100, 500, 600), "icon cache test",
+			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, 0),
 		iconSpewer(modifiers() == 0)
 {
 	iconSpewer.SetTarget(this);

@@ -356,7 +356,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	menu->AddItem(fZoomTextOnlyMenuItem);
 
 	menu->AddSeparatorItem();
-	fFullscreenItem = new BMenuItem(B_TRANSLATE("Fullscreen"),
+	fFullscreenItem = new BMenuItem(B_TRANSLATE("Full screen"),
 		new BMessage(TOGGLE_FULLSCREEN), B_RETURN);
 	menu->AddItem(fFullscreenItem);
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Page source"),
@@ -988,13 +988,6 @@ BrowserWindow::MenusBeginning()
 
 
 void
-BrowserWindow::Zoom(BPoint origin, float width, float height)
-{
-	ToggleFullscreen();
-}
-
-
-void
 BrowserWindow::ScreenChanged(BRect screenSize, color_space format)
 {
 	if (fIsFullscreen)
@@ -1234,8 +1227,8 @@ BrowserWindow::LoadNegotiating(const BString& url, BWebView* view)
 
 	fURLInputGroup->SetText(url.String());
 
-	BString status(B_TRANSLATE("Requesting: "));
-	status << url;
+	BString status(B_TRANSLATE("Requesting %url"));
+	status.ReplaceFirst("%url", url);
 	view->WebPage()->SetStatusMessage(status);
 }
 
@@ -1249,8 +1242,8 @@ BrowserWindow::LoadCommitted(const BString& url, BWebView* view)
 	// This hook is invoked when the load is commited.
 	fURLInputGroup->SetText(url.String());
 
-	BString status(B_TRANSLATE("Loading: "));
-	status << url;
+	BString status(B_TRANSLATE("Loading %url"));
+	status.ReplaceFirst("%url", url);
 	view->WebPage()->SetStatusMessage(status);
 }
 
@@ -1275,7 +1268,7 @@ BrowserWindow::LoadFailed(const BString& url, BWebView* view)
 	if (view != CurrentWebView())
 		return;
 
-	BString status(B_TRANSLATE_COMMENT("%url failed.", "Loading URL failed. "
+	BString status(B_TRANSLATE_COMMENT("%url failed", "Loading URL failed. "
 		"Don't translate variable %url."));
 	status.ReplaceFirst("%url", url);
 	view->WebPage()->SetStatusMessage(status);
@@ -1290,7 +1283,7 @@ BrowserWindow::LoadFinished(const BString& url, BWebView* view)
 	if (view != CurrentWebView())
 		return;
 
-	BString status(B_TRANSLATE_COMMENT("%url finished.", "Loading URL "
+	BString status(B_TRANSLATE_COMMENT("%url finished", "Loading URL "
 		"finished. Don't translate variable %url."));
 	status.ReplaceFirst("%url", url);
 	view->WebPage()->SetStatusMessage(status);

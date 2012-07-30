@@ -155,21 +155,23 @@ BTrashWatcher::UpdateTrashIcons()
 	BDirectory trashDir;
 	while (roster.GetNextVolume(&volume) == B_OK) {
 		if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
-			// pull out the icons for the current trash state from resources and
-			// apply them onto the trash directory node
+			// pull out the icons for the current trash state from resources
+			// and apply them onto the trash directory node
 			size_t largeSize = 0;
 			size_t smallSize = 0;
-			const void* largeData = GetTrackerResources()->LoadResource('ICON',
-				fTrashFull ? R_TrashFullIcon : R_TrashIcon, &largeSize);
+			const void* largeData
+				= GetTrackerResources()->LoadResource('ICON',
+					fTrashFull ? R_TrashFullIcon : R_TrashIcon, &largeSize);
 
-			const void* smallData = GetTrackerResources()->LoadResource('MICN',
-				fTrashFull ? R_TrashFullIcon : R_TrashIcon,  &smallSize);
+			const void* smallData
+				= GetTrackerResources()->LoadResource('MICN',
+					fTrashFull ? R_TrashFullIcon : R_TrashIcon,  &smallSize);
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			size_t vectorSize = 0;
 			const void* vectorData = GetTrackerResources()->LoadResource(
-				B_VECTOR_ICON_TYPE, fTrashFull ? R_TrashFullIcon : R_TrashIcon,
-				&vectorSize);
+				B_VECTOR_ICON_TYPE,
+				fTrashFull ? R_TrashFullIcon : R_TrashIcon, &vectorSize);
 	
 			if (vectorData) {
 				trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,

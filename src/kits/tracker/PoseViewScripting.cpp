@@ -63,12 +63,12 @@ All rights reserved.
 // and previous/next specifiers the current PoseView sort order is used.
 // If PoseView is not in list view mode, the order in which poses are indexed
 // is arbitrary.
-// Both of these specifiers, but indices more so, are likely to be accurate only
-// till a next change to the PoseView (a change may be adding, removing a pose, changing
-// an attribute or stat resulting in a sort ordering change, changing the sort ordering
-// rule. When getting a selected item, there is no guarantee that the item will still
-// be selected after the operation. The client must be able to deal with these
-// inaccuracies.
+// Both of these specifiers, but indices more so, are likely to be accurate
+// only untill a next change to the PoseView (a change may be adding,
+// removing a pose, changing an attribute or stat resulting in a sort ordering
+// change, changing the sort ordering rule. When getting a selected item,
+// there is no guarantee that the item will still be selected after the
+// operation. The client must be able to deal with these inaccuracies.
 // Specifying an index/entry_ref that no longer exists will be handled well.
 
 #if 0
@@ -128,7 +128,8 @@ const property_info kPosesPropertyList[] = {
 	},
 	{	kPropertyEntry,
 		{ B_GET_PROPERTY },
-		{ B_DIRECT_SPECIFIER, B_INDEX_SPECIFIER, kPreviousSpecifier, kNextSpecifier },
+		{ B_DIRECT_SPECIFIER, B_INDEX_SPECIFIER, kPreviousSpecifier,
+			kNextSpecifier },
 		"get Entry [next|previous|index] # returns specified entries",
 		0,
 		{ B_REF_TYPE },
@@ -156,7 +157,8 @@ const property_info kPosesPropertyList[] = {
 	{	kPropertySelection,
 		{ B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER, kPreviousSpecifier, kNextSpecifier },
-		"set Selection of ... to {next|previous|entry} # selects specified entries",
+		"set Selection of ... to {next|previous|entry} # selects specified "
+		"entries",
 		0,
 		{},
 		{},
@@ -191,7 +193,7 @@ const property_info kPosesPropertyList[] = {
 		{},
 		{}
 	},
-	{NULL,
+	{	NULL,
 		{},
 		{},
 		NULL, 0,
@@ -209,7 +211,8 @@ BPoseView::GetSupportedSuites(BMessage* _SCRIPTING_ONLY(data))
 {
 #if _SUPPORTS_FEATURE_SCRIPTING
 	data->AddString("suites", kPosesSuites);
-	BPropertyInfo propertyInfo(const_cast<property_info*>(kPosesPropertyList));
+	BPropertyInfo propertyInfo(
+		const_cast<property_info*>(kPosesPropertyList));
 	data->AddFlat("messages", &propertyInfo);
 	
 	return _inherited::GetSupportedSuites(data);
@@ -249,7 +252,8 @@ BPoseView::HandleScriptingMessage(BMessage* _SCRIPTING_ONLY(message))
 	
 	switch (message->what) {
 		case B_CREATE_PROPERTY:
-			handled = CreateProperty(message, &specifier, form, property, &reply);
+			handled = CreateProperty(message, &specifier, form, property,
+				&reply);
 			break;
 
 		case B_GET_PROPERTY:
@@ -257,7 +261,8 @@ BPoseView::HandleScriptingMessage(BMessage* _SCRIPTING_ONLY(message))
 			break;
 		
 		case B_SET_PROPERTY:
-			handled = SetProperty(message, &specifier, form, property, &reply);
+			handled = SetProperty(message, &specifier, form, property,
+				&reply);
 			break;
 			
 		case B_COUNT_PROPERTIES:
@@ -302,7 +307,6 @@ BPoseView::ExecuteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 			for (int32 index = 0; specifier->FindRef("refs", index, &ref)
 				== B_OK; index++)
 				launchMessage.AddRef("refs", &ref);
-
 		} else if (form == (int32)B_INDEX_SPECIFIER) {
 			// move all poses specified by index to Trash
 			int32 specifyingIndex;
@@ -323,7 +327,8 @@ BPoseView::ExecuteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 		if (error == B_OK) {
 			// add a messenger to the launch message that will be used to
 			// dispatch scripting calls from apps to the PoseView
-			launchMessage.AddMessenger("TrackerViewToken", BMessenger(this, 0, 0));
+			launchMessage.AddMessenger("TrackerViewToken",
+				BMessenger(this, 0, 0));
 			if (fSelectionHandler)
 				fSelectionHandler->PostMessage(&launchMessage);
 		}
@@ -413,8 +418,8 @@ BPoseView::DeleteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 	bool handled = false;
 
 	if (strcmp(property, kPropertySelection) == 0) {
-		// deleting on a selection is handled as removing a part of the selection
-		// not to be confused with deleting a selected item
+		// deleting on a selection is handled as removing a part of the
+		// selection not to be confused with deleting a selected item
 
 		if (form == (int32)B_ENTRY_SPECIFIER) {
 			entry_ref ref;
@@ -454,7 +459,7 @@ BPoseView::DeleteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 
 	} else if (strcmp(property, kPropertyEntry) == 0) {
 		// deleting entries is handled by moving entries to trash
-	
+
 		// build a list of entries, specified by the specifier
 		BObjectList<entry_ref>* entryList = new BObjectList<entry_ref>();
 			// list will be deleted for us by the trashing thread
@@ -469,8 +474,8 @@ BPoseView::DeleteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 		} else if (form == (int32)B_INDEX_SPECIFIER) {
 			// move all poses specified by index to Trash
 			int32 specifyingIndex;
-			for (int32 index = 0; specifier->FindInt32("index", index, &specifyingIndex)
-				== B_OK; index++) {
+			for (int32 index = 0; specifier->FindInt32("index", index,
+					&specifyingIndex) == B_OK; index++) {
 				BPose* pose = PoseAtIndex(specifyingIndex);
 
 				if (!pose) {
@@ -478,7 +483,8 @@ BPoseView::DeleteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 					break;
 				}
 
-				entryList->AddItem(new entry_ref(*pose->TargetModel()->EntryRef()));
+				entryList->AddItem(
+					new entry_ref(*pose->TargetModel()->EntryRef()));
 			}
 		} else
 			return false;
@@ -486,8 +492,8 @@ BPoseView::DeleteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 		if (error == B_OK) {
 			TrackerSettings settings;
 			if (!settings.DontMoveFilesToTrash()) {
-				// move the list we build into trash, don't make the trashing task
-				// select the next item
+				// move the list we build into trash, don't make the
+				// trashing task select the next item
 				MoveListToTrash(entryList, false, false);
 			} else
 				Delete(entryList, false, settings.AskBeforeDeleteFile());
@@ -507,12 +513,13 @@ BPoseView::DeleteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 
 
 bool
-BPoseView::CountProperty(BMessage*, int32, const char* _SCRIPTING_ONLY(property),
+BPoseView::CountProperty(BMessage*, int32,
+	const char* _SCRIPTING_ONLY(property),
 	BMessage* _SCRIPTING_ONLY(reply))
 {
 #if _SUPPORTS_FEATURE_SCRIPTING
 	bool handled = false;
-//	PRINT(("BPoseView::CountProperty, %s\n", property));
+	//PRINT(("BPoseView::CountProperty, %s\n", property));
 
 	// just return the respecitve counts
 	if (strcmp(property, kPropertySelection) == 0) {
@@ -583,7 +590,8 @@ BPoseView::GetProperty(BMessage* _SCRIPTING_ONLY(specifier),
 						}
 						
 						if (pose->IsSelected()) {
-							reply->AddRef("result", pose->TargetModel()->EntryRef());
+							reply->AddRef("result",
+								pose->TargetModel()->EntryRef());
 							reply->AddInt32("index", IndexOfPose(pose));
 							break;
 						}
@@ -599,8 +607,10 @@ BPoseView::GetProperty(BMessage* _SCRIPTING_ONLY(specifier),
 			case B_DIRECT_SPECIFIER:
 			{
 				// return all entries of all poses in PoseView
-				for (int32 index = 0; index < count; index++)
-					reply->AddRef("result", PoseAtIndex(index)->TargetModel()->EntryRef());
+				for (int32 index = 0; index < count; index++) {
+					reply->AddRef("result",
+						PoseAtIndex(index)->TargetModel()->EntryRef());
+				}
 
 				handled = true;
 				break;
@@ -618,7 +628,8 @@ BPoseView::GetProperty(BMessage* _SCRIPTING_ONLY(specifier),
 					handled = true;
 					break;
 				}
-				reply->AddRef("result", PoseAtIndex(index)->TargetModel()->EntryRef());
+				reply->AddRef("result",
+					PoseAtIndex(index)->TargetModel()->EntryRef());
 
 				handled = true;
 				break;
@@ -627,7 +638,8 @@ BPoseView::GetProperty(BMessage* _SCRIPTING_ONLY(specifier),
 			case kPreviousSpecifier:
 			case kNextSpecifier:
 			{
-				// return entry and index of pose before or after specified pose
+				// return entry and index of pose before or after
+				// specified pose
 				entry_ref ref;
 				if (specifier->FindRef("data", &ref) != B_OK)
 					break;
@@ -703,16 +715,16 @@ BPoseView::SetProperty(BMessage* _SCRIPTING_ONLY(message), BMessage*,
 
 					int32 poseIndex;
 					BPose* pose = FindPose(&ref, form, &poseIndex);
-					
+
 					if (!pose) {
 						error = B_ENTRY_NOT_FOUND;
 						handled = true;
 						break;
 					}
-						
+
 					if (clearSelection) {
-						// first selected item must call SelectPose so the selection
-						// gets cleared first
+						// first selected item must call SelectPose so the
+						// selection gets cleared first
 						SelectPose(pose, poseIndex);
 						clearSelection = false;
 					} else
@@ -741,11 +753,13 @@ BPoseView::ResolveSpecifier(BMessage* _SCRIPTING_ONLY(message),
 	int32 _SCRIPTING_ONLY(form), const char* _SCRIPTING_ONLY(property))
 {
 #if _SUPPORTS_FEATURE_SCRIPTING
-	BPropertyInfo propertyInfo(const_cast<property_info*>(kPosesPropertyList));
+	BPropertyInfo propertyInfo(
+		const_cast<property_info*>(kPosesPropertyList));
 
-	int32 result = propertyInfo.FindMatch(message, index, specifier, form, property);
+	int32 result = propertyInfo.FindMatch(message, index, specifier, form,
+		property);
 	if (result < 0) {
-// 		PRINT(("FindMatch result %d \n"));
+		//PRINT(("FindMatch result %d \n"));
 		return _inherited::ResolveSpecifier(message, index, specifier,
 			form, property);
 	}
@@ -765,7 +779,7 @@ BPoseView::FindPose(const entry_ref* _SCRIPTING_ONLY(ref),
 	// flavor of FindPose, used by previous/next specifiers
 
 	BPose* pose = FindPose(ref, index);
-	
+
 	if (specifierForm == (int32)kPreviousSpecifier)
 		return PoseAtIndex(--*index);
 	else if (specifierForm == (int32)kNextSpecifier)

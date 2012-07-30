@@ -124,7 +124,8 @@ FavoritesMenu::AddNextItem()
 
 		try {
 			BPath path;
-			ThrowOnError( find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) );
+			ThrowOnError(find_directory(B_USER_SETTINGS_DIRECTORY,
+				&path, true));
 			path.Append(kGoDirectory);
 			mkdir(path.Path(), 0777);
 
@@ -169,7 +170,8 @@ FavoritesMenu::AddNextItem()
 			if (item == NULL)
 				return true;
 
-			item->SetLabel(ref.name);		// this is the name of the link in the Go dir
+			item->SetLabel(ref.name);
+				// this is the name of the link in the Go dir
 
 			if (!fAddedSeparatorForSection) {
 				fAddedSeparatorForSection = true;
@@ -214,7 +216,8 @@ FavoritesMenu::AddNextItem()
 				if (!ShouldShowModel(&model))
 					return true;
 
-				BMenuItem* item = BNavMenu::NewModelItem(&model, fOpenFileMessage, fTarget);
+				BMenuItem* item = BNavMenu::NewModelItem(&model,
+					fOpenFileMessage, fTarget);
 				if (item) {
 					if (!fAddedSeparatorForSection) {
 						fAddedSeparatorForSection = true;
@@ -252,8 +255,10 @@ FavoritesMenu::AddNextItem()
 
 			// don't add folders that are already in the GoTo section
 			if (find_if(fUniqueRefCheck.begin(), fUniqueRefCheck.end(),
-				bind2nd(std::equal_to<entry_ref>(), ref)) != fUniqueRefCheck.end())
+				bind2nd(std::equal_to<entry_ref>(), ref))
+					!= fUniqueRefCheck.end()) {
 				continue;
+			}
 
 			Model model(&ref, true);
 			if (model.InitCheck() != B_OK)
@@ -262,8 +267,8 @@ FavoritesMenu::AddNextItem()
 			if (!ShouldShowModel(&model))
 				return true;
 
-			BMenuItem* item = BNavMenu::NewModelItem(&model, fOpenFolderMessage,
-				fTarget, true);
+			BMenuItem* item = BNavMenu::NewModelItem(&model,
+				fOpenFolderMessage, fTarget, true);
 			if (item) {
 				if (!fAddedSeparatorForSection) {
 					fAddedSeparatorForSection = true;

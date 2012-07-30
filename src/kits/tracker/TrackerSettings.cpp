@@ -132,9 +132,9 @@ TTrackerState::TTrackerState()
 TTrackerState::TTrackerState(const TTrackerState&)
 	:	Settings("", "")
 {
-	// Placeholder copy constructor to prevent others from accidentally using the
-	// default copy constructor.  Note, the DEBUGGER call is for the off chance that
-	// a TTrackerState method (or friend) tries to make a copy.
+	// Placeholder copy constructor to prevent others from accidentally using
+	// the default copy constructor.  Note, the DEBUGGER call is for the off
+	// chance that a TTrackerState method (or friend) tries to make a copy.
 	DEBUGGER("Don't make a copy of this!");
 }
 
@@ -161,37 +161,56 @@ TTrackerState::LoadSettingsIfNeeded()
 	// Set default settings before reading from disk
 
 	Add(fShowDisksIcon = new BooleanValueSetting("ShowDisksIcon", false));
-	Add(fMountVolumesOntoDesktop = new BooleanValueSetting("MountVolumesOntoDesktop", true));
+	Add(fMountVolumesOntoDesktop
+		= new BooleanValueSetting("MountVolumesOntoDesktop", true));
 	Add(fMountSharedVolumesOntoDesktop =
 		new BooleanValueSetting("MountSharedVolumesOntoDesktop", true));
-	Add(fEjectWhenUnmounting = new BooleanValueSetting("EjectWhenUnmounting", true));
+	Add(fEjectWhenUnmounting
+		= new BooleanValueSetting("EjectWhenUnmounting", true));
 
-	Add(fDesktopFilePanelRoot = new BooleanValueSetting("DesktopFilePanelRoot", true));
-	Add(fShowFullPathInTitleBar = new BooleanValueSetting("ShowFullPathInTitleBar", false));
-	Add(fShowSelectionWhenInactive = new BooleanValueSetting("ShowSelectionWhenInactive", true));
-	Add(fTransparentSelection = new BooleanValueSetting("TransparentSelection", true));
-	Add(fSortFolderNamesFirst = new BooleanValueSetting("SortFolderNamesFirst", true));
+	Add(fDesktopFilePanelRoot
+		= new BooleanValueSetting("DesktopFilePanelRoot", true));
+	Add(fShowFullPathInTitleBar
+		= new BooleanValueSetting("ShowFullPathInTitleBar", false));
+	Add(fShowSelectionWhenInactive
+		= new BooleanValueSetting("ShowSelectionWhenInactive", true));
+	Add(fTransparentSelection
+		= new BooleanValueSetting("TransparentSelection", true));
+	Add(fSortFolderNamesFirst
+		= new BooleanValueSetting("SortFolderNamesFirst", true));
 	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", false));
-	Add(fTypeAheadFiltering = new BooleanValueSetting("TypeAheadFiltering", false));
- 	Add(fSingleWindowBrowse = new BooleanValueSetting("SingleWindowBrowse", false));
+	Add(fTypeAheadFiltering
+		= new BooleanValueSetting("TypeAheadFiltering", false));
+ 	Add(fSingleWindowBrowse
+		= new BooleanValueSetting("SingleWindowBrowse", false));
 	Add(fShowNavigator = new BooleanValueSetting("ShowNavigator", false));
 
-	Add(fRecentApplicationsCount = new ScalarValueSetting("RecentApplications", 10, "", ""));
-	Add(fRecentDocumentsCount = new ScalarValueSetting("RecentDocuments", 10, "", ""));
-	Add(fRecentFoldersCount = new ScalarValueSetting("RecentFolders", 10, "", ""));
+	Add(fRecentApplicationsCount
+		= new ScalarValueSetting("RecentApplications", 10, "", ""));
+	Add(fRecentDocumentsCount
+		= new ScalarValueSetting("RecentDocuments", 10, "", ""));
+	Add(fRecentFoldersCount
+		= new ScalarValueSetting("RecentFolders", 10, "", ""));
 
-	Add(fShowVolumeSpaceBar = new BooleanValueSetting("ShowVolumeSpaceBar", true));
+	Add(fShowVolumeSpaceBar
+		= new BooleanValueSetting("ShowVolumeSpaceBar", true));
 
-	Add(fUsedSpaceColor = new HexScalarValueSetting("UsedSpaceColor", 0xc000cb00, "", ""));
-	Add(fFreeSpaceColor = new HexScalarValueSetting("FreeSpaceColor", 0xc0ffffff, "", ""));
-	Add(fWarningSpaceColor = new HexScalarValueSetting("WarningSpaceColor", 0xc0cb0000, "", ""));
+	Add(fUsedSpaceColor
+		= new HexScalarValueSetting("UsedSpaceColor", 0xc000cb00, "", ""));
+	Add(fFreeSpaceColor
+		= new HexScalarValueSetting("FreeSpaceColor", 0xc0ffffff, "", ""));
+	Add(fWarningSpaceColor
+		= new HexScalarValueSetting("WarningSpaceColor", 0xc0cb0000, "", ""));
 
-	Add(fDontMoveFilesToTrash = new BooleanValueSetting("DontMoveFilesToTrash", false));
-	Add(fAskBeforeDeleteFile = new BooleanValueSetting("AskBeforeDeleteFile", true));
+	Add(fDontMoveFilesToTrash
+		= new BooleanValueSetting("DontMoveFilesToTrash", false));
+	Add(fAskBeforeDeleteFile
+		= new BooleanValueSetting("AskBeforeDeleteFile", true));
 
 	TryReadingSettings();
 
-	NameAttributeText::SetSortFolderNamesFirst(fSortFolderNamesFirst->Value());
+	NameAttributeText::SetSortFolderNamesFirst(
+		fSortFolderNamesFirst->Value());
 	RealNameAttributeText::SetSortFolderNamesFirst(
 		fSortFolderNamesFirst->Value());
 
@@ -456,7 +475,8 @@ TrackerSettings::SetShowNavigator(bool enabled)
 
 
 void
-TrackerSettings::RecentCounts(int32* applications, int32* documents, int32* folders)
+TrackerSettings::RecentCounts(int32* applications, int32* documents,
+	int32* folders)
 {
 	if (applications)
 		*applications = gTrackerState.fRecentApplicationsCount->Value();
