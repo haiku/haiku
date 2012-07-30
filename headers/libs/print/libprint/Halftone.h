@@ -102,14 +102,6 @@ protected:
 			void		SetupErrorBuffer(int x, int y, int width);
 			void		DitherFloydSteinberg(uchar* destination,
 							const uchar* source, int x, int y, int width);
-						// Do nothing method to get around a bug in
-						// the gcc2 cross-compiler built on Mac OS X
-						// Lion where a compiler error occurs when
-						// assigning a member function pointer to NULL
-						// or 0: cast specifies signature type.
-						// However, this should be legal according to
-						// the C++03 standard.
-			void		DitherNone(uchar*, const uchar*, int, int, int) {};
 
 private:
 	enum {

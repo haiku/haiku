@@ -65,15 +65,6 @@ private:
 									int32 srcSampleOffset, int32 srcSampleCount,
 									void* dest, int32 destSampleOffset,
 									int32 destSampleCount, float gain);
-								// Do nothing method to get around a bug in
-								// the gcc2 cross-compiler built on Mac OS X
-								// Lion where a compiler error occurs when
-								// assigning a member function pointer to NULL
-								// or 0: cast specifies signature type.
-								// However, this should be legal according to
-								// the C++03 standard.
-			void				no_conversion(const void*, int32, int32, void*,
-									int32, int32, float) {};
 };
 
 
