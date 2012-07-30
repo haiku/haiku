@@ -223,9 +223,18 @@ stop_keyboards(struct console* con)
 static struct keyboard*
 open_keyboards(int target, const char* start, struct keyboard* previous)
 {
-	DIR* dir = opendir(start);
-	if (dir == NULL)
-		return NULL;
+	// Wait for the directory to appear, if we're loaded early in boot
+	// it may take a while for it to appear while the drivers load.
+	DIR* dir;
+	int32 tries = 0;
+	while (true) {
+		dir = opendir(start);
+		if (dir != NULL)
+			break;
+		if(++tries == 10)
+			return NULL;
+		sleep(1);
+	}
 
 	struct keyboard* keyboard = previous;
 
