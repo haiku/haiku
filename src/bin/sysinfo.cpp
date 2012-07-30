@@ -17,7 +17,7 @@
 
 // ToDo: -disable_cpu_sn option is not yet implemented
 // ToDo: most of this file should go into an architecture dependent source file
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 
 struct cache_description {
 	uint8		code;
@@ -210,7 +210,7 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 	}
 }
 
-#endif	// __INTEL__
+#endif	// __INTEL__ || __x86_64__
 
 
 static void
@@ -245,14 +245,15 @@ print_level2_cache(uint32 reg, const char *name)
 	uint32 linesPerTag = (reg >> 8) & 0xf;		// intel does not define this
 	uint32 lineSize = reg & 0xff;
 
-	printf("\t%s: %lu KB, ", name, size);
+	printf("\t%s: %" B_PRIu32 " KB, ", name, size);
 	if (ways == 0xf)
 		printf("fully associative, ");
 	else if (ways == 0x1)
 		printf("direct-mapped, ");
 	else
 		printf("%lu-way set associative, ", 1UL << (ways / 2));
-	printf("%lu lines/tag, %lu bytes/line\n", linesPerTag, lineSize);
+	printf("%" B_PRIu32 " lines/tag, %" B_PRIu32 " bytes/line\n", linesPerTag,
+		lineSize);
 }
 
 
@@ -264,16 +265,17 @@ print_level1_cache(uint32 reg, const char *name)
 	uint32 linesPerTag = (reg >> 8) & 0xff;
 	uint32 lineSize = reg & 0xff;
 
-	printf("\t%s: %lu KB, ", name, size);
+	printf("\t%s: %" B_PRIu32 " KB, ", name, size);
 	if (ways == 0xff)
 		printf("fully associative, ");
 	else
-		printf("%lu-way set associative, ", ways);
-	printf("%lu lines/tag, %lu bytes/line\n", linesPerTag, lineSize);
+		printf("%" B_PRIu32 "-way set associative, ", ways);
+	printf("%" B_PRIu32 " lines/tag, %" B_PRIu32 " bytes/line\n", linesPerTag,
+		lineSize);
 }
 
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 
 static void
 print_cache_desc(int32 cpu)
@@ -315,7 +317,7 @@ print_intel_cache_desc(int32 cpu)
 
 	uint32 sets = info.regs.ecx;
 
-	printf("\tL%ld ",level);
+	printf("\tL%" B_PRId32 " ",level);
 
 	switch (type) {
 		case 1: printf("Data cache "); break;
@@ -327,8 +329,9 @@ print_intel_cache_desc(int32 cpu)
 	if (isFullyAssoc)
 		printf("fully associative, ");
 	else
-		printf("%lu-way set associative, ", ways);
-	printf("%lu lines/tag, %lu bytes/line\n", linesPerTag, lineSize);
+		printf("%" B_PRIu32 "-way set associative, ", ways);
+	printf("%" B_PRIu32 " lines/tag, %" B_PRIu32 " bytes/line\n", linesPerTag,
+		lineSize);
 
 	get_cpuid(&info, 0x80000006, cpu);
 	print_level2_cache(sets, "L2 cache");
@@ -342,7 +345,7 @@ print_transmeta_features(uint32 features)
 		printf("\t\tFCMOV\n");
 }
 
-#endif	// __INTEL__
+#endif	// __INTEL__ || __x86_64__
 
 
 static void
@@ -456,14 +459,15 @@ print_features(uint32 features)
 }
 
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 
 static void
 print_processor_signature(system_info *sys_info, cpuid_info *info, const char *prefix)
 {
 
 	if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
-		printf("\t%s%sype %lu, family %lu, model %u, stepping %lu, features 0x%08lx\n",
+		printf("\t%s%sype %" B_PRIu32 ", family %" B_PRIu32 ", model %u, "
+			"stepping %" B_PRIu32 ", features 0x%08" B_PRIx32 "\n",
 			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
 			info->eax_1.type,
 			info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
@@ -472,7 +476,8 @@ print_processor_signature(system_info *sys_info, cpuid_info *info, const char *p
 			info->eax_1.features);
 	} else if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
 		// model calculation is different for INTEL
-		printf("\t%s%sype %lu, family %lu, model %u, stepping %lu, features 0x%08lx\n",
+		printf("\t%s%sype %" B_PRIu32 ", family %" B_PRIu32 ", model %u, "
+			"stepping %" B_PRIu32 ", features 0x%08" B_PRIx32 "\n",
 			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
 			info->eax_1.type,
 			info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
@@ -482,7 +487,7 @@ print_processor_signature(system_info *sys_info, cpuid_info *info, const char *p
 	}
 }
 
-#endif	// __INTEL__
+#endif	// __INTEL__ || __x86_64__
 
 
 static void
@@ -495,7 +500,7 @@ dump_platform(system_info *info)
 }
 
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 
 static void
 dump_cpu(system_info *info, int32 cpu)
@@ -551,15 +556,15 @@ dump_cpu(system_info *info, int32 cpu)
 
 		// the BIOS may not have set the processor name
 		if (name[0])
-			printf("CPU #%ld: \"%s\"\n", cpu, name);
+			printf("CPU #%" B_PRId32 ": \"%s\"\n", cpu, name);
 		else {
 			// Intel CPUs don't seem to have the genuine vendor field
-			printf("CPU #%ld: %.12s\n", cpu,
+			printf("CPU #%" B_PRId32 ": %.12s\n", cpu,
 				(info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86 ?
 					baseInfo.eax_0.vendor_id : cpuInfo.eax_0.vendor_id);
 		}
 	} else {
-		printf("CPU #%ld: %.12s\n", cpu, baseInfo.eax_0.vendor_id);
+		printf("CPU #%" B_PRId32 ": %.12s\n", cpu, baseInfo.eax_0.vendor_id);
 		if (maxStandardFunction == 0)
 			return;
 	}
@@ -570,7 +575,7 @@ dump_cpu(system_info *info, int32 cpu)
 
 	if (maxStandardFunction >= 1) {
 		/* Extended features */
-		printf("\tExtended Intel: 0x%08lx\n", cpuInfo.eax_1.extended_features);
+		printf("\tExtended Intel: 0x%08" B_PRIx32 "\n", cpuInfo.eax_1.extended_features);
 		print_extended_features(cpuInfo.eax_1.extended_features);
 	}
 
@@ -619,7 +624,8 @@ dump_cpu(system_info *info, int32 cpu)
 
 		if (flagsInfo.eax_1.features & (1UL << 18)) {
 			get_cpuid(&cpuInfo, 3, cpu);
-			printf("Serial number: %04lx-%04lx-%04lx-%04lx-%04lx-%04lx\n",
+			printf("Serial number: %04" B_PRIx32 "-%04" B_PRIx32 "-%04" B_PRIx32
+				"-%04" B_PRIx32 "-%04" B_PRIx32 "-%04" B_PRIx32 "\n",
 				flagsInfo.eax_1.features >> 16, flagsInfo.eax_1.features & 0xffff,
 				cpuInfo.regs.edx >> 16, cpuInfo.regs.edx & 0xffff,
 				cpuInfo.regs.ecx >> 16, cpuInfo.regs.edx & 0xffff);
@@ -629,7 +635,7 @@ dump_cpu(system_info *info, int32 cpu)
 	putchar('\n');
 }
 
-#endif	// __INTEL__
+#endif	// __INTEL__ || __x86_64__
 
 
 static void
@@ -646,28 +652,30 @@ dump_cpus(system_info *info)
 		snprintf(modelString, 32, "(Unknown %x)", info->cpu_type);
 	}
 
-	printf("%ld %s%s%s, revision %04lx running at %LdMHz (ID: 0x%08lx 0x%08lx)\n\n",
+	printf("%" B_PRId32 " %s%s%s, revision %04" B_PRIx32 " running at %"
+		B_PRId64 "MHz (ID: 0x%08" B_PRIx32 " 0x%08" B_PRIx32 ")\n\n",
 		info->cpu_count,
 		vendor ? vendor : "", vendor ? " " : "", model,
 		info->cpu_revision,
 		info->cpu_clock_speed / 1000000,
 		info->id[0], info->id[1]);
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 	for (int32 cpu = 0; cpu < info->cpu_count; cpu++)
 		dump_cpu(info, cpu);
-#endif	// __INTEL__
+#endif	// __INTEL__ || __x86_64__
 }
 
 
 static void
 dump_mem(system_info *info)
 {
-	printf("%10lu bytes free      (used/max %10lu / %10lu)\n",
+	printf("%10" B_PRIu32 " bytes free      (used/max %10" B_PRIu32 " / %10"
+		B_PRIu32 ")\n",
 		B_PAGE_SIZE * (uint32)(info->max_pages - info->used_pages),
 		B_PAGE_SIZE * (uint32)info->used_pages,
 		B_PAGE_SIZE * (uint32)info->max_pages);
-	printf("                           (cached   %10lu)\n",
+	printf("                           (cached   %10" B_PRIu32 ")\n",
 		B_PAGE_SIZE * (uint32)info->cached_pages);
 }
 
@@ -675,7 +683,8 @@ dump_mem(system_info *info)
 static void
 dump_sem(system_info *info)
 {
-	printf("%10ld semaphores free (used/max %10ld / %10ld)\n",
+	printf("%10" B_PRId32 " semaphores free (used/max %10" B_PRId32 " / %10"
+		B_PRId32 ")\n",
 		info->max_sems - info->used_sems,
 		info->used_sems, info->max_sems);
 }
@@ -684,7 +693,8 @@ dump_sem(system_info *info)
 static void
 dump_ports(system_info *info)
 {
-	printf("%10ld ports free      (used/max %10ld / %10ld)\n",
+	printf("%10" B_PRId32 " ports free      (used/max %10" B_PRId32 " / %10"
+		B_PRId32 ")\n",
 		info->max_ports - info->used_ports,
 		info->used_ports, info->max_ports);
 }
@@ -693,7 +703,8 @@ dump_ports(system_info *info)
 static void
 dump_thread(system_info *info)
 {
-	printf("%10ld threads free    (used/max %10ld / %10ld)\n",
+	printf("%10" B_PRId32 " threads free    (used/max %10" B_PRId32 " / %10"
+		B_PRId32 ")\n",
 		info->max_threads - info->used_threads,
 		info->used_threads, info->max_threads);
 }
@@ -702,7 +713,8 @@ dump_thread(system_info *info)
 static void
 dump_team(system_info *info)
 {
-	printf("%10ld teams free      (used/max %10ld / %10ld)\n",
+	printf("%10" B_PRId32 " teams free      (used/max %10" B_PRId32 " / %10"
+		B_PRId32 ")\n",
 		info->max_teams - info->used_teams,
 		info->used_teams, info->max_teams);
 }
@@ -711,7 +723,7 @@ dump_team(system_info *info)
 static void
 dump_kinfo(system_info *info)
 {
-	printf("Kernel name: %s built on: %s %s version 0x%Lx\n",
+	printf("Kernel name: %s built on: %s %s version 0x%" B_PRIx64 "\n",
 		info->kernel_name,
 		info->kernel_build_date, info->kernel_build_time,
 		info->kernel_version );
@@ -752,7 +764,8 @@ main(int argc, char *argv[])
 			const char *opt = argv[i];
 			if (strncmp(opt, "-id", strlen(opt)) == 0) {
 				/* note: the original also assumes this option on "sysinfo -" */
-				printf("0x%.8lx 0x%.8lx\n", info.id[0], info.id[1]);
+				printf("0x%.8" B_PRIx32 " 0x%.8" B_PRIx32 "\n", info.id[0],
+					info.id[1]);
 			} else if (strncmp(opt, "-cpu", strlen(opt)) == 0) {
 				dump_cpus(&info);
 			} else if (strncmp(opt, "-mem", strlen(opt)) == 0) {
