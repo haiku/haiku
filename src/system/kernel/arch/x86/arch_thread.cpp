@@ -172,23 +172,6 @@ x86_initial_return_to_userland(Thread* thread, iframe* frame)
 }
 
 
-uint8*
-x86_get_signal_stack(Thread* thread, struct iframe* frame,
-	struct sigaction* action)
-{
-	// use the alternate signal stack if we should and can
-	if (thread->signal_stack_enabled
-		&& (action->sa_flags & SA_ONSTACK) != 0
-		&& (frame->user_sp < thread->signal_stack_base
-			|| frame->user_sp >= thread->signal_stack_base
-				+ thread->signal_stack_size)) {
-		return (uint8*)(thread->signal_stack_base + thread->signal_stack_size);
-	}
-
-	return (uint8*)frame->user_sp;
-}
-
-
 //	#pragma mark -
 
 

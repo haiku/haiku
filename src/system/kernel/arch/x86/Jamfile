@@ -26,6 +26,7 @@ if $(TARGET_ARCH) = x86_64 {
 		interrupts.S
 		stubs.cpp
 		signals.cpp
+		signals_asm.S
 		syscalls.cpp
 		thread.cpp
 

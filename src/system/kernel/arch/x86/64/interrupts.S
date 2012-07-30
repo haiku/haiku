@@ -337,8 +337,9 @@ FUNCTION(x86_64_syscall_entry):
 	// Get the system call table entry. Note I'm hardcoding the shift because
 	// sizeof(syscall_info) is 16 and scale factors of 16 aren't supported,
 	// so can't just do leaq kSyscallInfos(, %rax, SYSCALL_INFO_sizeof).
-	shlq	$4, %r14
-	leaq	kSyscallInfos(, %r14, 1), %rax
+	movq	%r14, %rax
+	shlq	$4, %rax
+	leaq	kSyscallInfos(, %rax, 1), %rax
 
 	// Check the number of call arguments, greater than 6 (6 * 8 = 48) requires
 	// a stack copy.
@@ -387,6 +388,10 @@ FUNCTION(x86_64_syscall_entry):
 	cli
 
 	UPDATE_THREAD_KERNEL_TIME()
+
+	// If we've just restored a signal frame, use the IRET path.
+	cmpq	$SYSCALL_RESTORE_SIGNAL_FRAME, %r14
+	je		.Liret
 
 	// If the return address is not canonical, return using the IRET path.
 	// On Intel's implementation of SYSRET, the canonical address check for the

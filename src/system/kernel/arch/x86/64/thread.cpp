@@ -12,7 +12,7 @@
 
 #include <string.h>
 
-#include <arch_cpu.h>
+#include <commpage.h>
 #include <cpu.h>
 #include <debug.h>
 #include <kernel.h>
@@ -54,6 +54,26 @@ x86_set_tls_context(Thread* thread)
 {
 	// Set FS segment base address to the TLS segment.
 	x86_write_msr(IA32_MSR_FS_BASE, thread->user_local_storage);
+}
+
+
+static uint8*
+get_signal_stack(Thread* thread, iframe* frame, struct sigaction* action)
+{
+	// Use the alternate signal stack if we should and can.
+	if (thread->signal_stack_enabled
+			&& (action->sa_flags & SA_ONSTACK) != 0
+			&& (frame->user_sp < thread->signal_stack_base
+				|| frame->user_sp >= thread->signal_stack_base
+					+ thread->signal_stack_size)) {
+		return (uint8*)(thread->signal_stack_base + thread->signal_stack_size);
+	}
+
+	// We are going to use the stack that we are already on. We must not touch
+	// the red zone (128 byte area below the stack pointer, reserved for use
+	// by functions to store temporary data and guaranteed not to be modified
+	// by signal handlers).
+	return (uint8*)(frame->user_sp - 128);
 }
 
 
@@ -203,8 +223,8 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	filled in:
 	- \c context.uc_stack: The stack currently used by the thread.
 	- \c context.uc_mcontext: The current userland state of the registers.
-	- \c syscall_restart_return_value: Architecture specific use. On x86 the
-		value of eax and edx which are overwritten by the syscall return value.
+	- \c syscall_restart_return_value: Architecture specific use. On x86_64 the
+		value of rax which is overwritten by the syscall return value.
 
 	Furthermore the function needs to set \c thread->user_signal_context to the
 	userland pointer to the \c ucontext_t on the user stack.
@@ -219,14 +239,116 @@ status_t
 arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	struct signal_frame_data* signalFrameData)
 {
-	panic("arch_setup_signal_frame: TODO\n");
-	return B_ERROR;
+	iframe* frame = x86_get_current_iframe();
+	if (!IFRAME_IS_USER(frame)) {
+		panic("arch_setup_signal_frame(): No user iframe!");
+		return B_BAD_VALUE;
+	}
+
+	// Store the register state.
+	signalFrameData->context.uc_mcontext.rax = frame->ax;
+	signalFrameData->context.uc_mcontext.rbx = frame->bx;
+	signalFrameData->context.uc_mcontext.rcx = frame->cx;
+	signalFrameData->context.uc_mcontext.rdx = frame->dx;
+	signalFrameData->context.uc_mcontext.rdi = frame->di;
+	signalFrameData->context.uc_mcontext.rsi = frame->si;
+	signalFrameData->context.uc_mcontext.rbp = frame->bp;
+	signalFrameData->context.uc_mcontext.r8 = frame->r8;
+	signalFrameData->context.uc_mcontext.r9 = frame->r9;
+	signalFrameData->context.uc_mcontext.r10 = frame->r10;
+	signalFrameData->context.uc_mcontext.r11 = frame->r11;
+	signalFrameData->context.uc_mcontext.r12 = frame->r12;
+	signalFrameData->context.uc_mcontext.r13 = frame->r13;
+	signalFrameData->context.uc_mcontext.r14 = frame->r14;
+	signalFrameData->context.uc_mcontext.r15 = frame->r15;
+	signalFrameData->context.uc_mcontext.rsp = frame->user_sp;
+	signalFrameData->context.uc_mcontext.rip = frame->ip;
+	signalFrameData->context.uc_mcontext.rflags = frame->flags;
+
+	// Store the FPU state. There appears to be a bug in GCC where the aligned
+	// attribute on a structure is being ignored when the structure is allocated
+	// on the stack, so even if the fpu_state struct has aligned(16) it may not
+	// get aligned correctly. Instead, use the current thread's FPU save area
+	// and then memcpy() to the frame structure.
+	x86_fxsave(thread->arch_info.fpu_state);
+	memcpy((void*)&signalFrameData->context.uc_mcontext.fpu,
+		thread->arch_info.fpu_state,
+		sizeof(signalFrameData->context.uc_mcontext.fpu));
+
+	// Fill in signalFrameData->context.uc_stack.
+	signal_get_user_stack(frame->user_sp, &signalFrameData->context.uc_stack);
+
+	// Store syscall_restart_return_value (TODO).
+	//signalFrameData->syscall_restart_return_value = frame->orig_rax;
+
+	// Get the stack to use and copy the frame data to it.
+	uint8* userStack = get_signal_stack(thread, frame, action);
+
+	userStack -= sizeof(*signalFrameData);
+	signal_frame_data* userSignalFrameData = (signal_frame_data*)userStack;
+
+	if (user_memcpy(userSignalFrameData, signalFrameData,
+			sizeof(*signalFrameData)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
+	// Copy a return address to the stack so that backtraces will be correct.
+	userStack -= sizeof(frame->ip);
+	if (user_memcpy(userStack, &frame->ip, sizeof(frame->ip)) != B_OK)
+		return B_BAD_ADDRESS;
+
+	// Update Thread::user_signal_context, now that everything seems to have
+	// gone fine.
+	thread->user_signal_context = &userSignalFrameData->context;
+
+	// Set up the iframe to execute the signal handler wrapper on our prepared
+	// stack. First argument points to the frame data.
+	frame->user_sp = (addr_t)userStack;
+	frame->ip = ((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_SIGNAL_HANDLER];
+	frame->di = (addr_t)userSignalFrameData;
+
+	return B_OK;
 }
 
 
 int64
 arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 {
-	panic("arch_restore_signal_frame: TODO\n");
-	return B_ERROR;
+	iframe* frame = x86_get_current_iframe();
+
+	// TODO
+	//frame->orig_rax = signalFrameData->syscall_restart_return_value;
+
+	frame->ax = signalFrameData->context.uc_mcontext.rax;
+	frame->bx = signalFrameData->context.uc_mcontext.rbx;
+	frame->cx = signalFrameData->context.uc_mcontext.rcx;
+	frame->dx = signalFrameData->context.uc_mcontext.rdx;
+	frame->di = signalFrameData->context.uc_mcontext.rdi;
+	frame->si = signalFrameData->context.uc_mcontext.rsi;
+	frame->bp = signalFrameData->context.uc_mcontext.rbp;
+	frame->r8 = signalFrameData->context.uc_mcontext.r8;
+	frame->r9 = signalFrameData->context.uc_mcontext.r9;
+	frame->r10 = signalFrameData->context.uc_mcontext.r10;
+	frame->r11 = signalFrameData->context.uc_mcontext.r11;
+	frame->r12 = signalFrameData->context.uc_mcontext.r12;
+	frame->r13 = signalFrameData->context.uc_mcontext.r13;
+	frame->r14 = signalFrameData->context.uc_mcontext.r14;
+	frame->r15 = signalFrameData->context.uc_mcontext.r15;
+	frame->user_sp = signalFrameData->context.uc_mcontext.rsp;
+	frame->ip = signalFrameData->context.uc_mcontext.rip;
+	frame->flags = (frame->flags & ~(uint64)X86_EFLAGS_USER_FLAGS)
+		| (signalFrameData->context.uc_mcontext.rflags & X86_EFLAGS_USER_FLAGS);
+
+	// Same as above, alignment may not be correct. Copy to thread and restore
+	// from there.
+	Thread* thread = thread_get_current_thread();
+	memcpy(thread->arch_info.fpu_state,
+		(void*)&signalFrameData->context.uc_mcontext.fpu,
+		sizeof(thread->arch_info.fpu_state));
+	x86_fxrstor(thread->arch_info.fpu_state);
+
+	// The syscall return code overwrites frame->ax with the return value of
+	// the syscall, need to return it here to ensure the correct value is
+	// restored.
+	return frame->ax;
 }

@@ -107,6 +107,22 @@ x86_set_tls_context(Thread *thread)
 }
 
 
+static uint8*
+get_signal_stack(Thread* thread, struct iframe* frame, struct sigaction* action)
+{
+	// use the alternate signal stack if we should and can
+	if (thread->signal_stack_enabled
+		&& (action->sa_flags & SA_ONSTACK) != 0
+		&& (frame->user_sp < thread->signal_stack_base
+			|| frame->user_sp >= thread->signal_stack_base
+				+ thread->signal_stack_size)) {
+		return (uint8*)(thread->signal_stack_base + thread->signal_stack_size);
+	}
+
+	return (uint8*)frame->user_sp;
+}
+
+
 //	#pragma mark -
 
 
@@ -290,7 +306,7 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	signalFrameData->context.uc_mcontext.ebx = frame->bx;
 	x86_fnsave((void *)(&signalFrameData->context.uc_mcontext.xregs));
 
-	// fill in signalFrameData->context.uc_stack
+	// Fill in signalFrameData->context.uc_stack
 	signal_get_user_stack(frame->user_sp, &signalFrameData->context.uc_stack);
 
 	// store orig_eax/orig_edx in syscall_restart_return_value
@@ -299,7 +315,7 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 
 	// get the stack to use -- that's either the current one or a special signal
 	// stack
-	uint8* userStack = x86_get_signal_stack(thread, frame, action);
+	uint8* userStack = get_signal_stack(thread, frame, action);
 
 	// copy the signal frame data onto the stack
 	userStack -= sizeof(*signalFrameData);

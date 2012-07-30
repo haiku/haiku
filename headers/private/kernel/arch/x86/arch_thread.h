@@ -25,8 +25,6 @@ struct iframe* x86_get_thread_user_iframe(Thread* thread);
 
 phys_addr_t x86_next_page_directory(Thread* from, Thread* to);
 void x86_initial_return_to_userland(Thread* thread, struct iframe* iframe);
-uint8* x86_get_signal_stack(Thread* thread, struct iframe* frame,
-	struct sigaction* action);
 
 void x86_restart_syscall(struct iframe* frame);
 void x86_set_tls_context(Thread* thread);

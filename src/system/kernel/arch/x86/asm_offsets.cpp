@@ -91,6 +91,7 @@ dummy()
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, context);
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, user_data);
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, handler);
+	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, siginfo_handler);
 
 	// struct ucontext_t
 	DEFINE_OFFSET_MACRO(UCONTEXT_T, __ucontext_t, uc_mcontext);
