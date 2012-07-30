@@ -19,7 +19,14 @@ if $(HAIKU_ATA_STACK) = 1 {
 	IDE_ONLY = "" ;
 }
 
-SYSTEM_BIN = bash ;
+SYSTEM_BIN = "[" base64 basename bash cat chgrp chmod chown chroot cksum comm
+	cp split cut date dd dircolors dirname du echo env expand expr factor false
+	fmt fold getlimits groups head hostname id <bin>install join kill link
+	link ln logname ls md5sum mkdir mkfifo mktemp mv nl nohup nproc od paste
+	pathchk pr printenv printf ptx pwd readlink rm rmdir safemode seq sha1sum
+	shred shuf sleep sort split stat stty su sum sync tac tail tee test timeout
+	touch tr true truncate tsort tty unexpand uname uniq unlink wc whoami yes
+;
 
 SYSTEM_APPS = ;
 
