@@ -731,7 +731,7 @@ BTextView::WindowActivated(bool state)
 	}
 
 	BPoint where;
-	ulong buttons;
+	uint32 buttons;
 	GetMouse(&where, &buttons, false);
 
 	if (Bounds().Contains(where))
@@ -3241,7 +3241,7 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	fSelectable = true;
 	fEditable = true;
 	fWrap = true;
-	fMaxBytes = LONG_MAX;
+	fMaxBytes = INT32_MAX;
 	fDisallowedChars = NULL;
 	fAlignment = B_ALIGN_LEFT;
 	fAutoindent = false;
@@ -5036,7 +5036,7 @@ BTextView::_Activate()
 		_ShowCaret();
 
 	BPoint where;
-	ulong buttons;
+	uint32 buttons;
 	GetMouse(&where, &buttons, false);
 	if (Bounds().Contains(where))
 		_TrackMouse(where, NULL);
@@ -5600,7 +5600,7 @@ BTextView::_ShowContextMenu(BPoint where)
 
 
 void
-BTextView::_FilterDisallowedChars(char* text, int32& length,
+BTextView::_FilterDisallowedChars(char* text, ssize_t& length,
 	text_run_array* runArray)
 {
 	if (!fDisallowedChars)
@@ -5609,9 +5609,9 @@ BTextView::_FilterDisallowedChars(char* text, int32& length,
 	if (fDisallowedChars->IsEmpty() || !text)
 		return;
 
-	int32 stringIndex = 0;
+	ssize_t stringIndex = 0;
 	if (runArray) {
-		int32 remNext = 0;
+		ssize_t remNext = 0;
 
 		for (int i = 0; i < runArray->count; i++) {
 			runArray->runs[i].offset -= remNext;
@@ -5669,7 +5669,7 @@ void
 BTextView::TextTrackState::SimulateMouseMovement(BTextView *textView)
 {
 	BPoint where;
-	ulong buttons;
+	uint32 buttons;
 	// When the mouse cursor is still and outside the textview,
 	// no B_MOUSE_MOVED message are sent, obviously. But scrolling
 	// has to work neverthless, so we "fake" a MouseMoved() call here.

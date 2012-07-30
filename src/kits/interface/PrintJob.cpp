@@ -575,7 +575,7 @@ BPrintJob::_RecurseView(BView* view, BPoint origin, BPicture* picture,
 void
 BPrintJob::_GetMangledName(char* buffer, size_t bufferSize) const
 {
-	snprintf(buffer, bufferSize, "%s@%lld", fPrintJobName,
+	snprintf(buffer, bufferSize, "%s@%" B_PRId64, fPrintJobName,
 		system_time() / 1000);
 }
 

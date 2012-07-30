@@ -188,7 +188,7 @@ TextGapBuffer::GetString(int32 fromOffset, int32* _numBytes)
 
 
 bool
-TextGapBuffer::FindChar(char inChar, long fromIndex, long* ioDelta)
+TextGapBuffer::FindChar(char inChar, int32 fromIndex, int32* ioDelta)
 {
 	long numChars = *ioDelta;
 	for (long i = 0; i < numChars; i++) {
@@ -333,7 +333,7 @@ TextGapBuffer::_MoveGapTo(int32 toIndex)
 
 
 void
-TextGapBuffer::_EnlargeGapTo(long inCount)
+TextGapBuffer::_EnlargeGapTo(int32 inCount)
 {
 	if (inCount == fGapCount)
 		return;
@@ -348,7 +348,7 @@ TextGapBuffer::_EnlargeGapTo(long inCount)
 
 
 void
-TextGapBuffer::_ShrinkGapTo(long inCount)
+TextGapBuffer::_ShrinkGapTo(int32 inCount)
 {
 	if (inCount == fGapCount)
 		return;

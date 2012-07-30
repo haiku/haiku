@@ -34,8 +34,8 @@ Range::GetErr() const {
 	else {
 		char start_str[32];
 		char end_str[32];
-		sprintf(start_str, "%ld", fStart);
-		sprintf(end_str, "%ld", fEnd);
+		sprintf(start_str, "%" B_PRId32, fStart);
+		sprintf(end_str, "%" B_PRId32, fEnd);
 		return new Err(std::string("Sniffer Parser Error -- Invalid range: [") + start_str + ":" + end_str + "]", -1);
 	}
 }

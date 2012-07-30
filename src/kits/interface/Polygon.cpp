@@ -157,15 +157,16 @@ BPolygon::_AddPoints(const BPoint* points, int32 count, bool computeBounds)
 	if (points == NULL || count <= 0)
 		return false;
 	if (count > MAX_POINT_COUNT || (fCount + count) > MAX_POINT_COUNT) {
-		fprintf(stderr, "BPolygon::_AddPoints(%ld) - too many points\n",
-			count);
+		fprintf(stderr, "BPolygon::_AddPoints(%" B_PRId32 ") - too many points"
+			"\n", count);
 		return false;
 	}
 
 	BPoint* newPoints = (BPoint*)realloc(fPoints, (fCount + count)
 		* sizeof(BPoint));
 	if (newPoints == NULL) {
-		fprintf(stderr, "BPolygon::_AddPoints(%ld) out of memory\n", count);
+		fprintf(stderr, "BPolygon::_AddPoints(%" B_PRId32 ") out of memory\n",
+			count);
 		return false;
 	}
 

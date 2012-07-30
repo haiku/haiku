@@ -515,7 +515,7 @@ BWindow::Quit()
 			name = "no-name";
 
 		printf("ERROR - you must Lock a looper before calling Quit(), "
-			   "team=%ld, looper=%s\n", Team(), name);
+			   "team=%" B_PRId32 ", looper=%s\n", Team(), name);
 	}
 
 	// Try to lock
@@ -1032,7 +1032,8 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 			be_roster->GetAppList(info.signature, &list);
 
 			for (int32 i = 0; i < list.CountItems(); i++) {
-				do_minimize_team(BRect(), (team_id)list.ItemAt(i), false);
+				do_minimize_team(BRect(), (team_id)(addr_t)list.ItemAt(i),
+					false);
 			}
 			break;
 		}
@@ -1433,8 +1434,8 @@ FrameMoved(origin);
 					if (BView* view = _FindView(info->token))
 						view->_Draw(info->updateRect);
 					else {
-						printf("_UPDATE_ - didn't find view by token: %ld\n",
-							info->token);
+						printf("_UPDATE_ - didn't find view by token: %"
+							B_PRId32 "\n", info->token);
 					}
 //drawTime += system_time() - drawStart;
 				}

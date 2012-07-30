@@ -272,7 +272,7 @@ ValueNode<float>::GetString(BString &predicate)
 	} value;
 	value.asFloat = fValue;
 //	int32 value = *reinterpret_cast<int32*>(&fValue);
-	sprintf(buffer, "0x%08lx", value.asInteger);
+	sprintf(buffer, "0x%08" B_PRIx32, value.asInteger);
 	predicate.SetTo(buffer);
 	return B_OK;
 }
@@ -289,7 +289,7 @@ ValueNode<double>::GetString(BString &predicate)
 	} value;
 //	int64 value = *reinterpret_cast<int64*>(&fValue);
 	value.asFloat = fValue;
-	sprintf(buffer, "0x%016Lx", value.asInteger);
+	sprintf(buffer, "0x%016" B_PRIx64, value.asInteger);
 	predicate.SetTo(buffer);
 	return B_OK;
 }

@@ -657,7 +657,7 @@ BRoster::GetAppList(BList* teamIDList) const
 		if (reply.what == B_REG_SUCCESS) {
 			team_id team;
 			for (int32 i = 0; reply.FindInt32("teams", i, &team) == B_OK; i++)
-				teamIDList->AddItem((void*)team);
+				teamIDList->AddItem((void*)(addr_t)team);
 		} else {
 			if (reply.FindInt32("error", &error) != B_OK)
 				error = B_ERROR;
@@ -700,7 +700,7 @@ BRoster::GetAppList(const char* sig, BList* teamIDList) const
 		if (reply.what == B_REG_SUCCESS) {
 			team_id team;
 			for (int32 i = 0; reply.FindInt32("teams", i, &team) == B_OK; i++)
-				teamIDList->AddItem((void*)team);
+				teamIDList->AddItem((void*)(addr_t)team);
 		} else if (reply.FindInt32("error", &error) != B_OK)
 			error = B_ERROR;
 	}

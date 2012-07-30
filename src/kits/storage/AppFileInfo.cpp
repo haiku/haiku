@@ -1430,7 +1430,7 @@ BAppFileInfo::_ReadData(const char* name, int32 id, type_code type,
 				error = B_NO_MEMORY;
 			bufferSize = info.size;
 		}
-		if (error == B_OK && bufferSize < info.size)
+		if (error == B_OK && (off_t)bufferSize < info.size)
 			error = B_BAD_VALUE;
 
 		// read the data

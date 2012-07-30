@@ -684,14 +684,14 @@ BEntry::_Dump(const char* name)
 		printf("------------------------------------------------------------\n");
 	}
 
-	printf("fCStatus == %ld\n", fCStatus);
+	printf("fCStatus == %" B_PRId32 "\n", fCStatus);
 
 	struct stat st;
 	if (fDirFd != -1
 		&& _kern_read_stat(fDirFd, NULL, false, &st,
 				sizeof(struct stat)) == B_OK) {
-		printf("dir.device == %ld\n", st.st_dev);
-		printf("dir.inode  == %lld\n", st.st_ino);
+		printf("dir.device == %" B_PRIdDEV "\n", st.st_dev);
+		printf("dir.inode  == %" B_PRIdINO "\n", st.st_ino);
 	} else {
 		printf("dir == NullFd\n");
 	}

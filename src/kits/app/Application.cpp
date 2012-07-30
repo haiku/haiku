@@ -522,7 +522,7 @@ BApplication::Quit()
 		if (!name)
 			name = "no-name";
 		printf("ERROR - you must Lock the application object before calling "
-			   "Quit(), team=%ld, looper=%s\n", Team(), name);
+			   "Quit(), team=%" B_PRId32 ", looper=%s\n", Team(), name);
 		unlock = true;
 		if (!Lock())
 			return;

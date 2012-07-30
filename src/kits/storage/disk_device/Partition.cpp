@@ -354,10 +354,11 @@ BPartition::GetPath(BPath* path) const
 		if (!leaf || strcmp(leaf, "raw") != B_OK)
 			return B_ERROR;
 
-		snprintf(indexBuffer, sizeof(indexBuffer), "%ld", Index());
+		snprintf(indexBuffer, sizeof(indexBuffer), "%" B_PRId32, Index());
 	} else {
 		// Our parent is a normal partition, no device: Append our index.
-		snprintf(indexBuffer, sizeof(indexBuffer), "%s_%ld", path->Leaf(), Index());
+		snprintf(indexBuffer, sizeof(indexBuffer), "%s_%" B_PRId32,
+			path->Leaf(), Index());
 	}
 
 	error = path->GetParent(path);

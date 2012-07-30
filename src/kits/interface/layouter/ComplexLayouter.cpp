@@ -85,9 +85,12 @@ public:
 
 	void Dump()
 	{
-		printf("ComplexLayouter::MyLayoutInfo(): %ld elements:\n", fCount);
-		for (int32 i = 0; i < fCount + 1; i++)
-			printf("  %2ld: location: %4ld\n", i, fLocations[i]);
+		printf("ComplexLayouter::MyLayoutInfo(): %" B_PRId32 " elements:\n",
+			fCount);
+		for (int32 i = 0; i < fCount + 1; i++) {
+			printf("  %2" B_PRId32 ": location: %4" B_PRId32 "\n", i,
+				fLocations[i]);
+		}
 	}
 
 public:

@@ -426,7 +426,7 @@ BPropertyInfo::PrintToStream() const
 		// specifiers
 		for (int32 i = 0; i < 10 && fPropInfo[pi].specifiers[i] != 0; i++) {
 			uint32 spec = fPropInfo[pi].specifiers[i];
-			printf("%lu", spec);
+			printf("%" B_PRIu32, spec);
 		}
 		printf("\n");
 	}

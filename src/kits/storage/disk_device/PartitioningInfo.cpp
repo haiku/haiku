@@ -220,10 +220,10 @@ BPartitioningInfo::PrintToStream() const
 		printf("BPartitioningInfo is not initialized\n");
 		return;
 	}
-	printf("BPartitioningInfo has %ld spaces:\n", fCount);
+	printf("BPartitioningInfo has %" B_PRId32 " spaces:\n", fCount);
 	for (int32 i = 0; i < fCount; i++) {
-		printf("  space at %ld: offset = %lld, size = %lld\n",
-			i, fSpaces[i].offset, fSpaces[i].size);
+		printf("  space at %" B_PRId32 ": offset = %" B_PRId64 ", size = %"
+			B_PRId64 "\n", i, fSpaces[i].offset, fSpaces[i].size);
 	}
 }
 

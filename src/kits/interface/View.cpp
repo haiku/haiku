@@ -5882,8 +5882,8 @@ BView::_PrintToStream()
 		"\tNextSibling: %s\n"
 		"\tPrevSibling: %s\n"
 		"\tOwner(Window): %s\n"
-		"\tToken: %ld\n"
-		"\tFlags: %ld\n"
+		"\tToken: %" B_PRId32 "\n"
+		"\tFlags: %" B_PRId32 "\n"
 		"\tView origin: (%f,%f)\n"
 		"\tView Bounds rectangle: (%f,%f,%f,%f)\n"
 		"\tShow level: %d\n"
@@ -5893,8 +5893,8 @@ BView::_PrintToStream()
 		"\tHorizontal Scrollbar %s\n"
 		"\tIs Printing?: %s\n"
 		"\tShelf?: %s\n"
-		"\tEventMask: %ld\n"
-		"\tEventOptions: %ld\n",
+		"\tEventMask: %" B_PRId32 "\n"
+		"\tEventOptions: %" B_PRId32 "\n",
 	Name(),
 	fParent ? fParent->Name() : "NULL",
 	fFirstChild ? fFirstChild->Name() : "NULL",
@@ -5922,7 +5922,7 @@ BView::_PrintToStream()
 		"\t\tHighColor: [%d,%d,%d,%d]\n"
 		"\t\tLowColor: [%d,%d,%d,%d]\n"
 		"\t\tViewColor: [%d,%d,%d,%d]\n"
-		"\t\tPattern: %llx\n"
+		"\t\tPattern: %" B_PRIx64 "\n"
 		"\t\tDrawingMode: %d\n"
 		"\t\tLineJoinMode: %d\n"
 		"\t\tLineCapMode: %d\n"

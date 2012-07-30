@@ -39,7 +39,7 @@ public:
 			void				BumpOrigin(float delta, int32 index);
 			void				BumpOffset(int32 delta, int32 index);
 
-			long				NumLines() const;
+			int32				NumLines() const;
 			float				MaxWidth() const;
 			STELine*			operator[](int32 index) const;
 };
