@@ -96,7 +96,6 @@ public:
 	virtual	bool				QuitRequested();
 	virtual	void				MenusBeginning();
 
-	virtual	void				Zoom(BPoint origin, float width, float height);
 	virtual void				ScreenChanged(BRect screenSize,
 									color_space format);
 	virtual void				WorkspacesChanged(uint32 oldWorkspaces,

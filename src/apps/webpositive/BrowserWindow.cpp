@@ -988,13 +988,6 @@ BrowserWindow::MenusBeginning()
 
 
 void
-BrowserWindow::Zoom(BPoint origin, float width, float height)
-{
-	ToggleFullscreen();
-}
-
-
-void
 BrowserWindow::ScreenChanged(BRect screenSize, color_space format)
 {
 	if (fIsFullscreen)
