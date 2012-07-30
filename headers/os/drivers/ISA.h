@@ -57,7 +57,7 @@ typedef struct isa_module_info {
 							isa_dma_entry	*table,			/* -> caller-supplied scatter/gather table */
 							long			num_entries		/* max # entries in table */
 						);
-	long			(*start_isa_dma) (
+	status_t		(*start_isa_dma) (
 							long	channel,				/* dma channel to use */
 							void	*buf,					/* buffer to transfer */
 							long	transfer_count,			/* # transfers */
@@ -70,8 +70,8 @@ typedef struct isa_module_info {
 							uchar				mode,		/* mode flags */
 							uchar				emode		/* extended mode flags */
 						);
-	long			(*lock_isa_dma_channel) (long channel);
-	long			(*unlock_isa_dma_channel) (long channel);
+	status_t		(*lock_isa_dma_channel) (long channel);
+	status_t		(*unlock_isa_dma_channel) (long channel);
 } isa_module_info;
 	
 #define	B_ISA_MODULE_NAME		"bus_managers/isa/v1"

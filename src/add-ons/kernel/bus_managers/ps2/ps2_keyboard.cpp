@@ -88,7 +88,8 @@ set_typematic(int32 rate, bigtime_t delay)
 {
 	uint8 value;
 
-	TRACE("ps2: set_typematic rate %ld, delay %Ld\n", rate, delay);
+	TRACE("ps2: set_typematic rate %" B_PRId32 ", delay %" B_PRId64 "\n",
+		rate, delay);
 
 	// input server and keyboard preferences *seem* to use a range of 20-300
 	if (rate < 20)
@@ -271,8 +272,8 @@ probe_keyboard(void)
 	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_RESET, NULL,
 		0, &data, 1);
 	if (status != B_OK || data != 0xaa) {
-		INFO("ps2: keyboard reset failed, status 0x%08lx, data 0x%02x\n",
-			status, data);
+		INFO("ps2: keyboard reset failed, status 0x%08" B_PRIx32 ", data 0x%02x"
+			"\n", status, data);
 		return B_ERROR;
 	}
 
@@ -297,14 +298,15 @@ probe_keyboard(void)
 	status = ps2_command(PS2_CTRL_READ_CMD, NULL, 0, &cmdbyte, 1);
 
 	if (status != B_OK) {
-		INFO("ps2: cannot read CMD byte on kbd probe:0x%#08lx\n", status);
+		INFO("ps2: cannot read CMD byte on kbd probe:%#08" B_PRIx32 "\n",
+			status);
 	} else
 	if ((cmdbyte & PS2_BITS_KEYBOARD_DISABLED) == PS2_BITS_KEYBOARD_DISABLED) {
 		cmdbyte &= ~PS2_BITS_KEYBOARD_DISABLED;
 		status = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
 		if (status != B_OK) {
-			INFO("ps2: cannot write 0x%02x to CMD byte on kbd probe:0x%08lx\n",
-					cmdbyte, status);
+			INFO("ps2: cannot write 0x%02x to CMD byte on kbd probe:%#08"
+				B_PRIx32 "\n", cmdbyte, status);
 		}
 	}
 	
@@ -312,7 +314,7 @@ probe_keyboard(void)
 			PS2_CMD_GET_DEVICE_ID, NULL, 0, sKeyboardIds, sizeof(sKeyboardIds));
 	
 	if (status != B_OK) {
-		INFO("ps2: cannot read keyboard device id:0x%#08lx\n", status);
+		INFO("ps2: cannot read keyboard device id:%#08" B_PRIx32 "\n", status);
 	}
 
 	return B_OK;
@@ -529,7 +531,8 @@ keyboard_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		case KB_SET_CONTROL_ALT_DEL_TIMEOUT:
 		case KB_CANCEL_CONTROL_ALT_DEL:
 		case KB_DELAY_CONTROL_ALT_DEL:
-			INFO("ps2: ioctl 0x%lx not implemented yet, returning B_OK\n", op);
+			INFO("ps2: ioctl 0x%" B_PRIx32 " not implemented yet, returning "
+				"B_OK\n", op);
 			return B_OK;
 
 		case KB_SET_DEBUG_READER:
@@ -541,7 +544,7 @@ keyboard_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 			return B_OK;
 
 		default:
-			INFO("ps2: invalid ioctl 0x%lx\n", op);
+			INFO("ps2: invalid ioctl 0x%" B_PRIx32 "\n", op);
 			return B_DEV_INVALID_IOCTL;
 	}
 }

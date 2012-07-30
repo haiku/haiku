@@ -40,7 +40,7 @@ PRIVATE_SYSTEM_LIBS = ;
 
 SYSTEM_SERVERS = ;
 
-SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci scsi config_manager ;
+SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci ps2 isa scsi config_manager ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 
 # modules
@@ -69,6 +69,7 @@ AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf null
 									  random <driver>tty zero ;
+AddDriversToHaikuImage input		: ps2_hid ;
 
 # kernel
 AddFilesToHaikuImage system : kernel_$(TARGET_ARCH) ;

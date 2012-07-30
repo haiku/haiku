@@ -7,4 +7,5 @@ KernelAddon isa :
 	: isa_arch_bus_manager.a
 	;
 
-SubInclude HAIKU_TOP src add-ons kernel bus_managers isa arch $(TARGET_ARCH) ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers isa arch
+	$(TARGET_KERNEL_ARCH) ;
