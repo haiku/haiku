@@ -11,21 +11,21 @@
 /* user space half of the syscall mechanism, to be copied into the commpage */
 
 // int 99 fallback
-FUNCTION(_user_syscall_int):
+FUNCTION(x86_user_syscall_int):
 	int	$99
 	ret
-FUNCTION_END(_user_syscall_int)
-SYMBOL(_user_syscall_int_end):
+FUNCTION_END(x86_user_syscall_int)
+SYMBOL(x86_user_syscall_int_end):
 
 
 // Intel sysenter/sysexit
-FUNCTION(_user_syscall_sysenter):
+FUNCTION(x86_user_syscall_sysenter):
 	// sysexit forces us to trash edx (-> eip) and ecx (-> esp), but they are
 	// scratch registers anyway. We use ecx right away to store esp.
 	movl	%esp, %ecx
 	sysenter
 	ret
-FUNCTION_END(_user_syscall_sysenter)
-SYMBOL(_user_syscall_sysenter_end):
+FUNCTION_END(x86_user_syscall_sysenter)
+SYMBOL(x86_user_syscall_sysenter_end):
 
 

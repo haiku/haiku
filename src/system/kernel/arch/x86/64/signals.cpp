@@ -16,15 +16,15 @@
 #include <smp.h>
 
 
-extern "C" void _user_signal_handler(void);
-extern int _user_signal_handler_end;
+extern "C" void x86_64_user_signal_handler(void);
+extern int x86_64_user_signal_handler_end;
 
 
 void
 x86_initialize_commpage_signal_handler()
 {
-	void* handlerCode = (void*)&_user_signal_handler;
-	void* handlerCodeEnd = &_user_signal_handler_end;
+	void* handlerCode = (void*)&x86_64_user_signal_handler;
+	void* handlerCodeEnd = &x86_64_user_signal_handler_end;
 
 	// Copy the signal handler code to the commpage.
 	size_t len = (size_t)((addr_t)handlerCodeEnd - (addr_t)handlerCode);

@@ -14,7 +14,7 @@
 
 
 // Userspace signal handler wrapper, copied to the commpage.
-FUNCTION(_user_signal_handler):
+FUNCTION(x86_64_user_signal_handler):
 	push	%rbp
 	movq	%rsp, %rbp
 
@@ -52,5 +52,5 @@ FUNCTION(_user_signal_handler):
 	leaq	SIGNAL_FRAME_DATA_context(%r12), %rdx
 	movq	SIGNAL_FRAME_DATA_user_data(%r12), %rcx
 	jmp		.Lcall_handler
-FUNCTION_END(_user_signal_handler)
-SYMBOL(_user_signal_handler_end):
+FUNCTION_END(x86_64_user_signal_handler)
+SYMBOL(x86_64_user_signal_handler_end):

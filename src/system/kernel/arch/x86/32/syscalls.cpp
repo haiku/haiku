@@ -18,10 +18,10 @@
 
 
 // user syscall assembly stubs
-extern "C" void _user_syscall_int(void);
-extern unsigned int _user_syscall_int_end;
-extern "C" void _user_syscall_sysenter(void);
-extern unsigned int _user_syscall_sysenter_end;
+extern "C" void x86_user_syscall_int(void);
+extern unsigned int x86_user_syscall_int_end;
+extern "C" void x86_user_syscall_sysenter(void);
+extern unsigned int x86_user_syscall_sysenter_end;
 
 // sysenter handler
 extern "C" void x86_sysenter();
@@ -78,8 +78,8 @@ init_amd_syscall_registers(void* dummy, int cpuNum)
 void
 x86_initialize_syscall(void)
 {
-	void* syscallCode = (void *)&_user_syscall_int;
-	void* syscallCodeEnd = &_user_syscall_int_end;
+	void* syscallCode = (void *)&x86_user_syscall_int;
+	void* syscallCodeEnd = &x86_user_syscall_int_end;
 
 	// check syscall
 	if (all_cpus_have_feature(FEATURE_COMMON, IA32_FEATURE_SEP)
@@ -89,8 +89,8 @@ x86_initialize_syscall(void)
 		dprintf("initialize_commpage_syscall(): sysenter/sysexit supported\n");
 
 		// the code to be used in userland
-		syscallCode = (void *)&_user_syscall_sysenter;
-		syscallCodeEnd = &_user_syscall_sysenter_end;
+		syscallCode = (void *)&x86_user_syscall_sysenter;
+		syscallCodeEnd = &x86_user_syscall_sysenter_end;
 
 		// tell all CPUs to init their sysenter/sysexit related registers
 		call_all_cpus_sync(&init_intel_syscall_registers, NULL);
