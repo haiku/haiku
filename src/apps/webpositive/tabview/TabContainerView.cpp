@@ -138,7 +138,7 @@ TabContainerView::MouseDown(BPoint where)
 	else {
 		if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
 			// Middle click outside tabs should always open a new tab.
-			fClickCount = 2;
+			fController->DoubleClickOutsideTabs();
 		} else if (clicks > 1)
 			fClickCount++;
 		else
