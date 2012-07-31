@@ -128,6 +128,7 @@ StdBinCommands
 # standard commands that need libbe.so, libsupc++.so, and libshared.a
 StdBinCommands
 	ramdisk.cpp
+	resizefs.cpp
 	: shared be [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libbnetapi.so, libsupc++.so

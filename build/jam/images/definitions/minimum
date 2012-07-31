@@ -21,7 +21,8 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	open
 	package package_repo passwd pc ping ping6 pkgman prio profile ps
 	query quit
-	ramdisk rc reindex release renice resattr rmattr rmindex roster route
+	ramdisk rc reindex release renice resattr resizefs rmattr rmindex roster
+	route
 	safemode screen_blanker screeninfo screenmode setarch setmime settype
 	setversion setvolume shutdown
 	strace su sysinfo system_time
