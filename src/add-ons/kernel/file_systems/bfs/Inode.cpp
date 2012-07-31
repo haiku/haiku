@@ -1517,7 +1517,8 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 				<< fVolume->BlockShift();
 			if (runBlockEnd > pos) {
 				run = data->direct[current];
-				offset = runBlockEnd - (run.Length() << fVolume->BlockShift());
+				offset = runBlockEnd
+					- ((uint32)run.Length() << fVolume->BlockShift());
 				return fVolume->ValidateBlockRun(run);
 			}
 		}
@@ -1878,7 +1879,7 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 
 				data->max_indirect_range = HOST_ENDIAN_TO_BFS_INT64(
 					data->MaxIndirectRange()
-					+ (run.Length() << fVolume->BlockShift()));
+					+ ((uint32)run.Length() << fVolume->BlockShift()));
 				data->size = HOST_ENDIAN_TO_BFS_INT64(blocksNeeded > 0
 					? data->MaxIndirectRange() : size);
 				continue;

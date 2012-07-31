@@ -527,7 +527,8 @@ bfs_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset, size_t size,
 			return status;
 
 		vecs[index].offset = volume->ToOffset(run) + offset - fileOffset;
-		vecs[index].length = (run.Length() << blockShift) - offset + fileOffset;
+		vecs[index].length = ((uint32)run.Length() << blockShift)
+			- offset + fileOffset;
 
 		// are we already done?
 		if ((uint64)size <= (uint64)vecs[index].length
