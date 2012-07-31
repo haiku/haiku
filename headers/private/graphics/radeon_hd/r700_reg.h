@@ -24,181 +24,11 @@
  *          Alex Deucher
  *          Jerome Glisse
  */
-#ifndef RV770_H
-#define RV770_H
+#ifndef R700_H
+#define R700_H
 
 
-#define R7XX_MAX_SH_GPRS				256
-#define R7XX_MAX_TEMP_GPRS				16
-#define R7XX_MAX_SH_THREADS				256
-#define R7XX_MAX_SH_STACK_ENTRIES		4096
-#define R7XX_MAX_BACKENDS				8
-#define R7XX_MAX_BACKENDS_MASK			0xff
-#define R7XX_MAX_SIMDS					16
-#define R7XX_MAX_SIMDS_MASK				0xffff
-#define R7XX_MAX_PIPES					8
-#define R7XX_MAX_PIPES_MASK				0xff
-
-#if 0
-/* Registers */
-#define	CB_COLOR0_BASE					0x28040
-#define	CB_COLOR1_BASE					0x28044
-#define	CB_COLOR2_BASE					0x28048
-#define	CB_COLOR3_BASE					0x2804C
-#define	CB_COLOR4_BASE					0x28050
-#define	CB_COLOR5_BASE					0x28054
-#define	CB_COLOR6_BASE					0x28058
-#define	CB_COLOR7_BASE					0x2805C
-#define	CB_COLOR7_FRAG					0x280FC
-
-#define	CC_GC_SHADER_PIPE_CONFIG			0x8950
-#define	CC_RB_BACKEND_DISABLE				0x98F4
-#define		BACKEND_DISABLE(x)				((x) << 16)
-#define	CC_SYS_RB_BACKEND_DISABLE			0x3F88
-
-#define	CGTS_SYS_TCC_DISABLE				0x3F90
-#define	CGTS_TCC_DISABLE				0x9148
-#define	CGTS_USER_SYS_TCC_DISABLE			0x3F94
-#define	CGTS_USER_TCC_DISABLE				0x914C
-
-#define	CP_ME_CNTL					0x86D8
-#define		CP_ME_HALT					(1<<28)
-#define		CP_PFP_HALT					(1<<26)
-#define	CP_ME_RAM_DATA					0xC160
-#define	CP_ME_RAM_RADDR					0xC158
-#define	CP_ME_RAM_WADDR					0xC15C
-#define CP_MEQ_THRESHOLDS				0x8764
-#define		STQ_SPLIT(x)					((x) << 0)
-#define	CP_PERFMON_CNTL					0x87FC
-#define	CP_PFP_UCODE_ADDR				0xC150
-#define	CP_PFP_UCODE_DATA				0xC154
-#define	CP_QUEUE_THRESHOLDS				0x8760
-#define		ROQ_IB1_START(x)				((x) << 0)
-#define		ROQ_IB2_START(x)				((x) << 8)
-#define CP_DEBUG					0xC1FC
-#define CP_RB_BASE					0xC100
-#define	CP_RB_CNTL					0xC104
-#define		RB_BUFSZ(x)					((x) << 0)
-#define		RB_BLKSZ(x)					((x) << 8)
-#define		RB_NO_UPDATE					(1 << 27)
-#define		RB_RPTR_WR_ENA					(1 << 31)
-#define		BUF_SWAP_32BIT					(2 << 16)
-#define	CP_RB_RPTR					0x8700
-#define	CP_RB_RPTR_ADDR					0xC10C
-#define	CP_RB_RPTR_ADDR_HI				0xC110
-#define	CP_RB_RPTR_WR					0xC108
-#define	CP_RB_WPTR					0xC114
-#define	CP_RB_WPTR_ADDR					0xC118
-#define	CP_RB_WPTR_ADDR_HI				0xC11C
-#define	CP_RB_WPTR_DELAY				0x8704
-#define	CP_SEM_WAIT_TIMER				0x85BC
-
-#define	DB_DEBUG3					0x98B0
-#define		DB_CLK_OFF_DELAY(x)				((x) << 11)
-#define DB_DEBUG4					0x9B8C
-#define		DISABLE_TILE_COVERED_FOR_PS_ITER		(1 << 6)
-
-#define	DCP_TILING_CONFIG				0x6CA0
-#define		PIPE_TILING(x)					((x) << 1)
-#define 	BANK_TILING(x)					((x) << 4)
-#define		GROUP_SIZE(x)					((x) << 6)
-#define		ROW_TILING(x)					((x) << 8)
-#define		BANK_SWAPS(x)					((x) << 11)
-#define		SAMPLE_SPLIT(x)					((x) << 14)
-#define		BACKEND_MAP(x)					((x) << 16)
-
-#define GB_TILING_CONFIG				0x98F0
-
-#define	GC_USER_SHADER_PIPE_CONFIG			0x8954
-#define		INACTIVE_QD_PIPES(x)				((x) << 8)
-#define		INACTIVE_QD_PIPES_MASK				0x0000FF00
-#define		INACTIVE_SIMDS(x)				((x) << 16)
-#define		INACTIVE_SIMDS_MASK				0x00FF0000
-
-#define	GRBM_CNTL					0x8000
-#define		GRBM_READ_TIMEOUT(x)				((x) << 0)
-#define	GRBM_SOFT_RESET					0x8020
-#define		SOFT_RESET_CP					(1<<0)
-#define	GRBM_STATUS					0x8010
-#define		CMDFIFO_AVAIL_MASK				0x0000000F
-#define		GUI_ACTIVE					(1<<31)
-#define	GRBM_STATUS2					0x8014
-#endif
-
-#define	R700_CG_MULT_THERMAL_STATUS			0x740
-#define		R700_ASIC_T(x)			        ((x) << 16)
-#define		R700_ASIC_T_MASK		        0x3FF0000
-#define		R700_ASIC_T_SHIFT		        16
-
-#define	HDP_HOST_PATH_CNTL					0x2C00
-#define	HDP_NONSURFACE_BASE					0x2C04
-#define	HDP_NONSURFACE_INFO					0x2C08
-#define	HDP_NONSURFACE_SIZE					0x2C0C
-#define HDP_REG_COHERENCY_FLUSH_CNTL		0x54A0
-#define	HDP_TILING_CONFIG					0x2F3C
-#define HDP_DEBUG1							0x2F34
-
-#define R700_MC_SHARED_CHMAP				0x2004
-#define		NOOFCHAN_SHIFT					12
-#define		NOOFCHAN_MASK					0x00003000
-#define R700_MC_SHARED_CHREMAP				0x2008
-
-#define	R700_MC_ARB_RAMCFG					0x2760
-#define		NOOFBANK_SHIFT					0
-#define		NOOFBANK_MASK					0x00000003
-#define		NOOFRANK_SHIFT					2
-#define		NOOFRANK_MASK					0x00000004
-#define		NOOFROWS_SHIFT					3
-#define		NOOFROWS_MASK					0x00000038
-#define		NOOFCOLS_SHIFT					6
-#define		NOOFCOLS_MASK					0x000000C0
-#define		CHANSIZE_SHIFT					8
-#define		CHANSIZE_MASK					0x00000100
-#define		BURSTLENGTH_SHIFT				9
-#define		BURSTLENGTH_MASK				0x00000200
-#define		CHANSIZE_OVERRIDE				(1 << 11)
-#define	R700_MC_VM_AGP_TOP					0x2028
-#define	R700_MC_VM_AGP_BOT					0x202C
-#define	R700_MC_VM_AGP_BASE					0x2030
-#define	R700_MC_VM_FB_LOCATION				0x2024
-#define	R700_MC_VM_MB_L1_TLB0_CNTL				0x2234
-#define	R700_MC_VM_MB_L1_TLB1_CNTL				0x2238
-#define	R700_MC_VM_MB_L1_TLB2_CNTL				0x223C
-#define	R700_MC_VM_MB_L1_TLB3_CNTL				0x2240
-#define		ENABLE_L1_TLB					(1 << 0)
-#define		ENABLE_L1_FRAGMENT_PROCESSING			(1 << 1)
-#define		SYSTEM_ACCESS_MODE_PA_ONLY			(0 << 3)
-#define		SYSTEM_ACCESS_MODE_USE_SYS_MAP			(1 << 3)
-#define		SYSTEM_ACCESS_MODE_IN_SYS			(2 << 3)
-#define		SYSTEM_ACCESS_MODE_NOT_IN_SYS			(3 << 3)
-#define		SYSTEM_APERTURE_UNMAPPED_ACCESS_PASS_THRU	(0 << 5)
-#define		EFFECTIVE_L1_TLB_SIZE(x)			((x)<<15)
-#define		EFFECTIVE_L1_QUEUE_SIZE(x)			((x)<<18)
-#define	R700_MC_VM_MD_L1_TLB0_CNTL				0x2654
-#define	R700_MC_VM_MD_L1_TLB1_CNTL				0x2658
-#define	R700_MC_VM_MD_L1_TLB2_CNTL				0x265C
-#define	R700_MC_VM_SYSTEM_APERTURE_DEFAULT_ADDR		0x203C
-#define	R700_MC_VM_SYSTEM_APERTURE_HIGH_ADDR			0x2038
-#define	R700_MC_VM_SYSTEM_APERTURE_LOW_ADDR			0x2034
-
-#define	PA_CL_ENHANCE					0x8A14
-#define		CLIP_VTX_REORDER_ENA				(1 << 0)
-#define		NUM_CLIP_SEQ(x)					((x) << 1)
-#define PA_SC_AA_CONFIG					0x28C04
-#define PA_SC_CLIPRECT_RULE				0x2820C
-#define	PA_SC_EDGERULE					0x28230
-#define	PA_SC_FIFO_SIZE					0x8BCC
-#define		SC_PRIM_FIFO_SIZE(x)				((x) << 0)
-#define		SC_HIZ_TILE_FIFO_SIZE(x)			((x) << 12)
-#define	PA_SC_FORCE_EOV_MAX_CNTS			0x8B24
-#define		FORCE_EOV_MAX_CLK_CNT(x)			((x)<<0)
-#define		FORCE_EOV_MAX_REZ_CNT(x)			((x)<<16)
-#define PA_SC_LINE_STIPPLE				0x28A0C
-#define	PA_SC_LINE_STIPPLE_STATE			0x8B10
-#define PA_SC_MODE_CNTL					0x28A4C
-#define	PA_SC_MULTI_CHIP_CNTL				0x8B20
-#define		SC_EARLYZ_TILE_FIFO_SIZE(x)			((x) << 20)
-
+/* Scratch Registers */
 #define	R700_SCRATCH_REG0					0x8500
 #define	R700_SCRATCH_REG1					0x8504
 #define	R700_SCRATCH_REG2					0x8508
@@ -209,6 +39,179 @@
 #define	R700_SCRATCH_REG7					0x851C
 #define	R700_SCRATCH_UMSK					0x8540
 #define	R700_SCRATCH_ADDR					0x8544
+
+/* CRT controler register offset */
+#define R700_CRTC0_REGISTER_OFFSET			0x0
+#define R700_CRTC1_REGISTER_OFFSET			0x800
+
+#define R700_MAX_SH_GPRS				256
+#define R700_MAX_TEMP_GPRS				16
+#define R700_MAX_SH_THREADS				256
+#define R700_MAX_SH_STACK_ENTRIES		4096
+#define R700_MAX_BACKENDS				8
+#define R700_MAX_BACKENDS_MASK			0xff
+#define R700_MAX_SIMDS					16
+#define R700_MAX_SIMDS_MASK				0xffff
+#define R700_MAX_PIPES					8
+#define R700_MAX_PIPES_MASK				0xff
+
+/* Registers */
+#define R700_CB_COLOR0_BASE				0x28040
+#define R700_CB_COLOR1_BASE				0x28044
+#define R700_CB_COLOR2_BASE				0x28048
+#define R700_CB_COLOR3_BASE				0x2804C
+#define R700_CB_COLOR4_BASE				0x28050
+#define R700_CB_COLOR5_BASE				0x28054
+#define R700_CB_COLOR6_BASE				0x28058
+#define R700_CB_COLOR7_BASE				0x2805C
+#define R700_CB_COLOR7_FRAG				0x280FC
+
+#define	R700_CC_GC_SHADER_PIPE_CONFIG	0x8950
+#define	R700_CC_RB_BACKEND_DISABLE		0x98F4
+#define		R700_BACKEND_DISABLE(x)		((x) << 16)
+#define	R700_CC_SYS_RB_BACKEND_DISABLE	0x3F88
+
+#define	R700_CGTS_SYS_TCC_DISABLE		0x3F90
+#define	R700_CGTS_TCC_DISABLE			0x9148
+#define	R700_CGTS_USER_SYS_TCC_DISABLE	0x3F94
+#define	R700_CGTS_USER_TCC_DISABLE		0x914C
+
+#define	R700_CP_ME_CNTL					0x86D8
+#define		R700_CP_ME_HALT				(1<<28)
+#define		R700_CP_PFP_HALT			(1<<26)
+#define	R700_CP_ME_RAM_DATA				0xC160
+#define	R700_CP_ME_RAM_RADDR			0xC158
+#define	R700_CP_ME_RAM_WADDR			0xC15C
+#define R700_CP_MEQ_THRESHOLDS			0x8764
+#define		STQ_SPLIT(x)				((x) << 0)
+#define	R700_CP_PERFMON_CNTL			0x87FC
+#define	R700_CP_PFP_UCODE_ADDR			0xC150
+#define	R700_CP_PFP_UCODE_DATA			0xC154
+#define	R700_CP_QUEUE_THRESHOLDS		0x8760
+#define		R700_ROQ_IB1_START(x)		((x) << 0)
+#define		R700_ROQ_IB2_START(x)		((x) << 8)
+#define R700_CP_DEBUG					0xC1FC
+#define R700_CP_RB_BASE					0xC100
+#define	R700_CP_RB_CNTL					0xC104
+#define		R700_RB_BUFSZ(x)			((x) << 0)
+#define		R700_RB_BLKSZ(x)			((x) << 8)
+#define		R700_RB_NO_UPDATE			(1 << 27)
+#define		R700_RB_RPTR_WR_ENA			(1 << 31)
+#define		R700_BUF_SWAP_32BIT			(2 << 16)
+#define	R700_CP_RB_RPTR					0x8700
+#define	R700_CP_RB_RPTR_ADDR			0xC10C
+#define	R700_CP_RB_RPTR_ADDR_HI			0xC110
+#define	R700_CP_RB_RPTR_WR				0xC108
+#define	R700_CP_RB_WPTR					0xC114
+#define	R700_CP_RB_WPTR_ADDR			0xC118
+#define	R700_CP_RB_WPTR_ADDR_HI			0xC11C
+#define	R700_CP_RB_WPTR_DELAY			0x8704
+#define	R700_CP_SEM_WAIT_TIMER			0x85BC
+
+#define	R700_DB_DEBUG3					0x98B0
+#define		R700_DB_CLK_OFF_DELAY(x)	((x) << 11)
+#define R700_DB_DEBUG					0x9B8C
+#define		R700_DISABLE_TILE_COVERED_FOR_PS_ITER (1 << 6)
+
+#define	R700_DCP_TILING_CONFIG			0x6CA0
+#define		R700_PIPE_TILING(x)			((x) << 1)
+#define 	R700_BANK_TILING(x)			((x) << 4)
+#define		R700_GROUP_SIZE(x)			((x) << 6)
+#define		R700_ROW_TILING(x)			((x) << 8)
+#define		R700_BANK_SWAPS(x)			((x) << 11)
+#define		R700_SAMPLE_SPLIT(x)		((x) << 14)
+#define		R700_BACKEND_MAP(x)			((x) << 16)
+
+#define R700_GB_TILING_CONFIG			0x98F0
+
+#define	R700_GC_USER_SHADER_PIPE_CONFIG	0x8954
+#define		R700_INACTIVE_QD_PIPES(x)	((x) << 8)
+#define		R700_INACTIVE_QD_PIPES_MASK	0x0000FF00
+#define		R700_INACTIVE_SIMDS(x)		((x) << 16)
+#define		R700_INACTIVE_SIMDS_MASK	0x00FF0000
+
+#define	R700_GRBM_CNTL					0x8000
+#define		R700_GRBM_READ_TIMEOUT(x)	((x) << 0)
+#define	R700_GRBM_SOFT_RESET			0x8020
+#define		R700_SOFT_RESET_CP			(1<<0)
+#define	R700_GRBM_STATUS				0x8010
+#define		R700_CMDFIFO_AVAIL_MASK		0x0000000F
+#define		R700_GUI_ACTIVE				(1<<31)
+#define	R700_GRBM_STATUS2				0x8014
+
+#define	R700_CG_MULT_THERMAL_STATUS		0x740
+#define		R700_ASIC_T(x)				((x) << 16)
+#define		R700_ASIC_T_MASK			0x3FF0000
+#define		R700_ASIC_T_SHIFT			16
+
+#define	R700_HDP_HOST_PATH_CNTL				0x2C00
+#define	R700_HDP_NONSURFACE_BASE			0x2C04
+#define	R700_HDP_NONSURFACE_INFO			0x2C08
+#define	R700_HDP_NONSURFACE_SIZE			0x2C0C
+#define R700_HDP_REG_COHERENCY_FLUSH_CNTL	0x54A0
+#define	R700_HDP_TILING_CONFIG				0x2F3C
+#define R700_HDP_DEBUG1						0x2F34
+
+#define R700_MC_SHARED_CHMAP				0x2004
+#define		R700_NOOFCHAN_SHIFT				12
+#define		R700_NOOFCHAN_MASK				0x00003000
+#define R700_MC_SHARED_CHREMAP				0x2008
+
+#define	R700_MC_ARB_RAMCFG					0x2760
+#define		R700_NOOFBANK_SHIFT				0
+#define		R700_NOOFBANK_MASK				0x00000003
+#define		R700_NOOFRANK_SHIFT				2
+#define		R700_NOOFRANK_MASK				0x00000004
+#define		R700_NOOFROWS_SHIFT				3
+#define		R700_NOOFROWS_MASK				0x00000038
+#define		R700_NOOFCOLS_SHIFT				6
+#define		R700_NOOFCOLS_MASK				0x000000C0
+#define		R700_CHANSIZE_SHIFT				8
+#define		R700_CHANSIZE_MASK				0x00000100
+#define		R700_BURSTLENGTH_SHIFT			9
+#define		R700_BURSTLENGTH_MASK			0x00000200
+#define		R700_CHANSIZE_OVERRIDE			(1 << 11)
+#define	R700_MC_VM_AGP_TOP					0x2028
+#define	R700_MC_VM_AGP_BOT					0x202C
+#define	R700_MC_VM_AGP_BASE					0x2030
+#define	R700_MC_VM_FB_LOCATION				0x2024
+#define	R700_MC_VM_MB_L1_TLB0_CNTL			0x2234
+#define	R700_MC_VM_MB_L1_TLB1_CNTL			0x2238
+#define	R700_MC_VM_MB_L1_TLB2_CNTL			0x223C
+#define	R700_MC_VM_MB_L1_TLB3_CNTL			0x2240
+#define		R700_ENABLE_L1_TLB					(1 << 0)
+#define		R700_ENABLE_L1_FRAGMENT_PROCESSING	(1 << 1)
+#define		R700_SYSTEM_ACCESS_MODE_PA_ONLY		(0 << 3)
+#define		R700_SYSTEM_ACCESS_MODE_USE_SYS_MAP	(1 << 3)
+#define		R700_SYSTEM_ACCESS_MODE_IN_SYS		(2 << 3)
+#define		R700_SYSTEM_ACCESS_MODE_NOT_IN_SYS	(3 << 3)
+#define		R700_SYSTEM_APERTURE_UNMAPPED_ACCESS_PASS_THRU (0 << 5)
+#define		R700_EFFECTIVE_L1_TLB_SIZE(x)		((x)<<15)
+#define		R700_EFFECTIVE_L1_QUEUE_SIZE(x)		((x)<<18)
+#define	R700_MC_VM_MD_L1_TLB0_CNTL				0x2654
+#define	R700_MC_VM_MD_L1_TLB1_CNTL				0x2658
+#define	R700_MC_VM_MD_L1_TLB2_CNTL				0x265C
+#define	R700_MC_VM_SYSTEM_APERTURE_DEFAULT_ADDR 0x203C
+#define	R700_MC_VM_SYSTEM_APERTURE_HIGH_ADDR	0x2038
+#define	R700_MC_VM_SYSTEM_APERTURE_LOW_ADDR		0x2034
+
+#define	R700_PA_CL_ENHANCE						0x8A14
+#define		R700_CLIP_VTX_REORDER_ENA			(1 << 0)
+#define		R700_NUM_CLIP_SEQ(x)				((x) << 1)
+#define R700_PA_SC_AA_CONFIG					0x28C04
+#define R700_PA_SC_CLIPRECT_RULE				0x2820C
+#define	R700_PA_SC_EDGERULE						0x28230
+#define	R700_PA_SC_FIFO_SIZE					0x8BCC
+#define		R700_SC_PRIM_FIFO_SIZE(x)			((x) << 0)
+#define		R700_SC_HIZ_TILE_FIFO_SIZE(x)		((x) << 12)
+#define	R700_PA_SC_FORCE_EOV_MAX_CNTS			0x8B24
+#define		R700_FORCE_EOV_MAX_CLK_CNT(x)		((x)<<0)
+#define		R700_FORCE_EOV_MAX_REZ_CNT(x)		((x)<<16)
+#define R700_PA_SC_LINE_STIPPLE					0x28A0C
+#define	R700_PA_SC_LINE_STIPPLE_STATE			0x8B10
+#define R700_PA_SC_MODE_CNTL					0x28A4C
+#define	R700_PA_SC_MULTI_CHIP_CNTL				0x8B20
+#define		R700_SC_EARLYZ_TILE_FIFO_SIZE(x)	((x) << 20)
 
 #if 0
 #define	SMX_DC_CTL0					0xA020
@@ -358,49 +361,50 @@
 #define	SRBM_STATUS				        0x0E50
 #endif
 
-#define D1GRPH_PRIMARY_SURFACE_ADDRESS                    0x6110
-#define D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH               0x6914
-#define D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH               0x6114
-#define D1GRPH_SECONDARY_SURFACE_ADDRESS                  0x6118
-#define D1GRPH_SECONDARY_SURFACE_ADDRESS_HIGH             0x691c
-#define D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH             0x611c
+#define R700_D1GRPH_PRIMARY_SURFACE_ADDRESS			0x6110
+#define R700_D1GRPH_PRIMARY_SURFACE_ADDRESS_HIGH	0x6914
+#define R700_D2GRPH_PRIMARY_SURFACE_ADDRESS_HIGH	0x6114
+#define R700_D1GRPH_SECONDARY_SURFACE_ADDRESS		0x6118
+#define R700_D1GRPH_SECONDARY_SURFACE_ADDRESS_HIGH	0x691c
+#define R700_D2GRPH_SECONDARY_SURFACE_ADDRESS_HIGH	0x611c
 
 /* PCIE link stuff */
-#define PCIE_LC_TRAINING_CNTL                             0xa1 /* PCIE_P */
-#define PCIE_LC_LINK_WIDTH_CNTL                           0xa2 /* PCIE_P */
-#       define LC_LINK_WIDTH_SHIFT                        0
-#       define LC_LINK_WIDTH_MASK                         0x7
-#       define LC_LINK_WIDTH_X0                           0
-#       define LC_LINK_WIDTH_X1                           1
-#       define LC_LINK_WIDTH_X2                           2
-#       define LC_LINK_WIDTH_X4                           3
-#       define LC_LINK_WIDTH_X8                           4
-#       define LC_LINK_WIDTH_X16                          6
-#       define LC_LINK_WIDTH_RD_SHIFT                     4
-#       define LC_LINK_WIDTH_RD_MASK                      0x70
-#       define LC_RECONFIG_ARC_MISSING_ESCAPE             (1 << 7)
-#       define LC_RECONFIG_NOW                            (1 << 8)
-#       define LC_RENEGOTIATION_SUPPORT                   (1 << 9)
-#       define LC_RENEGOTIATE_EN                          (1 << 10)
-#       define LC_SHORT_RECONFIG_EN                       (1 << 11)
-#       define LC_UPCONFIGURE_SUPPORT                     (1 << 12)
-#       define LC_UPCONFIGURE_DIS                         (1 << 13)
-#define PCIE_LC_SPEED_CNTL                                0xa4 /* PCIE_P */
-#       define LC_GEN2_EN_STRAP                           (1 << 0)
-#       define LC_TARGET_LINK_SPEED_OVERRIDE_EN           (1 << 1)
-#       define LC_FORCE_EN_HW_SPEED_CHANGE                (1 << 5)
-#       define LC_FORCE_DIS_HW_SPEED_CHANGE               (1 << 6)
-#       define LC_SPEED_CHANGE_ATTEMPTS_ALLOWED_MASK      (0x3 << 8)
-#       define LC_SPEED_CHANGE_ATTEMPTS_ALLOWED_SHIFT     3
-#       define LC_CURRENT_DATA_RATE                       (1 << 11)
-#       define LC_VOLTAGE_TIMER_SEL_MASK                  (0xf << 14)
-#       define LC_CLR_FAILED_SPD_CHANGE_CNT               (1 << 21)
-#       define LC_OTHER_SIDE_EVER_SENT_GEN2               (1 << 23)
-#       define LC_OTHER_SIDE_SUPPORTS_GEN2                (1 << 24)
-#define MM_CFGREGS_CNTL                                   0x544c
-#       define MM_WR_TO_CFG_EN                            (1 << 3)
-#define LINK_CNTL2                                        0x88 /* F0 */
-#       define TARGET_LINK_SPEED_MASK                     (0xf << 0)
-#       define SELECTABLE_DEEMPHASIS                      (1 << 6)
+#define R700_PCIE_LC_TRAINING_CNTL				0xa1 /* PCIE_P */
+#define R700_PCIE_LC_LINK_WIDTH_CNTL			0xa2 /* PCIE_P */
+#define 	R700_LC_LINK_WIDTH_SHIFT			0
+#define 	R700_LC_LINK_WIDTH_MASK				0x7
+#define 	R700_LC_LINK_WIDTH_X0				0
+#define 	R700_LC_LINK_WIDTH_X1				1
+#define 	R700_LC_LINK_WIDTH_X2				2
+#define 	R700_LC_LINK_WIDTH_X4				3
+#define 	R700_LC_LINK_WIDTH_X8				4
+#define 	R700_LC_LINK_WIDTH_X16				6
+#define 	R700_LC_LINK_WIDTH_RD_SHIFT			4
+#define 	R700_LC_LINK_WIDTH_RD_MASK			0x70
+#define 	R700_LC_RECONFIG_ARC_MISSING_ESCAPE	(1 << 7)
+#define 	R700_LC_RECONFIG_NOW				(1 << 8)
+#define 	R700_LC_RENEGOTIATION_SUPPORT		(1 << 9)
+#define 	R700_LC_RENEGOTIATE_EN				(1 << 10)
+#define 	R700_LC_SHORT_RECONFIG_EN			(1 << 11)
+#define 	R700_LC_UPCONFIGURE_SUPPORT			(1 << 12)
+#define 	R700_LC_UPCONFIGURE_DIS				(1 << 13)
+#define R700_PCIE_LC_SPEED_CNTL					0xa4 /* PCIE_P */
+#define 	R700_LC_GEN2_EN_STRAP				(1 << 0)
+#define 	R700_LC_TARGET_LINK_SPEED_OVERRIDE_EN (1 << 1)
+#define 	R700_LC_FORCE_EN_HW_SPEED_CHANGE	(1 << 5)
+#define 	R700_LC_FORCE_DIS_HW_SPEED_CHANGE	(1 << 6)
+#define 	R700_LC_SPEED_CHANGE_ATTEMPTS_ALLOWED_MASK (0x3 << 8)
+#define 	R700_LC_SPEED_CHANGE_ATTEMPTS_ALLOWED_SHIFT 3
+#define 	R700_LC_CURRENT_DATA_RATE			(1 << 11)
+#define 	R700_LC_VOLTAGE_TIMER_SEL_MASK		(0xf << 14)
+#define 	R700_LC_CLR_FAILED_SPD_CHANGE_CNT	(1 << 21)
+#define 	R700_LC_OTHER_SIDE_EVER_SENT_GEN2	(1 << 23)
+#define 	R700_LC_OTHER_SIDE_SUPPORTS_GEN2	(1 << 24)
+#define R700_MM_CFGREGS_CNTL					0x544c
+#define 	R700_MM_WR_TO_CFG_EN				(1 << 3)
+#define R700_LINK_CNTL2							0x88 /* F0 */
+#define 	R700_TARGET_LINK_SPEED_MASK			(0xf << 0)
+#define 	R700_SELECTABLE_DEEMPHASIS			(1 << 6)
 
-#endif
+
+#endif /* R700_H */

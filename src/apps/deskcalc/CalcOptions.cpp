@@ -20,6 +20,7 @@ CalcOptions::CalcOptions()
 	:
 	auto_num_lock(false),
 	audio_feedback(false),
+	degree_mode(false),
 	keypad_mode(KEYPAD_MODE_BASIC)
 {
 }
@@ -37,6 +38,9 @@ CalcOptions::LoadSettings(const BMessage* archive)
 	if (archive->FindBool("audio feedback", &option) == B_OK)
 		audio_feedback = option;
 
+	if (archive->FindBool("degree mode", &option) == B_OK)
+		degree_mode = option;
+
 	if (archive->FindUInt8("keypad mode", &keypad_mode_option) == B_OK)
 		keypad_mode = keypad_mode_option;
 }
@@ -51,8 +55,10 @@ CalcOptions::SaveSettings(BMessage* archive) const
 		ret = archive->AddBool("audio feedback", audio_feedback);
 
 	if (ret == B_OK)
+		ret = archive->AddBool("degree mode", degree_mode);
+
+	if (ret == B_OK)
 		ret = archive->AddUInt8("keypad mode", keypad_mode);
 
 	return ret;
 }
-

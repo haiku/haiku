@@ -88,6 +88,10 @@ CalcWindow::MessageReceived(BMessage* message)
 			fCalcView->ToggleAudioFeedback();
 			break;
 
+		case MSG_OPTIONS_ANGLE_MODE:
+			fCalcView->ToggleAngleMode();
+			break;
+
 		case MSG_OPTIONS_KEYPAD_MODE_COMPACT:
 			fCalcView->SetKeypadMode(KEYPAD_MODE_COMPACT);
 			break;

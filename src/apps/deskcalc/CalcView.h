@@ -16,6 +16,7 @@
 enum {
 	MSG_OPTIONS_AUTO_NUM_LOCK				= 'oanl',
 	MSG_OPTIONS_AUDIO_FEEDBACK				= 'oafb',
+	MSG_OPTIONS_ANGLE_MODE					= 'oamd',
 	MSG_OPTIONS_KEYPAD_MODE_COMPACT			= 'okmc',
 	MSG_OPTIONS_KEYPAD_MODE_BASIC			= 'okmb',
 	MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC		= 'okms',
@@ -90,6 +91,9 @@ class CalcView : public BView {
 			// (option currently disabled)
 			void				ToggleAudioFeedback(void);
 
+			// Toggle radian/degree mode
+			void				ToggleAngleMode(void);
+
 			// Set the keypad mode
 			void				SetKeypadMode(uint8 mode);
 
@@ -147,6 +151,10 @@ class CalcView : public BView {
 			BPopUpMenu*			fPopUpMenu;
 			BMenuItem*			fAutoNumlockItem;
 			BMenuItem*			fAudioFeedbackItem;
+
+			BMenuItem*			fAngleModeRadianItem;
+			BMenuItem*			fAngleModeDegreeItem;
+
 			BMenuItem*			fKeypadModeCompactItem;
 			BMenuItem*			fKeypadModeBasicItem;
 			BMenuItem*			fKeypadModeScientificItem;

@@ -37,8 +37,8 @@ radeon_bios_init_scratch()
 	uint32 biosScratch6;
 
 	if (info.chipsetID >= RADEON_R600) {
-		biosScratch2 = Read32(OUT, R600_BIOS_2_SCRATCH);
-		biosScratch6 = Read32(OUT, R600_BIOS_6_SCRATCH);
+		biosScratch2 = Read32(OUT, R600_SCRATCH_REG2);
+		biosScratch6 = Read32(OUT, R600_SCRATCH_REG6);
 	} else {
 		biosScratch2 = Read32(OUT, RADEON_BIOS_2_SCRATCH);
 		biosScratch6 = Read32(OUT, RADEON_BIOS_6_SCRATCH);
@@ -50,8 +50,8 @@ radeon_bios_init_scratch()
 		// bios shouldn't handle mode switching
 
 	if (info.chipsetID >= RADEON_R600) {
-		Write32(OUT, R600_BIOS_2_SCRATCH, biosScratch2);
-		Write32(OUT, R600_BIOS_6_SCRATCH, biosScratch6);
+		Write32(OUT, R600_SCRATCH_REG2, biosScratch2);
+		Write32(OUT, R600_SCRATCH_REG6, biosScratch6);
 	} else {
 		Write32(OUT, RADEON_BIOS_2_SCRATCH, biosScratch2);
 		Write32(OUT, RADEON_BIOS_6_SCRATCH, biosScratch6);

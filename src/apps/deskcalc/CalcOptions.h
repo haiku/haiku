@@ -24,6 +24,7 @@ class BMessage;
 struct CalcOptions {
 	bool auto_num_lock;		// automatically activate numlock
 	bool audio_feedback;	// provide audio feedback
+	bool degree_mode;		// radian or degree mode
 	uint8 keypad_mode;		// keypad mode options
 
 				CalcOptions();

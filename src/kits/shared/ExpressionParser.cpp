@@ -338,7 +338,8 @@ class Tokenizer {
 
 
 ExpressionParser::ExpressionParser()
-	: fTokenizer(new Tokenizer())
+	:	fTokenizer(new Tokenizer()),
+		fDegreeMode(false)
 {
 }
 
@@ -346,6 +347,20 @@ ExpressionParser::ExpressionParser()
 ExpressionParser::~ExpressionParser()
 {
 	delete fTokenizer;
+}
+
+
+bool
+ExpressionParser::DegreeMode()
+{
+	return fDegreeMode;
+}
+
+
+void
+ExpressionParser::SetDegreeMode(bool degrees)
+{
+	fDegreeMode = degrees;
 }
 
 
@@ -594,19 +609,36 @@ ExpressionParser::_ParseFunction(const Token& token)
 		return _ParseFactorial(values[0].abs());
 	} else if (strcasecmp("acos", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		if (values[0] < -1 || values[0] > 1)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].acos());
 	} else if (strcasecmp("asin", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		if (values[0] < -1 || values[0] > 1)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].asin());
 	} else if (strcasecmp("atan", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		return _ParseFactorial(values[0].atan());
 	} else if (strcasecmp("atan2", token.string.String()) == 0) {
 		_InitArguments(values, 2);
+
+		if (fDegreeMode) {
+			values[0] = values[0] * MM_PI / 180;
+			values[1] = values[1] * MM_PI / 180;
+		}
+
 		return _ParseFactorial(values[0].atan2(values[1]));
 	} else if (strcasecmp("cbrt", token.string.String()) == 0) {
 		_InitArguments(values, 1);
@@ -616,9 +648,13 @@ ExpressionParser::_ParseFunction(const Token& token)
 		return _ParseFactorial(values[0].ceil());
 	} else if (strcasecmp("cos", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		return _ParseFactorial(values[0].cos());
 	} else if (strcasecmp("cosh", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		// This function always uses radians
 		return _ParseFactorial(values[0].cosh());
 	} else if (strcasecmp("exp", token.string.String()) == 0) {
 		_InitArguments(values, 1);
@@ -630,34 +666,46 @@ ExpressionParser::_ParseFunction(const Token& token)
 		_InitArguments(values, 1);
 		if (values[0] <= 0)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].log());
 	} else if (strcasecmp("log", token.string.String()) == 0) {
 		_InitArguments(values, 1);
 		if (values[0] <= 0)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].log10());
 	} else if (strcasecmp("pow", token.string.String()) == 0) {
 		_InitArguments(values, 2);
 		return _ParseFactorial(values[0].pow(values[1]));
 	} else if (strcasecmp("sin", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		return _ParseFactorial(values[0].sin());
 	} else if (strcasecmp("sinh", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		// This function always uses radians
 		return _ParseFactorial(values[0].sinh());
 	} else if (strcasecmp("sqrt", token.string.String()) == 0) {
 		_InitArguments(values, 1);
 		if (values[0] < 0)
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].sqrt());
 	} else if (strcasecmp("tan", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (fDegreeMode)
+			values[0] = values[0] * MM_PI / 180;
+
 		MAPM divided_by_half_pi = values[0] / MM_HALF_PI;
 		if (divided_by_half_pi.is_integer() && divided_by_half_pi.is_odd())
 			throw ParseException("out of domain", token.position);
+
 		return _ParseFactorial(values[0].tan());
 	} else if (strcasecmp("tanh", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		// This function always uses radians
 		return _ParseFactorial(values[0].tanh());
 	}
 
