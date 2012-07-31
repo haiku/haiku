@@ -127,8 +127,20 @@ KFileSystem::Repair(KPartition* partition, bool checkOnly, disk_job_id job)
 status_t
 KFileSystem::Resize(KPartition* partition, off_t size, disk_job_id job)
 {
-	// to be implemented
-	return B_ERROR;
+	if (partition == NULL || fModule == NULL)
+		return B_ERROR;
+	if (fModule->resize == NULL)
+		return B_NOT_SUPPORTED;
+
+	int fd = -1;
+	status_t result = partition->Open(O_RDWR, &fd);
+	if (result != B_OK)
+		return result;
+
+	result = fModule->resize(fd, partition->ID(), size, job);
+
+	close(fd);
+	return result;
 }
 
 
