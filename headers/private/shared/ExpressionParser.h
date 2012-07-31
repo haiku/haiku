@@ -42,6 +42,9 @@ class ExpressionParser {
 								ExpressionParser();
 								~ExpressionParser();
 
+			bool				DegreeMode();
+			void				SetDegreeMode(bool degrees);
+
 			void				SetSupportHexInput(bool enabled);
 
 			BString				Evaluate(const char* expressionString);
@@ -49,7 +52,6 @@ class ExpressionParser {
 			double				EvaluateToDouble(const char* expressionString);
 
  private:
-
 			MAPM				_ParseBinary();
 			MAPM				_ParseSum();
 			MAPM				_ParseProduct();
@@ -64,6 +66,8 @@ class ExpressionParser {
 			void				_EatToken(int32 type);
 
 			Tokenizer*			fTokenizer;
+
+			bool				fDegreeMode;
 };
 
 #endif // EXPRESSION_PARSER_H

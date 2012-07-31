@@ -244,6 +244,10 @@ CalcView::MessageReceived(BMessage* message)
 			case MSG_OPTIONS_AUDIO_FEEDBACK:
 				ToggleAudioFeedback();
 				return;
+
+			case MSG_OPTIONS_ANGLE_MODE:
+				ToggleAngleMode();
+				return;
 		}
 	}
 
@@ -931,6 +935,7 @@ CalcView::Evaluate()
 
 	try {
 		ExpressionParser parser;
+		parser.SetDegreeMode(fOptions->degree_mode);
 		value = parser.Evaluate(expression.String());
 	} catch (ParseException e) {
 		BString error(e.message.String());
@@ -969,6 +974,16 @@ CalcView::ToggleAudioFeedback(void)
 	fOptions->audio_feedback = !fOptions->audio_feedback;
 	fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
 }
+
+
+void
+CalcView::ToggleAngleMode(void)
+{
+	fOptions->degree_mode = !fOptions->degree_mode;
+	fAngleModeRadianItem->SetMarked(!fOptions->degree_mode);
+	fAngleModeDegreeItem->SetMarked(fOptions->degree_mode);
+}
+
 
 void
 CalcView::SetKeypadMode(uint8 mode)
@@ -1257,6 +1272,10 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 		new BMessage(MSG_OPTIONS_AUTO_NUM_LOCK));
 	fAudioFeedbackItem = new BMenuItem(B_TRANSLATE("Audio Feedback"),
 		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
+	fAngleModeRadianItem = new BMenuItem(B_TRANSLATE("Radian Mode"),
+		new BMessage(MSG_OPTIONS_ANGLE_MODE));
+	fAngleModeDegreeItem = new BMenuItem(B_TRANSLATE("Degree Mode"),
+		new BMessage(MSG_OPTIONS_ANGLE_MODE));
 	if (addKeypadModeMenuItems) {
 		fKeypadModeCompactItem = new BMenuItem(B_TRANSLATE("Compact"),
 			new BMessage(MSG_OPTIONS_KEYPAD_MODE_COMPACT), '0');
@@ -1269,6 +1288,8 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 	// apply current settings
 	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
 	fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
+	fAngleModeRadianItem->SetMarked(!fOptions->degree_mode);
+	fAngleModeDegreeItem->SetMarked(fOptions->degree_mode);
 
 	// construct menu
 	fPopUpMenu = new BPopUpMenu("pop-up", false, false);
@@ -1277,6 +1298,9 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 	// TODO: Enable this when we use beep events which can be configured
 	// in the Sounds preflet.
 	//fPopUpMenu->AddItem(fAudioFeedbackItem);
+	fPopUpMenu->AddSeparatorItem();
+	fPopUpMenu->AddItem(fAngleModeRadianItem);
+	fPopUpMenu->AddItem(fAngleModeDegreeItem);
 	if (addKeypadModeMenuItems) {
 		fPopUpMenu->AddSeparatorItem();
 		fPopUpMenu->AddItem(fKeypadModeCompactItem);
