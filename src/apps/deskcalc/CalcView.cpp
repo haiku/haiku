@@ -1276,9 +1276,9 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 		new BMessage(MSG_OPTIONS_AUTO_NUM_LOCK));
 	fAudioFeedbackItem = new BMenuItem(B_TRANSLATE("Audio Feedback"),
 		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
-	fAngleModeRadianItem = new BMenuItem(B_TRANSLATE("Radian Mode"),
+	fAngleModeRadianItem = new BMenuItem(B_TRANSLATE("Radians"),
 		new BMessage(MSG_OPTIONS_ANGLE_MODE_RADIAN));
-	fAngleModeDegreeItem = new BMenuItem(B_TRANSLATE("Degree Mode"),
+	fAngleModeDegreeItem = new BMenuItem(B_TRANSLATE("Degrees"),
 		new BMessage(MSG_OPTIONS_ANGLE_MODE_DEGREE));
 	if (addKeypadModeMenuItems) {
 		fKeypadModeCompactItem = new BMenuItem(B_TRANSLATE("Compact"),
