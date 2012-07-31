@@ -19,7 +19,6 @@
 #include "r600_reg.h"
 #include "r700_reg.h"
 #include "evergreen_reg.h"
-#include "evergreend.h"
 #include "si_reg.h"
 
 #include <Accelerant.h>

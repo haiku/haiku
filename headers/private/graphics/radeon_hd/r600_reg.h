@@ -24,6 +24,7 @@
  * Authors: Dave Airlie
  *          Alex Deucher
  *          Jerome Glisse
+ *          Alexander von Gluck <kallisti5@unixzen.com>
  */
 #ifndef __R600_REG_H__
 #define __R600_REG_H__
@@ -46,6 +47,7 @@
 #define R600_PCIE_PORT_INDEX					0x0038
 #define R600_PCIE_PORT_DATA						0x003c
 
+/* Memory Controler */
 #define R600_MC_VM_FB_LOCATION					0x2180
 #define 	R600_MC_FB_BASE_MASK				0x0000FFFF
 #define 	R600_MC_FB_BASE_SHIFT				0
@@ -83,6 +85,7 @@
 #define 	R600_D1GRPH_SWAP_ENDIAN_32BIT		(2 << 0)
 #define 	R600_D1GRPH_SWAP_ENDIAN_64BIT		(3 << 0)
 
+/* Hot plug detection */
 #define R600_HDP_HOST_PATH_CNTL					0x2C00
 #define R600_HDP_NONSURFACE_BASE				0x2C04
 #define R600_HDP_NONSURFACE_INFO				0x2C08

@@ -23,9 +23,10 @@
  * Authors: Dave Airlie
  *          Alex Deucher
  *          Jerome Glisse
+ *          Alexander von Gluck <kallisti5@unixzen.com>
  */
-#ifndef R700_H
-#define R700_H
+#ifndef __R700_REG_H__
+#define __R700_REG_H__
 
 
 /* Scratch Registers */
@@ -407,4 +408,4 @@
 #define 	R700_SELECTABLE_DEEMPHASIS			(1 << 6)
 
 
-#endif /* R700_H */
+#endif /* __R700_REG_H__ */
