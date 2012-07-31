@@ -116,16 +116,14 @@ tq_handle_thread(void *data)
 	sem = tq->tq_sem;
 	tq_unlock(tq, cpu_state);
 
-	while (1) {
-		status_t status = acquire_sem(sem);
-		if (status < B_OK)
-			break;
-
+	while (acquire_sem(sem) == B_NO_ERROR) {
 		tq_lock(tq, &cpu_state);
 		t = list_remove_head_item(&tq->tq_list);
+		tq_unlock(tq, cpu_state);
+		if (t == NULL)
+			continue;
 		pending = t->ta_pending;
 		t->ta_pending = 0;
-		tq_unlock(tq, cpu_state);
 
 		t->ta_handler(t->ta_argument, pending);
 	}
@@ -319,7 +317,7 @@ init_taskqueues()
 			return B_NO_MEMORY;
 
 		status = taskqueue_start_threads(&taskqueue_fast, 1,
-			B_REAL_TIME_PRIORITY, "fast taskq");
+			B_REAL_TIME_PRIORITY, "fast taskq thread");
 		if (status < B_OK)
 			goto err_1;
 	}
