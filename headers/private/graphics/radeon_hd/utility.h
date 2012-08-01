@@ -8,6 +8,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+
 #define ROUND_TO_PAGE_SIZE(x) (((x) + (B_PAGE_SIZE) - 1) & ~((B_PAGE_SIZE) - 1))
+
 
 #endif	/* UTILITY_H */

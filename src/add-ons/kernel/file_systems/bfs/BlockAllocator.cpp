@@ -1990,8 +1990,8 @@ BlockAllocator::_CheckInodeBlocks(Inode* inode, const char* name)
 			if (status != B_OK)
 				return status;
 
-			int32 maxIndex =
-				((uint32)indirect.Length() << fVolume->BlockShift())
+			int32 maxIndex
+				= ((uint32)indirect.Length() << fVolume->BlockShift())
 					/ sizeof(block_run);
 
 			for (int32 index = 0; index < maxIndex; ) {

@@ -23,10 +23,10 @@
  * Authors: Dave Airlie
  *          Alex Deucher
  *          Jerome Glisse
- *			Alexander von Gluck IV
+ *          Alexander von Gluck <kallisti5@unixzen.com>
  */
-#ifndef AVIVO_H
-#define AVIVO_H
+#ifndef __AVIVO_REG_H__
+#define __AVIVO_REG_H__
 
 
 #define	AVIVO_D1CRTC_UPDATE_LOCK					0x60E8
@@ -558,4 +558,4 @@
 #define 	AVIVO_D2_VBLANK_INTERRUPT						(1 << 5)
 
 
-#endif /* AVIVO_H */
+#endif /* __AVIVO_REG_H__ */

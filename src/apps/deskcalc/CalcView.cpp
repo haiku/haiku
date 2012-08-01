@@ -245,8 +245,12 @@ CalcView::MessageReceived(BMessage* message)
 				ToggleAudioFeedback();
 				return;
 
-			case MSG_OPTIONS_ANGLE_MODE:
-				ToggleAngleMode();
+			case MSG_OPTIONS_ANGLE_MODE_RADIAN:
+				SetDegreeMode(false);
+				return;
+
+			case MSG_OPTIONS_ANGLE_MODE_DEGREE:
+				SetDegreeMode(true);
 				return;
 		}
 	}
@@ -977,11 +981,11 @@ CalcView::ToggleAudioFeedback(void)
 
 
 void
-CalcView::ToggleAngleMode(void)
+CalcView::SetDegreeMode(bool degrees)
 {
-	fOptions->degree_mode = !fOptions->degree_mode;
-	fAngleModeRadianItem->SetMarked(!fOptions->degree_mode);
-	fAngleModeDegreeItem->SetMarked(fOptions->degree_mode);
+	fOptions->degree_mode = degrees;
+	fAngleModeRadianItem->SetMarked(!degrees);
+	fAngleModeDegreeItem->SetMarked(degrees);
 }
 
 
@@ -1272,10 +1276,10 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 		new BMessage(MSG_OPTIONS_AUTO_NUM_LOCK));
 	fAudioFeedbackItem = new BMenuItem(B_TRANSLATE("Audio Feedback"),
 		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
-	fAngleModeRadianItem = new BMenuItem(B_TRANSLATE("Radian Mode"),
-		new BMessage(MSG_OPTIONS_ANGLE_MODE));
-	fAngleModeDegreeItem = new BMenuItem(B_TRANSLATE("Degree Mode"),
-		new BMessage(MSG_OPTIONS_ANGLE_MODE));
+	fAngleModeRadianItem = new BMenuItem(B_TRANSLATE("Radians"),
+		new BMessage(MSG_OPTIONS_ANGLE_MODE_RADIAN));
+	fAngleModeDegreeItem = new BMenuItem(B_TRANSLATE("Degrees"),
+		new BMessage(MSG_OPTIONS_ANGLE_MODE_DEGREE));
 	if (addKeypadModeMenuItems) {
 		fKeypadModeCompactItem = new BMenuItem(B_TRANSLATE("Compact"),
 			new BMessage(MSG_OPTIONS_KEYPAD_MODE_COMPACT), '0');

@@ -20,9 +20,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  *
  * Authors: Alex Deucher
+ *          Alexander von Gluck <kallisti5@unixzen.com>
  */
-#ifndef SI_H
-#define SI_H
+#ifndef __SI_REG_H__
+#define __SI_REG_H__
 
 
 #define TAHITI_RB_BITMAP_WIDTH_PER_SH		2
@@ -30,6 +31,7 @@
 #define TAHITI_GB_ADDR_CONFIG_GOLDEN		0x12011003
 #define VERDE_GB_ADDR_CONFIG_GOLDEN			0x12010002
 
+/* Sensors */
 #define	SI_CG_MULT_THERMAL_STATUS			0x714
 #define		SI_ASIC_MAX_TEMP(x)				((x) << 0)
 #define		SI_ASIC_MAX_TEMP_MASK			0x000001ff
