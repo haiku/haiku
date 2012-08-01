@@ -740,7 +740,7 @@ BDragger::_BuildDefaultPopUp()
 	if (name != NULL)
 		msg->AddString("target", name);
 
-	BString about(B_TRANSLATE("About %app"));
+	BString about(B_TRANSLATE("About %app" B_UTF8_ELLIPSIS));
 	about.ReplaceFirst("%app", name);
 
 	fPopUp->AddItem(new BMenuItem(about.String(), msg));
