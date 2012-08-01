@@ -29,7 +29,7 @@ dump_raw_data(const char *buffer, size_t size)
 
 	while (dumpPosition < size) {
 		// Position for this line
-		printf("\t%04lx: ", dumpPosition);
+		printf("\t%04" B_PRIx32 ": ", dumpPosition);
 
 		// Print the bytes in form of hexadecimal numbers
 		for (uint32 i = 0; i < kChunkSize; i++) {
@@ -72,35 +72,35 @@ show_attr_contents(BNode& node, const char* attribute, const attr_info& info)
 	char buffer[kLimit];
 	ssize_t bytesRead = node.ReadAttr(attribute, info.type, 0, buffer, size);
 	if (bytesRead != size) {
-		fprintf(stderr, "Could only read %lld bytes from attribute!\n",
+		fprintf(stderr, "Could only read %" B_PRIdOFF " bytes from attribute!\n",
 			size);
 		return;
 	}
 
 	switch (info.type) {
 		case B_INT8_TYPE:
-			printf("%d\n", *((int8 *)buffer));
+			printf("%" B_PRId8 "\n", *((int8 *)buffer));
 			break;
 		case B_UINT8_TYPE:
-			printf("%u\n", *((uint8 *)buffer));
+			printf("%" B_PRIu8 "\n", *((uint8 *)buffer));
 			break;
 		case B_INT16_TYPE:
-			printf("%d\n", *((int16 *)buffer));
+			printf("%" B_PRId16 "\n", *((int16 *)buffer));
 			break;
 		case B_UINT16_TYPE:
-			printf("%u\n", *((uint16 *)buffer));
+			printf("%" B_PRIu16 "\n", *((uint16 *)buffer));
 			break;
 		case B_INT32_TYPE:
-			printf("%ld\n", *((int32 *)buffer));
+			printf("%" B_PRId32 "\n", *((int32 *)buffer));
 			break;
 		case B_UINT32_TYPE:
-			printf("%lu\n", *((uint32 *)buffer));
+			printf("%" B_PRIu32 "\n", *((uint32 *)buffer));
 			break;
 		case B_INT64_TYPE:
-			printf("%lld\n", *((int64 *)buffer));
+			printf("%" B_PRId64 "\n", *((int64 *)buffer));
 			break;
 		case B_UINT64_TYPE:
-			printf("%llu\n", *((uint64 *)buffer));
+			printf("%" B_PRIu64 "\n", *((uint64 *)buffer));
 			break;
 		case B_FLOAT_TYPE:
 			printf("%f\n", *((float *)buffer));
@@ -198,7 +198,7 @@ get_type(type_code type)
 				sprintf(buffer, "'%c%c%c%c'", value[0], value[1], value[2],
 					value[3]);
 			} else
-				sprintf(buffer, "0x%08lx", type);
+				sprintf(buffer, "0x%08" B_PRIx32, type);
 
 			return buffer;
 		}
@@ -262,7 +262,7 @@ main(int argc, char *argv[])
 			status = node.GetAttrInfo(name, &attrInfo);
 			if (status >= B_OK) {
 				printf("%*s", kTypeWidth, get_type(attrInfo.type));
-				printf("% *Li  ", kSizeWidth, attrInfo.size);
+				printf("% *" B_PRId64 "  ", kSizeWidth, attrInfo.size);
 				printf("\"%s\"", name);
 
 				if (printContents) {
@@ -283,6 +283,6 @@ main(int argc, char *argv[])
 		}
 	}
 
-	printf("\n%Ld bytes total in attributes.\n", total);
+	printf("\n%" B_PRId64 " bytes total in attributes.\n", total);
 	return 0;
 }

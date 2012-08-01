@@ -28,8 +28,8 @@ printTeamInfo(team_info *teamInfo, bool printHeader)
 		printf("%-50s %5s %8s %4s %4s\n", "Team", "Id", "#Threads", "Gid", \
 			"Uid");
 		
-	printf("%-50s %5ld %8ld %4d %4d\n", teamInfo->args, teamInfo->team,
-		teamInfo->thread_count, teamInfo->uid, teamInfo->gid);
+	printf("%-50s %5" B_PRId32 " %8" B_PRId32 " %4d %4d\n", teamInfo->args,
+		teamInfo->team, teamInfo->thread_count, teamInfo->uid, teamInfo->gid);
 }
 
 
@@ -37,7 +37,7 @@ static void
 printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo)
 {
 	char *threadState;
-	uint32 threadCookie = 0;
+	int32 threadCookie = 0;
 	sem_info semaphoreInfo;
 	thread_info threadInfo;
 	
@@ -51,18 +51,21 @@ printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo)
 		else
 			threadState = sStates[threadInfo.state - 1];
 
-		printf("%-37s %5ld %8s %4ld %8llu %8llu ",
-			threadInfo.name, threadInfo.thread, threadState,
+		printf("%-37s %5" B_PRId32 " %8s %4" B_PRId32 " %8" B_PRIu64 " %8"
+			B_PRId64 " ", threadInfo.name, threadInfo.thread, threadState,
 			threadInfo.priority, (threadInfo.user_time / 1000),
 			(threadInfo.kernel_time / 1000));
 
 		if (printSemaphoreInfo) {
 			if (threadInfo.state == B_THREAD_WAITING && threadInfo.sem != -1) {
 				status_t status = get_sem_info(threadInfo.sem, &semaphoreInfo);
-				if (status == B_OK)
-					printf("%s(%ld)\n", semaphoreInfo.name, semaphoreInfo.sem);
-				else
-					printf("%s(%ld)\n", strerror(status), threadInfo.sem);
+				if (status == B_OK) {
+					printf("%s(%" B_PRId32 ")\n", semaphoreInfo.name,
+						semaphoreInfo.sem);
+				} else {
+					printf("%s(%" B_PRId32 ")\n", strerror(status),
+						threadInfo.sem);
+				}
 			} else
 				puts("");
 		} else
@@ -74,7 +77,7 @@ int
 main(int argc, char **argv)
 {
 	team_info teamInfo;
-	uint32 teamCookie = 0;
+	int32 teamCookie = 0;
 	system_info systemInfo;
 	bool printSystemInfo = false;
 	bool printThreads = false;
@@ -153,13 +156,13 @@ main(int argc, char **argv)
 		// system stats
 		get_system_info(&systemInfo);
 		printf("\nSystem Info\n");
-		printf("%luk (%lu bytes) total memory\n",
+		printf("%" B_PRIu32 "k (%" B_PRIu32 " bytes) total memory\n",
 			(systemInfo.max_pages * B_PAGE_SIZE / 1024),
 			(systemInfo.max_pages * B_PAGE_SIZE));
-		printf("%luk (%lu bytes) currently committed\n",
+		printf("%" B_PRIu32 "k (%" B_PRIu32 " bytes) currently committed\n",
 			(systemInfo.used_pages * B_PAGE_SIZE / 1024),
 			(systemInfo.used_pages * B_PAGE_SIZE));
-		printf("%luk (%lu bytes) currently available\n",
+		printf("%" B_PRIu32 "k (%" B_PRIu32 " bytes) currently available\n",
 			(systemInfo.max_pages - systemInfo.used_pages) * B_PAGE_SIZE / 1024,
 			(systemInfo.max_pages - systemInfo.used_pages) * B_PAGE_SIZE);
 		printf("%2.1f%% memory utilisation\n",

@@ -73,7 +73,7 @@ setTimeZoneOffset(BPath path)
 
 	_kern_set_timezone(timeZoneOffset, timeZoneID.String(),
 		timeZoneID.Length());
-	printf("timezone is %s, offset is %ld seconds from GMT.\n",
+	printf("timezone is %s, offset is %" B_PRId32 " seconds from GMT.\n",
 		timeZoneID.String(), timeZoneOffset);
 }
 

@@ -320,7 +320,7 @@ print_error(char *number)
 		error = p->value;
 	}
 
-	printf("0x%lx: %s\n", error, strerror(error));
+	printf("0x%" B_PRIx32 ": %s\n", error, strerror(error));
 }
 
 

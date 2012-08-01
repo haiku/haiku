@@ -64,15 +64,16 @@ main(int argc, char **argv)
 	while (!walker.AtEnd()) {
 		const CatKey &key(walker.GetKey());
 		key.GetStringParts(&str, &ctx, &cmt);
-		printf("Hash:\t\t%lu\nKey:\t\t<%s:%s:%s>\nTranslation:\t%s\n-----\n",
-			key.fHashVal, str.String(), ctx.String(), cmt.String(),
+		printf("Hash:\t\t%" B_PRIu32 "\nKey:\t\t<%s:%s:%s>\nTranslation:\t%s\n"
+			"-----\n", key.fHashVal, str.String(), ctx.String(), cmt.String(),
 			walker.GetValue());
 		walker.Next();
 	}
 	int32 count = inputCatalog.CountItems();
-	if (count)
-		fprintf(stderr, "%ld entr%s dumped\n",	count, (count==1 ? "y": "ies"));
-	else
+	if (count) {
+		fprintf(stderr, "%" B_PRId32 " entr%s dumped\n", count,
+			(count==1 ? "y": "ies"));
+	} else
 		fprintf(stderr, "no entries found\n");
 	return res;
 }

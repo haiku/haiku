@@ -184,11 +184,11 @@ collectAllCatalogKeys(BString& inputStr)
 		if (fetchKey(in)) {
 			if (haveID) {
 				if (showKeys)
-					printf("CatKey(%ld)\n", id);
+					printf("CatKey(%" B_PRId32 ")\n", id);
 				res = catalog->SetString(id, "");
 				if (res != B_OK) {
-					fprintf(stderr, "couldn't add key %ld - error: %s\n",
-						id, strerror(res));
+					fprintf(stderr, "couldn't add key %" B_PRId32 " - error: "
+						"%s\n", id, strerror(res));
 					exit(-1);
 				}
 			} else {
@@ -285,8 +285,8 @@ main(int argc, char **argv)
 		char *buf = inputStr.LockBuffer(sz);
 		off_t rsz = inFile.Read(buf, sz);
 		if (rsz < sz) {
-			fprintf(stderr, "couldn't read %Ld bytes from %s (got only %Ld)\n",
-				sz, inputFile, rsz);
+			fprintf(stderr, "couldn't read %" B_PRId64 " bytes from %s (got "
+				"only %" B_PRId64 ")\n", sz, inputFile, rsz);
 			exit(-1);
 		}
 		inputStr.UnlockBuffer(rsz);
@@ -301,7 +301,7 @@ main(int argc, char **argv)
 		if (showSummary) {
 			int32 count = catalog->CountItems();
 			if (count)
-				fprintf(stderr, "%ld key%s found and written to %s\n",
+				fprintf(stderr, "%" B_PRId32 " key%s found and written to %s\n",
 					count, (count==1 ? "": "s"), outputFile.String());
 			else
 				fprintf(stderr, "no keys found\n");

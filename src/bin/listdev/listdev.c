@@ -87,16 +87,20 @@ dump_attribute(struct device_attr_info *attr, int32 level)
 			printf("string : \"%s\"", attr->value.string);
 			break;
 		case B_UINT8_TYPE:
-			printf("uint8 : %u (%#x)", attr->value.ui8, attr->value.ui8);
+			printf("uint8 : %" B_PRIu8 " (%#" B_PRIx8 ")", attr->value.ui8,
+				attr->value.ui8);
 			break;
 		case B_UINT16_TYPE:
-			printf("uint16 : %u (%#x)", attr->value.ui16, attr->value.ui16);
+			printf("uint16 : %" B_PRIu16 " (%#" B_PRIx16 ")", attr->value.ui16,
+				attr->value.ui16);
 			break;
 		case B_UINT32_TYPE:
-			printf("uint32 : %lu (%#lx)", attr->value.ui32, attr->value.ui32);
+			printf("uint32 : %" B_PRIu32 " (%#" B_PRIx32 ")", attr->value.ui32,
+				attr->value.ui32);
 			break;
 		case B_UINT64_TYPE:
-			printf("uint64 : %Lu (%#Lx)", attr->value.ui64, attr->value.ui64);
+			printf("uint64 : %" B_PRIu64 " (%#" B_PRIx64 ")", attr->value.ui64,
+				attr->value.ui64);
 			break;
 		default:
 			printf("raw data");

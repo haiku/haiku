@@ -19,14 +19,19 @@ if $(HAIKU_ATA_STACK) = 1 {
 	IDE_ONLY = "" ;
 }
 
-SYSTEM_BIN = "[" base64 basename bash cat chgrp chmod chown chroot cksum comm
-	cp split cut date dd dircolors dirname du echo env expand expr factor false
-	fmt fold getlimits groups head hostname id <bin>install join kill link
-	ln locale logname ls md5sum mkdir mkfifo mktemp mv nl nohup nproc od paste
-	pathchk pr printenv printf ps ptx pwd readlink rm rmdir safemode seq
+SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr chgrp chmod
+	chown chroot cksum clear clockconfig cmp collectcatkeys comm compress
+	copyattr cp csplit cut date dd diff diff3 dircolors dirname du
+	dumpcatalog echo eject env error expand expr factor false find finddir
+	fmt fold fortune gawk gzip gzexe getlimits groups head hostname id
+	<bin>install isvolume join kernel_debugger kill less lessecho lesskey link
+	linkcatkeys listdev ln locale locate logger logname ls md5sum mkdir mkfifo
+	mktemp mount mountvolume mv nl nohup nproc od paste patch pathchk pr
+	printenv printf ps ptx pwd readlink rm rmattr rmdir safemode sdiff seq
 	sha1sum shred shuf sleep sort split stat stty su sum sync sysinfo tac tail
 	tee test timeout touch tr true truncate tsort tty unexpand uname uniq
-	unlink wc whoami yes
+	unlink unmount unzip <bin>updatedb waitfor wc whoami xargs xres yes
+	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
 SYSTEM_APPS = ;
