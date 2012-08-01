@@ -401,7 +401,7 @@ while [ $# -gt 0 ] ; do
 			buildCrossToolsScript="${buildCrossToolsScript}_gcc4"
 			case "$2" in
 				x86)	HAIKU_GCC_MACHINE=i586-pc-haiku;;
-				x86_64)	HAIKU_GCC_MACHINE=x86_64-pc-haiku; targetArch=x86_64;;
+				x86_64)	HAIKU_GCC_MACHINE=x86_64-unknown-haiku; targetArch=x86_64;;
 				ppc)	HAIKU_GCC_MACHINE=powerpc-apple-haiku; targetArch=ppc;;
 				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku; targetArch=m68k;;
 				arm)	HAIKU_GCC_MACHINE=arm-unknown-haiku; targetArch=arm;;
@@ -511,15 +511,19 @@ if [ -n "$crossToolsPrefix" ]; then
 	get_build_tool_path LD ld
 	get_build_tool_path OBJCOPY objcopy
 	get_build_tool_path RANLIB ranlib
+fi
+
+# prepare gcc settings
+standard_gcc_settings
+
+# cross tools for gcc4 builds
+if [ -n "$crossToolsPrefix" ]; then
 	case $HAIKU_GCC_RAW_VERSION in
 		4.*)
 			get_build_tool_path ELFEDIT elfedit
 		;;
 	esac
 fi
-
-# prepare gcc settings
-standard_gcc_settings
 
 # check whether the Haiku compiler really targets Haiku or BeOS
 case "$HAIKU_GCC_MACHINE" in
