@@ -636,12 +636,24 @@ ResourceFile::_InitELFXFile(BFile& file, uint64 fileSize)
 	}
 
 	// align the offset
-	if (resourceAlignment < kELFMinResourceAlignment)
-		resourceAlignment = kELFMinResourceAlignment;
-	if (resourceAlignment > kELFMaxResourceAlignment) {
-		throw Exception(B_IO_ERROR, "The ELF object file requires an invalid "
-			"alignment: %lu.", resourceAlignment);
+	if (fileHeader.e_ident[EI_CLASS] == ELFCLASS64) {
+		// For ELF64 binaries we use a different alignment behaviour. It is
+		// not necessary to align the position of the resources in the file to
+		// the maximum value of p_align, and in fact on x86_64 this behaviour
+		// causes an undesirable effect: since the default segment alignment is
+		// 2MB, aligning to p_align causes all binaries to be at least 2MB when
+		// resources have been added. So, just align to an 8-byte boundary.
+		resourceAlignment = 8;
+	} else {
+		// Retain previous alignment behaviour for compatibility.
+		if (resourceAlignment < kELFMinResourceAlignment)
+			resourceAlignment = kELFMinResourceAlignment;
+		if (resourceAlignment > kELFMaxResourceAlignment) {
+			throw Exception(B_IO_ERROR, "The ELF object file requires an "
+				"invalid alignment: %lu.", resourceAlignment);
+		}
 	}
+
 	resourceOffset = align_value(resourceOffset, resourceAlignment);
 	if (resourceOffset >= fileSize) {
 //		throw Exception("The ELF object file does not contain resources.");
