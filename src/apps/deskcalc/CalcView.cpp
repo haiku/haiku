@@ -712,15 +712,14 @@ CalcView::FrameResized(float width, float height)
 void
 CalcView::AboutRequested()
 {
-	const char* authors[] = {
-		"Timothy Wayper",
-		"Stephan Aßmus",
-		"Ingo Weinhold",
+	const char* extraCopyrights[] = {
+		"1997, 1998 R3 Software Ltd.",
 		NULL
 	};
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("DeskCalc"), 2006, authors,
-		B_UTF8_COPYRIGHT "1997, 1998 R3 Software Ltd.");
-	about.Show();
+
+	BAboutWindow* about = new BAboutWindow(kAppName, kAppSig);
+	about->AddCopyright(2006, "Haiku, Inc.", extraCopyrights);
+	about->Show();
 }
 
 
@@ -1289,6 +1288,9 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 		fKeypadModeScientificItem = new BMenuItem(B_TRANSLATE("Scientific"),
 			new BMessage(MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC), '2');
 	}
+	BMenuItem* aboutItem
+		= new BMenuItem(B_TRANSLATE("About DeskCalc" B_UTF8_ELLIPSIS),
+			new BMessage(B_ABOUT_REQUESTED));
 
 	// apply current settings
 	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
@@ -1313,6 +1315,8 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 		fPopUpMenu->AddItem(fKeypadModeScientificItem);
 		_MarkKeypadItems(fOptions->keypad_mode);
 	}
+	fPopUpMenu->AddSeparatorItem();
+	fPopUpMenu->AddItem(aboutItem);
 }
 
 

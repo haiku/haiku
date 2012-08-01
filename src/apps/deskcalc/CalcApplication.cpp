@@ -30,6 +30,7 @@
 
 
 static const char* kSettingsFileName	= "DeskCalc_settings";
+const char* kAppName			= B_TRANSLATE_SYSTEM_NAME("DeskCalc");
 const char* kAppSig				= "application/x-vnd.Haiku-DeskCalc";
 
 static const float kDefaultWindowWidth	= 220.0;

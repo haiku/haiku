@@ -31,6 +31,7 @@ static const float kMaximumWidthBasic		= 400.0f;
 static const float kMinimumHeightBasic		= 130.0f;
 static const float kMaximumHeightBasic		= 400.0f;
 
+class BAboutWindow;
 class BString;
 class BMenuItem;
 class BPopUpMenu;

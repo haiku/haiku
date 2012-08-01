@@ -15,6 +15,7 @@
 #include <Application.h>
 
 
+extern const char* kAppName;
 extern const char* kAppSig;
 
 class BFile;
