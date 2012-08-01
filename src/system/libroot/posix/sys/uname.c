@@ -55,6 +55,9 @@ uname(struct utsname *info)
 		case B_AT_CLONE_PLATFORM:
 			platform = "BePC";
 			break;
+		case B_64_BIT_PC_PLATFORM:
+			platform = "x86_64";
+			break;
 		default:
 			platform = "unknown";
 			break;

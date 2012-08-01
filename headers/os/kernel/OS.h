@@ -713,7 +713,8 @@ typedef enum platform_types {
 	B_MK_61_PLATFORM,
 	B_NINTENDO_64_PLATFORM,
 	B_AMIGA_PLATFORM,
-	B_ATARI_PLATFORM
+	B_ATARI_PLATFORM,
+	B_64_BIT_PC_PLATFORM
 } platform_type;
 
 typedef struct {

@@ -68,7 +68,11 @@ arch_get_system_info(system_info *info, size_t size)
 	// - various cpu_info
 	info->cpu_clock_speed = sCpuClockSpeed;
 	// - bus_clock_speed
+#ifdef __x86_64__
+	info->platform_type = B_64_BIT_PC_PLATFORM;
+#else
 	info->platform_type = B_AT_CLONE_PLATFORM;
+#endif
 
 	// ToDo: clock speeds could be retrieved via SMBIOS/DMI
 	return B_OK;
