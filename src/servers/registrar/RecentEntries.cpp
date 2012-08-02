@@ -245,10 +245,10 @@ RecentEntries::Print()
 	std::list<recent_entry*>::iterator item;
 	int counter = 1;
 	for (item = fEntryList.begin(); item != fEntryList.end(); item++) {
-		printf("%d: device == '%ld', dir == '%lld', name == '%s', app == '%s', "
-			"index == %ld\n", counter++, (*item)->ref.device,
-			(*item)->ref.directory, (*item)->ref.name, (*item)->sig.c_str(),
-			(*item)->index);
+		printf("%d: device == '%" B_PRIdDEV "', dir == '%" B_PRIdINO "', "
+			"name == '%s', app == '%s', index == %" B_PRId32 "\n", counter++,
+			(*item)->ref.device, (*item)->ref.directory, (*item)->ref.name,
+			(*item)->sig.c_str(), (*item)->index);
 	}
 	return B_OK;
 }
@@ -308,9 +308,10 @@ RecentEntries::Save(FILE* file, const char *description, const char *tag)
 			for (std::list<recent_entry*>::iterator item = list.begin();
 					item != list.end(); i++, item++) {
 				recent_entry *entry = *item;
-				if (entry)
-					fprintf(file, " \"%s\" %ld", entry->sig.c_str(), entry->index);
-				else {
+				if (entry) {
+					fprintf(file, " \"%s\" %" B_PRId32, entry->sig.c_str(),
+						entry->index);
+				} else {
 					D(PRINT("WARNING: RecentEntries::Save(): The entry %ld "
 						"entries from the front of the compiled recent_entry* "
 						"list for the entry ref (%ld, %lld, '%s') was found to "

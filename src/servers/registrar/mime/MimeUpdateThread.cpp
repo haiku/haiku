@@ -125,9 +125,9 @@ MimeUpdateThread::ThreadFunction()
 		status_t error = fManagerMessenger.SendMessage(&msg, (BHandler*)NULL, 500000);
 		if (error)
 			OUT("WARNING: ThreadManager::ThreadEntryFunction(): Termination notification "
-				"failed with error 0x%lx\n", error);
+				"failed with error 0x%" B_PRIx32 "\n", error);
 	}
-	DBG(OUT("(id: %ld) exiting mime update thread with result 0x%lx\n",
+	DBG(OUT("(id: %ld) exiting mime update thread with result 0x%" B_PRIx32 "\n",
 		find_thread(NULL), err));
 	return err;
 }

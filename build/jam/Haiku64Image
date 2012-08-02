@@ -46,7 +46,7 @@ SYSTEM_LIBS = libbe.so libroot.so libroot-addon-icu.so
 
 PRIVATE_SYSTEM_LIBS = ;
 
-SYSTEM_SERVERS = ;
+SYSTEM_SERVERS = registrar ;
 
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci ps2 isa scsi config_manager ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
@@ -97,14 +97,14 @@ AddFilesToHaikuImage system preferences	: $(SYSTEM_PREFERENCES) ;
 AddFilesToHaikuImage system demos		: $(SYSTEM_DEMOS) ;
 
 AddSymlinkToHaikuImage system bin : bash : sh ;
-#AddSymlinkToHaikuImage system bin : less : more ;
-#AddSymlinkToHaikuImage system bin : gzip : gunzip ;
-#AddSymlinkToHaikuImage system bin : gzip : zcat ;
-#AddSymlinkToHaikuImage system bin : zdiff : zcmp ;
-#AddSymlinkToHaikuImage system bin : unzip : zipinfo ;
-#AddSymlinkToHaikuImage system bin : gawk : awk ;
-#AddSymlinkToHaikuImage system bin : grep : egrep ;
-#AddSymlinkToHaikuImage system bin : grep : fgrep ;
+AddSymlinkToHaikuImage system bin : less : more ;
+AddSymlinkToHaikuImage system bin : gzip : gunzip ;
+AddSymlinkToHaikuImage system bin : gzip : zcat ;
+AddSymlinkToHaikuImage system bin : zdiff : zcmp ;
+AddSymlinkToHaikuImage system bin : unzip : zipinfo ;
+AddSymlinkToHaikuImage system bin : gawk : awk ;
+AddSymlinkToHaikuImage system bin : grep : egrep ;
+AddSymlinkToHaikuImage system bin : grep : fgrep ;
 
 
 # scripts and data files

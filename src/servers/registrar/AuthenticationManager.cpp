@@ -975,7 +975,8 @@ AuthenticationManager::_RequestThread()
 				debug_printf("B_REG_UPDATE_GROUP done: currently unsupported!\n");
 				break;
 			default:
-				debug_printf("REG: invalid message: %lu\n", message.What());
+				debug_printf("REG: invalid message: %" B_PRIu32 "\n",
+					message.What());
 
 		}
 	}

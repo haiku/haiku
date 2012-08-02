@@ -398,9 +398,10 @@ AssociatedTypes::BuildAssociatedTypesTable()
 	if (!err) {
 		fHaveDoneFullBuild = true;
 //		PrintToStream();
+	} else {
+		DBG(OUT("Mime::AssociatedTypes::BuildAssociatedTypesTable() failed, "
+			"error code == 0x%" B_PRIx32 "\n", err));
 	}
-	else
-		DBG(OUT("Mime::AssociatedTypes::BuildAssociatedTypesTable() failed, error code == 0x%lx\n", err));
 	return err;
 
 }

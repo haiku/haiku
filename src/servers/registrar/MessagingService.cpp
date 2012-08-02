@@ -408,12 +408,13 @@ MessagingService::_CommandProcessor()
 			const messaging_command *command = area->PopCommand();
 			if (!command) {
 				// something's seriously wrong
-				ERROR("MessagingService::_CommandProcessor(): area %p (%ld) "
-					"has command count %ld, but doesn't return any more "
-					"commands.", area, area->ID(), area->CountCommands());
+				ERROR("MessagingService::_CommandProcessor(): area %p (%"
+					B_PRId32 ") has command count %" B_PRId32 ", but doesn't "
+					"return any more commands.", area, area->ID(),
+					area->CountCommands());
 				break;
 			}
-PRINT("MessagingService::_CommandProcessor(): got command %lu\n",
+PRINT("MessagingService::_CommandProcessor(): got command %" B_PRIu32 "\n",
 command->command);
 
 			// dispatch the command
@@ -424,7 +425,7 @@ command->command);
 					command->size - sizeof(messaging_command));
 			} else {
 				WARNING("MessagingService::_CommandProcessor(): No handler "
-					"found for command %lu\n", command->command);
+					"found for command %" B_PRIu32 "\n", command->command);
 			}
 		}
 
@@ -440,7 +441,7 @@ command->command);
 			} else {
 				// Bad, but what can we do?
 				ERROR("MessagingService::_CommandProcessor(): Failed to clone "
-					"kernel area %ld: %s\n", area->NextKernelAreaID(),
+					"kernel area %" B_PRId32 ": %s\n", area->NextKernelAreaID(),
 					strerror(error));
 			}
 

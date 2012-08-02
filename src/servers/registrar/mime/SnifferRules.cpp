@@ -408,8 +408,10 @@ SnifferRules::BuildRuleList()
 		fMaxBytesNeeded = maxBytesNeeded;
 		fHaveDoneFullBuild = true;
 //		PrintToStream();
-	} else
-		DBG(OUT("Mime::SnifferRules::BuildRuleList() failed, error code == 0x%lx\n", err));
+	} else {
+		DBG(OUT("Mime::SnifferRules::BuildRuleList() failed, error code == 0x%"
+			B_PRIx32 "\n", err));
+	}
 	return err;
 }
 

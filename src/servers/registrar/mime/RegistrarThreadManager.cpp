@@ -199,8 +199,9 @@ RegistrarThreadManager::KillThreads()
 					(*i)->Id()));
 				status_t err = kill_thread((*i)->Id());
 				if (err)
-					OUT("WARNING: RegistrarThreadManager::KillThreads(): kill_thread(%ld) failed with "
-						"error code 0x%lx\n", (*i)->Id(), err);
+					OUT("WARNING: RegistrarThreadManager::KillThreads(): kill_thread(%"
+						B_PRId32 ") failed with error code 0x%" B_PRIx32 "\n",
+						(*i)->Id(), err);
 			}				
 			DBG(OUT("RegistrarThreadManager::KillThreads(): Cleaning up thread %ld\n",
 				(*i)->Id()));
