@@ -393,19 +393,6 @@ FUNCTION(x86_64_syscall_entry):
 	cmpq	$SYSCALL_RESTORE_SIGNAL_FRAME, %r14
 	je		.Liret
 
-	// If the return address is not canonical, return using the IRET path.
-	// On Intel's implementation of SYSRET, the canonical address check for the
-	// return address is performed before the switch to user mode, so a fault
-	// for a non-canonical address will be triggered in kernel mode. However, by
-	// then we will have switched onto the user stack meaning the kernel could
-	// be tricked into executing with the user RSP. Using IRET will handle
-	// non-canonical addresses properly.
-	movq	IFRAME_user_sp(%rsp), %rax
-	sarq	$47, %rax
-	incl	%eax
-	cmpl	$1, %eax
-	ja		.Liret
-
 	// Restore the iframe and RCX/R11 for SYSRET.
 	RESTORE_IFRAME()
 	pop		%rcx

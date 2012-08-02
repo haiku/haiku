@@ -31,7 +31,14 @@
 #endif
 
 // Buffers passed in from user-space shouldn't point into the kernel.
-#define IS_USER_ADDRESS(x)			(!IS_KERNEL_ADDRESS(x))
+#if USER_BASE == 0
+#	define IS_USER_ADDRESS(x)		((addr_t)(x) <= USER_TOP)
+#elif USER_TOP == __HAIKU_ADDR_MAX
+#	define IS_USER_ADDRESS(x)		((addr_t)(x) >= USER_BASE)
+#else
+#	define IS_USER_ADDRESS(x) \
+		((addr_t)(x) >= USER_BASE && (addr_t)(x) <= USER_TOP)
+#endif
 
 #define DEBUG_KERNEL_STACKS
 	// Note, debugging kernel stacks doesn't really work yet. Since the
