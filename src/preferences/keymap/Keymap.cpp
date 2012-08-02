@@ -339,7 +339,10 @@ Keymap::SetDeadKeyTrigger(dead_key_index deadKeyIndex, const BString& trigger)
 status_t
 Keymap::Use()
 {
-	return _restore_key_map_();
+	status_t result = _restore_key_map_();
+	if (result == B_OK)
+		set_keyboard_locks(modifiers());
+	return result;
 }
 
 
