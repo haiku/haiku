@@ -170,7 +170,7 @@ MainWindow::MainWindow(BRect frame)
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "root menu");
 
 	// create all the menu items
-	fFormatMI = new BMenuItem(B_TRANSLATE("Format (not implemented)"),
+	fWipeMI = new BMenuItem(B_TRANSLATE("Wipe (not implemented)"),
 		new BMessage(MSG_FORMAT));
 	fEjectMI = new BMenuItem(B_TRANSLATE("Eject"),
 		new BMessage(MSG_EJECT), 'E');
@@ -193,17 +193,17 @@ MainWindow::MainWindow(BRect frame)
 
 	// Disk menu
 	fDiskMenu = new BMenu(B_TRANSLATE("Disk"));
-	fDiskMenu->AddItem(fFormatMI);
 
+	fDiskMenu->AddItem(fWipeMI);
 	fDiskInitMenu = new BMenu(B_TRANSLATE("Initialize"));
 	fDiskMenu->AddItem(fDiskInitMenu);
 
-	fDiskMenu->AddItem(fEjectMI);
-	fDiskMenu->AddItem(fSurfaceTestMI);
-
 	fDiskMenu->AddSeparatorItem();
 
+	fDiskMenu->AddItem(fEjectMI);
+	fDiskMenu->AddItem(fSurfaceTestMI);
 	fDiskMenu->AddItem(fRescanMI);
+
 	menuBar->AddItem(fDiskMenu);
 
 	// Parition menu
@@ -529,12 +529,12 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 	fFormatMenu->SetEnabled(false);
 
 	if (!disk) {
-		fFormatMI->SetEnabled(false);
+		fWipeMI->SetEnabled(false);
 		fEjectMI->SetEnabled(false);
 		fSurfaceTestMI->SetEnabled(false);
 	} else {
-//		fFormatMI->SetEnabled(true);
-		fFormatMI->SetEnabled(false);
+//		fWipeMI->SetEnabled(true);
+		fWipeMI->SetEnabled(false);
 		fEjectMI->SetEnabled(disk->IsRemovableMedia());
 //		fSurfaceTestMI->SetEnabled(true);
 		fSurfaceTestMI->SetEnabled(false);

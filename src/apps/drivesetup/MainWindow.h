@@ -88,7 +88,7 @@ private:
 			BMenu*				fPartitionMenu;
 			BMenu*				fFormatMenu;
 
-			BMenuItem*			fFormatMI;
+			BMenuItem*			fWipeMI;
 			BMenuItem*			fEjectMI;
 			BMenuItem*			fSurfaceTestMI;
 			BMenuItem*			fRescanMI;
