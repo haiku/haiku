@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons kernel generic bios ;
+
+UsePrivateKernelHeaders ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) x86emu ] ;
+
+KernelAddon bios :
+	decode.c
+	fpu.c
+	ops.c
+	ops2.c
+	prim_ops.c
+	sys.c
+
+	bios.cpp
+;
+

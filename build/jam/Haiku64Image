@@ -65,7 +65,7 @@ AddFilesToHaikuImage system add-ons kernel debugger
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
-	: $(ATA_ONLY)ata_adapter dpc locked_pool scsi_periph <module>tty ;
+	: $(ATA_ONLY)ata_adapter bios dpc locked_pool scsi_periph <module>tty ;
 AddFilesToHaikuImage system add-ons kernel partitioning_systems
 	: intel session ;
 
