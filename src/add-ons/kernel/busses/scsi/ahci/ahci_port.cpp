@@ -148,14 +148,14 @@ AHCIPort::Init2()
 
 	ResetPort(true);
 
-	TRACE("ie   0x%08lx\n", fRegs->ie);
-	TRACE("is   0x%08lx\n", fRegs->is);
-	TRACE("cmd  0x%08lx\n", fRegs->cmd);
-	TRACE("ssts 0x%08lx\n", fRegs->ssts);
-	TRACE("sctl 0x%08lx\n", fRegs->sctl);
-	TRACE("serr 0x%08lx\n", fRegs->serr);
-	TRACE("sact 0x%08lx\n", fRegs->sact);
-	TRACE("tfd  0x%08lx\n", fRegs->tfd);
+	TRACE("ie   0x%08" B_PRIx32 "\n", fRegs->ie);
+	TRACE("is   0x%08" B_PRIx32 "\n", fRegs->is);
+	TRACE("cmd  0x%08" B_PRIx32 "\n", fRegs->cmd);
+	TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
+	TRACE("sctl 0x%08" B_PRIx32 "\n", fRegs->sctl);
+	TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
+	TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
+	TRACE("tfd  0x%08" B_PRIx32 "\n", fRegs->tfd);
 
 	fDevicePresent = (fRegs->ssts & 0xf) == 0x3;
 
@@ -300,7 +300,7 @@ AHCIPort::PostReset()
 	FlushPostedWrites();
 
 	if (!fTestUnitReadyActive) {
-		TRACE("device signature 0x%08lx (%s)\n", fRegs->sig,
+		TRACE("device signature 0x%08" B_PRIx32 " (%s)\n", fRegs->sig,
 			(fRegs->sig == 0xeb140101) ? "ATAPI" : (fRegs->sig == 0x00000101) ?
 				"ATA" : "unknown");
 	}
@@ -339,8 +339,8 @@ AHCIPort::Interrupt()
 
 	uint32 ci = fRegs->ci;
 
-	RWTRACE("[%lld] %ld AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, "
-		"is 0x%08lx, ci 0x%08lx\n", system_time(), find_thread(NULL),
+	RWTRACE("[%lld] %ld AHCIPort::Interrupt port %d, fCommandsActive 0x%08" B_PRIx32 ", "
+		"is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", system_time(), find_thread(NULL),
 		fIndex, fCommandsActive, is, ci);
 
 	acquire_spinlock(&fSpinlock);
@@ -359,13 +359,13 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 
 	if (!fTestUnitReadyActive) {
 		TRACE("AHCIPort::InterruptErrorHandler port %d, "
-			"fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex,
+			"fCommandsActive 0x%08" B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", fIndex,
 			fCommandsActive, is, ci);
 
-		TRACE("ssts 0x%08lx\n", fRegs->ssts);
-		TRACE("sctl 0x%08lx\n", fRegs->sctl);
-		TRACE("serr 0x%08lx\n", fRegs->serr);
-		TRACE("sact 0x%08lx\n", fRegs->sact);
+		TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
+		TRACE("sctl 0x%08" B_PRIx32 "\n", fRegs->sctl);
+		TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
+		TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	}
 
 	// read and clear SError
@@ -615,8 +615,8 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		fSectorSize = 512;
 		fSectorCount = !(lba || sectors) ? 0 : lba48 ? sectors48 : sectors;
 		fTrim = ataData.data_set_management_support;
-		TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %lu, "
-			"sectors48 %llu, size %llu\n",
+		TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %" B_PRIu32
+			", sectors48 %" B_PRIu64 ", size %" B_PRIu64 "\n",
 			lba, lba48, fUse48BitCommands, sectors, sectors48,
 			fSectorCount * fSectorSize);
 	}
@@ -687,7 +687,8 @@ AHCIPort::ScsiReadCapacity(scsi_ccb *request)
 		return;
 	}
 
-	TRACE("SectorSize %lu, SectorCount 0x%llx\n", fSectorSize, fSectorCount);
+	TRACE("SectorSize %" B_PRIu32 ", SectorCount 0x%" B_PRIx64 "\n",
+		fSectorSize, fSectorCount);
 
 	if (fSectorCount > 0xffffffff)
 		panic("ahci: SCSI emulation doesn't support harddisks larger than 2TB");
@@ -814,20 +815,20 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 	FLOW("tfd %#x\n", tfd);
 	FLOW("prdbc %ld\n", fCommandList->prdbc);
-	FLOW("ci   0x%08lx\n", fRegs->ci);
-	FLOW("is   0x%08lx\n", fRegs->is);
-	FLOW("serr 0x%08lx\n", fRegs->serr);
+	FLOW("ci   0x%08" B_PRIx32 "\n", fRegs->ci);
+	FLOW("is   0x%08" B_PRIx32 "\n", fRegs->is);
+	FLOW("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
 
 /*
-	TRACE("ci   0x%08lx\n", fRegs->ci);
-	TRACE("ie   0x%08lx\n", fRegs->ie);
-	TRACE("is   0x%08lx\n", fRegs->is);
-	TRACE("cmd  0x%08lx\n", fRegs->cmd);
-	TRACE("ssts 0x%08lx\n", fRegs->ssts);
-	TRACE("sctl 0x%08lx\n", fRegs->sctl);
-	TRACE("serr 0x%08lx\n", fRegs->serr);
-	TRACE("sact 0x%08lx\n", fRegs->sact);
-	TRACE("tfd  0x%08lx\n", fRegs->tfd);
+	TRACE("ci   0x%08" B_PRIx32 "\n", fRegs->ci);
+	TRACE("ie   0x%08" B_PRIx32 "\n", fRegs->ie);
+	TRACE("is   0x%08" B_PRIx32 "\n", fRegs->is);
+	TRACE("cmd  0x%08" B_PRIx32 "\n", fRegs->cmd);
+	TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
+	TRACE("sctl 0x%08" B_PRIx32 "\n", fRegs->sctl);
+	TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
+	TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
+	TRACE("tfd  0x%08" B_PRIx32 "\n", fRegs->tfd);
 */
 
 	if (fResetPort || status == B_TIMED_OUT) {
@@ -1025,5 +1026,5 @@ AHCIPort::ScsiGetRestrictions(bool *isATAPI, bool *noAutoSense,
 	*noAutoSense = fIsATAPI; // emulated auto sense for ATA, but not ATAPI
 	*maxBlocks = fUse48BitCommands ? 65536 : 256;
 	TRACE("AHCIPort::ScsiGetRestrictions port %d: isATAPI %d, noAutoSense %d, "
-		"maxBlocks %lu\n", fIndex, *isATAPI, *noAutoSense, *maxBlocks);
+		"maxBlocks %" B_PRIu32 "\n", fIndex, *isATAPI, *noAutoSense, *maxBlocks);
 }
