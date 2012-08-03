@@ -31,6 +31,8 @@ public:
 	inline			FileSystem*	GetFileSystem() const;
 
 	inline			void*		FileCache();
+	inline			OpenFileCookie*	WriteCookie();
+	inline			void		SetWriteCookie(OpenFileCookie* cookie);
 
 					status_t	GetChangeInfo(uint64* change);
 
@@ -116,6 +118,9 @@ protected:
 
 					DirectoryCache*	fCache;
 					void*		fFileCache;
+					OpenFileCookie*	fWriteCookie;
+
+					bool		fWriteDirty;
 };
 
 
@@ -162,6 +167,20 @@ inline void*
 Inode::FileCache()
 {
 	return fFileCache;
+}
+
+
+inline OpenFileCookie*
+Inode::WriteCookie()
+{
+	return fWriteCookie;
+}
+
+
+inline void
+Inode::SetWriteCookie(OpenFileCookie* cookie)
+{
+	fWriteCookie = cookie;
 }
 
 

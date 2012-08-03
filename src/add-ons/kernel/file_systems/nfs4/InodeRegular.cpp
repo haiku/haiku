@@ -384,6 +384,8 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 	uint64 fileSize;
 	const char* buffer = reinterpret_cast<const char*>(_buffer);
 
+	fWriteDirty = true;
+
 	while (size < *_length) {
 		do {
 			RPC::Server* serv = fFileSystem->Server();
@@ -460,6 +462,9 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 status_t
 Inode::Commit()
 {
+	if (!fWriteDirty)
+		return B_OK;
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);

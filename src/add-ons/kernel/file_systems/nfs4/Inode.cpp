@@ -24,7 +24,9 @@ Inode::Inode()
 	:
 	fAttrCacheExpire(0),
 	fCache(NULL),
-	fFileCache(NULL)
+	fFileCache(NULL),
+	fWriteCookie(NULL),
+	fWriteDirty(false)
 {
 	mutex_init(&fAttrCacheLock, NULL);
 }
