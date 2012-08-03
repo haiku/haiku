@@ -5,7 +5,7 @@
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
- *		John Scipione, jscipione@gmail.com
+ *		John Scipione <jscipione@gmail.com>
  *		Timothy Wayper <timmy@wunderbear.com>
  */
 

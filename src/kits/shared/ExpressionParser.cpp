@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2011 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione <jscipione@gmail.com>
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
 #include <ExpressionParser.h>

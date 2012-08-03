@@ -1,6 +1,9 @@
 /*
  * Copyright 2006 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef INPUT_TEXT_VIEW_H
 #define INPUT_TEXT_VIEW_H

@@ -5,8 +5,8 @@
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Philippe Saint-Pierre, stpere@gmail.com
- *		John Scipione, jscipione@gmail.com
+ *		Philippe Saint-Pierre <stpere@gmail.com>
+ *		John Scipione <jscipione@gmail.com>
  *		Timothy Wayper <timmy@wunderbear.com>
  */
 
