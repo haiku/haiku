@@ -909,17 +909,14 @@ TInfoView::Draw(BRect updateRect)
 	strcpy(fInfoStr, dimensionsInfo);
 	DrawString(fInfoStr);
 
-	rgb_color c = { 0,0,0, 255 };
-	uchar index = 0;
-	if (fMagView) {
-		c = fMagView->SelectionColor();
-		BScreen s;
-		index = s.IndexForColor(c);
-	}
-	MovePenTo(10, fFontHeight*2+5);
+	rgb_color color = { 0, 0, 0, 255 };
+	if (fMagView)
+		color = fMagView->SelectionColor();
 	char str[64];
-	sprintf(str, "R: %i G: %i B: %i  (0x%x)",
-		c.red, c.green, c.blue, index);
+	snprintf(str, sizeof(str), "R: %i G: %i B: %i (#%02x%02x%02x)",
+		color.red, color.green, color.blue, color.red, color.green, color.red);
+
+	MovePenTo(10, fFontHeight*2+5);
 	invalRect.Set(10, fFontHeight+7, 10 + StringWidth(fRGBStr), fFontHeight*2+7);
 	SetHighColor(ViewColor());
 	FillRect(invalRect);
