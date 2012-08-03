@@ -31,6 +31,8 @@ public:
 	inline			FileSystem*	GetFileSystem() const;
 
 	inline			void*		FileCache();
+					status_t	RevalidateFileCache();
+
 	inline			OpenFileCookie*	WriteCookie();
 	inline			void		SetWriteCookie(OpenFileCookie* cookie);
 
@@ -117,8 +119,11 @@ protected:
 					FileSystem*	fFileSystem;
 
 					DirectoryCache*	fCache;
+
+					uint64		fChange;
 					void*		fFileCache;
 					OpenFileCookie*	fWriteCookie;
+					mutex		fFileCacheLock;
 
 					bool		fWriteDirty;
 };

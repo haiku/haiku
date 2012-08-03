@@ -29,6 +29,7 @@ Inode::Inode()
 	fWriteDirty(false)
 {
 	mutex_init(&fAttrCacheLock, NULL);
+	mutex_init(&fFileCacheLock, NULL);
 }
 
 
@@ -55,8 +56,8 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 
 		req.PutFH(inode->fInfo.fHandle);
 
-		Attribute attr[] = { FATTR4_TYPE, FATTR4_SIZE, FATTR4_FSID,
-			FATTR4_FILEID };
+		Attribute attr[] = { FATTR4_TYPE, FATTR4_CHANGE, FATTR4_SIZE,
+			FATTR4_FSID, FATTR4_FILEID };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
 		status_t result = request.Send();
@@ -73,14 +74,14 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 		AttrValue* values;
 		uint32 count;
 		result = reply.GetAttr(&values, &count);
-		if (result != B_OK || count < 3)
+		if (result != B_OK || count < 4)
 			return result;
 
 		if (fi.fFileId == 0) {
-			if (count < 4 || values[3].fAttribute != FATTR4_FILEID)
+			if (count < 5 || values[4].fAttribute != FATTR4_FILEID)
 				inode->fInfo.fFileId = fs->AllocFileId();
 			else
-				inode->fInfo.fFileId = values[3].fData.fValue64;
+				inode->fInfo.fFileId = values[4].fData.fValue64;
 		} else
 			inode->fInfo.fFileId = fi.fFileId;
 
@@ -90,12 +91,15 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 		if (inode->fType == NF4DIR)
 			inode->fCache = new DirectoryCache(inode);
 
+		// FATTR4_CHANGE is mandatory
+		inode->fChange = values[1].fData.fValue64;
+
 		// FATTR4_SIZE is mandatory
-		size = values[1].fData.fValue64;
+		size = values[2].fData.fValue64;
 
 		// FATTR4_FSID is mandatory
 		FileSystemId* fsid =
-			reinterpret_cast<FileSystemId*>(values[2].fData.fPointer);
+			reinterpret_cast<FileSystemId*>(values[3].fData.fPointer);
 		if (*fsid != fs->FsId()) {
 			delete[] values;
 			return B_ENTRY_NOT_FOUND;
@@ -121,7 +125,36 @@ Inode::~Inode()
 		file_cache_delete(fFileCache);
 
 	delete fCache;
+	mutex_destroy(&fFileCacheLock);
 	mutex_destroy(&fAttrCacheLock);
+}
+
+
+status_t
+Inode::RevalidateFileCache()
+{
+	uint64 change;
+	status_t result = GetChangeInfo(&change);
+	if (result != B_OK)
+		return result;
+
+	MutexLocker _(fFileCacheLock);
+	if (change == fChange)
+		return B_OK;
+
+	result = _UpdateAttrCache(true);
+	if (result != B_OK)
+		return result;
+
+	file_cache_sync(fFileCache);
+	Commit();
+	file_cache_delete(fFileCache);
+
+	fFileCache = file_cache_create(fFileSystem->DevId(), ID(),
+		fAttrCache.st_size);
+
+	change = fChange;
+	return B_OK;
 }
 
 

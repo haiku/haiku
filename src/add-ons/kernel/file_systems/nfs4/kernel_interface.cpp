@@ -429,7 +429,6 @@ nfs4_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 		return B_NO_MEMORY;
 	*_cookie = cookie;
 
-
 	status_t result = inode->Open(openMode, cookie);
 	if (result != B_OK)
 		delete cookie;
@@ -605,6 +604,9 @@ nfs4_acquire_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+
+	inode->RevalidateFileCache();
+
 	return inode->AcquireLock(cookie, lock, wait);
 }
 
@@ -619,6 +621,10 @@ nfs4_release_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 		return B_OK;
 
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+
+	file_cache_sync(inode->FileCache());
+	inode->Commit();
+
 	if (lock != NULL)
 		return inode->ReleaseLock(cookie, lock);
 	else
