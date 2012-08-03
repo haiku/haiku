@@ -207,6 +207,12 @@ enum OpenFlags {
 	OPEN4_RESULT_LOCKTYPE_POSIX	= 4
 };
 
+struct ChangeInfo {
+	bool	fAtomic;
+	uint64	fBefore;
+	uint64	fAfter;
+};
+
 enum WriteStable {
 	UNSTABLE4				= 0,
 	DATA_SYNC4				= 1,

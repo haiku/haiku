@@ -70,7 +70,7 @@ RootInode::_UpdateInfo(bool force)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (_HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -152,7 +152,7 @@ RootInode::ProbeMigration()
 		if (reply.NFS4Error() == NFS4ERR_MOVED)
 			return true;
 
-		if (_HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
 		return false;
@@ -179,7 +179,7 @@ RootInode::GetLocations(AttrValue** attrv)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (_HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();

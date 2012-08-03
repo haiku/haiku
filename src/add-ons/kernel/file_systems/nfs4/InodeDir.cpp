@@ -20,95 +20,7 @@
 status_t
 Inode::CreateDir(const char* name, int mode)
 {
-	bool badOwner = false;
-
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fInfo.fHandle);
-
-		uint32 i = 0;
-		AttrValue cattr[3];
-		cattr[i].fAttribute = FATTR4_MODE;
-		cattr[i].fFreePointer = false;
-		cattr[i].fData.fValue32 = mode;
-		i++;
-
-		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER)) {
-			cattr[i].fAttribute = FATTR4_OWNER;
-			cattr[i].fFreePointer = true;
-			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
-			i++;
-		}
-
-		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
-			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
-			cattr[i].fFreePointer = true;
-			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
-			i++;
-		}
-
-		req.Create(NF4DIR, name, cattr, i);
-
-		req.GetFH();
-		Attribute attr[] = { FATTR4_FILEID };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (reply.NFS4Error() == NFS4ERR_BADOWNER) {
-			badOwner = true;
-			continue;
-		}
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-
-		uint64 before, after;
-		bool atomic;
-		result = reply.Create(&before, &after, atomic);
-		if (result != B_OK)
-			return result;
-
-		FileHandle handle;
-		result = reply.GetFH(&handle);
-		if (result != B_OK)
-			return result;
-
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
-
-		uint32 fileID;
-		if (count == 0)
-			fileID = fFileSystem->AllocFileId();
-		else
-			fileID = values[0].fData.fValue64;
-
-		result = _ChildAdded(name, fileID, handle);
-		if (result != B_OK)
-			return B_OK;
-
-		if (fCache->Lock() == B_OK) {
-			if (atomic && fCache->ChangeInfo() == before) {
-				fCache->AddEntry(name, fileID, true);
-				fCache->SetChangeInfo(after);
-			} else if (fCache->ChangeInfo() != before)
-				fCache->Trash();
-			fCache->Unlock();
-		}
-
-		return B_OK;
-	} while (true);
+	return CreateObject(name, NULL, mode, NF4DIR);
 }
 
 
@@ -118,116 +30,22 @@ Inode::OpenDir(OpenDirCookie* cookie)
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
 
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
+	status_t result = Access(R_OK);
+	if (result != B_OK)
+		return result;
 
-		req.PutFH(fInfo.fHandle);
-		req.Access();
+	cookie->fFileSystem = fFileSystem;
+	cookie->fSpecial = 0;
+	cookie->fSnapshot = NULL;
+	cookie->fCurrent = NULL;
+	cookie->fEOF = false;
 
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-
-		uint32 allowed;
-		result = reply.Access(NULL, &allowed);
-		if (result != B_OK)
-			return result;
-
-		if (allowed & ACCESS4_READ != ACCESS4_READ)
-			return B_PERMISSION_DENIED;
-
-		cookie->fFileSystem = fFileSystem;
-		cookie->fSpecial = 0;
-		cookie->fSnapshot = NULL;
-		cookie->fCurrent = NULL;
-		cookie->fEOF = false;
-
-		fFileSystem->Root()->MakeInfoInvalid();
-
-		return B_OK;
-	} while (true);
+	return B_OK;
 }
 
 
 status_t
-Inode::_ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
-	bool* eof, uint64* change, uint64* dirCookie, uint64* dirCookieVerf)
-{
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fInfo.fHandle);
-
-		Attribute dirAttr[] = { FATTR4_CHANGE };
-		if (*change == 0)
-			req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
-
-		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
-		req.ReadDir(*count, *dirCookie, *dirCookieVerf, attr,
-			sizeof(attr) / sizeof(Attribute));
-
-		req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
-
-		status_t result = request.Send(cookie);
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-
-		AttrValue* before = NULL;
-		uint32 attrCount;
-		if (*change == 0) {
-			result = reply.GetAttr(&before, &attrCount);
-			if (result != B_OK)
-				return result;
-		}
-
-		result = reply.ReadDir(dirCookie, dirCookieVerf, dirents,
-			count, eof);
-		if (result != B_OK) {
-			delete[] before;
-			return result;
-		}
-
-		AttrValue* after;
-		result = reply.GetAttr(&after, &attrCount);
-		if (result != B_OK) {
-			delete[] before;
-			return result;
-		}
-
-		if (*change == 0 && before[0].fData.fValue64 == after[0].fData.fValue64
-			|| *change == after[0].fData.fValue64)
-			*change = after[0].fData.fValue64;
-		else
-			return B_ERROR;
-
-		delete[] before;
-		delete[] after;
-
-		return B_OK;
-	} while (true);
-}
-
-
-status_t
-Inode::_FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
+Inode::FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 	uint32 size)
 {
 	uint32 nameSize = strlen(name);
@@ -249,7 +67,7 @@ Inode::_FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 
 
 status_t
-Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
+Inode::ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
@@ -271,7 +89,7 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (_HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -295,13 +113,13 @@ Inode::_ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 		} else
 			fileId = fFileSystem->AllocFileId();
 
-		return _FillDirEntry(de, _FileIdToInoT(fileId), "..", pos, size);
+		return FillDirEntry(de, FileIdToInoT(fileId), "..", pos, size);
 	} while (true);
 }
 
 
 status_t
-Inode::_GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
+Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 	OpenDirCookie* cookie, uint64* _change)
 {
 	DirectoryCacheSnapshot* snapshot = new DirectoryCacheSnapshot;
@@ -317,7 +135,7 @@ Inode::_GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 		uint32 count;
 		DirEntry* dirents;
 
-		status_t result = _ReadDirOnce(&dirents, &count, cookie, &eof, &change,
+		status_t result = ReadDirOnce(&dirents, &count, cookie, &eof, &change,
 			&dirCookie, &dirCookieVerf);
 		if (result != B_OK) {
 			delete snapshot;
@@ -335,9 +153,9 @@ Inode::_GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 
 			ino_t id;
 			if (dirents[i].fAttrCount == 2)
-				id = _FileIdToInoT(dirents[i].fAttrs[1].fData.fValue64);
+				id = FileIdToInoT(dirents[i].fAttrs[1].fData.fValue64);
 			else
-				id = _FileIdToInoT(fFileSystem->AllocFileId());
+				id = FileIdToInoT(fFileSystem->AllocFileId());
 	
 			NameCacheEntry* entry = new NameCacheEntry(dirents[i].fName, id);
 			if (entry == NULL || entry->fName == NULL) {
@@ -381,7 +199,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 		cookie->fSnapshot = fCache->GetSnapshot();
 		if (cookie->fSnapshot == NULL) {
 			uint64 change;
-			result = _GetDirSnapshot(&cookie->fSnapshot, cookie, &change);
+			result = GetDirSnapshot(&cookie->fSnapshot, cookie, &change);
 			if (result != B_OK) {
 				fCache->Unlock();
 				fFileSystem->Revalidator().Unlock();
@@ -405,7 +223,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 
 		status_t result;
-		result = _FillDirEntry(de, fInfo.fFileId, ".", pos, size);
+		result = FillDirEntry(de, fInfo.fFileId, ".", pos, size);
 
 		if (result == B_BUFFER_OVERFLOW)
 			overflow = true;
@@ -422,9 +240,11 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 		
 		status_t result;
 		if (strcmp(fInfo.fName, "/"))
-			result = _ReadDirUp(de, pos, size);
-		else
-			result = _FillDirEntry(de, _FileIdToInoT(fInfo.fFileId), "..", pos, size);
+			result = ReadDirUp(de, pos, size);
+		else {
+			result = FillDirEntry(de, FileIdToInoT(fInfo.fFileId), "..", pos,
+				size);
+		}
 
 		if (result == B_BUFFER_OVERFLOW)
 			overflow = true;
@@ -452,7 +272,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 			break;
 		}
 
-		if (_FillDirEntry(de, cookie->fCurrent->fNode, cookie->fCurrent->fName,
+		if (FillDirEntry(de, cookie->fCurrent->fNode, cookie->fCurrent->fName,
 			pos, size) == B_BUFFER_OVERFLOW) {
 			overflow = true;
 			break;

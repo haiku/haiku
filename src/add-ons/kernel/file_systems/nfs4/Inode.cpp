@@ -66,7 +66,7 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (inode->_HandleErrors(reply.NFS4Error(), serv))
+		if (inode->HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
 		reply.PutFH();
@@ -142,7 +142,7 @@ Inode::RevalidateFileCache()
 	if (change == fChange)
 		return B_OK;
 
-	result = _UpdateAttrCache(true);
+	result = UpdateAttrCache(true);
 	if (result != B_OK)
 		return result;
 
@@ -159,45 +159,6 @@ Inode::RevalidateFileCache()
 
 
 status_t
-Inode::GetChangeInfo(uint64* change)
-{
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fInfo.fHandle);
-
-		Attribute attr[] = { FATTR4_CHANGE };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK || count < 1)
-			return result;
-
-		// FATTR4_CHANGE is mandatory
-		*change = values[0].fData.fValue64;
-		delete[] values;
-
-		return B_OK;
-	} while (true);
-}
-
-
-status_t
 Inode::LookUp(const char* name, ino_t* id)
 {
 	if (fType != NF4DIR)
@@ -208,472 +169,179 @@ Inode::LookUp(const char* name, ino_t* id)
 		return B_OK;
 	}
 
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
+	uint64 change;
+	uint64 fileID;
+	FileHandle handle;
+	status_t result = NFS4Inode::LookUp(name, &change, &fileID, &handle);
+	if (result != B_OK)
+		return result;
 
-		req.PutFH(fInfo.fHandle);
+	*id = FileIdToInoT(fileID);
 
-		Attribute dirAttr[] = { FATTR4_CHANGE };
-		req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
+	result = ChildAdded(name, fileID, handle);
+	if (result != B_OK)
+		return result;
 
-		if (!strcmp(name, ".."))
-			req.LookUpUp();
-		else
-			req.LookUp(name);
+	fFileSystem->Revalidator().Lock();
+	if (fCache->Lock() != B_OK) {
+		fCache->ResetAndLock();
+		fCache->SetChangeInfo(change);
+	} else {
+		fFileSystem->Revalidator().RemoveDirectory(fCache);
+		fCache->ValidateChangeInfo(change);
+	}
 
-		req.GetFH();
+	fCache->AddEntry(name, *id);
+	fFileSystem->Revalidator().AddDirectory(fCache);
+	fCache->Unlock();
+	fFileSystem->Revalidator().Unlock();
 
-		Attribute attr[] = { FATTR4_FSID, FATTR4_FILEID };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
-
-		uint64 change = values[0].fData.fValue64;
-		delete[] values;
-
-		if (!strcmp(name, ".."))
-			result = reply.LookUpUp();
-		else
-			result = reply.LookUp();
-		if (result != B_OK)
-			return result;
-
-		FileHandle fh;
-		reply.GetFH(&fh);
-
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
-
-		// FATTR4_FSID is mandatory
-		FileSystemId* fsid =
-			reinterpret_cast<FileSystemId*>(values[0].fData.fPointer);
-		if (*fsid != fFileSystem->FsId()) {
-			delete[] values;
-			return B_ENTRY_NOT_FOUND;
-		}
-
-		uint64 fileId;
-		if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
-			fileId = fFileSystem->AllocFileId();
-		else
-			fileId = values[1].fData.fValue64;
-		delete[] values;
-
-		*id = _FileIdToInoT(fileId);
-
-		result = _ChildAdded(name, fileId, fh);
-		if (result != B_OK)
-			return result;
-
-		fFileSystem->Revalidator().Lock();
-		if (fCache->Lock() != B_OK) {
-			fCache->ResetAndLock();
-			fCache->SetChangeInfo(change);
-		} else {
-			fFileSystem->Revalidator().RemoveDirectory(fCache);
-			fCache->ValidateChangeInfo(change);
-		}
-
-		fCache->AddEntry(name, *id);
-		fFileSystem->Revalidator().AddDirectory(fCache);
-		fCache->Unlock();
-		fFileSystem->Revalidator().Unlock();
-
-		return B_OK;
-	} while (true);
+	return B_OK;
 }
 
 
 status_t
 Inode::Link(Inode* dir, const char* name)
 {
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
+	ChangeInfo changeInfo;
+	status_t result = NFS4Inode::Link(dir, name, &changeInfo);
+	if (result != B_OK)
+		return result;
 
-		req.PutFH(fInfo.fHandle);
-		req.SaveFH();
-		req.PutFH(dir->fInfo.fHandle);
-		req.Link(name);
+	fFileSystem->Root()->MakeInfoInvalid();
 
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
+	FileInfo fi = fInfo;
+	fi.fParent = dir->fInfo.fHandle;
+	free(const_cast<char*>(fi.fName));
+	fi.fName = strdup(name);
+	if (fi.fName == NULL)
+		return B_NO_MEMORY;
 
-		ReplyInterpreter& reply = request.Reply();
+	char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
+		strlen(fInfo.fPath)));
+	if (path == NULL)
+		return B_NO_MEMORY;
 
-		// FileHandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			fInfo.UpdateFileHandles(fFileSystem);
-			dir->fInfo.UpdateFileHandles(dir->fFileSystem);
-			continue;
-		}
+	strcpy(path, dir->fInfo.fPath);
+	strcat(path, "/");
+	strcat(path, name);
+	free(const_cast<char*>(fi.fPath));
+	fi.fPath = path;
 
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			fFileSystem->Migrate(serv);
-			continue;
-		}
+	fFileSystem->InoIdMap()->AddEntry(fi, fInfo.fFileId);
 
-		reply.PutFH();
-		reply.SaveFH();
-		reply.PutFH();
+	if (dir->fCache->Lock() == B_OK) {
+		if (changeInfo.fAtomic
+			&& dir->fCache->ChangeInfo() == changeInfo.fBefore) {
+			dir->fCache->AddEntry(name, fInfo.fFileId, true);
+			dir->fCache->SetChangeInfo(changeInfo.fAfter);
+		} else if (dir->fCache->ChangeInfo() != changeInfo.fBefore)
+			dir->fCache->Trash();
+		dir->fCache->Unlock();
+	}
 
-		uint64 before, after;
-		bool atomic;
-		result = reply.Link(&before, &after, atomic);
-		if (result != B_OK)
-			return result;
-
-		fFileSystem->Root()->MakeInfoInvalid();
-
-		FileInfo fi = fInfo;
-		fi.fParent = dir->fInfo.fHandle;
-		free(const_cast<char*>(fi.fName));
-		fi.fName = strdup(name);
-		if (fi.fName == NULL)
-			return B_NO_MEMORY;
-
-		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-			strlen(fInfo.fPath)));
-		if (path == NULL)
-			return B_NO_MEMORY;
-
-		strcpy(path, dir->fInfo.fPath);
-		strcat(path, "/");
-		strcat(path, name);
-		free(const_cast<char*>(fi.fPath));
-		fi.fPath = path;
-
-		fFileSystem->InoIdMap()->AddEntry(fi, fInfo.fFileId);
-
-		if (dir->fCache->Lock() == B_OK) {
-			if (atomic && dir->fCache->ChangeInfo() == before) {
-				dir->fCache->AddEntry(name, fInfo.fFileId, true);
-				dir->fCache->SetChangeInfo(after);
-			} else if (dir->fCache->ChangeInfo() != before)
-				dir->fCache->Trash();
-			dir->fCache->Unlock();
-		}
-
-		return B_OK;
-	} while (true);
+	return B_OK;
 }
 
 
-// May cause problem similar to Rename (described below). When node's is has
-// more than one hard link and we delete the name it stores for FileHandle
-// restoration node will inocorectly become unavailable.
 status_t
 Inode::Remove(const char* name, FileType type)
 {
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fInfo.fHandle);
-		req.LookUp(name);
-		AttrValue attr;
-		attr.fAttribute = FATTR4_TYPE;
-		attr.fFreePointer = false;
-		attr.fData.fValue32 = NF4DIR;
-		if (type == NF4DIR)
-			req.Verify(&attr, 1);
-		else
-			req.Nverify(&attr, 1);
-
-		req.PutFH(fInfo.fHandle);
-		req.Remove(name);
-
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-		result = reply.LookUp();
-		if (result != B_OK)
-			return result;
-
-		if (type == NF4DIR)
-			result = reply.Verify();
-		else
-			result = reply.Nverify();
-
-		if (result == NFS4ERR_SAME && type != NF4DIR)
-			return B_IS_A_DIRECTORY;
-		if (result == NFS4ERR_NOT_SAME && type == NF4DIR)
-			return B_NOT_A_DIRECTORY;
-		if (result != B_OK)
-			return result;
-
-		reply.PutFH();
-
-		uint64 before, after;
-		bool atomic;
-		result = reply.Remove(&before, &after, atomic);
-
-		if (fCache->Lock() == B_OK) {
-			if (atomic && fCache->ChangeInfo() == before) {
-				fCache->RemoveEntry(name);
-				fCache->SetChangeInfo(after);
-			} else if (fCache->ChangeInfo() != before)
-				fCache->Trash();
-			fCache->Unlock();
-		}
-
-		fFileSystem->Root()->MakeInfoInvalid();
-
+	ChangeInfo changeInfo;
+	status_t result = NFS4Inode::RemoveObject(name, type, &changeInfo);
+	if (result != B_OK)
 		return result;
-	} while (true);
+
+	if (fCache->Lock() == B_OK) {
+		if (changeInfo.fAtomic
+			&& fCache->ChangeInfo() == changeInfo.fBefore) {
+			fCache->RemoveEntry(name);
+			fCache->SetChangeInfo(changeInfo.fAfter);
+		} else if (fCache->ChangeInfo() != changeInfo.fBefore)
+			fCache->Trash();
+		fCache->Unlock();
+	}
+
+	fFileSystem->Root()->MakeInfoInvalid();
+
+	return B_OK;
 }
 
 
-// Rename may cause some problems if FileHandles are volatile and local Inode
-// object exists for renamed node. It's stored filename will become invalid
-// and, consequnetly, FileHandle restoration will fail. Probably, it will
-// be much easier to solve this problem if more metadata is cached.
 status_t
 Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 {
 	if (from->fFileSystem != to->fFileSystem)
 		return B_DONT_DO_THAT;
 
-	do {
-		RPC::Server* serv = from->fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
+	ChangeInfo fromChange, toChange;
+	uint64 fileID;
+	status_t result = NFS4Inode::Rename(from, to, fromName, toName, &fromChange,
+		&toChange, &fileID);
+	if (result != B_OK)
+		return result;
 
-		req.PutFH(from->fInfo.fHandle);
-		req.SaveFH();
-		req.PutFH(to->fInfo.fHandle);
-		req.Rename(fromName, toName);
+	from->fFileSystem->Root()->MakeInfoInvalid();
 
-		Attribute attr[] = { FATTR4_FILEID };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-		req.LookUp(toName);
+	if (from->fCache->Lock() == B_OK) {
+		if (fromChange.fAtomic
+			&& from->fCache->ChangeInfo() == fromChange.fBefore) {
+			from->fCache->RemoveEntry(fromName);
+			from->fCache->SetChangeInfo(fromChange.fAfter);
+		} else if (from->fCache->ChangeInfo() != fromChange.fBefore)
+			from->fCache->Trash();
+		from->fCache->Unlock();
+	}
 
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
+	if (to->fCache->Lock() == B_OK) {
+		if (toChange.fAtomic
+			&& to->fCache->ChangeInfo() == toChange.fBefore) {
+			to->fCache->AddEntry(toName, fileID, true);
+			to->fCache->SetChangeInfo(toChange.fAfter);
+		} else if (to->fCache->ChangeInfo() != toChange.fBefore)
+			to->fCache->Trash();
+		to->fCache->Unlock();
+	}
 
-		ReplyInterpreter& reply = request.Reply();
-
-		// FileHandle has expired
-		if (reply.NFS4Error() == NFS4ERR_FHEXPIRED) {
-			from->fInfo.UpdateFileHandles(from->fFileSystem);
-			to->fInfo.UpdateFileHandles(to->fFileSystem);
-			continue;
-		}
-
-		// filesystem has been moved
-		if (reply.NFS4Error() == NFS4ERR_MOVED) {
-			from->fFileSystem->Migrate(serv);
-			continue;
-		}
-
-		reply.PutFH();
-		reply.SaveFH();
-		reply.PutFH();
-
-		uint64 fromBefore, fromAfter, toBefore, toAfter;
-		bool fromAtomic, toAtomic;
-		result = reply.Rename(&fromBefore, &fromAfter, fromAtomic, &toBefore,
-			&toAfter, toAtomic);
-		if (result != B_OK)
-			return result;
-
-		result = reply.LookUp();
-		if (result != B_OK)
-			return result;
-
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
-
-		uint32 fileID;
-		if (count == 0)
-			fileID = from->fFileSystem->AllocFileId();
-		else
-			fileID = values[1].fData.fValue64;
-
-		from->fFileSystem->Root()->MakeInfoInvalid();
-
-		if (from->fCache->Lock() == B_OK) {
-			if (fromAtomic && from->fCache->ChangeInfo() == fromBefore) {
-				from->fCache->RemoveEntry(fromName);
-				from->fCache->SetChangeInfo(fromAfter);
-			} else if (from->fCache->ChangeInfo() != fromBefore)
-				from->fCache->Trash();
-			from->fCache->Unlock();
-		}
-
-		if (to->fCache->Lock() == B_OK) {
-			if (toAtomic && to->fCache->ChangeInfo() == toBefore) {
-				to->fCache->AddEntry(toName, fileID, true);
-				to->fCache->SetChangeInfo(toAfter);
-			} else if (to->fCache->ChangeInfo() != toBefore)
-				to->fCache->Trash();
-			to->fCache->Unlock();
-		}
-
-		return B_OK;
-	} while (true);
+	return B_OK;
 }
 
 
 status_t
 Inode::CreateLink(const char* name, const char* path, int mode)
 {
-	bool badOwner = false;
-
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fInfo.fHandle);
-
-		uint32 i = 0;
-		AttrValue cattr[3];
-		cattr[i].fAttribute = FATTR4_MODE;
-		cattr[i].fFreePointer = false;
-		cattr[i].fData.fValue32 = mode;
-		i++;
-
-		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER)) {
-			cattr[i].fAttribute = FATTR4_OWNER;
-			cattr[i].fFreePointer = true;
-			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
-			i++;
-		}
-
-		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
-			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
-			cattr[i].fFreePointer = true;
-			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
-			i++;
-		}
-
-		req.Create(NF4LNK, name, cattr, i, path);
-
-		req.GetFH();
-		Attribute attr[] = { FATTR4_FILEID };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (reply.NFS4Error() == NFS4ERR_BADOWNER) {
-			badOwner = true;
-			continue;
-		}
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-
-		uint64 before, after;
-		bool atomic;
-		result = reply.Create(&before, &after, atomic);
-		if (result != B_OK)
-			return result;
-
-		FileHandle handle;
-		reply.GetFH(&handle);
-
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
-
-		uint32 fileID;
-		if (count == 0)
-			fileID = fFileSystem->AllocFileId();
-		else
-			fileID = values[0].fData.fValue64;
-
-		fFileSystem->Root()->MakeInfoInvalid();
-
-		result = _ChildAdded(name, fileID, handle);
-		if (result != B_OK)
-			return B_OK;
-
-		if (fCache->Lock() == B_OK) {
-			if (atomic && fCache->ChangeInfo() == before) {
-				fCache->AddEntry(name, fileID, true);
-				fCache->SetChangeInfo(after);
-			} else if (fCache->ChangeInfo() != before)
-				fCache->Trash();
-			fCache->Unlock();
-		}
-
-		return B_OK;
-	} while (true);
+	return CreateObject(name, path, mode, NF4LNK);
 }
 
 
 status_t
-Inode::ReadLink(void* buffer, size_t* length)
+Inode::CreateObject(const char* name, const char* path, int mode, FileType type)
 {
-	if (fType != NF4LNK)
-		return B_BAD_VALUE;
+	ChangeInfo changeInfo;
+	uint64 fileID;
+	FileHandle handle;
 
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
+	status_t result = NFS4Inode::CreateObject(name, path, mode, type, &changeInfo,
+		&fileID, &handle);
+	if (result != B_OK)
+		return B_OK;
 
-		req.PutFH(fInfo.fHandle);
-		req.ReadLink();	
+	fFileSystem->Root()->MakeInfoInvalid();
 
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
+	result = ChildAdded(name, fileID, handle);
+	if (result != B_OK)
+		return B_OK;
 
-		ReplyInterpreter& reply = request.Reply();
+	if (fCache->Lock() == B_OK) {
+		if (changeInfo.fAtomic && fCache->ChangeInfo() == changeInfo.fBefore) {
+			fCache->AddEntry(name, fileID, true);
+			fCache->SetChangeInfo(changeInfo.fAfter);
+		} else if (fCache->ChangeInfo() != changeInfo.fBefore)
+			fCache->Trash();
+		fCache->Unlock();
+	}
 
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-
-		uint32 size;
-		result = reply.ReadLink(buffer, &size, *length);
-		*length = static_cast<size_t>(size);
-
-		return result;
-	} while (true);
+	return B_OK;
 }
 
 
@@ -682,69 +350,22 @@ Inode::Access(int mode)
 {
 	int acc = 0;
 
-	if (fFileSystem->IsAttrSupported(FATTR4_MODE)) {
-		status_t result = _UpdateAttrCache();
-		if (result != B_OK)
-			return result;
+	uint32 allowed;
+	status_t result = NFS4Inode::Access(&allowed);
+	if (result != B_OK)
+		return result;
 
-		// Root squashing and owner mapping problems may make this function
-		// return false values. However, since due to race condition it can
-		// not be used for anything critical, it is not a serius problem.
+	if ((allowed & ACCESS4_READ) != 0)
+		acc |= R_OK;
 
-		mode_t nodeMode = fAttrCache.st_mode;
-		uint8 userMode = (nodeMode & S_IRWXU) >> 6;
-		uint8 groupMode = (nodeMode & S_IRWXG) >> 3;
-		uint8 otherMode = (nodeMode & S_IRWXO);
+	if ((allowed & ACCESS4_LOOKUP) != 0)
+		acc |= X_OK | R_OK;
 
-		uid_t uid = geteuid();
-		if (uid == 0)
-			acc = userMode | groupMode | otherMode | R_OK | W_OK;
-		else if (uid == fAttrCache.st_uid)
-			acc = userMode;
-		else if (getegid() == fAttrCache.st_gid)
-			acc = groupMode;
-		else
-			acc = otherMode;
-	} else {
-		do {
-			RPC::Server* serv = fFileSystem->Server();
-			Request request(serv);
-			RequestBuilder& req = request.Builder();
+	if ((allowed & ACCESS4_EXECUTE) != 0)
+		acc |= X_OK;
 
-			req.PutFH(fInfo.fHandle);
-			req.Access();
-
-			status_t result = request.Send();
-			if (result != B_OK)
-				return result;
-
-			ReplyInterpreter& reply = request.Reply();
-
-			if (_HandleErrors(reply.NFS4Error(), serv))
-				continue;
-
-			reply.PutFH();
-
-			uint32 allowed;
-			result = reply.Access(NULL, &allowed);
-			if (result != B_OK)
-				return result;
-
-			if ((allowed & ACCESS4_READ) != 0)
-				acc |= R_OK;
-
-			if (fType == NF4DIR && (allowed & ACCESS4_LOOKUP) != 0)
-				acc |= X_OK | R_OK;
-
-			if (fType != NF4DIR && (allowed & ACCESS4_EXECUTE) != 0)
-				acc |= X_OK;
-
-			if ((allowed & ACCESS4_MODIFY) != 0)
-				acc |= W_OK;
-
-			break;
-		} while (true);
-	}
+	if ((allowed & ACCESS4_MODIFY) != 0)
+		acc |= W_OK;
 
 	if ((mode & acc) != mode)
 		return B_NOT_ALLOWED;
@@ -756,7 +377,7 @@ Inode::Access(int mode)
 status_t
 Inode::Stat(struct stat* st)
 {
-	status_t result = _UpdateAttrCache();
+	status_t result = UpdateAttrCache();
 	if (result != B_OK)
 		return result;
 
@@ -776,7 +397,7 @@ Inode::Stat(struct stat* st)
 
 
 status_t
-Inode::_UpdateAttrCache(bool force)
+Inode::UpdateAttrCache(bool force)
 {
 	if (!force && fAttrCacheExpire > time(NULL))
 		return B_OK;
@@ -786,135 +407,85 @@ Inode::_UpdateAttrCache(bool force)
 	if (fAttrCacheExpire > time(NULL))
 		return B_OK;
 
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
+	AttrValue* values;
+	uint32 count;
+	status_t result = GetStat(&values, &count);
+	if (result != B_OK)
+		return result;
 
-		req.PutFH(fInfo.fHandle);
-
-		Attribute attr[] = { FATTR4_SIZE, FATTR4_MODE, FATTR4_NUMLINKS,
-							FATTR4_OWNER, FATTR4_OWNER_GROUP,
-							FATTR4_TIME_ACCESS, FATTR4_TIME_CREATE,
-							FATTR4_TIME_METADATA, FATTR4_TIME_MODIFY };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
-
-		// FATTR4_SIZE is mandatory
-		if (count < 1 || values[0].fAttribute != FATTR4_SIZE) {
-			delete[] values;
-			return B_BAD_VALUE;
-		}
-		fAttrCache.st_size = values[0].fData.fValue64;
-
-		uint32 next = 1;
-		fAttrCache.st_mode = Type();
-		if (count >= next && values[next].fAttribute == FATTR4_MODE) {
-			fAttrCache.st_mode |= values[next].fData.fValue32;
-			next++;
-		} else {
-			// Try to guess using ACCESS request
-			request.Reset();
-			request.Builder().PutFH(fInfo.fHandle);
-			request.Builder().Access();
-			result = request.Send();
-			if (result != B_OK)
-				return result;
-			request.Reply().PutFH();
-			uint32 prvl;
-			result = request.Reply().Access(NULL, &prvl);
-			if (result != B_OK)
-				return result;
-
-			if ((prvl & ACCESS4_READ) != 0)
-				fAttrCache.st_mode |= S_IRUSR | S_IRGRP | S_IROTH;
-
-			if ((prvl & ACCESS4_MODIFY) != 0)
-				fAttrCache.st_mode |= S_IWUSR | S_IWGRP | S_IWOTH;
-
-			if (fType == NF4DIR && (prvl & ACCESS4_LOOKUP) != 0)
-				fAttrCache.st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
-
-			if (fType != NF4DIR && (prvl & ACCESS4_EXECUTE) != 0)
-				fAttrCache.st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
-		}
-
-		if (count >= next && values[next].fAttribute == FATTR4_NUMLINKS) {
-			fAttrCache.st_nlink = values[next].fData.fValue32;
-			next++;
-		} else
-			fAttrCache.st_nlink = 1;
-
-		if (count >= next && values[next].fAttribute == FATTR4_OWNER) {
-			char* owner = reinterpret_cast<char*>(values[next].fData.fPointer);
-			if (owner != NULL && isdigit(owner[0]))
-				fAttrCache.st_uid = atoi(owner);
-			else
-				fAttrCache.st_uid = gIdMapper->GetUserId(owner);
-			next++;
-		} else
-			fAttrCache.st_uid = 0;
-
-		if (count >= next && values[next].fAttribute == FATTR4_OWNER_GROUP) {
-			char* group = reinterpret_cast<char*>(values[next].fData.fPointer);
-			if (group != NULL && isdigit(group[0]))
-				fAttrCache.st_gid = atoi(group);
-			else
-				fAttrCache.st_gid = gIdMapper->GetGroupId(group);
-			next++;
-		} else
-			fAttrCache.st_gid = 0;
-
-		if (count >= next && values[next].fAttribute == FATTR4_TIME_ACCESS) {
-			memcpy(&fAttrCache.st_atim, values[next].fData.fPointer,
-				sizeof(timespec));
-			next++;
-		} else
-			memset(&fAttrCache.st_atim, 0, sizeof(timespec));
-
-		if (count >= next && values[next].fAttribute == FATTR4_TIME_CREATE) {
-			memcpy(&fAttrCache.st_crtim, values[next].fData.fPointer,
-				sizeof(timespec));
-			next++;
-		} else
-			memset(&fAttrCache.st_crtim, 0, sizeof(timespec));
-
-		if (count >= next && values[next].fAttribute == FATTR4_TIME_METADATA) {
-			memcpy(&fAttrCache.st_ctim, values[next].fData.fPointer,
-				sizeof(timespec));
-			next++;
-		} else
-			memset(&fAttrCache.st_ctim, 0, sizeof(timespec));
-
-		if (count >= next && values[next].fAttribute == FATTR4_TIME_MODIFY) {
-			memcpy(&fAttrCache.st_mtim, values[next].fData.fPointer,
-				sizeof(timespec));
-			next++;
-		} else
-			memset(&fAttrCache.st_mtim, 0, sizeof(timespec));
-
+	// FATTR4_SIZE is mandatory
+	if (count < 1 || values[0].fAttribute != FATTR4_SIZE) {
 		delete[] values;
+		return B_BAD_VALUE;
+	}
+	fAttrCache.st_size = values[0].fData.fValue64;
 
-		fAttrCacheExpire = time(NULL) + kAttrCacheExpirationTime;
+	uint32 next = 1;
+	fAttrCache.st_mode = Type();
+	if (count >= next && values[next].fAttribute == FATTR4_MODE) {
+		fAttrCache.st_mode |= values[next].fData.fValue32;
+		next++;
+	} else
+		fAttrCache.st_mode = 777;
 
-		return B_OK;
-	} while (true);
+	if (count >= next && values[next].fAttribute == FATTR4_NUMLINKS) {
+		fAttrCache.st_nlink = values[next].fData.fValue32;
+		next++;
+	} else
+		fAttrCache.st_nlink = 1;
+
+	if (count >= next && values[next].fAttribute == FATTR4_OWNER) {
+		char* owner = reinterpret_cast<char*>(values[next].fData.fPointer);
+		if (owner != NULL && isdigit(owner[0]))
+			fAttrCache.st_uid = atoi(owner);
+		else
+			fAttrCache.st_uid = gIdMapper->GetUserId(owner);
+		next++;
+	} else
+		fAttrCache.st_uid = 0;
+
+	if (count >= next && values[next].fAttribute == FATTR4_OWNER_GROUP) {
+		char* group = reinterpret_cast<char*>(values[next].fData.fPointer);
+		if (group != NULL && isdigit(group[0]))
+			fAttrCache.st_gid = atoi(group);
+		else
+			fAttrCache.st_gid = gIdMapper->GetGroupId(group);
+		next++;
+	} else
+		fAttrCache.st_gid = 0;
+
+	if (count >= next && values[next].fAttribute == FATTR4_TIME_ACCESS) {
+		memcpy(&fAttrCache.st_atim, values[next].fData.fPointer,
+			sizeof(timespec));
+		next++;
+	} else
+		memset(&fAttrCache.st_atim, 0, sizeof(timespec));
+
+	if (count >= next && values[next].fAttribute == FATTR4_TIME_CREATE) {
+		memcpy(&fAttrCache.st_crtim, values[next].fData.fPointer,
+			sizeof(timespec));
+		next++;
+	} else
+		memset(&fAttrCache.st_crtim, 0, sizeof(timespec));
+
+	if (count >= next && values[next].fAttribute == FATTR4_TIME_METADATA) {
+		memcpy(&fAttrCache.st_ctim, values[next].fData.fPointer,
+			sizeof(timespec));
+		next++;
+	} else
+		memset(&fAttrCache.st_ctim, 0, sizeof(timespec));
+
+	if (count >= next && values[next].fAttribute == FATTR4_TIME_MODIFY) {
+		memcpy(&fAttrCache.st_mtim, values[next].fData.fPointer,
+			sizeof(timespec));
+		next++;
+	} else
+		memset(&fAttrCache.st_mtim, 0, sizeof(timespec));
+	delete[] values;
+
+	fAttrCacheExpire = time(NULL) + kAttrCacheExpirationTime;
+
+	return B_OK;
 }
 
 
@@ -981,51 +552,21 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 		i++;
 	}
 
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
+	result = NFS4Inode::WriteStat(cookie, attr, i);
 
-		req.PutFH(fInfo.fHandle);
-		if ((mask & B_STAT_SIZE) != 0)
-			req.SetAttr(cookie->fStateId, cookie->fStateSeq, attr, i);
-		else
-			req.SetAttr(NULL, 0, attr, i);
+	if ((mask & B_STAT_SIZE) != 0) {
+		Close(cookie);
+		delete cookie;
+	}
 
-		status_t result = request.Send();
-		if (result != B_OK) {
-			Close(cookie);
-			delete cookie;
-			return result;
-		}
+	UpdateAttrCache(true);
 
-		ReplyInterpreter& reply = request.Reply();
-
-		if (_HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-		result = reply.SetAttr();
-
-		if ((mask & B_STAT_SIZE) != 0) {
-			Close(cookie);
-			delete cookie;
-		}
-
-		if (result != B_OK)
-			return result;
-
-		break;
-	} while (true);
-
-	_UpdateAttrCache(true);
-
-	return B_OK;
+	return result;
 }
 
 
 inline status_t
-Inode::_CheckLockType(short ltype, uint32 mode)
+Inode::CheckLockType(short ltype, uint32 mode)
 {
 	switch (ltype) {
 		case F_UNLCK:
@@ -1046,62 +587,43 @@ Inode::_CheckLockType(short ltype, uint32 mode)
 	}
 }
 
-
 status_t
 Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
 {
 	if (lock->l_type == F_UNLCK)
 		return B_OK;
 
-	status_t result = _CheckLockType(lock->l_type, cookie->fMode);
+	status_t result = CheckLockType(lock->l_type, cookie->fMode);
 	if (result != B_OK)
 		return result;
 
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
+	LockType ltype = sGetLockType(lock->l_type, false);
+	uint64 position = lock->l_start;
+	uint64 length = lock->l_len;
+	bool conflict;
 
-		req.PutFH(fInfo.fHandle);
-		req.LockT(sGetLockType(lock->l_type, false), lock->l_start,
-			lock->l_len, cookie);
-
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter &reply = request.Reply();
-		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
-			continue;
-
-		reply.PutFH();
-		LockType ltype;
-		uint64 pos, len;
-		result = reply.LockT(&pos, &len, &ltype);
-		if (reply.NFS4Error() == NFS4ERR_DENIED) {
-			lock->l_type = sLockTypeToHaiku(ltype);
-			lock->l_start = static_cast<off_t>(pos);
-			if (len >= OFF_MAX)
-				lock->l_len = OFF_MAX;
-			else
-				lock->l_len = static_cast<off_t>(len);
-
-			result = B_OK;
-		} else if (reply.NFS4Error() == NFS4_OK)
-			lock->l_type = F_UNLCK;
-
+	result = NFS4Inode::TestLock(cookie, &ltype, &position, &length, conflict);
+	if (result != B_OK)
 		return result;
-	} while (true);
+
+	if (conflict) {
+		lock->l_type = sLockTypeToHaiku(ltype);
+		lock->l_start = static_cast<off_t>(position);
+		if (length >= OFF_MAX)
+			lock->l_len = OFF_MAX;
+		else
+			lock->l_len = static_cast<off_t>(length);
+	} else
+		lock->l_type = F_UNLCK;
 
 	return B_OK;
 }
-
 
 status_t
 Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	bool wait)
 {
-	status_t result = _CheckLockType(lock->l_type, cookie->fMode);
+	status_t result = CheckLockType(lock->l_type, cookie->fMode);
 	if (result != B_OK)
 		return result;
 
@@ -1125,42 +647,9 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 		linfo->fLength = lock->l_len;
 	linfo->fType = sGetLockType(lock->l_type, wait);
 
-	do {
-		MutexLocker ownerLocker(linfo->fOwner->fLock);
-
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fInfo.fHandle);
-		req.Lock(cookie, linfo);
-
-		status_t result = request.Send();
-		if (result != B_OK) {
-			cookie->DeleteLock(linfo);
-			return result;
-		}
-
-		ReplyInterpreter &reply = request.Reply();
-
-		reply.PutFH();
-		result = reply.Lock(linfo);
-
-		ownerLocker.Unlock();
-		if (wait && reply.NFS4Error() == NFS4ERR_DENIED) {
-			snooze_etc(sSecToBigTime(5), B_SYSTEM_TIMEBASE,
-				B_RELATIVE_TIMEOUT);
-			continue;
-		}
-		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
-			continue;
-
-		if (result != B_OK) {
-			cookie->DeleteLock(linfo);
-			return result;
-		}
-		break;
-	} while (true);
+	result = NFS4Inode::AcquireLock(cookie, linfo, wait);
+	if (result != B_OK)
+		return result;
 
 	MutexLocker _(cookie->fLocksLock);
 	cookie->AddLock(linfo);
@@ -1194,38 +683,9 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 	if (linfo == NULL)
 		return B_BAD_VALUE;
 
-	do {
-		MutexLocker ownerLocker(linfo->fOwner->fLock);
-
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fInfo.fHandle);
-		req.LockU(linfo);
-
-		status_t result = request.Send();
-		if (result != B_OK) {
-			cookie->DeleteLock(linfo);
-			return result;
-		}
-
-		ReplyInterpreter &reply = request.Reply();
-
-		reply.PutFH();
-		result = reply.LockU(linfo);
-
-		ownerLocker.Unlock();
-		if (_HandleErrors(reply.NFS4Error(), serv, cookie))
-			continue;
-
-		if (result != B_OK) {
-			cookie->DeleteLock(linfo);
-			return result;
-		}
-
-		break;
-	} while (true);
+	status_t result = NFS4Inode::ReleaseLock(cookie, linfo);
+	if (result != B_OK)
+		return result;
 
 	cookie->DeleteLock(linfo);
 
@@ -1239,32 +699,8 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 	MutexLocker _(cookie->fLocksLock);
 	LockInfo* linfo = cookie->fLocks;
 	while (linfo != NULL) {
-		do {
-			MutexLocker ownerLocker(linfo->fOwner->fLock);
-
-			RPC::Server* serv = fFileSystem->Server();
-			Request request(serv);
-			RequestBuilder& req = request.Builder();
-
-			req.PutFH(fInfo.fHandle);
-			req.LockU(linfo);
-
-			status_t result = request.Send();
-			if (result != B_OK)
-				break;
-
-			ReplyInterpreter& reply = request.Reply();
-
-			reply.PutFH();
-			reply.LockU(linfo);
-
-			ownerLocker.Unlock();
-			if (_HandleErrors(reply.NFS4Error(), serv, cookie))
-				continue;
-
-			break;
-		} while (true);
-	
+		MutexLocker ownerLocker(linfo->fOwner->fLock);
+		NFS4Inode::ReleaseLock(cookie, linfo);
 		cookie->RemoveLock(linfo, NULL);
 		cookie->DeleteLock(linfo);
 
@@ -1275,86 +711,8 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 }
 
 
-bool
-Inode::_HandleErrors(uint32 nfs4Error, RPC::Server* serv,
-	OpenFileCookie* cookie)
-{
-	uint32 leaseTime;
-
-	switch (nfs4Error) {
-		case NFS4_OK:
-			return false;
-
-		// server needs more time, we need to wait
-		case NFS4ERR_LOCKED:
-		case NFS4ERR_DELAY:
-			if (cookie == NULL) {
-				snooze_etc(sSecToBigTime(5), B_SYSTEM_TIMEBASE,
-					B_RELATIVE_TIMEOUT);
-				return true;
-			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
-				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
-					B_RELATIVE_TIMEOUT, sSecToBigTime(5));
-				if (result != B_TIMED_OUT) {
-					release_sem(cookie->fSnoozeCancel);
-					return false;
-				}
-				return true;
-			}
-			return false;
-
-		// server is in grace period, we need to wait
-		case NFS4ERR_GRACE:
-			leaseTime = fFileSystem->NFSServer()->LeaseTime();
-			if (cookie == NULL) {
-				snooze_etc(sSecToBigTime(leaseTime) / 3, B_SYSTEM_TIMEBASE,
-					B_RELATIVE_TIMEOUT);
-				return true;
-			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
-				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
-					B_RELATIVE_TIMEOUT, sSecToBigTime(leaseTime) / 3);
-				if (result != B_TIMED_OUT) {
-					release_sem(cookie->fSnoozeCancel);
-					return false;
-				}
-				return true;
-			}
-			return false;
-
-		// server has rebooted, reclaim share and try again
-		case NFS4ERR_STALE_CLIENTID:
-		case NFS4ERR_STALE_STATEID:
-			fFileSystem->NFSServer()->ServerRebooted(cookie->fClientId);
-			return true;
-
-		// FileHandle has expired
-		case NFS4ERR_FHEXPIRED:
-			if (fInfo.UpdateFileHandles(fFileSystem) == B_OK)
-				return true;
-			return false;
-
-		// filesystem has been moved
-		case NFS4ERR_LEASE_MOVED:
-		case NFS4ERR_MOVED:
-			fFileSystem->Migrate(serv);
-			return true;
-
-		// lease has expired
-		case NFS4ERR_EXPIRED:
-			if (cookie != NULL) {
-				fFileSystem->NFSServer()->ClientId(cookie->fClientId, true);
-				return true;
-			}
-			return false;
-
-		default:
-			return false;
-	}
-}
-
-
 status_t
-Inode::_ChildAdded(const char* name, uint64 fileID,
+Inode::ChildAdded(const char* name, uint64 fileID,
 	const FileHandle& fileHandle)
 {
 	fFileSystem->Root()->MakeInfoInvalid();
@@ -1377,6 +735,6 @@ Inode::_ChildAdded(const char* name, uint64 fileID,
 	strcat(path, name);
 	fi.fPath = path;
 
-	return fFileSystem->InoIdMap()->AddEntry(fi, _FileIdToInoT(fileID));
+	return fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
 }
 

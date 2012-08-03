@@ -9,17 +9,10 @@
 #define INODE_H
 
 
-#include <sys/stat.h>
-
-#include <SupportDefs.h>
-
-#include "Cookie.h"
-#include "FileSystem.h"
-#include "NFS4Defs.h"
-#include "ReplyInterpreter.h"
+#include "NFS4Inode.h"
 
 
-class Inode {
+class Inode : public NFS4Inode {
 public:
 	static			status_t	CreateInode(FileSystem* fs, const FileInfo& fi,
 									Inode** inode);
@@ -36,22 +29,23 @@ public:
 	inline			OpenFileCookie*	WriteCookie();
 	inline			void		SetWriteCookie(OpenFileCookie* cookie);
 
-					status_t	GetChangeInfo(uint64* change);
+					status_t	LookUp(const char* name, ino_t* id);
+
+					status_t	Access(int mode);
 
 					status_t	Commit();
 
-					status_t	LookUp(const char* name, ino_t* id);
+					status_t	CreateObject(const char* name, const char* path,
+									int mode, FileType type);
 
 					status_t	CreateLink(const char* name, const char* path,
 									int mode);
-					status_t	ReadLink(void* buffer, size_t* length);
 
 					status_t	Link(Inode* dir, const char* name);
 					status_t	Remove(const char* name, FileType type);
 	static			status_t	Rename(Inode* from, Inode* to,
 									const char* fromName, const char* toName);
 
-					status_t	Access(int mode);
 					status_t	Stat(struct stat* st);
 					status_t	WriteStat(const struct stat* st, uint32 mask);
 
@@ -77,46 +71,32 @@ public:
 									const struct flock* lock);
 					status_t	ReleaseAllLocks(OpenFileCookie* cookie);
 
-
 protected:
 								Inode();
 
-					bool		_HandleErrors(uint32 nfs4Error,
-									RPC::Server* serv,
-									OpenFileCookie* cookie = NULL);
-
-					status_t	_ConfirmOpen(const FileHandle& fh,
-									OpenFileCookie* cookie);
-
-					status_t	_ReadDirOnce(DirEntry** dirents, uint32* count,
-									OpenDirCookie* cookie, bool* eof,
-									uint64* change, uint64* dirCookie,
-									uint64* dirCookieVerf);
-					status_t	_FillDirEntry(struct dirent* de, ino_t id,
-									const char* name, uint32 pos, uint32 size);
-					status_t	_ReadDirUp(struct dirent* de, uint32 pos,
+					status_t	ReadDirUp(struct dirent* de, uint32 pos,
 									uint32 size);
-					status_t	_GetDirSnapshot(DirectoryCacheSnapshot**
+					status_t	FillDirEntry(struct dirent* de, ino_t id,
+									const char* name, uint32 pos, uint32 size);
+					status_t	GetDirSnapshot(DirectoryCacheSnapshot**
 									_snapshot, OpenDirCookie* cookie,
 									uint64* _change);
 
-					status_t	_ChildAdded(const char* name, uint64 fileID,
+					status_t	ChildAdded(const char* name, uint64 fileID,
 									const FileHandle& fileHandle);
 
-	static inline	status_t	_CheckLockType(short ltype, uint32 mode);
+					status_t	UpdateAttrCache(bool force = false);
 
-	static inline	ino_t		_FileIdToInoT(uint64 fileid);
+	static inline	status_t	CheckLockType(short ltype, uint32 mode);
+
+	static inline	ino_t		FileIdToInoT(uint64 fileid);
+
+					uint32		fType;
 
 					struct stat	fAttrCache;
 					mutex		fAttrCacheLock;
 					time_t		fAttrCacheExpire;
 	static const	time_t		kAttrCacheExpirationTime	= 60;
-					status_t	_UpdateAttrCache(bool force = false);
-
-					uint32		fType;
-
-					FileInfo	fInfo;
-					FileSystem*	fFileSystem;
 
 					DirectoryCache*	fCache;
 
@@ -130,7 +110,7 @@ protected:
 
 
 inline ino_t
-Inode::_FileIdToInoT(uint64 fileid)
+Inode::FileIdToInoT(uint64 fileid)
 {
 	if (sizeof(ino_t) >= sizeof(uint64))
 		return fileid;
@@ -143,7 +123,7 @@ Inode::_FileIdToInoT(uint64 fileid)
 inline ino_t
 Inode::ID() const
 {
-	return _FileIdToInoT(fInfo.fFileId);
+	return FileIdToInoT(fInfo.fFileId);
 }
 
 
