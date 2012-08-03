@@ -151,7 +151,7 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 
 	*_length = size;
 
-	fAttrCache.st_size = max_c(fAttrCache.st_size, *_length + pos);
+	fMetaCache.GrowFile(size + pos);
 	fFileSystem->Root()->MakeInfoInvalid();
 
 	return B_OK;

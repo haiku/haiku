@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include "MetadataCache.h"
 #include "Request.h"
 
 
@@ -126,7 +127,7 @@ RootInode::_UpdateInfo(bool force)
 	fInfoCache.flags = 0;
 	strncpy(fInfoCache.volume_name, fInfo.fName, B_FILE_NAME_LENGTH);
 
-	fInfoCacheExpire = time(NULL) + kAttrCacheExpirationTime;
+	fInfoCacheExpire = time(NULL) + MetadataCache::kExpirationTime;
 
 	return B_OK;
 }

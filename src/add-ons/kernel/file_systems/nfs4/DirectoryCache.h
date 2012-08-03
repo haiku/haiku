@@ -64,7 +64,7 @@ public:
 	inline	Inode*			GetInode();
 	inline	time_t			ExpireTime();
 
-	static	const bigtime_t	kExpirationTime		= 5000000;
+	static	const bigtime_t	kExpirationTime		= 15000000;
 private:
 			SinglyLinkedList<NameCacheEntry>	fNameCache;
 

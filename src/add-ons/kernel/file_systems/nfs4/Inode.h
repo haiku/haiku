@@ -9,6 +9,7 @@
 #define INODE_H
 
 
+#include "MetadataCache.h"
 #include "NFS4Inode.h"
 
 
@@ -85,7 +86,7 @@ protected:
 					status_t	ChildAdded(const char* name, uint64 fileID,
 									const FileHandle& fileHandle);
 
-					status_t	UpdateAttrCache(bool force = false);
+					status_t	GetStat(struct stat* st);
 
 	static inline	status_t	CheckLockType(short ltype, uint32 mode);
 
@@ -93,11 +94,7 @@ protected:
 
 					uint32		fType;
 
-					struct stat	fAttrCache;
-					mutex		fAttrCacheLock;
-					time_t		fAttrCacheExpire;
-	static const	time_t		kAttrCacheExpirationTime	= 60;
-
+					MetadataCache	fMetaCache;
 					DirectoryCache*	fCache;
 
 					uint64		fChange;

@@ -15,6 +15,7 @@ KernelAddon nfs4 :
 	InodeDir.cpp
 	InodeRegular.cpp
 	kernel_interface.cpp
+	MetadataCache.cpp
 	NFS4Inode.cpp
 	NFS4Object.cpp
 	NFS4Server.cpp
