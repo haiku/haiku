@@ -508,10 +508,10 @@ TTeamMenuItem::DrawContentLabel()
 	bool canHandle = !barview->Dragging()
 		|| barview->AppCanHandleTypes(Signature());
 	if (_IsSelected() && IsEnabled() && canHandle)
-		menu->SetLowColor(tint_color(menu->ViewColor(),
+		menu->SetLowColor(tint_color(menu->LowColor(),
 			B_HIGHLIGHT_BACKGROUND_TINT));
 	else
-		menu->SetLowColor(menu->ViewColor());
+		menu->SetLowColor(menu->LowColor());
 
 	menu->DrawString(label);
 

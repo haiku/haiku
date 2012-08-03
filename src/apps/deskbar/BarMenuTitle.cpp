@@ -130,7 +130,7 @@ TBarMenuTitle::DrawContent()
 		return;
 	}
 
-	rgb_color menuColor = menu->ViewColor();
+	rgb_color menuColor = menu->LowColor();
 	rgb_color dark = tint_color(menuColor, B_DARKEN_1_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
 	rgb_color black = {0, 0, 0, 255};
