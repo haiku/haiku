@@ -1439,7 +1439,7 @@ BMenu::_InitData(BMessage* archive)
 	fLayoutData->lastResizingMode = ResizingMode();
 
 	SetLowColor(sMenuInfo.background_color);
-	SetViewColor(sMenuInfo.background_color);
+	SetViewColor(B_TRANSPARENT_COLOR);
 
 	fTriggerEnabled = sMenuInfo.triggers_always_shown;
 

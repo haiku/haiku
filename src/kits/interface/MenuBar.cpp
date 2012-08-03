@@ -47,8 +47,8 @@ struct menubar_data {
 BMenuBar::BMenuBar(BRect frame, const char* title, uint32 resizeMask,
 		menu_layout layout, bool resizeToFit)
 	:
-	BMenu(frame, title, resizeMask, B_WILL_DRAW | B_FRAME_EVENTS, layout,
-		resizeToFit),
+	BMenu(frame, title, resizeMask, B_WILL_DRAW | B_FRAME_EVENTS
+		| B_FULL_UPDATE_ON_RESIZE, layout, resizeToFit),
 	fBorder(B_BORDER_FRAME),
 	fTrackingPID(-1),
 	fPrevFocusToken(-1),
