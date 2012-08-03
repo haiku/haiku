@@ -828,7 +828,13 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	}
 
 	if (diskSystem.IsFileSystem()) {
-		if (partition->ContentName() && strlen(partition->ContentName()) > 0) {
+		if (disk->ID() == selectedPartition) {
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to format a raw disk? (most people initialize the disk "
+				"with a partitioning system first) You will be asked "
+				"again before changes are written to the disk."));
+		} else if (partition->ContentName()
+			&& strlen(partition->ContentName()) > 0) {
 			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
 				"want to format the partition \"%s\"? You will be asked "
 				"again before changes are written to the disk."),
