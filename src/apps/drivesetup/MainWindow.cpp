@@ -194,14 +194,14 @@ MainWindow::MainWindow(BRect frame)
 	// Disk menu
 	fDiskMenu = new BMenu(B_TRANSLATE("Disk"));
 
-	fDiskMenu->AddItem(fWipeMI);
+	// fDiskMenu->AddItem(fWipeMI);
 	fDiskInitMenu = new BMenu(B_TRANSLATE("Initialize"));
 	fDiskMenu->AddItem(fDiskInitMenu);
 
 	fDiskMenu->AddSeparatorItem();
 
 	fDiskMenu->AddItem(fEjectMI);
-	fDiskMenu->AddItem(fSurfaceTestMI);
+	// fDiskMenu->AddItem(fSurfaceTestMI);
 	fDiskMenu->AddItem(fRescanMI);
 
 	menuBar->AddItem(fDiskMenu);
