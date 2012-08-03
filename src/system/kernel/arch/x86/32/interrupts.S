@@ -516,8 +516,6 @@ STATIC_FUNCTION(int_bottom):
 	// exception.
 	orl		$0x10000, IFRAME_flags(%ebp);
 
-	testl	$0x20000, IFRAME_flags(%ebp)	// VM86 mode
-	jnz		int_bottom_vm86
 	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)	// user mode
 	je		int_bottom_user
 
@@ -581,36 +579,6 @@ STATIC_FUNCTION(int_bottom_user):
 	UPDATE_THREAD_KERNEL_TIME()
 	POP_IFRAME_AND_RETURN()
 FUNCTION_END(int_bottom_user)
-
-
-STATIC_FUNCTION(int_bottom_vm86):
-	movl	$KERNEL_DATA_SEG,%eax
-	cld
-	movl	%eax,%ds
-	movl	%eax,%es
-
-	// update the thread's user time
-	movl	%dr3, %edi				// thread pointer
-	cli
-	UPDATE_THREAD_USER_TIME()
-
-	// leave interrupts disabled -- the handler will enable them, if
-	// necessary
-
-	pushl	%ebp
-	movl	IFRAME_vector(%ebp), %eax
-	call	*gInterruptHandlerTable(, %eax, 4)
-
-	cli								// disable interrupts
-
-	// update the thread's kernel time and return
-	UPDATE_THREAD_KERNEL_TIME()
-
-	// the above will reset the in_kernel flag to 0, but we actually stay
-	movb	$1, THREAD_in_kernel(%edi);
-
-	POP_IFRAME_AND_RETURN()
-FUNCTION_END(int_bottom_vm86)
 
 
 // test interrupt handler for performance measurements
@@ -856,80 +824,3 @@ FUNCTION(x86_return_to_userland):
 	UPDATE_THREAD_KERNEL_TIME()
 	POP_IFRAME_AND_RETURN()
 FUNCTION_END(x86_return_to_userland)
-
-
-/* status_t x86_vm86_enter(struct vm86_iframe *frame) */
-FUNCTION(x86_vm86_enter):
-	// save critical registers
-	pushf
-	pushl	%edi
-	pushl	%esi
-	pushl	%ebp
-	pushl	%ebx
-	push	%gs
-	push	%fs
-
-	// get pointers
-	movl	32(%esp), %esi	// vm86 iframe
-	pushl	%esi			// ... store iframe addr for x86_vm86_return
-	movl	%dr3, %edi		// Thread*
-
-	// make sure eflags are in right shape
-	movl	VM86_IFRAME_flags(%esi), %eax
-	andl	$0x200CD5, %eax		// leave ID,OF,DF,SF,ZF,AF,PF,CF flags
-	orl		$0x20202, %eax		// set VM and IF flags (+10b)
-	movl	%eax, VM86_IFRAME_flags(%esi)
-
-	// update kernel_stack_top and tss.esp0
-	pushl	THREAD_kernel_stack_top(%edi)
-	movl	%esp, THREAD_kernel_stack_top(%edi)
-	pushl	%esp
-	call	x86_set_tss_and_kstack
-
-	// go to vm86 mode
-	cli
-	UPDATE_THREAD_KERNEL_TIME()
-	lea		20(%esi), %esp
-	popa
-	addl	$16, %esp
-	iret
-FUNCTION_END(x86_vm86_enter)
-
-
-/* void x86_vm86_return(struct vm86_iframe *frame, status_t retval) */
-FUNCTION(x86_vm86_return):
-	// set stack to where x86_vm86_enter was left
-	movl 8(%esp), %ebx
-	movl 4(%esp), %esi
-	cli
-	movl %esi, %esp
-	addl $VM86_IFRAME_sizeof, %esp
-
-	// save old iframe
-	popl	%eax	// old kernel stack top
-	popl	%edi
-	movl	$(VM86_IFRAME_sizeof >> 2), %ecx
-	cld
-	rep movsl
-
-	// adjust kernel_stack_top and tss.esp0
-	movl	%dr3, %edi
-	movl	%eax, THREAD_kernel_stack_top(%edi)
-	pushl	%eax
-	call	x86_set_tss_and_kstack
-	addl	$4, %esp
-
-	// restore registers
-	movl %ebx, %eax
-
-	// we skip %fs, as this contains the CPU dependent TLS segment
-	addl $4, %esp;
-
-	pop %gs
-	popl %ebx
-	popl %ebp
-	popl %esi
-	popl %edi
-	popf
-	ret
-FUNCTION_END(x86_vm86_return)

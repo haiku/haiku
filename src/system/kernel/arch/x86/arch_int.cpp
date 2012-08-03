@@ -25,7 +25,6 @@
 #include <arch/x86/apic.h>
 #include <arch/x86/descriptors.h>
 #include <arch/x86/msi.h>
-#include <arch/x86/vm86.h>
 
 #include <stdio.h>
 
@@ -108,14 +107,6 @@ x86_unexpected_exception(iframe* frame)
 	int32 signalCode;
 	addr_t signalAddress = 0;
 	int32 signalError = B_ERROR;
-
-#ifndef __x86_64__
-	if (IFRAME_IS_VM86(frame)) {
-		x86_vm86_return((vm86_iframe*)frame, (frame->vector == 13) ?
-			B_OK : B_ERROR);
-		// won't get here
-	}
-#endif
 
 	switch (frame->vector) {
 		case 0:		// Divide Error Exception (#DE)

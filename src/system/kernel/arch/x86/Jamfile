@@ -55,7 +55,6 @@ if $(TARGET_ARCH) = x86_64 {
 		syscalls.cpp
 		syscalls_asm.S
 		thread.cpp
-		vm86.cpp
 
 		arch_user_debugger.cpp
 		ioapic.cpp

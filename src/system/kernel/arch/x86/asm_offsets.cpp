@@ -68,10 +68,6 @@ dummy()
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, r10);
 #else
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, orig_eax);
-
-	// struct vm86_iframe
-	DEFINE_SIZEOF_MACRO(VM86_IFRAME, vm86_iframe);
-	DEFINE_OFFSET_MACRO(VM86_IFRAME, vm86_iframe, flags);
 #endif
 
 	// struct syscall_info

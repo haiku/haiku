@@ -27,7 +27,6 @@
 #include <arch/x86/apic.h>
 #include <arch/x86/descriptors.h>
 #include <arch/x86/pic.h>
-#include <arch/x86/vm86.h>
 
 #include "interrupts.h"
 
