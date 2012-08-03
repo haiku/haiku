@@ -235,7 +235,6 @@ bios_prepare(bios_state** _state)
 			(void*)state->mapped_address, kTotalSize);
 		return status;
 	}
-	*((uint32 *)state->mapped_address) = 0xdeadbeef;
 
 	// Map the extended BIOS data area and VGA memory.
 	void* address = (void*)(state->mapped_address + kEBDABase);
