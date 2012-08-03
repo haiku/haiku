@@ -194,6 +194,10 @@ MainWindow::MainWindow(BRect frame)
 	// Disk menu
 	fDiskMenu = new BMenu(B_TRANSLATE("Disk"));
 	fDiskMenu->AddItem(fFormatMI);
+
+	fDiskInitMenu = new BMenu(B_TRANSLATE("Initialize"));
+	fDiskMenu->AddItem(fDiskInitMenu);
+
 	fDiskMenu->AddItem(fEjectMI);
 	fDiskMenu->AddItem(fSurfaceTestMI);
 
@@ -206,8 +210,8 @@ MainWindow::MainWindow(BRect frame)
 	fPartitionMenu = new BMenu(B_TRANSLATE("Partition"));
 	fPartitionMenu->AddItem(fCreateMI);
 
-	fInitMenu = new BMenu(B_TRANSLATE("Initialize"));
-	fPartitionMenu->AddItem(fInitMenu);
+	fFormatMenu = new BMenu(B_TRANSLATE("Format"));
+	fPartitionMenu->AddItem(fFormatMenu);
 
 	fPartitionMenu->AddItem(fDeleteMI);
 
@@ -514,12 +518,15 @@ void
 MainWindow::_UpdateMenus(BDiskDevice* disk,
 	partition_id selectedPartition, partition_id parentID)
 {
-	while (BMenuItem* item = fInitMenu->RemoveItem(0L))
+	while (BMenuItem* item = fFormatMenu->RemoveItem(0L))
+		delete item;
+	while (BMenuItem* item = fDiskInitMenu->RemoveItem(0L))
 		delete item;
 
 	fCreateMI->SetEnabled(false);
 	fUnmountMI->SetEnabled(false);
-	fInitMenu->SetEnabled(false);
+	fDiskInitMenu->SetEnabled(false);
+	fFormatMenu->SetEnabled(false);
 
 	if (!disk) {
 		fFormatMI->SetEnabled(false);
@@ -543,7 +550,7 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			fCreateMI->SetEnabled(true);
 
 		bool prepared = disk->PrepareModifications() == B_OK;
-		fInitMenu->SetEnabled(prepared);
+		fFormatMenu->SetEnabled(prepared);
 		fDeleteMI->SetEnabled(prepared);
 
 		BPartition* partition = disk->FindDescendant(selectedPartition);
@@ -554,12 +561,6 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			if (!diskSystem.SupportsInitializing())
 				continue;
 
-			if (disk->ID() != selectedPartition
-				&& disk->ContainsPartitioningSystem()
-				&& !diskSystem.IsFileSystem()) {
-				// Do not confuse the user with nested partition maps?
-				continue;
-			}
 			BMessage* message = new BMessage(MSG_INITIALIZE);
 			message->AddInt32("parent id", parentID);
 			message->AddString("disk system", diskSystem.PrettyName());
@@ -568,18 +569,32 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			label << B_UTF8_ELLIPSIS;
 			BMenuItem* item = new BMenuItem(label.String(), message);
 
-// TODO: Very unintuitive that we have to use the pretty name here!
+			// TODO: Very unintuitive that we have to use PrettyName (vs Name)
 			item->SetEnabled(partition != NULL
-//				&& partition->CanInitialize(diskSystem.Name()));
 				&& partition->CanInitialize(diskSystem.PrettyName()));
-			fInitMenu->AddItem(item);
+
+			if (disk->ID() == selectedPartition
+				&& !diskSystem.IsFileSystem()) {
+				// Disk is selected, and DiskSystem is a partition map
+				fDiskInitMenu->AddItem(item);
+			} else if (diskSystem.IsFileSystem()) {
+				// Otherwise a filesystem
+				fFormatMenu->AddItem(item);
+			}
 		}
 
 		// Mount items
 		if (partition) {
-			fInitMenu->SetEnabled(!partition->IsMounted()
+			fFormatMenu->SetEnabled(!partition->IsMounted()
 				&& !partition->IsReadOnly()
-				&& partition->Device()->HasMedia());
+				&& partition->Device()->HasMedia()
+				&& fFormatMenu->CountItems() > 0);
+
+			fDiskInitMenu->SetEnabled(!partition->IsMounted()
+				&& !partition->IsReadOnly()
+				&& partition->Device()->HasMedia()
+				&& partition->IsDevice()
+				&& fDiskInitMenu->CountItems() > 0);
 
 			fDeleteMI->SetEnabled(!partition->IsMounted()
 				&& !partition->IsDevice());
@@ -601,7 +616,8 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		} else {
 			fDeleteMI->SetEnabled(false);
 			fMountMI->SetEnabled(false);
-			fInitMenu->SetEnabled(false);
+			fFormatMenu->SetEnabled(false);
+			fDiskInitMenu->SetEnabled(false);
 		}
 
 		if (prepared)

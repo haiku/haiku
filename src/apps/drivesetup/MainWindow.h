@@ -83,8 +83,10 @@ private:
 			SpaceIDMap			fSpaceIDMap;
 
 			BMenu*				fDiskMenu;
+			BMenu*				fDiskInitMenu;
+
 			BMenu*				fPartitionMenu;
-			BMenu*				fInitMenu;
+			BMenu*				fFormatMenu;
 
 			BMenuItem*			fFormatMI;
 			BMenuItem*			fEjectMI;
