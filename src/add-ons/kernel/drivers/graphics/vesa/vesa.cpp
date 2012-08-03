@@ -9,15 +9,53 @@
 
 #include <string.h>
 
+#include <drivers/bios.h>
+
 #include <boot_item.h>
 #include <frame_buffer_console.h>
 #include <util/kernel_cpp.h>
-#include <arch/x86/vm86.h>
 #include <vm/vm.h>
 
 #include "driver.h"
 #include "utility.h"
 #include "vesa_info.h"
+
+
+static bios_module_info* sBIOSModule;
+
+
+/*!	Loads the BIOS module and sets up a state for it. The BIOS module is only
+	loaded when we need it, as it is quite a large module.
+*/
+static status_t
+vbe_call_prepare(bios_state** state)
+{
+	status_t status;
+
+	status = get_module(B_BIOS_MODULE_NAME, (module_info**)&sBIOSModule);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": failed to get BIOS module: %s\n",
+			strerror(status));
+		return status;
+	}
+
+	status = sBIOSModule->prepare(state);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": failed to prepare BIOS state: %s\n",
+			strerror(status));
+		put_module(B_BIOS_MODULE_NAME);
+	}
+
+	return status;
+}
+
+
+static void
+vbe_call_finish(bios_state* state)
+{
+	sBIOSModule->finish(state);
+	put_module(B_BIOS_MODULE_NAME);
+}
 
 
 static status_t
@@ -80,26 +118,31 @@ get_color_space_for_depth(uint32 depth)
 
 
 static status_t
-vbe_get_mode_info(struct vm86_state& vmState, uint16 mode,
-	struct vbe_mode_info* modeInfo)
+vbe_get_mode_info(bios_state* state, uint16 mode, struct vbe_mode_info* modeInfo)
 {
-	struct vbe_mode_info* vbeModeInfo = (struct vbe_mode_info*)0x1000;
-
+	void* vbeModeInfo = sBIOSModule->allocate_mem(state,
+		sizeof(struct vbe_mode_info));
+	if (vbeModeInfo == NULL)
+		return B_NO_MEMORY;
 	memset(vbeModeInfo, 0, sizeof(vbe_mode_info));
-	vmState.regs.eax = 0x4f01;
-	vmState.regs.ecx = mode;
-	vmState.regs.es  = 0x1000 >> 4;
-	vmState.regs.edi = 0x0000;
 
-	status_t status = vm86_do_int(&vmState, 0x10);
+	uint32 physicalAddress = sBIOSModule->physical_address(state, vbeModeInfo);
+	bios_regs regs = {};
+	regs.eax = 0x4f01;
+	regs.ecx = mode;
+	regs.es  = physicalAddress >> 4;
+	regs.edi = physicalAddress - (regs.es << 4);
+
+	status_t status = sBIOSModule->interrupt(state, 0x10, &regs);
 	if (status != B_OK) {
-		dprintf(DEVICE_NAME ": vbe_get_mode_info(%u): vm86 failed\n", mode);
+		dprintf(DEVICE_NAME ": vbe_get_mode_info(%u): BIOS failed: %s\n", mode,
+			strerror(status));
 		return status;
 	}
 
-	if ((vmState.regs.eax & 0xffff) != 0x4f) {
-		dprintf(DEVICE_NAME ": vbe_get_mode_info(): BIOS returned 0x%04lx\n",
-			vmState.regs.eax & 0xffff);
+	if ((regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vbe_get_mode_info(%u): BIOS returned "
+			"0x%04" B_PRIx32 "\n", mode, regs.eax & 0xffff);
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -109,20 +152,22 @@ vbe_get_mode_info(struct vm86_state& vmState, uint16 mode,
 
 
 static status_t
-vbe_set_mode(struct vm86_state& vmState, uint16 mode)
+vbe_set_mode(bios_state* state, uint16 mode)
 {
-	vmState.regs.eax = 0x4f02;
-	vmState.regs.ebx = (mode & SET_MODE_MASK) | SET_MODE_LINEAR_BUFFER;
+	bios_regs regs = {};
+	regs.eax = 0x4f02;
+	regs.ebx = (mode & SET_MODE_MASK) | SET_MODE_LINEAR_BUFFER;
 
-	status_t status = vm86_do_int(&vmState, 0x10);
+	status_t status = sBIOSModule->interrupt(state, 0x10, &regs);
 	if (status != B_OK) {
-		dprintf(DEVICE_NAME ": vbe_set_mode(%u): vm86 failed\n", mode);
+		dprintf(DEVICE_NAME ": vbe_set_mode(%u): BIOS failed: %s\n", mode,
+			strerror(status));
 		return status;
 	}
 
-	if ((vmState.regs.eax & 0xffff) != 0x4f) {
-		dprintf(DEVICE_NAME ": vbe_set_mode(): BIOS returned 0x%04lx\n",
-			vmState.regs.eax & 0xffff);
+	if ((regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vbe_set_mode(%u): BIOS returned 0x%04" B_PRIx32
+			"\n", mode, regs.eax & 0xffff);
 		return B_ERROR;
 	}
 
@@ -152,64 +197,64 @@ vbe_get_dpms_capabilities(uint32& vbeMode, uint32& mode)
 	vbeMode = 0;
 	mode = B_DPMS_ON;
 
-	// Prepare vm86 mode environment
-	struct vm86_state vmState;
-	status_t status = vm86_prepare(&vmState, 0x20000);
-	if (status != B_OK) {
-		dprintf(DEVICE_NAME": vbe_get_dpms_capabilities(): vm86_prepare "
-			"failed: %s\n", strerror(status));
+	// Prepare BIOS environment
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
 		return status;
-	}
 
-	vmState.regs.eax = 0x4f10;
-	vmState.regs.ebx = 0;
-	vmState.regs.esi = 0;
-	vmState.regs.edi = 0;
+	bios_regs regs = {};
+	regs.eax = 0x4f10;
+	regs.ebx = 0;
+	regs.esi = 0;
+	regs.edi = 0;
 
-	status = vm86_do_int(&vmState, 0x10);
+	status = sBIOSModule->interrupt(state, 0x10, &regs);
 	if (status != B_OK) {
-		dprintf(DEVICE_NAME ": vbe_get_dpms_capabilities(): vm86 failed\n");
+		dprintf(DEVICE_NAME ": vbe_get_dpms_capabilities(): BIOS failed: %s\n",
+			strerror(status));
 		goto out;
 	}
 
-	if ((vmState.regs.eax & 0xffff) != 0x4f) {
+	if ((regs.eax & 0xffff) != 0x4f) {
 		dprintf(DEVICE_NAME ": vbe_get_dpms_capabilities(): BIOS returned "
-			"0x%04lx\n", vmState.regs.eax & 0xffff);
+			"0x%04" B_PRIx32 "\n", regs.eax & 0xffff);
 		status = B_ERROR;
 		goto out;
 	}
 
-	vbeMode = vmState.regs.ebx >> 8;
+	vbeMode = regs.ebx >> 8;
 	mode = vbe_to_system_dpms(vbeMode);
 
 out:
-	vm86_cleanup(&vmState);
+	vbe_call_finish(state);
 	return status;
 }
 
 
 static status_t
-vbe_set_bits_per_gun(vm86_state& vmState, vesa_info& info, uint8 bits)
+vbe_set_bits_per_gun(bios_state* state, vesa_info& info, uint8 bits)
 {
 	info.bits_per_gun = 6;
 
-	vmState.regs.eax = 0x4f08;
-	vmState.regs.ebx = (bits << 8) | 1;
+	bios_regs regs = {};
+	regs.eax = 0x4f08;
+	regs.ebx = (bits << 8) | 1;
 
-	status_t status = vm86_do_int(&vmState, 0x10);
+	status_t status = sBIOSModule->interrupt(state, 0x10, &regs);
 	if (status != B_OK) {
-		dprintf(DEVICE_NAME ": vbe_set_bits_per_gun(): vm86 failed: %s\n",
+		dprintf(DEVICE_NAME ": vbe_set_bits_per_gun(): BIOS failed: %s\n",
 			strerror(status));
 		return status;
 	}
 
-	if ((vmState.regs.eax & 0xffff) != 0x4f) {
-		dprintf(DEVICE_NAME ": vbe_set_bits_per_gun(): BIOS returned 0x%04lx\n",
-			vmState.regs.eax & 0xffff);
+	if ((regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vbe_set_bits_per_gun(): BIOS returned "
+			"0x%04" B_PRIx32 "\n", regs.eax & 0xffff);
 		return B_ERROR;
 	}
 
-	info.bits_per_gun = vmState.regs.ebx >> 8;
+	info.bits_per_gun = regs.ebx >> 8;
 	return B_OK;
 }
 
@@ -219,17 +264,14 @@ vbe_set_bits_per_gun(vesa_info& info, uint8 bits)
 {
 	info.bits_per_gun = 6;
 
-	struct vm86_state vmState;
-	status_t status = vm86_prepare(&vmState, 0x20000);
-	if (status != B_OK) {
-		dprintf(DEVICE_NAME": vbe_set_bits_per_gun(): vm86_prepare failed: "
-			"%s\n", strerror(status));
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
 		return status;
-	}
 
-	status = vbe_set_bits_per_gun(vmState, info, bits);
+	status = vbe_set_bits_per_gun(state, info, bits);
 
-	vm86_cleanup(&vmState);
+	vbe_call_finish(state);
 	return status;
 }
 
@@ -386,31 +428,29 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 	if (mode >= info.shared_info->vesa_mode_count)
 		return B_ENTRY_NOT_FOUND;
 
-	// Prepare vm86 mode environment
-	struct vm86_state vmState;
-	status_t status = vm86_prepare(&vmState, 0x20000);
-	if (status != B_OK) {
-		dprintf(DEVICE_NAME": vesa_set_display_mode(): vm86_prepare failed\n");
+	// Prepare BIOS environment
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
 		return status;
-	}
 
 	// Get mode information
 	struct vbe_mode_info modeInfo;
-	status = vbe_get_mode_info(vmState, info.modes[mode].mode, &modeInfo);
+	status = vbe_get_mode_info(state, info.modes[mode].mode, &modeInfo);
 	if (status != B_OK) {
 		dprintf(DEVICE_NAME": vesa_set_display_mode(): cannot get mode info\n");
 		goto out;
 	}
 
 	// Set mode
-	status = vbe_set_mode(vmState, info.modes[mode].mode);
+	status = vbe_set_mode(state, info.modes[mode].mode);
 	if (status != B_OK) {
 		dprintf(DEVICE_NAME": vesa_set_display_mode(): cannot set mode\n");
 		goto out;
 	}
 
 	if (info.modes[mode].bits_per_pixel <= 8)
-		vbe_set_bits_per_gun(vmState, info, 8);
+		vbe_set_bits_per_gun(state, info, 8);
 
 	// Map new frame buffer if necessary
 
@@ -426,7 +466,7 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 	}
 
 out:
-	vm86_cleanup(&vmState);
+	vbe_call_finish(state);
 	return status;
 }
 
@@ -437,38 +477,36 @@ vesa_get_dpms_mode(vesa_info& info, uint32& mode)
 	mode = B_DPMS_ON;
 		// we always return a valid mode
 
-	// Prepare vm86 mode environment
-	struct vm86_state vmState;
-	status_t status = vm86_prepare(&vmState, 0x20000);
-	if (status != B_OK) {
-		dprintf(DEVICE_NAME": vesa_get_dpms_mode(): vm86_prepare failed: %s\n",
-			strerror(status));
+	// Prepare BIOS environment
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
 		return status;
-	}
 
-	vmState.regs.eax = 0x4f10;
-	vmState.regs.ebx = 2;
-	vmState.regs.esi = 0;
-	vmState.regs.edi = 0;
+	bios_regs regs = {};
+	regs.eax = 0x4f10;
+	regs.ebx = 2;
+	regs.esi = 0;
+	regs.edi = 0;
 
-	status = vm86_do_int(&vmState, 0x10);
+	status = sBIOSModule->interrupt(state, 0x10, &regs);
 	if (status != B_OK) {
-		dprintf(DEVICE_NAME ": vesa_get_dpms_mode(): vm86 failed: %s\n",
+		dprintf(DEVICE_NAME ": vesa_get_dpms_mode(): BIOS failed: %s\n",
 			strerror(status));
 		goto out;
 	}
 
-	if ((vmState.regs.eax & 0xffff) != 0x4f) {
-		dprintf(DEVICE_NAME ": vesa_get_dpms_mode(): BIOS returned 0x%04lx\n",
-			vmState.regs.eax & 0xffff);
+	if ((regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vesa_get_dpms_mode(): BIOS returned "
+			"0x%" B_PRIx32 "\n", regs.eax & 0xffff);
 		status = B_ERROR;
 		goto out;
 	}
 
-	mode = vbe_to_system_dpms(vmState.regs.ebx >> 8);
+	mode = vbe_to_system_dpms(regs.ebx >> 8);
 
 out:
-	vm86_cleanup(&vmState);
+	vbe_call_finish(state);
 	return status;
 }
 
@@ -489,36 +527,34 @@ vesa_set_dpms_mode(vesa_info& info, uint32 mode)
 
 	vbeMode &= info.vbe_dpms_capabilities;
 
-	// Prepare vm86 mode environment
-	struct vm86_state vmState;
-	status_t status = vm86_prepare(&vmState, 0x20000);
-	if (status != B_OK) {
-		dprintf(DEVICE_NAME": vesa_set_dpms_mode(): vm86_prepare failed: %s\n",
-			strerror(status));
+	// Prepare BIOS environment
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
 		return status;
-	}
 
-	vmState.regs.eax = 0x4f10;
-	vmState.regs.ebx = (vbeMode << 8) | 1;
-	vmState.regs.esi = 0;
-	vmState.regs.edi = 0;
+	bios_regs regs = {};
+	regs.eax = 0x4f10;
+	regs.ebx = (vbeMode << 8) | 1;
+	regs.esi = 0;
+	regs.edi = 0;
 
-	status = vm86_do_int(&vmState, 0x10);
+	status = sBIOSModule->interrupt(state, 0x10, &regs);
 	if (status != B_OK) {
-		dprintf(DEVICE_NAME ": vesa_set_dpms_mode(): vm86 failed: %s\n",
+		dprintf(DEVICE_NAME ": vesa_set_dpms_mode(): BIOS failed: %s\n",
 			strerror(status));
 		goto out;
 	}
 
-	if ((vmState.regs.eax & 0xffff) != 0x4f) {
-		dprintf(DEVICE_NAME ": vesa_set_dpms_mode(): BIOS returned 0x%04lx\n",
-			vmState.regs.eax & 0xffff);
+	if ((regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vesa_set_dpms_mode(): BIOS returned "
+			"0x%04" B_PRIx32 "\n", regs.eax & 0xffff);
 		status = B_ERROR;
 		goto out;
 	}
 
 out:
-	vm86_cleanup(&vmState);
+	vbe_call_finish(state);
 	return status;
 }
 
@@ -527,26 +563,33 @@ status_t
 vesa_set_indexed_colors(vesa_info& info, uint8 first, uint8* colors,
 	uint16 count)
 {
+	bios_regs regs = {};
+	uint32 shift, physicalAddress;
+
 	if (first + count > 256)
 		count = 256 - first;
 
-	// Prepare vm86 mode environment
-	struct vm86_state vmState;
-	status_t status = vm86_prepare(&vmState, 0x20000);
-	if (status != B_OK) {
-		dprintf(DEVICE_NAME": vesa_set_indexed_colors(): vm86_prepare failed: "
-			"%s\n", strerror(status));
+	// Prepare BIOS environment
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
 		return status;
+
+	uint8* palette = (uint8*)sBIOSModule->allocate_mem(state, 256 * 4);
+	if (palette == NULL) {
+		status = B_NO_MEMORY;
+		goto out;
 	}
 
-	uint8* palette = (uint8*)0x1000;
-	uint32 shift = 8 - info.bits_per_gun;
+	shift = 8 - info.bits_per_gun;
 
 	// convert colors to VESA palette
 	for (int32 i = first; i < count; i++) {
 		uint8 color[3];
-		if (user_memcpy(color, &colors[i * 3], 3) < B_OK)
-			return B_BAD_ADDRESS;
+		if (user_memcpy(color, &colors[i * 3], 3) < B_OK) {
+			status = B_BAD_ADDRESS;
+			goto out;
+		}
 
 		// order is BGR-
 		palette[i * 4 + 0] = color[2] >> shift;
@@ -556,27 +599,28 @@ vesa_set_indexed_colors(vesa_info& info, uint8 first, uint8* colors,
 	}
 
 	// set palette
-	vmState.regs.eax = 0x4f09;
-	vmState.regs.ebx = 0;
-	vmState.regs.ecx = count;
-	vmState.regs.edx = first;
-	vmState.regs.es  = 0x1000 >> 4;
-	vmState.regs.edi = 0x0000;
+	physicalAddress = sBIOSModule->physical_address(state, palette);
+	regs.eax = 0x4f09;
+	regs.ebx = 0;
+	regs.ecx = count;
+	regs.edx = first;
+	regs.es  = physicalAddress >> 4;
+	regs.edi = physicalAddress - (regs.es << 4);
 
-	status = vm86_do_int(&vmState, 0x10);
+	status = sBIOSModule->interrupt(state, 0x10, &regs);
 	if (status != B_OK) {
-		dprintf(DEVICE_NAME ": vesa_set_indexed_colors(): vm86 failed: %s\n",
+		dprintf(DEVICE_NAME ": vesa_set_indexed_colors(): BIOS failed: %s\n",
 			strerror(status));
 		goto out;
 	}
 
-	if ((vmState.regs.eax & 0xffff) != 0x4f) {
+	if ((regs.eax & 0xffff) != 0x4f) {
 		dprintf(DEVICE_NAME ": vesa_set_indexed_colors(): BIOS returned "
-			"0x%04lx\n", vmState.regs.eax & 0xffff);
+			"0x%04" B_PRIx32 "\n", regs.eax & 0xffff);
 		status = B_ERROR;
 	}
 
 out:
-	vm86_cleanup(&vmState);
+	vbe_call_finish(state);
 	return status;
 }
