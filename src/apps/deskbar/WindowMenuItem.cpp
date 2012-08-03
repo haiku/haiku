@@ -273,7 +273,7 @@ TWindowMenuItem::DrawContent()
 
 	menu->MovePenTo(contLoc);
 	// Set the pen color so that the label is always visible.
-	menu->SetHighColor(0, 0, 0);
+	menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
 	BMenuItem::DrawContent();
 
