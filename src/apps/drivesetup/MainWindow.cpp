@@ -649,8 +649,8 @@ MainWindow::_DisplayPartitionError(BString _message,
 
 	if (error < B_OK) {
 		BString helper = message;
-		const char* errorString =
-			B_TRANSLATE_COMMENT("Error: ", "in any error alert");
+		const char* errorString
+			= B_TRANSLATE_COMMENT("Error: ", "in any error alert");
 		snprintf(message, sizeof(message), "%s\n\n%s%s", helper.String(),
 			errorString, strerror(error));
 	}
@@ -806,25 +806,6 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 	}
 
-	char message[512];
-	if (partition->ContentName() && strlen(partition->ContentName()) > 0) {
-		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you want "
-			"to initialize the partition \"%s\"? You will be asked again "
-			"before changes are written to the disk."),
-			partition->ContentName());
-	} else {
-		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you want "
-			"to initialize the partition? You will be asked again "
-			"before changes are written to the disk."));
-	}
-	BAlert* alert = new BAlert("first notice", message,
-		B_TRANSLATE("Continue"), B_TRANSLATE("Cancel"), NULL,
-		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
-	int32 choice = alert->Go();
-
-	if (choice == 1)
-		return;
-
 	BDiskSystem diskSystem;
 	fDDRoster.RewindDiskSystems();
 	bool found = false;
@@ -837,12 +818,39 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		}
 	}
 
+	char message[512];
+
 	if (!found) {
 		snprintf(message, sizeof(message), B_TRANSLATE("Disk system \"%s\"\" "
 			"not found!"));
 		_DisplayPartitionError(message);
 		return;
 	}
+
+	if (diskSystem.IsFileSystem()) {
+		if (partition->ContentName() && strlen(partition->ContentName()) > 0) {
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to format the partition \"%s\"? You will be asked "
+				"again before changes are written to the disk."),
+				partition->ContentName());
+		} else {
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to format the partition? You will be asked again "
+				"before changes are written to the disk."));
+		}
+	} else {
+		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			"want to initialize the selected disk? All data will be lost. "
+			"You will be asked again before changes are written to the "
+			"disk.\n"));
+	}
+	BAlert* alert = new BAlert("first notice", message,
+		B_TRANSLATE("Continue"), B_TRANSLATE("Cancel"), NULL,
+		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+	int32 choice = alert->Go();
+
+	if (choice == 1)
+		return;
 
 	ModificationPreparer modificationPreparer(disk);
 	status_t ret = modificationPreparer.ModificationStatus();
@@ -854,6 +862,8 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 
 	BString name;
 	BString parameters;
+
+	// TODO: diskSystem.IsFileSystem() seems like a better fit here?
 	if (diskSystemName == "Be File System") {
 		InitParamsPanel* panel = new InitParamsPanel(this, diskSystemName,
 			partition);
@@ -930,11 +940,21 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	partition = disk->FindDescendant(selectedPartition);
 
 	if (ret == B_OK) {
-		_DisplayPartitionError(B_TRANSLATE("The partition %s has been "
-			"successfully initialized.\n"), partition);
+		if (diskSystem.IsFileSystem()) {
+			_DisplayPartitionError(B_TRANSLATE("The partition %s has been "
+				"successfully formatted.\n"), partition);
+		} else {
+			_DisplayPartitionError(B_TRANSLATE("The disk has been "
+				"successfully initialized.\n"), partition);
+		}
 	} else {
-		_DisplayPartitionError(B_TRANSLATE("Failed to initialize the "
-			"partition %s!\n"), partition, ret);
+		if (diskSystem.IsFileSystem()) {
+			_DisplayPartitionError(B_TRANSLATE("Failed to format the "
+				"partition %s!\n"), partition, ret);
+		} else {
+			_DisplayPartitionError(B_TRANSLATE("Failed to initialize the "
+				"disk %s!\n"), partition, ret);
+		}
 	}
 
 	_ScanDrives();
@@ -1042,7 +1062,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	ret = modificationPreparer.CommitModifications();
 
 	if (ret != B_OK) {
-		_DisplayPartitionError(B_TRANSLATE("Failed to initialize the "
+		_DisplayPartitionError(B_TRANSLATE("Failed to format the "
 			"partition. No changes have been written to disk."));
 		return;
 	}
@@ -1054,6 +1074,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	_ScanDrives();
 	fDiskView->ForceUpdate();
 }
+
 
 void
 MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
