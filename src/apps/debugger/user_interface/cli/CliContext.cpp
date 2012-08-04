@@ -6,6 +6,7 @@
 
 #include "CliContext.h"
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 #include "UserInterface.h"
@@ -17,6 +18,36 @@
 // enough. Should that ever change, we would need a thread-safe
 // EditLine* -> CliContext* map.
 static CliContext* sCurrentContext;
+
+
+// #pragma mark - Event
+
+
+struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
+	Event(int type, Thread* thread = NULL)
+		:
+		fType(type),
+		fThreadReference(thread)
+	{
+	}
+
+	int Type() const
+	{
+		return fType;
+	}
+
+	Thread* GetThread() const
+	{
+		return fThreadReference.Get();
+	}
+
+private:
+	int					fType;
+	BReference<Thread>	fThreadReference;
+};
+
+
+// #pragma mark - CliContext
 
 
 CliContext::CliContext()
@@ -31,7 +62,8 @@ CliContext::CliContext()
 	fInputLoopWaitingForEvents(0),
 	fEventsOccurred(0),
 	fInputLoopWaiting(false),
-	fTerminating(false)
+	fTerminating(false),
+	fCurrentThread(NULL)
 {
 	sCurrentContext = this;
 }
@@ -87,6 +119,9 @@ CliContext::Cleanup()
 {
 	Terminating();
 
+	while (Event* event = fPendingEvents.RemoveHead())
+		delete event;
+
 	if (fEditLine != NULL) {
 		el_end(fEditLine);
 		fEditLine = NULL;
@@ -116,6 +151,41 @@ CliContext::Terminating()
 }
 
 
+thread_id
+CliContext::CurrentThreadID() const
+{
+	return fCurrentThread != NULL ? fCurrentThread->ID() : -1;
+}
+
+
+void
+CliContext::SetCurrentThread(Thread* thread)
+{
+	AutoLocker<BLocker> locker(fLock);
+
+	if (fCurrentThread != NULL)
+		fCurrentThread->ReleaseReference();
+
+	fCurrentThread = thread;
+
+	if (fCurrentThread != NULL)
+		fCurrentThread->AcquireReference();
+}
+
+
+void
+CliContext::PrintCurrentThread()
+{
+	AutoLocker<Team> teamLocker(fTeam);
+
+	if (fCurrentThread != NULL) {
+		printf("current thread: %" B_PRId32 " \"%s\"\n", fCurrentThread->ID(),
+			fCurrentThread->Name());
+	} else
+		printf("no current thread\n");
+}
+
+
 const char*
 CliContext::PromptUser(const char* prompt)
 {
@@ -125,6 +195,8 @@ CliContext::PromptUser(const char* prompt)
 	const char* line = el_gets(fEditLine, &count);
 
 	fPrompt = NULL;
+
+	ProcessPendingEvents();
 
 	return line;
 }
@@ -155,39 +227,124 @@ CliContext::QuitSession(bool killTeam)
 void
 CliContext::WaitForThreadOrUser()
 {
+	ProcessPendingEvents();
+
 // TODO: Deal with SIGINT as well!
 	for (;;) {
 		_PrepareToWaitForEvents(
-			EVENT_USER_INTERRUPT | EVENT_THREAD_STATE_CHANGED);
+			EVENT_USER_INTERRUPT | EVENT_THREAD_STOPPED);
 
 		// check whether there are any threads stopped already
-		thread_id stoppedThread = -1;
+		Thread* stoppedThread = NULL;
+		BReference<Thread> stoppedThreadReference;
+
 		AutoLocker<Team> teamLocker(fTeam);
 
 		for (ThreadList::ConstIterator it = fTeam->Threads().GetIterator();
 				Thread* thread = it.Next();) {
 			if (thread->State() == THREAD_STATE_STOPPED) {
-				stoppedThread = thread->ID();
+				stoppedThread = thread;
+				stoppedThreadReference.SetTo(thread);
 				break;
 			}
 		}
 
 		teamLocker.Unlock();
 
-		if (stoppedThread >= 0)
-			_SignalInputLoop(EVENT_THREAD_STATE_CHANGED);
+		if (stoppedThread != NULL) {
+			if (fCurrentThread == NULL)
+				fCurrentThread = stoppedThread;
+
+			_SignalInputLoop(EVENT_THREAD_STOPPED);
+		}
 
 		uint32 events = _WaitForEvents();
-		if ((events & EVENT_QUIT) != 0 || stoppedThread >= 0)
+		if ((events & EVENT_QUIT) != 0 || stoppedThread != NULL) {
+			ProcessPendingEvents();
 			return;
+		}
 	}
 }
 
 
 void
-CliContext::ThreadStateChanged(const Team::ThreadEvent& event)
+CliContext::ProcessPendingEvents()
 {
-	_SignalInputLoop(EVENT_THREAD_STATE_CHANGED);
+	AutoLocker<Team> teamLocker(fTeam);
+
+	for (;;) {
+		// get the next event
+		AutoLocker<BLocker> locker(fLock);
+		Event* event = fPendingEvents.RemoveHead();
+		locker.Unlock();
+		if (event == NULL)
+			break;
+		ObjectDeleter<Event> eventDeleter(event);
+
+		// process the event
+		Thread* thread = event->GetThread();
+
+		switch (event->Type()) {
+			case EVENT_QUIT:
+			case EVENT_USER_INTERRUPT:
+				break;
+			case EVENT_THREAD_ADDED:
+				printf("[new thread: %" B_PRId32 " \"%s\"]\n", thread->ID(),
+					thread->Name());
+				break;
+			case EVENT_THREAD_REMOVED:
+				printf("[thread terminated: %" B_PRId32 " \"%s\"]\n",
+					thread->ID(), thread->Name());
+				break;
+			case EVENT_THREAD_STOPPED:
+				printf("[thread stopped: %" B_PRId32 " \"%s\"]\n",
+					thread->ID(), thread->Name());
+				break;
+		}
+	}
+}
+
+
+void
+CliContext::ThreadAdded(const Team::ThreadEvent& threadEvent)
+{
+	_QueueEvent(
+		new(std::nothrow) Event(EVENT_THREAD_ADDED, threadEvent.GetThread()));
+	_SignalInputLoop(EVENT_THREAD_ADDED);
+}
+
+
+void
+CliContext::ThreadRemoved(const Team::ThreadEvent& threadEvent)
+{
+	_QueueEvent(
+		new(std::nothrow) Event(EVENT_THREAD_REMOVED, threadEvent.GetThread()));
+	_SignalInputLoop(EVENT_THREAD_REMOVED);
+}
+
+
+void
+CliContext::ThreadStateChanged(const Team::ThreadEvent& threadEvent)
+{
+	if (threadEvent.GetThread()->State() != THREAD_STATE_STOPPED)
+		return;
+
+	_QueueEvent(
+		new(std::nothrow) Event(EVENT_THREAD_STOPPED, threadEvent.GetThread()));
+	_SignalInputLoop(EVENT_THREAD_STOPPED);
+}
+
+
+void
+CliContext::_QueueEvent(Event* event)
+{
+	if (event == NULL) {
+		// no memory -- can't do anything about it
+		return;
+	}
+
+	AutoLocker<BLocker> locker(fLock);
+	fPendingEvents.Add(event);
 }
 
 

@@ -214,9 +214,19 @@ CommandLineUserInterface::_InputLoopEntry(void* data)
 status_t
 CommandLineUserInterface::_InputLoop()
 {
+	thread_id currentThread = -1;
+
 	while (!fTerminating) {
 		// Wait for a thread or Ctrl-C.
 		fContext.WaitForThreadOrUser();
+		if (fContext.IsTerminating())
+			break;
+
+		// Print the active thread, if it changed.
+		if (fContext.CurrentThreadID() != currentThread) {
+			fContext.PrintCurrentThread();
+			currentThread = fContext.CurrentThreadID();
+		}
 
 		// read a command line
 		const char* line = fContext.PromptUser(kDebuggerPrompt);
