@@ -4130,25 +4130,21 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			addressSpace->ReadUnlock();
 #endif
 
-			// TODO: the fault_callback is a temporary solution for vm86
-			if (thread->fault_callback == NULL
-				|| thread->fault_callback(address, faultAddress, isWrite)) {
-				// If the thread has a signal handler for SIGSEGV, we simply
-				// send it the signal. Otherwise we notify the user debugger
-				// first.
-				struct sigaction action;
-				if ((sigaction(SIGSEGV, NULL, &action) == 0
-						&& action.sa_handler != SIG_DFL
-						&& action.sa_handler != SIG_IGN)
-					|| user_debug_exception_occurred(B_SEGMENT_VIOLATION,
-						SIGSEGV)) {
-					Signal signal(SIGSEGV,
-						status == B_PERMISSION_DENIED
-							? SEGV_ACCERR : SEGV_MAPERR,
-						EFAULT, thread->team->id);
-					signal.SetAddress((void*)address);
-					send_signal_to_thread(thread, signal, 0);
-				}
+			// If the thread has a signal handler for SIGSEGV, we simply
+			// send it the signal. Otherwise we notify the user debugger
+			// first.
+			struct sigaction action;
+			if ((sigaction(SIGSEGV, NULL, &action) == 0
+					&& action.sa_handler != SIG_DFL
+					&& action.sa_handler != SIG_IGN)
+				|| user_debug_exception_occurred(B_SEGMENT_VIOLATION,
+					SIGSEGV)) {
+				Signal signal(SIGSEGV,
+					status == B_PERMISSION_DENIED
+						? SEGV_ACCERR : SEGV_MAPERR,
+					EFAULT, thread->team->id);
+				signal.SetAddress((void*)address);
+				send_signal_to_thread(thread, signal, 0);
 			}
 		}
 	}
