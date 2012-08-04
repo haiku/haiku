@@ -16,7 +16,11 @@
 #include <Referenceable.h>
 
 #include "CliContext.h"
+#include "CliContinueCommand.h"
 #include "CliQuitCommand.h"
+#include "CliStackTraceCommand.h"
+#include "CliStopCommand.h"
+#include "CliThreadCommand.h"
 #include "CliThreadsCommand.h"
 
 
@@ -268,8 +272,18 @@ CommandLineUserInterface::_InputLoop()
 status_t
 CommandLineUserInterface::_RegisterCommands()
 {
-	if (_RegisterCommand("help", new(std::nothrow) HelpCommand(this)) &&
+	BReference<CliCommand> stackTraceCommandReference(
+		new(std::nothrow) CliStackTraceCommand, true);
+	BReference<CliCommand> stackTraceCommandReference2(
+		stackTraceCommandReference.Get());
+
+	if (_RegisterCommand("bt", stackTraceCommandReference.Detach()) &&
+		_RegisterCommand("continue", new(std::nothrow) CliContinueCommand) &&
+		_RegisterCommand("help", new(std::nothrow) HelpCommand(this)) &&
 		_RegisterCommand("quit", new(std::nothrow) CliQuitCommand) &&
+		_RegisterCommand("sc", stackTraceCommandReference2.Detach()) &&
+		_RegisterCommand("stop", new(std::nothrow) CliStopCommand) &&
+		_RegisterCommand("thread", new(std::nothrow) CliThreadCommand) &&
 		_RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)) {
 		return B_OK;
 	}
