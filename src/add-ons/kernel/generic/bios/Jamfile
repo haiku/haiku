@@ -1,17 +1,23 @@
 SubDir HAIKU_TOP src add-ons kernel generic bios ;
 
+UseHeaders [ LibraryHeaders x86emu ] ;
 UsePrivateKernelHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) x86emu ] ;
 
-KernelAddon bios :
+local x86emuSources =
 	decode.c
 	fpu.c
 	ops.c
 	ops2.c
 	prim_ops.c
 	sys.c
+;
 
+KernelAddon bios :
+	$(x86emuSources)
 	bios.cpp
 ;
 
+SEARCH on [ FGristFiles $(x86emuSources) ]
+	= [ FDirName $(HAIKU_TOP) src libs x86emu ] ;
