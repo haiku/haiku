@@ -133,6 +133,7 @@ typedef struct acpi_data {
 
 enum {
 	ACPI_ALLOCATE_BUFFER = -1,
+	ACPI_ALLOCATE_LOCAL_BUFFER = -2,
 };
 
 
