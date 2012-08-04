@@ -4,11 +4,13 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Timothy Wayper <timmy@wunderbear.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione <jscipione@gmail.com>
+ *		Timothy Wayper <timmy@wunderbear.com>
  */
 #ifndef _CALC_APPLICATION_H
 #define _CALC_APPLICATION_H
+
 
 #include <Application.h>
 

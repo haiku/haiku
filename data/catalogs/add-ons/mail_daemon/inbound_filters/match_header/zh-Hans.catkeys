@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MatchHeader	2292311232
+1	english	x-vnd.Haiku-MatchHeader	1205906732
 <Choose action>	ConfigView		<选择动作>
 has	ConfigView		具有
 Move to	ConfigView		移动到
@@ -10,5 +10,6 @@ Rule filter	RuleFilter		过滤规则
 <Choose account>	ConfigView		<选择账户>
 Set flags to	ConfigView		设置标志为
 Set as read	ConfigView		设为读取
+Reply with	ConfigView		回复为
 If	ConfigView		如果
 header (e.g. Subject)	ConfigView		邮件头（如 主题）

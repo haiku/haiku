@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	3778030996
+1	polish	x-vnd.Haiku-libtracker	1868621245
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -388,7 +388,6 @@ Restoring: 	StatusWindow		Przywracanie:
 system	B_SYSTEM_DIRECTORY		system
 Skip	FSUtils		Pomiń
 Settings…	MountMenu		Ustawienia…
-Error emptying Trash!	FSUtils		Błąd przy opróżniania kosza!
 Recent folders	FavoritesMenu		Ostatnio odwiedzane foldery
 Close	ContainerWindow		Zamknij
 Preferred for file	OpenWithWindow		Preferowane dla pliku

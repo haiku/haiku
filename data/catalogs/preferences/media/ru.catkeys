@@ -12,7 +12,7 @@ Starting media server…	Media Window		Запуск медиасервера…
 Done shutting down.	Media Window		Остановка завершена.
 Video settings	Media Window		Настройки видео
 Video output:	Media views		Видео выход:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Невозможно подключиться к медиа серверу.\nХотите запустить его?\n
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Невозможно подключиться к медиа серверу.\nХотите запустить его?
 Restart media services	Media views		Перезапустить медиа службы
 Couldn't remove volume control in Deskbar: %s\n	Media views		Не удалось удалить регулятор громкости из Deskbar: %s\n
 Media	System name		Медиа

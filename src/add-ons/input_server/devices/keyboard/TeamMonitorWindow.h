@@ -32,13 +32,13 @@ public:
 
 			void			Enable();
 			void			Disable();
-			void			DeselectAll();
 			void			LocaleChanged();
 			void			QuitTeam(TeamListItem* item);
 			void			MarkUnquittableTeam(BMessage* message);
+			bool			HandleKeyDown(BMessage* msg);
 
 private:
-			void			UpdateList();
+			void			_UpdateList();
 
 			bool			fQuitting;
 			BMessageRunner*	fUpdateRunner;

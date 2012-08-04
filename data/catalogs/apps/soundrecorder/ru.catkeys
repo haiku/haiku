@@ -35,11 +35,11 @@ File name: 	RecorderWindow		Имя файла:
 Cannot connect to the selected sound input	RecorderWindow		Невозможно подключиться к выбранному звуковому входу
 Cannot get the file to play	RecorderWindow		Невозможно воспроизвести файл
 Cannot record a sound that long	RecorderWindow		Невозможно записать звук такой длины
-Duration:	RecorderWindow		Продолжительность: 
-Compression:	RecorderWindow		Сжатие: 
+Duration:	RecorderWindow		Продолжительность:
+Compression:	RecorderWindow		Сжатие:
 Cannot find an unused name to use for the new recording	RecorderWindow		Невозможно найти свободное имя для новой записи
 Channels: 	RecorderWindow		Каналы: 
 Save	RecorderWindow		Сохранить
 Sample rate: 	RecorderWindow		Частота дискретизации: 
 Cannot connect to media server	RecorderWindow		Невозможно подключиться к медиа серверу
-File name:	RecorderWindow		Имя файла: 
+File name:	RecorderWindow		Имя файла:

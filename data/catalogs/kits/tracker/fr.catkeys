@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	733527088
+1	french	x-vnd.Haiku-libtracker	3119084633
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -383,7 +383,6 @@ Restoring: 	StatusWindow		Restauration :
 system	B_SYSTEM_DIRECTORY		système
 Skip	FSUtils		Passer
 Settings…	MountMenu		Réglages…
-Error emptying Trash!	FSUtils		Erreur en vidant la corbeille !
 Recent folders	FavoritesMenu		Dossiers récents
 Close	ContainerWindow		Fermer
 Preferred for file	OpenWithWindow		Préférence pour le fichier

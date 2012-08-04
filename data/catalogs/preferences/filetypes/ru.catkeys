@@ -81,7 +81,7 @@ Select preferred application	FileType Window		Выбрать предпочти�
 Single launch	Application Type Window		Одиночный запуск
 Golden master	Application Types Window		Золотая
 %s file type	FileType Window		Тип файла %s
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Приложение \"%s\" не поддерживает данный тип файлов. Вы действительно хотите установить его?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Приложение \"%s\" не поддерживает данный тип файлов. \nВы действительно хотите установить его?
 Type:	Attribute Window		Тип:
 Removing uninstalled application types	Application Types Window		Очищение удаленных типов приложений
 Done	Attribute Window		Готово

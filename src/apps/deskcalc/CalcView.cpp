@@ -4,9 +4,10 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Timothy Wayper <timmy@wunderbear.com>
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Philippe Saint-Pierre, stpere@gmail.com
+ *		Philippe Saint-Pierre <stpere@gmail.com>
+ *		John Scipione <jscipione@gmail.com>
+ *		Timothy Wayper <timmy@wunderbear.com>
  */
 
 

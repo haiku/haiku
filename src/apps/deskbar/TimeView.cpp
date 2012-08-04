@@ -159,7 +159,7 @@ TTimeView::Draw(BRect /*updateRect*/)
 	SetHighColor(ViewColor());
 	SetLowColor(ViewColor());
 	FillRect(Bounds());
-	SetHighColor(0, 0, 0, 255);
+	SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
 	DrawString(fCurrentTimeStr, fTimeLocation);
 

@@ -45,6 +45,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Возникла проблема при сохранении настроек.\nвозможно у вас нет прав на запись в директорию настроек загрузки.
 Enable notifications at startup	GeneralView		Добавить уведомления в автозагрузку
 Notifications	PrefletView		Уведомления
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер уведомлений не найден.\nЭто означает, что сервер уведомлений может быть поврежден.
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер уведомлений не найден.
 Applications	NotificationView		Приложения
 Events are notified	GeneralView		События уведомляются

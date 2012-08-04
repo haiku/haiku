@@ -12,7 +12,7 @@ resource app_version {
 	internal = 1,
 
 	short_info = "DeskCalc",
-	long_info = "DeskCalc ©2006-2011 Haiku, Inc."
+	long_info = "DeskCalc ©2006-2012 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

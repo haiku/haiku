@@ -379,6 +379,8 @@ void
 BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
 {
 	BFont font;
+	fSuper->GetFont(&font);
+
 	BString string(fLabel);
 
 	font.TruncateString(&string, B_TRUNCATE_MIDDLE, maxWidth);
@@ -410,7 +412,7 @@ BMenuItem::DrawContent()
 	}
 
 	// truncate if needed
-	if (frameWidth > labelWidth)
+	if (frameWidth >= labelWidth)
 		fSuper->DrawString(fLabel);
 	else {
 		char *truncatedLabel = new char[strlen(fLabel) + 4];

@@ -1,15 +1,15 @@
-1	japanese	x-vnd.Haiku-WebPositive	2461471851
+1	japanese	x-vnd.Haiku-WebPositive	3136989668
 Username:	Authentication Panel		ユーザー名：
-Show tabs if only one page is open.	Settings Window		ページが一つだけ開いている場合もタブを表示する。
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
 Cancel	Settings Window		キャンセル
 Close window	WebPositive Window		ウィンドウを閉じる
 Quit	WebPositive		終了
+The download could not be opened.	Download Window		 ダウンロードを開けませんでした。
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	ダウンロードフォルダーを開けませんでした。\n\nエラー： %error
+Open location	WebPositive Window		url を開く
 Clear history	WebPositive Window		履歴のクリア
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		昨日
-Authentication Required	Authentication Panel		認証が必要です
 Default standard font size:	Settings Window		規定の標準フォントサイズ：
 Start page:	Settings Window		スタートページ：
 History	WebPositive Window		履歴
@@ -17,12 +17,12 @@ Error opening downloads folder	Download Window		ダウンロードフォルダ�
 Paste	WebPositive Window		貼り付け
 Settings	Settings Window		設定
 %seconds seconds left	Download Window		残り %seconds 秒
+Confirmation	WebPositive Window		確認
 Window	WebPositive Window		ウィンドウ
 Decrease size	WebPositive Window		サイズを小さく
 Serif font:	Settings Window		セリフフォント：
-Use proxy server to connect to the internet.	Settings Window		インターネット接続にプロキシーサーバーを使用する。
 Page source	WebPositive Window		ページのソース
-Next	WebPositive Window		次
+Next	WebPositive Window		次へ
 Find next	WebPositive Window		次を検索
 Download folder:	Settings Window		ダウンロードフォルダ：
 Edit	WebPositive Window		編集
@@ -30,16 +30,16 @@ Over %hours hours left	Download Window		残り %hours 時間以上
 Cancel	Authentication Panel		キャンセル
 Match case	WebPositive Window		大文字小文字を区別
 Search page:	Settings Window		検索ページ：
-Show Home Button	Settings Window		ホームボタンを表示する
 Zoom text only	WebPositive Window		テキストのみ拡大
-Requesting: 	WebPositive Window		要求中：
 Default fixed font size:	Settings Window		規定の固定フォントサイズ：
 Close tab	WebPositive Window		タブを閉じる
 Over 1 hour left	Download Window		残り 1 時間以上
 Quit	WebPositive Window		終了
+Open download error	Download Window		ダウンロードを開く際にエラー
 Standard font:	Settings Window		標準フォント：
-Restart	Download Window		再起動
+Restart	Download Window		再開
 Proxy server	Settings Window		プロキシサーバー
+Open containing folder	Download Window		ファイルのフォルダーを開く
 New window	WebPositive Window		新規ウィンドウ
 Open	Download Window		開く
 Reload	WebPositive Window		再読み込み
@@ -47,25 +47,30 @@ Downloads	Download Window		ダウンロード
 Sans serif font:	Settings Window		サンセリフフォント：
 Over %days days left	Download Window		残り %days 日以上
 Forward	WebPositive Window		進む
+of	Download Window	...as in '12kB of 256kB'	/
 Revert	Settings Window		元に戻す
 Fixed font:	Settings Window		固定幅フォント：
 Cut	WebPositive Window		切り取り
 Bookmark this page	WebPositive Window		このページをブックマーク
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークフォルダーを表示しようとした時にエラーが発生しました。\n\nエラー: %error
 Open downloads folder	Download Window		ダウンロードフォルダーを開く
-Auto-hide interface in fullscreen mode.	Settings Window		フルスクリーンモードで自動的にインターフェースを隠す。
 Number of days to keep links in History menu:	Settings Window		履歴メニューにリンクを残す日数：
 Hide	Download Window		隠す
 Reset size	WebPositive Window		サイズをリセット
 Find:	WebPositive Window		検索：
 Increase size	WebPositive Window		サイズを大きく
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	ブックマークフォルダーの取得時にエラーが発生しました。\n\nエラー： %error
 Over 1 day left	Download Window		残り 1 日以上
 Downloads	WebPositive Window		ダウンロード
 Apply	Settings Window		適用
 Bookmark info	WebPositive Window		ブックマーク情報
 Size:	Font Selection view		サイズ：
+About	WebPositive Window		WebPositive について
+Finish: 	Download Window	Finishing time	完了：
 Fonts	Settings Window		フォント
 Close	WebPositive Window		閉じる
 OK	Download Window		OK
+Page source error	WebPositive Window		ページソースのエラー
 Open blank page	Settings Window		空白のページを開く
 New tabs:	Settings Window		新しいタブ：
 Cancel	WebPositive Window		キャンセル
@@ -77,18 +82,18 @@ Remove	Download Window		削除
 Find	WebPositive Window		検索
 Find previous	WebPositive Window		前を検索
 Settings	WebPositive Window		設定
-Proxy server address:	Settings Window		プロキシサーバのアドレス：
-Proxy server port:	Settings Window		プロキシサーバポート：
+Proxy server address:	Settings Window		プロキシサーバーのアドレス：
+Proxy server port:	Settings Window		プロキシサーバーポート：
 Bookmarks	WebPositive Window		ブックマーク
 %minutes minutes	Download Window		%minutes 分
 Paste	URL Bar		貼り付け
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		パスワードテキストを隠す
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	古池や A frog jumps in, 水の音。
 Over 1 minute left	Download Window		残り 1 分以上
 Open start page	Settings Window		スタートページを開く
 Continue downloads	WebPositive		ダウンロードを続ける
-Cancel	Download Window		キャンセル
+Cancel	Download Window		中止
 Open search page	Settings Window		検索ページを開く
 Password:	Authentication Panel		パスワード：
 Back	WebPositive Window		戻る
@@ -96,17 +101,25 @@ New browser window	Download Window		新規ブラウザウィンドウ
 Today	WebPositive Window		今日
 1 second left	Download Window		残り 1 秒
 Remember username and password for this site	Authentication Panel		このサイトのユーザー名とパスワードを記憶する
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ダウンロードが進行中です。WebPositive を今終了してもよいですか?
 New tab	WebPositive Window		新規タブ
 Downloads in progress	WebPositive		ダウンロードが進行中です
 Style:	Font Selection view		スタイル：
 General	Settings Window		一般
-Fullscreen	WebPositive Window		全画面表示
 View	WebPositive Window		表示
 Previous	WebPositive Window		前へ
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークファイルの作成中にエラーが発生しました。\n\nエラー： %error
+Bookmark error	WebPositive Window		ブックマークエラー
+Do you really want to clear the browsing history?	WebPositive Window		本当にブラウズ履歴をクリアしますか?
 Copy	WebPositive Window		コピー
+Open bookmarks confirmation	WebPositive Window		ブックマークを開く確認
+Remove missing	Download Window		見つからない物を削除
+Clone current page	Settings Window		現在のページを複製
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	一度に %addedCount 個のブックマークを開きますか?
 OK	Authentication Panel		OK
-Auto-hide mouse pointer.	Settings Window		マウスポインターを自動的に隠す。
 Copy	URL Bar		コピー
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		ブックマークの管理
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでにあります。
 New windows:	Settings Window		新規ウィンドウ：
+Remove finished	Download Window		完了した物を削除

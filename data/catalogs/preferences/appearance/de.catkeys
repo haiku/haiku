@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Appearance	1557879521
+1	german	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Normal:
 Control highlight	Colors tab		Steuerelement - Ausgewählt
 Control border	Colors tab		Steuerelement - Rahmen
@@ -31,6 +31,7 @@ Window decorator:	DecorSettingsView		Fenster-Dekorator:
 Selected menu item text	Colors tab		Menü - Text (ausgewählt)
 Menu background	Colors tab		Menü - Hintergrund
 OK	DecorSettingsView		OK
+Control mark	Colors tab		Steuerelement - Markierung
 Size:	Font Selection view		Größe:
 Panel background	Colors tab		Oberfläche - Hintergrund
 Menu font:	Font view		Menü:

@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	2326864078
+1	english	x-vnd.haiku-icon_o_matic	4233739176
 Select All	Icon-O-Matic-PathManipulator		全选
 Add Style	Icon-O-Matic-AddStylesCmd		添加样式
 Color (#%02x%02x%02x)	Style name after dropping a color		颜色(#%02x%02x%02x)
@@ -117,6 +117,7 @@ Gradient	Icon-O-Matic-StyleTypes		渐变
 Min LOD	Icon-O-Matic-PropertyNames		最小层次细节
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON 属性
 Invert selection	Icon-O-Matic-Properties		反向选择
+Drop shapes	Icon-O-Matic-ShapesList		拽入样式
 Export as…	Icon-O-Matic-Menu-File		导出为...
 Transformation	Transformation		转换
 Click on an object in	Empty property list - 1st line		点击对象
@@ -158,6 +159,7 @@ Snap to grid	Icon-O-Matic-Menu-Settings		对齐网格
 Remove	Icon-O-Matic-ShapesList		删除
 Yes	Icon-O-Matic-StyledTextImport		是
 Transformation	Icon-O-Matic-TransformersList		转换
+Save image	Icon-O-Matic-SavePanel		保存图像
 Add Styles	Icon-O-Matic-AddStylesCmd		添加样式
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		删除控制点
 Format	Icon-O-Matic-SavePanel		格式

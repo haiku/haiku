@@ -6,6 +6,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
 #include "ExpressionTextView.h"
 
 #include <new>
@@ -15,6 +16,7 @@
 #include <Window.h>
 
 #include "CalcView.h"
+
 
 using std::nothrow;
 
@@ -93,7 +95,7 @@ ExpressionTextView::KeyDown(const char* bytes, int32 numBytes)
 	// history.
 	if (current != Text())
 		fHistoryPos = fPreviousExpressions.CountItems();
-		
+
 	// If changes where not applied the value has become a new expression
 	// note that even if only the left or right arrow keys are pressed the
 	// fCurrentValue string will be cleared.
@@ -131,7 +133,7 @@ void
 ExpressionTextView::SetTextRect(BRect rect)
 {
 	InputTextView::SetTextRect(rect);
-	
+
 	int32 count = fPreviousExpressions.CountItems();
 	if (fHistoryPos == count && fCurrentValue.CountChars() > 0)
 		SetValue(fCurrentValue.String());
@@ -207,7 +209,7 @@ ExpressionTextView::SetValue(BString value)
 			if (offset == firstDigit + 1) {
 				// if the value is 0.01 or larger then scientific notation
 				// won't shorten the string
-				if (value[firstDigit] != '0' || value[firstDigit + 2] != '0' 
+				if (value[firstDigit] != '0' || value[firstDigit + 2] != '0'
 					|| value[firstDigit + 3] != '0') {
 					exponent = 0;
 				} else {
@@ -236,7 +238,7 @@ ExpressionTextView::SetValue(BString value)
 					// move the period
 					value.Remove(offset, 1);
 					value.Insert('.', 1, firstDigit + 1);
-					
+
 					exponent = offset - (firstDigit + 1);
 				}
 			}
@@ -252,7 +254,7 @@ ExpressionTextView::SetValue(BString value)
 		stringWidth = font.StringWidth(value);
 		char lastRemovedDigit = '0';
 		while (offset > firstDigit && stringWidth > viewWidth) {
-			if (value[offset] != '.')	
+			if (value[offset] != '.')
 				lastRemovedDigit = value[offset];
 			value.Remove(offset--, 1);
 			stringWidth = font.StringWidth(value);
@@ -270,9 +272,11 @@ ExpressionTextView::SetValue(BString value)
 			for (; offset >= firstDigit; offset--) {
 				if (value[offset] == '.')
 					continue;
+
 				digit = (int)(value[offset]) - '0' + 1; // ascii to int + 1
 				if (digit != 10)
 					break;
+
 				value[offset] = '0';
 			}
 			if (digit == 10) {
@@ -285,8 +289,9 @@ ExpressionTextView::SetValue(BString value)
 
 				// remove the exponent value and the last digit
 				offset = value.FindFirst('E');
-				if (offset == B_ERROR) 
+				if (offset == B_ERROR)
 					offset = value.CountChars();
+
 				value.Truncate(--offset);
 				offset--; // offset now points to the last digit
 
@@ -301,6 +306,7 @@ ExpressionTextView::SetValue(BString value)
 				offset = value.FindFirst('E');
 				if (offset == B_ERROR)
 					offset = value.CountChars();
+
 				offset--;
 			}
 		}
@@ -317,7 +323,7 @@ ExpressionTextView::SetValue(BString value)
 		}
 	}
 
-	// set the new value	
+	// set the new value
 	SetExpression(value);
 }
 
@@ -444,4 +450,3 @@ ExpressionTextView::SaveSettings(BMessage* archive) const
 	}
 	return B_OK;
 }
-

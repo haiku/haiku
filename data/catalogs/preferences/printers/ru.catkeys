@@ -31,7 +31,7 @@ Blue	TestPageView		Синий
 Remove	PrintersWindow		Удалить
 <pick one>	AddPrinterDialog		<выбрать>
 Add …	PrintersWindow		Добавить…
-Print jobs for 	PrintersWindow		Задания печати для
+Print jobs for 	PrintersWindow		Задания печати для 
 Failed	JobListView		Неудача
 %.2f KB	JobListView		%.2f Кбайт
 Magenta	TestPageView		Маджента

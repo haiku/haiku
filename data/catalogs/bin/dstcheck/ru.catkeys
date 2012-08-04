@@ -2,5 +2,5 @@
 Use this time	dstcheck		Использовать это время
 Ask me later	dstcheck		Спросить позже
 Manually adjust time…	dstcheck		Настроить вручную…
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Внимание!\n\nИз-за сезонного перевода времени часы вашего компьютера могут быть смещены на час. Ваш компьютер думает, что сейчас
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Внимание!\n\nИз-за сезонного перевода времени часы вашего компьютера могут быть смещены на час.\nВаш компьютер думает, что сейчас
 .\n\nIs this the correct time?	dstcheck		.\n\nЭто верное время?

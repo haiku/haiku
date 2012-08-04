@@ -10,7 +10,7 @@ Quit	Keymap window		Выйти
 Switch shortcut keys to Haiku mode	Keymap window		Переключить раскладку в режим Haiku
 Circumflex trigger	Keymap window		Циркумфлекс
 Diaeresis trigger	Keymap window		Диерезис
-Disabled	Modifier keys window	Do nothing	Отключено 
+Disabled	Modifier keys window	Do nothing	Отключено
 Open…	Keymap window		Открыть…
 System:	Keymap window		Системные:
 Set modifier keys…	Keymap window		Назначить клавиши-модификаторы…

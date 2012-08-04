@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2125023871
+1	english	x-vnd.Haiku-libtracker	1249217006
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -47,6 +47,7 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Clean up	DeskWindow		清空
 You cannot copy or move the root directory.	FSUtils		您无法复制或移动根目录。
 Invert selection	FilePanelPriv		反向选择
+Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	重命名
 save text	FilePanelPriv		保存文本
 Select all	FilePanelPriv		全选
 Link to:	InfoWindow		链接到： 
@@ -103,6 +104,7 @@ Add printer…	ContainerWindow		添加打印机...
 Open	VolumeWindow		打开
 New folder	ContainerWindow		新建文件夹
 Kind	ContainerWindow		种类
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	重命名
 home	B_USER_DIRECTORY		主目录
 Select…	ContainerWindow		选择...
 Copy to	ContainerWindow		复制到
@@ -195,6 +197,7 @@ Could not find application \"%appname\"	OpenWithWindow		未找到 \"%appname\" �
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		选中项目无法移动至垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
 Invert	SelectionWindow		恢复
 Save Query as template…	FindPanel		保存查询为模板...
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	重命名
 Find	FindPanel		搜索
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	移动
 Get info	ContainerWindow		获取信息
@@ -246,6 +249,7 @@ Cancel	Tracker		取消
 Sorry, you cannot edit that attribute.	WidgetAttributeText		对不起，您无法编辑该属性。
 Name	ContainerWindow		名称
 Disk mount settings	AutoMounterSettings		磁盘挂载设置
+Reverse order	ContainerWindow		倒序排列
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		确定
 Add current folder	FilePanelPriv		添加当前目录
@@ -261,6 +265,7 @@ Unknown	WidgetAttributeText		未知
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"（缺失符号：%symbol）。\n
 by name	FindPanel		名称
 Creating links: 	StatusWindow		创建链接：
+Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	重命名
 Paused: click to resume or stop	StatusWindow		暂停：点击继续或停止
 Preferred for %type	OpenWithWindow		首选 %type
 GiB	WidgetAttributeText		GiB
@@ -298,6 +303,7 @@ Permissions	ContainerWindow		权限
 moving	FSUtils		移动中
 Identify	InfoWindow		标识
 Recent folders	ContainerWindow		最近目录
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	重命名
 Close all	ContainerWindow		关闭所有
 Include trash	FindPanel		包括垃圾箱
 Query template	FindPanel		查询模板
@@ -373,7 +379,6 @@ Restoring: 	StatusWindow		恢复中...
 system	B_SYSTEM_DIRECTORY		系统
 Skip	FSUtils		跳过
 Settings…	MountMenu		设置...
-Error emptying Trash!	FSUtils		清空垃圾箱出错!
 Recent folders	FavoritesMenu		最近目录
 Close	ContainerWindow		关闭
 Preferred for file	OpenWithWindow		文件首选

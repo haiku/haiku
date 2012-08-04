@@ -400,7 +400,7 @@ TTeamMenuItem::DrawContent()
 	// what we want
 	if (fDrawLabel) {
 		menu->SetDrawingMode(B_OP_OVER);
-		menu->SetHighColor(0, 0, 0);
+		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
 		// override the drawing of the content when the item is disabled
 		// the wrong lowcolor is used when the item is disabled since the
@@ -508,10 +508,10 @@ TTeamMenuItem::DrawContentLabel()
 	bool canHandle = !barview->Dragging()
 		|| barview->AppCanHandleTypes(Signature());
 	if (_IsSelected() && IsEnabled() && canHandle)
-		menu->SetLowColor(tint_color(menu->ViewColor(),
+		menu->SetLowColor(tint_color(menu->LowColor(),
 			B_HIGHLIGHT_BACKGROUND_TINT));
 	else
-		menu->SetLowColor(menu->ViewColor());
+		menu->SetLowColor(menu->LowColor());
 
 	menu->DrawString(label);
 

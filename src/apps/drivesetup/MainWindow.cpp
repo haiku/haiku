@@ -170,7 +170,7 @@ MainWindow::MainWindow(BRect frame)
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "root menu");
 
 	// create all the menu items
-	fFormatMI = new BMenuItem(B_TRANSLATE("Format (not implemented)"),
+	fWipeMI = new BMenuItem(B_TRANSLATE("Wipe (not implemented)"),
 		new BMessage(MSG_FORMAT));
 	fEjectMI = new BMenuItem(B_TRANSLATE("Eject"),
 		new BMessage(MSG_EJECT), 'E');
@@ -193,21 +193,25 @@ MainWindow::MainWindow(BRect frame)
 
 	// Disk menu
 	fDiskMenu = new BMenu(B_TRANSLATE("Disk"));
-	fDiskMenu->AddItem(fFormatMI);
-	fDiskMenu->AddItem(fEjectMI);
-	fDiskMenu->AddItem(fSurfaceTestMI);
+
+	// fDiskMenu->AddItem(fWipeMI);
+	fDiskInitMenu = new BMenu(B_TRANSLATE("Initialize"));
+	fDiskMenu->AddItem(fDiskInitMenu);
 
 	fDiskMenu->AddSeparatorItem();
 
+	fDiskMenu->AddItem(fEjectMI);
+	// fDiskMenu->AddItem(fSurfaceTestMI);
 	fDiskMenu->AddItem(fRescanMI);
+
 	menuBar->AddItem(fDiskMenu);
 
 	// Parition menu
 	fPartitionMenu = new BMenu(B_TRANSLATE("Partition"));
 	fPartitionMenu->AddItem(fCreateMI);
 
-	fInitMenu = new BMenu(B_TRANSLATE("Initialize"));
-	fPartitionMenu->AddItem(fInitMenu);
+	fFormatMenu = new BMenu(B_TRANSLATE("Format"));
+	fPartitionMenu->AddItem(fFormatMenu);
 
 	fPartitionMenu->AddItem(fDeleteMI);
 
@@ -514,20 +518,23 @@ void
 MainWindow::_UpdateMenus(BDiskDevice* disk,
 	partition_id selectedPartition, partition_id parentID)
 {
-	while (BMenuItem* item = fInitMenu->RemoveItem(0L))
+	while (BMenuItem* item = fFormatMenu->RemoveItem(0L))
+		delete item;
+	while (BMenuItem* item = fDiskInitMenu->RemoveItem(0L))
 		delete item;
 
 	fCreateMI->SetEnabled(false);
 	fUnmountMI->SetEnabled(false);
-	fInitMenu->SetEnabled(false);
+	fDiskInitMenu->SetEnabled(false);
+	fFormatMenu->SetEnabled(false);
 
 	if (!disk) {
-		fFormatMI->SetEnabled(false);
+		fWipeMI->SetEnabled(false);
 		fEjectMI->SetEnabled(false);
 		fSurfaceTestMI->SetEnabled(false);
 	} else {
-//		fFormatMI->SetEnabled(true);
-		fFormatMI->SetEnabled(false);
+//		fWipeMI->SetEnabled(true);
+		fWipeMI->SetEnabled(false);
 		fEjectMI->SetEnabled(disk->IsRemovableMedia());
 //		fSurfaceTestMI->SetEnabled(true);
 		fSurfaceTestMI->SetEnabled(false);
@@ -543,7 +550,7 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			fCreateMI->SetEnabled(true);
 
 		bool prepared = disk->PrepareModifications() == B_OK;
-		fInitMenu->SetEnabled(prepared);
+		fFormatMenu->SetEnabled(prepared);
 		fDeleteMI->SetEnabled(prepared);
 
 		BPartition* partition = disk->FindDescendant(selectedPartition);
@@ -554,12 +561,6 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			if (!diskSystem.SupportsInitializing())
 				continue;
 
-			if (disk->ID() != selectedPartition
-				&& disk->ContainsPartitioningSystem()
-				&& !diskSystem.IsFileSystem()) {
-				// Do not confuse the user with nested partition maps?
-				continue;
-			}
 			BMessage* message = new BMessage(MSG_INITIALIZE);
 			message->AddInt32("parent id", parentID);
 			message->AddString("disk system", diskSystem.PrettyName());
@@ -568,18 +569,32 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			label << B_UTF8_ELLIPSIS;
 			BMenuItem* item = new BMenuItem(label.String(), message);
 
-// TODO: Very unintuitive that we have to use the pretty name here!
+			// TODO: Very unintuitive that we have to use PrettyName (vs Name)
 			item->SetEnabled(partition != NULL
-//				&& partition->CanInitialize(diskSystem.Name()));
 				&& partition->CanInitialize(diskSystem.PrettyName()));
-			fInitMenu->AddItem(item);
+
+			if (disk->ID() == selectedPartition
+				&& !diskSystem.IsFileSystem()) {
+				// Disk is selected, and DiskSystem is a partition map
+				fDiskInitMenu->AddItem(item);
+			} else if (diskSystem.IsFileSystem()) {
+				// Otherwise a filesystem
+				fFormatMenu->AddItem(item);
+			}
 		}
 
 		// Mount items
 		if (partition) {
-			fInitMenu->SetEnabled(!partition->IsMounted()
+			fFormatMenu->SetEnabled(!partition->IsMounted()
 				&& !partition->IsReadOnly()
-				&& partition->Device()->HasMedia());
+				&& partition->Device()->HasMedia()
+				&& fFormatMenu->CountItems() > 0);
+
+			fDiskInitMenu->SetEnabled(!partition->IsMounted()
+				&& !partition->IsReadOnly()
+				&& partition->Device()->HasMedia()
+				&& partition->IsDevice()
+				&& fDiskInitMenu->CountItems() > 0);
 
 			fDeleteMI->SetEnabled(!partition->IsMounted()
 				&& !partition->IsDevice());
@@ -601,7 +616,8 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		} else {
 			fDeleteMI->SetEnabled(false);
 			fMountMI->SetEnabled(false);
-			fInitMenu->SetEnabled(false);
+			fFormatMenu->SetEnabled(false);
+			fDiskInitMenu->SetEnabled(false);
 		}
 
 		if (prepared)
@@ -633,8 +649,8 @@ MainWindow::_DisplayPartitionError(BString _message,
 
 	if (error < B_OK) {
 		BString helper = message;
-		const char* errorString =
-			B_TRANSLATE_COMMENT("Error: ", "in any error alert");
+		const char* errorString
+			= B_TRANSLATE_COMMENT("Error: ", "in any error alert");
 		snprintf(message, sizeof(message), "%s\n\n%s%s", helper.String(),
 			errorString, strerror(error));
 	}
@@ -790,25 +806,6 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 	}
 
-	char message[512];
-	if (partition->ContentName() && strlen(partition->ContentName()) > 0) {
-		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you want "
-			"to initialize the partition \"%s\"? You will be asked again "
-			"before changes are written to the disk."),
-			partition->ContentName());
-	} else {
-		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you want "
-			"to initialize the partition? You will be asked again "
-			"before changes are written to the disk."));
-	}
-	BAlert* alert = new BAlert("first notice", message,
-		B_TRANSLATE("Continue"), B_TRANSLATE("Cancel"), NULL,
-		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
-	int32 choice = alert->Go();
-
-	if (choice == 1)
-		return;
-
 	BDiskSystem diskSystem;
 	fDDRoster.RewindDiskSystems();
 	bool found = false;
@@ -821,12 +818,45 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		}
 	}
 
+	char message[512];
+
 	if (!found) {
 		snprintf(message, sizeof(message), B_TRANSLATE("Disk system \"%s\"\" "
 			"not found!"));
 		_DisplayPartitionError(message);
 		return;
 	}
+
+	if (diskSystem.IsFileSystem()) {
+		if (disk->ID() == selectedPartition) {
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to format a raw disk? (most people initialize the disk "
+				"with a partitioning system first) You will be asked "
+				"again before changes are written to the disk."));
+		} else if (partition->ContentName()
+			&& strlen(partition->ContentName()) > 0) {
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to format the partition \"%s\"? You will be asked "
+				"again before changes are written to the disk."),
+				partition->ContentName());
+		} else {
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to format the partition? You will be asked again "
+				"before changes are written to the disk."));
+		}
+	} else {
+		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			"want to initialize the selected disk? All data will be lost. "
+			"You will be asked again before changes are written to the "
+			"disk.\n"));
+	}
+	BAlert* alert = new BAlert("first notice", message,
+		B_TRANSLATE("Continue"), B_TRANSLATE("Cancel"), NULL,
+		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+	int32 choice = alert->Go();
+
+	if (choice == 1)
+		return;
 
 	ModificationPreparer modificationPreparer(disk);
 	status_t ret = modificationPreparer.ModificationStatus();
@@ -838,6 +868,8 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 
 	BString name;
 	BString parameters;
+
+	// TODO: diskSystem.IsFileSystem() seems like a better fit here?
 	if (diskSystemName == "Be File System") {
 		InitParamsPanel* panel = new InitParamsPanel(this, diskSystemName,
 			partition);
@@ -914,11 +946,21 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	partition = disk->FindDescendant(selectedPartition);
 
 	if (ret == B_OK) {
-		_DisplayPartitionError(B_TRANSLATE("The partition %s has been "
-			"successfully initialized.\n"), partition);
+		if (diskSystem.IsFileSystem()) {
+			_DisplayPartitionError(B_TRANSLATE("The partition %s has been "
+				"successfully formatted.\n"), partition);
+		} else {
+			_DisplayPartitionError(B_TRANSLATE("The disk has been "
+				"successfully initialized.\n"), partition);
+		}
 	} else {
-		_DisplayPartitionError(B_TRANSLATE("Failed to initialize the "
-			"partition %s!\n"), partition, ret);
+		if (diskSystem.IsFileSystem()) {
+			_DisplayPartitionError(B_TRANSLATE("Failed to format the "
+				"partition %s!\n"), partition, ret);
+		} else {
+			_DisplayPartitionError(B_TRANSLATE("Failed to initialize the "
+				"disk %s!\n"), partition, ret);
+		}
 	}
 
 	_ScanDrives();
@@ -1026,7 +1068,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	ret = modificationPreparer.CommitModifications();
 
 	if (ret != B_OK) {
-		_DisplayPartitionError(B_TRANSLATE("Failed to initialize the "
+		_DisplayPartitionError(B_TRANSLATE("Failed to format the "
 			"partition. No changes have been written to disk."));
 		return;
 	}
@@ -1038,6 +1080,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	_ScanDrives();
 	fDiskView->ForceUpdate();
 }
+
 
 void
 MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)

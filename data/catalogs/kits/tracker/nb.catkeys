@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	3686096343
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1776686592
 common	B_COMMON_DIRECTORY		felles
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvisning
@@ -383,7 +383,6 @@ Restoring: 	StatusWindow		Gjenoppretter:
 system	B_SYSTEM_DIRECTORY		system
 Skip	FSUtils		Hopp over
 Settings…	MountMenu		Innstillinger...
-Error emptying Trash!	FSUtils		Feil ved tømming av søppelkurv!
 Recent folders	FavoritesMenu		Nylige mapper
 Close	ContainerWindow		Lukk
 Preferred for file	OpenWithWindow		Foretrukket for fil

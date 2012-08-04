@@ -93,6 +93,19 @@ FilterLocaleChanged(BMessage* message, BHandler** target,
 }
 
 
+filter_result
+FilterKeyDown(BMessage* message, BHandler** target,
+	BMessageFilter *filter)
+{
+	if (message->what == B_KEY_DOWN && gTeamMonitorWindow != NULL) {
+		if (gTeamMonitorWindow->HandleKeyDown(message))
+			return B_SKIP_MESSAGE;
+	}
+
+	return B_DISPATCH_MESSAGE;
+}
+
+
 class AllShowingTextView : public BTextView {
 public:
 							AllShowingTextView(const char* name);
@@ -227,16 +240,15 @@ TeamMonitorWindow::TeamMonitorWindow()
 
 	AddShortcut('T', B_COMMAND_KEY | B_OPTION_KEY,
 		new BMessage(kMsgLaunchTerminal));
-	AddShortcut('K', B_COMMAND_KEY | B_OPTION_KEY,
-		new BMessage(TM_KILL_APPLICATION));
-	AddShortcut('Q', B_COMMAND_KEY | B_OPTION_KEY,
-		new BMessage(TM_QUIT_APPLICATION));
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
 	gLocalizedNamePreferred
 		= BLocaleRoster::Default()->IsFilesystemTranslationPreferred();
 
 	gTeamMonitorWindow = this;
+
+	this->AddCommonFilter(new BMessageFilter(B_ANY_DELIVERY,
+		B_ANY_SOURCE, B_KEY_DOWN, FilterKeyDown));
 
 	if (be_app->Lock()) {
 		be_app->AddCommonFilter(new BMessageFilter(B_ANY_DELIVERY,
@@ -261,14 +273,6 @@ TeamMonitorWindow::~TeamMonitorWindow()
 
 
 void
-TeamMonitorWindow::Show()
-{
-	fListView->MakeFocus();
-	BWindow::Show();
-}
-
-
-void
 TeamMonitorWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
@@ -277,7 +281,7 @@ TeamMonitorWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case kMsgUpdate:
-			UpdateList();
+			_UpdateList();
 			break;
 
 		case kMsgCtrlAltDelPressed:
@@ -306,7 +310,7 @@ TeamMonitorWindow::MessageReceived(BMessage* msg)
 				fListView->CurrentSelection()));
 			if (item != NULL) {
 				kill_team(item->GetInfo()->team);
-				UpdateList();
+				_UpdateList();
 			}
 			break;
 		}
@@ -353,77 +357,19 @@ TeamMonitorWindow::MessageReceived(BMessage* msg)
 }
 
 
+void
+TeamMonitorWindow::Show()
+{
+	fListView->MakeFocus();
+	BWindow::Show();
+}
+
+
 bool
 TeamMonitorWindow::QuitRequested()
 {
 	Disable();
 	return fQuitting;
-}
-
-
-void
-TeamMonitorWindow::UpdateList()
-{
-	bool changed = false;
-
-	for (int32 i = 0; i < fListView->CountItems(); i++) {
-		TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
-		if (item != NULL)
-			item->SetFound(false);
-	}
-
-	int32 cookie = 0;
-	team_info info;
-	while (get_next_team_info(&cookie, &info) == B_OK) {
-		if (info.team <=16)
-			continue;
-
-		bool found = false;
-		for (int32 i = 0; i < fListView->CountItems(); i++) {
-			TeamListItem* item
-				= dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
-			if (item != NULL && item->GetInfo()->team == info.team) {
-				item->SetFound(true);
-				found = true;
-			}
-		}
-
-		if (!found) {
-			TeamListItem* item = new TeamListItem(info);
-
-			fListView->AddItem(item,
-				item->IsSystemServer() ? fListView->CountItems() : 0);
-			item->SetFound(true);
-			changed = true;
-		}
-	}
-
-	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
-		TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
-		if (item != NULL && !item->Found()) {
-			if (item == fDescriptionView->Item()) {
-				fDescriptionView->SetItem(NULL);
-				fKillButton->SetEnabled(false);
-				fQuitButton->SetEnabled(false);
-			}
-
-			delete fListView->RemoveItem(i);
-			changed = true;
-		}
-	}
-
-	if (changed)
-		fListView->Invalidate();
-
-	bool desktopRunning = be_roster->IsRunning(kTrackerSignature)
-		&& be_roster->IsRunning(kDeskbarSignature);
-	if (!desktopRunning && fRestartButton->IsHidden()) {
-		fRestartButton->Show();
-		SetDefaultButton(fRestartButton);
-		fRestartButton->Parent()->Layout(true);
-	}
-
-	fRestartButton->SetEnabled(!desktopRunning);
 }
 
 
@@ -435,7 +381,7 @@ TeamMonitorWindow::Enable()
 			BMessage message(kMsgUpdate);
 			fUpdateRunner = new BMessageRunner(this, &message, 1000000LL);
 
-			UpdateList();
+			_UpdateList();
 			Show();
 		}
 		Unlock();
@@ -529,6 +475,114 @@ TeamMonitorWindow::MarkUnquittableTeam(BMessage* message)
 
 	fTeamQuitterList.RemoveItem(teamQuitter);
 	delete teamQuitter;
+}
+
+
+bool
+TeamMonitorWindow::HandleKeyDown(BMessage* msg)
+{
+	uint32 rawChar = msg->FindInt32("raw_char");
+	uint32 modifier = msg->FindInt32("modifiers");
+
+	// Ignore the system modifier namespace
+	if ((modifier & (B_CONTROL_KEY | B_COMMAND_KEY))
+			== (B_CONTROL_KEY | B_COMMAND_KEY))
+		return false;
+
+	bool quit = false;
+	bool kill = false;
+	switch (rawChar) {
+		case B_DELETE:
+			if (modifier & B_SHIFT_KEY)
+				kill = true;
+			else
+				quit = true;
+			break;
+		case 'q':
+		case 'Q':
+			quit = true;
+			break;
+		case 'k':
+		case 'K':
+			kill = true;
+			break;
+	}
+
+	if (quit) {
+		PostMessage(TM_QUIT_APPLICATION);
+		return true;
+	} else if (kill) {
+		PostMessage(TM_KILL_APPLICATION);
+		return true;
+	}
+
+	return false;
+}
+
+
+void
+TeamMonitorWindow::_UpdateList()
+{
+	bool changed = false;
+
+	for (int32 i = 0; i < fListView->CountItems(); i++) {
+		TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+		if (item != NULL)
+			item->SetFound(false);
+	}
+
+	int32 cookie = 0;
+	team_info info;
+	while (get_next_team_info(&cookie, &info) == B_OK) {
+		if (info.team <=16)
+			continue;
+
+		bool found = false;
+		for (int32 i = 0; i < fListView->CountItems(); i++) {
+			TeamListItem* item
+				= dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+			if (item != NULL && item->GetInfo()->team == info.team) {
+				item->SetFound(true);
+				found = true;
+			}
+		}
+
+		if (!found) {
+			TeamListItem* item = new TeamListItem(info);
+
+			fListView->AddItem(item,
+				item->IsSystemServer() ? fListView->CountItems() : 0);
+			item->SetFound(true);
+			changed = true;
+		}
+	}
+
+	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
+		TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(i));
+		if (item != NULL && !item->Found()) {
+			if (item == fDescriptionView->Item()) {
+				fDescriptionView->SetItem(NULL);
+				fKillButton->SetEnabled(false);
+				fQuitButton->SetEnabled(false);
+			}
+
+			delete fListView->RemoveItem(i);
+			changed = true;
+		}
+	}
+
+	if (changed)
+		fListView->Invalidate();
+
+	bool desktopRunning = be_roster->IsRunning(kTrackerSignature)
+		&& be_roster->IsRunning(kDeskbarSignature);
+	if (!desktopRunning && fRestartButton->IsHidden()) {
+		fRestartButton->Show();
+		SetDefaultButton(fRestartButton);
+		fRestartButton->Parent()->Layout(true);
+	}
+
+	fRestartButton->SetEnabled(!desktopRunning);
 }
 
 

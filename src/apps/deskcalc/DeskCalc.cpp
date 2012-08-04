@@ -8,10 +8,12 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
 #include <stdio.h>
 
 #include "CalcApplication.h"
 #include "ExpressionParser.h"
+
 
 int
 main(int argc, char* argv[])
@@ -19,7 +21,7 @@ main(int argc, char* argv[])
 	if (argc == 1) {
 		// run GUI
 		CalcApplication* app = new CalcApplication();
-		
+
 		app->Run();
 		delete app;
 	} else {

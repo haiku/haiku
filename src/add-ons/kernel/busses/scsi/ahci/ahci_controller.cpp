@@ -80,7 +80,8 @@ AHCIController::Init()
 		TRACE("PCI SATA capability found at offset 0x%x\n", capabilityOffset);
 		satacr0 = fPCI->read_pci_config(fPCIDevice, capabilityOffset, 4);
 		satacr1 = fPCI->read_pci_config(fPCIDevice, capabilityOffset + 4, 4);
-		TRACE("satacr0 = 0x%08lx, satacr1 = 0x%08lx\n", satacr0, satacr1);
+		TRACE("satacr0 = 0x%08" B_PRIx32 ", satacr1 = 0x%08" B_PRIx32 "\n",
+			satacr0, satacr1);
 	}
 
 	uint16 pcicmd = fPCI->read_pci_config(fPCIDevice, PCI_command, 2);
@@ -92,10 +93,10 @@ AHCIController::Init()
 
 	if (fPCIVendorID == PCI_VENDOR_JMICRON) {
 		uint32 ctrl = fPCI->read_pci_config(fPCIDevice, PCI_JMICRON_CONTROLLER_CONTROL_1, 4);
-		TRACE("Jmicron controller control 1 old 0x%08lx\n", ctrl);
+		TRACE("Jmicron controller control 1 old 0x%08" B_PRIx32 "\n", ctrl);
 		ctrl &= ~((1 << 9) | (1 << 12) | (1 << 14));	// disable SFF 8038i emulation
 		ctrl |= (1 << 8) | (1 << 13) | (1 << 15);		// enable AHCI controller
-		TRACE("Jmicron controller control 1 new 0x%08lx\n", ctrl);
+		TRACE("Jmicron controller control 1 new 0x%08" B_PRIx32 "\n", ctrl);
 		fPCI->write_pci_config(fPCIDevice, PCI_JMICRON_CONTROLLER_CONTROL_1, 4, ctrl);
 	}
 
@@ -132,14 +133,15 @@ AHCIController::Init()
 	fPortImplementedMask = fRegs->pi;
 	if (fPortImplementedMask == 0) {
 		fPortImplementedMask = 0xffffffff >> (32 - fPortCountMax);
-		TRACE("ports-implemented mask is zero, using 0x%lx instead.\n", fPortImplementedMask);
+		TRACE("ports-implemented mask is zero, using 0x%" B_PRIx32 " instead.\n",
+			fPortImplementedMask);
 	}
 
 	fPortCountAvail = count_bits_set(fPortImplementedMask);
 
-	TRACE("cap: Interface Speed Support: generation %lu\n",	(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
-	TRACE("cap: Number of Command Slots: %d (raw %#lx)\n",	fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
-	TRACE("cap: Number of Ports: %d (raw %#lx)\n",			fPortCountMax, (fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+	TRACE("cap: Interface Speed Support: generation %" B_PRIu32 "\n",	(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
+	TRACE("cap: Number of Command Slots: %d (raw %#" B_PRIx32 ")\n",	fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
+	TRACE("cap: Number of Ports: %d (raw %#" B_PRIx32 ")\n",			fPortCountMax, (fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
 	TRACE("cap: Supports Port Multiplier: %s\n",		(fRegs->cap & CAP_SPM) ? "yes" : "no");
 	TRACE("cap: Supports External SATA: %s\n",			(fRegs->cap & CAP_SXS) ? "yes" : "no");
 	TRACE("cap: Enclosure Management Supported: %s\n",	(fRegs->cap & CAP_EMS) ? "yes" : "no");
@@ -156,9 +158,9 @@ AHCIController::Init()
 
 	TRACE("cap: Supports AHCI mode only: %s\n",			(fRegs->cap & CAP_SAM) ? "yes" : "no");
 	TRACE("ghc: AHCI Enable: %s\n",						(fRegs->ghc & GHC_AE) ? "yes" : "no");
-	TRACE("Ports Implemented Mask: %#08lx\n",			fPortImplementedMask);
+	TRACE("Ports Implemented Mask: %#08" B_PRIx32 "\n",	fPortImplementedMask);
 	TRACE("Number of Available Ports: %d\n",			fPortCountAvail);
-	TRACE("AHCI Version %lu.%lu\n",						fRegs->vs >> 16, fRegs->vs & 0xff);
+	TRACE("AHCI Version %" B_PRIu32 ".%" B_PRIu32 "\n",	fRegs->vs >> 16, fRegs->vs & 0xff);
 	TRACE("Interrupt %u\n",								fIRQ);
 
 	// setup interrupt handler

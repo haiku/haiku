@@ -56,11 +56,11 @@ Mount all	MainWindow		Подключить все
 Cancel	MainWindow		Отмена
 Delete partition	MainWindow		Удалить раздел
 End: %ld MB	Support		Конец: %ld Мбайт
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел \"%s\"?\nПовторый запрос будет выдан непосредственно перед записью изменений на диск.
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел \"%s\"?\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
 Eject	MainWindow		Извлечь
 Partition	MainWindow		Раздел
 File system	PartitionList		Файловая система
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел?\nПовторый запрос будет выдан непосредственно перед записью изменений на диск.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел?\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
 Validation of the given creation parameters failed.	MainWindow		Не удалось применить введённые при создании параметры.
 Size	PartitionList		Размер
 Validation of the given initialization parameters failed.	MainWindow		Не удалось применить параметры, введенные при инициализации.

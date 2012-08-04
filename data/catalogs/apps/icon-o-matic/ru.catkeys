@@ -181,7 +181,7 @@ Assign Paths	Icon-O-Matic-AddPathsCmd		Применить контуры
 OK	Icon-O-Matic-SVGImport		ОК
 Multi paste	Icon-O-Matic-Properties		Мульти вставка
 to attach transformers.	Empty transformers list - 2nd line		чтобы применить трансформатор.
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Сбросить изменения 
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Сбросить изменения
 Reverse Path	Icon-O-Matic-ReversePathCmd		Обратить контур
 Scale	Icon-O-Matic-TransformationBoxStates		Масштабировать
 Duplicate	Icon-O-Matic-PathsList		Дублировать

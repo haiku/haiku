@@ -9,13 +9,13 @@ Installation completed. Boot sector has been written to '%s'. Press Quit to leav
 Quit	InstallerApp		Выход
 Additional disk space required: 0.0 KiB	InstallerWindow		Необходимо дополнительного пространства: 0.0 Кбайт
 With GRUB it's: (hdN,n)\n\n	InstallerApp		В GRUB это: (hdN,n)\n\n
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n
+\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Остановить
-Install progress:  	InstallerWindow		Прогресс установки: 
+Install progress:  	InstallerWindow		Прогресс установки:  
 2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Запуск установки.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Это программное обеспечение пока еще находится в состоянии альфа качества! Это значит, что есть большой риск потери данных. Чаще делайте резервные копии! Мы вас предупредили.\n\n
-Are you sure you want to abort the installation?	InstallerWindow		Вы уверены, что хотите  прервать установку
+This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Это программное обеспечение пока еще находится в состоянии альфа качества! Это значит, что есть большой риск потери данных. Чаще делайте резервные копии! Мы вас предупредили.\n\n\n
+Are you sure you want to abort the installation?	InstallerWindow		Вы уверены, что хотите прервать установку?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Вы уверены, что хотите начать установку на текущий загрузочный диск? Установщику потребуется перезагрузка компьютера, если вы продолжите.
 Quit Boot Manager	InstallerWindow		Закройте Менеджер Загрузки
 Stop	InstallerWindow		Остановить
@@ -72,7 +72,7 @@ You can't install the contents of a disk onto itself. Please choose a different 
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" это номер раздела, который в GRUB 2 начинается с \"1\"\n
 Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Начиная с os-prober v1.44 (т.е. в Ubuntu 11.04 и старше), Haiku должна распознаваться из коробки. Чтобы добавить Haiku в меню GRUB, откройте Терминал и введите:\n\n
 Quit DriveSetup	InstallerWindow		Закройте Разметку диска
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" это номер жесткого диска, начинающийся с \"0\".\n\
+\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" это номер жесткого диска, начинающийся с \"0\".\n
 Hide optional packages	InstallerWindow		Скрыть опциональные пакеты
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте окно разметки диска перед закрытием окна Установщика.
 Restart system	InstallerWindow		Перезагрузить компьютер
@@ -90,10 +90,10 @@ OK	InstallProgress		ОК
 Please choose target	InstallerWindow		Пожалуйста, выберите раздел для установки
 ???	InstallerWindow	Unknown partition name	???
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Если вы устанавливаете Haiku на реальный компьютер (не в эмуляторе), то рекомендуем заранее подготовить раздел на жестком диске. Установщик и утилита разметки диска (DriveSetup) предложат инициализировать существующий раздел в родную файловую систему Haiku, но функция изменения положения разделов не была протестирована на достаточном количестве компьютеров, поэтому мы пока не рекомендуем её использовать.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Установщик сделает раздел с Haiku загрузочным, но не предпримет никаких действий для интеграции Haiku в существующее загрузочное меню. Если у вас уже установлен GRUB, то вы можете добавить Haiku в его загрузочное меню. В зависимости от версии GRUB это делается по-разному.\n\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Установщик сделает раздел с Haiku загрузочным, но не предпримет никаких действий для интеграции Haiku в существующее загрузочное меню. Если у вас уже установлен GRUB, то вы можете добавить Haiku в его загрузочное меню. В зависимости от версии GRUB это делается по-разному.\n\n\n
 Begin	InstallerWindow		Начать
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		И наконец, вам нужно обновить загрузочное меню, введя следующую команду:\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Если вы еще не создали раздел, то просто перезагрузитесь, создайте раздел с помощью любой утилиты, с которой вы лучше всего знакомы, а затем перезагрузитесь в Haiku для продолжения установки. Например, вы можете использовать GParted Live-CD, он также умеет менять размер существующих разделов для подготовки свободного места.\n\n
+If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Если вы еще не создали раздел, то просто перезагрузитесь, создайте раздел с помощью любой утилиты, с которой вы лучше всего знакомы, а затем перезагрузитесь в Haiku для продолжения установки. Например, вы можете использовать GParted Live-CD, он также умеет менять размер существующих разделов для подготовки свободного места.\n\n\n
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		В GRUB 2 первый логический (расширенный) раздел всегда имеет номер \"5\", вне зависимости от количества первичных разделов.\n\n
 Write boot sector	InstallerWindow		Записать загрузочный сектор
 Cancel	InstallerWindow		Отмена
@@ -113,10 +113,10 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Вы уверены, что хотите прервать установку?
 Onto:	InstallerWindow		На диск:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте Менеджер Загрузки перед закрытием окна установщика.
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Когда вы первый раз успешно загрузитесь в установленную Haiku, не забудьте прочесть нашу документацию, доступную в файлах \"Welcome\" и  \"Userguide\". Ссылки на них находятся на рабочем столе и в закладках WebPositive.\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Когда вы первый раз успешно загрузитесь в установленную Haiku, не забудьте прочесть нашу документацию, доступную в файлах \"Welcome\" и  \"Userguide\". Ссылки на них находятся на рабочем столе и в закладках WebPositive.\n\n
 Tools	InstallerWindow		Инструменты
 The mount point could not be retrieved.	InstallProgress		Невозможно определить точку подключения.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Выбранный диск не является пустым.\nВы уверены, что хотите продолжить?\n\nВнимание: Папка 'system' будет полностью перезаписана, все остальные папки будут объединены, а файлы и папки, которые существуют на обоих носителях будут перезаписаны с установочного диска.
-You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Вы можете увидеть нужный раздел, например, с помощью GParted.\n\n
+You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Вы можете увидеть нужный раздел, например, с помощью GParted.\n\n\n
 \ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <ваш текстовый редактор> /etc/grub.d/40_custom\n\n

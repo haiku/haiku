@@ -1,9 +1,10 @@
-1	russian	x-vnd.Haiku-PackageInstaller	4079768122
+1	russian	x-vnd.Haiku-PackageInstaller	2766848951
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
 Continue	PackageInstall		Продолжить
 Image not loaded correctly	PackageImageViewer		Изображение некорректно загружено
+Install 	PackageView		Установить 
 Install	PackageView		Установить
 %.1f GiB	PackageView		%.1f Гбайт
 Done	PackageInstall		Готово

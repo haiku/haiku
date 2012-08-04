@@ -15,7 +15,7 @@ Screen preferences by the Haiku team	Screen		Настройки экрана о�
 Screen	System name		Экран
 OK	Screen		ОК
 Workspaces	Screen		Рабочие столы
-The screen mode could not be set:\n\t%s\n	Screen		Не возможно установить этот режим:\n\t%s\
+The screen mode could not be set:\n\t%s\n	Screen		Не возможно установить этот режим:\n\t%s\n
 no	Screen		нет
 Could not write VESA mode settings file:\n\t	Screen		Ну удалось записать файл настроек VESA режима:\n\t
 Type or use the left and right arrow keys.	Screen		Наберите число или используйте левую или правую стрелку.

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	4105576244
+1	russian	x-vnd.Haiku-About	3837926831
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 BSD (4-clause)	AboutView		4-пунктовая BSD
@@ -42,6 +42,7 @@ Contains software from the FreeBSD Project, released under the BSD license:\ncal
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Все права защищены © 2010-2011 Google Inc.
 About this system	AboutWindow		Об этой системе
+BSD (2-clause)	AboutView		2-пунктовая BSD
 Version:	AboutView		Версия:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Все права защищены © 1994-2008 Xiph.Org.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Все права защищены © Максим Шеманарев (McSeem).

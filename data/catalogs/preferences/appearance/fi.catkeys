@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	1557879521
+1	finnish	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Pelkkä kirjasin:
 Control highlight	Colors tab		Kontrollin korostus
 Control border	Colors tab		Kontrollin reuna
@@ -31,6 +31,7 @@ Window decorator:	DecorSettingsView		Ikkunan kehystäjä:
 Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
 Menu background	Colors tab		Valikon tausta
 OK	DecorSettingsView		Valmis
+Control mark	Colors tab		Ohjausmerkki
 Size:	Font Selection view		Koko:
 Panel background	Colors tab		Paneelin tausta
 Menu font:	Font view		Valikkokirjasin:

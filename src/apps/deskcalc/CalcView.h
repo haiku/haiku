@@ -4,14 +4,16 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Timothy Wayper <timmy@wunderbear.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione <jscipione@gmail.com>
+ *		Timothy Wayper <timmy@wunderbear.com>
  */
-
 #ifndef _CALC_VIEW_H
 #define _CALC_VIEW_H
 
+
 #include <View.h>
+
 
 enum {
 	MSG_OPTIONS_AUTO_NUM_LOCK				= 'oanl',

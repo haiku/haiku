@@ -201,7 +201,9 @@ TWindowMenuItem::Draw()
 		return;
 	}
 
-	rgb_color menuColor = tint_color(Menu()->ViewColor(), 1.07);
+	// TODO: Tint this smartly based on the low color, this does
+	// nothing to black.
+	rgb_color menuColor = tint_color(Menu()->LowColor(), 1.07);
 	BRect frame(Frame());
 	BMenu* menu = Menu();
 
@@ -271,7 +273,7 @@ TWindowMenuItem::DrawContent()
 
 	menu->MovePenTo(contLoc);
 	// Set the pen color so that the label is always visible.
-	menu->SetHighColor(0, 0, 0);
+	menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
 	BMenuItem::DrawContent();
 

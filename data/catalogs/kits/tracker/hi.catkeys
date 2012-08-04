@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	602946887
+1	hindi	x-vnd.Haiku-libtracker	2988504432
 common	B_COMMON_DIRECTORY		सामान्य
 OK	WidgetAttributeText		ठीक है
 Icon view	VolumeWindow		चिह्न दृश्य
@@ -381,7 +381,6 @@ Restoring: 	StatusWindow		पुनर्स्थापित कर रहा 
 system	B_SYSTEM_DIRECTORY		सिस्टम
 Skip	FSUtils		छोड़ें
 Settings…	MountMenu		सेटिंग्स...
-Error emptying Trash!	FSUtils		रद्दी खाली करने मे त्रुटि!
 Recent folders	FavoritesMenu		हाल ही में उपयोग किये गये फ़ोल्डर्स
 Close	ContainerWindow		बंद करे
 Preferred for file	OpenWithWindow		फ़ाइल के लिए पसंदीदा

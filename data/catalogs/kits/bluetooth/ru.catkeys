@@ -32,7 +32,7 @@ Audio/Video	DeviceClass		Аудио/Видео
 Glasses	DeviceClass		Очки
 Keyboard	DeviceClass		Клавиатура
 Camera	DeviceClass		Камера
-Major class: 	DeviceClass		Основной класс:
+Major class: 	DeviceClass		Основной класс: 
 50-67% utilized	DeviceClass		Использовано 50-67%
 Card reader	DeviceClass		Картридер
 Set-top box	DeviceClass		Телеприставка

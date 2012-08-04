@@ -88,7 +88,7 @@ Find failed	Terminal TermWindow		Строка не найдена
 Search forward	Terminal FindWindow		Искать сверху вниз
 Edit tab title…	Terminal TermWindow		Переименовать вкладку…
 Find previous	Terminal TermWindow		Найти ранее
-Tab title:	Terminal TermWindow		Заголовок вкладки
+Tab title:	Terminal TermWindow		Заголовок вкладки:
 Find next	Terminal TermWindow		Найти далее
 Close active tab	Terminal TermWindow		Закрыть активную вкладку
 Paste	Terminal TermWindow		Вставить

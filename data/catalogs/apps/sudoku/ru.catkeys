@@ -13,9 +13,9 @@ Solve single field	SudokuWindow		Решить одиночное поле
 Solve	SudokuWindow		Решить
 Redo	SudokuWindow		Повторить
 File	SudokuWindow		Файл
-Advanced	SudokuWindow		Опытная 
+Advanced	SudokuWindow		Опытная
 Start again	SudokuWindow		Начать снова
-HTML	SudokuWindow		HTML 
+HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		Запрос судоку
 Copy	SudokuWindow		Копировать
 Mark valid hints	SudokuWindow		Пометить верные подсказки
@@ -25,7 +25,7 @@ Snapshot current	SudokuWindow		Сохранить состояние
 Text	SudokuWindow		Текст
 Creating solvable field	SudokuGenerator		Создание решаемого поля
 View	SudokuWindow		Вид
-Progress monitor	ProgressWindow		Монитор состояния 
+Progress monitor	ProgressWindow		Монитор состояния
 Mark invalid values	SudokuWindow		Пометить неверные значения
 Blank	SudokuWindow		Пустая
 Help	SudokuWindow		Помощь

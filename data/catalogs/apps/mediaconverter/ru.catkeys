@@ -6,11 +6,11 @@ Error	MediaConverter		Ошибка
 Error loading a file	MediaConverter		Ошибка при загрузке файла
 File Error	MediaConverter-FileInfo		Ошибка файла
 Open…	Menu		Открыть…
-Start [ms]: 	MediaConverter		Начало [мс]:
+Start [ms]: 	MediaConverter		Начало [мс]: 
 Output file '%filename' created	MediaConverter		Выходящий файл '%filename' создан
 Output format	MediaConverter		Формат вывода
-%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f кГц стерео / кадров: %lld 
-End   [ms]: 	MediaConverter		Конец [мс]:
+%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f кГц стерео / кадров: %lld
+End   [ms]: 	MediaConverter		Конец [мс]: 
 MediaConverter	System name		Медиаконвертер
 No video	Video codecs list		Без видео
 Duration:	MediaConverter-FileInfo		Длительность:
@@ -24,7 +24,7 @@ OK	MediaConverter-FileInfo		ОК
  seconds	MediaFileInfo		 секунд
 Source files	MediaConverter		Исходящие файлы
 Cancelling	MediaConverter		Отменяется
-%d byte 	MediaFileInfo		%d байт
+%d byte 	MediaFileInfo		%d байт 
 Error loading files	MediaConverter		Ошибка при загрузке файлов
 Cancel	MediaConverter		Отмена
 None available	Video codecs		Не доступно
@@ -36,7 +36,7 @@ Continue	MediaConverter		Продолжить
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кодирования
 Video:	MediaConverter-FileInfo		Видео:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld кадров
-%d bit 	MediaFileInfo		%d бит
+%d bit 	MediaFileInfo		%d бит 
 Error creating '%filename'	MediaConverter		Ошибка создания '%filename'
 Video quality not supported	MediaConverter		Качество видео не поддерживается
 Cancelling…	MediaConverter		Отменяется…
@@ -62,7 +62,7 @@ Writing audio track: %ld%% complete	MediaConverter		Запись аудио до
 Video quality: %3d%%	MediaConverter		Качество видео: %3d%%
 Output folder	MediaConverter		Сохранять в папку
 Audio quality: %3d%%	MediaConverter		Качество аудио: %3d%%
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Произошла ошибка при чтении информации о файле.\n\nОшибка:
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Произошла ошибка при чтении информации о файле.\n\nОшибка: 
 Error read video frame %Ld	MediaConverter		Ошибка чтения видеокадра %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles файлов не были распознаны как поддерживаемые медиа файлы:
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / кадров: %lld 
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / кадров: %lld
