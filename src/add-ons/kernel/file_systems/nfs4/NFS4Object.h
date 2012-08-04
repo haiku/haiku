@@ -8,18 +8,21 @@
 #ifndef NFS4OBJECT_H
 #define NFS4OBJECT_H
 
-
-#include "Cookie.h"
-#include "FileSystem.h"
+#include "FileInfo.h"
 #include "NFS4Defs.h"
+#include "RPCServer.h"
 
+
+class OpenFileCookie;
+class OpenState;
 
 class NFS4Object {
 public:
 	bool		HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 					OpenFileCookie* cookie = NULL);
 
-protected:
+	status_t	ConfirmOpen(const FileHandle& fileHandle, OpenState* state);
+
 	FileInfo	fInfo;
 	FileSystem*	fFileSystem;
 };

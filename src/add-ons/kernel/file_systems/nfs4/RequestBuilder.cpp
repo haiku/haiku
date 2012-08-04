@@ -171,11 +171,14 @@ void
 RequestBuilder::_GenerateLockOwner(XDR::WriteStream& stream,
 	OpenFileCookie* cookie, LockOwner* owner)
 {
-	stream.AddUHyper(cookie->fClientId);
+	stream.AddUHyper(cookie->fClientID);
 
 	uint64 lockOwner[2];
 	lockOwner[0] = owner->fOwner;
-	lockOwner[1] = cookie->fInfo.fFileId;
+	if (cookie->fWriteState != NULL)
+		lockOwner[1] = cookie->fWriteState->fInfo.fFileId;
+	else
+		lockOwner[1] = cookie->fReadState->fInfo.fFileId;
 	stream.AddOpaque(lockOwner, sizeof(lockOwner));
 }
 
@@ -202,11 +205,17 @@ RequestBuilder::Lock(OpenFileCookie* cookie, LockInfo* lock, bool reclaim)
 		fRequest->Stream().AddBoolean(true);			// new lock owner
 
 		// open seq stateid
-		fRequest->Stream().AddUInt(cookie->fSequence++);
-		fRequest->Stream().AddUInt(cookie->fStateSeq);
-		fRequest->Stream().AddUInt(cookie->fStateId[0]);
-		fRequest->Stream().AddUInt(cookie->fStateId[1]);
-		fRequest->Stream().AddUInt(cookie->fStateId[2]);
+		OpenState* state;
+		if (lock->fType == READ_LT || lock->fType == READW_LT)
+			state = cookie->fReadState;
+		else
+			state = cookie->fWriteState;
+
+		fRequest->Stream().AddUInt(state->fSequence++);
+		fRequest->Stream().AddUInt(state->fStateSeq);
+		fRequest->Stream().AddUInt(state->fStateID[0]);
+		fRequest->Stream().AddUInt(state->fStateID[1]);
+		fRequest->Stream().AddUInt(state->fStateID[2]);
 
 		// lock seq owner
 		fRequest->Stream().AddUInt(lock->fOwner->fSequence++);
@@ -246,7 +255,7 @@ RequestBuilder::LockT(LockType type, uint64 pos, uint64 len,
 	fRequest->Stream().AddUHyper(pos);
 	fRequest->Stream().AddUHyper(len);
 
-	fRequest->Stream().AddUHyper(cookie->fClientId);
+	fRequest->Stream().AddUHyper(cookie->fClientID);
 
 	uint32 owner = find_thread(NULL);
 	fRequest->Stream().AddOpaque(&owner, sizeof(owner));

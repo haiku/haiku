@@ -20,22 +20,15 @@
 
 
 status_t
-Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
-	ino_t* id)
-{
-	cookie->fMode = mode;
-	cookie->fSequence = 0;
-	cookie->fLocks = NULL;
-
+Inode::CreateState(const char* name, int mode, int perms, OpenState* state) {
 	uint64 fileID;
 	FileHandle handle;
 	ChangeInfo changeInfo;
-	status_t result = CreateFile(name, mode, perms, cookie, &changeInfo,
+
+	status_t result = CreateFile(name, mode, perms, state, &changeInfo,
 		&fileID, &handle);
 	if (result != B_OK)
 		return result;
-
-	*id = FileIdToInoT(fileID);
 
 	FileInfo fi;
 	fi.fFileId = fileID;
@@ -50,7 +43,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	strcat(path, name);
 	fi.fPath = path;
 
-	fFileSystem->InoIdMap()->AddEntry(fi, *id);
+	fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
 
 	if (fCache->Lock() == B_OK) {
 		if (changeInfo.fAtomic
@@ -62,8 +55,59 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 		fCache->Unlock();
 	}
 
+	state->fFileSystem = fFileSystem;
+	state->fInfo = fi;
+
+	return B_OK;
+}
+
+
+status_t
+Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
+	ino_t* id)
+{
+	cookie->fMode = mode;
+	cookie->fLocks = NULL;
+
+	MutexLocker _(fStateLock);
+	int openMode = mode & O_RWMASK;
+
+	if (openMode == O_WRONLY || openMode == O_RDWR) {
+		OpenState* state = new OpenState;
+		status_t result = CreateState(name, O_WRONLY, perms, state);
+		if (result != B_OK)
+			return result;
+
+		fWriteState = state;
+		*id = FileIdToInoT(cookie->fWriteState->fInfo.fFileId);
+		cookie->fWriteState = fWriteState;
+	}
+
+	if (openMode == O_RDONLY || openMode == O_RDWR) {
+		OpenState* state = new OpenState;
+		state->fInfo = fInfo;
+		state->fFileSystem = fFileSystem;
+
+		status_t result;
+		if (openMode == O_RDWR)
+			result = OpenFile(state, O_RDONLY);
+		else
+			result = CreateState(name, O_RDONLY, perms, state);
+
+		if (result != B_OK) {
+			if (fWriteState != NULL)
+				if (fWriteState->ReleaseReference() == 1)
+					fWriteState = NULL;
+			return result;
+		}
+
+		fReadState = state;
+		*id = FileIdToInoT(cookie->fReadState->fInfo.fFileId);
+		cookie->fReadState = fReadState;
+	}
+
 	cookie->fFileSystem = fFileSystem;
-	cookie->fInfo = fi;
+	cookie->fClientID = fFileSystem->NFSServer()->ClientId();
 
 	fFileSystem->AddOpenFile(cookie);
 	fFileSystem->Root()->MakeInfoInvalid();
@@ -75,15 +119,59 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 status_t
 Inode::Open(int mode, OpenFileCookie* cookie)
 {
-	cookie->fFileSystem = fFileSystem;
-	cookie->fInfo = fInfo;
-	cookie->fMode = mode;
-	cookie->fSequence = 0;
-	cookie->fLocks = NULL;
+	MutexLocker _(fStateLock);
+	int openMode = mode & O_RWMASK;
 
-	status_t result = OpenFile(cookie, mode);
-	if (result != B_OK)
-		return result;
+	if (openMode == O_WRONLY || openMode == O_RDWR) {
+		if (fWriteState == NULL) {
+			OpenState* state = new OpenState;
+			if (state == NULL)
+				return B_NO_MEMORY;
+
+			state->fInfo = fInfo;
+			state->fFileSystem = fFileSystem;
+			status_t result = OpenFile(state, O_WRONLY);
+			if (result != B_OK)
+				return result;
+
+			fWriteState = state;
+		} else
+			fWriteState->AcquireReference();
+
+		cookie->fWriteState = fWriteState;
+	}
+
+	if (openMode == O_RDONLY || openMode == O_RDWR) {
+		if (fReadState == NULL) {
+			OpenState* state = new OpenState;
+			if (state == NULL) {
+				if (fWriteState != NULL)
+					if (fWriteState->ReleaseReference() == 1)
+						fWriteState = NULL;
+				return B_NO_MEMORY;
+			}
+
+			state->fInfo = fInfo;
+			state->fFileSystem = fFileSystem;
+			status_t result = OpenFile(state, O_RDONLY);
+			if (result != B_OK) {
+				if (fWriteState != NULL)
+					if (fWriteState->ReleaseReference() == 1)
+						fWriteState = NULL;
+				return result;
+			}
+
+			fReadState = state;
+		} else
+			fReadState->AcquireReference();
+
+		cookie->fReadState = fReadState;
+	}
+
+	cookie->fClientID = fFileSystem->NFSServer()->ClientId();
+	cookie->fFileSystem = fFileSystem;
+	cookie->fMode = mode;
+	cookie->fLocks = NULL;
 
 	fFileSystem->AddOpenFile(cookie);
 
@@ -95,7 +183,17 @@ status_t
 Inode::Close(OpenFileCookie* cookie)
 {
 	fFileSystem->RemoveOpenFile(cookie);
-	return CloseFile(cookie);
+
+	MutexLocker _(fStateLock);
+	if (cookie->fWriteState != NULL)
+		if (cookie->fWriteState->ReleaseReference() == 1)
+			fWriteState = NULL;
+
+	if (cookie->fReadState != NULL)
+		if (cookie->fReadState->ReleaseReference() == 1)
+			fReadState = NULL;
+
+	return B_OK;
 }
 
 
@@ -109,7 +207,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length,
 	status_t result;
 	while (size < *_length && !*eof) {
 		uint32 len = *_length - size;
-		result = ReadFile(cookie, pos + size, &len,
+		result = ReadFile(cookie, fReadState, pos + size, &len,
 			reinterpret_cast<char*>(buffer) + size, eof);
 		if (result != B_OK) {
 			if (size == 0)
@@ -138,7 +236,8 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 
 	while (size < *_length) {
 		uint32 len = *_length - size;
-		status_t result = WriteFile(cookie, pos + size, &len, buffer + size);
+		status_t result = WriteFile(cookie, fWriteState, pos + size, &len,
+			buffer + size);
 		if (result != B_OK) {
 			if (size == 0)
 				return result;

@@ -11,6 +11,7 @@
 
 #include "MetadataCache.h"
 #include "NFS4Inode.h"
+#include "OpenState.h"
 
 
 class Inode : public NFS4Inode {
@@ -26,9 +27,6 @@ public:
 
 	inline			void*		FileCache();
 					status_t	RevalidateFileCache();
-
-	inline			OpenFileCookie*	WriteCookie();
-	inline			void		SetWriteCookie(OpenFileCookie* cookie);
 
 					status_t	LookUp(const char* name, ino_t* id);
 
@@ -75,6 +73,9 @@ public:
 protected:
 								Inode();
 
+					status_t	CreateState(const char* name, int mode,
+									int perms, OpenState* state);
+
 					status_t	ReadDirUp(struct dirent* de, uint32 pos,
 									uint32 size);
 					status_t	FillDirEntry(struct dirent* de, ino_t id,
@@ -99,8 +100,11 @@ protected:
 
 					uint64		fChange;
 					void*		fFileCache;
-					OpenFileCookie*	fWriteCookie;
 					mutex		fFileCacheLock;
+
+					OpenState*	fWriteState;
+					OpenState*	fReadState;
+					mutex		fStateLock;
 
 					bool		fWriteDirty;
 };
@@ -149,20 +153,6 @@ inline void*
 Inode::FileCache()
 {
 	return fFileCache;
-}
-
-
-inline OpenFileCookie*
-Inode::WriteCookie()
-{
-	return fWriteCookie;
-}
-
-
-inline void
-Inode::SetWriteCookie(OpenFileCookie* cookie)
-{
-	fWriteCookie = cookie;
 }
 
 

@@ -245,38 +245,6 @@ NFS4Inode::ReadLink(void* buffer, size_t* length)
 
 
 status_t
-NFS4Inode::ConfirmOpen(const FileHandle& fh, OpenFileCookie* cookie)
-{
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fh);
-		req.OpenConfirm(cookie->fSequence++, cookie->fStateId,
-			cookie->fStateSeq);
-
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (HandleErrors(reply.NFS4Error(), serv))
-			continue;
-
-		reply.PutFH();
-		result = reply.OpenConfirm(&cookie->fStateSeq);
-		if (result != B_OK)
-			return result;
-
-		return B_OK;
-	} while (true);
-}
-
-
-status_t
 NFS4Inode::GetStat(AttrValue** values, uint32* count)
 {
 	do {
@@ -309,7 +277,7 @@ NFS4Inode::GetStat(AttrValue** values, uint32* count)
 
 
 status_t
-NFS4Inode::WriteStat(OpenFileCookie* cookie, AttrValue* attrs, uint32 attrCount)
+NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
@@ -317,8 +285,8 @@ NFS4Inode::WriteStat(OpenFileCookie* cookie, AttrValue* attrs, uint32 attrCount)
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
-		if (cookie != NULL)
-			req.SetAttr(cookie->fStateId, cookie->fStateSeq, attrs, attrCount);
+		if (state != NULL)
+			req.SetAttr(state->fStateID, state->fStateSeq, attrs, attrCount);
 		else
 			req.SetAttr(NULL, 0, attrs, attrCount);
 
@@ -414,7 +382,7 @@ NFS4Inode::Rename(Inode* from, Inode* to, const char* fromName,
 
 status_t
 NFS4Inode::CreateFile(const char* name, int mode, int perms,
-	OpenFileCookie* cookie, ChangeInfo* changeInfo, uint64* fileID,
+	OpenState* state, ChangeInfo* changeInfo, uint64* fileID,
 	FileHandle* handle)
 {
 	bool confirm;
@@ -422,13 +390,13 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 
 	bool badOwner = false;
 	do {
-		cookie->fClientId = fFileSystem->NFSServer()->ClientId();
+		state->fClientID = fFileSystem->NFSServer()->ClientId();
 
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
+		state->fOwnerID = atomic_add64(&state->fLastOwnerID, 1);
 
 		req.PutFH(fInfo.fHandle);
 
@@ -459,8 +427,8 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 			i++;
 		}
 
-		req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
-			cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, name, cattr,
+		req.Open(CLAIM_NULL, state->fSequence++, sModeToAccess(mode),
+			state->fClientID, OPEN4_CREATE, state->fOwnerID, name, cattr,
 			i, (mode & O_EXCL) == O_EXCL);
 
 		req.GetFH();
@@ -485,7 +453,7 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 
 		reply.PutFH();
 
-		result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm,
+		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
 			&changeInfo->fBefore, &changeInfo->fAfter, &changeInfo->fAtomic);
 		if (result != B_OK)
 			return result;
@@ -508,26 +476,28 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 		break;
 	} while (true);
 
+	state->fOpened = true;
+
 	if (confirm)
-		return ConfirmOpen(*handle, cookie);
+		return ConfirmOpen(*handle, state);
 
 	return B_OK;
 }
 
 
 status_t
-NFS4Inode::OpenFile(OpenFileCookie* cookie, int mode)
+NFS4Inode::OpenFile(OpenState* state, int mode)
 {
 	bool confirm;
 	status_t result;
 	do {
-		cookie->fClientId = fFileSystem->NFSServer()->ClientId();
+		state->fClientID = fFileSystem->NFSServer()->ClientId();
 
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		cookie->fOwnerId = atomic_add64(&cookie->fLastOwnerId, 1);
+		state->fOwnerID = atomic_add64(&state->fLastOwnerID, 1);
 
 		// Since we are opening the file using a pair (parentFH, name) we
 		// need to check for race conditions.
@@ -556,12 +526,12 @@ NFS4Inode::OpenFile(OpenFileCookie* cookie, int mode)
 			attr.fAttribute = FATTR4_SIZE;
 			attr.fFreePointer = false;
 			attr.fData.fValue64 = 0;
-			req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
-				cookie->fClientId, OPEN4_CREATE, cookie->fOwnerId, fInfo.fName,
+			req.Open(CLAIM_NULL, state->fSequence++, sModeToAccess(mode),
+				state->fClientID, OPEN4_CREATE, state->fOwnerID, fInfo.fName,
 				&attr, 1, false);
 		} else
-		req.Open(CLAIM_NULL, cookie->fSequence++, sModeToAccess(mode),
-			cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, fInfo.fName);
+		req.Open(CLAIM_NULL, state->fSequence++, sModeToAccess(mode),
+			state->fClientID, OPEN4_NOCREATE, state->fOwnerID, fInfo.fName);
 
 		result = request.Send();
 		if (result != B_OK)
@@ -588,22 +558,25 @@ NFS4Inode::OpenFile(OpenFileCookie* cookie, int mode)
 		}
 
 		reply.PutFH();
-		result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
+		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm);
 		if (result != B_OK)
 			return result;
 
 		break;
 	} while (true);
 
+	state->fOpened = true;
+
 	if (confirm)
-		return ConfirmOpen(fInfo.fHandle, cookie);
+		return ConfirmOpen(fInfo.fHandle, state);
 
 	return B_OK;
 }
 
 
 status_t
-NFS4Inode::CloseFile(OpenFileCookie* cookie)
+NFS4Inode::ReadFile(OpenFileCookie* cookie, OpenState* state, uint64 position,
+	uint32* length, void* buffer, bool* eof)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
@@ -611,34 +584,7 @@ NFS4Inode::CloseFile(OpenFileCookie* cookie)
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
-		req.Close(cookie->fSequence++, cookie->fStateId, cookie->fStateSeq);
-
-		status_t result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		ReplyInterpreter& reply = request.Reply();
-
-		if (HandleErrors(reply.NFS4Error(), serv, cookie))
-			continue;
-
-		reply.PutFH();
-		return reply.Close();
-	} while (true);
-}
-
-
-status_t
-NFS4Inode::ReadFile(OpenFileCookie* cookie, uint64 position, uint32* length,
-	void* buffer, bool* eof)
-{
-	do {
-		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
-		RequestBuilder& req = request.Builder();
-
-		req.PutFH(fInfo.fHandle);
-		req.Read(cookie->fStateId, cookie->fStateSeq, position, *length);
+		req.Read(state->fStateID, state->fStateSeq, position, *length);
 
 		status_t result = request.Send(cookie);
 		if (result != B_OK)
@@ -660,9 +606,10 @@ NFS4Inode::ReadFile(OpenFileCookie* cookie, uint64 position, uint32* length,
 
 
 status_t
-NFS4Inode::WriteFile(OpenFileCookie* cookie, uint64 position, uint32* length,
-	const void* buffer)
+NFS4Inode::WriteFile(OpenFileCookie* cookie, OpenState* state, uint64 position,
+	uint32* length, const void* buffer)
 {
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
@@ -670,8 +617,7 @@ NFS4Inode::WriteFile(OpenFileCookie* cookie, uint64 position, uint32* length,
 
 		req.PutFH(fInfo.fHandle);
 
-		req.Write(cookie->fStateId, cookie->fStateSeq, buffer, position,
-			*length);
+		req.Write(state->fStateID, state->fStateSeq, buffer, position, *length);
 
 		status_t result = request.Send(cookie);
 		if (result != B_OK)

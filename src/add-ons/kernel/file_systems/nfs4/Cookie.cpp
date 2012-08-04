@@ -13,9 +13,6 @@
 #include "Request.h"
 
 
-vint64 OpenFileCookie::fLastOwnerId = 0;
-
-
 LockOwner::LockOwner(uint32 owner)
 	:
 	fSequence(0),
@@ -164,7 +161,7 @@ OpenFileCookie::GetLockOwner(uint32 owner)
 	if (current == NULL)
 		return NULL;
 
-	current->fClientId = fClientId;
+	current->fClientId = fClientID;
 	current->fNext = fLockOwners;
 	if (fLockOwners != NULL)
 		fLockOwners->fPrev = current;

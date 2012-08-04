@@ -59,6 +59,7 @@ NFS4Server::ServerRebooted(uint64 clientId)
 	while (fs != NULL) {
 		OpenFileCookie* current = fs->OpenFilesLock();
 		while (current != NULL) {
+			current->fClientID = fClientId;
 			_ReclaimOpen(current);
 			_ReclaimLocks(current);
 			current = current->fNext;
@@ -74,47 +75,10 @@ NFS4Server::ServerRebooted(uint64 clientId)
 status_t
 NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
 {
-	if (cookie->fClientId == fClientId)
-		return B_OK;
-	
-	cookie->fClientId = fClientId;
-
-	Request request(fServer);
-	RequestBuilder& req = request.Builder();
-
-	req.PutFH(cookie->fInfo.fHandle);
-	req.Open(CLAIM_PREVIOUS, cookie->fSequence++, sModeToAccess(cookie->fMode),
-		cookie->fClientId, OPEN4_NOCREATE, cookie->fOwnerId, NULL);
-
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
-
-	ReplyInterpreter& reply = request.Reply();
-
-	reply.PutFH();
-
-	bool confirm;
-	result = reply.Open(cookie->fStateId, &cookie->fStateSeq, &confirm);
-	if (result != B_OK)
-		return result;
-
-	if (confirm) {
-		request.Reset();
-
-		req.PutFH(cookie->fInfo.fHandle);
-		req.OpenConfirm(cookie->fSequence++, cookie->fStateId,
-			cookie->fStateSeq);
-
-		result = request.Send();
-		if (result != B_OK)
-			return result;
-
-		reply.PutFH();
-		result = reply.OpenConfirm(&cookie->fStateSeq);
-		if (result != B_OK)
-			return result;
-	}
+	if (cookie->fWriteState != NULL)
+		cookie->fWriteState->Reclaim(fClientId);
+	if (cookie->fReadState != NULL)
+		cookie->fReadState->Reclaim(fClientId);
 
 	return B_OK;
 }
@@ -136,7 +100,10 @@ NFS4Server::_ReclaimLocks(OpenFileCookie* cookie)
 			Request request(fServer);
 			RequestBuilder& req = request.Builder();
 
-			req.PutFH(cookie->fInfo.fHandle);
+			if (cookie->fWriteState != NULL)
+				req.PutFH(cookie->fWriteState->fInfo.fHandle);
+			else
+				req.PutFH(cookie->fReadState->fInfo.fHandle);
 			req.Lock(cookie, linfo, true);
 
 			status_t result = request.Send();

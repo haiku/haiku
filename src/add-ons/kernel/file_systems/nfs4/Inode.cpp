@@ -24,9 +24,11 @@ Inode::Inode()
 	:
 	fCache(NULL),
 	fFileCache(NULL),
-	fWriteCookie(NULL),
+	fWriteState(NULL),
+	fReadState(NULL),
 	fWriteDirty(false)
 {
+	mutex_init(&fStateLock, NULL);
 	mutex_init(&fFileCacheLock, NULL);
 }
 
@@ -123,6 +125,7 @@ Inode::~Inode()
 		file_cache_delete(fFileCache);
 
 	delete fCache;
+	mutex_destroy(&fStateLock);
 	mutex_destroy(&fFileCacheLock);
 }
 
@@ -479,22 +482,10 @@ status_t
 Inode::WriteStat(const struct stat* st, uint32 mask)
 {
 	status_t result;
-	OpenFileCookie* cookie = NULL;
 	AttrValue attr[6];
 	uint32 i = 0;
 
 	if ((mask & B_STAT_SIZE) != 0) {
-		delete cookie;
-		cookie = new OpenFileCookie;
-		if (cookie == NULL)
-			return B_NO_MEMORY;
-
-		result = Open(O_WRONLY, cookie);
-		if (result != B_OK) {
-			delete cookie;
-			return result;
-		}
-
 		attr[i].fAttribute = FATTR4_SIZE;
 		attr[i].fFreePointer = false;
 		attr[i].fData.fValue64 = st->st_size;
@@ -538,12 +529,9 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 		i++;
 	}
 
-	result = NFS4Inode::WriteStat(cookie, attr, i);
-
-	if ((mask & B_STAT_SIZE) != 0) {
-		Close(cookie);
-		delete cookie;
-	}
+	MutexLocker stateLocker(fStateLock);
+	result = NFS4Inode::WriteStat(fWriteState, attr, i);
+	stateLocker.Unlock();
 
 	fMetaCache.InvalidateStat();
 	if ((mask & B_STAT_MODE) != 0 || (mask & B_STAT_UID) != 0
@@ -689,7 +677,6 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 	MutexLocker _(cookie->fLocksLock);
 	LockInfo* linfo = cookie->fLocks;
 	while (linfo != NULL) {
-		MutexLocker ownerLocker(linfo->fOwner->fLock);
 		NFS4Inode::ReleaseLock(cookie, linfo);
 		cookie->RemoveLock(linfo, NULL);
 		cookie->DeleteLock(linfo);

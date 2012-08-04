@@ -13,6 +13,9 @@
 
 #include <SupportDefs.h>
 
+#include "Cookie.h"
+#include "FileInfo.h"
+#include "FileSystem.h"
 #include "NFS4Object.h"
 #include "ReplyInterpreter.h"
 
@@ -38,19 +41,20 @@ protected:
 							ChangeInfo* toChange, uint64* fileID);
 
 			status_t	GetStat(AttrValue** values, uint32* count);
-			status_t	WriteStat(OpenFileCookie* cookie, AttrValue* attrs,
+			status_t	WriteStat(OpenState* state, AttrValue* attrs,
 							uint32 attrCount);
 
 			status_t	CreateFile(const char* name, int mode, int perms,
-							OpenFileCookie* cookie, ChangeInfo* changeInfo,
+							OpenState* state, ChangeInfo* changeInfo,
 							uint64* fileID, FileHandle* handle);
-			status_t	OpenFile(OpenFileCookie* cookie, int mode);
-			status_t	CloseFile(OpenFileCookie* cookie);
+			status_t	OpenFile(OpenState* state, int mode);
 
-			status_t	ReadFile(OpenFileCookie* cookie, uint64 position,
-							uint32* length, void* buffer, bool* eof);
-			status_t	WriteFile(OpenFileCookie* cookie, uint64 position,
-							uint32* length, const void* buffer);
+			status_t	ReadFile(OpenFileCookie* cookie, OpenState* state,
+							uint64 position, uint32* length, void* buffer,
+							bool* eof);
+			status_t	WriteFile(OpenFileCookie* cookie, OpenState* state,
+							uint64 position, uint32* length,
+							const void* buffer);
 
 			status_t	CreateObject(const char* name, const char* path,
 							int mode, FileType type, ChangeInfo* changeInfo,
@@ -67,10 +71,6 @@ protected:
 			status_t	AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo,
 							bool wait);
 			status_t	ReleaseLock(OpenFileCookie* cookie, LockInfo* lockInfo);
-
-			status_t	ConfirmOpen(const FileHandle& fileHandle,
-							OpenFileCookie* cookie);
-
 };
 
 

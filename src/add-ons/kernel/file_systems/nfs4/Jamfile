@@ -19,6 +19,7 @@ KernelAddon nfs4 :
 	NFS4Inode.cpp
 	NFS4Object.cpp
 	NFS4Server.cpp
+	OpenState.cpp
 	ReplyInterpreter.cpp
 	Request.cpp
 	RequestBuilder.cpp

@@ -7,7 +7,10 @@
  */
 
 
+#include "Cookie.h"
+#include "FileSystem.h"
 #include "NFS4Object.h"
+#include "Request.h"
 
 
 bool
@@ -59,7 +62,7 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		// server has rebooted, reclaim share and try again
 		case NFS4ERR_STALE_CLIENTID:
 		case NFS4ERR_STALE_STATEID:
-			fFileSystem->NFSServer()->ServerRebooted(cookie->fClientId);
+			fFileSystem->NFSServer()->ServerRebooted(cookie->fClientID);
 			return true;
 
 		// FileHandle has expired
@@ -77,7 +80,7 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		// lease has expired
 		case NFS4ERR_EXPIRED:
 			if (cookie != NULL) {
-				fFileSystem->NFSServer()->ClientId(cookie->fClientId, true);
+				fFileSystem->NFSServer()->ClientId(cookie->fClientID, true);
 				return true;
 			}
 			return false;
@@ -85,5 +88,36 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		default:
 			return false;
 	}
+}
+
+
+status_t
+NFS4Object::ConfirmOpen(const FileHandle& fh, OpenState* state)
+{
+	do {
+		RPC::Server* serv = fFileSystem->Server();
+		Request request(serv);
+
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fh);
+		req.OpenConfirm(state->fSequence++, state->fStateID, state->fStateSeq);
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		if (HandleErrors(reply.NFS4Error(), serv))
+			continue;
+
+		reply.PutFH();
+		result = reply.OpenConfirm(&state->fStateSeq);
+		if (result != B_OK)
+			return result;
+
+		return B_OK;
+	} while (true);
 }
 

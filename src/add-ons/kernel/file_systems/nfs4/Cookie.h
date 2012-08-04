@@ -12,6 +12,7 @@
 #include <SupportDefs.h>
 
 #include "FileSystem.h"
+#include "OpenState.h"
 
 
 struct LockOwner {
@@ -70,18 +71,12 @@ struct Cookie {
 };
 
 struct OpenFileCookie : public Cookie {
-			uint64			fClientId;
+			uint64			fClientID;
+
+			OpenState*		fReadState;
+			OpenState*		fWriteState;
 
 			uint32			fMode;
-
-			FileInfo		fInfo;
-			uint32			fStateId[3];
-			uint32			fStateSeq;
-
-			uint32			fSequence;
-
-			uint64			fOwnerId;
-	static	vint64			fLastOwnerId;
 
 			LockInfo*		fLocks;
 			mutex			fLocksLock;
