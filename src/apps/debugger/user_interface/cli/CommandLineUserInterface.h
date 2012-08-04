@@ -64,7 +64,8 @@ private:
 									CliCommand* command);
 			void				_ExecuteCommand(int argc,
 									const char* const* argv);
-			void				_PrintHelp();
+			CommandEntry*		_FindCommand(const char* commandName);
+			void				_PrintHelp(const char* commandName);
 
 private:
 			CliContext			fContext;
