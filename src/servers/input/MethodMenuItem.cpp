@@ -17,7 +17,7 @@
 #include <string.h>
 #include "MethodMenuItem.h"
 
-MethodMenuItem::MethodMenuItem(int32 cookie, const char* name, const uchar* icon, BMenu *subMenu, BMessenger &messenger)
+MethodMenuItem::MethodMenuItem(void *cookie, const char* name, const uchar* icon, BMenu *subMenu, BMessenger &messenger)
 	: BMenuItem(subMenu),
 	fIcon(BRect(0, 0, MENUITEM_ICON_SIZE - 1, MENUITEM_ICON_SIZE - 1), B_CMAP8),
 	fCookie(cookie)
@@ -28,7 +28,7 @@ MethodMenuItem::MethodMenuItem(int32 cookie, const char* name, const uchar* icon
 }
 
 
-MethodMenuItem::MethodMenuItem(int32 cookie, const char* name, const uchar* icon)
+MethodMenuItem::MethodMenuItem(void *cookie, const char* name, const uchar* icon)
 	: BMenuItem(name, NULL),
 	fIcon(BRect(0, 0, MENUITEM_ICON_SIZE - 1, MENUITEM_ICON_SIZE - 1), B_CMAP8),
 	fCookie(cookie)

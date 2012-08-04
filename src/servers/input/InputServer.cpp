@@ -625,8 +625,8 @@ void
 InputServer::HandleSetMethod(BMessage* message)
 {
 	CALLED();
-	uint32 cookie;
-	if (message->FindInt32("cookie", (int32*)&cookie) == B_OK) {
+	void* cookie;
+	if (message->FindPointer("cookie", &cookie) == B_OK) {
 		BInputServerMethod *method = (BInputServerMethod*)cookie;
 		PRINT(("%s cookie %p\n", __PRETTY_FUNCTION__, method));
 		SetActiveMethod(method);

@@ -57,7 +57,7 @@ class MethodReplicant : public BView {
 		void UpdateMethodName(BMessage *);
 		void AddMethod(BMessage *message);
 		void RemoveMethod(BMessage *message);
-		MethodMenuItem *FindItemByCookie(int32 cookie);
+		MethodMenuItem *FindItemByCookie(void *cookie);
 };
 
 #endif
