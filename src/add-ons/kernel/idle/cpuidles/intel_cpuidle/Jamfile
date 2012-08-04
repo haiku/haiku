@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel idle cpuidles intel_cpuidle ;
-
-UsePrivateKernelHeaders ;
-
-KernelAddon intel_cpuidle :
-	intel_cpuidle.cpp
-	;

@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel drivers power x86_cpuidle ;
+
+UsePrivateKernelHeaders ;
+
+KernelAddon x86_cpuidle :
+	acpi_cpuidle.cpp
+	intel_cpuidle.cpp
+	;
+
+Depends x86_cpuidle : acpi ;

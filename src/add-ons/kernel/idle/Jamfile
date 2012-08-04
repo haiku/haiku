@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel idle ;
-
-SubInclude HAIKU_TOP src add-ons kernel idle cpuidles ;
-SubInclude HAIKU_TOP src add-ons kernel idle generic ;

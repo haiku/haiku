@@ -14,7 +14,7 @@ extern "C" {
 
 #define CPUIDLE_CSTATE_MAX	8
 #define CSTATE_NAME_LENGTH	32
-#define B_CPUIDLE_MODULE_NAME "idle/generic/cpuidle/v1"
+#define B_CPUIDLE_MODULE_NAME "generic/cpuidle/v1"
 
 
 struct CpuidleStat {
@@ -28,28 +28,25 @@ struct CpuidleInfo {
 	CpuidleStat	stats[CPUIDLE_CSTATE_MAX];
 };
 
+struct CpuidleDevice;
 
 struct CpuidleCstate {
 	char	name[CSTATE_NAME_LENGTH];
 	int32	latency;
-	int32	(*EnterIdle)(int32 state, CpuidleCstate *cstate);
+	int32	(*EnterIdle)(int32 state, CpuidleDevice *device);
 	void	*pData;
 };
 
 
-struct CpuidleModuleInfo {
-	module_info		info;
+struct CpuidleDevice {
 	CpuidleCstate	cStates[CPUIDLE_CSTATE_MAX];
 	int32			cStateCount;
 };
 
 
-struct GenCpuidle {
+struct CpuidleModuleInfo {
 	module_info	info;
-	int32		(*GetIdleStateCount)(void);
-	char *		(*GetIdleStateName)(int32 state);
-	void		(*GetIdleStateInfo)(int32 cpu, int32 state,
-									CpuidleStat *stat);
+	status_t	(*AddDevice)(CpuidleDevice *device);
 };
 
 
