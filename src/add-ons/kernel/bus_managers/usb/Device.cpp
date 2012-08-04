@@ -81,11 +81,11 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 			&actualLength);
 
 		if (status < B_OK || actualLength != sizeof(usb_configuration_descriptor)) {
-			TRACE_ERROR("error fetching configuration %ld\n", i);
+			TRACE_ERROR("error fetching configuration %" B_PRId32 "\n", i);
 			return;
 		}
 
-		TRACE("configuration %ld\n", i);
+		TRACE("configuration %" B_PRId32 "\n", i);
 		TRACE("\tlength:..............%d\n", configDescriptor.length);
 		TRACE("\tdescriptor_type:.....0x%02x\n", configDescriptor.descriptor_type);
 		TRACE("\ttotal_length:........%d\n", configDescriptor.total_length);
@@ -106,8 +106,8 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 
 		if (status < B_OK || actualLength != configDescriptor.total_length) {
 			TRACE_ERROR("error fetching full configuration"
-				" descriptor %ld got %lu expected %u\n", i,
-				actualLength, configDescriptor.total_length);
+				" descriptor %" B_PRId32 " got %" B_PRIuSIZE " expected %"
+				B_PRIu16 "\n", i, actualLength, configDescriptor.total_length);
 			free(configData);
 			return;
 		}

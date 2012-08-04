@@ -65,7 +65,9 @@ void
 print_descriptor_chain(ehci_qtd *descriptor)
 {
 	while (descriptor) {
-		dprintf(" %08lx n%08lx a%08lx t%08lx %08lx %08lx %08lx %08lx %08lx s%ld\n",
+		dprintf(" %08" B_PRIx32 " n%08" B_PRIx32 " a%08" B_PRIx32 " t%08" B_PRIx32
+			" %08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32
+			" %08" B_PRIx32 " s%"B_PRIuSIZE "\n",
 			descriptor->this_phy, descriptor->next_phy,
 			descriptor->alt_next_phy, descriptor->token,
 			descriptor->buffer_phy[0], descriptor->buffer_phy[1],
@@ -82,14 +84,17 @@ print_descriptor_chain(ehci_qtd *descriptor)
 void
 print_queue(ehci_qh *queueHead)
 {
-	dprintf("queue:    t%08lx n%08lx ch%08lx ca%08lx cu%08lx\n",
+	dprintf("queue:    t%08" B_PRIx32 " n%08" B_PRIx32 " ch%08" B_PRIx32
+		" ca%08" B_PRIx32 " cu%08" B_PRIx32 "\n",
 		queueHead->this_phy, queueHead->next_phy, queueHead->endpoint_chars,
 		queueHead->endpoint_caps, queueHead->current_qtd_phy);
-	dprintf("overlay:  n%08lx a%08lx t%08lx %08lx %08lx %08lx %08lx %08lx\n",
-		queueHead->overlay.next_phy, queueHead->overlay.alt_next_phy,
-		queueHead->overlay.token, queueHead->overlay.buffer_phy[0],
-		queueHead->overlay.buffer_phy[1], queueHead->overlay.buffer_phy[2],
-		queueHead->overlay.buffer_phy[3], queueHead->overlay.buffer_phy[4]);
+	dprintf("overlay:  n%08" B_PRIx32 " a%08" B_PRIx32 " t%08" B_PRIx32
+		" %08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32
+		" %08" B_PRIx32 "\n", queueHead->overlay.next_phy,
+		queueHead->overlay.alt_next_phy, queueHead->overlay.token,
+		queueHead->overlay.buffer_phy[0], queueHead->overlay.buffer_phy[1],
+		queueHead->overlay.buffer_phy[2], queueHead->overlay.buffer_phy[3],
+		queueHead->overlay.buffer_phy[4]);
 	print_descriptor_chain(queueHead->element_log);
 }
 
@@ -201,11 +206,12 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	// map the registers
 	uint32 offset = fPCIInfo->u.h0.base_registers[0] & (B_PAGE_SIZE - 1);
-	addr_t physicalAddress = fPCIInfo->u.h0.base_registers[0] - offset;
+	phys_addr_t physicalAddress = fPCIInfo->u.h0.base_registers[0] - offset;
 	size_t mapSize = (fPCIInfo->u.h0.base_register_sizes[0] + offset
 		+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
-	TRACE("map physical memory 0x%08lx (base: 0x%08lx; offset: %lx); size: %ld\n",
+	TRACE("map physical memory 0x%08" B_PRIx32 " (base: 0x%08" B_PRIxPHYSADDR
+		"; offset: %" B_PRIx32 "); size: %" B_PRIu32 "\n",
 		fPCIInfo->u.h0.base_registers[0], physicalAddress, offset,
 		fPCIInfo->u.h0.base_register_sizes[0]);
 
@@ -220,11 +226,11 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	fCapabilityRegisters += offset;
 	fOperationalRegisters = fCapabilityRegisters + ReadCapReg8(EHCI_CAPLENGTH);
-	TRACE("mapped capability registers: 0x%08lx\n", (uint32)fCapabilityRegisters);
-	TRACE("mapped operational registers: 0x%08lx\n", (uint32)fOperationalRegisters);
+	TRACE("mapped capability registers: 0x%p\n", fCapabilityRegisters);
+	TRACE("mapped operational registers: 0x%p\n", fOperationalRegisters);
 
-	TRACE("structural parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCSPARAMS));
-	TRACE("capability parameters: 0x%08lx\n", ReadCapReg32(EHCI_HCCPARAMS));
+	TRACE("structural parameters: 0x%08" B_PRIx32 "\n", ReadCapReg32(EHCI_HCSPARAMS));
+	TRACE("capability parameters: 0x%08" B_PRIx32 "\n", ReadCapReg32(EHCI_HCCPARAMS));
 
 	if (EHCI_HCCPARAMS_FRAME_CACHE(ReadCapReg32(EHCI_HCCPARAMS)))
 		fThreshold = 2 + 8;
@@ -237,7 +243,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	uint32 extendedCapPointer = ReadCapReg32(EHCI_HCCPARAMS) >> EHCI_ECP_SHIFT;
 	extendedCapPointer &= EHCI_ECP_MASK;
 	if (extendedCapPointer > 0) {
-		TRACE("extended capabilities register at %ld\n", extendedCapPointer);
+		TRACE("extended capabilities register at %" B_PRIu32 "\n", extendedCapPointer);
 
 		uint32 legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
@@ -376,7 +382,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	// allocate the periodic frame list
 	fPeriodicFrameListArea = fStack->AllocateArea((void **)&fPeriodicFrameList,
-		(void **)&physicalAddress, frameListSize, "USB EHCI Periodic Framelist");
+		&physicalAddress, frameListSize, "USB EHCI Periodic Framelist");
 	if (fPeriodicFrameListArea < B_OK) {
 		TRACE_ERROR("unable to allocate periodic framelist\n");
 		return;
@@ -389,7 +395,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	// create the interrupt entries to support different polling intervals
 	TRACE("creating interrupt entries\n");
-	addr_t physicalBase = physicalAddress + B_PAGE_SIZE;
+	uint32_t physicalBase = physicalAddress + B_PAGE_SIZE;
 	uint8 *logicalBase = (uint8 *)fPeriodicFrameList + B_PAGE_SIZE;
 	memset(logicalBase, 0, B_PAGE_SIZE);
 
@@ -410,16 +416,21 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 			| (0xff << EHCI_QH_CAPS_ISM_SHIFT);
 
 		physicalBase += sizeof(interrupt_entry);
+		if ((physicalBase & 0x10) != 0) {
+			panic("physical base for interrupt entry %" B_PRId32
+				" not aligned on 32, interrupt entry structure size %lu\n",
+					i, sizeof(interrupt_entry));
+		}
 	}
 
 	// create the itd and sitd entries
 	TRACE("build up iso entries\n");
-	addr_t itdPhysicalBase = physicalAddress + B_PAGE_SIZE + B_PAGE_SIZE;
+	uint32_t itdPhysicalBase = physicalAddress + B_PAGE_SIZE + B_PAGE_SIZE;
 	itd_entry* itds = (itd_entry *)((uint8 *)fPeriodicFrameList + B_PAGE_SIZE
 		+ B_PAGE_SIZE);
 	memset(itds, 0, itdListSize);
 
-	addr_t sitdPhysicalBase = itdPhysicalBase + itdListSize;
+	uint32_t sitdPhysicalBase = itdPhysicalBase + itdListSize;
 	sitd_entry* sitds = (sitd_entry *)((uint8 *)fPeriodicFrameList + B_PAGE_SIZE
 		+ B_PAGE_SIZE + itdListSize);
 	memset(sitds, 0, sitdListSize);
@@ -427,23 +438,25 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	fItdEntries = new(std::nothrow) ehci_itd *[EHCI_VFRAMELIST_ENTRIES_COUNT];
 	fSitdEntries = new(std::nothrow) ehci_sitd *[EHCI_VFRAMELIST_ENTRIES_COUNT];
 
+	dprintf("sitd entry size %lu, itd entry size %lu\n", sizeof(sitd_entry), sizeof(itd_entry));
 	for (int32 i = 0; i < EHCI_VFRAMELIST_ENTRIES_COUNT; i++) {
 		ehci_sitd *sitd = &sitds[i].sitd;
 		sitd->this_phy = sitdPhysicalBase | EHCI_ITEM_TYPE_SITD;
 		sitd->back_phy = EHCI_ITEM_TERMINATE;
 		fSitdEntries[i] = sitd;
-		TRACE("sitd entry %ld %p 0x%lx\n", i, sitd, sitd->this_phy);
+		TRACE("sitd entry %" B_PRId32 " %p 0x%" B_PRIx32 "\n", i, sitd, sitd->this_phy);
 
 		ehci_itd *itd = &itds[i].itd;
 		itd->this_phy = itdPhysicalBase | EHCI_ITEM_TYPE_ITD;
 		itd->next_phy = sitd->this_phy;
 		fItdEntries[i] = itd;
-		TRACE("itd entry %ld %p 0x%lx\n", i, itd, itd->this_phy);
+		TRACE("itd entry %" B_PRId32 " %p 0x%" B_PRIx32 "\n", i, itd, itd->this_phy);
 
 		sitdPhysicalBase += sizeof(sitd_entry);
 		itdPhysicalBase += sizeof(itd_entry);
 		if ((sitdPhysicalBase & 0x10) != 0 || (itdPhysicalBase & 0x10) != 0)
-			panic("physical base for entry %ld not aligned on 32\n", i);
+			panic("physical base for entry %" B_PRId32 " not aligned on 32\n",
+				i);
 	}
 
 	// build flat interrupt tree
@@ -479,7 +492,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	for (int32 i = 0; i < EHCI_FRAMELIST_ENTRIES_COUNT; i++) {
 		fPeriodicFrameList[i] =
 			fItdEntries[i & (EHCI_VFRAMELIST_ENTRIES_COUNT - 1)]->this_phy;
-		TRACE("periodic entry %ld linked to 0x%lx\n", i, fPeriodicFrameList[i]);
+		TRACE("periodic entry %" B_PRId32 " linked to 0x%" B_PRIx32 "\n", i, fPeriodicFrameList[i]);
 	}
 
 	// Create the array that will keep bandwidth information
@@ -504,7 +517,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	fAsyncQueueHead->overlay.next_phy = EHCI_ITEM_TERMINATE;
 
 	WriteOpReg(EHCI_ASYNCLISTADDR, (uint32)fAsyncQueueHead->this_phy);
-	TRACE("set the async list addr to 0x%08lx\n", ReadOpReg(EHCI_ASYNCLISTADDR));
+	TRACE("set the async list addr to 0x%08" B_PRIx32 "\n", ReadOpReg(EHCI_ASYNCLISTADDR));
 
 	fInitOK = true;
 	TRACE("EHCI host controller driver constructed\n");
@@ -554,7 +567,7 @@ status_t
 EHCI::Start()
 {
 	TRACE("starting EHCI host controller\n");
-	TRACE("usbcmd: 0x%08lx; usbsts: 0x%08lx\n", ReadOpReg(EHCI_USBCMD),
+	TRACE("usbcmd: 0x%08" B_PRIx32 "; usbsts: 0x%08" B_PRIx32 "\n", ReadOpReg(EHCI_USBCMD),
 		ReadOpReg(EHCI_USBSTS));
 
 	bool hasPerPortChangeEvent = (ReadCapReg32(EHCI_HCCPARAMS)
@@ -589,7 +602,7 @@ EHCI::Start()
 	bool running = false;
 	for (int32 i = 0; i < 10; i++) {
 		uint32 status = ReadOpReg(EHCI_USBSTS);
-		TRACE("try %ld: status 0x%08lx\n", i, status);
+		TRACE("try %" B_PRId32 ": status 0x%08" B_PRIx32 "\n", i, status);
 
 		if (status & EHCI_USBSTS_HCHALTED) {
 			snooze(10000);
@@ -729,9 +742,10 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 		return B_NO_MEMORY;
 	}
 
-	TRACE("isochronous submitted size=%ld bytes, TDs=%ld, "
-		"maxPacketSize=%ld, packetSize=%ld, restSize=%ld\n", transfer->DataLength(),
-		isochronousData->packet_count, pipe->MaxPacketSize(), packetSize, restSize);
+	TRACE("isochronous submitted size=%" B_PRIuSIZE " bytes, TDs=%" B_PRIu32 ", "
+		"maxPacketSize=%" B_PRIuSIZE ", packetSize=%" B_PRIuSIZE ", restSize=%"
+		B_PRIuSIZE "\n", transfer->DataLength(), isochronousData->packet_count,
+		pipe->MaxPacketSize(), packetSize, restSize);
 
 	// Find the entry where to start inserting the first Isochronous descriptor
 	if (isochronousData->flags & USB_ISO_ASAP ||
@@ -741,7 +755,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 			currentFrame = fNextStartingFrame;
 		else {
 			uint32 threshold = fThreshold;
-			TRACE("threshold: %ld\n", threshold);
+			TRACE("threshold: %" B_PRIu32 "\n", threshold);
 
 			// find the first available frame with enough bandwidth.
 			// This should always be the case, as defining the starting frame
@@ -768,8 +782,8 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 	uint16 itdIndex = 0;
 	size_t dataLength = transfer->DataLength();
 	void* bufferLog;
-	addr_t bufferPhy;
-	if (fStack->AllocateChunk(&bufferLog, (void**)&bufferPhy, dataLength) < B_OK) {
+	phys_addr_t bufferPhy;
+	if (fStack->AllocateChunk(&bufferLog, &bufferPhy, dataLength) < B_OK) {
 		TRACE_ERROR("unable to allocate itd buffer\n");
 		delete[] isoRequest;
 		return B_NO_MEMORY;
@@ -777,7 +791,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 
 	memset(bufferLog, 0, dataLength);
 
-	addr_t currentPhy = bufferPhy;
+	phys_addr_t currentPhy = bufferPhy;
 	uint32 frameCount = 0;
 	while (dataLength > 0) {
 		ehci_itd* itd = CreateItdDescriptor();
@@ -792,7 +806,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 				| (length << EHCI_ITD_TLENGTH_SHIFT) | (pg << EHCI_ITD_PG_SHIFT)
 				| (offset << EHCI_ITD_TOFFSET_SHIFT);
 			itd->last_token = i;
-			TRACE("isochronous filled slot %ld 0x%lx\n", i, itd->token[i]);
+			TRACE("isochronous filled slot %" B_PRId32 " 0x%" B_PRIx32 "\n", i, itd->token[i]);
 			dataLength -= length;
 			offset += length;
 			if (dataLength > 0 && offset > 0xfff) {
@@ -815,7 +829,8 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 			((((pipe->MaxPacketSize() >> EHCI_ITD_MAXPACKETSIZE_LENGTH) + 1)
 			& EHCI_ITD_MUL_MASK) << EHCI_ITD_MUL_SHIFT);
 
-		TRACE("isochronous filled itd buffer_phy[0,1,2] 0x%lx, 0x%lx 0x%lx\n",
+		TRACE("isochronous filled itd buffer_phy[0,1,2] 0x%" B_PRIx32 ", 0x%"
+			B_PRIx32 " 0x%" B_PRIx32 "\n",
 			itd->buffer_phy[0], itd->buffer_phy[1], itd->buffer_phy[2]);
 
 		if (!LockIsochronous())
@@ -905,7 +920,8 @@ EHCI::AddTo(Stack *stack)
 	if (!sPCIModule) {
 		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
 		if (status < B_OK) {
-			TRACE_MODULE_ERROR("getting pci module failed! 0x%08lx\n", status);
+			TRACE_MODULE_ERROR("getting pci module failed! 0x%08" B_PRIx32
+				"\n", status);
 			return status;
 		}
 	}
@@ -1178,7 +1194,7 @@ EHCI::Interrupt()
 	uint32 status = ReadOpReg(EHCI_USBSTS) & EHCI_USBSTS_INTMASK;
 	if ((status & fEnabledInterrupts) == 0) {
 		if (status != 0) {
-			TRACE("discarding not enabled interrupts 0x%08lx\n", status);
+			TRACE("discarding not enabled interrupts 0x%08" B_PRIx32 "\n", status);
 			WriteOpReg(EHCI_USBSTS, status);
 		}
 
@@ -1480,13 +1496,14 @@ EHCI::FinishTransfers()
 				uint32 status = descriptor->token;
 				if (status & EHCI_QTD_STATUS_ACTIVE) {
 					// still in progress
-					TRACE("qtd (0x%08lx) still active\n", descriptor->this_phy);
+					TRACE("qtd (0x%08" B_PRIx32 ") still active\n", descriptor->this_phy);
 					break;
 				}
 
 				if (status & EHCI_QTD_STATUS_ERRMASK) {
 					// a transfer error occured
-					TRACE_ERROR("qtd (0x%08lx) error: 0x%08lx\n", descriptor->this_phy, status);
+					TRACE_ERROR("qtd (0x%" B_PRIx32 ") error: 0x%08" B_PRIx32
+						"\n", descriptor->this_phy, status);
 
 					uint8 errorCount = status >> EHCI_QTD_ERRCOUNT_SHIFT;
 					errorCount &= EHCI_QTD_ERRCOUNT_MASK;
@@ -1535,7 +1552,7 @@ EHCI::FinishTransfers()
 
 				if (descriptor->next_phy & EHCI_ITEM_TERMINATE) {
 					// we arrived at the last (stray) descriptor, we're done
-					TRACE("qtd (0x%08lx) done\n", descriptor->this_phy);
+					TRACE("qtd (0x%08" B_PRIx32 ") done\n", descriptor->this_phy);
 					callbackStatus = B_OK;
 					transferDone = true;
 					break;
@@ -1718,9 +1735,10 @@ EHCI::FinishIsochronousTransfers()
 
 			ehci_itd *itd = fItdEntries[currentFrame];
 
-			TRACE("FinishIsochronousTransfers itd %p phy 0x%lx prev (%p/0x%lx)"
-				" at frame %ld\n", itd, itd->this_phy, itd->prev,
-				itd->prev != NULL ? itd->prev->this_phy : 0, currentFrame);
+			TRACE("FinishIsochronousTransfers itd %p phy 0x%" B_PRIx32
+				" prev (%p/0x%" B_PRIx32 ") at frame %" B_PRId32 "\n", itd,
+				itd->this_phy, itd->prev, itd->prev != NULL
+					? itd->prev->this_phy : 0, currentFrame);
 
 			if (!LockIsochronous())
 				continue;
@@ -1728,9 +1746,10 @@ EHCI::FinishIsochronousTransfers()
 			// Process the frame till it has isochronous descriptors in it.
 			while (!(itd->next_phy & EHCI_ITEM_TERMINATE) && itd->prev != NULL) {
 				TRACE("FinishIsochronousTransfers checking itd %p last_token"
-					" %ld\n", itd, itd->last_token);
-				TRACE("FinishIsochronousTransfers tokens 0x%lx 0x%lx 0x%lx "
-					"0x%lx 0x%lx 0x%lx 0x%lx 0x%lx\n",
+					" %" B_PRId32 "\n", itd, itd->last_token);
+				TRACE("FinishIsochronousTransfers tokens 0x%" B_PRIx32 " 0x%"
+					B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx32
+					" 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx32 "\n",
 					itd->token[0], itd->token[1], itd->token[2], itd->token[3],
 					itd->token[4], itd->token[5], itd->token[6], itd->token[7]);
 				if (((itd->token[itd->last_token] >> EHCI_ITD_STATUS_SHIFT)
@@ -1784,7 +1803,7 @@ EHCI::FinishIsochronousTransfers()
 					delete [] transfer->descriptors;
 					delete transfer->transfer;
 					fStack->FreeChunk(transfer->buffer_log,
-						(void *)transfer->buffer_phy, transfer->buffer_size);
+						(phys_addr_t)transfer->buffer_phy, transfer->buffer_size);
 					delete transfer;
 					transferDone = true;
 				} else {
@@ -1809,7 +1828,7 @@ ehci_qh *
 EHCI::CreateQueueHead()
 {
 	ehci_qh *result;
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
 		sizeof(ehci_qh)) < B_OK) {
 		TRACE_ERROR("failed to allocate queue head\n");
@@ -1889,7 +1908,7 @@ EHCI::FreeQueueHead(ehci_qh *queueHead)
 
 	FreeDescriptorChain(queueHead->element_log);
 	FreeDescriptor(queueHead->stray_log);
-	fStack->FreeChunk(queueHead, (void *)queueHead->this_phy, sizeof(ehci_qh));
+	fStack->FreeChunk(queueHead, (phys_addr_t)queueHead->this_phy, sizeof(ehci_qh));
 }
 
 
@@ -2088,7 +2107,7 @@ ehci_qtd *
 EHCI::CreateDescriptor(size_t bufferSize, uint8 pid)
 {
 	ehci_qtd *result;
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
 		sizeof(ehci_qtd)) < B_OK) {
 		TRACE_ERROR("failed to allocate a qtd\n");
@@ -2118,7 +2137,7 @@ EHCI::CreateDescriptor(size_t bufferSize, uint8 pid)
 	if (fStack->AllocateChunk(&result->buffer_log, &physicalAddress,
 		bufferSize) < B_OK) {
 		TRACE_ERROR("unable to allocate qtd buffer\n");
-		fStack->FreeChunk(result, (void *)result->this_phy, sizeof(ehci_qtd));
+		fStack->FreeChunk(result, (phys_addr_t)result->this_phy, sizeof(ehci_qtd));
 		return NULL;
 	}
 
@@ -2181,10 +2200,10 @@ EHCI::FreeDescriptor(ehci_qtd *descriptor)
 
 	if (descriptor->buffer_log) {
 		fStack->FreeChunk(descriptor->buffer_log,
-			(void *)descriptor->buffer_phy[0], descriptor->buffer_size);
+			(phys_addr_t)descriptor->buffer_phy[0], descriptor->buffer_size);
 	}
 
-	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy,
+	fStack->FreeChunk(descriptor, (phys_addr_t)descriptor->this_phy,
 		sizeof(ehci_qtd));
 }
 
@@ -2207,7 +2226,7 @@ ehci_itd *
 EHCI::CreateItdDescriptor()
 {
 	ehci_itd *result;
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
 		sizeof(ehci_itd)) < B_OK) {
 		TRACE_ERROR("failed to allocate a itd\n");
@@ -2226,7 +2245,7 @@ ehci_sitd *
 EHCI::CreateSitdDescriptor()
 {
 	ehci_sitd *result;
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
 		sizeof(ehci_sitd)) < B_OK) {
 		TRACE_ERROR("failed to allocate a sitd\n");
@@ -2247,7 +2266,7 @@ EHCI::FreeDescriptor(ehci_itd *descriptor)
 	if (!descriptor)
 		return;
 
-	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy,
+	fStack->FreeChunk(descriptor, (phys_addr_t)descriptor->this_phy,
 		sizeof(ehci_itd));
 }
 
@@ -2258,7 +2277,7 @@ EHCI::FreeDescriptor(ehci_sitd *descriptor)
 	if (!descriptor)
 		return;
 
-	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy,
+	fStack->FreeChunk(descriptor, (phys_addr_t)descriptor->this_phy,
 		sizeof(ehci_sitd));
 }
 
@@ -2558,7 +2577,8 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 		}
 	}
 
-	TRACE("ReadIsochronousDescriptorChain packet count %ld\n", packet);
+	TRACE("ReadIsochronousDescriptorChain packet count %" B_PRId32 "\n",
+		packet);
 
 	return totalLength;
 }

@@ -26,12 +26,12 @@ public:
 
 		status_t					Allocate(size_t size,
 										void **logicalAddress,
-										void **physicalAddress);
+										phys_addr_t *physicalAddress);
 
 		// one of both addresses needs to be provided, the other may be NULL
 		status_t					Deallocate(size_t size,
 										void *logicalAddress,
-										void *physicalAddress);
+										phys_addr_t physicalAddress);
 
 		void						PrintToStream();
 		void						DumpArrays();

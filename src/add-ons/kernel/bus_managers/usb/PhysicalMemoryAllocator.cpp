@@ -77,8 +77,6 @@ PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 
 	fArea = create_area(fName, &fLogicalBase, B_ANY_KERNEL_ADDRESS,
 		roundedSize, B_32_BIT_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
-		// TODO: Use B_CONTIGUOUS when the TODOs regarding 64 bit physical
-		// addresses are fixed (if possible).
 	if (fArea < B_OK) {
 		TRACE_ERROR(("PMA: failed to create memory area\n"));
 		return;
@@ -131,9 +129,8 @@ PhysicalMemoryAllocator::_Unlock()
 
 status_t
 PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
-	void **physicalAddress)
+	phys_addr_t *physicalAddress)
 {
-// TODO: physicalAddress should be a phys_addr_t*!
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (debug_debugger_running()) {
 		for (int32 i = 0; i < 64; i++) {
@@ -142,7 +139,7 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 				fDebugUseMap |= mask;
 				*logicalAddress = (void *)((uint8 *)fLogicalBase + fDebugBase
 					+ i * fDebugChunkSize);
-				*physicalAddress = (void *)(fPhysicalBase + fDebugBase
+				*physicalAddress = (phys_addr_t)(fPhysicalBase + fDebugBase
 					+ i * fDebugChunkSize);
 				return B_OK;
 			}
@@ -204,7 +201,7 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 				_Unlock();
 				size_t offset = fBlockSize[arrayToUse] * i;
 				*logicalAddress = (void *)((uint8 *)fLogicalBase + offset);
-				*physicalAddress = (void *)(fPhysicalBase + offset);
+				*physicalAddress = (phys_addr_t)(fPhysicalBase + offset);
 				return B_OK;
 			}
 		}
@@ -234,9 +231,8 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 
 status_t
 PhysicalMemoryAllocator::Deallocate(size_t size, void *logicalAddress,
-	void *physicalAddress)
+	phys_addr_t physicalAddress)
 {
-// TODO: physicalAddress should be a phys_addr_t!
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (debug_debugger_running()) {
 		uint32 index = ((uint8 *)logicalAddress - (uint8 *)fLogicalBase
@@ -259,9 +255,9 @@ PhysicalMemoryAllocator::Deallocate(size_t size, void *logicalAddress,
 		}
 	}
 
-	uint32 offset;
+	phys_addr_t offset;
 	if (logicalAddress)
-		offset = (uint32)logicalAddress - (uint32)fLogicalBase;
+		offset = (addr_t)logicalAddress - (addr_t)fLogicalBase;
 	else if (physicalAddress)
 		offset = (addr_t)physicalAddress - fPhysicalBase;
 	else {
@@ -318,7 +314,7 @@ PhysicalMemoryAllocator::PrintToStream()
 	dprintf("\tMin block size:\t\t\t%ld bytes\n", fBlockSize[0]);
 	dprintf("\tMax block size:\t\t\t%ld bytes\n", fBlockSize[fArrayCount - 1]);
 	dprintf("\tMin count per block:\t%ld\n\n", fArrayLength[fArrayCount - 1]);
-	dprintf("\tArray count:\t\t\t%ld\n", fArrayCount);
+	dprintf("\tArray count:\t\t\t%" B_PRId32 "\n", fArrayCount);
 
 	dprintf("\tArray slots:\t\t\t% 8ld", fArrayLength[0]);
 	for (int32 i = 1; i < fArrayCount; i++)
@@ -344,7 +340,7 @@ PhysicalMemoryAllocator::DumpArrays()
 {
 	uint32 padding = 2;
 	for (int32 i = 0; i < fArrayCount; i++) {
-		dprintf("\tArray(%ld):\t", i);
+		dprintf("\tArray(%" B_PRId32 "):\t", i);
 		for (size_t j = 0; j < fArrayLength[i]; j++) {
 			if (padding > 2) {
 				for (uint32 k = 0; k < (padding - 2) / 4; k++)
@@ -393,9 +389,9 @@ PhysicalMemoryAllocator::DumpFreeSlots()
 		}
 
 		if (i > 0)
-			dprintf(", % 8ld", freeSlots);
+			dprintf(", %8" B_PRIu32, freeSlots);
 		else
-			dprintf("% 8ld", freeSlots);
+			dprintf("%8" B_PRIu32, freeSlots);
 	}
 	dprintf("\n");
 }

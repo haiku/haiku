@@ -130,13 +130,13 @@
 // Isochronous (High-Speed) Transfer Descriptors (iTD, EHCI Spec 3.2)
 typedef struct ehci_itd {
 	// Hardware Part
-	addr_t		next_phy;
+	uint32		next_phy;
 	uint32		token[8];
-	addr_t		buffer_phy[7];
-	addr_t		ext_buffer_phy[7];
+	uint32		buffer_phy[7];
+	uint32		ext_buffer_phy[7];
 
 	// Software Part
-	addr_t		this_phy;
+	uint32		this_phy;
 	struct ehci_itd	*next;
 	struct ehci_itd	*prev;
 	uint32		last_token;
@@ -172,7 +172,7 @@ typedef struct ehci_itd {
 // Split Transaction Isochronous Transfer Descriptors (siTD, EHCI Spec 3.3)
 typedef struct ehci_sitd {
 	// Hardware Part
-	addr_t		next_phy;
+	uint32		next_phy;
 	uint8		port_number;
 	uint8		hub_address;
 	uint8		endpoint;
@@ -183,34 +183,34 @@ typedef struct ehci_sitd {
 	uint16		transfer_length;
 	uint8		cprogmask;
 	uint8		status;
-	addr_t		buffer_phy[2];
-	addr_t		back_phy;
-	addr_t		ext_buffer_phy[2];
+	uint32		buffer_phy[2];
+	uint32		back_phy;
+	uint32		ext_buffer_phy[2];
 
 	// Software Part
-	addr_t		this_phy;
+	uint32		this_phy;
 	struct ehci_sitd *next;
 	struct ehci_sitd *prev;
 	size_t		buffer_size;
 	void		*buffer_log;
-} ehci_sitd;
+} _PACKED ehci_sitd;
 
 // Queue Element Transfer Descriptors (qTD, EHCI Spec 3.5)
 typedef struct ehci_qtd {
 	// Hardware Part
-	addr_t		next_phy;
-	addr_t		alt_next_phy;
+	uint32		next_phy;
+	uint32		alt_next_phy;
 	uint32		token;
-	addr_t		buffer_phy[5];
-	addr_t		ext_buffer_phy[5];
+	uint32		buffer_phy[5];
+	uint32		ext_buffer_phy[5];
 
 	// Software Part
-	addr_t		this_phy;
+	uint32		this_phy;
 	struct ehci_qtd	*next_log;
 	void		*alt_next_log;
 	size_t		buffer_size;
 	void		*buffer_log;
-} ehci_qtd;
+} _PACKED ehci_qtd;
 
 
 #define EHCI_QTD_DATA_TOGGLE	(1 << 31)
@@ -244,21 +244,21 @@ typedef struct ehci_qtd {
 // Queue Head (QH, EHCI Spec 3.6)
 typedef struct ehci_qh {
 	// Hardware Part
-	addr_t		next_phy;
+	uint32		next_phy;
 	uint32		endpoint_chars;
 	uint32		endpoint_caps;
-	addr_t		current_qtd_phy;
+	uint32		current_qtd_phy;
 
 	struct {
-		addr_t		next_phy;
-		addr_t		alt_next_phy;
+		uint32		next_phy;
+		uint32		alt_next_phy;
 		uint32		token;
-		addr_t		buffer_phy[5];
-		addr_t		ext_buffer_phy[5];
+		uint32		buffer_phy[5];
+		uint32		ext_buffer_phy[5];
 	} overlay;
 
 	// Software Part
-	addr_t		this_phy;
+	uint32		this_phy;
 	struct ehci_qh *next_log;
 	struct ehci_qh *prev_log;
 	ehci_qtd	*stray_log;
@@ -268,17 +268,30 @@ typedef struct ehci_qh {
 
 typedef struct {
 	ehci_qh		queue_head;
+#ifdef B_HAIKU_64_BIT
+	uint32		padding[6];
+#else
 	uint32		padding[2];
+#endif
 } interrupt_entry;
 
 typedef struct {
 	ehci_itd	itd;
+#ifdef B_HAIKU_64_BIT
+	uint32		padding[1]; // align on 128
+#else
 	uint32		padding[5]; // align on 128
+#endif
 } itd_entry;
 
 typedef struct {
 	ehci_sitd	sitd;
-	uint32		padding[2]; // align on 64
+
+#ifdef B_HAIKU_64_BIT
+	uint32		padding[14]; // align on 64
+#else
+	uint32 		padding[2]; // align on 64
+#endif
 } sitd_entry;
 
 #define EHCI_INTERRUPT_ENTRIES_COUNT	(7 + 1)		// (log 128 / log 2) + 1

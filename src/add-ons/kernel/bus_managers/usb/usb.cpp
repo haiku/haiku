@@ -145,7 +145,7 @@ uninstall_notify(const char *driverName)
 const usb_device_descriptor *
 get_device_descriptor(usb_device device)
 {
-	TRACE_MODULE("get_device_descriptor(%ld)\n", device);
+	TRACE_MODULE("get_device_descriptor(%" B_PRId32 ")\n", device);
 	Object *object = gUSBStack->GetObject(device);
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return NULL;
@@ -157,7 +157,8 @@ get_device_descriptor(usb_device device)
 const usb_configuration_info *
 get_nth_configuration(usb_device device, uint32 index)
 {
-	TRACE_MODULE("get_nth_configuration(%ld, %lu)\n", device, index);
+	TRACE_MODULE("get_nth_configuration(%" B_PRId32 ", %" B_PRIu32 ")\n",
+		device, index);
 	Object *object = gUSBStack->GetObject(device);
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return NULL;
@@ -169,7 +170,7 @@ get_nth_configuration(usb_device device, uint32 index)
 const usb_configuration_info *
 get_configuration(usb_device device)
 {
-	TRACE_MODULE("get_configuration(%ld)\n", device);
+	TRACE_MODULE("get_configuration(%" B_PRId32 ")\n", device);
 	Object *object = gUSBStack->GetObject(device);
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return NULL;
@@ -182,7 +183,8 @@ status_t
 set_configuration(usb_device device,
 	const usb_configuration_info *configuration)
 {
-	TRACE_MODULE("set_configuration(%ld, %p)\n", device, configuration);
+	TRACE_MODULE("set_configuration(%" B_PRId32 ", %p)\n", device,
+		configuration);
 	Object *object = gUSBStack->GetObject(device);
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
@@ -194,7 +196,7 @@ set_configuration(usb_device device,
 status_t
 set_alt_interface(usb_device device, const usb_interface_info *interface)
 {
-	TRACE_MODULE("set_alt_interface(%ld, %p)\n", device, interface);
+	TRACE_MODULE("set_alt_interface(%" B_PRId32 ", %p)\n", device, interface);
 	Object *object = gUSBStack->GetObject(device);
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
@@ -206,7 +208,7 @@ set_alt_interface(usb_device device, const usb_interface_info *interface)
 status_t
 set_feature(usb_id handle, uint16 selector)
 {
-	TRACE_MODULE("set_feature(%ld, %d)\n", handle, selector);
+	TRACE_MODULE("set_feature(%" B_PRId32 ", %d)\n", handle, selector);
 	Object *object = gUSBStack->GetObject(handle);
 	if (!object)
 		return B_DEV_INVALID_PIPE;
@@ -218,7 +220,7 @@ set_feature(usb_id handle, uint16 selector)
 status_t
 clear_feature(usb_id handle, uint16 selector)
 {
-	TRACE_MODULE("clear_feature(%ld, %d)\n", handle, selector);
+	TRACE_MODULE("clear_feature(%" B_PRId32 ", %d)\n", handle, selector);
 	Object *object = gUSBStack->GetObject(handle);
 	if (!object)
 		return B_DEV_INVALID_PIPE;
@@ -230,7 +232,7 @@ clear_feature(usb_id handle, uint16 selector)
 status_t
 get_status(usb_id handle, uint16 *status)
 {
-	TRACE_MODULE("get_status(%ld, %p)\n", handle, status);
+	TRACE_MODULE("get_status(%" B_PRId32 ", %p)\n", handle, status);
 	if (!status)
 		return B_BAD_VALUE;
 
@@ -246,7 +248,8 @@ status_t
 get_descriptor(usb_device device, uint8 type, uint8 index, uint16 languageID,
 	void *data, size_t dataLength, size_t *actualLength)
 {
-	TRACE_MODULE("get_descriptor(%ld, 0x%02x, 0x%02x, 0x%04x, %p, %ld, %p)\n",
+	TRACE_MODULE("get_descriptor(%" B_PRId32 ", 0x%02x, 0x%02x, 0x%04x, %p, "
+		"%" B_PRIuSIZE ", %p)\n",
 		device, type, index, languageID, data, dataLength, actualLength);
 	Object *object = gUSBStack->GetObject(device);
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
@@ -261,8 +264,9 @@ status_t
 send_request(usb_device device, uint8 requestType, uint8 request,
 	uint16 value, uint16 index, uint16 length, void *data, size_t *actualLength)
 {
-	TRACE_MODULE("send_request(%ld, 0x%02x, 0x%02x, 0x%04x, 0x%04x, %d, %p, %p)\n",
-		device, requestType, request, value, index, length, data, actualLength);
+	TRACE_MODULE("send_request(%" B_PRId32 ", 0x%02x, 0x%02x, 0x%04x, 0x%04x, "
+		"%d, %p, %p)\n", device, requestType, request, value, index, length,
+		data, actualLength);
 	Object *object = gUSBStack->GetObject(device);
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
@@ -277,9 +281,9 @@ queue_request(usb_device device, uint8 requestType, uint8 request,
 	uint16 value, uint16 index, uint16 length, void *data,
 	usb_callback_func callback, void *callbackCookie)
 {
-	TRACE_MODULE("queue_request(%ld, 0x%02x, 0x%02x, 0x%04x, 0x%04x, %u, %p, %p, %p)\n",
-		device, requestType, request, value, index, length, data, callback,
-		callbackCookie);
+	TRACE_MODULE("queue_request(%" B_PRId32 ", 0x%02x, 0x%02x, 0x%04x, 0x%04x,"
+		" %u, %p, %p, %p)\n", device, requestType, request, value, index,
+		length, data, callback,	callbackCookie);
 	Object *object = gUSBStack->GetObject(device);
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
@@ -293,7 +297,7 @@ status_t
 queue_interrupt(usb_pipe pipe, void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
-	TRACE_MODULE("queue_interrupt(%ld, %p, %ld, %p, %p)\n",
+	TRACE_MODULE("queue_interrupt(%" B_PRId32 ", %p, %ld, %p, %p)\n",
 		pipe, data, dataLength, callback, callbackCookie);
 	Object *object = gUSBStack->GetObject(pipe);
 	if (!object || (object->Type() & USB_OBJECT_INTERRUPT_PIPE) == 0)
@@ -308,7 +312,7 @@ status_t
 queue_bulk(usb_pipe pipe, void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
-	TRACE_MODULE("queue_bulk(%ld, %p, %ld, %p, %p)\n",
+	TRACE_MODULE("queue_bulk(%"B_PRId32 ", %p, %" B_PRIuSIZE ", %p, %p)\n",
 		pipe, data, dataLength, callback, callbackCookie);
 	Object *object = gUSBStack->GetObject(pipe);
 	if (!object || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)
@@ -323,7 +327,7 @@ status_t
 queue_bulk_v(usb_pipe pipe, iovec *vector, size_t vectorCount,
 	usb_callback_func callback, void *callbackCookie)
 {
-	TRACE_MODULE("queue_bulk_v(%ld, %p, %ld, %p, %p)\n",
+	TRACE_MODULE("queue_bulk_v(%" B_PRId32 ", %p, %" B_PRIuSIZE " %p, %p)\n",
 		pipe, vector, vectorCount, callback, callbackCookie);
 	Object *object = gUSBStack->GetObject(pipe);
 	if (!object || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)
@@ -338,8 +342,8 @@ status_t
 queue_bulk_v_physical(usb_pipe pipe, iovec *vector, size_t vectorCount,
 	usb_callback_func callback, void *callbackCookie)
 {
-	TRACE_MODULE("queue_bulk_v_physical(%ld, %p, %ld, %p, %p)\n",
-		pipe, vector, vectorCount, callback, callbackCookie);
+	TRACE_MODULE("queue_bulk_v_physical(%" B_PRId32 ", %p, %" B_PRIuSIZE
+		", %p, %p)\n", pipe, vector, vectorCount, callback, callbackCookie);
 	Object *object = gUSBStack->GetObject(pipe);
 	if (!object || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
@@ -355,7 +359,8 @@ queue_isochronous(usb_pipe pipe, void *data, size_t dataLength,
 	uint32 *startingFrameNumber, uint32 flags, usb_callback_func callback,
 	void *callbackCookie)
 {
-	TRACE_MODULE("queue_isochronous(%ld, %p, %ld, %p, %ld, %p, 0x%08lx, %p, %p)\n",
+	TRACE_MODULE("queue_isochronous(%" B_PRId32 ", %p, %" B_PRIuSIZE ", %p, "
+		"%" B_PRId32 ", %p, 0x%08" B_PRIx32 ", %p, %p)\n",
 		pipe, data, dataLength, packetDesc, packetCount, startingFrameNumber,
 		flags, callback, callbackCookie);
 	Object *object = gUSBStack->GetObject(pipe);
@@ -372,8 +377,8 @@ status_t
 set_pipe_policy(usb_pipe pipe, uint8 maxQueuedPackets,
 	uint16 maxBufferDurationMS, uint16 sampleSize)
 {
-	TRACE_MODULE("set_pipe_policy(%ld, %d, %d, %d)\n", pipe, maxQueuedPackets,
-		maxBufferDurationMS, sampleSize);
+	TRACE_MODULE("set_pipe_policy(%" B_PRId32 ", %d, %d, %d)\n", pipe,
+		maxQueuedPackets, maxBufferDurationMS, sampleSize);
 	Object *object = gUSBStack->GetObject(pipe);
 	if (!object || (object->Type() & USB_OBJECT_ISO_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
@@ -386,7 +391,7 @@ set_pipe_policy(usb_pipe pipe, uint8 maxQueuedPackets,
 status_t
 cancel_queued_transfers(usb_pipe pipe)
 {
-	TRACE_MODULE("cancel_queued_transfers(%ld)\n", pipe);
+	TRACE_MODULE("cancel_queued_transfers(%" B_PRId32 ")\n", pipe);
 	Object *object = gUSBStack->GetObject(pipe);
 	if (!object || (object->Type() & USB_OBJECT_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
@@ -398,7 +403,8 @@ cancel_queued_transfers(usb_pipe pipe)
 status_t
 usb_ioctl(uint32 opcode, void *buffer, size_t bufferSize)
 {
-	TRACE_MODULE("usb_ioctl(%lu, %p, %ld)\n", opcode, buffer, bufferSize);
+	TRACE_MODULE("usb_ioctl(%" B_PRIu32 ", %p, %" B_PRIuSIZE ")\n", opcode,
+		buffer, bufferSize);
 
 	switch (opcode) {
 		case 'DNAM': {
@@ -564,21 +570,21 @@ struct usb_module_info gModuleInfoV3 = {
 const usb_device_descriptor *
 get_device_descriptor_v2(const void *device)
 {
-	return get_device_descriptor((usb_id)device);
+	return get_device_descriptor((usb_id)(ssize_t)device);
 }
 
 
 const usb_configuration_info *
 get_nth_configuration_v2(const void *device, uint index)
 {
-	return get_nth_configuration((usb_id)device, index);
+	return get_nth_configuration((usb_id)(ssize_t)device, index);
 }
 
 
 const usb_configuration_info *
 get_configuration_v2(const void *device)
 {
-	return get_configuration((usb_id)device);
+	return get_configuration((usb_id)(ssize_t)device);
 }
 
 
@@ -586,35 +592,35 @@ status_t
 set_configuration_v2(const void *device,
 	const usb_configuration_info *configuration)
 {
-	return set_configuration((usb_id)device, configuration);
+	return set_configuration((usb_id)(ssize_t)device, configuration);
 }
 
 
 status_t
 set_alt_interface_v2(const void *device, const usb_interface_info *interface)
 {
-	return set_alt_interface((usb_id)device, interface);
+	return set_alt_interface((usb_id)(ssize_t)device, interface);
 }
 
 
 status_t
 set_feature_v2(const void *object, uint16 selector)
 {
-	return set_feature((usb_id)object, selector);
+	return set_feature((usb_id)(ssize_t)object, selector);
 }
 
 
 status_t
 clear_feature_v2(const void *object, uint16 selector)
 {
-	return clear_feature((usb_id)object, selector);
+	return clear_feature((usb_id)(ssize_t)object, selector);
 }
 
 
 status_t
 get_status_v2(const void *object, uint16 *status)
 {
-	return get_status((usb_id)object, status);
+	return get_status((usb_id)(ssize_t)object, status);
 }
 
 
@@ -622,7 +628,7 @@ status_t
 get_descriptor_v2(const void *device, uint8 type, uint8 index,
 	uint16 languageID, void *data, size_t dataLength, size_t *actualLength)
 {
-	return get_descriptor((usb_id)device, type, index, languageID, data,
+	return get_descriptor((usb_id)(ssize_t)device, type, index, languageID, data,
 		dataLength, actualLength);
 }
 
@@ -632,7 +638,7 @@ send_request_v2(const void *device, uint8 requestType, uint8 request,
 	uint16 value, uint16 index, uint16 length, void *data,
 	size_t /*dataLength*/, size_t *actualLength)
 {
-	return send_request((usb_id)device, requestType, request, value, index,
+	return send_request((usb_id)(ssize_t)device, requestType, request, value, index,
 		length, data, actualLength);
 }
 
@@ -642,7 +648,7 @@ queue_request_v2(const void *device, uint8 requestType, uint8 request,
 	uint16 value, uint16 index, uint16 length, void *data,
 	size_t /*dataLength*/, usb_callback_func callback, void *callbackCookie)
 {
-	return queue_request((usb_id)device, requestType, request, value, index,
+	return queue_request((usb_id)(ssize_t)device, requestType, request, value, index,
 		length, data, callback, callbackCookie);
 }
 
@@ -651,7 +657,7 @@ status_t
 queue_interrupt_v2(const void *pipe, void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
-	return queue_interrupt((usb_id)pipe, data, dataLength, callback,
+	return queue_interrupt((usb_id)(ssize_t)pipe, data, dataLength, callback,
 		callbackCookie);
 }
 
@@ -660,7 +666,7 @@ status_t
 queue_bulk_v2(const void *pipe, void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
-	return queue_bulk((usb_id)pipe, data, dataLength, callback,
+	return queue_bulk((usb_id)(ssize_t)pipe, data, dataLength, callback,
 		callbackCookie);
 }
 
@@ -673,7 +679,7 @@ queue_isochronous_v2(const void *pipe, void *data, size_t dataLength,
 	// ToDo: convert rlea to usb_iso_packet_descriptor
 	// ToDo: use a flag to indicate that the callback shall produce a rlea
 	usb_iso_packet_descriptor *packetDesc = NULL;
-	return queue_isochronous((usb_id)pipe, data, dataLength, packetDesc, 0,
+	return queue_isochronous((usb_id)(ssize_t)pipe, data, dataLength, packetDesc, 0,
 		NULL, 0, callback, callbackCookie);
 }
 
@@ -682,7 +688,7 @@ status_t
 set_pipe_policy_v2(const void *pipe, uint8 maxQueuedPackets,
 	uint16 maxBufferDurationMS, uint16 sampleSize)
 {
-	return set_pipe_policy((usb_id)pipe, maxQueuedPackets, maxBufferDurationMS,
+	return set_pipe_policy((usb_id)(ssize_t)pipe, maxQueuedPackets, maxBufferDurationMS,
 		sampleSize);
 }
 
@@ -690,7 +696,7 @@ set_pipe_policy_v2(const void *pipe, uint8 maxQueuedPackets,
 status_t
 cancel_queued_transfers_v2(const void *pipe)
 {
-	return cancel_queued_transfers((usb_id)pipe);
+	return cancel_queued_transfers((usb_id)(ssize_t)pipe);
 }
 
 

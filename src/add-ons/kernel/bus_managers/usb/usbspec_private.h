@@ -39,8 +39,8 @@
 
 struct memory_chunk
 {
-	addr_t next_item;
-	addr_t physical;
+	uint32 next_item;
+	uint32 physical;
 };
 
 

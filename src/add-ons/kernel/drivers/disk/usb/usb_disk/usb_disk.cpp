@@ -18,7 +18,7 @@
 
 #define DRIVER_NAME			"usb_disk"
 #define DEVICE_NAME_BASE	"disk/usb/"
-#define DEVICE_NAME			DEVICE_NAME_BASE"%ld/%d/raw"
+#define DEVICE_NAME			DEVICE_NAME_BASE"%" B_PRIu32 "/%d/raw"
 
 
 //#define TRACE_USB_DISK
@@ -130,7 +130,7 @@ status_t	usb_disk_receive_csw(disk_device *device,
 				command_status_wrapper *status);
 status_t	usb_disk_operation(device_lun *lun, uint8 operation,
 				uint8 opLength, uint32 logicalBlockAddress,
-				uint16 transferLength, void *data, uint32 *dataLength,
+				uint16 transferLength, void *data, size_t *dataLength,
 				bool directionIn);
 
 status_t	usb_disk_request_sense(device_lun *lun);
@@ -259,7 +259,7 @@ usb_disk_receive_csw(disk_device *device, command_status_wrapper *status)
 status_t
 usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	uint32 logicalBlockAddress, uint16 transferLength, void *data,
-	uint32 *dataLength, bool directionIn)
+	size_t *dataLength, bool directionIn)
 {
 	TRACE("operation: lun: %u; op: %u; oplen: %u; lba: %lu; tlen: %u; data: "
 		"%p; dlen: %p (%lu); in: %c\n",
@@ -427,7 +427,7 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 status_t
 usb_disk_request_sense(device_lun *lun)
 {
-	uint32 dataLength = sizeof(scsi_request_sense_6_parameter);
+	size_t dataLength = sizeof(scsi_request_sense_6_parameter);
 	scsi_request_sense_6_parameter parameter;
 	status_t result = usb_disk_operation(lun, SCSI_REQUEST_SENSE_6, 6, 0,
 		dataLength, &parameter, &dataLength, true);
@@ -463,7 +463,7 @@ usb_disk_request_sense(device_lun *lun)
 				TRACE_ALWAYS("request_sense: media changed\n");
 				lun->media_changed = true;
 				lun->media_present = true;
-				
+
 				return B_DEV_MEDIA_CHANGED;
 			}
 			// fall through
@@ -492,7 +492,7 @@ usb_disk_request_sense(device_lun *lun)
 status_t
 usb_disk_mode_sense(device_lun *lun)
 {
-	uint32 dataLength = sizeof(scsi_mode_sense_6_parameter);
+	size_t dataLength = sizeof(scsi_mode_sense_6_parameter);
 	scsi_mode_sense_6_parameter parameter;
 	status_t result = usb_disk_operation(lun, SCSI_MODE_SENSE_6, 6,
 		SCSI_MODE_PAGE_DEVICE_CONFIGURATION, dataLength, &parameter,
@@ -538,7 +538,7 @@ usb_disk_test_unit_ready(device_lun *lun)
 status_t
 usb_disk_inquiry(device_lun *lun)
 {
-	uint32 dataLength = sizeof(scsi_inquiry_6_parameter);
+	size_t dataLength = sizeof(scsi_inquiry_6_parameter);
 	scsi_inquiry_6_parameter parameter;
 	status_t result = B_ERROR;
 	for (uint32 tries = 0; tries < 3; tries++) {
@@ -586,7 +586,7 @@ usb_disk_reset_capacity(device_lun *lun)
 status_t
 usb_disk_update_capacity(device_lun *lun)
 {
-	uint32 dataLength = sizeof(scsi_read_capacity_10_parameter);
+	size_t dataLength = sizeof(scsi_read_capacity_10_parameter);
 	scsi_read_capacity_10_parameter parameter;
 	status_t result = B_ERROR;
 
@@ -1126,7 +1126,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 #endif
 
 		default:
-			TRACE_ALWAYS("unhandled ioctl %ld\n", op);
+			TRACE_ALWAYS("unhandled ioctl %" B_PRId32 "\n", op);
 			break;
 	}
 
@@ -1177,7 +1177,7 @@ usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
 	}
 
 	*length = 0;
-	TRACE_ALWAYS("read fails with 0x%08lx\n", result);
+	TRACE_ALWAYS("read fails with 0x%08" B_PRIx32 "\n", result);
 	return result;
 }
 
@@ -1228,7 +1228,7 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 	}
 
 	*length = 0;
-	TRACE_ALWAYS("write fails with 0x%08lx\n", result);
+	TRACE_ALWAYS("write fails with 0x%08" B_PRIx32 "\n", result);
 	return result;
 }
 
@@ -1270,7 +1270,7 @@ init_driver()
 	status_t result = get_module(B_USB_MODULE_NAME,
 		(module_info **)&gUSBModule);
 	if (result < B_OK) {
-		TRACE_ALWAYS("getting module failed 0x%08lx\n", result);
+		TRACE_ALWAYS("getting module failed 0x%08" B_PRIx32 "\n", result);
 		mutex_destroy(&gDeviceListLock);
 		return result;
 	}
