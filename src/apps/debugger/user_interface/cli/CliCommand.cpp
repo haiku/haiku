@@ -6,6 +6,8 @@
 
 #include "CliCommand.h"
 
+#include <stdio.h>
+
 
 CliCommand::CliCommand(const char* summary, const char* usage)
 	:
@@ -17,4 +19,13 @@ CliCommand::CliCommand(const char* summary, const char* usage)
 
 CliCommand::~CliCommand()
 {
+}
+
+
+void
+CliCommand::PrintUsage(const char* commandName) const
+{
+	printf("Usage: ");
+	printf(Usage(), commandName);
+	printf("\n");
 }
