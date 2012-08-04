@@ -60,6 +60,8 @@ if $(HAIKU_ATA_STACK) = 1 {
 		: generic_ide_pci ;
 }
 
+AddFilesToHaikuImage system add-ons kernel busses scsi
+	: ahci ;
 AddFilesToHaikuImage system add-ons kernel debugger
 	: <kdebug>demangle ;
 AddFilesToHaikuImage system add-ons kernel file_systems
@@ -212,7 +214,7 @@ AddFilesToHaikuImage system : haiku_loader ;
 # boot module links
 AddBootModuleSymlinksToHaikuImage
 	$(ATA_ONLY)ata pci config_manager dpc scsi $(ATA_ONLY)ata_adapter
-	locked_pool scsi_periph generic_ide_pci scsi_cd scsi_disk intel
+	locked_pool scsi_periph ahci generic_ide_pci scsi_cd scsi_disk intel
 	bfs
 ;
 
