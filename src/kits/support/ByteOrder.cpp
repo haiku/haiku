@@ -49,14 +49,15 @@ swap_data(type_code type, void *_data, size_t length, swap_action action)
 		case B_FLOAT_TYPE:
 		case B_INT32_TYPE:
 		case B_UINT32_TYPE:
-		case B_SIZE_T_TYPE:
-		case B_SSIZE_T_TYPE:
 		case B_TIME_TYPE:
-		case B_POINTER_TYPE:
 		case B_RECT_TYPE:
 		case B_POINT_TYPE:
+#if B_HAIKU_32_BIT
+		case B_SIZE_T_TYPE:
+		case B_SSIZE_T_TYPE:
+		case B_POINTER_TYPE:
+#endif
 		{
-			// ToDo: some of these types may not be 32-bit on 64-bit platforms!
 			uint32 *data = (uint32 *)_data;
 			uint32 *end = (uint32 *)((addr_t)_data + length);
 
@@ -72,6 +73,11 @@ swap_data(type_code type, void *_data, size_t length, swap_action action)
 		case B_INT64_TYPE:
 		case B_UINT64_TYPE:
 		case B_OFF_T_TYPE:
+#if B_HAIKU_64_BIT
+		case B_SIZE_T_TYPE:
+		case B_SSIZE_T_TYPE:
+		case B_POINTER_TYPE:
+#endif
 		{
 			uint64 *data = (uint64 *)_data;
 			uint64 *end = (uint64 *)((addr_t)_data + length);
