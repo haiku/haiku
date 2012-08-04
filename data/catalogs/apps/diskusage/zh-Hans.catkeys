@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DiskUsage	3634416251
+1	english	x-vnd.Haiku-DiskUsage	3399777733
 Scanning %refName%	Scanner		扫描 %refName% 
 Size	Info Window		大小
 Rescan	Pie View		重新扫描
@@ -14,6 +14,7 @@ Scan	Status View		扫描
 file unavailable	Status View		文件不可用
 Get Info	Pie View		获取信息
 DiskUsage	System name		磁盘查看器
+ in %d files	Info Window		位于 %d 个文件
 %d files	Status View		%d 文件
 Created	Info Window		已创建
 Modified	Info Window		已修改

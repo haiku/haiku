@@ -1,0 +1,126 @@
+1	finnish	x-vnd.Haiku-WebPositive	2598330196
+Username:	Authentication Panel		Käyttäjätunnus:
+Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
+Cancel	Settings Window		Peru
+Close window	WebPositive Window		Sulje ikkuna
+Quit	WebPositive		Lopeta
+The download could not be opened.	Download Window		Latausta ei kyetty avaamaan.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Latauskansiota ei kyetty avaamaan.\n\nVirhe: %error
+Open location	WebPositive Window		Avaa sijainti
+Clear history	WebPositive Window		Poista historiatiedot
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Eilen
+Default standard font size:	Settings Window		Oletusvakiokirjasinkoko:
+Start page:	Settings Window		Aloitussivu:
+History	WebPositive Window		Historia
+Error opening downloads folder	Download Window		Virhe avattaessa latauskansiota
+Paste	WebPositive Window		Liitä
+Settings	Settings Window		Asetukset
+%seconds seconds left	Download Window		%seconds sekuntia jäljellä
+Confirmation	WebPositive Window		Vahvistus
+Window	WebPositive Window		Ikkuna
+Decrease size	WebPositive Window		Pienennä kirjasinkokoa
+Serif font:	Settings Window		Pääteviivallinen kirjasin:
+Page source	WebPositive Window		Sivulähde
+Next	WebPositive Window		Seuraava
+Find next	WebPositive Window		Etsi seuraava
+Download folder:	Settings Window		Latauskansio:
+Edit	WebPositive Window		Muokkaa
+Over %hours hours left	Download Window		Yli %hours tuntia jäljellä
+Cancel	Authentication Panel		Peru
+Match case	WebPositive Window		Erottele kirjainkoot
+Search page:	Settings Window		Etsintäsivu:
+Zoom text only	WebPositive Window		Suurenna vain tekstiä
+Default fixed font size:	Settings Window		Kirjasimen kiinteä oletuskoko:
+Close tab	WebPositive Window		Sulje välilehti
+Over 1 hour left	Download Window		Yli 1 tuntia jäljellä
+Quit	WebPositive Window		Lopeta
+Open download error	Download Window		Avaa latausvirhe
+Standard font:	Settings Window		Vakiokirjasin:
+Restart	Download Window		Käynnistä uudelleen
+Proxy server	Settings Window		Välityspalvelin
+Open containing folder	Download Window		Avaa kansio, josta tiedosto löytyy
+New window	WebPositive Window		Uusi ikkuna
+Open	Download Window		Avaa
+Reload	WebPositive Window		Lataa uudelleen
+Downloads	Download Window		Lataukset
+Sans serif font:	Settings Window		Sans serif -kirjasin:
+Over %days days left	Download Window		Yli %days  päivää jäljellä
+Forward	WebPositive Window		Lähetä edelleen
+of	Download Window	...as in '12kB of 256kB'	/
+Revert	Settings Window		Palauta
+Fixed font:	Settings Window		Tasalevyinen kirjasin:
+Cut	WebPositive Window		Leikkaa
+Bookmark this page	WebPositive Window		Merkitse tämä sivu kirjanmerkillä
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Virhe yritettäessä näyttää kirjanmerkkikansiota.\n\nVirhe: %error
+Open downloads folder	Download Window		Avaa latauskansio
+Number of days to keep links in History menu:	Settings Window		Kuinka monta päivää linkit pidetään historiavalikossa:
+Hide	Download Window		Piilota
+Reset size	WebPositive Window		Nollaa koko
+Find:	WebPositive Window		Etsi:
+Increase size	WebPositive Window		Kasvata kirjasinkokoa
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Virhe noudettaessa kirjanmerkkikansiota.\n\nVirhe: %error
+Over 1 day left	Download Window		Yli1 päivää jäljellä
+Downloads	WebPositive Window		Lataukset
+Apply	Settings Window		Käytä
+Bookmark info	WebPositive Window		Kirjanmerkkitiedot
+Size:	Font Selection view		Koko:
+About	WebPositive Window		Ohjelmasta
+Finish: 	Download Window	Finishing time	Valmis:
+Fonts	Settings Window		Kirjasimet
+Close	WebPositive Window		Sulje
+OK	Download Window		Valmis
+Page source error	WebPositive Window		Sivulähdevirhe
+Open blank page	Settings Window		Avaa tyhjä sivu
+New tabs:	Settings Window		Uudet välilehdet:
+Cancel	WebPositive Window		Peru
+Open all	WebPositive Window		Avaa kaikki
+Clear	URL Bar		Tyhjennä
+Cut	URL Bar		Leikkaa
+Clear	WebPositive Window		Tyhjennä
+Remove	Download Window		Poista
+Find	WebPositive Window		Etsi
+Find previous	WebPositive Window		Etsi edellinen
+Settings	WebPositive Window		Asetukset
+Proxy server address:	Settings Window		Välityspalvelimen osoite:
+Proxy server port:	Settings Window		Välityspalvelimen portti:
+Bookmarks	WebPositive Window		Kirjanmerkit
+%minutes minutes	Download Window		%minutes minuuttia
+Paste	URL Bar		Liitä
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Piilota salasanateksti
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.
+Over 1 minute left	Download Window		Yli 1 minuutti jäljellä
+Open start page	Settings Window		Avaa aloitussivu
+Continue downloads	WebPositive		Jatka latauksia
+Cancel	Download Window		Peru
+Open search page	Settings Window		Avaa etsintäsivu
+Password:	Authentication Panel		Salasana:
+Back	WebPositive Window		Takaisin
+New browser window	Download Window		Uusi selainikkuna
+Today	WebPositive Window		Tänään
+1 second left	Download Window		1 sekunti jäljellä
+Remember username and password for this site	Authentication Panel		Muista tämän sivuston käyttäjätunniste ja salasana
+Earlier	WebPositive Window		Aiempi
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Latauksia on yhä menossa, haluatko todella poistu WebPositive-ohjelmasta nyt?
+New tab	WebPositive Window		Uusi välilehti
+Downloads in progress	WebPositive		Latauksia käynnissä
+Style:	Font Selection view		Tyyli:
+General	Settings Window		Yleiset
+View	WebPositive Window		Näkymä
+Previous	WebPositive Window		Edellinen
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Tapahtui virhe kirjanmerkkitiedostoa luotaessa.\n\nVirhe: %error
+Bookmark error	WebPositive Window		Kirjanmerkkivirhe
+Do you really want to clear the browsing history?	WebPositive Window		Haluatko todella tyhjentää koko selaushistorian?
+Copy	WebPositive Window		Kopioi
+Open bookmarks confirmation	WebPositive Window		Avaa kirjanmerkkien vahvistaminen
+Remove missing	Download Window		Poista puuttuva
+Clone current page	Settings Window		Kloonaa nykyinen sivu
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Haluatko avata kaikki %addedCount-kirjanmerkit kerralla?
+OK	Authentication Panel		Valmis
+Copy	URL Bar		Kopioi
+OK	WebPositive Window		Valmis
+Manage bookmarks	WebPositive Window		Hallinnoi kirjanmerkkejä
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Kirjanmerkki (%bookmarkName) tälle sivulle on jo olemassa.
+New windows:	Settings Window		Uudet ikkunat:
+Remove finished	Download Window		Poista päättyneet

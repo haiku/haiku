@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2795444721
+1	japanese	x-vnd.Haiku-libtracker	886034970
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -308,7 +308,7 @@ Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		%library
 The Tracker must be running to see Info windows.	PoseView		情報ウィンドウを表示するには、Trackerが実行されている必要があります。
 Other	FilePermissionsView		その他
 Query name:	FindPanel		クエリ名：
-Permissions	ContainerWindow		アクセス許可
+Permissions	ContainerWindow		アクセス権
 moving	FSUtils		移動中
 Identify	InfoWindow		ファイル形式を判別
 Recent folders	ContainerWindow		最近開いたフォルダー
@@ -390,7 +390,6 @@ Restoring: 	StatusWindow		復元中：
 system	B_SYSTEM_DIRECTORY		システム
 Skip	FSUtils		スキップ
 Settings…	MountMenu		設定…
-Error emptying Trash!	FSUtils		ごみ箱を空にしている途中でエラーが発生しました。
 Recent folders	FavoritesMenu		最近開いたフォルダー
 Close	ContainerWindow		閉じる
 Preferred for file	OpenWithWindow		関連付けの第一優先

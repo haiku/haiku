@@ -13,7 +13,7 @@ Settings	GrepWindow		Настройки
 Select all	GrepWindow		Выделить все
 OK	GrepWindow		ОК
 Skip folders starting with a dot	GrepWindow		Не искать в папках, начинающихся с точки
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не смог открыть одну папку или более
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не смог открыть одну папку или более.
 Escape search text	GrepWindow		Экранировать текст поиска
 Search	GrepWindow		Искать
 Open selection	GrepWindow		Открыть выделенные файлы

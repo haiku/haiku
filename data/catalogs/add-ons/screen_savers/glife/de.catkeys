@@ -1,0 +1,15 @@
+1	german	x-vnd.Haiku-GLifeScreensaver	1707534289
+Grid Border: %li	GLife ScreenSaver		Rastergrenze: %li
+Grid Width: 	GLife ScreenSaver		Rasterbreite:
+none	GLife ScreenSaver		keine
+Grid Height: 	GLife ScreenSaver		Rasterhöhe:
+%sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
+None	GLife ScreenSaver		Keine
+4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
+Grid Width: %li	GLife ScreenSaver		Rasterbreite: %li
+Grid Height: %li	GLife ScreenSaver		Rasterhöhe: %li
+Grid Life Delay: 	GLife ScreenSaver		Verzögerung pro Generation:
+OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Spiel des Lebens\"
+Grid Life Delay: %s	GLife ScreenSaver		Verzögerung pro Generation: %s
+Grid Border: 	GLife ScreenSaver		Rastergrenze:
+by Aaron Hill	GLife ScreenSaver		von Aaron Hill

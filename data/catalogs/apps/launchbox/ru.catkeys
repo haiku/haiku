@@ -12,7 +12,7 @@ Ignore double-click	LaunchBox		Игнорировать двойной щелч�
 Auto-raise	LaunchBox		Всплывать при наведении
 Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
 Show window border	LaunchBox		Отображать рамку окна
-Pad	LaunchBox		Панель 
+Pad	LaunchBox		Панель
 Icon size	LaunchBox		Размер значков
 Bummer	LaunchBox		Облом
 Cancel	LaunchBox		Отмена
@@ -27,8 +27,8 @@ Settings	LaunchBox		Настройки
 Failed to launch 'something', error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
 Pad %1	LaunchBox		Панель %1
 Close	LaunchBox		Закрыть
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка:
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка: 
 You can drag an icon here.	LaunchBox		Вы можете перетащить значок сюда.
 Clone	LaunchBox		Дублировать
 launch popup	LaunchBox		launch popup
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель? (Эта панель не сохранится)
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель?\n(Эта панель не сохранится)

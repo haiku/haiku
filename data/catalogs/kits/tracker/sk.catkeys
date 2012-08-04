@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	4051148499
+1	slovak	x-vnd.Haiku-libtracker	2141738748
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -387,7 +387,6 @@ Restoring: 	StatusWindow		Obnovuje sa:
 system	B_SYSTEM_DIRECTORY		systém
 Skip	FSUtils		Preskočiť
 Settings…	MountMenu		Nastavenia…
-Error emptying Trash!	FSUtils		Chyba pri vyprázdňovaní Koša!
 Recent folders	FavoritesMenu		Nedávne priečinky
 Close	ContainerWindow		Zatvoriť
 Preferred for file	OpenWithWindow		Preferovaná pre súbor

@@ -14,7 +14,7 @@ Font	CharacterWindow		Шрифт
 CJK compatibility ideographs Supplement	UnicodeBlocks		Дополнение CJK совместимых иероглифов
 Coptic	UnicodeBlocks		Коптский
 Tai Le	UnicodeBlocks		Тай Лы
-CJK strokes	UnicodeBlocks		Черты Иероглифов Восточной Азии 
+CJK strokes	UnicodeBlocks		Черты Иероглифов Восточной Азии
 Old italic	UnicodeBlocks		Этрусский алфавит
 Clear	CharacterWindow		Очистить
 Font size:	CharacterWindow		Размер шрифта:

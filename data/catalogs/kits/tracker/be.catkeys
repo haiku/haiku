@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	2415801168
+1	belarusian	x-vnd.Haiku-libtracker	506391417
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -395,7 +395,6 @@ Restoring: 	StatusWindow		Аднаўленне:
 system	B_SYSTEM_DIRECTORY		сістэма
 Skip	FSUtils		Прапусціць
 Settings…	MountMenu		Наладкі...
-Error emptying Trash!	FSUtils		Памылка пры ачыстцы Сметніцы!
 Recent folders	FavoritesMenu		Нядаўнія каталогі
 Close	ContainerWindow		Закрыць
 Preferred for file	OpenWithWindow		Пажаданая для файла

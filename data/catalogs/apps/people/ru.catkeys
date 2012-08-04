@@ -27,7 +27,7 @@ Save changes before quitting?	People		Сохранить изменения пе
 Load image…	People		Выбрать рисунок…
 OK	People		ОК
 Remove image	People		Удалить рисунок
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не удалось запустить FileTypes для настройки атрибутов Персоны.\n\nОшибка:
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не удалось запустить FileTypes для настройки атрибутов Персоны.\n\nОшибка: 
 Home phone	People		Домашний телефон
 Save as…	People		Сохранить как…
 Redo	People		Отменить

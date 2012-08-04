@@ -31,7 +31,7 @@ Battery discharging	PowerStatus		Батарея разряжается
 Serial number: 	PowerStatus		Серийный номер: 
 Capacity granularity 1: 	PowerStatus		Детализация ёмкости 1: 
 OK	PowerStatus		ОК
-OEM info: 	PowerStatus		OEM информация: 
+OEM info: 	PowerStatus		Изготовитель: 
 Design voltage: 	PowerStatus		Штатное напряжение: 
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nразработали:\n Axel Dörfler и Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Батарея заряжается

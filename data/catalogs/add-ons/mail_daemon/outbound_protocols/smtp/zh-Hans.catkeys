@@ -1,6 +1,8 @@
-1	english	x-vnd.Haiku-SMTP	1052586247
+1	english	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		SMTP 服务器：
+STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		登陆服务器 %serv 失败
+Unencrypted	ConfigView		未加密
 . The server says:\n	smtp		。服务器回复：\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		连接到服务器...
@@ -10,4 +12,5 @@ Destination:	ConfigView		目标：
 : Connection refused or host not found.	smtp		：连接被拒绝，或者未发现主机。
 None	ConfigView		无
 POP3 before SMTP	ConfigView		POP3 位于 SMTP 之前
+SSL	ConfigView		SSL
 . The server said:\n	smtp		。服务器回复：\n

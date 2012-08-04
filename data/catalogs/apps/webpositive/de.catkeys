@@ -1,0 +1,126 @@
+1	german	x-vnd.Haiku-WebPositive	2598330196
+Username:	Authentication Panel		Benutzername:
+Copy URL to clipboard	Download Window		Adresse in Zwischenablage kopieren
+Cancel	Settings Window		Abbrechen
+Close window	WebPositive Window		Fenster schließen
+Quit	WebPositive		Beenden
+The download could not be opened.	Download Window		Die heruntergeladene Datei kann nicht geöffnet werden.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Der Download-Ordner kann nicht geöffnet werden.\n\nFehler: %error
+Open location	WebPositive Window		Speicherort öffnen
+Clear history	WebPositive Window		Verlauf leeren
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Gestern
+Default standard font size:	Settings Window		Größe der Standard-Schrift:
+Start page:	Settings Window		Startseite:
+History	WebPositive Window		Verlauf
+Error opening downloads folder	Download Window		Fehler beim Öffnen des Download-Ordners
+Paste	WebPositive Window		Einfügen
+Settings	Settings Window		Einstellungen
+%seconds seconds left	Download Window		Noch %seconds Sekunden
+Confirmation	WebPositive Window		Bestätigung
+Window	WebPositive Window		Fenster
+Decrease size	WebPositive Window		Verkleinern
+Serif font:	Settings Window		Serifenschrift:
+Page source	WebPositive Window		Quelltext der Seite
+Next	WebPositive Window		Weiter
+Find next	WebPositive Window		Nächster Treffer
+Download folder:	Settings Window		Download-Ordner:
+Edit	WebPositive Window		Bearbeiten
+Over %hours hours left	Download Window		Noch über %hours Stunden
+Cancel	Authentication Panel		Abbrechen
+Match case	WebPositive Window		Groß-/Kleinschreibung beachten
+Search page:	Settings Window		Suchmachine:
+Zoom text only	WebPositive Window		Nur Text vergrößern
+Default fixed font size:	Settings Window		Größe der Schrift fester Breite:
+Close tab	WebPositive Window		Reiter schließen
+Over 1 hour left	Download Window		Noch über eine Stunde
+Quit	WebPositive Window		Beenden
+Open download error	Download Window		Fehler beim Öffnen
+Standard font:	Settings Window		Standardschrift:
+Restart	Download Window		Neustart
+Proxy server	Settings Window		Proxy-Server
+Open containing folder	Download Window		Speicherort öffnen
+New window	WebPositive Window		Neues Fenster
+Open	Download Window		Öffnen
+Reload	WebPositive Window		Aktualisieren
+Downloads	Download Window		Downloads
+Sans serif font:	Settings Window		Serifenlose Schrift:
+Over %days days left	Download Window		Noch %days Tage
+Forward	WebPositive Window		Vorwärts
+of	Download Window	...as in '12kB of 256kB'	von
+Revert	Settings Window		Anfangswerte
+Fixed font:	Settings Window		Schrift fester Breite:
+Cut	WebPositive Window		Ausschneiden
+Bookmark this page	WebPositive Window		Lesezeichen für diese Seite anlegen
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Der Lesezeichen-Ordner kann nicht angezeigt werden.\n\nFehler: %error
+Open downloads folder	Download Window		Download-Ordner öffnen
+Number of days to keep links in History menu:	Settings Window		Anzahl der Tage im Verlauf-Menü:
+Hide	Download Window		Ausblenden
+Reset size	WebPositive Window		Größe zurücksetzen
+Find:	WebPositive Window		Suchen:
+Increase size	WebPositive Window		Vergrößern
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Auf den Lesezeichen-Ordner kann nicht zugegriffen werden.\n\nFehler: %error
+Over 1 day left	Download Window		Noch über einen Tag
+Downloads	WebPositive Window		Downloads
+Apply	Settings Window		Anwenden
+Bookmark info	WebPositive Window		Lesezeichen Info
+Size:	Font Selection view		Größe:
+About	WebPositive Window		Über
+Finish: 	Download Window	Finishing time	Fertig:
+Fonts	Settings Window		Schriftarten
+Close	WebPositive Window		Schließen
+OK	Download Window		OK
+Page source error	WebPositive Window		Fehler im Quellcode der Seite
+Open blank page	Settings Window		Leere Seite öffnen
+New tabs:	Settings Window		Neue Reiter:
+Cancel	WebPositive Window		Abbrechen
+Open all	WebPositive Window		Alle öffnen
+Clear	URL Bar		Leeren
+Cut	URL Bar		Ausschneiden
+Clear	WebPositive Window		Leeren
+Remove	Download Window		Entfernen
+Find	WebPositive Window		Suchen
+Find previous	WebPositive Window		Vorheriger Treffer
+Settings	WebPositive Window		Einstellungen
+Proxy server address:	Settings Window		Proxy-Serveradresse:
+Proxy server port:	Settings Window		Proxy-Serverport:
+Bookmarks	WebPositive Window		Lesezeichen
+%minutes minutes	Download Window		%minutes Minuten
+Paste	URL Bar		Einfügen
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Passwort verstecken
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.
+Over 1 minute left	Download Window		Noch über 1 Minute
+Open start page	Settings Window		Startseite öffnen
+Continue downloads	WebPositive		Downloads fortsetzen
+Cancel	Download Window		Abbrechen
+Open search page	Settings Window		Suchmaschine öffnen
+Password:	Authentication Panel		Passwort:
+Back	WebPositive Window		Zurück
+New browser window	Download Window		Neues Browser-Fenster
+Today	WebPositive Window		Heute
+1 second left	Download Window		Noch 1 Sekunde
+Remember username and password for this site	Authentication Panel		Benutzername und Passwort für diese Seite speichern
+Earlier	WebPositive Window		Früher
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll WebPositive wirklich beendet werden?
+New tab	WebPositive Window		Neuer Reiter
+Downloads in progress	WebPositive		Download Warnung
+Style:	Font Selection view		Stil:
+General	Settings Window		Allgemein
+View	WebPositive Window		Ansicht
+Previous	WebPositive Window		Zurück
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Das Lesezeichen konnte nicht angelegt werden.\n\nFehler: %error
+Bookmark error	WebPositive Window		Lesezeichen Fehler
+Do you really want to clear the browsing history?	WebPositive Window		Soll der Verlauf wirklich gelöscht werden?
+Copy	WebPositive Window		Kopieren
+Open bookmarks confirmation	WebPositive Window		Lesezeichen öffnen
+Remove missing	Download Window		Fehlende entfernen
+Clone current page	Settings Window		Aktuelle Seite verwenden
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
+OK	Authentication Panel		OK
+Copy	URL Bar		Kopieren
+OK	WebPositive Window		OK
+Manage bookmarks	WebPositive Window		Lesezeichen verwalten
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Es existiert bereits ein Lesezeichen für diese Seite (%bookmarkName).
+New windows:	Settings Window		Neue Fenster:
+Remove finished	Download Window		Fertige entfernen

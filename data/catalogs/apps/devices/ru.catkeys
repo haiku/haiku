@@ -39,8 +39,8 @@ Device class	DeviceSCSI		Класс устройства
 Device name	DeviceACPI		Название устройства
 Driver used	Device		Используемый драйвер
 Other	DeviceSCSI		Другие
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Имя устройства\t\t\t\t: %Name%\nПроизводитель\t\t\t: %Manufacturer%\nИспользуемый драйвер\t\t\t\t: %DriverUsed%\nПути устройства\t: %DevicePaths%
-ACPI Thermal Zone	DeviceACPI		Термодатчик ACPI 
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Имя устройства\t\t\t\t: %Name%\nПроизводитель\t\t\t: %Manufacturer%\nИспользуемый драйвер\t\t\t\t: %DriverUsed%\nПуть к устройству\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		Термодатчик ACPI
 Communications	DeviceSCSI		Устройства связи
 Bus	DevicesView		Шина
 Communication controller	Device		Контроллер связи
@@ -51,7 +51,7 @@ None	Device		Отсутствует
 PCI bus	DevicesView		Шина PCI
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Информация о классе:\t\t\t\t: %classInfo%
 Basic information	DevicesView		Основная информация
-PCI Information	DevicePCI		PCI информация 
+PCI Information	DevicePCI		PCI информация
 Manufacturer:	Device		Производитель:
 ACPI bus	DevicesView		Шина ACPI
 Changer	DeviceSCSI		Changer
@@ -70,7 +70,7 @@ Serial bus controller	Device		Контроллер последовательн�
 Wireless controller	Device		Беспроводной контроллер
 ACPI node '%1'	DeviceACPI		ACPI нода '%1'
 Device name	Device		Название устройства
-Manufacturer	Device		Производитель 
+Manufacturer	Device		Производитель
 Name	PropertyList		Имя
 Manufacturer	DevicePCI		Производитель
 Intelligent controller	Device		Интеллектуальный контроллер
@@ -91,5 +91,5 @@ Unclassified device	Device		Неклассифицированные устро�
 Device name	DeviceSCSI		Имя устройства
 Card Reader	DeviceSCSI		Кардридер
 Class info	DevicePCI		Информация о классе
-Device paths	DevicePCI		Пути устройства
+Device paths	DevicePCI		Путь к устройству
 Devices	DevicesView		Устройства

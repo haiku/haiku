@@ -2,7 +2,7 @@
 P-faults	DataSource		Ошибки страниц
 Media nodes	DataSource		Медиа узлы
 Threads	DataSource		Потоки
-MB	DataSource		Мбайт
+MB	DataSource		МБ
 Add graph	ActivityWindow		Добавить график
 Teams	DataSource		Процессы
 Hide legend	ActivityView		Скрыть легенду

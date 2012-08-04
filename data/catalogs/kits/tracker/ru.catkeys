@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	3778030996
+1	russian	x-vnd.Haiku-libtracker	1868621245
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -134,7 +134,7 @@ Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils	
 Add-ons	ContainerWindow		Дополнения
 Edit templates…	TemplatesMenu		Изменить шаблоны…
 Finish: %time - Over %finishtime left	StatusWindow		Окончание: %time - Осталось более %finishtime
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Объект с именем \"%name\" уже существует в этой папке. Заменить его ссылкой, которую вы создаёте?"
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Объект с именем \"%name\" уже существует в этой папке. Заменить его ссылкой, которую вы создаёте?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Извините, но на принимающем разделе недостаточно свободного места для копирования выделенных файлов.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (%error). 
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Извините, сохранение более одного файла недопустимо.
@@ -364,7 +364,7 @@ Favorites	FilePanelPriv		Закладки
 Name	QueryPoseView		Имя
 Delete	FSUtils		Удалить
 Modified	FindPanel		Изменён
-Error moving \"%name\" to Trash. (%error)	FSUtils		Ошибка при перемещении \"%name\" в корзину.
+Error moving \"%name\" to Trash. (%error)	FSUtils		Ошибка при перемещении \"%name\" в корзину. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Невозможно заменить папку её же собственной подпапкой.
 <No recent items>	FavoritesMenu		<Нет недавних объектов>
 Preferences…	ContainerWindow		Настройки…
@@ -388,7 +388,6 @@ Restoring: 	StatusWindow		Восстановление:
 system	B_SYSTEM_DIRECTORY		Система
 Skip	FSUtils		Пропустить
 Settings…	MountMenu		Настройки…
-Error emptying Trash!	FSUtils		Ошибка при очищении корзины!
 Recent folders	FavoritesMenu		Недавние папки
 Close	ContainerWindow		Закрыть
 Preferred for file	OpenWithWindow		Предпочтительно для файлов

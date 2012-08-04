@@ -1,18 +1,21 @@
-1	english	x-vnd.Haiku-MediaPlayer	1836607731
+1	english	x-vnd.Haiku-MediaPlayer	641020488
 raw audio	MediaPlayer-InfoWin		原生音频
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
+%d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		流设置
 <unknown>	PlaylistItem-album		<未知>
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		全屏模式比例控制
 Video	MediaPlayer-InfoWin		视频
 Subtitle size:	MediaPlayer-SettingsWindow		字幕大小：
 Save Playlist	MediaPlayer-PlaylistWindow		保存播放列表
+(not supported)	MediaPlayer-InfoWin		(不支持)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		所要播放的文件都不是媒体文件。
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		播放列表保存失败。\n\n 错误：
 New player…	MediaPlayer-Main		新建播放器...
 100% scale	MediaPlayer-Main		100％
 Subtitle placement:	MediaPlayer-SettingsWindow		字幕布局：
 Close	MediaPlayer-Main		关闭
+Display Mode	MediaPlayer-InfoWin		显示模式
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		有些文件无法被移动到垃圾箱。
 <unknown>	MediaPlayer-InfoWin		<未知>
 Open	MediaPlayer-Main		打开
@@ -22,12 +25,14 @@ Track %d	MediaPlayer-Main		轨道 %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1（宽屏）
 Medium	MediaPlayer-SettingsWindow		中等
 Close	MediaPlayer-PlaylistWindow		关闭
+Stereo	MediaPlayer-InfoWin		立体声
 Open…	MediaPlayer-PlaylistWindow		打开...
 Toggle mute.	MediaPlayer-Main		切换静音。
 Undo	MediaPlayer-PlaylistWindow		撤销
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		启用硬件视频覆盖，如果其可用。
 File info…	MediaPlayer-Main		文件信息...
 Pause playback.	MediaPlayer-Main		暂停播放。
+Overlay	MediaPlayer-InfoWin		覆盖
 Remove Entry	MediaPlayer-RemovePLItemsCmd		删除条目
 Close window after playing audio	MediaPlayer-SettingsWindow		音频播放结束后关闭窗口
 Full volume	MediaPlayer-SettingsWindow		最大音量
@@ -113,6 +118,7 @@ Move file to Trash	MediaPlayer-PlaylistWindow		移动文件到垃圾箱
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		静音
 Toggle pause/play.	MediaPlayer-Main		暂停/播放。
+min	MediaPlayer-InfoWin	Minutes	分
 Small	MediaPlayer-SettingsWindow		小
 Randomize	MediaPlayer-PlaylistWindow		随机
 Off	Subtitles menu		关
@@ -120,6 +126,7 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		随机条目
 Revert	MediaPlayer-SettingsWindow		恢复
 Edit	MediaPlayer-PlaylistWindow		编辑
 Start media server	MediaPlayer-Main		启动媒体服务器
+Toggle fullscreen.	MediaPlayer-Main		全平切换。
 <unnamed>	PlaylistItem-name		<未命名>
 Open Clips	MediaPlayer-Main		打开片段
 OK	MediaPlayer-PlaylistWindow		确定
@@ -134,6 +141,7 @@ Always on top	MediaPlayer-Main		置顶
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		删除条目到垃圾箱
 Save	MediaPlayer-Main		保存
 <nothing to undo>	MediaPlayer-PlaylistWindow		<无撤销内容>
+Mono	MediaPlayer-InfoWin		单声道
 Save	MediaPlayer-PlaylistWindow		保存
 Remove	MediaPlayer-PlaylistWindow		移除
 Full screen	MediaPlayer-Main		全屏

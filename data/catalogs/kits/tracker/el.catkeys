@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2160148895
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	250739144
 common	B_COMMON_DIRECTORY		κοινό
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
@@ -378,7 +378,6 @@ Restoring: 	StatusWindow		Αποκατάσταση:
 system	B_SYSTEM_DIRECTORY		σύστημα
 Skip	FSUtils		Παράλειψη
 Settings…	MountMenu		Ρυθμίσεις...
-Error emptying Trash!	FSUtils		Σφάλμα κατά το άδειασμα του Κάδου!
 Recent folders	FavoritesMenu		Πρόσφατοι φάκελοι
 Close	ContainerWindow		Κλείσιμο
 Preferred for file	OpenWithWindow		Προτινόμενο για το αρχείο

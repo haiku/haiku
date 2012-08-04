@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3778030996
+1	lithuanian	x-vnd.Haiku-libtracker	1868621245
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -388,7 +388,6 @@ Restoring: 	StatusWindow		Atkuriama:
 system	B_SYSTEM_DIRECTORY		Sistema
 Skip	FSUtils		Praleisti
 Settings…	MountMenu		Nuostatos…
-Error emptying Trash!	FSUtils		Klaida tuštinant Šiukšlinę!
 Recent folders	FavoritesMenu		Paskiausi aplankai
 Close	ContainerWindow		Užverti
 Preferred for file	OpenWithWindow		Numatytoji failui

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1975309530
+1	romanian	x-vnd.Haiku-libtracker	65899779
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vizualizare pictogramă
 Add-ons	FilePanelPriv		Module
@@ -317,7 +317,6 @@ Restore	ContainerWindow		Restaurează
 Restoring: 	StatusWindow		Se restaurează:
 Skip	FSUtils		Omite
 Settings…	MountMenu		Configurări...
-Error emptying Trash!	FSUtils		Eroare la eliberarea gunoiului!
 Recent folders	FavoritesMenu		Dosare recente
 Close	ContainerWindow		Închide
 Preferred for file	OpenWithWindow		Preferat pentru fișier

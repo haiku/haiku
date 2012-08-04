@@ -1,0 +1,99 @@
+1	russian	x-vnd.Haiku-WebPositive	3193305619
+Username:	Authentication Panel		Имя пользователя:
+Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
+Cancel	Settings Window		Отмена
+Close window	WebPositive Window		Закрыть окно
+Quit	WebPositive		Выход
+The download could not be opened.	Download Window		Невозможно открыть загруженный файл.
+Clear history	WebPositive Window		Очистить историю
+Yesterday	WebPositive Window		Вчера
+Default standard font size:	Settings Window		Размер стандартного шрифта по умолчанию:
+Start page:	Settings Window		Начальная страница:
+History	WebPositive Window		История
+Error opening downloads folder	Download Window		Ошибка открытия каталога загрузок
+Paste	WebPositive Window		Вставить
+Settings	Settings Window		Настройки
+%seconds seconds left	Download Window		осталось %seconds секунд
+Confirmation	WebPositive Window		Подтверждение
+Window	WebPositive Window		Окно
+Decrease size	WebPositive Window		Уменьшить размер
+Serif font:	Settings Window		Шрифт с засечками:
+Page source	WebPositive Window		Код страницы
+Next	WebPositive Window		Вперед
+Find next	WebPositive Window		Найти далее
+Download folder:	Settings Window		Папка для загрузок:
+Edit	WebPositive Window		Изменить
+Over %hours hours left	Download Window		Осталось более %hours часов
+Cancel	Authentication Panel		Отмена
+Match case	WebPositive Window		Учитывать регистр
+Search page:	Settings Window		Страница поиска:
+Zoom text only	WebPositive Window		Масштабировать только текст
+Default fixed font size:	Settings Window		Размер моноширинного шрифта:
+Close tab	WebPositive Window		Закрыть вкладку
+Over 1 hour left	Download Window		Осталось боле одного часа
+Quit	WebPositive Window		Выход
+Open download error	Download Window		Ошибка при открытии загруженного файла
+Standard font:	Settings Window		Обычный шрифт:
+Restart	Download Window		Перезапустить
+Proxy server	Settings Window		Прокси-сервер
+Open containing folder	Download Window		Открыть папку с файлом
+New window	WebPositive Window		Новое окно
+Open	Download Window		Открыть
+Reload	WebPositive Window		Обновить
+Downloads	Download Window		Загрузки
+Sans serif font:	Settings Window		Шрифт без засечек:
+Over %days days left	Download Window		Осталось более %days дней
+Forward	WebPositive Window		Вперёд
+of	Download Window	...as in '12kB of 256kB'	из
+Revert	Settings Window		Вернуть
+Fixed font:	Settings Window		Моноширинный шрифт:
+Cut	WebPositive Window		Вырезать
+Bookmark this page	WebPositive Window		Добавить в закладки
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Произошла ошибка при открытии папки с закладками.\n\nОшибка: %error
+Open downloads folder	Download Window		Открыть папку загрузок
+Number of days to keep links in History menu:	Settings Window		Количество дней, которые надо держать ссылки в меню История:
+Hide	Download Window		Скрыть
+Reset size	WebPositive Window		Сбросить размер
+Find:	WebPositive Window		Найти:
+Increase size	WebPositive Window		Увеличить размер
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Произошла ошибка при открытии папки с закладками.\n\nОшибка: %error
+Over 1 day left	Download Window		Осталось более 1 дня
+Downloads	WebPositive Window		Загрузки
+Apply	Settings Window		Применить
+Bookmark info	WebPositive Window		Информация о закладке
+Size:	Font Selection view		Размер:
+About	WebPositive Window		О программе
+Finish: 	Download Window	Finishing time	Завершиться в: 
+Fonts	Settings Window		Шрифты
+Close	WebPositive Window		Закрыть
+OK	Download Window		OK
+Page source error	WebPositive Window		Ошибка в исходном коде страницы
+Open blank page	Settings Window		Открыть пустую страницу
+New tabs:	Settings Window		Новые вкладки:
+Cancel	WebPositive Window		Отмена
+Open all	WebPositive Window		Открыть все
+Clear	URL Bar		Очистить
+Cut	URL Bar		Вырезать
+Clear	WebPositive Window		Очистить
+Remove	Download Window		Удалить
+Find	WebPositive Window		Найти
+Find previous	WebPositive Window		Найти ранее
+Settings	WebPositive Window		Настройки
+Proxy server address:	Settings Window		Адрес прокси-сервера:
+Proxy server port:	Settings Window		Порт прокси-сервера:
+Bookmarks	WebPositive Window		Закладки
+%minutes minutes	Download Window		%minutes минут
+Paste	URL Bar		Вставить
+/s)	Download Window	...as in 'per second'	/с)
+Hide password text	Authentication Panel		Скрыть текст пароля
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
+Over 1 minute left	Download Window		Осталось более 1 минуты
+Open start page	Settings Window		Открыть стартовую страницу
+Continue downloads	WebPositive		Продолжить загрузку
+Cancel	Download Window		Отмена
+Password:	Authentication Panel		Пароль:
+Today	WebPositive Window		Сегодня
+1 second left	Download Window		осталась 1 секунда
+Remember username and password for this site	Authentication Panel		Запомнить имя пользователя и пароль для этого сайта
+Earlier	WebPositive Window		Ранее
+General	Settings Window		Общие

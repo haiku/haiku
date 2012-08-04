@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	3203928783
+1	dutch; flemish	x-vnd.Haiku-libtracker	1294519032
 common	B_COMMON_DIRECTORY		algemeen
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
@@ -384,7 +384,6 @@ Restoring: 	StatusWindow		Herstelt:
 system	B_SYSTEM_DIRECTORY		system
 Skip	FSUtils		Overslaan
 Settings…	MountMenu		Instellingen...
-Error emptying Trash!	FSUtils		Fout bij het leegmaken van de prullenbak!
 Recent folders	FavoritesMenu		Recente mappen
 Close	ContainerWindow		Sluiten
 Preferred for file	OpenWithWindow		Bevoorkeurd voor bestand

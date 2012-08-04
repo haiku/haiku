@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2244772743
+1	ukrainian	x-vnd.Haiku-libtracker	335362992
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
@@ -383,7 +383,6 @@ Restoring: 	StatusWindow		Відновлення:
 system	B_SYSTEM_DIRECTORY		system
 Skip	FSUtils		Пропустити
 Settings…	MountMenu		Налаштування…
-Error emptying Trash!	FSUtils		Помилка при очистці Кошика!
 Recent folders	FavoritesMenu		Недавні папки
 Close	ContainerWindow		Закрити
 Preferred for file	OpenWithWindow		Бажаний  для файлу

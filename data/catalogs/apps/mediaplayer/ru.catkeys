@@ -18,7 +18,7 @@ New player…	MediaPlayer-Main		Новый плеер…
 100% scale	MediaPlayer-Main		Масштаб 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Расположение субтитров:
 Close	MediaPlayer-Main		Закрыть
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Некоторые файлы не могут быть перемещены в Корзину
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Некоторые файлы не могут быть перемещены в Корзину.
 <unknown>	MediaPlayer-InfoWin		<неизвестно>
 Open	MediaPlayer-Main		Открыть
 Next	MediaPlayer-Main		Следующий
@@ -93,7 +93,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Все ф
 <untitled>	PlaylistItem-title		<безымянный>
 Track	Audio Track Menu		Дорожка
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нечего возвращать>
-Skip to the next track.	MediaPlayer-Main		Прыгнуть к следующему треку
+Skip to the next track.	MediaPlayer-Main		Перейти к следующему треку.
 Play	MediaPlayer-Main		Играть
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Удалить записи в корзину
 200% scale	MediaPlayer-Main		Масштаб 200%
