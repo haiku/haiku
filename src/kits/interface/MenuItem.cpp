@@ -410,7 +410,7 @@ BMenuItem::DrawContent()
 	}
 
 	// truncate if needed
-	if (frameWidth > labelWidth)
+	if (frameWidth >= labelWidth)
 		fSuper->DrawString(fLabel);
 	else {
 		char *truncatedLabel = new char[strlen(fLabel) + 4];
