@@ -31,6 +31,8 @@
 #include <BufferConsumer.h>
 #include "SoundUtils.h"
 
+namespace BPrivate {
+
 
 class SoundConsumer : public BBufferConsumer {
 public:
@@ -143,5 +145,7 @@ private:
 };
 
 
-#endif	// SOUND_CONSUMER_H
+}
 
+
+#endif	// SOUND_CONSUMER_H
