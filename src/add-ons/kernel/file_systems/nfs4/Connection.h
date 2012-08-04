@@ -26,6 +26,14 @@ struct ServerAddress {
 
 								ServerAddress();
 
+			const char*			ProtocolString() const;
+			char*				UniversalAddress() const;
+
+			socklen_t			AddressSize() const;
+
+			uint16				Port() const;
+			const void*			InAddr() const;
+
 	static	status_t			ResolveName(const char* name,
 									ServerAddress* address);
 };

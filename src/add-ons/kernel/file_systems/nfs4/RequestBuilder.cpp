@@ -636,10 +636,16 @@ RequestBuilder::SetClientID(const RPC::Server* server)
 	if (result != B_OK)
 		return result;
 
-	// Callbacks are currently not supported
-	fRequest->Stream().AddUInt(0);
-	fRequest->Stream().AddOpaque(NULL, 0);
-	fRequest->Stream().AddOpaque(NULL, 0);
+	fRequest->Stream().AddUInt(0x40000000);
+
+	ServerAddress local = server->LocalID();
+	fRequest->Stream().AddString(local.ProtocolString());
+	char* uAddr = local.UniversalAddress();
+	if (uAddr == NULL)
+		return B_NO_MEMORY;
+	fRequest->Stream().AddString(uAddr);
+	free(uAddr);
+
 	fRequest->Stream().AddUInt(0);
 
 	fOpCount++;

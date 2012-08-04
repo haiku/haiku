@@ -57,6 +57,93 @@ ServerAddress::ServerAddress()
 }
 
 
+const char*
+ServerAddress::ProtocolString() const
+{
+	static const char* tcpName = "tcp";
+	static const char* udpName = "udp";
+	static const char* unknown = "";
+
+	switch (fProtocol) {
+		case IPPROTO_TCP:
+			return tcpName;
+		case IPPROTO_UDP:
+			return udpName;
+		default:
+			return unknown;
+	}
+}
+
+
+char*
+ServerAddress::UniversalAddress() const
+{
+	const sockaddr* address = reinterpret_cast<const sockaddr*>(&fAddress);
+
+	char* uAddr = reinterpret_cast<char*>(malloc(INET6_ADDRSTRLEN + 16));
+	if (uAddr == NULL)
+		return NULL;
+
+	if (inet_ntop(address->sa_family, InAddr(), uAddr, AddressSize()) == NULL)
+		return NULL;
+
+	char port[16];
+	sprintf(port, ".%d.%d", Port() >> 8, Port() & 0xff);
+	strcat(uAddr, port);
+
+	return uAddr;
+}
+
+
+socklen_t
+ServerAddress::AddressSize() const
+{
+	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
+		case AF_INET:
+			return sizeof(sockaddr_in);
+		case AF_INET6:
+			return sizeof(sockaddr_in6);
+		default:
+			return 0;
+	}
+}
+
+
+uint16
+ServerAddress::Port() const
+{
+	uint16 port;
+
+	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
+		case AF_INET:
+			port = reinterpret_cast<const sockaddr_in*>(&fAddress)->sin_port;
+			break;
+		case AF_INET6:
+			port = reinterpret_cast<const sockaddr_in6*>(&fAddress)->sin6_port;
+			break;
+		default:
+			port = 0;
+	}
+
+	return ntohs(port);
+}
+
+
+const void*
+ServerAddress::InAddr() const
+{
+	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
+		case AF_INET:
+			return &reinterpret_cast<const sockaddr_in*>(&fAddress)->sin_addr;
+		case AF_INET6:
+			return &reinterpret_cast<const sockaddr_in6*>(&fAddress)->sin6_addr;
+		default:
+			return NULL;
+	}
+}
+
+
+
 status_t
 ServerAddress::ResolveName(const char* name, ServerAddress* address)
 {
@@ -143,18 +230,7 @@ Connection::GetLocalAddress(ServerAddress* address)
 {
 	address->fProtocol = fServerAddress.fProtocol;
 
-	socklen_t addressSize;
-	switch (reinterpret_cast<const sockaddr*>(&fServerAddress)->sa_family) {
-		case AF_INET:
-			addressSize = sizeof(sockaddr_in);
-			break;
-		case AF_INET6:
-			addressSize = sizeof(sockaddr_in6);
-			break;
-		default:
-			return B_BAD_VALUE;
-	}
-
+	socklen_t addressSize = fServerAddress.AddressSize();
 	return getsockname(fSocket,
 		(struct sockaddr*)&address->fAddress, &addressSize);
 }
