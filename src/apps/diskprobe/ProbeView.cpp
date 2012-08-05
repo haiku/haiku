@@ -1105,10 +1105,12 @@ EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize,
 		if (system_time() > startTime + 8000000LL) {
 			// If the user had to wait more than 8 seconds for the result,
 			// we are trying to please him with a requester...
-			(new BAlert(B_TRANSLATE("DiskProbe request"),
+			BAlert* alert = new BAlert(B_TRANSLATE("DiskProbe request"),
 				B_TRANSLATE("Could not find search string."), 
 				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, 
-				B_WARNING_ALERT))->Go(NULL);
+				B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go(NULL);
 		} else
 			beep();
 	}
@@ -1867,9 +1869,11 @@ ProbeView::_Save()
 		"All changes will be lost when you quit."),
 		strerror(status));
 
-	(new BAlert(B_TRANSLATE("DiskProbe request"),
+	BAlert* alert = new BAlert(B_TRANSLATE("DiskProbe request"),
 		buffer, B_TRANSLATE("OK"), NULL, NULL,
-		B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
+		B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go(NULL);
 
 	return status;
 }
@@ -1883,9 +1887,12 @@ ProbeView::QuitRequested()
 	if (!fEditor.IsModified())
 		return true;
 
-	int32 chosen = (new BAlert(B_TRANSLATE("DiskProbe request"),
-		B_TRANSLATE("Save changes before closing?"), B_TRANSLATE("Don't save"), B_TRANSLATE("Cancel"), 
-		B_TRANSLATE("Save"),	B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+	BAlert* alert = new BAlert(B_TRANSLATE("DiskProbe request"),
+		B_TRANSLATE("Save changes before closing?"), B_TRANSLATE("Don't save"),
+		B_TRANSLATE("Cancel"), B_TRANSLATE("Save"), B_WIDTH_AS_USUAL,
+		B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
+	int32 chosen = alert->Go();
 
 	if (chosen == 0)
 		return true;

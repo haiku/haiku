@@ -381,9 +381,11 @@ MidiPlayerWindow::LoadFile(entry_ref* ref)
 		scopeView->SetPlaying(false);
 		scopeView->Invalidate();
 
-		(new BAlert(NULL, B_TRANSLATE("Could not load song"),
+		BAlert* alert = new BAlert(NULL, B_TRANSLATE("Could not load song"),
 			B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 }
 

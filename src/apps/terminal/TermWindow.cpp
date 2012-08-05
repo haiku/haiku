@@ -711,7 +711,7 @@ TermWindow::MessageReceived(BMessage *message)
 				BAlert* alert = new BAlert(B_TRANSLATE("Find failed"),
 					errorMsg, B_TRANSLATE("OK"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				alert->SetShortcut(0, B_ESCAPE);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 
 				alert->Go();
 				fFindPreviousMenuItem->SetEnabled(false);
@@ -729,7 +729,7 @@ TermWindow::MessageReceived(BMessage *message)
 					B_TRANSLATE("Text not found."),
 					B_TRANSLATE("OK"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				alert->SetShortcut(0, B_ESCAPE);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 				fFindPreviousMenuItem->SetEnabled(false);
 				fFindNextMenuItem->SetEnabled(false);
@@ -751,7 +751,7 @@ TermWindow::MessageReceived(BMessage *message)
 				BAlert* alert = new BAlert(B_TRANSLATE("Find failed"),
 					B_TRANSLATE("Not found."), B_TRANSLATE("OK"),
 					NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				alert->SetShortcut(0, B_ESCAPE);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 			}
 			break;

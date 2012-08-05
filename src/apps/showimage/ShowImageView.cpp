@@ -953,6 +953,7 @@ ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("The file '%s' could not "
 			"be written."), name);
 		BAlert* palert = new BAlert("", buffer, B_TRANSLATE("OK"));
+		palert->SetFlags(palert->Flags() | B_CLOSE_ON_ESCAPE);
 		palert->Go();
 	}
 

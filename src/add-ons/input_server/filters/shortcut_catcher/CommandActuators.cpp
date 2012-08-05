@@ -195,8 +195,11 @@ LaunchCommandActuator::KeyEventAsync(const BMessage* keyMsg,
 			str << " Please check your Shortcuts settings.";
 		}
 
-		if (fArgc < 1 || err != B_NO_ERROR)
-			(new BAlert(str1.String(), str.String(), "OK"))->Go(NULL);
+		if (fArgc < 1 || err != B_NO_ERROR) {
+			BAlert* alert = new BAlert(str1.String(), str.String(), "OK");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go(NULL);
+		}
 	}
 }
 
@@ -1015,7 +1018,9 @@ MIMEHandlerCommandActuator::KeyEventAsync(const BMessage* keyMsg,
 			str << "Can't launch handler for ";
 			str << ", no such MIME type exists. Please check your Shortcuts";
 			str << " settings.";
-			(new BAlert(str1.String(), str.String(), "OK"))->Go(NULL);
+			BAlert* alert = new BAlert(str1.String(), str.String(), "OK");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go(NULL);
 		}
 	}
 }
@@ -1693,7 +1698,9 @@ SendMessageCommandActuator::KeyEventAsync(const BMessage* keyMsg,
 		BString str1("Shortcuts SendMessage error");
 		if (fSignature.Length() == 0) {
 			str << "SendMessage: Target application signature not specified";
-			(new BAlert(str1.String(), str.String(), "OK"))->Go(NULL);
+			BAlert* alert = new BAlert(str1.String(), str.String(), "OK");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go(NULL);
 		} else {
 			status_t error = B_OK;
 			BMessenger msngr(fSignature.String(), -1, &error);

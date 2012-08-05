@@ -35,6 +35,7 @@ KeyboardApplication::MessageReceived(BMessage* message)
 				B_TRANSLATE("Something has gone wrong!"),
 				B_TRANSLATE("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
+			errorAlert->SetFlags(errorAlert->Flags() | B_CLOSE_ON_ESCAPE);
 			errorAlert->Go();
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			break;
@@ -49,8 +50,10 @@ KeyboardApplication::MessageReceived(BMessage* message)
 void
 KeyboardApplication::AboutRequested()
 {
-	(new BAlert("about", B_TRANSLATE("Written by Andrew Edward McCall"),
-		B_TRANSLATE("OK")))->Go();
+	BAlert* alert = new BAlert("about",
+		B_TRANSLATE("Written by Andrew Edward McCall"),	B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
 }
 
 

@@ -82,6 +82,7 @@ InstallerApp::AboutRequested()
 	BAlert *alert = new BAlert("about", B_TRANSLATE("Installer\n"
 		"\twritten by Jérôme Duval and Stephan Aßmus\n"
 		"\tCopyright 2005-2010, Haiku.\n\n"), B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	BTextView *view = alert->TextView();
 	BFont font;
 

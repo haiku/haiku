@@ -412,6 +412,7 @@ DownloadProgressView::MessageReceived(BMessage* message)
 				BAlert* alert = new BAlert(B_TRANSLATE("Open download error"),
 					B_TRANSLATE("The download could not be opened."),
 					B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
 			}
 			break;

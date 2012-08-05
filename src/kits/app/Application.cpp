@@ -649,6 +649,7 @@ BApplication::AboutRequested()
 	thread_info info;
 	if (get_thread_info(Thread(), &info) == B_OK) {
 		BAlert *alert = new BAlert("_about_", info.name, "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 	}
 }

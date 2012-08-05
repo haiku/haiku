@@ -278,14 +278,18 @@ AttributeWindow::MessageReceived(BMessage *message)
 		case kMsgRemoveAttribute:
 		{
 			char buffer[1024];
+
 			snprintf(buffer, sizeof(buffer),
 				B_TRANSLATE("Do you really want to remove the attribute \"%s\" from "
 				"the file \"%s\"?\n\nYou cannot undo this action."),
 				fAttribute, Ref().name);
 
-			int32 chosen = (new BAlert(B_TRANSLATE("DiskProbe request"),
+			BAlert* alert = new BAlert(B_TRANSLATE("DiskProbe request"),
 				buffer, B_TRANSLATE("Cancel"), B_TRANSLATE("Remove"), NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			int32 chosen = alert->Go();
+
 			if (chosen == 1) {
 				BNode node(&Ref());
 				if (node.InitCheck() == B_OK)

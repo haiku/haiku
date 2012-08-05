@@ -564,6 +564,7 @@ PictureView::_HandleDrop(BMessage* msg)
 			text.ReplaceFirst("%name%", name);
 			BAlert* alert = new BAlert(B_TRANSLATE("Error"), text.String(),
 				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}

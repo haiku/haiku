@@ -1661,7 +1661,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView* textView)
 			B_TRANSLATE("Sorry, you cannot edit that attribute."),
 			B_TRANSLATE("Cancel"),
 			0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return false;
 	}
@@ -1698,7 +1698,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView* textView)
 					"attribute cannot store a multi-byte glyph."),
 					B_TRANSLATE("Cancel"),
 					0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-				alert->SetShortcut(0, B_ESCAPE);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 				return false;
 			}
@@ -1806,7 +1806,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView* textView)
 			B_TRANSLATE("There was an error writing the attribute."),
 			B_TRANSLATE("Cancel"),
 			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 
 		fValueIsDefined = false;

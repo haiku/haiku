@@ -309,6 +309,7 @@ ConfigWindow::AboutRequested()
 
 	BAlert *about = new BAlert("About printer server", text.String(),
 		B_TRANSLATE("OK"));
+	about->SetFlags(about->Flags() | B_CLOSE_ON_ESCAPE);
 	about->Go();
 }
 

@@ -679,12 +679,14 @@ FileTypesWindow::MessageReceived(BMessage* message)
 					"group, hold down the Shift key and press \"Remove\"."),
 					B_TRANSLATE("Remove"), B_SHIFT_KEY, B_TRANSLATE("Cancel"),
 					0, NULL, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+				alert->SetShortcut(1, B_ESCAPE);
 			} else {
 				alert = new BAlert(B_TRANSLATE("FileTypes request"),
 					B_TRANSLATE("Removing a file type cannot be reverted.\n"
 					"Are you sure you want to remove it?"),
 					B_TRANSLATE("Remove"), B_TRANSLATE("Cancel"),
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->SetShortcut(1, B_ESCAPE);
 			}
 			if (alert->Go())
 				break;

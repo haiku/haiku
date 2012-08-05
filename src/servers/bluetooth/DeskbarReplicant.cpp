@@ -242,6 +242,7 @@ DeskbarReplicant::_ShowErrorAlert(BString msg, status_t status)
 {
 	msg << "\n\nError: " << strerror(status);
 	BAlert* alert = new BAlert("Bluetooth error", msg.String(), "OK");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go(NULL);
 }
 

@@ -436,7 +436,8 @@ MediaWindow::InitMedia(bool first)
 			B_TRANSLATE("Quit"),
 			B_TRANSLATE("Start media server"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (alert->Go()==0)
+		alert->SetShortcut(0, B_ESCAPE);
+		if (alert->Go() == 0)
 			return B_ERROR;
 
 		fAlert = new MediaAlert(BRect(0, 0, 300, 60),
@@ -565,6 +566,7 @@ ErrorAlert(char* errorMessage) {
 	printf("%s\n", errorMessage);
 	BAlert* alert = new BAlert("BAlert", errorMessage, B_TRANSLATE("OK"),
 		NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 	exit(1);
 }

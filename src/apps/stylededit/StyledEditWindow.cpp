@@ -1640,7 +1640,8 @@ StyledEditWindow::_ShowStatistics()
 
 	BAlert* alert = new BAlert("Statistics", result, B_TRANSLATE("OK"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
-
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	
 	return alert->Go();
 }
 

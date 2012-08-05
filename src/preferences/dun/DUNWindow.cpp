@@ -357,7 +357,7 @@ void DUNWindow::MessageReceived (BMessage *message)
    	    	connectbutton->SetEnabled(false);
    	    	//debug
 			BAlert *errormsg = new BAlert("errormsg", "The hidden wispy bush\nOver the green flower\nThe sea and connection have stopped.", "   Haiku Error ;)   " , NULL, NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
-		    errormsg->SetShortcut(0, B_ESCAPE);
+		    errormsg->SetFlags(errormsg->Flags() | B_CLOSE_ON_ESCAPE);
     		errormsg->Go();
 		}	
 			break;
@@ -367,7 +367,7 @@ void DUNWindow::MessageReceived (BMessage *message)
    	    	disconnectbutton->SetEnabled(false);
    	    	connectbutton->SetEnabled(true);
    	    	BAlert *errormsg = new BAlert("errormsg", "A late long rain\nOver an icy meadow\nBroken connection and dreams.", "   Haiku Error ;)   ", NULL , NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);   	   		
-   	    	errormsg->SetShortcut(0, B_ESCAPE);
+   	    	errormsg->SetFlags(errormsg->Flags() | B_CLOSE_ON_ESCAPE);
    	    	errormsg->Go();
 	   	}    
 	   		break;
@@ -376,7 +376,7 @@ void DUNWindow::MessageReceived (BMessage *message)
 	   	{
 	   		// debug
 			BAlert *errormsg = new BAlert("errormsg", "Hark! Something is wrong.\nFor this is not what I asked.\n\nMy life is somewhat ... Incomplete.\n", "   Haiku Error ;)   " , NULL, NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
-		    errormsg->SetShortcut(0, B_ESCAPE);
+		    errormsg->SetFlags(errormsg->Flags() | B_CLOSE_ON_ESCAPE);
     		errormsg->Go();
 	   	}
 	   		break;
@@ -385,7 +385,7 @@ void DUNWindow::MessageReceived (BMessage *message)
 	   	{
    			// debug
 			BAlert *errormsg = new BAlert("errormsg", "Lost Clouds.\nDisappear behind the mountains.\n\nFor an eternity must I wait ?\n", "   Haiku Error ;)   " , NULL, NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
-		    errormsg->SetShortcut(0, B_ESCAPE);
+		    errormsg->SetFlags(errormsg->Flags() | B_CLOSE_ON_ESCAPE);
     		errormsg->Go();
 	   	}
 	   		break;

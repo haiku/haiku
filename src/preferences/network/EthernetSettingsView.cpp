@@ -589,12 +589,16 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 	status_t status = interface.AutoConfigure(AF_INET);
 
 	if (status == B_BAD_PORT_ID) {
-		(new BAlert("error", B_TRANSLATE("The net_server needs to run for "
-			"the auto configuration!"), B_TRANSLATE("OK")))->Go();
+		BAlert* alert = new BAlert("error", B_TRANSLATE("The net_server needs to run for "
+			"the auto configuration!"), B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	} else if (status != B_OK) {
 		BString errorMessage(B_TRANSLATE("Auto-configuring failed: "));
 		errorMessage << strerror(status);
-		(new BAlert("error", errorMessage.String(), "OK"))->Go();
+		BAlert* alert = new BAlert("error", errorMessage.String(), "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 
 	return status;

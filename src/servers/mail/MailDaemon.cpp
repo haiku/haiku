@@ -306,6 +306,7 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 				BAlert* alert = new BAlert(B_TRANSLATE("New Messages"),
 					fAlertString.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL);
 				alert->SetFeel(B_NORMAL_WINDOW_FEEL);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
 				fAlertString = B_EMPTY_STRING;
 			}

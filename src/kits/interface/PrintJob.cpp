@@ -103,6 +103,7 @@ static void
 ShowError(const char* message)
 {
 	BAlert* alert = new BAlert(B_TRANSLATE("Error"), message, B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -748,6 +749,7 @@ PrintServerMessenger::RejectUserInput()
 	fHiddenApplicationModalWindow = new BAlert("bogus", "app_modal", "OK");
 	fHiddenApplicationModalWindow->DefaultButton()->SetEnabled(false);
 	fHiddenApplicationModalWindow->SetDefaultButton(NULL);
+	fHiddenApplicationModalWindow->SetFlags(fHiddenApplicationModalWindow->Flags() | B_CLOSE_ON_ESCAPE);
 	fHiddenApplicationModalWindow->MoveTo(-65000, -65000);
 	fHiddenApplicationModalWindow->Go(NULL);
 }

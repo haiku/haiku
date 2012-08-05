@@ -361,7 +361,7 @@ TOnscreenView::MessageReceived(BMessage *msg)
 				"Clock (The Replicant version)\n\n(C)2002, 2003 OpenBeOS,\n"
 				"2004 - 2007, Haiku, Inc.\n\nOriginally coded  by the folks "
 				"at Be.\n  Copyright Be Inc., 1991 - 1998", "OK");
-			
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}	break;
 

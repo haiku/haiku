@@ -237,12 +237,14 @@ SettingsWindow::SettingsWindow()
 	status_t result = fSettings.SwapVolume().InitCheck();
 
 	if (result != B_OK) {
-		int32 choice = (new BAlert("VirtualMemory", B_TRANSLATE(
+		BAlert* alert = new BAlert("VirtualMemory", B_TRANSLATE(
 			"The swap volume specified in the settings file is invalid.\n"
 			"You can keep the current setting or switch to the "
 			"default swap volume."),
 			B_TRANSLATE("Keep"), B_TRANSLATE("Switch"), NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		int32 choice = alert->Go();
 		if (choice == 1) {
 			BVolumeRoster volumeRoster;
 			BVolume bootVolume;
@@ -293,7 +295,7 @@ SettingsWindow::MessageReceived(BMessage* message)
 				// ToDo: maybe we want to remove this possibility in the GUI
 				// as Be did, but I thought a proper warning could be helpful
 				// (for those that want to change that anyway)
-				int32 choice = (new BAlert("VirtualMemory",
+				BAlert* alert = new BAlert("VirtualMemory",
 					B_TRANSLATE(
 					"Disabling virtual memory will have unwanted effects on "
 					"system stability once the memory is used up.\n"
@@ -301,7 +303,9 @@ SettingsWindow::MessageReceived(BMessage* message)
 					"until this point is reached.\n\n"
 					"Are you really sure you want to turn it off?"),
 					B_TRANSLATE("Turn off"), B_TRANSLATE("Keep enabled"), NULL,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->SetShortcut(1, B_ESCAPE);
+				int32 choice = alert->Go();
 				if (choice == 1) {
 					fSwapEnabledCheckBox->SetValue(1);
 					break;

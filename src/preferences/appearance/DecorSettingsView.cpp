@@ -120,7 +120,7 @@ DecorSettingsView::MessageReceived(BMessage *msg)
 
 			BAlert *infoAlert = new BAlert(B_TRANSLATE("About Decorator"),
 				infoText.String(), B_TRANSLATE("OK"));
-			infoAlert->SetShortcut(0, B_ESCAPE); 
+			infoAlert->SetFlags(infoAlert->Flags() | B_CLOSE_ON_ESCAPE);
 			infoAlert->Go(); 
 
 			break;

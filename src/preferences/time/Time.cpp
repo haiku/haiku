@@ -59,6 +59,7 @@ TimeApplication::AboutRequested()
 		"Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\t"
 		"Julun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku."),
 		B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 

@@ -106,6 +106,7 @@ TouchpadView::MouseUp(BPoint point)
 			"normal mouse operation. Do you really want to change it?"),
 			B_TRANSLATE("OK"), B_TRANSLATE("Cancel"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
 		result = alert->Go();
 	}
 	if (result == 0) {

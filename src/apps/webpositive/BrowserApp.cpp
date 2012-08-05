@@ -103,6 +103,7 @@ BrowserApp::AboutRequested()
 
 	BAlert* alert = new BAlert("About WebPositive", aboutText.String(),
 		"Sweet!");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go(NULL);
 }
 

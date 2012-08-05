@@ -1985,11 +1985,13 @@ AttributeView::FinishEditingTitle(bool commit)
 		if (entry.InitCheck() == B_OK
 			&& entry.GetParent(&parent) == B_OK) {
 			if (parent.Contains(text)) {
-				(new BAlert("",
+				BAlert* alert = new BAlert("",
 					B_TRANSLATE("That name is already taken. "
 					"Please type another one."),
 					B_TRANSLATE("OK"),
-					0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+					0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 				reopen = true;
 			} else {
 				if (fModel->IsVolume()) {
@@ -2009,11 +2011,12 @@ AttributeView::FinishEditingTitle(bool commit)
 			}
 		}
 	} else if (length >= B_FILE_NAME_LENGTH) {
-		(new BAlert("",
-			B_TRANSLATE("That name is too long. "
-			"Please type another one."),
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("That name is too long. Please type another one."),
 			B_TRANSLATE("OK"),
-			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		reopen = true;
 	}
 

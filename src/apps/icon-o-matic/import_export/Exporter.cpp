@@ -116,6 +116,7 @@ Exporter::_ExportThread()
 				"Exporter - Continue in error dialog"), 
 			NULL, NULL);
 		// launch alert asynchronously
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 	} else {
 		// success

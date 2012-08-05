@@ -125,6 +125,7 @@ PackageInstall::_Install()
 				"and continue the installation?"),
 			B_TRANSLATE("Continue"),
 			B_TRANSLATE("Abort"));
+		reinstall->SetShortcut(1, B_ESCAPE);
 
 		if (reinstall->Go() == 0) {
 			// Uninstall the package

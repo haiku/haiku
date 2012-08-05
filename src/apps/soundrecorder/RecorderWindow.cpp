@@ -1175,7 +1175,9 @@ RecorderWindow::ErrorAlert(const char * action, status_t err)
 		sprintf(msg, "%s: %s. [%lx]", action, strerror(err), (int32) err);
 	else
 		sprintf(msg, "%s.", action);
-	(new BAlert("", msg, B_TRANSLATE("Stop")))->Go();
+	BAlert* alert = new BAlert("", msg, B_TRANSLATE("Stop"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
 }
 
 
@@ -1334,15 +1336,20 @@ RecorderWindow::RefsReceived(BMessage *msg)
 	}
 
 	if (countBad > 0 && countGood == 0) {
-		(new BAlert(B_TRANSLATE("Nothing to play"), B_TRANSLATE("None of the "
-			"files appear to be audio files"), B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+		BAlert* alert = new BAlert(B_TRANSLATE("Nothing to play"),
+			B_TRANSLATE("None of the files appear to be audio files"),
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	} else if (countGood > 0) {
-		if (countBad > 0)
-			(new BAlert(B_TRANSLATE("Invalid audio files"), B_TRANSLATE("Some "
-				"of the files don't appear to be audio files"),
+		if (countBad > 0) {
+			BAlert* alert = new BAlert(B_TRANSLATE("Invalid audio files"),
+			B_TRANSLATE("Some of the files don't appear to be audio files"),
 				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT))->Go();
+				B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+		}
 		fSoundList->Select(fSoundList->CountItems() - 1);
 	}
 }

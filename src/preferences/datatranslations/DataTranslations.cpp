@@ -53,6 +53,7 @@ DataTranslationsApplication::_InstallError(const char* name, status_t status)
 	text.UnlockBuffer();
 	BAlert* alert = new BAlert(B_TRANSLATE("DataTranslations - Error"),
 		text.String(), B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -83,7 +84,8 @@ DataTranslationsApplication::_NoTranslatorError(const char* name)
 		B_TRANSLATE("The item '%name' does not appear to be a Translator and "
 		"will not be installed."));
 	text.ReplaceAll("%name", name);
-	BAlert* alert = new BAlert("", text.String(), B_TRANSLATE("Ok"));
+	BAlert* alert = new BAlert("", text.String(), B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -152,6 +154,7 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 			BAlert* alert = new BAlert(B_TRANSLATE("DataTranslations - Note"),
 				B_TRANSLATE("The new translator has been installed "
 					"successfully."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go(NULL);
 		} else
 			_InstallError(ref.name, status);

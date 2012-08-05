@@ -669,6 +669,7 @@ ScreenshotWindow::_ShowSettings(bool activate)
 		&rect);
 	if (err < B_OK || view == NULL) {
 		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	} else {
 		if (fSettingsWindow) {

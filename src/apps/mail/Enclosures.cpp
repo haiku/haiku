@@ -249,10 +249,12 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 					if (window && window->Mail())
 						window->Mail()->RemoveComponent(item->Component());
 
-					(new BAlert("", B_TRANSLATE(
+					BAlert* alert = new BAlert("", B_TRANSLATE(
 						"Removing attachments from a forwarded mail is not yet "
 						"implemented!\nIt will not yet work correctly."),
-						B_TRANSLATE("OK")))->Go();
+						B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go();
 				}
 				else
 					watch_node(item->NodeRef(), B_STOP_WATCHING, this);
@@ -302,9 +304,11 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 				if (badType)
 				{
 					beep();
-					(new BAlert("",
+					BAlert* alert = new BAlert("",
 						B_TRANSLATE("Only files can be added as attachments."),
-						B_TRANSLATE("OK")))->Go();
+						B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go();
 				}
 			}
 			break;

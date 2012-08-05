@@ -718,6 +718,7 @@ MainWindow::Open(const entry_ref& ref, bool append)
 				"Cancel button - error alert"),	
 			NULL, NULL);
 		// launch alert asynchronously
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 
 		delete icon;
@@ -796,6 +797,7 @@ MainWindow::Open(const BMessenger& externalObserver, const uint8* data,
 					"Cancel button - error alert"),	
 				NULL, NULL);
 			// launch alert asynchronously
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go(NULL);
 
 			delete icon;
@@ -1273,7 +1275,8 @@ MainWindow::_CheckSaveIcon(const BMessage* currentMessage)
 
 	BAlert* alert = new BAlert("save", 
 		B_TRANSLATE("Save changes to current icon?"), B_TRANSLATE("Discard"),
-		 B_TRANSLATE("Cancel"), B_TRANSLATE("Save"));
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Save"));
+	alert->SetShortcut(0, B_ESCAPE);
 	int32 choice = alert->Go();
 	switch (choice) {
 		case 0:

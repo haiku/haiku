@@ -135,8 +135,9 @@ SetupView::CheckSetup()
 
 			if (ep->Connect(fServerAddress->Text(), port) != B_OK) {
 				BString text;
-				text << "Fail to connect to " << fServerAddress->Text() << ":" << (int) port << "!";
+				text << "Failed to connect to " << fServerAddress->Text() << ":" << (int) port << "!";
 				BAlert* alert = new BAlert("", text.String(), "OK");
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 				return false;
 			};
@@ -149,7 +150,8 @@ SetupView::CheckSetup()
 		};
 	};
 
-	BAlert* alert = new BAlert("", "please input parameters.", "OK");
+	BAlert* alert = new BAlert("", "Please input parameters.", "OK");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 	return false;
 }

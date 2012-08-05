@@ -421,9 +421,11 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 	return; // Successful.
 
 ErrorExit:
-	(new BAlert ("SpamFilterConfig Error", B_TRANSLATE("Sorry, unable to "
-		"launch the spamdbm program to let you edit the server settings."),
-		B_TRANSLATE("Close")))->Go ();
+	BAlert* alert = new BAlert ("SpamFilterConfig Error", B_TRANSLATE("Sorry, "
+		"unable to launch the spamdbm program to let you edit the server "
+		"settings."), B_TRANSLATE("Close"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go ();
 	return;
 }
 

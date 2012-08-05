@@ -50,6 +50,7 @@ VirtualMemory::AboutRequested()
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 13, &font);
 
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 

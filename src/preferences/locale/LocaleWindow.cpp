@@ -147,6 +147,7 @@ LocaleWindow::LocaleWindow()
 				"use this preflet!"),
 			B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 

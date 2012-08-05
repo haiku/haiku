@@ -146,7 +146,7 @@ MediaConverterApp::RefsReceived(BMessage* msg)
 		BAlert* alert = new BAlert((errors > 1) ? 
 			B_TRANSLATE("Error loading files") : 
 			B_TRANSLATE("Error loading a file"), 
-			alertText.String(),	B_TRANSLATE("Continue")	, NULL, NULL, 
+			alertText.String(),	B_TRANSLATE("Continue"), NULL, NULL, 
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->Go();
 	}

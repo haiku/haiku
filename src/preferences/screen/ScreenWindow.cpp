@@ -520,8 +520,11 @@ ScreenWindow::QuitRequested()
 			BString warning = B_TRANSLATE("Could not write VESA mode settings"
 				" file:\n\t");
 			warning << strerror(status);
-			(new BAlert(B_TRANSLATE("Warning"), warning.String(), B_TRANSLATE("OK"), NULL,
-				NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
+				warning.String(), B_TRANSLATE("OK"), NULL,
+				NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 		}
 	}
 
@@ -1303,6 +1306,7 @@ ScreenWindow::_Apply()
 		BAlert* alert = new BAlert(B_TRANSLATE("Warning"), message,
 			B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 }

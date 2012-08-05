@@ -192,13 +192,17 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 			Save();
 			break;
 
-		case M_DELETE:
-			if (!(new BAlert("",
+		case M_DELETE: {
+			BAlert* alert = new BAlert("",
 					B_TRANSLATE("Really delete this signature? This cannot "
 						"be undone."),
 					B_TRANSLATE("Cancel"),
 					B_TRANSLATE("Delete"),
-					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go())
+					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			int32 choice = alert->Go();
+			
+			if (choice == 0)
 				break;
 
 			if (fFile) {
@@ -210,7 +214,7 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 				fSigView->fName->MakeFocus(true);
 			}
 			break;
-
+		}
 		case M_SIGNATURE:
 			if (Clear()) {
 				msg->FindRef("ref", &ref);
@@ -231,9 +235,11 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 				else {
 					fFile = NULL;
 					beep();
-					(new BAlert("",
+					BAlert* alert = new BAlert("",
 						B_TRANSLATE("Couldn't open this signature. Sorry."),
-						B_TRANSLATE("OK")))->Go();
+						B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go();
 				}
 			}
 			break;
@@ -385,9 +391,11 @@ TSignatureWindow::Save()
 
 err_exit:
 	beep();
-	(new BAlert("",
+	BAlert* alert = new BAlert("",
 		B_TRANSLATE("An error occurred trying to save this signature."),
-		B_TRANSLATE("Sorry")))->Go();
+		B_TRANSLATE("Sorry"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
 }
 
 

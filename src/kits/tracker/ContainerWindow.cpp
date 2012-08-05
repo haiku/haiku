@@ -286,7 +286,7 @@ AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref dirRef)
 
 	BAlert* alert = new BAlert("", buffer.String(), B_TRANSLATE("Cancel"),
 		0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-	alert->SetShortcut(0, B_ESCAPE);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 
 	return result;
@@ -3213,7 +3213,7 @@ BContainerWindow::LoadAddOn(BMessage* message)
 
 		BAlert* alert = new BAlert("", buffer.String(),	B_TRANSLATE("Cancel"),
 			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return;
 	}

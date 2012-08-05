@@ -178,6 +178,7 @@ void T9InputServerMethod::MessageReceived(BMessage *message)
       s << " - ";
       s << (long) fDeskbarMenu->ItemAt(v);
       BAlert *a = new BAlert("Plop", s.String(), "OK");
+      a->SetFlags(a->Flags() | B_CLOSE_ON_ESCAPE);
       a->Go(NULL);
       }*/
     break;

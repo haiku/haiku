@@ -193,7 +193,7 @@ PulseApp::ShowAbout(bool asApplication)
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, name.Length(), &font);
-	alert->SetShortcut(0, B_ESCAPE);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	// Use the asynchronous version so we don't block the window's thread
 	alert->Go(NULL);
 }
@@ -278,7 +278,7 @@ LoadInDeskbar()
 		message.UnlockBuffer();
 		BAlert *alert = new BAlert(B_TRANSLATE("Error"),
 			message.String(), B_TRANSLATE("OK"));
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		return false;
 	}

@@ -1121,6 +1121,7 @@ CDDBQuery::_ParseData(const BString &data)
 
 		// TODO: finish, once I find an entry which actually has a year in it
 		BAlert *alert = new BAlert("SimplyVorbis", "DYEAR entry found\n", "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		
 	}

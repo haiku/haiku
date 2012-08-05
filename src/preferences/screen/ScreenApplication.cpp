@@ -40,7 +40,7 @@ ScreenApplication::AboutRequested()
 	BAlert *aboutAlert = new BAlert(B_TRANSLATE("About"),
 		B_TRANSLATE("Screen preferences by the Haiku team"), B_TRANSLATE("OK"),
 		NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
-	aboutAlert->SetShortcut(0, B_OK);
+	aboutAlert->SetFlags(aboutAlert->Flags() | B_CLOSE_ON_ESCAPE);
 	aboutAlert->Go();
 }
 

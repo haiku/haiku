@@ -159,7 +159,9 @@ void WatchView::OnAboutRequested()
 		"mahlzeit@users.sourceforge.net\n\n"
 		"Thanks to Jason Parks for his help.\n");
 	text.ReplaceFirst("%1", VERSION);
-	(new BAlert(NULL, text.String(), B_TRANSLATE("OK")))->Go(NULL);
+	BAlert* alert = new BAlert(NULL, text.String(), B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go(NULL);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

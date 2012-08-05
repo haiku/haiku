@@ -367,9 +367,11 @@ DiskProbe::RefsReceived(BMessage *message)
 				"error message is shown."),
 				ref.name, strerror(status));
 
-			(new BAlert(B_TRANSLATE("DiskProbe request"),
+			BAlert* alert = new BAlert(B_TRANSLATE("DiskProbe request"),
 				buffer, B_TRANSLATE("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+				B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 		}
 	}
 }

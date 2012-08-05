@@ -702,6 +702,7 @@ GraphicsDriver::_PrintJob(BFile* spoolFile)
 			alert = new BAlert("", fTransport->LastError().c_str(), "OK");
 		else
 			alert = new BAlert("", "Printer not responding.", "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 

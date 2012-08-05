@@ -165,6 +165,7 @@ MediaFileInfoView::Update(BMediaFile* file, entry_ref* ref)
 			BAlert* alert = new BAlert(
 				B_TRANSLATE("File Error"), error.String(),
 				B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go(NULL);
 		}
 	} else {

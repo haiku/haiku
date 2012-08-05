@@ -1503,8 +1503,10 @@ DisplayErrorMessage (
   {
     AlertPntr = new BAlert (TitleString, MessageString,
       "Acknowledge", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-    if (AlertPntr != NULL)
+    if (AlertPntr != NULL) {
+      AlertPntr->SetFlags(AlertPntr->Flags() | B_CLOSE_ON_ESCAPE);
       AlertPntr->Go ();
+    }
   }
 }
 
@@ -1839,8 +1841,10 @@ EstimateRefFilesAndDisplay (BMessage *MessagePntr)
         g_MaxInterestingWords - j);
 
     AlertPntr = new BAlert ("Estimate", TempString, "OK");
-    if (AlertPntr != NULL)
+    if (AlertPntr != NULL) {
+      AlertPntr->SetFlags(AlertPntr->Flags() | B_CLOSE_ON_ESCAPE);
       AlertPntr->Go ();
+    }
   }
 }
 
@@ -2533,7 +2537,7 @@ uses to extract words from messages.  In particular, HTML is now handled.\n\n"
 "Compiled on " __DATE__ " at " __TIME__ ".", "Done");
   if (AboutAlertPntr != NULL)
   {
-    AboutAlertPntr->SetShortcut (0, B_ESCAPE);
+    AboutAlertPntr->SetFlags(AboutAlertPntr->Flags() | B_CLOSE_ON_ESCAPE);
     AboutAlertPntr->Go ();
   }
 }

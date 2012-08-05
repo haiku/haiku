@@ -633,6 +633,7 @@ MainWin::MessageReceived(BMessage* msg)
 			BAlert* alert = new BAlert(B_TRANSLATE("Nothing to Play"),
 				B_TRANSLATE("None of the files you wanted to play appear "
 				"to be media files."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			fControls->SetDisabledString(kDisabledSeekMessage);
 			break;
@@ -1090,8 +1091,10 @@ MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 		BString message = B_TRANSLATE("%app% encountered an internal error. "
 			"The file could not be opened.");
 		message.ReplaceFirst("%app%", kApplicationName);
-		(new BAlert(kApplicationName, message.String(),
-			B_TRANSLATE("OK")))->Go();
+		BAlert* alert = new BAlert(kApplicationName, message.String(),
+			B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		_PlaylistItemOpened(item, ret);
 	} else {
 		BString string;
@@ -1337,7 +1340,10 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 			} else {
 				message << B_TRANSLATE("Error: ") << strerror(result);
 			}
-			(new BAlert("error", message.String(), B_TRANSLATE("OK")))->Go();
+			BAlert* alert = new BAlert("error", message.String(),
+				B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			fControls->SetDisabledString(kDisabledSeekMessage);
 		} else {
 			// Just go to the next file and don't bother user (yet)

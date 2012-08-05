@@ -457,8 +457,9 @@ bool
 NetworkWindow::QuitRequested(void)
 {
 	if (fSave->IsEnabled() == true) {
-		BAlert *alert = new BAlert("Save Info Alert","Save changes before quitting?",
-									"Don't Save","Cancel","Save");
+		BAlert *alert = new BAlert("Save Info Alert", "Save changes before "
+			quitting?",	"Don't Save", "Cancel", "Save");
+		alert->SetShortcut(1, B_ESCAPE);
 		int32 result = alert->Go();
 		
 		switch (result) {
@@ -486,8 +487,9 @@ NetworkWindow::QuitRequested(void)
 
 void NetworkWindow::DeleteConfigFile()
 {
-	BAlert *alert = new BAlert("Alert","Really delete networking configuration?",
-								"Delete","Cancel");
+	BAlert *alert = new BAlert("Alert", "Really delete networking configuration?",
+								"Delete", "Cancel");
+	alert->SetShortcut(1, B_ESCAPE);
 	int32 result = alert->Go();
 	
 	if (result == 0) {

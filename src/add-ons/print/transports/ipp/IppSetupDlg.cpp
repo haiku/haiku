@@ -141,6 +141,7 @@ bool IppSetupView::UpdateViewData()
 	}
 
 	BAlert *alert = new BAlert("", error_msg.c_str(), "OK");
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 	return false;
 }

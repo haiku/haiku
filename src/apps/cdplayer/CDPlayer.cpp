@@ -88,6 +88,7 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask,
 			"It appears that there are no CD"
 			" drives on your computer or there is no system software to "
 			"support one. Sorry."), B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 

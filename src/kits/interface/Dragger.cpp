@@ -303,11 +303,13 @@ BDragger::MessageReceived(BMessage* msg)
 			if (fShelf != NULL)
 				Window()->PostMessage(kDeleteReplicant, fTarget, NULL);
 			else {
-				(new BAlert(B_TRANSLATE("Warning"),
+				BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
 					B_TRANSLATE("Can't delete this replicant from its original "
 					"application. Life goes on."),
 					B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_FROM_WIDEST,
-					B_WARNING_ALERT))->Go(NULL);
+					B_WARNING_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go(NULL);
 			}
 			break;
 

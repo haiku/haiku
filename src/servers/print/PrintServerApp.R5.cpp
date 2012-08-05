@@ -97,6 +97,7 @@ PrintServerApp::async_thread(void* data)
 						B_TRANSLATE("Would you like to set one up now?"));
 					BAlert* alert = new BAlert("Info", alertText.String(),
 						B_TRANSLATE("No"), B_TRANSLATE("Yes"));
+					alert->SetShortcut(0, B_ESCAPE);
 					if (alert->Go() == 1) {
 						if (count == 0)
 							run_add_printer_panel();
@@ -143,6 +144,7 @@ PrintServerApp::async_thread(void* data)
 						text.ReplaceFirst("@", printerName.String());
 						BAlert* alert = new BAlert("", text.String(),
 							B_TRANSLATE("No"), B_TRANSLATE("Yes"));
+						alert->SetShortcut(0, B_ESCAPE);
 						if (alert->Go() == 1)
 							p->app->SelectPrinter(printerName.String());
 					}

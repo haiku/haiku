@@ -257,7 +257,7 @@ UninstallView::MessageReceived(BMessage* msg)
 					"been corrupted."), B_TRANSLATE("OK"), NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			}
-
+			notify->SetFlags(notify->Flags() | B_CLOSE_ON_ESCAPE);
 			notify->Go();
 		}
 		default:

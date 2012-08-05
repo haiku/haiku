@@ -755,10 +755,11 @@ TContentView::MessageReceived(BMessage *msg)
 				free (signature);
 			} else {
 				beep();
-				(new BAlert("",
+				BAlert* alert = new BAlert("",
 					B_TRANSLATE("An error occurred trying to open this "
-						"signature."),
-					B_TRANSLATE("Sorry")))->Go();
+						"signature."), B_TRANSLATE("Sorry"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 			break;
 		}
@@ -1914,10 +1915,11 @@ TTextView::Open(hyper_text *enclosure)
 			status_t result = be_roster->Launch(handlerToLaunch, 1, &enclosure->name);
 			if (result != B_NO_ERROR && result != B_ALREADY_RUNNING) {
 				beep();
-				(new BAlert("",
+				BAlert* alert = new BAlert("",
 					B_TRANSLATE("There is no installed handler for "
-						"URL links."),
-					"Sorry"))->Go();
+						"URL links."), B_TRANSLATE("Sorry"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 			break;
 		}
@@ -2065,9 +2067,10 @@ TTextView::Save(BMessage *msg, bool makeNewFile)
 
 	if (result != B_NO_ERROR) {
 		beep();
-		(new BAlert("", B_TRANSLATE("An error occurred trying to save "
-				"the attachment."),
-			B_TRANSLATE("Sorry")))->Go();
+		BAlert* alert = new BAlert("", B_TRANSLATE("An error occurred trying to save "
+				"the attachment."),	B_TRANSLATE("Sorry"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 
 	return result;
@@ -3337,10 +3340,11 @@ TTextView::Undo(BClipboard */*clipboard*/)
 					Select(offset, offset + length);
 				} else {
 					::beep();
-					(new BAlert("",
+					BAlert* alert = new BAlert("",
 						B_TRANSLATE("Inconsistency occurred in the undo/redo "
-							"buffer."),
-						B_TRANSLATE("OK")))->Go();
+							"buffer."),	B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go();
 				}
 				break;
 		}
@@ -3384,10 +3388,11 @@ TTextView::Redo()
 
 			case K_REPLACED:
 				::beep();
-				(new BAlert("",
+				BAlert* alert = new BAlert("",
 					B_TRANSLATE("Inconsistency occurred in the undo/redo "
-						"buffer."),
-					B_TRANSLATE("OK")))->Go();
+						"buffer."),	B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 				break;
 		}
 		ScrollToSelection();

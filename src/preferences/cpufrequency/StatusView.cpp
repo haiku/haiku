@@ -429,7 +429,7 @@ StatusView::_AboutRequested()
 	BAlert *alert = new BAlert("about", B_TRANSLATE("CPUFrequency\n"
 			"\twritten by Clemens Zeidler\n"
 			"\tCopyright 2009, Haiku, Inc.\n"),
-		B_TRANSLATE("Ok"));
+		B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -440,6 +440,7 @@ StatusView::_AboutRequested()
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 13, &font);
 
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -689,9 +690,10 @@ StatusView::_OpenPreferences()
 			"Launching the CPU frequency preflet failed.\n\nError: "));
 		errorMessage << strerror(ret);
 		BAlert* alert = new BAlert("launch error", errorMessage.String(),
-			"Ok");
+			"OK");
 		// asynchronous alert in order to not block replicant host
 		// application
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 	}
 }
