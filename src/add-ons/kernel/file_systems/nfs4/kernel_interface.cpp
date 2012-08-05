@@ -20,6 +20,7 @@
 #include "RequestBuilder.h"
 #include "ReplyInterpreter.h"
 #include "RootInode.h"
+#include "RPCCallbackServer.h"
 #include "RPCServer.h"
 
 
@@ -637,6 +638,13 @@ nfs4_init()
 		return B_NO_MEMORY;
 	}
 
+	gRPCCallbackServer = new(std::nothrow) RPC::CallbackServer;
+	if (gRPCCallbackServer == NULL) {
+		delete gRPCServerManager;
+		delete gIdMapper;
+		return B_NO_MEMORY;
+	}
+
 	return B_OK;
 }
 
@@ -646,6 +654,7 @@ nfs4_uninit()
 {
 	dprintf("NFS4 Uninit\n");
 
+	delete gRPCCallbackServer;
 	delete gIdMapper;
 	delete gRPCServerManager;
 

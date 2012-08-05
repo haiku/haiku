@@ -129,6 +129,22 @@ ServerAddress::Port() const
 }
 
 
+void
+ServerAddress::SetPort(uint16 port)
+{
+	port = htons(port);
+
+	switch (reinterpret_cast<sockaddr*>(&fAddress)->sa_family) {
+		case AF_INET:
+			reinterpret_cast<sockaddr_in*>(&fAddress)->sin_port = port;
+			break;
+		case AF_INET6:
+			reinterpret_cast<sockaddr_in6*>(&fAddress)->sin6_port = port;
+			break;
+	}
+}
+
+
 const void*
 ServerAddress::InAddr() const
 {
@@ -147,7 +163,7 @@ ServerAddress::InAddr() const
 status_t
 ServerAddress::ResolveName(const char* name, ServerAddress* address)
 {
-	address->fProtocol = IPPROTO_UDP;
+	address->fProtocol = IPPROTO_TCP;
 
 	// getaddrinfo() is very expensive when called from kernel, so we do not
 	// want to call it unless there is no other choice.
@@ -194,12 +210,27 @@ ServerAddress::ResolveName(const char* name, ServerAddress* address)
 
 Connection::Connection(const ServerAddress& address)
 	:
+	ConnectionBase(address)
+{
+}
+
+
+ConnectionListener::ConnectionListener(const ServerAddress& address)
+	:
+	ConnectionBase(address)
+{
+}
+
+
+ConnectionBase::ConnectionBase(const ServerAddress& address)
+	:
 	fWaitCancel(create_sem(0, NULL)),
 	fSocket(-1),
 	fServerAddress(address)
 {
 	mutex_init(&fSocketLock, NULL);
 }
+
 
 
 ConnectionStream::ConnectionStream(const ServerAddress& address)
@@ -216,7 +247,7 @@ ConnectionPacket::ConnectionPacket(const ServerAddress& address)
 }
 
 
-Connection::~Connection()
+ConnectionBase::~ConnectionBase()
 {
 	if (fSocket != -1)
 		close(fSocket);
@@ -226,13 +257,13 @@ Connection::~Connection()
 
 
 status_t
-Connection::GetLocalAddress(ServerAddress* address)
+ConnectionBase::GetLocalAddress(ServerAddress* address)
 {
 	address->fProtocol = fServerAddress.fProtocol;
 
-	socklen_t addressSize = fServerAddress.AddressSize();
-	return getsockname(fSocket,
-		(struct sockaddr*)&address->fAddress, &addressSize);
+	socklen_t addressSize = sizeof(address->fAddress);
+	return getsockname(fSocket,	(struct sockaddr*)&address->fAddress,
+		&addressSize);
 }
 
 
@@ -409,20 +440,24 @@ ConnectionPacket::Receive(void** _buffer, uint32* _size)
 }
 
 
+Connection*
+Connection::CreateObject(const ServerAddress& address)
+{
+	switch (address.fProtocol) {
+		case IPPROTO_TCP:
+			return new(std::nothrow) ConnectionStream(address);
+		case IPPROTO_UDP:
+			return new(std::nothrow) ConnectionPacket(address);
+		default:
+			return NULL;
+	}
+}
+
+
 status_t
 Connection::Connect(Connection **_connection, const ServerAddress& address)
 {
-	Connection* conn;
-	switch (address.fProtocol) {
-		case IPPROTO_TCP:
-			conn = new(std::nothrow) ConnectionStream(address);
-			break;
-		case IPPROTO_UDP:
-			conn = new(std::nothrow) ConnectionPacket(address);
-			break;
-		default:
-			return B_BAD_VALUE;
-	}
+	Connection* conn = CreateObject(address);
 	if (conn == NULL)
 		return B_NO_MEMORY;
 
@@ -431,6 +466,21 @@ Connection::Connect(Connection **_connection, const ServerAddress& address)
 		delete conn;
 		return result;
 	}
+
+	*_connection = conn;
+
+	return B_OK;
+}
+
+
+status_t
+Connection::SetTo(Connection **_connection, int socket,
+	const ServerAddress& address)
+{
+	Connection* conn = CreateObject(address);
+	if (conn == NULL)
+		return B_NO_MEMORY;
+	conn->fSocket = socket;
 
 	*_connection = conn;
 
@@ -491,11 +541,97 @@ Connection::Reconnect()
 
 
 void
-Connection::Disconnect()
+ConnectionBase::Disconnect()
 {
 	release_sem(fWaitCancel);
 
 	close(fSocket);
 	fSocket = -1;
+}
+
+
+status_t
+ConnectionListener::Listen(ConnectionListener** _listener, uint16 port)
+{
+	int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (sock < 0)
+		return errno;
+
+	sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_len = sizeof(addr);
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = INADDR_ANY;
+	addr.sin_port = htons(port);
+	if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) != B_OK) {
+		close(sock);
+		return errno;
+	}
+
+	if (listen(sock, 5) != B_OK) {
+		close(sock);
+		return errno;
+	}
+
+	ServerAddress address;
+	address.fProtocol = IPPROTO_TCP;
+	memset(&address.fAddress, 0, sizeof(address.fAddress));
+
+	ConnectionListener* listener;
+	listener = new(std::nothrow) ConnectionListener(address);
+	if (listener == NULL) {
+		close(sock);
+		return B_NO_MEMORY;
+	}
+
+	listener->fSocket = sock;
+
+	*_listener = listener;
+
+	return B_OK;
+}
+
+
+status_t
+ConnectionListener::AcceptConnection(Connection** _connection)
+{
+	object_wait_info object[2];
+	object[0].object = fWaitCancel;
+	object[0].type = B_OBJECT_TYPE_SEMAPHORE;
+	object[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
+
+	object[1].object = fSocket;
+	object[1].type = B_OBJECT_TYPE_FD;
+	object[1].events = B_EVENT_READ;
+
+	do {
+		status_t result = wait_for_objects(object, 2);
+		if (result < B_OK ||
+			(object[0].events & B_EVENT_ACQUIRE_SEMAPHORE) != 0) {
+			return ECONNABORTED;
+		} else if ((object[1].events & B_EVENT_READ) == 0)
+			continue;
+		break;
+	} while (true);
+
+	sockaddr_storage addr;
+	socklen_t length = sizeof(addr);
+	int sock = accept(fSocket, reinterpret_cast<sockaddr*>(&addr), &length);
+	if (sock < 0)
+		return errno;
+
+	ServerAddress address;
+	address.fProtocol = IPPROTO_TCP;
+	address.fAddress = addr;
+	Connection* connection;
+
+	status_t result = Connection::SetTo(&connection, sock, address);
+	if (result != B_OK) {
+		close(sock);
+		return result;
+	}
+
+	*_connection = connection;
+	return B_OK;
 }
 

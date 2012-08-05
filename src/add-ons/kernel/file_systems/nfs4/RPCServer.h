@@ -14,6 +14,7 @@
 
 #include "Connection.h"
 #include "RPCCall.h"
+#include "RPCCallback.h"
 #include "RPCReply.h"
 
 
@@ -76,6 +77,8 @@ public:
 	inline	ProgramData*			PrivateData();
 	inline	void					SetPrivateData(ProgramData* privateData);
 
+			Callback*				GetCallback();
+
 private:
 	inline	uint32					_GetXID();
 
@@ -93,6 +96,9 @@ private:
 			const ServerAddress*	fAddress;
 
 			ProgramData*			fPrivateData;
+
+			mutex					fCallbackLock;
+			Callback*				fCallback;
 
 			vint32					fXID;
 	static	const bigtime_t			kWaitTime	= 1000000;

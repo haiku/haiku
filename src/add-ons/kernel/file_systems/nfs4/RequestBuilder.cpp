@@ -13,6 +13,8 @@
 #include <string.h>
 
 #include "Cookie.h"
+#include "RPCCallback.h"
+#include "RPCCallbackServer.h"
 
 
 RequestBuilder::RequestBuilder(Procedure proc)
@@ -620,7 +622,7 @@ RequestBuilder::SetAttr(const uint32* id, uint32 stateSeq, AttrValue* attr,
 
 
 status_t
-RequestBuilder::SetClientID(const RPC::Server* server)
+RequestBuilder::SetClientID(RPC::Server* server)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -638,15 +640,21 @@ RequestBuilder::SetClientID(const RPC::Server* server)
 
 	fRequest->Stream().AddUInt(0x40000000);
 
-	ServerAddress local = server->LocalID();
+	uint32 id = server->GetCallback()->ID();
+
+	ServerAddress local = gRPCCallbackServer->LocalID();
+	ServerAddress servAddr = server->LocalID();
+	servAddr.SetPort(local.Port());
+
 	fRequest->Stream().AddString(local.ProtocolString());
-	char* uAddr = local.UniversalAddress();
+
+	char* uAddr = servAddr.UniversalAddress();
 	if (uAddr == NULL)
 		return B_NO_MEMORY;
 	fRequest->Stream().AddString(uAddr);
 	free(uAddr);
 
-	fRequest->Stream().AddUInt(0);
+	fRequest->Stream().AddUInt(id);
 
 	fOpCount++;
 

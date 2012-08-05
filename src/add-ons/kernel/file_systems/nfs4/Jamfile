@@ -26,6 +26,9 @@ KernelAddon nfs4 :
 	RootInode.cpp
 	RPCAuth.cpp
 	RPCCall.cpp
+	RPCCallback.cpp
+	RPCCallbackRequest.cpp
+	RPCCallbackServer.cpp
 	RPCReply.cpp
 	RPCServer.cpp
 	XDR.cpp

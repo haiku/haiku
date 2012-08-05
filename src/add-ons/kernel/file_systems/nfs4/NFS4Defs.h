@@ -20,6 +20,11 @@ enum Procedure {
 	ProcCompound	= 1
 };
 
+enum CallbackProcedure {
+	CallbackProcNull		= 0,
+	CallbackProcCompound	= 1
+};
+
 enum Opcode {
 	OpAccess				= 3,
 	OpClose					= 4,

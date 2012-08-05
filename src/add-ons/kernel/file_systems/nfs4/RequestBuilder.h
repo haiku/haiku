@@ -69,7 +69,7 @@ public:
 			status_t				SaveFH();
 			status_t				SetAttr(const uint32* id, uint32 stateSeq,
 										AttrValue* attr, uint32 count);
-			status_t				SetClientID(const RPC::Server* server);
+			status_t				SetClientID(RPC::Server* server);
 			status_t				SetClientIDConfirm(uint64 id, uint64 ver);
 			status_t				Verify(AttrValue* attr, uint32 count);
 			status_t				Write(const uint32* id, uint32 stateSeq,

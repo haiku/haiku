@@ -13,6 +13,7 @@
 
 #include <util/AutoLock.h>
 
+#include "RPCCallbackServer.h"
 #include "RPCReply.h"
 
 
@@ -77,14 +78,22 @@ Server::Server(Connection* connection, ServerAddress* address)
 	fConnection(connection),
 	fAddress(address),
 	fPrivateData(NULL),
+	fCallback(NULL),
 	fXID(rand() << 1)
 {
+	mutex_init(&fCallbackLock, NULL);
+
 	_StartListening();
 }
 
 
 Server::~Server()
 {
+	if (fCallback != NULL)
+		gRPCCallbackServer->UnregisterCallback(fCallback);
+	delete fCallback;
+	mutex_destroy(&fCallbackLock);
+
 	delete fPrivateData;
 
 	fThreadCancel = true;
@@ -211,6 +220,19 @@ Server::Repair()
 
 	wait_for_thread(fThread, &result);
 	return _StartListening();
+}
+
+
+Callback*
+Server::GetCallback()
+{
+	MutexLocker _(fCallbackLock);
+	if (fCallback == NULL) {
+		fCallback = new Callback;
+		gRPCCallbackServer->RegisterCallback(fCallback);
+	}
+
+	return fCallback;
 }
 
 
