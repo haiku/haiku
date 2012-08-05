@@ -14,6 +14,8 @@
 #include "OpenState.h"
 
 
+class Delegation;
+
 class Inode : public NFS4Inode {
 public:
 	static			status_t	CreateInode(FileSystem* fs, const FileInfo& fi,
@@ -24,6 +26,8 @@ public:
 	inline			mode_t		Type() const;
 	inline			const char*	Name() const;
 	inline			FileSystem*	GetFileSystem() const;
+
+	inline			void		SetOpenState(OpenState* state);
 
 	inline			void*		FileCache();
 					status_t	RevalidateFileCache();
@@ -93,17 +97,20 @@ protected:
 
 	static inline	ino_t		FileIdToInoT(uint64 fileid);
 
+private:
 					uint32		fType;
 
 					MetadataCache	fMetaCache;
 					DirectoryCache*	fCache;
 
+					rw_lock		fDelegationLock;
+					Delegation*	fDelegation;
+
 					uint64		fChange;
 					void*		fFileCache;
 					mutex		fFileCacheLock;
 
-					OpenState*	fWriteState;
-					OpenState*	fReadState;
+					OpenState*	fOpenState;
 					mutex		fStateLock;
 
 					bool		fWriteDirty;
@@ -153,6 +160,14 @@ inline void*
 Inode::FileCache()
 {
 	return fFileCache;
+}
+
+
+inline void
+Inode::SetOpenState(OpenState* state)
+{
+	MutexLocker _(fStateLock);
+	fOpenState = state;
 }
 
 

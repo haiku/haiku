@@ -493,9 +493,8 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 
 
 status_t
-NFS4Inode::OpenFile(OpenState* state, int mode)
+NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 {
-	OpenDelegationData delegation;
 	bool confirm;
 	status_t result;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
@@ -571,7 +570,7 @@ NFS4Inode::OpenFile(OpenState* state, int mode)
 
 		reply.PutFH();
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
-			&delegation);
+			delegation);
 
 		FileHandle handle;
 		reply.GetFH(&handle);
@@ -586,9 +585,6 @@ NFS4Inode::OpenFile(OpenState* state, int mode)
 
 	if (confirm)
 		return ConfirmOpen(fInfo.fHandle, state);
-
-	if (delegation.fType != OPEN_DELEGATE_NONE)
-		dprintf("GOT A DELEGATION!\n");
 
 	return B_OK;
 }

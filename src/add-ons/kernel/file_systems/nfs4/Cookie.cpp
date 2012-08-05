@@ -161,7 +161,6 @@ OpenFileCookie::GetLockOwner(uint32 owner)
 	if (current == NULL)
 		return NULL;
 
-	current->fClientId = fClientID;
 	current->fNext = fLockOwners;
 	if (fLockOwners != NULL)
 		fLockOwners->fPrev = current;

@@ -52,6 +52,7 @@ inline status_t
 InodeIdMap::AddEntry(const FileInfo& fi, ino_t id)
 {
 	MutexLocker _(fLock);
+	fMap.Remove(id);
 	return fMap.Insert(id, fi);
 }
 

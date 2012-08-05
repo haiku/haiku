@@ -298,6 +298,10 @@ ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm,
 
 	// delegation info
 	uint32 delegation = fReply->Stream().GetUInt();
+	OpenDelegationData data;
+	if (delegData == NULL)
+		delegData = &data;
+
 	if (delegation == OPEN_DELEGATE_NONE) {
 		delegData->fType = OPEN_DELEGATE_NONE;
 		return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;

@@ -24,8 +24,7 @@ Inode::Inode()
 	:
 	fCache(NULL),
 	fFileCache(NULL),
-	fWriteState(NULL),
-	fReadState(NULL),
+	fOpenState(NULL),
 	fWriteDirty(false)
 {
 	mutex_init(&fStateLock, NULL);
@@ -530,7 +529,7 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 	}
 
 	MutexLocker stateLocker(fStateLock);
-	result = NFS4Inode::WriteStat(fWriteState, attr, i);
+	result = NFS4Inode::WriteStat(fOpenState, attr, i);
 	stateLocker.Unlock();
 
 	fMetaCache.InvalidateStat();

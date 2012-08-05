@@ -71,10 +71,7 @@ struct Cookie {
 };
 
 struct OpenFileCookie : public Cookie {
-			uint64			fClientID;
-
-			OpenState*		fReadState;
-			OpenState*		fWriteState;
+			OpenState*		fOpenState;
 
 			uint32			fMode;
 

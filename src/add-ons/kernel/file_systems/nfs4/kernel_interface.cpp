@@ -400,10 +400,24 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 		return result;
 	}
 
-	void* ptr;
-	result = get_vnode(volume, *_newVnodeID, &ptr);
-	if (result != B_OK)
-		delete cookie;
+	Inode* child;
+	result = get_vnode(volume, *_newVnodeID, reinterpret_cast<void**>(&child));
+	if (result != B_OK) {
+		result = inode->GetFileSystem()->GetInode(*_newVnodeID, &child);
+		if (result != B_OK) {
+			delete cookie;
+			return result;
+		}
+
+		result = new_vnode(volume, *_newVnodeID, child, &gNFSv4VnodeOps);
+		if (result != B_OK) {
+			delete child;
+			delete cookie;
+			return result;
+		}
+	}
+
+	child->SetOpenState(cookie->fOpenState);
 
 	return result;
 }

@@ -33,7 +33,7 @@ protected:
 			status_t	LookUp(const char* name, uint64* change, uint64* fileID,
 							FileHandle* handle);
 
-			status_t	Link(Inode* dir, const char* name,
+			status_t	Link(Inode* dir, const char* name,s
 							ChangeInfo* changeInfo);
 
 	static	status_t	Rename(Inode* from, Inode* to, const char* fromName,
@@ -47,7 +47,8 @@ protected:
 			status_t	CreateFile(const char* name, int mode, int perms,
 							OpenState* state, ChangeInfo* changeInfo,
 							uint64* fileID, FileHandle* handle);
-			status_t	OpenFile(OpenState* state, int mode);
+			status_t	OpenFile(OpenState* state, int mode,
+							OpenDelegationData* delegation);
 
 			status_t	ReadFile(OpenFileCookie* cookie, OpenState* state,
 							uint64 position, uint32* length, void* buffer,
