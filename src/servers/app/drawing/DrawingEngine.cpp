@@ -1513,7 +1513,7 @@ DrawingEngine::CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 			src = src & dst;
 
 			// calc offset in buffer
-			bits += (int32)src.left * 4 + (int32)src.top * bytesPerRow;
+			bits += (ssize_t)src.left * 4 + (ssize_t)src.top * bytesPerRow;
 
 			uint32 width = src.IntegerWidth() + 1;
 			uint32 height = src.IntegerHeight() + 1;
@@ -1554,7 +1554,7 @@ DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 		yIncrement = bytesPerRow;
 	}
 
-	uint8* dst = src + yOffset * bytesPerRow + xOffset * 4;
+	uint8* dst = src + (ssize_t)yOffset * bytesPerRow + (ssize_t)xOffset * 4;
 
 	if (xIncrement == 1) {
 		uint8 tmpBuffer[width * 4];
