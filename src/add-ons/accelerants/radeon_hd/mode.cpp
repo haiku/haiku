@@ -167,11 +167,13 @@ radeon_set_display_mode(display_mode* mode)
 			continue;
 
 		uint32 connectorIndex = gDisplay[id]->connectorIndex;
-		dp_info *dpInfo = &gConnector[connectorIndex]->dpInfo;
 
 		// Determine DP lanes if DP
-		if (connector_is_dp(connectorIndex))
-			dpInfo->laneCount = dp_get_lane_count(dpInfo, mode);
+		if (connector_is_dp(connectorIndex)) {
+			dp_info *dpInfo = &gConnector[connectorIndex]->dpInfo;
+			dpInfo->laneCount = dp_get_lane_count(connectorIndex, mode);
+			dpInfo->linkRate = dp_get_link_rate(connectorIndex, mode);
+		}
 
 		// *** crtc and encoder prep
 		encoder_output_lock(true);
@@ -184,7 +186,7 @@ radeon_set_display_mode(display_mode* mode)
 
 		// *** CRT controler mode set
 		// TODO: program SS
-		pll_set(ATOM_PPLL1, mode->timing.pixel_clock, id);
+		pll_set(ATOM_PPLL1, mode, id);
 			// TODO: check if ATOM_PPLL1 is used and use ATOM_PPLL2 if so
 		display_crtc_set_dtd(id, mode);
 
@@ -207,7 +209,7 @@ radeon_set_display_mode(display_mode* mode)
 				encoder_dig_setup(connectorIndex,
 					ATOM_ENCODER_CMD_DP_VIDEO_OFF, 0);
 
-			dp_link_train(id, mode);
+			dp_link_train(connectorIndex, mode);
 
 			if (info.dceMajor >= 4)
 				encoder_dig_setup(connectorIndex,
