@@ -463,7 +463,7 @@ dp_get_adjust_request_pre_emphasis(dp_info* dp, int lane)
 {
 	int i = DP_ADJ_REQUEST_0_1 + (lane >> 1);
 	int s = (((lane & 1) != 0) ? DP_ADJ_PRE_EMPHASIS_LANEB_SHIFT
-		: DP_ADJ_PRE_EMPHASIS_LANEB_SHIFT);
+		: DP_ADJ_PRE_EMPHASIS_LANEA_SHIFT);
 	uint8 l = dp->linkStatus[i - DP_LANE_STATUS_0_1];
 
 	return ((l >> s) & 0x3) << DP_TRAIN_PRE_EMPHASIS_SHIFT;
@@ -776,7 +776,6 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 
 	dp_link_train_cr(connectorIndex);
 	dp_link_train_ce(connectorIndex);
-
 
 	// *** DisplayPort link training finish
 	snooze(400);
