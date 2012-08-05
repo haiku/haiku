@@ -593,7 +593,7 @@ ConnectionListener::Listen(ConnectionListener** _listener, uint16 port)
 
 
 status_t
-ConnectionListener::AcceptConnection(Connection** _connection)
+ConnectionListener::AcceptConnection(Connection** connection)
 {
 	object_wait_info object[2];
 	object[0].object = fWaitCancel;
@@ -623,15 +623,13 @@ ConnectionListener::AcceptConnection(Connection** _connection)
 	ServerAddress address;
 	address.fProtocol = IPPROTO_TCP;
 	address.fAddress = addr;
-	Connection* connection;
 
-	status_t result = Connection::SetTo(&connection, sock, address);
+	status_t result = Connection::SetTo(connection, sock, address);
 	if (result != B_OK) {
 		close(sock);
 		return result;
 	}
 
-	*_connection = connection;
 	return B_OK;
 }
 

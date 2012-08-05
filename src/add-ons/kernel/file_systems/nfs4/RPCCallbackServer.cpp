@@ -170,7 +170,7 @@ CallbackServer::NewConnection(Connection* connection)
 		return B_NO_MEMORY;
 
 	arguments[0] = this;
-	arguments[1] = connection;
+	arguments[1] = entry;
 
 	thread_id thread;
 	thread = spawn_kernel_thread(&CallbackServer::ConnectionThreadLauncher,
@@ -224,7 +224,7 @@ status_t
 CallbackServer::ConnectionThread(ConnectionEntry* entry)
 {
 	Connection* connection = entry->fConnection;
-	dprintf("NEW CONNECTION\n");
+
 	while (fThreadRunning) {
 		uint32 size;
 		void* buffer;

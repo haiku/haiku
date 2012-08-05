@@ -26,7 +26,7 @@ enum {
 	PROGRAM_NFS_CB	= 0x40000000
 };
 
-#define NFS_VERSION	4
+#define NFS_CB_VERSION	1
 
 
 CallbackRequest::CallbackRequest(void *buffer, int size)
@@ -44,6 +44,9 @@ CallbackRequest::CallbackRequest(void *buffer, int size)
 		return;
 
 	if (fStream.GetUInt() != PROGRAM_NFS_CB)
+		return;
+
+	if (fStream.GetUInt() != NFS_CB_VERSION)
 		return;
 
 	fProcedure = fStream.GetUInt();
