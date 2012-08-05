@@ -574,7 +574,7 @@ BStatusBar::SetTo(float value, const char* text, const char* trailingText)
 	}
 
 	// TODO: Ask the BControlLook in the first place about dirty rect.
-	if (be_control_look)
+	if (be_control_look != NULL)
 		update.InsetBy(-1, -1);
 
 	Invalidate(update);
