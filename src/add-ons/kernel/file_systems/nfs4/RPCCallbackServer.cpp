@@ -287,6 +287,7 @@ CallbackServer::ListenerThread()
 {
 	while (fThreadRunning) {
 		Connection* connection;
+
 		status_t result = fListener->AcceptConnection(&connection);
 		if (result != B_OK) {
 			fThreadRunning = false;

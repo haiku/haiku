@@ -551,7 +551,7 @@ ConnectionBase::Disconnect()
 
 
 status_t
-ConnectionListener::Listen(ConnectionListener** _listener, uint16 port)
+ConnectionListener::Listen(ConnectionListener** listener, uint16 port)
 {
 	int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sock < 0)
@@ -577,16 +577,13 @@ ConnectionListener::Listen(ConnectionListener** _listener, uint16 port)
 	address.fProtocol = IPPROTO_TCP;
 	memset(&address.fAddress, 0, sizeof(address.fAddress));
 
-	ConnectionListener* listener;
-	listener = new(std::nothrow) ConnectionListener(address);
-	if (listener == NULL) {
+	*listener = new(std::nothrow) ConnectionListener(address);
+	if (*listener == NULL) {
 		close(sock);
 		return B_NO_MEMORY;
 	}
 
-	listener->fSocket = sock;
-
-	*_listener = listener;
+	(*listener)->fSocket = sock;
 
 	return B_OK;
 }

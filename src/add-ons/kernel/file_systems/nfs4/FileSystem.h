@@ -51,6 +51,10 @@ public:
 	inline	dev_t				DevId() const;
 	inline	InodeIdMap*			InoIdMap();
 
+	inline	uint64				OpenOwner() const;
+	inline	uint32				OpenOwnerSequenceLock();
+	inline	void				OpenOwnerSequenceUnlock(bool increment = true);
+
 			FileSystem*			fNext;
 			FileSystem*			fPrev;
 private:
@@ -61,6 +65,10 @@ private:
 			OpenFileCookie*		fOpenFiles;
 			uint32				fOpenCount;
 			mutex				fOpenLock;
+
+			uint64				fOpenOwner;
+			uint32				fOpenOwnerSequence;
+			mutex				fOpenOwnerLock;
 
 			uint32				fExpireType;
 			uint32				fSupAttrs[2];
@@ -160,6 +168,30 @@ inline InodeIdMap*
 FileSystem::InoIdMap()
 {
 	return &fInoIdMap;
+}
+
+
+inline uint64
+FileSystem::OpenOwner() const
+{
+	return fOpenOwner;
+}
+
+
+inline uint32
+FileSystem::OpenOwnerSequenceLock()
+{
+	mutex_lock(&fOpenOwnerLock);
+	return fOpenOwnerSequence;
+}
+
+
+inline void
+FileSystem::OpenOwnerSequenceUnlock(bool increment = true)
+{
+	if (increment)
+		fOpenOwnerSequence++;
+	mutex_unlock(&fOpenOwnerLock);
 }
 
 

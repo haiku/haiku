@@ -103,6 +103,7 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 status_t
 NFS4Object::ConfirmOpen(const FileHandle& fh, OpenState* state)
 {
+	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
@@ -110,16 +111,20 @@ NFS4Object::ConfirmOpen(const FileHandle& fh, OpenState* state)
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fh);
-		req.OpenConfirm(state->fSequence++, state->fStateID, state->fStateSeq);
+		req.OpenConfirm(sequence, state->fStateID, state->fStateSeq);
 
 		status_t result = request.Send();
-		if (result != B_OK)
+		if (result != B_OK) {
+			fFileSystem->OpenOwnerSequenceUnlock(false);
 			return result;
+		}
 
 		ReplyInterpreter& reply = request.Reply();
 
 		if (HandleErrors(reply.NFS4Error(), serv))
 			continue;
+
+		fFileSystem->OpenOwnerSequenceUnlock();
 
 		reply.PutFH();
 		result = reply.OpenConfirm(&state->fStateSeq);

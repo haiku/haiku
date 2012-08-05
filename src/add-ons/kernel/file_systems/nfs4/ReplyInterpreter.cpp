@@ -266,8 +266,8 @@ ReplyInterpreter::LockU(LockInfo* linfo)
 
 
 status_t
-ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm, uint64* _before,
-	uint64* _after, bool* _atomic)
+ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm,
+	OpenDelegationData* delegData, ChangeInfo* changeInfo)
 {
 	status_t res = _OperationError(OpOpen);
 	if (res != B_OK)
@@ -280,14 +280,13 @@ ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm, uint64* _before,
 
 	// change info
 	bool atomic = fReply->Stream().GetBoolean();
-	if (_atomic != NULL)
-		*_atomic = atomic;
 	uint64 before = fReply->Stream().GetUHyper();
-	if (_before != NULL)
-		*_before = before;
 	uint64 after = fReply->Stream().GetUHyper();
-	if (_after != NULL)
-		*_after = after;
+	if (changeInfo != NULL) {
+		changeInfo->fAtomic = atomic;
+		changeInfo->fBefore = before;
+		changeInfo->fAfter = after;
+	}
 
 	uint32 flags = fReply->Stream().GetUInt();
 	*confirm = (flags & OPEN4_RESULT_CONFIRM) == OPEN4_RESULT_CONFIRM;
@@ -298,7 +297,41 @@ ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm, uint64* _before,
 		fReply->Stream().GetUInt();
 
 	// delegation info
+	uint32 delegation = fReply->Stream().GetUInt();
+	if (delegation == OPEN_DELEGATE_NONE) {
+		delegData->fType = OPEN_DELEGATE_NONE;
+		return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	}
+
+	delegData->fStateSeq = fReply->Stream().GetUInt();
+	delegData->fStateID[0] = fReply->Stream().GetUInt();
+	delegData->fStateID[1] = fReply->Stream().GetUInt();
+	delegData->fStateID[2] = fReply->Stream().GetUInt();
+
+	delegData->fRecall = fReply->Stream().GetBoolean();
+
+	switch (delegation) {
+		case OPEN_DELEGATE_READ:
+			delegData->fType = OPEN_DELEGATE_READ;
+			break;
+		case OPEN_DELEGATE_WRITE:
+			delegData->fType = OPEN_DELEGATE_WRITE;
+
+			int32 limitBy = fReply->Stream().GetInt();
+			if (limitBy == NFS_LIMIT_SIZE)
+				delegData->fSpaceLimit = fReply->Stream().GetUHyper();
+			else if (limitBy == NFS_LIMIT_BLOCKS) {
+				uint32 numBlocks = fReply->Stream().GetUInt();
+				delegData->fSpaceLimit = fReply->Stream().GetUInt() * numBlocks;
+			}
+			break;
+	}
+
+	// ACE data
 	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetUInt();
+	fReply->Stream().GetOpaque(NULL);
 
 	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
 }

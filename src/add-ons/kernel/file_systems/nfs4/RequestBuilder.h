@@ -41,7 +41,8 @@ public:
 			status_t				GetFH();
 			status_t				Link(const char* name);
 			status_t				Lock(OpenFileCookie* cookie,
-										LockInfo* lock, bool reclaim = false);
+										LockInfo* lock, uint32 sequence,
+										bool reclaim = false);
 			status_t				LockT(LockType type, uint64 pos,
 										uint64 len, OpenFileCookie* cookie);
 			status_t				LockU(LockInfo* lock);

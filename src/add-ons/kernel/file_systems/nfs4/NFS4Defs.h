@@ -207,9 +207,30 @@ enum OpenClaim {
 	CLAIM_DELEGATE_PREV		= 3
 };
 
+enum OpenDelegation {
+	OPEN_DELEGATE_NONE		= 0,
+	OPEN_DELEGATE_READ		= 1,
+	OPEN_DELEGATE_WRITE		= 2
+};
+
+struct OpenDelegationData {
+	OpenDelegation	fType;
+
+	uint32			fStateSeq;
+	uint32			fStateID[3];
+
+	bool			fRecall;
+	uint64			fSpaceLimit;
+};
+
 enum OpenFlags {
 	OPEN4_RESULT_CONFIRM		= 2,
 	OPEN4_RESULT_LOCKTYPE_POSIX	= 4
+};
+
+enum {
+	NFS_LIMIT_SIZE		= 1,
+	NFS_LIMIT_BLOCKS	= 2
 };
 
 struct ChangeInfo {

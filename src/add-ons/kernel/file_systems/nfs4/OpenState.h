@@ -28,13 +28,7 @@ struct OpenState : public NFS4Object, public KernelReferenceable {
 			uint32			fStateID[3];
 			uint32			fStateSeq;
 
-			uint32			fSequence;
-
-			uint64			fOwnerID;
-	static	vint64			fLastOwnerID;
-
 			bool			fOpened;
-
 
 			status_t		Reclaim(uint64 newClientID);
 

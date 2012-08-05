@@ -389,14 +389,14 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 	status_t result;
 
 	bool badOwner = false;
+	OpenDelegationData delegation;
+	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
 
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
-
-		state->fOwnerID = atomic_add64(&state->fLastOwnerID, 1);
 
 		req.PutFH(fInfo.fHandle);
 
@@ -427,9 +427,9 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 			i++;
 		}
 
-		req.Open(CLAIM_NULL, state->fSequence++, sModeToAccess(mode),
-			state->fClientID, OPEN4_CREATE, state->fOwnerID, name, cattr,
-			i, (mode & O_EXCL) == O_EXCL);
+		req.Open(CLAIM_NULL, sequence, sModeToAccess(mode),
+			state->fClientID, OPEN4_CREATE, fFileSystem->OpenOwner(), name,
+			cattr, i, (mode & O_EXCL) == O_EXCL);
 
 		req.GetFH();
 
@@ -439,22 +439,29 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 		}
 
 		result = request.Send();
-		if (result != B_OK)
+		if (result != B_OK) {
+			fFileSystem->OpenOwnerSequenceUnlock(false);
 			return result;
+		}
 
 		ReplyInterpreter& reply = request.Reply();
 
 		if (reply.NFS4Error() == NFS4ERR_BADOWNER) {
+			fFileSystem->OpenOwnerSequenceUnlock();
+			sequence = fFileSystem->OpenOwnerSequenceLock();
+
 			badOwner = true;
 			continue;
 		}
 		if (HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
+		fFileSystem->OpenOwnerSequenceUnlock();
+
 		reply.PutFH();
 
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
-			&changeInfo->fBefore, &changeInfo->fAfter, &changeInfo->fAtomic);
+			&delegation, changeInfo);
 		if (result != B_OK)
 			return result;
 
@@ -488,16 +495,16 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 status_t
 NFS4Inode::OpenFile(OpenState* state, int mode)
 {
+	OpenDelegationData delegation;
 	bool confirm;
 	status_t result;
+	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
 
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
-
-		state->fOwnerID = atomic_add64(&state->fLastOwnerID, 1);
 
 		// Since we are opening the file using a pair (parentFH, name) we
 		// need to check for race conditions.
@@ -526,21 +533,26 @@ NFS4Inode::OpenFile(OpenState* state, int mode)
 			attr.fAttribute = FATTR4_SIZE;
 			attr.fFreePointer = false;
 			attr.fData.fValue64 = 0;
-			req.Open(CLAIM_NULL, state->fSequence++, sModeToAccess(mode),
-				state->fClientID, OPEN4_CREATE, state->fOwnerID, fInfo.fName,
-				&attr, 1, false);
+			req.Open(CLAIM_NULL, sequence, sModeToAccess(mode),
+				state->fClientID, OPEN4_CREATE, fFileSystem->OpenOwner(), 
+				fInfo.fName, &attr, 1, false);
 		} else
-		req.Open(CLAIM_NULL, state->fSequence++, sModeToAccess(mode),
-			state->fClientID, OPEN4_NOCREATE, state->fOwnerID, fInfo.fName);
+		req.Open(CLAIM_NULL, sequence, sModeToAccess(mode), state->fClientID,
+			OPEN4_NOCREATE, fFileSystem->OpenOwner(), fInfo.fName);
+		req.GetFH();
 
 		result = request.Send();
-		if (result != B_OK)
+		if (result != B_OK) {
+			fFileSystem->OpenOwnerSequenceUnlock(false);
 			return result;
+		}
 
 		ReplyInterpreter& reply = request.Reply();
 
 		if (HandleErrors(reply.NFS4Error(), serv, NULL, state))
 			continue;
+
+		fFileSystem->OpenOwnerSequenceUnlock();
 
 		// Verify if the file we want to open is the file this Inode
 		// represents.
@@ -558,7 +570,12 @@ NFS4Inode::OpenFile(OpenState* state, int mode)
 		}
 
 		reply.PutFH();
-		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm);
+		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
+			&delegation);
+
+		FileHandle handle;
+		reply.GetFH(&handle);
+
 		if (result != B_OK)
 			return result;
 
@@ -569,6 +586,9 @@ NFS4Inode::OpenFile(OpenState* state, int mode)
 
 	if (confirm)
 		return ConfirmOpen(fInfo.fHandle, state);
+
+	if (delegation.fType != OPEN_DELEGATE_NONE)
+		dprintf("GOT A DELEGATION!\n");
 
 	return B_OK;
 }
@@ -891,6 +911,7 @@ NFS4Inode::TestLock(OpenFileCookie* cookie, LockType* type, uint64* position,
 status_t
 NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 {
+	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		MutexLocker ownerLocker(lockInfo->fOwner->fLock);
 
@@ -899,11 +920,13 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
-		req.Lock(cookie, lockInfo);
+		req.Lock(cookie, lockInfo, sequence);
 
 		status_t result = request.Send();
-		if (result != B_OK)
+		if (result != B_OK) {
+			fFileSystem->OpenOwnerSequenceUnlock(false);
 			return result;
+		}
 
 		ReplyInterpreter &reply = request.Reply();
 
@@ -912,13 +935,16 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 
 		ownerLocker.Unlock();
 		if (wait && reply.NFS4Error() == NFS4ERR_DENIED) {
+			fFileSystem->OpenOwnerSequenceUnlock();
 			snooze_etc(sSecToBigTime(5), B_SYSTEM_TIMEBASE,
 				B_RELATIVE_TIMEOUT);
+			sequence = fFileSystem->OpenOwnerSequenceLock();
 			continue;
 		}
 		if (HandleErrors(reply.NFS4Error(), serv, cookie))
 			continue;
 
+		fFileSystem->OpenOwnerSequenceUnlock();
 		if (result != B_OK)
 			return result;
 

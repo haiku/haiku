@@ -15,11 +15,8 @@
 #include "Request.h"
 
 
-vint64 OpenState::fLastOwnerID = 0;
-
 OpenState::OpenState()
 	:
-	fSequence(0),
 	fOpened(false)
 {
 	mutex_init(&fLock, NULL);
@@ -46,27 +43,34 @@ OpenState::Reclaim(uint64 newClientID)
 	fClientID = newClientID;
 
 	bool confirm;
+	OpenDelegationData delegation;
+
+	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		RPC::Server* server = fFileSystem->Server();
 		Request request(server);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
-		req.Open(CLAIM_PREVIOUS, fSequence++, sModeToAccess(fMode), newClientID,
-			OPEN4_NOCREATE, fOwnerID, NULL);
+		req.Open(CLAIM_PREVIOUS, sequence, sModeToAccess(fMode), newClientID,
+			OPEN4_NOCREATE, fFileSystem->OpenOwner(), NULL);
 
 		status_t result = request.Send();
-		if (result != B_OK)
+		if (result != B_OK) {
+			fFileSystem->OpenOwnerSequenceUnlock(false);
 			return result;
+		}
 
 		ReplyInterpreter& reply = request.Reply();
 
 		if (HandleErrors(reply.NFS4Error(), server))
 			continue;
 
+ 		fFileSystem->OpenOwnerSequenceUnlock();
+
 		reply.PutFH();
 
-		result = reply.Open(fStateID, &fStateSeq, &confirm);
+		result = reply.Open(fStateID, &fStateSeq, &confirm, &delegation);
 		if (result != B_OK)
 			return result;
 	} while (true);
@@ -87,24 +91,29 @@ OpenState::Close()
 	MutexLocker _(fLock);
 	fOpened = false;
 
+	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
-		req.Close(fSequence++, fStateID, fStateSeq);
+		req.Close(sequence, fStateID, fStateSeq);
 
 		status_t result = request.Send();
-		if (result != B_OK)
+		if (result != B_OK) {
+			fFileSystem->OpenOwnerSequenceUnlock(false);
 			return result;
+		}
 
 		ReplyInterpreter& reply = request.Reply();
 
 		if (HandleErrors(reply.NFS4Error(), serv, NULL, this))
 			continue;
+ 		fFileSystem->OpenOwnerSequenceUnlock();
 
 		reply.PutFH();
+
 		return reply.Close();
 	} while (true);
 }

@@ -186,7 +186,8 @@ RequestBuilder::_GenerateLockOwner(XDR::WriteStream& stream,
 
 
 status_t
-RequestBuilder::Lock(OpenFileCookie* cookie, LockInfo* lock, bool reclaim)
+RequestBuilder::Lock(OpenFileCookie* cookie, LockInfo* lock, uint32 sequence,
+	bool reclaim)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -213,7 +214,7 @@ RequestBuilder::Lock(OpenFileCookie* cookie, LockInfo* lock, bool reclaim)
 		else
 			state = cookie->fWriteState;
 
-		fRequest->Stream().AddUInt(state->fSequence++);
+		fRequest->Stream().AddUInt(sequence);
 		fRequest->Stream().AddUInt(state->fStateSeq);
 		fRequest->Stream().AddUInt(state->fStateID[0]);
 		fRequest->Stream().AddUInt(state->fStateID[1]);

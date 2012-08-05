@@ -27,10 +27,16 @@ FileSystem::FileSystem()
 	fPrev(NULL),
 	fOpenFiles(NULL),
 	fOpenCount(0),
+	fOpenOwnerSequence(0),
 	fPath(NULL),
 	fRoot(NULL),
 	fId(1)
 {
+	fOpenOwner = rand();
+	fOpenOwner <<= 32;
+	fOpenOwner |= rand();
+
+	mutex_init(&fOpenOwnerLock, NULL);
 	mutex_init(&fOpenLock, NULL);
 }
 
@@ -40,6 +46,7 @@ FileSystem::~FileSystem()
 	NFSServer()->RemoveFileSystem(this);
 
 	mutex_destroy(&fOpenLock);
+	mutex_destroy(&fOpenOwnerLock);
 
 	free(const_cast<char*>(fPath));
 	delete fRoot;

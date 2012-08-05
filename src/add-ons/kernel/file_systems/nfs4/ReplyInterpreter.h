@@ -81,8 +81,8 @@ public:
 	inline	status_t	LookUpUp();
 	inline	status_t	Nverify();
 			status_t	Open(uint32* id, uint32* seq, bool* confirm,
-							uint64* before = NULL, uint64* after = NULL,
-							bool* atomic = NULL);
+							OpenDelegationData* delegData,
+							ChangeInfo* changeInfo = NULL);
 			status_t	OpenConfirm(uint32* stateSeq);
 	inline	status_t	PutFH();
 	inline	status_t	PutRootFH();
