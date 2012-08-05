@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1304,7 +1304,8 @@ DwarfTypeFactory::_ResolveTypeByteSize(DIEType* typeEntry,
 			case DW_TAG_ptr_to_member_type:
 				_size = fTypeContext->GetCompilationUnit()->AddressSize();
 
-				TRACE_LOCALS("  pointer/reference type: size: %llu\n", _size);
+				TRACE_LOCALS("  pointer/reference type: size: %" B_PRIu64 "\n",
+					_size);
 
 				return B_OK;
 			default:
@@ -1327,7 +1328,7 @@ DwarfTypeFactory::_ResolveTypeByteSize(DIEType* typeEntry,
 
 	_size = size.ToUInt64();
 
-	TRACE_LOCALS("  -> size: %llu\n", _size);
+	TRACE_LOCALS("  -> size: %" B_PRIu64 "\n", _size);
 
 	return B_OK;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -130,11 +130,12 @@ IntegerFormatter::FormatValue(const BVariant& value, integer_format format,
 			snprintf(buffer, bufferSize, "%#x", (uint16)value.ToUInt64());
 			break;
 		case INTEGER_FORMAT_HEX_32:
-			snprintf(buffer, bufferSize, "%#lx", (uint32)value.ToUInt64());
+			snprintf(buffer, bufferSize, "%#" B_PRIx32,
+				(uint32)value.ToUInt64());
 			break;
 		case INTEGER_FORMAT_HEX_64:
 		default:
-			snprintf(buffer, bufferSize, "%#llx", value.ToUInt64());
+			snprintf(buffer, bufferSize, "%#" B_PRIx64, value.ToUInt64());
 			break;
 	}
 

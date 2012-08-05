@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -346,7 +346,8 @@ DwarfType::ResolveLocation(DwarfTypeContext* typeContext,
 				// TODO: Use bit size and bit offset, if specified!
 			_location.SetPieceAt(0, piece);
 
-			TRACE_LOCALS("  set single piece size to %llu\n", ByteSize());
+			TRACE_LOCALS("  set single piece size to %" B_PRIu64 "\n",
+				ByteSize());
 		}
 	}
 
@@ -670,8 +671,8 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 		bitSize = value.ToUInt64();
 	}
 
-	TRACE_LOCALS("bit field: byte size: %llu, bit offset/size: %llu/%llu\n",
-		byteSize, bitOffset, bitSize);
+	TRACE_LOCALS("bit field: byte size: %" B_PRIu64 ", bit offset/size: %"
+		B_PRIu64 "/%" B_PRIu64 "\n", byteSize, bitOffset, bitSize);
 
 	if (bitOffset + bitSize > byteSize * 8)
 		return B_BAD_VALUE;
@@ -942,8 +943,8 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 		// doesn't have a stride and the previous dimension's element count is
 		// not known), we can only resolve the first element.
 		if (dimensionStride == 0 && index != 0) {
-			WARNING("No dimension bit stride for dimension %ld and element "
-				"index is not 0.\n", dimensionIndex);
+			WARNING("No dimension bit stride for dimension %" B_PRId32 " and "
+				"element index is not 0.\n", dimensionIndex);
 			return B_BAD_VALUE;
 		}
 
@@ -953,7 +954,7 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 		previousDimensionStride = dimensionStride;
 	}
 
-	TRACE_LOCALS("total element bit offset: %lld\n", elementOffset);
+	TRACE_LOCALS("total element bit offset: %" B_PRId64 "\n", elementOffset);
 
 	// create the value location object for the element
 	ValueLocation* location = new(std::nothrow) ValueLocation(

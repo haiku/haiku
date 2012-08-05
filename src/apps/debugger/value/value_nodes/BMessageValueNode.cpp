@@ -255,8 +255,8 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		return B_NO_MEMORY;
 	error = valueLoader->LoadRawValue(headerAddress, sizeof(
 		BMessage::message_header), fHeader);
-	TRACE_LOCALS("BMessage: Header Address: 0x%" B_PRIx64 ", result: %ld\n",
-		headerAddress.ToUInt64(), error);
+	TRACE_LOCALS("BMessage: Header Address: 0x%" B_PRIx64 ", result: %s\n",
+		headerAddress.ToUInt64(), strerror(error));
 	if (error != B_OK)
 		return error;
 
@@ -269,15 +269,16 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	else
 		fHeader->what = what.ToUInt32();
 
-	TRACE_LOCALS("BMessage: what: 0x%" B_PRIx32 ", result: %ld\n",
-		what.ToUInt32(), error);
+	TRACE_LOCALS("BMessage: what: 0x%" B_PRIx32 ", result: %s\n",
+		what.ToUInt32(), strerror(error));
 
 	size_t fieldsSize = fHeader->field_count * sizeof(
 		BMessage::field_header);
 	if (fIsFlatMessage)
 		fDataLocation.SetTo(fieldAddress.ToUInt64() + fieldsSize);
 
-	size_t totalSize = sizeof(BMessage::message_header) + fieldsSize + fHeader->data_size;
+	size_t totalSize = sizeof(BMessage::message_header) + fieldsSize
+		+ fHeader->data_size;
 	uint8* messageBuffer = new(std::nothrow) uint8[totalSize];
 	if (messageBuffer == NULL)
 		return B_NO_MEMORY;
@@ -296,7 +297,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		error = valueLoader->LoadRawValue(fieldAddress, fieldsSize,
 			fFields);
 		TRACE_LOCALS("BMessage: Field Header Address: 0x%" B_PRIx64
-			", result: %ld\n",	headerAddress.ToUInt64(), error);
+			", result: %s\n",	headerAddress.ToUInt64(), strerror(error));
 		if (error != B_OK)
 			return error;
 
@@ -307,7 +308,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		error = valueLoader->LoadRawValue(fDataLocation, fHeader->data_size,
 			fData);
 		TRACE_LOCALS("BMessage: Data Address: 0x%" B_PRIx64
-			", result: %ld\n",	fDataLocation.ToUInt64(), error);
+			", result: %s\n",	fDataLocation.ToUInt64(), strerror(error));
 		if (error != B_OK)
 			return error;
 		memcpy(tempBuffer, fFields, fieldsSize);
@@ -710,7 +711,7 @@ BMessageValueNode::BMessageFieldNodeChild::BMessageFieldNodeChild(
 	fType->AcquireReference();
 
 	if (fFieldIndex >= 0)
-		fPresentationName.SetToFormat("[%ld]", fFieldIndex);
+		fPresentationName.SetToFormat("[%" B_PRId32 "]", fFieldIndex);
 }
 
 

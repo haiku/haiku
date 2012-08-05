@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef WORKER_H
@@ -40,7 +40,7 @@ class JobKey {
 public:
 	virtual						~JobKey();
 
-	virtual	uint32				HashValue() const = 0;
+	virtual	size_t				HashValue() const = 0;
 
 	virtual	bool				operator==(const JobKey& other) const = 0;
 };
@@ -54,7 +54,7 @@ public:
 								SimpleJobKey(void* object, uint32 type);
 								SimpleJobKey(const SimpleJobKey& other);
 
-	virtual	uint32				HashValue() const;
+	virtual	size_t				HashValue() const;
 
 	virtual	bool				operator==(const JobKey& other) const;
 

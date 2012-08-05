@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -198,7 +198,7 @@ CompoundValueNode::CreateChildren()
 
 	// base types
 	for (int32 i = 0; BaseType* baseType = fType->BaseTypeAt(i); i++) {
-		TRACE_LOCALS("  base %ld\n", i);
+		TRACE_LOCALS("  base %" B_PRId32 "\n", i);
 
 		BaseTypeChild* child = new(std::nothrow) BaseTypeChild(this, baseType);
 		if (child == NULL || !fChildren.AddItem(child)) {
@@ -211,7 +211,7 @@ CompoundValueNode::CreateChildren()
 
 	// members
 	for (int32 i = 0; DataMember* member = fType->DataMemberAt(i); i++) {
-		TRACE_LOCALS("  member %ld: \"%s\"\n", i, member->Name());
+		TRACE_LOCALS("  member %" B_PRId32 ": \"%s\"\n", i, member->Name());
 
 		MemberChild* child = new(std::nothrow) MemberChild(this, member);
 		if (child == NULL || !fChildren.AddItem(child)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -17,7 +17,7 @@ CpuStateX86::CpuStateX86()
 }
 
 
-CpuStateX86::CpuStateX86(const debug_cpu_state_x86& state)
+CpuStateX86::CpuStateX86(const x86_debug_cpu_state& state)
 	:
 	fSetRegisters(),
 	fInterruptVector(0)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, François Revol, revol@free.fr
  * Distributed under the terms of the MIT License.
  */
@@ -73,7 +73,7 @@ DisassemblerX86::GetNextInstruction(BString& line, target_addr_t& _address,
 	uint32 address = (uint32)ud_insn_off(fUdisData);
 
 	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "0x%08lx: %16.16s  %s", address,
+	snprintf(buffer, sizeof(buffer), "0x%08" B_PRIx32 ": %16.16s  %s", address,
 		ud_insn_hex(fUdisData), ud_insn_asm(fUdisData));
 			// TODO: Resolve symbols!
 

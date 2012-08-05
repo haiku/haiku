@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -134,7 +134,7 @@ public:
 		if (error != B_OK)
 			return false;
 
-		TRACE_EXPR("  -> frame base: %llx\n", fFrameBasePointer);
+		TRACE_EXPR("  -> frame base: %" B_PRIx64 "\n", fFrameBasePointer);
 
 		_address = fFrameBasePointer;
 		return true;
@@ -420,9 +420,9 @@ DwarfFile::Load(const char* fileName)
 			break;
 		}
 
-		TRACE_DIE("DWARF%d compilation unit: version %d, length: %lld, "
-			"abbrevOffset: %lld, address size: %d\n", dwarf64 ? 64 : 32,
-			version, unitLength, abbrevOffset, addressSize);
+		TRACE_DIE("DWARF%d compilation unit: version %d, length: %" B_PRIu64
+			", abbrevOffset: %" B_PRIdOFF ", address size: %d\n",
+			dwarf64 ? 64 : 32, version, unitLength, abbrevOffset, addressSize);
 
 		if (version != 2 && version != 3) {
 			WARNING("\"%s\": Unsupported compilation unit version: %d\n",
@@ -818,7 +818,7 @@ DwarfFile::_ParseCompilationUnit(CompilationUnit* unit)
 	unit->SetUnitEntry(unitEntry);
 
 	TRACE_DIE_ONLY(
-		TRACE_DIE("remaining bytes in unit: %lld\n",
+		TRACE_DIE("remaining bytes in unit: %" B_PRIdOFF "\n",
 			dataReader.BytesRemaining());
 		if (dataReader.HasData()) {
 			TRACE_DIE("  ");
@@ -853,7 +853,7 @@ DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
 	// get the corresponding abbreviation entry
 	AbbreviationEntry abbreviationEntry;
 	if (!abbreviationTable->GetAbbreviationEntry(code, abbreviationEntry)) {
-		WARNING("No abbreviation entry for code %lu\n", code);
+		WARNING("No abbreviation entry for code %" B_PRIu32 "\n", code);
 		return B_BAD_DATA;
 	}
 
@@ -861,17 +861,17 @@ DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
 	status_t error = fDebugInfoFactory.CreateDebugInfoEntry(
 		abbreviationEntry.Tag(), entry);
 	if (error != B_OK) {
-		WARNING("Failed to generate entry for tag %lu, code %lu\n",
-			abbreviationEntry.Tag(), code);
+		WARNING("Failed to generate entry for tag %" B_PRIu32 ", code %"
+			B_PRIu32 "\n", abbreviationEntry.Tag(), code);
 		return error;
 	}
 
 	ObjectDeleter<DebugInfoEntry> entryDeleter(entry);
 
-	TRACE_DIE("%*sentry %p at %lld: %lu, tag: %s (%lu), children: %d\n",
-		level * 2, "", entry, entryOffset, abbreviationEntry.Code(),
-		get_entry_tag_name(abbreviationEntry.Tag()), abbreviationEntry.Tag(),
-		abbreviationEntry.HasChildren());
+	TRACE_DIE("%*sentry %p at %" B_PRIdOFF ": %" B_PRIu32 ", tag: %s (%"
+		B_PRIu32 "), children: %d\n", level * 2, "", entry, entryOffset,
+		abbreviationEntry.Code(), get_entry_tag_name(abbreviationEntry.Tag()),
+		abbreviationEntry.Tag(), abbreviationEntry.HasChildren());
 
 	error = fCurrentCompilationUnit->AddDebugInfoEntry(entry, entryOffset);
 	if (error != B_OK)
@@ -943,7 +943,7 @@ DwarfFile::_FinishCompilationUnit(CompilationUnit* unit)
 		off_t offset;
 		unit->GetEntryAt(i, entry, offset);
 
-		TRACE_DIE("entry %p at %lld\n", entry, offset);
+		TRACE_DIE("entry %p at %" B_PRIdOFF "\n", entry, offset);
 
 		// seek the reader to the entry
 		dataReader.SeekAbsolute(offset);
@@ -1069,7 +1069,8 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 						? (off_t)dataReader.Read<uint64>(0)
 						: (off_t)dataReader.Read<uint32>(0);
 					if (offset >= fDebugStringSection->Size()) {
-						WARNING("Invalid DW_FORM_strp offset: %lld\n", offset);
+						WARNING("Invalid DW_FORM_strp offset: %" B_PRIdOFF "\n",
+							offset);
 						return B_BAD_DATA;
 					}
 					attributeValue.SetToString(
@@ -1106,7 +1107,8 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				break;
 			case DW_FORM_indirect:
 			default:
-				WARNING("Unsupported attribute form: %lu\n", attributeForm);
+				WARNING("Unsupported attribute form: %" B_PRIu32 "\n",
+					attributeForm);
 				return B_BAD_DATA;
 		}
 
@@ -1115,10 +1117,10 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 		uint8 attributeClass = get_attribute_class(attributeName,
 			attributeForm);
 		if (attributeClass == ATTRIBUTE_CLASS_UNKNOWN) {
-			TRACE_DIE("skipping attribute with unrecognized class: %s (%#lx) "
-				"%s (%#lx)\n", get_attribute_name_name(attributeName),
-				attributeName, get_attribute_form_name(attributeForm),
-				attributeForm);
+			TRACE_DIE("skipping attribute with unrecognized class: %s (%#"
+				B_PRIx32 ") %s (%#" B_PRIx32 ")\n",
+				get_attribute_name_name(attributeName), attributeName,
+				get_attribute_form_name(attributeForm), attributeForm);
 			continue;
 		}
 //		attributeValue.attributeClass = attributeClass;
@@ -1158,8 +1160,8 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 						if (attributeName == DW_AT_sibling)
 							continue;
 
-						WARNING("Failed to resolve reference: %s (%#lx) "
-							"%s (%#lx): value: %llu\n",
+						WARNING("Failed to resolve reference: %s (%#" B_PRIx32
+							") %s (%#" B_PRIx32 "): value: %" B_PRIu64 "\n",
 							get_attribute_name_name(attributeName),
 							attributeName,
 							get_attribute_form_name(attributeForm),
@@ -1220,7 +1222,8 @@ DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 {
 	off_t offset = unit->UnitEntry()->StatementListOffset();
 
-	TRACE_LINES("DwarfFile::_ParseLineInfo(%p), offset: %lld\n", unit, offset);
+	TRACE_LINES("DwarfFile::_ParseLineInfo(%p), offset: %" B_PRIdOFF "\n", unit,
+		offset);
 
 	DataReader dataReader((uint8*)fDebugLineSection->Data() + offset,
 		fDebugLineSection->Size() - offset, unit->AddressSize());
@@ -1268,9 +1271,9 @@ DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 	if (version != 2 && version != 3)
 		return B_UNSUPPORTED;
 
-	TRACE_LINES("  unitLength:           %llu\n", unitLength);
+	TRACE_LINES("  unitLength:           %" B_PRIu64 "\n", unitLength);
 	TRACE_LINES("  version:              %u\n", version);
-	TRACE_LINES("  headerLength:         %llu\n", headerLength);
+	TRACE_LINES("  headerLength:         %" B_PRIu64 "\n", headerLength);
 	TRACE_LINES("  minInstructionLength: %u\n", minInstructionLength);
 	TRACE_LINES("  defaultIsStatement:   %d\n", defaultIsStatement);
 	TRACE_LINES("  lineBase:             %d\n", lineBase);
@@ -1302,8 +1305,9 @@ DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 		if (dataReader.HasOverflow())
 			return B_BAD_DATA;
 
-		TRACE_LINES("    \"%s\", dir index: %llu, mtime: %llu, length: %llu\n",
-			file, dirIndex, modificationTime, fileLength);
+		TRACE_LINES("    \"%s\", dir index: %" B_PRIu64 ", mtime: %" B_PRIu64
+			", length: %" B_PRIu64 "\n", file, dirIndex, modificationTime,
+			fileLength);
 
 		if (!unit->AddFile(file, dirIndex))
 			return B_NO_MEMORY;
@@ -1343,7 +1347,7 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 			// the ones generated by GCC 4 aren't.
 	}
 
-	TRACE_CFI("DwarfFile::_UnwindCallFrame(%#llx)\n", location);
+	TRACE_CFI("DwarfFile::_UnwindCallFrame(%#" B_PRIx64 ")\n", location);
 
 	DataReader dataReader((uint8*)currentFrameSection->Data(),
 		currentFrameSection->Size(), unit->AddressSize());
@@ -1426,8 +1430,9 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 					cieID = lengthOffset - cieID;
 				}
 
-				TRACE_CFI("  found fde: length: %llu (%lld), CIE offset: %#llx, "
-					"location: %#llx, range: %#llx\n", length, remaining, cieID,
+				TRACE_CFI("  found fde: length: %" B_PRIu64 " (%" B_PRIdOFF
+					"), CIE offset: %#" B_PRIx64 ", location: %#" B_PRIx64 ", "
+					"range: %#" B_PRIx64 "\n", length, remaining, cieID,
 					initialLocation, addressRange);
 
 				CfaContext context(location, initialLocation);
@@ -1505,11 +1510,11 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 						return B_BAD_VALUE;
 				}
 
-				TRACE_CFI("  frame address: %#llx\n", frameAddress);
+				TRACE_CFI("  frame address: %#" B_PRIx64 "\n", frameAddress);
 
 				// apply the register rules
 				for (uint32 i = 0; i < registerCount; i++) {
-					TRACE_CFI("  reg %lu\n", i);
+					TRACE_CFI("  reg %" B_PRIu32 "\n", i);
 
 					uint32 valueType = outputInterface->RegisterValueType(i);
 					if (valueType == 0)
@@ -1532,8 +1537,8 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 						}
 						case CFA_RULE_LOCATION_OFFSET:
 						{
-							TRACE_CFI("  -> CFA_RULE_LOCATION_OFFSET: %lld\n",
-								rule->Offset());
+							TRACE_CFI("  -> CFA_RULE_LOCATION_OFFSET: %"
+								B_PRId64 "\n", rule->Offset());
 
 							BVariant value;
 							if (inputInterface->ReadValueFromMemory(
@@ -1642,8 +1647,8 @@ DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
 
 	uint8 version = dataReader.Read<uint8>(0);
 	if (version != 1) {
-		TRACE_CFI("  cie: length: %llu, offset: %#llx, version: %u "
-			"-- unsupported\n",	length, cieOffset, version);
+		TRACE_CFI("  cie: length: %" B_PRIu64 ", offset: %#" B_PRIx64 ", "
+			"version: %u -- unsupported\n",	length, (uint64)cieOffset, version);
 		return B_UNSUPPORTED;
 	}
 
@@ -1660,16 +1665,18 @@ DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
 	context.SetDataAlignment(dataReader.ReadSignedLEB128(0));
 	context.SetReturnAddressRegister(dataReader.ReadUnsignedLEB128(0));
 
-	TRACE_CFI("  cie: length: %llu, offset: %#llx, version: %u, augmentation: "
-		"\"%s\", aligment: code: %lu, data: %ld, return address reg: %lu\n",
-		length, cieOffset, version, cieAugmentation.String(),
+	TRACE_CFI("  cie: length: %" B_PRIu64 ", offset: %#" B_PRIx64 ", version: "
+		"%u, augmentation: \"%s\", aligment: code: %" B_PRIu32 ", data: %"
+		B_PRId32 ", return address reg: %" B_PRIu32 "\n", length,
+		(uint64)cieOffset, version, cieAugmentation.String(),
 		context.CodeAlignment(), context.DataAlignment(),
 		context.ReturnAddressRegister());
 
 	status_t error = cieAugmentation.Read(dataReader);
 	if (error != B_OK) {
-		TRACE_CFI("  cie: length: %llu, version: %u, augmentation: \"%s\" "
-			"-- unsupported\n", length, version, cieAugmentation.String());
+		TRACE_CFI("  cie: length: %" B_PRIu64 ", version: %u, augmentation: "
+			"\"%s\" -- unsupported\n", length, version,
+			cieAugmentation.String());
 		return error;
 	}
 
@@ -1690,7 +1697,7 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 	CfaContext& context, DataReader& dataReader)
 {
 	while (dataReader.BytesRemaining() > 0) {
-		TRACE_CFI("    [%2lld]", dataReader.BytesRemaining());
+		TRACE_CFI("    [%2" B_PRId64 "]", dataReader.BytesRemaining());
 
 		uint8 opcode = dataReader.Read<uint8>(0);
 		if ((opcode >> 6) != 0) {
@@ -1699,7 +1706,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 			switch (opcode >> 6) {
 				case DW_CFA_advance_loc:
 				{
-					TRACE_CFI("    DW_CFA_advance_loc: %#lx\n", operand);
+					TRACE_CFI("    DW_CFA_advance_loc: %#" B_PRIx32 "\n",
+						operand);
 
 					target_addr_t location = context.Location()
 						+ operand * context.CodeAlignment();
@@ -1711,8 +1719,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				case DW_CFA_offset:
 				{
 					uint64 offset = dataReader.ReadUnsignedLEB128(0);
-					TRACE_CFI("    DW_CFA_offset: reg: %lu, offset: %llu\n",
-						operand, offset);
+					TRACE_CFI("    DW_CFA_offset: reg: %" B_PRIu32 ", offset: "
+						"%" B_PRIu64 "\n", operand, offset);
 
 					if (CfaRule* rule = context.RegisterRule(operand)) {
 						rule->SetToLocationOffset(
@@ -1722,7 +1730,7 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				}
 				case DW_CFA_restore:
 				{
-					TRACE_CFI("    DW_CFA_restore: %#lx\n", operand);
+					TRACE_CFI("    DW_CFA_restore: %#" B_PRIx32 "\n", operand);
 
 					context.RestoreRegisterRule(operand);
 					break;
@@ -1739,7 +1747,7 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					target_addr_t location = dataReader.ReadAddress(0);
 
-					TRACE_CFI("    DW_CFA_set_loc: %#llx\n", location);
+					TRACE_CFI("    DW_CFA_set_loc: %#" B_PRIx64 "\n", location);
 
 					if (location < context.Location())
 						return B_BAD_VALUE;
@@ -1752,7 +1760,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					uint32 delta = dataReader.Read<uint8>(0);
 
-					TRACE_CFI("    DW_CFA_advance_loc1: %#lx\n", delta);
+					TRACE_CFI("    DW_CFA_advance_loc1: %#" B_PRIx32 "\n",
+						delta);
 
 					target_addr_t location = context.Location()
 						+ delta * context.CodeAlignment();
@@ -1765,7 +1774,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					uint32 delta = dataReader.Read<uint16>(0);
 
-					TRACE_CFI("    DW_CFA_advance_loc2: %#lx\n", delta);
+					TRACE_CFI("    DW_CFA_advance_loc2: %#" B_PRIx32 "\n",
+						delta);
 
 					target_addr_t location = context.Location()
 						+ delta * context.CodeAlignment();
@@ -1778,7 +1788,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					uint32 delta = dataReader.Read<uint32>(0);
 
-					TRACE_CFI("    DW_CFA_advance_loc4: %#lx\n", delta);
+					TRACE_CFI("    DW_CFA_advance_loc4: %#" B_PRIx32 "\n",
+						delta);
 
 					target_addr_t location = context.Location()
 						+ delta * context.CodeAlignment();
@@ -1792,8 +1803,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 					uint64 offset = dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_offset_extended: reg: %lu, "
-						"offset: %llu\n", reg, offset);
+					TRACE_CFI("    DW_CFA_offset_extended: reg: %" B_PRIu32 ", "
+						"offset: %" B_PRIu64 "\n", reg, offset);
 
 					if (CfaRule* rule = context.RegisterRule(reg)) {
 						rule->SetToLocationOffset(
@@ -1805,7 +1816,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_restore_extended: %#lx\n", reg);
+					TRACE_CFI("    DW_CFA_restore_extended: %#" B_PRIx32 "\n",
+						reg);
 
 					context.RestoreRegisterRule(reg);
 					break;
@@ -1814,7 +1826,7 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_undefined: %lu\n", reg);
+					TRACE_CFI("    DW_CFA_undefined: %" B_PRIu32 "\n", reg);
 
 					if (CfaRule* rule = context.RegisterRule(reg))
 						rule->SetToUndefined();
@@ -1824,7 +1836,7 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_same_value: %lu\n", reg);
+					TRACE_CFI("    DW_CFA_same_value: %" B_PRIu32 "\n", reg);
 
 					if (CfaRule* rule = context.RegisterRule(reg))
 						rule->SetToSameValue();
@@ -1835,7 +1847,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint32 reg1 = dataReader.ReadUnsignedLEB128(0);
 					uint32 reg2 = dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_register: reg1: %lu, reg2: %lu\n", reg1, reg2);
+					TRACE_CFI("    DW_CFA_register: reg1: %" B_PRIu32 ", reg2: "
+						"%" B_PRIu32 "\n", reg1, reg2);
 
 					if (CfaRule* rule = context.RegisterRule(reg1))
 						rule->SetToValueOffset(reg2);
@@ -1864,8 +1877,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 					uint64 offset = dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_def_cfa: reg: %lu, offset: %llu\n",
-						reg, offset);
+					TRACE_CFI("    DW_CFA_def_cfa: reg: %" B_PRIu32 ", offset: "
+						"%" B_PRIu64 "\n", reg, offset);
 
 					context.GetCfaCfaRule()->SetToRegisterOffset(reg, offset);
 					break;
@@ -1874,7 +1887,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_def_cfa_register: %lu\n", reg);
+					TRACE_CFI("    DW_CFA_def_cfa_register: %" B_PRIu32 "\n",
+						reg);
 
 					if (context.GetCfaCfaRule()->Type()
 							!= CFA_CFA_RULE_REGISTER_OFFSET) {
@@ -1887,7 +1901,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					uint64 offset = dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_def_cfa_offset: %llu\n", offset);
+					TRACE_CFI("    DW_CFA_def_cfa_offset: %" B_PRIu64 "\n",
+						offset);
 
 					if (context.GetCfaCfaRule()->Type()
 							!= CFA_CFA_RULE_REGISTER_OFFSET) {
@@ -1902,8 +1917,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint8* block = (uint8*)dataReader.Data();
 					dataReader.Skip(blockLength);
 
-					TRACE_CFI("    DW_CFA_def_cfa_expression: %p, %llu\n",
-						block, blockLength);
+					TRACE_CFI("    DW_CFA_def_cfa_expression: %p, %" B_PRIu64
+						"\n", block, blockLength);
 
 					context.GetCfaCfaRule()->SetToExpression(block,
 						blockLength);
@@ -1916,8 +1931,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint8* block = (uint8*)dataReader.Data();
 					dataReader.Skip(blockLength);
 
-					TRACE_CFI("    DW_CFA_expression: reg: %lu, block: %p, "
-						"%llu\n", reg, block, blockLength);
+					TRACE_CFI("    DW_CFA_expression: reg: %" B_PRIu32 ", "
+						"block: %p, %" B_PRIu64 "\n", reg, block, blockLength);
 
 					if (CfaRule* rule = context.RegisterRule(reg))
 						rule->SetToLocationExpression(block, blockLength);
@@ -1928,8 +1943,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 					int64 offset = dataReader.ReadSignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_offset_extended: reg: %lu, "
-						"offset: %lld\n", reg, offset);
+					TRACE_CFI("    DW_CFA_offset_extended: reg: %" B_PRIu32 ", "
+						"offset: %" B_PRId64 "\n", reg, offset);
 
 					if (CfaRule* rule = context.RegisterRule(reg)) {
 						rule->SetToLocationOffset(
@@ -1942,8 +1957,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 					int64 offset = dataReader.ReadSignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_def_cfa_sf: reg: %lu, offset: %lld\n",
-						reg, offset);
+					TRACE_CFI("    DW_CFA_def_cfa_sf: reg: %" B_PRIu32 ", "
+						"offset: %" B_PRId64 "\n", reg, offset);
 
 					context.GetCfaCfaRule()->SetToRegisterOffset(reg,
 						offset * (int32)context.DataAlignment());
@@ -1953,7 +1968,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					int64 offset = dataReader.ReadSignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_def_cfa_offset: %lld\n", offset);
+					TRACE_CFI("    DW_CFA_def_cfa_offset: %" B_PRId64 "\n",
+						offset);
 
 					if (context.GetCfaCfaRule()->Type()
 							!= CFA_CFA_RULE_REGISTER_OFFSET) {
@@ -1968,8 +1984,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 					uint64 offset = dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_val_offset: reg: %lu, offset: %llu\n",
-						reg, offset);
+					TRACE_CFI("    DW_CFA_val_offset: reg: %" B_PRIu32 ", "
+						"offset: %" B_PRIu64 "\n", reg, offset);
 
 					if (CfaRule* rule = context.RegisterRule(reg)) {
 						rule->SetToValueOffset(
@@ -1982,8 +1998,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
 					int64 offset = dataReader.ReadSignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_val_offset_sf: reg: %lu, "
-						"offset: %lld\n", reg, offset);
+					TRACE_CFI("    DW_CFA_val_offset_sf: reg: %" B_PRIu32 ", "
+						"offset: %" B_PRId64 "\n", reg, offset);
 
 					if (CfaRule* rule = context.RegisterRule(reg)) {
 						rule->SetToValueOffset(
@@ -1998,8 +2014,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					uint8* block = (uint8*)dataReader.Data();
 					dataReader.Skip(blockLength);
 
-					TRACE_CFI("    DW_CFA_val_expression: reg: %lu, block: %p, "
-						"%llu\n", reg, block, blockLength);
+					TRACE_CFI("    DW_CFA_val_expression: reg: %" B_PRIu32 ", "
+						"block: %p, %" B_PRIu64 "\n", reg, block, blockLength);
 
 					if (CfaRule* rule = context.RegisterRule(reg))
 						rule->SetToValueExpression(block, blockLength);
@@ -2011,7 +2027,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				{
 					uint64 delta = dataReader.Read<uint64>(0);
 
-					TRACE_CFI("    DW_CFA_MIPS_advance_loc8: %#llx\n", delta);
+					TRACE_CFI("    DW_CFA_MIPS_advance_loc8: %#" B_PRIx64 "\n",
+						delta);
 
 					target_addr_t location = context.Location()
 						+ delta * context.CodeAlignment();
@@ -2034,7 +2051,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					TRACE_CFI_ONLY(uint64 size =)
 						dataReader.ReadUnsignedLEB128(0);
 
-					TRACE_CFI("    DW_CFA_GNU_args_size: %llu\n", size);
+					TRACE_CFI("    DW_CFA_GNU_args_size: %" B_PRIu64 "\n",
+						size);
 // TODO: Implement!
 					break;
 				}
@@ -2045,7 +2063,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 					int64 offset = dataReader.ReadSignedLEB128(0);
 
 					TRACE_CFI("    DW_CFA_GNU_negative_offset_extended: "
-						"reg: %lu, offset: %lld\n", reg, offset);
+						"reg: %" B_PRIu32 ", offset: %" B_PRId64 "\n", reg,
+						offset);
 
 					if (CfaRule* rule = context.RegisterRule(reg)) {
 						rule->SetToLocationOffset(
@@ -2125,7 +2144,8 @@ DwarfFile::_ParsePublicTypesInfo(DataReader& dataReader, bool dwarf64)
 		return B_BAD_DATA;
 
 	TRACE_PUBTYPES("DwarfFile::_ParsePublicTypesInfo(): compilation unit debug "
-		"info: (%lld, %lld)\n", debugInfoOffset, debugInfoSize);
+		"info: (%" B_PRIdOFF ", %" B_PRIdOFF ")\n", debugInfoOffset,
+		debugInfoSize);
 
 	while (dataReader.BytesRemaining() > 0) {
 		off_t entryOffset = dwarf64
@@ -2136,7 +2156,7 @@ DwarfFile::_ParsePublicTypesInfo(DataReader& dataReader, bool dwarf64)
 
 		TRACE_PUBTYPES_ONLY(const char* name =) dataReader.ReadString();
 
-		TRACE_PUBTYPES("  \"%s\" -> %lld\n", name, entryOffset);
+		TRACE_PUBTYPES("  \"%s\" -> %" B_PRIdOFF "\n", name, entryOffset);
 	}
 
 	return B_OK;

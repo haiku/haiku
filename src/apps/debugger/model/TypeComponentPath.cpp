@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -82,13 +82,13 @@ TypeComponent::Dump() const
 			printf("undefined");
 			break;
 		case TYPE_COMPONENT_BASE_TYPE:
-			printf("base %llu \"%s\"", index, name.String());
+			printf("base %" B_PRIu64 " \"%s\"", index, name.String());
 			break;
 		case TYPE_COMPONENT_DATA_MEMBER:
-			printf("member %llu \"%s\"", index, name.String());
+			printf("member %" B_PRIu64 " \"%s\"", index, name.String());
 			break;
 		case TYPE_COMPONENT_ARRAY_ELEMENT:
-			printf("element %llu \"%s\"", index, name.String());
+			printf("element %" B_PRIu64 " \"%s\"", index, name.String());
 			break;
 	}
 }

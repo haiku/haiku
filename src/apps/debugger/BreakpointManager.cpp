@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -499,7 +499,7 @@ BreakpointManager::_UpdateBreakpointInstallation(Breakpoint* breakpoint)
 		if (error != B_OK)
 			return error;
 
-		TRACE_CONTROL("BREAKPOINT at %#llx installed: %s\n",
+		TRACE_CONTROL("BREAKPOINT at %#" B_PRIx64 " installed: %s\n",
 			breakpoint->Address(), strerror(error));
 
 		breakpoint->SetInstalled(true);
@@ -507,7 +507,7 @@ BreakpointManager::_UpdateBreakpointInstallation(Breakpoint* breakpoint)
 		// uninstall
 		fDebuggerInterface->UninstallBreakpoint(breakpoint->Address());
 
-		TRACE_CONTROL("BREAKPOINT at %#llx uninstalled\n",
+		TRACE_CONTROL("BREAKPOINT at %#" B_PRIx64 " uninstalled\n",
 			breakpoint->Address());
 
 		breakpoint->SetInstalled(false);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -363,7 +363,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 	// create the debug event listener
 	char buffer[128];
-	snprintf(buffer, sizeof(buffer), "team %ld debug listener", fTeamID);
+	snprintf(buffer, sizeof(buffer), "team %" B_PRId32 " debug listener",
+		fTeamID);
 	fDebugEventListener = spawn_thread(_DebugEventListenerEntry, buffer,
 		B_NORMAL_PRIORITY, this);
 	if (fDebugEventListener < 0)
@@ -842,8 +843,8 @@ TeamDebugger::_DebugEventListener()
 				// TODO: Error handling!
 
 		if (event->Team() != fTeamID) {
-			TRACE_EVENTS("TeamDebugger for team %ld: received event from team "
-				"%ld!\n", fTeamID, event->Team());
+			TRACE_EVENTS("TeamDebugger for team %" B_PRId32 ": received event "
+				"from team %" B_PRId32 "!\n", fTeamID, event->Team());
 			continue;
 		}
 
@@ -862,7 +863,7 @@ TeamDebugger::_DebugEventListener()
 void
 TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 {
-	TRACE_EVENTS("TeamDebugger::_HandleDebuggerMessage(): %ld\n",
+	TRACE_EVENTS("TeamDebugger::_HandleDebuggerMessage(): %" B_PRId32 "\n",
 		event->EventType());
 
 	bool handled = false;
@@ -872,8 +873,8 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 
 	switch (event->EventType()) {
 		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_DEBUGGED: thread: %ld\n",
-				event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_DEBUGGED: thread: %"
+				B_PRId32 "\n", event->Thread());
 
 			if (handler != NULL) {
 				handled = handler->HandleThreadDebugged(
@@ -881,8 +882,8 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_DEBUGGER_CALL: thread: %ld\n",
-				event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_DEBUGGER_CALL: thread: %" B_PRId32
+				"\n", event->Thread());
 
 			if (handler != NULL) {
 				handled = handler->HandleDebuggerCall(
@@ -890,8 +891,8 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_BREAKPOINT_HIT: thread: %ld\n",
-				event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_BREAKPOINT_HIT: thread: %" B_PRId32
+				"\n", event->Thread());
 
 			if (handler != NULL) {
 				handled = handler->HandleBreakpointHit(
@@ -899,8 +900,8 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_WATCHPOINT_HIT: thread: %ld\n",
-				event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_WATCHPOINT_HIT: thread: %" B_PRId32
+				"\n", event->Thread());
 
 			if (handler != NULL) {
 				handled = handler->HandleWatchpointHit(
@@ -908,8 +909,8 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_SINGLE_STEP: thread: %ld\n",
-				event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_SINGLE_STEP: thread: %" B_PRId32
+				"\n", event->Thread());
 
 			if (handler != NULL) {
 				handled = handler->HandleSingleStep(
@@ -917,8 +918,8 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %ld\n",
-				event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %"
+				B_PRId32 "\n", event->Thread());
 
 			if (handler != NULL) {
 				handled = handler->HandleExceptionOccurred(
@@ -930,11 +931,11 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 //			break;
 		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
 			// TODO: Handle!
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %ld\n",
-				event->Team());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %" B_PRId32
+				"\n", event->Team());
 			break;
 		case B_DEBUGGER_MESSAGE_TEAM_EXEC:
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n",
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %" B_PRId32 "\n",
 				event->Team());
 			// TODO: Handle!
 			break;
@@ -942,8 +943,8 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 		{
 			ThreadCreatedEvent* threadEvent
 				= dynamic_cast<ThreadCreatedEvent*>(event);
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_CREATED: thread: %ld\n",
-				threadEvent->NewThread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_CREATED: thread: %" B_PRId32
+				"\n", threadEvent->NewThread());
 			handled = _HandleThreadCreated(threadEvent);
 			break;
 		}
@@ -951,8 +952,8 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 		{
 			ThreadRenamedEvent* threadEvent
 				= dynamic_cast<ThreadRenamedEvent*>(event);
-			TRACE_EVENTS("DEBUGGER_MESSAGE_THREAD_RENAMED: thread: %ld "
-				"(\"%s\")\n",
+			TRACE_EVENTS("DEBUGGER_MESSAGE_THREAD_RENAMED: thread: %" B_PRId32
+				" (\"%s\")\n",
 				threadEvent->RenamedThread(), threadEvent->NewName());
 			handled = _HandleThreadRenamed(threadEvent);
 			break;
@@ -962,13 +963,13 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			ThreadPriorityChangedEvent* threadEvent
 				= dynamic_cast<ThreadPriorityChangedEvent*>(event);
 			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED: thread:"
-				" %ld\n", threadEvent->ChangedThread());
+				" %" B_PRId32 "\n", threadEvent->ChangedThread());
 			handled = _HandleThreadPriorityChanged(threadEvent);
 			break;
 		}
 		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
-			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_DELETED: thread: %ld\n",
-				event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_DELETED: thread: %" B_PRId32
+				"\n", event->Thread());
 			handled = _HandleThreadDeleted(
 				dynamic_cast<ThreadDeletedEvent*>(event));
 			break;
@@ -977,7 +978,7 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			ImageCreatedEvent* imageEvent
 				= dynamic_cast<ImageCreatedEvent*>(event);
 			TRACE_EVENTS("B_DEBUGGER_MESSAGE_IMAGE_CREATED: image: \"%s\" "
-				"(%ld)\n", imageEvent->GetImageInfo().Name().String(),
+				"(%" B_PRId32 ")\n", imageEvent->GetImageInfo().Name().String(),
 				imageEvent->GetImageInfo().ImageID());
 			handled = _HandleImageCreated(imageEvent);
 			break;
@@ -987,7 +988,7 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			ImageDeletedEvent* imageEvent
 				= dynamic_cast<ImageDeletedEvent*>(event);
 			TRACE_EVENTS("B_DEBUGGER_MESSAGE_IMAGE_DELETED: image: \"%s\" "
-				"(%ld)\n", imageEvent->GetImageInfo().Name().String(),
+				"(%" B_PRId32 ")\n", imageEvent->GetImageInfo().Name().String(),
 				imageEvent->GetImageInfo().ImageID());
 			handled = _HandleImageDeleted(imageEvent);
 			break;
@@ -1000,8 +1001,8 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			// not interested
 			break;
 		default:
-			WARNING("TeamDebugger for team %ld: unknown event type: "
-				"%ld\n", fTeamID, event->EventType());
+			WARNING("TeamDebugger for team %" B_PRId32 ": unknown event type: "
+				"%" B_PRId32 "\n", fTeamID, event->EventType());
 			break;
 	}
 
@@ -1124,7 +1125,8 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 void
 TeamDebugger::_HandleImageFileChanged(image_id imageID)
 {
-	TRACE_IMAGES("TeamDebugger::_HandleImageFileChanged(%ld)\n", imageID);
+	TRACE_IMAGES("TeamDebugger::_HandleImageFileChanged(%" B_PRId32 ")\n",
+		imageID);
 // TODO: Reload the debug info!
 }
 
@@ -1132,8 +1134,8 @@ TeamDebugger::_HandleImageFileChanged(image_id imageID)
 void
 TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 {
-	TRACE_CONTROL("TeamDebugger::_HandleSetUserBreakpoint(%#llx, %d)\n",
-		address, enabled);
+	TRACE_CONTROL("TeamDebugger::_HandleSetUserBreakpoint(%#" B_PRIx64
+		", %d)\n", address, enabled);
 
 	// check whether there already is a breakpoint
 	AutoLocker< ::Team> locker(fTeam);
@@ -1187,9 +1189,9 @@ TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 
 		target_addr_t relativeAddress = address - functionInstance->Address();
 
-		TRACE_CONTROL("  relative address: %#llx, source location: "
-			"(%ld, %ld)\n", relativeAddress, sourceLocation.Line(),
-			sourceLocation.Column());
+		TRACE_CONTROL("  relative address: %#" B_PRIx64 ", source location: "
+			"(%" B_PRId32 ", %" B_PRId32 ")\n", relativeAddress,
+			sourceLocation.Line(), sourceLocation.Column());
 
 		// get function id
 		FunctionID* functionID = functionInstance->GetFunctionID();
@@ -1212,8 +1214,8 @@ TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 		for (FunctionInstanceList::ConstIterator it
 					= function->Instances().GetIterator();
 				FunctionInstance* instance = it.Next();) {
-			TRACE_CONTROL("  function instance %p: range: %#llx - %#llx\n",
-				instance, instance->Address(),
+			TRACE_CONTROL("  function instance %p: range: %#" B_PRIx64 " - %#"
+				B_PRIx64 "\n", instance, instance->Address(),
 				instance->Address() + instance->Size());
 
 			// get the breakpoint address for the instance
@@ -1235,8 +1237,8 @@ TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 				}
 			}
 
-			TRACE_CONTROL("    breakpoint address using source info: %llx\n",
-				instanceAddress);
+			TRACE_CONTROL("    breakpoint address using source info: %" B_PRIx64
+				"\n", instanceAddress);
 
 			if (instanceAddress == 0) {
 				// No source file (or we failed getting the statement), so try
@@ -1246,7 +1248,7 @@ TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 				instanceAddress = instance->Address() + relativeAddress;
 			}
 
-			TRACE_CONTROL("    final breakpoint address: %llx\n",
+			TRACE_CONTROL("    final breakpoint address: %" B_PRIx64 "\n",
 				instanceAddress);
 
 			UserBreakpointInstance* breakpointInstance = new(std::nothrow)
@@ -1282,7 +1284,8 @@ TeamDebugger::_HandleSetUserBreakpoint(UserBreakpoint* breakpoint, bool enabled)
 void
 TeamDebugger::_HandleClearUserBreakpoint(target_addr_t address)
 {
-	TRACE_CONTROL("TeamDebugger::_HandleClearUserBreakpoint(%#llx)\n", address);
+	TRACE_CONTROL("TeamDebugger::_HandleClearUserBreakpoint(%#" B_PRIx64 ")\n",
+		address);
 
 	AutoLocker< ::Team> locker(fTeam);
 

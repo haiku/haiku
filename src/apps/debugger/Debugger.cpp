@@ -240,14 +240,14 @@ get_debugged_program(const Options& options, DebuggedProgramInfo& _info)
 		status_t error = get_thread_info(thread, &threadInfo);
 		if (error != B_OK) {
 			// TODO: Notify the user!
-			fprintf(stderr, "Error: Failed to get info for thread \"%ld\": "
-				"%s\n", thread, strerror(error));
+			fprintf(stderr, "Error: Failed to get info for thread \"%" B_PRId32
+				"\": %s\n", thread, strerror(error));
 			return false;
 		}
 
 		team = threadInfo.team;
 	}
-	printf("team: %ld, thread: %ld\n", team, thread);
+	printf("team: %" B_PRId32 ", thread: %" B_PRId32 "\n", team, thread);
 
 	_info.team = team;
 	_info.thread = thread;
@@ -289,13 +289,13 @@ start_team_debugger(team_id teamID, SettingsManager* settingsManager,
 		error = debugger->Init(teamID, threadID, stopInMain);
 
 	if (error != B_OK) {
-		printf("Error: debugger for team %ld failed to init: %s!\n",
+		printf("Error: debugger for team %" B_PRId32 " failed to init: %s!\n",
 			teamID, strerror(error));
 		delete debugger;
 		return NULL;
 	} else
-		printf("debugger for team %ld created and initialized successfully!\n",
-			teamID);
+		printf("debugger for team %" B_PRId32 " created and initialized "
+			"successfully!\n", teamID);
 
 	return debugger;
 }
@@ -458,7 +458,8 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 
 	TeamDebugger* debugger = _FindTeamDebugger(programInfo.team);
 	if (debugger != NULL) {
-		printf("There's already a debugger for team: %ld\n", programInfo.team);
+		printf("There's already a debugger for team: %" B_PRId32 "\n",
+			programInfo.team);
 		debugger->Activate();
 		return;
 	}
@@ -471,8 +472,7 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 void
 Debugger::TeamDebuggerStarted(TeamDebugger* debugger)
 {
-	printf("debugger for team %ld started...\n",
-		debugger->TeamID());
+	printf("debugger for team %" B_PRId32 " started...\n", debugger->TeamID());
 
  	// Note: see TeamDebuggerQuit() note about locking
 	AutoLocker<Debugger> locker(this);
@@ -489,8 +489,7 @@ Debugger::TeamDebuggerQuit(TeamDebugger* debugger)
 	// way around. If we even need to do that, we'll have to introduce a
 	// separate lock to protect the list.
 
-	printf("debugger for team %ld quit.\n",
-		debugger->TeamID());
+	printf("debugger for team %" B_PRId32 " quit.\n", debugger->TeamID());
 
 	AutoLocker<Debugger> locker(this);
 	fTeamDebuggers.RemoveItem(debugger);
