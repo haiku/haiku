@@ -2303,7 +2303,7 @@ FindPanel::RestoreWindowState(const BNode* node)
 			BTextControl* textControl = dynamic_cast<BTextControl*>(view);
 			if (textControl != NULL && Mode() == kByFormulaItem) {
 				int32 selStart = 0;
-				int32 selEnd = LONG_MAX;
+				int32 selEnd = INT32_MAX;
 				node->ReadAttr("_trk/focusedSelStart", B_INT32_TYPE, 0,
 					&selStart, sizeof(selStart));
 				node->ReadAttr("_trk/focusedSelEnd", B_INT32_TYPE, 0,
@@ -3162,7 +3162,7 @@ MostUsedNames::~MostUsedNames()
 			if (entry->count < -10 && i > 0)
 				continue;
 
-			sprintf(line, "%ld %s\n", entry->count, entry->name);
+			sprintf(line, "%" B_PRId32 " %s\n", entry->count, entry->name);
 			if (file.Write(line, strlen(line)) < B_OK)
 				break;
 		}

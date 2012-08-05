@@ -1308,7 +1308,7 @@ BContainerWindow::SetLayoutState(BNode* node, const BMessage* message)
 
 		for (int32 index = 0; index < count; index++) {
 			const void* buffer;
-			int32 size;
+			ssize_t size;
 			result = message->FindData(name, type, index, &buffer, &size);
 			if (result != B_OK) {
 				PRINT(("error reading %s \n", name));
@@ -3059,7 +3059,7 @@ BContainerWindow::BuildAddOnMenu(BMenu* menu)
 
 	// found the addons menu, empty it first
 	for (;;) {
-		item = menu->RemoveItem(0L);
+		item = menu->RemoveItem((int32)0);
 		if (!item)
 			break;
 		delete item;

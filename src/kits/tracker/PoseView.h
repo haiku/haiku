@@ -1014,7 +1014,7 @@ BPoseView::AddToExtent(const BRect&rect)
 inline void
 BPoseView::ClearExtent()
 {
-	fExtent.Set(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
+	fExtent.Set(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN);
 }
 
 

@@ -34,7 +34,7 @@ SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr chgrp chmod
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
-SYSTEM_APPS = ;
+SYSTEM_APPS = Terminal ;
 
 SYSTEM_PREFERENCES = ;
 
@@ -42,7 +42,7 @@ SYSTEM_DEMOS = ;
 
 SYSTEM_LIBS = libbe.so libbnetapi.so libnetwork.so
 	libroot.so libroot-addon-icu.so
-	libtextencoding.so libtranslation.so
+	libtextencoding.so libtracker.so libtranslation.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 	$(HAIKU_FREETYPE_CURRENT_LIB)
 ;

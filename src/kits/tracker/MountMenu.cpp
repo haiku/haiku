@@ -171,7 +171,7 @@ MountMenu::AddDynamicItem(add_state)
 {
 	// remove old items
 	for (;;) {
-		BMenuItem* item = RemoveItem(0L);
+		BMenuItem* item = RemoveItem((int32)0);
 		if (item == NULL)
 			break;
 		delete item;

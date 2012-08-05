@@ -1553,7 +1553,7 @@ TermWindow::_MakeWindowSizeMenu()
 		char label[32];
 		int32 columns = windowSizes[i][0];
 		int32 rows = windowSizes[i][1];
-		snprintf(label, sizeof(label), "%ldx%ld", columns, rows);
+		snprintf(label, sizeof(label), "%" B_PRId32 "x%" B_PRId32, columns, rows);
 		BMessage* message = new BMessage(MSG_COLS_CHANGED);
 		message->AddInt32("columns", columns);
 		message->AddInt32("rows", rows);

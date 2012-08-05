@@ -1264,7 +1264,7 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 	const size_t kMaxBufferSize = 1024* 1024;
 
 	size_t bufsize = kMinBufferSize;
-	if (bufsize < srcStat->st_size) {
+	if ((off_t)bufsize < srcStat->st_size) {
 		//	File bigger than the buffer size: determine an optimal buffer size
 		system_info sinfo;
 		get_system_info(&sinfo);
@@ -2343,7 +2343,7 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 	fnum = 1;
 	strcpy(temp_name, name);
 	while (destDir->Contains(temp_name)) {
-		sprintf(temp_name, "%s %ld", copybase, ++fnum);
+		sprintf(temp_name, "%s %" B_PRId32, copybase, ++fnum);
 
 		if (strlen(temp_name) > (B_FILE_NAME_LENGTH - 1)) {
 			// The name has grown too long. Maybe we just went from
@@ -2352,7 +2352,7 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 			// truncate the 'root' name and continue.
 			// ??? should we reset fnum or not ???
 			root[strlen(root) - 1] = '\0';
-			sprintf(temp_name, "%s%s %ld", root, suffix, fnum);
+			sprintf(temp_name, "%s%s %" B_PRId32, root, suffix, fnum);
 		}
 	}
 
@@ -3233,7 +3233,7 @@ _TrackerLaunchAppWithDocuments(const entry_ref* appRef, const BMessage* refs,
 	if (error == B_OK) {
 		// close possible parent window, if specified
 		const node_ref* nodeToClose = 0;
-		int32 numBytes;
+		ssize_t numBytes;
 		refs->FindData("nodeRefsToClose", B_RAW_TYPE,
 			(const void**)&nodeToClose, &numBytes);
 		if (nodeToClose)

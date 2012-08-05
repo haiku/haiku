@@ -386,7 +386,7 @@ TermParse::EscParse()
 
 	int32 srcLen = sizeof(cbuf);
 	int32 dstLen = sizeof(dstbuf);
-	long dummyState = 0;
+	int32 dummyState = 0;
 
 	int width = 1;
 	BAutolock locker(fBuffer);
@@ -1250,7 +1250,7 @@ TermParse::_DeviceStatusReport(int n)
 			}
 		case 6:
 			// Cursor position report requested
-			len = sprintf(sbuf, "\033[%ld;%ldR",
+			len = sprintf(sbuf, "\033[%" B_PRId32 ";%" B_PRId32 "R",
 					fBuffer->Cursor().y + 1,
 					fBuffer->Cursor().x + 1);
 			write(fFd, sbuf, len);

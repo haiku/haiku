@@ -1300,7 +1300,7 @@ GenericAttributeText::ReadValue(BString* result)
 			GenericValueStruct tmp;
 			if (fModel->Node()->GetAttrInfo(fColumn->AttrName(), &info)
 					== B_OK) {
-				if (info.size && info.size <= sizeof(int64)) {
+				if (info.size && info.size <= (off_t)sizeof(int64)) {
 					length = fModel->Node()->ReadAttr(fColumn->AttrName(),
 						fColumn->AttrType(), 0, &tmp, (size_t)info.size);
 				}
@@ -1460,22 +1460,22 @@ GenericAttributeText::FitValue(BString* result, const BPoseView* view)
 			break;
 
 		case B_INT32_TYPE:
-			sprintf(buffer, "%ld", fValue.int32t);
+			sprintf(buffer, "%" B_PRId32, fValue.int32t);
 			fFullValueText = buffer;
 			break;
 
 		case B_UINT32_TYPE:
-			sprintf(buffer, "%ld", fValue.uint32t);
+			sprintf(buffer, "%" B_PRId32, fValue.uint32t);
 			fFullValueText = buffer;
 			break;
 
 		case B_INT64_TYPE:
-			sprintf(buffer, "%Ld", fValue.int64t);
+			sprintf(buffer, "%" B_PRId64, fValue.int64t);
 			fFullValueText = buffer;
 			break;
 
 		case B_UINT64_TYPE:
-			sprintf(buffer, "%Ld", fValue.uint64t);
+			sprintf(buffer, "%" B_PRId64, fValue.uint64t);
 			fFullValueText = buffer;
 			break;
 
@@ -1886,10 +1886,10 @@ DurationAttributeText::FitValue(BString* result, const BPoseView* view)
 
 	char buffer[256];
 	if (hours > 0) {
-		snprintf(buffer, sizeof(buffer), "%s%ld:%02ld:%02ld",
-			negative ? "-" : "", hours, minutes, seconds);
+		snprintf(buffer, sizeof(buffer), "%s%" B_PRId32 ":%02" B_PRId32 ":%02"
+			B_PRId32, negative ? "-" : "", hours, minutes, seconds);
 	} else {
-		snprintf(buffer, sizeof(buffer), "%s%ld:%02ld",
+		snprintf(buffer, sizeof(buffer), "%s%" B_PRId32 ":%02" B_PRId32,
 			negative ? "-" : "", minutes, seconds);
 	}
 

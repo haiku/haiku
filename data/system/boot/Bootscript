@@ -116,6 +116,13 @@ if [ "$SAFEMODE" != "yes" ]; then
 	waitfor _input_server_event_loop_		# wait for input devices
 fi
 
+# TODO: remove this when x86_64 is more complete.
+if [ "$(uname -m)" = "x86_64" ]; then
+	cd /boot/home
+	launch system/apps/Terminal
+	exit
+fi
+
 # Now ask the user if he wants to run the Installer or continue to the Desktop.
 if [ "$isReadOnly" = "yes" ]; then
 	# Create Installer link (using the write overlay)

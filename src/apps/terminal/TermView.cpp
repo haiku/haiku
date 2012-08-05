@@ -1560,7 +1560,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 		if (fEncoding != M_UTF8) {
 			char destBuffer[16];
 			int32 destLen = sizeof(destBuffer);
-			long state = 0;
+			int32 state = 0;
 			convert_from_utf8(fEncoding, bytes, &numBytes, destBuffer,
 				&destLen, &state, '?');
 			_ScrollTo(0, true);
@@ -1758,7 +1758,7 @@ TermView::MessageReceived(BMessage *msg)
 	if (msg->WasDropped() && (msg->what == B_SIMPLE_DATA
 			|| msg->what == B_MIME_DATA)) {
 		char *text;
-		int32 numBytes;
+		ssize_t numBytes;
 		//rgb_color *color;
 
 		int32 i = 0;

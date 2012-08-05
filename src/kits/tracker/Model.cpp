@@ -1083,7 +1083,7 @@ Model::SupportsMimeType(const char* type, const BObjectList<BString>* list,
 
 		// check if this model lists the type of dropped document as supported
 		const char* mimeSignature;
-		int32 bufferLength;
+		ssize_t bufferLength;
 
 		if (message.FindData("types", 'CSTR', index,
 				(const void**)&mimeSignature, &bufferLength)) {
@@ -1157,7 +1157,7 @@ Model::IsSuperHandler() const
 
 	for (int32 index = 0; ; index++) {
 		const char* mimeSignature;
-		int32 bufferLength;
+		ssize_t bufferLength;
 
 		if (message.FindData("types", 'CSTR', index,
 			(const void**)&mimeSignature, &bufferLength)) {
@@ -1271,8 +1271,8 @@ Model::GetVersionString(BString &result, version_kind kind)
 		return error;
 
 	char vstr[32];
-	sprintf(vstr, "%ld.%ld.%ld", version.major, version.middle,
-		version.minor);
+	sprintf(vstr, "%" B_PRId32 ".%" B_PRId32 ".%" B_PRId32, version.major,
+		version.middle, version.minor);
 	result = vstr;
 	return B_OK;
 }

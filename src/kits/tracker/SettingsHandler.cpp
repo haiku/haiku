@@ -103,8 +103,10 @@ ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void* passThru)
 		NextArgv();
 		fCurrentArgv[fArgc] = 0;
 		const char* result = (argvHandlerFunc)(fArgc, fCurrentArgv, passThru);
-		if (result)
-			printf("File %s; Line %ld # %s", fFileName, fLineNo, result);
+		if (result) {
+			printf("File %s; Line %" B_PRId32 " # %s", fFileName, fLineNo,
+				result);
+		}
 		MakeArgvEmpty();
 		if (result)
 			return B_ERROR;
@@ -188,8 +190,8 @@ ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 			// handle new line
 			fEatComment = false;
 			if (!fSawBackslash && (fInDoubleQuote || fInSingleQuote)) {
-				printf("File %s ; Line %ld # unterminated quote\n", name,
-					fLineNo);
+				printf("File %s ; Line %" B_PRId32 " # unterminated quote\n",
+					name, fLineNo);
 				result = B_ERROR;
 				break;
 			}

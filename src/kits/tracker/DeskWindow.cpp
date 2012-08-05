@@ -462,7 +462,7 @@ BDeskWindow::MessageReceived(BMessage* message)
 {
 	if (message->WasDropped()) {
 		const rgb_color* color;
-		int32 size;
+		ssize_t size;
 		// handle "roColour"-style color drops
 		if (message->FindData("RGBColor", 'RGBC',
 			(const void**)&color, &size) == B_OK) {
