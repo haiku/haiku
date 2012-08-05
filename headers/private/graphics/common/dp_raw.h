@@ -168,6 +168,12 @@
 #define DP_LANE_STATUS_CR_DONE_B			(1 << 4)	// Bool
 #define DP_LANE_STATUS_CHEQ_DONE_B			(1 << 5)	// Bool
 #define DP_LANE_STATUS_SYMB_LOCK_B			(1 << 6)	// Bool
+#define DP_LANE_STATUS_EQUALIZED_A			DP_LANE_STATUS_CR_DONE_A \
+											|| DP_LANE_STATUS_CHEQ_DONE_A \
+											|| DP_LANE_STATUS_SYMB_LOCK_A
+#define DP_LANE_STATUS_EQUALIZED_B			DP_LANE_STATUS_CR_DONE_B \
+											|| DP_LANE_STATUS_CHEQ_DONE_B \
+											|| DP_LANE_STATUS_SYMB_LOCK_B
 // DP Lane Align Status (0x0204)
 #define DP_LANE_ALIGN						0x0204		// Reg
 #define DP_LANE_ALIGN_DONE					(1 << 0)	// Bool
