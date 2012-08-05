@@ -33,7 +33,7 @@ protected:
 			status_t	LookUp(const char* name, uint64* change, uint64* fileID,
 							FileHandle* handle);
 
-			status_t	Link(Inode* dir, const char* name,s
+			status_t	Link(Inode* dir, const char* name,
 							ChangeInfo* changeInfo);
 
 	static	status_t	Rename(Inode* from, Inode* to, const char* fromName,

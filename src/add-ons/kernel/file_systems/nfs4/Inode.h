@@ -32,6 +32,8 @@ public:
 	inline			void*		FileCache();
 					status_t	RevalidateFileCache();
 
+	inline			uint64		MaxFileSize();
+
 					status_t	LookUp(const char* name, ino_t* id);
 
 					status_t	Access(int mode);
@@ -57,8 +59,13 @@ public:
 					status_t	Open(int mode, OpenFileCookie* cookie);
 					status_t	Close(OpenFileCookie* cookie);
 					status_t	Read(OpenFileCookie* cookie, off_t pos,
-									void* buffer, size_t* length, bool* eof);
+									void* buffer, size_t* length);
 					status_t	Write(OpenFileCookie* cookie, off_t pos,
+									const void* buffer, size_t *_length);
+
+					status_t	ReadDirect(OpenFileCookie* cookie, off_t pos,
+									void* buffer, size_t* length, bool* eof);
+					status_t	WriteDirect(OpenFileCookie* cookie, off_t pos,
 									const void* buffer, size_t *_length);
 
 					status_t	CreateDir(const char* name, int mode);
@@ -109,6 +116,7 @@ private:
 					uint64		fChange;
 					void*		fFileCache;
 					mutex		fFileCacheLock;
+					uint64		fMaxFileSize;
 
 					OpenState*	fOpenState;
 					mutex		fStateLock;
@@ -168,6 +176,13 @@ Inode::SetOpenState(OpenState* state)
 {
 	MutexLocker _(fStateLock);
 	fOpenState = state;
+}
+
+
+inline uint64
+Inode::MaxFileSize()
+{
+	return fMaxFileSize;
 }
 
 

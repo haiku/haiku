@@ -230,7 +230,7 @@ nfs4_read_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
 
 		do {
 			size_t bytesRead = bytesLeft;
-			result = inode->Read(cookie, pos, buffer, &bytesRead, &eof);
+			result = inode->ReadDirect(cookie, pos, buffer, &bytesRead, &eof);
 			if (result != B_OK)
 				return result;
 
@@ -255,15 +255,17 @@ nfs4_write_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
 
 	status_t result;
-	uint32 ioSize = inode->GetFileSystem()->Root()->IOSize();
 	for (size_t i = 0; i < count; i++) {
-		size_t bytesLeft = vecs[i].iov_len;
+		uint64 bytesLeft = vecs[i].iov_len;
+		if (pos + bytesLeft > inode->MaxFileSize())
+			bytesLeft = inode->MaxFileSize() - pos;
+
 		char* buffer = reinterpret_cast<char*>(vecs[i].iov_base);
 
 		do {
-			size_t bytesWritten = min_c(ioSize, bytesLeft);
+			size_t bytesWritten = bytesLeft;
 
-			result = inode->Write(cookie, pos, buffer, &bytesWritten);
+			result = inode->WriteDirect(cookie, pos, buffer, &bytesWritten);
 			if (result != B_OK)
 				return result;
 
@@ -468,8 +470,6 @@ nfs4_free_cookie(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 		return B_OK;
 
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
-	file_cache_sync(inode->FileCache());
-	inode->Commit();
 
 	inode->Close(cookie);
 	delete cookie;
@@ -479,7 +479,7 @@ nfs4_free_cookie(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 
 
 static status_t
-nfs4_read(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos,
+nfs4_read(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 	void* buffer, size_t* length)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
@@ -490,7 +490,9 @@ nfs4_read(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos,
 	if (inode->Type() == S_IFLNK)
 		return B_BAD_VALUE;
 
-	return file_cache_read(inode->FileCache(), cookie, pos, buffer, length);
+	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
+
+	return inode->Read(cookie, pos, buffer, length);
 }
 
 
@@ -508,17 +510,7 @@ nfs4_write(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
 
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
 
-	struct stat stat;
-	status_t result = inode->Stat(&stat);
-	if (result != B_OK)
-		return result;
-
-	uint64 fileSize = max_c(stat.st_size, pos + *length);
-	result = file_cache_set_size(inode->FileCache(), fileSize);
-	if (result != B_OK)
-		return result;
-
-	return file_cache_write(inode->FileCache(), cookie, pos, _buffer, length);
+	return inode->Write(cookie, pos, _buffer, length);
 }
 
 
@@ -626,9 +618,6 @@ nfs4_release_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 		return B_OK;
 
 	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
-
-	file_cache_sync(inode->FileCache());
-	inode->Commit();
 
 	if (lock != NULL)
 		return inode->ReleaseLock(cookie, lock);

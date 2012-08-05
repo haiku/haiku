@@ -135,6 +135,9 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 status_t
 Inode::Close(OpenFileCookie* cookie)
 {
+	file_cache_sync(fFileCache);
+	Commit();
+
 	fFileSystem->RemoveOpenFile(cookie);
 
 	MutexLocker _(fStateLock);
@@ -147,11 +150,14 @@ Inode::Close(OpenFileCookie* cookie)
 
 
 status_t
-Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length,
+Inode::ReadDirect(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length,
 	bool* eof)
 {
 	*eof = false;
 	uint32 size = 0;
+
+	uint32 ioSize = fFileSystem->Root()->IOSize();
+	*_length = min_c(ioSize, *_length);
 
 	status_t result;
 	while (size < *_length && !*eof) {
@@ -175,11 +181,24 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length,
 
 
 status_t
-Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
+Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
+{
+	bool eof = false;
+	if ((cookie->fMode & O_NOCACHE) != 0)
+		return ReadDirect(cookie, pos, buffer, _length, &eof);
+	return file_cache_read(fFileCache, cookie, pos, buffer, _length);
+}
+
+
+status_t
+Inode::WriteDirect(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 	size_t *_length)
 {
 	uint32 size = 0;
 	const char* buffer = reinterpret_cast<const char*>(_buffer);
+
+	uint32 ioSize = fFileSystem->Root()->IOSize();
+	*_length = min_c(ioSize, *_length);
 
 	fWriteDirty = true;
 
@@ -203,6 +222,34 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 	fFileSystem->Root()->MakeInfoInvalid();
 
 	return B_OK;
+}
+
+
+status_t
+Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
+	size_t *_length)
+{
+	struct stat st;
+	status_t result = Stat(&st);
+	if (result != B_OK)
+		return result;
+
+	if ((cookie->fMode & O_APPEND) != 0)
+		pos = st.st_size;
+
+	uint64 fileSize = max_c(st.st_size, pos + *_length);
+	fMaxFileSize = max_c(fMaxFileSize, fileSize);
+
+	if ((cookie->fMode & O_NOCACHE) != 0) {
+		WriteDirect(cookie, pos, _buffer, _length);
+		Commit();
+	}
+
+	result = file_cache_set_size(fFileCache, fileSize);
+	if (result != B_OK)
+		return result;
+
+	return file_cache_write(fFileCache, cookie, pos, _buffer, _length);
 }
 
 

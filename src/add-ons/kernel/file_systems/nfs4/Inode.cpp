@@ -24,6 +24,7 @@ Inode::Inode()
 	:
 	fCache(NULL),
 	fFileCache(NULL),
+	fMaxFileSize(0),
 	fOpenState(NULL),
 	fWriteDirty(false)
 {
@@ -638,6 +639,9 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 status_t
 Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 {
+	file_cache_sync(fFileCache);
+	Commit();
+
 	LockInfo* prev = NULL;
 
 	thread_info info;
@@ -673,6 +677,9 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 status_t
 Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 {
+	file_cache_sync(fFileCache);
+	Commit();
+
 	MutexLocker _(cookie->fLocksLock);
 	LockInfo* linfo = cookie->fLocks;
 	while (linfo != NULL) {
