@@ -203,7 +203,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			if ((modifiers & B_CONTROL_KEY) != 0)
 #endif
 			{
-				STRACE(("Set Workspace %ld\n", key - 1));
+				STRACE(("Set Workspace %" B_PRId32 "\n", key - 1));
 
 				fDesktop->SetWorkspaceAsync(key - B_F1_KEY, takeWindow);
 				return B_SKIP_MESSAGE;
@@ -2640,8 +2640,8 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 
 		default:
-			printf("Desktop %d:%s received unexpected code %ld\n", 0, "baron",
-				code);
+			printf("Desktop %d:%s received unexpected code %" B_PRId32 "\n", 0,
+				"baron", code);
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
@@ -3366,8 +3366,8 @@ Desktop::_SetCurrentWorkspaceConfiguration()
 	if (status != B_OK) {
 		// The application having the direct screen lock didn't give it up in
 		// time, make it crash
-		syslog(LOG_ERR, "Team %ld did not give up its direct screen lock.\n",
-			fDirectScreenTeam);
+		syslog(LOG_ERR, "Team %" B_PRId32 " did not give up its direct screen "
+			"lock.\n", fDirectScreenTeam);
 
 		debug_thread(fDirectScreenTeam);
 		fDirectScreenTeam = -1;

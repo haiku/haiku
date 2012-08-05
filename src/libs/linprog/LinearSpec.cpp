@@ -656,7 +656,7 @@ BString
 LinearSpec::ToString() const
 {
 	BString string;
-	string << "LinearSpec " << (int32)this << ":\n";
+	string << "LinearSpec " << (addr_t)this << ":\n";
 	for (int i = 0; i < fVariables.CountItems(); i++) {
 		Variable* variable = fVariables.ItemAt(i);
 		string += variable->ToString();

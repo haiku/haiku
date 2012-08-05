@@ -60,7 +60,7 @@ MasterServerDevice::~MasterServerDevice()
 	// cleanup
 	_StopAll();
 	if (_LockDevices()) {
-		while (PointingDevice* device = (PointingDevice*)fDevices.RemoveItem(0L))
+		while (PointingDevice* device = (PointingDevice*)fDevices.RemoveItem((int32)0))
 			delete device;
 		_UnlockDevices();
 	}

@@ -380,9 +380,11 @@ if $(TARGET_ARCH) = x86 {
 
 # Freetype
 local freetypeBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 	if $(TARGET_ARCH) = ppc {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-ppc-gcc4-2012-06-26.zip ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86_64-2012-08-04.zip ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86-gcc4-2012-06-15.zip ;
 	} else {

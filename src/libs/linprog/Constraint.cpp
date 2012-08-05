@@ -344,7 +344,7 @@ Constraint::ToString() const
 	BString string;
 	string << "Constraint ";
 	string << fLabel;
-	string << "(" << (int32)this << "): ";
+	string << "(" << (addr_t)this << "): ";
 
 	if (fIsValid) {
 		for (int i = 0; i < fLeftSide->CountItems(); i++) {

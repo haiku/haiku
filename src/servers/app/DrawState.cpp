@@ -635,10 +635,10 @@ DrawState::PrintToStream() const
 		fHighColor.red, fHighColor.green, fHighColor.blue, fHighColor.alpha);
 	printf("\t LowColor: r=%d g=%d b=%d a=%d\n",
 		fLowColor.red, fLowColor.green, fLowColor.blue, fLowColor.alpha);
-	printf("\t Pattern: %llu\n", fPattern.GetInt64());
+	printf("\t Pattern: %" B_PRIu64 "\n", fPattern.GetInt64());
 
-	printf("\t DrawMode: %lu\n", (uint32)fDrawingMode);
-	printf("\t AlphaSrcMode: %ld\t AlphaFncMode: %ld\n",
+	printf("\t DrawMode: %" B_PRIu32 "\n", (uint32)fDrawingMode);
+	printf("\t AlphaSrcMode: %" B_PRId32 "\t AlphaFncMode: %" B_PRId32 "\n",
 		   (int32)fAlphaSrcMode, (int32)fAlphaFncMode);
 
 	printf("\t LineCap: %d\t LineJoin: %d\t MiterLimit: %.2f\n",
@@ -652,9 +652,9 @@ DrawState::PrintToStream() const
 	printf("\t Size: %.1f (%.1f)\n", fFont.Size(), fUnscaledFontSize);
 	printf("\t Shear: %.2f\n", fFont.Shear());
 	printf("\t Rotation: %.2f\n", fFont.Rotation());
-	printf("\t Spacing: %ld\n", fFont.Spacing());
-	printf("\t Encoding: %ld\n", fFont.Encoding());
+	printf("\t Spacing: %" B_PRId32 "\n", fFont.Spacing());
+	printf("\t Encoding: %" B_PRId32 "\n", fFont.Encoding());
 	printf("\t Face: %d\n", fFont.Face());
-	printf("\t Flags: %lu\n", fFont.Flags());
+	printf("\t Flags: %" B_PRIu32 "\n", fFont.Flags());
 }
 

@@ -1614,9 +1614,11 @@ void
 View::PrintToStream() const
 {
 	printf("View:          %s\n", Name());
-	printf("  fToken:           %ld\n", fToken);
-	printf("  fFrame:           IntRect(%ld, %ld, %ld, %ld)\n", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
-	printf("  fScrollingOffset: IntPoint(%ld, %ld)\n", fScrollingOffset.x, fScrollingOffset.y);
+	printf("  fToken:           %" B_PRId32 "\n", fToken);
+	printf("  fFrame:           IntRect(%" B_PRId32 ", %" B_PRId32 ", %" B_PRId32 ", %" B_PRId32 ")\n",
+		fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
+	printf("  fScrollingOffset: IntPoint(%" B_PRId32 ", %" B_PRId32 ")\n",
+		fScrollingOffset.x, fScrollingOffset.y);
 	printf("  fHidden:          %d\n", fHidden);
 	printf("  fVisible:         %d\n", fVisible);
 	printf("  fWindow:          %p\n", fWindow);

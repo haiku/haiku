@@ -57,7 +57,7 @@ public:
 			bool				WriteUnlock();
 
 			// does the current thread hold a write lock ?
-			bool				IsWriteLocked(uint32 *stackBase = NULL,
+			bool				IsWriteLocked(addr_t *stackBase = NULL,
 									thread_id *thread = NULL) const;
 
 #if MULTI_LOCKER_DEBUG
@@ -97,7 +97,7 @@ private:
 			status_t			fInit;
 			int32				fWriterNest;
 			thread_id			fWriterThread;
-			uint32				fWriterStackBase;
+			addr_t				fWriterStackBase;
 
 #if MULTI_LOCKER_TIMING
 			uint32 				rl_count;

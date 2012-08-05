@@ -666,7 +666,7 @@ class BoundingBoxConsumer {
 	BoundingBoxConsumer(Transformable& transform, BRect* rectArray,
 			bool asString)
 		: rectArray(rectArray)
-		, stringBoundingBox(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN)
+		, stringBoundingBox(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN)
 		, fAsString(asString)
 		, fCurves(fPathAdaptor)
 		, fContour(fCurves)

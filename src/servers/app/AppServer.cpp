@@ -189,9 +189,9 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			int32 version;
 			if (msg.Read<int32>(&version) < B_OK
 				|| version != AS_PROTOCOL_VERSION) {
-				syslog(LOG_ERR, "Application for user %ld with port %ld does "
-					"not support the current server protocol.\n", userID,
-					replyPort);
+				syslog(LOG_ERR, "Application for user %" B_PRId32 " with port "
+					"%" B_PRId32 " does not support the current server "
+					"protocol.\n", userID, replyPort);
 			} else {
 				desktop = _FindDesktop(userID, targetScreen);
 				if (desktop == NULL) {
@@ -245,8 +245,8 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 #endif
 
 		default:
-			STRACE(("Server::MainLoop received unexpected code %ld (offset %ld)\n",
-				code, code - SERVER_TRUE));
+			STRACE(("Server::MainLoop received unexpected code %" B_PRId32 " "
+				"(offset %" B_PRId32 ")\n", code, code - SERVER_TRUE));
 			break;
 	}
 }

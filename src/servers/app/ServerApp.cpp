@@ -109,7 +109,8 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 		fSignature = "application/no-signature";
 
 	char name[B_OS_NAME_LENGTH];
-	snprintf(name, sizeof(name), "a<%ld:%s", clientTeam, SignatureLeaf());
+	snprintf(name, sizeof(name), "a<%" B_PRId32 ":%s", clientTeam,
+		SignatureLeaf());
 
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
 	if (fMessagePort < B_OK)
@@ -141,8 +142,8 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	desktop->UnlockSingleWindow();
 
 	STRACE(("ServerApp %s:\n", Signature()));
-	STRACE(("\tBApp port: %ld\n", fClientReplyPort));
-	STRACE(("\tReceiver port: %ld\n", fMessagePort));
+	STRACE(("\tBApp port: %" B_PRId32 "\n", fClientReplyPort));
+	STRACE(("\tReceiver port: %" B_PRId32 "\n", fMessagePort));
 }
 
 
@@ -505,7 +506,7 @@ ServerApp::NotifyDeleteClientArea(area_id serverArea)
 void
 ServerApp::_GetLooperName(char* name, size_t length)
 {
-	snprintf(name, length, "a:%ld:%s", ClientTeam(), SignatureLeaf());
+	snprintf(name, length, "a:%" B_PRId32 ":%s", ClientTeam(), SignatureLeaf());
 }
 
 
@@ -567,13 +568,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			fMapLocker.Lock();
 
-			debug_printf("Application %ld, %s: %d bitmaps:\n", ClientTeam(),
-				Signature(), (int)fBitmapMap.size());
+			debug_printf("Application %" B_PRId32 ", %s: %d bitmaps:\n",
+				ClientTeam(), Signature(), (int)fBitmapMap.size());
 
 			BitmapMap::const_iterator iterator = fBitmapMap.begin();
 			for (; iterator != fBitmapMap.end(); iterator++) {
 				ServerBitmap* bitmap = iterator->second;
-				debug_printf("  [%ld] %ldx%ld, area %ld, size %ld\n",
+				debug_printf("  [%" B_PRId32 "] %" B_PRId32 "x%" B_PRId32 ", "
+					"area %" B_PRId32 ", size %" B_PRId32 "\n",
 					bitmap->Token(), bitmap->Width(), bitmap->Height(),
 					bitmap->Area(), bitmap->BitsLength());
 			}
@@ -765,8 +767,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			ServerBitmap* bitmap = _FindBitmap(token);
 			if (bitmap != NULL) {
-				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(),
-					token));
+				STRACE(("ServerApp %s: Deleting Bitmap %" B_PRId32 "\n",
+					Signature(), token));
 
 				_DeleteBitmap(bitmap);
 			}
@@ -787,7 +789,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			ServerBitmap* bitmap = GetBitmap(token);
 			if (bitmap != NULL) {
 				STRACE(("ServerApp %s: Get overlay restrictions for bitmap "
-					"%ld\n", Signature(), token));
+					"%" B_PRId32 "\n", Signature(), token));
 
 				status = fDesktop->HWInterface()->GetOverlayRestrictions(
 					bitmap->Overlay(), &restrictions);
@@ -3161,8 +3163,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 
 		default:
-			printf("ServerApp %s received unhandled message code %ld\n",
-				Signature(), code);
+			printf("ServerApp %s received unhandled message code %" B_PRId32
+				"\n", Signature(), code);
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
@@ -3199,8 +3201,8 @@ ServerApp::_MessageLooper()
 	status_t err = B_OK;
 
 	while (!fQuitting) {
-		STRACE(("info: ServerApp::_MessageLooper() listening on port %ld.\n",
-			fMessagePort));
+		STRACE(("info: ServerApp::_MessageLooper() listening on port %" B_PRId32
+			".\n", fMessagePort));
 
 		err = receiver.GetNextMessage(code, B_INFINITE_TIMEOUT);
 		if (err != B_OK || code == B_QUIT_REQUESTED) {

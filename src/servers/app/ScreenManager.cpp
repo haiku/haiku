@@ -105,7 +105,7 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 		}
 	}
 
-#if TEST_MODE == 0
+#if TEST_MODE == 0 && !defined(__x86_64__)
 	if (added == 0 && target != NULL) {
 		// there's a specific target screen we want to initialize
 		// TODO: right now we only support remote screens, but we could

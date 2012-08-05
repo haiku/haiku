@@ -36,6 +36,11 @@ Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
 	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
 
 
+local BROKEN_64 = ;
+if $(TARGET_ARCH) != x86_64 {
+    BROKEN_64 = "" ;
+}
+
 Server app_server :
 	Angle.cpp
 	AppServer.cpp
@@ -87,7 +92,7 @@ Server app_server :
 	# libraries
 	:
 	libtranslation.so libbe.so libbnetapi.so
-	libasdrawing.a libasremote.a libashtml5.a 
+	libasdrawing.a $(BROKEN_64)libasremote.a $(BROKEN_64)libashtml5.a 
 	libpainter.a libagg.a $(HAIKU_FREETYPE_LIB)
 	libstackandtile.a liblinprog.a libtextencoding.so libshared.a
 	$(TARGET_LIBSTDC++)

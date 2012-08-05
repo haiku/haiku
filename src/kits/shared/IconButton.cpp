@@ -520,7 +520,7 @@ BIconButton::TrimIcon(bool keepAspect)
 	uint32 bpr = fNormalBitmap->BytesPerRow();
 	uint32 width = fNormalBitmap->Bounds().IntegerWidth() + 1;
 	uint32 height = fNormalBitmap->Bounds().IntegerHeight() + 1;
-	BRect trimmed(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
+	BRect trimmed(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN);
 	for (uint32 y = 0; y < height; y++) {
 		uint8* b = bits + 3;
 		bool rowHasAlpha = false;

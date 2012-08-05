@@ -40,13 +40,20 @@ SYSTEM_PREFERENCES = ;
 
 SYSTEM_DEMOS = ;
 
-SYSTEM_LIBS = libbe.so libroot.so libroot-addon-icu.so
+SYSTEM_LIBS = libbe.so libbnetapi.so libnetwork.so
+	libroot.so libroot-addon-icu.so
+	libtextencoding.so libtranslation.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
+	$(HAIKU_FREETYPE_CURRENT_LIB)
 ;
 
 PRIVATE_SYSTEM_LIBS = ;
 
-SYSTEM_SERVERS = registrar ;
+SYSTEM_SERVERS = app_server input_server registrar syslog_daemon ;
+
+SYSTEM_ADD_ONS_ACCELERANTS = vesa.accelerant ;
+
+SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = vesa ;
 
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci ps2 isa scsi config_manager ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
@@ -79,6 +86,7 @@ AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf null
 									  random <driver>tty zero ;
+AddDriversToHaikuImage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage input		: ps2_hid ;
 
 # kernel
@@ -87,6 +95,12 @@ AddFilesToHaikuImage system : kernel_$(TARGET_ARCH) ;
 # libs
 AddLibrariesToHaikuHybridImage system lib
 	: $(SYSTEM_LIBS) $(PRIVATE_SYSTEM_LIBS) ;
+
+# libfreetype.so links to the current freetype lib
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
+	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LINK)
+	: libfreetype.so : : true ;
 
 # servers
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
@@ -139,11 +153,11 @@ local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes
 fortuneFiles = $(fortuneFiles:G=data!fortunes) ;
 AddFilesToHaikuImage system data fortunes : $(fortuneFiles) ;
 
-#local fontDir = [ FDirName $(HAIKU_TOP) data system data fonts ] ;
-#local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
-#local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
-#AddFilesToHaikuImage system data fonts psfonts : $(psFonts) ;
-#AddFilesToHaikuImage system data fonts ttfonts : $(ttFonts) ;
+local fontDir = [ FDirName $(HAIKU_TOP) data system data fonts ] ;
+local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
+local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
+AddFilesToHaikuImage system data fonts psfonts : $(psFonts) ;
+AddFilesToHaikuImage system data fonts ttfonts : $(ttFonts) ;
 
 local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
 	: *.keymap ] ;
@@ -217,6 +231,13 @@ AddBootModuleSymlinksToHaikuImage
 	locked_pool scsi_periph ahci generic_ide_pci scsi_cd scsi_disk intel
 	bfs
 ;
+
+# add-ons
+AddFilesToHaikuImage system add-ons accelerants
+	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
+
+AddFilesToHaikuImage system add-ons input_server devices
+	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
 
 # create directories that will remain empty
 AddDirectoryToHaikuImage common bin ;

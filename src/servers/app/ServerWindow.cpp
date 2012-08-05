@@ -234,14 +234,14 @@ ServerWindow::~ServerWindow()
 	for (int32 i = 0; i < count; i++) {
 		profile* p = (profile*)profiles.ItemAtFast(i);
 		string_for_message_code(p->code, codeName);
-		printf("[%s] called %ld times, %g secs (%Ld usecs per call)\n",
-			codeName.String(), p->count, p->time / 1000000.0,
+		printf("[%s] called %" B_PRId32 " times, %g secs (%" B_PRId64 " usecs "
+			"per call)\n", codeName.String(), p->count, p->time / 1000000.0,
 			p->time / p->count);
 	}
 	if (sRedrawProcessingTime.count > 0) {
-		printf("average redraw processing time: %g secs, count: %ld (%lld "
-			"usecs per call)\n", sRedrawProcessingTime.time / 1000000.0,
-			sRedrawProcessingTime.count,
+		printf("average redraw processing time: %g secs, count: %" B_PRId32 " "
+			"(%" B_PRId64 " usecs per call)\n",
+			sRedrawProcessingTime.time / 1000000.0, sRedrawProcessingTime.count,
 			sRedrawProcessingTime.time / sRedrawProcessingTime.count);
 	}
 //	if (sNextMessageTime.count > 0) {
@@ -326,7 +326,7 @@ ServerWindow::_GetLooperName(char* name, size_t length)
 	if (title == NULL || !title[0])
 		title = "Unnamed Window";
 
-	snprintf(name, length, "w:%ld:%s", ClientTeam(), title);
+	snprintf(name, length, "w:%" B_PRId32 ":%s", ClientTeam(), title);
 }
 
 
@@ -522,7 +522,7 @@ ServerWindow::_CreateView(BPrivate::LinkReceiver& link, View** _parent)
 	link.Read<rgb_color>(&viewColor);
 	link.Read<int32>(&parentToken);
 
-	STRACE(("ServerWindow(%s)::_CreateView()-> view %s, token %ld\n",
+	STRACE(("ServerWindow(%s)::_CreateView()-> view %s, token %" B_PRId32 "\n",
 		fTitle, name, token));
 
 	View* newView;
@@ -612,8 +612,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<bool>(&minimize);
 			if (link.Read<int32>(&showLevel) == B_OK) {
 				DTRACE(("ServerWindow %s: Message AS_MINIMIZE_WINDOW, "
-					"showLevel: %ld, minimize: %d\n", Title(), showLevel,
-					minimize));
+					"showLevel: %" B_PRId32 ", minimize: %d\n", Title(),
+					showLevel, minimize));
 
 				if (showLevel <= 0) {
 					// window is currently hidden - ignore the minimize request
@@ -942,8 +942,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&maxHeight);
 */
 			DTRACE(("ServerWindow %s: Message AS_SET_SIZE_LIMITS: "
-				"x: %ld-%ld, y: %ld-%ld\n",
-				Title(), minWidth, maxWidth, minHeight, maxHeight));
+				"x: %" B_PRId32 "-%" B_PRId32 ", y: %" B_PRId32 "-%" B_PRId32
+				"\n", Title(), minWidth, maxWidth, minHeight, maxHeight));
 
 			fWindow->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
@@ -1112,12 +1112,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				// TODO: if this happens, we probably want to kill the app and
 				// clean up
 				debug_printf("ServerWindow %s: Message "
-					"\n\n\nAS_SET_CURRENT_VIEW: view not found, token %ld\n",
-					fTitle, token);
+					"\n\n\nAS_SET_CURRENT_VIEW: view not found, token %"
+					B_PRId32 "\n", fTitle, token);
 				current = NULL;
 			} else {
 				DTRACE(("\n\n\nServerWindow %s: Message AS_SET_CURRENT_VIEW: %s, "
-					"token %ld\n", fTitle, current->Name(), token));
+					"token %" B_PRId32 "\n", fTitle, current->Name(), token));
 				_SetCurrentView(current);
 			}
 			break;
@@ -1457,7 +1457,7 @@ fDesktop->LockSingleWindow();
 				break;
 
 			DTRACE(("ServerWindow %s: Message AS_VIEW_RESIZE_MODE: "
-				"View: %s -> %ld\n", Title(), fCurrentView->Name(),
+				"View: %s -> %" B_PRId32 "\n", Title(), fCurrentView->Name(),
 				resizeMode));
 
 			fCurrentView->SetResizeMode(resizeMode);
@@ -1482,8 +1482,8 @@ fDesktop->LockSingleWindow();
 			}
 
 			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_FLAGS: "
-				"View: %s -> flags: %lu\n", Title(), fCurrentView->Name(),
-				flags));
+				"View: %s -> flags: %" B_PRIu32 "\n", Title(),
+				fCurrentView->Name(), flags));
 			break;
 		}
 		case AS_VIEW_HIDE:
@@ -1929,7 +1929,7 @@ fDesktop->LockSingleWindow();
 					break;
 
 				DTRACE(("ServerWindow %s: Message AS_VIEW_SET_CLIP_REGION: "
-					"View: %s -> rect count: %ld, frame = "
+					"View: %s -> rect count: %" B_PRId32 ", frame = "
 					"BRect(%.1f, %.1f, %.1f, %.1f)\n",
 					Title(), fCurrentView->Name(), rectCount,
 					region.Frame().left, region.Frame().top,
@@ -1976,8 +1976,8 @@ fDesktop->LockSingleWindow();
 				break;
 
 			DTRACE(("ServerWindow %s: Message AS_VIEW_INVALIDATE_REGION: "
-					"View: %s -> rect count: %ld, frame: BRect(%.1f, %.1f, "
-					"%.1f, %.1f)\n", Title(),
+					"View: %s -> rect count: %" B_PRId32 ", frame: BRect(%.1f, "
+					"%.1f, %.1f, %.1f)\n", Title(),
 					fCurrentView->Name(), region.CountRects(),
 					region.Frame().left, region.Frame().top,
 					region.Frame().right, region.Frame().bottom));
@@ -2141,7 +2141,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 	if (!fCurrentView->IsVisible() || !fWindow->IsVisible()) {
 		if (link.NeedsReply()) {
 			debug_printf("ServerWindow::DispatchViewDrawingMessage() got "
-				"message %ld that needs a reply!\n", code);
+				"message %" B_PRId32 " that needs a reply!\n", code);
 			// the client is now blocking and waiting for a reply!
 			fLink.StartMessage(B_ERROR);
 			fLink.Flush();
@@ -2285,8 +2285,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			ServerBitmap* bitmap = fServerApp->GetBitmap(info.bitmapToken);
 			if (bitmap != NULL) {
 				DTRACE(("ServerWindow %s: Message AS_VIEW_DRAW_BITMAP: "
-					"View: %s, bitmap: %ld (size %ld x %ld), "
-					"BRect(%.1f, %.1f, %.1f, %.1f) -> "
+					"View: %s, bitmap: %" B_PRId32 " (size %" B_PRId32 " x "
+					"%" B_PRId32 "), BRect(%.1f, %.1f, %.1f, %.1f) -> "
 					"BRect(%.1f, %.1f, %.1f, %.1f)\n",
 					fTitle, fCurrentView->Name(), info.bitmapToken,
 					bitmap->Width(), bitmap->Height(),
@@ -3388,7 +3388,7 @@ ServerWindow::_MessageLooper()
 #ifdef PROFILE_MESSAGE_LOOP
 		bigtime_t diff = system_time() - start;
 		if (diff > 10000) {
-			printf("ServerWindow %s: lock acquisition took %Ld usecs\n",
+			printf("ServerWindow %s: lock acquisition took %" B_PRId64 " usecs\n",
 				Title(), diff);
 		}
 #endif
@@ -3470,8 +3470,8 @@ ServerWindow::_MessageLooper()
 				sMessageProfile[code].time += diff;
 #endif
 				if (diff > 10000) {
-					printf("ServerWindow %s: message %ld took %Ld usecs\n",
-						Title(), code, diff);
+					printf("ServerWindow %s: message %" B_PRId32 " took %"
+						B_PRId64 " usecs\n", Title(), code, diff);
 				}
 			}
 #endif
@@ -3554,8 +3554,8 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 	if (fDirectWindowInfo == NULL)
 		return;
 
-	STRACE(("HandleDirectConnection(bufferState = %ld, driverState = %ld)\n",
-		bufferState, driverState));
+	STRACE(("HandleDirectConnection(bufferState = %" B_PRId32 ", driverState = "
+		"%" B_PRId32 ")\n", bufferState, driverState));
 
 	status_t status = fDirectWindowInfo->SetState(
 		(direct_buffer_state)bufferState, (direct_driver_state)driverState,

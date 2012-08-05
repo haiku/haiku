@@ -131,7 +131,7 @@ public:
 		fDryRun(dryRun),
 		fSubpixelAntiAliased(subpixelAntiAliased),
 		fVector(false),
-		fBounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN),
+		fBounds(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
 		fNextCharPos(nextCharPos),
 
 		fTransformedGlyph(transformedGlyph),

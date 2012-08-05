@@ -266,9 +266,9 @@ InputServerStream::_MessageFromPort(BMessage** _message, bigtime_t timeout)
 	delete[] buffer;
 
 	if (status != B_OK) {
-		printf("Unflatten event failed: %s, port message code was: %ld - %c%c%c%c\n",
-			strerror(status), code, (int8)(code >> 24), (int8)(code >> 16),
-			(int8)(code >> 8), (int8)code);
+		printf("Unflatten event failed: %s, port message code was: %" B_PRId32
+			" - %c%c%c%c\n", strerror(status), code, (int8)(code >> 24),
+			(int8)(code >> 16), (int8)(code >> 8), (int8)code);
 		delete message;
 		return status;
 	}

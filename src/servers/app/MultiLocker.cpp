@@ -149,7 +149,7 @@ MultiLocker::InitCheck()
 	contained.
 */
 bool
-MultiLocker::IsWriteLocked(uint32* _stackBase, thread_id* _thread) const
+MultiLocker::IsWriteLocked(addr_t* _stackBase, thread_id* _thread) const
 {
 #if TIMING
 	bigtime_t start = system_time();
@@ -163,7 +163,7 @@ MultiLocker::IsWriteLocked(uint32* _stackBase, thread_id* _thread) const
 		// this is managed by taking the address of the item on the
 		// stack and dividing it by the size of the memory pages
 		// if it is the same as the cached stack_page, there is a match
-		uint32 stackBase = (uint32)&writeLockHolder / B_PAGE_SIZE;
+		addr_t stackBase = (addr_t)&writeLockHolder / B_PAGE_SIZE;
 		thread_id thread = 0;
 
 		if (fWriterStackBase == stackBase) {
@@ -248,7 +248,7 @@ MultiLocker::WriteLock()
 	bool locked = false;
 
 	if (fInit == B_OK) {
-		uint32 stackBase = 0;
+		addr_t stackBase = 0;
 		thread_id thread = -1;
 
 		if (IsWriteLocked(&stackBase, &thread)) {
@@ -434,7 +434,7 @@ MultiLocker::WriteLock()
 	if (fInit != B_OK)
 		debugger("lock not initialized");
 
-	uint32 stackBase = 0;
+	addr_t stackBase = 0;
 	thread_id thread = -1;
 
 	if (IsWriteLocked(&stackBase, &thread)) {
@@ -508,7 +508,7 @@ MultiLocker::WriteUnlock()
 	} else {
 		char message[256];
 		snprintf(message, sizeof(message), "Non-writer attempting to "
-			"WriteUnlock() - write holder: %ld", fWriterThread);
+			"WriteUnlock() - write holder: %" B_PRId32, fWriterThread);
 		debugger(message);
 	}
 

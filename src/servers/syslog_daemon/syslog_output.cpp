@@ -50,7 +50,7 @@ prepare_output()
 		// check file size
 		struct stat stat;
 		if (fstat(sLog, &stat) == 0) {
-			if (stat.st_size < sLogMaxSize)
+			if (stat.st_size < (off_t)sLogMaxSize)
 				needNew = false;
 			else
 				tooLarge = true;
@@ -100,7 +100,7 @@ write_to_log(const char *buffer, int32 length)
 	if (sRepeatCount > 0) {
 		char repeat[64];
 		ssize_t size = snprintf(repeat, sizeof(repeat),
-			"Last message repeated %ld time%s\n", sRepeatCount,
+			"Last message repeated %" B_PRId32 " time%s\n", sRepeatCount,
 			sRepeatCount > 1 ? "s" : "");
 		sRepeatCount = 0;
 		if (write(sLog, repeat, strlen(repeat)) < size)
@@ -144,7 +144,7 @@ syslog_output(syslog_message &message)
 	}
 
 	if ((message.options & LOG_PID) != 0) {
-		pos += snprintf(header + pos, sizeof(header) - pos, "[%ld]",
+		pos += snprintf(header + pos, sizeof(header) - pos, "[%" B_PRId32 "]",
 			message.from);
 	}
 
