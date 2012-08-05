@@ -21,7 +21,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 
 SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr chgrp chmod
 	chown chroot cksum clear clockconfig cmp collectcatkeys comm compress
-	copyattr cp csplit cut date dd diff diff3 dircolors dirname du
+	copyattr cp csplit cut date dd diff diff3 dircolors dirname df du
 	dumpcatalog echo eject env error expand expr factor false find finddir
 	fmt fold fortune gawk gzip gzexe getlimits groups head hostname id
 	<bin>install isvolume join kernel_debugger kill less lessecho lesskey link
@@ -91,7 +91,7 @@ AddDriversToHaikuImage				: console dprintf null
 									  random <driver>tty zero ;
 AddDriversToHaikuImage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage disk usb		: usb_disk ;
-AddDriversToHaikuImage input		: ps2_hid ;
+AddDriversToHaikuImage input		: ps2_hid usb_hid ;
 
 # kernel
 AddFilesToHaikuImage system : kernel_$(TARGET_ARCH) ;
