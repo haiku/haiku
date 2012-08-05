@@ -9,6 +9,7 @@
 #define RPCCALLBACKREQUEST_H
 
 
+#include "RPCDefs.h"
 #include "XDR.h"
 
 
@@ -25,6 +26,8 @@ public:
 	inline	uint32				Procedure();
 
 	inline	status_t			Error();
+	inline	AcceptStat			RPCError();
+
 	inline	XDR::ReadStream&	Stream();
 
 private:
@@ -34,6 +37,7 @@ private:
 			uint32				fProcedure;
 
 			status_t			fError;
+			AcceptStat			fRPCError;
 
 			XDR::ReadStream		fStream;
 			void*				fBuffer;
@@ -65,6 +69,13 @@ inline status_t
 CallbackRequest::Error()
 {
 	return fError;
+}
+
+
+inline AcceptStat
+CallbackRequest::RPCError()
+{
+	return fRPCError;
 }
 
 

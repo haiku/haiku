@@ -16,6 +16,8 @@
 #include <SupportDefs.h>
 #include <util/kernel_cpp.h>
 
+#include "RPCDefs.h"
+
 
 using namespace RPC;
 

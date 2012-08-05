@@ -14,11 +14,6 @@
 
 namespace RPC {
 
-enum auth_flavour {
-	AUTH_NONE	= 0,
-	AUTH_SYS	= 1
-};
-
 class Auth {
 public:
 	inline	const XDR::WriteStream&		Stream() const;

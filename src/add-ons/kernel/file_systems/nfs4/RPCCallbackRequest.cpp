@@ -12,26 +12,16 @@
 #include <stdlib.h>
 
 #include "NFS4Defs.h"
+#include "RPCDefs.h"
 
 
 using namespace RPC;
-
-enum {
-	CALL		= 0
-};
-
-#define	VERSION		2
-
-enum {
-	PROGRAM_NFS_CB	= 0x40000000
-};
-
-#define NFS_CB_VERSION	1
 
 
 CallbackRequest::CallbackRequest(void *buffer, int size)
 	:
 	fError(B_BAD_VALUE),
+	fRPCError(GARBAGE_ARGS),
 	fStream(buffer, size),
 	fBuffer(buffer)
 {
@@ -43,11 +33,15 @@ CallbackRequest::CallbackRequest(void *buffer, int size)
 	if (fStream.GetUInt() != VERSION)
 		return;
 
-	if (fStream.GetUInt() != PROGRAM_NFS_CB)
+	if (fStream.GetUInt() != PROGRAM_NFS_CB) {
+		fRPCError = PROG_UNAVAIL;
 		return;
+	}
 
-	if (fStream.GetUInt() != NFS_CB_VERSION)
+	if (fStream.GetUInt() != NFS_CB_VERSION) {
+		fRPCError = PROG_MISMATCH;
 		return;
+	}
 
 	fProcedure = fStream.GetUInt();
 
@@ -60,9 +54,11 @@ CallbackRequest::CallbackRequest(void *buffer, int size)
 			return;
 
 		fID = fStream.GetUInt();
-	}
-
-	fError = B_OK;
+	} else if (fProcedure == CallbackProcNull) {
+		fRPCError = SUCCESS;
+		fError = B_OK;
+	} else
+		fRPCError = PROC_UNAVAIL;
 }
 
 

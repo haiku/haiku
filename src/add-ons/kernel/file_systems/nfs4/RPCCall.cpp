@@ -11,20 +11,10 @@
 
 #include <util/kernel_cpp.h>
 
+#include "RPCDefs.h"
+
 
 using namespace RPC;
-
-enum {
-	CALL		= 0
-};
-
-#define	VERSION		2
-
-enum {
-	PROGRAM_NFS	= 100003
-};
-
-#define NFS_VERSION	4
 
 
 Call::Call()

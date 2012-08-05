@@ -11,6 +11,7 @@
 
 #include "NFS4Defs.h"
 #include "RPCCallback.h"
+#include "RPCCallbackReply.h"
 #include "RPCCallbackRequest.h"
 
 
@@ -224,6 +225,7 @@ status_t
 CallbackServer::ConnectionThread(ConnectionEntry* entry)
 {
 	Connection* connection = entry->fConnection;
+	CallbackReply* reply;
 
 	while (fThreadRunning) {
 		uint32 size;
@@ -238,7 +240,17 @@ CallbackServer::ConnectionThread(ConnectionEntry* entry)
 		if (request == NULL || request->Error() != B_OK) {
 			free(buffer);
 			continue;
+		} else if (request != NULL) {
+			reply = CallbackReply::Create(request->XID(), request->RPCError());
+			if (reply != NULL) {
+				connection->Send(reply->Stream().Buffer(),
+					reply->Stream().Size());
+				delete reply;
+			}
+			free(buffer);
+			continue;
 		}
+
 
 		switch (request->Procedure()) {
 			case CallbackProcCompound:
@@ -246,7 +258,12 @@ CallbackServer::ConnectionThread(ConnectionEntry* entry)
 				break;
 
 			case CallbackProcNull:
-				dprintf("GOT CB_NULL %x\n", (int)request->XID());
+				reply = CallbackReply::Create(request->XID());
+				if (reply != NULL) {
+					connection->Send(reply->Stream().Buffer(),
+						reply->Stream().Size());
+					delete reply;
+				}
 
 			default:
 				free(buffer);

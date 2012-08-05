@@ -11,31 +11,10 @@
 
 #include <util/kernel_cpp.h>
 
+#include "RPCDefs.h"
+
 
 using namespace RPC;
-
-enum {
-	REPLY	= 1
-};
-
-enum {
-	MSG_ACCEPTED	= 0,
-	MSG_DENIED		= 1
-};
-
-enum accept_stat {
-	SUCCESS       = 0, /* RPC executed successfully       */
-	PROG_UNAVAIL  = 1, /* remote hasn't exported program  */
-	PROG_MISMATCH = 2, /* remote can't support version #  */
-	PROC_UNAVAIL  = 3, /* program can't support procedure */
-	GARBAGE_ARGS  = 4, /* procedure can't decode params   */
-	SYSTEM_ERR    = 5  /* e.g. memory allocation failure  */
-};
-
-enum reject_stat {
-	RPC_MISMATCH = 0, /* RPC version number != 2          */
-	AUTH_ERROR = 1    /* remote can't authenticate caller */
-};
 
 
 Reply::Reply(void *buffer, int size)

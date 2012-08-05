@@ -27,6 +27,7 @@ KernelAddon nfs4 :
 	RPCAuth.cpp
 	RPCCall.cpp
 	RPCCallback.cpp
+	RPCCallbackReply.cpp
 	RPCCallbackRequest.cpp
 	RPCCallbackServer.cpp
 	RPCReply.cpp
