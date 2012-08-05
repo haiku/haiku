@@ -23,6 +23,7 @@ struct iframe {
 	uint64 cx;
 	uint64 bx;
 	uint64 ax;
+	uint64 orig_rax;
 	uint64 vector;
 	uint64 error_code;
 	uint64 ip;

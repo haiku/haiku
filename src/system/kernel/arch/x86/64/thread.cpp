@@ -21,6 +21,7 @@
 #include <team.h>
 #include <thread.h>
 #include <tls.h>
+#include <tracing.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
@@ -36,6 +37,32 @@
 #endif
 
 
+#ifdef SYSCALL_TRACING
+
+namespace SyscallTracing {
+
+class RestartSyscall : public AbstractTraceEntry {
+	public:
+		RestartSyscall()
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("syscall restart");
+		}
+};
+
+}
+
+#	define TSYSCALL(x)	new(std::nothrow) SyscallTracing::x
+
+#else
+#	define TSYSCALL(x)
+#endif	// SYSCALL_TRACING
+
+
 extern "C" void x86_64_thread_entry();
 
 // Initial thread saved state.
@@ -45,7 +72,17 @@ static arch_thread sInitialState;
 void
 x86_restart_syscall(iframe* frame)
 {
-	panic("x86_restart_syscall: TODO");
+	Thread* thread = thread_get_current_thread();
+
+	atomic_and(&thread->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
+	atomic_or(&thread->flags, THREAD_FLAGS_SYSCALL_RESTARTED);
+
+	// Get back the original system call number and modify the frame to
+	// re-execute the syscall instruction.
+	frame->ax = frame->orig_rax;
+	frame->ip -= 2;
+
+	TSYSCALL(RestartSyscall());
 }
 
 
@@ -278,8 +315,8 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	// Fill in signalFrameData->context.uc_stack.
 	signal_get_user_stack(frame->user_sp, &signalFrameData->context.uc_stack);
 
-	// Store syscall_restart_return_value (TODO).
-	//signalFrameData->syscall_restart_return_value = frame->orig_rax;
+	// Store syscall_restart_return_value.
+	signalFrameData->syscall_restart_return_value = frame->orig_rax;
 
 	// Get the stack to use and copy the frame data to it.
 	uint8* userStack = get_signal_stack(thread, frame, action);
@@ -316,9 +353,7 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 {
 	iframe* frame = x86_get_current_iframe();
 
-	// TODO
-	//frame->orig_rax = signalFrameData->syscall_restart_return_value;
-
+	frame->orig_rax = signalFrameData->syscall_restart_return_value;
 	frame->ax = signalFrameData->context.uc_mcontext.rax;
 	frame->bx = signalFrameData->context.uc_mcontext.rbx;
 	frame->cx = signalFrameData->context.uc_mcontext.rcx;

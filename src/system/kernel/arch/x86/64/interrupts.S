@@ -19,6 +19,7 @@
 
 // Push the remainder of the interrupt frame onto the stack.
 #define PUSH_IFRAME_BOTTOM(iframeType)	\
+	push	%rax;	/* orig_rax */		\
 	push	%rax;						\
 	push	%rbx;						\
 	push	%rcx;						\
@@ -54,7 +55,7 @@
 	pop		%rcx;						\
 	pop		%rbx;						\
 	pop		%rax;						\
-	addq	$16, %rsp;
+	addq	$24, %rsp;
 
 
 // The macros below require R12 to contain the current thread pointer. R12 is
