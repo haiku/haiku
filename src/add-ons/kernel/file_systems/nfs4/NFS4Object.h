@@ -19,7 +19,7 @@ class OpenState;
 class NFS4Object {
 public:
 	bool		HandleErrors(uint32 nfs4Error, RPC::Server* serv,
-					OpenFileCookie* cookie = NULL);
+					OpenFileCookie* cookie = NULL, OpenState* state = NULL);
 
 	status_t	ConfirmOpen(const FileHandle& fileHandle, OpenState* state);
 

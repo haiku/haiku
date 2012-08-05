@@ -539,7 +539,7 @@ NFS4Inode::OpenFile(OpenState* state, int mode)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(reply.NFS4Error(), serv, NULL, state))
 			continue;
 
 		// Verify if the file we want to open is the file this Inode
@@ -592,7 +592,7 @@ NFS4Inode::ReadFile(OpenFileCookie* cookie, OpenState* state, uint64 position,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv, cookie))
+		if (HandleErrors(reply.NFS4Error(), serv, cookie, state))
 			continue;
 
 		reply.PutFH();
@@ -625,7 +625,7 @@ NFS4Inode::WriteFile(OpenFileCookie* cookie, OpenState* state, uint64 position,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv, cookie))
+		if (HandleErrors(reply.NFS4Error(), serv, cookie, state))
 			continue;
 
 		reply.PutFH();

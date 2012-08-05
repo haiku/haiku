@@ -15,7 +15,7 @@
 
 bool
 NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
-	OpenFileCookie* cookie)
+	OpenFileCookie* cookie, OpenState* state)
 {
 	uint32 leaseTime;
 
@@ -62,8 +62,14 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		// server has rebooted, reclaim share and try again
 		case NFS4ERR_STALE_CLIENTID:
 		case NFS4ERR_STALE_STATEID:
-			fFileSystem->NFSServer()->ServerRebooted(cookie->fClientID);
-			return true;
+			if (cookie != NULL) {
+				fFileSystem->NFSServer()->ServerRebooted(cookie->fClientID);
+				return true;
+			} else if (state != NULL) {
+				fFileSystem->NFSServer()->ServerRebooted(state->fClientID);
+				return true;
+			}
+			return false;
 
 		// FileHandle has expired
 		case NFS4ERR_FHEXPIRED:
@@ -81,6 +87,9 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		case NFS4ERR_EXPIRED:
 			if (cookie != NULL) {
 				fFileSystem->NFSServer()->ClientId(cookie->fClientID, true);
+				return true;
+			} else if (state != NULL) {
+				fFileSystem->NFSServer()->ClientId(state->fClientID, true);
 				return true;
 			}
 			return false;

@@ -101,7 +101,7 @@ OpenState::Close()
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(reply.NFS4Error(), serv, NULL, this))
 			continue;
 
 		reply.PutFH();
