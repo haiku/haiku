@@ -24,7 +24,9 @@ public:
 			enum {
 				EVENT_QUIT					= 0x01,
 				EVENT_USER_INTERRUPT		= 0x02,
-				EVENT_THREAD_STATE_CHANGED	= 0x04,
+				EVENT_THREAD_ADDED			= 0x04,
+				EVENT_THREAD_REMOVED		= 0x08,
+				EVENT_THREAD_STOPPED		= 0x10,
 			};
 
 public:
@@ -37,9 +39,18 @@ public:
 
 			void				Terminating();
 
+			bool				IsTerminating() const	{ return fTerminating; }
+
 			// service methods for the input loop thread follow
 
 			Team*				GetTeam() const	{ return fTeam; }
+			UserInterfaceListener* GetUserInterfaceListener() const
+									{ return fListener; }
+
+			Thread*				CurrentThread() const { return fCurrentThread; }
+			thread_id			CurrentThreadID() const;
+			void				SetCurrentThread(Thread* thread);
+			void				PrintCurrentThread();
 
 			const char*			PromptUser(const char* prompt);
 			void				AddLineToInputHistory(const char* line);
@@ -47,13 +58,24 @@ public:
 			void				QuitSession(bool killTeam);
 
 			void				WaitForThreadOrUser();
+			void				ProcessPendingEvents();
+
+private:
+			struct Event;
+
+			typedef DoublyLinkedList<Event> EventList;
 
 private:
 	// Team::Listener
+	virtual	void				ThreadAdded(const Team::ThreadEvent& event);
+	virtual	void				ThreadRemoved(const Team::ThreadEvent& event);
+
 	virtual	void				ThreadStateChanged(
 									const Team::ThreadEvent& event);
 
 private:
+			void				_QueueEvent(Event* event);
+
 			void				_PrepareToWaitForEvents(uint32 eventMask);
 			uint32				_WaitForEvents();
 			void				_SignalInputLoop(uint32 events);
@@ -72,6 +94,10 @@ private:
 			uint32				fEventsOccurred;
 			bool				fInputLoopWaiting;
 	volatile bool				fTerminating;
+
+			Thread*				fCurrentThread;
+
+			EventList			fPendingEvents;
 };
 
 

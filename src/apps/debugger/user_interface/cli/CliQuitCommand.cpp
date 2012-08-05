@@ -43,7 +43,7 @@ CliQuitCommand::Execute(int argc, const char* const* argv, CliContext& context)
 			break;
 		}
 
-		if (trimmedLine == "d")
+		if (trimmedLine == "c")
 			break;
 	}
 }

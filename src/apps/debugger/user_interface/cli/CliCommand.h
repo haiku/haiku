@@ -21,6 +21,8 @@ public:
 			const char*			Summary() const	{ return fSummary; }
 			const char*			Usage() const	{ return fUsage; }
 
+			void				PrintUsage(const char* commandName) const;
+
 	virtual	void				Execute(int argc, const char* const* argv,
 									CliContext& context) = 0;
 

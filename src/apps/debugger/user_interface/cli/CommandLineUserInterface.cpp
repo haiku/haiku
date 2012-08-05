@@ -16,7 +16,11 @@
 #include <Referenceable.h>
 
 #include "CliContext.h"
+#include "CliContinueCommand.h"
 #include "CliQuitCommand.h"
+#include "CliStackTraceCommand.h"
+#include "CliStopCommand.h"
+#include "CliThreadCommand.h"
 #include "CliThreadsCommand.h"
 
 
@@ -56,16 +60,23 @@ private:
 struct CommandLineUserInterface::HelpCommand : CliCommand {
 	HelpCommand(CommandLineUserInterface* userInterface)
 		:
-		CliCommand("print a list of all commands",
-			"%s\n"
-			"Prints a list of all commands."),
+		CliCommand("print help for a command or a list of all commands",
+			"%s [ <command> ]\n"
+			"Prints help for command <command>, if given, or a list of all "
+				"commands\n"
+			"otherwise."),
 		fUserInterface(userInterface)
 	{
 	}
 
 	virtual void Execute(int argc, const char* const* argv, CliContext& context)
 	{
-		fUserInterface->_PrintHelp();
+		if (argc > 2) {
+			PrintUsage(argv[0]);
+			return;
+		}
+
+		fUserInterface->_PrintHelp(argc == 2 ? argv[1] : NULL);
 	}
 
 private:
@@ -207,9 +218,19 @@ CommandLineUserInterface::_InputLoopEntry(void* data)
 status_t
 CommandLineUserInterface::_InputLoop()
 {
+	thread_id currentThread = -1;
+
 	while (!fTerminating) {
 		// Wait for a thread or Ctrl-C.
 		fContext.WaitForThreadOrUser();
+		if (fContext.IsTerminating())
+			break;
+
+		// Print the active thread, if it changed.
+		if (fContext.CurrentThreadID() != currentThread) {
+			fContext.PrintCurrentThread();
+			currentThread = fContext.CurrentThreadID();
+		}
 
 		// read a command line
 		const char* line = fContext.PromptUser(kDebuggerPrompt);
@@ -251,8 +272,18 @@ CommandLineUserInterface::_InputLoop()
 status_t
 CommandLineUserInterface::_RegisterCommands()
 {
-	if (_RegisterCommand("help", new(std::nothrow) HelpCommand(this)) &&
+	BReference<CliCommand> stackTraceCommandReference(
+		new(std::nothrow) CliStackTraceCommand, true);
+	BReference<CliCommand> stackTraceCommandReference2(
+		stackTraceCommandReference.Get());
+
+	if (_RegisterCommand("bt", stackTraceCommandReference.Detach()) &&
+		_RegisterCommand("continue", new(std::nothrow) CliContinueCommand) &&
+		_RegisterCommand("help", new(std::nothrow) HelpCommand(this)) &&
 		_RegisterCommand("quit", new(std::nothrow) CliQuitCommand) &&
+		_RegisterCommand("sc", stackTraceCommandReference2.Detach()) &&
+		_RegisterCommand("stop", new(std::nothrow) CliStopCommand) &&
+		_RegisterCommand("thread", new(std::nothrow) CliThreadCommand) &&
 		_RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)) {
 		return B_OK;
 	}
@@ -282,33 +313,63 @@ CommandLineUserInterface::_RegisterCommand(const BString& name,
 void
 CommandLineUserInterface::_ExecuteCommand(int argc, const char* const* argv)
 {
-	const char* commandName = argv[0];
+	CommandEntry* commandEntry = _FindCommand(argv[0]);
+	if (commandEntry != NULL)
+		commandEntry->Command()->Execute(argc, argv, fContext);
+}
+
+
+CommandLineUserInterface::CommandEntry*
+CommandLineUserInterface::_FindCommand(const char* commandName)
+{
 	size_t commandNameLength = strlen(commandName);
 
-	CommandEntry* firstEntry = NULL;
+	// try to find an exact match first
+	CommandEntry* commandEntry = NULL;
 	for (int32 i = 0; CommandEntry* entry = fCommands.ItemAt(i); i++) {
-		if (entry->Name().Compare(commandName, commandNameLength) == 0) {
-			if (firstEntry != NULL) {
-				printf("Ambiguous command \"%s\".\n", commandName);
-				return;
-			}
-
-			firstEntry = entry;
+		if (entry->Name() == commandName) {
+			commandEntry = entry;
+			break;
 		}
 	}
 
-	if (firstEntry == NULL) {
-		printf("Unknown command \"%s\".\n", commandName);
-		return;
+	// If nothing found yet, try partial matches, but only, if they are
+	// unambiguous.
+	if (commandEntry == NULL) {
+		for (int32 i = 0; CommandEntry* entry = fCommands.ItemAt(i); i++) {
+			if (entry->Name().Compare(commandName, commandNameLength) == 0) {
+				if (commandEntry != NULL) {
+					printf("Error: Ambiguous command \"%s\".\n", commandName);
+					return NULL;
+				}
+
+				commandEntry = entry;
+			}
+		}
 	}
 
-	firstEntry->Command()->Execute(argc, argv, fContext);
+	if (commandEntry == NULL) {
+		printf("Error: Unknown command \"%s\".\n", commandName);
+		return NULL;
+	}
+
+	return commandEntry;
 }
 
 
 void
-CommandLineUserInterface::_PrintHelp()
+CommandLineUserInterface::_PrintHelp(const char* commandName)
 {
+	// If a command name is given, print the usage for that one.
+	if (commandName != NULL) {
+		CommandEntry* commandEntry = _FindCommand(commandName);
+		if (commandEntry != NULL)
+			commandEntry->Command()->PrintUsage(commandEntry->Name().String());
+		return;
+	}
+
+	// No command name given -- print a list of all commands.
+
 	// determine longest command name
 	int32 longestCommandName = 0;
 	for (int32 i = 0; CommandEntry* entry = fCommands.ItemAt(i); i++) {

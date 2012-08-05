@@ -410,6 +410,27 @@ dp_clock_recovery_ok(dp_info* dp)
 }
 
 
+static bool
+dp_clock_equalization_ok(dp_info* dp)
+{
+	uint8 laneAlignment
+		= dp->linkStatus[DP_LANE_ALIGN - DP_LANE_STATUS_0_1];
+
+	if ((laneAlignment & DP_LANE_ALIGN_DONE) == 0)
+		return false;
+
+	int lane;
+	for (lane = 0; lane < dp->laneCount; lane++) {
+		uint8 laneStatus = dp_get_lane_status(dp, lane);
+		if ((laneStatus & DP_LANE_STATUS_EQUALIZED_A)
+			!= DP_LANE_STATUS_EQUALIZED_A) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
 static void
 dp_update_vs_emph(uint32 connectorIndex)
 {
@@ -613,6 +634,58 @@ dp_link_train_cr(uint32 connectorIndex)
 
 
 status_t
+dp_link_train_ce(uint32 connectorIndex)
+{
+	TRACE("%s\n", __func__);
+
+	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
+
+	// TODO: DisplayPort: Supports TP3?
+	dp_set_tp(connectorIndex, DP_TRAIN_PATTERN_2);
+
+	dp->trainingAttempts = 0;
+	bool channelEqual = false;
+
+	while (1) {
+		if (dp->trainingReadInterval == 0)
+			snooze(100);
+		else
+			snooze(1000 * 4 * dp->trainingReadInterval);
+
+		if (!dp_get_link_status(dp))
+			break;
+
+		if (dp_clock_equalization_ok(dp)) {
+			channelEqual = true;
+			break;
+		}
+
+		if (dp->trainingAttempts > 5) {
+			ERROR("%s: ERROR: failed > 5 times!\n", __func__);
+			break;
+		}
+
+		dp_get_adjust_train(dp);
+
+		dp_update_vs_emph(connectorIndex);
+		dp->trainingAttempts++;
+	}
+
+	if (!channelEqual) {
+		ERROR("%s: ERROR: failed\n", __func__);
+		return B_ERROR;
+	}
+
+	TRACE("%s: channels equalized at voltage %d pre-emphasis %d\n",
+		__func__, dp->trainingSet[0] & DP_ADJ_VCC_SWING_LANEA_MASK,
+		(dp->trainingSet[0] & DP_TRAIN_PRE_EMPHASIS_MASK)
+		>> DP_TRAIN_PRE_EMPHASIS_SHIFT);
+
+	return B_OK;
+}
+
+
+status_t
 dp_link_train(uint8 crtcID, display_mode* mode)
 {
 	TRACE("%s\n", __func__);
@@ -702,7 +775,7 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 	dpcd_reg_write(hwPin, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
 
 	dp_link_train_cr(connectorIndex);
-	// TODO: dp_link_train_ce
+	dp_link_train_ce(connectorIndex);
 
 
 	// *** DisplayPort link training finish

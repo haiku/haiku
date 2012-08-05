@@ -37,6 +37,7 @@ void dp_setup_connectors();
 
 status_t dp_link_train(uint8 crtcID, display_mode* mode);
 status_t dp_link_train_cr(uint32 connectorIndex);
+status_t dp_link_train_ce(uint32 connectorIndex);
 
 
 #endif /* RADEON_HD_DISPLAYPORT_H */
