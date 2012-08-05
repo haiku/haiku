@@ -1338,8 +1338,6 @@ error1:
 //	#pragma mark - userland symbol lookup
 
 
-// TODO x86_64
-#ifndef __x86_64__
 class UserSymbolLookup {
 public:
 	static UserSymbolLookup& Default()
@@ -1546,7 +1544,6 @@ UserSymbolLookup::_Read(const T* address, T& data)
 
 UserSymbolLookup UserSymbolLookup::sLookup;
 	// doesn't need construction, but has an Init() method
-#endif
 
 
 //	#pragma mark - public kernel API
@@ -1733,8 +1730,6 @@ elf_debug_lookup_user_symbol_address(Team* team, addr_t address,
 	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
 	bool *_exactMatch)
 {
-	// TODO x86_64
-#ifndef __x86_64__
 	if (team == NULL || team == team_get_kernel_team())
 		return B_BAD_VALUE;
 
@@ -1745,9 +1740,6 @@ elf_debug_lookup_user_symbol_address(Team* team, addr_t address,
 
 	return lookup.LookupSymbolAddress(address, _baseAddress, _symbolName,
 		_imageName, _exactMatch);
-#else
-	return B_ENTRY_NOT_FOUND;
-#endif
 }
 
 
