@@ -57,6 +57,14 @@ LockInfo::operator==(const struct flock& lock) const
 }
 
 
+bool
+LockInfo::operator==(const LockInfo& lock) const
+{
+	return fOwner == lock.fOwner && fStart == lock.fStart
+		&& fLength == lock.fLength && fType == lock.fType;
+}
+
+
 Cookie::Cookie()
 	:
 	fRequests(NULL),
@@ -131,102 +139,26 @@ Cookie::CancelAll()
 
 OpenFileCookie::OpenFileCookie()
 	:
-	fLocks(NULL),
-	fLockOwners(NULL)
+	fLocks(NULL)
 {
-	mutex_init(&fLocksLock, NULL);
-	mutex_init(&fOwnerLock, NULL);
 }
 
 
-OpenFileCookie::~OpenFileCookie()
-{
-	mutex_destroy(&fLocksLock);
-	mutex_destroy(&fOwnerLock);
-}
-
-
-LockOwner*
-OpenFileCookie::GetLockOwner(uint32 owner)
-{
-	LockOwner* current = fLockOwners;
-	while (current != NULL) {
-		if (current->fOwner == owner)
-			return current;
-
-		current = current->fNext;
-	}
-
-	current = new LockOwner(owner);
-	if (current == NULL)
-		return NULL;
-
-	current->fNext = fLockOwners;
-	if (fLockOwners != NULL)
-		fLockOwners->fPrev = current;
-	fLockOwners = current;
-
-	return current;
-}
-
-
-// Caller must hold fLocksLock
 void
 OpenFileCookie::AddLock(LockInfo* lock)
 {
-	lock->fNext = fLocks;
+	lock->fCookieNext = fLocks;
 	fLocks = lock;
 }
 
 
-// Caller must hold fLocksLock
 void
 OpenFileCookie::RemoveLock(LockInfo* lock, LockInfo* prev)
 {
 	if (prev != NULL)
-		prev->fNext = lock->fNext;
+		prev->fCookieNext = lock->fCookieNext;
 	else
-		fLocks = lock->fNext;
-}
-
-
-void
-OpenFileCookie::DeleteLock(LockInfo* lock)
-{
-	MutexLocker _(fOwnerLock);
-
-	LockOwner* owner = lock->fOwner;
-	delete lock;
-
-	if (owner->fUseCount == 0) {
-		if (owner->fPrev)
-			owner->fPrev->fNext = owner->fNext;
-		else
-			fLockOwners = owner->fNext;
-		if (owner->fNext)
-			owner->fNext->fPrev = owner->fPrev;
-
-		_ReleaseLockOwner(owner);
-		delete owner;
-	}
-}
-
-
-status_t
-OpenFileCookie::_ReleaseLockOwner(LockOwner* owner)
-{
-	Request request(fFileSystem->Server());
-	RequestBuilder& req = request.Builder();
-
-	req.ReleaseLockOwner(this, owner);
-
-	status_t result = request.Send();
-	if (result != B_OK)
-		return result;
-
-	ReplyInterpreter &reply = request.Reply();
-
-	return reply.ReleaseLockOwner();
+		fLocks = lock->fCookieNext;
 }
 
 

@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "Cookie.h"
+#include "OpenState.h"
 #include "RPCCallback.h"
 #include "RPCCallbackServer.h"
 
@@ -192,19 +193,19 @@ RequestBuilder::GetFH()
 
 void
 RequestBuilder::_GenerateLockOwner(XDR::WriteStream& stream,
-	OpenFileCookie* cookie, LockOwner* owner)
+	OpenState* state, LockOwner* owner)
 {
-	stream.AddUHyper(cookie->fOpenState->fClientID);
+	stream.AddUHyper(state->fClientID);
 
 	uint64 lockOwner[2];
 	lockOwner[0] = owner->fOwner;
-	lockOwner[1] = cookie->fOpenState->fInfo.fFileId;
+	lockOwner[1] = state->fInfo.fFileId;
 	stream.AddOpaque(lockOwner, sizeof(lockOwner));
 }
 
 
 status_t
-RequestBuilder::Lock(OpenFileCookie* cookie, LockInfo* lock, uint32 sequence,
+RequestBuilder::Lock(OpenState* state, LockInfo* lock, uint32 sequence,
 	bool reclaim)
 {
 	if (fProcedure != ProcCompound)
@@ -226,8 +227,6 @@ RequestBuilder::Lock(OpenFileCookie* cookie, LockInfo* lock, uint32 sequence,
 		fRequest->Stream().AddBoolean(true);			// new lock owner
 
 		// open seq stateid
-		OpenState* state = cookie->fOpenState;
-
 		fRequest->Stream().AddUInt(sequence);
 		fRequest->Stream().AddUInt(state->fStateSeq);
 		fRequest->Stream().AddUInt(state->fStateID[0]);
@@ -236,7 +235,7 @@ RequestBuilder::Lock(OpenFileCookie* cookie, LockInfo* lock, uint32 sequence,
 
 		// lock seq owner
 		fRequest->Stream().AddUInt(lock->fOwner->fSequence++);
-		_GenerateLockOwner(fRequest->Stream(), cookie, lock->fOwner);
+		_GenerateLockOwner(fRequest->Stream(), state, lock->fOwner);
 
 	} else {
 		fRequest->Stream().AddBoolean(false);			// old lock owner
@@ -258,7 +257,7 @@ RequestBuilder::Lock(OpenFileCookie* cookie, LockInfo* lock, uint32 sequence,
 
 status_t
 RequestBuilder::LockT(LockType type, uint64 pos, uint64 len,
-	OpenFileCookie* cookie)
+	OpenState* state)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -272,7 +271,7 @@ RequestBuilder::LockT(LockType type, uint64 pos, uint64 len,
 	fRequest->Stream().AddUHyper(pos);
 	fRequest->Stream().AddUHyper(len);
 
-	fRequest->Stream().AddUHyper(cookie->fOpenState->fClientID);
+	fRequest->Stream().AddUHyper(state->fClientID);
 
 	uint32 owner = find_thread(NULL);
 	fRequest->Stream().AddOpaque(&owner, sizeof(owner));
@@ -381,7 +380,7 @@ RequestBuilder::Nverify(AttrValue* attr, uint32 count)
 status_t
 RequestBuilder::Open(OpenClaim claim, uint32 seq, uint32 access, uint64 id,
 	OpenCreate oc, uint64 ownerId, const char* name, AttrValue* attr,
-	uint32 count, bool excl)
+	uint32 count, bool excl, OpenDelegation delegationType)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -413,7 +412,7 @@ RequestBuilder::Open(OpenClaim claim, uint32 seq, uint32 access, uint64 id,
 			fRequest->Stream().AddString(name, strlen(name));
 			break;
 		case CLAIM_PREVIOUS:
-			fRequest->Stream().AddUInt(0);
+			fRequest->Stream().AddUInt(delegationType);
 			break;
 		default:
 			return B_UNSUPPORTED;
@@ -795,7 +794,7 @@ RequestBuilder::Write(const uint32* id, uint32 stateSeq, const void* buffer,
 
 
 status_t
-RequestBuilder::ReleaseLockOwner(OpenFileCookie* cookie, LockOwner* owner)
+RequestBuilder::ReleaseLockOwner(OpenState* state, LockOwner* owner)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -803,7 +802,7 @@ RequestBuilder::ReleaseLockOwner(OpenFileCookie* cookie, LockOwner* owner)
 		return B_NO_MEMORY;
 
 	fRequest->Stream().AddUInt(OpReleaseLockOwner);
-	_GenerateLockOwner(fRequest->Stream(), cookie, owner);
+	_GenerateLockOwner(fRequest->Stream(), state, owner);
 
 	fOpCount++;
 

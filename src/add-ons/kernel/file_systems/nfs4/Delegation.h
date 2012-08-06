@@ -24,16 +24,12 @@ public:
 							uint64 clientID);
 						~Delegation();
 
-	status_t			Write(void* buffer, uint32* size);
-	status_t			Read(void* buffer, uint32* size);
-
 	// TODO: locks
 
-	status_t			Reclaim(uint64 newClientID);
-
-	status_t			GiveUp(bool truncate);
+	status_t			GiveUp(bool truncate = false);
 
 	inline	Inode*		GetInode();
+	inline	OpenDelegation Type();
 
 protected:
 	status_t			ReturnDelegation();
@@ -51,6 +47,13 @@ inline Inode*
 Delegation::GetInode()
 {
 	return fInode;
+}
+
+
+inline OpenDelegation
+Delegation::Type()
+{
+	return fData.fType;
 }
 
 

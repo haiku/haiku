@@ -57,66 +57,18 @@ NFS4Server::ServerRebooted(uint64 clientId)
 	MutexLocker _(fFSLock);
 	FileSystem* fs = fFileSystems;
 	while (fs != NULL) {
-		OpenFileCookie* current = fs->OpenFilesLock();
+		OpenState* current = fs->OpenFilesLock();
 		while (current != NULL) {
-			_ReclaimOpen(current);
-			_ReclaimLocks(current);
+			current->Reclaim(fClientId);
+
 			current = current->fNext;
 		}
 		fs->OpenFilesUnlock();
+
 		fs = fs->fNext;
 	}
 
 	return fClientId;
-}
-
-
-status_t
-NFS4Server::_ReclaimOpen(OpenFileCookie* cookie)
-{
-	if (cookie->fOpenState != NULL)
-		cookie->fOpenState->Reclaim(fClientId);
-
-	return B_OK;
-}
-
-
-status_t
-NFS4Server::_ReclaimLocks(OpenFileCookie* cookie)
-{
-	MutexLocker _(cookie->fLocksLock);
-	LockInfo* linfo = cookie->fLocks;
-	while (linfo != NULL) {
-		MutexLocker locker(linfo->fOwner->fLock);
-		if (linfo->fOwner->fClientId != fClientId) {
-			memset(linfo->fOwner->fStateId, 0, sizeof(linfo->fOwner->fStateId));
-			linfo->fOwner->fClientId = fClientId;
-		}
-
-		do {
-			Request request(fServer);
-			RequestBuilder& req = request.Builder();
-
-			req.PutFH(cookie->fOpenState->fInfo.fHandle);
-			req.Lock(cookie, linfo, true);
-
-			status_t result = request.Send();
-			if (result != B_OK)
-				break;
-
-			ReplyInterpreter &reply = request.Reply();
-
-			reply.PutFH();
-			reply.Lock(linfo);
-
-			break;
-		} while (true);
-		locker.Unlock();
-
-		linfo = linfo->fNext;
-	}
-
-	return B_OK;
 }
 
 

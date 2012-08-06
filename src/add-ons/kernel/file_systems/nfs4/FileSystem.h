@@ -30,14 +30,12 @@ public:
 
 			status_t			Migrate(const RPC::Server* serv);
 
-			OpenFileCookie*		OpenFilesLock();
+			OpenState*			OpenFilesLock();
 			void				OpenFilesUnlock();
 	inline	uint32				OpenFilesCount();
-			void				AddOpenFile(OpenFileCookie* cookie);
-			void				RemoveOpenFile(OpenFileCookie* cookie);
+			void				AddOpenFile(OpenState* state);
+			void				RemoveOpenFile(OpenState* state);
 
-			OpenFileCookie*		DelegationsLock();
-			void				DelegationsUnlock();
 			void				AddDelegation(Delegation* delegation);
 			void				RemoveDelegation(Delegation* delegation);
 			Delegation*			GetDelegation(const FileHandle& handle);
@@ -69,11 +67,10 @@ private:
 
 			CacheRevalidator	fCacheRevalidator;
 
-			DoublyLinkedList<Delegation> fOpenDelegations;
 			mutex				fDelegationLock;
 			AVLTreeMap<FileHandle, Delegation*> fHandleToDelegation;
 
-			OpenFileCookie*		fOpenFiles;
+			OpenState*			fOpenFiles;
 			uint32				fOpenCount;
 			mutex				fOpenLock;
 

@@ -84,7 +84,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 
 	cookie->fFileSystem = fFileSystem;
 
-	fFileSystem->AddOpenFile(cookie);
+	fFileSystem->AddOpenFile(state);
 	fFileSystem->Root()->MakeInfoInvalid();
 
 	return B_OK;
@@ -109,6 +109,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		if (result != B_OK)
 			return result;
 
+		fFileSystem->AddOpenFile(state);
 		fOpenState = state;
 	} else {
 		int newMode = mode & O_RWMASK;
@@ -127,8 +128,6 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	cookie->fFileSystem = fFileSystem;
 	cookie->fMode = mode;
 	cookie->fLocks = NULL;
-
-	fFileSystem->AddOpenFile(cookie);
 
 	if (data.fType != OPEN_DELEGATE_NONE) {
 		Delegation* delegation
@@ -150,12 +149,13 @@ Inode::Close(OpenFileCookie* cookie)
 	file_cache_sync(fFileCache);
 	Commit();
 
-	fFileSystem->RemoveOpenFile(cookie);
-
 	MutexLocker _(fStateLock);
-	if (cookie->fOpenState != NULL)
-		if (cookie->fOpenState->ReleaseReference() == 1)
+	if (cookie->fOpenState != NULL) {
+		if (cookie->fOpenState->ReleaseReference() == 1) {
+			fFileSystem->RemoveOpenFile(fOpenState);
 			fOpenState = NULL;
+		}
+	}
 
 	return B_OK;
 }

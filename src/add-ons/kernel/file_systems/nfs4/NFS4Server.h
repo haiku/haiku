@@ -43,9 +43,6 @@ public:
 			status_t		CallbackRecall(RequestInterpreter* request,
 								ReplyBuilder* reply);
 private:
-			status_t		_ReclaimOpen(OpenFileCookie* cookie);
-			status_t		_ReclaimLocks(OpenFileCookie* cookie);
-
 			status_t		_GetLeaseTime();
 
 			status_t		_StartRenewing();

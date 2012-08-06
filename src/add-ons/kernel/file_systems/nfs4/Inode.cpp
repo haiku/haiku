@@ -607,6 +607,8 @@ status_t
 Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	bool wait)
 {
+	OpenState* state = cookie->fOpenState;
+
 	status_t result = CheckLockType(lock->l_type, cookie->fMode);
 	if (result != B_OK)
 		return result;
@@ -614,8 +616,8 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	thread_info info;
 	get_thread_info(find_thread(NULL), &info);
 
-	MutexLocker locker(cookie->fOwnerLock);
-	LockOwner* owner = cookie->GetLockOwner(info.team);
+	MutexLocker locker(state->fOwnerLock);
+	LockOwner* owner = state->GetLockOwner(info.team);
 	if (owner == NULL)
 		return B_NO_MEMORY;
 
@@ -635,7 +637,8 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	if (result != B_OK)
 		return result;
 
-	MutexLocker _(cookie->fLocksLock);
+	MutexLocker _(state->fLocksLock);
+	state->AddLock(linfo);
 	cookie->AddLock(linfo);
 
 	return B_OK;
@@ -654,8 +657,21 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 	get_thread_info(find_thread(NULL), &info);
 	uint32 owner = info.team;
 
-	MutexLocker locker(cookie->fLocksLock);
-	LockInfo* linfo = cookie->fLocks;
+	OpenState* state = cookie->fOpenState;
+	MutexLocker locker(state->fLocksLock);
+	LockInfo* linfo = state->fLocks;
+	while (linfo != NULL) {
+		if (linfo->fOwner->fOwner == owner && *linfo == *lock) {
+			state->RemoveLock(linfo, prev);
+			break;
+		}
+
+		prev = linfo;
+		linfo = linfo->fNext;
+	}
+
+	prev = NULL;
+	linfo = cookie->fLocks;
 	while (linfo != NULL) {
 		if (linfo->fOwner->fOwner == owner && *linfo == *lock) {
 			cookie->RemoveLock(linfo, prev);
@@ -663,7 +679,7 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 		}
 
 		prev = linfo;
-		linfo = linfo->fNext;
+		linfo = linfo->fCookieNext;
 	}
 	locker.Unlock();
 
@@ -674,7 +690,7 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 	if (result != B_OK)
 		return result;
 
-	cookie->DeleteLock(linfo);
+	state->DeleteLock(linfo);
 
 	return B_OK;
 }
@@ -686,12 +702,26 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 	file_cache_sync(fFileCache);
 	Commit();
 
-	MutexLocker _(cookie->fLocksLock);
+	OpenState* state = cookie->fOpenState;
+	MutexLocker _(state->fLocksLock);
 	LockInfo* linfo = cookie->fLocks;
 	while (linfo != NULL) {
-		NFS4Inode::ReleaseLock(cookie, linfo);
 		cookie->RemoveLock(linfo, NULL);
-		cookie->DeleteLock(linfo);
+
+		LockInfo* prev = NULL;
+		LockInfo* stateLock = state->fLocks;
+		while (stateLock != NULL) {
+			if (*linfo == *stateLock) {
+				state->RemoveLock(stateLock, prev);
+				break;
+			}
+
+			prev = stateLock;
+			stateLock = stateLock->fNext;
+		}
+
+		NFS4Inode::ReleaseLock(cookie, linfo);
+		state->DeleteLock(linfo);
 
 		linfo = cookie->fLocks;
 	}
@@ -733,6 +763,8 @@ Inode::SetDelegation(Delegation* delegation)
 {
 	WriteLocker _(fDelegationLock);
 	fDelegation = delegation;
+	fOpenState->AcquireReference();
+	fOpenState->fDelegation = delegation;
 	fFileSystem->AddDelegation(delegation);
 }
 
@@ -746,6 +778,14 @@ Inode::RecallDelegation(bool truncate)
 
 	fDelegation->GiveUp(truncate);
 	fFileSystem->RemoveDelegation(fDelegation);
+
+	MutexLocker stateLocker(fStateLock);
+	fOpenState->fDelegation = NULL;
+	if (fOpenState->ReleaseReference() == 1) {
+		fFileSystem->RemoveOpenFile(fOpenState);
+		fOpenState = NULL;
+	}
+
 	delete fDelegation;
 	fDelegation = NULL;
 }

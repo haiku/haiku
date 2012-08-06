@@ -19,7 +19,7 @@
 #include "XDR.h"
 
 
-class OpenFileCookie;
+class OpenState;
 class LockInfo;
 class LockOwner;
 
@@ -41,11 +41,10 @@ public:
 			status_t				GetAttr(Attribute* attrs, uint32 count);
 			status_t				GetFH();
 			status_t				Link(const char* name);
-			status_t				Lock(OpenFileCookie* cookie,
-										LockInfo* lock, uint32 sequence,
-										bool reclaim = false);
+			status_t				Lock(OpenState* state, LockInfo* lock,
+										uint32 sequence, bool reclaim = false);
 			status_t				LockT(LockType type, uint64 pos,
-										uint64 len, OpenFileCookie* cookie);
+										uint64 len, OpenState* state);
 			status_t				LockU(LockInfo* lock);
 			status_t				LookUp(const char* name);
 			status_t				LookUpUp();
@@ -54,7 +53,9 @@ public:
 										uint32 access, uint64 id, OpenCreate oc,
 										uint64 ownerId, const char* name,
 										AttrValue* attr = NULL,
-										uint32 count = 0, bool excl = false);
+										uint32 count = 0, bool excl = false,
+										OpenDelegation delegType
+											= OPEN_DELEGATE_NONE);
 			status_t				OpenConfirm(uint32 seq, const uint32* id,
 										uint32 stateSeq);
 			status_t				PutFH(const FileHandle& fh);
@@ -77,7 +78,7 @@ public:
 			status_t				Write(const uint32* id, uint32 stateSeq,
 										const void* buffer, uint64 pos,
 										uint32 len);
-			status_t				ReleaseLockOwner(OpenFileCookie* cookie,
+			status_t				ReleaseLockOwner(OpenState* state,
 										LockOwner* owner);
 
 			RPC::Call*				Request();
@@ -86,8 +87,7 @@ private:
 			void					_InitHeader();
 
 			void					_GenerateLockOwner(XDR::WriteStream& stream,
-										OpenFileCookie* cookie,
-										LockOwner* owner);
+										OpenState* state, LockOwner* owner);
 			status_t				_GenerateClientId(XDR::WriteStream& stream,
 										const RPC::Server* server);
 

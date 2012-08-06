@@ -10,6 +10,7 @@
 #include "Cookie.h"
 #include "FileSystem.h"
 #include "NFS4Object.h"
+#include "OpenState.h"
 #include "Request.h"
 
 

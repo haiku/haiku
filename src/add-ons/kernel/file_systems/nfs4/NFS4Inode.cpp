@@ -879,7 +879,7 @@ NFS4Inode::TestLock(OpenFileCookie* cookie, LockType* type, uint64* position,
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
-		req.LockT(*type, *position, *length, cookie);
+		req.LockT(*type, *position, *length, cookie->fOpenState);
 
 		status_t result = request.Send();
 		if (result != B_OK)
@@ -916,7 +916,7 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
-		req.Lock(cookie, lockInfo, sequence);
+		req.Lock(cookie->fOpenState, lockInfo, sequence);
 
 		status_t result = request.Send();
 		if (result != B_OK) {

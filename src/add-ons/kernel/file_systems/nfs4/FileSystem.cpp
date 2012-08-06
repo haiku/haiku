@@ -267,7 +267,7 @@ FileSystem::Migrate(const RPC::Server* serv)
 }
 
 
-OpenFileCookie*
+OpenState*
 FileSystem::OpenFilesLock()
 {
 	mutex_lock(&fOpenLock);
@@ -283,30 +283,30 @@ FileSystem::OpenFilesUnlock()
 
 
 void
-FileSystem::AddOpenFile(OpenFileCookie* cookie)
+FileSystem::AddOpenFile(OpenState* state)
 {
 	MutexLocker _(fOpenLock);
 
-	cookie->fPrev = NULL;
-	cookie->fNext = fOpenFiles;
+	state->fPrev = NULL;
+	state->fNext = fOpenFiles;
 	if (fOpenFiles != NULL)
-		fOpenFiles->fPrev = cookie;
-	fOpenFiles = cookie;
+		fOpenFiles->fPrev = state;
+	fOpenFiles = state;
 	NFSServer()->IncUsage();
 }
 
 
 void
-FileSystem::RemoveOpenFile(OpenFileCookie* cookie)
+FileSystem::RemoveOpenFile(OpenState* state)
 {
 	MutexLocker _(fOpenLock);
-	if (cookie == fOpenFiles)
-		fOpenFiles = cookie->fNext;
+	if (state == fOpenFiles)
+		fOpenFiles = state->fNext;
 
-	if (cookie->fNext)
-		cookie->fNext->fPrev = cookie->fPrev;
-	if (cookie->fPrev)
-		cookie->fPrev->fNext = cookie->fNext;
+	if (state->fNext)
+		state->fNext->fPrev = state->fPrev;
+	if (state->fPrev)
+		state->fPrev->fNext = state->fNext;
 	NFSServer()->DecUsage();
 }
 
@@ -315,8 +315,6 @@ void
 FileSystem::AddDelegation(Delegation* delegation)
 {
 	MutexLocker _(fDelegationLock);
-
-	fOpenDelegations.InsertBefore(fOpenDelegations.Head(), delegation);
 
 	fHandleToDelegation.Remove(delegation->fInfo.fHandle);
 	fHandleToDelegation.Insert(delegation->fInfo.fHandle, delegation);
@@ -330,7 +328,6 @@ FileSystem::RemoveDelegation(Delegation* delegation)
 {
 	MutexLocker _(fDelegationLock);
 
-	fOpenDelegations.Remove(delegation);
 	fHandleToDelegation.Remove(delegation->fInfo.fHandle);
 
 	NFSServer()->DecUsage();

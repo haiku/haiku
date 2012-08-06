@@ -12,8 +12,9 @@
 #include <SupportDefs.h>
 
 #include "FileSystem.h"
-#include "OpenState.h"
 
+
+struct OpenState;
 
 struct LockOwner {
 			uint64			fClientId;
@@ -43,11 +44,13 @@ struct LockInfo {
 			LockType		fType;
 
 			LockInfo*		fNext;
+			LockInfo*		fCookieNext;
 
 							LockInfo(LockOwner* owner);
 							~LockInfo();
 
 			bool			operator==(const struct flock& lock) const;
+			bool			operator==(const LockInfo& lock) const;
 };
 
 struct Cookie {
@@ -76,25 +79,11 @@ struct OpenFileCookie : public Cookie {
 			uint32			fMode;
 
 			LockInfo*		fLocks;
-			mutex			fLocksLock;
-
-			LockOwner*		fLockOwners;
-			mutex			fOwnerLock;
-
-			OpenFileCookie*	fNext;
-			OpenFileCookie*	fPrev;
-
-							OpenFileCookie();
-							~OpenFileCookie();
-
-			LockOwner*		GetLockOwner(uint32 owner);
 
 			void			AddLock(LockInfo* lock);
 			void			RemoveLock(LockInfo* lock, LockInfo* prev);
-			void			DeleteLock(LockInfo* lock);
 
-private:
-			status_t		_ReleaseLockOwner(LockOwner* owner);
+							OpenFileCookie();
 };
 
 struct OpenDirCookie : public Cookie {
