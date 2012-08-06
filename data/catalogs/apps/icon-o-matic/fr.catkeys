@@ -129,4 +129,4 @@ Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Enlever les formes
 Clean up	Icon-O-Matic-PathsList		Nettoyer
-Detect Orient.	Icon-O-Matic-PropertyNames		Détecter l'orientation
+Detect Orient.	Icon-O-Matic-PropertyNames		Détecter l'orientation.

@@ -27,7 +27,7 @@ TX	DataSource	Shorter version for Sending	Передача
 Quit	ActivityWindow		Выход
 Block cache memory	DataSource		Память блокового кэша
 Remove graph	ActivityView		Удалить график
-%.1f MB	DataSource		%.1f Мбайт
+%.1f MB	DataSource		%.1f МБ
 %lld sec.	SettingsWindow		%lld сек.
 %lld ms	SettingsWindow		%lld мс
 CPU usage	DataSource		Использование ЦПУ
@@ -43,6 +43,6 @@ File	ActivityWindow		Файл
 usage	DataSource		(загрузка)
 Additional items	ActivityView		Дополнительные графики
 Network receive	DataSource		Входящий трафик
-%.1f KB/s	DataSource		%.1f Кбайт/с
+%.1f KB/s	DataSource		%.1f КБ/с
 Memory	DataSource		Память
 RX	DataSource	Shorter version for Receiving.	Прием

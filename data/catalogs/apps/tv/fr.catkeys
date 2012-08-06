@@ -23,5 +23,5 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Télévision Numérique Terre
 force 544 x 576, display aspect 4:3	MainWin		forcer en 544x576, proportions 4:3
 pixel aspect ratio	MainWin		proportions de l'image
 No menu	MainWin		Pas de menu
-Error, connecting to interface failed:\n\n	MainWin		Erreur, impossible de se connecter à l'interface:\n\n
-force 720 x 576, display aspect 4:3	MainWin		Forcer en 720 x 576, proportions 4:3
+Error, connecting to interface failed:\n\n	MainWin		Erreur, impossible de se connecter à l'interface :\n\n
+force 720 x 576, display aspect 4:3	MainWin		forcer en 720 x 576, proportions 4:3

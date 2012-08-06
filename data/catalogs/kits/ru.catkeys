@@ -1,12 +1,12 @@
 1	russian	x-vnd.Haiku-libbe	180647795
 Close	AboutWindow		Закрыть
-%3.2f GiB	StringForSize		%3.2f Гбайт
+%3.2f GiB	StringForSize		%3.2f ГБ
 Written by:	AboutWindow		Разработан:
 About %app%	AboutMenuItem		О программе…
 Cut	TextView		Вырезать
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \"%description\".\n%error
 Copy	TextView		Копировать
-%3.2f KiB	StringForSize		%3.2f Кбайт
+%3.2f KiB	StringForSize		%3.2f КБ
 %d bytes	StringForSize		%d байт
 About…	AboutWindow		О программе…
 Error	PrintJob		Ошибка
@@ -19,7 +19,7 @@ OK	ZombieReplicantView		ОК
 Print Server is not responding.	PrintJob		Сервер печати не отвечает.
 Paste	TextView		Вставить
 Copyright © %years% Haiku, Inc.	AboutWindow		Все права защищены © %years% Haiku, Inc.
-%.2f TiB	StringForSize		%.2f Тбайт
+%.2f TiB	StringForSize		%.2f ТБ
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
 Redo	TextView		Повторить
 <empty>	Menu		<пусто>
@@ -27,7 +27,7 @@ Select All	TextView		Выделить все
 Warning	Dragger		Внимание
 Undo	TextView		Отменить
 Red:	ColorControl		Красный:
-%3.2f MiB	StringForSize		%3.2f Мбайт
+%3.2f MiB	StringForSize		%3.2f МБ
 About %app…	Dragger		О программе…
 Error	ZombieReplicantView		Ошибка
 Blue:	ColorControl		Синий:

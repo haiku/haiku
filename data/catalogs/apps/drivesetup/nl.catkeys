@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	1209826930
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	2908539543
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		Verwijderen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde partitie onherroepelijk kwijt zijn als u dit doet!
@@ -16,22 +16,18 @@ Partition name:	CreateParamsPanel		Partitienaam:
 Initialize	InitParamsPanel		Initialiseer
 Could not mount partition %s.	MainWindow		Kon partitie %s niet betrekken.
 The partition %s is already unmounted.	MainWindow		De partitie %s is al onttrokken.
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet initialiseren. Er werden geen veranderingen naar de schijf geschreven.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet verwijderen. Er werden geen veranderingen naar de schijf geschreven.
 Partition type:	CreateParamsPanel		Partitiesoort:
 Could not delete the selected partition.	MainWindow		Kon de geselecteerde partitie niet verwijderen.
 Initialize	MainWindow		Initialiseren
 Error: 	MainWindow	in any error alert	Fout:
 Partition %ld	DiskView		Partitie %ld
-The partition %s has been successfully initialized.\n	MainWindow		De partitie %s werd met succes geïnitialiseerd.\n
 <empty>	DiskView		<leeg>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisatie van de partitie %s is mislukt. (Er werd niets naar de schijf geschreven.)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
 Mounted at	PartitionList		Betrokken bij
-Failed to initialize the partition %s!\n	MainWindow		Initialisatie van partitie %s is mislukt!\n
 There was an error acquiring the partition row.	MainWindow		Er is een fout ontstaan bij het verkrijgen van de partitieregel.
 You need to select a partition entry from the list.	MainWindow		U dient een partitie uit de lijst te selecteren.
-Format (not implemented)	MainWindow		Formatteren (niet geïmplementeerd)
 The currently selected partition does not have a parent partition.	MainWindow		De nu geselecteerde partitie heeft geen bovenliggende partitie.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde schijf onherroepelijk kwijt zijn als u dit doet!
 Offset: %ld MB	Support		Offset: %ld MB
@@ -56,11 +52,9 @@ Mount all	MainWindow		Alles betrekken
 Cancel	MainWindow		Annuleren
 Delete partition	MainWindow		Partitie verwijderen
 End: %ld MB	Support		Einde: %ld MB
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie \"%s\" wilt initialiseren? Het zal nog een keer gevraagd worden voordat veranderingen naar de schijf worden geschreven.
 Eject	MainWindow		Uitwerpen
 Partition	MainWindow		Partitie
 File system	PartitionList		Bestandssysteem
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie wilt initialiseren? Het zal nog een keer gevraagd worden voordat veranderingen naar de schijf worden geschreven.
 Validation of the given creation parameters failed.	MainWindow		Natrekken van de gegeven creatieparameters is mislukt.
 Size	PartitionList		Grootte
 Validation of the given initialization parameters failed.	MainWindow		Natrekken van de opgegeven initialisatieparameters is mislukt.

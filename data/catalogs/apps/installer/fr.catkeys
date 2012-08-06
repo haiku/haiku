@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	2099988747
+1	french	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Ainsi, après les autres entrées du menu vers la fin du fichier, ajouter quelque chose semblable à ces lignes :\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l'installation et redémarrer le système ?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -12,6 +12,7 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		Avec GRUB c'est: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Arrêt
 Install progress:  	InstallerWindow		Avancement de l'installation :  
+2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Début de l'installation.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		C'est un logiciel en version alpha ! Ce qui signifie qu'il existe un gros risque de perdre des données importantes. Faites des sauvegardes fréquemment ! Vous aurez été prévenu.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l'installation ?
@@ -37,6 +38,7 @@ Boot sector successfully written.	InstallProgress		Écriture du secteur d'amorce
 Performing installation.	InstallProgress		Installation en cours.
 scanning…	InstallerWindow		recherche…
 Set up boot menu	InstallerWindow		Mettre en place le menu de démarrage
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (depuis os-prober v1.44)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		La première partition logique a toujours le numéro « 4 », quel que soit le nombre de partitions primaires.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		La convention de nommage de GRUB est toujours : (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <votre éditeur de texte favori> /boot/grub/menu.lst\n\n
@@ -48,6 +50,7 @@ README	InstallerApp		LISEZ-MOI
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Le disque de destination pourrait ne pas avoir assez de place. Sélectionnez un autre disque ou retirez certains objets optionnels.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Veuillez fermer les fenêtres du gestionnaire de démarrage et du gestionnaire de disques avant de quitter l'Installeur.
 Scanning for disks…	InstallerWindow		Recherche des disques…
+2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Impossible de monter ce disque. Veuillez en choisir un autre.
 ?? of ??	InstallerWindow	Unknown progress	?? sur ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -67,10 +70,11 @@ Installer	System name		Installeur
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Vous ne pouvez pas installer le contenu d'un disque sur lui-même. Sélectionnez un autre disque.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		« n » est le numéro de la partition, numérotée à partir de « 1 » avec GRUB 2\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		A partir de os-prober v1.44 (par exemple dans Ubuntu 11.04 ou ultérieure), Haiku doit être reconnu nativement. Pour ajouter Haiku au menu GRUB, ouvrez un Terminal et tapez :\n\n
 Quit DriveSetup	InstallerWindow		Quitter le Gestionnaire de Disques
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		« N » est le numéro du disque dur, numéroté à partir de « 0 ».\n
 Hide optional packages	InstallerWindow		Cacher les paquets optionnels
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l'Installeur
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l'Installeur.
 Restart system	InstallerWindow		Redémarrer le système
 OK	InstallerWindow		OK
 Set up partitions…	InstallerWindow		Ajuster les partitions…
@@ -85,8 +89,8 @@ Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerAp
 OK	InstallProgress		OK
 Please choose target	InstallerWindow		Veuillez sélectionner la destination
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Si vous installez Haiku sur du matériel réel (pas dans un émulateur) il vous est recommandé de préparer au préalable une partition sur votre disque dur. L'installeur et le gestionnaire de disques permettent d'initialiser des partitions existantes au système de fichier natif de Haiku, mais les options pour changer la disposition actuelle des partitions peuvent ne pas avoir été testées sur un assez grand nombre d'ordinateurs donc il n'est pas conseillé de les utiliser.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) L'installeur va rendre la partition Haiku amorçable, mais ne s'occupera pas d'intégrer Haiku à un menu de démarrage existant. Si vous avez déjà installé GRUB, vous pouvez ajouter Haiku à son menu de démarrage. Cela se fait différemment en fonction de la version de GRUB que vous utilisez.\n\n\n
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Si vous installez Haiku sur du matériel réel (pas dans un émulateur) il vous est recommandé de préparer au préalable une partition sur votre disque dur. L'installeur et le gestionnaire de disques permettent d'initialiser des partitions existantes au système de fichier natif de Haiku, mais les options pour changer la disposition actuelle des partitions peuvent ne pas avoir été testées sur un assez grand nombre d'ordinateurs donc il n'est pas conseillé de les utiliser.\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   L'installeur va rendre la partition Haiku amorçable, mais ne s'occupera pas d'intégrer Haiku à un menu de démarrage existant. Si vous avez déjà installé GRUB, vous pouvez ajouter Haiku à son menu de démarrage. Cela se fait différemment en fonction de la version de GRUB que vous utilisez.\n\n\n
 Begin	InstallerWindow		Commencer
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Finalement, vous devez mettre à jour le menu de démarrage en entrant :\n\n
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Si vous n'avez pas encore créé de partition, redémarrez et créez-la avec votre outil préféré, puis revenez dans Haiku pour continuer l'installation. Vous pouvez par exemple utiliser le Live-CD GParted, qui permet au besoin, de redimensionner les partitions pour faire de la place.\n\n\n
@@ -105,10 +109,11 @@ NOTE: While the naming strategy for hard disks is still as described under 2.1) 
 Cancel	InstallProgress		Annuler
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Lancement du gestionnaire de démarrage et de DriveSetup…\n\nFermez ces deux applications pour poursuivre l'installation.
 Try installing anyway	InstallProgress		Essayer d'installer quand même
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		En dessous de l'entête qui ne doit pas être modifiée, ajoutez quelque chose semblable à ces lignes:\n\n
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		En dessous de l'entête qui ne doit pas être modifiée, ajoutez quelque chose semblable à ces lignes :\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Êtes vous sur de vouloir arrêter l'installation ?
 Onto:	InstallerWindow		Vers :
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du gestionnaire de démarrage avant de fermer la fenêtre d'Installation.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Lorsque vous aurez démarré Haiku pour la première fois, prenez le temps de lire notre documentation de « Bienvenue » et le « Guide utilisateur ». Vous les trouverez en liens sur le bureau et en signet dans WebPositive.\n\n
 Tools	InstallerWindow		Outils
 The mount point could not be retrieved.	InstallProgress		Le point de montage n'a pu être récupéré.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Le volume de destination n'est pas vide. Souhaitez-vous tout de même effectuer l'installation ?\n\nNote : le dossier 'system' sera une copie fidèle de celui du volume source, le contenu des autres dossiers sera fusionné, tandis que les fichiers ou liens du volume source remplaceront les fichiers ou les liens existants sur le volume de destination.

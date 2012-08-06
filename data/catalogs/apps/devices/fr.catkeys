@@ -1,9 +1,10 @@
-1	french	x-vnd.Haiku-Devices	2109382396
+1	french	x-vnd.Haiku-Devices	2511616912
 Manufacturer	DeviceSCSI		Fabricant
 Order by:	DevicesView		Trier par :
 ACPI controller	Device		Contrôleur ACPI
 Memory controller	Device		Contrôleur mémoire
 Driver used	DevicePCI		Pilote utilisé
+CD-ROM	DeviceSCSI		CD-ROM
 ISA bus	Device		Bus ISA
 ACPI bus	Device		Bus ACPI
 ISA bus	DevicesView		Bus ISA
@@ -12,25 +13,31 @@ Computer	Device		Ordinateur
 Unknown device	Device		Périphérique inconnu
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Information de classe\t\t\t: %classInfo%
 Processor	DeviceSCSI		Microprocesseur
+RBC	DeviceSCSI		RBC
 Detailed	DevicesView		Détail
 Category	DevicesView		Catégorie
 Quit	DevicesView		Quitter
 Device paths	Device		Chemin des périphériques
+Printer	DeviceSCSI		Imprimante
 Processor	Device		Microprocesseur
+Optical Drive	DeviceSCSI		Lecteur optique
 ACPI Processor Namespace '%2'	DeviceACPI		Espace de nom ACPI du processeur « %2 »
 Bridge	DeviceSCSI		Pont
 unknown	Device		inconnu
 ACPI Information	DeviceACPI		Informations ACPI
 Generic system peripheral	Device		Périphérique système générique
 Not implemented	DevicePCI		Non implémenté
+Disk Drive	DeviceSCSI		Unité de disque
 Not implemented	DeviceACPI		Non implémenté
 Device name	DevicePCI		Nom du périphérique
 Display controller	Device		Contrôleur d'affichage
 Mass storage controller	Device		Contrôleur de mémoire de masse
 Input device controller	Device		Contrôleur de périphérique d'entrée
 Network controller	Device		Adaptateur réseau
+Device class	DeviceSCSI		Classe de périphérique
 Device name	DeviceACPI		Nom du périphérique
 Driver used	Device		Pilote utilisé
+Other	DeviceSCSI		Autre
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nom du périphérique\t\t\t\t\t: %Name%\nFabricant\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t: %Manufacturer%\nPilote utilisé\t\t\t\t\t\t\t\t\t\t: %DriverUsed%\nChemins du périphérique\t: %DevicePaths%
 ACPI Thermal Zone	DeviceACPI		Zone thermique ACPI
 Bus	DevicesView		Bus
@@ -68,12 +75,15 @@ SCSI Information	DeviceSCSI		Informations SCSI
 Bridge	Device		Pont
 Refresh devices	DevicesView		Rafraichir les périphériques
 Unknown device	DevicesView		Périphérique inconnu
+Graphics Peripheral	DeviceSCSI		Périphérique graphique
+Tape Drive	DeviceSCSI		Lecteur de bandes
 Bus Information	Device		Informations du bus
 Connection	DevicesView		Connexion
 Generate system information	DevicesView		Générer les informations systèmes
 Encryption controller	Device		Contrôleur de chiffrement
 Unclassified device	Device		Périphérique inclassable
 Device name	DeviceSCSI		Nom du périphérique
+Card Reader	DeviceSCSI		Lecteur de cartes
 Class info	DevicePCI		Information de classe
 Device paths	DevicePCI		Chemin des périphériques
 Devices	DevicesView		Périphériques

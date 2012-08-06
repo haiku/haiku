@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DriveSetup	1209826930
+1	english	x-vnd.Haiku-DriveSetup	2908539543
 DriveSetup	System name		磁盘管理器
 Delete	MainWindow		删除
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行此操作，选中分区上的所有数据将丢失，无法恢复！
@@ -16,22 +16,18 @@ Partition name:	CreateParamsPanel		分区名称：
 Initialize	InitParamsPanel		初始化
 Could not mount partition %s.	MainWindow		无法挂载分区 ％s。
 The partition %s is already unmounted.	MainWindow		分区 ％s 已经卸载。  
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		初始化分区失败。所作修改未写入磁盘。
 Failed to delete the partition. No changes have been written to disk.	MainWindow		删除分区失败。所作修改未写入磁盘。
 Partition type:	CreateParamsPanel		分区类型：
 Could not delete the selected partition.	MainWindow		无法删除所选分区。  
 Initialize	MainWindow		初始化
 Error: 	MainWindow	in any error alert	错误：
 Partition %ld	DiskView		分区 %ld
-The partition %s has been successfully initialized.\n	MainWindow		分区 %s 已被初始化。\n
 <empty>	DiskView		<空白>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		初始化分区 %s 失败。(修改未写入磁盘。)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，分区中的所有数据将丢失，无法恢复！
 Mounted at	PartitionList		挂载于
-Failed to initialize the partition %s!\n	MainWindow		无法初始化分区 %s！\n
 There was an error acquiring the partition row.	MainWindow		获取分区序列出错。
 You need to select a partition entry from the list.	MainWindow		您需要从列表中选择一个分区。
-Format (not implemented)	MainWindow		格式化（未执行）
 The currently selected partition does not have a parent partition.	MainWindow		当前选中分区无父分区。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，选中磁盘中的所有数据将丢失，无法恢复！
 Offset: %ld MB	Support		偏移量：％ld MB
@@ -56,11 +52,9 @@ Mount all	MainWindow		挂载所有磁盘
 Cancel	MainWindow		取消
 Delete partition	MainWindow		删除分区
 End: %ld MB	Support		结束：%ld MB
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		您确定初始化\"%s\"分区吗？在修改写入磁盘之前，您将会再次接受询问。
 Eject	MainWindow		弹出
 Partition	MainWindow		分区
 File system	PartitionList		文件系统
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		您确定初始化分区吗？在修改写入磁盘之前，您将会再次接受询问。
 Validation of the given creation parameters failed.	MainWindow		给定创建参数验证失败。
 Size	PartitionList		大小
 Validation of the given initialization parameters failed.	MainWindow		给定初始化参数验证失败。

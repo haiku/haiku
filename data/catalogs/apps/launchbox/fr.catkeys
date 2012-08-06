@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-LaunchBox	3587127275
+1	french	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Nouveau
 Set description…	LaunchBox		Ajouter une description…
 Vertical layout	LaunchBox		Disposition verticale
@@ -18,11 +18,13 @@ Bummer	LaunchBox		Zut
 Cancel	LaunchBox		Annuler
 Remove button	LaunchBox		Ôter le boutton
 Horizontal layout	LaunchBox		Disposition horizontale
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nÉchec au lancement de l'application à la signature '%2'.\n\nErreur :
 Failed to launch '%1'.\n\nError:	LaunchBox		Impossible de lancer « %1 ».\n\nErreur :
 Name Panel	LaunchBox		Nom du panneau
 Add button here	LaunchBox		Ajouter un bouton ici
 Description for '%3'	LaunchBox		Description for « %3 »
 Settings	LaunchBox		Réglages
+Failed to launch 'something', error in Pad data.	LaunchBox		Impossible de lancer «quelque chose» : erreur dans les données du Pad.
 Pad %1	LaunchBox		Pavé %1
 Close	LaunchBox		Fermer
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Impossible d'envoyer « ouvrir le dossier » au Tracker.\n\nErreur : 

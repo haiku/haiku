@@ -3,10 +3,10 @@ Edit	People		Éditer
 Error	People		Erreur
 City	People		Ville
 The file '%name%' could not be written.	People		Impossible d'écrire le fichier « %name% ».
-none	Groups list		Aucun
+none	Groups list		aucun
 Configure attributes	People		Configurer les attributs
 Company	People		Société
-%name% picture	People		Photo de 
+%name% picture	People		Photo de %name%
 Work phone	People		Téléphone professionnel
 People	System name		Personnes
 New person	People		Nouvelle personne

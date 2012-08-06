@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3119084633
+1	french	x-vnd.Haiku-libtracker	3743225404
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -15,7 +15,9 @@ Decrease size	ContainerWindow		Diminuer la taille
 Mini icon view	VolumeWindow		Vue en petites icônes
 You must have at least one attribute showing.	PoseView		Vous devez avoir au moins un attribut visible.
 Permissions	InfoWindow		Permissions
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Inverser la sélection
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Documents récents
 Modified	QueryPoseView		Modifié
 Created	ContainerWindow		Créé
@@ -47,6 +49,7 @@ Select all	ContainerWindow		Sélectionner tout
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Désolé, un attribut “Caractère” ne peut pas contenir un glyphe multi-octet.
 Clean up	DeskWindow		Nettoyer
 You cannot copy or move the root directory.	FSUtils		Vous ne pouvez ni copier, ni déplacer le répertoire racine.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed sur %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Inverser la sélection
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Renommer
 save text	FilePanelPriv		sauvegarder le texte
@@ -88,6 +91,7 @@ Replace	FilePanelPriv		Remplacer
 Select all	VolumeWindow		Sélectionner tout
 Opens with:	InfoWindow		Ouvrir avec :
 Open	ContainerWindow		Ouvrir
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Erreur de calcul de la taille du dossier.
 New folder	FilePanelPriv		Nouveau dossier
 %name info	InfoWindow	InfoWindow Title	Informations sur %name
@@ -248,6 +252,7 @@ Trash	TrackerSettingsWindow		Corbeille
 Unmount	ContainerWindow		Démonter
 Copy layout	ContainerWindow		Copier la disposition
 label too long	PoseView		label trop long
+Finish: %time	StatusWindow		Fin : %time
 Cancel	Tracker		Annuler
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Désolé, vous ne pouvez pas modifier cet attribut.
 Name	ContainerWindow		Nom
@@ -304,6 +309,7 @@ The Tracker must be running to see Info windows.	PoseView		Le Tracker doit être
 Other	FilePermissionsView		Autre
 Query name:	FindPanel		Nom de la requête :
 Permissions	ContainerWindow		Permissions
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		déplacement
 Identify	InfoWindow		Identifier
 Recent folders	ContainerWindow		Dossiers récents

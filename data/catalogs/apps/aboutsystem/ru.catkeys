@@ -4,11 +4,11 @@ Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (з�
 BSD (4-clause)	AboutView		4-пунктовая BSD
 %ld Processors:	AboutView		Процессоров: %ld
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Все права защищены © 1996-2005 Julian R Seward.
-%d MiB total	AboutView		Всего %d Мбайт
+%d MiB total	AboutView		Всего %d МБ
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
 The Haiku-Ports team\n	AboutView		Команде Haiku-Ports\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Все права защищены ©  1998-2003 Daniel Veillard.
-%d MiB used (%d%%)	AboutView		%d Мбайт использовано  (%d%%)
+%d MiB used (%d%%)	AboutView		%d МБ использовано (%d%%)
 Website, marketing & documentation:\n	AboutView		Веб-сайт, маркетинг и документация:\n
 AboutSystem	System name		О системе
 Copyright © 2003 Peter Hanappe and others.	AboutView		Все права защищены © 2003 Peter Hanappe и другие.
@@ -20,7 +20,7 @@ Source Code: 	AboutView		Исходный код:
 Processor:	AboutView		Процессор:
 Kernel:	AboutView		Ядро:
 BSD (3-clause)	AboutView		3-пунктовая BSD
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total Мбайт всего, %inaccessible Мбайт недоступно
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total МБ всего, %inaccessible МБ недоступно
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Все права защищены © 2000-2007 Fabrice Bellard и другие.
 Contributors:\n	AboutView		Внесли вклад в развитие:\n
 Unknown	AboutView		Неизвестен

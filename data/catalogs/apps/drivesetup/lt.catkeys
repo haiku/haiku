@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-DriveSetup	1209826930
+1	lithuanian	x-vnd.Haiku-DriveSetup	2908539543
 DriveSetup	System name		Diskų ženklintuvas
 Delete	MainWindow		Šalinti
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skaidinyje, bus negrįžtamai prarasti!
@@ -16,22 +16,18 @@ Partition name:	CreateParamsPanel		Skaidinio pavadinimas:
 Initialize	InitParamsPanel		Ženklinti
 Could not mount partition %s.	MainWindow		Skaidinio „%s“ prijungti nepavyko.
 The partition %s is already unmounted.	MainWindow		Skaidinys „%s“ jau atjungtas.
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Skaidinio suženklinti nepavyko. Pakeitimai į diską neįrašyti.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Skaidinio pašalinti nepavyko. Pakeitimai į diską neįrašyti.
 Partition type:	CreateParamsPanel		Skaidinio tipas:
 Could not delete the selected partition.	MainWindow		Pasirinkto skaidinio pašalinti nepavyko.
 Initialize	MainWindow		Ženklinti
 Error: 	MainWindow	in any error alert	Klaida: 
 Partition %ld	DiskView		Skaidinys %ld
-The partition %s has been successfully initialized.\n	MainWindow		Skaidinys „%s“ sėkmingai suženklintas.\n
 <empty>	DiskView		<tuščia>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Skaidinio „%s“ suženklinti nepavyko. Pakeitimai į diską neįrašyti.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys skaidinyje, bus negrįžtamai prarasti!
 Mounted at	PartitionList		Prijungtas kaip
-Failed to initialize the partition %s!\n	MainWindow		Nepavyko suženklinti skaidinio „%s“!\n
 There was an error acquiring the partition row.	MainWindow		Klaida gaunant skaidinių sąrašą.
 You need to select a partition entry from the list.	MainWindow		Būtina iš sąrašo pasirinkti skaidinį.
-Format (not implemented)	MainWindow		Ženklinti (dar nerealizuota)
 The currently selected partition does not have a parent partition.	MainWindow		Pasirinkas skaidinys nėra loginis diskas kitame skaidinyje.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame diske, bus negrįžtamai prarasti!
 Offset: %ld MB	Support		Poslinkis: %ld MB
@@ -56,11 +52,9 @@ Mount all	MainWindow		Prijungti visus
 Cancel	MainWindow		Atsisakyti
 Delete partition	MainWindow		Šalinti skaidinį
 End: %ld MB	Support		Pabaiga: %ld MiB
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ar tikrai norite suženklinti skaidinį „%s“? Prieš įrašant pakeitimus į diską, Jūsų bus paklausta dar kartą.
 Eject	MainWindow		Išimti
 Partition	MainWindow		Skaidinys
 File system	PartitionList		Failų sistema
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Ar tikrai norite suženklinti skaidinį? Prieš įrašant pakeitimus į diską, Jūsų bus paklausta dar kartą.
 Validation of the given creation parameters failed.	MainWindow		Nurodyti netinkami kūrimo parametrai.
 Size	PartitionList		Dydis
 Validation of the given initialization parameters failed.	MainWindow		Nurodyti netinkami ženklinimo parametrai.

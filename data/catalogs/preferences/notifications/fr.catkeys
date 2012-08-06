@@ -27,7 +27,7 @@ Can't save preferenes, you probably don't have write access to the settings dire
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 Yes	NotificationView		Oui
 Large icon	DisplayView		Grande icône
-Icon size:	DisplayView		Taille de l'icône
+Icon size:	DisplayView		Taille de l'icône :
 Hide notifications from screen after	GeneralView		Faire disparaître les notifications de l'écran après
 Disable notifications	GeneralView		Désactiver les notifications
 Notifications	System name		Notifications
@@ -35,12 +35,12 @@ Notifications	NotificationView		Notifications
 No	NotificationView		Non
 Title	NotificationView		Titre
 Information	NotificationView		Information
-Window width:	DisplayView		Largeur de la fenêtre
+Window width:	DisplayView		Largeur de la fenêtre :
 Application	NotificationView		Application
 Enabled	NotificationView		Activer
 OK	DisplayView		OK
 Unknown	NotificationView		Inconnu
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Impossible d'enregistrer les préférences, vous n'avez probablement pas le droit d'écrire dans le répertoire des  réglages du démarrage.
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Impossible d'enregistrer les préférences, vous n'avez probablement pas le droit d'écrire dans le répertoire des réglages du démarrage.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 Enable notifications at startup	GeneralView		Activer les notifications au démarrage

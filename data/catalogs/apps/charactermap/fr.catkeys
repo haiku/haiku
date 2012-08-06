@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CharacterMap	1545664922
+1	french	x-vnd.Haiku-CharacterMap	2745781253
 Enclosed alphanumerics	UnicodeBlocks		Alphanumériques cerclés
 Basic Latin	UnicodeBlocks		Latin basic
 View	CharacterWindow		Vue
@@ -40,6 +40,7 @@ Tagbanwa	UnicodeBlocks		Tagbanoua
 Kanbun	UnicodeBlocks		Kanboun
 Syriac	UnicodeBlocks		Syriaque
 CJK compatibility ideographs Supplement	UnicodeBlocks		Supplément d'idéogrammes de compatibilité CJC
+Musical symbols	UnicodeBlocks		Symboles musicaux
 Hangul syllables	UnicodeBlocks		Syllabes hangûl
 Coptic	UnicodeBlocks		Copte
 Tai Le	UnicodeBlocks		Taï-le
