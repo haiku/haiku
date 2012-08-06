@@ -388,8 +388,11 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		return;
 	}
 
-	if ((physicalAddress & 0xfff) != 0)
-		panic("EHCI_PERIODICLISTBASE not aligned on 4k: 0x%lx\n", physicalAddress);
+	if ((physicalAddress & 0xfff) != 0) {
+		panic("EHCI_PERIODICLISTBASE not aligned on 4k: 0x%" B_PRIxPHYSADDR
+			"\n", physicalAddress);
+	}
+
 	// set the periodic frame list base on the controller
 	WriteOpReg(EHCI_PERIODICLISTBASE, (uint32)physicalAddress);
 

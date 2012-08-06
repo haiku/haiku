@@ -99,7 +99,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	uint32 offset = sPCIModule->read_pci_config(fPCIInfo->bus,
 		fPCIInfo->device, fPCIInfo->function, PCI_base_registers, 4);
 	offset &= PCI_address_memory_32_mask;
-	TRACE_ALWAYS("iospace offset: 0x%lx\n", offset);
+	TRACE_ALWAYS("iospace offset: 0x%" B_PRIx32 "\n", offset);
 	fRegisterArea = map_physical_memory("OHCI memory mapped registers",
 		offset,	B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
@@ -121,7 +121,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		return;
 	}
 
-	void *hccaPhysicalAddress;
+	phys_addr_t hccaPhysicalAddress;
 	fHccaArea = fStack->AllocateArea((void **)&fHcca, &hccaPhysicalAddress,
 		sizeof(ohci_hcca), "USB OHCI Host Controller Communication Area");
 
@@ -165,7 +165,8 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	for (int32 i = 0; i < OHCI_STATIC_ENDPOINT_COUNT; i++) {
 		fInterruptEndpoints[i] = _AllocateEndpoint();
 		if (!fInterruptEndpoints[i]) {
-			TRACE_ERROR("failed to allocate interrupt endpoint %ld", i);
+			TRACE_ERROR("failed to allocate interrupt endpoint %" B_PRId32 "\n",
+				i);
 			while (--i >= 0)
 				_FreeEndpoint(fInterruptEndpoints[i]);
 			_FreeEndpoint(fDummyBulk);
@@ -362,7 +363,7 @@ OHCI::Start()
 	uint32 control = _ReadReg(OHCI_CONTROL);
 	if ((control & OHCI_HC_FUNCTIONAL_STATE_MASK)
 		!= OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL) {
-		TRACE_ERROR("controller not started (0x%08lx)!\n", control);
+		TRACE_ERROR("controller not started (0x%08" B_PRIx32 ")!\n", control);
 		return B_ERROR;
 	} else
 		TRACE("controller is operational!\n");
@@ -409,7 +410,8 @@ OHCI::SubmitTransfer(Transfer *transfer)
 		return _SubmitIsochronousTransfer(transfer);
 	}
 
-	TRACE_ERROR("tried to submit transfer for unknown pipe type %lu\n", type);
+	TRACE_ERROR("tried to submit transfer for unknown pipe type %" B_PRIu32 "\n",
+		type);
 	return B_ERROR;
 }
 
@@ -485,7 +487,7 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 status_t
 OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 {
-	TRACE("pipe change %d for pipe 0x%08lx\n", change, (uint32)pipe);
+	TRACE("pipe change %d for pipe %p\n", change, pipe);
 	if (pipe->DeviceAddress() == fRootHubAddress) {
 		// no need to insert/remove endpoint descriptors for the root hub
 		return B_OK;
@@ -524,7 +526,8 @@ OHCI::AddTo(Stack *stack)
 	if (!sPCIModule) {
 		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
 		if (status < B_OK) {
-			TRACE_MODULE_ERROR("getting pci module failed! 0x%08lx\n", status);
+			TRACE_MODULE_ERROR("getting pci module failed! 0x%08" B_PRIx32 "\n",
+				status);
 			return status;
 		}
 	}
@@ -926,7 +929,7 @@ OHCI::_FinishTransfers()
 						// was halted because of this td, but we do not need
 						// to know, as when it was halted by another td this
 						// still ensures that this td was handled before).
-						TRACE_ERROR("td error: 0x%08lx\n", status);
+						TRACE_ERROR("td error: 0x%08" B_PRIx32 "\n", status);
 
 						switch (status) {
 							case OHCI_TD_CONDITION_CRC_ERROR:
@@ -1036,7 +1039,7 @@ OHCI::_FinishTransfers()
 
 			// break the descriptor chain on the last descriptor
 			transfer->last_descriptor->next_logical_descriptor = NULL;
-			TRACE("transfer %p done with status 0x%08lx\n",
+			TRACE("transfer %p done with status 0x%08" B_PRIx32 "\n",
 				transfer, callbackStatus);
 
 			// if canceled the callback has already been called
@@ -1326,7 +1329,7 @@ ohci_endpoint_descriptor *
 OHCI::_AllocateEndpoint()
 {
 	ohci_endpoint_descriptor *endpoint;
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 
 	mutex *lock = (mutex *)malloc(sizeof(mutex));
 	if (lock == NULL) {
@@ -1345,7 +1348,7 @@ OHCI::_AllocateEndpoint()
 	mutex_init(lock, "ohci endpoint lock");
 
 	endpoint->flags = OHCI_ENDPOINT_SKIP;
-	endpoint->physical_address = (addr_t)physicalAddress;
+	endpoint->physical_address = (uint32)physicalAddress;
 	endpoint->head_physical_descriptor = 0;
 	endpoint->tail_logical_descriptor = NULL;
 	endpoint->tail_physical_descriptor = 0;
@@ -1365,7 +1368,7 @@ OHCI::_FreeEndpoint(ohci_endpoint_descriptor *endpoint)
 	mutex_destroy(endpoint->lock);
 	free(endpoint->lock);
 
-	fStack->FreeChunk((void *)endpoint, (void *)endpoint->physical_address,
+	fStack->FreeChunk((void *)endpoint, endpoint->physical_address,
 		sizeof(ohci_endpoint_descriptor));
 }
 
@@ -1522,7 +1525,7 @@ ohci_general_td *
 OHCI::_CreateGeneralDescriptor(size_t bufferSize)
 {
 	ohci_general_td *descriptor;
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 
 	if (fStack->AllocateChunk((void **)&descriptor, &physicalAddress,
 		sizeof(ohci_general_td)) != B_OK) {
@@ -1530,7 +1533,7 @@ OHCI::_CreateGeneralDescriptor(size_t bufferSize)
 		return NULL;
 	}
 
-	descriptor->physical_address = (addr_t)physicalAddress;
+	descriptor->physical_address = (uint32)physicalAddress;
 	descriptor->next_physical_descriptor = 0;
 	descriptor->next_logical_descriptor = NULL;
 	descriptor->buffer_size = bufferSize;
@@ -1542,12 +1545,13 @@ OHCI::_CreateGeneralDescriptor(size_t bufferSize)
 	}
 
 	if (fStack->AllocateChunk(&descriptor->buffer_logical,
-		(void **)&descriptor->buffer_physical, bufferSize) != B_OK) {
+		&physicalAddress, bufferSize) != B_OK) {
 		TRACE_ERROR("failed to allocate space for buffer\n");
-		fStack->FreeChunk(descriptor, (void *)descriptor->physical_address,
+		fStack->FreeChunk(descriptor, descriptor->physical_address,
 			sizeof(ohci_general_td));
 		return NULL;
 	}
+	descriptor->buffer_physical = physicalAddress;
 
 	descriptor->last_physical_byte_address
 		= descriptor->buffer_physical + bufferSize - 1;
@@ -1563,10 +1567,10 @@ OHCI::_FreeGeneralDescriptor(ohci_general_td *descriptor)
 
 	if (descriptor->buffer_logical) {
 		fStack->FreeChunk(descriptor->buffer_logical,
-			(void *)descriptor->buffer_physical, descriptor->buffer_size);
+			descriptor->buffer_physical, descriptor->buffer_size);
 	}
 
-	fStack->FreeChunk((void *)descriptor, (void *)descriptor->physical_address,
+	fStack->FreeChunk((void *)descriptor, descriptor->physical_address,
 		sizeof(ohci_general_td));
 }
 
@@ -1819,11 +1823,11 @@ void
 OHCI::_PrintEndpoint(ohci_endpoint_descriptor *endpoint)
 {
 	TRACE_ALWAYS("endpoint %p\n", endpoint);
-	dprintf("\tflags........... 0x%08lx\n", endpoint->flags);
-	dprintf("\ttail_physical... 0x%08lx\n", endpoint->tail_physical_descriptor);
-	dprintf("\thead_physical... 0x%08lx\n", endpoint->head_physical_descriptor);
-	dprintf("\tnext_physical... 0x%08lx\n", endpoint->next_physical_endpoint);
-	dprintf("\tphysical........ 0x%08lx\n", endpoint->physical_address);
+	dprintf("\tflags........... 0x%08" B_PRIx32 "\n", endpoint->flags);
+	dprintf("\ttail_physical... 0x%08" B_PRIx32 "\n", endpoint->tail_physical_descriptor);
+	dprintf("\thead_physical... 0x%08" B_PRIx32 "\n", endpoint->head_physical_descriptor);
+	dprintf("\tnext_physical... 0x%08" B_PRIx32 "\n", endpoint->next_physical_endpoint);
+	dprintf("\tphysical........ 0x%08" B_PRIx32 "\n", endpoint->physical_address);
 	dprintf("\ttail_logical.... %p\n", endpoint->tail_logical_descriptor);
 	dprintf("\tnext_logical.... %p\n", endpoint->next_logical_endpoint);
 }
@@ -1834,11 +1838,11 @@ OHCI::_PrintDescriptorChain(ohci_general_td *topDescriptor)
 {
 	while (topDescriptor) {
 		TRACE_ALWAYS("descriptor %p\n", topDescriptor);
-		dprintf("\tflags........... 0x%08lx\n", topDescriptor->flags);
-		dprintf("\tbuffer_physical. 0x%08lx\n", topDescriptor->buffer_physical);
-		dprintf("\tnext_physical... 0x%08lx\n", topDescriptor->next_physical_descriptor);
-		dprintf("\tlast_byte....... 0x%08lx\n", topDescriptor->last_physical_byte_address);
-		dprintf("\tphysical........ 0x%08lx\n", topDescriptor->physical_address);
+		dprintf("\tflags........... 0x%08" B_PRIx32 "\n", topDescriptor->flags);
+		dprintf("\tbuffer_physical. 0x%08" B_PRIx32 "\n", topDescriptor->buffer_physical);
+		dprintf("\tnext_physical... 0x%08" B_PRIx32 "\n", topDescriptor->next_physical_descriptor);
+		dprintf("\tlast_byte....... 0x%08" B_PRIx32 "\n", topDescriptor->last_physical_byte_address);
+		dprintf("\tphysical........ 0x%08" B_PRIx32 "\n", topDescriptor->physical_address);
 		dprintf("\tbuffer_size..... %lu\n", topDescriptor->buffer_size);
 		dprintf("\tbuffer_logical.. %p\n", topDescriptor->buffer_logical);
 		dprintf("\tnext_logical.... %p\n", topDescriptor->next_logical_descriptor);
