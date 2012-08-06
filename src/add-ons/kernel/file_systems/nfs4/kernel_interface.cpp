@@ -392,7 +392,10 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	*_cookie = cookie;
 
 	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
-	status_t result = inode->Create(name, openMode, perms, cookie, _newVnodeID);
+
+	OpenDelegationData data;
+	status_t result = inode->Create(name, openMode, perms, cookie, &data,
+		_newVnodeID);
 	if (result != B_OK) {
 		delete cookie;
 		return result;
@@ -416,6 +419,17 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	}
 
 	child->SetOpenState(cookie->fOpenState);
+
+	if (data.fType != OPEN_DELEGATE_NONE) {
+		Delegation* delegation
+			= new(std::nothrow) Delegation(data, child,
+				cookie->fOpenState->fClientID);
+		if (delegation != NULL) {
+			delegation->fInfo = cookie->fOpenState->fInfo;
+			delegation->fFileSystem = child->GetFileSystem();
+			child->SetDelegation(delegation);
+		}
+	}
 
 	return result;
 }

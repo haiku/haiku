@@ -20,13 +20,14 @@
 
 
 status_t
-Inode::CreateState(const char* name, int mode, int perms, OpenState* state) {
+Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
+	OpenDelegationData* delegationData) {
 	uint64 fileID;
 	FileHandle handle;
 	ChangeInfo changeInfo;
 
 	status_t result = CreateFile(name, mode, perms, state, &changeInfo,
-		&fileID, &handle);
+		&fileID, &handle, delegationData);
 	if (result != B_OK)
 		return result;
 
@@ -64,7 +65,7 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state) {
 
 status_t
 Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
-	ino_t* id)
+	OpenDelegationData* data, ino_t* id)
 {
 	cookie->fMode = mode;
 	cookie->fLocks = NULL;
@@ -72,7 +73,7 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	MutexLocker _(fStateLock);
 
 	OpenState* state = new OpenState;
-	status_t result = CreateState(name, mode, perms, state);
+	status_t result = CreateState(name, mode, perms, state, data);
 	if (result != B_OK)
 		return result;
 
@@ -99,6 +100,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	OpenDelegationData data;
 	data.fType = OPEN_DELEGATE_NONE;
 	if (fOpenState == NULL) {
+		// TODO: revalidate cache
+
 		OpenState* state = new OpenState;
 		if (state == NULL)
 			return B_NO_MEMORY;

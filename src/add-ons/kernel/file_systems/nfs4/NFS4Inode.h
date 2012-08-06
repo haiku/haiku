@@ -46,7 +46,8 @@ protected:
 
 			status_t	CreateFile(const char* name, int mode, int perms,
 							OpenState* state, ChangeInfo* changeInfo,
-							uint64* fileID, FileHandle* handle);
+							uint64* fileID, FileHandle* handle,
+							OpenDelegationData* delegation);
 			status_t	OpenFile(OpenState* state, int mode,
 							OpenDelegationData* delegation);
 

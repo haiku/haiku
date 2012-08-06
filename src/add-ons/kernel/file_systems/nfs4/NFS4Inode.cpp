@@ -381,15 +381,14 @@ NFS4Inode::Rename(Inode* from, Inode* to, const char* fromName,
 
 
 status_t
-NFS4Inode::CreateFile(const char* name, int mode, int perms,
-	OpenState* state, ChangeInfo* changeInfo, uint64* fileID,
-	FileHandle* handle)
+NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
+	ChangeInfo* changeInfo, uint64* fileID, FileHandle* handle,
+	OpenDelegationData* delegation)
 {
 	bool confirm;
 	status_t result;
 
 	bool badOwner = false;
-	OpenDelegationData delegation;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
@@ -461,7 +460,7 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms,
 		reply.PutFH();
 
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
-			&delegation, changeInfo);
+			delegation, changeInfo);
 		if (result != B_OK)
 			return result;
 

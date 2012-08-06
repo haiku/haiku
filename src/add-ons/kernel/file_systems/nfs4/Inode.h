@@ -59,7 +59,8 @@ public:
 					status_t	WriteStat(const struct stat* st, uint32 mask);
 
 					status_t	Create(const char* name, int mode, int perms,
-									OpenFileCookie* cookie, ino_t* id);
+									OpenFileCookie* cookie,
+									OpenDelegationData* data, ino_t* id);
 					status_t	Open(int mode, OpenFileCookie* cookie);
 					status_t	Close(OpenFileCookie* cookie);
 					status_t	Read(OpenFileCookie* cookie, off_t pos,
@@ -89,7 +90,8 @@ protected:
 								Inode();
 
 					status_t	CreateState(const char* name, int mode,
-									int perms, OpenState* state);
+									int perms, OpenState* state,
+									OpenDelegationData* data);
 
 					status_t	ReadDirUp(struct dirent* de, uint32 pos,
 									uint32 size);
