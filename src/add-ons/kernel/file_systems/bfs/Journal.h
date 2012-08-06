@@ -41,6 +41,8 @@ public:
 
 	inline	uint32			FreeLogBlocks() const;
 
+			status_t		MoveLog(block_run newLog);
+
 #ifdef BFS_DEBUGGER_COMMANDS
 			void			Dump();
 #endif
@@ -49,7 +51,8 @@ private:
 			bool			_HasSubTransaction() const
 								{ return fHasSubtransaction; }
 
-			status_t		_FlushLog(bool canWait, bool flushBlocks);
+			status_t		_FlushLog(bool canWait, bool flushBlocks,
+								bool movingLog = false);
 			uint32			_TransactionSize() const;
 			status_t		_WriteTransactionToLog();
 			status_t		_CheckRunArray(const run_array* array);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2020, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2025, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1109,6 +1109,46 @@ BlockAllocator::Allocate(Transaction& transaction, Inode* inode,
 	}
 
 	return AllocateBlocks(transaction, group, start, numBlocks, minimum, run);
+}
+
+
+/*!	Attempts to allocate a specific block run.
+*/
+status_t
+BlockAllocator::AllocateBlockRun(Transaction& transaction, block_run run)
+{
+	RecursiveLocker lock(fLock);
+
+	if (run.AllocationGroup() >= fNumGroups)
+		return B_BAD_VALUE;
+
+	if (!IsCompletelyInsideAllowedRange(run))
+		return B_DEVICE_FULL;
+
+	uint32 bitsPerBlock = fVolume->BlockSize() << 3;
+
+	AllocationGroup& group = fGroups[run.AllocationGroup()];
+	AllocationBlock cached(fVolume);
+
+	int32 end = run.Start() + run.Length();
+
+	// check that the requested blocks are free
+	for (int32 block = run.Start(); block < end; block++) {
+		if (cached.SetTo(group, block / bitsPerBlock) < B_OK)
+			RETURN_ERROR(B_ERROR);
+
+		if (cached.IsUsed(block % bitsPerBlock))
+			return B_DEVICE_FULL;
+	}
+
+	status_t status = group.Allocate(transaction, run.Start(), run.Length());
+	if (status != B_OK)
+		return status;
+
+	fVolume->SuperBlock().used_blocks
+		= HOST_ENDIAN_TO_BFS_INT64(fVolume->UsedBlocks() + run.Length());
+
+	return B_OK;
 }
 
 

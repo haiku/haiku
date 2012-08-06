@@ -41,11 +41,14 @@ public:
 			status_t		Allocate(Transaction& transaction, Inode* inode,
 								off_t numBlocks, block_run& run,
 								uint16 minimum = 1);
-			status_t		Free(Transaction& transaction, block_run run);
 
 			status_t		AllocateBlocks(Transaction& transaction,
 								int32 group, uint16 start, uint16 numBlocks,
 								uint16 minimum, block_run& run);
+			status_t		AllocateBlockRun(Transaction& transaction,
+									  block_run run);
+
+			status_t		Free(Transaction& transaction, block_run run);
 
 			status_t		Trim(uint64 offset, uint64 size,
 								uint64& trimmedSize);
