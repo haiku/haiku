@@ -45,7 +45,10 @@ CallbackRequest::CallbackRequest(void *buffer, int size)
 
 	fProcedure = fStream.GetUInt();
 
+	fStream.GetUInt();
 	fStream.GetOpaque(NULL);
+
+	fStream.GetUInt();
 	fStream.GetOpaque(NULL);
 
 	if (fProcedure == CallbackProcCompound) {
@@ -54,6 +57,9 @@ CallbackRequest::CallbackRequest(void *buffer, int size)
 			return;
 
 		fID = fStream.GetUInt();
+
+		fRPCError = SUCCESS;
+		fError = B_OK;
 	} else if (fProcedure == CallbackProcNull) {
 		fRPCError = SUCCESS;
 		fError = B_OK;

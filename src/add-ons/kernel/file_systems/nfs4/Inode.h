@@ -34,6 +34,9 @@ public:
 
 	inline			uint64		MaxFileSize();
 
+					void		SetDelegation(Delegation* delegation);
+					void		RecallDelegation(bool truncate = false);
+
 					status_t	LookUp(const char* name, ino_t* id);
 
 					status_t	Access(int mode);

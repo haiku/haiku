@@ -71,6 +71,7 @@ public:
 			status_t	Close();
 			status_t	Commit();
 			status_t	Create(uint64* before, uint64* after, bool& atomic);
+	inline	status_t	DelegReturn();
 			status_t	GetAttr(AttrValue** attrs, uint32* count);
 			status_t	GetFH(FileHandle* fh);
 			status_t	Link(uint64* before, uint64* after, bool& atomic);
@@ -147,6 +148,13 @@ inline uint32
 ReplyInterpreter::NFS4Error()
 {
 	return fNFS4Error;
+}
+
+
+inline status_t
+ReplyInterpreter::DelegReturn()
+{
+	return _OperationError(OpDelegReturn);
 }
 
 

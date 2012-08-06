@@ -26,7 +26,7 @@ CallbackServer::CallbackServer()
 	fConnectionList(NULL),
 	fListener(NULL),
 	fThreadRunning(false),
-	fCallbackArray(NULL),
+	//fCallbackArray(NULL),
 	fArraySize(0),
 	fFreeSlot(-1)
 {
@@ -40,7 +40,7 @@ CallbackServer::~CallbackServer()
 {
 	StopServer();
 
-	free(fCallbackArray);
+	//free(fCallbackArray);
 	rw_lock_destroy(&fArrayLock);
 	mutex_destroy(&fThreadLock);
 	mutex_destroy(&fConnectionLock);
@@ -68,7 +68,7 @@ CallbackServer::RegisterCallback(Callback* callback)
 		for (uint32 i = fArraySize; i < newSize; i++)
 			array[i].fNext = i + 1;
 
-		array[fArraySize * 2 - 1].fNext = -1;
+		array[newSize - 1].fNext = -1;
 
 		fCallbackArray = array;
 		fFreeSlot = fArraySize;
@@ -240,7 +240,7 @@ CallbackServer::ConnectionThread(ConnectionEntry* entry)
 		if (request == NULL || request->Error() != B_OK) {
 			free(buffer);
 			continue;
-		} else if (request != NULL) {
+		} else if (request != NULL && request->Error() != B_OK) {
 			reply = CallbackReply::Create(request->XID(), request->RPCError());
 			if (reply != NULL) {
 				connection->Send(reply->Stream().Buffer(),
@@ -250,7 +250,6 @@ CallbackServer::ConnectionThread(ConnectionEntry* entry)
 			free(buffer);
 			continue;
 		}
-
 
 		switch (request->Procedure()) {
 			case CallbackProcCompound:

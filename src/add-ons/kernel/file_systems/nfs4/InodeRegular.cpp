@@ -96,6 +96,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 {
 	MutexLocker _(fStateLock);
 
+	OpenDelegationData data;
+	data.fType = OPEN_DELEGATE_NONE;
 	if (fOpenState == NULL) {
 		OpenState* state = new OpenState;
 		if (state == NULL)
@@ -103,7 +105,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 		state->fInfo = fInfo;
 		state->fFileSystem = fFileSystem;
-		status_t result = OpenFile(state, mode, NULL);
+		status_t result = OpenFile(state, mode, &data);
 		if (result != B_OK)
 			return result;
 
@@ -112,7 +114,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		int newMode = mode & O_RWMASK;
 		int oldMode = fOpenState->fMode & O_RWMASK;
 		if (oldMode != newMode && oldMode != O_RDWR) {
-			status_t result = OpenFile(fOpenState, O_RDWR, NULL);
+			status_t result = OpenFile(fOpenState, O_RDWR, &data);
 			if (result != B_OK)
 				return result;
 			fOpenState->fMode = O_RDWR;
@@ -127,6 +129,16 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	cookie->fLocks = NULL;
 
 	fFileSystem->AddOpenFile(cookie);
+
+	if (data.fType != OPEN_DELEGATE_NONE) {
+		Delegation* delegation
+			= new(std::nothrow) Delegation(data, this, fOpenState->fClientID);
+		if (delegation != NULL) {
+			delegation->fInfo = fOpenState->fInfo;
+			delegation->fFileSystem = fFileSystem;
+			SetDelegation(delegation);
+		}
+	}
 
 	return B_OK;
 }

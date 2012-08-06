@@ -24,6 +24,9 @@ struct FileHandle {
 	inline				FileHandle();
 	inline				FileHandle(const FileHandle& fh);
 	inline	FileHandle&	operator=(const FileHandle& fh);
+
+	inline	bool		operator>(const FileHandle& handle) const;
+	inline	bool		operator<(const FileHandle& handle) const;
 };
 
 
@@ -84,6 +87,24 @@ FileHandle::operator=(const FileHandle& fh)
 	fSize = fh.fSize;
 	memcpy(fData, fh.fData, fSize);
 	return *this;
+}
+
+
+inline bool
+FileHandle::operator>(const FileHandle& handle) const
+{
+	if (fSize > handle.fSize)
+		return true;
+	return memcmp(fData, handle.fData, fSize) > 0;
+}
+
+
+inline bool
+FileHandle::operator<(const FileHandle& handle) const
+{
+	if (fSize < handle.fSize)
+		return true;
+	return memcmp(fData, handle.fData, fSize) < 0;
 }
 
 

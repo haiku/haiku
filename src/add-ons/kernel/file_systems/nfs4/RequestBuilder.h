@@ -37,6 +37,7 @@ public:
 			status_t				Create(FileType type, const char* name,
 										AttrValue* attr, uint32 count,
 										const char* path = NULL);
+			status_t				DelegReturn(const uint32* id, uint32 seq);
 			status_t				GetAttr(Attribute* attrs, uint32 count);
 			status_t				GetFH();
 			status_t				Link(const char* name);

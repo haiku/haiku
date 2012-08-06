@@ -48,6 +48,9 @@ private:
 
 class ProgramData {
 public:
+	virtual	status_t	ProcessCallback(CallbackRequest* request,
+							Connection* connection) = 0;
+
 	virtual				~ProgramData() { }
 };
 

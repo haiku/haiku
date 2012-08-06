@@ -25,11 +25,16 @@ enum CallbackProcedure {
 	CallbackProcCompound	= 1
 };
 
+enum CallbackOpcode {
+	OpCallbackRecall		= 4
+};
+
 enum Opcode {
 	OpAccess				= 3,
 	OpClose					= 4,
 	OpCommit				= 5,
 	OpCreate				= 6,
+	OpDelegReturn			= 8,
 	OpGetAttr				= 9,
 	OpGetFH					= 10,
 	OpLink					= 11,

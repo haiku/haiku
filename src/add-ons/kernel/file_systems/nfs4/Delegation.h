@@ -15,9 +15,12 @@
 #include "NFS4Object.h"
 
 
-class Delegation : public NFS4Object {
+class Inode;
+
+class Delegation : public NFS4Object,
+	public DoublyLinkedListLinkImpl<Delegation> {
 public:
-						Delegation(OpenDelegationData data, Inode* inode,
+						Delegation(const OpenDelegationData& data, Inode* inode,
 							uint64 clientID);
 						~Delegation();
 
@@ -28,7 +31,12 @@ public:
 
 	status_t			Reclaim(uint64 newClientID);
 
-	status_t			GiveUp(bool flush);
+	status_t			GiveUp(bool truncate);
+
+	inline	Inode*		GetInode();
+
+protected:
+	status_t			ReturnDelegation();
 
 private:
 	uint64				fClientID;
@@ -37,6 +45,13 @@ private:
 
 	rw_lock				fLock;
 };
+
+
+inline Inode*
+Delegation::GetInode()
+{
+	return fInode;
+}
 
 
 #endif	// DELEGATION_H

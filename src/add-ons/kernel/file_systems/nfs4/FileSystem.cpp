@@ -38,6 +38,7 @@ FileSystem::FileSystem()
 
 	mutex_init(&fOpenOwnerLock, NULL);
 	mutex_init(&fOpenLock, NULL);
+	mutex_init(&fDelegationLock, NULL);
 }
 
 
@@ -45,6 +46,7 @@ FileSystem::~FileSystem()
 {
 	NFSServer()->RemoveFileSystem(this);
 
+	mutex_destroy(&fDelegationLock);
 	mutex_destroy(&fOpenLock);
 	mutex_destroy(&fOpenOwnerLock);
 
@@ -306,5 +308,45 @@ FileSystem::RemoveOpenFile(OpenFileCookie* cookie)
 	if (cookie->fPrev)
 		cookie->fPrev->fNext = cookie->fNext;
 	NFSServer()->DecUsage();
+}
+
+
+void
+FileSystem::AddDelegation(Delegation* delegation)
+{
+	MutexLocker _(fDelegationLock);
+
+	fOpenDelegations.InsertBefore(fOpenDelegations.Head(), delegation);
+
+	fHandleToDelegation.Remove(delegation->fInfo.fHandle);
+	fHandleToDelegation.Insert(delegation->fInfo.fHandle, delegation);
+
+	NFSServer()->IncUsage();
+}
+
+
+void
+FileSystem::RemoveDelegation(Delegation* delegation)
+{
+	MutexLocker _(fDelegationLock);
+
+	fOpenDelegations.Remove(delegation);
+	fHandleToDelegation.Remove(delegation->fInfo.fHandle);
+
+	NFSServer()->DecUsage();
+}
+
+
+Delegation*
+FileSystem::GetDelegation(const FileHandle& handle)
+{
+	MutexLocker _(fDelegationLock);
+
+	AVLTreeMap<FileHandle, Delegation*>::Iterator it;
+	it = fHandleToDelegation.Find(handle);
+	if (!it.HasCurrent())
+		return NULL;
+
+	return it.Current();
 }
 

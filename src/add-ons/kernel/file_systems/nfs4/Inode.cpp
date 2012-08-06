@@ -23,11 +23,13 @@
 Inode::Inode()
 	:
 	fCache(NULL),
+	fDelegation(NULL),
 	fFileCache(NULL),
 	fMaxFileSize(0),
 	fOpenState(NULL),
 	fWriteDirty(false)
 {
+	rw_lock_init(&fDelegationLock, NULL);
 	mutex_init(&fStateLock, NULL);
 	mutex_init(&fFileCacheLock, NULL);
 }
@@ -121,12 +123,16 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 
 Inode::~Inode()
 {
+	if (fDelegation != NULL)
+		RecallDelegation();
+
 	if (fFileCache != NULL)
 		file_cache_delete(fFileCache);
 
 	delete fCache;
 	mutex_destroy(&fStateLock);
 	mutex_destroy(&fFileCacheLock);
+	rw_lock_destroy(&fDelegationLock);
 }
 
 
@@ -719,5 +725,28 @@ Inode::ChildAdded(const char* name, uint64 fileID,
 	fi.fPath = path;
 
 	return fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
+}
+
+
+void
+Inode::SetDelegation(Delegation* delegation)
+{
+	WriteLocker _(fDelegationLock);
+	fDelegation = delegation;
+	fFileSystem->AddDelegation(delegation);
+}
+
+
+void
+Inode::RecallDelegation(bool truncate)
+{
+	WriteLocker _(fDelegationLock);
+	if (fDelegation == NULL)
+		return;
+
+	fDelegation->GiveUp(truncate);
+	fFileSystem->RemoveDelegation(fDelegation);
+	delete fDelegation;
+	fDelegation = NULL;
 }
 

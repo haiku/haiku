@@ -228,7 +228,7 @@ Server::GetCallback()
 {
 	MutexLocker _(fCallbackLock);
 	if (fCallback == NULL) {
-		fCallback = new Callback;
+		fCallback = new(std::nothrow) Callback(this);
 		gRPCCallbackServer->RegisterCallback(fCallback);
 	}
 

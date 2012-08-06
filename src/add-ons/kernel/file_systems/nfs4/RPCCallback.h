@@ -15,9 +15,12 @@
 namespace RPC {
 
 class CallbackRequest;
+class Server;
 
 class Callback {
 public:
+						Callback(Server* server);
+
 	inline	void		SetID(int32 id);
 	inline	int32		ID();
 
@@ -25,6 +28,7 @@ public:
 							Connection* connection);
 
 private:
+			Server*		fServer;
 			int32		fID;
 };
 

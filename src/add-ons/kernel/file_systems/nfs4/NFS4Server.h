@@ -11,6 +11,8 @@
 
 #include <lock.h>
 
+#include "ReplyBuilder.h"
+#include "RequestInterpreter.h"
 #include "RPCServer.h"
 
 
@@ -34,6 +36,12 @@ public:
 			uint64			ClientId(uint64 prevId = 0, bool forceNew = false);
 
 	inline	uint32			LeaseTime();
+
+	virtual	status_t		ProcessCallback(RPC::CallbackRequest* request,
+								Connection* connection);
+
+			status_t		CallbackRecall(RequestInterpreter* request,
+								ReplyBuilder* reply);
 private:
 			status_t		_ReclaimOpen(OpenFileCookie* cookie);
 			status_t		_ReclaimLocks(OpenFileCookie* cookie);

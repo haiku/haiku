@@ -10,6 +10,7 @@
 
 
 #include "CacheRevalidator.h"
+#include "Delegation.h"
 #include "InodeIdMap.h"
 #include "NFS4Defs.h"
 #include "NFS4Server.h"
@@ -34,6 +35,12 @@ public:
 	inline	uint32				OpenFilesCount();
 			void				AddOpenFile(OpenFileCookie* cookie);
 			void				RemoveOpenFile(OpenFileCookie* cookie);
+
+			OpenFileCookie*		DelegationsLock();
+			void				DelegationsUnlock();
+			void				AddDelegation(Delegation* delegation);
+			void				RemoveDelegation(Delegation* delegation);
+			Delegation*			GetDelegation(const FileHandle& handle);
 
 	inline	CacheRevalidator&	Revalidator();
 
@@ -61,6 +68,10 @@ private:
 								FileSystem();
 
 			CacheRevalidator	fCacheRevalidator;
+
+			DoublyLinkedList<Delegation> fOpenDelegations;
+			mutex				fDelegationLock;
+			AVLTreeMap<FileHandle, Delegation*> fHandleToDelegation;
 
 			OpenFileCookie*		fOpenFiles;
 			uint32				fOpenCount;

@@ -10,15 +10,22 @@
 #include "RPCCallback.h"
 
 #include "RPCCallbackRequest.h"
+#include "RPCServer.h"
 
 
 using namespace RPC;
 
 
+Callback::Callback(Server* server)
+	:
+	fServer(server)
+{
+}
+
+
 status_t
 Callback::EnqueueRequest(CallbackRequest* request, Connection* connection)
 {
-	dprintf("GOT A CALLBACK REQUEST %x\n", (int)request->XID());
-	return B_OK;
+	return fServer->PrivateData()->ProcessCallback(request, connection);
 }
 

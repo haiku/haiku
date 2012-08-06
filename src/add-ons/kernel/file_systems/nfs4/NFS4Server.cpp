@@ -315,3 +315,71 @@ NFS4Server::_RenewalThreadStart(void* ptr)
 	return server->_Renewal();
 }
 
+
+status_t
+NFS4Server::ProcessCallback(RPC::CallbackRequest* request,
+	Connection* connection)
+{
+	RequestInterpreter req(request);
+	ReplyBuilder reply(request->XID());
+
+	status_t result;
+	uint32 count = req.OperationCount();
+
+	for (uint32 i = 0; i < count; i++) {
+		switch (req.Operation()) {
+			case OpCallbackRecall:
+				result = CallbackRecall(&req, &reply);
+				break;
+			default:
+				result = B_NOT_SUPPORTED;
+		}
+
+		if (result != B_OK)
+			break;
+	}
+
+	XDR::WriteStream& stream = reply.Reply()->Stream();
+	connection->Send(stream.Buffer(), stream.Size());
+
+	return B_OK;
+}
+
+
+status_t
+NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
+{
+	uint32 stateID[3];
+	uint32 stateSeq;
+	bool truncate;
+	FileHandle handle;
+
+	status_t result = request->Recall(&handle, truncate, &stateSeq, stateID);
+	if (result != B_OK)
+		return result;
+
+	MutexLocker locker(fFSLock);
+
+	Delegation* delegation = NULL;
+	FileSystem* current = fFileSystems;
+	while (current != NULL) {
+		delegation = current->GetDelegation(handle);
+		if (delegation != NULL)
+			break;
+
+		current = current->fNext;
+	}
+	locker.Unlock();
+
+	if (delegation == NULL) {
+		reply->Recall(B_FILE_NOT_FOUND);
+		return B_FILE_NOT_FOUND;
+	}
+
+	// TODO: should be asynchronous
+	delegation->GetInode()->RecallDelegation(truncate);
+
+	reply->Recall(B_OK);
+	return B_OK;
+}
+

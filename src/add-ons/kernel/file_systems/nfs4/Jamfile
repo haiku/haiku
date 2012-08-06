@@ -7,6 +7,7 @@ KernelAddon nfs4 :
 	CacheRevalidator.cpp
 	Cookie.cpp
 	Connection.cpp
+	Delegation.cpp
 	DirectoryCache.cpp
 	FileInfo.cpp
 	FileSystem.cpp
@@ -20,9 +21,11 @@ KernelAddon nfs4 :
 	NFS4Object.cpp
 	NFS4Server.cpp
 	OpenState.cpp
+	ReplyBuilder.cpp
 	ReplyInterpreter.cpp
 	Request.cpp
 	RequestBuilder.cpp
+	RequestInterpreter.cpp
 	RootInode.cpp
 	RPCAuth.cpp
 	RPCCall.cpp
