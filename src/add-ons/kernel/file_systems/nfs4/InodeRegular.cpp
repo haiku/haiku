@@ -95,12 +95,12 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 status_t
 Inode::Open(int mode, OpenFileCookie* cookie)
 {
-	MutexLocker _(fStateLock);
+	MutexLocker locker(fStateLock);
 
 	OpenDelegationData data;
 	data.fType = OPEN_DELEGATE_NONE;
 	if (fOpenState == NULL) {
-		// TODO: revalidate cache
+		RevalidateFileCache();
 
 		OpenState* state = new OpenState;
 		if (state == NULL)
@@ -114,16 +114,28 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 		fFileSystem->AddOpenFile(state);
 		fOpenState = state;
+		locker.Unlock();
 	} else {
+		fOpenState->AcquireReference();
+		locker.Unlock();
+
 		int newMode = mode & O_RWMASK;
 		int oldMode = fOpenState->fMode & O_RWMASK;
 		if (oldMode != newMode && oldMode != O_RDWR) {
+			if (oldMode == O_RDONLY)
+				RecallReadDelegation();
+
 			status_t result = OpenFile(fOpenState, O_RDWR, &data);
-			if (result != B_OK)
+			if (result != B_OK) {
+				locker.Lock();
+				if (fOpenState->ReleaseReference() == 1) {
+					fFileSystem->RemoveOpenFile(fOpenState);
+					fOpenState = NULL;
+				}
 				return result;
+			}
 			fOpenState->fMode = O_RDWR;
 		}
-		fOpenState->AcquireReference();
 	}
 
 	cookie->fOpenState = fOpenState;

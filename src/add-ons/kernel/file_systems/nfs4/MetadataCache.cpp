@@ -12,7 +12,8 @@
 
 MetadataCache::MetadataCache()
 	:
-	fExpire(0)
+	fExpire(0),
+	fForceValid(false)
 {
 	mutex_init(&fLock, NULL);
 }
@@ -28,7 +29,7 @@ status_t
 MetadataCache::GetStat(struct stat* st)
 {
 	MutexLocker _(fLock);
-	if (fExpire > time(NULL)) {
+	if (fForceValid || fExpire > time(NULL)) {
 		// Do not touch other members of struct stat
 		st->st_size = fStatCache.st_size;
 		st->st_mode = fStatCache.st_mode;
@@ -96,4 +97,27 @@ MetadataCache::SetAccess(uid_t uid, uint32 allowed)
 	entry.fExpire = time(NULL) + kExpirationTime;
 	fAccessCache.Insert(uid, entry);
 }
+
+
+status_t
+MetadataCache::LockValid()
+{
+	MutexLocker _(fLock);
+	if (fForceValid || fExpire > time(NULL)) {
+		fForceValid = true;
+		return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
+void
+MetadataCache::UnlockValid()
+{
+	MutexLocker _(fLock);
+	fExpire = time(NULL) + kExpirationTime;
+	fForceValid = false;
+}
+
 

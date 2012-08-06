@@ -36,6 +36,7 @@ public:
 
 					void		SetDelegation(Delegation* delegation);
 					void		RecallDelegation(bool truncate = false);
+					void		RecallReadDelegation();
 
 					status_t	LookUp(const char* name, ino_t* id);
 
@@ -92,6 +93,8 @@ protected:
 					status_t	CreateState(const char* name, int mode,
 									int perms, OpenState* state,
 									OpenDelegationData* data);
+
+					void		ReturnDelegation(bool truncate);
 
 					status_t	ReadDirUp(struct dirent* de, uint32 pos,
 									uint32 size);

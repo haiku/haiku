@@ -32,6 +32,9 @@ public:
 					status_t	GetAccess(uid_t uid, uint32* allowed);
 					void		SetAccess(uid_t uid, uint32 allowed);
 
+					status_t	LockValid();
+					void		UnlockValid();
+
 	inline			void		InvalidateStat();
 	inline			void		InvalidateAccess();
 
@@ -41,6 +44,7 @@ public:
 private:
 					struct stat	fStatCache;
 					time_t		fExpire;
+					bool		fForceValid;
 
 					AVLTreeMap<uid_t, AccessEntry>	fAccessCache;
 

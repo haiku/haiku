@@ -26,11 +26,8 @@ Delegation::Delegation(const OpenDelegationData& data, Inode* inode,
 status_t
 Delegation::GiveUp(bool truncate)
 {
-	if (!truncate) {
+	if (!truncate)
 		fInode->SyncAndCommit(true);
-
-		// TODO: claim locks
-	}
 
 	ReturnDelegation();
 

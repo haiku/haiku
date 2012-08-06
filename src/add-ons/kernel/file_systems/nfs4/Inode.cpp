@@ -139,6 +139,9 @@ Inode::~Inode()
 status_t
 Inode::RevalidateFileCache()
 {
+	if (fDelegation != NULL)
+		return B_OK;
+
 	uint64 change;
 	status_t result = GetChangeInfo(&change);
 	if (result != B_OK)
@@ -153,8 +156,7 @@ Inode::RevalidateFileCache()
 	if (result != B_OK)
 		return result;
 
-	file_cache_sync(fFileCache);
-	Commit();
+	SyncAndCommit(true);
 	file_cache_delete(fFileCache);
 
 	fFileCache = file_cache_create(fFileSystem->DevId(), ID(), st.st_size);
@@ -760,6 +762,12 @@ void
 Inode::SetDelegation(Delegation* delegation)
 {
 	WriteLocker _(fDelegationLock);
+
+	fMetaCache.InvalidateStat();
+	struct stat st;
+	Stat(&st);
+	fMetaCache.LockValid();	
+
 	fDelegation = delegation;
 	fOpenState->AcquireReference();
 	fOpenState->fDelegation = delegation;
@@ -773,6 +781,24 @@ Inode::RecallDelegation(bool truncate)
 	WriteLocker _(fDelegationLock);
 	if (fDelegation == NULL)
 		return;
+	ReturnDelegation(truncate);
+}
+
+
+void
+Inode::RecallReadDelegation()
+{
+	WriteLocker _(fDelegationLock);
+	if (fDelegation == NULL || fDelegation->Type() != OPEN_DELEGATE_READ)
+		return;
+	ReturnDelegation(false);
+}
+
+
+void
+Inode::ReturnDelegation(bool truncate)
+{
+	fMetaCache.UnlockValid();
 
 	fDelegation->GiveUp(truncate);
 	fFileSystem->RemoveDelegation(fDelegation);

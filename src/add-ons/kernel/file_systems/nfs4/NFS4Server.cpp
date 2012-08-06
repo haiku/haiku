@@ -332,6 +332,7 @@ NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
 	delegation->GetInode()->RecallDelegation(truncate);
 
 	reply->Recall(B_OK);
+
 	return B_OK;
 }
 

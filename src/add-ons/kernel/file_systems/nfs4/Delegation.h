@@ -23,8 +23,6 @@ public:
 						Delegation(const OpenDelegationData& data, Inode* inode,
 							uint64 clientID);
 
-	// TODO: locks
-
 	status_t			GiveUp(bool truncate = false);
 
 	inline	Inode*		GetInode();
