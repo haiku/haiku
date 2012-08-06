@@ -17,6 +17,7 @@
 #include <CharacterSetRoster.h>
 #include <Entry.h>
 #include <File.h>
+#include <List.h>
 #include <MenuItem.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -834,6 +835,7 @@ BTranslationUtils::GetDefaultSettings(const char *kTranslatorName,
 	return pMessage;
 }
 
+
 // ---------------------------------------------------------------
 // AddTranslationItems
 //
@@ -908,24 +910,45 @@ BTranslationUtils::AddTranslationItems(BMenu *intoMenu, uint32 fromType,
 		if (!ok)
 			continue;
 
+		// Get supported output formats
+		BList formatList;
 		err = roster->GetOutputFormats(ids[tix], &formats, &numFormats); 
 		if (err == B_OK) {
-			for (int oix = 0; oix < numFormats; oix++) { 
-				if (formats[oix].type != fromType) { 
-					BMessage *itemmsg; 
-					if (kModel)
-						itemmsg = new BMessage(*kModel);
-					else
-						itemmsg = new BMessage(B_TRANSLATION_MENU);
-					itemmsg->AddInt32(kTranslatorIdName, ids[tix]);
-					itemmsg->AddInt32(kTranslatorTypeName, formats[oix].type);
-					intoMenu->AddItem(
-						new BMenuItem(formats[oix].name, itemmsg));
+			for (int oix = 0; oix < numFormats; oix++) {
+				if (formats[oix].type != fromType) {
+					formatList.AddItem(const_cast<translation_format*>(
+						&formats[oix]));
 				}
 			}
+		}
+
+		// Sort alphabetically by name
+		formatList.SortItems(&CompareTranslationFormatByName);
+
+		// Now add the menu items
+		for (int i = 0; i < formatList.CountItems(); i++) {
+			translation_format* format = static_cast<translation_format*>(
+				formatList.ItemAt(i));
+
+			BMessage *itemmsg;
+			if (kModel)
+				itemmsg = new BMessage(*kModel);
+			else
+				itemmsg = new BMessage(B_TRANSLATION_MENU);
+			itemmsg->AddInt32(kTranslatorIdName, ids[tix]);
+			itemmsg->AddInt32(kTranslatorTypeName, format->type);
+			intoMenu->AddItem(new BMenuItem(format->name, itemmsg));
 		}
 	}
 
 	delete[] ids;
 	return B_OK;
+}
+
+
+int
+BTranslationUtils::CompareTranslationFormatByName(const void* format1, const void* format2)
+{
+	return strcasecmp(static_cast<const translation_format*>(format1)->name,
+		static_cast<const translation_format*>(format2)->name);
 }
