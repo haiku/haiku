@@ -1,23 +1,38 @@
-1	french	x-vnd.Haiku-Keymap	140876782
+1	french	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Majuscule :
 Revert	Modifier keys window		Défaire
 Tilde trigger	Keymap window		Tilde
 Grave trigger	Keymap window		Accent grave
+Role	Modifier keys window	As in the role of a modifier key	Rôle
 Select dead keys	Keymap window		Sélection des touches mortes
+Cancel	Modifier keys window		Annuler
 Quit	Keymap window		Quitter
 Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis en mode Haiku
 Circumflex trigger	Keymap window		Accent circonflexe
 Diaeresis trigger	Keymap window		Tréma
+Disabled	Modifier keys window	Do nothing	Désactivé
 Open…	Keymap window		Ouvrir…
 System:	Keymap window		Système :
+Set modifier keys…	Keymap window		Régler les touches modificatrices…
+Option:	Modifier keys window	Option key role name	Option :
 Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Touche majuscule
 User:	Keymap window		Utilisateur :
+Key	Modifier keys window	As in a computer keyboard key	Touche
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Touche contrôle
+Control:	Modifier keys window	Control key role name	Contrôle :
 Sample and clipboard:	Keymap window		Exemple et presse-papier :
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Touche Alt/Option
 Layout	Keymap window		Disposition
 Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches de raccourcis en mode Linux/Windows
 Revert	Keymap window		Défaire
+Command:	Modifier keys window	Command key role name	Commande :
 Save as…	Keymap window		Enregistrer sous…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Touche Win/Cmd
 File	Keymap window		Fichier
 (Current)	Keymap window		(Actif)
 Font	Keymap window		Police
 Keymap	System name		Disposition du clavier
+Set modifier keys	Modifier keys window		Régler les touches modificatrices
+Modifier keys	Modifier keys window		Touches modificatrices
 Acute trigger	Keymap window		Accent aigu

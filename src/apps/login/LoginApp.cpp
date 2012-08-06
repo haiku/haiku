@@ -51,12 +51,14 @@ LoginApp::ReadyToRun()
 	BScreen screen;
 
 	if (fEditShelfMode) {
-		(new BAlert(B_TRANSLATE("Info"), B_TRANSLATE("You can customize the "
+		BAlert* alert = new BAlert(B_TRANSLATE("Info"), B_TRANSLATE("You can customize the "
 			"desktop shown behind the Login application by dropping replicants"
 			" onto it.\n"
 			"\n"
 			"When you are finished just quit the application (Alt-Q)."),
-			B_TRANSLATE("OK")))->Go(NULL);
+			B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go(NULL);
 	} else {
 		BRect frame(0, 0, 450, 150);
 		frame.OffsetBySelf(screen.Frame().Width()/2 - frame.Width()/2,
@@ -94,14 +96,21 @@ LoginApp::MessageReceived(BMessage *message)
 			if (error < B_OK) {
 				BString msg(B_TRANSLATE("Error: %1"));
 				msg.ReplaceFirst("%1", strerror(error));
-				(new BAlert(("Error"), msg.String(), B_TRANSLATE("OK")))->Go();
+				BAlert* alert = new BAlert(("Error"), msg.String(),
+					B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 			break;
 		}
 		case kSuspendAction:
-			(new BAlert(B_TRANSLATE("Error"), B_TRANSLATE("Unimplemented"),
-				B_TRANSLATE("OK")))->Go();
+		{
+			BAlert* alert = new BAlert(B_TRANSLATE("Error"),
+				B_TRANSLATE("Unimplemented"), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			break;
+		}
 #endif
 	default:
 		BApplication::MessageReceived(message);

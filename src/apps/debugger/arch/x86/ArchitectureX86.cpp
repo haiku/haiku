@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -250,11 +250,11 @@ status_t
 ArchitectureX86::CreateCpuState(const void* cpuStateData, size_t size,
 	CpuState*& _state)
 {
-	if (size != sizeof(debug_cpu_state_x86))
+	if (size != sizeof(x86_debug_cpu_state))
 		return B_BAD_VALUE;
 
 	CpuStateX86* state = new(std::nothrow) CpuStateX86(
-		*(const debug_cpu_state_x86*)cpuStateData);
+		*(const x86_debug_cpu_state*)cpuStateData);
 	if (state == NULL)
 		return B_NO_MEMORY;
 

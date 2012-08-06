@@ -63,13 +63,17 @@ void LoginInfo::MessageReceived(BMessage *message)
 					else {
 						BAlert *alert = new BAlert("Login Info Alert",
 							"Passwords don't match. Please try again","OK");
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						alert->Go();
 					}	
 					
 			}
 			else {
 			
-				BAlert *alert = new BAlert("Login Info Alert","You didn't fill all the fields","Oups...",NULL,NULL,B_WIDTH_FROM_WIDEST,B_INFO_ALERT);
+				BAlert *alert = new BAlert("Login Info Alert",
+					"You didn't fill in all the fields","Oops...", NULL, NULL,
+					B_WIDTH_FROM_WIDEST,B_INFO_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 			}	
 			break;

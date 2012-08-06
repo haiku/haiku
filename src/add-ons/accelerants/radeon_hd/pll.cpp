@@ -503,7 +503,7 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 
 
 status_t
-pll_adjust(pll_info* pll, uint8 crtcID)
+pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
@@ -585,7 +585,7 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 								|= DISPPLL_CONFIG_COHERENT_MODE;
 							/* 16200 or 27000 */
 							uint32 dpLinkSpeed
-								= dp_get_link_clock(connectorIndex);
+								= dp_get_link_rate(connectorIndex, mode);
 							args.v3.sInput.usPixelClock
 								= B_HOST_TO_LENDIAN_INT16(dpLinkSpeed / 10);
 						} else if ((encoderFlags & ATOM_DEVICE_DFP_SUPPORT)
@@ -650,17 +650,17 @@ pll_adjust(pll_info* pll, uint8 crtcID)
 
 
 status_t
-pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
+pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
 {
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
-	pll->pixelClock = pixelClock;
+	pll->pixelClock = mode->timing.pixel_clock;
 	pll->id = pllID;
 
 	pll_setup_flags(pll, crtcID);
 		// set up any special flags
-	pll_adjust(pll, crtcID);
+	pll_adjust(pll, mode, crtcID);
 		// get any needed clock adjustments, set reference/post dividers
 	pll_compute(pll);
 		// compute dividers
@@ -799,7 +799,7 @@ pll_set(uint8 pllID, uint32 pixelClock, uint8 crtcID)
 	}
 
 	TRACE("%s: set adjusted pixel clock %" B_PRIu32 " (was %" B_PRIu32 ")\n",
-		__func__, pll->pixelClock, pixelClock);
+		__func__, pll->pixelClock, mode->timing.pixel_clock);
 
 	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
 

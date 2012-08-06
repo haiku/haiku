@@ -98,6 +98,7 @@ PackageView::AttachedToWindow()
 				"possible reasons for this might be that the requested file "
 				"is not a valid BeOS .pkg package."), B_TRANSLATE("OK"),
 				NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		warning->SetFlags(warning->Flags() | B_CLOSE_ON_ESCAPE);
 		warning->Go();
 
 		Window()->PostMessage(B_QUIT_REQUESTED);
@@ -195,6 +196,7 @@ PackageView::MessageReceived(BMessage *msg)
 				B_TRANSLATE("The package you requested has been successfully "
 					"installed on your system."),
 				B_TRANSLATE("OK"));
+			notify->SetFlags(notify->Flags() | B_CLOSE_ON_ESCAPE);
 
 			notify->Go();
 			fStatusWindow->Hide();
@@ -214,6 +216,7 @@ PackageView::MessageReceived(BMessage *msg)
 				B_TRANSLATE(
 					"The installation of the package has been aborted."),
 				B_TRANSLATE("OK"));
+			notify->SetFlags(notify->Flags() | B_CLOSE_ON_ESCAPE);
 			notify->Go();
 			fStatusWindow->Hide();
 			fInstall->SetEnabled(true);
@@ -234,6 +237,7 @@ PackageView::MessageReceived(BMessage *msg)
 				NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			fprintf(stderr,
 				B_TRANSLATE("Error while installing the package\n"));
+			notify->SetFlags(notify->Flags() | B_CLOSE_ON_ESCAPE);
 			notify->Go();
 			fStatusWindow->Hide();
 			fInstall->SetEnabled(true);
@@ -354,7 +358,8 @@ PackageView::ItemExists(PackageItem &item, BPath &path, int32 &policy)
 				B_TRANSLATE("Replace"),
 				B_TRANSLATE("Skip"),
 				B_TRANSLATE("Abort"));
-
+			alert->SetShortcut(2, B_ESCAPE);
+			
 			choice = alert->Go();
 			switch (choice) {
 				case 0:

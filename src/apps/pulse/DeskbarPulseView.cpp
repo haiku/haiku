@@ -182,7 +182,7 @@ void DeskbarPulseView::Remove() {
 		str.UnlockBuffer();
 		BAlert *alert = new BAlert(B_TRANSLATE("Info"), str.String(),
 			B_TRANSLATE("OK"));
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 	}
 	delete deskbar;

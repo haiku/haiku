@@ -1290,6 +1290,7 @@ GrepWindow::_OnTrimSelection()
 		text << "\n";
 		BAlert* alert = new BAlert(NULL, text.String(), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		return;
 	}
@@ -1382,6 +1383,7 @@ GrepWindow::_OnSelectInTracker()
 			B_TRANSLATE("Please select the files you wish to have selected for you in "
 				"Tracker."),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		return;
 	}
@@ -1446,6 +1448,7 @@ GrepWindow::_OnSelectInTracker()
 		str1.ReplaceFirst("%APP_NAME",APP_NAME);
 		BAlert* alert = new BAlert(NULL, str1.String(), B_TRANSLATE("OK"), 
 			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 		goto out;
 	}

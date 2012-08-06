@@ -375,7 +375,9 @@ MainWin::SelectInterface(int i)
 		BString s;
 		s << B_TRANSLATE("Error, interface is busy:\n\n");
 		s << gDeviceRoster->DeviceName(i);
-		(new BAlert("error", s.String(), B_TRANSLATE("OK")))->Go();
+		BAlert* alert = new BAlert("error", s.String(), B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return;
 	}
 
@@ -384,7 +386,9 @@ MainWin::SelectInterface(int i)
 		BString s;
 		s << B_TRANSLATE("Error, connecting to interface failed:\n\n");
 		s << gDeviceRoster->DeviceName(i);
-		(new BAlert("error", s.String(), B_TRANSLATE("OK")))->Go();
+		BAlert* alert = new BAlert("error", s.String(), B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 
 done:

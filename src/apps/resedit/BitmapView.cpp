@@ -250,8 +250,9 @@ BitmapView::MessageReceived(BMessage *msg)
 	switch (msg->what)
 	{
 		case M_REMOVE_IMAGE: {
-			BAlert *alert = new BAlert("Mr. Peeps!", "This cannot be undone. Remove the image?",
-										"Remove", "Cancel");
+			BAlert *alert = new BAlert("Mr. Peeps!", "This cannot be undone. "
+				"Remove the image?", "Remove", "Cancel");
+			alert->SetShortcut(1, B_ESCAPE);
 			int32 value = alert->Go();
 			if (value == 0) {
 				SetBitmap(NULL);

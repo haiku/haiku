@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	1209826930
+1	german	x-vnd.Haiku-DriveSetup	2908539543
 DriveSetup	System name		Datenträgerverwaltung
 Delete	MainWindow		Löschen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
@@ -16,22 +16,18 @@ Partition name:	CreateParamsPanel		Partitionsname:
 Initialize	InitParamsPanel		Initialisieren
 Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
 The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Die Initialisierung der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 Partition type:	CreateParamsPanel		Partitionstyp:
 Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
 Initialize	MainWindow		Initialisieren
 Error: 	MainWindow	in any error alert	Fehler: 
 Partition %ld	DiskView		Partition %ld
-The partition %s has been successfully initialized.\n	MainWindow		Die Partition %s wurde erfolgreich initialisiert.\n
 <empty>	DiskView		<leer>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen. Der Datenträger blieb unverändert.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition gehen dabei unwiderruflich verloren!
 Mounted at	PartitionList		Eingehangen als
-Failed to initialize the partition %s!\n	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen!\n
 There was an error acquiring the partition row.	MainWindow		Es ist ein interner Fehler aufgetreten.
 You need to select a partition entry from the list.	MainWindow		Bitte einen Partitionseintrag aus der Liste wählen.
-Format (not implemented)	MainWindow		Formatieren (nicht implementiert)
 The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem gewählten Datenträger gehen dabei unwiderruflich verloren!
 Offset: %ld MB	Support		Versatz: %ld MiB
@@ -56,11 +52,9 @@ Mount all	MainWindow		Alle einhängen
 Cancel	MainWindow		Abbrechen
 Delete partition	MainWindow		Partition löschen
 End: %ld MB	Support		Ende: %ld MiB
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich initialisiert werden?\nDie Änderungen werden erst auf den Datenträger geschrieben, wenn sie nochmals bestätigt werden.
 Eject	MainWindow		Auswerfen
 Partition	MainWindow		Partition
 File system	PartitionList		Dateisystem
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition wirklich initialisiert werden?\nDie Änderungen werden erst auf den Datenträger geschrieben, wenn sie nochmals bestätigt werden.
 Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
 Size	PartitionList		Größe
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.

@@ -1081,7 +1081,7 @@ BScrollBar::Draw(BRect updateRect)
 		}
 
 		// fill the clickable surface of the thumb
-		if (be_control_look) {
+		if (be_control_look != NULL) {
 			be_control_look->DrawButtonBackground(this, rect, updateRect,
 				normal, 0, BControlLook::B_ALL_BORDERS, fOrientation);
 		} else {

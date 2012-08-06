@@ -93,7 +93,6 @@ PCApplication::ReadyToRun()
 			" or install it in the Deskbar."), B_TRANSLATE("Run in window"),
 			B_TRANSLATE("Install in Deskbar"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go() != 0) {
 			BDeskbar deskbar;
@@ -107,7 +106,7 @@ PCApplication::ReadyToRun()
 			B_TRANSLATE("ProcessController is already installed in Deskbar."),
 			B_TRANSLATE("OK"), NULL,
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 

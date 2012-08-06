@@ -90,7 +90,6 @@ PowerStatus::ReadyToRun()
 			"or install it in the Deskbar."), B_TRANSLATE("Run in window"),
 			B_TRANSLATE("Install in Deskbar"), NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go()) {
 			image_info info;

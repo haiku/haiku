@@ -98,6 +98,7 @@ MainWindow::QuitRequested()
 			B_TRANSLATE("Really close this pad?\n"
 						"(The pad will not be remembered.)"),
 			B_TRANSLATE("Close"), B_TRANSLATE("Cancel"), NULL);
+		alert->SetShortcut(1, B_ESCAPE);
 		if (alert->Go() == 1)
 			return false;
 	}
@@ -172,6 +173,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if (errorMessage.Length() > 0) {
 				BAlert* alert = new BAlert("error", errorMessage.String(),
 					B_TRANSLATE("Bummer"), NULL, NULL, B_WIDTH_FROM_WIDEST);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
 			}
 			break;

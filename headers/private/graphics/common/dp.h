@@ -40,7 +40,10 @@ typedef struct {
 uint32 dp_encode_link_rate(uint32 linkRate);
 uint32 dp_decode_link_rate(uint32 rawLinkRate);
 
-uint32 dp_get_lane_count(dp_info* dpInfo, display_mode* mode);
+uint32 dp_get_lane_count_max(dp_info* dpInfo);
+uint32 dp_get_link_rate_max(dp_info* dpInfo);
+
+uint32 dp_get_pixel_clock_max(int linkRate, int laneCount, int bpp);
 
 
 #endif /* _DP_H */

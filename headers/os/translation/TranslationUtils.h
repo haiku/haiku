@@ -77,6 +77,9 @@ public:
 									BTranslatorRoster* roster = NULL);
 
 private:
+	static	int					CompareTranslationFormatByName(const void* format1,
+									const void* format2);
+
 	static	color_space			sBitmapSpace;
 };
 

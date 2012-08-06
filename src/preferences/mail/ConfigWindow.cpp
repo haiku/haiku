@@ -866,8 +866,10 @@ ConfigWindow::_RevertToLastSettings()
 				"\nThe general settings couldn't be reverted.\n\n"
 				"Error retrieving general settings:\n%s\n"),
 			strerror(status));
-		(new BAlert(B_TRANSLATE("Error"), text, B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert* alert = new BAlert(B_TRANSLATE("Error"), text,
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 
 	// revert account data

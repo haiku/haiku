@@ -184,6 +184,7 @@ PasswordWindow::MessageReceived(BMessage *message)
 					BAlert *alert = new BAlert("noMatch",
 						B_TRANSLATE("Passwords don't match. Please try again."),
 						B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 					break;
 				}

@@ -641,8 +641,10 @@ TTracker::InstallTemporaryBackgroundImages()
 			"failed. \nReason: %error"));
 		errorMessage.ReplaceFirst("%func", __PRETTY_FUNCTION__);
 		errorMessage.ReplaceFirst("%error", strerror(status));
-		(new BAlert("AlertError", errorMessage.String(), B_TRANSLATE("OK"),
-			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+		BAlert* alert = new BAlert("AlertError", errorMessage.String(),
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return;
 	}
 	path.Append("artwork");

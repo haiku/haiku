@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	1911470348
+1	ukrainian	x-vnd.Haiku-DriveSetup	58298917
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		Видалити
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
@@ -16,20 +16,16 @@ Partition name:	CreateParamsPanel		Ім'я розділу:
 Initialize	InitParamsPanel		Ініціалізувати
 Could not mount partition %s.	MainWindow		Неможливо підмонтувати розділ %s.
 The partition %s is already unmounted.	MainWindow		Розділ %s повністю відмонтований.
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Ініціалізація розділу призупинена. Жодні зміни не були записані на диск.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Видалення розділу призупинене. Жодні зміни не були записані на диск.
 Partition type:	CreateParamsPanel		Тип розділу:
 Could not delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
 Initialize	MainWindow		Ініціалізація
 Error: 	MainWindow	in any error alert	Помилка:
 Partition %ld	DiskView		Розділ %ld
-The partition %s has been successfully initialized.\n	MainWindow		Розділ %s був успішно ініціалізований.\n
 <empty>	DiskView		<пусто>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Ініціалізація розділу %s призупинена. (Нічого не було записано на диск.)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви  впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на розділі будуть безповоротно втрачені!
 Mounted at	PartitionList		Змонтувати на
-Failed to initialize the partition %s!\n	MainWindow		Призупинена ініціалізація розділу %s!\n
 There was an error acquiring the partition row.	MainWindow		Сталася помилка при одержанні параметрів розділу.
 You need to select a partition entry from the list.	MainWindow		Ви повинні вибрати розділ зі списку.
-Format (not implemented)	MainWindow		Форматування(не підтримується)
 The currently selected partition does not have a parent partition.	MainWindow		Поточний розділ не має батіківського розділу.

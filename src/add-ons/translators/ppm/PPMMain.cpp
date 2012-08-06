@@ -51,6 +51,7 @@ main()
 		BAlert * err = new BAlert("Error", 
 			B_TRANSLATE("Something is wrong with the PPMTranslator!"), 
 			B_TRANSLATE("OK"));
+		err->SetFlags(err->Flags() | B_CLOSE_ON_ESCAPE);
 		err->Go();
 		return 1;
 	}

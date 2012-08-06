@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PoorMan	995747556
+1	french	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Emplacement du site Web
 Error Server	PoorMan		Erreur du serveur
 Settings…	PoorMan		Réglages…
@@ -24,13 +24,17 @@ Advanced	PoorMan		Avancé
 OK	PoorMan		OK
 Status: Stopped	PoorMan		État : Arrêté
 Dir Created	PoorMan		Répertoire créé
+Log to file	PoorMan		Consigner vers le journal
 Quit	PoorMan		Quitter
 Hits: 0	PoorMan		Sollicitations : 0
 Save log console	PoorMan		Sauvegarder la console de journalisation
 Edit	PoorMan		Éditer
+Create Log File	PoorMan		Créer un journal
+Log to console	PoorMan		Consigner vers la console
 Directory: (none)	PoorMan		Répertoire : (aucun)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Veuillez choisir le dossier à publier sur le Web.\n\nVous pouvez sélectionnez le dossier de votre choix, ou laisser PoorMan\ncréer le dossier par défaut « public_html » dans votre dossier personnel.
 Log To Console	PoorMan		Consigner vers la console
+Connections	PoorMan		Connexions
 Status: Running	PoorMan		État : En fonction
 connections	PoorMan		connexions
 Controls	PoorMan		Contrôles
@@ -38,12 +42,13 @@ Send file listing if there's no start page	PoorMan		Envoyer la liste des fichier
 Error Dir	PoorMan		Répertoire d'erreurs
 Select all	PoorMan		Sélectionner tout
 File	PoorMan		Fichier
+File Logging	PoorMan		Fichier de journalisation
 Save console selections as…	PoorMan		Enregistrer la sélection de la console sous…
 File logging	PoorMan		Fichier de journalisation
-Select web folder	PoorMan		Sélectionner un dossier WEB
+Select web folder	PoorMan		Sélectionner un dossier Web
 Logging view	PoorMan		Vue du journal
 Logging	PoorMan		Journalisation
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dossier Web par défaut a été créé à « /boot/home/public_html. »\nVérifiez qu'il existe un fichier HTML nommé « index.html » dans ce dossier.
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dossier Web par défaut a été créé à « /boot/home/public_html ».\nVérifiez qu'il existe un fichier HTML nommé « index.html » dans ce dossier.
 Clear log file	PoorMan		Vider le journal
 Log file name:	PoorMan		Nom du fichier de journalisation :
 Directory: 	PoorMan		Répertoire : 
@@ -53,6 +58,7 @@ Create log file	PoorMan		Créer un journal
 Starting up... 	PoorMan		Démarrage…
 Site	PoorMan		Site
 Cancel	PoorMan		Annuler
+Console logging	PoorMan		Console de journalisation
 Cannot start the server	PoorMan		Impossible de démarrer le serveur
 Select	PoorMan		Sélectionner
 Save console as…	PoorMan		Enregistrer la console sous…

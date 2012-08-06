@@ -1,0 +1,123 @@
+1	french	x-vnd.Haiku-WebPositive	2104753528
+Show home button	Settings Window		Afficher le bouton de la page d'accueil
+Username:	Authentication Panel		Utilisateur :
+Copy URL to clipboard	Download Window		Copier l'URL dans le presse-papiers
+Cancel	Settings Window		Annuler
+Close window	WebPositive Window		Fermer la fenêtre
+Quit	WebPositive		Quitter
+The download could not be opened.	Download Window		Impossible d'ouvrir l'objet téléchargé.
+Open location	WebPositive Window		Ouvrir l'emplacement
+Clear history	WebPositive Window		Nettoyer l'historique
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Hier
+Default standard font size:	Settings Window		Taille par défaut de la police standard :
+Start page:	Settings Window		Page de départ :
+History	WebPositive Window		Historique
+Error opening downloads folder	Download Window		Impossible d'ouvrir le dossier de téléchargement
+Paste	WebPositive Window		Coller
+Settings	Settings Window		Réglages
+%seconds seconds left	Download Window		%seconds secondes restantes
+Confirmation	WebPositive Window		Confirmation
+Window	WebPositive Window		Fenêtre
+Decrease size	WebPositive Window		Réduire la taille
+Serif font:	Settings Window		Police serif :
+Loading %url	WebPositive Window		Chargement de %url
+Page source	WebPositive Window		Source de la page
+Next	WebPositive Window		Suivant
+Find next	WebPositive Window		Rechercher le suivant
+Download folder:	Settings Window		Dossier de téléchargement :
+Edit	WebPositive Window		Édition
+Over %hours hours left	Download Window		Plus de %hours heures restantes
+Cancel	Authentication Panel		Annuler
+Match case	WebPositive Window		Respecter la casse
+Search page:	Settings Window		Page de recherche :
+Zoom text only	WebPositive Window		Grossir uniquement le texte
+Default fixed font size:	Settings Window		Taille par défaut de la police à chasse fixe :
+Close tab	WebPositive Window		Fermer l'onglet
+Auto-hide mouse pointer	Settings Window		Cacher le pointeur de souris automatiquement
+Over 1 hour left	Download Window		Plus d'1 heure restante
+Quit	WebPositive Window		Quitter
+Full screen	WebPositive Window		Plein écran
+Standard font:	Settings Window		Police standard :
+Restart	Download Window		Recommencer
+Proxy server	Settings Window		Serveur mandataire
+Open containing folder	Download Window		Ouvrir le dossier contenant le fichier
+New window	WebPositive Window		Nouvelle fenêtre
+Open	Download Window		Ouvrir
+Reload	WebPositive Window		Recharger
+Downloads	Download Window		Téléchargements
+Sans serif font:	Settings Window		Police sans serif :
+Over %days days left	Download Window		Plus de %days jours restant
+Forward	WebPositive Window		Suivant
+of	Download Window	...as in '12kB of 256kB'	de
+Revert	Settings Window		Restaurer
+Fixed font:	Settings Window		Police à chasse fixe :
+Cut	WebPositive Window		Couper
+Bookmark this page	WebPositive Window		Poser un signet sur cette page
+Hide	Download Window		Cacher
+Reset size	WebPositive Window		Réinitialiser la taille
+Find:	WebPositive Window		Rechercher :
+Increase size	WebPositive Window		Augmenter la taille
+Over 1 day left	Download Window		Plus d'un jour restant
+Downloads	WebPositive Window		Téléchargements
+Requesting %url	WebPositive Window		Requête de %url
+Apply	Settings Window		Appliquer
+Bookmark info	WebPositive Window		Informations sur le signet
+Size:	Font Selection view		Taille :
+Show tabs if only one page is open	Settings Window		Afficher les onglets même s'il n'y a qu'une page ouverte
+About	WebPositive Window		À propos
+Finish: 	Download Window	Finishing time	Fin : 
+Fonts	Settings Window		Polices
+Close	WebPositive Window		Fermer
+OK	Download Window		OK
+Open blank page	Settings Window		Ouvrir une page blanche
+New tabs:	Settings Window		Nouvel onglet :
+Cancel	WebPositive Window		Annuler
+Open all	WebPositive Window		Tout ouvrir
+Clear	URL Bar		Vider
+Cut	URL Bar		Couper
+Clear	WebPositive Window		Vider
+Remove	Download Window		Enlever
+Find	WebPositive Window		Rechercher
+Find previous	WebPositive Window		Rechercher le précédent
+Settings	WebPositive Window		Réglages
+Proxy server address:	Settings Window		Adresse du serveur mandataire :
+Proxy server port:	Settings Window		Port du serveur mandataire :
+Bookmarks	WebPositive Window		Signets
+%minutes minutes	Download Window		%minutes minutes
+Paste	URL Bar		Coller
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Camoufler le mot de passe
+Over 1 minute left	Download Window		Plus d'une minute restante
+Open start page	Settings Window		Ouvrir la page de départ
+Continue downloads	WebPositive		Continuer les téléchargements
+Cancel	Download Window		Annuler
+Open search page	Settings Window		Ouvrir la page de recherche
+Password:	Authentication Panel		Mot de passe :
+Back	WebPositive Window		Précédent
+New browser window	Download Window		Nouvelle fenêtre de navigation
+Today	WebPositive Window		Aujourd'hui
+1 second left	Download Window		1 seconde restante
+Remember username and password for this site	Authentication Panel		Mémoriser l'utilisateur et son mot de passe pour ce site
+Earlier	WebPositive Window		Avant
+Authentication required	Authentication Panel		Authentification requise
+Use proxy server to connect to the internet	Settings Window		Utiliser un serveur mandataire pour se connecter à Internet
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Il y a encore des téléchargements en cours. Voulez vous vraiment quitter WebPositive maintenant ?
+Auto-hide interface in full screen mode	Settings Window		Cacher automatiquement l'interface en mode plein écran
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url a échoué
+New tab	WebPositive Window		Nouvel onglet
+Downloads in progress	WebPositive		Téléchargement en cours
+Style:	Font Selection view		Style :
+General	Settings Window		Général
+View	WebPositive Window		Affichage
+Previous	WebPositive Window		Précédent
+Bookmark error	WebPositive Window		Erreur de signet
+Copy	WebPositive Window		Copier
+OK	Authentication Panel		OK
+Copy	URL Bar		Copier
+OK	WebPositive Window		OK
+Manage bookmarks	WebPositive Window		Gérer les signets
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Il existe déjà le signet « %bookmarkName » pour cette page.
+New windows:	Settings Window		Nouvelle fenêtre :
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminé
+Remove finished	Download Window		Retirer les éléments achevés

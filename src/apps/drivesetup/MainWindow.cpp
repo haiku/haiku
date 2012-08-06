@@ -657,6 +657,7 @@ MainWindow::_DisplayPartitionError(BString _message,
 
 	BAlert* alert = new BAlert("error", message, B_TRANSLATE("OK"), NULL, NULL,
 		B_WIDTH_FROM_WIDEST, error < B_OK ? B_STOP_ALERT : B_INFO_ALERT);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go(NULL);
 }
 
@@ -853,6 +854,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	BAlert* alert = new BAlert("first notice", message,
 		B_TRANSLATE("Continue"), B_TRANSLATE("Cancel"), NULL,
 		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
 	int32 choice = alert->Go();
 
 	if (choice == 1)
@@ -933,6 +935,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	alert = new BAlert("final notice", message,
 		B_TRANSLATE("Write changes"), B_TRANSLATE("Cancel"), NULL,
 		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
 	choice = alert->Go();
 
 	if (choice == 1)
@@ -1050,6 +1053,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 		"All data on the partition will be irretrievably lost if you do "
 		"so!"), B_TRANSLATE("Write changes"), B_TRANSLATE("Cancel"), NULL,
 		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
 	int32 choice = alert->Go();
 
 	if (choice == 1)
@@ -1130,6 +1134,7 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 		"All data on the partition will be irretrievably lost if you "
 		"do so!"), B_TRANSLATE("Delete partition"), B_TRANSLATE("Cancel"), NULL,
 		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
 	int32 choice = alert->Go();
 
 	if (choice == 1)

@@ -118,9 +118,11 @@ RemovePLItemsCommand::Perform()
 				message << 
 					B_TRANSLATE("Some files could not be moved into Trash.");
 			message << "\n\n" << B_TRANSLATE("Error: ") << strerror(moveError);
-			(new BAlert(B_TRANSLATE("Move Into Trash Error"), message.String(),
-				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT))->Go(NULL);
+			BAlert* alert = new BAlert(B_TRANSLATE("Move into trash error"),
+				message.String(), B_TRANSLATE("OK"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go(NULL);
 		}
 	}
 

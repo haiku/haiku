@@ -177,6 +177,7 @@ ObjectView::ObjectView(BRect rect, const char *name, ulong resizingMode,
 		BAlert *NoResourceAlert	= new BAlert(B_TRANSLATE("Error"),
 						kNoResourceError, B_TRANSLATE("OK"), NULL, NULL,
 						B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
+		NoResourceAlert->SetFlags(NoResourceAlert->Flags() | B_CLOSE_ON_ESCAPE);
 		NoResourceAlert->Go();
 		delete Tri;
 	}
@@ -323,6 +324,7 @@ ObjectView::MessageReceived(BMessage* msg)
 				BAlert *NoResourceAlert	= new BAlert(B_TRANSLATE("Error"),
 						kNoResourceError, B_TRANSLATE("OK"), NULL, NULL,
 						B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
+				NoResourceAlert->SetFlags(NoResourceAlert->Flags() | B_CLOSE_ON_ESCAPE);
 				NoResourceAlert->Go();
 				delete Tri;
 			}

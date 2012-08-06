@@ -1025,6 +1025,8 @@ ApplicationTypeWindow::QuitRequested()
 			B_TRANSLATE("Do you want to save the changes?"),
 			B_TRANSLATE("Quit, don't save"), B_TRANSLATE("Cancel"),
 			B_TRANSLATE("Save"), B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
+
 		int32 choice = alert->Go();
 		switch (choice) {
 			case 0:

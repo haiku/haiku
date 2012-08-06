@@ -407,7 +407,7 @@ _BMCMenuBar_::_Init(bool setMaxContentWidth)
 	bottom--;
 #endif
 
-	if (be_control_look)
+	if (be_control_look != NULL)
 		left = right = be_control_look->DefaultLabelSpacing();
 
 	SetItemMargins(left, top, right + fShowPopUpMarker ? 10 : 0, bottom);

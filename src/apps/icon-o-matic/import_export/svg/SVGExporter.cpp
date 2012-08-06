@@ -164,6 +164,7 @@ SVGExporter::_DisplayWarning() const
 							   "be lost."),
 							   B_TRANSLATE("Cancel"), 
 							   B_TRANSLATE("Overwrite"));
+	alert->SetShortcut(0, B_ESCAPE);
 	return alert->Go() == 1;
 }
 

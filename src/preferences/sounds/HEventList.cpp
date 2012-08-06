@@ -127,6 +127,7 @@ HEventList::SelectionChanged()
 			BMediaFiles().RemoveRefFor(fType, row->Name(), ref);
 			BAlert* alert = new BAlert("alert",
 				B_TRANSLATE("No such file or directory"), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			return;
 		}

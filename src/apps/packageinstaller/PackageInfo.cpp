@@ -1044,6 +1044,7 @@ PackageInfo::Parse()
 				B_TRANSLATE("Continue"),
 				B_TRANSLATE("Abort"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		warning->SetShortcut(1, B_ESCAPE);
 		selection = warning->Go();
 
 		if (selection == 1) {

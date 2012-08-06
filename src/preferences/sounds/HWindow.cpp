@@ -212,6 +212,7 @@ HWindow::MessageReceived(BMessage* message)
 						B_TRANSLATE("This is not an audio file."),
 						B_TRANSLATE("OK"), NULL, NULL,
 						B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 					break;
 				}

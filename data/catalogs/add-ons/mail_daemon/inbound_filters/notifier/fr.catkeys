@@ -12,5 +12,5 @@ Central alert	ConfigView		Alerte générale
 Alert	ConfigView		Alerte
 none	ConfigView		aucune
 New messages	filter		Nouveaux messages
-New mails notification	ConfigView		Notification de nouveaux courriels
+New mails notification	ConfigView		Notification de nouveaux courriers
 OK	filter		OK

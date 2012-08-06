@@ -316,13 +316,15 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		goto error; // shouldn't happen
 
 	// check if target has enough space
-	if ((fSpaceRequired > 0 && targetVolume.FreeBytes() < fSpaceRequired)
-		&& ((new BAlert("", B_TRANSLATE("The destination disk may not have "
-			"enough space. Try choosing a different disk or choose to not "
-			"install optional items."), B_TRANSLATE("Try installing anyway"),
-			B_TRANSLATE("Cancel"), 0,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
-		goto error;
+	if (fSpaceRequired > 0 && targetVolume.FreeBytes() < fSpaceRequired) {
+		BAlert* alert = new BAlert("", B_TRANSLATE("The destination disk may "
+			"not have enough space. Try choosing a different disk or choose "
+			"to not install optional items."),
+			B_TRANSLATE("Try installing anyway"), B_TRANSLATE("Cancel"), 0,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
+		if (alert->Go() != 0)
+				goto error;
 	}
 
 	if (fDDRoster.GetPartitionWithID(srcItem->ID(), &device, &partition) == B_OK) {
@@ -346,14 +348,16 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	}
 
 	// check not installing on boot volume
-	if ((strncmp(BOOT_PATH, targetDirectory.Path(), strlen(BOOT_PATH)) == 0)
-		&& ((new BAlert("", B_TRANSLATE("Are you sure you want to install "
-			"onto the current boot disk? The Installer will have to reboot "
-			"your machine if you proceed."), B_TRANSLATE("OK"),
-			B_TRANSLATE("Cancel"), 0,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
-		_SetStatusMessage("Installation stopped.");
-		goto error;
+	if (strncmp(BOOT_PATH, targetDirectory.Path(), strlen(BOOT_PATH)) == 0) {
+		BAlert* alert = new BAlert("", B_TRANSLATE("Are you sure you want to "
+			"install onto the current boot disk? The Installer will have to "
+			"reboot your machine if you proceed."), B_TRANSLATE("OK"),
+			B_TRANSLATE("Cancel"), 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
+		if (alert->Go() != 0) {
+			_SetStatusMessage("Installation stopped.");
+			goto error;
+		}
 	}
 
 	// check if target volume's trash dir has anything in it
@@ -376,19 +380,22 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			entries++;
 	}
 
-	if (entries != 0
-		&& ((new BAlert("", B_TRANSLATE("The target volume is not empty. Are "
-			"you sure you want to install anyway?\n\nNote: The 'system' folder "
-			"will be a clean copy from the source volume, all other folders "
-			"will be merged, whereas files and links that exist on both the "
-			"source and target volume will be overwritten with the source "
-			"volume version."),
+	if (entries != 0) {
+		BAlert* alert = new BAlert("", B_TRANSLATE("The target volume is not "
+			"empty. Are you sure you want to install anyway?\n\nNote: The "
+			"'system' folder will be a clean copy from the source volume, all "
+			"other folders will be merged, whereas files and links that exist "
+			"on both the source and target volume will be overwritten with "
+			"the source volume version."),
 			B_TRANSLATE("Install anyway"), B_TRANSLATE("Cancel"), 0,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
+		if (alert->Go() != 0) {
 		// TODO: Would be cool to offer the option here to clean additional
 		// folders at the user's choice (like /boot/common and /boot/develop).
-		err = B_CANCELED;
-		goto error;
+			err = B_CANCELED;
+			goto error;
+		}
 	}
 
 	// Begin actual installation

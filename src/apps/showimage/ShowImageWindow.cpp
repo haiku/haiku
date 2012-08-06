@@ -1108,6 +1108,7 @@ ShowImageWindow::_LoadError(const entry_ref& ref)
 			"LoadAlerts"),
 		B_TRANSLATE_CONTEXT("OK", "Alerts"), NULL, NULL,
 		B_WIDTH_AS_USUAL, B_INFO_ALERT);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 
@@ -1216,6 +1217,8 @@ ShowImageWindow::_ClosePrompt()
 
 	BAlert* alert = new BAlert(B_TRANSLATE("Close document"), prompt.String(),
 		B_TRANSLATE("Cancel"), B_TRANSLATE("Close"));
+	alert->SetShortcut(0, B_ESCAPE);
+	
 	if (alert->Go() == 0) {
 		// Cancel
 		return false;

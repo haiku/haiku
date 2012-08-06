@@ -10,4 +10,4 @@ Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Format Bitmap Be (Trad
 Low	JPEG2000Translator		Basse
 About	JPEG2000Translator		À propos
 High	JPEG2000Translator		Haute
-Read greyscale images as RGB32	JPEG2000Translator		Lire les images en nuances de gris en RVB24
+Read greyscale images as RGB32	JPEG2000Translator		Lire les images en nuances de gris en RVB32

@@ -1,0 +1,20 @@
+1	french	x-vnd.Haiku-FontDemo	3756411221
+Outline:	ControlView		Contour :
+Size: 50	ControlView		Taille : 50
+Stop cycling	ControlView		Arrêter de boucler
+Shear: 90	ControlView		Inclinaison : 90
+Spacing: 0	ControlView		Espacement : 0
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Rotation : %d
+Shear: %d	ControlView		Inclinaison : %d
+Spacing: %d	ControlView		Espacement : %d
+Cycle fonts	ControlView		Polices en boucle
+Font:	ControlView		Police :
+Rotation: 0	ControlView		Rotation : 0
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		Contrôles
+Outline: %d	ControlView		Contour : %d
+Text:	ControlView		Texte :
+Antialiased text	ControlView		Anticrénelage
+Bounding boxes	ControlView		Boîtes englobantes
+Size: %d	ControlView		Taille : %d

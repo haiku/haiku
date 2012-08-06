@@ -1,9 +1,11 @@
-1	french	x-vnd.Haiku-libtextencoding	3916923811
+1	french	x-vnd.Haiku-libtextencoding	3062073902
 ISO Greek	textencodings		ISO Grecque
 ISO South European	textencodings		ISO Europe du Sud
+Chinese Big5	textencodings		Chinois Big5
 ISO Hebrew	textencodings		ISO Hébreu
 ISO Arabic	textencodings		ISO Arabe
 ISO Latin 9	textencodings		ISO Latin 9
+Japanese Shift JIS	textencodings		Japonais Shift-JIS
 DOS Cyrillic	textencodings		DOS Cyrillique
 Windows Cyrillic (CP 1251)	textencodings		Windows Cyrillique (CP 1251)
 Japanese EUC	textencodings		Japonais EUC
@@ -11,9 +13,15 @@ Unicode	textencodings		Unicode
 Chinese GB18030	textencodings		Chinois GB18030
 ISO North European	textencodings		ISO Europe du nord
 ISO Celtic	textencodings		ISO Celtique
+Unicode (UCS-2)	textencodings		Unicode (UCS-2)
 Windows Latin-1 (CP 1252)	textencodings		Windows Latin-1 (CP 1252)
+Macintosh Roman	textencodings		Roman Macintosh
 ISO Turkish	textencodings		ISO Turque
+Japanese JIS	textencodings		Japonais JIS
+KOI8-R Cyrillic	textencodings		KOI8-R Cyrillique
+ISO Baltic	textencodings		ISO Balte
 ISO Nordic	textencodings		ISO Nordique
+EUC Korean	textencodings		Coréen EUC
 ISO West European	textencodings		ISO Europe occidentale
 ISO East European	textencodings		ISO Europe de l'est
 DOS Latin-US	textencodings		DOS Latin-US

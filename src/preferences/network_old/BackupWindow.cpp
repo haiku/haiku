@@ -63,6 +63,7 @@ BackupWin::MessageReceived(BMessage *message)
 			}
 			else {
 				BAlert *alert = new BAlert("Backup Info Alert","You must specify a name.","OK");
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 			}	
 			break;

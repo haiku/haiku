@@ -365,6 +365,7 @@ SavePanel::_ExportSettings()
 //	status_t err = roster->MakeConfigurationView(item->id, NULL, &view, &rect);
 //	if (err < B_OK || view == NULL) {
 //		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
+//		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 //		alert->Go();
 //	} else {
 //		if (fConfigWindow != NULL) {

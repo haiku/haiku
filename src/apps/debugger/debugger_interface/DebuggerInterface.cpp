@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -266,7 +266,7 @@ DebuggerInterface::Init()
 
 	// create debugger port
 	char buffer[128];
-	snprintf(buffer, sizeof(buffer), "team %ld debugger", fTeamID);
+	snprintf(buffer, sizeof(buffer), "team %" B_PRId32 " debugger", fTeamID);
 	fDebuggerPort = create_port(100, buffer);
 	if (fDebuggerPort < 0)
 		return fDebuggerPort;
@@ -719,8 +719,8 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 			break;
 		}
 		default:
-			printf("DebuggerInterface for team %ld: unknown message from "
-				"kernel: %ld\n", fTeamID, messageCode);
+			printf("DebuggerInterface for team %" B_PRId32 ": unknown message "
+				"from kernel: %" B_PRId32 "\n", fTeamID, messageCode);
 			// fall through...
 		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:

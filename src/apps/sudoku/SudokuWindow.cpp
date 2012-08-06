@@ -411,9 +411,11 @@ SudokuWindow::_MessageDropped(BMessage* message)
 				strerror(status));
 		}
 
-		(new BAlert(B_TRANSLATE("Sudoku request"),
+		BAlert* alert = new BAlert(B_TRANSLATE("Sudoku request"),
 			buffer, B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 }
 
@@ -554,11 +556,15 @@ SudokuWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgSudokuSolved:
-			(new BAlert(B_TRANSLATE("Sudoku request"),
+		{
+			BAlert* alert = new BAlert(B_TRANSLATE("Sudoku request"),
 				B_TRANSLATE("Sudoku solved - congratulations!\n"),
 				B_TRANSLATE("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_IDEA_ALERT))->Go();
+				B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			break;
+		}
 
 		case B_OBSERVER_NOTICE_CHANGE:
 		{

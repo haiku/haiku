@@ -357,7 +357,7 @@ TrackerCopyLoopControl::FileError(const char* message, const char* name,
 
 	BAlert* alert = new BAlert("", buffer.String(),	B_TRANSLATE("Cancel"), 0, 0,
 		B_WIDTH_AS_USUAL, B_STOP_ALERT);
-	alert->SetShortcut(0, B_ESCAPE);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 	return false;
 }
@@ -736,7 +736,7 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 		BAlert* alert = new BAlert("",
 			B_TRANSLATE("You can't move or copy items to read-only volumes."),
 			B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return B_ERROR;
 	}
@@ -762,7 +762,7 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 			BAlert* alert = new BAlert("", errorStr.String(),
 				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT);
-			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			return B_ERROR;
 		}
@@ -820,7 +820,7 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 							B_TRANSLATE_NOCOLLECT(kNoFreeSpace),
 							B_TRANSLATE("Cancel"),
 							0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-						alert->SetShortcut(0, B_ESCAPE);
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						alert->Go();
 						return B_ERROR;
 					}
@@ -993,7 +993,7 @@ MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList,
 				BAlert* alert = new BAlert("", error.String(),
 					B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
 					B_WARNING_ALERT);
-				alert->SetShortcut(0, B_ESCAPE);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 				break;
 			}
@@ -1012,7 +1012,7 @@ MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList,
 					BAlert* alert = new BAlert("", error.String(),
 						B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
 						B_WARNING_ALERT);
-					alert->SetShortcut(0, B_ESCAPE);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 					break;
 				}
@@ -1742,8 +1742,10 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 	} catch (MoveError error) {
 		BString errorString(B_TRANSLATE("Error moving \"%name\""));
 		errorString.ReplaceFirst("%name", ref.name);
-		(new BAlert("", errorString.String(), B_TRANSLATE("OK"), 0, 0,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert* alert = new BAlert("", errorString.String(), B_TRANSLATE("OK"),
+			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return error.fError;
 	} catch (FailWithAlert error) {
 		BString buffer(error.fString);
@@ -1751,8 +1753,10 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 			buffer.ReplaceFirst("%name", error.fName);
 		else
 			buffer <<  error.fString;
-		(new BAlert("", buffer.String(), B_TRANSLATE("OK"),	0, 0,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert* alert = new BAlert("", buffer.String(), B_TRANSLATE("OK"),
+			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 
 		return error.fError;
 	}
@@ -1890,7 +1894,7 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 				BAlert* alert = new BAlert("", buffer.String(),
 					B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
 					B_WARNING_ALERT);
-				alert->SetShortcut(0, B_ESCAPE);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 			} else {
 				BMessage message(kUnmountVolume);
@@ -1910,11 +1914,13 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 		trash_dir.GetEntry(&trashEntry);
 
 		if (dir == trash_dir || dir.Contains(&trashEntry)) {
-			(new BAlert("",
+			BAlert* alert = new BAlert("",
 				B_TRANSLATE("You cannot put the Trash, home or Desktop "
 					"directory into the trash."),
 				B_TRANSLATE("OK"),
-				0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+				0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 
 			// return no error so we don't get two dialogs
 			return B_OK;
@@ -2062,20 +2068,24 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 			&& moveMode != kCreateRelativeLink
 			&& (srcDirectory == *destDir
 				|| srcDirectory.Contains(&destEntry))) {
-			(new BAlert("",
+			BAlert* alert = new BAlert("",
 				B_TRANSLATE("You can't move a folder into itself "
 				"or any of its own sub-folders."), B_TRANSLATE("OK"),
-				0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+				0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return B_ERROR;
 		}
 	}
 
 	if (FSIsTrashDir(sourceEntry) && moveMode != kCreateLink
 		&& moveMode != kCreateRelativeLink) {
-		(new BAlert("",
+		BAlert* alert = new BAlert("",
 			B_TRANSLATE("You can't move or copy the trash."),
 			B_TRANSLATE("OK"), 0, 0, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT))->Go();
+			B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return B_ERROR;
 	}
 
@@ -2098,11 +2108,12 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 	if (destIsDir) {
 		BDirectory test_dir(&entry);
 		if (test_dir.Contains(sourceEntry)) {
-			(new BAlert("",
+			BAlert* alert = new BAlert("",
 				B_TRANSLATE("You can't replace a folder "
 				"with one of its sub-folders."),
-				B_TRANSLATE("OK"),
-				0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+				B_TRANSLATE("OK"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return B_ERROR;
 		}
 	}
@@ -2112,12 +2123,14 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 	if (moveMode != kCreateLink
 		&& moveMode != kCreateRelativeLink
 		&& destIsDir != sourceIsDirectory) {
-			(new BAlert("", sourceIsDirectory
+			BAlert* alert = new BAlert("", sourceIsDirectory
 				? B_TRANSLATE("You cannot replace a file with a folder or a "
 				"symbolic link.")
 				: B_TRANSLATE("You cannot replace a folder or a symbolic link "
 				"with a file."), B_TRANSLATE("OK"),	0, 0, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT))->Go();
+				B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return B_ERROR;
 		}
 
@@ -2196,7 +2209,7 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 		error.ReplaceFirst("%name", name);;
 		BAlert* alert = new BAlert("", error.String(),
 			B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 
@@ -2815,9 +2828,10 @@ empty_trash(void*)
 	}
 
 	if (err != B_OK && err != kTrashCanceled && err != kUserCanceled) {
-		(new BAlert("", B_TRANSLATE("Error emptying Trash"),
-			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT))->Go();
+		BAlert* alert = new BAlert("", B_TRANSLATE("Error emptying Trash"),
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 	}
 
 	return B_OK;
@@ -2887,10 +2901,12 @@ _DeleteTask(BObjectList<entry_ref>* list, bool confirm)
 				err = entry.Remove();
 		}
 
-		if (err != kTrashCanceled && err != kUserCanceled && err != B_OK)
-			(new BAlert("",	B_TRANSLATE("Error deleting items"),
-				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT))->Go();
+		if (err != kTrashCanceled && err != kUserCanceled && err != B_OK) {
+			BAlert* alert = new BAlert("", B_TRANSLATE("Error deleting items"),
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+		}
 	}
 
 	delete list;
@@ -3081,7 +3097,7 @@ FSCreateNewFolderIn(const node_ref* dirNode, entry_ref* newRef,
 	BAlert* alert = new BAlert("",
 		B_TRANSLATE("Sorry, could not create a new folder."),
 		B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-	alert->SetShortcut(0, B_ESCAPE);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 	return result;
 }
@@ -3254,7 +3270,7 @@ _TrackerLaunchAppWithDocuments(const entry_ref* appRef, const BMessage* refs,
 			BAlert* alert = new BAlert("", alertString.String(),
 				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT);
-			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}
@@ -3557,7 +3573,7 @@ _TrackerLaunchDocuments(const entry_ref* /*doNotUse*/, const BMessage* refs,
 			BAlert* alert = new BAlert("", alertString.String(),
 				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT);
-			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}

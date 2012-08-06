@@ -174,7 +174,7 @@ _BTextInput_::AlignTextRect()
 	float vInset = max_c(1, floorf((textRect.Height() - LineHeight(0)) / 2.0));
 	float hInset = 2;
 
-	if (be_control_look)
+	if (be_control_look != NULL)
 		hInset = be_control_look->DefaultLabelSpacing();
 
 	textRect.InsetBy(hInset, vInset);

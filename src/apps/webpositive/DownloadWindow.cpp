@@ -286,6 +286,7 @@ DownloadWindow::MessageReceived(BMessage* message)
 				errorString.ReplaceFirst("%error", strerror(status));
 				BAlert* alert = new BAlert(B_TRANSLATE("Error opening downloads "
 					"folder"), errorString.String(), B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
 			}
 			break;

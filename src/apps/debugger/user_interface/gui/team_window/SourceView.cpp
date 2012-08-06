@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2009, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -384,7 +384,7 @@ SourceView::BaseView::GetLineRange(BRect rect, int32& minLine,
 	int32 lineHeight = (int32)fFontInfo->lineHeight;
 	minLine = (int32)rect.top / lineHeight;
 	maxLine = ((int32)ceilf(rect.bottom) + lineHeight - 1) / lineHeight;
-	minLine = std::max(minLine, 0L);
+	minLine = std::max(minLine, (int32)0);
 	maxLine = std::min(maxLine, fSourceCode->CountLines() - 1);
 }
 
@@ -1772,7 +1772,7 @@ SourceView::UserBreakpointChanged(UserBreakpoint* breakpoint)
 bool
 SourceView::ScrollToAddress(target_addr_t address)
 {
-	TRACE_GUI("SourceView::ScrollToAddress(%#llx)\n", address);
+	TRACE_GUI("SourceView::ScrollToAddress(%#" B_PRIx64 ")\n", address);
 
 	if (fSourceCode == NULL)
 		return false;
@@ -1794,7 +1794,7 @@ SourceView::ScrollToAddress(target_addr_t address)
 bool
 SourceView::ScrollToLine(uint32 line)
 {
-	TRACE_GUI("SourceView::ScrollToLine(%lu)\n", line);
+	TRACE_GUI("SourceView::ScrollToLine(%" B_PRIu32 ")\n", line);
 
 	if (fSourceCode == NULL || line >= (uint32)fSourceCode->CountLines())
 		return false;
@@ -1804,7 +1804,7 @@ SourceView::ScrollToLine(uint32 line)
 
 	BRect visible = Bounds();
 
-	TRACE_GUI("SourceView::ScrollToLine(%ld)\n", line);
+	TRACE_GUI("SourceView::ScrollToLine(%" B_PRId32 ")\n", line);
 	TRACE_GUI("  visible: (%f, %f) - (%f, %f), line: %f - %f\n", visible.left,
 		visible.top, visible.right, visible.bottom, top, bottom);
 

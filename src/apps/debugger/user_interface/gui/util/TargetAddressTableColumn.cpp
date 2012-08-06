@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,7 +23,7 @@ BField*
 TargetAddressTableColumn::PrepareField(const BVariant& value) const
 {
 	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%#llx", value.ToUInt64());
+	snprintf(buffer, sizeof(buffer), "%#" B_PRIx64, value.ToUInt64());
 
 	return StringTableColumn::PrepareField(
 		BVariant(buffer, B_VARIANT_DONT_COPY_DATA));

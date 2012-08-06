@@ -298,6 +298,7 @@ NetworkStatusView::MessageReceived(BMessage* message)
 					BAlert* alert = new BAlert(name, text.String(),
 						B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 						B_STOP_ALERT);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go(NULL);
 				}
 			}
@@ -401,6 +402,7 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 	}
 
 	BAlert* alert = new BAlert(name, text.String(), B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	BTextView* view = alert->TextView();
 	BFont font;
 
@@ -509,6 +511,7 @@ NetworkStatusView::_AboutRequested()
 	about.ReplaceFirst("%2", "Copyright 2007-2010");
 		// Append a new year here
 	BAlert* alert = new BAlert("about", about, B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -602,6 +605,7 @@ NetworkStatusView::_OpenNetworksPreferences()
 		errorMessage << strerror(status);
 		BAlert* alert = new BAlert("launch error", errorMessage.String(),
 			B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 
 		// asynchronous alert in order to not block replicant host application
 		alert->Go(NULL);

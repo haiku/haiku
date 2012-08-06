@@ -1177,9 +1177,11 @@ TMailWindow::MessageReceived(BMessage *msg)
 						msg.AddRef("refs", fRef);
 						tracker.SendMessage(&msg);
 					} else {
-						(new BAlert("",
+						BAlert* alert = new BAlert("",
 							B_TRANSLATE("Need Tracker to move items to trash"),
-							B_TRANSLATE("Sorry")))->Go();
+							B_TRANSLATE("Sorry"));
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+						alert->Go();
 					}
 				}
 			} else {
@@ -1344,14 +1346,14 @@ TMailWindow::MessageReceived(BMessage *msg)
 					1, &arg);
 
 				if (result != B_NO_ERROR) {
-					(new BAlert("",	B_TRANSLATE(
+					BAlert* alert = new BAlert("", B_TRANSLATE(
 						"Sorry, could not find an application that "
 						"supports the 'Person' data type."),
-						B_TRANSLATE("OK")))->Go();
+						B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go();
 				}
-
 			}
-
 			free(arg);
 			break;
 		}
@@ -1581,10 +1583,12 @@ TMailWindow::MessageReceived(BMessage *msg)
 				snooze (1500000);
 			if (!gDictCount) {
 				beep();
-				(new BAlert("",
+				BAlert* alert = new BAlert("",
 					B_TRANSLATE("Mail couldn't find its dictionary."),
 					B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-					B_OFFSET_SPACING, B_STOP_ALERT))->Go();
+					B_OFFSET_SPACING, B_STOP_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			} else {
 				fSpelling->SetMarked(!fSpelling->IsMarked());
 				fContentView->fTextView->EnableSpellCheck(
@@ -1626,6 +1630,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 					B_TRANSLATE("Put your favorite e-mail queries and query "
 					"templates in this folder."), B_TRANSLATE("OK"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
 			}
 
@@ -2225,8 +2230,10 @@ TMailWindow::Send(bool now)
 		status_t status = SaveAsDraft();
 		if (status != B_OK) {
 			beep();
-			(new BAlert("", B_TRANSLATE("E-mail draft could not be saved!"),
-				B_TRANSLATE("OK")))->Go();
+			BAlert* alert = new BAlert("", B_TRANSLATE("E-mail draft could "
+				"not be saved!"), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 		}
 		return status;
 	}
@@ -2315,11 +2322,14 @@ TMailWindow::Send(bool now)
 						"the unencodable ones), or choose Cancel to go back "
 						"and try fixing it up.");
 					messageString.ReplaceFirst("%ld", countString);
-					userAnswer = (new BAlert("Question", messageString.String(),
+					BAlert* alert = new BAlert("Question", messageString.String(),
 						B_TRANSLATE("Send"),
 						B_TRANSLATE("Cancel"),
 						NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-						B_WARNING_ALERT))->Go();
+						B_WARNING_ALERT);
+					alert->SetShortcut(1, B_ESCAPE);
+					userAnswer = alert->Go();
+					
 					if (userAnswer == 1) {
 						// Cancel was picked.
 						return -1;
@@ -2450,11 +2460,13 @@ TMailWindow::Send(bool now)
 			close = true;
 			fSent = true;
 
-			int32 start = (new BAlert("no daemon",
+			BAlert* alert = new BAlert("no daemon",
 				B_TRANSLATE("The mail_daemon is not running. The message is "
 				"queued and will be sent when the mail_daemon is started."),
-				B_TRANSLATE("Start now"), B_TRANSLATE("OK")))->Go();
-
+				B_TRANSLATE("Start now"), B_TRANSLATE("OK"));
+			alert->SetShortcut(1, B_ESCAPE);
+			int32 start = alert->Go();
+			
 			if (start == 0) {
 				result = be_roster->Launch("application/x-vnd.Be-POST");
 				if (result == B_OK) {
@@ -2489,7 +2501,9 @@ TMailWindow::Send(bool now)
 
 	if (result != B_NO_ERROR && result != B_MAIL_NO_DAEMON) {
 		beep();
-		(new BAlert("", errorMessage.String(), B_TRANSLATE("OK")))->Go();
+		BAlert* alert = new BAlert("", errorMessage.String(), B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 	}
 	if (close) {
 		PostMessage(B_QUIT_REQUESTED);
@@ -2721,8 +2735,10 @@ ErrorExit:
 	sprintf(errorString, "Unable to train the message file \"%s\" as %s.  "
 		"Possibly useful error code: %s (%ld).",
 		filePath.Path(), CommandWord, strerror (errorCode), errorCode);
-	(new BAlert("", errorString,
-		B_TRANSLATE("OK")))->Go();
+	BAlert* alert = new BAlert("", errorString,	B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
+
 	return errorCode;
 }
 

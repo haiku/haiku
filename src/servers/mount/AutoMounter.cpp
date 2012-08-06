@@ -569,8 +569,10 @@ AutoMounter::_MountVolume(const BMessage* message)
 		char text[512];
 		snprintf(text, sizeof(text),
 			B_TRANSLATE("Error mounting volume:\n\n%s"), strerror(status));
-		(new BAlert(B_TRANSLATE("Mount error"), text,
-			B_TRANSLATE("OK")))->Go(NULL);
+		BAlert* alert = new BAlert(B_TRANSLATE("Mount error"), text,
+			B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go(NULL);
 	}
 }
 
@@ -603,8 +605,10 @@ AutoMounter::_ReportUnmountError(const char* name, status_t error)
 	snprintf(text, sizeof(text), B_TRANSLATE("Could not unmount disk "
 		"\"%s\":\n\t%s"), name, strerror(error));
 
-	(new BAlert(B_TRANSLATE("Unmount error"), text, B_TRANSLATE("OK"),
-		NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
+	BAlert* alert = new BAlert(B_TRANSLATE("Unmount error"), text,
+		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go(NULL);
 }
 
 

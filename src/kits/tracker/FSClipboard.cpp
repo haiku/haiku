@@ -479,7 +479,7 @@ FSClipboardPaste(Model* model, uint32 linksMode)
 			B_TRANSLATE("You must drop items on one of the disk icons "
 			"in the \"Disks\" window."), B_TRANSLATE("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		okToMove = false;
 	}
@@ -493,7 +493,7 @@ FSClipboardPaste(Model* model, uint32 linksMode)
 			B_TRANSLATE("Sorry, you can't copy items to the Trash."),
 			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		okToMove = false;
 	}

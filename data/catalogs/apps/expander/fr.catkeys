@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Expander	386826896
+1	french	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Décompresser
 Close window when done expanding	ExpanderPreferences		Fermer la fenêtre après l'extraction
 Set destination…	ExpanderMenu		Choisir la destination…
@@ -6,6 +6,7 @@ Use:	ExpanderPreferences		Utiliser :
 File expanded	ExpanderWindow		Fichier décompressé
 The destination is read only.	ExpanderWindow		La destination est en lecture seule.
 Expander: Open	ExpanderWindow		Expander : Ouvrir
+ is not supported	ExpanderWindow		 n'est pas supporté
 Expander settings	ExpanderPreferences		Réglages du Décompresseur
 Select current	DirectoryFilePanel		Sélectionner le répertoire courant
 Source	ExpanderWindow		Source
@@ -15,8 +16,11 @@ Cancel	ExpanderWindow		Annuler
 Automatically expand files	ExpanderPreferences		Décompresser les fichiers automatiquement
 Creating listing for '%s'	ExpanderWindow		Créer un inventaire pour « %s »
 Continue	ExpanderWindow		Continuer
+Destination folder	ExpanderPreferences		Dossier de destination
 The destination folder does not exist.	ExpanderWindow		Le dossier de destination n'existe pas.
+Other	ExpanderPreferences		Autre
 Cancel	ExpanderPreferences		Annuler
+Expansion	ExpanderPreferences		Décompression
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Êtes vous sur de vouloir stopper la décompression cette\narchive? Les fichiers extraits seront peut être incomplets.
 Select	DirectoryFilePanel		Sélectionner
 Same directory as source (archive) file	ExpanderPreferences		Même répertoire que le fichier source archivé
@@ -39,7 +43,7 @@ Close	ExpanderMenu		Fermer
 The destination is not a folder.	ExpanderWindow		La destination n'est pas un dossier.
 Open destination folder after extraction	ExpanderPreferences		Ouvrir le dossier de destination après l'extraction
 Set source…	ExpanderMenu		Choisir la source…
-Select '%s'	DirectoryFilePanel		Selectionner '%s'
+Select '%s'	DirectoryFilePanel		Sélectionner '%s'
 Show contents	ExpanderMenu		Montrer le contenu
 Stop	ExpanderWindow		Arrêt
 Destination	ExpanderWindow		Destination

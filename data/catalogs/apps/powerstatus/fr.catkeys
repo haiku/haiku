@@ -1,36 +1,41 @@
-1	french	x-vnd.Haiku-PowerStatus	751886234
+1	french	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible : 
 Show percent	PowerStatus		Afficher les pourcentages
 Design capacity: 	PowerStatus		Capacité nominale : 
+ mW	PowerStatus		 mW
 Type: 	PowerStatus		Type : 
 non-rechargeable	PowerStatus		non-rechargeable
 Empty battery slot	PowerStatus		Emplacement libre de batterie
+ mV	PowerStatus		 mV
 Run in window	PowerStatus		Exécuter en fenêtre
 About	PowerStatus		À propos
 PowerStatus	System name		État d'énergie
 PowerStatus	PowerStatus		État d'énergie
+ mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Informations batteries…
 Damaged battery	PowerStatus		Batterie endommagée
 Show time	PowerStatus		Monter le temps
 Last full charge: 	PowerStatus		Dernière charge complète : 
 Battery unused	PowerStatus		Batterie inutilisée
 Extended battery info	PowerStatus		Informations additionnelles
+ mA	PowerStatus		 mA
 Current rate: 	PowerStatus		Consommation actuelle : 
 discharging	PowerStatus		sur batteries
 Show text label	PowerStatus		Afficher l'étiquette texte
 About…	PowerStatus		À propos…
 Model number: 	PowerStatus		Numéro de modèle : 
 Install in Deskbar	PowerStatus		Installer dans la Deskbar
-Capacity: 	PowerStatus		Capacité :
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Capacité : 
 Battery discharging	PowerStatus		Consommation des batteries
-Serial number: 	PowerStatus		Numéro de série :
-Capacity granularity 1: 	PowerStatus		Granularité de charge 1 :
+Serial number: 	PowerStatus		Numéro de série : 
+Capacity granularity 1: 	PowerStatus		Granularité de charge 1 : 
 OK	PowerStatus		OK
 OEM info: 	PowerStatus		Informations fabricant : 
-Design voltage: 	PowerStatus		Voltage nominal :
+Design voltage: 	PowerStatus		Voltage nominal : 
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		État d'énergie\nÉcrit par Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Batterie en charge
-Design capacity warning: 	PowerStatus		Avertissement de capacité nominale :
+Design capacity warning: 	PowerStatus		Avertissement de capacité nominale : 
 Battery info	PowerStatus		Informations batteries
 Quit	PowerStatus		Quitter
 rechargeable	PowerStatus		rechargeable
@@ -38,6 +43,6 @@ charging	PowerStatus		en charge
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vous pouvez exécuter « État d'énergie » dans une fenêtre ou l'installer dans la Deskbar.
 Power status box	PowerStatus		Zone d'énergie
 Show status icon	PowerStatus		Afficher l'icône d'état
-Capacity granularity 2: 	PowerStatus		Granularité de charge 2 :
-Technology: 	PowerStatus		Technologie :
+Capacity granularity 2: 	PowerStatus		Granularité de charge 2 : 
+Technology: 	PowerStatus		Technologie : 
 no battery	PowerStatus		pas de batterie

@@ -136,6 +136,7 @@ GeneralView::MessageReceived(BMessage* msg)
 						" found, this means your InfoPopper installation was"
 						" not successfully completed."), B_TRANSLATE("OK"),
 						NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					(void)alert->Go();
 					return;
 				}
@@ -153,6 +154,7 @@ GeneralView::MessageReceived(BMessage* msg)
 							"cannot be stopped, because the server can't be"
 							" reached."), B_TRANSLATE("OK"), NULL, NULL,
 							B_WIDTH_AS_USUAL, B_STOP_ALERT);
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						(void)alert->Go();
 						return;
 					}
@@ -164,6 +166,7 @@ GeneralView::MessageReceived(BMessage* msg)
 							" notifications because the server can't be "
 							"reached."), B_TRANSLATE("OK"),
 							NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						(void)alert->Go();
 						return;
 					}
@@ -181,6 +184,7 @@ GeneralView::MessageReceived(BMessage* msg)
 							" was not successfully completed."),
 							B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 							B_STOP_ALERT);
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						(void)alert->Go();
 						return;
 					}
@@ -215,6 +219,7 @@ GeneralView::Load()
 				"It's possible you don't have write access to the "
 				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		(void)alert->Go();
 	}
 
@@ -270,6 +275,7 @@ GeneralView::Save()
 			B_TRANSLATE("An error occurred saving the preferences.\n"
 				"It's possible you are running out of disk space."),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		(void)alert->Go();
 		return ret;
 	}
@@ -296,6 +302,7 @@ GeneralView::Save()
 			"write access to the boot settings directory."), B_TRANSLATE("OK"),
 			NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		(void)alert->Go();
 		return ret;
 	}
@@ -316,6 +323,7 @@ GeneralView::Save()
 				"you probably don't have write permission to the boot settings"
 				" directory."), B_TRANSLATE("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			(void)alert->Go();
 			return ret;
 		}

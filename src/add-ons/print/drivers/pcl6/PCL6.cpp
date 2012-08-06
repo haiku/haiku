@@ -176,6 +176,7 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 	}
 	catch (TransportException& err) {
 		BAlert* alert = new BAlert("", err.What(), "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return false;
 	} 

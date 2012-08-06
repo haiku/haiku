@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -117,7 +117,7 @@ ThreadHandler::HandleBreakpointHit(BreakpointHitEvent* event)
 	CpuState* cpuState = event->GetCpuState();
 	target_addr_t instructionPointer = cpuState->InstructionPointer();
 
-	TRACE_EVENTS("ThreadHandler::HandleBreakpointHit(): ip: %llx\n",
+	TRACE_EVENTS("ThreadHandler::HandleBreakpointHit(): ip: %" B_PRIx64 "\n",
 		instructionPointer);
 
 	// check whether this is a temporary breakpoint we're waiting for
@@ -265,7 +265,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	StackFrame* frame = stackTrace->FrameAt(0);
 
-	TRACE_CONTROL("  ip: %#llx\n", frame->InstructionPointer());
+	TRACE_CONTROL("  ip: %#" B_PRIx64 "\n", frame->InstructionPointer());
 
 	// When the thread is in a syscall, do the same for all step kinds: Stop it
 	// when it returns by means of a breakpoint.
@@ -315,7 +315,7 @@ ThreadHandler::HandleThreadAction(uint32 action)
 		return;
 	}
 
-	TRACE_CONTROL("  statement: %#llx - %#llx\n",
+	TRACE_CONTROL("  statement: %#" B_PRIx64 " - %#" B_PRIx64 "\n",
 		fStepStatement->CoveringAddressRange().Start(),
 		fStepStatement->CoveringAddressRange().End());
 
@@ -481,7 +481,7 @@ ThreadHandler::_DoStepOver(CpuState* cpuState)
 	}
 
 	TRACE_CONTROL("  subroutine call -- installing breakpoint at address "
-		"%#llx\n", info.Address() + info.Size());
+		"%#" B_PRIx64 "\n", info.Address() + info.Size());
 
 	if (_InstallTemporaryBreakpoint(info.Address() + info.Size()) != B_OK)
 		return false;
@@ -633,7 +633,7 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 bool
 ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 {
-	TRACE_CONTROL("ThreadHandler::_HandleSingleStepStep(): ip: %llx\n",
+	TRACE_CONTROL("ThreadHandler::_HandleSingleStepStep(): ip: %" B_PRIx64 "\n",
 		cpuState->InstructionPointer());
 
 	switch (fStepMode) {

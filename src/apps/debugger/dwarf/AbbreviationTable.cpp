@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -116,8 +116,10 @@ AbbreviationTable::_ParseAbbreviationEntry(DataReader& abbrevReader,
 			return B_NO_MEMORY;
 
 		fEntryTable.Insert(entry);
-	} else
-		fprintf(stderr, "Duplicate abbreviation table entry %lu!\n", code);
+	} else {
+		fprintf(stderr, "Duplicate abbreviation table entry %" B_PRIu32 "!\n",
+			code);
+	}
 
 	_nullEntry = false;
 	return B_OK;

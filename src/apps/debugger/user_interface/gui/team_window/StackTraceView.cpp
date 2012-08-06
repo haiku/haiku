@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -95,7 +95,7 @@ public:
 				}
 
 				char offset[32];
-				snprintf(offset, sizeof(offset), " + %#llx",
+				snprintf(offset, sizeof(offset), " + %#" B_PRIx64,
 					frame->InstructionPointer() - baseAddress);
 
 				name << offset;

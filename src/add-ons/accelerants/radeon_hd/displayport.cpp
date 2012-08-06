@@ -321,15 +321,81 @@ dp_aux_set_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool end)
 
 
 uint32
-dp_get_link_clock(uint32 connectorIndex)
+dp_get_lane_count(uint32 connectorIndex, display_mode* mode)
+{
+	// Radeon specific
+	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
+
+	size_t pixelChunk;
+	size_t pixelsPerChunk;
+	status_t result = get_pixel_size_for((color_space)mode->space, &pixelChunk,
+		NULL, &pixelsPerChunk);
+
+	if (result != B_OK) {
+		TRACE("%s: Invalid color space!\n", __func__);
+		return 0;
+	}
+
+	uint32 bitsPerPixel = (pixelChunk / pixelsPerChunk) * 8;
+
+	uint32 dpMaxLinkRate = dp_get_link_rate_max(dpInfo);
+	uint32 dpMaxLaneCount = dp_get_lane_count_max(dpInfo);
+
+	uint32 lane;
+	for (lane = 1; lane < dpMaxLaneCount; lane <<= 1) {
+		uint32 maxPixelClock = dp_get_pixel_clock_max(dpMaxLinkRate, lane,
+			bitsPerPixel);
+		if (mode->timing.pixel_clock <= maxPixelClock)
+			break;
+	}
+
+	TRACE("%s: Lanes: %" B_PRIu32 "\n", __func__, lane);
+	return lane;
+}
+
+
+uint32
+dp_get_link_rate(uint32 connectorIndex, display_mode* mode)
 {
 	uint16 encoderID = gConnector[connectorIndex]->encoderExternal.objectID;
 
 	if (encoderID == ENCODER_OBJECT_ID_NUTMEG)
 		return 270000;
 
-	// TODO: calculate DisplayPort max pixel clock based on bpp and DP channels
-	return 162000;
+	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
+	uint32 laneCount = dp_get_lane_count(connectorIndex, mode);
+
+	size_t pixelChunk;
+	size_t pixelsPerChunk;
+	status_t result = get_pixel_size_for((color_space)mode->space, &pixelChunk,
+		NULL, &pixelsPerChunk);
+
+	if (result != B_OK) {
+		TRACE("%s: Invalid color space!\n", __func__);
+		return 0;
+	}
+
+	uint32 bitsPerPixel = (pixelChunk / pixelsPerChunk) * 8;
+
+	uint32 maxPixelClock
+		= dp_get_pixel_clock_max(162000, laneCount, bitsPerPixel);
+	if (mode->timing.pixel_clock <= maxPixelClock)
+		return 162000;
+
+	maxPixelClock = dp_get_pixel_clock_max(270000, laneCount, bitsPerPixel);
+	if (mode->timing.pixel_clock <= maxPixelClock)
+		return 270000;
+
+	// TODO: DisplayPort 1.2
+	#if 0
+	if (is_dp12_capable(connectorIndex)) {
+		maxPixelClock = dp_get_pixel_clock_max(540000, laneCount, bitsPerPixel);
+		if (mode->timing.pixel_clock <= maxPixelClock)
+			return 540000;
+	}
+	#endif
+
+	return dp_get_link_rate_max(dpInfo);
 }
 
 
@@ -364,8 +430,6 @@ dp_setup_connectors()
 			dpInfo->valid = true;
 			memcpy(dpInfo->config, auxMessage, 8);
 		}
-
-		dpInfo->linkRate = dp_get_link_clock(index);
 	}
 }
 
@@ -463,7 +527,7 @@ dp_get_adjust_request_pre_emphasis(dp_info* dp, int lane)
 {
 	int i = DP_ADJ_REQUEST_0_1 + (lane >> 1);
 	int s = (((lane & 1) != 0) ? DP_ADJ_PRE_EMPHASIS_LANEB_SHIFT
-		: DP_ADJ_PRE_EMPHASIS_LANEB_SHIFT);
+		: DP_ADJ_PRE_EMPHASIS_LANEA_SHIFT);
 	uint8 l = dp->linkStatus[i - DP_LANE_STATUS_0_1];
 
 	return ((l >> s) & 0x3) << DP_TRAIN_PRE_EMPHASIS_SHIFT;
@@ -686,11 +750,10 @@ dp_link_train_ce(uint32 connectorIndex)
 
 
 status_t
-dp_link_train(uint8 crtcID, display_mode* mode)
+dp_link_train(uint32 connectorIndex, display_mode* mode)
 {
 	TRACE("%s\n", __func__);
 
-	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 
 	if (dp->valid != true) {
@@ -776,7 +839,6 @@ dp_link_train(uint8 crtcID, display_mode* mode)
 
 	dp_link_train_cr(connectorIndex);
 	dp_link_train_ce(connectorIndex);
-
 
 	// *** DisplayPort link training finish
 	snooze(400);

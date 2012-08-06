@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	1209826930
+1	romanian	x-vnd.Haiku-DriveSetup	2908539543
 DriveSetup	System name		ConfigurareDiscuri
 Delete	MainWindow		Șterge
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția selectată vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
@@ -16,22 +16,18 @@ Partition name:	CreateParamsPanel		Nume partiție:
 Initialize	InitParamsPanel		Inițializează
 Could not mount partition %s.	MainWindow		Nu s-a putut monta partiția %s.
 The partition %s is already unmounted.	MainWindow		Partiția %s este deja demontată.
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Inițializarea partiției a eșuat. Nu s-au scris modificări pe disc.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Ștergerea partiției a eșuat. Nu s-au scris modificări pe disc.
 Partition type:	CreateParamsPanel		Tip de partiție:
 Could not delete the selected partition.	MainWindow		Nu s-a putut șterge partiția selectată.
 Initialize	MainWindow		Inițializează
 Error: 	MainWindow	in any error alert	Eroare:
 Partition %ld	DiskView		Partiție %ld
-The partition %s has been successfully initialized.\n	MainWindow		Partiția %s a fost inițializată cu succes.\n
 <empty>	DiskView		<liber>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inițializarea partiției %s a eșuat. (Nu s-a scris nimic pe disk.)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiție vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Mounted at	PartitionList		Montat la
-Failed to initialize the partition %s!\n	MainWindow		Inițializarea partiției %s a eșuat!\n
 There was an error acquiring the partition row.	MainWindow		A apărut o eroare la obținerea rândului partiției.
 You need to select a partition entry from the list.	MainWindow		Trebuie să selectați o intrare de partiție din listă.
-Format (not implemented)	MainWindow		Format (nu este implementat)
 The currently selected partition does not have a parent partition.	MainWindow		Partiția selectată curent nu are o partiție superioară.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul selectat vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Offset: %ld MB	Support		Decalaj: %ld MiB
@@ -56,11 +52,9 @@ Mount all	MainWindow		Montează tot
 Cancel	MainWindow		Anulează
 Delete partition	MainWindow		Șterge partiție
 End: %ld MB	Support		Final: %ld MiB
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să inițializați partiția \„%s\”? Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.
 Eject	MainWindow		Scoate
 Partition	MainWindow		Partiție
 File system	PartitionList		Sistem de fișiere
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să inițializați partiția? Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.
 Validation of the given creation parameters failed.	MainWindow		Validarea parametrilor de creare furnizați a eșuat.
 Size	PartitionList		Dimensiune
 Validation of the given initialization parameters failed.	MainWindow		Validarea parametrilor de inițializare furnizați a eșuat.

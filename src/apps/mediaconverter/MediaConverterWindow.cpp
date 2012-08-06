@@ -428,8 +428,10 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 			if (status != B_OK && status != B_ALREADY_RUNNING) {
 				BString errorString(B_TRANSLATE("Error launching: %strError%"));
 				errorString.ReplaceFirst("%strError%", strerror(status));
-				(new BAlert(B_TRANSLATE("Error"), errorString.String(), 
-					B_TRANSLATE("OK")))->Go();
+				BAlert* alert = new BAlert(B_TRANSLATE("Error"),
+					errorString.String(), B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 			break;
 		}

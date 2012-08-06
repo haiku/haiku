@@ -88,6 +88,7 @@ BAboutWindow::Show()
 	font.SetFace(B_BOLD_FACE);
 	font.SetSize(font.Size() * 1.7);
 	view->SetFontAndColor(0, fAppName->Length(), &font);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 

@@ -62,13 +62,15 @@ MidiServerApp::~MidiServerApp()
 void
 MidiServerApp::AboutRequested()
 {
-	(new BAlert(0,
+	BAlert* alert = new BAlert(0,
 		"Haiku midi_server 1.0.0 alpha\n\n"
 		"notes disguised as bytes\n"
 		"propagating to endpoints,\n"
 		"an aural delight",
-		"Okay", 0, 0, B_WIDTH_AS_USUAL, 
-		B_INFO_ALERT))->Go();
+		"OK", 0, 0, B_WIDTH_AS_USUAL, 
+		B_INFO_ALERT);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
 }
 
 

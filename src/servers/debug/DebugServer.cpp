@@ -689,6 +689,7 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 		BAlert *alert = new BAlert(NULL, buffer.String(),
 			B_TRANSLATE("Debug"), B_TRANSLATE("OK"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		int32 result = alert->Go();
 		kill = (result == 1);
 		_NotifyRegistrar(fTeam, false, !kill);

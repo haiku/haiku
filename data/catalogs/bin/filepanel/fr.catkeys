@@ -10,7 +10,7 @@ short\tlong\tdescription\n	FilePanelApp		courte\tlongue\tdescription\n
 %s: this option requires a parameter\n	FilePanelApp		%s: cette option requiert un paramètre\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\touvre un panneau d'ouverture de fichier (par défaut)\n
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnon implémenté\n
--s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\touvre un panneau de sauvegarde de fichier \n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\touvre un panneau de sauvegarde de fichier\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tspécifie un nom par défaut pour l'enregistrement\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\trend le panneau modal\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\taffiche cette aide\n

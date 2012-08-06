@@ -216,7 +216,9 @@ PersonWindow::MessageReceived(BMessage* msg)
 					}
 					else {
 						sprintf(str, B_TRANSLATE("Could not create %s."), name);
-						(new BAlert("", str, B_TRANSLATE("Sorry")))->Go();
+						BAlert* alert = new BAlert("", str, B_TRANSLATE("Sorry"));
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+						alert->Go();
 					}
 				}
 			}
@@ -294,9 +296,12 @@ PersonWindow::QuitRequested()
 	status_t result;
 
 	if (!fView->IsSaved()) {
-		result = (new BAlert("", B_TRANSLATE("Save changes before quitting?"),
+		BAlert* alert = new BAlert("", B_TRANSLATE("Save changes before quitting?"),
 							B_TRANSLATE("Cancel"), B_TRANSLATE("Quit"),
-							B_TRANSLATE("Save")))->Go();
+							B_TRANSLATE("Save"));
+		alert->SetShortcut(0, B_ESCAPE);
+		result = alert->Go();
+
 		if (result == 2) {
 			if (fRef)
 				fView->Save();

@@ -280,7 +280,7 @@ ProcessController::MessageReceived(BMessage *message)
 						B_TRANSLATE("This team is already gone"B_UTF8_ELLIPSIS),
 						B_TRANSLATE("Ok!"), NULL, NULL, B_WIDTH_AS_USUAL,
 						B_STOP_ALERT);
-					alert->SetShortcut(0, B_ESCAPE);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 				}
 			}
@@ -298,6 +298,8 @@ ProcessController::MessageReceived(BMessage *message)
 						B_TRANSLATE("Cancel"), B_TRANSLATE("Debug this thread!"),
 						B_TRANSLATE("Kill this thread!"), B_WIDTH_AS_USUAL,
 						B_STOP_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
+
 					#define KILL 2
 					#else
 					snprintf(question, sizeof(question),
@@ -306,6 +308,8 @@ ProcessController::MessageReceived(BMessage *message)
 					alert = new BAlert(B_TRANSLATE("Please confirm"), question,
 						B_TRANSLATE("Cancel"), B_TRANSLATE("Kill this thread!"),
 						NULL, B_WIDTH_AS_USUAL,	B_STOP_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
+					
 					#define KILL 1
 					#endif
 					alert->SetShortcut(0, B_ESCAPE);
@@ -330,7 +334,7 @@ ProcessController::MessageReceived(BMessage *message)
 						B_TRANSLATE("This thread is already gone"B_UTF8_ELLIPSIS),
 						B_TRANSLATE("Ok!"),	NULL, NULL,
 						B_WIDTH_AS_USUAL, B_STOP_ALERT);
-					alert->SetShortcut(0, B_ESCAPE);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 				}
 			}
@@ -408,7 +412,7 @@ ProcessController::MessageReceived(BMessage *message)
 						"You can't turn it off!"),
 						B_TRANSLATE("That's no Fun!"), NULL, NULL,
 						B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-					alert->SetShortcut(0, B_ESCAPE);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 				} else
 					_kern_set_cpu_enabled(cpu, !_kern_cpu_enabled(cpu));
@@ -893,6 +897,7 @@ thread_debug_thread(void *arg)
 						alert = new BAlert("", "The semaphore wasn't released, "
 							"because it wasn't necessary anymore!",
 							"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						alert->Go();
 					}
 				}

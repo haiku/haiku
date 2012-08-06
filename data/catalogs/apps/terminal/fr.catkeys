@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	3270518047
+1	french	x-vnd.Haiku-Terminal	1294209621
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -8,7 +8,7 @@ Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas
 Text size	Terminal TermWindow		Taille du texte
 Match case	Terminal FindWindow		Sensible à la casse
 Quit	Terminal TermWindow		Quitter
-Use default shell	Terminal Shell		Utiliser l'interpréteur de commande par défaut.
+Use default shell	Terminal Shell		Utiliser l'interpréteur de commande par défaut
 Confirm exit if active programs exist	Terminal AppearancePrefView		Demander une confirmation à la fermeture si un programme est actif
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre de l'onglet actif peut\ncontenir les éléments suivants :\n
 Select all	Terminal TermWindow		Sélectionner tout
@@ -42,6 +42,7 @@ Green on Black	Terminal colors schema		Vert sur noir
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		L'application « %1 » fonctionne encore.\nSi vous fermez l'onglet, l'application sera interrompue.
 Size:	Terminal AppearancePrefView		Taille :
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossible d'exécuter « %command » :\n\t%error
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               affiche cette aide\n  -t,     --title              défini le titre de la fenêtre\n  -f,     --fullscreen         démarre en plein écran\n
 Full screen	Terminal TermWindow		Plein écran
 Window title…	Terminal TermWindow		Titre de la fenêtre…
 Page setup…	Terminal TermWindow		Mise en page…
@@ -59,6 +60,7 @@ Text not found.	Terminal TermWindow		Texte non trouvé.
 Find…	Terminal TermWindow		Rechercher…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		L'application « %1 » fonctionne encore.\nSi vous fermez le Terminal, l'application sera interrompue.
 Move here	Terminal TermView		Déplacer ici
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail courant du processus actif dans l'onglet\n\t\t\tcourant. Optionnellement, le nombre maximum d'élément peut-être\n\t\t\tspécifié. E.g. '%2d' pour au plus 2 éléments.\n\t%i\t-\tL'index de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l'onglet courant.\n\t%t\t-\tLe titre de l'onglet courant.\n\t%%\t-\tLe caractère '%'.
 White on Black	Terminal colors schema		Blanc sur noir
 Error!	Terminal getString		Erreur !
 New tab	Terminal TermWindow		Nouvel onglet
@@ -70,6 +72,7 @@ Close	Terminal TermWindow		Fermer
 Text	Terminal AppearancePrefView		Texte
 Clear all	Terminal TermWindow		Effacer tout
 Text encoding	Terminal TermWindow		Encodage texte
+size	Terminal TermView		taille
 Close window	Terminal TermWindow		Fermer la fenêtre
 Save as default	Terminal TermWindow		Enregistrer les préférences
 Set tab title	Terminal TermWindow		Changer le titre de l'onglet
@@ -94,5 +97,6 @@ Save changes to this settings panel?	Terminal PrefWindow		Voulez-vous enregistre
 Cancel	Terminal PrefWindow		Annuler
 Shell 	Terminal TermWindow		Interpréteur de commande
 Save	Terminal PrefWindow		Enregistrer
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail courant du processus actif.\n\t\t\tOptionnellement, le nombre maximum d'élément peut-\n\t\t\têtre spécifié. E.g. '%2d' pour au plus deux éléments.\n\t%i\t-\tL'index de l'onglet.\n\t%p\t-\tLe nom du processus actif.\n\t%%\t-\tLe caractere '%'.
 Cancel	Terminal TermView		Annuler
 Use default	Terminal SetTitleWindow		Par défaut

@@ -27,13 +27,14 @@ void
 BluetoothApplication::ReadyToRun()
 {
 	if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
-
-		int32 choice = (new BAlert("bluetooth_server not running",
+		BAlert* alert = new BAlert("bluetooth_server not running",
 			B_TRANSLATE("bluetooth_server has not been found running on the "
 			"system. Should be started, or stay offline"),
 			B_TRANSLATE("Work offline"), B_TRANSLATE("Quit"),
 			B_TRANSLATE("Start please"), B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT))->Go();
+			B_WARNING_ALERT);
+		alert->SetShortcut(2, B_ESCAPE);
+		int32 choice = alert->Go();
 
 
 		switch (choice) {
@@ -90,8 +91,8 @@ BluetoothApplication::MessageReceived(BMessage* message)
 void
 BluetoothApplication::AboutRequested()
 {
-
-	(new BAlert("about", B_TRANSLATE("Haiku Bluetooth system, (ARCE)\n\n"
+	BAlert* alert = new BAlert("about", B_TRANSLATE(
+							"Haiku Bluetooth system, (ARCE)\n\n"
 							"Created by Oliver Ruiz Dorantes\n\n"
 							"With support of:\n"
 							"	- Mika Lindqvist\n"
@@ -121,8 +122,9 @@ BluetoothApplication::AboutRequested()
 							"	- Petter H. Juliussen\n"
 							"Who gave me all the knowledge:\n"
 							"	- the yellowTAB team"),
-						B_TRANSLATE("OK")))->Go();
-
+						B_TRANSLATE("OK"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
 }
 
 

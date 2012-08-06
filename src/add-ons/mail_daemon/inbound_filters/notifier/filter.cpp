@@ -79,6 +79,7 @@ NotifyFilter::MailboxSynced(status_t status)
 
 		BAlert *alert = new BAlert(B_TRANSLATE("New messages"), text.String(),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->SetFeel(B_NORMAL_WINDOW_FEEL);
 		alert->Go(NULL);
 	}

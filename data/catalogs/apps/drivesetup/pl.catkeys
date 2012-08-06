@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	1209826930
+1	polish	x-vnd.Haiku-DriveSetup	2908539543
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		Usuń
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranej partycji bedą bezpowrotnie utracone!
@@ -16,22 +16,18 @@ Partition name:	CreateParamsPanel		Nazwa partycji:
 Initialize	InitParamsPanel		Inicjalizacja
 Could not mount partition %s.	MainWindow		Nie można zamontować partycji %s.
 The partition %s is already unmounted.	MainWindow		Partycja %s została już odmontowana.
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Błąd podczas inicjalizacji partycji. Żadne zmiany nie zostały zapisane na dysk.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Błąd podczas usuwaniu partycji. Żadne zmiany nie zostały zapisane na dysk.
 Partition type:	CreateParamsPanel		Typ partycji:
 Could not delete the selected partition.	MainWindow		Nie można usunąć wybranej partycji.
 Initialize	MainWindow		Inicjalizacja
 Error: 	MainWindow	in any error alert	Błąd: 
 Partition %ld	DiskView		Partycja %ld
-The partition %s has been successfully initialized.\n	MainWindow		Partycja %s została poprawnie zainicjalizowana.\n
 <empty>	DiskView		<pusty>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicjalizacja partycji %s nie powiodła się. (Żadne zmiany nie zostały zapisane na dysku.)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranej partycji bedą bezpowrotnie utracone!
 Mounted at	PartitionList		Zamontowany jako
-Failed to initialize the partition %s!\n	MainWindow		Błąd podczas inicjalizacji partycji %s!\n
 There was an error acquiring the partition row.	MainWindow		Wystąpił błąd podczas pobierania informacji o partycji.
 You need to select a partition entry from the list.	MainWindow		Musisz wybrać partycję docelową z listy.
-Format (not implemented)	MainWindow		Formatuj (nie zaimplementowane)
 The currently selected partition does not have a parent partition.	MainWindow		Wybrana partycja nie posiada partycji nadrzędnej.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranym dysku bedą bezpowrotnie utracone!
 Offset: %ld MB	Support		Przesunięcie: %ld MB
@@ -56,11 +52,9 @@ Mount all	MainWindow		Zamontuj wszystko
 Cancel	MainWindow		Anuluj
 Delete partition	MainWindow		Usuń partycję
 End: %ld MB	Support		Koniec: %ld MB
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Czy na pewno chcesz zainicjalizować partycję \"%s\"? Zostaniesz spytany ponownie zanim zmiany zostaną zapisane na dysk twardy.
 Eject	MainWindow		Wysuń
 Partition	MainWindow		Partycja
 File system	PartitionList		System plików
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Czy jesteś pewien decyzji o zainicjalizowaniu partycji? Zostaniesz spytany ponownie zanim zmiany zostaną zapisane na dysk twardy.
 Validation of the given creation parameters failed.	MainWindow		Sprawdzenie poprawności parametrów tworzenia partycji nie powiodło się.
 Size	PartitionList		Rozmiar
 Validation of the given initialization parameters failed.	MainWindow		Sprawdzenie poprawności parametrów inicjalizacji nie powiodło się.

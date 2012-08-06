@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	2598330196
+1	german	x-vnd.Haiku-WebPositive	2697327739
 Username:	Authentication Panel		Benutzername:
 Copy URL to clipboard	Download Window		Adresse in Zwischenablage kopieren
 Cancel	Settings Window		Abbrechen
@@ -35,6 +35,7 @@ Default fixed font size:	Settings Window		Größe der Schrift fester Breite:
 Close tab	WebPositive Window		Reiter schließen
 Over 1 hour left	Download Window		Noch über eine Stunde
 Quit	WebPositive Window		Beenden
+Full screen	WebPositive Window		Vollbild
 Open download error	Download Window		Fehler beim Öffnen
 Standard font:	Settings Window		Standardschrift:
 Restart	Download Window		Neustart

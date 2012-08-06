@@ -95,6 +95,7 @@ AutoConfigWindow::MessageReceived(BMessage* msg)
 					invalidMailAlert = new BAlert("invalidMailAlert",
 						B_TRANSLATE("Enter a valid e-mail address."),
 						B_TRANSLATE("OK"));
+					invalidMailAlert->SetFlags(invalidMailAlert->Flags() | B_CLOSE_ON_ESCAPE);
 					invalidMailAlert->Go();
 					return;
 				}

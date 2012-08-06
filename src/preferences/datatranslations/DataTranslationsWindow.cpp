@@ -282,6 +282,7 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 		view->SetFontAndColor(index, index + strlen(labels[i]), &font);
 	}
 
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 

@@ -635,6 +635,7 @@ PowerStatusReplicant::_AboutRequested()
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, strlen(B_TRANSLATE("PowerStatus")), &font);
 
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 

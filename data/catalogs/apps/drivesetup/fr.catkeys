@@ -1,10 +1,10 @@
-1	french	x-vnd.Haiku-DriveSetup	1209826930
+1	french	x-vnd.Haiku-DriveSetup	2908539543
 DriveSetup	System name		Gestionnaire de disque
 Delete	MainWindow		Supprimer
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les changements sur le disque ?\n\nToutes les données de la partition sélectionnée seront effacées si vous le faites !
 Rescan	MainWindow		Analyser
 OK	MainWindow		OK
-Could not aquire partitioning information.	MainWindow		Impossible de récupérer les informations sur les partitions
+Could not aquire partitioning information.	MainWindow		Impossible de récupérer les informations sur les partitions.
 There's no space on the partition where a child partition could be created.	MainWindow		Il n'y a pas de place dans cette partition pour créer une partition fille.
 %ld MiB	Support		%ld Mio
 <empty>	PartitionList		<vide>
@@ -16,22 +16,18 @@ Partition name:	CreateParamsPanel		Nom de la partition :
 Initialize	InitParamsPanel		Initialiser
 Could not mount partition %s.	MainWindow		Impossible de monter la partition %s.
 The partition %s is already unmounted.	MainWindow		La partition %s est déjà démontée.
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Impossible d'initialiser la partition. Aucun changement n'a été enregistré sur le disque.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Impossible de supprimer la partition. Aucun changement n'a été enregistré sur le disque.
 Partition type:	CreateParamsPanel		Type de partition :
 Could not delete the selected partition.	MainWindow		Impossible de supprimer la partition sélectionnée.
 Initialize	MainWindow		Initialiser
 Error: 	MainWindow	in any error alert	Erreur : 
 Partition %ld	DiskView		Partition %ld
-The partition %s has been successfully initialized.\n	MainWindow		La partition %s a été correctement initialisée.\n
 <empty>	DiskView		<vide>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		L'initialisation de la partition %s a échoué. (Aucune modification n'a été apportée au disque.)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les changements sur le disque ?\n\nToutes les données de la partition seront définitivement perdues si vous le faites !
 Mounted at	PartitionList		Montée en
-Failed to initialize the partition %s!\n	MainWindow		Impossible d'initialiser la partition %s !\n
 There was an error acquiring the partition row.	MainWindow		Erreur de lecture des informations de la partition.
 You need to select a partition entry from the list.	MainWindow		Sélectionnez d'abord une entrée de la table des partitions.
-Format (not implemented)	MainWindow		Format (non implémenté)
 The currently selected partition does not have a parent partition.	MainWindow		La partition sélectionnée n'a pas de partition parente.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les changements sur le disque ?\n\nToutes les données du disque seront définitivement perdues si vous le faites !
 Offset: %ld MB	Support		Déplacement : %ld Mo
@@ -52,15 +48,13 @@ Active	PartitionList		Active
 Volume name	PartitionList		Nom de volume
 Continue	MainWindow		Continuer
 Cannot delete the selected partition.	MainWindow		La partition sélectionnée ne peut pas être supprimée.
-Mount all	MainWindow		Monter Tout
+Mount all	MainWindow		Monter tout
 Cancel	MainWindow		Annuler
 Delete partition	MainWindow		Supprimer la partition
 End: %ld MB	Support		Fin : %ld Mo
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir initialiser la partition « %s » ? La question vous sera à nouveau posée avant que les modifications ne soient écrites sur le disque.
 Eject	MainWindow		Éjecter
 Partition	MainWindow		Partition
 File system	PartitionList		Système de fichiers
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir initialiser la partition ? La question vous sera à nouveau posée avant que les modifications ne soient écrites sur le disque.
 Validation of the given creation parameters failed.	MainWindow		Le contrôle des paramètres de création donnés a échoué.
 Size	PartitionList		Taille
 Validation of the given initialization parameters failed.	MainWindow		Le contrôle des paramètres d'initialisation donnés a échoué.

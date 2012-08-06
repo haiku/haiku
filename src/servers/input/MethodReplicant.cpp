@@ -137,11 +137,15 @@ MethodReplicant::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
-			(new BAlert("About Method Replicant",
+		{
+			BAlert* alert = new BAlert("About Method Replicant",
 				"Method Replicant (Replicant)\n"
 				"  Brought to you by Jérôme DUVAL.\n\n"
-				"Haiku, 2004-2009", "OK"))->Go();
+				"Haiku, 2004-2009", "OK");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			break;
+		}
 		case IS_UPDATE_NAME:
 			UpdateMethodName(message);
 			break;

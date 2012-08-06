@@ -286,6 +286,7 @@ ShortcutsWindow::QuitRequested()
 			B_TRANSLATE("Really quit without saving your changes?"),
 			B_TRANSLATE("Don't save"), B_TRANSLATE("Cancel"),
 			B_TRANSLATE("Save"));
+		alert->SetShortcut(1, B_ESCAPE);
 		switch(alert->Go()) {
 			case 1:
 				ret = false;
@@ -296,10 +297,12 @@ ShortcutsWindow::QuitRequested()
 				// up the file requester
 				if (fLastSaved.InitCheck() == B_OK) {
 					if (_SaveKeySet(fLastSaved) == false) {
-						(new BAlert(ERROR, 
+						BAlert* alert = new BAlert(ERROR, 
 							B_TRANSLATE("Shortcuts was unable to save your "
 								"KeySet file!"), 
-							B_TRANSLATE("Oh no")))->Go();
+							B_TRANSLATE("Oh no"));
+						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+						alert->Go();
 						ret = true; //quit anyway
 					}
 				} else {
@@ -550,9 +553,11 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 							fLastSaved = BEntry(&ref);
 							break;
 						} else {
-							(new BAlert(ERROR, 
+							BAlert* alert = new BAlert(ERROR, 
 								B_TRANSLATE("Shortcuts was couldn't open your "
-								"KeySet file!"), B_TRANSLATE("OK")))->Go(NULL);
+								"KeySet file!"), B_TRANSLATE("OK"));
+							alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+							alert->Go(NULL);
 							break;
 						}
 					}
@@ -576,10 +581,11 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 					_GetSettingsFile(&eref);
 					if (ref == eref) fKeySetModified = false;
 				} else {
-					(new BAlert(ERROR, 
+					BAlert* alert = new BAlert(ERROR, 
 						B_TRANSLATE("Shortcuts was unable to parse your "
-						"KeySet file!"), 
-						B_TRANSLATE("OK")))->Go(NULL);
+						"KeySet file!"), B_TRANSLATE("OK"));
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					alert->Go(NULL);
 					break;
 				}
 			}
@@ -629,9 +635,11 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 			} else PostMessage(SAVE_KEYSET_AS); // open the save requester...
 
 			if (showSaveError) {
-				(new BAlert(ERROR, 
+				BAlert* alert = new BAlert(ERROR, 
 					B_TRANSLATE("Shortcuts wasn't able to save your keyset."), 
-					B_TRANSLATE("OK")))->Go(NULL);
+					B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go(NULL);
 			}
 			break;
 		}

@@ -178,6 +178,7 @@ CannaLooper::MessageReceived(BMessage* msg)
 				"  Copyright 1992 NEC Corporation, Tokyo, Japan\n"
 				"  Special thanks to T.Murai for porting\n",
 				"OK");
+			panel->SetFlags(panel->Flags() | B_CLOSE_ON_ESCAPE);
 			panel->Go();
 			break;
 		}

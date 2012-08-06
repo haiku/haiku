@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -290,7 +290,8 @@ status_t
 DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 {
 	TRACE_IMAGES("DwarfImageDebugInfo::GetFunctions()\n");
-	TRACE_IMAGES("  %ld compilation units\n", fFile->CountCompilationUnits());
+	TRACE_IMAGES("  %" B_PRId32 " compilation units\n",
+		fFile->CountCompilationUnits());
 
 	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
 			i++) {
@@ -368,7 +369,7 @@ DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 			DwarfFunctionDebugInfo* function
 				= new(std::nothrow) DwarfFunctionDebugInfo(this, unit,
 					subprogramEntry, rangeList, name, file,
-					SourceLocation(line, std::max(column, 0L)));
+					SourceLocation(line, std::max(column, (int32)0)));
 			if (function == NULL || !functions.AddItem(function)) {
 				delete function;
 				return B_NO_MEMORY;
@@ -568,9 +569,10 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		for (int32 i = 0; i < registerCount; i++) {
 			const Register* reg = registers + i;
 			BVariant value;
-			if (previousCpuState->GetRegisterValue(reg, value))
-				TRACE_CFI("  %3s: %#lx\n", reg->Name(), value.ToUInt32());
-			else
+			if (previousCpuState->GetRegisterValue(reg, value)) {
+				TRACE_CFI("  %3s: %#" B_PRIx32 "\n", reg->Name(),
+					value.ToUInt32());
+			} else
 				TRACE_CFI("  %3s: undefined\n", reg->Name());
 		}
 	)
@@ -649,8 +651,8 @@ status_t
 DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 	target_addr_t address, Statement*& _statement)
 {
-	TRACE_CODE("DwarfImageDebugInfo::GetStatement(function: %p, address: %#llx)\n",
-		_function, address);
+	TRACE_CODE("DwarfImageDebugInfo::GetStatement(function: %p, address: %#"
+		B_PRIx64 ")\n", _function, address);
 
 	DwarfFunctionDebugInfo* function
 		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
@@ -719,7 +721,7 @@ DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 		if (state.isStatement) {
 			statementAddress = state.address;
 			statementLine = state.line - 1;
-			statementColumn = std::max(state.column - 1, 0L);
+			statementColumn = std::max(state.column - 1, (int32)0);
 		}
 	}
 
@@ -741,8 +743,8 @@ DwarfImageDebugInfo::GetStatementAtSourceLocation(FunctionDebugInfo* _function,
 	target_addr_t functionEndAddress = functionStartAddress + function->Size();
 
 	TRACE_LINES2("DwarfImageDebugInfo::GetStatementAtSourceLocation(%p, "
-		"(%ld, %ld)): function range: %#llx - %#llx\n", function,
-		sourceLocation.Line(), sourceLocation.Column(),
+		"(%" B_PRId32 ", %" B_PRId32 ")): function range: %#" B_PRIx64 " - %#"
+		B_PRIx64 "\n", function, sourceLocation.Line(), sourceLocation.Column(),
 		functionStartAddress, functionEndAddress);
 
 	AutoLocker<BLocker> locker(fLock);
@@ -778,9 +780,10 @@ DwarfImageDebugInfo::GetStatementAtSourceLocation(FunctionDebugInfo* _function,
 			target_addr_t endAddress = state.address;
 
 			if (statementAddress < endAddress) {
-				TRACE_LINES2("  statement: %#llx - %#llx, location: "
-					"(%ld, %ld)\n", statementAddress, endAddress, statementLine,
-					statementColumn);
+				TRACE_LINES2("  statement: %#" B_PRIx64 " - %#" B_PRIx64
+					", location: (%" B_PRId32 ", %" B_PRId32 ")\n",
+					statementAddress, endAddress, statementLine,
+				 	statementColumn);
 			}
 
 			if (statementAddress < endAddress
@@ -812,7 +815,7 @@ DwarfImageDebugInfo::GetStatementAtSourceLocation(FunctionDebugInfo* _function,
 		if (state.isStatement) {
 			statementAddress = state.address;
 			statementLine = state.line - 1;
-			statementColumn = std::max(state.column - 1, 0L);
+			statementColumn = std::max(state.column - 1, (int32)0);
 		}
 	}
 
@@ -902,8 +905,9 @@ DwarfImageDebugInfo::_AddSourceCodeInfo(CompilationUnit* unit,
 	int32 statementLine = -1;
 	int32 statementColumn = -1;
 	while (program.GetNextRow(state)) {
-		TRACE_LINES2("  %#llx  (%ld, %ld, %ld)  %d\n", state.address,
-			state.file, state.line, state.column, state.isStatement);
+		TRACE_LINES2("  %#" B_PRIx64 "  (%" B_PRId32 ", %" B_PRId32 ", %"
+			B_PRId32 ")  %d\n", state.address, state.file, state.line,
+			state.column, state.isStatement);
 
 		bool isOurFile = state.file == fileIndex;
 
@@ -917,9 +921,10 @@ DwarfImageDebugInfo::_AddSourceCodeInfo(CompilationUnit* unit,
 				if (error != B_OK)
 					return error;
 
-				TRACE_LINES2("  -> statement: %#llx - %#llx, source location: "
-					"(%ld, %ld)\n", statementAddress, endAddress, statementLine,
-					statementColumn);
+				TRACE_LINES2("  -> statement: %#" B_PRIx64 " - %#" B_PRIx64
+					", source location: (%" B_PRId32 ", %" B_PRId32 ")\n",
+					statementAddress, endAddress, statementLine,
+				 	statementColumn);
 			}
 
 			statementAddress = 0;
@@ -932,7 +937,7 @@ DwarfImageDebugInfo::_AddSourceCodeInfo(CompilationUnit* unit,
 		if (state.isStatement) {
 			statementAddress = state.address;
 			statementLine = state.line - 1;
-			statementColumn = std::max(state.column - 1, 0L);
+			statementColumn = std::max(state.column - 1, (int32)0);
 		}
 	}
 
@@ -969,16 +974,16 @@ DwarfImageDebugInfo::_CreateLocalVariables(CompilationUnit* unit,
 	target_addr_t lowPC, const EntryListWrapper& variableEntries,
 	const EntryListWrapper& blockEntries)
 {
-	TRACE_LOCALS("DwarfImageDebugInfo::_CreateLocalVariables(): ip: %#llx, "
-		"low PC: %#llx\n", instructionPointer, lowPC);
+	TRACE_LOCALS("DwarfImageDebugInfo::_CreateLocalVariables(): ip: %#" B_PRIx64
+		", low PC: %#" B_PRIx64 "\n", instructionPointer, lowPC);
 
 	// iterate through the variables and add the ones in scope
 	for (DebugInfoEntryList::ConstIterator it
 			= variableEntries.list.GetIterator();
 		DIEVariable* variableEntry = dynamic_cast<DIEVariable*>(it.Next());) {
 
-		TRACE_LOCALS("  variableEntry %p, scope start: %llu\n", variableEntry,
-			variableEntry->StartScope());
+		TRACE_LOCALS("  variableEntry %p, scope start: %" B_PRIu64 "\n",
+			variableEntry, variableEntry->StartScope());
 
 		// check the variable's scope
 		if (instructionPointer < lowPC + variableEntry->StartScope())

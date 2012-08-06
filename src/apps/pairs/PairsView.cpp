@@ -175,7 +175,7 @@ PairsView::_ReadRandomIcons()
 			BAlert* alert = new BAlert("Fatal", msgStr.String(),
 				B_TRANSLATE("OK"), 	NULL, NULL, B_WIDTH_FROM_WIDEST,
 				B_STOP_ALERT);
-			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			exit(1);
 		}

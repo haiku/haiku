@@ -2609,7 +2609,7 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 			BAlert* alert = new BAlert("",
 				B_TRANSLATE("You must have at least one attribute showing."),
 				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 
@@ -4833,7 +4833,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			B_TRANSLATE("You must drop items on one of the disk icons "
 			"in the \"Disks\" window."), B_TRANSLATE("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		okToMove = false;
 	}
@@ -4844,7 +4844,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			B_TRANSLATE("Sorry, you can't copy items to the Trash."),
 			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		okToMove = false;
 	}
@@ -4855,7 +4855,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			B_TRANSLATE("Sorry, you can't create links in the Trash."),
 			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		okToMove = false;
 	}
@@ -5745,7 +5745,7 @@ CheckVolumeReadOnly(const entry_ref* ref)
 			B_TRANSLATE("Files cannot be moved or deleted from a read-only "
 			"volume."), B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_STOP_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return false;
 	}
@@ -6085,8 +6085,10 @@ BPoseView::SelectMatchingEntries(const BMessage* message)
 			BString message(
 				B_TRANSLATE("Error in regular expression:\n\n'%errstring'"));
 			message.ReplaceFirst("%errstring", regExpression.ErrorString());
-			(new BAlert("", message.String(), B_TRANSLATE("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+			BAlert* alert = new BAlert("", message.String(), B_TRANSLATE("OK"),
+				NULL, NULL,	B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			return 0;
 		}
 	}
@@ -8077,7 +8079,7 @@ BPoseView::OpenInfoWindows()
 			B_TRANSLATE("The Tracker must be running to see Info windows."),
 			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return;
  	}
@@ -8094,7 +8096,7 @@ BPoseView::SetDefaultPrinter()
 			B_TRANSLATE("The Tracker must be running to see set the default "
 			"printer."), B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return;
  	}

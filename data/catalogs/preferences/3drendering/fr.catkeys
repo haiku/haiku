@@ -1,7 +1,8 @@
-1	french	x-vnd.Haiku-3DRendering	2283979738
+1	french	x-vnd.Haiku-3DRendering	1918042667
 List stack size:	Capabilities		Taille de la pile de listes :
 Information	InfoView		Informations
 Max. clipping planes:	Capabilities		Nombre de plans de coupes :
+Max. texture units:	Capabilities		Nombre maximum d'unités de textures :
 Renderer name:	InfoView		Nom du moteur de rendu :
 Vendor name:	InfoView		Nom du vendeur :
 Attributes stack size:	Capabilities		Taille de la pile d'attributs :
@@ -14,7 +15,10 @@ Max. lights:	Capabilities		Nombre d'éclairages maximum :
 Max. 2D texture size:	Capabilities		Taille maximum des textures 2D :
 Max. convolution:	Capabilities		Convolution maximale :
 GLUT API version:	InfoView		Version de l'API GLUT :
+Texture stack size:	Capabilities		Taille de la pile de textures :
 Max. 3D texture size:	Capabilities		Taille maximum des textures 3D :
+3D Rendering	System name		Rendu 3D
 Capabilities	Capabilities		Aptitudes
+Max. recommended index elements:	Capabilities		Nombre maximum d'index recommandé :
 Available	Extensions		Disponible
 Extensions	Extensions		Extensions

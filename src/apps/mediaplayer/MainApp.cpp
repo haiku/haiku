@@ -93,6 +93,8 @@ MainApp::MainApp()
 			"Would you like to start it ?"), B_TRANSLATE("Quit"),
 			B_TRANSLATE("Start media server"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		
 		if (alert->Go() == 0) {
 			PostMessage(B_QUIT_REQUESTED);
 			return;

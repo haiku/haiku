@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	3882211276
+1	french	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Police simple :
 Control highlight	Colors tab		Mise en valeur de contrôle
 Control border	Colors tab		Bordure des contrôles
@@ -27,9 +27,11 @@ Window border	Colors tab		Bordure de fenêtre
 Window tab text	Colors tab		Texte des titres de fenêtres
 Document text	Colors tab		Texte du document
 Navigation pulse	Colors tab		Pulsation de navigation
+Window decorator:	DecorSettingsView		Décorateur de fenêtre :
 Selected menu item text	Colors tab		Texte de l'élément sélectionné dans le menu
 Menu background	Colors tab		Arrière plan de menu
 OK	DecorSettingsView		OK
+Control mark	Colors tab		Point de contrôle
 Size:	Font Selection view		Taille :
 Panel background	Colors tab		Arrière plan des panneaux
 Menu font:	Font view		Police des menus :
@@ -50,6 +52,7 @@ LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
 Selected menu item border	Colors tab		Bordure de l'élément sélectionné dans le menu
 Strong	AntialiasingSettingsView		Épais
 Panel text	Colors tab		Texte des panneaux
+Decorators	APRWindow		Décorateurs
 Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
 Antialiasing menu	AntialiasingSettingsView		Menu lissage
 Fonts	APRWindow		Polices

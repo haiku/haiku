@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -96,12 +96,14 @@ private:
 				break;
 			case B_INT32_TYPE:
 			case B_UINT32_TYPE:
-				snprintf(buffer, bufferSize, "0x%08lx", value.ToUInt32());
+				snprintf(buffer, bufferSize, "0x%08" B_PRIx32,
+					value.ToUInt32());
 				break;
 			case B_INT64_TYPE:
 			case B_UINT64_TYPE:
 			default:
-				snprintf(buffer, bufferSize, "0x%016llx", value.ToUInt64());
+				snprintf(buffer, bufferSize, "0x%016" B_PRIx64,
+					value.ToUInt64());
 				break;
 		}
 

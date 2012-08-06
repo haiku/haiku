@@ -672,8 +672,10 @@ OpenWithPoseView::OpenSelection(BPose* pose, int32*)
 			B_TRANSLATE("Could not find application \"%appname\""));
 		errorString.ReplaceFirst("%appname", pose->TargetModel()->Name());
 
-		(new BAlert("", errorString.String(), B_TRANSLATE("OK"), 0, 0,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		BAlert* alert = new BAlert("", errorString.String(), B_TRANSLATE("OK"),
+			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 		return;
 	}
 

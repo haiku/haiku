@@ -43,10 +43,10 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Majuscule
 *MoveMouseTo 50% 50%	ShortcutsWindow		*BougerLaSourisEn 50% 50%
 Save KeySet as…	ShortcutsWindow		Enregistrer le jeu de touches sous…
 Open	ShortcutsWindow		Ouvrir
-Really quit without saving your changes?	ShortcutsWindow		Voulez-vous vraiment sortir sans enregistrer vos modifications ? 
+Really quit without saving your changes?	ShortcutsWindow		Voulez-vous vraiment sortir sans enregistrer vos modifications ?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu analyser votre fichier de jeu de touches !
 Select	ShortcutsWindow		Sélectionner
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre fichier de jeu de touches !
-Oh no	ShortcutsWindow		Oh non!
+Oh no	ShortcutsWindow		Oh non !
 LaunchHandler	ShortcutsSpec		GestionnaireDeLancement
-Shortcuts	System name		Raccourcis 
+Shortcuts	System name		Raccourcis

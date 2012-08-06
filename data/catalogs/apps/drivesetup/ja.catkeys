@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	1209826930
+1	japanese	x-vnd.Haiku-DriveSetup	2908539543
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		削除
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		変更を本当にディスクに保存しますか？\n\nその場合、選択されたパーティションのすべてのデータが失われますので、ご注意ください。
@@ -16,22 +16,18 @@ Partition name:	CreateParamsPanel		パーティション名 :
 Initialize	InitParamsPanel		初期化
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできませんでした。
 The partition %s is already unmounted.	MainWindow		パーティション %s は既にマウント解除されています。
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		パーティションの初期化に失敗しました。変更は保存されていません。
 Failed to delete the partition. No changes have been written to disk.	MainWindow		パーティションの削除に失敗しました。変更は保存されていません。
 Partition type:	CreateParamsPanel		パーティション種別 :
 Could not delete the selected partition.	MainWindow		選択されたパーティションを削除できませんでした。
 Initialize	MainWindow		初期化
 Error: 	MainWindow	in any error alert	エラー : 
 Partition %ld	DiskView		パーティション %ld
-The partition %s has been successfully initialized.\n	MainWindow		%s パーティションの初期化に成功しました。\n
 <empty>	DiskView		<空>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s パーティションの初期化に失敗しました。（ディスクに何も書き込まれていません）
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、ディスクのすべてのデータが失われますので、ご注意ください。
 Mounted at	PartitionList		マウント先
-Failed to initialize the partition %s!\n	MainWindow		パーティション %s の初期化に失敗しました！\n
 There was an error acquiring the partition row.	MainWindow		パーティション情報を取得の際、エラーが発生しました。
 You need to select a partition entry from the list.	MainWindow		一覧からパーティションを一つ選択してください。
-Format (not implemented)	MainWindow		フォーマット（実装されていません）
 The currently selected partition does not have a parent partition.	MainWindow		選択されたパーティションには親パーティションがありません。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、選択されたディスクのデータがすべて失われますので、ご注意ください。
 Offset: %ld MB	Support		オフセット： %ld MB
@@ -56,11 +52,9 @@ Mount all	MainWindow		すべてマウント
 Cancel	MainWindow		中止
 Delete partition	MainWindow		パーティションを削除
 End: %ld MB	Support		末端： %ld MB
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		本当にパーティション \"%s\" を初期化して良いですか? 変更をディスクに書き込む直前に再度確認します。
 Eject	MainWindow		取り出す
 Partition	MainWindow		パーティション
 File system	PartitionList		ファイルシステム
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		本当にパーティションを初期化して良いですか? 変更をディスクに書き込む直前に再度確認します。
 Validation of the given creation parameters failed.	MainWindow		作成パラメーターの検証に失敗しました。
 Size	PartitionList		サイズ
 Validation of the given initialization parameters failed.	MainWindow		初期化パラメーターの検証に失敗しました

@@ -9,5 +9,5 @@ SGI image	SGITranslator		Image SGI
 RLE	SGIView		RLE
 SGI Settings	SGIMain		Réglages SGI
 \n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nbasé sur le plugin SGI v1.5 de GIMP :\n
-written by:\n	SGIView		Écrit  par :\n
+written by:\n	SGIView		écrit par :\n
 SGI image translator	SGIView		Traducteur d'images SGI

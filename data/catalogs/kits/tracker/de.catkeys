@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	506391417
+1	german	x-vnd.Haiku-libtracker	1301055003
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -15,7 +15,9 @@ Decrease size	ContainerWindow		Verkleinern
 Mini icon view	VolumeWindow		Mini-Icon-Ansicht
 You must have at least one attribute showing.	PoseView		Es muss mindestens ein Attribut angezeigt werden.
 Permissions	InfoWindow		Berechtigungen
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Auswahl umkehren
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Letzte Dokumente
 Modified	QueryPoseView		Geändert
 Created	ContainerWindow		Erstellt
@@ -40,6 +42,7 @@ Make active printer	ContainerWindow		Zum aktiven Drucker machen
 Create link here	ContainerWindow		Verknüpfung hier erstellen
 Moving: 	StatusWindow		Verschiebe:
 before	FindPanel		vor
+Error emptying Trash	FSUtils		Fehler beim Leeren des Papierkorbs
 On	FindPanel		auf
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		größer als
@@ -92,6 +95,7 @@ Select all	VolumeWindow		Alles auswählen
 Opens with:	InfoWindow		Wird geöffnet mit:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Wird der MIME-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten!
 Open	ContainerWindow		Öffnen
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Fehler beim Ermitteln der Ordnergröße.
 New folder	FilePanelPriv		Neuer Ordner
 %name info	InfoWindow	InfoWindow Title	%name Info
@@ -314,6 +318,7 @@ The Tracker must be running to see Info windows.	PoseView		Um Info-Fenster zeige
 Other	FilePermissionsView		Andere
 Query name:	FindPanel		Query-Name:
 Permissions	ContainerWindow		Berechtigungen
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		verschoben
 Identify	InfoWindow		Identifizieren
 Recent folders	ContainerWindow		Letzte Ordner

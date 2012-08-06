@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -1191,7 +1191,8 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 void
 TeamWindow::_HandleImageDebugInfoChanged(image_id imageID)
 {
-	TRACE_GUI("TeamWindow::_HandleImageDebugInfoChanged(%ld)\n", imageID);
+	TRACE_GUI("TeamWindow::_HandleImageDebugInfoChanged(%" B_PRId32 ")\n",
+		imageID);
 
 	// We're only interested in the currently selected thread
 	if (fActiveImage == NULL || imageID != fActiveImage->ID())

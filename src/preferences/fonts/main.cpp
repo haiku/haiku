@@ -50,7 +50,8 @@ FontsApp::AboutRequested()
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 5, &font);
-
+	
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }
 

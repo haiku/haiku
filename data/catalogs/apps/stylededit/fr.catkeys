@@ -17,7 +17,7 @@ Can't undo	Menus		Impossible d'annuler
 Save	Menus		Sauvegarder
 Replace with:	FindandReplaceWindow		Remplacer par :
 Cancel	SaveAlert		Annuler
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossible de revenir, fichier non trouvé : « %s ».
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rétablissement impossible, fichier non trouvé : « %s ».
 Case-sensitive	FindandReplaceWindow		Sensible à la casse
 Green	Menus		Vert
 Revert to saved…	Menus		Revenir à la dernière version enregistrée…

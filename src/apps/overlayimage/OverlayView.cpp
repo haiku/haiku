@@ -159,8 +159,7 @@ OverlayView::OverlayAboutRequested()
 		"originally by Seth Flaxman\n\t"
 		"modified by Hartmuth Reh\n\t"
 		"further modified by Humdinger\n",
-		"OK");
-
+		"OK");	
 	BTextView *view = alert->TextView();
 	BFont font;
 	view->SetStylable(true);
@@ -168,6 +167,6 @@ OverlayView::OverlayAboutRequested()
 	font.SetSize(font.Size() + 7.0f);
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 12, &font);
-	
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);	
 	alert->Go();
 }

@@ -96,7 +96,7 @@ BCheckBox::Archive(BMessage *archive, bool deep) const
 void
 BCheckBox::Draw(BRect updateRect)
 {
-	if (be_control_look) {
+	if (be_control_look != NULL) {
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 		uint32 flags = be_control_look->Flags(this);

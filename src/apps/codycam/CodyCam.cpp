@@ -62,6 +62,7 @@ ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 		B_TRANSLATE("OK"));
 	if (window != NULL)
 		alert->CenterIn(window->Frame());
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 
 	printf("%s\n%s [%lx]", message, strerror(err), err);

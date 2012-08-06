@@ -227,9 +227,11 @@ FileTypes::RefsReceived(BMessage* message)
 				"%s"),
 				ref.name, strerror(status));
 
-			(new BAlert(B_TRANSLATE("FileTypes request"),
+			BAlert* alert = new BAlert(B_TRANSLATE("FileTypes request"),
 				buffer, B_TRANSLATE("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+				B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 
 			message->RemoveData("refs", --index);
 			continue;
@@ -475,9 +477,11 @@ error_alert(const char* message, status_t status, alert_type type)
 			strerror(status));
 	}
 
-	(new BAlert(B_TRANSLATE("FileTypes request"),
+	BAlert* alert = new BAlert(B_TRANSLATE("FileTypes request"),
 		status == B_OK ? message : warning,
-		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, type))->Go();
+		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, type);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 }
 
 

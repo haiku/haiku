@@ -214,7 +214,7 @@ void SnowView::MessageReceived(BMessage *msg)
 			"Where is Santa ??");
 		info->SetFeel(B_NORMAL_WINDOW_FEEL);
 		info->SetLook(B_FLOATING_WINDOW_LOOK);
-		info->SetFlags(info->Flags()|B_NOT_ZOOMABLE);
+		info->SetFlags(info->Flags()|B_NOT_ZOOMABLE|B_CLOSE_ON_ESCAPE);
 		info->Go(NULL);
 		break;
 	default:

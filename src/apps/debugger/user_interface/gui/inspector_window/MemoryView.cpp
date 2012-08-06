@@ -161,7 +161,7 @@ MemoryView::Draw(BRect rect)
 				const char* blockAddress = currentAddress + (j
 					* blockByteSize);
 				_GetNextHexBlock(buffer,
-					std::min(hexBlockSize, sizeof(buffer)),
+					std::min((size_t)hexBlockSize, sizeof(buffer)),
 					blockAddress);
 				DrawString(buffer, drawPoint);
 				if (targetAddress >= blockAddress && targetAddress <

@@ -34,8 +34,10 @@ MouseApplication::MouseApplication()
 void
 MouseApplication::AboutRequested()
 {
-	(new BAlert("about", B_TRANSLATE("...by Andrew Edward McCall"),
-		B_TRANSLATE("Dig Deal")))->Go();
+	BAlert* alert = new BAlert("about",
+		B_TRANSLATE("...by Andrew Edward McCall"), B_TRANSLATE("Dig Deal"));
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
 }
 
 

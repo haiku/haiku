@@ -107,6 +107,7 @@ DisplayView::Load()
 				"It's possible you don't have write access to the "
 				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		(void)alert->Go();
 	}
 
@@ -176,6 +177,7 @@ DisplayView::Save()
 			B_TRANSLATE("Can't save preferenes, you probably don't have "
 				"write access to the settings directory or the disk is full."),
 				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		(void)alert->Go();
 		return ret;
 	}

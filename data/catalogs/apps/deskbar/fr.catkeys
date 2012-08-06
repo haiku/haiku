@@ -1,15 +1,21 @@
-1	french	x-vnd.Be-TSKB	1095421712
+1	french	x-vnd.Be-TSKB	3197510812
 Power off	DeskbarMenu		Éteindre
+Show day of week	PreferencesWindow		Afficher le jour de la semaine
 Edit menu…	PreferencesWindow		Éditer le menu…
+Suspend	DeskbarMenu		Mettre en veille
 Applications	PreferencesWindow		Applications
+Time preferences…	TimeView		Préférences de l'heure…
+About Haiku	DeskbarMenu		À propos de Haiku
 Recent documents:	PreferencesWindow		Documents récents :
 Recent applications	DeskbarMenu		Applications récentes
 Sort running applications	PreferencesWindow		Trier les applications lancées
+Show time	Tray		Afficher l'heure
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applications
 Find…	DeskbarMenu		Rechercher…
 Window	PreferencesWindow		Fenêtre
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Documents récents
+Show seconds	PreferencesWindow		Afficher les secondes
 Auto-hide	PreferencesWindow		Masquer automatiquement
 Always on top	PreferencesWindow		Toujours au dessus
 <Deskbar folder is empty>	DeskbarMenu		<Le dossier Deskbar est vide>
@@ -17,6 +23,7 @@ Show all	WindowMenu		Montrer tout
 No windows	WindowMenu		Pas de fenêtres
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Redémarrer l'ordinateur
+Large	PreferencesWindow		Grande
 Auto-raise	PreferencesWindow		Rehausser automatiquement
 Hide time	TimeView		Cacher l'heure
 Recent folders:	PreferencesWindow		Dossiers récents :
@@ -25,6 +32,7 @@ Restart Tracker	DeskbarMenu		Redémarrer le Tracker
 Close all	WindowMenu		Tout fermer
 Deskbar preferences	PreferencesWindow		Réglages de la Deskbar
 Mount	DeskbarMenu		Monter
+Small	PreferencesWindow		Petite
 Recent applications:	PreferencesWindow		Applications récentes :
 Shutdown…	DeskbarMenu		Arrêter…
 Tracker always first	PreferencesWindow		Lister le Tracker en premier
@@ -35,8 +43,10 @@ Show calendar…	TimeView		Montrer le calendrier…
 Deskbar preferences…	DeskbarMenu		Réglages de la Deskbar…
 Expand new applications	PreferencesWindow		Développer les nouvelles applications
 Show replicants	DeskbarMenu		Afficher les réplicants
+Hide application names	PreferencesWindow		Cacher le nom des applications
 Clock	PreferencesWindow		Horloge
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Démos
+Icon size	PreferencesWindow		Taille des icônes
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Gadgets
 Hide all	WindowMenu		Tout cacher
 Quit application	WindowMenu		Quitter l'application

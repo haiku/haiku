@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -77,7 +77,7 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 		}
 
 		if (piece.size > kMaxPieceSize) {
-			TRACE_LOCALS("  -> overly long piece size (%llu bytes)\n",
+			TRACE_LOCALS("  -> overly long piece size (%" B_PRIu64 " bytes)\n",
 				piece.size);
 			return B_UNSUPPORTED;
 		}
@@ -85,7 +85,7 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 		totalBitSize += piece.bitSize;
 	}
 
-	TRACE_LOCALS("  -> totalBitSize: %llu\n", totalBitSize);
+	TRACE_LOCALS("  -> totalBitSize: %" B_PRIu64 "\n", totalBitSize);
 
 	if (totalBitSize == 0) {
 		TRACE_LOCALS("  -> no size\n");
@@ -99,8 +99,8 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 
 	uint64 valueBitSize = BVariant::SizeOfType(valueType) * 8;
 	if (!shortValueIsFine && totalBitSize < valueBitSize) {
-		TRACE_LOCALS("  -> too short for value type (%llu vs. %llu bits)\n",
-			totalBitSize, valueBitSize);
+		TRACE_LOCALS("  -> too short for value type (%" B_PRIu64 " vs. %"
+			B_PRIu64 " bits)\n", totalBitSize, valueBitSize);
 		return B_BAD_VALUE;
 	}
 
@@ -130,8 +130,8 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 			{
 				target_addr_t address = piece.address;
 
-				TRACE_LOCALS("  piece %ld: memory address: %#llx, bits: %lu\n",
-					i, address, bitSize);
+				TRACE_LOCALS("  piece %" B_PRId32 ": memory address: %#"
+					B_PRIx64 ", bits: %" B_PRIu32 "\n", i, address, bitSize);
 
 				uint8 pieceBuffer[kMaxPieceSize];
 				ssize_t bytesRead = fTeamMemory->ReadMemory(address,
@@ -161,8 +161,8 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 			}
 			case VALUE_PIECE_LOCATION_REGISTER:
 			{
-				TRACE_LOCALS("  piece %ld: register: %lu, bits: %lu\n", i,
-					piece.reg, bitSize);
+				TRACE_LOCALS("  piece %" B_PRId32 ": register: %" B_PRIu32
+					", bits: %" B_PRIu32 "\n", i, piece.reg, bitSize);
 
 				if (fCpuState == NULL) {
 					WARNING("ValueLoader::LoadValue(): register piece, but no "

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TIME_UTILS_H
@@ -65,8 +65,9 @@ format_bigtime(bigtime_t time, char* buffer, size_t bufferSize)
 	decomposed_bigtime decomposed;
 	decompose_time(time, decomposed);
 
-	snprintf(buffer, bufferSize, "%02lld:%02d:%02d:%06d", decomposed.hours,
-		decomposed.minutes, decomposed.seconds, decomposed.micros);
+	snprintf(buffer, bufferSize, "%02" B_PRId64 ":%02d:%02d:%06d",
+		decomposed.hours, decomposed.minutes, decomposed.seconds,
+		decomposed.micros);
 	return buffer;
 }
 
@@ -86,8 +87,9 @@ format_nanotime(nanotime_t time, char* buffer, size_t bufferSize)
 	decomposed_nanotime decomposed;
 	decompose_time(time, decomposed);
 
-	snprintf(buffer, bufferSize, "%02lld:%02d:%02d:%09d", decomposed.hours,
-		decomposed.minutes, decomposed.seconds, decomposed.nanos);
+	snprintf(buffer, bufferSize, "%02" B_PRId64 ":%02d:%02d:%09d",
+		decomposed.hours, decomposed.minutes, decomposed.seconds,
+		decomposed.nanos);
 	return buffer;
 }
 

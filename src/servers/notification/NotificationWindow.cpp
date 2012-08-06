@@ -440,6 +440,7 @@ NotificationWindow::_LoadAppFilters(bool startMonitor)
 			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
 					B_TRANSLATE("Couldn't start filter monitor."
 						" Live filter changes disabled."), B_TRANSLATE("Darn."));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}
@@ -504,6 +505,7 @@ NotificationWindow::_LoadGeneralSettings(bool startMonitor)
 			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
 						B_TRANSLATE("Couldn't start general settings monitor.\n"
 						"Live filter changes disabled."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}
@@ -555,6 +557,7 @@ NotificationWindow::_LoadDisplaySettings(bool startMonitor)
 			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
 				B_TRANSLATE("Couldn't start display settings monitor.\n"
 					"Live filter changes disabled."), B_TRANSLATE("OK"));
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
 	}

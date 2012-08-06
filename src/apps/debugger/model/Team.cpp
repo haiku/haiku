@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -367,7 +367,7 @@ status_t
 Team::GetStatementAtAddress(target_addr_t address, FunctionInstance*& _function,
 	Statement*& _statement)
 {
-	TRACE_CODE("Team::GetStatementAtAddress(%#llx)\n", address);
+	TRACE_CODE("Team::GetStatementAtAddress(%#" B_PRIx64 ")\n", address);
 
 	// get the image at the address
 	Image* image = ImageByAddress(address);
@@ -422,8 +422,8 @@ status_t
 Team::GetStatementAtSourceLocation(SourceCode* sourceCode,
 	const SourceLocation& location, Statement*& _statement)
 {
-	TRACE_CODE("Team::GetStatementAtSourceLocation(%p, (%ld, %ld))\n",
-		sourceCode, location.Line(), location.Column());
+	TRACE_CODE("Team::GetStatementAtSourceLocation(%p, (%" B_PRId32 ", %"
+		B_PRId32 "))\n", sourceCode, location.Line(), location.Column());
 
 	// If we're lucky the source code can provide us with a statement.
 	if (DisassembledCode* code = dynamic_cast<DisassembledCode*>(sourceCode)) {

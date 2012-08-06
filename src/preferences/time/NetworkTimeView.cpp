@@ -377,8 +377,10 @@ NetworkTimeView::MessageReceived(BMessage* message)
 						"while synchronizing:\r\n%s"),
 						errorString);
 
-				(new BAlert(B_TRANSLATE("Time"), buffer, 
-					B_TRANSLATE("OK")))->Go();
+				BAlert* alert = new BAlert(B_TRANSLATE("Time"), buffer, 
+					B_TRANSLATE("OK"));
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
 			}
 			break;
 		}
