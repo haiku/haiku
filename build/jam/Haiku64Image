@@ -55,7 +55,8 @@ SYSTEM_ADD_ONS_ACCELERANTS = vesa.accelerant ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = vesa ;
 
-SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci ps2 isa scsi config_manager ;
+SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci ps2 isa scsi config_manager
+	usb ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 
 # modules
@@ -69,6 +70,8 @@ if $(HAIKU_ATA_STACK) = 1 {
 
 AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci ;
+AddFilesToHaikuImage system add-ons kernel busses usb
+	: <usb>ehci ;
 AddFilesToHaikuImage system add-ons kernel debugger
 	: <kdebug>demangle ;
 AddFilesToHaikuImage system add-ons kernel file_systems
@@ -87,6 +90,7 @@ AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 AddDriversToHaikuImage				: console dprintf null
 									  random <driver>tty zero ;
 AddDriversToHaikuImage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
+AddDriversToHaikuImage disk usb		: usb_disk ;
 AddDriversToHaikuImage input		: ps2_hid ;
 
 # kernel
@@ -227,8 +231,10 @@ AddFilesToHaikuImage system : haiku_loader ;
 
 # boot module links
 AddBootModuleSymlinksToHaikuImage
-	$(ATA_ONLY)ata pci config_manager dpc scsi $(ATA_ONLY)ata_adapter
-	locked_pool scsi_periph ahci generic_ide_pci scsi_cd scsi_disk intel
+	$(ATA_ONLY)ata pci config_manager dpc scsi usb $(ATA_ONLY)ata_adapter
+	locked_pool scsi_periph ahci generic_ide_pci <usb>ehci
+	scsi_cd scsi_disk usb_disk
+	intel
 	bfs
 ;
 
