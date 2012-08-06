@@ -805,13 +805,20 @@ Inode::ReturnDelegation(bool truncate)
 
 	MutexLocker stateLocker(fStateLock);
 	fOpenState->fDelegation = NULL;
+	ReleaseOpenState();
+
+	delete fDelegation;
+	fDelegation = NULL;
+}
+
+
+void
+Inode::ReleaseOpenState()
+{
 	if (fOpenState->ReleaseReference() == 1) {
 		fFileSystem->RemoveOpenFile(fOpenState);
 		fOpenState = NULL;
 	}
-
-	delete fDelegation;
-	fDelegation = NULL;
 }
 
 

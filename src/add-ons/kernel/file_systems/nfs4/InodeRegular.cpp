@@ -130,13 +130,24 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 			status_t result = OpenFile(fOpenState, O_RDWR, &data);
 			if (result != B_OK) {
 				locker.Lock();
-				if (fOpenState->ReleaseReference() == 1) {
-					fFileSystem->RemoveOpenFile(fOpenState);
-					fOpenState = NULL;
-				}
+				ReleaseOpenState();
 				return result;
 			}
 			fOpenState->fMode = O_RDWR;
+		} else {
+			int newMode = mode & O_RWMASK;
+			uint32 allowed = 0;
+			if (newMode == O_RDWR || newMode == O_RDONLY)
+				allowed |= R_OK;
+			if (newMode == O_RDWR || newMode == O_WRONLY)
+				allowed |= W_OK;
+
+			status_t result = Access(allowed);
+			if (result != B_OK) {
+				locker.Lock();
+				ReleaseOpenState();
+				return result;
+			}
 		}
 	}
 
@@ -173,12 +184,7 @@ Inode::Close(OpenFileCookie* cookie)
 	SyncAndCommit();
 
 	MutexLocker _(fStateLock);
-	if (cookie->fOpenState != NULL) {
-		if (cookie->fOpenState->ReleaseReference() == 1) {
-			fFileSystem->RemoveOpenFile(fOpenState);
-			fOpenState = NULL;
-		}
-	}
+	ReleaseOpenState();
 
 	return B_OK;
 }

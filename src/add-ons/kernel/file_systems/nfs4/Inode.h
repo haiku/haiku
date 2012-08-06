@@ -93,6 +93,8 @@ public:
 protected:
 								Inode();
 
+					void		ReleaseOpenState();
+
 					status_t	CreateState(const char* name, int mode,
 									int perms, OpenState* state,
 									OpenDelegationData* data);
