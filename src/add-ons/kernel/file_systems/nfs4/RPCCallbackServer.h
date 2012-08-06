@@ -20,6 +20,8 @@ class Callback;
 
 struct ConnectionEntry {
 	Connection*			fConnection;
+	thread_id			fThread;
+
 	ConnectionEntry*	fNext;
 	ConnectionEntry*	fPrev;
 };

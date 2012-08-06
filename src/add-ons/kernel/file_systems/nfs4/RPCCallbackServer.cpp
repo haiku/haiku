@@ -143,6 +143,10 @@ CallbackServer::StopServer()
 		ConnectionEntry* entry = fConnectionList;
 		fConnectionList = entry->fNext;
 		entry->fConnection->Disconnect();
+
+		status_t result;
+		wait_for_thread(entry->fThread, &result);
+
 		delete entry->fConnection;
 		delete entry;
 	}
@@ -163,6 +167,8 @@ CallbackServer::NewConnection(Connection* connection)
 
 	MutexLocker locker(fConnectionLock);
 	entry->fNext = fConnectionList;
+	if (fConnectionList != NULL)
+		fConnectionList->fPrev = entry;
 	fConnectionList = entry;
 	locker.Unlock();
 
@@ -177,13 +183,17 @@ CallbackServer::NewConnection(Connection* connection)
 	thread = spawn_kernel_thread(&CallbackServer::ConnectionThreadLauncher,
 		"NFSv4 Callback Connection", B_NORMAL_PRIORITY, arguments);
 	if (thread < B_OK) {
+		ReleaseConnection(entry);
 		free(arguments);
 		return thread;
 	}
 
+	entry->fThread = thread;
+
 	status_t result = resume_thread(thread);
 	if (result != B_OK) {
 		kill_thread(thread);
+		ReleaseConnection(entry);
 		free(arguments);
 		return result;
 	}
@@ -232,7 +242,8 @@ CallbackServer::ConnectionThread(ConnectionEntry* entry)
 		void* buffer;
 		status_t result = connection->Receive(&buffer, &size);
 		if (result != B_OK) {
-			ReleaseConnection(entry);
+			if (result != ECONNABORTED)
+				ReleaseConnection(entry);
 			return result;
 		}
 
