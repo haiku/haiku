@@ -42,6 +42,7 @@ public:
 
 			status_t		CallbackRecall(RequestInterpreter* request,
 								ReplyBuilder* reply);
+			status_t		RecallAll();
 private:
 			status_t		_GetLeaseTime();
 

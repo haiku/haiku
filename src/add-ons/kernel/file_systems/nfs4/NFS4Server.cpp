@@ -11,6 +11,7 @@
 #include "Inode.h"
 #include "NFS4Server.h"
 #include "Request.h"
+#include "WorkQueue.h"
 
 
 NFS4Server::NFS4Server(RPC::Server* serv)
@@ -247,6 +248,9 @@ NFS4Server::_Renewal()
 		request.Send();
 
 		switch (request.Reply().NFS4Error()) {
+			case NFS4ERR_CB_PATH_DOWN:
+				RecallAll();
+				break;
 			case NFS4ERR_STALE_CLIENTID:
 				ServerRebooted(clientId);
 				break;
@@ -328,11 +332,40 @@ NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
 		return B_FILE_NOT_FOUND;
 	}
 
-	// TODO: should be asynchronous
-	delegation->GetInode()->RecallDelegation(truncate);
+	DelegationRecallArgs* args = new(std::nothrow) DelegationRecallArgs;
+	args->fDelegation = delegation;
+	args->fTruncate = truncate;
+	gWorkQueue->EnqueueJob(DelegationRecall, args);
 
 	reply->Recall(B_OK);
 
+	return B_OK;
+}
+
+
+status_t
+NFS4Server::RecallAll()
+{
+#if 0
+	MutexLocker locker(fFSLock);
+
+	Delegation* delegation = NULL;
+	FileSystem* current = fFileSystems;
+	while (current != NULL) {
+		delegation = current->GetDelegation(handle);
+		if (delegation != NULL)
+			break;
+
+		current = current->fNext;
+	}
+	locker.Unlock();
+
+	DelegationRecallArgs args = new(std::nothrow) DelegationRecallArgs;
+	DelegationRecallArgs* args;
+	args->fDelegation = delegation;
+	args->fTruncate = truncate;
+	gWorkQueue->EnqueueJob(DelegationRecall, args);
+#endif
 	return B_OK;
 }
 

@@ -26,7 +26,7 @@ CallbackServer::CallbackServer()
 	fConnectionList(NULL),
 	fListener(NULL),
 	fThreadRunning(false),
-	//fCallbackArray(NULL),
+	fCallbackArray(NULL),
 	fArraySize(0),
 	fFreeSlot(-1)
 {
@@ -40,7 +40,7 @@ CallbackServer::~CallbackServer()
 {
 	StopServer();
 
-	//free(fCallbackArray);
+	free(fCallbackArray);
 	rw_lock_destroy(&fArrayLock);
 	mutex_destroy(&fThreadLock);
 	mutex_destroy(&fConnectionLock);

@@ -163,7 +163,7 @@ ServerAddress::InAddr() const
 status_t
 ServerAddress::ResolveName(const char* name, ServerAddress* address)
 {
-	address->fProtocol = IPPROTO_TCP;
+	address->fProtocol = IPPROTO_UDP;
 
 	// getaddrinfo() is very expensive when called from kernel, so we do not
 	// want to call it unless there is no other choice.

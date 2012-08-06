@@ -22,6 +22,7 @@
 #include "RootInode.h"
 #include "RPCCallbackServer.h"
 #include "RPCServer.h"
+#include "WorkQueue.h"
 
 
 extern fs_volume_ops gNFSv4VolumeOps;
@@ -282,8 +283,21 @@ nfs4_write_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
 static status_t
 nfs4_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
 {
-	// no asynchronous calls yet
-	return B_UNSUPPORTED;
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
+	IORequestArgs* args = new(std::nothrow) IORequestArgs;
+	if (args == NULL) {
+		notify_io_request(request, B_NO_MEMORY);
+		return B_NO_MEMORY;
+	}
+	args->fRequest = request;
+	args->fInode = inode;
+
+	status_t result = gWorkQueue->EnqueueJob(IORequest, args);
+	if (result != B_OK)
+		notify_io_request(request, result);
+
+	return result;
 }
 
 
@@ -651,10 +665,19 @@ nfs4_init()
 		return B_NO_MEMORY;
 	}
 
+	gWorkQueue = new(std::nothrow) WorkQueue;
+	if (gWorkQueue == NULL || gWorkQueue->InitStatus() != B_OK) {
+		delete gWorkQueue;
+		delete gIdMapper;
+		delete gRPCServerManager;
+		return B_NO_MEMORY;
+	}
+
 	gRPCCallbackServer = new(std::nothrow) RPC::CallbackServer;
 	if (gRPCCallbackServer == NULL) {
-		delete gRPCServerManager;
 		delete gIdMapper;
+		delete gWorkQueue;
+		delete gRPCServerManager;
 		return B_NO_MEMORY;
 	}
 
@@ -669,6 +692,7 @@ nfs4_uninit()
 
 	delete gRPCCallbackServer;
 	delete gIdMapper;
+	delete gWorkQueue;
 	delete gRPCServerManager;
 
 	return B_OK;
