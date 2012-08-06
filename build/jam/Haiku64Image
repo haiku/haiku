@@ -71,9 +71,9 @@ if $(HAIKU_ATA_STACK) = 1 {
 AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage system add-ons kernel busses usb
-	: <usb>ehci ;
+	: <usb>uhci <usb>ehci ;
 AddFilesToHaikuImage system add-ons kernel debugger
-	: <kdebug>demangle ;
+	: <kdebug>demangle <kdebug>invalidate_on_exit <kdebug>usb_keyboard ;
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
@@ -232,7 +232,7 @@ AddFilesToHaikuImage system : haiku_loader ;
 # boot module links
 AddBootModuleSymlinksToHaikuImage
 	$(ATA_ONLY)ata pci config_manager dpc scsi usb $(ATA_ONLY)ata_adapter
-	locked_pool scsi_periph ahci generic_ide_pci <usb>ehci
+	locked_pool scsi_periph ahci generic_ide_pci <usb>uhci <usb>ehci
 	scsi_cd scsi_disk usb_disk
 	intel
 	bfs

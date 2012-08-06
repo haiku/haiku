@@ -146,7 +146,8 @@ void
 print_descriptor_chain(uhci_td *descriptor)
 {
 	while (descriptor) {
-		dprintf("ph: 0x%08lx; lp: 0x%08lx; vf: %s; q: %s; t: %s; st: 0x%08lx; to: 0x%08lx\n",
+		dprintf("ph: 0x%08" B_PRIx32 "; lp: 0x%08" B_PRIx32 "; vf: %s; q: %s; "
+			"t: %s; st: 0x%08" B_PRIx32 "; to: 0x%08" B_PRIx32 "\n",
 			descriptor->this_phy & 0xffffffff, descriptor->link_phy & 0xfffffff0,
 			descriptor->link_phy & 0x4 ? "y" : "n",
 			descriptor->link_phy & 0x2 ? "qh" : "td",
@@ -174,13 +175,13 @@ Queue::Queue(Stack *stack)
 
 	mutex_init(&fLock, "uhci queue lock");
 
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 	fStatus = fStack->AllocateChunk((void **)&fQueueHead, &physicalAddress,
 		sizeof(uhci_qh));
 	if (fStatus < B_OK)
 		return;
 
-	fQueueHead->this_phy = (addr_t)physicalAddress;
+	fQueueHead->this_phy = (uint32)physicalAddress;
 	fQueueHead->element_phy = QH_TERMINATE;
 
 	fStrayDescriptor = NULL;
@@ -193,10 +194,10 @@ Queue::~Queue()
 	Lock();
 	mutex_destroy(&fLock);
 
-	fStack->FreeChunk(fQueueHead, (void *)fQueueHead->this_phy, sizeof(uhci_qh));
+	fStack->FreeChunk(fQueueHead, fQueueHead->this_phy, sizeof(uhci_qh));
 
 	if (fStrayDescriptor)
-		fStack->FreeChunk(fStrayDescriptor, (void *)fStrayDescriptor->this_phy,
+		fStack->FreeChunk(fStrayDescriptor, fStrayDescriptor->this_phy,
 			sizeof(uhci_td));
 }
 
@@ -244,7 +245,7 @@ Queue::TerminateByStrayDescriptor()
 {
 	// According to the *BSD USB sources, there needs to be a stray transfer
 	// descriptor in order to get some chipset to work nicely (like the PIIX).
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 	status_t result = fStack->AllocateChunk((void **)&fStrayDescriptor,
 		&physicalAddress, sizeof(uhci_td));
 	if (result < B_OK) {
@@ -253,7 +254,7 @@ Queue::TerminateByStrayDescriptor()
 	}
 
 	fStrayDescriptor->status = 0;
-	fStrayDescriptor->this_phy = (addr_t)physicalAddress;
+	fStrayDescriptor->this_phy = (uint32)physicalAddress;
 	fStrayDescriptor->link_phy = TD_TERMINATE;
 	fStrayDescriptor->link_log = NULL;
 	fStrayDescriptor->buffer_phy = 0;
@@ -263,7 +264,7 @@ Queue::TerminateByStrayDescriptor()
 		| (0x7f << TD_TOKEN_DEVADDR_SHIFT) | TD_TOKEN_IN;
 
 	if (!Lock()) {
-		fStack->FreeChunk(fStrayDescriptor, (void *)fStrayDescriptor->this_phy,
+		fStack->FreeChunk(fStrayDescriptor, fStrayDescriptor->this_phy,
 			sizeof(uhci_td));
 		return B_ERROR;
 	}
@@ -346,7 +347,7 @@ Queue::RemoveTransfer(uhci_qh *transfer, bool lock)
 }
 
 
-addr_t
+uint32
 Queue::PhysicalAddress()
 {
 	return fQueueHead->this_phy;
@@ -358,8 +359,14 @@ Queue::PrintToStream()
 {
 #ifdef TRACE_USB
 	TRACE("queue:\n");
-	dprintf("link phy: 0x%08lx; link type: %s; terminate: %s\n", fQueueHead->link_phy & 0xfff0, fQueueHead->link_phy & 0x0002 ? "QH" : "TD", fQueueHead->link_phy & 0x0001 ? "yes" : "no");
-	dprintf("elem phy: 0x%08lx; elem type: %s; terminate: %s\n", fQueueHead->element_phy & 0xfff0, fQueueHead->element_phy & 0x0002 ? "QH" : "TD", fQueueHead->element_phy & 0x0001 ? "yes" : "no");
+	dprintf("link phy: 0x%08" B_PRIx32 "; link type: %s; terminate: %s\n",
+		fQueueHead->link_phy & 0xfff0,
+		fQueueHead->link_phy & 0x0002 ? "QH" : "TD",
+		fQueueHead->link_phy & 0x0001 ? "yes" : "no");
+	dprintf("elem phy: 0x%08" B_PRIx32 "; elem type: %s; terminate: %s\n",
+		fQueueHead->element_phy & 0xfff0,
+		fQueueHead->element_phy & 0x0002 ? "QH" : "TD",
+		fQueueHead->element_phy & 0x0001 ? "yes" : "no");
 #endif
 }
 
@@ -413,11 +420,11 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	fRegisterBase = sPCIModule->read_pci_config(fPCIInfo->bus,
 		fPCIInfo->device, fPCIInfo->function, PCI_memory_base, 4);
 	fRegisterBase &= PCI_address_io_mask;
-	TRACE("iospace offset: 0x%08lx\n", fRegisterBase);
+	TRACE("iospace offset: 0x%08" B_PRIx32 "\n", fRegisterBase);
 
 	if (fRegisterBase == 0) {
 		fRegisterBase = fPCIInfo->u.h0.base_registers[0];
-		TRACE_ALWAYS("register base: 0x%08lx\n", fRegisterBase);
+		TRACE_ALWAYS("register base: 0x%08" B_PRIx32 "\n", fRegisterBase);
 	}
 
 	// enable pci address access
@@ -444,9 +451,9 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	}
 
 	// Setup the frame list
-	void *physicalAddress;
-	fFrameArea = fStack->AllocateArea((void **)&fFrameList,
-		(void **)&physicalAddress, 4096, "USB UHCI framelist");
+	phys_addr_t physicalAddress;
+	fFrameArea = fStack->AllocateArea((void **)&fFrameList, &physicalAddress,
+		4096, "USB UHCI framelist");
 
 	if (fFrameArea < B_OK) {
 		TRACE_ERROR("unable to create an area for the frame pointer list\n");
@@ -641,7 +648,7 @@ UHCI::Start()
 	bool running = false;
 	for (int32 i = 0; i < 10; i++) {
 		uint16 status = ReadReg16(UHCI_USBSTS);
-		TRACE("current loop %ld, status 0x%04x\n", i, status);
+		TRACE("current loop %" B_PRId32 ", status 0x%04x\n", i, status);
 
 		if (status & UHCI_USBSTS_HCHALT)
 			snooze(10000);
@@ -1149,7 +1156,7 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 		}
 	}
 
-	TRACE("isochronous submitted size=%ld bytes, TDs=%ld, "
+	TRACE("isochronous submitted size=%ld bytes, TDs=%" B_PRId32 ", "
 		"packetSize=%ld, restSize=%ld\n", transfer->DataLength(),
 		isochronousData->packet_count, packetSize, restSize);
 
@@ -1328,8 +1335,8 @@ UHCI::FinishTransfers()
 			continue;
 
 		TRACE("finishing transfers (first transfer: 0x%08lx; last"
-			" transfer: 0x%08lx)\n", (uint32)fFirstTransfer,
-			(uint32)fLastTransfer);
+			" transfer: 0x%08lx)\n", (addr_t)fFirstTransfer,
+			(addr_t)fLastTransfer);
 		transfer_data *lastTransfer = NULL;
 		transfer_data *transfer = fFirstTransfer;
 		Unlock();
@@ -1343,15 +1350,16 @@ UHCI::FinishTransfers()
 				uint32 status = descriptor->status;
 				if (status & TD_STATUS_ACTIVE) {
 					// still in progress
-					TRACE("td (0x%08lx) still active\n", descriptor->this_phy);
+					TRACE("td (0x%08" B_PRIx32 ") still active\n",
+						descriptor->this_phy);
 					break;
 				}
 
 				if (status & TD_ERROR_MASK) {
 					// an error occured
-					TRACE_ERROR("td (0x%08lx) error: status: 0x%08lx;"
-						" token: 0x%08lx;\n", descriptor->this_phy, status,
-						descriptor->token);
+					TRACE_ERROR("td (0x%08" B_PRIx32 ") error: status: 0x%08"
+						B_PRIx32 "; token: 0x%08" B_PRIx32 ";\n",
+						descriptor->this_phy, status, descriptor->token);
 
 					uint8 errorCount = status >> TD_ERROR_COUNT_SHIFT;
 					errorCount &= TD_ERROR_COUNT_MASK;
@@ -1396,7 +1404,7 @@ UHCI::FinishTransfers()
 						&& uhci_td_actual_length(descriptor)
 							< uhci_td_maximum_length(descriptor))) {
 					// all descriptors are done, or we have a short packet
-					TRACE("td (0x%08lx) ok\n", descriptor->this_phy);
+					TRACE("td (0x%08" B_PRIx32 ") ok\n", descriptor->this_phy);
 					callbackStatus = B_OK;
 					transferDone = true;
 					break;
@@ -1919,8 +1927,8 @@ UHCI::AddTo(Stack *stack)
 	if (!sPCIModule) {
 		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
 		if (status < B_OK) {
-			TRACE_MODULE_ERROR("AddTo(): getting pci module failed! 0x%08lx\n",
-				status);
+			TRACE_MODULE_ERROR("AddTo(): getting pci module failed! 0x%08"
+				B_PRIx32 "\n", status);
 			return status;
 		}
 	}
@@ -1956,8 +1964,8 @@ UHCI::AddTo(Stack *stack)
 			}
 
 			if (bus->InitCheck() < B_OK) {
-				TRACE_MODULE_ERROR("AddTo(): InitCheck() failed 0x%08lx\n",
-					bus->InitCheck());
+				TRACE_MODULE_ERROR("AddTo(): InitCheck() failed 0x%08" B_PRIx32
+					"\n", bus->InitCheck());
 				delete bus;
 				continue;
 			}
@@ -2027,12 +2035,12 @@ uhci_qh *
 UHCI::CreateTransferQueue(uhci_td *descriptor)
 {
 	uhci_qh *queueHead;
-	void *physicalAddress;
-	if (fStack->AllocateChunk((void **)&queueHead,
-		&physicalAddress, sizeof(uhci_qh)) < B_OK)
+	phys_addr_t physicalAddress;
+	if (fStack->AllocateChunk((void **)&queueHead, &physicalAddress,
+		sizeof(uhci_qh)) < B_OK)
 		return NULL;
 
-	queueHead->this_phy = (addr_t)physicalAddress;
+	queueHead->this_phy = (uint32)physicalAddress;
 	queueHead->element_phy = descriptor->this_phy;
 	return queueHead;
 }
@@ -2044,7 +2052,7 @@ UHCI::FreeTransferQueue(uhci_qh *queueHead)
 	if (!queueHead)
 		return;
 
-	fStack->FreeChunk(queueHead, (void *)queueHead->this_phy, sizeof(uhci_qh));
+	fStack->FreeChunk(queueHead, queueHead->this_phy, sizeof(uhci_qh));
 }
 
 
@@ -2052,7 +2060,7 @@ uhci_td *
 UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 {
 	uhci_td *result;
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 
 	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
 		sizeof(uhci_td)) < B_OK) {
@@ -2060,7 +2068,7 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 		return NULL;
 	}
 
-	result->this_phy = (addr_t)physicalAddress;
+	result->this_phy = (uint32)physicalAddress;
 	result->status = TD_STATUS_ACTIVE;
 	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
 		result->status |= TD_CONTROL_ISOCHRONOUS;
@@ -2090,12 +2098,13 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 		return result;
 	}
 
-	if (fStack->AllocateChunk(&result->buffer_log, (void **)&result->buffer_phy,
+	if (fStack->AllocateChunk(&result->buffer_log, &physicalAddress,
 		bufferSize) < B_OK) {
 		TRACE_ERROR("unable to allocate space for the buffer\n");
-		fStack->FreeChunk(result, (void *)result->this_phy, sizeof(uhci_td));
+		fStack->FreeChunk(result, result->this_phy, sizeof(uhci_td));
 		return NULL;
 	}
+	result->buffer_phy = physicalAddress;
 
 	return result;
 }
@@ -2150,10 +2159,10 @@ UHCI::FreeDescriptor(uhci_td *descriptor)
 
 	if (descriptor->buffer_log) {
 		fStack->FreeChunk(descriptor->buffer_log,
-			(void *)descriptor->buffer_phy, descriptor->buffer_size);
+			descriptor->buffer_phy, descriptor->buffer_size);
 	}
 
-	fStack->FreeChunk(descriptor, (void *)descriptor->this_phy, sizeof(uhci_td));
+	fStack->FreeChunk(descriptor, descriptor->this_phy, sizeof(uhci_td));
 }
 
 
