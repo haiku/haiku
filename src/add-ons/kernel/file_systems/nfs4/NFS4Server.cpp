@@ -346,26 +346,26 @@ NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
 status_t
 NFS4Server::RecallAll()
 {
-#if 0
-	MutexLocker locker(fFSLock);
+	MutexLocker _(fFSLock);
+	FileSystem* fs = fFileSystems;
+	while (fs != NULL) {
+		DoublyLinkedList<Delegation>& list = fs->DelegationsLock();
+		DoublyLinkedList<Delegation>::Iterator iterator = list.GetIterator();
 
-	Delegation* delegation = NULL;
-	FileSystem* current = fFileSystems;
-	while (current != NULL) {
-		delegation = current->GetDelegation(handle);
-		if (delegation != NULL)
-			break;
+		Delegation* current = iterator.Next();
+		while (current != NULL) {
+			DelegationRecallArgs* args = new(std::nothrow) DelegationRecallArgs;
+			args->fDelegation = current;
+			args->fTruncate = false;
+			gWorkQueue->EnqueueJob(DelegationRecall, args);
 
-		current = current->fNext;
+			current = iterator.Next();
+		}	
+		fs->DelegationsUnlock();
+
+		fs = fs->fNext;
 	}
-	locker.Unlock();
 
-	DelegationRecallArgs args = new(std::nothrow) DelegationRecallArgs;
-	DelegationRecallArgs* args;
-	args->fDelegation = delegation;
-	args->fTruncate = truncate;
-	gWorkQueue->EnqueueJob(DelegationRecall, args);
-#endif
 	return B_OK;
 }
 

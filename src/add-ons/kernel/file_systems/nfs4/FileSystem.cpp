@@ -311,10 +311,27 @@ FileSystem::RemoveOpenFile(OpenState* state)
 }
 
 
+DoublyLinkedList<Delegation>&
+FileSystem::DelegationsLock()
+{
+	mutex_lock(&fDelegationLock);
+	return fDelegationList;
+}
+
+
+void
+FileSystem::DelegationsUnlock()
+{
+	mutex_unlock(&fDelegationLock);
+}
+
+
 void
 FileSystem::AddDelegation(Delegation* delegation)
 {
 	MutexLocker _(fDelegationLock);
+
+	fDelegationList.InsertBefore(fDelegationList.Head(), delegation);
 
 	fHandleToDelegation.Remove(delegation->fInfo.fHandle);
 	fHandleToDelegation.Insert(delegation->fInfo.fHandle, delegation);
@@ -328,6 +345,7 @@ FileSystem::RemoveDelegation(Delegation* delegation)
 {
 	MutexLocker _(fDelegationLock);
 
+	fDelegationList.Remove(delegation);
 	fHandleToDelegation.Remove(delegation->fInfo.fHandle);
 
 	NFSServer()->DecUsage();

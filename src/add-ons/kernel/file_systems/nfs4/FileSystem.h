@@ -36,6 +36,8 @@ public:
 			void				AddOpenFile(OpenState* state);
 			void				RemoveOpenFile(OpenState* state);
 
+			DoublyLinkedList<Delegation>&	DelegationsLock();
+			void				DelegationsUnlock();
 			void				AddDelegation(Delegation* delegation);
 			void				RemoveDelegation(Delegation* delegation);
 			Delegation*			GetDelegation(const FileHandle& handle);
@@ -68,6 +70,7 @@ private:
 			CacheRevalidator	fCacheRevalidator;
 
 			mutex				fDelegationLock;
+			DoublyLinkedList<Delegation>	fDelegationList;
 			AVLTreeMap<FileHandle, Delegation*> fHandleToDelegation;
 
 			OpenState*			fOpenFiles;
