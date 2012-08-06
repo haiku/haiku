@@ -526,15 +526,6 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 		}
 
 		req.PutFH(fInfo.fParent);
-		if ((mode & O_TRUNC) == O_TRUNC) {
-			AttrValue attr;
-			attr.fAttribute = FATTR4_SIZE;
-			attr.fFreePointer = false;
-			attr.fData.fValue64 = 0;
-			req.Open(CLAIM_NULL, sequence, sModeToAccess(mode),
-				state->fClientID, OPEN4_CREATE, fFileSystem->OpenOwner(), 
-				fInfo.fName, &attr, 1, false);
-		} else
 		req.Open(CLAIM_NULL, sequence, sModeToAccess(mode), state->fClientID,
 			OPEN4_NOCREATE, fFileSystem->OpenOwner(), fInfo.fName);
 		req.GetFH();

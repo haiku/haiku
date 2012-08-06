@@ -138,6 +138,13 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		}
 	}
 
+	if ((mode & O_TRUNC) == O_TRUNC) {
+		struct stat st;
+		st.st_size = 0;
+		WriteStat(&st, B_STAT_SIZE);
+		file_cache_set_size(fFileCache, 0);
+	}
+
 	cookie->fOpenState = fOpenState;
 
 	cookie->fFileSystem = fFileSystem;
