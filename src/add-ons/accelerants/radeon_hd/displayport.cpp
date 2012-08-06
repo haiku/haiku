@@ -857,3 +857,47 @@ dp_link_train(uint32 connectorIndex, display_mode* mode)
 
 	return B_OK;
 }
+
+
+void
+debug_dp_info()
+{
+	ERROR("Current DisplayPort Info =================\n");
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		if (gConnector[id]->valid == true) {
+			dp_info* dp = &gConnector[id]->dpInfo;
+			ERROR("Connector #%" B_PRIu32 ") DP: %s\n", id,
+				dp->valid ? "true" : "false");
+
+			if (!dp->valid)
+				continue;
+			ERROR(" + DP Config Data\n");
+			ERROR("   - max lane count:          %d\n",
+				dp->config[DP_MAX_LANE_COUNT] & DP_MAX_LANE_COUNT_MASK);
+			ERROR("   - max link rate:           %d\n",
+				dp->config[DP_MAX_LINK_RATE]);
+			ERROR("   - receiver port count:     %d\n",
+				dp->config[DP_NORP] & DP_NORP_MASK);
+			ERROR("   - downstream port present: %s\n",
+				(dp->config[DP_DOWNSTREAMPORT] & DP_DOWNSTREAMPORT_EN)
+				? "yes" : "no");
+			ERROR("   - downstream port count:   %d\n",
+				dp->config[DP_DOWNSTREAMPORT_COUNT]
+				& DP_DOWNSTREAMPORT_COUNT_MASK);
+			ERROR(" + Training\n");
+			ERROR("   - use encoder:             %s\n",
+				dp->trainingUseEncoder ? "true" : "false");
+			ERROR("   - attempts:                %" B_PRIu8 "\n",
+				dp->trainingAttempts);
+			ERROR("   - delay:                   %d\n",
+				dp->trainingReadInterval);
+			ERROR(" + Data\n");
+			ERROR("   - auxPin:                  0x%" B_PRIX32"\n", dp->auxPin);
+			ERROR(" + Video\n");
+			ERROR("   - laneCount:               %d\n", dp->laneCount);
+			ERROR("   - linkRate:                %" B_PRIu32 "\n",
+				dp->linkRate);
+		}
+	}
+	ERROR("==========================================\n");
+}

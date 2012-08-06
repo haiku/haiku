@@ -40,5 +40,6 @@ status_t dp_link_train(uint32 connectorIndex, display_mode* mode);
 status_t dp_link_train_cr(uint32 connectorIndex);
 status_t dp_link_train_ce(uint32 connectorIndex);
 
+void debug_dp_info();
 
 #endif /* RADEON_HD_DISPLAYPORT_H */
