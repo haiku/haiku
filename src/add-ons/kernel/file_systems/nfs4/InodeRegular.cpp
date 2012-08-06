@@ -31,6 +31,8 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 	if (result != B_OK)
 		return result;
 
+	RevalidateFileCache();
+
 	FileInfo fi;
 	fi.fFileId = fileID;
 	fi.fHandle = handle;

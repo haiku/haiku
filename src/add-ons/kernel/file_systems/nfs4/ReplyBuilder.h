@@ -22,6 +22,8 @@ public:
 
 			RPC::CallbackReply*		Reply();
 
+			status_t				GetAttr(status_t status, int mask,
+										uint64 size, uint64 change);
 			status_t				Recall(status_t status);
 
 private:

@@ -57,6 +57,40 @@ ReplyBuilder::Reply()
 
 
 status_t
+ReplyBuilder::GetAttr(status_t status, int mask, uint64 size, uint64 change)
+{
+	if (fStatus != B_OK)
+		return B_ERROR;
+
+	fReply->Stream().AddUInt(OpCallbackGetAttr);
+	fReply->Stream().AddUInt(_HaikuErrorToNFS4(fStatus));
+	fStatus = status;
+
+	if (status == B_OK) {
+		uint32 bitmap = 0;
+		if ((mask & CallbackAttrChange) != 0)
+			bitmap |= 1 << FATTR4_CHANGE;
+		if ((mask & CallbackAttrSize) != 0)
+			bitmap |= 1 << FATTR4_SIZE;
+		fReply->Stream().AddUInt(1);
+		fReply->Stream().AddUInt(bitmap);
+
+		XDR::WriteStream str;
+		if ((mask & CallbackAttrChange) != 0)
+			str.AddUHyper(change);
+
+		if ((mask & CallbackAttrSize) != 0)
+			str.AddUHyper(size);
+		fReply->Stream().AddOpaque(str);
+	}
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 ReplyBuilder::Recall(status_t status)
 {
 	if (fStatus != B_OK)

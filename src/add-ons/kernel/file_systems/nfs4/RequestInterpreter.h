@@ -24,6 +24,7 @@ public:
 	inline	uint32		OperationCount();
 	inline	uint32		Operation();
 
+			status_t	GetAttr(FileHandle* handle, int* mask);
 			status_t	Recall(FileHandle* handle, bool& truncate,
 							uint32* stateSeq, uint32* stateID);
 

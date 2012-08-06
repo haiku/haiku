@@ -26,6 +26,7 @@ enum CallbackProcedure {
 };
 
 enum CallbackOpcode {
+	OpCallbackGetAttr		= 3,
 	OpCallbackRecall		= 4
 };
 
@@ -135,6 +136,10 @@ enum Attribute {
 	FATTR4_MAXIMUM_ATTR_ID
 };
 
+enum CallbackAttr {
+	CallbackAttrSize			= 1,
+	CallbackAttrChange			= 2
+};
 
 static inline bool sIsAttrSet(Attribute attr, const uint32* bitmap,
 	uint32 count)

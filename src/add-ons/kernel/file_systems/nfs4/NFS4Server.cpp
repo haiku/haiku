@@ -284,6 +284,9 @@ NFS4Server::ProcessCallback(RPC::CallbackRequest* request,
 
 	for (uint32 i = 0; i < count; i++) {
 		switch (req.Operation()) {
+			case OpCallbackGetAttr:
+				result = CallbackGetAttr(&req, &reply);
+				break;
 			case OpCallbackRecall:
 				result = CallbackRecall(&req, &reply);
 				break;
@@ -338,6 +341,48 @@ NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
 	gWorkQueue->EnqueueJob(DelegationRecall, args);
 
 	reply->Recall(B_OK);
+
+	return B_OK;
+}
+
+
+status_t
+NFS4Server::CallbackGetAttr(RequestInterpreter* request, ReplyBuilder* reply)
+{
+	FileHandle handle;
+	int mask;
+
+	status_t result = request->GetAttr(&handle, &mask);
+	if (result != B_OK)
+		return result;
+	return B_OK;
+
+	MutexLocker locker(fFSLock);
+
+	Delegation* delegation = NULL;
+	FileSystem* current = fFileSystems;
+	while (current != NULL) {
+		delegation = current->GetDelegation(handle);
+		if (delegation != NULL)
+			break;
+
+		current = current->fNext;
+	}
+	locker.Unlock();
+
+	if (delegation == NULL) {
+		reply->GetAttr(B_FILE_NOT_FOUND, 0, 0, 0);
+		return B_FILE_NOT_FOUND;
+	}
+
+	struct stat st;
+	delegation->GetInode()->Stat(&st);
+
+	uint64 change;
+	change = delegation->GetInode()->Change();
+	if (delegation->GetInode()->Dirty())
+		change++;
+	reply->GetAttr(B_OK, mask, st.st_size, change);
 
 	return B_OK;
 }

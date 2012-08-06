@@ -29,6 +29,40 @@ RequestInterpreter::~RequestInterpreter()
 
 
 status_t
+RequestInterpreter::GetAttr(FileHandle* handle, int* _mask)
+{
+	if (fLastOperation != OpCallbackGetAttr)
+		return B_BAD_VALUE;
+
+	uint32 size;
+	const void* ptr = fRequest->Stream().GetOpaque(&size);
+	handle->fSize = size;
+	memcpy(handle->fData, ptr, size);
+
+	uint32 count = fRequest->Stream().GetUInt();
+	if (count < 1) {
+		*_mask = 0;
+		return fRequest->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	}
+
+	uint32 bitmap = fRequest->Stream().GetUInt();
+	uint32 mask = 0;
+
+	if ((bitmap & (1 << FATTR4_CHANGE)) != 0)
+		mask |= CallbackAttrChange;
+	if ((bitmap & (1 << FATTR4_SIZE)) != 0)
+		mask |= CallbackAttrSize;
+
+	*_mask = mask;
+
+	for (uint32 i = 1; i < count; i++)
+		fRequest->Stream().GetUInt();
+
+	return fRequest->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+}
+
+
+status_t
 RequestInterpreter::Recall(FileHandle* handle, bool& truncate, uint32* stateSeq,
 	uint32* stateID)
 {

@@ -34,6 +34,9 @@ public:
 
 	inline			uint64		MaxFileSize();
 
+	inline			uint64		Change();
+	inline			bool		Dirty();
+
 					void		SetDelegation(Delegation* delegation);
 					void		RecallDelegation(bool truncate = false);
 					void		RecallReadDelegation();
@@ -192,6 +195,20 @@ inline uint64
 Inode::MaxFileSize()
 {
 	return fMaxFileSize;
+}
+
+
+inline uint64
+Inode::Change()
+{
+	return fChange;
+}
+
+
+inline bool
+Inode::Dirty()
+{
+	return fWriteDirty;
 }
 
 

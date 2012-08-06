@@ -43,6 +43,9 @@ public:
 			status_t		CallbackRecall(RequestInterpreter* request,
 								ReplyBuilder* reply);
 			status_t		RecallAll();
+
+			status_t		CallbackGetAttr(RequestInterpreter* request,
+								ReplyBuilder* reply);
 private:
 			status_t		_GetLeaseTime();
 
