@@ -42,6 +42,7 @@ public:
 					status_t	Access(int mode);
 
 					status_t	Commit();
+					status_t	SyncAndCommit(bool force = false);
 
 					status_t	CreateObject(const char* name, const char* path,
 									int mode, FileType type);

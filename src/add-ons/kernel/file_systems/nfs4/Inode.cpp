@@ -648,8 +648,7 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 status_t
 Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 {
-	file_cache_sync(fFileCache);
-	Commit();
+	SyncAndCommit();
 
 	LockInfo* prev = NULL;
 
@@ -699,8 +698,7 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 status_t
 Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 {
-	file_cache_sync(fFileCache);
-	Commit();
+	SyncAndCommit();
 
 	OpenState* state = cookie->fOpenState;
 	MutexLocker _(state->fLocksLock);
@@ -788,5 +786,16 @@ Inode::RecallDelegation(bool truncate)
 
 	delete fDelegation;
 	fDelegation = NULL;
+}
+
+
+status_t
+Inode::SyncAndCommit(bool force)
+{
+	if (!force && fDelegation != NULL)
+		return B_OK;
+
+	file_cache_sync(fFileCache);
+	return Commit();
 }
 

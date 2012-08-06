@@ -22,7 +22,6 @@ class Delegation : public NFS4Object,
 public:
 						Delegation(const OpenDelegationData& data, Inode* inode,
 							uint64 clientID);
-						~Delegation();
 
 	// TODO: locks
 
@@ -38,8 +37,6 @@ private:
 	uint64				fClientID;
 	OpenDelegationData	fData;
 	Inode*				fInode;
-
-	rw_lock				fLock;
 };
 
 

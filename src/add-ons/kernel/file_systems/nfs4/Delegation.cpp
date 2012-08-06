@@ -20,20 +20,16 @@ Delegation::Delegation(const OpenDelegationData& data, Inode* inode,
 	fData(data),
 	fInode(inode)
 {
-	rw_lock_init(&fLock, NULL);
 }
 
-
-Delegation::~Delegation()
-{
-	rw_lock_destroy(&fLock);
-}
 
 status_t
 Delegation::GiveUp(bool truncate)
 {
 	if (!truncate) {
-		// save buffers
+		fInode->SyncAndCommit(true);
+
+		// TODO: claim locks
 	}
 
 	ReturnDelegation();

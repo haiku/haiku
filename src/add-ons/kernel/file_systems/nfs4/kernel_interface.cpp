@@ -308,11 +308,7 @@ static status_t
 nfs4_fsync(fs_volume* volume, fs_vnode* vnode)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
-	status_t result = file_cache_sync(inode->FileCache());
-	if (result != B_OK)
-		return result;
-
-	return inode->Commit();
+	return inode->SyncAndCommit();
 }
 
 

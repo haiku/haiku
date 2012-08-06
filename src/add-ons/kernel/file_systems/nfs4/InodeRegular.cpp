@@ -146,8 +146,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 status_t
 Inode::Close(OpenFileCookie* cookie)
 {
-	file_cache_sync(fFileCache);
-	Commit();
+	SyncAndCommit();
 
 	MutexLocker _(fStateLock);
 	if (cookie->fOpenState != NULL) {
