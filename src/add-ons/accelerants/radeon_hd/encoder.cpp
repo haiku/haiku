@@ -1849,8 +1849,8 @@ static const char* encoder_name_matrix[37] = {
 	"Internal Kaleidoscope LVTMA",
 	"Internal Kaleidoscope UNIPHY1",
 	"Internal Kaleidoscope UNIPHY2",
-	"External Travis Bridge",
 	"External Nutmeg Bridge",
+	"External Travis Bridge",
 	"Internal Kaleidoscope VCE"
 };
 
