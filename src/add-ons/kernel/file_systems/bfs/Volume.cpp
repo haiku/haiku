@@ -357,8 +357,11 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	off_t diskSize;
 	if (opener.GetSize(&diskSize, &fDeviceBlockSize) != B_OK)
 		RETURN_ERROR(B_ERROR);
-	if (diskSize < (NumBlocks() << BlockShift()))
+	if (diskSize < (NumBlocks() << BlockShift())) {
+		FATAL(("Disk size (%" B_PRIdOFF " bytes) < file system size (%"
+			B_PRIdOFF " bytes)!\n", diskSize, NumBlocks() << BlockShift()));
 		RETURN_ERROR(B_BAD_VALUE);
+	}
 
 	// set the current log pointers, so that journaling will work correctly
 	fLogStart = fSuperBlock.LogStart();
