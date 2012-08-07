@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-FileTypes	473999706
+1	lithuanian	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		Programų tipai…
 Description:	Application Types Window		Aprašas:
 Args only	Application Type Window		Tik argumentai
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Tipas:
 Removing uninstalled application types	Application Types Window		Šalinami išdiegtų programų tipai
 Done	Attribute Window		Atlikta
-Set Preferred Application	Preferred App Menu		Skirti pageidautiną programą
 no icon	FileTypes Window		be piktogramos
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Versija

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Appearance	3882211276
+1	slovak	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Základné písmo:
 Control highlight	Colors tab		Zvýraznenie ovládacieho prvku
 Control border	Colors tab		Okraj ovládacieho prvku
@@ -27,9 +27,11 @@ Window border	Colors tab		Okraj okna
 Window tab text	Colors tab		Text záložky okna
 Document text	Colors tab		Text dokumentu
 Navigation pulse	Colors tab		Pulz navigácie
+Window decorator:	DecorSettingsView		Dekorátor okna:
 Selected menu item text	Colors tab		Text položky zvoleného menu
 Menu background	Colors tab		Pozadie menu
 OK	DecorSettingsView		OK
+Control mark	Colors tab		Riadiaca značka
 Size:	Font Selection view		Veľkosť:
 Panel background	Colors tab		Pozadie panelu
 Menu font:	Font view		Písmo menu:
@@ -50,6 +52,7 @@ LCD subpixel	AntialiasingSettingsView		LCD subpixel
 Selected menu item border	Colors tab		Okraj vybranej položky menu
 Strong	AntialiasingSettingsView		Hrubý
 Panel text	Colors tab		Text panelu
+Decorators	APRWindow		Dekorácie:
 Monospaced fonts only	AntialiasingSettingsView		Iba písma s pevnou šírkou znaku
 Antialiasing menu	AntialiasingSettingsView		Menu antialiasing
 Fonts	APRWindow		Písma

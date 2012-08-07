@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FileTypes	473999706
+1	russian	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		Типы приложений…
 Description:	Application Types Window		Описание:
 Args only	Application Type Window		Только аргументы
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Тип:
 Removing uninstalled application types	Application Types Window		Очищение удаленных типов приложений
 Done	Attribute Window		Готово
-Set Preferred Application	Preferred App Menu		Установить предпочтительное приложение
 no icon	FileTypes Window		нет значка
 Alpha	Application Types Window		Альфа
 Version	Application Types Window		Версия

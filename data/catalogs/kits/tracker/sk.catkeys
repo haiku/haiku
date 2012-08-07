@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	2141738748
+1	slovak	x-vnd.Haiku-libtracker	2588930404
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -15,7 +15,9 @@ Decrease size	ContainerWindow		Zmenšiť veľkosť
 Mini icon view	VolumeWindow		Zobrazenie mini ikon
 You must have at least one attribute showing.	PoseView		Musí sa zobrazovať aspoň jeden atribút.
 Permissions	InfoWindow		Oprávnenia
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Invertovať výber
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Nedávne dokumenty
 Modified	QueryPoseView		Zmenené
 Created	ContainerWindow		Vytvorené
@@ -89,6 +91,7 @@ Replace	FilePanelPriv		Nahradiť
 Select all	VolumeWindow		Vybrať všetko
 Opens with:	InfoWindow		Otvára sa pomocou:
 Open	ContainerWindow		Otvoriť
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Chyba pri výpočte veľkosti priečinka.
 New folder	FilePanelPriv		Nový priečinok
 %name info	InfoWindow	InfoWindow Title	Info o %name
@@ -308,6 +311,7 @@ The Tracker must be running to see Info windows.	PoseView		Tracker musí bežať
 Other	FilePermissionsView		Iné
 Query name:	FindPanel		Názov Požiadavky:
 Permissions	ContainerWindow		Oprávnenia
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		presúvanie
 Identify	InfoWindow		Identifikovať
 Recent folders	ContainerWindow		Nedávne priečinky

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	3699683348
+1	russian	x-vnd.Haiku-MediaPlayer	1143240926
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -53,7 +53,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Получает U
 400% scale	MediaPlayer-Main		Масштаб 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка при сохранени плейлиста:\n\nОшибка: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Переместить записи
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Ошибка перемещения в корзину
 Audio	MediaPlayer-Main		Аудио
 Open Playlist	MediaPlayer-PlaylistWindow		Открыть плейлист
 MediaPlayer	System name		Медиаплеер

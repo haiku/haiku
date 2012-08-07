@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	4123753294
+1	ukrainian	x-vnd.Haiku-MediaPlayer	1567310872
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
 Stream settings	MediaPlayer-Main		Настройки потоку
 <unknown>	PlaylistItem-album		<невідомий>
@@ -45,7 +45,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Отримати U
 400% scale	MediaPlayer-Main		Масштаб 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено:\n\nПомилка:
 Move Entries	MediaPlayer-MovePLItemsCmd		Перемістити записи
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Помилка переміщення в корзину
 Audio	MediaPlayer-Main		Аудіо
 Open Playlist	MediaPlayer-PlaylistWindow		Відкрити список відтворення
 MediaPlayer	System name		Медіа програвач

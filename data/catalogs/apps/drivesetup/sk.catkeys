@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-DriveSetup	2908539543
+1	slovak	x-vnd.Haiku-DriveSetup	3244521115
 DriveSetup	System name		Nastavenie diskových oblastí
 Delete	MainWindow		Zmazať
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
@@ -11,10 +11,13 @@ There's no space on the partition where a child partition could be created.	Main
 Unable to find the selected partition by ID.	MainWindow		Nebolo možné nájsť vybranú oblasť podľa ID.
 Select a partition from the list below.	DiskView		Vyberte oblasť zo zoznamu dolu.
 No disk devices have been recognized.	DiskView		Neboli rozpoznané žiadne diskové zariadenia.
+Failed to initialize the disk %s!\n	MainWindow		Nepodarilo sa inicializovať disk %s!\n
 The selected disk is read-only.	MainWindow		Vybraný disk je len na čítanie.
 Partition name:	CreateParamsPanel		Názov oblasti:
 Initialize	InitParamsPanel		Inicializovať
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ste si istí, že chcete naformátovať oblasť „%s“? Pred zapísaním zmien na disk sa vás program znova spýta.
 Could not mount partition %s.	MainWindow		Nepodarilo sa pripojiť oblasť %s.
+The partition %s has been successfully formatted.\n	MainWindow		Oblasť %s bola úspešne naformátovaná.\n
 The partition %s is already unmounted.	MainWindow		Oblasť %s je už odpojená.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Nepodarilo sa zmazať oblasť. Žiadne zmeny neboli zapísané na disk.
 Partition type:	CreateParamsPanel		Typ oblasti:
@@ -34,15 +37,20 @@ Offset: %ld MB	Support		Ofset: %ld MB
 Write changes	MainWindow		Zapísať zmeny
 There was an error preparing the disk for modifications.	MainWindow		Vyskytla sa chyba pri pripravovaní disku na zmeny.
 The partition %s is already mounted.	MainWindow		Oblasť %s je už pripojená.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Ste si istí, že chcete naformátovať oblasť? Pred zapísaním zmien na disk sa vás program znova spýta.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na disku %s budú nenávratne stratené!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete zmazať vybranú diskovú oblasť?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
 Create…	MainWindow		Vytvoriť…
 Disk system \"%s\"\" not found!	MainWindow		Diskový systém „%s“ nenájdený!
+The disk has been successfully initialized.\n	MainWindow		Disk bol úspešne inicializovaný.\n
 Could not unmount partition %s.	MainWindow		Nepodarilo sa odpojiť oblasť %s.
+Failed to format the partition %s!\n	MainWindow		Nepodarilo sa naformátovať oblasť %s!\n
 Mount	MainWindow		Pripojiť
 Create	CreateParamsPanel		Vytvoriť
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ste si istí, že chcete naformátovať neformátovaný disk? (väčšina ľudí najskôr disk inicializuje pomocou systému na rozdelenie disku) Pred zapísaním zmien na disk sa vás program znova spýta.
 Device	PartitionList		Zariadenie
 Disk	MainWindow		Disk
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ste si istí, že chcete inicializovať vybraný disk? Stratia sa všetky údaje na ňom. Pred zapísaním zmien na disk sa vás program znova spýta.\n
 Device	DiskView		Zariadenie
 Active	PartitionList		Aktívna
 Volume name	PartitionList		Názov zväzku

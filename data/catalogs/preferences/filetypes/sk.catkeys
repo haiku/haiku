@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-FileTypes	473999706
+1	slovak	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		Typy aplikácií…
 Description:	Application Types Window		Popis:
 Args only	Application Type Window		Iba argumenty
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Typ:
 Removing uninstalled application types	Application Types Window		Odstraňujú sa typy odinštalovaných aplikácií
 Done	Attribute Window		Hotovo
-Set Preferred Application	Preferred App Menu		Nastaviť preferovanú aplikáciu
 no icon	FileTypes Window		bez ikony
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Verzia

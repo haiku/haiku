@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	1694310530
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	3432835404
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikansk)
 <unknown>	PlaylistItem-album		<ukjent>
 Video	MediaPlayer-InfoWin		Video
@@ -34,7 +34,6 @@ There is no decoder installed to handle the file format, or the decoder has trou
 Gets the URI of the currently playing item.	MediaPlayer-Main		Hent URI av det som spiller nå
 400% scale	MediaPlayer-Main		400% skalert
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Lagring av spilleliste feilet:\n\nFeilmelding:
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Feil ved flytting til søppelkurv
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Åpne spilleliste
 MediaPlayer	System name		Mediaspiller

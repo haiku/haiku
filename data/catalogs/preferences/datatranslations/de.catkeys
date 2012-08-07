@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DataTranslations	458105477
+1	german	x-vnd.Haiku-DataTranslations	3820343452
 DataTranslations	System name		Datenkonvertierung
 Cancel	DataTranslations		Abbrechen
 Name:	DataTranslations		Name:
@@ -14,6 +14,5 @@ Info	DataTranslations		Info
 Path:	DataTranslations		Pfad:
 The new translator has been installed successfully.	DataTranslations		Der neue Translator wurde erfolgreich installiert.
 DataTranslations - Error	DataTranslations		Datenkonvertierung - Fehler
-Ok	DataTranslations		OK
 OK	DataTranslations		OK
 Version:	DataTranslations		Version:

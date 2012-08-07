@@ -1,0 +1,15 @@
+1	slovak	x-vnd.Haiku-GLifeScreensaver	1707534289
+Grid Border: %li	GLife ScreenSaver		Okraj mriežky: %li
+Grid Width: 	GLife ScreenSaver		Šírka mriežky:
+none	GLife ScreenSaver		žiadna
+Grid Height: 	GLife ScreenSaver		Výška mriežky:
+%sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
+None	GLife ScreenSaver		Žiadna
+4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
+Grid Width: %li	GLife ScreenSaver		Šírka mriežky: %li
+Grid Height: %li	GLife ScreenSaver		Výška mriežky: %li
+Grid Life Delay: 	GLife ScreenSaver		Oneskorenie životnosti mriežky:
+OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL „Hra života“
+Grid Life Delay: %s	GLife ScreenSaver		Oneskorenie životnosti mriežky: %s
+Grid Border: 	GLife ScreenSaver		Okraj mriežky:
+by Aaron Hill	GLife ScreenSaver		napísal Aaron Hill

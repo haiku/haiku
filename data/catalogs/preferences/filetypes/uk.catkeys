@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	473999706
+1	ukrainian	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		Типи додатків…
 Description:	Application Types Window		Опис:
 Args only	Application Type Window		Тільки аргументи
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Тип:
 Removing uninstalled application types	Application Types Window		Видалення типів для невстановлених додатків
 Done	Attribute Window		Виконано
-Set Preferred Application	Preferred App Menu		Встановити бажаний додаток
 no icon	FileTypes Window		іконка відсутня
 Alpha	Application Types Window		Aльфа
 Version	Application Types Window		Версія

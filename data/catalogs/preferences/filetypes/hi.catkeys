@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-FileTypes	473999706
+1	hindi	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		आवेदन के प्रकार...
 Description:	Application Types Window		विवरण
 Args only	Application Type Window		केवल अर्ग्स
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		प्रकार:
 Removing uninstalled application types	Application Types Window		अनिन्स्तोल्ड आवेदन प्रकार को हटाएँ
 Done	Attribute Window		हो गया
-Set Preferred Application	Preferred App Menu		पसंदीदा आवेदन सेट करें
 no icon	FileTypes Window		कोई चिह्न नहीं
 Alpha	Application Types Window		अल्फा
 Version	Application Types Window		संस्करण

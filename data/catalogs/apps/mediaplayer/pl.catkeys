@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	2389197979
+1	polish	x-vnd.Haiku-MediaPlayer	4127722853
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -58,7 +58,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Pobiera adres URI 
 400% scale	MediaPlayer-Main		400% skali
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Zapisywanie listy odtwarzania nie powiodło się:\n\nBłąd: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Przeniesienie wpisów
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Błąd przenoszenia do Kosza
 Audio	MediaPlayer-Main		Dźwięk
 Open Playlist	MediaPlayer-PlaylistWindow		Otwórz listę odtwarzania
 MediaPlayer	System name		MediaPlayer

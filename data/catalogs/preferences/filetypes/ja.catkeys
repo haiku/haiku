@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-FileTypes	473999706
+1	japanese	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		アプリケーションタイプ...
 Description:	Application Types Window		説明：
 Args only	Application Type Window		引数のみ
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		タイプ：
 Removing uninstalled application types	Application Types Window		アンイントール済アプリケーションのタイプを削除します
 Done	Attribute Window		完了
-Set Preferred Application	Preferred App Menu		優先アプリケーションを設定する
 no icon	FileTypes Window		アイコン無し
 Alpha	Application Types Window		アルファ版
 Version	Application Types Window		バージョン

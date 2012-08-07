@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	641020488
+1	english	x-vnd.Haiku-MediaPlayer	2379545362
 raw audio	MediaPlayer-InfoWin		原生音频
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
 %d kHz	MediaPlayer-InfoWin		%d kHz
@@ -53,7 +53,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		获取当前播放
 400% scale	MediaPlayer-Main		400％
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		播放列表保存失败：\n\n错误： 
 Move Entries	MediaPlayer-MovePLItemsCmd		移动条目
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		移动到垃圾箱出错
 Audio	MediaPlayer-Main		音频
 Open Playlist	MediaPlayer-PlaylistWindow		打开播放列表
 MediaPlayer	System name		媒体播放器

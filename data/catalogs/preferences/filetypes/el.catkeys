@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	473999706
+1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		Τύποι εφαρμογής...
 Description:	Application Types Window		Περιγραφή:
 Args only	Application Type Window		Μόνο παράμετροι
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Τύπος:
 Removing uninstalled application types	Application Types Window		Αφαίρεση απεγκατεστημένων τύπων εφαρμογών
 Done	Attribute Window		Ολοκληρώθηκε
-Set Preferred Application	Preferred App Menu		Ορισμός Προτεινόμενης Εφαρμογής
 no icon	FileTypes Window		χωρίς εικονίδιο
 Alpha	Application Types Window		Άλφα
 Version	Application Types Window		ΈΚδοση

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	4123753294
+1	romanian	x-vnd.Haiku-MediaPlayer	1567310872
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 Stream settings	MediaPlayer-Main		Configurări flux
 <unknown>	PlaylistItem-album		<necunoscut>
@@ -45,7 +45,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Obține adresa URI
 400% scale	MediaPlayer-Main		scală 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat:\n\nEroare:
 Move Entries	MediaPlayer-MovePLItemsCmd		Mută intrări
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Eroare de mutare la gunoi
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Deschide lista de redare
 MediaPlayer	System name		PlayerMedia

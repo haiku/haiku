@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	2389197979
+1	finnish	x-vnd.Haiku-MediaPlayer	4127722853
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -58,7 +58,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Hakee parhaillaan 
 400% scale	MediaPlayer-Main		400 % skaala
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelo tallentaminen epäonnistui:\n\nVirhe:
 Move Entries	MediaPlayer-MovePLItemsCmd		Siirrä kappaleita
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Siirrä roskakoriin
 Audio	MediaPlayer-Main		Ääni
 Open Playlist	MediaPlayer-PlaylistWindow		Avaa soittoluettelo
 MediaPlayer	System name		Mediasoitin
