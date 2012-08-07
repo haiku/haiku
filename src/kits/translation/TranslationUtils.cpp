@@ -17,9 +17,9 @@
 #include <CharacterSetRoster.h>
 #include <Entry.h>
 #include <File.h>
-#include <List.h>
 #include <MenuItem.h>
 #include <NodeInfo.h>
+#include <ObjectList.h>
 #include <Path.h>
 #include <Resources.h>
 #include <Roster.h>
@@ -894,6 +894,8 @@ BTranslationUtils::AddTranslationItems(BMenu *intoMenu, uint32 fromType,
 	if (err < B_OK)
 		return err;
 
+	BObjectList<translator_info> infoList;
+
 	for (int tix = 0; tix < count; tix++) {
 		const translation_format *formats = NULL;
 		int32 numFormats = 0;
@@ -911,34 +913,35 @@ BTranslationUtils::AddTranslationItems(BMenu *intoMenu, uint32 fromType,
 			continue;
 
 		// Get supported output formats
-		BList formatList;
 		err = roster->GetOutputFormats(ids[tix], &formats, &numFormats); 
 		if (err == B_OK) {
 			for (int oix = 0; oix < numFormats; oix++) {
 				if (formats[oix].type != fromType) {
-					formatList.AddItem(const_cast<translation_format*>(
-						&formats[oix]));
+					infoList.AddItem(_BuildTranslatorInfo(ids[tix],
+						const_cast<translation_format*>(&formats[oix])));
 				}
 			}
 		}
+	}
 
-		// Sort alphabetically by name
-		formatList.SortItems(&CompareTranslationFormatByName);
+	// Sort alphabetically by name
+	infoList.SortItems(&_CompareTranslatorInfoByName);
 
-		// Now add the menu items
-		for (int i = 0; i < formatList.CountItems(); i++) {
-			translation_format* format = static_cast<translation_format*>(
-				formatList.ItemAt(i));
+	// Now add the menu items
+	for (int i = 0; i < infoList.CountItems(); i++) {
+		translator_info* info = infoList.ItemAt(i);
 
-			BMessage *itemmsg;
-			if (kModel)
-				itemmsg = new BMessage(*kModel);
-			else
-				itemmsg = new BMessage(B_TRANSLATION_MENU);
-			itemmsg->AddInt32(kTranslatorIdName, ids[tix]);
-			itemmsg->AddInt32(kTranslatorTypeName, format->type);
-			intoMenu->AddItem(new BMenuItem(format->name, itemmsg));
-		}
+		BMessage *itemmsg;
+		if (kModel)
+			itemmsg = new BMessage(*kModel);
+		else
+			itemmsg = new BMessage(B_TRANSLATION_MENU);
+		itemmsg->AddInt32(kTranslatorIdName, info->translator);
+		itemmsg->AddInt32(kTranslatorTypeName, info->type);
+		intoMenu->AddItem(new BMenuItem(info->name, itemmsg));
+
+		// Delete object created in _BuildTranslatorInfo
+		delete info;
 	}
 
 	delete[] ids;
@@ -946,9 +949,26 @@ BTranslationUtils::AddTranslationItems(BMenu *intoMenu, uint32 fromType,
 }
 
 
-int
-BTranslationUtils::CompareTranslationFormatByName(const void* format1, const void* format2)
+translator_info*
+BTranslationUtils::_BuildTranslatorInfo(const translator_id id, const translation_format* format)
 {
-	return strcasecmp(static_cast<const translation_format*>(format1)->name,
-		static_cast<const translation_format*>(format2)->name);
+	// Caller must delete
+	translator_info* info = new translator_info;
+
+	info->translator = id;
+	info->type = format->type;
+	info->group = format->group;
+	info->quality = format->quality;
+	info->capability = format->capability;
+	strlcpy(info->name, format->name, sizeof(info->name));
+	strlcpy(info->MIME, format->MIME, sizeof(info->MIME));
+
+	return info;
+}
+
+
+int
+BTranslationUtils::_CompareTranslatorInfoByName(const translator_info* info1, const translator_info* info2)
+{
+	return strcasecmp(info1->name, info2->name);
 }
