@@ -196,7 +196,7 @@ public:
 									const image_t* image, int32 symbolCount);
 	virtual						~LoadedImage();
 
-	virtual	const Elf32_Sym*	LookupSymbol(addr_t address,
+	virtual	const elf_sym*		LookupSymbol(addr_t address,
 									addr_t* _baseAddress,
 									const char** _symbolName,
 									size_t *_symbolNameLen,
@@ -251,7 +251,7 @@ SymbolLookup::Init()
 
 		// find the runtime loader debug area
 		runtime_loader_debug_area *remoteDebugArea = NULL;
-		int32 cookie = 0;
+		ssize_t cookie = 0;
 		area_info areaInfo;
 		while (get_next_area_info(fTeam, &cookie, &areaInfo) == B_OK) {
 			if (strcmp(areaInfo.name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0) {
@@ -340,7 +340,7 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 	if (_imageName != NULL)
 		*_imageName = image->Name();
 
-	const Elf32_Sym* symbolFound = image->LookupSymbol(address, _baseAddress,
+	const elf_sym* symbolFound = image->LookupSymbol(address, _baseAddress,
 		_symbolName, _symbolNameLen, _exactMatch);
 
 	TRACE(("SymbolLookup::LookupSymbolAddress(): done: symbol: %p, image name: "
@@ -557,7 +557,7 @@ SymbolLookup::LoadedImage::~LoadedImage()
 }
 
 
-const Elf32_Sym*
+const elf_sym*
 SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 	const char** _symbolName, size_t *_symbolNameLen, bool *_exactMatch) const
 {
@@ -566,7 +566,7 @@ SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 		(void*)fImage->regions[0].vmstart, fImage->regions[0].size));
 
 	// search the image for the symbol
-	const struct Elf32_Sym *symbolFound = NULL;
+	const elf_sym *symbolFound = NULL;
 	addr_t deltaFound = INT_MAX;
 	bool exactMatch = false;
 	const char *symbolName = NULL;
@@ -575,7 +575,7 @@ SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 	const elf_region_t *textRegion = fImage->regions;				// local
 
 	for (int32 i = 0; i < symbolCount; i++) {
-		const struct Elf32_Sym *symbol = &fSymbolLookup->Read(fImage->syms[i]);
+		const elf_sym *symbol = &fSymbolLookup->Read(fImage->syms[i]);
 
 		// The symbol table contains not only symbols referring to functions
 		// and data symbols within the shared object, but also referenced
@@ -584,8 +584,7 @@ SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 		// that have an st_value != 0 (0 seems to be an indication for a
 		// symbol defined elsewhere -- couldn't verify that in the specs
 		// though).
-		if ((ELF32_ST_TYPE(symbol->st_info) != STT_FUNC
-				&& ELF32_ST_TYPE(symbol->st_info) != STT_OBJECT)
+		if ((symbol->Type() != STT_FUNC && symbol->Type() != STT_OBJECT)
 			|| symbol->st_value == 0
 			|| symbol->st_value + symbol->st_size + textRegion->delta
 				> textRegion->vmstart + textRegion->size) {
@@ -643,10 +642,9 @@ SymbolLookup::LoadedImage::NextSymbol(int32& iterator, const char** _symbolName,
 		if (++iterator >= fSymbolCount)
 			return B_ENTRY_NOT_FOUND;
 
-		const struct Elf32_Sym* symbol
+		const elf_sym* symbol
 			= &fSymbolLookup->Read(fImage->syms[iterator]);
-		if ((ELF32_ST_TYPE(symbol->st_info) != STT_FUNC
-				&& ELF32_ST_TYPE(symbol->st_info) != STT_OBJECT)
+		if ((symbol->Type() != STT_FUNC && symbol->Type() != STT_OBJECT)
 			|| symbol->st_value == 0) {
 			continue;
 		}
@@ -656,8 +654,8 @@ SymbolLookup::LoadedImage::NextSymbol(int32& iterator, const char** _symbolName,
 		*_symbolNameLen = fSymbolLookup->_SymbolNameLen(*_symbolName);
 		*_symbolAddress = symbol->st_value + fTextDelta;
 		*_symbolSize = symbol->st_size;
-		*_symbolType = ELF32_ST_TYPE(symbol->st_info) == STT_FUNC
-			? B_SYMBOL_TYPE_TEXT : B_SYMBOL_TYPE_DATA;
+		*_symbolType = symbol->Type() == STT_FUNC ? B_SYMBOL_TYPE_TEXT
+			: B_SYMBOL_TYPE_DATA;
 
 		return B_OK;
 	}

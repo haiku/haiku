@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include <elf_common.h>
 #include <image.h>
 #include <OS.h>
 
@@ -16,7 +17,6 @@
 
 struct image_t;
 struct runtime_loader_debug_area;
-struct Elf32_Sym;
 
 
 namespace BPrivate {
@@ -35,7 +35,7 @@ public:
 				{ return (addr_t)fInfo.text; }
 			size_t				TextSize() const	{ return fInfo.text_size; }
 
-	virtual	const Elf32_Sym*	LookupSymbol(addr_t address,
+	virtual	const elf_sym*		LookupSymbol(addr_t address,
 									addr_t* _baseAddress,
 									const char** _symbolName,
 									size_t *_symbolNameLen,
@@ -60,7 +60,7 @@ public:
 								SymbolTableBasedImage();
 	virtual						~SymbolTableBasedImage();
 
-	virtual	const Elf32_Sym*	LookupSymbol(addr_t address,
+	virtual	const elf_sym*		LookupSymbol(addr_t address,
 									addr_t* _baseAddress,
 									const char** _symbolName,
 									size_t *_symbolNameLen,
@@ -76,7 +76,7 @@ protected:
 
 protected:
 			addr_t				fLoadDelta;
-			Elf32_Sym*			fSymbolTable;
+			elf_sym*			fSymbolTable;
 			char*				fStringTable;
 			int32				fSymbolCount;
 			size_t				fStringTableSize;

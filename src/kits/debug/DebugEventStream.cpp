@@ -123,7 +123,7 @@ BDebugEventInputStream::Seek(off_t streamOffset)
 	if (fStream != NULL)
 		return B_UNSUPPORTED;
 
-	if (streamOffset < 0 || streamOffset > fBufferCapacity)
+	if (streamOffset < 0 || streamOffset > (off_t)fBufferCapacity)
 		return B_BUFFER_OVERFLOW;
 
 	fStreamPosition = 0;

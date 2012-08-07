@@ -16,7 +16,6 @@
 
 struct image_t;
 struct runtime_loader_debug_area;
-struct Elf32_Sym;
 
 
 namespace BPrivate {
