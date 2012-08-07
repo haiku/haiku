@@ -951,8 +951,7 @@ display_crtc_ss(uint8 crtcID, int command)
 	} else if (info.dceMajor >= 2) {
 		if ((command == ATOM_DISABLE) || (pll->ssPercentage == 0)
 			|| (pll->ssType & ATOM_EXTERNAL_SS_MASK)) {
-			// TODO: gpu_ss_disable needs pll id
-			radeon_gpu_ss_disable();
+			radeon_gpu_ss_control(pll, false);
 			return;
 		}
 		args.lvds_ss_2.usSpreadSpectrumPercentage

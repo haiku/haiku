@@ -16,6 +16,7 @@
 #include "accelerant.h"
 #include "atom.h"
 #include "bios.h"
+#include "pll.h"
 #include "utility.h"
 
 
@@ -715,7 +716,7 @@ radeon_gpu_ring_boot(uint32 ringType)
 
 
 status_t
-radeon_gpu_ss_disable()
+radeon_gpu_ss_control(pll_info* pll, bool enable)
 {
 	TRACE("%s called\n", __func__);
 
@@ -723,25 +724,52 @@ radeon_gpu_ss_disable()
 	uint32 ssControl;
 
 	if (info.chipsetID >= RADEON_CEDAR) {
-		// PLL1
-		ssControl = Read32(OUT, EVERGREEN_P1PLL_SS_CNTL);
-		ssControl &= ~EVERGREEN_PxPLL_SS_EN;
-		Write32(OUT, EVERGREEN_P1PLL_SS_CNTL, ssControl);
-		// PLL2
-		ssControl = Read32(OUT, EVERGREEN_P2PLL_SS_CNTL);
-		ssControl &= ~EVERGREEN_PxPLL_SS_EN;
-		Write32(OUT, EVERGREEN_P2PLL_SS_CNTL, ssControl);
+		switch (pll->id) {
+			case ATOM_PPLL1:
+				// PLL1
+				ssControl = Read32(OUT, EVERGREEN_P1PLL_SS_CNTL);
+				if (enable)
+					ssControl |= EVERGREEN_PxPLL_SS_EN;
+				else
+					ssControl &= ~EVERGREEN_PxPLL_SS_EN;
+				Write32(OUT, EVERGREEN_P1PLL_SS_CNTL, ssControl);
+				break;
+			case ATOM_PPLL2:
+				// PLL2
+				ssControl = Read32(OUT, EVERGREEN_P2PLL_SS_CNTL);
+				if (enable)
+					ssControl |= EVERGREEN_PxPLL_SS_EN;
+				else
+					ssControl &= ~EVERGREEN_PxPLL_SS_EN;
+				Write32(OUT, EVERGREEN_P2PLL_SS_CNTL, ssControl);
+				break;
+		}
+		// DCPLL, no action
+		return B_OK;
 	} else if (info.chipsetID >= RADEON_RS600) {
-		// PLL1
-		ssControl = Read32(OUT, AVIVO_P1PLL_INT_SS_CNTL);
-		ssControl &= ~1;
-		Write32(OUT, AVIVO_P1PLL_INT_SS_CNTL, ssControl);
-		// PLL2
-		ssControl = Read32(OUT, AVIVO_P2PLL_INT_SS_CNTL);
-		ssControl &= ~1;
-		Write32(OUT, AVIVO_P2PLL_INT_SS_CNTL, ssControl);
-	} else
-		return B_ERROR;
+		switch (pll->id) {
+			case ATOM_PPLL1:
+				// PLL1
+				ssControl = Read32(OUT, AVIVO_P1PLL_INT_SS_CNTL);
+				if (enable)
+					ssControl |= 1;
+				else
+					ssControl &= ~1;
+				Write32(OUT, AVIVO_P1PLL_INT_SS_CNTL, ssControl);
+				break;
+			case ATOM_PPLL2:
+				// PLL2
+				ssControl = Read32(OUT, AVIVO_P2PLL_INT_SS_CNTL);
+				if (enable)
+					ssControl |= 1;
+				else
+					ssControl &= ~1;
+				Write32(OUT, AVIVO_P2PLL_INT_SS_CNTL, ssControl);
+				break;
+		}
+		// DCPLL, no action
+		return B_OK;
+	}
 
-	return B_OK;
+	return B_ERROR;
 }

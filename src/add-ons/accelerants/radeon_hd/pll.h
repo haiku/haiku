@@ -103,8 +103,8 @@ status_t pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID);
 status_t pll_compute(pll_info* pll);
 void pll_setup_flags(pll_info* pll, uint8 crtcID);
 status_t pll_limit_probe(pll_info* pll);
-status_t pll_dp_ss_probe(pll_info* pll);
-status_t pll_asic_ss_probe(pll_info* pll);
+status_t pll_ppll_ss_probe(pll_info* pll, uint32 ssID);
+status_t pll_asic_ss_probe(pll_info* pll, uint32 ssID);
 status_t pll_set(display_mode* mode, uint8 crtcID);
 status_t pll_pick(uint32 connectorIndex);
 

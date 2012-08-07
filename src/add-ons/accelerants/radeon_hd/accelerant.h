@@ -76,6 +76,8 @@ struct accelerant_info {
 	uint32			displayClockFrequency;
 	uint32			dpExternalClock;
 
+	uint32			lvdsSpreadSpectrumID;
+
 	RingQueue*		ringQueue[RADEON_QUEUE_MAX]; // Ring buffer command processor
 };
 

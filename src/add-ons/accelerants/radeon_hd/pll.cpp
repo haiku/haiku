@@ -128,7 +128,7 @@ pll_limit_probe(pll_info* pll)
 
 
 status_t
-pll_dp_ss_probe(pll_info* pll)
+pll_ppll_ss_probe(pll_info* pll, uint32 ssID)
 {
 	uint8 tableMajor;
 	uint8 tableMinor;
@@ -151,7 +151,7 @@ pll_dp_ss_probe(pll_info* pll)
 
 	int i;
 	for (i = 0; i < indices; i++) {
-		if (ss_info->asSS_Info[i].ucSS_Id == pll->id) {
+		if (ss_info->asSS_Info[i].ucSS_Id == ssID) {
 			pll->ssPercentage = B_LENDIAN_TO_HOST_INT16(
 				ss_info->asSS_Info[i].usSpreadSpectrumPercentage);
 			pll->ssType = ss_info->asSS_Info[i].ucSpreadSpectrumType;
@@ -175,7 +175,7 @@ pll_dp_ss_probe(pll_info* pll)
 
 
 status_t
-pll_asic_ss_probe(pll_info* pll)
+pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 {
 	uint8 tableMajor;
 	uint8 tableMinor;
@@ -207,7 +207,7 @@ pll_asic_ss_probe(pll_info* pll)
 
 			for (i = 0; i < indices; i++) {
 				if (ss_info->info.asSpreadSpectrum[i].ucClockIndication
-					!= pll->id) {
+					!= ssID) {
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
@@ -234,7 +234,7 @@ pll_asic_ss_probe(pll_info* pll)
 
 			for (i = 0; i < indices; i++) {
 				if (ss_info->info_2.asSpreadSpectrum[i].ucClockIndication
-					!= pll->id) {
+					!= ssID) {
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
@@ -262,7 +262,7 @@ pll_asic_ss_probe(pll_info* pll)
 
 			for (i = 0; i < indices; i++) {
 				if (ss_info->info_3.asSpreadSpectrum[i].ucClockIndication
-					!= pll->id) {
+					!= ssID) {
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
@@ -492,6 +492,11 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 
 	if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
 		pll->flags |= PLL_PREFER_CLOSEST_LOWER;
+
+	if ((info.chipsetFlags & CHIP_APU) != 0) {
+		// Use fractional feedback on APU's
+		pll->flags |= PLL_USE_FRAC_FB_DIV;
+	}
 }
 
 
@@ -657,11 +662,37 @@ pll_set(display_mode* mode, uint8 crtcID)
 	pll_compute(pll);
 		// compute dividers
 
-	pll_asic_ss_probe(pll);
-		// probe spread spectrum metrics (TODO: pll_dp_ss_probe)
+	radeon_shared_info &info = *gInfo->shared_info;
+	pll->ssType = 0;
+
+	switch (display_get_encoder_mode(connectorIndex)) {
+		case ATOM_ENCODER_MODE_DP_MST:
+		case ATOM_ENCODER_MODE_DP:
+			if (info.dceMajor >= 4)
+				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_DP);
+			else {
+				// TODO: DP Clock == 1.62Ghz?
+				pll_ppll_ss_probe(pll, ATOM_DP_SS_ID1);
+			}
+			break;
+		case ATOM_ENCODER_MODE_LVDS:
+			if (info.dceMajor >= 4)
+				pll_asic_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
+			else
+				pll_ppll_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
+			break;
+		case ATOM_ENCODER_MODE_DVI:
+			if (info.dceMajor >= 4)
+				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_TMDS);
+			break;
+		case ATOM_ENCODER_MODE_HDMI:
+			if (info.dceMajor >= 4)
+				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_HDMI);
+			break;
+	}
+
 	display_crtc_ss(crtcID, ATOM_DISABLE);
 		// disable ss
-
 
 	uint8 tableMajor;
 	uint8 tableMinor;
