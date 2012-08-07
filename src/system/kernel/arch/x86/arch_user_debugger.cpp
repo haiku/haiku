@@ -39,27 +39,27 @@ extern bool gHasSSE;
 const uint8 kX86SoftwareBreakpoint[1] = { 0xcc };
 
 // maps breakpoint slot index to LEN_i LSB number
-static const uint32 sDR7Len[4] = {
+static const size_t sDR7Len[4] = {
 	X86_DR7_LEN0_LSB, X86_DR7_LEN1_LSB, X86_DR7_LEN2_LSB, X86_DR7_LEN3_LSB
 };
 
 // maps breakpoint slot index to R/W_i LSB number
-static const uint32 sDR7RW[4] = {
+static const size_t sDR7RW[4] = {
 	X86_DR7_RW0_LSB, X86_DR7_RW1_LSB, X86_DR7_RW2_LSB, X86_DR7_RW3_LSB
 };
 
 // maps breakpoint slot index to L_i bit number
-static const uint32 sDR7L[4] = {
+static const size_t sDR7L[4] = {
 	X86_DR7_L0, X86_DR7_L1, X86_DR7_L2, X86_DR7_L3
 };
 
 // maps breakpoint slot index to G_i bit number
-static const uint32 sDR7G[4] = {
+static const size_t sDR7G[4] = {
 	X86_DR7_G0, X86_DR7_G1, X86_DR7_G2, X86_DR7_G3
 };
 
 // maps breakpoint slot index to B_i bit number
-static const uint32 sDR6B[4] = {
+static const size_t sDR6B[4] = {
 	X86_DR6_B0, X86_DR6_B1, X86_DR6_B2, X86_DR6_B3
 };
 
@@ -68,8 +68,78 @@ static const uint32 sDR6B[4] = {
 static bool sQEmuSingleStepHack = false;
 
 
+#ifdef __x86_64__
+
+
 static void
-get_iframe_registers(struct iframe *frame, debug_cpu_state *cpuState)
+get_iframe_registers(const iframe* frame, debug_cpu_state* cpuState)
+{
+	// Get general purpose registers.
+	cpuState->r15 = frame->r15;
+	cpuState->r14 = frame->r14;
+	cpuState->r13 = frame->r13;
+	cpuState->r12 = frame->r12;
+	cpuState->r11 = frame->r11;
+	cpuState->r10 = frame->r10;
+	cpuState->r9 = frame->r9;
+	cpuState->r8 = frame->r8;
+	cpuState->rbp = frame->bp;
+	cpuState->rsi = frame->si;
+	cpuState->rdi = frame->di;
+	cpuState->rdx = frame->dx;
+	cpuState->rcx = frame->cx;
+	cpuState->rbx = frame->bx;
+	cpuState->rax = frame->ax;
+	cpuState->rip = frame->ip;
+	cpuState->cs = frame->cs;
+	cpuState->rflags = frame->flags;
+	cpuState->rsp = frame->sp;
+	cpuState->ss = frame->ss;
+
+	// Other segment registers are not saved or changed on interrupts, so
+	// get their value here.
+	uint16 seg;
+	__asm__ volatile ("movw %%ds, %0" : "=r" (seg));
+	cpuState->ds = seg;
+	__asm__ volatile ("movw %%es, %0" : "=r" (seg));
+	cpuState->es = seg;
+	__asm__ volatile ("movw %%fs, %0" : "=r" (seg));
+	cpuState->fs = seg;
+	__asm__ volatile ("movw %%gs, %0" : "=r" (seg));
+	cpuState->gs = seg;
+}
+
+
+static void
+set_iframe_registers(iframe* frame, const debug_cpu_state* cpuState)
+{
+	frame->r15 = cpuState->r15;
+	frame->r14 = cpuState->r14;
+	frame->r13 = cpuState->r13;
+	frame->r12 = cpuState->r12;
+	frame->r11 = cpuState->r11;
+	frame->r10 = cpuState->r10;
+	frame->r9 = cpuState->r9;
+	frame->r8 = cpuState->r8;
+	frame->bp = cpuState->rbp;
+	frame->si = cpuState->rsi;
+	frame->di = cpuState->rdi;
+	frame->dx = cpuState->rdx;
+	frame->cx = cpuState->rcx;
+	frame->bx = cpuState->rbx;
+	frame->ax = cpuState->rax;
+	frame->ip = cpuState->rip;
+	frame->flags = (frame->flags & ~X86_EFLAGS_USER_SETTABLE_FLAGS)
+		| (cpuState->rflags & X86_EFLAGS_USER_SETTABLE_FLAGS);
+	frame->sp = cpuState->rsp;
+}
+
+
+#else	// __x86_64__
+
+
+static void
+get_iframe_registers(const iframe* frame, debug_cpu_state* cpuState)
 {
 	cpuState->gs = frame->gs;
 	cpuState->fs = frame->fs;
@@ -93,25 +163,56 @@ get_iframe_registers(struct iframe *frame, debug_cpu_state *cpuState)
 }
 
 
+static void
+set_iframe_registers(iframe* frame, const debug_cpu_state* cpuState)
+{
+//	frame->gs = cpuState->gs;
+//	frame->fs = cpuState->fs;
+//	frame->es = cpuState->es;
+//	frame->ds = cpuState->ds;
+	frame->di = cpuState->edi;
+	frame->si = cpuState->esi;
+	frame->bp = cpuState->ebp;
+//	frame->esp = cpuState->esp;
+	frame->bx = cpuState->ebx;
+	frame->dx = cpuState->edx;
+	frame->cx = cpuState->ecx;
+	frame->ax = cpuState->eax;
+//	frame->vector = cpuState->vector;
+//	frame->error_code = cpuState->error_code;
+	frame->ip = cpuState->eip;
+//	frame->cs = cpuState->cs;
+	frame->flags = (frame->flags & ~X86_EFLAGS_USER_SETTABLE_FLAGS)
+		| (cpuState->eflags & X86_EFLAGS_USER_SETTABLE_FLAGS);
+	frame->user_sp = cpuState->user_esp;
+//	frame->user_ss = cpuState->user_ss;
+}
+
+
+#endif	// __x86_64__
+
+
 static inline void
-install_breakpoints(const arch_team_debug_info &teamInfo)
+install_breakpoints(const arch_team_debug_info& teamInfo)
 {
 	// set breakpoints
-	asm("movl %0, %%dr0" : : "r"(teamInfo.breakpoints[0].address));
-	asm("movl %0, %%dr1" : : "r"(teamInfo.breakpoints[1].address));
-	asm("movl %0, %%dr2" : : "r"(teamInfo.breakpoints[2].address));
-//	asm("movl %0, %%dr3" : : "r"(teamInfo.breakpoints[3].address));
-		// DR3 is used to hold the current Thread*.
+	asm("mov %0, %%dr0" : : "r"(teamInfo.breakpoints[0].address));
+	asm("mov %0, %%dr1" : : "r"(teamInfo.breakpoints[1].address));
+	asm("mov %0, %%dr2" : : "r"(teamInfo.breakpoints[2].address));
+#ifdef __x86_64__
+	asm("mov %0, %%dr3" : : "r"(teamInfo.breakpoints[3].address));
+		// DR3 is used to hold the current Thread* on 32.
+#endif
 
 	// enable breakpoints
-	asm("movl %0, %%dr7" : : "r"(teamInfo.dr7));
+	asm("mov %0, %%dr7" : : "r"(teamInfo.dr7));
 }
 
 
 static inline void
 disable_breakpoints()
 {
-	asm("movl %0, %%dr7" : : "r"(X86_BREAKPOINTS_DISABLED_DR7));
+	asm("mov %0, %%dr7" : : "r"((size_t)X86_BREAKPOINTS_DISABLED_DR7));
 }
 
 
@@ -119,8 +220,8 @@ disable_breakpoints()
 	Interrupts must be disabled and the team debug info lock be held.
 */
 static inline status_t
-set_breakpoint(arch_team_debug_info &info, void *address, uint32 type,
-	uint32 length, bool setGlobalFlag)
+set_breakpoint(arch_team_debug_info& info, void* address, size_t type,
+	size_t length, bool setGlobalFlag)
 {
 	// check, if there is already a breakpoint at that address
 	bool alreadySet = false;
@@ -169,7 +270,7 @@ set_breakpoint(arch_team_debug_info &info, void *address, uint32 type,
 	Interrupts must be disabled and the team debug info lock be held.
 */
 static inline status_t
-clear_breakpoint(arch_team_debug_info &info, void *address, bool watchpoint)
+clear_breakpoint(arch_team_debug_info& info, void* address, bool watchpoint)
 {
 	// find the breakpoint
 	int32 slot = -1;
@@ -202,12 +303,12 @@ clear_breakpoint(arch_team_debug_info &info, void *address, bool watchpoint)
 
 
 static status_t
-set_breakpoint(void *address, uint32 type, uint32 length)
+set_breakpoint(void* address, size_t type, size_t length)
 {
 	if (!address)
 		return B_BAD_VALUE;
 
-	Thread *thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
@@ -223,12 +324,12 @@ set_breakpoint(void *address, uint32 type, uint32 length)
 
 
 static status_t
-clear_breakpoint(void *address, bool watchpoint)
+clear_breakpoint(void* address, bool watchpoint)
 {
 	if (!address)
 		return B_BAD_VALUE;
 
-	Thread *thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
@@ -260,7 +361,7 @@ install_breakpoints_per_cpu(void* /*cookie*/, int cpu)
 
 
 static status_t
-set_kernel_breakpoint(void *address, uint32 type, uint32 length)
+set_kernel_breakpoint(void* address, size_t type, size_t length)
 {
 	if (!address)
 		return B_BAD_VALUE;
@@ -284,7 +385,7 @@ set_kernel_breakpoint(void *address, uint32 type, uint32 length)
 
 
 static status_t
-clear_kernel_breakpoint(void *address, bool watchpoint)
+clear_kernel_breakpoint(void* address, bool watchpoint)
 {
 	if (!address)
 		return B_BAD_VALUE;
@@ -311,7 +412,7 @@ clear_kernel_breakpoint(void *address, bool watchpoint)
 
 static inline status_t
 check_watch_point_parameters(void* address, uint32 type, int32 length,
-	uint32& archType, uint32& archLength)
+	size_t& archType, size_t& archLength)
 {
 	// check type
 	switch (type) {
@@ -333,12 +434,12 @@ check_watch_point_parameters(void* address, uint32 type, int32 length,
 			archLength = X86_BREAKPOINT_LENGTH_1;
 			break;
 		case 2:
-			if ((uint32)address & 0x1)
+			if ((addr_t)address & 0x1)
 				return B_BAD_WATCHPOINT_ALIGNMENT;
 			archLength = X86_BREAKPOINT_LENGTH_2;
 			break;
 		case 4:
-			if ((uint32)address & 0x3)
+			if ((addr_t)address & 0x3)
 				return B_BAD_WATCHPOINT_ALIGNMENT;
 			archLength = X86_BREAKPOINT_LENGTH_4;
 			break;
@@ -352,6 +453,7 @@ check_watch_point_parameters(void* address, uint32 type, int32 length,
 
 // #pragma mark - kernel debugger commands
 
+
 #if KERNEL_BREAKPOINTS
 
 static int
@@ -361,7 +463,7 @@ debugger_breakpoints(int argc, char** argv)
 	arch_team_debug_info& info = kernelTeam->debug_info.arch_info;
 
 	for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
-		kprintf("breakpoint[%ld] ", i);
+		kprintf("breakpoint[%" B_PRId32 "] ", i);
 
 		if (info.breakpoints[i].address != NULL) {
 			kprintf("%p ", info.breakpoints[i].address);
@@ -491,7 +593,7 @@ debugger_watchpoint(int argc, char** argv)
 		uint32 type = readWrite ? B_DATA_READ_WRITE_WATCHPOINT
 			: B_DATA_WRITE_WATCHPOINT;
 
-		uint32 archType, archLength;
+		size_t archType, archLength;
 		error = check_watch_point_parameters((void*)address, type, length,
 			archType, archLength);
 
@@ -516,7 +618,7 @@ debugger_single_step(int argc, char** argv)
 	// TODO: Since we need an iframe, this doesn't work when KDL wasn't entered
 	// via an exception.
 
-	struct iframe* frame = x86_get_current_iframe();
+	iframe* frame = x86_get_current_iframe();
 	if (frame == NULL) {
 		kprintf("Failed to get the current iframe!\n");
 		return 0;
@@ -535,7 +637,7 @@ debugger_single_step(int argc, char** argv)
 
 
 void
-arch_clear_team_debug_info(struct arch_team_debug_info *info)
+arch_clear_team_debug_info(arch_team_debug_info* info)
 {
 	for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++)
 		info->breakpoints[i].address = NULL;
@@ -545,21 +647,21 @@ arch_clear_team_debug_info(struct arch_team_debug_info *info)
 
 
 void
-arch_destroy_team_debug_info(struct arch_team_debug_info *info)
+arch_destroy_team_debug_info(arch_team_debug_info* info)
 {
 	arch_clear_team_debug_info(info);
 }
 
 
 void
-arch_clear_thread_debug_info(struct arch_thread_debug_info *info)
+arch_clear_thread_debug_info(arch_thread_debug_info* info)
 {
 	info->flags = 0;
 }
 
 
 void
-arch_destroy_thread_debug_info(struct arch_thread_debug_info *info)
+arch_destroy_thread_debug_info(arch_thread_debug_info* info)
 {
 	arch_clear_thread_debug_info(info);
 }
@@ -568,7 +670,7 @@ arch_destroy_thread_debug_info(struct arch_thread_debug_info *info)
 void
 arch_update_thread_single_step()
 {
-	if (struct iframe* frame = x86_get_user_iframe()) {
+	if (iframe* frame = x86_get_user_iframe()) {
 		Thread* thread = thread_get_current_thread();
 
 		// set/clear TF in EFLAGS depending on whether single stepping is
@@ -582,9 +684,9 @@ arch_update_thread_single_step()
 
 
 void
-arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
+arch_set_debug_cpu_state(const debug_cpu_state* cpuState)
 {
-	if (struct iframe *frame = x86_get_user_iframe()) {
+	if (iframe* frame = x86_get_user_iframe()) {
 		// For the floating point state to be correct the calling function must
 		// not use these registers (not even indirectly).
 		if (gHasSSE) {
@@ -597,39 +699,21 @@ arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
 			memcpy(thread->arch_info.fpu_state, &cpuState->extended_registers,
 				sizeof(cpuState->extended_registers));
 			x86_fxrstor(thread->arch_info.fpu_state);
+#ifndef __x86_64__
 		} else {
 			// TODO: Implement! We need to convert the format first.
 //			x86_frstor(&cpuState->extended_registers);
+#endif
 		}
-
-//		frame->gs = cpuState->gs;
-//		frame->fs = cpuState->fs;
-//		frame->es = cpuState->es;
-//		frame->ds = cpuState->ds;
-		frame->di = cpuState->edi;
-		frame->si = cpuState->esi;
-		frame->bp = cpuState->ebp;
-//		frame->esp = cpuState->esp;
-		frame->bx = cpuState->ebx;
-		frame->dx = cpuState->edx;
-		frame->cx = cpuState->ecx;
-		frame->ax = cpuState->eax;
-//		frame->vector = cpuState->vector;
-//		frame->error_code = cpuState->error_code;
-		frame->ip = cpuState->eip;
-//		frame->cs = cpuState->cs;
-		frame->flags = (frame->flags & ~X86_EFLAGS_USER_SETTABLE_FLAGS)
-			| (cpuState->eflags & X86_EFLAGS_USER_SETTABLE_FLAGS);
-		frame->user_sp = cpuState->user_esp;
-//		frame->user_ss = cpuState->user_ss;
+		set_iframe_registers(frame, cpuState);
 	}
 }
 
 
 void
-arch_get_debug_cpu_state(debug_cpu_state *cpuState)
+arch_get_debug_cpu_state(debug_cpu_state* cpuState)
 {
-	if (struct iframe *frame = x86_get_user_iframe()) {
+	if (iframe* frame = x86_get_user_iframe()) {
 		// For the floating point state to be correct the calling function must
 		// not use these registers (not even indirectly).
 		if (gHasSSE) {
@@ -642,12 +726,14 @@ arch_get_debug_cpu_state(debug_cpu_state *cpuState)
 				// unlike fnsave, fxsave doesn't reinit the FPU state
 			memcpy(&cpuState->extended_registers, thread->arch_info.fpu_state,
 				sizeof(cpuState->extended_registers));
+#ifndef __x86_64__
 		} else {
 			x86_fnsave(&cpuState->extended_registers);
 			x86_frstor(&cpuState->extended_registers);
 				// fnsave reinits the FPU state after saving, so we need to
 				// load it again
 			// TODO: Convert to fxsave format!
+#endif
 		}
 		get_iframe_registers(frame, cpuState);
 	}
@@ -655,7 +741,7 @@ arch_get_debug_cpu_state(debug_cpu_state *cpuState)
 
 
 status_t
-arch_set_breakpoint(void *address)
+arch_set_breakpoint(void* address)
 {
 	return set_breakpoint(address, X86_INSTRUCTION_BREAKPOINT,
 		X86_BREAKPOINT_LENGTH_1);
@@ -663,16 +749,16 @@ arch_set_breakpoint(void *address)
 
 
 status_t
-arch_clear_breakpoint(void *address)
+arch_clear_breakpoint(void* address)
 {
 	return clear_breakpoint(address, false);
 }
 
 
 status_t
-arch_set_watchpoint(void *address, uint32 type, int32 length)
+arch_set_watchpoint(void* address, uint32 type, int32 length)
 {
-	uint32 archType, archLength;
+	size_t archType, archLength;
 	status_t error = check_watch_point_parameters(address, type, length,
 		archType, archLength);
 	if (error != B_OK)
@@ -683,14 +769,14 @@ arch_set_watchpoint(void *address, uint32 type, int32 length)
 
 
 status_t
-arch_clear_watchpoint(void *address)
+arch_clear_watchpoint(void* address)
 {
 	return clear_breakpoint(address, true);
 }
 
 
 bool
-arch_has_breakpoints(struct arch_team_debug_info *info)
+arch_has_breakpoints(arch_team_debug_info* info)
 {
 	// Reading info->dr7 is atomically, so we don't need to lock. The caller
 	// has to ensure, that the info doesn't go away.
@@ -701,7 +787,7 @@ arch_has_breakpoints(struct arch_team_debug_info *info)
 #if KERNEL_BREAKPOINTS
 
 status_t
-arch_set_kernel_breakpoint(void *address)
+arch_set_kernel_breakpoint(void* address)
 {
 	status_t error = set_kernel_breakpoint(address, X86_INSTRUCTION_BREAKPOINT,
 		X86_BREAKPOINT_LENGTH_1);
@@ -716,7 +802,7 @@ arch_set_kernel_breakpoint(void *address)
 
 
 status_t
-arch_clear_kernel_breakpoint(void *address)
+arch_clear_kernel_breakpoint(void* address)
 {
 	status_t error = clear_kernel_breakpoint(address, false);
 
@@ -730,9 +816,9 @@ arch_clear_kernel_breakpoint(void *address)
 
 
 status_t
-arch_set_kernel_watchpoint(void *address, uint32 type, int32 length)
+arch_set_kernel_watchpoint(void* address, uint32 type, int32 length)
 {
-	uint32 archType, archLength;
+	size_t archType, archLength;
 	status_t error = check_watch_point_parameters(address, type, length,
 		archType, archLength);
 
@@ -749,7 +835,7 @@ arch_set_kernel_watchpoint(void *address, uint32 type, int32 length)
 
 
 status_t
-arch_clear_kernel_watchpoint(void *address)
+arch_clear_kernel_watchpoint(void* address)
 {
 	status_t error = clear_kernel_breakpoint(address, true);
 
@@ -771,9 +857,9 @@ arch_clear_kernel_watchpoint(void *address)
  *	Interrupts are disabled. \a frame is unused, i.e. can be \c NULL.
  */
 void
-x86_init_user_debug_at_kernel_exit(struct iframe *frame)
+x86_init_user_debug_at_kernel_exit(iframe* frame)
 {
-	Thread *thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_DEFINED))
 		return;
@@ -800,14 +886,14 @@ x86_init_user_debug_at_kernel_exit(struct iframe *frame)
 void
 x86_exit_user_debug_at_kernel_entry()
 {
-	Thread *thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	// We need to save the current values of dr6 and dr7 in the CPU structure,
 	// since in case of a debug exception we might overwrite them before
 	// x86_handle_debug_exception() is called. Debug exceptions occur when
 	// hitting a hardware break/watchpoint or when single-stepping.
-	asm("movl %%dr6, %0" : "=r"(thread->cpu->arch.dr6));
-	asm("movl %%dr7, %0" : "=r"(thread->cpu->arch.dr7));
+	asm("mov %%dr6, %0" : "=r"(thread->cpu->arch.dr6));
+	asm("mov %%dr7, %0" : "=r"(thread->cpu->arch.dr7));
 
 	// The remainder needs only be done, when user breakpoints are installed.
 	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_INSTALLED))
@@ -833,7 +919,7 @@ x86_exit_user_debug_at_kernel_entry()
  *	Interrupts are disabled and will possibly be enabled by the function.
  */
 void
-x86_handle_debug_exception(struct iframe *frame)
+x86_handle_debug_exception(iframe* frame)
 {
 	Thread* thread = thread_get_current_thread();
 
@@ -842,14 +928,14 @@ x86_handle_debug_exception(struct iframe *frame)
 	// x86_exit_user_debug_at_kernel_entry() has already been invoked and dr6
 	// and dr7 are stored in the cpu info. Otherwise we need to fetch the
 	// current values from the registers.
-	uint32 dr6;
-	uint32 dr7;
+	size_t dr6;
+	size_t dr7;
 	if (IFRAME_IS_USER(frame)) {
 		dr6 = thread->cpu->arch.dr6;
 		dr7 = thread->cpu->arch.dr7;
 	} else {
-		asm("movl %%dr6, %0" : "=r"(dr6));
-		asm("movl %%dr7, %0" : "=r"(dr7));
+		asm("mov %%dr6, %0" : "=r"(dr6));
+		asm("mov %%dr7, %0" : "=r"(dr7));
 	}
 
 	TRACE(("x86_handle_debug_exception(): DR6: %lx, DR7: %lx\n", dr6, dr7));
@@ -862,7 +948,7 @@ x86_handle_debug_exception(struct iframe *frame)
 		bool watchpoint = true;
 		for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
 			if (dr6 & (1 << sDR6B[i])) {
-				uint32 type = (dr7 >> sDR7RW[i]) & 0x3;
+				size_t type = (dr7 >> sDR7RW[i]) & 0x3;
 				if (type == X86_INSTRUCTION_BREAKPOINT)
 					watchpoint = false;
 			}
@@ -972,7 +1058,7 @@ x86_handle_debug_exception(struct iframe *frame)
  *	Interrupts are disabled and will possibly be enabled by the function.
  */
 void
-x86_handle_breakpoint_exception(struct iframe *frame)
+x86_handle_breakpoint_exception(iframe* frame)
 {
 	TRACE(("x86_handle_breakpoint_exception()\n"));
 
@@ -994,7 +1080,7 @@ void
 x86_init_user_debug()
 {
 	// get debug settings
-	if (void *handle = load_driver_settings("kernel")) {
+	if (void* handle = load_driver_settings("kernel")) {
 		sQEmuSingleStepHack = get_driver_boolean_parameter(handle,
 			"qemu_single_step_hack", false, false);;
 

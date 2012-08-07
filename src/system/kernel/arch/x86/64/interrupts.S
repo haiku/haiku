@@ -109,17 +109,12 @@
 																\
 	UNLOCK_THREAD_TIME()
 
-// TODO
-#if 0
 #define STOP_USER_DEBUGGING()									\
 	testl	$(THREAD_FLAGS_BREAKPOINTS_INSTALLED				\
 			| THREAD_FLAGS_SINGLE_STEP), THREAD_flags(%r12);	\
 	jz		1f;													\
 	call	x86_exit_user_debug_at_kernel_entry;				\
   1:
-#else
-#define STOP_USER_DEBUGGING()	
-#endif
 
 
 // The following code defines the interrupt service routines for all 256
@@ -273,12 +268,12 @@ STATIC_FUNCTION(int_bottom_user):
 	call	thread_at_kernel_exit_no_signals
 
 .Lkernel_exit_work_done:
-	// Install breakpoints, if defined. TODO
-	//testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
-	//jz	1f
-	//movq	%rbp, %rdi
-	//call	x86_init_user_debug_at_kernel_exit
-//1:
+	// Install breakpoints, if defined.
+	testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
+	jz		1f
+	movq	%rbp, %rdi
+	call	x86_init_user_debug_at_kernel_exit
+1:
 	// Restore the saved registers.
 	RESTORE_IFRAME()
 
@@ -333,7 +328,7 @@ FUNCTION(x86_64_syscall_entry):
 
 	// Check whether the syscall number is valid.
 	cmpq	$SYSCALL_COUNT, %r14
-	jae		.Lbad_syscall_number
+	jae		.Lsyscall_return
 
 	// Get the system call table entry. Note I'm hardcoding the shift because
 	// sizeof(syscall_info) is 16 and scale factors of 16 aren't supported,
@@ -348,6 +343,11 @@ FUNCTION(x86_64_syscall_entry):
 	cmpq	$48, %rcx
 	ja		.Lsyscall_stack_args
 
+.Lperform_syscall:
+	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%r12)
+	jnz		.Lpre_syscall_debug
+
+.Lpre_syscall_debug_done:
 	// Restore the arguments from the iframe. UPDATE_THREAD_USER_TIME() makes
 	// 2 function calls which means they may have been overwritten. Note that
 	// argument 4 is in R10 on the frame rather than RCX as RCX is used by
@@ -359,7 +359,7 @@ FUNCTION(x86_64_syscall_entry):
 	movq	IFRAME_r8(%rbp), %r8
 	movq	IFRAME_r9(%rbp), %r9
 
-	// TODO: pre-syscall tracing/debug
+	// TODO: pre-syscall tracing
 
 	// Call the function and save its return value.
 	call	*SYSCALL_INFO_function(%rax)
@@ -367,7 +367,9 @@ FUNCTION(x86_64_syscall_entry):
 
 	// TODO: post-syscall tracing
 
-.Lbad_syscall_number:
+	// Restore the original stack pointer and return.
+	movq	%rbp, %rsp
+
 .Lsyscall_return:
 	// Clear the restarted flag.
 	testl	$THREAD_FLAGS_SYSCALL_RESTARTED, THREAD_flags(%r12)
@@ -405,9 +407,41 @@ FUNCTION(x86_64_syscall_entry):
 	swapgs
 	sysretq
 
-.Lpost_syscall_work:
-	// TODO: post-syscall debugging
+.Lpre_syscall_debug:
+	// user_debug_pre_syscall expects a pointer to a block of arguments, need
+	// to push the register arguments onto the stack.
+	push	IFRAME_r9(%rbp)
+	push	IFRAME_r8(%rbp)
+	push	IFRAME_r10(%rbp)
+	push	IFRAME_dx(%rbp)
+	push	IFRAME_si(%rbp)
+	push	IFRAME_di(%rbp)
+	movq	%r14, %rdi				// syscall number
+	movq	%rsp, %rsi
+	push	%rax
+	call	user_debug_pre_syscall
+	pop		%rax
+	addq	$48, %rsp
+	jmp		.Lpre_syscall_debug_done
 
+.Lpost_syscall_work:
+	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%r12)
+	jz		1f
+
+	// Post-syscall debugging. Same as above, need a block of arguments.
+	push	IFRAME_r9(%rbp)
+	push	IFRAME_r8(%rbp)
+	push	IFRAME_r10(%rbp)
+	push	IFRAME_dx(%rbp)
+	push	IFRAME_si(%rbp)
+	push	IFRAME_di(%rbp)
+	movq	%r14, %rdi				// syscall number
+	movq	%rsp, %rsi
+	movq	IFRAME_ax(%rbp), %rdx	// return value
+	movq	%r13, %rcx				// start time, preserved earlier
+	call	user_debug_post_syscall
+	addq	$48, %rsp
+1:
 	// Do we need to handle signals?
 	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD) \
 			, THREAD_flags(%r12)
@@ -422,11 +456,11 @@ FUNCTION(x86_64_syscall_entry):
 	movq	%rsp, %rdi
 	call	x86_restart_syscall
 1:
-	// Install breakpoints, if defined. TODO
-	//testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
-	//jz	.Liret
-	//movq	%rbp, %rdi
-	//call	x86_init_user_debug_at_kernel_exit
+	// Install breakpoints, if defined.
+	testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
+	jz		.Liret
+	movq	%rbp, %rdi
+	call	x86_init_user_debug_at_kernel_exit
 
 	// On this return path it is possible that the frame has been modified,
 	// for example to execute a signal handler. In this case it is safer to
@@ -470,25 +504,8 @@ FUNCTION(x86_64_syscall_entry):
 	movsq
 	movq	$0, THREAD_fault_handler(%r12)
 
-	// Restore the register arguments from the iframe.
-	movq	IFRAME_di(%rbp), %rdi
-	movq	IFRAME_si(%rbp), %rsi
-	movq	IFRAME_dx(%rbp), %rdx
-	movq	IFRAME_r10(%rbp), %rcx
-	movq	IFRAME_r8(%rbp), %r8
-	movq	IFRAME_r9(%rbp), %r9
-
-	// TODO: pre-syscall tracing/debug
-
-	// Call the function and save its return value.
-	call	*SYSCALL_INFO_function(%rax)
-	movq	%rax, IFRAME_ax(%rbp)
-
-	// TODO: post-syscall tracing
-
-	// Restore the original stack pointer and return.
-	movq	%rbp, %rsp
-	jmp		.Lsyscall_return
+	// Perform the call.
+	jmp		.Lperform_syscall
 
 .Lbad_syscall_args:
 	movq	$0, THREAD_fault_handler(%r12)

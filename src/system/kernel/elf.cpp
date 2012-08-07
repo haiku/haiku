@@ -2506,8 +2506,6 @@ elf_init(kernel_args *args)
 // #pragma mark -
 
 
-// TODO: x86_64
-#ifndef __x86_64__
 /*!	Reads the symbol and string table for the kernel image with the given ID.
 	\a _symbolCount and \a _stringTableSize are both in- and output parameters.
 	When called they call the size of the buffers given by \a symbolTable and
@@ -2519,7 +2517,7 @@ elf_init(kernel_args *args)
 	values in the table to get the actual symbol addresses.
 */
 status_t
-_user_read_kernel_image_symbols(image_id id, struct Elf32_Sym* symbolTable,
+_user_read_kernel_image_symbols(image_id id, elf_sym* symbolTable,
 	int32* _symbolCount, char* stringTable, size_t* _stringTableSize,
 	addr_t* _imageDelta)
 {
@@ -2551,7 +2549,7 @@ _user_read_kernel_image_symbols(image_id id, struct Elf32_Sym* symbolTable,
 
 	// get the tables and infos
 	addr_t imageDelta = image->text_region.delta;
-	const Elf32_Sym* symbols;
+	const elf_sym* symbols;
 	int32 symbolCount;
 	const char* strings;
 
@@ -2579,7 +2577,7 @@ _user_read_kernel_image_symbols(image_id id, struct Elf32_Sym* symbolTable,
 	// copy symbol table
 	int32 symbolsToCopy = min_c(symbolCount, maxSymbolCount);
 	if (symbolTable != NULL && symbolsToCopy > 0) {
-		if (user_memcpy(symbolTable, symbols, sizeof(Elf32_Sym) * symbolsToCopy)
+		if (user_memcpy(symbolTable, symbols, sizeof(elf_sym) * symbolsToCopy)
 				!= B_OK) {
 			return B_BAD_ADDRESS;
 		}
@@ -2605,4 +2603,3 @@ _user_read_kernel_image_symbols(image_id id, struct Elf32_Sym* symbolTable,
 
 	return B_OK;
 }
-#endif

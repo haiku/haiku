@@ -77,8 +77,9 @@ static status_t
 debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 	bool dontWait)
 {
-	TRACE(("debugger_write(): thread: %ld, team %ld, port: %ld, code: %lx, message: %p, "
-		"size: %lu, dontWait: %d\n", thread_get_current_thread()->id,
+	TRACE(("debugger_write(): thread: %" B_PRId32 ", team %" B_PRId32 ", "
+		"port: %" B_PRId32 ", code: %" B_PRIx32 ", message: %p, size: %lu, "
+		"dontWait: %d\n", thread_get_current_thread()->id,
 		thread_get_current_thread()->team->id, port, code, buffer, bufferSize,
 		dontWait));
 
@@ -94,7 +95,7 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 	error = acquire_sem_etc(writeLock, 1,
 		dontWait ? (uint32)B_RELATIVE_TIMEOUT : (uint32)B_KILL_CAN_INTERRUPT, 0);
 	if (error != B_OK) {
-		TRACE(("debugger_write() done1: %lx\n", error));
+		TRACE(("debugger_write() done1: %" B_PRIx32 "\n", error));
 		return error;
 	}
 
@@ -119,7 +120,7 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 	// release the write lock
 	release_sem(writeLock);
 
-	TRACE(("debugger_write() done: %lx\n", error));
+	TRACE(("debugger_write() done: %" B_PRIx32 "\n", error));
 
 	return error;
 }
@@ -529,8 +530,9 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 	restart = false;
 	Thread *thread = thread_get_current_thread();
 
-	TRACE(("thread_hit_debug_event(): thread: %ld, event: %lu, message: %p, "
-		"size: %ld\n", thread->id, (uint32)event, message, size));
+	TRACE(("thread_hit_debug_event(): thread: %" B_PRId32 ", event: %" B_PRIu32
+		", message: %p, size: %" B_PRId32 "\n", thread->id, (uint32)event,
+		message, size));
 
 	// check, if there's a debug port already
 	bool setPort = !(atomic_get(&thread->debug_info.flags)
@@ -567,8 +569,8 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 		= (thread->team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED);
 	if (thread->id == thread->team->debug_info.nub_thread) {
 		// Ugh, we're the nub thread. We shouldn't be here.
-		TRACE(("thread_hit_debug_event(): Misdirected nub thread: %ld\n",
-			thread->id));
+		TRACE(("thread_hit_debug_event(): Misdirected nub thread: %" B_PRId32
+			"\n", thread->id));
 
 		error = B_ERROR;
 	} else if (debuggerInstalled || !requireDebugger) {
@@ -614,8 +616,8 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 		delete_port(deletePort);
 
 	if (error != B_OK) {
-		TRACE(("thread_hit_debug_event() error: thread: %ld, error: %lx\n",
-			thread->id, error));
+		TRACE(("thread_hit_debug_event() error: thread: %" B_PRId32 ", error: "
+			"%" B_PRIx32 "\n", thread->id, error));
 		return error;
 	}
 
@@ -627,8 +629,9 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 		origin->team = thread->team->id;
 		origin->nub_port = nubPort;
 
-		TRACE(("thread_hit_debug_event(): thread: %ld, sending message to "
-			"debugger port %ld\n", thread->id, debuggerPort));
+		TRACE(("thread_hit_debug_event(): thread: %" B_PRId32 ", sending "
+			"message to debugger port %" B_PRId32 "\n", thread->id,
+			debuggerPort));
 
 		error = debugger_write(debuggerPort, event, message, size, false);
 	}
@@ -648,15 +651,15 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 
 			if (commandMessageSize < 0) {
 				error = commandMessageSize;
-				TRACE(("thread_hit_debug_event(): thread: %ld, failed "
-					"to receive message from port %ld: %lx\n",
+				TRACE(("thread_hit_debug_event(): thread: %" B_PRId32 ", failed "
+					"to receive message from port %" B_PRId32 ": %" B_PRIx32 "\n",
 					thread->id, port, error));
 				break;
 			}
 
 			switch (command) {
 				case B_DEBUGGED_THREAD_MESSAGE_CONTINUE:
-					TRACE(("thread_hit_debug_event(): thread: %ld: "
+					TRACE(("thread_hit_debug_event(): thread: %" B_PRId32 ": "
 						"B_DEBUGGED_THREAD_MESSAGE_CONTINUE\n",
 						thread->id));
 					result = commandMessage.continue_thread.handle_event;
@@ -667,7 +670,7 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 
 				case B_DEBUGGED_THREAD_SET_CPU_STATE:
 				{
-					TRACE(("thread_hit_debug_event(): thread: %ld: "
+					TRACE(("thread_hit_debug_event(): thread: %" B_PRId32 ": "
 						"B_DEBUGGED_THREAD_SET_CPU_STATE\n",
 						thread->id));
 					arch_set_debug_cpu_state(
@@ -720,9 +723,9 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 			}
 		}
 	} else {
-		TRACE(("thread_hit_debug_event(): thread: %ld, failed to send "
-			"message to debugger port %ld: %lx\n", thread->id,
-			debuggerPort, error));
+		TRACE(("thread_hit_debug_event(): thread: %" B_PRId32 ", failed to send "
+			"message to debugger port %" B_PRId32 ": %" B_PRIx32 "\n",
+			thread->id, debuggerPort, error));
 	}
 
 	// update the thread debug info
@@ -993,8 +996,8 @@ void
 user_debug_team_deleted(team_id teamID, port_id debuggerPort)
 {
 	if (debuggerPort >= 0) {
-		TRACE(("user_debug_team_deleted(team: %ld, debugger port: %ld)\n",
-			teamID, debuggerPort));
+		TRACE(("user_debug_team_deleted(team: %" B_PRId32 ", debugger port: "
+			"%" B_PRId32 ")\n", teamID, debuggerPort));
 
 		debug_team_deleted message;
 		message.origin.thread = -1;
@@ -1541,7 +1544,8 @@ broadcast_debugged_thread_message(Thread *nubThread, int32 code,
 				code, message, size);
 			if (error != B_OK) {
 				TRACE(("broadcast_debugged_thread_message(): Failed to send "
-					"message to thread %ld: %lx\n", thread->id, error));
+					"message to thread %" B_PRId32 ": %" B_PRIx32 "\n",
+					thread->id, error));
 			}
 		}
 	}
@@ -1551,8 +1555,8 @@ broadcast_debugged_thread_message(Thread *nubThread, int32 code,
 static void
 nub_thread_cleanup(Thread *nubThread)
 {
-	TRACE(("nub_thread_cleanup(%ld): debugger port: %ld\n", nubThread->id,
-		nubThread->team->debug_info.debugger_port));
+	TRACE(("nub_thread_cleanup(%" B_PRId32 "): debugger port: %" B_PRId32 "\n",
+		nubThread->id, nubThread->team->debug_info.debugger_port));
 
 	ConditionVariable debugChangeCondition;
 	prepare_debugger_change(nubThread->team, debugChangeCondition);
@@ -1654,8 +1658,8 @@ debug_nub_thread(void *)
 	RELEASE_TEAM_DEBUG_INFO_LOCK(nubThread->team->debug_info);
 	restore_interrupts(state);
 
-	TRACE(("debug_nub_thread() thread: %ld, team %ld, nub port: %ld\n",
-		nubThread->id, nubThread->team->id, port));
+	TRACE(("debug_nub_thread() thread: %" B_PRId32 ", team %" B_PRId32 ", nub "
+		"port: %" B_PRId32 "\n", nubThread->id, nubThread->team->id, port));
 
 	// notify all threads that a debugger has been installed
 	broadcast_debugged_thread_message(nubThread,
@@ -1674,8 +1678,8 @@ debug_nub_thread(void *)
 			// thread, we need to update that.
 			nub_thread_cleanup(nubThread);
 
-			TRACE(("nub thread %ld: terminating: %lx\n", nubThread->id,
-				messageSize));
+			TRACE(("nub thread %" B_PRId32 ": terminating: %lx\n",
+				nubThread->id, messageSize));
 
 			return messageSize;
 		}
@@ -1719,10 +1723,10 @@ debug_nub_thread(void *)
 				}
 				reply.read_memory.error = result;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_READ_MEMORY: "
-					"reply port: %ld, address: %p, size: %ld, result: %lx, "
-					"read: %ld\n", nubThread->id, replyPort, address, size,
-					result, bytesRead));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_READ_MEMORY: "
+					"reply port: %" B_PRId32 ", address: %p, size: %" B_PRId32
+					", result: %" B_PRIx32 ", read: %ld\n", nubThread->id,
+					replyPort, address, size, result, bytesRead));
 
 				// send only as much data as necessary
 				reply.read_memory.size = bytesRead;
@@ -1755,10 +1759,10 @@ debug_nub_thread(void *)
 				}
 				reply.write_memory.error = result;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_WRITE_MEMORY: "
-					"reply port: %ld, address: %p, size: %ld, result: %lx, "
-					"written: %ld\n", nubThread->id, replyPort, address, size,
-					result, bytesWritten));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_WRITE_MEMORY: "
+					"reply port: %" B_PRId32 ", address: %p, size: %" B_PRId32
+					", result: %" B_PRIx32 ", written: %ld\n", nubThread->id,
+					replyPort, address, size, result, bytesWritten));
 
 				reply.write_memory.size = bytesWritten;
 				sendReply = true;
@@ -1772,8 +1776,8 @@ debug_nub_thread(void *)
 				int32 flags = message.set_team_flags.flags
 					& B_TEAM_DEBUG_USER_FLAG_MASK;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_TEAM_FLAGS: "
-					"flags: %lx\n", nubThread->id, flags));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_SET_TEAM_FLAGS"
+					": flags: %" B_PRIx32 "\n", nubThread->id, flags));
 
 				Team *team = thread_get_current_thread()->team;
 
@@ -1797,9 +1801,9 @@ debug_nub_thread(void *)
 				int32 flags = message.set_thread_flags.flags
 					& B_THREAD_DEBUG_USER_FLAG_MASK;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_THREAD_FLAGS: "
-					"thread: %ld, flags: %lx\n", nubThread->id, threadID,
-					flags));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_SET_THREAD_FLAGS"
+					": thread: %" B_PRId32 ", flags: %" B_PRIx32 "\n",
+					nubThread->id, threadID, flags));
 
 				// set the flags
 				Thread* thread = Thread::GetAndLock(threadID);
@@ -1831,9 +1835,10 @@ debug_nub_thread(void *)
 				handleEvent = message.continue_thread.handle_event;
 				singleStep = message.continue_thread.single_step;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_CONTINUE_THREAD: "
-					"thread: %ld, handle event: %lu, single step: %d\n",
-					nubThread->id, threadID, handleEvent, singleStep));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_CONTINUE_THREAD"
+					": thread: %" B_PRId32 ", handle event: %" B_PRIu32 ", "
+					"single step: %d\n", nubThread->id, threadID, handleEvent,
+					singleStep));
 
 				// find the thread and get its debug port
 				port_id threadDebugPort = -1;
@@ -1861,8 +1866,8 @@ debug_nub_thread(void *)
 				const debug_cpu_state &cpuState
 					= message.set_cpu_state.cpu_state;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_CPU_STATE: "
-					"thread: %ld\n", nubThread->id, threadID));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_SET_CPU_STATE"
+					": thread: %" B_PRId32 "\n", nubThread->id, threadID));
 
 				// find the thread and get its debug port
 				port_id threadDebugPort = -1;
@@ -1888,8 +1893,8 @@ debug_nub_thread(void *)
 				thread_id threadID = message.get_cpu_state.thread;
 				replyPort = message.get_cpu_state.reply_port;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_CPU_STATE: "
-					"thread: %ld\n", nubThread->id, threadID));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_GET_CPU_STATE"
+					": thread: %" B_PRId32 "\n", nubThread->id, threadID));
 
 				// find the thread and get its debug port
 				port_id threadDebugPort = -1;
@@ -1921,8 +1926,8 @@ debug_nub_thread(void *)
 				replyPort = message.set_breakpoint.reply_port;
 				void *address = message.set_breakpoint.address;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_BREAKPOINT: "
-					"address: %p\n", nubThread->id, address));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_SET_BREAKPOINT"
+					": address: %p\n", nubThread->id, address));
 
 				// check the address
 				status_t result = B_OK;
@@ -1951,8 +1956,8 @@ debug_nub_thread(void *)
 				// get the parameters
 				void *address = message.clear_breakpoint.address;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_CLEAR_BREAKPOINT: "
-					"address: %p\n", nubThread->id, address));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_CLEAR_BREAKPOINT"
+					": address: %p\n", nubThread->id, address));
 
 				// check the address
 				status_t result = B_OK;
@@ -1979,9 +1984,9 @@ debug_nub_thread(void *)
 				uint32 type = message.set_watchpoint.type;
 				int32 length = message.set_watchpoint.length;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_WATCHPOINT: "
-					"address: %p, type: %lu, length: %ld\n", nubThread->id,
-					address, type, length));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_SET_WATCHPOINT"
+					": address: %p, type: %" B_PRIu32 ", length: %" B_PRId32 "\n",
+					nubThread->id, address, type, length));
 
 				// check the address and size
 				status_t result = B_OK;
@@ -2014,8 +2019,8 @@ debug_nub_thread(void *)
 				// get the parameters
 				void *address = message.clear_watchpoint.address;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_CLEAR_WATCHPOINT: "
-					"address: %p\n", nubThread->id, address));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_CLEAR_WATCHPOINT"
+					": address: %p\n", nubThread->id, address));
 
 				// check the address
 				status_t result = B_OK;
@@ -2043,10 +2048,11 @@ debug_nub_thread(void *)
 				uint32 ignoreOp = message.set_signal_masks.ignore_op;
 				uint32 ignoreOnceOp = message.set_signal_masks.ignore_once_op;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_SIGNAL_MASKS: "
-					"thread: %ld, ignore: %llx (op: %lu), ignore once: %llx "
-					"(op: %lu)\n", nubThread->id, threadID, ignore,
-						ignoreOp, ignoreOnce, ignoreOnceOp));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_SET_SIGNAL_MASKS"
+					": thread: %" B_PRId32 ", ignore: %" B_PRIx64 " (op: %"
+					B_PRIu32 "), ignore once: %" B_PRIx64 " (op: %" B_PRIu32
+					")\n", nubThread->id, threadID, ignore, ignoreOp,
+					ignoreOnce, ignoreOnceOp));
 
 				// set the masks
 				Thread* thread = Thread::GetAndLock(threadID);
@@ -2114,10 +2120,11 @@ debug_nub_thread(void *)
 				} else
 					result = B_BAD_THREAD_ID;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_SIGNAL_MASKS: "
-					"reply port: %ld, thread: %ld, ignore: %llx, "
-					"ignore once: %llx, result: %lx\n", nubThread->id,
-					replyPort, threadID, ignore, ignoreOnce, result));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_GET_SIGNAL_MASKS"
+					": reply port: %" B_PRId32 ", thread: %" B_PRId32 ", "
+					"ignore: %" B_PRIx64 ", ignore once: %" B_PRIx64 ", result: "
+					"%" B_PRIx32 "\n", nubThread->id, replyPort, threadID,
+					ignore, ignoreOnce, result));
 
 				// prepare the message
 				reply.get_signal_masks.error = result;
@@ -2134,9 +2141,9 @@ debug_nub_thread(void *)
 				int signal = message.set_signal_handler.signal;
 				struct sigaction &handler = message.set_signal_handler.handler;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER: "
-					"signal: %d, handler: %p\n", nubThread->id,
-					signal, handler.sa_handler));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER"
+					": signal: %d, handler: %p\n", nubThread->id, signal,
+					handler.sa_handler));
 
 				// set the handler
 				sigaction(signal, &handler, NULL);
@@ -2157,9 +2164,9 @@ debug_nub_thread(void *)
 					result = errno;
 				}
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER: "
-					"reply port: %ld, signal: %d, handler: %p\n", nubThread->id,
-					replyPort, signal,
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER"
+					": reply port: %" B_PRId32 ", signal: %d, handler: %p\n",
+					nubThread->id, replyPort, signal,
 					reply.get_signal_handler.handler.sa_handler));
 
 				// prepare the message
@@ -2171,8 +2178,8 @@ debug_nub_thread(void *)
 
 			case B_DEBUG_MESSAGE_PREPARE_HANDOVER:
 			{
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_PREPARE_HANDOVER\n",
-					nubThread->id));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_MESSAGE_PREPARE_HANDOVER"
+					"\n", nubThread->id));
 
 				Team *team = nubThread->team;
 
@@ -2228,9 +2235,9 @@ debug_nub_thread(void *)
 					B_DEBUG_MIN_PROFILE_INTERVAL);
 				status_t result = B_OK;
 
-				TRACE(("nub thread %ld: B_DEBUG_START_PROFILER: "
-					"thread: %ld, sample area: %ld\n", nubThread->id, threadID,
-					sampleArea));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_START_PROFILER: "
+					"thread: %" B_PRId32 ", sample area: %" B_PRId32 "\n",
+					nubThread->id, threadID, sampleArea));
 
 				if (stackDepth < 1)
 					stackDepth = 1;
@@ -2331,8 +2338,8 @@ debug_nub_thread(void *)
 				replyPort = message.stop_profiler.reply_port;
 				status_t result = B_OK;
 
-				TRACE(("nub thread %ld: B_DEBUG_STOP_PROFILER: "
-					"thread: %ld\n", nubThread->id, threadID));
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_STOP_PROFILER: "
+					"thread: %" B_PRId32 "\n", nubThread->id, threadID));
 
 				area_id sampleArea = -1;
 				addr_t* samples = NULL;
@@ -2407,8 +2414,9 @@ debug_nub_thread(void *)
 			if (error != B_OK) {
 				// The debugger port is either not longer existing or we got
 				// interrupted by a kill signal. In either case we terminate.
-				TRACE(("nub thread %ld: failed to send reply to port %ld: %s\n",
-					nubThread->id, replyPort, strerror(error)));
+				TRACE(("nub thread %" B_PRId32 ": failed to send reply to port "
+					"%" B_PRId32 ": %s\n", nubThread->id, replyPort,
+					strerror(error)));
 
 				nub_thread_cleanup(nubThread);
 				return error;
@@ -2470,8 +2478,9 @@ static port_id
 install_team_debugger(team_id teamID, port_id debuggerPort,
 	thread_id causingThread, bool useDefault, bool dontReplace)
 {
-	TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
-		"dontReplace: %d)\n", teamID, debuggerPort, useDefault, dontReplace));
+	TRACE(("install_team_debugger(team: %" B_PRId32 ", port: %" B_PRId32 ", "
+		"default: %d, dontReplace: %d)\n", teamID, debuggerPort, useDefault,
+		dontReplace));
 
 	if (useDefault)
 		debuggerPort = atomic_get(&sDefaultDebuggerPort);
@@ -2481,7 +2490,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	status_t error = get_port_info(debuggerPort, &debuggerPortInfo);
 	if (error != B_OK) {
 		TRACE(("install_team_debugger(): Failed to get debugger port info: "
-			"%lx\n", error));
+			"%" B_PRIx32 "\n", error));
 		return error;
 	}
 	team_id debuggerTeam = debuggerPortInfo.team;
@@ -2490,7 +2499,8 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	// debugged team.
 	if (debuggerTeam == team_get_kernel_team_id() || debuggerTeam == teamID) {
 		TRACE(("install_team_debugger(): Can't debug kernel or debugger team. "
-			"debugger: %ld, debugged: %ld\n", debuggerTeam, teamID));
+			"debugger: %" B_PRId32 ", debugged: %" B_PRId32 "\n", debuggerTeam,
+			teamID));
 		return B_NOT_ALLOWED;
 	}
 
@@ -2618,13 +2628,14 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 		}
 
 		TRACE(("install_team_debugger() done: handed over to debugger: team: "
-			"%ld, port: %ld\n", debuggerTeam, debuggerPort));
+			"%" B_PRId32 ", port: %" B_PRId32 "\n", debuggerTeam,
+			debuggerPort));
 
 		return result;
 	}
 
 	if (done || error != B_OK) {
-		TRACE(("install_team_debugger() done1: %ld\n",
+		TRACE(("install_team_debugger() done1: %" B_PRId32 "\n",
 			(error == B_OK ? result : error)));
 		finish_debugger_change(team);
 		return (error == B_OK ? result : error);
@@ -2708,7 +2719,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 		delete breakpointManager;
 	}
 
-	TRACE(("install_team_debugger() done2: %ld\n",
+	TRACE(("install_team_debugger() done2: %" B_PRId32 "\n",
 		(error == B_OK ? result : error)));
 	return (error == B_OK ? result : error);
 }
@@ -2759,7 +2770,8 @@ _user_disable_debugger(int state)
 {
 	Team *team = thread_get_current_thread()->team;
 
-	TRACE(("_user_disable_debugger(%d): team: %ld\n", state, team->id));
+	TRACE(("_user_disable_debugger(%d): team: %" B_PRId32 "\n", state,
+		team->id));
 
 	cpu_status cpuState = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
@@ -2853,7 +2865,8 @@ _user_remove_team_debugger(team_id teamID)
 status_t
 _user_debug_thread(thread_id threadID)
 {
-	TRACE(("[%ld] _user_debug_thread(%ld)\n", find_thread(NULL), threadID));
+	TRACE(("[%" B_PRId32 "] _user_debug_thread(%" B_PRId32 ")\n",
+		find_thread(NULL), threadID));
 
 	// get the thread
 	Thread* thread = Thread::GetAndLock(threadID);

@@ -72,11 +72,9 @@ arch_int_init(kernel_args* args)
 		table[i] = x86_hardware_interrupt;
 
 	table[0]  = x86_unexpected_exception;	// Divide Error Exception (#DE)
-	//table[1]  = x86_handle_debug_exception; // Debug Exception (#DB)
-	table[1]  = x86_unexpected_exception;
+	table[1]  = x86_handle_debug_exception; // Debug Exception (#DB)
 	table[2]  = x86_fatal_exception;		// NMI Interrupt
-	//table[3]  = x86_handle_breakpoint_exception; // Breakpoint Exception (#BP)
-	table[3]  = x86_unexpected_exception;
+	table[3]  = x86_handle_breakpoint_exception; // Breakpoint Exception (#BP)
 	table[4]  = x86_unexpected_exception;	// Overflow Exception (#OF)
 	table[5]  = x86_unexpected_exception;	// BOUND Range Exceeded Exception (#BR)
 	table[6]  = x86_unexpected_exception;	// Invalid Opcode Exception (#UD)

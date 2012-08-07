@@ -263,8 +263,8 @@ typedef struct arch_cpu_info {
 
 	struct X86PagingStructures* active_paging_structures;
 
-	uint32				dr6;	// temporary storage for debug registers (cf.
-	uint32				dr7;	// x86_exit_user_debug_at_kernel_entry())
+	size_t				dr6;	// temporary storage for debug registers (cf.
+	size_t				dr7;	// x86_exit_user_debug_at_kernel_entry())
 
 	// local TSS for this cpu
 	struct tss			tss;
