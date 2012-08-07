@@ -929,7 +929,7 @@ Journal::_FlushLog(bool canWait, bool flushBlocks)
 
 	// write the current log entry to disk
 
-	if (fUnwrittenTransactions != 0 && _TransactionSize() != 0) {
+	if (fUnwrittenTransactions != 0) {
 		status = _WriteTransactionToLog();
 		if (status < B_OK)
 			FATAL(("writing current log entry failed: %s\n", strerror(status)));
