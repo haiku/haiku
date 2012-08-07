@@ -106,7 +106,8 @@ void pll_setup_flags(pll_info* pll, uint8 crtcID);
 status_t pll_limit_probe(pll_info* pll);
 status_t pll_dp_ss_probe(pll_info* pll);
 status_t pll_asic_ss_probe(pll_info* pll);
-status_t pll_set(uint8 pllID, display_mode* mode, uint8 crtcID);
+status_t pll_set(display_mode* mode, uint8 crtcID);
+status_t pll_pick(uint32 connectorIndex);
 
 
 #endif /* RADEON_HD_PLL_H */

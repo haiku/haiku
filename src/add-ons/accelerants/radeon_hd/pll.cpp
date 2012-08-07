@@ -17,6 +17,7 @@
 #include "accelerant_protos.h"
 #include "accelerant.h"
 #include "bios.h"
+#include "connector.h"
 #include "display.h"
 #include "displayport.h"
 #include "encoder.h"
@@ -650,13 +651,12 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 
 
 status_t
-pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
+pll_set(display_mode* mode, uint8 crtcID)
 {
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	pll->pixelClock = mode->timing.pixel_clock;
-	pll->id = pllID;
 
 	pll_setup_flags(pll, crtcID);
 		// set up any special flags
@@ -759,7 +759,7 @@ pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
 				= gConnector[connectorIndex]->encoder.objectID;
 			args.v5.ucEncoderMode
 				= display_get_encoder_mode(connectorIndex);
-			args.v5.ucPpll = pllID;
+			args.v5.ucPpll = pll->id;
 			break;
 		case 6:
 			args.v6.ulDispEngClkFreq
@@ -790,7 +790,7 @@ pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
 			args.v6.ucTransmitterID
 				= gConnector[connectorIndex]->encoder.objectID;
 			args.v6.ucEncoderMode = display_get_encoder_mode(connectorIndex);
-			args.v6.ucPpll = pllID;
+			args.v6.ucPpll = pll->id;
 			break;
 		default:
 			TRACE("%s: ERROR: table version %" B_PRIu8 ".%" B_PRIu8 " TODO\n",
@@ -807,4 +807,46 @@ pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
 	// Not yet, lets avoid this.
 
 	return result;
+}
+
+
+status_t
+pll_pick(uint32 connectorIndex)
+{
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
+
+	if (info.dceMajor == 6 && info.dceMinor == 1) {
+		// DCE 6.1 APU
+		if (gConnector[connectorIndex]->encoder.objectID
+			== ENCODER_OBJECT_ID_INTERNAL_UNIPHY && !linkB) {
+			pll->id = ATOM_PPLL2;
+			return B_OK;
+		}
+		// TODO: check for used PLL1 and use PLL2?
+		pll->id = ATOM_PPLL1;
+		return B_OK;
+	} else if (info.dceMajor >= 4) {
+		if (connector_is_dp(connectorIndex)) {
+			if (info.dceMajor >= 6) {
+				pll->id = ATOM_PPLL1;
+				return B_OK;
+			} else if (info.dceMajor >= 5) {
+				pll->id = ATOM_DCPLL;
+				return B_OK;
+			} else if (pll->dpExternalClock) {
+				pll->id = ATOM_PPLL_INVALID;
+				return B_OK;
+			}
+		}
+		pll->id = ATOM_PPLL1;
+		return B_OK;
+	}
+
+	// TODO: Should return the CRTCID here.
+	pll->id = ATOM_PPLL1;
+	return B_OK;
 }

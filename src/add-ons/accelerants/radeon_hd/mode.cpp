@@ -186,8 +186,14 @@ radeon_set_display_mode(display_mode* mode)
 
 		// *** CRT controler mode set
 		// TODO: program SS
-		pll_set(ATOM_PPLL1, mode, id);
-			// TODO: check if ATOM_PPLL1 is used and use ATOM_PPLL2 if so
+
+		// Set up PLL for connector
+		pll_pick(connectorIndex);
+		pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+		TRACE("%s: pll %d selected for connector %" B_PRIu32 "\n", __func__,
+			pll->id, connectorIndex);
+		pll_set(mode, id);
+
 		display_crtc_set_dtd(id, mode);
 
 		display_crtc_fb_set(id, mode);
