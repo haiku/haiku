@@ -66,6 +66,7 @@ public:
 	BPose* DeepFindPose(const node_ref* node, int32* index = NULL) const;
 		// same as FindPose, node can be a target of the actual
 		// pose if the pose is a symlink
+	PoseList *FindAllPoses(const node_ref *node) const;
 };
 
 // iteration glue, add permutations as needed

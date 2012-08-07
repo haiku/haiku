@@ -890,8 +890,6 @@ Model::AttrChanged(const char* attrName)
 	if (!attrName
 		|| strcmp(attrName, kAttrMIMEType) == 0
 		|| strcmp(attrName, kAttrPreferredApp) == 0) {
-		ModelNodeLazyOpener opener(this);
-		opener.OpenNode();
 		char mimeString[B_MIME_TYPE_LENGTH];
 		BNodeInfo info(fNode);
 		if (info.GetType(mimeString) != B_OK)
@@ -1194,7 +1192,8 @@ Model::Mimeset(bool force)
 	GetPath(&path);
 
 	update_mime_info(path.Path(), 0, 1, force ? 2 : 0);
-
+	ModelNodeLazyOpener opener(this);
+	opener.OpenNode();
 	AttrChanged(0);
 
 	return !oldType.ICompare(MimeType());
