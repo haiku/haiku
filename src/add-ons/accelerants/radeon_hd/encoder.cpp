@@ -1351,7 +1351,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 					// Select the PLL for the PHY
 					// DP PHY to be clocked from external src if possible
-					if (isDP && pll->dpExternalClock) {
+					if (isDP && gInfo->dpExternalClock) {
 						// use external clock source
 						args.v3.acConfig.ucRefClkSource = ATOM_DCPLL;
 					} else
@@ -1418,7 +1418,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 					// Select the PLL for the PHY
 					// DP PHY to be clocked from external src if possible
 					if (isDP) {
-						if (pll->dpExternalClock > 0) {
+						if (gInfo->dpExternalClock > 0) {
 							args.v4.acConfig.ucRefClkSource
 								= ENCODER_REFCLK_SRC_EXTCLK;
 						} else {

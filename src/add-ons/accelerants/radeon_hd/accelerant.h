@@ -72,6 +72,10 @@ struct accelerant_info {
 
 	volatile uint32	dpms_mode;		// current driver dpms mode
 
+	uint16			maximumPixelClock;
+	uint32			displayClockFrequency;
+	uint32			dpExternalClock;
+
 	RingQueue*		ringQueue[RADEON_QUEUE_MAX]; // Ring buffer command processor
 };
 

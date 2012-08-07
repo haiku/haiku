@@ -49,9 +49,6 @@ struct pll_info {
 	/* pixel clock to be programmed (kHz)*/
 	uint32 pixelClock;
 
-	/* external DisplayPort clock freq */
-	uint32 dpExternalClock;
-
 	/* flags for the current clock */
 	uint32 flags;
 
@@ -100,6 +97,8 @@ struct pll_info {
 };
 
 
+void pll_external_init();
+status_t pll_external_set(uint32 clock);
 status_t pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID);
 status_t pll_compute(pll_info* pll);
 void pll_setup_flags(pll_info* pll, uint8 crtcID);

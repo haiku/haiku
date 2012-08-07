@@ -252,8 +252,14 @@ radeon_init_accelerant(int device)
 
 	radeon_init_bios(gInfo->rom);
 
+	// probe firmware information
+	radeon_gpu_probe();
+
 	// disable spread spectrum as it requires lots of extra calculations
 	radeon_gpu_ss_disable();
+
+	// program external pll clock
+	pll_external_init();
 
 	// find GPIO pins from AtomBIOS
 	gpio_probe();

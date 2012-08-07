@@ -164,6 +164,7 @@
 #define		SOFT_RESET_IA			(1 << 15)
 
 
+status_t radeon_gpu_probe();
 status_t radeon_gpu_reset();
 void radeon_gpu_mc_halt(struct gpu_state *gpuState);
 void radeon_gpu_mc_resume(struct gpu_state *gpuState);

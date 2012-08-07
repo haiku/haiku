@@ -38,8 +38,6 @@ extern "C" void _sPrintf(const char* format, ...);
 status_t
 pll_limit_probe(pll_info* pll)
 {
-	radeon_shared_info &info = *gInfo->shared_info;
-
 	uint8 tableMajor;
 	uint8 tableMinor;
 	uint16 tableOffset;
@@ -119,12 +117,6 @@ pll_limit_probe(pll_info* pll)
 		firmwareInfo->info.usMinPixelClockPLL_Input) * 10;
 	pll->pllInMax = B_LENDIAN_TO_HOST_INT16(
 		firmwareInfo->info.usMaxPixelClockPLL_Input) * 10;
-
-	if (info.dceMajor >= 4) {
-		pll->dpExternalClock = B_LENDIAN_TO_HOST_INT16(
-			firmwareInfo->info_21.usUniphyDPModeExtClkFreq);
-	} else
-		pll->dpExternalClock = 0;
 
 	TRACE("%s: referenceFreq: %" B_PRIu16 "; pllOutMin: %" B_PRIu16 "; "
 		" pllOutMax: %" B_PRIu16 "; pllInMin: %" B_PRIu16 ";"
@@ -811,6 +803,86 @@ pll_set(display_mode* mode, uint8 crtcID)
 
 
 status_t
+pll_external_set(uint32 clock)
+{
+	TRACE("%s: set external pll clock to %" B_PRIu32 "\n", __func__, clock);
+
+	if (clock == 0)
+		ERROR("%s: Warning: default display clock is 0?\n", __func__);
+
+	// also known as PLL display engineering
+	uint8 tableMajor;
+	uint8 tableMinor;
+
+	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
+	atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor);
+
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
+
+	union setPixelClock {
+		SET_PIXEL_CLOCK_PS_ALLOCATION base;
+		PIXEL_CLOCK_PARAMETERS v1;
+		PIXEL_CLOCK_PARAMETERS_V2 v2;
+		PIXEL_CLOCK_PARAMETERS_V3 v3;
+		PIXEL_CLOCK_PARAMETERS_V5 v5;
+		PIXEL_CLOCK_PARAMETERS_V6 v6;
+	};
+	union setPixelClock args;
+	memset(&args, 0, sizeof(args));
+
+	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 dceVersion = (info.dceMajor * 100) + info.dceMinor;
+	switch (tableMajor) {
+		case 1:
+			switch(tableMinor) {
+				case 5:
+					// If the default DC PLL clock is specified,
+					// SetPixelClock provides the dividers.
+					args.v5.ucCRTC = ATOM_CRTC_INVALID;
+					args.v5.usPixelClock = B_HOST_TO_LENDIAN_INT16(clock);
+					args.v5.ucPpll = ATOM_DCPLL;
+					break;
+				case 6:
+					// If the default DC PLL clock is specified,
+					// SetPixelClock provides the dividers.
+					args.v6.ulDispEngClkFreq = B_HOST_TO_LENDIAN_INT32(clock);
+					if (dceVersion == 601)
+						args.v6.ucPpll = ATOM_EXT_PLL1;
+					else if (dceVersion >= 600)
+						args.v6.ucPpll = ATOM_PPLL0;
+					else
+						args.v6.ucPpll = ATOM_DCPLL;
+					break;
+				default:
+					ERROR("%s: Unknown table version %" B_PRIu8
+						".%" B_PRIu8 "\n", __func__, tableMajor, tableMinor);
+			}
+			break;
+		default:
+			ERROR("%s: Unknown table version %" B_PRIu8
+						".%" B_PRIu8 "\n", __func__, tableMajor, tableMinor);
+	}
+	return B_OK;
+}
+
+
+void
+pll_external_init()
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.dceMajor >= 6) {
+		pll_external_set(gInfo->displayClockFrequency);
+	} else if (info.dceMajor >= 4) {
+		// TODO: SS enabled? disable
+		pll_external_set(gInfo->displayClockFrequency);
+		// TODO: SS enabled? enable
+	}
+}
+
+
+status_t
 pll_pick(uint32 connectorIndex)
 {
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
@@ -837,7 +909,7 @@ pll_pick(uint32 connectorIndex)
 			} else if (info.dceMajor >= 5) {
 				pll->id = ATOM_DCPLL;
 				return B_OK;
-			} else if (pll->dpExternalClock) {
+			} else if (gInfo->dpExternalClock) {
 				pll->id = ATOM_PPLL_INVALID;
 				return B_OK;
 			}
