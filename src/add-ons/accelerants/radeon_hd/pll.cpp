@@ -691,7 +691,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 			break;
 	}
 
-	display_crtc_ss(crtcID, ATOM_DISABLE);
+	display_crtc_ss(pll, ATOM_DISABLE);
 		// disable ss
 
 	uint8 tableMajor;
@@ -826,7 +826,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 
 	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-	//display_crtc_ss(crtcID, ATOM_ENABLE);
+	//display_crtc_ss(pll, ATOM_ENABLE);
 	// Not yet, lets avoid this.
 
 	return result;
@@ -906,9 +906,17 @@ pll_external_init()
 	if (info.dceMajor >= 6) {
 		pll_external_set(gInfo->displayClockFrequency);
 	} else if (info.dceMajor >= 4) {
-		// TODO: SS enabled? disable
+		// Create our own pseudo pll
+		pll_info pll;
+		bool ssPresent = pll_asic_ss_probe(&pll, ASIC_INTERNAL_SS_ON_DCPLL)
+			== B_OK ? true : false;
+		if (ssPresent)
+			display_crtc_ss(&pll, ATOM_DISABLE);
 		pll_external_set(gInfo->displayClockFrequency);
-		// TODO: SS enabled? enable
+		#if 0
+		if (ssPresent)
+			display_crtc_ss(&pll, ATOM_ENABLE);
+		#endif
 	}
 }
 

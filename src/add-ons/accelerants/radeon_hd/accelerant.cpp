@@ -255,9 +255,6 @@ radeon_init_accelerant(int device)
 	// probe firmware information
 	radeon_gpu_probe();
 
-	// program external pll clock
-	pll_external_init();
-
 	// find GPIO pins from AtomBIOS
 	gpio_probe();
 
@@ -279,6 +276,9 @@ radeon_init_accelerant(int device)
 
 	// setup encoders on each connector if needed
 	encoder_init();
+
+	// program external pll clock
+	pll_external_init();
 
 	// setup link on any DisplayPort connectors
 	dp_setup_connectors();
