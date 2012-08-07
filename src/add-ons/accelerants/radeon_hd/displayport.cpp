@@ -160,14 +160,14 @@ dp_aux_read(uint32 hwPin, uint16 address,
 }
 
 
-static void
+void
 dpcd_reg_write(uint32 hwPin, uint16 address, uint8 value)
 {
 	dp_aux_write(hwPin, address, &value, 1, 0);
 }
 
 
-static uint8
+uint8
 dpcd_reg_read(uint32 hwPin, uint16 address)
 {
 	uint8 value = 0;

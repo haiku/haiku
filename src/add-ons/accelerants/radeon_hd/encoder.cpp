@@ -589,9 +589,17 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 				panelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
 			else if (connector->encoderExternal.objectID
 				== ENCODER_OBJECT_ID_TRAVIS) {
-				TRACE("%s: TODO: Travis: read DP confg data, DP1 vs DP2 mode\n",
-					__func__);
-				panelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
+				dp_info* dp = &gConnector[connectorIndex]->dpInfo;
+				uint8 id[6];
+				int bit;
+				for (bit = 0; bit < 6; bit++)
+					id[bit] = dpcd_reg_read(dp->auxPin, 0x503 + bit);
+				if (id[0] == 0x73 && id[1] == 0x69 && id[2] == 0x76
+					&& id[3] == 0x61 && id[4] == 0x72 && id[5] == 0x54) {
+					panelMode = DP_PANEL_MODE_INTERNAL_DP1_MODE;
+				} else {
+					panelMode = DP_PANEL_MODE_INTERNAL_DP2_MODE;
+				}
 			} else {
 				panelMode = DP_PANEL_MODE_INTERNAL_DP2_MODE;
 			}
@@ -1345,7 +1353,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 					// DP PHY to be clocked from external src if possible
 					if (isDP && pll->dpExternalClock) {
 						// use external clock source
-						args.v3.acConfig.ucRefClkSource = 2;
+						args.v3.acConfig.ucRefClkSource = ATOM_DCPLL;
 					} else
 						args.v3.acConfig.ucRefClkSource = pll->id;
 
