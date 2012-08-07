@@ -20,13 +20,13 @@ Context::FormatSigned(int64 value, int bytes) const
 	// decimal
 
 	if (fDecimal) {
-		snprintf(tmp, sizeof(tmp), "%lld", value);
+		snprintf(tmp, sizeof(tmp), "%" B_PRId64, value);
 		return tmp;
 	}
 
 	// hex
 
-	snprintf(tmp, sizeof(tmp), "0x%llx", value);
+	snprintf(tmp, sizeof(tmp), "0x%" B_PRIx64, value);
 
 	// Negative numbers are expanded when being converted to int64. Hence
 	// we skip all but the last 2 * bytes hex digits to retain the original
@@ -49,7 +49,7 @@ string
 Context::FormatUnsigned(uint64 value) const
 {
 	char tmp[32];
-	snprintf(tmp, sizeof(tmp), fDecimal ? "%llu" : "0x%llx", value);
+	snprintf(tmp, sizeof(tmp), fDecimal ? "%" B_PRIu64 : "0x%" B_PRIx64, value);
 	return tmp;
 }
 
@@ -57,7 +57,7 @@ string
 Context::FormatFlags(uint64 value) const
 {
 	char tmp[32];
-	snprintf(tmp, sizeof(tmp), "0x%llx", value);
+	snprintf(tmp, sizeof(tmp), "0x%" B_PRIx64, value);
 	return tmp;
 }
 

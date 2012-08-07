@@ -13,7 +13,7 @@ SubDirCcFlags -DHAVE_CONFIG_H -D_GNU_SOURCE ;
 
 # architecture specific sources
 local opcodesArchSources ;
-if $(TARGET_ARCH) = x86 {
+if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 	opcodesArchSources = i386-dis.c ;
 } else if $(TARGET_ARCH) = ppc {
 	opcodesArchSources = ppc-dis.c ;

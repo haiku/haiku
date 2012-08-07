@@ -33,6 +33,11 @@ if $(TARGET_ARCH) = x86 {
 	gdbHaikuArchTargetSources = i386-tdep.c i386-haiku-tdep.c i387-tdep.c ;
 	gdbHaikuArchNativeSources = i386-haiku-nat.c ;
 	gdbProcessorName = i386 ;
+} else if $(TARGET_ARCH) = x86_64 {
+	gdbHaikuArchTargetSources = amd64-tdep.c amd64-haiku-tdep.c i386-tdep.c
+		i387-tdep.c ;
+	gdbHaikuArchNativeSources = amd64-haiku-nat.c ;
+	gdbProcessorName = i386 ;
 } else if $(TARGET_ARCH) = ppc {
 	# TODO: Not yet implemented!
 	gdbProcessorName = ppc ;

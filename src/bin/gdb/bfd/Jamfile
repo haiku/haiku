@@ -8,6 +8,9 @@ SubDirSysHdrs [ FDirName $(HAIKU_TOP) src bin gawk intl ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -D_GNU_SOURCE ;
 
+local bfd32SelectVecs = &bfd_elf32_little_generic_vec,&bfd_elf32_big_generic_vec ;
+local bfd64SelectVecs = &bfd_elf64_little_generic_vec,&bfd_elf64_big_generic_vec ;
+
 # architecture specific sources
 local bfdArchSources ;
 if $(TARGET_ARCH) = x86 {
@@ -20,11 +23,31 @@ if $(TARGET_ARCH) = x86 {
 
 	ObjectCcFlags archures.c targets.c :
 		-DDEFAULT_VECTOR=bfd_elf32_i386_vec
-		-DSELECT_VECS=\"&bfd_elf32_i386_vec,&i386pe_vec,&i386pei_vec,&bfd_elf32_little_generic_vec,&bfd_elf32_big_generic_vec\"
+		-DSELECT_VECS=\"&bfd_elf32_i386_vec,&i386pe_vec,&i386pei_vec,$(bfd32SelectVecs)\"
 		-DSELECT_ARCHITECTURES=\"&bfd_i386_arch\"
 		-DHAVE_bfd_elf32_i386_vec
 		-DHAVE_i386pe_vec
 		-DHAVE_i386pei_vec
+		-DHAVE_bfd_elf32_little_generic_vec
+		-DHAVE_bfd_elf32_big_generic_vec
+	;
+} else if $(TARGET_ARCH) = x86_64 {
+	bfdArchSources =
+		cpu-i386.c
+		elf64-x86-64.c
+		elf32-i386.c
+		elf64.c
+		elf64-gen.c
+	;
+
+	ObjectCcFlags archures.c targets.c :
+		-DDEFAULT_VECTOR=bfd_elf64_x86_64_vec
+		-DSELECT_VECS=\"&bfd_elf64_x86_64_vec,&bfd_elf32_i386_vec,$(bfd32SelectVecs),$(bfd64SelectVecs)\"
+		-DSELECT_ARCHITECTURES=\"&bfd_i386_arch\"
+		-DHAVE_bfd_elf64_x86_64_vec
+		-DHAVE_bfd_elf32_i386_vec
+		-DHAVE_bfd_elf64_little_generic_vec
+		-DHAVE_bfd_elf64_big_generic_vec
 		-DHAVE_bfd_elf32_little_generic_vec
 		-DHAVE_bfd_elf32_big_generic_vec
 	;
@@ -81,7 +104,10 @@ local bfdGenericSources =
 	elf-strtab.c
 ;
 
-local bfdGeneratedSources = peigen.c ;
+local bfdGeneratedSources ;
+if $(TARGET_ARCH) != x86_64 {
+	bfdGeneratedSources = peigen.c ;
+}
 
 local bfdAllSources = 
 	$(bfdBaseSources)
@@ -167,6 +193,7 @@ local bfdHeadersToCopy =
 
 BFDSimpleSed peigen.c : peXXigen.c : s/XX/pe/g ;
 BFDSimpleSed elf32-target.h : elfxx-target.h : s/NN/32/g ;
+BFDSimpleSed elf64-target.h : elfxx-target.h : s/NN/64/g ;
 BFDFileSed targmatch.h : config.bfd : targmatch.sed ;
 BFDCopyConfigHeaders $(bfdHeadersToCopy) ;
 
@@ -174,7 +201,8 @@ BFDCopyConfigHeaders $(bfdHeadersToCopy) ;
 # depend on them.
 
 local bfdGeneratedHeaders
-	= [ FGristFiles $(bfdHeadersToCopy) elf32-target.h targmatch.h ] ;
+	= [ FGristFiles $(bfdHeadersToCopy) elf32-target.h elf64-target.h
+		targmatch.h ] ;
 
 Depends gdb-bfd-generated-headers : $(bfdGeneratedHeaders) ;
 NotFile gdb-bfd-generated-headers ;
