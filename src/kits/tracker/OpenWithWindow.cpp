@@ -648,6 +648,8 @@ OpenWithPoseView::InitDirentIterator(const entry_ref*)
 		HideBarberPole();
 		return NULL;
 	}
+	SetRefFilter(new OpenWithRefFilter(fIterator, entryList,
+		(fHaveCommonPreferredApp ? &fPreferredRef : 0)));
 	return fIterator;
 }
 
@@ -935,16 +937,25 @@ OpenWithPoseView::OpenWithRelationDescription(const Model* model,
 }
 
 
-bool
-OpenWithPoseView::ShouldShowPose(const Model* model, const PoseInfo* poseInfo)
-{
-	OpenWithContainerWindow* window = ContainerWindow();
-	// filter for add_poses
-	if (!fIterator->CanOpenWithFilter(model, window->EntryList(),
-		fHaveCommonPreferredApp ? &fPreferredRef : 0))
-		return false;
+//  #pragma mark -
 
-	return _inherited::ShouldShowPose(model, poseInfo);
+
+OpenWithRefFilter::OpenWithRefFilter(SearchForSignatureEntryList* iterator,
+	const BMessage *entryList, entry_ref* preferredRef)
+	:
+	fIterator(iterator),
+	fEntryList(entryList),
+	fPreferredRef(preferredRef)
+{
+}
+
+
+bool
+OpenWithRefFilter::Filter(const entry_ref* ref, BNode* node, stat_beos* st,
+	const char* filetype)
+{
+	Model *model = new Model(ref, true, true);
+	return fIterator->CanOpenWithFilter(model, fEntryList, fPreferredRef);
 }
 
 
