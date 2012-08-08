@@ -1,4 +1,5 @@
-1	japanese	x-vnd.Haiku-WebPositive	3136989668
+1	japanese	x-vnd.Haiku-WebPositive	2052381345
+Show home button	Settings Window		ホームボタンを表示する
 Username:	Authentication Panel		ユーザー名：
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
 Cancel	Settings Window		キャンセル
@@ -21,6 +22,7 @@ Confirmation	WebPositive Window		確認
 Window	WebPositive Window		ウィンドウ
 Decrease size	WebPositive Window		サイズを小さく
 Serif font:	Settings Window		セリフフォント：
+Loading %url	WebPositive Window		読み込み中 %url
 Page source	WebPositive Window		ページのソース
 Next	WebPositive Window		次へ
 Find next	WebPositive Window		次を検索
@@ -33,8 +35,10 @@ Search page:	Settings Window		検索ページ：
 Zoom text only	WebPositive Window		テキストのみ拡大
 Default fixed font size:	Settings Window		規定の固定フォントサイズ：
 Close tab	WebPositive Window		タブを閉じる
+Auto-hide mouse pointer	Settings Window		自動的にマウスポインターを隠す。
 Over 1 hour left	Download Window		残り 1 時間以上
 Quit	WebPositive Window		終了
+Full screen	WebPositive Window		全画面表示
 Open download error	Download Window		ダウンロードを開く際にエラー
 Standard font:	Settings Window		標準フォント：
 Restart	Download Window		再開
@@ -62,9 +66,11 @@ Increase size	WebPositive Window		サイズを大きく
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	ブックマークフォルダーの取得時にエラーが発生しました。\n\nエラー： %error
 Over 1 day left	Download Window		残り 1 日以上
 Downloads	WebPositive Window		ダウンロード
+Requesting %url	WebPositive Window		要求中 %url
 Apply	Settings Window		適用
 Bookmark info	WebPositive Window		ブックマーク情報
 Size:	Font Selection view		サイズ：
+Show tabs if only one page is open	Settings Window		ページが一つだけ開いている場合もタブを表示する。
 About	WebPositive Window		WebPositive について
 Finish: 	Download Window	Finishing time	完了：
 Fonts	Settings Window		フォント
@@ -101,7 +107,11 @@ New browser window	Download Window		新規ブラウザウィンドウ
 Today	WebPositive Window		今日
 1 second left	Download Window		残り 1 秒
 Remember username and password for this site	Authentication Panel		このサイトのユーザー名とパスワードを記憶する
+Authentication required	Authentication Panel		認証が必要です
+Use proxy server to connect to the internet	Settings Window		インターネット接続にプロキシーサーバーを使用する。
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ダウンロードが進行中です。WebPositive を今終了してもよいですか?
+Auto-hide interface in full screen mode	Settings Window		全画面表示時に自動的にインターフェースを隠す。
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 失敗。
 New tab	WebPositive Window		新規タブ
 Downloads in progress	WebPositive		ダウンロードが進行中です
 Style:	Font Selection view		スタイル：
@@ -122,4 +132,5 @@ OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		ブックマークの管理
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでにあります。
 New windows:	Settings Window		新規ウィンドウ：
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 完了。
 Remove finished	Download Window		完了した物を削除

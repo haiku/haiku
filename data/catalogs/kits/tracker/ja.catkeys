@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	886034970
+1	japanese	x-vnd.Haiku-libtracker	1680698556
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -14,7 +14,9 @@ Decrease size	ContainerWindow		サイズを小さく
 Mini icon view	VolumeWindow		ミニアイコン表示
 You must have at least one attribute showing.	PoseView		最低一つの属性を表示する必要があります。
 Permissions	InfoWindow		アクセス権
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		選択範囲を反転
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		最近開いたドキュメント
 Modified	QueryPoseView		更新日時
 Created	ContainerWindow		作成日時
@@ -39,6 +41,7 @@ Make active printer	ContainerWindow		プリンターを有効にする
 Create link here	ContainerWindow		ここにリンクを作成
 Moving: 	StatusWindow		移動中：
 before	FindPanel		以前
+Error emptying Trash	FSUtils		ごみ箱を空にしている途中でエラーが発生しました。
 On	FindPanel		有効
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		より大きい
@@ -89,6 +92,7 @@ Select all	VolumeWindow		すべて選択
 Opens with:	InfoWindow		アプリケーション：
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		MIME 設定を%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります!\n\n本当に続けますか?
 Open	ContainerWindow		開く
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		フォルダーサイズの計算中にエラー発生。
 New folder	FilePanelPriv		新規フォルダー
 %name info	InfoWindow	InfoWindow Title	%name の情報
@@ -309,6 +313,7 @@ The Tracker must be running to see Info windows.	PoseView		情報ウィンドウ
 Other	FilePermissionsView		その他
 Query name:	FindPanel		クエリ名：
 Permissions	ContainerWindow		アクセス権
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		移動中
 Identify	InfoWindow		ファイル形式を判別
 Recent folders	ContainerWindow		最近開いたフォルダー

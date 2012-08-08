@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	2908539543
+1	japanese	x-vnd.Haiku-DriveSetup	1372142450
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		削除
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		変更を本当にディスクに保存しますか？\n\nその場合、選択されたパーティションのすべてのデータが失われますので、ご注意ください。
@@ -11,10 +11,13 @@ There's no space on the partition where a child partition could be created.	Main
 Unable to find the selected partition by ID.	MainWindow		選択されたパーティションを ID で検出できませんでした。
 Select a partition from the list below.	DiskView		下記の一覧からパーティションを一つ選択してください。
 No disk devices have been recognized.	DiskView		ディスクデバイスが検出されませんでした。
+Failed to initialize the disk %s!\n	MainWindow		ディスク %s の初期化に失敗しました！\n
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。
 Partition name:	CreateParamsPanel		パーティション名 :
 Initialize	InitParamsPanel		初期化
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" を本当にフォーマットして良いですか?  変更をディスクに書き込む直前に再度確認します。
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできませんでした。
+The partition %s has been successfully formatted.\n	MainWindow		%s パーティションは正常にフォーマットされました。\n
 The partition %s is already unmounted.	MainWindow		パーティション %s は既にマウント解除されています。
 Failed to delete the partition. No changes have been written to disk.	MainWindow		パーティションの削除に失敗しました。変更は保存されていません。
 Partition type:	CreateParamsPanel		パーティション種別 :
@@ -34,15 +37,20 @@ Offset: %ld MB	Support		オフセット： %ld MB
 Write changes	MainWindow		変更を書き込む
 There was an error preparing the disk for modifications.	MainWindow		ディスクの変更のための準備をする際、エラーが発生しました。
 The partition %s is already mounted.	MainWindow		パーティション %s は既にマウントされています。
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		パーティションを本当にフォーマットして良いですか? 変更をディスクに書き込む直前に再度確認します。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、ディスク %s のデータが全て失われますので、ご注意ください。
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		選択されたパーティションを本当に削除しますか？\n\nその場合、パーティションのすべてのデータが失われますので、ご注意ください。
 Create…	MainWindow		新規作成…
 Disk system \"%s\"\" not found!	MainWindow		\"%s\"\" ディスクシステムがみつかりません!
+The disk has been successfully initialized.\n	MainWindow		ディスクは正常に初期化されました。\n
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できませんでした。
+Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました！\n
 Mount	MainWindow		マウント
 Create	CreateParamsPanel		新規作成
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		本当にディスク全体をフォーマットして良いですか?  (大抵の人はまずパーティショニングシステムでディスクを初期化します) 変更をディスクに書き込む直前に再度確認します。
 Device	PartitionList		デバイス
 Disk	MainWindow		ディスク
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		本当に選択したディスクを初期化しますか? データーはすべて失われます。変更をディスクに書き込む直前に再度確認します。\n
 Device	DiskView		デバイス
 Active	PartitionList		アクティブ
 Volume name	PartitionList		ボリューム名
@@ -57,6 +65,7 @@ Partition	MainWindow		パーティション
 File system	PartitionList		ファイルシステム
 Validation of the given creation parameters failed.	MainWindow		作成パラメーターの検証に失敗しました。
 Size	PartitionList		サイズ
+Wipe (not implemented)	MainWindow		ワイプ (実装されていません)
 Validation of the given initialization parameters failed.	MainWindow		初期化パラメーターの検証に失敗しました
 The selected partition does not contain a partitioning system.	MainWindow		選択されたパーティションにパーティションシステムはありません。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、ディスク %s のデータがすべて失われますので、ご注意ください。
@@ -65,7 +74,9 @@ Partition size	CreateParamsPanel		パーティションサイズ
 Surface test (not implemented)	MainWindow		表面チェック（実装されていません）
 Cancel	InitParamsPanel		中止
 Cancel	CreateParamsPanel		中止
+Format	MainWindow		フォーマット
 Parameters	PartitionList		パラメーター
 Creation of the partition has failed.	MainWindow		パーティションの作成に失敗しました。
 The currently selected partition is not empty.	MainWindow		選択されたパーティションにデータがあります。
+Failed to format the partition. No changes have been written to disk.	MainWindow		パーティションのフォーマットに失敗しました。変更はディスクに書きこまれていません。
 Unmount	MainWindow		マウント解除

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	2588930404
+1	slovak	x-vnd.Haiku-libtracker	2936402334
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -41,6 +41,7 @@ Make active printer	ContainerWindow		Urobiť tlačiareň aktívnou
 Create link here	ContainerWindow		Vytvoriť odkaz tu
 Moving: 	StatusWindow		Presúva sa: 
 before	FindPanel		pred
+Error emptying Trash	FSUtils		Chyba pri vyprázdňovaní Koša
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		väčší ako
 Delete	PoseView		Zmazať

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-DriveSetup	3244521115
+1	slovak	x-vnd.Haiku-DriveSetup	1372142450
 DriveSetup	System name		Nastavenie diskových oblastí
 Delete	MainWindow		Zmazať
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
@@ -65,6 +65,7 @@ Partition	MainWindow		Oblasť
 File system	PartitionList		Súborový systém
 Validation of the given creation parameters failed.	MainWindow		Overenie zadaných parametrov vytvorenia zlyhalo.
 Size	PartitionList		Veľkosť
+Wipe (not implemented)	MainWindow		Bezpečne vymazať (neimplementované)
 Validation of the given initialization parameters failed.	MainWindow		Overenie zadaných parametrov inicializácie zlyhalo.
 The selected partition does not contain a partitioning system.	MainWindow		Zdá sa, že vybraná disková oblasť neobsahuje systém oblastí.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na diskovej oblasti %s budú nenávratne stratené!
@@ -73,7 +74,9 @@ Partition size	CreateParamsPanel		Veľkosť oblasti
 Surface test (not implemented)	MainWindow		Test povrchu disku (neimplementované)
 Cancel	InitParamsPanel		Zrušiť
 Cancel	CreateParamsPanel		Zrušiť
+Format	MainWindow		Naformátovať
 Parameters	PartitionList		Parametre
 Creation of the partition has failed.	MainWindow		Vytvorenie diskovej oblasti zlyhalo.
 The currently selected partition is not empty.	MainWindow		Momentálne vybraná disková oblasť nie je prázdna.
+Failed to format the partition. No changes have been written to disk.	MainWindow		Nepodarilo sa naformátovať oblasť. Žiadne zmeny neboli zapísané na disk.
 Unmount	MainWindow		Odpojiť

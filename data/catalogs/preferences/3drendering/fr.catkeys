@@ -1,13 +1,15 @@
-1	french	x-vnd.Haiku-3DRendering	1918042667
+1	french	x-vnd.Haiku-3DRendering	1725618140
 List stack size:	Capabilities		Taille de la pile de listes :
 Information	InfoView		Informations
 Max. clipping planes:	Capabilities		Nombre de plans de coupes :
+GL version:	InfoView		Version de MesaGL :
 Max. texture units:	Capabilities		Nombre maximum d'unités de textures :
 Renderer name:	InfoView		Nom du moteur de rendu :
 Vendor name:	InfoView		Nom du vendeur :
 Attributes stack size:	Capabilities		Taille de la pile d'attributs :
 Name stack size:	Capabilities		Taille de la pile de noms :
 Auxiliary buffer(s):	Capabilities		Tampon(s) auxilliaire(s) :
+Max. recommended vertex elements:	Capabilities		Nombre d'index maximum recommandé :
 GLU version:	InfoView		Version de GLU :
 Model stack size:	Capabilities		Taille de la pile de modèles :
 Projection stack size:	Capabilities		Taille de la pile de projection :
@@ -16,6 +18,7 @@ Max. 2D texture size:	Capabilities		Taille maximum des textures 2D :
 Max. convolution:	Capabilities		Convolution maximale :
 GLUT API version:	InfoView		Version de l'API GLUT :
 Texture stack size:	Capabilities		Taille de la pile de textures :
+Max. evaluators equation order:	Capabilities		Ordre maximum des évaluateurs d'équations :
 Max. 3D texture size:	Capabilities		Taille maximum des textures 3D :
 3D Rendering	System name		Rendu 3D
 Capabilities	Capabilities		Aptitudes

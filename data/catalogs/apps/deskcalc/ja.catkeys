@@ -1,7 +1,9 @@
-1	japanese	x-vnd.Haiku-DeskCalc	1916192649
+1	japanese	x-vnd.Haiku-DeskCalc	3276968552
 Compact	CalcView		コンパクトモード
 Scientific	CalcView		関数モード
 DeskCalc	System name		電卓
 Basic	CalcView		基本モード
+Radians	CalcView		ラジアン
 Enable Num Lock on startup	CalcView		起動時に Num Lock を有効にする
+Degrees	CalcView		度
 Audio Feedback	CalcView		オーディオフィードバック

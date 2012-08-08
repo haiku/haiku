@@ -1,0 +1,72 @@
+1	slovak	x-vnd.Haiku-WebPositive	1271374360
+Copy URL to clipboard	Download Window		Kopírovať URL do schránky
+Cancel	Settings Window		Zrušiť
+Close window	WebPositive Window		Zatvoriť okno
+Quit	WebPositive		Ukončiť
+The download could not be opened.	Download Window		Stiahnutý súbor sa nepodarilo otvoriť.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Priečinok so stiahnutými súbormi sa nepodarilo otvoriť..\n\nChyba: %error
+Open location	WebPositive Window		Otvoriť umiestnenie
+Clear history	WebPositive Window		Vyčistiť históriu
+WebPositive	System name		WebPositive
+Decrease size	WebPositive Window		Zmenšiť veľkosť
+Serif font:	Settings Window		Pätkové písmo:
+Loading %url	WebPositive Window		Načítava sa %url
+Page source	WebPositive Window		Zdroj stránky
+Next	WebPositive Window		Ďalší
+Find next	WebPositive Window		Nájsť ďalší
+Download folder:	Settings Window		Priečinok stiahnutých súborov:
+Edit	WebPositive Window		Upraviť
+Over %hours hours left	Download Window		Zostáva viac ako %hours hodín
+Full screen	WebPositive Window		Celoobrazovkový režim
+Open download error	Download Window		Chyba pri otváraní sťahovaného súboru
+Standard font:	Settings Window		Štandardné písmo:
+Restart	Download Window		Reštartovať
+Proxy server	Settings Window		Proxy server
+Open containing folder	Download Window		Otvoriť nadradený priečinok
+New window	WebPositive Window		Nové okno
+Open	Download Window		Otvoriť
+Reload	WebPositive Window		Znovu načítať
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Vyskytla sa chyba pri zobrazovaní priečinka Záložky.\n\nChyba: %error
+Open downloads folder	Download Window		Otvoriť priečinok stiahnutých súborov
+Number of days to keep links in History menu:	Settings Window		Koľko dní ponechať odkazy v menu História:
+Hide	Download Window		Skryť
+Reset size	WebPositive Window		Obnoviť veľkosť
+Find:	WebPositive Window		Nájsť:
+Increase size	WebPositive Window		Zväčšiť veľkosť
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Vyskytla sa chyba pri získavaní priečinka záložiek.\n\nChyba: %error
+Over 1 day left	Download Window		Zostáva viac ako 1 deň
+Close	WebPositive Window		Zatvoriť
+OK	Download Window		OK
+Page source error	WebPositive Window		Chyba zdrojového kódu stránky
+Open blank page	Settings Window		Otvoriť prázdnu stránku
+New tabs:	Settings Window		Nové karty:
+Cancel	WebPositive Window		Zrušiť
+Open all	WebPositive Window		Otvoriť všetko
+Clear	URL Bar		Vyčistiť
+Cut	URL Bar		Vystrihnúť
+Paste	URL Bar		Vložiť
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Skryť text hesla
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Kŕdeľ ďatľov učí koňa obhrýzať kôru a žrať mäso
+Over 1 minute left	Download Window		Zostáva viac ako 1 minúta
+Open start page	Settings Window		Otvoriť úvodnú stránku
+Continue downloads	WebPositive		Pokračovať v sťahovaní
+Cancel	Download Window		Zrušiť
+Open search page	Settings Window		Otvoriť vyhľadávaciu stránku
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ešte stále prebieha sťahovanie. Skutočne chcete teraz WebPositive ukončiť?
+Auto-hide interface in full screen mode	Settings Window		Automaticky skryť prvky rozhrania v celoobrazovkovom režime
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url zlyhalo
+New tab	WebPositive Window		Nová karta
+Downloads in progress	WebPositive		Prebieha sťahovanie
+Style:	Font Selection view		Štýl:
+General	Settings Window		Všeobecné
+View	WebPositive Window		Zobraziť
+Previous	WebPositive Window		Predchádzajúce
+OK	Authentication Panel		OK
+Copy	URL Bar		Kopírovať
+OK	WebPositive Window		OK
+Manage bookmarks	WebPositive Window		Spravovať záložky
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Záložka tejto stránky (%bookmarkName) už existuje.
+New windows:	Settings Window		Nové okná:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url dokončené
+Remove finished	Download Window		Odstrániť dokončené
