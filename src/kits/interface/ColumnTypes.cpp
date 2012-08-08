@@ -406,9 +406,9 @@ BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
 
 	parent->GetFont(&font);
 	if (size < kKB_SIZE) {
-		sprintf(str, "%Ld bytes", size);
+		sprintf(str, "%" B_PRId64 " bytes", size);
 		if (font.StringWidth(str) > width)
-			sprintf(str, "%Ld B", size);
+			sprintf(str, "%" B_PRId64 " B", size);
 	} else {
 		const char*	suffix;
 		float float_value;
