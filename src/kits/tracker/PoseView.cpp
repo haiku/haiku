@@ -1359,7 +1359,7 @@ BPoseView::AddPosesTask(void* castToParams)
 					// have to node monitor ahead of time because Model will
 					// cache up the file type and preferred app
 					// OK to call when poseView is not locked
-				model = new Model(&dirNode, &itemNode, eptr->d_name, true);
+				model = new Model(&dirNode, &itemNode, eptr->d_name, false);
 				result = model->InitCheck();
 				modelChunkIndex++;
 				posesResult->fModels[modelChunkIndex] = model;
@@ -1403,15 +1403,12 @@ BPoseView::AddPosesTask(void* castToParams)
 
 				if (!PoseVisible(model,
 					&(posesResult->fPoseInfos[modelChunkIndex]))) {
-					model->CloseNode();
 					modelChunkIndex--;
 					continue;
 				}
 
 				if (model->IsSymLink())
 					view->CreateSymlinkPoseTarget(model);
-
-				model->CloseNode();
 			}
 
 			bigtime_t now = system_time();
