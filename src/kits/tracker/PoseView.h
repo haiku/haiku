@@ -1152,7 +1152,8 @@ inline void
 BPoseView::SetRefFilter(BRefFilter* filter)
 {
 	fRefFilter = filter;
-	FilterChanged();
+	if (filter != NULL)
+		FilterChanged();
 }
 
 

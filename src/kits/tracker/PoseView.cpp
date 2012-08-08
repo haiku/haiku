@@ -8030,8 +8030,6 @@ BPoseView::ClearPoses()
 
 	// clear all pose lists
 	fPoseList->MakeEmpty();
-	if (fFiltering)
-		fFilteredPoseList->MakeEmpty();
 	fMimeTypeListIsDirty = true;
 	fVSPoseList->MakeEmpty();
 	fZombieList->MakeEmpty();
@@ -8184,8 +8182,7 @@ BPoseView::Refresh()
 	AddPoses(TargetModel());
 	TargetModel()->CloseNode();
 
-	// fRefFilter must be set for this to happen
-	if (fFiltering) {
+	if (fRefFilter != NULL) {
 		fFiltering = false;
 		StartFiltering();
 	}
@@ -10018,6 +10015,7 @@ BPoseView::FilterPose(BPose* pose)
 	if (fRefFilter != NULL) {
 		PoseInfo poseInfo;
 		ReadPoseInfo(pose->TargetModel(), &poseInfo);
+		pose->TargetModel()->OpenNode();
 		if (!ShouldShowPose(pose->TargetModel(), &poseInfo))
 			return false;
 	}
@@ -10093,7 +10091,7 @@ BPoseView::StopFiltering()
 void
 BPoseView::ClearFilter()
 {
-	if (!fFiltering || fRefFilter != NULL)
+	if (!fFiltering)
 		return;
 
 	fCountView->CancelFilter();
