@@ -1078,6 +1078,8 @@ BPoseView::CommitActivePose(bool saveChanges)
 {
 	if (ActivePose()) {
 		int32 index = fPoseList->IndexOf(ActivePose());
+		if (fFiltering)
+			index = fFilteredPoseList->IndexOf(ActivePose());
 		BPoint loc(0, index * fListElemHeight);
 		if (ViewMode() != kListMode)
 			loc = ActivePose()->Location(this);
@@ -1456,7 +1458,7 @@ BPoseView::AddPosesTask(void* castToParams)
 		return B_ERROR;
 	}
 
-	ASSERT(!modelChunkIndex);
+	ASSERT(modelChunkIndex == -1);
 
 	delete posesResult;
 	delete container;
@@ -3315,6 +3317,15 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 	BPose* pose = EntryCreated(TargetModel()->NodeRef(), &destNodeRef,
 		destEntryRef.name, &index);
 
+	if (fFiltering) {
+		if (fFilteredPoseList->FindPose(&destNodeRef, &index) == NULL) {
+			float scrollBy = 0;
+			BRect bounds = Bounds();
+			AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy,
+				true, &index);
+		}
+	}
+
 	if (pose) {
 		WatchNewNode(pose->TargetModel()->NodeRef());
 		UpdateScrollRange();
@@ -3339,7 +3350,18 @@ BPoseView::NewFolder(const BMessage* message)
 		PlaceFolder(&ref, message);
 
 		int32 index;
-		BPose* pose = EntryCreated(TargetModel()->NodeRef(), &nodeRef, ref.name, &index);
+		BPose* pose = EntryCreated(TargetModel()->NodeRef(), &nodeRef, ref.name,
+			&index);
+
+		if (fFiltering) {
+			if (fFilteredPoseList->FindPose(&nodeRef, &index) == NULL) {
+				float scrollBy = 0;
+				BRect bounds = Bounds();
+				AddPoseToList(fFilteredPoseList, true, true, pose, bounds,
+					scrollBy, true, &index);
+			}
+		}
+
 		if (pose) {
 			UpdateScrollRange();
 			CommitActivePose();
@@ -8008,7 +8030,8 @@ BPoseView::ClearPoses()
 
 	// clear all pose lists
 	fPoseList->MakeEmpty();
-	fFilteredPoseList->MakeEmpty();
+	if (fFiltering)
+		fFilteredPoseList->MakeEmpty();
 	fMimeTypeListIsDirty = true;
 	fVSPoseList->MakeEmpty();
 	fZombieList->MakeEmpty();
