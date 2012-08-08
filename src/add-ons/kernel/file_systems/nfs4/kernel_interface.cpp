@@ -601,9 +601,10 @@ nfs4_read_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 static status_t
 nfs4_rewind_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 {
-	uint64* cookie = reinterpret_cast<uint64*>(_cookie);
-	cookie[0] = 0;
-	cookie[1] = 2;
+	OpenDirCookie* cookie = reinterpret_cast<OpenDirCookie*>(_cookie);
+	cookie->fSpecial = 0;
+	cookie->fCurrent = NULL;
+	cookie->fEOF = false;
 
 	return B_OK;
 }
