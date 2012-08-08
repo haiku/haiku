@@ -1394,6 +1394,7 @@ BPoseView::AddPosesTask(void* castToParams)
 					PRINT(("1 adding model %s to zombie list, error %s\n",
 						model->Name(), strerror(model->InitCheck())));
 					view->fZombieList->AddItem(model);
+					modelChunkIndex--;
 					continue;
 				}
 
@@ -1402,6 +1403,7 @@ BPoseView::AddPosesTask(void* castToParams)
 
 				if (!PoseVisible(model,
 					&(posesResult->fPoseInfos[modelChunkIndex]))) {
+					model->CloseNode();
 					modelChunkIndex--;
 					continue;
 				}
@@ -1414,7 +1416,7 @@ BPoseView::AddPosesTask(void* castToParams)
 
 			bigtime_t now = system_time();
 
-			if (!count || modelChunkIndex >= kMaxAddPosesChunk
+			if (!count || modelChunkIndex >= kMaxAddPosesChunk - 1
 				|| now > nextChunkTime) {
 				// keep getting models until we get <kMaxAddPosesChunk> of them
 				// or until 300000 runs out
