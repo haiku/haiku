@@ -239,7 +239,8 @@ DebuggerInterface::DebuggerInterface(team_id teamID)
 
 DebuggerInterface::~DebuggerInterface()
 {
-	fArchitecture->ReleaseReference();
+	if (fArchitecture != NULL)
+		fArchitecture->ReleaseReference();
 
 	Close(false);
 
@@ -251,6 +252,9 @@ status_t
 DebuggerInterface::Init()
 {
 	// create the architecture
+	// TODO: this probably needs to be rethought a bit,
+	// since especially when we eventually support remote debugging,
+	// the architecture will depend on the target machine, not the host
 #ifdef ARCH_x86
 	fArchitecture = new(std::nothrow) ArchitectureX86(this);
 #else
