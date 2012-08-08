@@ -90,6 +90,8 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	fFileSystem->AddOpenFile(state);
 	fFileSystem->Root()->MakeInfoInvalid();
 
+	notify_entry_created(fFileSystem->DevId(), ID(), name, *id);
+
 	return B_OK;
 }
 

@@ -9,11 +9,14 @@
 #define METADATACACHE_H
 
 
+#include <fs_interface.h>
 #include <lock.h>
 #include <SupportDefs.h>
 #include <util/AutoLock.h>
 #include <util/AVLTreeMap.h>
 
+
+class Inode;
 
 struct AccessEntry {
 	time_t	fExpire;
@@ -22,7 +25,7 @@ struct AccessEntry {
 
 class MetadataCache {
 public:
-								MetadataCache();
+								MetadataCache(Inode* inode);
 								~MetadataCache();
 
 					status_t	GetStat(struct stat* st);
@@ -41,10 +44,18 @@ public:
 	inline			void		Invalidate();
 
 	static const	time_t		kExpirationTime	= 60;
+
+protected:
+					void		NotifyChanges(const struct stat* oldStat,
+									const struct stat* newStat);
+
 private:
 					struct stat	fStatCache;
 					time_t		fExpire;
 					bool		fForceValid;
+
+					Inode*		fInode;
+					bool		fInited;
 
 					AVLTreeMap<uid_t, AccessEntry>	fAccessCache;
 

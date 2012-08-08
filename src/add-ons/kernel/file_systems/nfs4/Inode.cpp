@@ -22,6 +22,7 @@
 
 Inode::Inode()
 	:
+	fMetaCache(this),
 	fCache(NULL),
 	fDelegation(NULL),
 	fFileCache(NULL),
@@ -248,6 +249,8 @@ Inode::Link(Inode* dir, const char* name)
 		dir->fCache->Unlock();
 	}
 
+	notify_entry_created(fFileSystem->DevId(), dir->ID(), name, ID());
+
 	return B_OK;
 }
 
@@ -256,7 +259,8 @@ status_t
 Inode::Remove(const char* name, FileType type)
 {
 	ChangeInfo changeInfo;
-	status_t result = NFS4Inode::RemoveObject(name, type, &changeInfo);
+	uint64 fileID;
+	status_t result = NFS4Inode::RemoveObject(name, type, &changeInfo, &fileID);
 	if (result != B_OK)
 		return result;
 
@@ -271,6 +275,9 @@ Inode::Remove(const char* name, FileType type)
 	}
 
 	fFileSystem->Root()->MakeInfoInvalid();
+
+	notify_entry_removed(fFileSystem->DevId(), ID(), name,
+		FileIdToInoT(fileID));
 
 	return B_OK;
 }
@@ -311,6 +318,9 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
 		to->fCache->Unlock();
 	}
 
+	notify_entry_moved(from->fFileSystem->DevId(), from->ID(), fromName,
+		to->ID(), toName, FileIdToInoT(fileID));
+
 	return B_OK;
 }
 
@@ -348,6 +358,9 @@ Inode::CreateObject(const char* name, const char* path, int mode, FileType type)
 			fCache->Trash();
 		fCache->Unlock();
 	}
+
+	notify_entry_created(fFileSystem->DevId(), ID(), name,
+		FileIdToInoT(fileID));
 
 	return B_OK;
 }

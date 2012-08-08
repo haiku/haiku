@@ -175,7 +175,77 @@ DirectoryCache::Revalidate()
 		return B_OK;
 	}
 
+	DirectoryCacheSnapshot* oldSnapshot = fDirectoryCache;
+	oldSnapshot->AcquireReference();
+
 	Trash();
-	return B_ERROR;
+
+	DirectoryCacheSnapshot* newSnapshot;
+	status_t result = fInode->GetDirSnapshot(&newSnapshot, NULL, &fChange);
+	if (result != B_OK) {
+		oldSnapshot->ReleaseReference();
+		return B_OK;
+	}
+	newSnapshot->AcquireReference();
+
+	SetSnapshot(newSnapshot);
+	fExpireTime = system_time() + kExpirationTime;
+	fTrashed = false;
+
+	NotifyChanges(oldSnapshot, newSnapshot);
+	oldSnapshot->ReleaseReference();
+	newSnapshot->ReleaseReference();
+
+	return B_OK;
+}
+
+
+void
+DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
+	DirectoryCacheSnapshot* newSnapshot)
+{
+	MutexLocker _(newSnapshot->fLock);
+
+	SinglyLinkedList<NameCacheEntry>::Iterator oldIt
+		= oldSnapshot->fEntries.GetIterator();
+	NameCacheEntry* oldCurrent;
+
+	SinglyLinkedList<NameCacheEntry>::Iterator newIt
+		= newSnapshot->fEntries.GetIterator();
+	NameCacheEntry* newCurrent = newIt.Next();
+	while (newCurrent != NULL) {
+		oldIt = oldSnapshot->fEntries.GetIterator();
+		oldCurrent = oldIt.Next();
+
+		bool found = false;
+		NameCacheEntry* prev = NULL;
+		while (oldCurrent != NULL) {
+			if (oldCurrent->fNode == newCurrent->fNode &&
+				strcmp(oldCurrent->fName, newCurrent->fName) == 0) {
+				found = true;
+				break;
+			}
+
+			prev = oldCurrent;
+			oldCurrent = oldIt.Next();
+		}
+
+		if (!found) {
+			notify_entry_created(fInode->GetFileSystem()->DevId(),
+				fInode->ID(), newCurrent->fName, newCurrent->fNode);
+		} else
+			oldSnapshot->fEntries.Remove(prev, oldCurrent);
+
+		newCurrent = newIt.Next();
+	}
+
+	oldIt = oldSnapshot->fEntries.GetIterator();
+	oldCurrent = oldIt.Next();
+
+	while (oldCurrent != NULL) {
+		notify_entry_removed(fInode->GetFileSystem()->DevId(), fInode->ID(),
+			oldCurrent->fName, oldCurrent->fNode);
+		oldCurrent = oldIt.Next();
+	}
 }
 

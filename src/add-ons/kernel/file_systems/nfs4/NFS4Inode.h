@@ -62,7 +62,7 @@ protected:
 							int mode, FileType type, ChangeInfo* changeInfo,
 							uint64* fileID, FileHandle* handle);
 			status_t	RemoveObject(const char* name, FileType type,
-							ChangeInfo* changeInfo);
+							ChangeInfo* changeInfo, uint64* fileID);
 
 			status_t	ReadDirOnce(DirEntry** dirents, uint32* count,
 							OpenDirCookie* cookie, bool* eof, uint64* change,

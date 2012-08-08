@@ -90,6 +90,10 @@ public:
 									const struct flock* lock);
 					status_t	ReleaseAllLocks(OpenFileCookie* cookie);
 
+					status_t	GetDirSnapshot(DirectoryCacheSnapshot**
+									_snapshot, OpenDirCookie* cookie,
+									uint64* _change);
+
 protected:
 								Inode();
 
@@ -105,9 +109,6 @@ protected:
 									uint32 size);
 					status_t	FillDirEntry(struct dirent* de, ino_t id,
 									const char* name, uint32 pos, uint32 size);
-					status_t	GetDirSnapshot(DirectoryCacheSnapshot**
-									_snapshot, OpenDirCookie* cookie,
-									uint64* _change);
 
 					status_t	ChildAdded(const char* name, uint64 fileID,
 									const FileHandle& fileHandle);

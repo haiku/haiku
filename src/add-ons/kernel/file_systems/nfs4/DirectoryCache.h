@@ -65,6 +65,10 @@ public:
 	inline	time_t			ExpireTime();
 
 	static	const bigtime_t	kExpirationTime		= 15000000;
+protected:
+			void			NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
+								DirectoryCacheSnapshot* newSnapshot);
+
 private:
 			SinglyLinkedList<NameCacheEntry>	fNameCache;
 

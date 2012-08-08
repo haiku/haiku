@@ -736,7 +736,8 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 
 
 status_t
-NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo)
+NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
+	uint64* fileID)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
@@ -755,6 +756,10 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo)
 			req.Nverify(&attr, 1);
 
 		req.PutFH(fInfo.fHandle);
+
+		Attribute idAttr[] = { FATTR4_FILEID };
+		req.GetAttr(idAttr, sizeof(idAttr) / sizeof(Attribute));
+
 		req.Remove(name);
 
 		status_t result = request.Send();
@@ -784,6 +789,18 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo)
 			return result;
 
 		reply.PutFH();
+
+		AttrValue* values;
+		uint32 count;
+		result = reply.GetAttr(&values, &count);
+		if (result != B_OK)
+			return result;
+
+		if (count == 0)
+			*fileID = fFileSystem->AllocFileId();
+		else
+			*fileID = values[0].fData.fValue64;
+		delete[] values;
 
 		return reply.Remove(&changeInfo->fBefore, &changeInfo->fAfter,
 			changeInfo->fAtomic);
@@ -831,8 +848,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 				return result;
 		}
 
-		result = reply.ReadDir(dirCookie, dirCookieVerf, dirents,
-			count, eof);
+		result = reply.ReadDir(dirCookie, dirCookieVerf, dirents, count, eof);
 		if (result != B_OK) {
 			delete[] before;
 			return result;

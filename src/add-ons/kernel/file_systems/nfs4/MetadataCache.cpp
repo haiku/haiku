@@ -9,11 +9,17 @@
 
 #include "MetadataCache.h"
 
+#include <NodeMonitor.h>
 
-MetadataCache::MetadataCache()
+#include "Inode.h"
+
+
+MetadataCache::MetadataCache(Inode* inode)
 	:
 	fExpire(0),
-	fForceValid(false)
+	fForceValid(false),
+	fInode(inode),
+	fInited(false)
 {
 	mutex_init(&fLock, NULL);
 }
@@ -52,8 +58,12 @@ void
 MetadataCache::SetStat(const struct stat& st)
 {
 	MutexLocker _(fLock);
+	if (fInited)
+		NotifyChanges(&fStatCache, &st);
+
 	fStatCache = st;
 	fExpire = time(NULL) + kExpirationTime;
+	fInited = true;
 }
 
 
@@ -121,3 +131,35 @@ MetadataCache::UnlockValid()
 }
 
 
+void
+MetadataCache::NotifyChanges(const struct stat* oldStat,
+	const struct stat* newStat)
+{
+	uint32 flags = 0;
+	if (oldStat->st_size != newStat->st_size)
+		flags |= B_STAT_SIZE;
+	if (oldStat->st_mode != newStat->st_mode)
+		flags |= B_STAT_MODE;
+	if (oldStat->st_uid != newStat->st_uid)
+		flags |= B_STAT_UID;
+	if (oldStat->st_gid != newStat->st_gid)
+		flags |= B_STAT_GID;
+
+	if (memcmp(&oldStat->st_atim, &newStat->st_atim,
+		sizeof(struct timespec) == 0))
+		flags |= B_STAT_ACCESS_TIME;
+
+	if (memcmp(&oldStat->st_ctim, &newStat->st_ctim,
+		sizeof(struct timespec) == 0))
+		flags |= B_STAT_CHANGE_TIME;
+
+	if (memcmp(&oldStat->st_crtim, &newStat->st_crtim,
+		sizeof(struct timespec) == 0))
+		flags |= B_STAT_CREATION_TIME;
+
+	if (memcmp(&oldStat->st_mtim, &newStat->st_mtim,
+		sizeof(struct timespec) == 0))
+		flags |= B_STAT_MODIFICATION_TIME;
+
+	notify_stat_changed(fInode->GetFileSystem()->DevId(), fInode->ID(), flags);
+}
