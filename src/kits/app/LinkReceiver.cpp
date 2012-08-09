@@ -443,7 +443,7 @@ err:
 status_t
 LinkReceiver::ReadRegion(BRegion* region)
 {
-	status_t status = Read(&region->fCount, sizeof(int32));
+	status_t status = Read(&region->fCount, sizeof(long));
 	if (status >= B_OK)
 		status = Read(&region->fBounds, sizeof(clipping_rect));
 	if (status >= B_OK) {

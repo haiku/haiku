@@ -861,7 +861,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<uint32>(&newWorkspaces) != B_OK)
 				break;
 
-			DTRACE(("ServerWindow %s: Message AS_SET_WORKSPACES %lx\n",
+			DTRACE(("ServerWindow %s: Message AS_SET_WORKSPACES %" B_PRIx32 "\n",
 				Title(), newWorkspaces));
 
 			fDesktop->SetWindowWorkspaces(fWindow, newWorkspaces);
