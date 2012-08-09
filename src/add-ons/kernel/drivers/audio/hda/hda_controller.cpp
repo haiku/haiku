@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -670,11 +670,10 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		return rc;
 	}
 
-	stream->physical_buffer_descriptors = (uint32)pe.address;
+	stream->physical_buffer_descriptors = pe.address;
 
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, bdlCount);
-
 
 	/* Setup buffer descriptor list (BDL) entries */
 	uint32 fragments = 0;
@@ -689,13 +688,14 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 			// we want an interrupt after every buffer
 	}
 
-	/* Configure stream registers */
+	// Configure stream registers
 	stream->Write16(HDAC_STREAM_FORMAT, format);
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_LOWER,
-		stream->physical_buffer_descriptors);
-	stream->Write32(HDAC_STREAM_BUFFERS_BASE_UPPER, 0);
+		(uint32)stream->physical_buffer_descriptors);
+	stream->Write32(HDAC_STREAM_BUFFERS_BASE_UPPER,
+		(uint32)(stream->physical_buffer_descriptors >> 32));
 	stream->Write16(HDAC_STREAM_LAST_VALID, fragments - 1);
-	/* total cyclic buffer size in _bytes_ */
+	// total cyclic buffer size in _bytes_
 	stream->Write32(HDAC_STREAM_BUFFER_SIZE, stream->buffer_size
 		* stream->num_buffers);
 	stream->Write8(HDAC_STREAM_CONTROL2, stream->id << CONTROL2_STREAM_SHIFT);
