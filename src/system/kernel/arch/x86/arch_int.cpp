@@ -391,10 +391,7 @@ arch_int_are_interrupts_enabled(void)
 status_t
 arch_int_init_io(kernel_args* args)
 {
-	// TODO x86_64
-#ifndef __x86_64__
 	ioapic_init(args);
-#endif
 	msi_init();
 	return B_OK;
 }

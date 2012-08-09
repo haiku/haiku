@@ -55,9 +55,6 @@ if $(TARGET_ARCH) = x86_64 {
 		syscalls_asm.S
 		thread.cpp
 
-		ioapic.cpp
-		irq_routing_table.cpp
-
 		# paging
 		x86_physical_page_mapper_large_memory.cpp
 
@@ -90,6 +87,8 @@ local archGenericSources =
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
 	apic.cpp
+	ioapic.cpp
+	irq_routing_table.cpp
 	msi.cpp
 	pic.cpp
 
