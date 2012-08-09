@@ -287,11 +287,13 @@ NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(state->fInfo.fHandle);
-		if (state != NULL)
+		if (state != NULL) {
+			req.PutFH(state->fInfo.fHandle);
 			req.SetAttr(state->fStateID, state->fStateSeq, attrs, attrCount);
-		else
+		} else {
+			req.PutFH(fInfo.fHandle);
 			req.SetAttr(NULL, 0, attrs, attrCount);
+		}
 
 		status_t result = request.Send();
 		if (result != B_OK)
