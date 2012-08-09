@@ -1235,6 +1235,7 @@ IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data,
 		BFile file(&fRef, B_READ_WRITE);
 
 		BAppFileInfo info(&file);
+		info.SetInfoLocation(B_USE_ATTRIBUTES);
 		if (info.InitCheck() == B_OK) {
 			if (large != NULL || force)
 				info.SetIconForType(fType.Type(), large, B_LARGE_ICON);
