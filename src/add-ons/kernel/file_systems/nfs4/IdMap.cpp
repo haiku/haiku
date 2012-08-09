@@ -16,7 +16,8 @@
 #include "idmapper/IdMapper.h"
 
 
-IdMap*	gIdMapper	= NULL;
+IdMap*	gIdMapper		= NULL;
+mutex	gIdMapperLock;
 
 
 IdMap::IdMap()

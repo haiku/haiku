@@ -41,6 +41,7 @@ private:
 };
 
 extern IdMap*	gIdMapper;
+extern mutex	gIdMapperLock;
 
 
 #endif	// IDMAP_H

@@ -76,6 +76,12 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 {
 	status_t result;
 
+	MutexLocker locker(gIdMapperLock);
+	gIdMapper = new(std::nothrow) IdMap;
+	if (gIdMapper == NULL)
+		return B_NO_MEMORY;
+	locker.Unlock();
+
 	ServerAddress address;
 	char path[256];
 	result = ParseArguments(args, &address, path);
@@ -706,23 +712,20 @@ nfs4_init()
 	if (gRPCServerManager == NULL)
 		return B_NO_MEMORY;
 
-	gIdMapper = new(std::nothrow) IdMap;
-	if (gIdMapper == NULL) {
-		delete gRPCServerManager;
-		return B_NO_MEMORY;
-	}
+	mutex_init(&gIdMapperLock, "idmapper Init Lock");
+	gIdMapper = NULL;
 
 	gWorkQueue = new(std::nothrow) WorkQueue;
 	if (gWorkQueue == NULL || gWorkQueue->InitStatus() != B_OK) {
 		delete gWorkQueue;
-		delete gIdMapper;
+		mutex_destroy(&gIdMapperLock);
 		delete gRPCServerManager;
 		return B_NO_MEMORY;
 	}
 
 	gRPCCallbackServer = new(std::nothrow) RPC::CallbackServer;
 	if (gRPCCallbackServer == NULL) {
-		delete gIdMapper;
+		mutex_destroy(&gIdMapperLock);
 		delete gWorkQueue;
 		delete gRPCServerManager;
 		return B_NO_MEMORY;
@@ -741,6 +744,8 @@ nfs4_uninit()
 	delete gIdMapper;
 	delete gWorkQueue;
 	delete gRPCServerManager;
+
+	mutex_destroy(&gIdMapperLock);
 
 	return B_OK;
 }
