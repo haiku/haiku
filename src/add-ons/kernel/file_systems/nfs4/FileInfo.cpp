@@ -30,14 +30,15 @@ FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 		if (pathEnd != NULL)
 			*pathEnd = '\0';
 
-		req.LookUp(pathStart);
+		if (pathEnd != pathStart) {
+			req.LookUp(pathStart);
+			count++;
+		}
 
 		if (pathEnd != NULL && pathEnd[1] != '\0')
 			pathStart = pathEnd + 1;
 		else
 			pathStart = NULL;
-
-		count++;
 	}
 	free(path);
 

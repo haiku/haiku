@@ -268,9 +268,8 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 		
 		status_t result;
-		if (strcmp(fInfo.fName, "/"))
-			result = ReadDirUp(de, pos, size);
-		else {
+		result = ReadDirUp(de, pos, size);
+		if (result == B_ENTRY_NOT_FOUND) {
 			result = FillDirEntry(de, FileIdToInoT(fInfo.fFileId), "..", pos,
 				size);
 		}
