@@ -67,14 +67,15 @@ KillTeam(team_id team, const char *appName = NULL)
 		status_t error = get_team_info(team, &info);
 		if (error != B_OK) {
 			debug_printf("debug_server: KillTeam(): Error getting info for "
-				"team %ld: %s\n", team, strerror(error));
+				"team %" B_PRId32 ": %s\n", team, strerror(error));
 			info.args[0] = '\0';
 		}
 
 		appName = info.args;
 	}
 
-	debug_printf("debug_server: Killing team %ld (%s)\n", team, appName);
+	debug_printf("debug_server: Killing team %" B_PRId32 " (%s)\n", team,
+		appName);
 
 	kill_team(team);
 }
@@ -341,7 +342,7 @@ TeamDebugHandler::Init(port_id nubPort)
 	status_t error = get_team_info(fTeam, &fTeamInfo);
 	if (error != B_OK) {
 		debug_printf("debug_server: TeamDebugHandler::Init(): Failed to get "
-			"info for team %ld: %s\n", fTeam, strerror(error));
+			"info for team %" B_PRId32 ": %s\n", fTeam, strerror(error));
 		return error;
 	}
 
@@ -349,7 +350,8 @@ TeamDebugHandler::Init(port_id nubPort)
 	error = BPrivate::get_app_path(fTeam, fExecutablePath);
 	if (error != B_OK) {
 		debug_printf("debug_server: TeamDebugHandler::Init(): Failed to get "
-			"executable path of team %ld: %s\n", fTeam, strerror(error));
+			"executable path of team %" B_PRId32 ": %s\n", fTeam,
+			strerror(error));
 
 		fExecutablePath[0] = '\0';
 	}
@@ -358,8 +360,8 @@ TeamDebugHandler::Init(port_id nubPort)
 	error = init_debug_context(&fDebugContext, fTeam, nubPort);
 	if (error != B_OK) {
 		debug_printf("debug_server: TeamDebugHandler::Init(): Failed to init "
-			"debug context for team %ld, port %ld: %s\n", fTeam, nubPort,
-			strerror(error));
+			"debug context for team %" B_PRId32 ", port %" B_PRId32 ": %s\n",
+			fTeam, nubPort, strerror(error));
 		return error;
 	}
 
@@ -372,7 +374,7 @@ TeamDebugHandler::Init(port_id nubPort)
 
 	// create the message count semaphore
 	char name[B_OS_NAME_LENGTH];
-	snprintf(name, sizeof(name), "team %ld message count", fTeam);
+	snprintf(name, sizeof(name), "team %" B_PRId32 " message count", fTeam);
 	fMessageCountSem = create_sem(0, name);
 	if (fMessageCountSem < 0) {
 		debug_printf("debug_server: TeamDebugHandler::Init(): Failed to create "
@@ -381,7 +383,7 @@ TeamDebugHandler::Init(port_id nubPort)
 	}
 
 	// spawn the handler thread
-	snprintf(name, sizeof(name), "team %ld handler", fTeam);
+	snprintf(name, sizeof(name), "team %" B_PRId32 " handler", fTeam);
 	fHandlerThread = spawn_thread(&_HandlerThreadEntry, name, B_NORMAL_PRIORITY,
 		this);
 	if (fHandlerThread < 0) {
@@ -442,7 +444,7 @@ TeamDebugHandler::_SetupGDBArguments(BStringList &arguments, bool usingConsoled)
 {
 	// prepare the argument vector
 	BString teamString;
-	teamString.SetToFormat("--pid=%ld", fTeam);
+	teamString.SetToFormat("--pid=%" B_PRId32, fTeam);
 
 	status_t error;
 	BPath terminalPath;
@@ -480,7 +482,7 @@ TeamDebugHandler::_SetupGDBArguments(BStringList &arguments, bool usingConsoled)
 
 	if (!usingConsoled) {
 		BString windowTitle;
-		windowTitle.SetToFormat("Debug of Team %ld: %s", fTeam,
+		windowTitle.SetToFormat("Debug of Team %" B_PRId32 ": %s", fTeam,
 			_LastPathComponent(fExecutablePath));
 		if (!arguments.Add("-t") || !arguments.Add(windowTitle))
 			return B_NO_MEMORY;
@@ -512,12 +514,12 @@ TeamDebugHandler::_SetupGDBArguments(BStringList &arguments, bool usingConsoled)
 thread_id
 TeamDebugHandler::_EnterDebugger()
 {
-	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): team %ld\n",
-		fTeam));
+	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): team %" B_PRId32
+		"\n", fTeam));
 
 	// prepare a debugger handover
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): preparing "
-		"debugger handover for team %ld...\n", fTeam));
+		"debugger handover for team %" B_PRId32 "...\n", fTeam));
 
 	status_t error = send_debug_message(&fDebugContext,
 		B_DEBUG_MESSAGE_PREPARE_HANDOVER, NULL, 0, NULL, 0);
@@ -543,7 +545,7 @@ TeamDebugHandler::_EnterDebugger()
 
 	// start the terminal
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
-		"terminal (debugger) for team %ld...\n", fTeam));
+		"terminal (debugger) for team %" B_PRId32 "...\n", fTeam));
 
 #elif defined(HANDOVER_USE_DEBUGGER)
 	if (debugInConsoled) {
@@ -572,13 +574,13 @@ TeamDebugHandler::_EnterDebugger()
 			return B_NO_MEMORY;
 
 		BString debuggerParam;
-		debuggerParam.SetToFormat("%ld", fTeam);
+		debuggerParam.SetToFormat("%" B_PRId32, fTeam);
 		if (!arguments.Add("--team") || !arguments.Add(debuggerParam))
 			return B_NO_MEMORY;
 
 		// start the debugger
 		TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
-			"graphical debugger for team %ld...\n", fTeam));
+			"graphical debugger for team %" B_PRId32 "...\n", fTeam));
 	}
 #endif
 
@@ -595,7 +597,7 @@ TeamDebugHandler::_EnterDebugger()
 	resume_thread(thread);
 
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): debugger started "
-		"for team %ld: thread: %ld\n", fTeam, thread));
+		"for team %" B_PRId32 ": thread: %" B_PRId32 "\n", fTeam, thread));
 
 	return thread;
 }
@@ -615,8 +617,8 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 	// a team. That means only a few messages are actually possible, while
 	// others wouldn't trigger the debugger in the first place. So we deal with
 	// all of them the same way, by popping up an alert.
-	TRACE(("debug_server: TeamDebugHandler::_HandleMessage(): team %ld, code: "
-		"%ld\n", fTeam, (int32)message->Code()));
+	TRACE(("debug_server: TeamDebugHandler::_HandleMessage(): team %" B_PRId32
+		", code: %" B_PRId32 "\n", fTeam, (int32)message->Code()));
 
 	thread_id thread = message->Data().origin.thread;
 
@@ -626,8 +628,8 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
 			// This shouldn't happen.
 			debug_printf("debug_server: Got a spurious "
-				"B_DEBUGGER_MESSAGE_TEAM_DELETED message for team %ld\n",
-				fTeam);
+				"B_DEBUGGER_MESSAGE_TEAM_DELETED message for team %" B_PRId32
+				"\n", fTeam);
 			return true;
 
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
@@ -662,8 +664,8 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 			break;
 	}
 
-	debug_printf("debug_server: Thread %ld entered the debugger: %s\n", thread,
-		buffer);
+	debug_printf("debug_server: Thread %" B_PRId32 " entered the debugger: %s\n",
+		thread, buffer);
 
 	_PrintStackTrace(thread);
 
@@ -847,12 +849,12 @@ TeamDebugHandler::_HandlerThreadEntry(void *data)
 status_t
 TeamDebugHandler::_HandlerThread()
 {
-	TRACE(("debug_server: TeamDebugHandler::_HandlerThread(): team %ld\n",
-		fTeam));
+	TRACE(("debug_server: TeamDebugHandler::_HandlerThread(): team %" B_PRId32
+		"\n", fTeam));
 
 	// get initial message
-	TRACE(("debug_server: TeamDebugHandler::_HandlerThread(): team %ld: "
-		"getting message...\n", fTeam));
+	TRACE(("debug_server: TeamDebugHandler::_HandlerThread(): team %" B_PRId32
+		": getting message...\n", fTeam));
 
 	DebugMessage *message;
 	status_t error = _PopMessage(message);
@@ -902,8 +904,8 @@ TeamDebugHandler::_HandlerThread()
 				thread_info threadInfo;
 				if (get_thread_info(debuggerThread, &threadInfo) != B_OK) {
 					// the debugger is gone
-					debug_printf("debug_server: The debugger for team %ld "
-						"seems to be gone.", fTeam);
+					debug_printf("debug_server: The debugger for team %"
+						B_PRId32 " seems to be gone.", fTeam);
 
 					kill = true;
 					terminate = true;
@@ -1088,8 +1090,8 @@ DebugServer::_Listener()
 				"%s. Terminating!\n", strerror(bytesRead));
 			exit(1);
 		}
-TRACE(("debug_server: Got debug message: team: %ld, code: %ld\n",
-message->Data().origin.team, code));
+TRACE(("debug_server: Got debug message: team: %" B_PRId32 ", code: %" B_PRId32
+	"\n", message->Data().origin.team, code));
 
 		message->SetCode((debug_debugger_message)code);
 

@@ -49,7 +49,7 @@ SYSTEM_LIBS = libbe.so libbnetapi.so libdebug.so libnetwork.so
 
 PRIVATE_SYSTEM_LIBS = ;
 
-SYSTEM_SERVERS = app_server input_server registrar syslog_daemon ;
+SYSTEM_SERVERS = app_server debug_server input_server registrar syslog_daemon ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = vesa.accelerant ;
 

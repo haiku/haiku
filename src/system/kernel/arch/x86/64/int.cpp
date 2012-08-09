@@ -59,8 +59,11 @@ arch_int_init(kernel_args* args)
 		// fault stack address (this is set up in arch_cpu.cpp).
 		uint32 ist = (i == 8) ? 1 : 0;
 
+		// Breakpoint exception can be raised from userland.
+		uint32 dpl = (i == 3) ? DPL_USER : DPL_KERNEL;
+
 		set_interrupt_descriptor(&sIDT[i], (addr_t)&isr_array[i],
-			GATE_INTERRUPT, KERNEL_CODE_SEG, DPL_KERNEL, ist);
+			GATE_INTERRUPT, KERNEL_CODE_SEG, dpl, ist);
 	}
 
 	interrupt_handler_function** table = gInterruptHandlerTable;
