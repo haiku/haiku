@@ -318,10 +318,10 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 {
 	status_t result;
 
-	int32 size = 0;
+	uint32 size = 0;
 	void* buffer = NULL;
 
-	int32 record_size;
+	uint32 record_size;
 	bool last_one;
 
 	object_wait_info object[2];
@@ -359,7 +359,7 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 		}
 
 		record_size = ntohl(record_size);
-		last_one = record_size < 0;
+		last_one = static_cast<int32>(record_size) < 0;
 		record_size &= LAST_FRAGMENT - 1;
 
 		void* ptr = realloc(buffer, size + record_size);
@@ -374,7 +374,7 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 			result = recv(fSocket, (uint8*)buffer + size + received,
 							record_size - received, 0);
 			received += result;
-		} while (result > 0 && received < sizeof(record_size));
+		} while (result > 0 && received < record_size);
 		if (result < 0) {
 			result = errno;
 			free(buffer);
