@@ -68,6 +68,8 @@ protected:
 							OpenDirCookie* cookie, bool* eof, uint64* change,
 							uint64* dirCookie, uint64* dirCookieVerf);
 
+			status_t	OpenAttrDir(FileHandle* handle);
+
 			status_t	TestLock(OpenFileCookie* cookie, LockType* type,
 							uint64* position, uint64* length, bool& conflict);
 			status_t	AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo,

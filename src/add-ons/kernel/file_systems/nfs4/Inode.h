@@ -82,6 +82,8 @@ public:
 					status_t	ReadDir(void* buffer, uint32 size,
 									uint32* count, OpenDirCookie* cookie);
 
+					status_t	OpenAttrDir(OpenDirCookie* cookie);
+
 					status_t	TestLock(OpenFileCookie* cookie,
 									struct flock* lock);
 					status_t	AcquireLock(OpenFileCookie* cookie,
@@ -124,6 +126,7 @@ private:
 
 					MetadataCache	fMetaCache;
 					DirectoryCache*	fCache;
+					DirectoryCache*	fAttrCache;
 
 					rw_lock		fDelegationLock;
 					Delegation*	fDelegation;

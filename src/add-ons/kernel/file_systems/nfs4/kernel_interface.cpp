@@ -611,6 +611,52 @@ nfs4_rewind_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 
 
 static status_t
+nfs4_open_attr_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
+{
+	OpenDirCookie* cookie = new(std::nothrow) OpenDirCookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	*_cookie = cookie;
+
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	status_t result = inode->OpenAttrDir(cookie);
+	if (result != B_OK)
+		delete cookie;
+
+	return result;
+}
+
+
+static status_t
+nfs4_close_attr_dir(fs_volume* volume, fs_vnode* vnode, void* cookie)
+{
+	return nfs4_close_attr_dir(volume, vnode, cookie);
+}
+
+
+static status_t
+nfs4_free_attr_dir_cookie(fs_volume* volume, fs_vnode* vnode, void* cookie)
+{
+	return nfs4_free_dir_cookie(volume, vnode, cookie);
+}
+
+
+static status_t
+nfs4_read_attr_dir(fs_volume* volume, fs_vnode* vnode, void* cookie,
+	struct dirent* buffer, size_t bufferSize, uint32* _num)
+{
+	return nfs4_read_dir(volume, vnode, cookie, buffer, bufferSize, _num);
+}
+
+
+static status_t
+nfs4_rewind_attr_dir(fs_volume* volume, fs_vnode* vnode, void* cookie)
+{
+	return nfs4_rewind_attr_dir(volume, vnode, cookie);
+}
+
+
+static status_t
 nfs4_test_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 	struct flock* lock)
 {
@@ -774,11 +820,11 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_rewind_dir,
 
 	/* attribute directory operations */
-	NULL,	// open_attr_dir
-	NULL,	// close_attr_dir
-	NULL,	// free_attr_dir_cookie
-	NULL,	// read_attr_dir
-	NULL,	// rewind_attr_dir
+	nfs4_open_attr_dir,
+	nfs4_close_attr_dir,
+	nfs4_free_attr_dir_cookie,
+	nfs4_read_attr_dir,
+	nfs4_rewind_attr_dir,
 
 	/* attribute operations */
 	NULL,	// create_attr

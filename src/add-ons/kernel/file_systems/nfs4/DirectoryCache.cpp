@@ -10,6 +10,7 @@
 #include "DirectoryCache.h"
 
 #include <fs_cache.h>
+#include <NodeMonitor.h>
 
 #include "Inode.h"
 
@@ -46,10 +47,11 @@ DirectoryCacheSnapshot::~DirectoryCacheSnapshot()
 }
 
 
-DirectoryCache::DirectoryCache(Inode* inode)
+DirectoryCache::DirectoryCache(Inode* inode, bool attr)
 	:
 	fDirectoryCache(NULL),
 	fInode(inode),
+	fAttrDir(attr),
 	fTrashed(true)
 {
 	mutex_init(&fLock, NULL);
@@ -114,8 +116,12 @@ DirectoryCache::AddEntry(const char* name, ino_t node, bool created)
 		fDirectoryCache->fEntries.Add(entry);
 	}
 
-	return entry_cache_add(fInode->GetFileSystem()->DevId(), fInode->ID(), name,
-		node);
+	if (!fAttrDir) {
+		return entry_cache_add(fInode->GetFileSystem()->DevId(), fInode->ID(),
+			name, node);
+	}
+
+	return B_OK;
 }
 
 void
@@ -153,7 +159,10 @@ DirectoryCache::RemoveEntry(const char* name)
 		}
 	}
 
-	entry_cache_remove(fInode->GetFileSystem()->DevId(), fInode->ID(), name);
+	if (!fAttrDir) {
+		entry_cache_remove(fInode->GetFileSystem()->DevId(), fInode->ID(),
+			name);
+	}
 }
 
 
@@ -231,8 +240,13 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 		}
 
 		if (!found) {
-			notify_entry_created(fInode->GetFileSystem()->DevId(),
-				fInode->ID(), newCurrent->fName, newCurrent->fNode);
+			if (fAttrDir) {
+				notify_attribute_changed(fInode->GetFileSystem()->DevId(),
+					fInode->ID(), newCurrent->fName, B_ATTR_CREATED);
+			} else {
+				notify_entry_created(fInode->GetFileSystem()->DevId(),
+					fInode->ID(), newCurrent->fName, newCurrent->fNode);
+			}
 		} else
 			oldSnapshot->fEntries.Remove(prev, oldCurrent);
 
@@ -243,8 +257,13 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 	oldCurrent = oldIt.Next();
 
 	while (oldCurrent != NULL) {
-		notify_entry_removed(fInode->GetFileSystem()->DevId(), fInode->ID(),
-			oldCurrent->fName, oldCurrent->fNode);
+		if (fAttrDir) {
+			notify_attribute_changed(fInode->GetFileSystem()->DevId(),
+				fInode->ID(), newCurrent->fName, B_ATTR_REMOVED);
+		} else {
+			notify_entry_removed(fInode->GetFileSystem()->DevId(), fInode->ID(),
+				oldCurrent->fName, oldCurrent->fNode);
+		}
 		oldCurrent = oldIt.Next();
 	}
 }

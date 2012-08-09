@@ -44,6 +44,8 @@ struct FileInfo {
 			const char*	fName;
 			const char*	fPath;
 
+			FileHandle	fAttrDir;
+
 	inline				FileInfo();
 	inline				~FileInfo();
 	inline				FileInfo(const FileInfo& fi);

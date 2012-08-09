@@ -46,6 +46,7 @@ enum Opcode {
 	OpLookUpUp				= 16,
 	OpNverify				= 17,
 	OpOpen					= 18,
+	OpOpenAttrDir			= 19,
 	OpOpenConfirm			= 20,
 	OpPutFH					= 22,
 	OpPutRootFH				= 24,

@@ -39,8 +39,33 @@ Inode::OpenDir(OpenDirCookie* cookie)
 	cookie->fSnapshot = NULL;
 	cookie->fCurrent = NULL;
 	cookie->fEOF = false;
+	cookie->fAttrDir = false;
 
 	return B_OK;
+}
+
+
+status_t
+Inode::OpenAttrDir(OpenDirCookie* cookie)
+{
+	cookie->fFileSystem = fFileSystem;
+	cookie->fSpecial = 0;
+	cookie->fSnapshot = NULL;
+	cookie->fCurrent = NULL;
+	cookie->fEOF = false;
+	cookie->fAttrDir = true;
+
+	if (fInfo.fAttrDir.fSize == 0) {
+		FileHandle handle;
+
+		status_t result = NFS4Inode::OpenAttrDir(&handle);
+		if (result != B_OK)
+			return result;
+
+		fInfo.fAttrDir = handle;
+	}
+
+	return B_OK;	
 }
 
 
@@ -152,10 +177,13 @@ Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 				continue;
 
 			ino_t id;
-			if (dirents[i].fAttrCount == 2)
-				id = FileIdToInoT(dirents[i].fAttrs[1].fData.fValue64);
-			else
-				id = FileIdToInoT(fFileSystem->AllocFileId());
+			if (!cookie->fAttrDir) {
+				if (dirents[i].fAttrCount == 2)
+					id = FileIdToInoT(dirents[i].fAttrs[1].fData.fValue64);
+				else
+					id = FileIdToInoT(fFileSystem->AllocFileId());
+			} else
+				id = 0;
 	
 			NameCacheEntry* entry = new NameCacheEntry(dirents[i].fName, id);
 			if (entry == NULL || entry->fName == NULL) {
@@ -188,29 +216,30 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 	}
 
 	status_t result;
+	DirectoryCache* cache = cookie->fAttrDir ? fAttrCache : fCache;
 	if (cookie->fSnapshot == NULL) {
 		fFileSystem->Revalidator().Lock();
-		if (fCache->Lock() != B_OK) {
-			fCache->ResetAndLock();
+		if (cache->Lock() != B_OK) {
+			cache->ResetAndLock();
 		} else {
-			fFileSystem->Revalidator().RemoveDirectory(fCache);
+			fFileSystem->Revalidator().RemoveDirectory(cache);
 		}
 
-		cookie->fSnapshot = fCache->GetSnapshot();
+		cookie->fSnapshot = cache->GetSnapshot();
 		if (cookie->fSnapshot == NULL) {
 			uint64 change;
 			result = GetDirSnapshot(&cookie->fSnapshot, cookie, &change);
 			if (result != B_OK) {
-				fCache->Unlock();
+				cache->Unlock();
 				fFileSystem->Revalidator().Unlock();
 				return result;
 			}
-			fCache->ValidateChangeInfo(change);
-			fCache->SetSnapshot(cookie->fSnapshot);
+			cache->ValidateChangeInfo(change);
+			cache->SetSnapshot(cookie->fSnapshot);
 		}
 		cookie->fSnapshot->AcquireReference();
-		fFileSystem->Revalidator().AddDirectory(fCache);
-		fCache->Unlock();
+		fFileSystem->Revalidator().AddDirectory(cache);
+		cache->Unlock();
 		fFileSystem->Revalidator().Unlock();
 	}
 
@@ -219,7 +248,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 	uint32 i = 0;
 	bool overflow = false;
 
-	if (cookie->fSpecial == 0 && i < *_count) {
+	if (cookie->fSpecial == 0 && i < *_count && !cookie->fAttrDir) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 
 		status_t result;
@@ -235,7 +264,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 			return result;
 	}
 
-	if (cookie->fSpecial == 1 && i < *_count) {
+	if (cookie->fSpecial == 1 && i < *_count && !cookie->fAttrDir) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
 		
 		status_t result;

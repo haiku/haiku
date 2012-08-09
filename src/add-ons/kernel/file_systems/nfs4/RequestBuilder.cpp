@@ -446,6 +446,23 @@ RequestBuilder::OpenConfirm(uint32 seq, const uint32* id, uint32 stateSeq)
 
 
 status_t
+RequestBuilder::OpenAttrDir(bool create)
+{
+	if (fProcedure != ProcCompound)
+		return B_BAD_VALUE;
+	if (fRequest == NULL)
+		return B_NO_MEMORY;
+
+	fRequest->Stream().AddUInt(OpOpenAttrDir);
+	fRequest->Stream().AddBoolean(create);
+
+	fOpCount++;
+
+	return B_OK;
+}
+
+
+status_t
 RequestBuilder::PutFH(const FileHandle& fh)
 {
 	if (fProcedure != ProcCompound)

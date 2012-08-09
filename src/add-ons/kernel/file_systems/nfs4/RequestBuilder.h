@@ -56,6 +56,7 @@ public:
 										uint32 count = 0, bool excl = false,
 										OpenDelegation delegType
 											= OPEN_DELEGATE_NONE);
+			status_t				OpenAttrDir(bool create);
 			status_t				OpenConfirm(uint32 seq, const uint32* id,
 										uint32 stateSeq);
 			status_t				PutFH(const FileHandle& fh);

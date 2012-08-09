@@ -92,6 +92,8 @@ struct OpenDirCookie : public Cookie {
 			NameCacheEntry*				fCurrent;
 			bool						fEOF;
 
+			bool						fAttrDir;
+
 										~OpenDirCookie();
 };
 

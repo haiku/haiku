@@ -24,6 +24,7 @@ Inode::Inode()
 	:
 	fMetaCache(this),
 	fCache(NULL),
+	fAttrCache(NULL),
 	fDelegation(NULL),
 	fFileCache(NULL),
 	fMaxFileSize(0),
@@ -93,6 +94,7 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 
 		if (inode->fType == NF4DIR)
 			inode->fCache = new DirectoryCache(inode);
+		inode->fAttrCache = new DirectoryCache(inode, true);
 
 		// FATTR4_CHANGE is mandatory
 		inode->fChange = values[1].fData.fValue64;
@@ -131,6 +133,8 @@ Inode::~Inode()
 		file_cache_delete(fFileCache);
 
 	delete fCache;
+	delete fAttrCache;
+
 	mutex_destroy(&fStateLock);
 	mutex_destroy(&fFileCacheLock);
 	rw_lock_destroy(&fDelegationLock);

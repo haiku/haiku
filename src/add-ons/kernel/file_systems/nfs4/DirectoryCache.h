@@ -37,7 +37,7 @@ struct DirectoryCacheSnapshot : public KernelReferenceable {
 
 class DirectoryCache : public DoublyLinkedListLinkImpl<DirectoryCache> {
 public:
-							DirectoryCache(Inode* inode);
+							DirectoryCache(Inode* inode, bool attr = false);
 							~DirectoryCache();
 
 	inline	status_t		Lock();
@@ -76,6 +76,7 @@ private:
 
 			Inode*			fInode;
 
+			bool			fAttrDir;
 			bool			fTrashed;
 			mutex			fLock;
 

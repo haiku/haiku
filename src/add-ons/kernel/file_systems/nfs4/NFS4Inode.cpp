@@ -817,7 +817,10 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fInfo.fHandle);
+		if (cookie->fAttrDir)
+			req.PutFH(fInfo.fAttrDir);
+		else
+			req.PutFH(fInfo.fHandle);
 
 		Attribute dirAttr[] = { FATTR4_CHANGE };
 		if (*change == 0)
@@ -871,6 +874,37 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 		delete[] after;
 
 		return B_OK;
+	} while (true);
+}
+
+
+status_t
+NFS4Inode::OpenAttrDir(FileHandle* handle)
+{
+	do {
+		RPC::Server* serv = fFileSystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fInfo.fHandle);
+		req.OpenAttrDir(true);
+		req.GetFH();
+
+		status_t result = request.Send();
+		if (result != B_OK)
+			return result;
+
+		ReplyInterpreter& reply = request.Reply();
+
+		if (HandleErrors(reply.NFS4Error(), serv))
+			continue;
+
+		reply.PutFH();
+		result = reply.OpenAttrDir();
+		if (result != B_OK)
+			return result;
+
+		return reply.GetFH(handle);
 	} while (true);
 }
 

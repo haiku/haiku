@@ -84,6 +84,7 @@ public:
 			status_t	Open(uint32* id, uint32* seq, bool* confirm,
 							OpenDelegationData* delegData,
 							ChangeInfo* changeInfo = NULL);
+	inline	status_t	OpenAttrDir();
 			status_t	OpenConfirm(uint32* stateSeq);
 	inline	status_t	PutFH();
 	inline	status_t	PutRootFH();
@@ -169,6 +170,13 @@ inline status_t
 ReplyInterpreter::LookUpUp()
 {
 	return _OperationError(OpLookUpUp);
+}
+
+
+inline status_t
+ReplyInterpreter::OpenAttrDir()
+{
+	return _OperationError(OpOpenAttrDir);
 }
 
 
