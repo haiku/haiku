@@ -73,11 +73,12 @@ struct Cookie {
 			status_t		CancelAll();
 };
 
-struct OpenFileCookie : public Cookie {
+struct OpenStateCookie : public Cookie {
 			OpenState*		fOpenState;
-
 			uint32			fMode;
+};
 
+struct OpenFileCookie : public OpenStateCookie {
 			LockInfo*		fLocks;
 
 			void			AddLock(LockInfo* lock);
@@ -96,6 +97,8 @@ struct OpenDirCookie : public Cookie {
 
 										~OpenDirCookie();
 };
+
+struct OpenAttrCookie : public OpenStateCookie { };
 
 
 #endif	// COOKIE_H

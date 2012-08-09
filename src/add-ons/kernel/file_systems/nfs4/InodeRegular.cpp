@@ -193,7 +193,72 @@ Inode::Close(OpenFileCookie* cookie)
 
 
 status_t
-Inode::ReadDirect(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length,
+Inode::OpenAttr(const char* name, int mode, OpenAttrCookie* cookie, bool create,
+	int32 type)
+{
+	(void)type;
+
+	status_t result = LoadAttrDirHandle();
+	if (result != B_OK)
+		return result;
+
+	OpenDelegationData data;
+	data.fType = OPEN_DELEGATE_NONE;
+
+	OpenState* state = new OpenState;
+	if (state == NULL)
+		return B_NO_MEMORY;
+
+	state->fInfo.fName = name;
+	state->fInfo.fParent = fInfo.fAttrDir;
+	result = NFS4Inode::OpenAttr(state, name, mode, &data, create);
+	if (result != B_OK) {
+		delete state;
+		return result;
+	}
+
+	fFileSystem->AddOpenFile(state);
+
+	cookie->fOpenState = state;
+	cookie->fFileSystem = fFileSystem;
+	cookie->fMode = mode;
+
+	if (data.fType != OPEN_DELEGATE_NONE) {
+		Delegation* delegation
+			= new(std::nothrow) Delegation(data, this, fOpenState->fClientID,
+				true);
+		if (delegation != NULL) {
+			delegation->fInfo = state->fInfo;
+			delegation->fFileSystem = fFileSystem;
+			state->fDelegation = delegation;
+			fFileSystem->AddDelegation(delegation);
+		}
+	}
+
+	if ((mode & O_TRUNC) == O_TRUNC) {
+		struct stat st;
+		st.st_size = 0;
+		WriteStat(&st, B_STAT_SIZE, cookie);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Inode::CloseAttr(OpenAttrCookie* cookie)
+{
+	cookie->fOpenState->fDelegation->GiveUp();
+	fFileSystem->RemoveDelegation(cookie->fOpenState->fDelegation);
+	delete cookie->fOpenState->fDelegation;
+	delete cookie->fOpenState;
+
+	return B_OK;
+}
+
+
+status_t
+Inode::ReadDirect(OpenStateCookie* cookie, off_t pos, void* buffer, size_t* _length,
 	bool* eof)
 {
 	*eof = false;
@@ -203,9 +268,10 @@ Inode::ReadDirect(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _leng
 	*_length = min_c(ioSize, *_length);
 
 	status_t result;
+	OpenState* state = cookie != NULL ? cookie->fOpenState : fOpenState;
 	while (size < *_length && !*eof) {
 		uint32 len = *_length - size;
-		result = ReadFile(cookie, fOpenState, pos + size, &len,
+		result = ReadFile(cookie, state, pos + size, &len,
 			reinterpret_cast<char*>(buffer) + size, eof);
 		if (result != B_OK) {
 			if (size == 0)
@@ -234,7 +300,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 
 status_t
-Inode::WriteDirect(OpenFileCookie* cookie, off_t pos, const void* _buffer,
+Inode::WriteDirect(OpenStateCookie* cookie, off_t pos, const void* _buffer,
 	size_t *_length)
 {
 	uint32 size = 0;
@@ -243,12 +309,20 @@ Inode::WriteDirect(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 	uint32 ioSize = fFileSystem->Root()->IOSize();
 	*_length = min_c(ioSize, *_length);
 
-	fWriteDirty = true;
+	bool attribute = false;
+	OpenState* state = fOpenState;
+	if (cookie != NULL) {
+		attribute = cookie->fOpenState->fInfo.fHandle != fInfo.fHandle;
+		state = cookie->fOpenState;
+	}
+
+	if (!attribute)
+		fWriteDirty = true;
 
 	while (size < *_length) {
 		uint32 len = *_length - size;
-		status_t result = WriteFile(cookie, fOpenState, pos + size, &len,
-			buffer + size);
+		status_t result = WriteFile(cookie, state, pos + size,
+			&len, buffer + size, attribute);
 		if (result != B_OK) {
 			if (size == 0)
 				return result;

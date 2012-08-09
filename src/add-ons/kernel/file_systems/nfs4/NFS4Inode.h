@@ -38,9 +38,11 @@ protected:
 
 	static	status_t	Rename(Inode* from, Inode* to, const char* fromName,
 							const char* toName, ChangeInfo* fromChange,
-							ChangeInfo* toChange, uint64* fileID);
+							ChangeInfo* toChange, uint64* fileID,
+							bool attribute = false);
 
-			status_t	GetStat(AttrValue** values, uint32* count);
+			status_t	GetStat(AttrValue** values, uint32* count,
+							OpenAttrCookie* attr = NULL);
 			status_t	WriteStat(OpenState* state, AttrValue* attrs,
 							uint32 attrCount);
 
@@ -51,12 +53,15 @@ protected:
 			status_t	OpenFile(OpenState* state, int mode,
 							OpenDelegationData* delegation);
 
-			status_t	ReadFile(OpenFileCookie* cookie, OpenState* state,
+			status_t	OpenAttr(OpenState* state, const char* name, int mode,
+							OpenDelegationData* delegation, bool create);
+
+			status_t	ReadFile(OpenStateCookie* cookie, OpenState* state,
 							uint64 position, uint32* length, void* buffer,
 							bool* eof);
-			status_t	WriteFile(OpenFileCookie* cookie, OpenState* state,
+			status_t	WriteFile(OpenStateCookie* cookie, OpenState* state,
 							uint64 position, uint32* length,
-							const void* buffer);
+							const void* buffer, bool commit = false);
 
 			status_t	CreateObject(const char* name, const char* path,
 							int mode, FileType type, ChangeInfo* changeInfo,

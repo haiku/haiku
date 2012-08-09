@@ -245,14 +245,17 @@ NFS4Inode::ReadLink(void* buffer, size_t* length)
 
 
 status_t
-NFS4Inode::GetStat(AttrValue** values, uint32* count)
+NFS4Inode::GetStat(AttrValue** values, uint32* count, OpenAttrCookie* cookie)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fInfo.fHandle);
+		if (cookie != NULL)
+			req.PutFH(cookie->fOpenState->fInfo.fHandle);
+		else
+			req.PutFH(fInfo.fHandle);
 
 		Attribute attr[] = { FATTR4_SIZE, FATTR4_MODE, FATTR4_NUMLINKS,
 							FATTR4_OWNER, FATTR4_OWNER_GROUP,
@@ -260,7 +263,7 @@ NFS4Inode::GetStat(AttrValue** values, uint32* count)
 							FATTR4_TIME_METADATA, FATTR4_TIME_MODIFY };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
 
-		status_t result = request.Send();
+		status_t result = request.Send(cookie);
 		if (result != B_OK)
 			return result;
 
@@ -284,7 +287,7 @@ NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fInfo.fHandle);
+		req.PutFH(state->fInfo.fHandle);
 		if (state != NULL)
 			req.SetAttr(state->fStateID, state->fStateSeq, attrs, attrCount);
 		else
@@ -313,21 +316,29 @@ NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 status_t
 NFS4Inode::Rename(Inode* from, Inode* to, const char* fromName,
 	const char* toName, ChangeInfo* fromChange, ChangeInfo* toChange,
-	uint64* fileID)
+	uint64* fileID, bool attribute)
 {
 	do {
 		RPC::Server* serv = from->fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(from->fInfo.fHandle);
+		if (attribute)
+			req.PutFH(from->fInfo.fAttrDir);
+		else
+			req.PutFH(from->fInfo.fHandle);
 		req.SaveFH();
-		req.PutFH(to->fInfo.fHandle);
+		if (attribute)
+			req.PutFH(to->fInfo.fAttrDir);
+		else
+			req.PutFH(to->fInfo.fHandle);
 		req.Rename(fromName, toName);
 
-		Attribute attr[] = { FATTR4_FILEID };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
-		req.LookUp(toName);
+		if (!attribute) {
+			req.LookUp(toName);
+			Attribute attr[] = { FATTR4_FILEID };
+			req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		}
 
 		status_t result = request.Send();
 		if (result != B_OK)
@@ -358,22 +369,24 @@ NFS4Inode::Rename(Inode* from, Inode* to, const char* fromName,
 		if (result != B_OK)
 			return result;
 
-		result = reply.LookUp();
-		if (result != B_OK)
-			return result;
+		if (!attribute) {
+			result = reply.LookUp();
+			if (result != B_OK)
+				return result;
 
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
+			AttrValue* values;
+			uint32 count;
+			result = reply.GetAttr(&values, &count);
+			if (result != B_OK)
+				return result;
 
-		if (count == 0)
-			*fileID = from->fFileSystem->AllocFileId();
-		else
-			*fileID = values[0].fData.fValue64;
+			if (count == 0)
+				*fileID = from->fFileSystem->AllocFileId();
+			else
+				*fileID = values[0].fData.fValue64;
 
-		delete[] values;
+			delete[] values;
+		}
 
 		return B_OK;
 	} while (true);
@@ -581,7 +594,61 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 
 
 status_t
-NFS4Inode::ReadFile(OpenFileCookie* cookie, OpenState* state, uint64 position,
+NFS4Inode::OpenAttr(OpenState* state, const char* name, int mode,
+	OpenDelegationData* delegation, bool create)
+{
+	bool confirm;
+	status_t result;
+	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
+	do {
+		state->fClientID = fFileSystem->NFSServer()->ClientId();
+
+		RPC::Server* serv = fFileSystem->Server();
+		Request request(serv);
+		RequestBuilder& req = request.Builder();
+
+		req.PutFH(fInfo.fAttrDir);
+		req.Open(CLAIM_NULL, sequence, sModeToAccess(mode), state->fClientID,
+			create ? OPEN4_CREATE : OPEN4_NOCREATE, fFileSystem->OpenOwner(),
+			name);
+		req.GetFH();
+
+		result = request.Send();
+		if (result != B_OK) {
+			fFileSystem->OpenOwnerSequenceUnlock(false);
+			return result;
+		}
+
+		ReplyInterpreter& reply = request.Reply();
+
+		if (HandleErrors(reply.NFS4Error(), serv, NULL, state))
+			continue;
+
+		fFileSystem->OpenOwnerSequenceUnlock();
+
+		reply.PutFH();
+		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
+			delegation);
+
+		reply.GetFH(&state->fInfo.fHandle);
+
+		if (result != B_OK)
+			return result;
+
+		break;
+	} while (true);
+
+	state->fOpened = true;
+
+	if (confirm)
+		return ConfirmOpen(fInfo.fHandle, state);
+
+	return B_OK;
+}
+
+
+status_t
+NFS4Inode::ReadFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 	uint32* length, void* buffer, bool* eof)
 {
 	do {
@@ -589,7 +656,7 @@ NFS4Inode::ReadFile(OpenFileCookie* cookie, OpenState* state, uint64 position,
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fInfo.fHandle);
+		req.PutFH(state->fInfo.fHandle);
 		req.Read(state->fStateID, state->fStateSeq, position, *length);
 
 		status_t result = request.Send(cookie);
@@ -612,8 +679,8 @@ NFS4Inode::ReadFile(OpenFileCookie* cookie, OpenState* state, uint64 position,
 
 
 status_t
-NFS4Inode::WriteFile(OpenFileCookie* cookie, OpenState* state, uint64 position,
-	uint32* length, const void* buffer)
+NFS4Inode::WriteFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
+	uint32* length, const void* buffer, bool commit)
 {
 
 	do {
@@ -621,9 +688,10 @@ NFS4Inode::WriteFile(OpenFileCookie* cookie, OpenState* state, uint64 position,
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fInfo.fHandle);
+		req.PutFH(state->fInfo.fHandle);
 
-		req.Write(state->fStateID, state->fStateSeq, buffer, position, *length);
+		req.Write(state->fStateID, state->fStateSeq, buffer, position, *length,
+			commit);
 
 		status_t result = request.Send(cookie);
 		if (result != B_OK)
@@ -757,8 +825,10 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 
 		req.PutFH(fInfo.fHandle);
 
-		Attribute idAttr[] = { FATTR4_FILEID };
-		req.GetAttr(idAttr, sizeof(idAttr) / sizeof(Attribute));
+		if (type != NF4NAMEDATTR) {
+			Attribute idAttr[] = { FATTR4_FILEID };
+			req.GetAttr(idAttr, sizeof(idAttr) / sizeof(Attribute));
+		}
 
 		req.Remove(name);
 
@@ -790,17 +860,19 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 
 		reply.PutFH();
 
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
+		if (type != NF4NAMEDATTR) {
+			AttrValue* values;
+			uint32 count;
+			result = reply.GetAttr(&values, &count);
+			if (result != B_OK)
+				return result;
 
-		if (count == 0)
-			*fileID = fFileSystem->AllocFileId();
-		else
-			*fileID = values[0].fData.fValue64;
-		delete[] values;
+			if (count == 0)
+				*fileID = fFileSystem->AllocFileId();
+			else
+				*fileID = values[0].fData.fValue64;
+			delete[] values;
+		}
 
 		return reply.Remove(&changeInfo->fBefore, &changeInfo->fAfter,
 			changeInfo->fAtomic);

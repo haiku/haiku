@@ -262,68 +262,100 @@ Inode::Link(Inode* dir, const char* name)
 status_t
 Inode::Remove(const char* name, FileType type)
 {
+	if (type == NF4NAMEDATTR) {
+		status_t result = LoadAttrDirHandle();
+		if (result != B_OK)
+			return result;
+	}
+
 	ChangeInfo changeInfo;
 	uint64 fileID;
 	status_t result = NFS4Inode::RemoveObject(name, type, &changeInfo, &fileID);
 	if (result != B_OK)
 		return result;
 
-	if (fCache->Lock() == B_OK) {
+	DirectoryCache* cache = type != NF4NAMEDATTR ? fCache : fAttrCache;
+	if (cache->Lock() == B_OK) {
 		if (changeInfo.fAtomic
 			&& fCache->ChangeInfo() == changeInfo.fBefore) {
-			fCache->RemoveEntry(name);
-			fCache->SetChangeInfo(changeInfo.fAfter);
-		} else if (fCache->ChangeInfo() != changeInfo.fBefore)
-			fCache->Trash();
-		fCache->Unlock();
+			cache->RemoveEntry(name);
+			cache->SetChangeInfo(changeInfo.fAfter);
+		} else if (cache->ChangeInfo() != changeInfo.fBefore)
+			cache->Trash();
+		cache->Unlock();
 	}
 
 	fFileSystem->Root()->MakeInfoInvalid();
 
-	notify_entry_removed(fFileSystem->DevId(), ID(), name,
-		FileIdToInoT(fileID));
+	if (type == NF4NAMEDATTR) {
+		notify_attribute_changed(fFileSystem->DevId(), ID(), name,
+			B_ATTR_REMOVED);
+	} else {
+		notify_entry_removed(fFileSystem->DevId(), ID(), name,
+			FileIdToInoT(fileID));
+	}
 
 	return B_OK;
 }
 
 
 status_t
-Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName)
+Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
+	bool attribute)
 {
 	if (from->fFileSystem != to->fFileSystem)
 		return B_DONT_DO_THAT;
 
+	if (attribute) {
+		status_t result = from->LoadAttrDirHandle();
+		if (result != B_OK)
+			return result;
+
+		result = to->LoadAttrDirHandle();
+		if (result != B_OK)
+			return result;
+	}
+
 	ChangeInfo fromChange, toChange;
 	uint64 fileID;
 	status_t result = NFS4Inode::Rename(from, to, fromName, toName, &fromChange,
-		&toChange, &fileID);
+		&toChange, &fileID, attribute);
 	if (result != B_OK)
 		return result;
 
 	from->fFileSystem->Root()->MakeInfoInvalid();
 
-	if (from->fCache->Lock() == B_OK) {
+	DirectoryCache* cache = attribute ? from->fAttrCache : from->fCache;
+	if (cache->Lock() == B_OK) {
 		if (fromChange.fAtomic
-			&& from->fCache->ChangeInfo() == fromChange.fBefore) {
-			from->fCache->RemoveEntry(fromName);
-			from->fCache->SetChangeInfo(fromChange.fAfter);
-		} else if (from->fCache->ChangeInfo() != fromChange.fBefore)
-			from->fCache->Trash();
-		from->fCache->Unlock();
+			&& cache->ChangeInfo() == fromChange.fBefore) {
+			cache->RemoveEntry(fromName);
+			cache->SetChangeInfo(fromChange.fAfter);
+		} else if (cache->ChangeInfo() != fromChange.fBefore)
+			cache->Trash();
+		cache->Unlock();
 	}
 
-	if (to->fCache->Lock() == B_OK) {
+	cache = attribute ? to->fAttrCache : to->fCache;
+	if (cache->Lock() == B_OK) {
 		if (toChange.fAtomic
-			&& to->fCache->ChangeInfo() == toChange.fBefore) {
-			to->fCache->AddEntry(toName, fileID, true);
-			to->fCache->SetChangeInfo(toChange.fAfter);
+			&& cache->ChangeInfo() == toChange.fBefore) {
+			cache->AddEntry(toName, fileID, true);
+			cache->SetChangeInfo(toChange.fAfter);
 		} else if (to->fCache->ChangeInfo() != toChange.fBefore)
-			to->fCache->Trash();
-		to->fCache->Unlock();
+			cache->Trash();
+		cache->Unlock();
 	}
 
-	notify_entry_moved(from->fFileSystem->DevId(), from->ID(), fromName,
-		to->ID(), toName, FileIdToInoT(fileID));
+	if (attribute) {
+		notify_attribute_changed(from->fFileSystem->DevId(), from->ID(),
+			fromName, B_ATTR_REMOVED);
+		notify_attribute_changed(to->fFileSystem->DevId(), to->ID(), toName,
+			B_ATTR_CREATED);
+	} else {
+		notify_entry_moved(from->fFileSystem->DevId(), from->ID(), fromName,
+			to->ID(), toName, FileIdToInoT(fileID));
+	}
 
 	return B_OK;
 }
@@ -404,8 +436,11 @@ Inode::Access(int mode)
 
 
 status_t
-Inode::Stat(struct stat* st)
+Inode::Stat(struct stat* st, OpenAttrCookie* attr)
 {
+	if (attr != NULL)
+		return GetStat(st, attr);
+
 	status_t result = fMetaCache.GetStat(st);
 	if (result != B_OK) {
 		struct stat temp;
@@ -421,11 +456,11 @@ Inode::Stat(struct stat* st)
 
 
 status_t
-Inode::GetStat(struct stat* st)
+Inode::GetStat(struct stat* st, OpenAttrCookie* attr)
 {
 	AttrValue* values;
 	uint32 count;
-	status_t result = NFS4Inode::GetStat(&values, &count);
+	status_t result = NFS4Inode::GetStat(&values, &count, attr);
 	if (result != B_OK)
 		return result;
 
@@ -504,7 +539,7 @@ Inode::GetStat(struct stat* st)
 
 
 status_t
-Inode::WriteStat(const struct stat* st, uint32 mask)
+Inode::WriteStat(const struct stat* st, uint32 mask, OpenAttrCookie* cookie)
 {
 	status_t result;
 	AttrValue attr[6];
@@ -554,15 +589,18 @@ Inode::WriteStat(const struct stat* st, uint32 mask)
 		i++;
 	}
 
-	MutexLocker stateLocker(fStateLock);
-	result = NFS4Inode::WriteStat(fOpenState, attr, i);
-	stateLocker.Unlock();
+	if (cookie == NULL) {
+		MutexLocker stateLocker(fStateLock);
+		result = NFS4Inode::WriteStat(fOpenState, attr, i);
+		stateLocker.Unlock();
 
-	fMetaCache.InvalidateStat();
-	if ((mask & B_STAT_MODE) != 0 || (mask & B_STAT_UID) != 0
-		|| (mask & B_STAT_GID) != 0) {
-		fMetaCache.InvalidateAccess();
-	}
+		fMetaCache.InvalidateStat();
+		if ((mask & B_STAT_MODE) != 0 || (mask & B_STAT_UID) != 0
+			|| (mask & B_STAT_GID) != 0) {
+			fMetaCache.InvalidateAccess();
+		}
+	} else
+		result = NFS4Inode::WriteStat(cookie->fOpenState, attr, i);
 
 	return result;
 }

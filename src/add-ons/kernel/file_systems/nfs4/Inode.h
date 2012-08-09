@@ -57,24 +57,33 @@ public:
 					status_t	Link(Inode* dir, const char* name);
 					status_t	Remove(const char* name, FileType type);
 	static			status_t	Rename(Inode* from, Inode* to,
-									const char* fromName, const char* toName);
+									const char* fromName, const char* toName,
+									bool attribute = false);
 
-					status_t	Stat(struct stat* st);
-					status_t	WriteStat(const struct stat* st, uint32 mask);
+					status_t	Stat(struct stat* st,
+									OpenAttrCookie* attr = NULL);
+					status_t	WriteStat(const struct stat* st, uint32 mask,
+									OpenAttrCookie* attr = NULL);
 
 					status_t	Create(const char* name, int mode, int perms,
 									OpenFileCookie* cookie,
 									OpenDelegationData* data, ino_t* id);
 					status_t	Open(int mode, OpenFileCookie* cookie);
 					status_t	Close(OpenFileCookie* cookie);
+
+					status_t	OpenAttr(const char* name,  int mode,
+									OpenAttrCookie* cookie, bool create,
+									int32 type = 0);
+					status_t	CloseAttr(OpenAttrCookie* cookie);
+
 					status_t	Read(OpenFileCookie* cookie, off_t pos,
 									void* buffer, size_t* length);
 					status_t	Write(OpenFileCookie* cookie, off_t pos,
 									const void* buffer, size_t *_length);
 
-					status_t	ReadDirect(OpenFileCookie* cookie, off_t pos,
+					status_t	ReadDirect(OpenStateCookie* cookie, off_t pos,
 									void* buffer, size_t* length, bool* eof);
-					status_t	WriteDirect(OpenFileCookie* cookie, off_t pos,
+					status_t	WriteDirect(OpenStateCookie* cookie, off_t pos,
 									const void* buffer, size_t *_length);
 
 					status_t	CreateDir(const char* name, int mode);
@@ -96,6 +105,8 @@ public:
 									_snapshot, OpenDirCookie* cookie,
 									uint64* _change, bool attribute);
 
+					status_t	LoadAttrDirHandle();
+
 protected:
 								Inode();
 
@@ -115,7 +126,8 @@ protected:
 					status_t	ChildAdded(const char* name, uint64 fileID,
 									const FileHandle& fileHandle);
 
-					status_t	GetStat(struct stat* st);
+					status_t	GetStat(struct stat* st,
+									OpenAttrCookie* attr = NULL);
 
 	static inline	status_t	CheckLockType(short ltype, uint32 mode);
 

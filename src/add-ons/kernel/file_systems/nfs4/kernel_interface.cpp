@@ -636,7 +636,7 @@ nfs4_open_attr_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
 static status_t
 nfs4_close_attr_dir(fs_volume* volume, fs_vnode* vnode, void* cookie)
 {
-	return nfs4_close_attr_dir(volume, vnode, cookie);
+	return nfs4_close_dir(volume, vnode, cookie);
 }
 
 
@@ -658,7 +658,125 @@ nfs4_read_attr_dir(fs_volume* volume, fs_vnode* vnode, void* cookie,
 static status_t
 nfs4_rewind_attr_dir(fs_volume* volume, fs_vnode* vnode, void* cookie)
 {
-	return nfs4_rewind_attr_dir(volume, vnode, cookie);
+	return nfs4_rewind_dir(volume, vnode, cookie);
+}
+
+
+static status_t
+nfs4_create_attr(fs_volume* volume, fs_vnode* vnode, const char* name,
+	uint32 type, int openMode, void** _cookie)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
+	OpenAttrCookie* cookie = new OpenAttrCookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	*_cookie = cookie;
+
+	status_t result = inode->OpenAttr(name, openMode, cookie, true, type);
+	if (result != B_OK)
+		delete cookie;
+
+	return result;
+}
+
+
+static status_t
+nfs4_open_attr(fs_volume* volume, fs_vnode* vnode, const char* name,
+	int openMode, void** _cookie)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
+	OpenAttrCookie* cookie = new OpenAttrCookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	*_cookie = cookie;
+
+	status_t result = inode->OpenAttr(name, openMode, cookie, false);
+	if (result != B_OK)
+		delete cookie;
+
+	return result;
+}
+
+
+static status_t
+nfs4_close_attr(fs_volume* volume, fs_vnode* vnode, void* _cookie)
+{
+	Cookie* cookie = reinterpret_cast<Cookie*>(_cookie);
+	return cookie->CancelAll();
+}
+
+
+static status_t
+nfs4_free_attr_cookie(fs_volume* volume, fs_vnode* vnode, void* _cookie)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+
+	OpenAttrCookie* cookie = reinterpret_cast<OpenAttrCookie*>(_cookie);
+	inode->CloseAttr(cookie);
+	delete cookie;
+
+	return B_OK;
+}
+
+
+static status_t
+nfs4_read_attr(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
+	void* buffer, size_t* length)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenAttrCookie* cookie = reinterpret_cast<OpenAttrCookie*>(_cookie);
+	bool eof;
+	return inode->ReadDirect(cookie, pos, buffer, length, &eof);
+}
+
+
+static status_t
+nfs4_write_attr(fs_volume* volume, fs_vnode* vnode, void* _cookie, off_t pos,
+	const void* buffer, size_t* length)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenAttrCookie* cookie = reinterpret_cast<OpenAttrCookie*>(_cookie);
+	return inode->WriteDirect(cookie, pos, buffer, length);
+}
+
+
+static status_t
+nfs4_read_attr_stat(fs_volume* volume, fs_vnode* vnode, void* _cookie,
+	struct stat* stat)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenAttrCookie* cookie = reinterpret_cast<OpenAttrCookie*>(_cookie);
+	return inode->Stat(stat, cookie);
+}
+
+
+static status_t
+nfs4_write_attr_stat(fs_volume* volume, fs_vnode* vnode, void* _cookie,
+	const struct stat* stat, int statMask)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	OpenAttrCookie* cookie = reinterpret_cast<OpenAttrCookie*>(_cookie);
+	return inode->WriteStat(stat, statMask, cookie);
+}
+
+
+static status_t
+nfs4_rename_attr(fs_volume* volume, fs_vnode* fromVnode, const char* fromName,
+	fs_vnode* toVnode, const char* toName)
+{
+	Inode* fromInode = reinterpret_cast<Inode*>(fromVnode->private_node);
+	Inode* toInode = reinterpret_cast<Inode*>(toVnode->private_node);
+	return Inode::Rename(fromInode, toInode, fromName, toName, true);
+}
+
+
+static status_t
+nfs4_remove_attr(fs_volume* volume, fs_vnode* vnode, const char* name)
+{
+	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
+	return inode->Remove(name, NF4NAMEDATTR);
 }
 
 
@@ -832,17 +950,17 @@ fs_vnode_ops gNFSv4VnodeOps = {
 	nfs4_rewind_attr_dir,
 
 	/* attribute operations */
-	NULL,	// create_attr
-	NULL,	// open_attr
-	NULL,	// close_attr
-	NULL,	// free_attr_cookie
-	NULL,	// read_attr
-	NULL,	// write_attr
+	nfs4_create_attr,
+	nfs4_open_attr,
+	nfs4_close_attr,
+	nfs4_free_attr_cookie,
+	nfs4_read_attr,
+	nfs4_write_attr,
 
-	NULL,	// read_attr_stat
-	NULL,	// write_attr_stat
-	NULL,	// rename_attr
-	NULL,	// remove_attr
+	nfs4_read_attr_stat,
+	nfs4_write_attr_stat,
+	nfs4_rename_attr,
+	nfs4_remove_attr,
 
 	/* support for node and FS layers */
 	NULL,	// create_special_node

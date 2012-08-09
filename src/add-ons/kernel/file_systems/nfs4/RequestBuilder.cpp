@@ -788,7 +788,7 @@ RequestBuilder::Verify(AttrValue* attr, uint32 count)
 
 status_t
 RequestBuilder::Write(const uint32* id, uint32 stateSeq, const void* buffer,
-	uint64 pos, uint32 len)
+	uint64 pos, uint32 len, bool stable)
 {
 	if (fProcedure != ProcCompound)
 		return B_BAD_VALUE;
@@ -801,7 +801,7 @@ RequestBuilder::Write(const uint32* id, uint32 stateSeq, const void* buffer,
 	fRequest->Stream().AddUInt(id[1]);
 	fRequest->Stream().AddUInt(id[2]);
 	fRequest->Stream().AddUHyper(pos);
-	fRequest->Stream().AddInt(UNSTABLE4);
+	fRequest->Stream().AddInt(stable ? FILE_SYNC4 : UNSTABLE4);
 	fRequest->Stream().AddOpaque(buffer, len);
 
 	fOpCount++;
@@ -862,6 +862,12 @@ void
 RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
 	uint32 count)
 {
+	if (count == 0) {
+		stream.AddUInt(0);
+		stream.AddOpaque(NULL, 0);
+		return;
+	}
+
 	Attribute* attrs =
 		reinterpret_cast<Attribute*>(malloc(sizeof(Attribute) * count));
 	for (uint32 i = 0; i < count; i++)

@@ -55,6 +55,13 @@ Inode::OpenAttrDir(OpenDirCookie* cookie)
 	cookie->fEOF = false;
 	cookie->fAttrDir = true;
 
+	return LoadAttrDirHandle();	
+}
+
+
+status_t
+Inode::LoadAttrDirHandle()
+{
 	if (fInfo.fAttrDir.fSize == 0) {
 		FileHandle handle;
 
@@ -65,7 +72,7 @@ Inode::OpenAttrDir(OpenDirCookie* cookie)
 		fInfo.fAttrDir = handle;
 	}
 
-	return B_OK;	
+	return B_OK;
 }
 
 

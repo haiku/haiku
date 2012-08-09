@@ -21,7 +21,7 @@ class Delegation : public NFS4Object,
 	public DoublyLinkedListLinkImpl<Delegation> {
 public:
 						Delegation(const OpenDelegationData& data, Inode* inode,
-							uint64 clientID);
+							uint64 clientID, bool attr = false);
 
 	status_t			GiveUp(bool truncate = false);
 
@@ -35,6 +35,7 @@ private:
 	uint64				fClientID;
 	OpenDelegationData	fData;
 	Inode*				fInode;
+	bool				fAttribute;
 };
 
 

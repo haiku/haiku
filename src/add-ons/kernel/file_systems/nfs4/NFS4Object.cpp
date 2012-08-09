@@ -16,7 +16,7 @@
 
 bool
 NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
-	OpenFileCookie* cookie, OpenState* state)
+	OpenStateCookie* cookie, OpenState* state)
 {
 	uint32 leaseTime;
 

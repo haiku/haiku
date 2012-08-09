@@ -14,11 +14,12 @@
 
 
 Delegation::Delegation(const OpenDelegationData& data, Inode* inode,
-	uint64 clientID)
+	uint64 clientID, bool attribute)
 	:
 	fClientID(clientID),
 	fData(data),
-	fInode(inode)
+	fInode(inode),
+	fAttribute(attribute)
 {
 }
 
@@ -26,7 +27,7 @@ Delegation::Delegation(const OpenDelegationData& data, Inode* inode,
 status_t
 Delegation::GiveUp(bool truncate)
 {
-	if (!truncate)
+	if (!fAttribute && !truncate)
 		fInode->SyncAndCommit(true);
 
 	ReturnDelegation();

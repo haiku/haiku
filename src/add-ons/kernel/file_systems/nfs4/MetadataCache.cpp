@@ -83,7 +83,10 @@ MetadataCache::GetAccess(uid_t uid, uint32* allowed)
 	if (!it.HasCurrent())
 		return B_ENTRY_NOT_FOUND;
 
-	if (it.Current().fExpire < time(NULL)) {
+	if (!fForceValid)
+		it.Current().fForceValid = false;
+
+	if (!it.Current().fForceValid && it.Current().fExpire < time(NULL)) {
 		it.Remove();
 		return B_ERROR;
 	}
@@ -105,6 +108,7 @@ MetadataCache::SetAccess(uid_t uid, uint32 allowed)
 	AccessEntry entry;
 	entry.fAllowed = allowed;
 	entry.fExpire = time(NULL) + kExpirationTime;
+	entry.fForceValid = fForceValid;
 	fAccessCache.Insert(uid, entry);
 }
 

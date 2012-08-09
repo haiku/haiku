@@ -20,6 +20,8 @@ class Inode;
 
 struct AccessEntry {
 	time_t	fExpire;
+	bool	fForceValid;
+
 	uint32	fAllowed;
 };
 
