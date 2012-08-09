@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku-CPUFrequencyPref	3079996868
+1	french	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		Ok
 CPU frequency status view	CPU Frequency View		Vue de l'état de la fréquence du CPU
+OK	Status view		OK
 Set state	Status view		Changer l'état
 Defaults	Pref Window		Par défauts
 Install replicant into Deskbar	CPU Frequency View		Installer le réplicant dans la Deskbar

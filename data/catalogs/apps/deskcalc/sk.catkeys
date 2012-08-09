@@ -1,7 +1,9 @@
-1	slovak	x-vnd.Haiku-DeskCalc	1916192649
+1	slovak	x-vnd.Haiku-DeskCalc	3276968552
 Compact	CalcView		Kompaktná
 Scientific	CalcView		Vedecká
 DeskCalc	System name		Kalkulačka
 Basic	CalcView		Základná
+Radians	CalcView		Radiány
 Enable Num Lock on startup	CalcView		Zapnúť NumLock pri štarte
+Degrees	CalcView		Stupne
 Audio Feedback	CalcView		Zvuková spätná väzba

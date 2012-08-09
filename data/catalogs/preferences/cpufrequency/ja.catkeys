@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku-CPUFrequencyPref	3079996868
+1	japanese	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		Ok
 CPU frequency status view	CPU Frequency View		CPU 周波数ビュー
+OK	Status view		OK
 Set state	Status view		設定
 Defaults	Pref Window		デフォルト
 Install replicant into Deskbar	CPU Frequency View		レプリカントを Deskbar に表示

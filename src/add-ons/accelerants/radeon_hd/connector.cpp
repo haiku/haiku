@@ -200,6 +200,9 @@ connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 		// Store special lvds flags the encoder setup needs
 		gConnector[connectorIndex]->lvdsFlags = lvdsInfo->info.ucLVDS_Misc;
 
+		// Spread Spectrum ID (in SS table)
+		gInfo->lvdsSpreadSpectrumID = lvdsInfo->info.ucSS_Id;
+
 		uint16 flags = B_LENDIAN_TO_HOST_INT16(
 			lvdsInfo->info.sLCDTiming.susModeMiscInfo.usAccess);
 

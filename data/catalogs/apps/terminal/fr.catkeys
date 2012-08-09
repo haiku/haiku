@@ -33,7 +33,7 @@ Selected text	Terminal AppearancePrefView		Texte sélectionné
 Find	Terminal FindWindow		Rechercher
 Appearance	Terminal PrefWindow		Apparence
 Tab title:	Terminal AppearancePrefView		Titre de l'onglet :
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Le modèle utilisé pour composer le titre des onglets\ncontenir les éléments suivants :\n
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
 Color schema:	Terminal AppearancePrefView		Profil de couleurs :
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Fond

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	2141738748
+1	slovak	x-vnd.Haiku-libtracker	1574172506
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -15,11 +15,14 @@ Decrease size	ContainerWindow		Zmenšiť veľkosť
 Mini icon view	VolumeWindow		Zobrazenie mini ikon
 You must have at least one attribute showing.	PoseView		Musí sa zobrazovať aspoň jeden atribút.
 Permissions	InfoWindow		Oprávnenia
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Invertovať výber
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Nedávne dokumenty
 Modified	QueryPoseView		Zmenené
 Created	ContainerWindow		Vytvorené
 Error %error loading add-On %name.	ContainerWindow		Chyba %error pri načítaní doplnku %name.
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak %ifYouDoAction priečinok nastavení, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?
 contains	SelectionWindow		obsahuje
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Ľutujeme, nemôžete ukladať veci do koreňového adresára systému.
 Show shared volumes on Desktop	SettingsView		Zobraziť zdieľané zväzky na Ploche
@@ -39,6 +42,7 @@ Make active printer	ContainerWindow		Urobiť tlačiareň aktívnou
 Create link here	ContainerWindow		Vytvoriť odkaz tu
 Moving: 	StatusWindow		Presúva sa: 
 before	FindPanel		pred
+Error emptying Trash	FSUtils		Chyba pri vyprázdňovaní Koša
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		väčší ako
 Delete	PoseView		Zmazať
@@ -63,7 +67,7 @@ Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		N
 Close all in workspace	ContainerWindow		Zatvoriť všetky na pracovnej ploche
 Empty Trash	ContainerWindow		Vyprázdniť Kôš
 Name = %name	FindPanel	FindResultTitle	Názov = %name
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ste si istý, že chcete presunúť alebo skopírovať vybrané položky do tohto priečinka?
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ste si istí, že chcete presunúť alebo skopírovať vybrané položky do tohto priečinka?
 Does not handle file	OpenWithWindow		Nepracuje so súborom
 Arrange by	ContainerWindow		Usporiadať podľa
 Mount server error	AutoMounterSettings		Chyba pripájacieho servera
@@ -88,7 +92,9 @@ Cut	FilePanelPriv		Vystrihnúť
 Replace	FilePanelPriv		Nahradiť
 Select all	VolumeWindow		Vybrať všetko
 Opens with:	InfoWindow		Otvára sa pomocou:
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak %ifYouDoAction nastavenia MIME, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?
 Open	ContainerWindow		Otvoriť
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Chyba pri výpočte veľkosti priečinka.
 New folder	FilePanelPriv		Nový priečinok
 %name info	InfoWindow	InfoWindow Title	Info o %name
@@ -116,6 +122,7 @@ Move to Trash	ContainerWindow		Presunúť do Koša
 Move to	ContainerWindow		Presunúť do
 Create %s clipping	PoseView		Vytvoriť orezanie %s
 Set new link target	InfoWindow		Nastaviť nový cieľ odkazu
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction priečinok „system“, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?\n\nAk chcete priečinok „system“ napriek tomu %toDoAction, podržte kláves Shift a kliknite na „%toConfirmAction“.
 Save as Query template:	FindPanel		Uložiť ako šablónu Požiadavky:
 preferences	B_PREFERENCES_DIRECTORY		nastavenia
 Cancel	FSUtils		Zrušiť
@@ -139,6 +146,7 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nebol
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Ľutujeme, ukladanie viac ako jednej položky nie je dovolené.
 Searching for disks to mount…	StatusWindow		Hľadajú sa disky na pripojenie…
 New folder	FSUtils		Nový priečinok
+If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction priečinok „common“, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?\n\nAk chcete priečinok „common“ napriek tomu %toDoAction, podržte kláves Shift a kliknite na „%toConfirmAction“.
 Free space color	SettingsView		Farba voľného miesta
 Cut	ContainerWindow		Vystrihnúť
 Remove	FindPanel		Odstrániť
@@ -248,6 +256,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 Cancel	ContainerWindow		Zrušiť
 Only the boot disk	AutoMounterSettings		Iba zavádzací disk
 Trash	TrackerSettingsWindow		Kôš
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak %ifYouDoAction priečinok „config“, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?
 Unmount	ContainerWindow		Odpojiť
 Copy layout	ContainerWindow		Kopírovať rozloženie
 label too long	PoseView		menovka je príliš dlhá
@@ -308,6 +317,7 @@ The Tracker must be running to see Info windows.	PoseView		Tracker musí bežať
 Other	FilePermissionsView		Iné
 Query name:	FindPanel		Názov Požiadavky:
 Permissions	ContainerWindow		Oprávnenia
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		presúvanie
 Identify	InfoWindow		Identifikovať
 Recent folders	ContainerWindow		Nedávne priečinky
@@ -333,6 +343,7 @@ Handles any file	OpenWithWindow		Pracuje s ľubovoľným súborom
 Get info	FilePanelPriv		Získať info
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Zrušiť
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Aplikácia „%appname“ nepodporuje typ dokumentu, ktorý sa chystáte otvoriť.\nSte si istí, že chcete pokračovať?\n\nAk viete, že aplikácia tento typ dokumentu podporuje, mali by ste kontaktovať vydavateľa aplikácie a požiadať ho, aby aktualizoval aplikáciu, aby uvádzala tento typ dokumentu ako podporovaný.
 Disks	DirMenu		Disky
 New folder %ld	FSUtils		Nový priečinok %ld
 All BeOS disks	AutoMounterSettings		Všetky disky BeOS
@@ -369,7 +380,8 @@ You can't replace a folder with one of its sub-folders.	FSUtils		Nemôžete nahr
 Preferences…	ContainerWindow		Predvoľby…
 Move	PoseView		Presunúť
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
-Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ste si istý, že chcete zmazať vybrané položky? Túto operáciu nemožno vrátiť.
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ste si istí, že chcete zmazať vybrané položky? Túto operáciu nemožno vrátiť.
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction priečinok „home“, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?\n\nAk chcete priečinok „home“ napriek tomu %toDoAction, podržte kláves Shift a kliknite na „%toConfirmAction“.
 Add-ons	DeskWindow		Doplnky
 Name	FindPanel		Názov
 And	FindPanel		a

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-FileTypes	871051909
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-FileTypes	2434319854
 Application types…	FileTypes Window		Programtyper...
 Description:	Application Types Window		Beskrivelse
 Recognition rule is not valid:\n\n	FileTypes Window		Gjennkjenningsregel er ugyldig:\n\n
@@ -81,7 +81,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Type:
 Removing uninstalled application types	Application Types Window		Fjerner avinstallerte programtyper
 Done	Attribute Window		Ferdig
-Set Preferred Application	Preferred App Menu		Sett foretrukket program
 no icon	FileTypes Window		Ingen ikon
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Versjon

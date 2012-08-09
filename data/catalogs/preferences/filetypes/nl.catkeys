@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-FileTypes	473999706
+1	dutch; flemish	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		Toepassingstypes...
 Description:	Application Types Window		Beschrijving:
 Args only	Application Type Window		Alleen argumenten
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Type:
 Removing uninstalled application types	Application Types Window		Niet-geïnstalleerde applicatietypes worden verwijderd
 Done	Attribute Window		Klaar
-Set Preferred Application	Preferred App Menu		Voorkeurstoepassing instellen
 no icon	FileTypes Window		geen icoon
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Versie

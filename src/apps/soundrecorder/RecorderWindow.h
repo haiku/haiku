@@ -29,16 +29,24 @@
 #include "VolumeSlider.h"
 #include "VUView.h"
 
+
 class BMediaRoster;
 class BBox;
 class BButton;
 class BCheckBox;
 class BMenuField;
-class SoundConsumer;
 class SoundListView;
 class BScrollView;
 class BSlider;
 class BStringView;
+
+namespace BPrivate {
+class SoundConsumer;
+}
+
+
+using BPrivate::SoundConsumer;
+
 
 class RecorderWindow : public BWindow {
 public:

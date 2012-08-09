@@ -1,5 +1,6 @@
-1	english	x-vnd.Be-TSKB	1133985623
+1	english	x-vnd.Be-TSKB	3197510812
 Power off	DeskbarMenu		关闭电源
+Show day of week	PreferencesWindow		显示星期
 Edit menu…	PreferencesWindow		编辑菜单
 Suspend	DeskbarMenu		挂起
 Applications	PreferencesWindow		应用程序
@@ -39,7 +40,9 @@ Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		系统设置
 Recent folders	DeskbarMenu		最近文件夹：
 About this system	DeskbarMenu		关于本系统
 Show calendar…	TimeView		显示日历...
+Deskbar preferences…	DeskbarMenu		桌面栏首选项...
 Expand new applications	PreferencesWindow		展开新程序
+Show replicants	DeskbarMenu		显示 replicants
 Hide application names	PreferencesWindow		隐藏应用名称
 Clock	PreferencesWindow		时钟
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		演示程序

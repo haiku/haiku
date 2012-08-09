@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-FileTypes	473999706
+1	english	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		应用程序类型...
 Description:	Application Types Window		描述：
 Args only	Application Type Window		仅含参数
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		类型:
 Removing uninstalled application types	Application Types Window		删除未安装应用类型
 Done	Attribute Window		完成
-Set Preferred Application	Preferred App Menu		设置首选程序
 no icon	FileTypes Window		无图标
 Alpha	Application Types Window		内测版
 Version	Application Types Window		版本

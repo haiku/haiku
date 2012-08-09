@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	3052550296
+1	japanese	x-vnd.Haiku-MediaPlayer	3632366072
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 %d kHz	MediaPlayer-InfoWin		%d kHz
@@ -57,7 +57,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		現在再生中項
 400% scale	MediaPlayer-Main		400% 表示
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました:\n\nエラー:
 Move Entries	MediaPlayer-MovePLItemsCmd		項目の移動
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		ごみ箱への移動エラー
 Audio	MediaPlayer-Main		オーディオ
 Open Playlist	MediaPlayer-PlaylistWindow		プレイリストを開く
 MediaPlayer	System name		メディアプレイヤー
@@ -72,6 +71,7 @@ Stop playing.	MediaPlayer-Main		再生を停止
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		ファイル'%filename'を開けませんでした。\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		エラー:
 Audio	MediaPlayer-InfoWin		オーディオ
+Move into trash error	MediaPlayer-RemovePLItemsCmd		ごみ箱への移動エラー
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (不正なメッセージ)。プレイリストの保存に失敗しました。
 Skip to the previous track.	MediaPlayer-Main		前のトラックに飛ぶ
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% の内部エラーです。ファイルは開けませんでした。

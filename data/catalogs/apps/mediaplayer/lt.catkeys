@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	607764928
+1	lithuanian	x-vnd.Haiku-MediaPlayer	2346289802
 raw audio	MediaPlayer-InfoWin		neapdorotas garso įrašas
 Location	MediaPlayer-InfoWin		Vieta
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
@@ -58,7 +58,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Gauna šiuo metu a
 400% scale	MediaPlayer-Main		Mastelis 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Grojaraščio įrašyti nepavyko:\n\nKlaida:
 Move Entries	MediaPlayer-MovePLItemsCmd		Perkelti įrašus
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Klaida išmetant Šiukšlinėn
 Audio	MediaPlayer-Main		Garsas
 Open Playlist	MediaPlayer-PlaylistWindow		Atverti grojaraštį
 MediaPlayer	System name		Medijos leistuvė

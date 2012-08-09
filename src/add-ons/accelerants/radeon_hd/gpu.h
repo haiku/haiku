@@ -13,6 +13,8 @@
 
 #include <video_configuration.h>
 
+#include "pll.h"
+
 
 // GPU Control registers. These are combined as
 // the registers exist on all models, some flags
@@ -164,6 +166,7 @@
 #define		SOFT_RESET_IA			(1 << 15)
 
 
+status_t radeon_gpu_probe();
 status_t radeon_gpu_reset();
 void radeon_gpu_mc_halt(struct gpu_state *gpuState);
 void radeon_gpu_mc_resume(struct gpu_state *gpuState);
@@ -171,7 +174,8 @@ status_t radeon_gpu_mc_idlewait();
 status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_ring_setup();
 status_t radeon_gpu_ring_boot(uint32 ringType);
-status_t radeon_gpu_ss_disable();
+status_t radeon_gpu_ss_control(pll_info* pll, bool enable);
+
 
 
 #endif

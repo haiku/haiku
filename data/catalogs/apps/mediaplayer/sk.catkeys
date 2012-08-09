@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	607764928
+1	slovak	x-vnd.Haiku-MediaPlayer	2969013755
 raw audio	MediaPlayer-InfoWin		nespracovaný zvuk
 Location	MediaPlayer-InfoWin		Umiestnenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (americký)
@@ -58,7 +58,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Získa URI práve 
 400% scale	MediaPlayer-Main		400% zmena veľkosti
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ukladanie zoznamu stôp zlyhalo:\n\nChyba: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Presunúť položky
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Chyba pri presúvaní do Koša
 Audio	MediaPlayer-Main		Zvuk
 Open Playlist	MediaPlayer-PlaylistWindow		Otvoriť zoznam stôp
 MediaPlayer	System name		Prehrávač multimédií
@@ -70,8 +69,10 @@ Select all	MediaPlayer-PlaylistWindow		Vybrať všetky
 Move Entry	MediaPlayer-MovePLItemsCmd		Presunúť položku
 Open	MediaPlayer-PlaylistWindow		Otvoriť
 Stop playing.	MediaPlayer-Main		Zastaviť prehrávanie.
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Súbor „%filename“ nebolo možné otvoriť.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Chyba: 
 Audio	MediaPlayer-InfoWin		Zvuk
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Chyba pri presúvaní do Koša
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vnútorná chyba (chybný tvar správy). Ukladanie zoznamu stôp zlyhalo.
 Skip to the previous track.	MediaPlayer-Main		Preskočiť na predošlú stopu.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		V aplikácii %app% sa vyskytla vnútorná chyba. Súbor nebolo možné otvoriť.

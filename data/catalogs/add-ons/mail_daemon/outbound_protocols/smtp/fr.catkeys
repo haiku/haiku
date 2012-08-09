@@ -1,11 +1,16 @@
-1	french	x-vnd.Haiku-SMTP	2726836340
+1	french	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		Serveur SMTP :
-Error while logging in to %serv	smtp		Erreur lors de la connexion à %serv
+STARTTLS	ConfigView		STARTTLS
+Error while logging in to %serv	smtp		Impossible de se connecter à %serv
+Unencrypted	ConfigView		Non-chiffré
 . The server says:\n	smtp		. Le serveur indique :\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Connexion au serveur…
+Error while opening connection to %serv	smtp		Impossible d'ouvrir une connexion avec %serv
+POP3 authentication failed. The server said:\n	smtp		L'authentification POP3 a échoué. Le serveur a indiqué :\n
 Destination:	ConfigView		Destination :
 : Connection refused or host not found.	smtp		: Connexion refusée ou hôte non trouvé.
 None	ConfigView		Aucun
 POP3 before SMTP	ConfigView		POP3 avant SMTP
+SSL	ConfigView		SSL
 . The server said:\n	smtp		. Le serveur a indiqué :\n

@@ -65,6 +65,7 @@ All rights reserved.
 #include <Path.h>
 #include <StopWatch.h>
 #include <String.h>
+#include <SymLink.h>
 #include <TextView.h>
 #include <VolumeRoster.h>
 #include <Volume.h>
@@ -220,6 +221,7 @@ BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode,
 	fZombieList(new BObjectList<Model>(10, true)),
 	fColumnList(new BObjectList<BColumn>(4, true)),
 	fMimeTypeList(new BObjectList<BString>(10, true)),
+	fBrokenLinks(new BObjectList<Model>(10, false)),
 	fMimeTypeListIsDirty(false),
 	fViewState(new BViewState),
 	fStateNeedsSaving(false),
@@ -285,6 +287,7 @@ BPoseView::~BPoseView()
 	delete fViewState;
 	delete fModel;
 	delete fKeyRunner;
+	delete fBrokenLinks;
 
 	IconCache::sIconCache->Deleting(this);
 }
@@ -360,8 +363,6 @@ BPoseView::InitCommon()
 		AddTrashPoses();
 	else
 		AddPoses(TargetModel());
-
-	UpdateScrollRange();
 }
 
 
@@ -1077,6 +1078,8 @@ BPoseView::CommitActivePose(bool saveChanges)
 {
 	if (ActivePose()) {
 		int32 index = fPoseList->IndexOf(ActivePose());
+		if (fFiltering)
+			index = fFilteredPoseList->IndexOf(ActivePose());
 		BPoint loc(0, index * fListElemHeight);
 		if (ViewMode() != kListMode)
 			loc = ActivePose()->Location(this);
@@ -1312,7 +1315,7 @@ BPoseView::AddPosesTask(void* castToParams)
 
 	AddPosesResult* posesResult = new AddPosesResult;
 	posesResult->fCount = 0;
-	int32 modelChunkIndex = 0;
+	int32 modelChunkIndex = -1;
 	bigtime_t nextChunkTime = 0;
 	uint32 watchMask = view->WatchNewNodeMask();
 
@@ -1334,13 +1337,8 @@ BPoseView::AddPosesTask(void* castToParams)
 			node_ref dirNode;
 			node_ref itemNode;
 
-			posesResult->fModels[modelChunkIndex] = 0;
-				// ToDo - redo this so that modelChunkIndex increments
-				// right before a new model is added to the array;
-				// start with modelChunkIndex = -1
-
 			int32 count = container->GetNextDirents(eptr, 1024, 1);
-			if (count <= 0 && !modelChunkIndex)
+			if (count <= 0 && modelChunkIndex == -1)
 				break;
 
 			if (count) {
@@ -1361,8 +1359,9 @@ BPoseView::AddPosesTask(void* castToParams)
 					// have to node monitor ahead of time because Model will
 					// cache up the file type and preferred app
 					// OK to call when poseView is not locked
-				model = new Model(&dirNode, &itemNode, eptr->d_name, true);
+				model = new Model(&dirNode, &itemNode, eptr->d_name, false);
 				result = model->InitCheck();
+				modelChunkIndex++;
 				posesResult->fModels[modelChunkIndex] = model;
 			}
 
@@ -1395,51 +1394,42 @@ BPoseView::AddPosesTask(void* castToParams)
 					PRINT(("1 adding model %s to zombie list, error %s\n",
 						model->Name(), strerror(model->InitCheck())));
 					view->fZombieList->AddItem(model);
+					modelChunkIndex--;
 					continue;
 				}
 
 				view->ReadPoseInfo(model,
 					&(posesResult->fPoseInfos[modelChunkIndex]));
-				if (!view->ShouldShowPose(model,
-						&(posesResult->fPoseInfos[modelChunkIndex]))
-					// filter out models we do not want to show
-					|| (model->IsSymLink()
-						&& !view->CreateSymlinkPoseTarget(model))) {
-					// filter out symlinks whose target models we do not
-					// want to show
 
-					posesResult->fModels[modelChunkIndex] = 0;
-					delete model;
+				if (!PoseVisible(model,
+					&(posesResult->fPoseInfos[modelChunkIndex]))) {
+					modelChunkIndex--;
 					continue;
 				}
-					// TODO: we are only watching nodes that are visible and
-					// not zombies. EntryCreated watches everything, which is
-					// probably more correct.
-					// clean this up
 
-				model->CloseNode();
-				modelChunkIndex++;
+				if (model->IsSymLink())
+					view->CreateSymlinkPoseTarget(model);
 			}
 
 			bigtime_t now = system_time();
 
-			if (!count || modelChunkIndex >= kMaxAddPosesChunk
+			if (!count || modelChunkIndex >= kMaxAddPosesChunk - 1
 				|| now > nextChunkTime) {
 				// keep getting models until we get <kMaxAddPosesChunk> of them
 				// or until 300000 runs out
 
-				ASSERT(modelChunkIndex > 0);
+				ASSERT(modelChunkIndex >= 0);
 
 				// send of the created poses
 
-				posesResult->fCount = modelChunkIndex;
+				posesResult->fCount = modelChunkIndex + 1;
 				BMessage creationData(kAddNewPoses);
 				creationData.AddPointer("currentPoses", posesResult);
 				creationData.AddRef("ref", &ref);
 
 				lock.Target().SendMessage(&creationData);
 
-				modelChunkIndex = 0;
+				modelChunkIndex = -1;
 				nextChunkTime = now + 300000;
 
 				posesResult = new AddPosesResult;
@@ -1467,7 +1457,7 @@ BPoseView::AddPosesTask(void* castToParams)
 		return B_ERROR;
 	}
 
-	ASSERT(!modelChunkIndex);
+	ASSERT(modelChunkIndex == -1);
 
 	delete posesResult;
 	delete container;
@@ -1590,6 +1580,7 @@ BPoseView::AddPosesCompleted()
 	if (ViewMode() != kListMode)
 		CheckAutoPlacedPoses();
 
+	UpdateScrollRange();
 	HideBarberPole();
 
 	// make sure that the last item in the list is not placed
@@ -1784,7 +1775,6 @@ BPoseView::AddPoseToList(PoseList* list, bool visibleList, bool insertionSort,
 	if (indexPtr)
 		*indexPtr = poseIndex;
 }
-
 
 
 void
@@ -2660,6 +2650,16 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 	}
 
 	fStateNeedsSaving = true;
+	
+	if (fFiltering) {
+		// the column we removed might just be the one that was used to filter
+		int32 count = fFilteredPoseList->CountItems();
+		for (int32 i = count - 1; i >= 0; i--) {
+			BPose *pose = fFilteredPoseList->ItemAt(i);
+			if (!FilterPose(pose))
+				RemoveFilteredPose(pose, i);
+		}
+	}
 
 	return true;
 }
@@ -2726,6 +2726,12 @@ BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 		StartWatchDateFormatChange();
 
 	fStateNeedsSaving =  true;
+
+	if (fFiltering) {
+		// the column we added might just add new poses to be showed
+		fFiltering = false;
+		StartFiltering();
+	}
 
 	return true;
 }
@@ -3310,6 +3316,15 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 	BPose* pose = EntryCreated(TargetModel()->NodeRef(), &destNodeRef,
 		destEntryRef.name, &index);
 
+	if (fFiltering) {
+		if (fFilteredPoseList->FindPose(&destNodeRef, &index) == NULL) {
+			float scrollBy = 0;
+			BRect bounds = Bounds();
+			AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy,
+				true, &index);
+		}
+	}
+
 	if (pose) {
 		WatchNewNode(pose->TargetModel()->NodeRef());
 		UpdateScrollRange();
@@ -3334,7 +3349,18 @@ BPoseView::NewFolder(const BMessage* message)
 		PlaceFolder(&ref, message);
 
 		int32 index;
-		BPose* pose = EntryCreated(TargetModel()->NodeRef(), &nodeRef, ref.name, &index);
+		BPose* pose = EntryCreated(TargetModel()->NodeRef(), &nodeRef, ref.name,
+			&index);
+
+		if (fFiltering) {
+			if (fFilteredPoseList->FindPose(&nodeRef, &index) == NULL) {
+				float scrollBy = 0;
+				BRect bounds = Bounds();
+				AddPoseToList(fFilteredPoseList, true, true, pose, bounds,
+					scrollBy, true, &index);
+			}
+		}
+
 		if (pose) {
 			UpdateScrollRange();
 			CommitActivePose();
@@ -4928,11 +4954,16 @@ BPoseView::MoveSelectionTo(BPoint dropPt, BPoint clickPt,
 
 
 inline void
-UpdateWasBrokenSymlinkBinder(BPose* pose, Model*, BPoseView* poseView,
-	BPoint* loc)
+UpdateWasBrokenSymlinkBinder(BPose *pose, Model *model, int32 index,
+	BPoseView *poseView, BObjectList<Model> *fBrokenLinks)
 {
-	pose->UpdateWasBrokenSymlink(*loc, poseView);
-	loc->y += poseView->ListElemHeight();
+	if (!model->IsSymLink())
+		return;
+
+	BPoint loc(0, index * poseView->ListElemHeight());
+	pose->UpdateWasBrokenSymlink(loc, poseView);
+	if (model->LinkTo())
+		fBrokenLinks->RemoveItem(model);
 }
 
 
@@ -4943,9 +4974,18 @@ BPoseView::TryUpdatingBrokenLinks()
 	if (!lock)
 		return;
 
-	// try fixing broken symlinks
-	BPoint loc;
-	EachPoseAndModel(fPoseList, &UpdateWasBrokenSymlinkBinder, this, &loc);
+	BObjectList<Model> *brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
+
+	// try fixing broken symlinks, and detecting broken ones.
+	EachPoseAndModel(fPoseList, &UpdateWasBrokenSymlinkBinder, this,
+		fBrokenLinks);
+
+	for (int i = brokenLinksCopy->CountItems() - 1; i >= 0; i--) {
+		if (!fBrokenLinks->HasItem(brokenLinksCopy->ItemAt(i)))
+			StopWatchingParentsOf(brokenLinksCopy->ItemAt(i)->EntryRef());
+	}
+
+	delete brokenLinksCopy;
 }
 
 
@@ -5096,6 +5136,8 @@ BPoseView::FSNotification(const BMessage* message)
 
 				ASSERT(TargetModel());
 
+				int32 count = fBrokenLinks->CountItems();
+				bool createPose = true;
 				// Query windows can get notices on different dirNodes
 				// The Disks window can too
 				// So can the Desktop, as long as the integrate flag is on
@@ -5103,17 +5145,54 @@ BPoseView::FSNotification(const BMessage* message)
 				if (dirNode != *TargetModel()->NodeRef()
 					&& !TargetModel()->IsQuery()
 					&& !TargetModel()->IsRoot()
-					&& (!settings.ShowDisksIcon() || !IsDesktopView()))
-					// stray notification
-					break;
+					&& (!settings.ShowDisksIcon() || !IsDesktopView())) {
+					if (count == 0)
+						break;
+					createPose = false;
+				}
 
-				const char* name;
-				if (message->FindString("name", &name) == B_OK)
-					EntryCreated(&dirNode, &itemNode, name);
+				const char *name;
+				if (message->FindString("name", &name) != B_OK)
+					break;
 #if DEBUG
 				else
 					SERIAL_PRINT(("no name in entry creation message\n"));
+					break;
 #endif
+				if (count) {
+					// basically, let's say we have a broken link :
+					// ./a_link -> ./some_folder/another_folder/a_target
+					// and that both some_folder and another_folder didn't
+					// exist yet. We are looking if the just created folder
+					// is 'some_folder' and watch it, expecting the creation of
+					// 'another_folder' later and then report the link as fixed. 
+					Model *model = new Model(&dirNode, &itemNode, name);
+					if (model->IsDirectory()) {
+						BString createdPath(BPath(model->EntryRef()).Path());
+						BDirectory currentDir(TargetModel()->EntryRef());
+						BPath createdDir(model->EntryRef());
+						for (int32 i = 0; i < count; i++) {
+							BSymLink link(fBrokenLinks->ItemAt(i)->EntryRef());	
+							BPath path;
+							link.MakeLinkedPath(&currentDir, &path);
+							BString pathStr(path.Path());
+							pathStr.Append("/");
+							if (pathStr.Compare(createdPath,
+								createdPath.Length()) == 0) {
+								if (pathStr[createdPath.Length()] != '/')
+									break;
+								StopWatchingParentsOf(fBrokenLinks->ItemAt(i)
+									->EntryRef());
+								watch_node(&itemNode, B_WATCH_DIRECTORY, this);
+								break;
+							}
+						}
+					}
+					delete model;
+				}
+				if (createPose)
+					EntryCreated(&dirNode, &itemNode, name);
+				TryUpdatingBrokenLinks();
 				break;
 			}
 		case B_ENTRY_MOVED:
@@ -5162,7 +5241,9 @@ BPoseView::FSNotification(const BMessage* message)
 						break;
 					}
 				}
-				return DeletePose(&itemNode);
+
+			 	DeletePose(&itemNode);
+				TryUpdatingBrokenLinks();
 			}
 			break;
 
@@ -5222,39 +5303,28 @@ BPoseView::FSNotification(const BMessage* message)
 bool
 BPoseView::CreateSymlinkPoseTarget(Model* symlink)
 {
-	Model* newResolvedModel = NULL;
-	Model* result = symlink->LinkTo();
-
+	Model *newResolvedModel = NULL;
+	Model *result = symlink->LinkTo();
 	if (!result) {
-		newResolvedModel = new Model(symlink->EntryRef(), true, true);
-		WatchNewNode(newResolvedModel->NodeRef());
-			// this should be called before creating the model
-
-		if (newResolvedModel->InitCheck() != B_OK) {
-			// broken link, still can show though, bail
-			watch_node(newResolvedModel->NodeRef(), B_STOP_WATCHING, this);
-			delete newResolvedModel;
+		BEntry entry(symlink->EntryRef(), true);
+		if (entry.InitCheck() == B_OK) {
+			node_ref nref;
+			entry_ref eref;
+			entry.GetNodeRef(&nref);
+			entry.GetRef(&eref);
+			if (eref.directory != TargetModel()->NodeRef()->node)
+				WatchNewNode(&nref, B_WATCH_STAT | B_WATCH_ATTR | B_WATCH_NAME
+					| B_WATCH_INTERIM_STAT, this);
+			newResolvedModel = new Model(&entry, true);
+		} else {
+			fBrokenLinks->AddItem(symlink);
+			WatchParentOf(symlink->EntryRef());
 			return true;
 		}
 		result = newResolvedModel;
 	}
 
-	BModelOpener opener(result);
-		// open the model
-
-	PoseInfo poseInfo;
-	ReadPoseInfo(result, &poseInfo);
-
-	if (!ShouldShowPose(result, &poseInfo)) {
-		// symlink target invisible, make the link to it the same
-		watch_node(newResolvedModel->NodeRef(), B_STOP_WATCHING, this);
-		delete newResolvedModel;
-		// clean up what we allocated
-		return false;
-	}
-
 	symlink->SetLinkTo(result);
-		// watch the link target too
 	return true;
 }
 
@@ -5283,14 +5353,9 @@ BPoseView::EntryCreated(const node_ref* dirNode, const node_ref* itemNode,
 	PoseInfo poseInfo;
 	ReadPoseInfo(model, &poseInfo);
 
-	// filter out undesired poses
-	if (!ShouldShowPose(model, &poseInfo)) {
+	if (!PoseVisible(model, &poseInfo)) {
 		watch_node(model->NodeRef(), B_STOP_WATCHING, this);
 		delete model;
-		// TODO: take special care for fRefFilter'ed models, don't stop
-		// watching them and add the model to a "FilteredModels" list so that
-		// they can have a second chance of passing the filter on attribute
-		// (name) change. cf. r31307
 		return NULL;
 	}
 
@@ -5365,7 +5430,11 @@ BPoseView::EntryMoved(const BMessage* message)
 		// rename or move of entry in this directory (or query)
 
 		int32 index;
-		BPose* pose = fPoseList->FindPose(&itemNode, &index);
+		BPose *pose = fPoseList->FindPose(&itemNode, &index);
+		int32 poseListIndex = index;
+		bool visible = true;
+		if (fFiltering)
+			visible = fFilteredPoseList->FindPose(&itemNode, &index) != NULL;
 
 		if (pose) {
 			pose->TargetModel()->UpdateEntryRef(&dirNode, name);
@@ -5385,10 +5454,17 @@ BPoseView::EntryMoved(const BMessage* message)
 			if (pose->TargetModel()->OpenNode() == B_OK) {
 				pose->UpdateAllWidgets(index, loc, this);
 				pose->TargetModel()->CloseNode();
-				_CheckPoseSortOrder(fPoseList, pose, index);
-				if (fFiltering
-					&& fFilteredPoseList->FindPose(&itemNode, &index) != NULL) {
-					_CheckPoseSortOrder(fFilteredPoseList, pose, index);
+				_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
+				if (fFiltering) {
+					if (!visible && FilterPose(pose)) {
+						BRect bounds = Bounds();
+						float scrollBy = 0;
+						AddPoseToList(fFilteredPoseList, true, true, pose,
+							bounds, scrollBy, true);
+					} else if (visible && !FilterPose(pose))
+						RemoveFilteredPose(pose, index);
+					else
+						_CheckPoseSortOrder(fFilteredPoseList, pose, index);
 				}
 			}
 		} else {
@@ -5404,10 +5480,87 @@ BPoseView::EntryMoved(const BMessage* message)
 		if (pose)
 			pendingNodeMonitorCache.PoseCreatedOrMoved(this, pose);
 	} else if (oldDir == thisDirNode.node)
-		return DeletePose(&itemNode);
+		DeletePose(&itemNode);
 	else if (dirNode.node == thisDirNode.node)
 		EntryCreated(&dirNode, &itemNode, name);
+
+	TryUpdatingBrokenLinks();
 	return true;
+}
+
+
+void
+BPoseView::WatchParentOf(const entry_ref *ref)
+{
+	BPath currentDir(ref);
+	currentDir.GetParent(&currentDir);
+	BSymLink symlink(ref);
+	BPath path;
+
+	symlink.MakeLinkedPath(currentDir.Path(), &path);	
+	status_t status = path.GetParent(&path);
+
+	while (status == B_BAD_VALUE)
+		status = path.GetParent(&path);
+
+	if (status == B_ENTRY_NOT_FOUND)
+		return;
+
+	node_ref nref;
+	BNode(path.Path()).GetNodeRef(&nref);
+
+	if (nref != *TargetModel()->NodeRef())
+		watch_node(&nref, B_WATCH_DIRECTORY, this);
+}
+
+
+void
+BPoseView::StopWatchingParentsOf(const entry_ref* ref)
+{
+	BPath path;
+	BSymLink symlink(ref);
+	BPath currentDir(ref);
+	currentDir.GetParent(&currentDir);
+	symlink.MakeLinkedPath(currentDir.Path(), &path);
+
+	if (path.InitCheck() != B_OK)
+		return;
+
+	BObjectList<Model> *brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
+	int32 count = brokenLinksCopy->CountItems();
+
+	while (path.GetParent(&path) == B_OK) {
+		if (strcmp(path.Path(), "/") == 0)
+			break;
+
+		BNode dir(path.Path());
+		node_ref dirNode;
+		dir.GetNodeRef(&dirNode);
+
+		// don't stop watching yourself.
+		if (dirNode == *TargetModel()->NodeRef())
+			continue;
+
+		// make sure we don't have another broken links that still requires
+		// to watch this directory
+		bool keep = false;
+		for (int32 i = count - 1; i >= 0; i--) {
+			BSymLink link(brokenLinksCopy->ItemAt(i)->EntryRef());
+			BPath absolutePath;
+			link.MakeLinkedPath(currentDir.Path(), &absolutePath);
+			if (BString(absolutePath.Path()).Compare(path.Path(),
+					strlen(path.Path())) == 0) {
+				// a broken link still needs to watch this folder, but	
+				// don't let that same link also watch a deeper parent.
+				brokenLinksCopy->RemoveItemAt(i);
+				count--;
+				keep = true;
+			}
+		}
+		if (!keep)
+			watch_node(&dirNode, B_STOP_WATCHING, this);
+	}
+	delete brokenLinksCopy;
 }
 
 
@@ -5436,18 +5589,12 @@ BPoseView::AttributeChanged(const BMessage* message)
 	}
 
 	int32 index;
-	BPose* pose = fPoseList->DeepFindPose(&itemNode, &index);
 	attr_info info;
-	memset(&info, 0, sizeof(attr_info));
-	if (pose) {
-		int32 poseListIndex = index;
-		bool visible = true;
-		if (fFiltering)
-			visible = fFilteredPoseList->DeepFindPose(&itemNode, &index) != NULL;
-
-		BPoint loc(0, index * fListElemHeight);
-
-		Model* model = pose->TargetModel();
+	PoseList *posesFound = fPoseList->FindAllPoses(&itemNode);
+	int32 posesCount = posesFound->CountItems();
+	for (int i = 0; i < posesCount; i++) {
+		BPose *pose = posesFound->ItemAt(i);
+		Model *model = pose->TargetModel();
 		if (model->IsSymLink() && *model->NodeRef() != itemNode)
 			// change happened on symlink's target
 			model = model->ResolveIfLink();
@@ -5464,29 +5611,48 @@ BPoseView::AttributeChanged(const BMessage* message)
 			PRINT(("model %s busy, retrying in a bit\n", model->Name()));
 			snooze(10000);
 		}
-
-		if (result == B_OK) {
-			if (attrName && model->Node()) {
-					// the call below might fail if the attribute has been removed
-				model->Node()->GetAttrInfo(attrName, &info);
-				pose->UpdateWidgetAndModel(model, attrName, info.type, index,
-					loc, this, visible);
-			} else {
-				pose->UpdateWidgetAndModel(model, 0, 0, index, loc, this,
-					visible);
-			}
-
-			model->CloseNode();
-		} else {
+		if (result != B_OK) {
 			PRINT(("Cache Error %s\n", strerror(result)));
-			return false;
+			continue;
+		}
+
+		bool visible = fPoseList->FindPose(pose->TargetModel()->NodeRef(),
+				&index) != NULL;
+		int32 poseListIndex = index;
+
+		if (fFiltering)
+			visible = fFilteredPoseList->FindPose(pose->TargetModel()
+					->NodeRef(), &index) != NULL;
+
+		BPoint loc(0, index * fListElemHeight);
+		if (attrName && model->Node() != NULL) {
+			memset(&info, 0, sizeof(attr_info));
+			// the call below might fail if the attribute has been removed
+			model->Node()->GetAttrInfo(attrName, &info);
+			pose->UpdateWidgetAndModel(model, attrName, info.type, index,
+				loc, this, visible);
+			if (strcmp(attrName, kAttrMIMEType) == 0)
+				RefreshMimeTypeList();
+		} else {
+			pose->UpdateWidgetAndModel(model, 0, 0, index, loc, this,
+				visible);
+		}
+		model->CloseNode();
+		if (fFiltering) {
+			if (!visible && FilterPose(pose)) {
+				visible = true;
+				float scrollBy = 0;
+				BRect bounds = Bounds();
+				AddPoseToList(fFilteredPoseList, true, true, pose, bounds,
+					scrollBy, true);
+				continue;
+			} else if (visible && !FilterPose(pose)) {
+				RemoveFilteredPose(pose, index);
+				continue;
+			}
 		}
 
 		if (attrName) {
-			// rebuild the MIME type list, if the MIME type has changed
-			if (strcmp(attrName, kAttrMIMEType) == 0)
-				RefreshMimeTypeList();
-
 			// note: the following code is wrong, because this sort of hashing
 			// may overlap and we get aliasing
 			uint32 attrHash = AttrHashString(attrName, info.type);
@@ -5498,7 +5664,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 		} else {
 			int32 fields;
 			if (message->FindInt32("fields", &fields) != B_OK)
-				return true;
+				continue;
 
 			for (int i = sizeof(sAttrColumnMap) / sizeof(attr_column_relation);
 				i--;) {
@@ -5508,12 +5674,14 @@ BPoseView::AttributeChanged(const BMessage* message)
 						_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
 						if (fFiltering && visible)
 							_CheckPoseSortOrder(fFilteredPoseList, pose, index);
-						return true;
+						break;
 					}
 				}
 			}
 		}
-	} else {
+	}
+	delete posesFound;
+	if (posesCount == 0) {
 		// we received an attr changed notification for a zombie model, it means
 		// that although we couldn't open the node the first time, it seems
 		// to be fine now since we're receiving notifications about it, it might
@@ -7552,8 +7720,13 @@ BPoseView::DeleteSymLinkPoseTarget(const node_ref* itemNode, BPose* pose,
 {
 	ASSERT(pose->TargetModel()->IsSymLink());
 	watch_node(itemNode, B_STOP_WATCHING, this);
+
+	// watch the parent of the symlink, so that we know when the symlink
+	// can be considered fixed.
+	WatchParentOf(pose->TargetModel()->EntryRef());
+
 	BPoint loc(0, index * fListElemHeight);
-	pose->TargetModel()->SetLinkTo(0);
+	pose->TargetModel()->SetLinkTo(NULL);
 	pose->UpdateBrokenSymLink(loc, this);
 }
 
@@ -7568,8 +7741,10 @@ BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 
 	if (pose) {
 		fInsertedNodes.erase(fInsertedNodes.find(*itemNode));
-		if (TargetModel()->IsSymLink()) {
-			Model* target = pose->TargetModel()->LinkTo();
+		if (pose->TargetModel()->IsSymLink()) {
+			fBrokenLinks->RemoveItem(pose->TargetModel());
+			StopWatchingParentsOf(pose->TargetModel()->EntryRef());
+			Model *target = pose->TargetModel()->LinkTo();
 			if (target)
 				watch_node(target->NodeRef(), B_STOP_WATCHING, this);
 		}
@@ -7862,6 +8037,7 @@ BPoseView::ClearPoses()
 	fSelectionPivotPose = NULL;
 	fRealPivotPose = NULL;
 	fMimeTypesInSelectionCache.MakeEmpty();
+	fBrokenLinks->MakeEmpty();
 
 	DisableScrollBars();
 	ScrollTo(BPoint(0, 0));
@@ -8005,6 +8181,11 @@ BPoseView::Refresh()
 	// properly for proper icon caching!
 	AddPoses(TargetModel());
 	TargetModel()->CloseNode();
+
+	if (fRefFilter != NULL) {
+		fFiltering = false;
+		StartFiltering();
+	}
 
 	Invalidate();
 	ResetOrigin();
@@ -9776,14 +9957,16 @@ BPoseView::FilterChanged()
 	int32 stringCount = fFilterStrings.CountItems();
 	int32 length = fFilterStrings.LastItem()->CountChars();
 
-	if (!fFiltering && length > 0)
+	if (!fFiltering && (length > 0 || fRefFilter != NULL))
 		StartFiltering();
-	else if (fFiltering && stringCount == 1 && length == 0)
+	else if (fFiltering && stringCount == 1 && length == 0
+		&& fRefFilter == NULL)
 		ClearFilter();
 	else {
 		if (fLastFilterStringCount > stringCount
 			|| (fLastFilterStringCount == stringCount
-				&& fLastFilterStringLength > length)) {
+				&& fLastFilterStringLength > length)
+			|| fRefFilter != NULL) {
 			// something was removed, need to start over
 			fFilteredPoseList->MakeEmpty();
 			fFiltering = false;
@@ -9829,6 +10012,14 @@ BPoseView::FilterPose(BPose* pose)
 	if (!fFiltering || pose == NULL)
 		return false;
 
+	if (fRefFilter != NULL) {
+		PoseInfo poseInfo;
+		ReadPoseInfo(pose->TargetModel(), &poseInfo);
+		pose->TargetModel()->OpenNode();
+		if (!ShouldShowPose(pose->TargetModel(), &poseInfo))
+			return false;
+	}
+
 	int32 stringCount = fFilterStrings.CountItems();
 	int32 matchesLeft = stringCount;
 
@@ -9858,7 +10049,6 @@ BPoseView::FilterPose(BPose* pose)
 			}
 		}
 	}
-
 	return false;
 }
 

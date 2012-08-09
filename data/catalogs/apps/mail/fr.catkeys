@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	1896251069
+1	french	x-vnd.Be-MAIL	1925197549
 View	Mail		Vue
 %d - Date	Mail		%d - Date
 Attach attributes:	Mail		Attributs du fichier joint :
@@ -15,14 +15,15 @@ helpful message	Mail		message utile
 Colored quotes:	Mail		Citations en couleurs :
 Subject:	Mail		Objet :
 Reply to all	Mail		Répondre à tous
-Show icons & labels	Mail		Montrer les icônes et les textes
-Remove attachment	Mail		Retirer le fichier joint
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Pièce jointe : %name% (Type : %type%)
+Show icons & labels	Mail		Afficher les icônes et les étiquettes
+Remove attachment	Mail		Retirer la pièce jointe
 Button bar:	Mail		Barre d'icônes :
 spam	B_USER_DIRECTORY/mail/spam		spam
 Beginner	Mail		Débutant
 Don't save	Mail		Ne pas enregistrer
 Expert	Mail		Expert
-Reply account:	Mail		Compte pour la réponse :
+Reply account:	Mail		Compte de réponse :
 Discard	Mail		Ignorer
 Message	Mail		Message
 Reply to sender	Mail		Répondre à l'expéditeur
@@ -40,7 +41,7 @@ Preferences…	Mail		Préférences…
 Undo	Mail		Annuler
 Date:	Mail		Date :
 An error occurred trying to open this signature.	Mail		Une erreur est survenue en essayant d'ouvrir la signature.
-No file attributes, just plain data	Mail		Pas d'attributs, seulement des donnés
+No file attributes, just plain data	Mail		Pas d'attributs, seulement des donnés brutes
 Edit queries…	Mail		Modifier les requêtes…
 queries	B_USER_DIRECTORY/mail/queries		requêtes
 Paste	Mail		Coller
@@ -86,7 +87,7 @@ Page setup…	Mail		Mise en page…
 Text wrapping:	Mail		Renvoi à la ligne :
 Revert	Mail		Défaire
 File	Mail		Fichier
-mail	B_USER_DIRECTORY/mail		mail
+mail	B_USER_DIRECTORY/mail		courrier
 None	Mail		Aucun
 (Name unavailable)	Mail		(Nom non disponible)
 Copy link location	Mail		Copier l'adresse du lien

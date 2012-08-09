@@ -22,7 +22,7 @@
 #include <TabView.h>
 #include <TextControl.h>
 #include <TimeSource.h>
-#include <TranslationKit.h>
+#include <TranslationUtils.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "CodyCam"
@@ -66,57 +66,6 @@ ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 	alert->Go();
 
 	printf("%s\n%s [%lx]", message, strerror(err), err);
-}
-
-
-status_t
-AddTranslationItems(BMenu* intoMenu, uint32 fromType)
-{
-
-	BTranslatorRoster* use;
-	char* translatorTypeName;
-	const char* translatorIdName;
-
-	use = BTranslatorRoster::Default();
-	translatorIdName = "be:translator";
-	translatorTypeName = (char *)"be:type";
-	translator_id* ids = NULL;
-	int32 count = 0;
-
-	status_t err = use->GetAllTranslators(&ids, &count);
-	if (err < B_OK)
-		return err;
-
-	for (int tix = 0; tix < count; tix++) {
-		const translation_format* formats = NULL;
-		int32 num_formats = 0;
-		bool ok = false;
-		err = use->GetInputFormats(ids[tix], &formats, &num_formats);
-		if (err == B_OK)
-			for (int iix = 0; iix < num_formats; iix++) {
-				if (formats[iix].type == fromType) {
-					ok = true;
-					break;
-				}
-			}
-
-		if (!ok)
-			continue;
-
-		err = use->GetOutputFormats(ids[tix], &formats, &num_formats);
-		if (err == B_OK)
-			for (int oix = 0; oix < num_formats; oix++) {
- 				if (formats[oix].type != fromType) {
-					BMessage* itemmsg;
-					itemmsg = new BMessage(msg_translate);
-					itemmsg->AddInt32(translatorIdName, ids[tix]);
-					itemmsg->AddInt32(translatorTypeName, formats[oix].type);
-					intoMenu->AddItem(new BMenuItem(formats[oix].name, itemmsg));
-				}
-			}
-	}
-	delete[] ids;
-	return B_OK;
 }
 
 
@@ -684,7 +633,7 @@ VideoWindow::_BuildCaptureControls()
 
 	// format menu
 	fImageFormatMenu = new BPopUpMenu(B_TRANSLATE("Image Format Menu"));
-	AddTranslationItems(fImageFormatMenu, B_TRANSLATOR_BITMAP);
+	BTranslationUtils::AddTranslationItems(fImageFormatMenu, B_TRANSLATOR_BITMAP);
 	fImageFormatMenu->SetTargetForItems(this);
 
 	if (fImageFormatSettings->Value()

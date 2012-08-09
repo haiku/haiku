@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	1054657081
+1	english	x-vnd.Haiku-Terminal	1294209621
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
@@ -42,6 +42,7 @@ Green on Black	Terminal colors schema		黑底绿字
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭该标签，该进程将被杀死。
 Size:	Terminal AppearancePrefView		大小：
 Cannot execute \"%command\":\n\t%error	Terminal Shell		无法运行\"%command\":\n\t%错误
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help 打印帮助内容\n-t, --title 设置窗口标题\n-f, --fullscreen 全屏启动\n
 Full screen	Terminal TermWindow		全屏
 Window title…	Terminal TermWindow		窗口标题...
 Page setup…	Terminal TermWindow		页面设置...  

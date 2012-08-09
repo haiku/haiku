@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-mixer.media_addon	714120498
+1	english	x-vnd.Haiku-mixer.media_addon	3116938264
 Input gain controls represent	AudioMixer		输入增益控制表示
 Linear interpolation	AudioMixer		线性插补
 Virtual output channels	AudioMixer		虚拟输出通道
@@ -8,6 +8,7 @@ Allow input channel remapping	AudioMixer		启用输入频道重映射
 Resampling algorithm	AudioMixer		重采样算法
 Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		将输出音量衰减 3dB (类似 BeOS R5)
 Display balance control for stereo connections	AudioMixer		为立体声系统显示均衡控制器
+To output	AudioMixer		输出
 not connected	AudioMixer		未连接
 Refuse input format changes	AudioMixer		禁止输入格式改变
 Drop/repeat samples	AudioMixer		拽入/重复采样

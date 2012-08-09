@@ -1,7 +1,7 @@
 1	slovak	x-vnd.Haiku-VirtualMemory	688347876
 Turn off	SettingsWindow		Vypnúť
 GB	SettingsWindow		GB
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Vypnutie virtuálnej pamäte bude mať nežiadúce účinky na stabilitu systému v prípade vyčerpania pamäte.\nVirtuálna pamäť nemá vplyv na výkon systému pred dosiahnutím tohto stavu.\n\nSte si naozaj istý, že ju chcete vypnúť?
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Vypnutie virtuálnej pamäte bude mať nežiadúce účinky na stabilitu systému v prípade vyčerpania pamäte.\nVirtuálna pamäť nemá vplyv na výkon systému pred dosiahnutím tohto stavu.\n\nSte si naozaj istí, že ju chcete vypnúť?
 Requested swap file size:	SettingsWindow		Požadovaná veľkosť odkladacieho súboru:
 Physical memory: 	SettingsWindow		Fyzická pamäť: 
 Changes will take effect on restart!	SettingsWindow		Zmeny sa prejavia po reštarte!

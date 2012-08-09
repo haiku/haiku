@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-FileTypes	473999706
+1	belarusian	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		Тыпы праграм…
 Description:	Application Types Window		Апісанне:
 Args only	Application Type Window		Толькі аргументы
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Тып:
 Removing uninstalled application types	Application Types Window		Выдаленне тыпаў знішчаных праграм
 Done	Attribute Window		Зроблена
-Set Preferred Application	Preferred App Menu		Прызначыць Пажаданую Праграму
 no icon	FileTypes Window		няма іконкі
 Alpha	Application Types Window		Альфа
 Version	Application Types Window		Версія

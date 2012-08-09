@@ -14,7 +14,9 @@
 
 #include "accelerant_protos.h"
 #include "accelerant.h"
+#include "atom.h"
 #include "bios.h"
+#include "pll.h"
 #include "utility.h"
 
 
@@ -28,6 +30,62 @@
 #endif
 
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
+
+
+status_t
+radeon_gpu_probe()
+{
+	uint8 tableMajor;
+	uint8 tableMinor;
+	uint16 tableOffset;
+
+	gInfo->displayClockFrequency = 0;
+	gInfo->dpExternalClock = 0;
+
+	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
+	if (atom_parse_data_header(gAtomContext, index, NULL,
+		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
+		ERROR("%s: Couldn't parse data header\n", __func__);
+		return B_ERROR;
+	}
+
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
+
+	union atomFirmwareInfo {
+		ATOM_FIRMWARE_INFO info;
+		ATOM_FIRMWARE_INFO_V1_2 info_12;
+		ATOM_FIRMWARE_INFO_V1_3 info_13;
+		ATOM_FIRMWARE_INFO_V1_4 info_14;
+		ATOM_FIRMWARE_INFO_V2_1 info_21;
+		ATOM_FIRMWARE_INFO_V2_2 info_22;
+	};
+	union atomFirmwareInfo* firmwareInfo
+		= (union atomFirmwareInfo*)(gAtomContext->bios + tableOffset);
+
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.dceMajor >= 4) {
+		gInfo->displayClockFrequency = B_LENDIAN_TO_HOST_INT32(
+			firmwareInfo->info_21.ulDefaultDispEngineClkFreq);
+		if (gInfo->displayClockFrequency == 0) {
+			if (info.dceMajor >= 5)
+				gInfo->displayClockFrequency = 54000;
+			else
+				gInfo->displayClockFrequency = 60000;
+		}
+		gInfo->dpExternalClock = B_LENDIAN_TO_HOST_INT16(
+			firmwareInfo->info_21.usUniphyDPModeExtClkFreq);
+	}
+
+	gInfo->maximumPixelClock = B_LENDIAN_TO_HOST_INT16(
+		firmwareInfo->info.usMaxPixelClock);
+
+	if (gInfo->maximumPixelClock == 0)
+		gInfo->maximumPixelClock = 40000;
+
+	return B_OK;
+}
 
 
 status_t
@@ -658,7 +716,7 @@ radeon_gpu_ring_boot(uint32 ringType)
 
 
 status_t
-radeon_gpu_ss_disable()
+radeon_gpu_ss_control(pll_info* pll, bool enable)
 {
 	TRACE("%s called\n", __func__);
 
@@ -666,25 +724,52 @@ radeon_gpu_ss_disable()
 	uint32 ssControl;
 
 	if (info.chipsetID >= RADEON_CEDAR) {
-		// PLL1
-		ssControl = Read32(OUT, EVERGREEN_P1PLL_SS_CNTL);
-		ssControl &= ~EVERGREEN_PxPLL_SS_EN;
-		Write32(OUT, EVERGREEN_P1PLL_SS_CNTL, ssControl);
-		// PLL2
-		ssControl = Read32(OUT, EVERGREEN_P2PLL_SS_CNTL);
-		ssControl &= ~EVERGREEN_PxPLL_SS_EN;
-		Write32(OUT, EVERGREEN_P2PLL_SS_CNTL, ssControl);
+		switch (pll->id) {
+			case ATOM_PPLL1:
+				// PLL1
+				ssControl = Read32(OUT, EVERGREEN_P1PLL_SS_CNTL);
+				if (enable)
+					ssControl |= EVERGREEN_PxPLL_SS_EN;
+				else
+					ssControl &= ~EVERGREEN_PxPLL_SS_EN;
+				Write32(OUT, EVERGREEN_P1PLL_SS_CNTL, ssControl);
+				break;
+			case ATOM_PPLL2:
+				// PLL2
+				ssControl = Read32(OUT, EVERGREEN_P2PLL_SS_CNTL);
+				if (enable)
+					ssControl |= EVERGREEN_PxPLL_SS_EN;
+				else
+					ssControl &= ~EVERGREEN_PxPLL_SS_EN;
+				Write32(OUT, EVERGREEN_P2PLL_SS_CNTL, ssControl);
+				break;
+		}
+		// DCPLL, no action
+		return B_OK;
 	} else if (info.chipsetID >= RADEON_RS600) {
-		// PLL1
-		ssControl = Read32(OUT, AVIVO_P1PLL_INT_SS_CNTL);
-		ssControl &= ~1;
-		Write32(OUT, AVIVO_P1PLL_INT_SS_CNTL, ssControl);
-		// PLL2
-		ssControl = Read32(OUT, AVIVO_P2PLL_INT_SS_CNTL);
-		ssControl &= ~1;
-		Write32(OUT, AVIVO_P2PLL_INT_SS_CNTL, ssControl);
-	} else
-		return B_ERROR;
+		switch (pll->id) {
+			case ATOM_PPLL1:
+				// PLL1
+				ssControl = Read32(OUT, AVIVO_P1PLL_INT_SS_CNTL);
+				if (enable)
+					ssControl |= 1;
+				else
+					ssControl &= ~1;
+				Write32(OUT, AVIVO_P1PLL_INT_SS_CNTL, ssControl);
+				break;
+			case ATOM_PPLL2:
+				// PLL2
+				ssControl = Read32(OUT, AVIVO_P2PLL_INT_SS_CNTL);
+				if (enable)
+					ssControl |= 1;
+				else
+					ssControl &= ~1;
+				Write32(OUT, AVIVO_P2PLL_INT_SS_CNTL, ssControl);
+				break;
+		}
+		// DCPLL, no action
+		return B_OK;
+	}
 
-	return B_OK;
+	return B_ERROR;
 }

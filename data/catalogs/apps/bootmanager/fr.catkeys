@@ -53,7 +53,7 @@ Error reading partition table	BootManagerController	Title	Erreur de lecture de l
 Installation of boot menu failed	BootManagerController	Title	Echec de l'installation du menu de démarrage
 Backup Master Boot Record	BootManagerController	Title	Sauvegarde du MBR
 Quit	DrivesPage	Button	Quitter
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		L'ancien MBR a été correctement sauvegardé dans le fichier %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Partition par défaut :
 Partitions	DefaultPartitionPage	Pop up menu title	Partitions

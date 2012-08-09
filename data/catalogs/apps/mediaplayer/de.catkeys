@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	2389197979
+1	german	x-vnd.Haiku-MediaPlayer	4127722853
 raw audio	MediaPlayer-InfoWin		Raw-Audio
 Location	MediaPlayer-InfoWin		Ort
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
@@ -58,7 +58,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Fragt die URI des 
 400% scale	MediaPlayer-Main		400% Zoom
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen:\n\nFehler:
 Move Entries	MediaPlayer-MovePLItemsCmd		Einträge verschieben
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fehler beim Verschieben in den Papierkorb
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Playliste öffnen
 MediaPlayer	System name		Media-Player

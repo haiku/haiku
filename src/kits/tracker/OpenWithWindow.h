@@ -252,8 +252,6 @@ class OpenWithPoseView : public BPoseView {
 			// override to add selecting the default handling app
 			// for selection
 
-		virtual bool ShouldShowPose(const Model*, const PoseInfo*);
-
 		virtual void Pulse();
 
 		virtual void KeyDown(const char* bytes, int32 count);
@@ -266,6 +264,21 @@ class OpenWithPoseView : public BPoseView {
 			// private copy of the iterator pointer
 
 		typedef BPoseView _inherited;
+};
+
+
+class OpenWithRefFilter: public BRefFilter
+{
+	public:
+		OpenWithRefFilter(SearchForSignatureEntryList*, const BMessage*,
+			entry_ref*);
+		bool Filter(const entry_ref* ref, BNode* node, stat_beos* st,
+			const char* filetype);
+
+	private:
+		SearchForSignatureEntryList* fIterator;
+		const BMessage *fEntryList;
+		entry_ref* fPreferredRef;
 };
 
 

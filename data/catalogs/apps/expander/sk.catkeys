@@ -21,7 +21,7 @@ The destination folder does not exist.	ExpanderWindow		Cieľový priečinok neex
 Other	ExpanderPreferences		Ďalšie
 Cancel	ExpanderPreferences		Zrušiť
 Expansion	ExpanderPreferences		Rozpínanie
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ste si istý, že chcete zastaviť rozbaľovanie tohto archívu?\nRozbalené položky nemusia byť úplné.
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ste si istí, že chcete zastaviť rozbaľovanie tohto archívu?\nRozbalené položky nemusia byť úplné.
 Select	DirectoryFilePanel		Vybrať
 Same directory as source (archive) file	ExpanderPreferences		Rovnaký ako zdrojový (archívny) súbor
 Expanding '%s'	ExpanderWindow		Rozbaľuje sa „%s“

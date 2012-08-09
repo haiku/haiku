@@ -897,7 +897,7 @@ InstallerWindow::_QuitCopyEngine(bool askUser)
 			B_TRANSLATE_COMMENT("Stop", "In alert after pressing Stop"), 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetShortcut(1, B_ESCAPE);
-		quit = alert->Go();
+		quit = alert->Go() != 0;
 	}
 
 	if (quit) {

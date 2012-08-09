@@ -1,10 +1,11 @@
-1	french	x-vnd.Be-POST	1721236869
+1	french	x-vnd.Be-POST	677638342
 Fetching mail for %name	Notifier		Récupération des mails de %name
 Check for mails only	DeskbarView		Vérifier seulement les courriels
 Send pending mails	DeskbarView		Envoyer les courriels en attente
 New Messages	MailDaemon		Nouveaux Messages
 <no accounts>	DeskbarView		<aucun compte>
 %num new messages	DeskbarView		%num nouveaux messages
+Mail status	MailDaemon		État du courrier
 Shutdown mail services	DeskbarView		Arrêter les services de messagerie
 %num new message	DeskbarView		%num nouveau message
 Sending mail for %name	Notifier		Envoi des mails de %name

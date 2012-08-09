@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-MediaPlayer	3764443013
+1	hindi	x-vnd.Haiku-MediaPlayer	1208000591
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1(अमेरिकी)
 Stream settings	MediaPlayer-Main		स्ट्रीम सेटिंग्स
 <unknown>	PlaylistItem-album		<अज्ञात>
@@ -45,7 +45,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		अभी चल�
 400% scale	MediaPlayer-Main		चार सौ प्रतिशत स्केल
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		प्लेलिस्ट को सहेजना विफल:\n\nत्रुटि:
 Move Entries	MediaPlayer-MovePLItemsCmd		प्रविष्टियां ले जाएँ 
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		कचरा त्रुटि में ले जाएँ
 Audio	MediaPlayer-Main		ऑडियो
 Open Playlist	MediaPlayer-PlaylistWindow		ओपन प्लेलिस्ट
 MediaPlayer	System name		मीडियाप्लेयर  

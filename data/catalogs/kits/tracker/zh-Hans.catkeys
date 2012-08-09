@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1249217006
+1	english	x-vnd.Haiku-libtracker	4242202911
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -15,10 +15,13 @@ Decrease size	ContainerWindow		缩小尺寸
 Mini icon view	VolumeWindow		迷你图标
 You must have at least one attribute showing.	PoseView		您必须至少显示一个属性。
 Permissions	InfoWindow		权限
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		反向选择
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		最近文本
 Modified	QueryPoseView		修改
 Created	ContainerWindow		创建
+Error %error loading add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
 contains	SelectionWindow		包含
 Sorry, you can't save things at the root of your system.	FilePanelPriv		对不起，您不能够在系统根目录保存内容。
 Show shared volumes on Desktop	SettingsView		在桌面显示共享卷。
@@ -94,6 +97,7 @@ Add-ons	VolumeWindow		附加组件
 Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
 List view	VolumeWindow		列表视图
 matches wildcard expression	SelectionWindow		匹配通配符表达式
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	重命名
 You cannot replace a folder or a symbolic link with a file.	FSUtils		您不能够使用文件夹或符号链接替代文件。
 Show space bars on volumes	SettingsView		显示卷进度栏
 Invert selection	ContainerWindow		反向选择
@@ -300,6 +304,7 @@ The Tracker must be running to see Info windows.	PoseView		文件浏览器必须
 Other	FilePermissionsView		其它
 Query name:	FindPanel		查询名称：
 Permissions	ContainerWindow		权限
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		移动中
 Identify	InfoWindow		标识
 Recent folders	ContainerWindow		最近目录

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-FileTypes	473999706
+1	romanian	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		Tipuri de aplicații...
 Description:	Application Types Window		Descriere:
 Args only	Application Type Window		Doar arg
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Tip:
 Removing uninstalled application types	Application Types Window		Se elimină tipurile de aplicații dezinstalate
 Done	Attribute Window		Gata
-Set Preferred Application	Preferred App Menu		Configurează aplicație preferată
 no icon	FileTypes Window		fără pictogramă
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Versiune

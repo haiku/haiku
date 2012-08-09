@@ -1,6 +1,6 @@
-1	slovak	x-vnd.Haiku-Installer	2099988747
+1	slovak	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Za ďalšie položky menu blízko konca súboru pridajte niečo podobné týmto riadkom:\n\n
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ste si istý, že chcete zrušiť inštaláciu a reštartovať systém?
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ste si istí, že chcete zrušiť inštaláciu a reštartovať systém?
 \t}\n\n	InstallerApp		\t}\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Inštalátor\n\tnapísal Jérôme Duval a Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Novšie verzie GRUB používajú ďalší konfiguračný súbor na pridanie ďalších položiek do menu zavádzača. Ak ich chcete pridať na vrch, musíte vytvoriť alebo upraviť súbor spustením vášho obľúbeného textového editora z Terminálu takto:\n\n
@@ -12,10 +12,11 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		Pre GRUB je to: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Zastaviť
 Install progress:  	InstallerWindow		Priebeh inštalácie:  
+2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Začína inštalácia.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Toto je softvér v alfa kvalite! Znamená to, že existuje riziko straty dôležitých dát. Robte časté zálohy! Boli ste upozornený.\n\n\n
-Are you sure you want to abort the installation?	InstallerWindow		Ste si istý, že chcete prerušiť inštaláciu?
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ste si istý, že chcete vykonať inštaláciu na disk, z ktorého sa v súčasnosti zavádza systém? Ak budete pokračovať Inštalátor bude musieť reštartovať počítač.
+Are you sure you want to abort the installation?	InstallerWindow		Ste si istí, že chcete prerušiť inštaláciu?
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ste si istí, že chcete vykonať inštaláciu na disk, z ktorého sa v súčasnosti zavádza systém? Ak budete pokračovať Inštalátor bude musieť reštartovať počítač.
 Quit Boot Manager	InstallerWindow		Ukončiť Správcu zavádzania
 Stop	InstallerWindow		Zastaviť
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
@@ -37,6 +38,7 @@ Boot sector successfully written.	InstallProgress		Zavádzací sektor úspešne 
 Performing installation.	InstallProgress		Prebieha inštalácia.
 scanning…	InstallerWindow		zisťuje sa…
 Set up boot menu	InstallerWindow		Nastaviť zavádzacie menu
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (od os-prober v1.44)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Prvá logická oblasť má vždy číslo „4“ bez ohľadu na počet primárnych oblastí.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Schéma názvov pre GRUB je stále: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <váš obľúbený textový editor> /boot/grub/menu.lst\n\n
@@ -48,6 +50,7 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Cieľový disk nemusí mať dostatok miesta. Skúste zvoliť iný disk alebo zvoľte neinštalovať voliteľné položky.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prosím, zatvorte okná Správcu zavádzania a Nastavenie diskových oblastí predtým, než zatvoríte okno Inštalátora.
 Scanning for disks…	InstallerWindow		Zisťujú sa disky…
+2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk nie je možné pripojiť. Prosím, zvoľte iný disk.
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -67,6 +70,7 @@ Installer	System name		Inštalátor
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nemôžete inštalovať obsah disku na rovnaký disk. Prosím, zvoľte iný disk.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		„n“ je číslo oblasti, ktoré pre GRUB 2 začína „1“.\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Počínajúc os-prober v1.44 (napr. v Ubuntu 11.04 alebo novšom), Haiku by malo byť rozpoznané bez nutnosti akejkoľvek konfigurácie. Ak chcete pridať Haiku do menu GRUB, otvorte Terminál a zadajte:\n\n
 Quit DriveSetup	InstallerWindow		Ukončiť Nastavenie diskových oblastí
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		„N“ je číslo pevného disku, začína „0“.\n
 Hide optional packages	InstallerWindow		Skryť voliteľné balíky
@@ -106,12 +110,13 @@ Cancel	InstallProgress		Zrušiť
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Spúšťa sa Správca zavádzania a Nastavenie diskových oblastí…\n\nInštalácia bude pokračovať, keď zatvoríte obe aplikácie.
 Try installing anyway	InstallProgress		Skúsiť inštalovať napriek tomu
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Takže pod nadpisom, ktorý nesmiete upravovať, pridajte niečo podobné týmto riadkom:\n\n
-Are you sure you want to to stop the installation?	InstallerWindow		Ste si istý, že chcete zastaviť inštaláciu?
+Are you sure you want to to stop the installation?	InstallerWindow		Ste si istí, že chcete zastaviť inštaláciu?
 Onto:	InstallerWindow		Na:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Správcu zavádzania predtým, než zatvoríte okno Inštalátora.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Keď prvýkrát úspešne naštartujete Haiku, uistite sa, že si prečítate našu dokumentáciu „Vitajte“ a „Používateľská príručka“. Nájdete ich v záložkách na Ploche a vo WebPositive.\n\n
 Tools	InstallerWindow		Nástroje
 The mount point could not be retrieved.	InstallProgress		Nie je možné ziskať prípojný bod.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Cieľový zväzok nie je prázdny. Ste si istý, že chcete inštalovať napriek tomu?\n\nPozn.: Priečinok „system“ bude čistou kópiou zo zdrojového zväzku, všetky ďalšie priečinky budú zlúčené, pričom súbory a odkazy, ktoré existujú zároveň na zdrojovom aj cieľovom zväzku budú prepísané verziou zo zdrojového zväzku.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Cieľový zväzok nie je prázdny. Ste si istí, že chcete inštalovať napriek tomu?\n\nPozn.: Priečinok „system“ bude čistou kópiou zo zdrojového zväzku, všetky ďalšie priečinky budú zlúčené, pričom súbory a odkazy, ktoré existujú zároveň na zdrojovom aj cieľovom zväzku budú prepísané verziou zo zdrojového zväzku.
 You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Správnu oblasť si môžete pozrieť napr. v GParted.\n\n\n
 \ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\t sudo <váš obľúbený textový editor> /etc/grub.d/40_custom\n\n

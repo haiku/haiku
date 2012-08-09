@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1682337076
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	3420861950
 raw audio	MediaPlayer-InfoWin		ruwe audio
 Location	MediaPlayer-InfoWin		Locatie
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
@@ -57,7 +57,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Haalt de URI op va
 400% scale	MediaPlayer-Main		400% schaal
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Opslaan afspeellijst is mislukt:\n\nFout:
 Move Entries	MediaPlayer-MovePLItemsCmd		Onderdelen verplaatsen
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fout bij het verplaatsen naar Trash
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Afspeellijst openen
 MediaPlayer	System name		Mediaspeler

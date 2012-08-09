@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-FileTypes	473999706
+1	slovak	x-vnd.Haiku-FileTypes	2496450458
 Application types…	FileTypes Window		Typy aplikácií…
 Description:	Application Types Window		Popis:
 Args only	Application Type Window		Iba argumenty
@@ -29,7 +29,7 @@ Add	Extension Window		Pridať
 Select same preferred application as	FileType Window		Vybrať rovnakú preferovanú aplikáciu ako
 Cancel	Attribute Window		Zrušiť
 Icon	Application Type Window		Ikona
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Odstránenie typu súboru nemožno vrátiť.\nSte si istý, že ho chcete odstrániť?
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Odstránenie typu súboru nemožno vrátiť.\nSte si istí, že ho chcete odstrániť?
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Upravovateľné
 Multiple launch	Application Type Window		Viacnásobné spustenie
 (from application)	FileTypes Window		(z aplikácie)
@@ -49,6 +49,7 @@ Name:	Application Types Window		Názov:
 Group name:	New File Type Window		Názov skupiny:
 Preferred application	FileType Window		Preferovaná aplikácia
 Progress	Application Types Window		Priebeh
+Set preferred application	Preferred App Menu		Nastaviť preferovanú aplikáciu
 File	Application Type Window		Súbor
 Version:	Application Type Window		Verzia:
 Select…	FileTypes Window		Vybrať…
@@ -81,11 +82,10 @@ Select preferred application	FileType Window		Vybrať preferovanú aplikáciu
 Single launch	Application Type Window		Jednoduché spustenie
 Golden master	Application Types Window		Hlavný originál
 %s file type	FileType Window		typ súboru %s
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Aplikácia „%s“ nepodporuje tento typ súboru.\nSte si istý, že ju chcete nastaviť napriek tomu?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Aplikácia „%s“ nepodporuje tento typ súboru.\nSte si istí, že ju chcete nastaviť napriek tomu?
 Type:	Attribute Window		Typ:
 Removing uninstalled application types	Application Types Window		Odstraňujú sa typy odinštalovaných aplikácií
 Done	Attribute Window		Hotovo
-Set Preferred Application	Preferred App Menu		Nastaviť preferovanú aplikáciu
 no icon	FileTypes Window		bez ikony
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Verzia
@@ -98,7 +98,7 @@ New resource file…	FileTypes Window		Nový súbor zdrojov…
 Cancel	New File Type Window		Zrušiť
 Icon	FileTypes Window		Ikona
 Extension:	Extension Window		Prípona:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Odstránenie supertypu nemožno vrátiť.\nVšetky typy, ktoré patria tomuto supertypu budú stratené!\n\nSte si istý, že to chcete urobiť? Ak chcete odstrániť celú skupinu, podržte kláves Shift a stlačte „Odstrániť“.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Odstránenie supertypu nemožno vrátiť.\nVšetky typy, ktoré patria tomuto supertypu budú stratené!\n\nSte si istí, že to chcete urobiť? Ak chcete odstrániť celú skupinu, podržte kláves Shift a stlačte „Odstrániť“.
 Internal name:	FileTypes Window		Vnútorný názov:
 Add	Attribute Window		Pridať
 Close	Application Type Window		Zatvoriť

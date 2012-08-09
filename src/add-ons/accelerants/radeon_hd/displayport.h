@@ -22,6 +22,9 @@
 #define DP_TPS3_SUPPORTED (1 << 6) // Stored within MAX_LANE_COUNT
 
 
+uint8 dpcd_reg_read(uint32 hwPin, uint16 address);
+void dpcd_reg_write(uint32 hwPin, uint16 address, uint8 value);
+
 int dp_aux_write(uint32 hwPin, uint16 address, uint8* send,
 	uint8 sendBytes, uint8 delay);
 int dp_aux_read(uint32 hwPin, uint16 address, uint8* recv,
@@ -40,5 +43,6 @@ status_t dp_link_train(uint32 connectorIndex, display_mode* mode);
 status_t dp_link_train_cr(uint32 connectorIndex);
 status_t dp_link_train_ce(uint32 connectorIndex);
 
+void debug_dp_info();
 
 #endif /* RADEON_HD_DISPLAYPORT_H */

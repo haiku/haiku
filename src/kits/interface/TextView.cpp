@@ -4198,7 +4198,11 @@ BTextView::_StyledWidth(int32 fromOffset, int32 length, float* outAscent,
 float
 BTextView::_ActualTabWidth(float location) const
 {
-	return fTabWidth - fmod(location, fTabWidth);
+	float tabWidth = fTabWidth - fmod(location, fTabWidth);
+	if (round(tabWidth) == 0)
+		tabWidth = fTabWidth;
+
+	return tabWidth;
 }
 
 

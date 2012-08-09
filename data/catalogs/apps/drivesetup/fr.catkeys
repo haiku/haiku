@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-DriveSetup	2908539543
+1	french	x-vnd.Haiku-DriveSetup	3496601396
 DriveSetup	System name		Gestionnaire de disque
 Delete	MainWindow		Supprimer
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les changements sur le disque ?\n\nToutes les données de la partition sélectionnée seront effacées si vous le faites !
@@ -34,10 +34,11 @@ Offset: %ld MB	Support		Déplacement : %ld Mo
 Write changes	MainWindow		Enregistrer les modifications
 There was an error preparing the disk for modifications.	MainWindow		Une erreur est survenue pendant la préparation des modifications du disque.
 The partition %s is already mounted.	MainWindow		La partition %s est déjà montée.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir enregistrer les modifications au disque maintenant ?\n\nToutes les données sur le disque seront irrémédiablement perdues si vous le faites !
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les modifications sur disque maintenant ?\n\nToutes les données du disque %s seront irrémédiablement perdues si vous le faites !
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir supprimer la partition sélectionnée ?\n\nToutes les données sur la partition seront définitivement perdues si vous le faites !
 Create…	MainWindow		Créer…
 Disk system \"%s\"\" not found!	MainWindow		Le disque système « %s » est introuvable !
+The disk has been successfully initialized.\n	MainWindow		Le disque a été correctement initialisée.\n
 Could not unmount partition %s.	MainWindow		Impossible de démonter la partition %s.
 Mount	MainWindow		Monter
 Create	CreateParamsPanel		Créer

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DataTranslations	458105477
+1	russian	x-vnd.Haiku-DataTranslations	3820343452
 DataTranslations	System name		Трансляция данных
 Cancel	DataTranslations		Отмена
 Name:	DataTranslations		Имя:
@@ -14,6 +14,5 @@ Info	DataTranslations		Инфо
 Path:	DataTranslations		Путь:
 The new translator has been installed successfully.	DataTranslations		Новый транслятор был успешно установлен.
 DataTranslations - Error	DataTranslations		Трансляция данных - ошибка
-Ok	DataTranslations		OК
 OK	DataTranslations		ОК
 Version:	DataTranslations		Версия:

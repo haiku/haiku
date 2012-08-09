@@ -1,9 +1,11 @@
-1	slovak	x-vnd.Be-TSKB	359782181
+1	slovak	x-vnd.Be-TSKB	3197510812
 Power off	DeskbarMenu		Vypnúť
 Show day of week	PreferencesWindow		Zobraziť deň v týždni
 Edit menu…	PreferencesWindow		Upraviť menu…
+Suspend	DeskbarMenu		Režim spánku
 Applications	PreferencesWindow		Aplikácie
 Time preferences…	TimeView		Nastavenia času…
+About Haiku	DeskbarMenu		O Haiku
 Recent documents:	PreferencesWindow		Nedávne dokumenty:
 Recent applications	DeskbarMenu		Nedávne aplikácie
 Sort running applications	PreferencesWindow		Zoradiť bežiace aplikácie

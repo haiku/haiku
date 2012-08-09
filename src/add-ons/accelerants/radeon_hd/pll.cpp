@@ -17,6 +17,7 @@
 #include "accelerant_protos.h"
 #include "accelerant.h"
 #include "bios.h"
+#include "connector.h"
 #include "display.h"
 #include "displayport.h"
 #include "encoder.h"
@@ -37,8 +38,6 @@ extern "C" void _sPrintf(const char* format, ...);
 status_t
 pll_limit_probe(pll_info* pll)
 {
-	radeon_shared_info &info = *gInfo->shared_info;
-
 	uint8 tableMajor;
 	uint8 tableMinor;
 	uint16 tableOffset;
@@ -119,12 +118,6 @@ pll_limit_probe(pll_info* pll)
 	pll->pllInMax = B_LENDIAN_TO_HOST_INT16(
 		firmwareInfo->info.usMaxPixelClockPLL_Input) * 10;
 
-	if (info.dceMajor >= 4) {
-		pll->dpExternalClock = B_LENDIAN_TO_HOST_INT16(
-			firmwareInfo->info_21.usUniphyDPModeExtClkFreq);
-	} else
-		pll->dpExternalClock = 0;
-
 	TRACE("%s: referenceFreq: %" B_PRIu16 "; pllOutMin: %" B_PRIu16 "; "
 		" pllOutMax: %" B_PRIu16 "; pllInMin: %" B_PRIu16 ";"
 		"pllInMax: %" B_PRIu16 "\n", __func__, pll->referenceFreq,
@@ -135,7 +128,7 @@ pll_limit_probe(pll_info* pll)
 
 
 status_t
-pll_dp_ss_probe(pll_info* pll)
+pll_ppll_ss_probe(pll_info* pll, uint32 ssID)
 {
 	uint8 tableMajor;
 	uint8 tableMinor;
@@ -158,7 +151,7 @@ pll_dp_ss_probe(pll_info* pll)
 
 	int i;
 	for (i = 0; i < indices; i++) {
-		if (ss_info->asSS_Info[i].ucSS_Id == pll->id) {
+		if (ss_info->asSS_Info[i].ucSS_Id == ssID) {
 			pll->ssPercentage = B_LENDIAN_TO_HOST_INT16(
 				ss_info->asSS_Info[i].usSpreadSpectrumPercentage);
 			pll->ssType = ss_info->asSS_Info[i].ucSpreadSpectrumType;
@@ -182,7 +175,7 @@ pll_dp_ss_probe(pll_info* pll)
 
 
 status_t
-pll_asic_ss_probe(pll_info* pll)
+pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 {
 	uint8 tableMajor;
 	uint8 tableMinor;
@@ -214,7 +207,7 @@ pll_asic_ss_probe(pll_info* pll)
 
 			for (i = 0; i < indices; i++) {
 				if (ss_info->info.asSpreadSpectrum[i].ucClockIndication
-					!= pll->id) {
+					!= ssID) {
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
@@ -241,7 +234,7 @@ pll_asic_ss_probe(pll_info* pll)
 
 			for (i = 0; i < indices; i++) {
 				if (ss_info->info_2.asSpreadSpectrum[i].ucClockIndication
-					!= pll->id) {
+					!= ssID) {
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
@@ -269,7 +262,7 @@ pll_asic_ss_probe(pll_info* pll)
 
 			for (i = 0; i < indices; i++) {
 				if (ss_info->info_3.asSpreadSpectrum[i].ucClockIndication
-					!= pll->id) {
+					!= ssID) {
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
@@ -499,6 +492,11 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 
 	if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
 		pll->flags |= PLL_PREFER_CLOSEST_LOWER;
+
+	if ((info.chipsetFlags & CHIP_APU) != 0) {
+		// Use fractional feedback on APU's
+		pll->flags |= PLL_USE_FRAC_FB_DIV;
+	}
 }
 
 
@@ -650,13 +648,12 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 
 
 status_t
-pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
+pll_set(display_mode* mode, uint8 crtcID)
 {
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	pll->pixelClock = mode->timing.pixel_clock;
-	pll->id = pllID;
 
 	pll_setup_flags(pll, crtcID);
 		// set up any special flags
@@ -665,11 +662,37 @@ pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
 	pll_compute(pll);
 		// compute dividers
 
-	pll_asic_ss_probe(pll);
-		// probe spread spectrum metrics (TODO: pll_dp_ss_probe)
-	display_crtc_ss(crtcID, ATOM_DISABLE);
-		// disable ss
+	radeon_shared_info &info = *gInfo->shared_info;
+	pll->ssType = 0;
 
+	switch (display_get_encoder_mode(connectorIndex)) {
+		case ATOM_ENCODER_MODE_DP_MST:
+		case ATOM_ENCODER_MODE_DP:
+			if (info.dceMajor >= 4)
+				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_DP);
+			else {
+				// TODO: DP Clock == 1.62Ghz?
+				pll_ppll_ss_probe(pll, ATOM_DP_SS_ID1);
+			}
+			break;
+		case ATOM_ENCODER_MODE_LVDS:
+			if (info.dceMajor >= 4)
+				pll_asic_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
+			else
+				pll_ppll_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
+			break;
+		case ATOM_ENCODER_MODE_DVI:
+			if (info.dceMajor >= 4)
+				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_TMDS);
+			break;
+		case ATOM_ENCODER_MODE_HDMI:
+			if (info.dceMajor >= 4)
+				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_HDMI);
+			break;
+	}
+
+	display_crtc_ss(pll, ATOM_DISABLE);
+		// disable ss
 
 	uint8 tableMajor;
 	uint8 tableMinor;
@@ -759,7 +782,7 @@ pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
 				= gConnector[connectorIndex]->encoder.objectID;
 			args.v5.ucEncoderMode
 				= display_get_encoder_mode(connectorIndex);
-			args.v5.ucPpll = pllID;
+			args.v5.ucPpll = pll->id;
 			break;
 		case 6:
 			args.v6.ulDispEngClkFreq
@@ -790,7 +813,7 @@ pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
 			args.v6.ucTransmitterID
 				= gConnector[connectorIndex]->encoder.objectID;
 			args.v6.ucEncoderMode = display_get_encoder_mode(connectorIndex);
-			args.v6.ucPpll = pllID;
+			args.v6.ucPpll = pll->id;
 			break;
 		default:
 			TRACE("%s: ERROR: table version %" B_PRIu8 ".%" B_PRIu8 " TODO\n",
@@ -803,8 +826,138 @@ pll_set(uint8 pllID, display_mode* mode, uint8 crtcID)
 
 	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-	//display_crtc_ss(crtcID, ATOM_ENABLE);
+	//display_crtc_ss(pll, ATOM_ENABLE);
 	// Not yet, lets avoid this.
 
 	return result;
+}
+
+
+status_t
+pll_external_set(uint32 clock)
+{
+	TRACE("%s: set external pll clock to %" B_PRIu32 "\n", __func__, clock);
+
+	if (clock == 0)
+		ERROR("%s: Warning: default display clock is 0?\n", __func__);
+
+	// also known as PLL display engineering
+	uint8 tableMajor;
+	uint8 tableMinor;
+
+	int index = GetIndexIntoMasterTable(COMMAND, SetPixelClock);
+	atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor);
+
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
+
+	union setPixelClock {
+		SET_PIXEL_CLOCK_PS_ALLOCATION base;
+		PIXEL_CLOCK_PARAMETERS v1;
+		PIXEL_CLOCK_PARAMETERS_V2 v2;
+		PIXEL_CLOCK_PARAMETERS_V3 v3;
+		PIXEL_CLOCK_PARAMETERS_V5 v5;
+		PIXEL_CLOCK_PARAMETERS_V6 v6;
+	};
+	union setPixelClock args;
+	memset(&args, 0, sizeof(args));
+
+	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 dceVersion = (info.dceMajor * 100) + info.dceMinor;
+	switch (tableMajor) {
+		case 1:
+			switch(tableMinor) {
+				case 5:
+					// If the default DC PLL clock is specified,
+					// SetPixelClock provides the dividers.
+					args.v5.ucCRTC = ATOM_CRTC_INVALID;
+					args.v5.usPixelClock = B_HOST_TO_LENDIAN_INT16(clock);
+					args.v5.ucPpll = ATOM_DCPLL;
+					break;
+				case 6:
+					// If the default DC PLL clock is specified,
+					// SetPixelClock provides the dividers.
+					args.v6.ulDispEngClkFreq = B_HOST_TO_LENDIAN_INT32(clock);
+					if (dceVersion == 601)
+						args.v6.ucPpll = ATOM_EXT_PLL1;
+					else if (dceVersion >= 600)
+						args.v6.ucPpll = ATOM_PPLL0;
+					else
+						args.v6.ucPpll = ATOM_DCPLL;
+					break;
+				default:
+					ERROR("%s: Unknown table version %" B_PRIu8
+						".%" B_PRIu8 "\n", __func__, tableMajor, tableMinor);
+			}
+			break;
+		default:
+			ERROR("%s: Unknown table version %" B_PRIu8
+						".%" B_PRIu8 "\n", __func__, tableMajor, tableMinor);
+	}
+	return B_OK;
+}
+
+
+void
+pll_external_init()
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	if (info.dceMajor >= 6) {
+		pll_external_set(gInfo->displayClockFrequency);
+	} else if (info.dceMajor >= 4) {
+		// Create our own pseudo pll
+		pll_info pll;
+		bool ssPresent = pll_asic_ss_probe(&pll, ASIC_INTERNAL_SS_ON_DCPLL)
+			== B_OK ? true : false;
+		if (ssPresent)
+			display_crtc_ss(&pll, ATOM_DISABLE);
+		pll_external_set(gInfo->displayClockFrequency);
+		#if 0
+		if (ssPresent)
+			display_crtc_ss(&pll, ATOM_ENABLE);
+		#endif
+	}
+}
+
+
+status_t
+pll_pick(uint32 connectorIndex)
+{
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
+
+	if (info.dceMajor == 6 && info.dceMinor == 1) {
+		// DCE 6.1 APU
+		if (gConnector[connectorIndex]->encoder.objectID
+			== ENCODER_OBJECT_ID_INTERNAL_UNIPHY && !linkB) {
+			pll->id = ATOM_PPLL2;
+			return B_OK;
+		}
+		// TODO: check for used PLL1 and use PLL2?
+		pll->id = ATOM_PPLL1;
+		return B_OK;
+	} else if (info.dceMajor >= 4) {
+		if (connector_is_dp(connectorIndex)) {
+			if (info.dceMajor >= 6) {
+				pll->id = ATOM_PPLL1;
+				return B_OK;
+			} else if (info.dceMajor >= 5) {
+				pll->id = ATOM_DCPLL;
+				return B_OK;
+			} else if (gInfo->dpExternalClock) {
+				pll->id = ATOM_PPLL_INVALID;
+				return B_OK;
+			}
+		}
+		pll->id = ATOM_PPLL1;
+		return B_OK;
+	}
+
+	// TODO: Should return the CRTCID here.
+	pll->id = ATOM_PPLL1;
+	return B_OK;
 }

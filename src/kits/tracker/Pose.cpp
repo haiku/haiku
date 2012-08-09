@@ -37,6 +37,7 @@ All rights reserved.
 #include <string.h>
 
 #include <Debug.h>
+#include <NodeMonitor.h>
 #include <Volume.h>
 #include <fs_info.h>
 
@@ -360,6 +361,10 @@ BPose::UpdateBrokenSymLink(BPoint poseLoc, BPoseView* poseView)
 {
 	ASSERT(TargetModel()->IsSymLink());
 	ASSERT(!TargetModel()->LinkTo());
+
+	if (!TargetModel()->IsSymLink() || TargetModel()->LinkTo())
+		return;
+
 	UpdateIcon(poseLoc, poseView);
 }
 
@@ -370,15 +375,20 @@ BPose::UpdateWasBrokenSymlink(BPoint poseLoc, BPoseView* poseView)
 	if (!fModel->IsSymLink())
 		return;
 
-	if (fModel->LinkTo())
+	if (fModel->LinkTo()) {
+		BEntry entry(fModel->EntryRef(), true);
+		if (entry.InitCheck() != B_OK) {
+			watch_node(fModel->LinkTo()->NodeRef(), B_STOP_WATCHING, poseView);
+			fModel->SetLinkTo(NULL);
+			UpdateIcon(poseLoc, poseView);
+		}
 		return;
+	}
 
 	poseView->CreateSymlinkPoseTarget(fModel);
-	if (!fModel->LinkTo())
-		return;
-	
 	UpdateIcon(poseLoc, poseView);
-	fModel->LinkTo()->CloseNode();
+	if (fModel->LinkTo())
+		fModel->LinkTo()->CloseNode();
 }
 
 

@@ -843,7 +843,7 @@ display_crtc_set_dtd(uint8 crtcID, display_mode* mode)
 
 
 void
-display_crtc_ss(uint8 crtcID, int command)
+display_crtc_ss(pll_info* pll, int command)
 {
 	TRACE("%s\n", __func__);
 	radeon_shared_info &info = *gInfo->shared_info;
@@ -866,9 +866,6 @@ display_crtc_ss(uint8 crtcID, int command)
 
 	union enableSS args;
 	memset(&args, 0, sizeof(args));
-
-	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	if (info.dceMajor >= 5) {
 		args.v3.usSpreadSpectrumAmountFrac = B_HOST_TO_LENDIAN_INT16(0);
@@ -951,8 +948,7 @@ display_crtc_ss(uint8 crtcID, int command)
 	} else if (info.dceMajor >= 2) {
 		if ((command == ATOM_DISABLE) || (pll->ssPercentage == 0)
 			|| (pll->ssType & ATOM_EXTERNAL_SS_MASK)) {
-			// TODO: gpu_ss_disable needs pll id
-			radeon_gpu_ss_disable();
+			radeon_gpu_ss_control(pll, false);
 			return;
 		}
 		args.lvds_ss_2.usSpreadSpectrumPercentage

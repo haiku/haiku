@@ -914,7 +914,7 @@ TInfoView::Draw(BRect updateRect)
 		color = fMagView->SelectionColor();
 	char str[64];
 	snprintf(str, sizeof(str), "R: %i G: %i B: %i (#%02x%02x%02x)",
-		color.red, color.green, color.blue, color.red, color.green, color.red);
+		color.red, color.green, color.blue, color.red, color.green, color.blue);
 
 	MovePenTo(10, fFontHeight*2+5);
 	invalRect.Set(10, fFontHeight+7, 10 + StringWidth(fRGBStr), fFontHeight*2+7);

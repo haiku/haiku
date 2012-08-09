@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	4123753294
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	1567310872
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Αμερικάνικο)
 Stream settings	MediaPlayer-Main		Ρυθμίσεις ροής
 <unknown>	PlaylistItem-album		<άγνωστο>
@@ -45,7 +45,6 @@ Gets the URI of the currently playing item.	MediaPlayer-Main		Λαμβάνει �
 400% scale	MediaPlayer-Main		400% κλίμακα
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Απέτυχε η αποθήκευση της λίστας αναπαραγωγής:\n\nΣφάλμα:
 Move Entries	MediaPlayer-MovePLItemsCmd		Μετακίνηση Καταχωρήσεων
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Μετακίνηση στα Απορρίματα Σφαλμάτων
 Audio	MediaPlayer-Main		Ήχος
 Open Playlist	MediaPlayer-PlaylistWindow		Άνοιγμα λίστας αναπαραγωγής
 MediaPlayer	System name		MediaPlayer

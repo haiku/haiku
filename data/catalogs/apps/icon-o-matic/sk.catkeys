@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	3736361491
+1	slovak	x-vnd.haiku-icon_o_matic	4233739176
 Select All	Icon-O-Matic-PathManipulator		Vybrať všetky
 Add Style	Icon-O-Matic-AddStylesCmd		Pridať štýl
 Color (#%02x%02x%02x)	Style name after dropping a color		Farba (#%02x%02x%02x)
@@ -117,6 +117,7 @@ Gradient	Icon-O-Matic-StyleTypes		Farebný prechod
 Min LOD	Icon-O-Matic-PropertyNames		Min. detail
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribút BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Invertovať výber
+Drop shapes	Icon-O-Matic-ShapesList		Tvary tieňov
 Export as…	Icon-O-Matic-Menu-File		Exportovať ako…
 Transformation	Transformation		Transformácia
 Click on an object in	Empty property list - 1st line		Kliknite na objekt v

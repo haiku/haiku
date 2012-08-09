@@ -953,7 +953,7 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 			bitmapFrame.OffsetBy(shift);
 
 			fCursorAndDragBitmap = new ServerCursor(combindedBounds,
-				bitmap->ColorSpace(), 0, hotspot + shift);
+				bitmap->ColorSpace(), 0, shift);
 
 			// clear the combined buffer
 			uint8* dst = (uint8*)fCursorAndDragBitmap->Bits();

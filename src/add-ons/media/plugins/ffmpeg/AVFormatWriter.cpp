@@ -109,12 +109,13 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 	BAutolock _(fStreamLock);
 
 	fPacket.stream_index = fContext->nb_streams;
-	fStream = av_new_stream(fContext, fPacket.stream_index);
+	fStream = avformat_new_stream(fContext, NULL);
 
 	if (fStream == NULL) {
 		TRACE("  failed to add new stream\n");
 		return B_ERROR;
 	}
+	fStream->id = fPacket.stream_index;
 
 //	TRACE("  fStream->codec: %p\n", fStream->codec);
 	// TODO: This is a hack for now! Use avcodec_find_encoder_by_name()
@@ -173,19 +174,19 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		fStream->codec->channels = format->u.raw_audio.channel_count;
 		switch (format->u.raw_audio.format) {
 			case media_raw_audio_format::B_AUDIO_FLOAT:
-				fStream->codec->sample_fmt = SAMPLE_FMT_FLT;
+				fStream->codec->sample_fmt = AV_SAMPLE_FMT_FLT;
 				break;
 			case media_raw_audio_format::B_AUDIO_DOUBLE:
-				fStream->codec->sample_fmt = SAMPLE_FMT_DBL;
+				fStream->codec->sample_fmt = AV_SAMPLE_FMT_DBL;
 				break;
 			case media_raw_audio_format::B_AUDIO_INT:
-				fStream->codec->sample_fmt = SAMPLE_FMT_S32;
+				fStream->codec->sample_fmt = AV_SAMPLE_FMT_S32;
 				break;
 			case media_raw_audio_format::B_AUDIO_SHORT:
-				fStream->codec->sample_fmt = SAMPLE_FMT_S16;
+				fStream->codec->sample_fmt = AV_SAMPLE_FMT_S16;
 				break;
 			case media_raw_audio_format::B_AUDIO_UCHAR:
-				fStream->codec->sample_fmt = SAMPLE_FMT_U8;
+				fStream->codec->sample_fmt = AV_SAMPLE_FMT_U8;
 				break;
 
 			case media_raw_audio_format::B_AUDIO_CHAR:
@@ -198,28 +199,28 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 			switch (format->u.raw_audio.channel_count) {
 				default:
 				case 2:
-					fStream->codec->channel_layout = CH_LAYOUT_STEREO;
+					fStream->codec->channel_layout = AV_CH_LAYOUT_STEREO;
 					break;
 				case 1:
-					fStream->codec->channel_layout = CH_LAYOUT_MONO;
+					fStream->codec->channel_layout = AV_CH_LAYOUT_MONO;
 					break;
 				case 3:
-					fStream->codec->channel_layout = CH_LAYOUT_SURROUND;
+					fStream->codec->channel_layout = AV_CH_LAYOUT_SURROUND;
 					break;
 				case 4:
-					fStream->codec->channel_layout = CH_LAYOUT_QUAD;
+					fStream->codec->channel_layout = AV_CH_LAYOUT_QUAD;
 					break;
 				case 5:
-					fStream->codec->channel_layout = CH_LAYOUT_5POINT0;
+					fStream->codec->channel_layout = AV_CH_LAYOUT_5POINT0;
 					break;
 				case 6:
-					fStream->codec->channel_layout = CH_LAYOUT_5POINT1;
+					fStream->codec->channel_layout = AV_CH_LAYOUT_5POINT1;
 					break;
 				case 8:
-					fStream->codec->channel_layout = CH_LAYOUT_7POINT1;
+					fStream->codec->channel_layout = AV_CH_LAYOUT_7POINT1;
 					break;
 				case 10:
-					fStream->codec->channel_layout = CH_LAYOUT_7POINT1_WIDE;
+					fStream->codec->channel_layout = AV_CH_LAYOUT_7POINT1_WIDE;
 					break;
 			}
 		} else {
@@ -365,9 +366,13 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 
 	// Init I/O context with buffer and hook functions, pass ourself as
 	// cookie.
-	if (init_put_byte(fIOContext, buffer, kIOBufferSize, 1, this,
-			0, _Write, _Seek) != 0) {
-		TRACE("  init_put_byte() failed!\n");
+	// Allocate I/O context with buffer and hook functions, pass ourself as
+	// cookie.
+	memset(buffer, 0, kIOBufferSize);
+	fIOContext = avio_alloc_context(buffer, kIOBufferSize, 1, this, 0, _Write,
+		_Seek);
+	if (fIOContext == NULL) {
+		TRACE("  avio_alloc_context() failed!\n");
 		return B_ERROR;
 	}
 
@@ -410,12 +415,6 @@ AVFormatWriter::CommitHeader()
 	if (fHeaderWritten)
 		return B_NOT_ALLOWED;
 
-	// According to output_example.c, the output parameters must be set even
-	// if none are specified. In the example, this call is used after the
-	// streams have been created.
-	if (av_set_parameters(fContext, NULL) < 0)
-		return B_ERROR;
-
 #if OPEN_CODEC_CONTEXT
 	for (unsigned i = 0; i < fContext->nb_streams; i++) {
 		AVStream* stream = fContext->streams[i];
@@ -424,7 +423,7 @@ AVFormatWriter::CommitHeader()
 		// it may be an encoder from a different plugin.
 		AVCodecContext* codecContext = stream->codec;
 		AVCodec* codec = avcodec_find_encoder(codecContext->codec_id);
-		if (codec == NULL || avcodec_open(codecContext, codec) < 0) {
+		if (codec == NULL || avcodec_open2(codecContext, codec, NULL) < 0) {
 			TRACE("  stream[%u] - failed to open AVCodecContext\n", i);
 		}
 		TRACE("  stream[%u] time_base: (%d/%d), codec->time_base: (%d/%d)\n",
@@ -433,9 +432,9 @@ AVFormatWriter::CommitHeader()
 	}
 #endif
 
-	int result = av_write_header(fContext);
+	int result = avformat_write_header(fContext, NULL);
 	if (result < 0)
-		TRACE("  av_write_header(): %d\n", result);
+		TRACE("  avformat_write_header(): %d\n", result);
 
 	// We need to close the codecs we opened, even in case of failure.
 	fHeaderWritten = true;

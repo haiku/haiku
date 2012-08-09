@@ -16,7 +16,7 @@
  */
 
 enum {
-    B_STOP_WATCHING			= 0x0000,
+	B_STOP_WATCHING			= 0x0000,
 	B_WATCH_NAME			= 0x0001,
 	B_WATCH_STAT			= 0x0002,
 	B_WATCH_ATTR			= 0x0004,

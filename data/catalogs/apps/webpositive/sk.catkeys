@@ -1,0 +1,137 @@
+1	slovak	x-vnd.Haiku-WebPositive	1513721873
+Show home button	Settings Window		Zobraziť tlačidlo Domov
+Username:	Authentication Panel		Používateľské meno:
+Copy URL to clipboard	Download Window		Kopírovať URL do schránky
+Cancel	Settings Window		Zrušiť
+Close window	WebPositive Window		Zatvoriť okno
+Quit	WebPositive		Ukončiť
+The download could not be opened.	Download Window		Stiahnutý súbor sa nepodarilo otvoriť.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Priečinok so stiahnutými súbormi sa nepodarilo otvoriť..\n\nChyba: %error
+Open location	WebPositive Window		Otvoriť umiestnenie
+Clear history	WebPositive Window		Vyčistiť históriu
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Včera
+Default standard font size:	Settings Window		Predvolená veľkosť štandardného písma:
+Start page:	Settings Window		Úvodná stránka:
+History	WebPositive Window		História
+Error opening downloads folder	Download Window		Chyba pri otváraní priečinka stiahnutých súborov
+Paste	WebPositive Window		Vložiť
+Settings	Settings Window		Nastavenie
+%seconds seconds left	Download Window		Zostáva %seconds sekúnd
+Confirmation	WebPositive Window		Potvrdenie
+Window	WebPositive Window		Okno
+Decrease size	WebPositive Window		Zmenšiť veľkosť
+Serif font:	Settings Window		Pätkové písmo:
+Loading %url	WebPositive Window		Načítava sa %url
+Page source	WebPositive Window		Zdroj stránky
+Next	WebPositive Window		Ďalší
+Find next	WebPositive Window		Nájsť ďalší
+Download folder:	Settings Window		Priečinok stiahnutých súborov:
+Edit	WebPositive Window		Upraviť
+Over %hours hours left	Download Window		Zostáva viac ako %hours hodín
+Cancel	Authentication Panel		Zrušiť
+Match case	WebPositive Window		Rozlišovať veľkosť
+Search page:	Settings Window		Vyhľadávacia stránka:
+Zoom text only	WebPositive Window		Zväčšovať iba text
+Default fixed font size:	Settings Window		Predvolená veľkosť neproporcionálneho písma:
+Close tab	WebPositive Window		Zatvoriť kartu
+Auto-hide mouse pointer	Settings Window		Automaticky skrývať kurzor myši
+Over 1 hour left	Download Window		Zostáva viac ako 1 hodina
+Quit	WebPositive Window		Ukončiť
+Full screen	WebPositive Window		Celoobrazovkový režim
+Open download error	Download Window		Chyba pri otváraní sťahovaného súboru
+Standard font:	Settings Window		Štandardné písmo:
+Restart	Download Window		Reštartovať
+Proxy server	Settings Window		Proxy server
+Open containing folder	Download Window		Otvoriť nadradený priečinok
+New window	WebPositive Window		Nové okno
+Open	Download Window		Otvoriť
+Reload	WebPositive Window		Znovu načítať
+Downloads	Download Window		Sťahovania
+Sans serif font:	Settings Window		Bezpätkové písmo:
+Over %days days left	Download Window		Zostáva viac ako %days dní
+Forward	WebPositive Window		Dopredu
+of	Download Window	...as in '12kB of 256kB'	z
+Revert	Settings Window		Vrátiť
+Fixed font:	Settings Window		Neproporcionálne písmo:
+Cut	WebPositive Window		Vystrihnúť
+Bookmark this page	WebPositive Window		Uložiť stránku do záložiek
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Vyskytla sa chyba pri zobrazovaní priečinka Záložky.\n\nChyba: %error
+Open downloads folder	Download Window		Otvoriť priečinok stiahnutých súborov
+Number of days to keep links in History menu:	Settings Window		Koľko dní ponechať odkazy v menu História:
+Hide	Download Window		Skryť
+Reset size	WebPositive Window		Obnoviť veľkosť
+Find:	WebPositive Window		Nájsť:
+Increase size	WebPositive Window		Zväčšiť veľkosť
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Vyskytla sa chyba pri získavaní priečinka záložiek.\n\nChyba: %error
+Over 1 day left	Download Window		Zostáva viac ako 1 deň
+Downloads	WebPositive Window		Sťahovania
+Requesting %url	WebPositive Window		Prebieha požiadavka na %url
+Apply	Settings Window		Použiť
+Bookmark info	WebPositive Window		Info o záložke
+Size:	Font Selection view		Veľkosť:
+Show tabs if only one page is open	Settings Window		Zobrazovať karty, aj ak je otvorená iba jedna stránka
+About	WebPositive Window		O aplikácii
+Finish: 	Download Window	Finishing time	Koniec:
+Fonts	Settings Window		Písma
+Close	WebPositive Window		Zatvoriť
+OK	Download Window		OK
+Page source error	WebPositive Window		Chyba zdrojového kódu stránky
+Open blank page	Settings Window		Otvoriť prázdnu stránku
+New tabs:	Settings Window		Nové karty:
+Cancel	WebPositive Window		Zrušiť
+Open all	WebPositive Window		Otvoriť všetko
+Clear	URL Bar		Vyčistiť
+Cut	URL Bar		Vystrihnúť
+Clear	WebPositive Window		Vyčistiť
+Remove	Download Window		Odstrániť
+Find	WebPositive Window		Nájsť:
+Find previous	WebPositive Window		Nájsť predchádzajúci
+Settings	WebPositive Window		Nastavenia
+Proxy server address:	Settings Window		Adresa proxy servera:
+Proxy server port:	Settings Window		Port proxy servera:
+Bookmarks	WebPositive Window		Záložky
+%minutes minutes	Download Window		%minutes minút
+Paste	URL Bar		Vložiť
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Skryť text hesla
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Kŕdeľ ďatľov učí koňa obhrýzať kôru a žrať mäso
+Over 1 minute left	Download Window		Zostáva viac ako 1 minúta
+Open start page	Settings Window		Otvoriť úvodnú stránku
+Continue downloads	WebPositive		Pokračovať v sťahovaní
+Cancel	Download Window		Zrušiť
+Open search page	Settings Window		Otvoriť vyhľadávaciu stránku
+Password:	Authentication Panel		Heslo:
+Back	WebPositive Window		Späť
+New browser window	Download Window		Nové okno prehliadača
+Today	WebPositive Window		Dnes
+1 second left	Download Window		zostáva 1 sekunda
+Remember username and password for this site	Authentication Panel		Zapamätať si používateľské meno a heslo pre túto lokalitu
+Earlier	WebPositive Window		Skoršie
+Authentication required	Authentication Panel		Vyžaduje sa overenie totožnosti
+Use proxy server to connect to the internet	Settings Window		Používať na pripojenie k internetu proxy server
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ešte stále prebieha sťahovanie. Skutočne chcete teraz WebPositive ukončiť?
+Auto-hide interface in full screen mode	Settings Window		Automaticky skryť prvky rozhrania v celoobrazovkovom režime
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url zlyhalo
+New tab	WebPositive Window		Nová karta
+Downloads in progress	WebPositive		Prebieha sťahovanie
+Style:	Font Selection view		Štýl:
+General	Settings Window		Všeobecné
+View	WebPositive Window		Zobraziť
+Previous	WebPositive Window		Predchádzajúce
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Vyskytla sa chyba pri vytváraní súboru záložiek.\n\nChyba: %error
+Bookmark error	WebPositive Window		Chyba záložiek
+Do you really want to clear the browsing history?	WebPositive Window		Skutočne chcete vymazať históriu prehliadania?
+Copy	WebPositive Window		Kopírovať
+Open bookmarks confirmation	WebPositive Window		Potvrdenie otvorenia záložiek
+Remove missing	Download Window		Odstrániť chýbajúce
+Clone current page	Settings Window		Klonovať aktuálnu stránku
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Chcete otvoriť %addedCoun záložiek naraz?
+OK	Authentication Panel		OK
+Copy	URL Bar		Kopírovať
+OK	WebPositive Window		OK
+Manage bookmarks	WebPositive Window		Spravovať záložky
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Záložka tejto stránky (%bookmarkName) už existuje.
+New windows:	Settings Window		Nové okná:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url dokončené
+Remove finished	Download Window		Odstrániť dokončené
