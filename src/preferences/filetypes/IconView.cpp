@@ -9,6 +9,7 @@
 
 #include <Application.h>
 #include <AppFileInfo.h>
+#include <Attributes.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <IconEditorProtocol.h>
@@ -616,7 +617,9 @@ IconView::MessageReceived(BMessage* message)
 			if (message->FindString("attr", &name) != B_OK)
 				break;
 
-			if (!strcmp(name, "BEOS:L:STD_ICON"))
+			if (!strcmp(name, kAttrMiniIcon)
+				|| !strcmp(name, kAttrLargeIcon)
+				|| !strcmp(name, kAttrIcon))
 				Update();
 			break;
 		}
