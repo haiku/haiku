@@ -17,6 +17,7 @@ resource(1, "BEOS:FILE_TYPES") message
 	"types" = "application/x-vnd.Be.URL.icq",
 	"types" = "application/x-vnd.Be.URL.msn",
 	"types" = "application/x-vnd.Be.URL.mms",
+	"types" = "application/x-vnd.Be.URL.nfs",
 	"types" = "application/x-vnd.Be.URL.rtp",
 	"types" = "application/x-vnd.Be.URL.rtsp",
 //	"types" = "application/x-vnd.Be.URL.audio",
