@@ -269,6 +269,7 @@ _AVL_TREE_MAP_CLASS_NAME::MakeEmpty()
 {
 	AVLTreeNode* root = fTree.Root();
 	_FreeTree(root);
+	fTree.MakeEmpty();
 }
 
 
