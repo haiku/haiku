@@ -1,10 +1,11 @@
-1	english	x-vnd.Haiku-Mail	2262759699
+1	english	x-vnd.Haiku-Mail	897524389
 Settings	Config Window		设置
 Never	Config Window	show status window	从不
 Only when dial-up is connected	Config Window		仅在拨号连接时
 While sending and receiving	Config Window		在发送和接收时
 days	Config Window		天
 Incoming	Config Window		收件箱
+Server name:	E-Mail		服务器名称：
 OK	Config Window		确定
 Start mail services on startup	Config Window		自启动邮件服务
 E-mail address:	E-Mail		邮箱地址：

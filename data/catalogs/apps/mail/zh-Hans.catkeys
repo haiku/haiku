@@ -1,10 +1,11 @@
-1	english	x-vnd.Be-MAIL	1495323310
+1	english	x-vnd.Be-MAIL	2834665561
 View	Mail		查看
 %d - Date	Mail		%d - 日期
 Attach attributes:	Mail		附加属性：
 Inconsistency occurred in the undo/redo buffer.	Mail		缓冲区发生错误，撤销/重复操作无法执行。
 An error occurred trying to save the attachment.	Mail		出现错误，保存为副件。
 Copy to new	Mail		转发
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	标记为 'New'
 Edit	Mail		编辑
 Print	Mail		打印
 <none>	Mail		<无>
@@ -70,6 +71,7 @@ Size:	Mail		大小：
 Account from mail	Mail		邮件账户
 Edit signatures…	Mail		编辑署名…
 New	Mail		新建
+Attachments: 	Mail		附件：
 On	Mail		开启
 Set to %s	Mail		设置为 %s
 Forward	Mail		下一封

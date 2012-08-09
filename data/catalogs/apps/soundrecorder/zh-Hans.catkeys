@@ -1,15 +1,20 @@
-1	english	x-vnd.Haiku-SoundRecorder	4189888707
+1	english	x-vnd.Haiku-SoundRecorder	1981644768
 Loop	RecorderWindow		循环
 Cannot find default audio hardware	RecorderWindow		未发现默认音频设备
 Cannot find the temporary file created to hold the new recording	RecorderWindow		未找到存储新记录的临时文件
+Sample size:	RecorderWindow		示例大小：
 Nothing to play	RecorderWindow		无播放文件
+Duration: 	RecorderWindow		录制时间：
 Some of the files don't appear to be audio files	RecorderWindow		其中的一些文件不是音频文件
 File info	RecorderWindow		文件信息
 Drop files here	SoundListView		在这里放置文件
 Input	RecorderWindow		输入
 Stop	RecorderWindow		停止
+Format:	RecorderWindow		格式：
 Sound List	RecorderWindow		声音列表
+Compression: 	RecorderWindow		压缩：
 Rewind	RecorderWindow		倒回
+Sample rate:	RecorderWindow		采样频率：
 Invalid audio files	RecorderWindow		无效音频文件
 OK	RecorderWindow		确定
 Cannot open the temporary file created to hold the new recording	RecorderWindow		无法打开用于存储新记录的临时文件
@@ -18,11 +23,14 @@ Input:	RecorderWindow		输入：
 Forward	RecorderWindow		向前
 Play	RecorderWindow		播放
 SoundRecorder	System name		录音器
+Channels:	RecorderWindow		声道：
+ bits	RecorderWindow		位
 None	RecorderWindow		无
 Record	RecorderWindow		录音
 Sample size: 	RecorderWindow		大小示例：
 Cannot recognize this file as a media file	RecorderWindow		无法识别该文件为音频文件
 Format: 	RecorderWindow		格式：
+File name: 	RecorderWindow		文件名：
 Cannot connect to the selected sound input	RecorderWindow		无法连接到选中声音输入
 Cannot get the file to play	RecorderWindow		无法播放文件
 Cannot record a sound that long	RecorderWindow		无法进行长时间的记录

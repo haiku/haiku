@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-About	3434348710
+1	english	x-vnd.Haiku-About	519561637
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		版权 © 1999-2010 Gutenprint 的所有编写者。版权所有。
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (和他的 NewOS 内核)\n
 BSD (4-clause)	AboutView		BSD（4-条款）
@@ -11,6 +11,7 @@ The Haiku-Ports team\n	AboutView		 Haiku-Ports 小组\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		版权 © 1998-2003 Daniel Veillard。版权所有。
 %d MiB used (%d%%)	AboutView		已用 %d MiB (%d%%)
 Website, marketing & documentation:\n	AboutView		网站管理，商业宣传以及文档编写：\n
+GNU LGPL v2.1	AboutView		GNU LGPL v2.1
 AboutSystem	System name		关于系统
 MIT (no promotion)	AboutView		MIT（无附加条款）
 Copyright © 2003 Peter Hanappe and others.	AboutView		版权 © 2003 Peter Hanappe 及其他人员。
@@ -39,6 +40,7 @@ Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		版权© 200
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		内存状态：
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		版权 © 1996-1997 Jeff Prosise。版权所有。
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		版权所有 © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		版权 © 1994-2009, Thomas G. Lane, Guido Vollbeding。本软件基于 Independent JPEG Group 的部分工作。
 Past maintainers:\n	AboutView		先前维护人员：\n
 \n\nSpecial thanks to:\n	AboutView		\n\n特别感谢：\n

@@ -19,7 +19,7 @@ screenshot	Screenshot	Base filename of screenshot files	snímka obrazovky
 New screenshot	ScreenshotWindow		Nová snímka obrazovky
 Artwork folder	ScreenshotWindow		Priečinok s výtvarnými dielami
 Home folder	ScreenshotWindow		Domovský priečinok
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tento súbor už existuje.\n Ste si istý, že ho chcete prepísať?
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tento súbor už existuje.\nSte si istí, že ho chcete prepísať?
 Settings…	ScreenshotWindow		Nastavenia…
 overwrite	ScreenshotWindow		prepísať
 Delay:	ScreenshotWindow		Oneskorenie:

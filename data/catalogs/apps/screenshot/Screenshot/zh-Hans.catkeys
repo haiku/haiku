@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-screenshot	1697748405
+1	english	x-vnd.haiku-screenshot	1721618877
 seconds	ScreenshotWindow		秒
 Desktop	ScreenshotWindow		桌面
 Include window border	ScreenshotWindow		包含窗体边框
@@ -9,6 +9,7 @@ Cancel	ScreenshotWindow		取消
 Name:	ScreenshotWindow		名称：
 Choose folder	ScreenshotWindow		选择文件夹
 Save	ScreenshotWindow		保存
+Overwrite	ScreenshotWindow		覆盖
 Choose folder...	ScreenshotWindow		选择文件夹...
 Please select	ScreenshotWindow		请选择
 Save as:	ScreenshotWindow		保存为：

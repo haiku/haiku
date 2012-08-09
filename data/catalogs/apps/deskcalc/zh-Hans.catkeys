@@ -1,7 +1,9 @@
-1	english	x-vnd.Haiku-DeskCalc	1916192649
+1	english	x-vnd.Haiku-DeskCalc	3276968552
 Compact	CalcView		精简模式
 Scientific	CalcView		科学计算
 DeskCalc	System name		计算器
 Basic	CalcView		基本模式
+Radians	CalcView		弧度
 Enable Num Lock on startup	CalcView		启用数字键锁定
+Degrees	CalcView		度
 Audio Feedback	CalcView		音频反馈

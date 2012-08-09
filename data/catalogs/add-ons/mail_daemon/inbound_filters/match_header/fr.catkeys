@@ -1,10 +1,12 @@
-1	french	x-vnd.Haiku-MatchHeader	3677427558
+1	french	x-vnd.Haiku-MatchHeader	1205906732
 <Choose action>	ConfigView		<Choisir une action>
 has	ConfigView		a
 Move to	ConfigView		Déplacer vers
 Then	ConfigView		Alors
+value (use REGEX: in from of regular expressions like *spam*)	ConfigView		valeur (utilisez REGEX : à partir d'expressions régulières comme *spam*)
 this field is based on the action	ConfigView		ce champ est basé sur l'action
 Delete message	ConfigView		Supprimer le message
+Rule filter	RuleFilter		Règle de filtrage
 <Choose account>	ConfigView		<Choisir un compte>
 Set flags to	ConfigView		Placez les drapeaux à
 Set as read	ConfigView		Marquer comme lu

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	2379545362
+1	english	x-vnd.Haiku-MediaPlayer	3948226748
 raw audio	MediaPlayer-InfoWin		原生音频
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
 %d kHz	MediaPlayer-InfoWin		%d kHz
@@ -23,6 +23,7 @@ Next	MediaPlayer-Main		下一个
 OK	MediaPlayer-SettingsWindow		确定
 Track %d	MediaPlayer-Main		轨道 %d 
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1（宽屏）
+Display mode	MediaPlayer-InfoWin		显示模式
 Medium	MediaPlayer-SettingsWindow		中等
 Close	MediaPlayer-PlaylistWindow		关闭
 Stereo	MediaPlayer-InfoWin		立体声
@@ -64,8 +65,10 @@ Select all	MediaPlayer-PlaylistWindow		全选
 Move Entry	MediaPlayer-MovePLItemsCmd		移动条目
 Open	MediaPlayer-PlaylistWindow		打开
 Stop playing.	MediaPlayer-Main		停止播放。
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		无法打开文件 '%filename' 。\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		错误： 
 Audio	MediaPlayer-InfoWin		音频
+Move into trash error	MediaPlayer-RemovePLItemsCmd		移动到垃圾箱出错
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部错误（格式错误消息）。保存播放列表失败。
 Skip to the previous track.	MediaPlayer-Main		跳到上一个轨道。
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% 出现内部错误。文件无法打开。
@@ -126,6 +129,7 @@ Revert	MediaPlayer-SettingsWindow		恢复
 Edit	MediaPlayer-PlaylistWindow		编辑
 Start media server	MediaPlayer-Main		启动媒体服务器
 Toggle fullscreen.	MediaPlayer-Main		全平切换。
+ToggleFullscreen	MediaPlayer-Main		全屏切换。
 <unnamed>	PlaylistItem-name		<未命名>
 Open Clips	MediaPlayer-Main		打开片段
 OK	MediaPlayer-PlaylistWindow		确定

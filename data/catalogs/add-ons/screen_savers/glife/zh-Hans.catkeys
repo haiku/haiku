@@ -1,4 +1,7 @@
-1	english	x-vnd.Haiku-GLifeScreensaver	3809419477
+1	english	x-vnd.Haiku-GLifeScreensaver	1707534289
+Grid Border: %li	GLife ScreenSaver		栅栏边界：%li
+Grid Width: 	GLife ScreenSaver		栅栏宽度：%li
+none	GLife ScreenSaver		无
 Grid Height: 	GLife ScreenSaver		栅栏高度：
 %sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
 None	GLife ScreenSaver		无
@@ -7,3 +10,6 @@ Grid Width: %li	GLife ScreenSaver		栅栏宽度：%li
 Grid Height: %li	GLife ScreenSaver		栅栏高度：%li
 Grid Life Delay: 	GLife ScreenSaver		栅栏显示延迟：
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"游戏人生\"
+Grid Life Delay: %s	GLife ScreenSaver		栅栏显示延迟：
+Grid Border: 	GLife ScreenSaver		栅栏边界：
+by Aaron Hill	GLife ScreenSaver		由 Aaron Hill 编写

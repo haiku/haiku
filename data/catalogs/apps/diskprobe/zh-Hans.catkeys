@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DiskProbe	2706202187
+1	english	x-vnd.Haiku-DiskProbe	2306672993
 File offset: 	ProbeView		文件偏移量：
 %ld (native)	ProbeView		%ld（本地）
 64 bit unsigned value:	TypeEditors		64位无符号数：
@@ -59,6 +59,7 @@ Boolean value:	TypeEditors		布尔值：
 8 bit palette	TypeEditors		8位调色板
 Fit	ProbeView	Size of fonts, fits to available room	适应
 Probe device	OpenWindow		查找硬件
+ (native)	ProbeView		（本地）
 Unknown format	TypeEditors		未知类型
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	十六进制
 MIME type:	TypeEditors		MIME 类型：

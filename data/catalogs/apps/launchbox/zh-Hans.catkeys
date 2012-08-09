@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-LaunchBox	4192523522
+1	english	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		新建
 Set description…	LaunchBox		设置描述...
 Vertical layout	LaunchBox		竖直层
@@ -24,6 +24,7 @@ Name Panel	LaunchBox		命名面板
 Add button here	LaunchBox		在此处添加按钮
 Description for '%3'	LaunchBox		描述 '%3'
 Settings	LaunchBox		设置
+Failed to launch 'something', error in Pad data.	LaunchBox		启动“某个应用”失败，Pad 数据出错。
 Pad %1	LaunchBox		面板 %1
 Close	LaunchBox		关闭
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		发送 'open folder' 命令到 Tracker 失败。\n\n错误：

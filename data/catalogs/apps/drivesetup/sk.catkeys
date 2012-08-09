@@ -1,7 +1,7 @@
 1	slovak	x-vnd.Haiku-DriveSetup	1372142450
 DriveSetup	System name		Nastavenie diskových oblastí
 Delete	MainWindow		Zmazať
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
 Rescan	MainWindow		Znovu preskúmať
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Nepodarilo sa získať informácie o diskových oblastiach.
@@ -32,14 +32,14 @@ Mounted at	PartitionList		Pripojené na
 There was an error acquiring the partition row.	MainWindow		Vyskytla sa chyba pri získavaní radu oblasti.
 You need to select a partition entry from the list.	MainWindow		Musíte vybrať záznam oblasti zo zoznamu.
 The currently selected partition does not have a parent partition.	MainWindow		Momentálne vybraná oblasť nemá nadradenú oblasť.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranom disku budú nenávratne stratené!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranom disku budú nenávratne stratené!
 Offset: %ld MB	Support		Ofset: %ld MB
 Write changes	MainWindow		Zapísať zmeny
 There was an error preparing the disk for modifications.	MainWindow		Vyskytla sa chyba pri pripravovaní disku na zmeny.
 The partition %s is already mounted.	MainWindow		Oblasť %s je už pripojená.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Ste si istí, že chcete naformátovať oblasť? Pred zapísaním zmien na disk sa vás program znova spýta.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na disku %s budú nenávratne stratené!
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete zmazať vybranú diskovú oblasť?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete zmazať vybranú diskovú oblasť?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
 Create…	MainWindow		Vytvoriť…
 Disk system \"%s\"\" not found!	MainWindow		Diskový systém „%s“ nenájdený!
 The disk has been successfully initialized.\n	MainWindow		Disk bol úspešne inicializovaný.\n
@@ -68,7 +68,7 @@ Size	PartitionList		Veľkosť
 Wipe (not implemented)	MainWindow		Bezpečne vymazať (neimplementované)
 Validation of the given initialization parameters failed.	MainWindow		Overenie zadaných parametrov inicializácie zlyhalo.
 The selected partition does not contain a partitioning system.	MainWindow		Zdá sa, že vybraná disková oblasť neobsahuje systém oblastí.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na diskovej oblasti %s budú nenávratne stratené!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na diskovej oblasti %s budú nenávratne stratené!
 The partition %s is currently mounted.	MainWindow		Oblasť %s je momentálne pripojená.
 Partition size	CreateParamsPanel		Veľkosť oblasti
 Surface test (not implemented)	MainWindow		Test povrchu disku (neimplementované)

@@ -11,7 +11,7 @@ Every 2 hours	CodyCam		Toutes les 2 heures
 Closing the window\n	VideoConsumer.cpp		Fermeture de la fenêtre\n
 login ID expected	CodyCam		identifiant attendu
 Rate:	CodyCam		Vitesse :
-JPEG image	CodyCam		image JPEG
+JPEG image	CodyCam		Image JPEG
 Capture Rate Menu	CodyCam		Menu de vitesse de capture
 File %s # unterminated quote at end of file\n	SettingsHandler		Fichier %s # guillemet non fermé à la fin du fichier\n
 Password:	CodyCam		Mot de passe :
