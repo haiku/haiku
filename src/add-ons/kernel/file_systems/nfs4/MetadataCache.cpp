@@ -84,7 +84,7 @@ MetadataCache::GetAccess(uid_t uid, uint32* allowed)
 		return B_ENTRY_NOT_FOUND;
 
 	if (!fForceValid)
-		it.Current().fForceValid = false;
+		it.CurrentValuePointer()->fForceValid = false;
 
 	if (!it.Current().fForceValid && it.Current().fExpire < time(NULL)) {
 		it.Remove();
@@ -167,3 +167,4 @@ MetadataCache::NotifyChanges(const struct stat* oldStat,
 
 	notify_stat_changed(fInode->GetFileSystem()->DevId(), fInode->ID(), flags);
 }
+
