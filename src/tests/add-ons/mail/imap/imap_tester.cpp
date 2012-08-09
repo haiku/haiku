@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -107,6 +107,37 @@ do_fetch(int argc, char** argv)
 		from = to = atoul(argv[1]);
 
 	IMAP::FetchCommand command(from, to, mode);
+
+	// A fetch listener that dumps everything to stdout
+	class Listener : public IMAP::FetchListener {
+	public:
+		virtual	bool FetchData(IMAP::Response& reponse, uint32 uid,
+			IMAP::FetchMode mode, BDataIO& stream, size_t length)
+		{
+			BMallocIO copy;
+			char buffer[65535];
+			while (length > 0) {
+				ssize_t bytesRead = stream.Read(buffer,
+					min_c(sizeof(buffer), length));
+				if (bytesRead <= 0)
+					break;
+
+				copy.Write(buffer, bytesRead);
+				length -= bytesRead;
+			}
+
+			// Null terminate the buffer
+			char null = '\0';
+			copy.Write(&null, 1);
+
+			printf("================= UID %ld =================\n", uid);
+			puts((const char*)copy.Buffer());
+			return true;
+		}
+	} listener;
+
+	command.SetListener(&listener);
+
 	status_t status = sProtocol.ProcessCommand(command);
 	if (status != B_OK) {
 		error("fetch", status);

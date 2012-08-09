@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011, Haiku Inc. All Rights Reserved.
+ * Copyright 2010-2012, Haiku Inc. All Rights Reserved.
  * Copyright 2010 Clemens Zeidler. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -243,10 +243,15 @@ Protocol::ProcessCommand(Command& command, bigtime_t timeout)
 
 
 status_t
-Protocol::HandleResponse(bigtime_t timeout, bool disconnectOnTimeout)
+Protocol::HandleResponse(Command* command, bigtime_t timeout,
+	bool disconnectOnTimeout)
 {
 	status_t commandStatus = B_OK;
 	IMAP::ResponseParser parser(*fBufferedSocket);
+	if (IMAP::LiteralHandler* literalHandler
+			= dynamic_cast<IMAP::LiteralHandler*>(command))
+		parser.SetLiteralHandler(literalHandler);
+
 	IMAP::Response response;
 
 	bool done = false;
@@ -329,7 +334,7 @@ Protocol::_ProcessCommandWithoutAfterQuake(Command& command, bigtime_t timeout)
 	status_t status = SendCommand(commandID, commandString.String());
 	if (status == B_OK) {
 		fOngoingCommands[commandID] = &command;
-		status = HandleResponse(timeout);
+		status = HandleResponse(&command, timeout);
 	}
 
 	if (handler != NULL)

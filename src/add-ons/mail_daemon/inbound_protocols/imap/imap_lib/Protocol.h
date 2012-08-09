@@ -82,7 +82,7 @@ public:
 			const BString&		CommandError() { return fCommandError; }
 
 protected:
-			status_t			HandleResponse(
+			status_t			HandleResponse(Command* command,
 									bigtime_t timeout = kIMAP4ClientTimeout,
 									bool disconnectOnTimeout = true);
 			void				ProcessAfterQuacks(bigtime_t timeout);
