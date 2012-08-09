@@ -33,15 +33,15 @@ using namespace BPrivate::Debug;
 const void *
 Area::PrepareAddress(const void *address)
 {
-	TRACE(("Area::PrepareAddress(%p): area: %ld\n", address, fRemoteID));
+	TRACE(("Area::PrepareAddress(%p): area: %" B_PRId32 "\n", address, fRemoteID));
 
 	// clone the area, if not done already
 	if (fLocalID < 0) {
 		fLocalID = clone_area("cloned area", &fLocalAddress, B_ANY_ADDRESS,
 			B_READ_AREA, fRemoteID);
 		if (fLocalID < 0) {
-			TRACE(("Area::PrepareAddress(): Failed to clone area %ld: %s\n",
-				fRemoteID, strerror(fLocalID)));
+			TRACE(("Area::PrepareAddress(): Failed to clone area %" B_PRId32
+				": %s\n", fRemoteID, strerror(fLocalID)));
 			throw Exception(fLocalID);
 		}
 	}
@@ -89,8 +89,8 @@ RemoteMemoryAccessor::Init()
 	ssize_t cookie = 0;
 	status_t error;
 	while ((error = get_next_area_info(fTeam, &cookie, &areaInfo)) == B_OK) {
-		TRACE(("area %ld: address: %p, size: %ld, name: %s\n", areaInfo.area,
-			areaInfo.address, areaInfo.size, areaInfo.name));
+		TRACE(("area %" B_PRId32 ": address: %p, size: %ld, name: %s\n",
+			areaInfo.area, areaInfo.address, areaInfo.size, areaInfo.name));
 
 		Area *area = new(std::nothrow) Area(areaInfo.area, areaInfo.address,
 			areaInfo.size);
@@ -111,8 +111,8 @@ const void *
 RemoteMemoryAccessor::PrepareAddress(const void *remoteAddress,
 	int32 size) const
 {
-	TRACE(("RemoteMemoryAccessor::PrepareAddress(%p, %ld)\n", remoteAddress,
-		size));
+	TRACE(("RemoteMemoryAccessor::PrepareAddress(%p, %" B_PRId32 ")\n",
+		remoteAddress, size));
 
 	if (!remoteAddress) {
 		TRACE(("RemoteMemoryAccessor::PrepareAddress(): Got null address!\n"));
@@ -159,7 +159,8 @@ RemoteMemoryAccessor::AreaForLocalAddress(const void* address) const
 Area &
 RemoteMemoryAccessor::_FindArea(const void *address, int32 size) const
 {
-	TRACE(("RemoteMemoryAccessor::_FindArea(%p, %ld)\n", address, size));
+	TRACE(("RemoteMemoryAccessor::_FindArea(%p, %" B_PRId32 ")\n", address,
+		size));
 
 	for (AreaList::ConstIterator it = fAreas.GetIterator(); it.HasNext();) {
 		Area *area = it.Next();
@@ -375,7 +376,8 @@ status_t
 SymbolLookup::InitSymbolIterator(image_id imageID,
 	SymbolIterator& iterator) const
 {
-	TRACE(("SymbolLookup::InitSymbolIterator(): image ID: %ld\n", imageID));
+	TRACE(("SymbolLookup::InitSymbolIterator(): image ID: %" B_PRId32 "\n",
+		imageID));
 
 	// find the image
 	iterator.image = _FindImageByID(imageID);
@@ -561,7 +563,7 @@ const elf_sym*
 SymbolLookup::LoadedImage::LookupSymbol(addr_t address, addr_t* _baseAddress,
 	const char** _symbolName, size_t *_symbolNameLen, bool *_exactMatch) const
 {
-	TRACE(("LoadedImage::LookupSymbol(): found image: ID: %ld, text: "
+	TRACE(("LoadedImage::LookupSymbol(): found image: ID: %" B_PRId32 ", text: "
 		"address: %p, size: %ld\n", fImage->id,
 		(void*)fImage->regions[0].vmstart, fImage->regions[0].size));
 

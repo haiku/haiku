@@ -280,7 +280,7 @@ ImageFile::_LoadFile(const char* path, addr_t* _textAddress, size_t* _textSize,
 	if (memcmp(elfHeader->e_ident, ELF_MAGIC, 4) != 0)
 		return B_NOT_AN_EXECUTABLE;
 
-	if (elfHeader->e_ident[4] != ELFCLASS32)
+	if (elfHeader->e_ident[4] != ELF_CLASS)
 		return B_NOT_AN_EXECUTABLE;
 
 	// verify the location of the program headers
