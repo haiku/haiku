@@ -810,14 +810,15 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 
 status_t
 NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
-	bool* eof, uint64* change, uint64* dirCookie, uint64* dirCookieVerf)
+	bool* eof, uint64* change, uint64* dirCookie, uint64* dirCookieVerf,
+	bool attribute)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		if (cookie->fAttrDir)
+		if (attribute)
 			req.PutFH(fInfo.fAttrDir);
 		else
 			req.PutFH(fInfo.fHandle);

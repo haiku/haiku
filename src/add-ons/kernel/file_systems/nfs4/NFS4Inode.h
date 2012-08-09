@@ -66,7 +66,8 @@ protected:
 
 			status_t	ReadDirOnce(DirEntry** dirents, uint32* count,
 							OpenDirCookie* cookie, bool* eof, uint64* change,
-							uint64* dirCookie, uint64* dirCookieVerf);
+							uint64* dirCookie, uint64* dirCookieVerf,
+							bool attribute);
 
 			status_t	OpenAttrDir(FileHandle* handle);
 

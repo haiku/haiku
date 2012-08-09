@@ -190,7 +190,8 @@ DirectoryCache::Revalidate()
 	Trash();
 
 	DirectoryCacheSnapshot* newSnapshot;
-	status_t result = fInode->GetDirSnapshot(&newSnapshot, NULL, &fChange);
+	status_t result = fInode->GetDirSnapshot(&newSnapshot, NULL, &fChange,
+		fAttrDir);
 	if (result != B_OK) {
 		oldSnapshot->ReleaseReference();
 		return B_OK;

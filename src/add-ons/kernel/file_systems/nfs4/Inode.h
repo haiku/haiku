@@ -94,7 +94,7 @@ public:
 
 					status_t	GetDirSnapshot(DirectoryCacheSnapshot**
 									_snapshot, OpenDirCookie* cookie,
-									uint64* _change);
+									uint64* _change, bool attribute);
 
 protected:
 								Inode();

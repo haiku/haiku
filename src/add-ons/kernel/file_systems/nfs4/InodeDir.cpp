@@ -145,7 +145,7 @@ Inode::ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 
 status_t
 Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
-	OpenDirCookie* cookie, uint64* _change)
+	OpenDirCookie* cookie, uint64* _change, bool attribute)
 {
 	DirectoryCacheSnapshot* snapshot = new DirectoryCacheSnapshot;
 	if (snapshot == NULL)
@@ -161,7 +161,7 @@ Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 		DirEntry* dirents;
 
 		status_t result = ReadDirOnce(&dirents, &count, cookie, &eof, &change,
-			&dirCookie, &dirCookieVerf);
+			&dirCookie, &dirCookieVerf, attribute);
 		if (result != B_OK) {
 			delete snapshot;
 			return result;
@@ -177,7 +177,7 @@ Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 				continue;
 
 			ino_t id;
-			if (!cookie->fAttrDir) {
+			if (!attribute) {
 				if (dirents[i].fAttrCount == 2)
 					id = FileIdToInoT(dirents[i].fAttrs[1].fData.fValue64);
 				else
@@ -228,7 +228,8 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 		cookie->fSnapshot = cache->GetSnapshot();
 		if (cookie->fSnapshot == NULL) {
 			uint64 change;
-			result = GetDirSnapshot(&cookie->fSnapshot, cookie, &change);
+			result = GetDirSnapshot(&cookie->fSnapshot, cookie, &change,
+				cookie->fAttrDir);
 			if (result != B_OK) {
 				cache->Unlock();
 				fFileSystem->Revalidator().Unlock();
