@@ -534,6 +534,10 @@ Inode::GetStat(struct stat* st, OpenAttrCookie* attr)
 		memset(&st->st_mtim, 0, sizeof(timespec));
 	delete[] values;
 
+	st->st_blksize = fFileSystem->Root()->IOSize();
+	st->st_blocks = st->st_size / st->st_blksize;
+	st->st_blocks += st->st_size % st->st_blksize == 0 ? 0 : 1;
+
 	return B_OK;
 }
 

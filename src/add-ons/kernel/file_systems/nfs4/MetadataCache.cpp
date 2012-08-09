@@ -46,7 +46,8 @@ MetadataCache::GetStat(struct stat* st)
 		st->st_ctim = fStatCache.st_ctim;
 		st->st_crtim = fStatCache.st_crtim;
 		st->st_mtim = fStatCache.st_mtim;
-
+		st->st_blksize = fStatCache.st_blksize;
+		st->st_blocks = fStatCache.st_blocks;
 		return B_OK;
 	}
 
