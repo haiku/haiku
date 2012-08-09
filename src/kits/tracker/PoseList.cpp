@@ -114,8 +114,8 @@ PoseList::DeepFindPose(const node_ref* node, int32* resultingIndex) const
 }
 
 
-PoseList *
-PoseList::FindAllPoses(const node_ref *node) const
+PoseList*
+PoseList::FindAllPoses(const node_ref* node) const
 {
 	int32 count = CountItems();
 	PoseList *result = new PoseList(5, false);
@@ -131,16 +131,15 @@ PoseList::FindAllPoses(const node_ref *node) const
 			continue;
 
 		model = model->LinkTo();
-		if (model && *model->NodeRef() == *node) {
+		if (model != NULL && *model->NodeRef() == *node) {
 			result->AddItem(pose);
 			continue;
 		}
 		
-		if (!model) {
-			model = new Model(pose->TargetModel()->EntryRef(), true);
-			if (*model->NodeRef() == *node)
+		if (model == NULL) {
+			Model model(pose->TargetModel()->EntryRef(), true);
+			if (*model.NodeRef() == *node)
 				result->AddItem(pose);
-			delete model;
 		}
 	}
 	return result;

@@ -2655,7 +2655,7 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 		// the column we removed might just be the one that was used to filter
 		int32 count = fFilteredPoseList->CountItems();
 		for (int32 i = count - 1; i >= 0; i--) {
-			BPose *pose = fFilteredPoseList->ItemAt(i);
+			BPose* pose = fFilteredPoseList->ItemAt(i);
 			if (!FilterPose(pose))
 				RemoveFilteredPose(pose, i);
 		}
@@ -4953,15 +4953,15 @@ BPoseView::MoveSelectionTo(BPoint dropPt, BPoint clickPt,
 
 
 inline void
-UpdateWasBrokenSymlinkBinder(BPose *pose, Model *model, int32 index,
-	BPoseView *poseView, BObjectList<Model> *fBrokenLinks)
+UpdateWasBrokenSymlinkBinder(BPose* pose, Model* model, int32 index,
+	BPoseView* poseView, BObjectList<Model>* fBrokenLinks)
 {
 	if (!model->IsSymLink())
 		return;
 
 	BPoint loc(0, index * poseView->ListElemHeight());
 	pose->UpdateWasBrokenSymlink(loc, poseView);
-	if (model->LinkTo())
+	if (model->LinkTo() != NULL)
 		fBrokenLinks->RemoveItem(model);
 }
 
@@ -4973,7 +4973,7 @@ BPoseView::TryUpdatingBrokenLinks()
 	if (!lock)
 		return;
 
-	BObjectList<Model> *brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
+	BObjectList<Model>* brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
 
 	// try fixing broken symlinks, and detecting broken ones.
 	EachPoseAndModel(fPoseList, &UpdateWasBrokenSymlinkBinder, this,
@@ -4995,7 +4995,7 @@ BPoseView::PoseHandleDeviceUnmounted(BPose* pose, Model* model, int32 index,
 	if (model->NodeRef()->device == device)
 		poseView->DeletePose(model->NodeRef());
 	else if (model->IsSymLink()
-		&& model->LinkTo()
+		&& model->LinkTo() != NULL
 		&& model->LinkTo()->NodeRef()->device == device)
 		poseView->DeleteSymLinkPoseTarget(model->LinkTo()->NodeRef(), pose, index);
 }
@@ -5150,7 +5150,7 @@ BPoseView::FSNotification(const BMessage* message)
 					createPose = false;
 				}
 
-				const char *name;
+				const char* name;
 				if (message->FindString("name", &name) != B_OK)
 					break;
 #if DEBUG
@@ -5165,7 +5165,7 @@ BPoseView::FSNotification(const BMessage* message)
 					// exist yet. We are looking if the just created folder
 					// is 'some_folder' and watch it, expecting the creation of
 					// 'another_folder' later and then report the link as fixed. 
-					Model *model = new Model(&dirNode, &itemNode, name);
+					Model* model = new Model(&dirNode, &itemNode, name);
 					if (model->IsDirectory()) {
 						BString createdPath(BPath(model->EntryRef()).Path());
 						BDirectory currentDir(TargetModel()->EntryRef());
@@ -5302,8 +5302,8 @@ BPoseView::FSNotification(const BMessage* message)
 bool
 BPoseView::CreateSymlinkPoseTarget(Model* symlink)
 {
-	Model *newResolvedModel = NULL;
-	Model *result = symlink->LinkTo();
+	Model* newResolvedModel = NULL;
+	Model* result = symlink->LinkTo();
 	if (!result) {
 		BEntry entry(symlink->EntryRef(), true);
 		if (entry.InitCheck() == B_OK) {
@@ -5429,7 +5429,7 @@ BPoseView::EntryMoved(const BMessage* message)
 		// rename or move of entry in this directory (or query)
 
 		int32 index;
-		BPose *pose = fPoseList->FindPose(&itemNode, &index);
+		BPose* pose = fPoseList->FindPose(&itemNode, &index);
 		int32 poseListIndex = index;
 		bool visible = true;
 		if (fFiltering)
@@ -5489,7 +5489,7 @@ BPoseView::EntryMoved(const BMessage* message)
 
 
 void
-BPoseView::WatchParentOf(const entry_ref *ref)
+BPoseView::WatchParentOf(const entry_ref* ref)
 {
 	BPath currentDir(ref);
 	currentDir.GetParent(&currentDir);
@@ -5525,7 +5525,7 @@ BPoseView::StopWatchingParentsOf(const entry_ref* ref)
 	if (path.InitCheck() != B_OK)
 		return;
 
-	BObjectList<Model> *brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
+	BObjectList<Model>* brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
 	int32 count = brokenLinksCopy->CountItems();
 
 	while (path.GetParent(&path) == B_OK) {
@@ -5589,11 +5589,11 @@ BPoseView::AttributeChanged(const BMessage* message)
 
 	int32 index;
 	attr_info info;
-	PoseList *posesFound = fPoseList->FindAllPoses(&itemNode);
+	PoseList* posesFound = fPoseList->FindAllPoses(&itemNode);
 	int32 posesCount = posesFound->CountItems();
 	for (int i = 0; i < posesCount; i++) {
-		BPose *pose = posesFound->ItemAt(i);
-		Model *model = pose->TargetModel();
+		BPose* pose = posesFound->ItemAt(i);
+		Model* model = pose->TargetModel();
 		if (model->IsSymLink() && *model->NodeRef() != itemNode)
 			// change happened on symlink's target
 			model = model->ResolveIfLink();
@@ -5797,7 +5797,7 @@ BPoseView::DuplicateSelection(BPoint* dropStart, BPoint* dropEnd)
 
 	// create entry_ref list from selection
 	if (!fSelectionList->IsEmpty()) {
-		BObjectList<entry_ref> *srcList = new BObjectList<entry_ref>(
+		BObjectList<entry_ref>* srcList = new BObjectList<entry_ref>(
 			fSelectionList->CountItems(), true);
 		CopySelectionListToBListAsEntryRefs(fSelectionList, srcList);
 
@@ -5823,13 +5823,13 @@ BPoseView::SelectPoseAtLocation(BPoint point)
 
 
 void
-BPoseView::MoveListToTrash(BObjectList<entry_ref> *list, bool selectNext,
+BPoseView::MoveListToTrash(BObjectList<entry_ref>* list, bool selectNext,
 	bool deleteDirectly)
 {
 	if (!list->CountItems())
 		return;
 
-	BObjectList<FunctionObject> *taskList =
+	BObjectList<FunctionObject>* taskList =
 		new BObjectList<FunctionObject>(2, true);
 		// new owning list of tasks
 
@@ -7221,7 +7221,7 @@ BPoseView::WasDoubleClick(const BPose* pose, BPoint point)
 
 
 static void
-AddPoseRefToMessage(BPose *, Model* model, BMessage* message)
+AddPoseRefToMessage(BPose*, Model* model, BMessage* message)
 {
 	// Make sure that every file added to the message has its
 	// MIME type set.
@@ -7743,7 +7743,7 @@ BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 		if (pose->TargetModel()->IsSymLink()) {
 			fBrokenLinks->RemoveItem(pose->TargetModel());
 			StopWatchingParentsOf(pose->TargetModel()->EntryRef());
-			Model *target = pose->TargetModel()->LinkTo();
+			Model* target = pose->TargetModel()->LinkTo();
 			if (target)
 				watch_node(target->NodeRef(), B_STOP_WATCHING, this);
 		}
