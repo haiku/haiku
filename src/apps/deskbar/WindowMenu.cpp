@@ -120,7 +120,7 @@ TWindowMenu::AttachedToWindow()
 
 	int32 teamCount = fTeam->CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
-		team_id theTeam = (team_id)fTeam->ItemAt(i);
+		team_id theTeam = (addr_t)fTeam->ItemAt(i);
 		int32 tokenCount = 0;
 		int32* tokens = get_token_list(theTeam, &tokenCount);
 

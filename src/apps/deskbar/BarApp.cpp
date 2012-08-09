@@ -116,7 +116,7 @@ TBarApp::TBarApp()
 	numTeams = teamList.CountItems();
 	for (int32 i = 0; i < numTeams; i++) {
 		app_info appInfo;
-		team_id tID = (team_id)teamList.ItemAt(i);
+		team_id tID = (addr_t)teamList.ItemAt(i);
 		if (be_roster->GetRunningAppInfo(tID, &appInfo) == B_OK) {
 			AddTeam(appInfo.team, appInfo.flags, appInfo.signature,
 				&appInfo.ref);
@@ -454,7 +454,7 @@ TBarApp::MessageReceived(BMessage* message)
 			message->FindInt32("be:team", &team);
 
 			uint32 flags = 0;
-			message->FindInt32("be:flags", (long*)&flags);
+			message->FindInt32("be:flags", (int32*)&flags);
 
 			const char* sig = NULL;
 			message->FindString("be:signature", &sig);
@@ -717,14 +717,14 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 	int32 teamCount = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
 		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
-		if (barInfo->teams->HasItem((void*)team))
+		if (barInfo->teams->HasItem((void*)(addr_t)team))
 			return;
 		if (strcasecmp(barInfo->sig, sig) == 0)
 			multiLaunchTeam = barInfo;
 	}
 
 	if (multiLaunchTeam != NULL) {
-		multiLaunchTeam->teams->AddItem((void*)team);
+		multiLaunchTeam->teams->AddItem((void*)(addr_t)team);
 
 		int32 subsCount = sSubscribers.CountItems();
 		if (subsCount > 0) {
@@ -756,7 +756,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 		FetchAppIcon(barInfo->sig, barInfo->icon);
 	}
 
-	barInfo->teams->AddItem((void*)team);
+	barInfo->teams->AddItem((void*)(addr_t)team);
 
 	sBarTeamInfoList.AddItem(barInfo);
 
@@ -797,7 +797,7 @@ TBarApp::RemoveTeam(team_id team)
 	int32 teamCount = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
 		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
-		if (barInfo->teams->HasItem((void*)team)) {
+		if (barInfo->teams->HasItem((void*)(addr_t)team)) {
 			int32 subsCount = sSubscribers.CountItems();
 			if (subsCount > 0) {
 				BMessage message((barInfo->teams->CountItems() == 1)
@@ -810,7 +810,7 @@ TBarApp::RemoveTeam(team_id team)
 				}
 			}
 
-			barInfo->teams->RemoveItem((void*)team);
+			barInfo->teams->RemoveItem((void*)(addr_t)team);
 			if (barInfo->teams->CountItems() < 1) {
 				delete (BarTeamInfo*)sBarTeamInfoList.RemoveItem(i);
 				return;

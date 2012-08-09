@@ -115,7 +115,7 @@ TShowHideMenuItem::TeamShowHideCommon(int32 action, const BList* teamList,
 
 	int32 count = teamList->CountItems();
 	for (int32 index = 0; index < count; index++) {
-		team_id team = (team_id)teamList->ItemAt(index);
+		team_id team = (addr_t)teamList->ItemAt(index);
 
 		switch (action) {
 			case B_MINIMIZE_WINDOW:

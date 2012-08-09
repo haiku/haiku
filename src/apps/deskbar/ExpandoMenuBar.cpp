@@ -338,7 +338,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 
 			team_id teamID;
 			for (int32 team = 0; team < teamCount; team++) {
-				teamID = (team_id)teams->ItemAt(team);
+				teamID = (addr_t)teams->ItemAt(team);
 				kill_team(teamID);
 				// remove the team immediately from display
 				RemoveTeam(teamID, false);
@@ -378,7 +378,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		if (message->FindInt32("clicks", &clicks) == B_OK && clicks > 1
 			&& item == menuItem && item == fLastClickItem) {
 			// activate this team
-			be_roster->ActivateApp((team_id)item->Teams()->ItemAt(0));
+			be_roster->ActivateApp((addr_t)item->Teams()->ItemAt(0));
 			return;
 		}
 
@@ -627,8 +627,8 @@ TExpandoMenuBar::AddTeam(team_id team, const char* signature)
 		// Only add to team menu items
 		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
 			if (strcasecmp(item->Signature(), signature) == 0) {
-				if (!(item->Teams()->HasItem((void*)team)))
-					item->Teams()->AddItem((void*)team);
+				if (!(item->Teams()->HasItem((void*)(addr_t)team)))
+					item->Teams()->AddItem((void*)(addr_t)team);
 				break;
 			}
 		}
@@ -642,7 +642,7 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 	int32 count = CountItems();
 	for (int32 i = fFirstApp; i < count; i++) {
 		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
-			if (item->Teams()->HasItem((void*)team)) {
+			if (item->Teams()->HasItem((void*)(addr_t)team)) {
 				item->Teams()->RemoveItem(team);
 
 				if (partial)
@@ -849,7 +849,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 					for (int32 j = 0; j < teamCount; j++) {
 						// The following code is almost a copy/paste from
 						// WindowMenu.cpp
-						team_id	theTeam = (team_id)teamItem->Teams()->ItemAt(j);
+						team_id	theTeam = (addr_t)teamItem->Teams()->ItemAt(j);
 						int32 count = 0;
 						int32* tokens = get_token_list(theTeam, &count);
 

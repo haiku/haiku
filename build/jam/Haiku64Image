@@ -110,13 +110,49 @@ AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LINK)
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToHaikuImage system				: runtime_loader ;
+AddFilesToHaikuImage system				: runtime_loader Deskbar Tracker ;
 AddFilesToHaikuImage system bin			: $(SYSTEM_BIN) consoled ;
 AddFilesToHaikuImage system apps		: $(SYSTEM_APPS) ;
 AddFilesToHaikuImage system preferences	: $(SYSTEM_PREFERENCES) ;
 AddFilesToHaikuImage system demos		: $(SYSTEM_DEMOS) ;
 
+SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage system bin			: which ;
+SEARCH on installoptionalpackage = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage system bin			: installoptionalpackage ;
+SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage system bin			: install-wifi-firmwares.sh ;
+
+# Add the files to be used by installoptionalpackage.
+AddDirectoryToHaikuImage common data optional-packages ;
+local optional-pkg-files = OptionalBuildFeatures OptionalPackageDependencies
+	OptionalPackages OptionalLibPackages ;
+for name in $(optional-pkg-files) {
+	local file = [ FDirName $(HAIKU_TOP) build jam $(name) ] ;
+	AddFilesToHaikuImage common data optional-packages : $(file) ;
+}
+AddInstalledPackagesFileToHaikuImage ;
+
 AddSymlinkToHaikuImage system bin : bash : sh ;
+AddSymlinkToHaikuImage system bin : trash : untrash ;
+
+AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
+
+# Mailbox folders and symlink
+AddDirectoryToHaikuImage home mail draft ;
+AddDirectoryToHaikuImage home mail in ;
+AddDirectoryToHaikuImage home mail out ;
+
+AddSymlinkToHaikuImage home config : settings/deskbar : be ;
+# Deskbar Application links
+AddDirectoryToHaikuImage home config settings deskbar Applications ;
+DESKBAR_APPLICATIONS = Terminal ;
+local linkTarget ;
+for linkTarget in $(DESKBAR_APPLICATIONS) {
+	AddSymlinkToHaikuImage home config settings deskbar Applications
+		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
+}
+
 AddSymlinkToHaikuImage system bin : less : more ;
 AddSymlinkToHaikuImage system bin : gzip : gunzip ;
 AddSymlinkToHaikuImage system bin : gzip : zcat ;

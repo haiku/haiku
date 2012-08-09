@@ -119,7 +119,8 @@ fi
 # TODO: remove this when x86_64 is more complete.
 if [ "$(uname -m)" = "x86_64" ]; then
 	cd /boot/home
-	launch system/apps/Terminal
+	launch system/Tracker
+	launch system/Deskbar
 	exit
 fi
 
