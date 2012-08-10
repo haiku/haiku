@@ -9169,6 +9169,8 @@ DumpOne(BPose* pose, void*)
 void
 BPoseView::SortPoses()
 {
+	if (fTextWidgetToCheck != NULL)
+		fTextWidgetToCheck->CancelWait();
 	CommitActivePose();
 	// PRINT(("pose list count %d\n", fPoseList->CountItems()));
 #if xDEBUG
