@@ -7014,6 +7014,8 @@ BPoseView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 void
 BPoseView::MouseDragged(const BMessage* message)
 {
+	if (fTextWidgetToCheck != NULL)
+		fTextWidgetToCheck->CancelWait();
 	fTrackRightMouseUp = false;
 
 	BPoint where;
@@ -7100,6 +7102,10 @@ BPoseView::MouseDown(BPoint where)
 	if (pose) {
 		AddRemoveSelectionRange(where, extendSelection, pose);
 
+		if (fTextWidgetToCheck != NULL && (pose != fLastClickedPose
+				|| (buttons & B_SECONDARY_MOUSE_BUTTON) != 0))
+			fTextWidgetToCheck->CancelWait();
+
 		if (!extendSelection && !fTrackRightMouseUp && WasDoubleClick(pose, where)) {
 			// special handling for Path field double-clicks
 			if (!WasClickInPath(pose, index, where))
@@ -7108,6 +7114,8 @@ BPoseView::MouseDown(BPoint where)
 	} else {
 		// click was not in any pose
 		fLastClickedPose = NULL;
+		if (fTextWidgetToCheck != NULL)
+			fTextWidgetToCheck->CancelWait();
 
 		window->Activate();
 		window->UpdateIfNeeded();
@@ -7224,10 +7232,8 @@ BPoseView::WasDoubleClick(const BPose* pose, BPoint point)
 		fLastClickPt.Set(LONG_MAX, LONG_MAX);
 		fLastClickedPose = NULL;
 		fLastClickTime = 0;
-		if (fTextWidgetToCheck != NULL) {
+		if (fTextWidgetToCheck != NULL)
 			fTextWidgetToCheck->CancelWait();
-			fTextWidgetToCheck = NULL;
-		}
 		return true;
 	}
 

@@ -245,6 +245,7 @@ void
 BTextWidget::CancelWait()
 {
 	fLastClickedTime = 0;
+	fParams.poseView->SetTextWidgetToCheck(NULL);
 }
 
 
