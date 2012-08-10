@@ -185,6 +185,11 @@ DirectoryCache::Revalidate()
 	}
 
 	DirectoryCacheSnapshot* oldSnapshot = fDirectoryCache;
+	if (oldSnapshot == NULL) {
+		Trash();
+		return B_ERROR;
+	}
+
 	oldSnapshot->AcquireReference();
 
 	Trash();
@@ -194,7 +199,7 @@ DirectoryCache::Revalidate()
 		fAttrDir);
 	if (result != B_OK) {
 		oldSnapshot->ReleaseReference();
-		return B_OK;
+		return B_ERROR;
 	}
 	newSnapshot->AcquireReference();
 
