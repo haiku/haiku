@@ -2658,7 +2658,7 @@ DCRaw::_LoadRAW(const image_data_info& image)
 				break;
 
 			default:
-				fprintf(stderr, "DCRaw: unknown compression: %ld\n",
+				fprintf(stderr, "DCRaw: unknown compression: %" B_PRId32 "\n",
 					image.compression);
 				throw (status_t)B_NO_TRANSLATOR;
 				break;

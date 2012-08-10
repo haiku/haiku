@@ -982,7 +982,7 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 	// of the data from inSource has been read and written.
 	if (btoplain)
 		nreed = min((size_t)READ_BUFFER_SIZE,
-			txtheader.header.data_size - ntotalread);
+			(size_t)txtheader.header.data_size - ntotalread);
 	else
 		nreed = READ_BUFFER_SIZE;
 	nread = inSource->Read(buffer, nreed);
@@ -994,7 +994,7 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 		if (btoplain) {
 			ntotalread += nread;
 			nreed = min((size_t)READ_BUFFER_SIZE,
-				txtheader.header.data_size - ntotalread);
+				(size_t)txtheader.header.data_size - ntotalread);
 		} else
 			nreed = READ_BUFFER_SIZE;
 		nread = inSource->Read(buffer, nreed);

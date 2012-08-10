@@ -214,7 +214,7 @@ process_command(conversion_context &context, RTF::Command *command,
 
 	if (!strcmp(name, "sectnum")) {
 		char buffer[64];
-		snprintf(buffer, sizeof(buffer), "%ld", context.section);
+		snprintf(buffer, sizeof(buffer), "%" B_PRId32, context.section);
 		return write_text(context, buffer, target);
 	}
 	if (!strcmp(name, "pgnstarts")) {
@@ -227,7 +227,7 @@ process_command(conversion_context &context, RTF::Command *command,
 	}
 	if (!strcmp(name, "chpgn")) {
 		char buffer[64];
-		snprintf(buffer, sizeof(buffer), "%ld", context.page);
+		snprintf(buffer, sizeof(buffer), "%" B_PRId32, context.page);
 		return write_text(context, buffer, target);
 	}
 	return 0;
@@ -354,7 +354,7 @@ TextOutput::FlattenedRunArray(int32 &_size)
 	array->count = fRuns.CountItems();
 
 	for (int32 i = 0; i < array->count; i++) {
-		text_run *run = (text_run *)fRuns.RemoveItem(0L);
+		text_run *run = (text_run *)fRuns.RemoveItem((int32)0);
 		array->runs[i] = *run;
 		delete run;
 	}

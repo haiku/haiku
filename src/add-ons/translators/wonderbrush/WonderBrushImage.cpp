@@ -11,7 +11,7 @@
 #include "Canvas.h"
 
 WonderBrushImage::WonderBrushImage()
-	: fArchive(0UL)
+	: fArchive((uint32)0)
 {
 }
 

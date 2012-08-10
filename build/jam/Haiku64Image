@@ -44,20 +44,27 @@ SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
 
 SYSTEM_DEMOS = ;
 
-SYSTEM_LIBS = libbe.so libbnetapi.so libdebug.so libnetwork.so
-	libroot.so libroot-addon-icu.so
-	libtextencoding.so libtracker.so libtranslation.so
+SYSTEM_LIBS = libbe.so libbnetapi.so libdebug.so libjpeg.so libnetwork.so
+	libpng.so libroot.so libroot-addon-icu.so
+	libtextencoding.so libtiff.so libtracker.so libtranslation.so
+	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 	$(HAIKU_FREETYPE_CURRENT_LIB)
 ;
 
-PRIVATE_SYSTEM_LIBS = ;
+PRIVATE_SYSTEM_LIBS = libilmimf.so ;
 
 SYSTEM_SERVERS = app_server debug_server input_server mount_server
 	notification_server registrar syslog_daemon
 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = vesa.accelerant ;
+SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
+	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
+	PCXTranslator PNGTranslator PPMTranslator
+	RAWTranslator RTF-Translator SGITranslator STXTTranslator TGATranslator
+	TIFFTranslator WebPTranslator WonderBrushTranslator
+;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = vesa ;
 
@@ -191,6 +198,12 @@ AddFilesToHaikuImage home config boot : $(userBootScripts) ;
 # Add boot launch directory
 AddDirectoryToHaikuImage home config boot launch ;
 
+local logoArtwork =
+	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - big.png"
+	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - normal.png" ;
+SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
+AddFilesToHaikuImage system data artwork : $(logoArtwork) ;
+
 local etcDir = [ FDirName $(HAIKU_TOP) data etc ] ;
 local etcFiles = inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
@@ -293,6 +306,8 @@ AddBootModuleSymlinksToHaikuImage
 AddFilesToHaikuImage system add-ons accelerants
 	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
 
+AddFilesToHaikuHybridImage system add-ons Translators
+	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
 AddFilesToHaikuImage system add-ons input_server devices
 	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
 
@@ -310,6 +325,16 @@ AddDirectoryToHaikuImage common cache tmp ;
 
 AddDirectoryToHaikuImage home config add-ons kernel drivers bin ;
 AddDirectoryToHaikuImage home config add-ons kernel drivers dev ;
+AddDirectoryToHaikuImage home config add-ons input_server devices ;
+AddDirectoryToHaikuImage home config add-ons input_server filters ;
+AddDirectoryToHaikuImage home config add-ons input_server methods ;
+AddDirectoryToHaikuImage home config add-ons media plugins ;
+AddDirectoryToHaikuImage home config add-ons Tracker ;
+AddDirectoryToHaikuImage home config add-ons Print ;
+AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
+AddDirectoryToHaikuImage home config add-ons Translators ;
+AddDirectoryToHaikuImage system data synth ;
+AddDirectoryToHaikuImage system add-ons input_server methods ;
 
 # licenses
 CopyDirectoryToHaikuImage system data

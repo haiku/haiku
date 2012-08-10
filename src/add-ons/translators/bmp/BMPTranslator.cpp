@@ -648,7 +648,8 @@ BPositionIO *outDestination, color_space fromspace, MSInfoHeader &msheader)
 		}
 	}
 	while (rd == static_cast<ssize_t>(bitsRowBytes)) {
-		printf("translate_from_bits_to_bmp24() bmppixrow %ld\n", bmppixrow);
+		printf("translate_from_bits_to_bmp24() bmppixrow %" B_PRId32 "\n",
+			bmppixrow);
 	
 		for (int32 i = 0; i < msheader.width; i++) {
 			uint8 *bitspixel, *bmppixel;
@@ -1734,12 +1735,12 @@ BMPTranslator::translate_from_bmp(BPositionIO *inSource, uint32 outType,
 		if (!frommsformat && os2skip)
 			inSource->Seek(os2skip, SEEK_CUR);
 
-		rd = min((size_t)1024, fileHeader.fileSize - rdtotal);
+		rd = min((uint32)1024, fileHeader.fileSize - rdtotal);
 		rd = inSource->Read(buf, rd);
 		while (rd > 0) {
 			outDestination->Write(buf, rd);
 			rdtotal += rd;
-			rd = min((size_t)1024, fileHeader.fileSize - rdtotal);
+			rd = min((uint32)1024, fileHeader.fileSize - rdtotal);
 			rd = inSource->Read(buf, rd);
 		}
 		if (rd == 0)
