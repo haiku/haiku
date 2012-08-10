@@ -7137,9 +7137,10 @@ BPoseView::MouseDown(BPoint where)
 
 
 void
-BPoseView::SetTextWidgetToCheck(BTextWidget* widget)
+BPoseView::SetTextWidgetToCheck(BTextWidget* widget, BTextWidget* old)
 {
-	fTextWidgetToCheck = widget;
+	if (old == NULL || fTextWidgetToCheck == old)
+		fTextWidgetToCheck = widget;
 }
 
 

@@ -78,6 +78,9 @@ BTextWidget::BTextWidget(Model* model, BColumn* column, BPoseView* view)
 
 BTextWidget::~BTextWidget()
 {
+	if (fLastClickedTime != 0)
+		fParams.poseView->SetTextWidgetToCheck(NULL, this);
+
 	delete fText;
 }
 

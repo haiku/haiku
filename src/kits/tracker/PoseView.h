@@ -425,7 +425,7 @@ class BPoseView : public BView {
 		virtual void AdaptToVolumeChange(BMessage*);
 		virtual void AdaptToDesktopIntegrationChange(BMessage*);
 
-		void SetTextWidgetToCheck(BTextWidget*);
+		void SetTextWidgetToCheck(BTextWidget*, BTextWidget* = NULL);
 
 	protected:
 		// view setup
