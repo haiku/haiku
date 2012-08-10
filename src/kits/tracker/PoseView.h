@@ -425,6 +425,8 @@ class BPoseView : public BView {
 		virtual void AdaptToVolumeChange(BMessage*);
 		virtual void AdaptToDesktopIntegrationChange(BMessage*);
 
+		void SetTextWidgetToCheck(BTextWidget*);
+
 	protected:
 		// view setup
 		virtual void SetUpDefaultColumnsIfNeeded();
@@ -777,6 +779,8 @@ class BPoseView : public BView {
 		BRect fDeskbarFrame;
 
 		static OffscreenBitmap* sOffscreen;
+
+		BTextWidget* fTextWidgetToCheck;
 
 		typedef BView _inherited;
 };

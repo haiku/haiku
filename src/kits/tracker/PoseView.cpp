@@ -265,7 +265,8 @@ BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode,
 	fLastFilterStringLength(0),
 	fLastKeyTime(0),
 	fLastDeskbarFrameCheckTime(LONGLONG_MIN),
-	fDeskbarFrame(0, 0, -1, -1)
+	fDeskbarFrame(0, 0, -1, -1),
+	fTextWidgetToCheck(NULL)
 {
 	fViewState->SetViewMode(viewMode);
 	fShowSelectionWhenInactive
@@ -914,6 +915,11 @@ BPoseView::Pulse()
 			fLastLeftTop = LeftTop();
 		}
 	}
+
+	// do we have a TextWidget waiting for expiracy of its double-click
+	// check?
+	if (fTextWidgetToCheck != NULL)
+		fTextWidgetToCheck->CheckExpiration();
 }
 
 
@@ -1399,10 +1405,10 @@ BPoseView::AddPosesTask(void* castToParams)
 				}
 
 				view->ReadPoseInfo(model,
-					&(posesResult->fPoseInfos[modelChunkIndex]));
+					&posesResult->fPoseInfos[modelChunkIndex]);
 
 				if (!PoseVisible(model,
-					&(posesResult->fPoseInfos[modelChunkIndex]))) {
+					&posesResult->fPoseInfos[modelChunkIndex])) {
 					modelChunkIndex--;
 					continue;
 				}
@@ -7123,6 +7129,13 @@ BPoseView::MouseDown(BPoint where)
 
 
 void
+BPoseView::SetTextWidgetToCheck(BTextWidget* widget)
+{
+	fTextWidgetToCheck = widget;
+}
+
+
+void
 BPoseView::MouseUp(BPoint where)
 {
 	if (fSelectionRectInfo.isDragging)
@@ -7131,7 +7144,8 @@ BPoseView::MouseUp(BPoint where)
 	int32 index;
 	BPose* pose = FindPose(where, &index);
 	uint32 lastButtons = Window()->CurrentMessage()->FindInt32("last_buttons");
-	if (pose != NULL && fAllowPoseEditing && !fTrackRightMouseUp)
+	if (pose != NULL && fLastClickedPose != NULL && fAllowPoseEditing
+		&& !fTrackRightMouseUp)
 		pose->MouseUp(BPoint(0, index * fListElemHeight), this, where, index);
 
 
@@ -7210,6 +7224,10 @@ BPoseView::WasDoubleClick(const BPose* pose, BPoint point)
 		fLastClickPt.Set(LONG_MAX, LONG_MAX);
 		fLastClickedPose = NULL;
 		fLastClickTime = 0;
+		if (fTextWidgetToCheck != NULL) {
+			fTextWidgetToCheck->CancelWait();
+			fTextWidgetToCheck = NULL;
+		}
 		return true;
 	}
 

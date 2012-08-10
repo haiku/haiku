@@ -70,7 +70,8 @@ BTextWidget::BTextWidget(Model* model, BColumn* column, BPoseView* view)
 	fEditable(column->Editable()),
 	fVisible(true),
 	fActive(false),
-	fSymLink(model->IsSymLink())
+	fSymLink(model->IsSymLink()),
+	fLastClickedTime(0)
 {
 }
 
@@ -218,57 +219,65 @@ BTextWidget::CalcClickRect(BPoint poseLoc, const BColumn* column,
 
 
 void
-BTextWidget::MouseUp(BRect bounds, BPoseView* view, BPose* pose, BPoint)
+BTextWidget::CheckExpiration()
 {
-	// Start editing without delay if the pose was selected recently and this
-	// click is not the second click of a doubleclick.
-	// If the pose has been selected a long time ago, check again
-	// for a double click (inducing a delay).
-
-	// TODO: re-enable modifiers, one should be enough
-
-	if (IsEditable() && pose->IsSelected()) {
-		bigtime_t delta = system_time() - pose->SelectionTime();
+	if (IsEditable() && fParams.pose->IsSelected() && fLastClickedTime) {
 		bigtime_t doubleClickSpeed;
 		get_click_speed(&doubleClickSpeed);
-		bigtime_t oldClickSpeed = 2 * doubleClickSpeed;
 
-		// freshly selected and not a double click
-		if (delta > doubleClickSpeed && delta < oldClickSpeed) {
-			StartEdit(bounds, view, pose);
-			return;
+		bigtime_t delta = system_time() - fLastClickedTime;
+	
+		if (delta > doubleClickSpeed) {
+			// at least 'doubleClickSpeed' microseconds ellapsed and no click
+			// was registered since.
+			fLastClickedTime = 0;
+			fParams.poseView->SetTextWidgetToCheck(NULL);
+			StartEdit(fParams.bounds, fParams.poseView, fParams.pose);
 		}
-
-		// TODO: reimplement asynchronous
-		// selected a longer time ago, redo a double click detection
-		if (delta > oldClickSpeed) {
-			// check for double click
-			bigtime_t doubleClickTime = system_time() + doubleClickSpeed;
-			while (system_time() < doubleClickTime) {
-				// loop for double-click time and watch the mouse and keyboard
-
-				BPoint point;
-				uint32 buttons;
-				view->GetMouse(&point, &buttons, false);
-
-				// double click
-				if (buttons)
-					return;
-
-				// mouse moved too far
-				if (!bounds.Contains(point))
-					return;
-
-				//if (modifiers() & (B_SHIFT_KEY | B_COMMAND_KEY
-				//	| B_CONTROL_KEY | B_MENU_KEY))
-				//	// watch the keyboard (ignoring standard locking keys)
-				//	break;
-
-				snooze(10000);
-			}
-			StartEdit(bounds, view, pose);
-		}
+	} else {
+		fLastClickedTime = 0;
+		fParams.poseView->SetTextWidgetToCheck(NULL);
 	}
+}
+
+
+void
+BTextWidget::CancelWait()
+{
+	fLastClickedTime = 0;
+}
+
+
+void
+BTextWidget::MouseUp(BRect bounds, BPoseView* view, BPose* pose, BPoint)
+{
+	// Register the time of that click.  The PoseView, through its Pulse()
+	// will allow us to StartEdit() if no other click have been registered since
+	// then.
+
+	// TODO: re-enable modifiers, one should be enough
+	view->SetTextWidgetToCheck(NULL);
+	if (IsEditable() && pose->IsSelected()) {
+		bigtime_t doubleClickSpeed;
+		get_click_speed(&doubleClickSpeed);
+
+		if (fLastClickedTime == 0) {
+			fLastClickedTime = system_time();
+			if (fLastClickedTime - doubleClickSpeed < pose->SelectionTime())
+				fLastClickedTime = 0;
+		} else
+			fLastClickedTime = 0;
+
+		if (fLastClickedTime == 0)
+			return;
+
+		view->SetTextWidgetToCheck(this);
+
+		fParams.pose = pose;
+		fParams.bounds = bounds;
+		fParams.poseView = view;		
+	} else
+		fLastClickedTime = 0;
 }
 
 
