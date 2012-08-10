@@ -143,8 +143,8 @@ DecorSettingsView::_BuildDecorMenu()
 	for (int32 i = 0; i < count; ++i) {
 		DecorInfo* decorator = fDecorUtility.DecoratorAt(i);
 		if (decorator == NULL) {
-			fprintf(stderr, "Decorator : error NULL entry @ %li / %li\n",
-				i, count);
+			fprintf(stderr, "Decorator : error NULL entry @ %" B_PRId32 " / %"
+				B_PRId32 "\n", i, count);
 			continue;
 		}
 

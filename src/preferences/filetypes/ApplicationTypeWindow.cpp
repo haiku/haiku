@@ -610,11 +610,11 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 	// version info
 
 	char text[256];
-	snprintf(text, sizeof(text), "%ld", versionInfo.major);
+	snprintf(text, sizeof(text), "%" B_PRId32, versionInfo.major);
 	fMajorVersionControl->SetText(text);
-	snprintf(text, sizeof(text), "%ld", versionInfo.middle);
+	snprintf(text, sizeof(text), "%" B_PRId32, versionInfo.middle);
 	fMiddleVersionControl->SetText(text);
-	snprintf(text, sizeof(text), "%ld", versionInfo.minor);
+	snprintf(text, sizeof(text), "%" B_PRId32, versionInfo.minor);
 	fMinorVersionControl->SetText(text);
 
 	if (versionInfo.variety >= (uint32)fVarietyMenu->CountItems())
@@ -623,7 +623,7 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 	if (item != NULL)
 		item->SetMarked(true);
 
-	snprintf(text, sizeof(text), "%ld", versionInfo.internal);
+	snprintf(text, sizeof(text), "%" B_PRId32, versionInfo.internal);
 	fInternalVersionControl->SetText(text);
 
 	fShortDescriptionControl->SetText(versionInfo.short_info);

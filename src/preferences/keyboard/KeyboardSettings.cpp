@@ -98,8 +98,8 @@ KeyboardSettings::SetKeyboardRepeatDelay(bigtime_t delay)
 void
 KeyboardSettings::Dump()
 {
-	printf("repeat rate: %ld\n", fSettings.key_repeat_rate);
-	printf("repeat delay: %Ld\n", fSettings.key_repeat_delay);
+	printf("repeat rate: %" B_PRId32 "\n", fSettings.key_repeat_rate);
+	printf("repeat delay: %" B_PRId64 "\n", fSettings.key_repeat_delay);
 }
 
 

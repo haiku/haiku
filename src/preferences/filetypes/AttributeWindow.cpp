@@ -173,7 +173,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	fSpecialControl->SetEnabled(false);
 
 	char text[64];
-	snprintf(text, sizeof(text), "%ld", fAttribute.Width());
+	snprintf(text, sizeof(text), "%" B_PRId32, fAttribute.Width());
 	fWidthControl = new BTextControl(B_TRANSLATE_COMMENT("Width:",
 		"Default column width in Tracker for this attribute."),
 		text, NULL);

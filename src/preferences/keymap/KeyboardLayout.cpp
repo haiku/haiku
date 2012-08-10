@@ -332,7 +332,7 @@ KeyboardLayout::_Error(const parse_state& state, const char* reason, ...)
 	va_list args;
 	va_start(args, reason);
 
-	fprintf(stderr, "Syntax error in line %ld: ", state.line);
+	fprintf(stderr, "Syntax error in line %" B_PRId32 ": ", state.line);
 	vfprintf(stderr, reason, args);
 	fprintf(stderr, "\n");
 

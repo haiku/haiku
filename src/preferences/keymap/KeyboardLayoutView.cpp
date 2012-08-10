@@ -590,7 +590,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 			fDeadKey);
 	} else {
 		// Show the key code if there is no keymap
-		snprintf(text, sizeof(text), "%02lx", key->code);
+		snprintf(text, sizeof(text), "%02" B_PRIx32, key->code);
 	}
 
 	_SetFontSize(view, keyKind);
@@ -821,7 +821,7 @@ bool
 KeyboardLayoutView::_FunctionKeyLabel(uint32 code, char* text, size_t textSize)
 {
 	if (code >= B_F1_KEY && code <= B_F12_KEY) {
-		snprintf(text, textSize, "F%ld", code + 1 - B_F1_KEY);
+		snprintf(text, textSize, "F%" B_PRId32, code + 1 - B_F1_KEY);
 		return true;
 	}
 
@@ -1016,7 +1016,7 @@ KeyboardLayoutView::_KeyChanged(const BMessage* message)
 			checkSingle = false;
 
 		if (_KeyForCode(key) == NULL)
-			printf("no key for code %ld\n", key);
+			printf("no key for code %" B_PRId32 "\n", key);
 	}
 
 	for (int32 i = 0; i < 16; i++) {

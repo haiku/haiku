@@ -479,7 +479,7 @@ NetworkTimeView::_InitView()
 void
 NetworkTimeView::_UpdateServerList()
 {
-	while (fServerListView->RemoveItem(0L) != NULL);
+	while (fServerListView->RemoveItem((int32)0) != NULL);
 
 	const char* server;
 	int32 index = 0;

@@ -108,7 +108,7 @@ ProgressWindow::ProgressWindow(const char* message,
 	fQuitListener(signalQuit)
 {
 	char count[100];
-	snprintf(count, sizeof(count), "/%ld", max);
+	snprintf(count, sizeof(count), "/%" B_PRId32, max);
 
 	fStatusBar = new BStatusBar("status", message, count);
 	fStatusBar->SetMaxValue(max);
@@ -141,7 +141,8 @@ ProgressWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_UPDATE_STATUS_BAR:
 			char count[100];
-			snprintf(count, sizeof(count), "%ld", (int32)fStatusBar->CurrentValue() + 1);
+			snprintf(count, sizeof(count), "%" B_PRId32,
+				(int32)fStatusBar->CurrentValue() + 1);
 
 			fStatusBar->Update(1, NULL, count);
 			break;
@@ -431,7 +432,8 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 					&& appInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND)
 						== B_OK) {
 					char version[256];
-					snprintf(version, sizeof(version), "%lu.%lu.%lu, %s/%lu",
+					snprintf(version, sizeof(version),
+						"%" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 ", %s/%" B_PRIu32,
 						versionInfo.major, versionInfo.middle,
 						versionInfo.minor,
 						variety_to_text(versionInfo.variety),
