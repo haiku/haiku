@@ -30,7 +30,7 @@ public:
 
 			status_t			Migrate(const RPC::Server* serv);
 
-			OpenState*			OpenFilesLock();
+			DoublyLinkedList<OpenState>&	OpenFilesLock();
 			void				OpenFilesUnlock();
 	inline	uint32				OpenFilesCount();
 			void				AddOpenFile(OpenState* state);
@@ -73,7 +73,7 @@ private:
 			DoublyLinkedList<Delegation>	fDelegationList;
 			AVLTreeMap<FileHandle, Delegation*> fHandleToDelegation;
 
-			OpenState*			fOpenFiles;
+			DoublyLinkedList<OpenState>		fOpenFiles;
 			uint32				fOpenCount;
 			mutex				fOpenLock;
 

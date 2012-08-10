@@ -16,7 +16,7 @@
 
 bool
 NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
-	OpenStateCookie* cookie, OpenState* state)
+	OpenStateCookie* cookie, OpenState* state, uint32* sequence)
 {
 	uint32 leaseTime;
 
@@ -67,7 +67,14 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 		case NFS4ERR_STALE_CLIENTID:
 		case NFS4ERR_STALE_STATEID:
 			if (state != NULL) {
+				if (sequence != NULL)
+					fFileSystem->OpenOwnerSequenceUnlock(false);
+
 				fFileSystem->NFSServer()->ServerRebooted(state->fClientID);
+dprintf("returned rebooted\n");
+				if (sequence != NULL)
+					*sequence = fFileSystem->OpenOwnerSequenceLock();
+dprintf("locked again\n");
 				return true;
 			}
 			return false;

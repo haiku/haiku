@@ -13,6 +13,7 @@
 
 #include "FileSystem.h"
 #include "Request.h"
+#include "WorkQueue.h"
 
 
 OpenState::OpenState()
@@ -31,7 +32,9 @@ OpenState::OpenState()
 
 OpenState::~OpenState()
 {
+	fFileSystem->RemoveOpenFile(this);
 	Close();
+
 	mutex_destroy(&fLock);
 
 	mutex_destroy(&fLocksLock);
@@ -140,9 +143,10 @@ OpenState::Reclaim(uint64 newClientID)
 	if (fClientID == newClientID)
 		return B_OK;
 	fClientID = newClientID;
-
+dprintf("reclaim start\n");
 	_ReclaimOpen(newClientID);
 	_ReclaimLocks(newClientID);
+dprintf("reclaim end\n");
 	return B_OK;
 }
 
@@ -150,10 +154,16 @@ OpenState::Reclaim(uint64 newClientID)
 status_t
 OpenState::_ReclaimOpen(uint64 newClientID)
 {
+	dprintf("reclaim %s\n", fInfo.fName);
+
 	bool confirm;
 	OpenDelegationData delegation;
+	delegation.fType = OPEN_DELEGATE_NONE;
+	delegation.fRecall = false;
 
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
+	OpenDelegation delegType = fDelegation != NULL ? fDelegation->Type()
+		: OPEN_DELEGATE_NONE;
 	do {
 		RPC::Server* server = fFileSystem->Server();
 		Request request(server);
@@ -162,7 +172,7 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 		req.PutFH(fInfo.fHandle);
 		req.Open(CLAIM_PREVIOUS, sequence, sModeToAccess(fMode), newClientID,
 			OPEN4_NOCREATE, fFileSystem->OpenOwner(), NULL, NULL, 0, false,
-			fDelegation->Type());
+			delegType);
 
 		status_t result = request.Send();
 		if (result != B_OK) {
@@ -172,7 +182,7 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), server))
+		if (HandleErrors(reply.NFS4Error(), server, NULL, NULL, &sequence))
 			continue;
 
  		fFileSystem->OpenOwnerSequenceUnlock();
@@ -182,10 +192,19 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 		result = reply.Open(fStateID, &fStateSeq, &confirm, &delegation);
 		if (result != B_OK)
 			return result;
+
+		break;
 	} while (true);
 
-	if (delegation.fRecall)
-		fDelegation->GiveUp();
+	if (fDelegation != NULL)
+		fDelegation->SetData(delegation);
+
+	if (delegation.fRecall) {
+		DelegationRecallArgs* args = new(std::nothrow) DelegationRecallArgs;
+		args->fDelegation = fDelegation;
+		args->fTruncate = false;
+		gWorkQueue->EnqueueJob(DelegationRecall, args);
+	}
 
 	if (confirm)
 		return ConfirmOpen(fInfo.fHandle, this);
@@ -197,6 +216,8 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 status_t
 OpenState::_ReclaimLocks(uint64 newClientID)
 {
+	dprintf("reclaim locks %s\n", fInfo.fName);
+
 	MutexLocker _(fLocksLock);
 	LockInfo* linfo = fLocks;
 	while (linfo != NULL) {
@@ -264,7 +285,7 @@ OpenState::Close()
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv, NULL, this))
+		if (HandleErrors(reply.NFS4Error(), serv, NULL, this, &sequence))
 			continue;
  		fFileSystem->OpenOwnerSequenceUnlock();
 

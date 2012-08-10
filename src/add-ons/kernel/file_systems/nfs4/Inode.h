@@ -37,6 +37,8 @@ public:
 	inline			uint64		Change();
 	inline			bool		Dirty();
 
+	inline			OpenState*	GetOpenState();
+
 					void		SetDelegation(Delegation* delegation);
 					void		RecallDelegation(bool truncate = false);
 					void		RecallReadDelegation();
@@ -227,6 +229,13 @@ inline bool
 Inode::Dirty()
 {
 	return fWriteDirty;
+}
+
+
+inline OpenState*
+Inode::GetOpenState()
+{
+	return fOpenState;
 }
 
 

@@ -58,11 +58,13 @@ NFS4Server::ServerRebooted(uint64 clientId)
 	MutexLocker _(fFSLock);
 	FileSystem* fs = fFileSystems;
 	while (fs != NULL) {
-		OpenState* current = fs->OpenFilesLock();
+		DoublyLinkedList<OpenState>::Iterator iterator
+			= fs->OpenFilesLock().GetIterator();
+		OpenState* current = iterator.Next();
 		while (current != NULL) {
 			current->Reclaim(fClientId);
 
-			current = current->fNext;
+			current = iterator.Next();
 		}
 		fs->OpenFilesUnlock();
 

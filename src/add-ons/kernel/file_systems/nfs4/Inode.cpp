@@ -857,9 +857,9 @@ Inode::RecallReadDelegation()
 void
 Inode::ReturnDelegation(bool truncate)
 {
-	fMetaCache.UnlockValid();
-
 	fDelegation->GiveUp(truncate);
+
+	fMetaCache.UnlockValid();
 	fFileSystem->RemoveDelegation(fDelegation);
 
 	MutexLocker stateLocker(fStateLock);
@@ -874,10 +874,8 @@ Inode::ReturnDelegation(bool truncate)
 void
 Inode::ReleaseOpenState()
 {
-	if (fOpenState->ReleaseReference() == 1) {
-		fFileSystem->RemoveOpenFile(fOpenState);
+	if (fOpenState->ReleaseReference() == 1)
 		fOpenState = NULL;
-	}
 }
 
 

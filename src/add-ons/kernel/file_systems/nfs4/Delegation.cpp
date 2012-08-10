@@ -53,7 +53,7 @@ Delegation::ReturnDelegation()
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv))
+		if (HandleErrors(reply.NFS4Error(), serv, NULL, fInode->GetOpenState()))
 			continue;
 
 		reply.PutFH();

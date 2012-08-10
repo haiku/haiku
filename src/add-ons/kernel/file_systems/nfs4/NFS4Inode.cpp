@@ -553,7 +553,7 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv, NULL, state))
+		if (HandleErrors(reply.NFS4Error(), serv, NULL, state, &sequence))
 			continue;
 
 		fFileSystem->OpenOwnerSequenceUnlock();

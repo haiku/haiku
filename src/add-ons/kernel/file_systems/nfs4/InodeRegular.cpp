@@ -252,7 +252,6 @@ Inode::CloseAttr(OpenAttrCookie* cookie)
 	fFileSystem->RemoveDelegation(cookie->fOpenState->fDelegation);
 	delete cookie->fOpenState->fDelegation;
 	delete cookie->fOpenState;
-
 	return B_OK;
 }
 

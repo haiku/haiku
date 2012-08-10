@@ -17,7 +17,8 @@
 #include "NFS4Object.h"
 
 
-struct OpenState : public NFS4Object, public KernelReferenceable {
+struct OpenState : public NFS4Object, public KernelReferenceable,
+	public DoublyLinkedListLinkImpl<OpenState> {
 							OpenState();
 							~OpenState();
 
@@ -37,9 +38,6 @@ struct OpenState : public NFS4Object, public KernelReferenceable {
 
 			LockOwner*		fLockOwners;
 			mutex			fOwnerLock;
-
-			OpenState*		fNext;
-			OpenState*		fPrev;
 
 			LockOwner*		GetLockOwner(uint32 owner);
 

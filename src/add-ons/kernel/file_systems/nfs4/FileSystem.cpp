@@ -25,7 +25,6 @@ FileSystem::FileSystem()
 	:
 	fNext(NULL),
 	fPrev(NULL),
-	fOpenFiles(NULL),
 	fOpenCount(0),
 	fOpenOwnerSequence(0),
 	fPath(NULL),
@@ -267,7 +266,7 @@ FileSystem::Migrate(const RPC::Server* serv)
 }
 
 
-OpenState*
+DoublyLinkedList<OpenState>&
 FileSystem::OpenFilesLock()
 {
 	mutex_lock(&fOpenLock);
@@ -287,11 +286,8 @@ FileSystem::AddOpenFile(OpenState* state)
 {
 	MutexLocker _(fOpenLock);
 
-	state->fPrev = NULL;
-	state->fNext = fOpenFiles;
-	if (fOpenFiles != NULL)
-		fOpenFiles->fPrev = state;
-	fOpenFiles = state;
+	fOpenFiles.InsertBefore(fOpenFiles.Head(), state);
+
 	NFSServer()->IncUsage();
 }
 
@@ -300,13 +296,9 @@ void
 FileSystem::RemoveOpenFile(OpenState* state)
 {
 	MutexLocker _(fOpenLock);
-	if (state == fOpenFiles)
-		fOpenFiles = state->fNext;
 
-	if (state->fNext)
-		state->fNext->fPrev = state->fPrev;
-	if (state->fPrev)
-		state->fPrev->fNext = state->fNext;
+	fOpenFiles.Remove(state);
+
 	NFSServer()->DecUsage();
 }
 
@@ -335,8 +327,6 @@ FileSystem::AddDelegation(Delegation* delegation)
 
 	fHandleToDelegation.Remove(delegation->fInfo.fHandle);
 	fHandleToDelegation.Insert(delegation->fInfo.fHandle, delegation);
-
-	NFSServer()->IncUsage();
 }
 
 
@@ -347,8 +337,6 @@ FileSystem::RemoveDelegation(Delegation* delegation)
 
 	fDelegationList.Remove(delegation);
 	fHandleToDelegation.Remove(delegation->fInfo.fHandle);
-
-	NFSServer()->DecUsage();
 }
 
 

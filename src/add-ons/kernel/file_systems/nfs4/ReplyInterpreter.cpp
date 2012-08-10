@@ -827,6 +827,7 @@ ReplyInterpreter::_NFS4ErrorToHaiku(uint32 x)
 		case NFS4ERR_ISDIR:		return B_IS_A_DIRECTORY;
 		case NFS4ERR_INVAL:		return B_BAD_VALUE;
 		case NFS4ERR_FBIG:		return B_FILE_TOO_LARGE;
+		case NFS4ERR_NOTSUPP:	return B_UNSUPPORTED;
 		// ...
 		case NFS4ERR_DELAY:
 		case NFS4ERR_DENIED:

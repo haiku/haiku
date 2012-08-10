@@ -25,6 +25,7 @@ public:
 
 	status_t			GiveUp(bool truncate = false);
 
+	inline	void		SetData(const OpenDelegationData& data);
 	inline	Inode*		GetInode();
 	inline	OpenDelegation Type();
 
@@ -37,6 +38,13 @@ private:
 	Inode*				fInode;
 	bool				fAttribute;
 };
+
+
+inline void
+Delegation::SetData(const OpenDelegationData& data)
+{
+	fData = data;
+}
 
 
 inline Inode*
