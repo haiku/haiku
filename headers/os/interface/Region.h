@@ -85,7 +85,7 @@ private:
 								BRegion(const clipping_rect& rect);
 
 			void				_AdoptRegionData(BRegion& region);
-			bool				_SetSize(long newSize);
+			bool				_SetSize(int32 newSize);
 
 			clipping_rect		_Convert(const BRect& rect) const;
 			clipping_rect		_ConvertToInternal(const BRect& rect) const;
@@ -93,8 +93,8 @@ private:
 									const clipping_rect& rect) const;
 
 private:
-			long				fCount;
-			long				fDataSize;
+			int32				fCount;
+			int32				fDataSize;
 			clipping_rect		fBounds;
 			clipping_rect*		fData;
 };
