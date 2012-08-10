@@ -1,7 +1,9 @@
-1	belarusian	x-vnd.Haiku-DeskCalc	1916192649
+1	belarusian	x-vnd.Haiku-DeskCalc	3276968552
 Compact	CalcView		Кампактны
 Scientific	CalcView		Навуковы
 DeskCalc	System name		Калькулятар
 Basic	CalcView		Просты
+Radians	CalcView		Радыяны
 Enable Num Lock on startup	CalcView		Уключаць Num Lock пры запуску
+Degrees	CalcView		Градусы
 Audio Feedback	CalcView		Аўдыё Водгук

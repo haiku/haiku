@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	506391417
+1	belarusian	x-vnd.Haiku-libtracker	1301055003
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -15,7 +15,9 @@ Decrease size	ContainerWindow		Паменшыць памер
 Mini icon view	VolumeWindow		Від міні-іконак
 You must have at least one attribute showing.	PoseView		Патрэбна, каб быў паказаны хаця б адзін атрыбут.
 Permissions	InfoWindow		Дазволы
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Інвертаваць выдзяленне
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Нядаўнія дакменты
 Modified	QueryPoseView		Зменены
 Created	ContainerWindow		Створаны
@@ -40,6 +42,7 @@ Make active printer	ContainerWindow		Зрабіць актыўным прынт�
 Create link here	ContainerWindow		Стварыць спасылку тут
 Moving: 	StatusWindow		Перамяшчэнне
 before	FindPanel		перад
+Error emptying Trash	FSUtils		Памылка пры ачыстцы Сметніцы!
 On	FindPanel		На
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		больш за
@@ -92,6 +95,7 @@ Select all	VolumeWindow		Выбраць усё
 Opens with:	InfoWindow		Адкрыць з:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Калi вы %ifYouDoAction наладкі mime, %osName можа паводзіць сябе неадэкватна!\n\nВы ўпэўнены што жадаеце зрабіць гэта?
 Open	ContainerWindow		Адкрыць
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Памылка пры падліку памеру каталога.
 New folder	FilePanelPriv		Новы каталог
 %name info	InfoWindow	InfoWindow Title	%name інфа
@@ -314,6 +318,7 @@ The Tracker must be running to see Info windows.	PoseView		Каб бачыць �
 Other	FilePermissionsView		Іншае
 Query name:	FindPanel		Імя Запыту:
 Permissions	ContainerWindow		Правы
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		перамяшчаеце
 Identify	InfoWindow		Ідэнтыфікаваць
 Recent folders	ContainerWindow		Нядаўнія каталогі
