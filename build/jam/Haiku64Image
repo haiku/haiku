@@ -38,7 +38,7 @@ SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr chgrp chmod
 SYSTEM_APPS = AboutSystem Terminal ;
 
 SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
-	Keyboard Keymap Locale Mouse Notifications Screen Time Touchpad
+	Keyboard Keymap Locale Mouse Network Notifications Screen Time Touchpad
 	<preference>Tracker
 ;
 
