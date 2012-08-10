@@ -173,9 +173,9 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 	while ((pos + 6) <= fSize) {
 		int16 op = *reinterpret_cast<const int16 *>(data);
-		int32 size = *reinterpret_cast<const int32 *>(data + 2);
-		pos += 6;
-		data += 6;
+		size_t size = *reinterpret_cast<const size_t *>(data + sizeof(int16));
+		pos += sizeof(int16) + sizeof(size_t);
+		data += sizeof(int16) + sizeof(size_t);
 
 		if (pos + size > fSize)
 			debugger("PicturePlayer::Play: buffer overrun\n");
