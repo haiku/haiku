@@ -152,7 +152,7 @@ bus_alloc_resource(device_t dev, int type, int *rid, unsigned long start,
 		return NULL;
 
 	device_printf(dev, "bus_alloc_resource(%i, [%i], 0x%lx, 0x%lx, 0x%lx,"
-		"0x%lx)\n", type, *rid, start, end, count, flags);
+		"0x%" B_PRIx32 ")\n", type, *rid, start, end, count, flags);
 
 	// maybe a local array of resources is enough
 	res = (struct resource *)malloc(sizeof(struct resource));

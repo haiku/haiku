@@ -146,7 +146,7 @@ family::Release()
 family::Compare(void* _family, const void* _key)
 {
 	struct family* family = (struct family*)_family;
-	int key = (int)_key;
+	int key = (addr_t)_key;
 
 	if (family->type == key)
 		return 0;
@@ -159,7 +159,7 @@ family::Compare(void* _family, const void* _key)
 family::Hash(void* _family, const void* _key, uint32 range)
 {
 	struct family* family = (struct family*)_family;
-	int key = (int)_key;
+	int key = (addr_t)_key;
 
 	if (family != NULL)
 		return family->type % range;
@@ -171,7 +171,7 @@ family::Hash(void* _family, const void* _key, uint32 range)
 /*static*/ struct family*
 family::Lookup(int type)
 {
-	return (struct family*)hash_lookup(sFamilies, (void*)type);
+	return (struct family*)hash_lookup(sFamilies, (void*)(addr_t)type);
 }
 
 

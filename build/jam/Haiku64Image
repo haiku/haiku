@@ -24,15 +24,15 @@ SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr chgrp chmod
 	copyattr cp csplit cut date dd diff diff3 dircolors dirname df du
 	dumpcatalog echo eject env error expand expr factor false find finddir
 	fmt fold fortune gawk gdb gzip gzexe getlimits groups head hostname id
-	<bin>install isvolume join kernel_debugger kill less lessecho lesskey link
-	linkcatkeys listdev ln locale locate logger logname ls md5sum mkdir mkfifo
-	mktemp mount mountvolume mv nl nohup nproc od paste patch pathchk pr
-	printenv printf ps ptx pwd readlink ReadOnlyBootPrompt rm rmattr rmdir
-	safemode sdiff seq sha1sum shred shuf sleep sort split stat strace stty su
-	sum sync sysinfo tac tail tee test timeout touch tr true truncate tsort tty
-	unexpand uname uniq unlink unmount unzip <bin>updatedb waitfor wc whoami
-	xargs xres yes zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote
-	zipsplit zmore znew
+	ifconfig <bin>install isvolume join kernel_debugger kill less lessecho
+	lesskey link linkcatkeys listdev ln locale locate logger logname ls md5sum
+	mkdir mkfifo mktemp mount mountvolume mv nl nohup nproc od paste patch
+	pathchk ping pr printenv printf ps ptx pwd readlink ReadOnlyBootPrompt rm
+	rmattr rmdir safemode sdiff seq sha1sum shred shuf sleep sort split stat
+	strace stty su sum sync sysinfo tac tail tee test timeout touch tr true
+	truncate tsort tty unexpand uname uniq unlink unmount unzip <bin>updatedb
+	waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip zipcloak
+	<bin>zipgrep zipnote zipsplit zmore znew
 ;
 
 SYSTEM_APPS = AboutSystem Terminal ;
@@ -55,8 +55,13 @@ SYSTEM_LIBS = libbe.so libbnetapi.so libdebug.so libjpeg.so libnetwork.so
 PRIVATE_SYSTEM_LIBS = libilmimf.so ;
 
 SYSTEM_SERVERS = app_server debug_server input_server mount_server
-	notification_server registrar syslog_daemon
+	net_server notification_server registrar syslog_daemon
 ;
+
+SYSTEM_NETWORK_DEVICES = ethernet loopback ;
+SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
+	ipv6_datagram ;
+SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix icmp6 ipv6 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = vesa.accelerant ;
 SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
@@ -67,6 +72,11 @@ SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = vesa ;
+SYSTEM_ADD_ONS_DRIVERS_NET = 3com atheros813x ar81xx attansic_l1 attansic_l2
+	broadcom440x broadcom570x dec21xxx etherpci ipro100 ipro1000 jmicron2x0
+	marvell_yukon nforce pcnet pegasus rtl8139 rtl81xx sis19x syskonnect
+	via_rhine
+;
 
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci ps2 isa scsi config_manager
 	usb ;
@@ -105,6 +115,7 @@ AddDriversToHaikuImage				: console dprintf null
 AddDriversToHaikuImage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage disk usb		: usb_disk ;
 AddDriversToHaikuImage input		: ps2_hid usb_hid ;
+AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 
 # kernel
 AddFilesToHaikuImage system : kernel_$(TARGET_ARCH) ;
@@ -310,6 +321,14 @@ AddFilesToHaikuHybridImage system add-ons Translators
 	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
 AddFilesToHaikuImage system add-ons input_server devices
 	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
+AddFilesToHaikuImage system add-ons kernel network
+	: <net>notifications stack ;
+AddFilesToHaikuImage system add-ons kernel network devices
+	: $(SYSTEM_NETWORK_DEVICES) ;
+AddFilesToHaikuImage system add-ons kernel network datalink_protocols
+	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
+AddFilesToHaikuImage system add-ons kernel network protocols
+	: $(SYSTEM_NETWORK_PROTOCOLS) ;
 
 # create directories that will remain empty
 AddDirectoryToHaikuImage common bin ;

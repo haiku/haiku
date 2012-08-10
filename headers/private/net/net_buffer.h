@@ -85,9 +85,9 @@ struct net_buffer_module_info {
 
 	status_t		(*direct_access)(net_buffer* buffer, uint32 offset,
 						size_t bytes, void** _data);
-	status_t 		(*read)(net_buffer* buffer, uint32 offset, void* data,
+	status_t 		(*read)(net_buffer* buffer, size_t offset, void* data,
 						size_t bytes);
-	status_t		(*write)(net_buffer* buffer, uint32 offset,
+	status_t		(*write)(net_buffer* buffer, size_t offset,
 						const void* data, size_t bytes);
 
 	int32			(*checksum)(net_buffer* buffer, uint32 offset, size_t bytes,

@@ -241,12 +241,12 @@ dump_device_interface(int argc, char** argv)
 		= (net_device_interface*)parse_expression(argv[1]);
 
 	kprintf("device:            %p\n", interface->device);
-	kprintf("reader_thread:     %ld\n", interface->reader_thread);
+	kprintf("reader_thread:     %" B_PRId32 "\n", interface->reader_thread);
 	kprintf("up_count:          %" B_PRIu32 "\n", interface->up_count);
 	kprintf("ref_count:         %" B_PRId32 "\n", interface->ref_count);
 	kprintf("deframe_func:      %p\n", interface->deframe_func);
 	kprintf("deframe_ref_count: %" B_PRId32 "\n", interface->ref_count);
-	kprintf("consumer_thread:   %ld\n", interface->consumer_thread);
+	kprintf("consumer_thread:   %" B_PRId32 "\n", interface->consumer_thread);
 
 	kprintf("monitor_count:     %" B_PRId32 "\n", interface->monitor_count);
 	kprintf("monitor_lock:      %p\n", &interface->monitor_lock);

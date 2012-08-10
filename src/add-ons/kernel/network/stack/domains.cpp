@@ -77,8 +77,8 @@ dump_domains(int argc, char** argv)
 	
 		RouteList::Iterator routeIterator = domain->routes.GetIterator();
 		while (net_route_private* route = routeIterator.Next()) {
-			kprintf("    %p: dest %s, mask %s, gw %s, flags %lx, address %p\n",
-				route, AddressString(domain, route->destination
+			kprintf("    %p: dest %s, mask %s, gw %s, flags %" B_PRIx32 ", "
+				"address %p\n", route, AddressString(domain, route->destination
 					? route->destination : NULL).Data(),
 				AddressString(domain, route->mask ? route->mask : NULL).Data(),
 				AddressString(domain, route->gateway

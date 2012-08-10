@@ -736,7 +736,8 @@ Device::DumpRegisters()
 
 	for (size_t i = 0; i < _countof(RegisterEntries); i++) {
 		uint32 registerContents = ReadPCI32(RegisterEntries[i].Base);
-		kprintf("%s:\t%08lx\n", RegisterEntries[i].Name, registerContents);
+		kprintf("%s:\t%08" B_PRIx32 "\n", RegisterEntries[i].Name,
+			registerContents);
 		if (RegisterEntries[i].writeBack) {
 			WritePCI32(RegisterEntries[i].Base, registerContents);
 		}

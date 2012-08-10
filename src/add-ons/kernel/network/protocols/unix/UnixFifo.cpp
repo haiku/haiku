@@ -399,7 +399,7 @@ size_t
 UnixFifo::Readable() const
 {
 	size_t readable = fBuffer.Readable();
-	return readable > fReadRequested ? readable - fReadRequested : 0;
+	return (off_t)readable > fReadRequested ? readable - fReadRequested : 0;
 }
 
 
@@ -407,7 +407,7 @@ size_t
 UnixFifo::Writable() const
 {
 	size_t writable = fBuffer.Writable();
-	return writable > fWriteRequested ? writable - fWriteRequested : 0;
+	return (off_t)writable > fWriteRequested ? writable - fWriteRequested : 0;
 }
 
 

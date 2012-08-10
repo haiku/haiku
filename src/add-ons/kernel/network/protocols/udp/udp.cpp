@@ -739,7 +739,7 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 	// original packet
 	udp_header header;
 	if (gBufferModule->read(buffer, 0, &header,
-			std::min(buffer->size, sizeof(udp_header))) != B_OK)
+			std::min((size_t)buffer->size, sizeof(udp_header))) != B_OK)
 		return B_BAD_VALUE;
 
 	net_domain* domain = buffer->interface_address->domain;

@@ -186,14 +186,14 @@ create_device(const usb_device dev, const usb_interface_info *ii, uint16 ifno)
 
 	device->sem_lock = sem = create_sem(1, DRIVER_NAME "_lock");
 	if (sem < B_OK) {
-		DPRINTF_ERR("create_sem() failed 0x%lx\n", sem);
+		DPRINTF_ERR("create_sem() failed 0x%" B_PRIx32 "\n", sem);
 		free(device);
 		return NULL;
 	}
 	
 	device->rx_sem = sem = create_sem(1, DRIVER_NAME"_receive");
 	if (sem < B_OK) {
-		DPRINTF_ERR("create_sem() failed 0x%lx\n", sem);
+		DPRINTF_ERR("create_sem() failed 0x%" B_PRIx32 "\n", sem);
 		delete_sem(device->sem_lock);
 		free(device);
 		return NULL;
@@ -202,7 +202,7 @@ create_device(const usb_device dev, const usb_interface_info *ii, uint16 ifno)
 
 	device->rx_sem_cb = sem = create_sem(0, DRIVER_NAME"_receive_cb");
 	if (sem < B_OK) {
-		DPRINTF_ERR("create_sem() failed 0x%lx\n", sem);
+		DPRINTF_ERR("create_sem() failed 0x%" B_PRIx32 "\n", sem);
 		delete_sem(device->rx_sem);
 		delete_sem(device->sem_lock);
 		free(device);
@@ -499,7 +499,7 @@ pegasus_device_read(driver_cookie *cookie, off_t position, void *buffer, size_t 
 
 	// block until receive is available (if blocking is allowed)
 	if ((status = acquire_sem_etc(dev->rx_sem, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_NO_ERROR) {
-		DPRINTF_ERR("cannot acquire read sem: %lx, %s\n", status, strerror(status));
+		DPRINTF_ERR("cannot acquire read sem: %" B_PRIx32 ", %s\n", status, strerror(status));
 #ifndef __HAIKU__
 		*_length = 0;
 #endif
@@ -510,13 +510,13 @@ pegasus_device_read(driver_cookie *cookie, off_t position, void *buffer, size_t 
 	status = usb->queue_bulk(dev->pipe_in, dev->rx_buffer, MAX_FRAME_SIZE, &pegasus_rx_callback, dev);
 	
 	if (status != B_OK) {
-		DPRINTF_ERR("queue_bulk:failed:%08lx\n", status);
+		DPRINTF_ERR("queue_bulk:failed:%08" B_PRIx32 "\n", status);
 		goto rx_done;
 	}
 	
 	// block until data is available (if blocking is allowed)
 	if ((status = acquire_sem_etc(dev->rx_sem_cb, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_NO_ERROR) {
-		DPRINTF_ERR("cannot acquire read sem: %lx, %s\n", status, strerror(status));
+		DPRINTF_ERR("cannot acquire read sem: %" B_PRIx32 ", %s\n", status, strerror(status));
 #ifndef __HAIKU__
 		*_length = 0;
 #endif
@@ -567,7 +567,7 @@ pegasus_device_write(driver_cookie *cookie, off_t position,	const void *buffer, 
 	
 		// block until a free tx descriptor is available
 	if ((status = acquire_sem_etc(dev->tx_sem, 1, B_TIMEOUT, ETHER_TRANSMIT_TIMEOUT)) < B_NO_ERROR) {
-		DPRINTF_ERR("write: acquiring sem failed: %lx, %s\n", status, strerror(status));
+		DPRINTF_ERR("write: acquiring sem failed: %" B_PRIx32 ", %s\n", status, strerror(status));
 		return status;
 	}
 
@@ -594,13 +594,13 @@ pegasus_device_write(driver_cookie *cookie, off_t position,	const void *buffer, 
 		&pegasus_tx_callback, dev);
 	
 	if (status != B_OK){
-		DPRINTF_ERR("queue_bulk:failed:%08lx\n", status);
+		DPRINTF_ERR("queue_bulk:failed:%08" B_PRIx32 "\n", status);
 		goto tx_done;
 	}	
 	
 	// block until data is sent (if blocking is allowed)
 	if ((status = acquire_sem_etc(dev->tx_sem_cb, 1, B_CAN_INTERRUPT, 0)) != B_NO_ERROR) {
-		DPRINTF_ERR("cannot acquire write done sem: %lx, %s\n", status, strerror(status));
+		DPRINTF_ERR("cannot acquire write done sem: %" B_PRIx32 ", %s\n", status, strerror(status));
 #ifndef __HAIKU__
 		*_length = 0;
 #endif
