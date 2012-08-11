@@ -45,7 +45,7 @@ SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
 SYSTEM_DEMOS = ;
 
 SYSTEM_LIBS = libbe.so libbnetapi.so libdebug.so libjpeg.so libnetwork.so
-	libpng.so libroot.so libroot-addon-icu.so
+	libpng.so <revisioned>libroot.so libroot-addon-icu.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
@@ -118,7 +118,7 @@ AddDriversToHaikuImage input		: ps2_hid usb_hid ;
 AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 
 # kernel
-AddFilesToHaikuImage system : kernel_$(TARGET_ARCH) ;
+AddFilesToHaikuImage system : <revisioned>kernel_$(TARGET_ARCH) ;
 
 # libs
 AddLibrariesToHaikuHybridImage system lib

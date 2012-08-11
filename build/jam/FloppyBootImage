@@ -115,12 +115,7 @@ if $(TARGET_ARCH) = x86_64 {
 }
 
 # kernel
-if $(TARGET_ARCH) = x86_64 {
-	# TODO x86_64: ELF64 support not added to set_haiku_revision.
-	AddFilesToFloppyBootArchive system : kernel_$(TARGET_ARCH) ;
-} else {
-	AddFilesToFloppyBootArchive system : <revisioned>kernel_$(TARGET_ARCH) ;
-}
+AddFilesToFloppyBootArchive system : <revisioned>kernel_$(TARGET_ARCH) ;
 
 # scripts and data files
 
