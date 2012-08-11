@@ -14,7 +14,7 @@
 	__BEGIN_DECLS
 
 	/* assume that futimens() and utimensat() aren't available */
-	int	futimens(int fd, const struct timespec times[2]);
+	int futimens(int fd, const struct timespec times[2]);
 	int utimensat(int fd, const char* path, const struct timespec times[2],
 		int flag);
 

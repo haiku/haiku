@@ -213,6 +213,30 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 }
 
 
+DIR*
+fdopendir(int fd)
+{
+	struct stat st;
+	if (fstat(fd, &st)) {
+		// failed to get the stat info for fd, fstat() sets errno
+		return NULL;
+	}
+
+	if (!S_ISDIR(st.st_mode)) {
+		errno = ENOTDIR;
+		return NULL;
+	}
+
+	char path[MAXPATHLEN];
+	if (fcntl(fd, F_GETPATH, path) < 0) {
+		// failed to get the path of fd, fcntl() sets errno
+		return NULL;
+	}
+
+	return opendir(path);
+}
+
+
 int
 fstatat(int fd, const char *path, struct stat *st, int flag)
 {
@@ -391,11 +415,12 @@ symlinkat(const char *oldPath, int fd, const char *newPath)
 		return -1;
 	}
 
-	char oldFullPath[MAXPATHLEN];
-	if (get_path(fd, oldPath, oldFullPath) < 0)
+	// newPath is relative to the fd
+	char newFullPath[MAXPATHLEN];
+	if (get_path(fd, newPath, newFullPath) < 0)
 		return -1;
 
-	return symlink(oldFullPath, newPath);
+	return symlink(oldPath, newFullPath);
 }
 
 
