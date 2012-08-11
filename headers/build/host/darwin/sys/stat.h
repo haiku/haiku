@@ -1,11 +1,8 @@
 #ifndef _HAIKU_BUILD_COMPATIBILITY_DARWIN_SYS_STAT
 #define _HAIKU_BUILD_COMPATIBILITY_DARWIN_SYS_STAT
 
-
 #include_next <sys/stat.h>
-
 #include <sys/cdefs.h>
-
 
 #ifndef UTIME_NOW
 #	define UTIME_NOW	(-1)
@@ -28,5 +25,10 @@
 #	endif
 #endif
 
+int fchmodat(int fd, const char* path, mode_t mode, int flag);
+int fstatat(int fd, const char *path, struct stat *st, int flag);
+int mkdirat(int fd, const char *path, mode_t mode);
+int mkfifoat(int fd, const char *path, mode_t mode);
+int mknodat(int fd, const char *name, mode_t mode, dev_t dev);
 
 #endif	/* _HAIKU_BUILD_COMPATIBILITY_DARWIN_SYS_STAT */
