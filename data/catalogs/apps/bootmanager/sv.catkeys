@@ -1,65 +1,65 @@
 1	swedish	x-vnd.Haiku-BootManager	3014946856
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Kommer nu att återställa huvudstartsektorn (MBR) på %disk från %file. Vill du fortsätta?
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Kommer att skriva bootmenyn till hårddisken. Är du säker på att du vill fortsätta?
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Följande startmeny kommer att skrivas till startdisken (%s). Vänligen kontrollera informationen nedan innan du fortsätter.
-After five seconds	DefaultPartitionPage		Efter fem sekunder
-After four seconds	DefaultPartitionPage		Efter fyra sekunder
-After one minute	DefaultPartitionPage		Efter en minut
-After one second	DefaultPartitionPage		Efter en sekund
-After three seconds	DefaultPartitionPage		Efter tre sekunder
+The boot manager has been successfully installed on your system.	BootManagerController		Starthanteraren har installerats på ditt system.
 After two seconds	DefaultPartitionPage		Efter två sekunder
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Ett fel uppstod när startmenyn skulle sparas. Huvudstartsektorn kan vara förstörd. Du bör återställa huvudstartsektorn nu!
+Uninstall Boot Manager	UninstallPage	Title	Avinstallera Starthanteraren
 At least one partition must be selected!	BootManagerController		Minst en partition måste markeras!
-Back	BootManagerController	Button	Tillbaka
-Backup Master Boot Record	BootManagerController	Title	Säkerhetskopiera huvudstartsektorn
-Boot Manager is unable to read the partition table!	BootManagerController		Starthanteraren kan inte läsa partitionstabellen!
-BootManager	System name		StartHanterare
-Cannot access!	DrivesPage	Cannot install	Kan inte få åtkomst!
-Default Partition	DefaultPartitionPage	Title	Standardpartition
-Default Partition:	DefaultPartitionPage	Menu field label	Förvald partition:
-Done	BootManagerController	Button	Klar
-Drives	DrivesPage	Title	Diskar
-Error reading partition table	BootManagerController	Title	Kan ej läsa partitionstabellen
-File:	FileSelectionPage	Text control label	Fil:
+The old Master Boot Record could not be saved to %s	BootManagerController		Den gamla huvudstartsektorn kunde inte sparas till %s
+Restore MBR	BootManagerController	Button	Återställ MBR
 Hard Drive	DrivesPage	Default disk name	Hårddisk
-Immediately	DefaultPartitionPage		Omedelbart
-Install	DrivesPage	Button	Installera
-Installation of boot menu completed	BootManagerController	Title	Installationen av startmenyn färdigt
-Installation of boot menu failed	BootManagerController	Title	Installationen av startmenyn misslyckades
-Never	DefaultPartitionPage		Aldrig
-Next	WizardView	Button	Nästa
-No space available!	DrivesPage	Cannot install	Inget utrymme tillgängligt!
-OK	BootManagerController	Button	OK
-Old Master Boot Record Saved failure	BootManagerController	Title	Kunde inte spara gamla huvudstartsektorn
-Old Master Boot Record saved	BootManagerController	Title	Gamla huvudstartsektorn sparad
-Partition table not compatible	BootManagerController	Title	Partitionstabellen är ej kompatibel
-Partitions	DefaultPartitionPage	Pop up menu title	Partitioner
+USB Drive	DrivesPage	Default disk name	USB-disk
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Huvudstartsektorn (MBR) på startenheten:\n\t%s\nkommer nu att sparas till disk. Vänligen välj en fil att spara MBR till.\n\nOm något går fel under installationen eller om du senare vill ta bort startmenyn kan du köra Starthanteraren och välja alternativet 'Avinstallera'.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Kommer nu att återställa huvudstartsektorn (MBR) på %disk från %file. Vill du fortsätta?
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Ett fel uppstod när startmenyn skulle sparas. Huvudstartsektorn kan vara förstörd. Du bör återställa huvudstartsektorn nu!
 Partitions	PartitionsPage	Title	Partitioner
+Timeout: %s	DefaultPartitionPage		Timeout: %s
+Select	FileSelectionPage	Button	Välj
+Cannot access!	DrivesPage	Cannot install	Kan inte få åtkomst!
+Uninstall boot manager	BootManagerController	Title	Avinstallera starthanteraren
+After four seconds	DefaultPartitionPage		Efter fyra sekunder
+Uninstallation of boot menu failed	BootManagerController	Title	Avinstallationen av startmenyn misslyckades
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Vänligen lokalisera huvudstartsektorns (MBR) säkerhetskopia för återställning. Säkerhetskopian skapades första gången Starthanteraren installerades.
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Vänligen lokalisera huvudstartsektorns (MBR) återställningsfil. Filen skpades första gången Starthanteraren installerades.
+Next	WizardView	Button	Nästa
+Uninstallation of boot menu completed	BootManagerController	Title	Avinstallationen av startmenyn färdigt
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Vänligen välj den enhet som du vill installera starthanteraren på eller avinstallera från.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Vänligen välj en standardpartition och timeout.\nStartmenyn kommer att starta den förvalda partitionen efter timeouten om inte du väljer en annan partition. Du kan också låta startmenyn vänta tills du väljer en partiton.\nHåll 'ALT' tangenten intryckt för att inaktivera timouten vid uppstart.
-Previous	WizardView	Button	Föregående
-Quit	DrivesPage	Button	Avsluta
-Restore MBR	BootManagerController	Button	Återställ MBR
-Select	FileSelectionPage	Button	Välj
-Summary	BootManagerController	Title	Sammanfattning
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Huvudstartsektorn (MBR) på startenheten:\n\t%s\nkommer nu att sparas till disk. Vänligen välj en fil att spara MBR till.\n\nOm något går fel under installationen eller om du senare vill ta bort startmenyn kan du köra Starthanteraren och välja alternativet 'Avinstallera'.
-The Master Boot Record could not be restored!	BootManagerController		Huvudstartsektorn kunde inte återställas!
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Huvudstartsektorn på startenheten (%DISK) återställdes framgångsrikt från %FILE.
-The boot manager has been successfully installed on your system.	BootManagerController		Starthanteraren har installerats på ditt system.
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Följande partitoner hittades. Vänligen markera kryssrutan bredvid partitionerna du vill ha med i startmenyn. Du kan också namnge partitionerna som du vill att dom skall heta i startmenyn.
-The old Master Boot Record could not be saved to %s	BootManagerController		Den gamla huvudstartsektorn kunde inte sparas till %s
-The old Master Boot Record was successfully saved to %s.	BootManagerController		Den gamla huvudstartsektorn sparades till %s.
+After one second	DefaultPartitionPage		Efter en sekund
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Partitionstabellen på den första hårddisken är inte kompatibel med Starthanteraren.\nStarthanteraren behöver 2 KB ledigt utrymme före den första partitionen.
-Timeout: %s	DefaultPartitionPage		Timeout: %s
-USB Drive	DrivesPage	Default disk name	USB-disk
-Uninstall	DrivesPage	Button	Avinstallera
-Uninstall Boot Manager	UninstallPage	Title	Avinstallera Starthanteraren
-Uninstall boot manager	BootManagerController	Title	Avinstallera starthanteraren
-Uninstallation of boot menu completed	BootManagerController	Title	Avinstallationen av startmenyn färdigt
-Uninstallation of boot menu failed	BootManagerController	Title	Avinstallationen av startmenyn misslyckades
-Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Okänd
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Odöpt %d
-Update	DrivesPage	Button	Uppdatera
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Följande partitoner hittades. Vänligen markera kryssrutan bredvid partitionerna du vill ha med i startmenyn. Du kan också namnge partitionerna som du vill att dom skall heta i startmenyn.
+After one minute	DefaultPartitionPage		Efter en minut
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Huvudstartsektorn på startenheten (%DISK) återställdes framgångsrikt från %FILE.
 Write boot menu	BootManagerController	Button	Skriv startmeny
+The Master Boot Record could not be restored!	BootManagerController		Huvudstartsektorn kunde inte återställas!
+Uninstall	DrivesPage	Button	Avinstallera
+Default Partition	DefaultPartitionPage	Title	Standardpartition
+After five seconds	DefaultPartitionPage		Efter fem sekunder
+Back	BootManagerController	Button	Tillbaka
+Installation of boot menu completed	BootManagerController	Title	Installationen av startmenyn färdigt
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Odöpt %d
+File:	FileSelectionPage	Text control label	Fil:
+Previous	WizardView	Button	Föregående
+Install	DrivesPage	Button	Installera
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Följande startmeny kommer att skrivas till startdisken (%s). Vänligen kontrollera informationen nedan innan du fortsätter.
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Okänd
+Update	DrivesPage	Button	Uppdatera
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Vänligen lokalisera huvudstartsektorns (MBR) återställningsfil. Filen skpades första gången Starthanteraren installerades.
+Old Master Boot Record Saved failure	BootManagerController	Title	Kunde inte spara gamla huvudstartsektorn
+Drives	DrivesPage	Title	Diskar
+No space available!	DrivesPage	Cannot install	Inget utrymme tillgängligt!
+Never	DefaultPartitionPage		Aldrig
+Partition table not compatible	BootManagerController	Title	Partitionstabellen är ej kompatibel
+Old Master Boot Record saved	BootManagerController	Title	Gamla huvudstartsektorn sparad
+Boot Manager is unable to read the partition table!	BootManagerController		Starthanteraren kan inte läsa partitionstabellen!
+Error reading partition table	BootManagerController	Title	Kan ej läsa partitionstabellen
+Installation of boot menu failed	BootManagerController	Title	Installationen av startmenyn misslyckades
+Backup Master Boot Record	BootManagerController	Title	Säkerhetskopiera huvudstartsektorn
+Quit	DrivesPage	Button	Avsluta
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Kommer att skriva bootmenyn till hårddisken. Är du säker på att du vill fortsätta?
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Den gamla huvudstartsektorn sparades till %s.
+Default Partition:	DefaultPartitionPage	Menu field label	Förvald partition:
+Partitions	DefaultPartitionPage	Pop up menu title	Partitioner
+BootManager	System name		StartHanterare
+Summary	BootManagerController	Title	Sammanfattning
+OK	BootManagerController	Button	OK
+Immediately	DefaultPartitionPage		Omedelbart
+Done	BootManagerController	Button	Klar
+After three seconds	DefaultPartitionPage		Efter tre sekunder

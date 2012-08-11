@@ -1,34 +1,33 @@
-1	swedish	x-vnd.Haiku-LaunchBox	3172696206
-Add button here	LaunchBox		Lägg till knapp
-Auto-raise	LaunchBox		Upphöj automatiskt
-Bummer	LaunchBox		Hoppsan
-Cancel	LaunchBox		Avbryt
-Clear button	LaunchBox		Rensa knapp
-Clone	LaunchBox		Klona
-Close	LaunchBox		Stäng
-Description for '%3'	LaunchBox		Beskrivning för '%3'
-Failed to launch '%1'.\n\nError:	LaunchBox		Misslyckades att starta '%1'.\n\nFel:
-Failed to launch 'something',error in Pad data.	LaunchBox		Misslyckades att starta 'någonting'. Fel på knappen.
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Misslyckades att skicka 'öppna mapp' kommando till Tracker.\n\nFel:
-Horizontal layout	LaunchBox		Horisontal utformning
-Icon size	LaunchBox		Ikonstorlek
-Ignore double-click	LaunchBox		Ignorera dubbelklick
-LaunchBox	System name		StartBlock
-Name Panel	LaunchBox		Namnge Block
+1	swedish	x-vnd.Haiku-LaunchBox	4192523522
 New	LaunchBox		Ny
-OK	LaunchBox		OK
-Pad	LaunchBox		Block
-Pad %1	LaunchBox		Block %1
-Pad 1	LaunchBox		Block 1
-Quit	LaunchBox		Avsluta
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vill du verkligen stänga blocket?\n(Blocket kommer inte att kommas ihåg.)
-Remove button	LaunchBox		Ta bort knapp
 Set description…	LaunchBox		Ange beskrivning...
-Settings	LaunchBox		Inställningar
+Vertical layout	LaunchBox		Vertikal utformning
+OK	LaunchBox		OK
+Pad 1	LaunchBox		Block 1
+last chance	LaunchBox		sista chansen
+Quit	LaunchBox		Avsluta
+Clear button	LaunchBox		Rensa knapp
+LaunchBox	System name		StartBlock
+Ignore double-click	LaunchBox		Ignorera dubbelklick
+Auto-raise	LaunchBox		Upphöj automatiskt
 Show on all workspaces	LaunchBox		Visa på alla arbetsytor
 Show window border	LaunchBox		Visa fönsterkant
-Vertical layout	LaunchBox		Vertikal utformning
-You can drag an icon here.	LaunchBox		Du kan dra en ikon hit.
+Pad	LaunchBox		Block
+Icon size	LaunchBox		Ikonstorlek
+Bummer	LaunchBox		Hoppsan
+Cancel	LaunchBox		Avbryt
+Remove button	LaunchBox		Ta bort knapp
+Horizontal layout	LaunchBox		Horisontal utformning
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nKunde inte starta programmet med signaturen '%2'.\n\nFel:
-last chance	LaunchBox		sista chansen
+Failed to launch '%1'.\n\nError:	LaunchBox		Misslyckades att starta '%1'.\n\nFel:
+Name Panel	LaunchBox		Namnge Block
+Add button here	LaunchBox		Lägg till knapp
+Description for '%3'	LaunchBox		Beskrivning för '%3'
+Settings	LaunchBox		Inställningar
+Pad %1	LaunchBox		Block %1
+Close	LaunchBox		Stäng
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Misslyckades att skicka 'öppna mapp' kommando till Tracker.\n\nFel:
+You can drag an icon here.	LaunchBox		Du kan dra en ikon hit.
+Clone	LaunchBox		Klona
 launch popup	LaunchBox		starta popup
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vill du verkligen stänga blocket?\n(Blocket kommer inte att kommas ihåg.)

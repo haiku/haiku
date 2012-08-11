@@ -1,44 +1,44 @@
-1	swedish	x-vnd.Haiku-Time	3493650184
-<Other>	Time		<annan>
-Add	Time		Lägg till
-Africa	Time		Afrika
-America	Time		Amerika
-Antarctica	Time		Antarktis
-Arctic	Time		Arktis
-Asia	Time		Asien
-Atlantic	Time		Atlanten
-Australia	Time		Australien
-Could not contact server	Time		Kunde inte kontakta servern
-Could not create socket	Time		Kunde inte skapa en socket
-Current time:	Time		Aktuell tid:
-Date and time	Time		Datum och tid
-Europe	Time		Europa
+1	swedish	x-vnd.Haiku-Time	3249243267
 GMT (UNIX compatible)	Time		GMT (UNIX kompatibel)
-Hardware clock set to:	Time		Hårdvaruklockans tid:
-Indian	Time		Indien
+OK	Time		OK
+Asia	Time		Asien
+\nNow: 	Time		\nNu: 
+Africa	Time		Afrika
+Stop	Time		Stoppa
+Could not contact server	Time		Kunde inte kontakta servern
+Australia	Time		Australien
+Preview time:	Time		Förhandsvisa tid:
+Synchronize	Time		Synkronisera
+Revert	Time		Återställ
+Pacific	Time		Stilla havet
+Add	Time		Lägg till
+Date and time	Time		Datum och tid
+about	Time		om
 Local time (Windows compatible)	Time		Lokal tid (Windows kompatibel)
 Message receiving failed	Time		Kunde inte ta emot meddelandet
-Network time	Time		Internettid
-OK	Time		OK
-Pacific	Time		Stilla havet
-Preview time:	Time		Förhandsvisa tid:
-Received invalid time	Time		Tog emot en ogiltig tid
-Remove	Time		Ta bort
-Reset	Time		Återställ
-Revert	Time		Återställ
-Sending request failed	Time		Misslyckades att skicka förfrågan
 Set time zone	Time		Ange tidzon
-Stop	Time		Stoppa
-Synchronize	Time		Synkronisera
-Synchronize again	Time		Synkronisera igen
-Synchronize at boot	Time		Synkronisera vid uppstart
-The following error occured while synchronizing:r\n%s	Time		Följande fel uppstod vid synkronisering:r\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		Följande fel uppstod vid synkronisering:r\n%s: %s
-Time	System name		Tid
-Time	Time		Tid
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Datum & Tid, skrivet av:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
-Time zone	Time		Tidzon
-Try all servers	Time		Prova alla servrarna
 Waiting for answer failed	Time		Fick inget svar
-\nNow: 	Time		\nNu:
-about	Time		om
+Hardware clock set to:	Time		Hårdvaruklockans tid:
+The following error occured while synchronizing:r\n%s	Time		Följande fel uppstod vid synkronisering:r\n%s
+Europe	Time		Europa
+Remove	Time		Ta bort
+Time	Time		Tid
+Indian	Time		Indien
+Sending request failed	Time		Misslyckades att skicka förfrågan
+Arctic	Time		Arktis
+Time	System name		Tid
+America	Time		Amerika
+Reset	Time		Återställ
+Synchronize at boot	Time		Synkronisera vid uppstart
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, Skriven av:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Received invalid time	Time		Tog emot en ogiltig tid
+Antarctica	Time		Antarktis
+The following error occured while synchronizing:r\n%s: %s	Time		Följande fel uppstod vid synkronisering:r\n%s: %s
+<Other>	Time		<Annan>
+Current time:	Time		Aktuell tid:
+Try all servers	Time		Prova alla servrarna
+Time zone	Time		Tidzon
+Could not create socket	Time		Kunde inte skapa en socket
+Synchronize again	Time		Synkronisera igen
+Network time	Time		Internettid
+Atlantic	Time		Atlanten

@@ -1,68 +1,68 @@
-1	swedish	x-vnd.Haiku-MediaConverter	424866547
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanal / %lld rutor
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rutor
+1	swedish	x-vnd.Haiku-MediaConverter	296071315
+Video using parameters form settings	MediaConverter		Video med parametrar från inställningar
+Video encoding:	MediaConverter		Videokodning:
+No audio	Audio codecs list		Inget ljud
+Error	MediaConverter		Fel
+Error loading a file	MediaConverter		Fel vid inläsning av en fil
+File Error	MediaConverter-FileInfo		Filfel
+Open…	Menu		Öppna...
+Start [ms]: 	MediaConverter		Start [ms]:
+Output file '%filename' created	MediaConverter		Utfil '%filename' skapad
+Output format	MediaConverter		Utformat
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld rutor
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles kändes inte igen som mediafiler:
-%d bit 	MediaFileInfo		%d bitar
+End   [ms]: 	MediaConverter		Slut [ms]:
+MediaConverter	System name		MediaKonverterare
+No video	Video codecs list		Inga filmer
+Duration:	MediaConverter-FileInfo		Speltid:
+OK	MediaConverter		OK
+Error writing audio frame %Ld	MediaConverter		Fel vid skrivning av ljudstycke %Ld
+Error converting '%filename'	MediaConverter		Fel vid konvertering av '%filename'
+Low	MediaConverter		Låg
+Conversion completed	MediaConverter		Konverteringen klar
+Audio:	MediaConverter-FileInfo		Ljud:
+OK	MediaConverter-FileInfo		OK
+ seconds	MediaFileInfo		 sekunder
+Source files	MediaConverter		Källfiler
+Cancelling	MediaConverter		Avbryter
 %d byte 	MediaFileInfo		%d bytes
+Error loading files	MediaConverter		Fel vid inläsning av filer
+Cancel	MediaConverter		Avbryt
+None available	Video codecs		Inga tillgängliga
+Conversion cancelled	MediaConverter		Konverteringen avbröts
+No file selected	MediaConverter-FileInfo		Ingen fil vald
+Error writing video frame %Ld	MediaConverter		Fel vid skrivande av bildruta %Ld
+Select this folder	MediaConverter		Välj denna mapp
+Continue	MediaConverter		Fortsätt
+Encoder parameters	MediaConverter-EncoderWindow		Kodningsparametrar
+Video:	MediaConverter-FileInfo		Video:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld rutor
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ett fel uppstod vid inläsning av filinformationen.\n\nFel:
+%d bit 	MediaFileInfo		%d bitar
+Error creating '%filename'	MediaConverter		Fel vid skapandet av '%filename'
+Video quality not supported	MediaConverter		Videokvalitén stöds ej
+Cancelling…	MediaConverter		Avbryter...
+File details	MediaConverter		Fildetaljer
+Select	MediaConverter		Markera
+Writing video track: %ld%% complete	MediaConverter		Skriver videospår: %ld%% klart
+Quit	Menu		Avsluta
+Preview	MediaConverter		Förhandsvisa
+File format:	MediaConverter		Filformat:
+None available	Audio codecs		Inte tillgängliga
+MediaConverter+:SaveDirectory	MediaConverter		MediaKonverterare+:SaveDirectory
+Error read audio frame %Ld	MediaConverter		Fel vid inläsning av ljudstycke %Ld
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanal / %lld rutor
+Error launching: %strError%	MediaConverter		Fel vid start: %strError%
+High	MediaConverter		Hög
+The file was not recognized as a supported media file:	MediaConverter		Filen känns inte igen som en mediafil:
+Drop media files onto this window	MediaConverter		Släpp mediafiler i detta fönster
 Audio encoding:	MediaConverter		Ljudkodning:
 Audio quality not supported	MediaConverter		Ljudkvalité stöds ej
-Audio quality: %3d%%	MediaConverter		Ljudkvalité: %3d%%
-Audio:	MediaConverter-FileInfo		Ljud:
-Cancel	MediaConverter		Avbryt
-Cancelling	MediaConverter		Avbryter
-Cancelling…	MediaConverter		Avbryter...
-Continue	MediaConverter		Fortsätt
-Conversion cancelled	MediaConverter		Konverteringen avbröts
-Conversion completed	MediaConverter		Konverteringen klar
-Convert	MediaConverter		Konvertera
-Drop media files onto this window	MediaConverter		Släpp mediafiler i detta fönster
-Duration:	MediaConverter-FileInfo		Speltid:
-Encoder parameters	MediaConverter-EncoderWindow		Kodningsparametrar
-End   [ms]: 	MediaConverter		Slut [ms]:
-Error	MediaConverter		Fel
-Error converting '%filename'	MediaConverter		Fel vid konvertering av '%filename'
-Error creating '%filename'	MediaConverter		Fel vid skapandet av '%filename'
-Error launching: %strError%	MediaConverter		Fel vid start: %strError%
-Error loading a file	MediaConverter		Fel vid inläsning av en fil
-Error loading files	MediaConverter		Fel vid inläsning av filer
-Error read audio frame %Ld	MediaConverter		Fel vid inläsning av ljudstycke %Ld
-Error read video frame %Ld	MediaConverter		Fel vid inläsning av bildruta %ld
-Error writing audio frame %Ld	MediaConverter		Fel vid skrivning av ljudstycke %Ld
-Error writing video frame %Ld	MediaConverter		Fel vid skrivande av bildruta %Ld
 File	Menu		Arkiv
-File Error	MediaConverter-FileInfo		Filfel
-File details	MediaConverter		Fildetaljer
-File format:	MediaConverter		Filformat:
-High	MediaConverter		Hög
-Low	MediaConverter		Låg
-MediaConverter	System name		MediaKonverterare
-MediaConverter+:SaveDirectory	MediaConverter		MediaKonverterare+:SaveDirectory
-No audio	Audio codecs list		Inget ljud
-No file selected	MediaConverter-FileInfo		Ingen fil vald
-No video	Video codecs list		Inga filmer
-None available	Audio codecs		Inte tillgängliga
-None available	Video codecs		Inga tillgängliga
-OK	MediaConverter		OK
-OK	MediaConverter-FileInfo		OK
-Open…	Menu		Öppna...
-Output file '%filename' created	MediaConverter		Utfil '%filename' skapad
-Output folder	MediaConverter		Utmapp
-Output format	MediaConverter		Utformat
-Preview	MediaConverter		Förhandsvisa
-Quit	Menu		Avsluta
-Select	MediaConverter		Markera
-Select this folder	MediaConverter		Välj denna mapp
-Source files	MediaConverter		Källfiler
-Start [ms]: 	MediaConverter		Start [ms]:
-The file was not recognized as a supported media file:	MediaConverter		Filen känns inte igen som en mediafil:
-Video encoding:	MediaConverter		Videokodning:
-Video quality not supported	MediaConverter		Videokvalitén stöds ej
-Video quality: %3d%%	MediaConverter		Videokvalité: %3d%%
-Video using parameters form settings	MediaConverter		Video med parametrar från inställningar
-Video:	MediaConverter-FileInfo		Video:
+Convert	MediaConverter		Konvertera
 Writing audio track: %ld%% complete	MediaConverter		Skriver ljudspår: %ld%% klart
-Writing video track: %ld%% complete	MediaConverter		Skriver videospår: %ld%% klart
-seconds	MediaFileInfo		sekunder
+Video quality: %3d%%	MediaConverter		Videokvalité: %3d%%
+Output folder	MediaConverter		Utmapp
+Audio quality: %3d%%	MediaConverter		Ljudkvalité: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ett fel uppstod vid inläsning av filinformationen.\n\nFel:
+Error read video frame %Ld	MediaConverter		Fel vid inläsning av bildruta %ld
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles kändes inte igen som mediafiler:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rutor

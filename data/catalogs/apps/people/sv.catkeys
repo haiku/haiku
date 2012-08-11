@@ -1,49 +1,49 @@
 1	swedish	x-vnd.Be-PEPL	2993050801
-%name% picture	People		%name% bild
-Address	People		Adress
-Cancel	People		Avbryt
-City	People		Stad
-Close	People		Stäng
-Company	People		Företag
-Configure attributes	People		Ställ in attribut
-Contact information for a person.	Long mimetype description		Kontaktinformation för en person.
-Contact name	People		Kontaktnamn
-Copy	People		Kopiera
-Could not create %s.	People		Kunde inte skapa %s.
-Country	People		Land
-Cut	People		Klipp ut
-Drop an image here,\nor use the contextual menu.	People		Släpp en bild här,\neller använd högerklicksmenyn.
-E-mail	People		E-post
 Edit	People		Redigera
 Error	People		Fel
-Fax	People		Fax
-File	People		Arkiv
-Group	People		Grupp
-Home phone	People		Hemtelefon
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Misslyckades att starta FilTyper för redigering av attribut.\n\nFel:
-Load image…	People		Välj bild...
-Name	People		Namn
-New person	People		Ny person
-New person…	People		Ny person...
-Nickname	People		Smeknamn
-OK	People		OK
-Paste	People		Klistra in
-People	System name		Personer
-Person	Short mimetype description		Person
-Quit	People		Avsluta
-Redo	People		Gör om
-Remove image	People		Ta bort bild
-Revert	People		Återställ
-Save	People		Spara
-Save as…	People		Spara som...
-Save changes before quitting?	People		Spara ändringar innan avslut?
-Select all	People		Markera allt
-Sorry	People		Tyvärr
-State	People		Region
+City	People		Stad
 The file '%name%' could not be written.	People		Filen '%name%' kunde inte skrivas till.
-URL	People		URL
-Undo	People		Ångra
-Unnamed person	People		Namnlös person
-Work phone	People		Arbetstelefon
-Zip	People		Postnummer
 none	Groups list		ingen
+Configure attributes	People		Ställ in attribut
+Company	People		Företag
+%name% picture	People		%name% bild
+Work phone	People		Arbetstelefon
+People	System name		Personer
+New person	People		Ny person
+Select all	People		Markera allt
+File	People		Arkiv
+Unnamed person	People		Namnlös person
+Could not create %s.	People		Kunde inte skapa %s.
+Country	People		Land
+Close	People		Stäng
+Group	People		Grupp
+Nickname	People		Smeknamn
+Quit	People		Avsluta
+Name	People		Namn
+Revert	People		Återställ
+Undo	People		Ångra
+E-mail	People		E-post
+Save changes before quitting?	People		Spara ändringar innan avslut?
+Load image…	People		Välj bild...
+OK	People		OK
+Remove image	People		Ta bort bild
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Misslyckades att starta FilTyper för redigering av attribut.\n\nFel:
+Home phone	People		Hemtelefon
+Save as…	People		Spara som...
+Redo	People		Gör om
+Paste	People		Klistra in
+Drop an image here,\nor use the contextual menu.	People		Släpp en bild här,\neller använd högerklicksmenyn.
+Save	People		Spara
+Person	Short mimetype description		Person
+New person…	People		Ny person...
+Address	People		Adress
+URL	People		URL
+Sorry	People		Tyvärr
+Zip	People		Postnummer
+Contact information for a person.	Long mimetype description		Kontaktinformation för en person.
+Fax	People		Fax
+Contact name	People		Kontaktnamn
+Cut	People		Klipp ut
+Cancel	People		Avbryt
+State	People		Region
+Copy	People		Kopiera

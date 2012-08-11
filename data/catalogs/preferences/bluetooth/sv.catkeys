@@ -1,61 +1,61 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	4055730587
-15 secs	Settings view		15 s
-61 secs	Settings view		61 s
+1	swedish	x-vnd.Haiku-BluetoothPrefs	3926935355
 About Bluetooth…	Window		Om Bluetooth…
-Add device to list	Inquiry panel		Lägg till enhet till istan
-Add…	Remote devices		Lägg till…
-Always ask	Settings view		Fråga alltid
-As blocked	Remote devices		Som blockerad
-Authenticate	Extended local device view		Autentisera
-Bluetooth	System name		Bluetooth
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifiera att bluetoot här aktiverat på din enhet. Klicka på Fråga för att söka. Tidsåtgång för åtgärden är okänd, men bör inte ta mer än tre sekunder per enhet. Efter detta kommer du att kunna lägga till dem till din huvudlista, där du kan para ihop dem i förfrågan-panelen.
-Connections & channels…	Window		Lista över förbindelser och kanaler…
-Default inquiry time:	Settings view		Förvald frågotid:
-Defaults	Window		Förval
-Desktop	Settings view		Skrivbord
-Disconnect	Remote devices		Koppla från
-Discoverable	Extended local device view		Synlig
-From all devices	Settings view		För alla enheter
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Blåtands-system, (ARCE)\n\nSkapad av Oliver Ruiz Dorantes\n\nMed hjälp av:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nSom gav mig all kunskap:\n\t- the yellowTAB team
 Handheld	Settings view		Handhållen
-Help	Window		Hjälp
-Identify host as:	Settings view		Identifiera värd som:
-Identify us as...	Settings view		Identifiera som...
-Incoming connections policy:	Settings view		Policy för inkommande förbindelser:
-Inquiry	Inquiry panel		Förfrågan
-Laptop	Settings view		Bärbar dator
-Local devices found on system:	Settings view		Lokala enheter funna på systemet:
+Default inquiry time:	Settings view		Förvald frågotid:
 Manufacturer: 	Device View		Tillverkare:
-OK	main		OK
-Only from trusted devices	Settings view		Endast från betrodda källor
-Pair…	Remote devices		Par…
-Pick LocalDevice...	Settings view		Välj lokal enhet...
-Policy...	Settings view		Policy...
-Quit	main		Avsluta
-Refresh LocalDevices…	Window		Uppdatera lokal enhet…
+Add device to list	Inquiry panel		Lägg till enhet till istan
+Starting scan...	Inquiry panel		Startar avsökning...
+Show bluetooth console…	Window		Visa Bluetooth-konsol…
+Smart phone	Settings view		Telefon
+Server	Settings view		Server
+Stop bluetooth services…	Window		Stoppa Bluetooth-tjänster…
+Identify host as:	Settings view		Identifiera värd som:
+View	Window		Vy
 Refresh…	Remote devices		Uppdatera…
+Pair…	Remote devices		Par…
+Incoming connections policy:	Settings view		Policy för inkommande förbindelser:
+From all devices	Settings view		För alla enheter
+Show name	Extended local device view		Visa namn
+Local devices found on system:	Settings view		Lokala enheter funna på systemet:
 Remaining %1 seconds	Inquiry panel		Återstår %1 sekunder
-Remote devices	Window		Fjärrenheter
+Server	Window		Server
+Scanning completed.	Inquiry panel		Avsökning klar.
+OK	main		OK
 Remote devices list…	Window		Lista över fjärrenheter…
 Remove	Remote devices		Ta bort
-Retrieving name of %1	Inquiry panel		Hämtar namn från %1
-Retrieving names...	Inquiry panel		Hämtar namn...
-Revert	Window		Återgå
-Scanning completed.	Inquiry panel		Avsökning klar.
-Scanning progress	Inquiry panel		Genomsökningsstatus
-Server	Settings view		Server
-Server	Window		Server
-Service classes: 	Device View		Tjänsteklasser:
-Settings	Window		Inställningar
-Show bluetooth console…	Window		Visa Bluetooth-konsol…
-Show name	Extended local device view		Visa namn
-Smart phone	Settings view		Telefon
-Start bluetooth services…	Window		Starta Bluetooth-tjänster…
+Quit	main		Avsluta
+15 secs	Settings view		15 s
 Start please	main		Vänligen starta
-Starting scan...	Inquiry panel		Startar avsökning...
-Stop bluetooth services…	Window		Stoppa Bluetooth-tjänster…
+Start bluetooth services…	Window		Starta Bluetooth-tjänster…
+Policy...	Settings view		Policy...
+61 secs	Settings view		61 s
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Blåtands-system, (ARCE)\n\nSkapad av Oliver Ruiz Dorantes\n\nMed hjälp av:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nSom gav mig all kunskap:\n\t- the yellowTAB team
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Inga lokala enheter funna på systemet
-View	Window		Vy
+Identify us as...	Settings view		Identifiera som...
+ packets: 	Device View		Paketer:
+As blocked	Remote devices		Som blockerad
+Bluetooth	System name		Bluetooth
+Disconnect	Remote devices		Koppla från
+Pick LocalDevice...	Settings view		Välj lokal enhet...
+Defaults	Window		Förval
+Inquiry	Inquiry panel		Förfrågan
+Desktop	Settings view		Skrivbord
+Revert	Window		Återgå
+Remote devices	Window		Fjärrenheter
+Laptop	Settings view		Bärbar dator
+Discoverable	Extended local device view		Synlig
 Work offline	main		Arbeta nerkopplad
 bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server verkar inte vara igång. Den borde startas, eller vara nerkopplad
-packets: 	Device View		paket:
+Service classes: 	Device View		Tjänsteklasser:
+Connections & channels…	Window		Lista över förbindelser och kanaler…
+Refresh LocalDevices…	Window		Uppdatera lokal enhet…
+Settings	Window		Inställningar
+Only from trusted devices	Settings view		Endast från betrodda källor
+Scanning progress	Inquiry panel		Genomsökningsstatus
+Always ask	Settings view		Fråga alltid
+Retrieving name of %1	Inquiry panel		Hämtar namn från %1
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifiera att bluetoot här aktiverat på din enhet. Klicka på Fråga för att söka. Tidsåtgång för åtgärden är okänd, men bör inte ta mer än tre sekunder per enhet. Efter detta kommer du att kunna lägga till dem till din huvudlista, där du kan para ihop dem i förfrågan-panelen.
+Authenticate	Extended local device view		Autentisera
+Retrieving names...	Inquiry panel		Hämtar namn...
+Help	Window		Hjälp
+Add…	Remote devices		Lägg till…

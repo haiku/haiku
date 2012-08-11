@@ -1,34 +1,34 @@
 1	swedish	x-vnd.Haiku-Sudoku	2463385585
-Abort	ProgressWindow		Avbryt
-Advanced	SudokuWindow		Avancerat
-Blank	SudokuWindow		Tom
-Copy	SudokuWindow		Kopiera
-Could not open \"%s\":\n%s\n	SudokuWindow		Kunde inte öppna "\s":\n%s\n
-Could not set Sudoku:\n%s\n	SudokuWindow		Kunde inte ställa in Sudoku:\n%s\n
-Creating solvable field	SudokuGenerator		Skapar lösbart fält
-Easy	SudokuWindow		Lätt
-Export as…	SudokuWindow		Exportera som...
-File	SudokuWindow		Arkiv
-HTML	SudokuWindow		HTML
-Hard	SudokuWindow		Svår
-Help	SudokuWindow		Hjälp
-Mark invalid values	SudokuWindow		Markera felaktiga värden
-Mark valid hints	SudokuWindow		Markera korrekta minnesmarkeringar
-New	SudokuWindow		Ny
-OK	SudokuWindow		OK
-Open file…	SudokuWindow		Öppna fil...
-Progress monitor	ProgressWindow		Förloppsindikator
-Quit	SudokuWindow		Avsluta
-Redo	SudokuWindow		Gör om
 Restore snapshot	SudokuWindow		Hämta ögonblicksbild
-Searching for removable values	SudokuGenerator		Letar efter värden som kan tas bort
-Snapshot current	SudokuWindow		Ta ögonblicksbild
-Solve	SudokuWindow		Lös
-Solve single field	SudokuWindow		Lös ett fält
-Start again	SudokuWindow		Starta igen
+Could not set Sudoku:\n%s\n	SudokuWindow		Kunde inte ställa in Sudoku:\n%s\n
+Export as…	SudokuWindow		Exportera som...
+OK	SudokuWindow		OK
+New	SudokuWindow		Ny
+Abort	ProgressWindow		Avbryt
 Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		Kunde inte öppna "\s":\n%s\n
+Easy	SudokuWindow		Lätt
+Open file…	SudokuWindow		Öppna fil...
+Solve single field	SudokuWindow		Lös ett fält
+Solve	SudokuWindow		Lös
+Redo	SudokuWindow		Gör om
+File	SudokuWindow		Arkiv
+Advanced	SudokuWindow		Avancerat
+Start again	SudokuWindow		Starta igen
+HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		Sudoku undrar
+Copy	SudokuWindow		Kopiera
+Mark valid hints	SudokuWindow		Markera korrekta minnesmarkeringar
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku löst - grattis!\n
+Hard	SudokuWindow		Svår
+Snapshot current	SudokuWindow		Ta ögonblicksbild
 Text	SudokuWindow		Text
-Undo	SudokuWindow		Ångra
+Creating solvable field	SudokuGenerator		Skapar lösbart fält
 View	SudokuWindow		Visa
+Progress monitor	ProgressWindow		Förloppsindikator
+Mark invalid values	SudokuWindow		Markera felaktiga värden
+Blank	SudokuWindow		Tom
+Help	SudokuWindow		Hjälp
+Searching for removable values	SudokuGenerator		Letar efter värden som kan tas bort
+Undo	SudokuWindow		Ångra
+Quit	SudokuWindow		Avsluta

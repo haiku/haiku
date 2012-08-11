@@ -1,48 +1,48 @@
-1	swedish	x-vnd.Haiku-PowerStatus	2178654445
-About	PowerStatus		Om
-About…	PowerStatus		Om...
-Battery charging	PowerStatus		Laddar batteri
-Battery discharging	PowerStatus		Laddar ur batteriet
-Battery info	PowerStatus		Batteriinformation
-Battery info…	PowerStatus		Batteriinformation...
-Battery unused	PowerStatus		Batteri oanvänt
-Capacity granularity 1: 	PowerStatus		Kapacitetskornighet 1:
-Capacity granularity 2: 	PowerStatus		Kapacitetskornighet 2:
-Capacity: 	PowerStatus		Kapacitet:
-Current rate: 	PowerStatus		Nuvarande värde:
-Damaged battery	PowerStatus		Skadat batteri
+1	swedish	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
-Design capacity warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
-Design capacity: 	PowerStatus		Tillverkningskapacitet:
-Design voltage: 	PowerStatus		Tillverkningsspänning:
-Empty battery slot	PowerStatus		Tomt batterifack
-Extended battery info	PowerStatus		Ytterligare batteriinformation
-Install in Deskbar	PowerStatus		Installera i Deskbar
-Last full charge: 	PowerStatus		Senast fulladdad:
-Model number: 	PowerStatus		Modellnummer:
-OEM info: 	PowerStatus		OEM information:
-OK	PowerStatus		OK
-Power status box	PowerStatus		Batteristatus
-PowerStatus	PowerStatus		BatteriStatus
-PowerStatus	System name		BatteriStatus
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		BatteriStatus\nskrivet av Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
-Quit	PowerStatus		Avsluta
-Run in window	PowerStatus		Kör i fönster
-Serial number: 	PowerStatus		Serienummer:
 Show percent	PowerStatus		Visa procent
-Show status icon	PowerStatus		Visa statusikon
-Show text label	PowerStatus		Visa textetikett
-Show time	PowerStatus		Visa tid
-Technology: 	PowerStatus		Teknik:
+Design capacity: 	PowerStatus		Tillverkningskapacitet:
+ mW	PowerStatus		 mW
 Type: 	PowerStatus		Typ:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan köra BatteriStatus i ett fönster eller i Deskbar.
-charging	PowerStatus		laddar
-discharging	PowerStatus		laddar ur
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		inget batteri
 non-rechargeable	PowerStatus		Ej uppladdningsbar
+Empty battery slot	PowerStatus		Tomt batterifack
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Kör i fönster
+About	PowerStatus		Om
+PowerStatus	System name		BatteriStatus
+PowerStatus	PowerStatus		BatteriStatus
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Batteriinformation...
+Damaged battery	PowerStatus		Skadat batteri
+Show time	PowerStatus		Visa tid
+Last full charge: 	PowerStatus		Senast fulladdad:
+Battery unused	PowerStatus		Batteri oanvänt
+Extended battery info	PowerStatus		Ytterligare batteriinformation
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Nuvarande värde:
+discharging	PowerStatus		laddar ur
+Show text label	PowerStatus		Visa textetikett
+About…	PowerStatus		Om...
+Model number: 	PowerStatus		Modellnummer:
+Install in Deskbar	PowerStatus		Installera i Deskbar
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Kapacitet:
+Battery discharging	PowerStatus		Laddar ur batteriet
+Serial number: 	PowerStatus		Serienummer:
+Capacity granularity 1: 	PowerStatus		Kapacitetskornighet 1:
+OK	PowerStatus		OK
+OEM info: 	PowerStatus		OEM information:
+Design voltage: 	PowerStatus		Tillverkningsspänning:
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		BatteriStatus\nskrivet av Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Laddar batteri
+Design capacity warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
+Battery info	PowerStatus		Batteriinformation
+Quit	PowerStatus		Avsluta
 rechargeable	PowerStatus		uppladdningsbart
+charging	PowerStatus		laddar
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan köra BatteriStatus i ett fönster eller i Deskbar.
+Power status box	PowerStatus		Batteristatus
+Show status icon	PowerStatus		Visa statusikon
+Capacity granularity 2: 	PowerStatus		Kapacitetskornighet 2:
+Technology: 	PowerStatus		Teknik:
+no battery	PowerStatus		inget batteri

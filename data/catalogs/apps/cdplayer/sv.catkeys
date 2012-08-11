@@ -1,14 +1,14 @@
 1	swedish	x-vnd.Haiku-CDPlayer	592310631
-Audio CD	CDPlayer		Ljud-CD
-CD	CDPlayer		CD
-CD drive is empty	CDPlayer		CD-enheten är tom
 CDPlayer	System name		CDSpelare
+CD	CDPlayer		CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Skiva: %ld:%.2ld / %ld:%.2ld
-Disc: --:-- / --:--	CDPlayer		Skiva: --:-- / --:--
-Disc: 88:88 / 88:88	CDPlayer		Skiva: 88:88 / 88:88
-It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Det verkar inte finnas några CD enheter på din dator eller så finns det inget programstöd.
 OK	CDPlayer		OK
 Track %whichTrack%: %trackAt%	CDPlayer		Spår %whichTrack%: %trackAt%
+Audio CD	CDPlayer		Ljud-CD
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Det verkar inte finnas några CD enheter på din dator eller så finns det inget programstöd.
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Spår: %ld:%.2ld / %ld:%.2ld
-Track: --:-- / --:--	CDPlayer		Spår: --:-- / --:--
 Track: 88:88 / 88:88	CDPlayer		Spår: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Spår: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Skiva: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Skiva: --:-- / --:--
+CD drive is empty	CDPlayer		CD-enheten är tom

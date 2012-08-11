@@ -1,13 +1,13 @@
 1	swedish	x-vnd.Haiku-JPEG2000Translator	547915409
-About	JPEG2000Translator		Om
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be bitmappsformat (JPEG2000 översättning)
-High	JPEG2000Translator		Hög
+Write	JPEG2000Translator		Skriv
 JPEG2000 images	JPEG2000Translator		JPEG2000-bilder
-Low	JPEG2000Translator		Låg
 Output only codestream (.jpc)	JPEG2000Translator		Endast kodströms-utdata (.jpc)
+Write black-and-white images as RGB24	JPEG2000Translator		Skriv svart/vita bilder som RGB24
 Output quality	JPEG2000Translator		Utdatakvalitet
 Read	JPEG2000Translator		Läs
-Read greyscale images as RGB32	JPEG2000Translator		Läs gråskalebilder som RGB32
-Write	JPEG2000Translator		Skriv
-Write black-and-white images as RGB24	JPEG2000Translator		Skriv svart/vita bilder som RGB24
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBaserad på biblioteket JasPer:\n© 1999-2000, Image Power, Inc. och \nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 kodek användes för \"inspiration\".\n\thttp://www.imagemagick.org/\n
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be bitmappsformat (JPEG2000 översättning)
+Low	JPEG2000Translator		Låg
+About	JPEG2000Translator		Om
+High	JPEG2000Translator		Hög
+Read greyscale images as RGB32	JPEG2000Translator		Läs gråskalebilder som RGB32

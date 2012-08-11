@@ -1,57 +1,58 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	2709408798
+1	swedish	x-vnd.Haiku-PackageInstaller	1396489627
+Install to:	PackageView		Installera till:
+OK	PackageView		OK
+Accept	PackageTextViewer		Acceptera
+Continue	PackageInstall		Fortsätt
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Det valda paketet kunde inte installeras på ditt system. Det kan vara på grund av ett fel i paketet. Du bör kontakta paket-distributören om felet kvarstår.
+Image not loaded correctly	PackageImageViewer		Avbilden kunde inte läsas in korrekt
+Install 	PackageView		Installera 
+No package selected.	PackageInfo		Inga paket valda.
+Install	PackageView		Installera
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Det angivna paketet verkar redan vara installerat på ditt system. Vill du avinstallera det befintliga paketet och sedan fortsätta med installationen?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Vill du komma ihåg detta beslut under resten av denna installation?\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Storleken på paketet överensstämmer inte med kontrollsumman. Paketet kan vara korrupt eller kan ha ändrats efter att det skapades. Vill du ändå fortsätta?
+Error while installing the package\n	PackageView		Ett fel uppstod under paketinstallationen\n
+Disclaimer	PackageTextViewer		Ansvarsfriskrivning
 %.1f GiB	PackageView		%.1f GiB
-%.1f KiB	PackageView		%.1f KiB
-%.1f MiB	PackageView		%.1f MiB
+The installation of the package has been aborted.	PackageView		Installationen av paketet har avbrutits.
+Done	PackageInstall		Färdig
+All existing files will be replaced?	PackageView		Skall alla befintliga filer skrivas över?
+Preparing package	PackageInstall		Förbereder paket
+No package available.	PackageInfo		Inga paket tillgängliga.
+none	PackageView		ingen
+Stop	PackageStatus		Stoppa
+Other…	PackageView		Annan...
+No installation type selected	PackageView		Ingen installationstyp vald
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		En länk med namnet '%s' finns redan på det aktuella stället. Vill du ersätta den med en ur det här paketet, eller vill du hoppa över?
+Installing files and folders	PackageInstall		Installerar filer och mappar
+Package installer	PackageView		Paket intallerare
+Skip all	PackageView		Hoppa över alla
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Filen '%s' finns redan på det aktuella stället.\nVill du ersätta den med en ur paketet eller vill du hoppa över?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Ett skript med namnet '%s' finns redan på det aktuella stället.\nVill du ersätta det med ett ur paketet eller vill du hoppa över?
+Running post-installation scripts	PackageInstall		Kör efter-installationsskript
 %llu bytes	PackageView		%llu bytes
+Skip	PackageView		Hoppa över
+%.1f MiB	PackageView		%.1f MiB
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Mappen '%s' finns redan.\nVill du ersätta den med innehållet ur detta paket eller hoppa över mappen?
+The package you requested has been successfully installed on your system.	PackageView		Paketet som du begärde har installerats på ditt system.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fel! "%s" är inte en giltig sökväg.\n
+Installation type:	PackageView		Installationstyp:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Fel (%s)! Kunde inte öppna %s.\n
+Finishing installation	PackageInstall		Slutför installation
+Installing package	PackageStatus		Installerar paket
+Ask again	PackageView		Fråga igen
+Abort	PackageView		Avbryt
+Replace all	PackageView		Ersätt alla
+Decline	PackageTextViewer		Acceptera inte
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Filen '%s' finns redan i den angivna sökvägen.\nSkall filen skrivas över av filer i detta paket, eller skall den lämnas kvar?
+All existing files will be skipped?	PackageView		Hoppa över alla befintliga filer?
+Continue	PackageInfo		Fortsätt
+%.1f KiB	PackageView		%.1f KiB
 (%s free)	PackageView		(%s ledigt)
 Abort	PackageInfo		Avbryt
-Abort	PackageInstall		Avbryt
-Abort	PackageView		Avbryt
-Accept	PackageTextViewer		Acceptera
-All existing files will be replaced?	PackageView		Skall alla befintliga filer skrivas över?
-All existing files will be skipped?	PackageView		Hoppa över alla befintliga filer?
-Ask again	PackageView		Fråga igen
-Continue	PackageInfo		Fortsätt
-Continue	PackageInstall		Fortsätt
-Continue	PackageTextViewer		Fortsätt
-Decline	PackageTextViewer		Acceptera inte
-Disclaimer	PackageTextViewer		Ansvarsfriskrivning
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Vill du komma ihåg detta beslut under resten av denna installation?\n
-Done	PackageInstall		Färdig
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Fel (%s)! Kunde inte öppna %s.\n
-Error while installing the package\n	PackageView		Ett fel uppstod under paketinstallationen\n
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fel! "%s" är inte en giltig sökväg.\n
-Finishing installation	PackageInstall		Slutför installation
-Image not loaded correctly	PackageImageViewer		Avbilden kunde inte läsas in korrekt
-Install	PackageView		Installera
-Install to:	PackageView		Installera till:
-Installation progress	PackageView		Installationsförlopp
-Installation type:	PackageView		Installationstyp:
-Installing files and folders	PackageInstall		Installerar filer och mappar
-Installing package	PackageStatus		Installerar paket
-No installation type selected	PackageView		Ingen installationstyp vald
-No package available.	PackageInfo		Inga paket tillgängliga.
-No package selected.	PackageInfo		Inga paket valda.
-OK	PackageView		OK
-Other…	PackageView		Annan...
-Package installer	PackageView		Paket intallerare
 PackageInstaller	System name		PaketInstallerare
-Preparing package	PackageInstall		Förbereder paket
+Abort	PackageInstall		Avbryt
+Continue	PackageTextViewer		Fortsätt
 Replace	PackageView		Ersätt
-Replace all	PackageView		Ersätt alla
-Running post-installation scripts	PackageInstall		Kör efter-installationsskript
-Skip	PackageView		Hoppa över
-Skip all	PackageView		Hoppa över alla
-Stop	PackageStatus		Stoppa
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Mappen '%s' finns redan.\nVill du ersätta den med innehållet ur detta paket eller hoppa över mappen?
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Filen '%s' finns redan i den angivna sökvägen.\nSkall filen skrivas över av filer i detta paket, eller skall den lämnas kvar?
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Det angivna paketet verkar redan vara installerat på ditt system. Vill du avinstallera det befintliga paketet och sedan fortsätta med installationen?
-The installation of the package has been aborted.	PackageView		Installationen av paketet har avbrutits.
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Filen '%s' finns redan på det aktuella stället.\nVill du ersätta den med en ur paketet eller vill du hoppa över?
+Installation progress	PackageView		Installationsförlopp
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paketfilen är inte läsbar.\nEn möjlig anledning är att den begärda filen inte är ett giltigt BeOS paket.
-The package you requested has been successfully installed on your system.	PackageView		Paketet som du begärde har installerats på ditt system.
-The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Det valda paketet kunde inte installeras på ditt system. Det kan vara på grund av ett fel i paketet. Du bör kontakta paket-distributören om felet kvarstår.
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Ett skript med namnet '%s' finns redan på det aktuella stället.\nVill du ersätta det med ett ur paketet eller vill du hoppa över?
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		En länk med namnet '%s' finns redan på det aktuella stället. Vill du ersätta den med en ur det här paketet, eller vill du hoppa över?
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Storleken på paketet överensstämmer inte med kontrollsumman. Paketet kan vara korrupt eller kan ha ändrats efter att det skapades. Vill du ändå fortsätta?
-none	PackageView		ingen

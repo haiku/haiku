@@ -1,21 +1,21 @@
 1	swedish	x-vnd.Haiku-Network	2324385456
-<no wireless networks found>	EthernetSettingsView		<inga trådlösa nätverk funna>
-Adapter:	EthernetSettingsView		Nätverkskort:
-Apply	EthernetSettingsView		Använd
-Auto-configuring failed: 	EthernetSettingsView		Automatisk konfiguration misslyckades:
 Choose automatically	EthernetSettingsView		Välj automatiskt
-DHCP	EthernetSettingsView		DHCP
-DNS #1:	EthernetSettingsView		Primär DNS:
-DNS #2:	EthernetSettingsView		Sekundär DNS:
-Disabled	EthernetSettingsView		Inaktiverad
-Domain:	EthernetSettingsView		Domän:
 Gateway:	EthernetSettingsView		Gateway:
-IP address:	EthernetSettingsView		IP-adress:
-Mode:	EthernetSettingsView		Konfiguration:
 Netmask:	EthernetSettingsView		Nätmask:
-Network	System name		Nätverk
-Network:	EthernetSettingsView		Nätverk:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		Sekundär DNS:
+Apply	EthernetSettingsView		Använd
 OK	EthernetSettingsView		Ok
+DNS #1:	EthernetSettingsView		Primär DNS:
+IP address:	EthernetSettingsView		IP-adress:
+Adapter:	EthernetSettingsView		Nätverkskort:
+Domain:	EthernetSettingsView		Domän:
 Revert	EthernetSettingsView		Återställ
-Static	EthernetSettingsView		Statisk
+<no wireless networks found>	EthernetSettingsView		<inga trådlösa nätverk funna>
+Network	System name		Nätverk
+Mode:	EthernetSettingsView		Konfiguration:
+Network:	EthernetSettingsView		Nätverk:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Automatisk konfiguration kan inte ske utan att net_server körs!
+Disabled	EthernetSettingsView		Inaktiverad
+Auto-configuring failed: 	EthernetSettingsView		Automatisk konfiguration misslyckades:
+Static	EthernetSettingsView		Statisk

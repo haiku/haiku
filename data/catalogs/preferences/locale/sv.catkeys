@@ -1,31 +1,31 @@
 1	swedish	x-vnd.Haiku-Locale	1488345554
-12 hour	TimeFormatSettings		12 timmar
-24 hour	TimeFormatSettings		24 timmar
 Available languages	Locale Preflet Window		Tillgängliga språk
-Cancel	Locale Preflet Window		Avbryt
-Currency	TimeFormatSettings		Valuta
-Date	TimeFormatSettings		Datum
-Defaults	Locale Preflet Window		Förval
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar och Tracker måste startas om för att ändringarna skall gälla. Vill du starta om dom nu?
-Formatting	Locale Preflet Window		Formatering
-Full format:	TimeFormatSettings		Fullt format:
-Language	Locale Preflet Window		Språk
-Locale	Locale Preflet		Språk
-Locale	Locale Preflet Window		Språk
-Locale	System name		Språk & Format
-Long format:	TimeFormatSettings		Långt format:
-Medium format:	TimeFormatSettings		Mediumformat:
 Negative:	TimeFormatSettings		Negativt:
-Numbers	TimeFormatSettings		Nummer
-OK	Locale Preflet Window		OK
-Options	Locale Preflet Window		Alternativ
-Positive:	TimeFormatSettings		Positivt:
-Preferred languages	Locale Preflet Window		Föredragna språk
-Restart	Locale Preflet Window		Starta om
-Revert	Locale Preflet Window		Återgå
-Short format:	TimeFormatSettings		Kort format:
-Time	TimeFormatSettings		Tid
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Översätt program och mappar i Deskbar och Tracker.
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan inte hitta listan över tillgängliga språk! Prefleten kan inte användas!
-Use month/day-names from preferred language	TimeFormatSettings		Använd det förvalda språkets format för månad/dag
 already chosen	LanguageListView		redan valt
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan inte hitta listan över tillgängliga språk! Prefleten kan inte användas!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar och Tracker måste startas om för att ändringarna skall gälla. Vill du starta om dom nu?
+Long format:	TimeFormatSettings		Långt format:
+Currency	TimeFormatSettings		Valuta
+Locale	System name		Språk & Format
+Short format:	TimeFormatSettings		Kort format:
+Language	Locale Preflet Window		Språk
+Preferred languages	Locale Preflet Window		Föredragna språk
+Use month/day-names from preferred language	TimeFormatSettings		Använd det förvalda språkets format för månad/dag
+Formatting	Locale Preflet Window		Formatering
+Locale	Locale Preflet Window		Språk
+Numbers	TimeFormatSettings		Nummer
+24 hour	TimeFormatSettings		24 timmar
+OK	Locale Preflet Window		OK
+Restart	Locale Preflet Window		Starta om
+Full format:	TimeFormatSettings		Fullt format:
+Defaults	Locale Preflet Window		Förval
+Cancel	Locale Preflet Window		Avbryt
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Översätt program och mappar i Deskbar och Tracker.
+Revert	Locale Preflet Window		Återgå
+Medium format:	TimeFormatSettings		Mediumformat:
+12 hour	TimeFormatSettings		12 timmar
+Time	TimeFormatSettings		Tid
+Date	TimeFormatSettings		Datum
+Positive:	TimeFormatSettings		Positivt:
+Locale	Locale Preflet		Språk
+Options	Locale Preflet Window		Alternativ

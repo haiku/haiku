@@ -1,18 +1,18 @@
 1	swedish	x-vnd.haiku.zip-o-matic	2207848100
-%ld files added.	file:ZipOMaticWindow.cpp		%ld filer tillagda.
 1 file added.	file:ZipOMaticWindow.cpp		1 fil tillagd.
-Archive	file:ZipperThread.cpp		Arkiv
-Archive created OK	file:ZipOMaticWindow.cpp		Zipfil skapad utan problem.
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Vill du avbryta skapandet av den här filen?
-Continue	file:ZipOMaticWindow.cpp		Fortsätt
+Stop	file:ZipOMaticWindow.cpp		Avbryt
 Creating archive: %s	file:ZipOMaticWindow.cpp		Skapar fil: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Vill du avbryta dem?
+Continue	file:ZipOMaticWindow.cpp		Fortsätt
+Preparing to archive	file:ZipperThread.cpp		Förbereder...
 Drop files here.	file:ZipOMaticWindow.cpp		Släpp filer här.
-Error creating archive	file:ZipOMaticWindow.cpp		Något gick snett.
 Filename: %s	file:ZipOMaticWindow.cpp		Filnamn: %s
 Let them continue	file:ZipOMatic.cpp		Låt dem fortsätta
-Preparing to archive	file:ZipperThread.cpp		Förbereder...
-Stop	file:ZipOMaticWindow.cpp		Avbryt
-Stop them	file:ZipOMatic.cpp		Avbryt dem
+Do you want to stop them?	file:ZipOMatic.cpp		Vill du avbryta dem?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Vill du avbryta skapandet av den här filen?
+%ld files added.	file:ZipOMaticWindow.cpp		%ld filer tillagda.
 Stopped	file:ZipOMaticWindow.cpp		Avbruten
+Archive	file:ZipperThread.cpp		Arkiv
+Error creating archive	file:ZipOMaticWindow.cpp		Något gick snett.
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		%ld Zip-O-Matic är igång.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Zipfil skapad utan problem.
+Stop them	file:ZipOMatic.cpp		Avbryt dem

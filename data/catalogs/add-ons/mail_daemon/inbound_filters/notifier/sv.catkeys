@@ -1,16 +1,16 @@
 1	swedish	x-vnd.Haiku-NewMailNotification	3624191291
 %num new message	filter		%num nytt meddelande
 %num new messages	filter		%num nya meddelanden
-Alert	ConfigView		Avisering
-Beep	ConfigView		Pip
-Central alert	ConfigView		Central avisering
-Central beep	ConfigView		Centralt pip
 Keyboard LEDs	ConfigView		Tangentbords LEDs
-Log window	ConfigView		Loggfönster
-Method:	ConfigView		Metod:
-New mails notification	ConfigView		Notifikationer för e-post
-New messages	filter		Nya meddelanden
-OK	filter		OK
-You have %num new message for %name.	filter		Du har %num nytt meddelande för %name.
 You have %num new messages for %name.	filter		Du har %num nya meddelanden för %name.
+You have %num new message for %name.	filter		Du har %num nytt meddelande för %name.
+Log window	ConfigView		Loggfönster
+Central beep	ConfigView		Centralt pip
+Beep	ConfigView		Pip
+Method:	ConfigView		Metod:
+Central alert	ConfigView		Central avisering
+Alert	ConfigView		Avisering
 none	ConfigView		inga
+New messages	filter		Nya meddelanden
+New mails notification	ConfigView		Notifikationer för e-post
+OK	filter		OK

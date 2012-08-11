@@ -1,133 +1,132 @@
-1	swedish	x-vnd.Haiku-DiskProbe	3441574721
-%ld (native)	ProbeView		%ld (native)
-(native)	ProbeView		(native)
-15 bit	TypeEditors		15 bitar
-16 bit	TypeEditors		16 bitar
-16 bit signed value:	TypeEditors		16 bitars signed värde:
-16 bit unsigned value:	TypeEditors		16 bitars unsigned-värde:
-32 bit	TypeEditors		32 bitar
-32 bit signed value:	TypeEditors		32 bitars signed-värde:
-32 bit size or status:	TypeEditors		32 bitars storlek eller status:
-32 bit unsigned pointer:	TypeEditors		32 bitars unsigned-pekare:
-32 bit unsigned size:	TypeEditors		32 bitars unsigned-storlek:
-32 bit unsigned value:	TypeEditors		32 bitars unsigned-värde:
-64 bit signed offset:	TypeEditors		64 bitars signed-offset:
-64 bit signed value:	TypeEditors		64 bitars signed value:
-64 bit unsigned value:	TypeEditors		64 bitars unsigned-värde:
-8 bit palette	TypeEditors		8 bitars palett
-8 bit signed value:	TypeEditors		8 bitars signed-värde:
-8 bit unsigned value:	TypeEditors		8 bitars unsigned-värde:
-Add	ProbeView		Lägg till
-Attribute	AttributeWindow		Attribut
-Attribute	ProbeView		Attribut
-Attribute offset: 	ProbeView		Attributoffset:
-Attribute type: 	ProbeView		Attributstyp:
-Attribute: 	ProbeView		Attribut:
-Attributes	ProbeView		Attribut
-Back	ProbeView		Tillbaka
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Bas
-Block	ProbeView		Block
-Block %Ld (0x%Lx)	ProbeView		Block %Ld (0x%Lx)
-Block 0x%Lx	ProbeView		Block 0x%Lx
-Block: 	ProbeView		Block:
-BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Blockstorlek
-Bookmarks	ProbeView		Bokmärken
-Boolean	TypeEditors	This is the type of editor	Booleskt värde
-Boolean editor	TypeEditors		Boolesk editor
-Boolean value:	TypeEditors		Booleskt värde:
-Cancel	AttributeWindow		Avbryt
-Cancel	OpenWindow		Avbryt
-Cancel	ProbeView		Avbryt
-Case sensitive	FindWindow		Skiftlägeskänslig
-Close	AttributeWindow		Stäng
-Close	FileWindow		Stäng
-Close	ProbeView		Stäng
-Contents:	TypeEditors		Innehåll:
-Copy	ProbeView		Kopiera
-Could not find search string.	ProbeView		Kunde inte hitta söksträngen.
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Kunde inte öppna \"%s\":\n%s
-Could not open file \"%s\": %s\n	DiskProbe		Kunde inte öppna filen \"%s\": %s\n
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kunde inte läsa bilden
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimal
-Device	ProbeView		Enhet
-Device offset: 	ProbeView		Enhetsoffset:
-Device: 	ProbeView		Enhet:
-DiskProbe	System name		DiskInspekterare
-DiskProbe request	AttributeWindow		DiskInspekteraren
-DiskProbe request	DiskProbe		DiskInspekteraren
-DiskProbe request	ProbeView		DiskInspekterar begäran
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Vill du verkligen ta bort attributet \"%s\" från filen \"%s\"?\n\nDu kan inte ångra denna aktion.
-Don't save	ProbeView		Spara inte
-Double precision floating-point value:	TypeEditors		Dubbelprecisions flyttals-värde:
-Edit	ProbeView		Redigera
-Examine device:	OpenWindow		Undersök enhet:
-File	FileWindow		Arkiv
-File	ProbeView		Fil
+1	swedish	x-vnd.Haiku-DiskProbe	2900255050
 File offset: 	ProbeView		Filoffset:
-File: 	ProbeView		Fil: 
-Find	FindWindow		Sök
+%ld (native)	ProbeView		%ld (native)
+64 bit unsigned value:	TypeEditors		64 bitars unsigned-värde:
 Find again	ProbeView		Sök igen
-Find…	ProbeView		Sök…
-Fit	ProbeView	Size of fonts, fits to available room	Anpassa
-Flattened bitmap	TypeEditors		Platt bitmapp
-Floating-point value:	TypeEditors		Flyttalsvärde:
-Font size	ProbeView		Typsnittsstorlek
-Grayscale	TypeEditors		Gråskala
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
-Icon	TypeEditors		Ikon
-Icon view	TypeEditors		Ikonvy
-Image	TypeEditors	This is the type of view	Bild
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Bildvy
-MIME type editor	TypeEditors		MIME-typ redigerare
-MIME type:	TypeEditors		MIME-typ:
-Message	TypeEditors	This is the type of view	Meddelande
-Message View	TypeEditors		Meddelandeläge
-Mode:	FindWindow		Läge:
-Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
-Native: 0x%0*Lx	ProbeView		Native: 0x%0*Lx
-New…	FileWindow		Ny...
-Next	ProbeView		Nästa
-No type editor available	AttributeWindow		Redigeringsfunktion saknas
-Number	TypeEditors	This is the type of editor	Nummer
-Number editor	TypeEditors		Nummereditor
-Number:	TypeEditors		Nummer:
-OK	DiskProbe		OK
-OK	ProbeView		Ok
-Offset: 	ProbeView		Offset:
-Open device	FileWindow		Öppna enhet
-Open file…	FileWindow		Öppna fil...
-PNG format	TypeEditors		PNG-format
-Page setup…	ProbeView		Sidinställning…
-Paste	ProbeView		Klistra in
-Previous	ProbeView		Föregående
-Print…	ProbeView		Skriv ut...
-Probe device	OpenWindow		Inspektera enhet
-Probe file…	OpenWindow		Inspektera fil...
-Quit	FileWindow		Avsluta
-Raw editor	AttributeWindow		Råeditor
-Redo	ProbeView		Gör om
-Remove	AttributeWindow		Ta bort
-Remove from file	AttributeWindow		Ta bort från fil
-Save	ProbeView		Spara
-Save changes before closing?	ProbeView		Spara ändringar före stängning?
-Select all	ProbeView		Markera allt
-Selection	ProbeView		Markering
-Stop	ProbeView		Stopp
-String editor	TypeEditors		Strängeditor
-Swapped: %Ld (0x%0*Lx)	ProbeView		Växlat: %Ld (0x%0*Lx)
-Swapped: 0x%0*Lx	ProbeView		Växlat: 0x%0*Lx
 Text	FindWindow		Text
-Text	TypeEditors	This is the type of editor	Text
-Type editor	AttributeWindow		Typeditor:
-Type editor	ProbeView		Typeditor
-Type editor not supported	ProbeView		Typeditor stöds ej
-Undo	ProbeView		Ångra
-Unknown format	TypeEditors		Okänt format
-Unknown type	TypeEditors		Okänd typ
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Visa
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Skrivning till filen misslyckades:\n%s\n\nAlla ändringar kommer att gå förlorade när du avslutar.
-none	ProbeView	No attributes	ingen
-of 	ProbeView		av
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	av 0x0
+Find…	ProbeView		Sök…
+Case sensitive	FindWindow		Skiftlägeskänslig
+Cancel	OpenWindow		Avbryt
+Close	AttributeWindow		Stäng
+File	ProbeView		Fil
+Attribute	ProbeView		Attribut
+Floating-point value:	TypeEditors		Flyttalsvärde:
+16 bit	TypeEditors		16 bitar
+Attributes	ProbeView		Attribut
+Device offset: 	ProbeView		Enhetsoffset:
+Selection	ProbeView		Markering
+DiskProbe	System name		DiskInspekterare
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	meddelandekonstant: '%.4s'\n\n
+File	FileWindow		Arkiv
+OK	DiskProbe		OK
+Boolean	TypeEditors	This is the type of editor	Booleskt värde
+Paste	ProbeView		Klistra in
+PNG format	TypeEditors		PNG-format
+Font size	ProbeView		Typsnittsstorlek
+Attribute type: 	ProbeView		Attributstyp:
+Attribute	AttributeWindow		Attribut
+8 bit signed value:	TypeEditors		8 bitars signed-värde:
+Number:	TypeEditors		Nummer:
+Save	ProbeView		Spara
+Stop	ProbeView		Stopp
+Number editor	TypeEditors		Nummereditor
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+No type editor available	AttributeWindow		Redigeringsfunktion saknas
+Double precision floating-point value:	TypeEditors		Dubbelprecisions flyttals-värde:
+Device: 	ProbeView		Enhet:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Vill du verkligen ta bort attributet \"%s\" från filen \"%s\"?\n\nDu kan inte ångra denna aktion.
+Text	TypeEditors	This is the type of editor	Text
+8 bit unsigned value:	TypeEditors		8 bitars unsigned-värde:
+Block	ProbeView		Block
+Back	ProbeView		Tillbaka
+Device	ProbeView		Enhet
+Unknown type	TypeEditors		Okänd typ
+Block 0x%Lx	ProbeView		Block 0x%Lx
+Quit	FileWindow		Avsluta
+Undo	ProbeView		Ångra
+Close	ProbeView		Stäng
+Number	TypeEditors	This is the type of editor	Nummer
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimal
+16 bit signed value:	TypeEditors		16 bitars signed värde:
+String editor	TypeEditors		Strängeditor
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	av 0x0
+64 bit signed offset:	TypeEditors		64 bitars signed-offset:
+Boolean editor	TypeEditors		Boolesk editor
+Copy	ProbeView		Kopiera
+none	ProbeView	No attributes	ingen
+Boolean value:	TypeEditors		Booleskt värde:
+32 bit size or status:	TypeEditors		32 bitars storlek eller status:
+8 bit palette	TypeEditors		8 bitars palett
+Fit	ProbeView	Size of fonts, fits to available room	Anpassa
+Probe device	OpenWindow		Inspektera enhet
+ (native)	ProbeView		 (native)
+Unknown format	TypeEditors		Okänt format
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
+MIME type:	TypeEditors		MIME-typ:
+Page setup…	ProbeView		Sidinställning…
+New…	FileWindow		Ny...
+DiskProbe request	AttributeWindow		DiskInspekteraren
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kunde inte läsa bilden
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Blockstorlek
+Save changes before closing?	ProbeView		Spara ändringar före stängning?
+Type editor	AttributeWindow		Typredigerare
+Native: 0x%0*Lx	ProbeView		Native: 0x%0*Lx
+Raw editor	AttributeWindow		Raw editor
+Message View	TypeEditors		Meddelande vy
+DiskProbe request	ProbeView		DiskInspekteraren
+32 bit unsigned size:	TypeEditors		32 bit osignerad storlek:
+Flattened bitmap	TypeEditors		Tillplattad bitmap
+Open file…	FileWindow		Öppna fil...
+Next	ProbeView		Nästa
+Close	FileWindow		Stäng
+Attribute: 	ProbeView		Attribut: 
+Remove from file	AttributeWindow		Ta bort från fil
+Don't save	ProbeView		Spara inte
+Previous	ProbeView		Föregående
+64 bit signed value:	TypeEditors		64 bitars signed-värde:
+Icon	TypeEditors		Ikon
+Block: 	ProbeView		Block: 
+Examine device:	OpenWindow		Undersök enheten:
+Offset: 	ProbeView		Avstånd: 
+OK	ProbeView		OK
+Add	ProbeView		Lägg till
+Edit	ProbeView		Redigera
+Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
+32 bit unsigned value:	TypeEditors		32 bitars unsigned-värde:
+Message	TypeEditors	This is the type of view	Meddelande
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Kunde inte öppna \"%s\":\n%s
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Bas
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Bildvisning
+Cancel	AttributeWindow		Avbryt
+Type editor not supported	ProbeView		Typ editering stöds inte
+MIME type editor	TypeEditors		MIME typ editor
+Swapped: %Ld (0x%0*Lx)	ProbeView		Växlade: %Ld (0x%0*Lx)
+Find	FindWindow		Sök
+Remove	AttributeWindow		Ta bort
+Print…	ProbeView		Skriv ut...
+Block %Ld (0x%Lx)	ProbeView		Block %Ld (0x%Lx)
+Image	TypeEditors	This is the type of view	Bild
+Could not open file \"%s\": %s\n	DiskProbe		Kunde inte öppna filen \"%s\": %s\n
+Select all	ProbeView		Markera allt
+Probe file…	OpenWindow		Undersök filen...
+Icon view	TypeEditors		Ikonvy
+Bookmarks	ProbeView		Bokmärken
+Mode:	FindWindow		Läge:
+15 bit	TypeEditors		15 bitar
+Open device	FileWindow		Öppna enheten
+Could not find search string.	ProbeView		Kunde inte hitta söksträng.
+16 bit unsigned value:	TypeEditors		16 bitars osignerat värde:
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Vy
+Redo	ProbeView		Gör om
+File: 	ProbeView		Fil: 
+32 bit unsigned pointer:	TypeEditors		32 bitars osignerad pointer:
+of 	ProbeView		av 
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Skrivning till filen gick inte:\n %s\n \nAlla ändringar förloras när du avslutar programmet.
+32 bit	TypeEditors		32 bitar
+Cancel	ProbeView		Avbryt
+Swapped: 0x%0*Lx	ProbeView		Bytt: 0x%0*Lx
+Grayscale	TypeEditors		Gråskala
+32 bit signed value:	TypeEditors		32 bitars signerat värde:
+DiskProbe request	DiskProbe		DiskInspekteraren
+Type editor	ProbeView		Typredigerare
+Contents:	TypeEditors		Innehåll:

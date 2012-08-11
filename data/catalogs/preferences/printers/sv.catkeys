@@ -1,44 +1,44 @@
-1	swedish	x-vnd.Be-PRNT	2065133853
-%.2f KB	JobListView		%.2f KB
-1 pending job.	PrinterListView		1 utskrift i kön.
-<pick one>	AddPrinterDialog		<välj en>
-Add	AddPrinterDialog		Lägg till
-Add printer	AddPrinterDialog		Lägg till skrivare
-Add …	PrintersWindow		Lägg till...
-Black	TestPageView		Svart
-Blue	TestPageView		Blå
-Cancel	AddPrinterDialog		Avbryt
-Cancel job	PrintersWindow		Avbryt utskrift
-Completed	JobListView		Färdigt
-Connected to:	AddPrinterDialog		Ansluten till:
-Cyan	TestPageView		Cyan
-Default Printer	PrinterListView		Standardskrivare
-Driver: %driver%	PrinterListView		Drivrutin: %driver%
-Failed	JobListView		Misslyckades
-Green	TestPageView		Grön
-Magenta	TestPageView		Magneta
-Make default	PrintersWindow		Gör till förvald
-No pending jobs.	PrinterListView		Inga utskrifter i kön.
-No printer found!	TransportMenu		Ingen skrivare funnen!
-Print jobs for 	PrintersWindow		Utskriftjobb för
-Print jobs: No printer selected	PrintersWindow		Utskrifter: Ingen skrivare vald
-Print test page	PrintersWindow		Skriv ut testsida
-Printer name:	AddPrinterDialog		Skrivarnamn:
-Printer type:	AddPrinterDialog		Skrivartyp:
+1	swedish	x-vnd.Be-PRNT	2674539197
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Skrivare: %printer_name%\nDrivrutin: %driver%\n
+Waiting	JobListView		Väntar
+Print test page	PrintersWindow		Skriv ut testsida
+Test Page	TestPageView		Testsida
+Test Page	PrintersWindow		Testsida
+page	JobListView		sida
+Cancel	AddPrinterDialog		Avbryt
+Add printer	AddPrinterDialog		Lägg till skrivare
+Green	TestPageView		Grön
 Printers	PrintersWindow		Skrivare
+Default Printer	PrinterListView		Standardskrivare
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+No pending jobs.	PrinterListView		Inga utskrifter i kön.
+pages	JobListView		sidor
 Printers	System name		Skrivare
 Processing	JobListView		Bearbetar
 Red	TestPageView		Röd
-Remove	PrintersWindow		Ta bort
+Printer name:	AddPrinterDialog		Skrivarnamn:
+Driver: %driver%	PrinterListView		Drivrutin: %driver%
+ pending jobs.	PrinterListView		 utskrifter i kön.
+Black	TestPageView		Svart
 Restart job	PrintersWindow		Starta om utskrift
-Test Page	PrintersWindow		Testsida
-Test Page	TestPageView		Testsida
-Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+Add	AddPrinterDialog		Lägg till
+Make default	PrintersWindow		Gör till förvald
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
-Unknown status	JobListView		Okänd status
-Waiting	JobListView		Väntar
+Cancel job	PrintersWindow		Avbryt utskrift
 Yellow	TestPageView		Gul
-page	JobListView		sida
-pages	JobListView		sidor
-pending jobs.	PrinterListView		utskrifter i kön.
+Blue	TestPageView		Blå
+1 pending job.	PrinterListView		1 utskrift i kön.
+Remove	PrintersWindow		Ta bort
+<pick one>	AddPrinterDialog		<välj en>
+Add …	PrintersWindow		Lägg till...
+Print jobs for 	PrintersWindow		Utskriftjobb för
+Failed	JobListView		Misslyckades
+%.2f KB	JobListView		%.2f KB
+Magenta	TestPageView		Magneta
+Completed	JobListView		Färdigt
+No printer found!	TransportMenu		Ingen skrivare funnen!
+Print jobs: No printer selected	PrintersWindow		Utskrifter: Ingen skrivare vald
+Cyan	TestPageView		Cyan
+Unknown status	JobListView		Okänd status
+Connected to:	AddPrinterDialog		Ansluten till:
+Printer type:	AddPrinterDialog		Skrivartyp:

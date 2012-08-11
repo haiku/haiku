@@ -1,31 +1,31 @@
 1	swedish	x-vnd.Haiku-PPMTranslator	2886727868
+PPM Settings	PPMMain		PPM-inställningar
 Based on PPMTranslator sample code	PPMTranslator		Baserat på exempelkod från PPM-översättare
-Be Bitmap Format (PPMTranslator)	PPMTranslator		BE bitmappsformat (PPM-översättare)
-Bitmap 1 bit	PPMTranslator		1 bits bitmapp
+OK	PPMMain		OK
+Grayscale 8 bits	PPMTranslator		8 bitars gråskala
 CMY 8:8:8 32 bits	PPMTranslator		32 bitars CMY 8:8:8
+PPM image	PPMTranslator		PPM-bild
+RGBA 5:5:5:1 16 bits	PPMTranslator		16 bitars RGBA 5:5:5:1
+PPM Image Translator	PPMTranslator		PPM-bildöversättare
+Be Bitmap Format (PPMTranslator)	PPMTranslator		BE bitmappsformat (PPM-översättare)
 CMYA 8:8:8:8 32 bits	PPMTranslator		32 bitars CMYA 8:8:8:8
 CMYK 8:8:8:8 32 bits	PPMTranslator		32 bitars CMYK 8:8:8:8
-Grayscale 8 bits	PPMTranslator		8 bitars gråskala
-Input Color Space	PPMTranslator		Ingående färgrymd
-None	PPMTranslator		Ingen
-OK	PPMMain		OK
-PPM Image Translator	PPMTranslator		PPM-bildöversättare
-PPM Settings	PPMMain		PPM-inställningar
-PPM image	PPMTranslator		PPM-bild
-PPMTranslator Settings	PPMTranslator		Inställningar PPM-översättare
-RGB 5:5:5 16 bits	PPMTranslator		16 bitars RGB 5:5:5
+bits/space	PPMTranslator		bitar/utrymme
+RGB 8:8:8 32 bits big-endian	PPMTranslator		32 bitars big-endian RGB 8:8:8
+RGB 5:6:5 16 bits big-endian	PPMTranslator		16 bitars big-endian RGB 5:6:5
+Version %d.%d.%d %s	PPMTranslator		Version %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		16 bitars big-endian RGB 5:5:5
 RGB 5:6:5 16 bits	PPMTranslator		16 bitars RGB 5:6:5
-RGB 5:6:5 16 bits big-endian	PPMTranslator		16 bitars big-endian RGB 5:6:5
-RGB 8:8:8 32 bits	PPMTranslator		32 bitars big-endian RGB 8:8:8
-RGB 8:8:8 32 bits big-endian	PPMTranslator		32 bitars big-endian RGB 8:8:8
-RGBA 5:5:5:1 16 bits	PPMTranslator		16 bitars RGBA 5:5:5:1
-RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		16 bitars big-endian RGBA 5:5:5:1
+Write ASCII	PPMTranslator		Skriv ASCI
 RGBA 8:8:8:8 32 bits	PPMTranslator		32 bitars RGBA 8:8:8:8
+None	PPMTranslator		Ingen
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		16 bitars big-endian RGBA 5:5:5:1
+RGB 5:5:5 16 bits	PPMTranslator		16 bitars RGB 5:5:5
+Bitmap 1 bit	PPMTranslator		1 bits bitmapp
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		32 bitars big-endian RGBA 8:8:8:8
+Input Color Space	PPMTranslator		Ingående färgrymd
+RGB 8:8:8 32 bits	PPMTranslator		32 bitars big-endian RGB 8:8:8
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Exempelkod Copyright 1999, Be Incorporated
+PPMTranslator Settings	PPMTranslator		Inställningar PPM-översättare
 Something is wrong with the PPMTranslator!	PPMMain		Någonting är fel med PPM-översättaren
 System palette 8 bits	PPMTranslator		8 bitars systempalett
-Version %d.%d.%d %s	PPMTranslator		Version %d.%d.%d %s
-Write ASCII	PPMTranslator		Skriv ASCI
-bits/space	PPMTranslator		bitar/utrymme

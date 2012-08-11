@@ -1,24 +1,24 @@
 1	swedish	x-vnd.Haiku-GLTeapot	2890609668
-Add a teapot	TeapotWindow		Lägg till en tekanna
-Backface culling	TeapotWindow		Filtrera bort bakåtvända polygoner
-Blue	TeapotWindow		Blå
-FPS display	TeapotWindow		Visa bildrutor per sekund
-File	TeapotWindow		Arkiv
-Filled polygons	TeapotWindow		Fyllda polygoner
-Fog	TeapotWindow		Dimma
-GLTeapot	System name		GLTekanna
-Gouraud shading	TeapotWindow		Gouraud skuggning
-Green	TeapotWindow		Grön
-Lighting	TeapotWindow		Ljussättning
-Lights	TeapotWindow		Ljuskällor
-Lower left	TeapotWindow		Nedre vänstra
-Off	TeapotWindow		Av
-Options	TeapotWindow		Alternativ
-Perspective	TeapotWindow		Perspektiv
-Quit	TeapotWindow		Avsluta
-Red	TeapotWindow		Röd
-Right	TeapotWindow		Höger
 Upper center	TeapotWindow		Övre mitten
+Lighting	TeapotWindow		Ljussättning
+Off	TeapotWindow		Av
+Lower left	TeapotWindow		Nedre vänstra
 White	TeapotWindow		Vit
 Yellow	TeapotWindow		Gul
+Blue	TeapotWindow		Blå
+Gouraud shading	TeapotWindow		Gouraud skuggning
+Quit	TeapotWindow		Avsluta
+Filled polygons	TeapotWindow		Fyllda polygoner
+Fog	TeapotWindow		Dimma
+Backface culling	TeapotWindow		Filtrera bort bakåtvända polygoner
 Z-buffered	TeapotWindow		Z-buffrad
+File	TeapotWindow		Arkiv
+Options	TeapotWindow		Alternativ
+Perspective	TeapotWindow		Perspektiv
+GLTeapot	System name		GLTekanna
+Green	TeapotWindow		Grön
+Right	TeapotWindow		Höger
+FPS display	TeapotWindow		Visa bildrutor per sekund
+Add a teapot	TeapotWindow		Lägg till en tekanna
+Red	TeapotWindow		Röd
+Lights	TeapotWindow		Ljuskällor

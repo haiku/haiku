@@ -1,6 +1,6 @@
 1	swedish	x-vnd.Haiku-cmd-dstconfig	2337923203
-.\n\nIs this the correct time?	dstcheck		.\n\nÄr tiden korrekt?
-Ask me later	dstcheck		Fråga mig senare
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Viktigt!\n\nI och med bytet från sommartid så kan klockan på din dator gå en timme fel.\n
-Manually adjust time…	dstcheck		Ställ in tiden manuellt...
 Use this time	dstcheck		Använd denna tid
+Ask me later	dstcheck		Fråga mig senare
+Manually adjust time…	dstcheck		Ställ in tiden manuellt...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Viktigt!\n\nI och med bytet från sommartid så kan klockan på din dator gå en timme fel.\n
+.\n\nIs this the correct time?	dstcheck		.\n\nÄr tiden korrekt?
