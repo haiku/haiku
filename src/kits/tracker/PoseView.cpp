@@ -2656,7 +2656,7 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 	}
 
 	fStateNeedsSaving = true;
-	
+
 	if (fFiltering) {
 		// the column we removed might just be the one that was used to filter
 		int32 count = fFilteredPoseList->CountItems();
@@ -5170,14 +5170,14 @@ BPoseView::FSNotification(const BMessage* message)
 					// and that both some_folder and another_folder didn't
 					// exist yet. We are looking if the just created folder
 					// is 'some_folder' and watch it, expecting the creation of
-					// 'another_folder' later and then report the link as fixed. 
+					// 'another_folder' later and then report the link as fixed.
 					Model* model = new Model(&dirNode, &itemNode, name);
 					if (model->IsDirectory()) {
 						BString createdPath(BPath(model->EntryRef()).Path());
 						BDirectory currentDir(TargetModel()->EntryRef());
 						BPath createdDir(model->EntryRef());
 						for (int32 i = 0; i < count; i++) {
-							BSymLink link(fBrokenLinks->ItemAt(i)->EntryRef());	
+							BSymLink link(fBrokenLinks->ItemAt(i)->EntryRef());
 							BPath path;
 							link.MakeLinkedPath(&currentDir, &path);
 							BString pathStr(path.Path());
@@ -5502,7 +5502,7 @@ BPoseView::WatchParentOf(const entry_ref* ref)
 	BSymLink symlink(ref);
 	BPath path;
 
-	symlink.MakeLinkedPath(currentDir.Path(), &path);	
+	symlink.MakeLinkedPath(currentDir.Path(), &path);
 	status_t status = path.GetParent(&path);
 
 	while (status == B_BAD_VALUE)
@@ -5555,7 +5555,7 @@ BPoseView::StopWatchingParentsOf(const entry_ref* ref)
 			link.MakeLinkedPath(currentDir.Path(), &absolutePath);
 			if (BString(absolutePath.Path()).Compare(path.Path(),
 					strlen(path.Path())) == 0) {
-				// a broken link still needs to watch this folder, but	
+				// a broken link still needs to watch this folder, but
 				// don't let that same link also watch a deeper parent.
 				brokenLinksCopy->RemoveItemAt(i);
 				count--;
@@ -8365,7 +8365,7 @@ BPoseView::IdentifySelection()
 	int32 count = fSelectionList->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		BPose* pose = fSelectionList->ItemAt(index);
-		BEntry entry(pose->TargetModel()->EntryRef());
+		BEntry entry(pose->TargetModel()->ResolveIfLink()->EntryRef());
 		if (entry.InitCheck() == B_OK) {
 			BPath path;
 			if (entry.GetPath(&path) == B_OK)
