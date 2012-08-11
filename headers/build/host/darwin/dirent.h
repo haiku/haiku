@@ -7,7 +7,7 @@ extern "C" {
 
 #include_next <dirent.h>
 
-DIR* fdopendir(int fd);	
+DIR* fdopendir(int fd);
 
 #ifdef __cplusplus
 }
