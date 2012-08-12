@@ -86,8 +86,6 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 
 BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
 
-# We want rm_attrs to be self-contained, so we link against the static libroot.
-HOST_LIBROOT on <build>rm_attrs_tmp = $(HOST_STATIC_LIBROOT) ;
 BuildPlatformMain <build>rm_attrs_tmp : rm_attrs.cpp
 	: $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;
 MakeLocateDebug <build>rm_attrs ;
@@ -146,4 +144,3 @@ SubInclude HAIKU_TOP src tools unzip ;
 SubInclude HAIKU_TOP src tools vmdkimage ;
 SubInclude HAIKU_TOP src tools unflatten ;
 SubInclude HAIKU_TOP src tools zip ;
-

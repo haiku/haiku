@@ -4,7 +4,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -116,7 +115,7 @@ faccessat(int fd, const char* path, int accessMode, int flag)
 		return -1;
 	}
 
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call access() ignoring fd
 		return (flag & AT_EACCESS) != 0 ? eaccess(path, accessMode)
 			: access(path, accessMode);
@@ -146,7 +145,7 @@ fchmodat(int fd, const char* path, mode_t mode, int flag)
 		return -1;
 	}
 
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call chmod() ignoring fd
 		if ((flag & AT_SYMLINK_NOFOLLOW) != 0) {
 			// fake lchmod() with open() and fchmod()
@@ -190,7 +189,7 @@ fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 		return -1;
 	}
 
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call chown() ignoring fd
 		return (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lchown(path, owner, group)
 			: chown(path, owner, group);
@@ -244,7 +243,7 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 		return -1;
 	}
 
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call stat() or lstat() ignoring fd
 		return (flag & AT_SYMLINK_NOFOLLOW) != 0 ? lstat(path, st)
 			: stat(path, st);
@@ -268,7 +267,7 @@ fstatat(int fd, const char *path, struct stat *st, int flag)
 int
 mkdirat(int fd, const char *path, mode_t mode)
 {
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call mkdir() ignoring fd
 		return mkdir(path, mode);
 	}
@@ -290,7 +289,7 @@ mkdirat(int fd, const char *path, mode_t mode)
 int
 mkfifoat(int fd, const char *path, mode_t mode)
 {
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call mkfifo() ignoring fd
 		return mkfifo(path, mode);
 	}
@@ -312,7 +311,7 @@ mkfifoat(int fd, const char *path, mode_t mode)
 int
 mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 {
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call mknod() ignoring fd
 		return mknod(path, mode, dev);
 	}
@@ -334,14 +333,14 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 int
 renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 {
-	bool ignoreOldFD = false;
-	bool ignoreNewFD = false;
+	int ignoreOldFD = 0;
+	int ignoreNewFD = 0;
 
-	if (oldFD == AT_FDCWD || oldPath != NULL && oldPath[0] == '/')
-		ignoreOldFD = true;
+	if (oldFD == AT_FDCWD || (oldPath != NULL && oldPath[0] == '/'))
+		ignoreOldFD = 1;
 
-	if (newFD == AT_FDCWD || newPath != NULL && newPath[0] == '/')
-		ignoreNewFD = true;
+	if (newFD == AT_FDCWD || (newPath != NULL && newPath[0] == '/'))
+		ignoreNewFD = 1;
 
 	if (ignoreOldFD && ignoreNewFD) {
 		// call rename() ignoring the fd's
@@ -380,7 +379,7 @@ renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 ssize_t
 readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 {
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call readlink() ignoring fd
 		return readlink(path, buffer, bufferSize);
 	}
@@ -402,7 +401,7 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 int
 symlinkat(const char *oldPath, int fd, const char *newPath)
 {
-	if (fd == AT_FDCWD || newPath != NULL && newPath[0] == '/') {
+	if (fd == AT_FDCWD || (newPath != NULL && newPath[0] == '/')) {
 		// call symlink() ignoring fd
 		return symlink(oldPath, newPath);
 	}
@@ -431,7 +430,7 @@ unlinkat(int fd, const char *path, int flag)
 		return -1;
 	}
 
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call rmdir() or unlink() ignoring fd
 		return (flag & AT_REMOVEDIR) != 0 ? rmdir(path) : unlink(path);
 	}
@@ -465,14 +464,14 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 		return -1;
 	}
 
-	bool ignoreOldFD = false;
-	bool ignoreNewFD = false;
+	int ignoreOldFD = 0;
+	int ignoreNewFD = 0;
 
 	if (oldFD == AT_FDCWD || oldPath != NULL && oldPath[0] == '/')
-		ignoreOldFD = true;
+		ignoreOldFD = 1;
 
 	if (newFD == AT_FDCWD || newPath != NULL && newPath[0] == '/')
-		ignoreNewFD = true;
+		ignoreNewFD = 1;
 
 	if (ignoreOldFD && ignoreNewFD) {
 		// call link() ignoring the fd's
@@ -511,7 +510,7 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 int
 futimesat(int fd, const char *path, const struct timeval times[2])
 {
-	if (fd == AT_FDCWD || path != NULL && path[0] == '/') {
+	if (fd == AT_FDCWD || (path != NULL && path[0] == '/')) {
 		// call utimes() ignoring fd
 		return utimes(path, times);
 	}

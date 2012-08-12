@@ -1,16 +1,12 @@
 #ifndef _HAIKU_BUILD_COMPATIBILITY_DARWIN_DIRENT
 #define _HAIKU_BUILD_COMPATIBILITY_DARWIN_DIRENT
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include_next <dirent.h>
+
+__BEGIN_DECLS
 
 DIR* fdopendir(int fd);
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif	// _HAIKU_BUILD_COMPATIBILITY_DARWIN_DIRENT

@@ -1,10 +1,6 @@
 #ifndef _HAIKU_BUILD_COMPATIBILITY_DARWIN_FCNTL
 #define _HAIKU_BUILD_COMPATIBILITY_DARWIN_FCNTL
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include_next <fcntl.h>
 #include <sys/time.h>
 
@@ -24,11 +20,11 @@ extern "C" {
 #define AT_SYMLINK_FOLLOW	0x400	/* linkat() */
 #define AT_REMOVEDIR		0x800	/* unlinkat() */
 
+__BEGIN_DECLS
+
 int unlinkat(int fd, const char *path, int flag);
 int futimesat(int fd, const char *path, const struct timeval times[2]);
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif	// _HAIKU_BUILD_COMPATIBILITY_DARWIN_FCNTL

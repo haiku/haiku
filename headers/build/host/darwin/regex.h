@@ -3,14 +3,10 @@
 
 // Include the darwin port of gnuregex
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 #include </opt/local/include/gnuregex.h>
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif	// _HAIKU_BUILD_COMPATIBILITY_DARWIN_REGEX

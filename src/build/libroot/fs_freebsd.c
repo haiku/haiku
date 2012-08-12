@@ -40,11 +40,10 @@ haiku_freebsd_read(int fd, void *buf, size_t nbytes)
 
 	off_t seekDiff = (sectorSize - (cur % sectorSize)) % sectorSize;
 	off_t nbytesDiff = (nbytes - seekDiff) % sectorSize;
-	
+
 	if (seekDiff == 0 && nbytesDiff == 0) {
 		// Not needed but this saves malloc and free operations
 		return read(fd, buf, nbytes);
-		
 	} else if (cur % sectorSize + nbytes <= sectorSize) {
 		// Read complete in only a block
 		char* tmpBlock = (char*)malloc(sectorSize);
@@ -63,9 +62,8 @@ haiku_freebsd_read(int fd, void *buf, size_t nbytes)
 		}
 
 		free(tmpBlock);
-		
-		return nbytes;
 
+		return nbytes;
 	} else {
 		// Needs to write more than a block
 
@@ -88,13 +86,14 @@ haiku_freebsd_read(int fd, void *buf, size_t nbytes)
 
 		// Blocks between
 		if ((nbytes - seekDiff) >= sectorSize) {
-			if (read(fd, ((char*)buf) + seekDiff, nbytes - seekDiff - nbytesDiff) == -1)
+			if (read(fd, ((char*)buf) + seekDiff, nbytes - seekDiff
+					- nbytesDiff) == -1) {
 				perror("read between");
+			}
 		}
 		
 		// Last block if overflow
 		if (nbytesDiff > 0 ) {
-
 			off_t sdCur = lseek(fd, 0, SEEK_CUR);
 			if (sdCur == -1)
 				perror("lseek last");
@@ -107,10 +106,9 @@ haiku_freebsd_read(int fd, void *buf, size_t nbytes)
 		}
 
 		free(tmpBlock);
-		
+
 		return nbytes;
 	}
-
 }
 
 
@@ -157,9 +155,8 @@ haiku_freebsd_write(int fd, const void *buf, size_t nbytes)
 			perror("lseek2 oneblock");
 
 		free(tmpBlock);
-		
-		return nbytes;
 
+		return nbytes;
 	} else {
 		// Needs to write more than a block
 
@@ -179,7 +176,6 @@ haiku_freebsd_write(int fd, const void *buf, size_t nbytes)
 			memcpy(tmpBlock + (sectorSize - seekDiff), buf, seekDiff);
 			if (write(fd, tmpBlock, sectorSize)==-1)
 				perror("write seekDiff");
-			
 		}
 
 		// Blocks between
@@ -187,28 +183,29 @@ haiku_freebsd_write(int fd, const void *buf, size_t nbytes)
 			if (write(fd, ((char*)buf) + seekDiff, nbytes - seekDiff - nbytesDiff) == -1)
 				perror("write between");
 		}
-		
+
 		// Last block if overflow
 		if (nbytesDiff > 0) {
-
 			off_t sdCur = lseek(fd, 0, SEEK_CUR);
 			if (sdCur == -1)
 				perror("lseek last");
+
 			if (pread(fd, tmpBlock, sectorSize, sdCur) == -1)
 				perror("pread last");
+
 			memcpy(tmpBlock, ((char*)buf) + nbytes - nbytesDiff, nbytesDiff);
 			if (write(fd, tmpBlock, sectorSize) == -1)
 				perror("write last");
+
 			// repos at byte offset of latest wrote block
 			if (lseek(fd, -(sectorSize - nbytesDiff), SEEK_CUR) == -1)
 				perror("lseek2 last");
 		}
 
 		free(tmpBlock);
-		
+
 		return nbytes;
 	}
-
 }
 
 

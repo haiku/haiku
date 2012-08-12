@@ -25,10 +25,14 @@
 #	endif
 #endif
 
+__BEGIN_DECLS
+
 int fchmodat(int fd, const char* path, mode_t mode, int flag);
 int fstatat(int fd, const char *path, struct stat *st, int flag);
 int mkdirat(int fd, const char *path, mode_t mode);
 int mkfifoat(int fd, const char *path, mode_t mode);
 int mknodat(int fd, const char *name, mode_t mode, dev_t dev);
+
+__END_DECLS
 
 #endif	/* _HAIKU_BUILD_COMPATIBILITY_DARWIN_SYS_STAT */

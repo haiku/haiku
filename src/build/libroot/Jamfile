@@ -47,11 +47,11 @@ if $(HOST_PLATFORM) = cygwin || $(HOST_PLATFORM) = sunos {
 
 local hostPlatformSources ;
 if $(HOST_PLATFORM) = freebsd {
-	hostPlatformSources = fs_freebsd.cpp ;
+	hostPlatformSources = fs_freebsd.c ;
 }
 
 if $(HOST_PLATFORM) = darwin {
-	hostPlatformSources = fs_darwin.cpp ;
+	hostPlatformSources = fs_darwin.c ;
 }
 
 local librootSources =
