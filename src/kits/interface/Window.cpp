@@ -596,7 +596,6 @@ BWindow::Minimize(bool minimize)
 
 	fLink->StartMessage(AS_MINIMIZE_WINDOW);
 	fLink->Attach<bool>(minimize);
-	fLink->Attach<int32>(fShowLevel);
 	fLink->Flush();
 
 	Unlock();
@@ -2612,6 +2611,7 @@ BWindow::Show()
 
 		if (fShowLevel == 1) {
 			fLink->StartMessage(AS_SHOW_WINDOW);
+			fLink->Attach<int32>(fShowLevel);
 			fLink->Flush();
 		}
 
@@ -2645,6 +2645,7 @@ BWindow::Hide()
 
 	if (fShowLevel == 0) {
 		fLink->StartMessage(AS_HIDE_WINDOW);
+		fLink->Attach<int32>(fShowLevel);
 		fLink->Flush();
 	}
 

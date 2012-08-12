@@ -104,6 +104,7 @@ Window::Window(const BRect& frame, const char *name,
 
 	// windows start hidden
 	fHidden(true),
+	fShowLevel(0),
 	fMinimized(false),
 	fIsFocus(false),
 
@@ -1076,6 +1077,16 @@ Window::SetHidden(bool hidden)
 
 		// TODO: anything else?
 	}
+}
+
+
+void
+Window::SetShowLevel(int32 showLevel)
+{
+	if (showLevel == fShowLevel)
+		return;
+
+	fShowLevel = showLevel;
 }
 
 

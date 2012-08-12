@@ -481,7 +481,9 @@ ServerWindow::GetInfo(window_info& info)
 	info.window_right = (int)floor(fWindow->Frame().right);
 	info.window_bottom = (int)floor(fWindow->Frame().bottom);
 
-	info.show_hide_level = fWindow->IsHidden() ? 1 : 0; // ???
+	// This is essentially opposite of the ShowLevel, meaning a window is
+	// hidden if it is 1 or more, and shown if it is 0 or less.
+	info.show_hide_level = fWindow->ShowLevel() <= 0 ? 1 : 0;
 	info.is_mini = fWindow->IsMinimized();
 }
 
@@ -595,32 +597,40 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 {
 	switch (code) {
 		case AS_SHOW_WINDOW:
+		{
 			DTRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
 			_Show();
+
+			int32 showLevel;
+			if (link.Read<int32>(&showLevel) == B_OK) {
+				fWindow->SetShowLevel(showLevel);
+			}
 			break;
 
+		}
 		case AS_HIDE_WINDOW:
+		{
 			DTRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));
 			_Hide();
-			break;
 
+			int32 showLevel;
+			if (link.Read<int32>(&showLevel) == B_OK) {
+				fWindow->SetShowLevel(showLevel);
+			}
+			break;
+		}
 		case AS_MINIMIZE_WINDOW:
 		{
-			int32 showLevel;
 			bool minimize;
 
-			link.Read<bool>(&minimize);
-			if (link.Read<int32>(&showLevel) == B_OK) {
+			if (link.Read<bool>(&minimize) == B_OK) {
 				DTRACE(("ServerWindow %s: Message AS_MINIMIZE_WINDOW, "
-					"showLevel: %ld, minimize: %d\n", Title(), showLevel,
-					minimize));
+					"minimize: %d\n", Title(), minimize));
 
-				if (showLevel <= 0) {
-					// window is currently hidden - ignore the minimize request
+				if (fWindow->ShowLevel() <= 0) {
+					// Window is currently hidden - ignore the minimize
+					// request, but keep the state in sync.
 					fWindow->SetMinimized(minimize);
-						// TODO: commenting this out makes BWindow::fMinimized
-						// and Window::fMinimized go out of sync. However, not
-						// doing it currently causes #4127.
 					break;
 				}
 
