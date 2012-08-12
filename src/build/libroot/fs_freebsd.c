@@ -30,7 +30,7 @@ haiku_freebsd_read(int fd, void *buf, size_t nbytes)
 	if (S_ISREG(st.st_mode))
 		return read(fd, buf, nbytes); // Is a file! Good :)
 
-	int sectorSize;
+	uint sectorSize;
 	if (ioctl(fd, DIOCGSECTORSIZE, &sectorSize) == -1)
 		sectorSize = 512; // If fail, hardcode to 512 for now
 
@@ -122,7 +122,7 @@ haiku_freebsd_write(int fd, const void *buf, size_t nbytes)
 	if (S_ISREG(st.st_mode))
 		return write(fd, buf, nbytes); // Is a file! Good :)
 
-	int sectorSize;
+	uint sectorSize;
 	if (ioctl(fd, DIOCGSECTORSIZE, &sectorSize) == -1)
 		sectorSize = 512; // If fail, hardcode do 512 for now
 
@@ -210,11 +210,12 @@ haiku_freebsd_write(int fd, const void *buf, size_t nbytes)
 
 
 ssize_t
-haiku_freebsd_readv(int fd, const iovec *vecs, size_t count)
+haiku_freebsd_readv(int fd, const struct iovec *vecs, size_t count)
 {
 	ssize_t bytesRead = 0;
+	size_t i = 0;
 
-	for (size_t i = 0; i < count; i++) {
+	for (; i < count; i++) {
 		ssize_t currentRead = haiku_freebsd_read(fd, vecs[i].iov_base,
 			vecs[i].iov_len);
 
@@ -235,8 +236,9 @@ ssize_t
 haiku_freebsd_writev(int fd, const struct iovec *vecs, size_t count)
 {
 	ssize_t bytesWritten = 0;
+	size_t i = 0;
 
-	for (size_t i = 0; i < count; i++) {
+	for (; i < count; i++) {
 		ssize_t written = haiku_freebsd_write(fd, vecs[i].iov_base,
 			vecs[i].iov_len);
 
