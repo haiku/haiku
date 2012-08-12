@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	2908539543
+1	german	x-vnd.Haiku-DriveSetup	598414903
 DriveSetup	System name		Datenträgerverwaltung
 Delete	MainWindow		Löschen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
@@ -14,7 +14,9 @@ No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erk
 The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
 Partition name:	CreateParamsPanel		Partitionsname:
 Initialize	InitParamsPanel		Initialisieren
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
+The partition %s has been successfully formatted.\n	MainWindow		Die Partition \"%s\" wurde erfolgreich formatiert.\n
 The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 Partition type:	CreateParamsPanel		Partitionstyp:
@@ -34,15 +36,19 @@ Offset: %ld MB	Support		Versatz: %ld MiB
 Write changes	MainWindow		Änderungen schreiben
 There was an error preparing the disk for modifications.	MainWindow		Beim Vorbereiten der Änderungen trat ein interner Fehler auf.
 The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
 Create…	MainWindow		Anlegen…
 Disk system \"%s\"\" not found!	MainWindow		Medienschema \"%s\"\" nicht gefunden!
+The disk has been successfully initialized.\n	MainWindow		Der Datenträger wurde erfolgreich initialisiert.\n
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount	MainWindow		Einhängen
 Create	CreateParamsPanel		Anlegen
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Soll der leere Datenträger wirklich formatiert werden (üblicherweise wird zuerst eine Partitionstabelle angelegt)?Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 Device	PartitionList		Gerät
 Disk	MainWindow		Datenträger
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Soll der ausgewählte Datenträger wirklich formatiert werden? Alle Daten werden verloren gehen. Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.\n
 Device	DiskView		Gerät
 Active	PartitionList		Aktiv
 Volume name	PartitionList		Datenträgername
@@ -65,7 +71,9 @@ Partition size	CreateParamsPanel		Partitionsgröße:
 Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
 Cancel	InitParamsPanel		Abbrechen
 Cancel	CreateParamsPanel		Abbrechen
+Format	MainWindow		Formatieren
 Parameters	PartitionList		Parameter
 Creation of the partition has failed.	MainWindow		Anlegen der Parition schlug fehl.
 The currently selected partition is not empty.	MainWindow		Die gewählte Partition ist nicht leer.
+Failed to format the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 Unmount	MainWindow		Aushängen

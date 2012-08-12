@@ -105,7 +105,7 @@ Start now	Mail		Запустить сейчас
 Close	Mail		Закрыть
 No matches	Mail		Нет совпадений
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Не запущен mail_daemon. Сообщение поставлено в очередь и будет отправлено как только mail_daemon будет запущен.
-Really delete this signature? This cannot be undone.	Mail		Действительно удалить эту подпись? Эту операцию будет невозможно  отменить.
+Really delete this signature? This cannot be undone.	Mail		Действительно удалить эту подпись? Эту операцию будет невозможно отменить.
 Open	Mail		Открыть
 draft	B_USER_DIRECTORY/mail/draft		Черновики
 Quote	Mail		Цитата

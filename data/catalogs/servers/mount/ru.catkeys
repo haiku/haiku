@@ -8,7 +8,7 @@ Mounting volume '%s'\n\n	AutoMounter		Подключение раздела '%s'
 Cancel	AutoMounter		Отмена
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Невозможно отключить диск \"%s\":\n\t%s\n\nОтключить этот диск принудительно?\n\nВнимание: если какое-нибудь приложение в данный момент записывает данные на этот раздел, то отключение диска может привести к потере данных.\n
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Невозможно отключить диск \"%s\":\n\t%s
-Mounting volume <unnamed volume>\n\n	AutoMounter		Подключается раздел <безымянный раздел>\n\n
+Mounting volume <unnamed volume>\n\n	AutoMounter		Подключение раздела <безымянный раздел>\n\n
 OK	AutoMounter		ОК
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Файловая система этого раздела не является файловой системой Haiku. Строго рекомендуется подключить его в режиме только для чтения. Это предотвратит возможную потерю данных из-за потенциальных ошибок в Haiku.
 Previous volumes mounted.	AutoMounter		Подключенные ранее.

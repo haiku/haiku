@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-WebPositive	3193305619
+1	russian	x-vnd.Haiku-WebPositive	3688678160
+Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
 Cancel	Settings Window		Отмена
@@ -97,3 +98,5 @@ Today	WebPositive Window		Сегодня
 Remember username and password for this site	Authentication Panel		Запомнить имя пользователя и пароль для этого сайта
 Earlier	WebPositive Window		Ранее
 General	Settings Window		Общие
+OK	Authentication Panel		OK
+OK	WebPositive Window		OK

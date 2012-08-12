@@ -1,10 +1,16 @@
-1	russian	x-vnd.Haiku-NewMailNotification	3801190717
-%num new message	filter		%num новое сообщение
-%num new messages	filter		%num новых сообщений
+1	russian	x-vnd.Haiku-NewMailNotification	3624191291
+%num new message	filter		Новых сообщений: %num
+%num new messages	filter		Новых сообщений: %num
 Keyboard LEDs	ConfigView		Клавиатурные светодиоды
-You have %num new message for %name.	filter		У вас есть %num новое сообщение для %name.
+You have %num new messages for %name.	filter		Новых сообщений для %name: %num.
+You have %num new message for %name.	filter		Новых сообщений для %name: %num.
 Log window	ConfigView		Окно журнала
 Central beep	ConfigView		Центральный звуковой сигнал
 Beep	ConfigView		Звуковой сигнал
 Method:	ConfigView		Метод:
+Central alert	ConfigView		Центральное оповещение
 Alert	ConfigView		Оповещение
+none	ConfigView		нет
+New messages	filter		Новое сообщение
+New mails notification	ConfigView		Уведомление о новой почте
+OK	filter		OK

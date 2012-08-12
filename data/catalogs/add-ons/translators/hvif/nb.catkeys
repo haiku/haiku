@@ -1,6 +1,8 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HVIFTranslator	2227623652
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HVIFTranslator	813066125
 HVIF icons	HVIFTranslator		HVIF-ikoner
 Render size:	HVIFView		Visningsstørrelse
 HVIFTranslator Settings	HVIFTranslator		HVIF-oversetterinnstillinger
+Native Haiku vector icon translator	HVIFTranslator		Haiku-vektorikonoversetter
+Native Haiku icon format translator	HVIFView		Haiku-ikonformatoversetter
 HVIF Settings	HVIFMain		HVIF-innstillinger
 Version %d.%d.%d, %s	HVIFView		Versjon %d.%d.%d, %s

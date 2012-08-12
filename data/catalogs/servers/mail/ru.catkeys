@@ -1,8 +1,13 @@
-1	russian	x-vnd.Be-POST	933996868
+1	russian	x-vnd.Be-POST	2358436466
 Fetching mail for %name	Notifier		Получение почты для %name
 Check for mails only	DeskbarView		Только проверить почту
 Send pending mails	DeskbarView		Отправить почту в ожидании
-New Messages	MailDaemon		Новые Сообщения
+New Messages	MailDaemon		Новые сообщения
 <no accounts>	DeskbarView		<нет аккаунтов>
-%num new messages	DeskbarView		%num новых сообщений
+%num new messages	DeskbarView		Новых сообщений: %num
 Mail status	MailDaemon		Статус почты
+%num new messages.	MailDaemon		Новых сообщений: %num
+No new messages	MailDaemon		Нет новых сообщений
+No new messages	DeskbarView		Нет новых сообщений
+No new messages.	MailDaemon		Нет новых сообщений.
+Mail status	Notifier		Статус почты

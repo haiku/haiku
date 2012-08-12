@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1868621245
+1	russian	x-vnd.Haiku-libtracker	853863347
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -20,6 +20,7 @@ Recent documents	FavoritesMenu		Недавние документы
 Modified	QueryPoseView		Изменён
 Created	ContainerWindow		Создан
 Error %error loading add-On %name.	ContainerWindow		Ошибка %error при запуске дополнения %name.
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы %ifYouDoAction папку settings, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?
 contains	SelectionWindow		содержит
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Извините, сохранение объектов в корневой папке системы невозможно.
 Show shared volumes on Desktop	SettingsView		Показывать значки общих дисков
@@ -39,6 +40,7 @@ Make active printer	ContainerWindow		Сделать принтер основн�
 Create link here	ContainerWindow		Создать ссылку здесь
 Moving: 	StatusWindow		Перемещение: 
 before	FindPanel		до
+Error emptying Trash	FSUtils		Ошибка при очищении корзины!
 On	FindPanel		На
 MiB	WidgetAttributeText		МБ
 greater than	FindPanel		больше чем
@@ -64,7 +66,7 @@ Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		�
 Close all in workspace	ContainerWindow		Закрыть все на этом столе
 Empty Trash	ContainerWindow		Очистить корзину
 Name = %name	FindPanel	FindResultTitle	Имя = %name
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Вы уверены, что хотите скопировать или переместить выбранные объекты в эту папку?
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Вы уверены, что хотите скопировать или переместить выбранные объект в эту папку?
 Does not handle file	OpenWithWindow		Не поддерживает этот файл
 Arrange by	ContainerWindow		Выстроить по
 Mount server error	AutoMounterSettings		Ошибка сервера подключения дисков
@@ -89,6 +91,7 @@ Cut	FilePanelPriv		Вырезать
 Replace	FilePanelPriv		Заменить
 Select all	VolumeWindow		Выделить все
 Opens with:	InfoWindow		Открывать в:
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы %ifYouDoAction настройки mime, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?
 Open	ContainerWindow		Открыть
 Error calculating folder size.	InfoWindow		Ошибка при подсчете размера папки.
 New folder	FilePanelPriv		Новая папка
@@ -117,6 +120,7 @@ Move to Trash	ContainerWindow		В корзину
 Move to	ContainerWindow		Переместить в
 Create %s clipping	PoseView		Сохранить как %s
 Set new link target	InfoWindow		Изменить цель ссылки
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Если вы %ifYouDoAction папку system или её содержимое, %osName больше не сможет загружаться!\n\nВы уверены, что хотите сделать это?\n\nЧтобы %toDoAction папку system или её содержимое, зажмите клавишу Shift и нажмите \"%toConfirmAction\".
 Save as Query template:	FindPanel		Сохранить запрос как шаблон:
 preferences	B_PREFERENCES_DIRECTORY		Настройки
 Cancel	FSUtils		Отмена
@@ -140,6 +144,7 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не�
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Извините, сохранение более одного файла недопустимо.
 Searching for disks to mount…	StatusWindow		Поиск дисков для подключения…
 New folder	FSUtils		Новая папка
+If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Если вы %ifYouDoAction папку common, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?\n\nЧтобы %toDoAction папку common, зажмите клавишу Shift и нажмите \"%toConfirmAction\".
 Free space color	SettingsView		Цвет свободного места
 Cut	ContainerWindow		Вырезать
 Remove	FindPanel		Удалить
@@ -249,6 +254,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 Cancel	ContainerWindow		Отмена
 Only the boot disk	AutoMounterSettings		Только загрузочный диск
 Trash	TrackerSettingsWindow		Корзина
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы %ifYouDoAction папку config, Haiku может начать работать некорректно!\n\nВы уверены, что хотите сделать это?
 Unmount	ContainerWindow		Отключить
 Copy layout	ContainerWindow		Копировать вид папки
 label too long	PoseView		слишком длинное имя
@@ -334,6 +340,7 @@ Handles any file	OpenWithWindow		Поддерживает любые файлы
 Get info	FilePanelPriv		Информация
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Отмена
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Программа \"%appname\" не поддерживает открытие документов данного типа.\nВы действительно хотите открыть документ в ней?\n\nЕсли вы знаете, что программа поддерживает этот тип документов, то рекомендуется связаться с разработчиками программы и попросить их обновить список типов, поддерживаемых программой.
 Disks	DirMenu		Диски
 New folder %ld	FSUtils		Новая папка %ld
 All BeOS disks	AutoMounterSettings		Все диски BeOS
@@ -371,6 +378,7 @@ Preferences…	ContainerWindow		Настройки…
 Move	PoseView		Переместить
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Вы уверены, что хотите удалить выделенные объекты? Эту операцию будет невозможно отменить.
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Если вы %ifYouDoAction папку home, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?\nЧтобы %toDoAction папку home, зажмите клавишу Shift и нажмите \"%toConfirmAction\".
 Add-ons	DeskWindow		Дополнения
 Name	FindPanel		Имя
 And	FindPanel		и

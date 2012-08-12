@@ -53,7 +53,7 @@ Only from trusted devices	Settings view		Только от доверенных 
 Scanning progress	Inquiry panel		Прогресс сканирования
 Always ask	Settings view		Всегда спрашивать
 Retrieving name of %1	Inquiry panel		Получение имени %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Убедитесь, что на удалённом устройстве активирован bluetooth. Чтобы начать сканирование, нажмите кнопку \"Запрос\". Время, необходимое для получения имён неизвестно, хотя не должно превышать 3-х секунд на одно устройство. После этого вы сможете подключиться к ним.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Убедитесь, что на удалённом устройстве активирован bluetooth. Чтобы начать сканирование, нажмите кнопку 'Запрос'. Время, необходимое для получения имён неизвестно, хотя не должно превышать 3-х секунд на одно устройство. После этого вы сможете подключиться к ним.
 Authenticate	Extended local device view		Аутентифицировать
 Retrieving names...	Inquiry panel		Получение имен…
 Help	Window		Помощь

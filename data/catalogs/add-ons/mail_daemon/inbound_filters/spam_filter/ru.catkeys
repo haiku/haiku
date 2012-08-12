@@ -1,0 +1,9 @@
+1	russian	x-vnd.Haiku-SpamFilter	1975155212
+or empty e-mail	SpamFilterConfig		или пустое письмо
+Spam Filter (AGMS Bayesian)	SpamFilter		Спам-фильтр
+Genuine below and uncertain above:	SpamFilterConfig		Достоверно ниже и неточно выше:
+Spam above:	SpamFilterConfig		Спам выше:
+Add spam rating to start of subject	SpamFilterConfig		Добавить спам-рейтинг к начало темы
+Learn from all incoming e-mail	SpamFilterConfig		Обучаться на всех входящих письмах
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Извините, не удалось запустить программу spamdbm, чтобы дать вам возможность изменить настройки сервера.
+Close	SpamFilterConfig		Закрыть

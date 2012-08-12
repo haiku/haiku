@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	3837926831
+1	russian	x-vnd.Haiku-About	1855360637
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 BSD (4-clause)	AboutView		4-пунктовая BSD
@@ -7,7 +7,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Все �
 %d MiB total	AboutView		Всего %d МБ
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
 The Haiku-Ports team\n	AboutView		Команде Haiku-Ports\n
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Все права защищены ©  1998-2003 Daniel Veillard.
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Все права защищены © 1998-2003 Daniel Veillard.
 %d MiB used (%d%%)	AboutView		%d МБ использовано (%d%%)
 Website, marketing & documentation:\n	AboutView		Веб-сайт, маркетинг и документация:\n
 AboutSystem	System name		О системе
@@ -24,6 +24,7 @@ BSD (3-clause)	AboutView		3-пунктовая BSD
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Все права защищены © 2000-2007 Fabrice Bellard и другие.
 Contributors:\n	AboutView		Внесли вклад в развитие:\n
 Unknown	AboutView		Неизвестен
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Все права защищены © 2002-2004 Steve Lhomme.
 ... and the many people making donations!\n\n	AboutView		... и многим другим людям, делающим пожертвования!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… а также те, кого мы забыли упомянуть (простите!)\n\n
 %.2f GHz	AboutView		%.2f ГГц
@@ -37,6 +38,7 @@ Google & their Google Summer of Code program\n	AboutView		Корпорации G
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Все права защищены © 2002-2003 Steve Lhomme.
 \nCopyrights\n\n	AboutView		\nАвторские права\n\n
 Current maintainers:\n	AboutView		Текущие разработчики:\n
+Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Все права защищены © 2006-2007 Intel Coporation.
 Time running:	AboutView		Время работы:
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Содержит программное обеспечение из проекта FreeBSD, выпущен под лицензией BSD:\ncal, ftpd, ping, telnet, telnetd, tracerout\nВсе права защищены © 1994-2008 Проект FreeBSD.
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
@@ -45,16 +47,19 @@ About this system	AboutWindow		Об этой системе
 BSD (2-clause)	AboutView		2-пунктовая BSD
 Version:	AboutView		Версия:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Все права защищены © 1994-2008 Xiph.Org.
-Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Все права защищены © Максим Шеманарев (McSeem).
+Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Все права защищены © 2004-2005 Intel Corporation.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Все права защищены © 2002-2006 Максим Шеманарев (McSeem).
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Все права защищены © 1999-2007 Michael C. Ring.
 The BeGeistert team\n	AboutView		Команде BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Университету Окленда и Christof Lutteroth\n\n
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Все права защищены © 1995-2001 Lars Düning.
-Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Все права защищены © Александр Л. Рошал.
+Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Все права защищены © 2002-2008 Александр Л. Рошал.
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Все права защищены © 2003-2006 Intel Corporation.
 %ld MHz	AboutView		%ld МГц
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Содержит программное обеспечение из Проекта GNU, выпущенное под лицензиями GPL и LGPL:\nБиблиотека GNU C, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nВсе права защищены © Фонд свободного программного обеспечения.
 MIT license. All rights reserved.	AboutView		Лицензия MIT. Все права защищены.
 [Click a license name to read the respective license.]\n\n	AboutView		[Щелкните левой кнопкой мыши на название лицензии для её прочтения.]\n\n
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Все права защищены © 2007 Ralink Technology Corporation.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Все права защищены © 1990-2002 Info-ZIP.
 License: 	AboutView		Лицензия: 
 GCC %d Hybrid	AboutView		GCC %d Гибрид
