@@ -859,9 +859,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 							if (wInfo == NULL)
 								continue;
 
-							if (TWindowMenu::WindowShouldBeListed(wInfo->feel)
-								&& (wInfo->show_hide_level <= 0
-									|| wInfo->is_mini)) {
+							if (TWindowMenu::WindowShouldBeListed(wInfo)) {
 								// Check if we have a matching window item...
 								item = teamItem->ExpandedWindowItem(
 									wInfo->server_token);

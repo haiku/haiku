@@ -67,12 +67,12 @@ const int32 kSystemFloater = 6;
 #define B_TRANSLATION_CONTEXT "WindowMenu"
 
 bool
-TWindowMenu::WindowShouldBeListed(uint32 behavior)
+TWindowMenu::WindowShouldBeListed(client_window_info* info)
 {
-	if (behavior == kNormalWindow || behavior == kWindowScreen)
-		return true;
-
-	return false;
+	return ((info->feel == kNormalWindow || info->feel == kWindowScreen)
+			// Window has the right feel
+		&& info->show_hide_level <= 0);
+			// Window is not hidden
 }
 
 
@@ -129,8 +129,7 @@ TWindowMenu::AttachedToWindow()
 			if (wInfo == NULL)
 				continue;
 
-			if (WindowShouldBeListed(wInfo->feel)
-				&& (wInfo->show_hide_level <= 0 || wInfo->is_mini)) {
+			if (WindowShouldBeListed(wInfo)) {
 				// Don't add new items if we're expanded. We've already done
 				// this, they've just been moved.
 				int32 numItems = CountItems();

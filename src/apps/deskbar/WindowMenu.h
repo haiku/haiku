@@ -43,6 +43,7 @@ All rights reserved.
 
 #include <Menu.h>
 #include <String.h>
+#include <WindowInfo.h>
 
 
 class TWindowMenu : public BMenu {
@@ -54,7 +55,7 @@ class TWindowMenu : public BMenu {
 
 		BPoint			ScreenLocation();
 		void			SetExpanded(bool status, int addAtIndex);
-		static bool		WindowShouldBeListed(uint32 behavior);
+		static bool		WindowShouldBeListed(client_window_info* info);
 
 	private:
 		const BList		*fTeam;
