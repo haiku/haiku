@@ -51,7 +51,7 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 
- 	fTitle = new BStringView("title", B_TRANSLATE("TGA Image Translator"));
+ 	fTitle = new BStringView("title", B_TRANSLATE("TGA image translator"));
  	fTitle->SetFont(be_bold_font);
 
  	char detail[100];

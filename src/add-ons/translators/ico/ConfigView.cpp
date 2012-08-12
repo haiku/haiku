@@ -27,7 +27,7 @@ ConfigView::ConfigView()
 	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);	
 
 	BStringView* stringView = new BStringView("title", 
-		B_TRANSLATE("Windows icon images"));
+		B_TRANSLATE("Windows icon translator"));
 	stringView->SetFont(be_bold_font);
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);

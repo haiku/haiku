@@ -26,7 +26,8 @@ ConfigView::ConfigView(uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView *fTitle = new BStringView("title", B_TRANSLATE("EXR Images"));
+	BStringView *fTitle = new BStringView("title",
+		B_TRANSLATE("EXR image translator"));
 	fTitle->SetFont(be_bold_font);
 
 	char version[256];

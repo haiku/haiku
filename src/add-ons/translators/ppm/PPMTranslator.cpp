@@ -454,7 +454,7 @@ public:
 				SetLowColor(ViewColor());
 
 				mTitle = new BStringView("title",
-					B_TRANSLATE("PPM Image Translator"));
+					B_TRANSLATE("PPM image translator"));
 				mTitle->SetFont(be_bold_font);
 
 				char detail[100];

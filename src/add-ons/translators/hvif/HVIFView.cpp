@@ -30,7 +30,7 @@ HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)
 	BAlignment labelAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL);
 
 	BStringView* title= new BStringView("title",
-		B_TRANSLATE("Native Haiku icon format translator"));
+		B_TRANSLATE("Haiku vector icon translator"));
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
