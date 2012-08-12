@@ -45,8 +45,9 @@ callout_thread(void* /*data*/)
 			// scan timers for new timeout and/or execute a timer
 			mutex_lock(&sLock);
 
+			struct callout* c = NULL;
 			while (true) {
-				struct callout* c = (callout*)list_get_next_item(&sTimers, c);
+				c = (callout*)list_get_next_item(&sTimers, c);
 				if (c == NULL)
 					break;
 
