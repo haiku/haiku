@@ -2735,6 +2735,7 @@ BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 
 	if (fFiltering) {
 		// the column we added might just add new poses to be showed
+		fFilteredPoseList->MakeEmpty();
 		fFiltering = false;
 		StartFiltering();
 	}
