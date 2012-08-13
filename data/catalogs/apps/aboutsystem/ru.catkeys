@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	1855360637
+1	russian	x-vnd.Haiku-About	2004761361
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 BSD (4-clause)	AboutView		4-пунктовая BSD
@@ -20,16 +20,19 @@ Source Code: 	AboutView		Исходный код:
 Processor:	AboutView		Процессор:
 Kernel:	AboutView		Ядро:
 BSD (3-clause)	AboutView		3-пунктовая BSD
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku® и логотип HAIKU® являются зарегистрированными торговыми марками Haiku, Inc.\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total МБ всего, %inaccessible МБ недоступно
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Все права защищены © 2000-2007 Fabrice Bellard и другие.
 Contributors:\n	AboutView		Внесли вклад в развитие:\n
 Unknown	AboutView		Неизвестен
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Все права защищены © 1999-2006 Brian Paul. Проект Mesa3D.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Все права защищены © 2002-2004 Steve Lhomme.
 ... and the many people making donations!\n\n	AboutView		... и многим другим людям, делающим пожертвования!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… а также те, кого мы забыли упомянуть (простите!)\n\n
 %.2f GHz	AboutView		%.2f ГГц
 Memory:	AboutView		Память:
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Все права защищены © 1996-1997 Jeff Prosise.
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Все права защищены © 2006-2012 Kentaro Fukuchi
 Past maintainers:\n	AboutView		Предыдущие разработчики:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nОсобая благодарность:\n
 Licenses: 	AboutView		Лицензии: 
@@ -42,6 +45,7 @@ Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Все
 Time running:	AboutView		Время работы:
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Содержит программное обеспечение из проекта FreeBSD, выпущен под лицензией BSD:\ncal, ftpd, ping, telnet, telnetd, tracerout\nВсе права защищены © 1994-2008 Проект FreeBSD.
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Все права защищены © 1995, 1998-2001 Jef Poskanzer.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Все права защищены © 2010-2011 Google Inc.
 About this system	AboutWindow		Об этой системе
 BSD (2-clause)	AboutView		2-пунктовая BSD

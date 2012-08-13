@@ -19,7 +19,7 @@ Receiving	DataSource		Прием
 Settings…	ActivityWindow		Настройки…
 Ports	DataSource		Порты
 Page faults	DataSource		Ошибки страниц
-Sending	DataSource		Передача
+Sending	DataSource		Отправка
 Cache	DataSource		Кэш
 %.1f faults/s	DataSource		%.1f ошибок/с
 Update time interval:	SettingsWindow		Интервал обновления:

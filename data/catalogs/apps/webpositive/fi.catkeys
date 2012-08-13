@@ -1,4 +1,5 @@
-1	finnish	x-vnd.Haiku-WebPositive	2598330196
+1	finnish	x-vnd.Haiku-WebPositive	1513721873
+Show home button	Settings Window		Näytä aloitussivupainike
 Username:	Authentication Panel		Käyttäjätunnus:
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
 Cancel	Settings Window		Peru
@@ -21,6 +22,7 @@ Confirmation	WebPositive Window		Vahvistus
 Window	WebPositive Window		Ikkuna
 Decrease size	WebPositive Window		Pienennä kirjasinkokoa
 Serif font:	Settings Window		Pääteviivallinen kirjasin:
+Loading %url	WebPositive Window		Ladataan %url
 Page source	WebPositive Window		Sivulähde
 Next	WebPositive Window		Seuraava
 Find next	WebPositive Window		Etsi seuraava
@@ -33,8 +35,10 @@ Search page:	Settings Window		Etsintäsivu:
 Zoom text only	WebPositive Window		Suurenna vain tekstiä
 Default fixed font size:	Settings Window		Kirjasimen kiinteä oletuskoko:
 Close tab	WebPositive Window		Sulje välilehti
+Auto-hide mouse pointer	Settings Window		Piilota hiiren osoitin automaattisesti
 Over 1 hour left	Download Window		Yli 1 tuntia jäljellä
 Quit	WebPositive Window		Lopeta
+Full screen	WebPositive Window		Koko näyttö
 Open download error	Download Window		Avaa latausvirhe
 Standard font:	Settings Window		Vakiokirjasin:
 Restart	Download Window		Käynnistä uudelleen
@@ -62,9 +66,11 @@ Increase size	WebPositive Window		Kasvata kirjasinkokoa
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Virhe noudettaessa kirjanmerkkikansiota.\n\nVirhe: %error
 Over 1 day left	Download Window		Yli1 päivää jäljellä
 Downloads	WebPositive Window		Lataukset
+Requesting %url	WebPositive Window		Pyydetään %url
 Apply	Settings Window		Käytä
 Bookmark info	WebPositive Window		Kirjanmerkkitiedot
 Size:	Font Selection view		Koko:
+Show tabs if only one page is open	Settings Window		Näytä välilehdet vain kun yksi sivu on auki
 About	WebPositive Window		Ohjelmasta
 Finish: 	Download Window	Finishing time	Valmis:
 Fonts	Settings Window		Kirjasimet
@@ -102,7 +108,11 @@ Today	WebPositive Window		Tänään
 1 second left	Download Window		1 sekunti jäljellä
 Remember username and password for this site	Authentication Panel		Muista tämän sivuston käyttäjätunniste ja salasana
 Earlier	WebPositive Window		Aiempi
+Authentication required	Authentication Panel		Todennus vaaditaan
+Use proxy server to connect to the internet	Settings Window		Käytä välityspalvelinta yhdistämään internettiin
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Latauksia on yhä menossa, haluatko todella poistu WebPositive-ohjelmasta nyt?
+Auto-hide interface in full screen mode	Settings Window		Piilota käyttöliittymä kokoruutunäyttötilassa automaattisesti
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url epäonnistui
 New tab	WebPositive Window		Uusi välilehti
 Downloads in progress	WebPositive		Latauksia käynnissä
 Style:	Font Selection view		Tyyli:
@@ -123,4 +133,5 @@ OK	WebPositive Window		Valmis
 Manage bookmarks	WebPositive Window		Hallinnoi kirjanmerkkejä
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Kirjanmerkki (%bookmarkName) tälle sivulle on jo olemassa.
 New windows:	Settings Window		Uudet ikkunat:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url valmis
 Remove finished	Download Window		Poista päättyneet

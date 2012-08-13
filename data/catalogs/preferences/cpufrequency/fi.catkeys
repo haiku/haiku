@@ -1,6 +1,7 @@
-1	finnish	x-vnd.Haiku-CPUFrequencyPref	3079996868
+1	finnish	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		Valmis
 CPU frequency status view	CPU Frequency View		Suoritintaajuuden tilanäkymä
+OK	Status view		Valmis
 Set state	Status view		Aseta tila
 Defaults	Pref Window		Oletukset
 Install replicant into Deskbar	CPU Frequency View		Asenna kopio Työpöytäpalkkiin

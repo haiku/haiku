@@ -1,15 +1,15 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-JPEGTranslator	397783086
-Output quality	JPEGTranslator		Utdata-kvalitet
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-JPEGTranslator	54123690
+Output quality	JPEGTranslator		Output-kvalitet
 JPEG images	JPEGTranslator		JPEG-bilder
 Prevent colors 'washing out'	JPEGTranslator		Hindre 'utvaskede' farger
-JPEG Library Error: %s\n	be_jerror		JPEG-bibliotek-feil: %s\n
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Bruk CMYK-kode med 0 for 100% blekkdekning
 About	JPEGTranslator		Om
 Low	JPEGTranslator		Lav
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Gjør filen mindre (litt dårligere kvalitet)
 None	JPEGTranslator		Ingen
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bitmap-format (JPEGTranslator)
 Show warning messages	JPEGTranslator		Vis advarsler
-Output smoothing strength	JPEGTranslator		Utdata utjevningsstyrke
+Output smoothing strength	JPEGTranslator		Utjevningsstyrke for output
 High	JPEGTranslator		Høy
 Write	JPEGTranslator		Skriv
 Write black-and-white images as RGB24	JPEGTranslator		Skriv svart-hvitt-bilder som RGB24

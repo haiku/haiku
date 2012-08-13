@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	1054657081
+1	russian	x-vnd.Haiku-Terminal	1294209621
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -42,6 +42,7 @@ Green on Black	Terminal colors schema		Зелёный на чёрном
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете вкладку, то этот процесс будет уничтожен.
 Size:	Terminal AppearancePrefView		Размер:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \"%command\":\n\t%error
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               вывести эту справку\n  -t,     --title              задать заголовок окна\n  -f,     --fullscreen         запустить во весь экран\n
 Full screen	Terminal TermWindow		На весь экран
 Window title…	Terminal TermWindow		Заголовок окна…
 Page setup…	Terminal TermWindow		Настройка печати…

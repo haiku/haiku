@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PPMTranslator	4103848783
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PPMTranslator	4086122955
 PPM Settings	PPMMain		PPM-innstillinger
 Based on PPMTranslator sample code	PPMTranslator		Basert på PPMTranslator eksempelkode
 OK	PPMMain		OK
@@ -17,6 +17,7 @@ RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bit
 None	PPMTranslator		Ingen
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bit
 Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
+RGB 8:8:8 32 bits	PPMTranslator		RGBA 8:8:8 32 bit
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Eksempelkode-opphavsrett 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		PPM-oversetterinnstillinger
 Something is wrong with the PPMTranslator!	PPMMain		Noe er galt med PPM-oversetteren!

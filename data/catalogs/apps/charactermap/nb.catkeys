@@ -1,49 +1,88 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-CharacterMap	4276494503
-Basic Latin	UnicodeBlocks		Latin (enkel)
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-CharacterMap	2152393398
+Enclosed alphanumerics	UnicodeBlocks		Innkapslede alfanumeriske tegn
+Basic Latin	UnicodeBlocks		Grunnleggende latin
 View	CharacterWindow		Vis
-Latin-1 supplement	UnicodeBlocks		Latin-1 tillegg
+Latin-1 supplement	UnicodeBlocks		Latin-1-tillegg
 Hebrew	UnicodeBlocks		Hebraisk
-Georgian supplement	UnicodeBlocks		Georgisk supplement
+Georgian supplement	UnicodeBlocks		Georgisk tillegg
+CJK unified ideographs	UnicodeBlocks		Kinesiske, japanske og koreanske forente ideogrammer
+Modifier tone letters	UnicodeBlocks		Endrende tonetegn
 Khmer	UnicodeBlocks		Khmer
-Arabic presentation forms A	UnicodeBlocks		Arabisk presentasjonsformat-A
-Greek extended	UnicodeBlocks		Gresk (utvidet)
-Linear B ideograms	UnicodeBlocks		Linear B-ideogramer
-Devanagari	UnicodeBlocks		Devangari
+Hanunoo	UnicodeBlocks		Hanunoo
+Latin extended additional	UnicodeBlocks		Latin utvidet tillegg
+Arabic presentation forms A	UnicodeBlocks		Arabiske presentasjonsformer-A
+Greek extended	UnicodeBlocks		Gresk, utvidet
+Linear B ideograms	UnicodeBlocks		Linear B-ideogrammer
+Devanagari	UnicodeBlocks		Devanagari
 Armenian	UnicodeBlocks		Armensk
 Glagotic	UnicodeBlocks		Glagolittisk
 Mathematical operators	UnicodeBlocks		Matematiske operatorer
 General punctuation	UnicodeBlocks		Generell tegnsetting
 Miscellaneous technical	UnicodeBlocks		Diverse tekniske tegn
+Vertical forms	UnicodeBlocks		Loddrette former
 Ol Chiki	UnicodeBlocks		Ol chiki
 Arabic	UnicodeBlocks		Arabisk
+Ethiopic extended	UnicodeBlocks		Etiopisk, utvidet
 Arrows	UnicodeBlocks		Piler
-Font	CharacterWindow		Font
+Font	CharacterWindow		Skrifttype
+Variation selectors supplement	UnicodeBlocks		Tillegg for variasjonsvelgere
 Gujarati	UnicodeBlocks		Gujarati
 Cuneiform	UnicodeBlocks		Kileskrift
 Balinese	UnicodeBlocks		Balinesisk 
 Cham	UnicodeBlocks		Cham
+Specials	UnicodeBlocks		Spesielle tegn
+CJK compatibility ideographs	UnicodeBlocks		Kompatibilitetsideogrammer for kinesisk, japansk og koreansk
 Phonetic extensions	UnicodeBlocks		Fonetiske utvidelser
 Khmer symbols	UnicodeBlocks		Khmer-symboler
 Tagbanwa	UnicodeBlocks		Tagbanwa
+Kanbun	UnicodeBlocks		Kanbun
 Syriac	UnicodeBlocks		Syrisk
+Musical symbols	UnicodeBlocks		Musikksymboler
+Hangul syllables	UnicodeBlocks		Hangul-stavelser
 Coptic	UnicodeBlocks		Koptisk
 Mahjong tiles	UnicodeBlocks		Mahjong-brikker
+Spacing modifier letters	UnicodeBlocks		Avstandsendrende tegn
+Aegean numbers	UnicodeBlocks		Egeiske tall
+CJK strokes	UnicodeBlocks		KJK-strøk
+Old italic	UnicodeBlocks		Gammel kursiv
+Supplemental arrows B	UnicodeBlocks		Piler, tillegg B
+Cyrillic extended A	UnicodeBlocks		Kyrillisk, utvidet A
 Kharoshthi	UnicodeBlocks		Kharosthi
+Combining half marks	UnicodeBlocks		Kombinerende halve merker
 Cyrillic	UnicodeBlocks		Kyrillisk
 Katakana	UnicodeBlocks		Katakana
 Block elements	UnicodeBlocks		Blokkelementer
 Sundanese	UnicodeBlocks		Sundanesisk
 Miscellaneous mathematical symbols A	UnicodeBlocks		Diverse matematiske symboler A
-Cyrillic supplement	UnicodeBlocks		Kyrillisk supplement
+Cyrillic supplement	UnicodeBlocks		Kyrillisk tillegg
+Small form variants	UnicodeBlocks		Små varianter
 IPA extensions	UnicodeBlocks		IPA-utvidelser
-Arabic supplement	UnicodeBlocks		Arabisk supplement
+Thaana	UnicodeBlocks		Thaana
+Ogham	UnicodeBlocks		Ogham
+Combining diacritical marks for symbols	UnicodeBlocks		Kombinerende diakritiske tegn for symboler
+Syloti Nagri	UnicodeBlocks		Syloti Nagri
+Arabic supplement	UnicodeBlocks		Arabisk tillegg
+Latin extended C	UnicodeBlocks		Latin, utvidet C
+Bopomofo extended	UnicodeBlocks		Bopomofo, utvidet
+Lycian	UnicodeBlocks		Lykisk
 Font size:	CharacterWindow		Skriftstørrelse:
+Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Etiopisk
 Bengali	UnicodeBlocks		Bengalsk
+Supplementary private use area B	UnicodeBlocks		Tilleggsområde B for privat bruk
+CJK unified ideographs extension A	UnicodeBlocks		Forente KJK-tegn, utvidelse A
 Filter:	CharacterWindow		Filter:
+Hangul compatibility Jamo	UnicodeBlocks		Hangul med Jamo
+Ideographic description characters	UnicodeBlocks		Ideografiske beskrivelsestegn
+Arabic presentation forms B	UnicodeBlocks		Arabiske presentasjonsformer-B
+CJK compatibility forms	UnicodeBlocks		KJK kompatibilitetsformer
 Hiragana	UnicodeBlocks		Hiragana
 Tagalog	UnicodeBlocks		Tagalog
+Control pictures	UnicodeBlocks		Kontrollbilder
+Variation selectors	UnicodeBlocks		Variasjonsvelgere
+Linear B syllabary	UnicodeBlocks		Linear B stavelsesskrift
 Buginese	UnicodeBlocks		Buginesisk
+Bopomofo	UnicodeBlocks		Bopomofo
 Code	CharacterWindow		Kode
 Ancient Greek musical notation	UnicodeBlocks		Gammelgresk musikknotasjon
 Geometric shapes	UnicodeBlocks		Geometriske former

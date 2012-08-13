@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	3688678160
+1	russian	x-vnd.Haiku-WebPositive	1066475547
 Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
@@ -63,6 +63,7 @@ Downloads	WebPositive Window		Загрузки
 Apply	Settings Window		Применить
 Bookmark info	WebPositive Window		Информация о закладке
 Size:	Font Selection view		Размер:
+Show tabs if only one page is open	Settings Window		Всегда показывать панель вкладок, даже если открыта только одна вкладка.
 About	WebPositive Window		О программе
 Finish: 	Download Window	Finishing time	Завершиться в: 
 Fonts	Settings Window		Шрифты
@@ -92,11 +93,19 @@ Over 1 minute left	Download Window		Осталось более 1 минуты
 Open start page	Settings Window		Открыть стартовую страницу
 Continue downloads	WebPositive		Продолжить загрузку
 Cancel	Download Window		Отмена
+Open search page	Settings Window		Открыть поисковую страницу
 Password:	Authentication Panel		Пароль:
 Today	WebPositive Window		Сегодня
 1 second left	Download Window		осталась 1 секунда
 Remember username and password for this site	Authentication Panel		Запомнить имя пользователя и пароль для этого сайта
 Earlier	WebPositive Window		Ранее
+Authentication required	Authentication Panel		Требуется авторизация
+Use proxy server to connect to the internet	Settings Window		Использовать прокси-сервер для соединения с интернетом
+Auto-hide interface in full screen mode	Settings Window		Автоматически скрывать интерфейс в полноэкранном режиме
+New tab	WebPositive Window		Новая вкладка
 General	Settings Window		Общие
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Произошла ошибка при создании закладки.\n\nОшибка: %error
 OK	Authentication Panel		OK
 OK	WebPositive Window		OK
+New windows:	Settings Window		Новые окна:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен.
