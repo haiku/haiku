@@ -1,8 +1,10 @@
 #ifndef _HAIKU_BUILD_COMPATIBILITY_FREEBSD_SYS_STAT
 #define _HAIKU_BUILD_COMPATIBILITY_FREEBSD_SYS_STAT
 
+
 #include_next <sys/stat.h>
 #include <sys/cdefs.h>
+
 
 #ifndef UTIME_NOW
 #	define UTIME_NOW	(-1)

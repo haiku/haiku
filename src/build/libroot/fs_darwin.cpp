@@ -333,14 +333,14 @@ mknodat(int fd, const char *path, mode_t mode, dev_t dev)
 int
 renameat(int oldFD, const char* oldPath, int newFD, const char* newPath)
 {
-	int ignoreOldFD = 0;
-	int ignoreNewFD = 0;
+	bool ignoreOldFD = false;
+	bool ignoreNewFD = false;
 
 	if (oldFD == AT_FDCWD || (oldPath != NULL && oldPath[0] == '/'))
-		ignoreOldFD = 1;
+		ignoreOldFD = true;
 
 	if (newFD == AT_FDCWD || (newPath != NULL && newPath[0] == '/'))
-		ignoreNewFD = 1;
+		ignoreNewFD = true;
 
 	if (ignoreOldFD && ignoreNewFD) {
 		// call rename() ignoring the fd's
@@ -464,14 +464,14 @@ linkat(int oldFD, const char *oldPath, int newFD, const char *newPath,
 		return -1;
 	}
 
-	int ignoreOldFD = 0;
-	int ignoreNewFD = 0;
+	bool ignoreOldFD = false;
+	bool ignoreNewFD = false;
 
 	if (oldFD == AT_FDCWD || oldPath != NULL && oldPath[0] == '/')
-		ignoreOldFD = 1;
+		ignoreOldFD = true;
 
 	if (newFD == AT_FDCWD || newPath != NULL && newPath[0] == '/')
-		ignoreNewFD = 1;
+		ignoreNewFD = true;
 
 	if (ignoreOldFD && ignoreNewFD) {
 		// call link() ignoring the fd's

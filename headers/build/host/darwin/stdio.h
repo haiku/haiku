@@ -1,7 +1,9 @@
 #ifndef _HAIKU_BUILD_COMPATIBILITY_DARWIN_STDIO
 #define _HAIKU_BUILD_COMPATIBILITY_DARWIN_STDIO
 
+
 #include_next <stdio.h>
+
 
 __BEGIN_DECLS
 

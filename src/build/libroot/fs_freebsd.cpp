@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "fs_freebsd.h"
 
 #include <errno.h>
@@ -52,9 +53,12 @@ haiku_freebsd_read(int fd, void *buf, size_t nbytes)
 		off_t sdCur = lseek(fd, -(cur % sectorSize), SEEK_CUR);
 		if (sdCur == -1)
 			perror("lseek oneblock");
+
 		if (read(fd, tmpBlock, sectorSize) == -1)
 			perror("read oneblock");
+
 		memcpy((char*)buf, tmpBlock + cur % sectorSize, nbytes);
+
 		// repos at byte offset of latest wrote block
 		if (lseek(fd, -sectorSize + (cur % sectorSize) + nbytes, SEEK_CUR)
 				== -1) {
@@ -68,20 +72,22 @@ haiku_freebsd_read(int fd, void *buf, size_t nbytes)
 		// Needs to write more than a block
 
 		char* tmpBlock = (char*)malloc(sectorSize);
-		
+
 		// First block if seek isn't
 		if (seekDiff > 0) {
 			// read entire block at 0 pos
 			if (lseek(fd, -(sectorSize - seekDiff), SEEK_CUR) == -1)
 				perror("lseek seekDiff");
+
 			off_t sdCur = lseek(fd,0,SEEK_CUR);
 			if (sdCur == -1)
 				perror("lseek2 seekDiff");
+
 			if (read(fd, tmpBlock, sectorSize) == -1 )
 				perror("read seekDiff");
+
 			// alter content
 			memcpy(buf, tmpBlock + (sectorSize - seekDiff), seekDiff);
-			
 		}
 
 		// Blocks between
@@ -91,15 +97,18 @@ haiku_freebsd_read(int fd, void *buf, size_t nbytes)
 				perror("read between");
 			}
 		}
-		
+
 		// Last block if overflow
 		if (nbytesDiff > 0 ) {
 			off_t sdCur = lseek(fd, 0, SEEK_CUR);
 			if (sdCur == -1)
 				perror("lseek last");
+
 			if (read(fd, tmpBlock, sectorSize) == -1)
 				perror("read last");
+
 			memcpy(((char*)buf) + nbytes - nbytesDiff, tmpBlock, nbytesDiff);
+
 			// repos at byte offset of latest wrote block
 			if (lseek(fd, -(sectorSize - nbytesDiff), SEEK_CUR) == -1)
 				perror("lseek2 last");
@@ -136,7 +145,6 @@ haiku_freebsd_write(int fd, const void *buf, size_t nbytes)
 	if (seekDiff == 0 && nbytesDiff == 0) {
 		// Not needed but this saves malloc and free operations
 		return write(fd, buf, nbytes);
-		
 	} else if (cur % sectorSize + nbytes <= sectorSize) {
 		// Write complete in only a block
 		char* tmpBlock = (char*)malloc(sectorSize);
@@ -145,14 +153,19 @@ haiku_freebsd_write(int fd, const void *buf, size_t nbytes)
 		off_t sdCur = lseek(fd, -(cur % sectorSize), SEEK_CUR);
 		if (sdCur == -1)
 			perror("lseek oneblock");
+
 		if (pread(fd, tmpBlock, sectorSize, sdCur) == -1)
 			perror("pread oneblock");
+
 		memcpy(tmpBlock + cur % sectorSize, (char*)buf, nbytes);
 		if (write(fd, tmpBlock, sectorSize) == -1)
 			perror("write oneblock");
+
 		// repos at byte offset of latest written block
-		if (lseek(fd, -sectorSize + (cur % sectorSize) + nbytes, SEEK_CUR) == -1)
+		if (lseek(fd, -sectorSize + (cur % sectorSize) + nbytes, SEEK_CUR)
+				== -1) {
 			perror("lseek2 oneblock");
+		}
 
 		free(tmpBlock);
 
@@ -161,27 +174,32 @@ haiku_freebsd_write(int fd, const void *buf, size_t nbytes)
 		// Needs to write more than a block
 
 		char* tmpBlock = (char*)malloc(sectorSize);
-		
+
 		// First block if seek isn't
 		if (seekDiff > 0) {
 			// read entire block at 0 pos
 			if (lseek(fd, -(sectorSize - seekDiff), SEEK_CUR) == -1)
 				perror("lseek seekDiff");
+
 			off_t sdCur = lseek(fd, 0, SEEK_CUR);
 			if (sdCur == -1)
 				perror("lseek2 seekDiff");
-			if (pread(fd, tmpBlock, sectorSize, sdCur) == -1 )
+
+			if (pread(fd, tmpBlock, sectorSize, sdCur) == -1)
 				perror("pread seekDiff");
+
 			// alter content
 			memcpy(tmpBlock + (sectorSize - seekDiff), buf, seekDiff);
-			if (write(fd, tmpBlock, sectorSize)==-1)
+			if (write(fd, tmpBlock, sectorSize) == -1)
 				perror("write seekDiff");
 		}
 
 		// Blocks between
 		if ((nbytes - seekDiff) >= sectorSize) {
-			if (write(fd, ((char*)buf) + seekDiff, nbytes - seekDiff - nbytesDiff) == -1)
+			if (write(fd, ((char*)buf) + seekDiff, nbytes - seekDiff
+					- nbytesDiff) == -1) {
 				perror("write between");
+			}
 		}
 
 		// Last block if overflow
@@ -213,9 +231,8 @@ ssize_t
 haiku_freebsd_readv(int fd, const struct iovec *vecs, size_t count)
 {
 	ssize_t bytesRead = 0;
-	size_t i = 0;
 
-	for (; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		ssize_t currentRead = haiku_freebsd_read(fd, vecs[i].iov_base,
 			vecs[i].iov_len);
 
@@ -236,9 +253,8 @@ ssize_t
 haiku_freebsd_writev(int fd, const struct iovec *vecs, size_t count)
 {
 	ssize_t bytesWritten = 0;
-	size_t i = 0;
 
-	for (; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		ssize_t written = haiku_freebsd_write(fd, vecs[i].iov_base,
 			vecs[i].iov_len);
 

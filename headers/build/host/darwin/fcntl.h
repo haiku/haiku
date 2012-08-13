@@ -1,8 +1,10 @@
 #ifndef _HAIKU_BUILD_COMPATIBILITY_DARWIN_FCNTL
 #define _HAIKU_BUILD_COMPATIBILITY_DARWIN_FCNTL
 
+
 #include_next <fcntl.h>
 #include <sys/time.h>
+
 
 /*
  * Magic value that specify the use of the current working directory
