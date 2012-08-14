@@ -10,6 +10,7 @@
 
 #include <boot/kernel_args.h>
 #include <cpu.h>
+#include <debug.h>
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
 
@@ -27,6 +28,25 @@ static interrupt_descriptor* sIDT;
 interrupt_handler_function* gInterruptHandlerTable[kInterruptHandlerTableSize];
 
 extern uint8 isr_array[kInterruptHandlerTableSize][16];
+
+
+static void
+x86_64_general_protection_fault(iframe* frame)
+{
+	if (debug_debugger_running()) {
+		// Handle GPFs if there is a debugger fault handler installed, for
+		// non-canonical address accesses.
+		cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
+		if (cpu->fault_handler != 0) {
+			debug_set_page_fault_info(0, frame->ip, DEBUG_PAGE_FAULT_NO_INFO);
+			frame->ip = cpu->fault_handler;
+			frame->bp = cpu->fault_handler_stack_pointer;
+			return;
+		}
+	}
+
+	x86_unexpected_exception(frame);
+}
 
 
 /*!	Returns the virtual IDT address for CPU \a cpu. */
@@ -87,7 +107,7 @@ arch_int_init(kernel_args* args)
 	table[10] = x86_fatal_exception;		// Invalid TSS Exception (#TS)
 	table[11] = x86_fatal_exception;		// Segment Not Present (#NP)
 	table[12] = x86_fatal_exception;		// Stack Fault Exception (#SS)
-	table[13] = x86_unexpected_exception;	// General Protection Exception (#GP)
+	table[13] = x86_64_general_protection_fault; // General Protection Exception (#GP)
 	table[14] = x86_page_fault_exception;	// Page-Fault Exception (#PF)
 	table[16] = x86_unexpected_exception;	// x87 FPU Floating-Point Error (#MF)
 	table[17] = x86_unexpected_exception;	// Alignment Check Exception (#AC)
