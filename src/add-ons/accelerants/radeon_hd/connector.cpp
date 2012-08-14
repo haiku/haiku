@@ -764,7 +764,8 @@ debug_connectors()
 			uint16 gpioID = gConnector[id]->gpioID;
 
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
-			ERROR(" + connector:          %s\n", get_connector_name(connectorType));
+			ERROR(" + connector:          %s\n",
+				get_connector_name(connectorType));
 			ERROR(" + gpio table id:      %" B_PRIu16 "\n", gpioID);
 			ERROR(" + gpio hw pin:        0x%" B_PRIX32 "\n",
 				gGPIOInfo[gpioID]->hwPin);
@@ -772,7 +773,8 @@ debug_connectors()
 				gGPIOInfo[gpioID]->valid ? "true" : "false");
 
 			encoder_info* encoder = &gConnector[id]->encoder;
-			ERROR(" + encoder:            %s\n", get_encoder_name(encoder->type));
+			ERROR(" + encoder:            %s\n",
+				get_encoder_name(encoder->type));
 			ERROR("   - id:               %" B_PRIu16 "\n", encoder->objectID);
 			ERROR("   - type:             %s\n",
 				encoder_name_lookup(encoder->objectID));
@@ -783,7 +785,7 @@ debug_connectors()
 
 			ERROR("   - is bridge:        %s\n",
 				encoder->valid ? "true" : "false");
-				
+
 			if (!encoder->valid)
 				ERROR("   + external encoder: none\n");
 			else {
