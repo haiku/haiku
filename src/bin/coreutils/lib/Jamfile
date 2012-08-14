@@ -9,7 +9,7 @@ SubDirCcFlags -DHAVE_CONFIG_H -DB_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 SubDirSysHdrs $(SUBDIR) ;
 #SubDirSysHdrs $(SUBDIR) $(DOTDOT) ;
 
-StaticLibrary libfetish.a :
+local libSources =
 #	__fpending.c
 #	acl.c
 #	alloca.c
@@ -167,7 +167,6 @@ StaticLibrary libfetish.a :
 	readtokens.c
 	readtokens0.c
 #	realloc.c
-#	regex.c
 	rename.c
 	root-dev-ino.c
 #	rmdir.c
@@ -241,6 +240,19 @@ StaticLibrary libfetish.a :
 	xstrtoul.c
 	xstrtoumax.c
 	yesno.c
+;
+
+# For non-GCC 2 builds use the included regex implementation. The sources get
+# built against the included regex.h rather than the one from libroot. On
+# 32-bit this isn't problematic as they're compatible, but they are not for 64.
+# GCC 2 cannot compile the included implementation, so just link to libroot's
+# one there.
+if $(HAIKU_GCC_VERSION[1]) != 2 {
+	libSources += regex.c ;
+}
+
+StaticLibrary libfetish.a :
+	$(libSources)
 ;
 
 SEARCH on [ FGristFiles u8-uctomb.c u8-uctomb-aux.c ] = [ FDirName $(SUBDIR) unistr ] ;
