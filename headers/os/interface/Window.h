@@ -352,6 +352,7 @@ private:
 
 			void				_GetDecoratorSize(float* _borderWidth,
 									float* _tabHeight) const;
+			void				_SendShowOrHideMessage();
 
 private:
 			char*				fTitle;

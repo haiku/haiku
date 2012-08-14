@@ -315,7 +315,7 @@ ServerWindow::_PrepareQuit()
 		_Hide();
 		fDesktop->UnlockSingleWindow();
 	} else if (fThread >= B_OK)
-		PostMessage(AS_HIDE_WINDOW);
+		PostMessage(AS_INTERNAL_HIDE_WINDOW);
 }
 
 
@@ -481,9 +481,7 @@ ServerWindow::GetInfo(window_info& info)
 	info.window_right = (int)floor(fWindow->Frame().right);
 	info.window_bottom = (int)floor(fWindow->Frame().bottom);
 
-	// This is essentially opposite of the ShowLevel, meaning a window is
-	// hidden if it is 1 or more, and shown if it is 0 or less.
-	info.show_hide_level = fWindow->ShowLevel() <= 0 ? 1 : 0;
+	info.show_hide_level = fWindow->ShowLevel();
 	info.is_mini = fWindow->IsMinimized();
 }
 
@@ -596,43 +594,31 @@ void
 ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 {
 	switch (code) {
-		case AS_SHOW_WINDOW:
+		case AS_SHOW_OR_HIDE_WINDOW:
 		{
-			DTRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
-			_Show();
-
 			int32 showLevel;
 			if (link.Read<int32>(&showLevel) == B_OK) {
+				DTRACE(("ServerWindow %s: Message AS_SHOW_OR_HIDE_WINDOW, "
+					"show level: %d\n", Title(), showLevel));
+
 				fWindow->SetShowLevel(showLevel);
+				if (showLevel <= 0)
+					_Show();
+				else
+					_Hide();
 			}
 			break;
-
 		}
-		case AS_HIDE_WINDOW:
-		{
-			DTRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));
+		// Only for internal use within this class
+		case AS_INTERNAL_HIDE_WINDOW:
 			_Hide();
-
-			int32 showLevel;
-			if (link.Read<int32>(&showLevel) == B_OK) {
-				fWindow->SetShowLevel(showLevel);
-			}
 			break;
-		}
 		case AS_MINIMIZE_WINDOW:
 		{
 			bool minimize;
-
 			if (link.Read<bool>(&minimize) == B_OK) {
 				DTRACE(("ServerWindow %s: Message AS_MINIMIZE_WINDOW, "
 					"minimize: %d\n", Title(), minimize));
-
-				if (fWindow->ShowLevel() <= 0) {
-					// Window is currently hidden - ignore the minimize
-					// request, but keep the state in sync.
-					fWindow->SetMinimized(minimize);
-					break;
-				}
 
 				fDesktop->UnlockSingleWindow();
 				fDesktop->MinimizeWindow(fWindow, minimize);
