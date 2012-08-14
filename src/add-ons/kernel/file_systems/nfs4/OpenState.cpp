@@ -143,10 +143,10 @@ OpenState::Reclaim(uint64 newClientID)
 	if (fClientID == newClientID)
 		return B_OK;
 	fClientID = newClientID;
-dprintf("reclaim start\n");
+
 	_ReclaimOpen(newClientID);
 	_ReclaimLocks(newClientID);
-dprintf("reclaim end\n");
+
 	return B_OK;
 }
 
@@ -154,13 +154,12 @@ dprintf("reclaim end\n");
 status_t
 OpenState::_ReclaimOpen(uint64 newClientID)
 {
-	dprintf("reclaim %s\n", fInfo.fName);
-
 	bool confirm;
 	OpenDelegationData delegation;
 	delegation.fType = OPEN_DELEGATE_NONE;
 	delegation.fRecall = false;
 
+	status_t result;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	OpenDelegation delegType = fDelegation != NULL ? fDelegation->Type()
 		: OPEN_DELEGATE_NONE;
@@ -174,24 +173,26 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 			OPEN4_NOCREATE, fFileSystem->OpenOwner(), NULL, NULL, 0, false,
 			delegType);
 
-		status_t result = request.Send();
+		result = request.Send();
 		if (result != B_OK) {
-			fFileSystem->OpenOwnerSequenceUnlock(false);
+			fFileSystem->OpenOwnerSequenceUnlock(sequence);
 			return result;
 		}
 
 		ReplyInterpreter& reply = request.Reply();
 
+		sequence += IncrementSequence(reply.NFS4Error());
+
 		if (HandleErrors(reply.NFS4Error(), server, NULL, NULL, &sequence))
 			continue;
-
- 		fFileSystem->OpenOwnerSequenceUnlock();
 
 		reply.PutFH();
 
 		result = reply.Open(fStateID, &fStateSeq, &confirm, &delegation);
-		if (result != B_OK)
+		if (result != B_OK) {
+	 		fFileSystem->OpenOwnerSequenceUnlock(sequence);
 			return result;
+		}
 
 		break;
 	} while (true);
@@ -207,17 +208,16 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 	}
 
 	if (confirm)
-		return ConfirmOpen(fInfo.fHandle, this);
+		result = ConfirmOpen(fInfo.fHandle, this, &sequence);
 
-	return B_OK;
+ 	fFileSystem->OpenOwnerSequenceUnlock(sequence);
+	return result;
 }
 
 
 status_t
 OpenState::_ReclaimLocks(uint64 newClientID)
 {
-	dprintf("reclaim locks %s\n", fInfo.fName);
-
 	MutexLocker _(fLocksLock);
 	LockInfo* linfo = fLocks;
 	while (linfo != NULL) {
@@ -279,15 +279,17 @@ OpenState::Close()
 
 		status_t result = request.Send();
 		if (result != B_OK) {
-			fFileSystem->OpenOwnerSequenceUnlock(false);
+			fFileSystem->OpenOwnerSequenceUnlock(sequence);
 			return result;
 		}
 
 		ReplyInterpreter& reply = request.Reply();
 
+		sequence += IncrementSequence(reply.NFS4Error());
+
 		if (HandleErrors(reply.NFS4Error(), serv, NULL, this, &sequence))
 			continue;
- 		fFileSystem->OpenOwnerSequenceUnlock();
+ 		fFileSystem->OpenOwnerSequenceUnlock(sequence);
 
 		reply.PutFH();
 

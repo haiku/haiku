@@ -60,7 +60,7 @@ public:
 
 	inline	uint64				OpenOwner() const;
 	inline	uint32				OpenOwnerSequenceLock();
-	inline	void				OpenOwnerSequenceUnlock(bool increment = true);
+	inline	void				OpenOwnerSequenceUnlock(uint32 sequence);
 
 			FileSystem*			fNext;
 			FileSystem*			fPrev;
@@ -198,10 +198,9 @@ FileSystem::OpenOwnerSequenceLock()
 
 
 inline void
-FileSystem::OpenOwnerSequenceUnlock(bool increment = true)
+FileSystem::OpenOwnerSequenceUnlock(uint32 sequence)
 {
-	if (increment)
-		fOpenOwnerSequence++;
+	fOpenOwnerSequence = sequence;
 	mutex_unlock(&fOpenOwnerLock);
 }
 
