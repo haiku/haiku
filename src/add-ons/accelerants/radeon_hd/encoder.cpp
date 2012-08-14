@@ -1702,6 +1702,12 @@ encoder_dpms_set_dig(uint8 crtcID, int mode)
 				|| info.chipsetID == RADEON_RV730
 				|| (info.chipsetFlags & CHIP_APU) != 0
 				|| info.dceMajor >= 5) {
+				if (info.dceMajor >= 6) {
+					/*	We need to call CMD_SETUP before reenabling the encoder,
+						otherwise we never get a picture */
+					transmitter_dig_setup(connectorIndex, pll->pixelClock, 0, 0,
+						ATOM_ENCODER_CMD_SETUP);
+				}
 				transmitter_dig_setup(connectorIndex, pll->pixelClock, 0, 0,
 					ATOM_TRANSMITTER_ACTION_ENABLE);
 			} else {
