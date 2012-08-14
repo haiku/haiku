@@ -942,14 +942,14 @@ pll_pick(uint32 connectorIndex)
 		return B_OK;
 	} else if (info.dceMajor >= 4) {
 		if (connector_is_dp(connectorIndex)) {
-			if (info.dceMajor >= 6) {
+			if (gInfo->dpExternalClock) {
+				pll->id = ATOM_PPLL_INVALID;
+				return B_OK;
+			} else if (info.dceMajor >= 6) {
 				pll->id = ATOM_PPLL1;
 				return B_OK;
 			} else if (info.dceMajor >= 5) {
 				pll->id = ATOM_DCPLL;
-				return B_OK;
-			} else if (gInfo->dpExternalClock) {
-				pll->id = ATOM_PPLL_INVALID;
 				return B_OK;
 			}
 		}
