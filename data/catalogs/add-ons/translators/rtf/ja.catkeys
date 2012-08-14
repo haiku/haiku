@@ -1,9 +1,7 @@
-1	japanese	x-vnd.Haiku-RTFTranslator	526958155
+1	japanese	x-vnd.Haiku-RTFTranslator	3736645044
 Version %d.%d.%d, %s	ConfigView		バージョン %d.%d.%d, %s
 RTF text files	RTFTranslator		RTF テキストファイル
 RTF-Translator Settings	ConfigView		RTF-トランスレーター設定
-Rich Text Format (RTF) files	ConfigView		リッチテキストフォーマット (RTF) ファイル
 RTF Settings	main		RTF 設定
 RichTextFormat file	RTFTranslator		リッチテキストフォーマットファイル
-Rich Text Format Translator	RTFTranslator		リッチテキストフォーマットトランスレーター
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		リッチテキストフォーマットトランスレーター v%d.%d.%d %s

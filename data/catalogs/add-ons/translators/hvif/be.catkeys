@@ -1,8 +1,6 @@
-1	belarusian	x-vnd.Haiku-HVIFTranslator	813066125
+1	belarusian	x-vnd.Haiku-HVIFTranslator	2227623652
 HVIF icons	HVIFTranslator		значкі HVIF
 Render size:	HVIFView		Памер выніковай выявы:
 HVIFTranslator Settings	HVIFTranslator		Наладкі канвертара HVIF
-Native Haiku vector icon translator	HVIFTranslator		Канвертар вектарных значкаў Haiku
-Native Haiku icon format translator	HVIFView		Канвертар фармату вектарных значкаў Haiku
 HVIF Settings	HVIFMain		Наладкі HVIF
 Version %d.%d.%d, %s	HVIFView		Версія %d.%d.%d, %s

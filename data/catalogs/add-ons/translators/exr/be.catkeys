@@ -1,9 +1,7 @@
-1	belarusian	x-vnd.Haiku-EXRTranslator	3390292316
+1	belarusian	x-vnd.Haiku-EXRTranslator	2253035870
 Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
 EXR image translator	EXRTranslator		Канвертар EXR выяваў
 Based on OpenEXR (http://www.openexr.com)	ConfigView		Грунтуецца на матэрыялах праекту OpenEXR (http://www.openexr.com)
 EXR Settings	main		Наладкі EXR
-EXR Images	EXRTranslator		Выявы EXR
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		падраздяленне Lucasfilm Entertainment Company Ltd
-EXR Images	ConfigView		Выявы EXR
 EXR image	EXRTranslator		Выява EXR

@@ -1,8 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-ICOTranslator	3151213372
+1	dutch; flemish	x-vnd.Haiku-ICOTranslator	1637901496
 Cursor	ICOTranslator		Muisaanwijzer
 Version %d.%d.%d, %s	ConfigView		Versie %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld bit afbeelding
-Windows icon images	ConfigView		Windows pictogram
 Valid icon sizes are 16, 32, or 48	ConfigView		Toegelaten icoon grote zijn 16, 32 of 48
 Enforce valid icon sizes	ConfigView		Geldige pictogramgrootten afdwingen
 ICO Settings	main		ICO Instellingen
@@ -11,4 +10,3 @@ pixels in either direction.	ConfigView		pixels in beide richtingen.
 Write 32 bit images on true color input	ConfigView		Schrijf 32 bit afbeeldingen op ware kleur input
 Icon	ICOTranslator		Pictogram
 ICOTranslator Settings	ConfigView		ICOTranslator Instellingen
-Windows icon images	ICOTranslator		Windows pictogrammen

@@ -1,8 +1,6 @@
-1	swedish	x-vnd.Haiku-HVIFTranslator	813066125
+1	swedish	x-vnd.Haiku-HVIFTranslator	2227623652
 HVIF icons	HVIFTranslator		HVIF ikoner
 Render size:	HVIFView		Renderingsstorlek:
 HVIFTranslator Settings	HVIFTranslator		HVIF översättningsinställningar
-Native Haiku vector icon translator	HVIFTranslator		Haiku vektorikons översättare
-Native Haiku icon format translator	HVIFView		Haiku ikonöversättare
 HVIF Settings	HVIFMain		HVIF inställningar
 Version %d.%d.%d, %s	HVIFView		Version %d.%d.%d, %s

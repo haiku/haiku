@@ -1,8 +1,6 @@
-1	belarusian	x-vnd.Haiku-PCXTranslator	1002061545
+1	belarusian	x-vnd.Haiku-PCXTranslator	2307793683
 PCX Settings	main		Наладкі PCX
-PCX translator	PCXTranslator		Канвертар PCX
 Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		Наладкі канвертару PCX
 PCX %lu bit image	PCXTranslator		%lu-бітная выява PCX
-PCX images	ConfigView		Выявы PCX
 PCX images	PCXTranslator		Выявы PCX

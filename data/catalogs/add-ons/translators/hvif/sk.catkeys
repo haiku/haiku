@@ -1,8 +1,6 @@
-1	slovak	x-vnd.Haiku-HVIFTranslator	813066125
+1	slovak	x-vnd.Haiku-HVIFTranslator	2227623652
 HVIF icons	HVIFTranslator		Ikony HVIF
 Render size:	HVIFView		Veľkosť vykreslenia:
 HVIFTranslator Settings	HVIFTranslator		Nastavenia HVIFTranslator
-Native Haiku vector icon translator	HVIFTranslator		Prekladač Natívny vektorový formát ikon Haiku
-Native Haiku icon format translator	HVIFView		Prekladač Natívny vektorový formát ikon Haiku
 HVIF Settings	HVIFMain		Nastavenia HVIF
 Version %d.%d.%d, %s	HVIFView		Verzia %d.%d.%d, %s

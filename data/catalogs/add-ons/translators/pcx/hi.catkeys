@@ -1,8 +1,6 @@
-1	hindi	x-vnd.Haiku-PCXTranslator	1002061545
+1	hindi	x-vnd.Haiku-PCXTranslator	2307793683
 PCX Settings	main		PCX सेत्तिंग्स
-PCX translator	PCXTranslator		PCX अनुवादक
 Version %d.%d.%d, %s	ConfigView		संस्करण %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		PCX अनुवादक की सेत्तिंग्स
 PCX %lu bit image	PCXTranslator		PCX %lu बिट चित्र
-PCX images	ConfigView		PCX चित्र
 PCX images	PCXTranslator		PCX चित्र

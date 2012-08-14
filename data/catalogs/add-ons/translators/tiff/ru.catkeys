@@ -1,8 +1,7 @@
-1	russian	x-vnd.Haiku-TIFFTranslator	1327609507
+1	russian	x-vnd.Haiku-TIFFTranslator	3390030358
 LZW	TIFFView		LZW
 TIFF image	TIFFTranslator		TIFF изображение
 TIFF Library:	TIFFView		Библиотека TIFF:
-TIFF Image Translator	TIFFView		Транслятор TIFF изображений
 None	TIFFView		Не использовать
 TIFF images	TIFFTranslator		TIFF изображения
 TIFFTranslator Settings	TIFFTranslator		Настройки TIFF транслятора

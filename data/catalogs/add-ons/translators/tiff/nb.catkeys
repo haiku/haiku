@@ -1,9 +1,8 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-TIFFTranslator	292291870
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: kunne ikke sette mappe\n
 TIFF image	TIFFTranslator		TIF-bilde
 TIFF Library:	TIFFView		TIFF-bibliotek
-TIFF Image Translator	TIFFView		TIFF-bildeoversetter
 None	TIFFView		Ingen
 TIFF images	TIFFTranslator		TIFF-bilder
 TIFFTranslator Settings	TIFFTranslator		TIFF-oversetterinstillinger

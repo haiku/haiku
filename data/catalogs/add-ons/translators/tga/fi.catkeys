@@ -1,9 +1,8 @@
-1	finnish	x-vnd.Haiku-TGATranslator	4159874267
+1	finnish	x-vnd.Haiku-TGATranslator	2221210336
 Targa image (%d bits truecolor)	TGATranslator		Targa-kuva (%d-bittinen truecolor-kuva)
 Version %d.%d.%d %s	TGAView		Versio %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Ohita TGA-alfakanava
 Targa image (%d bits colormap)	TGATranslator		Targa-kuva (%d-bittinen värikartta)
-TGA Image Translator	TGAView		TGA-kuvamuunnin
 Targa image (%d bits RLE colormap)	TGATranslator		Targa-kuva (%d-bittinen RLE-värikartta)
 Targa image (%d bits gray)	TGATranslator		Targa-kuva (%d-bittinen harmaa)
 Written by the Haiku Translation Kit Team	TGAView		Tekijä: Haiku Translation Kit Team

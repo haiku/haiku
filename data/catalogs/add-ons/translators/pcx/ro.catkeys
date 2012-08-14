@@ -1,8 +1,6 @@
-1	romanian	x-vnd.Haiku-PCXTranslator	1002061545
+1	romanian	x-vnd.Haiku-PCXTranslator	2307793683
 PCX Settings	main		Configurări PCX
-PCX translator	PCXTranslator		Traducător PCX
 Version %d.%d.%d, %s	ConfigView		Versiune %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		Configurări TraducătorPCX
 PCX %lu bit image	PCXTranslator		Imagine PCX %lu biți
-PCX images	ConfigView		Imagini PCX
 PCX images	PCXTranslator		Imagini PCX

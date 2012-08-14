@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-PPMTranslator	2886727868
+1	hindi	x-vnd.Haiku-PPMTranslator	2435270880
 PPM Settings	PPMMain		PPM सेत्तिंग्स
 Based on PPMTranslator sample code	PPMTranslator		PPM अनुवादक सेमपल कोड पर आधारित 
 OK	PPMMain		ठीक है
@@ -6,7 +6,6 @@ Grayscale 8 bits	PPMTranslator		Grayscale 8 bits
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
 PPM image	PPMTranslator		PPM चित्र
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
-PPM Image Translator	PPMTranslator		PPM चित्र का अनुवादक
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bitmap Format (PPMTranslator)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits

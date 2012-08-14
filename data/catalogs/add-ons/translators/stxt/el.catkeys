@@ -1,8 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-STXTTranslator	4075159346
+1	greek, modern (1453-)	x-vnd.Haiku-STXTTranslator	3302294301
 Be styled text file	STXTTranslator		Αρχείο κειμένου Be
-StyledEdit files translator	STXTTranslator		Μεταφραστής αρχείων StyledEdit
 Plain text file	STXTTranslator		Αρχείο απλού κειμἐνου
-StyledEdit files translator	STXTView		Μεταφραστής αρχείων StyledEdit
 STXTTranslator Settings	STXTTranslator		Ρυθμίσεις μεταφραστή STXT
 StyledEdit files	STXTTranslator		StyledEdit αρχεία
 STXT Settings	STXTMain		Ρυθμίσεις STXT 

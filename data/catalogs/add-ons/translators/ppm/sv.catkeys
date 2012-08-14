@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PPMTranslator	2886727868
+1	swedish	x-vnd.Haiku-PPMTranslator	2435270880
 PPM Settings	PPMMain		PPM-inställningar
 Based on PPMTranslator sample code	PPMTranslator		Baserat på exempelkod från PPM-översättare
 OK	PPMMain		OK
@@ -6,7 +6,6 @@ Grayscale 8 bits	PPMTranslator		8 bitars gråskala
 CMY 8:8:8 32 bits	PPMTranslator		32 bitars CMY 8:8:8
 PPM image	PPMTranslator		PPM-bild
 RGBA 5:5:5:1 16 bits	PPMTranslator		16 bitars RGBA 5:5:5:1
-PPM Image Translator	PPMTranslator		PPM-bildöversättare
 Be Bitmap Format (PPMTranslator)	PPMTranslator		BE bitmappsformat (PPM-översättare)
 CMYA 8:8:8:8 32 bits	PPMTranslator		32 bitars CMYA 8:8:8:8
 CMYK 8:8:8:8 32 bits	PPMTranslator		32 bitars CMYK 8:8:8:8

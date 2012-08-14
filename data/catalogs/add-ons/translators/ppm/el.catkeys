@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PPMTranslator	2886727868
+1	greek, modern (1453-)	x-vnd.Haiku-PPMTranslator	2435270880
 PPM Settings	PPMMain		Ρυθμίσεις PPM 
 Based on PPMTranslator sample code	PPMTranslator		Βασισμένο σε δείγμα κώδικα του PPM μεταφραστή
 OK	PPMMain		Εντάξει
@@ -6,7 +6,6 @@ Grayscale 8 bits	PPMTranslator		Κλίμακα του Γκρι 8 bits
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
 PPM image	PPMTranslator		PPM εικόνα
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
-PPM Image Translator	PPMTranslator		Μεταφραστής εικόνας PPM
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Μορφή Be Bitmap (Μεταφραστής PPM)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PPMTranslator	2886727868
+1	ukrainian	x-vnd.Haiku-PPMTranslator	2435270880
 PPM Settings	PPMMain		Настройки PPM
 Based on PPMTranslator sample code	PPMTranslator		На основі зразка коду Перетворювача PPM
 OK	PPMMain		Гаразд
@@ -6,7 +6,6 @@ Grayscale 8 bits	PPMTranslator		8 бітні сірі
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 біт
 PPM image	PPMTranslator		Зображення PPM
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 біт
-PPM Image Translator	PPMTranslator		Перетворювач зображень PPM
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Формат Be Bitmap (Перетворювач PPM)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 біт
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 біт

@@ -1,9 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-TGATranslator	4159874267
+1	greek, modern (1453-)	x-vnd.Haiku-TGATranslator	2221210336
 Targa image (%d bits truecolor)	TGATranslator		Εικόνα Targa (%d bits truecolor)
 Version %d.%d.%d %s	TGAView		Έκδοση %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Αγνοήση καναλιού TGA άλφα 
 Targa image (%d bits colormap)	TGATranslator		Εικόνα Targa (%d bits colormap)
-TGA Image Translator	TGAView		Μεταφραστής εικόνων TGA
 Targa image (%d bits RLE colormap)	TGATranslator		Εικόνα Targa (%d bits RLE colormap)
 Targa image (%d bits gray)	TGATranslator		Εικόνα Targa (%d bits gray)
 Written by the Haiku Translation Kit Team	TGAView		Γράφτηκε από την ομάδα του Haiku Translation Kit 

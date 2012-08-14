@@ -1,8 +1,7 @@
-1	russian	x-vnd.Haiku-ICOTranslator	3151213372
+1	russian	x-vnd.Haiku-ICOTranslator	1637901496
 Cursor	ICOTranslator		Курсор
 Version %d.%d.%d, %s	ConfigView		Версия %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld битное изображение
-Windows icon images	ConfigView		Транслятор ICO значков
 Valid icon sizes are 16, 32, or 48	ConfigView		Верные размеры значков 16, 32 или 48
 Enforce valid icon sizes	ConfigView		Форсировать верные размеры значков
 ICO Settings	main		Настройки ICO транслятора
@@ -11,4 +10,3 @@ pixels in either direction.	ConfigView		пикселей в оба направ�
 Write 32 bit images on true color input	ConfigView		Записывать 24-битные значки как 32-битные
 Icon	ICOTranslator		Значок
 ICOTranslator Settings	ConfigView		Настройки ICO транслятора
-Windows icon images	ICOTranslator		ICO значки

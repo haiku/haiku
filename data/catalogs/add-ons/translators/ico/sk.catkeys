@@ -1,8 +1,7 @@
-1	slovak	x-vnd.Haiku-ICOTranslator	3151213372
+1	slovak	x-vnd.Haiku-ICOTranslator	1637901496
 Cursor	ICOTranslator		Kurzor
 Version %d.%d.%d, %s	ConfigView		Verzia %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld-bitový obrázok
-Windows icon images	ConfigView		Obrázky ikon Windows
 Valid icon sizes are 16, 32, or 48	ConfigView		Platné veľkosti ikon sú 16, 32 alebo 48
 Enforce valid icon sizes	ConfigView		Vynútiť veľkosť ikon
 ICO Settings	main		Nastavenia ICO
@@ -11,4 +10,3 @@ pixels in either direction.	ConfigView		pixle v oboch smeroch.
 Write 32 bit images on true color input	ConfigView		Zapisovať 32-btové obrázky na vstup true color
 Icon	ICOTranslator		Ikona
 ICOTranslator Settings	ConfigView		Nastavenia ICOTranslator
-Windows icon images	ICOTranslator		Obrázky ikon Windows

@@ -1,9 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-EXRTranslator	3390292316
+1	dutch; flemish	x-vnd.Haiku-EXRTranslator	2253035870
 Version %d.%d.%d, %s	ConfigView		Versie %d.%d.%d, %s
 EXR image translator	EXRTranslator		EXR afbeelding vertaler
 Based on OpenEXR (http://www.openexr.com)	ConfigView		Gebaseerd op OpenEXR (http://www.openexr.com)
 EXR Settings	main		EXR instellingen
-EXR Images	EXRTranslator		EXR afbeeldingen
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		een divisie van Lucasfilm Entertainment Company Ltd
-EXR Images	ConfigView		EXR afbeeldingen
 EXR image	EXRTranslator		EXR afbeelding

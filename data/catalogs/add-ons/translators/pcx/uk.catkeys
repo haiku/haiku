@@ -1,8 +1,6 @@
-1	ukrainian	x-vnd.Haiku-PCXTranslator	1002061545
+1	ukrainian	x-vnd.Haiku-PCXTranslator	2307793683
 PCX Settings	main		Настройки PCX
-PCX translator	PCXTranslator		Перетворювач PCX
 Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		Настройки перетворювача PCХ
 PCX %lu bit image	PCXTranslator		Зображення PCX %lu bit
-PCX images	ConfigView		Зображення PCX
 PCX images	PCXTranslator		Зображення PCX

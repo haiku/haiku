@@ -1,9 +1,8 @@
-1	english	x-vnd.Haiku-TGATranslator	4159874267
+1	english	x-vnd.Haiku-TGATranslator	2221210336
 Targa image (%d bits truecolor)	TGATranslator		Targa 图像（%d 位真彩）
 Version %d.%d.%d %s	TGAView		版本 %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		忽略 TGA 测试频道
 Targa image (%d bits colormap)	TGATranslator		Targa 图像（%d 位色图）
-TGA Image Translator	TGAView		TGA 图像转换器
 Targa image (%d bits RLE colormap)	TGATranslator		Targa 图像（%d 为 RLE 色图）
 Targa image (%d bits gray)	TGATranslator		Targa 图像（%d 位灰度）
 Written by the Haiku Translation Kit Team	TGAView		由 Haiku Translation Kit Team 编写

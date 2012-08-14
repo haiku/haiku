@@ -1,8 +1,6 @@
-1	lithuanian	x-vnd.Haiku-PCXTranslator	1002061545
+1	lithuanian	x-vnd.Haiku-PCXTranslator	2307793683
 PCX Settings	main		PCX nuostatos
-PCX translator	PCXTranslator		PCX keitiklis
 Version %d.%d.%d, %s	ConfigView		Versija %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		PCX keitiklio nuostatos
 PCX %lu bit image	PCXTranslator		PCX %lu bitų paveikslas
-PCX images	ConfigView		PCX paveikslai
 PCX images	PCXTranslator		PCX paveikslai

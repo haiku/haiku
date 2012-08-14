@@ -1,9 +1,7 @@
-1	slovak	x-vnd.Haiku-EXRTranslator	3390292316
+1	slovak	x-vnd.Haiku-EXRTranslator	2253035870
 Version %d.%d.%d, %s	ConfigView		Verzia %d.%d.%d, %s
 EXR image translator	EXRTranslator		Prekladač obrázkov EXR
 Based on OpenEXR (http://www.openexr.com)	ConfigView		Založené na OpenEXR (http://www.openexr.com)
 EXR Settings	main		Nastavenia EXR
-EXR Images	EXRTranslator		Obrázky EXR
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		divízia Lucasfilm Entertainment Company Ltd
-EXR Images	ConfigView		Obrázky EXR
 EXR image	EXRTranslator		Obrázok EXR

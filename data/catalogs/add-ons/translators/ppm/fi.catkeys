@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PPMTranslator	2886727868
+1	finnish	x-vnd.Haiku-PPMTranslator	2435270880
 PPM Settings	PPMMain		PPM-asetukset
 Based on PPMTranslator sample code	PPMTranslator		Perustuu PPM-muunninnäytekoodiin
 OK	PPMMain		Valmis
@@ -6,7 +6,6 @@ Grayscale 8 bits	PPMTranslator		Harmaaskaala 8 bittiä
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bittiä
 PPM image	PPMTranslator		PPM-kuva
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bittiä
-PPM Image Translator	PPMTranslator		PPM-kuvamuunnin
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be-bittikarttamuoto (PPM-muunnin)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bittiä
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bittiä

@@ -1,8 +1,6 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PCXTranslator	1002061545
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PCXTranslator	2307793683
 PCX Settings	main		PCX-innstillinger
-PCX translator	PCXTranslator		PCX-oversetter
 Version %d.%d.%d, %s	ConfigView		Versjon %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		PCX-oversetterinnstillinger
 PCX %lu bit image	PCXTranslator		PCX %lu bit bilde
-PCX images	ConfigView		PCX-bilder
 PCX images	PCXTranslator		PCX-bilder

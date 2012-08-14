@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-CodyCam	3353004969
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-CodyCam	2416864674
 Capturing Image…	VideoConsumer.cpp		Tar bilde...
 Every 30 seconds	CodyCam		Hvert 30. sekund
 File name:	CodyCam		Filnavn:
@@ -38,6 +38,7 @@ Every 8 hours	CodyCam		Hver 8. time
 Rename failed	VideoConsumer.cpp		Klarte ikke å gi nytt navn
 Cannot start time source!	CodyCam		Kan ikke starte tidskilde!
 Cannot register the video window	CodyCam		Kan ikke registrere videovinduet
+CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		Hver 24. time
 unknown command	SettingsHandler		ukjent kommando
 Video settings	CodyCam		Videoinnstillinger

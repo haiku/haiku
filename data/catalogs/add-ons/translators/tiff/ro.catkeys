@@ -1,9 +1,8 @@
-1	romanian	x-vnd.Haiku-TIFFTranslator	292291870
+1	romanian	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nu s-a putut configura dosarul\n
 TIFF image	TIFFTranslator		Imagine TIFF
 TIFF Library:	TIFFView		Bibliotecă TIFF:
-TIFF Image Translator	TIFFView		Traducător imagine TIFF
 None	TIFFView		Nimic
 TIFF images	TIFFTranslator		Imagini TIFF
 TIFFTranslator Settings	TIFFTranslator		Configurări TraducătorTIFF

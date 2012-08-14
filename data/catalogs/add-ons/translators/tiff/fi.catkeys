@@ -1,9 +1,8 @@
-1	finnish	x-vnd.Haiku-TIFFTranslator	292291870
+1	finnish	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: ei voitu asettaa hakemistoa\n
 TIFF image	TIFFTranslator		TIFF-kuva
 TIFF Library:	TIFFView		TIFF-kirjasto:
-TIFF Image Translator	TIFFView		TIFF-kuvamuunnin
 None	TIFFView		Ei mikään
 TIFF images	TIFFTranslator		TIFF-kuvat
 TIFFTranslator Settings	TIFFTranslator		TIFF-muunninasetukset

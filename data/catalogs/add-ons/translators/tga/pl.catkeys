@@ -1,9 +1,8 @@
-1	polish	x-vnd.Haiku-TGATranslator	4159874267
+1	polish	x-vnd.Haiku-TGATranslator	2221210336
 Targa image (%d bits truecolor)	TGATranslator		Obraz Targa (%d bitów Truecolor)
 Version %d.%d.%d %s	TGAView		Wersja %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Ignoruj kanał alpha TGA
 Targa image (%d bits colormap)	TGATranslator		Obraz Targa (%d bitów colormap)
-TGA Image Translator	TGAView		Translator obrazów TGA
 Targa image (%d bits RLE colormap)	TGATranslator		Obraz Targa (%d bitów RLE colormap)
 Targa image (%d bits gray)	TGATranslator		Obraz Targa (%d-bitowa skala szarości)
 Written by the Haiku Translation Kit Team	TGAView		Stworzone przez Zespół Translation Kit Haiku

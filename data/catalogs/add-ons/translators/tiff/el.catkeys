@@ -1,9 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-TIFFTranslator	292291870
+1	greek, modern (1453-)	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: αδυναμία ορισμού του καταλόγου\n
 TIFF image	TIFFTranslator		TIFF εικόνα
 TIFF Library:	TIFFView		TIFF Βιβλιοθήκη:
-TIFF Image Translator	TIFFView		Μεταφραστής εικόνων TIFF
 None	TIFFView		Κανένα
 TIFF images	TIFFTranslator		TIFF εικόνες
 TIFFTranslator Settings	TIFFTranslator		Ρυθμίσεις μεταφραστή TIFF

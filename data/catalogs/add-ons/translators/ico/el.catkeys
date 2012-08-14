@@ -1,8 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ICOTranslator	3151213372
+1	greek, modern (1453-)	x-vnd.Haiku-ICOTranslator	1637901496
 Cursor	ICOTranslator		Κέρσορας
 Version %d.%d.%d, %s	ConfigView		Έκδοση %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld bit εικόνα
-Windows icon images	ConfigView		Windows icon εικόνες
 Valid icon sizes are 16, 32, or 48	ConfigView		Έγκυρα μεγέθη είναι 16, 32, or 48
 Enforce valid icon sizes	ConfigView		Εξαναγκασμός έγκυρων μεγεθών
 ICO Settings	main		Ρυθμίσεις ICO
@@ -11,4 +10,3 @@ pixels in either direction.	ConfigView		pixels σε κάθε κατεύθυνσ�
 Write 32 bit images on true color input	ConfigView		Γράψιμο 32 bit εικώνων σε true color input
 Icon	ICOTranslator		Εικονίδιο
 ICOTranslator Settings	ConfigView		Ρυθμίσεις ICOTranslator
-Windows icon images	ICOTranslator		Εικόνες Windows icon

@@ -1,9 +1,8 @@
-1	ukrainian	x-vnd.Haiku-TIFFTranslator	292291870
+1	ukrainian	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		iВизначення заголовка tiff: неможливо встановити каталог\n
 TIFF image	TIFFTranslator		Зображення TIFF
 TIFF Library:	TIFFView		Бібліотека TIFF:
-TIFF Image Translator	TIFFView		Перетворювач зображень TIFF
 None	TIFFView		Жоден
 TIFF images	TIFFTranslator		Зображення TIFF
 TIFFTranslator Settings	TIFFTranslator		Настройки перетворювача TIFF

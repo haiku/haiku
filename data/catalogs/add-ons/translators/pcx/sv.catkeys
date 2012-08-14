@@ -1,8 +1,6 @@
-1	swedish	x-vnd.Haiku-PCXTranslator	1002061545
+1	swedish	x-vnd.Haiku-PCXTranslator	2307793683
 PCX Settings	main		PCX-inställningar
-PCX translator	PCXTranslator		PCX-översättare
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		PCX-översättningsinställningar
 PCX %lu bit image	PCXTranslator		PCX %lu bitbild
-PCX images	ConfigView		PCX-bilder
 PCX images	PCXTranslator		PCX-bilder

@@ -1,8 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-HVIFTranslator	813066125
+1	dutch; flemish	x-vnd.Haiku-HVIFTranslator	2227623652
 HVIF icons	HVIFTranslator		HVIF pictogrammen
 Render size:	HVIFView		Rendergrootte:
 HVIFTranslator Settings	HVIFTranslator		HVIFTranslator instellingen
-Native Haiku vector icon translator	HVIFTranslator		Native Haiku vector pictogram vertaler
-Native Haiku icon format translator	HVIFView		Native Haiku pictogram formaat vertaler
 HVIF Settings	HVIFMain		HVIF Instellingen
 Version %d.%d.%d, %s	HVIFView		Versie %d.%d.%d, %s
