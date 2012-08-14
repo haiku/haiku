@@ -24,6 +24,8 @@
 #define	LAST_FRAGMENT	0x80000000
 #define MAX_PACKET_SIZE	65535
 
+#define NFS_MIN_PORT	665
+
 
 bool
 ServerAddress::operator==(const ServerAddress& address)
@@ -507,6 +509,50 @@ Connection::Connect()
 	if (fSocket < 0)
 		return errno;
 
+	status_t result;
+	uint16 port, attempt = 0;
+
+	sockaddr_in addr;
+	sockaddr_in6 addr6;
+	switch (address.sa_family) {
+		case AF_INET:
+			memset(&addr, 0, sizeof(addr));
+			addr.sin_len = sizeof(addr);
+			addr.sin_family = AF_INET;
+			addr.sin_addr.s_addr = INADDR_ANY;
+			break;
+		case AF_INET6:
+			memset(&addr6, 0, sizeof(addr6));
+			addr6.sin6_len = sizeof(addr6);
+			addr6.sin6_family = AF_INET6;
+			break;
+	}
+
+	do {
+		port = rand() % (IPPORT_RESERVED - NFS_MIN_PORT);
+		port += NFS_MIN_PORT;
+
+		if (attempt == 9)
+			port = 0;
+		attempt++;
+
+		switch (address.sa_family) {
+			case AF_INET:
+				addr.sin_port = htons(port);
+				result = bind(fSocket, (struct sockaddr*)&addr, sizeof(addr));
+				break;
+			case AF_INET6:
+				addr6.sin6_port = htons(port);
+				result = bind(fSocket, (struct sockaddr*)&addr6, sizeof(addr6));
+				break;
+		}
+	} while (attempt <= 10 && result != B_OK);
+
+	if (attempt > 10) {
+		close(fSocket);
+		return result;
+	}
+
 	socklen_t addressSize;
 	switch (address.sa_family) {
 		case AF_INET:
@@ -519,7 +565,7 @@ Connection::Connect()
 			return B_BAD_VALUE;
 	}
 
-	status_t result = connect(fSocket, &address, addressSize);
+	result = connect(fSocket, &address, addressSize);
 	if (result != 0) {
 		result = errno;
 		close(fSocket);
