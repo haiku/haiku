@@ -1,4 +1,4 @@
-/* Copyright (C) 1995, 1996, 1997, 2000 Free Software Foundation, Inc.
+/* Copyright (C) 1995, 1996, 1997, 2000, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 #elif BITS_PER_MP_LIMB == 64
   /* Hopefully the compiler will combine the two bitfield extracts
      and this composition into just the original quadword extract.  */
-  res_ptr[0] = ((unsigned long int) u.ieee.mantissa0 << 32) | u.ieee.mantissa1;
+  res_ptr[0] = ((mp_limb_t) u.ieee.mantissa0 << 32) | u.ieee.mantissa1;
   #define N 1
 #else
   #error "mp_limb size " BITS_PER_MP_LIMB "not accounted for"
@@ -109,6 +109,13 @@ __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 	    }
 	}
     }
+  else if (u.ieee.exponent < 0x7fff
+#if N == 2
+	   && res_ptr[0] == 0
+#endif
+	   && res_ptr[N - 1] == 0)
+    /* Pseudo zero.  */
+    *expt = 0;
 
   return N;
 }
