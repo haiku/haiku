@@ -62,10 +62,16 @@ Inode::OpenAttrDir(OpenDirCookie* cookie)
 status_t
 Inode::LoadAttrDirHandle()
 {
+	if (!fFileSystem->NamedAttrs())
+		return B_UNSUPPORTED;
+
 	if (fInfo.fAttrDir.fSize == 0) {
 		FileHandle handle;
 
 		status_t result = NFS4Inode::OpenAttrDir(&handle);
+		if (result == B_UNSUPPORTED)
+			fFileSystem->SetNamedAttrs(false);
+
 		if (result != B_OK)
 			return result;
 

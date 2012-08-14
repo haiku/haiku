@@ -62,6 +62,9 @@ public:
 	inline	uint32				OpenOwnerSequenceLock();
 	inline	void				OpenOwnerSequenceUnlock(uint32 sequence);
 
+	inline	bool				NamedAttrs();
+	inline	void				SetNamedAttrs(bool attrs);
+
 			FileSystem*			fNext;
 			FileSystem*			fPrev;
 private:
@@ -83,6 +86,7 @@ private:
 
 			uint32				fExpireType;
 			uint32				fSupAttrs[2];
+			bool				fNamedAttrs;
 
 			FileSystemId		fFsId;
 			const char*			fPath;
@@ -202,6 +206,20 @@ FileSystem::OpenOwnerSequenceUnlock(uint32 sequence)
 {
 	fOpenOwnerSequence = sequence;
 	mutex_unlock(&fOpenOwnerLock);
+}
+
+
+inline bool
+FileSystem::NamedAttrs()
+{
+	return fNamedAttrs;
+}
+
+
+inline void
+FileSystem::SetNamedAttrs(bool attrs)
+{
+	fNamedAttrs = attrs;
 }
 
 

@@ -27,6 +27,7 @@ FileSystem::FileSystem()
 	fPrev(NULL),
 	fOpenCount(0),
 	fOpenOwnerSequence(0),
+	fNamedAttrs(true),
 	fPath(NULL),
 	fRoot(NULL),
 	fId(1)
