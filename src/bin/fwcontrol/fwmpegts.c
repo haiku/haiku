@@ -31,7 +31,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  * 
- * $FreeBSD: src/usr.sbin/fwcontrol/fwmpegts.c,v 1.1 2006/10/26 22:33:38 imp Exp $
+ * $FreeBSD: src/usr.sbin/fwcontrol/fwmpegts.c$
  */
 #include <sys/param.h>
 #ifndef __HAIKU__
@@ -59,10 +59,18 @@
 #include "iec68113.h"
 #else
 #include <sysexits.h>
+#endif
 
+#if defined(__FreeBSD__)
 #include <dev/firewire/firewire.h>
 #include <dev/firewire/iec68113.h>
+#elif defined(__NetBSD__)
+#include <dev/ieee1394/firewire.h>
+#include <dev/ieee1394/iec68113.h>
+#else
+//#warning "You need to add support for your OS"
 #endif
+
 
 #include "fwmethods.h"
 
@@ -95,7 +103,7 @@ MPEG-2 Transport Stream (MPEG TS) packet format according to IEC 61883:
 
 N.b. that CRCs are removed by firewire layer!
 
-The following fiels are fixed for IEEE-1394:
+The following fields are fixed for IEEE-1394:
 tag = 01b
 tcode = 1010b
 The length is payload length, i.e. includes CIP header and data size.
@@ -168,7 +176,7 @@ mpegtsrecv(int d, const char *filename, char ich, int count)
 	else {
 		fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0660);
 		if (fd == -1)
-			err(EX_NOINPUT, filename);
+			err(EX_NOINPUT, "%s", filename);
 	}
 	buf = malloc(RBUFSIZE);
 
