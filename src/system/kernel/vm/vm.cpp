@@ -4058,11 +4058,13 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			}
 		} else {
 #if 1
-			addressSpace->ReadLock();
-
 			// TODO: remove me once we have proper userland debugging support
 			// (and tools)
-			VMArea* area = addressSpace->LookupArea(faultAddress);
+			VMArea* area = NULL;
+			if (addressSpace != NULL) {
+				addressSpace->ReadLock();
+				area = addressSpace->LookupArea(faultAddress);
+			}
 
 			Thread* thread = thread_get_current_thread();
 			dprintf("vm_page_fault: thread \"%s\" (%" B_PRId32 ") in team "
@@ -4127,7 +4129,8 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			}
 #	endif	// 0 (stack trace)
 
-			addressSpace->ReadUnlock();
+			if (addressSpace != NULL)
+				addressSpace->ReadUnlock();
 #endif
 
 			// If the thread has a signal handler for SIGSEGV, we simply
