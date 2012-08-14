@@ -1091,7 +1091,10 @@ BPoseView::CommitActivePose(bool saveChanges)
 			loc = ActivePose()->Location(this);
 
 		ActivePose()->Commit(saveChanges, loc, this, index);
+		BPose *pose = fActivePose;
 		fActivePose = NULL;
+		if (fFiltering && !FilterPose(pose))
+			RemoveFilteredPose(pose, index);
 	}
 }
 
@@ -1742,7 +1745,8 @@ BPoseView::AddPoseToList(PoseList* list, bool visibleList, bool insertionSort,
 				// to show the area below the items that have already
 				// been added.
 				if (srcRect.top == viewBounds.top
-					&& srcRect.bottom >= viewBounds.top) {
+					&& srcRect.bottom >= viewBounds.top
+					&& poseIndex != 0) {
 					// if new pose above current view bounds, cache up
 					// the draw and do it later
 					listViewScrollBy += fListElemHeight;
@@ -5469,7 +5473,7 @@ BPoseView::EntryMoved(const BMessage* message)
 							bounds, scrollBy, true);
 					} else if (visible && !FilterPose(pose))
 						RemoveFilteredPose(pose, index);
-					else
+					else if (visible)
 						_CheckPoseSortOrder(fFilteredPoseList, pose, index);
 				}
 			}
