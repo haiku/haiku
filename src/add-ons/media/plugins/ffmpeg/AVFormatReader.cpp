@@ -52,14 +52,14 @@ static const int64 kNoPTSValue = 0x8000000000000000LL;
 
 
 static uint32
-avformat_to_beos_format(AVSampleFormat format)
+avformat_to_beos_format(SampleFormat format)
 {
 	switch (format) {
-		case AV_SAMPLE_FMT_U8: return media_raw_audio_format::B_AUDIO_UCHAR;
-		case AV_SAMPLE_FMT_S16: return media_raw_audio_format::B_AUDIO_SHORT;
-		case AV_SAMPLE_FMT_S32: return media_raw_audio_format::B_AUDIO_INT;
-		case AV_SAMPLE_FMT_FLT: return media_raw_audio_format::B_AUDIO_FLOAT;
-		case AV_SAMPLE_FMT_DBL: return media_raw_audio_format::B_AUDIO_DOUBLE;
+		case SAMPLE_FMT_U8: return media_raw_audio_format::B_AUDIO_UCHAR;
+		case SAMPLE_FMT_S16: return media_raw_audio_format::B_AUDIO_SHORT;
+		case SAMPLE_FMT_S32: return media_raw_audio_format::B_AUDIO_INT;
+		case SAMPLE_FMT_FLT: return media_raw_audio_format::B_AUDIO_FLOAT;
+		case SAMPLE_FMT_DBL: return media_raw_audio_format::B_AUDIO_DOUBLE;
 		default:
 			break;
 	}
@@ -68,7 +68,7 @@ avformat_to_beos_format(AVSampleFormat format)
 
 
 static uint32
-avformat_to_beos_byte_order(AVSampleFormat format)
+avformat_to_beos_byte_order(SampleFormat format)
 {
 	// TODO: Huh?
 	return B_MEDIA_HOST_ENDIAN;
@@ -83,7 +83,7 @@ avdictionary_to_message(AVDictionary* dictionary, BMessage* message)
 
 	AVDictionaryEntry* entry = NULL;
 	while ((entry = av_dict_get(dictionary, "", entry,
-		AV_DICT_IGNORE_SUFFIX))) {
+		AV_METADATA_IGNORE_SUFFIX))) {
 		// convert entry keys into something more meaningful using the names from
 		// id3v2.c
 		if (strcmp(entry->key, "TALB") == 0 || strcmp(entry->key, "TAL") == 0)
