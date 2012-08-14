@@ -403,7 +403,6 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 	bool confirm;
 	status_t result;
 
-	bool badOwner = false;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
@@ -414,7 +413,7 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 
 		req.PutFH(fInfo.fHandle);
 
-		AttrValue cattr[4];
+		AttrValue cattr[2];
 		uint32 i = 0;
 		if ((mode & O_TRUNC) == O_TRUNC) {
 			cattr[i].fAttribute = FATTR4_SIZE;
@@ -426,20 +425,6 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 		cattr[i].fFreePointer = false;
 		cattr[i].fData.fValue32 = perms;
 		i++;
-
-		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER)) {
-			cattr[i].fAttribute = FATTR4_OWNER;
-			cattr[i].fFreePointer = true;
-			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
-			i++;
-		}
-
-		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
-			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
-			cattr[i].fFreePointer = true;
-			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
-			i++;
-		}
 
 		req.Open(CLAIM_NULL, sequence, sModeToAccess(mode),
 			state->fClientID, OPEN4_CREATE, fFileSystem->OpenOwner(), name,
@@ -462,10 +447,6 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 
 		sequence += IncrementSequence(reply.NFS4Error());
 
-		if (reply.NFS4Error() == NFS4ERR_BADOWNER) {
-			badOwner = true;
-			continue;
-		}
 		if (HandleErrors(reply.NFS4Error(), serv, NULL, state, &sequence))
 			continue;
 
@@ -735,8 +716,6 @@ status_t
 NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 	FileType type, ChangeInfo* changeInfo, uint64* fileID, FileHandle* handle)
 {
-	bool badOwner = false;
-
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
@@ -745,25 +724,11 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 		req.PutFH(fInfo.fHandle);
 
 		uint32 i = 0;
-		AttrValue cattr[3];
+		AttrValue cattr[1];
 		cattr[i].fAttribute = FATTR4_MODE;
 		cattr[i].fFreePointer = false;
 		cattr[i].fData.fValue32 = mode;
 		i++;
-
-		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER)) {
-			cattr[i].fAttribute = FATTR4_OWNER;
-			cattr[i].fFreePointer = true;
-			cattr[i].fData.fPointer = gIdMapper->GetOwner(getuid());
-			i++;
-		}
-
-		if (!badOwner && fFileSystem->IsAttrSupported(FATTR4_OWNER_GROUP)) {
-			cattr[i].fAttribute = FATTR4_OWNER_GROUP;
-			cattr[i].fFreePointer = true;
-			cattr[i].fData.fPointer = gIdMapper->GetOwnerGroup(getgid());
-			i++;
-		}
 
 		switch (type) {
 			case NF4DIR:
@@ -786,10 +751,6 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (reply.NFS4Error() == NFS4ERR_BADOWNER) {
-			badOwner = true;
-			continue;
-		}
 		if (HandleErrors(reply.NFS4Error(), serv))
 			continue;
 
