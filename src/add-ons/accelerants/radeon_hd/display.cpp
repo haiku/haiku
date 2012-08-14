@@ -852,12 +852,6 @@ display_crtc_ss(pll_info* pll, int command)
 
 	int index = GetIndexIntoMasterTable(COMMAND, EnableSpreadSpectrumOnPPLL);
 
-	if (command != ATOM_DISABLE) {
-		ERROR("%s: TODO: SS was enabled, however functionality incomplete\n",
-			__func__);
-		command = ATOM_DISABLE;
-	}
-
 	union enableSS {
 		ENABLE_LVDS_SS_PARAMETERS lvds_ss;
 		ENABLE_LVDS_SS_PARAMETERS_V2 lvds_ss_2;
