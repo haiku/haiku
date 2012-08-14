@@ -272,6 +272,8 @@ detect_displays()
 			encoder_external_setup(id, 23860,
 				EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
 			gDisplay[displayIndex]->attached = true;
+
+			// TODO: DDC Router switching for DisplayPort (and others?)
 		} else if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
 		#endif
 		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {

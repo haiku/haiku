@@ -1351,9 +1351,11 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 					// Select the PLL for the PHY
 					// DP PHY to be clocked from external src if possible
+
+					// DCE4 has external DCPLL clock for DP
 					if (isDP && gInfo->dpExternalClock) {
-						// use external clock source
-						args.v3.acConfig.ucRefClkSource = ATOM_DCPLL;
+						// use external clock source (id'ed to 2 on DCE4)
+						args.v3.acConfig.ucRefClkSource = 2; // EXT clock
 					} else
 						args.v3.acConfig.ucRefClkSource = pll->id;
 
@@ -1417,6 +1419,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 					// Select the PLL for the PHY
 					// DP PHY to be clocked from external src if possible
+					// DCE5, DCPLL usually generates the DP ref clock
 					if (isDP) {
 						if (gInfo->dpExternalClock > 0) {
 							args.v4.acConfig.ucRefClkSource
