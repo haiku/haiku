@@ -580,6 +580,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	bool isDPBridge = connector->encoderExternal.isDPBridge;
 	bool linkB = connector->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
+	uint32 digEncoderID = encoder_pick_dig(connectorIndex);
 
 	uint32 panelMode = 0;
 	// determine DP panel mode if doing panel mode setup
@@ -627,7 +628,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	bool dualLink = false;
 	if (connector->type == VIDEO_CONNECTOR_DVID
 		&& pixelClock > 165000) {
-		// TODO: Expand on this
+		// TODO: Expand on this duallink code
 		dualLink = true;
 	}
 
@@ -727,8 +728,59 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 			}
 			break;
 		case 4:
+			args.v4.ucAction = command;
+			args.v4.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+
+			if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE)
+				args.v4.ucPanelMode = panelMode;
+			else {
+				args.v4.ucEncoderMode
+					= display_get_encoder_mode(connectorIndex);
+			}
+
+			if (args.v4.ucEncoderMode == ATOM_ENCODER_MODE_DP
+				|| args.v4.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
+				// Is DP?
+				args.v4.ucLaneNum = dpInfo->laneCount;
+				if (dpClock == 270000) {
+					args.v4.ucConfig
+						|= ATOM_ENCODER_CONFIG_V4_DPLINKRATE_2_70GHZ;
+				} else if (dpClock == 540000) {
+					args.v4.ucConfig
+						|= ATOM_ENCODER_CONFIG_V4_DPLINKRATE_5_40GHZ;
+				}
+			} else if (dualLink) {
+				// DualLink, double the lane numbers
+				args.v4.ucLaneNum = 8;
+			} else {
+				args.v4.ucLaneNum = 4;
+			}
+			args.v4.acConfig.ucDigSel = digEncoderID;
+
+			// TODO: get BPC
+			switch (8) {
+				case 0:
+					args.v4.ucBitPerColor = PANEL_BPC_UNDEFINE;
+					break;
+				case 6:
+					args.v4.ucBitPerColor = PANEL_6BIT_PER_COLOR;
+					break;
+				case 8:
+				default:
+					args.v4.ucBitPerColor = PANEL_8BIT_PER_COLOR;
+					break;
+				case 10:
+					args.v4.ucBitPerColor = PANEL_10BIT_PER_COLOR;
+					break;
+				case 12:
+					args.v4.ucBitPerColor = PANEL_12BIT_PER_COLOR;
+					break;
+				case 16:
+					args.v4.ucBitPerColor = PANEL_16BIT_PER_COLOR;
+					break;
+			}
+			// TODO: VVV RADEON_HPD_NONE?
 			args.v4.ucHPD_ID = 0;
-			ERROR("%s: tableMinor 4 TODO!\n", __func__);
 			break;
 		default:
 			ERROR("%s: unknown tableMinor!\n", __func__);
