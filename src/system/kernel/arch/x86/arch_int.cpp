@@ -893,8 +893,8 @@ arch_int_init_post_vm(struct kernel_args *args)
 status_t
 arch_int_init_io(kernel_args* args)
 {
-	ioapic_init(args);
 	msi_init();
+	ioapic_init(args);
 	return B_OK;
 }
 
