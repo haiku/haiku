@@ -353,8 +353,8 @@ Inode::WriteDirect(OpenStateCookie* cookie, off_t pos, const void* _buffer,
 
 	while (size < *_length) {
 		uint32 len = *_length - size;
-		status_t result = WriteFile(cookie, state, pos + size,
-			&len, buffer + size, attribute);
+		status_t result = WriteFile(cookie, state, pos + size, &len,
+			buffer + size, attribute);
 		if (result != B_OK) {
 			if (size == 0)
 				return result;

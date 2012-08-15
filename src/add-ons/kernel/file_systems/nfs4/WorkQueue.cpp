@@ -153,8 +153,10 @@ WorkQueue::JobIO(IORequestArgs* args)
 	uint64 size = 0;
 	status_t result;
 	if (io_request_is_write(args->fRequest)) {
-		result = read_from_io_request(args->fRequest, buffer, length);
+		if (offset + length > args->fInode->MaxFileSize())
+				length = args->fInode->MaxFileSize() - offset;
 
+		result = read_from_io_request(args->fRequest, buffer, length);
 		do {
 			size_t bytesWritten = length - size;
 			result = args->fInode->WriteDirect(NULL, offset + size,
