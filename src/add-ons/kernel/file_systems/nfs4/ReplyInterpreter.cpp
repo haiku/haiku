@@ -34,6 +34,7 @@ FSLocations::~FSLocations()
 
 AttrValue::AttrValue()
 	:
+	fAttribute(0),
 	fFreePointer(false)
 {
 }

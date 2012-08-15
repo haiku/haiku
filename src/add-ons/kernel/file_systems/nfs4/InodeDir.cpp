@@ -62,22 +62,41 @@ Inode::OpenAttrDir(OpenDirCookie* cookie)
 status_t
 Inode::LoadAttrDirHandle()
 {
-	if (!fFileSystem->NamedAttrs())
-		return B_UNSUPPORTED;
+	if (fInfo.fAttrDir.fSize != 0)
+		return B_OK;
 
-	if (fInfo.fAttrDir.fSize == 0) {
-		FileHandle handle;
+	FileHandle handle;
+	status_t result;
+	if (!fFileSystem->NamedAttrs()) {
+		char* attrDir
+			= reinterpret_cast<char*>(malloc(strlen(fInfo.fName) + 32));
+		if (attrDir == NULL)
+			return B_NO_MEMORY;
+		strcpy(attrDir, ".");
+		strcat(attrDir, fInfo.fName);
+		strcat(attrDir, "-haiku-attrs");
 
-		status_t result = NFS4Inode::OpenAttrDir(&handle);
+		result = NFS4Inode::LookUp(attrDir, NULL, NULL, &handle, true);
+		if (result == B_ENTRY_NOT_FOUND) {
+			ChangeInfo change;
+			struct stat st;
+			Stat(&st);
+			st.st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
+			result = NFS4Inode::CreateObject(attrDir, NULL, st.st_mode, NF4DIR,
+				&change, NULL, &handle, true);
+		}
+
+		free(attrDir);
+	} else {
+		result = NFS4Inode::OpenAttrDir(&handle);
 		if (result == B_UNSUPPORTED)
 			fFileSystem->SetNamedAttrs(false);
-
-		if (result != B_OK)
-			return result;
-
-		fInfo.fAttrDir = handle;
 	}
 
+	if (result != B_OK)
+		return result;
+
+	fInfo.fAttrDir = handle;
 	return B_OK;
 }
 
@@ -156,6 +175,31 @@ Inode::ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 }
 
 
+static char*
+FileToAttrName(const char* path)
+{
+	char* name = strdup(path);
+	if (name == NULL)
+		return NULL;
+
+	char* current = strpbrk(name, "#$");
+	while (current != NULL) {
+		switch (*current) {
+			case '#':
+				*current = '/';
+				break;
+			case '$':
+				*current = ':';
+				break;
+		}
+		current = strpbrk(name, "#$");
+	}
+
+	return name;
+}
+
+
+
 status_t
 Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 	OpenDirCookie* cookie, uint64* _change, bool attribute)
@@ -189,6 +233,9 @@ Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 			if (*fsid != fFileSystem->FsId())
 				continue;
 
+			if (strstr(dirents[i].fName, "-haiku-attrs") != NULL)
+				continue;
+
 			ino_t id;
 			if (!attribute) {
 				if (dirents[i].fAttrCount == 2)
@@ -198,7 +245,19 @@ Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 			} else
 				id = 0;
 	
-			NameCacheEntry* entry = new NameCacheEntry(dirents[i].fName, id);
+			const char* name = dirents[i].fName;
+			if (attribute)
+				name = FileToAttrName(name);
+			if (name == NULL) {
+				delete snapshot;
+				delete[] dirents;
+				return B_NO_MEMORY;
+			}
+
+			NameCacheEntry* entry = new NameCacheEntry(name, id);
+			if (attribute)
+				free(const_cast<char*>(name));
+
 			if (entry == NULL || entry->fName == NULL) {
 				if (entry->fName == NULL)
 					delete entry;

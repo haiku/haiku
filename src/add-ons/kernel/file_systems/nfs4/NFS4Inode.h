@@ -31,7 +31,7 @@ protected:
 			status_t	CommitWrites();
 
 			status_t	LookUp(const char* name, uint64* change, uint64* fileID,
-							FileHandle* handle);
+							FileHandle* handle, bool parent = false);
 
 			status_t	Link(Inode* dir, const char* name,
 							ChangeInfo* changeInfo);
@@ -65,7 +65,8 @@ protected:
 
 			status_t	CreateObject(const char* name, const char* path,
 							int mode, FileType type, ChangeInfo* changeInfo,
-							uint64* fileID, FileHandle* handle);
+							uint64* fileID, FileHandle* handle,
+							bool parent = false);
 			status_t	RemoveObject(const char* name, FileType type,
 							ChangeInfo* changeInfo, uint64* fileID);
 

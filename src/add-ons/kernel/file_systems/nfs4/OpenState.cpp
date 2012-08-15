@@ -32,7 +32,8 @@ OpenState::OpenState()
 
 OpenState::~OpenState()
 {
-	fFileSystem->RemoveOpenFile(this);
+	if (fOpened)
+		fFileSystem->RemoveOpenFile(this);
 	Close();
 
 	mutex_destroy(&fLock);

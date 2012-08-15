@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include <AutoDeleter.h>
 #include <fs_cache.h>
 #include <NodeMonitor.h>
 
@@ -192,15 +193,44 @@ Inode::Close(OpenFileCookie* cookie)
 }
 
 
+static char*
+AttrToFileName(const char* path)
+{
+	char* name = strdup(path);
+	if (name == NULL)
+		return NULL;
+
+	char* current = strpbrk(name, "/:");
+	while (current != NULL) {
+		switch (*current) {
+			case '/':
+				*current = '#';
+				break;
+			case ':':
+				*current = '$';
+				break;
+		}
+		current = strpbrk(name, "/:");
+	}
+
+	return name;
+}
+
+
 status_t
-Inode::OpenAttr(const char* name, int mode, OpenAttrCookie* cookie, bool create,
-	int32 type)
+Inode::OpenAttr(const char* _name, int mode, OpenAttrCookie* cookie,
+	bool create, int32 type)
 {
 	(void)type;
 
 	status_t result = LoadAttrDirHandle();
 	if (result != B_OK)
 		return result;
+
+	char* name = AttrToFileName(_name);
+	if (name == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter nameDeleter(name);
 
 	OpenDelegationData data;
 	data.fType = OPEN_DELEGATE_NONE;
@@ -209,8 +239,9 @@ Inode::OpenAttr(const char* name, int mode, OpenAttrCookie* cookie, bool create,
 	if (state == NULL)
 		return B_NO_MEMORY;
 
-	state->fInfo.fName = name;
+	state->fInfo.fName = strdup(name);
 	state->fInfo.fParent = fInfo.fAttrDir;
+	state->fFileSystem = fFileSystem;
 	result = NFS4Inode::OpenAttr(state, name, mode, &data, create);
 	if (result != B_OK) {
 		delete state;
@@ -225,8 +256,7 @@ Inode::OpenAttr(const char* name, int mode, OpenAttrCookie* cookie, bool create,
 
 	if (data.fType != OPEN_DELEGATE_NONE) {
 		Delegation* delegation
-			= new(std::nothrow) Delegation(data, this, fOpenState->fClientID,
-				true);
+			= new(std::nothrow) Delegation(data, this, state->fClientID, true);
 		if (delegation != NULL) {
 			delegation->fInfo = state->fInfo;
 			delegation->fFileSystem = fFileSystem;
@@ -235,7 +265,7 @@ Inode::OpenAttr(const char* name, int mode, OpenAttrCookie* cookie, bool create,
 		}
 	}
 
-	if ((mode & O_TRUNC) == O_TRUNC) {
+	if (create || (mode & O_TRUNC) == O_TRUNC) {
 		struct stat st;
 		st.st_size = 0;
 		WriteStat(&st, B_STAT_SIZE, cookie);
@@ -248,8 +278,11 @@ Inode::OpenAttr(const char* name, int mode, OpenAttrCookie* cookie, bool create,
 status_t
 Inode::CloseAttr(OpenAttrCookie* cookie)
 {
-	cookie->fOpenState->fDelegation->GiveUp();
-	fFileSystem->RemoveDelegation(cookie->fOpenState->fDelegation);
+	if (cookie->fOpenState->fDelegation != NULL) {
+		cookie->fOpenState->fDelegation->GiveUp();
+		fFileSystem->RemoveDelegation(cookie->fOpenState->fDelegation);
+	}
+
 	delete cookie->fOpenState->fDelegation;
 	delete cookie->fOpenState;
 	return B_OK;

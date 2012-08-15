@@ -107,17 +107,22 @@ NFS4Inode::Access(uint32* allowed)
 
 status_t
 NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
-	FileHandle* handle)
+	FileHandle* handle, bool parent)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fInfo.fHandle);
+		if (parent)
+			req.PutFH(fInfo.fParent);
+		else
+			req.PutFH(fInfo.fHandle);
 
-		Attribute dirAttr[] = { FATTR4_CHANGE };
-		req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
+		if (change != NULL) {
+			Attribute dirAttr[] = { FATTR4_CHANGE };
+			req.GetAttr(dirAttr, sizeof(dirAttr) / sizeof(Attribute));
+		}
 
 		if (!strcmp(name, ".."))
 			req.LookUpUp();
@@ -142,12 +147,14 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 
 		AttrValue* values;
 		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
+		if (change != NULL) {
+			result = reply.GetAttr(&values, &count);
+			if (result != B_OK)
+				return result;
 
-		*change = values[0].fData.fValue64;
-		delete[] values;
+			*change = values[0].fData.fValue64;
+			delete[] values;
+		}
 
 		if (!strcmp(name, ".."))
 			result = reply.LookUpUp();
@@ -170,10 +177,13 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 			return B_ENTRY_NOT_FOUND;
 		}
 
-		if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
-			*fileID = fFileSystem->AllocFileId();
-		else
-			*fileID = values[1].fData.fValue64;
+		if (fileID != NULL) {
+			if (count < 2 || values[1].fAttribute != FATTR4_FILEID)
+				*fileID = fFileSystem->AllocFileId();
+			else
+				*fileID = values[1].fData.fValue64;
+		}
+
 		delete[] values;
 
 		return B_OK;
@@ -536,10 +546,10 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 
 		ReplyInterpreter& reply = request.Reply();
 
+		sequence += IncrementSequence(reply.NFS4Error());
+
 		if (HandleErrors(reply.NFS4Error(), serv, NULL, state, &sequence))
 			continue;
-
-		sequence += IncrementSequence(reply.NFS4Error());
 
 		// Verify if the file we want to open is the file this Inode
 		// represents.
@@ -617,10 +627,10 @@ NFS4Inode::OpenAttr(OpenState* state, const char* name, int mode,
 
 		ReplyInterpreter& reply = request.Reply();
 
-		if (HandleErrors(reply.NFS4Error(), serv, NULL, state))
-			continue;
-
 		sequence += IncrementSequence(reply.NFS4Error());
+
+		if (HandleErrors(reply.NFS4Error(), serv, NULL, state, &sequence))
+			continue;
 
 		reply.PutFH();
 		result = reply.Open(state->fStateID, &state->fStateSeq, &confirm,
@@ -639,7 +649,7 @@ NFS4Inode::OpenAttr(OpenState* state, const char* name, int mode,
 	state->fOpened = true;
 
 	if (confirm)
-		result = ConfirmOpen(fInfo.fHandle, state, &sequence);
+		result = ConfirmOpen(state->fInfo.fHandle, state, &sequence);
 
 	fFileSystem->OpenOwnerSequenceUnlock(sequence);
 	return result;
@@ -714,14 +724,18 @@ NFS4Inode::WriteFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 
 status_t
 NFS4Inode::CreateObject(const char* name, const char* path, int mode,
-	FileType type, ChangeInfo* changeInfo, uint64* fileID, FileHandle* handle)
+	FileType type, ChangeInfo* changeInfo, uint64* fileID, FileHandle* handle,
+	bool parent)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fInfo.fHandle);
+		if (parent)
+			req.PutFH(fInfo.fParent);
+		else
+			req.PutFH(fInfo.fHandle);
 
 		uint32 i = 0;
 		AttrValue cattr[1];
@@ -742,8 +756,11 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 		}
 
 		req.GetFH();
-		Attribute attr[] = { FATTR4_FILEID };
-		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+
+		if (fileID != NULL) {
+			Attribute attr[] = { FATTR4_FILEID };
+			req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
+		}
 
 		status_t result = request.Send();
 		if (result != B_OK)
@@ -764,18 +781,20 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 		if (result != B_OK)
 			return result;
 
-		AttrValue* values;
-		uint32 count;
-		result = reply.GetAttr(&values, &count);
-		if (result != B_OK)
-			return result;
+		if (fileID != NULL) {
+			AttrValue* values;
+			uint32 count;
+			result = reply.GetAttr(&values, &count);
+			if (result != B_OK)
+				return result;
 
-		if (count == 0)
-			*fileID = fFileSystem->AllocFileId();
-		else
-			*fileID = values[0].fData.fValue64;
+			if (count == 0)
+				*fileID = fFileSystem->AllocFileId();
+			else
+				*fileID = values[0].fData.fValue64;
 
-		delete[] values;
+			delete[] values;
+		}
 
 		return B_OK;
 	} while (true);
