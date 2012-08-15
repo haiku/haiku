@@ -112,7 +112,7 @@ void MainWindow :: SetupMenuBar(BRect frame)
 	menu_shape->AddItem(new BMenuItem("Sphere", new BMessage(MSG_SHAPE_SPHERE), '3'));
 	
 	//	Options
-	BMenu *menu_options = new BMenu("Options");
+	BMenu *menu_options = new BMenu("Settings");
 	menu_options->AddItem(new BMenuItem("Wireframe", new BMessage(MSG_OPTION_WIREFRAME), 'S'));
 	//menu_options->AddItem(new BMenuItem("Fullscreen", new BMessage(MSG_FULLSCREEN), 'F'));
 	

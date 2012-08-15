@@ -1144,7 +1144,7 @@ MainWindow::_CreateMenuBar()
 	
 	BMenu* fileMenu = new BMenu(B_TRANSLATE("File"));
 	BMenu* editMenu = new BMenu(B_TRANSLATE("Edit"));
-	BMenu* settingsMenu = new BMenu(B_TRANSLATE("Options"));
+	BMenu* settingsMenu = new BMenu(B_TRANSLATE("Settings"));
 	fPathMenu = new BMenu(B_TRANSLATE("Path"));
 	fStyleMenu = new BMenu(B_TRANSLATE("Style"));
 	fShapeMenu = new BMenu(B_TRANSLATE("Shape"));

@@ -177,7 +177,7 @@ DeskbarReplicant::MouseDown(BPoint where)
 
 	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 
-	menu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem("Settings" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgOpenBluetoothPreferences)));
 
 	// TODO show list of known/paired devices

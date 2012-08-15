@@ -603,7 +603,7 @@ DeskbarView::_BuildMenu()
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Preferences" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(MD_OPEN_PREFS)));
 
 	if (modifiers() & B_SHIFT_KEY) {
