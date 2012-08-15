@@ -1,6 +1,8 @@
-1	german	x-vnd.Haiku-PCXTranslator	2307793683
+1	german	x-vnd.Haiku-PCXTranslator	938242683
 PCX Settings	main		PCX-Einstellungen
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		PCX-Translator-Einstellungen
+PCX image translator	PCXTranslator		PCX-Bild-Translator
 PCX %lu bit image	PCXTranslator		PCX-%lu-Bit-Bild
 PCX images	PCXTranslator		PCX-Bilder
+PCX image translator	ConfigView		PCX-Bild-Translator

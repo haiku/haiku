@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	598414903
+1	german	x-vnd.Haiku-DriveSetup	1372142450
 DriveSetup	System name		Datenträgerverwaltung
 Delete	MainWindow		Löschen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
@@ -11,6 +11,7 @@ There's no space on the partition where a child partition could be created.	Main
 Unable to find the selected partition by ID.	MainWindow		Die ausgewählte Partition konnte anhand ihrer ID nicht gefunden werden.
 Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
 No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erkannt.
+Failed to initialize the disk %s!\n	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen!\n
 The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
 Partition name:	CreateParamsPanel		Partitionsname:
 Initialize	InitParamsPanel		Initialisieren
@@ -43,9 +44,10 @@ Create…	MainWindow		Anlegen…
 Disk system \"%s\"\" not found!	MainWindow		Medienschema \"%s\"\" nicht gefunden!
 The disk has been successfully initialized.\n	MainWindow		Der Datenträger wurde erfolgreich initialisiert.\n
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
+Failed to format the partition %s!\n	MainWindow		Formatierung der Partition \"%s\" fehlgeschlagen!\n
 Mount	MainWindow		Einhängen
 Create	CreateParamsPanel		Anlegen
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Soll der leere Datenträger wirklich formatiert werden (üblicherweise wird zuerst eine Partitionstabelle angelegt)?Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Soll der leere Datenträger wirklich formatiert werden (üblicherweise wird zuerst eine Partitionstabelle angelegt)? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 Device	PartitionList		Gerät
 Disk	MainWindow		Datenträger
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Soll der ausgewählte Datenträger wirklich formatiert werden? Alle Daten werden verloren gehen. Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.\n
@@ -63,6 +65,7 @@ Partition	MainWindow		Partition
 File system	PartitionList		Dateisystem
 Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
 Size	PartitionList		Größe
+Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
 The selected partition does not contain a partitioning system.	MainWindow		Die ausgewählte Partition enthält kein Partitionierungssystem.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition \"%s\" gehen dabei unwiderruflich verloren!
@@ -75,5 +78,5 @@ Format	MainWindow		Formatieren
 Parameters	PartitionList		Parameter
 Creation of the partition has failed.	MainWindow		Anlegen der Parition schlug fehl.
 The currently selected partition is not empty.	MainWindow		Die gewählte Partition ist nicht leer.
-Failed to format the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
+Failed to format the partition. No changes have been written to disk.	MainWindow		Das Formatieren der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 Unmount	MainWindow		Aushängen

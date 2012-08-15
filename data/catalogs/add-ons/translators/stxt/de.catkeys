@@ -1,6 +1,8 @@
-1	german	x-vnd.Haiku-STXTTranslator	3302294301
+1	german	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Be-Styled-Textdatei
 Plain text file	STXTTranslator		Einfache Textdatei
 STXTTranslator Settings	STXTTranslator		STXTTranslator-Einstellungen
+StyledEdit file translator	STXTView		StyledEdit-Text-Translator
 StyledEdit files	STXTTranslator		StyledEdit-Dateien
+StyledEdit file translator	STXTTranslator		StyledEdit-Text-Translator
 STXT Settings	STXTMain		STXT-Einstellungen

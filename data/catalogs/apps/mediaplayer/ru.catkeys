@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	2305736531
+1	russian	x-vnd.Haiku-MediaPlayer	442582160
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -113,6 +113,8 @@ Large	MediaPlayer-SettingsWindow		крупный
 Bottom of video	MediaPlayer-SettingsWindow		нижняя часть видео
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		Стоп
+<unnamed media>	MediaPlayer-InfoWin		<безымянное медиа>
+raw video	MediaPlayer-InfoWin		необработанное видео
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (кончилась память). Не удалось сохранить плейлист.
 Hide interface	MediaPlayer-Main		Скрыть интерфейс

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-mixer.media_addon	2863296624
+1	russian	x-vnd.Haiku-mixer.media_addon	3450667169
 Input gain controls represent	AudioMixer		Входные регуляторы усиления представляют
 Linear interpolation	AudioMixer		Линейная интерполяция
 Virtual output channels	AudioMixer		Виртуальные каналы выхода
@@ -17,3 +17,11 @@ dB	AudioMixer		дБ
 Gain controls	AudioMixer		Регулировка усиления
 Input mapping	AudioMixer		Переназначение входа
 Mute	AudioMixer		Приглушить
+Input channel destinations	AudioMixer		Направления входных каналов
+To master	AudioMixer		До основного
+Master output	AudioMixer		Главный выход
+Setup	AudioMixer		Настройка
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Использовать нелинейные ползунки управления звуком
+Gain	AudioMixer		Усиление
+Allow output channel remapping	AudioMixer		Разрешить переназначение входного канала
+Physical input channels	AudioMixer		Физические входные каналы

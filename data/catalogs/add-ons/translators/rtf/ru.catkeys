@@ -1,7 +1,9 @@
-1	russian	x-vnd.Haiku-RTFTranslator	3736645044
+1	russian	x-vnd.Haiku-RTFTranslator	1620328626
 Version %d.%d.%d, %s	ConfigView		Версия %d.%d.%d, %s
 RTF text files	RTFTranslator		RTF текстовые файлы
 RTF-Translator Settings	ConfigView		Настройки RTF транслятора
+Rich Text Format (RTF) translator	ConfigView		Транслятор формата обогащённого текста (RTF)
 RTF Settings	main		Настройки RTF транслятора
 RichTextFormat file	RTFTranslator		Файл формата обогащённого текста
+Rich Text Format translator	RTFTranslator		Транслятор формата обогащённого текста
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Транслятор формата обогащённого текста v%d.%d.%d %s

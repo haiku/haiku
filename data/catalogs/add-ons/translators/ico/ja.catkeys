@@ -1,8 +1,9 @@
-1	japanese	x-vnd.Haiku-ICOTranslator	1637901496
+1	japanese	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		カーソル
 Version %d.%d.%d, %s	ConfigView		バージョン %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld bit イメージ
 Valid icon sizes are 16, 32, or 48	ConfigView		有効なアイコンサイズは16、32、または48
+Windows icons	ICOTranslator		Windows アイコン
 Enforce valid icon sizes	ConfigView		強制的に有効なサイズにする
 ICO Settings	main		ICO設定
 Windows icon translator	ICOTranslator		Windowsアイコン用トランスレータ
@@ -10,3 +11,4 @@ pixels in either direction.	ConfigView		ピクセル(縦横とも)です。
 Write 32 bit images on true color input	ConfigView		true colorの入力に対して32 bitイメージを書き出す
 Icon	ICOTranslator		アイコン
 ICOTranslator Settings	ConfigView		ICOTranslator Settings
+Windows icon translator	ConfigView		Windowsアイコン用トランスレータ

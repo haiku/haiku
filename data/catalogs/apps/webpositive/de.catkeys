@@ -1,4 +1,5 @@
-1	german	x-vnd.Haiku-WebPositive	2697327739
+1	german	x-vnd.Haiku-WebPositive	1513721873
+Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
 Copy URL to clipboard	Download Window		Adresse in Zwischenablage kopieren
 Cancel	Settings Window		Abbrechen
@@ -21,6 +22,7 @@ Confirmation	WebPositive Window		Bestätigung
 Window	WebPositive Window		Fenster
 Decrease size	WebPositive Window		Verkleinern
 Serif font:	Settings Window		Serifenschrift:
+Loading %url	WebPositive Window		%url wird geladen
 Page source	WebPositive Window		Quelltext der Seite
 Next	WebPositive Window		Weiter
 Find next	WebPositive Window		Nächster Treffer
@@ -33,6 +35,7 @@ Search page:	Settings Window		Suchmachine:
 Zoom text only	WebPositive Window		Nur Text vergrößern
 Default fixed font size:	Settings Window		Größe der Schrift fester Breite:
 Close tab	WebPositive Window		Reiter schließen
+Auto-hide mouse pointer	Settings Window		Mauszeiger automatisch ausblenden
 Over 1 hour left	Download Window		Noch über eine Stunde
 Quit	WebPositive Window		Beenden
 Full screen	WebPositive Window		Vollbild
@@ -63,9 +66,11 @@ Increase size	WebPositive Window		Vergrößern
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Auf den Lesezeichen-Ordner kann nicht zugegriffen werden.\n\nFehler: %error
 Over 1 day left	Download Window		Noch über einen Tag
 Downloads	WebPositive Window		Downloads
+Requesting %url	WebPositive Window		%url wird angefordert
 Apply	Settings Window		Anwenden
 Bookmark info	WebPositive Window		Lesezeichen Info
 Size:	Font Selection view		Größe:
+Show tabs if only one page is open	Settings Window		Reiter immer anzeigen
 About	WebPositive Window		Über
 Finish: 	Download Window	Finishing time	Fertig:
 Fonts	Settings Window		Schriftarten
@@ -103,7 +108,11 @@ Today	WebPositive Window		Heute
 1 second left	Download Window		Noch 1 Sekunde
 Remember username and password for this site	Authentication Panel		Benutzername und Passwort für diese Seite speichern
 Earlier	WebPositive Window		Früher
+Authentication required	Authentication Panel		Anmeldung erforderlich
+Use proxy server to connect to the internet	Settings Window		Proxy-Server zur Verbindung mit dem Internet nutzen
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll WebPositive wirklich beendet werden?
+Auto-hide interface in full screen mode	Settings Window		Bedienelemente im Vollbildmodus ausblenden
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url fehlgeschlagen
 New tab	WebPositive Window		Neuer Reiter
 Downloads in progress	WebPositive		Download Warnung
 Style:	Font Selection view		Stil:
@@ -124,4 +133,5 @@ OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Lesezeichen verwalten
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Es existiert bereits ein Lesezeichen für diese Seite (%bookmarkName).
 New windows:	Settings Window		Neue Fenster:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url geladen
 Remove finished	Download Window		Fertige entfernen
