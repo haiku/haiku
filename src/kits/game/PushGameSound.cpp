@@ -60,10 +60,10 @@ BPushGameSound::lock_status
 BPushGameSound::LockNextPage(void **out_pagePtr, size_t *out_pageSize)
 {
 	// the user can not lock every page
-	if (fPageLocked->CountItems() > fPageCount - 3)
+	if (fPageLocked->CountItems() > fPageCount - 1)
 		return lock_failed;
 
-	// the user cann't lock a page being played
+	// the user can't lock a page being played
 	if (fLockPos < fPlayPos
 		&& fLockPos + fPageSize > fPlayPos)
 		return lock_failed;
@@ -74,7 +74,7 @@ BPushGameSound::LockNextPage(void **out_pagePtr, size_t *out_pageSize)
 
 	// move the locker to the next page
 	fLockPos += fPageSize;
-	if (fLockPos > fBufferSize)
+	if (fLockPos >= fBufferSize)
 		fLockPos = 0;
 
 	*out_pagePtr = lockPage;
