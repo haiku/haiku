@@ -106,7 +106,7 @@ country_code_for_language(const BLanguage& language)
 			return "GR";
 		case 'en':	// United Kingdom
 			return "GB";
-		case 'hi'	// India
+		case 'hi':	// India
 			return 'IN';
 		case 'ja':	// Japan
 			return "JP";
