@@ -106,6 +106,8 @@ country_code_for_language(const BLanguage& language)
 			return "GR";
 		case 'en':	// United Kingdom
 			return "GB";
+		case 'hi'	// India
+			return 'IN';
 		case 'ja':	// Japan
 			return "JP";
 		case 'ko':	// South Korea
@@ -128,7 +130,6 @@ country_code_for_language(const BLanguage& language)
 		case 'fr':	// France
 		case 'hr':	// Croatia
 		case 'hu':	// Hungary
-		case 'in':	// India
 		case 'it':	// Italy
 		case 'lt':	// Lithuania
 		case 'nl':	// Netherlands
