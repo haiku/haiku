@@ -179,7 +179,7 @@ status_t
 DirectoryCache::Revalidate()
 {
 	uint64 change;
-	if (fInode->GetChangeInfo(&change) == B_OK && change == fChange) {
+	if (fInode->GetChangeInfo(&change, true) == B_OK && change == fChange) {
 		fExpireTime = system_time() + kExpirationTime;
 		return B_OK;
 	}

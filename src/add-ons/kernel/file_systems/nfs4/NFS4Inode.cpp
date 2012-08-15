@@ -14,14 +14,17 @@
 
 
 status_t
-NFS4Inode::GetChangeInfo(uint64* change)
+NFS4Inode::GetChangeInfo(uint64* change, bool attrDir)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv);
 		RequestBuilder& req = request.Builder();
 
-		req.PutFH(fInfo.fHandle);
+		if (attrDir)
+			req.PutFH(fInfo.fAttrDir);
+		else
+			req.PutFH(fInfo.fHandle);
 
 		Attribute attr[] = { FATTR4_CHANGE };
 		req.GetAttr(attr, sizeof(attr) / sizeof(Attribute));
