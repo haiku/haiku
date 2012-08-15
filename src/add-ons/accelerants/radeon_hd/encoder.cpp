@@ -1153,6 +1153,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 		DIG_TRANSMITTER_CONTROL_PARAMETERS_V2 v2;
 		DIG_TRANSMITTER_CONTROL_PARAMETERS_V3 v3;
 		DIG_TRANSMITTER_CONTROL_PARAMETERS_V4 v4;
+		DIG_TRANSMITTER_CONTROL_PARAMETERS_V1_5 v5;
 	};
 	union digTransmitterControl args;
 	memset(&args, 0, sizeof(args));
@@ -1454,6 +1455,70 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 						if (pixelClock > 165000)
 							args.v4.acConfig.fDualLinkConnector = 1;
 					}
+					break;
+				case 5:
+					args.v5.ucAction = command;
+
+					if (isDP) {
+						args.v5.usSymClock
+							= B_HOST_TO_LENDIAN_INT16(dpClock / 10);
+					} else {
+						args.v5.usSymClock
+							= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+					}
+					switch (encoderObjectID) {
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+							if (linkB)
+								args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYB;
+							else
+								args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYA;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+							if (linkB)
+								args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYD;
+							else
+								args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYC;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+							if (linkB)
+								args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYF;
+							else
+								args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYE;
+							break;
+					}
+					if (isDP) {
+						args.v5.ucLaneNum = dpLaneCount;
+					} else if (pixelClock >= 165000) {
+						args.v5.ucLaneNum = 8;
+					} else {
+						args.v5.ucLaneNum = 4;
+					}
+
+					args.v5.ucConnObjId = connectorObjectID;
+					args.v5.ucDigMode
+						= display_get_encoder_mode(connectorIndex);
+
+					if (isDP && gInfo->dpExternalClock) {
+						args.v5.asConfig.ucPhyClkSrcId
+							= ENCODER_REFCLK_SRC_EXTCLK;
+					} else {
+						args.v5.asConfig.ucPhyClkSrcId = pll->id;
+					}
+
+					if (isDP) {
+						args.v5.asConfig.ucCoherentMode = 1;
+							// DP always coherent
+					} else if ((gConnector[connectorIndex]->encoder.flags
+						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
+						// TODO: dig coherent mode? VVV
+						args.v5.asConfig.ucCoherentMode = 1;
+					}
+
+					// RADEON_HPD_NONE? VVV
+					args.v5.asConfig.ucHPDSel = 0;
+
+					args.v5.ucDigEncoderSel = 1 << digEncoderID;
+					args.v5.ucDPLaneSet = laneSet;
 					break;
 				default:
 					ERROR("%s: unknown table version\n", __func__);
