@@ -1,5 +1,5 @@
 /* Print floating point number in hexadecimal notation according to ISO C99.
-   Copyright (C) 1997, 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1997-2002,2004,2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
 
@@ -88,6 +88,86 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 # define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
 
+
+
+#ifdef __x86_64__
+
+/* sysdeps/x86_64/fpu/printf_fphex.c */
+
+#ifndef LONG_DOUBLE_DENORM_BIAS
+# define LONG_DOUBLE_DENORM_BIAS (IEEE854_LONG_DOUBLE_BIAS - 1)
+#endif
+
+#define PRINT_FPHEX_LONG_DOUBLE \
+do {									      \
+      /* The "strange" 80 bit format on ix86 and m68k has an explicit	      \
+	 leading digit in the 64 bit mantissa.  */			      \
+      unsigned long long int num;					      \
+									      \
+									      \
+      num = (((unsigned long long int) fpnum.ldbl.ieee.mantissa0) << 32	      \
+	     | fpnum.ldbl.ieee.mantissa1);				      \
+									      \
+      zero_mantissa = num == 0;						      \
+									      \
+      if (sizeof (unsigned long int) > 6)				      \
+	{								      \
+	  numstr = _itoa_word (num, numbuf + sizeof numbuf, 16,		      \
+			       info->spec == 'A');			      \
+	  wnumstr = _itowa_word (num,					      \
+				 wnumbuf + sizeof (wnumbuf) / sizeof (wchar_t),\
+				 16, info->spec == 'A');		      \
+	}								      \
+      else								      \
+	{								      \
+	  numstr = _itoa (num, numbuf + sizeof numbuf, 16, info->spec == 'A');\
+	  wnumstr = _itowa (num,					      \
+			    wnumbuf + sizeof (wnumbuf) / sizeof (wchar_t),    \
+			    16, info->spec == 'A');			      \
+	}								      \
+									      \
+      /* Fill with zeroes.  */						      \
+      while (numstr > numbuf + (sizeof numbuf - 64 / 4))		      \
+	{								      \
+	  *--numstr = '0';						      \
+	  *--wnumstr = L'0';						      \
+	}								      \
+									      \
+      /* We use a full nibble for the leading digit.  */		      \
+      leading = *numstr++;						      \
+									      \
+      /* We have 3 bits from the mantissa in the leading nibble.	      \
+	 Therefore we are here using `IEEE854_LONG_DOUBLE_BIAS + 3'.  */      \
+      exponent = fpnum.ldbl.ieee.exponent;				      \
+									      \
+      if (exponent == 0)						      \
+	{								      \
+	  if (zero_mantissa)						      \
+	    expnegative = 0;						      \
+	  else								      \
+	    {								      \
+	      /* This is a denormalized number.  */			      \
+	      expnegative = 1;						      \
+	      /* This is a hook for the m68k long double format, where the    \
+		 exponent bias is the same for normalized and denormalized    \
+		 numbers.  */						      \
+	      exponent = LONG_DOUBLE_DENORM_BIAS + 3;			      \
+	    }								      \
+	}								      \
+      else if (exponent >= IEEE854_LONG_DOUBLE_BIAS + 3)		      \
+	{								      \
+	  expnegative = 0;						      \
+	  exponent -= IEEE854_LONG_DOUBLE_BIAS + 3;			      \
+	}								      \
+      else								      \
+	{								      \
+	  expnegative = 1;						      \
+	  exponent = -(exponent - (IEEE854_LONG_DOUBLE_BIAS + 3));	      \
+	}								      \
+} while (0)
+
+#endif	/* __x86_64__ */
+
 
 int
 __printf_fphex (FILE *fp,
@@ -338,8 +418,8 @@ __printf_fphex (FILE *fp,
   /* Look for trailing zeroes.  */
   if (! zero_mantissa)
     {
-      wnumend = wnumbuf + sizeof wnumbuf;
-      numend = numbuf + sizeof numbuf;
+      wnumend = &wnumbuf[sizeof wnumbuf / sizeof wnumbuf[0]];
+      numend = &numbuf[sizeof numbuf / sizeof numbuf[0]];
       while (wnumend[-1] == L'0')
 	{
 	  --wnumend;
@@ -399,12 +479,15 @@ __printf_fphex (FILE *fp,
 		++leading;
 	      else
 		{
-		  leading = 1;
+		  leading = '1';
 		  if (expnegative)
 		    {
-		      exponent += 4;
-		      if (exponent >= 0)
-			expnegative = 0;
+		      exponent -= 4;
+		      if (exponent <= 0)
+			{
+			  exponent = -exponent;
+			  expnegative = 0;
+			}
 		    }
 		  else
 		    exponent += 4;
@@ -433,17 +516,13 @@ __printf_fphex (FILE *fp,
 	    + ((expbuf + sizeof expbuf) - expstr));
 	    /* Exponent.  */
 
-  /* Count the decimal point.  */
+  /* Count the decimal point.
+     A special case when the mantissa or the precision is zero and the `#'
+     is not given.  In this case we must not print the decimal point.  */
   if (precision > 0 || info->alt)
     width -= wide ? 1 : strlen (decimal);
 
-  /* A special case when the mantissa or the precision is zero and the `#'
-     is not given.  In this case we must not print the decimal point.  */
-  if (precision == 0 && !info->alt)
-    ++width;		/* This nihilates the +1 for the decimal-point
-			   character in the following equation.  */
-
-  if (!info->left && width > 0)
+  if (!info->left && info->pad != '0' && width > 0)
     PADN (' ', width);
 
   if (negative)
@@ -458,6 +537,10 @@ __printf_fphex (FILE *fp,
     outchar (info->spec + ('x' - 'a'));
   else
     outchar (info->spec == 'A' ? 'X' : 'x');
+
+  if (!info->left && info->pad == '0' && width > 0)
+    PADN ('0', width);
+
   outchar (leading);
 
   if (precision > 0 || info->alt)
@@ -473,9 +556,6 @@ __printf_fphex (FILE *fp,
       if (tofill > 0)
 	PADN ('0', tofill);
     }
-
-  if (info->left && info->pad == '0' && width > 0)
-    PADN ('0', width);
 
   if ('P' - 'A' == 'p' - 'a')
     outchar (info->spec + ('p' - 'a'));
