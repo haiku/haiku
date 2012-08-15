@@ -7149,6 +7149,16 @@ BPoseView::SetTextWidgetToCheck(BTextWidget* widget, BTextWidget* old)
 }
 
 
+BPoint
+BPoseView::Origin()
+{
+	if (ViewMode() == kListMode)
+		return fViewState->ListOrigin();
+
+	return fViewState->IconOrigin();
+}
+
+
 void
 BPoseView::MouseUp(BPoint where)
 {

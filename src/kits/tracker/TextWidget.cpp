@@ -381,12 +381,14 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	textRect.bottom--;
 	textView->SetTextRect(textRect);
 
+	BPoint origin = view->Origin();
 	textRect = view->Bounds();
+
 	bool hitBorder = false;
-	if (rect.left < 1)
-		rect.left = 1, hitBorder = true;
-	if (rect.right > textRect.right)
-		rect.right = textRect.right - 2, hitBorder = true;
+	if (rect.left <= origin.x)
+		rect.left = origin.x + 1, hitBorder = true;
+	if (rect.right >= textRect.right)
+		rect.right = textRect.right - 1, hitBorder = true;
 
 	textView->MoveTo(rect.LeftTop());
 	textView->ResizeTo(rect.Width(), rect.Height());

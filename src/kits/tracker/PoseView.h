@@ -426,6 +426,7 @@ class BPoseView : public BView {
 		virtual void AdaptToDesktopIntegrationChange(BMessage*);
 
 		void SetTextWidgetToCheck(BTextWidget*, BTextWidget* = NULL);
+		BPoint Origin();
 
 	protected:
 		// view setup
