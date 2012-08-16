@@ -33,7 +33,7 @@ x86_64-*)
 	# failure
 	binutilsConfigureArgs=""
 	gccConfigureArgs=""
-	kernelSupcxxFlags="-mno-red-zone"
+	kernelCcFlags="-mno-red-zone"
 	;;
 m68k-*)
 	binutilsConfigureArgs="--enable-multilib"
@@ -46,7 +46,7 @@ arm-*)
 *)
 	binutilsConfigureArgs="--disable-multilib"
 	gccConfigureArgs="--disable-multilib"
-	kernelSupcxxFlags=
+	kernelCcFlags=
 	;;
 esac
 
@@ -166,18 +166,26 @@ $MAKE $additionalMakeArgs install || {
 	exit 1
 }
 
-# build libsupc++ for the kernel if the target arch requires it
-if [ -n "$kernelSupcxxFlags" ]; then
-	cd $stdcxxObjDir
-	CFLAGS="-O2 $kernelSupcxxFlags" CXXFLAGS="-O2 $kernelSupcxxFlags" \
-		$gccSourceDir/libstdc++-v3/configure --prefix=$installDir \
-		--target=$haikuMachine --host=$haikuMachine --disable-shared \
-		--disable-multilib || exit 1
-	$MAKE $additionalMakeArgs -C libsupc++ || {
+# build libraries for the kernel if the target arch requires it
+if [ -n "$kernelCcFlags" ]; then
+	$MAKE -C $haikuMachine/libgcc clean
+	$MAKE -C $haikuMachine/libgcc CFLAGS="-g -O2 $kernelCcFlags" || {
+		echo "Error: Building kernel libgcc failed." >&2
+		exit 1
+	}
+
+	cp $haikuMachine/libgcc/libgcc.a \
+		$installDir/$haikuMachine/lib/libgcc-kernel.a || exit 1
+
+	$MAKE -C $haikuMachine/libstdc++-v3/libsupc++ clean
+	$MAKE -C $haikuMachine/libstdc++-v3/libsupc++ CFLAGS="-g -O2 $kernelCcFlags" \
+		CXXFLAGS="-g -O2 $kernelCcFlags" || {
 		echo "Error: Building kernel libsupc++ failed." >&2
 		exit 1
 	}
-	cp libsupc++/.libs/libsupc++.a $installDir/$haikuMachine/lib/libsupc++-kernel.a
+
+	cp $haikuMachine/libstdc++-v3/libsupc++/.libs/libsupc++.a \
+		$installDir/$haikuMachine/lib/libsupc++-kernel.a || exit 1
 fi
 
 # cleanup

@@ -188,6 +188,17 @@ standard_gcc_settings()
 			HAIKU_STATIC_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++.a`
 			HAIKU_SHARED_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++.so`
 
+			# If the architecture has separate runtime libraries for the
+			# kernel, use them.
+			HAIKU_KERNEL_LIBGCC=`$HAIKU_CC -print-file-name=libgcc-kernel.a`
+			if [ $HAIKU_KERNEL_LIBGCC = libgcc-kernel.a ]; then
+				HAIKU_KERNEL_LIBGCC=$HAIKU_GCC_LIBGCC
+			fi
+			HAIKU_KERNEL_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++-kernel.a`
+			if [ $HAIKU_KERNEL_LIBSUPCXX = libsupc++-kernel.a ]; then
+				HAIKU_KERNEL_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
+			fi
+
 			local headers
 			if [ -d $gccdir/../../../../$HAIKU_GCC_MACHINE/include/c++/$HAIKU_GCC_RAW_VERSION ]; then
 				headers=$gccdir/../../../../$HAIKU_GCC_MACHINE/include/c++/$HAIKU_GCC_RAW_VERSION
@@ -240,23 +251,17 @@ standard_gcc_settings()
 				echo "Please download it from www.haiku-os.org...";
 				exit 1;
 			fi
+
+			HAIKU_KERNEL_LIBGCC=$HAIKU_GCC_LIBGCC
+			HAIKU_KERNEL_LIBSUPCXX=
 		;;
 	esac
 
 	if [ "$targetArch" = "x86_64" ]; then
-		# Kernel doesn't need libgcc, and has a special version of libsupc++
-		# built with the correct flags. Note: Should libgcc ever be needed for
-		# the x86_64 kernel, a separate build of it will be needed with
-		# -mno-red-zone, like for libsupc++.
-		HAIKU_KERNEL_LIBGCC=
-		HAIKU_KERNEL_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++-kernel.a`
-
 		# Boot loader is 32-bit, need the 32-bit libs.
 		HAIKU_BOOT_LIBGCC=`$HAIKU_CC -m32 -print-libgcc-file-name`
 		HAIKU_BOOT_LIBSUPCXX=`$HAIKU_CC -m32 -print-file-name=libsupc++.a`
 	else
-		HAIKU_KERNEL_LIBGCC=$HAIKU_GCC_LIBGCC
-		HAIKU_KERNEL_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
 		HAIKU_BOOT_LIBGCC=$HAIKU_GCC_LIBGCC
 		HAIKU_BOOT_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
 	fi
