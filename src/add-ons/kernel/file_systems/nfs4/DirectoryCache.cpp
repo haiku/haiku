@@ -252,6 +252,25 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 			} else {
 				notify_entry_created(fInode->GetFileSystem()->DevId(),
 					fInode->ID(), newCurrent->fName, newCurrent->fNode);
+
+				FileInfo fi;
+				fi.fFileId = newCurrent->fNode;
+				fi.fParent = fInode->fInfo.fHandle;
+				fi.fName = strdup(newCurrent->fName);
+				if (fi.fName != NULL) {
+					size_t pathLength = strlen(newCurrent->fName) + 2 +
+						strlen(fInode->fInfo.fPath);
+					char* path = reinterpret_cast<char*>(malloc(pathLength));
+					if (path != NULL) {
+						strcpy(path, fInode->fInfo.fPath);
+						strcat(path, "/");
+						strcat(path, newCurrent->fName);
+						fi.fPath = path;
+
+						fInode->GetFileSystem()->InoIdMap()->AddEntry(fi,
+							Inode::FileIdToInoT(newCurrent->fNode));
+					}
+				}
 			}
 		} else
 			oldSnapshot->fEntries.Remove(prev, oldCurrent);

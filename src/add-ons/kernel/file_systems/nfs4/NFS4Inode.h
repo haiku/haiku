@@ -20,7 +20,7 @@
 #include "ReplyInterpreter.h"
 
 
-class NFS4Inode : protected NFS4Object {
+class NFS4Inode : public NFS4Object {
 public:
 			status_t	GetChangeInfo(uint64* change, bool attrDir = false);
 			status_t	ReadLink(void* buffer, size_t* length);

@@ -109,6 +109,7 @@ public:
 
 					status_t	LoadAttrDirHandle();
 
+	static inline	ino_t		FileIdToInoT(uint64 fileid);
 protected:
 								Inode();
 
@@ -132,8 +133,6 @@ protected:
 									OpenAttrCookie* attr = NULL);
 
 	static inline	status_t	CheckLockType(short ltype, uint32 mode);
-
-	static inline	ino_t		FileIdToInoT(uint64 fileid);
 
 private:
 					uint32		fType;

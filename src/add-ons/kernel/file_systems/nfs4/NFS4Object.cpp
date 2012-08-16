@@ -50,9 +50,9 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 
 				if (result != B_TIMED_OUT) {
 					release_sem(cookie->fSnoozeCancel);
-					return true;
+					return false;
 				}
-				return false;
+				return true;
 			}
 
 			if (sequence != NULL)
@@ -80,9 +80,9 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 
 				if (result != B_TIMED_OUT) {
 					release_sem(cookie->fSnoozeCancel);
-					return true;
+					return false;
 				}
-				return false;
+				return true;
 			}
 
 			if (sequence != NULL)
@@ -104,7 +104,8 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			}
 			return false;
 
-		// FileHandle has expired
+		// FileHandle has expired or is invalid
+		case NFS4ERR_BADHANDLE:
 		case NFS4ERR_FHEXPIRED:
 			if (fInfo.UpdateFileHandles(fFileSystem) == B_OK)
 				return true;
