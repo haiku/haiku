@@ -114,7 +114,7 @@ EthernetSettingsView::EthernetSettingsView()
 	rootLayout->SetSpacing(inset);
 	layout->SetSpacing(inset, inset);
 
-	BPopUpMenu* deviceMenu = new BPopUpMenu((B_TRANSLATE("<no adapter>"));
+	BPopUpMenu* deviceMenu = new BPopUpMenu(B_TRANSLATE("<no adapter>"));
 	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
 		BString& name = *fInterfaces.ItemAt(i);
 		BString label = name;
