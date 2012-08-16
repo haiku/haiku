@@ -41,7 +41,9 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 					*sequence = fFileSystem->OpenOwnerSequenceLock();
 
 				return true;
-			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
+			}
+
+			if ((cookie->fMode & O_NONBLOCK) == 0) {
 				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
 					B_RELATIVE_TIMEOUT, sSecToBigTime(5));
 
@@ -49,7 +51,8 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 					*sequence = fFileSystem->OpenOwnerSequenceLock();
 
 				if (result != B_TIMED_OUT) {
-					release_sem(cookie->fSnoozeCancel);
+					if (result == B_OK)
+						release_sem(cookie->fSnoozeCancel);
 					return false;
 				}
 				return true;
@@ -71,7 +74,9 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 				if (sequence != NULL)
 					*sequence = fFileSystem->OpenOwnerSequenceLock();
 				return true;
-			} else if ((cookie->fMode & O_NONBLOCK) == 0) {
+			}
+
+			if ((cookie->fMode & O_NONBLOCK) == 0) {
 				status_t result = acquire_sem_etc(cookie->fSnoozeCancel, 1,
 					B_RELATIVE_TIMEOUT, sSecToBigTime(leaseTime) / 3);
 
@@ -79,7 +84,8 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 					*sequence = fFileSystem->OpenOwnerSequenceLock();
 
 				if (result != B_TIMED_OUT) {
-					release_sem(cookie->fSnoozeCancel);
+					if (result == B_OK)
+						release_sem(cookie->fSnoozeCancel);
 					return false;
 				}
 				return true;

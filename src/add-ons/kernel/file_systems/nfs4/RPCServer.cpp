@@ -112,7 +112,7 @@ Server::_StartListening()
 	fThreadCancel = false;
 	fThreadError = B_OK;
 	fThread = spawn_kernel_thread(&Server::_ListenerThreadStart,
-									"NFSv4 Listener", B_NORMAL_PRIORITY, this);
+		"NFSv4 Listener", B_NORMAL_PRIORITY, this);
 	if (fThread < B_OK)
 		return fThread;
 

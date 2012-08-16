@@ -476,7 +476,14 @@ Connection::Connect(Connection **_connection, const PeerAddress& address)
 	if (conn == NULL)
 		return B_NO_MEMORY;
 
-	status_t result = conn->Connect();
+	status_t result;
+	if (conn->fWaitCancel < B_OK) {
+		result = conn->fWaitCancel;
+		delete conn;
+		return result;
+	}
+
+	result = conn->Connect();
 	if (result != B_OK) {
 		delete conn;
 		return result;
@@ -495,6 +502,14 @@ Connection::SetTo(Connection **_connection, int socket,
 	Connection* conn = CreateObject(address);
 	if (conn == NULL)
 		return B_NO_MEMORY;
+
+	status_t result;
+	if (conn->fWaitCancel < B_OK) {
+		result = conn->fWaitCancel;
+		delete conn;
+		return result;
+	}
+
 	conn->fSocket = socket;
 
 	*_connection = conn;
@@ -640,6 +655,14 @@ ConnectionListener::Listen(ConnectionListener** listener, uint16 port)
 	if (*listener == NULL) {
 		close(sock);
 		return B_NO_MEMORY;
+	}
+
+	status_t result;
+	if ((*listener)->fWaitCancel < B_OK) {
+		result = (*listener)->fWaitCancel;
+		close(sock);
+		delete *listener;
+		return result;
 	}
 
 	(*listener)->fSocket = sock;

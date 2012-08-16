@@ -231,7 +231,8 @@ NFS4Server::_Renewal()
 		status_t result = acquire_sem_etc(fWaitCancel, 1,
 			B_RELATIVE_TIMEOUT, sSecToBigTime(fLeaseTime - 2));
 		if (result != B_TIMED_OUT) {
-			release_sem(fWaitCancel);
+			if (result == B_OK)
+				release_sem(fWaitCancel);
 			return B_OK;
 		}
 
