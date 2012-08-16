@@ -67,7 +67,7 @@ SYSTEM_ADD_ONS_ACCELERANTS = vesa.accelerant ;
 SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
 	PCXTranslator PNGTranslator PPMTranslator
-	RAWTranslator RTF-Translator SGITranslator STXTTranslator TGATranslator
+	RAWTranslator RTFTranslator SGITranslator STXTTranslator TGATranslator
 	TIFFTranslator WebPTranslator WonderBrushTranslator
 ;
 
@@ -94,7 +94,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage system add-ons kernel busses usb
-	: <usb>uhci <usb>ehci ;
+	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage system add-ons kernel debugger
 	: <kdebug>demangle <kdebug>invalidate_on_exit <kdebug>usb_keyboard ;
 AddFilesToHaikuImage system add-ons kernel file_systems
@@ -307,7 +307,8 @@ AddFilesToHaikuImage system : haiku_loader ;
 # boot module links
 AddBootModuleSymlinksToHaikuImage
 	$(ATA_ONLY)ata pci config_manager dpc scsi usb $(ATA_ONLY)ata_adapter
-	locked_pool scsi_periph ahci generic_ide_pci <usb>uhci <usb>ehci
+	locked_pool scsi_periph ahci generic_ide_pci
+	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
 	intel
 	bfs
