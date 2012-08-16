@@ -94,7 +94,7 @@ dns_resolver_uninit()
 
 
 static void
-RelocateEntries(struct addrinfo *addr)
+RelocateEntries(struct addrinfo* addr)
 {
 	char* generalOffset = reinterpret_cast<char*>(addr);
 

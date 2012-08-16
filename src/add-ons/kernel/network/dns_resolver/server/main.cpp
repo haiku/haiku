@@ -94,7 +94,8 @@ GetAddrInfo(const char* buffer)
 		}
 
 		addrinfo* next = current->ai_next;
-		current->ai_next = reinterpret_cast<addrinfo*>(addrPos) + 1;
+		if (next != NULL)
+			current->ai_next = reinterpret_cast<addrinfo*>(addrPos) + 1;
 		memcpy(reply + addrPos, current, sizeof(addrinfo));
 		addrPos += sizeof(addrinfo);
 
