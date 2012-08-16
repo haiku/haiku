@@ -28,22 +28,22 @@
 
 
 bool
-ServerAddress::operator==(const ServerAddress& address)
+PeerAddress::operator==(const PeerAddress& address)
 {
 	return memcmp(&fAddress, &address.fAddress, sizeof(fAddress)) == 0
 		&& fProtocol == address.fProtocol;
 }
 
 bool
-ServerAddress::operator<(const ServerAddress& address)
+PeerAddress::operator<(const PeerAddress& address)
 {
 	int compare = memcmp(&fAddress, &address.fAddress, sizeof(fAddress));
 	return compare < 0 || (compare == 0 && fProtocol < address.fProtocol);
 }
 
 
-ServerAddress&
-ServerAddress::operator=(const ServerAddress& address)
+PeerAddress&
+PeerAddress::operator=(const PeerAddress& address)
 {
 	fAddress = address.fAddress;
 	fProtocol = address.fProtocol;
@@ -51,7 +51,7 @@ ServerAddress::operator=(const ServerAddress& address)
 }
 
 
-ServerAddress::ServerAddress()
+PeerAddress::PeerAddress()
 	:
 	fProtocol(0)
 {
@@ -60,7 +60,7 @@ ServerAddress::ServerAddress()
 
 
 const char*
-ServerAddress::ProtocolString() const
+PeerAddress::ProtocolString() const
 {
 	static const char* tcpName = "tcp";
 	static const char* udpName = "udp";
@@ -78,7 +78,7 @@ ServerAddress::ProtocolString() const
 
 
 char*
-ServerAddress::UniversalAddress() const
+PeerAddress::UniversalAddress() const
 {
 	const sockaddr* address = reinterpret_cast<const sockaddr*>(&fAddress);
 
@@ -98,7 +98,7 @@ ServerAddress::UniversalAddress() const
 
 
 socklen_t
-ServerAddress::AddressSize() const
+PeerAddress::AddressSize() const
 {
 	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
 		case AF_INET:
@@ -112,7 +112,7 @@ ServerAddress::AddressSize() const
 
 
 uint16
-ServerAddress::Port() const
+PeerAddress::Port() const
 {
 	uint16 port;
 
@@ -132,7 +132,7 @@ ServerAddress::Port() const
 
 
 void
-ServerAddress::SetPort(uint16 port)
+PeerAddress::SetPort(uint16 port)
 {
 	port = htons(port);
 
@@ -148,7 +148,7 @@ ServerAddress::SetPort(uint16 port)
 
 
 const void*
-ServerAddress::InAddr() const
+PeerAddress::InAddr() const
 {
 	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
 		case AF_INET:
@@ -161,9 +161,22 @@ ServerAddress::InAddr() const
 }
 
 
+size_t
+PeerAddress::InAddrSize() const
+{
+	switch (reinterpret_cast<const sockaddr*>(&fAddress)->sa_family) {
+		case AF_INET:
+			return sizeof(in_addr);
+		case AF_INET6:
+			return sizeof(in6_addr);
+		default:
+			return 0;
+	}
+}
+
 
 status_t
-ServerAddress::ResolveName(const char* name, ServerAddress* address)
+PeerAddress::ResolveName(const char* name, PeerAddress* address)
 {
 	address->fProtocol = IPPROTO_TCP;
 
@@ -210,39 +223,39 @@ ServerAddress::ResolveName(const char* name, ServerAddress* address)
 }
 
 
-Connection::Connection(const ServerAddress& address)
+Connection::Connection(const PeerAddress& address)
 	:
 	ConnectionBase(address)
 {
 }
 
 
-ConnectionListener::ConnectionListener(const ServerAddress& address)
+ConnectionListener::ConnectionListener(const PeerAddress& address)
 	:
 	ConnectionBase(address)
 {
 }
 
 
-ConnectionBase::ConnectionBase(const ServerAddress& address)
+ConnectionBase::ConnectionBase(const PeerAddress& address)
 	:
 	fWaitCancel(create_sem(0, NULL)),
 	fSocket(-1),
-	fServerAddress(address)
+	fPeerAddress(address)
 {
 	mutex_init(&fSocketLock, NULL);
 }
 
 
 
-ConnectionStream::ConnectionStream(const ServerAddress& address)
+ConnectionStream::ConnectionStream(const PeerAddress& address)
 	:
 	Connection(address)
 {
 }
 
 
-ConnectionPacket::ConnectionPacket(const ServerAddress& address)
+ConnectionPacket::ConnectionPacket(const PeerAddress& address)
 	:
 	Connection(address)
 {
@@ -259,9 +272,9 @@ ConnectionBase::~ConnectionBase()
 
 
 status_t
-ConnectionBase::GetLocalAddress(ServerAddress* address)
+ConnectionBase::GetLocalAddress(PeerAddress* address)
 {
-	address->fProtocol = fServerAddress.fProtocol;
+	address->fProtocol = fPeerAddress.fProtocol;
 
 	socklen_t addressSize = sizeof(address->fAddress);
 	return getsockname(fSocket,	(struct sockaddr*)&address->fAddress,
@@ -443,7 +456,7 @@ ConnectionPacket::Receive(void** _buffer, uint32* _size)
 
 
 Connection*
-Connection::CreateObject(const ServerAddress& address)
+Connection::CreateObject(const PeerAddress& address)
 {
 	switch (address.fProtocol) {
 		case IPPROTO_TCP:
@@ -457,7 +470,7 @@ Connection::CreateObject(const ServerAddress& address)
 
 
 status_t
-Connection::Connect(Connection **_connection, const ServerAddress& address)
+Connection::Connect(Connection **_connection, const PeerAddress& address)
 {
 	Connection* conn = CreateObject(address);
 	if (conn == NULL)
@@ -477,7 +490,7 @@ Connection::Connect(Connection **_connection, const ServerAddress& address)
 
 status_t
 Connection::SetTo(Connection **_connection, int socket,
-	const ServerAddress& address)
+	const PeerAddress& address)
 {
 	Connection* conn = CreateObject(address);
 	if (conn == NULL)
@@ -494,9 +507,9 @@ status_t
 Connection::Connect()
 {
 	const sockaddr& address =
-		*reinterpret_cast<const sockaddr*>(&fServerAddress);
+		*reinterpret_cast<const sockaddr*>(&fPeerAddress);
 
-	switch (fServerAddress.fProtocol) {
+	switch (fPeerAddress.fProtocol) {
 		case IPPROTO_TCP:
 			fSocket = socket(address.sa_family, SOCK_STREAM, IPPROTO_TCP);
 			break;
@@ -619,7 +632,7 @@ ConnectionListener::Listen(ConnectionListener** listener, uint16 port)
 		return errno;
 	}
 
-	ServerAddress address;
+	PeerAddress address;
 	address.fProtocol = IPPROTO_TCP;
 	memset(&address.fAddress, 0, sizeof(address.fAddress));
 
@@ -663,7 +676,7 @@ ConnectionListener::AcceptConnection(Connection** connection)
 	if (sock < 0)
 		return errno;
 
-	ServerAddress address;
+	PeerAddress address;
 	address.fProtocol = IPPROTO_TCP;
 	address.fAddress = addr;
 

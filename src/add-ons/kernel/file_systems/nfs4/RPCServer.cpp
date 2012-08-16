@@ -73,7 +73,7 @@ RequestManager::FindRequest(uint32 xid)
 }
 
 
-Server::Server(Connection* connection, ServerAddress* address)
+Server::Server(Connection* connection, PeerAddress* address)
 	:
 	fConnection(connection),
 	fAddress(address),
@@ -301,7 +301,7 @@ ServerManager::~ServerManager()
 
 
 status_t
-ServerManager::Acquire(Server** _server, const ServerAddress& address,
+ServerManager::Acquire(Server** _server, const PeerAddress& address,
 	ProgramData* (*createPrivateData)(Server*))
 {
 	status_t result;
@@ -372,7 +372,7 @@ ServerManager::Release(Server* server)
 
 
 ServerNode*
-ServerManager::_Find(const ServerAddress& address)
+ServerManager::_Find(const PeerAddress& address)
 {
 	ServerNode* node = fRoot;
 	while (node != NULL) {

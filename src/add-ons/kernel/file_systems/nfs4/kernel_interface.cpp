@@ -45,7 +45,7 @@ CreateNFS4Server(RPC::Server* serv)
 
 // TODO: IPv6 address will cause problems
 static status_t
-ParseArguments(const char* _args, ServerAddress* address, char* _path)
+ParseArguments(const char* _args, PeerAddress* address, char* _path)
 {
 	if (_args == NULL)
 		return B_BAD_VALUE;
@@ -58,7 +58,7 @@ ParseArguments(const char* _args, ServerAddress* address, char* _path)
 	}
 	*path++ = '\0';
 
-	status_t result = ServerAddress::ResolveName(args, address);
+	status_t result = PeerAddress::ResolveName(args, address);
 	if (result != B_OK)
 		return result;
 
@@ -82,7 +82,7 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 		return B_NO_MEMORY;
 	locker.Unlock();
 
-	ServerAddress address;
+	PeerAddress address;
 	char path[256];
 	result = ParseArguments(args, &address, path);
 	if (result != B_OK)

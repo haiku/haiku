@@ -673,8 +673,8 @@ RequestBuilder::SetClientID(RPC::Server* server)
 
 	uint32 id = server->GetCallback()->ID();
 
-	ServerAddress local = gRPCCallbackServer->LocalID();
-	ServerAddress servAddr = server->LocalID();
+	PeerAddress local = gRPCCallbackServer->LocalID();
+	PeerAddress servAddr = server->LocalID();
 	servAddr.SetPort(local.Port());
 
 	fRequest->Stream().AddString(local.ProtocolString());
@@ -700,46 +700,15 @@ RequestBuilder::_GenerateClientId(XDR::WriteStream& stream,
 	char id[512] = "HAIKU:kernel:";
 	int pos = strlen(id);
 
-	const sockaddr* remoteAddress =
-		reinterpret_cast<const sockaddr*>(&server->ID().fAddress);
+	PeerAddress local = server->LocalID();
 
-	ServerAddress local = server->LocalID();
-	const sockaddr* localAddress = reinterpret_cast<sockaddr*>(&local.fAddress);
-	
-	const sockaddr_in* address4;
-	const sockaddr_in6* address6;
-	switch (remoteAddress->sa_family) {
-		case AF_INET:
-			address4 = reinterpret_cast<const sockaddr_in*>(remoteAddress);
+	memcpy(id + pos, server->ID().InAddr(), server->ID().InAddrSize());
+	pos += sizeof(server->ID().InAddrSize());
 
-			memcpy(id + pos, &address4->sin_addr, sizeof(address4->sin_addr));
-			pos += sizeof(address4->sin_addr);
+	memcpy(id + pos, local.InAddr(), local.InAddrSize());
+	pos += sizeof(local.InAddrSize());
 
-			memcpy(id + pos,
-				&reinterpret_cast<const sockaddr_in*>(localAddress)->sin_addr,
-				sizeof(address4->sin_addr));
-			pos += sizeof(address4->sin_addr);
-
-			*(uint16*)(id + pos) = address4->sin_port;
-			break;
-
-		case AF_INET6:
-			address6 = reinterpret_cast<const sockaddr_in6*>(remoteAddress);
-
-			memcpy(id + pos, &address6->sin6_addr, sizeof(address6->sin6_addr));
-			pos += sizeof(address6->sin6_addr);
-
-			memcpy(id + pos,
-				&reinterpret_cast<const sockaddr_in6*>(localAddress)->sin6_addr,
-				sizeof(address6->sin6_addr));
-			pos += sizeof(address6->sin6_addr);
-
-			*(uint16*)(id + pos) = address6->sin6_port;
-			break;
-
-		default:
-			return B_BAD_VALUE;
-	}
+	*(uint16*)(id + pos) = server->ID().Port();
 	pos += sizeof(uint16);
 
 	*(uint16*)(id + pos) = server->ID().fProtocol;

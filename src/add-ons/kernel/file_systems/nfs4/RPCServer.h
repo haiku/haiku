@@ -57,7 +57,7 @@ public:
 class Server {
 public:
 									Server(Connection* connection,
-										ServerAddress* address);
+										PeerAddress* address);
 	virtual							~Server();
 
 			status_t				SendCall(Call* call, Reply** reply);
@@ -74,8 +74,8 @@ public:
 
 			status_t				Repair();
 
-	inline	const ServerAddress&	ID() const;
-	inline	ServerAddress			LocalID() const;
+	inline	const PeerAddress&	ID() const;
+	inline	PeerAddress			LocalID() const;
 
 	inline	ProgramData*			PrivateData();
 	inline	void					SetPrivateData(ProgramData* privateData);
@@ -96,7 +96,7 @@ private:
 
 			RequestManager			fRequests;
 			Connection*				fConnection;
-			const ServerAddress*	fAddress;
+			const PeerAddress*	fAddress;
 
 			ProgramData*			fPrivateData;
 
@@ -125,17 +125,17 @@ Server::CancelCall(Request* request)
 }
 
 
-inline const ServerAddress&
+inline const PeerAddress&
 Server::ID() const
 {
 	return *fAddress;
 }
 
 
-inline ServerAddress
+inline PeerAddress
 Server::LocalID() const
 {
-	ServerAddress addr;
+	PeerAddress addr;
 	memset(&addr, 0, sizeof(addr));
 	fConnection->GetLocalAddress(&addr);
 	return addr;
@@ -158,7 +158,7 @@ Server::SetPrivateData(ProgramData* privateData)
 
 
 struct ServerNode {
-	ServerAddress	fID;
+	PeerAddress	fID;
 	Server*			fServer;
 	int				fRefCount;
 
@@ -171,13 +171,13 @@ public:
 						ServerManager();
 						~ServerManager();
 
-			status_t	Acquire(Server** _server, const ServerAddress& address,
+			status_t	Acquire(Server** _server, const PeerAddress& address,
 								ProgramData* (*createPrivateData)(Server*));
 			void		Release(Server* server);
 
 private:
 
-			ServerNode*	_Find(const ServerAddress& address);
+			ServerNode*	_Find(const PeerAddress& address);
 			void		_Delete(ServerNode* node);
 			ServerNode*	_Insert(ServerNode* node);
 

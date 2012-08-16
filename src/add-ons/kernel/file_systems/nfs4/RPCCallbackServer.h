@@ -39,7 +39,7 @@ public:
 			status_t		RegisterCallback(Callback* callback);
 			status_t		UnregisterCallback(Callback* callback);
 
-	inline	ServerAddress	LocalID();
+	inline	PeerAddress	LocalID();
 
 protected:
 			status_t		StartServer();
@@ -72,10 +72,10 @@ private:
 };
 
 
-inline ServerAddress
+inline PeerAddress
 CallbackServer::LocalID()
 {
-	ServerAddress address;
+	PeerAddress address;
 	fListener->GetLocalAddress(&address);
 	return address;
 }

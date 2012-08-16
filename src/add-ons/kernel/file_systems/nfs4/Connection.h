@@ -15,16 +15,16 @@
 #include <SupportDefs.h>
 
 
-struct ServerAddress {
+struct PeerAddress {
 			sockaddr_storage	fAddress;
 			int					fProtocol;
 
-			bool				operator==(const ServerAddress& address);
-			bool				operator<(const ServerAddress& address);
+			bool				operator==(const PeerAddress& address);
+			bool				operator<(const PeerAddress& address);
 
-			ServerAddress&		operator=(const ServerAddress& address);
+			PeerAddress&		operator=(const PeerAddress& address);
 
-								ServerAddress();
+								PeerAddress();
 
 			const char*			ProtocolString() const;
 			char*				UniversalAddress() const;
@@ -35,17 +35,18 @@ struct ServerAddress {
 			uint16				Port() const;
 
 			const void*			InAddr() const;
+			size_t				InAddrSize() const;
 
 	static	status_t			ResolveName(const char* name,
-									ServerAddress* address);
+									PeerAddress* address);
 };
 
 class ConnectionBase {
 public:
-								ConnectionBase(const ServerAddress& address);
+								ConnectionBase(const PeerAddress& address);
 	virtual						~ConnectionBase();
 
-			status_t			GetLocalAddress(ServerAddress* address);
+			status_t			GetLocalAddress(PeerAddress* address);
 
 			void				Disconnect();
 
@@ -54,15 +55,15 @@ protected:
 			int					fSocket;
 			mutex				fSocketLock;
 
-			const ServerAddress	fServerAddress;
+			const PeerAddress	fPeerAddress;
 };
 
 class Connection : public ConnectionBase {
 public:
 	static	status_t			Connect(Connection **connection,
-									const ServerAddress& address);
+									const PeerAddress& address);
 	static	status_t			SetTo(Connection **connection, int socket,
-									const ServerAddress& address);
+									const PeerAddress& address);
 
 	virtual	status_t			Send(const void* buffer, uint32 size) = 0;
 	virtual	status_t			Receive(void** buffer, uint32* size) = 0;
@@ -70,16 +71,16 @@ public:
 			status_t			Reconnect();
 
 protected:
-	static	Connection*			CreateObject(const ServerAddress& address);
+	static	Connection*			CreateObject(const PeerAddress& address);
 
-								Connection(const ServerAddress& address);
+								Connection(const PeerAddress& address);
 			status_t			Connect();
 
 };
 
 class ConnectionStream : public Connection {
 public:
-								ConnectionStream(const ServerAddress& address);
+								ConnectionStream(const PeerAddress& address);
 
 	virtual	status_t			Send(const void* buffer, uint32 size);
 	virtual	status_t			Receive(void** buffer, uint32* size);
@@ -87,7 +88,7 @@ public:
 
 class ConnectionPacket : public Connection {
 public:
-								ConnectionPacket(const ServerAddress& address);
+								ConnectionPacket(const PeerAddress& address);
 
 	virtual	status_t			Send(const void* buffer, uint32 size);
 	virtual	status_t			Receive(void** buffer, uint32* size);
@@ -100,7 +101,7 @@ public:
 			status_t	AcceptConnection(Connection** connection);
 
 protected:
-						ConnectionListener(const ServerAddress& address);
+						ConnectionListener(const PeerAddress& address);
 };
 
 #endif	// CONNECTION_H
