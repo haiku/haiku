@@ -430,8 +430,9 @@ Inode::Access(int mode)
 	int acc = 0;
 
 	uint32 allowed;
+	bool cache = fFileSystem->GetConfiguration().fCacheMetadata;
 	status_t result = fMetaCache.GetAccess(geteuid(), &allowed);
-	if (result != B_OK) {
+	if (result != B_OK || !cache) {
 		result = NFS4Inode::Access(&allowed);
 		if (result != B_OK)
 			return result;
@@ -462,6 +463,10 @@ Inode::Stat(struct stat* st, OpenAttrCookie* attr)
 {
 	if (attr != NULL)
 		return GetStat(st, attr);
+
+	bool cache = fFileSystem->GetConfiguration().fCacheMetadata;
+	if (!cache)
+		return GetStat(st, NULL);
 
 	status_t result = fMetaCache.GetStat(st);
 	if (result != B_OK) {

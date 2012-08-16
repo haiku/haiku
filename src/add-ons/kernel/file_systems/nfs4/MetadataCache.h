@@ -69,7 +69,8 @@ inline void
 MetadataCache::InvalidateStat()
 {
 	MutexLocker _(fLock);
-	fExpire = 0;
+	if (!fForceValid)
+		fExpire = 0;
 }
 
 
@@ -77,7 +78,8 @@ inline void
 MetadataCache::InvalidateAccess()
 {
 	MutexLocker _(fLock);
-	fAccessCache.MakeEmpty();
+	if (!fForceValid)
+		fAccessCache.MakeEmpty();
 }
 
 

@@ -35,8 +35,7 @@ status_t
 MetadataCache::GetStat(struct stat* st)
 {
 	MutexLocker _(fLock);
-	bool cache = fInode->GetFileSystem()->GetConfiguration().fCacheMetadata;
-	if (fForceValid || (cache && fExpire > time(NULL))) {
+	if (fForceValid || fExpire > time(NULL)) {
 		// Do not touch other members of struct stat
 		st->st_size = fStatCache.st_size;
 		st->st_mode = fStatCache.st_mode;
@@ -112,9 +111,7 @@ MetadataCache::SetAccess(uid_t uid, uint32 allowed)
 	entry.fExpire = time(NULL) + kExpirationTime;
 	entry.fForceValid = fForceValid;
 
-	bool cache = fInode->GetFileSystem()->GetConfiguration().fCacheMetadata;
-	if (fForceValid || cache)
-		fAccessCache.Insert(uid, entry);
+	fAccessCache.Insert(uid, entry);
 }
 
 
