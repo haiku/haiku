@@ -204,15 +204,16 @@ dump_page(heap_page *page)
 		count++;
 
 	printf("\t\tpage %p: bin_index: %u; free_count: %u; empty_index: %u; "
-		"free_list %p (%lu entr%s)\n", page, page->bin_index, page->free_count,
-		page->empty_index, page->free_list, count, count == 1 ? "y" : "ies");
+		"free_list %p (%" B_PRIu32 " entr%s)\n", page, page->bin_index,
+		page->free_count, page->empty_index, page->free_list, count,
+		count == 1 ? "y" : "ies");
 }
 
 
 static void
 dump_bin(heap_bin *bin)
 {
-	printf("\telement_size: %lu; max_free_count: %u; page_list %p;\n",
+	printf("\telement_size: %" B_PRIu32 "; max_free_count: %u; page_list %p;\n",
 		bin->element_size, bin->max_free_count, bin->page_list);
 
 	for (heap_page *temp = bin->page_list; temp != NULL; temp = temp->next)
@@ -234,10 +235,11 @@ dump_allocator_areas(heap_allocator *heap)
 {
 	heap_area *area = heap->all_areas;
 	while (area) {
-		printf("\tarea %p: area: %ld; base: 0x%08lx; size: %lu; page_count: "
-			"%lu; free_pages: %p (%lu entr%s)\n", area, area->area, area->base,
-			area->size, area->page_count, area->free_pages,
-			area->free_page_count, area->free_page_count == 1 ? "y" : "ies");
+		printf("\tarea %p: area: %" B_PRId32 "; base: 0x%08lx; size: %lu; "
+			"page_count: %" B_PRIu32 "; free_pages: %p (%" B_PRIu32 " entr%s)\n",
+			area, area->area, area->base, area->size, area->page_count,
+			area->free_pages, area->free_page_count,
+			area->free_page_count == 1 ? "y" : "ies");
 		area = area->all_next;
 	}
 
@@ -248,10 +250,11 @@ dump_allocator_areas(heap_allocator *heap)
 static void
 dump_allocator(heap_allocator *heap, bool areas, bool bins)
 {
-	printf("allocator %p: name: %s; page_size: %lu; bin_count: %lu; pages: "
-		"%lu; free_pages: %lu; empty_areas: %lu\n", heap, heap->name,
-		heap->page_size, heap->bin_count, heap->total_pages,
-		heap->total_free_pages, heap->empty_areas);
+	printf("allocator %p: name: %s; page_size: %" B_PRIu32 "; bin_count: %"
+		B_PRIu32 "; pages: %" B_PRIu32 "; free_pages: %" B_PRIu32 "; "
+		"empty_areas: %" B_PRIu32 "\n", heap, heap->name, heap->page_size,
+		heap->bin_count, heap->total_pages, heap->total_free_pages,
+		heap->empty_areas);
 
 	if (areas)
 		dump_allocator_areas(heap);
@@ -304,8 +307,8 @@ dump_allocations(bool statsOnly, thread_id thread)
 						if (thread == -1 || info->thread == thread) {
 							// interesting...
 							if (!statsOnly) {
-								printf("thread: % 6ld; address: 0x%08lx;"
-									" size: %lu bytes\n", info->thread,
+								printf("thread: % 6" B_PRId32 "; address: "
+									"0x%08lx; size: %lu bytes\n", info->thread,
 									base, info->size);
 							}
 
@@ -330,7 +333,7 @@ dump_allocations(bool statsOnly, thread_id thread)
 					if (thread == -1 || info->thread == thread) {
 						// interesting...
 						if (!statsOnly) {
-							printf("thread: % 6ld; address: 0x%08lx;"
+							printf("thread: % 6" B_PRId32 "; address: 0x%08lx;"
 								" size: %lu bytes\n", info->thread,
 								base, info->size);
 						}
@@ -348,7 +351,8 @@ dump_allocations(bool statsOnly, thread_id thread)
 		}
 	}
 
-	printf("total allocations: %lu; total bytes: %lu\n", totalCount, totalSize);
+	printf("total allocations: %" B_PRIu32 "; total bytes: %lu\n", totalCount,
+		totalSize);
 }
 
 
@@ -1618,7 +1622,7 @@ heap_create_new_heap_area(heap_allocator *heap, const char *name, size_t size)
 static int32
 heap_wall_checker(void *data)
 {
-	int msInterval = (int32)data;
+	int msInterval = (addr_t)data;
 	while (!sStopWallChecking) {
 		heap_validate_walls();
 		snooze(msInterval * 1000);
@@ -1636,7 +1640,7 @@ heap_debug_start_wall_checking(int msInterval)
 {
 	if (sWallCheckThread < 0) {
 		sWallCheckThread = spawn_thread(heap_wall_checker, "heap wall checker",
-			B_LOW_PRIORITY, (void *)msInterval);
+			B_LOW_PRIORITY, (void *)(addr_t)msInterval);
 	}
 
 	if (sWallCheckThread < 0)
