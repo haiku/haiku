@@ -23,12 +23,12 @@ SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr chgrp chmod
 	chown chroot cksum clear clockconfig cmp collectcatkeys comm compress
 	copyattr cp csplit cut date dd diff diff3 dircolors dirname df du
 	dumpcatalog echo eject env error expand expr factor false find finddir
-	fmt fold fortune gawk gdb gzip gzexe getlimits groups head hostname id
+	fmt fold fortune gawk gdb gzip gzexe getlimits grep groups head hostname id
 	ifconfig <bin>install isvolume join kernel_debugger kill less lessecho
 	lesskey link linkcatkeys listdev ln locale locate logger logname ls md5sum
 	mkdir mkfifo mktemp mount mountvolume mv nl nohup nproc od paste patch
-	pathchk ping pr printenv printf ps ptx pwd readlink ReadOnlyBootPrompt rm
-	rmattr rmdir safemode sdiff seq sha1sum shred shuf sleep sort split stat
+	pathchk ping pr printenv printf ps ptx pwd rc readlink ReadOnlyBootPrompt
+	rm rmattr rmdir safemode sdiff seq sha1sum shred shuf sleep sort split stat
 	strace stty su sum sync sysinfo tac tail tee test timeout touch tr true
 	truncate tsort tty unexpand uname uniq unlink unmount unzip <bin>updatedb
 	waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip zipcloak

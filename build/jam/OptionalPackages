@@ -343,18 +343,25 @@ if [ IsOptionalHaikuImagePackageAdded BurnItNow ] {
 
 # Bzip
 if [ IsOptionalHaikuImagePackageAdded Bzip ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Bzip available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) = x86 {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				bzip2-1.0.6-r1a3-x86-gcc4-2011-05-24.zip
+				: $(baseURL)/bzip2-1.0.6-r1a3-x86-gcc4-2011-05-24.zip
+				: : true ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				bzip2-1.0.6-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/bzip2-1.0.6-r1a3-x86-gcc2-2011-05-17.zip
+				: : true ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
-			bzip2-1.0.6-r1a3-x86-gcc4-2011-05-24.zip
-			: $(baseURL)/bzip2-1.0.6-r1a3-x86-gcc4-2011-05-24.zip
+			bzip2-1.0.6-x86_64-2012-08-16.zip
+			: $(baseURL)/bzip2-1.0.6-x86_64-2012-08-16.zip
 			: : true ;
 	} else {
-		InstallOptionalHaikuImagePackage
-			bzip2-1.0.6-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/bzip2-1.0.6-r1a3-x86-gcc2-2011-05-17.zip
-			: : true ;
+		Echo "No optional package Bzip available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -641,81 +648,118 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 
 
 # DevelopmentBase
-if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
-		&& $(TARGET_ARCH) = x86 {
-	# gcc and binutils
-	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
+if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
+	if $(TARGET_ARCH) = x86 {
+		# gcc and binutils
+		if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
+			InstallOptionalHaikuImagePackage
+				gcc-2.95.3-x86-gcc2-2011-11-22.zip
+				: $(baseURL)/gcc-2.95.3-x86-gcc2-2011-11-22.zip ;
+		}
+
+		if $(HAIKU_GCC_VERSION[1]) = 2 {
+			# symlink to the appropriate system/lib[/gcc2] folder
+			AddSymlinkToHaikuHybridImage
+				develop abi x86 gcc2 tools gcc-2.95.3-haiku-111122 lib
+				: /system/lib libstdc++.r4.so : : true ;
+		}
+
+		if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
+			InstallOptionalHaikuImagePackage
+				gcc-4.6.2-x86-gcc4-2012-01-21.zip
+				: $(baseURL)/gcc-4.6.2-x86-gcc4-2012-01-21.zip ;
+		}
+
+		if $(HAIKU_GCC_VERSION[1]) = 4 {
+			# symlink cpp to g++'s headers
+			AddSymlinkToHaikuHybridImage develop abi x86 gcc4 headers
+				: ../tools/current/include/g++ : cpp ;
+
+			# symlink to the appropriate system/lib[/gcc4] folder
+			local libs = libstdc++.so libsupc++.so ;
+			for lib in $(libs) {
+				AddSymlinkToHaikuHybridImage
+					develop abi x86 gcc4 tools gcc-4.6.2-haiku-120121 lib
+					: /system/lib $(lib) : : true ;
+			}
+		}
+
+		# other commonly used tools
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				bison-2.4.3-r1a3-x86-gcc4-2011-05-23.zip
+				: $(baseURL)/bison-2.4.3-r1a3-x86-gcc4-2011-05-23.zip ;
+			InstallOptionalHaikuImagePackage
+				m4-1.4.16-r1a3-x86-gcc4-2011-05-23.zip
+				: $(baseURL)/m4-1.4.16-r1a3-x86-gcc4-2011-05-23.zip ;
+			InstallOptionalHaikuImagePackage
+				flex-2.5.35-r1a3-x86-gcc4-2011-05-23.zip
+				: $(baseURL)/flex-2.5.35-r1a3-x86-gcc4-2011-05-23.zip ;
+			InstallOptionalHaikuImagePackage
+				jam-2.5-x86-gcc4-2011-12-26.zip
+				: $(baseURL)/jam-2.5-x86-gcc4-2011-12-26.zip ;
+			InstallOptionalHaikuImagePackage
+				mkdepend-1.7-r1a3-x86-gcc4-2011-05-23.zip
+				: $(baseURL)/mkdepend-1.7-r1a3-x86-gcc4-2011-05-23.zip ;
+			InstallOptionalHaikuImagePackage
+				make-3.82-r1a3-x86-gcc4-2011-05-23.zip
+				: $(baseURL)/make-3.82-r1a3-x86-gcc4-2011-05-23.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				bison-2.4.3-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/bison-2.4.3-r1a3-x86-gcc2-2011-05-17.zip ;
+			InstallOptionalHaikuImagePackage
+				m4-1.4.16-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/m4-1.4.16-r1a3-x86-gcc2-2011-05-17.zip ;
+			InstallOptionalHaikuImagePackage
+				flex-2.5.35-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/flex-2.5.35-r1a3-x86-gcc2-2011-05-17.zip ;
+			InstallOptionalHaikuImagePackage
+				jam-2.5-x86-gcc2-2011-12-26.zip
+				: $(baseURL)/jam-2.5-x86-gcc2-2011-12-26.zip ;
+			InstallOptionalHaikuImagePackage
+				mkdepend-1.7-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/mkdepend-1.7-r1a3-x86-gcc2-2011-05-17.zip ;
+			InstallOptionalHaikuImagePackage
+				make-3.82-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/make-3.82-r1a3-x86-gcc2-2011-05-17.zip ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		# gcc and binutils
 		InstallOptionalHaikuImagePackage
-			gcc-2.95.3-x86-gcc2-2011-11-22.zip
-			: $(baseURL)/gcc-2.95.3-x86-gcc2-2011-11-22.zip ;
-	}
+			gcc-4.6.2-x86_64-2012-08-16.zip
+			: $(baseURL)/gcc-4.6.2-x86_64-2012-08-16.zip ;
 
-	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		# symlink to the appropriate system/lib[/gcc2] folder
-		AddSymlinkToHaikuHybridImage
-			develop abi x86 gcc2 tools gcc-2.95.3-haiku-111122 lib
-			: /system/lib libstdc++.r4.so : : true ;
-	}
-
-	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
-		InstallOptionalHaikuImagePackage
-			gcc-4.6.2-x86-gcc4-2012-01-21.zip
-			: $(baseURL)/gcc-4.6.2-x86-gcc4-2012-01-21.zip ;
-	}
-
-	if $(HAIKU_GCC_VERSION[1]) = 4 {
 		# symlink cpp to g++'s headers
-		AddSymlinkToHaikuHybridImage develop abi x86 gcc4 headers
+		AddSymlinkToHaikuHybridImage develop abi x86_64 gcc4 headers
 			: ../tools/current/include/g++ : cpp ;
 
 		# symlink to the appropriate system/lib[/gcc4] folder
 		local libs = libstdc++.so libsupc++.so ;
 		for lib in $(libs) {
 			AddSymlinkToHaikuHybridImage
-				develop abi x86 gcc4 tools gcc-4.6.2-haiku-120121 lib
+				develop abi x86_64 gcc4 tools gcc-4.6.2-haiku-120816 lib
 				: /system/lib $(lib) : : true ;
 		}
-	}
 
-	# other commonly used tools
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			bison-2.4.3-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/bison-2.4.3-r1a3-x86-gcc4-2011-05-23.zip ;
+			bison-2.5-x86_64-2012-08-12.zip
+			: $(baseURL)/bison-2.5-x86_64-2012-08-12.zip ;
 		InstallOptionalHaikuImagePackage
-			m4-1.4.16-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/m4-1.4.16-r1a3-x86-gcc4-2011-05-23.zip ;
+			m4-1.4.16-x86_64-2012-08-12.zip
+			: $(baseURL)/m4-1.4.16-x86_64-2012-08-12.zip ;
 		InstallOptionalHaikuImagePackage
-			flex-2.5.35-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/flex-2.5.35-r1a3-x86-gcc4-2011-05-23.zip ;
+			flex-2.5.35-x86_64-2012-08-12.zip
+			: $(baseURL)/flex-2.5.35-x86_64-2012-08-12.zip ;
 		InstallOptionalHaikuImagePackage
-			jam-2.5-x86-gcc4-2011-12-26.zip
-			: $(baseURL)/jam-2.5-x86-gcc4-2011-12-26.zip ;
+			jam-2.5-x86_64-2012-08-12.zip
+			: $(baseURL)/jam-2.5-x86_64-2012-08-12.zip ;
 		InstallOptionalHaikuImagePackage
-			mkdepend-1.7-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/mkdepend-1.7-r1a3-x86-gcc4-2011-05-23.zip ;
+			mkdepend-1.7-x86_64-2012-08-14.zip
+			: $(baseURL)/mkdepend-1.7-x86_64-2012-08-14.zip ;
 		InstallOptionalHaikuImagePackage
-			make-3.82-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/make-3.82-r1a3-x86-gcc4-2011-05-23.zip ;
-	} else {
-		InstallOptionalHaikuImagePackage
-			bison-2.4.3-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/bison-2.4.3-r1a3-x86-gcc2-2011-05-17.zip ;
-		InstallOptionalHaikuImagePackage
-			m4-1.4.16-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/m4-1.4.16-r1a3-x86-gcc2-2011-05-17.zip ;
-		InstallOptionalHaikuImagePackage
-			flex-2.5.35-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/flex-2.5.35-r1a3-x86-gcc2-2011-05-17.zip ;
-		InstallOptionalHaikuImagePackage
-			jam-2.5-x86-gcc2-2011-12-26.zip
-			: $(baseURL)/jam-2.5-x86-gcc2-2011-12-26.zip ;
-		InstallOptionalHaikuImagePackage
-			mkdepend-1.7-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/mkdepend-1.7-r1a3-x86-gcc2-2011-05-17.zip ;
-		InstallOptionalHaikuImagePackage
-			make-3.82-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/make-3.82-r1a3-x86-gcc2-2011-05-17.zip ;
+			make-3.82-x86_64-2012-08-11.zip
+			: $(baseURL)/make-3.82-x86_64-2012-08-11.zip ;
 	}
 }
 
@@ -742,7 +786,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
 
 
 # DevelopmentMin
-if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
+if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
+		&& ( $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 ) {
 	if ! ( $(HAIKU_GCC_VERSION[1]) in 2 4 ) {
 		Exit "Optional package DevelopmentMin: Unsupported GCC version:"
 			$(HAIKU_GCC_VERSION[1]) ;
@@ -1657,16 +1702,22 @@ if [ IsOptionalHaikuImagePackageAdded Ruby ] {
 
 # Sed
 if [ IsOptionalHaikuImagePackageAdded Sed ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Sed available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) = x86 {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				sed-4.2.1-r1a3-x86-gcc4-2011-05-24.zip
+				: $(baseURL)/sed-4.2.1-r1a3-x86-gcc4-2011-05-24.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				sed-4.2.1-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/sed-4.2.1-r1a3-x86-gcc2-2011-05-17.zip ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
-			sed-4.2.1-r1a3-x86-gcc4-2011-05-24.zip
-			: $(baseURL)/sed-4.2.1-r1a3-x86-gcc4-2011-05-24.zip ;
+			sed-4.2.1-x86_64-2012-08-14.zip
+			: $(baseURL)/sed-4.2.1-x86_64-2012-08-14.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage
-			sed-4.2.1-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/sed-4.2.1-r1a3-x86-gcc2-2011-05-17.zip ;
+		Echo "No optional package Sed available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1727,9 +1778,7 @@ if [ IsOptionalHaikuImagePackageAdded TagLib ] {
 
 # Tar
 if [ IsOptionalHaikuImagePackageAdded Tar ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Tar available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				tar-1.26-x86-gcc4-2012-06-19.zip
@@ -1739,6 +1788,12 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 				tar-1.26-x86-gcc2-2012-06-21.zip
 				: $(baseURL)/tar-1.26-x86-gcc2-2012-06-21.zip ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			tar-1.26-x86_64-2012-08-12.zip
+			: $(baseURL)/tar-1.26-x86_64-2012-08-12.zip ;
+	} else {
+		Echo "No optional package Tar available for $(TARGET_ARCH)" ;
 	}
 }
 

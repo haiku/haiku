@@ -17,7 +17,7 @@ BeMac|BeBox)
 	BE_HOST_CPU=ppc
 	;;
 *)
-	BE_HOST_CPU=unknown
+	BE_HOST_CPU=`uname -m`
 esac
 
 BELIBRARIES="$BUILDHOME/abi/current/library-paths/common:$BUILDHOME/lib/$BE_HOST_CPU"
