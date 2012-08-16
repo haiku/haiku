@@ -1,0 +1,14 @@
+#ifndef _HAIKU_BUILD_COMPATIBILITY_DARWIN_DIRENT
+#define _HAIKU_BUILD_COMPATIBILITY_DARWIN_DIRENT
+
+
+#include_next <dirent.h>
+
+
+__BEGIN_DECLS
+
+DIR* fdopendir(int fd);
+
+__END_DECLS
+
+#endif	// _HAIKU_BUILD_COMPATIBILITY_DARWIN_DIRENT

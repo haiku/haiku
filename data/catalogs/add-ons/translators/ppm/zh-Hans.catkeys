@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PPMTranslator	2886727868
+1	english	x-vnd.Haiku-PPMTranslator	2435270880
 PPM Settings	PPMMain		PPM 设置
 Based on PPMTranslator sample code	PPMTranslator		基于 PPM转换器 示例代码
 OK	PPMMain		确定
@@ -6,7 +6,6 @@ Grayscale 8 bits	PPMTranslator		灰度 8 bits
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
 PPM image	PPMTranslator		PPM 图像
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
-PPM Image Translator	PPMTranslator		PPM 图像转换器
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be 位图格式（PPM 转换器）
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits

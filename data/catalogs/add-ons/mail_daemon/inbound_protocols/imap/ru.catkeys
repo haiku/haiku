@@ -1,0 +1,8 @@
+1	russian	x-vnd.Haiku-IMAP	4105475134
+status	IMAPFolderConfig		статус
+Apply	IMAPFolderConfig		Применить
+IMAP Folders	imap_config		IMAP папки
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Запрашиваются IMAP папки, имейте терпение...
+IMAP Folders	IMAPFolderConfig		IMAP папки
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Подписать / Отписать IMAP папки, имейте терпение...
+Failed to fetch available storage.	IMAPFolderConfig		Не удалось запросить доступное пространство.

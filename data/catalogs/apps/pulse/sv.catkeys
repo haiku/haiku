@@ -1,48 +1,48 @@
 1	swedish	x-vnd.Haiku-Pulse	2324471783
-%.2f GHz	NormalPulseView		%.2f GHz
-%ld MHz	NormalPulseView		%ld MHz
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nAv David Ramsey och Arve Hjønnevåg\nReviderad av Daniel Switkin\n
-About Pulse…	CPUButton		Om Puls...
-About Pulse…	PulseView		Om Puls...
-Active color	ConfigView		Aktiv färg
-Bar colors	ConfigView		Bandfärg
-CPU progress bar	NormalPulseView		CPU progressband
-Defaults	PrefsWindow		Förval
-Deskbar	CPUButton		Deskbar
-Deskbar menu	CPUButton		Deskbar meny
-Deskbar mode	MiniPulseView		Deskbar-läge
-Deskbar mode	NormalPulseView		Deskbar-läge
-Deskbar mode	PrefsWindow		Deskbar-läge
-Error	PulseApp		Fel
-Fade colors	ConfigView		Tona färger
-Frame color	ConfigView		Ramfärg
-Idle color	ConfigView		Overksam färg
-Info	CPUButton		Information
-Info	DeskbarPulseView		Information
-Info	PulseApp		Information
-Info	PulseView		Information
-Installing in Deskbar failed\n%s	PulseApp		Misslyckades att installera i Deskbar\n%s
-Mini mode	DeskbarPulseView		Komprimerat läge
-Mini mode	NormalPulseView		Komprimerat läge
-Mini mode	PrefsWindow		Komprimerat läge
-Normal mode	DeskbarPulseView		Normalläge
-Normal mode	MiniPulseView		Normalläge
-Normal mode	PrefsWindow		Normalläge
-OK	CPUButton		OK
-OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
-OK	PulseApp		OK
-OK	PulseView		OK
-Pulse	NormalPulseView		Puls
-Pulse	PulseApp		Puls
-Pulse	System name		Puls
-Pulse settings	PulseWindow		Pulsinställningar
 Quit	DeskbarPulseView		Avsluta
-Quit	MiniPulseView		Avsluta
+Mini mode	DeskbarPulseView		Komprimerat läge
 Remove replicant	CPUButton		Ta bort replikant
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Misslyckades att ta bort från Deskbar.\n%s
-Settings…	PulseView		Inställningar...
+Active color	ConfigView		Aktiv färg
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Hantering: Pulse [--mini] [-w bredd] [--width=bredd]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Tona färger
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nAv David Ramsey och Arve Hjønnevåg\nReviderad av Daniel Switkin\n
+OK	DeskbarPulseView		OK
+Deskbar mode	PrefsWindow		Deskbar-läge
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		Normalläge
+Defaults	PrefsWindow		Förval
+Normal mode	MiniPulseView		Normalläge
+Error	PulseApp		Fel
+Info	PulseView		Information
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		Ramfärg
+Mini mode	PrefsWindow		Komprimerat läge
+OK	PulseApp		OK
+Bar colors	ConfigView		Bandfärg
+Settings…	PulseView		Inställningar...
+You can't disable the last active CPU.	PulseView		Du kan inte inaktivera den sista aktiva CPUn.
+Info	PulseApp		Information
+Info	CPUButton		Information
+OK	PulseView		OK
+Deskbar menu	CPUButton		Deskbar meny
+About Pulse…	PulseView		Om Puls...
+Deskbar mode	MiniPulseView		Deskbar-läge
+Quit	MiniPulseView		Avsluta
+Pulse	System name		Puls
+Pulse	NormalPulseView		Puls
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Deskbar-läge
+Pulse	PulseApp		Puls
 Width of icon:	ConfigView		Ikonbredd:
 You can't disable the last active CPU.	CPUButton		Du kan inte inaktivera den sista aktiva CPUn.
-You can't disable the last active CPU.	PulseView		Du kan inte inaktivera den sista aktiva CPUn.
+Normal mode	DeskbarPulseView		Normalläge
+OK	CPUButton		OK
+About Pulse…	CPUButton		Om Puls...
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Misslyckades att ta bort från Deskbar.\n%s
+Mini mode	NormalPulseView		Komprimerat läge
+Info	DeskbarPulseView		Information
+Pulse settings	PulseWindow		Pulsinställningar
+Idle color	ConfigView		Overksam färg
+Installing in Deskbar failed\n%s	PulseApp		Misslyckades att installera i Deskbar\n%s
+CPU progress bar	NormalPulseView		CPU progressband

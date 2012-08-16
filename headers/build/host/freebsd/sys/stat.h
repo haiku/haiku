@@ -3,7 +3,6 @@
 
 
 #include_next <sys/stat.h>
-
 #include <sys/cdefs.h>
 
 
@@ -14,7 +13,7 @@
 	__BEGIN_DECLS
 
 	/* assume that futimens() and utimensat() aren't available */
-	int	futimens(int fd, const struct timespec times[2]);
+	int futimens(int fd, const struct timespec times[2]);
 	int utimensat(int fd, const char* path, const struct timespec times[2],
 		int flag);
 
@@ -27,6 +26,5 @@
 #		define _HAIKU_BUILD_NO_UTIMENSAT	1
 #	endif
 #endif
-
 
 #endif	/* _HAIKU_BUILD_COMPATIBILITY_FREEBSD_SYS_STAT */

@@ -5,17 +5,9 @@
 #ifndef REMAPPED_FUNCTIONS_H
 #define REMAPPED_FUNCTIONS_H
 
-
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/stat.h>
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 int		_haiku_build_fchmod(int fd, mode_t mode);
 int		_haiku_build_fchmodat(int fd, const char* path, mode_t mode, int flag);
@@ -52,7 +44,6 @@ int		_haiku_build_openat(int fd, const char* path, int openMode,
 int		_haiku_build_fcntl(int fd, int op, int argument);
 int		_haiku_build_renameat(int fromFD, const char* from, int toFD,
 			const char* to);
-
 
 #ifdef __cplusplus
 } // extern "C"

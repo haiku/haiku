@@ -1,1 +1,27 @@
-1	swedish	x-vnd.Haiku-mixer.media_addon	0
+1	swedish	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Input volymkontroll representation
+Linear interpolation	AudioMixer		Linjär interpolering
+Virtual output channels	AudioMixer		Virtuella utkanaler
+Refuse output format changes	AudioMixer		Tillåt inte utformatändringar
+Output mapping	AudioMixer		Utgångs mappning
+Allow input channel remapping	AudioMixer		Tillåt ingång remapping
+Resampling algorithm	AudioMixer		Omsamplings algoritm
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Dämpa mixerns utsignal med 3dB (som i BeOS R5)
+Display balance control for stereo connections	AudioMixer		Visa balanskontroll för stereoanslutningar
+To output	AudioMixer		Till utgång
+not connected	AudioMixer		ej ansluten
+Refuse input format changes	AudioMixer		Tillåt inte informatsändringar
+Drop/repeat samples	AudioMixer		Ta bort/gör om samplingen
+Output channel sources	AudioMixer		Källa till utgångs kanaler
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Volymkontroller
+Input mapping	AudioMixer		Ingångs mappning
+Mute	AudioMixer		Tyst
+Input channel destinations	AudioMixer		Ingångskanalens mål
+To master	AudioMixer		Till huvudkanal
+Master output	AudioMixer		Utgång för huvudkanal
+Setup	AudioMixer		Inställningar
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Använd icke-linjärna volymkontroller (som i BeOS R5)
+Gain	AudioMixer		Volym
+Allow output channel remapping	AudioMixer		Tillåt ommappning av utgående kanal
+Physical input channels	AudioMixer		Fysiska ingångskanaler

@@ -448,6 +448,9 @@ WorkspacesView::MouseDown(BMessage* message, BPoint where)
 	BRect windowFrame;
 	BPoint leftTop;
 	while (workspace.GetPreviousWindow(window, leftTop) == B_OK) {
+		if (window->IsMinimized() || window->IsHidden())
+			continue;
+
 		BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame(),
 			leftTop);
 		if (frame.Contains(where) && window->Feel() != kDesktopWindowFeel

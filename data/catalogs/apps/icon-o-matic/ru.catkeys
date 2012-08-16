@@ -40,7 +40,7 @@ Remove Paths	Icon-O-Matic-RemovePathsCmd		Удалить контуры
 Scale Y	Icon-O-Matic-PropertyNames		Масштабировать по Y
 Add Control Point	Icon-O-Matic-AddPointCmd		Добавить точку управления
 Untitled	Icon-O-Matic-Main		Новый значок
-Multi Set 	Multi Set (property name)		Множество
+Multi Set 	Multi Set (property name)		Множество 
 any of the other lists to	Empty property list - 2nd line		любом другом списке для того,
 Save as…	Icon-O-Matic-Menu-File		Сохранить как…
 Change Color	Icon-O-Matic-SetColorCmd		Изменить цвет
@@ -58,7 +58,7 @@ PNG Set	Icon-O-Matic-SavePanel		Набор PNG
 Joins	Icon-O-Matic-PropertyNames		Соединения
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Удалить стиль
 Scale X	Icon-O-Matic-PropertyNames		Масштабировать по X
-Set 	Set (property name)		Множество
+Set 	Set (property name)		Множество 
 Cancel	Icon-O-Matic-SVGExport		Отмена
 Add shape with style	Icon-O-Matic-Menu-Shape		Добавить форму со стилем
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Удалить форму

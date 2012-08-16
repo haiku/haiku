@@ -1,0 +1,16 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-NewMailNotification	3624191291
+%num new message	filter		%num ny melding
+%num new messages	filter		%num nye meldinger
+Keyboard LEDs	ConfigView		LED på tastaturet
+You have %num new messages for %name.	filter		Du har %num nye meldinger til %name.
+You have %num new message for %name.	filter		Du har %num ny melding til %name.
+Log window	ConfigView		Logg-vindu
+Central beep	ConfigView		Sentral pipetone
+Beep	ConfigView		Pipetone
+Method:	ConfigView		Metode:
+Central alert	ConfigView		Sentral varsling
+Alert	ConfigView		Varsling
+none	ConfigView		ingen
+New messages	filter		Nye meldinger
+New mails notification	ConfigView		Varsling om ny e-post
+OK	filter		OK

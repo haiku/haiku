@@ -1,9 +1,9 @@
 1	swedish	x-vnd.Haiku-IMAP	3892875357
-Apply	IMAPFolderConfig		Använd
 Destination:	imap_config		Mål:
-Failed to fetch available storage.	IMAPFolderConfig		Misslyckades att hämta tillgängligt lagringsutrymme.
+status	IMAPFolderConfig		status
+Apply	IMAPFolderConfig		Använd
+IMAP Folders	imap_config		IMAP mappar
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Hämtar IMAP mappar, vänligen vänta...
 IMAP Folders	IMAPFolderConfig		IMAP mappar
-IMAP Folders	imap_config		IMAP mappar
 Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Prenumererar/avprenumererar på IMAP mappar, vänligen vänta...
-status	IMAPFolderConfig		status
+Failed to fetch available storage.	IMAPFolderConfig		Misslyckades att hämta tillgängligt lagringsutrymme.

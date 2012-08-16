@@ -1,8 +1,8 @@
-1	russian	x-vnd.Haiku-PCXTranslator	1002061545
+1	russian	x-vnd.Haiku-PCXTranslator	938242683
 PCX Settings	main		Настройки PCX транслятора
-PCX translator	PCXTranslator		Транслятор PCX изображений
 Version %d.%d.%d, %s	ConfigView		Версия %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		Настройки PCX транслятора
+PCX image translator	PCXTranslator		Транслятор PCX изображений
 PCX %lu bit image	PCXTranslator		PCX %lu битное изображение
-PCX images	ConfigView		PCX изображения
 PCX images	PCXTranslator		PCX изображения
+PCX image translator	ConfigView		Транслятор PCX изображений

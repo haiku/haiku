@@ -1339,7 +1339,7 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 
 STXTTranslator::STXTTranslator()
 	: BaseTranslator(B_TRANSLATE("StyledEdit files"), 
-		B_TRANSLATE("StyledEdit files translator"),
+		B_TRANSLATE("StyledEdit file translator"),
 		STXT_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

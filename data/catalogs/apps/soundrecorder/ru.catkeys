@@ -15,7 +15,7 @@ Sound List	RecorderWindow		Список звуков
 Compression: 	RecorderWindow		Сжатие: 
 Rewind	RecorderWindow		Перемотка
 Sample rate:	RecorderWindow		Частота дискретизации:
-Invalid audio files	RecorderWindow		Неверные аудио файлы
+Invalid audio files	RecorderWindow		Некорректные аудио файлы
  seconds	RecorderWindow		 секунд
 OK	RecorderWindow		ОК
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Невозможно открыть временный файл, созданный для хранения новой записи

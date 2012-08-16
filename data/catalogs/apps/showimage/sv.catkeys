@@ -1,62 +1,62 @@
 1	swedish	x-vnd.Haiku-ShowImage	886873119
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekunder
-Browse	Menus		Bläddra
-Cancel	ClosePrompt		Avbryt
-Clear selection	Menus		Rensa markering
-Close	ClosePrompt		Stäng
-Close	Menus		Stäng
-Close document	ClosePrompt		Stäng dokument
-Copy	Menus		Kopiera
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunde inte ladda bilden! Endera finns inte filen eller så saknas en bildöversättare för bildformatet.
-DPI:	PrintOptionsWindow		DPI:
-Edit	Menus		Redigera
+Use as background…	Menus		Använd som bakgrund…
 File	Menus		Arkiv
-First page	Menus		Första sidan
-Fit image to page	PrintOptionsWindow		Anpassa bild till sida
-Fit to window	Menus		Anpassa till fönster
-Flip left to right	Menus		Vänd åt sidan
-Flip top to bottom	Menus		Vänd upp och ner
+Slide delay	Menus		Bildspelsfördröjning
+Selection mode	Menus		Markeringsläge
+Zoom in	Menus		Zooma in
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har ändrats. Vill du verkligen stänga dokumentet?
+Page setup…	Menus		Sidinställningar...
+Print…	Menus		Skriv ut...
+OK	SaveToFile		Okej
+Previous page	Menus		Tidigare sida
+View	Menus		Visa
 Full screen	Menus		Fullskärm
 Go to page	Menus		Gå till sida
-Height: 	PrintOptionsWindow		Höjd: 
-High-quality zooming	Menus		Högkvalitets inzomning
-Image	Menus		Bild
-Job setup	PrintOptionsWindow		Utskriftsinställningar
-Last page	Menus		Sista sidan
-Leave full screen	Menus		Lämna fullskärmsläge
-Next file	Menus		Nästa fil
-Next page	Menus		Nästa sida
-OK	Alerts		OK
-OK	SaveToFile		Okej
-Open…	Menus		Öppna...
-Original size	Menus		Originalstorlek
-Page setup…	Menus		Sidinställningar...
-Previous file	Menus		Föregående fil
-Previous page	Menus		Tidigare sida
-Print options	PrintOptionsWindow		Utskriftsalternativ
-Print…	Menus		Skriv ut...
-Progress monitor	ProgressWindow		Förloppsmonitor
-Quit	Menus		Avsluta
-Rating	Menus		Betyg
-Resize to (in 1/72 inches):	PrintOptionsWindow		Ändra storlek till (i måttenheten 1/72 tum):
-Rotate clockwise	Menus		Rotera medurs
-Rotate counterclockwise	Menus		Rotera moturs
-Save as…	Menus		Spara som...
-Select all	Menus		Markera allt
-Selection mode	Menus		Markeringsläge
-Show caption in full screen mode	Menus		Visa rubrik i helskärmsläge
-Show tool bar	Menus		Visa verktygsfält
-ShowImage	System name		BildVisning
-Slide delay	Menus		Bildspelsfördröjning
-Slide show	Menus		Bildspel
-Stretch to window	Menus		Sträck ut i fönster
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har ändrats. Vill du verkligen stänga dokumentet?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har ändrats. Vill du verkligen stänga dokumentet?
-The file '%s' could not be written.	SaveToFile		Filen '%s' kunde inte skrivas.
-Undo	Menus		Ångra
-Use as background…	Menus		Använd som bakgrund…
-View	Menus		Visa
-Width:	PrintOptionsWindow		Bredd:
-Zoom factor in %:	PrintOptionsWindow		Zoomläge i %:
-Zoom in	Menus		Zooma in
 Zoom out	Menus		Zooma ut
+Quit	Menus		Avsluta
+Rotate counterclockwise	Menus		Rotera moturs
+High-quality zooming	Menus		Högkvalitets inzomning
+Browse	Menus		Bläddra
+Edit	Menus		Redigera
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunde inte ladda bilden! Endera finns inte filen eller så saknas en bildöversättare för bildformatet.
+First page	Menus		Första sidan
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har ändrats. Vill du verkligen stänga dokumentet?
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekunder
+Leave full screen	Menus		Lämna fullskärmsläge
+Close	Menus		Stäng
+Close	ClosePrompt		Stäng
+Undo	Menus		Ångra
+Resize to (in 1/72 inches):	PrintOptionsWindow		Ändra storlek till (i måttenheten 1/72 tum):
+Rating	Menus		Betyg
+Flip left to right	Menus		Vänd åt sidan
+Show caption in full screen mode	Menus		Visa rubrik i helskärmsläge
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		Öppna...
+Next file	Menus		Nästa fil
+Clear selection	Menus		Rensa markering
+Close document	ClosePrompt		Stäng dokument
+Height: 	PrintOptionsWindow		Höjd: 
+The file '%s' could not be written.	SaveToFile		Filen '%s' kunde inte skrivas.
+Cancel	ClosePrompt		Avbryt
+Show tool bar	Menus		Visa verktygsfält
+Fit to window	Menus		Anpassa till fönster
+Print options	PrintOptionsWindow		Utskriftsalternativ
+Copy	Menus		Kopiera
+Progress monitor	ProgressWindow		Förloppsmonitor
+Last page	Menus		Sista sidan
+Stretch to window	Menus		Sträck ut i fönster
+Previous file	Menus		Föregående fil
+ShowImage	System name		BildVisning
+Slide show	Menus		Bildspel
+Fit image to page	PrintOptionsWindow		Anpassa bild till sida
+Flip top to bottom	Menus		Vänd upp och ner
+Select all	Menus		Markera allt
+Zoom factor in %:	PrintOptionsWindow		Zoomläge i %:
+Width:	PrintOptionsWindow		Bredd:
+Image	Menus		Bild
+OK	Alerts		OK
+Rotate clockwise	Menus		Rotera medurs
+Job setup	PrintOptionsWindow		Utskriftsinställningar
+Original size	Menus		Originalstorlek
+Next page	Menus		Nästa sida
+Save as…	Menus		Spara som...

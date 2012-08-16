@@ -1,9 +1,8 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-TGATranslator	4159874267
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-TGATranslator	2221210336
 Targa image (%d bits truecolor)	TGATranslator		Targa-bilde (%d bit truecolor)
 Version %d.%d.%d %s	TGAView		Versjon %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Ignorer TGA alfakanal
 Targa image (%d bits colormap)	TGATranslator		Targa-bilde (%d bit colormap)
-TGA Image Translator	TGAView		TGA Bilde translator
 Targa image (%d bits RLE colormap)	TGATranslator		Targa-bilde (%d bit RLE colormap)
 Targa image (%d bits gray)	TGATranslator		Targa-bilde (%d bit gråtone)
 Written by the Haiku Translation Kit Team	TGAView		Skrevet av Haikus Translation Kit-team

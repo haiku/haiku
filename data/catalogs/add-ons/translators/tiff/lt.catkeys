@@ -1,9 +1,8 @@
-1	lithuanian	x-vnd.Haiku-TIFFTranslator	292291870
+1	lithuanian	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nepavyko nustatyti katalogo\n
 TIFF image	TIFFTranslator		TIFF paveikslas
 TIFF Library:	TIFFView		TIFF biblioteka:
-TIFF Image Translator	TIFFView		TIFF paveikslų keitiklis
 None	TIFFView		jokio
 TIFF images	TIFFTranslator		TIFF paveikslai
 TIFFTranslator Settings	TIFFTranslator		TIFF keitiklio nuostatos

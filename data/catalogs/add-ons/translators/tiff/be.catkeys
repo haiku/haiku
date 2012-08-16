@@ -1,9 +1,8 @@
-1	belarusian	x-vnd.Haiku-TIFFTranslator	292291870
+1	belarusian	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: немагчыма пераключыць каталог\n
 TIFF image	TIFFTranslator		Выява TIFF
 TIFF Library:	TIFFView		Бібліятэка TIFF:
-TIFF Image Translator	TIFFView		Канвертар выяваў TIFF
 None	TIFFView		Адсутнічае
 TIFF images	TIFFTranslator		Выявы TIFF
 TIFFTranslator Settings	TIFFTranslator		Наладкі канвертара выяваў TIFF

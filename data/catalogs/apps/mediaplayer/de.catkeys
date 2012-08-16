@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	4127722853
+1	german	x-vnd.Haiku-MediaPlayer	2969013755
 raw audio	MediaPlayer-InfoWin		Raw-Audio
 Location	MediaPlayer-InfoWin		Ort
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
@@ -72,6 +72,7 @@ Stop playing.	MediaPlayer-Main		Wiedergabe stoppen.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Die Datei '%filename' konnte nicht geöffnet werden.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Fehler: 
 Audio	MediaPlayer-InfoWin		Audio
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Fehler beim Verschieben in den Papierkorb
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (falsche Nachrichtenstruktur). Speichern der Playliste fehlgeschlagen.
 Skip to the previous track.	MediaPlayer-Main		Zum vorigen Track springen.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in %app% aufgetreten. Die Datei konnte nicht geöffnet werden.

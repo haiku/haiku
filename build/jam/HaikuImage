@@ -128,7 +128,7 @@ SYSTEM_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant
 SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
 	PCXTranslator PNGTranslator PPMTranslator
-	RAWTranslator RTF-Translator SGITranslator STXTTranslator TGATranslator
+	RAWTranslator RTFTranslator SGITranslator STXTTranslator TGATranslator
 	TIFFTranslator WebPTranslator WonderBrushTranslator
 ;
 SYSTEM_ADD_ONS_LOCALE_CATALOGS = <catalog-addon>plaintext ;

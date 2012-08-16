@@ -1,9 +1,9 @@
-1	russian	x-vnd.Haiku-EXRTranslator	3390292316
+1	russian	x-vnd.Haiku-EXRTranslator	106859695
 Version %d.%d.%d, %s	ConfigView		Версия %d.%d.%d, %s
 EXR image translator	EXRTranslator		Транслятор EXR изображений
 Based on OpenEXR (http://www.openexr.com)	ConfigView		Основано на OpenEXR (http://www.openexr.com)
 EXR Settings	main		Настройки EXR транслятора
-EXR Images	EXRTranslator		EXR изображения
+EXR images	EXRTranslator		EXR изображения
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		подразделение компании Lucasfilm Entertainment Ltd
-EXR Images	ConfigView		Транслятор EXR изображений
 EXR image	EXRTranslator		EXR изображение
+EXR image translator	ConfigView		Транслятор EXR изображений

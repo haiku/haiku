@@ -1,9 +1,10 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	2163563541
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	3652047890
 Manufacturer	DeviceSCSI		Produsent
 Order by:	DevicesView		Sorter etter:
 ACPI controller	Device		ACPI-kontroller
 Memory controller	Device		Minnekontroller
-Driver used	DevicePCI		Driver brukt
+Driver used	DevicePCI		Driver i bruk
+CD-ROM	DeviceSCSI		CD-ROM
 ISA bus	Device		ISA-buss
 ACPI bus	Device		ACPI-buss
 ISA bus	DevicesView		ISA-buss
@@ -12,26 +13,35 @@ Computer	Device		Datamaskin
 Unknown device	Device		Ukjent enhet
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klasseinformasjon:\t\t\t\t: %classInfo%
 Processor	DeviceSCSI		Prosessor
+RBC	DeviceSCSI		RBC
 Detailed	DevicesView		Detaljert
 Category	DevicesView		Kategori
 Quit	DevicesView		Avslutt
 Device paths	Device		Enhetsti
+Scanner	DeviceSCSI		Scanner
+Printer	DeviceSCSI		Skriver
 Processor	Device		Prosessor
+Optical Drive	DeviceSCSI		Optisk stasjon
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessor-navnerom '%2'
+Bridge	DeviceSCSI		Bro
 unknown	Device		ukjent
 ACPI Information	DeviceACPI		ACPI-informasjon
 Generic system peripheral	Device		Generisk ekstern enhet
 Not implemented	DevicePCI		Ikke implementert
+Disk Drive	DeviceSCSI		Diskstasjon
 Not implemented	DeviceACPI		Ikke implementert
 Device name	DevicePCI		Enhetsnavn
 Display controller	Device		Skjermkontroller
-Mass storage controller	Device		Masselagringsenhet
-Input device controller	Device		Inndata enhetskontroller
+Mass storage controller	Device		Masselagringskontroller
+Input device controller	Device		Input-enhetskontroller
 Network controller	Device		Nettverkskontroller
+Device class	DeviceSCSI		Enhetsklasse
 Device name	DeviceACPI		Enhetsnavn
 Driver used	Device		Driver brukt
+Other	DeviceSCSI		Annet
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Enhetsnavn\t\t\t\t: %Name%\nProdusent\t\t\t: %Manufacturer%\nDriver brukt\t\t\t\t: %DriverUsed%\nEnhetssti\t: %DevicePaths%
 ACPI Thermal Zone	DeviceACPI		ACPI-temperaturområde
+Communications	DeviceSCSI		Kommunikasjon
 Bus	DevicesView		Buss
 Communication controller	Device		Kommunikasjonskontroller
 Manufacturer	DeviceACPI		Produsent
@@ -54,13 +64,29 @@ Value	PropertyList		Verdi
 Report compatibility	DevicesView		Rapporter kompatibilitet
 Device	Device		Enhet
 Signal processing controller	Device		Signalbehandlingskontroller
-Serial bus controller	Device		Seriellbusskontroller
-Wireless controller	Device		Trådløs kontroller
+Serial bus controller	Device		Seriebusskontroller
+Wireless controller	Device		Trådløs-kontroller
 ACPI node '%1'	DeviceACPI		ACPI-node '%1'
 Device name	Device		Enhetsnavn
 Manufacturer	Device		Produsent
+Name	PropertyList		Navn
 Manufacturer	DevicePCI		Produsent
+Intelligent controller	Device		Intelligent kontroller
+Satellite communications controller	Device		Satellittkommunikasjonskontroller
+SCSI Information	DeviceSCSI		SCSI-informasjon
+Enclosure	DeviceSCSI		Vedlegg
+Bridge	Device		Bro
+Refresh devices	DevicesView		Oppdater enheter
 Unknown device	DevicesView		Ukjent enhet
+Graphics Peripheral	DeviceSCSI		Ekstern grafikkenhet
+Tape Drive	DeviceSCSI		Båndstasjon
+Bus Information	Device		Bussinformasjon
+Connection	DevicesView		Tilkobling
+Generate system information	DevicesView		Generer systeminformasjon
+Encryption controller	Device		Krypteringskontroller
+Unclassified device	Device		Uklassifisert enhet
 Device name	DeviceSCSI		Enhetsnavn
+Card Reader	DeviceSCSI		Kortleser
+Class info	DevicePCI		Klasseinformasjon
 Device paths	DevicePCI		Enhetsti
 Devices	DevicesView		Maskinvare

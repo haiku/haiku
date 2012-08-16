@@ -1,0 +1,9 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-IMAP	3892875357
+Destination:	imap_config		Mål:
+status	IMAPFolderConfig		status
+Apply	IMAPFolderConfig		Bruk
+IMAP Folders	imap_config		IMAP-mapper
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Henter IMAP-mapper, vent litt ...
+IMAP Folders	IMAPFolderConfig		IMAP-mapper
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Abonner / si opp IMAP-mapper, vent litt ...
+Failed to fetch available storage.	IMAPFolderConfig		Kunne ikke innhente tilgjengelig lagringsplass.

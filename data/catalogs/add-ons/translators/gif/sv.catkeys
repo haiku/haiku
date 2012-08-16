@@ -1,15 +1,15 @@
 1	swedish	x-vnd.Haiku-GIFTranslator	829368084
-Automatic (from alpha channel)	GIFView		Automatisk (från alfakanal)
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Be bitmappsformat (GIF-bildöversättare)
-BeOS system	GIFView		BeOS system
-Colors	GIFView		Färger
-GIF Settings	GIFTranslator		GIF inställningar
-GIF image	GIFTranslator		GIF-bild
-Greyscale	GIFView		Gråskala
+Websafe	GIFView		Webbsäker
+Write interlaced images	GIFView		Skriv sammanflätade bilder
 Optimal	GIFView		Optimal
+Greyscale	GIFView		Gråskala
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be bitmappsformat (GIF-bildöversättare)
+GIF image	GIFTranslator		GIF-bild
+Write transparent images	GIFView		Skriv transparenta bilder
 Palette	GIFView		Palett
 Use RGB color	GIFView		Använd RGB-färger
 Use dithering	GIFView		Använd färgsimulering
-Websafe	GIFView		Webbsäker
-Write interlaced images	GIFView		Skriv sammanflätade bilder
-Write transparent images	GIFView		Skriv transparenta bilder
+GIF Settings	GIFTranslator		GIF inställningar
+BeOS system	GIFView		BeOS system
+Automatic (from alpha channel)	GIFView		Automatisk (från alfakanal)
+Colors	GIFView		Färger

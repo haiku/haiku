@@ -1,9 +1,7 @@
-1	lithuanian	x-vnd.Haiku-RTFTranslator	526958155
+1	lithuanian	x-vnd.Haiku-RTFTranslator	3736645044
 Version %d.%d.%d, %s	ConfigView		Versija %d.%d.%d, %s
 RTF text files	RTFTranslator		RTF teksto failai
 RTF-Translator Settings	ConfigView		RTF keitiklio nuostatos
-Rich Text Format (RTF) files	ConfigView		RTF formato teksto failai
 RTF Settings	main		RTF nuostatos
 RichTextFormat file	RTFTranslator		RTF formato teksto failas
-Rich Text Format Translator	RTFTranslator		RTF keitiklis
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		RTF keitiklis, versija %d.%d.%d %s

@@ -1,9 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-TIFFTranslator	292291870
+1	dutch; flemish	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: kan directory niet plaatsen\n
 TIFF image	TIFFTranslator		TIFF afbeelding
 TIFF Library:	TIFFView		TIFF bibliotheek:
-TIFF Image Translator	TIFFView		TIFF Afbeelding Vertaler
 None	TIFFView		Geen
 TIFF images	TIFFTranslator		TIFF afbeeldingen
 TIFFTranslator Settings	TIFFTranslator		TIFFTranslator Instellingen

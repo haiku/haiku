@@ -31,8 +31,6 @@
 
 #if defined(HAIKU_HOST_PLATFORM_FREEBSD)
 #	include "fs_freebsd.h"
-#elif defined(HAIKU_HOST_PLATFORM_DARWIN)
-#	include "fs_darwin.h"
 #endif
 
 

@@ -1,1 +1,10 @@
-1	norwegian_bokmål	x-vnd.Haiku-JPEG2000Translator	0
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-JPEG2000Translator	2060367215
+Write	JPEG2000Translator		Skriv
+JPEG2000 images	JPEG2000Translator		JPEG2000-bilder
+Write black-and-white images as RGB24	JPEG2000Translator		Skriv svart-hvitt-bilder som RGB24
+Output quality	JPEG2000Translator		Output-kvalitet
+Read	JPEG2000Translator		Les
+Low	JPEG2000Translator		Lav
+About	JPEG2000Translator		Om
+High	JPEG2000Translator		Høy
+Read greyscale images as RGB32	JPEG2000Translator		Les gråtonebilder som RGB32

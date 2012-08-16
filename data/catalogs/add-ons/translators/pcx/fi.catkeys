@@ -1,8 +1,6 @@
-1	finnish	x-vnd.Haiku-PCXTranslator	1002061545
+1	finnish	x-vnd.Haiku-PCXTranslator	2307793683
 PCX Settings	main		PCX-asetukset
-PCX translator	PCXTranslator		PCX-muunnin
 Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		PCX-muunninasetukset
 PCX %lu bit image	PCXTranslator		PCX %lu-bittinen kuva
-PCX images	ConfigView		PCX-kuvat
 PCX images	PCXTranslator		PCX-kuvat

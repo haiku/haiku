@@ -1,9 +1,8 @@
-1	lithuanian	x-vnd.Haiku-TGATranslator	4159874267
+1	lithuanian	x-vnd.Haiku-TGATranslator	2221210336
 Targa image (%d bits truecolor)	TGATranslator		TGA paveikslas (%d bitų tikrosios spalvos)
 Version %d.%d.%d %s	TGAView		Versija %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Nepaisyti TGA alfa kanalo
 Targa image (%d bits colormap)	TGATranslator		TGA paveikslas (%d bitų spalvų atvaizdis)
-TGA Image Translator	TGAView		TGA paveikslų keitiklis
 Targa image (%d bits RLE colormap)	TGATranslator		TGA paveikslas (%d bitų RLE spalvų atvaizdis)
 Targa image (%d bits gray)	TGATranslator		TGA paveikslas (%d bitų pilkumo tonai)
 Written by the Haiku Translation Kit Team	TGAView		Sukūrė „Haiku“ komanda

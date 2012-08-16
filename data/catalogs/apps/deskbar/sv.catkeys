@@ -1,47 +1,52 @@
-1	swedish	x-vnd.Be-TSKB	1669813373
-<Be folder is empty>	BeMenu		<mappen är tom>
-About Haiku	BeMenu		Om Haiku
-About this system	BeMenu		Om Haiku
-Always on top	PreferencesWindow		Alltid överst
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
-Applications	PreferencesWindow		Program
-Auto-hide	PreferencesWindow		Dölj automatiskt
-Auto-raise	PreferencesWindow		Höj vid närkontakt
-Change time…	TimeView		Ställ in tid...
-Clock	PreferencesWindow		Klocka
-Close all	WindowMenu		Stäng alla
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
-Deskbar	System name		Deskbar
-Deskbar preferences	PreferencesWindow		Deskbar inställningar
-Deskbar preferences…	BeMenu		Inställningar...
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivbordsprogram
+1	swedish	x-vnd.Be-TSKB	3197510812
+Power off	DeskbarMenu		Stäng av
+Show day of week	PreferencesWindow		Visa dag i veckan
 Edit menu…	PreferencesWindow		Redigera meny...
-Expand new applications	PreferencesWindow		Expandera nya program
-Find…	BeMenu		Sök...
-Hide all	WindowMenu		Göm alla
-Hide time	TimeView		Göm tiden
-Menu	PreferencesWindow		Meny
-Mount	BeMenu		Montera
-No windows	WindowMenu		Saknar fönster
-Power off	BeMenu		Stäng av
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Inställningar
-Quit application	WindowMenu		Avsluta program
-Recent applications	BeMenu		Senaste programmen
-Recent applications:	PreferencesWindow		Senaste program:
-Recent documents	BeMenu		Senaste dokumenten
+Suspend	DeskbarMenu		Vänteläge
+Applications	PreferencesWindow		Program
+Time preferences…	TimeView		Tidspreferenser
+About Haiku	DeskbarMenu		Om Haiku
 Recent documents:	PreferencesWindow		Senaste dokument:
-Recent folders	BeMenu		Senaste mapparna
-Recent folders:	PreferencesWindow		Senaste mappar:
-Restart Tracker	BeMenu		Starta om Tracker
-Restart system	BeMenu		Starta om
-Show Time	Tray		Visa tid
-Show all	WindowMenu		Visa alla
-Show application expander	PreferencesWindow		Visa program-expanderare
-Show calendar…	TimeView		Visa kalender...
-Show replicants	BeMenu		Visa replikanthandtag
-Show seconds	PreferencesWindow		Visa sekunder
-Shutdown…	BeMenu		Avsluta Haiku...
+Recent applications	DeskbarMenu		Senaste program
 Sort running applications	PreferencesWindow		Sortera aktiva program
-Suspend	BeMenu		Viloläge
-Tracker always first	PreferencesWindow		Visa Tracker först
+Show time	Tray		Visa tid
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
+Find…	DeskbarMenu		Sök...
 Window	PreferencesWindow		Fönster
+Menu	PreferencesWindow		Meny
+Recent documents	DeskbarMenu		Senaste dokument
+Show seconds	PreferencesWindow		Visa sekunder
+Auto-hide	PreferencesWindow		Dölj automatiskt
+Always on top	PreferencesWindow		Alltid överst
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar mappen är tom>
+Show all	WindowMenu		Visa alla
+No windows	WindowMenu		Saknar fönster
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Starta om systemet
+Large	PreferencesWindow		Stor
+Auto-raise	PreferencesWindow		Höj vid närkontakt
+Hide time	TimeView		Göm tiden
+Recent folders:	PreferencesWindow		Senaste mappar:
+Show application expander	PreferencesWindow		Visa program-expanderare
+Restart Tracker	DeskbarMenu		Starta om Tracker
+Close all	WindowMenu		Stäng alla
+Deskbar preferences	PreferencesWindow		Deskbar inställningar
+Mount	DeskbarMenu		Montera
+Small	PreferencesWindow		Liten
+Recent applications:	PreferencesWindow		Senaste program:
+Shutdown…	DeskbarMenu		Stäng av…
+Tracker always first	PreferencesWindow		Visa Tracker först
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Inställningar
+Recent folders	DeskbarMenu		Senaste mappar
+About this system	DeskbarMenu		Om detta system
+Show calendar…	TimeView		Visa kalender...
+Deskbar preferences…	DeskbarMenu		Deskbar inställningar...
+Expand new applications	PreferencesWindow		Expandera nya program
+Show replicants	DeskbarMenu		Visa replicants
+Hide application names	PreferencesWindow		Göm applikation namnen
+Clock	PreferencesWindow		Klocka
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
+Icon size	PreferencesWindow		Ikonstorlek
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivbordsprogram
+Hide all	WindowMenu		Göm alla
+Quit application	WindowMenu		Avsluta program

@@ -1,6 +1,7 @@
-1	german	x-vnd.Haiku-CPUFrequencyPref	3079996868
+1	german	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		OK
 CPU frequency status view	CPU Frequency View		CPU-Takt-Anzeige
+OK	Status view		OK
 Set state	Status view		Fester Takt
 Defaults	Pref Window		Standardwerte
 Install replicant into Deskbar	CPU Frequency View		Replikant in Deskbar installieren

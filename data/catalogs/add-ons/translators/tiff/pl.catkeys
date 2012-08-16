@@ -1,9 +1,8 @@
-1	polish	x-vnd.Haiku-TIFFTranslator	292291870
+1	polish	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nie można ustawić katalogu\n
 TIFF image	TIFFTranslator		Obraz TIFF
 TIFF Library:	TIFFView		Biblioteka TIFF
-TIFF Image Translator	TIFFView		Translator obrazów TIFF
 None	TIFFView		Brak
 TIFF images	TIFFTranslator		Obrazy TIFF
 TIFFTranslator Settings	TIFFTranslator		Ustawienia translatora TIFF

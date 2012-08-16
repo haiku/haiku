@@ -48,5 +48,5 @@ Clock	PreferencesWindow		日付と時刻
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ
 Icon size	PreferencesWindow		アイコンのサイズ
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		デスクトップアプレット
-Hide all	WindowMenu		すべてを隠す
+Hide all	WindowMenu		すべて隠す
 Quit application	WindowMenu		アプリケーションを終了

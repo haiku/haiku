@@ -265,7 +265,8 @@ BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode,
 	fLastFilterStringLength(0),
 	fLastKeyTime(0),
 	fLastDeskbarFrameCheckTime(LONGLONG_MIN),
-	fDeskbarFrame(0, 0, -1, -1)
+	fDeskbarFrame(0, 0, -1, -1),
+	fTextWidgetToCheck(NULL)
 {
 	fViewState->SetViewMode(viewMode);
 	fShowSelectionWhenInactive
@@ -914,6 +915,11 @@ BPoseView::Pulse()
 			fLastLeftTop = LeftTop();
 		}
 	}
+
+	// do we have a TextWidget waiting for expiracy of its double-click
+	// check?
+	if (fTextWidgetToCheck != NULL)
+		fTextWidgetToCheck->CheckExpiration();
 }
 
 
@@ -1085,7 +1091,10 @@ BPoseView::CommitActivePose(bool saveChanges)
 			loc = ActivePose()->Location(this);
 
 		ActivePose()->Commit(saveChanges, loc, this, index);
+		BPose *pose = fActivePose;
 		fActivePose = NULL;
+		if (fFiltering && !FilterPose(pose))
+			RemoveFilteredPose(pose, index);
 	}
 }
 
@@ -1399,10 +1408,10 @@ BPoseView::AddPosesTask(void* castToParams)
 				}
 
 				view->ReadPoseInfo(model,
-					&(posesResult->fPoseInfos[modelChunkIndex]));
+					&posesResult->fPoseInfos[modelChunkIndex]);
 
 				if (!PoseVisible(model,
-					&(posesResult->fPoseInfos[modelChunkIndex]))) {
+					&posesResult->fPoseInfos[modelChunkIndex])) {
 					modelChunkIndex--;
 					continue;
 				}
@@ -1736,7 +1745,8 @@ BPoseView::AddPoseToList(PoseList* list, bool visibleList, bool insertionSort,
 				// to show the area below the items that have already
 				// been added.
 				if (srcRect.top == viewBounds.top
-					&& srcRect.bottom >= viewBounds.top) {
+					&& srcRect.bottom >= viewBounds.top
+					&& poseIndex != 0) {
 					// if new pose above current view bounds, cache up
 					// the draw and do it later
 					listViewScrollBy += fListElemHeight;
@@ -2650,12 +2660,12 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 	}
 
 	fStateNeedsSaving = true;
-	
+
 	if (fFiltering) {
 		// the column we removed might just be the one that was used to filter
 		int32 count = fFilteredPoseList->CountItems();
 		for (int32 i = count - 1; i >= 0; i--) {
-			BPose *pose = fFilteredPoseList->ItemAt(i);
+			BPose* pose = fFilteredPoseList->ItemAt(i);
 			if (!FilterPose(pose))
 				RemoveFilteredPose(pose, i);
 		}
@@ -2729,6 +2739,7 @@ BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 
 	if (fFiltering) {
 		// the column we added might just add new poses to be showed
+		fFilteredPoseList->MakeEmpty();
 		fFiltering = false;
 		StartFiltering();
 	}
@@ -4954,15 +4965,15 @@ BPoseView::MoveSelectionTo(BPoint dropPt, BPoint clickPt,
 
 
 inline void
-UpdateWasBrokenSymlinkBinder(BPose *pose, Model *model, int32 index,
-	BPoseView *poseView, BObjectList<Model> *fBrokenLinks)
+UpdateWasBrokenSymlinkBinder(BPose* pose, Model* model, int32 index,
+	BPoseView* poseView, BObjectList<Model>* fBrokenLinks)
 {
 	if (!model->IsSymLink())
 		return;
 
 	BPoint loc(0, index * poseView->ListElemHeight());
 	pose->UpdateWasBrokenSymlink(loc, poseView);
-	if (model->LinkTo())
+	if (model->LinkTo() != NULL)
 		fBrokenLinks->RemoveItem(model);
 }
 
@@ -4974,7 +4985,7 @@ BPoseView::TryUpdatingBrokenLinks()
 	if (!lock)
 		return;
 
-	BObjectList<Model> *brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
+	BObjectList<Model>* brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
 
 	// try fixing broken symlinks, and detecting broken ones.
 	EachPoseAndModel(fPoseList, &UpdateWasBrokenSymlinkBinder, this,
@@ -4996,7 +5007,7 @@ BPoseView::PoseHandleDeviceUnmounted(BPose* pose, Model* model, int32 index,
 	if (model->NodeRef()->device == device)
 		poseView->DeletePose(model->NodeRef());
 	else if (model->IsSymLink()
-		&& model->LinkTo()
+		&& model->LinkTo() != NULL
 		&& model->LinkTo()->NodeRef()->device == device)
 		poseView->DeleteSymLinkPoseTarget(model->LinkTo()->NodeRef(), pose, index);
 }
@@ -5151,7 +5162,7 @@ BPoseView::FSNotification(const BMessage* message)
 					createPose = false;
 				}
 
-				const char *name;
+				const char* name;
 				if (message->FindString("name", &name) != B_OK)
 					break;
 #if DEBUG
@@ -5165,14 +5176,14 @@ BPoseView::FSNotification(const BMessage* message)
 					// and that both some_folder and another_folder didn't
 					// exist yet. We are looking if the just created folder
 					// is 'some_folder' and watch it, expecting the creation of
-					// 'another_folder' later and then report the link as fixed. 
-					Model *model = new Model(&dirNode, &itemNode, name);
+					// 'another_folder' later and then report the link as fixed.
+					Model* model = new Model(&dirNode, &itemNode, name);
 					if (model->IsDirectory()) {
 						BString createdPath(BPath(model->EntryRef()).Path());
 						BDirectory currentDir(TargetModel()->EntryRef());
 						BPath createdDir(model->EntryRef());
 						for (int32 i = 0; i < count; i++) {
-							BSymLink link(fBrokenLinks->ItemAt(i)->EntryRef());	
+							BSymLink link(fBrokenLinks->ItemAt(i)->EntryRef());
 							BPath path;
 							link.MakeLinkedPath(&currentDir, &path);
 							BString pathStr(path.Path());
@@ -5303,8 +5314,8 @@ BPoseView::FSNotification(const BMessage* message)
 bool
 BPoseView::CreateSymlinkPoseTarget(Model* symlink)
 {
-	Model *newResolvedModel = NULL;
-	Model *result = symlink->LinkTo();
+	Model* newResolvedModel = NULL;
+	Model* result = symlink->LinkTo();
 	if (!result) {
 		BEntry entry(symlink->EntryRef(), true);
 		if (entry.InitCheck() == B_OK) {
@@ -5430,7 +5441,7 @@ BPoseView::EntryMoved(const BMessage* message)
 		// rename or move of entry in this directory (or query)
 
 		int32 index;
-		BPose *pose = fPoseList->FindPose(&itemNode, &index);
+		BPose* pose = fPoseList->FindPose(&itemNode, &index);
 		int32 poseListIndex = index;
 		bool visible = true;
 		if (fFiltering)
@@ -5463,7 +5474,7 @@ BPoseView::EntryMoved(const BMessage* message)
 							bounds, scrollBy, true);
 					} else if (visible && !FilterPose(pose))
 						RemoveFilteredPose(pose, index);
-					else
+					else if (visible)
 						_CheckPoseSortOrder(fFilteredPoseList, pose, index);
 				}
 			}
@@ -5490,14 +5501,14 @@ BPoseView::EntryMoved(const BMessage* message)
 
 
 void
-BPoseView::WatchParentOf(const entry_ref *ref)
+BPoseView::WatchParentOf(const entry_ref* ref)
 {
 	BPath currentDir(ref);
 	currentDir.GetParent(&currentDir);
 	BSymLink symlink(ref);
 	BPath path;
 
-	symlink.MakeLinkedPath(currentDir.Path(), &path);	
+	symlink.MakeLinkedPath(currentDir.Path(), &path);
 	status_t status = path.GetParent(&path);
 
 	while (status == B_BAD_VALUE)
@@ -5526,7 +5537,7 @@ BPoseView::StopWatchingParentsOf(const entry_ref* ref)
 	if (path.InitCheck() != B_OK)
 		return;
 
-	BObjectList<Model> *brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
+	BObjectList<Model>* brokenLinksCopy = new BObjectList<Model>(*fBrokenLinks);
 	int32 count = brokenLinksCopy->CountItems();
 
 	while (path.GetParent(&path) == B_OK) {
@@ -5550,7 +5561,7 @@ BPoseView::StopWatchingParentsOf(const entry_ref* ref)
 			link.MakeLinkedPath(currentDir.Path(), &absolutePath);
 			if (BString(absolutePath.Path()).Compare(path.Path(),
 					strlen(path.Path())) == 0) {
-				// a broken link still needs to watch this folder, but	
+				// a broken link still needs to watch this folder, but
 				// don't let that same link also watch a deeper parent.
 				brokenLinksCopy->RemoveItemAt(i);
 				count--;
@@ -5590,11 +5601,11 @@ BPoseView::AttributeChanged(const BMessage* message)
 
 	int32 index;
 	attr_info info;
-	PoseList *posesFound = fPoseList->FindAllPoses(&itemNode);
+	PoseList* posesFound = fPoseList->FindAllPoses(&itemNode);
 	int32 posesCount = posesFound->CountItems();
 	for (int i = 0; i < posesCount; i++) {
-		BPose *pose = posesFound->ItemAt(i);
-		Model *model = pose->TargetModel();
+		BPose* pose = posesFound->ItemAt(i);
+		Model* model = pose->TargetModel();
 		if (model->IsSymLink() && *model->NodeRef() != itemNode)
 			// change happened on symlink's target
 			model = model->ResolveIfLink();
@@ -5798,7 +5809,7 @@ BPoseView::DuplicateSelection(BPoint* dropStart, BPoint* dropEnd)
 
 	// create entry_ref list from selection
 	if (!fSelectionList->IsEmpty()) {
-		BObjectList<entry_ref> *srcList = new BObjectList<entry_ref>(
+		BObjectList<entry_ref>* srcList = new BObjectList<entry_ref>(
 			fSelectionList->CountItems(), true);
 		CopySelectionListToBListAsEntryRefs(fSelectionList, srcList);
 
@@ -5824,13 +5835,13 @@ BPoseView::SelectPoseAtLocation(BPoint point)
 
 
 void
-BPoseView::MoveListToTrash(BObjectList<entry_ref> *list, bool selectNext,
+BPoseView::MoveListToTrash(BObjectList<entry_ref>* list, bool selectNext,
 	bool deleteDirectly)
 {
 	if (!list->CountItems())
 		return;
 
-	BObjectList<FunctionObject> *taskList =
+	BObjectList<FunctionObject>* taskList =
 		new BObjectList<FunctionObject>(2, true);
 		// new owning list of tasks
 
@@ -7009,6 +7020,8 @@ BPoseView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 void
 BPoseView::MouseDragged(const BMessage* message)
 {
+	if (fTextWidgetToCheck != NULL)
+		fTextWidgetToCheck->CancelWait();
 	fTrackRightMouseUp = false;
 
 	BPoint where;
@@ -7095,6 +7108,10 @@ BPoseView::MouseDown(BPoint where)
 	if (pose) {
 		AddRemoveSelectionRange(where, extendSelection, pose);
 
+		if (fTextWidgetToCheck != NULL && (pose != fLastClickedPose
+				|| (buttons & B_SECONDARY_MOUSE_BUTTON) != 0))
+			fTextWidgetToCheck->CancelWait();
+
 		if (!extendSelection && !fTrackRightMouseUp && WasDoubleClick(pose, where)) {
 			// special handling for Path field double-clicks
 			if (!WasClickInPath(pose, index, where))
@@ -7103,6 +7120,8 @@ BPoseView::MouseDown(BPoint where)
 	} else {
 		// click was not in any pose
 		fLastClickedPose = NULL;
+		if (fTextWidgetToCheck != NULL)
+			fTextWidgetToCheck->CancelWait();
 
 		window->Activate();
 		window->UpdateIfNeeded();
@@ -7124,6 +7143,24 @@ BPoseView::MouseDown(BPoint where)
 
 
 void
+BPoseView::SetTextWidgetToCheck(BTextWidget* widget, BTextWidget* old)
+{
+	if (old == NULL || fTextWidgetToCheck == old)
+		fTextWidgetToCheck = widget;
+}
+
+
+BPoint
+BPoseView::Origin()
+{
+	if (ViewMode() == kListMode)
+		return fViewState->ListOrigin();
+
+	return fViewState->IconOrigin();
+}
+
+
+void
 BPoseView::MouseUp(BPoint where)
 {
 	if (fSelectionRectInfo.isDragging)
@@ -7132,7 +7169,8 @@ BPoseView::MouseUp(BPoint where)
 	int32 index;
 	BPose* pose = FindPose(where, &index);
 	uint32 lastButtons = Window()->CurrentMessage()->FindInt32("last_buttons");
-	if (pose != NULL && fAllowPoseEditing && !fTrackRightMouseUp)
+	if (pose != NULL && fLastClickedPose != NULL && fAllowPoseEditing
+		&& !fTrackRightMouseUp)
 		pose->MouseUp(BPoint(0, index * fListElemHeight), this, where, index);
 
 
@@ -7211,6 +7249,8 @@ BPoseView::WasDoubleClick(const BPose* pose, BPoint point)
 		fLastClickPt.Set(INT32_MAX, INT32_MAX);
 		fLastClickedPose = NULL;
 		fLastClickTime = 0;
+		if (fTextWidgetToCheck != NULL)
+			fTextWidgetToCheck->CancelWait();
 		return true;
 	}
 
@@ -7222,7 +7262,7 @@ BPoseView::WasDoubleClick(const BPose* pose, BPoint point)
 
 
 static void
-AddPoseRefToMessage(BPose *, Model* model, BMessage* message)
+AddPoseRefToMessage(BPose*, Model* model, BMessage* message)
 {
 	// Make sure that every file added to the message has its
 	// MIME type set.
@@ -7744,7 +7784,7 @@ BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 		if (pose->TargetModel()->IsSymLink()) {
 			fBrokenLinks->RemoveItem(pose->TargetModel());
 			StopWatchingParentsOf(pose->TargetModel()->EntryRef());
-			Model *target = pose->TargetModel()->LinkTo();
+			Model* target = pose->TargetModel()->LinkTo();
 			if (target)
 				watch_node(target->NodeRef(), B_STOP_WATCHING, this);
 		}
@@ -8341,7 +8381,7 @@ BPoseView::IdentifySelection()
 	int32 count = fSelectionList->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		BPose* pose = fSelectionList->ItemAt(index);
-		BEntry entry(pose->TargetModel()->EntryRef());
+		BEntry entry(pose->TargetModel()->ResolveIfLink()->EntryRef());
 		if (entry.InitCheck() == B_OK) {
 			BPath path;
 			if (entry.GetPath(&path) == B_OK)
@@ -9145,6 +9185,8 @@ DumpOne(BPose* pose, void*)
 void
 BPoseView::SortPoses()
 {
+	if (fTextWidgetToCheck != NULL)
+		fTextWidgetToCheck->CancelWait();
 	CommitActivePose();
 	// PRINT(("pose list count %d\n", fPoseList->CountItems()));
 #if xDEBUG

@@ -1,8 +1,8 @@
-1	russian	x-vnd.Haiku-STXTTranslator	4075159346
+1	russian	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Стилизованный текстовый файл BeOS
-StyledEdit files translator	STXTTranslator		Транслятор файлов StyledEdit
 Plain text file	STXTTranslator		Текстовый файл
-StyledEdit files translator	STXTView		Транслятор файлов StyledEdit
 STXTTranslator Settings	STXTTranslator		Настройки STXT транслятора
+StyledEdit file translator	STXTView		Транслятор файлов StyledEdit
 StyledEdit files	STXTTranslator		Файлы StyledEdit
+StyledEdit file translator	STXTTranslator		Транслятор файлов StyledEdit
 STXT Settings	STXTMain		Настройки STXT транслятора

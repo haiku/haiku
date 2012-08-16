@@ -1,6 +1,7 @@
-1	russian	x-vnd.Haiku-CPUFrequencyPref	3079996868
+1	russian	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		ОК
 CPU frequency status view	CPU Frequency View		Просмотр состояния частоты ЦП
+OK	Status view		OK
 Set state	Status view		Выбрать состояние
 Defaults	Pref Window		По умолчанию
 Install replicant into Deskbar	CPU Frequency View		Установить репликант в Deskbar

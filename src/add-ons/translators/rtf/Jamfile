@@ -8,9 +8,9 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 UsePrivateHeaders shared storage ;
 
-AddResources RTF-Translator : RTFTranslator.rdef ;
+AddResources RTFTranslator : RTFTranslator.rdef ;
 
-Translator RTF-Translator :
+Translator RTFTranslator :
 	main.cpp
 	ConfigView.cpp
 
@@ -24,7 +24,7 @@ $(HAIKU_LOCALE_LIBS)
 	: true
 ;
 
-DoCatalogs RTF-Translator :
+DoCatalogs RTFTranslator :
 	x-vnd.Haiku-RTFTranslator
 	:
 	main.cpp

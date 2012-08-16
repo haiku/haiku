@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-FileTypes	2037267651
+1	finnish	x-vnd.Haiku-FileTypes	2496450458
 Application types…	FileTypes Window		Sovellustyypit…
 Description:	Application Types Window		Kuvaus:
 Args only	Application Type Window		Vain argumentit
@@ -49,6 +49,7 @@ Name:	Application Types Window		Nimi:
 Group name:	New File Type Window		Ryhmänimi:
 Preferred application	FileType Window		Ensisijainen sovellus
 Progress	Application Types Window		Edistyminen
+Set preferred application	Preferred App Menu		Aseta ensisijainen sovellus
 File	Application Type Window		Tiedosto
 Version:	Application Type Window		Versio:
 Select…	FileTypes Window		Valitse…

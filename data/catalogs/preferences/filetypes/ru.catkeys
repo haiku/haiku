@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FileTypes	2037267651
+1	russian	x-vnd.Haiku-FileTypes	2496450458
 Application types…	FileTypes Window		Типы приложений…
 Description:	Application Types Window		Описание:
 Args only	Application Type Window		Только аргументы
@@ -49,6 +49,7 @@ Name:	Application Types Window		Имя:
 Group name:	New File Type Window		Имя группы:
 Preferred application	FileType Window		Предпочтительное приложение
 Progress	Application Types Window		Состояние
+Set preferred application	Preferred App Menu		Установить предпочтительное приложение
 File	Application Type Window		Файл
 Version:	Application Type Window		Версия:
 Select…	FileTypes Window		Выбрать…

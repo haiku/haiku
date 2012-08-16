@@ -1,4 +1,10 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-KeyboardInputServerDevice	4131445541
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+Kill application	Team monitor		Avbryt program
 Quit application	Team monitor		Avslutt program
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Merk et program i listen over og klikk på 'Avbryt program' eller 'Avslutt program' for å stanse det.\n\nHold CONTROL+ALT+DELETE nede i %ld sekunder for å starte maskinen på nytt.
+If the application will not quit you may have to kill it.	Team monitor		Hvis programmet ikke vil avslutte kan det hende du må avbryte det.
 Force reboot	Team monitor		Tving omstart
+Team monitor	Team monitor		Team-monitor
+(This team is a system component)	Team monitor		(Dette teamet er en systemkomponent)
+Restart the desktop	Team monitor		Start skrivebordet på nytt
 Cancel	Team monitor		Avbryt

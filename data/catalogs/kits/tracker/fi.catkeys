@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	506391417
+1	finnish	x-vnd.Haiku-libtracker	1301055003
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -15,7 +15,9 @@ Decrease size	ContainerWindow		Pienennä kokoa
 Mini icon view	VolumeWindow		Minikuvakenäkymä
 You must have at least one attribute showing.	PoseView		Sinulla on oltava vähintään yksi attribuutti näytettäväksi.
 Permissions	InfoWindow		Käyttöoikeudet
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Käänteinen valinta
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Äskettäiset asiakirjat
 Modified	QueryPoseView		Muokattu
 Created	ContainerWindow		Luotu
@@ -40,6 +42,7 @@ Make active printer	ContainerWindow		Tee aktiivinen tulostin
 Create link here	ContainerWindow		Luo linkki tähän
 Moving: 	StatusWindow		Siirretään:
 before	FindPanel		ennen
+Error emptying Trash	FSUtils		Virhe tyhjennettäessä roskakoria
 On	FindPanel		Kohteessa
 MiB	WidgetAttributeText		mebitavua
 greater than	FindPanel		suurempi kuin
@@ -92,6 +95,7 @@ Select all	VolumeWindow		Valitse kaikki
 Opens with:	InfoWindow		Avaa sovelluksella:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jos %ifYouDoAction mime-asetukset, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?
 Open	ContainerWindow		Avaa
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Virhe laskettaessa kansiokokoa.
 New folder	FilePanelPriv		Uusi kansio
 %name info	InfoWindow	InfoWindow Title	%name-tiedot
@@ -314,6 +318,7 @@ The Tracker must be running to see Info windows.	PoseView		Seuraajaohjelman on o
 Other	FilePermissionsView		Muu
 Query name:	FindPanel		Kyselynimi:
 Permissions	ContainerWindow		Käyttöoikeudet
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		siirretään
 Identify	InfoWindow		Tunnista
 Recent folders	ContainerWindow		Nykyiset kansiot

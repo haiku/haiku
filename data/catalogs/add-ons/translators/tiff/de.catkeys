@@ -1,9 +1,8 @@
-1	german	x-vnd.Haiku-TIFFTranslator	292291870
+1	german	x-vnd.Haiku-TIFFTranslator	2354712721
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: Ordner konnte nicht gesetzt werden\n
 TIFF image	TIFFTranslator		TIFF-Bild
 TIFF Library:	TIFFView		TIFF-Bibliothek:
-TIFF Image Translator	TIFFView		TIFF-Bild-Translator
 None	TIFFView		Keine
 TIFF images	TIFFTranslator		TIFF-Bilder
 TIFFTranslator Settings	TIFFTranslator		TIFFTranslator-Einstellungen

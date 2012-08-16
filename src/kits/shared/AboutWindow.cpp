@@ -29,11 +29,11 @@ BAboutWindow::BAboutWindow(const char *appName, int32 firstCopyrightYear,
 {
 	fAppName = new BString(appName);
 
-	const char* copyright = B_TRANSLATE_MARK("Copyright " B_UTF8_COPYRIGHT
-		" %years% Haiku, Inc.");
-	const char* writtenBy = B_TRANSLATE_MARK("Written by:");
-	copyright = gSystemCatalog.GetString(copyright, "AboutWindow");
-	writtenBy = gSystemCatalog.GetString(writtenBy, "AboutWindow");
+	const char* copyright = gSystemCatalog.GetString(
+		B_TRANSLATE_MARK("Copyright " B_UTF8_COPYRIGHT " %years% Haiku, Inc."),
+		"AboutWindow");
+	const char* writtenBy = gSystemCatalog.GetString(
+		B_TRANSLATE_MARK("Written by:"), "AboutWindow");
 
 	// Get current year
 	time_t tp;
@@ -75,10 +75,10 @@ BAboutWindow::~BAboutWindow()
 void
 BAboutWindow::Show()
 {
-	const char* aboutTitle = B_TRANSLATE_MARK("About" B_UTF8_ELLIPSIS);
-	const char* closeLabel = B_TRANSLATE_MARK("Close");
-	aboutTitle = gSystemCatalog.GetString(aboutTitle, "AboutWindow");
-	closeLabel = gSystemCatalog.GetString(closeLabel, "AboutWindow");
+	const char* aboutTitle = gSystemCatalog.GetString(
+		B_TRANSLATE_MARK("About" B_UTF8_ELLIPSIS), "AboutWindow");
+	const char* closeLabel = gSystemCatalog.GetString(
+		B_TRANSLATE_MARK("Close"), "AboutWindow");
 
 	BAlert *alert = new BAlert(aboutTitle, fText->String(), closeLabel);
 	BTextView *view = alert->TextView();

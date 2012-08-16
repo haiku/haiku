@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PPMTranslator	2886727868
+1	french	x-vnd.Haiku-PPMTranslator	2435270880
 PPM Settings	PPMMain		Réglages PPM
 Based on PPMTranslator sample code	PPMTranslator		Basé sur le code d'exemple du traducteur PPM
 OK	PPMMain		OK
@@ -6,7 +6,6 @@ Grayscale 8 bits	PPMTranslator		Nuances de gris 8 bits
 CMY 8:8:8 32 bits	PPMTranslator		CMJ 8:8:8 32 bits
 PPM image	PPMTranslator		Image PPM
 RGBA 5:5:5:1 16 bits	PPMTranslator		RVBA 5:5:5:1 16 bits
-PPM Image Translator	PPMTranslator		Traducteur PPM
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Format Bitmap Be (Traducteur PPM)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMJA 8:8:8:8 32 bits
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMJN 8:8:8:8 32 bits

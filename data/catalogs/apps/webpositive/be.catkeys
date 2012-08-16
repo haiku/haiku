@@ -1,0 +1,137 @@
+1	belarusian	x-vnd.Haiku-WebPositive	1513721873
+Show home button	Settings Window		Паказваць кнопку "Дадому"
+Username:	Authentication Panel		Карыстальнік:
+Copy URL to clipboard	Download Window		Скапіяваць спасылку
+Cancel	Settings Window		Скасаваць
+Close window	WebPositive Window		Зачыніць вакно
+Quit	WebPositive		Выйсці
+The download could not be opened.	Download Window		Немагчыма адкрыць запампованы файл.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Папка з запампованымі файламі не адкрываецца.\n\nПамылка: %error
+Open location	WebPositive Window		Адкрыць знаходжаньне
+Clear history	WebPositive Window		Ачысьціць гісторыю
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Учора
+Default standard font size:	Settings Window		Памер дапомнагы шрыфту:
+Start page:	Settings Window		Пачатковая старонка:
+History	WebPositive Window		Гісторыя
+Error opening downloads folder	Download Window		Немагчыма адчыніць папку запампованых файлаў
+Paste	WebPositive Window		Уставіць
+Settings	Settings Window		Наладкі
+%seconds seconds left	Download Window		Засталося %seconds секунд
+Confirmation	WebPositive Window		Пацверджанне
+Window	WebPositive Window		Вакно
+Decrease size	WebPositive Window		Паменшыць памер
+Serif font:	Settings Window		Шрыфт Serif:
+Loading %url	WebPositive Window		Спампоўка %url
+Page source	WebPositive Window		Зыходны код старонкі
+Next	WebPositive Window		Наступны
+Find next	WebPositive Window		Шукаць наступнае
+Download folder:	Settings Window		Папка спамповак:
+Edit	WebPositive Window		Рэдагаваць
+Over %hours hours left	Download Window		Засталося %hours гадзін
+Cancel	Authentication Panel		Скасаваць
+Match case	WebPositive Window		Улічваць рэгістр
+Search page:	Settings Window		Старонка пошуку:
+Zoom text only	WebPositive Window		Масштабаваць толькі тэкст
+Default fixed font size:	Settings Window		Дапомны памер роўнашырокага шрыфту:
+Close tab	WebPositive Window		Зачыніць укладку
+Auto-hide mouse pointer	Settings Window		Аўтаматычна хаваць курсор мышы
+Over 1 hour left	Download Window		Засталося болей за 1 гадзіну
+Quit	WebPositive Window		Выйсці
+Full screen	WebPositive Window		Поўнаэкранны рэжым
+Open download error	Download Window		Немагчыма адкрыць спампаваны файл
+Standard font:	Settings Window		Звычайны шрыфт:
+Restart	Download Window		Перазапусціць
+Proxy server	Settings Window		Проксі-сервер
+Open containing folder	Download Window		Адкрыць паку з гэтым файлам
+New window	WebPositive Window		Новае вакно
+Open	Download Window		Адчыніць
+Reload	WebPositive Window		Перазагрузіць
+Downloads	Download Window		Запампоўкі
+Sans serif font:	Settings Window		Шрыфт Sans serif:
+Over %days days left	Download Window		Засталося болей за %days дзён
+Forward	WebPositive Window		Наперад
+of	Download Window	...as in '12kB of 256kB'	з
+Revert	Settings Window		Адвярнуць
+Fixed font:	Settings Window		Роўнашырокі шрыфт:
+Cut	WebPositive Window		Выразаць
+Bookmark this page	WebPositive Window		Дадаць гэтую старонку ў закладкі
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Памылка падчас апрацоўкі папкі закладак.\n\nПамылка: %error
+Open downloads folder	Download Window		Адкрыць папку спамповак
+Number of days to keep links in History menu:	Settings Window		Выдаляць спасылкі з гісторыі пасля [дзён]:
+Hide	Download Window		Схаваць
+Reset size	WebPositive Window		Вярнуць памер
+Find:	WebPositive Window		Шукаць:
+Increase size	WebPositive Window		Павялічыць памер
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Памылка чытання папкі з закладкамі.\n\nПамылка: %error
+Over 1 day left	Download Window		Засталося болей 1 дня
+Downloads	WebPositive Window		Спампоўкі
+Requesting %url	WebPositive Window		Запыт да %url
+Apply	Settings Window		Ужыць
+Bookmark info	WebPositive Window		Інфа пра закладку
+Size:	Font Selection view		Памер:
+Show tabs if only one page is open	Settings Window		Паказваць укладку нават з адной старонкай
+About	WebPositive Window		Пра Праграму
+Finish: 	Download Window	Finishing time	Скончыць: 
+Fonts	Settings Window		Шрыфты
+Close	WebPositive Window		Зачыніць
+OK	Download Window		ОК
+Page source error	WebPositive Window		Памылка зыходнага коду старонкі
+Open blank page	Settings Window		Адчыніць пустую старонку
+New tabs:	Settings Window		Новыя ўкаладкі:
+Cancel	WebPositive Window		Скасаваць
+Open all	WebPositive Window		Адчыніць усе
+Clear	URL Bar		Ачысьціць
+Cut	URL Bar		Выразаць
+Clear	WebPositive Window		Ачысьціць
+Remove	Download Window		Выдаліць
+Find	WebPositive Window		Шукаць
+Find previous	WebPositive Window		Шукаць папярэдняе
+Settings	WebPositive Window		Наладкі
+Proxy server address:	Settings Window		Адрэс проксі-сэрвера:
+Proxy server port:	Settings Window		Порт проксі-сэрвера:
+Bookmarks	WebPositive Window		Закладкі
+%minutes minutes	Download Window		%minutes хвілін
+Paste	URL Bar		Уставіць
+/s)	Download Window	...as in 'per second'	/с
+Hide password text	Authentication Panel		Схаваць тэкст паролю
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Я жорстка заб’ю проста ў сэрца гэты расквечаны профіль, што ходзіць ля маёй хаты.
+Over 1 minute left	Download Window		Засталося болей за 1 хвіліну
+Open start page	Settings Window		Адчыніць пачатковую старонку
+Continue downloads	WebPositive		Працягваць спампоўку
+Cancel	Download Window		Скасаваць
+Open search page	Settings Window		Адчыніць старонку пошуку
+Password:	Authentication Panel		Пароль:
+Back	WebPositive Window		Назад
+New browser window	Download Window		Новае вакно
+Today	WebPositive Window		Сёння
+1 second left	Download Window		засталася 1 сэкунда
+Remember username and password for this site	Authentication Panel		Запамятаваць імя карыстальніка і пароль для гэтага сайта
+Earlier	WebPositive Window		Раней
+Authentication required	Authentication Panel		Патрабуецца аўтарызацыя
+Use proxy server to connect to the internet	Settings Window		Злучацца з сецівам праз проксі-сервер
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		WebPositive яшчэ ня скончыў спампоўку асобных файлаў. Усё роўна жадаеце выйсці?
+Auto-hide interface in full screen mode	Settings Window		Хаваць элементы інтэрфейсу ў поўнаэкранным рэжыме
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url не ўдалося апрацаваць
+New tab	WebPositive Window		Новая ўкладка
+Downloads in progress	WebPositive		 Ідзе спампоўванне файлаў
+Style:	Font Selection view		Стыль:
+General	Settings Window		Агульныя
+View	WebPositive Window		Выгляд
+Previous	WebPositive Window		Папярэдні
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Немагчыма стварыть файл с закладкай.\n\nПамылка: %error
+Bookmark error	WebPositive Window		Памылка закладкі
+Do you really want to clear the browsing history?	WebPositive Window		Вы сапраўды жадаеце выдаліць ўсю гісторыю?
+Copy	WebPositive Window		Скапіяваць
+Open bookmarks confirmation	WebPositive Window		Падцвержваць пераход па закладкам
+Remove missing	Download Window		Выдяляць страчанае
+Clone current page	Settings Window		Кланаваць гэту старонку
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Жадаеце адчыніць %addedCount закладак за адзін раз?
+OK	Authentication Panel		ОК
+Copy	URL Bar		Скапіяваць
+OK	WebPositive Window		ОК
+Manage bookmarks	WebPositive Window		Упарадкаваць закладкі
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка для гэтай старонкі (%bookmarkName) ўжо існуе.
+New windows:	Settings Window		Новае вакно:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url скончана
+Remove finished	Download Window		Выдаліць скончаныя

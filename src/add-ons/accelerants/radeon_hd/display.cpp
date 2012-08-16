@@ -272,6 +272,8 @@ detect_displays()
 			encoder_external_setup(id, 23860,
 				EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
 			gDisplay[displayIndex]->attached = true;
+
+			// TODO: DDC Router switching for DisplayPort (and others?)
 		} else if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
 		#endif
 		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
@@ -849,12 +851,6 @@ display_crtc_ss(pll_info* pll, int command)
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	int index = GetIndexIntoMasterTable(COMMAND, EnableSpreadSpectrumOnPPLL);
-
-	if (command != ATOM_DISABLE) {
-		ERROR("%s: TODO: SS was enabled, however functionality incomplete\n",
-			__func__);
-		command = ATOM_DISABLE;
-	}
 
 	union enableSS {
 		ENABLE_LVDS_SS_PARAMETERS lvds_ss;

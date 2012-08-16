@@ -44,6 +44,14 @@ class BPose;
 class BPoseView;
 class BColumn;
 
+
+struct MouseUpParams {
+	BPose* 		pose;
+	BRect 		bounds;
+	BPoseView* 	poseView;
+};
+
+
 class BTextWidget {
 public:
 	BTextWidget(Model*, BColumn*, BPoseView*);
@@ -93,6 +101,9 @@ public:
 	float PreferredWidth(const BPoseView*) const;
 	int Compare(const BTextWidget&, BPoseView*) const;
 		// used for sorting in PoseViews
+
+	void CheckExpiration();
+	void CancelWait();
 	
 private:
 	BRect CalcRectCommon(BPoint poseLoc, const BColumn*, const BPoseView*,
@@ -107,6 +118,9 @@ private:
 	bool fVisible : 1;
 	bool fActive : 1;
 	bool fSymLink : 1;
+	
+	bigtime_t fLastClickedTime;
+	struct MouseUpParams fParams;
 };
 
 

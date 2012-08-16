@@ -1,2 +1,19 @@
-1	norwegian_bokmål	x-vnd.Haiku-JPEGTranslator	813808668
-ISO	exit_parser		ISO
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-JPEGTranslator	54123690
+Output quality	JPEGTranslator		Output-kvalitet
+JPEG images	JPEGTranslator		JPEG-bilder
+Prevent colors 'washing out'	JPEGTranslator		Hindre 'utvaskede' farger
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Bruk CMYK-kode med 0 for 100% blekkdekning
+About	JPEGTranslator		Om
+Low	JPEGTranslator		Lav
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Gjør filen mindre (litt dårligere kvalitet)
+None	JPEGTranslator		Ingen
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bitmap-format (JPEGTranslator)
+Show warning messages	JPEGTranslator		Vis advarsler
+Output smoothing strength	JPEGTranslator		Utjevningsstyrke for output
+High	JPEGTranslator		Høy
+Write	JPEGTranslator		Skriv
+Write black-and-white images as RGB24	JPEGTranslator		Skriv svart-hvitt-bilder som RGB24
+Read greyscale images as RGB32	JPEGTranslator		Les gråtonebilder som RGB32
+Read	JPEGTranslator		Les
+JPEG Library Warning: %s\n	be_jerror		JPEG-bilbliotekadvarsel: %s\n
+Use progressive compression	JPEGTranslator		Bruk progressiv kompresjon

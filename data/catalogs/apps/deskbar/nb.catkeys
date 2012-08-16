@@ -1,28 +1,50 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	1689825316
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	3828916766
+Show day of week	PreferencesWindow		Vis ukedag
 Edit menu…	PreferencesWindow		Rediger meny...
 Applications	PreferencesWindow		Programmer
+Time preferences…	TimeView		Tidsinnstillinger ...
+About Haiku	DeskbarMenu		Om Haiku
 Recent documents:	PreferencesWindow		Nylig brukte dokumenter
+Recent applications	DeskbarMenu		Nylig brukte programmer
 Sort running applications	PreferencesWindow		Sorter kjørende programmer
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		B_USER_DESKBAR_DIRECTORY/Programmer
+Show time	Tray		Vis tid
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programmer
+Find…	DeskbarMenu		Finn ...
 Window	PreferencesWindow		Vindu
 Menu	PreferencesWindow		Meny
+Recent documents	DeskbarMenu		Nylig brukte dokumenter
+Show seconds	PreferencesWindow		Vis sekunder
+Auto-hide	PreferencesWindow		Skjul automatisk
 Always on top	PreferencesWindow		Alltid øverst
+<Deskbar folder is empty>	DeskbarMenu		<Skrivebord-mappen er tom>
 Show all	WindowMenu		Vis alle
 No windows	WindowMenu		Ingen vinduer
 Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Omstart
+Large	PreferencesWindow		Stor
 Auto-raise	PreferencesWindow		Fremhev automatisk
 Hide time	TimeView		Skjul klokken
 Recent folders:	PreferencesWindow		Nylig brukte mapper:
 Show application expander	PreferencesWindow		Vis Arkivåpner-programmet
+Restart Tracker	DeskbarMenu		Start Tracker på nytt
 Close all	WindowMenu		Lukk alle
 Deskbar preferences	PreferencesWindow		Innstillinger for Deskbar
-Recent applications:	PreferencesWindow		Nylig brukte programmer
+Mount	DeskbarMenu		Monter
+Small	PreferencesWindow		Liten
+Recent applications:	PreferencesWindow		Nylig brukte programmer:
+Shutdown…	DeskbarMenu		Avslutt ...
 Tracker always first	PreferencesWindow		Tracker alltid først
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		B_USER_DESKBAR_DIRECTORY/Innstillinger
-Show calendar…	TimeView		Vis kalender...
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Innstillinger
+Recent folders	DeskbarMenu		Nylig brukte mapper:
+About this system	DeskbarMenu		Om dette systemet
+Show calendar…	TimeView		Vis kalender ...
+Deskbar preferences…	DeskbarMenu		Innstillinger for Deskbar
 Expand new applications	PreferencesWindow		Pakk ut nye programmer
+Show replicants	DeskbarMenu		Vis replikanter
+Hide application names	PreferencesWindow		Skjul programnavn
 Clock	PreferencesWindow		Klokke
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		B_USER_DESKBAR_DIRECTORY/Demoer
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		B_USER_DESKBAR_DIRECTORY/Skrivebordsverktøy
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demoer
+Icon size	PreferencesWindow		Ikonstørrelse
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivebordsverktøy
 Hide all	WindowMenu		Skjul alle
 Quit application	WindowMenu		Avslutt program

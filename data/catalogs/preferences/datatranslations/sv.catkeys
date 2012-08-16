@@ -1,18 +1,18 @@
 1	swedish	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ett objekt döpt '%name' finns redan i översättningsmappen! Skall den befintliga översättaren skrivas över?
-Cancel	DataTranslations		Avbryt
-Could not install %s:\n%s	DataTranslations		Kunde inte installera %s:\n%s
 DataTranslations	System name		FormatÖversättare
-DataTranslations - Error	DataTranslations		FormatÖversättare - Fel
-DataTranslations - Note	DataTranslations		FormatÖversättare - Anteckning
-Info	DataTranslations		Info
-Info:	DataTranslations		Information:
+Cancel	DataTranslations		Avbryt
 Name:	DataTranslations		Namn:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Namn: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nSökväg:\n%s\n
-OK	DataTranslations		OK
-Overwrite	DataTranslations		Skriv över
-Path:	DataTranslations		Sökväg:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Objektet '%name' verkar inte vara en Översättare och kommer därför inte att installeras.
-The new translator has been installed successfully.	DataTranslations		Den nya formatöversättaren har installerats.
+Could not install %s:\n%s	DataTranslations		Kunde inte installera %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Använd denna kontrollpanel för att ange standardvärden för formatöversättare som kan användas när inställningar för ett program saknas.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ett objekt döpt '%name' finns redan i översättningsmappen! Skall den befintliga översättaren skrivas över?
+DataTranslations - Note	DataTranslations		FormatÖversättare - Anteckning
+Overwrite	DataTranslations		Skriv över
+Info:	DataTranslations		Information:
+Info	DataTranslations		Info
+Path:	DataTranslations		Sökväg:
+The new translator has been installed successfully.	DataTranslations		Den nya formatöversättaren har installerats.
+DataTranslations - Error	DataTranslations		FormatÖversättare - Fel
+OK	DataTranslations		OK
 Version:	DataTranslations		Version:

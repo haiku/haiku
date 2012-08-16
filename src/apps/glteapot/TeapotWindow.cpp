@@ -56,7 +56,7 @@ TeapotWindow::TeapotWindow(BRect rect, const char* name, window_type wt,
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	item->SetTarget(be_app);
 	msg.RemoveName("num");
-	menuBar->AddItem(menu = new BMenu(B_TRANSLATE("Options")));
+	menuBar->AddItem(menu = new BMenu(B_TRANSLATE("Settings")));
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Perspective"),
 		new BMessage(kMsgPerspective)));
 	item->SetTarget(fObjectView);

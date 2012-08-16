@@ -18,7 +18,7 @@ Start again	SudokuWindow		Начать снова
 HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		Запрос судоку
 Copy	SudokuWindow		Копировать
-Mark valid hints	SudokuWindow		Пометить верные подсказки
+Mark valid hints	SudokuWindow		Пометить корректные подсказки
 Sudoku solved - congratulations!\n	SudokuWindow		Судоку решен - поздравляем!\n
 Hard	SudokuWindow		Сложная
 Snapshot current	SudokuWindow		Сохранить состояние
@@ -26,7 +26,7 @@ Text	SudokuWindow		Текст
 Creating solvable field	SudokuGenerator		Создание решаемого поля
 View	SudokuWindow		Вид
 Progress monitor	ProgressWindow		Монитор состояния
-Mark invalid values	SudokuWindow		Пометить неверные значения
+Mark invalid values	SudokuWindow		Пометить некорректные значения
 Blank	SudokuWindow		Пустая
 Help	SudokuWindow		Помощь
 Searching for removable values	SudokuGenerator		Поиск удаляемых значений

@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <fs_volume.h>
 #include <Alert.h>
 #include <Debug.h>
 #include <NodeInfo.h>
@@ -466,6 +467,41 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
+	if (proto == "nfs") {
+		BString parameter(host);
+		_DecodeUrlString(path);
+		if (url.HasPort())
+			parameter << ":" << port;
+		//XXX: should not always be absolute! FIXME
+		parameter << ":/" << path;
+		BString prettyPath(path);
+		prettyPath.Remove(0, prettyPath.FindLast("/") + 1);
+		if (path == "" || path == "/")
+			prettyPath = "root";
+		prettyPath << " on " << host;
+		prettyPath.Prepend("/");
+		if (mkdir(prettyPath.String(), 0755) < 0) {
+			perror("mkdir");
+			return;
+		}
+		dev_t volume;
+		uint32 flags = 0;
+		fprintf(stderr, "parms:'%s'\n", parameter.String());
+		volume = fs_mount_volume(prettyPath.String(), NULL, "nfs4", flags,
+			parameter.String());
+		if (volume < B_OK) {
+			fprintf(stderr, "fs_mount_volume: %s\n", strerror(volume));
+			return;
+		}
+
+		BMessage m(B_REFS_RECEIVED);
+		entry_ref ref;
+		if (get_ref_for_path(prettyPath.String(), &ref) < B_OK)
+			return;
+		m.AddRef("refs", &ref);
+		be_roster->Launch(kTrackerSig, &m);
+		return;
+	}
 
 	/*
 

@@ -36,6 +36,7 @@
 #	define __HAIKU_ARCH					ppc
 #	define __HAIKU_ARCH_ABI				"ppc"
 #	define __HAIKU_ARCH_PPC				1
+#	define __HAIKU_ARCH_PHYSICAL_BITS	64
 #	define __HAIKU_BIG_ENDIAN			1
 #elif __M68K__
 #	define __HAIKU_ARCH					m68k

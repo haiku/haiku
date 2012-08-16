@@ -6,4 +6,4 @@ RAW image translator	RAWTranslator		Транслятор RAW изображен�
 RAW Settings	RAWTranslator main		Настройки RAW транслятора
 RAW images	RAWTranslator		RAW изображения
 %s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	RAW изображение %s
-Based on Dave Coffin's dcraw 8.63	ConfigView		Основан на dcraw 8.63 разработанного Dave Coffin
+Based on Dave Coffin's dcraw 8.63	ConfigView		Основан на dcraw 8.63 от Dave Coffin

@@ -1,10 +1,10 @@
 1	swedish	x-vnd.Haiku-libmail	161731481
-Connection type:	ProtocolConfigView		Anslutningstyp:
-Leave mail on server	ProtocolConfigView		Lämna e-post på servern
-Login type:	ProtocolConfigView		Inloggningstyp:
-Mail server:	ProtocolConfigView		E-postserver:
 Partially download messages larger than	ProtocolConfigView		Ladda ner meddelanden delvis som är större än
 Password:	ProtocolConfigView		Lösenord:
 Remove mail from server when deleted	ProtocolConfigView		Ta bort meddelanden från servern när dom raderas
+Mail server:	ProtocolConfigView		E-postserver:
 Select…	MailKit		Välj...
+Connection type:	ProtocolConfigView		Anslutningstyp:
+Leave mail on server	ProtocolConfigView		Lämna e-post på servern
 Username:	ProtocolConfigView		Användarnamn:
+Login type:	ProtocolConfigView		Inloggningstyp:

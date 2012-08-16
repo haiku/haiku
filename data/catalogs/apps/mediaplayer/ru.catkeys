@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	1143240926
+1	russian	x-vnd.Haiku-MediaPlayer	442582160
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -18,6 +18,7 @@ New player…	MediaPlayer-Main		Новый плеер…
 100% scale	MediaPlayer-Main		Масштаб 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Расположение субтитров:
 Close	MediaPlayer-Main		Закрыть
+Display Mode	MediaPlayer-InfoWin		Режим показа
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Некоторые файлы не могут быть перемещены в Корзину.
 <unknown>	MediaPlayer-InfoWin		<неизвестно>
 Open	MediaPlayer-Main		Открыть
@@ -25,14 +26,17 @@ Next	MediaPlayer-Main		Следующий
 OK	MediaPlayer-SettingsWindow		ОК
 Track %d	MediaPlayer-Main		Дорожка %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Синемаскоп)
+Display mode	MediaPlayer-InfoWin		Режим показа
 Medium	MediaPlayer-SettingsWindow		cредний
 Close	MediaPlayer-PlaylistWindow		Закрыть
+Stereo	MediaPlayer-InfoWin		Стерео
 Open…	MediaPlayer-PlaylistWindow		Открыть…
 Toggle mute.	MediaPlayer-Main		Включить/выключить звук.
 Undo	MediaPlayer-PlaylistWindow		Отменить
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Использовать аппаратный видеооверлей если возможно
 File info…	MediaPlayer-Main		Информация о файле…
 Pause playback.	MediaPlayer-Main		Приостановить проигрывание.
+Overlay	MediaPlayer-InfoWin		Оверлей
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Удалить запись
 Close window after playing audio	MediaPlayer-SettingsWindow		Закрыть окно после проигрывания музыки
 Full volume	MediaPlayer-SettingsWindow		На полной громкости
@@ -50,6 +54,7 @@ Start playing.	MediaPlayer-Main		Начать проигрывание.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не установлен декодер, необходимый для работы с этим форматом файлов или у декодера возникли проблемы с указанной версией этого формата.
 Import Entry	MediaPlayer-ImportPLItemsCmd		импортирование записи
 Gets the URI of the currently playing item.	MediaPlayer-Main		Получает URI текущей проигрываемой записи.
+%d Channels	MediaPlayer-InfoWin		%d Канала
 400% scale	MediaPlayer-Main		Масштаб 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка при сохранени плейлиста:\n\nОшибка: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Переместить записи
@@ -59,12 +64,15 @@ MediaPlayer	System name		Медиаплеер
 OK	MediaPlayer-Main		ОК
 Settings…	MediaPlayer-Main		Настройки…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки медиаплеера
+h	MediaPlayer-InfoWin	Hours	ч
 Select all	MediaPlayer-PlaylistWindow		Выделить все
 Move Entry	MediaPlayer-MovePLItemsCmd		Переместить запись
 Open	MediaPlayer-PlaylistWindow		Открыть
 Stop playing.	MediaPlayer-Main		Остановить проигрывание.
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' не может быть открыт.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Ошибка: 
 Audio	MediaPlayer-InfoWin		Аудио
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Ошибка перемещения в корзину
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (плохо сформированное сообщение). Не удалось сохранить плейлист.
 Skip to the previous track.	MediaPlayer-Main		Прыгнуть к предыдущему треку.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% обнаружил внутреннюю ошибку. Файл не может быть открыт.
@@ -91,6 +99,7 @@ Attributes	MediaPlayer-Main		Атрибуты
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Все файлы не могу быть перемещены в корзину.
 <untitled>	PlaylistItem-title		<безымянный>
 Track	Audio Track Menu		Дорожка
+unknown format	MediaPlayer-InfoWin		неизвестный формат
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нечего возвращать>
 Skip to the next track.	MediaPlayer-Main		Перейти к следующему треку.
 Play	MediaPlayer-Main		Играть
@@ -102,7 +111,10 @@ Aspect ratio	MediaPlayer-Main		Соотношение сторон
 Error: 	MediaPlayer-Main		Ошибка: 
 Large	MediaPlayer-SettingsWindow		крупный
 Bottom of video	MediaPlayer-SettingsWindow		нижняя часть видео
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		Стоп
+<unnamed media>	MediaPlayer-InfoWin		<безымянное медиа>
+raw video	MediaPlayer-InfoWin		необработанное видео
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (кончилась память). Не удалось сохранить плейлист.
 Hide interface	MediaPlayer-Main		Скрыть интерфейс
@@ -120,6 +132,9 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Перемешать запи
 Revert	MediaPlayer-SettingsWindow		Вернуть
 Edit	MediaPlayer-PlaylistWindow		Изменить
 Start media server	MediaPlayer-Main		Запустить медиа сервер
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Toggle fullscreen.	MediaPlayer-Main		Переключить в полноэкранный режим.
+ToggleFullscreen	MediaPlayer-Main		Переключить в полноэкранный режим
 <unnamed>	PlaylistItem-name		<без названия>
 Open Clips	MediaPlayer-Main		Открыть клипы
 OK	MediaPlayer-PlaylistWindow		ОК

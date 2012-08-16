@@ -1,8 +1,8 @@
-1	swedish	application/x-vnd.Haiku-BFSAddOn	1074880496
-1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Huvudsakligen små filer)
+1	swedish	x-vnd.Haiku-BFSAddOn	1074880496
+Enable query support	BFS_Initialize_Parameter		Aktivera sökstöd
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Rekommenderat)
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Huvudsakligen stora filer)
-Blocksize:	BFS_Initialize_Parameter		Blockstorlek:
 Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Att inaktivera sökfunktionaliteten kan öka hastigheten för vissa procedurer på filsystemet men bör endast inaktiveras om man är helt säker på att sökningar inte kommer att utnyttjas.\nEn volym måste ha sökfunktionaliteten aktiverad för att systemet ska kunna vara installeras på denna.
-Enable query support	BFS_Initialize_Parameter		Aktivera sökstöd
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Huvudsakligen små filer)
+Blocksize:	BFS_Initialize_Parameter		Blockstorlek:
 Name:	BFS_Initialize_Parameter		Namn:

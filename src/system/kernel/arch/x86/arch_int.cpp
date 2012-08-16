@@ -391,8 +391,8 @@ arch_int_are_interrupts_enabled(void)
 status_t
 arch_int_init_io(kernel_args* args)
 {
-	ioapic_init(args);
 	msi_init();
+	ioapic_init(args);
 	return B_OK;
 }
 

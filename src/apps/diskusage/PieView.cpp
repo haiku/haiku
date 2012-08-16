@@ -534,38 +534,20 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 
 		mySpan = parentSpan * (float)info->size / parentSize;
 		if (mySpan >= kMinSegmentSpan) {
-			rgb_color color = kBasePieColor[colorIdx];
-			color.red += kLightenFactor * level;
-			color.green += kLightenFactor * level;
-			color.blue += kLightenFactor * level;
-			SetHighColor(color);
-			SetPenSize(kPieRingSize);
+			const float tint = 1.4f - level * 0.08f;
 			float radius = kPieCenterSize + level * kPieRingSize
 				- kPieRingSize / 2.0;
-			StrokeArc(BPoint(cx, cy), radius, radius, beginAngle, mySpan);
 
-			SetHighColor(kOutlineColor);
-			SetPenSize(0.0);
-			float segBeginRadius = kPieCenterSize + (level - 1)
-				* kPieRingSize + 0.5;
-			float segLength = kPieRingSize - 0.5;
-			float rad = deg2rad(beginAngle);
-			float bx = cx + segBeginRadius * cos(rad);
-			float by = cy - segBeginRadius * sin(rad);
-			float ex = bx + segLength * cos(rad);
-			float ey = by - segLength * sin(rad);
-			StrokeLine(BPoint(bx, by), BPoint(ex, ey));
+			// Draw the grey border
+			SetHighColor(tint_color(kOutlineColor, tint));
+			SetPenSize(kPieRingSize + 1.5f);
+			StrokeArc(BPoint(cx, cy), radius, radius,
+				beginAngle - 0.001f * radius, mySpan  + 0.002f * radius);
 
-			rad = deg2rad(beginAngle + mySpan);
-			bx = cx + segBeginRadius * cos(rad);
-			by = cy - segBeginRadius * sin(rad);
-			ex = bx + segLength * cos(rad);
-			ey = by - segLength * sin(rad);
-			StrokeLine(BPoint(bx, by), BPoint(ex, ey));
-
-			SetPenSize(0.0);
-			SetHighColor(kOutlineColor);
-			radius += kPieRingSize / 2.0;
+			// Draw the colored area
+			rgb_color color = tint_color(kBasePieColor[colorIdx], tint);
+			SetHighColor(color);
+			SetPenSize(kPieRingSize);
 			StrokeArc(BPoint(cx, cy), radius, radius, beginAngle, mySpan);
 
 			// Record the segment for use during MouseMoved().

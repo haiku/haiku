@@ -1,10 +1,13 @@
-1	russian	x-vnd.Haiku-WebPositive	3193305619
+1	russian	x-vnd.Haiku-WebPositive	3017877022
+Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
 Cancel	Settings Window		Отмена
 Close window	WebPositive Window		Закрыть окно
 Quit	WebPositive		Выход
 The download could not be opened.	Download Window		Невозможно открыть загруженный файл.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Папка с загруженными файлами не может быть открыта.\n\nОшибка: %error
+Open location	WebPositive Window		Открыть адрес
 Clear history	WebPositive Window		Очистить историю
 Yesterday	WebPositive Window		Вчера
 Default standard font size:	Settings Window		Размер стандартного шрифта по умолчанию:
@@ -18,6 +21,7 @@ Confirmation	WebPositive Window		Подтверждение
 Window	WebPositive Window		Окно
 Decrease size	WebPositive Window		Уменьшить размер
 Serif font:	Settings Window		Шрифт с засечками:
+Loading %url	WebPositive Window		Загрузка %url
 Page source	WebPositive Window		Код страницы
 Next	WebPositive Window		Вперед
 Find next	WebPositive Window		Найти далее
@@ -30,8 +34,10 @@ Search page:	Settings Window		Страница поиска:
 Zoom text only	WebPositive Window		Масштабировать только текст
 Default fixed font size:	Settings Window		Размер моноширинного шрифта:
 Close tab	WebPositive Window		Закрыть вкладку
+Auto-hide mouse pointer	Settings Window		Автоматически скрывать курсор
 Over 1 hour left	Download Window		Осталось боле одного часа
 Quit	WebPositive Window		Выход
+Full screen	WebPositive Window		Полноэкранный режим
 Open download error	Download Window		Ошибка при открытии загруженного файла
 Standard font:	Settings Window		Обычный шрифт:
 Restart	Download Window		Перезапустить
@@ -59,9 +65,11 @@ Increase size	WebPositive Window		Увеличить размер
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Произошла ошибка при открытии папки с закладками.\n\nОшибка: %error
 Over 1 day left	Download Window		Осталось более 1 дня
 Downloads	WebPositive Window		Загрузки
+Requesting %url	WebPositive Window		Запрашивается %url
 Apply	Settings Window		Применить
 Bookmark info	WebPositive Window		Информация о закладке
 Size:	Font Selection view		Размер:
+Show tabs if only one page is open	Settings Window		Всегда показывать панель вкладок, даже если открыта только одна вкладка.
 About	WebPositive Window		О программе
 Finish: 	Download Window	Finishing time	Завершиться в: 
 Fonts	Settings Window		Шрифты
@@ -91,9 +99,26 @@ Over 1 minute left	Download Window		Осталось более 1 минуты
 Open start page	Settings Window		Открыть стартовую страницу
 Continue downloads	WebPositive		Продолжить загрузку
 Cancel	Download Window		Отмена
+Open search page	Settings Window		Открыть поисковую страницу
 Password:	Authentication Panel		Пароль:
+Back	WebPositive Window		Назад
+New browser window	Download Window		Новое окно браузера
 Today	WebPositive Window		Сегодня
 1 second left	Download Window		осталась 1 секунда
 Remember username and password for this site	Authentication Panel		Запомнить имя пользователя и пароль для этого сайта
 Earlier	WebPositive Window		Ранее
+Authentication required	Authentication Panel		Требуется авторизация
+Use proxy server to connect to the internet	Settings Window		Использовать прокси-сервер для соединения с интернетом
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		WebPositive все еще загружает файлы, вы уверены, что хотите закрыть его сейчас?
+Auto-hide interface in full screen mode	Settings Window		Автоматически скрывать интерфейс в полноэкранном режиме
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	не удалось обработать %url
+New tab	WebPositive Window		Новая вкладка
+Downloads in progress	WebPositive		Загрузка файлов
+Style:	Font Selection view		Стиль:
 General	Settings Window		Общие
+View	WebPositive Window		Вид
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Произошла ошибка при создании закладки.\n\nОшибка: %error
+OK	Authentication Panel		OK
+OK	WebPositive Window		OK
+New windows:	Settings Window		Новые окна:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен.

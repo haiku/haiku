@@ -36,7 +36,7 @@ STXTView::STXTView(const BRect &frame, const char *name, uint32 resizeMode,
 
 	BRect rect(10, 10, 200, 10 + height);
 	BStringView *stringView = new BStringView(rect, "title",
-		B_TRANSLATE("StyledEdit files translator"));
+		B_TRANSLATE("StyledEdit file translator"));
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);

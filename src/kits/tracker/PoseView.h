@@ -425,6 +425,9 @@ class BPoseView : public BView {
 		virtual void AdaptToVolumeChange(BMessage*);
 		virtual void AdaptToDesktopIntegrationChange(BMessage*);
 
+		void SetTextWidgetToCheck(BTextWidget*, BTextWidget* = NULL);
+		BPoint Origin();
+
 	protected:
 		// view setup
 		virtual void SetUpDefaultColumnsIfNeeded();
@@ -674,8 +677,8 @@ class BPoseView : public BView {
 		void Delete(const entry_ref&ref, bool selectNext, bool askUser);
 		void RestoreItemsFromTrash(BObjectList<entry_ref>*, bool selectNext);
 
-		void WatchParentOf(const entry_ref *);
-		void StopWatchingParentsOf(const entry_ref *);
+		void WatchParentOf(const entry_ref*);
+		void StopWatchingParentsOf(const entry_ref*);
 
 	private:
 		void DrawOpenAnimation(BRect);
@@ -698,9 +701,9 @@ class BPoseView : public BView {
 			// used for mime string based icon highliting during a drag
 		BObjectList<Model>* fZombieList;
 		PendingNodeMonitorCache pendingNodeMonitorCache;
-		BObjectList<BColumn> *fColumnList;
-		BObjectList<BString> *fMimeTypeList;
-		BObjectList<Model> *fBrokenLinks;
+		BObjectList<BColumn>* fColumnList;
+		BObjectList<BString>* fMimeTypeList;
+		BObjectList<Model>* fBrokenLinks;
 	  	bool fMimeTypeListIsDirty;
 		BViewState* fViewState;
 		bool fStateNeedsSaving;
@@ -777,6 +780,8 @@ class BPoseView : public BView {
 		BRect fDeskbarFrame;
 
 		static OffscreenBitmap* sOffscreen;
+
+		BTextWidget* fTextWidgetToCheck;
 
 		typedef BView _inherited;
 };

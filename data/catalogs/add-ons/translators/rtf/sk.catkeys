@@ -1,9 +1,7 @@
-1	slovak	x-vnd.Haiku-RTFTranslator	526958155
+1	slovak	x-vnd.Haiku-RTFTranslator	3736645044
 Version %d.%d.%d, %s	ConfigView		Verzia %d.%d.%d, %s
 RTF text files	RTFTranslator		Textové súbory RTF
 RTF-Translator Settings	ConfigView		Nastavenia prekladača RTF
-Rich Text Format (RTF) files	ConfigView		Súbory formátu Obohatený text (RTF)
 RTF Settings	main		Nastavenia RTF
 RichTextFormat file	RTFTranslator		Súbor RTF
-Rich Text Format Translator	RTFTranslator		Prekladač RTF
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Prekladač RTF v%d.%d.%d %s

@@ -315,7 +315,7 @@ ServerWindow::_PrepareQuit()
 		_Hide();
 		fDesktop->UnlockSingleWindow();
 	} else if (fThread >= B_OK)
-		PostMessage(AS_HIDE_WINDOW);
+		PostMessage(AS_INTERNAL_HIDE_WINDOW);
 }
 
 
@@ -481,7 +481,7 @@ ServerWindow::GetInfo(window_info& info)
 	info.window_right = (int)floor(fWindow->Frame().right);
 	info.window_bottom = (int)floor(fWindow->Frame().bottom);
 
-	info.show_hide_level = fWindow->IsHidden() ? 1 : 0; // ???
+	info.show_hide_level = fWindow->ShowLevel();
 	info.is_mini = fWindow->IsMinimized();
 }
 
@@ -594,35 +594,31 @@ void
 ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 {
 	switch (code) {
-		case AS_SHOW_WINDOW:
-			DTRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
-			_Show();
-			break;
-
-		case AS_HIDE_WINDOW:
-			DTRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));
-			_Hide();
-			break;
-
-		case AS_MINIMIZE_WINDOW:
+		case AS_SHOW_OR_HIDE_WINDOW:
 		{
 			int32 showLevel;
-			bool minimize;
-
-			link.Read<bool>(&minimize);
 			if (link.Read<int32>(&showLevel) == B_OK) {
-				DTRACE(("ServerWindow %s: Message AS_MINIMIZE_WINDOW, "
-					"showLevel: %" B_PRId32 ", minimize: %d\n", Title(),
-					showLevel, minimize));
+				DTRACE(("ServerWindow %s: Message AS_SHOW_OR_HIDE_WINDOW, "
+					"show level: %d\n", Title(), showLevel));
 
-				if (showLevel <= 0) {
-					// window is currently hidden - ignore the minimize request
-					fWindow->SetMinimized(minimize);
-						// TODO: commenting this out makes BWindow::fMinimized
-						// and Window::fMinimized go out of sync. However, not
-						// doing it currently causes #4127.
-					break;
-				}
+				fWindow->SetShowLevel(showLevel);
+				if (showLevel <= 0)
+					_Show();
+				else
+					_Hide();
+			}
+			break;
+		}
+		// Only for internal use within this class
+		case AS_INTERNAL_HIDE_WINDOW:
+			_Hide();
+			break;
+		case AS_MINIMIZE_WINDOW:
+		{
+			bool minimize;
+			if (link.Read<bool>(&minimize) == B_OK) {
+				DTRACE(("ServerWindow %s: Message AS_MINIMIZE_WINDOW, "
+					"minimize: %d\n", Title(), minimize));
 
 				fDesktop->UnlockSingleWindow();
 				fDesktop->MinimizeWindow(fWindow, minimize);

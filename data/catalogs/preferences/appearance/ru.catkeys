@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	1557879521
+1	russian	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Простой шрифт:
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
@@ -31,6 +31,7 @@ Window decorator:	DecorSettingsView		Оконный декоратор:
 Selected menu item text	Colors tab		Текст выделенного пункта меню
 Menu background	Colors tab		Фон меню
 OK	DecorSettingsView		ОК
+Control mark	Colors tab		Отметка
 Size:	Font Selection view		Размер:
 Panel background	Colors tab		Фон панели
 Menu font:	Font view		Шрифт меню:

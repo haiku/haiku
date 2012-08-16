@@ -1,160 +1,40 @@
-1	swedish	x-vnd.Be-MAIL	2276629278
+1	swedish	x-vnd.Be-MAIL	1584464035
+View	Mail		Visa
 %d - Date	Mail		%d - Datum
-%e - E-mail address	Mail		%e - mejladress
-%e wrote:\\n	Mail		%e skrev:\\n
-%n - Full name	Mail		%n - Fullständigt namn
-(Address unavailable)	Mail		(Adress saknas)
-(Date unavailable)	Mail		(Datum saknas)
-(Name unavailable)	Mail		(Namn saknas)
-<none>	Mail		<ingen>
-Account from mail	Mail		Konto från brev
-Account:	Mail		Konto:
-Accounts…	Mail		Konton...
-Add	Mail		Lägg till
-Add enclosure…	Mail		Bifoga fil...
-Add signature	Mail		Lägg till signatur
-An error occurred trying to open this signature.	Mail		Ett fel uppstod när den här signaturen skulle öppnas
-An error occurred trying to save the attachment.	Mail		Ett fel uppstod när den bifogade filen försökte sparas.
-An error occurred trying to save this signature.	Mail		Ett fel uppstod när signaturen skulle sparas.
 Attach attributes:	Mail		Bifoga attribut:
-Attachments:	Mail		Bilagor: 
-Auto signature:	Mail		Autosignatur:
+Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsekvens uppstod i ångra/gör om-bufferten.
+An error occurred trying to save the attachment.	Mail		Ett fel uppstod när den bifogade filen försökte sparas.
+Copy to new	Mail		Kopiera till ny
+Edit	Mail		Redigera
+Print	Mail		Skriv ut
+<none>	Mail		<ingen>
+New mail message	Mail		Nytt e-post-meddelande
 Automatic	Mail		Automatiskt
 Automatically mark mail as read:	Mail		Markera brev som lästa:
-Bcc:	Mail		Bcc:
-Beginner	Mail		Nybörjare
-Button bar:	Mail		Verktygsfält
-Cancel	Mail		Avbryt
-Cc:	Mail		Cc:
-Check spelling	Mail		Kontrollera stavning
-Close	Mail		Stäng
-Close and 	Mail		Stäng och
-Colored quotes:	Mail		Färglagda citeringar:
-Copy	Mail		Kopiera
-Copy link location	Mail		Kopiera länk
-Copy to new	Mail		Kopiera till ny
-Couldn't open this signature. Sorry.	Mail		Kunde inte öppna den här signaturen.
-Cut	Mail		Klipp ut
-Date:	Mail		Datum:
-Decoding:	Mail		Avkodning:
-Default account:	Mail		Huvudkonto:
-Delete	Mail		Radera
-Discard	Mail		Kasta bort
-Do you wish to save this message as a draft before closing?	Mail		Vill du spara det här meddelandet som ett utkast innan du stänger?
-Do you wish to send this message before closing?	Mail		Vill du skicka det här meddelandet innan du stänger?
-Don't save	Mail		Spara ej
-E-mail draft could not be saved!	Mail		Utkast kunde inte sparas!
-Edit	Mail		Redigera
-Edit queries…	Mail		Redigera sökningar...
-Edit signatures…	Mail		Redigera signaturer…
-Encoding:	Mail		Kodning:
-Expert	Mail		Expert
-File	Mail		Arkiv
-Find	Mail		Sök
-Find again	Mail		Sök igen
-Find…	Mail		Sök…
-Font:	Mail		Typsnitt:
-Forward	Mail		Framåt
-Forward without attachments	Mail		Eftersänd utan bifogade filer
-From:	Mail		Från:
-Hide	Mail		Göm
-Include file attributes in attachments	Mail		Inkludera fil-attribut i bifogade filer
-Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsekvens uppstod i ångra/gör om-bufferten.
-Initial spell check mode:	Mail		Startläge för stavningskontroll:
-Leave as '%s'	Mail		Lämna som '%s'
-Leave as New	Mail		Lämna som nytt
-Leave same	Mail		Ändra inte
-Mail	System name		E-post
-Mail couldn't find its dictionary.	Mail		Programmet kunde inte hitta sin ordlista.
-Mail preferences	Mail		E-post : Inställningar
-Mailing	Mail		Mejlning
-Message	Mail		Meddelande
-Move to trash	Mail		Flytta till papperskorgen
-Need Tracker to move items to trash	Mail		Tracker behövs för att flytta sakerna till Papperskorgen
-New	Mail		Ny
-New mail message	Mail		Nytt e-post-meddelande
-Next	Mail		Nästa
-Next message	Mail		Nästa meddelande
-No file attributes, just plain data	Mail		Inga fil-attribut, endast ren data
-No matches	Mail		Inga träffar
-None	Mail		Inget
-OK	Mail		OK
-Off	Mail		Av
-On	Mail		På
-Only files can be added as attachments.	Mail		Bara filer kan läggas till som bilaga.
-Open	Mail		Öppna
-Open attachment	Mail		Öppna bilaga
-Open draft	Mail		Öppna utkast
-Open this link	Mail		Öppna den här länken
-Page setup…	Mail		Sidinställning…
-Paste	Mail		Klistra in
-Preferences…	Mail		Inställningar...
-Previous	Mail		Föregående
-Previous message	Mail		Föregående meddelande
-Print	Mail		Skriv ut
-Print…	Mail		Skriv ut...
-Put your favorite e-mail queries and query templates in this folder.	Mail		Lägg dina favorit e-post sökningar och sökmallar i denna mapp.
-Queries	Mail		Sökningar
-Quit	Mail		Avsluta
-Quote	Mail		Citat
-Random	Mail		Slumpa
-Read 	Mail		Läst
-Really delete this signature? This cannot be undone.	Mail		Vill du radera den här signaturen? Det kan inte ångras.
-Redo	Mail		Gör om
-Remove attachment	Mail		Ta bort bifogad fil
-Remove enclosure	Mail		Ta bort bifogad fil
-Remove quote	Mail		Ta bort citat
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Det går inte att ta bort bifogade filer ur vidarebefordrade brev. Den funktionen är inte implementerad än.
-Reply	Mail		Svara
-Reply account:	Mail		Konto för att svara på e-post:
-Reply preamble:	Mail		Svarsingress:
-Reply to all	Mail		Svara alla
-Reply to sender	Mail		Svara avsändare
-Resend	Mail		Skicka om
-Revert	Mail		Återgå
-Save	Mail		Spara
-Save address	Mail		Spara adress
-Save as draft	Mail		Spara som utkast
-Save attachment…	Mail		Spara bifogad fil...
-Save changes to this signature?	Mail		Spara ändringarna för den här signaturen?
-Select all	Mail		Välj alla
-Send	Mail		Skicka
-Send message	Mail		Skicka meddelande
-Set to %s	Mail		Sätt till %s
-Set to Saved	Mail		Sätt till sparad
-Set to…	Mail		Sätt till…
-Show header	Mail		Visa brevhuvud
-Show icons & labels	Mail		Visa ikoner & etiketter
-Show icons only	Mail		Visa endast ikoner
-Show raw message	Mail		Visa meddelande i råformat
-Signature	Mail		Signatur
-Signature:	Mail		Signatur:
-Signatures	Mail		Signaturer
-Size:	Mail		Storlek:
-Sorry	Mail		Tyvärr
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Kunde inte hitta ett program för att öppna datatypen 'Person'.
-Start now	Mail		Starta nu
-Subject:	Mail		Ämne:
-Text wrapping:	Mail		Radbrytning:
-The mail_daemon could not be started:\n\t	Mail		E-posttjänsten kunde inte startas:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Haikus e-posttjänst är inte igång. Meddelandet är lagt i kö och skickas när e-posttjänsten har startats.
-There is no installed handler for URL links.	Mail		Det finns ingen behandlare installerad för att hantera URL-länkar
-Title:	Mail		Titel:
-To:	Mail		Till:
-Trash	Mail		Släng
-Undo	Mail		Ångra
-Unread	Mail		Oläst
-Use default account	Mail		Använd standardkonto
-User interface	Mail		Användargränssnitt
-View	Mail		Visa
-Warn unencodable:	Mail		Varna för ogiltiga tecken:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Brevets huvudtext innehåller %Id oläsbara tecken. Det är möjligt att en annan teckenuppsättning skulle vara mer lämplig. Tryck på Skicka för att sända brevet som det är - oläsbara tecken kommer ersättas - eller välj Avbryt för att gå tillbaka och korrigera problemet.
-\\n - Newline	Mail		\\n - Ny rad
-draft	B_USER_DIRECTORY/mail/draft		utkast
 helpful message	Mail		hjälpsamt meddelande
-in	B_USER_DIRECTORY/mail/in		inkorg
-mail	B_USER_DIRECTORY/mail		e-post
-out	B_USER_DIRECTORY/mail/out		utkorg
-queries	B_USER_DIRECTORY/mail/queries		sökningar
-sent	B_USER_DIRECTORY/mail/sent		skickat
+Colored quotes:	Mail		Färglagda citeringar:
+Subject:	Mail		Ämne:
+Reply to all	Mail		Svara alla
+Show icons & labels	Mail		Visa ikoner & etiketter
+Remove attachment	Mail		Ta bort bifogad fil
+Button bar:	Mail		Verktygsfält
 spam	B_USER_DIRECTORY/mail/spam		skräp
+Beginner	Mail		Nybörjare
+Don't save	Mail		Spara ej
+Expert	Mail		Expert
+Reply account:	Mail		Konto för att svara på e-post:
+Discard	Mail		Kasta bort
+Message	Mail		Meddelande
+Reply to sender	Mail		Svara avsändare
+There is no installed handler for URL links.	Mail		Det finns ingen behandlare installerad för att hantera URL-länkar
+Signature	Mail		Signatur
+Find again	Mail		Sök igen
+Signature:	Mail		Signatur:
+Preferences…	Mail		Inställningar...
+Undo	Mail		Ångra
+Date:	Mail		Datum:
+Paste	Mail		Klistra in
+in	B_USER_DIRECTORY/mail/in		i
+Save attachment…	Mail		Spara bilagor...
+Print…	Mail		Skriv ut…
+Signatures	Mail		Signaturer

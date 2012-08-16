@@ -1,6 +1,7 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HPGSTranslator	3081638323
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HPGSTranslator	885771575
 Based on HPGS (http://hpgs.berlios.de)	ConfigView		Basert på HPGS (http://hpgs.berlios.de)
-Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+Version %d.%d.%d, %s	ConfigView		Versjon %d.%d.%d, %s
+Error: Cannot process plot data %s\n	HPGSTranslator		Feil: Kan ikke behandle plot-data %s\n
 HPGS image	HPGSTranslator		HPGS-bilde
 HPGSTranslator Settings	ConfigView		HPGS-oversetterinnstillinger
 HPGS images	ConfigView		HPGS-bilder

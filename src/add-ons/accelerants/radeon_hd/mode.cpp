@@ -185,8 +185,6 @@ radeon_set_display_mode(display_mode* mode)
 		encoder_assign_crtc(id);
 
 		// *** CRT controler mode set
-		// TODO: program SS
-
 		// Set up PLL for connector
 		pll_pick(connectorIndex);
 		pll_info* pll = &gConnector[connectorIndex]->encoder.pll;

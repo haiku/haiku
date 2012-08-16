@@ -1,9 +1,8 @@
-1	japanese	x-vnd.Haiku-TGATranslator	4159874267
+1	japanese	x-vnd.Haiku-TGATranslator	2221210336
 Targa image (%d bits truecolor)	TGATranslator		Targa イメージ (%d ビット トゥルーカラー)
 Version %d.%d.%d %s	TGAView		バージョン %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		TGA のαチャンネルを無視する
 Targa image (%d bits colormap)	TGATranslator		Targa イメージ (%d ビット カラーマップ)
-TGA Image Translator	TGAView		TGA イメージトランスレーター
 Targa image (%d bits RLE colormap)	TGATranslator		Targa イメージ (%d ビット RLE カラーマップ)
 Targa image (%d bits gray)	TGATranslator		Targa イメージ (%d ビット グレー)
 Written by the Haiku Translation Kit Team	TGAView		Haiku トランスレーターキットチーム作

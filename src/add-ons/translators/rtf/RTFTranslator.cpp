@@ -84,7 +84,7 @@ RTFTranslator::TranslatorName() const
 const char *
 RTFTranslator::TranslatorInfo() const
 {
-	return B_TRANSLATE("Rich Text Format Translator");
+	return B_TRANSLATE("Rich Text Format translator");
 }
 
 

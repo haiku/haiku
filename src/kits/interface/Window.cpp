@@ -589,14 +589,14 @@ BWindow::ChildAt(int32 index) const
 void
 BWindow::Minimize(bool minimize)
 {
-	if (IsModal() || IsFloating() || fMinimized == minimize || !Lock())
+	if (IsModal() || IsFloating() || IsHidden() || fMinimized == minimize
+		|| !Lock())
 		return;
 
 	fMinimized = minimize;
 
 	fLink->StartMessage(AS_MINIMIZE_WINDOW);
 	fLink->Attach<bool>(minimize);
-	fLink->Attach<int32>(fShowLevel);
 	fLink->Flush();
 
 	Unlock();
@@ -770,10 +770,7 @@ BWindow::MessageReceived(BMessage* msg)
 			// connect all views to the server again
 			fTopView->_CreateSelf();
 
-			if (fShowLevel >= 1) {
-				fLink->StartMessage(AS_SHOW_WINDOW);
-				fLink->Flush();
-			}
+			_SendShowOrHideMessage();
 		}
 
 		return BLooper::MessageReceived(msg);
@@ -2096,10 +2093,6 @@ BWindow::IsMinimized() const
 	if (!locker.IsLocked())
 		return false;
 
-	// Hiding takes precendence over minimization!!!
-	if (IsHidden())
-		return false;
-
 	return fMinimized;
 }
 
@@ -2609,12 +2602,9 @@ BWindow::Show()
 {
 	bool runCalled = true;
 	if (Lock()) {
-		fShowLevel++;
+		fShowLevel--;
 
-		if (fShowLevel == 1) {
-			fLink->StartMessage(AS_SHOW_WINDOW);
-			fLink->Flush();
-		}
+		_SendShowOrHideMessage();
 
 		runCalled = fRunCalled;
 
@@ -2639,24 +2629,24 @@ BWindow::Show()
 void
 BWindow::Hide()
 {
-	if (!Lock())
-		return;
+	if (Lock()) {
+		// If we are minimized and are about to be hidden, unminimize
+		if (IsMinimized() && fShowLevel == 0)
+			Minimize(false);
 
-	fShowLevel--;
+		fShowLevel++;
 
-	if (fShowLevel == 0) {
-		fLink->StartMessage(AS_HIDE_WINDOW);
-		fLink->Flush();
+		_SendShowOrHideMessage();
+
+		Unlock();
 	}
-
-	Unlock();
 }
 
 
 bool
 BWindow::IsHidden() const
 {
-	return fShowLevel <= 0;
+	return fShowLevel > 0;
 }
 
 
@@ -2793,7 +2783,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fInTransaction = bitmapToken >= 0;
 	fUpdateRequested = false;
 	fActive = false;
-	fShowLevel = 0;
+	fShowLevel = 1;
 
 	fTopView = NULL;
 	fFocus = NULL;
@@ -4058,6 +4048,15 @@ BWindow::_GetDecoratorSize(float* _borderWidth, float* _tabHeight) const
 		*_borderWidth = borderWidth;
 	if (_tabHeight != NULL)
 		*_tabHeight = tabHeight;
+}
+
+
+void
+BWindow::_SendShowOrHideMessage()
+{
+	fLink->StartMessage(AS_SHOW_OR_HIDE_WINDOW);
+	fLink->Attach<int32>(fShowLevel);
+	fLink->Flush();
 }
 
 

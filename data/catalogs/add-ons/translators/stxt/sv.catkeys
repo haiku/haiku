@@ -1,8 +1,6 @@
-1	swedish	x-vnd.Haiku-STXTTranslator	4075159346
+1	swedish	x-vnd.Haiku-STXTTranslator	3302294301
 Be styled text file	STXTTranslator		Textfil i Be-format
 Plain text file	STXTTranslator		Klartextfil
-STXT Settings	STXTMain		STXT-inställningar
 STXTTranslator Settings	STXTTranslator		STXT-översättningsinställningar
 StyledEdit files	STXTTranslator		SkrivStiligt-filer
-StyledEdit files translator	STXTTranslator		SkrivStiligt filöversättare
-StyledEdit files translator	STXTView		SkrivStiligt filöversättare
+STXT Settings	STXTMain		STXT-inställningar

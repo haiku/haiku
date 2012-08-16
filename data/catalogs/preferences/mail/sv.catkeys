@@ -1,60 +1,61 @@
-1	swedish	x-vnd.Haiku-Mail	3957822883
-Account name:	Config Views		Kontonamn:
-Account name:	E-Mail		Kontonamn:
-Account settings	AutoConfigWindow		Kontoinställningar
-Account settings	Config Views		Kontoinställningar
-Accounts	Config Window		Konton
-Add	Config Window		Lägg till
-Add filter	Config Views		Lägg till filter
-Always	Config Window		Alltid
-Apply	Config Window		Verkställ
-Back	AutoConfigWindow		Tillbaka
-Check every	Config Window		Kontrollera varje
-Choose Protocol	E-Mail		Välj protokoll
-Create new account	AutoConfigWindow		Skapa konto
-E-mail	System name		E-post
-E-mail address:	E-Mail		E-postadress:
-Edit mailbox menu…	Config Window		Redigera e-postmeny...
-Enter a valid e-mail address.	AutoConfigWindow		Ange en giltig e-postadress.
-Error	Config Window		Fel
-Error retrieving general settings: %s\n	Config Window		Misslyckades att hämta grundinställningarna: %s\n
-Finish	AutoConfigWindow		Slutför
-Incoming	Config Window		Inkommande
-Incoming	E-Mail		Inkommande
-Incoming mail filters	Config Views		Inkommande e-postfilter
-Login name:	E-Mail		Inloggningsnamn:
+1	swedish	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Kontrollera e-post
-Miscellaneous	Config Window		Diverse
-Never	Config Window	show status window	Aldrig
-Next	AutoConfigWindow		Nästa
-OK	AutoConfigWindow		OK
-OK	Config Views		OK
-OK	Config Window		OK
-Only when dial-up is connected	Config Window		Endast när uppringd förbindelse är uppkopplad
-Outgoing	Config Window		Utgående
-Outgoing	E-Mail		Utgående
-Outgoing mail filters	Config Views		Utgående e-postfilter
-Password:	E-Mail		Lösenord:
-Real name:	Config Views		Verkligt namn:
-Real name:	E-Mail		Verkligt namn:
-Remove	Config Views		Ta bort
-Remove	Config Window		Ta bort
-Return address:	Config Views		Svarsadress:
-Revert	Config Window		Återgå
-Schedule outgoing mail when dial-up is disconnected	Config Window		Schemalägg utgående e-post när uppringning är nerkopplad
-Server Name:	E-Mail		Servernamn:
 Settings	Config Window		Inställningar
-Show connection status window:	Config Window		Visa anslutningsstatusfönster:
-Start mail services on startup	Config Window		Starta e-posttjänster vid start
-The filter could not be moved. Deleting filter.	Config Views		Filtret kunde inte flyttas. Tar bort filtret.
-While sending	Config Window		När sändning sker
+Never	Config Window	show status window	Aldrig
+Only when dial-up is connected	Config Window		Endast när uppringd förbindelse är uppkopplad
 While sending and receiving	Config Window		När sändning och mottagning sker
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGrundinställningarna kunde inte återställas.\n\nEtt fel uppstod när grundinställningarna skulle återställas:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nSkapa ett nytt konto via Lägg till-knappen.\n\nTa bort ett konto med Ta bort-knappen vid den valda objektet.\n\nVälj ett listobjekt för att ändra dess inställningar.
-\t\t· E-mail filters	Config Window		\t\t· E-postfilter
-\t\t· Incoming	Config Window		\t\t· Inkommande
-\t\t· Outgoing	Config Window		\t\t· Utgående
 days	Config Window		dagar
+Incoming	Config Window		Inkommande
+Server name:	E-Mail		Servernamn:
+OK	Config Window		OK
+Start mail services on startup	Config Window		Starta e-posttjänster vid start
+E-mail address:	E-Mail		E-postadress:
+Account name:	E-Mail		Kontonamn:
+Account name:	Config Views		Kontonamn:
+Create new account	AutoConfigWindow		Skapa konto
+OK	Config Views		OK
+The filter could not be moved. Deleting filter.	Config Views		Filtret kunde inte flyttas. Tar bort filtret.
+Revert	Config Window		Återgå
+Login name:	E-Mail		Inloggningsnamn:
+Incoming	E-Mail		Inkommande
+Password:	E-Mail		Lösenord:
+Accounts	Config Window		Konton
+Finish	AutoConfigWindow		Slutför
+Remove	Config Window		Ta bort
+Miscellaneous	Config Window		Diverse
+Show connection status window:	Config Window		Visa anslutningsstatusfönster:
+Server Name:	E-Mail		Servernamn:
+While sending	Config Window		När sändning sker
+Schedule outgoing mail when dial-up is disconnected	Config Window		Schemalägg utgående e-post när uppringning är nerkopplad
 hours	Config Window		timmar
-minutes	Config Window		minuter
+Enter a valid e-mail address.	AutoConfigWindow		Ange en giltig e-postadress.
+Add	Config Window		Lägg till
+Account settings	AutoConfigWindow		Kontoinställningar
+E-mail	System name		E-post
 never	Config Window	mail checking frequency	aldrig
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGrundinställningarna kunde inte återställas.\n\nEtt fel uppstod när grundinställningarna skulle återställas:\n%s\n
+Real name:	Config Views		Verkligt namn:
+\t\t· Outgoing	Config Window		\t\t· Utgående
+Choose Protocol	E-Mail		Välj protokoll
+Return address:	Config Views		Svarsadress:
+Edit mailbox menu…	Config Window		Redigera e-postmeny...
+Outgoing	E-Mail		Utgående
+\t\t· E-mail filters	Config Window		\t\t· E-postfilter
+Remove	Config Views		Ta bort
+\t\t· Incoming	Config Window		\t\t· Inkommande
+Next	AutoConfigWindow		Nästa
+Check every	Config Window		Kontrollera varje
+Back	AutoConfigWindow		Tillbaka
+Incoming mail filters	Config Views		Inkommande e-postfilter
+Account settings	Config Views		Kontoinställningar
+minutes	Config Window		minuter
+Error retrieving general settings: %s\n	Config Window		Misslyckades att hämta grundinställningarna: %s\n
+Real name:	E-Mail		Verkligt namn:
+Apply	Config Window		Verkställ
+Always	Config Window		Alltid
+OK	AutoConfigWindow		OK
+Add filter	Config Views		Lägg till filter
+Outgoing	Config Window		Utgående
+Outgoing mail filters	Config Views		Utgående e-postfilter
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nSkapa ett nytt konto via Lägg till-knappen.\n\nTa bort ett konto med Ta bort-knappen vid den valda objektet.\n\nVälj ett listobjekt för att ändra dess inställningar.
+Error	Config Window		Fel

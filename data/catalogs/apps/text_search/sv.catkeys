@@ -1,33 +1,33 @@
 1	swedish	x-vnd.Haiku.TextSearch	1180598828
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunde inte öppna en eller flera kataloger.
 %s: Not enough room to escape the filename.	Grepper		Saknar utrymme för att koda om filnamnet
-%s: There was a problem running grep.	Grepper		%s: Det uppstod ett problem när grep kördes.
-Actions	GrepWindow		Kommandon
-Cancel	GrepWindow		Avbryt
-Case-sensitive	GrepWindow		Skilj på små/stora bokstäver
-Close	GrepWindow		Stäng
-Copy text to clipboard	GrepWindow		Kopiera text till urklipp
-Encoding	GrepWindow		Teckenuppsättning
-Escape search text	GrepWindow		Skydda söksträngen med escapesekvenser
-File	GrepWindow		Arkiv
-Follow symbolic links	GrepWindow		Följ symboliska länkar
-History	GrepWindow		Historik
-Look in sub-folders	GrepWindow		Sök i underkataloger
-New window	GrepWindow		Nytt fönster
-OK	GrepWindow		OK
-Open files in Pe	GrepWindow		Öppna filerna i Pe
-Open selection	GrepWindow		Öppna markering
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Markera de filer du vill ska markeras i Tracker.
-Please select the files you wish to keep searching.	GrepWindow		Var god markera de filer du önskar fortsätta söka i.
-Quit	GrepWindow		Avsluta
-Search	GrepWindow		Sök
-Select all	GrepWindow		Markera allt
-Set target…	GrepWindow		Ange mål...
-Settings	GrepWindow		Inställningar
-Show files in Tracker	GrepWindow		Visa filer i Tracker
-Show lines	GrepWindow		Visa rader
-Skip folders starting with a dot	GrepWindow		Hoppa över dolda mappar
-Text files only	GrepWindow		Endast textfiler
-TextSearch	GrepWindow		TextSök
-The unselected files will be removed from the list.	GrepWindow		De omarkerade filerna kommer att tas bort från listan.
 Trim to selection	GrepWindow		Avgränsa sökning till markerade filer
+Follow symbolic links	GrepWindow		Följ symboliska länkar
+Close	GrepWindow		Stäng
+Cancel	GrepWindow		Avbryt
+The unselected files will be removed from the list.	GrepWindow		De omarkerade filerna kommer att tas bort från listan.
+Set target…	GrepWindow		Ange mål...
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Markera de filer du vill ska markeras i Tracker.
+Open files in Pe	GrepWindow		Öppna filerna i Pe
+Copy text to clipboard	GrepWindow		Kopiera text till urklipp
+Settings	GrepWindow		Inställningar
+Select all	GrepWindow		Markera allt
+OK	GrepWindow		OK
+Skip folders starting with a dot	GrepWindow		Hoppa över dolda mappar
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunde inte öppna en eller flera kataloger.
+Escape search text	GrepWindow		Skydda söksträngen med escapesekvenser
+Search	GrepWindow		Sök
+Open selection	GrepWindow		Öppna markering
+Look in sub-folders	GrepWindow		Sök i underkataloger
+Actions	GrepWindow		Kommandon
+File	GrepWindow		Arkiv
+Encoding	GrepWindow		Teckenuppsättning
+History	GrepWindow		Historik
+%s: There was a problem running grep.	Grepper		%s: Det uppstod ett problem när grep kördes.
+New window	GrepWindow		Nytt fönster
+Please select the files you wish to keep searching.	GrepWindow		Var god markera de filer du önskar fortsätta söka i.
+TextSearch	GrepWindow		TextSök
+Quit	GrepWindow		Avsluta
+Show files in Tracker	GrepWindow		Visa filer i Tracker
+Case-sensitive	GrepWindow		Skilj på små/stora bokstäver
+Text files only	GrepWindow		Endast textfiler
+Show lines	GrepWindow		Visa rader

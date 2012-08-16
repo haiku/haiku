@@ -17,11 +17,7 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 		defines = $(DEFINES) ;
 		headers = $(HAIKU_CONFIG_HEADERS) $(SEARCH_SOURCE) $(SUBDIRHDRS)
 			$(HDRS) ;
-			
-		# insert specific header folder containing the Catalog.h that should be 
-		# used when collecting the catalog keys:
-		sysHeaders = [ FDirName $(HAIKU_TOP) headers private locale collecting ]
-			$(SUBDIRSYSHDRS) $(SYSHDRS) ;
+		sysHeaders = $(SUBDIRSYSHDRS) $(SYSHDRS) ;
 
 		if $(PLATFORM) = host {
 			sysHeaders += $(HOST_HDRS) ;
@@ -71,7 +67,8 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 actions ExtractCatalogEntries1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	cat "$(2[2-])" | $(CC) -E $(CCDEFS) $(HDRS) - > "$(1)".pre
+	cat "$(2[2-])" \
+		| $(CC) -E $(CCDEFS) -DB_COLLECTING_CATKEYS $(HDRS) - > "$(1)".pre
 	$(2[1]) $(HAIKU_CATALOG_REGEXP) -s $(HAIKU_CATALOG_SIGNATURE) \
 		-w -o "$(1)" "$(1)".pre
 }

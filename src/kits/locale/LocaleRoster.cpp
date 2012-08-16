@@ -102,14 +102,20 @@ country_code_for_language(const BLanguage& language)
 			return "CZ";
 		case 'da':	// Denmark
 			return "DK";
+		case 'el':	// Greece
+			return "GR";
 		case 'en':	// United Kingdom
 			return "GB";
+		case 'hi':	// India
+			return "IN";
 		case 'ja':	// Japan
 			return "JP";
 		case 'ko':	// South Korea
 			return "KR";
 		case 'nb':	// Norway
 			return "NO";
+		case 'pa':	// Pakistan
+			return "PK";
 		case 'sv':	// Sweden
 			return "SE";
 		case 'uk':	// Ukraine
@@ -122,6 +128,7 @@ country_code_for_language(const BLanguage& language)
 		case 'es':	// Spain
 		case 'fi':	// Finland
 		case 'fr':	// France
+		case 'hr':	// Croatia
 		case 'hu':	// Hungary
 		case 'it':	// Italy
 		case 'lt':	// Lithuania

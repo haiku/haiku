@@ -93,7 +93,6 @@ struct pll_info {
 	/* asic spread spectrum */
 	uint16 ssRate;
 	uint16 ssAmount;
-
 };
 
 

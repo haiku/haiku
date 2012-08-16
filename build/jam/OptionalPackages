@@ -209,18 +209,23 @@ if [ IsOptionalHaikuImagePackageAdded BeAE ] {
 if [ IsOptionalHaikuImagePackageAdded Beam ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Beam available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package Beam available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage Beam-1.2alpha-x86-gcc2-2012-06-04.zip
-			: $(baseURL)/Beam-1.2alpha-x86-gcc2-2012-06-04.zip ;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				beam-1.2alpha-x86-gcc4-2012-08-11.zip
+				: $(baseURL)/beam-1.2alpha-x86-gcc4-2012-08-11.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				Beam-1.2alpha-x86-gcc2-2012-06-04.zip
+				: $(baseURL)/Beam-1.2alpha-x86-gcc2-2012-06-04.zip ;
+		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Beam/Beam ;
 	}
 }
 
 
-# BeBook
+# bebook
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 	InstallOptionalHaikuImagePackage bebook_20081026.zip
 		: $(baseURL)/bebook_20081026.zip
@@ -267,12 +272,16 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BePDF available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package BePDF available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage
-			bepdf-1.1.1b4-r1a3-x86-gcc2-2011-05-30.zip
-			: $(baseURL)/bepdf-1.1.1b4-r1a3-x86-gcc2-2011-05-30.zip ;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				bepdf-1.1.1b4-x86-gcc4-2012-08-11.zip
+				: $(baseURL)/bepdf-1.1.1b4-x86-gcc4-2012-08-11.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				bepdf-1.1.1b4-r1a3-x86-gcc2-2011-05-30.zip
+				: $(baseURL)/bepdf-1.1.1b4-r1a3-x86-gcc2-2011-05-30.zip ;
+		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BePDF/BePDF ;
 	}
@@ -1249,8 +1258,9 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 if [ IsOptionalHaikuImagePackageAdded LibLayout ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibLayout available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package LibLayout available for gcc4" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage liblayout-1.4.1-gcc4-2012-08-11.zip
+			: $(baseURL)/liblayout-1.4.1-gcc4-2012-08-11.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage liblayout-1.4.0-gcc2-2009-03-08.zip
 			: $(baseURL)/liblayout-1.4.0-gcc2-2009-03-08.zip ;

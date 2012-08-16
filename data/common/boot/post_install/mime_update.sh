@@ -24,6 +24,9 @@ done
 
 SYSTEM=$(/bin/finddir B_SYSTEM_DIRECTORY 2>/dev/null || echo "/boot/system")
 
+mimeset -f "$SYSTEM/bin/userguide"
+mimeset -f "$SYSTEM/bin/welcome"
+
 _progress 0.1 "system applications"
 mimeset -apps -f "$SYSTEM/apps"
 _progress 0.2 "documentation"

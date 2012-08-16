@@ -18,14 +18,11 @@ const rgb_color RGB_WIN = { 0xDE, 0xDB, 0xDE, 0xFF };
 const rgb_color RGB_PIE_OL = { 0x80, 0x80, 0x80, 0xFF };
 const rgb_color RGB_PIE_BG = { 0xFF, 0xFF, 0xFF, 0xFF };
 const rgb_color RGB_PIE_MT = { 0xA0, 0xA0, 0xA0, 0xFF };
-const rgb_color RGB_PIE_1 = { 0x00, 0x00, 0xb6, 0xFF };
-const rgb_color RGB_PIE_2 = { 0x00, 0x00, 0x68, 0xFF };
-const rgb_color RGB_PIE_3 = { 0xcf, 0x00, 0x00, 0xFF };
-const rgb_color RGB_PIE_4 = { 0xaf, 0x63, 0xb1, 0xFF };
 
 const int kBasePieColorCount = 4;
 const rgb_color kBasePieColor[kBasePieColorCount]
-	= { RGB_PIE_1, RGB_PIE_2, RGB_PIE_3, RGB_PIE_4 };
+	= { { 0x33, 0x66, 0x98, 0xFF }, { 0x43, 0xAE, 0x39, 0xFF },
+		{ 0xFF, 0xD3, 0x00, 0xFF }, { 0xFF, 0x76, 0x00, 0xFF } };
 
 const rgb_color kWindowColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 const rgb_color kOutlineColor = RGB_PIE_OL;
@@ -53,7 +50,6 @@ const float	kPieRingSize		= 20.0;
 const float	kPieInnerMargin		= 10.0;
 const float	kPieOuterMargin		= 10.0;
 const float	kMinSegmentSpan		= 2.0;
-const int	kLightenFactor		= 0x12;
 const float	kDragThreshold		= 5.0;
 
 extern entry_ref helpFileRef;

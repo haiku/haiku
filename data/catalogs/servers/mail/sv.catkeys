@@ -1,23 +1,23 @@
-1	swedish	x-vnd.Be-POST	2865617627
-%num new message	DeskbarView		%num nytt meddelande
-%num new message for %name\n	MailDaemon		%num nytt meddelande för %name\n
-%num new message.	MailDaemon		%num nytt meddelande.
-%num new messages	DeskbarView		%num nya meddelanden
-%num new messages for %name\n	MailDaemon		%num nya meddelanden för %name\n
-%num new messages.	MailDaemon		%num nya meddelanden.
-<no accounts>	DeskbarView		<inga konton>
-Check for mail now	DeskbarView		Kontrollera e-post nu
-Check for mails only	DeskbarView		Kontrollera bara e-post
-Create new message…	DeskbarView		Skapa nytt meddelande...
+1	swedish	x-vnd.Be-POST	2300302075
 Fetching mail for %name	Notifier		Hämtar e-post för %name
-Mail Status	Notifier		E-poststatus
-Mail daemon status log	MailDaemon		Statuslog för e-postdemon
-Mail status	MailDaemon		E-post status
-New Messages	MailDaemon		nya meddelanden
-No new messages	DeskbarView		inga nya meddelanden
-No new messages	MailDaemon		inga nya meddelanden
-No new messages.	MailDaemon		inga nya meddelanden.
-Preferences…	DeskbarView		Inställningar...
+Check for mails only	DeskbarView		Kontrollera bara e-post
 Send pending mails	DeskbarView		Skicka väntande meddelanden
-Sending mail for %name	Notifier		Skickar e-post för %name
+New Messages	MailDaemon		nya meddelanden
+<no accounts>	DeskbarView		<inga konton>
+%num new messages	DeskbarView		%num nya meddelanden
+Mail status	MailDaemon		E-post status
 Shutdown mail services	DeskbarView		Stäng av e-posttjänsterna
+%num new message	DeskbarView		%num nytt meddelande
+Sending mail for %name	Notifier		Skickar e-post för %name
+Preferences…	DeskbarView		Inställningar...
+%num new messages.	MailDaemon		%num nya meddelanden.
+%num new message.	MailDaemon		%num nytt meddelande.
+Create new message…	DeskbarView		Skapa nytt meddelande...
+%num new message for %name\n	MailDaemon		%num nytt meddelande för %name\n
+No new messages	MailDaemon		inga nya meddelanden
+Check for mail now	DeskbarView		Kontrollera e-post nu
+No new messages	DeskbarView		inga nya meddelanden
+%num new messages for %name\n	MailDaemon		%num nya meddelanden för %name\n
+Mail daemon status log	MailDaemon		Statuslog för e-postdemon
+No new messages.	MailDaemon		inga nya meddelanden.
+Mail status	Notifier		E-post status
