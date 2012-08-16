@@ -42,7 +42,7 @@ GIFView::GIFView(const char *name)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView *title = new BStringView("Title", translatorName);
+	BStringView *title = new BStringView("Title", B_TRANSLATE("GIF image translator"));
 	title->SetFont(be_bold_font);
 
 	char version_string[100];
