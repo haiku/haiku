@@ -230,16 +230,21 @@ Inode::Link(Inode* dir, const char* name)
 	if (fi.fName == NULL)
 		return B_NO_MEMORY;
 
-	char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-		strlen(fInfo.fPath)));
-	if (path == NULL)
-		return B_NO_MEMORY;
+	if (fInfo.fPath != NULL) {
+		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
+			strlen(fInfo.fPath)));
+		if (path == NULL)
+			return B_NO_MEMORY;
 
-	strcpy(path, dir->fInfo.fPath);
-	strcat(path, "/");
-	strcat(path, name);
-	free(const_cast<char*>(fi.fPath));
-	fi.fPath = path;
+		strcpy(path, fInfo.fPath);
+		strcat(path, "/");
+		strcat(path, name);
+		fi.fPath = path;
+	} else {
+		fi.fPath = strdup(name);
+		if (fi.fPath == NULL)
+			return B_NO_MEMORY;
+	}
 
 	fFileSystem->InoIdMap()->AddEntry(fi, fInfo.fFileId);
 
@@ -803,17 +808,30 @@ Inode::ChildAdded(const char* name, uint64 fileID,
 	if (fi.fName == NULL)
 		return B_NO_MEMORY;
 
-	char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-		strlen(fInfo.fPath)));
-	if (path == NULL)
-		return B_NO_MEMORY;
+	if (fInfo.fPath != NULL) {
+		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
+			strlen(fInfo.fPath)));
+		if (path == NULL)
+			return B_NO_MEMORY;
 
-	strcpy(path, fInfo.fPath);
-	strcat(path, "/");
-	strcat(path, name);
-	fi.fPath = path;
+		strcpy(path, fInfo.fPath);
+		strcat(path, "/");
+		strcat(path, name);
+		fi.fPath = path;
+	} else {
+		fi.fPath = strdup(name);
+		if (fi.fPath == NULL)
+			return B_NO_MEMORY;
+	}
 
 	return fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
+}
+
+
+const char*
+Inode::Name() const
+{
+	return fInfo.fName;
 }
 
 

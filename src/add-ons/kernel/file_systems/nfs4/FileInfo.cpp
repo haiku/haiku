@@ -56,7 +56,7 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 
 	uint32 lookupCount = 0;
 	status_t result;
-
+dprintf("%s %s\n", fs->Path(), fPath);
 	result = ParsePath(req, lookupCount, fs->Path());
 	if (result != B_OK)
 		return result;

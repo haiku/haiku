@@ -19,6 +19,9 @@ public:
 								RootInode();
 								~RootInode();
 
+	virtual	const char*			Name() const;
+	inline	void				SetName(const char* name);
+
 			status_t			ReadInfo(struct fs_info* info);
 	inline	void				MakeInfoInvalid();
 
@@ -31,6 +34,8 @@ private:
 			struct fs_info		fInfoCache;
 			mutex				fInfoCacheLock;
 			time_t				fInfoCacheExpire;
+
+			const char*			fName;
 
 			uint32				fIOSize;
 
@@ -52,6 +57,14 @@ RootInode::IOSize()
 	if (fIOSize == 0)
 		_UpdateInfo(true);
 	return fIOSize;
+}
+
+
+inline void
+RootInode::SetName(const char* name)
+{
+	free(const_cast<char*>(fName));
+	fName = strdup(name);
 }
 
 

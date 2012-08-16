@@ -20,11 +20,11 @@ class Inode : public NFS4Inode {
 public:
 	static			status_t	CreateInode(FileSystem* fs, const FileInfo& fi,
 									Inode** inode);
-								~Inode();
+	virtual						~Inode();
 
 	inline			ino_t		ID() const;
 	inline			mode_t		Type() const;
-	inline			const char*	Name() const;
+	virtual			const char*	Name() const;
 	inline			FileSystem*	GetFileSystem() const;
 
 	inline			void		SetOpenState(OpenState* state);
@@ -178,13 +178,6 @@ inline mode_t
 Inode::Type() const
 {
 	return sNFSFileTypeToHaiku[fType];
-}
-
-
-inline const char*
-Inode::Name() const
-{
-	return fInfo.fName;
 }
 
 

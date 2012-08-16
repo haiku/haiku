@@ -58,16 +58,20 @@ FileSystem::~FileSystem()
 
 
 static const char*
-sGetPath(const char* root, const char* path)
+GetPath(const char* root, const char* path)
 {
 	int slash = 0;
-	for (int i = 0; path[i] != '\0'; i++) {
+	int i;
+	for (i = 0; path[i] != '\0'; i++) {
 		if (path[i] != root[i] || root[i] == '\0')
 			break;
 
 		if (path[i] == '/')
 			slash = i;
 	}
+
+	if (path[i] == '\0')
+		return NULL;
 
 	return path + slash;
 }
@@ -149,12 +153,6 @@ FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
 	const char* name;
 	if (fsPath != NULL && fsPath[0] == '/')
 		fsPath++;
-	name = strrchr(fsPath, '/');
-	if (name != NULL) {
-		name++;
-		fi.fName = strdup(name);
-	} else
-		fi.fName = strdup(fsPath);
 
 	fs->fServer = serv;
 	fs->fDevId = id;
@@ -162,17 +160,29 @@ FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
 
 	fi.fHandle = fh;
 	fi.fParent = fh;
-	fi.fPath = strdup(sGetPath(fs->fPath, fsPath));
+	fi.fPath = strdup(GetPath(fs->fPath, fsPath));
+
+	if (fi.fPath != NULL) {
+		name = strrchr(fi.fPath, '/');
+		if (name != NULL) {
+			name++;
+			fi.fName = strdup(name);
+		}
+	}
 
 	delete[] values;
-
-	if (fi.fName == NULL || fi.fPath == NULL)
-		return B_NO_MEMORY;
 
 	Inode* inode;
 	result = Inode::CreateInode(fs, fi, &inode);
 	if (result != B_OK)
 		return result;
+
+	name = strrchr(fsPath, '/');
+	if (name != NULL) {
+		name++;
+		reinterpret_cast<RootInode*>(inode)->SetName(name);
+	} else
+		reinterpret_cast<RootInode*>(inode)->SetName(fsPath);
 
 	fs->fRoot = reinterpret_cast<RootInode*>(inode);
 

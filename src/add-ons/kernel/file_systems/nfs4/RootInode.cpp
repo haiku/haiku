@@ -18,6 +18,7 @@
 RootInode::RootInode()
 	:
 	fInfoCacheExpire(0),
+	fName(NULL),
 	fIOSize(0)
 {
 	mutex_init(&fInfoCacheLock, NULL);
@@ -26,6 +27,7 @@ RootInode::RootInode()
 
 RootInode::~RootInode()
 {
+	free(const_cast<char*>(fName));
 	mutex_destroy(&fInfoCacheLock);
 }
 
@@ -125,7 +127,7 @@ RootInode::_UpdateInfo(bool force)
 	} while (true);
 
 	fInfoCache.flags = 0;
-	strncpy(fInfoCache.volume_name, fInfo.fName, B_FILE_NAME_LENGTH);
+	strncpy(fInfoCache.volume_name, fName, B_FILE_NAME_LENGTH);
 
 	fInfoCacheExpire = time(NULL) + MetadataCache::kExpirationTime;
 
@@ -159,7 +161,6 @@ RootInode::ProbeMigration()
 		return false;
 	} while (true);
 }
-
 
 
 status_t
@@ -196,5 +197,12 @@ RootInode::GetLocations(AttrValue** attrv)
 	} while (true);
 
 	return B_OK;
+}
+
+
+const char*
+RootInode::Name() const
+{
+	return fName;
 }
 

@@ -23,7 +23,7 @@ public:
 	inline									~InodeIdMap();
 
 	inline	status_t						AddEntry(const FileInfo& fi,
-												ino_t id);
+												ino_t id, bool weak = false);
 	inline	status_t						RemoveEntry(ino_t id);
 	inline	status_t						GetFileInfo(FileInfo* fi, ino_t id);
 
@@ -49,10 +49,11 @@ InodeIdMap::~InodeIdMap()
 
 
 inline status_t
-InodeIdMap::AddEntry(const FileInfo& fi, ino_t id)
+InodeIdMap::AddEntry(const FileInfo& fi, ino_t id, bool weak)
 {
 	MutexLocker _(fLock);
-	fMap.Remove(id);
+	//if (weak)
+		fMap.Remove(id);
 	return fMap.Insert(id, fi);
 }
 

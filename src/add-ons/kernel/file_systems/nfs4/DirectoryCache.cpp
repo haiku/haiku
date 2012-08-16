@@ -184,7 +184,7 @@ status_t
 DirectoryCache::Revalidate()
 {
 	uint64 change;
-	if (fInode->GetChangeInfo(&change, true) != B_OK) {
+	if (fInode->GetChangeInfo(&change, fAttrDir) != B_OK) {
 		Trash();
 		return B_ERROR;
 	}
@@ -263,24 +263,34 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 				notify_entry_created(fInode->GetFileSystem()->DevId(),
 					fInode->ID(), newCurrent->fName, newCurrent->fNode);
 
-				FileInfo fi;
-				fi.fFileId = newCurrent->fNode;
-				fi.fParent = fInode->fInfo.fHandle;
-				fi.fName = strdup(newCurrent->fName);
-				if (fi.fName != NULL) {
-					size_t pathLength = strlen(newCurrent->fName) + 2 +
-						strlen(fInode->fInfo.fPath);
-					char* path = reinterpret_cast<char*>(malloc(pathLength));
-					if (path != NULL) {
+				do {
+					FileInfo fi;
+					fi.fFileId = newCurrent->fNode;
+					fi.fParent = fInode->fInfo.fHandle;
+					fi.fName = strdup(newCurrent->fName);
+					if (fi.fName == NULL)
+						break;
+
+					if (fInode->fInfo.fPath != NULL) {
+						size_t pathLength = strlen(newCurrent->fName) + 2 +
+							strlen(fInode->fInfo.fPath);
+						char* path = reinterpret_cast<char*>(pathLength);
+						if (path == NULL)
+							break;
+
 						strcpy(path, fInode->fInfo.fPath);
 						strcat(path, "/");
 						strcat(path, newCurrent->fName);
 						fi.fPath = path;
-
-						fInode->GetFileSystem()->InoIdMap()->AddEntry(fi,
-							Inode::FileIdToInoT(newCurrent->fNode));
+					} else {
+						fi.fPath = strdup(newCurrent->fName);
+						if (fi.fPath == NULL)
+							break;
 					}
-				}
+
+					fInode->GetFileSystem()->InoIdMap()->AddEntry(fi,
+						Inode::FileIdToInoT(newCurrent->fNode), true);
+				} while (false);
 			}
 		} else
 			oldSnapshot->fEntries.Remove(prev, oldCurrent);
