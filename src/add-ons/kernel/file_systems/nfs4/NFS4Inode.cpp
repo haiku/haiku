@@ -938,7 +938,8 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 			return result;
 		}
 
-		if (*change == 0 && before[0].fData.fValue64 == after[0].fData.fValue64
+		if ((*change == 0
+				&& before[0].fData.fValue64 == after[0].fData.fValue64)
 			|| *change == after[0].fData.fValue64)
 			*change = after[0].fData.fValue64;
 		else

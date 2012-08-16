@@ -53,7 +53,8 @@ LockInfo::operator==(const struct flock& lock) const
 	uint64 start = static_cast<uint64>(lock.l_start);
 	uint64 len = static_cast<uint64>(lock.l_len);
 
-	return fStart == start && fLength == len || eof && fLength == UINT64_MAX;
+	return fStart == start && (fLength == len
+		|| (eof && fLength == UINT64_MAX));
 }
 
 

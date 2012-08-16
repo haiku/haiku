@@ -26,8 +26,8 @@ struct dns_resolver_module {
 
 
 static inline int
-getaddrinfo(const char* node, const char* service, const struct addrinfo* hints,
-	struct addrinfo** res)
+kgetaddrinfo(const char* node, const char* service,
+	const struct addrinfo* hints, struct addrinfo** res)
 {
 	dns_resolver_module* dns;
 	status_t result = get_module(DNS_RESOLVER_MODULE_NAME,
@@ -44,10 +44,14 @@ getaddrinfo(const char* node, const char* service, const struct addrinfo* hints,
 
 
 static inline void
-freeaddrinfo(struct addrinfo* res)
+kfreeaddrinfo(struct addrinfo* res)
 {
 	free(res);
 }
+
+
+#define getaddrinfo		kgetaddrinfo
+#define freeaddrinfo	kfreeaddrinfo
 
 
 #endif	//	DNS_RESOLVER_H

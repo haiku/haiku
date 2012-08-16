@@ -110,8 +110,8 @@ FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
 	result = reply.Access(NULL, &allowed);
 	if (result != B_OK)
 		return result;
-	else if (allowed & (ACCESS4_READ | ACCESS4_LOOKUP)
-				!= (ACCESS4_READ | ACCESS4_LOOKUP))
+	else if ((allowed & (ACCESS4_READ | ACCESS4_LOOKUP))
+		!= (ACCESS4_READ | ACCESS4_LOOKUP))
 		return B_PERMISSION_DENIED;
 
 	AttrValue* values;

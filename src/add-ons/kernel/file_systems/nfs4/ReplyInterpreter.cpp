@@ -161,11 +161,11 @@ ReplyInterpreter::Create(uint64* before, uint64* after, bool& atomic)
 
 // Bit Twiddling Hacks
 // http://graphics.stanford.edu/~seander/bithacks.html
-static inline uint32 sCountBits(uint32 v)
+static inline uint32 CountBits(uint32 v)
 {
 	v = v - ((v >> 1) & 0x55555555);
 	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
-	return ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+	return (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
 }
 
 
@@ -562,7 +562,7 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	uint32 attr_count = 0;
 	for (uint32 i = 0; i < bcount; i++) {
 		bitmap[i] = str.GetUInt();
-		attr_count += sCountBits(bitmap[i]);
+		attr_count += CountBits(bitmap[i]);
 	}
 
 	if (attr_count == 0) {

@@ -109,8 +109,8 @@ uint64
 NFS4Server::ClientId(uint64 prevId, bool forceNew)
 {
 	MutexLocker _(fClientIdLock);
-	if (fUseCount == 0 && fClientIdLastUse + (time_t)LeaseTime() < time(NULL)
-		|| forceNew && fClientId == prevId) {
+	if ((fUseCount == 0 && fClientIdLastUse + (time_t)LeaseTime() < time(NULL))
+		|| (forceNew && fClientId == prevId)) {
 
 		Request request(fServer);
 		request.Builder().SetClientID(fServer);
