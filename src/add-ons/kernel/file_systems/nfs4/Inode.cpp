@@ -55,7 +55,7 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 	uint64 size;
 	do {
 		RPC::Server* serv = fs->Server();
-		Request request(serv);
+		Request request(serv, fs);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(inode->fInfo.fHandle);

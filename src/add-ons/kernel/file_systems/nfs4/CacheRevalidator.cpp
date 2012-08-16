@@ -105,6 +105,7 @@ CacheRevalidator::_DirectoryCacheRevalidator()
 		}
 
 		fDirectoryCaches.RemoveHead();
+		current->fRevalidated = false;
 
 		if (current->Revalidate() == B_OK)
 			AddDirectory(current);

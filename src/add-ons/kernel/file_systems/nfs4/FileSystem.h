@@ -19,10 +19,19 @@
 class Inode;
 class RootInode;
 
+struct MountConfiguration {
+	bool	fHard;
+	int		fRetryLimit;
+
+	bool	fEmulateNamedAttrs;
+	bool	fCacheMetadata;
+};
+
 class FileSystem {
 public:
 	static	status_t			Mount(FileSystem** pfs, RPC::Server* serv,
-									const char* path, dev_t id);
+									const char* path, dev_t id,
+									const MountConfiguration& configuration);
 								~FileSystem();
 
 			status_t			GetInode(ino_t id, Inode** inode);
@@ -65,10 +74,12 @@ public:
 	inline	bool				NamedAttrs();
 	inline	void				SetNamedAttrs(bool attrs);
 
+	inline	const MountConfiguration&	GetConfiguration();
+
 			FileSystem*			fNext;
 			FileSystem*			fPrev;
 private:
-								FileSystem();
+								FileSystem(const MountConfiguration& config);
 
 			CacheRevalidator	fCacheRevalidator;
 
@@ -99,6 +110,8 @@ private:
 			dev_t				fDevId;
 
 			InodeIdMap			fInoIdMap;
+
+			MountConfiguration	fConfiguration;
 };
 
 
@@ -220,6 +233,13 @@ inline void
 FileSystem::SetNamedAttrs(bool attrs)
 {
 	fNamedAttrs = attrs;
+}
+
+
+inline const MountConfiguration&
+FileSystem::GetConfiguration()
+{
+	return fConfiguration;
 }
 
 

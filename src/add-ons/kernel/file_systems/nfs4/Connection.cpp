@@ -77,6 +77,16 @@ PeerAddress::ProtocolString() const
 }
 
 
+void
+PeerAddress::SetProtocol(const char* protocol)
+{
+	if (strcmp(protocol, "tcp") == 0)
+		fProtocol = IPPROTO_TCP;
+	else if (strcmp(protocol, "udp") == 0)
+		fProtocol = IPPROTO_UDP;
+}
+
+
 char*
 PeerAddress::UniversalAddress() const
 {

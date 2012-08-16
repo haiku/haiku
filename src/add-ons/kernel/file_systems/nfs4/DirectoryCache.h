@@ -65,6 +65,8 @@ public:
 	inline	time_t			ExpireTime();
 
 	static	const bigtime_t	kExpirationTime		= 15000000;
+
+			bool			fRevalidated;
 protected:
 			void			NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 								DirectoryCacheSnapshot* newSnapshot);

@@ -27,6 +27,8 @@ struct PeerAddress {
 								PeerAddress();
 
 			const char*			ProtocolString() const;
+			void				SetProtocol(const char* protocol);
+
 			char*				UniversalAddress() const;
 
 			socklen_t			AddressSize() const;

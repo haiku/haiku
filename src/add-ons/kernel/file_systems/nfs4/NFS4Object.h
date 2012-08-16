@@ -27,9 +27,19 @@ public:
 
 	static	uint32		IncrementSequence(uint32 error);
 
+	inline				NFS4Object();
+
 			FileInfo	fInfo;
 			FileSystem*	fFileSystem;
 };
+
+
+inline
+NFS4Object::NFS4Object()
+	:
+	fFileSystem(NULL)
+{
+}
 
 
 #endif	// NFS4OBJECT_H

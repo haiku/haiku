@@ -49,7 +49,7 @@ FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 status_t
 FileInfo::UpdateFileHandles(FileSystem* fs)
 {
-	Request request(fs->Server());
+	Request request(fs->Server(), fs);
 	RequestBuilder& req = request.Builder();
 
 	req.PutRootFH();

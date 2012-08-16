@@ -58,6 +58,7 @@ CacheRevalidator::Unlock()
 inline void
 CacheRevalidator::AddDirectory(DirectoryCache* cache)
 {
+	cache->fRevalidated = true;
 	fDirectoryCaches.InsertAfter(fDirectoryCaches.Tail(), cache);
 }
 
@@ -65,7 +66,9 @@ CacheRevalidator::AddDirectory(DirectoryCache* cache)
 inline void
 CacheRevalidator::RemoveDirectory(DirectoryCache* cache)
 {
-	fDirectoryCaches.Remove(cache);
+	if (cache->fRevalidated == true)
+		fDirectoryCaches.Remove(cache);
+	cache->fRevalidated = false;
 }
 
 

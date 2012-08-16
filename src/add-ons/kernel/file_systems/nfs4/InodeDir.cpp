@@ -67,31 +67,42 @@ Inode::LoadAttrDirHandle()
 
 	FileHandle handle;
 	status_t result;
-	if (!fFileSystem->NamedAttrs()) {
-		char* attrDir
-			= reinterpret_cast<char*>(malloc(strlen(fInfo.fName) + 32));
-		if (attrDir == NULL)
-			return B_NO_MEMORY;
-		strcpy(attrDir, ".");
-		strcat(attrDir, fInfo.fName);
-		strcat(attrDir, "-haiku-attrs");
 
-		result = NFS4Inode::LookUp(attrDir, NULL, NULL, &handle, true);
-		if (result == B_ENTRY_NOT_FOUND) {
-			ChangeInfo change;
-			struct stat st;
-			Stat(&st);
-			st.st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
-			result = NFS4Inode::CreateObject(attrDir, NULL, st.st_mode, NF4DIR,
-				&change, NULL, &handle, true);
+	if (fFileSystem->NamedAttrs()) {
+		result = NFS4Inode::OpenAttrDir(&handle);
+		if (result == B_OK) {
+			fInfo.fAttrDir = handle;
+			return B_OK;
 		}
 
-		free(attrDir);
-	} else {
-		result = NFS4Inode::OpenAttrDir(&handle);
-		if (result == B_UNSUPPORTED)
-			fFileSystem->SetNamedAttrs(false);
+		if (result != B_UNSUPPORTED)
+			return result;
+
+		fFileSystem->SetNamedAttrs(false);
 	}
+
+	if (!fFileSystem->GetConfiguration().fEmulateNamedAttrs)
+		return B_UNSUPPORTED;
+
+	char* attrDir
+		= reinterpret_cast<char*>(malloc(strlen(fInfo.fName) + 32));
+	if (attrDir == NULL)
+		return B_NO_MEMORY;
+	strcpy(attrDir, ".");
+	strcat(attrDir, fInfo.fName);
+	strcat(attrDir, "-haiku-attrs");
+
+	result = NFS4Inode::LookUp(attrDir, NULL, NULL, &handle, true);
+	if (result == B_ENTRY_NOT_FOUND) {
+		ChangeInfo change;
+		struct stat st;
+		Stat(&st);
+		st.st_mode |= S_IXUSR | S_IXGRP | S_IXOTH;
+		result = NFS4Inode::CreateObject(attrDir, NULL, st.st_mode, NF4DIR,
+			&change, NULL, &handle, true);
+	}
+
+	free(attrDir);
 
 	if (result != B_OK)
 		return result;
@@ -128,7 +139,7 @@ Inode::ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);

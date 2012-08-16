@@ -114,7 +114,7 @@ OpenState::_ReleaseLockOwner(LockOwner* owner)
 {
 	do {
 		RPC::Server* server = fFileSystem->Server();
-		Request request(server);
+		Request request(server, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.ReleaseLockOwner(this, owner);
@@ -166,7 +166,7 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 		: OPEN_DELEGATE_NONE;
 	do {
 		RPC::Server* server = fFileSystem->Server();
-		Request request(server);
+		Request request(server, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -231,7 +231,7 @@ OpenState::_ReclaimLocks(uint64 newClientID)
 
 		do {
 			RPC::Server* server = fFileSystem->Server();
-			Request request(server);
+			Request request(server, fFileSystem);
 			RequestBuilder& req = request.Builder();
 
 			req.PutFH(fInfo.fHandle);
@@ -272,7 +272,7 @@ OpenState::Close()
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);

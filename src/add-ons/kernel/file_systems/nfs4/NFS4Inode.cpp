@@ -18,7 +18,7 @@ NFS4Inode::GetChangeInfo(uint64* change, bool attrDir)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		if (attrDir)
@@ -60,7 +60,7 @@ NFS4Inode::CommitWrites()
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -86,7 +86,7 @@ NFS4Inode::Access(uint32* allowed)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -114,7 +114,7 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		if (parent)
@@ -199,7 +199,7 @@ NFS4Inode::Link(Inode* dir, const char* name, ChangeInfo* changeInfo)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -231,7 +231,7 @@ NFS4Inode::ReadLink(void* buffer, size_t* length)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -262,7 +262,7 @@ NFS4Inode::GetStat(AttrValue** values, uint32* count, OpenAttrCookie* cookie)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		if (cookie != NULL)
@@ -297,7 +297,7 @@ NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		if (state != NULL) {
@@ -335,7 +335,7 @@ NFS4Inode::Rename(Inode* from, Inode* to, const char* fromName,
 {
 	do {
 		RPC::Server* serv = from->fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, from->fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		if (attribute)
@@ -421,7 +421,7 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
 
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -512,7 +512,7 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
 
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		// Since we are opening the file using a pair (parentFH, name) we
@@ -613,7 +613,7 @@ NFS4Inode::OpenAttr(OpenState* state, const char* name, int mode,
 		state->fClientID = fFileSystem->NFSServer()->ClientId();
 
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fAttrDir);
@@ -665,7 +665,7 @@ NFS4Inode::ReadFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(state->fInfo.fHandle);
@@ -697,7 +697,7 @@ NFS4Inode::WriteFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(state->fInfo.fHandle);
@@ -732,7 +732,7 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		if (parent)
@@ -810,7 +810,7 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -888,7 +888,7 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		if (attribute)
@@ -958,7 +958,7 @@ NFS4Inode::OpenAttrDir(FileHandle* handle)
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -990,7 +990,7 @@ NFS4Inode::TestLock(OpenFileCookie* cookie, LockType* type, uint64* position,
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -1027,7 +1027,7 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 		MutexLocker ownerLocker(lockInfo->fOwner->fLock);
 
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
@@ -1073,7 +1073,7 @@ NFS4Inode::ReleaseLock(OpenFileCookie* cookie, LockInfo* lockInfo)
 		MutexLocker ownerLocker(lockInfo->fOwner->fLock);
 
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);

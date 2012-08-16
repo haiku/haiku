@@ -49,6 +49,7 @@ DirectoryCacheSnapshot::~DirectoryCacheSnapshot()
 
 DirectoryCache::DirectoryCache(Inode* inode, bool attr)
 	:
+	fRevalidated(false),
 	fDirectoryCache(NULL),
 	fInode(inode),
 	fAttrDir(attr),
@@ -60,6 +61,10 @@ DirectoryCache::DirectoryCache(Inode* inode, bool attr)
 
 DirectoryCache::~DirectoryCache()
 {
+	fInode->GetFileSystem()->Revalidator().Lock();
+	fInode->GetFileSystem()->Revalidator().RemoveDirectory(this);
+	fInode->GetFileSystem()->Revalidator().Unlock();
+
 	mutex_destroy(&fLock);
 }
 
@@ -179,7 +184,12 @@ status_t
 DirectoryCache::Revalidate()
 {
 	uint64 change;
-	if (fInode->GetChangeInfo(&change, true) == B_OK && change == fChange) {
+	if (fInode->GetChangeInfo(&change, true) != B_OK) {
+		Trash();
+		return B_ERROR;
+	}
+
+	if (change == fChange) {
 		fExpireTime = system_time() + kExpirationTime;
 		return B_OK;
 	}

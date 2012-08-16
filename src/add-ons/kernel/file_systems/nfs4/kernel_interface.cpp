@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 
+#include <AutoDeleter.h>
 #include <fs_cache.h>
 #include <fs_interface.h>
 
@@ -28,9 +29,6 @@
 extern fs_volume_ops gNFSv4VolumeOps;
 extern fs_vnode_ops gNFSv4VnodeOps;
 
-extern "C" void
-dprintf(const char* format, ...);
-
 
 RPC::ServerManager* gRPCServerManager;
 
@@ -42,30 +40,80 @@ CreateNFS4Server(RPC::Server* serv)
 }
 
 
-
-// TODO: IPv6 address will cause problems
+// Format: ip{4,6}_address:path options
+// Available options:
+//	hard		- retry requests until success
+//	soft		- retry requests no more than retrans times (default)
+//	retrans=X	- retry requests X times (default: 5)
+//	ac			- use metadata cache (default)
+//	noac		- do not use metadata cache
+//	xattr-emu	- emulate named attributes
+//	noxattr-emu	- do not emulate named attributes (default)
+//	port=X		- connect to port X (default: 2049)
+//	proto=X		- user transport protocol X (default: tcp)
 static status_t
-ParseArguments(const char* _args, PeerAddress* address, char* _path)
+ParseArguments(const char* _args, PeerAddress* address, char** _path,
+	MountConfiguration* conf)
 {
 	if (_args == NULL)
 		return B_BAD_VALUE;
 
 	char* args = strdup(_args);
-	char* path = strpbrk(args, ":");
-	if (path == NULL) {
-		free(args);
+	if (args == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter argsDeleter(args);
+
+	char* options = strchr(args, ' ');
+	if (options != NULL)
+		*options++ = '\0';
+
+	char* path = strrchr(args, ':');
+	if (path == NULL)
 		return B_MISMATCHED_VALUES;
-	}
 	*path++ = '\0';
 
 	status_t result = PeerAddress::ResolveName(args, address);
 	if (result != B_OK)
 		return result;
 
-	_path[255] = '\0';
-	strncpy(_path, path, 255);
+	*_path = strdup(path);
+	if (*_path == NULL)
+		return B_NO_MEMORY;
 
-	free(args);
+	conf->fHard = false;
+	conf->fRetryLimit = 5;
+	conf->fEmulateNamedAttrs = false;
+	conf->fCacheMetadata = true;
+
+	char* optionsEnd;
+	if (options != NULL)
+		optionsEnd = strchr(options, ' ');
+	while (options != NULL && *options != '\0') {
+		if (optionsEnd != NULL)
+			*optionsEnd++ = '\0';
+
+		if (strcmp(options, "hard") == 0)
+			conf->fHard = true;
+		else if (strncmp(options, "retrans=", 8) == 0) {
+			options += strlen("retrans=");
+			conf->fRetryLimit = atoi(options);
+		} else if (strcmp(options, "noac") == 0)
+			conf->fCacheMetadata = false;
+		else if (strcmp(options, "xattr-emu") == 0)
+			conf->fEmulateNamedAttrs = true;
+		else if (strncmp(options, "port=", 5) == 0) {
+			options += strlen("port=");
+			address->SetPort(atoi(options));
+		} else if (strncmp(options, "proto=", 6) == 0) {
+			options += strlen("proto=");
+			address->SetProtocol(options);
+		}
+
+		options = optionsEnd;
+		if (options != NULL)
+			optionsEnd = strchr(options, ' ');
+	}
+
 	return B_OK;
 }
 
@@ -83,10 +131,12 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 	locker.Unlock();
 
 	PeerAddress address;
-	char path[256];
-	result = ParseArguments(args, &address, path);
+	MountConfiguration config;
+	char *path;
+	result = ParseArguments(args, &address, &path, &config);
 	if (result != B_OK)
 		return result;
+	MemoryDeleter pathDeleter(path);
 
 	RPC::Server *server;
 	result = gRPCServerManager->Acquire(&server, address, CreateNFS4Server);
@@ -94,7 +144,7 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 		return result;
 	
 	FileSystem* fs;
-	result = FileSystem::Mount(&fs, server, path, volume->id);
+	result = FileSystem::Mount(&fs, server, path, volume->id, config);
 	if (result != B_OK) {
 		gRPCServerManager->Release(server);
 		return result;
@@ -824,8 +874,6 @@ nfs4_release_lock(fs_volume* volume, fs_vnode* vnode, void* _cookie,
 status_t
 nfs4_init()
 {
-	dprintf("NFS4 Init\n");
-
 	gRPCServerManager = new(std::nothrow) RPC::ServerManager;
 	if (gRPCServerManager == NULL)
 		return B_NO_MEMORY;
@@ -856,8 +904,6 @@ nfs4_init()
 status_t
 nfs4_uninit()
 {
-	dprintf("NFS4 Uninit\n");
-
 	delete gRPCCallbackServer;
 	delete gIdMapper;
 	delete gWorkQueue;

@@ -41,7 +41,7 @@ Delegation::ReturnDelegation()
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);

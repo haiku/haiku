@@ -15,10 +15,12 @@
 
 
 class Cookie;
+class FileSystem;
 
 class Request {
 public:
-	inline						Request(RPC::Server* serv);
+	inline						Request(RPC::Server* server,
+									FileSystem* fileSystem);
 
 	inline	RequestBuilder&		Builder();
 	inline	ReplyInterpreter&	Reply();
@@ -31,18 +33,18 @@ private:
 			status_t			_SendTCP(Cookie* cookie);
 
 			RPC::Server*		fServer;
+			FileSystem*			fFileSystem;
 
 			RequestBuilder		fBuilder;
 			ReplyInterpreter	fReply;
-
-	static	const int			kRetryLimit = 5;
 };
 
 
 inline
-Request::Request(RPC::Server* serv)
+Request::Request(RPC::Server* server, FileSystem* fileSystem)
 	:
-	fServer(serv)
+	fServer(server),
+	fFileSystem(fileSystem)
 {
 }
 

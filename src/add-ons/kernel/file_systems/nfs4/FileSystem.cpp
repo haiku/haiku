@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include <AutoDeleter.h>
 #include <lock.h>
 
 #include "Request.h"
@@ -21,7 +22,7 @@ extern RPC::ServerManager* gRPCServerManager;
 extern RPC::ProgramData* CreateNFS4Server(RPC::Server* serv);
 
 
-FileSystem::FileSystem()
+FileSystem::FileSystem(const MountConfiguration& configuration)
 	:
 	fNext(NULL),
 	fPrev(NULL),
@@ -30,7 +31,8 @@ FileSystem::FileSystem()
 	fNamedAttrs(true),
 	fPath(NULL),
 	fRoot(NULL),
-	fId(1)
+	fId(1),
+	fConfiguration(configuration)
 {
 	fOpenOwner = rand();
 	fOpenOwner <<= 32;
@@ -73,9 +75,14 @@ sGetPath(const char* root, const char* path)
 
 status_t
 FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
-	dev_t id)
+	dev_t id, const MountConfiguration& configuration)
 {
-	Request request(serv);
+	FileSystem* fs = new(std::nothrow) FileSystem(configuration);
+	if (fs == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<FileSystem> fsDeleter(fs);
+
+	Request request(serv, fs);
 	RequestBuilder& req = request.Builder();
 
 	req.PutRootFH();
@@ -120,10 +127,6 @@ FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
 	if (result != B_OK || count < 2)
 		return result;
 
-	FileSystem* fs = new(std::nothrow) FileSystem;
-	if (fs == NULL)
-		return B_NO_MEMORY;
-
 	// FATTR4_SUPPORTED_ATTRS is mandatory
 	memcpy(fs->fSupAttrs, &values[0].fData.fValue64, sizeof(fs->fSupAttrs));
 
@@ -163,23 +166,20 @@ FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
 
 	delete[] values;
 
-	if (fi.fName == NULL || fi.fPath == NULL) {
-		delete fs;
+	if (fi.fName == NULL || fi.fPath == NULL)
 		return B_NO_MEMORY;
-	}
 
 	Inode* inode;
 	result = Inode::CreateInode(fs, fi, &inode);
-	if (result != B_OK) {
-		delete fs;
+	if (result != B_OK)
 		return result;
-	}
 
 	fs->fRoot = reinterpret_cast<RootInode*>(inode);
 
 	fs->NFSServer()->AddFileSystem(fs);
 	*pfs = fs;
 
+	fsDeleter.Detach();
 	return B_OK;
 }
 

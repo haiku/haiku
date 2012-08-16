@@ -111,6 +111,7 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			return false;
 
 		// FileHandle has expired or is invalid
+		case NFS4ERR_NOFILEHANDLE:
 		case NFS4ERR_BADHANDLE:
 		case NFS4ERR_FHEXPIRED:
 			if (fInfo.UpdateFileHandles(fFileSystem) == B_OK)
@@ -143,7 +144,7 @@ NFS4Object::ConfirmOpen(const FileHandle& fh, OpenState* state,
 {
 	do {
 		RPC::Server* serv = fFileSystem->Server();
-		Request request(serv);
+		Request request(serv, fFileSystem);
 
 		RequestBuilder& req = request.Builder();
 

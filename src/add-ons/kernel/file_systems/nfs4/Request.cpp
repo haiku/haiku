@@ -7,8 +7,10 @@
  */
 
 
-#include "Inode.h"
 #include "Request.h"
+
+#include "FileSystem.h"
+#include "Inode.h"
 
 
 status_t
@@ -36,10 +38,17 @@ Request::_SendUDP(Cookie* cookie)
 	if (cookie != NULL)
 		cookie->RegisterRequest(rpc);
 
+	int retryLimit = 0;
+	bool hard = true;
+	if (fFileSystem != NULL) {
+		retryLimit = fFileSystem->GetConfiguration().fRetryLimit;
+		hard = fFileSystem->GetConfiguration().fHard;
+	}
+
 	result = fServer->WaitCall(rpc);
 	if (result != B_OK) {
 		int attempts = 1;
-		while (result != B_OK && attempts++ < kRetryLimit) {
+		while (result != B_OK && (hard || attempts++ < retryLimit)) {
 			result = fServer->ResendCallAsync(fBuilder.Request(), rpc);
 			if (result != B_OK) {
 				if (cookie != NULL)
@@ -83,6 +92,15 @@ Request::_SendTCP(Cookie* cookie)
 
 	status_t result;
 	int attempts = 0;
+
+	int retryLimit = 0;
+	bool hard = true;
+
+	if (fFileSystem != NULL) {
+		retryLimit = fFileSystem->GetConfiguration().fRetryLimit;
+		hard = fFileSystem->GetConfiguration().fHard;
+	}
+
 	do {
 		result = fServer->SendCallAsync(fBuilder.Request(), &rpl, &rpc);
 		if (result == B_NO_MEMORY)
@@ -105,7 +123,7 @@ Request::_SendTCP(Cookie* cookie)
 
 			fServer->Repair();	
 		}
-	} while (result != B_OK && attempts++ < kRetryLimit);
+	} while (result != B_OK && (hard || attempts++ < retryLimit));
 
 	if (cookie != NULL)
 		cookie->UnregisterRequest(rpc);
