@@ -48,9 +48,9 @@ rule KernelLd
 	# libsupc++ is opt-out.
 	local libs ;
 	if ! [ on $(1) return HAIKU_NO_LIBSUPC++ ] {
-		libs += $(TARGET_STATIC_LIBSUPC++) ;
+		libs += $(TARGET_KERNEL_LIBSUPC++) ;
 	}
-	LINKLIBS on $(1) =  $(libs) $(TARGET_GCC_LIBGCC) ;
+	LINKLIBS on $(1) =  $(libs) $(TARGET_KERNEL_LIBGCC) ;
 
 	# TODO: Do we really want to invoke SetupKernel here? The objects should
 	# have been compiled with KernelObjects anyway, so we're doing that twice.

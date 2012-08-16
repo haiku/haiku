@@ -41,5 +41,5 @@ KernelAddon userlandfs
 	  UserlandFS.cpp
 	  Volume.cpp
 
-	: $(HAIKU_STATIC_LIBSUPC++)
+	: $(HAIKU_KERNEL_LIBSUPC++)
 ;

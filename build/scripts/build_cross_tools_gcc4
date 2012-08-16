@@ -33,6 +33,7 @@ x86_64-*)
 	# failure
 	binutilsConfigureArgs=""
 	gccConfigureArgs=""
+	kernelSupcxxFlags="-mno-red-zone"
 	;;
 m68k-*)
 	binutilsConfigureArgs="--enable-multilib"
@@ -45,6 +46,7 @@ arm-*)
 *)
 	binutilsConfigureArgs="--disable-multilib"
 	gccConfigureArgs="--disable-multilib"
+	kernelSupcxxFlags=
 	;;
 esac
 
@@ -101,13 +103,14 @@ installDir=$haikuOutputDir/cross-tools
 objDir=$haikuOutputDir/cross-tools-build
 binutilsObjDir=$objDir/binutils
 gccObjDir=$objDir/gcc
+stdcxxObjDir=$objDir/stdcxx
 tmpIncludeDir=$objDir/sysincludes
 tmpLibDir=$objDir/syslibs
 
 rm -rf $installDir $objDir
 
-mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $tmpIncludeDir \
-	$tmpLibDir || exit 1
+mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $stdcxxObjDir \
+	$tmpIncludeDir $tmpLibDir || exit 1
 mkdir -p $installDir/lib/gcc/$haikuMachine/$gccVersion
 
 
@@ -162,6 +165,20 @@ $MAKE $additionalMakeArgs install || {
 	echo "ERROR: Installing the cross compiler failed." >&2
 	exit 1
 }
+
+# build libsupc++ for the kernel if the target arch requires it
+if [ -n "$kernelSupcxxFlags" ]; then
+	cd $stdcxxObjDir
+	CFLAGS="-O2 $kernelSupcxxFlags" CXXFLAGS="-O2 $kernelSupcxxFlags" \
+		$gccSourceDir/libstdc++-v3/configure --prefix=$installDir \
+		--target=$haikuMachine --host=$haikuMachine --disable-shared \
+		--disable-multilib || exit 1
+	$MAKE $additionalMakeArgs -C libsupc++ || {
+		echo "Error: Building kernel libsupc++ failed." >&2
+		exit 1
+	}
+	cp libsupc++/.libs/libsupc++.a $installDir/$haikuMachine/lib/libsupc++-kernel.a
+fi
 
 # cleanup
 

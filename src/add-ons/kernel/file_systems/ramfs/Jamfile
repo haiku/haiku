@@ -45,5 +45,5 @@ KernelAddon ramfs
 	  SymLink.cpp
 	  Volume.cpp
 
-	: $(HAIKU_LIBSUPC++)
+	: $(HAIKU_KERNEL_LIBSUPC++)
 ;
