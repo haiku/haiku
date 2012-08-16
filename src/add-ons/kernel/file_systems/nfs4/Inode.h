@@ -132,6 +132,8 @@ protected:
 					status_t	GetStat(struct stat* st,
 									OpenAttrCookie* attr = NULL);
 
+					char*		AttrToFileName(const char* path);
+
 	static inline	status_t	CheckLockType(short ltype, uint32 mode);
 
 private:

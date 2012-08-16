@@ -85,11 +85,11 @@ Inode::LoadAttrDirHandle()
 		return B_UNSUPPORTED;
 
 	char* attrDir
-		= reinterpret_cast<char*>(malloc(strlen(fInfo.fName) + 32));
+		= reinterpret_cast<char*>(malloc(strlen(Name()) + 32));
 	if (attrDir == NULL)
 		return B_NO_MEMORY;
 	strcpy(attrDir, ".");
-	strcat(attrDir, fInfo.fName);
+	strcat(attrDir, Name());
 	strcat(attrDir, "-haiku-attrs");
 
 	result = NFS4Inode::LookUp(attrDir, NULL, NULL, &handle, true);

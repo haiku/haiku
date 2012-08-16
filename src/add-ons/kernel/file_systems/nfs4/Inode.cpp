@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <AutoDeleter.h>
 #include <fs_cache.h>
 #include <NodeMonitor.h>
 
@@ -267,10 +268,16 @@ Inode::Link(Inode* dir, const char* name)
 status_t
 Inode::Remove(const char* name, FileType type)
 {
+	MemoryDeleter nameDeleter;
 	if (type == NF4NAMEDATTR) {
 		status_t result = LoadAttrDirHandle();
 		if (result != B_OK)
 			return result;
+
+		name = AttrToFileName(name);
+		if (name == NULL)
+			return B_NO_MEMORY;
+		nameDeleter.SetTo(const_cast<char*>(name));
 	}
 
 	ChangeInfo changeInfo;
@@ -311,6 +318,8 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 	if (from->fFileSystem != to->fFileSystem)
 		return B_DONT_DO_THAT;
 
+	MemoryDeleter fromNameDeleter;
+	MemoryDeleter toNameDeleter;
 	if (attribute) {
 		status_t result = from->LoadAttrDirHandle();
 		if (result != B_OK)
@@ -319,6 +328,14 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 		result = to->LoadAttrDirHandle();
 		if (result != B_OK)
 			return result;
+
+		fromName = from->AttrToFileName(fromName);
+		toName = to->AttrToFileName(toName);
+
+		fromNameDeleter.SetTo(const_cast<char*>(fromName));
+		toNameDeleter.SetTo(const_cast<char*>(toName));
+		if (fromName == NULL || toName == NULL)
+			return B_NO_MEMORY;
 	}
 
 	ChangeInfo fromChange, toChange;

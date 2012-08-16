@@ -40,12 +40,15 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 	fi.fParent = fInfo.fHandle;
 	fi.fName = strdup(name);
 
-	char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-		strlen(fInfo.fPath)));
-	strcpy(path, fInfo.fPath);
-	strcat(path, "/");
-	strcat(path, name);
-	fi.fPath = path;
+	if (fInfo.fPath != NULL) {
+		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
+			strlen(fInfo.fPath)));
+		strcpy(path, fInfo.fPath);
+		strcat(path, "/");
+		strcat(path, name);
+		fi.fPath = path;
+	} else
+		fi.fPath = strdup(name);
 
 	fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
 
@@ -193,8 +196,8 @@ Inode::Close(OpenFileCookie* cookie)
 }
 
 
-static char*
-AttrToFileName(const char* path)
+char*
+Inode::AttrToFileName(const char* path)
 {
 	char* name = strdup(path);
 	if (name == NULL)

@@ -126,7 +126,13 @@ RootInode::_UpdateInfo(bool force)
 		break;
 	} while (true);
 
-	fInfoCache.flags = 0;
+	fInfoCache.flags = 	B_FS_IS_PERSISTENT | B_FS_IS_SHARED
+		| B_FS_SUPPORTS_NODE_MONITORING;
+
+	if (fFileSystem->NamedAttrs()
+		|| fFileSystem->GetConfiguration().fEmulateNamedAttrs)
+		fInfoCache.flags |= B_FS_HAS_MIME | B_FS_HAS_ATTR;
+
 	strncpy(fInfoCache.volume_name, fName, B_FILE_NAME_LENGTH);
 
 	fInfoCacheExpire = time(NULL) + MetadataCache::kExpirationTime;
