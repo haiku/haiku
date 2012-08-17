@@ -266,7 +266,7 @@ Inode::Link(Inode* dir, const char* name)
 
 
 status_t
-Inode::Remove(const char* name, FileType type)
+Inode::Remove(const char* name, FileType type, ino_t* id)
 {
 	MemoryDeleter nameDeleter;
 	if (type == NF4NAMEDATTR) {
@@ -298,6 +298,8 @@ Inode::Remove(const char* name, FileType type)
 	}
 
 	fFileSystem->Root()->MakeInfoInvalid();
+	if (id != NULL)
+		*id = FileIdToInoT(fileID);
 
 	if (type == NF4NAMEDATTR) {
 		notify_attribute_changed(fFileSystem->DevId(), ID(), name,

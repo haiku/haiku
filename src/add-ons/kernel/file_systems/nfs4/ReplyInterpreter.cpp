@@ -829,13 +829,19 @@ ReplyInterpreter::_NFS4ErrorToHaiku(uint32 x)
 		case NFS4ERR_INVAL:		return B_BAD_VALUE;
 		case NFS4ERR_FBIG:		return B_FILE_TOO_LARGE;
 		case NFS4ERR_NOTSUPP:	return B_UNSUPPORTED;
+		case NFS4ERR_ROFS:		return B_READ_ONLY_DEVICE;
+		case NFS4ERR_NAMETOOLONG:	return B_NAME_TOO_LONG;
+		case NFS4ERR_NOTEMPTY:	return B_DIRECTORY_NOT_EMPTY;
 		// ...
 		case NFS4ERR_DELAY:
 		case NFS4ERR_DENIED:
 		case NFS4ERR_LOCKED:
 		case NFS4ERR_GRACE:
 								return B_WOULD_BLOCK;
-		case NFS4ERR_FHEXPIRED:	return B_ENTRY_NOT_FOUND;
+
+		case NFS4ERR_STALE:
+		case NFS4ERR_FHEXPIRED:
+								return B_FILE_NOT_FOUND;
 		// ...
 		default:				return B_ERROR;
 	}

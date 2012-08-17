@@ -57,7 +57,8 @@ public:
 									int mode);
 
 					status_t	Link(Inode* dir, const char* name);
-					status_t	Remove(const char* name, FileType type);
+					status_t	Remove(const char* name, FileType type,
+									ino_t* id);
 	static			status_t	Rename(Inode* from, Inode* to,
 									const char* fromName, const char* toName,
 									bool attribute = false);

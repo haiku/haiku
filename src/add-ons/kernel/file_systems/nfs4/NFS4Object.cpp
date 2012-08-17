@@ -110,10 +110,11 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 			}
 			return false;
 
-		// FileHandle has expired or is invalid
+		// File Handle has expired, is invalid or the node has been deleted
 		case NFS4ERR_NOFILEHANDLE:
 		case NFS4ERR_BADHANDLE:
 		case NFS4ERR_FHEXPIRED:
+		case NFS4ERR_STALE:
 			if (fInfo.UpdateFileHandles(fFileSystem) == B_OK)
 				return true;
 			return false;

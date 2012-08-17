@@ -413,7 +413,13 @@ static status_t
 nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
-	return inode->Remove(name, NF4REG);
+
+	ino_t id;
+	status_t result = inode->Remove(name, NF4REG, &id);
+	if (result != B_OK)
+		return result;
+
+	return remove_vnode(volume, id);
 }
 
 
@@ -607,7 +613,11 @@ static status_t
 nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(parent->private_node);
-	return inode->Remove(name, NF4DIR);
+	ino_t id;
+	status_t result = inode->Remove(name, NF4DIR, &id);
+	if (result != B_OK)
+		return result;
+	return remove_vnode(volume, id);
 }
 
 
@@ -826,7 +836,7 @@ static status_t
 nfs4_remove_attr(fs_volume* volume, fs_vnode* vnode, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(vnode->private_node);
-	return inode->Remove(name, NF4NAMEDATTR);
+	return inode->Remove(name, NF4NAMEDATTR, NULL);
 }
 
 

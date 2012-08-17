@@ -824,13 +824,12 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 		else
 			req.Nverify(&attr, 1);
 
-		req.PutFH(fInfo.fHandle);
-
 		if (type != NF4NAMEDATTR) {
 			Attribute idAttr[] = { FATTR4_FILEID };
 			req.GetAttr(idAttr, sizeof(idAttr) / sizeof(Attribute));
 		}
 
+		req.PutFH(fInfo.fHandle);
 		req.Remove(name);
 
 		status_t result = request.Send();
@@ -859,8 +858,6 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 		if (result != B_OK)
 			return result;
 
-		reply.PutFH();
-
 		if (type != NF4NAMEDATTR) {
 			AttrValue* values;
 			uint32 count;
@@ -875,6 +872,7 @@ NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 			delete[] values;
 		}
 
+		reply.PutFH();
 		return reply.Remove(&changeInfo->fBefore, &changeInfo->fAfter,
 			changeInfo->fAtomic);
 	} while (true);
