@@ -58,8 +58,13 @@ static const size_t kInitialHeapSize = 64 * B_PAGE_SIZE;
 static const size_t kHeapIncrement = 16 * B_PAGE_SIZE;
 	// the steps in which to increase the heap size (must be a power of 2)
 
+#if B_HAIKU_64_BIT
+static const addr_t kHeapReservationBase = 0x1000000000;
+static const addr_t kHeapReservationSize = 0x1000000000;
+#else
 static const addr_t kHeapReservationBase = 0x18000000;
 static const addr_t kHeapReservationSize = 0x48000000;
+#endif
 
 static area_id sHeapArea;
 static hoardLockType sHeapLock;
