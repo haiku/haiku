@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-GLTeapot	2890609668
+1	belarusian	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		Зверху
 Lighting	TeapotWindow		Падсветка
 Off	TeapotWindow		Выключыць
@@ -13,7 +13,6 @@ Fog	TeapotWindow		Туман
 Backface culling	TeapotWindow		Адкідаць заднія
 Z-buffered	TeapotWindow		Z-буферызаваны
 File	TeapotWindow		Файл
-Options	TeapotWindow		Наладкі
 Perspective	TeapotWindow		Перспектыва
 GLTeapot	System name		GL Чайнік
 Green	TeapotWindow		Зялёны

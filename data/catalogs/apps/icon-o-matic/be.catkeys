@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	4233739176
+1	belarusian	x-vnd.haiku-icon_o_matic	3088916408
 Select All	Icon-O-Matic-PathManipulator		Выбраць Усё
 Add Style	Icon-O-Matic-AddStylesCmd		Дадаць Стыль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колер (#%02x%02x%02x)
@@ -192,7 +192,6 @@ Overwrite	Icon-O-Matic-SVGExport		Перазапісаць
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Замарозіць Фігуры
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Раздзяліць Кантрольную Кропку
 Open…	Icon-O-Matic-Menu-File		Адкрыць...
-Options	Icon-O-Matic-Menus		Опцыі
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Колер (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Правіць Градыент
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Ачысціць Шлях

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-GLTeapot	2890609668
+1	french	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		En haut au centre
 Lighting	TeapotWindow		Éclairage
 Off	TeapotWindow		Arrêt
@@ -13,7 +13,6 @@ Fog	TeapotWindow		Brouillard
 Backface culling	TeapotWindow		Abattage des faces arrières
 Z-buffered	TeapotWindow		Tampon de profondeur
 File	TeapotWindow		Fichier
-Options	TeapotWindow		Options
 Perspective	TeapotWindow		Perspective
 GLTeapot	System name		GLTeapot
 Green	TeapotWindow		Vert

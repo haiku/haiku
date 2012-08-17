@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	2988504432
+1	hindi	x-vnd.Haiku-libtracker	2038664208
 common	B_COMMON_DIRECTORY		सामान्य
 OK	WidgetAttributeText		ठीक है
 Icon view	VolumeWindow		चिह्न दृश्य
@@ -360,7 +360,6 @@ Modified	FindPanel		संशोधित किया गया
 Error moving \"%name\" to Trash. (%error)	FSUtils		जाने में त्रुटि \"%name\" रद्दी में. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		आप इस फ़ोल्डर की जगह इस के उप फ़ोल्डर नहीं डाल सकते.
 <No recent items>	FavoritesMenu		<कोई हाल के आइटम नहीं>
-Preferences…	ContainerWindow		वरीयताएँ...
 Move	PoseView		जाए
 Open and make preferred	OpenWithWindow		खोलें और फिर पसंद करें
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		आप सुनिश्चित हैं कि आप चयनित मद (s) को मिटाना चाहते हैं? इस आपरेशन को लौटाया नहीं जा सकता

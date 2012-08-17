@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3736361491
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	2591538723
 Select All	Icon-O-Matic-PathManipulator		Επιλογή όλων
 Add Style	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
 Color (#%02x%02x%02x)	Style name after dropping a color		Χρώμα (#%02x%02x%02x)
@@ -191,7 +191,6 @@ Overwrite	Icon-O-Matic-SVGExport		Αντικατάσταση
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Πάγωμα Σχημάτων
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Διαίρεση σημείου ελέγχου
 Open…	Icon-O-Matic-Menu-File		Άνοιγμα...
-Options	Icon-O-Matic-Menus		Επιλογές
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Χρώμα (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Επεξεργασία Gradient
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Καθαρισμός Μονοπατιού

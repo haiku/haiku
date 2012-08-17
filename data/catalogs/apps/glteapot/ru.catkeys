@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-GLTeapot	4001979038
+1	russian	x-vnd.Haiku-GLTeapot	504494930
 Upper center	TeapotWindow		Сверху на центр
 Lighting	TeapotWindow		Освещение
 Off	TeapotWindow		Выключить
@@ -12,7 +12,6 @@ Filled polygons	TeapotWindow		Заполненные многоугольник�
 Fog	TeapotWindow		Туман
 Z-buffered	TeapotWindow		Z-буферизация
 File	TeapotWindow		Файл
-Options	TeapotWindow		Опции
 Perspective	TeapotWindow		Перспектива
 GLTeapot	System name		Чайник
 Green	TeapotWindow		Зеленый

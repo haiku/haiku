@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	2755867189
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	1611044421
 Select All	Icon-O-Matic-PathManipulator		Velg alle
 Add Style	Icon-O-Matic-AddStylesCmd		Legg til stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Farge (#%02x%02x%02x)
@@ -162,7 +162,6 @@ Move Path	Icon-O-Matic-MovePathsCmd		Flytt sti
 Overwrite	Icon-O-Matic-SVGExport		Overskriv
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Splitt kontrollpunkt
 Open…	Icon-O-Matic-Menu-File		Åpne...
-Options	Icon-O-Matic-Menus		Valg
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farge (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Endre gradient
 Rounding	Icon-O-Matic-PropertyNames		Runding

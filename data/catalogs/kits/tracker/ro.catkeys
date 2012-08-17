@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	65899779
+1	romanian	x-vnd.Haiku-libtracker	3411026851
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vizualizare pictogramă
 Add-ons	FilePanelPriv		Module
@@ -298,7 +298,6 @@ Name	QueryPoseView		Nume
 Delete	FSUtils		Șterge
 Modified	FindPanel		Modificat
 You can't replace a folder with one of its sub-folders.	FSUtils		Nu puteți înlocui un dosar cu unul din subdosarele acestuia.
-Preferences…	ContainerWindow		Preferințe...
 Move	PoseView		Mută
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Sigur doriți să ștergeți elementul(ele) selectat(e)? Această operație nu poate fi inversată.

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1680698556
+1	japanese	x-vnd.Haiku-libtracker	730858332
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -373,7 +373,6 @@ Modified	FindPanel		更新日時
 Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に捨てようとしたら、エラーが発生しました。（%error）
 You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダーを同名のフォルダーと置き換えられません。
 <No recent items>	FavoritesMenu		<最近使った項目はありません>
-Preferences…	ContainerWindow		設定…
 Move	PoseView		移動
 Open and make preferred	OpenWithWindow		関連づけて開く
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除してもよろしいですか？削除した項目は復元できませんので、ご注意ください。

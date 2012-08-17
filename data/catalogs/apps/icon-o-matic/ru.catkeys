@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	4233739176
+1	russian	x-vnd.haiku-icon_o_matic	3088916408
 Select All	Icon-O-Matic-PathManipulator		Выделить всё
 Add Style	Icon-O-Matic-AddStylesCmd		Добавить стиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Цвет (#%02x%02x%02x)
@@ -192,7 +192,6 @@ Overwrite	Icon-O-Matic-SVGExport		Перезаписать
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Заморозить формы
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Разделить точку
 Open…	Icon-O-Matic-Menu-File		Открыть…
-Options	Icon-O-Matic-Menus		Опции
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Цвет (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Изменить градиент
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Очистить контур

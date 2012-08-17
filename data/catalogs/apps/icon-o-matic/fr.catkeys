@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	3302636941
+1	french	x-vnd.haiku-icon_o_matic	2157814173
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -124,7 +124,6 @@ Overwrite	Icon-O-Matic-SVGExport		Écraser
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Figer les formes
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Diviser le point de contrôle
 Open…	Icon-O-Matic-Menu-File		Ouvrir…
-Options	Icon-O-Matic-Menus		Options
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Enlever les formes

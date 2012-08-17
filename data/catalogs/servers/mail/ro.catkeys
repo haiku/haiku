@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-POST	2300302075
+1	romanian	x-vnd.Be-POST	2566871483
 Fetching mail for %name	Notifier		Se primește emailul pentru %name
 Check for mails only	DeskbarView		Verifică doar pentru emailuri
 Send pending mails	DeskbarView		Trimite emailurile în așteptare
@@ -9,7 +9,6 @@ Mail status	MailDaemon		Stare email
 Shutdown mail services	DeskbarView		Oprește serviciile de email
 %num new message	DeskbarView		%num de mesaje noi
 Sending mail for %name	Notifier		Se trimite emailul pentru %name
-Preferences…	DeskbarView		Preferințe...
 %num new messages.	MailDaemon		%num mesaje noi.
 %num new message.	MailDaemon		%num mesaj nou.
 Create new message…	DeskbarView		Creează mesaj nou...

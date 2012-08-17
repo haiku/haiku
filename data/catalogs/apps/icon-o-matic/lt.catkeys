@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	2985145160
+1	lithuanian	x-vnd.haiku-icon_o_matic	1840322392
 Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
 Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
 Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
@@ -189,7 +189,6 @@ Overwrite	Icon-O-Matic-SVGExport		Perrašyti
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Fiksuoti figūras
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Perkelti valdymo tašką
 Open…	Icon-O-Matic-Menu-File		Atverti…
-Options	Icon-O-Matic-Menus		Parinktys
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Spalva (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Keisti gradientą
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Išvalyti kreivę

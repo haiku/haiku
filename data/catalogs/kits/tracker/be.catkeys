@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	1301055003
+1	belarusian	x-vnd.Haiku-libtracker	351214779
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -378,7 +378,6 @@ Modified	FindPanel		Зменены
 Error moving \"%name\" to Trash. (%error)	FSUtils		Памылка пры адпраўцы \"%name\" да Сметніцы. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Вы не можаце замяніць каталог адным з яго падкаталогаў.
 <No recent items>	FavoritesMenu		<Няма нядаўніх элементаў>
-Preferences…	ContainerWindow		Наладкі...
 Move	PoseView		Перамясціць
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Вы ўпэўненыя, что жадаеце беззваротна выдаліць выбраны(я) элемент(ы)?

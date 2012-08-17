@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-GLTeapot	2890609668
+1	japanese	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		上中央
 Lighting	TeapotWindow		Lighting
 Off	TeapotWindow		オフ
@@ -13,7 +13,6 @@ Fog	TeapotWindow		フォグ
 Backface culling	TeapotWindow		バックフェースカリング
 Z-buffered	TeapotWindow		Z バッファーを使用
 File	TeapotWindow		ファイル
-Options	TeapotWindow		オプション
 Perspective	TeapotWindow		パースペクティブ
 GLTeapot	System name		GLTeapot
 Green	TeapotWindow		緑

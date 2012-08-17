@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-GLTeapot	2890609668
+1	slovak	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		Hore v strede
 Lighting	TeapotWindow		Osvetlenie
 Off	TeapotWindow		Vypnuté
@@ -13,7 +13,6 @@ Fog	TeapotWindow		Dym
 Backface culling	TeapotWindow		Orezávanie zadnej strany
 Z-buffered	TeapotWindow		Z-buffering
 File	TeapotWindow		Súbor
-Options	TeapotWindow		Možnosti
 Perspective	TeapotWindow		Perspektíva
 GLTeapot	System name		GLKonvica
 Green	TeapotWindow		Zelená
