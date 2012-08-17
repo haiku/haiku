@@ -81,6 +81,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Pe						- the powerful native Programmer's Editor
 #	Perl					- the scripting language
 #	Python					- the scripting language
+#	Puri					- chess game
 #	Rsync					- remote directory synchronization
 #	Ruby					- the programming language
 #	Sed						- the ultimate stream editor
@@ -1601,6 +1602,24 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 				: $(baseURL)/perl-5.10.1-r1a3-x86-gcc2-2011-05-17.zip
 				: : true ;
 		}
+	}
+}
+
+
+# Puri
+if [ IsOptionalHaikuImagePackageAdded Puri ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Puri available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				puri-0.3.9.1-x86-gcc4-2012-08-16.zip
+				: $(baseURL)/puri-0.3.9.1-x86-gcc4-2012-08-16.zip ;
+		} else {
+			Echo "No optional package Puri available for gcc2" ;
+		}
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/apps/Puri/Puri ;
 	}
 }
 
