@@ -715,6 +715,20 @@ get_table(const char* signature, uint32 instance, void** tableHeader)
 }
 
 
+status_t
+read_bit_register(uint32 regid, uint32 *val)
+{
+	return AcpiReadBitRegister(regid, (UINT32 *)val);
+}
+
+
+status_t
+write_bit_register(uint32 regid, uint32 val)
+{
+	return AcpiWriteBitRegister(regid, val);
+}
+
+
 struct acpi_module_info gACPIModule = {
 	{
 		B_ACPI_MODULE_NAME,
@@ -759,5 +773,7 @@ struct acpi_module_info gACPIModule = {
 	prepare_sleep_state,
 	enter_sleep_state,
 	reboot,
-	get_table
+	get_table,
+	read_bit_register,
+	write_bit_register
 };
