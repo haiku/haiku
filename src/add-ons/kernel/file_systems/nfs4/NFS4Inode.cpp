@@ -374,6 +374,12 @@ NFS4Inode::RenameNode(Inode* from, Inode* to, const char* fromName,
 			continue;
 		}
 
+		// need to wait
+		if (reply.NFS4Error() == NFS4ERR_DELAY) {
+			snooze_etc(sSecToBigTime(5), B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+			continue;
+		}
+
 		reply.PutFH();
 		reply.SaveFH();
 		reply.PutFH();
