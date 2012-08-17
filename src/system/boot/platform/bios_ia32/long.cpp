@@ -44,7 +44,7 @@ extern uint64 gLongKernelEntry;
 static inline uint64
 fix_address(uint64 address)
 {
-	return address - KERNEL_LOAD_BASE + KERNEL_LOAD_BASE_64BIT;
+	return address - KERNEL_LOAD_BASE + KERNEL_LOAD_BASE_64_BIT;
 }
 
 
@@ -119,10 +119,10 @@ long_mmu_init()
 	gKernelArgs.arch_args.vir_pgdir = fix_address((uint64)(addr_t)pml4);
 
 	// Store the virtual memory usage information.
-	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE_64BIT;
+	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE_64_BIT;
 	gKernelArgs.virtual_allocated_range[0].size = mmu_get_virtual_usage();
 	gKernelArgs.num_virtual_allocated_ranges = 1;
-	gKernelArgs.arch_args.virtual_end = ROUNDUP(KERNEL_LOAD_BASE_64BIT
+	gKernelArgs.arch_args.virtual_end = ROUNDUP(KERNEL_LOAD_BASE_64_BIT
 		+ gKernelArgs.virtual_allocated_range[0].size, 0x200000);
 
 	// Find the highest physical memory address. We map all physical memory

@@ -116,7 +116,7 @@ struct ELF64Class {
 	AllocateRegion(AddrType* _address, AddrType size, uint8 protection,
 		void **_mappedAddress)
 	{
-		// Assume the real 64-bit base address is KERNEL_LOAD_BASE_64BIT and
+		// Assume the real 64-bit base address is KERNEL_LOAD_BASE_64_BIT and
 		// the mappings in the loader address space are at KERNEL_LOAD_BASE.
 
 		void* address = (void*)(addr_t)(*_address & 0xffffffff);
@@ -127,7 +127,7 @@ struct ELF64Class {
 			return status;
 
 		*_mappedAddress = address;
-		*_address = (AddrType)(addr_t)address + KERNEL_LOAD_BASE_64BIT
+		*_address = (AddrType)(addr_t)address + KERNEL_LOAD_BASE_64_BIT
 			- KERNEL_LOAD_BASE;
 		return B_OK;
 	}
@@ -135,7 +135,7 @@ struct ELF64Class {
 	static inline void*
 	Map(AddrType address)
 	{
-		return (void*)(addr_t)(address - KERNEL_LOAD_BASE_64BIT
+		return (void*)(addr_t)(address - KERNEL_LOAD_BASE_64_BIT
 			+ KERNEL_LOAD_BASE);
 	}
 };

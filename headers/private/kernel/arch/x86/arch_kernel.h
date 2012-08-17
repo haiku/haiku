@@ -19,7 +19,7 @@
 
 // 32-bit and 64-bit kernel load addresses.
 #define KERNEL_LOAD_BASE		0x80000000
-#define KERNEL_LOAD_BASE_64BIT	0xffffffff80000000ll
+#define KERNEL_LOAD_BASE_64_BIT	0xffffffff80000000ll
 
 
 #elif defined(__x86_64__)
