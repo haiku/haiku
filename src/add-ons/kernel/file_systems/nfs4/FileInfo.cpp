@@ -47,6 +47,38 @@ FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 
 
 status_t
+FileInfo::CreateName(const char* dirPath, const char* name)
+{
+	free(const_cast<char*>(fName));
+	fName = strdup(name);
+	if (fName == NULL)
+		return B_NO_MEMORY;
+
+	if (dirPath != NULL) {
+		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
+			strlen(dirPath)));
+		if (path == NULL)
+			return B_NO_MEMORY;
+
+		strcpy(path, dirPath);
+		strcat(path, "/");
+		strcat(path, name);
+
+		free(const_cast<char*>(fPath));
+		fPath = path;
+	} else {
+		free(const_cast<char*>(fPath));
+		fPath = strdup(name);
+	}
+
+	if (fPath == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+status_t
 FileInfo::UpdateFileHandles(FileSystem* fs)
 {
 	Request request(fs->Server(), fs);
@@ -56,7 +88,7 @@ FileInfo::UpdateFileHandles(FileSystem* fs)
 
 	uint32 lookupCount = 0;
 	status_t result;
-dprintf("%s %s\n", fs->Path(), fPath);
+
 	result = ParsePath(req, lookupCount, fs->Path());
 	if (result != B_OK)
 		return result;

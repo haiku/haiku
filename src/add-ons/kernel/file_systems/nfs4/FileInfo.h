@@ -55,8 +55,10 @@ struct FileInfo {
 
 			status_t	UpdateFileHandles(FileSystem* fs);
 
-	static status_t		ParsePath(RequestBuilder& req, uint32& count,
+	static	status_t	ParsePath(RequestBuilder& req, uint32& count,
 							const char* _path);
+
+			status_t	CreateName(const char* dirPath, const char* name);
 };
 
 struct FileSystemId {

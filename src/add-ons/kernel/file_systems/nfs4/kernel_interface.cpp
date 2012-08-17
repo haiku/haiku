@@ -429,7 +429,21 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 {
 	Inode* fromInode = reinterpret_cast<Inode*>(fromDir->private_node);
 	Inode* toInode = reinterpret_cast<Inode*>(toDir->private_node);
-	return Inode::Rename(fromInode, toInode, fromName, toName);
+
+	ino_t id;
+	status_t result = Inode::Rename(fromInode, toInode, fromName, toName, false,
+		&id);
+	if (result != B_OK)
+		return result;
+
+	Inode* child;
+	result = get_vnode(volume, id, reinterpret_cast<void**>(&child));
+	if (result == B_OK) {
+		child->fInfo.fParent = toInode->fInfo.fHandle;
+		child->fInfo.CreateName(toInode->fInfo.fPath, toName);
+	}
+
+	return B_OK;
 }
 
 

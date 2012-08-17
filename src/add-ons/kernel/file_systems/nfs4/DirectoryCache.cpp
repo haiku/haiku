@@ -267,26 +267,10 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 					FileInfo fi;
 					fi.fFileId = newCurrent->fNode;
 					fi.fParent = fInode->fInfo.fHandle;
-					fi.fName = strdup(newCurrent->fName);
-					if (fi.fName == NULL)
+					status_t result = fi.CreateName(fInode->fInfo.fPath,
+						newCurrent->fName);
+					if (result != B_OK)
 						break;
-
-					if (fInode->fInfo.fPath != NULL) {
-						size_t pathLength = strlen(newCurrent->fName) + 2 +
-							strlen(fInode->fInfo.fPath);
-						char* path = reinterpret_cast<char*>(pathLength);
-						if (path == NULL)
-							break;
-
-						strcpy(path, fInode->fInfo.fPath);
-						strcat(path, "/");
-						strcat(path, newCurrent->fName);
-						fi.fPath = path;
-					} else {
-						fi.fPath = strdup(newCurrent->fName);
-						if (fi.fPath == NULL)
-							break;
-					}
 
 					fInode->GetFileSystem()->InoIdMap()->AddEntry(fi,
 						Inode::FileIdToInoT(newCurrent->fNode), true);

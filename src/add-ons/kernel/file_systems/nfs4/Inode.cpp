@@ -226,26 +226,9 @@ Inode::Link(Inode* dir, const char* name)
 
 	FileInfo fi = fInfo;
 	fi.fParent = dir->fInfo.fHandle;
-	free(const_cast<char*>(fi.fName));
-	fi.fName = strdup(name);
-	if (fi.fName == NULL)
-		return B_NO_MEMORY;
-
-	if (fInfo.fPath != NULL) {
-		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-			strlen(fInfo.fPath)));
-		if (path == NULL)
-			return B_NO_MEMORY;
-
-		strcpy(path, fInfo.fPath);
-		strcat(path, "/");
-		strcat(path, name);
-		fi.fPath = path;
-	} else {
-		fi.fPath = strdup(name);
-		if (fi.fPath == NULL)
-			return B_NO_MEMORY;
-	}
+	result = fi.CreateName(fInfo.fPath, name);
+	if (result != B_OK)
+		return result;
 
 	fFileSystem->InoIdMap()->AddEntry(fi, fInfo.fFileId);
 
@@ -315,7 +298,7 @@ Inode::Remove(const char* name, FileType type, ino_t* id)
 
 status_t
 Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
-	bool attribute)
+	bool attribute, ino_t* id)
 {
 	if (from->fFileSystem != to->fFileSystem)
 		return B_DONT_DO_THAT;
@@ -342,8 +325,8 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 
 	ChangeInfo fromChange, toChange;
 	uint64 fileID;
-	status_t result = NFS4Inode::Rename(from, to, fromName, toName, &fromChange,
-		&toChange, &fileID, attribute);
+	status_t result = NFS4Inode::RenameNode(from, to, fromName, toName,
+		&fromChange, &toChange, &fileID, attribute);
 	if (result != B_OK)
 		return result;
 
@@ -359,6 +342,9 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 			cache->Trash();
 		cache->Unlock();
 	}
+
+	if (id != NULL)
+		*id = FileIdToInoT(fileID);
 
 	cache = attribute ? to->fAttrCache : to->fCache;
 	if (cache->Lock() == B_OK) {
@@ -828,25 +814,9 @@ Inode::ChildAdded(const char* name, uint64 fileID,
 	fi.fFileId = fileID;
 	fi.fHandle = fileHandle;
 	fi.fParent = fInfo.fHandle;
-	fi.fName = strdup(name);
-	if (fi.fName == NULL)
-		return B_NO_MEMORY;
-
-	if (fInfo.fPath != NULL) {
-		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-			strlen(fInfo.fPath)));
-		if (path == NULL)
-			return B_NO_MEMORY;
-
-		strcpy(path, fInfo.fPath);
-		strcat(path, "/");
-		strcat(path, name);
-		fi.fPath = path;
-	} else {
-		fi.fPath = strdup(name);
-		if (fi.fPath == NULL)
-			return B_NO_MEMORY;
-	}
+	status_t result = fi.CreateName(fInfo.fPath, name);
+	if (result != B_OK)
+		return result;
 
 	return fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
 }

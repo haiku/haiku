@@ -38,17 +38,7 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 	fi.fFileId = fileID;
 	fi.fHandle = handle;
 	fi.fParent = fInfo.fHandle;
-	fi.fName = strdup(name);
-
-	if (fInfo.fPath != NULL) {
-		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-			strlen(fInfo.fPath)));
-		strcpy(path, fInfo.fPath);
-		strcat(path, "/");
-		strcat(path, name);
-		fi.fPath = path;
-	} else
-		fi.fPath = strdup(name);
+	fi.CreateName(fInfo.fPath, name);
 
 	fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
 

@@ -329,7 +329,7 @@ NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 
 
 status_t
-NFS4Inode::Rename(Inode* from, Inode* to, const char* fromName,
+NFS4Inode::RenameNode(Inode* from, Inode* to, const char* fromName,
 	const char* toName, ChangeInfo* fromChange, ChangeInfo* toChange,
 	uint64* fileID, bool attribute)
 {

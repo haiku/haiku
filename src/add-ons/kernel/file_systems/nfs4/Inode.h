@@ -58,10 +58,10 @@ public:
 
 					status_t	Link(Inode* dir, const char* name);
 					status_t	Remove(const char* name, FileType type,
-									ino_t* id);
+									ino_t* id = NULL);
 	static			status_t	Rename(Inode* from, Inode* to,
 									const char* fromName, const char* toName,
-									bool attribute = false);
+									bool attribute = false, ino_t* id = NULL);
 
 					status_t	Stat(struct stat* st,
 									OpenAttrCookie* attr = NULL);

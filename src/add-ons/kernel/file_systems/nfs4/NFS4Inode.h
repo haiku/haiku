@@ -36,7 +36,7 @@ protected:
 			status_t	Link(Inode* dir, const char* name,
 							ChangeInfo* changeInfo);
 
-	static	status_t	Rename(Inode* from, Inode* to, const char* fromName,
+	static	status_t	RenameNode(Inode* from, Inode* to, const char* fromName,
 							const char* toName, ChangeInfo* fromChange,
 							ChangeInfo* toChange, uint64* fileID,
 							bool attribute = false);
