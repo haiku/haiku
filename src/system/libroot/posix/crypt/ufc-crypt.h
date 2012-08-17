@@ -23,6 +23,8 @@
  * 
  */
 
+#include <SupportDefs.h>
+
 /* 
  * Requirements for datatypes:
  * 
@@ -99,9 +101,14 @@ typedef long long     long64;
 
 #ifndef _UFC_64_
 #ifndef _UFC_32_
+#if B_HAIKU_64_BIT
+#define _UFC_64_
+typedef unsigned long long64;
+#else
 #define _UFC_32_
-typedef unsigned long ufc_long;
 typedef unsigned long long32;
+#endif
+typedef unsigned long ufc_long;
 #endif
 #endif
 
