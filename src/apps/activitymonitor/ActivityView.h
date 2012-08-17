@@ -16,13 +16,14 @@
 #include "CircularBuffer.h"
 #include "DataSource.h"
 
+
+class BAboutWindow;
 class BBitmap;
 class BMessageRunner;
 class Scale;
 class SystemInfoHandler;
 class ViewHistory;
 struct data_item;
-
 
 class DataHistory {
 public:
@@ -145,6 +146,8 @@ private:
 	int32				fOriginalResolution;
 	SystemInfoHandler*	fSystemInfoHandler;
 	std::map<scale_type, ::Scale*> fScales;
+
+	BAboutWindow*	fAboutWindow;
 };
 
 #endif	// ACTIVITY_VIEW_H

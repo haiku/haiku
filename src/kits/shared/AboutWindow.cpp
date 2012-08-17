@@ -31,6 +31,7 @@
 #include <SystemCatalog.h>
 #include <TextView.h>
 #include <View.h>
+#include <Window.h>
 
 
 static const float kStripeWidth = 30.0;
@@ -80,8 +81,12 @@ StripeView::StripeView(BBitmap* icon)
 	BView("StripeView", B_WILL_DRAW),
 	fIcon(icon)
 {
-	SetExplicitMinSize(BSize(160.0, B_SIZE_UNSET));
-	SetExplicitPreferredSize(BSize(160.0, B_SIZE_UNLIMITED));
+	float width = 48.0f;
+	if (icon != NULL)
+		width += icon->Bounds().Width() - 16.0f;
+
+	SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
+	SetExplicitPreferredSize(BSize(width, B_SIZE_UNLIMITED));
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
@@ -233,7 +238,7 @@ AboutView::AppIcon(const char* signature)
 
 BAboutWindow::BAboutWindow(const char* appName, int32 firstCopyrightYear,
 	const char** authors, const char* extraInfo)
-	:	BWindow(BRect(0.0, 0.0, 300.0, 140.0), appName, B_TITLED_WINDOW,
+	:	BWindow(BRect(0.0, 0.0, 200.0, 140.0), appName, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -261,6 +266,19 @@ BAboutWindow::~BAboutWindow()
 }
 
 
+bool
+BAboutWindow::QuitRequested()
+{
+	while (!IsHidden())
+		Hide();
+
+	return false;
+}
+
+
+//	#pragma mark -
+
+
 void
 BAboutWindow::AddDescription(const char* description)
 {
@@ -270,8 +288,11 @@ BAboutWindow::AddDescription(const char* description)
 	const char* appDesc = B_TRANSLATE_MARK(description);
 	appDesc = gSystemCatalog.GetString(appDesc, "AboutWindow");
 
-	BString desc(appDesc);
-	desc << "\n\n";
+	BString desc("");
+	if (fAboutView->InfoView()->TextLength() > 0)
+		desc << "\n\n";
+
+	desc << appDesc;
 
 	fAboutView->InfoView()->Insert(desc.String());
 }
@@ -281,10 +302,7 @@ void
 BAboutWindow::AddCopyright(int32 firstCopyrightYear,
 	const char* copyrightHolder, const char** extraCopyrights)
 {
-	BString copyright(B_UTF8_COPYRIGHT " %years%");
-	if (copyrightHolder != NULL)
-		copyright << " " << copyrightHolder;
-
+	BString copyright(B_UTF8_COPYRIGHT " %years% %holder%");
 	const char* firstCopyright = B_TRANSLATE_MARK(copyright.String());
 	firstCopyright = gSystemCatalog.GetString(copyright, "AboutWindow");
 
@@ -298,10 +316,17 @@ BAboutWindow::AddCopyright(int32 firstCopyrightYear,
 	if (copyrightYears != currentYear)
 		copyrightYears << "-" << currentYear;
 
-	BString text(firstCopyright);
+	BString text("");
+	if (fAboutView->InfoView()->TextLength() > 0)
+		text << "\n\n";
 
-	// Replace the copyright year with the current year
+	text << firstCopyright;
+
+	// Fill out the copyright year placeholder
 	text.ReplaceAll("%years%", copyrightYears.String());
+
+	// Fill in the copyright holder placeholder
+	text.ReplaceAll("%holder%", copyrightHolder);
 
 	// Add extra copyright strings
 	if (extraCopyrights != NULL) {
@@ -309,12 +334,11 @@ BAboutWindow::AddCopyright(int32 firstCopyrightYear,
 		for (int32 i = 0; extraCopyrights[i]; i++)
 			text << "\n" << B_UTF8_COPYRIGHT << " " << extraCopyrights[i];
 	}
-	text << "\n";
 
 	const char* allRightsReserved = B_TRANSLATE_MARK("All Rights Reserved.");
 	allRightsReserved = gSystemCatalog.GetString(allRightsReserved,
 		"AboutWindow");
-	text << "    " << allRightsReserved << "\n\n";
+	text << "\n    " << allRightsReserved;
 
 	fAboutView->InfoView()->Insert(text.String());
 }
@@ -329,11 +353,14 @@ BAboutWindow::AddAuthors(const char** authors)
 	const char* writtenBy = B_TRANSLATE_MARK("Written by:");
 	writtenBy = gSystemCatalog.GetString(writtenBy, "AboutWindow");
 
-	BString text(writtenBy);
+	BString text("");
+	if (fAboutView->InfoView()->TextLength() > 0)
+		text << "\n\n";
+
+	text << writtenBy;
 	text << "\n";
 	for (int32 i = 0; authors[i]; i++)
 		text << "    " << authors[i] << "\n";
-	text << "\n";
 
 	fAboutView->InfoView()->Insert(text.String());
 }
@@ -348,11 +375,13 @@ BAboutWindow::AddSpecialThanks(const char** thanks)
 	const char* specialThanks = B_TRANSLATE_MARK("Special Thanks:");
 	specialThanks = gSystemCatalog.GetString(specialThanks, "AboutWindow");
 
-	BString text(specialThanks);
-	text << "\n";
+	BString text("");
+	if (fAboutView->InfoView()->TextLength() > 0)
+		text << "\n\n";
+
+	text << specialThanks << "\n";
 	for (int32 i = 0; thanks[i]; i++)
 		text << "    " << thanks[i] << "\n";
-	text << "\n";
 
 	fAboutView->InfoView()->Insert(text.String());
 }
@@ -366,11 +395,14 @@ BAboutWindow::AddVersionHistory(const char** history)
 
 	const char* versionHistory = B_TRANSLATE_MARK("Version history:");
 	versionHistory = gSystemCatalog.GetString(versionHistory, "AboutWindow");
-	BString text(versionHistory);
-	text << "\n";
+
+	BString text("");
+	if (fAboutView->InfoView()->TextLength() > 0)
+		text << "\n\n";
+
+	text << versionHistory << "\n";
 	for (int32 i = 0; history[i]; i++)
 		text << "    " << history[i] << "\n";
-	text << "\n";
 
 	fAboutView->InfoView()->Insert(text.String());
 }
@@ -385,8 +417,11 @@ BAboutWindow::AddExtraInfo(const char* extraInfo)
 	const char* appExtraInfo = B_TRANSLATE_MARK(extraInfo);
 	appExtraInfo = gSystemCatalog.GetString(extraInfo, "AboutWindow");
 
-	BString extra(appExtraInfo);
-	extra << "\n";
+	BString extra("");
+	if (fAboutView->InfoView()->TextLength() > 0)
+		extra << "\n\n";
+
+	extra << appExtraInfo;
 
 	fAboutView->InfoView()->Insert(extra.String());
 }
@@ -409,7 +444,8 @@ BAboutWindow::AboutPosition(float width, float height)
 	result.x = screenFrame.left + (screenFrame.Width() / 2.0) - (width / 2.0);
 
 	// This is probably sooo wrong, but it looks right on 1024 x 768
-	result.y = screenFrame.top + (screenFrame.Height() / 4.0) - ceil(height / 3.0);
+	result.y = screenFrame.top + (screenFrame.Height() / 4.0)
+		- ceil(height / 3.0);
 
 	return result;
 }

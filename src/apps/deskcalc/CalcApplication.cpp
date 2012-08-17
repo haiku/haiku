@@ -22,6 +22,7 @@
 #include <FindDirectory.h>
 #include <Path.h>
 
+#include "CalcView.h"
 #include "CalcWindow.h"
 
 
@@ -29,9 +30,9 @@
 #define B_TRANSLATION_CONTEXT "CalcApplication"
 
 
-static const char* kSettingsFileName	= "DeskCalc_settings";
-const char* kAppName			= B_TRANSLATE_SYSTEM_NAME("DeskCalc");
-const char* kAppSig				= "application/x-vnd.Haiku-DeskCalc";
+static const char* kSettingsFileName = "DeskCalc_settings";
+const char* kAppName = B_TRANSLATE_SYSTEM_NAME("DeskCalc");
+const char* kSignature = "application/x-vnd.Haiku-DeskCalc";
 
 static const float kDefaultWindowWidth	= 220.0;
 static const float kDefaultWindowHeight	= 140.0;
@@ -39,7 +40,7 @@ static const float kDefaultWindowHeight	= 140.0;
 
 CalcApplication::CalcApplication()
 	:
-	BApplication(kAppSig),
+	BApplication(kSignature),
 	fCalcWindow(NULL)
 {
 }
@@ -67,8 +68,7 @@ CalcApplication::ReadyToRun()
 void
 CalcApplication::AboutRequested()
 {
-	// TODO: implement me!
-	return BApplication::AboutRequested();
+	fCalcWindow->View()->MessageReceived(new BMessage(B_ABOUT_REQUESTED));
 }
 
 

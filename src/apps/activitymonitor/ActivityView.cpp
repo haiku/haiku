@@ -12,6 +12,7 @@
 #include <vector>
 
 #ifdef __HAIKU__
+#	include <AboutWindow.h>
 #	include <AbstractLayoutItem.h>
 #	include <ControlLook.h>
 #endif
@@ -175,6 +176,7 @@ const uint32 kMsgToggleDataSource = 'tgds';
 const uint32 kMsgToggleLegend = 'tglg';
 const uint32 kMsgUpdateResolution = 'ures';
 
+extern const char* kAppName;
 extern const char* kSignature;
 
 
@@ -598,6 +600,8 @@ ActivityView::~ActivityView()
 {
 	delete fOffscreen;
 	delete fSystemInfoHandler;
+
+	fAboutWindow->Quit();
 }
 
 
@@ -613,6 +617,9 @@ ActivityView::_Init(const BMessage* settings)
 	fLegendLayoutItem = NULL;
 #endif
 	SetViewColor(B_TRANSPARENT_COLOR);
+
+	fAboutWindow = new BAboutWindow(kAppName, kSignature);
+	fAboutWindow->AddCopyright(2008, "Haiku, Inc.");
 
 	fLastRefresh = 0;
 	fDrawResolution = 1;
@@ -1104,7 +1111,7 @@ ActivityView::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
-			ActivityMonitor::ShowAbout();
+			fAboutWindow->Show();
 			break;
 
 		case kMsgUpdateResolution:

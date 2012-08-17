@@ -24,6 +24,8 @@ class BAboutWindow : public BWindow {
 								const char* signature);
 	virtual					~BAboutWindow();
 
+	virtual	bool			QuitRequested();
+
 			void			AddDescription(const char* description);
 			void			AddCopyright(int32 firstCopyrightYear,
 								const char* copyrightHolder,
@@ -40,6 +42,7 @@ class BAboutWindow : public BWindow {
 
  private:
 			AboutView*		fAboutView;
+			BHandler*		fCaller;
 };
 
 #endif	// B_ABOUT_WINDOW_H

@@ -9,8 +9,9 @@
 #include <Application.h>
 #include <Catalog.h>
 
-class BMessage;
+
 class ActivityWindow;
+class BMessage;
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ActivityWindow"
@@ -27,8 +28,6 @@ public:
 	virtual	void	MessageReceived(BMessage* message);
 
 	virtual	void	AboutRequested();
-
-	static	void	ShowAbout();
 
 private:
 	ActivityWindow*	fWindow;

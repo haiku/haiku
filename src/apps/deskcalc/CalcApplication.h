@@ -16,7 +16,7 @@
 
 
 extern const char* kAppName;
-extern const char* kAppSig;
+extern const char* kSignature;
 
 class BFile;
 class CalcWindow;

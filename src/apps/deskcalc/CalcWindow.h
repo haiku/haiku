@@ -31,6 +31,8 @@ class CalcWindow : public BWindow {
 			void				SetFrame(BRect frame,
 									bool forceCenter = false);
 
+			CalcView*			View() const { return fCalcView; };
+
  private:
 			CalcView*			fCalcView;
 };

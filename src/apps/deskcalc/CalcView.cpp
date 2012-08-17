@@ -138,24 +138,10 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	fAudioFeedbackItem(NULL),
 	fOptions(new CalcOptions())
 {
-	// create expression text view
-	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
-	AddChild(fExpressionTextView);
-
-	// read data from archive
-	_LoadSettings(settings);
-
 	// tell the app server not to erase our b/g
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
-	// parse calculator description
-	_ParseCalcDesc(fKeypadDescription);
-
-	// colorize based on base color.
-	_Colorize();
-
-	// Fetch the calc icon for compact view
-	_FetchAppIcon(fCalcIcon);
+	_Init(settings);
 }
 
 
@@ -188,15 +174,7 @@ CalcView::CalcView(BMessage* archive)
 	// Do not restore the follow mode, in shelfs, we never follow.
 	SetResizingMode(B_FOLLOW_NONE);
 
-	// create expression text view
-	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
-	AddChild(fExpressionTextView);
-
-	// read data from archive
-	_LoadSettings(archive);
-
-	// Fetch the calc icon for compact view
-	_FetchAppIcon(fCalcIcon);
+	_Init(archive);
 }
 
 
@@ -205,6 +183,8 @@ CalcView::~CalcView()
 	delete fKeypad;
 	delete fOptions;
 	free(fKeypadDescription);
+
+	fAboutWindow->Quit();
 }
 
 
@@ -288,7 +268,7 @@ CalcView::MessageReceived(BMessage* message)
 
 			// (replicant) about box requested
 			case B_ABOUT_REQUESTED:
-				AboutRequested();
+				fAboutWindow->Show();
 				break;
 
 			case MSG_UNFLASH_KEY:
@@ -296,6 +276,7 @@ CalcView::MessageReceived(BMessage* message)
 				int32 key;
 				if (message->FindInt32("key", &key) == B_OK)
 					_FlashKey(key, 0);
+
 				break;
 			}
 
@@ -709,20 +690,6 @@ CalcView::FrameResized(float width, float height)
 }
 
 
-void
-CalcView::AboutRequested()
-{
-	const char* extraCopyrights[] = {
-		"1997, 1998 R3 Software Ltd.",
-		NULL
-	};
-
-	BAboutWindow* about = new BAboutWindow(kAppName, kAppSig);
-	about->AddCopyright(2006, "Haiku, Inc.", extraCopyrights);
-	about->Show();
-}
-
-
 status_t
 CalcView::Archive(BMessage* archive, bool deep) const
 {
@@ -735,7 +702,7 @@ CalcView::Archive(BMessage* archive, bool deep) const
 
 	// save app signature for replicant add-on loading
 	if (ret == B_OK)
-		ret = archive->AddString("add_on", kAppSig);
+		ret = archive->AddString("add_on", kSignature);
 
 	// save all the options
 	if (ret == B_OK)
@@ -813,73 +780,6 @@ CalcView::Paste(BMessage* message)
 			fExpressionTextView->Insert(temp.String());
 		}
 	}
-}
-
-
-status_t
-CalcView::_LoadSettings(BMessage* archive)
-{
-	if (!archive)
-		return B_BAD_VALUE;
-
-	// record calculator description
-	const char* calcDesc;
-	if (archive->FindString("calcDesc", &calcDesc) < B_OK)
-		calcDesc = kKeypadDescriptionBasic;
-
-	// save calculator description for reference
-	free(fKeypadDescription);
-	fKeypadDescription = strdup(calcDesc);
-
-	// read grid dimensions
-	if (archive->FindInt16("cols", &fColumns) < B_OK)
-		fColumns = 5;
-	if (archive->FindInt16("rows", &fRows) < B_OK)
-		fRows = 4;
-
-	// read color scheme
-	const rgb_color* color;
-	ssize_t size;
-	if (archive->FindData("rgbBaseColor", B_RGB_COLOR_TYPE,
-			(const void**)&color, &size) < B_OK
-		|| size != sizeof(rgb_color)) {
-		fBaseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-		puts("Missing rgbBaseColor from CalcView archive!\n");
-	} else {
-		fBaseColor = *color;
-	}
-
-	if (archive->FindData("rgbDisplay", B_RGB_COLOR_TYPE,
-			(const void**)&color, &size) < B_OK
-		|| size != sizeof(rgb_color)) {
-		fExpressionBGColor = (rgb_color){ 0, 0, 0, 255 };
-		puts("Missing rgbBaseColor from CalcView archive!\n");
-	} else {
-		fExpressionBGColor = *color;
-	}
-
-	// load options
-	fOptions->LoadSettings(archive);
-
-	// load display text
-	const char* display;
-	if (archive->FindString("displayText", &display) < B_OK) {
-		puts("Missing expression text from CalcView archive.\n");
-	} else {
-		// init expression text
-		fExpressionTextView->SetText(display);
-	}
-
-	// load expression history
-	fExpressionTextView->LoadSettings(archive);
-
-	// parse calculator description
-	_ParseCalcDesc(fKeypadDescription);
-
-	// colorize based on base color.
-	_Colorize();
-
-	return B_OK;
 }
 
 
@@ -1066,6 +966,99 @@ CalcView::SetKeypadMode(uint8 mode)
 
 
 // #pragma mark -
+
+
+void
+CalcView::_Init(BMessage* settings)
+{
+	// create the about window
+	const char* extraCopyrights[] = {
+		"1997, 1998 R3 Software Ltd.",
+		NULL
+	};
+
+	fAboutWindow = new BAboutWindow(kAppName, kSignature);
+	fAboutWindow->AddCopyright(2006, "Haiku, Inc.",
+		extraCopyrights);
+
+	// create expression text view
+	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
+	AddChild(fExpressionTextView);
+
+	// read data from archive
+	_LoadSettings(settings);
+
+	// fetch the calc icon for compact view
+	_FetchAppIcon(fCalcIcon);
+
+}
+
+
+status_t
+CalcView::_LoadSettings(BMessage* archive)
+{
+	if (!archive)
+		return B_BAD_VALUE;
+
+	// record calculator description
+	const char* calcDesc;
+	if (archive->FindString("calcDesc", &calcDesc) < B_OK)
+		calcDesc = kKeypadDescriptionBasic;
+
+	// save calculator description for reference
+	free(fKeypadDescription);
+	fKeypadDescription = strdup(calcDesc);
+
+	// read grid dimensions
+	if (archive->FindInt16("cols", &fColumns) < B_OK)
+		fColumns = 5;
+	if (archive->FindInt16("rows", &fRows) < B_OK)
+		fRows = 4;
+
+	// read color scheme
+	const rgb_color* color;
+	ssize_t size;
+	if (archive->FindData("rgbBaseColor", B_RGB_COLOR_TYPE,
+			(const void**)&color, &size) < B_OK
+		|| size != sizeof(rgb_color)) {
+		fBaseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+		puts("Missing rgbBaseColor from CalcView archive!\n");
+	} else {
+		fBaseColor = *color;
+	}
+
+	if (archive->FindData("rgbDisplay", B_RGB_COLOR_TYPE,
+			(const void**)&color, &size) < B_OK
+		|| size != sizeof(rgb_color)) {
+		fExpressionBGColor = (rgb_color){ 0, 0, 0, 255 };
+		puts("Missing rgbBaseColor from CalcView archive!\n");
+	} else {
+		fExpressionBGColor = *color;
+	}
+
+	// load options
+	fOptions->LoadSettings(archive);
+
+	// load display text
+	const char* display;
+	if (archive->FindString("displayText", &display) < B_OK) {
+		puts("Missing expression text from CalcView archive.\n");
+	} else {
+		// init expression text
+		fExpressionTextView->SetText(display);
+	}
+
+	// load expression history
+	fExpressionTextView->LoadSettings(archive);
+
+	// parse calculator description
+	_ParseCalcDesc(fKeypadDescription);
+
+	// colorize based on base color.
+	_Colorize();
+
+	return B_OK;
+}
 
 
 void
@@ -1372,7 +1365,7 @@ void
 CalcView::_FetchAppIcon(BBitmap* into)
 {
 	entry_ref appRef;
-	status_t status = be_roster->FindApp(kAppSig, &appRef);
+	status_t status = be_roster->FindApp(kSignature, &appRef);
 	if (status == B_OK) {
 		BFile file(&appRef, B_READ_ONLY);
 		BAppFileInfo appInfo(&file);
