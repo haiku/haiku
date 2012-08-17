@@ -613,44 +613,63 @@ if [ IsOptionalHaikuImagePackageAdded DemoPackage_Video ] {
 
 
 # Development
-if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
-	AddFilesToHaikuImage system apps : Debugger ;
-	AddSymlinkToHaikuImage home config settings deskbar Applications
-		: /boot/system/apps/Debugger : Debugger ;
-	# autotools
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+if [ IsOptionalHaikuImagePackageAdded Development ] {
+	if $(TARGET_ARCH) = x86 {
+		AddFilesToHaikuImage system apps : Debugger ;
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/system/apps/Debugger : Debugger ;
+		# autotools
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				autoconf-2.68-r1a3-x86-gcc4-2011-05-23.zip
+				: $(baseURL)/autoconf-2.68-r1a3-x86-gcc4-2011-05-23.zip
+				: : true ;
+			InstallOptionalHaikuImagePackage
+				automake-1.11.1-r1a3-x86-gcc4-2011-05-23.zip
+				: $(baseURL)/automake-1.11.1-r1a3-x86-gcc4-2011-05-23.zip
+				: : true ;
+			InstallOptionalHaikuImagePackage
+				libtool-2.4-r1a3-x86-gcc4-2011-05-23.zip
+				: $(baseURL)/libtool-2.4-r1a3-x86-gcc4-2011-05-23.zip
+				: : true ;
+			InstallOptionalHaikuImagePackage
+				texinfo-4.13a-x86-gcc4-2012-03-31.zip
+				: $(baseURL)/texinfo-4.13a-x86-gcc4-2012-03-31.zip
+				: : true ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				autoconf-2.68-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/autoconf-2.68-r1a3-x86-gcc2-2011-05-17.zip
+				: : true ;
+			InstallOptionalHaikuImagePackage
+				automake-1.11.1-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/automake-1.11.1-r1a3-x86-gcc2-2011-05-17.zip
+				: : true ;
+			InstallOptionalHaikuImagePackage
+				libtool-2.4-r1a3-x86-gcc2-2011-05-17.zip
+				: $(baseURL)/libtool-2.4-r1a3-x86-gcc2-2011-05-17.zip
+				: : true ;
+			InstallOptionalHaikuImagePackage
+				texinfo-4.13a-x86-gcc2-2012-03-31.zip
+				: $(baseURL)/texinfo-4.13a-x86-gcc2-2012-03-31.zip
+				: : true ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
-			autoconf-2.68-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/autoconf-2.68-r1a3-x86-gcc4-2011-05-23.zip
+			autoconf-2.69-x86_64-2012-08-17.zip
+			: $(baseURL)/autoconf-2.69-x86_64-2012-08-17.zip
 			: : true ;
 		InstallOptionalHaikuImagePackage
-			automake-1.11.1-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/automake-1.11.1-r1a3-x86-gcc4-2011-05-23.zip
+			automake-1.12.2-x86_64-2012-08-17.zip
+			: $(baseURL)/automake-1.12.2-x86_64-2012-08-17.zip
 			: : true ;
 		InstallOptionalHaikuImagePackage
-			libtool-2.4-r1a3-x86-gcc4-2011-05-23.zip
-			: $(baseURL)/libtool-2.4-r1a3-x86-gcc4-2011-05-23.zip
+			libtool-2.4.2-x86_64-2012-08-17.zip
+			: $(baseURL)/libtool-2.4.2-x86_64-2012-08-17.zip
 			: : true ;
 		InstallOptionalHaikuImagePackage
-			texinfo-4.13a-x86-gcc4-2012-03-31.zip
-			: $(baseURL)/texinfo-4.13a-x86-gcc4-2012-03-31.zip
-			: : true ;
-	} else {
-		InstallOptionalHaikuImagePackage
-			autoconf-2.68-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/autoconf-2.68-r1a3-x86-gcc2-2011-05-17.zip
-			: : true ;
-		InstallOptionalHaikuImagePackage
-			automake-1.11.1-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/automake-1.11.1-r1a3-x86-gcc2-2011-05-17.zip
-			: : true ;
-		InstallOptionalHaikuImagePackage
-			libtool-2.4-r1a3-x86-gcc2-2011-05-17.zip
-			: $(baseURL)/libtool-2.4-r1a3-x86-gcc2-2011-05-17.zip
-			: : true ;
-		InstallOptionalHaikuImagePackage
-			texinfo-4.13a-x86-gcc2-2012-03-31.zip
-			: $(baseURL)/texinfo-4.13a-x86-gcc2-2012-03-31.zip
+			texinfo-4.13a-x86_64-2012-08-17.zip
+			: $(baseURL)/texinfo-4.13a-x86_64-2012-08-17.zip
 			: : true ;
 	}
 }
@@ -1015,9 +1034,7 @@ if [ IsOptionalHaikuImagePackageAdded friss ] {
 
 # GetText
 if [ IsOptionalHaikuImagePackageAdded GetText ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package GetText available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				gettext-0.18.1.1-r1a3-x86-gcc4-2011-05-24.zip
@@ -1029,6 +1046,13 @@ if [ IsOptionalHaikuImagePackageAdded GetText ] {
 				: $(baseURL)/gettext-0.18.1.1-x86-gcc2-2011-02-07.zip
 				: : true ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			gettext-0.18.1.1-x86_64-2012-08-17.zip
+			: $(baseURL)/gettext-0.18.1.1-x86_64-2012-08-17.zip
+			: : true ;
+	} else {
+		Echo "No optional package GetText available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1398,9 +1422,7 @@ if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 
 # Nano
 if [ IsOptionalHaikuImagePackageAdded Nano ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Nano available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				nano-2.2.6-r1a3-x86-gcc4-2011-05-24.zip
@@ -1410,6 +1432,12 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 				nano-2.2.6-r1a3-x86-gcc2-2011-05-18.zip
 				: $(baseURL)/nano-2.2.6-r1a3-x86-gcc2-2011-05-18.zip ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			nano-2.3.1-x86_64-2012-08-17.zip
+			: $(baseURL)/nano-2.3.1-x86_64-2012-08-17.zip ;
+	} else {
+		Echo "No optional package Nano available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1636,9 +1664,7 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 
 # Perl
 if [ IsOptionalHaikuImagePackageAdded Perl ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Perl available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				perl-5.10.1-r1a3-x86-gcc4-2011-05-24.zip
@@ -1650,6 +1676,13 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 				: $(baseURL)/perl-5.10.1-r1a3-x86-gcc2-2011-05-17.zip
 				: : true ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			perl-5.10.1-x86_64-2012-08-17.zip
+			: $(baseURL)/perl-5.10.1-x86_64-2012-08-17.zip
+			: : true ;
+	} else {
+		Echo "No optional package Perl available for $(TARGET_ARCH)" ;
 	}
 }
 
