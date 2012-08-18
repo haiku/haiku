@@ -324,7 +324,7 @@ SavePalette::SavePalette(BBitmap *bitmap, int32 maxSizeInBits)
 		fSizeInBits++;
 	fSize = 1 << fSizeInBits;
 
-    ColorItem **topcolors = (ColorItem **)malloc(fSize  * 4);
+    ColorItem **topcolors = (ColorItem **)malloc(fSize * sizeof(ColorItem *));
     if (topcolors == NULL) {
         if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
         fFatalError = true;
