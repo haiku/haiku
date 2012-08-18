@@ -346,7 +346,7 @@ BNetAddress::SetTo(const char* hostname, unsigned short port)
 
 	// See if the string is an ASCII-fied IP address.
 	addr = inet_addr(hostname);
-	if (addr == INADDR_ANY || addr == (unsigned long)-1) {
+	if (addr == INADDR_ANY || addr == (in_addr_t)-1) {
 		// See if we can resolve the hostname to an IP address.
 		struct hostent* host = gethostbyname(hostname);
 		if (host != NULL)
