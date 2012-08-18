@@ -1113,8 +1113,14 @@ ActivityView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
 			if (fAboutWindow == NULL) {
+				const char* authors[] = {
+					"Axel Dörfler",
+					NULL
+				};
+
 				fAboutWindow = new BAboutWindow(kAppName, kSignature);
 				fAboutWindow->AddCopyright(2008, "Haiku, Inc.");
+				fAboutWindow->AddAuthors(authors);
 				fAboutWindow->Show();
 			} else if (fAboutWindow->IsHidden())
 				fAboutWindow->Show();

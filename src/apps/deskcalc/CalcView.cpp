@@ -277,9 +277,18 @@ CalcView::MessageReceived(BMessage* message)
 						NULL
 					};
 
+					const char* authors[] = {
+						"Stephan Aßmus",
+						"John Scipione",
+						"Timothy Wayper",
+						"Ingo Weinhold",
+						NULL
+					};
+
 					fAboutWindow = new BAboutWindow(kAppName, kSignature);
 					fAboutWindow->AddCopyright(2006, "Haiku, Inc.",
 						extraCopyrights);
+					fAboutWindow->AddAuthors(authors);
 					fAboutWindow->Show();
 				} else if (fAboutWindow->IsHidden())
 					fAboutWindow->Show();
