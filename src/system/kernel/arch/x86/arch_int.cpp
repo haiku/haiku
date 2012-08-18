@@ -389,6 +389,25 @@ arch_int_are_interrupts_enabled(void)
 
 
 status_t
+arch_int_init(kernel_args* args)
+{
+	// setup the standard programmable interrupt controller
+	pic_init();
+	return B_OK;
+}
+
+
+status_t
+arch_int_init_post_vm(kernel_args* args)
+{
+	// Always init the local apic as it can be used for timers even if we
+	// don't end up using the io apic
+	apic_init(args);
+	return B_OK;
+}
+
+
+status_t
 arch_int_init_io(kernel_args* args)
 {
 	msi_init();

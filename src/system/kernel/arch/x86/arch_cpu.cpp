@@ -5,7 +5,6 @@
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
- *
  */
 
 
@@ -22,7 +21,6 @@
 #include <debug.h>
 #include <elf.h>
 #include <smp.h>
-#include <tls.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
@@ -33,10 +31,6 @@
 
 #include "paging/X86PagingStructures.h"
 #include "paging/X86VMTranslationMap.h"
-
-#ifndef __x86_64__
-#include "32/interrupts.h"
-#endif
 
 
 #define DUMP_FEATURE_STRING 1
@@ -98,8 +92,6 @@ static uint32 sCpuRendezvous;
 static uint32 sCpuRendezvous2;
 static uint32 sCpuRendezvous3;
 static vint32 sTSCSyncRendezvous;
-
-segment_descriptor* gGDT = NULL;
 
 /* Some specials for the double fault handler */
 static uint8* sDoubleFaultStacks;
@@ -343,56 +335,6 @@ x86_init_fpu(void)
 }
 
 
-static void
-load_tss(int cpu)
-{
-	short seg = (TSS_SEGMENT(cpu) << 3) | DPL_KERNEL;
-	asm("ltr %%ax" : : "a" (seg));
-}
-
-
-static void
-init_double_fault(int cpuNum)
-{
-#ifdef __x86_64__
-	// x86_64 does not have task gates, so we use the IST mechanism to switch
-	// to the double fault stack upon a double fault (see 64/int.cpp).
-	struct tss* tss = &gCPU[cpuNum].arch.tss;
-	size_t stackSize;
-	tss->ist1 = (addr_t)x86_get_double_fault_stack(cpuNum, &stackSize);
-	tss->ist1 += stackSize;
-#else
-	// set up the double fault TSS
-	struct tss* tss = &gCPU[cpuNum].arch.double_fault_tss;
-
-	memset(tss, 0, sizeof(struct tss));
-	size_t stackSize;
-	tss->sp0 = (addr_t)x86_get_double_fault_stack(cpuNum, &stackSize);
-	tss->sp0 += stackSize;
-	tss->ss0 = KERNEL_DATA_SEG;
-	tss->cr3 = x86_read_cr3();
-		// copy the current cr3 to the double fault cr3
-	tss->eip = (uint32)&double_fault;
-	tss->es = KERNEL_DATA_SEG;
-	tss->cs = KERNEL_CODE_SEG;
-	tss->ss = KERNEL_DATA_SEG;
-	tss->esp = tss->sp0;
-	tss->ds = KERNEL_DATA_SEG;
-	tss->fs = KERNEL_DATA_SEG;
-	tss->gs = KERNEL_DATA_SEG;
-	tss->ldt_seg_selector = 0;
-	tss->io_map_base = sizeof(struct tss);
-
-	// add TSS descriptor for this new TSS
-	uint16 tssSegmentDescriptorIndex = DOUBLE_FAULT_TSS_BASE_SEGMENT + cpuNum;
-	set_tss_descriptor(&gGDT[tssSegmentDescriptorIndex],
-		(addr_t)tss, sizeof(struct tss));
-
-	x86_set_task_gate(cpuNum, 8, tssSegmentDescriptorIndex << 3);
-#endif
-}
-
-
 #if DUMP_FEATURE_STRING
 static void
 dump_feature_string(int currentCPU, cpu_ent* cpu)
@@ -554,7 +496,7 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 #endif	// DUMP_FEATURE_STRING
 
 
-static int
+static void
 detect_cpu(int currentCPU)
 {
 	cpu_ent* cpu = get_cpu_struct();
@@ -664,8 +606,6 @@ detect_cpu(int currentCPU)
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);
 #endif
-
-	return 0;
 }
 
 
@@ -700,7 +640,7 @@ x86_get_double_fault_stack(int32 cpu, size_t* _size)
 int32
 x86_double_fault_get_cpu(void)
 {
-	uint32 stack = x86_get_stack_frame();
+	addr_t stack = x86_get_stack_frame();
 	return (stack - (addr_t)sDoubleFaultStacks) / kDoubleFaultStackSize;
 }
 
@@ -774,25 +714,10 @@ detect_amdc1e_noarat()
 status_t
 arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
+	// Load descriptor tables for this CPU.
+	x86_descriptors_init_percpu(args, cpu);
+
 	detect_cpu(cpu);
-
-	// load the TSS for this cpu
-	// note the main cpu gets initialized in arch_cpu_init_post_vm()
-	if (cpu != 0) {
-		load_tss(cpu);
-
-		// set the IDT
-		struct {
-			uint16	limit;
-			void*	address;
-		} _PACKED descriptor = {
-			256 * sizeof(interrupt_descriptor) - 1,
-				// 256 descriptors (-1 for "limit")
-			x86_get_idt(cpu)
-		};
-
-		asm volatile("lidt	%0" : : "m"(descriptor));
-	}
 
 	if (!gCpuIdleFunc) {
 		if (detect_amdc1e_noarat())
@@ -800,7 +725,8 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 		else
 			gCpuIdleFunc = halt_idle;
 	}
-	return 0;
+
+	return B_OK;
 }
 
 
@@ -829,6 +755,9 @@ arch_cpu_init(kernel_args* args)
 	}
 #endif
 
+	// Initialize descriptor tables.
+	x86_descriptors_init(args);
+
 	return B_OK;
 }
 
@@ -837,11 +766,6 @@ status_t
 arch_cpu_init_post_vm(kernel_args* args)
 {
 	uint32 i;
-
-	// account for the segment descriptors
-	gGDT = (segment_descriptor*)(addr_t)args->arch_args.vir_gdt;
-	create_area("gdt", (void**)&gGDT, B_EXACT_ADDRESS, B_PAGE_SIZE,
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	// allocate an area for the double fault stacks
 	virtual_address_restrictions virtualRestrictions = {};
@@ -853,42 +777,18 @@ arch_cpu_init_post_vm(kernel_args* args)
 		&virtualRestrictions, &physicalRestrictions,
 		(void**)&sDoubleFaultStacks);
 
+	// More descriptor table setup.
+	x86_descriptors_init_post_vm(args);
+
 	X86PagingStructures* kernelPagingStructures
 		= static_cast<X86VMTranslationMap*>(
 			VMAddressSpace::Kernel()->TranslationMap())->PagingStructures();
 
-	// setup task-state segments
+	// Set active translation map on each CPU.
 	for (i = 0; i < args->num_cpus; i++) {
-		// initialize the regular and double fault tss stored in the per-cpu
-		// structure
-		memset(&gCPU[i].arch.tss, 0, sizeof(struct tss));
-#ifndef __x86_64__
-		gCPU[i].arch.tss.ss0 = KERNEL_DATA_SEG;
-#endif
-		gCPU[i].arch.tss.io_map_base = sizeof(struct tss);
-
-		// add TSS descriptor for this new TSS
-		set_tss_descriptor(&gGDT[TSS_SEGMENT(i)], (addr_t)&gCPU[i].arch.tss,
-			sizeof(struct tss));
-
-		// initialize the double fault tss
-		init_double_fault(i);
-
-		// init active translation map
 		gCPU[i].arch.active_paging_structures = kernelPagingStructures;
 		kernelPagingStructures->AddReference();
 	}
-
-	// set the current hardware task on cpu 0
-	load_tss(0);
-
-#ifndef __x86_64__
-	// setup TLS descriptors (one for every CPU)
-	for (i = 0; i < args->num_cpus; i++) {
-		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_SIZE,
-			DT_DATA_WRITEABLE, DPL_USER);
-	}
-#endif
 
 	if (!apic_available())
 		x86_init_fpu();
@@ -960,13 +860,6 @@ arch_cpu_init_post_modules(kernel_args* args)
 		B_SYMBOL_TYPE_TEXT);
 
 	return B_OK;
-}
-
-
-void
-x86_set_tss_and_kstack(addr_t kstack)
-{
-	get_cpu_struct()->arch.tss.sp0 = kstack;
 }
 
 

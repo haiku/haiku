@@ -13,6 +13,10 @@
 extern "C" {
 #endif
 
+
+struct iframe;
+
+
 void trap0();void trap1();void trap2();void trap3();void trap4();void trap5();
 void trap6();void trap7();void trap9();void trap10();void trap11();
 void trap12();void trap13();void trap14();void trap16();void trap17();
@@ -72,6 +76,10 @@ void trap245();void trap246();void trap247();void trap248();void trap249();
 void trap250();
 
 void trap251();void trap252();void trap253();void trap254();void trap255();
+
+void x86_double_fault_exception(struct iframe* frame);
+void x86_page_fault_exception_double_fault(struct iframe* frame);
+
 
 #ifdef __cplusplus
 }

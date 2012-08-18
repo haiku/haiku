@@ -163,7 +163,7 @@ x86_initial_return_to_userland(Thread* thread, iframe* frame)
 	// disable interrupts and set up CPU specifics for this thread
 	disable_interrupts();
 
-	x86_set_tss_and_kstack(thread->kernel_stack_top);
+	get_cpu_struct()->arch.tss.sp0 = thread->kernel_stack_top;
 	x86_set_tls_context(thread);
 	x86_set_syscall_stack(thread->kernel_stack_top);
 
@@ -208,7 +208,9 @@ arch_thread_init_tls(Thread* thread)
 void
 arch_thread_context_switch(Thread* from, Thread* to)
 {
-	x86_set_tss_and_kstack(to->kernel_stack_top);
+	cpu_ent* cpuData = to->cpu;
+
+	cpuData->arch.tss.sp0 = to->kernel_stack_top;
 	x86_set_syscall_stack(to->kernel_stack_top);
 
 	// set TLS GDT entry to the current thread - since this action is
@@ -216,7 +218,6 @@ arch_thread_context_switch(Thread* from, Thread* to)
 	if (to->user_local_storage != 0)
 		x86_set_tls_context(to);
 
-	struct cpu_ent* cpuData = to->cpu;
 	X86PagingStructures* activePagingStructures
 		= cpuData->arch.active_paging_structures;
 	VMAddressSpace* toAddressSpace = to->team->address_space;

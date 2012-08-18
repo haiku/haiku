@@ -12,6 +12,12 @@
 #ifndef _ASSEMBLER
 
 
+#include <SupportDefs.h>
+
+
+struct kernel_args;
+
+
 enum descriptor_privilege_levels {
 	DPL_KERNEL = 0,
 	DPL_USER = 3,
@@ -40,6 +46,11 @@ enum gate_types {
 	GATE_INTERRUPT = 14,
 	GATE_TRAP = 15,
 };
+
+
+void x86_descriptors_init(kernel_args* args);
+void x86_descriptors_init_percpu(kernel_args* args, int cpu);
+status_t x86_descriptors_init_post_vm(kernel_args* args);
 
 
 #endif	// !_ASSEMBLER

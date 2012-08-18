@@ -389,7 +389,6 @@ void x86_context_switch(struct arch_thread* oldState,
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
 void x86_swap_pgdir(addr_t newPageDir);
-void x86_set_tss_and_kstack(addr_t kstack);
 void x86_fxsave(void* fpuState);
 void x86_fxrstor(const void* fpuState);
 void x86_noop_swap(void* oldFpuState, const void* newFpuState);
@@ -397,7 +396,6 @@ void x86_fxsave_swap(void* oldFpuState, const void* newFpuState);
 addr_t x86_get_stack_frame();
 uint64 x86_read_msr(uint32 registerNumber);
 void x86_write_msr(uint32 registerNumber, uint64 value);
-void* x86_get_idt(int32 cpu);
 uint32 x86_count_mtrrs(void);
 void x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type);
 status_t x86_get_mtrr(uint32 index, uint64* _base, uint64* _length,
@@ -420,13 +418,9 @@ void x86_page_fault_exception(iframe* iframe);
 void x86_fnsave(void* fpuState);
 void x86_frstor(const void* fpuState);
 void x86_fnsave_swap(void* oldFpuState, const void* newFpuState);
-void x86_set_task_gate(int32 cpu, int32 n, int32 segment);
-void x86_double_fault_exception(iframe* frame);
-void x86_page_fault_exception_double_fault(iframe* frame);
 
 #endif
 
-extern segment_descriptor* gGDT;
 
 #ifdef __cplusplus
 }	// extern "C" {

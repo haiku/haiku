@@ -3,30 +3,26 @@
  * Copyright 2010, Clemens Zeidler, haiku@clemens-zeidler.de.
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  *
- * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
-#include <int.h>
+
+#include <arch/x86/descriptors.h>
 
 #include <stdio.h>
 
+#include <boot/kernel_args.h>
 #include <cpu.h>
-#include <smp.h>
+#include <tls.h>
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
 
-#include <arch/cpu.h>
 #include <arch/int.h>
-#include <arch/smp.h>
 #include <arch/user_debugger.h>
-#include <arch/vm.h>
-
-#include <arch/x86/apic.h>
-#include <arch/x86/descriptors.h>
-#include <arch/x86/pic.h>
 
 #include "interrupts.h"
 
@@ -36,9 +32,10 @@ static interrupt_descriptor* sIDTs[B_MAX_CPU_COUNT];
 // table with functions handling respective interrupts
 typedef void interrupt_handler_function(struct iframe* frame);
 
-#define INTERRUPT_HANDLER_TABLE_SIZE 256
-interrupt_handler_function* gInterruptHandlerTable[
-	INTERRUPT_HANDLER_TABLE_SIZE];
+static const uint32 kInterruptHandlerTableSize = 256;
+interrupt_handler_function* gInterruptHandlerTable[kInterruptHandlerTableSize];
+
+segment_descriptor* gGDT;
 
 
 /*!	Initializes a descriptor in an IDT.
@@ -88,23 +85,23 @@ set_trap_gate(int32 cpu, int n, void (*addr)())
 	For CPUs other than the boot CPU it must not be called before
 	arch_int_init_post_vm() (arch_cpu_init_post_vm() is fine).
 */
-void
-x86_set_task_gate(int32 cpu, int32 n, int32 segment)
+static void
+set_task_gate(int32 cpu, int32 n, int32 segment)
 {
 	sIDTs[cpu][n].a = (segment << 16);
 	sIDTs[cpu][n].b = 0x8000 | (0 << 13) | (0x5 << 8); // present, dpl 0, type 5
 }
 
 
-/*!	Returns the virtual IDT address for CPU \a cpu. */
-void*
-x86_get_idt(int32 cpu)
+static void
+load_tss(int cpu)
 {
-	return sIDTs[cpu];
+	short seg = (TSS_SEGMENT(cpu) << 3) | DPL_KERNEL;
+	asm("ltr %%ax" : : "a" (seg));
 }
 
 
-// #pragma mark -
+//	#pragma mark - Double fault handling
 
 
 void
@@ -171,17 +168,51 @@ x86_page_fault_exception_double_fault(struct iframe* frame)
 }
 
 
-status_t
-arch_int_init(struct kernel_args *args)
+static void
+init_double_fault(int cpuNum)
 {
-	int i;
+	// set up the double fault TSS
+	struct tss* tss = &gCPU[cpuNum].arch.double_fault_tss;
+
+	memset(tss, 0, sizeof(struct tss));
+	size_t stackSize;
+	tss->sp0 = (addr_t)x86_get_double_fault_stack(cpuNum, &stackSize);
+	tss->sp0 += stackSize;
+	tss->ss0 = KERNEL_DATA_SEG;
+	tss->cr3 = x86_read_cr3();
+		// copy the current cr3 to the double fault cr3
+	tss->eip = (uint32)&double_fault;
+	tss->es = KERNEL_DATA_SEG;
+	tss->cs = KERNEL_CODE_SEG;
+	tss->ss = KERNEL_DATA_SEG;
+	tss->esp = tss->sp0;
+	tss->ds = KERNEL_DATA_SEG;
+	tss->fs = KERNEL_DATA_SEG;
+	tss->gs = KERNEL_DATA_SEG;
+	tss->ldt_seg_selector = 0;
+	tss->io_map_base = sizeof(struct tss);
+
+	// add TSS descriptor for this new TSS
+	uint16 tssSegmentDescriptorIndex = DOUBLE_FAULT_TSS_BASE_SEGMENT + cpuNum;
+	set_tss_descriptor(&gGDT[tssSegmentDescriptorIndex],
+		(addr_t)tss, sizeof(struct tss));
+
+	set_task_gate(cpuNum, 8, tssSegmentDescriptorIndex << 3);
+}
+
+
+//	#pragma mark -
+
+
+void
+x86_descriptors_init(kernel_args* args)
+{
+	uint32 i;
 	interrupt_handler_function** table;
 
-	// set the global sIDT variable
+	// Get the GDT and boot CPU IDT set up by the boot loader.
+	gGDT = (segment_descriptor*)args->arch_args.vir_gdt;
 	sIDTs[0] = (interrupt_descriptor *)(addr_t)args->arch_args.vir_idt;
-
-	// setup the standard programmable interrupt controller
-	pic_init();
 
 	set_interrupt_gate(0, 0, &trap0);
 	set_interrupt_gate(0, 1, &trap1);
@@ -191,7 +222,7 @@ arch_int_init(struct kernel_args *args)
 	set_interrupt_gate(0, 5, &trap5);
 	set_interrupt_gate(0, 6, &trap6);
 	set_interrupt_gate(0, 7, &trap7);
-	// trap8 (double fault) is set in arch_cpu.c
+	// trap8 (double fault) is set in init_double_fault().
 	set_interrupt_gate(0, 9, &trap9);
 	set_interrupt_gate(0, 10, &trap10);
 	set_interrupt_gate(0, 11, &trap11);
@@ -447,7 +478,7 @@ arch_int_init(struct kernel_args *args)
 	// defaults
 	for (i = 0; i < ARCH_INTERRUPT_BASE; i++)
 		table[i] = x86_invalid_exception;
-	for (i = ARCH_INTERRUPT_BASE; i < INTERRUPT_HANDLER_TABLE_SIZE; i++)
+	for (i = ARCH_INTERRUPT_BASE; i < kInterruptHandlerTableSize; i++)
 		table[i] = x86_hardware_interrupt;
 
 	table[0] = x86_unexpected_exception;	// Divide Error Exception (#DE)
@@ -469,30 +500,51 @@ arch_int_init(struct kernel_args *args)
 	table[17] = x86_unexpected_exception;	// Alignment Check Exception (#AC)
 	table[18] = x86_fatal_exception;		// Machine-Check Exception (#MC)
 	table[19] = x86_unexpected_exception;	// SIMD Floating-Point Exception (#XF)
+}
 
-	return B_OK;
+
+void
+x86_descriptors_init_percpu(kernel_args* args, int cpu)
+{
+	// load the TSS for this cpu
+	// note the main cpu gets initialized in x86_descriptors_init_post_vm()
+	if (cpu != 0) {
+		load_tss(cpu);
+
+		// set the IDT
+		struct {
+			uint16	limit;
+			void*	address;
+		} _PACKED descriptor = {
+			256 * 8 - 1,	// 256 descriptors, 8 bytes each (-1 for "limit")
+			sIDTs[cpu]
+		};
+
+		asm volatile("lidt	%0" : : "m"(descriptor));
+	}
 }
 
 
 status_t
-arch_int_init_post_vm(struct kernel_args *args)
+x86_descriptors_init_post_vm(kernel_args* args)
 {
-	// Always init the local apic as it can be used for timers even if we
-	// don't end up using the io apic
-	apic_init(args);
+	uint32 i;
+
+	// account for the segment descriptors
+	create_area("gdt", (void **)&gGDT, B_EXACT_ADDRESS, B_PAGE_SIZE,
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	// create IDT area for the boot CPU
 	area_id area = create_area("idt", (void**)&sIDTs[0], B_EXACT_ADDRESS,
 		B_PAGE_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < 0)
+	if (area < B_OK)
 		return area;
 
 	// create IDTs for the off-boot CPU
 	size_t idtSize = 256 * 8;
 		// 256 8 bytes-sized descriptors
-	int32 cpuCount = smp_get_num_cpus();
-	if (cpuCount > 0) {
-		size_t areaSize = ROUNDUP(cpuCount * idtSize, B_PAGE_SIZE);
+	if (args->num_cpus > 0) {
+		size_t areaSize = ROUNDUP(args->num_cpus * idtSize, B_PAGE_SIZE);
 		interrupt_descriptor* idt;
 		virtual_address_restrictions virtualRestrictions = {};
 		virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
@@ -503,7 +555,7 @@ arch_int_init_post_vm(struct kernel_args *args)
 		if (area < 0)
 			return area;
 
-		for (int32 i = 1; i < cpuCount; i++) {
+		for (i = 1; i < args->num_cpus; i++) {
 			sIDTs[i] = idt;
 			memcpy(idt, sIDTs[0], idtSize);
 			idt += 256;
@@ -511,5 +563,31 @@ arch_int_init_post_vm(struct kernel_args *args)
 		}
 	}
 
-	return area >= B_OK ? B_OK : area;
+	// setup task-state segments
+	for (i = 0; i < args->num_cpus; i++) {
+		// initialize the regular and double fault tss stored in the per-cpu
+		// structure
+		memset(&gCPU[i].arch.tss, 0, sizeof(struct tss));
+		gCPU[i].arch.tss.ss0 = KERNEL_DATA_SEG;
+		gCPU[i].arch.tss.io_map_base = sizeof(struct tss);
+
+		// add TSS descriptor for this new TSS
+		set_tss_descriptor(&gGDT[TSS_SEGMENT(i)], (addr_t)&gCPU[i].arch.tss,
+			sizeof(struct tss));
+
+		// initialize the double fault tss
+		init_double_fault(i);
+	}
+
+	// set the current hardware task on cpu 0
+	load_tss(0);
+
+	// setup TLS descriptors (one for every CPU)
+
+	for (i = 0; i < args->num_cpus; i++) {
+		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_SIZE,
+			DT_DATA_WRITEABLE, DPL_USER);
+	}
+
+	return B_OK;
 }

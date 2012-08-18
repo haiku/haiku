@@ -67,6 +67,7 @@ class RestartSyscall : public AbstractTraceEntry {
 
 // from arch_cpu.cpp
 extern bool gHasSSE;
+extern segment_descriptor* gGDT;
 
 static struct arch_thread sInitialState _ALIGNED(16);
 	// the fpu_state must be aligned on a 16 byte boundary, so that fxsave can use it

@@ -22,7 +22,7 @@ if $(TARGET_ARCH) = x86_64 {
 	archSpecificSources =
 		arch.S
 		cpuid.S
-		int.cpp
+		descriptors.cpp
 		interrupts.S
 		signals.cpp
 		signals_asm.S
@@ -47,7 +47,7 @@ if $(TARGET_ARCH) = x86_64 {
 		arch.S
 		bios.cpp
 		cpuid.S
-		int.cpp
+		descriptors.cpp
 		interrupts.S
 		signals.cpp
 		signals_asm.S
