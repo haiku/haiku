@@ -149,12 +149,12 @@ sis900_txInterrupt(struct sis_info *info)
 
 		/* Does the device generate extra interrupts? */
 		if (status & SiS900_DESCR_OWN) {
-			struct buffer_desc *descriptor = (void *)read32(info->registers + SiS900_MAC_Tx_DESCR);
+			uint32 descriptor = read32(info->registers + SiS900_MAC_Tx_DESCR);
 			int16 that;
 			for (that = 0;
 				that < NUM_Tx_DESCR
 					&& physicalAddress(&info->txDescriptor[that],
-						sizeof(struct buffer_desc)) != (addr_t)descriptor;
+						sizeof(struct buffer_desc)) != descriptor;
 				that++) {
 			}
 			if (that == NUM_Tx_DESCR)
@@ -172,7 +172,7 @@ sis900_txInterrupt(struct sis_info *info)
 
 		if (status & (SiS900_DESCR_Tx_ABORT | SiS900_DESCR_Tx_UNDERRUN
 				| SiS900_DESCR_Tx_OOW_COLLISION)) {
-			dprintf("tx error: %lx\n", status);
+			dprintf("tx error: %" B_PRIx32 "\n", status);
 		} else
 			info->txDescriptor[info->txInterruptIndex].status = 0;
 
@@ -740,7 +740,7 @@ sis900_createRings(struct sis_info *info)
 
 	// initialize transmit buffer descriptors
 	for (i = 1; i < NUM_Tx_DESCR; i++)
-		info->txBuffer[i] = (void *)(((uint32)info->txBuffer[0]) + (i * BUFFER_SIZE));
+		info->txBuffer[i] = (void *)(((addr_t)info->txBuffer[0]) + (i * BUFFER_SIZE));
 
 	for (i = 0; i < NUM_Tx_DESCR; i++) {
 		info->txDescriptor[i].status = 0;
@@ -765,7 +765,7 @@ sis900_createRings(struct sis_info *info)
 
 	// initialize receive buffer descriptors
 	for (i = 1; i < NUM_Rx_DESCR; i++)
-		info->rxBuffer[i] = (void *)(((uint32)info->rxBuffer[0]) + (i * BUFFER_SIZE));
+		info->rxBuffer[i] = (void *)(((addr_t)info->rxBuffer[0]) + (i * BUFFER_SIZE));
 
 	for (i = 0; i < NUM_Rx_DESCR; i++) {
 		info->rxDescriptor[i].status = MAX_FRAME_SIZE;
