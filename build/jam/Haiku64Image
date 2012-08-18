@@ -39,7 +39,7 @@ SYSTEM_APPS = AboutSystem DriveSetup Installer Terminal ;
 
 SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
 	Keyboard Keymap Locale Mouse Network Notifications Screen Time Touchpad
-	<preference>Tracker
+	<preference>Tracker VirtualMemory
 ;
 
 SYSTEM_DEMOS = ;

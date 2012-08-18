@@ -203,11 +203,11 @@ Settings::_WriteSwapSettings()
 		SwapVolume().GetName(volumeName);
 	else if (fBadVolName)
 		strcpy(volumeName, fBadVolName);
-	snprintf(buffer, sizeof(buffer), "vm %s\nswap_size %Ld\nswap_volume %s\n",
-		SwapEnabled() ? "on" : "off", SwapSize(), 
+	snprintf(buffer, sizeof(buffer), "vm %s\nswap_size %" B_PRIdOFF "\n"
+		"swap_volume %s\n", SwapEnabled() ? "on" : "off", SwapSize(), 
 		volumeName[0] ? volumeName : NULL);
 #else
-	snprintf(buffer, sizeof(buffer), "vm %s\nswap_size %Ld\n",
+	snprintf(buffer, sizeof(buffer), "vm %s\nswap_size %" B_PRIdOFF "\n",
 		fSwapEnabled ? "on" : "off", fSwapSize);
 #endif
 
