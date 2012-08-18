@@ -81,9 +81,9 @@ StripeView::StripeView(BBitmap* icon)
 	BView("StripeView", B_WILL_DRAW),
 	fIcon(icon)
 {
-	float width = 48.0f;
+	float width = 0.0f;
 	if (icon != NULL)
-		width += icon->Bounds().Width() - 16.0f;
+		width += icon->Bounds().Width() + 32.0f;
 
 	SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
 	SetExplicitPreferredSize(BSize(width, B_SIZE_UNLIMITED));
@@ -99,6 +99,9 @@ StripeView::~StripeView()
 void
 StripeView::Draw(BRect updateRect)
 {
+	if (fIcon == NULL)
+		return;
+
 	SetHighColor(ViewColor());
 	FillRect(updateRect);
 
@@ -106,9 +109,6 @@ StripeView::Draw(BRect updateRect)
 	stripeRect.right = kStripeWidth;
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	FillRect(stripeRect);
-
-	if (fIcon == NULL)
-		return;
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
@@ -213,7 +213,7 @@ AboutView::AppIcon(const char* signature)
 		return NULL;
 
 	BBitmap* icon = new BBitmap(BRect(0.0, 0.0, 127.0, 127.0), B_RGBA32);
-	if (BNodeInfo::GetTrackerIcon(&ref, icon) == B_OK)
+	if (BNodeInfo::GetTrackerIcon(&ref, icon, (icon_size)128) == B_OK)
 		return icon;
 
 	delete icon;
@@ -225,7 +225,7 @@ AboutView::AppIcon(const char* signature)
 
 
 BAboutWindow::BAboutWindow(BHandler* handler, const char* appName, const char* signature)
-	:	BWindow(BRect(0.0, 0.0, 310.0, 140.0), appName, B_TITLED_WINDOW,
+	:	BWindow(BRect(0.0, 0.0, 200.0, 140.0), appName, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 		fCaller(handler)
