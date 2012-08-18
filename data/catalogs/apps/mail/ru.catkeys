@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	849531913
+1	russian	x-vnd.Be-MAIL	3337401776
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
@@ -27,6 +27,7 @@ Expert	Mail		Эксперт
 Reply account:	Mail		Ответить, используя акканут:
 Discard	Mail		Сбросить
 Message	Mail		Сообщение
+Settings…	Mail		Настройки…
 Reply to sender	Mail		Ответить отправителю
 There is no installed handler for URL links.	Mail		Не выбрано приложение для открытия ссылок.
 Signature	Mail		Подпись

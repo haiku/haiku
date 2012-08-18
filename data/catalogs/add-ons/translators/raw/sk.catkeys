@@ -1,7 +1,6 @@
-1	slovak	x-vnd.Haiku-RAWTranslator	1938728039
+1	slovak	x-vnd.Haiku-RAWTranslator	2229230003
 RAWTranslator Settings	ConfigView		Nastavenia Prekladača RAW
 Version %d.%d.%d, %s	ConfigView		Verzia %d.%d.%d, %s
-RAW Images	ConfigView		Obrázky RAW
 RAW image translator	RAWTranslator		Prekladač obrázkov RAW
 RAW Settings	RAWTranslator main		Nastavenia RAW
 RAW images	RAWTranslator		Obrázky RAW

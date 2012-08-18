@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-GLifeScreensaver	206066243
+1	japanese	x-vnd.Haiku-GLifeScreensaver	1707534289
 Grid Border: %li	GLife ScreenSaver		グリッドの輪郭： %li
 Grid Width: 	GLife ScreenSaver		グリッドの幅：
 none	GLife ScreenSaver		無し
@@ -10,5 +10,6 @@ Grid Width: %li	GLife ScreenSaver		グリッドの幅： %li
 Grid Height: %li	GLife ScreenSaver		グリッドの高さ： %li
 Grid Life Delay: 	GLife ScreenSaver		グリッドの生存猶予： 
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"ライフゲーム\"
+Grid Life Delay: %s	GLife ScreenSaver		グリッドの生存猶予： %s
 Grid Border: 	GLife ScreenSaver		グリッドの境界：
 by Aaron Hill	GLife ScreenSaver		Aaron Hill 作

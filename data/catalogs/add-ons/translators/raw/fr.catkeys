@@ -1,9 +1,8 @@
-1	french	x-vnd.Haiku-RAWTranslator	1938728039
+1	french	x-vnd.Haiku-RAWTranslator	2229230003
 RAWTranslator Settings	ConfigView		Réglages du traducteur RAW
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
-RAW Images	ConfigView		Images RAW
 RAW image translator	RAWTranslator		Traducteur d'images RAW
 RAW Settings	RAWTranslator main		Réglages RAW
 RAW images	RAWTranslator		Images RAW
-%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	Image %s RAW
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	Image brute %s
 Based on Dave Coffin's dcraw 8.63	ConfigView		Basé sur dcraw 8.63 de Dave Coffin

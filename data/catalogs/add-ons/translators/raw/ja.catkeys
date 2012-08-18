@@ -1,7 +1,6 @@
-1	japanese	x-vnd.Haiku-RAWTranslator	1938728039
+1	japanese	x-vnd.Haiku-RAWTranslator	2229230003
 RAWTranslator Settings	ConfigView		RAW トランスレーター設定
 Version %d.%d.%d, %s	ConfigView		バージョン %d.%d.%d, %s
-RAW Images	ConfigView		RAW イメージ
 RAW image translator	RAWTranslator		RAW イメージトランスレーター
 RAW Settings	RAWTranslator main		RAW 設定
 RAW images	RAWTranslator		RAW イメージ

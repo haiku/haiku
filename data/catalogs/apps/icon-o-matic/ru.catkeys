@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	3088916408
+1	russian	x-vnd.haiku-icon_o_matic	2079362081
 Select All	Icon-O-Matic-PathManipulator		Выделить всё
 Add Style	Icon-O-Matic-AddStylesCmd		Добавить стиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Цвет (#%02x%02x%02x)
@@ -65,6 +65,7 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		Удалить форму
 Reverse	Icon-O-Matic-PathsList		Обратить
 HVIF Source Code	Icon-O-Matic-SavePanel		Исходный код HVIF
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Сбросить изменения
+Settings	Icon-O-Matic-Menus		Настройки
 All	Icon-O-Matic-Properties		Все
 Multi Paste Properties	Icon-O-Matic-Properties		Вставить все свойства
 Undo	Icon-O-Matic-Main		Отменить

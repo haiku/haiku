@@ -1,6 +1,8 @@
-1	french	x-vnd.Haiku-HVIFTranslator	2227623652
+1	french	x-vnd.Haiku-HVIFTranslator	249304797
+Haiku vector icon translator	HVIFTranslator		Traducteur d'icônes vectorielles Haiku
 HVIF icons	HVIFTranslator		Icônes HVIF
 Render size:	HVIFView		Taille de rendu :
 HVIFTranslator Settings	HVIFTranslator		Réglages du traducteur d'icônes HVIF
+Haiku vector icon translator	HVIFView		Traducteur d'icônes vectorielles Haiku
 HVIF Settings	HVIFMain		Réglages HVIF
 Version %d.%d.%d, %s	HVIFView		Version %d.%d.%d, %s

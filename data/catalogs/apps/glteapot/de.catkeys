@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-GLTeapot	3688092856
+1	german	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Mitte oben
 Lighting	TeapotWindow		Beleuchtung
 Off	TeapotWindow		Aus
@@ -9,6 +9,7 @@ Blue	TeapotWindow		Blau
 Gouraud shading	TeapotWindow		Gouraud Shading
 Quit	TeapotWindow		Beenden
 Filled polygons	TeapotWindow		Gefüllte Polygone
+Settings	TeapotWindow		Einstellungen
 Fog	TeapotWindow		Nebel
 Backface culling	TeapotWindow		Backface Culling
 Z-buffered	TeapotWindow		Z-Buffering

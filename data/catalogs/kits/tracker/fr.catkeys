@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	351214779
+1	french	x-vnd.Haiku-libtracker	2606149823
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -164,6 +164,7 @@ no supporting apps	OpenWithWindow		aucune application apte
 That name is already taken. Please type another one.	InfoWindow		Ce nom est déjà utilisé. Veuillez en saisir un autre.
 Sorry, you can't create links in the Trash.	PoseView		Désolé, vous ne pouvez pas créer des liens dans la Corbeille.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Un élément nommé « %name » existe déjà dans ce dossier, et peut contenir\ndes éléments de même noms. Voulez vous les remplacer par ceux contenu dans le dossier que vous êtes en train de %verb ?
+Tracker preferences…	ContainerWindow		Préférences du Tracker…
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Lier « %name » à :
 Mount settings…	VolumeWindow		Réglages du montage…
 Select…	VolumeWindow		Sélectionner…

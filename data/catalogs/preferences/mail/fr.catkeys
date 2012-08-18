@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Mail	3624866527
+1	french	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Levée du courrier
 Settings	Config Window		Réglages
 Never	Config Window	show status window	Jamais
@@ -14,6 +14,7 @@ Account name:	E-Mail		Nom du compte :
 Account name:	Config Views		Nom du compte :
 Create new account	AutoConfigWindow		Créé un nouveau compte
 OK	Config Views		OK
+The filter could not be moved. Deleting filter.	Config Views		Le filtre n'a pas pu être déplacé. Suppression du filtre.
 Revert	Config Window		Rétablir
 Login name:	E-Mail		Nom de connexion :
 Incoming	E-Mail		En arrivée

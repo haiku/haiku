@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-DriveSetup	3496601396
+1	french	x-vnd.Haiku-DriveSetup	1372142450
 DriveSetup	System name		Gestionnaire de disque
 Delete	MainWindow		Supprimer
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les changements sur le disque ?\n\nToutes les données de la partition sélectionnée seront effacées si vous le faites !
@@ -11,12 +11,15 @@ There's no space on the partition where a child partition could be created.	Main
 Unable to find the selected partition by ID.	MainWindow		Impossible de trouver la partition sélectionnée par son ID.
 Select a partition from the list below.	DiskView		Sélectionnez une partition dans la liste ci-dessous.
 No disk devices have been recognized.	DiskView		Aucun périphérique disque n'a été reconnu.
+Failed to initialize the disk %s!\n	MainWindow		Impossible d'initialiser le disque %s !\n
 The selected disk is read-only.	MainWindow		Le disque choisi est en lecture seule.
 Partition name:	CreateParamsPanel		Nom de la partition :
 Initialize	InitParamsPanel		Initialiser
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir formater la partition « %s » ? Une confirmation vous sera à nouveau demandée avant que les changements ne soient écrits sur le disque.
 Could not mount partition %s.	MainWindow		Impossible de monter la partition %s.
+The partition %s has been successfully formatted.\n	MainWindow		La partition %s a été correctement formatée.\n
 The partition %s is already unmounted.	MainWindow		La partition %s est déjà démontée.
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Impossible de supprimer la partition. Aucun changement n'a été enregistré sur le disque.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Impossible de supprimer la partition. Aucun changement n'a été écrit sur le disque.
 Partition type:	CreateParamsPanel		Type de partition :
 Could not delete the selected partition.	MainWindow		Impossible de supprimer la partition sélectionnée.
 Initialize	MainWindow		Initialiser
@@ -29,21 +32,25 @@ Mounted at	PartitionList		Montée en
 There was an error acquiring the partition row.	MainWindow		Erreur de lecture des informations de la partition.
 You need to select a partition entry from the list.	MainWindow		Sélectionnez d'abord une entrée de la table des partitions.
 The currently selected partition does not have a parent partition.	MainWindow		La partition sélectionnée n'a pas de partition parente.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les changements sur le disque ?\n\nToutes les données du disque seront définitivement perdues si vous le faites !
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir écrire les changements sur le disque ?\n\nToutes les données du disque seront définitivement perdues si vous le faites !
 Offset: %ld MB	Support		Déplacement : %ld Mo
-Write changes	MainWindow		Enregistrer les modifications
+Write changes	MainWindow		Écrire les modifications
 There was an error preparing the disk for modifications.	MainWindow		Une erreur est survenue pendant la préparation des modifications du disque.
 The partition %s is already mounted.	MainWindow		La partition %s est déjà montée.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir formater la partition ? Une confirmation vous sera à nouveau demandée avant que les changements ne soient écrits sur le disque.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les modifications sur disque maintenant ?\n\nToutes les données du disque %s seront irrémédiablement perdues si vous le faites !
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir supprimer la partition sélectionnée ?\n\nToutes les données sur la partition seront définitivement perdues si vous le faites !
 Create…	MainWindow		Créer…
 Disk system \"%s\"\" not found!	MainWindow		Le disque système « %s » est introuvable !
 The disk has been successfully initialized.\n	MainWindow		Le disque a été correctement initialisée.\n
 Could not unmount partition %s.	MainWindow		Impossible de démonter la partition %s.
+Failed to format the partition %s!\n	MainWindow		Impossible de formater la partition %s !\n
 Mount	MainWindow		Monter
 Create	CreateParamsPanel		Créer
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir formater un disque brut ? (la plus part du temps, il convient au préalable d'initialiser le disque avec un système de partitions ) Une confirmation vous sera à nouveau demandée avant que les changements ne soient écrits sur le disque.
 Device	PartitionList		Périphérique
 Disk	MainWindow		Disque
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Êtes-vous sûr de vouloir initialiser le disque sélectionné ? Toutes les données seront perdues. Une confirmation vous sera à nouveau demandée avant que les changements ne soient écrits sur le disque.\n
 Device	DiskView		Périphérique
 Active	PartitionList		Active
 Volume name	PartitionList		Nom de volume
@@ -58,6 +65,7 @@ Partition	MainWindow		Partition
 File system	PartitionList		Système de fichiers
 Validation of the given creation parameters failed.	MainWindow		Le contrôle des paramètres de création donnés a échoué.
 Size	PartitionList		Taille
+Wipe (not implemented)	MainWindow		Effacer (non implémenté)
 Validation of the given initialization parameters failed.	MainWindow		Le contrôle des paramètres d'initialisation donnés a échoué.
 The selected partition does not contain a partitioning system.	MainWindow		La partition sélectionnée ne contient pas de système de partitionnement.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir enregistrer les modifications sur le disque maintenant ?\n\nToutes les données sur la partition %s seront définitivement perdues si vous le faites !
@@ -66,7 +74,9 @@ Partition size	CreateParamsPanel		Taille de la partition
 Surface test (not implemented)	MainWindow		Test de surface (non implémenté)
 Cancel	InitParamsPanel		Annuler
 Cancel	CreateParamsPanel		Annuler
+Format	MainWindow		Formater
 Parameters	PartitionList		Paramètres
 Creation of the partition has failed.	MainWindow		La partition n'a pas pu être créée.
 The currently selected partition is not empty.	MainWindow		La partition sélectionnée n'est pas vide.
+Failed to format the partition. No changes have been written to disk.	MainWindow		Impossible de formater la partition. Aucun changement n'a été écrit sur le disque.
 Unmount	MainWindow		Démonter

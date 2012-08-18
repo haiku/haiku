@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-GLTeapot	3688092856
+1	japanese	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		上中央
 Lighting	TeapotWindow		Lighting
 Off	TeapotWindow		オフ
@@ -9,6 +9,7 @@ Blue	TeapotWindow		青
 Gouraud shading	TeapotWindow		グローシェーディング
 Quit	TeapotWindow		終了
 Filled polygons	TeapotWindow		ポリゴンを塗りつぶす
+Settings	TeapotWindow		設定
 Fog	TeapotWindow		フォグ
 Backface culling	TeapotWindow		バックフェースカリング
 Z-buffered	TeapotWindow		Z バッファーを使用

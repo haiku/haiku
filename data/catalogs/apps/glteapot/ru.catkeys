@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-GLTeapot	504494930
+1	russian	x-vnd.Haiku-GLTeapot	2681052815
 Upper center	TeapotWindow		Сверху на центр
 Lighting	TeapotWindow		Освещение
 Off	TeapotWindow		Выключить
@@ -9,6 +9,7 @@ Blue	TeapotWindow		Голубой
 Gouraud shading	TeapotWindow		Метод тонирования Гуро
 Quit	TeapotWindow		Выход
 Filled polygons	TeapotWindow		Заполненные многоугольники
+Settings	TeapotWindow		Настройки
 Fog	TeapotWindow		Туман
 Z-buffered	TeapotWindow		Z-буферизация
 File	TeapotWindow		Файл

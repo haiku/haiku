@@ -1,7 +1,6 @@
-1	finnish	x-vnd.Haiku-RAWTranslator	1938728039
+1	finnish	x-vnd.Haiku-RAWTranslator	2229230003
 RAWTranslator Settings	ConfigView		RAW-muunninasetukset
 Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
-RAW Images	ConfigView		RAW-kuvat
 RAW image translator	RAWTranslator		RAW-kuvamuunnin
 RAW Settings	RAWTranslator main		RAW-asetukset
 RAW images	RAWTranslator		RAW-kuvat

@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	849531913
+1	german	x-vnd.Be-MAIL	3337401776
 View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attribute von Anhängen:
@@ -27,6 +27,7 @@ Expert	Mail		Experte
 Reply account:	Mail		Konto zum Beantworten:
 Discard	Mail		Verwerfen
 Message	Mail		Nachricht
+Settings…	Mail		Einstellungen…
 Reply to sender	Mail		Antwort an Absender
 There is no installed handler for URL links.	Mail		URL-Verweisen ist keine Anwendung zugeordnet.
 Signature	Mail		Signatur

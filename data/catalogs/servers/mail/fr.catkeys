@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-POST	944207750
+1	french	x-vnd.Be-POST	1091177030
 Fetching mail for %name	Notifier		Récupération des mails de %name
 Check for mails only	DeskbarView		Vérifier seulement les courriels
 Send pending mails	DeskbarView		Envoyer les courriels en attente
@@ -17,4 +17,7 @@ No new messages	MailDaemon		Aucun nouveau message
 Check for mail now	DeskbarView		Vérifier les courriels maintenant
 No new messages	DeskbarView		Aucun nouveau message
 %num new messages for %name\n	MailDaemon		%num nouveaux messages pour %name\n
+Mail daemon status log	MailDaemon		Journal d'état du démon de courrier
+Settings…	DeskbarView		Réglages…
 No new messages.	MailDaemon		Aucun nouveau message.
+Mail status	Notifier		État du courrier
