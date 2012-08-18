@@ -112,7 +112,7 @@ StripeView::Draw(BRect updateRect)
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	DrawBitmapAsync(fIcon, BPoint(15.0, 5.0));
+	DrawBitmapAsync(fIcon, BPoint(31.0, 5.0));
 }
 
 
