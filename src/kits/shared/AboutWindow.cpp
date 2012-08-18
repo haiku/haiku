@@ -343,8 +343,6 @@ BAboutWindow::AddCopyright(int32 firstCopyrightYear,
 	const char* copyrightHolder, const char** extraCopyrights)
 {
 	BString copyright(B_UTF8_COPYRIGHT " %years% %holder%");
-	const char* firstCopyright = B_TRANSLATE_MARK(copyright.String());
-	firstCopyright = gSystemCatalog.GetString(copyright, "AboutWindow");
 
 	// Get current year
 	time_t tp;
