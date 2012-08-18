@@ -254,11 +254,10 @@ AboutView::AppIcon(const char* signature)
 //	#pragma mark -
 
 
-BAboutWindow::BAboutWindow(BHandler* handler, const char* appName, const char* signature)
+BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 	:	BWindow(BRect(0.0, 0.0, 200.0, 140.0), appName, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS),
-		fCaller(handler)
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	_Init(appName, signature);
 }
@@ -275,18 +274,9 @@ BAboutWindow::~BAboutWindow()
 bool
 BAboutWindow::QuitRequested()
 {
-	if (fCaller != NULL) {
-		status_t status;
-		BMessenger messenger(fCaller, NULL, &status);
-		if (status == B_OK && messenger.IsValid()) {
-			BMessage* message = new BMessage(B_ABOUT_REQUESTED);
-			message->AddBool("quit", true);
-			messenger.SendMessage(message);
-			delete message;
-		}
-	}
+	Hide();
 
-	return true;
+	return false;
 }
 
 

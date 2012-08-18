@@ -270,13 +270,6 @@ CalcView::MessageReceived(BMessage* message)
 
 			// (replicant) about box requested
 			case B_ABOUT_REQUESTED:
-			{
-				bool quit = false;
-				if (message->FindBool("quit", &quit) == B_OK && quit) {
-					fAboutWindow = NULL;
-					break;
-				}
-
 				if (fAboutWindow == NULL) {
 					// create the about window
 					const char* extraCopyrights[] = {
@@ -284,15 +277,16 @@ CalcView::MessageReceived(BMessage* message)
 						NULL
 					};
 
-					fAboutWindow = new BAboutWindow(this, kAppName, kSignature);
+					fAboutWindow = new BAboutWindow(kAppName, kSignature);
 					fAboutWindow->AddCopyright(2006, "Haiku, Inc.",
 						extraCopyrights);
 					fAboutWindow->Show();
-				} else
+				} else if (fAboutWindow->IsHidden())
+					fAboutWindow->Show();
+				else
 					fAboutWindow->Activate();
 
 				break;
-			}
 
 			case MSG_UNFLASH_KEY:
 			{

@@ -426,13 +426,6 @@ ProcessController::MessageReceived(BMessage *message)
 		}
 
 		case B_ABOUT_REQUESTED:
-		{
-			bool quit = false;
-			if (message->FindBool("quit", &quit) == B_OK && quit) {
-				fAboutWindow = NULL;
-				break;
-			}
-
 			if (fAboutWindow == NULL) {
 				const char* extraCopyrights[] = {
 					"1997-2001 Georges-Edouard Berenger",
@@ -444,16 +437,17 @@ ProcessController::MessageReceived(BMessage *message)
 					NULL
 				};
 
-				fAboutWindow = new BAboutWindow(this,
+				fAboutWindow = new BAboutWindow(
 					B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
 				fAboutWindow->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
 				fAboutWindow->AddAuthors(authors);
 				fAboutWindow->Show();
-			} else
+			} else if (fAboutWindow->IsHidden())
+				fAboutWindow->Show();
+			else
 				fAboutWindow->Activate();
 
 			break;
-		}
 
 		default:
 			BView::MessageReceived(message);

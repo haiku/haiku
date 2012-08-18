@@ -17,8 +17,7 @@ class BHandler;
 
 class BAboutWindow : public BWindow {
  public:
-							BAboutWindow(BHandler* handler,
-								const char* appName, 
+							BAboutWindow(const char* appName,
 								const char* signature);
 	virtual					~BAboutWindow();
 

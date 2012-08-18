@@ -73,13 +73,6 @@ LocalePreflet::MessageReceived(BMessage* message)
 			break;
 
 		case B_ABOUT_REQUESTED:
-		{
-			bool quit = false;
-			if (message->FindBool("quit", &quit) == B_OK && quit) {
-				fAboutWindow = NULL;
-				break;
-			}
-
 			if (fAboutWindow == NULL) {
 				const char* authors[] = {
 					"Axel Dörfler",
@@ -88,15 +81,16 @@ LocalePreflet::MessageReceived(BMessage* message)
 					NULL
 				};
 
-				fAboutWindow = new BAboutWindow(this, kAppName, kSignature);
+				fAboutWindow = new BAboutWindow(kAppName, kSignature);
 				fAboutWindow->AddCopyright(2005, "Haiku, Inc.");
 				fAboutWindow->AddAuthors(authors);
 				fAboutWindow->Show();
-			} else
+			} else if (fAboutWindow->IsHidden())
+				fAboutWindow->Show();
+			else
 				fAboutWindow->Activate();
 
 			break;
-		}
 
 		default:
 			BApplication::MessageReceived(message);
