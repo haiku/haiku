@@ -358,7 +358,7 @@ BAboutWindow::AddCopyright(int32 firstCopyrightYear,
 	if (fAboutView->InfoView()->TextLength() > 0)
 		text << "\n\n";
 
-	text << firstCopyright;
+	text << copyright;
 
 	// Fill out the copyright year placeholder
 	text.ReplaceAll("%years%", copyrightYears.String());
