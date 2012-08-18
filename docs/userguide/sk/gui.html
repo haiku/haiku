@@ -57,10 +57,10 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-		<a href="#move-resize">Easy moving and resizing</a><br />
-                <a href="#stack-tile">Stack &amp; Tile</a><br />
-                <a href="#open-save-panel">Open and save panels</a><br />
-                <a href="#replicants">Replicants</a></td></tr>
+		<a href="#move-resize">Rýchly spôsob presúvania a zmeny veľkosti okien</a><br />
+                <a href="#stack-tile">Skladanie a dlaždice</a><br />
+                <a href="#open-save-panel">Panely Otvoriť a Uložiť</a><br />
+                <a href="#replicants">Replikanti</a></td></tr>
 </table>
 
 <h1>Používateľské rozhranie Haiku</h1>
@@ -77,13 +77,14 @@
 <li>Okno môžete dať preč z popredia pravým kliknutím na jeho kartu (alebo okraj).</li></ul></li>
 <li><p>Tlačidlo Zavrieť.</p></li>
 <li><p>Tlačidlo „zväčšenia“ (alebo <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Vo väčšina aplikácií sa okno maximalizuje. Sú ale aj výnimky. Napríklad okná Trackera, ktoré svoju veľkosť zmenia tak, aby sa čo najlepšie prispôsobili obsahu.</p></li>
-<li><p>Ťahaním myšou počas držania rohu meníte veľkosť okna. Ťahaním počas držania hocijakej inej časti okraja sa okno presúva.</p></li>
+<li><p>The window border. Left-dragging moves the window, right-dragging resizes.</p></li>
+<li><p>The resize corner.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">Rýchly spôsob na presúvanie a zmenu veľkosti okien</a></h2>
-<p>Pohybovanie a menenie veľkosti je veľká časť interakcie s viacerými súčasne bežiacimi aplikáciami. Namiesto triafania malej žltej karty alebo ešte menšieho okraja, existuje aj pohodlnejší spôsob. Okrem toho, že je roh okna malý, má aj ďalšie obmedzenie: Dovoľuje vám meniť veľkosť iba v smere dolného pravého rohu.</p>
+<a id="move-resize" name="move-resize">Rýchly spôsob presúvania a zmeny veľkosti okien</a></h2>
+<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner. <br />Right-dragging a border for resizing works, but again you'll have to aim carefully.</p>
 <p>Ako elegantné riešenie tohoto problému ponúka Haiku klávesovú skratku <span class="key">CTRL</span> <span class="key">ALT</span> s použitím myši. Pozrite aj sekciu <a href="keyboard-shortcuts.html#general">Skratky a klávesové kombinácie</a>, kde nájdete ďalšie informácie o skratkách na správu okien.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
 <p>Držanie <span class="key">CTRL</span> <span class="key">ALT</span> zvýrazní okraje najbližšie pri kurzore. Presúvaním myši môžete meniť zvýraznené okraje. Držaním  <i>pravého tlačidla myši</i> ťahaním meníte veľkosť okna pozdĺž vyznačených okrajov.</p>
@@ -91,22 +92,22 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
-<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
-In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<a id="stack-tile" name="stack-tile">Skladanie a dlaždice</a></h2>
+<p>Používateľské rozhranie Haikuposkytuje jedinečnú vlastnosť, ktorá dokonale využíva skutočnosť, že okná majú žltú kartu namiesto titulného pruhu plnej šírky. Hovorí sa jej „Skladanie a dlaždice“.<br />
+V príklade dolu je okno Trackera so záložkami pridláždené k ľavej strane okna WebPositive, ktoré je samotné zložené s iným oknom Trackera zobrazujúcim priečinok <tt>haiku</tt> so zdrojovým kódom. V tejto animácii používateľ kliká na karty poskladaných okien, čím ich striedavo vynáša do popredia.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
-<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>Takto spojené skupiny okien je možné spolu presúvať a meniť ich veľkosť - čo sa hodí v prostredí, kde sa pracuje na viacerých projektoch. Namiesto hľadania správneho okna prehliadača s oknami s dokumentáciou, editorom a Trackerom a možno poštou súvisiacou s jedným s projektov, na ktorých pracujete ich môžete jednoducho poskladať a zdláždiť k sebe.</p>
+<p>Samotné aranžovanie okien je jednoduché: Podržte <span class="key">OPT</span> počas ťahania okna za jeho kartu v blízkosti karty alebo okraja iného okna, pokým sa nevysvieti a následne pusťte tlačidlo myši.</p>
+<p>Skladanie a dlaždice pozostávajú z dvoch súvisiacich častí.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<td><p>„<i>Skladanie</i>“ je dávanie okien na jedno na druhé, pričom sa žlté karty automaticky presúvajú na miesto.<br />
+Počas držania klávesu <span class="key">OPT</span> karty menia farbu, keď sa prekrývajú; pustením okna dosiahnete skladanie.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>„<i>Dláždenie</i>“ znamená zlepovanie okien zvisle alebo vodorovne jedno k druhému.<br />
+Opäť, počas držania klávesu <span class="key">OPT</span> okraje, ktoré sa zlepia pri pustení okna zmenia farbu, keď ich pritiahnete blízko jedno k druhému.</p></td></tr></table>
+<p>Oddeľovanie prebieha rovnako - podržaním klávesu <span class="key">OPT</span> a odtiahnutím okna za jeho kartu zo skupiny.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -140,8 +141,8 @@ Všetky Obľúbené sú uložené v <span class="path">/boot/home/config/setting
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="replicants" name="replicants">Replikanty</a></h2>
-<p>Replikanty sú malé samostatné súčasti aplikácií, ktoré sa dajú integrovať do iných programov. Po aktivovaní možnosti Panela <span class="menu">Zobraziť replikantov</span> môžete rozoznať aplikácie s replikantom podľa tejto malej rúčky v pravom dolnom rohu:</p>
+<a id="replicants" name="replicants">Replikanti</a></h2>
+<p>Replikanti sú malé samostatné súčasti aplikácií, ktoré sa dajú integrovať do iných programov. Po aktivovaní možnosti Panela <span class="menu">Zobraziť replikantov</span> môžete rozoznať aplikácie s replikantom podľa tejto malej rúčky v pravom dolnom rohu:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
 <p>Najprominentnejšie miesto na použitie replikantov je Plocha: Jednoducho na ňu myšou pretiahnite rúčku replikanta. Odteraz je táto aplikácia súčasťou Plochy a ak s ňou chcete pracovať, pôvodnú aplikáciu už nemusíte spúšťať.<br />
 Pravým kliknutím na rúčku replikanta vyvoláte menu s možnosťami zobraziť ďalšie informácie <span class="menu">O aplikácií</span> alebo <span class="menu">Odstrániť replikanta</span>.</p>

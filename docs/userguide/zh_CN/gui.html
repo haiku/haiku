@@ -51,21 +51,20 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>索引</td></tr>
 <tr class="index"><td>
-		<a href="#move-resize">Easy moving and resizing</a><br />
-                <a href="#stack-tile">Stack &amp; Tile</a><br />
-                <a href="#open-save-panel">Open and save panels</a><br />
+		<a href="#move-resize">移动和自定义大小</a><br />
+                <a href="#stack-tile">重叠和拼贴</a><br />
+                <a href="#open-save-panel">打开和保存面板</a><br />
                 <a href="#replicants">Replicants</a></td></tr>
 </table>
 
 <h1>Haiku的图形用户界面</h1>
 
-<p>Haiku的图形用户界面是系统的组成部分。与基于Unix的操作系统不同的是，Haiku没有独立的窗口管理器，而且在启动时不能够进入命令行界面。Haiku所面向的人群是桌面用户，所以命令行界面不是非常必要。</p>
-<p>鉴于您已经有过使用其他图形环境的经历，那么我们就跳过这些标准，例如，菜单，右键菜单，拖拽操作等； 直接开始了解Haiku图形用户界面与其他系统不同的地方。</p>
+<p>Haiku 的图形用户界面是系统的组成部分。与基于 Unix 的操作系统不同的是，Haiku 没有独立的窗口管理器，而且在启动时不能够进入命令行界面。Haiku 所面向的人群是桌面用户，因此命令行界面并不非常必要。</p>
+<p>鉴于您已经有过使用其他图形环境的经历，那么我们就跳过这些标准，例如，菜单，右键菜单，拖拽操作等； 直接开始了解 Haiku 图形用户界面与其他系统不同的地方。</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
 <p>Haiku的图形界面只有很少一部分不是很常见，可能需要进行解释。</p>
 <ol>
@@ -76,13 +75,14 @@
 <li>您可以通过右键点击标签（或者窗口边界）来置后窗口。</li></ul></li>
 <li><p>关闭按钮</p></li>
 <li><p>“缩放”按钮（也可以通过<span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span> 组合键进行缩放）。对于大多数的程序，该按钮将会把窗口最大化。但并不是都如此，例如Tracker窗口，该按钮将会依据其内容将窗口放大至合适大小。</p></li>
-<li><p>可调整的窗口边角。在窗口的边缘拖拽将会移动整个窗口。</p></li>
+<li><p>窗口边界。左键拖拽移动窗口，右键拖拽改变大小。</p></li>
+<li><p>可调整的窗口边角。</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="move-resize" name="move-resize">快速移动或调整窗口</a></h2>
-<p>移动和调整窗口时和多个并发运行程序交互的重要部分。除了通过微小的黄色标签和更窄的窗口边框，还有更为方便的方法可供使用。而且，该边角不仅很小，而且还有另外限制：它仅允许在右下角，并且沿右下角方向使用。</p>
+<p>移动和调整窗口时和多个并发运行程序交互的重要部分。除了通过微小的黄色标签和更窄的窗口边框，还有更为方便的方法可供使用。而且，该边角不仅很小，而且还有另外限制：它仅允许在右下角，并且沿右下角方向使用。<br />右键拖动边角将会改变其大小，但是您必须仔细进行操作。</p>
 <p>为了定位这些问题，Haiku 提供了使用组合键 <span class="key">CTRL</span> <span class="key">ALT</span> 和鼠标的灵活方法。更多窗口管理快捷键的信息，请查阅 <a href="keyboard-shortcuts.html#general">快捷键和组合键</a> 。</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
 <p>按下 <span class="key">CTRL</span> <span class="key">ALT</span> 将会高亮显示最接近鼠标的窗口边界。向另一个边界方向移动将会激活该目标。点击并使用 <i>鼠标右键</i> 拖动将会重定义高亮边界的窗口。</p>
@@ -90,22 +90,22 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
-<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
-In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<a id="stack-tile" name="stack-tile">重叠与拼贴</a></h2>
+<p>Haiku 的用户界面提供了一个特别的功能，根据其窗口仅拥有的一个黄色标签而非全部安度标题栏的实际情况，提供了非常精巧的功能。它称之为“重叠与拼贴”。<br />
+在下述图示中，一个具有书签的 Tracker 窗口拼贴到了其左边的 WebPositive 窗口，而其本身则与另一个显示源目录 <tt>haiku</tt> 的窗口相重叠。在这个动画中，用户点击重叠窗口的标签以便将它们交替置顶。 </p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
-<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>与此相关联，一组窗口可以移动并放置到一起，- 这样可以方便的在一个以项目为中心的环境中进行管理工作。不仅可以在文档窗口中进行便利的查找，甚至是与当前项目有关的编辑器，文件浏览器，以及电子邮件，你也可以将它们重叠拼贴起来。</p>
+<p>窗口的排布也非常简单：按下 <span class="key">OPT</span> 键，通过标签拖动窗口到另一个窗口的标签或边界，直到其显示为高亮后，然后再释放鼠标按键。</p>
+<p>重叠和拼贴由两个相关部分组成。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<td><p>"<i>重叠</i>" 用于将窗口依次叠放起来，自动将黄色标签移动到指定位置。<br />
+在按下 <span class="key">OPT</span> 键，当标签重叠时，标签颜色发生变化，然后放下窗口以实现重叠。</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>"<i>拼贴</i>" 用于将冲口水平或者竖直拼贴到一起。<br />
+当然，在按下 <span class="key">OPT</span> ，当您放下窗口时，它们的边界将会融合到一起；当窗口彼此接近时会改变颜色。</p></td></tr></table>
+<p>分离也是同样的方式，通过标签拖动窗口时，按下 <span class="key">OPT</span> 键，将会使其从窗口组中分离。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Haiku's GUI</title>
+	<title>Haikun graafinen käyttöliittymä</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,117 +43,114 @@
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="workspaces.html">Työtilat</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>Hakemisto</td></tr>
 <tr class="index"><td>
-		<a href="#move-resize">Easy moving and resizing</a><br />
-                <a href="#stack-tile">Stack &amp; Tile</a><br />
-                <a href="#open-save-panel">Open and save panels</a><br />
-                <a href="#replicants">Replicants</a></td></tr>
+		<a href="#move-resize">Helppo siirtäminen ja koon muuttaminen</a><br />
+                <a href="#stack-tile">Pinoa ja laatoita</a><br />
+                <a href="#open-save-panel">Avaus- ja tallentamispaneelit</a><br />
+                <a href="#replicants">Replikantit</a></td></tr>
 </table>
 
-<h1>Haiku's GUI</h1>
+<h1>Haikun graafinen käyttöliittymä</h1>
 
-<p>Haiku's graphical user interface is an integral part of the system. Unlike Unix-based operating systems, there's no separate window manager and booting just into a command line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
-<p>As you probably have experience with other graphical environments, let's skip over the standards like menus, right-click context menus, drag&amp;drop etc. Let's have a look at the few unique aspects of Haiku's GUI instead.</p>
+<p>Haikun graafinen käyttöliittymä on järjestelmän kiinteä osa. Toisin kuin Unix-perustaisissa järjestelmissä, ei ole mitään erillistä ikkunahallintaa eikä alkulataus vain komentorivikuoreen ei ole mahdollista. Haikun kohdistuu työpöytäkäyttäjiin, ja komentorivikuoreen käynnistymistä ei ole pidetty tarpeellisena.</p>
+<p>Koska sinulla on luultavasti kokemuksia muista graafisista ympäristöistä, hypätään standardien, kuten valikoiden, hiiren oikealla painikkeella näkyviin saatavan asiayhteysvalikon, vedä ja raahaa -toiminnon jne. ylitse. Tutustutaan sen sijaan muutamaan Haikun ainutlaatuiseen puoleen.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
-<p>There are only a few things in Haiku's GUI that aren't obvious and deserve an explanation.</p>
+<p>Haikun graafisessa käyttöliittymässä on vain muutamia asioita, jotka eivät ole itsestään selviä ja ansaitsevat selityksen.</p>
 <ol>
-<li><p>The Deskbar is Haiku's "Start" menu and taskbar, if you will. See topic <a href="deskbar.html">Deskbar</a>.</p></li>
-<li>The yellow tab offers more than just a program's name or a document's filename:
-<ul><li>You can move it by holding the <span class="key">SHIFT</span> key while dragging it to another position, enabling you to stack a number of windows and conveniently access them by their named tab.</li>
-<li>You minimize a window with a double-click on its tab (or with <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). A such hidden window can be accessed by its entry in the <a href="deskbar.html">Deskbar</a> or the <a href="twitcher.html">Twitcher</a>.</li>
-<li>You can send a window to the back with a right-click on its tab (or its border).</li></ul></li>
-<li><p>The close button.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size. It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
-<li><p>The resize corner. Dragging anywhere else on a window's border will move the window.</p></li>
+<li><p>Työpöytäpalkki on Haikuns "Käynnistä"-valikko ja tehtäväpakki, jos niin haluat. Katso aihetta <a href="deskbar.html">Työpöytäpalkki</a>.</p></li>
+<li>Keltainen välilehti tarjoaa muutakin kuin vain ohjelman nimen tai asiakirjan tiedostonimen:
+<ul><li>Voit siirtää ikkunaa pitämällä <span class="key">VAIHTO</span>-näppäimen alhaalla raahatessasi sitä toiseen paikkaan, ottaen käyttöön lukuisien ikkunoiden pinoamisen ja pääset kätevästi käsiksi niihin niiden nimetyn välilehden kautta.</li>
+<li>Muutat ikkunan minimikokoiseksi kaksoisnapsauttamalla sen välilehteä (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> -näppäimillä). Sellainen piilotettu ikkuna voidaan kutsua valitsemalla sen valikkorivi <a href="deskbar.html">Työpöytäpalkissa</a> tai <a href="twitcher.html">Twitcher</a>-ohjelmassa.</li>
+<li>Voit lähettää ikkunan taustalle napsauttamalla sen välilehteä (tai sen reunaa) hiiren oikealla painikkeella.</li></ul></li>
+<li><p>Sulje-painike.</p></li>
+<li><p>Laajentamispainike (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). useimmissa sovelluksissa, laajentaa ikkunan maksimikokoon. Sen ei kuintenkaan tarvitse tehdä sitä. Seuraaja-ikkunat esimerkiksi muuttavat kokoaan parhaiten sisältöön sopivaan kokoon.</p></li>
+<li><p>Ikkunan reuna. Raahaaminen hiiren vasemmalla painikkeella siirtää ikkunan, raahaaminen hiiren oikealla painikkeella muuttaa ikkunan kokoa.</p></li>
+<li><p>Koon muuttamiskulma.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
-<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner.</p>
-<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<a id="move-resize" name="move-resize">Nopea tapa siirtää tai muuttaa ikkunan kokoa</a></h2>
+<p>Ikkunoiden siirtäminen ja koon muuttaminen on laaja osa vuorovaikutuksesta useiden samanaikaisesti suoritettavien sovellusten välillä. Sen sijaan, että yritettäisiin osua pieneen keltaiseen otsikkovälilehteen tai vielä ohuempaan reurnaviivaan, ikkunoiden siirtämiseksi on kätevämpi tapa. Koon muuttamisnurkalla on pienen koon lisäksi myös toinen rajoitus. Se sallii koon muuttamisen vain oikean alakulman suuntaan ja siitä keskustaan päin.<br />Raahaaminen hiiren oikealla painikkeella toimii, mutta sinun on tähdättävä huolellisesti.</p>
+<p>Näiden asioiden ratkaisemiseksi Haiku tarjoaa näppärän ratkaisun ikkunahallintaan käyttämällä näppäinyhdistelmää <span class="key">CTRL</span> <span class="key">ALT</span> ja hiirtä. Katso myös ikkunahallintaan liittyviä lisätietoja kappaleesta <a href="keyboard-shortcuts.html#general">Pikanäppäimet ja näppäinyhdistelmät</a>.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
-<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
-<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
+<p>Pitämällä alhaalla näppäimet <span class="key">CTRL</span> <span class="key">ALT</span> korostetaan ikkunareuna, joka sijaitsee lähimpänä hiiren kohdistinta. Siirrä hiirtä toiseen suuntaan ja toinen raja vaihtuu kohteeksi. Napsautamalla ja raahaaminen <i>hiiren oikealla painikkeella</i> voi muuttaa ikkunan kokoa korostetun reunan kohdalta.</p>
+<p>Pidä alhaalla näppäimet <span class="key">CTRL</span> <span class="key">ALT</span> ja napsauta sekä raahaa <i>hiiren vasemmalla painikkeella</i> kaikkialle ja ikkuna siirtyy mukana. Nopea napsautus <i>hiiren oikealla painikkeella</i> lähettää sen takaisin.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
-<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
-In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<a id="stack-tile" name="stack-tile">Pino ja laatoitus</a></h2>
+<p>Haikun käyttöliittymä tarjoaa ainutlaatuisia ominaisuuksia, jotka painottaa, että ikkkunoilla on keltainen välilehti eikä täysilevyinen otsikkopalkki käytön parantamiseksi. Sitä kutsutaan nimellä "Pino ja laatoitus".<br />
+Alla olevassa esimerkissä, Seuraaja-ikkuna kirjanmerkillä on laatoitettu WebPositive-ikkunan viereen, mikä itse on pinottu toisen Seuraajaikkunan kanssa, mikä näyttää lähdekansion <tt>haiku</tt>. Tässä animaatiossa käyttäjä napsauttaa pinoikkunan välilehtiä tuoden ne vuorotellen etualalle.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
-<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>Tällä tavalla yhdistetty ikkunoiden ryhmää voidaan siirtää ja sen kokoa voidaan muuttaa yhdessä - näppärä järjestely työskenneltäessä hankekeskeisemmässä ympäristössä. Oikean selainikkunan etsimisen sijasta dokumentaatio, editori ja seuraajaikkunat ja ehkä hankkeeseen liittyvät sähköpostiviestit voidaan vain pinota ja laatoittaa yhteen.</p>
+<p>Ikkunoiden todellisen järjestelyn tekeminen on helppoa. Pidä alhaalla <span class="key">OPT</span>-näppäintä samalla kun raahaat ikkunaa välilehdestä toisen ikkunan välilehden tai reunan viereen, kunnes se korostuu ja vapauta sitten hiiren painike.</p>
+<p>Pino ja laatoitus sisältää kaksi asiaan littyvää osaa.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<td><p>"<i>Pinoaminen</i>" on ikkunoiden laittamista toistensa päälle, jolloin keltaiset välilehdet siirtyvät automaattisesti oikeaan paikkaan.<br />
+Kun pidetään alhaalla <span class="key">OPT</span>-painiketta, välilehdet vaihtavat väriä, kun niiden päälle siirretään ikkuna; pudota sitten ikkuna pinoamisen aloittamiseksi.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>"<i>Laatoitus</i>" ikkunoiden liimaamista yhteen vaakasuoraan tai pystysuoraan.<br />
+Taas pitämällä alhaalla <span class="key">OPT</span>-näppäintä reunat, jotka liimautuvat yhteen, kun pudotat ikkunan, vaihtavat väriä, kun tuot ne kyllin lähelle toisiaan.</p></td></tr></table>
+<p>Ikkunoiden erottaminen tehdään samalla tavalla, pitämällä <span class="key">OPT</span>-näppäin alhaalla samalla kun ikkuna vedetään välilehdestä kiinnipitäen pois ryhmästä.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-panel" name="open-save-panel">Open and save panels</a></h2>
-<p>When opening or saving a file from any application, a panel like this opens:</p>
+<a id="open-save-panel" name="open-save-panel">Avataan ja tallennetaan paneeleja</a></h2>
+<p>Kun avataan tai tallennetaan tiedostoa mistä tahansa sovelluksesta, avautuu tämän näköinen paneeli:</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
-You can enter parent folders with the pop-up menu above the file listing.</p>
-<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menu bar) into the panel. This changes the panel to that new location.</p>
+<p>Siinä on kaikki tavalliset asiat: Nykyisen kansion tiedostoluettelo, josta voi valita tiedoston, tiedoston tallennustapauksessa tekstikenttä tiedostonimen kirjoittamista varten ja ponnahdusvalikko eri tiedostomuotoja ja niiden asetuksia varten.<br />Voit siirtyä äitihakemistoon ponnahdusvalikosta tiedostoluettelon yläpuolelta.</p>
+<p>Jos sinulla on jo Seuraaja-ikkuna tiedoston avaussijainnissa, voit yksinkertaisesti raahata minkä tahansa tiedoston tai kainsio-esityksen (toisin sanoen symbolin valikkopalkin oikealla puolella) paneeliin. Tämä vaihtaa paneelin uuteen paikkaa.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
-<p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Näppäimistön pikanäppäimet</a></h3>
+<p>Monet pikanäppäinmäärittelyt avaus- ja sulkemispaneelissa ovat samat kuin Seuraajassa käytetyt. Sitäpaitsi komennoissa, jotka ovat myös käytettävissä <span class="menu">Tiedosto</span>-valikion kautta, on muutamia jotka eivät ole itsestäänselviä:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Creates a new folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Lets you rename the selected entry.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Moves into the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Moves into the selected folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Takes you to your Desktop.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Takes you to your Home folder.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Luo uuden kansion.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Sallii sinun nimetä uudelleen valitun kohteen.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Siirtää äitikansioon.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> tai <span class="key">ENTER</span></td><td></td><td> Siirtää valittuun kansioon.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Siirtää sinut työpöydällesi.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Siirtää sinut kotikansioosi.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
-<p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<a id="favorites-recent" name="favorites-recent">Suosikit ja äskettäiset kansiot</a></h3>
+<p><span class="menu">Suosikit</span>-valikko avaus- ja sulkemispaneelissa tarjoaa äskettäin vieraillut kansiot ja suosikkisijainnit, jotka voit asettaa itse. Kuten pienellä nuolella ilmaistaan, voit käyttää myös näitä sijainteja navigoidaksesi kauemmas alaspäin alivalikkojen hierarkkiassa.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add current folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Configure favorites...</span> and delete its entry.<br />
-All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>
+<p>Suosikin lisäämiseksi navigoit yksinkertaisesti haluamaasi kohteeseen ja valitset <span class="menu">Suosikit | Lisää nykyinen kansio</span>. Tästä alkaen se esiintyy jokaisessa avaus- ja tallentamispaneelissa. Suosikin poistamiseksi valitse <span class="menu">Suosikit | Aseta suosikit...</span> ja poista haluamasi suosikkirivi.<br />Kaikki suosikit pidetään kansiossa <span class="path">/boot/home/config/settings/Tracker/Go/</span>. Joten pystyisit myös lisäämään ja poistamaan linkkejä tiedostoihin ja kansioihin suoraan sieltä.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="replicants" name="replicants">Replicants</a></h2>
-<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
+<a id="replicants" name="replicants">Replikantit</a></h2>
+<p>Replikantit ovat pieniä itsensä sisältäviä sovellusosia, jotka on integroitu toisiin sovelluksiin. Edellyttäen, että Seuraajan valitsin <span class="menu">Näytä  replikantit</span> on aktivoitu, tunnistat sovelluksen replikanttiosan pienestä kahvasta, joka on normaalisti oikeassa alakulmassa:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>The most prominent place that accepts Replicants is the Desktop: You simply drag &amp; drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
-A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove replicant</span>.</p>
-<div class="box-info">Should you experience difficulties with a Replicant on the Desktop and just can't get rid of it, delete <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Unfortunately, this will remove <i>all</i> Replicants from the Desktop.</div>
-<p>Examples for replicatable applications are the graphs of the <a href="applications/activitymonitor.html">ActivityMonitor</a>, the <a href="workspaces.html">Workspaces applet</a> or <a href="applications/deskcalc.html">DeskCalc</a>.</p>
+<p>Huomioonherättävin paikka, joka hyväksyy Replikantit on Työpöytä. Yksinkertaisesti rahaat ja pudotat pienen kahvan sille. Siitä alkaen se on osa Työpöytää ja sovellus, josta Replikantti on lähtöisin, ei tarvitse käynnistyä toimiakseen.<br />Hiiren oikean painikkeen painallus Replikanttikahvassa tarjoaa asiayhteysvalikon, joka näyttää alkuperäsovelluksen <span class="menu">Ohjelmasta</span>-ikkunan ja <span class="menu">Poista replikantti</span>-valikon.</p>
+<div class="box-info">Jos koet vaikeuksia Replikantin kanssa Työpöydällä ja et pääse niistä eroon, poista <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Valitettavasti tämä poistaa <i>kaikki</i> Replikantit Työpöydältä.</div>
+<p>Esimerkkejä replikoitavista sovelluksista ovat  <a href="applications/activitymonitor.html">Aktiviteettivalvontar</a>-ohjelman graafit, <a href="workspaces.html">Työtilat-sovelma</a> tai <a href="applications/deskcalc.html">Työpöytälaskin</a>.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="workspaces.html">Työtilat</a>  »
 </span></div>
 </div>
 

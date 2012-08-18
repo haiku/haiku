@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Queries</title>
+	<title>Kyselyt</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -42,14 +44,14 @@
 </ul>
 <span>
  «  <a href="index.html">Hakemisto</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workshop-filetypes+attributes.html">Workshop</a>  »
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="workshop-filetypes+attributes.html">Työpaja</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -64,14 +66,14 @@
 </td></tr>
 </table>
 
-<h1>Queries</h1>
+<h1>Kyselyt</h1>
 
 <p>A query is a file search based on file attributes and can be performed within Tracker or in Terminal. Queries are saved in <span class="path">/boot/home/queries/</span> and by default last seven days before being purged. Note, these aren't static result lists of your search, but are the query formulas which trigger a new search whenever you open them.<br />
 Even better, you don't have to double-click to re-do a query. You can <a href="tracker.html#navigating">drill down</a> a saved query just like any folder by right-clicking on it and navigating through the submenus.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="find-window" name="find-window">The Find window</a></h2>
+<a id="find-window" name="find-window">Etsintäikkuna</a></h2>
 <p>You start a query by invoking the <span class="menu">Find...</span> menu either from the Deskbar menu or any Tracker window or the Desktop (which is actually a fullscreen Tracker window). The shortcut is <span class="key">ALT</span> <span class="key">F</span>. You're presented with the Find window:</p>
 <img src="images/queries-images/basic-query.png" alt="basic-query.png" />
 <ol>
@@ -92,12 +94,12 @@ Even better, you don't have to double-click to re-do a query. You can <a href="t
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="basic-query" name="basic-query">Basic queries - "by Name"</a></h2>
+<a id="basic-query" name="basic-query">Peruskyselyt - "nimellä"</a></h2>
 <p>If you simply want to find all files and folders on your mounted disks that match a certain pattern, simply leave the search method at <span class="menu">by Name</span>, enter the search term into the text box and press <span class="key">ENTER</span>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="adv-query" name="adv-query">Advanced queries - "by Attribute"</a></h2>
+<a id="adv-query" name="adv-query">Kehittyneemmät kyselyt - "attribuutilla"</a></h2>
 <p>You can create more advanced queries by searching within the attributes of specific file types. For that to work, these attributes have to be <a href="index.html">indexed</a>.</p>
 <img src="images/queries-images/query-window.png" alt="query-window.png" />
 <p>You start by setting the filetype from <span class="menu">All files and folders</span> to, for example, <span class="menu">Text | E-mail</span> and change the search method to <span class="menu">by Attribute</span>.</p>
@@ -110,7 +112,7 @@ A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="more-adv-query" name="more-adv-query">Even more advanced queries - "by Formula"</a></h2>
+<a id="more-adv-query" name="more-adv-query">Vielä edistyneemmät kyselyt - "kaavalla"</a></h2>
 <p>Typing in a formula query by hand is daunting and really quite unpractical. It still has its uses.</p>
 <p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to <span class="menu">by Formula</span> mode and be overwhelmed by this one line query string:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
@@ -129,7 +131,7 @@ A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="result-window" name="result-window">The result window</a></h2>
+<a id="result-window" name="result-window">Tulosikkuna</a></h2>
 <p>After you start a search, the Find window will be replaced by a result window. Here is an example that queried for "server":</p>
 <img src="images/queries-images/result-window.png" alt="result-window.png" />
 <p>Besides the gray background, result windows work exactly like any other Tracker window. Some things are worth noting:</p>
@@ -144,7 +146,7 @@ A good way to cut down the number of search results.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-template" name="query-template">Query Templates</a></h2>
+<a id="query-template" name="query-template">Kyselymallinteet</a></h2>
 <p>If you double click a saved query, the file search is at once started and the result window opens immediately. However, you may not want to search with these <i>exact</i> search parameters, but use it as starting point to only slightly tweak the formula.<br />
 By using the <span class="menu">Save query as template</span> menu item (see <a href="#find-window">(1) in screenshot</a> at the top) or drag&amp;dropping the icon (10) anywhere with the right mouse button, you can create just such a template. Double clicking it won't open a result window, but the Find panel, giving you the opportunity to quickly change search strings or add/remove attributes.</p>
 <p>Wherever you choose to save query templates, they'll be listed in the Find panel's menu of recent queries.</p>
@@ -154,8 +156,8 @@ By using the <span class="menu">Save query as template</span> menu item (see <a 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="index.html">Hakemisto</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workshop-filetypes+attributes.html">Workshop</a>  »
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="workshop-filetypes+attributes.html">Työpaja</a>  »
 </span></div>
 </div>
 

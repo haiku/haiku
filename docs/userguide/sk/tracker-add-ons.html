@@ -51,35 +51,34 @@
 
 <div id="content">
 <div>
-<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h1>Doplnky Trackera</h1>
 
-<p>Applications can install add-ons so they can be invoked easily on a selection of files from Tracker. Only the add-ons that can handle a specific filetype are presented under <span class="menu">Add-Ons</span> from the context menu or the <span class="menu">File</span> menu of a Tracker window. Some add-ons don't necessarily need a file to work on and are thus always present.</p>
-<p>Tracker Add-Ons, or links to applications that can act as add-ons, can be installed in three different locations (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
+<p>Aplikácie môžu inštalovať doplnky, ktoré je možné jednoducho vyvolať pri vybraní súboru v Trackeri. Iba doplnky, ktoré dokážu pracovať s konkrétnym typom súboru sa zobrazia v kontextovom menu <span class="menu">Doplnky</span> alebo v menu <span class="menu">Súbor</span> okna Trackera. Niektoré doplnky nepotrebujú nutne súbor, s ktorým by pracovali a preto sú prítomné vždy.</p>
+<p>Doplnky Trackera alebo odkazy na aplikácie, ktoré sa môžu správať ako doplnky možno nainštalovať na tri rôzne miesta (pozri tému <a href="filesystem-layout.html">Rozloženie súborového systému</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td> for system provided add-ons.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> for add-ons available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> for add-ons only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td> pre doplnky, ktoré poskytuje systém.</td></tr>
+<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> pre doplnky dostupné každému používateľovi.</td></tr>
+<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> pre doplnky dostupné iba vám.</td></tr>
 </table>
-<p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
-Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>
+<p>K názvu súboru doplnku je možné pridať pomlčku a veľké písmeno a ten je potom dostupný prostredníctvom klávesovej skratky. Napríklad <span class="app">Otvoriť cieľový priečinok-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
+Samozrejme, keď skratku vyberáte musíte dávať pozor na možné konflikty klávesových skratiek. Nemôžete mať rovnakú skratku pre viaceré doplnky.</p>
 
-<h2><a id="system-add-ons" name="system-add-ons">Haiku's Tracker Add-Ons</a></h2>
-<p>These Tracker Add-Ons come with every Haiku installation:</p>
+<h2><a id="system-add-ons" name="system-add-ons">Doplnky Trackera Haiku</a></h2>
+<p>Tieto doplnky Tracker sa dodávajú s každou inštaláciou Haiku:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
-	<tr><td class="onelinetop"><b>Background</b><i>-B</i></td>
-		<td valign="top">Opens the <a href="preferences/backgrounds.html">Background</a> preferences to change the color or image of the Desktop or any folder. Invoked on an image file the Background panel is launched with that image already loaded as a potential background.</td></tr>
-	<tr><td class="onelinetop"><b>DiskUsage</b><i>-I</i></td>
-		<td valign="top">Starts the <a href="applications/diskusage.html">DiskUsage</a> application with the according folder as basis.</td></tr>
-	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
-		<td valign="top">Invoked on a file, opens its specific <a href="filetypes.html">FileType</a> panel, otherwise the general FileTypes preferences are launched.</td></tr>
-	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
-		<td valign="top">Can only be used on a linked file and opens the folder that file lives in.</td></tr>
-	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
-		<td valign="top">Starts the <a href="applications/textsearch.html">TextSearch</a> application to look for a string in the selected folder (and its subfolders).</td></tr>
+	<tr><td class="onelinetop"><b>Pozadie</b><i>-B</i></td>
+		<td valign="top">Otvorí nastavenia <a href="preferences/backgrounds.html">Pozadia</a>, kde sa dá zmeniťfarba obrázka Plochy alebo akéhokoľvek priečinka. Pri vyvolaní na súbore obrázka sa spustí panel Pozadie a dotyčný obrázok už bude načítaný ako potenciálne pozadie.</td></tr>
+	<tr><td class="onelinetop"><b>Využitie disku</b><i>-I</i></td>
+		<td valign="top">Spustí aplikáciu <a href="applications/diskusage.html">Využitie disku</a> na dotyčnom priečinku.</td></tr>
+	<tr><td class="onelinetop"><b>Typ súboru</b><i>-F</i></td>
+		<td valign="top">Pri vyvolaní na súbore spustí jeho konkrétny panel <a href="filetypes.html">Typ súboru</a>, v opačnom prípade spustí všeobecné nastavenia Typy súborov.</td></tr>
+	<tr><td class="onelinetop"><b>Otvoriť cieľový priečinok</b><i>-O</i></td>
+		<td valign="top">Možno vyvolať iba na odkaze na súbor a otvorí priečinok, v ktorom sa dotyčný súbor nachádza.</td></tr>
+	<tr><td class="onelinetop"><b>Hľadanie textu</b><i>-G</i></td>
+		<td valign="top">Spustí aplikáciu <a href="applications/textsearch.html">Hľadanie textu</a> na vyhľadanie reťazca vo vybranom priečinku (a jeho podpriečinkoch).</td></tr>
 	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
-		<td valign="top">A selection of files will be added to a zip archive, invoked without a selection opens a panel to create an archive via drag&amp;drop.</td></tr>
+		<td valign="top">Výber súborov sa pridá do archívu zip. Pri vyvolaní bez výberu otvorí panel, kde sa bude dať vytvoriť archív pomocou Ťahaj&amp;pusť.</td></tr>
 </table>
 
 </div>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -51,7 +51,7 @@
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Reporting bugs</td></tr>
+<tr class="heading"><td>Index</td></tr>
 <tr class="index"><td><a href="#account">Getting a Trac account</a><br />
                 <a href="#report">Creating a bug report</a><br />
                 <a href="#app">Application bugs</a><br />
@@ -121,6 +121,7 @@ Note that in KDL your keyboard may not work. PS/2 keyboards always do, USB keybo
 </table>
 <p>For more information, see the article <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Welcome to Kernel Debugging Land</a>.</p>
 <p>The KDL output is written to the serial port (if you have one, a respective cable, and a second computer to connect with, you can capture the output there via a terminal program) and to the syslog. If you can't leave KDL it won't be written to the syslog file, though. There's a boot loader debug option that allows you to capture it nonetheless (see below).</p>
+<p>You can generate QR codes from KDL output that can then be converted to text using smartphones or similar devices. See the blog post <a href="http://www.haiku-os.org/blog/mmlr/2012-07-01_qr_encode_your_kdl_output">QR Encode your KDL Output</a> on how to get data out of KDL using that feature.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">Syslog</a></h3>

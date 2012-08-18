@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -43,7 +43,7 @@
 <li><a href="../../en/preferences/appearance.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
+    <a href="../preferences.html" class="uplink">Asetukset</a> 
 ::  <a href="backgrounds.html">Tausta-asetukset</a>  »
 </span></div>
 </div>
@@ -55,21 +55,40 @@
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
-<tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span></td></tr>
+<tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
+<span class="path">~/config/settings/system/app_server/decorator_settings</span><br />
+<span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
 <p>Ulkoasuasetukset sallivat sinun vaihtaa joitakin Haikun visuaalisia muotoja.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="fonts" name="fonts">Kirjasimet</a></h2>
+<img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
+<p>Haiku määrittää kolme vakiokirjasinta eri tarkoituksiin. Asetat pelkän, vahvennetun ja kiinteävälisen kirjasimen tyypit ja koot siten kuin haluat käyttää niitä koko järjestelmässä. Niiden lisäksi on erilliset asetukset valikoissa käytetyille kirjasimille.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="installing_fonts" name="installing_fonts">Uusien kirjasimien asentaminen</a></h3>
+<p>Asennat uudet kirjasimet kopioimalla ne vastaavaan käyttäjäkansioon, esim.: <span class="path">/boot/common/data/fonts/</span> tai <span class="path">/boot/home/config/data/fonts/</span> (katso aihe <a href="../filesystem-layout.html">Tiedostojärjestelmäasettelu</a>).</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Värit</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>Ensimmäisessä välilehdessä, <span class="menu">Värit</span>, voit vaihtaa käyttöliittymän eri osien värejä. Värikaivo hyväksyy raahaa ja pudota -toiminnon muista ohjelmista, sallien sinun vetää värejä esimerkiksi <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> tai <span class="app">Tausta-asetukset</span> -paneeleista.</p>
+<p>Välilehdessä <span class="menu">Värit</span> voit vaihtaa käyttöliittymän eri osien värejä. Värikaivo hyväksyy raahaa ja pudota -toiminnon muista ohjelmista, sallien sinun vetää värejä esimerkiksi <span class="app">WonderBrush</span>-, <span class="app">Icon-O-Matic</span>- tai <span class="app">Tausta-asetukset</span>-paneeleista.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="decorators" name="decorators">Ikkunakorostukset</a></h2>
+<img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
+<p>Korostukset määrittävät ikkunoiden ja käyttöliittymän kaikkien komponenttien ulkonäön ja käyttötuntuman. Nykyisin Haikun mukana tulee vain oletuskorostukset. Jos löydät ja asennat muita korotuksia, voit valita erilaisen ponnahdusvalikosta.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="antialiasing" name="antialiasing">Reunanpehmennys</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>Toinen välilehti, <span class="menu">Reunanpehmennys</span>, tarjoaa erilaisia asetuksia kuinka asioita voidaan renderoida näytöllä.</p>
+<p>Välilehti <span class="menu">Reunanpehmennys</span> tarjoaa erilaisia asetuksia kuinka asioita voidaan renderoida näytöllä.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -109,7 +128,7 @@ Reunanpehmennystapa</h3>
 
 <div class="nav">
 <div class="inner"><span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
+    <a href="../preferences.html" class="uplink">Asetukset</a> 
 ::  <a href="backgrounds.html">Tausta-asetukset</a>  »
 </span></div>
 </div>

@@ -4,24 +4,26 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  * 		Niels Reedijk, Matt Madia and Ingo Weinhold who wrote
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="all" />
-	<title>Reporting bugs</title>
+	<title>Vikojen ilmoittaminen</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -48,62 +50,62 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Reporting bugs</td></tr>
-<tr class="index"><td><a href="#account">Getting a Trac account</a><br />
-                <a href="#report">Creating a bug report</a><br />
-                <a href="#app">Application bugs</a><br />
-                  <a href="#server">Server bugs</a><br />
-                  <a href="#kernel">Kernel bugs</a><br />
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td><a href="#account">Trac-tilin saaminen</a><br />
+                <a href="#report">Vikailmoituksen luominen</a><br />
+                <a href="#app">Sovellusviat</a><br />
+                  <a href="#server">Palvelinviat</a><br />
+                  <a href="#kernel">Käyttöjärjestelmäydinviat</a><br />
                   <a href="#kdl">Kernel Debugging Land - KDL</a><br />
-                  <a href="#syslog">Syslog</a><br />
+                  <a href="#syslog">Järjestelmäloki</a><br />
                   <a href="#onscreen">On screen debug output</a><br />
-                  <a href="#hardware">Hardware/Driver bugs</a><br />
-                  <a href="#next">What's next?</a></td></tr>
+                  <a href="#hardware">Laitteisto-/Ajuriviat</a><br />
+                  <a href="#next">Mitä seuraavaksi?</a></td></tr>
 </table>
 
-<h1>Reporting bugs</h1>
+<h1>Vikojen ilmoittaminen</h1>
 
-<p>Since our developers are unable to test every hardware combination, nor every different way of interacting with the operating system, we are relying on users to give us some input on how things work at their end. Since Haiku is still quite young, it's very likely that you will encounter bugs. We thank you for taking the time to report these. Together we can improve Haiku, bit by bit.</p>
-<p>To keep our bugtracker effective, it's essential to abide by the <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Bug Tracker Etiquette</a>.</p>
-
-<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account" name="accout">Getting a Trac account</a></h2>
-<p>To file a ticket, you need to have an account at <a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku's Bugtracker</a>.<br />
-When creating a new account, be certain to <b>provide your email address</b> as it is necessary to obtain basic ticket modification privileges. Be sure to <b>check your spam folder</b> shortly afterwards, as the all important verification mail often ends up there.</p>
+<p>Koska kehittäjämme eivät pysty testaamaan jokaista laitteistoyhdistelmää, eikä jokaista erilaista käyttöjärjestelmän vuorovaikutusta, luotamme käyttäjien antavan meille palautetta siitä, kuinka asiat toimivat heidän laitteissaan. Koska Haiku on aika nuori, on hyvin todennäköistä, että käyttäjä kohtaa vikoja. Kiitämme siitä ajasta, jota käytät niistä ilmoittamiseen. Yhdessä voimme parantaa Haikua pala palalta.</p>
+<p>Vianjäljityksen pitämiseksi tehokkaana on olennaista noudattaa <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Vianjäljitysetikettiä</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="report" name="report">Creating a bug report</a></h2>
-<p>Before reporting a bug, please <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">make sure</a> that it does not yet exist. You can also use the <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">search</a> function for this.<br />
-After you have established that it's a unique bug, make your information as accurate as possible:</p>
+<a id="account" name="accout">Trac-tiilin  saaminen</a></h2>
+<p>Jos luot vikalipun, sinulla on oltava tili <a href="http://dev.haiku-os.org/register" title="Registröidy Haikun vikajäljittäjään">Haikun vikajäljittäjässä</a>.<br />
+Luotaessa uutta tiliä muista <b>tarjota sähköpostiosoitteesi</b>, koska se on välttämätön lipun muokkausoikeusien saamiseksi. Tarkista varmuuden vuoksi <b>roskapostikansiosi</b> pian jälkeenpäin, koska kaikki tärkeät vahvistussähköpostiviestit usein päättyvät sinne.</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="report" name="report">Vikailmoituksen luominen</a></h2>
+<p><a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">Varmista</a> ennen vian ilmoittamista, että vastaavaa vikailmoitusta ei ole jo olemassa. Voit käyttää myös <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">etsi</a>-toimintoa tähän.<br />
+Varmista sen jälkeen kun olet esitellyt ainutlaatuisen vian, että tietosi ovat niin tarkkoja kuin mahdollista:</p>
 <ul>
-	<li><p>Attempt to reproduce your issue on the current revision of Haiku. Pre-built images for testing purposes are  <a href="http://haiku-files.org/">available</a>.</p></li>
-	<li><p>Include basic information such as how you are testing Haiku (on real hardware, on VMWare, on QEMU, etc.).</p></li>
-	<li><p>Mention which revision from <acronym title="Subversion, the source code management system we use">SVN</acronym> you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (gcc2, gcc4, gcc2hybrid, gcc4hybrid). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
-	<li><p>Describe the problem you are experiencing. Try to be as accurate as you can: describe the actual behavior, and the behavior you expected.</p></li>
-	<li><p>Describe what steps you need to perform in order to expose the bug. This will help developers reproduce the bug.</p></li>
-	<li><p>Attach as much information as you have. If it is a GUI bug, or a bug in one of the applications, try to take a screenshot by pressing the <span class="key">PRINT</span> key.</p></li>
+	<li><p>Yritä toistaa havaitsemasi vika nykyisessä Haikun korjausversiossa. Esirakennetut tiedostovedokset testaustarkoituksiin löytyvät <a href="http://haiku-files.org/">täältä</a>.</p></li>
+	<li><p>Sisällytä mukaan perustietoa siitä, kuinka testaat Haikua (todellisessa tietokoneessa, VMWare-ympäristössä, QEMU-emulaattorissa, jne.).</p></li>
+	<li><p>Mainitse, mitä <acronym title="Subversion, käyttämämme lähdekoodin versionhallintajärjestelmä">SVN</acronym>-korjausversiota käytät. Löydät tämän tiedon Työpöytäpalkin valikosta <span class="menu">Haikusta...</span>. Mainitse myös, että minkälaisella rakennusjärjestelmällä (gcc2, gcc4, gcc2hybrid, gcc4hybrid) testaamasi järjestelmä on rakennettu. Ladattavat tiedostovedokset on nimetty niiden mukaan. Itse rakennetuissa tiedostovedoksissa tiedät itse, kuinka se on rakennettu.</p></li>
+	<li><p>Kuvaile kokemasi pulma. Yritä olla niin tarkka kuin voit: kuvaile todellinen käyttäytyminen, ja se käyttäytyminen, jota odotit.</p></li>
+	<li><p>Kuvaile, mitä vaiheita pitää suorittaa vian paljastumiseksi. Tämä auttaa kehittäjiä toistamaan vian.</p></li>
+	<li><p>Liitä mukaan niin paljon tietoja, kuin sinulla on. Jos kyseessä on graafisen käyttöliittymän vika, tai vika yhdessä sovelluksessa, yritä tehdä näytönkaappaus painamalla <span class="key">PRINT SCREEN</span>-näppäintä.</p></li>
 </ul>
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="app" name="app">Application bugs</a></h2>
-<p>When an application crashed, you should invoke the debugger from the alert that pops up. This will open a Terminal window with gdb (the GNU debugger) running in it. Entering <span class="cli">bt</span>, you create a "backtrace" that you should copy in its entirety (including the part before you entered the <span class="cli">bt</span> command) and attach it to the ticket.</p>
+<a id="app" name="app">Sovellusviat</a></h2>
+<p>Kun sovellus kaatuu, sinun pitäisi kutsua vikajäljitintä hälytysikkunasta, joka ponnahtaa näkyviin. Tämä avaa Pääteikkunan gdb-ohjelmalla (GNU-vikajäljitin), joka käynnistyy. Kirjoittamalla <span class="cli">bt</span>, luot "paluujäljen". jonka sinun pitäisi kopioida kokonaisuudessaan (mukaan lukien se osa, joka tuli näkyviin, ennen kuin kirjoitit <span class="cli">bt</span>-komennon) ja liittää se vikalippuun.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="server" name="server">Server bugs</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
-Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.</p>
+<a id="server" name="server">Palvelinviat</a></h2>
+<p>Kun elintärkeät palvelimet, kuten app-, registrar- tai input-palvelin kaatuvat, et näe tavallista kaatumishälytystä. Sen sijaan koko näyttö muuttuu valkoiseksi tja gdb-istunto käynnistyy ja sen tuloste ilmaantuu näytölle. Todennäköisesti pystyt yhä liikuttamaan hiiren kohdistinta, mikä ylikirjoittaa valkoisen ja gdb-tulosteen näytöllä. Yhä vielä toimivat sovellukset (kuten Prosessivalvonta tai Työpöytäpalkin kello) saattavat myös kirjoittaa vikajäljitin tulosteen päälle näytölle.<br />
+Paitsi että kaikki on rumempaa ja epämukavampaa, sama koskee myös sovellusvikoja. Tärkeintä on hankkia paluujälki (<span class="cli">bt</span>-komento). Sinun on ehkä otettava valokuva näytöstä digitaalikameralla, koska et voi kopioida tekstiä mihinkään.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="kernel" name="kernel">Kernel bugs</a></h2>
-<p>Kernel bugs are usual the ones with the most severe effects while at the same time being the hardest to debug. There are different kinds of symptoms, which most likely point to a kernel or driver issue:</p>
+<a id="kernel" name="kernel">Käyttöjärjestelmäydinviat</a></h2>
+<p>Käyttöjärjestelmäydinviat ovat tavallisesti vaikutuksiltaan vakavimmat ja samanaikaisesti niiden vikajäljittäminen on vaikeinta. Käyttöjärjestelmäytimeen tai ajuriin osoittavat selvimmin seuraavat oireet:</p>
 <ul>
-<li><p>The system enters kernel debugging land (KDL) on its own volition. The upper part of the screen is cleared white and several lines of text are printed on it. The second line says "<i>Welcome to Kernel Debugging Land...</i>", the one above it states the immediate reason for entering KDL.</p></li>
-<li><p>The system reboots spontaneously.</p></li>
-<li><p>The system freezes completely. You can't move the mouse and no application draws anything anymore. An important test in that situation is, whether you still can enter KDL via the shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> being <span class="key">PRINT</span> on most keyboards). Wait at least a minute to see, if anything happens.</p></li>
-<li><p>The system doesn't boot up correctly. It may reboot spontaneously or stop at some point (e.g. at some icon of the boot screen). In the latter case also try <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
+<li><p>Järjestelmä siirtyy Käyttöjärjestelmän vianjäljitysmaahan (KDL) omasta tahdostaan. Näytön ylempi osa muuttuu valkoiseksi ja sille tulostetaan useita rivejä tekstiä. Toinen rivi sanoo "<i>Welcome to Kernel Debugging Land...</i>". Sen yläpuolella oleva rivi kertoo välittömän syyn siirtymisestä KDL:ään.</p></li>
+<li><p>Järjestelmä alkulatautuu itsestään.</p></li>
+<li><p>Järjestelmä jäätyy täysin. Et voi siirtää hiiren osoitinta ja mikään sovellus ei enää toimi. Tärkeä testi siinä tilanteessa on, että pystytkö siirtymään KDL:ään pikanäppäimellä <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> mikä on <span class="key">PRINT</span> useimmissa näppäimistöissä). Odota vähintään minuutti nähdeksesi, että tapahtuuko jotain.</p></li>
+<li><p>Järjestelmä ei alkulataa oikein. Se voi alkulatautua itsestään tai pysähtyä jossain vaiheessa (esimerkiksi jonkun alkaulatausnäytön kuvakkeen kohdalla). Yritä jälkimmäisessä tapauksessa myös <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
 <li><p>The whole system or some piece of hardware doesn't behave correctly. For example, it could be very slow, errors occur, or something doesn't work at all. If some hardware doesn't work at all, the first obvious check is whether Haiku supports it at all at the moment (e.g. ask on a mailing list or a forum).</p></li>
 </ul>
 <p>Note that while only the last point seems to indicate hardware relation, all the other symptoms could be caused by a bug in a hardware driver as well. If you have a suspicion what piece of hardware or corresponding driver might have to do with the problem, check whether removing/disabling the hardware or the driver makes a difference. For example, if you suspect Wifi you may find that your BIOS has an option to disable it. Or if not, you could remove the responsible Wifi driver from your Haiku installation (in <span class="path">/boot/system/add-ons/kernel/drivers/bin</span>).</p>
@@ -114,13 +116,14 @@ Besides everything being more ugly and inconvenient, basically the same applies 
 Note that in KDL your keyboard may not work. PS/2 keyboards always do, USB keyboards connected via UHCI controllers do only, if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
 <p>KDL itself is a kind of a shell. One can execute commands that print information about the system. The following commands might be of interest:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (aka sc)</td><td> </td><td>Prints a back trace. If the system entered KDL on its on volition, always enter that one.</td></tr>
+<tr><td><span class="cli">bt</span> (eli sc)</td><td> </td><td>Prints a back trace. If the system entered KDL on its on volition, always enter that one.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>Shows the handled and unhandled hardware interrupts.</td></tr>
-<tr><td class="onelinetop"><span class="cli">co</span> (aka continue)</td><td> </td><td>Leaves the kernel debugger and continues normal operation of the system, if that is possible.</td></tr>
+<tr><td class="onelinetop"><span class="cli">co</span> (eli jatka)</td><td> </td><td>Leaves the kernel debugger and continues normal operation of the system, if that is possible.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Reboots the system immediately. You will lose all unsaved data and even those that have been saved, but have not yet been written back to disk.</td></tr>
 </table>
 <p>For more information, see the article <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Welcome to Kernel Debugging Land</a>.</p>
 <p>The KDL output is written to the serial port (if you have one, a respective cable, and a second computer to connect with, you can capture the output there via a terminal program) and to the syslog. If you can't leave KDL it won't be written to the syslog file, though. There's a boot loader debug option that allows you to capture it nonetheless (see below).</p>
+<p>You can generate QR codes from KDL output that can then be converted to text using smartphones or similar devices. See the blog post <a href="http://www.haiku-os.org/blog/mmlr/2012-07-01_qr_encode_your_kdl_output">QR Encode your KDL Output</a> on how to get data out of KDL using that feature.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">Syslog</a></h3>
@@ -137,7 +140,7 @@ Finally select <span class="menu">Return to main menu</span> and then <span clas
 One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../../userguide/fi/bootloader.html">Boot Loader</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hardware" name="hardware">Hardware/Driver bugs</a></h2>
+<a id="hardware" name="hardware">Laitteisto/ajuriviat</a></h2>
 <p>When dealing with a hardware/driver related bug, you should attach the following information as text files:</p>
 
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
@@ -152,7 +155,7 @@ One or more pages of text will display on the screen, only the last few lines ne
 <p>The first four commands are entered into Terminal. Add a <span class="cli"> &gt; output.txt</span> after a command, and it's piped into a text file called "output.txt" that you can attach to your bug report or email.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="next" name="next">What's next?</a></h2>
+<a id="next" name="next">Mitä seuraavaksi?</a></h2>
 <p>After the bug has been reported, a developer will look at your bug and try to classify it. Remember, we are all volunteers, and as such, sometimes a bug report might go unanswered for a while. Adding new information when it becomes available usually helps getting a bug picked up quicker, but do not try to 'bump' the bug up by adding
 non-descriptive comments.</p>
 <p>Remember, reporting a bug is not something you spend a little time on and then you are done. If you reported a bug, then you are part of the Haiku development process. Developers might come up with questions while they are trying to fix your bug. Please stay around to answer these. Consider your participation 'done' when the bug is marked

@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Filesystem layout</title>
+	<title>Tiedostojärjestelmäsijoittelu</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -42,103 +44,98 @@
 </ul>
 <span>
  «  <a href="bootloader.html">Alkukäynnistyslataaja</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="gui.html">Haiku's GUI</a>  »
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="gui.html">Haikun graafinen käyttöliittymä</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Filesystem layout</h1>
+<h1>Tiedostojärjestelmäsijoittelu</h1>
 
-<p>Haiku's filesystem layout is quite transparent, trying to always use non-cryptic names for files and folders, that don't leave the user guessing. Files and folders that are important for the system to function properly, are protected from accidental tempering by showing one of these alerts:</p>
+<p>Haikun tiedostojärjestelmäsijoittelu on aika läpinäkyvä, yrittäen aina käyttää salaamattomia tiedosto- ja kansionimiä, mikä ei jätä käyttäjille arvaamisen tarvetta. Tiedostot ja kansiot, jotka ovat tärkeitä järjestelmän toimimiseksi kunnolla, on suojattu vahingossa tapahtuvalta käsitttelyltä yhdellä näistä hälytyksistä:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
-<p>The second alert pops up if you try to rename or delete something in the system hierarchy. Here, the "<span class="button">Do it</span>" button will only become clickable when you're holding down the <span class="key">SHIFT</span> key.</p>
-<p>Generally, there are three separate branches springing from the root folder of the boot volume:</p>
+<p>Toinen hälytys ponnahtaa esiin, jos yrität nimetä uudelleen tai poistaa jotain järjestelmähierarkiasta. Tässä painiketta <span class="button">Nimeä uudelleen</span> on napsautettava vain, jos pidät <span class="button">VAIHTO</span>-näppäintä alhaalla.</p>
+<p>Yleensä alkulataustaltion juurihakemistosta erkanee kolme haaraa:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>belongs to the system. Don't touch!</td></tr>
-<tr><td><span class="path">/boot/common/</span></td><td> </td><td>holds files that are shared between users.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>is your personal folder where you keep your data and settings.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>kuuluu järjestelmään. Älä koske!</td></tr>
+<tr><td><span class="path">/boot/common/</span></td><td> </td><td>säilyttää käyttäjien kesken jaetut tiedostot.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>on henkilökohtainen kansiosi omien tietojen ja asetusten säilyttämiseksi.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">The system folder - <span class="path">/boot/system/</span></a></h2>
-<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
-Whatever it's named, you should not alter what's inside. Every update of Haiku can add, remove or overwrite anything within it. If you want to add functionality, maybe with other Tracker Add-Ons or Translators or maybe another hardware driver, you install these things under your own <span class="path">/boot/home/</span> hierarchy or, if it's supposed to be for every user, under <span class="path">/boot/common/</span>. As long as Haiku isn't multi-user, this distinction has no apparent effect, as there's only one user with one <i>home</i> folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
-<p>So, let's say you want to install a new Translator for the latest image format, you <b>don't</b> simply copy it into the respective system folder. Remember: Don't touch!<br />
-Instead, you put it into the mirrored hierarchy under <span class="path">/boot/common/</span> or <span class="path">/boot/home/config/</span>.</p>
-<p>In our example the location for Translators in the system folder would be</p>
+<a id="system" name="system">Järjestelmäkansio - <span class="path">/boot/system/</span></a></h2>
+<p>Haikun edeltäjässä BeOS-käyttöjärjestelmässä tämä kansio oli nimeltään <span class="path">/boot/beos/</span>. Saatat yhä löytää sen joissakin vanhemmissa dokumenteissa (esimerkiksi alkuperäisessä BeBook-kirjassa).<br />Mikä sen nimi sitten onkaan, sinun ei pitäisi muuttaa mitään sen sisällä. Haikun jokainen päivitys voi lisätä, poista tai korvata mitä tahansa sen sisällä. Jos haluat lisätä toiminnallisuutta, ehkä toisen Seuraajalisäosan tai Tietomuuntimen tai ehkä toisen toisen laitteistoajurin, asenna nämä asiat omaan <span class="path">/boot/home/</span>-hierarkiaan, tai jos sen otaksutaan olevan kaikille käyttäjille, kansioon <span class="path">/boot/common/</span>. Niin kauan kuin Haiku ei ole monikäyttäjäjärjestelmä, tällä erottelulla ei ole näkyvää vaikutusta, koska on vain yksi käyttäjä yhdellä <i>koti</i>-kansiolla. Mutta koska mahdollisesti myöhemmin tulee tuki useammalle käyttäjälle, on järkevää oppia oikea tapa heti aluksi.</p>
+<p>Joten sanotaan, että haluat asentaa uuden Tietomuuntimen viimeisintä kuvatieodstomuotoa varten, <b>älä</b> yksinkertaisesti kopioi sitä vastaavaan järjestelmäkansioon. Muista: Älä koske siihen!<br />Laita se sen sijaan peilihierarkiaan kansioon <span class="path">/boot/common/</span> tai kansioon <span class="path">/boot/home/config/</span>.</p>
+<p>Esimerkissämme Tietomuuntimen järjestelmäkansio olisi</p>
 <p><span class="path">/boot/system/add-ons/Translators/</span></p>
-<p>So, the user "mirror" folder is either</p>
+<p>Joten käyttäjän "peili"-kansio on joko</p>
 <p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
-or<br />
+tai<br />
 <span class="path">/boot/common/add-ons/Translators/</span></p>
-<p>This has another advantage: If the component you have installed messes things up (which is possible as you install hardware drivers like this, too) you are able to choose "<i>Disable user add-ons</i>" from the <a href="bootloader.html">Boot Loader</a> menu and are thus always able to boot without the offending component.</p>
-<p>Most of the time, however, you won't have to deal with these things at all, since every software that comes from a trusted source should include an installation routine that handles these things.<br />
-<!--
-If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
-</p>
-<p><i>TODO.... Table to be added ....</i>
+<p>Tällä on toinen etu: Jos asentamasi komponentti sotkee asioita (mikä on mahdollista, kun asennat myös laitteistoajureita kuten tämä), voit valita <i>Ota pois käytöstä käyttäjälisäosat</i> <a href="bootloader.html">Alkulataus</a>-valikosta ja kykenevät aina alkukäynnistämään ilman viallista komponenttia.</p>
+<p>Useimmiten et joudu käsittelemään tällaisia asioita ollenkaan, koska jokainen ohjelmisto tulee turvatusta lähteestä ja pitäisi sisältää asennusrutiinit, jotka käsittelevät tällaisia asioita.<br />
+Most of the time, however, you won't have to deal with these things at all, since every software that comes from a trusted source should include an installation routine that handles these things.<br /><!--
+Jos haluat tietää enemmän siitä, kuinka moottori tikittää Haikussa, sinun on vilkaistava järjestelmäkansion kokoonpanokuvausta:</p>
+<p><i>TODO.... Lisättävä taulukko ....</i>
 <table>
 </table>
--->
-</p>
+--></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="common" name="common">The common folder - <span class="path">/boot/common/</span></a></h2>
-<p>Haiku is not a multi-user system yet. Once it is though, every user has her own <i>home</i> folder that is not accessible to anyone else. Every application or added component like Tracker Add-Ons, Translators etc. as well as any data that's supposed to be shared between different users, has to be put under <span class="path">/boot/common/</span>.</p>
+<a id="common" name="common">Yhteiskansio - <span class="path">/boot/common/</span></a></h2>
+<p>Haiku ei ole vielä monikäyttäjäjärjestelmä. Kun näin on laita, jokaisella käyttäjällä on oma <i>koti</i>-kansio, johon muut eivät pääse käsiksi. Jokainen sovellus ja lisätyt komponentit, kuten Seuraajalisäosat, Tietomuuntimet, jne samoin kuin kaikki eri käyttäjien kesken jaettavat tiedot on laitettava kansion <span class="path">/boot/common/</span> alle.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="home" name="home">The home folder - <span class="path">/boot/home/</span></a></h2>
-<p>This folder belongs to you. Here you can create and delete files and folders as you wish. However, you shouldn't mess too much with the <span class="path">~/config/</span> directory and its subfolders. You <i>could</i> delete e.g. the <span class="path">~/config/settings/</span> folder without damaging the operating system itself, but who wants to lose all his configurations and application settings? In any case, the system warns you with the at the top mentioned alert.</p>
-<p>Besides the <span class="path">~/config/add-ons/</span> folder, which mirrors the system's add-ons folder for additional components as described above, there are a few other folders of interest. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)</p>
+<a id="home" name="home">Kotikansio - <span class="path">/boot/home/</span></a></h2>
+<p>Tämä kansio kuuluu sinulle. Täällä voit luoda ja poista tiedostoja ja kansiota mielesi mukaan. Sinun ei kuitenkaan pitäisi sotkea liikaa <span class="path">~/config/</span>-kansiota ja sen alikansioita. <i>Voisit</i> poistaa esimerkiksi <span class="path">~/config/settings/</span>-kansion vaurioittamatta itse käyttöjärjestelmää, mutta kuka haluaa menettää kaikki asetuksensa ja sovellusasetukset? Missä tapauksessa tahansa, järjestelmä varoittaa sinua sivun ylälaidassa mainitulla hälytyksellä.</p>
+<p>Paitsi <span class="path">~/config/add-ons/</span>-kansio, joka peilaa järjestelmän lisäosakansiota lisäkomponentteja varten, kuten kuvattiin yllä, on myös muutamia muita kiinnostavia kansioita. (Muuten, aaltoviiva ("<tt>~</tt>") on oikotie kotihakemistoon, joten sinune ei tarvitse aina kirjoittaa "<span class="path">/boot/home/</span>" Pääteikkunassa.)</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
-<td>By default, this is where your mails are kept.</td></tr>
+<td>Oletuksena tämä on kansio, jossa sähköpostisi säilytetään.</td></tr>
 
 <tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
-<td><a href="queries.html">Queries</a> are stored, by default temporarily for 7 days, in this folder.</td></tr>
+<td><a href="queries.html">Kyselyt</a> tallennetaan oletuksena tilapäisesti 7 päiväksi tähäh kansioon.</td></tr>
 
 <tr><td><span class="path">~/config/be/</span></td><td> </td>
-<td>Again from our BeOS legacy, the <span class="path">be</span> folder contains what's shown in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>. You can add and remove items by putting files, folders, links or queries into this folder.</td></tr>
+<td>Taas BeOS-perinne, <span class="path">be</span>-kansio sisältää mitä nähdään <a href="deskbar.html#deskbar-menu">Työpöytäpalkkivalikossa</a>. Voit lisätä ja poistaa valikkorivejä laittamalla tiedostoja, kansioita, linkkejä ja kyselyjä tähän kansioon.</td></tr>
 
 <tr><td><span class="path">~/config/bin/</span></td><td> </td>
-<td>Complements the system's <span class="path">/boot/system/bin/</span> folder and holds all your command line programs.</td></tr>
+<td>Täydentää järjestelmän <span class="path">/boot/system/bin/</span>-kansiota ja säilyttää kaikki komentoriviohjelmasi.</td></tr>
 
 <tr><td><span class="path">~/config/boot/</span></td><td> </td>
-<td>This folder is the place for <a href="bash-scripting.html#user-scripts">User Scripts</a> that are executed before or after the system boots up or shuts down.</td></tr>
+<td>Tämä kansio on paikka <a href="bash-scripting.html#user-scripts">Käyttäjäskripteille</a>, jotka suoritetaan ennen alkulatausta tai sammuttamista tai niiden jälkeen.</td></tr>
 
 <tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
-<td>Links to programs or documents in this folder are automatically launched on every boot-up.</td></tr>
+<td>Linkit ohjelmiin tai asiakirjoihin tässä kansiossa käynnistetään automaattisesti jokaisen alkulatauksen yhteydessä.</td></tr>
 
 <tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
-<td>Simply copy a TrueType or Postscript font into this folder and its usable right away.</td></tr>
+<td>Kopioi yksinkertaisesti TrueType tai Postscript -kirjasimet tähän kansioon ja se on heti käytettävissä.</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
-<td>This folder contains the settings to all applications and a few configurations for the system. Some applications manage their settings in their own subfolders, others simply put their configuration file in there.</td></tr>
+<td>Tämä kansio sisältää asetuksia kaikkiin sovelluksiin ja muutamia järjestelmän asetuksia. Jotkut sovellukset käsittelevät asetuksiaan omissa alikansioisssa, toiset laittavat yksinkertaisesti asetustiedostonsa tänne.</td></tr>
 
 <tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
-<td>In this <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> database Haiku keeps track of all the different <a href="filetypes.html">filetypes</a> and their settings.</td></tr>
+<td>Tässä <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>-tietokannassa Haiku säilyttää kaikkien eri <a href="filetypes.html">tiedostotyyppien</a> jäljet ja niiden asetuksia.</td></tr>
 
 <tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
-<td>There's one settings file that may be of interest: <span class="cli">kernel</span> offers some low level configurations like disabling <acronym title="Symmetric Multi Processing">SMP</acronym>, activating serial debugging or enabling advanced power management. You activate a configuration line by removing the commentary symbol "<tt>#</tt>". Be careful here!</td></tr>
+<td>Yksi asetustiedosto saattaa olla kiinnostava: <span class="cli">kernel</span> tarjoaa joitakin alemman tason asetuksia kuten <acronym title="Symmetric Multi Processing">SMP</acronym>:n ottamisen pois käytöstä, sarjavianjäljityksen aktivoinnin tai kehittyneen virranhallinnan (APM) käyttöönoton. Voit aktivoida asetusrivin poistamalla kommenttimerkin "<tt>#</tt>" rivin alusta. Ole varovainen tässä!</td></tr>
 
 <tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
-<td>Besides the various settings files for Tracker, there are some interesting subfolders:</td></tr>
+<td>Paitsi Seuraajan eri asetustiedostoja, tässä on joitakin kiinnostavia alikansioita:</td></tr>
 
-<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Show and arrange all attributes and the window size to your liking. Every new folder you create will use it as a template.</td></tr>
+<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Näyttää ja järjestää kaikki attribuutit ja ikkunakoot haluamallasi tavalla. Jokainen uusi luomasi kansio käyttää sitä mallinteena.</td></tr>
 
-<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>You can define the layout of query result windows for certain filetypes. See topic <a href="queries.html#result-window">Query: The result window</a>.</td></tr>
+<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Voit määritellä kyselytulosikkunan asettelun tietyille tiedostotyypeille. Katso aihe <a href="queries.html#result-window">Kysely: Tulosikkuna</a>.</td></tr>
 
-<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Put links to your favorite locations in here to make them available e.g. in open and save panels. See topic <a href="gui.html#favorites-recent">Haiku's GUI: Favorites and recent folders</a>.</td></tr>
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Laita linkkejä suosikkipaikkaasi tässä tehdäksesi käytettäväksi esimerkiksi paneelien avaamisessa ja sulkemisessa. Katso aihe <a href="gui.html#favorites-recent">Haiku graafinen käyttöliittymä: Suosikit ja äskettäiset kansiot</a>.</td></tr>
 
-<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Add a template for any filetype that's then available from Tracker's <span class="menu">File | New...</span> menu. See topic <a href="tracker.html#working-with-files">Tracker: Working with files</a>.</td></tr>
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Lisää mallinne jokaiselle tiedostotyypille, joka on käytettävissä Seuraajan <span class="menu">Tiedosto | Uusi...</span>-valikossa. Katso aihe <a href="tracker.html#working-with-files">Seuraaja: Työskentely tiedostoilla</a>.</td></tr>
 </table>
 
 </div>
@@ -147,8 +144,8 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="bootloader.html">Alkukäynnistyslataaja</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="gui.html">Haiku's GUI</a>  »
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="gui.html">Haikun graafinen käyttöliittymä</a>  »
 </span></div>
 </div>
 

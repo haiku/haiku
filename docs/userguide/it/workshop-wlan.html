@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2012, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Workshop: Wireless networking</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guida dell'utente</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/it.png" alt="" /> Italiano</li>
+<li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../ru/workshop-wlan.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workshop-wlan.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/workshop-wlan.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/workshop-wlan.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/workshop-wlan.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/workshop-wlan.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/workshop-wlan.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/workshop-wlan.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="workshop-email.html">Workshop: Managing Email</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#firmware">Getting supported hardware to work</a><br />
+	<a href="#gui">Joining a wireless network</a><br />
+	<a href="#commandline">Joining from the command line</a><br />
+	<a href="#tips">Tips</a>
+</td></tr>
+</table>
+
+<h1>Workshop: Wireless networking</h1>
+
+<p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
+This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">this list online</a> for a list of supported models or check <a href="http://www.freebsd.org/releases/9.0R/hardware.html#WLAN">FreeBSD 9's release hardware notes</a>.</p>
+<div class="box-info">Currently only PCI, PCI-X, PCI-Express, Mini PCI, and Mini PCI-Express devices are expected to work.<br />
+PCMCIA, CardBus, ExpressCard, USB and ISA devices still need more work to become functional.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="firmware" name="firmware">Getting supported hardware to work</a></h2>
+<p>Even if the first hurdle of generally supported hardware is taken, some wireless network cards require binary firmware modules to properly operate. Haiku cannot include some of these proprietary firmware files due to licensing issues. Haiku does however include a simple script which will retrieve and install all of the needed proprietary bits for you. Generally, if you are planning to use wireless networking, it is a good idea to run this script to ensure your system has all of these firmwares available when they are needed.</p>
+<p>Open a Terminal and type:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>Now review the licenses and accept them to install all of the available firmware files.</p>
+
+<p>If you don't have internet access to download those lacking firmwares under Haiku, there's an offline method, see under <a href="#tips">tips</a> below.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="gui" name="gui">Joining a wireless network</a></h2>
+<p>By default, Haiku will join the first unencrypted wireless network it finds after booting up. To connect to a specific network, you use the Desktop applet <a href="desktop-applets/networkstatus.html">NetworkStatus</a>.</p>
+<p>Right-click on its icon in the Deskbar and choose the network's public name (which is the "SSID" it broadcasts) from the context menu.</p>
+<img src="images/workshop-wlan-images/join-network.png" alt="join-network.png" />
+<p>A window opens where you enter the type of authentication (probably WPA/WPA2, WEP is not a secure encryption anymore!) and the password for that wireless network. Click <span class="button">OK</span> to start the login process.<br /> Depending on your hardware and network configuration this may take a while. You'll be kept informed of the progress by notifications:</p>
+<img src="images/workshop-wlan-images/join-status.gif" alt="join-network.gif" />
+<p>Once it reads "Ready" and the NetworkStatus icon in the Deskbar shows a green round light, the connection is established. If the notifications end in "No link" and a yellow triangle, something went wrong, probably an incorrect password.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="commandline" name="commandline">Joining from the command line</a></h2>
+<p>If you prefer to use the command line or would like to use scripting or the <span class="path">~/config/boot/UserBootscript</span> to automate things to join a specific network on bootup, there's the command <tt>ifconfig</tt>.</p>
+<p>Start a Terminal and enter the first line to scan for available wireless networks:</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
+name                             address              signal  auth
+haiku-top                        01:d0:19:a6:88:42        30  WPA
+ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
+<p>The path to your wireless network adapter has to be adjusted, of course.<br />
+The output shows the public name (SSID), MAC address, signal strength and authentication method of all found networks.</p>
+<p>To join a network, use this line and insert the respective public name (SSID) and password:</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join {SSID} {password}</pre>
+<p>Make sure the initial configuration of the wireless network adapter after booting up has finished, before issuing <tt>ifconfig</tt> commands or they might be ignored. Depending on your hardware and network configuration that may take a while. Watch those notifications...</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">Tips</a></h2>
+<ul><li><p>Here is how you get to install your firmware if you don't yet have a working internet connection under Haiku. You download the following files while in another operating system, boot Haiku, copy them to their respective location and invoke the <span class="cli">install-wifi-firmwares.sh</span> script.</p>
+
+<ul>
+<li><p>Copy these two to <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/</span>:<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2">http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2</a><br />
+		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h</a></p>
+</li>
+<li><p>Copy this to <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/bits</span>:<br />
+		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h</a></p>
+</li>
+<li><p>Copy this to <span class="path">/boot/system/data/firmware/broadcom43xx/</span>:<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o">http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o</a></p>
+</li>
+<li><p>Copy this to <span class="path">/boot/system/data/firmware/marvell88w8335/</span>:<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz">http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz</a></p>
+</li>
+</ul>
+<p>When all those files are in their place, proceed as described above, i.e. open a Terminal and type:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>Review the licenses and accept them to install all of the now available firmware files.</p>
+</li></ul>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="workshop-email.html">Workshop: Managing Email</a> 
+::  <a href="contents.html" class="uplink">Contenuti</a> 
+::  <a href="applications.html">Applicazioni</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

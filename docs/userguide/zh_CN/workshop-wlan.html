@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2012, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
+ *		Humdinger
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>操作练习：无线网络</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>用户指南</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workshop-wlan.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workshop-wlan.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/workshop-wlan.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/workshop-wlan.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../pt_PT/workshop-wlan.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/workshop-wlan.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/workshop-wlan.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="workshop-email.html">Workshop: Managing Email</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>索引</td></tr>
+<tr class="index"><td>
+	<a href="#firmware">添加支持硬件</a><br />
+	<a href="#gui">无线网络连接</a><br />
+	<a href="#commandline">命令行连接</a><br />
+	<a href="#tips">建议</a>
+</td></tr>
+</table>
+
+<h1>操作练习：无线网络</h1>
+
+<p>在目前永久网络连接条件下，网络的运行就显得尤为必要。对于小的项目来说，对日新月异的硬件提供驱动支持基本上是不可能的，Haiku 目前基于 <a href="http://www.freebsd.org">FreeBSD</a> 兼容层提供网络驱动的支持。<br />
+尽管并没有提供 100% 硬件的支持，但是保证了对大量硬件的支持。更多硬件支持信息请查阅 <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">在线列表</a> 或者 <a href="http://www.freebsd.org/releases/9.0R/hardware.html#WLAN">FreeBSD 9 硬件发布声明</a>。</p>
+<div class="box-info">目前只有 PCI, PCI-X, PCI-Express, Mini PCI, and Mini PCI-Express 设备能够很好运行。<br />
+PCMCIA, CardBus, ExpressCard, USB and ISA 设备仍需要一些功能完善。</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="firmware" name="firmware">添加支持硬件</a></h2>
+<p>虽然我们已经越过了首个障碍，提供了常用的硬件支持，但是一些无线网卡可能需要一些二进制固件模块。由于授权问题，Haiku无法包含这些私有固件文件。Haiku 包含了一个简单的脚本，它可用于为你检索和安装所有这些需要的私有位。一般情况下，如果您计划使用无线网络，您最好执行该脚本以确保您的系统包含所有这些需要的固件文件。</p>
+<p>打开终端，输入：</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>接下来查看授权协议，然后接受协议并安装所有可用的固件文件。</p>
+
+<p>如果您在Haiku下无法访问网络，不能够下载缺失的固件，我们还提供了离线的方式，详情参考如下 <a href="#tips">建议</a> 。</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="gui" name="gui">无线网络连接</a></h2>
+<p>默认情况下，在启动之后，Haiku将会连接到其发现的首个未加密的无线网络。如果需要连接到指定网络，您需要使用桌面小工具 <a href="desktop-applets/networkstatus.html">网络状态</a>。</p>
+<p>右键点击桌面栏图标，然后从菜单中选择网络公开名称（也就是其广播的“SSID”）。</p>
+<img src="images/workshop-wlan-images/join-network.png" alt="join-network.png" />
+<p>之后将会打开一个窗口，您可以输入加密类型（如 WPA/WPA2，WEP不再是一个安全的加密方式！） 和无线网络密码。点击 <span class="button">确定</span> 启动登录进程。<br /> 根据硬件和网络配置的不同，需要等待的时间也会有所差异。然后您会看到如下通知：</p>
+<img src="images/workshop-wlan-images/join-status.gif" alt="join-network.gif" />
+<p>当其状态显示为 "Ready" 时，桌面栏中的网络状态显示为圆浅绿色，网络连接也已建立。。如果通知显示为 "No link" ，网络状态图标将会显示为三角黄色，这也就意味着网络连接出现错误，有可能是密码错误。</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="commandline" name="commandline">命令行连接</a></h2>
+<p>如果您对命令行情有独钟，或者喜欢使用脚本，或者使用 <span class="path">~/config/boot/UserBootscript</span> 在系统启动时自动连接指定网络，您可以使用命令 <tt>ifconfig</tt>。</p>
+<p>启动终端，然后输入命令扫描可用无线网络：</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
+name                             address              signal  auth
+haiku-top                        01:d0:19:a6:88:42        30  WPA
+ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
+<p>当然，您需要确定无线网络适配器的路径。<br />
+该命令的输出结果将会显示所有发现网络的公开名称（SSID），MAC 地址，信号强度以及加密方法。</p>
+<p>为了连接网络，请使用下面的命令，在其中使用相应的公开名称（SSID）和密码：</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join {SSID} {password}</pre>
+<p>在输入 <tt>ifconfig</tt>  命令之前，请确保启动后无线网络适配器的初始化配置，否则命令将会被忽略。根据硬件和网络配置的不同，可能需要等待一段时间，请查看如下通知...</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">建议</a></h2>
+<ul><li><p>下述是 Haiku 在没有网络连接情况下，安装您的网络固件的方法。在其他系统下下载如下文件，然后启动Haiku，将他们复制到相应的位置，然后调用 <span class="cli">install-wifi-firmwares.sh</span> 脚本。</p>
+
+<ul>
+<li><p>复制下述文件到 <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/</span>；<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2">http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2</a><br />
+		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h</a></p>
+</li>
+<li><p>复制下面文件到 <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/bits</span>；<br />
+		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h</a></p>
+</li>
+<li><p>复制下面文件到 <span class="path">/boot/system/data/firmware/broadcom43xx/</span>；<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o">http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o</a></p>
+</li>
+<li><p>复制下面文件到 <span class="path">/boot/system/data/firmware/marvell88w8335/</span>；<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz">http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz</a></p>
+</li>
+</ul>
+<p>在完成所有上述文件复制之后，如上所述，打开终端，输入：</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>查看授权协议，然后接受它们以安装所有可用的固件文件。</p></li></ul>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="workshop-email.html">操作练习：邮件管理</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
+::  <a href="applications.html">应用程序</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

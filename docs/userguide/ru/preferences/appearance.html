@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -53,26 +53,46 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Внешний вид</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Настройки (Preferences)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
-<tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span></td></tr>
+<tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
+<span class="path">~/config/settings/system/app_server/decorator_settings</span><br />
+<span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
 <p>С помощью панели настройки <span class="app">Внешний вид</span> вы сможете изменить некоторые свойства внешнего вида Haiku.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="fonts" name="fonts">Fonts</a></h2>
+<img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
+<p>Haiku defines three standard fonts for different purposes. You set plain, bold and fixed font types and sizes that will be used throughout the system. Besides these, there's also a separate setting for the font used in menus.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="installing_fonts" name="installing_fonts">Installing new fonts</a></h3>
+<p>You install new fonts by copying them into their respective user folder, i.e. <span class="path">/boot/common/data/fonts/</span> or <span class="path">/boot/home/config/data/fonts/</span> (see topic <a href="../filesystem-layout.html">Filesystem layout</a>).</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Цвета</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>На вкладке <span class="menu">Цвета</span> вы можете изменять цвет различных элементов интерфейса. Метод drag&amp;drop позволит вам указать нужный цвет из других программ, таких как <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> или панели <span class="app">Фон</span>.</p>
+<p>In the <span class="menu">Colors</span> tab, you can change the colors of different parts of the user interface. The color well accepts drag&amp;drops from other programs, letting you drag colors over from e.g. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> or the <span class="app">Backgrounds</span> panel.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="decorators" name="decorators">Window decorators</a></h2>
+<img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
+<p>Decorators determine the look and feel of windows and all GUI elements. Currently Haiku comes with only one default decorator. Should you find and install other decorators, you can choose a different one from the pop-up menu.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="antialiasing" name="antialiasing">Сглаживание</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>Вторая вкладка, <span class="menu">Сглаживание</span>, позволяет настроить способ отображения текста на экране.</p>
+<p>The tab <span class="menu">Antialiasing</span> provides different settings for how things are rendered on screen.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" />

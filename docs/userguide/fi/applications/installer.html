@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Installer</title>
+	<title>Asennusohjelma</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,44 +43,40 @@
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="magnify.html">Magnify</a>  »
+ «  <a href="icon-o-matic.html">Kuvakemaatti</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
+::  <a href="magnify.html">Suurennuslasi</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Asennusohjelma</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
-<tr><td>Asetukset</td><td></td><td><i>none</i></td></tr>
+<tr><td>Asetukset</td><td></td><td><i>ei mitään</i></td></tr>
 </table>
 <p><br /></p>
-<p>The Installer is used to copy Haiku onto another volume.<br />
-Upon launch it displays a start window with important information. It's not a mindless EULA you're used to click away in the blink of an eye, it states:</p>
+<p>Asennusohjelmaa käytetään Haikun kopioimiseksi toiselle taltiolle.<br />Käynnistettäessä se näyttää käynnistysikkunan tärkeillä tiedoilla.  Se ei ole järjetön EULA, jonka olet tottunut napsauttamaan pois silmänräpäyksessä, se ilmoittaa:</p>
 <ul>
-<li><p>This is alpha-quality software. Make backups or suffer the consequences!</p></li>
-<li><p>The Installer needs a prepared partition. You may have to use a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> or a similar tool until Haiku's DriveSetup is mature enough to handle this task.</p></li>
-<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
+<li><p>Tämä on alfalaatuinen ohjelmisto. Tee varmuuskopioita, tai kärsi seurauksista!</p></li>
+<li><p>Asennusohjelma tarvitsee ennakolta valmistellun osion. Olet ehkä käyttänyt <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a>-levyä tai samanlaista työkalua kunnes Haikun Levyasema-asetusohjelma on kypsynyt kylliksi käsittelemään tämän tehtävän.</p></li>
+<li>Haiku voidaan lisätä manuaalisesti alkulataushallintaan <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. Ohjeet siitä, kuinka tämä todella tehdään, ovat saatavilla osoitteesta <a href="http://www.haiku-os.org/get-haiku/installation-guide">verkko-opaste</a>.</li>
 </ul>
 <p><br /><br /></p>
-<p>Once you acknowledged with <span class="button">Continue</span>, you're presented with the main window:</p>
+<p>Kun olet kerran hyväksynyt <span class="button">Jatka</span>-painikkeella, sinulle esitellään pääikkuna:</p>
 <img src="../images/apps-images/installer.png" alt="installer.png" />
-<p>In the first pop-up menu you choose the source for the installation. It can be a currently installed Haiku or can come from an install CD or USB drive, etc.<br />
-The second pop-up menu specifies the target for the installation. This target partition/volume will be completely overwritten and has to be set aside beforehand by a partitioning tool like GParted.</p>
-<p>Clicking the little expander widget will <i>Show optional packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
-<p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
-<p><span class="button">Begin</span> starts the installation procedure, which basically copies everything but the <span class="path">home/</span> and <span class="path">common/</span> folder onto the target volume and makes it bootable.</p>
+<p>Ensimmäisessä ponnahdusvalikossa valitset asennuksen lähteen. Se voi olla jo asennettu Haiku-järjestelmä tai voi tulla asennus-CD-levyltä tai USB-levyltä, jne.<br />Toinen ponnahdusvalikko määrittelee asennuksen kohteen. Tämä kohdeosio/taltio korvataan kokonaan ja se on laitettu syrjään GParted-ohjelman tapaisella osiointityökalulla.</p>
+<p>Pienen laajentajakäyttöliittymäkomponentin napsauttaminen avaa <i>Näytä valinnaiset pakkaukset</i>, jos niitä on käytettävissä, jotka voit valita asennettavaksi perus-Haikun lisäksi.</p>
+<p>Sinun pitäisi lopuksi tarkistaa, että poimit todella oikean kohteen ennen asennusprosessin aloittamista. Napsauta painiketta <span class="button">Aseta osiot...</span>, mikä käynnistää <a href="drivesetup.html">Levyasema-asetukset</a> ja sinulla on näkymä olemassaolevien taltioiden ja osioiden nimeämiseksi ja sijoittelemiseksi.</p>
+<p><span class="button">Aloita</span> käynnistää asennusproseduurin, joka perimmillään kopoi kaikki paitsi <span class="path">home/</span>- ja <span class="path">common/</span> -kansion kohdetaltiolle ja tekee siitä alkuladattavan.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tools" name="tools">Tools</a></h2>
-<p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please choose target</span> menu and select <span class="menu">Write boot sector</span> from the <span class="menu">Tools</span> menu to make it bootable again.</p>
-<p>The other item in the <span class="menu">Tools</span> menu is used to <span class="menu">Set up a boot menu</span> that puts a menu in the boot sector to choose what operating system to boot. See topic <a href="bootmanager.html">BootManager</a> for more information.<br />
- You don't need to run the <span class="app">BootManager</span> if you already use a bootmanager like GRUB, in which case you have to add Haiku manually (see above), or Haiku runs exclusively on your machine.</p>
+<a id="tools" name="tools">Työkalut</a></h2>
+<p>Asennusproseduurin lopussa osio tehdään automaattisesti alkuladattavaksi. Voi kuitenkin tapahtua, että joku toinen käyttöjärjestelmä tai osiointityökalu (vahingossa) korvaa Haiku-taltion alkulataussektorin. Alkulataa tässä tapauksessa asennus-CD-levysi ja käynnistä asennusohjelma. Valitse Haiku-alkulatausosio <span class="menu">Kohde: Valitse kohde</span>-valikko ja valitse <span class="menu">Kirjoita alkulataussektori</span> valikosta <span class="menu">Työkalut</span> sen tekemiseksi uudelleen alkuladattavaksi.</p>
+<p>Toista valintaa  <span class="menu">Työkalut</span>-valikossa käytetään <span class="menu">Aseta alkulatausvalikko</span>-asetukseen, joka laittaa alkulataussektoriin valikon, josta voidaan valita, mikä käyttöjärjestelmä alkuladataan. Katso lisätietoja aiheesta <a href="bootmanager.html">Alkulataushallinta</a>.<br />Sinun ei tarvitse suoritaa <span class="app">Alkulataushallinta</span>-ohjelmaa, jos sinä jo käytät alkulataushallintaa kuten GRUB, missä tapauksessa sinun on lisättäv Haiku manuaalisesti (katso yllä), tai jos Haiku on ainoa käyttöjärjestelmä koneellasi.</p>
 
 
 </div>
@@ -86,9 +84,9 @@ The second pop-up menu specifies the target for the installation. This target pa
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="magnify.html">Magnify</a>  »
+ «  <a href="icon-o-matic.html">Kuvakemaatti</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
+::  <a href="magnify.html">Suurennuslasi</a>  »
 </span></div>
 </div>
 

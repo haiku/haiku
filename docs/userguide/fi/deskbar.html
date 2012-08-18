@@ -4,23 +4,26 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Deskbar</title>
+	<title>Työpöytäpalkki</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,99 +44,98 @@
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filetypes.html">Filetypes</a>  »
+ «  <a href="tracker-add-ons.html">Seuraajalisäosat</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="filetypes.html">Tiedostotyypit</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
 <tr class="index"><td>
-	<a href="#deskbar-menu">The Deskbar Menu</a><br />
-	<a href="#tray">The Tray</a><br />
-	<a href="#list-of-apps">The list of running programs</a>
-</td></tr>
+	<a href="#deskbar-menu">Työpöytäpalkkivalikko</a><br />
+	<a href="#tray">Tarjotin</a><br />
+	<a href="#list-of-apps">Käynnissä olevien ohjelmien luettelo</a></td></tr>
 </table>
 
-<h1>Deskbar</h1>
+<h1>Työpöytäpalkki</h1>
 
-<p>The Deskbar is the little panel that by default is located in the upper right corner of the screen. It's Haiku's version of Windows' taskbar with its Start button. It contains the Deskbar menu from where you can start applications and preferences, a tray with a clock and other tools below that and a list of currently running programs at the bottom.</p>
+<p>Työpöytäpalkki on pieni paneeli, joka oletuksena sijaitsee näytön oikeanpuoleisessa yläkulmassa. Se on Haikun versio Windowsin tehtäväpalkista Käynnistä-painikkeineen. Se sisältää Työpalkkivalikon, josta voit käynnistää sovellukset ja asetusohjelmat, tarjottimen kellolla ja muilla työkaluilla sen alla sekä alimmaisena parhaillaan suoritettavien ohjelmien luettelo.</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on one side of the tray and drag&amp;drop it into the new position. You can also fold it into a more compact layout by drag&amp;dropping the knobbly area onto the Deskbar menu.</p>
+<p>Voit siirtää Työpöytäpalkin mihin nurkkaan tahansa tai palkkina näytön ylä- tai alarajalle tarttumalla pisteviiva-alueeseen tarjottimen sivussa ja raahaamalla ja pudottamalla sen uuteen paikkaan. Voit taittaa sen myös pienempään tilaan raahaamalla ja pudottamalla pisteviiva-alue Työpöytäpalkkivalikkoon.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="deskbar-menu" name="deskbar-menu">The Deskbar Menu</a></h2>
-<p>A menu opens when you click on the Deskbar's top:</p>
+<a id="deskbar-menu" name="deskbar-menu">Työpöytäpalkkivalikko</a></h2>
+<p>Valikko avautuu, kun napsautat Työpöytäpalkin yläosaa.</p>
 <img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
 <ul>
-<li><p><b>About this system...</b> - Shows some basic information of the system, licenses and the credits of the Haiku project.</p></li>
+<li><p><b>Tästä järjestelmästä...</b> - Näyttää joitakin järjestelmän perustietoja, lisenssitiedot ja Haiku-hankkeen tunnustukset kehittäjille.</p></li>
 
-<li><p><b>Find...</b> - Opens the <a href="queries.html">Query</a> dialog.</p></li>
-<li><p><b>Show replicants</b> - Shows/hides the little <a href="gui.html#replicants">Replicant</a> widget you use to drag it around, remove or access its context menu.</p></li>
-<li><p><b>Mount</b> - Offers the same options as when invoked by right-clicking the Desktop (see <a href="tracker.html#mounting-volumes">Mounting Volumes</a>).</p></li>
-<li><p><b>Deskbar preferences...</b> - Opens a panel to configure the Deskbar (see below).</p></li>
-<li><p><b>Shutdown</b> - Offers options to either <span class="menu">Restart system</span> or <span class="menu">Power off</span>.</p></li>
-<li><p><b>Recent documents, folders, applications</b> - List of the last recently opened documents, folders and applications (see <span class="menu">Deskbar preferences</span> below).</p></li>
-<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences (see <span class="menu">Deskbar preferences</span> below).</p></li>
+<li><p><b>Etsi...</b> - Avaa <a href="queries.html">Kysely</a>-valintaikkunan.</p></li>
+<li><p><b>Näytä replikantit</b> - Näyttää/piilottaa pienen <a href="gui.html#replicants">Replikantti</a>-käyttöliittymäkomponentin, jota käytät aiheyhteysvalikon ympäriinsä raahaamiseen, poistamiseen ja kutsumiseen.</p></li>
+<li><p><b>Liitä</b> - Tarjoaa samat valitsimet kuin kutsuttaessa hiiren oikealla painikkeella työpöydältä (katso <a href="tracker.html#mounting-volumes">Liitä taltiot</a>).</p></li>
+<li><p><b>Työpöytäpalkkiasetukset...</b> - Avaa paneelin Työpöytäpalkin asetuksia varten (katso alla).</p></li>
+<li><p><b>Sammuttaminen</b> - Avaa valitsimet joko <span class="menu">Käynnistä järjestelmä uudelleen</span> tai <span class="menu">Sammuta virta</span>.</p></li>
+<li><p><b>Äskettäiset asiakirjat, kansiot ja sovellukset</b> - Viimeiseksi avattujen asiakirjojen, kansioiden ja sovellusten luettelo (katso <span class="menu">Työpöytäpalkkiasetukset</span> alla).</p></li>
+<li><p><b>Sovellukset, demot, työpöytäpalkkisovelmat, asetukset</b> - Asennettujen sovellusten, demojen, sovelmien ja asetusohjelmien luettelo (katso <span class="menu">Työpöytäpalkin asetukset</span> alla).</p></li>
 </ul>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Deskbar Preferences</h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Työpöytäpalkin asetukset</h3>
 <img src="images/deskbar-images/configure.png" alt="configure.png" />
 <ul>
-<li><p><b>Menu</b><br />
-Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
-The button <span class="button">Edit menu...</span> opens the folder <span class="path">/boot/home/config/be/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
-You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
-<p>It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p></li>
-<li><p><b>Window</b></p>
+<li><p><b>Valikko</b><br />
+Tässä voit asettaa Työpöytäpalkin valikossa näkyvien äskettäisten asiakirjojen, kansioiden ja sovellusten lukumäärän, tai haluatko nähdä niitä ollenkaan.<br />Painike <span class="button">Muokkaa valikkoa...</span> avaa kansion <span class="path">/boot/home/config/be/</span>. Siitä löydät tiedostot ja kansiot, jotka ilmaantuvat Työpöytäpalkkiin. Oletuksena nämä ovat <span class="menu">Sovellukset</span>, <span class="menu">Demot</span>, <span class="menu">Työpöytäpalkkisovelmat</span>, ja <span class="menu">Asetukset</span>.<br />Voit poistaa ja lisätä kohteita kuten linkkejä sovelluksiin, asiakirjoihin tai jopa kyselyjä yksinkertaisesti kopioimalla/poistamalla niitä tästä kansiosta tai tähän kansioon.</p>
+<p>Vielä yksinkertaisempaa on raahata tiedosto, kansio tai tallennettu kysely ja pudottaa se sinne minne haluat sen Työpöytäpalkissa.</p></li>
+<li><p><b>Ikkuna</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Always on top</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
-<tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
-<tr><td><span class="menu">Auto-hide</span></td><td> </td><td>The Deskbar is reduced to only a few pixels and only pops up if the mouse pointer touches them.</td></tr>
+<tr><td><span class="menu">Aina päällimmäisenä</span></td><td> </td><td>Työpöytäpalkki pysyy aina kaikkien muiden ikkunoiden päällä.</td></tr>
+<tr><td><span class="menu">Nosta automaattisesti</span></td><td> </td><td>Työpöytäpalkki ponnahtaa etualalle, jos hiiren kohdistin koskettaa sitä.</td></tr>
+<tr><td><span class="menu">Piilota automaattisesti</span></td><td> </td><td>Työpöytäpalkki on pienennetty vain muutaman pikselin kokoiseksi ja ponnahtaa näkyviin vain, jos hiiren kohdistin koskettaa niitä.</td></tr>
 </table></li>
-<li><p><b>Applications</b></p>
+<li><p><b>Sovellukset</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Sort running applications</span></td><td> </td><td>Sorts the list of running programs alphabetically.</td></tr>
-<tr><td><span class="menu">Tracker always first</span></td><td> </td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Show application expander</span></td><td> </td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
-<tr><td><span class="menu">Expand new applications</span></td><td> </td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
+<tr><td><span class="menu">Lajittele suoritettavat sovellukset</span></td><td> </td><td>Lajittelee suoritettavat ohjelmat aakkosjärjestykseen.</td></tr>
+<tr><td><span class="menu">Seuraaja aina ensimmäisenä</span></td><td> </td><td>Vieläpä silloin, kun sovellukset on lajiteltu aakkosjärjestykseen, Seuraaja on aina ensimmäisenä luettelossa.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Näytä sovelluslaajentaja</span></td><td> </td><td>Tarjoaa pienen käyttöliittymäkomponentin näyttämään/piilottamaan ohjelman kaikki ikkunat sen Työpöytäpalkkirivin alle.</td></tr>
+<tr><td><span class="menu">Laajenna uudet sovellukset</span></td><td> </td><td>Vasta käynnistettyjen ohjelmien ikkunat laajenevat automaattisesti niiden Työpöytäpalkkirivillä.</td></tr>
+<tr><td><span class="menu">Piilota sovellusnimet</span></td><td> </td><td>Poistaa suoritettavien sovellusten tekstinimiöt.</td></tr>
+<tr><td><span class="menu">Kuvakekoko</span></td><td> </td><td>Säätää suoritettavien sovellusten kuvakekoon.</td></tr>
 </table></li>
-<li><p><b>Clock</b></p>
+<li><p><b>Kello</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Show seconds</span></td><td> </td><td>Adds the display of seconds to the clock.</td></tr>
+<tr><td><span class="menu">Näytä sekunnit</span></td><td> </td><td>Lisää kelloon sekuntien näytön.</td></tr>
+<tr><td><span class="menu">Näytä viikonpäivä</span></td><td> </td><td>Lisää viikonpäivän lyhenteen kelloon.</td></tr>
 </table></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tray" name="tray">The Tray</a></h2>
+<a id="tray" name="tray">Tarjotin</a></h2>
 <img src="images/deskbar-images/calendar.png" alt="calendar.png" />
-<p>Among other things, the tray is housing the clock. Hover the mouse over it to display the date in a tooltip. Left-click it to show a calendar. Right-click it to hide/show the clock or launch the <a href="preferences/time.html">Time</a> preferences to set it.</p>
-<p>Any program can install an icon in the tray to provide an interface to the user. The email system, for instance, shows a different symbol when there's unread mail and offers a context menu to e.g. create or check for new mail. <span class="app">ProcessController</span> is another example that uses its icon in the tray to provide information (CPU/memory usage) and to offer a context menu.</p>
+<p>Muiden asioiden lisäksi tarjotin on säilytyspaikka kellolle. Hiiren kohdistimen siirtäminen sen yläpuolelle näyttää päivämäärän työkaluvihjeessä. Hiiren vasemmalla painikkeella saa näkyviin kalenterin. Hiiren oikealla painikeella piilotetaan/näytetään kello tai käynnistetään <a href="preferences/time.html">Aika</a>-asetukset sen asettamiseksi.</p>
+<p>Mikä tahansa ohjelma voi asentaa kuvakkeen tarjottimelle tarjoten käyttöliittymän käyttäjälle. Sähköpostijärjestelmä, esimerkiksi, näyttää erilaisen symbolin silloin kun on lukematonta postia ja tarjoaa asiayhteysvalikon esimerkiksi uuden sähköpostiviestin luomiseksi tai lukemiseksi. <span class="app">Prosessivalvonta</span> on toinen esimerkki, joka käyttää tarjottimen kuvakkeita tietojen tarjoamiseen (prosessori/muistikäyttä) ja tarjoaa asiayhteysvalikon.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="list-of-apps" name="list-of-apps">The list of running programs</a></h2>
+<a id="list-of-apps" name="list-of-apps">Käynnissä olevien ohjelmien luettelo</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
-<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows, from the submenu. By right-clicking you can minimize or close a window or the entire application.</p>
-<p>If you activated Expanders in the Deskbar settings, you can expand/collapse the list of windows directly under an application's entry.</p>
-<p>In front of every application's windows is a symbol providing info on its state. A bright symbol means a window is visible, a dark one that it's minimized. Three lines in front of a symbol shows that it's not on the current workspace.</p>
+<p>Voit vaihtaa tiettyä suoritettavaa sovellusta napsauttamalla sen riviä Työpöytäpalkissa ja valitsemalla alivalikosta (yhden sen) ikkunoista. Hiiren oikealla painikkeella voit minimoida tai sulkea ikkunan tai koko sovelluksen.</p>
+<p>Jos aktivoit Laajentajat Työpöytäpalkin asetuksissa, voit laajentaa/supistaa ikkunoiden luettelon suoraan sovellusrivin alla.</p>
+<p>Jokaisen sovellusikkunan edessä on symboli, joka tarjoaa tietoa sen tilasta. Kirkas symboli tarkoittaa, että ikkuna on näkyvissä, tumma symboli tarkoittaa, että se on minimoitu. Kolme viivaa symbolin edessä näyttää, että se ei ole nykyisessä työtilassa.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filetypes.html">Filetypes</a>  »
+ «  <a href="tracker-add-ons.html">Seuraajalisäosat</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="filetypes.html">Tiedostotyypit</a>  »
 </span></div>
 </div>
 

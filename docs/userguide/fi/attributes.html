@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Attributes</title>
+	<title>Attribuutit</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,45 +43,45 @@
 <li><a href="../en/attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="filetypes.html">Tiedostotyypit</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
 ::  <a href="index.html">Hakemisto</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Attributes</h1>
+<h1>Attribuutit</h1>
 
-<p>Attributes are data fields that belong to a file but aren't part of that file, e.g. they are not computed into the file size and can be copied or changed without touching the file itself. The system uses these attributes to store e.g. file size, file type or date of the last modification. This is similar to other operating systems and their filesystems.</p>
-<p>What's different is that you can add any kind of attribute to any file and display it or make it editable in a Tracker window. You just have to define the kind of attribute you want to add to a file type (e.g. string, integer or time) and give it a name and description.</p>
-<p>The file itself doesn't even need any contents at all. Take a look at these People files for example:</p>
+<p>Attribuutit ovat tietokenttiä, jotka kuuluvat tiedostoon, mutta eivät ole tuon tiedoston osa, toisin sanoen niitä ei lasketa mukaan tiedoston kokoa laskettaessa ja niitä voidaan kopioida ja muuttaa koskematta itse tiedostoon. Järjestelmä käyttää attribuutteja esimerkiksi tiedoston koon, tiedostotyypin ja viimeisen muokkauspäivämäärän tallentamiseen. Tämä on samanlaista kuin muissa käyttöjärjestelmissä ja niiden tiedostojärjestelmissä.</p>
+<p>Erona muihin on kuitenkin, että voit lisätä minkä tyyppisen attribuutin tahansa mihinkä tahansa tiedostoon ja näyttää sen tai tehdä siitä muokattava Seuraaja-ikkunassa. On vain määriteltävä tiedostotyyppiin lisättävän attribuutin tyyppi (esimerkiksi merkkijono, kokonaisluku tai aika) ja annettava sille nimi ja kuvaus.</p>
+<p>Itse tiedosto ei edes tarvitse mitään sisältöä. Vilkaise esimerkiksi näitä Ihmiset-tiedostoja:</p>
 <img src="images/attributes-images/people.png" alt="people.png" />
 <br />
-<p>As you can see, these are all 0-sized files with attached attributes, the E-mail attribute of "John Nox" being edited right in Tracker.</p>
-<p>If you index these attributes, as People, Email or audio files are by default, they are also searchable with Haiku's fast query system.</p>
+<p>Kuten näet, nämä kaikki ovat nollakokoisia tiedostoja, joihin on liitetty attribuutteja. Sähköpostiattribuutti "John Nox" on parhaillaan muokattavana Seuraajassa.</p>
+<p>Jos indeksoit näitä attribuutteja, kuten oletuksena Ihmiset-, sähköposti- tai äänitiedostoja, ne ovat myös etsittävänä Haikun nopeassa hakujärjestelmässä.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-tracker" name="attributes-tracker">Attributes in Tracker</a></h2>
-<p>Attributes are displayed quite similar to a database or spreadsheet. Using Tracker you can choose which attributes to display (columns) and sort file listings (rows) accordingly.</p>
-<p>To do this, open a Tracker window, click on the <span class="menu">Attributes</span> menu, and select the attributes you want to display. Alternatively, simply right-click onto a column heading and mark the items in the context menu. You can rearrange the columns by a simple drag&amp;drop of the column heading. Moving a column out of a window, is a fast way to get rid of columns you don't need.</p>
-<p>Double-click on the line between two attributes in the heading to automatically resize a column to its optimal width.</p>
-<p>Click on a column heading to toggle the sorting order from ascending to descending. You can establish a secondary sort order by pressing the <span class="key">SHIFT</span> key while clicking on a column heading. You can sort your People files by company and within that order sort by contact name, for instance. See the above screenshot as an example. The secondary sort order is marked by a lighter colored indicator beside the heading.</p>
-<p>Editing these attributes is as simple as renaming a file: Either click on an entry or press <span class="key">ALT</span> <span class="key">E</span> and move between the attributes with <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> leaves the editing mode without applying the changes.</p>
+<a id="attributes-tracker" name="attributes-tracker">Attribuutit Seuraajassa</a></h2>
+<p>Attribuutit näytetään aika lailla samalla tavalla kuin tietokannoissa tai taulukonlaskentaohjelmissa. Seuraajaa käyttämällä voit valita, mitkä attribuutit (sarakkeet) näytät ja lajitella tiedostoluettelot (rivit) sen mukaan.</p>
+<p>Tämän tekemiseksi avaa Seuraaja-ikkuna, napsauta <span class="menu">Attribuutit</span>-valikkoa ja valitse attribuutit, jotka haluat näyttää. Vaihtoehtoisesti, napsauta yksinkertaisesti hiiren oikealla painikkeella sarakeotsakkeen päällä ja merkitse sarakkeet asiayhteysvalikossa. Voit järjestää sarakkeet uudelleen yksinkertaisesti sarakeotsakkeiden raahaa&amp;pudota-menettelyllä. Sarakkeen siirtäminen ikkunan ulkopuolelle on nopea tapa päästä eroon sarakkeista, joita et tarvitse.</p>
+<p>Kaksoisnapsauta otsakerivillä kahden attribuutin välissä, jolloin sarake automaattisesti muuttaa leveytensä optimaaliseksi.</p>
+<p>Napsauta sarakeotsaketta lajittelujärjestyksen vaihtamiseksi päinvastaiseksi. Voit perustaa toissijaisen lajittelujärjestyksen painamalla <span class="key">VAIHTO</span>-näppäintä samalla kun napsautat sarakeotsaketta. Voit lajitella Ihmiset-tiedostosi esimerkiksi yrityksen nimen mukaan ja sen sisällä lajitella yhteystietojen nimen mukaan. Katso yllä olevaa näyttökaappausta esimerkkinä. Toissijainen lajittelu on merkitty vaaleammanvärisellä indikaattorilla otsakkeen vieressä.</p>
+<p>Näiden attribuuttien muokkaus on yhtä helppoa kuin tiedoston nimeäminen uudelleen: Napsauta joko riviä tai paina <span class="key">ALT</span> <span class="key">E</span> -näppäimiä ja siirry attribuuttien välillä <span class="key">SARKAIN</span>-näppäimellä tai <span class="key">VAIHTO</span> <span class="key">SARKAIN</span> -näppäimillä. Poistut <span class="key">ESC</span>-näppäimellä muokkaustilasta ilman että muutokset astuvat voimaan.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-terminal" name="attributes-terminal">Attributes in Terminal</a></h2>
-<p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal.</p>
+<a id="attributes-terminal" name="attributes-terminal">Attribuutit Pääteikkunassa</a></h2>
+<p>Jos pidät parempana käyttää komentoriviä ja suunnittelet työskenteleväsi monien tiedostojen kanssa käyttäen skriptausta, on useita komentoja, joilla voidaan ohjata attribuutteja Pääteikkunasta.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
-<p><span class="cli">listattr</span> lists a file's attributes, but doesn't show the contents of the attributes.</p>
-<pre>usage: listattr 'filename' ['filename' ...]</pre>
-<p>From our screenshot example above:</p>
+<p>
+<span class="cli">listattr</span> luettelee tiedoston attribuutit, mutta ei näytä attribuuttien sisältöä.</p>
+<pre>käyttö: listattr 'tiedostonimi' ['tiedostonimi' ...]</pre>
+<p>Yllä olevasta näyttökaappausesimerkistämme:</p>
 <pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
 File: Clara Botters
    Type         Size                 Name
@@ -105,64 +107,65 @@ MIME String         21  "BEOS:TYPE"
     Raw Data         20  "_trk/pinfo_le"
  
 131 bytes total in attributes.</pre>
-<p>Besides all the "<tt>META:*</tt>" attributes that hold the contact's information, there are two attributes that are managed by the system:</p>
+<p>Paitsi kaikki "<tt>META:*</tt>"-attribuutit, jotka säilyttävät yhteystietoja, on kaksi attribuuttia, joiden hallinnoinnista vastaa järjestelmä:</p>
 <ul>
-<li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>". It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
-<li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
-<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
+<li><p><tt>BEOS:TYPE</tt> säilyttää tiedostotyypin kuten <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>-merkkijono, tässä tapauksessa "<tt>application/x-person</tt>". Se määrittelee oletuskuvakkeen ja sovelluksen, joka avaa tiedoston, kun sitä esimerkiksi kaksoisnapsautetaan.</p></li>
+<li><p>"<tt>_trk/pinfo_le</tt>" on attribuutti, jossa Seuraaja säilyttää tiedoston kuvakkeen sijainnin.</p></li></ul>
+<div class="box-info">Huomaa kenoviiva sanan "Clara" jäljessä. Pääteikkunassa on käytettävissä erikoisia koodinvaihtomerkkejä kuten <tt>'"*\$?!</tt>. Sanojen "Clara" ja "Botters" välissä oleva välilyönti on myös yksi niistä. Siksi kenoviivaa käytetään ilmaisemaan, että sanan "Clara" jälkeen on todella välilyönti, eikä kyseessä ole koodinvaihtomerkki.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="catattr" name="catattr">catattr</a></h3>
-<p><span class="cli">catattr</span> displays the contents of a specific attribute of a file.</p>
-<pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
-<p>Again our example:</p>
+<p><span class="cli">catattr</span> näyttää tiedoston tietyn attribuutin sisällön.</p>
+<pre>käyttö: catattr [--raw|-r] attr_name tiedosto1 [tiedosto2...]</pre>
+<p>Taas esimerkkimme:</p>
 <pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
-<p><span class="cli">addattr</span> adds an attribute to a file and/or fills it with a value.</p>
-<pre>usage: addattr [-t type] attr value file1 [file2...]
-    or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
+<p><span class="cli">addattr</span> lisää attribuutin tiedostoon ja/tai täyttää sen arvolla.</p>
+<pre>käyttö: addattr [-t tyyppi] attribuutti arvo tiedosto1 [tiedosto2...]
+    tai: addattr [-f arvo-tiedostosta] [-t tyyppi] attribuutti tiedosto1 [tiedosto2...]
  
-         Type is one of:
-                 string, mime, int, llong, float, double, bool, icon, raw
-                 or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
-         The default is "string"</pre>
-<p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
+         Tyyppi on yksi seuraavista:
+                 merkkijono, mime-tyyppi, kokonaisluku, llong-luku, float-liukuluku, 
+                 double-luku, bool-boolean arvo, kuvake, raw-raaka-arvo 
+                 tai numeerinen arvo (toisin sanoen 0x1234, 42, 'ABCD', ...)
+         Oletus on merkkijono eli "string"</pre>
+<p>Joten sanotaan, että jos edellä mainittu Clara sai työpaikan monikansallisessa Barkelbaer Inc. -yrityksessä, niin aiemmin tyhjänä ollut "Company"-attribuutti täytetään tuolla tiedolla (mikä on tyyppiä "string"):</p>
 <pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rmattr" name="rmattr">rmattr</a></h3>
-<p><span class="cli">rmattr</span> completely removes an attribute from a file.</p>
+<p><span class="cli">rmattr</span> poistaa attribuutin kokonaan tiedostosta.</p>
 
-<pre>usage: rmattr [-p] attr filename1 [filename2...]
-         'attr' is the name of an attribute of the file
-         If '-p' is specified, 'attr' is regarded as a pattern.</pre>
-<p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
+<pre>käyttö: rmattr [-p] attr tiedostonimi1 [tiedostonimi2...]
+         'attr' on tiedoston attribuutin nimi
+         Jos '-p' on määritelty, 'attr' -määrittelyä pidetään mallina.</pre>
+<p>Vaikka kaikessa käytännöllisyydessä olisi riittävää, jos "Fax"-attribuutti vain jätettäisiin täyttämättä, sen voi kokonaan poistaa Claran tiedostosta kirjoittamalla:</p>
 <pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
-<p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
-<pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
+<p><span class="cli">copyattr</span> kopioi attribuutteja yhdestä tai useammasta tiedostosta toiseen. Oletuksena tiedoston todellista sisältöä <b>ei</b> kopioida.</p>
+<pre>Käyttö: copyattr &lt;valitsimet&gt; &lt;lähde&gt; [ ... ] &lt;kohde&gt;</pre>
 
-<p>If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</p>
+<p>Jos haluat kopioida attribuutit ja myös itse datatiedoston, voit lisätä valitsimen "<span class="cli">-d</span>" tai "<span class="cli">--data</span>".</p>
 
 <p><br /></p>
-<p>More information on these commands and their options can be found by typing the command name followed by "<span class="cli">-h</span>" or "<span class="cli">--help</span>".</p>
+<p>Lisätietoja näistä komennoista ja niiden valitsimista löytyy kirjoittamalla komentonimien ja sen jälkeen valitsimen "<span class="cli">-h</span>" tai "<span class="cli">--help</span>".</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="filetypes.html">Tiedostotyypit</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
 ::  <a href="index.html">Hakemisto</a>  »
 </span></div>
 </div>

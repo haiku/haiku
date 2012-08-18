@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2012, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Työpaja: Langaton verkko</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Käyttäjäopas</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/fi.png" alt="" /> Suomi</li>
+<li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workshop-wlan.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workshop-wlan.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/workshop-wlan.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/workshop-wlan.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/workshop-wlan.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/workshop-wlan.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../sk/workshop-wlan.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="workshop-email.html">Workshop: Managing Email</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#firmware">Kuinka tuettu laitteisto saadaan toimimaan</a><br />
+	<a href="#gui">Langattomaan verkkoon liittyminen</a><br />
+	<a href="#commandline">Liittyminen komentoriviltä</a><br />
+	<a href="#tips">Vihjeet</a>
+</td></tr>
+</table>
+
+<h1>Työpaja: Langaton verkko</h1>
+
+<p>Verkkoyhteyksien saaminen toimimaan on olennasta nykypäivän tarpeessa pysyvään internet-yhteytteen. Koska erilaisten ja jatkuvasti muuttuvien laitteistojen ja ajurien pitäminen ajan tasalla on aika mahdotonta pienelle projektille, Haiku käyttää <a href="http://www.freebsd.org">FreeBSD</a>-yhteensopivuuskerrosta verkkoajureissaan.<br />
+Tämä takaa valtavan joukon tuettuja laitteita, vaikka se ei luultavasti kata 100 prosenttia markkinoilla olevista. Katso <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">tätä luetteloa verkossa</a> tuetuista malleista tai tarkista <a href="http://www.freebsd.org/releases/9.0R/hardware.html#WLAN">FreeBSD 9:n julkistettujen laitteiden tiedot</a>.</p>
+<div class="box-info">Nykyisin vain PCI-, PCI-X-, PCI-Express-, Mini PCI-, ja Mini PCI-Express-laitteiden otaksutaan toimivan.<br />
+PCMCIA-, CardBus-, ExpressCard-, USB- ja ISA-laitteet tarvitsevat vielä työtä tullakseen toimiviksi.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="firmware" name="firmware">Kuinka tuettu laitteisto saadaan toimimaan</a></h2>
+<p>Vieläpä kun ensimmäinen estä yleisesti tuetulle laitteistolle on otettu, niin jotkut langattomat verkkokortit vaativat binaarimikro-ohjelmistomoduuleja toimiakseen oikein. Haiku ei voi sisällyttää joitakin näitä yksityisomistuksellisia mikro-ohjelmistotiedostoja lisenssointiehtojen vuoksi. Haiku sisältää kuitenkin joitakin skriptejä, jotka noutavat ja asentavat kaikki tarvittavat yksityisoikeudelliset palaset sinulle. Jos suunnittelet langatonta verkko, on yleensä hyvä ajatus suorittaa nämä skriptit, jotta varmistut, että järjestelmässäsi on kaikki nämä tarvitsemasi tarvittavat mikro-ohjelmistot käytettävissä.</p>
+<p>Avaa Pääteikkuna ja kirjoita:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>Katselmoi nyt lisenssit ja hyväksy ne, jotta voit asentaa kaikki tarvittavat mikro-ohjelmistotiedostot.</p>
+
+<p>Jos sinulla ei ole Haikussa pääsyä internettiin puuttuvien mikro-ohjelmistotiedostojen lataamiseksi, on olemassa erillismenetelmä, katso <a href="#tips">Vihjeet</a> alla.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="gui" name="gui">Langattomaan verkkoon liittyminen</a></h2>
+<p>Oletuksena Haiku liittyy ensimmäiseen salaamattomaan verkkoon, jonka se löytää alkulatauksen jälken. Jotta voisit yhdistää tiettyyn verkkoon, käytä Työpöytä-sovelmaa <a href="desktop-applets/networkstatus.html">Verkkotila</a>.</p>
+<p>Napsauta sen kuvaketta Työpöytäpalkissa ja valitse verkon julkinen nimi (joka on "SSID", jonka se lähettää) asiayhteysvalikosta.</p>
+<img src="images/workshop-wlan-images/join-network.png" alt="join-network.png" />
+<p>Avautuu ikkuna, johon voit kirjoittaa todennustyypin (luultavasti WPA/WPA2, WEP ei ole enää turvallinen salausmenetelmä!) ja salasanan tuolle langattomalle verkolle. Napsauta <span class="button">Valmis</span>-painiketta kirjautumisprosessin käynnistämiseksi.<br /> Laitteistostasi ja verkkoasetuksistasi riippuen tämä voi kestää hetken. Saat tiedon edistymisestä ilmoituksilla:</p>
+<img src="images/workshop-wlan-images/join-status.gif" alt="join-network.gif" />
+<p>Jos ilmoitusikkunassa lukee "Ready" ja Verkkotilakuvake Työpöytäpalkissa näyttää vihreää pyöreää valoa, yhteys on perustettu. Jos ilmoitusikkunassa näkyy teksti "No link" ja keltainen kolmio, jotain meni väärin, luultavasti salasana oli väärä.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="commandline" name="commandline">Liittyminen komentoriviltä</a></h2>
+<p>Jos komentorivin käyttö tuntuu paremmalta tai haluaisit käyttää skriptausta tai <span class="path">~/config/boot/UserBootscript</span>-skriptiä liittyäksesi automaattisesti tiettyyn verkkoon alkulatauksen yhteydessä, sitä varten on komento <tt>ifconfig</tt>.</p>
+<p>Käynnistä Pääteikkuna ja kirjoita ensimmäinen rivi, jolla käynnistät käytettävissä olevien langattomien  verkkojen etsinnän:</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
+name                             address              signal  auth
+haiku-top                        01:d0:19:a6:88:42        30  WPA
+ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
+<p>Polku langattomaan verkkosovittimeesi on tietysti säädettävä.<br />
+Tulostus näyttää julkisen nimen (SSID), MAC-osoitteen, signaalivoimakkuuden ja todentamismenetelmän kaikissa löydetyissä verkoissa.</p>
+<p>Kätä tätä riviä verkkoonliittymisessä ja lisää vastaava julkinen nimi (SSID) ja salasana:</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join {SSID} {salasana}</pre>
+<p>Varmista, että langattoman verkon sovittimen alustava asetus on valmis ennen komennon <tt>ifconfig</tt> antamsta tai ne ohitetaan. Laitteistostasi ja verkkoasetuksistasi riippuen tämä voi kestää hetken. Katso noita ilmoituksia...</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">Vihjeet</a></h2>
+<ul><li><p>Tässä kerrotaan, kuinka voit asentaa mikro-ohjelmiston, jos et vielä ole saanut toimivaa internet-yhteyttä Haikussa. Lataa tiedostot jossain toisessa käyttöjärjestelmässä, alkulataa Haiku, kopioi tiedostot vastaaviin sijainteihin ja kutsu skriptiä <span class="cli">install-wifi-firmwares.sh</span>.</p>
+
+<ul>
+<li><p>Kopioi nämä kaksi kohteeseen <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/</span>:<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2">http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2</a><br />
+		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h</a></p>
+</li>
+<li><p>Kopioi tämä kohteeseen <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/bits</span>:<br />
+		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h</a></p>
+</li>
+<li><p>Kopioi tämä kohteeseen <span class="path">/boot/system/data/firmware/broadcom43xx/</span>:<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o">http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o</a></p>
+</li>
+<li><p>Kopioi tämä kohteeseen <span class="path">/boot/system/data/firmware/marvell88w8335/</span>:<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz">http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz</a></p>
+</li>
+</ul>
+<p>Kun kaikki nuo tiedostot ovat paikoillaan, etene kuten on kuvailtu yllä, ts. avaa Pääteikkuna ja kirjoita:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>Katselmoi lisenssit ja hyväksy ne, jotta kaikkien nyt käytettävissä olevien mikro-ohjelmistotiedostojen asentaminen onnistuu.</p>
+</li></ul>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="workshop-email.html">Työpaja: Sähköpostin hallinta</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="applications.html">Sovellukset</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

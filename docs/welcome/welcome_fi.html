@@ -4,23 +4,25 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de> 
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="all" />
-	<title>Welcome to Haiku!</title>
+	<title>Tervetuloa Haikuun!</title>
 	<link rel="stylesheet" type="text/css" href="Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -47,78 +49,92 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#welcome">Tervetuloa Haikuun!</a><br />
+	<a href="#bugreport">Varo ohjelmistovikoja</a><br />
+	<a href="#system">Järjestelmään tutustuminen</a><br />
+	<a href="#software">Lisäohjelmistojen asentaminen</a><br />
+	<a href="#wifi">Wifi-verkot Haikussa</a><br />
+	<a href="#api">Tutustuminen sovellusohjelmointirajapintaan</a><br />
+	<a href="#contact">Yhteydenotot</a></td></tr>
+</table>
 
 <h2>
-<a id="welcome" name="welcome">Welcome to Haiku!</a></h2>
-<p>Thank you very much for checking out Haiku! This is our third public release. We hope to attract new developers to our project and give future users a chance to check out Haiku. We realize that this <i>alpha release</i> does not yet fully live up to the goals that we have set for ourselves and doesn't offer all the features and well-rounded end-user experience planned for the final R1 version. However, we hope that this release lets you discover Haiku's great potential and that you share our excitement.</p>
+<a id="welcome" name="welcome">Tervetuloa Haikuun!</a></h2>
+<p>Kiitoksia oikein paljon, että latasit Haiku-käyttöjärjestelmän! Tämä on kolmas julkinen julkaisumme. Toivomme houkuttelevamme uusia kehittäjiä hankkeeseemme ja antavamme tuleville käyttäjillä mahdollisuuden tutustua Haikuun. Tiedämme, että tämä <i>alfa-julkaisu</i> ei vielä täytä niitä odotuksia, jotka olemme asettaneet itsellemme ja se ei tarjoa kaikkia ominaisuuksia ja lopullisen R1-version täysiä käyttäjäkokemuksia. Toivomme kuitenkin, että tämä julkaisu antaa sinulle mahdollisuuden löytää Haikun suuren potentiaalin ja että jaat meidän innostuksemme.</p>
+<p>Vieraile projektimme kotisivulla <a hrf="http://www.haiku-os.org">Haiku-os.org</a> saadaksesi viimeisimmät uutiset ja tiedonannot.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bugreport" name="bugreport">Beware of Bugs</a></h2>
-<p>We have been working hard to fix all possibly show stopping bugs, however, being an alpha release, there are bound to be plenty left undiscovered.</p>
-<div class="box-warning">We discourage using alpha versions as a production system. Your data could very well be altered, mangled or downright destroyed.</div>
+<a id="bugreport" name="bugreport">Varo ohjelmistovikoja</a></h2>
+<p>Olemme työskennelleet kovasti korjataksemme kaikki mahdolliset esityksen pysäyttävät viat, mutta kuitenkin tämä on ohjelmiston alfa-julkaisu, ja siinä on jäljellä runsaasti löytämättömiä vikoja</p>
+<div class="box-warning">Emme suosittele käyttämään alfa-versioita tuotantojärjestelmänä. Tietosi voivat aivan hyvin muuttua, vääristyä tai suorastaan tuhoutua.</div>
 
-<p>One of the main reasons for releasing an alpha version is to attract more people to test the system and discover bugs or provide suggestions for future enhancements. Please file bugs and enhancements in our bug tracker after using its search function to avoid duplicates.</p>
+<p>Yksi pääsyy alfa-versioiden julkaisemiseen on houkutella lisää ihmisiä järjestelmän testaamiseen ja vikojen havaitsemiseen tai tarjota ehdotuksia tulevista laajennuksista. Ilmoita vioista ja laajennuksista  vikaseuraajajärjestelmässämme sen jälkeen kun olet käyttänyt sen etsintätoimintoa kaksoiskappaleilmoitusten estämiseksi.</p>
 <ul>
-	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Haiku Bug Tracker</a></li>
-	<li><a href="fi/bugreports.html">Tips for a helpful bug report</a></li>
+	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Haiku-vikaseuraaja</a></li>
+	<li><a href="fi/bugreports.html">Vihjeitä hyödyllisiä vikailmoituksia varten</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">Getting to know the system</a></h2>
-<p>The first release(s) of Haiku will be very much like the BeOS R5, the operating system it is reimplementing. If you never experienced it, have a look at these links:</p>
+<a id="system" name="system">Järjestelmään tutustuminen</a></h2>
+<p>Haikun ensimmäiset julkaisut ovat paljolti kuin BeOS R5, käyttöjärjestelmän uudelleentoteutus. Jos et ole koskaan kokenut sitä, vilkaise näitä linkkejä:</p>
 <ul>
-	<li><a href="../userguide/fi/contents.html">Haiku User Guide</a></li>
-	<li><a href="http://www.haiku-os.org/community/" class="printurl">List of BeOS/Haiku websites</a></li>
+	<li><a href="../userguide/fi/contents.html">Haiku-käyttäjäopas</a></li>
+	<li><a href="http://www.haiku-os.org/community/" class="printurl">BeOS/Haiku -webbisivustojen luettelo</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="software">Installing more software</a></h2>
-<p>Because of our binary and source compatibility, many BeOS applications run on Haiku (you may have to install the optional package "beoscompatibility" for some programs, see below). After downloading a package, simply unzip it (double clicking opens <span class="app">Expander</span>) to <span class="path">/boot/apps/</span> and start the application from there.</p>
+<a id="software" name="software">Lisäohjelmistojen asentaminen</a></h2>
+<p>Binaari- ja lähdekoodiyhteensopivuuden vuoksi monia BeOS-sovelluksia voidaan suorittaa Haikussa (sinun on ehkä asennettava valinnainen paketti ”beoscompatibility” joitakin ohjelmia varten, katso alla). Yksinkertaisesti pura pakkaus latauksen jälkeen (hiiren kaksoisnapsautus avaa <span class="app">Laajentaja</span>n) kansioon <span class="path">/boot/apps/</span> ja käynnistä sovellus sieltä.</p>
 
-<p>Popular software repositories are:</p>
+<p>Suosittuja ohjelmistovarastoja ovat:</p>
 <ul>
 	<li><a href="http://www.haikuware.com" class="printurl">Haikuware</a></li>
 	<li><a href="http://www.bebits.com" class="printurl">BeBits</a></li>
-	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - maintains patches for ported software</li>
-	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - hosts native BeOS and Haiku open source software projects</li>
+	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - ylläpitää siirretyn ohjelmiston korjauksia</li>
+	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - ylläpitää aitoja BeOS- ja Haiku open source -ohjelmistohankkeita</li>
 </ul>
 
-<p>There are also so-called Optional Packages, which are used by Haiku's build system. It is not intended for end users to manually extract and install them. Instead, a utility script is provided, <tt>installoptionalpackage</tt>. This script is meant to bridge the gap while Haiku's package management is still under construction. It will allow you to install most of the available Optional Packages.<br />
-You'll have to run a command in Terminal: <tt>installoptionalpackage -h</tt> explains its usage.</p>
+<p>Haikun rakentamisjärjestelmässä käytetään myös niin sanottuja valinnaisia pakkauksia. Ei ole tarkoitus, että loppukäyttäjät manuaalisesti purkavat ja asentavat pakkaukset. Sen sijaan tarkoitusta varten on apuohjelmaskripti <tt>installoptionalpackage</tt>. Tämän skriptin tarkoitus on täyttää aukko, joka johtuu siitä, että Haikun pakettihallinta on vielä suunnitteilla. Skripti sallii sinun asentaa useimmat saatavilla olevat valinnaiset pakkaukset.<br />Sinun on suoritettava komento Pääteikkunassa: <tt>installoptionalpackage -h</tt> selittää sen käytön.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="wifi">Wifi in Haiku</a></h2>
-<p>Wifi does work to some extent. At the moment you can only connect to unencrypted or WEP encrypted wireless networks. Due to several different licensing policies of different vendors, a manual installation process for the firmware may be required. A list of working devices and instructions for installation can be found on our <a href="fi/wifi.html">Wifi</a> page (also <a href="http://www.haiku-os.org/guides/wifi">online</a>).</p> 
+<a id="software" name="wifi">Wifi-verkot Haikussa</a></h2>
+<p>Haiku supports wireless networks that are WPA/WPA2 or WEP encrypted and of course open, unencrypted connections. Due to several different licensing policies of different hardware vendors, a manual installation process for the firmware may be required. You'll find more information on supported hardware, firmware installation and how to join a wireless network in the Haiku User Guide's <a href="../userguide/fi/workshop-wlan.html">Workshop: Wireless networking</a>.</p> 
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="api" name="api">Getting to know the API</a></h2>
-<p>Since Haiku is a reimplementation, the API is still the same as for BeOS R5 (with some additions). Therefore the documentation in the Be Book is still a valid resource. Thanks to ACCESS, who owns the rights to former Be Inc. property, we are allowed to provide a copy of the Be Book.</p>
+<a id="api" name="api">Tutustuminen sovellusohjelmointirajapintaan</a></h2>
+<p>Since Haiku is a reimplementation, the API is still the same as for BeOS R5 (with some additions). Therefore the documentation in the Be Book is still a valid resource. Thanks to ACCESS, who owns the rights to former Be Inc. property, we are allowed to provide a copy of the Be Book.<br />
+Deviations from the BeOS API and Haiku specific additions are collected in the Haiku Book.</p>
 
-<p>There are additional resources that should help you getting started:</p>
+<p>There are some resources that should help you getting started:</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">Development FAQ</a></li>
-	<li><a href="http://dev.haiku-os.org/browser/" class="printurl">Source Browser</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">The Be Book</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be Newsletter Archive</a></li>
+	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">Kehitys-UKK</a></li>
+	<li><a href="http://dev.haiku-os.org/browser/" class="printurl">Lähdekoodiselain</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">Be-kirja</a></li>
+	<li><a href="http://api.haiku-os.org" class="printurl">Haiku-kirja</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be-uutiskirjearkisto</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="contact" name="contact">Getting in contact</a></h2>
-<p>Get in contact with other developers and users and join the discussions on IRC, in our forums or the mailing lists. When many different people come together, rules have to established to keep communication effective. Please respect our <a href="http://www.haiku-os.org/community/ml/etiquette">Mailing List Etiquette</a>.</p>
+<a id="contact" name="contact">Yhteydenotot</a></h2>
+<p>Get in contact with other developers and users and join the discussions on IRC (<a href="http://webchat.freenode.net/?channels=haiku">#haiku</a> on webchat), in our forums or the mailing lists. When many different people come together, rules have to established to keep communication effective. Please respect our <a href="http://www.haiku-os.org/community/ml/etiquette">Mailing List Etiquette</a>.</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">IRC channels</a></li>
-	<li><a href="http://www.haiku-os.org/forum" class="printurl">Forums</a></li>
-	<li><a href="http://www.freelists.org/list/haiku" class="printurl">General mailing list</a></li>
-	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">Development mailing list concerning Haiku itself</a></li>
-	<li><a href="http://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Mailing list for 3rd party application programmers</a></li>
-	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">Overview of all mailing lists</a></li>
+	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">IRC-kanavat</a></li>
+	<li><a href="http://www.haiku-os.org/forum" class="printurl">Foorumit</a></li>
+	<li><a href="http://www.freelists.org/list/haiku" class="printurl">Yleinen sähköpostilista</a></li>
+	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">Haikua itseä koskeva kehityssähköpostilista</a></li>
+	<li><a href="http://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Kolmannen osapuolen sovellusohjelmoijien sähköpostilista</a></li>
+	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">Kaikkien sähköpostilistojen yleiskatsaus</a></li>
 </ul>
 
 </div>

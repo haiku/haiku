@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,21 +57,40 @@
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
-<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span></td></tr>
+<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
+<span class="path">~/config/settings/system/app_server/decorator_settings</span><br />
+<span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
 <p>Les préférences d'Apparence vous permettent de changer certaines caractéristiques visuelles de Haiku.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="fonts" name="fonts">Polices</a></h2>
+<img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
+<p>Haiku défini trois polices standards selon les besoins. Ainsi, vous choisissez les types de polices pour les styles simple, gras et fixe avec la taille qui sera utilisée dans tout le système. De plus, vous disposez aussi d'un réglage séparé de la police utilisée dans les menus.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="installing_fonts" name="installing_fonts">Installer de nouvelles polices</a></h3>
+<p>Vous installez de nouvelles polices en les copiant dans leurs dossiers utilisateurs respectifs, i.e. <span class="path">/boot/common/data/fonts/</span> ou <span class="path">/boot/home/config/data/fonts/</span> (Voir le sujet sur la <a href="../filesystem-layout.html">structure du système de fichiers</a>).</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Couleurs</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>Dans le premier onglet, <span class="menu">Couleurs</span>, vous pouvez régler les couleurs de différentes parties de l'interface utilisateur. La palette de couleurs accepte les glisser-déposer de couleurs depuis d'autres programmes, ce qui vous permettra de glisser des couleurs depuis par exemple <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span>, ou les préférences <span class="app">Backgrounds</span>.</p>
+<p>Dans l'onglet, <span class="menu">Couleurs</span>, vous pouvez modifier les couleurs de différents éléments de l'interface utilisateur. La palette de couleurs accepte les glisser-déposer de couleurs depuis d'autres programmes, ce qui vous permettra de glisser des couleurs depuis par exemple <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span>, ou les préférences <span class="app">Backgrounds</span>.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="decorators" name="decorators">Décorateurs de fenêtres</a></h2>
+<img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
+<p>les décorateurs déterminent l'apparence et le comportement des fenêtres de tous les éléments d'interface graphique. Actuellement Haiku est livré avec le seul décorateur par défaut. Si vous trouver et installer d'autres décorateurs, vous pouvez en choisir un dans la liste déroulante.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="antialiasing" name="antialiasing">Lissage</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>Le deuxième onglet, <span class="menu">Lissage</span>, permet de régler la manière dont les éléments graphiques sont rendus à l'écran.</p>
+<p>L'onglet <span class="menu">Lissage</span>, permet de régler la manière de dessiner les choses à l'écran.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
