@@ -75,7 +75,7 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = vesa ;
 SYSTEM_ADD_ONS_DRIVERS_NET = 3com atheros813x ar81xx attansic_l1 attansic_l2
 	broadcom440x broadcom570x dec21xxx etherpci ipro100 ipro1000 jmicron2x0
 	marvell_yukon nforce pcnet pegasus rtl8139 rtl81xx sis19x syskonnect
-	via_rhine
+	via_rhine wb840
 ;
 
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci ps2 isa scsi config_manager

@@ -539,7 +539,7 @@ wb_create_rings(wb_device* device)
 		return device->rxArea;
 
 	for (i = 1; i < WB_RX_LIST_CNT; i++) {
-		device->rxBuffer[i] = (void*)(((uint32)device->rxBuffer[0])
+		device->rxBuffer[i] = (void*)(((addr_t)device->rxBuffer[0])
 			+ (i * WB_BUFBYTES));
 	}
 
@@ -567,7 +567,7 @@ wb_create_rings(wb_device* device)
 	}
 
 	for (i = 1; i < WB_TX_LIST_CNT; i++) {
-		device->txBuffer[i] = (void*)(((uint32)device->txBuffer[0])
+		device->txBuffer[i] = (void*)(((addr_t)device->txBuffer[0])
 			+ (i * WB_BUFBYTES));
 	}
 
