@@ -11,8 +11,6 @@
 #include <View.h>
 
 
-const int32 kAboutWindowClosed = 'abwc';
-
 class AboutView;
 class BPoint;
 class BHandler;

@@ -426,6 +426,13 @@ ProcessController::MessageReceived(BMessage *message)
 		}
 
 		case B_ABOUT_REQUESTED:
+		{
+			bool quit = false;
+			if (message->FindBool("quit", &quit) == B_OK && quit) {
+				fAboutWindow = NULL;
+				break;
+			}
+
 			if (fAboutWindow == NULL) {
 				const char* extraCopyrights[] = {
 					"1997-2001 Georges-Edouard Berenger",
@@ -446,10 +453,7 @@ ProcessController::MessageReceived(BMessage *message)
 				fAboutWindow->Activate();
 
 			break;
-
-		case kAboutWindowClosed:
-			fAboutWindow = NULL;
-			break;
+		}
 
 		default:
 			BView::MessageReceived(message);

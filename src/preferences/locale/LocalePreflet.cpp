@@ -73,6 +73,13 @@ LocalePreflet::MessageReceived(BMessage* message)
 			break;
 
 		case B_ABOUT_REQUESTED:
+		{
+			bool quit = false;
+			if (message->FindBool("quit", &quit) == B_OK && quit) {
+				fAboutWindow = NULL;
+				break;
+			}
+
 			if (fAboutWindow == NULL) {
 				const char* authors[] = {
 					"Axel Dörfler",
@@ -89,10 +96,7 @@ LocalePreflet::MessageReceived(BMessage* message)
 				fAboutWindow->Activate();
 
 			break;
-
-		case kAboutWindowClosed:
-			fAboutWindow = NULL;
-			break;
+		}
 
 		default:
 			BApplication::MessageReceived(message);

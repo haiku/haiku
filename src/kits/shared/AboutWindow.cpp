@@ -248,8 +248,12 @@ BAboutWindow::QuitRequested()
 	if (fCaller != NULL) {
 		status_t status;
 		BMessenger messenger(fCaller, NULL, &status);
-		if (status == B_OK && messenger.IsValid())
-			messenger.SendMessage(new BMessage(kAboutWindowClosed));
+		if (status == B_OK && messenger.IsValid()) {
+			BMessage* message = new BMessage(B_ABOUT_REQUESTED);
+			message->AddBool("quit", true);
+			messenger.SendMessage(message);
+			delete message;
+		}
 	}
 
 	return true;

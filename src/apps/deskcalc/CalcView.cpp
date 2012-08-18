@@ -270,6 +270,13 @@ CalcView::MessageReceived(BMessage* message)
 
 			// (replicant) about box requested
 			case B_ABOUT_REQUESTED:
+			{
+				bool quit = false;
+				if (message->FindBool("quit", &quit) == B_OK && quit) {
+					fAboutWindow = NULL;
+					break;
+				}
+
 				if (fAboutWindow == NULL) {
 					// create the about window
 					const char* extraCopyrights[] = {
@@ -285,10 +292,7 @@ CalcView::MessageReceived(BMessage* message)
 					fAboutWindow->Activate();
 
 				break;
-
-			case kAboutWindowClosed:
-				fAboutWindow = NULL;
-				break;
+			}
 
 			case MSG_UNFLASH_KEY:
 			{

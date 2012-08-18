@@ -1112,6 +1112,13 @@ ActivityView::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
+		{
+			bool quit = false;
+			if (message->FindBool("quit", &quit) == B_OK && quit) {
+				fAboutWindow = NULL;
+				break;
+			}
+
 			if (fAboutWindow == NULL) {
 				fAboutWindow = new BAboutWindow(this, kAppName, kSignature);
 				fAboutWindow->AddCopyright(2008, "Haiku, Inc.");
@@ -1120,10 +1127,7 @@ ActivityView::MessageReceived(BMessage* message)
 				fAboutWindow->Activate();
 
 			break;
-
-		case kAboutWindowClosed:
-			fAboutWindow = NULL;
-			break;
+		}
 
 		case kMsgUpdateResolution:
 		{
