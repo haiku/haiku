@@ -822,7 +822,7 @@ static void
 ndp_timer(struct net_timer* timer, void* data)
 {
 	ndp_entry* entry = (ndp_entry*)data;
-	TRACE(("NDP timer %ld, entry %p!\n", entry->timer_state, entry));
+	TRACE(("NDP timer %" B_PRId32 ", entry %p!\n", entry->timer_state, entry));
 
 	switch (entry->timer_state) {
 		case NDP_NO_STATE:
