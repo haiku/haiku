@@ -157,7 +157,7 @@ HIDReport::SetReport(status_t status, uint8 *report, size_t length)
 	fReportStatus = status;
 	fCurrentReport = report;
 	if (status == B_OK && length * 8 < fReportSize) {
-		TRACE_ALWAYS("report of %lu bits too small, expected %lu bits\n",
+		TRACE_ALWAYS("report of %lu bits too small, expected %" B_PRIu32 " bits\n",
 			length * 8, fReportSize);
 		fReportStatus = B_ERROR;
 	}
@@ -276,10 +276,10 @@ HIDReport::PrintToStream()
 
 	TRACE_ALWAYS("\ttype: %u %s\n", fType, typeName);
 	TRACE_ALWAYS("\treport id: %u\n", fReportID);
-	TRACE_ALWAYS("\treport size: %lu bits = %lu bytes\n", fReportSize,
-		(fReportSize + 7) / 8);
+	TRACE_ALWAYS("\treport size: %" B_PRIu32 " bits = %" B_PRIu32 " bytes\n",
+		fReportSize, (fReportSize + 7) / 8);
 
-	TRACE_ALWAYS("\titem count: %lu\n", fItemsUsed);
+	TRACE_ALWAYS("\titem count: %" B_PRIu32 "\n", fItemsUsed);
 	for (uint32 i = 0; i < fItemsUsed; i++) {
 		HIDReportItem *item = fItems[i];
 		if (item != NULL)
