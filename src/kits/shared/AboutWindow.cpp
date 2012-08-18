@@ -112,7 +112,7 @@ StripeView::Draw(BRect updateRect)
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	DrawBitmapAsync(fIcon, BPoint(31.0, 5.0));
+	DrawBitmapAsync(fIcon, BPoint(15.0f, 10.0f));
 }
 
 
@@ -194,6 +194,31 @@ AboutView::AppVersion(const char* signature)
 		appVersion << " " << versionInfo.major << "." << versionInfo.middle;
 		if (versionInfo.minor > 0)
 			appVersion << "." << versionInfo.minor;
+
+		// Add the version variety
+		const char* variety = NULL;
+		switch (versionInfo.variety) {
+			case B_DEVELOPMENT_VERSION:
+				variety = B_TRANSLATE_MARK("development");
+				break;
+			case B_ALPHA_VERSION:
+				variety = B_TRANSLATE_MARK("alpha");
+				break;
+			case B_BETA_VERSION:
+				variety = B_TRANSLATE_MARK("beta");
+				break;
+			case B_GAMMA_VERSION:
+				variety = B_TRANSLATE_MARK("gamma");
+				break;
+			case B_GOLDEN_MASTER_VERSION:
+				variety = B_TRANSLATE_MARK("gold master");
+				break;
+		}
+
+		if (variety != NULL) {
+			variety = gSystemCatalog.GetString(variety, "AboutWindow");
+			appVersion << "-" << variety;
+		}
 
 		return appVersion.String();
 	}
