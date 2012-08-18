@@ -172,11 +172,11 @@ AboutView::AppVersion(const char* signature)
 	if (signature == NULL)
 		return NULL;
 
-	app_info appInfo;
-	if (be_roster->GetAppInfo(signature, &appInfo) != B_OK)
+	entry_ref ref;
+	if (be_roster->FindApp(signature, &ref) != B_OK)
 		return NULL;
 
-	BFile file(&appInfo.ref, B_READ_ONLY);
+	BFile file(&ref, B_READ_ONLY);
 	BAppFileInfo appMime(&file);
 	if (appMime.InitCheck() != B_OK)
 		return NULL;
@@ -212,8 +212,13 @@ AboutView::AppIcon(const char* signature)
 	if (be_roster->FindApp(signature, &ref) != B_OK)
 		return NULL;
 
+	BFile file(&ref, B_READ_ONLY);
+	BAppFileInfo appMime(&file);
+	if (appMime.InitCheck() != B_OK)
+		return NULL;
+
 	BBitmap* icon = new BBitmap(BRect(0.0, 0.0, 127.0, 127.0), B_RGBA32);
-	if (BNodeInfo::GetTrackerIcon(&ref, icon, (icon_size)128) == B_OK)
+	if (appMime.GetIcon(icon, (icon_size)128) == B_OK)
 		return icon;
 
 	delete icon;
