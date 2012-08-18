@@ -23,6 +23,7 @@ class BAboutWindow : public BWindow {
 
 	virtual	bool			QuitRequested();
 
+			BPoint			AboutPosition(float width, float height);
 			void			AddDescription(const char* description);
 			void			AddCopyright(int32 firstCopyrightYear,
 								const char* copyrightHolder,
@@ -31,8 +32,6 @@ class BAboutWindow : public BWindow {
 			void			AddSpecialThanks(const char** thanks);
 			void			AddVersionHistory(const char** history);
 			void			AddExtraInfo(const char* extraInfo);
-
-			BPoint			AboutPosition(float width, float height);
 
  private:
 			AboutView*		fAboutView;
