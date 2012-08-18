@@ -257,14 +257,17 @@ standard_gcc_settings()
 		;;
 	esac
 
-	if [ "$targetArch" = "x86_64" ]; then
-		# Boot loader is 32-bit, need the 32-bit libs.
-		HAIKU_BOOT_LIBGCC=`$HAIKU_CC -m32 -print-libgcc-file-name`
-		HAIKU_BOOT_LIBSUPCXX=`$HAIKU_CC -m32 -print-file-name=libsupc++.a`
-	else
-		HAIKU_BOOT_LIBGCC=$HAIKU_GCC_LIBGCC
-		HAIKU_BOOT_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
-	fi
+	case $HAIKU_GCC_MACHINE in
+		x86_64-*)
+			# Boot loader is 32-bit, need the 32-bit libs.
+			HAIKU_BOOT_LIBGCC=`$HAIKU_CC -m32 -print-libgcc-file-name`
+			HAIKU_BOOT_LIBSUPCXX=`$HAIKU_CC -m32 -print-file-name=libsupc++.a`
+		;;
+		*)
+			HAIKU_BOOT_LIBGCC=$HAIKU_GCC_LIBGCC
+			HAIKU_BOOT_LIBSUPCXX=$HAIKU_STATIC_LIBSUPCXX
+		;;
+	esac
 }
 
 # set_default_value
