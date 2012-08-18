@@ -34,9 +34,6 @@ class BAboutWindow : public BWindow {
 
 			BPoint			AboutPosition(float width, float height);
 
- protected:
-			void			_Init(const char* appName, const char* signature);
-
  private:
 			AboutView*		fAboutView;
 			BHandler*		fCaller;

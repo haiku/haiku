@@ -259,7 +259,19 @@ BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	_Init(appName, signature);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+
+	const char* about = B_TRANSLATE_MARK("About");
+	about = gSystemCatalog.GetString(about, "AboutWindow");
+
+	BString title(about);
+	title << " " << appName;
+	SetTitle(title.String());
+
+	fAboutView = new AboutView(appName, signature);
+	AddChild(fAboutView);
+
+	MoveTo(AboutPosition(Frame().Width(), Frame().Height()));
 }
 
 
@@ -452,26 +464,4 @@ BAboutWindow::AboutPosition(float width, float height)
 		- ceil(height / 3.0);
 
 	return result;
-}
-
-
-//	#pragma mark -
-
-
-void
-BAboutWindow::_Init(const char* appName, const char* signature)
-{
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	const char* about = B_TRANSLATE_MARK("About");
-	about = gSystemCatalog.GetString(about, "AboutWindow");
-
-	BString title(about);
-	title << " " << appName;
-	SetTitle(title.String());
-
-	fAboutView = new AboutView(appName, signature);
-	AddChild(fAboutView);
-
-	MoveTo(AboutPosition(Frame().Width(), Frame().Height()));
 }
