@@ -1934,7 +1934,7 @@ TRoster::_LoadRosterSettings(const char* path)
 						char app[B_PATH_NAME_LENGTH];
 						char rank[B_PATH_NAME_LENGTH];
 						entry_ref ref;
-						uint32 index = 0;
+						ulong index = 0;
 
 						// Convert the given path to an entry ref
 						streamError = stream.GetString(path);
