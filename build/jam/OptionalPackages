@@ -777,7 +777,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 			m4-1.4.16-x86_64-2012-08-12.zip
 			: $(baseURL)/m4-1.4.16-x86_64-2012-08-12.zip ;
 		InstallOptionalHaikuImagePackage
-			flex-2.5.35-x86_64-2012-08-12.zip
+			flex-2.5.35-x86_64-2012-08-18.zip
 			: $(baseURL)/flex-2.5.35-x86_64-2012-08-12.zip ;
 		InstallOptionalHaikuImagePackage
 			jam-2.5-x86_64-2012-08-12.zip
