@@ -3504,7 +3504,7 @@ DCRaw::Identify()
 	if (fMeta.maximum == 0)
 		fMeta.maximum = (1 << _Raw().bits_per_sample) - 1;
 
-	if (fFilters == ~0UL)
+	if (fFilters == ~(uint32)0)
 		fFilters = 0x94949494;
 	if (fFilters && fColors == 3) {
 		for (int32 i = 0; i < 32; i += 4) {
