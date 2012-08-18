@@ -601,7 +601,9 @@ ActivityView::~ActivityView()
 	delete fOffscreen;
 	delete fSystemInfoHandler;
 
-	fAboutWindow->Quit();
+	// replicant deleted, destroy the about window
+	if (fAboutWindow != NULL)
+		fAboutWindow->Quit();
 }
 
 
@@ -617,9 +619,6 @@ ActivityView::_Init(const BMessage* settings)
 	fLegendLayoutItem = NULL;
 #endif
 	SetViewColor(B_TRANSPARENT_COLOR);
-
-	fAboutWindow = new BAboutWindow(kAppName, kSignature);
-	fAboutWindow->AddCopyright(2008, "Haiku, Inc.");
 
 	fLastRefresh = 0;
 	fDrawResolution = 1;
@@ -648,6 +647,8 @@ ActivityView::_Init(const BMessage* settings)
 	const char* name;
 	for (int32 i = 0; settings->FindString("source", i, &name) == B_OK; i++)
 		AddDataSource(DataSource::FindSource(name), settings);
+
+	fAboutWindow = NULL;
 }
 
 
@@ -1111,7 +1112,17 @@ ActivityView::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
-			fAboutWindow->Show();
+			if (fAboutWindow == NULL) {
+				fAboutWindow = new BAboutWindow(this, kAppName, kSignature);
+				fAboutWindow->AddCopyright(2008, "Haiku, Inc.");
+				fAboutWindow->Show();
+			} else
+				fAboutWindow->Activate();
+
+			break;
+
+		case kAboutWindowClosed:
+			fAboutWindow = NULL;
 			break;
 
 		case kMsgUpdateResolution:

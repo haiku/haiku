@@ -11,16 +11,16 @@
 #include <View.h>
 
 
+const int32 kAboutWindowClosed = 'abwc';
+
 class AboutView;
 class BPoint;
+class BHandler;
 
 class BAboutWindow : public BWindow {
  public:
-							BAboutWindow(const char* appName,
-								int32 firstCopyrightYear,
-								const char** authors = NULL,
-								const char* extraInfo = NULL);
-							BAboutWindow(const char* appName, 
+							BAboutWindow(BHandler* handler,
+								const char* appName, 
 								const char* signature);
 	virtual					~BAboutWindow();
 

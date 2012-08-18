@@ -184,7 +184,9 @@ CalcView::~CalcView()
 	delete fOptions;
 	free(fKeypadDescription);
 
-	fAboutWindow->Quit();
+	// replicant deleted, destroy the about window
+	if (fAboutWindow != NULL)
+		fAboutWindow->Quit();
 }
 
 
@@ -268,7 +270,24 @@ CalcView::MessageReceived(BMessage* message)
 
 			// (replicant) about box requested
 			case B_ABOUT_REQUESTED:
-				fAboutWindow->Show();
+				if (fAboutWindow == NULL) {
+					// create the about window
+					const char* extraCopyrights[] = {
+						"1997, 1998 R3 Software Ltd.",
+						NULL
+					};
+
+					fAboutWindow = new BAboutWindow(this, kAppName, kSignature);
+					fAboutWindow->AddCopyright(2006, "Haiku, Inc.",
+						extraCopyrights);
+					fAboutWindow->Show();
+				} else
+					fAboutWindow->Activate();
+
+				break;
+
+			case kAboutWindowClosed:
+				fAboutWindow = NULL;
 				break;
 
 			case MSG_UNFLASH_KEY:
@@ -971,16 +990,6 @@ CalcView::SetKeypadMode(uint8 mode)
 void
 CalcView::_Init(BMessage* settings)
 {
-	// create the about window
-	const char* extraCopyrights[] = {
-		"1997, 1998 R3 Software Ltd.",
-		NULL
-	};
-
-	fAboutWindow = new BAboutWindow(kAppName, kSignature);
-	fAboutWindow->AddCopyright(2006, "Haiku, Inc.",
-		extraCopyrights);
-
 	// create expression text view
 	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
 	AddChild(fExpressionTextView);
@@ -991,6 +1000,7 @@ CalcView::_Init(BMessage* settings)
 	// fetch the calc icon for compact view
 	_FetchAppIcon(fCalcIcon);
 
+	fAboutWindow = NULL;
 }
 
 

@@ -204,6 +204,10 @@ ProcessController::~ProcessController()
 
 	delete fMessageRunner;
 	gPCView = NULL;
+
+	// replicant deleted, destroy the about window
+	if (fAboutWindow != NULL)
+		fAboutWindow->Quit();
 }
 
 
@@ -217,10 +221,11 @@ ProcessController::Init()
 	memset(fCPUTimes, 0, sizeof(fCPUTimes));
 	memset(fPrevActive, 0, sizeof(fPrevActive));
 	fPrevTime = 0;
+	fAboutWindow = NULL;
 }
 
 
-ProcessController *
+ProcessController*
 ProcessController::Instantiate(BMessage *data)
 {
 	if (!validate_instantiation(data, kClassName))
@@ -421,27 +426,34 @@ ProcessController::MessageReceived(BMessage *message)
 		}
 
 		case B_ABOUT_REQUESTED:
-			AboutRequested();
+			if (fAboutWindow == NULL) {
+				const char* extraCopyrights[] = {
+					"1997-2001 Georges-Edouard Berenger",
+					NULL
+				};
+
+				const char* authors[] = {
+					"Georges-Edouard Berenger",
+					NULL
+				};
+
+				fAboutWindow = new BAboutWindow(this,
+					B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
+				fAboutWindow->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
+				fAboutWindow->AddAuthors(authors);
+				fAboutWindow->Show();
+			} else
+				fAboutWindow->Activate();
+
+			break;
+
+		case kAboutWindowClosed:
+			fAboutWindow = NULL;
 			break;
 
 		default:
 			BView::MessageReceived(message);
 	}
-}
-
-
-void
-ProcessController::AboutRequested()
-{
-	const char* authors[] = {
-		"Georges-Edouard Berenger",
-		NULL
-	};
-
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("ProcessController"), 2007, authors,
-		"Copyright 1997-2001\n"
-		"Georges-Edouard Berenger.");
-	about.Show();
 }
 
 

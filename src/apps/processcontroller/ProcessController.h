@@ -25,6 +25,7 @@
 #include <View.h>
 
 
+class BAboutWindow;
 class BMessageRunner;
 class ThreadBarMenu;
 
@@ -44,7 +45,6 @@ class ProcessController : public BView {
 		static	ProcessController* Instantiate(BMessage* data);
 		virtual	status_t Archive(BMessage *data, bool deep = true) const;
 
-		void			AboutRequested();
 		void			Update();
 		void			DefaultColors();
 
@@ -58,6 +58,7 @@ class ProcessController : public BView {
 	private:
 		void			Init();
 
+		BAboutWindow*	fAboutWindow;
 		bool			fTemp;
 		float			fMemoryUsage;
 		float			fLastBarHeight[B_MAX_CPU_COUNT];

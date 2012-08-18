@@ -208,27 +208,15 @@ AboutView::AppIcon(const char* signature)
 	if (signature == NULL)
 		return NULL;
 
-	app_info appInfo;
-	if (be_roster->GetAppInfo(signature, &appInfo) != B_OK)
+	entry_ref ref;
+	if (be_roster->FindApp(signature, &ref) != B_OK)
 		return NULL;
 
-	BFile file(&appInfo.ref, B_READ_ONLY);
-	BAppFileInfo appMime(&file);
-	if (appMime.InitCheck() != B_OK)
-		return NULL;
-
-	// fetch the app icon
 	BBitmap* icon = new BBitmap(BRect(0.0, 0.0, 127.0, 127.0), B_RGBA32);
-	if (appMime.GetIcon(icon, B_LARGE_ICON) == B_OK)
+	if (BNodeInfo::GetTrackerIcon(&ref, icon) == B_OK)
 		return icon;
 
-	// couldn't find the app icon
-	// fetch the generic 3 boxes icon
-	BMimeType defaultAppMime;
-	defaultAppMime.SetTo(B_APP_MIME_TYPE);
-	if (defaultAppMime.GetIcon(icon, B_LARGE_ICON) == B_OK)
-		return icon;
-
+	delete icon;
 	return NULL;
 }
 
@@ -236,23 +224,11 @@ AboutView::AppIcon(const char* signature)
 //	#pragma mark -
 
 
-BAboutWindow::BAboutWindow(const char* appName, int32 firstCopyrightYear,
-	const char** authors, const char* extraInfo)
-	:	BWindow(BRect(0.0, 0.0, 200.0, 140.0), appName, B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
-{
-	_Init(appName, NULL);
-	AddCopyright(firstCopyrightYear, "Haiku, Inc.", NULL);
-	AddAuthors(authors);
-	AddExtraInfo(extraInfo);
-}
-
-
-BAboutWindow::BAboutWindow(const char* appName, const char* signature)
+BAboutWindow::BAboutWindow(BHandler* handler, const char* appName, const char* signature)
 	:	BWindow(BRect(0.0, 0.0, 310.0, 140.0), appName, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+			| B_AUTO_UPDATE_SIZE_LIMITS),
+		fCaller(handler)
 {
 	_Init(appName, signature);
 }
@@ -269,10 +245,14 @@ BAboutWindow::~BAboutWindow()
 bool
 BAboutWindow::QuitRequested()
 {
-	while (!IsHidden())
-		Hide();
+	if (fCaller != NULL) {
+		status_t status;
+		BMessenger messenger(fCaller, NULL, &status);
+		if (status == B_OK && messenger.IsValid())
+			messenger.SendMessage(new BMessage(kAboutWindowClosed));
+	}
 
-	return false;
+	return true;
 }
 
 
