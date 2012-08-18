@@ -19,23 +19,23 @@ if $(HAIKU_ATA_STACK) = 1 {
 	IDE_ONLY = "" ;
 }
 
-SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr chgrp chmod
-	chown chroot cksum clear clockconfig cmp collectcatkeys comm compress
-	copyattr cp csplit cut date dd diff diff3 dircolors dirname df du
+SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr checkfs
+	chgrp chmod chown chroot cksum clear clockconfig cmp collectcatkeys comm
+	compress copyattr cp csplit cut date dd diff diff3 dircolors dirname df du
 	dumpcatalog echo eject env error expand expr factor false find finddir
 	fmt fold fortune gawk gdb gzip gzexe getlimits grep groups head hostname id
 	ifconfig <bin>install isvolume join kernel_debugger kill less lessecho
-	lesskey link linkcatkeys listdev ln locale locate logger logname ls md5sum
-	mkdir mkfifo mktemp mount mountvolume mv nl nohup nproc od paste patch
-	pathchk ping pr printenv printf ps ptx pwd rc readlink ReadOnlyBootPrompt
-	rm rmattr rmdir safemode sdiff seq sha1sum shred shuf sleep sort split stat
-	strace stty su sum sync sysinfo tac tail tee test timeout touch tr true
-	truncate tsort tty unexpand uname uniq unlink unmount unzip <bin>updatedb
-	waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip zipcloak
-	<bin>zipgrep zipnote zipsplit zmore znew
+	lesskey link linkcatkeys listdev ln locale locate logger logname ls
+	makebootable md5sum mkdir mkfifo mkfs  mktemp mount mountvolume mv nl
+	nohup nproc od paste patch pathchk ping pr printenv printf ps ptx pwd rc
+	readlink ReadOnlyBootPrompt rm rmattr rmdir safemode sdiff seq sha1sum
+	shred shuf sleep sort split stat strace stty su sum sync sysinfo tac tail
+	tee test timeout touch tr true truncate tsort tty unexpand uname uniq
+	unlink unmount unzip <bin>updatedb waitfor wc wget whoami xargs xres yes
+	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
-SYSTEM_APPS = AboutSystem Terminal ;
+SYSTEM_APPS = AboutSystem DriveSetup Installer Terminal ;
 
 SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
 	Keyboard Keymap Locale Mouse Network Notifications Screen Time Touchpad
@@ -170,7 +170,7 @@ AddDirectoryToHaikuImage home mail out ;
 AddSymlinkToHaikuImage home config : settings/deskbar : be ;
 # Deskbar Application links
 AddDirectoryToHaikuImage home config settings deskbar Applications ;
-DESKBAR_APPLICATIONS = Terminal ;
+DESKBAR_APPLICATIONS = DriveSetup Installer Terminal ;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
 	AddSymlinkToHaikuImage home config settings deskbar Applications
@@ -330,6 +330,9 @@ AddFilesToHaikuImage system add-ons kernel network datalink_protocols
 	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
 AddFilesToHaikuImage system add-ons kernel network protocols
 	: $(SYSTEM_NETWORK_PROTOCOLS) ;
+
+AddFilesToHaikuImage system add-ons disk_systems
+	: <disk_system>intel <disk_system>bfs ;
 
 # create directories that will remain empty
 AddDirectoryToHaikuImage common bin ;

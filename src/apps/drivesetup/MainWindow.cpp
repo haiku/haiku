@@ -518,9 +518,9 @@ void
 MainWindow::_UpdateMenus(BDiskDevice* disk,
 	partition_id selectedPartition, partition_id parentID)
 {
-	while (BMenuItem* item = fFormatMenu->RemoveItem(0L))
+	while (BMenuItem* item = fFormatMenu->RemoveItem((int32)0))
 		delete item;
-	while (BMenuItem* item = fDiskInitMenu->RemoveItem(0L))
+	while (BMenuItem* item = fDiskInitMenu->RemoveItem((int32)0))
 		delete item;
 
 	fCreateMI->SetEnabled(false);

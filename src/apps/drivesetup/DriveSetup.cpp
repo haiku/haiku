@@ -23,7 +23,7 @@
 DriveSetup::DriveSetup()
 	: BApplication("application/x-vnd.Haiku-DriveSetup"),
 	fWindow(NULL),
-	fSettings(0UL)
+	fSettings((uint32)0)
 {
 }
 
