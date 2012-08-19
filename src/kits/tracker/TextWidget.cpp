@@ -381,7 +381,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	textRect.bottom--;
 	textView->SetTextRect(textRect);
 
-	BPoint origin = view->Origin();
+	BPoint origin = view->LeftTop();
 	textRect = view->Bounds();
 
 	bool hitBorder = false;
