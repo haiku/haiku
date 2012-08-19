@@ -180,6 +180,7 @@ struct MulticastStateHash {
 struct ipv6_protocol : net_protocol {
 	ipv6_protocol()
 		:
+		raw(NULL),
 		multicast_filter(this)
 	{
 	}
