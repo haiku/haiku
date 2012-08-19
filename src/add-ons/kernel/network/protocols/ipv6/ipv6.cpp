@@ -184,6 +184,11 @@ struct ipv6_protocol : net_protocol {
 	{
 	}
 
+	~ipv6_protocol()
+	{
+		delete raw;
+	}
+
 	RawSocket	*raw;
 	uint8		service_type;
 	uint8		time_to_live;
@@ -974,8 +979,6 @@ ipv6_uninit_protocol(net_protocol* _protocol)
 {
 	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
 
-	delete protocol->raw;
-	delete protocol->multicast_address;
 	delete protocol;
 	return B_OK;
 }
