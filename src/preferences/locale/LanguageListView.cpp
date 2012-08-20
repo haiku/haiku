@@ -70,6 +70,7 @@ LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
 			color = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
 		else
 			color = owner->ViewColor();
+
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
 		owner->FillRect(frame);
@@ -77,11 +78,19 @@ LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
 		owner->SetLowColor(owner->ViewColor());
 
 	BString text = Text();
-	if (IsEnabled())
-		owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
-	else {
-		owner->SetHighColor(tint_color(owner->LowColor(), B_DARKEN_3_TINT));
+	if (!IsEnabled()) {
+		rgb_color textColor = ui_color(B_MENU_ITEM_TEXT_COLOR);
+		if (textColor.red + textColor.green + textColor.blue > 128 * 3)
+			owner->SetHighColor(tint_color(textColor, B_DARKEN_2_TINT));
+		else
+			owner->SetHighColor(tint_color(textColor, B_LIGHTEN_2_TINT));
+
 		text << "   [" << B_TRANSLATE("already chosen") << "]";
+	} else {
+		if (IsSelected())
+			owner->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+		else
+			owner->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 	}
 
 	owner->MovePenTo(frame.left + kLeftInset + textOffset,
@@ -359,7 +368,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 dragIndex,
 			item->DrawItem(view, itemBounds);
 			itemBounds.top = itemBounds.bottom + 1.0;
 		}
-		// make a black frame arround the edge
+		// make a black frame around the edge
 		view->SetHighColor(0, 0, 0, 255);
 		view->StrokeRect(view->Bounds());
 		view->Sync();
