@@ -1,9 +1,10 @@
-1	japanese	x-vnd.Haiku-GIFTranslator	829368084
+1	japanese	x-vnd.Haiku-GIFTranslator	2708495435
 Websafe	GIFView		Webセーフカラー
 Write interlaced images	GIFView		インターレースイメージを書き出す
 Optimal	GIFView		最適化
 Greyscale	GIFView		グレースケール
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Be ビットマップフォーマット (GIFTranslator)
+GIF image translator	GIFView		GIF イメージトランスレーター
 GIF image	GIFTranslator		GIF イメージ
 Write transparent images	GIFView		透過イメージを書き出す
 Palette	GIFView		パレット

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	849531913
+1	finnish	x-vnd.Be-MAIL	1599879742
 View	Mail		Näkymä
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
@@ -27,6 +27,7 @@ Expert	Mail		Asiantuntija
 Reply account:	Mail		Vastaustili:
 Discard	Mail		Hylkää
 Message	Mail		Viesti
+Settings…	Mail		Asetukset…
 Reply to sender	Mail		Vastaa lähettäjälle
 There is no installed handler for URL links.	Mail		Verkko-osoitelinkeille ei ole asennettua käsittelijää.
 Signature	Mail		Allekirjoitus
@@ -81,6 +82,7 @@ Only files can be added as attachments.	Mail		Vain tiedostoja voi lisätä liitt
 Previous message	Mail		Edellinen viesti
 Attachments:	Mail		Liitteet:
 Title:	Mail		Otsikko:
+<no account found>	Mail		<tiliä ei löytynyt>
 Find…	Mail		Etsi…
 Accounts…	Mail		Tilit…
 Mail preferences	Mail		Sähköpostiasetukset

@@ -7,7 +7,7 @@ Close window	WebPositive Window		Fenster schließen
 Quit	WebPositive		Beenden
 The download could not be opened.	Download Window		Die heruntergeladene Datei kann nicht geöffnet werden.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Der Download-Ordner kann nicht geöffnet werden.\n\nFehler: %error
-Open location	WebPositive Window		Speicherort öffnen
+Open location	WebPositive Window		URL öffnen
 Clear history	WebPositive Window		Verlauf leeren
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Gestern

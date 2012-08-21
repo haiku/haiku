@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	3017877022
+1	russian	x-vnd.Haiku-WebPositive	1513721873
 Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
@@ -9,6 +9,7 @@ The download could not be opened.	Download Window		Невозможно откр
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Папка с загруженными файлами не может быть открыта.\n\nОшибка: %error
 Open location	WebPositive Window		Открыть адрес
 Clear history	WebPositive Window		Очистить историю
+WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Вчера
 Default standard font size:	Settings Window		Размер стандартного шрифта по умолчанию:
 Start page:	Settings Window		Начальная страница:
@@ -23,7 +24,7 @@ Decrease size	WebPositive Window		Уменьшить размер
 Serif font:	Settings Window		Шрифт с засечками:
 Loading %url	WebPositive Window		Загрузка %url
 Page source	WebPositive Window		Код страницы
-Next	WebPositive Window		Вперед
+Next	WebPositive Window		Далее
 Find next	WebPositive Window		Найти далее
 Download folder:	Settings Window		Папка для загрузок:
 Edit	WebPositive Window		Изменить
@@ -117,8 +118,20 @@ Downloads in progress	WebPositive		Загрузка файлов
 Style:	Font Selection view		Стиль:
 General	Settings Window		Общие
 View	WebPositive Window		Вид
+Previous	WebPositive Window		Ранее
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Произошла ошибка при создании закладки.\n\nОшибка: %error
+Bookmark error	WebPositive Window		Ошибка закладки
+Do you really want to clear the browsing history?	WebPositive Window		Вы действительно хотите очистить историю посещений?
+Copy	WebPositive Window		Копировать
+Open bookmarks confirmation	WebPositive Window		Подтверждение открытия закладок
+Remove missing	Download Window		Удалить отсутствующие
+Clone current page	Settings Window		Клонировать текущую страницу
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Вы хотите открыть сразу %addedCount закладок?
 OK	Authentication Panel		OK
+Copy	URL Bar		Копировать
 OK	WebPositive Window		OK
+Manage bookmarks	WebPositive Window		Изменить закладки…
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка для этой страницы (%bookmarkName) уже существует.
 New windows:	Settings Window		Новые окна:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен.
+Remove finished	Download Window		Удалить загруженные

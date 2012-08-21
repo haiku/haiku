@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2158958167
+1	russian	x-vnd.Haiku-libtracker	351214779
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -15,7 +15,9 @@ Decrease size	ContainerWindow		Уменьшить размер
 Mini icon view	VolumeWindow		Мелкие значки
 You must have at least one attribute showing.	PoseView		Вы должны оставить хотя бы один атрибут для просмотра.
 Permissions	InfoWindow		Права
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Инвертировать
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Недавние документы
 Modified	QueryPoseView		Изменён
 Created	ContainerWindow		Создан
@@ -93,6 +95,7 @@ Select all	VolumeWindow		Выделить все
 Opens with:	InfoWindow		Открывать в:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы %ifYouDoAction настройки mime, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?
 Open	ContainerWindow		Открыть
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Ошибка при подсчете размера папки.
 New folder	FilePanelPriv		Новая папка
 %name info	InfoWindow	InfoWindow Title	Информация о %name
@@ -161,7 +164,6 @@ no supporting apps	OpenWithWindow		нет поддерживающих прог�
 That name is already taken. Please type another one.	InfoWindow		Это имя уже занято. Пожалуйста, введите другое.
 Sorry, you can't create links in the Trash.	PoseView		Извините, но вы не можете создавать ссылки в корзине.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Папка \"%name\" уже существует.\nЗаменить существующие файлы при совпадении имён?
-Tracker preferences…	ContainerWindow		Настройки Tracker…
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Ссылка \"%name\" на:
 Mount settings…	VolumeWindow		Настройка подключения дисков…
 Select…	VolumeWindow		Выделить…
@@ -316,6 +318,7 @@ The Tracker must be running to see Info windows.	PoseView		Для просмот
 Other	FilePermissionsView		Другие
 Query name:	FindPanel		Имя запроса:
 Permissions	ContainerWindow		Права
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		перемещаемый
 Identify	InfoWindow		Опознать
 Recent folders	ContainerWindow		Недавнюю папку

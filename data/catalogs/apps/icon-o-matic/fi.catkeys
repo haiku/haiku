@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	3088916408
+1	finnish	x-vnd.haiku-icon_o_matic	2079362081
 Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
 Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
@@ -65,6 +65,7 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		Poista hahmo
 Reverse	Icon-O-Matic-PathsList		Käänteinen
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-lähdekoodi
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Nollaa muuntimet
+Settings	Icon-O-Matic-Menus		Asetukset
 All	Icon-O-Matic-Properties		Kaikki
 Multi Paste Properties	Icon-O-Matic-Properties		Useita liittämisominaisuuksia
 Undo	Icon-O-Matic-Main		Peru

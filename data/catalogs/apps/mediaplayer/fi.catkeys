@@ -163,4 +163,4 @@ Save error	MediaPlayer-PlaylistWindow		Tallenna virhe
 Rating	MediaPlayer-Main		Aseta arvosana
 Playlist	MediaPlayer-PlaylistWindow		Soittoluettelo
 Lock Peaks	MediaPlayer-PeakView		Lukitse huiput
-Low volume	MediaPlayer-SettingsWindow		Alenna äänenvoimakkuutta
+Low volume	MediaPlayer-SettingsWindow		Alhainen äänenvoimakkuus

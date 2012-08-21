@@ -1,9 +1,10 @@
-1	german	x-vnd.Haiku-GIFTranslator	829368084
+1	german	x-vnd.Haiku-GIFTranslator	2708495435
 Websafe	GIFView		Web-Farben
 Write interlaced images	GIFView		Bilder interlaced ausgeben
 Optimal	GIFView		Optimal
 Greyscale	GIFView		Graustufen
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Be-Bitmap-Format (GIFTranslator)
+GIF image translator	GIFView		GIF-Bild-Translator
 GIF image	GIFTranslator		GIF-Bild
 Write transparent images	GIFView		Bilder mit Transparenz ausgeben
 Palette	GIFView		Palette:

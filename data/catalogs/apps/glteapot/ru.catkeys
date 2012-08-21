@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-GLTeapot	2681052815
+1	russian	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Сверху на центр
 Lighting	TeapotWindow		Освещение
 Off	TeapotWindow		Выключить
@@ -11,6 +11,7 @@ Quit	TeapotWindow		Выход
 Filled polygons	TeapotWindow		Заполненные многоугольники
 Settings	TeapotWindow		Настройки
 Fog	TeapotWindow		Туман
+Backface culling	TeapotWindow		Заднее отбрасывание
 Z-buffered	TeapotWindow		Z-буферизация
 File	TeapotWindow		Файл
 Perspective	TeapotWindow		Перспектива

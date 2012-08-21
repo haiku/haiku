@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-IMAP	4105475134
+1	russian	x-vnd.Haiku-IMAP	3892875357
+Destination:	imap_config		Назначение:
 status	IMAPFolderConfig		статус
 Apply	IMAPFolderConfig		Применить
 IMAP Folders	imap_config		IMAP папки
