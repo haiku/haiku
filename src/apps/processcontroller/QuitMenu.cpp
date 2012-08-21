@@ -72,13 +72,13 @@ QuitMenu::AttachedToWindow()
 	for (int t = CountItems() - 1; t >= 0; t--) {
 		QuitMenuItem* item = (QuitMenuItem*)ItemAt(t);
 		bool found = false;
-		for (int a = 0; !found && (tmid = (team_id)apps.ItemAt(a)) != 0; a++)
+		for (int a = 0; !found && (tmid = (team_id)(addr_t)apps.ItemAt(a)) != 0; a++)
 			if (item->Team() == tmid)
 				found = true;
 		if (!found)
 			RemoveItem(t);
 	}
-	for (int a = 0; (tmid = (team_id) apps.ItemAt(a)) != 0; a++) {
+	for (int a = 0; (tmid = (team_id)(addr_t) apps.ItemAt(a)) != 0; a++) {
 		AddTeam(tmid);
 	}
 

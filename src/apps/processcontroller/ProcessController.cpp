@@ -90,7 +90,7 @@ bool gInDeskbar = false;
 
 #define addtopbottom(x) if (top) popup->AddItem(x); else popup->AddItem(x, 0)
 
-long thread_popup(void *arg);
+status_t thread_popup(void *arg);
 
 int32			gPopupFlag = 0;
 thread_id		gPopupThreadID = 0;
@@ -103,8 +103,8 @@ typedef struct {
 
 #define DEBUG_THREADS 1
 
-long thread_quit_application(void *arg);
-long thread_debug_thread(void *arg);
+status_t thread_quit_application(void *arg);
+status_t thread_debug_thread(void *arg);
 
 typedef struct {
 	thread_id	thread;
@@ -257,7 +257,7 @@ ProcessController::MessageReceived(BMessage *message)
 			if (message->FindInt32("team", &team) == B_OK) {
 				resume_thread(spawn_thread(thread_quit_application,
 					B_TRANSLATE("Quit application"), B_NORMAL_PRIORITY,
-					(void*) team));
+					(void*)(addr_t)team));
 			}
 			break;
 
@@ -309,7 +309,7 @@ ProcessController::MessageReceived(BMessage *message)
 						B_TRANSLATE("Cancel"), B_TRANSLATE("Kill this thread!"),
 						NULL, B_WIDTH_AS_USUAL,	B_STOP_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
-					
+
 					#define KILL 1
 					#endif
 					alert->SetShortcut(0, B_ESCAPE);
@@ -342,7 +342,7 @@ ProcessController::MessageReceived(BMessage *message)
 
 		case 'PrTh':
 			if (message->FindInt32("thread", &thread) == B_OK) {
-				long new_priority;
+				int32 new_priority;
 				if (message->FindInt32("priority", &new_priority) == B_OK)
 					set_thread_priority(thread, new_priority);
 			}
@@ -665,7 +665,7 @@ ProcessController::Update()
 //	#pragma mark -
 
 
-long
+status_t
 thread_popup(void *arg)
 {
 	Tpopup_param* param = (Tpopup_param*) arg;
@@ -829,16 +829,16 @@ thread_popup(void *arg)
 }
 
 
-long
+status_t
 thread_quit_application(void *arg)
 {
-	BMessenger messenger(NULL, (team_id)arg);
+	BMessenger messenger(NULL, (addr_t)arg);
 	messenger.SendMessage(B_QUIT_REQUESTED);
 	return B_OK;
 }
 
 
-long
+status_t
 thread_debug_thread(void *arg)
 {
 	Tdebug_thead_param*	param = (Tdebug_thead_param*) arg;
