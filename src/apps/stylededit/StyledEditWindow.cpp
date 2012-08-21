@@ -1118,7 +1118,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		fontMessage->AddFloat("size", fontSizes[i]);
 
 		char label[64];
-		snprintf(label, sizeof(label), "%ld", fontSizes[i]);
+		snprintf(label, sizeof(label), "%" B_PRId32, fontSizes[i]);
 		fFontSizeMenu->AddItem(menuItem = new BMenuItem(label, fontMessage));
 
 		if (fontSizes[i] == (int32)be_plain_font->Size())
@@ -1451,7 +1451,7 @@ StyledEditWindow::_Search(BString string, bool caseSensitive, bool wrap,
 	if (start != B_ERROR) {
 		finish = start + length;
 		fTextView->Select(start, finish);
-		
+
 		if (scrollToOccurence)
 			fTextView->ScrollToSelection();
 		return true;
@@ -1505,7 +1505,7 @@ StyledEditWindow::_ReplaceAll(BString findThis, BString replaceWith,
 {
 	bool first = true;
 	fTextView->SetSuppressChanges(true);
-	
+
 	// start from the beginning of text
 	fTextView->Select(0, 0);
 
@@ -1517,11 +1517,11 @@ StyledEditWindow::_ReplaceAll(BString findThis, BString replaceWith,
 		}
 		int32 start;
 		int32 finish;
-				
+
 		fTextView->GetSelection(&start, &finish);
 		fTextView->Delete(start, start + findThis.Length());
 		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
-		
+
 		// advance the caret behind the inserted text
 		start += replaceWith.Length();
 		fTextView->Select(start, start);
@@ -1641,7 +1641,7 @@ StyledEditWindow::_ShowStatistics()
 	BAlert* alert = new BAlert("Statistics", result, B_TRANSLATE("OK"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	
+
 	return alert->Go();
 }
 
