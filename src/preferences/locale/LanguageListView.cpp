@@ -67,7 +67,7 @@ LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
 	if (IsSelected() || complete) {
 		rgb_color color;
 		if (IsSelected())
-			color = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
+			color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 		else
 			color = owner->ViewColor();
 
@@ -79,7 +79,7 @@ LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
 
 	BString text = Text();
 	if (!IsEnabled()) {
-		rgb_color textColor = ui_color(B_MENU_ITEM_TEXT_COLOR);
+		rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
 		if (textColor.red + textColor.green + textColor.blue > 128 * 3)
 			owner->SetHighColor(tint_color(textColor, B_DARKEN_2_TINT));
 		else
@@ -88,9 +88,9 @@ LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
 		text << "   [" << B_TRANSLATE("already chosen") << "]";
 	} else {
 		if (IsSelected())
-			owner->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
 		else
-			owner->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	}
 
 	owner->MovePenTo(frame.left + kLeftInset + textOffset,
