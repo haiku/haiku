@@ -236,7 +236,7 @@ public:
 	void Clear()
 	{
 		MapLocker locker(this);
-		return fMap.Clear();
+		fMap.Clear();
 	}
 
 	Value Get(const Key& key) const

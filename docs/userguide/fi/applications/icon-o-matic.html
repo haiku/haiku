@@ -9,18 +9,20 @@
  *
  * Authors:
  *              Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta http-equiv="Content-Style-Type" content="text/css" />
         <meta name="robots" content="all" />
-        <title>Icon-O-Matic</title>
+        <title>Kuvakemaatti</title>
         <link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,30 +43,29 @@
 <li><a href="../../en/applications/icon-o-matic.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="expander.html">Expander</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="installer.html">Installer</a>  »
+ «  <a href="expander.html">Laajentaja</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
+::  <a href="installer.html">Asennusohjelma</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
-<tr class="index"><td><a href="#bitmap-vector">BeOS bitmap vs. Haiku vector icons</a><br />
-                <a href="#icons-attributes">Icons are attributes</a><br />
-                <a href="#i-o-m">Creating icons with Icon-O-Matic</a><br />
-                  <a href="#i-o-m-path">Path</a><br />
-                  <a href="#i-o-m-shape">Shape</a><br />
-                  <a href="#i-o-m-style">Style</a><br />
-                  <a href="#i-o-m-transformer">Transformer</a><br />
-                  <a href="#i-o-m-save">Saving an icon</a><br />
-                  <a href="#i-o-m-tips">Tips &amp; Tricks</a></td></tr>
+<tr class="index"><td><a href="#bitmap-vector">BeOS-bittikartta vs. Haiku-vektorikuvakkeet</a><br />
+                <a href="#icons-attributes">Kuvakkeet ovat attribuutteja</a><br />
+                <a href="#i-o-m">Kuvakkeiden luominen Kuvakemaatilla</a><br />
+                  <a href="#i-o-m-path">Polku</a><br />
+                  <a href="#i-o-m-shape">Hahmo</a><br />
+                  <a href="#i-o-m-style">Tyyli</a><br />
+                  <a href="#i-o-m-transformer">Tiedostomuuntimet</a><br />
+                  <a href="#i-o-m-save">Kuvakkeen tallentaminen</a><br />
+                  <a href="#i-o-m-tips">Vihjeet ja niksit</a></td></tr>
 </table>
 
-<h2><img src="../../images/apps-images/icon-o-matic-icon_64.png" alt="icon-o-matic-icon_64.png" width="64" height="64" />Icon-O-Matic</h2>
+<h2><img src="../../images/apps-images/icon-o-matic-icon_64.png" alt="icon-o-matic-icon_64.png" width="64" height="64" />Kuvakemaatti</h2>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
@@ -74,28 +75,28 @@
 
 <p><br /></p>
 
-<p>Before we come to the actual creating of icons in Icon-O-Matic, a few words on Haiku's icons in general.</p>
+<p>Ennen kuin todella aloitamme kuvakkeiden luomisen Kuvakemaatissa, muutama sana Haikun kuvakkeista yleensä.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bitmap-vector" name="bitmap-vector">BeOS bitmap vs. Haiku vector icons</a></h2>
-<p>Contrary to the BeOS, Haiku uses vector icons instead of bitmap icons. A special Haiku Vector Icon Format (HVIF) was developed that is highly optimized for small file sizes and fast rendering. That's why our icons are for the most part <i>much</i> smaller than either a bitmap or the widely used SVG format. Also, unlike BeOS' bitmap icons, Haiku isn't limited to an 8bit palette (256 colors).<br />
-Take this icon of the Terminal, for example:</p>
+<a id="bitmap-vector" name="bitmap-vector">BeOS-bittikartta vs. Haikun-vektorikuvakkeet</a></h2>
+<p>Päinvastoin kuin BeOS, Haiku käyttää vektorikuvakkeita bittikarttakuvakkeiden sijasta. Kehitettiin erityinen Haiku-vektorikuvakemuoto (HVIF), joka on hyvin optimoitu pieneen tiedostokokoon ja nopeaan renderointiin. Tästä syystä kuvakkeemme ovat enimmäkseen <i>paljon</i> pienempiä kuin bittikartat tai laajalti käytetty SVG-muoto. Myös toisin kuin BeOS:n bittikarttakuvakkeissa, Haiku ei ole rajoittunut 8-bittiseen palettiin (256 väriä).<br />
+Ota esimerkiksi tämä Pääteikkunakuvake:</p>
 <table border="0" cellpadding="10">
-        <tr align="center"><td><b>Bitmap</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
+        <tr align="center"><td><b>Bittikartta</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
         <tr align="center"><td><img src="../../images/apps-images/i-o-m-terminal-bitmap32.png" alt="i-o-m-terminal-bitmap32" width="32" height="32" /> <img src="../../images/apps-images/i-o-m-terminal-bitmap16.png" alt="i-o-m-terminal-bitmap16" width="16" height="16" /></td><td style="width:100px"><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td><td><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td></tr>
-        <tr align="center"><td>1,024 byte<br />+ 256 byte</td><td> 7,192 byte </td><td> 768 byte </td></tr>
+        <tr align="center"><td>1,024 tavua<br />+ 256 tavua</td><td> 7,192 tavua </td><td> 768 tavua </td></tr>
 </table>
-<p>Note that the BeOS used two versions of an icon, one 16x16 and one 32x32, to achieve good visuals in List and Icon View mode.</p>
-<p>This trick isn't needed with vector icons. Besides only taking up a few hundred bytes in a file, vector icons also scale much better than bitmaps. (Note: BeOS offered only a 16x16 and 32x32 display.)</p>
+<p>Huomaa, että BeOS käytti kahta kuvakeversiota, yksi 16x16 ja toinen 32x32 saavuttaakseen hyvän visuaalisen asun luetteloissa ja kuvakenäkymätilassa.</p>
+<p>Tätä temppua ei tarvita vektorikuvakkeissa. Paitsi että koko on vain muutamia satoja tavuja, vektorikuvakkeet skaalautuvat myös paljon paremmin kuin bittikarttatiedostot. (Huomaa: BeOS tarjosi ainoastaan 16x16 ja 32x32 näytöt.)</p>
 <table border="0" cellpadding="10">
         <tr align="center"><td> </td><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td><td><b>128x128</b></td></tr>
-        <tr align="center"><td><b>Bitmap</b></td>
+        <tr align="center"><td><b>Bittikartta</b></td>
                 <td><img src="../../images/apps-images/i-o-m-bitmap16.png" alt="i-o-m-bitmap16" width="16" height="16" /></td>
                 <td><img src="../../images/apps-images/i-o-m-bitmap32.png" alt="i-o-m-bitmap32" width="32" height="32" /></td>
                 <td><img src="../../images/apps-images/i-o-m-bitmap64.png" alt="i-o-m-bitmap64" width="64" height="64" /></td>
                 <td><img src="../../images/apps-images/i-o-m-bitmap128.png" alt="i-o-m-bitmap128" width="128" height="128" /></td></tr>
-        <tr align="center"><td><b>Vector</b></td>
+        <tr align="center"><td><b>Vektori</b></td>
                 <td><img src="../../images/apps-images/i-o-m-vector16.png" alt="i-o-m-vector16" width="16" height="16" /></td>
                 <td><img src="../../images/apps-images/i-o-m-vector32.png" alt="i-o-m-vector32" width="32" height="32" /></td>
                 <td><img src="../../images/apps-images/i-o-m-vector64.png" alt="i-o-m-vector64" width="64" height="64" /></td>
@@ -105,40 +106,36 @@ Take this icon of the Terminal, for example:</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icons-attributes" name="icons-attributes">Icons are attributes</a></h2>
-<p>Icons are stored as an attribute with their file. However, that doesn't mean that every file has to have this attribute to appear with an icon in a Tracker window: data files inherit their icon from their filetype. To globally change the filetype's icon you use the <span class="app">FileTypes</span> preferences. If you only want to add a special icon to an individual file, you use the <span class="app">FileType add-on</span> on it instead. See topic <a href="../filetypes.html">Filetypes</a> for more information.</p>
-<div class="box-info">Being an attribute, it follows that only filesystems supporting metadata can retain a file's individual icon. So, if you move files off your BFS volume, consider zipping them up so you don't lose icons or other attributes.</div>
+<a id="icons-attributes" name="icons-attributes">Kuvakkeet ovat attribuutteja</a></h2>
+<p>Kuvakkeet tallennetaan tiedoston attribuuttina. Se ei kuitenkaan tarkoita, että jokaisella tiedostolla on tämä attribuutti, joka näkyy Seuraajan ikkunassa: datatiedostot perivät kuvakkeensa tiedostotyypistään. Yleisesti käytettyä tiedostotyypin kuvaketta voi muuttaa <span class="app">Tiedostotyypit</span>-asetuksista. Jos haluat vain lisätä tietyn kuvakkeen yksittäiseen tiedostoon, käytä siihen sen sijaan <span class="app">Tiedostotyyppilisäosaa</span>. Katso lisätietoja aiheesta <a href="../filetypes.html">Tiedostotyypit</a>.</p>
+<div class="box-info">Kun kyse on attribuutista, siitä seuraa, että vain metatietoja tukeva tiedostojärjestelmä voi säilyttää tiedoston yksilöllisen kuvakkeen. Joten jos siirrät tiedostoja pois BFS-taltiolta, harkitse niiden tiivistämistä arkistoksi niin että et kadota kuvakkeita tai muita attribuutteja.</div>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m" name="i-o-m">Creating icons with Icon-O-Matic</a></h2>
-<p>Icon-O-Matic is Haiku's icon editor that can save your work as HVIF, SVG or PNG. The icon can also be directly attached as attribute to an existing file or exported as a resource or source file used by developers. Since the application was tailored to the optimized HVIF format, its usage reflects the inner workings of this format.</p>
-<p>Other than your normal vector graphics software, you don't deal with separate objects that each include all their specific properties like path, stroke width, stroke and fill color etc. Rather, you assemble your objects ("shapes") from shared paths and colors ("styles") and set certain properties. This re-using of elements is one secret of HVIF's efficiency. Although that imposes some constraints on the icon designer, there are a few advantages, too.<br />
-For example, by re-using a path, several objects can be modified together by manipulating this one path. Think of an object and its shadow. Modifying their shared path will change the object itself and automatically its (maybe slightly distorted/translated) shadow.</p>
+<a id="i-o-m" name="i-o-m">Kuvakkeiden luominen Kuvakemaatilla</a></h2>
+<p>Kuvakemaatti on Haikun kuvake-editori, joka voi tallentaa työsi HVIF-, SVG- tai PNG-tiedostona. Kuvake voidaan myös suoraan liittää olemassa olevan tiedoston attribuutiksi tai viedä kehittäjien käyttämäksi resurssiksi tai lähdetiedostoksi. Koska sovellus räätälöitiin optimoituun HVIF-muotoon, sen käyttö heijastaa tämän muodon sisäistä toimintaa.</p>
+<p>Toisin kun tavalliset vektorigrafiikkaohjelmistot, et jaa erillisiä objekteja, joista jokainen sisällyttää kaikki tietyt ominaisuutensa, kuten polku, viivaleveys, viiva ja täyttöväri, jne. Pikemminkin asennat objekti("hahmosi") jaetuista poluista ja väreistä ("tyylit") ja asetat tiettyjä ominaisuuksia. Tämä elementtien uudelleenkäyttö on yksi HVIF-muodon tehokkuuden salaisuuksista. Vaikka se määrää joitakin rajoituksia kuvakesuunnittelijalle, siitä on myös muutamia etuja.<br />Esimerkiksi polkua uudelleenkäytettäessä useita objekteja voidaan muokata yhdessä manipuloimalla tätä yhtä polkua. Ajattele objektia ja sen varjoa. Niiden jaetun polkun muokkaaminen muuttaa itse objektia ja automaattisesti sen (ehkä hiukan vääristynyttä/kääntynyttä) varjoa.</p>
 
-<p>Here's a quick overview of Icon-O-Matic's window:</p>
+<p>Tässä on Kuvakemaatti-ikkunan pikayleiskuva:</p>
 <img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
 
-<p>To create any visible object on the canvas, you need a shape with a path and a style. Conveniently, you can create one, two or all three of those together from the <span class="menu">Shape</span> menu. Every kind of object (Paths, Shapes, Transformers, and Styles) has a menu above its list of elements, offering various commands. Every element has certain options that are set in the <span class="menu">Properties</span> view.</p>
+<p>Tarvitset kaikkien näkyvien objektien luominen kankaalle hahmoa polulla ja tyylillä. Kätevästi voit luoda yhden, kaksi tai kaikki kolme yhdessä <span class="menu">Hahmo</span>-valikosta. Jokaisella objektityyppillä (polut, hahmot, tiedostomuuntimet, ja tyylit) on valikko sen elementtiluettelon yläpuolella tarjoten eri komentoja. Jokaisella elementillä on tiettyjä valitsimia, jotka asetetaan <span class="menu">Ominaisuudet</span>-näkymässä.</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-path" name="i-o-m-path">Path</a></h3>
-<p>A path consists of several points which are connected with lines or Bezier curves. To add or change points, make sure the path is selected in the path list.</p>
+<a id="i-o-m-path" name="i-o-m-path">Polku</a></h3>
+<p>Polku koostuu useista pisteistä, jotka yhdistetään viivoilla tai Bezier-kaarilla. Pisteiden lisäämiseksi tai muuttamiseksi varmista, että polku on valittu polkuluettelossa.</p>
 
-<p>Simply clicking in the canvas will set the first point. While setting a point, you decide if the resulting line will be straight or curved: a simple click and release produces a straight line, holding down the mouse button and moving the mouse will drag out the handles for a Bezier curve. Of course, you can also change it all later on.</p>
+<p>Kankaan napsauttaminen asettaa yksinkertaisesti ensimmäisen pisteen. Pisteitä asetettaessa päätät, jos tuloksena oleva viiva on suora tai kaareva: yksinkertainen napsautus ja vapautus tuottaa suoran viivan, hiiren painikkeen pitäminen alhaalla ja hiiren siirtäminen raahaa Bezier-kaaren kahvan. Tietysti voit myös muuttaa sen kaiken myöhemmin.</p>
 
 <img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" />
 
-<p>To get from "A" to "B", you have to transform some points from corner-points to curve-points. That's done by holding <span class="key">ALT</span> while clicking on a point and dragging out the handles. This results in a symmetrical Bezier: the second handle follows the movement of the other. If you need to move the handles independently, again click&amp;drag on a Bezier handle while holding <span class="key">ALT</span>.<br />
-Vice versa, to go from Bezier to a corner-point, hold <span class="key">ALT</span> and click on a point.</p>
+<p>Päästäksesi pisteestä "A" pisteeseen "B", sinun on muunnettava joitakin pisteitä kulmapisteistä kaaripisteiksi. Se tehdään pitämällä <span class="key">ALT</span>-näppäin alhaalla samalla kun napsautetaan pistettä ja raahataan sitä kahvoista. Tästä on seurauksena symmetrinen Bezier-kaari: toinen kahva seuraa ensimmäisen liikettä. Jos sinulla on tarve siirtää kahvoja toisistaan riippumatta, napsauta ja rahaa taas Bezier-kahvasta samalla kun pidät alhaalla <span class="key">ALT</span>-näppäintä.<br />Päinvastaisessa tapauksessa, mentäessä Bezier-kaaresta kulmapisteeseen, pidä alhaalla <span class="key">ALT</span>-näppäintä ja napsauta pistettä.</p>
 
-<p>To move a point, simply click&amp;drag it. To select more than one point, hold down <span class="key">SHIFT</span> and draw a selection rectangle. Selected points are marked with a red border instead of the usual black.<br />
-To insert a point into a path you click on the connecting line between two points.<br />
-Selected points are deleted by pressing <span class="key">DEL</span> or by clicking on any point while holding <span class="key">CTRL</span>.</p>
+<p>Pisteen siirtämiseksi yksinkertaisesti napsauta ja raahaa sitä. Useamman kuin yhden pisteen valitsemiseksi pidä alhaalla <span class="key">VAIHTO</span>-näppäin ja piirrä valintanelikulmio. Valitut pisteet merkitään punaisella reunalla eikä tavallisella mustalla.<br />Pisteen lisäämiseksi polkuun napsauta yhdysviivaa kahden pisteen välillä.<br />Valitut pisteet poistetaan painamalla <span class="key">DEL</span>-näppäintä tai napsauttamalla mitä tahansa pistettä samalla kun pidetään alhaalla <span class="key">CTRL</span>-näppäintä.</p>
 
-<p>The mouse pointer indicates the current mode:</p>
+<p>Hiiren osoitin osoittaa nykyisen tilan:</p>
 <table summary="Mouse pointer states, Path" border="0" cellpadding="10">
         <tr align="center">
                 <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-path" width="16" height="16" /></td>
@@ -149,46 +146,46 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
                 <td><img src="../../images/apps-images/i-o-m-pointer-select.png" alt="i-o-m-pointer-select" width="16" height="16" /></td>
         </tr>
         <tr align="center">
-                <td>Move point(s)</td>
-                <td>Insert point</td>
-                <td>Add point</td>
-                <td>Delete point<br /><span class="key">CTRL</span></td>
-                <td>Corner↔Bezier<br /><span class="key">ALT</span></td>
-                <td>Select points<br /><span class="key">SHIFT</span></td>
+                <td>Siirrä pisteet</td>
+                <td>Lisäpiste</td>
+                <td>Lisää piste</td>
+                <td>Poista piste<br /><span class="key">CTRL</span></td>
+                <td>Kulma↔Bezier<br /><span class="key">ALT</span></td>
+                <td>Valitse pisteet<br /><span class="key">VAIHTO</span></td>
         </tr>
 </table>
-<p>You can invoke a context menu by right-clicking a point or a selection of points:</p>
+<p>Voit kutsua asiayhteysvalikkoa napsauttamalla pistettä tai pisteiden valintaa hiiren kakkospainikkeella:</p>
 <table summary="Path context" border="0" cellspacing="0" cellpadding="2">
-<tr><td class="onelinetop"><span class="menu">Select all</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Selects all points of the current path.</td></tr>
-<tr><td><span class="menu">Transform</span></td><td><span class="key">T</span></td><td>Puts all selected points in a transformation box, so you can move, resize and rotate them together. It works just like with shapes, described a bit further down.</td></tr>
-<tr><td><span class="menu">Split</span></td><td></td><td>Splits selected points into two, one sitting on top of the other.</td></tr>
-<tr><td><span class="menu">Flip</span></td><td></td><td>Rotates selected points by 180°. Only has an effect on Bezier points.</td></tr>
-<tr><td><span class="menu">Remove</span></td><td><span class="key">DEL</span></td><td>Deletes selected points.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Valitse kaikki</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Valitsee nykyisen polun kaikki pisteet.</td></tr>
+<tr><td><span class="menu">Muunna</span></td><td><span class="key">T</span></td><td>Laittaa kaikki valitut pisteet muunnosikkunaan, joten voit siirtää, muuttaa niiden kokoa ja pyörittää niitä ympäri yhdessä. Se toimii aivan samoin kuin muodoilla, kuten kuvataan myöhemmin tässä asikirjassa.</td></tr>
+<tr><td><span class="menu">Jaa kahtia</span></td><td></td><td>Jakka valitut pisteet kahtia, toinen sijaiten toisen päällä.</td></tr>
+<tr><td><span class="menu">Käännä ylösalaisin</span></td><td></td><td>Pyörittää valittuja pisteitä 180°. Tällä on vaikutusta vain Bezier-pisteisiin.</td></tr>
+<tr><td><span class="menu">Poista</span></td><td><span class="key">DEL</span></td><td>Poistaa valitut pisteet.</td></tr>
 </table>
 
-<h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Path Menu</a></h4>
-<p>The <span class="menu">Path</span> menu offers a few obvious entries to <span class="menu">Add rectangle</span> and <span class="menu">Add circle</span> or to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a path. Here are some that may need a bit more explaining:</p>
+<h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Polkuvalikko</a></h4>
+<p>Valikko <span class="menu">Polku</span> tarjoaa muutamia ilmeisiä rivejä <span class="menu">Lisää nelikulmio</span> and <span class="menu">Lisää ympyrä</span> tai polulle <span class="menu">Tee kaksoiskappale</span> tai <span class="menu">Poista</span>. Tässä on muutamia, jotka vaatinevat lisäselitystä:</p>
 
 <table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Reverse</span></td><td style="width:15px;"></td><td>If your path isn't "closed" (see Path Properties below), a click into the canvas always creates a new point, connecting it with the last one. "Reverse" will reverse this order and your new point will connect to original start point instead.</td></tr>
-<tr><td><span class="menu">Clean up</span></td><td></td><td>Most useful with imported SVGs, this function will remove redundant points.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Rotate indices right</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Practically, this rotates the opening of a path. It's best seen when using a not-closed path with a style and a shape with a stroke transformer. Now, if your path looks like a ⊂ it will rotate like this: ⊂ ∩ ⊃ ∪.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Rotate indices left</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Does the same in the other direction.</td></tr>
+<tr><td><span class="menu">Käännä päinvastaiseksi</span></td><td style="width:15px;"></td><td>Jos polkusi ei ole "suljettu" (katso Polkuominaisuuksia alla), napsautus canvas-komponenttiin luo aina uuden pisteen, joka yhdistyy edelliseen. "Käännä päinvastaiseksi" muuttaa tämän järjestyksen ja uusi piste yhdistetään sen sijaan alkuperäiseen aloituspisteeseen.</td></tr>
+<tr><td><span class="menu">Siivoa</span></td><td></td><td>Kaikkein hyödyllisin tuoduille SVG-tiedostoille, tämä toiminto poistaa kaksoiskappalepisteet.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Pyöritä indeksejä oikealle</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Käytännössä tämä pyörittää polun avausta. Se nähdään parhaiten, kun käytetään ei-suljettua tyylillä varustettua polkua ja hahmoa viivamuuntimella. Nyt, jos polku näyttää kuten ⊂ se pyörii kuin tämä: ⊂ ∩ ⊃ ∪.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Pyöritä indeksejä vasemmalle</span></td><td><span class="key">ALT</span> <span class="key">VAIHTO</span> <span class="key">R</span></td><td>Tekee saman toiseen suuntaan.</td></tr>
 </table>
 
-<h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Path Properties</a></h4>
-<p><span class="menu">Properties</span> at the bottom left of the window offers all available settings of the currently selected object. A path only has two: a <span class="menu">Name</span> and if it's <span class="menu">Closed</span> or not.</p>
+<h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Polkuominaisuudet</a></h4>
+<p><span class="menu">Ominaisuudet</span> ikkunan vasemmassa alakulmassa tarjoaa kaikki käytettävissä olevat nykyisin valitun objektin asetukset. Polulla on vain kaksi: a <span class="menu">Nimi</span> ja onko se <span class="menu">Suljettu</span> vai ei.</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-shape" name="i-o-m-shape">Shape</a></h3>
-<p>A shape groups together one or more paths with a style. Practically, it's the object that you'll actually see on the canvas. The grouping is done with the checkboxes in front of the paths and styles: Just select your shape and tick off the desired path(s) and a style.</p>
-<p>A shape defines how a path and style is applied, e.g. if the object is filled or only stroked (which is done by using Transformers on the shape, we'll get to that later). Also, a shape can be moved, rotated or resized without touching the used path. That way, you can re-use a single path and get different, but related, shapes.</p>
+<a id="i-o-m-shape" name="i-o-m-shape">Hahmo</a></h3>
+<p>Hahmo ryhmittää yhteen yhden tai useampia polkuja, joilla on tyyli. Käytännössä se on objekti, jonka todellisuudessa näkee canvas-komponentissa. Ryhmitys tehdään valintaruuduilla polkujen ja tyylien edessä: valitse vain hahmosi ja rasti halutut polut ja tyyli.</p>
+<p>Hahmo määrittää, kuinka polku ja tyyli toteutetaan, esimerkiksi sen, että onko objekti täytetty vai vain raidoitettu (mikä tehdään käyttämällä muunninta hahmossa, tulemme siihen myöhemmin). Myös hahmoa voidaan siirtää, pyörittää ja sen kokoa voidaan muuttaa koskettamatta käytettyä polkua. Tällä tavalla voit käyttää uudelleen yksittäistä polkua ja saada erilaisen, mutta sukua olevat muodot.</p>
 
 <img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape" />
 
-<p>When a shape is selected from the list, a rectangle is drawn around it. Depending on where exactly you grab it, the shape is moved, resized or rotated around a point in its center, which itself can be moved. Holding <span class="key">SHIFT</span> will lock direction when moving, limit rotating to 45° angles and restrict the aspect ratio while resizing. The mouse pointer again indicates the current mode:</p>
+<p>Kun hahmo valitaan luettelosta, sen ympärille piirretään nelikulmio. Riippuen siitä, mistä tartut siihen, hahmoa siirretään, sen kokoa muutetaan tai sitä pyöritetään keskipisteen ympäri, mitä itseäkin voidaan siirtää. Pitämällä <span class="key">VAIHTO</span>-näppäimen alhaalla lukitaan siirtosuunta, rajoitetaan pyörittäminen 45°:een ja rajoitetaan kuvasuhdetta kokoa muutettaessa. Hiiren osoitin kertoo taas nykyisen tilan:</p>
 <table summary="Mouse pointer states, Shape" border="0" cellpadding="10">
         <tr align="center">
                 <td><img src="../../images/apps-images/i-o-m-pointer-move-shape.png" alt="i-o-m- move-shape" width="16" height="16" /></td>
@@ -197,32 +194,32 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
                 <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-rotation" width="16" height="16" /></td>
         </tr>
         <tr align="center">
-                <td>Move</td>
-                <td>Resize</td>
-                <td>Rotate</td>
-                <td>Move<br />rotation point</td>
+                <td>Siirrä</td>
+                <td>Muuta kokoa</td>
+                <td>Pyöritä</td>
+                <td>Siirrä<br />pyörityspistettä</td>
         </tr>
 </table>
 
-<p>Shapes lie on top of each other, each is on its own layer, if you will. To reorder them you drag&amp;drop their entry to a different position in the list.</p>
+<p>Hahmot sijaitsevat toistensa päällä, jokainen omassa kerroksessaan, jos niin halutaan. Ne voi järjestää uudelleen rahaamalla ja pudottamalla komponenttirivin eri kohtaan luettelossa.</p>
 
-<h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">Shape Menu</a></h4>
-<p>The <span class="menu">Shape</span> menu offers the before mentioned possibility to <span class="menu">Add empty, with path/style/path &amp; style</span> and to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a shape. Then, there is:</p>
+<h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">Hahmovalikko</a></h4>
+<p><span class="menu">Hahmo</span>-valikko tarjoaa aiemmin mainitut mahdollisuudet <span class="menu">Lisää tyhjä, path/style/path-polku ja tyyli</span> ja hahmolle <span class="menu">Tee kaksoiskappale</span> tai <span class="menu">Poista</span>. Sitten on myös:</p>
 <table summary="Shape menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Reset transformation</span></td><td style="width:15px;"></td><td>Reverts all the move, resize and rotate transformations you have applied to the shape.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Freeze transformation</span></td><td></td><td>When you transform a shape, its assigned path(s) stay in their original position. This may be intended; maybe more than one shape is using that path, maybe you intentionally used <span class="menu">Options | Snap to grid</span> to set the points at precise pixel borders.<br />
-If not, "Freeze transformation" will apply the current shape transformation to the assigned path(s). A future "Reset Transformation" will then return to this new state.</td></tr>
+<tr><td><span class="menu">Nollaa muunnos</span></td><td style="width:15px;"></td><td>Palauttaa kaikki hahmon siirrot, koon muuttamiset ja pyörittämiset, joita olet toteuttanut hahmoon.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Jäädytä muunnos</span></td><td></td><td>Kun muunnat hahmoa, siihen liitetyt polut pysyvät alkuperäisillä paikoillaan. Tämä voi olla tarkoituksellista; ehkä useampi hahmo käyttää tuota polkua, ehkä tarkoituksellisesti käytit  <span class="menu">Valitsimet | Napsauta rasteriin</span> pisteiden asettamiseksi tarkkoihin pikselirajoihin.<br />
+Jos näin ei ole, "Jäädytä muunnos" soveltaa nykyistä hahmomuunnosta liitettyihin polkuihin. Tuleva "Nollaa muunnos" palauttaa sitten tähän uuteen tilaan.</td></tr>
 </table>
 
-<h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Shape Properties</a></h4>
-<p>Besides a <span class="menu">Name</span>, the <span class="menu">Properties</span> view for a shape has these options:</p>
+<h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Hahmo-ominaisuudet</a></h4>
+<p>Paitsi <span class="menu">Nimi</span>, hahmon <span class="menu">Ominaisuudet</span>-näkymällä on nämä valitsimet:</p>
 
 <table summary="Shape properties" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Min LOD</span></td><td></td><td>Minimum Level of Detail</td></tr>
-<tr><td><span class="menu">Max LOD</span></td><td></td><td>Maximum Level of Detail</td></tr>
+<tr><td><span class="menu">Minimi-LOD</span></td><td></td><td>Yksityiskohtatason minimi</td></tr>
+<tr><td><span class="menu">Maksimi-LOD</span></td><td></td><td>Yksityiskohtatason maksimi</td></tr>
 </table>
 
-<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Level of Detail (LOD)</a></h5>
+<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Yksityiskohtataso (LOD)</a></h5>
 <table summary="LOD example" border="0" cellpadding="10">
         <tr align="center"><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td></tr>
         <tr align="center">
@@ -230,95 +227,95 @@ If not, "Freeze transformation" will apply the current shape transformation to t
                 <td><img src="../../images/apps-images/i-o-m-lod-icon_32.png" alt="i-o-m-lod-icon_32" width="32" height="32" /></td>
                 <td><img src="../../images/apps-images/i-o-m-lod-icon_64.png" alt="i-o-m-lod-icon_64" width="64" height="64" /></td></tr>
 </table>
-<p>See how there are no numbers in the 16px version of the BeVexed icon? That's done with the "Level of Detail" setting of their shapes.<br />
-With the LOD you control the visibility of a shape depending on its size. That way, you can leave away details of an icon that look good on a bigger icon, but maybe not so much on its smaller version.</p>
-<p>This is how it works: A LOD of 1.0 is defined as a 64px icon size. To get the LOD of a particular icon size you simply divide it by 64, e.g. a 16px icon has a LOD of 16/64 = 0.25. A shape won't be visible below its <span class="menu">Min LOD</span> and above its <span class="menu">Max LOD</span>.</p>
-<p>So, if you set a shape's <span class="menu">Min LOD</span> to 0.0 and the <span class="menu">Max LOD</span> to 0.5, this means that the shape will only be visible for icon sizes smaller or <i>equal</i> to 32px. If you wanted to exclude the 32px icon size, you'd have to stay below 0.5, say 0.49.</p>
-<p>The LOD is not only for leaving out detailing shapes, but also to e.g. change the stroke width at different sizes, if you feel that's needed. Simply duplicate a shape, make your changes and set both of their LOD settings to show either one or the other. Here lies the only source of potential confusion, when you unwittingly overlap LODs of shapes, and wonder why at some size both are visible...<br />
-For example, if Shape 1 were to be shown below 48px and Shape 2 from 48px upward (LOD: 48/64 = 0.75):</p>
+<p>Katso, onko BeVexed-kuvakkeen 16 pikseliversiossa numeroita? Se tehdään niiden hahmojen "Yksityiskohtataso"-asetuksella.<br />
+LOD-asetuksella ohjaat hahmon näkyvyyttä sen koosta riippuen. Sillä tavalla voit jättää pois kuvakkeesta yksityiskohdat, jotka näyttävät hyvältä isommassa kuvakkeessa, mutta eivät niin paljoa pienemmässä versiossa.</p>
+<p>Näin se toimii: 1.0 LOD on määritelty 64 pikselin kuvakekoko. Jotta saataisiin tietty LOD-kuvakekoko, se on yksinkertaisesti jaettava 64:lla, esimerkiksi 16 pikselin kuvakkeella on 16/64 LOD = 0.25. Hahmo ei ole näkyvä sen <span class="menu">Minimi LOD</span>-arvon alla ja sen <span class="menu">Maksimi LOD</span>-arvon yläpuolella.</p>
+<p>Joten, jos asetat hahmon <span class="menu">Minimi LOD</span>-arvoksi 0.0 ja <span class="menu">Maksimi LOD</span>-arvoksi 0.5, tämä tarkoittaa, että hahmo on näkyvä ainoastaan kuvakekkoina, jotka ovat pienempiä tai <i>yhtäsuuria</i> kuin 32 pikseliä. Jos haluat sulkea pois 32 pikselin kuvakekoon, sinun on jäätävä arvon 0.5 alapuolelle, sanotaan vaikka 0.49.</p>
+<p>LOD ei ole vain hahmon yksityiskohtien jättämistä varten, mutta myös esim.: piirrosviivan leveyden vaihtamiseksi erikokoiseksi, jos sinusta tuntuu, että sitä tarvitaan. Kopioi hahmosta kaksoiskappale ja tee muutoksesi sekä aseta sen molemmat LOD-asetukset näyttämään joko yhtä tai toista. Tässä on yksi hämmennyksen lähde, kun vahingossa kirjoitat hahmon LOD-arvojen päälle, ja ihmettelet, että miksei jotkut kokoarvot ole näkyvissä...<br />
+Esimerkiksi, jos Hahmo 1 näytettiin alle 48 pikselin kokoisena ja Hahmo 2 arvosta 48 pikseliä ylöspäin (LOD: 48/64 = 0.75):</p>
 
 <table summary="LOD values example" border="0" cellpadding="5">
-<tr align="center"><td></td><td colspan="2"><b>OK</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Not OK!</b></td></tr>
-<tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Shape 1</b></td><td>Min LOD</td><td>0.00</td><td>Min LOD</td><td>0.00</td></tr>
-<tr style="background-color:#F1F1F1"><td>Max LOD</td><td><span style="background-color:#33FF33">0.74</span></td><td>Max LOD</td><td><span style="background-color:#FF9977">0.75</span></td></tr>
+<tr align="center"><td></td><td colspan="2"><b>Hyvä</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Ei hyvä!</b></td></tr>
+<tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Hahmo 1</b></td><td>Minimi-LOD</td><td>0.00</td><td>Minimi-LOD</td><td>0.00</td></tr>
+<tr style="background-color:#F1F1F1"><td>Maksim-LOD</td><td><span style="background-color:#33FF33">0.74</span></td><td>Maksim-LOD</td><td><span style="background-color:#FF9977">0.75</span></td></tr>
 <tr><td colspan="6"></td></tr>
-<tr style="background-color:#F8F8F8"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Shape 2</b></td><td>Min LOD</td><td>0.75</td><td>Min LOD</td><td>0.75</td></tr>
-<tr style="background-color:#F8F8F8"><td>Max LOD</td><td>4.00</td><td>Max LOD</td><td>4.00</td></tr>
+<tr style="background-color:#F8F8F8"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Hahmo 2</b></td><td>Minimi-LOD</td><td>0.75</td><td>Minimi-LOD</td><td>0.75</td></tr>
+<tr style="background-color:#F8F8F8"><td>Maksim-LOD</td><td>4.00</td><td>Maksim-LOD</td><td>4.00</td></tr>
 </table>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-style" name="i-o-m-style">Style</a></h3>
-<p>A style can either be a solid color or some type of gradient.<br />
-Besides the predefined colors under <span class="menu">Swatches</span>, you can mix your own by clicking on the current color. Also, note the slider under the color spectrum which sets the alpha-channel (transparency).</p>
+<a id="i-o-m-style" name="i-o-m-style">Tyyli</a></h3>
+<p>Tyyli voi olla joko täysivärinen tai jonkuntyyppinen liukuväri.<br />
+Paitsi ennakolta määriteltyjä värejä <span class="menu">Palaset</span>-valikossa, voit sekoittaa värejä napsauttamalla nykyistä väriä. Huomaa myös liukukytkin värispektrin alla, mikä asettaa alfakanavan (läpinäkyvyys).</p>
 <img src="../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients" />
-<p>You quickly create a new style by mixing your color and simply drag&amp;dropping it into the list of styles.</p>
-<p>If you go for a gradient, you set the type (<span class="menu">Linear</span>, <span class="menu">Radial</span>, <span class="menu">Diamond</span>, <span class="menu">Cone</span>) and then define the start and end colors. This is done with a drag&amp;drop from a color bucket into the respective color indicator under the gradient.<br />
-Of course you can move these indicators to change the gradient to your liking. You can also insert more indicators to add more colors by double-clicking into the gradient. Pressing <span class="key">DEL</span> removes the selected indicator.</p>
-<p>You can move, resize and rotate the representing box of a gradient on the canvas until it fits your needs. This works just like with shapes.</p>
+<p>Luot uuden tyylin nopeasti sekoittamalla värisi ja yksinkertaisesti raahaamalla ja pudottamalla sen tyylien luetteloon.</p>
+<p>Jos siirryt liukuväriin, aseta tyypiksi (<span class="menu">Lineaarinen</span>, <span class="menu">Säteettäinen</span>, <span class="menu">Vinoneliö</span>, <span class="menu">Kartio</span>) ja määrittele sitten alku- ja loppuvärit. Tämä tehdään raahaamalla ja pudottamalla värisanko vastaavaan väri-indikaattoriin liukuvärin alla.<br />
+Voit tietysti siirtää nämä indikaattorit vaihtamaan liukuväriä halusi mukaan. Voit myös lisätä lisää värejä kaksoisnapsauttamalla liukuväriin. Painikkeen <span class="key">DEL</span> painaminen poistaa valitun indikaattorin.</p>
+<p>Voit siirtää, muuttaa kokoa ja kääntää liukuvärin esittelyikkunaa piirtoalueella kunnes se sopii tarkoituksiisi. Tämä toimii kuten hahmoilla.</p>
 
-<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Style Menu</a></h4>
-<p>The <span class="menu">Style</span> menu offers the usual entries to <span class="menu">Add</span>, <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a style and to <span class="menu">Reset transformation</span>.</p>
+<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Tyylivalikko</a></h4>
+<p><span class="menu">Tyyli</span>-valikko tarjoaa tavallisia valikkorivejä <span class="menu">Lisää</span>, <span class="menu">Tee kaksoiskappale</span> tai <span class="menu">Poista</span> tyyli ja <span class="menu">Nollaa muunnos</span>.</p>
 
-<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Style Properties</a></h4>
-<p>The <span class="menu">Name</span> is the only <span class="menu">Properties</span> of a style.</p>
+<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Tyyliominaisuudet</a></h4>
+<p><span class="menu">Nimi</span> on tyylin ainoa <span class="menu">Ominaisuus</span>.</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-transformer" name="i-o-m-transformer">Transformer</a></h3>
-<p>A shape can have Transformers which change its appearance. The effects, however, are more subtle than a truck turning into a battle robot...</p>
+<a id="i-o-m-transformer" name="i-o-m-transformer">Muunnin</a></h3>
+<p>Hahmolla voi olla Muuntimia, jotka vaihtavat sen ulkoasun. Tehosteet ovat kuitenkin hienovaraisempia kuin kuorma-auton muuntuminen taistelurobotiksi...</p>
 
-<h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Transformer Add Menu</a></h4>
+<h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Muuntimen Lisää-valikko</a></h4>
 <table summary=" Transformer Add menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Contour</span></td><td></td><td>Adds an outline to a shape.</td></tr>
-<tr><td><span class="menu">Stroke</span></td><td></td><td>Strokes the path of a shape instead of filling it with a style.</td></tr>
+<tr><td><span class="menu">Ääriviiva</span></td><td></td><td>Lisää ääriviivan hahmoon.</td></tr>
+<tr><td><span class="menu">Viiva</span></td><td></td><td>Viivoittaa hahmon polun eikä täytä sitä tyylillä.</td></tr>
 </table>
 
-<p>Depending on the kind of Transformer, you'll get a different set of properties.</p>
+<p>Muuntimen tyypistä riippuen saat erilaisia ominaisjoukkoja.</p>
 
-<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Transformer Properties</a></h4>
-<p>Besides a <span class="menu">Name</span> and the actual <span class="menu">Width</span> for the transformer, the <span class="menu">Properties</span> view has these (depending on its type slightly differing) options:</p>
+<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Muunninominaisuudet</a></h4>
+<p>Paitsi Muuntimen <span class="menu">Nimi</span> ja todellinen <span class="menu">Leveys</span>, <span class="menu">Ominaisuudet</span>-valikkonäkymällä on nämä (riippuen lievästi sen tyyppieroista) valitsimet:</p>
 <table summary="Transformer properties" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Caps</span></td><td style="width:15px;"></td><td><i>Stroke only</i>. Defines the end caps of a line: <span class="menu">Butt</span>, <span class="menu">Square</span> or <span class="menu">Round</span>.</td></tr>
-<tr><td><span class="menu">Detect orient.</span></td><td></td><td><i>Contour only</i>. Determines if the contour is to the inside or outside the path.</td></tr>
-<tr><td><span class="menu">Joins</span></td><td></td><td>Defines how lines are joint at a point: <span class="menu">Miter</span>, <span class="menu">Round</span> or <span class="menu">Bevel</span>.</td></tr>
-<tr><td><span class="menu">Miter limit</span></td><td></td><td>Only when the above <span class="menu">Joins</span> is set to "Miter" this setting influences the looks of the miter joint. </td></tr>
+<tr><td><span class="menu">Pääteholkit</span></td><td style="width:15px;"></td><td><i>Vain piirrosviiva</i>. Määrittää viivan suojaholkit: <span class="menu">Nuppi</span>, <span class="menu">Neliö</span> tai <span class="menu">Pyöreä</span>.</td></tr>
+<tr><td><span class="menu">Havaitse suunta</span></td><td></td><td><i>Vain ääriiva</i>. Määrittää, onko ääriviiva polun sisäpuolella vai ulkopuolella.</td></tr>
+<tr><td><span class="menu">Liitokset</span></td><td></td><td>Määrittää, kuinka viivat yhdistetään pisteessä: <span class="menu">Viistekulma</span>, <span class="menu">Pyöreä</span> tai <span class="menu">Särmä</span>.</td></tr>
+<tr><td><span class="menu">Viistekulmaraja</span></td><td></td><td>Vain kun yläpuolella oleva <span class="menu">Liitokset</span> on asetettu arvoon "Viistekulma" tämä asetus vaikuttaa viistoliitoksen ulkonäköön. </td></tr>
 </table>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-save" name="i-o-m-save">Saving an icon</a></h3>
-<p>There's your usual menu bar at the top, <span class="menu">File</span>, <span class="menu">Edit</span>, <span class="menu">Options</span>. The usage is pretty much self-explaining, so we'll only look at how to save your work.</p>
-<p><span class="menu">File | Save as...</span> will save in a special Icon-O-Matic format that retains additional information like the names of paths, shapes and styles. These will be stripped from the actual icon once you export it to save space. It's a good idea to back-up your work like this, because without named objects everything's named "&lt;path&gt;/&lt;shape&gt;/&lt;style&gt;" which makes specific changes tedious.</p>
+<a id="i-o-m-save" name="i-o-m-save">Kuvakkeen tallentaminen</a></h3>
+<p>Ylimpänä on tavallinen valikkopalkki, <span class="menu">Tiedosto</span>, <span class="menu">Muokkaa</span>, <span class="menu">Valitsimet</span>. Käyttö on paljolti itsestäänselvää, joten katsomme vain, kuinka työ tallennetaan.</p>
+<p><span class="menu">Tiedosto | Tallenna nimellä...</span> tallentaa erikoisessa Kuvakemaatti-muodossa, joka säilyttää lisätiedot, kuten polkujen nimet, hahmot ja tyylit. Nämä riisutaan todellisesta kuvakkeesta heti kun viet sen tallennustilaan. On hyvä ajatus varmuuskopioida työsi tällä tavoin, koska ilman nimettyjä objekteja kaikki nimetään "&lt;polku&gt;/&lt;hahmo&gt;/&lt;tyyli&gt;" mikä tekee tietyt vaihdot hankaliksi.</p>
 
-<p><span class="menu">File | Export as...</span> opens a familiar save panel with a file format pop-up menu at the bottom, offering these choices:</p>
+<p><span class="menu">Tiedosto | Vie nimellä...</span> avaa tutun tallennuspaneelin, jonka pohjalla on tiedostonmuodon ponnahdusvalikko, joka tarjoaa nämä valinnat:</p>
 <table summary="file formats" border="0" cellspacing="0" cellpadding="2">
-<tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku Vector Icon Format</td></tr>
-<tr><td>HVIF RDef</td><td></td><td>Saves as resource used by programmers</td></tr>
-<tr><td>HVIF source code</td><td></td><td>Saves as source code used by programmers</td></tr>
-<tr><td>SVG</td><td></td><td>Saves as SVG</td></tr>
-<tr><td>PNG</td><td></td><td>Saves as a 64px sized PNG</td></tr>
-<tr><td>PNG set</td><td></td><td>Saves as 16, 32 and 64px sized PNGs</td></tr>
-<tr><td>BEOS:ICON attribute</td><td></td><td>Choose a file and set its icon attribute directly</td></tr>
-<tr><td>META:ICON attribute</td><td></td><td>Choose a file and attach the icon as mere meta data</td></tr>
+<tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku-vektorikuvakemuoto</td></tr>
+<tr><td>HVIF RDef</td><td></td><td>Tallentaa ohjelmoijien käyttämänä resurssina</td></tr>
+<tr><td>HVIF-lähdekoodi</td><td></td><td>Tallentaa ohjelmoijien käyttämänä lähdekoodina</td></tr>
+<tr><td>SVG</td><td></td><td>Tallentaa SVG-tiedostona</td></tr>
+<tr><td>PNG</td><td></td><td>Tallentaa 64px -kokoisena PNG-tiedostona</td></tr>
+<tr><td>PNG set</td><td></td><td>Tallentaa 16-, 32- ja 64px -kokoisina PNG-tiedostoina</td></tr>
+<tr><td>BEOS:ICON-attribuutti</td><td></td><td>Valitse tiedosto ja aseta kuvakeattribuutti suoraan</td></tr>
+<tr><td>META:ICON-attribuutti</td><td></td><td>Valitse tiedosto ja liitä kuvake pelkkänä meta-tietona</td></tr>
 </table>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-tips" name="i-o-m-tips">Tips &amp; Tricks</a></h3>
-<p>A few things you should keep in mind when working with Icon-O-Matic and some general tips for its usage:</p>
+<a id="i-o-m-tips" name="i-o-m-tips">Vihjeet ja niksit</a></h3>
+<p>Muutamia asioita tulisi pitää mielessä, kun työskennellään Kuvakemaatilla ja joitakin yleisiä vihjeitä sen käytöstä:</p>
 <ul>
-<li><p>Read the <a href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/icon_guidelines/index.html">Icon Guidelines</a> to learn about important characteristics of Haiku icons, e.g. perspective, colors and shadows.</p></li>
-<li><p>You should always try to minimize your use of paths, those are the most expensive, file size wise. Re-use paths wherever possible and work with manipulated shapes and their transformers instead. Smart use of gradients can also save space.</p></li>
-<li><p>Wherever possible, you should activate Snap-to-Grid from the <span class="menu">Options</span> menu when editing paths. Path points that align with the 64x64 pixel grid use less storage space. You'll also get the crispest look if points are set on exact pixel borders. For example, it is important to align the most prominent outlines with the 16x16 grid.</p></li>
-<li><p>Check the preview to see if your icon still looks good in 16x16. You may want to use the <a href="#i-o-m-shape-lod">Level Of Detail</a> settings described in the Shapes section.</p></li>
-<li><p>There's an easy way to produce letters, even if Icon-O-Matic doesn't provide such a tool. Just enter the text in a text editor such as StyledEdit, adjust font type and style, and drag&amp;drop or copy&amp;paste the selected text into Icon-O-Matic. This will create the according paths and shapes.</p></li>
-<li><p>If you assign more than one path to a shape, their overlapping areas will cancel each other out. When one path is completely inside another, it practically creates a hole in the resulting shape.</p></li>
-<li><p>You can zoom in and out of the canvas with the mouse wheel. Panning is done either by click&amp;drag with the middle mouse button or with a normal left-click&amp;drag while holding <span class="key">SPACE</span>.</p></li>
+<li><p>Lue <a href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/icon_guidelines/index.html">Kuvakeohjeet</a> oppiaksesi Haiku-kuvakkeiden tärkeät ominaisuudet, esim.: perspektiivi, värit ja varjot.</p></li>
+<li><p>Polkujen käyttöä tulisia aina yrittää minimoida, koska ne ovat kalliimpia tiedoston koon kannalta.  Yritä käyttää polkuja uudelleen aina kun mahdollista ja työskentele sen sijaan manipuloitujen hahmojen ja niiden muunnosten kanssa. Liukuvärien älykäs käyttö voi myös säästää tilaa.</p></li>
+<li><p>Pitäisi milloin vain mahdollista aktivoida Kiinnitä-rasteriin <span class="menu">Valitsimet</span>-valikosta kun muokataan polkuja. Polkupisteet, jotka tasaavat 64x64 pikselin rasterikäyttöön käyttävät vähemmän tallennustila. Saat myös teräväpiirteisemmän näkymän, jos pisteet on asetettu tarkalleen pikselirajoille. Esimerkiksi, on tärkeää tasata silmiinpistävimmät ääriviivat 16x16-rasteriin.</p></li>
+<li><p>Tarkista esikatselu nähdäksesi, näyttääkö kuvake yhä hyvältä 16x16-koossa. Haluat ehkä käyttää Hahmo-kappaleessa kuvailtuja <a href="#i-o-m-shape-lod">Yksityiskohtataso</a>-asetuksia.</p></li>
+<li><p>Kirjainten tuottamien on helppoa, vaikka Kuvakemaatti ei tarjoa sellaista työkalua. Kirjoita vain teksti sellaisessa tekstieditorissa kuin StyleEdit, säädä kirjasintyyppi ja -tyyli sekä raahaa ja pudota tai kopioi-liitä valittu teksti Kuvakemaattiin. Tämä luo vastaavat polut ja hahmot.</p></li>
+<li><p>Jos liität useamman kuin yhden polun hahmoon, päällekkäiset alueet peruvat toisensa. Kun yksi polku on kokonaan toisen sisällä, se luo käytännössä reiän tuloksena olevaan hahmoon.</p></li>
+<li><p>Voit lähentää ja loitontaa piirrosaluetta hiiren rullalla. Vieritys tehdään joko napsauttamalla ja raahaamalla hiiren keskimmäisellä painikkeella tai normaalilla napsauta hiiren vasemmalla painikkeella ja raahaa samalla kun <span class="key">VÄLI</span>-painiketta pidetään alhaalla.</p></li>
 </ul>
 
 
@@ -342,9 +339,9 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="expander.html">Expander</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="installer.html">Installer</a>  »
+ «  <a href="expander.html">Laajentaja</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
+::  <a href="installer.html">Asennusohjelma</a>  »
 </span></div>
 </div>
 

@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Managing Email</title>
+	<title>Työpaja: Sähköpostin hallinta</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -50,93 +52,90 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
 <tr class="index"><td>
-	<a href="#mailsystem">Haiku's mail system</a><br />
-	<a href="#statuses">Using custom statuses</a><br />
-	<a href="#queries">Using queries</a><br />
-	<a href="#tips">More tips</a>
-</td></tr>
+	<a href="#mailsystem">Haikun sähköpostijärjestelmä</a><br />
+	<a href="#statuses">Käytetään omia tiloja</a><br />
+	<a href="#queries">Käytetään kyselyjä</a><br />
+	<a href="#tips">Lisävihjeitä</a></td></tr>
 </table>
 
-<h1>Workshop: Managing Email</h1>
+<h1>Työpaja: Sähköpostin hallinta</h1>
 
-<p>This workshop takes a look on how to manage email under Haiku. It assumes that the email services are correctly configured with the <a href="preferences/e-mail.html">E-Mail</a> preferences and you're familiar with the basic features of the <a href="applications/mail.html">Mail</a> application.</p>
+<p>Tämä työpaja vilkaisee, kuinka sähköpostia hallinnoidaan Haikussa. Se otaksuu, että sähköpostipalvelu on asetettu oikein <a href="preferences/e-mail.html">Sähköpostiasetukset</a>-sovelluksella ja <a href="applications/mail.html">Sähköposti</a>-sovelluksen perusominaisuudet ovat sinulle tuttuja.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="mailsystem" name="mailsystem">Haiku's mail system</a></h2>
-<p>If you come to Haiku from other operating systems, you're probably used to big applications like MS Outlook or Mozilla's Thunderbird. You have to configure them by entering all the info on mail server addresses etc. and they use their own contacts database. They take care of sending and fetching email and store them in some big special file.<br />
-Changing you email client can be a hassle with quite some ex/importing and converting going on. Using more than one client in parallel to check out what else is available is also not without the occasional kerfuffle.</p>
-<p>Haiku's mail system is different. It breaks down into smaller separate modules.</p>
-<p>There's the <span class="app">mail_daemon</span> that takes care of the communication with your mail servers. The <a href="preferences/e-mail.html">E-Mail</a> preferences is the one central point to configure your email accounts and how often they're checked, for example.</p>
-<p>Every message that is fetched or sent is saved as one single email file, with its header information (like sender, subject, date) and status (like New, Replied, Sent) in BFS attributes. This enables searching/filtering them with Haiku's fast queries.</p>
+<a id="mailsystem" name="mailsystem">Haikun sähköpostijärjestelmä</a></h2>
+<p>Jos tulet Haikuun muista käyttöjärjestelmistä, olet luultavasti käyttänyt suuria sovelluksia kuten MS Outlook tai Mozillan Thunderbird. Sinun on asetettava ne kirjoittamalla kaikki tiedot sähköpostipalvelimien osoitteista jne. ja ne käyttävät omia yhteystietotietokantojaan. Ne ottavat huolehtiakseen sähköpostin lähettämisestä ja noutamisesta sekä tallentavat ne johonkin suureen erikoistiedostoon.<br />Sähköpostiasiakassovelluksen vaihtaminen on melkoinen hässäkkä vaatien tiedoston vientiä ja tuontia sekä muuntamista. Useamman kuin yhden asiakasohjelman käyttäminen rinnakkain sen tarkistamiseksi, mitä on saatavilla ei myöskään onnistu ilman hässäkkää.</p>
+<p>Haikun sähköpostijärjestelmä on erilainen. Se on jaettu erillisiin pienempiin moduuleihin.</p>
+<p>Siinä on <span class="app">mail_daemon</span>-taustaprosessi, joka huolehtii viestinnästä sähköpostipalvelimiesi kanssa. <a href="preferences/e-mail.html">Sähköpostiasetukset</a> -ohjelma on yksi keskeinen paikka asettaa sähköpostitilisi ja esimerkiksi se, kuinka usein ne tarkistetaan.</p>
+<p>Jokainen noudettu tai lähetetty viesti tallennetaan otsaketietoineen (kuten lähettäjä, aihe, päivämäärä) ja tilatietoineen (kuten Uusi, Vastattu, Lähetetty) yhtenä yksittäisenä sähköpostitiedostona BFS-attribuutteihin. Tämä ottaa käyttöön niiden etsinnän/suodattamisen Haikun nopeiden kyselyjen avulla.</p>
 <img src="images/workshop-email-images/browsing.png" alt="browsing.png" /> 
-<p>With every email being in a separate file, viewing them becomes just as easy as browsing through a folder (or query result) of images with <a href="applications/showimage.html">ShowImage</a>. Leaving the Tracker window open, you'll see the moving selection of the currently viewed file while you use the previous/next button to move through them.<br />
-As they are independent files, using a viewer other than Haiku's <a href="applications/mail.html">Mail</a> causes no problems whatsoever.</p>
-<p>Similarly, creating a new message results in just another file that is handed to the mail_daemon that takes care of sending it off. Contact management is deferred to the <a href="applications/people.html">People</a> application.</p>
-<p>In a nutshell, where other mail clients do everything, from communicating with the mail servers to providing a view with all your mails and tools to search and filter them, Haiku uses a chain of smaller tools and general file management:</p>
+<p>Koska jokainen sähköpostiviesti on erillisessä tiedostossa, niiden katsominen on yhtä helppoa kuin kansion (tai kyselytuloksen) kuvien selaaminen <a href="applications/showimage.html">ShowImage</a>-sovelluksella. Jättämällä Seuraaja-ikkunan auki näet parhaillaan katsottavan tiedoston siirtyvän valinnan samalla kun käytät edellinen/seuraava -painiketta niiden läpi kulkemiseen.<br />
+Koska ne ovat riippumattomia tiedostoja, jonkun toisen selaimen kuin Haikun <a href="applications/mail.html">Sähköposti</a> ei aiheuta ollenkaan mitään vaikeuksia.</p>
+<p>Samalla tavalla uuden viestin luomisen tulos on vain toinen tiedosto, joka ojennetaan mail_daemon-taustaprosessille, joka ottaa huolehtiakseen sen lähettämisestä. Yhteystietohallinta on alistettu  <a href="applications/people.html">Ihmiset</a>-sovellukselle.</p>
+<p>Pähkinänkuoressa, missä muut sähköpostiasiakasohjelmat tekevät kaiken, viestinnän sähköpostipalvelimen kanssa ja tarjoavat näkymän kaikkiin sähköpostiviesteihin ja työkalut viestien etsintään ja suodattamiseen, Haiku käyttää pienempien työkalujen ketjua ja yleistä tiedostohallintaa:</p>
 <ul>
-<li><p>The <span class="app">mail_daemon</span> to fetch/send mail and save them as normal files.</p></li>
-<li><p>Tracker windows and queries to find and show email files.</p></li>
-<li><p>The <span class="app">Mail</span> application to view email files and create new messages relying on system-wide contact management by the <span class="app">People</span> app.</p></li>
+<li><p><span class="app">mail_daemon</span>-taustaprosessi sähköpostiviestien noutamiseksi ja lähettämiseksi ja tallentamiseksi normaaleina tiedostoina.</p></li>
+<li><p>Seuraajaikkunoita ja kyselyitä sähköpostitiedostojen löytämiseksi ja näyttämiseksi.</p></li>
+<li><p><span class="app">Sähköposti</span>-sovellusta sähköpostitiedostojen katsomiseen ja uusien viestien luomiseen tukeutuen <span class="app">Ihmiset</span>-sovelluksen järjestelmänlaajuiseen yhteystietohallintaan.</p></li>
 </ul>
-<p>Especially using Tracker and queries to manage emails is a powerful idea. The experience you gain can be transferred to any other problem that is dealing with files. Be it images, music, video, contacts or any other documents, using Tracker is at the core of all file managing.<br />
-Also, improvements in any of these system areas benefit not just emailing, but all applications that make use of them.</p>
+<p>Erityisesti Seuraajan ja kyselyjen käyttö sähköpostiviestien hallintaa on tehokas ajatus.  Kokemus, jonka saat, on siirrettävissä mihin tahansa muuhun tiedostopulmaan. Olkoon se kuvia, musiikkia, videota, yhteystietoja tai muita asiakirjoja, Seuraajan käyttäminen on kaiken tiedostohallinnan ydintä.<br />
+Parannukset kaikkiin näihin järjestelmiin eivät koske vain sähköpostien lähettämistä, vaan kaikkia sovelluksia, jotka käyttävät niitä.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="status" name="status">Using custom statuses</a></h2>
-<p>When you browse through your newly arrived email, you may want to come back to some of them later to think about it in more depth. While you could use Mail's menu <span class="menu">Close and | Leave as New</span> to keep them in your "<i>New messages</i>" query, things tend to pile up that way...</p>
-<p>One solution is of course to just start a reply and save it as draft. But if you don't expect to write a reply and just want to re-read the mail later, that isn't ideal.</p>
+<a id="status" name="status">Käytetään omia tiloja</a></h2>
+<p>Kun selaat äskettäin saapunutta sähköpostia, haluat palata joihinkin niihin myöhemmin ajatellaksesi niitä perusteellisemmin. Vaikka voisit käyttää sähköpostiohjelman valikon <span class="menu">Sulje ja | Jätä uutena</span> pitämään ne sähköpostiviesteinäsi ”<i>Uudet viestit</i>”-kyselyllä, asioilla on tapana kasaantua sillä tavoin...</p>
+<p>Yksi ratkaisu olisi tietysti aloittaa vastaus ja tallentaa se luonnoksena. Mutta sinun ei odoteta kirjoittavan vastausta ja vain haluavan lukea sähköposti uudelleen myöhemmin, se ei ole ideaalitilanne.</p>
 <img src="images/workshop-email-images/status.png" alt="status.png" /> 
-<p>Better use <span class="menu">Close and | Set to...</span> to create a new status and use that to categorize your mail. For example, you could call the status "<i>Later</i>", and then query for that when you find more time.<br />
-Or you use different statuses for specific projects. For example, I created a status "<i>HUG</i>" (for "Haiku user guide") under which I collect every mail that may influence the contents of the user guide, like commit messages about code changes that alter or introduce some feature or anything else I feel could improve the user guide.<br />
-In any case, try to keep the status name short. That way it always fits in a normally wide "Status" column in Tracker.</p>
-<p>You don't have to open an email with the <span class="app">Mail</span> application to set its status. With the Tracker add-ons <span class="app">Mark as Read </span> and <span class="app">Mark as...</span> you can select some email files and set their status in one go.</p>
+<p>Käytä uusien tilojen parempaan luomiseen ja sähköpostien luokitteluun valikkoja <span class="menu">Sulje ja | Aseta arvoon...</span>. Voit esimerkiksi kutsua tilaa ”<i>Myöhemmin</i>”, ja kysellä sitä sitten, kun sinulla on enemmän aikaa.<br />
+Tai voit käyttää eri tiloja tietyille projekteille. Esimerkiksi loin tilan ”<i>HUG</i>” (”Haiku user guide”), jonka alla kerään jokaisen sähköpostiviestin, joka voi vaikuttaa käyttöopasteiden sisältöön, kuten versionhallinnan commit-viestit lähdekoodimuutoksista, jotka muuttavat tai esittelevät joitakin ominaisuuksia tai jotakin muuta mitä haluaisin muuttaa käyttöopasteissa.<br />
+Yritkä kaikissa tapauksissa pitää tilanimi lyhyenä. Sillä tavalla se sopii aina Seuraajan ”Tila”-sarakkeen normaaliin leveyteen.</p>
+<p>Sinun ei tarvitse avata sähköpostiviesti sovelluksella <span class="app">Sähköposti</span> sen tilan asettamiseksi. Seuraaja-liitännäisellä <span class="app">Merkitse luetuksi</span> ja <span class="app">Merkitse tilana...</span> voit valita joitakin sähköpostitiedostoja ja asettaa niiden tilan yhdellä kerralla.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="queries" name="queries">Using queries</a></h2>
-<p>Sure, you specify a folder to store all your email, you can open it et voilà,  there's all you mail. But over time the folder becomes crowded and showing all will take longer and longer as thousands of files and their attributes have to be parsed and sorted. Also, most of the time you don't really care about two year old emails of Nigerian princes and their inheritory trouble ...</p>
-<div class="box-info">A lot of time when populating a folder is spent on putting files read from disk into the correct sorting order and displaying that in the window. If you do have to open a folder with a huge number of files, you can shorten the wait by making the Tracker window "invisible", i.e. either minimize it or change to another workspace. Watch <a href="applications/processcontroller.html">ProcessController</a> to see how it affects CPU usage.</div>
-<p><a href="queries.html">Queries</a>, to the rescue!</p>
-<p>By using queries, you can narrow down the view of your mails. Actually, the mailbox icon in the Deskbar uses queries.</p>
+<a id="queries" name="queries">Käytetään kyselyjä</a></h2>
+<p>Tietysti voit määritellä kansion kaiken sähköpostisi tallentamiseen. Voit avata sen ja siellä on kaikki sähköpostisi. Mutta ajan mittaan kansio tulee täyteen ja viestien näyttäminen kestää yhä kauemmin, koska tuhansien tiedostojen ja niiden attribuuttien jäsentämiseen kuluu aikaa. Enimmäkseen et todella välitä kaksi vuotta vanhoista sähköpostiviesteistä nigerialaisesta prinssistä ja heidän perintöpulmista ...</p>
+<div class="box-info">Paljon kansioiden kansoittamisajasta menee tiedostojen lukemiseen levyltä oikeaan lajittelujärjestyksen ja niiden näyttämiseen ikkunassa. Jos sinun on avattava kansio, jossa on valtava määrä tiedostoja, voit lyhentää odottamisaikaa muuttamalla Seuraaja-ikkunan tilaksi ”näkymätön", ts. joko minimoimalla sen tai vaihtamalla toiseen työtilaan. Katso <a href="applications/processcontroller.html">Prosessivalvonta</a> nähdäksesi, mitä se vaikuttaa suoritinkäyttöön.</div>
+<p><a href="queries.html">Kyselyt</a> pelastukseksi!</p>
+<p>Kyselyjä käyttämällä voit kaventaa sähköpostiviestisi näkymäaluetta. Itse asiassa Työpöytäpalkin sähköpostikuvake käyttää kyselyjä.</p>
 <img src="images/workshop-email-images/daemon-in-deskbar.png" alt="daemon-in-deskbar.png" /> 
-<p>The <span class="menu">Open Draft</span> submenu does a query for the status "<i>Draft</i>", which is set by <span class="app">Mail</span> when you save a message.</p>
-<p><span class="menu">Open Inbox Folder</span> and <span class="menu">Open Mail Folder</span> are just links to regular folders (and not very useful in my opinion).</p>
-<p>The <span class="menu"># new messages</span> submenu is populated by a query for email with the status "<i>New</i>" (that same query is used to change the mailbox icon to show some letters in it, by the way).</p>
+<p>Alivalikko <span class="menu">Avaa luonnos</span> kyselee tilaa ”<i>Luonnos</i>”, jonka <span class="app">Sähköposti</span>-sovellus asettin viestiä tallentaessasi.</p>
+<p><span class="menu">Avaa ulevan sähköpostin kansio</span> ja <span class="menu">Avaa sähköpostikansio</span> ovat vain linkkejä tavallisiin kansioihin (ja mielestäni ne eivät ole kovin hyödyllisiä).</p>
+<p>Alivalikko <span class="menu"># new messages</span> kansoitetaan kyselemällä sähköpostiviestien ”<i>Uusi</i>”-tilaa (kysely on muuten sama, kuin se, jota käytetään vaihtamaan sähköpostikuvake näyttämään joitakin kirjaimia).</p>
 
-<p>You can add your own queries (or folders, applications, scripts etc.) to that context menu too, by putting them or links to them into <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
-<div class="box-info">The query <span class="path">~/config/settings/Mail/mailbox</span> is a special case: It is executed when left-clicking the mailbox icon in the Deskbar. If you want to change that behavior, you can replace it with any other file (or link to a file), just name it "<i>mailbox</i>". It doesn't have to be a query, a link to a folder of queries or a script or application works just as well.</div>
+<p>Voit myös lisätä omia kyselyjä (tai kansioita, sovelluksia, skriptejä jne.) asiayhteysvalikkoon laittemalla niitä tai linkkejä niihin kansioon <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
+<div class="box-info">Kysely <span class="path">~/config/settings/Mail/mailbox</span> on erikoistapaus: Se suoritetaan napsauttamalla hiiren ykköspainikkeella Työpöytäpalkissa. Jos haluat muuttaa tuota käyttäytymistä, voit korvata sen millä tahansa muulla tiedostolla (tai linkillä tiedostoon), nimeä se vain nimellä ”<i>mailbox</i>”. Sen ei tarvitse olla kysely, sillä linkki kansioon, skripti tai sovelIus toimii aivan yhtä hyvin.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-examples" name="query-examples">Query examples</a></h3>
-<p>Here are a few examples of useful queries:</p>
+<a id="query-examples" name="query-examples">Kyselyesimerkit</a></h3>
+<p>Tässä on muutamia esimerkkejä hyödyllisistä kyselyistä:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="10">
 <tr align="center"><td><img src="images/workshop-email-images/query-1.png" alt="query-1.png" /><br />
-This finds all mails with the custom status "<i>Later</i>".</td>
+Tämä löytää kaikki sähköpostiviestit omalla tilalla "<i>Myöhemmin</i>".</td>
 <td><img src="images/workshop-email-images/query-2.png" alt="query-2.png" /><br />
-This finds all mails of the past 2 days.</td></tr>
+Tämä löytää kaikki sähköpostiviestit viimeisen 2 päivän ajalta.</td></tr>
 
 <tr align="center"><td><img src="images/workshop-email-images/query-3.png" alt="query-3.png" /><br />
-This finds all mails by Ingo Weinhold of the past 2 weeks.</td>
+Tämä löytää kaikki Ingo Weinholdin postittamat sähköpostiviesttit viimeisen 2 viikon ajalta.</td>
 <td><img src="images/workshop-email-images/query-4.png" alt="query-4.png" /><br />
-This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
+Tämä löytää kaikki sähköpostiviestit Haiku commit listalta viimeisen 12 tunnin ajalta.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">More tips</a></h2>
+<a id="tips" name="tips">Lisävihjeitä</a></h2>
 <ul>
-<li><p>If you don't save a query as "<i>Query</i>" but as "<i>Query template</i>", invoking it won't show the result window, but the Find... window instead. That way you can easily exchange the search string for the subject or sender, for example, or change a "<i>2 days</i>" time limit to "<i>3 days</i>".</p></li>
-<li><p>Activating "type-ahead filtering" in <a href="tracker.html#tracker-preferences">Tracker's preferences</a> allows you to very quickly filter a query result even further. Often it's enough to query for all mails of the last 3 days and go with type-ahead filtering from there. The big advantage is, that you don't have to exactly specify which attribute to search for, as all displayed are considered when filtering.</p></li>
-<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> is a nifty little application that will query for all mails with the same subject/sender/time-frame etc. of a dropped email. Kind of what the <span class="menu">Queries</span> menu in the <span class="app">Mail</span> app is supposed to do.</p></li>
+<li><p>Jos et tallenna kyselyä tilaksi ”<i>Kysely</i>” vaan tilaksi ”<i>Kyselymallinne</i>”, sen kutsuminen ei näytä tulosikkunaa, vaan sen sijaan Etsi... -ikkunan. Sillä tavalla voit helposti vaihtaa esimerkiksi aiheen tai lähettäjän etsintämerkkijonon, tai vaihtaa "<i>2 päivää</i>" aikarajan ajaksi "<i>3 päivää</i>".</p></li>
+<li><p>Aktivoimalla "type-ahead filtering"-suodatus <a href="tracker.html#tracker-preferences">Seuraaja-asetuksissa</a> sallii sinun nopeasti suodattaa kyselytuloksia vielä edelleen. Usein ei riitä kysyä kaikkia sähköpostiviestejä viimeisen 3 päivän ajalta ja tehdä niille sieltä type-ahead-suodatus. Suuri etu on, että sinun ei tarvitse tarkkaan määritellä, mitä attribuuttia etsitään, koska kaikki näytetyt käsitellään suodatuksen yhteydessä.</p></li>
+<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> on näppärä pieni sovellus, joka kyselee kaikista sähköpostiviesteistä samalla aihe/lähettäjä/aikakehys jne. luetuista sähköpostiviesteistä. Vähän samaa kuin <span class="menu">Kyselyt</span>-valikon <span class="app">Sähköposti</span>-sovelluksessa otaksutaan tekevän.</p></li>
 </ul>
 
 </div>
@@ -144,9 +143,9 @@ This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="applications.html">Applications</a>  »
+ «  <a href="queries.html">Kyselyt</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="applications.html">Sovellukset</a>  »
 </span></div>
 </div>
 

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2663284831
+1	swedish	x-vnd.Haiku-libtracker	1713444607
 common	B_COMMON_DIRECTORY		gemensam
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
@@ -372,7 +372,6 @@ Modified	FindPanel		Modifierad
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fel vid flytt av "%name" till Papperskorgen. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Du kan inte ersätta en katalog med en av dess underkataloger.
 <No recent items>	FavoritesMenu		<Inga tidigare objekt>
-Preferences…	ContainerWindow		Inställningar…
 Move	PoseView		Flytta
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Är du säker på att du vill radera de valda objekten? Denna operation kan inte ångras.

@@ -1,7 +1,6 @@
-1	russian	x-vnd.Haiku-RAWTranslator	1938728039
+1	russian	x-vnd.Haiku-RAWTranslator	2229230003
 RAWTranslator Settings	ConfigView		Настройки RAW транслятора
 Version %d.%d.%d, %s	ConfigView		Версия %d.%d.%d, %s
-RAW Images	ConfigView		Транслятор RAW изображений
 RAW image translator	RAWTranslator		Транслятор RAW изображений
 RAW Settings	RAWTranslator main		Настройки RAW транслятора
 RAW images	RAWTranslator		RAW изображения

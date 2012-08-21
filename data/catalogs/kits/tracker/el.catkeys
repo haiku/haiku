@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	250739144
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3595866216
 common	B_COMMON_DIRECTORY		κοινό
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
@@ -357,7 +357,6 @@ Modified	FindPanel		Τροποποιήθηκε
 Error moving \"%name\" to Trash. (%error)	FSUtils		Σφάλμα κατά τη μετακίνηση του \"%name\" στα Απορρίματα.(%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Δεν μπορείτε να αντικαταστήσετε ένα φάκελο με ένα από τους υποφακέλους του.
 <No recent items>	FavoritesMenu		<Κανένα πρόσφατο στοιχείο>
-Preferences…	ContainerWindow		Προτιμήσεις...
 Move	PoseView		Μετακίνηση
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Είστε σίγουρος οτι θέλετε να διαγράψετε τα επιλεγμένα αρχεία; Αυτή η λειτουργία δε μπορεί να αναστραφεί. 

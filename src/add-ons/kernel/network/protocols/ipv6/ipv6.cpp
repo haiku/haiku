@@ -180,8 +180,14 @@ struct MulticastStateHash {
 struct ipv6_protocol : net_protocol {
 	ipv6_protocol()
 		:
+		raw(NULL),
 		multicast_filter(this)
 	{
+	}
+
+	~ipv6_protocol()
+	{
+		delete raw;
 	}
 
 	RawSocket	*raw;
@@ -974,8 +980,6 @@ ipv6_uninit_protocol(net_protocol* _protocol)
 {
 	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
 
-	delete protocol->raw;
-	delete protocol->multicast_address;
 	delete protocol;
 	return B_OK;
 }

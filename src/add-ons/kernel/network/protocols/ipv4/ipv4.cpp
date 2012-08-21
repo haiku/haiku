@@ -163,8 +163,14 @@ struct MulticastStateHash {
 struct ipv4_protocol : net_protocol {
 	ipv4_protocol()
 		:
+		raw(NULL),
 		multicast_filter(this)
 	{
+	}
+
+	~ipv4_protocol()
+	{
+		delete raw;
 	}
 
 	RawSocket*			raw;
@@ -1029,9 +1035,8 @@ ipv4_uninit_protocol(net_protocol* _protocol)
 {
 	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
-	delete protocol->raw;
-	delete protocol->multicast_address;
 	delete protocol;
+
 	return B_OK;
 }
 

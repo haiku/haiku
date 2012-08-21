@@ -806,6 +806,7 @@ TermWindow::MessageReceived(BMessage *message)
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
 				ResizeTo(screen.Frame().Width()+1, screen.Frame().Height()+1);
 				MoveTo(screen.Frame().left, screen.Frame().top);
+				SetFlags(Flags() | (B_NOT_RESIZABLE | B_NOT_MOVABLE));
 				fFullScreen = true;
 			} else { // exit fullscreen
 				_ActiveTermView()->DisableResizeView();
@@ -819,6 +820,7 @@ TermWindow::MessageReceived(BMessage *message)
 				fTabView->MoveBy(0, mbHeight);
 				SetLook(fSavedLook);
 				fSavedFrame = BRect(0,0,-1,-1);
+				SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
 				fFullScreen = false;
 			}
 			break;

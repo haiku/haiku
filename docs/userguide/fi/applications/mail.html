@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Mail</title>
+	<title>Sähköposti</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,75 +43,75 @@
 <li><a href="../../en/applications/mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="magnify.html">Magnify</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="mediaplayer.html">MediaPlayer</a>  »
+ «  <a href="magnify.html">Suurennuslasi</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
+::  <a href="mediaplayer.html">Mediasoitin</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
-<tr class="index"><td><a href="#reading">Reading messages</a><br />
-	<a href="#creating">Creating new messages</a><br />
-	<a href="#preferences">Preferences</a></td></tr>
+<tr class="index"><td><a href="#reading">Sähköpostiviestien lukeminen</a><br />
+	<a href="#creating">Uusien sähköpostiviestien luominen</a><br />
+	<a href="#preferences">Asetukset</a></td></tr>
 </table>
 
-<h2><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png" width="64" height="64" />Mail</h2>
+<h2><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png" width="64" height="64" />Sähköposti</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/Mail</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/Mail/</span><br />
-<span class="path">~/config/settings/Mail/Menu Links/</span> - Objects put here appear in the mailbox' context menu<br />
-<span class="path">~/config/settings/Mail/signatures/</span> - Location to store signatures<br />
-<span class="path">~/config/settings/Mail/status/</span> - Location to store custom statuses</td></tr>
+<span class="path">~/config/settings/Mail/Menu Links/</span> - Tähän laitetut objektit näkyvät sähköpostiohjelman asiayhteysvalikossa<br />
+<span class="path">~/config/settings/Mail/signatures/</span> - Allekirjoitusten tallennuspaikka<br />
+<span class="path">~/config/settings/Mail/status/</span> - Omien tilojen tallennuspaikka</td></tr>
 </table>
 <p><br /></p>
-<p>Mail is Haiku's default viewer and editor of emails. It has nothing to do with the actual fetching and sending of mails, which is done by the mail_daemon and can be configured via the <a href="../preferences/e-mail.html">E-mail</a> preferences.</p>
-<p>This page is a general overview of the application Mail. For more information how email in Haiku works, refer to the <a href="../workshop-email.html">Workshop on managing email</a>.</p>
+<p>Sähköposti on Haikun sähköpostiviestien oletuskatselin ja -muokkain. Sillä ei ole mitään tekemistä itse sähköpostiviestien noutamisen ja lähettämisen kanssa, minkä tekee mail_daemon-taustaprosessi ja se voidaan asettaa <a href="../preferences/e-mail.html">Sähköpostiasetukset</a>-ohjelmalla.</p>
+<p>Tämä sivu on yleiskatsaus Sähköpostisovellukseen. Lisätietoja siitä, kuinka sähköposti toimii Haikussa, löytyy viitteestä <a href="../workshop-email.html">Työpaja sähköpostiviestien hallinnointiin</a>.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="reading" name="reading">Reading messages</a></h2>
-<p>You double-click an email file to open it in Mail. The interface is quite simple:</p>
+<a id="reading" name="reading">Sähköpostiviestien lukeminen</a></h2>
+<p>Sähköpostitiedoston avaamiseksi Sähköpostiohjelmassa sinun on kaksoisnapsautettava sitä. Käyttöliittymä on aika yksinkertainen:</p>
 <img src="../images/apps-images/mail-read.png" alt="email-read.png" /> 
-<p>A menu and optional tool bar on top, with an area of the interesting attributes of a mail (to, from, subject, date) below that, and then the actual body of the mail. If the mail appears with strange characters or empty, try to change the <span class="menu">Decoding</span> from the pop-up menu.</p>
-<p>If there are files attached to an email, they are listed at the end of the message. A right-click on one opens a context menu to <span class="menu">Save attachment...</span> or <span class="menu">Open attachment</span>. You can also drag &amp; drop directly to the Desktop or another Tracker window.</p>
-<p>Most of the menu and tool bar items are pretty self-explaining, so we'll concentrate just on the highlights.</p>
+<p>Ylhäällä on valikko ja sen alla valinnainen työkalupalkki sähköpostin kiinnostusalueattribuuteilla (vastaanottaja, lähettäjä, aihe, päivämäärä) ja sähköpostiviestin varsinainen runko. Jos sähköpostiviestissä ilmenee outoja merkkejä tai se on tyhjä, yritä vaihtaa koodausta ponnahdusvalikon <span class="menu">Dekoodaus</span>-valikosta.</p>
+<p>Jos sähköpostiviestissasi on liitteitä, ne on lueteltu viestin lopussa. Hiiren kakkospainikkeealla voi avata asiayhteysvalikon valikkoon <span class="menu">Tallenna liite...</span> tai <span class="menu">Avaa liite</span>. Voit myös raahata ja pudottaa liitteen Työpöydälle tai toiseen Seuraaja-ikkunaan.</p>
+<p>Useimmat valikon ja työkalupalkin kohdat ovat itsestäänselittäviä, joten keskitymme vain huippukohtiin.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>File</h3>
-<p>When you close the window of a new mail, its status is normally switched from "New" to "Read". But you can set other statuses as well, by choosing from the <span class="menu">Close and...</span> submenu. There you'll also find the option <span class="menu">Set to...</span> to create your own custom statuses, which are saved under <span class="path">~/config/settings/Mail/status/</span>.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Tiedosto</h3>
+<p>Kun suljet uuden sähköpostiviestin ikkunan, sen tila vaihtuu normaalisti "Uudesta" "Luetuksi". Mutta voit asettaa myös tiloja valitsemalla tilan alivalikosta <span class="menu">Sulje ja...</span>. Sieltä löydät myös valitsimen <span class="menu">Aseta tilaan...</span>, mikä luo sinun omia tilojas, jotka tallennetaan hakemistoon <span class="path">~/config/settings/Mail/status/</span>.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Edit</h3>
-<p>Here you'll find an item to open Mail's <span class="menu">Preferences...</span> (<a href="#preferences">see below</a>) and a shortcut to manage your <span class="menu">Accounts...</span>, which will open the <a href="../preferences/e-mail.html">E-mail</a> preference panel.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Muokkaa</h3>
+<p>Tästä löydät kohdan valikon <span class="menu">Asetukset...</span> (<a href="#preferences">katso alla</a>) avaamiseksi ja pikanäppäimen, jolla hallinnoit valikkokohtaa <span class="menu">Tilit...</span>, joka avaa <a href="../preferences/e-mail.html">Sähköpostiasetukset</a>-paneelin.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>View</h3>
-<p>You'll only seldomly need these two items, if at all:</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Katso</h3>
+<p>Tarvitset näitä kohtaa harvoin, jos koskaan:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Show header</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>Shows the complete header of a mail, in case you need to track down the path of your mail, for example.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Show raw message</span></td><td></td><td></td><td>Displays a mail in its raw state, i.e. with all its control characters and without Mail's coloring of quotes or URLs, for example..</td></tr>
+<tr><td><span class="menu">Näytä otsake</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>Näyttää sähköpostiviestin täydellisen otsakkeen esimerkiksi siltä varalta, että sinun on jäljitettävä sähköpostiviestisi polku.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Näytä raakaviesti</span></td><td></td><td></td><td>Näyttää sähköpostiviestin raakatilassaan, toisin sanoen, kaikkine ohjausmerkkeineen ja esimerkiksi ilman Sähköposti-ohjelman väritettyjä lainauksia tai verkko-osoitteita..</td></tr>
 </table>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Message</h3>
-<p>The different options to reply to a mail may need a bit of explanation.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Viesti</h3>
+<p>Eri valinnat sähköpostiviestiin vastaamisessa tarvitsevat ehkä hiukan selittämistä.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Reply</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td style="width:10px;"></td><td>The standard reply to the server that has sent the mail to you. NOTE: In case of a mailing list post, this normally replies back to the mailing list, <i>not</i> just the person that wrote the post!</td></tr>
-<tr><td class="onelinetop"><span class="menu">Reply to sender</span></td><td><span class="key">OPT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>This on the other hand, sends directly and only to the person listed in the "From" attribute.</td></tr>
-<tr><td><span class="menu">Reply to all</span></td><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>Replies to the original sender plus all other (cc'ed) recipients of the original mail.</td></tr>
+<tr><td><span class="menu">Vastaa</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td style="width:10px;"></td><td>Vakio vastaus palvelimelle, joka on lähettänyt sähköpostia sinulle. HUOMAA: Silloin kun on kyse sähköpostituslistapostista, tämä vastaa normaalisti takaisin postituslistalle, <i>ei</i> juuri sille henkilölle, joka kirjoitti viestin!</td></tr>
+<tr><td class="onelinetop"><span class="menu">Vastaa lähettäjälle</span></td><td><span class="key">OPT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>Toisaalta lähettää suoraan ja vain henkilölle, joka on lueteltu ”Lähettäjä”-attribuutissa.</td></tr>
+<tr><td><span class="menu">Vastaa kaikille</span></td><td class="onelinetop"><span class="key">VAIHTO</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>Vastaa alkuperäiselle lähettäjälle plus kaikille muille alkuperäisen sähköpostiviestin (Kopio-)vastaanottajille.</td></tr>
 </table>
-<div class="box-info">If you mark a passage in the email before replying to it, only the marked text will be quoted in your answering mail. A nice way to cut down on excessive quoting, which is frowned upon by pretty much everybody...</div>
-<p>The items to <span class="menu">Forward</span>, <span class="menu">Resend</span> and <span class="menu">Copy to new</span> are again pretty self-explaining.</p>
-<p>When you've opened an email from a Tracker or query result window, <span class="menu">Previous message</span> and <span class="menu">Next message</span> will move to the previous/next email in the list.</p>
-<p><span class="menu">Save address</span> collects all email addresses from the header and the actual email body in a submenu. Choosing an address will open the <a href="people.html">People</a> application in order to complete and save the contact information.</p>
+<div class="box-info">Jos merkitset jakson sähköpostiviestistä ennen vastaamista siihen, merkkitty teksti lainataan vastaussähköpostiviestiisi. Kiva tapa supistaa ylimääräistä lainaamista, mitä aika moni paheksuu...</div>
+<p>Valinnat <span class="menu">Lähetä edelleen</span>, <span class="menu">Lähetä uudelleen</span> and <span class="menu">Kopioi uuteen</span> ovat taas aika itsestään selittäviä.</p>
+<p>Kun olet avannut sähköpostin Seuraajasta tai kyselytulosikkunasta, <span class="menu">Edellinen viesti</span> ja <span class="menu">Seuraava viesti</span> siirtävät edelliseen tai seuraavaan viestiin luettelossa.</p>
+<p><span class="menu">Tallenna osoite</span> kerää kaikki sähköpostiosoitteet otsakkeesta ja todellisesta sähköpostiviestin rungosta alivalikossa. Osoitteen valitseminen avaa <a href="people.html">Ihmiset</a>-sovelluksen, jossa voit täydentää ja tallentaa yhteystietoja.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Queries</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Kyselyt</h3>
 <p>This doesn't work yet, but is intended to hold queries that would show all mail related to the currently open mail, like all from the same sender or same subject/thread.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating new messages</a></h2>
+<a id="creating" name="creating">Uusien sähköpostiviestien luominen</a></h2>
 <p>A new email is created by invoking the <span class="menu">New mail message</span> menu or the corresponding icon from the tool bar of an open email. Or you just start the Mail application or choose <span class="menu">Create new message...</span> from the context menu of the mailbox icon in the Deskbar.</p>
 <img src="../images/apps-images/mail-write.png" alt="email-write.png" /> 
 <p>The window is pretty similar to the one when reading mails. The menu and tool bar items are slightly different and the text boxes have to be filled with the recipient's email address, subject and so on, of course.</p>
@@ -119,10 +121,10 @@
 <span class="menu">To</span>, <span class="menu">CC</span>, and <span class="menu">BCC</span> are pop-up menus. They contain all email addresses on your system found by a query for <a href="people.html">People</a> files. Their "Group" attribute will sort them in corresponding submenus.</p>
 <p>Again, we'll focus on the more interesting features in the menus.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>File</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Tiedosto</h3>
 <p>With <span class="menu">Save as draft</span> you can store your work so far and come back to it later. To load it again, choose it from the <span class="menu">Open draft</span> submenu that will list the result of a query for all mails with the status "Draft".</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Edit</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Muokkaa</h3>
 <p><span class="menu">Quote</span> and <span class="menu">Remove quote</span> or their respective shortcuts <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> are used to add/remove a level of quoting by adjusting the number of "&gt;" symbols in front of quoted lines. Just select some text in all the lines you want un/quoted and invoke the menu item.</p>
 
 <img src="../images/apps-images/mail-spellcheck.png" alt="email-spellcheck.png" /> 
@@ -131,8 +133,8 @@
 Right-clicking such a word opens a context menu offering suggestions to correct the word or to <span class="menu">Add</span> it to the accepted vocabulary.</p>
 <p>Then, there are again the items to open Mail's <span class="menu">Preferences...</span> (<a href="#preferences">see below</a>) and a shortcut to managing your <span class="menu">Accounts...</span>, which will open the <a href="../preferences/e-mail.html">E-mail</a> preference panel.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Message</h3>
-<p>With <span class="menu">Add signature</span> you can add predefined texts to the end of your mail. From its submenu you can choose a specific or <span class="menu">Random</span> one.</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Viesti</h3>
+<p>Valikolla <span class="menu">Lisää allekirjoitus</span> voit lisätä ennakolta määritellyn tekstin sähköpostiviestisi loppuun. Sen alivalikosta voit valita tietyn tekstin tai <span class="menu">Satunnaisen</span>.</p>
 
 <img src="../images/apps-images/mail-signature.png" alt="email-signature.png" /> 
 
@@ -144,16 +146,16 @@ Right-clicking such a word opens a context menu offering suggestions to correct 
 <p>File attachments are listed below the header section. You can remove a file by invoking a context menu or by selecting it and pressing <span class="key">DEL</span>.</p>
 
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Queries</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Kyselyt</h3>
 <p>This doesn't work yet, but is intended to hold queries that would show all mail related to the currently open mail, like all to the same recipient or same subject/thread.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preferences" name="preferences">Preferences</a></h2>
+<a id="preferences" name="preferences">Asetukset</a></h2>
 <img src="../images/apps-images/mail-preferences.png" alt="email-preferences.png" /> 
 <p>Mail's preferences come in two parts:</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>User interface</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Käyttöliittymä</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Button bar</span></td><td style="width:10px;"></td><td>Options to show labels under the icons or hide the tool bar completely.</td></tr>
 <tr><td><span class="menu">Font</span></td><td></td><td>Sets the type of font used for the email text.</td></tr>
@@ -188,9 +190,9 @@ Should you opt not to send attributes with your attachments, remember zip up you
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="magnify.html">Magnify</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="mediaplayer.html">MediaPlayer</a>  »
+ «  <a href="magnify.html">Suurennuslasi</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
+::  <a href="mediaplayer.html">Mediasoitin</a>  »
 </span></div>
 </div>
 

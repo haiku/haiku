@@ -23,5 +23,5 @@ Master output	AudioMixer		Главный выход
 Setup	AudioMixer		Настройка
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Использовать нелинейные ползунки управления звуком
 Gain	AudioMixer		Усиление
-Allow output channel remapping	AudioMixer		Разрешить переназначение входного канала
-Physical input channels	AudioMixer		Физические входные каналы
+Allow output channel remapping	AudioMixer		Разрешить переназначение выходного канала
+Physical input channels	AudioMixer		Физические каналы входа

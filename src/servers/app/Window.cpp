@@ -102,9 +102,10 @@ Window::Window(const BRect& frame, const char *name,
 	fInUpdate(false),
 	fUpdatesEnabled(true),
 
-	// windows start hidden
+	// Windows start hidden
 	fHidden(true),
-	fShowLevel(0),
+	// Hidden is 1 or more
+	fShowLevel(1),
 	fMinimized(false),
 	fIsFocus(false),
 

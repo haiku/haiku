@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Pengphei Han
+ *		dgy18787
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -52,7 +53,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 
 <table class="index" id="index" summary="index">
@@ -72,23 +72,23 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mailsystem" name="mailsystem">Haiku 邮件系统</a></h2>
-<p>如果您在使用 Haiku 之前有过其他系统的经验，您可能会习惯于 MS Outlook 或者 Mozilla 的雷鸟等大型邮件程序。您必须输入所有有关邮件服务器地址等的信息进行配置，并且它们使用各自的联系人数据库。它们负责发送和获取邮件，并将邮件存入一些大的特殊文件。<br />
-更换邮件客户端会非常的麻烦，您必须进行导入/导出等操作，还要进行系列的转换。同时使用多个邮件客户端检查邮件也是不可行的，可能会带来不必要的混乱。</p>
+<p>如果您在使用 Haiku 之前有过其他系统的经验，您可能会习惯于 MS Outlook 或者 Mozilla 的 Thunderbird 等大型邮件程序。您必须输入所有有关邮件服务器地址的信息进行配置，并且它们使用各自的联系人数据库。它们负责发送和获取邮件，并将邮件存入一些大的特殊文件。<br />
+邮件客户端的更换会非常的麻烦，您必须进行导入/导出等操作，还要进行系列的转换。同时使用多个邮件客户端检查邮件也是不可行的，可能会带来不必要的混乱。</p>
 <p>Haiku 邮件系统稍有不同。它由一些较小的独立模块构成。</p>
 <p> <span class="app">mail_daemon</span> 负责与您的邮件服务器进行通信。<a href="preferences/e-mail.html">电子邮件</a> 首选项集中管理邮件账户的配置，例如邮件检查时间。 </p>
 <p>每个收到/发送的消息都将保存为单个的邮件文件，它们的邮件头信息（如发送者，主题，日期）和状态（如新邮件，已回复，已发送）保存为 BFS 属性。这样能够方便使用 Haiku 的快速查询进行搜索和过滤。</p>
 <img src="images/workshop-email-images/browsing.png" alt="browsing.png" /> 
-<p>With every email being in a separate file, viewing them becomes just as easy as browsing through a folder (or query result) of images with <a href="applications/showimage.html">ShowImage</a>. Leaving the Tracker window open, you'll see the moving selection of the currently viewed file while you use the previous/next button to move through them.<br />
-As they are independent files, using a viewer other than Haiku's <a href="applications/mail.html">Mail</a> causes no problems whatsoever.</p>
-<p>Similarly, creating a new message results in just another file that is handed to the mail_daemon that takes care of sending it off. Contact management is deferred to the <a href="applications/people.html">People</a> application.</p>
-<p>In a nutshell, where other mail clients do everything, from communicating with the mail servers to providing a view with all your mails and tools to search and filter them, Haiku uses a chain of smaller tools and general file management:</p>
+<p>由于每个邮件都是独立的文件，进行查阅就非常简单，就像是在使用 <a href="applications/showimage.html">图片查看器</a> 浏览图像目录（或者查询结果）。在您使用上一个/下一个按钮浏览邮件时，在打开的文件浏览器窗口中，您可以看到当前浏览文件的切换选中。<br />
+因为他们都是独立的文件，无论是使用查看器还是 Haiku 的 <a href="applications/mail.html">电子邮箱</a> 程序都没有任何差别。</p>
+<p>与此相似，创建新邮件也就是相当于去创建一个由 mail_daemon 管理并负责发送的新文件。联系方式则由 <a href="applications/people.html">联系人</a> 应用进行管理。</p>
+<p>总而言之，其他的邮件客户端会负责所有的事情；然而对于 Haiku ，从与邮件服务器交互，到查看您的所有邮件，以致于邮件搜索和过滤的工具，它则通过很多小工具和常用文件管理来完成：</p>
 <ul>
-<li><p>The <span class="app">mail_daemon</span> to fetch/send mail and save them as normal files.</p></li>
-<li><p>Tracker windows and queries to find and show email files.</p></li>
-<li><p>The <span class="app">Mail</span> application to view email files and create new messages relying on system-wide contact management by the <span class="app">People</span> app.</p></li>
+<li><p><span class="app">mail_daemon</span> 用于获取、发送邮件，并将其保存为常规文件。</p></li>
+<li><p>文件浏览器窗口和查询用于查找和显示电子邮件文件。</p></li>
+<li><p><span class="app">电子邮箱</span> 程序依赖于<span class="app">联系人</span> 程序提供的系统内联系人管理功能，用于查看邮件文件和新建邮件。</p></li>
 </ul>
-<p>Especially using Tracker and queries to manage emails is a powerful idea. The experience you gain can be transferred to any other problem that is dealing with files. Be it images, music, video, contacts or any other documents, using Tracker is at the core of all file managing.<br />
-Also, improvements in any of these system areas benefit not just emailing, but all applications that make use of them.</p>
+<p>使用 文件浏览器 和查询功能进行邮件管理确实很不错。您于此获得的经验可用于任何和文件处理有关的问题。例如图像，音乐，视频，联系人以及其他任何文档，都可以使用文件浏览器，因为它是所有文件管理的核心。<br />
+同时，在这些系统领域的提供不仅仅能够惠及电子邮件处理，还会有助于所有使用这些功能的应用程序。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -96,25 +96,27 @@ Also, improvements in any of these system areas benefit not just emailing, but a
 <p>在您检查自己的新邮件时，您可能希望之后在仔细的进行阅读。您可以使用电子邮件菜单的<span class="menu">关闭且保留为新邮件</span> ，让它们仍然保留在您的 “<i>新邮件</i>” 查询中，以这种方式让任务保留起来。</p>
 <p>当然另一种方式是撰写回复并保存为草稿。但是如果您不希望编写回复，而只是留待以后再次阅读，这样就不大方便。</p>
 <img src="images/workshop-email-images/status.png" alt="status.png" /> 
-<p>Better use <span class="menu">Close and | Set to...</span> to create a new status and use that to categorize your mail. For example, you could call the status "<i>Later</i>", and then query for that when you find more time.<br />
-Or you use different statuses for specific projects. For example, I created a status "<i>HUG</i>" (for "Haiku user guide") under which I collect every mail that may influence the contents of the user guide, like commit messages about code changes that alter or introduce some feature or anything else I feel could improve the user guide.<br />
-In any case, try to keep the status name short. That way it always fits in a normally wide "Status" column in Tracker.</p>
-<p>You don't have to open an email with the <span class="app">Mail</span> application to set its status. With the Tracker add-ons <span class="app">Mark as Read </span> and <span class="app">Mark as...</span> you can select some email files and set their status in one go.</p>
+<p>您最好使用 <span class="menu">关闭 | 标记为...</span> 来创建一个新状态，为您的邮件分类。比如，您可以为其命名为"<i>待阅</i>"，在您空闲的时候再查询该状态的邮件，阅读即可。<br />
+
+或者，你可以为指定项目使用不同状态。例如，我创建了 "<i>HUG</i>"（表示 "Haiku user guide"，即 Haiku 用户指南）状态，然后在其下放置所有可能会影响用户指南内容的邮件，如有关代码更改提醒，新功能引入，或者任何我觉得能够增强用户指南的提交邮件。<br />
+但是，请务必保证状态名称的简洁。最好能够完整显示在文件浏览器的 “状态” 栏宽度内。</p>
+<p>您不一定要使用 <span class="app">电子邮箱</span> 程序打开邮件进行状态设置。您也可以选中某些邮件文件，然后使用文件浏览器的 <span class="app">标记为已读 </span> 或 <span class="app">标记为...</span> 附加组件来一次性设置它们的状态。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="queries" name="queries">使用查询</a></h2>
-<p>Sure, you specify a folder to store all your email, you can open it et voilà,  there's all you mail. But over time the folder becomes crowded and showing all will take longer and longer as thousands of files and their attributes have to be parsed and sorted. Also, most of the time you don't really care about two year old emails of Nigerian princes and their inheritory trouble ...</p>
-<div class="box-info">A lot of time when populating a folder is spent on putting files read from disk into the correct sorting order and displaying that in the window. If you do have to open a folder with a huge number of files, you can shorten the wait by making the Tracker window "invisible", i.e. either minimize it or change to another workspace. Watch <a href="applications/processcontroller.html">ProcessController</a> to see how it affects CPU usage.</div>
-<p><a href="queries.html">Queries</a>, to the rescue!</p>
-<p>By using queries, you can narrow down the view of your mails. Actually, the mailbox icon in the Deskbar uses queries.</p>
+<p>当然，您指定目录储存邮件，您打开这个目录，里面就是您所有的邮件。时间久了，这个目录难免会变得拥挤不堪，由于有上千个文件，并且它们属性需要解析和分类，其中全部内容的显示需要很长的时间。并且，通常您并不关心两年前有关尼日利亚和它们遗留问题的古老邮件...</p>
+<div class="box-info">在获取目录时，大部分时间都花费在从磁盘读入文件，正确排序之后显示在窗口。如果您确实需要打开具有大量文件的目录，您可以将文件浏览器窗口隐藏来缩短等待时间，例如，将其最小化，或者切换到其他工作空间。您可以查看 <a href="applications/processcontroller.html">进程管理器</a> 获取其对处理器的占用情况。</div>
+<p><a href="queries.html">查询</a>，大救星！</p>
+<p>使用查询，您可以浏览查看邮件。实际上，桌面栏上的电子邮箱图标就是用了查询。</p>
 <img src="images/workshop-email-images/daemon-in-deskbar.png" alt="daemon-in-deskbar.png" /> 
-<p>The <span class="menu">Open Draft</span> submenu does a query for the status "<i>Draft</i>", which is set by <span class="app">Mail</span> when you save a message.</p>
-<p><span class="menu">Open Inbox Folder</span> and <span class="menu">Open Mail Folder</span> are just links to regular folders (and not very useful in my opinion).</p>
-<p>The <span class="menu"># new messages</span> submenu is populated by a query for email with the status "<i>New</i>" (that same query is used to change the mailbox icon to show some letters in it, by the way).</p>
+<p><span class="menu">打开草稿</span> 就是对 “<i>草稿</i>” 状态的查询，也就是您在使用 <span class="app">电子邮箱</span> 保存邮件时所设置的状态。</p>
+<p><span class="menu">打开收件箱</span> 和 <span class="menu">打开邮件目录</span> 都是常规目录的链接（在我看来，并没有很大用处）。</p>
+<p><span class="menu"># 新消息</span> 子菜单由对状态为 "<i>新邮件</i>" 的邮件的一次查询实现。（当然，也使用了同样的查询来修改邮箱图标上的邮件数量）。</p>
 
-<p>You can add your own queries (or folders, applications, scripts etc.) to that context menu too, by putting them or links to them into <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
-<div class="box-info">The query <span class="path">~/config/settings/Mail/mailbox</span> is a special case: It is executed when left-clicking the mailbox icon in the Deskbar. If you want to change that behavior, you can replace it with any other file (or link to a file), just name it "<i>mailbox</i>". It doesn't have to be a query, a link to a folder of queries or a script or application works just as well.</div>
+<p>您可以在上述菜单中加入自己的查询（如目录、程序和脚本等）中，也就是把它们或者它们的链接放入目录 <span class="path">~/config/settings/Mail/Menu Links</span> 。</p>
+<div class="box-info"><span class="path">~/config/settings/Mail/mailbox</span> 查询比较特殊：左键单击桌面栏中邮箱图标时，它将被执行。如果您想修改它的行为，您可以将其替换为其他文件（或者文件链接），并命名为 “<i>mailbox</i> ”。它并不一定要是一个查询，比如查询目录的链接，脚本或者其他程序都能够胜任。
+</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -136,9 +138,10 @@ In any case, try to keep the status name short. That way it always fits in a nor
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">更多帮助</a></h2>
 <ul>
-<li><p>If you don't save a query as "<i>Query</i>" but as "<i>Query template</i>", invoking it won't show the result window, but the Find... window instead. That way you can easily exchange the search string for the subject or sender, for example, or change a "<i>2 days</i>" time limit to "<i>3 days</i>".</p></li>
-<li><p>Activating "type-ahead filtering" in <a href="tracker.html#tracker-preferences">Tracker's preferences</a> allows you to very quickly filter a query result even further. Often it's enough to query for all mails of the last 3 days and go with type-ahead filtering from there. The big advantage is, that you don't have to exactly specify which attribute to search for, as all displayed are considered when filtering.</p></li>
-<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> is a nifty little application that will query for all mails with the same subject/sender/time-frame etc. of a dropped email. Kind of what the <span class="menu">Queries</span> menu in the <span class="app">Mail</span> app is supposed to do.</p></li>
+<li><p>如果您没有将查询保存为 "<i>Query</i>" 而是 "<i>Query template</i>"，那么使用它并不会显示结果窗口，而是 查询... 窗口。 通过这种方式，你可以轻松地修改搜索邮件的主题和发送者的字符。比如将时间 "<i>2 天</i>" 限制在 "<i>3 天</i>"。</p></li>
+<li><p>在 <a href="tracker.html#tracker-preferences">文件浏览器首选项</a> 中激活 “实时过滤” 将允许您进一步的筛选查询结果。通常情况下，在使用实施过滤的情况下查询最近三天的邮件就已经足够了。
+这种方式最大的优点在于，您不需要准确的指定所要搜索的属性，因为在过滤时已经将所有显示属性包括在内。</p></li>
+<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> 是一个非常精巧的程序，可以用来查询与目标邮件具有相同主题/发送者/时间等的邮件。其与 <span class="app">电子邮箱</span> 程序中 <span class="menu">查询</span> 菜单所提供的功能相类似。</p></li>
 </ul>
 
 </div>

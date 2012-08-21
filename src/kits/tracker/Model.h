@@ -262,6 +262,7 @@ class Model {
 		status_t fStatus;
 		BString fLocalizedName;
 		bool fHasLocalizedName;
+		bool fLocalizedNameIsCached;
 };
 
 

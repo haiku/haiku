@@ -426,7 +426,6 @@ class BPoseView : public BView {
 		virtual void AdaptToDesktopIntegrationChange(BMessage*);
 
 		void SetTextWidgetToCheck(BTextWidget*, BTextWidget* = NULL);
-		BPoint Origin();
 
 	protected:
 		// view setup
@@ -714,7 +713,6 @@ class BPoseView : public BView {
 		BPose* fAlreadySelectedDropTarget;
 		BLooper* fSelectionHandler;
 		BPoint fLastClickPt;
-		bigtime_t fLastClickTime;
 		const BPose* fLastClickedPose;
 		BPoint fLastLeftTop;
 		BRect fLastExtent;

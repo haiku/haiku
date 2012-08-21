@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	853863347
+1	russian	x-vnd.Haiku-libtracker	2158958167
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -161,6 +161,7 @@ no supporting apps	OpenWithWindow		нет поддерживающих прог�
 That name is already taken. Please type another one.	InfoWindow		Это имя уже занято. Пожалуйста, введите другое.
 Sorry, you can't create links in the Trash.	PoseView		Извините, но вы не можете создавать ссылки в корзине.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Папка \"%name\" уже существует.\nЗаменить существующие файлы при совпадении имён?
+Tracker preferences…	ContainerWindow		Настройки Tracker…
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Ссылка \"%name\" на:
 Mount settings…	VolumeWindow		Настройка подключения дисков…
 Select…	VolumeWindow		Выделить…
@@ -374,7 +375,6 @@ Modified	FindPanel		Изменён
 Error moving \"%name\" to Trash. (%error)	FSUtils		Ошибка при перемещении \"%name\" в корзину. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Невозможно заменить папку её же собственной подпапкой.
 <No recent items>	FavoritesMenu		<Нет недавних объектов>
-Preferences…	ContainerWindow		Настройки…
 Move	PoseView		Переместить
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Вы уверены, что хотите удалить выделенные объекты? Эту операцию будет невозможно отменить.

@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -43,26 +43,24 @@
 <li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="filetypes.html">FileTypes</a>  »
+ «  <a href="deskbar.html">Työpöytäpalkki</a> 
+::  <a href="../preferences.html" class="uplink">Asetukset</a> 
+::  <a href="filetypes.html">Tiedostotyypit</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
 <tr class="index"><td>
-	<a href="#creating">Creating a new e-mail account</a><br />
-	<a href="#account-settings">Account settings</a><br />
-	<a href="#incoming">Setting up incoming e-mail</a><br />
-	<a href="#outgoing">Setting up outgoing e-mail</a><br />
-	<a href="#filters">Notifications and e-mail filters</a><br />
-	<a href="#settings">Setting up the Mail Service</a>
-</td></tr>
+	<a href="#creating">Uuden sähköpostitilin luominen</a><br />
+	<a href="#account-settings">Tiliasetukset</a><br />
+	<a href="#incoming">Lisää saapuvan sähköpostin asetuksista</a><br />
+	<a href="#outgoing">Lisää lähtevän sähköpostin asetuksista</a><br />
+	<a href="#filters">Ilmoitukset ja muut sähköpostisuodattimet</a><br />
+	<a href="#settings">Postipalvelun asettaminen</a></td></tr>
 </table>
 
 <h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />Sähköposti</h2>
@@ -71,162 +69,153 @@
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
-<p>Haiku provides a system that retrieves e-mail regularly via a Mail Service (also known as mail_daemon) and saves each mail as a single text file. It parses the mail and fills its attributes with all necessary header information, like from, to, subject and its unread status. Now it can be queried by you or any application. This system also makes switching e-mail clients easy as all the data and your configuration stays the same.<br />
-The configuration is done in the E-Mail preference panel.</p>
+<p>Haiku tarjoaa järjestelmän, joka noutaa sähköpostia säännöllisesti Sähköpostipalvelun kautta (tunnetaan myös nimellä mail_daemon) ja tallentaa jokaisen sähköpostiviestin yksittäisenä tekstitiedostona. Se jäsentää sähköpostiviestin ja täyttää sen attribuutit kaikilla välttämättömillä otsaketiedoilla, kuten lähettäjä, vastaanottaja, aihe ja viestin lukemistila. Nyt sinä tai mikä tahansa sovellus voi kysyä sitä. Tämä järjestelmä tekee sähköpostiasiakasohjelman vaihtamisen helpoksi, koska kaikki tiedot ja asetuksesi pysyvät samana.<br />Asetus on tehty sähköpostiasetuspaneelissa.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">Uuden sähköpostitilin luominen</a></h2>
-<p>Let's go through the process of setting up an e-mail account.<br />
-You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. This opens a panel where you fill in your account info:</p>
+<p>Käykäämme sähköpostitilin asetusprosessi lävitse.<br />Aloitat napsauttamalla <span class="button">Lisää</span>-painiketta, mikä luo uuden, nimeämättömän tilin. Tämä avaa paneelin, jossa täytät tilitietosi:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>First, you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
-<p>Now you enter your <i>E-mail address</i>, <i>Login name</i> and <i>Password</i>, give an <i>Account name</i> under which it will be known under Haiku and your <i>Real name</i>.</p>
-<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses. If that is not the case, clicking <span class="button">Next</span> will open another window to enter this information by hand:</p>
+<p>Ensimmäiseksi asetat sen millä yhteyskäytännöllä vastaanotat sähköpostisi, joko <span class="menu">POP3</span>-yhteyskäytännöllä tai <span class="menu">IMAP</span>-yhteyskäytännöllä.</p>
+<p>Nyt kirjoitat <i>sähköpostiosoitteesi</i>, <i>kirjautumisnimesi</i> ja <i>salasanasi</i> sekä annat sen <i>tilinimen</i>, jonka alla se tunnetaan Haikussa ja <i>oikean nimesi</i>.</p>
+<p>Jos tilisi on pääsähköpostitarjoajalta, Haiku jo tietää kaikki tekniset yksityiskohdat kuten palvelimen IP-osoitteet. Jos näin ei ole laita, painikkeen <span class="button">Seuraava</span> napsauttaminen avaa toisen ikkunan näiden tietojen kirjoittamiseksi manuaalisesti:</p>
 <img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
-<p>You first set the <i>Server name</i>, <i>Login type</i> and <i>Connection type</i> for the incoming mail, below that for the outgoing mail. You should find the necessary information on your email provider's website.<br />
-See below for more info about the various settings and additional options.</p>
+<p>Asetat ensiksi <i>palvelinnimen</i>, <i>kirjautumistyypin</i> ja <i>yhteystyypin</i> tulevalle sähköpostille ja sen alla lähtevälle sähköpostille. Sinun pitäisi löytää tarpeelliset tiedot sähköpostitarjoajasi webbisivulta.<br />Katso alla lisätietoja eri asetuksista ja lisävalitsimista.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account-settings" name="account-settings">Tiliasetukset</a></h2>
-<p>By selecting the name of an account in the left list, you can change some general settings:</p>
+<p>Valitsemalla tilin nimen vasemmanpuoleisesta luettelosta voit vaihtaa joitakin yleisiä asetuksia:</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p>The <i>Account name</i> is the name that's shown for example in the list of accounts in the E-mail preferences. <i>Real name</i> is the name someone sees when she gets mail from you. <i>Return address</i> is the email address that is used when someone replies to your mail. Normally that is the same address you've sent your email from.</p>
-<p>If you'd like to use an email account to only send or only receive email, you can de/activate that usage by right-clicking the account's name in the leftside list to set the checkmarks accordingly.</p>
+<p><i>Tilinimi</i> on nimi, joka näytetään esimerkiksi sähköpostiasetusten tililuettelossa. <i>Oikea nimi</i> on se nimi, jonka joku näkee, kun hän saa sähköpostia sinulta. <i>Paluuosoite</i> on sähköpostiosoite, jota käytetään, kun joku vastaa sähköpostiisi. Normaalisti se on sama osoite, josta olet lähettänyt sähköpostiviestisi.</p>
+<p>Jos haluat käyttää sähköpostitiliäsi vain joko lähettämiseen tai vastaanottamiseen, voit aktivoida/poistaa aktivoinnin käyttämällä hiiren oikeaa painiketta tilin nimen kohdalla vasemmanpuoleisessa luettelossa. mikä asettaa hyväksymismerkin vastaavasti.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="incoming" name="incoming">Lisää saapuvan sähköpostin asetuksista</a></h2>
-<p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
+<p>Napsauta painiketta <span class="menu">Tuleva</span> tilin nimen kohdalla sen asettamiseksi kuinka sähköpostia vastaanotetaan.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>First is the <span class="menu">Mail server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
-<p>Then you enter your login information, <i>Login name</i> and <i>Password</i>, and if necessary change the <i>Login type</i> from the default <span class="menu">Plain text</span> to <span class="menu">APOP</span> for authentication.</p>
-<p>If you use <i>POP3</i> and retrieve mails of this account from different computers, you may want to activate the option to <span class="menu">Leave mail on server</span> and only <span class="menu">Remove mail from server when deleted</span> locally.</p>
-<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify <span class="menu">IMAP folders</span> to only synchronize with a specific folder and its subfolders.</p>
-<p>Also, you can opt to only <span class="menu">Partially download messages larger than</span> a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
-<p>You can change the <i>Destination</i> of your inbox (default: <span class="path">/boot/home/mail/in/</span>), which is useful if you'd like to separate the mails from different accounts into their own folders. However, queries let you sort things out just as well.</p>
+<p>Ensimmäisenä on <span class="menu">Sähköpostipalvelin</span>-osoite tulevalle sähköpostille. Jos sähköpostitarjoajasi haluaa sinun kirjautuvat tiettyyn porttiin, voit lisätä sen osoitteeseen, erotettuna kaksoispisteellä. Esimerkiksi <tt>pop.your-provider.org:1400</tt>.</p>
+<p>Seuraavaksi kirjoitat kirjautumistiedot: <i>kirjautumisnimi</i> ja <i>salasana</i>, ja vaihdat <i>kirjautumistyypin</i>, jos se on välttämätöntä, oletusarvosta <span class="menu">Pelkkä teksti</span> todentamista varten <span class="menu">APOP</span>-tyypiksi.</p>
+<p>Jos käytät <i>POP3</i>-yhteyskäytäntöä ja noudat tämän tilin sähköpostiviestit eri tietokoneilta, saatat haluta aktivoida valitsimen <span class="menu">Jätä sähköposti palvelimelle</span> ja vain <span class="menu">Poista sähköpostiviesti palvelimelta poistettaessa</span> paikallisesti.</p>
+<p>Jos käytät sen sijaan <i>IMAP</i>-yhteyskäytäntöä, sinulla on valitsin <span class="menu">Poista sähköposti palvelimelta poistettaessa</span> paikallisesti. Voit määritellä <span class="menu">IMAP-kansiot</span> vain synkronoidaksesi tietyn kansion ja sen alikansiot.</p>
+<p>Voit myös valita vain <span class="menu">Osittain ladatut viestit suurempia kuin</span> tietty koko. Tällä saat näkyviin vain otsakkeen ja voit päättää, että haluatko ladata loput viestistä plus mahdolliseet liitteet sen jälkeen kun olet nähnyt aiheen ja kuka on lähettänyt viestin. Tämä on hyödyllinen hitailla yhteyksillä.</p>
+<p>Voit vaihtaa tulevan sähköpostilaatikkosi <i>Kohteen</i> (oletus: <span class="path">/boot/home/mail/in/</span>), mikä on hyödyllinen, jos haluat erotella eri tilien sähköpostit omiin kansioihin. Kyselyt sallivat sinun kuitenkin lajitella sanomat yhtä helposti.</p>
 
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="outgoing" name="outgoing">Lisää lähtevän sähköpostin asetuksista</a></h2>
-<p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
+<p>Napsauta <span class="menu">Lähtevä</span> tilin nimen kohdalla sen asettamiseksi, kuinka sähköpostiviestit lähetetään.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>First is the <i>SMTP server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
-<p>If you need to login, you change the <i>Login Type</i> to <span class="menu">ESMTP</span> and enter username and password above. The other type is used for providers that need you to check for mail with <span class="menu">POP3 before SMTP</span> for identification.</p>
-<p>As with incoming mail, you can also change the <i>Destination</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
+<p>Ensimmäisenä on <i>SMTP-palvelin</i>osoite lähtevää sähköpostia varten. Kuten edellä tulevalle sähköpostin palvelimelle, voit käyttää tiettyä porttia, jos on tarvetta. Esimerkiksi <tt>mail.your-provider.org:1200</tt>.</p>
+<p>Jos sinun on kirjauduttava, voit vaihtaa <i>kirjautumistyypin</i> <span class="menu">ESMTP</span>-valikosta ja kirjoittaa käyttäjänimen ja salasanan ylle. Toista tyyppiä <span class="menu">POP3 ennen SMTP</span> käyttävät sähköpostitarjoajat, jotka haluavat tunnistaa sähköposti lähettäjän.</p>
+<p>Kuten tulevassa sähköpostissa, voin myös vaihtaa lähtevän sähköpostilaatikon <i>kohteen</i> (oletus: <span class="path">/boot/home/mail/out/</span>).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filters" name="filters">Ilmoitukset ja muut sähköpostisuodattimet</a></h2>
-<p>Notifications for newly arrived email and methods to sort and filter emails are found in <span class="menu">E-Mail filters</span> under an account's name. You can add any number of filters that are applied one after the other and rearrange them by drag&amp;dropping them to their new position.<br />
-Currently there are three <span class="menu">Incoming mail filters</span> you can add. After adding a filter, you have to select it to see its options.</p>
+<p>Ilmoitukset vasta saapuneista sähköpostiviesteistä ja menetelmät sähköpostiviestien lajittelemiseksi ja suodattamiseksi löytyvät valikosta <span class="menu">Sähköpostisuodattimet</span> tilin nimen alapuolelta. Voit lisätä minkä tahansa määrän suodattimia, jotka suoritetaan peräkkäin yksi kerrallaan ja järjestään en uudelleen raahaamalla ja pudottamalla ne uuteen sijaintiinsa.<br />Nykyisin siellä on kolme <span class="menu">Tulevan postin suodatinta</span>, jotka voit lisätä. Suodattimen lisäämisen jälkeen voit valita sen nähdäksesi suodattimen valitsimet.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 Roskapostisuodatin (AGMS Bayesian)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
-<p>The spam filter uses statistical methods to classify a mail as unwanted spam. It assigns a value between 0 and 1 to it and you can decide what are the limits for a genuine mail and what will be considered spam.<br />
-You can have that spam rating added to the start of the subject.<br />
-Also, the spam filter can learn from all incoming e-mail. Of course, you'll have to teach it by sorting out the false positives, mails that were mistakenly marked as spam. You'll find more on that when we discuss the application <span class="app">Mail</span>.</p>
-<p>Together with the following <span class="menu">Rule filter</span>, you're able to automatically sort out detected spam mails.</p>
+<p>Roskapostisuodatin käyttää tilastollisia menetelmiä sähköpostiviestien luokittelemiseksi ei-halutuksi roskapostiksi. Se liittää arvon välillä 0 ja 1 siihen ja voit päättää, mitkä ovat rajat aidolle sähköpostiviestille ja mitä pidetään roskapostina.<br />Sinulla on roskapostiarvosana Aihe-rivin alussa.<br />Roskapostisuodatin voi myös oppia tulevista sähköpostiviesteistä. Tietysti sinun on opetettava sitä lajittelemalla pois väärät positiiviset - sähköpostiviestit, jotka on vahingossa merkitty roskapostiksi. Löydät lisätietoja kun keskustelemme sovelluksesta <span class="app">Sähköposti</span>.</p>
+<p>Seuraavan <span class="menu">Sääntösuodattimen</span> kanssa kykenet automaattisesti lajittelemaan havaitut roskapostilähetykset.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Sääntösuodatin</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
-<p>This filter compares the mail header to a search pattern and performs some action according to the rules you set up.<br />
- With the first text field you specify which header to check against. These are available:</p>
+<p>Tämä suodatin vertaa sähköpostiotsaketta hakumalliin ja suorittaa joitakin toimintoja asettamiesi sääntöjen mukaan.<br />Ensimmäisellä tekstikentällä määrittelet, mitä otsaketta vastaan tarkistus tehdään. Nämä ovat käytettävissä:</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
-		<td>the name of the sender</td></tr>
-	<tr><td><span class="menu">From</span></td><td> </td>
-		<td>the e-mail address of the sender</td></tr>
-	<tr><td><span class="menu">To</span></td><td> </td>
-		<td>your e-mail address (different for each e-mail account)</td></tr>
-	<tr><td><span class="menu">Reply to</span></td><td> </td>
-		<td>the e-mail address replies are sent to</td></tr>
-	<tr><td><span class="menu">When</span></td><td> </td>
-		<td>the date and time the mail was received</td></tr>
-	<tr><td><span class="menu">Subject</span></td><td> </td>
-		<td>the subject line</td></tr>
-	<tr><td><span class="menu">Cc</span></td><td> </td>
-		<td>addresses of anyone receiving a carbon copy (Cc)</td></tr>
-	<tr><td><span class="menu">Account</span></td><td> </td>
-		<td>the name of the e-mail's account</td></tr>
-	<tr><td><span class="menu">Status</span></td><td> </td>
-		<td>The current status of the e-mail. Normally, this can be "Read", "Replied", "Sent", "Forwarded", "New", or anything you have defined yourself. However, unless you change it yourself in a filter, it will always be "New" after the Mail Service fetched the mail.</td></tr>
-	<tr><td><span class="menu">Priority</span></td><td> </td>
-		<td>is set by the sender's e-mail program (e.g. "urgent")</td></tr>
-	<tr><td><span class="menu">Thread</span></td><td> </td>
-		<td>essentially the same as "Subject", but without things like Re: or Fwd:</td></tr>
-	<tr><td><span class="menu">Classification group</span></td><td> </td>
-		<td>depending on what the spam filter classified it as, this will either be empty (if uncertain) or contain the word "Genuine" or "Spam"</td></tr>
-	<tr><td class="onelinetop"><span class="menu">Spam/Genuine estimate</span></td><td> </td>
-		<td>this is a numerical estimate that the spam filter assigned to the e-mail. They are shown in scientific notation, where 1.065e-12 translates to 1.065 divided by 10 to the 12th power, which in this case translates to 0.000000000001065.</td></tr>
+	<tr><td><span class="menu">Nimi</span></td><td style="width:5px;"> </td>
+		<td>lähettäjän nimi</td></tr>
+	<tr><td><span class="menu">Lähettäjä</span></td><td> </td>
+		<td>lähettäjän sähköpostiosoite</td></tr>
+	<tr><td><span class="menu">Vastaanottaja</span></td><td> </td>
+		<td>sähköpostiosoitteesi (eri jokaiselle sähköpostitilille)</td></tr>
+	<tr><td><span class="menu">Vastausosoite</span></td><td> </td>
+		<td>sähköpostiosoite, johon vastaukset lähetetään</td></tr>
+	<tr><td><span class="menu">Milloin</span></td><td> </td>
+		<td>päivämäärä ja kellonaika, jolloin sähköpostiviesti vastaanotettiin</td></tr>
+	<tr><td><span class="menu">Aihe</span></td><td> </td>
+		<td>aiherivi</td></tr>
+	<tr><td><span class="menu">Kopio</span></td><td> </td>
+		<td>kaikkien niiden sähköpostiosoitteet, jotka saavat viestin kopion</td></tr>
+	<tr><td><span class="menu">Tili</span></td><td> </td>
+		<td>sähköpostitilin nimi</td></tr>
+	<tr><td><span class="menu">Tila</span></td><td> </td>
+		<td>Sähköpostin nykyinen tila. Normaalisti tämä voi olla "Luettu", "Vastattu", "Lähetetty", "Lähetetty edelleen", "Uusi", tai mitä tahansa, mitä olet määritellyt itse. Kuitenkin, jos et muuta sitä itse suodattimessa, se on aina "Uusi" sen jälkeen kun sähköpostipalvelu nouti sähköpostiviestin.</td></tr>
+	<tr><td><span class="menu">Prioriteetti</span></td><td> </td>
+		<td>lähettäjän sähköpostiohjelman asettama (esimerkiksi "kiireellinen")</td></tr>
+	<tr><td><span class="menu">Säie</span></td><td> </td>
+		<td>olennaisesti sama kuin "Aihe", mutta ilman edeltäviä merkintöjä Vastaus: tai Edelleenlähetys:</td></tr>
+	<tr><td><span class="menu">Luokitteluryhmä</span></td><td> </td>
+		<td>riippuen siitä, miten roskapostisuodatin luokittelee sen, tämä on joko tyhjä (jos epävarma) tai sisältää sanan "Aito" tai "Roskaposti"</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Roskaposti/aitousarvio</span></td><td> </td>
+		<td>tämä on numeerinen arvio, jonka roskapostisuodatin liittää sähköpostiviestiin. Ne näytetään tieteellisellä merkintätavalla, missä 1.065e-12 käännetään luvuksi 1.065 jaetuna 10:llä ja korotettuna 12. potenssiinr, mistä tässä tapauksessa tulee 0.000000000001065 (piste tarkoittaa desimaalipilkkua).</td></tr>
 </table>
-<p>The second text field holds your search pattern. It accepts <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">regular expressions</a> which gives it great flexibility, while unfortunately complicating things a bit. Read up on it a bit, it's well worth it and simple search patterns aren't <i>that</i> complicated at all.</p>
-<p>With the pop-up menu below it, you assign an action when the pattern matches. You can move or delete a mail, set the status to "Read" or anything else or set the e-mail account you'll reply with.</p>
+<p>Toinen tekstikenttä sisältää hakumallisi. Se hyväksyy <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">säännölliset lausekkeet</a>, mikä antaa sille joustavuuden samalla kun se tekee siitä valitettavasti mutkikkaamman. Lue hiukan siitä, koska se on sen arvoinen ja yksinkertaiset hakumallit eivät ole <i>niin</i> mutkikkaita ollenkaan.</p>
+<p>Sen alapuolisessa ponnahdusvalikossa liität toiminnon kun hakumalli täsmää. Voit siirtää tai poistaa sähköpostiviestin, asettaa tilaksi "Luettu" tai jotain muuta tai asettaa sähköpostitili, jolla vastaat.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 Ilmoitus uudesta sähköpostiviestistä</h3>
 <img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
-<p>There are several ways you can choose to be notified of newly arrived email. Under <span class="menu">Method</span> you find a number of options that can be combined as well:</p>
+<p>Voit valita useita tapoja, millä tavoin sinulle ilmoitetaan vasta saapuneesta sähköpostiviestistä. <span class="menu">Menetelmä</span>-valikosta löydät lukuisia valitsimia, joita voidaan myös yhdistellä:</p>
 <table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">none</span></td><td style="width:5px;"> </td>
-		<td>No notification</td></tr>
-	<tr><td><span class="menu">Beep</span></td><td> </td>
-		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences for <i>every</i> new email</td></tr>
-	<tr><td><span class="menu">Alert</span></td><td> </td>
-		<td>Shows an alert window for <i>every</i> new email</td></tr>
-	<tr><td><span class="menu">Keyboard LEDs</span></td><td> </td>
-		<td>Blinks some LEDs like the caps-lock indicator</td></tr>
-	<tr><td class="onelinetop"><span class="menu">Central alert</span></td><td> </td>
-		<td>Shows <i>one</i> alert window for all new mails</td></tr>
-	<tr><td><span class="menu">Central beep</span></td><td> </td>
-		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences <i>once</i> for new mail</td></tr>
-	<tr><td><span class="menu">Log window</span></td><td> </td>
-		<td>Shows the log window</td></tr>
+	<tr><td><span class="menu">ei mitään</span></td><td style="width:5px;"> </td>
+		<td>Ei ilmoitusta</td></tr>
+	<tr><td><span class="menu">Piippaus</span></td><td> </td>
+		<td>Soittaa "Uusi sähköpostiviesti"-tapahtumalle <a href="sounds.html">Ääniasetukset</a>-ohjelmassa asetetun äänitiedoston <i>jokaisen</i> uuden sähköpostiviestin saapuessa</td></tr>
+	<tr><td><span class="menu">Hälytys</span></td><td> </td>
+		<td>Näyttää hälytysikkunan <i>jokaisen</i> uuden sähköpostiviestin saapuessa</td></tr>
+	<tr><td><span class="menu">Näppäimistön LEDit</span></td><td> </td>
+		<td>Vilkuttaa joitakin LEDejä kuten Caos Lock -indikaattori</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Keskushälytys</span></td><td> </td>
+		<td>Näyttää <i>yhden</i> hälytysikkunan kaikille uusille sähköpostiviesteille</td></tr>
+	<tr><td><span class="menu">Keskuspiippaus</span></td><td> </td>
+		<td>Soittaa "Uusi sähköpostiviesti"-tapahtumalle <a href="sounds.html">Ääniasetukset</a>-ohjelmassa asetetun äänitiedoston <i>kerran</i> ensimmäisen uuden sähköpostiviestin saapuessa</td></tr>
+	<tr><td><span class="menu">Loki-ikkuna</span></td><td> </td>
+		<td>Näyttää loki-ikkunan</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 Lähtevän sähköpostin suodattimet</h3>
-<p>At this moment, there's only one filter that deals with outgoing mail: <span class="cli">fortune</span>.
-<br />It will attach a randomly chosen funny or wise "fortune cookie" to the end of every mail before it's sent out. You can do a dry run by issuing the command <span class="cli">fortune</span> in a Terminal.</p>
+<p>Tällä hetkellä on vain yksi lähtevää sähköpostia käsittelevä suodatin: <span class="cli">fortune</span>.<br />Se liittää satunnaisesti valitun hauskan tai viisaan "onnenkeksin" jokaisen sähköpostiviestin loppuun ennen sen lähettämistä. Voit kuiva-ajaa antamalla Pääteikkunassa komennon <span class="cli">fortune</span>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Postipalvelun asettaminen</a></h2>
-<p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the Mail Service that does all the actual checking and fetching how to do its job.</p>
+<p>Sen jälkeen kun tulevan ja lähtevän postin sähköpostipalvelimet (ja ehkä myös jotkut suodattimet) on asetettu, sinun on kehotettava Sähköpostipalvelua, joka tekee todellisen tarkistuksen ja noutamisen, tekemään työnsä.</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p>Under <i>Mail checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
-If you're on a dial-up connection, you may want to do that <span class="menu">Only when dial-up is connected</span> and also <span class="menu">Schedule outgoing mail when dial-up is disconnected</span> to avoid dialing automatically in regularly only to check for mail.</p>
-<p>The Mail Service has a status window which you can set to show up <span class="menu">Never</span>, <span class="menu">While sending</span>, <span class="menu">While sending and receiving</span> or <span class="menu">Always</span>.</p>
-<p>Make sure to <span class="menu">Start mail services on startup</span> or there will be no mail_daemon running to do your bidding...</p>
+<p><i>Sähköpostin tarkistus</i>-kohdassa asetat aikavälin, jolloin tilin sähköpostipalvelimelta kysellään uusia sähköpostiviestejä.<br />Jos sinulla on valintainen verkkoyhteys, saatat haluta tehdä sen <span class="menu">Vain kun valintayhteys on yhdistetty</span> ja myös <span class="menu">Aikatauluta lähtevä sähköposti kun valintayhteys ei ole kytketty</span>, jotta vältät säännöllistä automaattivalintaa vain sähköpostin tarkistamiseksi.</p>
+<p>Sähköpostipalvelulla on tilaikkuna, jonka voit asettaa näyttämään <span class="menu">Ei koskaan</span>, <span class="menu">Lähetettäessä</span>, <span class="menu">Lähetettäessä ja vastaanotettaessa</span> tai <span class="menu">Aina</span>.</p>
+<p>Varmista, että <span class="menu">Käynnistä sähköpostipalvelut järjestelmän käynnistyksen yhteydessä</span> on valittu tai ei ole mitään mail_daemon-taustaprosessia käynnissä tekemään kyselyä...</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
-<p><span class="menu">Edit mailbox menu...</span> will open the folder <span class="path">/boot/home/config/Mail/Menu Links/</span>. All folders or queries (!) or their links put into this folder will appear in the context menu of the mailbox icon of the Mail Services in the Deskbar tray.</p>
-<p>From that menu, you can also <span class="menu">Create new message...</span>, <span class="menu">Check for mail now</span> or edit <span class="menu">Preferences...</span>.</p>
-<p>If you hold down <span class="key">SHIFT</span> when invoking the context menu, you'll get additional commands:</p>
+<p>Painike <span class="menu">Muokkaa sähköpostilaatikkovalikkoa...</span> avaa kansion <span class="path">/boot/home/config/Mail/Menu Links/</span>. Kakki kansiot tai kyselyt (!) tai niiden linkit, jotka on laitettu tähän kansioon, ilmaantuvat Työpöytäpalkin tarjottimen sähköpostipalvelujen sähköpostilaatikkokuvakkeen asiayhteysvalikkoon.</p>
+<p>Tuosta valikosta voit myös <span class="menu">Luo uusi viesti...</span>, <span class="menu">Tarkista sähköposti nyt</span> tai muokata <span class="menu">Asetukset...</span>.</p>
+<p>Jos pidät alhaalal <span class="key">VAIHTO</span>-näppäintä asiayhteysvalikkoa kutsuessasi, saat näkyviin lisäkomentoja:</p>
 <table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">Check for mails only</span></td><td style="width:5px;"> </td>
-		<td>Offers a submenu to check only one specific account</td></tr>
-	<tr><td><span class="menu">Send pending mails</span></td><td> </td>
-		<td>Allows you to send pending mails without also checking for new mails</td></tr>
-	<tr><td><span class="menu">Shutdown mail services</span></td><td> </td>
-		<td>Quits the whole email infrastructure (mail_daemon)</td></tr>
+	<tr><td><span class="menu">Tarkistaa vain sähköpostiviestit</span></td><td style="width:5px;"> </td>
+		<td>Tarjoaa alivalikon vain yhden tietyn tilin tarkistamiseksi</td></tr>
+	<tr><td><span class="menu">Lähettää odottavat sähköpostiviestit</span></td><td> </td>
+		<td>Salli lähettää vireillä olevat sähköpostiviestit tarkistamatta uusia sähköpostiviestejä</td></tr>
+	<tr><td><span class="menu">Sulkee sähköpostipalvelut</span></td><td> </td>
+		<td>Sulkee koko sähköpostijärjestelmän (mail_daemon)</td></tr>
 </table>
-<p>The mailbox icon itself shows if there are unread messages (status "New") when there are envelopes inside.</p>
+<p>Sähköpostilaatikon kuvake itse näyttää, jos on lukemattomia viestejä (tila "Uusi"), kun siinä on kirjekuoria sisällä.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="filetypes.html">FileTypes</a>  »
+ «  <a href="deskbar.html">Työpöytäpalkki</a> 
+::  <a href="../preferences.html" class="uplink">Asetukset</a> 
+::  <a href="filetypes.html">Tiedostotyypit</a>  »
 </span></div>
 </div>
 

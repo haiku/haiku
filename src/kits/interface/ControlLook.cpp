@@ -344,7 +344,6 @@ BControlLook::DrawMenuItemBackground(BView* view, BRect& rect,
 	if ((flags & B_ACTIVATED) != 0) {
 		topTint = 0.9;
 		bottomTint = 1.05;
-		selectedColor = tint_color(base, 1.26);
 	} else if ((flags & B_DISABLED) != 0) {
 		topTint = 0.80;
 		bottomTint = 1.07;

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-icon_o_matic	4233739176
+1	swedish	x-vnd.haiku-icon_o_matic	3088916408
 Select All	Icon-O-Matic-PathManipulator		Markera allt
 Add Style	Icon-O-Matic-AddStylesCmd		Lägg till stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Färg (#%02x%02x%02x)
@@ -192,7 +192,6 @@ Overwrite	Icon-O-Matic-SVGExport		Skriv över
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Frys figurer
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Klyv kontrollpunkt
 Open…	Icon-O-Matic-Menu-File		Öppna...
-Options	Icon-O-Matic-Menus		Alternativ
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Färg (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Redigera övergång
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Rensa upp bana

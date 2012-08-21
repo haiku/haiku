@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-GLTeapot	2890609668
+1	lithuanian	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		Viršuje centre
 Lighting	TeapotWindow		Apšvietimas
 Off	TeapotWindow		Išjungta
@@ -13,7 +13,6 @@ Fog	TeapotWindow		Rūkas
 Backface culling	TeapotWindow		Nugarėlių atranka
 Z-buffered	TeapotWindow		Z–buferiavimas
 File	TeapotWindow		Failas
-Options	TeapotWindow		Parinktys
 Perspective	TeapotWindow		Perspektyva
 GLTeapot	System name		Arbatinukas
 Green	TeapotWindow		Žalia

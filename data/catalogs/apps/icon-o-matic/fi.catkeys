@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	4233739176
+1	finnish	x-vnd.haiku-icon_o_matic	3088916408
 Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
 Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
@@ -192,7 +192,6 @@ Overwrite	Icon-O-Matic-SVGExport		Korvaa
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Jähmetä hahmot
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Halkaise ohjauspiste
 Open…	Icon-O-Matic-Menu-File		Avaa...
-Options	Icon-O-Matic-Menus		Valitsimet
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Väri (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Muokkaa kaltevuutta
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Nollaa polku

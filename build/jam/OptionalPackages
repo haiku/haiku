@@ -81,6 +81,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Pe						- the powerful native Programmer's Editor
 #	Perl					- the scripting language
 #	Python					- the scripting language
+#	Puri					- chess game
 #	Rsync					- remote directory synchronization
 #	Ruby					- the programming language
 #	Sed						- the ultimate stream editor
@@ -1605,6 +1606,24 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 }
 
 
+# Puri
+if [ IsOptionalHaikuImagePackageAdded Puri ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Puri available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				puri-0.3.9.1-x86-gcc4-2012-08-16.zip
+				: $(baseURL)/puri-0.3.9.1-x86-gcc4-2012-08-16.zip ;
+		} else {
+			Echo "No optional package Puri available for gcc2" ;
+		}
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/apps/Puri/Puri ;
+	}
+}
+
+
 # Python
 if [ IsOptionalHaikuImagePackageAdded Python ] {
 	if $(TARGET_ARCH) != x86 {
@@ -1902,6 +1921,12 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 			Echo "No optional package WebPositive available for gcc2" ;
 		} else {
 			Echo "WebPositive will be compiled by gcc4 inside $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)" ;
+			local catalogs = [ on WebPositive return $(HAIKU_CATALOG_FILES) ] ;
+			if $(catalogs) {
+				local signature = x-vnd.Haiku-WebPositive ;
+				AddFilesToHaikuImage system data locale catalogs $(signature)
+					: $(catalogs) ;
+			}
 		}
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		AddFilesToHaikuHybridImage apps : WebPositive ;

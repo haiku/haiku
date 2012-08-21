@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	2104753528
+1	french	x-vnd.Haiku-WebPositive	732657731
 Show home button	Settings Window		Afficher le bouton de la page d'accueil
 Username:	Authentication Panel		Utilisateur :
 Copy URL to clipboard	Download Window		Copier l'URL dans le presse-papiers
@@ -6,6 +6,7 @@ Cancel	Settings Window		Annuler
 Close window	WebPositive Window		Fermer la fenêtre
 Quit	WebPositive		Quitter
 The download could not be opened.	Download Window		Impossible d'ouvrir l'objet téléchargé.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Le dossier de téléchargement n'a pas pu être ouvert.\n\nErreur : %error
 Open location	WebPositive Window		Ouvrir l'emplacement
 Clear history	WebPositive Window		Nettoyer l'historique
 WebPositive	System name		WebPositive
@@ -54,10 +55,13 @@ Revert	Settings Window		Restaurer
 Fixed font:	Settings Window		Police à chasse fixe :
 Cut	WebPositive Window		Couper
 Bookmark this page	WebPositive Window		Poser un signet sur cette page
+Open downloads folder	Download Window		Ouvrir le dossier des téléchargements
+Number of days to keep links in History menu:	Settings Window		Nombre de jours de conservation de l'historique :
 Hide	Download Window		Cacher
 Reset size	WebPositive Window		Réinitialiser la taille
 Find:	WebPositive Window		Rechercher :
 Increase size	WebPositive Window		Augmenter la taille
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Une erreur est survenue en récupérant le dossier des signets.\n\nErreur : %error
 Over 1 day left	Download Window		Plus d'un jour restant
 Downloads	WebPositive Window		Téléchargements
 Requesting %url	WebPositive Window		Requête de %url
@@ -70,6 +74,7 @@ Finish: 	Download Window	Finishing time	Fin :
 Fonts	Settings Window		Polices
 Close	WebPositive Window		Fermer
 OK	Download Window		OK
+Page source error	WebPositive Window		Erreur dans la page source
 Open blank page	Settings Window		Ouvrir une page blanche
 New tabs:	Settings Window		Nouvel onglet :
 Cancel	WebPositive Window		Annuler
@@ -111,8 +116,12 @@ Style:	Font Selection view		Style :
 General	Settings Window		Général
 View	WebPositive Window		Affichage
 Previous	WebPositive Window		Précédent
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Une erreur est survenue en créant le fichier de signet.\n\nErreur : %error
 Bookmark error	WebPositive Window		Erreur de signet
+Do you really want to clear the browsing history?	WebPositive Window		Voulez-vous vraiment effacer l'historique de navigation ?
 Copy	WebPositive Window		Copier
+Open bookmarks confirmation	WebPositive Window		Confirmation de l'ouverture des signets
+Clone current page	Settings Window		Cloner la page actuelle
 OK	Authentication Panel		OK
 Copy	URL Bar		Copier
 OK	WebPositive Window		OK

@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-POST	2300302075
+1	german	x-vnd.Be-POST	1091177030
 Fetching mail for %name	Notifier		E-Mails für %name abrufen
 Check for mails only	DeskbarView		E-Mails nur abrufen für
 Send pending mails	DeskbarView		E-Mails senden
@@ -9,7 +9,6 @@ Mail status	MailDaemon		E-Mail-Status
 Shutdown mail services	DeskbarView		E-Mail-Dienst ausschalten
 %num new message	DeskbarView		%num neue Nachricht
 Sending mail for %name	Notifier		E-Mails von %name senden
-Preferences…	DeskbarView		Einstellungen…
 %num new messages.	MailDaemon		%num neue Nachrichten.
 %num new message.	MailDaemon		%num neue Nachricht.
 Create new message…	DeskbarView		Nachricht verfassen…
@@ -19,5 +18,6 @@ Check for mail now	DeskbarView		E-Mails jetzt abrufen
 No new messages	DeskbarView		Keine neuen Nachrichten
 %num new messages for %name\n	MailDaemon		%num neue Nachrichten für %name\n
 Mail daemon status log	MailDaemon		E-Mail-Dienst Statusmeldungen
+Settings…	DeskbarView		Einstellungen…
 No new messages.	MailDaemon		Keine neuen Nachrichten.
 Mail status	Notifier		Email-Status

@@ -1,7 +1,6 @@
-1	belarusian	x-vnd.Haiku-RAWTranslator	1938728039
+1	belarusian	x-vnd.Haiku-RAWTranslator	2229230003
 RAWTranslator Settings	ConfigView		Наладкі канвертара RAW
 Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
-RAW Images	ConfigView		Выявы RAW
 RAW image translator	RAWTranslator		Канвертар выяваў RAW
 RAW Settings	RAWTranslator main		Наладкі RAW
 RAW images	RAWTranslator		Выявы RAW

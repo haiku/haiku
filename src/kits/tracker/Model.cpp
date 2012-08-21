@@ -96,7 +96,8 @@ Model::Model()
 	fWritable(false),
 	fNode(NULL),
 	fStatus(B_NO_INIT),
-	fHasLocalizedName(false)
+	fHasLocalizedName(false),
+	fLocalizedNameIsCached(false)
 {
 }
 
@@ -111,7 +112,8 @@ Model::Model(const Model &cloneThis)
 	fWritable(false),
 	fNode(NULL),
 	fLocalizedName(cloneThis.fLocalizedName),
-	fHasLocalizedName(cloneThis.fHasLocalizedName)
+	fHasLocalizedName(cloneThis.fHasLocalizedName),
+	fLocalizedNameIsCached(cloneThis.fLocalizedNameIsCached)
 {
 	fStatBuf.st_dev = cloneThis.NodeRef()->device;
 	fStatBuf.st_ino = cloneThis.NodeRef()->node;
@@ -137,7 +139,8 @@ Model::Model(const node_ref* dirNode, const node_ref* node, const char* name,
 	fPreferredAppName(NULL),
 	fWritable(false),
 	fNode(NULL),
-	fHasLocalizedName(false)
+	fHasLocalizedName(false),
+	fLocalizedNameIsCached(false)
 {
 	SetTo(dirNode, node, name, open, writable);
 }
@@ -148,7 +151,8 @@ Model::Model(const BEntry* entry, bool open, bool writable)
 	fPreferredAppName(NULL),
 	fWritable(false),
 	fNode(NULL),
-	fHasLocalizedName(false)
+	fHasLocalizedName(false),
+	fLocalizedNameIsCached(false)
 {
 	SetTo(entry, open, writable);
 }
@@ -161,7 +165,8 @@ Model::Model(const entry_ref* ref, bool traverse, bool open, bool writable)
 	fIconFrom(kUnknownSource),
 	fWritable(false),
 	fNode(NULL),
-	fHasLocalizedName(false)
+	fHasLocalizedName(false),
+	fLocalizedNameIsCached(false)
 {
 	BEntry entry(ref, traverse);
 	fStatus = entry.InitCheck();
@@ -569,11 +574,14 @@ Model::SetupBaseType()
 void
 Model::CacheLocalizedName()
 {
-	if (BLocaleRoster::Default()->GetLocalizedFileName(
-			fLocalizedName, fEntryRef, true) == B_OK)
-		fHasLocalizedName = true;
-	else
-		fHasLocalizedName = false;
+	if (!fLocalizedNameIsCached) {
+		fLocalizedNameIsCached = true;
+		if (BLocaleRoster::Default()->GetLocalizedFileName(
+				fLocalizedName, fEntryRef, true) == B_OK)
+			fHasLocalizedName = true;
+		else
+			fHasLocalizedName = false;
+	}
 }
 
 

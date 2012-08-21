@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	2834665561
+1	russian	x-vnd.Be-MAIL	3337401776
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
@@ -27,6 +27,7 @@ Expert	Mail		Эксперт
 Reply account:	Mail		Ответить, используя акканут:
 Discard	Mail		Сбросить
 Message	Mail		Сообщение
+Settings…	Mail		Настройки…
 Reply to sender	Mail		Ответить отправителю
 There is no installed handler for URL links.	Mail		Не выбрано приложение для открытия ссылок.
 Signature	Mail		Подпись
@@ -38,7 +39,6 @@ Save changes to this signature?	Mail		Сохранить изменения в �
 Cc:	Mail		Копия:
 Off	Mail		Выключить
 Find	Mail		Найти
-Preferences…	Mail		Настройки…
 Undo	Mail		Отменить
 Date:	Mail		Дата:
 An error occurred trying to open this signature.	Mail		Возникла ошибка при попытке открытия этой подписи.

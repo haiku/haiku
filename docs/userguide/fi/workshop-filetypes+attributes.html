@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Filetypes, Attributes, Index and Queries</title>
+	<title>Työpaja: Tiedostotyypit, attribuutit, indeksi ja kyselyt</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,15 +43,15 @@
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="applications.html">Applications</a>  »
+ «  <a href="queries.html">Kyselyt</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="applications.html">Sovellukset</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -68,7 +70,7 @@
 </td></tr>
 </table>
 
-<h1>Workshop: Filetypes, Attributes, Index and Queries</h1>
+<h1>Työpaja: Tiedostotyypit, attribuutit, indeksi ja kyselyt</h1>
 
 <p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.</p>
 
@@ -79,7 +81,7 @@
 To that we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
 <p>Here are the attributes I'd like to see for my DVDs:</p>
 <ul>
-<li>Movie title</li>
+<li>Elokuvaotsikko</li>
 <li>Genre</li>
 <li>URL to e.g. IMdB</li>
 <li>Director/Cast</li>
@@ -91,7 +93,7 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="custom-filetype" name="custom-filetype">Creating a custom filetype</a></h2>
+<a id="custom-filetype" name="custom-filetype">Oman tiedostotyypin luominen</a></h2>
 <p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
 <p>Now, a panel for your new DVDdb filetype opens:</p>
@@ -99,17 +101,17 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">Icon</a></h3>
+<a id="icon" name="icon">Kuvake</a></h3>
 <p>Double-click the icon well to open  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="file-recognition" name="file-recognition">File Recognition</a></h3>
+<a id="file-recognition" name="file-recognition">Tiedostotunnistus</a></h3>
 <p>You can add suffixes like .txt, .jpg, .mp3 to recognize files by their extention. Useful when working with files from systems without MIME typing. We don't need that for our example.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="description" name="description">Description</a></h3>
+<a id="description" name="description">Kuvaus</a></h3>
 <ul>
 <li><i>Type name</i> - Appears e.g. in the Attribute menu of Tracker windows and the "Kind" attribute of a file.</li>
 <li><i>Description</i> - A bit more detailed description.</li>
@@ -117,16 +119,16 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="pref_app" name="pref_app">Preferred Application</a></h3>
+<a id="pref_app" name="pref_app">Ensisijainen sovellus</a></h3>
 <p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">Select...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
-<tr><td class="onelinetop"><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+<tr><td><span class="button">Valitse...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
+<tr><td class="onelinetop"><span class="button">Sama kuin...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h3>
+<a id="extra_attribute" name="extra_attribute">Lisäattribuutit</a></h3>
 <p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
@@ -159,25 +161,25 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 </ul></li></ul>
 <p>Now, insert all the info for our attributes:</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th><th>indexed?</th><th>Description</th></tr>
-<tr><td>DVDdb:title</td>	<td>text</td>		<td>yes</td>	<td>Movie title</td></tr>
-<tr><td>DVDdb:genre</td>	<td>text</td>		<td>yes</td>	<td>Genre</td></tr>
-<tr><td>DVDdb:url</td>		<td>text</td>		<td>no</td>	<td>URL</td></tr>
-<tr><td>DVDdb:cast</td>		<td>text</td>		<td>yes</td>	<td>Director/Cast</td></tr>
-<tr><td>DVDdb:plot</td>		<td>text</td>		<td>no</td>	<td>Plot</td></tr>
-<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>yes</td>	<td>Rating 1 to 10</td></tr>
-<tr><td>DVDdb:coord</td>	<td>text</td>		<td>no</td>	<td>Shelf</td></tr>
-<tr><td>DVDdb:lent</td>		<td>text</td>		<td>yes</td>	<td>Lent to</td></tr>
+<tr><th>Sisäinen nimi</th><th>Attribuuttityyppi</th><th>indeksoitu?</th><th>Kuvaus</th></tr>
+<tr><td>DVDdb:title</td>	<td>text</td>		<td>kyllä</td>	<td>Elokuvaotsikko</td></tr>
+<tr><td>DVDdb:genre</td>	<td>text</td>		<td>kyllä</td>	<td>Genre</td></tr>
+<tr><td>DVDdb:url</td>		<td>text</td>		<td>ei</td>	<td>Verkko-osoite</td></tr>
+<tr><td>DVDdb:cast</td>		<td>text</td>		<td>kyllä</td>	<td>Director/Cast</td></tr>
+<tr><td>DVDdb:plot</td>		<td>text</td>		<td>ei</td>	<td>Plot</td></tr>
+<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>kyllä</td>	<td>Arvosana 1 ... 10</td></tr>
+<tr><td>DVDdb:coord</td>	<td>text</td>		<td>ei</td>	<td>Shelf</td></tr>
+<tr><td>DVDdb:lent</td>		<td>text</td>		<td>kyllä</td>	<td>Lent to</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="indexing" name="indexing">Indexing</a></h2>
+<a id="indexing" name="indexing">Indeksointi</a></h2>
 <p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
 So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
 <p>This leaves these attributes:</p>
 <table summary="Attribute Type" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th></tr>
+<tr><th>Sisäinen nimi</th><th>Attribuuttityyppi</th></tr>
 <tr><td>DVDdb:title</td><td>text</td></tr>
 <tr><td>DVDdb:genre</td><td>text</td></tr>
 <tr><td>DVDdb:cast</td><td>text</td></tr>
@@ -218,9 +220,9 @@ Open the folder containing your DVDdb files and arrange the attributes how you'd
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="applications.html">Applications</a>  »
+ «  <a href="queries.html">Kyselyt</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="applications.html">Sovellukset</a>  »
 </span></div>
 </div>
 

@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Terminal</title>
+	<title>Pääteikkuna</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -42,30 +44,30 @@
 </ul>
 <span>
  «  <a href="stylededit.html">StyledEdit</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
+::  <a href="textsearch.html">Tekstihaku</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
+<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Pääteikkuna</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/common/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/common/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - lisää/korvaa oletukset tiedostossa <span class="path">/boot/common/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - lisää/korvaa oletukset tiedostossa <span class="path">/boot/common/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
-<p>The Terminal is Haiku's interface to bash, the Bourne Again Shell.</p>
-<p>Please refer to the topic on <a href="../bash-scripting.html">Scripting</a> for a few links to online tutorials on working in the shell and also have a look at <a href="cli-apps.html">Haiku's commandline applications</a>. Here, we'll concentrate on the Terminal application itself.</p>
+<p>Pääteikkuna on Haikun käyttöliittymä bash-komentotulkkiin, the Bourne Again Shell.</p>
+<p>Viittaan aiheen <a href="../bash-scripting.html">Skriptaus</a> muutamiin verkko-oppituntien linkkeihin toimimisestä komentotulkin alla ja kannattaa myös katsoa <a href="cli-apps.html">Haikun komentorivisovellukset</a>. Tässä keskitymme itse Pääteikkuna-sovellukseen.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="windows-tabs" name="windows-tabs">Windows and tabs</a></h2>
+<a id="windows-tabs" name="windows-tabs">Ikkunat ja välilehdet</a></h2>
 <p>You can open as many Terminals as needed, either each in it's own window by simply launching more Terminals or with <span class="key">ALT</span> <span class="key">N</span> from an already running Terminal. Or you use Terminal's tabbed view and open more tabs with <span class="key">ALT</span> <span class="key">T</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
@@ -77,7 +79,7 @@ Via <span class="menu">Edit | Window title...</span> the Terminal window's title
 <p>Changed window size and text encoding are only kept choosing <span class="menu">Settings | Save as default</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Settings</a></h2>
+<a id="settings" name="settings">Asetukset</a></h2>
 <p><span class="menu">Settings | Settings...</span> opens a panel to configure the standard settings of a Terminal.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
@@ -113,7 +115,7 @@ Both files can be created in the <span class="path">home/</span> folder and add 
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hints" name="hints">Hints for working with the Terminal</a></h2>
+<a id="hints" name="hints">Vihjeitä Pääteikkunatyöskentelystä</a></h2>
 <ul><li><p>Dragging a file or folder from a Tracker window into the Terminal will insert its path at the location of the cursor. Dragging with the right mouse button offers additional actions in a context menu:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Insert path</span></td><td> </td><td>Inserts the location of the file, same as drag&amp;dropping with the left mouse button.</td></tr>
@@ -133,8 +135,8 @@ Both files can be created in the <span class="path">home/</span> folder and add 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="stylededit.html">StyledEdit</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
+::  <a href="textsearch.html">Tekstihaku</a>  »
 </span></div>
 </div>
 

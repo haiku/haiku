@@ -1,0 +1,17 @@
+1	french	x-vnd.Haiku-Login	3428662131
+Error: %1	Login App		Erreur : %1
+Hide password	Login View		Camoufler le mot de passe
+Desktop	Desktop Window		Bureau
+Invalid login!	Login View		Échec de l'identification !
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLancer en mode édition de présentoire pour permettre la personnalisation du bureau.\n
+OK	Login View		OK
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	erreur %s\n
+Login:	Login View		Identifiant :
+Error	Login App		Erreur
+Unimplemented	Login App		Non implémenté
+Welcome to Haiku	Login Window		Bienvenue dans Haiku
+Reboot	Login View		Redémarrer
+Halt	Login View		Arrêter
+Password:	Login View		Mot de passe :
+OK	Login App		OK
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tLa fenêtre n'est pas rendue modale\n

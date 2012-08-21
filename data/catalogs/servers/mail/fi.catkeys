@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-POST	2300302075
+1	finnish	x-vnd.Be-POST	2566871483
 Fetching mail for %name	Notifier		Noudetaan sähköpostia vastaanottajalle %name
 Check for mails only	DeskbarView		Tarkista vain sähköpostit
 Send pending mails	DeskbarView		Lähetä odottamassa olevat sähköpostit
@@ -9,7 +9,6 @@ Mail status	MailDaemon		Sähköpostitila
 Shutdown mail services	DeskbarView		Sulje sähköpostipalvelut
 %num new message	DeskbarView		%num uusi viesti
 Sending mail for %name	Notifier		Lähetetään sähköpostia vastaanottajalle %name
-Preferences…	DeskbarView		Asetukset...
 %num new messages.	MailDaemon		%num uutta viestiä.
 %num new message.	MailDaemon		%num uusi viesti.
 Create new message…	DeskbarView		Luo uusi viesti...

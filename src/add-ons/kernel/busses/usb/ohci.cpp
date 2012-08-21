@@ -10,6 +10,7 @@
 
 #include <module.h>
 #include <PCI.h>
+#include <PCI_x86.h>
 #include <USB3.h>
 #include <KernelExport.h>
 #include <util/AutoLock.h>
@@ -19,6 +20,7 @@
 #define USB_MODULE_NAME "ohci"
 
 pci_module_info *OHCI::sPCIModule = NULL;
+pci_x86_module_info *OHCI::sPCIx86Module = NULL;
 
 
 static int32
@@ -309,10 +311,24 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		B_URGENT_DISPLAY_PRIORITY, (void *)this);
 	resume_thread(fFinishThread);
 
+	// Find the right interrupt vector, using MSIs if available.
+	uint8 interruptVector = fPCIInfo->u.h0.interrupt_line;
+	if (sPCIx86Module != NULL && sPCIx86Module->get_msi_count(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function) >= 1) {
+		uint8 msiVector = 0;
+		if (sPCIx86Module->configure_msi(fPCIInfo->bus, fPCIInfo->device,
+				fPCIInfo->function, 1, &msiVector) == B_OK
+			&& sPCIx86Module->enable_msi(fPCIInfo->bus, fPCIInfo->device,
+				fPCIInfo->function) == B_OK) {
+			TRACE_ALWAYS("using message signaled interrupts\n");
+			interruptVector = msiVector;
+		}
+	}
+
 	// Install the interrupt handler
 	TRACE("installing interrupt handler\n");
-	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
-		_InterruptHandler, (void *)this, 0);
+	install_io_interrupt_handler(interruptVector, _InterruptHandler,
+		(void *)this, 0);
 
 	// Enable interesting interrupts now that the handler is in place
 	_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_NORMAL_INTERRUPTS
@@ -538,6 +554,14 @@ OHCI::AddTo(Stack *stack)
 		return B_NO_MEMORY;
 	}
 
+	// Try to get the PCI x86 module as well so we can enable possible MSIs.
+	if (sPCIx86Module == NULL && get_module(B_PCI_X86_MODULE_NAME,
+			(module_info **)&sPCIx86Module) != B_OK) {
+		// If it isn't there, that's not critical though.
+		TRACE_MODULE_ERROR("failed to get pci x86 module\n");
+		sPCIx86Module = NULL;
+	}
+
 	for (uint32 i = 0 ; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
 		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
 			&& item->class_api == PCI_usb_ohci) {
@@ -555,6 +579,12 @@ OHCI::AddTo(Stack *stack)
 				delete item;
 				sPCIModule = NULL;
 				put_module(B_PCI_MODULE_NAME);
+
+				if (sPCIx86Module != NULL) {
+					sPCIx86Module = NULL;
+					put_module(B_PCI_X86_MODULE_NAME);
+				}
+
 				return B_NO_MEMORY;
 			}
 
@@ -578,6 +608,12 @@ OHCI::AddTo(Stack *stack)
 		delete item;
 		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
+
+		if (sPCIx86Module != NULL) {
+			sPCIx86Module = NULL;
+			put_module(B_PCI_X86_MODULE_NAME);
+		}
+
 		return ENODEV;
 	}
 

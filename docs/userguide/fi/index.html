@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -20,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,27 +43,25 @@
 <li><a href="../en/index.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="attributes.html">Attributes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="queries.html">Queries</a>  »
+ «  <a href="attributes.html">Attribuutit</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="queries.html">Kyselyt</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Hakemisto</h1>
 
-<p><a href="attributes.html">Attributes</a> and <a href="queries.html">Queries</a> are key features of Haiku. While attributes are useful on their own, to display additional information on a file, for a query on them, they need to be indexed. It puts them into a lookup table, which in turn makes queries lightning fast.<br />
-The index is part of the filesystem and is kept for every volume/partition separately.</p>
+<p><a href="attributes.html">Attribuutit</a> ja <a href="queries.html">Kyselyt</a> ovat Haikun avainominaisuuksia. Kun attribuutit ovat hyödyllisiä sellaisenaan, lisätietojen näyttämiseksi tiedostosta, niiden kyselemiseksi attribuutit on indeksoitava. Se laittaa ne hakutauluun, joka vuorostaan tekee kyselyt salamannopeiksi.<br />
+Indeksi on tiedostojärjestelmän osa ja se pidetään jokaisella taltiolla tai osiolla erikseen.</p>
 
-<h2>
-Indexing commands in Terminal</h2> 
-<p>There are several commands to manage the index:</p>
+<h2>Indeksointikomennot Pääteikkunassa</h2> 
+<p>Indeksin käsittelemiseen on useita komentoja:</p>
 <ul> 
-<li><b>lsindex</b> - Displays the indexed attributes on the current volume/partition.<br />
-These are the attributes that are indexed by default:</li>
+<li><b>lsindex</b> - Näyttää indeksoidut attribuutit nykyiseltä taltiolta/osiolta.<br />
+Nämä ovat oletuksena indeksoidut attribuutit:</li>
 </ul>
 <pre class="terminal"> ~ -&gt;lsindex 
 BEOS:APP_SIG 
@@ -104,60 +104,58 @@ name
 size 
 </pre>
 <ul>
-<li><b>mkindex</b> - Adds an attribute to the index of a volume/partition. </li>
+<li><b>mkindex</b> - Lisää attribuutin taltion/osion indeksiin. </li>
 </ul>
-<pre>Usage: mkindex [options] &lt;attribute&gt; 
-Creates a new index for the specified attribute. 
+<pre>Käyttö: mkindex [valitsimet] &lt;attribuutti&gt; 
+Luo uuden indeksin määrätylle attribuutille. 
  
-  -d, --volume=PATH     a path on the volume to which the index will be added, 
-                        defaults to current volume. 
-  -t, --type=TYPE       the type of the attribute being indexed.  One of "int", 
-                        "llong", "string", "float", or "double". 
-                        Defaults to "string". 
-      --copy-from       path to volume to copy the indexes from. 
-  -v, --verbose         print information about the index being created 
+  -d, --volume=POLKU    polku taltioon, johon indeksi lisätään, 
+                        oletuksena nykyinen taltio. 
+  -t, --type=TYYPPI      indeksoitavan attribuutin tyyppi.  Yksi seuraavista: "int", 
+                        "llong", "string", "float", tai "double". 
+                        Oletus on "string". 
+      --copy-from       polku taltioon, josta indeksit kopioidaan. 
+  -v, --verbose         tulosta tiedot luodusta indeksistä 
 
 </pre>
-<p>Only <b>new</b> files with that attribute come automatically into the index!<br />
-Existing files have to be added manually by copying them and deleting the originals after that. Alternatively you can use the command <span class="cli">reindex</span>. 
+<p>Vain <b>uudet</b> tiedostot, joilla on attribuutti, indekstoidaan automaattisesti!<br />
+Olemassa olevat tiedostot on lisättävä manuaalisesti kopioimalla ne ja poistamalla alkuperäiset sen jälkeen. Vaihtoehtoisesti voit käyttää komentoa <span class="cli">reindex</span>. 
 </p>
 <ul>
-<li><b>reindex</b> - Puts the attributes of existing files into the newly created index of a volume/partition. </li>
+<li><b>reindex</b> - Laittaa olemassa olevien tiedostojen attribuutit vasta luotuun taltion/osion indeksiin. </li>
 </ul>
-<pre>Usage: reindex [-rvf] attr &lt;list of filenames and/or directories&gt; 
-  -r    enter directories recursively
-  -v    verbose output
-  -f    create/update all indices from the source volume,
-        "attr" is the path to the source volume
+<pre>Käyttö: reindex [-rvf] attr &lt;tiedostonimien ja/tai hakemistojen luettelo&gt; 
+  -r    liiku hakemistoista rekursiivisesti
+  -v    tulosta laveasti
+  -f    luo/päivittää kaikki indeksit lähdetaltiosta,
+        "attr" on polku lähdetaltioon
 
 </pre>
 <ul>
-<li><b>rmindex</b> - Removes an attribute from the index of a volume/partition.</li>
+<li><b>rmindex</b> - Poistaa attribuutin taltion/osion indeksistä.</li>
 </ul>
-<pre>Usage: rmindex [OPTION]... INDEX_NAME 
+<pre>Käyttö: rmindex [VALITSIN]... INDEKSI_NIMI 
  
-Removes the index named INDEX_NAME from a disk volume.  Once this has been 
-done, it will no longer be possible to use the query system to search for 
-files with the INDEX_NAME attribute. 
+Poistaa indeksin nimeltään INDEKSI_NIMI levytaltiosta.  Heti kun tämä on tehty, ei ole enää mahdollista käyttää kyselyjärjestelmää tiedostojen etsimiseen INDEKSI_NIMI-attribuutilla. 
  
-  -d, --volume=PATH     a path on the volume from which the index will be 
-                         removed 
-  -h, --help            display this help and exit 
-  -p, --pattern         INDEX_NAME is a pattern 
-  -v, --verbose         print information about the index being removed 
+  -d, --volume=POLKU    polku taltioon, josta indeksi 
+                         poistetaan 
+  -h, --help            näytä opaste ja poistu 
+  -p, --pattern         INDEKSI_NIMI on malli 
+  -v, --verbose         tulosta tiedot poistettavasta indeksistä 
  
-INDEX_NAME is the name of a file attribute. 
+INDEKSI_NIMI on tiedostoattribuutin nimi. 
  
-If no volume is specified, the volume of the current directory is assumed.</pre>
+Jos taltiota ei ole määritelty, otaksutaan taltio, jossa nykyinen hakemisto sijaitsee.</pre>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="attributes.html">Attributes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="queries.html">Queries</a>  »
+ «  <a href="attributes.html">Attribuutit</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="queries.html">Kyselyt</a>  »
 </span></div>
 </div>
 

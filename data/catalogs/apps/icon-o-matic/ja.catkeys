@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	3736361491
+1	japanese	x-vnd.haiku-icon_o_matic	2591538723
 Select All	Icon-O-Matic-PathManipulator		すべて選択
 Add Style	Icon-O-Matic-AddStylesCmd		スタイルを追加
 Color (#%02x%02x%02x)	Style name after dropping a color		カラー (#%02x%02x%02x)
@@ -191,7 +191,6 @@ Overwrite	Icon-O-Matic-SVGExport		上書き
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		シェイプを固定
 Split Control Point	Icon-O-Matic-SplitPointsCmd		コントロールポイントを分割
 Open…	Icon-O-Matic-Menu-File		開く…
-Options	Icon-O-Matic-Menus		オプション
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		カラー (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		グラデーションの編集
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		パスをクリーンアップ

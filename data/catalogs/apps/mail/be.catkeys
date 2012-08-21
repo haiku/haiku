@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	2834665561
+1	belarusian	x-vnd.Be-MAIL	3337401776
 View	Mail		Агляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Атрыбуты ўкладання:
@@ -27,6 +27,7 @@ Expert	Mail		Поўны
 Reply account:	Mail		Акаунт для адказаў:
 Discard	Mail		Адхіліць
 Message	Mail		Паведамленне
+Settings…	Mail		Наладкі…
 Reply to sender	Mail		Адказаць адпраўніку
 There is no installed handler for URL links.	Mail		Апрацоўшчык URL спасылак не ўсталяваны.
 Signature	Mail		Подпіс
@@ -38,7 +39,6 @@ Save changes to this signature?	Mail		Захаваць змены подпісу
 Cc:	Mail		Cc:
 Off	Mail		Адключыць
 Find	Mail		Шукаць
-Preferences…	Mail		Наладкі…
 Undo	Mail		Вярнуць
 Date:	Mail		Дата:
 An error occurred trying to open this signature.	Mail		Памылка. Немагчыма адкрыць гэты подпіс.

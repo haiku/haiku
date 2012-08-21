@@ -1,8 +1,7 @@
-1	ukrainian	x-vnd.Haiku-WebPTranslator	3630570850
+1	ukrainian	x-vnd.Haiku-WebPTranslator	2427600890
 Compression method:	ConfigView		Метод стискання
 Based on libwebp v0.1,	ConfigView		На основі libwebp v0.1,
 Preset	ConfigView		Набір параметрів
-WebP Images	ConfigView		Зображення WebP
 WebP images	WebPTranslator		Зображення WebP
 WebPTranslator Settings	ConfigView		Настройки перетворювача WebP
 Output quality:	ConfigView		Якість виведення

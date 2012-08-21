@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	2326864078
+1	romanian	x-vnd.haiku-icon_o_matic	1182041310
 Select All	Icon-O-Matic-PathManipulator		Selectează tot
 Add Style	Icon-O-Matic-AddStylesCmd		Adaugă stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Culoare (#%02x%02x%02x)
@@ -190,7 +190,6 @@ Overwrite	Icon-O-Matic-SVGExport		Suprascrie
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Îngheață forme
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Separă punct de control
 Open…	Icon-O-Matic-Menu-File		Deschide...
-Options	Icon-O-Matic-Menus		Opțiuni
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Culoare (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Editează degrade
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Curăță cale

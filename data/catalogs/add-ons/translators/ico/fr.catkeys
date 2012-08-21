@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-ICOTranslator	1637901496
+1	french	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		Curseur
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Image Windows %s %ld bits
 Valid icon sizes are 16, 32, or 48	ConfigView		Les tailles d'icônes valides sont 16, 32 ou 48
+Windows icons	ICOTranslator		Icône Windows
 Enforce valid icon sizes	ConfigView		Imposer des tailles valides aux icônes
 ICO Settings	main		Réglages des icônes
 Windows icon translator	ICOTranslator		Traducteur d'icônes Windows
@@ -10,3 +11,4 @@ pixels in either direction.	ConfigView		pixels dans n'importe quel sens.
 Write 32 bit images on true color input	ConfigView		Écrire des images 32 bits pour les entrées en vraies couleurs
 Icon	ICOTranslator		Icône
 ICOTranslator Settings	ConfigView		Réglages du traducteur d'icônes
+Windows icon translator	ConfigView		Traducteur d'icônes Windows

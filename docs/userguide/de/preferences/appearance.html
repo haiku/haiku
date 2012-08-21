@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,21 +57,40 @@
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
 <tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/preferences/Appearance">/boot/System/preferences/Erscheinungsbild</acronym></span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/system/app_server/appearance">~/Konfiguration/settings/system/app_server/appearance</acronym></span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/system/app_server/appearance">~/Konfiguration/settings/system/app_server/appearance</acronym></span><br />
+<span class="path"><acronym title="~/config/settings/system/app_server/decorator_setting">~/Konfiguration/settings/system/app_server/decorator_setting</acronym></span><br />
+<span class="path"><acronym title="~/config/settings/system/app_server/fonts">~/Konfiguration/settings/system/app_server/fonts</acronym></span></td></tr>
 </table>
 <p>Im <acronym title="Appearance">Erscheinungsbild</acronym> Panel lassen sich einige Details von Haikus Erscheinungsbild anpassen.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="fonts" name="fonts">Schriftarten</a></h2>
+<img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
+<p>Haiku verwendet systemweit drei verschiedene Schriftarten. Sie können hier unter "Normal", "Fett" und "Feste Breite" (Schrift mit fester Buchstabenbreite) festgelegt werden. Daneben kann auch noch die Schriftart für Menüs eingestellt werden.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="installing_fonts" name="installing_fonts">Installation neuer Schriftarten</a></h3>
+<p>Neue Schriftarten werden installiert, indem sie an ihren Platz im Dateisystem kopiert werden. Diese sind: <span class="path"><acronym title="/boot/common/data/fonts/">/boot/Allgemein/data/fonts/</acronym></span>, beziehungsweise <span class="path"><acronym title="/boot/home/config/data/fonts/">/boot/Benutzer/Konfiguration/data/fonts/</acronym></span> (unter <a href="../filesystem-layout.html">Dateisystem Layout</a> wird der Unterschied dieser beiden Speicherorte näher erläutert).</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Farben</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>Im ersten Reiter, <span class="menu">Farben</span>, lassen sich die Farben einiger Teile der Oberfläche einstellen. In das Farbfeld können Farben per Drag &amp; Drop aus anderen Programmen, wie zum Beispiel <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> oder dem <span class="app"><acronym title="Backgrounds">Hintergründe</acronym></span> Panel, gezogen werden.</p>
+<p>Im Reiter, <span class="menu">Farben</span> lassen sich die Farben einiger Teile der Oberfläche einstellen. In das Farbfeld können Farben per Drag &amp; Drop aus anderen Programmen, wie zum Beispiel <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> oder dem <span class="app"><acronym title="Backgrounds">Hintergründe</acronym></span> Panel, gezogen werden.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="decorators" name="decorators">Dekorator</a></h2>
+<img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
+<p>Dekoratoren bestimmen Aussehen und Verhalten von Fenstern und all ihrer grafischen Elemente. Zur Zeit gibt es für Haiku allerdings nur einen einzigen Standard-Dekorator. Sollte man irgendwo einen alternativen Dekorator gefunden und installiert haben, ließe er sich hier auf alle Fälle auswählen.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="antialiasing" name="antialiasing">Kantenglättung</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>Im zweiten Reiter, <span class="menu">Kantenglättung</span>, befinden sich unterschiedliche Einstellungen, die die Ausgabe auf dem Bildschirm beeinflussen.</p>
+<p>Im Reiter, <span class="menu">Kantenglättung</span> befinden sich unterschiedliche Einstellungen, die die Ausgabe auf dem Bildschirm beeinflussen.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

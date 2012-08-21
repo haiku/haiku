@@ -230,7 +230,6 @@ BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode,
 	fAlreadySelectedDropTarget(NULL),
 	fSelectionHandler(be_app),
 	fLastClickPt(LONG_MAX, LONG_MAX),
-	fLastClickTime(0),
 	fLastClickedPose(NULL),
 	fLastExtent(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN),
 	fTitleView(NULL),
@@ -7149,16 +7148,6 @@ BPoseView::SetTextWidgetToCheck(BTextWidget* widget, BTextWidget* old)
 }
 
 
-BPoint
-BPoseView::Origin()
-{
-	if (ViewMode() == kListMode)
-		return fViewState->ListOrigin();
-
-	return fViewState->IconOrigin();
-}
-
-
 void
 BPoseView::MouseUp(BPoint where)
 {
@@ -7230,24 +7219,16 @@ BPoseView::WasClickInPath(const BPose* pose, int32 index, BPoint mouseLoc) const
 bool
 BPoseView::WasDoubleClick(const BPose* pose, BPoint point)
 {
-	// check time and proximity
+	// check proximity
 	BPoint delta = point - fLastClickPt;
+	int32 clicks = Window()->CurrentMessage()->FindInt32("clicks");
 
-	bigtime_t sysTime;
-	Window()->CurrentMessage()->FindInt64("when", &sysTime);
-
-	bigtime_t timeDelta = sysTime - fLastClickTime;
-
-	bigtime_t doubleClickSpeed;
-	get_click_speed(&doubleClickSpeed);
-
-	if (timeDelta < doubleClickSpeed
+	if (clicks == 2
 		&& fabs(delta.x) < kDoubleClickTresh
 		&& fabs(delta.y) < kDoubleClickTresh
 		&& pose == fLastClickedPose) {
 		fLastClickPt.Set(LONG_MAX, LONG_MAX);
 		fLastClickedPose = NULL;
-		fLastClickTime = 0;
 		if (fTextWidgetToCheck != NULL)
 			fTextWidgetToCheck->CancelWait();
 		return true;
@@ -7255,7 +7236,6 @@ BPoseView::WasDoubleClick(const BPose* pose, BPoint point)
 
 	fLastClickPt = point;
 	fLastClickedPose = pose;
-	fLastClickTime = sysTime;
 	return false;
 }
 

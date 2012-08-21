@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>TextSearch</title>
+	<title>Tekstihaku</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,24 +43,24 @@
 <li><a href="../../en/applications/textsearch.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="terminal.html">Terminal</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+ «  <a href="terminal.html">Pääteikkuna</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />TextSearch</h2>
+<h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />Tekstihaku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><i>No entry, normally launched via Tracker Add-on</i></td></tr>
+<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><i>Ei valikkoriviä, käynnistetään normaalisti  Seuraajalisäosan kautta</i></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
 <p><br /></p>
-<p>TextSearch looks for a string in text files. Typically it is invoked from <a href="../tracker-add-ons.html">Tracker's Add-on</a> context menu on the selection of files or folders you want to search.</p>
+<p>Tekstihaku etsii merkkijonoa tekstitiedostoissa. Tyypillisesti sitä kutsutaan <a href="../tracker-add-ons.html">Seuraajan lisäosan</a> asiayhteysvalikosta valitsemalla tiedostot tai kansiot, josta merkkijonoa halutaan etsiä.</p>
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
@@ -66,31 +68,30 @@
 
 <p>Only a few words on some of the otherwise self-explaining menu items:</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
-<tr><td colspan="5"><h3>File menu</h3></td></tr>
-<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
-</td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through.</td></tr>
-<tr><td colspan="5"><h3>Action menu</h3></td></tr>
-<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries from the list that are not currently selected.</td></tr>
-<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
-<tr><td colspan="5"><h3>Settings menu</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
+<tr><td colspan="5"><h3>Tiedostovalikko</h3></td></tr>
+<tr><td class="onelinetop"><span class="menu">Uusi ikkuna</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Avaa uuden ikkunan, jossa voit kirjoittaa toisen merkkijonon ja etsiä sitä samoista tiedostoista/kansioista.</td></tr>
+<tr><td><span class="menu">Aseta kohde...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Valitaan uusi tiedostojen ja kansioiden joukko etsittäväksi.</td></tr>
+<tr><td colspan="5"><h3>Toimintovalikko</h3></td></tr>
+<tr><td><span class="menu">Karsi-valinta</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Poistaa kaikki rivit luettelosta, joka ei ole nykyisin valittu.</td></tr>
+<tr><td><span class="menu">Avaa-valinta</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
+<tr><td><span class="menu">Avaa tiedostoja Seuraajassa</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Avaa nykyisin valittujen tiedostojen sijainnin Seuraajassa.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Kopioi tekstin leikepöydälle</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Kopioi nykyisen valinnan leikepöydälle.</td></tr>
+<tr><td colspan="5"><h3>Asetukset-valikko</h3></td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">Ohita kansiot, jotka alkavat pisteellä</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
 <tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
-<tr><td colspan="5"><h3>History menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Contains recently used search strings.</td></tr>
-<tr><td colspan="5"><h3>Encoding menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Lets you choose different character encodings if needed.</td></tr>
+<tr><td colspan="3"><span class="menu">Vain tekstitiedostot</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
+<tr><td colspan="5"><h3>Historiavalikko</h3></td></tr>
+<tr><td colspan="4"></td><td>Sisältää äskettäin käytetyt etsintämerkkijonot.</td></tr>
+<tr><td colspan="5"><h3>Koodausvalikko</h3></td></tr>
+<tr><td colspan="4"></td><td>Antaa sinun valita eri merkkikoodausten välillä, jos on tarvetta.</td></tr>
 </table>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="terminal.html">Terminal</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+ «  <a href="terminal.html">Pääteikkuna</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>
 </div>

@@ -32,7 +32,7 @@ ColorWhichItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
-			owner->SetHighColor(tint_color(lowColor, B_DARKEN_2_TINT));
+			owner->SetHighColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
 			owner->SetLowColor(owner->HighColor());
 		} else
 			owner->SetHighColor(lowColor);
@@ -53,14 +53,18 @@ ColorWhichItem::DrawItem(BView *owner, BRect frame, bool complete)
 	owner->MovePenTo(frame.left + colorRect.Width() + 8, frame.top
 		+ BaselineOffset());
 
-	// TODO: Don't hardcode black here, calculate based on background
-	// color or use B_CONTROL_TEXT_COLOR constant.
-	rgb_color black = (rgb_color){ 0, 0, 0, 255 };
-
-	if (!IsEnabled())
-		owner->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
-	else
-		owner->SetHighColor(black);
+	if (!IsEnabled()) {
+		rgb_color textColor = ui_color(B_MENU_ITEM_TEXT_COLOR);
+		if (textColor.red + textColor.green + textColor.blue > 128 * 3)
+			owner->SetHighColor(tint_color(textColor, B_DARKEN_2_TINT));
+		else
+			owner->SetHighColor(tint_color(textColor, B_LIGHTEN_2_TINT));
+	} else {
+		if (IsSelected())
+			owner->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+		else
+			owner->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+	}
 
 	owner->DrawString(Text());
 

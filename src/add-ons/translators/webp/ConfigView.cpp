@@ -58,7 +58,8 @@ ConfigView::ConfigView(TranslatorSettings* settings, uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView* title = new BStringView("title", B_TRANSLATE("WebP Images"));
+	BStringView* title = new BStringView("title",
+		B_TRANSLATE("WebP image translator"));
 	title->SetFont(be_bold_font);
 
 	char versionString[256];

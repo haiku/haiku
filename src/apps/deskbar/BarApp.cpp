@@ -749,7 +749,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 	}
 
 	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
-		new BBitmap(IconRect(), kIconColorSpace), strdup(ref->name));
+		new BBitmap(IconRect(), kIconColorSpace), strdup(name.String()));
 
 	if ((barInfo->flags & B_BACKGROUND_APP) == 0
 		&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {

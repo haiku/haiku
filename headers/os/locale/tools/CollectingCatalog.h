@@ -2,16 +2,11 @@
  * Copyright 2012, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _COLLECTING_CATALOG_H_
-#define _COLLECTING_CATALOG_H_
-
-
-#include_next <Catalog.h>
+#ifndef _TOOLS_COLLECTING_CATALOG_H_
+#define _TOOLS_COLLECTING_CATALOG_H_
 
 
 // Translation macros used when executing collectcatkeys
-#undef B_TRANSLATION_CONTEXT
-
 #undef B_TRANSLATE
 #define B_TRANSLATE(string) \
 	B_CATKEY((string), B_TRANSLATION_CONTEXT)

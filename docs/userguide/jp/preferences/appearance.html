@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2012, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -46,7 +46,7 @@
 </ul>
 <span>
     <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+::  <a href="backgrounds.html">背景</a>  »
 </span></div>
 </div>
 
@@ -57,21 +57,40 @@
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
+<span class="path">~/config/settings/system/app_server/decorator_settings</span><br />
+<span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
 <p>外観 (Appearance) プリファレンスで、Haiku の外見の一部を変更できます。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="fonts" name="fonts">フォント</a></h2>
+<img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
+<p>Haiku は異なった目的のために 3 種類の標準フォントを定めています。ここでシステム全体で用いられるフォントのスタイル (通常・太字・固定幅) とサイズを設定します。加えて、メニューで使われるフォントの設定が別にあります。</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="installing_fonts" name="installing_fonts">新しいフォントのインストール</a></h3>
+<p>新しいフォントは、各自のユーザフォルダーにコピーすることでインストールできます。つまり、<span class="path">/boot/common/data/fonts/</span> または、<span class="path">/boot/home/config/data/fonts/</span> です (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックをご覧ください)。</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">色 (Colors)</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>最初のタブ、<span class="menu">色 (Colors)</span> で、ユーザーインターフェースの各部位の色を変更できます。ドラッグアンドドロップによって、ほかのアプリケーションから色を持ってこられるようになっているので、たとえば、<span class="app">WonderBrush</span>、<span class="app">Icon-O-Matic</span>、または<span class="app">背景</span> パネルなどから色をドラッグできます。</p>
+<p><span class="menu">色 (Colors)</span> タブで、ユーザーインターフェースの各部位の色を変更できます。ドラッグアンドドロップによって、ほかのアプリケーションから色を持ってこられるようになっているので、たとえば、<span class="app">WonderBrush</span>、<span class="app">Icon-O-Matic</span>、または<span class="app">背景</span> パネルなどから色をドラッグできます。</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="decorators" name="decorators">ウインドウデコレーター</a></h2>
+<img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
+<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku はただひとつのデフォルトデコレーターだけがついています。ほかのデコレーターを見つけてインストールすることがあれば、ポップアップメニューからべつのデコレーターを選べるでしょう。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="antialiasing" name="antialiasing">アンチエイリアス (Antialiasing)</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>2番目のタブ、<span class="menu">アンチエイリアス (Antialiasing)</span> で、画面描画に関するさまざまな設定を行えます。</p>
+<p><span class="menu">アンチエイリアス (Antialiasing)</span> タブで、画面描画に関するさまざまな設定を行えます。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -113,7 +132,7 @@
 <div class="nav">
 <div class="inner"><span>
     <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+::  <a href="backgrounds.html">背景</a>  »
 </span></div>
 </div>
 

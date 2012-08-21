@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -44,15 +44,14 @@
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">Dateisystem Layout</a> 
+::  <a href="contents.html" class="uplink">Inhalt</a> 
+::  <a href="workspaces.html"><acronym title="Workspaces">Arbeitsflächen</acronym></a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
@@ -77,13 +76,15 @@
 <li>Ein Rechtsklick auf den Reiter eines Fensters (oder dessen Rahmen) schickt es in der Hierarchie offener Fenster ganz nach hinten.</li></ul></li>
 <li><p>Der Button zum Fenster schließen.</p></li>
 <li><p>Der "Zoom" Button (auch durch <span class="key">STRG</span> <span class="key">ALT</span> <span class="key">Z</span>). Die meisten Anwendungen ziehen damit ihr Fenster auf die Maximalgröße auf. Das muss aber nicht immer sein. Tracker-Fenster etwa, ändern sich so, dass der Inhalt optimal dargestellt wird.</p></li>
-<li><p>Die Ecke zum Ändern der Fenstergröße. Zieht man irgendwo anders am Rahmen eines Fensters, verschiebt man es stattdessen.</p></li>
+<li><p>Der Fensterrahmen: zieht man mit der linken Maustaste, wird das Fenster verschoben, mit der rechten wird die Fenstergröße geändert.</p></li>
+<li><p>Die Ecke zum Ändern der Fenstergröße.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="move-resize" name="move-resize">Bequem Fenstergröße und -position ändern</a></h2>
-<p>Arbeitet man mit mehreren Anwendungen gleichzeitig müssen oft Fenster verschoben oder in der Größe verändert werden. Es gibt dafür einen bequemeren Weg als auf die kleinen gelben Reiter zu zielen oder auf die noch kleineren Fensterrahmen. Und zu seiner geringen Größe kommt bei der Ecke noch dazu, dass man die Fenstergröße nur hier und auch nur in Richtung rechts und unten ändern kann.</p>
+<p>Arbeitet man mit mehreren Anwendungen gleichzeitig müssen oft Fenster verschoben oder in der Größe verändert werden. Es gibt dafür einen bequemeren Weg als auf die kleinen gelben Reiter zu zielen oder auf die noch kleineren Fensterrahmen. Und zu seiner geringen Größe kommt bei der Ecke noch dazu, dass man die Fenstergröße nur hier und auch nur in Richtung rechts und unten ändern kann.<br />
+Sicher, per Rechtsklick kann man ein Fenster auch an jeder Rahmenstelle in der Größe ändern, aber dazu muss man auch ziemlich genau zielen.</p>
 <p>Haikus Lösung ist die Einführung des Tastenkürzels <span class="key">STRG</span> <span class="key">ALT</span> in Kombination mit der Maus. Siehe dazu auch das Kapitel <a href="keyboard-shortcuts.html#general">Tastaturkürzel und Tastenkombinationen</a> für weitere Kürzel zum Fenstermanagement.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
 <p>Wird <span class="key">STRG</span> <span class="key">ALT</span> gehalten, färben sich die dem Mauszeiger nächstgelegenen Fensterrahmen. Bewegt man die Maus in die Nähe eines anderen Rahmens, ändert sich das Ziel der Aktion entsprechend. Klickt und zieht man nun die Maus mit der <i>rechten Maustaste</i>, wird das Fenster entlang der eingefärbten Seite(n) vergrößert oder verkleinert.</p>
@@ -92,21 +93,21 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
-<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
-In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<p>Haikus grafische Oberfläche bietet eine Funktion, die die Tatsache nutzt, dass  Fenster nur einen gelben Reiter haben anstatt einer Titelleiste auf ganzer Breite. Dieses Feature heißt "Stack &amp; Tile".<br />
+Das folgende Beispiel zeigt ein Tracker-Fenster mit Lesezeichen, das zur Linken eines WebPositive Fensters klebt ("Tiling"), das wiederum mit einem anderen Tracker-Fenster gestapelt wurde ("Stacking"), das den Sourcecode-Ordner <tt>haiku</tt> zeigt. Die Animation simuliert, wie der Benutzer mit einem Klick auf die Titelreiter der Fenster im Stapel abwechselnd mal das eine, mal das andere Fenster in den Vordergrund holt.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
-<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>So verbunden, können die Fenster gemeinsam als Gruppe verschoben oder in der Größe verändert werden. Praktisch, wenn man projektorientiert arbeiten möchte: Anstatt nach dem Browserfenster mit der Dokumentation, dem Editor, Tracker-Fenster und vielleicht eine das aktuelle Projekt betreffende Email zu suchen, werden all diese Fenster einfach per "Stack &amp; Tile" zusammengefügt.</p>
+<p>Das eigentliche Gruppieren von Fenstern ist einfach: Man hält <span class="key">OPT</span> gedrückt während man ein Fenster an seinem Reiter greift; bewegt man das Fenster nun in die Nähe von Reiter oder Rahmen eines anderen Fensters, ändert sich deren Farbe und man lässt das Fenster los.</p>
+<p>"Stack &amp; Tile" besteht aus zwei verwandten Komponenten.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<td><p>Als "<i>Stacking</i>" bezeichnet man das Stapeln von Fenstern; die gelben Reiter werden dabei automatisch nebeneinander angeordnet.<br />
+Beim Halten von <span class="key">OPT</span> ändert sich die Farbe der Reiter, sobald sie überlappen; durch Loslassen werden die Fenster dann gestapelt.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>Unter "<i>Tiling</i>" versteht man das horizontale oder vertikale Andocken von Fenstern, so dass sie praktisch aneinander kleben bleiben.<br />
+Wieder ändern sich beim Halten von <span class="key">OPT</span> Farben, diesmal die Andockstellen der Rahmen, sobald sich zwei Fenster nahe genug gekommen sind.</p></td></tr></table>
+<p>Trennen lassen sich Fenster auf gleiche Weise: <span class="key">OPT</span> halten und ein Fenster an seinem Reiter fassen und aus der Fenstergruppe ziehen.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -119,8 +120,8 @@ Zum übergeordneten Verzeichnis gelangt man mit dem Pop-up Menü über der Datei
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
-<p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Tastaturkürzel</a></h3>
+<p>Viele Kürzel in Öffnen- und Speicherdialogen sind die gleichen wie im Tracker. Neben den Befehlen, die auch über das Menü <span class="menu">Datei</span> erreichbar sind, gibt es noch einige nicht so offensichtliche:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>Erstellt einen neuen Ordner.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>Benennt das ausgewählte Objekt um.</td></tr>
@@ -153,9 +154,9 @@ Ein Rechtsklick auf ein Replikanten-Symbol öffnet ein Kontextmenü, um das <spa
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">Dateisystem Layout</a> 
+::  <a href="contents.html" class="uplink">Inhalt</a> 
+::  <a href="workspaces.html"><acronym title="Workspaces">Arbeitsflächen</acronym></a>  »
 </span></div>
 </div>
 

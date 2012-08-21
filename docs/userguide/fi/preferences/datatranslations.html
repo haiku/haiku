@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>DataTranslations</title>
+	<title>Tietomuuntimet</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -42,50 +44,44 @@
 </ul>
 <span>
  «  <a href="backgrounds.html">Tausta-asetukset</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="deskbar.html">Deskbar</a>  »
+::  <a href="../preferences.html" class="uplink">Asetukset</a> 
+::  <a href="deskbar.html">Työpöytäpalkki</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />DataTranslations</h2>
+<h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />Tietomuuntimet</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
-<tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/*</span> - Every Translator creates its own settings file here after you've changes its defaults.<br />
-<span class="path">~/config/settings/system/DataTranslations settings</span> - Stores the panel's window position.</td></tr>
+<tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/*</span> - 
+Jokainen muunnin luo omat asetustiedostonsa tänne sen jälkeen kun olet muuttanut sen asetuksia<br /><span class="path">~/config/settings/system/DataTranslations settings</span> - Tallentaa paneelin ikkunan sijainnin.</td></tr>
 </table>
-<p>Every application has the ability to open and save every file format for which there's a Translator installed. The settings for these Translators are configured in the DataTranslations preferences.</p>
+<p>Jokaisella sovelluksella on kyky avata ja tallentaa kaikissa niissä tiedostomuodoissa, joissa on Tietomuunnin asennettuna. Näiden muuntimien asetukset on asetettu Tietomuunninasetuksissa.</p>
 <p><br /></p>
 <img src="../images/prefs-images/datatranslations.png" alt="datatranslations.png" />
-<p>Depending on its capabilities, each Translator offers different settings. At least you'll get an <span class="button">Info...</span> button that opens a window with the credits and the installation path.<br />
-The following table gives an overview of the default Translators and their most useful options.</p>
+<p>Muuntimen kyvyistä riippuen jokainen muunnin tarjoaa eri asetuksia. Saat vähintään <span class="button">Tiedot...</span>-painikkeen, joka avaa ikkunan, jossa ilmoitetaan kehittäjätiedot ja asennuspolku.<br />Seuraava taulukko esittää yhteenvedon oletusmuuntimista ja niiden hyödyllisimmistä valitsimista.</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">BMP images</span></td><td>24bit, uncompressed, no transparency</td></tr>
-<tr><td><span class="menu">EXR images</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym>'s high dynamic-range (HDR) format</td></tr>
-<tr><td><span class="menu">GIF images</span></td><td>8bit, lossless compression, transparency<br />
-You can reduce the filesize by limiting the number of used colors and the palette.<br />
-You can write images with transparency, either by automatically using the alpha channel or by setting the RGB value that will be transparent by hand.</td></tr>
-<tr><td><span class="menu">JPEG2000 images</span></td><td>24bit, compressed, no transparency<br />
-Here, you normally only care about the output quality.</td></tr>
-<tr><td><span class="menu">JPEG images</span></td><td>24bit, compressed, no transparency<br />
-Besides the output quality you can also set a smoothing that will lessen compression artefacts but can blur the picture a little.</td></tr>
-<tr><td><span class="menu">PCX images</span></td><td>24bit, uncompressed, no transparency, PC Paintbrush Exchange format</td></tr>
-<tr><td><span class="menu">PNG images</span></td><td>32bit, lossless compression, transparency</td></tr>
-<tr><td><span class="menu">PPM images</span></td><td>24bit, uncompressed, no transparency, Portable PixMap format</td></tr>
-<tr><td><span class="menu">RAW images</span></td><td>up to 48bit, uncompressed, no transparency</td></tr>
-<tr><td><span class="menu">RTF text files</span></td><td>Formatted text</td></tr>
-<tr><td><span class="menu">SGI images</span></td><td>24bit, optional lossless compression, transparency</td></tr>
-<tr><td><span class="menu">StyledEdit files</span></td><td>Formatted text</td></tr>
-<tr><td><span class="menu">TGA images</span></td><td>32bit, optional lossless compression, transparency</td></tr>
-<tr><td><span class="menu">TIFF images</span></td><td>24bit, optional lossless compression, layers, transparency</td></tr>
-<tr><td class="onelinetop"><span class="menu">WonderBrush images</span></td><td>32bit, layers, transparency, vector/pixel data</td></tr>
+<tr><td><span class="menu">BMP-kuvat</span></td><td>24-bittinen, tiivistämätön, ei läpinäkyvyytt'ä </td></tr>
+<tr><td><span class="menu">EXR-kuvat</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym>:n jyrrkästi dynaaiisen alueen (HDR) -muoto</td></tr>
+<tr><td><span class="menu">GIF-kuvat</span></td><td>8-bittinen, häviötön tiivistys, läpinäkyvyys<nr></nr>Voit pienentää tiedostokokoa rajoittamalla käytettyjen värien määrää ja palettia.<br />Voit tallentaa kuvat läpinäkyvyydellä joko automaattisesti käyttämällä alfa-kanavaa tai asettamalla manuaalisesti läpinäkyvän RGB-arvon.</td></tr>
+<tr><td><span class="menu">JPEG2000-kuvat</span></td><td>24-bittinen, tiivistetty, ei läpinäkyvyyttä<br />Tässä välität normaalisti vain tulostuslaadusta.</td></tr>
+<tr><td><span class="menu">JPEG-kuvat</span></td><td>24-bittinen, tiivistetty, ei läpinäkyvyyttä<br />Tulostuslaadun lisäksi voit asettaa myös pehmennyksen, joka vähentää tiivistysartefakteja, mutta voi sumentaa kuvaa hiukan.</td></tr>
+<tr><td><span class="menu">PCX-kuvat</span></td><td>24-bittinen, tiivistämätön, ei läpinäkyvyyttä, PC Paintbrush -vaihtomuoto</td></tr>
+<tr><td><span class="menu">PNG-kuvat</span></td><td>32-bittinen, häviötön tiivistys, läpinäkyvyys</td></tr>
+<tr><td><span class="menu">PPM-kuvat</span></td><td>24-bittinen, tiivistämätön, ei läpinäkyvyyttä, siirrettävä PixMap -muoto</td></tr>
+<tr><td><span class="menu">RAW-kuvat</span></td><td>aina 48-bittiseen, tiivistämätön, ei läpinäkyvyyttä</td></tr>
+<tr><td><span class="menu">RTF-tekstitiedostot</span></td><td>Muotoiltu teksti</td></tr>
+<tr><td><span class="menu">SGI-kuvat</span></td><td>24-bittinen, valinnainen häviötön tiivistys, läpinäkyvyys</td></tr>
+<tr><td><span class="menu">StyledEdit-tiedostot</span></td><td>Muotoiltu teksti</td></tr>
+<tr><td><span class="menu">TGA-kuvat</span></td><td>32-bittinen, valinnainen häviötön tiivistys, läpinäkyvyys</td></tr>
+<tr><td><span class="menu">TIFF-kuvat</span></td><td>24-bittinen, valinnainen häviötön tiivistys, kerrokset, läpinäkyvyys</td></tr>
+<tr><td class="onelinetop"><span class="menu">WonderBrush-kuvat</span></td><td>32-bittinen, kerrokset, läpinäkyvyys, vektori/pikselitiedot</td></tr>
 </table>
 <p><br /></p>
-<div class="box-info">Screenshots, charts, black&amp;white drawings and other images with few used colors, as well as small pictures are best saved as GIF (up to 256 colors) or PNG (millions of colors). JPEG, for example, introduces compression artefacts without gain in smaller filesize.</div>
+<div class="box-info">Näytönkaappaukset, kaaviot, mustavalkoiset piirrokset ja muut kuvat muutamilla käytetyillä väreillä samoin kuin pienoiskuvat on paras tallentaa GIF-muodossa (aina 256 väriä) tai PNG-muodossa (miljoonia värejä). JPEG-muoto, esimerkiksi, esittelee tiivistysartefaktit ilman pienemmän tiedostokoon hyötyä.</div>
 
 </div>
 </div>
@@ -93,8 +89,8 @@ Besides the output quality you can also set a smoothing that will lessen compres
 <div class="nav">
 <div class="inner"><span>
  «  <a href="backgrounds.html">Tausta-asetukset</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="deskbar.html">Deskbar</a>  »
+::  <a href="../preferences.html" class="uplink">Asetukset</a> 
+::  <a href="deskbar.html">Työpöytäpalkki</a>  »
 </span></div>
 </div>
 

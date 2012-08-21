@@ -2085,7 +2085,7 @@ BContainerWindow::AddWindowMenu(BMenu* menu)
 
 	menu->AddSeparatorItem();
 
-	item = new BMenuItem(B_TRANSLATE("Tracker preferences" B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kShowSettingsWindow));
 	item->SetTarget(be_app);
 	menu->AddItem(item);

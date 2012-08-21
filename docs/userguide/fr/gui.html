@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -43,15 +43,15 @@
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">Structure du système de fichiers</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="workspaces.html">Espaces de travail</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
@@ -77,12 +77,13 @@
 <li>Vous pouvez envoyer une fenêtre à l'arrière plan avec un clic droit sur son onglet (ou sa bordure).</li></ul></li>
 <li><p>Le bouton de fermeture.</p></li>
 <li><p>Le bouton "zoom" (ou <span class="key">CTRL</span> <span class="key">CMD</span> <span class="key">Z</span>). Dans la plupart des applications, il élargira une fenêtre à la taille maximale. Cependant ce n'est pas obligatoire. La fenêtre du Tracker, par exemple, sera retaillée au mieux de son contenu.</p></li>
-<li><p>Le coin de redimensionnement. Tirer la bordure d'une fenêtre d'un autre endroit déplacera la fenêtre.</p></li>
+<li><p>La bordure de fenêtre. Un glissé-gauche déplace la fenêtre alors qu'un glissé-droit la redimensionne.</p></li>
+<li><p>Le coin de redimensionnement.</p></li>
 </ol>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="move-resize" name="move-resize">Une manière rapide de déplacer ou retailler les fenêtres</a></h2>
-<p>Le déplacement et le redimensionnement des fenêtres est une partie importante de l’interaction avec les applications qui s'exécutent simultanément. Plutôt que de viser le petit onglet jaune du titre, ou la bordure de fenêtre encore plus fine, il existe un moyen plus pratique pour déplacer une fenêtre. De même, le petit coin de redimensionnement  a une autre limitation : Il permet seulement un redimensionnement de l'angle inférieur droit.</p>
+<p>Le déplacement et le redimensionnement des fenêtres est une partie importante de l’interaction avec les applications qui s'exécutent simultanément. Plutôt que de viser le petit onglet jaune du titre, ou la bordure de fenêtre encore plus fine, il existe un moyen plus pratique pour déplacer une fenêtre. De plus, le coin de redimensionnement a une autre limitation : Il ne permet le redimensionnement qu'à partir de l'angle inférieur droit.<br />Même si un glissé-droit sur la bordure de la fenêtre pour redimensionner celle-ci fonctionne, vous aurez toutefois à viser soigneusement.</p>
 <p>Pour répondre à ces questions, Haiku fournit une solution élégante pour manipuler les fenêtres à l'aide de la combinaison des touches <span class="key">CTRL</span> <span class="key">ALT</span> et la souris. Référez-vous au chapitre <a href="keyboard-shortcuts.html#general">Raccourcis claviers</a> pour d'autres combinaisons
 de touches concernant la gestion des fenêtres.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
@@ -97,16 +98,16 @@ In the example below, a Tracker window with bookmarks is tiled to the left of a 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
 <p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
 <p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>Empiler &amp; juxtaposer se compose de deux fonctions complémentaires.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
 <td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
 While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>"<i>juxtaposer</i>" consiste à coller ensemble des fenêtres horizontalement ou verticalement.<br />
+Toujours en maintenant la touche <span class="key">OPT</span>, les bordures qui seront fusionnées si vous lâchez les fenêtres, changent de couleur quand vous les rapprochez l'une de l'autre.</p></td></tr></table>
+<p>La séparation s'effectue de la même manière, en maintenant la touche <span class="key">OPT</span> tout en déplaçant la fenêtre hors du groupe par son onglet.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -156,9 +157,9 @@ Un clic droit sur la poignée d'un Réplicant ouvrira un menu contextuel, où <s
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">Structure du système de fichiers</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="workspaces.html">Espaces de travail</a>  »
 </span></div>
 </div>
 

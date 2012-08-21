@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-PPMTranslator	2435270880
+1	belarusian	x-vnd.Haiku-PPMTranslator	276252412
 PPM Settings	PPMMain		Наладкі PPM
 Based on PPMTranslator sample code	PPMTranslator		Грунтуецца на зыходным тэксце прыкладу "PPMTranslator"
 OK	PPMMain		ОК
@@ -9,6 +9,7 @@ RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 біт
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Фармат бітмапу BeOS (Канвертар PPM)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 біт
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 біт
+PPM image translator	PPMTranslator		Канвертар выяваў PPM
 bits/space	PPMTranslator		бітаў/ліст
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 бітаў (big-endian)
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 бітаў (big-endian)

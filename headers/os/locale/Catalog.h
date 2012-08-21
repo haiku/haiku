@@ -86,6 +86,13 @@ private:
 	// Tip: Use a descriptive name of the class implemented in that
 	//		source-file.
 
+#ifdef B_COLLECTING_CATKEYS
+
+// pull in all the macros used when collecting catalog keys.
+#include <tools/CollectingCatalog.h>
+
+#else
+
 // Translation macros which may be used to shorten translation requests:
 #undef B_TRANSLATE
 #define B_TRANSLATE(string) \
@@ -172,7 +179,7 @@ private:
 #undef B_TRANSLATE_MARK_SYSTEM_NAME_VOID
 #define B_TRANSLATE_MARK_SYSTEM_NAME_VOID(string)
 
-// Translation macros which do not let collectcatkeys try to collect the key
+// Translation macros which cause collectcatkeys to ignore this key
 // (useful in combination with the marking macros above):
 #undef B_TRANSLATE_NOCOLLECT
 #define B_TRANSLATE_NOCOLLECT(string) \
@@ -193,6 +200,8 @@ private:
 #undef B_TRANSLATE_NOCOLLECT_SYSTEM_NAME
 #define B_TRANSLATE_NOCOLLECT_SYSTEM_NAME(string) \
 	B_TRANSLATE_SYSTEM_NAME(string)
+
+#endif	/* B_COLLECTING_CATKEYS */
 
 #endif	/* B_AVOID_TRANSLATION_MACROS */
 

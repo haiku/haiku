@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-GLTeapot	2890609668
+1	ukrainian	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		Вище центру
 Lighting	TeapotWindow		Свічення
 Off	TeapotWindow		Вимкнути
@@ -13,7 +13,6 @@ Fog	TeapotWindow		Туман
 Backface culling	TeapotWindow		Backface culling
 Z-buffered	TeapotWindow		Z-буферизація
 File	TeapotWindow		Файл
-Options	TeapotWindow		Опції
 Perspective	TeapotWindow		Перспектива
 GLTeapot	System name		Чайник GL
 Green	TeapotWindow		Зелений

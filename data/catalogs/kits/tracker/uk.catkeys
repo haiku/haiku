@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	335362992
+1	ukrainian	x-vnd.Haiku-libtracker	3680490064
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
@@ -362,7 +362,6 @@ Modified	FindPanel		Змінений
 Error moving \"%name\" to Trash. (%error)	FSUtils		Помилка переміщення \"%name\" до Кошика. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Ви не можете замінити папку однією з вкладених папок.
 <No recent items>	FavoritesMenu		<Немає недавніх елементів>
-Preferences…	ContainerWindow		Настройки…
 Move	PoseView		Перемістити
 Open and make preferred	OpenWithWindow		Відкрити і зробити бажаним
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ви впевнені що хочете видалити вибрані елементи? Ця операція необоротна

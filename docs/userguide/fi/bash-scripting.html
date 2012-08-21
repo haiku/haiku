@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Bash and Scripting</title>
+	<title>Bash ja skriptaus</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -41,67 +43,64 @@
 <li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="preferences.html">Preferences</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-<!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
+ «  <a href="preferences.html">Asetukset</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+<!-- ::  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a>  » -->
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Bash and Scripting</h1>
+<h1>Bash ja skriptaus</h1>
 
-<p>"Scripting" is the technique of automating procedures by stringing together commands and saving it all as text files, so called "scripts". Every time you run such a script, the commands are processed one after the other just like they would if you entered them into the <a href="applications/terminal.html">Terminal</a> by hand.<br />
-Scripts can range from simply executing a few commands in a specific order to sophisticated pieces of code that solve complex tasks.</p>
+<p>"Skriptaus" on proseduurien automointitekniikka, jossa komentoja ketjutetaan merkkijonoiksi ja tallennetaan tekstitiedostona, niin kutsuttuna "skripteinä". Joka kerta kun skripti suoritetaan, komennot käsitellään yksi kerrallaan aivan kuin ne olisi kirjoitettu käsin <a href="applications/terminal.html">Pääteikkunassa</a>.<br />Skriptit voivat ulottua yksinkertaisesta muutaman komennon suorittamisesta aina edistyneisiin koodipätkiin, jotka ratkaisevat monimutkaisia tehtäviä.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bash" name="bash">The Bash</a></h2>
-<p>Since scripts rely naturally a lot on the shell they are interpreted by, you should first familiarize yourself with the BASH that's used by Haiku. There are many resources online as it's a widely used shell. One nice document is Johan Jansson's <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.</p>
+<a id="bash" name="bash">Bash-komentotulkki</a></h2>
+<p>Koska skriptit turvautuvat luonnollisesti paljolti komentotulkkeihin, jotka tulkitsevat niitä, sinun pitäisi ensiksi tutustua BASH-komentotulkkiin, jota käytetään Haikussa. Verkossa on monia resursseja, koska se on laajalti käytetty komentotulkki. Yksi hyvä dokumentti on Johan Janssonin <a href="http://www.beforever.com/bashtut.htm" class="printurl">Perehdyttämien bash-komentotulkkiin - oppitunti bash-komnentotulkista BeOS-käyttöjärjestelmässä</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="scripting-bible" name="scripting-bible">The Scripting Bible</a></h2>
-<p>After you've learned a few basics about working in the shell, it's time to slowly ease yourself into the world of scripting. Again, you'll find loads of tutorials and reference material online as well as in bookstores. A very nice introduction that's practically tailor-made for Haiku is the online available <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) of Scot Hacker's BeOS Bible.</p>
+<a id="scripting-bible" name="scripting-bible">Skriptausraamattu</a></h2>
+<p>Sen jälkeen kun olet oppinut muutaman perusasian komentotulkissa työskentelemisestä, on aika hitaasti ujuttautua skriptausmaailmaan. Taas löydät kuormittain oppikursseja ja viitemateriaalia verkosta ja myös kirjakaupoista. Hyvä perehdyttäminen, joka on käytännöllisesti räätälöity Haikua varten, on verkossa linkissä <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Skriptauskappale</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900 kilotavua</a>) Scot Hackerin BeOS-raamatusta.</p>
 
 <h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Scripts in Haiku</a></h2>
-<p>In Haiku, the system makes of course also use of scripting. Booting and shutting down are typical scripting procedures. These defined sequences can be augmented by the user with certain user scripts.<br />
-If they don't exist already, you'll have to create the needed files yourself. Otherwise simply add your commands where in the process you want them to be executed.</p>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Skriptit Haikussa</a></h2>
+<p>Haikussa myös käyttöjärjestelmä käyttää skriptausta. Alkulataus ja järjestelmän sulkeminen ovat tyypillisiä skriptausproseduureja. Käyttäjä voi lisätä näihin määriteltyihin sekvensseihin tiettyjä käyttäjäskriptejä.<br />Jos niitä ei jo ole olemassa, sinun on lisättävä tarvittavat tiedostot itse. Muussa tapauksessa lisää yksinkertaisesti komentosi prosessissa sinne, missä haluat ne suorittaa.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="userbootscript" name="userbootscript">The UserBootscript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserBootscript</span> will be executed after the system has finished its boot process. For example, you could launch a number of programs that would then be automatically started on every boot up:</p>
-<pre># Start LaunchBox
+<a id="userbootscript" name="userbootscript">UserBootscript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserBootscript</span> suoritetaan sen jälkeen kun järjestelmä on lopettanut alkulatausprosessin. Esimerkiksi voisit käynnistää skriptissä lukuisia ohjelmia, jotka käynnistyisivät silloin automaattisesti jokaisen alkulatauksen yhteydessä:</p>
+<pre># Käynnistä LaunchBox
 /boot/system/apps/LaunchBox &amp;
 
-# Start Workspaces Applet
+# Käynnistä Workspaces Applet
 /boot/system/apps/Workspaces &amp;</pre>
-<p>Remember to end a command with an "<tt>&amp;</tt>" to start it as a background process, or the script will halt until that command has finished (in this case: the launched app was closed again).</p>
+<p>Muista lisätä komennon loppuun "<tt>&amp;</tt>" ohjelman käynnistämiseksi taustaprosessina, tai skripti pysähtyy, kunnes komento on suoritettu loppuun (tässä tapauksessa: kunnes käynnistetty sovellus on taas suljettu).</p>
 
-<p>A simple alternative to the above for launching applications at boot up is to put links to them in the <span class="path">/boot/home/config/boot/launch</span> directory. This can be done simply by right-clicking on the application you wish to have started automatically, going to <span class="menu">Create Link</span> and then <a href="tracker.html#navigating">navigating</a> to the above directory.</p>
-
-<h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> will be executed as the first step in the shutdown process. If the script returns a non-zero exit status, the shutdown is aborted.</p>
+<p>Yksinkertainen vaihtoehto yllämainitulle sovellusten käynnistämiselle alkulatauksen yhteydessä on laittaa linkit sovelluksiin <span class="path">/boot/home/config/boot/launch</span>-hakemistoon. Tämä voidaan tehdä yksinkertaisesti hiiren oikean painikkeen napsautuksella sellaisen sovelluksen kohdalla, jonka toivot käynnistyvän automaattisesti, valitsemalla valikosta <span class="menu">Luo linkki</span> ja sitten <a href="tracker.html#navigating">navigoimalla</a> yllä olevaan hakemistoon.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> is executed as the last step in the shutdown process. Note, that most parts of the system have terminated by the time this script is executed.</p>
+<a id="usershutdownscript" name="usershutdownscript">UserShutdownScript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> suoritetaan ensimmäisenä askeleena sulkemisprosessissa. Jos skripti palauttaa nollasta poikkeavan arvon, sulkeminen keskeytetään.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> suoritetaan sulkemisprosessin viimeisenä askeleena. Huomaa, että suurin osa järjestelmästä on lopetettu siinä vaiheessa kun tämä skripti suoritetaan.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="preferences.html">Preferences</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-<!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
+ «  <a href="preferences.html">Asetukset</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+<!-- ::  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a>  » -->
 </span></div>
 </div>
 

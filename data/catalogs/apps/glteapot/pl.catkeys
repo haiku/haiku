@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-GLTeapot	2890609668
+1	polish	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		Górne
 Lighting	TeapotWindow		Oświetlenie
 Off	TeapotWindow		Wyłącz
@@ -13,7 +13,6 @@ Fog	TeapotWindow		Mgła
 Backface culling	TeapotWindow		Usuwanie niewidocznych powierzchni
 Z-buffered	TeapotWindow		Buforowane Z
 File	TeapotWindow		Plik
-Options	TeapotWindow		Opcje
 Perspective	TeapotWindow		Perspektywa
 GLTeapot	System name		GLTeapot
 Green	TeapotWindow		Zielony
