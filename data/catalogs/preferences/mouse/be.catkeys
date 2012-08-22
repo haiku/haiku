@@ -4,7 +4,7 @@ Warp	SettingsView		Заварот
 2-Button	SettingsView		Дзвюхкнопкавая
 Double-click test area	SettingsView		Месца праверкі падвойнага кліка
 Revert	MouseWindow		Вярнуць
-...by Andrew Edward McCall	MouseApplication		... распрацавана Andrew Edward McCall
+...by Andrew Edward McCall	MouseApplication		...распрацавана Andrew Edward McCall
 Mouse acceleration	SettingsView		Паскарэнне мышы
 Click to focus	SettingsView		Фокус па націску
 Click to focus and raise	SettingsView		Клік факусіруе і падымае наверх

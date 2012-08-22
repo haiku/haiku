@@ -40,14 +40,14 @@ Remove Paths	Icon-O-Matic-RemovePathsCmd		Выдаліць Шляхі
 Scale Y	Icon-O-Matic-PropertyNames		Шкала Y
 Add Control Point	Icon-O-Matic-AddPointCmd		Дадаць кантрольную кропку
 Untitled	Icon-O-Matic-Main		Неназваны
-Multi Set 	Multi Set (property name)		Прызначыць некалькі
+Multi Set 	Multi Set (property name)		Прызначыць некалькі 
 any of the other lists to	Empty property list - 2nd line		любым з іншых спісаў каб
-Save as…	Icon-O-Matic-Menu-File		Захаваць як...
+Save as…	Icon-O-Matic-Menu-File		Захаваць як…
 Change Color	Icon-O-Matic-SetColorCmd		Змяніць колер
 Style	Icon-O-Matic-Menus		Стыль
 <modify path>	Icon-O-Matic-PathCmd		<змяніць пуць>
 Opening the icon failed!	Icon-O-Matic-Main		Нельга адкрыць іконку!
-Error: 	Icon-O-Matic-Main		Памылка:
+Error: 	Icon-O-Matic-Main		Памылка: 
 Rotate indices backwards	Icon-O-Matic-PathsList		Павярнуць індэксы назад
 Name	Icon-O-Matic-PropertyNames		Імя
 bad news	Icon-O-Matic-Exporter		дрэнныя навіны
@@ -58,7 +58,7 @@ PNG Set	Icon-O-Matic-SavePanel		Набор PNG
 Joins	Icon-O-Matic-PropertyNames		Злучэнні
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Выдаліць Стыль
 Scale X	Icon-O-Matic-PropertyNames		Шкала X
-Set 	Set (property name)		Прызначыць
+Set 	Set (property name)		Прызначыць 
 Cancel	Icon-O-Matic-SVGExport		Адмена
 Add shape with style	Icon-O-Matic-Menu-Shape		Дадаць фігуру са стылям
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Выдаліць Фігуру
@@ -109,7 +109,7 @@ The text you are trying to import is quite long,are you sure?	Icon-O-Matic-Style
 Add	Icon-O-Matic-TransformersList		Дадаць
 Export Icon	Dialog title		Экспартаваць Іконку
 Color	Icon-O-Matic-StyleTypes		Колер
-Settings…	Icon-O-Matic-SavePanel		Наладкі...
+Settings…	Icon-O-Matic-SavePanel		Наладкі…
 Remove	Icon-O-Matic-PathManipulator		Выдаліць
 Radial	Icon-O-Matic-StyleTypes		Радыяльны
 Perspective	Icon-O-Matic-TransformersList		Перспектыва
@@ -119,7 +119,7 @@ Min LOD	Icon-O-Matic-PropertyNames		Мін. LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрыбут BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Інвертаваць выдзяленне
 Drop shapes	Icon-O-Matic-ShapesList		Падаючыя формы
-Export as…	Icon-O-Matic-Menu-File		Экспартаваць як...
+Export as…	Icon-O-Matic-Menu-File		Экспартаваць як…
 Transformation	Transformation		Трансфармацыя
 Click on an object in	Empty property list - 1st line		Клікніце па аб'екце у
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Перамясціць Трансформеры
@@ -142,7 +142,7 @@ Move Pivot	Icon-O-Matic-TransformationBoxStates		Перамясціць Стры
 Path	Icon-O-Matic-Menus		Шлях
 Freeze transformation	Icon-O-Matic-ShapesList		Замарозіць трансфармацыю
 File	Icon-O-Matic-Menus		Файл
-Error: 	Icon-O-Matic-Exporter		Памылка:
+Error: 	Icon-O-Matic-Exporter		Памылка: 
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Дадаць Трансформераў
 Diamond	Icon-O-Matic-StyleTypes		Ромб
 Path	Icon-O-Matic-PropertyNames		Шлях
@@ -187,12 +187,12 @@ Reverse Path	Icon-O-Matic-ReversePathCmd		Звараціць Шлях
 Scale	Icon-O-Matic-TransformationBoxStates		Масштаб
 Duplicate	Icon-O-Matic-PathsList		Дуплікаваць
 Save	Icon-O-Matic-Menu-File		Захаваць
-Append…	Icon-O-Matic-Menu-File		Дадаць...
+Append…	Icon-O-Matic-Menu-File		Дадаць…
 Move Path	Icon-O-Matic-MovePathsCmd		Перамясціць Шлях
 Overwrite	Icon-O-Matic-SVGExport		Перазапісаць
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Замарозіць Фігуры
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Раздзяліць Кантрольную Кропку
-Open…	Icon-O-Matic-Menu-File		Адкрыць...
+Open…	Icon-O-Matic-Menu-File		Адкрыць…
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Колер (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Правіць Градыент
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Ачысціць Шлях

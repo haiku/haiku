@@ -3,14 +3,14 @@ display a load/save file panel\n	FilePanelApp		паказаць панель з�
 options:\n	FilePanelApp		опцыі:\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		карыстанне: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tтыпы данных, якія могуць быць адкрыты: любая камбінацыя f, d, s (файл (прадвызначаны), дырэкторыя, спасылка)\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		карыстанне: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--дырэкторыя\tадкрыць у <каталозе>\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		карыстанне: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t --directory\t адкрыць у <каталозе>\n
 %s not a valid option\n	FilePanelApp		%s - няправільная опцыя\n
 short\tlong\tdescription\n	FilePanelApp		кароткае\tдоўгае\tапісанне\n
 %s: this option requires a parameter\n	FilePanelApp		%s гэтая опцыя патрабуе параметр\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tужываць панель закрузкі (прадвызначана)\n
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tнерэалізавана\n
--s\t--save\tuse a save FilePanel\n	FilePanelApp		-l\t--load\tужываць панель захавання\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t --save\t ужываць панель захавання\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tазначыць стандартнае імя для захавання\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tробіць панель мадальнай\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tпаказаць ключы\n

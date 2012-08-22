@@ -24,7 +24,7 @@ Search:	NotificationView		Пошук:
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Сервер паведамленняў не знойдзены.\nМагчымая прычына - няправільная ўсталёўка
 Allowed	NotificationView		Дазволена
 Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Нельга захаваць наладкі, магчыма, вы не маеце доступу да дырэкторыі наладак, або дыскзапоўнены.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Не ўдалося захаваць наладкі.\nМагчыма, вы не маеце доступу да да дырэкторыі наладак.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Не ўдалося захаваць наладкі.\nМагчыма, вы не маеце доступу да дырэкторыі наладак.
 Yes	NotificationView		Так
 Large icon	DisplayView		Вялікая іконка
 Icon size:	DisplayView		Памер іконкі

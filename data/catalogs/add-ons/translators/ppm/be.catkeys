@@ -1,6 +1,6 @@
 1	belarusian	x-vnd.Haiku-PPMTranslator	276252412
 PPM Settings	PPMMain		Наладкі PPM
-Based on PPMTranslator sample code	PPMTranslator		Грунтуецца на зыходным тэксце прыкладу "PPMTranslator"
+Based on PPMTranslator sample code	PPMTranslator		Грунтуецца на зыходным тэксце прыкладу PPMTranslator
 OK	PPMMain		ОК
 Grayscale 8 bits	PPMTranslator		Шэракаляровы 8 біт
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 біт
@@ -25,7 +25,7 @@ Bitmap 1 bit	PPMTranslator		Бітмап 1 біт
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 бітаў (big-endian)
 Input Color Space	PPMTranslator		Зыходная палета колераў
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 бітаў
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Ліцэнзія '1999, Be Incorporated' на выкарыстанне зыходнага коду прыкладаў.
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Ліцэнзія '1999, Be Incorporated' на выкарыстанне зыходнага коду прыкладаў
 PPMTranslator Settings	PPMTranslator		Наладкі канвертара PPM
 Something is wrong with the PPMTranslator!	PPMMain		Увага! Канвертар PPM мае нейкія праблемы!
 System palette 8 bits	PPMTranslator		Сістэмная палета 8 бітаў

@@ -24,7 +24,7 @@ OK	MediaConverter-FileInfo		ОК
  seconds	MediaFileInfo		 секундаў
 Source files	MediaConverter		Зыходныя файлы
 Cancelling	MediaConverter		Адмена
-%d byte 	MediaFileInfo		%d байтаў
+%d byte 	MediaFileInfo		%d байтаў 
 Error loading files	MediaConverter		Немагчыма загрузіць файлы
 Cancel	MediaConverter		Адмена
 None available	Video codecs		Не даступна
@@ -36,13 +36,13 @@ Continue	MediaConverter		Працяг
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кадыроўшчыка
 Video:	MediaConverter-FileInfo		Відэа:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f fps / %Ld фрэймаў
-%d bit 	MediaFileInfo		%d біт
+%d bit 	MediaFileInfo		%d біт 
 Error creating '%filename'	MediaConverter		Немагчыма стварыць '%filename'
 Video quality not supported	MediaConverter		Якасць відэа не падтрымліваецца
 Cancelling…	MediaConverter		Адмена…
 File details	MediaConverter		Падрабязнасці пра файл
 Select	MediaConverter		Абраць
-Writing video track: %ld%% complete	MediaConverter		Запіс відэа трэку: выканана на %Ld%%
+Writing video track: %ld%% complete	MediaConverter		Запіс відэа трэку: выканана на %ld%%
 Quit	Menu		Выйсці
 Preview	MediaConverter		Прагляд
 File format:	MediaConverter		Фармат файла:
@@ -58,11 +58,11 @@ Audio encoding:	MediaConverter		Аўдыё кадаванне:
 Audio quality not supported	MediaConverter		Якасць аўдыё не падтрымліваецца
 File	Menu		Файл
 Convert	MediaConverter		Канвертаваць
-Writing audio track: %ld%% complete	MediaConverter		Запіс аўдыё трэку: выканана на %Ld%%
+Writing audio track: %ld%% complete	MediaConverter		Запіс аўдыё трэку: выканана на %ld%%
 Video quality: %3d%%	MediaConverter		Якасць відэа: %3d%%
 Output folder	MediaConverter		Папка для выходных файлаў
 Audio quality: %3d%%	MediaConverter		Якасць аўдыё: %3d%%
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Не ўдалося прачытаць інфармацыю пра файл.\n\nПамылка :
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Не ўдалося прачытаць інфармацыю пра файл.\n\nПамылка : 
 Error read video frame %Ld	MediaConverter		Немагчыма прачытаць фрэйм %Ld у відэапатоку
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles файлаў не былі прызнаныя як медыя, іх немагчыма апрацаваць:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / %lld фрэймаў

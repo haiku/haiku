@@ -1,9 +1,10 @@
-1	belarusian	x-vnd.Haiku-GIFTranslator	829368084
+1	belarusian	x-vnd.Haiku-GIFTranslator	2708495435
 Websafe	GIFView		Прыдатны для Web
 Write interlaced images	GIFView		Запісваць выявы з чаргаваннем
 Optimal	GIFView		Аптымальны
 Greyscale	GIFView		Шэракаляровы
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Фармат бітмапу BeOS (канвертар GIF)
+GIF image translator	GIFView		Канвертар выяваў GIF
 GIF image	GIFTranslator		Выявы GIF
 Write transparent images	GIFView		Запісваць выявы з празрыстасцю
 Palette	GIFView		Палета

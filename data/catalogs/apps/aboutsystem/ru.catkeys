@@ -23,7 +23,7 @@ Processor:	AboutView		Процессор:
 Kernel:	AboutView		Ядро:
 BSD (3-clause)	AboutView		3-пунктовая BSD
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Все права защищены © 2001-2002 Thomas Broyer, Charlie Bozeman и Daniel Veillard.
-Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Отдельные части этого программного обеспечения находятся под авторским правом.\nВсе права защищены © 1996-2000 Проект FreeType.
+Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Отдельные части этого программного обеспечения находятся под авторским правом.\nВсе права защищены © 1996-2006 Проект FreeType.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku® и логотип HAIKU® являются зарегистрированными торговыми марками Haiku, Inc.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Все права защищены © 1987-1988 Digital Equipment Corporation, Мейнард, Массачусетс.
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total МБ всего, %inaccessible МБ недоступно

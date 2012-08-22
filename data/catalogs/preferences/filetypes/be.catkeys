@@ -21,12 +21,12 @@ File type	FileType Window		Тып файла
 Could not change attributes	Attribute Window		Немагчыма змяніць атрыбуты
 Could not retrieve preferred application of this file	Preferred App Menu		Не ўдалося вызначыць пажаданую праграму для гэтага файла
 Beta	Application Types Window		Бэта
-Extensions:	FileTypes Window		Пашырэнні
+Extensions:	FileTypes Window		Пашырэнні:
 Select same preferred application as	FileTypes Window		Выбраць такую ж пажаданую праграму, як і
 Save	Application Type Window		Захаваць
 Could not retrieve application signature	Preferred App Menu		Не ўдалося вызначыць подпіс парграмы
 Add	Extension Window		Дадаць
-Select same preferred application as	FileType Window		Вылучыць тую самую пажаданую праграму як і ў 
+Select same preferred application as	FileType Window		Вылучыць тую самую пажаданую праграму як і ў
 Cancel	Attribute Window		Скасаваць
 Icon	Application Type Window		Іконка
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Выдаленне тыпу файла не можа быть адменена.\nСапраўды працягваць?
@@ -43,7 +43,7 @@ Attribute	Attribute Window		Атрыбут
 Show recognition rule	FileTypes Window		Паказаць правіла распазнання
 FileTypes request	Preferred App Menu		Запыт FileTypes
 Could not open file	FileType Window		Немагчыма адркрыць файл
-Description:	FileTypes Window		Апісанне
+Description:	FileTypes Window		Апісанне:
 File	FileTypes Window		Файл
 Name:	Application Types Window		Імя:
 Group name:	New File Type Window		Імя групы:
@@ -52,9 +52,9 @@ Progress	Application Types Window		Прагрэс
 Set preferred application	Preferred App Menu		Прызначыць пажаданую праграму
 File	Application Type Window		Файл
 Version:	Application Type Window		Версія:
-Select…	FileTypes Window		Выбраць...
+Select…	FileTypes Window		Выбраць…
 FileTypes request	FileTypes		запыт FileTypes
-Open…	FileTypes Window		Адкрыць...
+Open…	FileTypes Window		Адкрыць…
 Select…	FileType Window		Вылучыць…
 Launch	Application Types Window		Запуск
 Same as…	FileType Window	The same APPLICATION as ...	Такая ж, як…
@@ -70,7 +70,7 @@ Development	Application Types Window		Распрацоўная
 Open file	FileTypes		Адчыніць Файл
 Special:	Attribute Window		Спецыяльны:
 Alpha	Application Type Window		Alpha
-Add…	FileTypes Window		Дадаць..
+Add…	FileTypes Window		Дадаць…
 Signature:	Application Type Window		Подпіс:
 Quit, don't save	Application Type Window		Выйсьці, не захоўваць
 Add…	Application Type Window		Дадаць…
@@ -94,7 +94,7 @@ Add new group	New File Type Window		Дадаць новую групу
 Move down	FileTypes Window		Перасунуць уніз
 Cancel	Application Type Window		Скасаваць
 Settings	FileTypes Window		Наладкі
-New resource file…	FileTypes Window		Новы файл рэсурсаў
+New resource file…	FileTypes Window		Новы файл рэсурсаў…
 Cancel	New File Type Window		Скасаваць
 Icon	FileTypes Window		Іконка
 Extension:	Extension Window		Пашырэнне:
@@ -128,7 +128,7 @@ Final	Application Type Window		Канчатковы
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Шырыня:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Паказваць як:
 This file type already exists	New File Type Window		Гэты тып файла ўжо існуе
-Same as…	FileTypes Window		Такая ж, як...
+Same as…	FileTypes Window		Такая ж, як…
 Exclusive launch	Application Type Window		Выбарны запуск
 %ld Application type%s could be removed.	Application Types Window		%ld тыпаў праграм%s можна выдаліць.
 FileTypes	System name		Тыпы файлаў
@@ -141,13 +141,13 @@ Cancel	FileTypes Window		Адмена
 Select preferred application	FileTypes Window		Выбраць пажаданую праграму
 Right	Attribute Window	Attribute column alignment in Tracker	Справа
 Default application	FileType Window		Прадвызначаная праграма
-Long description:	Application Type Window		Падрабязнае апісанне
-FileTypes request	FileTypes Window		Запыт тыпу.
+Long description:	Application Type Window		Падрабязнае апісанне:
+FileTypes request	FileTypes Window		Запыт тыпу
 Version info	Application Type Window		Інфармацыя пра версію
 (from super type)	FileTypes Window		(з галоўнага тыпу)
 Version:	Application Types Window		Версія:
 Preferred application	FileTypes Window		Пажаданая праграма
-Short description:	Application Type Window		Кароткан апісанне
+Short description:	Application Type Window		Кароткае апісанне:
 File could not be opened	Preferred App Menu		Файля ня можа быць адчынены
 Could not change file extensions	Extension Window		Не ўдалося змяніць пашырэнні файлаў
 Edit icon…	Icon View		Рэдагаваць іконку…

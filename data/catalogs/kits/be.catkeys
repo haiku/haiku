@@ -8,7 +8,7 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		�
 Copy	TextView		Капіяваць
 %3.2f KiB	StringForSize		%3.2f КіБ
 %d bytes	StringForSize		%d байтаў
-About…	AboutWindow		Пра прагарму...
+About…	AboutWindow		Пра прагарму…
 Error	PrintJob		Памылка
 No Pages to print!	PrintJob		Няма старонак для друку!
 OK	Dragger		ОК
@@ -16,7 +16,7 @@ OK	PrintJob		ОК
 Green:	ColorControl		Зялёны:
 Remove replicant	Dragger		Выдаліць рэпліканта
 OK	ZombieReplicantView		ОК
-Print Server is not responding.	PrintJob		Сервер друку не адказвае
+Print Server is not responding.	PrintJob		Сервер друку не адказвае.
 Paste	TextView		Уставіць
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 %.2f TiB	StringForSize		%.2f ТіБ

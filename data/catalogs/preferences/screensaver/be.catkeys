@@ -2,10 +2,10 @@
 Could not load screen saver	ScreenSaver		Не ўдалося загрузіць захавальнік экрана
 30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запусціць захавальнік
-Password…	ScreenSaver		Пароль...
+Password…	ScreenSaver		Пароль…
 Password:	ScreenSaver		Пароль:
 Password lock	ScreenSaver		Ахова паролем
-Add…	ScreenSaver		Дадаць...
+Add…	ScreenSaver		Дадаць…
 Screensavers	ScreenSaver		Захавальнікі экрана
 mouse is here	ScreenSaver		мыш тут
 Display Power Management Signaling not available	ScreenSaver		Кіраванне сілкаваннем дысплэя (DPMS) не падтрымліваецца
@@ -19,7 +19,7 @@ No options available	ScreenSaver		Ніякія опцыі недаступныя
 Password Window	ScreenSaver		Вакно Пароля
 Fade now when	ScreenSaver		Марнець адразу ж, калі
 Screensaver settings	ScreenSaver		Наладкі захавальніка
-Passwords don't match. Please try again.	ScreenSaver		Паролі не супадаюць
+Passwords don't match. Please try again.	ScreenSaver		Паролі не супадаюць.
 OK	ScreenSaver		ОК
 Don't fade when	ScreenSaver		Не марнець, калі
 Blackness	ScreenSaver		Чарната

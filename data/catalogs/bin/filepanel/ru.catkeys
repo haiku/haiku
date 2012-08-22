@@ -4,7 +4,7 @@ options:\n	FilePanelApp		опции:\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		использование: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tвид записей, которые могут быть открыты (flavour): любая комбинация f, d, s (файл (по умолчанию), каталог, ссылка)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		использование: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--каталог\tоткрыть в <папке>\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tоткрыть в <папке>\n
 %s not a valid option\n	FilePanelApp		%s неправильная опция\n
 short\tlong\tdescription\n	FilePanelApp		короткое\tдлинное\tописание\n
 %s: this option requires a parameter\n	FilePanelApp		%s: эта опция требует параметра\n

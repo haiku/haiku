@@ -6,7 +6,7 @@ Use:	ExpanderPreferences		Выкарыстаць:
 File expanded	ExpanderWindow		Файл распакаваны
 The destination is read only.	ExpanderWindow		Запіс ў тэчку прызначэння не дазволены.
 Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць
- is not supported	ExpanderWindow		не падтрымлiваецца
+ is not supported	ExpanderWindow		 не падтрымлiваецца
 Expander settings	ExpanderPreferences		Наладкі Распакоўшчыка
 Select current	DirectoryFilePanel		Пазначыць бягучы
 Source	ExpanderWindow		Крыніца

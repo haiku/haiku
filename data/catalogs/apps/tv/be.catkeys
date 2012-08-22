@@ -1,7 +1,7 @@
 1	belarusian	x-vnd.Haiku.TV	1995288111
 TV	MainWin		Тэлевізар
 Channel	MainWin		Канал
-Settings…	MainWin		Наладкі...
+Settings…	MainWin		Наладкі…
 Interface	MainWin		Інтэрфейс
 Keep aspect ratio	MainWin		Захоўваць суадносіны бакоў
 Previous channel	MainWin		Папярэдні канал
@@ -24,4 +24,4 @@ force 544 x 576, display aspect 4:3	MainWin		прымусовыя 544 x 576 (4:3
 pixel aspect ratio	MainWin		суадносіны бакоў для пікселяў
 No menu	MainWin		Няма меню
 Error, connecting to interface failed:\n\n	MainWin		Памылка, далучыцца да інтэрфейсу не ўдалося:\n\n
-force 720 x 576, display aspect 4:3	MainWin		прымусовыя 544 x 576 (4:3)
+force 720 x 576, display aspect 4:3	MainWin		прымусовыя 720 x 576, экран 4:3

@@ -1,6 +1,6 @@
-1	belarusian	x-vnd.Haiku-MidiPlayer	4180509704
+1	belarusian	x-vnd.Haiku-MidiPlayer	1227982606
 None	Main Window		Няма
-Live input:	Main Window		Live Уваход
+Live input:	Main Window		Live Уваход:
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nМузычны геній\nІграе вельмі многа\nВыдатных песень
 Stop	Main Window		Спыніць
 Cavern	Main Window		Пячора
@@ -13,6 +13,7 @@ Play	Main Window		Іграць
 Garage	Main Window		Гараж
 Closet	Main Window		Шкаф
 MidiPlayer	System name		Праігравальнік MIDI
+OK	Main Application		ОК
 Drop MIDI file here	Scope View		Кідайце MIDI файл сюды
 Igor's lab	Main Window		Лабараторыя Ігара
 Scope	Main Window		Абшар

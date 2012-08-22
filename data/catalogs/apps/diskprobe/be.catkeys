@@ -1,7 +1,7 @@
 1	belarusian	x-vnd.Haiku-DiskProbe	2306672993
-File offset: 	ProbeView		Адступ:
+File offset: 	ProbeView		Адступ: 
 %ld (native)	ProbeView		%ld (родны)
-64 bit unsigned value:	TypeEditors		64-бітнае значэнне без знаку
+64 bit unsigned value:	TypeEditors		64-бітнае значэнне без знаку:
 Find again	ProbeView		Знайсці зноў
 Text	FindWindow		Тэкст
 Find…	ProbeView		Знайсці…
@@ -13,7 +13,7 @@ Attribute	ProbeView		Атрыбут
 Floating-point value:	TypeEditors		Значэнне з плаваючай запятой:
 16 bit	TypeEditors		16-бітны
 Attributes	ProbeView		Атрыбуты
-Device offset: 	ProbeView		Адступ прылады:
+Device offset: 	ProbeView		Адступ прылады: 
 Selection	ProbeView		Выдзяленне
 DiskProbe	System name		DiskProbe
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	што: '%.4s'\n\n
@@ -23,9 +23,9 @@ Boolean	TypeEditors	This is the type of editor	Булевы
 Paste	ProbeView		Уставіць
 PNG format	TypeEditors		Фармат PNG
 Font size	ProbeView		Памер шрыфту
-Attribute type: 	ProbeView		Тып атрыбуту:
+Attribute type: 	ProbeView		Тып атрыбуту: 
 Attribute	AttributeWindow		Атрыбут
-8 bit signed value:	TypeEditors		8-бітнае знакавае занчэнне
+8 bit signed value:	TypeEditors		8-бітнае знакавае занчэнне:
 Number:	TypeEditors		Нумар:
 Save	ProbeView		Захаваць
 Stop	ProbeView		Стоп
@@ -33,10 +33,10 @@ Number editor	TypeEditors		Рэдактар нумараў
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
 No type editor available	AttributeWindow		Рэдактар тыпаў недаступны
 Double precision floating-point value:	TypeEditors		Значэнне з плаваючай запятой двайной дакладнасці:
-Device: 	ProbeView		Прылада:
+Device: 	ProbeView		Прылада: 
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Сапраўды жадаеце выдаліць атрыбут \"%s\" з файла\"%s\"?\n\nВы не зможаце адмяніць гэтае дзеянне.
 Text	TypeEditors	This is the type of editor	Тэкставы
-8 bit unsigned value:	TypeEditors		8-бітнае занчэнне без знаку
+8 bit unsigned value:	TypeEditors		8-бітнае занчэнне без знаку:
 Block	ProbeView		Блок
 Back	ProbeView		Назад
 Device	ProbeView		Прылада
@@ -59,7 +59,7 @@ Boolean value:	TypeEditors		Лагічнае значэнне:
 8 bit palette	TypeEditors		8-бітная палітра
 Fit	ProbeView	Size of fonts, fits to available room	Умясціць
 Probe device	OpenWindow		Зандыраваць прыладу
- (native)	ProbeView		(зыходны)
+ (native)	ProbeView		 (зыходны)
 Unknown format	TypeEditors		Невядомы фармат
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шаснаццатковы
 MIME type:	TypeEditors		MIME тып:
@@ -79,15 +79,15 @@ Flattened bitmap	TypeEditors		Сплюснутая карта бітаў
 Open file…	FileWindow		Адкрыць файл…
 Next	ProbeView		Далейшы
 Close	FileWindow		Закрыць
-Attribute: 	ProbeView		Атрыбут:
+Attribute: 	ProbeView		Атрыбут: 
 Remove from file	AttributeWindow		Выдаліць з файла
 Don't save	ProbeView		Не захоўваць
 Previous	ProbeView		Папярэдні
 64 bit signed value:	TypeEditors		64-бітнае значэнне:
 Icon	TypeEditors		Іконка
-Block: 	ProbeView		Блок:
+Block: 	ProbeView		Блок: 
 Examine device:	OpenWindow		Даследаваць прыладу:
-Offset: 	ProbeView		Адступ:
+Offset: 	ProbeView		Адступ: 
 OK	ProbeView		Так
 Add	ProbeView		Дадаць
 Edit	ProbeView		Рэдагаваць
@@ -115,13 +115,13 @@ Mode:	FindWindow		Рэжым:
 15 bit	TypeEditors		15 біт
 Open device	FileWindow		Адкрыць прыладу
 Could not find search string.	ProbeView		Не атрымалася знайсці страку пошуку.
-16 bit unsigned value:	TypeEditors		16-бітные значэнне без знаку
-Attribute offset: 	ProbeView		Адступ атрыбуту:
+16 bit unsigned value:	TypeEditors		16-бітные значэнне без знаку:
+Attribute offset: 	ProbeView		Адступ атрыбуту: 
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Від
 Redo	ProbeView		Яшчэ раз
-File: 	ProbeView		Файл:
+File: 	ProbeView		Файл: 
 32 bit unsigned pointer:	TypeEditors		32-бітны указальнік без знаку:
-of 	ProbeView		з
+of 	ProbeView		з 
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Не ўдалося запісаць у файл:\n%s\n\nУсе змены будуць згублены, калі вы выйдзеце.
 32 bit	TypeEditors		32 біт
 Cancel	ProbeView		Адмена

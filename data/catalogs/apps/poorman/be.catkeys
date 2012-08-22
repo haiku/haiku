@@ -1,7 +1,7 @@
 1	belarusian	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Месцазнаходжанне вэб-сайта
 Error Server	PoorMan		Сервер Памылак
-Settings…	PoorMan		Наладкі...
+Settings…	PoorMan		Наладкі…
 Create PoorMan log	PoorMan		Стварыць лог PoorMan
 Shutting down.\n	PoorMan		Выключэнне.\n
 Hits: %lu	PoorMan		Пераходы:%lu
@@ -43,7 +43,7 @@ Error Dir	PoorMan		Каталог Памылак
 Select all	PoorMan		Выбраць усё
 File	PoorMan		Файл
 File Logging	PoorMan		Пратакол ў файл
-Save console selections as…	PoorMan		Захоўваць выдзяленні кансолі як...
+Save console selections as…	PoorMan		Захоўваць выдзяленні кансолі як…
 File logging	PoorMan		Пратакаліраванне файлаў
 Select web folder	PoorMan		Выбраць выб-каталог
 Logging view	PoorMan		Від пратакаліравання
@@ -51,11 +51,11 @@ Logging	PoorMan		Пратакаліраванне
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартны вэб-каталог быў створаны у \"/boot/home/public_html.\"\nПераканайцеся, что там ёсць HTML файл\"index.html\".
 Clear log file	PoorMan		Ачысціць лог-файл
 Log file name:	PoorMan		Імя лог-файла
-Directory: 	PoorMan		Дырэкторыя:
+Directory: 	PoorMan		Дырэкторыя: 
 Log To File	PoorMan		Лог у Файл
 Done	PoorMan		Гатова
 Create log file	PoorMan		Стварыць лог
-Starting up... 	PoorMan		Загрузка...
+Starting up... 	PoorMan		Загрузка... 
 Site	PoorMan		Сайт
 Cancel	PoorMan		Адмена
 Console logging	PoorMan		Пратакол на кансоль

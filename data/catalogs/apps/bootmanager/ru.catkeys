@@ -26,7 +26,7 @@ After one second	DefaultPartitionPage		1 секунда
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Таблица разделов первого жесткого диска несовместима с менеджером загрузки.\nМенеджеру загрузки требуется 2 КБ свободного места перед первым разделом.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Были обнаружены следующие разделы. Пожалуйста, отметьте разделы, которые должны отображаться в загрузочном меню. Вы также можете присвоить имена разделам, которые будут отображаться в этом меню.
 After one minute	DefaultPartitionPage		1 минута
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Загрузочная запись (MBR) устройства (%DISK) была успешна восстановлена из файла %s.
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Загрузочная запись (MBR) устройства (%DISK) была успешна восстановлена из файла %FILE.
 Write boot menu	BootManagerController	Button	Записать загрузочное меню
 The Master Boot Record could not be restored!	BootManagerController		Невозможно восстановить загрузочную запись (MBR)!
 Uninstall	DrivesPage	Button	Удалить

@@ -8,7 +8,7 @@ Connecting to POP3 server…	pop3		Далучэнне да POP3 сервера�
 Getting UniqueIDs…	pop3		Атрыманне ідэнтыфікатараў…
 : No reply.\n	pop3		: Няма адказу.\n
 : Connection refused or host not found	pop3		: Адмова ў далучэнні альбо хост не знойдзены
-Error while connecting to server %serv	pop3		Памылка падчас далучэння %user да сервера
+Error while connecting to server %serv	pop3		Памылка падчас далучэння %serv да сервера
 Error while authenticating user %user	pop3		Памылка падчас аўтэнтыфікацыі %user
 Destination:	ConfigView		Прызначэнне:
 APOP	ConfigView		APOP

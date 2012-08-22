@@ -41,8 +41,8 @@ Application	ShortcutsWindow		Праграма
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Гудок
 *MoveMouseTo 50% 50%	ShortcutsWindow		*РухацьМышДа 50% 50%
-Save KeySet as…	ShortcutsWindow		Захаваць KeySet як...
-Open	ShortcutsWindow		Адкрыць...
+Save KeySet as…	ShortcutsWindow		Захаваць KeySet як…
+Open	ShortcutsWindow		Адкрыць
 Really quit without saving your changes?	ShortcutsWindow		Сапраўды выйсці, не захоўваючы змены?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог разабраць ваш файл KeySet!
 Select	ShortcutsWindow		Выбраць

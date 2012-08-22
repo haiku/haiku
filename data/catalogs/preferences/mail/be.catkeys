@@ -9,9 +9,9 @@ Incoming	Config Window		Уваходны
 Server name:	E-Mail		Імя серверу:
 OK	Config Window		ОК
 Start mail services on startup	Config Window		Запускаць паштовыя службы пры загрузцы
-E-mail address:	E-Mail		Адрас E-mail
+E-mail address:	E-Mail		Адрас E-mail:
 Account name:	E-Mail		Імя акаунта:
-Account name:	Config Views		Імя акаунту
+Account name:	Config Views		Імя акаунту:
 Create new account	AutoConfigWindow		Стварыць новы рахунак
 OK	Config Views		ОК
 The filter could not be moved. Deleting filter.	Config Views		Немагчыма перамесціць фільтар. Фільтар выдаляецца.
@@ -38,7 +38,7 @@ Real name:	Config Views		Рэальнае імя:
 \t\t· Outgoing	Config Window		\t\t· Выходны
 Choose Protocol	E-Mail		Выбраць пратакол
 Return address:	Config Views		Адрас звароту:
-Edit mailbox menu…	Config Window		Правіць меню паштовай скрыні...
+Edit mailbox menu…	Config Window		Правіць меню паштовай скрыні…
 Outgoing	E-Mail		Выходны
 \t\t· E-mail filters	Config Window		\t\t· Фільтры е-пошты
 Remove	Config Views		Выдаліць

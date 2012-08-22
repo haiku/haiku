@@ -1,7 +1,7 @@
 1	belarusian	x-vnd.Be-TSKB	3197510812
 Power off	DeskbarMenu		Выключыць
 Show day of week	PreferencesWindow		Паказваць дзень тыдню
-Edit menu…	PreferencesWindow		Змяніць меню...
+Edit menu…	PreferencesWindow		Змяніць меню…
 Suspend	DeskbarMenu		Прыпыніць
 Applications	PreferencesWindow		Праграмы
 Time preferences…	TimeView		Наладкі Часу…
@@ -14,7 +14,7 @@ Applications	B_USER_DESKBAR_DIRECTORY/Applications		Праграмы
 Find…	DeskbarMenu		Знайсці…
 Window	PreferencesWindow		Акно
 Menu	PreferencesWindow		Меню
-Recent documents	DeskbarMenu		Нядаўнія дакументы:
+Recent documents	DeskbarMenu		Нядаўнія дакументы
 Show seconds	PreferencesWindow		Паказваць секунды
 Auto-hide	PreferencesWindow		Схаваць аўтаматычна
 Always on top	PreferencesWindow		Заўсёды наверсе
@@ -33,13 +33,13 @@ Close all	WindowMenu		Закрыць усё
 Deskbar preferences	PreferencesWindow		Наладкі Deskbar
 Mount	DeskbarMenu		Прымацаваць
 Small	PreferencesWindow		Малы
-Recent applications:	PreferencesWindow		Нядаўнія праграмы
+Recent applications:	PreferencesWindow		Нядаўнія праграмы:
 Shutdown…	DeskbarMenu		Спыніць…
 Tracker always first	PreferencesWindow		Трэкер заўсёды першы
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Наладкі
 Recent folders	DeskbarMenu		Нядаўнія каталёгі
 About this system	DeskbarMenu		Пра гэтую сістэму
-Show calendar…	TimeView		Паказаць календар...
+Show calendar…	TimeView		Паказаць календар…
 Deskbar preferences…	DeskbarMenu		Наладкі Deskbar-у…
 Expand new applications	PreferencesWindow		Разгарнуць новыя праграмы
 Show replicants	DeskbarMenu		Паказваць дупліканты

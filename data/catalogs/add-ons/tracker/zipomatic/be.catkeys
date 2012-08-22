@@ -4,7 +4,7 @@ Stop	file:ZipOMaticWindow.cpp		Спыніць
 Creating archive: %s	file:ZipOMaticWindow.cpp		Стварыць архіў: %s
 Continue	file:ZipOMaticWindow.cpp		Працягваць
 Preparing to archive	file:ZipperThread.cpp		Падрыхтоўка да архівацыі
-Drop files here.	file:ZipOMaticWindow.cpp		Кіньце файлы сюды
+Drop files here.	file:ZipOMaticWindow.cpp		Кіньце файлы сюды.
 Filename: %s	file:ZipOMaticWindow.cpp		Імя файла: %s
 Let them continue	file:ZipOMatic.cpp		Дазволіць ім працягваць
 Do you want to stop them?	file:ZipOMatic.cpp		Жадаеце іх спыніць?

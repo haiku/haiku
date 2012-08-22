@@ -25,7 +25,7 @@ Bitmap 1 bit	PPMTranslator		Битмап 1 бит
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 бита (big-endian)
 Input Color Space	PPMTranslator		Исходная палитра цветов
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 бита
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Лицензия 1999, Be Incorporated на использование\nпримеров исходного кода
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Лицензия 1999, Be Incorporated на использование примеров исходного кода
 PPMTranslator Settings	PPMTranslator		Настройки PPM транслятора
 Something is wrong with the PPMTranslator!	PPMMain		Что-то не так с PPM транслятором!
 System palette 8 bits	PPMTranslator		Системная палитра 8 бит

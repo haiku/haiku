@@ -1,6 +1,6 @@
 1	belarusian	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Новы
-Set description…	LaunchBox		Прызначыць апісанне...
+Set description…	LaunchBox		Прызначыць апісанне…
 Vertical layout	LaunchBox		Вертыкальная расстаноўка
 OK	LaunchBox		ОК
 Pad 1	LaunchBox		Падложка 1
@@ -27,7 +27,7 @@ Settings	LaunchBox		Наладкі
 Failed to launch 'something', error in Pad data.	LaunchBox		Не ўдалося запусціць 'нешта', памылка дадзеных Pad.
 Pad %1	LaunchBox		Блокнот %1
 Close	LaunchBox		Закрыць
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не ўдалося адаслаць Трэкеру каманду 'адкрыць каталог'.\n\nПамылка:
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не ўдалося адаслаць Трэкеру каманду 'адкрыць каталог'.\n\nПамылка: 
 You can drag an icon here.	LaunchBox		Можаце перацягнуць сюды іконку.
 Clone	LaunchBox		Кланіраваць
 launch popup	LaunchBox		запусіць выпадальнае меню

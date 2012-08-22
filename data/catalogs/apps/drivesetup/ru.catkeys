@@ -42,12 +42,12 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите удалить выбранный раздел?\n\nВсе данные на этом разделе будут безвозвратно потеряны, если вы продолжите!
 Create…	MainWindow		Создать…
 Disk system \"%s\"\" not found!	MainWindow		Дисковая система \"%s\"\" не обнаружена!
-The disk has been successfully initialized.\n	MainWindow		Раздел %s был успешно инициализирован.\n
+The disk has been successfully initialized.\n	MainWindow		Диск был успешно инициализирован.\n
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Failed to format the partition %s!\n	MainWindow		Не удалось инициализировать раздел %s!\n
 Mount	MainWindow		Подключить
 Create	CreateParamsPanel		Создать
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать весь диск? (обычно на диске создают систему разделов) \nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать весь диск? (обычно на диске создают систему разделов)\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
 Device	PartitionList		Устройство
 Disk	MainWindow		Диск
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Вы уверены, что хотите инициализировать выбранный диск? Все данные на этом диске будут потеряны.\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
@@ -68,7 +68,7 @@ Size	PartitionList		Размер
 Wipe (not implemented)	MainWindow		Форматировать (еще не реализовано)
 Validation of the given initialization parameters failed.	MainWindow		Не удалось применить параметры, введенные при инициализации.
 The selected partition does not contain a partitioning system.	MainWindow		Выбранный раздел не содержит таблицу разделов.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на выбранном разделе будут безвозвратно потеряны!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на разделе %s будут безвозвратно потеряны!
 The partition %s is currently mounted.	MainWindow		Раздел %s в данный момент подключен.
 Partition size	CreateParamsPanel		Размер раздела
 Surface test (not implemented)	MainWindow		Тест поверхности (еще не реализовано)

@@ -11,7 +11,7 @@ Novas	ChartWindow		Novas
 LineArray	ChartWindow		LineArray
  0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 м/с  (лагарыфмічная шкала)
 Free motion	ChartWindow		Свабоднае падзенне
-(high) 100% 	ChartWindow		(высшы) 100%
+(high) 100% 	ChartWindow		(высшы) 100% 
 Green	ChartWindow		Зялёны
 Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 патокі
@@ -39,4 +39,4 @@ DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Чырвоны
 None	ChartWindow		Нiчога
 Battle	ChartWindow		Бiтва
-Space:	ChartWindow		Космас
+Space:	ChartWindow		Космас:

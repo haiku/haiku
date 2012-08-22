@@ -257,7 +257,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 Cancel	ContainerWindow		Отмена
 Only the boot disk	AutoMounterSettings		Только загрузочный диск
 Trash	TrackerSettingsWindow		Корзина
-If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы %ifYouDoAction папку config, Haiku может начать работать некорректно!\n\nВы уверены, что хотите сделать это?
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы %ifYouDoAction папку config, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?
 Unmount	ContainerWindow		Отключить
 Copy layout	ContainerWindow		Копировать вид папки
 label too long	PoseView		слишком длинное имя

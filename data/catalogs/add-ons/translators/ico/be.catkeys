@@ -5,9 +5,9 @@ Windows %s %ld bit image	ICOTranslator		Выява Windows %s %ld біт
 Valid icon sizes are 16, 32, or 48	ConfigView		Стандартныя памеры значкаў 16, 32 або 48
 Windows icons	ICOTranslator		Значкі Windows
 Enforce valid icon sizes	ConfigView		Выкарыстоўваць стандартныя памеры
-ICO Settings	main		 Наладкі ICO
+ICO Settings	main		Наладкі ICO
 Windows icon translator	ICOTranslator		Канвертар значкаў Windows
-pixels in either direction.	ConfigView		пікселяў у кожным напрамку
+pixels in either direction.	ConfigView		пікселяў у кожным напрамку.
 Write 32 bit images on true color input	ConfigView		Запісать выявы ў 32 біт поўны колер
 Icon	ICOTranslator		Значак
 ICOTranslator Settings	ConfigView		Наладкі канвертара ICO

@@ -1,5 +1,5 @@
 1	belarusian	x-vnd.Haiku-Installer	3488795908
-So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Дадайце ў канец кожнага з ніжэйшых запісаў меню нешта падобнае да гэтага:
+So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Дадайце ў канец кожнага з ніжэйшых запісаў меню нешта падобнае да гэтага:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Сапраўды спыніць усталёўку і перазагрузіць сістэму?
 \t}\n\n	InstallerApp		\t}\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tАўтары: Jérôme Duval, Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -11,8 +11,8 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Патрэбна яшч
 With GRUB it's: (hdN,n)\n\n	InstallerApp		У GRUB гэта: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Стоп
-Install progress:  	InstallerWindow		Прагрэс усталёўкі:
-2.2) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
+Install progress:  	InstallerWindow		Прагрэс усталёўкі:  
+2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Пачынаецца Ўсталёўка.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Гэта праграма знаходзіцца ў альфа-версіі! Гэта значыць, вы рызыкуеце згубіць важныя даныя. Часцей рабіце рэзервовыя копіі! Мы вас папярэдзілі.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Вы насамрэч жадаеце перарваць усталёўку?
@@ -36,7 +36,7 @@ Quit	InstallerWindow		Выйсці
 Welcome to the Haiku Installer!\n\n	InstallerApp		Прывітанне! Гэта ўсталёўшчык Haiku.\n\n
 Boot sector successfully written.	InstallProgress		Загрузачны сектар паспяхова запісаны.
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
-scanning…	InstallerWindow		сканіраванне...
+scanning…	InstallerWindow		сканіраванне…
 Set up boot menu	InstallerWindow		Наладзіць меню запуску
 2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (пачынаючы з os-prober v1.44)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Першы лагічны падзел заўсёды пад нумарам \"4\", нягледзячы на нумары асноўных падзелаў.\n\n
@@ -49,21 +49,21 @@ Restart	InstallerWindow		Перазапусціць
 README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Дыск прызначэння, пэўна, не мае патрэбнага месца. Паспрабуйце выбраць іншы дыск або адмяніце ўсталёўку дадатковых пунктаў.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Калі ласка, закрыйце Boot Manager і DriveSetup перад закрыццём Усталёўшчыка.
-Scanning for disks…	InstallerWindow		Сканіраванне дыскаў...
-2.3) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
+Scanning for disks…	InstallerWindow		Сканіраванне дыскаў…
+2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Немагчыма замантаваць дыск. Калі ласка, выберыце іншы.
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		 \tmenuentry \"Haiku Alpha\" {\n
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запусціце утыліту DriveSetup каб размеціць\nдаступныя дыскі.\nПадзелы могуць быць ініцыялізаваны файлавай сістэмай\nBe File System, патрэбнай для загрузачнага падзелу Haiku.
+\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запусціце утыліту DriveSetup каб\nразмеціць даступныя дыскі.\nПадзелы могуць быць ініцыялізаваны файлавай сістэмай\nBe File System, патрэбнай для загрузачнага падзелу Haiku.
 Show optional packages	InstallerWindow		Паказваць дадатковыя пакункі
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		У сістэме не знойдзена падыходзячых падзелаў. Калі ласка, размецьце дыск і ініцыялізуйце хаця б адзін падзел файлавай сістэмай Be File System.
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Дадаткова вы павінны паправіць другі файл, каб урэшце паказаць меню загрузкі:\n\n
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце пажаданы дыск з выплывальнага меню. Потым клікніце \"Пачаць\"
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце пажаданы дыск з выплывальнага меню. Потым клікніце \"Пачаць\".
 Unknown Type	InstallProgress	Partition content type	Невядомы тып
 <none>	InstallerWindow	No partition available	<Няма>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
-You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Вы прыкмеціце, што GRUB выкарыстоўвае схема наймавання дыскаў не такую, як Linux
-\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" - нумар падзелу, таксама пачынаецца з \"0\"\n
+You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Вы прыкмеціце, што GRUB выкарыстоўвае схема наймавання дыскаў не такую, як Linux\n\n
+\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" - нумар падзелу, таксама пачынаецца з \"0\".\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'.Націсніце Перазапусціць, каб перазапусціць кампутар ці абрярыце іншы том для яшчэ адной усталёўкі.
 Installation canceled.	InstallProgress		Усталёўка адмененая.
 Installer	System name		Усталёўшчык
@@ -77,11 +77,11 @@ Hide optional packages	InstallerWindow		Схаваць дадатковыя па
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Калі ласка, закройце вакно DriveSetup перад тым як закрыць Усталёўшчык.
 Restart system	InstallerWindow		Перазагрузіць сістэму
 OK	InstallerWindow		ОК
-Set up partitions…	InstallerWindow		Правіць падзелы...
+Set up partitions…	InstallerWindow		Правіць падзелы…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Немагчыма змантаваць падзел. Абярыце, калі ласка, іншы.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Працуе Boot Manager…\n\nЗакрыйце Boot Manager для працягу ўсталёўкі.
 Install anyway	InstallProgress		Усталяваць усё роўна
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Адбылася памылка і ўсталёўка абарвалася:\n\nError: %s
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Адбылася памылка і ўсталёўка абарвалася:\n\nError:  %s
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Націсніце кнопку Пачаць, каб усталяваць з '%1s' на '%2s'.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Працуе DriveSetup…\n\nЗакрыйце DriveSetup для працягу ўсталёўкі.
@@ -89,8 +89,8 @@ Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerAp
 OK	InstallProgress		ОК
 Please choose target	InstallerWindow		Калі ласка, выберыце дыск прызначэння
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Калі вы ўсталёўваеце Haiku на рэальнае жалеза (не на эмулятар), мы рэкамендуем загадзя падрыхтаваць падзел на дыску.Усталёўшчык і утыліта DriveSetup дапамогуць усталяваць на падзеле родную для Haiku файлавую сістэму, але опыці па змене цякучай табліцы падзелаў яшчэ недадакова пратэсціраваныя, таму іх ужыванне не рэкамендуецца.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)Усталёўшчык зробіць падзел Haiku загрузачным, але не дадасць Haiku да вашага меню загрузкі. Калі у вас ужо ўсталяваны GRUB, вы можаце самастойна дадаць Haiku да яго меню. Гэта робіцца па-рознаму у залежнасці ад вашай версіі загрузчыка.\n\n\n
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Калі вы ўсталёўваеце Haiku на рэальнае жалеза (не на эмулятар), мы рэкамендуем загадзя падрыхтаваць падзел на дыску.Усталёўшчык і утыліта DriveSetup дапамогуць усталяваць на падзеле родную для Haiku файлавую сістэму, але опыці па змене цякучай табліцы падзелаў яшчэ недадакова пратэсціраваныя, таму іх ужыванне не рэкамендуецца.\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Усталёўшчык зробіць падзел Haiku загрузачным, але не дадасць Haiku да вашага меню загрузкі. Калі у вас ужо ўсталяваны GRUB, вы можаце самастойна дадаць Haiku да яго меню. Гэта робіцца па-рознаму у залежнасці ад вашай версіі загрузчыка.\n\n\n
 Begin	InstallerWindow		Пачаць
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Урэшце, трэба абнавіць меню камандай:\n\n
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Калі вы яшчэ не стварылі падзел, перазагрузіце сістэму, стварыце падзел найбольш зручнай для вас прыладай, і запусціце Haiku каб працягнуць усталёўку. Напрыклад, вы можаце карыстацца GParted Live-CD, ён таксама ўмее змяняць памеры падзелаў.\n\n\n

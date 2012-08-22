@@ -3,11 +3,11 @@ Outline:	ControlView		Абрыс:
 Size: 50	ControlView		Памер: 50
 Stop cycling	ControlView		спынiць цыкл
 Shear: 90	ControlView		Зрух: 90
-Spacing: 0	ControlView		Адбіўка:
+Spacing: 0	ControlView		Адбіўка: 0
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Паварот: %d
 Shear: %d	ControlView		Зрух: %d
-Spacing: %d	ControlView		Адбіўка:
+Spacing: %d	ControlView		Адбіўка: %d
 Cycle fonts	ControlView		Паўтор шрыфтоў
 Font:	ControlView		Шрыфт:
 Rotation: 0	ControlView		Паварот:0

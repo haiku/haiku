@@ -5,7 +5,7 @@ Prevent colors 'washing out'	JPEGTranslator		Прадухіляць страту
 JPEG Library Error: %s\n	be_jerror		Памылка бібліятэкі JPEG: %s\n
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Выкарыстоўваць код CMYK 0 для 100% ахопа чарніламі
 About	JPEGTranslator		Пра праграму
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nГрунтуецца на праекце IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nз падтрымкай \"безстратнага\" кадавання (дададзена Ken Murchison)\n\thttp://www.oceana.com/ftp/ljpeg/\n\nВыкарыстоўваць мэтады пераўтварэнняў колераў (распрацаваныя Magnus Hellman)\n\thttp://www.bebits.com/app/802\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nГрунтуецца на праекце IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nз падтрымкай \"безстратнага\" кадавання (дададзена Ken Murchison)\n\thttp://www.oceana.com/ftp/ljpeg/\n\nВыкарыстоўваць мэтады пераўтварэнняў колераў (распрацаваныя Magnus Hellman)\n\thttp://www.bebits.com/app/802\n
 Low	JPEGTranslator		Нізкая
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Зрабіць файл меншым (магчыма страта якасці)
 None	JPEGTranslator		Адсутнічае
@@ -18,4 +18,4 @@ Write black-and-white images as RGB24	JPEGTranslator		Запісваць чор�
 Read greyscale images as RGB32	JPEGTranslator		Чытаць выявы з шэрай палетай як RGB32
 Read	JPEGTranslator		Прачытаць
 JPEG Library Warning: %s\n	be_jerror		Папярэджанне бібліятэкі JPEG: %s\n
-Use progressive compression	JPEGTranslator		Выкарыстоўваць "прагрэсіўны" сціск
+Use progressive compression	JPEGTranslator		Выкарыстоўваць прагрэсіўны сціск

@@ -63,7 +63,7 @@ Print…	Mail		Друкаваць…
 Warn unencodable:	Mail		Правяраць кадоўку:
 Quit	Mail		Выйсці
 %n - Full name	Mail		%n - Поўнае імя
- Read 	Mail		Чытаць
+ Read 	Mail		 Чытаць 
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	cp1251
 Trash	Mail		Сметніца
 Default account:	Mail		Прадвызначаны акаунт:
@@ -71,7 +71,7 @@ Size:	Mail		Памер:
 Account from mail	Mail		Акаунт з паведамлення
 Edit signatures…	Mail		Праўка подпісаў…
 New	Mail		Новае
-Attachments: 	Mail		Укладаньні
+Attachments: 	Mail		Укладаньні: 
 On	Mail		Уключыць
 Set to %s	Mail		Паставіць у %s
 Forward	Mail		Пераслаць
@@ -80,7 +80,7 @@ E-mail draft could not be saved!	Mail		Немагчыма захаваць па�
 To:	Mail		Каму:
 Only files can be added as attachments.	Mail		Можна ўкладаць толькі файлы.
 Previous message	Mail		Папярэдняе паведамленне
-Attachments:	Mail		Укладанні: 
+Attachments:	Mail		Укладанні:
 Title:	Mail		Загаловак:
 Find…	Mail		Знайсці…
 Accounts…	Mail		Акаунты…
@@ -137,7 +137,7 @@ Queries	Mail		Запыты
 Do you wish to save this message as a draft before closing?	Mail		Жадаеце захаваць паведамленне ў чарнавіках да таго як закрыеце яго?
 Save	Mail		Захаваць
 Random	Mail		Выпадковы
-Close and 	Mail		Закрыць ды
+Close and 	Mail		Закрыць ды 
 Save as draft	Mail		Захаваць у чарнавіках
 The mail_daemon could not be started:\n\t	Mail		Сервер mail_daemon ня можа быць запушчаны:\n\t
 Open attachment	Mail		Адкрыць укладанне

@@ -5,7 +5,7 @@ You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatu
 Run in window	NetworkStatus		Запускаць у вакне
 No link	NetworkStatusView		Няма спасылкі
 Install in Deskbar	NetworkStatus		Усталяваць на Deskbar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не ўдалося запусціць сеткавыя наладкі.\n\nПамылка:
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не ўдалося запусціць сеткавыя наладкі.\n\nПамылка: 
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tаўтары: %1, Hugo Santos\n\t%2, Haiku, Inc.\n
 Netmask	NetworkStatusView		Маска сеткі
 Broadcast	NetworkStatusView		Вяшчанне

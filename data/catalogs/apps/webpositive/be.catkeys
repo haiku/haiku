@@ -93,7 +93,7 @@ Proxy server port:	Settings Window		Порт проксі-сэрвера:
 Bookmarks	WebPositive Window		Закладкі
 %minutes minutes	Download Window		%minutes хвілін
 Paste	URL Bar		Уставіць
-/s)	Download Window	...as in 'per second'	/с
+/s)	Download Window	...as in 'per second'	/с)
 Hide password text	Authentication Panel		Схаваць тэкст паролю
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Я жорстка заб’ю проста ў сэрца гэты расквечаны профіль, што ходзіць ля маёй хаты.
 Over 1 minute left	Download Window		Засталося болей за 1 хвіліну
@@ -114,7 +114,7 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Auto-hide interface in full screen mode	Settings Window		Хаваць элементы інтэрфейсу ў поўнаэкранным рэжыме
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url не ўдалося апрацаваць
 New tab	WebPositive Window		Новая ўкладка
-Downloads in progress	WebPositive		 Ідзе спампоўванне файлаў
+Downloads in progress	WebPositive		Ідзе спампоўванне файлаў
 Style:	Font Selection view		Стыль:
 General	Settings Window		Агульныя
 View	WebPositive Window		Выгляд

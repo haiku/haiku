@@ -1,9 +1,9 @@
 1	belarusian	x-vnd.Haiku-PowerStatus	3419486861
-Design capacity low warning: 	PowerStatus		Паведамленне аб нізкай зыходнай ёмістасці
+Design capacity low warning: 	PowerStatus		Паведамленне аб нізкай зыходнай ёмістасці: 
 Show percent	PowerStatus		Паказаць працэнты
-Design capacity: 	PowerStatus		Зыходная ёмістасць
+Design capacity: 	PowerStatus		Зыходная ёмістасць: 
  mW	PowerStatus		 mW
-Type: 	PowerStatus		Тып
+Type: 	PowerStatus		Тып: 
 non-rechargeable	PowerStatus		не перазараджальны
 Empty battery slot	PowerStatus		Пусты слот акумулятара
  mV	PowerStatus		 mV
@@ -15,27 +15,27 @@ PowerStatus	PowerStatus		Статус сілкавання
 Battery info…	PowerStatus		Інфармацыя пра акумулятар
 Damaged battery	PowerStatus		Пашкоджаны акумулятар
 Show time	PowerStatus		Паказаць час
-Last full charge: 	PowerStatus		Апошняя поўная зарадка
+Last full charge: 	PowerStatus		Апошняя поўная зарадка: 
 Battery unused	PowerStatus		Акумулятар не выкарыстоўваецца
 Extended battery info	PowerStatus		Пашыраная інфармацыя пра акумулятар
  mA	PowerStatus		 mA
-Current rate: 	PowerStatus		Зараз:
+Current rate: 	PowerStatus		Зараз: 
 discharging	PowerStatus		разраджаецца
 Show text label	PowerStatus		Паказаць тэкставую метку
 About…	PowerStatus		Пра праграму...
-Model number: 	PowerStatus		Нумар мадэлі
+Model number: 	PowerStatus		Нумар мадэлі: 
 Install in Deskbar	PowerStatus		Усталяваць у Deskbar
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Ёмістасць
+Capacity: 	PowerStatus		Ёмістасць: 
 Battery discharging	PowerStatus		Акумулятар разраджаецца
-Serial number: 	PowerStatus		Серыйны нумар
-Capacity granularity 1: 	PowerStatus		Дэталізацыя ёмістасці 1:
+Serial number: 	PowerStatus		Серыйны нумар: 
+Capacity granularity 1: 	PowerStatus		Дэталізацыя ёмістасці 1: 
 OK	PowerStatus		ОК
-OEM info: 	PowerStatus		Інфа OEM:
-Design voltage: 	PowerStatus		Зыходная напруга:
+OEM info: 	PowerStatus		Інфа OEM: 
+Design voltage: 	PowerStatus		Зыходная напруга: 
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nАўтары: Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Акумулятар зараджаецца
-Design capacity warning: 	PowerStatus		Паведамленне пра зыходную ёмістасць
+Design capacity warning: 	PowerStatus		Паведамленне пра зыходную ёмістасць: 
 Battery info	PowerStatus		Інфармацыя пра акумулятар
 Quit	PowerStatus		Выйсці
 rechargeable	PowerStatus		перазараджальны
@@ -43,6 +43,6 @@ charging	PowerStatus		зараджаецца
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Вы можаце запускаць PowerStatus у вакне або ўсталяваць яго ў Deskbar.
 Power status box	PowerStatus		Вакно стану сілкавання
 Show status icon	PowerStatus		Паказваць іконку стану
-Capacity granularity 2: 	PowerStatus		Дэталізацыя ёмістасці 2
-Technology: 	PowerStatus		Тэхналогія:
+Capacity granularity 2: 	PowerStatus		Дэталізацыя ёмістасці 2: 
+Technology: 	PowerStatus		Тэхналогія: 
 no battery	PowerStatus		няма акумулятара

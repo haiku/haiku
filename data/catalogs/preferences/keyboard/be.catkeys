@@ -1,6 +1,6 @@
 1	belarusian	x-vnd.Haiku-Keyboard	1711838804
 Written by Andrew Edward McCall	KeyboardApplication		Праграма распрацавана Andrew Edward McCall
-Typing test area	KeyboardView		Месца праверкі набору тэкста.
+Typing test area	KeyboardView		Месца праверкі набору тэкст
 Defaults	KeyboardWindow		Прадвызначаныя
 Key repeat rate	KeyboardView		Хуткасць паўтору сімвала
 Revert	KeyboardWindow		Вярнуць

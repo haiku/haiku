@@ -7,7 +7,7 @@ The old Master Boot Record could not be saved to %s	BootManagerController		Не�
 Restore MBR	BootManagerController	Button	Аднавіць MBR
 Hard Drive	DrivesPage	Default disk name	Дыск
 USB Drive	DrivesPage	Default disk name	USB дыск
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Master Boot Record (MBR) прылады:\n\t%s\n зараз будзе запісаны на дыск. Калі ласка, абярыце файл для захавання MBR. \n\nКалі пры ўстаноўцы нешта пойдзе не так, або вы пажадаеце выдаліць меню загрузкі пазней, проста запусціце праграму загрузчыка (bootman) і абярыце опцыю "Выдаліць".
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Master Boot Record (MBR) прылады:\n\t%s\n зараз будзе запісаны на дыск. Калі ласка, абярыце файл для захавання MBR. \n\nКалі пры ўстаноўцы нешта пойдзе не так, або вы пажадаеце выдаліць меню загрузкі пазней, проста запусціце праграму загрузчыка (bootman) і абярыце опцыю 'Выдаліць'.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Master Boot Record (MBR) дыска %disk зараз будзе адноўлены з выкарыстаннем раней захаванай копіі змешчанай ў файле %file. Жадаеце аднавіць Master Boot Record?
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Падчас запісу меню запуску на дыск адбылася памылка. Магчыма, што Master Boot Record можа быць пашкоджаны. Каб пазбегнуць праблем аднавіце MBR!
 Partitions	PartitionsPage	Title	Падзелы
@@ -16,7 +16,7 @@ Select	FileSelectionPage	Button	Абраць
 Cannot access!	DrivesPage	Cannot install	Няма доступу!
 Uninstall boot manager	BootManagerController	Title	Выдаліць Менеджэр Запуску
 After four seconds	DefaultPartitionPage		Праз чатыры секунды
-Uninstallation of boot menu failed	BootManagerController	Title	Памылка. Выдаленне меню запуску не ўдалося.
+Uninstallation of boot menu failed	BootManagerController	Title	Памылка. Выдаленне меню запуску не ўдалося
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Калі ласка, азначце файл, з якога будзе адноўлены MBR. Гэта файл, створаны пры першай ўстаноўцы менеджэра запуску.
 Next	WizardView	Button	Далей
 Uninstallation of boot menu completed	BootManagerController	Title	Выдаленне меню запуску завершана
@@ -26,14 +26,14 @@ After one second	DefaultPartitionPage		Праз адну секунду
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Табліца падзелаў першага дыска несумяшчальная з Менеджерам Запуску.\nМенеджэру Запуску неабходна 2KB свабоднага месца перад першым падзелам.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Былі найдзеныя наступныя падзелы. Калі ласка, адзначце падзелы, якія будуць уключаны ў меню запуску. Вы таксама можаце ўказаць пажаданыя назвы падзелаў для меню.
 After one minute	DefaultPartitionPage		Праз адну хвіліну
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Загрузачны запіс (MBR) устройства (%DISK) паспяхова адноулены з файла %FILE
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Загрузачны запіс (MBR) устройства (%DISK) паспяхова адноулены з файла %FILE.
 Write boot menu	BootManagerController	Button	Запісаць меню запуску на дыск
 The Master Boot Record could not be restored!	BootManagerController		Не ўдалося аднавіць табліцу падзелаў!
 Uninstall	DrivesPage	Button	Выдаліць
 Default Partition	DefaultPartitionPage	Title	Прадвызначаны падзел
 After five seconds	DefaultPartitionPage		Праз пяць секунд
 Back	BootManagerController	Button	Назад
-Installation of boot menu completed	BootManagerController	Title	Устаноўка меню запуску скончаная.
+Installation of boot menu completed	BootManagerController	Title	Устаноўка меню запуску скончаная
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Bez nazvy %d
 File:	FileSelectionPage	Text control label	Файл:
 Previous	WizardView	Button	Папярэдняе

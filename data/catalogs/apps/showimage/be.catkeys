@@ -1,12 +1,12 @@
 1	belarusian	x-vnd.Haiku-ShowImage	886873119
-Use as background…	Menus		Ужыць як фон...
+Use as background…	Menus		Ужыць як фон…
 File	Menus		Файл
 Slide delay	Menus		Затрымка слайду
 Selection mode	Menus		Рэжым Выдзялення
 Zoom in	Menus		Павялічыць
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' зменены. Вы жадаеце яго закрыць?
-Page setup…	Menus		Наладкі старонкі...
-Print…	Menus		Друкаваць...
+Page setup…	Menus		Наладкі старонкі…
+Print…	Menus		Друкаваць…
 OK	SaveToFile		ОК
 Previous page	Menus		Папярэдняя старонка
 View	Menus		Від
@@ -35,7 +35,7 @@ Open…	Menus		Адкрыць...
 Next file	Menus		Наступны файл
 Clear selection	Menus		Ачысціць выдзяленне
 Close document	ClosePrompt		Закрыць дакумент
-Height: 	PrintOptionsWindow		Вышыня:
+Height: 	PrintOptionsWindow		Вышыня: 
 The file '%s' could not be written.	SaveToFile		Немагчыма запісаць файл '%s'.
 Cancel	ClosePrompt		Адмена
 Show tool bar	Menus		Паказаць панэль інструментаў
@@ -59,4 +59,4 @@ Rotate clockwise	Menus		Павярнуць па гадзіннікавай ст�
 Job setup	PrintOptionsWindow		Наладка заданняў
 Original size	Menus		Пачатковы памер
 Next page	Menus		Наступная старонка
-Save as…	Menus		Захаваць як...
+Save as…	Menus		Захаваць як…
