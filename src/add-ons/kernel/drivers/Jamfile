@@ -4,7 +4,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers bluetooth ;
 SubInclude HAIKU_TOP src add-ons kernel drivers bus ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio ;
 SubInclude HAIKU_TOP src add-ons kernel drivers common ;
-SubInclude HAIKU_TOP src add-ons kernel drivers cpuidle ;
 SubInclude HAIKU_TOP src add-ons kernel drivers disk ;
 SubInclude HAIKU_TOP src add-ons kernel drivers dvb ;
 SubInclude HAIKU_TOP src add-ons kernel drivers input ;
