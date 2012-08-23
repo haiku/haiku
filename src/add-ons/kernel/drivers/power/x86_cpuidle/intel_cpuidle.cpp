@@ -96,8 +96,9 @@ intel_cpuidle_init(void)
 	 * ecx[1] support for treating interrupts as break-events for mwait
 	 * edx number of sub-states
 	 */
-	if (!((cpuid.regs.ecx & 0x1) && (cpuid.regs.ecx & 0x2) &&
-		cpuid.regs.edx)) {
+	if ((cpuid.regs.ecx & 0x1) == 0 ||
+		(cpuid.regs.ecx & 0x2) == 0 ||
+		cpuid.regs.edx == 0) {
 		return B_ERROR;
 	}
 
