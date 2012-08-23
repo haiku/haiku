@@ -2,7 +2,8 @@ SubDir HAIKU_TOP src add-ons translators hpgs ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) lib ] ;
 SubDirCcFlags -DHPGS_SHARED -std=c99 ;
-UseLibraryHeaders zlib png ;
+UseLibraryHeaders zlib ;
+UseHeaders $(HAIKU_LIBPNG_HEADERS) : true ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 local sources = 
@@ -39,13 +40,16 @@ hpgstransform.c
 hpgszostream.c
 ;
 
+Includes [ FGristFiles hpgsimage.c ]
+	: $(HAIKU_LIBPNG_HEADERS_DEPENDENCY) ;
+
 Translator HPGSTranslator :
 	# HPGSTranslator classes
 	ConfigView.cpp
 	HPGSTranslator.cpp
 	$(sources)
-	: be translation libpng.so libtextencoding.so libz.so libtranslatorsutils.a
-	$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be translation $(HAIKU_LIBPNG_LIB) libtextencoding.so libz.so
+		libtranslatorsutils.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: true
 ;
 

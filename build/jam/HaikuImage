@@ -87,10 +87,10 @@ SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
 	libgame.so $(X86_ONLY)libGL.so libgnu.so
-	libjpeg.so
+	$(HAIKU_JPEG_CURRENT_LIB)
 	libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
-	libpng.so
+	$(HAIKU_LIBPNG_CURRENT_LIB)
 	<revisioned>libroot.so libroot-addon-icu.so
 	libscreensaver.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
@@ -337,6 +337,18 @@ AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
 	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
 AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LINK)
 	: libfreetype.so : : true ;
+
+# libpng.so links to the current libpng
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_LIBPNG_CURRENT_LIB:BS)
+	: $(HAIKU_LIBPNG_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_LIBPNG_CURRENT_LINK)
+	: libpng.so : : true ;
+
+# libjpeg.so links to the current libjpeg
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LIB:BS)
+	: $(HAIKU_JPEG_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LINK)
+	: libjpeg.so : : true ;
 
 # servers
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
