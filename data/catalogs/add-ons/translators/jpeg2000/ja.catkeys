@@ -1,6 +1,6 @@
 1	japanese	x-vnd.Haiku-JPEG2000Translator	547915409
 Write	JPEG2000Translator		書き出し
-JPEG2000 images	JPEG2000Translator		JPEG2000イメージ
+JPEG2000 images	JPEG2000Translator		JPEG2000 イメージ
 Output only codestream (.jpc)	JPEG2000Translator		Codestreamのみ出力 (.jpc)
 Write black-and-white images as RGB24	JPEG2000Translator		モノクロイメージをRGB24として書き出す
 Output quality	JPEG2000Translator		出力品質

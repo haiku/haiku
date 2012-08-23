@@ -2,7 +2,7 @@
 Error, NULL state description?\n	ShortcutsSpec		Памылка, апісанне стану NULL?\n
 MoveMouse	ShortcutsSpec		РухацьМыш
 OK	ShortcutsWindow		ОК
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змагла захаваць вашу канфігурацыю (KeySet).
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог захаваць вашу канфігурацыю (KeySet).
 Cancel	ShortcutsWindow		Адмена
 InsertString	ShortcutsSpec		УставіцьСтраку
 Append KeySet…	ShortcutsWindow		Дадаць KeySet…

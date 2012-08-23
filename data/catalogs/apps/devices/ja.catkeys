@@ -12,7 +12,7 @@ Docking station	Device		ドッキングステーション
 Computer	Device		コンピューター
 Unknown device	Device		不明なデバイス
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		クラス情報:\t\t\t\t: %classInfo%
-Processor	DeviceSCSI		プロセッサー
+Processor	DeviceSCSI		プロセッサ
 RBC	DeviceSCSI		RBC
 Detailed	DevicesView		詳細
 Category	DevicesView		カテゴリー順
@@ -20,9 +20,9 @@ Quit	DevicesView		終了
 Device paths	Device		デバイスパス
 Scanner	DeviceSCSI		スキャナ
 Printer	DeviceSCSI		プリンター
-Processor	Device		プロセッサー
+Processor	Device		プロセッサ
 Optical Drive	DeviceSCSI		光学ドライブ
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI プロセッサーネームスペース '%2'
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI プロセッサネームスペース '%2'
 Bridge	DeviceSCSI		ブリッジ
 unknown	Device		不明
 ACPI Information	DeviceACPI		ACPI 情報

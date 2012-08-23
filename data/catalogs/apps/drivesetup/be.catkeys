@@ -6,7 +6,7 @@ Rescan	MainWindow		Перасканіраваць
 OK	MainWindow		ОК
 Could not aquire partitioning information.	MainWindow		Не ўдалося атрымаць інфармацыю аб падзелах.
 There's no space on the partition where a child partition could be created.	MainWindow		Няма мечца на падзеле для стварэння даччынага падзела.
-%ld MiB	Support		%ld MiB
+%ld MiB	Support		%ld МіБ
 <empty>	PartitionList		<пуста>
 Unable to find the selected partition by ID.	MainWindow		Не ўдалося знайсці абраны падзел па ID.
 Select a partition from the list below.	DiskView		Абярыце падзел са спісу нішэй.

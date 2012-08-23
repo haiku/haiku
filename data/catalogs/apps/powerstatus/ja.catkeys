@@ -7,12 +7,12 @@ Type: 	PowerStatus		タイプ:
 non-rechargeable	PowerStatus		再充電不能
 Empty battery slot	PowerStatus		バッテリースロットが空です
  mV	PowerStatus		 mV
-Run in window	PowerStatus		ウインドウモードで起動
+Run in window	PowerStatus		ウィンドウモードで起動
 About	PowerStatus		このソフトウェアについて
 PowerStatus	System name		電源状態
 PowerStatus	PowerStatus		電源状態
  mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		バッテリー情報...
+Battery info…	PowerStatus		バッテリー情報…
 Damaged battery	PowerStatus		損傷したバッテリー
 Show time	PowerStatus		時間を表示
 Last full charge: 	PowerStatus		現在の最大容量
@@ -40,7 +40,7 @@ Battery info	PowerStatus		バッテリー情報
 Quit	PowerStatus		終了
 rechargeable	PowerStatus		再充電する
 charging	PowerStatus		充電中
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus をウインドウモードで起動するか、または Deskbar 中にインストールできます。
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus をウィンドウモードで起動することや、 Deskbar 中にインストールすることができます。
 Power status box	PowerStatus		電源ステータスボックス
 Show status icon	PowerStatus		状態アイコンを表示
 Capacity granularity 2: 	PowerStatus		容量精度 2:

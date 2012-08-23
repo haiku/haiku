@@ -2,7 +2,7 @@
 SMTP server:	ConfigView		SMTPサーバー：
 STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		%serv へのログイン中にエラーが発生しました
-Unencrypted	ConfigView		暗号化なし
+Unencrypted	ConfigView		暗号化無し
 . The server says:\n	smtp		サーバーからのメッセージです\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		接続中...

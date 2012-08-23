@@ -18,7 +18,7 @@ Save	Menus		保存
 Replace with:	FindandReplaceWindow		置換：
 Cancel	SaveAlert		中止
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
-Case-sensitive	FindandReplaceWindow		大文字/小文字を区別
+Case-sensitive	FindandReplaceWindow		大文字と小文字を区別する
 Green	Menus		緑
 Revert to saved…	Menus		最新保存版に戻す…
 Yellow	Menus		黄
@@ -32,7 +32,7 @@ Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されました
 Edit	Menus		編集
 Font	Menus		フォント
 Replace all	FindandReplaceWindow		すべて置換
-Statistics…	Menus		統計...
+Statistics…	Menus		統計…
 Default	Open_and_SaveAsPanel		デフォルト
 Replace next	Menus		次を置換
 Cancel	FindandReplaceWindow		中止

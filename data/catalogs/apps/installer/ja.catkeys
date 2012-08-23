@@ -17,7 +17,7 @@ Starting Installation.	InstallProgress		準備をしています…
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		品質のソフトウェアです。高い確率で重要なデータを失う恐れがあります。こまめにバックアップをとってください! さらに、次の点に留意してください。\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		本当にインストールを中断してよいですか ?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		使用中の起動ディスクにインストールしますか？この場合、システムを再起動する必要があります。
-Quit Boot Manager	InstallerWindow		ブートマネージャーの終了
+Quit Boot Manager	InstallerWindow		ブートマネージャーを終了
 Stop	InstallerWindow		中断
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
 \tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
@@ -60,7 +60,7 @@ No partitions have been found that are suitable for installation. Please set up 
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		実際にブートメニューを表示させるには、もうひとつのファイルを編集する必要があります。\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		インストール先を選択してから、"開始" ボタンをクリックしてください。
 Unknown Type	InstallProgress	Partition content type	パーティション種別不明
-<none>	InstallerWindow	No partition available	＜無し＞
+<none>	InstallerWindow	No partition available	<無し>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		GRUBがハードディスクに関してLinuxと異なる命名戦略を使用していることに注意してください。\n\n
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\"はパーティション番号で、これも\"0\"から数えます。\n
@@ -71,7 +71,7 @@ You can't install the contents of a disk onto itself. Please choose a different 
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\"はパーティション番号で、GRUB 2は\"1\"から数えます。\n
 Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		os-prober v1.44  以降 (たとえば、Ubuntu 11.04 以降) では、Haiku は設定なしで認識するはずです。Haiku を GRUB メニューに追加するには、ターミナルを立ち上げて以下を入力します：\n\n
-Quit DriveSetup	InstallerWindow		DriveSetup の終了
+Quit DriveSetup	InstallerWindow		DriveSetup を終了
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\"はハードディスクの番号で、\"0\"から数えます。\n
 Hide optional packages	InstallerWindow		オプショナルパッケージを隠す
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。

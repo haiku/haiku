@@ -33,7 +33,7 @@ There is no installed handler for URL links.	Mail		URL リンク用ハンドラ�
 Signature	Mail		署名
 Find again	Mail		次を検索
 Bcc:	Mail		Bcc:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		メッセージ本文には %ld 個エンコードできない文字があります。他の文字セットを使うと修正される可能性があります。そのまま送信する場合、「送信」ボタンを押してください（代用文字が Unicode 化可能な文字に代わって使われます）。文字セットを変更する場合、「中止」ボタンを押して下さい。
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		メッセージ本文には %ld 個エンコードできない文字があります。他の文字セットを使うと修正される可能性があります。そのまま送信する場合、「送信」ボタンを押してください (代用文字が Unicode 化可能な文字に代わって使われます)。文字セットを変更する場合、「中止」ボタンを押して下さい。
 Signature:	Mail		署名:
 Save changes to this signature?	Mail		署名の変更を確定し保存しますか？
 Cc:	Mail		Cc:
@@ -42,7 +42,7 @@ Find	Mail		検索
 Undo	Mail		元に戻す
 Date:	Mail		日付：
 An error occurred trying to open this signature.	Mail		この署名を開くときにエラーが発生しました。
-No file attributes, just plain data	Mail		ファイル属性を付けない（データのみ）
+No file attributes, just plain data	Mail		ファイル属性を付けない (データのみ)
 Edit queries…	Mail		クエリフォルダーを開く…
 queries	B_USER_DIRECTORY/mail/queries		クエリ
 Paste	Mail		貼り付け
@@ -108,10 +108,10 @@ The mail_daemon is not running. The message is queued and will be sent when the 
 Really delete this signature? This cannot be undone.	Mail		署名を削除しますか？削除した書名は復元できませんので、ご注意ください。
 Open	Mail		開く
 draft	B_USER_DIRECTORY/mail/draft		下書き
-Quote	Mail		引用符をつける
+Quote	Mail		引用符を付ける
 Add	Mail		追加
 Next message	Mail		次のメッセージ
-User interface	Mail		インターフェースの設定
+User interface	Mail		インターフェイスの設定
 Cancel	Mail		中止
 Send message	Mail		メッセージを送信
 Remove enclosure	Mail		添付ファイルを削除

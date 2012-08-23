@@ -28,6 +28,6 @@ Please select the files you wish to keep searching.	GrepWindow		検索したい�
 TextSearch	GrepWindow		テキスト検索
 Quit	GrepWindow		終了
 Show files in Tracker	GrepWindow		Tracker でファイルを選択
-Case-sensitive	GrepWindow		大文字小文字を区別
+Case-sensitive	GrepWindow		大文字と小文字を区別する
 Text files only	GrepWindow		テキストファイルのみ
 Show lines	GrepWindow		行を表示

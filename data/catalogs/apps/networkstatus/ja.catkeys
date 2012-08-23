@@ -1,6 +1,6 @@
 1	japanese	x-vnd.Haiku-NetworkStatus	2931949650
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		ネットワーク状況のオプション:\n\t--deskbar\tDeskbarにレプリカントを自動的に追加します。\n\t--help\t\tこの情報を表示して終了します。\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		ネットワーク状況をウィンドウで動かしたり、Deskbarにインストールできます。
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		ネットワーク状況をウィンドウで動かすことや、Deskbarにインストールすることができます。
 <no wireless networks found>	NetworkStatusView		<無線ネットワークが見つかりません>
 Run in window	NetworkStatus		ウィンドウで実行
 No link	NetworkStatusView		リンク無し

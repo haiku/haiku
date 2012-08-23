@@ -35,7 +35,7 @@ Notifications	NotificationView		通知
 No	NotificationView		いいえ
 Title	NotificationView		タイトル
 Information	NotificationView		情報
-Window width:	DisplayView		ウインドウの幅：
+Window width:	DisplayView		ウィンドウの幅：
 Application	NotificationView		アプリケーション
 Enabled	NotificationView		有効
 OK	DisplayView		OK

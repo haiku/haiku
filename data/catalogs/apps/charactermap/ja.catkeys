@@ -26,7 +26,7 @@ Arabic	UnicodeBlocks		アラビア文字
 Ethiopic extended	UnicodeBlocks		エチオピア文字
 Arrows	UnicodeBlocks		矢印
 Font	CharacterWindow		フォント
-Variation selectors supplement	UnicodeBlocks		異体字セレクタ補助
+Variation selectors supplement	UnicodeBlocks		異体字セレクター補助
 Gujarati	UnicodeBlocks		グジャラーティ文字
 Cuneiform	UnicodeBlocks		楔形文字
 CJK radicals supplement	UnicodeBlocks		CJK部首補助
@@ -53,13 +53,13 @@ Supplemental arrows B	UnicodeBlocks		補助矢印B
 Cyrillic extended A	UnicodeBlocks		キリル文字拡張A
 Kharoshthi	UnicodeBlocks		カローシュティー文字
 Combining half marks	UnicodeBlocks		半記号(合成可能)
-Cyrillic	UnicodeBlocks		キリール文字
+Cyrillic	UnicodeBlocks		キリル文字
 Katakana	UnicodeBlocks		カタカナ
 Block elements	UnicodeBlocks		ブロック要素
 Clear	CharacterWindow		クリアー
 Sundanese	UnicodeBlocks		スンダ文字
 Miscellaneous mathematical symbols A	UnicodeBlocks		各種数学記号A
-Cyrillic supplement	UnicodeBlocks		キリール文字補助
+Cyrillic supplement	UnicodeBlocks		キリル文字補助
 Small form variants	UnicodeBlocks		小字形
 IPA extensions	UnicodeBlocks		IPA拡張
 Thaana	UnicodeBlocks		ターナ文字
@@ -102,7 +102,7 @@ Combining diacritical marks	UnicodeBlocks		ダイアクリティカルマーク(
 Supplement punctuation	UnicodeBlocks		補助句読点
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		統合カナダ先住民音節
 Ugaritic	UnicodeBlocks		ウガリト文字
-CJK symbols and punctuation	UnicodeBlocks		CJKの記号及び句読点
+CJK symbols and punctuation	UnicodeBlocks		CJK の記号および句読点
 File	CharacterWindow		ファイル
 Number forms	UnicodeBlocks		数字に準じるもの
 Cherokee	UnicodeBlocks		チェロキー文字
@@ -123,7 +123,7 @@ Tibetan	UnicodeBlocks		チベット文字
 Ancient Greek numbers	UnicodeBlocks		古代ギリシャ数字
 Vai	UnicodeBlocks		ヴァイ文字
 Yi Radicals	UnicodeBlocks		イ文字部首
-Cyrillic extended B	UnicodeBlocks		キリール文字拡張B
+Cyrillic extended B	UnicodeBlocks		キリル文字拡張 B
 Quit	CharacterWindow		終了
 Braille patterns	UnicodeBlocks		点字図形
 New Tai Lue	UnicodeBlocks		新タイ・ルー文字
@@ -166,7 +166,7 @@ Latin extended B	UnicodeBlocks		ラテン文字拡張B
 Box drawing	UnicodeBlocks		罫線素辺
 Mathematical alphanumeric symbols	UnicodeBlocks		数学用英数字記号
 Copy character	CharacterView		文字をコピー
-Greek and Coptic	UnicodeBlocks		ギリシア文字及びコプト文字
+Greek and Coptic	UnicodeBlocks		ギリシャ文字およびコプト文字
 Carian	UnicodeBlocks		カリア文字
 Georgian	UnicodeBlocks		グルジア文字
 Phaistos disc	UnicodeBlocks		ファイストスの円盤の文字

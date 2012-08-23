@@ -67,7 +67,7 @@ Video display and loudspeaker	DeviceClass		Відэаэкран і гучнаг�
 Peripheral	DeviceClass		Перыферыя
 #NoOwnerError#Not Valid name	RemoteDevice		#НямаЎладальніка#Няправільнае імя
 Wired modem or voice gateway	DeviceClass		Шнуравы мадэм або лінія перадачы голасу
-Jacket	DeviceClass		Куртка (?)
+Jacket	DeviceClass		Кажух
 Unspecified	DeviceClass		Невызначана
 Fully available	DeviceClass		Поўнасцю даступны
 67-83% utilized	DeviceClass		67-83% выкарыстана

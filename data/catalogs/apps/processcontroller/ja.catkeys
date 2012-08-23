@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-ProcessController	2887520383
-Memory usage	ProcessController		メモリー使用量
+Memory usage	ProcessController		メモリ使用量
 Do you really want to kill the team \"%s\"?	ProcessController		本当に team \"%s\" を強制終了してよいですか?
 Idle priority	ProcessController		アイドル優先度
 Restart Deskbar	ProcessController		Deskbar を再起動
@@ -16,7 +16,7 @@ Run in window	ProcessController		ウィンドウモードで起動
 Processor %d	ProcessController		プロセッサ %d
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 ProcessController is already installed in Deskbar.	ProcessController		プロセスコントローラーは、すでに Deskbar にインストールされています
-This is the last active processor...\nYou can't turn it off!	ProcessController		このプロセッサは最後の一個です。\n止める事は出来ません！
+This is the last active processor...\nYou can't turn it off!	ProcessController		このプロセッサは最後の一個です。\n止める事はできません！
 Info	ProcessController		情報
 Quit application	ProcessController		アプリケーションを終了
 Low priority	ProcessController		低優先度
@@ -26,11 +26,11 @@ Lowest active priority	ProcessController		最低アクティブ優先度
 Restart Tracker	ProcessController		Tracker を再起動
 Live in the Deskbar	ProcessController		Deskbar 中で動作
 Kill this thread!	ProcessController		Thread を強制終了
-Debug this thread!	ProcessController		Thread をデバッグ
+Debug this thread!	ProcessController		このスレッドをデバッグ
 Normal priority	ProcessController		通常優先度
 New Terminal	ProcessController		ターミナルを起動
 Urgent priority	ProcessController		緊急優先度
-About ProcessController…	ProcessController		プロセスコントローラーについて...
+About ProcessController…	ProcessController		プロセスコントローラーについて…
 Ok!	ProcessController		Ok!
 Quit an application	ProcessController		アプリケーションを終了
 Install in Deskbar	ProcessController		Deskbar にインストール

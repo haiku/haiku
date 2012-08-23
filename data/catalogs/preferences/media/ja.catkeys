@@ -18,7 +18,7 @@ Couldn't remove volume control in Deskbar: %s\n	Media views		音量コントロ�
 Media	System name		メディア
 Telling media_addon_server to quit.	Media Window		media_addon_server を終了させようとしています。
 Audio mixer	Media Window		オーディオミキサー
-This hardware has no controls.	Media Window		このハードウエアにはコントロールがありません。
+This hardware has no controls.	Media Window		このハードウェアにはコントロールがありません。
 Audio output:	Media views		オーディオ出力：
 Restarting media services\nStarting media server…\n	Media Window		メディアサービスを再起動します\nメディアサービスを起動中…\n
 Audio settings	Media Window		オーディオ設定

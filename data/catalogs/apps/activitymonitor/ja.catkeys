@@ -9,8 +9,8 @@ Hide legend	ActivityView		説明を隠す
 Network send	DataSource		ネットワーク送信バイト数
 CPU usage (combined)	DataSource		CPU 使用率(合計)
 CPU	DataSource		CPU
-Used memory	DataSource		使用メモリー
-Cached memory	DataSource		キャッシュメモリー
+Used memory	DataSource		使用メモリ
+Cached memory	DataSource		キャッシュメモリ
 Apps	DataSource		アプリ
 Show legend	ActivityView		説明を表示
 Text clipboard	DataSource		テキストクリップボード
@@ -25,7 +25,7 @@ Cache	DataSource		キャッシュ
 Update time interval:	SettingsWindow		更新間隔：
 TX	DataSource	Shorter version for Sending	送信
 Quit	ActivityWindow		終了
-Block cache memory	DataSource		ブロックキャッシュメモリー
+Block cache memory	DataSource		ブロックキャッシュメモリ
 Remove graph	ActivityView		グラフの削除
 %.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld 秒
@@ -44,5 +44,5 @@ usage	DataSource		使用量
 Additional items	ActivityView		追加項目
 Network receive	DataSource		ネットワーク受信バイト数
 %.1f KB/s	DataSource		%.1f KB/s
-Memory	DataSource		メモリー
+Memory	DataSource		メモリ
 RX	DataSource	Shorter version for Receiving.	受信

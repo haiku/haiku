@@ -33,7 +33,7 @@ Remove	PrintersWindow		Выдаліць
 Add …	PrintersWindow		Дадаць ...
 Print jobs for 	PrintersWindow		Заданні друку для 
 Failed	JobListView		Не ўдалося
-%.2f KB	JobListView		%.2f KB
+%.2f KB	JobListView		%.2f КБ
 Magenta	TestPageView		Пурпурны
 Completed	JobListView		Скончана
 No printer found!	TransportMenu		Прынтэры не знойдзены!

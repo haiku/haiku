@@ -23,7 +23,7 @@ Accounts	Config Window		アカウント
 Finish	AutoConfigWindow		完了
 Remove	Config Window		削除
 Miscellaneous	Config Window		その他
-Show connection status window:	Config Window		通信状況ウインドウを表示
+Show connection status window:	Config Window		通信状況ウィンドウを表示
 Server Name:	E-Mail		サーバ名:
 While sending	Config Window		送信中に
 Schedule outgoing mail when dial-up is disconnected	Config Window		ダイアルアップ接続が切断した時に送信メールを予約する
@@ -33,7 +33,7 @@ Add	Config Window		追加
 Account settings	AutoConfigWindow		アカウント設定
 E-mail	System name		メール
 never	Config Window	mail checking frequency	手動でチェック
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定をもとに戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定を元に戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
 Real name:	Config Views		本名：
 \t\t· Outgoing	Config Window		\t\t· 送信
 Choose Protocol	E-Mail		プロトコルを選択してください

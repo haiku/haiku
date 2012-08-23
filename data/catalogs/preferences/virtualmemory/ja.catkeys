@@ -1,9 +1,9 @@
 1	japanese	x-vnd.Haiku-VirtualMemory	688347876
 Turn off	SettingsWindow		無効にする
 GB	SettingsWindow		GB
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		仮想メモリーを無効にすると、使用可能な物理メモリーが少なくなったときにシステムが不安定になることもあります。\n物理メモリーが少なくなるまでは仮想メモリがシステムパフォーマンスに影響を与えることはありません。\n\n仮想メモリーを本当に無効にしますか？
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		仮想メモリを無効にすると、使用可能な物理メモリが少なくなったときにシステムが不安定になることもあります。\n物理メモリが少なくなるまでは仮想メモリがシステムパフォーマンスに影響を与えることはありません。\n\n仮想メモリを本当に無効にしますか？
 Requested swap file size:	SettingsWindow		指定されたスワップサイズ：
-Physical memory: 	SettingsWindow		物理メモリー : 
+Physical memory: 	SettingsWindow		物理メモリ : 
 Changes will take effect on restart!	SettingsWindow		設定の変更は再起動後に有効になります!
 Defaults	SettingsWindow		デフォルト
 KB	SettingsWindow		KB
@@ -11,10 +11,10 @@ Use volume:	SettingsWindow		パーティション：
 Insufficient space for a swap file.	SettingsWindow		スワップファイルのための充分な空き容量がありません。
 Keep enabled	SettingsWindow		有効のままにする
 Revert	SettingsWindow		元に戻す
-VirtualMemory	System name		仮想メモリー
+VirtualMemory	System name		仮想メモリ
 Current swap file size: 	SettingsWindow		現在のスワップファイルサイズ：
 OK	VirtualMemoryApp		OK
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tAxel Dörfler 作\n\tCopyright 2005, Haiku.\n
-Enable virtual memory	SettingsWindow		仮想メモリーを有効にする
+Enable virtual memory	SettingsWindow		仮想メモリを有効にする
 MB	SettingsWindow		MB
 %Ld B	SettingsWindow		%Ld B

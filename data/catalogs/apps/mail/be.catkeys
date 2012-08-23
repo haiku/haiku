@@ -32,7 +32,7 @@ Reply to sender	Mail		Адказаць адпраўніку
 There is no installed handler for URL links.	Mail		Апрацоўшчык URL спасылак не ўсталяваны.
 Signature	Mail		Подпіс
 Find again	Mail		Шукаць далей
-Bcc:	Mail		Bcc:
+Bcc:	Mail		Скрытая копія:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
 Signature:	Mail		Подпіс:
 Save changes to this signature?	Mail		Захаваць змены подпісу?

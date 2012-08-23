@@ -3,7 +3,7 @@ BMP images	BMPTranslator		BMP イメージ
 BMPTranslator Settings	BMPTranslator		BMP トランスレーター設定
 BMP image (OS/2 format, %d bits)	BMPTranslator		BMP イメージ (OS/2 フォーマット, %d bit)
 BMP image translator	BMPView		BMP イメージトランスレーター
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP イメージ(MS フォーマット, %d bit
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP イメージ (MS フォーマット, %d bit
 BMP Settings	BMPMain		BMP 設定
 Version %d.%d.%d, %s	BMPView		バージョン %d.%d.%d, %s
 BMP image translator	BMPTranslator		BMP イメージトランスレーター

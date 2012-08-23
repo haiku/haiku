@@ -26,11 +26,11 @@ Loading %url	WebPositive Window		読み込み中 %url
 Page source	WebPositive Window		ページのソース
 Next	WebPositive Window		次へ
 Find next	WebPositive Window		次を検索
-Download folder:	Settings Window		ダウンロードフォルダ：
+Download folder:	Settings Window		ダウンロードフォルダー：
 Edit	WebPositive Window		編集
 Over %hours hours left	Download Window		残り %hours 時間以上
 Cancel	Authentication Panel		キャンセル
-Match case	WebPositive Window		大文字小文字を区別
+Match case	WebPositive Window		大文字と小文字を区別する
 Search page:	Settings Window		検索ページ：
 Zoom text only	WebPositive Window		テキストのみ拡大
 Default fixed font size:	Settings Window		規定の固定フォントサイズ：
@@ -110,7 +110,7 @@ Remember username and password for this site	Authentication Panel		このサイ�
 Authentication required	Authentication Panel		認証が必要です
 Use proxy server to connect to the internet	Settings Window		インターネット接続にプロキシーサーバーを使用する。
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ダウンロードが進行中です。WebPositive を今終了してもよいですか?
-Auto-hide interface in full screen mode	Settings Window		全画面表示時に自動的にインターフェースを隠す。
+Auto-hide interface in full screen mode	Settings Window		全画面表示時に自動的にインターフェイスを隠す。
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 失敗。
 New tab	WebPositive Window		新規タブ
 Downloads in progress	WebPositive		ダウンロードが進行中です

@@ -29,13 +29,13 @@ OK	People		OK
 Remove image	People		イメージを削除する
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Person 属性を設定する FileTypes の起動に失敗しました。\n\nエラー:
 Home phone	People		自宅の電話番号
-Save as…	People		名前を付けて保存...
+Save as…	People		名前を付けて保存…
 Redo	People		やり直し
 Paste	People		貼り付け
 Drop an image here,\nor use the contextual menu.	People		画像をここにドロップしてください。\nまたは、コンテクストメニューを使ってください。
 Save	People		保存
 Person	Short mimetype description		人物
-New person…	People		新規作成...
+New person…	People		新規作成…
 Address	People		住所
 URL	People		URL
 Sorry	People		すみません

@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-DiskProbe	969240855
 File offset: 	ProbeView		ファイルオフセット：
 %ld (native)	ProbeView		%ld (ネイティブ)
-64 bit unsigned value:	TypeEditors		符号なし 64 ビット値：
+64 bit unsigned value:	TypeEditors		符号無し 64 ビット値：
 Find again	ProbeView		再検索
 Text	FindWindow		テキスト
 Find…	ProbeView		検索…
@@ -36,7 +36,7 @@ Double precision floating-point value:	TypeEditors		倍精度浮動小数点値�
 Device: 	ProbeView		デバイス：
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		本当に属性 \"%s\" をファイル \"%s\"から削除してよろしいですか?\n\nこの動作は元に戻せません。
 Text	TypeEditors	This is the type of editor	テキスト
-8 bit unsigned value:	TypeEditors		符号なし 8 ビット値：
+8 bit unsigned value:	TypeEditors		符号無し 8 ビット値：
 Block	ProbeView		ブロック
 Back	ProbeView		戻る
 Device	ProbeView		デバイス
@@ -53,7 +53,7 @@ of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In language
 64 bit signed offset:	TypeEditors		符号つき 64 ビットオフセット値：
 Boolean editor	TypeEditors		ブール値エディタ
 Copy	ProbeView		コピー
-none	ProbeView	No attributes	属性なし
+none	ProbeView	No attributes	属性無し
 Boolean value:	TypeEditors		ブール値：
 32 bit size or status:	TypeEditors		32 ビットのサイズまたはステータス：
 8 bit palette	TypeEditors		8 ビットパレット
@@ -74,7 +74,7 @@ Native: 0x%0*Lx	ProbeView		ネイティブ：0x%0*Lx
 Raw editor	AttributeWindow		Raw エディター
 Message View	TypeEditors		メッセージビュー
 DiskProbe request	ProbeView		DiskProbe リクエスト
-32 bit unsigned size:	TypeEditors		符号なし 32 ビット値：
+32 bit unsigned size:	TypeEditors		符号無し 32 ビット値：
 Flattened bitmap	TypeEditors		フラット化したビットマップ
 Open file…	FileWindow		ファイルを開く…
 Next	ProbeView		次へ
@@ -83,7 +83,7 @@ Attribute: 	ProbeView		属性：
 Remove from file	AttributeWindow		ファイルから削除
 Don't save	ProbeView		保存しない
 Previous	ProbeView		前へ
-64 bit signed value:	TypeEditors		符号なし 64 ビット値：
+64 bit signed value:	TypeEditors		符号無し 64 ビット値：
 Icon	TypeEditors		アイコン
 Block: 	ProbeView		ブロック：
 Examine device:	OpenWindow		デバイスを調べる：
@@ -92,7 +92,7 @@ OK	ProbeView		OK
 Add	ProbeView		追加
 Edit	ProbeView		編集
 Native: %Ld (0x%0*Lx)	ProbeView		ネイティブ： %Ld (0x%0*Lx)
-32 bit unsigned value:	TypeEditors		符号なし 32 ビット値：
+32 bit unsigned value:	TypeEditors		符号無し 32 ビット値：
 Message	TypeEditors	This is the type of view	メッセージ
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\"を開けませんでした：\n%s
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	基数
@@ -120,7 +120,7 @@ Attribute offset: 	ProbeView		属性のオフセット：
 View	ProbeView	This is the last menubar item 'File Edit Block View'	表示
 Redo	ProbeView		やり直し
 File: 	ProbeView		ファイル：
-32 bit unsigned pointer:	TypeEditors		符号なし 32 ビットポインタ：
+32 bit unsigned pointer:	TypeEditors		符号無し 32 ビットポインタ：
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		ファイルの書き込みに失敗しました：\n%s\n\nすべての変更は終了時に失われます。
 32 bit	TypeEditors		32 ビット
 Cancel	ProbeView		中止

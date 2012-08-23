@@ -4,7 +4,7 @@
 Keyboard LEDs	ConfigView		キーボードLED
 You have %num new messages for %name.	filter		%name より\n%num 通のメッセージが届きました。
 You have %num new message for %name.	filter		%name より\n%num 通のメッセージが届きました。
-Log window	ConfigView		ログウインドウ
+Log window	ConfigView		ログウィンドウ
 Central beep	ConfigView		ビープ音 (すべてのアカウント)
 Beep	ConfigView		ビープ音
 Method:	ConfigView		方法：

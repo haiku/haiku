@@ -8,7 +8,7 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\
 Copy	TextView		コピー
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d バイト
-About…	AboutWindow		このソフトウエアについて…
+About…	AboutWindow		このソフトウェアについて…
 Error	PrintJob		エラー
 No Pages to print!	PrintJob		印刷するページがありません。
 OK	Dragger		OK

@@ -11,7 +11,7 @@ The Haiku-Ports team\n	AboutView		Каманда Haiku-Ports\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Аўтарскае права © 1998-2003 Daniel Veillard. Правы захаваныя.
 %d MiB used (%d%%)	AboutView		%d MiB выкарыстана (%d%%)
 Website, marketing & documentation:\n	AboutView		Web-сайт, маркетынг і дакументацыя:\n
-GNU LGPL v2.1	AboutView		GNU LGPL v2.1
+GNU LGPL v2.1	AboutView		GNU LGPL версія 2.1
 AboutSystem	System name		Пра Сістэму
 MIT (no promotion)	AboutView		MIT (без рэкламы)
 Copyright © 2003 Peter Hanappe and others.	AboutView		Аўтарскае права © 2003 Peter Hanappe і іншыя.
@@ -83,5 +83,5 @@ Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView	
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Аўтарскае права © 1990-2002 Info-ZIP. Правы захаваныя.
 License: 	AboutView		Ліцензія: 
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 by Andy Ritger грунтуецца на Generalized Timing Formula
-GCC %d Hybrid	AboutView		GCC %d Hybrid
+GCC %d Hybrid	AboutView		GCC %d Гібрыд
 Translations:\n	AboutView		Пераклады:\n

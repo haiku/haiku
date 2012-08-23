@@ -2,7 +2,7 @@
 <Choose action>	ConfigView		<абярыце аперацыю>
 has	ConfigView		меў
 Move to	ConfigView		Перасунуць у
-Then	ConfigView		Then
+Then	ConfigView		Тады
 value (use REGEX: in from of regular expressions like *spam*)	ConfigView		параметр (выкарыстайце REGEX: у выглядзе regular expressions, напрыклад *spam*)
 this field is based on the action	ConfigView		гэты параметр грунтуецца на аперацыі
 Delete message	ConfigView		Выдаліць паведамленне
@@ -11,5 +11,5 @@ Rule filter	RuleFilter		Правіла фільтра
 Set flags to	ConfigView		Меткі паведамлення ў
 Set as read	ConfigView		Пазначыць як прагледжанае
 Reply with	ConfigView		Адказаць з
-If	ConfigView		If
+If	ConfigView		Калі
 header (e.g. Subject)	ConfigView		загаловак (Subject)

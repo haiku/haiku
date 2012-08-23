@@ -18,7 +18,7 @@ Rotate counterclockwise	Menus		反時計まわりに 90° 回転
 High-quality zooming	Menus		高画質ズーム
 Browse	Menus		閲覧
 Edit	Menus		編集
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		画像ファイルを読み込めません！ ファイルまたは画像トランスレータが存在しません。
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		画像ファイルを読み込めません！ ファイルまたは画像トランスレーターが存在しません。
 First page	Menus		最初のページ
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		'%s' の %d ページが変更されました。それでもファイルを閉じますか？
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
@@ -31,7 +31,7 @@ Rating	Menus		評価
 Flip left to right	Menus		左右反転
 Show caption in full screen mode	Menus		全画面表示モードでキャプションを表示
 DPI:	PrintOptionsWindow		解像度 (DPI)：
-Open…	Menus		開く...
+Open…	Menus		開く…
 Next file	Menus		次のファイル
 Clear selection	Menus		選択解除
 Close document	ClosePrompt		ファイルを閉じる
