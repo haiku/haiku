@@ -6,6 +6,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern CpuidleModuleInfo *gIdle;
+
 static inline void
 x86_monitor(const void *addr, unsigned long ecx, unsigned long edx)
 {

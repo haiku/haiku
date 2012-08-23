@@ -89,11 +89,11 @@ struct acpi_cstate_info {
 	uint8 type;
 };
 
-static device_manager_info *sDeviceManager;
 static acpi_cpuidle_driver_info *acpi_processor[B_MAX_CPU_COUNT];
-static CpuidleModuleInfo *sIdle;
 static CpuidleDevice sAcpiDevice;
+static device_manager_info *sDeviceManager;
 static acpi_module_info *sAcpi;
+CpuidleModuleInfo *gIdle;
 
 
 static status_t
@@ -431,20 +431,14 @@ static status_t
 acpi_cpuidle_init(void)
 {
 	dprintf("acpi_cpuidle_init\n");
-	if (get_module(B_CPUIDLE_MODULE_NAME, (module_info**)&sIdle) != B_OK)
-		return B_ERROR;
-	if (get_module(B_ACPI_MODULE_NAME, (module_info**)&sAcpi) != B_OK)
-		return B_ERROR;
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++)
 		if (acpi_cpuidle_setup(acpi_processor[i]) != B_OK)
 			return B_ERROR;
 
-	status_t status = sIdle->AddDevice(&sAcpiDevice);
+	status_t status = gIdle->AddDevice(&sAcpiDevice);
 	if (status == B_OK)
 		dprintf("using acpi idle\n");
-	else
-		put_module(B_CPUIDLE_MODULE_NAME);
 	return status;
 }
 
@@ -553,9 +547,6 @@ static void
 acpi_cpuidle_uninit_driver(void *driverCookie)
 {
 	dprintf("acpi_cpuidle_uninit_driver");
-	put_module(B_CPUIDLE_MODULE_NAME);
-	if (sAcpi)
-		put_module(B_ACPI_MODULE_NAME);
 	acpi_cpuidle_driver_info *device = (acpi_cpuidle_driver_info *)driverCookie;
 	free(device);
 }
@@ -563,6 +554,8 @@ acpi_cpuidle_uninit_driver(void *driverCookie)
 
 module_dependency module_dependencies[] = {
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager },
+	{ B_ACPI_MODULE_NAME, (module_info **)&sAcpi},
+	{ B_CPUIDLE_MODULE_NAME, (module_info **)&gIdle },
 	{}
 };
 

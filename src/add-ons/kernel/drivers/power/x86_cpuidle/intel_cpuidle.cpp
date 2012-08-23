@@ -16,7 +16,6 @@
 
 #include "x86_cpuidle.h"
 
-static CpuidleModuleInfo *sIdle;
 static CpuidleDevice sIntelDevice;
 
 static void *kMwaitEax[] = {
@@ -82,8 +81,6 @@ status_t
 intel_cpuidle_init(void)
 {
 	dprintf("intel idle init\n");
-	if (get_module(B_CPUIDLE_MODULE_NAME, (module_info**)&sIdle) != B_OK)
-		return B_ERROR;
 	cpu_ent *cpu = get_cpu_struct();
 	if (cpu->arch.vendor != VENDOR_INTEL ||	cpu->arch.family != 6)
 		return B_ERROR;
@@ -116,10 +113,8 @@ intel_cpuidle_init(void)
 			kMwaitEax[i];
 		sIntelDevice.cStateCount++;
 	}
-	status_t status = sIdle->AddDevice(&sIntelDevice);
+	status_t status = gIdle->AddDevice(&sIntelDevice);
 	if (status == B_OK)
 		dprintf("using intel idle\n");
-	else
-		put_module(B_CPUIDLE_MODULE_NAME);
 	return status;
 }
