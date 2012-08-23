@@ -813,6 +813,7 @@ IconView::MouseDown(BPoint where)
 			// start tracking - this icon might be dragged around
 			fDragPoint = where;
 			fTracking = true;
+			SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		}
 	}
 
@@ -903,7 +904,6 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		DragMessage(&message, dragBitmap, B_OP_ALPHA,
 			fDragPoint - BitmapRect().LeftTop(), this);
 		fDragging = true;
-		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	}
 
 	if (dragMessage != NULL && !fDragging && AcceptsDrag(dragMessage)) {
