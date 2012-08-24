@@ -167,7 +167,7 @@ start_raw(int argc, const char **argv)
 	args.platform.boot_tgz_data = NULL;
 	args.platform.boot_tgz_size = 0;
 
-	serial_init();
+	serial_init(gFDT);
 	console_init();
 	cpu_init();
 
