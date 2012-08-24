@@ -22,7 +22,8 @@ static const char *sTabTab = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 #define DS "%.*s"
 #define DA depth - 1, sTabTab
 
-#define FDT_DUMP_PROPS
+//#define FDT_DUMP_NODES
+//#define FDT_DUMP_PROPS
 //#define FDT_DUMP_PROP_VALUES
 
 
@@ -79,6 +80,7 @@ void dump_fdt(const void *fdt)
 	dprintf("fdt_size_dt_strings: %d\n", fdt_size_dt_strings(fdt));
 	dprintf("fdt_size_dt_struct: %d\n", fdt_size_dt_struct(fdt));
 
+#ifdef FDT_DUMP_NODES
 	dprintf("fdt tree:\n");
 
 	while ((node = fdt_next_node(fdt, node, &depth)) >= 0) {
@@ -103,6 +105,7 @@ void dump_fdt(const void *fdt)
 		}
 #endif
 	}
+#endif
 }
 
 
