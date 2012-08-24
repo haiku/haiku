@@ -46,7 +46,7 @@ static void dump_hex(const char *data, int32 len, int depth)
 			astr[i % 16] = isprint(data[i]) ? data[i] : '.';
 			astr[(i % 16) + 1] = '\0';
 		}
-		dprintf(DS"    %-32.32s	%s\n", DA, str, astr);
+		dprintf(DS"    %-48.48s	%s\n", DA, str, astr);
 	}
 }
 
