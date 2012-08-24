@@ -17,6 +17,12 @@
 #include <new>
 #include <string.h>
 
+extern "C" {
+#include <fdt.h>
+#include <libfdt.h>
+#include <libfdt_env.h>
+};
+
 
 DebugUART* gUART;
 
@@ -90,11 +96,94 @@ serial_cleanup(void)
 }
 
 
-extern "C" void
-serial_init(void)
+static void
+serial_init_fdt(const void *fdt)
 {
-	gUART = arch_get_uart_8250(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
-	if (gUART == 0)
+	const char *name;
+	const char *type;
+	int node;
+	int len;
+	phys_addr_t regs;
+	int32 clock = 0;
+	int32 speed = 0;
+	const void *prop;
+
+	if (fdt == NULL)
+		return;
+
+	name = fdt_get_alias(fdt, "serial");
+	if (name == NULL)
+		name = fdt_get_alias(fdt, "serial0");
+	if (name == NULL)
+		name = fdt_get_alias(fdt, "serial1");
+	// TODO: else use /chosen linux,stdout-path
+	if (name == NULL)
+		return;
+
+	node = fdt_path_offset(fdt, name);
+	//dprintf("serial: using '%s', node %d\n", name, node);
+	if (node < 0)
+		return;
+
+	type = (const char *)fdt_getprop(fdt, node, "device_type", &len);
+	//dprintf("serial: type: '%s'\n", type);
+	if (type == NULL || strcmp(type, "serial"))
+		return;
+
+	// determine the MMIO address
+	// TODO: ppc640 use 64bit addressing, but U-Boot seems to map it below 4G,
+	// and the FDT is not very clear. libfdt is also getting 64bit addr support.
+	// so FIXME someday.
+	prop = fdt_getprop(fdt, node, "virtual-reg", &len);
+	if (prop && len == 4) {
+		regs = fdt32_to_cpu(*(uint32_t *)prop);
+		//dprintf("serial: virtual-reg 0x%08llx\n", (int64)regs);
+	} else {
+		prop = fdt_getprop(fdt, node, "reg", &len);
+		if (prop && len >= 4) {
+			regs = fdt32_to_cpu(*(uint32_t *)prop);
+			//dprintf("serial: reg 0x%08llx\n", (int64)regs);
+		} else
+			return;
+	}
+
+	// get the UART clock rate
+	prop = fdt_getprop(fdt, node, "clock-frequency", &len);
+	if (prop && len == 4) {
+		clock = fdt32_to_cpu(*(uint32_t *)prop);
+		//dprintf("serial: clock %ld\n", clock);
+	}
+
+	// get current speed (XXX: not yet passed over)
+	prop = fdt_getprop(fdt, node, "current-speed", &len);
+	if (prop && len == 4) {
+		speed = fdt32_to_cpu(*(uint32_t *)prop);
+		//dprintf("serial: speed %ld\n", speed);
+	}
+
+	if (fdt_node_check_compatible(fdt, node, "ns16550a") == 1
+		|| fdt_node_check_compatible(fdt, node, "ns16550") == 1) {
+		gUART = arch_get_uart_8250(regs, clock);
+		//dprintf("serial: using 8250\n");
+		return;
+	}
+
+}
+
+
+extern "C" void
+serial_init(const void *fdt)
+{
+	// first try with hints from the FDT
+	serial_init_fdt(fdt);
+
+#ifdef BOARD_UART_DEBUG
+	// fallback to hardcoded board UART
+	if (gUART == NULL)
+		gUART = arch_get_uart_8250(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
+#endif
+
+	if (gUART == NULL)
 		return;
 
 	serial_enable();
