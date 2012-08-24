@@ -50,6 +50,7 @@ extern "C" int main(stage2_args *args);
 extern "C" void _start(void);
 extern "C" int start_raw(int argc, const char **argv);
 extern "C" void dump_uimage(struct image_header *image);
+extern "C" void dump_fdt(const void *fdt);
 
 // declared in shell.S
 // those are initialized to NULL but not in the BSS
@@ -186,11 +187,13 @@ start_raw(int argc, const char **argv)
 			dprintf("argv[%d] @%lx = '%s'\n", i, (uint32)argv[i], argv[i]);
 		dprintf("os: %d\n", (int)gUBootOS);
 		dprintf("gd @ %p\n", gUBootGlobalData);
-		dprintf("gd->bd @ %p\n", gUBootGlobalData->bd);
+		if (gUBootGlobalData)
+			dprintf("gd->bd @ %p\n", gUBootGlobalData->bd);
 		//dprintf("fb_base %p\n", (void*)gUBootGlobalData->fb_base);
-		dprintf("uimage @ %p\n", gUImage);
 		if (gUImage)
 			dump_uimage(gUImage);
+		if (gFDT)
+			dump_fdt(gFDT);
 	}
 	
 	mmu_init();
