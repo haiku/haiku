@@ -36,7 +36,7 @@ Failed	JobListView		エラー
 %.2f KB	JobListView		%.2f KB
 Magenta	TestPageView		マゼンタ
 Completed	JobListView		完了
-No printer found!	TransportMenu		プリンターガ見つかりません。
+No printer found!	TransportMenu		プリンターが見つかりません。
 Print jobs: No printer selected	PrintersWindow		印刷ジョブ：プリンターが選択されていません
 Cyan	TestPageView		シアン
 Unknown status	JobListView		状態が不明

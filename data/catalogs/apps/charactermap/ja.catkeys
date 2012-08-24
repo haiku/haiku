@@ -5,7 +5,7 @@ View	CharacterWindow		表示
 Latin-1 supplement	UnicodeBlocks		ラテン1補助
 Hebrew	UnicodeBlocks		ヘブライ文字
 Georgian supplement	UnicodeBlocks		グルジア文字補助
-CJK unified ideographs	UnicodeBlocks		CJK統合漢字
+CJK unified ideographs	UnicodeBlocks		CJK 統合漢字
 Modifier tone letters	UnicodeBlocks		声調修飾文字
 Khmer	UnicodeBlocks		クメール文字
 Supplementary private use area A	UnicodeBlocks		補助私用領域A
@@ -29,17 +29,17 @@ Font	CharacterWindow		フォント
 Variation selectors supplement	UnicodeBlocks		異体字セレクター補助
 Gujarati	UnicodeBlocks		グジャラーティ文字
 Cuneiform	UnicodeBlocks		楔形文字
-CJK radicals supplement	UnicodeBlocks		CJK部首補助
+CJK radicals supplement	UnicodeBlocks		CJK 部首補助
 Balinese	UnicodeBlocks		バリ文字
 Cham	UnicodeBlocks		チャム文字
 Specials	UnicodeBlocks		特殊用途文字
-CJK compatibility ideographs	UnicodeBlocks		CJK互換漢字
+CJK compatibility ideographs	UnicodeBlocks		CJK 互換漢字
 Phonetic extensions	UnicodeBlocks		発音拡張
 Khmer symbols	UnicodeBlocks		クメール記号
 Tagbanwa	UnicodeBlocks		タグバンワ文字
 Kanbun	UnicodeBlocks		漢文
 Syriac	UnicodeBlocks		シリア文字
-CJK compatibility ideographs Supplement	UnicodeBlocks		CJK互換漢字補助
+CJK compatibility ideographs Supplement	UnicodeBlocks		CJK 互換漢字補助
 Musical symbols	UnicodeBlocks		演奏記号
 Hangul syllables	UnicodeBlocks		ハングル音節文字
 Coptic	UnicodeBlocks		コプト文字
@@ -47,7 +47,7 @@ Tai Le	UnicodeBlocks		タイ・レ文字
 Mahjong tiles	UnicodeBlocks		麻雀牌
 Spacing modifier letters	UnicodeBlocks		前進を伴う修飾文字
 Aegean numbers	UnicodeBlocks		エーゲ数字
-CJK strokes	UnicodeBlocks		CJK字画
+CJK strokes	UnicodeBlocks		CJK 字画
 Old italic	UnicodeBlocks		古イタリア文字
 Supplemental arrows B	UnicodeBlocks		補助矢印B
 Cyrillic extended A	UnicodeBlocks		キリル文字拡張A
@@ -56,7 +56,7 @@ Combining half marks	UnicodeBlocks		半記号(合成可能)
 Cyrillic	UnicodeBlocks		キリル文字
 Katakana	UnicodeBlocks		カタカナ
 Block elements	UnicodeBlocks		ブロック要素
-Clear	CharacterWindow		クリアー
+Clear	CharacterWindow		クリア
 Sundanese	UnicodeBlocks		スンダ文字
 Miscellaneous mathematical symbols A	UnicodeBlocks		各種数学記号A
 Cyrillic supplement	UnicodeBlocks		キリル文字補助
@@ -76,12 +76,12 @@ Osmanya	UnicodeBlocks		オスマン文字
 Ethiopic	UnicodeBlocks		エチオピア文字
 Bengali	UnicodeBlocks		ベンガル文字
 Supplementary private use area B	UnicodeBlocks		補助私用領域B
-CJK unified ideographs extension A	UnicodeBlocks		CJK統合漢字拡張A
+CJK unified ideographs extension A	UnicodeBlocks		CJK 統合漢字拡張 A
 Filter:	CharacterWindow		フィルター:
 Hangul compatibility Jamo	UnicodeBlocks		ハングル字母
 Ideographic description characters	UnicodeBlocks		漢字構成記述文字
 Arabic presentation forms B	UnicodeBlocks		アラビア表示形B
-CJK compatibility forms	UnicodeBlocks		CJK互換形
+CJK compatibility forms	UnicodeBlocks		CJK 互換形
 Hiragana	UnicodeBlocks		ひらがな
 Tagalog	UnicodeBlocks		タガログ文字
 Control pictures	UnicodeBlocks		制御機能用記号
@@ -131,7 +131,7 @@ Runic	UnicodeBlocks		ルーン文字
 Miscellaneous mathematical symbols B	UnicodeBlocks		各種数学記号B
 Cuneiform numbers and punctuation	UnicodeBlocks		楔形文字数字と句読点
 Private use area	UnicodeBlocks		私用領域
-CJK unified ideographs extension B	UnicodeBlocks		CJK統合漢字拡張B
+CJK unified ideographs extension B	UnicodeBlocks		CJK 統合漢字拡張 B
 Phags-pa	UnicodeBlocks		パスパ文字
 Kangxi radicals	UnicodeBlocks		康煕部首
 Dingbats	UnicodeBlocks		装飾記号
@@ -156,7 +156,7 @@ Supplemental arrows A	UnicodeBlocks		補助矢印A
 Miscellaneous symbols and arrows	UnicodeBlocks		各種記号と矢印
 Yijing hexagram symbols	UnicodeBlocks		易経記号
 Supplemental mathematical operators	UnicodeBlocks		補助数学演算記号
-Enclosed CJK letters and months	UnicodeBlocks		囲みCJK文字・月
+Enclosed CJK letters and months	UnicodeBlocks		囲み CJK 文字・月
 Kayah Li	UnicodeBlocks		カヤー文字
 Alphabetic presentation forms	UnicodeBlocks		アルファベット表示形
 Halfwidth and fullwidth forms	UnicodeBlocks		半角・全角形
@@ -171,7 +171,7 @@ Carian	UnicodeBlocks		カリア文字
 Georgian	UnicodeBlocks		グルジア文字
 Phaistos disc	UnicodeBlocks		ファイストスの円盤の文字
 Shavian	UnicodeBlocks		シェイヴィアン文字
-CJK compatibility	UnicodeBlocks		CJK互換用文字
+CJK compatibility	UnicodeBlocks		CJK 互換用文字
 Malayalam	UnicodeBlocks		マラヤーラム文字
 N'Ko	UnicodeBlocks		マネンカ文字
 Kannada	UnicodeBlocks		カンナダ文字

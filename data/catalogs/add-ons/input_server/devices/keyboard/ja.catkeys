@@ -4,7 +4,7 @@ Quit application	Team monitor		アプリケーションを終了
 Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		アプリケーションを選んで、「アプリケーションの強制終了」か「アプリケーションの終了」のどちらかのボタンを押して閉じてください。\n\nCONTROL+ALT+DELETE を %ld 秒間押して再起動してください。
 If the application will not quit you may have to kill it.	Team monitor		アプリケーションが終了しない場合は、強制終了しないといけないかもしれません。
 Force reboot	Team monitor		強制再起動
-Team monitor	Team monitor		チームモニタ
+Team monitor	Team monitor		チームモニター
 (This team is a system component)	Team monitor		(このチームはシステムの構成要素です)
 Restart the desktop	Team monitor		デスクトップを再起動
 Cancel	Team monitor		中止

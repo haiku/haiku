@@ -123,7 +123,7 @@ Bookmark error	WebPositive Window		ブックマークエラー
 Do you really want to clear the browsing history?	WebPositive Window		本当にブラウズ履歴をクリアしますか?
 Copy	WebPositive Window		コピー
 Open bookmarks confirmation	WebPositive Window		ブックマークを開く確認
-Remove missing	Download Window		見つからない物を削除
+Remove missing	Download Window		Remove missing
 Clone current page	Settings Window		現在のページを複製
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	一度に %addedCount 個のブックマークを開きますか?
 OK	Authentication Panel		OK
@@ -133,4 +133,4 @@ Manage bookmarks	WebPositive Window		ブックマークの管理
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでにあります。
 New windows:	Settings Window		新規ウィンドウ：
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 完了。
-Remove finished	Download Window		完了した物を削除
+Remove finished	Download Window		Remove finished

@@ -6,7 +6,7 @@ Only when dial-up is connected	Config Window		ダイアルアップ接続のと�
 While sending and receiving	Config Window		送受信中に
 days	Config Window		日毎にチェック
 Incoming	Config Window		受信
-Server name:	E-Mail		サーバ名:
+Server name:	E-Mail		サーバー名:
 OK	Config Window		OK
 Start mail services on startup	Config Window		起動時にメールサービスを開始する
 E-mail address:	E-Mail		E-mail アドレス
@@ -24,7 +24,7 @@ Finish	AutoConfigWindow		完了
 Remove	Config Window		削除
 Miscellaneous	Config Window		その他
 Show connection status window:	Config Window		通信状況ウィンドウを表示
-Server Name:	E-Mail		サーバ名:
+Server Name:	E-Mail		サーバー名:
 While sending	Config Window		送信中に
 Schedule outgoing mail when dial-up is disconnected	Config Window		ダイアルアップ接続が切断した時に送信メールを予約する
 hours	Config Window		時間毎にチェック
@@ -56,6 +56,6 @@ Always	Config Window		常に
 OK	AutoConfigWindow		OK
 Add filter	Config Views		フィルターを追加
 Outgoing	Config Window		送信
-Outgoing mail filters	Config Views		送信メールフイルター
+Outgoing mail filters	Config Views		送信メールフィルター
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\n追加ボタンで新規アカウントを作成してください。\n\n削除ボタンで選択したアカウントを削除してください。\n\nリストのアイテムを選択して、設定を変更してください。
 Error	Config Window		エラー

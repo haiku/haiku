@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	730858332
+1	japanese	x-vnd.Haiku-libtracker	1680698556
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -85,7 +85,7 @@ Ignore case	SelectionWindow		大文字/小文字を区別しない
 is not	FindPanel		除く
 OK	AutoMounterSettings		OK
 Windows	TrackerSettingsWindow		ウィンドウ
-Tracker preferences	TrackerSettingsWindow		Trackerの設定
+Tracker preferences	TrackerSettingsWindow		Tracker の設定
 Cut	FilePanelPriv		切り取り
 Replace	FilePanelPriv		置換
 Select all	VolumeWindow		すべて選択
@@ -101,7 +101,7 @@ Add-ons	VolumeWindow		アドオン
 Sorry, you can't copy items to the Trash.	PoseView		ごみ箱にコピーすることはできません。
 List view	VolumeWindow		一覧表示
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
-rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名称変更
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名前の変更
 You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダーをリンクまたはファイルと置き換えることはできません。
 Show space bars on volumes	SettingsView		ディスクの容量グラフを表示する
 Invert selection	ContainerWindow		選択範囲を反転
@@ -208,7 +208,7 @@ Could not find application \"%appname\"	OpenWithWindow		アプリケーション
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に捨てることはできません。完全に削除しても良いでしょうか？元は戻せませんので、ご注意ください。
 Invert	SelectionWindow		反転
 Save Query as template…	FindPanel		クエリテンプレートとして保存…
-rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名称変更
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名前の変更
 Find	FindPanel		検索
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	移動
 Get info	ContainerWindow		詳細情報…
@@ -373,8 +373,9 @@ Modified	FindPanel		更新日時
 Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に捨てようとしたら、エラーが発生しました。(%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダーを同名のフォルダーと置き換えられません。
 <No recent items>	FavoritesMenu		<最近使った項目はありません>
+Preferences…	ContainerWindow		設定…
 Move	PoseView		移動
-Open and make preferred	OpenWithWindow		関連づけて開く
+Open and make preferred	OpenWithWindow		関連付けて開く
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除してもよろしいですか？削除した項目は復元できませんので、ご注意ください。
 If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		ホームフォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります!\n\n本当に続けますか?\n\nそれでもホームフォルダーの%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Add-ons	DeskWindow		アドオン
