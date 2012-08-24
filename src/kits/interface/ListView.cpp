@@ -1381,6 +1381,9 @@ BListView::_InitObject(list_view_type type)
 	fTrack = new track_data;
 	fTrack->try_drag = false;
 	fTrack->item_index = -1;
+
+	SetViewColor(ui_color(B_LIST_BACKGROUND_COLOR));
+	SetLowColor(ui_color(B_LIST_BACKGROUND_COLOR));
 }
 
 

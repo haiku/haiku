@@ -1610,14 +1610,12 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 if [ IsOptionalHaikuImagePackageAdded Puri ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Puri available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
+		Echo "No optional package Puri for gcc2" ;
 	} else {
-		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage
-				puri-0.3.9.1-x86-gcc4-2012-08-16.zip
-				: $(baseURL)/puri-0.3.9.1-x86-gcc4-2012-08-16.zip ;
-		} else {
-			Echo "No optional package Puri available for gcc2" ;
-		}
+		InstallOptionalHaikuImagePackage
+			puri-0.3.9.1-x86-gcc4-2012-08-16.zip
+			: $(baseURL)/puri-0.3.9.1-x86-gcc4-2012-08-16.zip ;
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Puri/Puri ;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -161,7 +161,7 @@ struct hda_stream {
 
 	area_id		buffer_area;
 	area_id		buffer_descriptors_area;
-	uint32		physical_buffer_descriptors;	/* BDL physical address */
+	phys_addr_t	physical_buffer_descriptors;	/* BDL physical address */
 
 	int32		incorrect_position_count;
 	bool		use_dma_position;

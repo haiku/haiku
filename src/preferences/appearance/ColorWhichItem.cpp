@@ -32,7 +32,7 @@ ColorWhichItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
-			owner->SetHighColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 			owner->SetLowColor(owner->HighColor());
 		} else
 			owner->SetHighColor(lowColor);
@@ -54,16 +54,16 @@ ColorWhichItem::DrawItem(BView *owner, BRect frame, bool complete)
 		+ BaselineOffset());
 
 	if (!IsEnabled()) {
-		rgb_color textColor = ui_color(B_MENU_ITEM_TEXT_COLOR);
+		rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
 		if (textColor.red + textColor.green + textColor.blue > 128 * 3)
 			owner->SetHighColor(tint_color(textColor, B_DARKEN_2_TINT));
 		else
 			owner->SetHighColor(tint_color(textColor, B_LIGHTEN_2_TINT));
 	} else {
 		if (IsSelected())
-			owner->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
 		else
-			owner->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	}
 
 	owner->DrawString(Text());

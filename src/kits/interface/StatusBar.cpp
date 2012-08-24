@@ -225,7 +225,7 @@ BStatusBar::MinSize()
 	float width, height;
 	GetPreferredSize(&width, &height);
 
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), BSize(width, height));
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), BSize(width, height));
 }
 
 
@@ -236,7 +236,7 @@ BStatusBar::MaxSize()
 	GetPreferredSize(&width, &height);
 
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), 
-			BSize(B_SIZE_UNLIMITED, height));
+		BSize(B_SIZE_UNLIMITED, height));
 }
 
 
@@ -246,7 +246,8 @@ BStatusBar::PreferredSize()
 	float width, height;
 	GetPreferredSize(&width, &height);
 
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), BSize(width, height));
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		BSize(width, height));
 }
 
 
