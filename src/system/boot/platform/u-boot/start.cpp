@@ -21,6 +21,12 @@
 
 #include <string.h>
 
+extern "C" {
+#include <fdt.h>
+#include <libfdt.h>
+#include <libfdt_env.h>
+};
+
 
 #define HEAP_SIZE (128 * 1024)
 
@@ -171,12 +177,35 @@ start_raw(int argc, const char **argv)
 	console_init();
 	cpu_init();
 
+	// if we get passed an FDT, check /chosen for initrd
+	if (gFDT != NULL) {
+		int node = fdt_path_offset(gFDT, "/chosen");
+		const void *prop;
+		int len;
+		phys_addr_t initrd_start = 0, initrd_end = 0;
+
+		if (node >= 0) {
+			prop = fdt_getprop(gFDT, node, "linux,initrd-start", &len);
+			if (prop && len == 4)
+				initrd_start = fdt32_to_cpu(*(uint32_t *)prop);
+			prop = fdt_getprop(gFDT, node, "linux,initrd-end", &len);
+			if (prop && len == 4)
+				initrd_end = fdt32_to_cpu(*(uint32_t *)prop);
+			if (initrd_end > initrd_start) {
+				args.platform.boot_tgz_data = (void *)initrd_start;
+				args.platform.boot_tgz_size = initrd_end - initrd_start;
+		dprintf("Found boot tgz from FDT @ %p, %" B_PRIu32 " bytes\n",
+			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
+			}
+		}
+	}
+
 	// if we get passed a uimage, try to find the second blob
 	if (gUImage != NULL
 		&& image_multi_getimg(gUImage, 1,
 			(uint32*)&args.platform.boot_tgz_data,
 			&args.platform.boot_tgz_size)) {
-		dprintf("Found boot tgz @ %p, %" B_PRIu32 " bytes\n",
+		dprintf("Found boot tgz from uimage @ %p, %" B_PRIu32 " bytes\n",
 			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
 	}
 
