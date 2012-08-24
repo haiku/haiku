@@ -628,16 +628,16 @@ Inode::WriteStat(const struct stat* st, uint32 mask, OpenAttrCookie* cookie)
 	if ((mask & B_STAT_ACCESS_TIME) != 0) {
 		attr[i].fAttribute = FATTR4_TIME_ACCESS_SET;
 		attr[i].fFreePointer = true;
-		attr[i].fData.fPointer = malloc(sizeof(st->st_atime));
-		memcpy(attr[i].fData.fPointer, &st->st_atime, sizeof(st->st_atim));
+		attr[i].fData.fPointer = malloc(sizeof(st->st_atim));
+		memcpy(attr[i].fData.fPointer, &st->st_atim, sizeof(st->st_atim));
 		i++;
 	}
 
 	if ((mask & B_STAT_MODIFICATION_TIME) != 0) {
 		attr[i].fAttribute = FATTR4_TIME_MODIFY_SET;
 		attr[i].fFreePointer = true;
-		attr[i].fData.fPointer = malloc(sizeof(st->st_mtime));
-		memcpy(attr[i].fData.fPointer, &st->st_mtime, sizeof(st->st_mtim));
+		attr[i].fData.fPointer = malloc(sizeof(st->st_mtim));
+		memcpy(attr[i].fData.fPointer, &st->st_mtim, sizeof(st->st_mtim));
 		i++;
 	}
 
