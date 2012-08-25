@@ -900,6 +900,7 @@ status_t nv_general_powerup()
 		break;
 	case 0x029010de: /* Nvidia Geforce 7900 GTX */
 	case 0x029110de: /* Nvidia Geforce 7900 GT */
+	case 0x029210de: /* Nvidia Geforce 7900 GS */
 	case 0x029310de: /* Nvidia Geforce 7900 GX2 */
 		si->ps.card_type = G71;
 		si->ps.card_arch = NV40A;
