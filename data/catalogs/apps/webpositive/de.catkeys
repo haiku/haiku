@@ -1,7 +1,7 @@
 1	german	x-vnd.Haiku-WebPositive	1513721873
 Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
-Copy URL to clipboard	Download Window		Adresse in Zwischenablage kopieren
+Copy URL to clipboard	Download Window		Adresse kopieren
 Cancel	Settings Window		Abbrechen
 Close window	WebPositive Window		Fenster schließen
 Quit	WebPositive		Beenden
@@ -24,7 +24,7 @@ Decrease size	WebPositive Window		Verkleinern
 Serif font:	Settings Window		Serifenschrift:
 Loading %url	WebPositive Window		%url wird geladen
 Page source	WebPositive Window		Quelltext der Seite
-Next	WebPositive Window		Weiter
+Next	WebPositive Window		Vorwärts
 Find next	WebPositive Window		Nächster Treffer
 Download folder:	Settings Window		Download-Ordner:
 Edit	WebPositive Window		Bearbeiten

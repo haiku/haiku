@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	351214779
+1	german	x-vnd.Haiku-libtracker	1301055003
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -378,6 +378,7 @@ Modified	FindPanel		Geändert
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fehler beim Verschieben von \"%name\" in den Papierkorb. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Ordner können nicht mit einem seiner Unterordner ersetzt werden.
 <No recent items>	FavoritesMenu		<Keine letzten Objekte>
+Preferences…	ContainerWindow		Einstellungen…
 Move	PoseView		Verschieben
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Sollen die ausgewählten Objekte wirklich gelöscht werden? Diese Aktion kann nicht rückgängig gemacht werden.
