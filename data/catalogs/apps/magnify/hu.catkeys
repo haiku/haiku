@@ -1,29 +1,29 @@
-1	hungarian	x-vnd.Haiku-Magnify	3748875992
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixel/pixel
-Add a crosshair	Magnify-Main		Egy célkereszt hozzáadása
+1	hungarian	x-vnd.Haiku-Magnify	283320408
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		nincs semmi a vágólapon
+Make square	Magnify-Main		Négyzetté alakítás
 Copy image	Magnify-Main		Kép másolása
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Másolás/Mentés:\n másolás - a vágólapra másolja a jelenlegi képet\n mentés - elmenti a kép bitjeit egy, a\n felhasználtó által megadott fájlba\n
-Decrease pixel size	Magnify-Main		Pixelméret csökkentése
-Decrease window size	Magnify-Main		Ablak méretének csökkentése
-Freeze/Unfreeze image	Magnify-Main		Kép rögzítése/feloldása
+Magnify help	Magnify-Help		Nagyító súgója
+usage: magnify [size] (magnify size * size pixels)\n	Console		használat: magnify [méret] (nagyítási méret * méret pixelben)\n
+Stick coordinates	Magnify-Main		Koordináták rögzítése
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Infó:\n információ rejtése/megjelenítése - elrejti/megjeleníti ezeket az új funkciókat\n megjegyzés: ha megjelenítés alatt van, egy vörös négyzet\n fog megjelenni, ami azt jelzi, hogy melyik pixel\n adatait jelzi épp ki\n all these new features\n note: when showing, a red square will appear which signifies\n which pixel's rgb values will be displayed\n célkeresztek hozzáadása/eltávolítása - 2 célkereszt lehet\ maximum,\n amik segítenek az objektumok elrendezésében és elhelyezésében.\n A célkereszteket kék négyzetek és vonalak jelzik.\n rácsvonalak elrejtése/megjelenítése - elrejti/megjeleníti a pixelek közti rácsot\n
+  freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		  fagyasztás - a kurzor alatti terület fagyasztása/felolvasztása
+Hide/Show grid	Magnify-Main		Rácsvonalak elrejtése/megjelenítése
+magnify: size must be a multiple of 4\n	Console		nagyítás: a méret 4-gyel osztható kell, hogy legyen\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Általános:\n 32 x 32 - a bal felül lévő számok a látható pixelek\n számát jelzik (szélesség x magasság)\n 8 pixel/pixel - azt mutatja, hogy egy pixel nagyítására hány\n pixelt használ fel\n R:152 G:52 B:10 - a vörös négyzet alatti\n pixel RGB értékei\n
 Help	Magnify-Main		Súgó
-Hide/Show grid	Magnify-Main		Rácsvonalak elrejtése/megjelenítése
-Hide/Show info	Magnify-Main		Infó elrejtése/megjelenítése
-Increase pixel size	Magnify-Main		Pixelek méretének növelése
-Increase window size	Magnify-Main		Ablak méretének növelése
-Info	Magnify-Main		Infó
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Infó:\n információ rejtése/megjelenítése - elrejti/megjeleníti ezeket az új funkciókat\n megjegyzés: ha megjelenítés alatt van, egy vörös négyzet\n fog megjelenni, ami azt jelzi, hogy melyik pixel\n adatait jelzi épp ki\n all these new features\n note: when showing, a red square will appear which signifies\n which pixel's rgb values will be displayed\n célkeresztek hozzáadása/eltávolítása - 2 célkereszt lehet\ maximum,\n amik segítenek az objektumok elrendezésében és elhelyezésében.\n A célkereszteket kék négyzetek és vonalak jelzik.\n rácsvonalak elrejtése/megjelenítése - elrejti/megjeleníti a pixelek közti rácsot\n
-Magnify	System name		Nagyító
-Magnify help	Magnify-Help		Nagyító súgója
-Make square	Magnify-Main		Négyzetté alakítás
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigáció:\n nyílgombok - a jelenlegi kijelölést elmozdítja 1 pixellel\n option-nyílgombok - elmozdítja az egeret 1 pixellel\n x jelzi a kijelölést - a jelenlegi kijelölésben van egy 'x'\n
-Remove a crosshair	Magnify-Main		Célkereszt eltávolítása
-Save image	Magnify-Main		Kép mentése
 Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Átméretezés:\n négyzetté alakítás - a szélességet és magasságot a nagyobbal\n teszi egyenlővé, hogy négyzet legyen\n ablak méretének növelése/csökkentése - 4 pixellel nagyobbá vagy kisebbé\n teszi az ablakot.\n megjegyzés: az ablak keretének elhúzásával is át\n lehet méretezni az ablakot bármilyen méretűre.\n pixelek méretének növelése/csökkentése - növeli vagy csökkenti a pixelek számát\n ami azt adja meg, hogy hányszorosan nagyítson egy valós\n pixelt. 1-től 16-ig terjedhet.\n
-Stick coordinates	Magnify-Main		Koordináták rögzítése
-freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		befagyasztás - be/kifagyasztja annak a nagyítását ami felett\n a kurzor épp van\n
-magnify: size must be a multiple of 4\n	Console		nagyítás: a méret 4-gyel osztható kell, hogy legyen\n
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		nincs semmi a vágólapon
-size must be > 4 and a multiple of 4\n	Console		a méret legyen több, mint 4, és legyen osztható 4-gyel\n
-usage: magnify [size] (magnify size * size pixels)\n	Console		használat: magnify [méret] (nagyítási méret * méret pixelben)\n
+Decrease pixel size	Magnify-Main		Pixelméret csökkentése
+Magnify	System name		Nagyító
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixel/pixel
+Info	Magnify-Main		Infó
+Remove a crosshair	Magnify-Main		Célkereszt eltávolítása
+Freeze/Unfreeze image	Magnify-Main		Kép rögzítése/feloldása
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Másolás/Mentés:\n másolás - a vágólapra másolja a jelenlegi képet\n mentés - elmenti a kép bitjeit egy, a\n felhasználtó által megadott fájlba\n
+Hide/Show info	Magnify-Main		Infó elrejtése/megjelenítése
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigáció:\n nyílgombok - a jelenlegi kijelölést elmozdítja 1 pixellel\n option-nyílgombok - elmozdítja az egeret 1 pixellel\n x jelzi a kijelölést - a jelenlegi kijelölésben van egy 'x'\n
+Save image	Magnify-Main		Kép mentése
+Increase window size	Magnify-Main		Ablak méretének növelése
+Decrease window size	Magnify-Main		Ablak méretének csökkentése
+Increase pixel size	Magnify-Main		Pixelek méretének növelése
+  size must be > 4 and a multiple of 4\n	Console		  a méretnek nagyobbnak kell lennie a 4 többszörösénél
+Add a crosshair	Magnify-Main		Egy célkereszt hozzáadása

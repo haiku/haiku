@@ -1,133 +1,133 @@
-1	hungarian	x-vnd.Haiku-DiskProbe	3441574721
-%ld (native)	ProbeView		%ld (natív)
-(native)	ProbeView		(natív)
-15 bit	TypeEditors		15-bites
-16 bit	TypeEditors		16-bites
-16 bit signed value:	TypeEditors		16-bites aláírt érték
-16 bit unsigned value:	TypeEditors		16-bites aláíratlan érték:
-32 bit	TypeEditors		32-bites
-32 bit signed value:	TypeEditors		32-bites aláírt érték
-32 bit size or status:	TypeEditors		32-bites méret vagy állapot:
-32 bit unsigned pointer:	TypeEditors		32-bites aláíratlan mutató:
-32 bit unsigned size:	TypeEditors		32-bites aláíratlan méret:
-32 bit unsigned value:	TypeEditors		32-bites aláíratlan érték:
-64 bit signed offset:	TypeEditors		64-bites aláírt eltolás
-64 bit signed value:	TypeEditors		64-bites aláírt érték:
-64 bit unsigned value:	TypeEditors		64-bites aláíratlan érték:
-8 bit palette	TypeEditors		8-bites paletta
-8 bit signed value:	TypeEditors		8-bites aláírt érték:
-8 bit unsigned value:	TypeEditors		8-bites aláíratlan érték:
-Add	ProbeView		Hozzáadás
-Attribute	AttributeWindow		Attribútum
-Attribute	ProbeView		Attribútum
-Attribute offset: 	ProbeView		Attribútum eltolás:
-Attribute type: 	ProbeView		Attribútum típusa
-Attribute: 	ProbeView		Attribútum:
-Attributes	ProbeView		Attríbútumok
-Back	ProbeView		Vissza
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Számrendszer
-Block	ProbeView		Blokk
-Block %Ld (0x%Lx)	ProbeView		Blokk %Ld (0x%Lx)
-Block 0x%Lx	ProbeView		Blokk 0x%Lx
-Block: 	ProbeView		Blokk:
-BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Blokkméret
-Bookmarks	ProbeView		Könyvjelzők
-Boolean	TypeEditors	This is the type of editor	Boolean
-Boolean editor	TypeEditors		Boolean szerkesztő
-Boolean value:	TypeEditors		Kétállású érték:
-Cancel	AttributeWindow		Mégse
-Cancel	OpenWindow		Mégse
-Cancel	ProbeView		Mégse
-Case sensitive	FindWindow		Kis- és nagybetűk megkülönböztetése
-Close	AttributeWindow		Bezárás
-Close	FileWindow		Bezárás
-Close	ProbeView		Bezárás
-Contents:	TypeEditors		Tartalom:
-Copy	ProbeView		Másolás
-Could not find search string.	ProbeView		A keresési szöveg nem található.
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nem sikerült megnyitni: \"%s\":\n%s
-Could not open file \"%s\": %s\n	DiskProbe		Nem sikerült megnyitni ezt a fájlt: \"%s\", ezért: %s\n
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nem sikerült beolvasni a képet
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimális
-Device	ProbeView		Eszköz
-Device offset: 	ProbeView		Eszköz eltolás:
-Device: 	ProbeView		Eszköz:
-DiskProbe	System name		DiskProbe
-DiskProbe request	AttributeWindow		DiskProbe kérés
-DiskProbe request	DiskProbe		DiskProbe kérés
-DiskProbe request	ProbeView		DiskProbe kérés
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Biztos el akarja távolítani a(z) \"%s\" attríbútumot a következő fájlból: \"%s\"?\n\n Ezt nem lehet visszavonni.
-Don't save	ProbeView		Ne mentse
-Double precision floating-point value:	TypeEditors		Duplapontosságú lebegőpontos érték:
-Edit	ProbeView		Szerkesztés
-Examine device:	OpenWindow		Eszköz vizsgálata:
-File	FileWindow		Fájl
-File	ProbeView		Fájl
+1	hungarian	x-vnd.Haiku-DiskProbe	2306672993
 File offset: 	ProbeView		Fájl eltolás:
-File: 	ProbeView		Fájl:
-Find	FindWindow		Keresés
+%ld (native)	ProbeView		%ld (natív)
+64 bit unsigned value:	TypeEditors		64-bites aláíratlan érték:
 Find again	ProbeView		Keresés tovább
-Find…	ProbeView		Keresés...
-Fit	ProbeView	Size of fonts, fits to available room	Átméretezés hogy kiférjen
-Flattened bitmap	TypeEditors		Lapos bittérkép
-Floating-point value:	TypeEditors		Lebegőpontos érték:
-Font size	ProbeView		Betűméret
-Grayscale	TypeEditors		Szürkeárnyalatos
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimális
-Icon	TypeEditors		Ikon
-Icon view	TypeEditors		Ikonnézet
-Image	TypeEditors	This is the type of view	Kép
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Képnézet
-MIME type editor	TypeEditors		MIME típusszerkesztő
-MIME type:	TypeEditors		MIME típus:
-Message	TypeEditors	This is the type of view	Üzenet
-Message View	TypeEditors		Üzenetnézet
-Mode:	FindWindow		Mód:
-Native: %Ld (0x%0*Lx)	ProbeView		Natív: %Ld (0x%0*Lx)
-Native: 0x%0*Lx	ProbeView		Natív: 0x%0*Lx
-New…	FileWindow		Új...
-Next	ProbeView		Következő
-No type editor available	AttributeWindow		Nincs elérhető típusszerkesztő
-Number	TypeEditors	This is the type of editor	Szám
-Number editor	TypeEditors		Számszerkesztő
-Number:	TypeEditors		Szám:
-OK	DiskProbe		OK
-OK	ProbeView		OK
-Offset: 	ProbeView		Eltolás:
-Open device	FileWindow		Eszköz megnyitása
-Open file…	FileWindow		Fájl megnyitása...
-PNG format	TypeEditors		PNG formátum
-Page setup…	ProbeView		Oldalbeállítás...
-Paste	ProbeView		Beillesztés
-Previous	ProbeView		Előző
-Print…	ProbeView		Nyomtatás...
-Probe device	OpenWindow		Szondaeszköz
-Probe file…	OpenWindow		Szondafájl...
-Quit	FileWindow		Kilépés
-Raw editor	AttributeWindow		Nyers szerkesztő
-Redo	ProbeView		Újra
-Remove	AttributeWindow		Eltávolítás
-Remove from file	AttributeWindow		Eltávolítás a fájlból
-Save	ProbeView		Mentés
-Save changes before closing?	ProbeView		Elmentsük a változtatásokat bezárás előtt?
-Select all	ProbeView		Összes kijelölése
-Selection	ProbeView		Kijelölés
-Stop	ProbeView		Leállítás
-String editor	TypeEditors		Szövegszerkesztő
-Swapped: %Ld (0x%0*Lx)	ProbeView		Cserélve: %Ld (0x%0*Lx)
-Swapped: 0x%0*Lx	ProbeView		Cserélve: 0x%0*Lx
 Text	FindWindow		Szöveg
-Text	TypeEditors	This is the type of editor	Szöveg
-Type editor	AttributeWindow		Típusszerkesztő
-Type editor	ProbeView		Típusszerkesztő
-Type editor not supported	ProbeView		Nem támogatott típusszerkesztő
-Undo	ProbeView		Visszavonás
-Unknown format	TypeEditors		Ismeretlen formátum
-Unknown type	TypeEditors		Ismeretlen típus
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Nézet
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Nem sikerült a következő fájlba írni:\n%s\n\nKilépéskor minden változtatás el fog veszni.
-none	ProbeView	No attributes	nincs
-of 	ProbeView		innen:
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	innen: 0x0
+Find…	ProbeView		Keresés...
+Case sensitive	FindWindow		Kis- és nagybetűk megkülönböztetése
+Cancel	OpenWindow		Mégse
+Close	AttributeWindow		Bezárás
+File	ProbeView		Fájl
+Attribute	ProbeView		Attribútum
+Floating-point value:	TypeEditors		Lebegőpontos érték:
+16 bit	TypeEditors		16-bites
+Attributes	ProbeView		Attríbútumok
+Device offset: 	ProbeView		Eszköz eltolás:
+Selection	ProbeView		Kijelölés
+DiskProbe	System name		DiskProbe
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	melyik: '%.4s'\n\n
+File	FileWindow		Fájl
+OK	DiskProbe		OK
+Boolean	TypeEditors	This is the type of editor	Boolean
+Paste	ProbeView		Beillesztés
+PNG format	TypeEditors		PNG formátum
+Font size	ProbeView		Betűméret
+Attribute type: 	ProbeView		Attribútum típusa
+Attribute	AttributeWindow		Attribútum
+8 bit signed value:	TypeEditors		8-bites aláírt érték:
+Number:	TypeEditors		Szám:
+Save	ProbeView		Mentés
+Stop	ProbeView		Leállítás
+Number editor	TypeEditors		Számszerkesztő
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+No type editor available	AttributeWindow		Nincs elérhető típusszerkesztő
+Double precision floating-point value:	TypeEditors		Duplapontosságú lebegőpontos érték:
+Device: 	ProbeView		Eszköz:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Biztos el akarja távolítani a(z) \"%s\" attríbútumot a következő fájlból: \"%s\"?\n\n Ezt nem lehet visszavonni.
+Text	TypeEditors	This is the type of editor	Szöveg
+8 bit unsigned value:	TypeEditors		8-bites aláíratlan érték:
+Block	ProbeView		Blokk
+Back	ProbeView		Vissza
+Device	ProbeView		Eszköz
+Unknown type	TypeEditors		Ismeretlen típus
+Block 0x%Lx	ProbeView		Blokk 0x%Lx
+Quit	FileWindow		Kilépés
+Undo	ProbeView		Visszavonás
+Close	ProbeView		Bezárás
+Number	TypeEditors	This is the type of editor	Szám
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimális
+16 bit signed value:	TypeEditors		16-bites aláírt érték
+String editor	TypeEditors		Szövegszerkesztő
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	innen: 0x0
+64 bit signed offset:	TypeEditors		64-bites aláírt eltolás
+Boolean editor	TypeEditors		Boolean szerkesztő
+Copy	ProbeView		Másolás
+none	ProbeView	No attributes	nincs
+Boolean value:	TypeEditors		Kétállású érték:
+32 bit size or status:	TypeEditors		32-bites méret vagy állapot:
+8 bit palette	TypeEditors		8-bites paletta
+Fit	ProbeView	Size of fonts, fits to available room	Átméretezés hogy kiférjen
+Probe device	OpenWindow		Szondaeszköz
+ (native)	ProbeView		%ld (natív)
+Unknown format	TypeEditors		Ismeretlen formátum
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimális
+MIME type:	TypeEditors		MIME típus:
+Page setup…	ProbeView		Oldalbeállítás...
+New…	FileWindow		Új...
+DiskProbe request	AttributeWindow		DiskProbe kérés
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nem sikerült beolvasni a képet
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Blokkméret
+Save changes before closing?	ProbeView		Elmentsük a változtatásokat bezárás előtt?
+Type editor	AttributeWindow		Típusszerkesztő
+Native: 0x%0*Lx	ProbeView		Natív: 0x%0*Lx
+Raw editor	AttributeWindow		Nyers szerkesztő
+Message View	TypeEditors		Üzenetnézet
+DiskProbe request	ProbeView		DiskProbe kérés
+32 bit unsigned size:	TypeEditors		32-bites aláíratlan méret:
+Flattened bitmap	TypeEditors		Lapos bittérkép
+Open file…	FileWindow		Fájl megnyitása...
+Next	ProbeView		Következő
+Close	FileWindow		Bezárás
+Attribute: 	ProbeView		Attribútum:
+Remove from file	AttributeWindow		Eltávolítás a fájlból
+Don't save	ProbeView		Ne mentse
+Previous	ProbeView		Előző
+64 bit signed value:	TypeEditors		64-bites aláírt érték:
+Icon	TypeEditors		Ikon
+Block: 	ProbeView		Blokk:
+Examine device:	OpenWindow		Eszköz vizsgálata:
+Offset: 	ProbeView		Eltolás:
+OK	ProbeView		OK
+Add	ProbeView		Hozzáadás
+Edit	ProbeView		Szerkesztés
+Native: %Ld (0x%0*Lx)	ProbeView		Natív: %Ld (0x%0*Lx)
+32 bit unsigned value:	TypeEditors		32-bites aláíratlan érték:
+Message	TypeEditors	This is the type of view	Üzenet
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nem sikerült megnyitni: \"%s\":\n%s
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Számrendszer
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Képnézet
+Cancel	AttributeWindow		Mégse
+Type editor not supported	ProbeView		Nem támogatott típusszerkesztő
+MIME type editor	TypeEditors		MIME típusszerkesztő
+Swapped: %Ld (0x%0*Lx)	ProbeView		Cserélve: %Ld (0x%0*Lx)
+Find	FindWindow		Keresés
+Remove	AttributeWindow		Eltávolítás
+Print…	ProbeView		Nyomtatás...
+Block %Ld (0x%Lx)	ProbeView		Blokk %Ld (0x%Lx)
+Image	TypeEditors	This is the type of view	Kép
+Could not open file \"%s\": %s\n	DiskProbe		Nem sikerült megnyitni ezt a fájlt: \"%s\", ezért: %s\n
+Select all	ProbeView		Összes kijelölése
+Probe file…	OpenWindow		Szondafájl...
+Icon view	TypeEditors		Ikonnézet
+Bookmarks	ProbeView		Könyvjelzők
+Mode:	FindWindow		Mód:
+15 bit	TypeEditors		15-bites
+Open device	FileWindow		Eszköz megnyitása
+Could not find search string.	ProbeView		A keresési szöveg nem található.
+16 bit unsigned value:	TypeEditors		16-bites aláíratlan érték:
+Attribute offset: 	ProbeView		Attribútum eltolás:
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Nézet
+Redo	ProbeView		Újra
+File: 	ProbeView		Fájl:
+32 bit unsigned pointer:	TypeEditors		32-bites aláíratlan mutató:
+of 	ProbeView		innen:
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Nem sikerült a következő fájlba írni:\n%s\n\nKilépéskor minden változtatás el fog veszni.
+32 bit	TypeEditors		32-bites
+Cancel	ProbeView		Mégse
+Swapped: 0x%0*Lx	ProbeView		Cserélve: 0x%0*Lx
+Grayscale	TypeEditors		Szürkeárnyalatos
+32 bit signed value:	TypeEditors		32-bites aláírt érték
+DiskProbe request	DiskProbe		DiskProbe kérés
+Type editor	ProbeView		Típusszerkesztő
+Contents:	TypeEditors		Tartalom:

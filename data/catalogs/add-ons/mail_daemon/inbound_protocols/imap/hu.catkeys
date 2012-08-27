@@ -1,9 +1,9 @@
 1	hungarian	x-vnd.Haiku-IMAP	3892875357
-Apply	IMAPFolderConfig		Alkalmazás
 Destination:	imap_config		Cél:
-Failed to fetch available storage.	IMAPFolderConfig		Nem sikerült letölteni az elérhető tárhely mennyiségét.
+status	IMAPFolderConfig		állapot
+Apply	IMAPFolderConfig		Alkalmazás
+IMAP Folders	imap_config		IMAP mappák
 Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAP mappák letöltése, kis türelmet...
 IMAP Folders	IMAPFolderConfig		IMAP mappák
-IMAP Folders	imap_config		IMAP mappák
 Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Feliratkozás / leiratkozás IMAP mappákról, kis türelmet...
-status	IMAPFolderConfig		állapot
+Failed to fetch available storage.	IMAPFolderConfig		Nem sikerült letölteni az elérhető tárhely mennyiségét.

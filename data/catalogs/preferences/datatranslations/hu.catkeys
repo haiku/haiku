@@ -1,18 +1,18 @@
 1	hungarian	x-vnd.Haiku-DataTranslations	3820343452
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Egy elem '%name' már létezik a Translators mappában! A meglévő fordítót felül kell írni?
+DataTranslations	System name		Értelmezők
 Cancel	DataTranslations		Mégsem
-Could not install %s:\n%s	DataTranslations		A(z)%s nem telepíthető:\n%s
-DataTranslations	System name		DataTranslations
-DataTranslations - Error	DataTranslations		DataTranslations -Hiba
-DataTranslations - Note	DataTranslations		DataTranslations - Jegyzet
-Info	DataTranslations		Info
-Info:	DataTranslations		Info:
 Name:	DataTranslations		Név:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Név: %s \nVerzió: %ld.%ld.%ld\n\nInfo:\n%s\n\nElérési út:\n%s\n
-OK	DataTranslations		OK
-Overwrite	DataTranslations		Átírás
-Path:	DataTranslations		Elérési út:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		A(z) '%name' nem lesz feltelepítve, mivel nem tűnik fordítónak.
-The new translator has been installed successfully.	DataTranslations		Az új fordító sikeresen telepítve.
+Could not install %s:\n%s	DataTranslations		A(z)%s nem telepíthető:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Használja ezt a vezérlőpanelt a fordítók alapértelmezett értékeinek beállításához, amit használniuk kell ha nincs náluk más megadva.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Egy elem '%name' már létezik a Translators mappában! A meglévő fordítót felül kell írni?
+DataTranslations - Note	DataTranslations		DataTranslations - Jegyzet
+Overwrite	DataTranslations		Átírás
+Info:	DataTranslations		Info:
+Info	DataTranslations		Info
+Path:	DataTranslations		Elérési út:
+The new translator has been installed successfully.	DataTranslations		Az új fordító sikeresen telepítve.
+DataTranslations - Error	DataTranslations		DataTranslations -Hiba
+OK	DataTranslations		OK
 Version:	DataTranslations		Verzió:

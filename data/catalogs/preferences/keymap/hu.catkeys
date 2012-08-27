@@ -1,31 +1,38 @@
-1	hungarian	x-vnd.Haiku-Keymap	3895282621
-(Current)	Keymap window		(jelenlegi)
-Acute trigger	Keymap window		Ékezet kapcsoló
-Cancel	Modifier Keys window		Mégse
-Caps Lock:	Modifier Keys window		Caps Lock:
-Circumflex trigger	Keymap window		Kalap kapcsoló
-Command:	Modifier Keys window		Command:
-Control:	Modifier Keys window		Control:
-Diaeresis trigger	Keymap window		Tréma kapcsoló
-File	Keymap window		Fájl
-Font	Keymap window		Betűtípus
-Grave trigger	Keymap window		Fordított ékezet kapcsoló
-Keymap	System name		Billentyűzetkiosztás
-Layout	Keymap window		Elrendezés
-Modifier Keys	Modifier Keys window		Módosító gombok
-OK	Modifier Keys window		OK
-Open…	Keymap window		Megnyitás…
-Option:	Modifier Keys window		Opció:
-Quit	Keymap window		Kilépés
-Revert	Keymap window		Visszaállítás
-Revert	Modifier Keys window		Visszaállítás
-Sample and clipboard:	Keymap window		Minta és vágólap:
-Save as…	Keymap window		Mentés másként…
-Select dead keys	Keymap window		„Beragadó” gombok kiválasztása
-Set Modifier Keys…	Keymap window		Módosító gombok beállítása...
-Switch shortcut keys	Keymap window		Billentyűzetkombináció-váltás
-Switch shortcut keys to Haiku mode	Keymap window		Billentyűzetkombináció-váltás Haiku-módra
-Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció váltása Windows/Linux módra
-System:	Keymap window		Nyelv:
+1	hungarian	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Váltógomb:
+Revert	Modifier keys window		Visszaállítás
 Tilde trigger	Keymap window		Hullámvonal kapcsoló
+Grave trigger	Keymap window		Fordított ékezet kapcsoló
+Role	Modifier keys window	As in the role of a modifier key	Szerep
+Select dead keys	Keymap window		„Beragadó” gombok kiválasztása
+Cancel	Modifier keys window		Mégse
+Quit	Keymap window		Kilépés
+Switch shortcut keys to Haiku mode	Keymap window		Billentyűzetkombináció-váltás Haiku-módra
+Circumflex trigger	Keymap window		Kalap kapcsoló
+Diaeresis trigger	Keymap window		Tréma kapcsoló
+Disabled	Modifier keys window	Do nothing	Letiltva
+Open…	Keymap window		Megnyitás…
+System:	Keymap window		Nyelv:
+Set modifier keys…	Keymap window		Módosító billentyű megadása…
+Option:	Modifier keys window	Option key role name	Opció billentyű:
+Switch shortcut keys	Keymap window		Billentyűzetkombináció-váltás
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Váltó billentyű
 User:	Keymap window		Felhasználó:
+Key	Modifier keys window	As in a computer keyboard key	Billentyű
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Vezérlőbillentyű
+Control:	Modifier keys window	Control key role name	Vezérlőbillentyű:
+Sample and clipboard:	Keymap window		Minta és vágólap:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opc billentyű
+Layout	Keymap window		Elrendezés
+Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció váltása Windows/Linux módra
+Revert	Keymap window		Visszaállítás
+Command:	Modifier keys window	Command key role name	Parancsbillentyű:
+Save as…	Keymap window		Mentés másként…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd billentyű
+File	Keymap window		Fájl
+(Current)	Keymap window		(jelenlegi)
+Font	Keymap window		Betűtípus
+Keymap	System name		Billentyűzetkiosztás
+Set modifier keys	Modifier keys window		Módosító billentyű megadása
+Modifier keys	Modifier keys window		Módosító billentyű
+Acute trigger	Keymap window		Ékezet kapcsoló

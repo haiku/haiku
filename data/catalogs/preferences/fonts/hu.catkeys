@@ -1,12 +1,12 @@
 1	hungarian	x-vnd.Haiku-Fonts	4164233892
-Bold font:	Font view		Félkövér betűtípus:
-Defaults	Main window		Alapértelmezés
-Fixed font:	Font view		Fix méretű betűtípus:
-Fonts	System name		Betűtípusok
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Betűtípusok\n\tCopyright 2004-2005, Haiku.\n\n
-Menu font:	Font view		Menük betűtípusa:
-OK	main		OK
 Plain font:	Font view		Egyszerű betűtípus:
+Defaults	Main window		Alapértelmezés
+OK	main		OK
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Betűtípusok\n\tCopyright 2004-2005, Haiku.\n\n
 Revert	Main window		Visszaállítás
 Size:	Font Selection view		Méret:
+Menu font:	Font view		Menük betűtípusa:
+Fixed font:	Font view		Fix méretű betűtípus:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
+Bold font:	Font view		Félkövér betűtípus:
+Fonts	System name		Betűtípusok

@@ -1,8 +1,8 @@
-1	hungarian	x-vnd.Haiku-HVIFTranslator	813066125
-HVIF Settings	HVIFMain		HVIF Beállítások
+1	hungarian	x-vnd.Haiku-HVIFTranslator	249304797
+Haiku vector icon translator	HVIFTranslator		Natív Haiku vektoros ikon fordító
 HVIF icons	HVIFTranslator		HVIF ikonok
-HVIFTranslator Settings	HVIFTranslator		HVIFTranslator beállításai
-Native Haiku icon format translator	HVIFView		Natív Haiku ikon formátum fordító
-Native Haiku vector icon translator	HVIFTranslator		Natív Haiku vektoros ikon fordító
 Render size:	HVIFView		Renderelt méret
+HVIFTranslator Settings	HVIFTranslator		HVIFTranslator beállításai
+Haiku vector icon translator	HVIFView		Natív Haiku vektoros ikon fordító
+HVIF Settings	HVIFMain		HVIF Beállítások
 Version %d.%d.%d, %s	HVIFView		%d.%d.%d, %s verzió

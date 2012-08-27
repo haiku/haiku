@@ -1,15 +1,15 @@
 1	hungarian	x-vnd.Be-WORK	2548258861
-About Workspaces…	Workspaces		Workspaces névjegye...
-Always on top	Workspaces		Mindig felül
-Auto-raise	Workspaces		Automatikus kiemelés
-Change workspace count…	Workspaces		Munkaasztalok számának megváltoztatása...
 Invalid argument: %s\n	Workspaces		Érvénytelen paraméter: %s\n
-Live in the Deskbar	Workspaces		Átrakás a Deskbarra
-OK	Workspaces		OK
 Quit	Workspaces		Kilépés
+Workspaces	System name		Munkaasztalok
+Change workspace count…	Workspaces		Munkaasztalok számának megváltoztatása...
 Remove replicant	Workspaces		Másolat eltávolítása
+About Workspaces…	Workspaces		Workspaces névjegye...
+Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\nírta: %1 és %2.\n\nMinden jog fenntartva %3, Haiku.\n\nAz Option gombbal hátra lehet küldeni az ablakokat. A Control gombbal pedig előre lehet őket hozni.\n
 Show window border	Workspaces		Ablakkeret megjelenítése
+Auto-raise	Workspaces		Automatikus kiemelés
+OK	Workspaces		OK
+Always on top	Workspaces		Mindig felül
+Live in the Deskbar	Workspaces		Átrakás a Deskbarra
 Show window tab	Workspaces		Ablakfül megjelenítése
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Használat: %s [opciók] [munkaasztal]\naz \"opciók\"-ban lehet:\n --notitle\t\tnincs címsáv, a keret és átméretezés marad\n --noborder\t\t nincs címsáv, keret és átméretezés\n --avoidfocus\t\taz ablak nem kerülhet fókuszba\n --alwaysontop\t\t mindig felül tartja az ablakot\n --notmovable\t\telmozdíthatatlanná teszi az ablakot\n --autoraise\t\telőtérbe helyezi az ablakot ha a kijelző szélénél van\n --help\t\tkiírja ezt a súgót és kilép\nés a \"munkaasztal\" pedig megadja, hogy hanyas számú\n munkaasztalra kíván váltani (lehet 0-31)\n
-Workspaces	System name		Workspaces
-Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\nírta: %1 és %2.\n\nMinden jog fenntartva %3, Haiku.\n\nAz Option gombbal hátra lehet küldeni az ablakokat. A Control gombbal pedig előre lehet őket hozni.\n

@@ -1,15 +1,16 @@
-1	hungarian	x-vnd.Haiku-GIFTranslator	829368084
-Automatic (from alpha channel)	GIFView		Automatikus (alfa csatornából)
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap formátum (GIFTranslator)
-BeOS system	GIFView		BeOS rendszer
-Colors	GIFView		Színek
-GIF Settings	GIFTranslator		GIF beállítások
-GIF image	GIFTranslator		GIF kép
-Greyscale	GIFView		Szürkeárnyalatos
+1	hungarian	x-vnd.Haiku-GIFTranslator	2708495435
+Websafe	GIFView		Websafe
+Write interlaced images	GIFView		Váltottsoros képként ment
 Optimal	GIFView		Optimális
+Greyscale	GIFView		Szürkeárnyalatos
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap formátum (GIFTranslator)
+GIF image translator	GIFView		GIF kép átalakító
+GIF image	GIFTranslator		GIF kép
+Write transparent images	GIFView		Fehér áttetsző képek
 Palette	GIFView		Paletta
 Use RGB color	GIFView		RGB színek használata
 Use dithering	GIFView		Simítás alkalmazása
-Websafe	GIFView		Websafe
-Write interlaced images	GIFView		Váltottsoros képként ment
-Write transparent images	GIFView		Fehér áttetsző képek
+GIF Settings	GIFTranslator		GIF beállítások
+BeOS system	GIFView		BeOS rendszer
+Automatic (from alpha channel)	GIFView		Automatikus (alfa csatornából)
+Colors	GIFView		Színek

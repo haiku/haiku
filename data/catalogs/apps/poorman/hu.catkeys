@@ -1,61 +1,66 @@
-1	hungarian	x-vnd.Haiku.PoorMan	412131821
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Itt lett létrehozva egy netes mappa: \"/boot/home/public_html.\"\nTegyen bele egy \"index.html\" nevű HTML fájlt!
-About PoorMan…	PoorMan		PoorMan névjegye...
-Advanced	PoorMan		Haladó
-Cancel	PoorMan		Mégse
-Cannot start the server	PoorMan		Nem sikerült elindítani a szervert
-Clear console log	PoorMan		Konzolnapló ürítése
-Clear hit counter	PoorMan		Találati számláló nullázása
-Clear log file	PoorMan		Naplófájl ürítése
-Console Logging	PoorMan		Konzoli naplózás
-Controls	PoorMan		Vezérlők
-Copy	PoorMan		Másolás
-Create	PoorMan		Készítés
-Create PoorMan log	PoorMan		PoorMan napló készítése
-Create log file	PoorMan		Naplófájl készítése
-Default	PoorMan		Alapértelmezett
-Dir Created	PoorMan		Mappa létrehozva
-Directory: 	PoorMan		Mappa:
-Directory: (none)	PoorMan		Mappa: (nincs)
-Done	PoorMan		Kész
-Edit	PoorMan		Szerkesztés
-Error Dir	PoorMan		Hiba könyvtár
-Error Server	PoorMan		Hibakiszolgáló
-File	PoorMan		Fájl
-File Name	PoorMan		Fájlnév
-File logging	PoorMan		Fájlnaplózás
-Hits: %lu	PoorMan		Találatok: %lu
-Hits: 0	PoorMan		Találatok: 0
-Log To Console	PoorMan		Naplózás konzolba
-Log To File	PoorMan		Naplózás fájlba
-Log file name:	PoorMan		Naplófájl neve:
-Logging	PoorMan		Naplózás
-Logging view	PoorMan		Naplózási nézet
-Max. simultaneous connections:	PoorMan		Max. egyijű kapcsolat:
-OK	PoorMan		OK
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérjük, válassza ki a netes mappát a közzétételnek.\n\nA PoorMan létre tud hozna egy alapértelmezett \"public_html\" mappád a home mappán belül.\nVagy pedig választhat egyet a saját mappái közül ehelyett.
-PoorMan	System name		PoorMan
-PoorMan settings	PoorMan		PoorMan beállításai
-Quit	PoorMan		Kilépés
-Run server	PoorMan		Kiszolgáló futtatása
-Save console as…	PoorMan		Konzol mentése másként...
-Save console selections as…	PoorMan		Konzolbéli kijelölés mentése másként...
-Save log console	PoorMan		Konzolnapló mentése
-Save log console selection	PoorMan		Konzolbéli kijelölés mentése
-Select	PoorMan		Kiválasztás
-Select all	PoorMan		Mind kijelölése
-Select web folder	PoorMan		Netes mappa kiválasztása
-Send file listing if there's no start page	PoorMan		Fájllista küldése ha nincs kezdőlap
-Settings…	PoorMan		Beállítások...
-Shutting down.	PoorMan		Leállás.
-Shutting down.\n	PoorMan		Leállás.\n
-Site	PoorMan		Oldal
-Start page:	PoorMan		Kezdőlap:
-Starting up... 	PoorMan		Indítás...
-Status: Running	PoorMan		Állapot: Fut
-Status: Stopped	PoorMan		Állapot: Leállítva
-Web folder:	PoorMan		Netes mappa:
+1	hungarian	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Weboldal helye
-Website options	PoorMan		Weboldal beállítások
-connections	PoorMan		kapcsolat
+Error Server	PoorMan		Hibakiszolgáló
+Settings…	PoorMan		Beállítások...
+Create PoorMan log	PoorMan		PoorMan napló készítése
+Shutting down.\n	PoorMan		Leállás.\n
+Hits: %lu	PoorMan		Találatok: %lu
+Web folder:	PoorMan		Netes mappa:
+Default	PoorMan		Alapértelmezett
+Save log console selection	PoorMan		Konzolbéli kijelölés mentése
+Run server	PoorMan		Kiszolgáló futtatása
+PoorMan settings	PoorMan		PoorMan beállításai
+Clear hit counter	PoorMan		Találati számláló nullázása
+Copy	PoorMan		Másolás
+Max. simultaneous connections:	PoorMan		Max. egyijű kapcsolat:
+Start page:	PoorMan		Kezdőlap:
 done.\n	PoorMan		kész.\n
+Create	PoorMan		Készítés
+Shutting down.	PoorMan		Leállás.
+Website options	PoorMan		Weboldal beállítások
+File Name	PoorMan		Fájlnév
+Clear console log	PoorMan		Konzolnapló ürítése
+Advanced	PoorMan		Haladó
+OK	PoorMan		OK
+Status: Stopped	PoorMan		Állapot: Leállítva
+Dir Created	PoorMan		Mappa létrehozva
+Log to file	PoorMan		Naplózás fájlba
+Quit	PoorMan		Kilépés
+Hits: 0	PoorMan		Találatok: 0
+Save log console	PoorMan		Konzolnapló mentése
+Edit	PoorMan		Szerkesztés
+Create Log File	PoorMan		Naplófájl készítése
+Log to console	PoorMan		Naplózás konzolba
+Directory: (none)	PoorMan		Mappa: (nincs)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérjük, válassza ki a netes mappát a közzétételnek.\n\nA PoorMan létre tud hozna egy alapértelmezett \"public_html\" mappád a home mappán belül.\nVagy pedig választhat egyet a saját mappái közül ehelyett.
+Log To Console	PoorMan		Naplózás konzolba
+Connections	PoorMan		Kapcsolatok
+Status: Running	PoorMan		Állapot: Fut
+connections	PoorMan		kapcsolat
+Controls	PoorMan		Vezérlők
+Send file listing if there's no start page	PoorMan		Fájllista küldése ha nincs kezdőlap
+Error Dir	PoorMan		Hiba könyvtár
+Select all	PoorMan		Mind kijelölése
+File	PoorMan		Fájl
+File Logging	PoorMan		Fájlnaplózás
+Save console selections as…	PoorMan		Konzolbéli kijelölés mentése másként...
+File logging	PoorMan		Fájlnaplózás
+Select web folder	PoorMan		Netes mappa kiválasztása
+Logging view	PoorMan		Naplózási nézet
+Logging	PoorMan		Naplózás
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Itt lett létrehozva egy netes mappa: \"/boot/home/public_html.\"\nTegyen bele egy \"index.html\" nevű HTML fájlt!
+Clear log file	PoorMan		Naplófájl ürítése
+Log file name:	PoorMan		Naplófájl neve:
+Directory: 	PoorMan		Mappa:
+Log To File	PoorMan		Naplózás fájlba
+Done	PoorMan		Kész
+Create log file	PoorMan		Naplófájl készítése
+Starting up... 	PoorMan		Indítás...
+Site	PoorMan		Oldal
+Cancel	PoorMan		Mégse
+Console logging	PoorMan		Konzoli naplózás
+Cannot start the server	PoorMan		Nem sikerült elindítani a szervert
+Select	PoorMan		Kiválasztás
+Save console as…	PoorMan		Konzol mentése másként...
+PoorMan	System name		PoorMan
+Console Logging	PoorMan		Konzoli naplózás

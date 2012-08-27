@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	2099988747
+1	dutch; flemish	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Voeg dus achter de andere menu-onderdelen aan de onderkant van het bestand iets soortgelijks als dit toe:
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Bent u zeker dat u de installatie wilt afbreken en het systeem wilt herstarten?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -12,6 +12,7 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		Met GRUB is het: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Stop
 Install progress:  	InstallerWindow		Voortgang installatie:  
+2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Installatie wordt gestart.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dit is software van alfakwaliteit! Dat betekent dat er een hoog risico is om belangrijke data te verliezen. Maak geregeld back-ups! U bent gewaarschuwd.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Bent u zeker dat u de installatie wilt stoppen?
@@ -37,6 +38,7 @@ Boot sector successfully written.	InstallProgress		Schrijven opstartsector gesla
 Performing installation.	InstallProgress		Uitvoering installatie.
 scanning…	InstallerWindow		Scant…
 Set up boot menu	InstallerWindow		Boot-menu opzetten
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (sinds os-prober v1.44)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		De eerste logische partitie heeft altijd het nummer \"4\", ongeacht het aantal primaire partities.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUB's schema voor naamgeving is nog steeds: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <uw favoriete editor> /boot/grub/menu.lst\n\n
@@ -48,6 +50,7 @@ README	InstallerApp		LEESMIJ
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		De doelschijf heeft mogelijk niet genoeg ruimte. Probeer een andere schijf te kiezen, of kies ervoor om geen optionele items te installeren.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sluit alstublieft de vensters van Boot Manager en DriveSetup, voordat u het Installer-venster sluit.
 Scanning for disks…	InstallerWindow		Zoekt naar schijven…
+2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		De schijf kan niet betrokken worden. Kies alstublieft een andere schijf.
 ?? of ??	InstallerWindow	Unknown progress	?? van ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenu-item \"Haiku Alpha\" {\n
@@ -67,6 +70,7 @@ Installer	System name		Installatieprogramma
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		U kunt de inhoud van een schijf niet op zichzelf installeren. Kies alstublieft een andere schijf.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" is het partitienummer, dat voor GRUB2 begint met \"1\"\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Vanaf os-prober v1.44 (in Ubuntu 11.04 of later) zal Haiku automatisch herkend worden. Om Haiku aan het GRUB-menu toe te voegen, open een Terminal en doe het onderstaande:\n\n
 Quit DriveSetup	InstallerWindow		DriveSetup afsluiten
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" is het hardeschijf-nummer, beginnend met \"0\".\n
 Hide optional packages	InstallerWindow		Optionele paketten niet tonen
@@ -109,6 +113,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Bent u zeker dat u de installatie wilt stoppen?
 Onto:	InstallerWindow		Naar:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sluit alstublieft het venster van Boot Manager voordat u het Installer-venster sluit.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Wanneer u met succes Haiku voor het eerst start, lees dan onze \"Welkom\" en \"Gebruikersgids\" documentatie. Er staan links op het bureaublad en in de bladwijzers van WebPositive.\n\n
 Tools	InstallerWindow		Gereedschap
 The mount point could not be retrieved.	InstallProgress		Het betrekpunt kon niet worden opgehaald.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		De doelgegevensdrager is niet leeg. Bent u zeker dat u toch wilt installeren?\n\nLet op: De map 'system' zal een volledige kopie zijn van de brongegevensdrager. Alle andere mappen zullen worden samengevoegd, terwijl bestanden en links die bestaan op zowel bron- als doelgegevensdrager overschreven zullen worden door de versie van de brongegevensdrager.

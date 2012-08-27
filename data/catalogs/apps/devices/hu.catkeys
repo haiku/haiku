@@ -1,95 +1,95 @@
 1	hungarian	x-vnd.Haiku-Devices	865240481
-ACPI Information	DeviceACPI		ACPI információ
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI processzor névtér '%2'
-ACPI System Bus	DeviceACPI		ACPI rendszerbusz
-ACPI System Indicator	DeviceACPI		ACPI rendszerjelző
-ACPI Thermal Zone	DeviceACPI		ACPI hőzóna
-ACPI bus	Device		ACPI port
-ACPI bus	DevicesView		ACPI port
-ACPI controller	Device		ACPI vezérlő
-ACPI node '%1'	DeviceACPI		'%1' ACPI csomópont
-Array	DeviceSCSI		Halmaz
-Basic information	DevicesView		Alap információk
-Bridge	Device		Híd
-Bridge	DeviceSCSI		Híd
-Bus	DevicesView		Busz
-Bus Information	Device		Buszinformáció
-CD-ROM	DeviceSCSI		CD meghajtó
-Card Reader	DeviceSCSI		Kártyaolvasó
-Category	DevicesView		Kategória
-Changer	DeviceSCSI		Cserélő
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Osztályinformáció:\t\t\t\t: %classInfo%
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Osztály információi\t\t\t\t: %classinfo%
-Class info	DevicePCI		Osztály információ
-Communication controller	Device		Kommunikációs vezérlő
-Communications	DeviceSCSI		Kommunikáció
-Computer	Device		Számítógép
-Computer	DevicesView		Számítógép
-Connection	DevicesView		Kapcsolat
-Detailed	DevicesView		Részletezve
-Device	Device		Eszköz
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Eszköznév\t\t\t\t: %Name%\nGyártó\t\t\t: %Manufacturer%\nIllesztőprogram\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%
-Device class	DeviceSCSI		Eszközosztály
-Device name	Device		Eszköz neve
-Device name	DeviceACPI		Eszköznév
-Device name	DevicePCI		Eszköznév
-Device name	DeviceSCSI		Eszköznév
-Device name:	Device		Eszköz neve:
-Device paths	Device		Eszközelérési útvonalak
-Device paths	DevicePCI		Eszköz elérési útja
-Devices	DevicesView		Eszközök
-Devices	System name		Eszközök
-Disk Drive	DeviceSCSI		Lemezmeghajtó
-Display controller	Device		Kijelző vezérlő
-Docking station	Device		Dokkállomás
-Driver used	Device		Használt illesztőprogram
-Driver used	DevicePCI		Használt eszközkezelő
-Enclosure	DeviceSCSI		Befoglaló
-Encryption controller	Device		Titkosítási vezérlő
-Generate system information	DevicesView		Rendszerinformáció előállítása
-Generic system peripheral	Device		Általános rendszer periféria
-Graphics Peripheral	DeviceSCSI		Grafikai eszköz
-ISA bus	Device		ISA port
-ISA bus	DevicesView		ISA port
-Input device controller	Device		Beviteli eszköz vezérlő
-Intelligent controller	Device		Intelligens vezérlő
-Manufacturer	Device		Gyártó
-Manufacturer	DeviceACPI		Gyártó
-Manufacturer	DevicePCI		Gyártó
 Manufacturer	DeviceSCSI		Gyártó
-Manufacturer:	Device		Gyártó:
-Mass storage controller	Device		Háttértároló vezérlő
-Memory controller	Device		Memóriavezérlő
-Multimedia controller	Device		Multimedia vezérlő
-Name	PropertyList		Név
-Network controller	Device		Hálózati vezérlő
-None	Device		Nincs
-Not implemented	DeviceACPI		Nincs megvalósítva
-Not implemented	DevicePCI		Nincs mrgvalósítva
-Optical Drive	DeviceSCSI		Optikai meghajtó
 Order by:	DevicesView		Rendezés ez alapján:
-Other	DeviceSCSI		Egyéb
-PCI Information	DevicePCI		PCI információ
-PCI bus	Device		PCI port
-PCI bus	DevicesView		PCI port
+ACPI controller	Device		ACPI vezérlő
+Memory controller	Device		Memóriavezérlő
+Driver used	DevicePCI		Használt eszközkezelő
+CD-ROM	DeviceSCSI		CD meghajtó
+ISA bus	Device		ISA port
+ACPI bus	Device		ACPI port
+ISA bus	DevicesView		ISA port
+Docking station	Device		Dokkállomás
+Computer	Device		Számítógép
+Unknown device	Device		Ismeretlen eszköz
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Osztályinformáció:\t\t\t\t: %classInfo%
+Processor	DeviceSCSI		Processzor
+RBC	DeviceSCSI		RBC
+Detailed	DevicesView		Részletezve
+Category	DevicesView		Kategória
+Quit	DevicesView		Kilépés
+Device paths	Device		Eszközelérési útvonalak
+Scanner	DeviceSCSI		Szkenner
 Printer	DeviceSCSI		Nyomtató
 Processor	Device		Processzor
-Processor	DeviceSCSI		Processzor
-Quit	DevicesView		Kilépés
-RBC	DeviceSCSI		RBC
-Refresh devices	DevicesView		Eszközök frissítése
-Report compatibility	DevicesView		Kompatibilitás jelentése
-SCSI Information	DeviceSCSI		SCSI Információi
-Satellite communications controller	Device		Szatellit kommunikáció vezérlő
-Scanner	DeviceSCSI		Szkenner
-Serial bus controller	Device		Soros busz vezérlő
-Signal processing controller	Device		Jelfeldolgozó vezérlő
-Tape Drive	DeviceSCSI		Szalagmeghajtó
-Unclassified device	Device		Besorolatlan eszköz
-Unknown	DevicePCI		Ismeretlen
-Unknown device	Device		Ismeretlen eszköz
-Unknown device	DevicesView		Ismeretlen eszköz
-Value	PropertyList		Érték
-Wireless controller	Device		Vezeték nélküli vezérlő
-Worm	DeviceSCSI		Féreg
+Optical Drive	DeviceSCSI		Optikai meghajtó
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI processzor névtér '%2'
+Bridge	DeviceSCSI		Híd
 unknown	Device		ismeretlen
+ACPI Information	DeviceACPI		ACPI információ
+Generic system peripheral	Device		Általános rendszer periféria
+Not implemented	DevicePCI		Nincs mrgvalósítva
+Disk Drive	DeviceSCSI		Lemezmeghajtó
+Not implemented	DeviceACPI		Nincs megvalósítva
+Device name	DevicePCI		Eszköznév
+Display controller	Device		Kijelző vezérlő
+Mass storage controller	Device		Háttértároló vezérlő
+Input device controller	Device		Beviteli eszköz vezérlő
+Network controller	Device		Hálózati vezérlő
+Device class	DeviceSCSI		Eszközosztály
+Device name	DeviceACPI		Eszköznév
+Driver used	Device		Használt illesztőprogram
+Other	DeviceSCSI		Egyéb
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Eszköznév\t\t\t\t: %Name%\nGyártó\t\t\t: %Manufacturer%\nIllesztőprogram\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		ACPI hőzóna
+Communications	DeviceSCSI		Kommunikáció
+Bus	DevicesView		Busz
+Communication controller	Device		Kommunikációs vezérlő
+Manufacturer	DeviceACPI		Gyártó
+PCI bus	Device		PCI port
+ACPI System Indicator	DeviceACPI		ACPI rendszerjelző
+None	Device		Nincs
+PCI bus	DevicesView		PCI port
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Osztály információi\t\t\t\t: %classinfo%
+Basic information	DevicesView		Alap információk
+PCI Information	DevicePCI		PCI információ
+Manufacturer:	Device		Gyártó:
+ACPI bus	DevicesView		ACPI port
+Changer	DeviceSCSI		Cserélő
+ACPI System Bus	DeviceACPI		ACPI rendszerbusz
+Devices	System name		Eszközök
+Worm	DeviceSCSI		Féreg
+Multimedia controller	Device		Multimedia vezérlő
+Unknown	DevicePCI		Ismeretlen
+Device name:	Device		Eszköz neve:
+Computer	DevicesView		Számítógép
+Value	PropertyList		Érték
+Report compatibility	DevicesView		Kompatibilitás jelentése
+Device	Device		Eszközök
+Signal processing controller	Device		Jelfeldolgozó vezérlő
+Serial bus controller	Device		Soros busz vezérlő
+Wireless controller	Device		Vezeték nélküli vezérlő
+ACPI node '%1'	DeviceACPI		ACPI csomópont '%1'
+Device name	Device		Eszköznév
+Manufacturer	Device		Gyártó
+Name	PropertyList		Név
+Manufacturer	DevicePCI		Gyártó
+Intelligent controller	Device		Intelligens vezérlő
+Satellite communications controller	Device		Műholdas kommunikációs vezérlő
+SCSI Information	DeviceSCSI		SCSI-információk
+Enclosure	DeviceSCSI		Doboz
+Array	DeviceSCSI		Tömb
+Bridge	Device		Híd
+Refresh devices	DevicesView		Eszközök frissítése
+Unknown device	DevicesView		Ismeretlen eszköz
+Graphics Peripheral	DeviceSCSI		Grafikus periféria
+Tape Drive	DeviceSCSI		Szalagos meghajtó
+Bus Information	Device		Busz-információ
+Connection	DevicesView		Csatlakozás
+Generate system information	DevicesView		Rendszerinformáció létrehozása
+Encryption controller	Device		Titkosító vezérlő
+Unclassified device	Device		Nem besorolt eszköz
+Device name	DeviceSCSI		Eszköznév
+Card Reader	DeviceSCSI		Kártyaolvasó
+Class info	DevicePCI		Osztály-információk
+Device paths	DevicePCI		Eszközelérési útvonalak
+Devices	DevicesView		Eszközök

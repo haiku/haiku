@@ -1,0 +1,15 @@
+1	hungarian	x-vnd.Haiku-GLifeScreensaver	1707534289
+Grid Border: %li	GLife ScreenSaver		Rács határ: %li
+Grid Width: 	GLife ScreenSaver		Rácsszélesség:
+none	GLife ScreenSaver		nincs
+Grid Height: 	GLife ScreenSaver		Rácsmagasság
+%sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
+None	GLife ScreenSaver		Nincs
+4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
+Grid Width: %li	GLife ScreenSaver		Rács szélessége: %li
+Grid Height: %li	GLife ScreenSaver		Rács magassága: %li
+Grid Life Delay: 	GLife ScreenSaver		Késleltetés:
+OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Életjáték\"
+Grid Life Delay: %s	GLife ScreenSaver		Késleltetés: %s
+Grid Border: 	GLife ScreenSaver		Keret:
+by Aaron Hill	GLife ScreenSaver		Aaron Hill által

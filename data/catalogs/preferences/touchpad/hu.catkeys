@@ -1,20 +1,20 @@
 1	hungarian	x-vnd.Haiku-Touchpad	607725922
-Acceleration	TouchpadPrefView		Gyorsulás
-Cancel	TouchpadPrefView		Mégse
-Defaults	TouchpadPrefView		Alapértelmezés
-Fast	TouchpadPrefView		Gyors
-High	TouchpadPrefView		Magas
-Horizontal	TouchpadPrefView		Vízszintes
-Horizontal scrolling	TouchpadPrefView		Vízszintes görgetés
-OK	TouchpadPrefView		OK
-Off	TouchpadPrefView		Ki
-Please confirm	TouchpadPrefView		Kérjük, erősítse meg
-Revert	TouchpadPrefView		Visszaállít
 Scrolling	TouchpadPrefView		Görgetés
-Sensitivity	TouchpadPrefView		Érzékenység
-Slow	TouchpadPrefView		Lassú
-Tapping	TouchpadPrefView		Érintőtábla használata
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Az új görgetési terület túl nagy és hátráltathatja az egér használatában. Biztos meg szeretné változtatni?
 Touchpad	System name		Érintőtábla
+Revert	TouchpadPrefView		Visszaállít
+Tapping	TouchpadPrefView		Érintőtábla használata
+Please confirm	TouchpadPrefView		Kérjük, erősítse meg
 Two finger scrolling	TouchpadPrefView		Kétujjas görgetés
+Defaults	TouchpadPrefView		Alapértelmezés
+Slow	TouchpadPrefView		Lassú
 Vertical	TouchpadPrefView		Függőleges
+High	TouchpadPrefView		Magas
+Horizontal scrolling	TouchpadPrefView		Vízszintes görgetés
+Fast	TouchpadPrefView		Gyors
+OK	TouchpadPrefView		OK
+Acceleration	TouchpadPrefView		Gyorsulás
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Az új görgetési terület túl nagy és hátráltathatja az egér használatában. Biztos meg szeretné változtatni?
+Horizontal	TouchpadPrefView		Vízszintes
+Off	TouchpadPrefView		Ki
+Sensitivity	TouchpadPrefView		Érzékenység
+Cancel	TouchpadPrefView		Mégse

@@ -1,20 +1,20 @@
 1	hungarian	x-vnd.Haiku-VirtualMemory	688347876
-%Ld B	SettingsWindow		%Ld B
-Changes will take effect on restart!	SettingsWindow		A változtatások csak újraindítás után válnak érvényessé!
-Current swap file size: 	SettingsWindow		Jelenlegi cserefájl mérete: 
-Defaults	SettingsWindow		Alapértelmezés
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		A virtuális memória kikapcsolása egyes esetekkor nem kívánt hatással lehet a rendszer stabilitására.\nAmíg a rendszermemória el nem fogy, addig a virtuális memória használatára nincs szükség.\n\nBiztosan ki szeretné kapcsolni ezt a funkciót?
-Enable virtual memory	SettingsWindow		Virtuális memória engedélyezése
-GB	SettingsWindow		GB
-Insufficient space for a swap file.	SettingsWindow		Nincs elég hely a cserefájlnak.
-KB	SettingsWindow		KB
-Keep enabled	SettingsWindow		Tartsa bekapcsolva
-MB	SettingsWindow		MB
-OK	VirtualMemoryApp		OK
-Physical memory: 	SettingsWindow		Fizikai memória: 
-Requested swap file size:	SettingsWindow		Az igényelt cserefájl mérete:
-Revert	SettingsWindow		Visszaállít
 Turn off	SettingsWindow		Kikapcsol
+GB	SettingsWindow		GB
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		A virtuális memória kikapcsolása egyes esetekkor nem kívánt hatással lehet a rendszer stabilitására.\nAmíg a rendszermemória el nem fogy, addig a virtuális memória használatára nincs szükség.\n\nBiztosan ki szeretné kapcsolni ezt a funkciót?
+Requested swap file size:	SettingsWindow		Az igényelt cserefájl mérete:
+Physical memory: 	SettingsWindow		Fizikai memória: 
+Changes will take effect on restart!	SettingsWindow		A változtatások csak újraindítás után válnak érvényessé!
+Defaults	SettingsWindow		Eredeti
+KB	SettingsWindow		KB
 Use volume:	SettingsWindow		Partíció:
-VirtualMemory	System name		VirtuálisMemória
+Insufficient space for a swap file.	SettingsWindow		Nincs elég hely a cserefájlnak.
+Keep enabled	SettingsWindow		Tartsa bekapcsolva
+Revert	SettingsWindow		Visszaállít
+VirtualMemory	System name		Virtuális memória
+Current swap file size: 	SettingsWindow		Jelenlegi cserefájl mérete: 
+OK	VirtualMemoryApp		OK
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuális memória\n\tÍrta Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Virtuális memória engedélyezése
+MB	SettingsWindow		MB
+%Ld B	SettingsWindow		%Ld B

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-FileTypes	2037267651
+1	dutch; flemish	x-vnd.Haiku-FileTypes	2496450458
 Application types…	FileTypes Window		Toepassingstypes...
 Description:	Application Types Window		Beschrijving:
 Args only	Application Type Window		Alleen argumenten
@@ -49,6 +49,7 @@ Name:	Application Types Window		Naam:
 Group name:	New File Type Window		Groepnaam:
 Preferred application	FileType Window		Voorkeurstoepassing
 Progress	Application Types Window		Voortgang
+Set preferred application	Preferred App Menu		Voorkeurstoepassing instellen
 File	Application Type Window		Bestand
 Version:	Application Type Window		Versie:
 Select…	FileTypes Window		Selecteer...

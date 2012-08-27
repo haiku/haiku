@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Appearance	1933110481
+1	dutch; flemish	x-vnd.Haiku-Appearance	436973754
 Plain font:	Font view		Standaardlettertype:
 Control highlight	Colors tab		Keuze-accent
 Control border	Colors tab		Keuzerand
@@ -23,6 +23,7 @@ Tooltip background	Colors tab		Achtergrond Tooltip
 Selected menu item background	Colors tab		Achtergrond geselecteerd menu-item
 Antialiasing	APRWindow		Anti-aliasing
 Navigation base	Colors tab		Basis navigatie
+Selected list item text	Colors tab		Tekst geselecteerd lijstitem
 Window border	Colors tab		Vensterrand
 Window tab text	Colors tab		Tekst venstertab
 Document text	Colors tab		Tekst document
@@ -30,6 +31,7 @@ Navigation pulse	Colors tab		Puls navigatie
 Window decorator:	DecorSettingsView		Vensterdecorator:
 Selected menu item text	Colors tab		Tekst geselecteerd menu-item
 Menu background	Colors tab		Achtergrond menu
+List background	Colors tab		Achtergrond van lijst
 OK	DecorSettingsView		OK
 Size:	Font Selection view		Grootte:
 Panel background	Colors tab		Achtergrond paneel

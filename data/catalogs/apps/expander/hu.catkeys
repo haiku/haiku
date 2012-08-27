@@ -1,49 +1,49 @@
-1	hungarian	x-vnd.Haiku-Expander	187676748
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Biztosan le szeretné állítani\na kibontást? A kibontás még nem fejeződött be.
-Automatically expand files	ExpanderPreferences		Fájlok automatikus kibontása
-Automatically show contents listing	ExpanderPreferences		Tartalom listázása automatikusan
-Cancel	ExpanderPreferences		Mégse
-Cancel	ExpanderWindow		Mégsem
-Close	ExpanderMenu		Bezár
-Close window when done expanding	ExpanderPreferences		A kibontás végeztével zárja be az ablakot
-Continue	ExpanderWindow		Folytatás
-Creating listing for '%s'	ExpanderWindow		'%s' lista létrehozása
-Destination	ExpanderWindow		Cél
-Destination folder:	ExpanderPreferences		Célmappa:
-Error when expanding archive	ExpanderWindow		Hiba történt a kibontás közben
+1	hungarian	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Kibontás
-Expand	ExpanderWindow		Kibont
-Expander	System name		Kibontó
-Expander settings	ExpanderPreferences		Kibontó beállításai
-Expander: Choose destination	DirectoryFilePanel		Kibontó: Cél választása
-Expander: Open	ExpanderWindow		Kibontó: Megnyitás
-Expanding '%s'	ExpanderWindow		'%s' kibontása
-Expansion:	ExpanderPreferences		Kibontás:
-File	ExpanderMenu		Fájl
-File expanded	ExpanderWindow		A fájl kibontva
-Hide contents	ExpanderWindow		Tartalom elrejtése
-Leave destination folder path empty	ExpanderPreferences		Hagyja üresen a célmappa útvonalát
-OK	ExpanderPreferences		OK
-Open destination folder after extraction	ExpanderPreferences		Kibontás után nyissa meg a célmappát
-Other:	ExpanderPreferences		Egyéb:
-Same directory as source (archive) file	ExpanderPreferences		A mappa amiben a forrásfájl (az archívum) van
-Select	DirectoryFilePanel		Kiválaszt
-Select	ExpanderPreferences		Kiválasztás
-Select '%s'	DirectoryFilePanel		'%s' kiválasztása
-Select current	DirectoryFilePanel		Jelenlegi kiválasztása
+Close window when done expanding	ExpanderPreferences		A kibontás végeztével zárja be az ablakot
 Set destination…	ExpanderMenu		Cél választása…
-Set source…	ExpanderMenu		Forrás beállítása…
+Use:	ExpanderPreferences		Hasznája ezt:
+File expanded	ExpanderWindow		A fájl kibontva
+The destination is read only.	ExpanderWindow		A cél nem írható.
+Expander: Open	ExpanderWindow		Kibontó: Megnyitás
+ is not supported	ExpanderWindow		nem támogatott
+Expander settings	ExpanderPreferences		Kibontó beállításai
+Select current	DirectoryFilePanel		Jelenlegi kiválasztása
+Source	ExpanderWindow		Forrás
+Error when expanding archive	ExpanderWindow		Hiba történt a kibontás közben
+Hide contents	ExpanderWindow		Tartalom elrejtése
+Cancel	ExpanderWindow		Mégsem
+Automatically expand files	ExpanderPreferences		Fájlok automatikus kibontása
+Creating listing for '%s'	ExpanderWindow		'%s' lista létrehozása
+Continue	ExpanderWindow		Folytatás
+Destination folder	ExpanderPreferences		Célmappa
+The destination folder does not exist.	ExpanderWindow		A célkönyvtár nem létezik.
+Other	ExpanderPreferences		Egyéb
+Cancel	ExpanderPreferences		Mégse
+Expansion	ExpanderPreferences		Kiterjesztés
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Biztosan le szeretné állítani\na kibontást? A kibontás még nem fejeződött be.
+Select	DirectoryFilePanel		Kiválaszt
+Same directory as source (archive) file	ExpanderPreferences		A mappa amiben a forrásfájl (az archívum) van
+Expanding '%s'	ExpanderWindow		'%s' kibontása
 Settings	ExpanderMenu		Beállítások
 Settings…	ExpanderMenu		Beállítások…
-Show contents	ExpanderMenu		Tartalom megjelenítése
+Expander: Choose destination	DirectoryFilePanel		Kibontó: Cél választása
+Select	ExpanderPreferences		Kiválasztás
 Show contents	ExpanderWindow		Tartalom megjelenítése
-Source	ExpanderWindow		Forrás
-Stop	ExpanderMenu		Leállítás
-Stop	ExpanderWindow		Megállít
-The destination folder does not exist.	ExpanderWindow		A célkönyvtár nem létezik.
-The destination is not a folder.	ExpanderWindow		A cél nem könyvtárra mutat.
-The destination is read only.	ExpanderWindow		A cél nem írható.
-The file doesn't exist	ExpanderWindow		A fájl nem létezik
+Automatically show contents listing	ExpanderPreferences		Tartalom listázása automatikusan
+OK	ExpanderPreferences		OK
+Leave destination folder path empty	ExpanderPreferences		Hagyja üresen a célmappa útvonalát
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		A könyvtár át lett mozgatva, nevezve vagy nem\ntámogatott.
-Use:	ExpanderPreferences		Hasznája ezt:
-is not supported	ExpanderWindow		nem támogatott
+The file doesn't exist	ExpanderWindow		A fájl nem létezik
+Stop	ExpanderMenu		Leállítás
+File	ExpanderMenu		Fájl
+Expander	System name		Kibontó
+Expand	ExpanderWindow		Kibont
+Close	ExpanderMenu		Bezár
+The destination is not a folder.	ExpanderWindow		A cél nem könyvtárra mutat.
+Open destination folder after extraction	ExpanderPreferences		Kibontás után nyissa meg a célmappát
+Set source…	ExpanderMenu		Forrás beállítása…
+Select '%s'	DirectoryFilePanel		'%s' kiválasztása
+Show contents	ExpanderMenu		Tartalom megjelenítése
+Stop	ExpanderWindow		Megállít
+Destination	ExpanderWindow		Cél

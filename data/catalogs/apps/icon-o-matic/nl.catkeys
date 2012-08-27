@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	2591538723
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	2079362081
 Select All	Icon-O-Matic-PathManipulator		Alles selecteren
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
 Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#02x%02x%02x)
@@ -65,6 +65,7 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		Vorm verwijderen
 Reverse	Icon-O-Matic-PathsList		Omgekeerd
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-broncode
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Transformaties opnieuw instellen
+Settings	Icon-O-Matic-Menus		Instellingen
 All	Icon-O-Matic-Properties		Alle
 Multi Paste Properties	Icon-O-Matic-Properties		Eigenschappen van meervoudig plakken
 Undo	Icon-O-Matic-Main		Ongedaan maken
@@ -117,6 +118,7 @@ Gradient	Icon-O-Matic-StyleTypes		Gradiënt
 Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON-attribuut
 Invert selection	Icon-O-Matic-Properties		Selectie omkeren
+Drop shapes	Icon-O-Matic-ShapesList		Vormen laten vervallen
 Export as…	Icon-O-Matic-Menu-File		Exporteren als...
 Transformation	Transformation		Transformatie
 Click on an object in	Empty property list - 1st line		Klik op een object in

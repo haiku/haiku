@@ -1,22 +1,23 @@
-1	hungarian	x-vnd.Haiku-NetworkStatus	853756860
-%ifaceName information:\n	NetworkStatusView		%ifaceName információi:\n
+1	hungarian	x-vnd.Haiku-NetworkStatus	2931949650
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus opciói:\n\t--deskbar\tautomatikusan hozzáad egy másolatot a Deskbarhoz\n\t--help\t\tkiírja ezt és kilép\n
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		A NetworkStatus futtatható ablakban, vagy telepíthető a Deskbarra.
 <no wireless networks found>	NetworkStatusView		<nem található vezeték nélküli hálózat>
-Address	NetworkStatusView		Cím
-Broadcast	NetworkStatusView		Broadcast
-Configuring	NetworkStatusView		Konfigurálás
-Could not join wireless network:\n	NetworkStatusView		Nem lehet csatlakozni a vezeték nélküli hálózatra:\n
+Run in window	NetworkStatus		Futtatás ablakban
+No link	NetworkStatusView		Nincs kapcsolat
 Install in Deskbar	NetworkStatus		Telepítés a Deskbarra
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Nem sikerült elindítani a hálózati prefletet.\n\nHiba:
-Netmask	NetworkStatusView		Hálózati maszk
-NetworkStatus	System name		NetworkStatus
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus opciói:\n\t--deskbar\tautomatikusan hozzáad egy másolatot a Deskbarhoz\n\t--help\t\tkiírja ezt és kilép\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tírta: %1 és Hugo Santos\n\t%2, Haiku, Inc.\n
-No link	NetworkStatusView		Nincs kapcsolat
-No stateful configuration	NetworkStatusView		Nincs konfiguráció
-OK	NetworkStatusView		OK
-Open network preferences…	NetworkStatusView		Hálózati beállítások megnyitása...
-Quit	NetworkStatusView		Kilépés
-Ready	NetworkStatusView		Kész
-Run in window	NetworkStatus		Futtatás ablakban
+Netmask	NetworkStatusView		Hálózati maszk
+Broadcast	NetworkStatusView		Broadcast
 Unknown	NetworkStatusView		Ismeretlen
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		A NetworkStatus futtatható ablakban, vagy telepíthető a Deskbarra.
+Network Status	NetworkStatusView		Hálózat állapota
+Ready	NetworkStatusView		Kész
+No stateful configuration	NetworkStatusView		Nincs konfiguráció
+%ifaceName information:\n	NetworkStatusView		%ifaceName információi:\n
+Configuring	NetworkStatusView		Konfigurálás
+Address	NetworkStatusView		Cím
+OK	NetworkStatusView		OK
+NetworkStatus	System name		NetworkStatus
+Open network preferences…	NetworkStatusView		Hálózati beállítások megnyitása...
+Could not join wireless network:\n	NetworkStatusView		Nem lehet csatlakozni a vezeték nélküli hálózatra:\n
+Quit	NetworkStatusView		Kilépés

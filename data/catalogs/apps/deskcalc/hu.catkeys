@@ -1,7 +1,9 @@
-1	hungarian	x-vnd.Haiku-DeskCalc	1916192649
-Audio Feedback	CalcView		Visszajelzés hanggal
-Basic	CalcView		Alap
+1	hungarian	x-vnd.Haiku-DeskCalc	3276968552
 Compact	CalcView		Kompakt
-DeskCalc	System name		Számológép
-Enable Num Lock on startup	CalcView		Num Lock bekapcsolása indításkor
 Scientific	CalcView		Tudományos
+DeskCalc	System name		Számológép
+Basic	CalcView		Alap
+Radians	CalcView		Radián
+Enable Num Lock on startup	CalcView		Numerikus billentyűzet bekapcsolása indításkor
+Degrees	CalcView		Fok
+Audio Feedback	CalcView		Hangos visszajelzés

@@ -1,50 +1,50 @@
 1	hungarian	x-vnd.Haiku-Notifications	3631903554
-Allowed	NotificationView		Engedélyezve
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Hiba történt a beállítások mentése során.\nLehet hogy elfogyott a hely a lemezen.
-Application	NotificationView		Alkalmazás
-Applications	NotificationView		Alkalmazások
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nem lehet engedélyezni az értesítéseket indításkor, valószínűleg nem rendelkezik írási jogosultságokkal a boot beállításmappájához.
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nem lehet menteni a beállításokat, valószínűleg nem rendelkezik írási jogosultságokkal a boot beállításmappához.
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nem lehet menteni a beállításokat, valószínűleg ön nem rendelkezik írási jogosultságokkal a beállításmappához, vagy megtelt a lemez.
-Cannot disable notifications because the server can't be reached.	GeneralView		Nem lehet letiltani az értesítéseket, mert nem sikerült elérni a kiszolgálót.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nem lehet leállítani az értesítéseket, mert nem sikerült elérni a kiszolgálót.\nEbből következően az InfoPopper telepítése sem volt sikeres.
-Disable notifications	GeneralView		Értesítések letiltása
-Display	PrefletView		Kijelző
-Enable notifications	GeneralView		Értesítések engedélyezése
-Enable notifications at startup	GeneralView		Értesítések engedélyezése indításkor
-Enabled	NotificationView		Engedélyezve
-Error	NotificationView		Hiba
-Events are not notified	GeneralView		Az eseményekről nem lesz értesítés
-Events are notified	GeneralView		Az eseményekről lesz értesítés
-General	PrefletView		Általános
-Hide notifications from screen after	GeneralView		Értesítések elrejtése
-Icon size:	DisplayView		Ikonok mérete:
-Important	NotificationView		Fontos
-Information	NotificationView		Információ
-Large icon	DisplayView		Nagy ikon
-Last Received	NotificationView		Legutóbbi fogadott
-Mini icon	DisplayView		Mini ikon
-No	NotificationView		Nem
 Notifications	GeneralView		Értesítések
-Notifications	NotificationView		Értesítések
-Notifications	PrefletView		Értesítések
-Notifications	System name		Értesítések
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Nem lehet leállítani az értesítéseket, mert nem sikerült elérni a kiszolgálót.
-OK	DisplayView		OK
-OK	GeneralView		OK
-OK	NotificationView		OK
-Progress	NotificationView		Folyamat
+seconds of inactivity	GeneralView		másodpercnyi inaktivitás után
 Revert	PrefletWin		Visszaállítás
+Mini icon	DisplayView		Mini ikon
+Enable notifications	GeneralView		Értesítések engedélyezése
+Error	NotificationView		Hiba
+OK	GeneralView		OK
+Events are not notified	GeneralView		Az eseményekről nem lesz értesítés
 Save	PrefletWin		Mentés
+Type	NotificationView		Típus
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Nem lehet leállítani az értesítéseket, mert nem sikerült elérni a kiszolgálót.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nem lehet leállítani az értesítéseket, mert nem sikerült elérni a kiszolgálót.\nEbből következően az InfoPopper telepítése sem volt sikeres.
+OK	NotificationView		OK
+Important	NotificationView		Fontos
+Cannot disable notifications because the server can't be reached.	GeneralView		Nem lehet letiltani az értesítéseket, mert nem sikerült elérni a kiszolgálót.
+Progress	NotificationView		Folyamat
+Last Received	NotificationView		Legutóbbi fogadott
+General	PrefletView		Általános
+Display	PrefletView		Kijelző
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nem lehet engedélyezni az értesítéseket indításkor, valószínűleg nem rendelkezik írási jogosultságokkal a boot beállításmappájához.
 Search:	NotificationView		Keresés:
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Nem sikerült elérni a kiszolgálót, és ebből következően az InfoPopper telepítése sem volt sikeres.
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Az értesítéskiszolgáló nem található.\nLehet, hogy nem lett jól feltelepítve.
+Allowed	NotificationView		Engedélyezve
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nem lehet menteni a beállításokat, valószínűleg ön nem rendelkezik írási jogosultságokkal a beállításmappához, vagy megtelt a lemez.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Nem sikerült menteni a beállításokat, valószínűleg ön nem rendelkezik írási jogosultságokkal a beállításmappához.
+Yes	NotificationView		Igen
+Large icon	DisplayView		Nagy ikon
+Icon size:	DisplayView		Ikonok mérete:
+Hide notifications from screen after	GeneralView		Értesítések elrejtése
+Disable notifications	GeneralView		Értesítések letiltása
+Notifications	System name		Értesítések
+Notifications	NotificationView		Értesítések
+No	NotificationView		Nem
+Title	NotificationView		Cím
+Information	NotificationView		Információ
+Window width:	DisplayView		Ablakszélesség:
+Application	NotificationView		Alkalmazás
+Enabled	NotificationView		Engedélyezve
+OK	DisplayView		OK
+Unknown	NotificationView		Ismeretlen
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nem lehet menteni a beállításokat, valószínűleg nem rendelkezik írási jogosultságokkal a boot beállításmappához.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Nem sikerült menteni a beállításokat.\nValószínűleg nem rendelkezik írási jogosultságokkal a beállításmappához.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Nem sikerült menteni a beállításokat.\nValószínűleg nem rendelkezik írási jogosultságokkal a beállításmappához.
-Title	NotificationView		Cím
-Type	NotificationView		Típus
-Unknown	NotificationView		Ismeretlen
-Window width:	DisplayView		Ablakszélesség:
-Yes	NotificationView		Igen
-seconds of inactivity	GeneralView		másodpercnyi inaktivitás után
+Enable notifications at startup	GeneralView		Értesítések engedélyezése indításkor
+Notifications	PrefletView		Értesítések
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Nem sikerült elérni a kiszolgálót, és ebből következően az InfoPopper telepítése sem volt sikeres.
+Applications	NotificationView		Alkalmazások
+Events are notified	GeneralView		Az eseményekről lesz értesítés

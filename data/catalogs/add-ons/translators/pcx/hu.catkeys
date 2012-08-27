@@ -1,8 +1,8 @@
-1	hungarian	x-vnd.Haiku-PCXTranslator	1002061545
-PCX %lu bit image	PCXTranslator		PCX %lu-bites kép
+1	hungarian	x-vnd.Haiku-PCXTranslator	938242683
 PCX Settings	main		PCX Beállítások
-PCX images	ConfigView		PCX képek
-PCX images	PCXTranslator		PCX képek
-PCX translator	PCXTranslator		PCX fordító
-PCXTranslator Settings	ConfigView		PCX fordító beállításai
 Version %d.%d.%d, %s	ConfigView		%d.%d.%d, %s verzió
+PCXTranslator Settings	ConfigView		PCX fordító beállításai
+PCX image translator	PCXTranslator		PCX kép értelmező
+PCX %lu bit image	PCXTranslator		PCX %lu-bites kép
+PCX images	PCXTranslator		PCX képek
+PCX image translator	ConfigView		PCX kép értelmező

@@ -1,0 +1,137 @@
+1	hungarian	x-vnd.Haiku-WebPositive	1513721873
+Show home button	Settings Window		Kezdőlap-gomb megjelenítése
+Username:	Authentication Panel		Felhasználónév:
+Copy URL to clipboard	Download Window		Cím másolása a vágólapra
+Cancel	Settings Window		Mégse
+Close window	WebPositive Window		Ablak bezárása
+Quit	WebPositive		Kilépés
+The download could not be opened.	Download Window		A letöltés nem nyitható meg.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	A letöltések mappája nem nyitható meg.\n\nHiba: %error
+Open location	WebPositive Window		Cím megnyitása
+Clear history	WebPositive Window		Előzmények törlése
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Tegnap
+Default standard font size:	Settings Window		Alapértelmezett betűméret:
+Start page:	Settings Window		Kezdőlap:
+History	WebPositive Window		Előzmény
+Error opening downloads folder	Download Window		Hiba történt a letöltések mappa megnyitásakor
+Paste	WebPositive Window		Beillesztés
+Settings	Settings Window		Beállítások
+%seconds seconds left	Download Window		%seconds másodperc van hátra
+Confirmation	WebPositive Window		Megerősítés
+Window	WebPositive Window		Ablak
+Decrease size	WebPositive Window		Méret csökkentése
+Serif font:	Settings Window		Serif betűtípus:
+Loading %url	WebPositive Window		%url betöltése
+Page source	WebPositive Window		Oldal forrása
+Next	WebPositive Window		Következő
+Find next	WebPositive Window		Következő keresése
+Download folder:	Settings Window		Letöltések helye:
+Edit	WebPositive Window		Szerkesztés
+Over %hours hours left	Download Window		Több, mint %hours óra van hátra
+Cancel	Authentication Panel		Mégse
+Match case	WebPositive Window		Kis- és nagybetű megkülönböztetése
+Search page:	Settings Window		Keresőoldal:
+Zoom text only	WebPositive Window		Csak a szöveg nagyítása
+Default fixed font size:	Settings Window		Alapértelmezett rögzített betűméret:
+Close tab	WebPositive Window		Oldal bezárása
+Auto-hide mouse pointer	Settings Window		Egérmutató automatikus elrejtése
+Over 1 hour left	Download Window		Több, mint 1 óra van hátra
+Quit	WebPositive Window		Kilépés
+Full screen	WebPositive Window		Teljes képernyő
+Open download error	Download Window		A letöltés nem nyitható meg
+Standard font:	Settings Window		Normál betűtípus:
+Restart	Download Window		Újraindítás
+Proxy server	Settings Window		Proxy kiszolgáló
+Open containing folder	Download Window		Tartalmazó mappa megnyitása
+New window	WebPositive Window		Új ablak
+Open	Download Window		Megnyitás
+Reload	WebPositive Window		Újratöltés
+Downloads	Download Window		Letöltések
+Sans serif font:	Settings Window		Sans serif betűtípus:
+Over %days days left	Download Window		Több, mint %days nap van hátra
+Forward	WebPositive Window		Előre
+of	Download Window	...as in '12kB of 256kB'	/
+Revert	Settings Window		Visszaállít
+Fixed font:	Settings Window		Rögzített szélességű betűtípus:
+Cut	WebPositive Window		Kivágás
+Bookmark this page	WebPositive Window		Könyvjelző az oldalhoz
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hiba történt a Könyvjelzők mappa megjelenítésekor.\n\nHiba: %error
+Open downloads folder	Download Window		A letöltési mappa megnyitása
+Number of days to keep links in History menu:	Settings Window		Előzmények megtartásának ideje (nap):
+Hide	Download Window		Elrejtés
+Reset size	WebPositive Window		Méret visszaállítása
+Find:	WebPositive Window		Keresés:
+Increase size	WebPositive Window		Méret növelése
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Hiba történt a Könyvjelzők mappa lekérésekor.\n\nHiba: %error
+Over 1 day left	Download Window		Több, mint 1 nap van hátra
+Downloads	WebPositive Window		Letöltések
+Requesting %url	WebPositive Window		%url megnyitása
+Apply	Settings Window		Alkalmaz
+Bookmark info	WebPositive Window		Könyvjelző információk
+Size:	Font Selection view		Méret:
+Show tabs if only one page is open	Settings Window		A fülek megjelenítése, ha csak egy van megnyitva
+About	WebPositive Window		Névjegy
+Finish: 	Download Window	Finishing time	Befejezés:
+Fonts	Settings Window		Betűtípusok
+Close	WebPositive Window		Bezárás
+OK	Download Window		Rendben
+Page source error	WebPositive Window		Hiba az oldal forrásában
+Open blank page	Settings Window		Megnyitás üres oldalon
+New tabs:	Settings Window		Új fülek:
+Cancel	WebPositive Window		Mégse
+Open all	WebPositive Window		Az összes megnyitása
+Clear	URL Bar		Törlés
+Cut	URL Bar		Kivágás
+Clear	WebPositive Window		Törlés
+Remove	Download Window		Eltávolítás
+Find	WebPositive Window		Keresés
+Find previous	WebPositive Window		Előző találat
+Settings	WebPositive Window		Beállítások
+Proxy server address:	Settings Window		Proxy-kiszolgáló címe:
+Proxy server port:	Settings Window		Proxy-kiszolgáló port:
+Bookmarks	WebPositive Window		Könyvjelzők
+%minutes minutes	Download Window		%minutes perc
+Paste	URL Bar		Beillesztés
+/s)	Download Window	...as in 'per second'	/mp)
+Hide password text	Authentication Panel		Jelszó elrejtése
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
+Over 1 minute left	Download Window		Több, mint 1 perc van hátra
+Open start page	Settings Window		Kezdőlap megnyitása
+Continue downloads	WebPositive		Letöltések folytatása
+Cancel	Download Window		Mégse
+Open search page	Settings Window		Keresőoldal megnyitása
+Password:	Authentication Panel		Jelszó:
+Back	WebPositive Window		Vissza
+New browser window	Download Window		Új böngésző-ablak
+Today	WebPositive Window		Ma
+1 second left	Download Window		1 másodperc van hátra
+Remember username and password for this site	Authentication Panel		Felhasználói név és jelszó megjegyzése
+Earlier	WebPositive Window		Korábban
+Authentication required	Authentication Panel		Hitelesítés szükséges
+Use proxy server to connect to the internet	Settings Window		Proxy használata az internetre történő csatlakozáshoz
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Letöltés van folyamatban. Biztosan be akarja zárni a programot?
+Auto-hide interface in full screen mode	Settings Window		Vezérlők elrejtése teljes képernyős módban
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url betöltése sikertelen
+New tab	WebPositive Window		Új fül
+Downloads in progress	WebPositive		Letöltés folyamatban
+Style:	Font Selection view		Stílus:
+General	Settings Window		Általános
+View	WebPositive Window		Megjelenítés
+Previous	WebPositive Window		Előző
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hiba történt a könyvjelző létrehozásakor.\n\nHiba: %error
+Bookmark error	WebPositive Window		Könyvjelző hiba
+Do you really want to clear the browsing history?	WebPositive Window		Biztosan törölni szeretné az előzményeket?
+Copy	WebPositive Window		Másolás
+Open bookmarks confirmation	WebPositive Window		Könyvjelzők megerősítése
+Remove missing	Download Window		Hiányzó törlése
+Clone current page	Settings Window		Jelenlegi oldal másolása
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Biztosan meg akar nyitni %addedCount könyvjelzőt egyszerre?
+OK	Authentication Panel		Rendben
+Copy	URL Bar		Másolás
+OK	WebPositive Window		Rendben
+Manage bookmarks	WebPositive Window		Könyjelzők kezelése
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ehhez az oldalhoz (%bookmarkName) már tartozik könyvjelző.
+New windows:	Settings Window		Új ablak:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url betöltése kész
+Remove finished	Download Window		Elkészültek eltávolítása a listából

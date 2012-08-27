@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-MAIL	849531913
+1	dutch; flemish	x-vnd.Be-MAIL	1599879742
 View	Mail		Bekijken
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attributen bijvoegen:
@@ -27,6 +27,7 @@ Expert	Mail		Expert
 Reply account:	Mail		Antwoordaccount:
 Discard	Mail		Verwerpen
 Message	Mail		Bericht
+Settings…	Mail		Instellingen…
 Reply to sender	Mail		Afzender beantwoorden
 There is no installed handler for URL links.	Mail		Er is geen toepassing voor het openen van URL-links.
 Signature	Mail		Onderschrift
@@ -81,6 +82,7 @@ Only files can be added as attachments.	Mail		Alleen bestanden kunnen bijlagen w
 Previous message	Mail		Vorig bericht
 Attachments:	Mail		Bijlagen: 
 Title:	Mail		Titel:
+<no account found>	Mail		<geen account gevonden>
 Find…	Mail		Zoeken...
 Accounts…	Mail		Accounts…
 Mail preferences	Mail		Mailvoorkeuren

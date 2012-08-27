@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	3337401776
+1	russian	x-vnd.Be-MAIL	1599879742
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
@@ -82,6 +82,7 @@ Only files can be added as attachments.	Mail		Только файлы могут
 Previous message	Mail		Предыдущее письмо
 Attachments:	Mail		Вложения:
 Title:	Mail		Заголовок:
+<no account found>	Mail		<аккаунт не найден>
 Find…	Mail		Найти…
 Accounts…	Mail		Аккаунты…
 Mail preferences	Mail		Настройки почты

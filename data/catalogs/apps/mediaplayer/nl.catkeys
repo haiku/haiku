@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	3420861950
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	2969013755
 raw audio	MediaPlayer-InfoWin		ruwe audio
 Location	MediaPlayer-InfoWin		Locatie
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
@@ -13,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Afspeellijst bewaren
 (not supported)	MediaPlayer-InfoWin		(niet ondersteund)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Geen van de bestanden die u wilde afspelen lijken mediabestanden te zijn.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Opslaan van de afspeellijst is mislukt.\n\nFout:
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Nieuwe speler...
 100% scale	MediaPlayer-Main		100% schaal
 Subtitle placement:	MediaPlayer-SettingsWindow		Positie van de ondertitels:
@@ -68,8 +69,10 @@ Select all	MediaPlayer-PlaylistWindow		Alles selecteren
 Move Entry	MediaPlayer-MovePLItemsCmd		Onderdeel verplaatsen
 Open	MediaPlayer-PlaylistWindow		Openen
 Stop playing.	MediaPlayer-Main		Stop afspelen.
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Het bestand '%filename' kon niet geopend worden.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Fout:
 Audio	MediaPlayer-InfoWin		Audio
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Fout bij het verplaatsen naar de vuilnisbak
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interne fout (misvormd bericht). Opslaan van de afspeellijst is mislukt.
 Skip to the previous track.	MediaPlayer-Main		Overslaan tot de vorige track.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Er trad een interne fout op bij %app%. Het bestand kon niet geopend worden.
@@ -130,6 +133,7 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Onderdelen randomizeren
 Revert	MediaPlayer-SettingsWindow		Herstellen
 Edit	MediaPlayer-PlaylistWindow		Aanpassen
 Start media server	MediaPlayer-Main		Start mediaserver
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Volledig scherm in-/uitschakelen.
 ToggleFullscreen	MediaPlayer-Main		Volledig scherm in-/uitschakelen
 <unnamed>	PlaylistItem-name		<naamloos>

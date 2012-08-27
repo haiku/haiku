@@ -1,30 +1,30 @@
 1	hungarian	x-vnd.Haiku-Media	1473363280
-<none>	Media views		<nincs>
-Audio input:	Media views		Hangbemenet:
-Audio mixer	Media Window		Hangerőszabályzó
-Audio output:	Media views		Hangkimenet:
-Audio settings	Media Window		Hangbeállítások
-Channel:	Media views		Csatorna:
-Cleaning up.	Media Window		Rendrakás.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nem lehet csatlakozni a Médiakiszolgálóhoz.\nEl szeretné indítani most?
 Couldn't add volume control in Deskbar: %s\n	Media views		Nem lehetett a hangerőszabályzót helyezni a Deskbarra: %s\n
-Couldn't remove volume control in Deskbar: %s\n	Media views		Nem lehetett a hangerőszabályzót eltávolítani a Deskbarról: %s\n
-Defaults	Media views		Alapértelmezés
-Done shutting down.	Media Window		Leállítva.
-Media	System name		Média
-OK	Media Window		Rendben
-Quit	Media Window		Kilépés
 Ready for use…	Media Window		Használatra kész…
-Restart media services	Media views		Médiaszolgáltatások újraindítása
-Restarting media services\nShutting down media server\n	Media Window		Médiaszolgáltatások újraindítása\nMédiakiszolgáló leállítása\n
-Restarting media services\nStarting media server…\n	Media Window		Médiaszolgáltatások újraindítása\nMédiakiszolgáló elindítása…\n
-Show volume control on Deskbar	Media views		Hangerőszabályzó az Asztalsávon
-Start media server	Media Window		Média kiszolgáló elindítása
-Starting media server…	Media Window		Médiakiszolgáló elindítása…
-Stopping media server…	Media Window		Médiakiszolgáló leállítása…
-Telling media_addon_server to quit.	Media Window		A Médiabővítmény-kiszolgáló leállítása.
-This hardware has no controls.	Media Window		Ennek az eszköznek nincsenek vezérlői.
 Video input:	Media views		Képbemenet:
-Video output:	Media views		Képkimenet:
-Video settings	Media Window		Videóbeállítások
 Waiting for media_server to quit.	Media Window		Várakozás a Médiakiszolgáló kilépésére.
+Cleaning up.	Media Window		Rendrakás.
+Defaults	Media views		Alapértelmezés
+Stopping media server…	Media Window		Médiakiszolgáló leállítása…
+Quit	Media Window		Kilépés
+OK	Media Window		Rendben
+Starting media server…	Media Window		Médiakiszolgáló elindítása…
+Done shutting down.	Media Window		Leállítva.
+Video settings	Media Window		Videóbeállítások
+Video output:	Media views		Képkimenet:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nem lehet csatlakozni a Médiakiszolgálóhoz.\nEl szeretné indítani most?
+Restart media services	Media views		Médiaszolgáltatások újraindítása
+Couldn't remove volume control in Deskbar: %s\n	Media views		Nem lehetett a hangerőszabályzót eltávolítani a Deskbarról: %s\n
+Media	System name		Média
+Telling media_addon_server to quit.	Media Window		A Médiabővítmény-kiszolgáló leállítása.
+Audio mixer	Media Window		Hangerőszabályzó
+This hardware has no controls.	Media Window		Ennek az eszköznek nincsenek vezérlői.
+Audio output:	Media views		Hangkimenet:
+Restarting media services\nStarting media server…\n	Media Window		Médiaszolgáltatások újraindítása\nMédiakiszolgáló elindítása…\n
+Audio settings	Media Window		Hangbeállítások
+Start media server	Media Window		Média kiszolgáló elindítása
+Restarting media services\nShutting down media server\n	Media Window		Médiaszolgáltatások újraindítása\nMédiakiszolgáló leállítása\n
+<none>	Media views		<nincs>
+Channel:	Media views		Csatorna:
+Show volume control on Deskbar	Media views		Hangerőszabályzó az Asztalsávon
+Audio input:	Media views		Hangbemenet:

@@ -1,48 +1,48 @@
 1	hungarian	x-vnd.Haiku-ProcessController	2887520383
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About ProcessController…	ProcessController		Folyamatkezelő névjegye...
-Cancel	ProcessController		Mégse
-Custom priority	ProcessController		Egyéni prioritás
-Damned!	ProcessController		Fenébe!
-Debug this thread!	ProcessController		Szál hibakeresése!
-Debug thread	ProcessController		Szál hibakeresése
-Display priority	ProcessController		Kijelzési prioritás
-Do you really want to kill the team \"%s\"?	ProcessController		Biztos le kívánja állítani a(z) \"%s\" csapatot?
-Error saving file	ProcessController		Hiba történt a fájl mentése során
-Gone teams…	ProcessController		Eltűnt csapatok...
-Idle priority	ProcessController		Üresjárat prioritás
-Info	ProcessController		Infó
-Install in Deskbar	ProcessController		Telepítés a Deskbarra
-Kill this thread!	ProcessController		Szál leállítása!
-Live in the Deskbar	ProcessController		Átrakás a Deskbarra
-Low priority	ProcessController		Alacsony prioritás
-Lowest active priority	ProcessController		Legalacsonyabb aktív prioritás
 Memory usage	ProcessController		Memóriahasználat
-New Terminal	ProcessController		Új terminál
-Normal priority	ProcessController		Normál prioritás
-OK	ProcessController		OK
-Ok!	ProcessController		Ok!
-Please confirm	ProcessController		Jóváhagyás
-ProcessController	System name		Folyamatkezelő
-ProcessController is already installed in Deskbar.	ProcessController		A Folyamatkezelő már telepítve van a Deskbarra.
-Processor %d	ProcessController		%d processzor
-Quit an application	ProcessController		Kilépés egy alkalmazásból
-Quit application	ProcessController		Kilépés az alkalmazásból
-Real-time display priority	ProcessController		Valós idejű kijelzési prioritás
-Real-time priority	ProcessController		Valós idejű prioritás
+Do you really want to kill the team \"%s\"?	ProcessController		Biztos le kívánja állítani a(z) \"%s\" csapatot?
+Idle priority	ProcessController		Üresjárat prioritás
 Restart Deskbar	ProcessController		Deskbar újraindítása
-Restart Tracker	ProcessController		Tracker újraindítása
-Run in window	ProcessController		Futtatás ablakban
-System resources & caches…	ProcessController		Rendszer erőforrásai és gyorsítótárai...
-That's no Fun!	ProcessController		Ez nem vicces!
-This is the last active processor...\nYou can't turn it off!	ProcessController		Ez a legutolsó aktív processzor...\nNem lehet leállítani!
+Custom priority	ProcessController		Egyéni prioritás
+Debug thread	ProcessController		Szál hibakeresése
 This team is already gone…	ProcessController		Ez a csapat már eltűnt...
+Error saving file	ProcessController		Hiba történt a fájl mentése során
+Real-time priority	ProcessController		Valós idejű prioritás
+Your setting file could not be saved!\n(%s)	ProcessController		A beállításfájlt nem sikerült elmenteni!\n(%s)
 This thread is already gone…	ProcessController		Ez a szál már eltűnt...
+Cancel	ProcessController		Mégse
+Display priority	ProcessController		Kijelzési prioritás
+Run in window	ProcessController		Futtatás ablakban
+Processor %d	ProcessController		%d processzor
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		A Folyamatkezelő már telepítve van a Deskbarra.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Ez a legutolsó aktív processzor...\nNem lehet leállítani!
+Info	ProcessController		Infó
+Quit application	ProcessController		Kilépés az alkalmazásból
+Low priority	ProcessController		Alacsony prioritás
+What do you want to do with the thread \"%s\"?	ProcessController		Mit kíván tenni a(z) \"%s\" szállal?
+Gone teams…	ProcessController		Eltűnt csapatok...
+Lowest active priority	ProcessController		Legalacsonyabb aktív prioritás
+Restart Tracker	ProcessController		Tracker újraindítása
+Live in the Deskbar	ProcessController		Átrakás a Deskbarra
+Kill this thread!	ProcessController		Szál leállítása!
+Debug this thread!	ProcessController		Szál hibakeresése!
+Normal priority	ProcessController		Normál prioritás
+New Terminal	ProcessController		Új terminál
+Urgent priority	ProcessController		Magas prioritás
+About ProcessController…	ProcessController		Folyamatkezelő névjegye...
+Ok!	ProcessController		Ok!
+Quit an application	ProcessController		Kilépés egy alkalmazásból
+Install in Deskbar	ProcessController		Telepítés a Deskbarra
 Threads and CPU usage	ProcessController		Szálak és processzorhasználat
 Urgent display priority	ProcessController		Magas kijelzési prioritás
-Urgent priority	ProcessController		Magas prioritás
+OK	ProcessController		OK
+Damned!	ProcessController		Fenébe!
 Usage: %s [-deskbar]\n	ProcessController		Használat: %s [-deskbar]\n
-What do you want to do with the thread \"%s\"?	ProcessController		Mit kíván tenni a(z) \"%s\" szállal?
+ProcessController	System name		Folyamatkezelő
+Real-time display priority	ProcessController		Valós idejű kijelzési prioritás
+Please confirm	ProcessController		Jóváhagyás
 Yes, kill this team!	ProcessController		Igen, állítsa le a csapatot!
+System resources & caches…	ProcessController		Rendszer erőforrásai és gyorsítótárai...
+That's no Fun!	ProcessController		Ez nem vicces!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Futtathatja a Folyamatkezelőt egy ablakban, vagy feltelepítheti azt a Deskbarra.
-Your setting file could not be saved!\n(%s)	ProcessController		A beállításfájlt nem sikerült elmenteni!\n(%s)

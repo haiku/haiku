@@ -1,157 +1,157 @@
-1	hungarian	x-vnd.Haiku-FileTypes	473999706
-%1 application type	Application Type Window		%1 programtípus
-%ld Application type%s could be removed.	Application Types Window		%ld programtípus%s eltávolítható.
-%s file type	FileType Window		%s fájltípusok
-(from application)	FileTypes Window		(programból)
-(from super type)	FileTypes Window		(szupertípustól)
-Abort	Application Types Window		Megszakítás
-Add	Attribute Window		Hozzáadás
-Add	Extension Window		Hozzáadás
-Add group	New File Type Window		Csoport hozzáadása
-Add icon…	Icon View		Ikon hozzáadása…
-Add new group	New File Type Window		Új csoport hozzáadása
-Add type	New File Type Window		Típus hozzáadása
-Add…	Application Type Window		Hozzáadás…
-Add…	FileTypes Window		Hozzáadás...
-Alignment:	Attribute Window		Igazítás:
-Alpha	Application Type Window		Alfa
-Alpha	Application Types Window		Alfa
-Application flags	Application Type Window		Programjelölők
-Application type	Application Type Window		Programtípus
-Application types	Application Types Window		Programtípusok
+1	hungarian	x-vnd.Haiku-FileTypes	2496450458
 Application types…	FileTypes Window		Programtípusok...
-Args only	Application Type Window		Csak argumentumok
-Attribute	Attribute Window		Attribútum
-Attribute name:	Attribute Window		Attribútum neve:
-Background app	Application Type Window		Háttérprogram
-Beta	Application Type Window		Béta
-Beta	Application Types Window		Béta
-Cancel	Application Type Window		Mégse
-Cancel	Attribute Window		Mégse
-Cancel	Extension Window		Mégse
-Cancel	FileTypes Window		Mégse
-Cancel	New File Type Window		Mégse
-Cancel	Preferred App Menu		Mégse
-Cancel	Type List Window		Mégse
-Center	Attribute Window	Attribute column alignment in Tracker	Középre
-Choose type	Type List Window		Típus kiválasztása
-Close	Application Type Window		Bezárás
-Could not change attributes	Attribute Window		Nem lehetett módosítani az attribútumokat
-Could not change file extensions	Extension Window		Nem lehet átállítani a fájlkiterjesztést
-Could not install file type	New File Type Window		A fájltípus nem telepíthető
-Could not open \"%s\":\n%s	FileTypes		„%s” nem megnyitható:\n%s
-Could not open file	FileType Window		Nem lehetett megnyitni a fájlt
-Could not remove file type: %s\n	FileTypes Window		Nem sikerült eltávolítani ezt a fájltípust: %s\n
-Could not retrieve application signature	Preferred App Menu		Nem található a program aláírása
-Could not retrieve preferred application of this file	Preferred App Menu		Nem található az ehhez a fájlhoz használandó program
-Could not set preferred application	FileTypes Window		Nem lehetett beállítani a használandó programot
-Default application	FileType Window		Alapértelmezett alkalmazás
-Description	FileTypes Window		Leírás
 Description:	Application Types Window		Leírás:
-Description:	FileTypes Window		Leírás:
-Development	Application Type Window		Fejlesztés
-Development	Application Types Window		Fejlesztés alatt
-Display as:	Attribute Window	Tracker offers different display modes for attributes.	Megjelenítés így:
-Do you want to save the changes?	Application Type Window		Elmenti a változtatásokat?
-Done	Attribute Window		Kész
-Done	Extension Window		Kész
-Done	Type List Window		Kész
-Edit icon…	Icon View		Ikon szerkesztése…
-Editable	Attribute Window	If Tracker allows to edit this attribute.	Szerkeszthető
-Edit…	Application Types Window		Szerkesztés...
-Exclusive launch	Application Type Window		Kivételes indítás
-Extension	Extension Window		Kiterjesztés
-Extension:	Extension Window		Kiterjesztés:
-Extensions:	FileTypes Window		Kiterjesztések:
-Extra attributes	FileTypes Window		Extra attribútumok
-File	Application Type Window		Fájl
-File	FileTypes Window		Fájl
-File could not be opened	Preferred App Menu		A fájl nem megnyitható
-File recognition	FileTypes Window		Fájlfelismerés
-File type	FileType Window		Fájltípus
-FileTypes	FileTypes		Fájltípusok
-FileTypes	System name		Fájltípusok
-FileTypes request	FileTypes		Fájltípusok-kérés
-FileTypes request	FileTypes Window		Fájltípusok kérés
-FileTypes request	Preferred App Menu		Fájltípusok kérés
-Final	Application Type Window		Végleges
-Final	Application Types Window		Végleges
-Gamma	Application Type Window		Gamma
-Gamma	Application Types Window		Gamma
-Golden master	Application Type Window		Végleges kiadás
-Golden master	Application Types Window		Végleges verzió
-Group name:	New File Type Window		Csoport neve:
-Group:	New File Type Window		Csoport:
-Icon	Application Type Window		Ikon
-Icon	FileType Window		Ikon
-Icon	FileTypes Window		Ikon
-Information	Application Types Window		Információ
-Internal name:	Attribute Window		Belső név:
-Internal name:	FileTypes Window		Belső név:
-Internal name:	New File Type Window		Belső név:
-Launch	Application Types Window		Indítás
-Left	Attribute Window	Attribute column alignment in Tracker	Bal
-Long description:	Application Type Window		Bő leírás:
-Move down	FileTypes Window		Mozgatás fel
-Move up	FileTypes Window		Mozgatás le
-Multiple files from \"%s\" file type	FileType Window		Több \"%s\" fájltípusú fájl
-Multiple launch	Application Type Window		Többszöri indítás
-Name:	Application Types Window		Név:
-New file type	New File Type Window		Új fájltípus
-New resource file…	FileTypes Window		Új forrásfájl...
-None	FileTypes Window		Nincs
-OK	FileTypes		OK
-Open file	FileTypes		Fájl megnyitása
-Open…	FileTypes Window		Megnyitás...
-Path:	Application Types Window		Útvonal:
-Preferred application	FileType Window		Előnyben részesített program
-Preferred application	FileTypes Window		Használandó program
-Progress	Application Types Window		Folyamat
-Quit	FileTypes Window		Kilépés
-Quit, don't save	Application Type Window		Kilépés mentés nélkül
+Args only	Application Type Window		Csak argumentumok
 Recognition rule is not valid:\n\n	FileTypes Window		Felismerési szabály érvénytelen:\n\n
+Add group	New File Type Window		Csoport hozzáadása
 Remove	Application Type Window		Eltávolítás
-Remove	FileTypes Window		Eltávolítás
-Remove icon	Icon View		Ikon eltávolítása
-Remove uninstalled	Application Types Window		Eltávolítottak törlése
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Egy fájltípus eltávolítását nem lehet visszavonni.\nBiztos el akarja távolítani?
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarja tenni? A teljes csoport eltávolításához tartsa lenyomva a Shift billentyűt és nyomjon az \"Eltávolítás\" gombra.
-Removing uninstalled application types	Application Types Window		Eltávolított programok típusainak törlése
-Right	Attribute Window	Attribute column alignment in Tracker	Jobbra
-Rule:	FileTypes Window		Szabály:
-Same as…	FileType Window	The same APPLICATION as ...	Ugyanaz, mint...
-Same as…	FileType Window	The same TYPE as ...	Ugyanaz, mint...
-Same as…	FileTypes Window		Ugyanaz, mint...
-Save	Application Type Window		Mentés
-Save into resource file…	Application Type Window		Mentés forrásfájlba…
-Save request	Application Type Window		Kérés elmentése
-Select preferred application	FileType Window		előnyben részesített program kiválasztása
-Select preferred application	FileTypes Window		Használandó program kiválasztása
-Select same preferred application as	FileType Window		Ugyanazon előnyben részesített program kiválasztása mint
-Select same preferred application as	FileTypes Window		Használja ugyanazt a programot, mint ehhez:
 Select same type as	FileType Window		Ugyanazon típus kiválasztása, mint
-Select…	FileType Window		Kiválasztás…
-Select…	FileTypes Window		Kiválasztás...
-Set Preferred Application	Preferred App Menu		Előnyben részesített program megadása
-Settings	FileTypes Window		Beállítások
-Short description:	Application Type Window		Rövid leírás:
-Show icons in list	FileTypes Window		Ikonok megjelenítése a listában
-Show in Tracker…	Application Types Window		Megjelenítés Trackerben:
-Show recognition rule	FileTypes Window		Felismerési szabály megjelenítése
-Signature:	Application Type Window		Aláírás:
-Signature:	Application Types Window		Aláírás:
-Single launch	Application Type Window		Elindítás egyszer
-Special:	Attribute Window		Különleges:
+Remove icon	Icon View		Ikon eltávolítása
 Supported types	Application Type Window		Támogatott típusok
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		„%s” program nem támogatja ezt a fájltípust.\nBiztosan ehhez rendeli hozzá?
-This file type already exists	New File Type Window		Ez a fájltípus már létezik
+Show icons in list	FileTypes Window		Ikonok megjelenítése a listában
 Type name:	FileTypes Window		Típus neve:
-Type:	Attribute Window		Típus:
-Version	Application Types Window		Verzió
-Version info	Application Type Window		Verzió információ
+Internal name:	New File Type Window		Belső név:
+Choose type	Type List Window		Típus kiválasztása
+New file type	New File Type Window		Új fájltípus
+Rule:	FileTypes Window		Szabály:
+Add icon…	Icon View		Ikon hozzáadása…
+Multiple files from \"%s\" file type	FileType Window		Több \"%s\" fájltípusú fájl
+Do you want to save the changes?	Application Type Window		Elmenti a változtatásokat?
+File type	FileType Window		Fájltípus
+Could not change attributes	Attribute Window		Nem lehetett módosítani az attribútumokat
+Could not retrieve preferred application of this file	Preferred App Menu		Nem található az ehhez a fájlhoz használandó program
+Beta	Application Types Window		Béta
+Extensions:	FileTypes Window		Kiterjesztések:
+Select same preferred application as	FileTypes Window		Használja ugyanazt a programot, mint ehhez:
+Save	Application Type Window		Mentés
+Could not retrieve application signature	Preferred App Menu		Nem található a program aláírása
+Add	Extension Window		Hozzáadás
+Select same preferred application as	FileType Window		Ugyanazon előnyben részesített program kiválasztása mint
+Cancel	Attribute Window		Mégse
+Icon	Application Type Window		Ikon
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Egy fájltípus eltávolítását nem lehet visszavonni.\nBiztos el akarja távolítani?
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Szerkeszthető
+Multiple launch	Application Type Window		Többszöri indítás
+(from application)	FileTypes Window		(programból)
+Could not set preferred application	FileTypes Window		Nem lehetett beállítani a használandó programot
+Group:	New File Type Window		Csoport:
+%1 application type	Application Type Window		%1 programtípus
+Done	Extension Window		Kész
+Application type	Application Type Window		Programtípus
+Done	Type List Window		Kész
+Attribute	Attribute Window		Attribútum
+Show recognition rule	FileTypes Window		Felismerési szabály megjelenítése
+FileTypes request	Preferred App Menu		Fájltípusok kérés
+Could not open file	FileType Window		Nem lehetett megnyitni a fájlt
+Description:	FileTypes Window		Leírás:
+File	FileTypes Window		Fájl
+Name:	Application Types Window		Név:
+Group name:	New File Type Window		Csoport neve:
+Preferred application	FileType Window		Előnyben részesített program
+Progress	Application Types Window		Folyamat
+Set preferred application	Preferred App Menu		Előnyben részesített program megadása
+File	Application Type Window		Fájl
 Version:	Application Type Window		Verzió:
-Version:	Application Types Window		Verzió:
-Visible	Attribute Window		Látható
-Width:	Attribute Window	Default column width in Tracker for this attribute.	Szélesség:
+Select…	FileTypes Window		Kiválasztás...
+FileTypes request	FileTypes		Fájltípusok-kérés
+Open…	FileTypes Window		Megnyitás...
+Select…	FileType Window		Kiválasztás…
+Launch	Application Types Window		Indítás
+Same as…	FileType Window	The same APPLICATION as ...	Ugyanaz, mint...
+Abort	Application Types Window		Megszakítás
+FileTypes	FileTypes		Fájltípusok
+OK	FileTypes		OK
+Extra attributes	FileTypes Window		Extra attribútumok
+Development	Application Type Window		Fejlesztés
+Edit…	Application Types Window		Szerkesztés...
+Icon	FileType Window		Ikon
+Final	Application Types Window		Végleges
+Development	Application Types Window		Fejlesztés alatt
+Open file	FileTypes		Fájl megnyitása
+Special:	Attribute Window		Különleges:
+Alpha	Application Type Window		Alfa
+Add…	FileTypes Window		Hozzáadás...
+Signature:	Application Type Window		Aláírás:
+Quit, don't save	Application Type Window		Kilépés mentés nélkül
+Add…	Application Type Window		Hozzáadás…
 [Multiple files] file types	FileType Window		[Többféle fájl] fájltípusai
+Information	Application Types Window		Információ
+Gamma	Application Types Window		Gamma
+Quit	FileTypes Window		Kilépés
+Select preferred application	FileType Window		előnyben részesített program kiválasztása
+Single launch	Application Type Window		Elindítás egyszer
+Golden master	Application Types Window		Végleges verzió
+%s file type	FileType Window		%s fájltípusok
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		„%s” program nem támogatja ezt a fájltípust.\nBiztosan ehhez rendeli hozzá?
+Type:	Attribute Window		Típus:
+Removing uninstalled application types	Application Types Window		Eltávolított programok típusainak törlése
+Done	Attribute Window		Kész
 no icon	FileTypes Window		nincs ikon
+Alpha	Application Types Window		Alfa
+Version	Application Types Window		Verzió
+Background app	Application Type Window		Háttérprogram
+Add new group	New File Type Window		Új csoport hozzáadása
+Move down	FileTypes Window		Mozgatás fel
+Cancel	Application Type Window		Mégse
+Settings	FileTypes Window		Beállítások
+New resource file…	FileTypes Window		Új forrásfájl...
+Cancel	New File Type Window		Mégse
+Icon	FileTypes Window		Ikon
+Extension:	Extension Window		Kiterjesztés:
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarja tenni? A teljes csoport eltávolításához tartsa lenyomva a Shift billentyűt és nyomjon az \"Eltávolítás\" gombra.
+Internal name:	FileTypes Window		Belső név:
+Add	Attribute Window		Hozzáadás
+Close	Application Type Window		Bezárás
+File recognition	FileTypes Window		Fájlfelismerés
+Remove uninstalled	Application Types Window		Eltávolítottak törlése
+Center	Attribute Window	Attribute column alignment in Tracker	Középre
+Golden master	Application Type Window		Végleges kiadás
+Could not open \"%s\":\n%s	FileTypes		„%s” nem megnyitható:\n%s
+Alignment:	Attribute Window		Igazítás:
+Left	Attribute Window	Attribute column alignment in Tracker	Bal
+Cancel	Extension Window		Mégse
+Path:	Application Types Window		Útvonal:
+Application flags	Application Type Window		Programjelölők
+Cancel	Type List Window		Mégse
+Move up	FileTypes Window		Mozgatás le
+Description	FileTypes Window		Leírás
+Save request	Application Type Window		Kérés elmentése
+Beta	Application Type Window		Béta
+None	FileTypes Window		Nincs
+Remove	FileTypes Window		Eltávolítás
+Attribute name:	Attribute Window		Attribútum neve:
+Extension	Extension Window		Kiterjesztés
+Add type	New File Type Window		Típus hozzáadása
+Internal name:	Attribute Window		Belső név:
+Show in Tracker…	Application Types Window		Megjelenítés Trackerben:
+Final	Application Type Window		Végleges
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Szélesség:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Megjelenítés így:
+This file type already exists	New File Type Window		Ez a fájltípus már létezik
+Same as…	FileTypes Window		Ugyanaz, mint...
+Exclusive launch	Application Type Window		Kivételes indítás
+%ld Application type%s could be removed.	Application Types Window		%ld programtípus%s eltávolítható.
+FileTypes	System name		Fájltípusok
+Application types	Application Types Window		Programtípusok
+Could not remove file type: %s\n	FileTypes Window		Nem sikerült eltávolítani ezt a fájltípust: %s\n
+Signature:	Application Types Window		Aláírás:
+Gamma	Application Type Window		Gamma
+Cancel	Preferred App Menu		Mégse
+Cancel	FileTypes Window		Mégse
+Select preferred application	FileTypes Window		Használandó program kiválasztása
+Right	Attribute Window	Attribute column alignment in Tracker	Jobbra
+Default application	FileType Window		Alapértelmezett alkalmazás
+Long description:	Application Type Window		Bő leírás:
+FileTypes request	FileTypes Window		Fájltípusok kérés
+Version info	Application Type Window		Verzió információ
+(from super type)	FileTypes Window		(szupertípustól)
+Version:	Application Types Window		Verzió:
+Preferred application	FileTypes Window		Használandó program
+Short description:	Application Type Window		Rövid leírás:
+File could not be opened	Preferred App Menu		A fájl nem megnyitható
+Could not change file extensions	Extension Window		Nem lehet átállítani a fájlkiterjesztést
+Edit icon…	Icon View		Ikon szerkesztése…
+Same as…	FileType Window	The same TYPE as ...	Ugyanaz, mint...
+Save into resource file…	Application Type Window		Mentés forrásfájlba…
+Visible	Attribute Window		Látható
+Could not install file type	New File Type Window		A fájltípus nem telepíthető

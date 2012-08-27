@@ -1,14 +1,14 @@
 1	hungarian	x-vnd.Haiku-desklink	3053930521
-%g dB	MediaReplicant		%g dB
-%ld dB	VolumeControl		%ld dB
-Beep	MediaReplicant		Csipogás
 Control physical output	MediaReplicant		Fizikai kimenet vezérlése
 Couldn't launch 	MediaReplicant		Nem indítható
-Media preferences…	MediaReplicant		Médiabeállítások...
-No media server running	VolumeControl		Nem fut a médiakiszolgáló
 OK	MediaReplicant		OK
-Open MediaPlayer	MediaReplicant		MediaPlayer megnyitása
-Options	MediaReplicant		Opciók
 Sound preferences…	MediaReplicant		Hangbeállítások...
-Volume	VolumeControl		Hangerő
+%g dB	MediaReplicant		%g dB
+No media server running	VolumeControl		Nem fut a médiakiszolgáló
+Media preferences…	MediaReplicant		Médiabeállítások...
+Open MediaPlayer	MediaReplicant		MediaPlayer megnyitása
 desklink	MediaReplicant		desklink
+Options	MediaReplicant		Opciók
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		Csipogás
+Volume	VolumeControl		Hangerő

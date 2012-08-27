@@ -1,11 +1,11 @@
 1	hungarian	x-vnd.Haiku-PNGTranslator	2504765797
-Interlace Option	PNGTranslator		Váltottsoros beállítás
-Interlacing type:	PNGTranslator		Váltottsorosság típusa:
-None	PNGTranslator		Nincs
-PNG Interlace Menu	PNGTranslator		PNG váltottsoros menü
-PNG Settings	PNGTranslator		PNG Beállítások
-PNG image	PNGTranslator		PNG kép
-PNG image translator	PNGTranslator		PNG kép-fordító
-PNG images	PNGTranslator		PNG képek
-PNGTranslator Settings	PNGTranslator		PNG kép-fordító Beállításai
 Version %d.%d.%d, %s	PNGTranslator		%d.%d.%d, %s verzió
+Interlace Option	PNGTranslator		Váltottsoros beállítás
+PNG Interlace Menu	PNGTranslator		PNG váltottsoros menü
+PNG image	PNGTranslator		PNG kép
+PNG Settings	PNGTranslator		PNG Beállítások
+PNG image translator	PNGTranslator		PNG kép-fordító
+None	PNGTranslator		Nincs
+PNG images	PNGTranslator		PNG képek
+Interlacing type:	PNGTranslator		Váltottsorosság típusa:
+PNGTranslator Settings	PNGTranslator		PNG kép-fordító Beállításai

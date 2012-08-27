@@ -1,33 +1,33 @@
 1	hungarian	x-vnd.Haiku.TextSearch	1180598828
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nem tudott megnyitni egy, vagy több mappát.
 %s: Not enough room to escape the filename.	Grepper		%s: Nincs elég hely kihagyni a fájlnevet.
-%s: There was a problem running grep.	Grepper		%s: Hiba történt a grep futtatása közben.
-Actions	GrepWindow		Műveletek
-Cancel	GrepWindow		Mégse
-Case-sensitive	GrepWindow		Kis- és nagybetűk megkülönböztetése
-Close	GrepWindow		Bezárás
-Copy text to clipboard	GrepWindow		Szöveg másolása a vágólapra
-Encoding	GrepWindow		Kódolás
-Escape search text	GrepWindow		Keresési szöveg kihagyása
-File	GrepWindow		Fájl
-Follow symbolic links	GrepWindow		Szimbolikus linkek követése
-History	GrepWindow		Előzmények
-Look in sub-folders	GrepWindow		Keresés almappákban is
-New window	GrepWindow		Új ablak
-OK	GrepWindow		OK
-Open files in Pe	GrepWindow		Fájlok megnyitása Pe-ben
-Open selection	GrepWindow		Kijelölés megnyitása
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Jelölje meg azokat a fájlokat a Trackerben, amelyek kijelölésre kerüljenek.
-Please select the files you wish to keep searching.	GrepWindow		Kérjük, válassza ki azokat a fájlokat amelyekben folytatni kívánja a keresést.
-Quit	GrepWindow		Kilépés
-Search	GrepWindow		Keresés
-Select all	GrepWindow		Összes kijelölése
-Set target…	GrepWindow		Cél megadása...
-Settings	GrepWindow		Beállítások
-Show files in Tracker	GrepWindow		Fájlok megjelenítése a Trackerben
-Show lines	GrepWindow		Sorok megjelenítése
-Skip folders starting with a dot	GrepWindow		Ponttal kezdődő mappák átugrása
-Text files only	GrepWindow		Csak szövegfájlokban
-TextSearch	GrepWindow		SzövegKeresés
-The unselected files will be removed from the list.	GrepWindow		A ki nem választott fájlok el lesznek távolítva a listáról.
 Trim to selection	GrepWindow		Kijelölés kivágása
+Follow symbolic links	GrepWindow		Szimbolikus linkek követése
+Close	GrepWindow		Bezárás
+Cancel	GrepWindow		Mégse
+The unselected files will be removed from the list.	GrepWindow		A ki nem választott fájlok el lesznek távolítva a listáról.
+Set target…	GrepWindow		Cél megadása...
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Jelölje meg azokat a fájlokat a Trackerben, amelyek kijelölésre kerüljenek.
+Open files in Pe	GrepWindow		Fájlok megnyitása Pe-ben
+Copy text to clipboard	GrepWindow		Szöveg másolása a vágólapra
+Settings	GrepWindow		Beállítások
+Select all	GrepWindow		Összes kijelölése
+OK	GrepWindow		OK
+Skip folders starting with a dot	GrepWindow		Ponttal kezdődő mappák átugrása
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nem tudott megnyitni egy, vagy több mappát.
+Escape search text	GrepWindow		Keresési szöveg kihagyása
+Search	GrepWindow		Keresés
+Open selection	GrepWindow		Kijelölés megnyitása
+Look in sub-folders	GrepWindow		Keresés almappákban is
+Actions	GrepWindow		Műveletek
+File	GrepWindow		Fájl
+Encoding	GrepWindow		Kódolás
+History	GrepWindow		Előzmények
+%s: There was a problem running grep.	Grepper		%s: Hiba történt a grep futtatása közben.
+New window	GrepWindow		Új ablak
+Please select the files you wish to keep searching.	GrepWindow		Kérjük, válassza ki azokat a fájlokat amelyekben folytatni kívánja a keresést.
+TextSearch	GrepWindow		Szövegkeresés
+Quit	GrepWindow		Kilépés
+Show files in Tracker	GrepWindow		Fájlok megjelenítése a Trackerben
+Case-sensitive	GrepWindow		Kis- és nagybetűk megkülönböztetése
+Text files only	GrepWindow		Csak szövegfájlokban
+Show lines	GrepWindow		Sorok megjelenítése

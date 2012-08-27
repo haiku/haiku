@@ -1,48 +1,48 @@
-1	hungarian	x-vnd.Haiku-PowerStatus	2178654445
-About	PowerStatus		Névjegy
-About…	PowerStatus		Névjegy...
-Battery charging	PowerStatus		Akku töltődik
-Battery discharging	PowerStatus		Akku használatban
-Battery info	PowerStatus		Akku infó
-Battery info…	PowerStatus		Akku infó...
-Battery unused	PowerStatus		Használatlan akku
-Capacity granularity 1: 	PowerStatus		Kapacitás granularitás 1:
-Capacity granularity 2: 	PowerStatus		Kapacitás granularitás 2:
-Capacity: 	PowerStatus		Kapacitás:
-Current rate: 	PowerStatus		Jelenlegi gyakoriság:
-Damaged battery	PowerStatus		Sérült akku
+1	hungarian	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		Figyelmeztetés alacsony tervezett kapacitásnál:
-Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés:
-Design capacity: 	PowerStatus		Tervezett kapacitás:
-Design voltage: 	PowerStatus		Tervezett feszültség:
-Empty battery slot	PowerStatus		Nincs akku behelyezve
-Extended battery info	PowerStatus		Bővebb akku információ
-Install in Deskbar	PowerStatus		Telepítés a Deskbarra
-Last full charge: 	PowerStatus		Utolsó teljes feltöltés:
-Model number: 	PowerStatus		Típusszám:
-OEM info: 	PowerStatus		OEM információk:
-OK	PowerStatus		OK
-Power status box	PowerStatus		Energiaállapot doboza
-PowerStatus	PowerStatus		Energiaállapot
-PowerStatus	System name		Energiaállapot
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Energiaállapot\nírta: Axel Dörfler, Clemens Zeidler\nSzerzői jog 2006, Haiku, Inc.\n
-Quit	PowerStatus		Kilépés
-Run in window	PowerStatus		Futtatás ablakban
-Serial number: 	PowerStatus		Szériaszám:
 Show percent	PowerStatus		Százalék megjelenítése
-Show status icon	PowerStatus		Állapotikon megjelenítése
-Show text label	PowerStatus		Szöveges címke megjelenítése
-Show time	PowerStatus		Idő kijelzése
-Technology: 	PowerStatus		Technológia:
+Design capacity: 	PowerStatus		Tervezett kapacitás:
+ mW	PowerStatus		mW
 Type: 	PowerStatus		Típus:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futatthatja az Energiaállapotot egy ablakban, vagy a Deskbarra telepítheti azt.
-charging	PowerStatus		töltődik
-discharging	PowerStatus		használatban
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		nincs akku
 non-rechargeable	PowerStatus		Nem újratölthető
+Empty battery slot	PowerStatus		Nincs akku behelyezve
+ mV	PowerStatus		mV
+Run in window	PowerStatus		Futtatás ablakban
+About	PowerStatus		Névjegy
+PowerStatus	System name		Energiaállapot
+PowerStatus	PowerStatus		Energiaállapot
+ mWh	PowerStatus		mWh
+Battery info…	PowerStatus		Akku infó...
+Damaged battery	PowerStatus		Sérült akku
+Show time	PowerStatus		Idő kijelzése
+Last full charge: 	PowerStatus		Utolsó teljes feltöltés:
+Battery unused	PowerStatus		Használatlan akku
+Extended battery info	PowerStatus		Bővebb akku információ
+ mA	PowerStatus		mA
+Current rate: 	PowerStatus		Jelenlegi gyakoriság:
+discharging	PowerStatus		használatban
+Show text label	PowerStatus		Szöveges címke megjelenítése
+About…	PowerStatus		Névjegy...
+Model number: 	PowerStatus		Típusszám:
+Install in Deskbar	PowerStatus		Telepítés a Deskbarra
+ mAh	PowerStatus		mAh
+Capacity: 	PowerStatus		Kapacitás:
+Battery discharging	PowerStatus		Akku használatban
+Serial number: 	PowerStatus		Szériaszám:
+Capacity granularity 1: 	PowerStatus		Kapacitás granularitás 1:
+OK	PowerStatus		OK
+OEM info: 	PowerStatus		OEM információk:
+Design voltage: 	PowerStatus		Tervezett feszültség:
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Energiaállapot\nírta: Axel Dörfler, Clemens Zeidler\nSzerzői jog 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Akku töltődik
+Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés:
+Battery info	PowerStatus		Akku infó
+Quit	PowerStatus		Kilépés
 rechargeable	PowerStatus		újratölthető
+charging	PowerStatus		töltődik
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futatthatja az Energiaállapotot egy ablakban, vagy a Deskbarra telepítheti azt.
+Power status box	PowerStatus		Energiaállapot doboza
+Show status icon	PowerStatus		Állapotikon megjelenítése
+Capacity granularity 2: 	PowerStatus		Kapacitás granularitás 2:
+Technology: 	PowerStatus		Technológia:
+no battery	PowerStatus		nincs akku

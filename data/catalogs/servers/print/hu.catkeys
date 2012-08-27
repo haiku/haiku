@@ -1,54 +1,54 @@
 1	hungarian	x-vnd.Be-PSRV	1761631281
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Már létezik egy ilyen nevű nyomtató, de nem működik! Felülírja?
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Már létezik egy ilyen nevű nyomtató, de nem található hozzá driver! Felülírja?
-A0	ConfigWindow	ISO 216 paper size	A0
-A1	ConfigWindow	ISO 216 paper size	A1
-A2	ConfigWindow	ISO 216 paper size	A2
-A3	ConfigWindow	ISO 216 paper size	A3
-A4	ConfigWindow	ISO 216 paper size	A4
-A5	ConfigWindow	ISO 216 paper size	A5
-A6	ConfigWindow	ISO 216 paper size	A6
-All pages	ConfigWindow		Összes oldal
-All pages, %1 copies	ConfigWindow		Minden oldal, %1 példány
-B5	ConfigWindow	ISO 216 paper size	B5
-Cancel	ConfigWindow		Mégsem
-Cancel	PrintServerApp		Mégsem
-Create a new printer	PrintServerApp Scripting		Létrehoz egy új nyomtatót
-Delete a specific printer	PrintServerApp Scripting		Törli a megadott nyomtatót
-Get comments about this printer	Printer Scripting		Megadja a nyomtató megjegyzéseit
-Get currently available ports/devices	Transport Scripting		Megadja a jelenleg használható portokat/eszközöket
-Get name of printer	Printer Scripting		Megadja a nyomtató nevét
-Get name of the printer add-on used for this printer	Printer Scripting		Megadja a nyomtatón használt nyomtatóbővítményt
-Get name of the transport add-on used for this printer	Printer Scripting		Megadja a nyomtatón használt transzporterbővítményt
-Get name of transport	Transport Scripting		Megadja a transzporter nevét
-Get the transport configuration for this printer	Printer Scripting		Megadja a nyomtató transzporter-beállításait
-Landscape	ConfigWindow		Fekvő
-Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
-Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
-Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
-No	PrintServerApp		Nem
-OK	ConfigWindow		Rendben
-OK	PrintServerApp		OK
-Page %1 to %2	ConfigWindow		%1.-%2. oldal
-Page %1 to %2, %3 copies	ConfigWindow		%1 -%2 oldal, %3 példány
-Page setup	ConfigWindow		Oldalbeállítás
-Page setup:	ConfigWindow		Oldalbeállítás:
-Paper setup:	ConfigWindow		Papír tulajdonságai:
-Portrait	ConfigWindow		Álló
-Print setup	ConfigWindow		Nyomtatási beállítások
-Printer server	ConfigWindow		Nyomtatókiszolgáló
-Printer:	ConfigWindow		Nyomtató:
-Retrieve a specific printer	PrintServerApp Scripting		Megad egy válaszott nyomtatót
-Retrieve a specific transport	PrintServerApp Scripting		Megad egy kiválasztott transzportert
-Retrieve or select the active printer	PrintServerApp Scripting		Megadja vagy kiválasztja az aktív nyomtatót
-Return the number of available printers	PrintServerApp Scripting		Megadja az elérhető nyomtatók számát
+Undefined	ConfigWindow		Nem meghatározott
 Return the number of available transports	PrintServerApp Scripting		Megadja az elérhető transzporterek számát
+Return the number of available printers	PrintServerApp Scripting		Megadja az elérhető nyomtatók számát
+Get currently available ports/devices	Transport Scripting		Megadja a jelenleg használható portokat/eszközöket
+Retrieve or select the active printer	PrintServerApp Scripting		Megadja vagy kiválasztja az aktív nyomtatót
+Cancel	PrintServerApp		Mégsem
+Retrieve a specific printer	PrintServerApp Scripting		Megad egy válaszott nyomtatót
+Page %1 to %2	ConfigWindow		%1 - %2 oldal
+Get name of the printer add-on used for this printer	Printer Scripting		Megadja a nyomtatón használt nyomtatóbővítményt
+Page setup:	ConfigWindow		Oldalbeállítás:
+OK	ConfigWindow		Rendben
+Cancel	ConfigWindow		Mégsem
+Printer server	ConfigWindow		Nyomtatókiszolgáló
+Page %1 to %2, %3 copies	ConfigWindow		%1 -%2 oldal, %3 példány
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Már létezik egy ilyen nevű nyomtató, de nem található hozzá driver! Felülírja?
+Yes	PrintServerApp		Igen
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
+Would you like to set one up now?	PrintServerApp		Szeretne beállítani egyet most?
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Álló
+All pages	ConfigWindow		Összes oldal
+There is no default printer set up.	PrintServerApp		Nincs beállítva alapértelmezett nyomtató.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
+Printer:	ConfigWindow		Nyomtató:
+A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Válasszon nyomtatót
 Show configuration window	PrintServerApp Scripting		Beállításablak megjelenítése
-Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Megadja a nyomtató megjegyzéseit
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Már létezik egy ilyen nevű nyomtató, de nem működik! Felülírja?
+No	PrintServerApp		Nem
+Get the transport configuration for this printer	Printer Scripting		Megadja a nyomtató transzporter-beállításait
+Landscape	ConfigWindow		Fekvő
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
 There are no printers set up.	PrintServerApp		Nincs beállítva nyomtató.
-There is no default printer set up.	PrintServerApp		Nincs beállítva alapértelmezett nyomtató.
-Undefined	ConfigWindow		Nem meghatározott
+Get name of the transport add-on used for this printer	Printer Scripting		Megadja a nyomtatón használt transzporterbővítményt
+All pages, %1 copies	ConfigWindow		Minden oldal, %1 példány
+Delete a specific printer	PrintServerApp Scripting		Törli a megadott nyomtatót
+Create a new printer	PrintServerApp Scripting		Létrehoz egy új nyomtatót
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Nyomtatási beállítások
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Megad egy kiválasztott transzportert
+Get name of printer	Printer Scripting		Megadja a nyomtató nevét
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Megadja a transzporter nevét
+A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Szeretné, ha @ lenne az alapértelmezett nyomtató?
-Would you like to set one up now?	PrintServerApp		Szeretne beállítani egyet most?
-Yes	PrintServerApp		Igen
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		Oldalbeállítás
+Paper setup:	ConfigWindow		Papír tulajdonságai:

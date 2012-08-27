@@ -1,80 +1,80 @@
 1	hungarian	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		StyledEdit
+Paste	Menus		Beillesztés
+OK	LoadAlert		OK
+File	Menus		Fájl
 ???	LoadAlert		???
-Align	Menus		Igazítás
-Black	Menus		Fekete
-Blue	Menus		Kék
-Bold	Menus		Félkövér
+Lines:	Statistics		Sorok:
+Italic	Menus		Dőlt
+Left	Menus		Bal
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Visszaállítja a(z) \"%s\" legutolsó verzióját? 
+Search backwards	FindandReplaceWindow		Keresés visszafelé
+Size	Menus		Méret
+Save	QuitAlert		Mentés
+Page setup…	Menus		Oldalbeállítás...
+Print…	Menus		Nyomtatás...
 Can't undo	Menus		Nem vonható vissza
-Cancel	FindandReplaceWindow		Mégse
-Cancel	QuitAlert		Mégse
-Cancel	RevertToSavedAlert		Mégse
+Save	Menus		Mentés
+Replace with:	FindandReplaceWindow		Csere erre:
 Cancel	SaveAlert		Mégse
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a(z) \"%s\" fájl nem található.
 Case-sensitive	FindandReplaceWindow		Kis- és nagybetűérzékeny
-Center	Menus		Középre
-Characters:	Statistics		Karakterek:
-Close	Menus		Bezárás
-Color	Menus		Szín
-Copy	Menus		Másolás
-Cut	Menus		Kivágás
-Cyan	Menus		Cián
-Default	Open_and_SaveAsPanel		Alapértelmett
-Document	Menus		Dokumentum
-Document statistics	Statistics		Dokumentum statisztikái
-Don't save	QuitAlert		Ne mentse
-Don't save	SaveAlert		Ne mentsen
-Edit	Menus		Szerkesztés
-Encoding	Open_and_SaveAsPanel		Kódolás
-Error loading \"%s\":\n\t%s	LoadAlert		Hiba történt ennek a betöltése közben: \"%s\":\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Hiba a(z) \"%s\" betöltése közben:\n\tA formátum nem támogatott
-Error saving \"%s\":\n%s	SaveAlert		Hiba történt \"%s\" mentése közben:\n%s
-File	Menus		Fájl
-Find	FindandReplaceWindow		Keresés
-Find again	Menus		Keresés újra
-Find selection	Menus		Keresés a kijelölésben
-Find:	FindandReplaceWindow		Keresés:
-Find…	Menus		Keresés…
-Font	Menus		Betűtípus
 Green	Menus		Zöld
-Italic	Menus		Dőlt
-Left	Menus		Bal
-Lines:	Statistics		Sorok:
+Revert to saved…	Menus		Vissza a mentett állapotra…
+Yellow	Menus		Sárga
+Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
+Wrap lines	Menus		Sortörés
+Quit	Menus		Kilépés
+Document statistics	Statistics		Dokumentum statisztikái
+Cancel	RevertToSavedAlert		Mégse
+Document	Menus		Dokumentum
+Save changes to the document \"%s\"? 	QuitAlert		Menti a(z) \"%s\" változtatásait? 
+Edit	Menus		Szerkesztés
+Font	Menus		Betűtípus
+Replace all	FindandReplaceWindow		Mindet cseréli
+Statistics…	Menus		Statisztikák...
+Default	Open_and_SaveAsPanel		Alapértelmett
+Replace next	Menus		Következő cseréje
+Cancel	FindandReplaceWindow		Mégse
+Close	Menus		Bezárás
+Save	SaveAlert		Mentés
+Words:	Statistics		Szavak:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Hiba a(z) \"%s\" betöltése közben:\n\tA formátum nem támogatott
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Ne mentse
+Align	Menus		Igazítás
+Color	Menus		Szín
+Red	Menus		Vörös
+Open…	Menus		Megnyitás…
+Center	Menus		Középre
+Blue	Menus		Kék
+Cyan	Menus		Cián
+OK	Statistics		OK
 Magenta	Menus		Bíbor
 New	Menus		Új
-OK	LoadAlert		OK
-OK	RevertToSavedAlert		OK
-OK	SaveAlert		OK
-OK	Statistics		OK
-Open…	Menus		Megnyitás…
-Page setup…	Menus		Oldalbeállítás...
-Paste	Menus		Beillesztés
-Print…	Menus		Nyomtatás...
-Quit	Menus		Kilépés
-Red	Menus		Vörös
-Redo typing	QuitAlert		Újragépelés
-Replace	FindandReplaceWindow		Cserél
-Replace all	FindandReplaceWindow		Mindet cseréli
-Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
-Replace next	Menus		Következő cseréje
-Replace with:	FindandReplaceWindow		Csere erre:
-Replace…	Menus		Csere…
-Revert to saved…	Menus		Vissza a mentett állapotra…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Visszaállítja a(z) \"%s\" legutolsó verzióját? 
-Right	Menus		Jobb
-Save	Menus		Mentés
-Save	QuitAlert		Mentés
-Save	SaveAlert		Mentés
-Save as…	Menus		Mentés másként...
-Save changes to the document \"%s\"? 	QuitAlert		Menti a(z) \"%s\" változtatásait? 
-Search backwards	FindandReplaceWindow		Keresés visszafelé
-Select all	Menus		Összes kijelölése
-Size	Menus		Méret
-Statistics…	Menus		Statisztikák...
-StyledEdit	System name		StyledEdit
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti a(z) \"%s\" dokumentum változtatásait? 
-Undo typing	QuitAlert		Gépelés visszavonása
-Untitled 	StyledEditWindow		Névtelen
-Words:	Statistics		Szavak:
-Wrap lines	Menus		Sortörés
 Wrap-around search	FindandReplaceWindow		Folyamatos köresés
-Yellow	Menus		Sárga
+Bold	Menus		Félkövér
+Find selection	Menus		Keresés a kijelölésben
+Find:	FindandReplaceWindow		Keresés:
+Error saving \"%s\":\n%s	SaveAlert		Hiba történt \"%s\" mentése közben:\n%s
+Copy	Menus		Másolás
+Cut	Menus		Kivágás
+Replace	FindandReplaceWindow		Cserél
+Find again	Menus		Keresés újra
+Cancel	QuitAlert		Mégse
+Find…	Menus		Keresés…
+Select all	Menus		Összes kijelölése
+Don't save	SaveAlert		Ne mentsen
+Error loading \"%s\":\n\t%s	LoadAlert		Hiba történt ennek a betöltése közben: \"%s\":\n\t%s
+Undo typing	QuitAlert		Gépelés visszavonása
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti a(z) \"%s\" dokumentum változtatásait? 
+Black	Menus		Fekete
+Untitled 	StyledEditWindow		Névtelen
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Keresés
+Encoding	Open_and_SaveAsPanel		Kódolás
+Characters:	Statistics		Karakterek:
+Save as…	Menus		Mentés másként...
+Redo typing	QuitAlert		Újragépelés
+Replace…	Menus		Csere…
+Right	Menus		Jobb

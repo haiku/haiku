@@ -1,68 +1,68 @@
-1	hungarian	x-vnd.Haiku-MediaConverter	424866547
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld csatorna / %lld képkocka
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld képkocka
+1	hungarian	x-vnd.Haiku-MediaConverter	296071315
+Video using parameters form settings	MediaConverter		Videó a beállítások paramétereivel
+Video encoding:	MediaConverter		Videó kódolása:
+No audio	Audio codecs list		Nincs hang
+Error	MediaConverter		Hiba
+Error loading a file	MediaConverter		Hiba történt a fájl betöltése során
+File Error	MediaConverter-FileInfo		Fájlhiba
+Open…	Menu		Megnyitás...
+Start [ms]: 	MediaConverter		Kezdet [ms]:
+Output file '%filename' created	MediaConverter		A(z) '%filename' kimeneti fájl létre lett hozva.
+Output format	MediaConverter		Kimeneti formátum
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld képkocka
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles fájl típusa nem támogatott:
-%d bit 	MediaFileInfo		%d bit
+End   [ms]: 	MediaConverter		Vége [ms]:
+MediaConverter	System name		Médiakonverter
+No video	Video codecs list		Nincs videó
+Duration:	MediaConverter-FileInfo		Időtartam:
+OK	MediaConverter		OK
+Error writing audio frame %Ld	MediaConverter		Hiba történt a %Ld. hang írása közben
+Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl konvertálása közben
+Low	MediaConverter		Alacsony
+Conversion completed	MediaConverter		Konvertálás kész
+Audio:	MediaConverter-FileInfo		Hang:
+OK	MediaConverter-FileInfo		OK
+ seconds	MediaFileInfo		 másodperc
+Source files	MediaConverter		Forrásfájlok
+Cancelling	MediaConverter		Megszakítás folyamatban
 %d byte 	MediaFileInfo		%d byte
+Error loading files	MediaConverter		Hiba történt a fájlok betöltése során
+Cancel	MediaConverter		Mégse
+None available	Video codecs		Nincs elérhető
+Conversion cancelled	MediaConverter		Konvertálás megszakítva
+No file selected	MediaConverter-FileInfo		Nincs fájl kiválasztva
+Error writing video frame %Ld	MediaConverter		Hiba történt a %Ld. képkocka írása közben
+Select this folder	MediaConverter		E mappa kijelölése
+Continue	MediaConverter		Folytatás
+Encoder parameters	MediaConverter-EncoderWindow		Enkóder paraméterei
+Video:	MediaConverter-FileInfo		Videó:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld képkocka
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Hiba történt a fájl beolvasása közben.\n\nHiba:
+%d bit 	MediaFileInfo		%d bit
+Error creating '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl létrehozása közben
+Video quality not supported	MediaConverter		Nem támogatott videóminőség
+Cancelling…	MediaConverter		Megszakítás...
+File details	MediaConverter		Fájl részletei
+Select	MediaConverter		Kijelölés
+Writing video track: %ld%% complete	MediaConverter		Videósáv írása: %ld%% kész
+Quit	Menu		Kilépés
+Preview	MediaConverter		Előnézet
+File format:	MediaConverter		Fájlformátum:
+None available	Audio codecs		Nincs elérhető
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+Error read audio frame %Ld	MediaConverter		Hiba történt a %Ld. hang olvasása közben
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld csatorna / %lld képkocka
+Error launching: %strError%	MediaConverter		Hiba történt a %strError% indítása közben
+High	MediaConverter		Magas
+The file was not recognized as a supported media file:	MediaConverter		A fájl típusa nem támogatott:
+Drop media files onto this window	MediaConverter		Húzzon médiafájlokat erre az ablakra
 Audio encoding:	MediaConverter		Audió kódolása:
 Audio quality not supported	MediaConverter		Ez a hangminőség nem támogatott
-Audio quality: %3d%%	MediaConverter		Audió minősége: %3d%%
-Audio:	MediaConverter-FileInfo		Hang:
-Cancel	MediaConverter		Mégse
-Cancelling	MediaConverter		Megszakítás folyamatban
-Cancelling…	MediaConverter		Megszakítás...
-Continue	MediaConverter		Folytatás
-Conversion cancelled	MediaConverter		Konvertálás megszakítva
-Conversion completed	MediaConverter		Konvertálás kész
-Convert	MediaConverter		Konvertálás
-Drop media files onto this window	MediaConverter		Húzzon médiafájlokat erre az ablakra
-Duration:	MediaConverter-FileInfo		Időtartam:
-Encoder parameters	MediaConverter-EncoderWindow		Enkóder paraméterei
-End   [ms]: 	MediaConverter		Vége [ms]:
-Error	MediaConverter		Hiba
-Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl konvertálása közben
-Error creating '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl létrehozása közben
-Error launching: %strError%	MediaConverter		Hiba történt a %strError% indítása közben
-Error loading a file	MediaConverter		Hiba történt a fájl betöltése során
-Error loading files	MediaConverter		Hiba történt a fájlok betöltése során
-Error read audio frame %Ld	MediaConverter		Hiba történt a %Ld. hang olvasása közben
-Error read video frame %Ld	MediaConverter		Hiba történt a %Ld. képkocka olvasása közben
-Error writing audio frame %Ld	MediaConverter		Hiba történt a %Ld. hang írása közben
-Error writing video frame %Ld	MediaConverter		Hiba történt a %Ld. képkocka írása közben
 File	Menu		Fájl
-File Error	MediaConverter-FileInfo		Fájlhiba
-File details	MediaConverter		Fájl részletei
-File format:	MediaConverter		Fájlformátum:
-High	MediaConverter		Magas
-Low	MediaConverter		Alacsony
-MediaConverter	System name		Médiakonverter
-MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
-No audio	Audio codecs list		Nincs hang
-No file selected	MediaConverter-FileInfo		Nincs fájl kiválasztva
-No video	Video codecs list		Nincs videó
-None available	Audio codecs		Nincs elérhető
-None available	Video codecs		Nincs elérhető
-OK	MediaConverter		OK
-OK	MediaConverter-FileInfo		OK
-Open…	Menu		Megnyitás...
-Output file '%filename' created	MediaConverter		A(z) '%filename' kimeneti fájl létre lett hozva.
-Output folder	MediaConverter		Kimeneti mappa
-Output format	MediaConverter		Kimeneti formátum
-Preview	MediaConverter		Előnézet
-Quit	Menu		Kilépés
-Select	MediaConverter		Kijelölés
-Select this folder	MediaConverter		E mappa kijelölése
-Source files	MediaConverter		Forrásfájlok
-Start [ms]: 	MediaConverter		Kezdet [ms]:
-The file was not recognized as a supported media file:	MediaConverter		A fájl típusa nem támogatott:
-Video encoding:	MediaConverter		Videó kódolása:
-Video quality not supported	MediaConverter		Nem támogatott videóminőség
-Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
-Video using parameters form settings	MediaConverter		Videó a beállítások paramétereivel
-Video:	MediaConverter-FileInfo		Videó:
+Convert	MediaConverter		Konvertálás
 Writing audio track: %ld%% complete	MediaConverter		Audiósáv írása: %ld%% kész
-Writing video track: %ld%% complete	MediaConverter		Videósáv írása: %ld%% kész
-seconds	MediaFileInfo		másodperc
+Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
+Output folder	MediaConverter		Kimeneti mappa
+Audio quality: %3d%%	MediaConverter		Audió minősége: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Hiba történt a fájl beolvasása közben.\n\nHiba:
+Error read video frame %Ld	MediaConverter		Hiba történt a %Ld. képkocka olvasása közben
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles fájl típusa nem támogatott:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld képkocka

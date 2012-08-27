@@ -1,26 +1,27 @@
-1	hungarian	x-vnd.haiku-screenshot	1697748405
-Artwork folder	ScreenshotWindow		Artwork mappa
-Cancel	ScreenshotWindow		Mégse
-Capture active window	ScreenshotWindow		Kép az aktív ablakról
-Choose folder	ScreenshotWindow		Mappa kiválasztása
-Choose folder...	ScreenshotWindow		Mappa kiválasztása...
-Copy to clipboard	ScreenshotWindow		Másolás a vágólapra
-Delay:	ScreenshotWindow		Késleltetés:
+1	hungarian	x-vnd.haiku-screenshot	1721618877
+seconds	ScreenshotWindow		másodperc
 Desktop	ScreenshotWindow		Asztal
-Home folder	ScreenshotWindow		Home mappa
-Include mouse pointer	ScreenshotWindow		Az egérkurzor belefoglalása a képbe
 Include window border	ScreenshotWindow		Az ablak keretének belefoglalása a képbe
-Name:	ScreenshotWindow		Név:
-New screenshot	ScreenshotWindow		Új képernyőkép
-Please select	ScreenshotWindow		Kérjük válasszon
-Save	ScreenshotWindow		Mentés
-Save as:	ScreenshotWindow		Mentés másként:
-Save in:	ScreenshotWindow		Mentés ide:
 Screenshot	System name		Képernyőkép
 Select	ScreenshotWindow		Kiválasztás
-Settings…	ScreenshotWindow		Beállítások...
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ez a fájl már létezik.\n Biztos felül kívánja írni?
-Translator Settings	ScreenshotWindow		Fordító beállítások
-overwrite	ScreenshotWindow		felülírás
+Capture active window	ScreenshotWindow		Kép az aktív ablakról
+Cancel	ScreenshotWindow		Mégse
+Name:	ScreenshotWindow		Név:
+Choose folder	ScreenshotWindow		Mappa kiválasztása
+Save	ScreenshotWindow		Mentés
+Overwrite	ScreenshotWindow		Felülírás
+Choose folder...	ScreenshotWindow		Mappa kiválasztása...
+Please select	ScreenshotWindow		Kérjük válasszon
+Save as:	ScreenshotWindow		Mentés másként:
+Copy to clipboard	ScreenshotWindow		Másolás a vágólapra
+Save in:	ScreenshotWindow		Mentés ide:
 screenshot	Screenshot	Base filename of screenshot files	képernyőkép
-seconds	ScreenshotWindow		másodperc
+New screenshot	ScreenshotWindow		Új képernyőkép
+Artwork folder	ScreenshotWindow		Artwork mappa
+Home folder	ScreenshotWindow		Home mappa
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ez a fájl már létezik.\n Biztos felül kívánja írni?
+Settings…	ScreenshotWindow		Beállítások...
+overwrite	ScreenshotWindow		felülírás
+Delay:	ScreenshotWindow		Késleltetés:
+Include mouse pointer	ScreenshotWindow		Az egérkurzor belefoglalása a képbe
+Translator Settings	ScreenshotWindow		Fordító beállítások

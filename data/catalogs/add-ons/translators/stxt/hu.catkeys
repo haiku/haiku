@@ -1,8 +1,8 @@
-1	hungarian	x-vnd.Haiku-STXTTranslator	4075159346
+1	hungarian	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Formázott szövegfájl
 Plain text file	STXTTranslator		Egszerű szövegfájl
-STXT Settings	STXTMain		STXT beállításai
 STXTTranslator Settings	STXTTranslator		STXT értelmező beállításai
+StyledEdit file translator	STXTView		StyledEdit értelmező
 StyledEdit files	STXTTranslator		StyledEdit fájlok
-StyledEdit files translator	STXTTranslator		StyledEdit fájlértelmező
-StyledEdit files translator	STXTView		StyledEdit fájlértelmező
+StyledEdit file translator	STXTTranslator		StyledEdit értelmező
+STXT Settings	STXTMain		STXT beállításai

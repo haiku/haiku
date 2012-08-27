@@ -1,29 +1,29 @@
 1	hungarian	x-vnd.Haiku-ScreenSaver	215605989
-30 seconds	ScreenSaver		30 másodperc
-Add…	ScreenSaver		Hozzáadás...
-Blackness	ScreenSaver		Sötétség
-Cancel	ScreenSaver		Mégse
-Confirm password:	ScreenSaver		Jelszó megerősítése:
 Could not load screen saver	ScreenSaver		A képernyőkímélő betöltése sikertelen
-Display Power Management Signaling not available	ScreenSaver		A kijelző energiakezelési jelzései nem elérhetőek
-Don't fade when	ScreenSaver		Ne halványítsa el ekkor:
-Done	ScreenSaver		Kész
-Enable screensaver	ScreenSaver		Képernyőkímélő engedélyezése
-Fade now when	ScreenSaver		Elhalványítás ekkor:
-General	ScreenSaver		Általános
-No options available	ScreenSaver		Nincsenek elérhető beállítások
-OK	ScreenSaver		OK
-Password Window	ScreenSaver		Jelszóablak
-Password lock	ScreenSaver		Jelszavas zárolás
-Password:	ScreenSaver		Jelszó:
-Passwords don't match. Please try again.	ScreenSaver		A jelszavak nem egyeznek, próbálja újra.
-Password…	ScreenSaver		Jelszó...
-ScreenSaver	System name		Képernyőkímélő
-Screensaver settings	ScreenSaver		Képernyőkímélő beállításai
-Screensavers	ScreenSaver		Képernyőkímélők
+30 seconds	ScreenSaver		30 másodperc
 Start screensaver	ScreenSaver		Képernyőkímélő indítása
-Test	ScreenSaver		Próba
-Turn off screen	ScreenSaver		Képernyő kikapcsolása
-Use custom password	ScreenSaver		Egyéni jelszó használata
-Use network password	ScreenSaver		Hálózati jelszó használata
+Password…	ScreenSaver		Jelszó...
+Password:	ScreenSaver		Jelszó:
+Password lock	ScreenSaver		Jelszavas zárolás
+Add…	ScreenSaver		Hozzáadás...
+Screensavers	ScreenSaver		Képernyőkímélők
 mouse is here	ScreenSaver		az egér itt van
+Display Power Management Signaling not available	ScreenSaver		A kijelző energiakezelési jelzései nem elérhetőek
+ScreenSaver	System name		Képernyővédő
+Test	ScreenSaver		Próba
+General	ScreenSaver		Általános
+Enable screensaver	ScreenSaver		Képernyőkímélő engedélyezése
+Cancel	ScreenSaver		Mégse
+Turn off screen	ScreenSaver		Képernyő kikapcsolása
+No options available	ScreenSaver		Nincsenek elérhető beállítások
+Password Window	ScreenSaver		Jelszóablak
+Fade now when	ScreenSaver		Elhalványítás ekkor:
+Screensaver settings	ScreenSaver		Képernyőkímélő beállításai
+Passwords don't match. Please try again.	ScreenSaver		A jelszavak nem egyeznek, próbálja újra.
+OK	ScreenSaver		OK
+Don't fade when	ScreenSaver		Ne halványítsa el ekkor:
+Blackness	ScreenSaver		Sötétség
+Use custom password	ScreenSaver		Egyéni jelszó használata
+Done	ScreenSaver		Kész
+Confirm password:	ScreenSaver		Jelszó megerősítése:
+Use network password	ScreenSaver		Hálózati jelszó használata

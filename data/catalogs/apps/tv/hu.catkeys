@@ -1,25 +1,27 @@
-1	hungarian	x-vnd.Haiku.TV	3131207081
-Always on top	MainWin		Mindig legyen felül az ablak
+1	hungarian	x-vnd.Haiku.TV	1995288111
+TV	MainWin		Tv
 Channel	MainWin		Csatorna
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Digitális videóközvetítés TV
-Debug	MainWin		Hibaelhárítás
-Error, connecting to interface failed:\n\n	MainWin		Hiba, nem sikerült csatlakozni a felülethez:\n\n
-Error, interface is busy:\n\n	MainWin		Hiba, a felület foglalt:\n\n
-Full screen	MainWin		Teljes képernyő
+Settings…	MainWin		Beállítások...
 Interface	MainWin		Felület
 Keep aspect ratio	MainWin		Képarány megtartása
-Next channel	MainWin		Következő csatorna
-No border	MainWin		Keret kikapcsolása
-No menu	MainWin		Nincs menü
-None	MainWin		Nincs
-OK	MainWin		OK
 Previous channel	MainWin		Előző csatorna
-Quit	MainWin		Kilépés
 Settings	MainWin		Beállítások
-Settings…	MainWin		Beállítások...
-TV	MainWin		Tv
-force 544 x 576, display aspect 4:3	MainWin		544 x 576 kényszerítése, 4:3-as képaránnyal
-force 704 x 576, display aspect 4:3	MainWin		704 x 576 kikényszerítése, 4:3-as képaránnyal
-force 720 x 576, display aspect 4:3	MainWin		720 x 576 kényszerítése, 4:3-as képaránnyal
-pixel aspect ratio	MainWin		képarány
+TV	System name		Tv
+No border	MainWin		Keret kikapcsolása
+Always on top	MainWin		Mindig legyen felül az ablak
+OK	MainWin		OK
+Quit	MainWin		Kilépés
+Full screen	MainWin		Teljes képernyő
+Debug	MainWin		Hibaelhárítás
+Scale to native size	MainWin		Méretezés az eredeti méretre
 unknown	MainWin		ismeretlen
+Next channel	MainWin		Következő csatorna
+Error, interface is busy:\n\n	MainWin		Hiba, a felület foglalt:\n\n
+None	MainWin		Nincs
+force 704 x 576, display aspect 4:3	MainWin		704 x 576 kikényszerítése, 4:3-as képaránnyal
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digitális videóközvetítés TV
+force 544 x 576, display aspect 4:3	MainWin		544 x 576 kényszerítése, 4:3-as képaránnyal
+pixel aspect ratio	MainWin		képarány
+No menu	MainWin		Nincs menü
+Error, connecting to interface failed:\n\n	MainWin		Hiba, nem sikerült csatlakozni a felülethez:\n\n
+force 720 x 576, display aspect 4:3	MainWin		720 x 576 kényszerítése, 4:3-as képaránnyal

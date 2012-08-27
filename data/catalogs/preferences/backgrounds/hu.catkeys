@@ -1,25 +1,25 @@
 1	hungarian	x-vnd.Haiku-Backgrounds	3513602073
-All workspaces	Main View		Minden munkaasztalra
-Apply	Main View		Alkalmaz
-Backgrounds	System name		Hátterek
-Center	Main View		Középre
-Current workspace	Main View		Jelenlegi munkaasztal
+Backgrounds	System name		Háttér
+X:	Main View		X:
+Resolution: 	Image Filepanel		Felbontás: 
+pick one	Main View		válasszon egyet
 Default	Main View		Alapértelmezés
-Default folder	Main View		Alapértelmezett könyvtár
-Folder: 	Main View		Könyvtár: 
-Icon label outline	Main View		Ikonfelirat körvonala
-Image:	Main View		Kép:
+Center	Main View		Középre
 Manual	Main View		Kézi elhelyezés
+Default folder	Main View		Alapértelmezett könyvtár
+Revert	Main View		Visszaállít
 None	Main View		Nincs
-Other folder…	Main View		Más könyvtár…
+All workspaces	Main View		Minden munkaasztalra
+Icon label outline	Main View		Ikonfelirat körvonala
 Other…	Main View		Egyéb…
+Current workspace	Main View		Jelenlegi munkaasztal
+Folder: 	Main View		Könyvtár: 
+Apply	Main View		Alkalmaz
+Other folder…	Main View		Más könyvtár…
+Y:	Main View		Y:
+Tile	Main View		Sorminta
+Select	Main View		Kiválaszt
+Scale to fit	Main View		Illeszkedően
 Placement:	Main View		Elhelyezkedés:
 Preview	Main View		Előnézet
-Resolution: 	Image Filepanel		Felbontás: 
-Revert	Main View		Visszaállít
-Scale to fit	Main View		Illeszkedően
-Select	Main View		Kiválaszt
-Tile	Main View		Sorminta
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		válasszon egyet
+Image:	Main View		Kép:

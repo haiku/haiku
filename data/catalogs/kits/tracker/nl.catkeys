@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	344678808
+1	dutch; flemish	x-vnd.Haiku-libtracker	2210926534
 common	B_COMMON_DIRECTORY		algemeen
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
@@ -15,7 +15,9 @@ Decrease size	ContainerWindow		Grootte verminderen
 Mini icon view	VolumeWindow		Mini-icoonweergave
 You must have at least one attribute showing.	PoseView		Er moet minstens één eigenschap weergegeven worden.
 Permissions	InfoWindow		Machtigingen
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Selectie omkeren
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Recente documenten
 Modified	QueryPoseView		Gewijzigd
 Created	ContainerWindow		Gemaakt
@@ -88,6 +90,7 @@ Replace	FilePanelPriv		Vervangen
 Select all	VolumeWindow		Alles selecteren
 Opens with:	InfoWindow		Wordt geopend met:
 Open	ContainerWindow		Openen
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Fout bij het berekenen van de mapgrootte
 New folder	FilePanelPriv		Nieuwe map
 %name info	InfoWindow	InfoWindow Title	%name info
@@ -115,6 +118,7 @@ Move to Trash	ContainerWindow		Verplaatsen naar prullenbak
 Move to	ContainerWindow		Verplaatsen naar
 Create %s clipping	PoseView		Maak %s clipping
 Set new link target	InfoWindow		Nieuw linkdoel instellen
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Als u %ifYouDoAction de systeemmap of de inhoud, dan kunt u %osName niet langer opstarten!\n\nWeet u zeker dat u dit wilt doen?\n\nOm toch %toDoAction de systeemmap of de inhoud te doen, houd de Shift-toets vast en klik \"%toConfirmAction\".
 Save as Query template:	FindPanel		Opslaan als zoekopdracht-sjabloon:
 preferences	B_PREFERENCES_DIRECTORY		voorkeuren
 Cancel	FSUtils		Annuleren
@@ -131,6 +135,7 @@ OK	TrackerInitialState		Oké
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" kon niet geopend worden. Het bestand is ten onrechte aangeduid als uitvoerbaar.
 Add-ons	ContainerWindow		Invoegtoepassingen
 Edit templates…	TemplatesMenu		Wijzig sjablonen...
+Finish: %time - Over %finishtime left	StatusWindow		Einde: %time - Meer dan %finishtime resterend
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Er bestaat al een item \"%name\" in deze map. Wilt u het vervangen door het gelinkte bestand dat u aan het maken bent?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Sorry, er is niet genoeg vrije ruimte op het bestemmingsvolume om de selectie te kopiëren.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" kon niet met \"%app\" geopend worden (%error).

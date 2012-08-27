@@ -1,12 +1,12 @@
 1	hungarian	x-vnd.Haiku-HPGSTranslator	3633584048
 Based on HPGS (http://hpgs.berlios.de)	ConfigView		HPGS kód alapján (http://hpgs.berlis.de)
-Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Hiba: Nem lehet befoglalni plot eszközt az olvasóba: %s\n
+Version %d.%d.%d, %s	ConfigView		%d.%d.%d, %s verzió
 Error: Cannot process plot data %s\n	HPGSTranslator		Hiba: Plot adatok nem feldolgozhatóak %s\n
 HPGS image	HPGSTranslator		HPGS kép
-HPGS image translator	HPGSTranslator		HPGS kép fordító
+HPGSTranslator Settings	ConfigView		HPGSTranslator beállításai
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Hiba: Nem lehet befoglalni plot eszközt az olvasóba: %s\n
 HPGS images	ConfigView		HPGS képek
 HPGS images	HPGSTranslator		HPGS képek
-HPGSTranslator Settings	ConfigView		HPGSTranslator beállításai
-Version %d.%d.%d, %s	ConfigView		%d.%d.%d, %s verzió
-Write error %s\n	HPGSTranslator		Íráshiba: %s\n
 no hpgs\n	HPGSTranslator		no hpgs\n
+HPGS image translator	HPGSTranslator		HPGS kép fordító
+Write error %s\n	HPGSTranslator		Íráshiba: %s\n

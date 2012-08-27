@@ -1,6 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-STXTTranslator	3302294301
+1	dutch; flemish	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Be stijl tekstbestand
 Plain text file	STXTTranslator		Platte tekstbestand
 STXTTranslator Settings	STXTTranslator		STXTVertaler Instellingen
+StyledEdit file translator	STXTView		StyledEdit-bestanden translator
 StyledEdit files	STXTTranslator		StyledEdit bestanden
+StyledEdit file translator	STXTTranslator		StyledEdit-bestanden translator
 STXT Settings	STXTMain		STXT Instellingen

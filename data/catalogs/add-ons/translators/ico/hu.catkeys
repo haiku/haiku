@@ -1,14 +1,14 @@
-1	hungarian	x-vnd.Haiku-ICOTranslator	3151213372
+1	hungarian	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		Kurzor
-Enforce valid icon sizes	ConfigView		Érvényes ikonméretek kényszerítése
-ICO Settings	main		ICO Beállítások
-ICOTranslator Settings	ConfigView		ICOFordító beállításai
-Icon	ICOTranslator		Ikon
-Valid icon sizes are 16, 32, or 48	ConfigView		Érvényes ikonméretek: 16, 32 és 48
 Version %d.%d.%d, %s	ConfigView		%d.%d.%d, %s verzió
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld bites kép
-Windows icon images	ConfigView		Windows ikonképek
-Windows icon images	ICOTranslator		Windows ikonképek
+Valid icon sizes are 16, 32, or 48	ConfigView		Érvényes ikonméretek: 16, 32 és 48
+Windows icons	ICOTranslator		Windows ikon
+Enforce valid icon sizes	ConfigView		Érvényes ikonméretek kényszerítése
+ICO Settings	main		ICO Beállítások
 Windows icon translator	ICOTranslator		Windows ikonfordító
-Write 32 bit images on true color input	ConfigView		32-bites képek írása true color bementre
 pixels in either direction.	ConfigView		pixel minden irányba
+Write 32 bit images on true color input	ConfigView		32-bites képek írása true color bementre
+Icon	ICOTranslator		Ikon
+ICOTranslator Settings	ConfigView		ICOFordító beállításai
+Windows icon translator	ConfigView		Windows ikonfordító

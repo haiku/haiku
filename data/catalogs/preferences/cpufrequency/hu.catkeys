@@ -1,20 +1,21 @@
-1	hungarian	x-vnd.Haiku-CPUFrequencyPref	3079996868
-CPU frequency status view	CPU Frequency View		A processzor órajelmutatója
-CPUFrequency	System name		CPUFrequency
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Processzor-órajelbeállító\n\tÍrta: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		Alapértelmezés
-Dynamic performance	Status view		Dinamikus teljesítmény
-Dynamic stepping	CPU Frequency View		Szabadon választható fokozatok
-High performance	Status view		Nagy teljesítmény
-Install replicant into Deskbar	CPU Frequency View		Másolat telepítése az asztalsávba
-Integration time [ms]: 	CPU Frequency View		Alkalmazkodás ideje [ms]: 
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Nem sikerült a processzorórajel-szabályozót elindítani.\n\nHibaok:
-Low energy	Status view		Alacsony energiafogyasztás
+1	hungarian	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		Rendben
-Open Speedstep preferences…	Status view		Fokozatszabályozási beállító megnyitása…
-Quit	Status view		Kilépés
-Revert	Pref Window		Visszaállít
+CPU frequency status view	CPU Frequency View		A processzor órajelmutatója
+OK	Status view		Rendben
 Set state	Status view		Órajel beállítása
-Step up by CPU usage	Color Step View		Kiegyensúlyozott teljesítmény
+Defaults	Pref Window		Alapértelmezés
+Install replicant into Deskbar	CPU Frequency View		Másolat telepítése az asztalsávba
+Quit	Status view		Kilépés
+High performance	Status view		Nagy teljesítmény
 Stepping policy	CPU Frequency View		Fokozatszabályozás
+Dynamic performance	Status view		Dinamikus teljesítmény
+Step up by CPU usage	Color Step View		Kiegyensúlyozott teljesítmény
+Dynamic stepping	CPU Frequency View		Szabadon választható fokozatok
 Stepping policy: 	CPU Frequency View		Fokozatszabályozás:
+Integration time [ms]: 	CPU Frequency View		Alkalmazkodás ideje [ms]: 
+Open Speedstep preferences…	Status view		Fokozatszabályozási beállító megnyitása…
+Revert	Pref Window		Visszaállít
+Low energy	Status view		Alacsony energiafogyasztás
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Nem sikerült a processzorórajel-szabályozót elindítani.\n\nHibaok:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Processzor-órajelbeállító\n\tÍrta: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		CPUFrequency

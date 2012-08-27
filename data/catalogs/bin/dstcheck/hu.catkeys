@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-cmd-dstconfig	2337923203
-.\n\nIs this the correct time?	dstcheck		.\n\nEz a helyes idő?
-Ask me later	dstcheck		Kérdezze később
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Figyelem!\n\nA nyári/téli időszámítások közti váltás miatt lehet hogy a számítógépén az idő egy órával el van tolódva.\nSzerintünk ennyi az idő:
-Manually adjust time…	dstcheck		Idő kézi beállítása...
 Use this time	dstcheck		Használja ezt az időt
+Ask me later	dstcheck		Kérdezze később
+Manually adjust time…	dstcheck		Idő kézi beállítása...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Figyelem!\n\nA nyári/téli időszámítások közti váltás miatt lehet hogy a számítógépén az idő egy órával el van tolódva.\nSzerintünk ennyi az idő:
+.\n\nIs this the correct time?	dstcheck		.\n\nEz a helyes idő?
