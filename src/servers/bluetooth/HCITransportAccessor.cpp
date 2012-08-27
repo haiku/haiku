@@ -47,13 +47,13 @@ HCITransportAccessor::IssueCommand(raw_command rc, size_t size)
 {
 	if (Id() < 0 || fDescriptor < 0)
 		return B_ERROR;
-
+/*
 printf("### Command going: len = %ld\n", size);
 for (uint16 index = 0 ; index < size; index++ ) {
 	printf("%x:",((uint8*)rc)[index]);
 }
 printf("### \n");
-
+*/
 
 	return ioctl(fDescriptor, ISSUE_BT_COMMAND, rc, size);
 }

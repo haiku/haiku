@@ -115,11 +115,17 @@ struct hci_command_header {
 	} __attribute__ ((packed));
 	#define OCF_WRITE_PG_TIMEOUT		0x0018
 
+	#define OCF_READ_SCAN_ENABLE		0x0019
+	struct hci_read_scan_enable {
+		uint8		status;
+		uint8		enable;
+	} __attribute__ ((packed));
+
 	#define OCF_WRITE_SCAN_ENABLE		0x001A
 		#define HCI_SCAN_DISABLED		0x00
-		#define HCI_SCAN_INQUIRY		0x01
-		#define HCI_SCAN_PAGE			0x02
-		#define HCI_SCAN_INQUIRY_PAGE	0x03
+		#define HCI_SCAN_INQUIRY		0x01 //Page Scan disabled
+		#define HCI_SCAN_PAGE			0x02 //Inquiry Scan disabled
+		#define HCI_SCAN_INQUIRY_PAGE	0x03 //All enabled
 	struct hci_write_scan_enable {
 		uint8		scan;
 	} __attribute__ ((packed));
