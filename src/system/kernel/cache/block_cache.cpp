@@ -160,12 +160,13 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 
 	void			Free(void* buffer);
 	void*			Allocate();
+	void			FreeBlock(cached_block* block);
+	cached_block*	NewBlock(off_t blockNumber);
+	void			FreeBlockParentData(cached_block* block);
+
 	void			RemoveUnusedBlocks(int32 count, int32 minSecondsOld = 0);
 	void			RemoveBlock(cached_block* block);
 	void			DiscardBlock(cached_block* block);
-	void			FreeBlock(cached_block* block);
-	cached_block*	NewBlock(off_t blockNumber);
-
 
 private:
 	static void		_LowMemoryHandler(void* data, uint32 resources,
@@ -230,6 +231,9 @@ private:
 			void				_BlockDone(cached_block* block,
 									hash_iterator* iterator);
 			void				_UnmarkWriting(cached_block* block);
+
+	static	int					_CompareBlocks(const void* _blockA,
+									const void* _blockB);
 
 private:
 	static	const size_t		kBufferSize = 64;
@@ -983,20 +987,6 @@ lookup_transaction(block_cache* cache, int32 id)
 //	#pragma mark - cached_block
 
 
-int
-compare_blocks(const void* _blockA, const void* _blockB)
-{
-	cached_block* blockA = *(cached_block**)_blockA;
-	cached_block* blockB = *(cached_block**)_blockB;
-
-	off_t diff = blockA->block_number - blockB->block_number;
-	if (diff > 0)
-		return 1;
-
-	return diff < 0 ? -1 : 0;
-}
-
-
 bool
 cached_block::CanBeWritten() const
 {
@@ -1153,7 +1143,7 @@ BlockWriter::Write(hash_iterator* iterator, bool canUnlock)
 	// Sort blocks in their on-disk order
 	// TODO: ideally, this should be handled by the I/O scheduler
 
-	qsort(fBlocks, fCount, sizeof(void*), &compare_blocks);
+	qsort(fBlocks, fCount, sizeof(void*), &_CompareBlocks);
 	fDeletedTransaction = false;
 
 	for (uint32 i = 0; i < fCount; i++) {
@@ -1303,6 +1293,20 @@ BlockWriter::_UnmarkWriting(cached_block* block)
 		block->busy_writing_waiters = false;
 		fCache->busy_writing_condition.NotifyAll();
 	}
+}
+
+
+/*static*/ int
+BlockWriter::_CompareBlocks(const void* _blockA, const void* _blockB)
+{
+	cached_block* blockA = *(cached_block**)_blockA;
+	cached_block* blockB = *(cached_block**)_blockB;
+
+	off_t diff = blockA->block_number - blockB->block_number;
+	if (diff > 0)
+		return 1;
+
+	return diff < 0 ? -1 : 0;
 }
 
 
@@ -1474,6 +1478,16 @@ block_cache::NewBlock(off_t blockNumber)
 
 
 void
+block_cache::FreeBlockParentData(cached_block* block)
+{
+	ASSERT(block->parent_data != NULL);
+	if (block->parent_data != block->current_data)
+		Free(block->parent_data);
+	block->parent_data = NULL;
+}
+
+
+void
 block_cache::RemoveUnusedBlocks(int32 count, int32 minSecondsOld)
 {
 	TRACE(("block_cache: remove up to %" B_PRId32 " unused blocks\n", count));
@@ -1526,10 +1540,8 @@ block_cache::DiscardBlock(cached_block* block)
 {
 	ASSERT(block->discard);
 
-	if (block->parent_data != NULL && block->parent_data != block->current_data)
-		Free(block->parent_data);
-
-	block->parent_data = NULL;
+	if (block->parent_data != NULL)
+		FreeBlockParentData(block);
 
 	if (block->original_data != NULL) {
 		Free(block->original_data);
@@ -1774,8 +1786,7 @@ put_cached_block(block_cache* cache, cached_block* block)
 			ASSERT(!block->unused);
 			block->unused = true;
 
-			ASSERT(block->original_data == NULL
-				&& block->parent_data == NULL);
+			ASSERT(block->original_data == NULL && block->parent_data == NULL);
 			cache->unused_blocks.Add(block);
 			cache->unused_block_count++;
 		}
@@ -1939,7 +1950,8 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 	if (transaction != NULL && transaction->id != transactionID) {
 		// TODO: we have to wait here until the other transaction is done.
 		//	Maybe we should even panic, since we can't prevent any deadlocks.
-		panic("get_writable_cached_block(): asked to get busy writable block (transaction %ld)\n", block->transaction->id);
+		panic("get_writable_cached_block(): asked to get busy writable block "
+			"(transaction %ld)\n", block->transaction->id);
 		put_cached_block(cache, block);
 		return NULL;
 	}
@@ -1993,7 +2005,8 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 		// remember any previous contents for the parent transaction
 		block->parent_data = cache->Allocate();
 		if (block->parent_data == NULL) {
-			// TODO: maybe we should just continue the current transaction in this case...
+			// TODO: maybe we should just continue the current transaction in
+			// this case...
 			TB(Error(cache, blockNumber, "allocate parent failed"));
 			FATAL(("could not allocate parent\n"));
 			put_cached_block(cache, block);
@@ -2817,11 +2830,8 @@ cache_end_transaction(void* _cache, int32 id,
 			cache->Free(block->original_data);
 			block->original_data = NULL;
 		}
-		if (transaction->has_sub_transaction) {
-			if (block->parent_data != block->current_data)
-				cache->Free(block->parent_data);
-			block->parent_data = NULL;
-		}
+		if (transaction->has_sub_transaction && block->parent_data != NULL)
+			cache->FreeBlockParentData(block);
 
 		// move the block to the previous transaction list
 		transaction->blocks.Add(block);
@@ -2868,11 +2878,8 @@ cache_abort_transaction(void* _cache, int32 id)
 			cache->Free(block->original_data);
 			block->original_data = NULL;
 		}
-		if (transaction->has_sub_transaction) {
-			if (block->parent_data != block->current_data)
-				cache->Free(block->parent_data);
-			block->parent_data = NULL;
-		}
+		if (transaction->has_sub_transaction && block->parent_data != NULL)
+			cache->FreeBlockParentData(block);
 
 		block->transaction_next = NULL;
 		block->transaction = NULL;
@@ -3102,12 +3109,10 @@ cache_start_sub_transaction(void* _cache, int32 id)
 			continue;
 		}
 
-		if (transaction->has_sub_transaction
-			&& block->parent_data != NULL
-			&& block->parent_data != block->current_data) {
+		if (transaction->has_sub_transaction && block->parent_data != NULL) {
 			// there already is an older sub transaction - we acknowledge
 			// its changes and move its blocks up to the parent
-			cache->Free(block->parent_data);
+			cache->FreeBlockParentData(block);
 		}
 
 		// we "allocate" the parent data lazily, that means, we don't copy
