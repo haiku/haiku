@@ -23,7 +23,7 @@ mutex	gIdMapperLock;
 IdMap::IdMap()
 {
 	mutex_init(&fLock, NULL);
-	_Repair();
+	fInitStatus = _Repair();
 }
 
 

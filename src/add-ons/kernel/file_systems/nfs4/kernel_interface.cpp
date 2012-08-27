@@ -124,10 +124,18 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 {
 	status_t result;
 
+	/* prepare idmapper server */
 	MutexLocker locker(gIdMapperLock);
 	gIdMapper = new(std::nothrow) IdMap;
 	if (gIdMapper == NULL)
 		return B_NO_MEMORY;
+
+	result = gIdMapper->InitStatus();
+	if (result != B_OK) {
+		delete gIdMapper;
+		gIdMapper = NULL;
+		return result;
+	}
 	locker.Unlock();
 
 	PeerAddress address;
