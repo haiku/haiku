@@ -984,6 +984,27 @@ lookup_transaction(block_cache* cache, int32 id)
 }
 
 
+/*!	Writes back any changes made to blocks in \a transaction that are still
+	part of a previous transacton.
+*/
+static status_t
+write_blocks_in_previous_transaction(block_cache* cache,
+	cache_transaction* transaction)
+{
+	BlockWriter writer(cache);
+
+	cached_block* block = transaction->first_block;
+	for (; block != NULL; block = block->transaction_next) {
+		if (block->previous_transaction != NULL) {
+			// need to write back pending changes
+			writer.Add(block);
+		}
+	}
+
+	return writer.Write();
+}
+
+
 //	#pragma mark - cached_block
 
 
@@ -2789,17 +2810,7 @@ cache_end_transaction(void* _cache, int32 id,
 	}
 
 	// Write back all pending transaction blocks
-
-	BlockWriter writer(cache);
-	cached_block* block = transaction->first_block;
-	for (; block != NULL; block = block->transaction_next) {
-		if (block->previous_transaction != NULL) {
-			// need to write back pending changes
-			writer.Add(block);
-		}
-	}
-
-	status_t status = writer.Write();
+	status_t status = write_blocks_in_previous_transaction(cache, transaction);
 	if (status != B_OK)
 		return status;
 
@@ -2816,7 +2827,8 @@ cache_end_transaction(void* _cache, int32 id,
 	// iterate through all blocks and free the unchanged original contents
 
 	cached_block* next;
-	for (block = transaction->first_block; block != NULL; block = next) {
+	for (cached_block* block = transaction->first_block; block != NULL;
+			block = next) {
 		next = block->transaction_next;
 		ASSERT(block->previous_transaction == NULL);
 
@@ -2920,16 +2932,7 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 
 	// iterate through all blocks and free the unchanged original contents
 
-	BlockWriter writer(cache);
-	cached_block* block = transaction->first_block;
-	for (; block != NULL; block = block->transaction_next) {
-		if (block->previous_transaction != NULL) {
-			// need to write back pending changes
-			writer.Add(block);
-		}
-	}
-
-	status_t status = writer.Write();
+	status_t status = write_blocks_in_previous_transaction(cache, transaction);
 	if (status != B_OK)
 		return status;
 
@@ -2951,7 +2954,8 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 
 	cached_block* last = NULL;
 	cached_block* next;
-	for (block = transaction->first_block; block != NULL; block = next) {
+	for (cached_block* block = transaction->first_block; block != NULL;
+			block = next) {
 		next = block->transaction_next;
 		ASSERT(block->previous_transaction == NULL);
 
