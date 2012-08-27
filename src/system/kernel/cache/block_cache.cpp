@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1539,6 +1539,7 @@ void
 block_cache::DiscardBlock(cached_block* block)
 {
 	ASSERT(block->discard);
+	ASSERT(block->previous_transaction == NULL);
 
 	if (block->parent_data != NULL)
 		FreeBlockParentData(block);
@@ -2830,8 +2831,10 @@ cache_end_transaction(void* _cache, int32 id,
 			cache->Free(block->original_data);
 			block->original_data = NULL;
 		}
-		if (transaction->has_sub_transaction && block->parent_data != NULL)
+		if (block->parent_data != NULL) {
+			ASSERT(transaction->has_sub_transaction);
 			cache->FreeBlockParentData(block);
+		}
 
 		// move the block to the previous transaction list
 		transaction->blocks.Add(block);
@@ -3089,36 +3092,32 @@ cache_start_sub_transaction(void* _cache, int32 id)
 	// move all changed blocks up to the parent
 
 	cached_block* block = transaction->first_block;
-	cached_block* last = NULL;
 	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
-		if (block->discard) {
-			// This block has been discarded in the parent transaction
-			// TODO: this is wrong: since the parent transaction is not
-			// finished here (just extended), this block cannot be reverted
-			// anymore in case the parent transaction is aborted!!!
-			if (last != NULL)
-				last->transaction_next = next;
-			else
-				transaction->first_block = next;
-
-			cache->DiscardBlock(block);
-			transaction->num_blocks--;
-			continue;
-		}
-
-		if (transaction->has_sub_transaction && block->parent_data != NULL) {
-			// there already is an older sub transaction - we acknowledge
+		if (block->parent_data != NULL) {
+			// There already is an older sub transaction - we acknowledge
 			// its changes and move its blocks up to the parent
+			ASSERT(transaction->has_sub_transaction);
 			cache->FreeBlockParentData(block);
+		}
+		if (block->discard) {
+			// This block has been discarded in the parent transaction.
+			// Just throw away any changes made in this transaction, so that
+			// it can still be reverted to its original contents if needed
+			ASSERT(block->previous_transaction == NULL);
+			if (block->original_data != NULL) {
+				memcpy(block->current_data, block->original_data,
+					cache->block_size);
+				block->original_data = NULL;
+			}
+			continue;
 		}
 
 		// we "allocate" the parent data lazily, that means, we don't copy
 		// the data (and allocate memory for it) until we need to
 		block->parent_data = block->current_data;
-		last = block;
 	}
 
 	// all subsequent changes will go into the sub transaction
