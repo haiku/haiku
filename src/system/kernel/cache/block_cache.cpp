@@ -1291,6 +1291,7 @@ BlockWriter::_BlockDone(cached_block* block, hash_iterator* iterator)
 	}
 	if (block->transaction == NULL && block->ref_count == 0 && !block->unused) {
 		// the block is no longer used
+		ASSERT(block->original_data == NULL && block->parent_data == NULL);
 		block->unused = true;
 		fCache->unused_blocks.Add(block);
 		fCache->unused_block_count++;
@@ -1639,13 +1640,10 @@ block_cache::_GetUnusedBlock()
 		unused_block_count--;
 		hash_remove(hash, block);
 
-		// TODO: see if parent/compare data is handled correctly here!
-		if (block->parent_data != NULL
-			&& block->parent_data != block->original_data)
-			Free(block->parent_data);
-		if (block->original_data != NULL)
-			Free(block->original_data);
+		ASSERT(block->original_data == NULL && block->parent_data == NULL);
+		block->unused = false;
 
+		// TODO: see if compare data is handled correctly here!
 #if BLOCK_CACHE_DEBUG_CHANGED
 		if (block->compare != NULL)
 			Free(block->compare);
@@ -3059,8 +3057,18 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 
 			block->transaction_next = NULL;
 			block->transaction = NULL;
-			if (block->previous_transaction == NULL)
+			if (block->previous_transaction == NULL) {
+				cache->Free(block->original_data);
+				block->original_data = NULL;
 				block->is_dirty = false;
+
+				if (block->ref_count == 0) {
+					// Move the block into the unused list if possible
+					block->unused = true;
+					cache->unused_blocks.Add(block);
+					cache->unused_block_count++;
+				}
+			}
 		} else {
 			if (block->parent_data != block->current_data) {
 				// The block has been changed and must be restored - the block
