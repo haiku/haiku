@@ -32,7 +32,7 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	fIsPlaying(false),
 	fIsFullscreen(false),
 	fFullscreenControlsVisible(false),
-	fFirstAfterFullscreen(false),
+	fFirstPulseAfterFullscreen(false),
 	fSendHideCounter(0),
 	fLastMouseMove(system_time()),
 
@@ -134,7 +134,7 @@ VideoView::Pulse()
 		if (buttons == 0) {
 			// Hide the full screen controls (and the mouse pointer)
 			// after a while
-			if (fFullscreenControlsVisible || fFirstAfterFullscreen) {
+			if (fFullscreenControlsVisible || fFirstPulseAfterFullscreen) {
 				if (fSendHideCounter == 0 || fSendHideCounter == 3) {
 					// Send after 1.5s and after 4.5s
 					BMessage message(M_HIDE_FULL_SCREEN_CONTROLS);
@@ -144,7 +144,7 @@ VideoView::Pulse()
 					Window()->PostMessage(&message, Window());
 				}
 				fSendHideCounter++;
-				fFirstAfterFullscreen = false;
+				fFirstPulseAfterFullscreen = false;
 			}
 
 			// Take care of disabling the screen saver
@@ -310,7 +310,7 @@ VideoView::SetFullscreen(bool fullScreen)
 {
 	fIsFullscreen = fullScreen;
 	fSendHideCounter = 0;
-	fFirstAfterFullscreen = true;
+	fFirstPulseAfterFullscreen = true;
 }
 
 
