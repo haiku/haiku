@@ -3035,6 +3035,7 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 	// revert all changes back to the version of the parent
 
 	cached_block* block = transaction->first_block;
+	cached_block* last = NULL;
 	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
@@ -3046,21 +3047,32 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 			ASSERT(block->original_data != NULL);
 			memcpy(block->current_data, block->original_data,
 				cache->block_size);
+
+			if (last != NULL)
+				last->transaction_next = next;
+			else
+				transaction->first_block = next;
+
 			block->transaction_next = NULL;
 			block->transaction = NULL;
 			if (block->previous_transaction == NULL)
 				block->is_dirty = false;
-		} else if (block->parent_data != block->current_data) {
-			// The block has been changed and must be restored - the block
-			// is still dirty and part of the transaction
-			TRACE(("cache_abort_sub_transaction(id = %ld): restored contents "
-				"of block %Ld\n", transaction->id, block->block_number));
-			memcpy(block->current_data, block->parent_data, cache->block_size);
-			cache->Free(block->parent_data);
-			// The block stays dirty
+		} else {
+			if (block->parent_data != block->current_data) {
+				// The block has been changed and must be restored - the block
+				// is still dirty and part of the transaction
+				TRACE(("cache_abort_sub_transaction(id = %ld): restored "
+					"contents of block %Ld\n", transaction->id,
+					block->block_number));
+				memcpy(block->current_data, block->parent_data,
+					cache->block_size);
+				cache->Free(block->parent_data);
+				// The block stays dirty
+			}
+			block->parent_data = NULL;
+			last = block;
 		}
 
-		block->parent_data = NULL;
 		block->discard = false;
 	}
 
