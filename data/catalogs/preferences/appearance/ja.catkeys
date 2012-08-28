@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Appearance	4131954014
+1	japanese	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		標準フォント：
 Control highlight	Colors tab		コントロールのハイライト
 Control border	Colors tab		コントロールの境界
@@ -23,7 +23,6 @@ Tooltip background	Colors tab		ツールチップの背景
 Selected menu item background	Colors tab		メニュー選択項目の背景
 Antialiasing	APRWindow		アンチエイリアス
 Navigation base	Colors tab		ナビゲーション
-Selected list item text	Colors tab		リスト選択項目の文字
 Window border	Colors tab		ウィンドウ枠
 Window tab text	Colors tab		ウィンドウタブの文字
 Document text	Colors tab		ドキュメントの文字
@@ -31,17 +30,14 @@ Navigation pulse	Colors tab		ナビゲーションの点滅
 Window decorator:	DecorSettingsView		ウィンドウデコレーター：
 Selected menu item text	Colors tab		メニュー選択項目の文字
 Menu background	Colors tab		メニューの背景
-List background	Colors tab		リストの背景
 OK	DecorSettingsView		OK
 Control mark	Colors tab		コントロールの選択部
 Size:	Font Selection view		サイズ：
-Selected list item background	Colors tab		リスト選択項目の背景
 Panel background	Colors tab		パネルの背景
 Menu font:	Font view		メニューフォント：
 Colors	APRWindow		色
 Control background	Colors tab		コントロールの背景
 Inactive window tab	Colors tab		非アクティブウィンドウタブ
-List item text	Colors tab		リスト項目のテキスト
 Appearance	System name		外観
 Fixed font:	Font view		等幅フォント：
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	古池や A frog jumps in, 水の音。

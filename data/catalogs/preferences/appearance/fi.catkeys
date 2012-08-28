@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	4131954014
+1	finnish	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Pelkkä kirjasin:
 Control highlight	Colors tab		Kontrollin korostus
 Control border	Colors tab		Kontrollin reuna
@@ -23,7 +23,6 @@ Tooltip background	Colors tab		Työkaluvinkin tausta
 Selected menu item background	Colors tab		Valitun valikkovalinnan tausta
 Antialiasing	APRWindow		Reunanpehmennys
 Navigation base	Colors tab		Navigoinnin pohja
-Selected list item text	Colors tab		Valitun luettelorivin teksti
 Window border	Colors tab		Ikkunaraja
 Window tab text	Colors tab		Ikkunakahvan teksti
 Document text	Colors tab		Dokumentin teksti
@@ -31,17 +30,14 @@ Navigation pulse	Colors tab		Navigoinnin välke
 Window decorator:	DecorSettingsView		Ikkunan kehystäjä:
 Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
 Menu background	Colors tab		Valikon tausta
-List background	Colors tab		Luettelotausta
 OK	DecorSettingsView		Valmis
 Control mark	Colors tab		Ohjausmerkki
 Size:	Font Selection view		Koko:
-Selected list item background	Colors tab		Valitun luettelorivin tausta
 Panel background	Colors tab		Paneelin tausta
 Menu font:	Font view		Valikkokirjasin:
 Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
 Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
-List item text	Colors tab		Luettelorivin teksti
 Appearance	System name		Ulkoasuasetukset
 Fixed font:	Font view		Tasalevyinen kirjasin:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.

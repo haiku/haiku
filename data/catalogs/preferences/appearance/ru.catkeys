@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	4131954014
+1	russian	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Простой шрифт:
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
@@ -23,7 +23,6 @@ Tooltip background	Colors tab		Фон подсказки
 Selected menu item background	Colors tab		Фон выбранного пункта меню
 Antialiasing	APRWindow		Сглаживание
 Navigation base	Colors tab		Основа навигации
-Selected list item text	Colors tab		Текст выделенного пункта в списке
 Window border	Colors tab		Рамка окна
 Window tab text	Colors tab		Текст заголовка окна
 Document text	Colors tab		Текст документа
@@ -31,17 +30,14 @@ Navigation pulse	Colors tab		Навигационная пульсация
 Window decorator:	DecorSettingsView		Оконный декоратор:
 Selected menu item text	Colors tab		Текст выделенного пункта меню
 Menu background	Colors tab		Фон меню
-List background	Colors tab		Фон списка
 OK	DecorSettingsView		ОК
 Control mark	Colors tab		Отметка
 Size:	Font Selection view		Размер:
-Selected list item background	Colors tab		Фон выбранного пункта в списке
 Panel background	Colors tab		Фон панели
 Menu font:	Font view		Шрифт меню:
 Colors	APRWindow		Цвета
 Control background	Colors tab		Фон элемента
 Inactive window tab	Colors tab		Заголовок неактивного окна
-List item text	Colors tab		Текст пункта в списке
 Appearance	System name		Внешний вид
 Fixed font:	Font view		Моноширинный шрифт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.

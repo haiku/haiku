@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Appearance	4131954014
+1	german	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Normal:
 Control highlight	Colors tab		Steuerelement - Ausgewählt
 Control border	Colors tab		Steuerelement - Rahmen
@@ -23,7 +23,6 @@ Tooltip background	Colors tab		Tooltip - Hintergrund
 Selected menu item background	Colors tab		Menü - Hintergrund (ausgewählt)
 Antialiasing	APRWindow		Kantenglättung
 Navigation base	Colors tab		Navigation - Grundfarbe
-Selected list item text	Colors tab		Liste - Text (ausgewählt)
 Window border	Colors tab		Fenster - Rahmen
 Window tab text	Colors tab		Reiter - Text
 Document text	Colors tab		Dokument - Text
@@ -31,17 +30,14 @@ Navigation pulse	Colors tab		Navigation - Leuchtfarbe
 Window decorator:	DecorSettingsView		Fenster-Dekorator:
 Selected menu item text	Colors tab		Menü - Text (ausgewählt)
 Menu background	Colors tab		Menü - Hintergrund
-List background	Colors tab		Liste - Hintergrund
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Steuerelement - Markierung
 Size:	Font Selection view		Größe:
-Selected list item background	Colors tab		Liste - Hintergrund (ausgewählt)
 Panel background	Colors tab		Oberfläche - Hintergrund
 Menu font:	Font view		Menü:
 Colors	APRWindow		Farben
 Control background	Colors tab		Steuerelement - Hintergrund
 Inactive window tab	Colors tab		Reiter (inaktiv)
-List item text	Colors tab		Liste - Text
 Appearance	System name		Erscheinungsbild
 Fixed font:	Font view		Feste Breite:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Franz jagt im total verwahrlosten Taxi quer durch Bayern.
