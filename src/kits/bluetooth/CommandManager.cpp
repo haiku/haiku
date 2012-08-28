@@ -106,6 +106,13 @@ void* buildReadClassOfDevice(size_t* outsize)
 }
 
 
+void* buildReadScan(size_t* outsize)
+{
+	return buildCommand(OGF_CONTROL_BASEBAND, OCF_READ_SCAN_ENABLE,
+	NULL, 0, outsize);
+}
+
+
 void* buildWriteScan(uint8 scanmode, size_t* outsize)
 {
 	struct hci_write_scan_enable* param;
@@ -118,7 +125,6 @@ void* buildWriteScan(uint8 scanmode, size_t* outsize)
 	}
 
 	return command;
-
 }
 
 

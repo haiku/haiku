@@ -1,7 +1,11 @@
 SubDir HAIKU_TOP src tools translation pnginfo ;
 
 UseLibraryHeaders zlib ;
-UseLibraryHeaders png ;
+UseHeaders $(HAIKU_LIBPNG_HEADERS) : true ;
 
-BinCommand pnginfo : pnginfo.cpp : be libpng.a libz.a $(TARGET_LIBSUPC++) ;
+Includes [ FGristFiles pnginfo.cpp ]
+	: $(HAIKU_LIBPNG_HEADERS_DEPENDENCY) ;
+
+BinCommand pnginfo : pnginfo.cpp : be $(HAIKU_LIBPNG_LIB) libz.a
+	$(TARGET_LIBSUPC++) ;
 

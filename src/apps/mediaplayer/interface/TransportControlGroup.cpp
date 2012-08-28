@@ -66,7 +66,8 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	fPlayPause(NULL),
 	fStop(NULL),
 	fMute(NULL),
-	fSymbolScale(1.0f)
+	fSymbolScale(1.0f),
+	fLastEnabledButtons(0)
 {
 	// Pick a symbol size based on the current system font size, but make
 	// sure the size is uneven, so the pointy shapes have their middle on
@@ -284,7 +285,7 @@ TransportControlGroup::MessageReceived(BMessage* message)
 uint32
 TransportControlGroup::EnabledButtons()
 {
-	return 0;
+	return fLastEnabledButtons;
 }
 
 
@@ -362,6 +363,8 @@ TransportControlGroup::SetEnabled(uint32 buttons)
 {
 	if (!LockLooper())
 		return;
+
+	fLastEnabledButtons = buttons;
 
 	fSeekSlider->SetEnabled(buttons & SEEK_ENABLED);
 	fSeekSlider->SetToolTip((buttons & SEEK_ENABLED) != 0

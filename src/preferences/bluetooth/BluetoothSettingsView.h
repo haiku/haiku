@@ -28,6 +28,8 @@ private:
 			void			_BuildConnectionPolicy();
 			void			_BuildClassMenu();
 			void			_BuildLocalDevicesMenu();
+			bool			_SetDeviceClass(uint8 major, uint8 minor
+								, uint16 service);
 
 protected:
 			float			fDivider;

@@ -30,13 +30,7 @@
 #define B_TRANSLATION_CONTEXT "Settings view"
 
 static const int32 kMsgSetConnectionPolicy = 'sCpo';
-
-static const int32 kMsgSetDeviceClassDesktop = 'sDCd';
-static const int32 kMsgSetDeviceClassServer = 'sDCs';
-static const int32 kMsgSetDeviceClassLaptop = 'sDCl';
-static const int32 kMsgSetDeviceClassHandheld = 'sDCh';
-static const int32 kMsgSetDeviceClassSmartPhone = 'sDCp';
-
+static const int32 kMsgSetDeviceClass = 'sDC0';
 static const int32 kMsgSetInquiryTime = 'afEa';
 static const int32 kMsgLocalSwitched = 'lDsW';
 
@@ -108,7 +102,6 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 
 		.SetInsets(10, 10, 10, 10)
 	);
-
 }
 
 
@@ -136,9 +129,6 @@ BluetoothSettingsView::AttachedToWindow()
 void
 BluetoothSettingsView::MessageReceived(BMessage* message)
 {
-
-	DeviceClass devClass;
-
 	switch (message->what) {
 		case kMsgLocalSwitched:
 		{
@@ -151,44 +141,29 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 			}
 		}
 		break;
-
-		case kMsgSetDeviceClassDesktop:
+/*
+		To be fixed :)
+		case kMsgSetConnectionPolicy:
 		{
-			devClass.SetRecord(1, 1, 0x72);
-			if (ActiveLocalDevice != NULL)
-				ActiveLocalDevice->SetDeviceClass(devClass);
+			//uint8 Policy;
+			//if (message->FindInt8("Policy", (int8*)&Policy) == B_OK)
 			break;
 		}
-
-		case kMsgSetDeviceClassServer:
+		
+		case kMsgSetInquiryTime:
 		{
-			devClass.SetRecord(1, 2, 0x72);
-			if (ActiveLocalDevice != NULL)
-				ActiveLocalDevice->SetDeviceClass(devClass);
 			break;
-		}
+		}*/
 
-		case kMsgSetDeviceClassLaptop:
+		case kMsgSetDeviceClass:
 		{
-			devClass.SetRecord(1, 3, 0x72);
-			if (ActiveLocalDevice != NULL)
-				ActiveLocalDevice->SetDeviceClass(devClass);
-			break;
-		}
-
-		case kMsgSetDeviceClassHandheld:
-		{
-			devClass.SetRecord(1, 4, 0x72);
-			if (ActiveLocalDevice != NULL)
-				ActiveLocalDevice->SetDeviceClass(devClass);
-			break;
-		}
-
-		case kMsgSetDeviceClassSmartPhone:
-		{
-			devClass.SetRecord(2, 3, 0x72);
-			if (ActiveLocalDevice != NULL)
-				ActiveLocalDevice->SetDeviceClass(devClass);
+			uint8 deviceClass;
+			if (message->FindInt8("DeviceClass", (int8*)&deviceClass) == B_OK) {
+				if (deviceClass == 5)
+					_SetDeviceClass(2, 3, 0x72);
+				else
+					_SetDeviceClass(1, deviceClass, 0x72);
+			}
 			break;
 		}
 
@@ -199,6 +174,22 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+bool
+BluetoothSettingsView::_SetDeviceClass(uint8 major, uint8 minor, uint16 service)
+{
+	bool haveRun = true;
+	
+	DeviceClass devClass;
+	devClass.SetRecord(major, minor, service);
+	if (ActiveLocalDevice != NULL)
+		ActiveLocalDevice->SetDeviceClass(devClass);
+	else
+		haveRun = false;
+		
+	return haveRun;
 }
 
 
@@ -216,46 +207,50 @@ BluetoothSettingsView::_BuildConnectionPolicy()
 	fPolicyMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetConnectionPolicy);
-	message->AddBool("Policy", 2);
+	message->AddInt8("Policy", 2);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kTrustedLabel), message);
 	fPolicyMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetConnectionPolicy);
-	message->AddBool("Policy", 3);
+	message->AddInt8("Policy", 3);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kAlwaysLabel), NULL);
 	fPolicyMenu->AddItem(item);
-
 }
 
 
 void
 BluetoothSettingsView::_BuildClassMenu()
 {
+	
+	BMessage* message = NULL;
+	BMenuItem* item = NULL;
 
 	fClassMenu = new BPopUpMenu(B_TRANSLATE("Identify us as..."));
-	BMessage* message;
 
-	message = new BMessage(kMsgSetDeviceClassDesktop);
-	BMenuItem* item
-		= new BMenuItem(B_TRANSLATE_NOCOLLECT(kDesktopLabel), message);
+	message = new BMessage(kMsgSetDeviceClass);
+	message->AddInt8("DeviceClass", 1);
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kDesktopLabel), message);
 	fClassMenu->AddItem(item);
 
-	message = new BMessage(kMsgSetDeviceClassServer);
+	message = new BMessage(kMsgSetDeviceClass);
+	message->AddInt8("DeviceClass", 2);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kServerLabel), message);
 	fClassMenu->AddItem(item);
 
-	message = new BMessage(kMsgSetDeviceClassLaptop);
+	message = new BMessage(kMsgSetDeviceClass);
+	message->AddInt8("DeviceClass", 3);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kLaptopLabel), message);
 	fClassMenu->AddItem(item);
 
-	message = new BMessage(kMsgSetDeviceClassHandheld);
+	message = new BMessage(kMsgSetDeviceClass);
+	message->AddInt8("DeviceClass", 4);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kHandheldLabel), message);
 	fClassMenu->AddItem(item);
 
-	message = new BMessage(kMsgSetDeviceClassSmartPhone);
+	message = new BMessage(kMsgSetDeviceClass);
+	message->AddInt8("DeviceClass", 5);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kPhoneLabel), message);
 	fClassMenu->AddItem(item);
-
 }
 
 

@@ -1,6 +1,7 @@
 /*
  * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * Copyright 2008 Mika Lindqvist
+ * Copyright 2012 Fredrik Modéen [firstname]@[lastname].se
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef _COMMAND_MANAGER_H
@@ -104,6 +105,7 @@ SingleParameterCommandRequest(uint8 ofg, uint8 ocf, PARAMETERTYPE parameter,
 /* CONTROL BASEBAND */
 void* buildReset(size_t* outsize);
 void* buildReadLocalName(size_t* outsize);
+void* buildReadScan(size_t* outsize);
 void* buildWriteScan(uint8 scanmode, size_t* outsize);
 void* buildReadClassOfDevice(size_t* outsize);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -160,12 +160,13 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 
 	void			Free(void* buffer);
 	void*			Allocate();
+	void			FreeBlock(cached_block* block);
+	cached_block*	NewBlock(off_t blockNumber);
+	void			FreeBlockParentData(cached_block* block);
+
 	void			RemoveUnusedBlocks(int32 count, int32 minSecondsOld = 0);
 	void			RemoveBlock(cached_block* block);
 	void			DiscardBlock(cached_block* block);
-	void			FreeBlock(cached_block* block);
-	cached_block*	NewBlock(off_t blockNumber);
-
 
 private:
 	static void		_LowMemoryHandler(void* data, uint32 resources,
@@ -230,6 +231,9 @@ private:
 			void				_BlockDone(cached_block* block,
 									hash_iterator* iterator);
 			void				_UnmarkWriting(cached_block* block);
+
+	static	int					_CompareBlocks(const void* _blockA,
+									const void* _blockB);
 
 private:
 	static	const size_t		kBufferSize = 64;
@@ -980,21 +984,28 @@ lookup_transaction(block_cache* cache, int32 id)
 }
 
 
-//	#pragma mark - cached_block
-
-
-int
-compare_blocks(const void* _blockA, const void* _blockB)
+/*!	Writes back any changes made to blocks in \a transaction that are still
+	part of a previous transacton.
+*/
+static status_t
+write_blocks_in_previous_transaction(block_cache* cache,
+	cache_transaction* transaction)
 {
-	cached_block* blockA = *(cached_block**)_blockA;
-	cached_block* blockB = *(cached_block**)_blockB;
+	BlockWriter writer(cache);
 
-	off_t diff = blockA->block_number - blockB->block_number;
-	if (diff > 0)
-		return 1;
+	cached_block* block = transaction->first_block;
+	for (; block != NULL; block = block->transaction_next) {
+		if (block->previous_transaction != NULL) {
+			// need to write back pending changes
+			writer.Add(block);
+		}
+	}
 
-	return diff < 0 ? -1 : 0;
+	return writer.Write();
 }
+
+
+//	#pragma mark - cached_block
 
 
 bool
@@ -1153,7 +1164,7 @@ BlockWriter::Write(hash_iterator* iterator, bool canUnlock)
 	// Sort blocks in their on-disk order
 	// TODO: ideally, this should be handled by the I/O scheduler
 
-	qsort(fBlocks, fCount, sizeof(void*), &compare_blocks);
+	qsort(fBlocks, fCount, sizeof(void*), &_CompareBlocks);
 	fDeletedTransaction = false;
 
 	for (uint32 i = 0; i < fCount; i++) {
@@ -1280,6 +1291,7 @@ BlockWriter::_BlockDone(cached_block* block, hash_iterator* iterator)
 	}
 	if (block->transaction == NULL && block->ref_count == 0 && !block->unused) {
 		// the block is no longer used
+		ASSERT(block->original_data == NULL && block->parent_data == NULL);
 		block->unused = true;
 		fCache->unused_blocks.Add(block);
 		fCache->unused_block_count++;
@@ -1303,6 +1315,20 @@ BlockWriter::_UnmarkWriting(cached_block* block)
 		block->busy_writing_waiters = false;
 		fCache->busy_writing_condition.NotifyAll();
 	}
+}
+
+
+/*static*/ int
+BlockWriter::_CompareBlocks(const void* _blockA, const void* _blockB)
+{
+	cached_block* blockA = *(cached_block**)_blockA;
+	cached_block* blockB = *(cached_block**)_blockB;
+
+	off_t diff = blockA->block_number - blockB->block_number;
+	if (diff > 0)
+		return 1;
+
+	return diff < 0 ? -1 : 0;
 }
 
 
@@ -1474,6 +1500,16 @@ block_cache::NewBlock(off_t blockNumber)
 
 
 void
+block_cache::FreeBlockParentData(cached_block* block)
+{
+	ASSERT(block->parent_data != NULL);
+	if (block->parent_data != block->current_data)
+		Free(block->parent_data);
+	block->parent_data = NULL;
+}
+
+
+void
 block_cache::RemoveUnusedBlocks(int32 count, int32 minSecondsOld)
 {
 	TRACE(("block_cache: remove up to %" B_PRId32 " unused blocks\n", count));
@@ -1525,11 +1561,10 @@ void
 block_cache::DiscardBlock(cached_block* block)
 {
 	ASSERT(block->discard);
+	ASSERT(block->previous_transaction == NULL);
 
-	if (block->parent_data != NULL && block->parent_data != block->current_data)
-		Free(block->parent_data);
-
-	block->parent_data = NULL;
+	if (block->parent_data != NULL)
+		FreeBlockParentData(block);
 
 	if (block->original_data != NULL) {
 		Free(block->original_data);
@@ -1605,13 +1640,10 @@ block_cache::_GetUnusedBlock()
 		unused_block_count--;
 		hash_remove(hash, block);
 
-		// TODO: see if parent/compare data is handled correctly here!
-		if (block->parent_data != NULL
-			&& block->parent_data != block->original_data)
-			Free(block->parent_data);
-		if (block->original_data != NULL)
-			Free(block->original_data);
+		ASSERT(block->original_data == NULL && block->parent_data == NULL);
+		block->unused = false;
 
+		// TODO: see if compare data is handled correctly here!
 #if BLOCK_CACHE_DEBUG_CHANGED
 		if (block->compare != NULL)
 			Free(block->compare);
@@ -1774,8 +1806,7 @@ put_cached_block(block_cache* cache, cached_block* block)
 			ASSERT(!block->unused);
 			block->unused = true;
 
-			ASSERT(block->original_data == NULL
-				&& block->parent_data == NULL);
+			ASSERT(block->original_data == NULL && block->parent_data == NULL);
 			cache->unused_blocks.Add(block);
 			cache->unused_block_count++;
 		}
@@ -1939,7 +1970,8 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 	if (transaction != NULL && transaction->id != transactionID) {
 		// TODO: we have to wait here until the other transaction is done.
 		//	Maybe we should even panic, since we can't prevent any deadlocks.
-		panic("get_writable_cached_block(): asked to get busy writable block (transaction %ld)\n", block->transaction->id);
+		panic("get_writable_cached_block(): asked to get busy writable block "
+			"(transaction %ld)\n", block->transaction->id);
 		put_cached_block(cache, block);
 		return NULL;
 	}
@@ -1993,7 +2025,8 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 		// remember any previous contents for the parent transaction
 		block->parent_data = cache->Allocate();
 		if (block->parent_data == NULL) {
-			// TODO: maybe we should just continue the current transaction in this case...
+			// TODO: maybe we should just continue the current transaction in
+			// this case...
 			TB(Error(cache, blockNumber, "allocate parent failed"));
 			FATAL(("could not allocate parent\n"));
 			put_cached_block(cache, block);
@@ -2775,17 +2808,7 @@ cache_end_transaction(void* _cache, int32 id,
 	}
 
 	// Write back all pending transaction blocks
-
-	BlockWriter writer(cache);
-	cached_block* block = transaction->first_block;
-	for (; block != NULL; block = block->transaction_next) {
-		if (block->previous_transaction != NULL) {
-			// need to write back pending changes
-			writer.Add(block);
-		}
-	}
-
-	status_t status = writer.Write();
+	status_t status = write_blocks_in_previous_transaction(cache, transaction);
 	if (status != B_OK)
 		return status;
 
@@ -2802,7 +2825,8 @@ cache_end_transaction(void* _cache, int32 id,
 	// iterate through all blocks and free the unchanged original contents
 
 	cached_block* next;
-	for (block = transaction->first_block; block != NULL; block = next) {
+	for (cached_block* block = transaction->first_block; block != NULL;
+			block = next) {
 		next = block->transaction_next;
 		ASSERT(block->previous_transaction == NULL);
 
@@ -2817,10 +2841,9 @@ cache_end_transaction(void* _cache, int32 id,
 			cache->Free(block->original_data);
 			block->original_data = NULL;
 		}
-		if (transaction->has_sub_transaction) {
-			if (block->parent_data != block->current_data)
-				cache->Free(block->parent_data);
-			block->parent_data = NULL;
+		if (block->parent_data != NULL) {
+			ASSERT(transaction->has_sub_transaction);
+			cache->FreeBlockParentData(block);
 		}
 
 		// move the block to the previous transaction list
@@ -2868,11 +2891,8 @@ cache_abort_transaction(void* _cache, int32 id)
 			cache->Free(block->original_data);
 			block->original_data = NULL;
 		}
-		if (transaction->has_sub_transaction) {
-			if (block->parent_data != block->current_data)
-				cache->Free(block->parent_data);
-			block->parent_data = NULL;
-		}
+		if (transaction->has_sub_transaction && block->parent_data != NULL)
+			cache->FreeBlockParentData(block);
 
 		block->transaction_next = NULL;
 		block->transaction = NULL;
@@ -2910,16 +2930,7 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 
 	// iterate through all blocks and free the unchanged original contents
 
-	BlockWriter writer(cache);
-	cached_block* block = transaction->first_block;
-	for (; block != NULL; block = block->transaction_next) {
-		if (block->previous_transaction != NULL) {
-			// need to write back pending changes
-			writer.Add(block);
-		}
-	}
-
-	status_t status = writer.Write();
+	status_t status = write_blocks_in_previous_transaction(cache, transaction);
 	if (status != B_OK)
 		return status;
 
@@ -2941,7 +2952,8 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 
 	cached_block* last = NULL;
 	cached_block* next;
-	for (block = transaction->first_block; block != NULL; block = next) {
+	for (cached_block* block = transaction->first_block; block != NULL;
+			block = next) {
 		next = block->transaction_next;
 		ASSERT(block->previous_transaction == NULL);
 
@@ -3025,6 +3037,7 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 	// revert all changes back to the version of the parent
 
 	cached_block* block = transaction->first_block;
+	cached_block* last = NULL;
 	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
@@ -3036,21 +3049,42 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 			ASSERT(block->original_data != NULL);
 			memcpy(block->current_data, block->original_data,
 				cache->block_size);
+
+			if (last != NULL)
+				last->transaction_next = next;
+			else
+				transaction->first_block = next;
+
 			block->transaction_next = NULL;
 			block->transaction = NULL;
-			if (block->previous_transaction == NULL)
+			if (block->previous_transaction == NULL) {
+				cache->Free(block->original_data);
+				block->original_data = NULL;
 				block->is_dirty = false;
-		} else if (block->parent_data != block->current_data) {
-			// The block has been changed and must be restored - the block
-			// is still dirty and part of the transaction
-			TRACE(("cache_abort_sub_transaction(id = %ld): restored contents "
-				"of block %Ld\n", transaction->id, block->block_number));
-			memcpy(block->current_data, block->parent_data, cache->block_size);
-			cache->Free(block->parent_data);
-			// The block stays dirty
+
+				if (block->ref_count == 0) {
+					// Move the block into the unused list if possible
+					block->unused = true;
+					cache->unused_blocks.Add(block);
+					cache->unused_block_count++;
+				}
+			}
+		} else {
+			if (block->parent_data != block->current_data) {
+				// The block has been changed and must be restored - the block
+				// is still dirty and part of the transaction
+				TRACE(("cache_abort_sub_transaction(id = %ld): restored "
+					"contents of block %Ld\n", transaction->id,
+					block->block_number));
+				memcpy(block->current_data, block->parent_data,
+					cache->block_size);
+				cache->Free(block->parent_data);
+				// The block stays dirty
+			}
+			block->parent_data = NULL;
+			last = block;
 		}
 
-		block->parent_data = NULL;
 		block->discard = false;
 	}
 
@@ -3082,38 +3116,32 @@ cache_start_sub_transaction(void* _cache, int32 id)
 	// move all changed blocks up to the parent
 
 	cached_block* block = transaction->first_block;
-	cached_block* last = NULL;
 	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
-		if (block->discard) {
-			// This block has been discarded in the parent transaction
-			// TODO: this is wrong: since the parent transaction is not
-			// finished here (just extended), this block cannot be reverted
-			// anymore in case the parent transaction is aborted!!!
-			if (last != NULL)
-				last->transaction_next = next;
-			else
-				transaction->first_block = next;
-
-			cache->DiscardBlock(block);
-			transaction->num_blocks--;
-			continue;
-		}
-
-		if (transaction->has_sub_transaction
-			&& block->parent_data != NULL
-			&& block->parent_data != block->current_data) {
-			// there already is an older sub transaction - we acknowledge
+		if (block->parent_data != NULL) {
+			// There already is an older sub transaction - we acknowledge
 			// its changes and move its blocks up to the parent
-			cache->Free(block->parent_data);
+			ASSERT(transaction->has_sub_transaction);
+			cache->FreeBlockParentData(block);
+		}
+		if (block->discard) {
+			// This block has been discarded in the parent transaction.
+			// Just throw away any changes made in this transaction, so that
+			// it can still be reverted to its original contents if needed
+			ASSERT(block->previous_transaction == NULL);
+			if (block->original_data != NULL) {
+				memcpy(block->current_data, block->original_data,
+					cache->block_size);
+				block->original_data = NULL;
+			}
+			continue;
 		}
 
 		// we "allocate" the parent data lazily, that means, we don't copy
 		// the data (and allocate memory for it) until we need to
 		block->parent_data = block->current_data;
-		last = block;
 	}
 
 	// all subsequent changes will go into the sub transaction

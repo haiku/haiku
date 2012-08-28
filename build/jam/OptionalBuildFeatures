@@ -501,3 +501,83 @@ if $(HAIKU_BUILD_FEATURE_WEBKIT) {
 		HAIKU_WEBKIT_HEADERS = [ FDirName $(HAIKU_WEBKIT_DIR) include ] ;
 	}
 }
+
+# libpng
+local libpngBaseURL = $(baseURL)/lib ;
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
+	if $(TARGET_ARCH) = ppc {
+		HAIKU_LIBPNG_FILE = libpng-1.5.12-ppc-gcc4-2012-08-27.zip ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_LIBPNG_FILE = libpng-1.5.12-x86-gcc4-2012-08-23.zip ;
+	} else {
+		HAIKU_LIBPNG_FILE = libpng-1.5.12-x86-gcc2-2012-08-23.zip ;
+	}
+
+	local libpngZipFile = [ DownloadFile $(HAIKU_LIBPNG_FILE)
+		: $(libpngBaseURL)/$(HAIKU_LIBPNG_FILE) ] ;
+
+	HAIKU_LIBPNG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_LIBPNG_FILE:B) ] ;
+
+	HAIKU_LIBPNG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LIBPNG_DIR)
+		: common/include : $(libpngZipFile)
+		: extracted-libpng ] ;
+
+	HAIKU_LIBPNG_LIB = [ ExtractArchive $(HAIKU_LIBPNG_DIR)
+		:
+		common/lib/libpng.so
+		: $(libpngZipFile)
+		: extracted-libpng ] ;
+	HAIKU_LIBPNG_CURRENT_LIB = [ ExtractArchive $(HAIKU_LIBPNG_DIR)
+		:
+		common/lib/libpng15.so.15.12.0
+		: $(libpngZipFile)
+		: extracted-libpng ] ;
+	Depends $(HAIKU_LIBPNG_LIB) $(HAIKU_LIBPNG_CURRENT_LIB) : $(HAIKU_LIBPNG_HEADERS_DEPENDENCY) ;
+
+	HAIKU_LIBPNG_CURRENT_LINK = libpng.so.15 ;
+
+	HAIKU_LIBPNG_HEADERS = [ FDirName $(HAIKU_LIBPNG_DIR) common include ] ;
+} else {
+	Echo "libpng support not available on $(TARGET_ARCH)" ;
+}
+
+# jpeg
+local jpegBaseURL = $(baseURL)/lib ;
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
+	if $(TARGET_ARCH) = ppc {
+		HAIKU_JPEG_FILE = jpeg-8d-ppc-gcc4-2012-08-27.zip ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_JPEG_FILE = jpeg-8d-x86-gcc4-2012-08-23.zip ;
+	} else {
+		HAIKU_JPEG_FILE = jpeg-8d-x86-gcc2-2012-08-23.zip ;
+	}
+
+	local jpegZipFile = [ DownloadFile $(HAIKU_JPEG_FILE)
+		: $(jpegBaseURL)/$(HAIKU_JPEG_FILE) ] ;
+
+	HAIKU_JPEG_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_JPEG_FILE:B) ] ;
+
+	HAIKU_JPEG_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_JPEG_DIR)
+		: common/include : $(jpegZipFile)
+		: extracted-jpeg ] ;
+
+	HAIKU_JPEG_LIB = [ ExtractArchive $(HAIKU_JPEG_DIR)
+		:
+		common/lib/libjpeg.so
+		: $(jpegZipFile)
+		: extracted-jpeg ] ;
+	HAIKU_JPEG_CURRENT_LIB = [ ExtractArchive $(HAIKU_JPEG_DIR)
+		:
+		common/lib/libjpeg.so.8.4.0
+		: $(jpegZipFile)
+		: extracted-jpeg ] ;
+	Depends $(HAIKU_JPEG_LIB) $(HAIKU_JPEG_CURRENT_LIB) : $(HAIKU_JPEG_HEADERS_DEPENDENCY) ;
+
+	HAIKU_JPEG_CURRENT_LINK = libjpeg.so.8 ;
+
+	HAIKU_JPEG_HEADERS = [ FDirName $(HAIKU_JPEG_DIR) common include ] ;
+} else {
+	Echo "jpeg support not available on $(TARGET_ARCH)" ;
+}
