@@ -440,7 +440,7 @@ AddOnManager::_UnregisterAddOn(BEntry& entry)
 			gInputServer->SetMethodReplicant(NULL);
 		} else if (method != NULL) {
 			BMessage msg(IS_REMOVE_METHOD);
-			msg.AddInt32("cookie", (uint32)method);
+			msg.AddInt32("cookie", method->fOwner->Cookie());
 			if (gInputServer->MethodReplicant())
 				gInputServer->MethodReplicant()->SendMessage(&msg);
 		}

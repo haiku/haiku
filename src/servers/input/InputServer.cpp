@@ -625,11 +625,23 @@ void
 InputServer::HandleSetMethod(BMessage* message)
 {
 	CALLED();
-	uint32 cookie;
-	if (message->FindInt32("cookie", (int32*)&cookie) == B_OK) {
-		BInputServerMethod *method = (BInputServerMethod*)cookie;
-		PRINT(("%s cookie %p\n", __PRETTY_FUNCTION__, method));
-		SetActiveMethod(method);
+	int32 cookie;
+	if (message->FindInt32("cookie", &cookie) != B_OK)
+		return;
+	if (cookie == gKeymapMethod.fOwner->Cookie()) {
+		SetActiveMethod(&gKeymapMethod);
+	} else {
+		BAutolock lock(InputServer::gInputMethodListLocker);
+		for (int32 i = 0; i < gInputMethodList.CountItems(); i++) {
+			BInputServerMethod* method
+				= (BInputServerMethod*)InputServer::gInputMethodList.ItemAt(i);
+			if (method->fOwner->Cookie() == cookie) {
+				PRINT(("%s cookie %" B_PRId32 "\n", __PRETTY_FUNCTION__,
+					cookie));
+				SetActiveMethod(method);
+				break;
+			}
+		}
 	}
 }
 
