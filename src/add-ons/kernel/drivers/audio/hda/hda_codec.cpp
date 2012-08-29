@@ -897,7 +897,8 @@ hda_widget_find_input_path(hda_audio_group* audioGroup, hda_widget* widget,
 	switch (widget->type) {
 		case WT_PIN_COMPLEX:
 			// already used
-			if (widget->flags & WIDGET_FLAG_INPUT_PATH)
+			if ((widget->flags & (WIDGET_FLAG_INPUT_PATH 
+					| WIDGET_FLAG_OUTPUT_PATH)) != 0)
 				return false;
 
 			if (PIN_CAP_IS_INPUT(widget->d.pin.capabilities)) {
@@ -917,7 +918,8 @@ TRACE("      %*sinput: added input widget %ld\n", (int)depth * 2, "", widget->no
 		case WT_AUDIO_SELECTOR:
 		{
 			// already used
-			if (widget->flags & WIDGET_FLAG_INPUT_PATH)
+			if ((widget->flags & (WIDGET_FLAG_INPUT_PATH 
+					| WIDGET_FLAG_OUTPUT_PATH)) != 0)
 				return false;
 
 			// search for pin complex in this path
