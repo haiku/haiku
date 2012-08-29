@@ -186,7 +186,13 @@ const struct supported_device {
 	{0x6898, 4, 0, RADEON_CYPRESS, CHIP_STD, "Radeon HD 5870"},
 	//  Hemlock
 	{0x689c, 4, 0, RADEON_HEMLOCK, CHIP_STD, "Radeon HD 5900"},
+
 	// Fusion APUS
+	/* R1A4 branch change: Disable APU's as external Display
+     * Port bridges don't yet function. Users of these cards
+     * will see only a black screen at boot.
+     */
+	#if 0
 	//  Palm
 	{0x9804, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6250"},
 	{0x9805, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6290"},
@@ -207,6 +213,7 @@ const struct supported_device {
 	{0x9643, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2 M"},
 	{0x9644, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD 6410D"},
 	{0x9645, 4, 1, RADEON_SUMO2, CHIP_APU, "Radeon HD SUMO2 M"},
+	#endif
 
 	// Radeon HD 64xx - HD 69xx
 	// Introduced: 2010
