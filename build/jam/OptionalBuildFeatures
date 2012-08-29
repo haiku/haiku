@@ -535,7 +535,7 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 		: extracted-libpng ] ;
 	Depends $(HAIKU_LIBPNG_LIB) $(HAIKU_LIBPNG_CURRENT_LIB) : $(HAIKU_LIBPNG_HEADERS_DEPENDENCY) ;
 
-	HAIKU_LIBPNG_CURRENT_LINK = libpng.so.15 ;
+	HAIKU_LIBPNG_CURRENT_LINK = libpng15.so.15 ;
 
 	HAIKU_LIBPNG_HEADERS = [ FDirName $(HAIKU_LIBPNG_DIR) common include ] ;
 } else {
