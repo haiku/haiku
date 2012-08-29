@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1713444607
+1	swedish	x-vnd.Haiku-libtracker	1301055003
 common	B_COMMON_DIRECTORY		gemensam
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
@@ -22,6 +22,7 @@ Recent documents	FavoritesMenu		Senaste dokumenten
 Modified	QueryPoseView		Modifierad
 Created	ContainerWindow		Skapad
 Error %error loading add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du %ifYouDoAction inställnings foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?
 contains	SelectionWindow		innehåller
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Du kan inte spara i roten på filsystemet.
 Show shared volumes on Desktop	SettingsView		Visa delade volymer på Skrivbordet
@@ -92,6 +93,7 @@ Cut	FilePanelPriv		Klipp ut
 Replace	FilePanelPriv		Ersätt
 Select all	VolumeWindow		Markera allt
 Opens with:	InfoWindow		Öppnas med:
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du %ifYouDoAction mime inställningarna, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?
 Open	ContainerWindow		Öppna
 96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Ett fel uppstod vid beräkningen av mappens storlek.
@@ -121,6 +123,7 @@ Move to Trash	ContainerWindow		Flytta till Papperskorgen
 Move to	ContainerWindow		Flytta till
 Create %s clipping	PoseView		Skapa %s förkortning
 Set new link target	InfoWindow		Ange nytt länkmål
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Om du %ifYouDoAction system foldern eller dess innehåll, kommer du inte att kunna boot:a %osName!\n \n Är du säker på att du vill göra detta?\n\nFör att %toDoAction system foldern eller dess innehåll i alla fall,  håll nere Shift och klicka  \"%toConfirmAction\".
 Save as Query template:	FindPanel		Spara som Sökmall:
 preferences	B_PREFERENCES_DIRECTORY		inställningar
 Cancel	FSUtils		Avbryt
@@ -144,6 +147,7 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Ledsen, att spara mer än ett objekt är inte tillåtet.
 Searching for disks to mount…	StatusWindow		Letar efter diskar för montering...
 New folder	FSUtils		Ny mapp
+If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Om du %ifYouDoAction common foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?\n\nFör att %toDoAction common foldern ändå, håll nere Shift och klicka \"%toConfirmAction\".
 Free space color	SettingsView		Färg för ledigt utrymme
 Cut	ContainerWindow		Klipp ut
 Remove	FindPanel		Ta bort
@@ -253,6 +257,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 Cancel	ContainerWindow		Avbryt
 Only the boot disk	AutoMounterSettings		Bara uppstartsdisken
 Trash	TrackerSettingsWindow		Papperskorgen
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du %ifYouDoAction config foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?
 Unmount	ContainerWindow		Avmontera
 Copy layout	ContainerWindow		Kopiera layout
 label too long	PoseView		etiketten är för lång
@@ -339,6 +344,7 @@ Handles any file	OpenWithWindow		Hanterar alla filtyper
 Get info	FilePanelPriv		Få info
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Avbryt
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Applikationen \"%appname\" supporterar inte denna typ av document du försöker att öppna.\n Är du säker på att du vill fortsätta?\n \n Om du vet att applikationen supporterar denna dokument typ, borde du kontakta ägaren av applikationen och fråga efter uppdaterad version som stödjer dokumentet du vill öppna.
 Disks	DirMenu		Diskar
 New folder %ld	FSUtils		Ny mapp %ld
 All BeOS disks	AutoMounterSettings		Alla BeOS volymer
@@ -372,9 +378,11 @@ Modified	FindPanel		Modifierad
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fel vid flytt av "%name" till Papperskorgen. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Du kan inte ersätta en katalog med en av dess underkataloger.
 <No recent items>	FavoritesMenu		<Inga tidigare objekt>
+Preferences…	ContainerWindow		Inställningar…
 Move	PoseView		Flytta
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Är du säker på att du vill radera de valda objekten? Denna operation kan inte ångras.
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Om du %ifYouDoAction home foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?\n\nFör att %toDoAction home foldern ändå, håll nere Shift och klicka \"%toConfirmAction\".
 Add-ons	DeskWindow		Tillägg
 Name	FindPanel		Namn
 And	FindPanel		Och

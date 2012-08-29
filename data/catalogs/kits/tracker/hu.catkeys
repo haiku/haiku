@@ -1,8 +1,8 @@
 1	hungarian	x-vnd.Haiku-libtracker	1301055003
-common	B_COMMON_DIRECTORY		általános
-OK	WidgetAttributeText		OK
+common	B_COMMON_DIRECTORY		közös
+OK	WidgetAttributeText		Rendben
 Icon view	VolumeWindow		Ikonnézet
-Add-ons	FilePanelPriv		Bővítmények
+Add-ons	FilePanelPriv		Kiegészítők
 Desktop	Model		Asztal
 Identify	ContainerWindow		Beazonosítás
 Warning space color	SettingsView		Veszély jelzőszíne
@@ -42,7 +42,7 @@ Make active printer	ContainerWindow		Beállítás aktív nyomtatónak
 Create link here	ContainerWindow		Hivatkozás készítése ide
 Moving: 	StatusWindow		Áthelyezés:
 before	FindPanel		ezelőtt:
-Error emptying Trash	FSUtils		Hiba történt a Kuka ürítése közben.
+Error emptying Trash	FSUtils		Hiba történt a Szemetes ürítése közben.
 On	FindPanel		Ekkor:
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		nagyobb, mint
@@ -60,13 +60,13 @@ Link to:	InfoWindow		Link ehhez:
 Location	ContainerWindow		Hely
 Location	QueryPoseView		Hely
 config	B_USER_CONFIG_DIRECTORY		konfigurációs
-apps	B_APPS_DIRECTORY		alkalmazás
+apps	B_APPS_DIRECTORY		programok
 Icon view	ContainerWindow		Ikonnézet
 Size	QueryPoseView		Méret
-Emptying Trash… 	StatusWindow		Kuka ürítése...
+Emptying Trash… 	StatusWindow		Szemetes ürítése...
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker új mintái
 Close all in workspace	ContainerWindow		Összes bezárása a munkaasztalon
-Empty Trash	ContainerWindow		Kuka ürítése
+Empty Trash	ContainerWindow		Szemetes ürítése
 Name = %name	FindPanel	FindResultTitle	Név = %name
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Biztos át szeretné helyezni vagy át szeretné másolni a kijelölt elemeket ebbe a mappába?
 Does not handle file	OpenWithWindow		Nem kezeli a fájlt
@@ -76,7 +76,7 @@ Search	FindPanel		Keresés
 Preparing to empty Trash…	StatusWindow		Felkészülés a Kuka ürítésére...
 Disks	Model		Lemezek
 Create link	ContainerWindow		Hivatkozás készítése
-develop	B_COMMON_DEVELOP_DIRECTORY		fejlesztési
+develop	B_COMMON_DEVELOP_DIRECTORY		fejlesztés
 Decrease size	DeskWindow		Méret csökkentése
 Size	ContainerWindow		Méret
 All disks	AutoMounterSettings		Összes lemez
@@ -86,7 +86,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 no items	CountView		nincs elem
 Ignore case	SelectionWindow		Kis- és nagybetűk különbségének mellőzése
 is not	FindPanel		nem
-OK	AutoMounterSettings		OK
+OK	AutoMounterSettings		Rendben
 Windows	TrackerSettingsWindow		Ablakok
 Tracker preferences	TrackerSettingsWindow		Tracker beállításai
 Cut	FilePanelPriv		Kivágás
@@ -100,7 +100,7 @@ Error calculating folder size.	InfoWindow		Hiba történt a mappa méretének sz
 New folder	FilePanelPriv		Új mappa
 %name info	InfoWindow	InfoWindow Title	%name információi
 Favorites	FavoritesMenu		Kedvencek
-Add-ons	VolumeWindow		Bővítmények
+Add-ons	VolumeWindow		Kiegészítők
 Sorry, you can't copy items to the Trash.	PoseView		Sajnáljuk, de nem lehet a Kukába másolni elemeket.
 List view	VolumeWindow		Listanézet
 matches wildcard expression	SelectionWindow		megfelel a helyettesítő kifejezésnek
@@ -116,7 +116,7 @@ Open	VolumeWindow		Megnyitás
 New folder	ContainerWindow		Új mappa
 Kind	ContainerWindow		Típus
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	átnevezni
-home	B_USER_DIRECTORY		home
+home	B_USER_DIRECTORY		saját mappa
 Select…	ContainerWindow		Kijelölés...
 Copy to	ContainerWindow		Másolás
 Move to Trash	ContainerWindow		Áthelyezés a Kukába
@@ -185,7 +185,7 @@ Duplicate	ContainerWindow		Duplikálás
 New folder%ld	FSUtils		Új mappa%ld
 Outline selection rectangle only	SettingsView		Körvonal csak a kijelölés téglalapjának
 Select all	DeskWindow		Összes kiválasztása
-OK	InfoWindow		OK
+OK	InfoWindow		Rendben
 Replace	FSUtils		Csere
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Ezt az elemet fogja most felülírni:\n\t%name%dest\nezzel:\n\t%name%src\n\nBiztos felül kívánja írni azzal amit most akar %movemode?
 Mini icon view	DeskWindow		Mini ikonnézet
@@ -242,7 +242,7 @@ Some items already exist in this folder with the same names as the items you are
 The mount server could not be contacted.	AutoMounterSettings		A csatlakoztatási szerverhez nem sikerült kapcsolódni.
 Error deleting items	FSUtils		Hiba történt az elemek törlése közben
 Create relative link here	ContainerWindow		Relatív link létrehozása itt
-trash	B_TRASH_DIRECTORY		kuka
+trash	B_TRASH_DIRECTORY		szemetes
 matches regular expression	SelectionWindow		illeszkedik a reguláris kifejezésre
 Mount settings…	SettingsView		Felcsatolási beállítások...
 Edit name	InfoWindow		Név szerkesztése
@@ -256,7 +256,7 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		A megadott mappában már létezik egy \"%name\" nevű fájl. Kívánja felülírni?
 Cancel	ContainerWindow		Mégse
 Only the boot disk	AutoMounterSettings		Csak a bootolási lemezt
-Trash	TrackerSettingsWindow		Kuka
+Trash	TrackerSettingsWindow		Szemetes
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ha %ifYouDoAction a konfigurációs mappát, akkor lehet, hogy a %osName nem fog megfelelően működni!\n\nBiztosan folytatni akarja?
 Unmount	ContainerWindow		Leválasztás
 Copy layout	ContainerWindow		Elrendezés másolása
@@ -289,7 +289,7 @@ GiB	WidgetAttributeText		GiB
 There was an error deleting \"%name\":\n\t%error	FSUtils		Hiba történt ennek a törlése közben: \"%name\"\n\t%error
 Paste	FilePanelPriv		Beillesztés
 Copy more	ContainerWindow		Több másolása
-OK	PoseView		OK
+OK	PoseView		Rendben
 Read	FilePermissionsView		Olvasás
 Clean up all	ContainerWindow		Összes tisztítása
 New folder	TemplatesMenu		Új mappa
@@ -324,12 +324,12 @@ Identify	InfoWindow		Azonosítás
 Recent folders	ContainerWindow		Legutóbbi mappák
 rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	átnevezi
 Close all	ContainerWindow		Összes bezárása
-Include trash	FindPanel		Kuka belefoglalása
+Include trash	FindPanel		A szemetesben is
 Query template	FindPanel		Lekérdezéssablon
 Open %name with:	OpenWithWindow		%name megnyitása ezzel:
 Empty folder	NavMenu		Üres mappa
 Copy here	ContainerWindow		Másolás ide
-Move to Trash	FilePanelPriv		Áthelyezés a Kukába
+Move to Trash	FilePanelPriv		Áthelyezés a szemetesbe
 Current folder	ContainerWindow		Jelenlegi mappa
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		A megadott név már egy létező mappa neve. Kérjük válasszon egy másik nevet.
 Clean up	ContainerWindow		Tisztítás
@@ -370,7 +370,7 @@ Desktop	B_DESKTOP_DIRECTORY		Asztal
 List folders first	SettingsView		Listázásban a mappák felülre helyezése
 Get info	VolumeWindow		Információ
 Name	SelectionWindow		Név
-Trash	Model		Kuka
+Trash	Model		Szemetes
 Favorites	FilePanelPriv		Kedvencek
 Name	QueryPoseView		Név
 Delete	FSUtils		Törlés
@@ -411,10 +411,10 @@ Paste layout	ContainerWindow		Elrendezés beillesztése
 Select	InfoWindow		Kiválasztás
 Could not update permissions of file \"%name\". %error	FSUtils		Nem sikerült módosítani a(z) \"%name\" fájl jogosultságait. %error
 Select…	FilePanelPriv		Kiválasztás...
-Don't move files to Trash	SettingsView		Ne helyezze át a törölt fájlokat a Kukába
+Don't move files to Trash	SettingsView		Ne helyezze át a törölt fájlokat a Szemetesben
 There was an error resolving the link.	Tracker		Hiba történt a hivatkozás követése során.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/mp
-You can't move or copy the trash.	FSUtils		A kukát nem lehet áthelyezni vagy másolni.
+You can't move or copy the trash.	FSUtils		A szemetest nem lehet áthelyezni vagy másolni.
 ends with	SelectionWindow		ezzel végződik:
 Volume icons	TrackerSettingsWindow		Kötetikonok
 That name is already taken. Please type another one.	WidgetAttributeText		Ez a név már foglalt. Kérjük válasszon egy másikat.
@@ -437,7 +437,7 @@ Prompt	FSUtils		Kérdés
 Edit query	ContainerWindow		Lekérdezés szerkesztése
 Find…	ContainerWindow		Keresés...
 Create a Query	FindPanel		Lekérdezésminta létrehozása
-Move to Trash	FSUtils		Áthelyezés a Kukába
+Move to Trash	FSUtils		Áthelyezés a szemetesbe
 Automatic disk mounting	AutoMounterSettings		Automatikus lemezfelcsatolás
 Original name	ContainerWindow		Eredeti név
 Find	FSUtils		Keresés
@@ -454,5 +454,5 @@ Mount	ContainerWindow		Felcsatolás
 Cancel	FSClipBoard		Mégse
 Cut more	ContainerWindow		Több kivágása
 Deleting: 	StatusWindow		Törlés:
-Empty Trash	InfoWindow		Kuka kiürítése
+Empty Trash	InfoWindow		Szemetes ürítése
 Add	FindPanel		Hozzáadás

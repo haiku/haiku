@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Expander	3391041670
+1	swedish	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Expandera
 Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
 Set destination…	ExpanderMenu		Ange mål…
@@ -32,6 +32,8 @@ Select	ExpanderPreferences		Välj
 Show contents	ExpanderWindow		Visa innehåll
 Automatically show contents listing	ExpanderPreferences		Automatiskt visa list innehåll
 OK	ExpanderPreferences		OK
+Leave destination folder path empty	ExpanderPreferences		Lämna destinations folder tom
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Foldern har antingen flyttats, omdöpt eller\nsupporteras inte.
 The file doesn't exist	ExpanderWindow		Filen finns inte
 Stop	ExpanderMenu		Stopp
 File	ExpanderMenu		Fil
@@ -39,6 +41,7 @@ Expander	System name		Expandera
 Expand	ExpanderWindow		Expandera
 Close	ExpanderMenu		Stäng
 The destination is not a folder.	ExpanderWindow		Målet är inte en mapp.
+Open destination folder after extraction	ExpanderPreferences		Öppna destinations foldern efter extraktionen
 Set source…	ExpanderMenu		Sätt källa…
 Select '%s'	DirectoryFilePanel		Välj '%s'
 Show contents	ExpanderMenu		Visa innehåll

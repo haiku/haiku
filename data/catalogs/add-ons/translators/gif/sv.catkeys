@@ -1,9 +1,10 @@
-1	swedish	x-vnd.Haiku-GIFTranslator	829368084
+1	swedish	x-vnd.Haiku-GIFTranslator	2708495435
 Websafe	GIFView		Webbsäker
 Write interlaced images	GIFView		Skriv sammanflätade bilder
 Optimal	GIFView		Optimal
 Greyscale	GIFView		Gråskala
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Be bitmappsformat (GIF-bildöversättare)
+GIF image translator	GIFView		GIF bild översättare
 GIF image	GIFTranslator		GIF-bild
 Write transparent images	GIFView		Skriv transparenta bilder
 Palette	GIFView		Palett

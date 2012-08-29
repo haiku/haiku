@@ -65,7 +65,7 @@ Icon view	ContainerWindow		Kuvakenäkymä
 Size	QueryPoseView		Koko
 Emptying Trash… 	StatusWindow		Tyhjennetään roskakoria...
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Jäljittäjän uudet mallinteet
-Close all in workspace	ContainerWindow		Sulje kaikki työtilat
+Close all in workspace	ContainerWindow		Sulje kaikki työtilassa
 Empty Trash	ContainerWindow		Tyhjennä roskakori
 Name = %name	FindPanel	FindResultTitle	Nimi = %name
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Oletko varma, että haluat kopioida tai siirtää valitut kohteet tähän kansioon?

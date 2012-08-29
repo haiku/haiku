@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DriveSetup	232650930
+1	swedish	x-vnd.Haiku-DriveSetup	1372142450
 DriveSetup	System name		DiskHanterare
 Delete	MainWindow		Ta bort
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på den valda partitionen kommer att raderas om du gör så!
@@ -15,6 +15,7 @@ Failed to initialize the disk %s!\n	MainWindow		Misslyckades att initiera partio
 The selected disk is read-only.	MainWindow		Den valda disken är inte skrivbar.
 Partition name:	CreateParamsPanel		Partitionsnamn:
 Initialize	InitParamsPanel		Initiera
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Är du säker att du vill formatera partitionen \"%s\"? Du kommet att få frågan igen innan ändringarna skrivs till disk.
 Could not mount partition %s.	MainWindow		Kunde inte montera partition %s.
 The partition %s has been successfully formatted.\n	MainWindow		Partitionen %s har initierats.\n
 The partition %s is already unmounted.	MainWindow		Partitionen %s är redan avmonterad.
@@ -46,8 +47,10 @@ Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
 Failed to format the partition %s!\n	MainWindow		Misslyckades att formatera partionen %s!\n
 Mount	MainWindow		Montera
 Create	CreateParamsPanel		Skapa
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Är du säker att du vill formatera en raw disk? (de flesta initierar disken med en partion först) Du kommet att få frågan igen innan ändringarna skrivs till disk.
 Device	PartitionList		Enhet
 Disk	MainWindow		Disk
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Är du säker att du vill initiera den valda disken? All data kommer att förloras. Du kommet att få frågan igen innan ändringarna skrivs till disk.\n
 Device	DiskView		Enhet
 Active	PartitionList		Aktiv
 Volume name	PartitionList		Volymnamn

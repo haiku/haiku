@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DiskProbe	2900255050
+1	swedish	x-vnd.Haiku-DiskProbe	2306672993
 File offset: 	ProbeView		Filoffset:
 %ld (native)	ProbeView		%ld (native)
 64 bit unsigned value:	TypeEditors		64 bitars unsigned-värde:
@@ -116,6 +116,7 @@ Mode:	FindWindow		Läge:
 Open device	FileWindow		Öppna enheten
 Could not find search string.	ProbeView		Kunde inte hitta söksträng.
 16 bit unsigned value:	TypeEditors		16 bitars osignerat värde:
+Attribute offset: 	ProbeView		Attribut motvikt: 
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Vy
 Redo	ProbeView		Gör om
 File: 	ProbeView		Fil: 

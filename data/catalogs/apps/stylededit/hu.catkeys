@@ -6,7 +6,7 @@ File	Menus		Fájl
 ???	LoadAlert		???
 Lines:	Statistics		Sorok:
 Italic	Menus		Dőlt
-Left	Menus		Bal
+Left	Menus		Balra
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Visszaállítja a(z) \"%s\" legutolsó verzióját? 
 Search backwards	FindandReplaceWindow		Keresés visszafelé
 Size	Menus		Méret
@@ -77,4 +77,4 @@ Characters:	Statistics		Karakterek:
 Save as…	Menus		Mentés másként...
 Redo typing	QuitAlert		Újragépelés
 Replace…	Menus		Csere…
-Right	Menus		Jobb
+Right	Menus		Jobbra

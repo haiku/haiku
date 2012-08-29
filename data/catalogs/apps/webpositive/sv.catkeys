@@ -1,0 +1,29 @@
+1	swedish	x-vnd.Haiku-WebPositive	1680292693
+Show home button	Settings Window		Visa hem-knappen
+Username:	Authentication Panel		Användarnamn:
+Copy URL to clipboard	Download Window		Kopiera URL till urklipp
+Cancel	Settings Window		Avbryt
+Close window	WebPositive Window		Stäng fönster
+Quit	WebPositive		Avsluta
+The download could not be opened.	Download Window		Dokumentet kunde inte öppnas.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Nerladdninge foldern kunde inte öppnas.\n\nError: %error
+Open location	WebPositive Window		Öppna plats
+Clear history	WebPositive Window		Töm historik
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Igår
+Default standard font size:	Settings Window		Default standard font storlek:
+Start page:	Settings Window		Start sida:
+History	WebPositive Window		Historik
+Error opening downloads folder	Download Window		Fel vid öppnande av nerladdnings foldern
+Paste	WebPositive Window		Klistra in
+Settings	Settings Window		Inställningar
+%seconds seconds left	Download Window		%seconds secunder kvar
+Confirmation	WebPositive Window		Bekräftelse
+Window	WebPositive Window		Fönster
+Serif font:	Settings Window		Serif-typsnitt:
+Loading %url	WebPositive Window		Läser in %url
+Page source	WebPositive Window		Sidkälla
+Next	WebPositive Window		Nästa
+Find next	WebPositive Window		Sök nästa
+Download folder:	Settings Window		Hämtningsmapp:
+Edit	WebPositive Window		Redigera

@@ -7,7 +7,7 @@ Close window	WebPositive Window		Ablak bezárása
 Quit	WebPositive		Kilépés
 The download could not be opened.	Download Window		A letöltés nem nyitható meg.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	A letöltések mappája nem nyitható meg.\n\nHiba: %error
-Open location	WebPositive Window		Cím megnyitása
+Open location	WebPositive Window		Cím megadása
 Clear history	WebPositive Window		Előzmények törlése
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Tegnap
@@ -68,16 +68,16 @@ Over 1 day left	Download Window		Több, mint 1 nap van hátra
 Downloads	WebPositive Window		Letöltések
 Requesting %url	WebPositive Window		%url megnyitása
 Apply	Settings Window		Alkalmaz
-Bookmark info	WebPositive Window		Könyvjelző információk
+Bookmark info	WebPositive Window		Könyvjelző információi
 Size:	Font Selection view		Méret:
-Show tabs if only one page is open	Settings Window		A fülek megjelenítése, ha csak egy van megnyitva
+Show tabs if only one page is open	Settings Window		A fülek megjelenítése, ha csak egy oldal van megnyitva
 About	WebPositive Window		Névjegy
 Finish: 	Download Window	Finishing time	Befejezés:
 Fonts	Settings Window		Betűtípusok
 Close	WebPositive Window		Bezárás
 OK	Download Window		Rendben
 Page source error	WebPositive Window		Hiba az oldal forrásában
-Open blank page	Settings Window		Megnyitás üres oldalon
+Open blank page	Settings Window		Üres oldal megnyitása
 New tabs:	Settings Window		Új fülek:
 Cancel	WebPositive Window		Mégse
 Open all	WebPositive Window		Az összes megnyitása
@@ -88,8 +88,8 @@ Remove	Download Window		Eltávolítás
 Find	WebPositive Window		Keresés
 Find previous	WebPositive Window		Előző találat
 Settings	WebPositive Window		Beállítások
-Proxy server address:	Settings Window		Proxy-kiszolgáló címe:
-Proxy server port:	Settings Window		Proxy-kiszolgáló port:
+Proxy server address:	Settings Window		Proxy címe:
+Proxy server port:	Settings Window		Proxy port:
 Bookmarks	WebPositive Window		Könyvjelzők
 %minutes minutes	Download Window		%minutes perc
 Paste	URL Bar		Beillesztés
@@ -103,7 +103,7 @@ Cancel	Download Window		Mégse
 Open search page	Settings Window		Keresőoldal megnyitása
 Password:	Authentication Panel		Jelszó:
 Back	WebPositive Window		Vissza
-New browser window	Download Window		Új böngésző-ablak
+New browser window	Download Window		Új böngészőablak
 Today	WebPositive Window		Ma
 1 second left	Download Window		1 másodperc van hátra
 Remember username and password for this site	Authentication Panel		Felhasználói név és jelszó megjegyzése

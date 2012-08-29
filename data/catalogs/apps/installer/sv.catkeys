@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	89497359
+1	swedish	x-vnd.Haiku-Installer	1788932451
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Efter de andra menyposterna mot slutet av filen, lägg till något som liknar dessa rader:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet
 \t}\n\n	InstallerApp		\t}\n\n
@@ -54,7 +54,7 @@ Scanning for disks…	InstallerWindow		Skannar efter diskar…
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disken kan inte monteras. Var god välj en annan disk.
 ?? of ??	InstallerWindow	Unknown progress	?? av ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Starta DiskHanteringsverktyget för att partitionera\ntillgängliga hårddiskar och annan media.\nPartitioner can formateras med Be-filsystemet\n som krävs för en Haiku boot-partition.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Starta DiskHanteringsverktyget för att partitionera\ntillgängliga hårddiskar och annan media.\nPartitioner can formateras med Be-filsystemet\nsom krävs för en Haiku boot-partition.
 Show optional packages	InstallerWindow		Visa valfria paket
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Inga partitioner har hittats som är dugliga för installation. Var god ställ in partitioner och initialisera minst en partition med Be-filsystemet.
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Eventuellt så måste du redigera en annan fil för att se startmenyn:\n\n
@@ -91,3 +91,4 @@ Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme beh�
 Cancel	InstallProgress		Avbryt
 Try installing anyway	InstallProgress		Försök installera iallafall
 Are you sure you want to to stop the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
+\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\t sudo <valfri textredigerare> /etc/grub.d/40_custom\n\n

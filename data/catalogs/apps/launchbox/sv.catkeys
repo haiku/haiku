@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-LaunchBox	4192523522
+1	swedish	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Ny
 Set description…	LaunchBox		Ange beskrivning...
 Vertical layout	LaunchBox		Vertikal utformning
@@ -24,6 +24,7 @@ Name Panel	LaunchBox		Namnge Block
 Add button here	LaunchBox		Lägg till knapp
 Description for '%3'	LaunchBox		Beskrivning för '%3'
 Settings	LaunchBox		Inställningar
+Failed to launch 'something', error in Pad data.	LaunchBox		Kunde inte köra 'something', error i Pad data.
 Pad %1	LaunchBox		Block %1
 Close	LaunchBox		Stäng
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Misslyckades att skicka 'öppna mapp' kommando till Tracker.\n\nFel:

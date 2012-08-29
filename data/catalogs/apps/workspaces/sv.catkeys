@@ -1,12 +1,15 @@
-1	swedish	x-vnd.Be-WORK	932379173
+1	swedish	x-vnd.Be-WORK	2548258861
 Invalid argument: %s\n	Workspaces		Felaktigt argument: %s\n
 Quit	Workspaces		Avsluta
 Workspaces	System name		Arbetsytor
 Change workspace count…	Workspaces		Ändra antalet arbetsytor...
+Remove replicant	Workspaces		Ta bort replicant
 About Workspaces…	Workspaces		Om Arbetsytor
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Arbetsytor\nskrivet av %1 och %2.\n\nCopyright %3, Haiku.\n\nFlytta fönster längst bak med alt-tangenten. Flytta fönster främst med ctrl-tangenten.\n
 Show window border	Workspaces		Visa fönsterkant
 Auto-raise	Workspaces		Höj upp automatiskt
 OK	Workspaces		OK
 Always on top	Workspaces		Alltid överst
+Live in the Deskbar	Workspaces		Kör i Deskbaren
 Show window tab	Workspaces		Visa fönsterflik
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Användning: %s [options] [workspace]\ndär \"options\" är:\n  --notitle\t \t tittel baren borttagen, kant och resize kvar\n  --noborder\t \t tittel, kant och resize borttaget\n  --avoidfocus\t \t gör så fönstret inte får några keybord events\n  --alwaysontop\t \t behåll fönstret synligt helatiden\n  --notmovable\t \t fönstret kan inte flyttas runt\n  --autoraise\t \t automatisk höj workspace fönstret när den är vid skärmens kant\n  --help\t \t visa denna hjälp och avsluta\noch \"workspace\" är nummret på den Workspace vill ändra till (0-31)\n

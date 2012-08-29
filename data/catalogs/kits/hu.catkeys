@@ -11,11 +11,11 @@ Copy	TextView		Másolás
 About…	AboutWindow		Névjegy...
 Error	PrintJob		Hiba
 No Pages to print!	PrintJob		Nincs nyomtatható oldal!
-OK	Dragger		OK
-OK	PrintJob		OK
+OK	Dragger		Rendben
+OK	PrintJob		Rendben
 Green:	ColorControl		Zöld:
 Remove replicant	Dragger		Másolat eltávolítása
-OK	ZombieReplicantView		OK
+OK	ZombieReplicantView		Rendben
 Print Server is not responding.	PrintJob		A nyomtatókiszolgáló nem válaszol.
 Paste	TextView		Beillesztés
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
