@@ -125,6 +125,21 @@ enum pin_dev_type {
 #define VID_GET_STRIPE_CONTROL				0xf2400
 #define VID_SET_STRIPE_CONTROL				0x72000
 #define VID_FUNCTION_RESET					0x7ff00
+/* later specification updates */
+#define VID_GET_EDID_LIKE_DATA				0xf2f00
+#define VID_GET_CONVERTER_CHANNEL_COUNT		0xf2d00
+#define VID_SET_CONVERTER_CHANNEL_COUNT		0x72d00
+#define VID_GET_DATA_ISLAND_PACKET_SIZE		0xf2e00
+#define VID_GET_DATA_ISLAND_PACKET_INDEX	0xf3000
+#define VID_SET_DATA_ISLAND_PACKET_INDEX	0x73000
+#define VID_GET_DATA_ISLAND_PACKET_DATA		0xf3100
+#define VID_SET_DATA_ISLAND_PACKET_DATA		0x73100
+#define VID_GET_DATA_ISLAND_PACKET_XMITCTRL	0xf3200
+#define VID_SET_DATA_ISLAND_PACKET_XMITCTRL	0x73200
+#define VID_GET_CONTENT_PROTECTION_CONTROL	0xf3300
+#define VID_SET_CONTENT_PROTECTION_CONTROL	0x73300
+#define VID_GET_ASP_CHANNEL_MAPPING			0xf3400
+#define VID_SET_ASP_CHANNEL_MAPPING			0x73400
 
 /* Parameter IDs */
 #define PID_VENDOR_ID					0x00
@@ -179,6 +194,8 @@ enum pin_dev_type {
 
 
 /* Audio widget capabilities */
+#define AUDIO_CAP_CHANNEL_COUNT_MASK	0x0000e000
+#define AUDIO_CAP_CHANNEL_COUNT_SHIFT	13
 #define AUDIO_CAP_DELAY_MASK			0x000f0000
 #define AUDIO_CAP_DELAY_SHIFT			16
 #define AUDIO_CAP_TYPE_MASK				0x00f00000
@@ -196,6 +213,11 @@ enum pin_dev_type {
 #define AUDIO_CAP_DIGITAL				(1L << 9)
 #define AUDIO_CAP_POWER_CONTROL			(1L << 10)
 #define AUDIO_CAP_LEFT_RIGHT_SWAP		(1L << 11)
+#define AUDIO_CAP_CP_CAPS				(1L << 12)
+
+#define AUDIO_CAP_CHANNEL_COUNT(c)	\
+	(((c & AUDIO_CAP_CHANNEL_COUNT_MASK) >> (AUDIO_CAP_CHANNEL_COUNT_SHIFT - 1)) \
+		| AUDIO_CAP_STEREO)
 
 /* Amplifier capabilities */
 #define AMP_CAP_MUTE					0xf0000000
@@ -219,20 +241,27 @@ enum pin_dev_type {
 #define PIN_CAP_OUTPUT					(1L << 4)
 #define PIN_CAP_INPUT					(1L << 5)
 #define PIN_CAP_BALANCE					(1L << 6)
+#define PIN_CAP_HDMI					(1L << 7)
 #define PIN_CAP_VREF_CTRL_HIZ				(1L << 8)
 #define PIN_CAP_VREF_CTRL_50				(1L << 9)
 #define PIN_CAP_VREF_CTRL_GROUND				(1L << 10)
 #define PIN_CAP_VREF_CTRL_80				(1L << 12)
 #define PIN_CAP_VREF_CTRL_100				(1L << 13)
 #define PIN_CAP_EAPD_CAP				(1L << 16)
+#define PIN_CAP_DP						(1L << 24)
+#define PIN_CAP_HBR						(1L << 27)
 
 #define PIN_CAP_IS_PRES_DETECT_CAP(c)	((c & PIN_CAP_PRES_DETECT) != 0)
 #define PIN_CAP_IS_OUTPUT(c)	((c & PIN_CAP_OUTPUT) != 0)
 #define PIN_CAP_IS_INPUT(c)	((c & PIN_CAP_INPUT) != 0)
+#define PIN_CAP_IS_BALANCE(c)	((c & PIN_CAP_BALANCE) != 0)
+#define PIN_CAP_IS_HDMI(c)	((c & PIN_CAP_HDMI) != 0)
 #define PIN_CAP_IS_VREF_CTRL_50_CAP(c)	((c & PIN_CAP_VREF_CTRL_50) != 0)
 #define PIN_CAP_IS_VREF_CTRL_80_CAP(c)	((c & PIN_CAP_VREF_CTRL_80) != 0)
 #define PIN_CAP_IS_VREF_CTRL_100_CAP(c)	((c & PIN_CAP_VREF_CTRL_100) != 0)
 #define PIN_CAP_IS_EAPD_CAP(c)	((c & PIN_CAP_EAPD_CAP) != 0)
+#define PIN_CAP_IS_DP(c)	((c & PIN_CAP_DP) != 0)
+#define PIN_CAP_IS_HBR(c)		((c & PIN_CAP_HBR) != 0)
 
 /* PCM support */
 #define PCM_8_BIT						(1L << 16)
@@ -280,9 +309,18 @@ enum pin_dev_type {
 
 /* Unsolicited Response */
 #define UNSOLRESP_ENABLE				(1L << 7)
+#define UNSOLRESP_TAG_MASK				0x0000003f
+#define UNSOLRESP_TAG_SHIFT				0
 
 /* Pin sense */
 #define PIN_SENSE_PRESENCE_DETECT		(1L << 31)
+#define PIN_SENSE_ELD_VALID				(1L << 30)
+#define PIN_SENSE_IMPEDANCE_MASK		0x7fffffff
+#define PIN_SENSE_IMPEDANCE_SHIFT		0
+
+#define PIN_SENSE_IMPEDANCE_INVALID		0x7fffffff
+#define PIN_SENSE_SET_CHANNEL_LEFT		0
+#define PIN_SENSE_SET_CHANNEL_RIGHT		1
 
 /* Supported power states */
 #define POWER_STATE_D0					(1L << 0)
