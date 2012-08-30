@@ -92,7 +92,7 @@ Tracker preferences	TrackerSettingsWindow		Seuraaja-asetukset
 Cut	FilePanelPriv		Leikkaa
 Replace	FilePanelPriv		Korvaa
 Select all	VolumeWindow		Valitse kaikki
-Opens with:	InfoWindow		Avaa sovelluksella:
+Opens with:	InfoWindow		Avautuu sovelluksella:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jos %ifYouDoAction mime-asetukset, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?
 Open	ContainerWindow		Avaa
 96 x 96	DeskWindow		96 x 96
@@ -429,7 +429,7 @@ Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
 ends with	FindPanel		loppuu kohteella
 New	ContainerWindow		Uusi
 Name matches wildcard expression:###	SelectionWindow		Nimi täsmää jokerilausekkeeseen:###
-less than	FindPanel		vähemmän kuin
+less than	FindPanel		pienempi kuin
 64 x 64	DeskWindow		64 x 64
 Modified	ContainerWindow		Muokattu
 Edit Query template	FindPanel		Muokkaa kyselymallinnetta

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Appearance	1933110481
+1	dutch; flemish	x-vnd.Haiku-Appearance	1557879521
 Plain font:	Font view		Standaardlettertype:
 Control highlight	Colors tab		Keuze-accent
 Control border	Colors tab		Keuzerand
@@ -51,6 +51,7 @@ LCD subpixel	AntialiasingSettingsView		LCD-subpixel
 Selected menu item border	Colors tab		Rand geselecteerd menu-item
 Strong	AntialiasingSettingsView		Sterk
 Panel text	Colors tab		Tekst paneel
+Decorators	APRWindow		Vensterthema's
 Monospaced fonts only	AntialiasingSettingsView		Alleen niet-proportionele lettertypes
 Antialiasing menu	AntialiasingSettingsView		Anti-aliasing menu
 Fonts	APRWindow		Lettertypen
