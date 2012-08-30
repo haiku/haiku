@@ -26,16 +26,19 @@ SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr checkfs
 	fmt fold fortune gawk gdb gzip gzexe getlimits grep groups head hostname id
 	ifconfig <bin>install isvolume join kernel_debugger kill less lessecho
 	lesskey link linkcatkeys listdev ln locale locate logger logname ls
-	makebootable md5sum mkdir mkfifo mkfs  mktemp mount mountvolume mv nl
-	nohup nproc od paste patch pathchk ping pr printenv printf ps ptx pwd rc
-	readlink ReadOnlyBootPrompt rm rmattr rmdir safemode sdiff seq sha1sum
-	shred shuf sleep sort split stat strace stty su sum sync sysinfo tac tail
-	tee test timeout touch tr true truncate tsort tty unexpand uname uniq
-	unlink unmount unzip <bin>updatedb waitfor wc wget whoami xargs xres yes
-	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
+	makebootable md5sum mimeset mkdir mkfifo mkfs mktemp mount mountvolume
+	mv nl nohup notify nproc od paste patch pathchk ping pr printenv printf
+	ps ptx pwd query rc readlink ReadOnlyBootPrompt rm rmattr rmdir safemode
+	sdiff seq sha1sum shred shuf sleep sort split stat strace stty su sum sync
+	sysinfo tac tail tee test timeout touch tr true truncate tsort tty unexpand
+	uname uniq unlink unmount unzip <bin>updatedb waitfor wc wget whoami xargs
+	xres yes zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit
+	zmore znew
 ;
 
-SYSTEM_APPS = AboutSystem DriveSetup Installer Terminal ;
+SYSTEM_APPS = AboutSystem DriveSetup Installer NetworkStatus ProcessController
+	StyledEdit Terminal
+;
 
 SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
 	Keyboard Keymap Locale Mouse Network Notifications Screen Time Touchpad
@@ -170,10 +173,18 @@ AddDirectoryToHaikuImage home mail out ;
 AddSymlinkToHaikuImage home config : settings/deskbar : be ;
 # Deskbar Application links
 AddDirectoryToHaikuImage home config settings deskbar Applications ;
-DESKBAR_APPLICATIONS = DriveSetup Installer Terminal ;
+DESKBAR_APPLICATIONS = DriveSetup Installer StyledEdit Terminal ;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
 	AddSymlinkToHaikuImage home config settings deskbar Applications
+		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
+}
+
+# Deskbar Desktop applets links
+AddDirectoryToHaikuImage home config settings deskbar Desktop\ applets ;
+DESKBAR_DESKTOP_APPLETS = NetworkStatus ProcessController ;
+for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
+	AddSymlinkToHaikuImage home config settings deskbar Desktop\ applets
 		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
@@ -300,6 +311,17 @@ SEARCH on $(driverSettingsFiles)
 	= [ FDirName $(HAIKU_TOP) data settings kernel drivers ] ;
 AddFilesToHaikuImage home config settings kernel drivers
 	: $(driverSettingsFiles) ;
+
+# post install scripts and fresh install indicator file
+local postInstallFiles = add_catalog_entry_attributes.sh
+	default_deskbar_items.sh mime_update.sh ;
+postInstallFiles = $(postInstallFiles:G=post-install) ;
+SEARCH on $(postInstallFiles)
+	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
+SEARCH on <post-install>fresh_install
+	= [ FDirName $(HAIKU_TOP) data common settings ] ;
+AddFilesToHaikuImage common boot post_install : $(postInstallFiles) ;
+AddFilesToHaikuImage common settings : <post-install>fresh_install ;
 
 # boot loader
 AddFilesToHaikuImage system : haiku_loader ;
