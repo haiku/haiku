@@ -159,6 +159,7 @@ dump_widget_audio_capabilities(uint32 capabilities)
 		uint32		flag;
 		const char*	name;
 	} kFlags[] = {
+		{AUDIO_CAP_CP_CAPS, "CP caps"},
 		{AUDIO_CAP_LEFT_RIGHT_SWAP, "L-R swap"},
 		{AUDIO_CAP_POWER_CONTROL, "Power"},
 		{AUDIO_CAP_DIGITAL, "Digital"},
