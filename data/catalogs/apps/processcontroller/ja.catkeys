@@ -24,7 +24,7 @@ What do you want to do with the thread \"%s\"?	ProcessController		次の thread 
 Gone teams…	ProcessController		終了した team…
 Lowest active priority	ProcessController		最低アクティブ優先度
 Restart Tracker	ProcessController		Tracker を再起動
-Live in the Deskbar	ProcessController		Deskbar 中で動作
+Live in the Deskbar	ProcessController		Deskbar 中で実行
 Kill this thread!	ProcessController		Thread を強制終了
 Debug this thread!	ProcessController		このスレッドをデバッグ
 Normal priority	ProcessController		通常優先度

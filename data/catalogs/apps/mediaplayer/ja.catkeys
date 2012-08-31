@@ -1,4 +1,5 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	3632366072
+1	japanese	x-vnd.Haiku-MediaPlayer	2969013755
+raw audio	MediaPlayer-InfoWin		raw オーディオ
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 %d kHz	MediaPlayer-InfoWin		%d kHz
@@ -13,7 +14,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		プレイリストを保存
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		再生しようとしているファイルはメディアファイルではないようです。
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました:\n\nエラー:
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
-New player…	MediaPlayer-Main		新規プレイヤー…
+New player…	MediaPlayer-Main		新規プレーヤー…
 100% scale	MediaPlayer-Main		100% 表示
 Subtitle placement:	MediaPlayer-SettingsWindow		サブタイトルの位置：
 Close	MediaPlayer-Main		閉じる
@@ -30,7 +31,7 @@ Medium	MediaPlayer-SettingsWindow		中
 Close	MediaPlayer-PlaylistWindow		閉じる
 Stereo	MediaPlayer-InfoWin		ステレオ
 Open…	MediaPlayer-PlaylistWindow		開く…
-Toggle mute.	MediaPlayer-Main		ミュートの切替え
+Toggle mute.	MediaPlayer-Main		ミュートのオン / オフ
 Undo	MediaPlayer-PlaylistWindow		元に戻す：
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		可能なら、ハードウェアビデオオーバーレイを使う
 File info…	MediaPlayer-Main		ファイルの情報…
@@ -40,7 +41,7 @@ Remove Entry	MediaPlayer-RemovePLItemsCmd		項目の削除
 Close window after playing audio	MediaPlayer-SettingsWindow		オーディオ再生終了後、ウィンドウを閉じる
 Full volume	MediaPlayer-SettingsWindow		最大音量
 Drop files to play	MediaPlayer-Main		ファイルをドロップして再生してください。
-TogglePlaying	MediaPlayer-Main		再生のオン/オフ
+TogglePlaying	MediaPlayer-Main		再生のオン / オフ
 Copyright	MediaPlayer-InfoWin		著作権
 Cancel	MediaPlayer-SettingsWindow		取り消し
 Loop audio	MediaPlayer-SettingsWindow		オーディオを繰り返し再生
@@ -59,7 +60,7 @@ Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		プレイリ�
 Move Entries	MediaPlayer-MovePLItemsCmd		項目の移動
 Audio	MediaPlayer-Main		オーディオ
 Open Playlist	MediaPlayer-PlaylistWindow		プレイリストを開く
-MediaPlayer	System name		メディアプレイヤー
+MediaPlayer	System name		メディアプレーヤー
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		設定…
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 設定
@@ -113,6 +114,7 @@ Bottom of video	MediaPlayer-SettingsWindow		ビデオの下側
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		停止
 <unnamed media>	MediaPlayer-InfoWin		<名前のないメディア>
+raw video	MediaPlayer-InfoWin		raw ビデオ
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリ不足)。プレイリストの保存に失敗しました。
 Hide interface	MediaPlayer-Main		インターフェイスを隠す
@@ -121,7 +123,7 @@ none	Subtitles menu		無し
 Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に移動
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		ミュート
-Toggle pause/play.	MediaPlayer-Main		一時停止と再生の切替え
+Toggle pause/play.	MediaPlayer-Main		一時停止 / 再生
 Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku メディアキット：
 min	MediaPlayer-InfoWin	Minutes	分
 Small	MediaPlayer-SettingsWindow		小

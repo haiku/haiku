@@ -2,7 +2,7 @@
 Website location	PoorMan		ウェブサイトの場所
 Error Server	PoorMan		サーバーエラー
 Settings…	PoorMan		設定…
-Create PoorMan log	PoorMan		PoorManのログを作成
+Create PoorMan log	PoorMan		PoorMan のログを作成
 Shutting down.\n	PoorMan		シャットダウン中です。\n
 Hits: %lu	PoorMan		ヒット: %lu
 Web folder:	PoorMan		Web フォルダー：
@@ -42,25 +42,25 @@ Send file listing if there's no start page	PoorMan		スタートページがな�
 Error Dir	PoorMan		ディレクトリエラー
 Select all	PoorMan		すべて選択
 File	PoorMan		ファイル
-File Logging	PoorMan		ファイルロギング
+File Logging	PoorMan		ファイルログ
 Save console selections as…	PoorMan		コンソールの選択部を保存…
-File logging	PoorMan		ファイルロギング
+File logging	PoorMan		ファイルログ
 Select web folder	PoorMan		選択
-Logging view	PoorMan		ロギングビュー
-Logging	PoorMan		ロギング
+Logging view	PoorMan		ログビュー
+Logging	PoorMan		ログ
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		デフォルトの web フォルダーが \"/boot/home/public_html.\" に作成されました。\nフォルダー中に \"index.html\" という HTML ファイルがあることを確認してください。
 Clear log file	PoorMan		ログファイルを消去
 Log file name:	PoorMan		ログファイル名：
 Directory: 	PoorMan		ディレクトリ：
-Log To File	PoorMan		ファイルにログ出力
+Log To File	PoorMan		ファイルにログを出力
 Done	PoorMan		完了
 Create log file	PoorMan		作成
 Starting up... 	PoorMan		起動中です…
 Site	PoorMan		サイト
 Cancel	PoorMan		中止
-Console logging	PoorMan		コンソールロギング
+Console logging	PoorMan		コンソールログ
 Cannot start the server	PoorMan		サーバーを開始できません
 Select	PoorMan		選択
 Save console as…	PoorMan		コンソールを別名で保存…
 PoorMan	System name		PoorMan
-Console Logging	PoorMan		コンソールロギング
+Console Logging	PoorMan		コンソールログ

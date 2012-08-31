@@ -1,11 +1,11 @@
-1	french	x-vnd.haiku-icon_o_matic	2934880409
+1	french	x-vnd.haiku-icon_o_matic	4046269783
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
 Add	Icon-O-Matic-StylesList		Ajouter
 Move Shape	Icon-O-Matic-MoveShapesCommand		Déplacer la forme
 Opening the document failed!	Icon-O-Matic-Main		L'ouverture du document a échoué !
-Reset transformation	Icon-O-Matic-ShapesList		Annuler la transformation
+Reset transformation	Icon-O-Matic-ShapesList		Réinitialiser la transformation
 Move Paths	Icon-O-Matic-MovePathsCmd		Déplacer les chemins
 None	Icon-O-Matic-Properties		Aucun
 New	Icon-O-Matic-Menu-File		Nouveau
@@ -50,6 +50,7 @@ Remove Style	Icon-O-Matic-RemoveStylesCmd		Enlever le style
 Cancel	Icon-O-Matic-SVGExport		Annuler
 Add shape with style	Icon-O-Matic-Menu-Shape		Ajouter une forme avec un style
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Enlever la forme
+Reverse	Icon-O-Matic-PathsList		Inverser
 HVIF Source Code	Icon-O-Matic-SavePanel		Code source HVIF
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Réinitialiser les Transformations
 Settings	Icon-O-Matic-Menus		Réglages
@@ -92,7 +93,9 @@ Gradient	Icon-O-Matic-StyleTypes		Dégradé
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Attribut BEOS:ICON
 Export as…	Icon-O-Matic-Menu-File		Exporter sous…
 Transformation	Transformation		Transformation
-Reset transformation	Icon-O-Matic-StylesList		Annuler la transformation
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Déplacer les transformations
+Move Styles	Icon-O-Matic-MoveStylesCmd		Déplacer les styles
+Reset transformation	Icon-O-Matic-StylesList		Réinitialiser la transformation
 Conic	Icon-O-Matic-StyleTypes		Conique
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Diviser les points de contrôle
 Save	Icon-O-Matic-Menu-Settings		Sauvegarder
@@ -103,6 +106,7 @@ Shape	Icon-O-Matic-Menus		Forme
 Properties	Icon-O-Matic-Menus		Propriétés
 Move Pivot	Icon-O-Matic-TransformationBoxStates		Déplacer le pivot
 Path	Icon-O-Matic-Menus		Chemin
+Freeze transformation	Icon-O-Matic-ShapesList		Figer la transformation
 File	Icon-O-Matic-Menus		Fichier
 Error: 	Icon-O-Matic-Exporter		Erreur : 
 Diamond	Icon-O-Matic-StyleTypes		Diamant
@@ -126,21 +130,26 @@ Format	Icon-O-Matic-SavePanel		Format
 Edit	Icon-O-Matic-Menus		Éditer
 Duplicate	Icon-O-Matic-StylesList		Dupliquer
 too big	Icon-O-Matic-StyledTextImport		trop grand
+Assign Style	Icon-O-Matic-AssignStyleCmd		Assigner un style
 Color	Icon-O-Matic-PropertyNames		Couleur
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Insérer un point de contrôle
 Flip Control Point	Icon-O-Matic-FlipPointsCmd		Retourner le Point de Contrôle
 Redo	Icon-O-Matic-Main		Rétablir
+Assign Paths	Icon-O-Matic-AddPathsCmd		Assigner les chemins
 OK	Icon-O-Matic-SVGImport		OK
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Réinitialiser la transformation
 Scale	Icon-O-Matic-TransformationBoxStates		Échelle
 Duplicate	Icon-O-Matic-PathsList		Dupliquer
 Save	Icon-O-Matic-Menu-File		Enregistrer
+Append…	Icon-O-Matic-Menu-File		Ajouter…
+Move Path	Icon-O-Matic-MovePathsCmd		Déplacer les chemins
 Overwrite	Icon-O-Matic-SVGExport		Écraser
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Figer les formes
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Diviser le point de contrôle
 Open…	Icon-O-Matic-Menu-File		Ouvrir…
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé
+Rounding	Icon-O-Matic-PropertyNames		Arrondi
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Enlever les formes
 Clean up	Icon-O-Matic-PathsList		Nettoyer
 Detect Orient.	Icon-O-Matic-PropertyNames		Détecter l'orientation.
