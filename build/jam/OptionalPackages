@@ -507,12 +507,12 @@ if [ IsOptionalHaikuImagePackageAdded Colors! ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				Colors!-2.0-x86-gcc4-2012-04-30.zip
-				: $(baseURL)/Colors\!-2.0-x86-gcc4-2012-04-30.zip ;
+				Colors!-2.1-r1a4-x86-gcc4-2012-08-30.zip
+				: $(baseURL)/Colors\!-2.1-r1a4-x86-gcc4-2012-08-30.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				Colors!-2.0-x86-gcc2-2012-04-30.zip
-				: $(baseURL)/Colors\!-2.0-x86-gcc2-2012-04-30.zip ;
+				Colors!-2.1-r1a4-x86-gcc2-2012-08-30.zip
+				: $(baseURL)/Colors\!-2.1-r1a4-x86-gcc2-2012-08-30.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Colors\!/Colors\! ;
