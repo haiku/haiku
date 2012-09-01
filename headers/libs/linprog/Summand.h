@@ -19,6 +19,7 @@ class Variable;
  */
 class Summand {
 public:
+								Summand(Summand* summand);
 								Summand(double coeff, Variable* var);
 								~Summand();
 
@@ -31,7 +32,6 @@ public:
 private:
 			double				fCoeff;
 			Variable*			fVar;
-			bool    			fUsedInPenaltyFunction;  //not set yet
 };
 
 typedef BObjectList<Summand> SummandList;
