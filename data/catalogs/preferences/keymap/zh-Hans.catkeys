@@ -1,23 +1,38 @@
-1	english	x-vnd.Haiku-Keymap	140876782
+1	english	x-vnd.Haiku-Keymap	4022885915
+Shift:	Modifier keys window	Shift key role name	Shift：
 Revert	Modifier keys window		取消
 Tilde trigger	Keymap window		触发颚化字符
 Grave trigger	Keymap window		触发雕刻字符
+Role	Modifier keys window	As in the role of a modifier key	作用
 Select dead keys	Keymap window		选择废键：
+Cancel	Modifier keys window		取消
 Quit	Keymap window		退出
 Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
 Circumflex trigger	Keymap window		触发音调符号
 Diaeresis trigger	Keymap window		触发分音符号
+Disabled	Modifier keys window	Do nothing	禁用
 Open…	Keymap window		打开..
 System:	Keymap window		系统：
+Set modifier keys…	Keymap window		设置修饰键…
+Option:	Modifier keys window	Option key role name	选项：
 Switch shortcut keys	Keymap window		切换快捷键
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift 键
 User:	Keymap window		用户：
+Key	Modifier keys window	As in a computer keyboard key	按键
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl 键
+Control:	Modifier keys window	Control key role name	控制：
 Sample and clipboard:	Keymap window		示例和剪贴板：
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt 键
 Layout	Keymap window		布局
 Switch shortcut keys to Windows/Linux mode	Keymap window		切换快捷键为 Windows/Linux 模式
 Revert	Keymap window		取消
+Command:	Modifier keys window	Command key role name	命令：
 Save as…	Keymap window		保存为...
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd 键
 File	Keymap window		文件
 (Current)	Keymap window		（当前）
 Font	Keymap window		字体
 Keymap	System name		键盘映射
+Set modifier keys	Modifier keys window		设置修饰键
+Modifier keys	Modifier keys window		修饰键
 Acute trigger	Keymap window		触发尖重音符

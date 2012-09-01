@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	849531913
+1	english	x-vnd.Be-MAIL	1599879742
 View	Mail		查看
 %d - Date	Mail		%d - 日期
 Attach attributes:	Mail		附加属性：
@@ -27,6 +27,7 @@ Expert	Mail		专家
 Reply account:	Mail		回复：
 Discard	Mail		忽略
 Message	Mail		邮件
+Settings…	Mail		设置…
 Reply to sender	Mail		回复发件人
 There is no installed handler for URL links.	Mail		 URL 链接无法处理。
 Signature	Mail		样式
@@ -81,6 +82,7 @@ Only files can be added as attachments.	Mail		只有文件可以作为附件发�
 Previous message	Mail		上一个
 Attachments:	Mail		附件：
 Title:	Mail		标题：
+<no account found>	Mail		<未发现账户>
 Find…	Mail		查询...
 Accounts…	Mail		账户…
 Mail preferences	Mail		邮箱首选项

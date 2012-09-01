@@ -18,7 +18,7 @@ Detailed	DevicesView		詳細
 Category	DevicesView		カテゴリー順
 Quit	DevicesView		終了
 Device paths	Device		デバイスパス
-Scanner	DeviceSCSI		スキャナ
+Scanner	DeviceSCSI		スキャナー
 Printer	DeviceSCSI		プリンター
 Processor	Device		プロセッサ
 Optical Drive	DeviceSCSI		光学ドライブ

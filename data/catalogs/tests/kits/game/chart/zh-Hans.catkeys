@@ -1,4 +1,4 @@
-1	english	x-vnd.Be.ChartDemo	4060481316
+1	english	x-vnd.Be.ChartDemo	986636897
 Slow rotation	ChartWindow		慢速旋转
 Pink	ChartWindow		粉红色
 Comet	ChartWindow		彗星
@@ -9,9 +9,11 @@ Blue	ChartWindow		蓝色
 Colors	ChartWindow		颜色
 Novas	ChartWindow		新星
 LineArray	ChartWindow		线型数组
+ 0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s （对数坐标）
 Free motion	ChartWindow		自由运动
 (high) 100% 	ChartWindow		（高）100%
 Green	ChartWindow		绿色
+Amas	ChartWindow		Ams
 2 threads	ChartWindow		2 线程
 Yellow	ChartWindow		黄色
 Off	ChartWindow		关闭
@@ -25,6 +27,13 @@ Special	ChartWindow		特殊
 Status	ChartWindow		状态
 Star density	ChartWindow		星体密度
 600.0 f/s	ChartWindow		600.0 f/s
+Display:	ChartWindow		显示：
+Space color	ChartWindow		空间颜色
+White	ChartWindow		白色
+Chart	System name		Chart
+Animation:	ChartWindow		动画效果：
+Frames/s	ChartWindow		帧/秒
+Auto demo	ChartWindow		自动演示
 CPU load	ChartWindow		处理器使用率
 DrawBitmap	ChartWindow		绘制位图
 Red	ChartWindow		红色

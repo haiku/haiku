@@ -1,4 +1,7 @@
-1	english	x-vnd.Haiku-libtextencoding	1212670976
+1	english	x-vnd.Haiku-libtextencoding	3062073902
+ISO Greek	textencodings		ISO 希腊语
+ISO South European	textencodings		ISO 南欧语言
+Chinese Big5	textencodings		中文 Big5
 ISO Hebrew	textencodings		ISO 希伯来语
 ISO Arabic	textencodings		ISO 阿拉伯语
 ISO Latin 9	textencodings		ISO 拉丁文-9

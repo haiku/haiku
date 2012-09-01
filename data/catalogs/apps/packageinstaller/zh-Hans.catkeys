@@ -1,10 +1,11 @@
-1	english	x-vnd.Haiku-PackageInstaller	2709408798
+1	english	x-vnd.Haiku-PackageInstaller	1396489627
 Install to:	PackageView		安装到：
 OK	PackageView		确认
 Accept	PackageTextViewer		接受
 Continue	PackageInstall		继续
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		所需包安转到系统失败。目标包文件可能出现错误。详情请咨询该包的发布者。
 Image not loaded correctly	PackageImageViewer		图像加载失败
+Install 	PackageView		安装
 No package selected.	PackageInfo		未选择安装包。
 Install	PackageView		安装
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		给定包可能已经安装到系统。您确定要卸载已存在的包，然后继续安装吗？

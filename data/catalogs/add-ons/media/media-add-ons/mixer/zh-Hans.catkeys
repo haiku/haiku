@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-mixer.media_addon	3116938264
+1	english	x-vnd.Haiku-mixer.media_addon	3450667169
 Input gain controls represent	AudioMixer		输入增益控制表示
 Linear interpolation	AudioMixer		线性插补
 Virtual output channels	AudioMixer		虚拟输出通道
@@ -18,6 +18,7 @@ Gain controls	AudioMixer		增益控制
 Input mapping	AudioMixer		输入映射
 Mute	AudioMixer		静音
 Input channel destinations	AudioMixer		目标输入通道
+To master	AudioMixer		到主音量
 Master output	AudioMixer		主音量输出
 Setup	AudioMixer		配置
 Use non linear gain sliders (like BeOS R5)	AudioMixer		使用非线性增益滚动条( 类似 BeOS R5 )

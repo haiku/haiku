@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	3088916408
+1	english	x-vnd.haiku-icon_o_matic	2079362081
 Select All	Icon-O-Matic-PathManipulator		全选
 Add Style	Icon-O-Matic-AddStylesCmd		添加样式
 Color (#%02x%02x%02x)	Style name after dropping a color		颜色(#%02x%02x%02x)
@@ -65,6 +65,7 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		删除模型
 Reverse	Icon-O-Matic-PathsList		撤销
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF 源码
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		重置转换
+Settings	Icon-O-Matic-Menus		设置
 All	Icon-O-Matic-Properties		全部
 Multi Paste Properties	Icon-O-Matic-Properties		批量粘贴属性
 Undo	Icon-O-Matic-Main		撤销

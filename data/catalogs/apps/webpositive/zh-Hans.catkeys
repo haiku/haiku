@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-WebPositive	3625199472
+1	english	x-vnd.Haiku-WebPositive	1360241600
 Show home button	Settings Window		显示 home 按钮
 Username:	Authentication Panel		用户名：
 Copy URL to clipboard	Download Window		复制 URL 到剪贴板
@@ -6,6 +6,11 @@ Cancel	Settings Window		取消
 Close window	WebPositive Window		关闭窗口
 Quit	WebPositive		退出
 The download could not be opened.	Download Window		下载内容无法打开。
+Yesterday	WebPositive Window		昨天
+Default standard font size:	Settings Window		默认标准字体大小：
+Start page:	Settings Window		开始页面：
+History	WebPositive Window		历史
+Error opening downloads folder	Download Window		打开下载目录出错
 Paste	WebPositive Window		粘贴
 Settings	Settings Window		设置
 %seconds seconds left	Download Window		剩余 %seconds 秒
@@ -15,6 +20,11 @@ Decrease size	WebPositive Window		缩小
 Serif font:	Settings Window		衬线字体：
 Loading %url	WebPositive Window		载入 %url
 Page source	WebPositive Window		查看网页源码
+Next	WebPositive Window		下一页
+Find next	WebPositive Window		查找下一个
+Download folder:	Settings Window		下载目录：
+Edit	WebPositive Window		编辑
+Cancel	Authentication Panel		取消
 Default fixed font size:	Settings Window		默认等宽字体大小：
 Close tab	WebPositive Window		关闭标签页
 Auto-hide mouse pointer	Settings Window		自动隐藏鼠标焦点
@@ -24,6 +34,10 @@ Full screen	WebPositive Window		全屏
 Open download error	Download Window		打开下载出错
 Standard font:	Settings Window		标准字体：
 Restart	Download Window		重新下载
+Reload	WebPositive Window		重载页面
+Downloads	Download Window		下载
+Sans serif font:	Settings Window		无衬线字体：
+Over %days days left	Download Window		剩余 %days 天
 Forward	WebPositive Window		前一页
 of	Download Window	...as in '12kB of 256kB'	 全部
 Revert	Settings Window		恢复
@@ -60,6 +74,7 @@ Cut	URL Bar		剪切
 Clear	WebPositive Window		清除
 Remove	Download Window		删除
 Find	WebPositive Window		查找
+Find previous	WebPositive Window		查找上一个
 Settings	WebPositive Window		设置
 Proxy server address:	Settings Window		代理服务器地址：
 Proxy server port:	Settings Window		代理服务器端口：
@@ -69,6 +84,15 @@ Paste	URL Bar		粘贴
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		隐藏密码文本
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	敏捷的棕毛小狐狸超越了懒惰的大黄狗。
+Over 1 minute left	Download Window		剩余 1 分钟
+Open start page	Settings Window		打开开始页面
+Continue downloads	WebPositive		继续下载
+Cancel	Download Window		取消
+Open search page	Settings Window		打开搜索页面
+Password:	Authentication Panel		密码：
+Back	WebPositive Window		后退
+New browser window	Download Window		新建浏览窗口
+Today	WebPositive Window		今天
 1 second left	Download Window		剩余 1 秒
 Remember username and password for this site	Authentication Panel		记住本站点的用户名和密码
 Earlier	WebPositive Window		早期
@@ -96,3 +120,6 @@ Copy	URL Bar		复制
 OK	WebPositive Window		确定
 Manage bookmarks	WebPositive Window		管理书签
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	本页面的书签页（%bookmarkName）已经存在。
+New windows:	Settings Window		新建窗口：
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 完成
+Remove finished	Download Window		删除完成内容

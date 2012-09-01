@@ -143,7 +143,7 @@ The mail_daemon could not be started:\n\t	Mail		メールサービス (mail_daem
 Open attachment	Mail		添付ファイルを開く
 sent	B_USER_DIRECTORY/mail/sent		送信済みメール
 (Date unavailable)	Mail		(日付が利用できません)
-Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリーテンプレートをこのフォルダーに入れてください。
+Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリテンプレートをこのフォルダーに入れてください。
 Reply	Mail		返信
 From:	Mail		差出人：
 Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。

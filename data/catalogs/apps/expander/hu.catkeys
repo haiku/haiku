@@ -9,10 +9,10 @@ Expander: Open	ExpanderWindow		Kibontó: Megnyitás
  is not supported	ExpanderWindow		nem támogatott
 Expander settings	ExpanderPreferences		Kibontó beállításai
 Select current	DirectoryFilePanel		Jelenlegi kiválasztása
-Source	ExpanderWindow		Forrás
+Source	ExpanderWindow		Csomag
 Error when expanding archive	ExpanderWindow		Hiba történt a kibontás közben
 Hide contents	ExpanderWindow		Tartalom elrejtése
-Cancel	ExpanderWindow		Mégsem
+Cancel	ExpanderWindow		Mégse
 Automatically expand files	ExpanderPreferences		Fájlok automatikus kibontása
 Creating listing for '%s'	ExpanderWindow		'%s' lista létrehozása
 Continue	ExpanderWindow		Folytatás
@@ -31,7 +31,7 @@ Expander: Choose destination	DirectoryFilePanel		Kibontó: Cél választása
 Select	ExpanderPreferences		Kiválasztás
 Show contents	ExpanderWindow		Tartalom megjelenítése
 Automatically show contents listing	ExpanderPreferences		Tartalom listázása automatikusan
-OK	ExpanderPreferences		OK
+OK	ExpanderPreferences		Rendben
 Leave destination folder path empty	ExpanderPreferences		Hagyja üresen a célmappa útvonalát
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		A könyvtár át lett mozgatva, nevezve vagy nem\ntámogatott.
 The file doesn't exist	ExpanderWindow		A fájl nem létezik
@@ -45,5 +45,5 @@ Open destination folder after extraction	ExpanderPreferences		Kibontás után ny
 Set source…	ExpanderMenu		Forrás beállítása…
 Select '%s'	DirectoryFilePanel		'%s' kiválasztása
 Show contents	ExpanderMenu		Tartalom megjelenítése
-Stop	ExpanderWindow		Megállít
-Destination	ExpanderWindow		Cél
+Stop	ExpanderWindow		Leállítás
+Destination	ExpanderWindow		Hova

@@ -1,6 +1,7 @@
-1	english	x-vnd.Haiku-CPUFrequencyPref	3079996868
+1	english	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		确定
 CPU frequency status view	CPU Frequency View		CPU 状态视图
+OK	Status view		确定
 Set state	Status view		状态设置
 Defaults	Pref Window		默认
 Install replicant into Deskbar	CPU Frequency View		添加 CPU 监视器到桌面栏

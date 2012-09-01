@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-MediaPlayer	3948226748
+1	english	x-vnd.Haiku-MediaPlayer	2969013755
 raw audio	MediaPlayer-InfoWin		原生音频
+Location	MediaPlayer-InfoWin		位置
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		流设置
@@ -8,9 +9,11 @@ Scale controls in full screen mode	MediaPlayer-SettingsWindow		全屏模式比�
 Video	MediaPlayer-InfoWin		视频
 Subtitle size:	MediaPlayer-SettingsWindow		字幕大小：
 Save Playlist	MediaPlayer-PlaylistWindow		保存播放列表
+<no media>	MediaPlayer-InfoWin		<无媒体>
 (not supported)	MediaPlayer-InfoWin		(不支持)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		所要播放的文件都不是媒体文件。
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		播放列表保存失败。\n\n 错误：
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		新建播放器...
 100% scale	MediaPlayer-Main		100％
 Subtitle placement:	MediaPlayer-SettingsWindow		字幕布局：
@@ -39,6 +42,7 @@ Close window after playing audio	MediaPlayer-SettingsWindow		音频播放结束�
 Full volume	MediaPlayer-SettingsWindow		最大音量
 Drop files to play	MediaPlayer-Main		拖放文件以播放
 TogglePlaying	MediaPlayer-Main		播放切换
+Copyright	MediaPlayer-InfoWin		版权所有
 Cancel	MediaPlayer-SettingsWindow		取消
 Loop audio	MediaPlayer-SettingsWindow		音频循环播放
 Container	MediaPlayer-InfoWin		容器
@@ -120,6 +124,7 @@ Move file to Trash	MediaPlayer-PlaylistWindow		移动文件到垃圾箱
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		静音
 Toggle pause/play.	MediaPlayer-Main		暂停/播放。
+Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku 媒体套件：
 min	MediaPlayer-InfoWin	Minutes	分
 Small	MediaPlayer-SettingsWindow		小
 Randomize	MediaPlayer-PlaylistWindow		随机
@@ -128,6 +133,7 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		随机条目
 Revert	MediaPlayer-SettingsWindow		恢复
 Edit	MediaPlayer-PlaylistWindow		编辑
 Start media server	MediaPlayer-Main		启动媒体服务器
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		全平切换。
 ToggleFullscreen	MediaPlayer-Main		全屏切换。
 <unnamed>	PlaylistItem-name		<未命名>
@@ -145,7 +151,9 @@ Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		删除条目到垃圾箱
 Save	MediaPlayer-Main		保存
 <nothing to undo>	MediaPlayer-PlaylistWindow		<无撤销内容>
 Mono	MediaPlayer-InfoWin		单声道
+File info	MediaPlayer-InfoWin		文件信息
 Save	MediaPlayer-PlaylistWindow		保存
+%d Bit	MediaPlayer-InfoWin		%d Bit
 Remove	MediaPlayer-PlaylistWindow		移除
 Full screen	MediaPlayer-Main		全屏
 Open file…	MediaPlayer-Main		打开文件...

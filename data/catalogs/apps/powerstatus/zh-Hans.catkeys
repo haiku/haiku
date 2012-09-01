@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PowerStatus	3986536563
+1	english	x-vnd.Haiku-PowerStatus	3419486861
 Design capacity low warning: 	PowerStatus		设计低容量警告：
 Show percent	PowerStatus		显示百分比
 Design capacity: 	PowerStatus		设计容量：
@@ -25,6 +25,7 @@ Show text label	PowerStatus		显示文字标签
 About…	PowerStatus		关于...
 Model number: 	PowerStatus		型号：
 Install in Deskbar	PowerStatus		安装到桌面栏
+ mAh	PowerStatus		mAh
 Capacity: 	PowerStatus		容量：
 Battery discharging	PowerStatus		电池供电
 Serial number: 	PowerStatus		编号：

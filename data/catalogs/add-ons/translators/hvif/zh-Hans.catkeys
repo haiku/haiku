@@ -1,6 +1,8 @@
-1	english	x-vnd.Haiku-HVIFTranslator	2227623652
+1	english	x-vnd.Haiku-HVIFTranslator	249304797
+Haiku vector icon translator	HVIFTranslator		Haiku 矢量图标转换器
 HVIF icons	HVIFTranslator		HVIF 图标
 Render size:	HVIFView		渲染尺寸：
 HVIFTranslator Settings	HVIFTranslator		HVIF 转换器设置
+Haiku vector icon translator	HVIFView		Haiku 矢量图标转换器
 HVIF Settings	HVIFMain		HVIF 设置
 Version %d.%d.%d, %s	HVIFView		版本 %d.%d.%d，%s

@@ -34,7 +34,7 @@ Open…	MediaPlayer-PlaylistWindow		開く…
 Toggle mute.	MediaPlayer-Main		ミュートのオン / オフ
 Undo	MediaPlayer-PlaylistWindow		元に戻す：
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		可能なら、ハードウェアビデオオーバーレイを使う
-File info…	MediaPlayer-Main		ファイルの情報…
+File info…	MediaPlayer-Main		ファイル情報…
 Pause playback.	MediaPlayer-Main		再生を一時停止する。
 Overlay	MediaPlayer-InfoWin		オーバーレイ
 Remove Entry	MediaPlayer-RemovePLItemsCmd		項目の削除
@@ -151,7 +151,7 @@ Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱へ移�
 Save	MediaPlayer-Main		保存
 <nothing to undo>	MediaPlayer-PlaylistWindow		<元に戻すものがありません>
 Mono	MediaPlayer-InfoWin		モノラル
-File info	MediaPlayer-InfoWin		ファイルの情報
+File info	MediaPlayer-InfoWin		ファイル情報
 Save	MediaPlayer-PlaylistWindow		保存
 %d Bit	MediaPlayer-InfoWin		%d ビット
 Remove	MediaPlayer-PlaylistWindow		削除

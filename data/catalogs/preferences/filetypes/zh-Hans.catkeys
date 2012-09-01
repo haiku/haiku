@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-FileTypes	2037267651
+1	english	x-vnd.Haiku-FileTypes	2496450458
 Application types…	FileTypes Window		应用程序类型...
 Description:	Application Types Window		描述：
 Args only	Application Type Window		仅含参数
@@ -49,6 +49,7 @@ Name:	Application Types Window		名称：
 Group name:	New File Type Window		组名：
 Preferred application	FileType Window		首选程序
 Progress	Application Types Window		进程
+Set preferred application	Preferred App Menu		设置首选应用
 File	Application Type Window		文件
 Version:	Application Type Window		版本:
 Select…	FileTypes Window		选择

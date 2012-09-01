@@ -24,7 +24,7 @@ Stop	InstallerWindow		Leállítás
 OK	InstallerApp		Rendben
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válassza ki a lemezt melyről telepíteni szeretne és válassza ki azt, amelyre telepít. Ha végzett, kattitnson a „Telepítés” gombra.
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
-Install from:	InstallerWindow		E lemezről:
+Install from:	InstallerWindow		Honnan:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		FONTOS TUDNIVALÓK A HAIKU TELEPÍTÉSE ELŐTT\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Folytatás
@@ -111,7 +111,7 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Try installing anyway	InstallProgress		Feltelepítés megpróbálása
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Tehát a fejléc alá, amit nem szabad átírni, írjon be néhány ehhez hasonló sort:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Biztosan félbeszakítja a telepítést?
-Onto:	InstallerWindow		E lemezre:
+Onto:	InstallerWindow		Hova:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Kérjük, zárja be a Bootkezelő ablakát még mielőtt a Telepítő ablakát bezárná.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) A Haiku első indításakor olvassa el az \"Köszöntő\"-t és a \"Felhasználói útmutató\"-t. Ezek megtalálhatóak az Asztalon és a WebPositive könyvjelzői között.\n\n
 Tools	InstallerWindow		Eszközök

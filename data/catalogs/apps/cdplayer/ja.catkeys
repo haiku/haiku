@@ -8,7 +8,7 @@ Audio CD	CDPlayer		オーディオ CD
 It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		CD ドライブが無いか、CD ドライブをサポートするためのシステムソフトウェアがありません。ごめんなさい。
 Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		トラック: %ld:%.2ld / %ld:%.2ld
 Track: 88:88 / 88:88	CDPlayer		トラック: 88:88 / 88:88
-Track: --:-- / --:--	CDPlayer		トラック：　--:-- / --:--
+Track: --:-- / --:--	CDPlayer		トラック:  --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		ディスク: 88:88 / 88:88
-Disc: --:-- / --:--	CDPlayer		ディスク：　--:-- / --:--
+Disc: --:-- / --:--	CDPlayer		ディスク: --:-- / --:--
 CD drive is empty	CDPlayer		CD が入っていません

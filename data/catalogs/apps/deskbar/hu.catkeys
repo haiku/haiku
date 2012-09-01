@@ -7,8 +7,8 @@ Applications	PreferencesWindow		Programok
 Time preferences…	TimeView		Idő beállítása…
 About Haiku	DeskbarMenu		Haiku névjegye
 Recent documents:	PreferencesWindow		Utolsó dokumentumok:
-Recent applications	DeskbarMenu		Legutóbbi alkalmazások
-Sort running applications	PreferencesWindow		Futó alkalmazások rendezése
+Recent applications	DeskbarMenu		Legutóbbi programok
+Sort running applications	PreferencesWindow		Futó programok rendezése
 Show time	Tray		Idő megjelenítése
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programok
 Find…	DeskbarMenu		Keresés...
@@ -18,7 +18,7 @@ Recent documents	DeskbarMenu		Legutóbbi dokumentumok
 Show seconds	PreferencesWindow		Másodpercek megjelenítése
 Auto-hide	PreferencesWindow		Automatikus elrejtés
 Always on top	PreferencesWindow		Mindig felül
-<Deskbar folder is empty>	DeskbarMenu		<A Deskbar mappa üres>
+<Deskbar folder is empty>	DeskbarMenu		<Az Asztalsáv mappa üres>
 Show all	WindowMenu		Összes megjelenítése
 No windows	WindowMenu		Nincsenek ablakok
 Deskbar	System name		Asztalsáv
@@ -31,7 +31,7 @@ Show application expander	PreferencesWindow		Programkiterjesztő mutatása
 Restart Tracker	DeskbarMenu		Tracker újraindítása
 Close all	WindowMenu		Összes bezárása
 Deskbar preferences	PreferencesWindow		Asztalsáv-beállítások
-Mount	DeskbarMenu		Felcsatolás
+Mount	DeskbarMenu		Csatolás
 Small	PreferencesWindow		Kicsi
 Recent applications:	PreferencesWindow		Legutóbbi programok:
 Shutdown…	DeskbarMenu		Leállítás...
@@ -41,12 +41,12 @@ Recent folders	DeskbarMenu		Legutóbbi mappák
 About this system	DeskbarMenu		Rendszer névjegye
 Show calendar…	TimeView		Naptár megjelenítése...
 Deskbar preferences…	DeskbarMenu		Asztalsáv-beállítások…
-Expand new applications	PreferencesWindow		Új alkalmazások kibontása
+Expand new applications	PreferencesWindow		Új programok kibontása
 Show replicants	DeskbarMenu		Replikánsok megjelenítése
 Hide application names	PreferencesWindow		Programnevek elrejtése
 Clock	PreferencesWindow		Óra
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demók
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Bemutatók
 Icon size	PreferencesWindow		Ikon mérete
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Asztali kisalkalmazások
 Hide all	WindowMenu		Összes elrejtése
-Quit application	WindowMenu		Kilépés az alkalmazásból
+Quit application	WindowMenu		Kilépés a programból

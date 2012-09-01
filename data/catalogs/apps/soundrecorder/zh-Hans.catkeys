@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-SoundRecorder	1981644768
+1	english	x-vnd.Haiku-SoundRecorder	2149017672
 Loop	RecorderWindow		循环
 Cannot find default audio hardware	RecorderWindow		未发现默认音频设备
 Cannot find the temporary file created to hold the new recording	RecorderWindow		未找到存储新记录的临时文件
@@ -16,6 +16,7 @@ Compression: 	RecorderWindow		压缩：
 Rewind	RecorderWindow		倒回
 Sample rate:	RecorderWindow		采样频率：
 Invalid audio files	RecorderWindow		无效音频文件
+ seconds	RecorderWindow		秒
 OK	RecorderWindow		确定
 Cannot open the temporary file created to hold the new recording	RecorderWindow		无法打开用于存储新记录的临时文件
 None of the files appear to be audio files	RecorderWindow		所有文件都不是音频文件

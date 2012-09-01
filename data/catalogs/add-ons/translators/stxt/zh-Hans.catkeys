@@ -1,6 +1,8 @@
-1	english	x-vnd.Haiku-STXTTranslator	3302294301
+1	english	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Be 格式文本文件
 Plain text file	STXTTranslator		纯文本文件
 STXTTranslator Settings	STXTTranslator		STXT 转换器设置
+StyledEdit file translator	STXTView		StyledEdit 文件转换器
 StyledEdit files	STXTTranslator		StyledEdit 文件
+StyledEdit file translator	STXTTranslator		StyledEdit 文件转换器
 STXT Settings	STXTMain		STXT 设置

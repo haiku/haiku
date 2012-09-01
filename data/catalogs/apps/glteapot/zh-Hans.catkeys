@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-GLTeapot	3688092856
+1	english	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		上部中心
 Lighting	TeapotWindow		灯光
 Off	TeapotWindow		关闭
@@ -9,6 +9,7 @@ Blue	TeapotWindow		蓝色
 Gouraud shading	TeapotWindow		高氏渲染
 Quit	TeapotWindow		退出
 Filled polygons	TeapotWindow		填充
+Settings	TeapotWindow		设置
 Fog	TeapotWindow		模糊
 Backface culling	TeapotWindow		隐面消除
 Z-buffered	TeapotWindow		Z-缓冲

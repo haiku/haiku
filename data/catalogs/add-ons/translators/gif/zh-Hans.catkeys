@@ -1,9 +1,10 @@
-1	english	x-vnd.Haiku-GIFTranslator	829368084
+1	english	x-vnd.Haiku-GIFTranslator	2708495435
 Websafe	GIFView		网络安全色
 Write interlaced images	GIFView		写入隔行图像
 Optimal	GIFView		最佳效果
 Greyscale	GIFView		灰度
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Be 位图格式（GIF转换器）
+GIF image translator	GIFView		GIF 图像转换器
 GIF image	GIFTranslator		GIF 图像
 Write transparent images	GIFView		写入透明图像
 Palette	GIFView		调色板
