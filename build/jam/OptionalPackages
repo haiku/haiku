@@ -28,7 +28,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Bluetooth				- experimental Haiku components for Bluetooth
 #	BurnItNow				- CD burning app
 #	Bzip					- file archiving utility
-#   Caya                    - a multiprotocol im client
+#	Caya					- a multiprotocol im client
 #	CCache					- fast compiler cache
 #	CDRecord				- the command line CD writing tools
 #	Clang					- the LLVM C and C++ compiler (llvm, libs, headers)
@@ -561,8 +561,8 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				cvs-1.12.13.1-r1a4-x86-gcc4-2012-08-30.zip 
-				: $(baseURL)/cvs-1.12.13.1-r1a4-x86-gcc4-2012-08-30.zip 
+				cvs-1.12.13.1-r1a4-x86-gcc4-2012-08-30.zip
+				: $(baseURL)/cvs-1.12.13.1-r1a4-x86-gcc4-2012-08-30.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
@@ -644,7 +644,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 			: : true ;
 		InstallOptionalHaikuImagePackage
 			texinfo-4.13a-r1a4-x86-gcc2-2012-08-28.zip
-			: $(baseURL)texinfo-4.13a-r1a4-x86-gcc2-2012-08-28.zip
+			: $(baseURL)/texinfo-4.13a-r1a4-x86-gcc2-2012-08-28.zip
 			: : true ;
 	}
 }
@@ -1228,7 +1228,7 @@ if [ IsOptionalHaikuImagePackageAdded Libmng ] {
 			: $(baseURL)/lib/libmng-1.0.10-r1a3-x86-gcc4-2011-05-24.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			libmng-1.0.10-r1a4-x86-gcc2-2012-08-28.zip 
+			libmng-1.0.10-r1a4-x86-gcc2-2012-08-28.zip
 			: $(baseURL)/lib/libmng-1.0.10-r1a4-x86-gcc2-2012-08-28.zip  ;
 	}
 }
@@ -1276,7 +1276,7 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package Links available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage 
+		InstallOptionalHaikuImagePackage
 			links-2.3pre2-r1a4-x86-gcc2-2012-08-30.zip
 			: $(baseURL)/links-2.3pre2-r1a4-x86-gcc2-2012-08-30.zip ;
 		AddSymlinkToHaikuImage home config settings deskbar Applications
