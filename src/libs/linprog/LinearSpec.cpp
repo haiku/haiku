@@ -288,6 +288,8 @@ bool
 LinearSpec::RemoveConstraint(Constraint* constraint, bool deleteConstraint,
 	bool notifyListener)
 {
+	if (constraint == NULL)
+		return false;
 	fSolver->ConstraintRemoved(constraint);
 	if (!fConstraints.RemoveItem(constraint))
 		return false;
