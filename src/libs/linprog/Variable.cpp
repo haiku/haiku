@@ -8,9 +8,7 @@
 
 #include "Variable.h"
 
-#include <float.h>	// for DBL_MAX
-
-#include <File.h>
+#include <math.h>
 
 #include "Constraint.h"
 #include "LinearSpec.h"
@@ -167,18 +165,22 @@ Variable::SetLabel(const char* label)
 BString
 Variable::ToString() const
 {
-	BString string;
+	BString string = "x";
+	string << Index() << " ";
 	if (fLabel) {
-		string << fLabel;
+		string << fLabel << ": ";
 		if (!fIsValid)
 			string << "(invalid)";
 	} else {
-		string << "Variable ";
 		if (!fIsValid)
 			string << "(invalid," << (int32)this << ")";
 		else
-			string << Index();
+			string << Index() << ": ";
 	}
+	string << Value();
+	BString pointerString;
+	pointerString.SetToFormat("%p", this);
+	string << " (" << pointerString << ")";
 	return string;
 }
 
