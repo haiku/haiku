@@ -47,7 +47,6 @@ WindowArea::WindowArea(Crossing* leftTop, Crossing* rightTop,
 	fWidthConstraint(NULL),
 	fHeightConstraint(NULL)
 {
-
 }
 
 
@@ -320,6 +319,12 @@ WindowArea::PropagateToGroup(SATGroup* group)
 	if (!newLeftTop || !newRightTop || !newLeftBottom || !newRightBottom)
 		return false;
 
+	// hold a ref to the crossings till we cleaned up everything
+	BReference<Crossing> oldLeftTop = fLeftTopCrossing;
+	BReference<Crossing> oldRightTop = fRightTopCrossing;
+	BReference<Crossing> oldLeftBottom = fLeftBottomCrossing;
+	BReference<Crossing> oldRightBottom = fRightBottomCrossing;
+
 	fLeftTopCrossing = newLeftTop;
 	fRightTopCrossing = newRightTop;
 	fLeftBottomCrossing = newLeftBottom;
@@ -331,6 +336,7 @@ WindowArea::PropagateToGroup(SATGroup* group)
 	// manage constraints
 	if (Init(group) == false)
 		return false;
+
 	oldGroup->fWindowAreaList.RemoveItem(this);
 	for (int32 i = 0; i < fWindowList.CountItems(); i++) {
 		SATWindow* window = fWindowList.ItemAt(i);
@@ -360,12 +366,15 @@ WindowArea::MoveToTopLayer(SATWindow* window)
 void
 WindowArea::_UninitConstraints()
 {
-	delete fMinWidthConstraint;
-	delete fMinHeightConstraint;
-	delete fMaxWidthConstraint;
-	delete fMaxHeightConstraint;
-	delete fWidthConstraint;
-	delete fHeightConstraint;
+	LinearSpec* linearSpec = fGroup->GetLinearSpec();
+
+	linearSpec->RemoveConstraint(fMinWidthConstraint, true);
+	linearSpec->RemoveConstraint(fMinHeightConstraint, true);
+	linearSpec->RemoveConstraint(fMaxWidthConstraint, true);
+	linearSpec->RemoveConstraint(fMaxHeightConstraint, true);
+	linearSpec->RemoveConstraint(fWidthConstraint, true);
+	linearSpec->RemoveConstraint(fHeightConstraint, true);
+
 	fMinWidthConstraint = NULL;
 	fMinHeightConstraint = NULL;
 	fMaxWidthConstraint = NULL;
@@ -1157,14 +1166,12 @@ SATGroup::_SplitGroupIfNecessary(WindowArea* removedArea)
 	while (_FindConnectedGroup(neighbourWindows, removedArea, newGroup)) {
 		STRACE_SAT("Connected group found; %i window(s)\n",
 			(int)newGroup.CountItems());
-
 		if (newGroup.CountItems() == 1
 			&& newGroup.ItemAt(0)->WindowList().CountItems() == 1) {
 			SATWindow* window = newGroup.ItemAt(0)->WindowList().ItemAt(0);
 			RemoveWindow(window);
 			_EnsureGroupIsOnScreen(window->GetGroup());
-		}
-		else if (ownGroupProcessed)
+		} else if (ownGroupProcessed)
 			_SpawnNewGroup(newGroup);
 		else {
 			_EnsureGroupIsOnScreen(this);
