@@ -38,8 +38,8 @@ struct SharedSolver::MinSizeValidator {
 		if (solveResult == LinearProgramming::kUnbounded) {
 			solver->SetMinSize(layout, BSize(0, 0));
 		} else {
-			solver->SetMinSize(layout, BSize(layout->Right()->Value(),
-				layout->Bottom()->Value()));
+			solver->SetMinSize(layout, BSize(ceilf(layout->Right()->Value()),
+				ceilf(layout->Bottom()->Value())));
 		}
 	}
 };
@@ -58,8 +58,8 @@ struct SharedSolver::MaxSizeValidator {
 			solver->SetMaxSize(layout,
 				BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 		} else {
-			solver->SetMaxSize(layout, BSize(layout->Right()->Value(),
-				layout->Bottom()->Value()));
+			solver->SetMaxSize(layout, BSize(floorf(layout->Right()->Value()),
+				floorf(layout->Bottom()->Value())));
 		}
 	}
 };
