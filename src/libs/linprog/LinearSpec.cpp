@@ -9,7 +9,6 @@
 #include "LinearSpec.h"
 
 #include <new>
-#include <stdio.h>
 
 #include "ActiveSetSolver.h"
 
@@ -32,6 +31,56 @@ SolverInterface::SolverInterface(LinearSpec* linSpec)
 	fLinearSpec(linSpec)
 {
 
+}
+
+
+SolverInterface::~SolverInterface()
+{	
+}
+
+
+bool
+SolverInterface::AddConstraint(Constraint* constraint, bool notifyListener)
+{
+	return fLinearSpec->AddConstraint(constraint, notifyListener);
+}
+
+
+bool
+SolverInterface::RemoveConstraint(Constraint* constraint, bool deleteConstraint,
+	bool notifyListener)
+{
+	return fLinearSpec->RemoveConstraint(constraint, deleteConstraint,
+		notifyListener);
+}
+
+	
+SpecificationListener::~SpecificationListener()
+{
+}
+
+
+void
+SpecificationListener::VariableAdded(Variable* variable)
+{	
+}
+
+
+void
+SpecificationListener::VariableRemoved(Variable* variable)
+{
+}
+
+
+void
+SpecificationListener::ConstraintAdded(Constraint* constraint)
+{
+}
+
+
+void
+SpecificationListener::ConstraintRemoved(Constraint* constraint)
+{
 }
 
 
@@ -61,6 +110,20 @@ LinearSpec::~LinearSpec()
 		RemoveVariable(fVariables.ItemAt(0));
 
 	delete fSolver;
+}
+
+
+bool
+LinearSpec::AddListener(SpecificationListener* listener)
+{
+	return fListeners.AddItem(listener);	
+}
+
+
+bool
+LinearSpec::RemoveListener(SpecificationListener* listener)
+{
+	return fListeners.RemoveItem(listener);
 }
 
 
@@ -106,6 +169,10 @@ LinearSpec::AddVariable(Variable* variable)
 		RemoveVariable(variable, false);
 		return false;
 	}
+
+	for (int32 i = 0; i < fListeners.CountItems(); i++)
+		fListeners.ItemAt(i)->VariableAdded(variable);
+
 	return true;
 }
 
@@ -121,7 +188,6 @@ LinearSpec::RemoveVariable(Variable* variable, bool deleteVariable)
 	if (fVariables.RemoveItem(variable) == false)
 		return false;
 	fUsedVariables.RemoveItem(variable);
-
 	variable->fIsValid = false;
 
 	// invalidate all constraints that use this variable
@@ -129,9 +195,6 @@ LinearSpec::RemoveVariable(Variable* variable, bool deleteVariable)
 	const ConstraintList& constraints = Constraints();
 	for (int i = 0; i < constraints.CountItems(); i++) {
 		Constraint* constraint = constraints.ItemAt(i);
-
-		if (!constraint->IsValid())
-			continue;
 
 		SummandList* summands = constraint->LeftSide();
 		for (int j = 0; j < summands->CountItems(); j++) {
@@ -145,9 +208,12 @@ LinearSpec::RemoveVariable(Variable* variable, bool deleteVariable)
 	for (int i = 0; i < markedForInvalidation.CountItems(); i++)
 		RemoveConstraint(markedForInvalidation.ItemAt(i));
 
-
 	if (deleteVariable)
 		delete variable;
+
+	for (int32 i = 0; i < fListeners.CountItems(); i++)
+		fListeners.ItemAt(i)->VariableRemoved(variable);
+
 	return true;
 }
 
@@ -178,6 +244,20 @@ LinearSpec::UpdateRange(Variable* variable)
 bool
 LinearSpec::AddConstraint(Constraint* constraint)
 {
+	return AddConstraint(constraint, true);
+}
+
+
+bool
+LinearSpec::RemoveConstraint(Constraint* constraint, bool deleteConstraint)
+{
+	return RemoveConstraint(constraint, deleteConstraint, true);
+}
+
+
+bool
+LinearSpec::AddConstraint(Constraint* constraint, bool notifyListener)
+{
 	if (!fConstraints.AddItem(constraint))
 		return false;
 
@@ -185,8 +265,7 @@ LinearSpec::AddConstraint(Constraint* constraint)
 	SummandList* leftSide = constraint->LeftSide();
 	for (int i = 0; i < leftSide->CountItems(); i++) {
 		Variable* var = leftSide->ItemAt(i)->Var();
-		if (var->AddReference() == 1)
-			fUsedVariables.AddItem(var);
+		_AddConstraintRef(var);
 	}
 
 	if (!fSolver->ConstraintAdded(constraint)) {
@@ -194,35 +273,79 @@ LinearSpec::AddConstraint(Constraint* constraint)
 		return false;
 	}
 
-	constraint->fIsValid = true;
+	constraint->fLS = this;
+
+	if (notifyListener) {
+		for (int32 i = 0; i < fListeners.CountItems(); i++)
+			fListeners.ItemAt(i)->ConstraintAdded(constraint);
+	}
+
 	return true;
 }
 
 
 bool
-LinearSpec::RemoveConstraint(Constraint* constraint, bool deleteConstraint)
+LinearSpec::RemoveConstraint(Constraint* constraint, bool deleteConstraint,
+	bool notifyListener)
 {
 	fSolver->ConstraintRemoved(constraint);
 	if (!fConstraints.RemoveItem(constraint))
 		return false;
-	constraint->fIsValid = false;
 
 	SummandList* leftSide = constraint->LeftSide();
-	for (int i = 0; i < leftSide->CountItems(); i++) {
+	for (int32 i = 0; i < leftSide->CountItems(); i++) {
 		Variable* var = leftSide->ItemAt(i)->Var();
-		if (var->RemoveReference() == 0)
-			fUsedVariables.RemoveItem(var);
+		_RemoveConstraintRef(var);
 	}
 
+	if (notifyListener) {
+		for (int32 i = 0; i < fListeners.CountItems(); i++)
+			fListeners.ItemAt(i)->ConstraintRemoved(constraint);
+	}
+
+	constraint->fLS = NULL;
 	if (deleteConstraint)
 		delete constraint;
+
 	return true;
 }
 
 
-bool
-LinearSpec::UpdateLeftSide(Constraint* constraint)
+void
+LinearSpec::_AddConstraintRef(Variable* var)
 {
+	if (var->AddReference() == 1)
+		fUsedVariables.AddItem(var);
+}
+
+
+void
+LinearSpec::_RemoveConstraintRef(Variable* var)
+{
+	if (var->RemoveReference() == 0)
+		fUsedVariables.RemoveItem(var);
+}
+
+
+bool
+LinearSpec::UpdateLeftSide(Constraint* constraint,
+	const SummandList* oldSummands)
+{
+	SummandList* leftSide = constraint->LeftSide();
+	if (leftSide != NULL) {
+		for (int32 i = 0; i < leftSide->CountItems(); i++) {
+			Variable* var = leftSide->ItemAt(i)->Var();
+			_AddConstraintRef(var);			
+		}
+	}
+	if (oldSummands != NULL) {
+		// the summands have changed, update the var ref count
+		for (int32 i = 0; i < oldSummands->CountItems(); i++) {
+			Variable* var = oldSummands->ItemAt(i)->Var();
+			_RemoveConstraintRef(var);			
+		}
+	}
+
 	if (!fSolver->LeftSideChanged(constraint))
 		return false;
 	return true;
@@ -247,105 +370,12 @@ LinearSpec::UpdateOperator(Constraint* constraint)
 }
 
 
-/**
- * Adds a new hard linear constraint to the specification.
- *
- * @param coeffs		the constraint's coefficients
- * @param vars			the constraint's variables
- * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
- * @return the new constraint
- */
-Constraint*
-LinearSpec::AddConstraint(SummandList* summands, OperatorType op,
-	double rightSide)
+bool
+LinearSpec::UpdatePenalties(Constraint* constraint)
 {
-	return AddConstraint(summands, op, rightSide, -1, -1);
-}
-
-
-/**
- * Adds a new hard linear constraint to the specification with a single summand.
- *
- * @param coeff1		the constraint's first coefficient
- * @param var1			the constraint's first variable
- * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
- * @return the new constraint
- */
-Constraint*
-LinearSpec::AddConstraint(double coeff1, Variable* var1,
-	OperatorType op, double rightSide)
-{
-	return AddConstraint(coeff1, var1, op, rightSide, -1, -1);
-}
-
-
-/**
- * Adds a new hard linear constraint to the specification with two summands.
- *
- * @param coeff1		the constraint's first coefficient
- * @param var1			the constraint's first variable
- * @param coeff2		the constraint's second coefficient
- * @param var2			the constraint's second variable
- * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
- * @return the new constraint
- */
-Constraint*
-LinearSpec::AddConstraint(double coeff1, Variable* var1,
-	double coeff2, Variable* var2, OperatorType op, double rightSide)
-{
-	return AddConstraint(coeff1, var1, coeff2, var2, op, rightSide, -1,
-		-1);
-}
-
-
-/**
- * Adds a new hard linear constraint to the specification with three summands.
- *
- * @param coeff1		the constraint's first coefficient
- * @param var1			the constraint's first variable
- * @param coeff2		the constraint's second coefficient
- * @param var2			the constraint's second variable
- * @param coeff3		the constraint's third coefficient
- * @param var3			the constraint's third variable
- * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
- * @return the new constraint
- */
-Constraint*
-LinearSpec::AddConstraint(double coeff1, Variable* var1,
-		double coeff2, Variable* var2, double coeff3, Variable* var3,
-		OperatorType op, double rightSide)
-{
-	return AddConstraint(coeff1, var1, coeff2, var2, coeff3, var3, op,
-		rightSide, -1, -1);
-}
-
-
-/**
- * Adds a new hard linear constraint to the specification with four summands.
- *
- * @param coeff1		the constraint's first coefficient
- * @param var1			the constraint's first variable
- * @param coeff2		the constraint's second coefficient
- * @param var2			the constraint's second variable
- * @param coeff3		the constraint's third coefficient
- * @param var3			the constraint's third variable
- * @param coeff4		the constraint's fourth coefficient
- * @param var4			the constraint's fourth variable
- * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
- * @return the new constraint
- */
-Constraint*
-LinearSpec::AddConstraint(double coeff1, Variable* var1,
-		double coeff2, Variable* var2, double coeff3, Variable* var3,
-		double coeff4, Variable* var4, OperatorType op, double rightSide)
-{
-	return AddConstraint(coeff1, var1, coeff2, var2, coeff3, var3, coeff4, var4,
-		op, rightSide, -1, -1);
+	if (!fSolver->PenaltiesChanged(constraint))
+		return false;
+	return true;
 }
 
 
@@ -486,32 +516,19 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 }
 
 
-BSize
-LinearSpec::MinSize(Variable* width, Variable* height)
-{
-	return fSolver->MinSize(width, height);
-}
-
-
-BSize
-LinearSpec::MaxSize(Variable* width, Variable* height)
-{
-	return fSolver->MaxSize(width, height);
-}
-
-
-
 ResultType
 LinearSpec::FindMins(const VariableList* variables)
 {
-	return fSolver->FindMins(variables);
+	fResult = fSolver->FindMins(variables);
+	return fResult;
 }
 
 
 ResultType
 LinearSpec::FindMaxs(const VariableList* variables)
 {
-	return fSolver->FindMaxs(variables);
+	fResult = fSolver->FindMaxs(variables);
+	return fResult;
 }
 
 
