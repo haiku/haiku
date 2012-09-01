@@ -18,7 +18,6 @@
 // #define DEBUG_ACTIVE_SOLVER
 
 #ifdef DEBUG_ACTIVE_SOLVER
-#include <stdio.h>
 #define TRACE(x...) printf(x)
 #else
 #define TRACE(x...) /* nothing */
@@ -79,6 +78,17 @@ int32
 EquationSystem::Columns()
 {
 	return fColumns;
+}
+
+
+bool
+EquationSystem::InRange(int32 row, int32 column)
+{
+	if (row < 0 || row >= fRows)
+		return false;
+	if (column < 0 || column >= fColumns)
+		return false;
+	return true;
 }
 
 
@@ -187,10 +197,6 @@ EquationSystem::GaussJordan(int32 i)
 void
 EquationSystem::RemoveLinearlyDependentRows()
 {
-	double oldB[fRows];
-	for (int r = 0; r < fRows; r++)
-		oldB[r] = fB[r];
-
 	double** temp = allocate_matrix(fRows, fColumns);
 	bool independentRows[fRows];
 
@@ -315,7 +321,7 @@ AddMaxConstraint(LinearSpec* spec, Variable* var)
 
 ActiveSetSolver::ActiveSetSolver(LinearSpec* linearSpec)
 	:
-	QPSolverInterface(linearSpec),
+	SolverInterface(linearSpec),
 
 	fVariables(linearSpec->UsedVariables()),
 	fConstraints(linearSpec->Constraints())
@@ -384,10 +390,77 @@ solve(EquationSystem& system)
 }
 
 
+static bool is_soft_inequality(Constraint* constraint)
+{
+	if (constraint->PenaltyNeg() <= 0. && constraint->PenaltyPos() <= 0.)
+		return false;
+	if (constraint->Op() != kEQ)
+		return true;
+	return false;
+}
+
+
+class SoftInequalityAdder {
+public:
+	SoftInequalityAdder(LinearSpec* linSpec, ConstraintList& allConstraints)
+		:
+		fLinearSpec(linSpec)
+	{
+		for (int32 c = 0; c < allConstraints.CountItems(); c++) {
+			Constraint* constraint = allConstraints.ItemAt(c);
+			if (!is_soft_inequality(constraint))
+				continue;
+	
+			Variable* variable = fLinearSpec->AddVariable();
+			variable->SetRange(0, 20000);
+
+			Constraint* helperConst = fLinearSpec->AddConstraint(1, variable,
+				kEQ, 0, constraint->PenaltyNeg(), constraint->PenaltyPos());
+			fInequalitySoftConstraints.AddItem(helperConst);
+			
+			double coeff = -1;
+			if (constraint->Op() == kGE)
+				coeff = 1;
+	
+			Constraint* modifiedConstraint = new Constraint(constraint);
+			allConstraints.AddItem(modifiedConstraint, c);
+			allConstraints.RemoveItemAt(c + 1);
+			fModifiedIneqConstraints.AddItem(modifiedConstraint);
+			modifiedConstraint->LeftSide()->AddItem(
+				new Summand(coeff, variable));
+		}
+		for (int32 c = 0; c < fInequalitySoftConstraints.CountItems(); c++)
+			allConstraints.AddItem(fInequalitySoftConstraints.ItemAt(c));
+	}
+
+	~SoftInequalityAdder()
+	{
+		for (int32 c = 0; c < fModifiedIneqConstraints.CountItems(); c++)
+			delete fModifiedIneqConstraints.ItemAt(c);
+		for (int32 c = 0; c < fInequalitySoftConstraints.CountItems(); c++) {
+			Constraint* con = fInequalitySoftConstraints.ItemAt(c);
+			fLinearSpec->RemoveVariable(con->LeftSide()->ItemAt(0)->Var());
+				// this also deletes the constraint
+		}
+	}
+
+private:
+	LinearSpec*		fLinearSpec;
+	ConstraintList	fModifiedIneqConstraints;
+	ConstraintList	fInequalitySoftConstraints;
+};
+
+
 ResultType
 ActiveSetSolver::Solve()
 {
-	int32 nConstraints = fConstraints.CountItems();
+	
+	// make a copy of the original constraints and create soft inequality
+	// constraints
+	ConstraintList allConstraints(fConstraints);
+	SoftInequalityAdder adder(fLinearSpec, allConstraints);
+
+	int32 nConstraints = allConstraints.CountItems();
 	int32 nVariables = fVariables.CountItems();
 
 	if (nVariables > nConstraints) {
@@ -404,15 +477,16 @@ ActiveSetSolver::Solve()
 	// setup constraint matrix and add slack variables if necessary
 	int32 rowIndex = 0;
 	for (int32 c = 0; c < nConstraints; c++) {
-		Constraint* constraint = fConstraints.ItemAt(c);
-		if (constraint->IsSoft())
+		Constraint* constraint = allConstraints.ItemAt(c);
+		if (is_soft(constraint))
 			continue;
 		SummandList* leftSide = constraint->LeftSide();
 		system.B(rowIndex) = constraint->RightSide();
 		for (int32 sIndex = 0; sIndex < leftSide->CountItems(); sIndex++ ) {
 			Summand* summand = leftSide->ItemAt(sIndex);
 			double coefficient = summand->Coeff();
-			system.A(rowIndex, summand->VariableIndex()) = coefficient;
+			int32 columnIndex = summand->VariableIndex();
+			system.A(rowIndex, columnIndex) = coefficient;
 		}
 		if (constraint->Op() == kLE) {
 			system.A(rowIndex, slackIndex) = 1;
@@ -436,8 +510,9 @@ ActiveSetSolver::Solve()
 	system.Results(results, nVariables + nConstraints);
 	TRACE("base system solved\n");
 
-	LayoutOptimizer optimizer(fConstraints, nVariables);
-	optimizer.Solve(results);
+	LayoutOptimizer optimizer(allConstraints, nVariables);
+	if (!optimizer.Solve(results))
+		return kInfeasible;
 
 	// back to the variables
 	for (int32 i = 0; i < nVariables; i++)
@@ -487,6 +562,7 @@ ActiveSetSolver::VariableRangeChanged(Variable* variable)
 		constraintGE = fLinearSpec->AddConstraint(1, variable, kGE, 0);
 		if (constraintGE == NULL)
 			return false;
+		constraintGE->SetLabel("Var Min");
 		fVariableGEConstraints.RemoveItemAt(variableIndex);
 		fVariableGEConstraints.AddItem(constraintGE, variableIndex);
 	}
@@ -494,6 +570,7 @@ ActiveSetSolver::VariableRangeChanged(Variable* variable)
 		constraintLE = fLinearSpec->AddConstraint(1, variable, kLE, 20000);
 		if (constraintLE == NULL)
 			return false;
+		constraintLE->SetLabel("Var Max");
 		fVariableLEConstraints.RemoveItemAt(variableIndex);
 		fVariableLEConstraints.AddItem(constraintLE, variableIndex);
 	}
@@ -509,14 +586,14 @@ ActiveSetSolver::VariableRangeChanged(Variable* variable)
 bool
 ActiveSetSolver::ConstraintAdded(Constraint* constraint)
 {
-	return QPSolverInterface::ConstraintAdded(constraint);
+	return true;
 }
 
 
 bool
 ActiveSetSolver::ConstraintRemoved(Constraint* constraint)
 {
-	return QPSolverInterface::ConstraintRemoved(constraint);
+	return true;
 }
 
 
@@ -542,60 +619,16 @@ ActiveSetSolver::OperatorChanged(Constraint* constraint)
 
 
 bool
+ActiveSetSolver::PenaltiesChanged(Constraint* constraint)
+{
+	return true;
+}
+
+
+bool
 ActiveSetSolver::SaveModel(const char* fileName)
 {
 	return false;
-}
-
-
-BSize
-ActiveSetSolver::MinSize(Variable* width, Variable* height)
-{
-	ConstraintList softConstraints;
-	_RemoveSoftConstraint(softConstraints);
-
-	Constraint* heightConstraint = fLinearSpec->AddConstraint(1, height,
-		kEQ, 0, 5, 5);
-	Constraint* widthConstraint = fLinearSpec->AddConstraint(1, width,
-		kEQ, 0, 5, 5);
-	ResultType result = Solve();
-	fLinearSpec->RemoveConstraint(heightConstraint);
-	fLinearSpec->RemoveConstraint(widthConstraint);
-
-	_AddSoftConstraint(softConstraints);
-
-	if (result == kUnbounded)
-		return kMinSize;
-	if (result != kOptimal)
-		TRACE("Could not solve the layout specification (%d). ", result);
-
-	return BSize(width->Value(), height->Value());
-}
-
-
-BSize
-ActiveSetSolver::MaxSize(Variable* width, Variable* height)
-{
-	ConstraintList softConstraints;
-	_RemoveSoftConstraint(softConstraints);
-
-	const double kHugeValue = 32000;
-	Constraint* heightConstraint = fLinearSpec->AddConstraint(1, height,
-		kEQ, kHugeValue, 5, 5);
-	Constraint* widthConstraint = fLinearSpec->AddConstraint(1, width,
-		kEQ, kHugeValue, 5, 5);
-	ResultType result = Solve();
-	fLinearSpec->RemoveConstraint(heightConstraint);
-	fLinearSpec->RemoveConstraint(widthConstraint);
-
-	_AddSoftConstraint(softConstraints);
-
-	if (result == kUnbounded)
-		return kMaxSize;
-	if (result != kOptimal)
-		TRACE("Could not solve the layout specification (%d). ", result);
-
-	return BSize(width->Value(), height->Value());
 }
 
 
@@ -632,10 +665,11 @@ ActiveSetSolver::_RemoveSoftConstraint(ConstraintList& list)
 	ConstraintList allConstraints = fLinearSpec->Constraints();
 	for (int i = 0; i < allConstraints.CountItems(); i++) {
 		Constraint* constraint = allConstraints.ItemAt(i);
-		if (!constraint->IsSoft())
+		// soft eq an ineq constraint?
+		if (constraint->PenaltyNeg() <= 0. && constraint->PenaltyPos() <= 0.)
 			continue;
 
-		if (fLinearSpec->RemoveConstraint(constraint, false) == true)
+		if (RemoveConstraint(constraint, false, false) == true)
 			list.AddItem(constraint);
 	}
 }
@@ -647,7 +681,7 @@ ActiveSetSolver::_AddSoftConstraint(const ConstraintList& list)
 	for (int i = 0; i < list.CountItems(); i++) {
 		Constraint* constraint = list.ItemAt(i);
 		// at least don't leak it
-		if (fLinearSpec->AddConstraint(constraint) == false)
+		if (AddConstraint(constraint, false) == false)
 			delete constraint;
 	}
 }
@@ -661,13 +695,11 @@ ActiveSetSolver::_FindWithConstraintsNoSoft(const VariableList* variables,
 	_RemoveSoftConstraint(softConstraints);
 
 	ConstraintList constraints;
-	for (int32 i = variables->CountItems() - 1; i >= 0; i--) {
+	for (int32 i = 0; i < variables->CountItems(); i++)
 		constraints.AddItem(constraintFunc(fLinearSpec, variables->ItemAt(i)));
-	}
 
 	ResultType result = Solve();
-
-	for (int32 i = constraints.CountItems() - 1; i >= 0; i--)
+	for (int32 i = 0; i < constraints.CountItems(); i++)
 		fLinearSpec->RemoveConstraint(constraints.ItemAt(i));
 
 	_AddSoftConstraint(softConstraints);
