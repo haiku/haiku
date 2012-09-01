@@ -308,6 +308,24 @@ StackAndTile::WindowActitvated(Window* window)
 void
 StackAndTile::WindowSentBehind(Window* window, Window* behindOf)
 {
+	SATWindow* satWindow = GetSATWindow(window);
+	if (satWindow == NULL)
+		return;
+	SATGroup* group = satWindow->GetGroup();
+	if (group == NULL)
+		return;
+	Desktop* desktop = satWindow->GetWindow()->Desktop();
+	if (desktop == NULL)
+		return;
+
+	const WindowAreaList& areaList = group->GetAreaList();
+	for (int32 i = 0; i < areaList.CountItems(); i++) {
+		WindowArea* area = areaList.ItemAt(i);
+		SATWindow* topWindow = area->TopWindow();
+		if (topWindow == NULL || topWindow == satWindow)
+			continue;
+		desktop->SendWindowBehind(topWindow->GetWindow(), behindOf);
+	}
 }
 
 
