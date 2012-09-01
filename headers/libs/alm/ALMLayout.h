@@ -16,6 +16,8 @@
 
 class BView;
 class BLayoutItem;
+class Constraint;
+
 
 namespace BPrivate {
 	class SharedSolver;
@@ -53,9 +55,40 @@ public:
 			XTab*				XTabAt(int32 index) const;
 			YTab*				YTabAt(int32 index, bool ordered = false);
 			YTab*				YTabAt(int32 index) const;
+	const	XTabList			GetXTabs() const;
+	const	YTabList			GetYTabs() const;
 
 			int32				IndexOf(XTab* tab, bool ordered = false);
 			int32				IndexOf(YTab* tab, bool ordered = false);
+
+			int32				CountConstraints() const;
+			Constraint*			ConstraintAt(int32 index) const;
+			bool				AddConstraint(Constraint* constraint);
+			bool				RemoveConstraint(Constraint* constraint,
+									bool deleteConstraint = true);
+
+			Constraint*			AddConstraint(double coeff1, Variable* var1,
+									OperatorType op, double rightSide,
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
+			Constraint*			AddConstraint(double coeff1, Variable* var1,
+									double coeff2, Variable* var2,
+									OperatorType op, double rightSide,
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
+			Constraint*			AddConstraint(double coeff1, Variable* var1,
+									double coeff2, Variable* var2,
+									double coeff3, Variable* var3,
+									OperatorType op, double rightSide,
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
+			Constraint*			AddConstraint(double coeff1, Variable* var1,
+									double coeff2, Variable* var2,
+									double coeff3, Variable* var3,
+									double coeff4, Variable* var4,
+									OperatorType op, double rightSide,
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
 
 			Row*				AddRow(YTab* top, YTab* bottom);
 			Column*				AddColumn(XTab* left, XTab* right);
@@ -66,6 +99,7 @@ public:
 			YTab*				Bottom() const;
 
 			LinearProgramming::LinearSpec* Solver() const;
+			LinearProgramming::ResultType ValidateLayout();
 
 			void				SetInsets(float insets);
 			void				SetInsets(float x, float y);
@@ -106,9 +140,7 @@ public:
 									YTab* bottom = NULL);
 	virtual	Area*				AddItem(BLayoutItem* item, Row* row,
 									Column* column);
-									
-			bool				SaveLayout(BMessage* archive) const;
-			bool				RestoreLayout(const BMessage* archive);
+
 	struct BadLayoutPolicy;
 
 			void				SetBadLayoutPolicy(BadLayoutPolicy* policy);
@@ -192,6 +224,9 @@ private:
 	friend class YTab;
 	friend class Area;
 
+			class BALMLayoutSpecListener;
+	friend	class BALMLayoutSpecListener;
+			
 			float				InsetForTab(XTab* tab) const;
 			float				InsetForTab(YTab* tab) const;
 
@@ -208,6 +243,7 @@ private:
 			void				_SetSolver(BPrivate::SharedSolver* solver);
 
 			BPrivate::SharedSolver* fSolver;
+			BALMLayoutSpecListener* fSpecListener;
 
 			BReference<XTab>	fLeft;
 			BReference<XTab>	fRight;
@@ -231,9 +267,12 @@ private:
 			YTabList			fYTabList;
 			bool				fYTabsSorted;
 
+			BObjectList<Constraint>	fConstraints;
+
 			RowColumnManager*	fRowColumnManager;
 
 			BadLayoutPolicy*	fBadLayoutPolicy;
+
 			uint32				_reserved[5];
 };
 

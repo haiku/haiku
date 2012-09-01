@@ -184,6 +184,25 @@ BALM::BALMLayout::DefaultPolicy::Instantiate(BMessage* archive)
 }
 
 
+class BALMLayout::BALMLayoutSpecListener 
+	: public LinearProgramming::SpecificationListener {
+public:
+	BALMLayoutSpecListener(BALMLayout* layout)
+		:
+		fLayout(layout)
+	{		
+	}
+
+	void ConstraintRemoved(Constraint* constraint)
+	{
+		fLayout->fConstraints.RemoveItem(constraint);
+	}
+
+private:
+			BALMLayout*			fLayout;
+};
+
+
 /*!
  * Constructor.
  * Creates new layout engine.
@@ -203,6 +222,9 @@ BALMLayout::BALMLayout(float hSpacing, float vSpacing, BALMLayout* friendLayout)
 	fBadLayoutPolicy(new DefaultPolicy())
 {
 	_SetSolver(friendLayout ? friendLayout->fSolver : new SharedSolver());
+
+	fSpecListener = new BALMLayoutSpecListener(this);
+	Solver()->AddListener(fSpecListener);
 
 	fLeft = AddXTab();
 	fRight = AddXTab();
@@ -278,13 +300,22 @@ BALMLayout::BALMLayout(BMessage* archive)
 		err = unarchiver.EnsureUnarchived(kSolverField);
 
 	unarchiver.Finish(err);
+
+	fSpecListener = new BALMLayoutSpecListener(this);
+	Solver()->AddListener(fSpecListener);
 }
 
 
 BALMLayout::~BALMLayout()
 {
+	Solver()->RemoveListener(fSpecListener);
+	delete fSpecListener;
+
 	delete fRowColumnManager;
 	delete fBadLayoutPolicy;
+
+	for (int32 i = 0; i < fConstraints.CountItems(); i++)
+		Solver()->RemoveConstraint(fConstraints.ItemAt(i), true);
 
 	if (fSolver) {
 		fSolver->LayoutLeaving(this);
@@ -409,6 +440,20 @@ BALMLayout::YTabAt(int32 index) const
 }
 
 
+const XTabList
+BALMLayout::GetXTabs() const
+{
+	return fXTabList;
+}
+
+
+const YTabList
+BALMLayout::GetYTabs() const
+{
+	return fYTabList;
+}
+
+
 int32
 BALMLayout::IndexOf(XTab* tab, bool ordered)
 {
@@ -430,6 +475,85 @@ BALMLayout::IndexOf(YTab* tab, bool ordered)
 		fYTabsSorted = true;
 	}
 	return fYTabList.IndexOf(tab);
+}
+
+
+int32
+BALMLayout::CountConstraints() const
+{
+	return fConstraints.CountItems();
+}
+
+
+Constraint*
+BALMLayout::ConstraintAt(int32 index) const
+{
+	return fConstraints.ItemAt(index);
+}
+
+
+bool
+BALMLayout::AddConstraint(Constraint* constraint)
+{
+	fConstraints.AddItem(constraint);
+	return Solver()->AddConstraint(constraint);
+}
+
+
+bool
+BALMLayout::RemoveConstraint(Constraint* constraint,
+	bool deleteConstraint)
+{
+	if (!fConstraints.RemoveItem(constraint))
+		return false;
+	return Solver()->RemoveConstraint(constraint, deleteConstraint);
+}
+
+
+Constraint*
+BALMLayout::AddConstraint(double coeff1, Variable* var1, OperatorType op,
+	double rightSide, double penaltyNeg, double penaltyPos)
+{
+	Constraint* constraint = Solver()->AddConstraint(coeff1, var1, op,
+		rightSide, penaltyNeg, penaltyPos);
+	fConstraints.AddItem(constraint);
+	return constraint;
+}
+
+
+Constraint*
+BALMLayout::AddConstraint(double coeff1, Variable* var1, double coeff2,
+	Variable* var2,	OperatorType op, double rightSide, double penaltyNeg,
+	double penaltyPos)
+{
+	Constraint* constraint = Solver()->AddConstraint(coeff1, var1, coeff2, var2,
+		op, rightSide, penaltyNeg, penaltyPos);
+	fConstraints.AddItem(constraint);
+	return constraint;
+}
+
+Constraint*
+BALMLayout::AddConstraint(double coeff1, Variable* var1, double coeff2,
+	Variable* var2, double coeff3, Variable* var3, OperatorType op,
+	double rightSide, double penaltyNeg, double penaltyPos)
+{
+	Constraint* constraint = Solver()->AddConstraint(coeff1, var1, coeff2, var2,
+		coeff3, var3, op, rightSide, penaltyNeg, penaltyPos);
+	fConstraints.AddItem(constraint);
+	return constraint;
+}
+
+
+Constraint*
+BALMLayout::AddConstraint(double coeff1, Variable* var1, double coeff2,
+	Variable* var2, double coeff3, Variable* var3, double coeff4,
+	Variable* var4, OperatorType op, double rightSide, double penaltyNeg,
+	double penaltyPos)
+{
+	Constraint* constraint = Solver()->AddConstraint(coeff1, var1, coeff2, var2,
+		coeff3, var3, coeff4, var4, op, rightSide, penaltyNeg, penaltyPos);
+	fConstraints.AddItem(constraint);
+	return constraint;
 }
 
 
@@ -775,6 +899,7 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* _left, YTab* _top, XTab* _right,
 		return NULL;
 	}
 
+	fSolver->Invalidate(true);
 	area->_Init(Solver(), left, top, right, bottom, fRowColumnManager);
 	fRowColumnManager->AddArea(area);
 
@@ -795,138 +920,11 @@ BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
 	if (!area)
 		return NULL;
 
+	fSolver->Invalidate(true);
 	area->_Init(Solver(), row, column, fRowColumnManager);
 
 	fRowColumnManager->AddArea(area);
 	return area;
-}
-
-
-enum {
-	kLeftBorderIndex = -2,
-	kTopBorderIndex = -3,
-	kRightBorderIndex = -4,
-	kBottomBorderIndex = -5,
-};
-
-
-bool
-BALMLayout::SaveLayout(BMessage* archive) const
-{
-	archive->MakeEmpty();
-
-	archive->AddInt32("nXTabs", CountXTabs());
-	archive->AddInt32("nYTabs", CountYTabs());
-
-	XTabList xTabs = fXTabList;
-	xTabs.RemoveItem(fLeft);
-	xTabs.RemoveItem(fRight);
-	YTabList yTabs = fYTabList;
-	yTabs.RemoveItem(fTop);
-	yTabs.RemoveItem(fBottom);
-	
-	int32 nAreas = CountAreas();
-	for (int32 i = 0; i < nAreas; i++) {
-		Area* area = AreaAt(i);
-		if (area->Left() == fLeft)
-			archive->AddInt32("left", kLeftBorderIndex);
-		else
-			archive->AddInt32("left", xTabs.IndexOf(area->Left()));
-		if (area->Top() == fTop)
-			archive->AddInt32("top", kTopBorderIndex);
-		else
-			archive->AddInt32("top", yTabs.IndexOf(area->Top()));
-		if (area->Right() == fRight)
-			archive->AddInt32("right", kRightBorderIndex);
-		else
-			archive->AddInt32("right", xTabs.IndexOf(area->Right()));
-		if (area->Bottom() == fBottom)
-			archive->AddInt32("bottom", kBottomBorderIndex);
-		else
-			archive->AddInt32("bottom", yTabs.IndexOf(area->Bottom()));
-	}
-	return true;
-}
-
-
-bool
-BALMLayout::RestoreLayout(const BMessage* archive)
-{
-	int32 neededXTabs;
-	int32 neededYTabs;
-	if (archive->FindInt32("nXTabs", &neededXTabs) != B_OK)
-		return false;
-	if (archive->FindInt32("nYTabs", &neededYTabs) != B_OK)
-		return false;
-	// First store a reference to all needed tabs otherwise they might get lost
-	// while editing the layout
-	std::vector<BReference<XTab> > newXTabs;
-	std::vector<BReference<YTab> > newYTabs;
-	int32 existingXTabs = fXTabList.CountItems();
-	for (int32 i = 0; i < neededXTabs; i++) {
-		if (i < existingXTabs)
-			newXTabs.push_back(BReference<XTab>(fXTabList.ItemAt(i)));
-		else
-			newXTabs.push_back(AddXTab());
-	}
-	int32 existingYTabs = fYTabList.CountItems();
-	for (int32 i = 0; i < neededYTabs; i++) {
-		if (i < existingYTabs)
-			newYTabs.push_back(BReference<YTab>(fYTabList.ItemAt(i)));
-		else
-			newYTabs.push_back(AddYTab());
-	}
-
-	XTabList xTabs = fXTabList;
-	xTabs.RemoveItem(fLeft);
-	xTabs.RemoveItem(fRight);
-	YTabList yTabs = fYTabList;
-	yTabs.RemoveItem(fTop);
-	yTabs.RemoveItem(fBottom);
-
-	int32 nAreas = CountAreas();
-	for (int32 i = 0; i < nAreas; i++) {
-		Area* area = AreaAt(i);
-		if (area == NULL)
-			return false;
-		int32 left = -1;
-		if (archive->FindInt32("left", i, &left) != B_OK)
-			break;
-		int32 top = archive->FindInt32("top", i);
-		int32 right = archive->FindInt32("right", i);
-		int32 bottom = archive->FindInt32("bottom", i);
-
-		XTab* leftTab = NULL;
-		YTab* topTab = NULL;
-		XTab* rightTab = NULL;
-		YTab* bottomTab = NULL;
-
-		if (left == kLeftBorderIndex)
-			leftTab = fLeft;
-		else
-			leftTab = xTabs.ItemAt(left);
-		if (top == kTopBorderIndex)
-			topTab = fTop;
-		else
-			topTab = yTabs.ItemAt(top);
-		if (right == kRightBorderIndex)
-			rightTab = fRight;
-		else
-			rightTab = xTabs.ItemAt(right);
-		if (bottom == kBottomBorderIndex)
-			bottomTab = fBottom;
-		else
-			bottomTab = yTabs.ItemAt(bottom);
-		if (leftTab == NULL || topTab == NULL || rightTab == NULL
-			|| bottomTab == NULL)
-			return false;
-
-		area->SetLeft(leftTab);
-		area->SetTop(topTab);
-		area->SetRight(rightTab);
-		area->SetBottom(bottomTab);
-	}
-	return true;
 }
 
 
@@ -1334,6 +1332,17 @@ LinearSpec*
 BALMLayout::Solver() const
 {
 	return fSolver->Solver();
+}
+
+
+ResultType
+BALMLayout::ValidateLayout()
+{
+	// we explicitly recaluclate the layout so set the invalidate flag first
+	fSolver->Invalidate(true);
+
+	BLayoutContext* context = LayoutContext();
+	return fSolver->ValidateLayout(context);
 }
 
 

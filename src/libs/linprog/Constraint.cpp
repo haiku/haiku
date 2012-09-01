@@ -25,6 +25,36 @@
 #endif
 
 
+Constraint::Constraint()
+	:
+	fLS(NULL),
+	fLeftSide(new SummandList),
+	fOp(kEQ),
+	fRightSide(0),
+	fPenaltyNeg(-1),
+	fPenaltyPos(-1)
+{
+}
+
+
+Constraint::Constraint(Constraint* constraint)
+	:
+	fLS(NULL),
+	fLeftSide(new SummandList),
+	fOp(constraint->Op()),
+	fRightSide(constraint->RightSide()),
+	fPenaltyNeg(constraint->PenaltyNeg()),
+	fPenaltyPos(constraint->PenaltyPos()),
+	fLabel(constraint->Label())
+{
+	SummandList* orgSummands = constraint->LeftSide();
+	for (int32 i = 0; i < orgSummands->CountItems(); i++) {
+		Summand* summand = orgSummands->ItemAt(i);
+		fLeftSide->AddItem(new Summand(summand));
+	}
+}
+
+
 /**
  * Gets the index of the constraint.
  *
@@ -33,6 +63,8 @@
 int32
 Constraint::Index() const
 {
+	if (fLS == NULL)
+		return -1;
 	int32 i = fLS->Constraints().IndexOf(this);
 	if (i == -1)
 		STRACE(("Constraint not part of fLS->Constraints()."));
@@ -59,11 +91,11 @@ Constraint::LeftSide()
  *
  * @param summands	a BList containing the Summand objects that make up the new left side
  */
-void
-Constraint::SetLeftSide(SummandList* summands)
+bool
+Constraint::SetLeftSide(SummandList* summands, bool deleteOldSummands)
 {
-	if (!fIsValid)
-		return;
+	if (summands == NULL)
+		debugger("Invalid summands");
 
 	// check left side
 	for (int32 i = 0; i < summands->CountItems(); i++) {
@@ -79,76 +111,76 @@ Constraint::SetLeftSide(SummandList* summands)
 		}
 	}
 
+	if (fLS == NULL) {
+		if (deleteOldSummands)
+			delete fLeftSide;
+		fLeftSide = summands;
+		return true;
+	}
+
+	// notify the solver
+	SummandList oldSummands;
+	if (fLeftSide != NULL)
+		oldSummands = *fLeftSide;
+	if (deleteOldSummands)
+		delete fLeftSide;
 	fLeftSide = summands;
-	fLS->UpdateLeftSide(this);
+	if (fLS != NULL)
+		fLS->UpdateLeftSide(this, &oldSummands);
+
+	if (deleteOldSummands) {
+		for (int32 i = 0; i < oldSummands.CountItems(); i++)
+			delete oldSummands.ItemAt(i);
+	}
+	return true;
 }
 
 
-void
+bool
 Constraint::SetLeftSide(double coeff1, Variable* var1)
 {
-	if (!fIsValid)
-		return;
-
-	for (int i=0; i<fLeftSide->CountItems(); i++)
-		delete fLeftSide->ItemAt(i);
-	fLeftSide->MakeEmpty();
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	SetLeftSide(fLeftSide);
+	SummandList* list = new SummandList;
+	list->AddItem(new(std::nothrow) Summand(coeff1, var1));
+	return SetLeftSide(list, true);
 }
 
 
-void
+bool
 Constraint::SetLeftSide(double coeff1, Variable* var1,
 	double coeff2, Variable* var2)
 {
-	if (!fIsValid)
-		return;
-
-	for (int i=0; i<fLeftSide->CountItems(); i++)
-		delete fLeftSide->ItemAt(i);
-	fLeftSide->MakeEmpty();
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff2, var2));
-	SetLeftSide(fLeftSide);
+	SummandList* list = new SummandList;
+	list->AddItem(new(std::nothrow) Summand(coeff1, var1));
+	list->AddItem(new(std::nothrow) Summand(coeff2, var2));
+	return SetLeftSide(list, true);
 }
 
 
-void
+bool
 Constraint::SetLeftSide(double coeff1, Variable* var1,
 	double coeff2, Variable* var2,
 	double coeff3, Variable* var3)
 {
-	if (!fIsValid)
-		return;
-
-	for (int i=0; i<fLeftSide->CountItems(); i++)
-		delete fLeftSide->ItemAt(i);
-	fLeftSide->MakeEmpty();
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff2, var2));
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff3, var3));
-	SetLeftSide(fLeftSide);
+	SummandList* list = new SummandList;
+	list->AddItem(new(std::nothrow) Summand(coeff1, var1));
+	list->AddItem(new(std::nothrow) Summand(coeff2, var2));
+	list->AddItem(new(std::nothrow) Summand(coeff3, var3));
+	return SetLeftSide(list, true);
 }
 
 
-void
+bool
 Constraint::SetLeftSide(double coeff1, Variable* var1,
 	double coeff2, Variable* var2,
 	double coeff3, Variable* var3,
 	double coeff4, Variable* var4)
 {
-	if (!fIsValid)
-		return;
-
-	for (int i=0; i<fLeftSide->CountItems(); i++)
-		delete fLeftSide->ItemAt(i);
-	fLeftSide->MakeEmpty();
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff2, var2));
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff3, var3));
-	fLeftSide->AddItem(new(std::nothrow) Summand(coeff4, var4));
-	SetLeftSide(fLeftSide);
+	SummandList* list = new SummandList;
+	list->AddItem(new(std::nothrow) Summand(coeff1, var1));
+	list->AddItem(new(std::nothrow) Summand(coeff2, var2));
+	list->AddItem(new(std::nothrow) Summand(coeff3, var3));
+	list->AddItem(new(std::nothrow) Summand(coeff4, var4));
+	return SetLeftSide(list, true);
 }
 
 
@@ -172,11 +204,9 @@ Constraint::Op()
 void
 Constraint::SetOp(OperatorType value)
 {
-	if (!fIsValid)
-		return;
-
 	fOp = value;
-	fLS->UpdateOperator(this);
+	if (fLS != NULL)
+		fLS->UpdateOperator(this);
 }
 
 
@@ -200,15 +230,13 @@ Constraint::RightSide() const
 void
 Constraint::SetRightSide(double value)
 {
-	if (!fIsValid)
-		return;
-
 	if (fRightSide == value)
 		return;
 
 	fRightSide = value;
 
-	fLS->UpdateRightSide(this);
+	if (fLS != NULL)
+		fLS->UpdateRightSide(this);
 }
 
 
@@ -235,7 +263,8 @@ Constraint::SetPenaltyNeg(double value)
 {
 	fPenaltyNeg = value;
 
-	fLS->UpdateLeftSide(this);
+	if (fLS != NULL)
+		fLS->UpdatePenalties(this);
 }
 
 
@@ -261,7 +290,8 @@ Constraint::SetPenaltyPos(double value)
 {
 	fPenaltyPos = value;
 
-	fLS->UpdateLeftSide(this);
+	if (fLS != NULL)
+		fLS->UpdatePenalties(this);
 }
 
 
@@ -279,49 +309,10 @@ Constraint::SetLabel(const char* label)
 }
 
 
-/**
- * Gets the slack variable for the negative variations.
- *
- * @return the slack variable for the negative variations
- */
-Variable*
-Constraint::DNeg() const
-{
-	if (fDNegObjSummand == NULL)
-		return NULL;
-	return fDNegObjSummand->Var();
-}
-
-
-/**
- * Gets the slack variable for the positive variations.
- *
- * @return the slack variable for the positive variations
- */
-Variable*
-Constraint::DPos() const
-{
-	if (fDPosObjSummand == NULL)
-		return NULL;
-	return fDPosObjSummand->Var();
-}
-
-
-bool
-Constraint::IsSoft() const
-{
-	if (fOp != kEQ)
-		return false;
-    if (fPenaltyNeg > 0. || fPenaltyPos > 0.)
-		return true;
-	return false;
-}
-
-
 bool
 Constraint::IsValid()
 {
-	return fIsValid;
+	return fLS != NULL;
 }
 
 
@@ -330,11 +321,11 @@ Constraint::Invalidate()
 {
 	STRACE(("Constraint::Invalidate() on %d\n", this));
 
-	if (!fIsValid)
+	if (fLS == NULL)
 		return;
 
-	fIsValid = false;
 	fLS->RemoveConstraint(this, false);
+	fLS = NULL;
 }
 
 
@@ -346,25 +337,23 @@ Constraint::ToString() const
 	string << fLabel;
 	string << "(" << (int32)this << "): ";
 
-	if (fIsValid) {
-		for (int i = 0; i < fLeftSide->CountItems(); i++) {
-			Summand* s = static_cast<Summand*>(fLeftSide->ItemAt(i));
-			if (i != 0 && s->Coeff() >= 0)
-				string << " + ";
-			string << (float)s->Coeff() << "*";
-			string << "x";
-			string << s->Var()->Index();
-			string << " ";
-		}
-		string << ((fOp == kEQ) ? "== "
-			: (fOp == kGE) ? ">= "
-			: (fOp == kLE) ? "<= "
-			: "?? ");
-		string << (float)fRightSide;
-		string << " PenaltyPos=" << (float)PenaltyPos();
-		string << " PenaltyNeg=" << (float)PenaltyNeg();
-	} else
-		string << "invalid";
+	for (int i = 0; i < fLeftSide->CountItems(); i++) {
+		Summand* s = static_cast<Summand*>(fLeftSide->ItemAt(i));
+		if (i != 0 && s->Coeff() >= 0)
+			string << " + ";
+		string << (float)s->Coeff() << "*";
+		string << "x";
+		string << s->Var()->Index();
+		string << " ";
+	}
+	string << ((fOp == kEQ) ? "== "
+		: (fOp == kGE) ? ">= "
+		: (fOp == kLE) ? "<= "
+		: "?? ");
+	string << (float)fRightSide;
+	string << " PenaltyPos=" << (float)PenaltyPos();
+	string << " PenaltyNeg=" << (float)PenaltyNeg();
+
 	return string;
 }
 
@@ -384,15 +373,13 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 	double rightSide, double penaltyNeg, double penaltyPos)
 	:
 	fLS(ls),
+	fLeftSide(NULL),
 	fOp(op),
 	fRightSide(rightSide),
 	fPenaltyNeg(penaltyNeg),
-	fPenaltyPos(penaltyPos),
-	fDNegObjSummand(NULL),
-	fDPosObjSummand(NULL),
-	fIsValid(true)
+	fPenaltyPos(penaltyPos)
 {
-	SetLeftSide(summands);
+	SetLeftSide(summands, false);
 }
 
 

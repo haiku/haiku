@@ -23,9 +23,9 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 }
 
 if $(HAIKU_GCC_VERSION[1]) >= 4 {
-	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-x86-gcc4-2012-06-19.zip ;
+	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-r1a4-x86-gcc4-2012-08-29.zip ;
 } else {
-	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-x86-gcc2-2012-06-19.zip ;
+	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-r1a4-x86-gcc2-2012-08-26.zip ;
 }
 
 HAIKU_OPENSSL_URL = $(baseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
@@ -382,7 +382,7 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86-gcc4-2012-06-15.zip ;
 	} else {
-		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86-gcc2-2012-06-19.zip ;
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-r1a4-x86-gcc2-2012-08-28.zip ;
 	}
 
 	local freetypeZipFile = [ DownloadFile $(HAIKU_FREETYPE_FILE)
@@ -467,7 +467,7 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 	HAIKU_BUILD_FEATURE_WEBKIT = 1 ;
 }
 
-HAIKU_WEBKIT_FILE = haikuwebkit-1.1.3-x86-gcc4-2012-07-20-1.zip ;
+HAIKU_WEBKIT_FILE = haikuwebkit-1.1.3-x86-gcc4-2012-08-31a.zip ;
 
 if $(HAIKU_BUILD_FEATURE_WEBKIT) {
 	if $(TARGET_ARCH) != x86 {
@@ -535,7 +535,7 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 		: extracted-libpng ] ;
 	Depends $(HAIKU_LIBPNG_LIB) $(HAIKU_LIBPNG_CURRENT_LIB) : $(HAIKU_LIBPNG_HEADERS_DEPENDENCY) ;
 
-	HAIKU_LIBPNG_CURRENT_LINK = libpng.so.15 ;
+	HAIKU_LIBPNG_CURRENT_LINK = libpng15.so.15 ;
 
 	HAIKU_LIBPNG_HEADERS = [ FDirName $(HAIKU_LIBPNG_DIR) common include ] ;
 } else {

@@ -153,10 +153,14 @@ BInputServerMethod::_ReservedInputServerMethod4()
 }
 
 
+static int32 sNextMethodCookie = 1;
+
+
 _BMethodAddOn_::_BMethodAddOn_(BInputServerMethod *method, const char *name,
 	const uchar *icon)
 	: fMethod(method),
-	fMenu(NULL)
+	fMenu(NULL),
+	fCookie(sNextMethodCookie++)
 {
 	fName = strdup(name);
 	if (icon != NULL)
@@ -183,7 +187,7 @@ _BMethodAddOn_::SetName(const char* name)
 		fName = strdup(name);
 
 	BMessage msg(IS_UPDATE_NAME);
-	msg.AddInt32("cookie", (uint32)fMethod);
+	msg.AddInt32("cookie", fCookie);
 	msg.AddString("name", name);
 	if (((InputServer*)be_app)->MethodReplicant())
 		return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
@@ -203,7 +207,7 @@ _BMethodAddOn_::SetIcon(const uchar* icon)
 		memset(fIcon, 0x1d, 16*16*1);
 
 	BMessage msg(IS_UPDATE_ICON);
-	msg.AddInt32("cookie", (uint32)fMethod);
+	msg.AddInt32("cookie", fCookie);
 	msg.AddData("icon", B_RAW_TYPE, icon, 16*16*1);
 	if (((InputServer*)be_app)->MethodReplicant())
 		return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
@@ -220,7 +224,7 @@ _BMethodAddOn_::SetMenu(const BMenu *menu, const BMessenger &messenger)
 	fMessenger = messenger;
 
 	BMessage msg(IS_UPDATE_MENU);
-	msg.AddInt32("cookie", (uint32)fMethod);
+	msg.AddInt32("cookie", fCookie);
 	BMessage menuMsg;
 	if (menu)
 		menu->Archive(&menuMsg);
@@ -238,10 +242,10 @@ _BMethodAddOn_::MethodActivated(bool activate)
 {
 	CALLED();
 	if (fMethod) {
-		PRINT(("%s cookie %p\n", __PRETTY_FUNCTION__, fMethod));
+		PRINT(("%s cookie %" B_PRId32 "\n", __PRETTY_FUNCTION__, fCookie));
 		if (activate && ((InputServer*)be_app)->MethodReplicant()) {
 			BMessage msg(IS_UPDATE_METHOD);
-        		msg.AddInt32("cookie", (uint32)fMethod);
+        		msg.AddInt32("cookie", fCookie);
                 	((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
 		}
 		return fMethod->MethodActivated(activate);
@@ -253,9 +257,9 @@ _BMethodAddOn_::MethodActivated(bool activate)
 status_t
 _BMethodAddOn_::AddMethod()
 {
-	PRINT(("%s cookie %p\n", __PRETTY_FUNCTION__, fMethod));
+	PRINT(("%s cookie %" B_PRId32 "\n", __PRETTY_FUNCTION__, fCookie));
 	BMessage msg(IS_ADD_METHOD);
-	msg.AddInt32("cookie", (uint32)fMethod);
+	msg.AddInt32("cookie", fCookie);
 	msg.AddString("name", fName);
 	msg.AddData("icon", B_RAW_TYPE, fIcon, 16*16*1);
 	if (((InputServer*)be_app)->MethodReplicant())

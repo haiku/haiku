@@ -99,6 +99,7 @@ class _BMethodAddOn_ {
 		status_t SetMenu(const BMenu* menu, const BMessenger& messenger);
 		status_t MethodActivated(bool activate);
 		status_t AddMethod();
+		int32 Cookie() { return fCookie; }
 
 	private:
 		BInputServerMethod* fMethod;
@@ -106,6 +107,7 @@ class _BMethodAddOn_ {
 		uchar fIcon[16*16*1];
 		const BMenu* fMenu;
 		BMessenger fMessenger;
+		int32 fCookie;
 };
 
 class KeymapMethod : public BInputServerMethod {

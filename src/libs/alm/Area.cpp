@@ -549,6 +549,8 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	// really above the bottom y-tab
 	fMinContentWidth = ls->AddConstraint(-1.0, fLeft, 1.0, fRight, kGE, 0);
 	fMinContentHeight = ls->AddConstraint(-1.0, fTop, 1.0, fBottom, kGE, 0);
+
+	InvalidateSizeConstraints();
 }
 
 
@@ -619,26 +621,41 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 	max.width += LeftInset() + RightInset();
 	max.height += TopInset() + BottomInset();
 
+	const double kPriority = 100;
 	// we only need max constraints if the alignment is full height/width
 	// otherwise we can just align the item in the free space
 	BAlignment alignment = fLayoutItem->Alignment();
-	if (alignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT) {
+	double priority = kPriority;
+	if (alignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT)
+		priority = -1;
+
+	if (max.Height() < 20000) {
 		if (fMaxContentHeight == NULL) {
 			fMaxContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
-				kLE, max.Height());
-		} else
+				kLE, max.Height(), priority, priority);
+		} else {
 			fMaxContentHeight->SetRightSide(max.Height());
+			fMaxContentHeight->SetPenaltyNeg(priority);
+			fMaxContentHeight->SetPenaltyPos(priority);
+		}
 	} else {
 		delete fMaxContentHeight;
 		fMaxContentHeight = NULL;
 	}
 
-	if (alignment.Horizontal() == B_ALIGN_USE_FULL_WIDTH) {
+	priority = kPriority;
+	if (alignment.Horizontal() == B_ALIGN_USE_FULL_WIDTH)
+		priority = -1;
+
+	if (max.Width() < 20000) {
 		if (fMaxContentWidth == NULL) {
 			fMaxContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, kLE,
-				max.Width());
-		} else
+				max.Width(), priority, priority);
+		} else {
 			fMaxContentWidth->SetRightSide(max.Width());
+			fMaxContentWidth->SetPenaltyNeg(priority);
+			fMaxContentWidth->SetPenaltyPos(priority);
+		}
 	} else {
 		delete fMaxContentWidth;
 		fMaxContentWidth = NULL;
