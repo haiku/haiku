@@ -6,9 +6,6 @@
 #ifndef	CONSTRAINT_H
 #define	CONSTRAINT_H
 
-#include <math.h>
-
-#include <File.h>
 #include <ObjectList.h>
 #include <String.h>
 #include <SupportDefs.h>
@@ -28,20 +25,26 @@ class LinearSpec;
  */
 class Constraint {
 public:
+								Constraint();
+			/*! Creates a soft copy of the constraint which is not connected
+			to the solver. Variables are not copied or cloned but the soft copy
+			has its own summand list with summands. */
+								Constraint(Constraint* constraint);
+
 			int32				Index() const;
 
 			SummandList*		LeftSide();
-			/*! This just overwrites the current list. The caller has to take
-			care about the old left side, i.e. delete it. */
-			void				SetLeftSide(SummandList* summands);
+
+			bool				SetLeftSide(SummandList* summands,
+									bool deleteOldSummands);
 			
-			void				SetLeftSide(double coeff1, Variable* var1);
-			void				SetLeftSide(double coeff1, Variable* var1,
+			bool				SetLeftSide(double coeff1, Variable* var1);
+			bool				SetLeftSide(double coeff1, Variable* var1,
 									double coeff2, Variable* var2);
-			void				SetLeftSide(double coeff1, Variable* var1,
+			bool				SetLeftSide(double coeff1, Variable* var1,
 									double coeff2, Variable* var2,
 									double coeff3, Variable* var3);
-			void				SetLeftSide(double coeff1, Variable* var1,
+			bool				SetLeftSide(double coeff1, Variable* var1,
 									double coeff2, Variable* var2,
 									double coeff3, Variable* var3,
 									double coeff4, Variable* var4);
@@ -57,11 +60,6 @@ public:
 
 			const char*			Label();
 			void				SetLabel(const char* label);
-
-			Variable*			DNeg() const;
-			Variable*			DPos() const;
-
-			bool				IsSoft() const;
 
 			bool				IsValid();
 			void				Invalidate();
@@ -86,16 +84,10 @@ private:
 
 			double				fPenaltyNeg;
 			double				fPenaltyPos;
-			Summand*			fDNegObjSummand;
-			Summand*			fDPosObjSummand;
 			BString				fLabel;
-
-			bool				fIsValid;
 
 public:
 	friend class		LinearSpec;
-	friend class		LPSolveInterface;
-
 };
 
 
