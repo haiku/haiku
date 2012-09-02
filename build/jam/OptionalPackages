@@ -1174,12 +1174,12 @@ if [ IsOptionalHaikuImagePackageAdded LibEvent ] {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				libevent-2.0.10-r1a4-x86-gcc4-2012-08-30.zip
-				: $(baseURL)/lib/libevent-2.0.10-r1a4-x86-gcc4-2012-08-30.zip
+				: $(baseURL)/libevent-2.0.10-r1a4-x86-gcc4-2012-08-30.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
 				libevent-2.0.10-r1a4-x86-gcc2-2012-08-28.zip
-				: $(baseURL)/lib/libevent-2.0.10-r1a4-x86-gcc2-2012-08-28.zip
+				: $(baseURL)/libevent-2.0.10-r1a4-x86-gcc2-2012-08-28.zip
 				: : true ;
 		}
 	}
@@ -1225,11 +1225,11 @@ if [ IsOptionalHaikuImagePackageAdded Libmng ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			libmng-1.0.10-r1a3-x86-gcc4-2011-05-24.zip
-			: $(baseURL)/lib/libmng-1.0.10-r1a3-x86-gcc4-2011-05-24.zip ;
+			: $(baseURL)/libmng-1.0.10-r1a3-x86-gcc4-2011-05-24.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			libmng-1.0.10-r1a4-x86-gcc2-2012-08-28.zip
-			: $(baseURL)/lib/libmng-1.0.10-r1a4-x86-gcc2-2012-08-28.zip  ;
+			: $(baseURL)/libmng-1.0.10-r1a4-x86-gcc2-2012-08-28.zip  ;
 	}
 }
 
