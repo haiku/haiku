@@ -5,7 +5,7 @@ No audio	Audio codecs list		Nincs hang
 Error	MediaConverter		Hiba
 Error loading a file	MediaConverter		Hiba történt a fájl betöltése során
 File Error	MediaConverter-FileInfo		Fájlhiba
-Open…	Menu		Megnyitás...
+Open…	Menu		Megnyitás…
 Start [ms]: 	MediaConverter		Kezdet [ms]:
 Output file '%filename' created	MediaConverter		A(z) '%filename' kimeneti fájl létre lett hozva.
 Output format	MediaConverter		Kimeneti formátum
@@ -14,13 +14,13 @@ End   [ms]: 	MediaConverter		Vége [ms]:
 MediaConverter	System name		Médiakonverter
 No video	Video codecs list		Nincs videó
 Duration:	MediaConverter-FileInfo		Időtartam:
-OK	MediaConverter		OK
+OK	MediaConverter		Rendben
 Error writing audio frame %Ld	MediaConverter		Hiba történt a %Ld. hang írása közben
 Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl konvertálása közben
 Low	MediaConverter		Alacsony
 Conversion completed	MediaConverter		Konvertálás kész
 Audio:	MediaConverter-FileInfo		Hang:
-OK	MediaConverter-FileInfo		OK
+OK	MediaConverter-FileInfo		Rendben
  seconds	MediaFileInfo		 másodperc
 Source files	MediaConverter		Forrásfájlok
 Cancelling	MediaConverter		Megszakítás folyamatban
@@ -39,7 +39,7 @@ Video:	MediaConverter-FileInfo		Videó:
 %d bit 	MediaFileInfo		%d bit
 Error creating '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl létrehozása közben
 Video quality not supported	MediaConverter		Nem támogatott videóminőség
-Cancelling…	MediaConverter		Megszakítás...
+Cancelling…	MediaConverter		Megszakítás…
 File details	MediaConverter		Fájl részletei
 Select	MediaConverter		Kijelölés
 Writing video track: %ld%% complete	MediaConverter		Videósáv írása: %ld%% kész

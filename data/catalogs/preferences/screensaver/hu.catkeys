@@ -2,10 +2,10 @@
 Could not load screen saver	ScreenSaver		A képernyőkímélő betöltése sikertelen
 30 seconds	ScreenSaver		30 másodperc
 Start screensaver	ScreenSaver		Képernyőkímélő indítása
-Password…	ScreenSaver		Jelszó...
+Password…	ScreenSaver		Jelszó…
 Password:	ScreenSaver		Jelszó:
 Password lock	ScreenSaver		Jelszavas zárolás
-Add…	ScreenSaver		Hozzáadás...
+Add…	ScreenSaver		Hozzáadás…
 Screensavers	ScreenSaver		Képernyőkímélők
 mouse is here	ScreenSaver		az egér itt van
 Display Power Management Signaling not available	ScreenSaver		A kijelző energiakezelési jelzései nem elérhetőek
@@ -20,7 +20,7 @@ Password Window	ScreenSaver		Jelszóablak
 Fade now when	ScreenSaver		Elhalványítás ekkor:
 Screensaver settings	ScreenSaver		Képernyőkímélő beállításai
 Passwords don't match. Please try again.	ScreenSaver		A jelszavak nem egyeznek, próbálja újra.
-OK	ScreenSaver		OK
+OK	ScreenSaver		Rendben
 Don't fade when	ScreenSaver		Ne halványítsa el ekkor:
 Blackness	ScreenSaver		Sötétség
 Use custom password	ScreenSaver		Egyéni jelszó használata

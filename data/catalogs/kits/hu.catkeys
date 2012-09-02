@@ -8,7 +8,7 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		N
 Copy	TextView		Másolás
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%Ld byte
-About…	AboutWindow		Névjegy...
+About…	AboutWindow		Névjegy…
 Error	PrintJob		Hiba
 No Pages to print!	PrintJob		Nincs nyomtatható oldal!
 OK	Dragger		Rendben
@@ -28,7 +28,7 @@ Warning	Dragger		Figyelmeztetés
 Undo	TextView		Visszavonás
 Red:	ColorControl		Vörös:
 %3.2f MiB	StringForSize		%3.2f MiB
-About %app…	Dragger		%app névjegye...
+About %app…	Dragger		%app névjegye…
 Error	ZombieReplicantView		Hiba
 Blue:	ColorControl		Kék:
 Can't delete this replicant from its original application. Life goes on.	Dragger		Nem lehet ezt a másolatot törölni az eredeti alkalmazástól, de az élet megy tovább.

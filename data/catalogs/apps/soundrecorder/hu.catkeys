@@ -17,7 +17,7 @@ Rewind	RecorderWindow		Visszatekerés
 Sample rate:	RecorderWindow		Mintavételezés frekvenciája:
 Invalid audio files	RecorderWindow		Érvénytelen hangfájlok
  seconds	RecorderWindow		 másodperc
-OK	RecorderWindow		OK
+OK	RecorderWindow		Rendben
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Nem sikerült megnyitni az új felvételt tároló ideiglenes fájlt
 None of the files appear to be audio files	RecorderWindow		A fájlok egyike sem hangfájl
 Input:	RecorderWindow		Bemenet:

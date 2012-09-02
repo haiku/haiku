@@ -8,8 +8,8 @@ Configure attributes	People		Attribútumok beállítása
 Company	People		Cég
 %name% picture	People		%name% kép
 Work phone	People		Munkahelyi telefon
-People	System name		Személyek
-New person	People		Új személy
+People	System name		Névjegyek
+New person	People		Új névjegy
 Select all	People		Mind kijelölése
 File	People		Fájl
 Unnamed person	People		Névtelen személy
@@ -24,26 +24,26 @@ Revert	People		Visszaállít
 Undo	People		Visszavonás
 E-mail	People		E-mail
 Save changes before quitting?	People		Kilépés előtt mentsük a változtatásokat?
-Load image…	People		Kép betöltése...
-OK	People		OK
+Load image…	People		Kép betöltése…
+OK	People		Rendben
 Remove image	People		Kép eltávolítása
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Nem sikerül elindítani a Fájltípusok prefletet a személy attribútumainak beállításához.\n\nHiba:
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Nem sikerül elindítani a Fájltípusok programot a névjegy jellemzőinek beállításához.\n\nHiba:
 Home phone	People		Otthoni telefon
-Save as…	People		Mentés másként...
+Save as…	People		Mentés másként…
 Redo	People		Újra
 Paste	People		Beillesztés
 Drop an image here,\nor use the contextual menu.	People		Húzzon ide egy képet,\nvagy válasszon a menüben.
 Save	People		Mentés
-Person	Short mimetype description		Személy
-New person…	People		Új személy...
+Person	Short mimetype description		Névjegy
+New person…	People		Új névjegy…
 Address	People		Cím
 URL	People		URL
-Sorry	People		Bocsánat
+Sorry	People		Sajnálom
 Zip	People		Irányítószám
-Contact information for a person.	Long mimetype description		Személy információi
+Contact information for a person.	Long mimetype description		Elérhetőség információk
 Fax	People		Fax
 Contact name	People		Kapcsolat neve
 Cut	People		Kivágás
 Cancel	People		Mégse
-State	People		Megye/Állam
+State	People		Megye
 Copy	People		Másolás

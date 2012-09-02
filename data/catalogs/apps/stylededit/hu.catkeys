@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Haiku-StyledEdit	1508367857
 StyledEdit	System name		StyledEdit
 Paste	Menus		Beillesztés
-OK	LoadAlert		OK
+OK	LoadAlert		Rendben
 File	Menus		Fájl
 ???	LoadAlert		???
 Lines:	Statistics		Sorok:
@@ -11,8 +11,8 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Visszaállítja a(z) 
 Search backwards	FindandReplaceWindow		Keresés visszafelé
 Size	Menus		Méret
 Save	QuitAlert		Mentés
-Page setup…	Menus		Oldalbeállítás...
-Print…	Menus		Nyomtatás...
+Page setup…	Menus		Oldalbeállítás…
+Print…	Menus		Nyomtatás…
 Can't undo	Menus		Nem vonható vissza
 Save	Menus		Mentés
 Replace with:	FindandReplaceWindow		Csere erre:
@@ -32,7 +32,7 @@ Save changes to the document \"%s\"? 	QuitAlert		Menti a(z) \"%s\" változtatás
 Edit	Menus		Szerkesztés
 Font	Menus		Betűtípus
 Replace all	FindandReplaceWindow		Mindet cseréli
-Statistics…	Menus		Statisztikák...
+Statistics…	Menus		Statisztikák…
 Default	Open_and_SaveAsPanel		Alapértelmett
 Replace next	Menus		Következő cseréje
 Cancel	FindandReplaceWindow		Mégse
@@ -40,7 +40,7 @@ Close	Menus		Bezárás
 Save	SaveAlert		Mentés
 Words:	Statistics		Szavak:
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Hiba a(z) \"%s\" betöltése közben:\n\tA formátum nem támogatott
-OK	RevertToSavedAlert		OK
+OK	RevertToSavedAlert		Rendben
 Don't save	QuitAlert		Ne mentse
 Align	Menus		Igazítás
 Color	Menus		Szín
@@ -49,7 +49,7 @@ Open…	Menus		Megnyitás…
 Center	Menus		Középre
 Blue	Menus		Kék
 Cyan	Menus		Cián
-OK	Statistics		OK
+OK	Statistics		Rendben
 Magenta	Menus		Bíbor
 New	Menus		Új
 Wrap-around search	FindandReplaceWindow		Folyamatos köresés
@@ -70,11 +70,11 @@ Undo typing	QuitAlert		Gépelés visszavonása
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti a(z) \"%s\" dokumentum változtatásait? 
 Black	Menus		Fekete
 Untitled 	StyledEditWindow		Névtelen
-OK	SaveAlert		OK
+OK	SaveAlert		Rendben
 Find	FindandReplaceWindow		Keresés
 Encoding	Open_and_SaveAsPanel		Kódolás
 Characters:	Statistics		Karakterek:
-Save as…	Menus		Mentés másként...
+Save as…	Menus		Mentés másként…
 Redo typing	QuitAlert		Újragépelés
 Replace…	Menus		Csere…
 Right	Menus		Jobbra

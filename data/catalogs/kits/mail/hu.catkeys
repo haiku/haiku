@@ -3,7 +3,7 @@ Partially download messages larger than	ProtocolConfigView		Részben letöltött
 Password:	ProtocolConfigView		Jelszó:
 Remove mail from server when deleted	ProtocolConfigView		Levél eltávolítása a kiszolgálóról törléskor
 Mail server:	ProtocolConfigView		Levelezőkiszolgáló:
-Select…	MailKit		Kiválasztás...
+Select…	MailKit		Kiválasztás…
 Connection type:	ProtocolConfigView		Kapcsolat típusa:
 Leave mail on server	ProtocolConfigView		Levelek meghagyása a kiszolgálón
 Username:	ProtocolConfigView		Felhasználói név:

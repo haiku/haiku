@@ -4,7 +4,7 @@ Handheld	Settings view		Mobiltelefon
 Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát:
 Manufacturer: 	Device View		Gyártó:
 Add device to list	Inquiry panel		Eszköz hozzáadása
-Starting scan...	Inquiry panel		Keresés...
+Starting scan...	Inquiry panel		Keresés…
 Show bluetooth console…	Window		Bluetooth-konzol megjelenítése…
 Smart phone	Settings view		Okostelefon
 Server	Settings view		Kiszolgáló
@@ -20,7 +20,7 @@ Local devices found on system:	Settings view		Helyi megtalált eszközök a rend
 Remaining %1 seconds	Inquiry panel		%1 másodperc van hátra
 Server	Window		Kiszolgáló
 Scanning completed.	Inquiry panel		Keresés befejezve.
-OK	main		OK
+OK	main		Rendben
 Remote devices list…	Window		Távoli eszközök listája…
 Remove	Remote devices		Eltávolítás
 Quit	main		Kilépés
@@ -31,7 +31,7 @@ Policy...	Settings view		Szabály…
 61 secs	Settings view		61 mp
 Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth rendszer, (ARCE)\n\nLétrehozta: Oliver Ruiz Dorantes\n\nA következők támogatásával:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nKöszönjük azoknak, akik segítettek…\n\nHardver szállításával/adományozásával:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nGazdaságilag:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nJavításokkal:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nAki megtanított engem minderre:\n\t- A yellowTAB csapat
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nincs egy regisztrált Bluetooth eszköz sem a rendszerben
-Identify us as...	Settings view		Azonosítása mint...
+Identify us as...	Settings view		Azonosítása mint…
  packets: 	Device View		csomagok:
 As blocked	Remote devices		Blokkoltként
 Bluetooth	System name		Bluetooth

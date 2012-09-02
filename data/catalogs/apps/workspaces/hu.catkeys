@@ -2,13 +2,13 @@
 Invalid argument: %s\n	Workspaces		Érvénytelen paraméter: %s\n
 Quit	Workspaces		Kilépés
 Workspaces	System name		Munkaasztalok
-Change workspace count…	Workspaces		Munkaasztalok számának megváltoztatása...
+Change workspace count…	Workspaces		Munkaasztalok számának megváltoztatása…
 Remove replicant	Workspaces		Másolat eltávolítása
-About Workspaces…	Workspaces		Munkaasztalok névjegye...
+About Workspaces…	Workspaces		Munkaasztalok névjegye…
 Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Munkaasztalok\nírta: %1 és %2.\n\nMinden jog fenntartva %3, Haiku.\n\nAz Option gombbal hátra lehet küldeni az ablakokat. A Control gombbal pedig előre lehet őket hozni.\n
 Show window border	Workspaces		Ablakkeret megjelenítése
 Auto-raise	Workspaces		Automatikus kiemelés
-OK	Workspaces		OK
+OK	Workspaces		Rendben
 Always on top	Workspaces		Mindig felül
 Live in the Deskbar	Workspaces		Átrakás az Asztalsávra
 Show window tab	Workspaces		Ablakfül megjelenítése

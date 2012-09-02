@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.haiku-registrar	2599857937
 Restart system	ShutdownProcess		Rendszer újraindítása
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		A(z) \"%appName%\" alkalmazás lehet, hogy blokkolva van egy modális panelen.
-OK	ShutdownProcess		OK
+OK	ShutdownProcess		Rendben
 System is shut down	ShutdownProcess		A rendszer leállt
 It's now safe to turn off the computer.	ShutdownProcess		Most már kikapcsolhatja a számítógépet.
 Cancel	ShutdownProcess		Mégse
@@ -10,7 +10,7 @@ Asking other processes to quit.	ShutdownProcess		Folyamatok megkérése a leáll
 Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\" megkérése a leállásra.
 %action%?	ShutdownProcess		%action%?
 Shutdown aborted	ShutdownProcess		Leállítás megszakítva
-Restarting…	ShutdownProcess		Újraindulás...
+Restarting…	ShutdownProcess		Újraindulás…
 Asking background applications to quit.	ShutdownProcess		Háttéralkalmazások megkérése a leállásra.
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		A(z) \"%appName%\" megszakította a rendszer leállítását.
 Tidying things up a bit.	ShutdownProcess		Rendezés.
@@ -20,4 +20,4 @@ Cancel shutdown	ShutdownProcess		Leállítás megszakítása
 Kill application	ShutdownProcess		Alkalmazás leállítása
 Shut down	ShutdownProcess		Leállítás
 Restart	ShutdownProcess		Újraindítás
-Shutting down…	ShutdownProcess		Leállás...
+Shutting down…	ShutdownProcess		Leállás…

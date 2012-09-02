@@ -11,13 +11,13 @@ Shutdown mail services	DeskbarView		Levelezés szolgáltatásainak leállítása
 Sending mail for %name	Notifier		%name üzeneteinek küldése
 %num new messages.	MailDaemon		%num új üzenet.
 %num new message.	MailDaemon		%num új üzenet.
-Create new message…	DeskbarView		Új üzenet...
+Create new message…	DeskbarView		Új üzenet…
 %num new message for %name\n	MailDaemon		%num új üzenet %name számára\n
 No new messages	MailDaemon		Nincs új üzenet
 Check for mail now	DeskbarView		Üzenetek ellenőrzése most
 No new messages	DeskbarView		Nincs új üzenet
 %num new messages for %name\n	MailDaemon		%num új üzenet %name számára\n
 Mail daemon status log	MailDaemon		Levelezés daemon állapotának naplója
-Settings…	DeskbarView		Beállítások...
+Settings…	DeskbarView		Beállítások…
 No new messages.	MailDaemon		Nincs új üzenet.
 Mail status	Notifier		Levelezés állapota

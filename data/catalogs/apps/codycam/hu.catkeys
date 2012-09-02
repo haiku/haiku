@@ -1,5 +1,5 @@
 1	hungarian	x-vnd.Haiku-CodyCam	2416864674
-Capturing Image…	VideoConsumer.cpp		Kép készítése...
+Capturing Image…	VideoConsumer.cpp		Kép készítése…
 Every 30 seconds	CodyCam		30 másodpercenként
 File name:	CodyCam		Fájlnév:
 Last Capture: 	VideoConsumer.cpp		Legutóbbi kép:
@@ -21,8 +21,8 @@ password	CodyCam		jelszó
 Directory:	CodyCam		Könyvtár:
 Every minute	CodyCam		Percenként
 read: %ld\n	SftpClient		olvasás: %ld\n
-Waiting…	CodyCam		Várakozás...
-Logging in…	VideoConsumer.cpp		Bejelentkezés...
+Waiting…	CodyCam		Várakozás…
+Logging in…	VideoConsumer.cpp		Bejelentkezés…
 Server:	CodyCam		Kiszolgáló:
 server address expected	CodyCam		kiszolgáló címének megadása szükséges
 Error creating output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl készítése során
@@ -32,7 +32,7 @@ Output	CodyCam		Kimenet
 Every 15 minutes	CodyCam		15 percenként
 Cannot find an available video stream	CodyCam		Nem található elérhető videóadás
 Can't find an available connection to the video window	CodyCam		Nem található használható kapcsolat a videó ablakához
-Transmitting…	VideoConsumer.cpp		Átvitel...
+Transmitting…	VideoConsumer.cpp		Átvitel…
 Cannot get a time source	CodyCam		Nem található időforrás
 Every 8 hours	CodyCam		8 óránként
 Rename failed	VideoConsumer.cpp		Átnevezés sikertelen
@@ -55,22 +55,22 @@ Stop video	CodyCam		Videó leállítása
 Locking the window\n	VideoConsumer.cpp		Ablak zárolása\n
 File %s; Line %ld # %s	SettingsHandler		%s fájl; Sor %ld # %s
 Couldn't find requested directory on server	VideoConsumer.cpp		A megadott könyvtár nem található a kiszolgálón
-Renaming…	VideoConsumer.cpp		Átnevezés...
+Renaming…	VideoConsumer.cpp		Átnevezés…
 Local	CodyCam		Helyi
 Error setting type of output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl típusának megadása során
 upload client name expected	CodyCam		nincs megadva a feltöltési kliens neve
 SFTP	CodyCam		SFTP
-Connected…	VideoConsumer.cpp		Csatlakozva...
+Connected…	VideoConsumer.cpp		Csatlakozva…
 PASS <suppressed>  (real password sent)\n	FtpClient		PASS <rejtve> (itt az igazi jelszó lett elküldve)\n
 Every 5 minutes	CodyCam		5 percenként
 read: %d\n	SftpClient		olvasás: %d\n
-OK	CodyCam		OK
+OK	CodyCam		Rendben
 Capture controls	CodyCam		Képkészítés vezérlői
 Every hour	CodyCam		Óránként
 Cannot connect the video source to the video window	CodyCam		Nem lehet beállítani az videó forrását a videó ablakának
 capture rate expected	CodyCam		nincs megadva a képkészítés gyakorisága
 Error getting initial latency for the capture node	CodyCam		Hiba történt a képkészítési csomópont kezdeti késésének lekérése során
-Send to…	CodyCam		Küldés...
+Send to…	CodyCam		Küldés…
 on or off expected	Settings	Do not translate 'on' and 'off'	nincs megadva hogy 'on' vagy 'off'
 Quit	CodyCam		Kilépés
 cmd: '%s'\n	FtpClient		cmd: '%s'\n

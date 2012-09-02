@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Haiku.TV	1995288111
 TV	MainWin		Tv
 Channel	MainWin		Csatorna
-Settings…	MainWin		Beállítások...
+Settings…	MainWin		Beállítások…
 Interface	MainWin		Felület
 Keep aspect ratio	MainWin		Képarány megtartása
 Previous channel	MainWin		Előző csatorna
@@ -9,7 +9,7 @@ Settings	MainWin		Beállítások
 TV	System name		Tv
 No border	MainWin		Keret kikapcsolása
 Always on top	MainWin		Mindig legyen felül az ablak
-OK	MainWin		OK
+OK	MainWin		Rendben
 Quit	MainWin		Kilépés
 Full screen	MainWin		Teljes képernyő
 Debug	MainWin		Hibaelhárítás

@@ -6,7 +6,7 @@ Quit game	PairsWindow		Kilépés a játékból
 Game	PairsWindow		Játék
 Size	PairsWindow		Méret
 New	PairsWindow		Új
-OK	PairsView		OK
+OK	PairsView		Rendben
 Intermediate (6x6)	PairsWindow		Haladó (6x6)
 Quit	PairsWindow		Kilépés
 Pairs	System name		Párok

@@ -16,7 +16,7 @@ Show legend	ActivityView		Magyarázat megjelenítése
 Text clipboard	DataSource		Szöveges vágólap
 Settings	ActivityWindow		Beállítások
 Receiving	DataSource		Fogadás
-Settings…	ActivityWindow		Beállítások...
+Settings…	ActivityWindow		Beállítások…
 Ports	DataSource		Portok
 Page faults	DataSource		Laphibák
 Sending	DataSource		Küldés

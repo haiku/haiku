@@ -10,7 +10,7 @@ Name:	ScreenshotWindow		Név:
 Choose folder	ScreenshotWindow		Mappa kiválasztása
 Save	ScreenshotWindow		Mentés
 Overwrite	ScreenshotWindow		Felülírás
-Choose folder...	ScreenshotWindow		Mappa kiválasztása...
+Choose folder...	ScreenshotWindow		Mappa kiválasztása…
 Please select	ScreenshotWindow		Kérjük válasszon
 Save as:	ScreenshotWindow		Mentés másként:
 Copy to clipboard	ScreenshotWindow		Másolás a vágólapra
@@ -20,7 +20,7 @@ New screenshot	ScreenshotWindow		Új képernyőkép
 Artwork folder	ScreenshotWindow		Artwork mappa
 Home folder	ScreenshotWindow		Home mappa
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ez a fájl már létezik.\n Biztos felül kívánja írni?
-Settings…	ScreenshotWindow		Beállítások...
+Settings…	ScreenshotWindow		Beállítások…
 overwrite	ScreenshotWindow		felülírás
 Delay:	ScreenshotWindow		Késleltetés:
 Include mouse pointer	ScreenshotWindow		Az egérkurzor belefoglalása a képbe

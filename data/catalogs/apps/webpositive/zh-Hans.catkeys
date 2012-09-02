@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-WebPositive	1360241600
+1	english	x-vnd.Haiku-WebPositive	1513721873
 Show home button	Settings Window		显示 home 按钮
 Username:	Authentication Panel		用户名：
 Copy URL to clipboard	Download Window		复制 URL 到剪贴板
@@ -6,6 +6,10 @@ Cancel	Settings Window		取消
 Close window	WebPositive Window		关闭窗口
 Quit	WebPositive		退出
 The download could not be opened.	Download Window		下载内容无法打开。
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	下载目录无法打开。\n\n错误：%error
+Open location	WebPositive Window		打开位置
+Clear history	WebPositive Window		清空历史
+WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		昨天
 Default standard font size:	Settings Window		默认标准字体大小：
 Start page:	Settings Window		开始页面：
@@ -24,7 +28,11 @@ Next	WebPositive Window		下一页
 Find next	WebPositive Window		查找下一个
 Download folder:	Settings Window		下载目录：
 Edit	WebPositive Window		编辑
+Over %hours hours left	Download Window		剩余 %hours 小时
 Cancel	Authentication Panel		取消
+Match case	WebPositive Window		匹配条件
+Search page:	Settings Window		搜索页面：
+Zoom text only	WebPositive Window		仅缩放文本
 Default fixed font size:	Settings Window		默认等宽字体大小：
 Close tab	WebPositive Window		关闭标签页
 Auto-hide mouse pointer	Settings Window		自动隐藏鼠标焦点
@@ -34,6 +42,10 @@ Full screen	WebPositive Window		全屏
 Open download error	Download Window		打开下载出错
 Standard font:	Settings Window		标准字体：
 Restart	Download Window		重新下载
+Proxy server	Settings Window		代理服务器
+Open containing folder	Download Window		打开文件目录
+New window	WebPositive Window		新建窗口：
+Open	Download Window		打开
 Reload	WebPositive Window		重载页面
 Downloads	Download Window		下载
 Sans serif font:	Settings Window		无衬线字体：

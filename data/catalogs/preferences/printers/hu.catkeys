@@ -30,7 +30,7 @@ Blue	TestPageView		Kék
 1 pending job.	PrinterListView		1 függő feladat.
 Remove	PrintersWindow		Eltávolítás
 <pick one>	AddPrinterDialog		<válasszon egyet>
-Add …	PrintersWindow		Hozzáadás...
+Add …	PrintersWindow		Hozzáadás…
 Print jobs for 	PrintersWindow		Feladatok ennek:
 Failed	JobListView		Sikertelen
 %.2f KB	JobListView		%.2f KB

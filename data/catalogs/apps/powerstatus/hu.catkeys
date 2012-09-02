@@ -12,7 +12,7 @@ About	PowerStatus		Névjegy
 PowerStatus	System name		Energiaállapot
 PowerStatus	PowerStatus		Energiaállapot
  mWh	PowerStatus		mWh
-Battery info…	PowerStatus		Akku infó...
+Battery info…	PowerStatus		Akku infó…
 Damaged battery	PowerStatus		Sérült akku
 Show time	PowerStatus		Idő kijelzése
 Last full charge: 	PowerStatus		Utolsó teljes feltöltés:
@@ -22,15 +22,15 @@ Extended battery info	PowerStatus		Bővebb akku információ
 Current rate: 	PowerStatus		Jelenlegi gyakoriság:
 discharging	PowerStatus		használatban
 Show text label	PowerStatus		Szöveges címke megjelenítése
-About…	PowerStatus		Névjegy...
+About…	PowerStatus		Névjegy…
 Model number: 	PowerStatus		Típusszám:
-Install in Deskbar	PowerStatus		Telepítés a Deskbarra
+Install in Deskbar	PowerStatus		Telepítés az Asztalsávra
  mAh	PowerStatus		mAh
 Capacity: 	PowerStatus		Kapacitás:
 Battery discharging	PowerStatus		Akku használatban
 Serial number: 	PowerStatus		Szériaszám:
 Capacity granularity 1: 	PowerStatus		Kapacitás granularitás 1:
-OK	PowerStatus		OK
+OK	PowerStatus		Rendben
 OEM info: 	PowerStatus		OEM információk:
 Design voltage: 	PowerStatus		Tervezett feszültség:
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Energiaállapot\nírta: Axel Dörfler, Clemens Zeidler\nSzerzői jog 2006, Haiku, Inc.\n
@@ -40,7 +40,7 @@ Battery info	PowerStatus		Akku infó
 Quit	PowerStatus		Kilépés
 rechargeable	PowerStatus		újratölthető
 charging	PowerStatus		töltődik
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futatthatja az Energiaállapotot egy ablakban, vagy a Deskbarra telepítheti azt.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futatthatja az Energiaállapotot egy ablakban, vagy az Asztalsávra telepítheti azt.
 Power status box	PowerStatus		Energiaállapot doboza
 Show status icon	PowerStatus		Állapotikon megjelenítése
 Capacity granularity 2: 	PowerStatus		Kapacitás granularitás 2:

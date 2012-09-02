@@ -30,7 +30,7 @@ Flip Control Points	Icon-O-Matic-FlipPointsCmd		Vezérlőpontok tükrözése
 warning	Icon-O-Matic-SVGExport		figyelmeztetés
 Copy	Icon-O-Matic-Properties		Másolás
 Miter Limit	Icon-O-Matic-PropertyNames		Miter korlát
-OK	Icon-O-Matic-ColorPicker		OK
+OK	Icon-O-Matic-ColorPicker		Rendben
 Remove Control Point	Icon-O-Matic-RemovePointsCmd		Vezérlőpont eltávolítása
 Bleep!	Exporter - Continue in error dialog		Bíííp!
 Add circle	Icon-O-Matic-PathsList		Kör hozzáadása
@@ -42,7 +42,7 @@ Add Control Point	Icon-O-Matic-AddPointCmd		Vezérlőpont hozzáadása
 Untitled	Icon-O-Matic-Main		Névtelen
 Multi Set 	Multi Set (property name)		Többszörös beállítás
 any of the other lists to	Empty property list - 2nd line		a többi erre listáz:
-Save as…	Icon-O-Matic-Menu-File		Mentés másként...
+Save as…	Icon-O-Matic-Menu-File		Mentés másként…
 Change Color	Icon-O-Matic-SetColorCmd		Szín váltása
 Style	Icon-O-Matic-Menus		Stílus
 <modify path>	Icon-O-Matic-PathCmd		<útvonal módosítása>
@@ -109,7 +109,7 @@ The text you are trying to import is quite long,are you sure?	Icon-O-Matic-Style
 Add	Icon-O-Matic-TransformersList		Hozzáadás
 Export Icon	Dialog title		Ikon exprotálása
 Color	Icon-O-Matic-StyleTypes		Szín
-Settings…	Icon-O-Matic-SavePanel		Beállítások...
+Settings…	Icon-O-Matic-SavePanel		Beállítások…
 Remove	Icon-O-Matic-PathManipulator		Eltávolítás
 Radial	Icon-O-Matic-StyleTypes		Sugaras
 Perspective	Icon-O-Matic-TransformersList		Perspektíva
@@ -119,7 +119,7 @@ Min LOD	Icon-O-Matic-PropertyNames		Min LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON attribútum
 Invert selection	Icon-O-Matic-Properties		Kijelölés invertálása
 Drop shapes	Icon-O-Matic-ShapesList		Alakzatok eldobása
-Export as…	Icon-O-Matic-Menu-File		Exportálás másként...
+Export as…	Icon-O-Matic-Menu-File		Exportálás másként…
 Transformation	Transformation		Transzformáció
 Click on an object in	Empty property list - 1st line		Kattintson egy objektumra ebben:
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Transzformációk áthelyezése
@@ -179,7 +179,7 @@ Insert Control Point	Icon-O-Matic-InsertPointCmd		Vezérlőpont beszúrása
 Flip Control Point	Icon-O-Matic-FlipPointsCmd		Vezérlőpont tükrözése
 Redo	Icon-O-Matic-Main		Újra
 Assign Paths	Icon-O-Matic-AddPathsCmd		Útvonalak hozzárendelése
-OK	Icon-O-Matic-SVGImport		OK
+OK	Icon-O-Matic-SVGImport		Rendben
 Multi paste	Icon-O-Matic-Properties		Többszörös beillesztés
 to attach transformers.	Empty transformers list - 2nd line		transzformerek csatolásához.
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Transzformáció visszaállítása
@@ -187,12 +187,12 @@ Reverse Path	Icon-O-Matic-ReversePathCmd		Útvonal megfordítása
 Scale	Icon-O-Matic-TransformationBoxStates		Méretezés
 Duplicate	Icon-O-Matic-PathsList		Megkettőzés
 Save	Icon-O-Matic-Menu-File		Mentés
-Append…	Icon-O-Matic-Menu-File		Hozzáfűzés...
+Append…	Icon-O-Matic-Menu-File		Hozzáfűzés…
 Move Path	Icon-O-Matic-MovePathsCmd		Útvonal mozgatása
 Overwrite	Icon-O-Matic-SVGExport		Felülírás
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Alakzatok rögzítése
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Vezérlőpont felbontása
-Open…	Icon-O-Matic-Menu-File		Megnyitás...
+Open…	Icon-O-Matic-Menu-File		Megnyitás…
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Szín (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Színátmenet szerkesztése
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Útvonal törlése

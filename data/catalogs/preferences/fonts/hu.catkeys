@@ -1,9 +1,9 @@
 1	hungarian	x-vnd.Haiku-Fonts	4164233892
 Plain font:	Font view		Egyszerű betűtípus:
 Defaults	Main window		Alapértelmezés
-OK	main		OK
+OK	main		Rendben
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Betűtípusok\n\tCopyright 2004-2005, Haiku.\n\n
-Revert	Main window		Visszaállítás
+Revert	Main window		Visszaállít
 Size:	Font Selection view		Méret:
 Menu font:	Font view		Menük betűtípusa:
 Fixed font:	Font view		Fix méretű betűtípus:

@@ -5,9 +5,9 @@ Slide delay	Menus		Képváltás közti szünet
 Selection mode	Menus		Kijelölés módja
 Zoom in	Menus		Nagyítás
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum megváltozott. Biztosan be szeretné zárni?
-Page setup…	Menus		Oldalbeállítás...
-Print…	Menus		Nyomtatás...
-OK	SaveToFile		OK
+Page setup…	Menus		Oldalbeállítás…
+Print…	Menus		Nyomtatás…
+OK	SaveToFile		Rendben
 Previous page	Menus		Előző oldal
 View	Menus		Nézet
 Full screen	Menus		Teljes képernyő
@@ -31,7 +31,7 @@ Rating	Menus		Értékelés
 Flip left to right	Menus		Balról jobbra hajtás
 Show caption in full screen mode	Menus		Felirat mutatása teljes képernyős módban
 DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Megnyitás...
+Open…	Menus		Megnyitás…
 Next file	Menus		Következő fájl
 Clear selection	Menus		Kijelölés törlése
 Close document	ClosePrompt		Dokumentum bezárása
@@ -54,9 +54,9 @@ Select all	Menus		Összes kiválasztása
 Zoom factor in %:	PrintOptionsWindow		Nagyítás mértéke százalékban:
 Width:	PrintOptionsWindow		Szélesség:
 Image	Menus		Kép
-OK	Alerts		OK
+OK	Alerts		Rendben
 Rotate clockwise	Menus		Forgatás az óramutató irányába
 Job setup	PrintOptionsWindow		Feladatbeállítás
 Original size	Menus		Eredeti méret
 Next page	Menus		Következő oldal
-Save as…	Menus		Mentés másként...
+Save as…	Menus		Mentés másként…

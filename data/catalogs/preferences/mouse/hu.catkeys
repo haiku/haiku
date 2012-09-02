@@ -15,7 +15,7 @@ Instant warp	SettingsView		Szünetmentes áthajlás
 Dig Deal	MouseApplication		Dig Deal
 1-Button	SettingsView		Egygombos
 Double-click speed	SettingsView		Duplakattintás sebessége
-Defaults	MouseWindow		Alapértelmezett
+Defaults	MouseWindow		Eredeti
 Focus follows mouse	SettingsView		A fókusz az egér helyzetétől függ
 Accept first click	SettingsView		Első kattintás elfogadása
 Fast	SettingsView		Gyors

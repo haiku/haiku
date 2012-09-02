@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Weboldal helye
 Error Server	PoorMan		Hibakiszolgáló
-Settings…	PoorMan		Beállítások...
+Settings…	PoorMan		Beállítások…
 Create PoorMan log	PoorMan		PoorMan napló készítése
 Shutting down.\n	PoorMan		Leállás.\n
 Hits: %lu	PoorMan		Találatok: %lu
@@ -21,7 +21,7 @@ Website options	PoorMan		Weboldal beállítások
 File Name	PoorMan		Fájlnév
 Clear console log	PoorMan		Konzolnapló ürítése
 Advanced	PoorMan		Haladó
-OK	PoorMan		OK
+OK	PoorMan		Rendben
 Status: Stopped	PoorMan		Állapot: Leállítva
 Dir Created	PoorMan		Mappa létrehozva
 Log to file	PoorMan		Naplózás fájlba
@@ -43,7 +43,7 @@ Error Dir	PoorMan		Hiba könyvtár
 Select all	PoorMan		Mind kijelölése
 File	PoorMan		Fájl
 File Logging	PoorMan		Fájlnaplózás
-Save console selections as…	PoorMan		Konzolbéli kijelölés mentése másként...
+Save console selections as…	PoorMan		Konzolbéli kijelölés mentése másként…
 File logging	PoorMan		Fájlnaplózás
 Select web folder	PoorMan		Netes mappa kiválasztása
 Logging view	PoorMan		Naplózási nézet
@@ -55,12 +55,12 @@ Directory: 	PoorMan		Mappa:
 Log To File	PoorMan		Naplózás fájlba
 Done	PoorMan		Kész
 Create log file	PoorMan		Naplófájl készítése
-Starting up... 	PoorMan		Indítás...
+Starting up... 	PoorMan		Indítás…
 Site	PoorMan		Oldal
 Cancel	PoorMan		Mégse
 Console logging	PoorMan		Konzoli naplózás
 Cannot start the server	PoorMan		Nem sikerült elindítani a szervert
 Select	PoorMan		Kiválasztás
-Save console as…	PoorMan		Konzol mentése másként...
+Save console as…	PoorMan		Konzol mentése másként…
 PoorMan	System name		PoorMan
 Console Logging	PoorMan		Konzoli naplózás

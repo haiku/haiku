@@ -2,18 +2,18 @@
 yes	Screen		igen
 Use laptop panel:	Screen		Használt laptopképernyő:
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 szín
-/other…	Screen		/egyéb...
+/other…	Screen		/egyéb…
 16 bits/pixel, 65536 colors	Screen		16 bit/pixel, 65538 szín
-Revert	Screen		Visszaállítás
+Revert	Screen		Visszaállít
 Swap displays:	Screen		Kijezők megcserélése:
 Combine displays:	Screen		Kijelzők összevonása:
 Done	Screen		Kész
-Set background…	Screen		Háttér beállítása...
+Set background…	Screen		Háttér beállítása…
 Undo	Screen		Visszavonás
 if needed	Screen		ha szükséges
 Screen preferences by the Haiku team	Screen		A Haiku csapat képernyő-beállításai
 Screen	System name		Képernyő
-OK	Screen		OK
+OK	Screen		Rendben
 Workspaces	Screen		Munkaasztalok
 The screen mode could not be set:\n\t%s\n	Screen		A kijelzőmód nem állítható be erre:\n\t%s\n
 no	Screen		nem
@@ -32,7 +32,7 @@ Current workspace	Screen		Jelenlegi munkaasztal
 About	Screen		Névjegy
 24 bits/pixel, 16 Million colors	Screen		24 bit/pixel, 16 millió szín
 horizontally	Screen		vízszintesen
-Other…	Screen		Egyéb...
+Other…	Screen		Egyéb…
 Cancel	Screen		Mégse
 bits/pixel	Screen		bit/pixel
 Settings will revert in %seconds seconds.	Screen		A beállítások %seconds másodperc múlva automatikusan visszaállításra kerülnek.

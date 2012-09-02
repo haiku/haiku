@@ -13,7 +13,7 @@ Keep enabled	SettingsWindow		Tartsa bekapcsolva
 Revert	SettingsWindow		Visszaállít
 VirtualMemory	System name		Virtuális memória
 Current swap file size: 	SettingsWindow		Jelenlegi cserefájl mérete: 
-OK	VirtualMemoryApp		OK
+OK	VirtualMemoryApp		Rendben
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuális memória\n\tÍrta Axel Dörfler\n\tCopyright 2005, Haiku.\n
 Enable virtual memory	SettingsWindow		Virtuális memória engedélyezése
 MB	SettingsWindow		MB

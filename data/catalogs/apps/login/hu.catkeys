@@ -4,7 +4,7 @@ Hide password	Login View		Jelszó elrejtése
 Desktop	Desktop Window		Asztal
 Invalid login!	Login View		Érvénytelen felhasználónév!
 --edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tIndítás szerkesztési módban, hogy lehetssen szerkeszteni az asztalt.\n
-OK	Login View		OK
+OK	Login View		Rendben
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	hiba %s\n
 Login:	Login View		Felhasználónév:
 Error	Login App		Hiba
@@ -17,5 +17,5 @@ Info	Login App		Infó
 Halt	Login View		Megszakítás
 ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	Ellenőrzés: %s\n
 Password:	Login View		Jelszó:
-OK	Login App		OK
+OK	Login App		Rendben
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tKikapcsolja az ablak modálisságát\n

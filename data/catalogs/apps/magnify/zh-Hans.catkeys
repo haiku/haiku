@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Magnify	3515889001
+1	english	x-vnd.Haiku-Magnify	283320408
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		无修剪消息\n
 Make square	Magnify-Main		创建方形
 Copy image	Magnify-Main		复制图像
@@ -6,6 +6,7 @@ Magnify help	Magnify-Help		放大帮助
 usage: magnify [size] (magnify size * size pixels)\n	Console		用法：magnify [size]（如，放大 size * size 像素）\n
 Stick coordinates	Magnify-Main		插入坐标
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		信息:\n 隐藏/显示信息 - 隐藏/显示 所有新功能\n 注意：当显示，红色方形反映出\n 显示其中像素的RGB值将\n 添加/删除十字光标- 可以添加（或删除)2十字光标\n 以帮助路线和安置对象。\n 十字光标为代表的蓝色方块和蓝线。\n 隐藏/显示网格- 隐藏/显示像素分隔的网格。
+  freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		freeze - 冻结/解冻当前鼠标聚焦内容的放大倍率\n
 Hide/Show grid	Magnify-Main		隐藏/显示栅格
 magnify: size must be a multiple of 4\n	Console		放大：尺寸必须为 4 的倍数。\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		常用：\n 32 x 32 - 左上数字为可见像素的数量（宽 x 高）\n 8 pixels/pixel - 代表用于放大单个像素的像素数量\n R:152 G:52 B:10 - 红色方块之下的像素的 RGB 值。

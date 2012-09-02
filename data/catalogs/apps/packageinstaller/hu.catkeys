@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-PackageInstaller	1396489627
 Install to:	PackageView		Telepítés ide:
-OK	PackageView		OK
+OK	PackageView		Rendben
 Accept	PackageTextViewer		Elfogadás
 Continue	PackageInstall		Folytatás
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		A kért csomag telepítése a rendszerre sikertelen volt. Lehet, hogy ez a cél csomagfájl hibája miatt következett be. Kérjük, vegye fel a kapcsolatot a csomag terjesztőjével.
@@ -21,7 +21,7 @@ Preparing package	PackageInstall		Csomag előkészítése
 No package available.	PackageInfo		Nincs elérhető csomag.
 none	PackageView		nincs
 Stop	PackageStatus		Leállítás
-Other…	PackageView		Egyéb...
+Other…	PackageView		Egyéb…
 No installation type selected	PackageView		Nincs másféle telepítéstípus kiválasztva
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		A(z) '%s' nevű szimbolikus link már létezik a megadott útvonalon.\nFelülírja, vagy ugorjuk át?
 Installing files and folders	PackageInstall		Fájlok és mappák telepítése

@@ -7,15 +7,15 @@ While sending and receiving	Config Window		Küldéskor és fogadáskor
 days	Config Window		naponként
 Incoming	Config Window		Bejövő
 Server name:	E-Mail		Kiszolgáló neve:
-OK	Config Window		OK
+OK	Config Window		Rendben
 Start mail services on startup	Config Window		A rendszer indításával együtt a levelezés szolgáltatásai is induljanak el
 E-mail address:	E-Mail		E-mail cím:
 Account name:	E-Mail		Fiók neve:
 Account name:	Config Views		Felhasználói név:
 Create new account	AutoConfigWindow		Új fiók létrehozása
-OK	Config Views		OK
+OK	Config Views		Rendben
 The filter could not be moved. Deleting filter.	Config Views		Nem lehetett áthelyezni a szűrőt. A szűrő törlése.
-Revert	Config Window		Visszaállítás
+Revert	Config Window		Visszaállít
 Login name:	E-Mail		Felhasználói név:
 Incoming	E-Mail		Bejövő
 Password:	E-Mail		Jelszó:
@@ -38,7 +38,7 @@ Real name:	Config Views		Valódi név:
 \t\t· Outgoing	Config Window		\t\t· Kimenő
 Choose Protocol	E-Mail		Protokoll választása
 Return address:	Config Views		Feladói cím:
-Edit mailbox menu…	Config Window		Postafiókmenü szerkesztése...
+Edit mailbox menu…	Config Window		Postafiókmenü szerkesztése…
 Outgoing	E-Mail		Kimenő
 \t\t· E-mail filters	Config Window		\t\t· Email szűrők
 Remove	Config Views		Eltávolítás
@@ -53,7 +53,7 @@ Error retrieving general settings: %s\n	Config Window		Hiba történt az által�
 Real name:	E-Mail		Valódi név:
 Apply	Config Window		Alkalmaz
 Always	Config Window		Mindig
-OK	AutoConfigWindow		OK
+OK	AutoConfigWindow		Rendben
 Add filter	Config Views		Szűrő hozzáadása
 Outgoing	Config Window		Kimenő
 Outgoing mail filters	Config Views		Kimenő levelek szűrői

@@ -14,7 +14,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Lejátszási lista mentése
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Egyik fájl se tűnik médiafájlnak.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Lejátszási lista mentése sikertelen.\n\nHiba:
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
-New player…	MediaPlayer-Main		Új lejátszó...
+New player…	MediaPlayer-Main		Új lejátszó…
 100% scale	MediaPlayer-Main		100%-os méretezés
 Subtitle placement:	MediaPlayer-SettingsWindow		Felirat helye:
 Close	MediaPlayer-Main		Bezárás
@@ -23,18 +23,18 @@ Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Néhány
 <unknown>	MediaPlayer-InfoWin		<ismeretlen>
 Open	MediaPlayer-Main		Megnyitás
 Next	MediaPlayer-Main		Következő
-OK	MediaPlayer-SettingsWindow		OK
+OK	MediaPlayer-SettingsWindow		Rendben
 Track %d	MediaPlayer-Main		Szám %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Megjelenítési mód
 Medium	MediaPlayer-SettingsWindow		Közepes
 Close	MediaPlayer-PlaylistWindow		Bezárás
 Stereo	MediaPlayer-InfoWin		Sztereó
-Open…	MediaPlayer-PlaylistWindow		Megnyitás...
+Open…	MediaPlayer-PlaylistWindow		Megnyitás…
 Toggle mute.	MediaPlayer-Main		Némítás állítása.
 Undo	MediaPlayer-PlaylistWindow		Visszavonás
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardveres videófedők használata ha elérhetőek.
-File info…	MediaPlayer-Main		Fájlinfó...
+File info…	MediaPlayer-Main		Fájlinfó…
 Pause playback.	MediaPlayer-Main		Lejátszás szüneteltetése.
 Overlay	MediaPlayer-InfoWin		Overlay
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Bejegyzés eltávolítása
@@ -61,8 +61,8 @@ Move Entries	MediaPlayer-MovePLItemsCmd		Bejegyzések áthelyezése
 Audio	MediaPlayer-Main		Audió
 Open Playlist	MediaPlayer-PlaylistWindow		Lejátszási lista megnyitása
 MediaPlayer	System name		Médialejátszó
-OK	MediaPlayer-Main		OK
-Settings…	MediaPlayer-Main		Beállítások...
+OK	MediaPlayer-Main		Rendben
+Settings…	MediaPlayer-Main		Beállítások…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Médialejátszó beállításai
 h	MediaPlayer-InfoWin	Hours	ó
 Select all	MediaPlayer-PlaylistWindow		Mind kijelölése
@@ -78,7 +78,7 @@ Skip to the previous track.	MediaPlayer-Main		Ugrás az előző számra.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		A(z) %app% egy belső hibáa ütközött. A fájlt nem sikerült megnyitni.
 Close window after playing video	MediaPlayer-SettingsWindow		Videófájl lejátszása után zárja be az ablakot
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Filmek simított átméretezése
-OK	MediaPlayer-RemovePLItemsCmd		OK
+OK	MediaPlayer-RemovePLItemsCmd		Rendben
 50% scale	MediaPlayer-Main		50%-os méret
 Subtitles	MediaPlayer-Main		Feliratok
 Prev	MediaPlayer-Main		Előző
@@ -130,7 +130,7 @@ Small	MediaPlayer-SettingsWindow		Kicsi
 Randomize	MediaPlayer-PlaylistWindow		Véletlenszerű
 Off	Subtitles menu		Ki
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Bejegyzések véletlenszerűsítése
-Revert	MediaPlayer-SettingsWindow		Visszaállítás
+Revert	MediaPlayer-SettingsWindow		Visszaállít
 Edit	MediaPlayer-PlaylistWindow		Szerkesztés
 Start media server	MediaPlayer-Main		Médiakiszolgáló indítása
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
@@ -138,12 +138,12 @@ Toggle fullscreen.	MediaPlayer-Main		Teljes képernyő.
 ToggleFullscreen	MediaPlayer-Main		Teljesképernyő
 <unnamed>	PlaylistItem-name		<névtelen>
 Open Clips	MediaPlayer-Main		Klipek megnyitása
-OK	MediaPlayer-PlaylistWindow		OK
+OK	MediaPlayer-PlaylistWindow		Rendben
 none	Audio track menu		nincs
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Megadja/beállítja a hangerőt (0.0-2.0)
-Playlist…	MediaPlayer-Main		Lejátszási lista...
+Playlist…	MediaPlayer-Main		Lejátszási lista…
 <unknown>	PlaylistItem-author		<névtelen>
-Save as…	MediaPlayer-PlaylistWindow		Mentés másként...
+Save as…	MediaPlayer-PlaylistWindow		Mentés másként…
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Bejegyzések másolása
 Redo	MediaPlayer-PlaylistWindow		Újra
 Always on top	MediaPlayer-Main		Mindig felül legyen
@@ -156,7 +156,7 @@ Save	MediaPlayer-PlaylistWindow		Mentés
 %d Bit	MediaPlayer-InfoWin		%d bit
 Remove	MediaPlayer-PlaylistWindow		Eltávolítás
 Full screen	MediaPlayer-Main		Teljes képernyő
-Open file…	MediaPlayer-Main		Fájl megnyitása...
+Open file…	MediaPlayer-Main		Fájl megnyitása…
 300% scale	MediaPlayer-Main		300%-os méret
 Bottom of screen	MediaPlayer-SettingsWindow		A képernyő alján
 Save error	MediaPlayer-PlaylistWindow		Mentési hiba

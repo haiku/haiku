@@ -59,7 +59,7 @@ Default Partition:	DefaultPartitionPage	Menu field label	Alapértelmezett partí
 Partitions	DefaultPartitionPage	Pop up menu title	Partíciók
 BootManager	System name		BootManager
 Summary	BootManagerController	Title	Összegzés
-OK	BootManagerController	Button	OK
+OK	BootManagerController	Button	Rendben
 Immediately	DefaultPartitionPage		Azonnal
 Done	BootManagerController	Button	Kész
 After three seconds	DefaultPartitionPage		Három másodperc után

@@ -5,7 +5,7 @@ Error while logging in to %serv	smtp		Hiba történt a %serv kiszolgálóra val�
 Unencrypted	ConfigView		Titkosítatlan
 . The server says:\n	smtp		. A kiszolgáló válasza:\n
 ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Csatlakozás a kiszolgálóhoz...
+Connecting to server…	smtp		Csatlakozás a kiszolgálóhoz…
 Error while opening connection to %serv	smtp		Hiba történt a %serv kiszolgálóval való kapcsolat nyitása közben
 POP3 authentication failed. The server said:\n	smtp		A POP3 hitelesítés sikertelen volt. A kiszolgáló válasza:\n
 Destination:	ConfigView		Cél:

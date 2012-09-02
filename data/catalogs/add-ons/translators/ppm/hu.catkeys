@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Haiku-PPMTranslator	276252412
 PPM Settings	PPMMain		PPM beállítások
 Based on PPMTranslator sample code	PPMTranslator		A PPM fordító mintakódja alapján
-OK	PPMMain		OK
+OK	PPMMain		Rendben
 Grayscale 8 bits	PPMTranslator		Szürekárnyalatos 8-bites
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32-bites
 PPM image	PPMTranslator		PPM kép

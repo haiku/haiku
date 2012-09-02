@@ -2,17 +2,17 @@
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Hiba történt a beállítások mentése során.\nLehet hogy elfogyott a hely a lemezen.
 Notifications	GeneralView		Értesítések
 seconds of inactivity	GeneralView		másodpercnyi inaktivitás után
-Revert	PrefletWin		Visszaállítás
+Revert	PrefletWin		Visszaállít
 Mini icon	DisplayView		Mini ikon
 Enable notifications	GeneralView		Értesítések engedélyezése
 Error	NotificationView		Hiba
-OK	GeneralView		OK
+OK	GeneralView		Rendben
 Events are not notified	GeneralView		Az eseményekről nem lesz értesítés
 Save	PrefletWin		Mentés
 Type	NotificationView		Típus
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Nem lehet leállítani az értesítéseket, mert nem sikerült elérni a kiszolgálót.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nem lehet leállítani az értesítéseket, mert nem sikerült elérni a kiszolgálót.\nEbből következően az InfoPopper telepítése sem volt sikeres.
-OK	NotificationView		OK
+OK	NotificationView		Rendben
 Important	NotificationView		Fontos
 Cannot disable notifications because the server can't be reached.	GeneralView		Nem lehet letiltani az értesítéseket, mert nem sikerült elérni a kiszolgálót.
 Progress	NotificationView		Folyamat
@@ -38,7 +38,7 @@ Information	NotificationView		Információ
 Window width:	DisplayView		Ablakszélesség:
 Application	NotificationView		Alkalmazás
 Enabled	NotificationView		Engedélyezve
-OK	DisplayView		OK
+OK	DisplayView		Rendben
 Unknown	NotificationView		Ismeretlen
 Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nem lehet menteni a beállításokat, valószínűleg nem rendelkezik írási jogosultságokkal a boot beállításmappához.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Nem sikerült menteni a beállításokat.\nValószínűleg nem rendelkezik írási jogosultságokkal a beállításmappához.

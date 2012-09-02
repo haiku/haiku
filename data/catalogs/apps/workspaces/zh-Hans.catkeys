@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-WORK	4170489135
+1	english	x-vnd.Be-WORK	2548258861
 Invalid argument: %s\n	Workspaces		无效参数：%s\n
 Quit	Workspaces		退出
 Workspaces	System name		工作区
@@ -12,3 +12,4 @@ OK	Workspaces		确定
 Always on top	Workspaces		置顶
 Live in the Deskbar	Workspaces		驻留桌面栏
 Show window tab	Workspaces		显示窗口标签
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		使用方法: %s [选项] [工作空间]\n其中的 \"options\" 如下：\n--notitle\t\t移除标题，并保留边框和尺寸调整控件\n--noborder\t\t移除标题，边框和尺寸调整控件\n--avoidfocus\t\t阻止窗口被按键事件控制\n--alwaysontop\t\t窗口置顶\n--notmovable\t\t禁用移动窗口\n--autoraise\t\t到达屏幕边界时，自动打开工作空间窗口\n--help\t\t显示帮助并退出\n并且 \"workspace\" 是切换到的工作空间编号（0-31）\n

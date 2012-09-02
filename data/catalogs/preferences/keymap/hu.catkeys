@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-Keymap	4022885915
 Shift:	Modifier keys window	Shift key role name	Váltógomb:
-Revert	Modifier keys window		Visszaállítás
+Revert	Modifier keys window		Visszaállít
 Tilde trigger	Keymap window		Hullámvonal kapcsoló
 Grave trigger	Keymap window		Fordított ékezet kapcsoló
 Role	Modifier keys window	As in the role of a modifier key	Szerep
@@ -25,7 +25,7 @@ Sample and clipboard:	Keymap window		Minta és vágólap:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opc billentyű
 Layout	Keymap window		Elrendezés
 Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció váltása Windows/Linux módra
-Revert	Keymap window		Visszaállítás
+Revert	Keymap window		Visszaállít
 Command:	Modifier keys window	Command key role name	Parancsbillentyű:
 Save as…	Keymap window		Mentés másként…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd billentyű

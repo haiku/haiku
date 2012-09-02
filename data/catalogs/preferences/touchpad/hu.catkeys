@@ -5,13 +5,13 @@ Revert	TouchpadPrefView		Visszaállít
 Tapping	TouchpadPrefView		Érintőtábla használata
 Please confirm	TouchpadPrefView		Kérjük, erősítse meg
 Two finger scrolling	TouchpadPrefView		Kétujjas görgetés
-Defaults	TouchpadPrefView		Alapértelmezés
+Defaults	TouchpadPrefView		Eredeti
 Slow	TouchpadPrefView		Lassú
 Vertical	TouchpadPrefView		Függőleges
 High	TouchpadPrefView		Magas
 Horizontal scrolling	TouchpadPrefView		Vízszintes görgetés
 Fast	TouchpadPrefView		Gyors
-OK	TouchpadPrefView		OK
+OK	TouchpadPrefView		Rendben
 Acceleration	TouchpadPrefView		Gyorsulás
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Az új görgetési terület túl nagy és hátráltathatja az egér használatában. Biztos meg szeretné változtatni?
 Horizontal	TouchpadPrefView		Vízszintes

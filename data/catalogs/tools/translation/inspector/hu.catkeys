@@ -15,18 +15,18 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		A mentés funkció még nincs megvalósítva.
 First Page	ImageWindow		Első oldal
 Next Page	ImageWindow		Következő oldal
-Open...	ImageWindow		Megnyitás...
+Open...	ImageWindow		Megnyitás…
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nHasznált fordító:\nName: %1\nInfó: %2\nVerzió: %3\n
-Save...	ImageWindow		Mentés...
+Save...	ImageWindow		Mentés…
 Info	ImageWindow		Infó
-OK	ImageWindow		OK
+OK	ImageWindow		Rendben
 Window	ImageWindow		Ablak
 Quit	ImageWindow		Kilépés
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Kiválasztott Dokumentum: %1\n\nHasznált Fordító:\nNév: %2\nInfó: %3\nVerzió: %4\n
 Active Translators	ImageWindow		Aktív fordítók
 View	ImageWindow		Nézet
 Previous Page	ImageWindow		Előző oldal
-OK	ImageView		OK
+OK	ImageView		Rendben
 System Translators	ActiveTranslatorsWindow		Rendszerfordítók
 Unknown	ImageView		Ismeretlen
 File	ImageWindow		Fájl

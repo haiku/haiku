@@ -40,7 +40,7 @@ Get name of the transport add-on used for this printer	Printer Scripting		Megadj
 All pages, %1 copies	ConfigWindow		Minden oldal, %1 példány
 Delete a specific printer	PrintServerApp Scripting		Törli a megadott nyomtatót
 Create a new printer	PrintServerApp Scripting		Létrehoz egy új nyomtatót
-OK	PrintServerApp		OK
+OK	PrintServerApp		Rendben
 Print setup	ConfigWindow		Nyomtatási beállítások
 A1	ConfigWindow	ISO 216 paper size	A1
 Retrieve a specific transport	PrintServerApp Scripting		Megad egy kiválasztott transzportert

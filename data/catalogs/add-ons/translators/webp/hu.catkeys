@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-WebPTranslator	2427600890
+1	hungarian	x-vnd.Haiku-WebPTranslator	3197103165
 Compression method:	ConfigView		Tömörítés módja:
+WebP image translator	ConfigView		WebP képértelmező
 Based on libwebp v0.1,	ConfigView		A libwebp v0.1 alapján,
 Preset	ConfigView		Beállítások
 WebP images	WebPTranslator		WebP Képek
@@ -15,7 +16,7 @@ Picture	ConfigView		Kép
 Low	ConfigView		Alacsony
 High	ConfigView		Magas
 Drawing	ConfigView		Rajz
-Default	ConfigView		Alapértelmezett
+Default	ConfigView		Eredeti
 Fast	ConfigView		Gyors
 Photo	ConfigView		Fotó
 Preprocessing filter	ConfigView		Előfeldolgozó szűrő

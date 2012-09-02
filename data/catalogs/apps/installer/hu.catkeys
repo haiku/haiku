@@ -79,7 +79,7 @@ Restart system	InstallerWindow		Számítógép újraindítása
 OK	InstallerWindow		Rendben
 Set up partitions…	InstallerWindow		Partíciók szerkesztése…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		A partíciót nem lehetett csatolni. Kérem, válasszon egy másik partíciót!
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Bootkezelő fut...\n\nA telepítés folytatásához zárja be a Bootkezelőt.
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Bootkezelő fut…\n\nA telepítés folytatásához zárja be a Bootkezelőt.
 Install anyway	InstallProgress		Telepítés folytatása
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Hiba történt és a telepítés nem ment teljesen végbe:\n\nA hiba:  „%s”
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
@@ -107,7 +107,7 @@ Boot sector not written because of an internal error.	InstallProgress		A Boot sz
 Additional disk space required: %s	InstallerWindow		Még ennyi hely szükségeltetik: %s
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		MEGJEGYZÉS: Ugyan a merevlemezek elnevezése itt is ugyanúgy működik mint ahogy az a 2.1)-es pontban le van írva, a partíciók elnevezése máshogy működik.\n\n
 Cancel	InstallProgress		Mégsem
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		A Bootkezelő és a Lemezkezelő fut...\n\nA telepítés folytatásához zárja be mindkét alkalmazást.
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		A Bootkezelő és a Lemezkezelő fut…\n\nA telepítés folytatásához zárja be mindkét alkalmazást.
 Try installing anyway	InstallProgress		Feltelepítés megpróbálása
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Tehát a fejléc alá, amit nem szabad átírni, írjon be néhány ehhez hasonló sort:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Biztosan félbeszakítja a telepítést?

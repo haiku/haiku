@@ -1,14 +1,14 @@
 1	hungarian	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		Mentett állás visszaállítása
 Could not set Sudoku:\n%s\n	SudokuWindow		Nem sikerült beállítani ezt:\n%s\n
-Export as…	SudokuWindow		Exportálás...
-OK	SudokuWindow		OK
+Export as…	SudokuWindow		Exportálás…
+OK	SudokuWindow		Rendben
 New	SudokuWindow		Új
 Abort	ProgressWindow		Megszakítás
 Sudoku	System name		Sudoku
 Could not open \"%s\":\n%s\n	SudokuWindow		Nem lehetett megnyitni ezt: \"%s\":\n%s\n
 Easy	SudokuWindow		Könnyű
-Open file…	SudokuWindow		Fájl megnyitása...
+Open file…	SudokuWindow		Fájl megnyitása…
 Solve single field	SudokuWindow		Egy mező megoldása
 Solve	SudokuWindow		Megoldás
 Redo	SudokuWindow		Újra

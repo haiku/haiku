@@ -2,47 +2,47 @@
 Memory usage	ProcessController		Memóriahasználat
 Do you really want to kill the team \"%s\"?	ProcessController		Biztos le kívánja állítani a(z) \"%s\" csapatot?
 Idle priority	ProcessController		Üresjárat prioritás
-Restart Deskbar	ProcessController		Deskbar újraindítása
+Restart Deskbar	ProcessController		Asztalsáv újraindítása
 Custom priority	ProcessController		Egyéni prioritás
 Debug thread	ProcessController		Szál hibakeresése
-This team is already gone…	ProcessController		Ez a csapat már eltűnt...
+This team is already gone…	ProcessController		Ez a csapat már eltűnt…
 Error saving file	ProcessController		Hiba történt a fájl mentése során
 Real-time priority	ProcessController		Valós idejű prioritás
 Your setting file could not be saved!\n(%s)	ProcessController		A beállításfájlt nem sikerült elmenteni!\n(%s)
-This thread is already gone…	ProcessController		Ez a szál már eltűnt...
+This thread is already gone…	ProcessController		Ez a szál már eltűnt…
 Cancel	ProcessController		Mégse
 Display priority	ProcessController		Kijelzési prioritás
 Run in window	ProcessController		Futtatás ablakban
 Processor %d	ProcessController		%d processzor
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-ProcessController is already installed in Deskbar.	ProcessController		A Folyamatkezelő már telepítve van a Deskbarra.
-This is the last active processor...\nYou can't turn it off!	ProcessController		Ez a legutolsó aktív processzor...\nNem lehet leállítani!
+ProcessController is already installed in Deskbar.	ProcessController		A Folyamatkezelő már telepítve van az Asztalsávra.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Ez a legutolsó aktív processzor…\nNem lehet leállítani!
 Info	ProcessController		Infó
 Quit application	ProcessController		Kilépés az alkalmazásból
 Low priority	ProcessController		Alacsony prioritás
 What do you want to do with the thread \"%s\"?	ProcessController		Mit kíván tenni a(z) \"%s\" szállal?
-Gone teams…	ProcessController		Eltűnt csapatok...
+Gone teams…	ProcessController		Eltűnt csapatok…
 Lowest active priority	ProcessController		Legalacsonyabb aktív prioritás
 Restart Tracker	ProcessController		Tracker újraindítása
-Live in the Deskbar	ProcessController		Átrakás a Deskbarra
+Live in the Deskbar	ProcessController		Átrakás az Asztalsávra
 Kill this thread!	ProcessController		Szál leállítása!
 Debug this thread!	ProcessController		Szál hibakeresése!
 Normal priority	ProcessController		Normál prioritás
 New Terminal	ProcessController		Új terminál
 Urgent priority	ProcessController		Magas prioritás
-About ProcessController…	ProcessController		Folyamatkezelő névjegye...
-Ok!	ProcessController		Ok!
+About ProcessController…	ProcessController		Folyamatkezelő névjegye…
+Ok!	ProcessController		Rendben!
 Quit an application	ProcessController		Kilépés egy alkalmazásból
-Install in Deskbar	ProcessController		Telepítés a Deskbarra
+Install in Deskbar	ProcessController		Telepítés az Asztalsávra
 Threads and CPU usage	ProcessController		Szálak és processzorhasználat
 Urgent display priority	ProcessController		Magas kijelzési prioritás
-OK	ProcessController		OK
+OK	ProcessController		Rendben
 Damned!	ProcessController		Fenébe!
 Usage: %s [-deskbar]\n	ProcessController		Használat: %s [-deskbar]\n
 ProcessController	System name		Folyamatkezelő
 Real-time display priority	ProcessController		Valós idejű kijelzési prioritás
 Please confirm	ProcessController		Jóváhagyás
 Yes, kill this team!	ProcessController		Igen, állítsa le a csapatot!
-System resources & caches…	ProcessController		Rendszer erőforrásai és gyorsítótárai...
+System resources & caches…	ProcessController		Rendszer erőforrásai és gyorsítótárai…
 That's no Fun!	ProcessController		Ez nem vicces!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Futtathatja a Folyamatkezelőt egy ablakban, vagy feltelepítheti azt a Deskbarra.
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Futtathatja a Folyamatkezelőt egy ablakban, vagy feltelepítheti azt az Asztalsávra.
