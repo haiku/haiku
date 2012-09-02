@@ -9,7 +9,7 @@ Includes [ FGristFiles AntialiasingSettingsView.cpp ]
 Preference Appearance :
 	APRMain.cpp
 	AntialiasingSettingsView.cpp
-	DecorSettingsView.cpp
+	LookAndFeelSettingsView.cpp
 	FontSelectionView.cpp
 	FontView.cpp
 	APRView.cpp
@@ -40,7 +40,7 @@ DoCatalogs Appearance :
 	ColorSet.cpp
 	ColorWell.cpp
 	ColorWhichItem.cpp
-	DecorSettingsView.cpp
+	LookAndFeelSettingsView.cpp
 	FontView.cpp
 	FontSelectionView.cpp
 ;
