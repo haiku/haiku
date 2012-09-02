@@ -16,6 +16,7 @@
 
 
 class BButton;
+class BCheckBox;
 class BMenuField;
 class BPopUpMenu;
 
@@ -40,6 +41,8 @@ private:
 			void				_BuildDecorMenu();
 			void				_AdoptToCurrentDecor();
 			void				_AdoptInterfaceToCurrentDecor();
+			bool				_GetDoubleScrollbarArrowsSetting();
+			void				_SetDoubleScrollbarArrowsSetting(bool value);
 
 private:
 			DecorInfoUtility	fDecorUtility;
@@ -47,9 +50,11 @@ private:
 			BButton*			fDecorInfoButton;
 			BMenuField*			fDecorMenuField;
 			BPopUpMenu*			fDecorMenu;
+			BCheckBox*			fDoubleScrollbarArrowsCheckBox;
 
 			BString				fSavedDecor;
 			BString				fCurrentDecor;
+			bool				fSavedDoubleArrowsValue;
 };
 
 #endif // DECOR_SETTINGS_VIEW_H
