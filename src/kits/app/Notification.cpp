@@ -75,6 +75,16 @@ BNotification::BNotification(BMessage* archive)
 	if (archive->FindRef("_onClickFile", &onClickFile) == B_OK)
 		SetOnClickFile(&onClickFile);
 
+	entry_ref onClickRef;
+	int32 index = 0;
+	while (archive->FindRef("_onClickRef", index++, &onClickRef) == B_OK)
+		AddOnClickRef(&onClickRef);
+
+	BString onClickArgv;
+	index = 0;
+	while (archive->FindString("_onClickArgv", index++, &onClickArgv) == B_OK)
+		AddOnClickArg(onClickArgv);
+
 	status_t ret = B_OK;
 	BMessage icon;
 	if ((ret = archive->FindMessage("_icon", &icon)) == B_OK) {
@@ -131,7 +141,7 @@ BNotification::Instantiate(BMessage* archive)
 /*! \brief Archives the BNotification in the BMessages @archive.
 
 	\sa BArchivable::Archive(), Instantiate() static function.
-	\return 
+	\return
 	- \c B_OK: Everything went fine.
 	- \c Other errors: Archiving has failed.
 */
