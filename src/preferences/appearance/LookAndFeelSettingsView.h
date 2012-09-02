@@ -5,9 +5,10 @@
  *  Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Ryan Leavengood <leavengood@gmail.com>
  */
-#ifndef DECOR_SETTINGS_VIEW_H
-#define DECOR_SETTINGS_VIEW_H
+#ifndef LOOK_AND_FEEL_SETTINGS_VIEW_H
+#define LOOK_AND_FEEL_SETTINGS_VIEW_H
 
 
 #include <DecorInfo.h>
@@ -21,10 +22,10 @@ class BMenuField;
 class BPopUpMenu;
 
 
-class DecorSettingsView : public BView {
+class LookAndFeelSettingsView : public BView {
 public:
-								DecorSettingsView(const char* name);
-	virtual						~DecorSettingsView();
+								LookAndFeelSettingsView(const char* name);
+	virtual						~LookAndFeelSettingsView();
 
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
@@ -57,4 +58,4 @@ private:
 			bool				fSavedDoubleArrowsValue;
 };
 
-#endif // DECOR_SETTINGS_VIEW_H
+#endif // LOOK_AND_FEEL_SETTINGS_VIEW_H
