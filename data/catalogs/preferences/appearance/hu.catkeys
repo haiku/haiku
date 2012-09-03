@@ -1,19 +1,19 @@
 1	hungarian	x-vnd.Haiku-Appearance	2671941221
 Plain font:	Font view		Alap betűtípus:
-Control highlight	Colors tab		Kiválasztás szabályozása
-Control border	Colors tab		Szegély szabályozása
+Control highlight	Colors tab		Kiválasztott vezérlőelem
+Control border	Colors tab		Vezérlőelem kerete
 Antialiasing type:	AntialiasingSettingsView		Élsimítás módja:
 Shadow	Colors tab		Árnyék
 On	AntialiasingSettingsView		Be
-Defaults	APRWindow		Alapértelmezés
+Defaults	APRWindow		Eredeti
 Grayscale	AntialiasingSettingsView		Szürkeárnyalat
 Shine	Colors tab		Ragyogás színe
 About	DecorSettingsView		Névjegy
 Off	AntialiasingSettingsView		Ki
-Choose Decorator	DecorSettingsView		Díszítés kiválasztása
+Choose Decorator	DecorSettingsView		Dekoráció kiválasztása
 Success	Colors tab		Sikerült
-Inactive window tab text	Colors tab		Nem aktív ablak címszövege
-About Decorator	DecorSettingsView		Díszítés névjegye
+Inactive window tab text	Colors tab		Inaktív ablak címszövege
+About Decorator	DecorSettingsView		Dekoráció névjegye
 Failure	Colors tab		Nem sikerült
 Hinting menu	AntialiasingSettingsView		Körvonalmenü
 Document background	Colors tab		Dokumentum háttere
@@ -37,20 +37,20 @@ Panel background	Colors tab		Panel háttere
 Menu font:	Font view		Menü betütípusa:
 Colors	APRWindow		Színek
 Control background	Colors tab		Kiválasztás háttere
-Inactive window tab	Colors tab		Nem aktív albak füle
+Inactive window tab	Colors tab		Inaktív ablak füle
 Appearance	System name		Megjelenés
 Fixed font:	Font view		Rögzített szélességű betűtípus:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
 Reduce colored edges filter strength:	AntialiasingSettingsView		A színezett betűszélek szűrőjének erősségi szintje:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		A glifakörvonalasítással összevont szubpixel-alapú élsimítás nem használható a Haiku ezen kiadásában, mivel lehetséges szabadalmi viták forrása lehet. E funckió használatához magának kell megépítenie saját Haiku-rendszerét és beállítania bizonyos opciókat a libfreetype konfigurációs fejlécében.
-Control text	Colors tab		Alapszöveg
-Tooltip text	Colors tab		Eszköztár-szöveg
+Control text	Colors tab		Vezérlőelem szövege
+Tooltip text	Colors tab		Buboréksúgó szövege
 Bold font:	Font view		Félkövér betű:
 Inactive window border	Colors tab		Inaktív ablakkeret
 Menu item text	Colors tab		Menüelem-szöveg
 LCD subpixel	AntialiasingSettingsView		LCD-szubpixel
 Selected menu item border	Colors tab		Kiválasztott menüelem szegélye
-Strong	AntialiasingSettingsView		Félkövér
+Strong	AntialiasingSettingsView		Erős
 Panel text	Colors tab		Panel szövege
 Decorators	APRWindow		Dekorációk
 Monospaced fonts only	AntialiasingSettingsView		Csak rögzített szélességű betűtípusok

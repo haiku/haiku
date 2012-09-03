@@ -57,7 +57,7 @@ About to write the boot menu to disk. Are you sure you want to continue?	BootMan
 The old Master Boot Record was successfully saved to %s.	BootManagerController		A régi MBR elmentésre került ide: %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Alapértelmezett partíció:
 Partitions	DefaultPartitionPage	Pop up menu title	Partíciók
-BootManager	System name		BootManager
+BootManager	System name		Rendszertöltő menü
 Summary	BootManagerController	Title	Összegzés
 OK	BootManagerController	Button	Rendben
 Immediately	DefaultPartitionPage		Azonnal
