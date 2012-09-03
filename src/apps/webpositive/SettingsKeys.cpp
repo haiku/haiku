@@ -49,3 +49,6 @@ const char* kDefaultSearchPageURL = "http://www.google.com";
 const char* kSettingsKeyUseProxy = "use http proxy";
 const char* kSettingsKeyProxyAddress = "http proxy address";
 const char* kSettingsKeyProxyPort = "http proxy port";
+const char* kSettingsKeyUseProxyAuth = "use http proxy authentication";
+const char* kSettingsKeyProxyUsername = "http proxy username";
+const char* kSettingsKeyProxyPassword = "http proxy password";
