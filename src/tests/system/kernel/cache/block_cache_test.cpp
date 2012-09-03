@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -398,6 +398,45 @@ test_abort_sub_transaction()
 	gBlocks[1].write = true;
 	gBlocks[1].is_dirty = false;
 
+	cache_end_transaction(gCache, id, NULL, NULL);
+	cache_sync_transaction(gCache, id);
+
+	start_test("Abort sub with empty block");
+	id = cache_start_transaction(gCache);
+
+	gBlocks[1].present = true;
+	gBlocks[1].read = true;
+
+	block = block_cache_get_writable(gCache, 1, id);
+	or_block(block, BLOCK_CHANGED_IN_PREVIOUS);
+	gBlocks[1].original = gBlocks[1].current;
+	gBlocks[1].current |= BLOCK_CHANGED_IN_PREVIOUS;
+
+	block_cache_put(gCache, 1);
+
+	gBlocks[1].is_dirty = true;
+	TEST_BLOCKS(1, 1);
+
+	cache_start_sub_transaction(gCache, id);
+
+	gBlocks[0].present = true;
+
+	block = block_cache_get_empty(gCache, 0, id);
+	or_block(block, BLOCK_CHANGED_IN_SUB);
+	gBlocks[0].current = BLOCK_CHANGED_IN_SUB;
+
+	block_cache_put(gCache, 0);
+
+	cache_abort_sub_transaction(gCache, id);
+
+	gBlocks[0].write = false;
+	gBlocks[0].is_dirty = false;
+	gBlocks[0].parent = 0;
+	gBlocks[0].original = 0;
+	TEST_BLOCKS(0, 1);
+
+	gBlocks[1].write = true;
+	gBlocks[1].is_dirty = false;
 	cache_end_transaction(gCache, id, NULL, NULL);
 	cache_sync_transaction(gCache, id);
 }
