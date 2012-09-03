@@ -263,8 +263,10 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 		fFlags(0),
 		fItemList(0),
 		fContainer(0),
-		fTypesList(list)
+		fTypesList(new BObjectList<BString>(10, true))
 {
+	if (list != NULL)
+		*fTypesList = *list;
 	InitIconPreloader();
 
 	SetFont(be_plain_font);
@@ -292,8 +294,10 @@ BNavMenu::BNavMenu(const char* title, uint32 message,
 		fFlags(0),
 		fItemList(0),
 		fContainer(0),
-		fTypesList(list)
+		fTypesList(new BObjectList<BString>(10, true))
 {
+	if (list != NULL)
+		*fTypesList = *list;
 	InitIconPreloader();
 
 	SetFont(be_plain_font);
@@ -313,6 +317,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message,
 
 BNavMenu::~BNavMenu()
 {
+	delete fTypesList;
 }
 
 
@@ -814,7 +819,7 @@ BNavMenu::SetShowParent(bool show)
 void
 BNavMenu::SetTypesList(const BObjectList<BString>* list)
 {
-	fTypesList = list;
+	*fTypesList = *list;
 }
 
 
