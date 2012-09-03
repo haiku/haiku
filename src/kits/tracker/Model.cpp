@@ -1109,12 +1109,14 @@ Model::SupportsMimeType(const char* type, const BObjectList<BString>* list,
 		if (type) {
 			BString typeString(type);
 			match = MatchMimeTypeString(&typeString, mimeSignature);
-		} else
-			match = WhileEachListItem(const_cast<BObjectList<BString>*>(list),
-				MatchMimeTypeString, mimeSignature);
-				// const_cast shouldnt be here, have to have it until
-				// MW cleans up
-
+		} else {
+			if (list != NULL && !list->IsEmpty()) {
+				match = WhileEachListItem(const_cast<BObjectList<BString>*>(list),
+					MatchMimeTypeString, mimeSignature);
+			}
+			// const_cast shouldnt be here, have to have it until
+			// MW cleans up
+		}
 		if (match == kMatch)
 			// supports the actual type, it can't get any better
 			return kModelSupportsType;
