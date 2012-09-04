@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-GLTeapot	3688092856
+1	lithuanian	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Viršuje centre
 Lighting	TeapotWindow		Apšvietimas
 Off	TeapotWindow		Išjungta
@@ -9,6 +9,7 @@ Blue	TeapotWindow		Mėlyna
 Gouraud shading	TeapotWindow		Guro šešėliavimas
 Quit	TeapotWindow		Baigti darbą
 Filled polygons	TeapotWindow		Užpildyti daugiakampiai
+Settings	TeapotWindow		Nuostatos
 Fog	TeapotWindow		Rūkas
 Backface culling	TeapotWindow		Nugarėlių atranka
 Z-buffered	TeapotWindow		Z–buferiavimas

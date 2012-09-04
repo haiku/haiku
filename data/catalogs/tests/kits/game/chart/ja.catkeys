@@ -13,13 +13,13 @@ LineArray	ChartWindow		LineArray
 Free motion	ChartWindow		自由運動
 (high) 100% 	ChartWindow		(高) 100% 
 Green	ChartWindow		緑
-Amas	ChartWindow		Amas
+Amas	ChartWindow		星団
 2 threads	ChartWindow		2 スレッド
 Yellow	ChartWindow		黄
 Off	ChartWindow		オフ
 Chaos	ChartWindow		カオス
 Full screen	ChartWindow		全画面表示
-Spiral	ChartWindow		渦巻
+Spiral	ChartWindow		渦状銀河
 Slow motion	ChartWindow		スローモーション
  5% (low)	ChartWindow		5% (低)
 Fast motion	ChartWindow		高速モーション

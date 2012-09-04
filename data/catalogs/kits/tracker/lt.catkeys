@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	918781021
+1	lithuanian	x-vnd.Haiku-libtracker	1301055003
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -15,11 +15,14 @@ Decrease size	ContainerWindow		Sumažinti
 Mini icon view	VolumeWindow		Rodyti mažas piktogramas
 You must have at least one attribute showing.	PoseView		Bent vienas požymis turi likti matomas.
 Permissions	InfoWindow		Leidimai
+128 x 128	DeskWindow		128×128
 Invert selection	VolumeWindow		Invertuoti žymėjimą
+128 x 128	ContainerWindow		128×128
 Recent documents	FavoritesMenu		Paskiausi dokumentai
 Modified	QueryPoseView		Modifikavimo data
 Created	ContainerWindow		Sukūrimo data
 Error %error loading add-On %name.	ContainerWindow		Klaida %error įkeliant priedą „%name“.
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeigu %ifYouDoAction Nuostatų aplanką, „%osName“ sistemos elgesys taps nenuspėjamas!\n\nAr tikrai norite tai atlikti?
 contains	SelectionWindow		savyje turi
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Apgailestaujame, tačiau į šakninį failų sistemos aplanką nieko rašyti neleidžiama.
 Show shared volumes on Desktop	SettingsView		Darbalaukyje rodyti bendrintus tomus
@@ -39,6 +42,7 @@ Make active printer	ContainerWindow		Laikyti numatytuoju spausdintuvu
 Create link here	ContainerWindow		Sukurti nuorodą čia
 Moving: 	StatusWindow		Perkeliama:
 before	FindPanel		iki
+Error emptying Trash	FSUtils		Klaida tuštinant Šiukšlinę
 On	FindPanel		Tome
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		didesnis nei
@@ -89,7 +93,9 @@ Cut	FilePanelPriv		Iškirpti
 Replace	FilePanelPriv		Pakeisti
 Select all	VolumeWindow		Pažymėti visus
 Opens with:	InfoWindow		Atveriamas naudojant:
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeigu %ifYouDoAction MIME nuostatas, „%osName“ sistemos elgesys taps nenuspėjamas!\n\nAr tikrai norite tai atlikti?
 Open	ContainerWindow		Atverti
+96 x 96	DeskWindow		96×96
 Error calculating folder size.	InfoWindow		Skaičiuojant aplanko dydį, įvyko klaida.
 New folder	FilePanelPriv		Naujas aplankas
 %name info	InfoWindow	InfoWindow Title	Informacija apie „%name“
@@ -117,6 +123,7 @@ Move to Trash	ContainerWindow		Išmesti Šiukšlinėn
 Move to	ContainerWindow		Perkelti į
 Create %s clipping	PoseView		Sukurti „%s“ tipo iškarpą
 Set new link target	InfoWindow		Keisti nuorodos paskirtį
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction Sistemos aplanką arba jo turinį, nebegalėsite įkelti „%osName“ sistemos!\n\nAr tikrai norite tai atlikti?\n\nJeigu vis tiek norite %toDoAction Sistemos aplanką, spustelėkite mygtuką „%toConfirmAction“, laikydami nuspaustą Lyg2 klavišą.
 Save as Query template:	FindPanel		Įrašyti kaip užklausos šabloną:
 preferences	B_PREFERENCES_DIRECTORY		Nuostatos
 Cancel	FSUtils		Atsisakyti
@@ -140,6 +147,7 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Deja, vienu metu įrašyti daugiau nei vieno failo neleidžiama.
 Searching for disks to mount…	StatusWindow		Ieškoma prijungtinų diskų…
 New folder	FSUtils		Naujas aplankas
+If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction aplanką „Bendra“, „%osName“ sistemos elgesys taps nenuspėjamas!\n\nAr tikrai norite tai atlikti?\n\nJeigu vis tiek norite %toDoAction aplanką „Bendra“, spustelėkite mygtuką „%toConfirmAction“, laikydami nuspaustą Lyg2 klavišą.
 Free space color	SettingsView		Laisvos vietos spalva
 Cut	ContainerWindow		Iškirpti
 Remove	FindPanel		Pašalinti
@@ -249,6 +257,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 Cancel	ContainerWindow		Atsisakyti
 Only the boot disk	AutoMounterSettings		Tik paleidimo tomą
 Trash	TrackerSettingsWindow		Šiukšlinė
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeigu %ifYouDoAction konfigūracijos aplanką, „%osName“ sistemos elgesys taps nenuspėjamas!\n\nAr tikrai norite tai atlikti?
 Unmount	ContainerWindow		Atjungti
 Copy layout	ContainerWindow		Kopijuoti išdėstymą
 label too long	PoseView		vardas per ilgas
@@ -309,6 +318,7 @@ The Tracker must be running to see Info windows.	PoseView		Informacijos langams 
 Other	FilePermissionsView		Kiti
 Query name:	FindPanel		Užklausos vardas:
 Permissions	ContainerWindow		Leidimai
+96 x 96	ContainerWindow		96×96
 moving	FSUtils		perkeliate
 Identify	InfoWindow		Atpažinti
 Recent folders	ContainerWindow		Paskiausi aplankai
@@ -334,6 +344,7 @@ Handles any file	OpenWithWindow		Palaiko visus failus
 Get info	FilePanelPriv		Savybės
 32 x 32	DeskWindow		32×32
 Cancel	FilePanelPriv		Atsisakyti
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Programa „%appname“ nepalaiko dokumento, kurį bandote ja atverti, tipo.\nAr tikrai norite tęsti?\n\nJeigu žinote, jog ši programa geba dirbti su šio tipo dokumentais, jums derėtų susisiekti su programos leidėju ir paprašyti programą pataisyti, kad ji nurodytų šį dokumentų tipą kaip palaikomą.
 Disks	DirMenu		Tomai
 New folder %ld	FSUtils		Naujas aplankas %ld
 All BeOS disks	AutoMounterSettings		Visus „BeOS“ tomus
@@ -367,9 +378,11 @@ Modified	FindPanel		Modifikavimo data
 Error moving \"%name\" to Trash. (%error)	FSUtils		Klaida perkeliant „%name“ į Šiukšlinę (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Aplanko pakeisti vienu jo poaplankių negalima.
 <No recent items>	FavoritesMenu		<Paskiausių objektų nėra>
+Preferences…	ContainerWindow		Nuostatos…
 Move	PoseView		Perkelti
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ar tikrai norite pašalinti pažymėtus objektus? Neužmirškite, jog šis veiksmas negrįžtamas.
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction Namų aplanką, „%osName“ sistemos elgesys taps nenuspėjamas!\n\nAr tikrai norite tai atlikti?\n\nJeigu vis tiek norite %toDoAction Namų aplanką, spustelėkite mygtuką „%toConfirmAction“, laikydami nuspaustą Lyg2 klavišą.
 Add-ons	DeskWindow		Priedai
 Name	FindPanel		Vardas
 And	FindPanel		ir

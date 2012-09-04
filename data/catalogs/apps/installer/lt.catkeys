@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Installer	2099988747
+1	lithuanian	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Taigi, /boot/grub/menu.lst failo gale, po visų kitų meniu punktų aprašų, prirašykite kažką panašaus į šias eilutes:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ar tikrai norite nutraukti diegimą ir paleisti kompiuterį iš naujo?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -12,6 +12,7 @@ With GRUB it's: (hdN,n)\n\n	InstallerApp		„GRUB“ atveju jie įvardijami taip
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Nutraukti
 Install progress:  	InstallerWindow		Įdiegiama: 
+2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Diegimas pradedamas.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ši programinė įranga kol kas yra alfa kokybės! Tai reškia, jog ją naudojant, yra nemaža rizika prarasti svarbius duomenis. Įspėjame – dažnai darykitės atsargines kopijas!\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Ar tikrai norite nutraukti diegimą?
@@ -37,6 +38,7 @@ Boot sector successfully written.	InstallProgress		Paleidimo sektorius sėkminga
 Performing installation.	InstallProgress		Diegiama.
 scanning…	InstallerWindow		žvalgoma…
 Set up boot menu	InstallerWindow		Įdiegti paleidyklės meniu
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (pradedant „os-prober“ 1.44 versija)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Pirmojo loginio disko numeris visuomet yra 4, nepriklausomai nuo pirminių skaidinių kiekio.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		„GRUB“ diskų vardai vis dar atrodo taip: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <Jūsų mėgiamas tekstų redaktorius> /boot/grub/menu.lst\n\n
@@ -48,6 +50,7 @@ README	InstallerApp		Lydimoji instrukcija
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Paskirties diske nepakanka vietos. Išsirinkite kitą diską arba pašalinkite žymėjimą nuo papildomų paketų, kad šie nebūtų diegiami.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Paleidyklės ir Diskų ženklintuvo langus.
 Scanning for disks…	InstallerWindow		Apžvelgiami kaupikliai…
+2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Šio disko prijungti negalima. Pasirinkite kitą diską.
 ?? of ??	InstallerWindow	Unknown progress	?? iš ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku\" {\n
@@ -67,6 +70,7 @@ Installer	System name		Įdiegimo programa
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Skaidinio turinio diegti į jį patį negalima. Pasirinkite kitą skaidinį.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		„n“ – skaidinio numeris, kuris „GRUB 2“ atveju pradedamas nuo 1.\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Pradedant „os-prober“ 1.44 versija (pavyzdžiui, „Ubuntu 11.04“ ir vėlesnėse laidose), „Haiku“ operacinė sistema turėtų būti aptikta ir atpažinta automatiškai. Kad įtrauktumėte „Haiku“ į „GRUB“ paleidyklės meniu, atverkite terminalą ir įveskite komandą:\n
 Quit DriveSetup	InstallerWindow		Užbaikite Diskų ženklintuvo darbą
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		„N“ – tai standžiojo disko numeris, pradedant nuo 0.\n
 Hide optional packages	InstallerWindow		Nerodyti papildomų paketų
@@ -109,6 +113,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Ar tikrai norite nutraukti diegimą?
 Onto:	InstallerWindow		Į:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Paleidyklės langą.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Pirmąkart sėkmingai paleidę „Haiku“, nepamirškite paskaityti dokumentacijos, esančios „Welcome“ ir „Userguide“ failuose. Saitus į juos rasite Darbalaukyje ir „WebPositive“ adresyne.\n\n
 Tools	InstallerWindow		Priemonės
 The mount point could not be retrieved.	InstallProgress		Prijungimo taško nustatyti nepavyko.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Pasirinktas skaidinys nėra tuščias. Ar tikrai norite tęsti diegimą?\n\nDėmesio: aplankas „system“ bus perrašytas švaria kopija iš šaltinio skaidinio, o visi kiti aplankai bus apjungti, konfliktuojančius failus ir nuorodas perrašant esančiais šaltinio skaidinyje.

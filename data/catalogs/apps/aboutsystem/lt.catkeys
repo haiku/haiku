@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-About	3434348710
+1	lithuanian	x-vnd.Haiku-About	519561637
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		© 1999-2010 „Gutenprint“ autoriai. Visos teisės saugomos.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis'ui Geiselbrecht'ui (už „NewOS“ branduolį)\n
 BSD (4-clause)	AboutView		BSD (4 punktų)
@@ -11,6 +11,7 @@ The Haiku-Ports team\n	AboutView		„Haiku-Ports“ komandai\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		© 1998-2003 Daniel Veillard. Visos teisės saugomos.
 %d MiB used (%d%%)	AboutView		%d MiB naudojama (%d%%)
 Website, marketing & documentation:\n	AboutView		Saityno svetainė, rinkodara ir dokumentacija:\n
+GNU LGPL v2.1	AboutView		GNU LGPL 2.1 versija
 AboutSystem	System name		Apie šią sistemą
 MIT (no promotion)	AboutView		MIT (su ribojimu reklamai)
 Copyright © 2003 Peter Hanappe and others.	AboutView		© 2003 Peter Hanappe ir kiti.
@@ -39,6 +40,7 @@ Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		© 2002-2004
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Atmintis:
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		© 1996-1997 Jeff Prosise. Visos teisės saugomos.
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		© 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		© 1994-2009, Thomas G. Lane, Guido Vollbeding. Ši programinė įranga iš dalies pagrįsta „Independent JPEG Group“ darbu.
 Past maintainers:\n	AboutView		Ankstesni vystytojai:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nYpatingos padėkos:\n

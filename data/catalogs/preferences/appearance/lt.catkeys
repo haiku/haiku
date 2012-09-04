@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Appearance	3882211276
+1	lithuanian	x-vnd.Haiku-Appearance	1557879521
 Plain font:	Font view		Paprastas šriftas:
 Control highlight	Colors tab		Valdiklių paryškinimas
 Control border	Colors tab		Valdiklių rėmeliai
@@ -27,6 +27,7 @@ Window border	Colors tab		Veikiamojo lango rėmelis
 Window tab text	Colors tab		Veikiamojo lango antraštės tekstas
 Document text	Colors tab		Dokumento tekstas
 Navigation pulse	Colors tab		Veikiamojo elemento (židinio) žybsniai
+Window decorator:	DecorSettingsView		Langų dekoruoklis:
 Selected menu item text	Colors tab		Veikiamojo meniu elemento tekstas
 Menu background	Colors tab		Meniu fonas
 OK	DecorSettingsView		Gerai
@@ -50,6 +51,7 @@ LCD subpixel	AntialiasingSettingsView		subpikselinis LCD
 Selected menu item border	Colors tab		Veikiamojo meniu elemento rėmelis
 Strong	AntialiasingSettingsView		Intensyvus
 Panel text	Colors tab		Skydelių tekstas
+Decorators	APRWindow		Dekoruokliai:
 Monospaced fonts only	AntialiasingSettingsView		tik lygiapločių šriftų
 Antialiasing menu	AntialiasingSettingsView		Glodinimo meniu
 Fonts	APRWindow		Šriftai

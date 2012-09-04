@@ -1,6 +1,7 @@
-1	lithuanian	x-vnd.Haiku-CPUFrequencyPref	3079996868
+1	lithuanian	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		Gerai
 CPU frequency status view	CPU Frequency View		Centrinio procesoriaus dažnio indikatorius
+OK	Status view		Gerai
 Set state	Status view		Pasirinkta būsena
 Defaults	Pref Window		Numatytai
 Install replicant into Deskbar	CPU Frequency View		Patalpinti indikatorių pranešimų srityje

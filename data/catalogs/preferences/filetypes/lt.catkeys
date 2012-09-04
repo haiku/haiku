@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-FileTypes	2037267651
+1	lithuanian	x-vnd.Haiku-FileTypes	2496450458
 Application types…	FileTypes Window		Programų tipai…
 Description:	Application Types Window		Aprašas:
 Args only	Application Type Window		Tik argumentai
@@ -49,6 +49,7 @@ Name:	Application Types Window		Pavadinimas:
 Group name:	New File Type Window		Grupės pavadinimas:
 Preferred application	FileType Window		Pageidautina programa
 Progress	Application Types Window		Eiga
+Set preferred application	Preferred App Menu		Skirti pageidautiną programą
 File	Application Type Window		Failas
 Version:	Application Type Window		Versija:
 Select…	FileTypes Window		Parinkti…

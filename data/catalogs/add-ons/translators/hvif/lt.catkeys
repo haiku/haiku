@@ -1,6 +1,8 @@
-1	lithuanian	x-vnd.Haiku-HVIFTranslator	2227623652
+1	lithuanian	x-vnd.Haiku-HVIFTranslator	249304797
+Haiku vector icon translator	HVIFTranslator		„Haiku“ vektorinių piktogramų keitiklis
 HVIF icons	HVIFTranslator		HVIF piktogramos
 Render size:	HVIFView		Piktogramų dydis:
 HVIFTranslator Settings	HVIFTranslator		HVIF keitiklio nuostatos
+Haiku vector icon translator	HVIFView		„Haiku“ vektorinių piktogramų keitiklis
 HVIF Settings	HVIFMain		HVIF nuostatos
 Version %d.%d.%d, %s	HVIFView		Versija %d.%d.%d, %s

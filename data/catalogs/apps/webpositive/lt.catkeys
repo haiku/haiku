@@ -1,0 +1,137 @@
+1	lithuanian	x-vnd.Haiku-WebPositive	1513721873
+Show home button	Settings Window		Rodyti Namų mygtuką
+Username:	Authentication Panel		Naudotojo vardas:
+Copy URL to clipboard	Download Window		Kopijuoti URL adresą į iškarpinę
+Cancel	Settings Window		Atsisakyti
+Close window	WebPositive Window		Užverti langą
+Quit	WebPositive		Baigti darbą
+The download could not be opened.	Download Window		Parsiųsto failo atverti nepavyko.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Parsiuntimų aplanko atverti nepavyko.\n\nKlaida: %error
+Open location	WebPositive Window		Atverti adresą
+Clear history	WebPositive Window		Išvalyti žurnalą
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Vakar
+Default standard font size:	Settings Window		Numatytasis šrifto dydis:
+Start page:	Settings Window		Pradžios tinklapis:
+History	WebPositive Window		Žurnalas
+Error opening downloads folder	Download Window		Klaida atveriant parsiuntimų aplanką
+Paste	WebPositive Window		Įdėti
+Settings	Settings Window		Nuostatos
+%seconds seconds left	Download Window		Liko %seconds sek.
+Confirmation	WebPositive Window		Patvirtinimas
+Window	WebPositive Window		Langas
+Decrease size	WebPositive Window		Sumažinti dydį
+Serif font:	Settings Window		Šriftas su užraitais:
+Loading %url	WebPositive Window		Įkeliamas %url
+Page source	WebPositive Window		Tinklapio pirminis tekstas
+Next	WebPositive Window		Toliau
+Find next	WebPositive Window		Ieškoti toliau
+Download folder:	Settings Window		Parsiuntimų aplankas:
+Edit	WebPositive Window		Taisa
+Over %hours hours left	Download Window		Liko daugiau nei %hours val.
+Cancel	Authentication Panel		Atsisakyti
+Match case	WebPositive Window		Paisyti raidžių registro
+Search page:	Settings Window		Paieškos tinklapis:
+Zoom text only	WebPositive Window		Keisti tik teksto dydį
+Default fixed font size:	Settings Window		Numatytasis lygiapločio šrifto dydis:
+Close tab	WebPositive Window		Užverti kortelę
+Auto-hide mouse pointer	Settings Window		Automatiškai slėpti pelės žymeklį
+Over 1 hour left	Download Window		Liko daugiau nei 1 valanda
+Quit	WebPositive Window		Baigti darbą
+Full screen	WebPositive Window		Visas ekranas
+Open download error	Download Window		Klaida atveriant parsiųstą failą
+Standard font:	Settings Window		Numatytasis šriftas:
+Restart	Download Window		Paleisti iš naujo
+Proxy server	Settings Window		Įgaliotasis serveris
+Open containing folder	Download Window		Atverti aplanką su šiuo failu
+New window	WebPositive Window		Naujas langas
+Open	Download Window		Atverti
+Reload	WebPositive Window		Atsiųsti iš naujo
+Downloads	Download Window		Parsiuntimai
+Sans serif font:	Settings Window		Šriftas be užraitų:
+Over %days days left	Download Window		Liko daugiau nei %days d.
+Forward	WebPositive Window		Pirmyn
+of	Download Window	...as in '12kB of 256kB'	iš
+Revert	Settings Window		Atšaukti pakeitimus
+Fixed font:	Settings Window		Lygiaplotis šriftas:
+Cut	WebPositive Window		Iškirpti
+Bookmark this page	WebPositive Window		Įtraukti šį tinklapį į adresyną
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Bandant atverti Adresyno aplanką, įvyko klaida.\n\nKlaida: %error
+Open downloads folder	Download Window		Atverti parsiuntimų aplanką
+Number of days to keep links in History menu:	Settings Window		Kiek dienų laikyti saitus žurnalo meniu:
+Hide	Download Window		Nerodyti
+Reset size	WebPositive Window		Atstatyti pradinį dydį
+Find:	WebPositive Window		Ieškoti:
+Increase size	WebPositive Window		Padidinti
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Bandant atverti adresyno aplanką, įvyko klaida.\n\nKlaida: %error
+Over 1 day left	Download Window		Liko daugiau nei 1 diena
+Downloads	WebPositive Window		Parsiuntimai
+Requesting %url	WebPositive Window		Siunčiama užklausa tinklapiui %url
+Apply	Settings Window		Taikyti
+Bookmark info	WebPositive Window		Adresyno įrašo savybės
+Size:	Font Selection view		Dydis:
+Show tabs if only one page is open	Settings Window		Rodyti korteles net kai jų tėra viena
+About	WebPositive Window		Apie
+Finish: 	Download Window	Finishing time	Numatoma pabaiga: 
+Fonts	Settings Window		Šriftai
+Close	WebPositive Window		Užverti
+OK	Download Window		Gerai
+Page source error	WebPositive Window		Tinklapio pirminio teksto klaida
+Open blank page	Settings Window		Atverti tuščią tinklapį
+New tabs:	Settings Window		Naujos kortelės:
+Cancel	WebPositive Window		Atsisakyti
+Open all	WebPositive Window		Atverti viską
+Clear	URL Bar		Išvalyti
+Cut	URL Bar		Iškirpti
+Clear	WebPositive Window		Išvalyti
+Remove	Download Window		Pašalinti
+Find	WebPositive Window		Ieškoti
+Find previous	WebPositive Window		Ieškoti ankstesnio frazės egzemplioriaus
+Settings	WebPositive Window		Nuostatos
+Proxy server address:	Settings Window		Įgaliotojo serverio adresas:
+Proxy server port:	Settings Window		Įgaliotojo serverio prievadas:
+Bookmarks	WebPositive Window		Adresynas
+%minutes minutes	Download Window		%minutes min.
+Paste	URL Bar		Įdėti
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Nerodyti slaptažodžio teksto
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą.
+Over 1 minute left	Download Window		Liko daugiau nei 1 minutė
+Open start page	Settings Window		Atverti pradžios tinklapį
+Continue downloads	WebPositive		Tęsti parsiuntimus
+Cancel	Download Window		Atsisakyti
+Open search page	Settings Window		Atverti paieškos tinklapį
+Password:	Authentication Panel		Slaptažodis:
+Back	WebPositive Window		Atgal
+New browser window	Download Window		Naujas naršyklės langas
+Today	WebPositive Window		Šiandien
+1 second left	Download Window		Liko 1 sekundė
+Remember username and password for this site	Authentication Panel		Įsiminti naudotojo vardą ir slaptažodį šioje svetainėje
+Earlier	WebPositive Window		Anksčiau
+Authentication required	Authentication Panel		Būtina nustatyti tapatybę
+Use proxy server to connect to the internet	Settings Window		Jungimuisi prie interneto naudoti įgaliotąjį serverį
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Dar yra vykstančių parsiuntimų. Ar tikrai norite baigti „WebPositive“ darbą?
+Auto-hide interface in full screen mode	Settings Window		Automatiškai slėpti programos sąsają viso ekrano veiksenoje
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	Įkelti %url nepavyko
+New tab	WebPositive Window		Nauja kortelė
+Downloads in progress	WebPositive		Vyksta parsiuntimai
+Style:	Font Selection view		Stilius:
+General	Settings Window		Bendrosios
+View	WebPositive Window		Rodymas
+Previous	WebPositive Window		Ankstesnis
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Sukuriant adresyno įrašą, įvyko klaida.\n\nKlaida: %error
+Bookmark error	WebPositive Window		Adresyno įrašo klaida
+Do you really want to clear the browsing history?	WebPositive Window		Ar tikrai norite išvalyti naršymo žurnalą?
+Copy	WebPositive Window		Kopijuoti
+Open bookmarks confirmation	WebPositive Window		Adresyno įrašų atvėrimo patvirtinimas
+Remove missing	Download Window		Pašalinti trūkstamus
+Clone current page	Settings Window		Klonuoti atvertą tinklapį
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ar tikrai norite atverti iškart %addedCount adresyno įrašus(-ų)?
+OK	Authentication Panel		Gerai
+Copy	URL Bar		Kopijuoti
+OK	WebPositive Window		Gerai
+Manage bookmarks	WebPositive Window		Tvarkyti adresyną
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Šis tinklapis (%bookmarkName) jau yra įtrauktas į adresyną.
+New windows:	Settings Window		Nauji langai:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	Tinklapis „%url“ įkeltas.
+Remove finished	Download Window		Pašalinti užbaigtus

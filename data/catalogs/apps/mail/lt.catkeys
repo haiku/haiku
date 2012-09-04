@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-MAIL	4141360526
+1	lithuanian	x-vnd.Be-MAIL	596741059
 View	Mail		Rodymas
 %d - Date	Mail		%d – data
 Attach attributes:	Mail		Pridedamų failų požymių įtraukimas:
@@ -26,6 +26,7 @@ Expert	Mail		Žinovas
 Reply account:	Mail		Paskyra rašant atsakymą:
 Discard	Mail		Atmesti
 Message	Mail		Laiškas
+Settings…	Mail		Nuostatos…
 Reply to sender	Mail		Atsakyti siuntėjui
 There is no installed handler for URL links.	Mail		Programa, galinti atverti URL saitus, neįdiegta.
 Signature	Mail		Prierašas
@@ -80,6 +81,7 @@ Only files can be added as attachments.	Mail		Kaip priedus pridėti galima tik f
 Previous message	Mail		Ankstesnis laiškas
 Attachments:	Mail		Priedai:
 Title:	Mail		Pavadinimas:
+<no account found>	Mail		<paskyra nerasta>
 Find…	Mail		Ieškoti…
 Accounts…	Mail		Paskyros…
 Mail preferences	Mail		Pašto nuostatos

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PPMTranslator	2435270880
+1	lithuanian	x-vnd.Haiku-PPMTranslator	276252412
 PPM Settings	PPMMain		PPM nuostatos
 Based on PPMTranslator sample code	PPMTranslator		Sukurta PPM keitiklio pavyzdinio kodo pagrindu
 OK	PPMMain		Gerai
@@ -9,6 +9,7 @@ RGBA 5:5:5:1 16 bits	PPMTranslator		RŽMA 5:5:5:1 16 bitų
 Be Bitmap Format (PPMTranslator)	PPMTranslator		„Be“ paveikslų formatas (PPM keitiklis)
 CMYA 8:8:8:8 32 bits	PPMTranslator		ŽPGA 8:8:8:8 32 bitų
 CMYK 8:8:8:8 32 bits	PPMTranslator		ŽPGJ 8:8:8:8 32 bitų
+PPM image translator	PPMTranslator		PPM paveikslų keitiklis
 bits/space	PPMTranslator		bitų/erdvėje
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RŽM 8:8:8 32 bitų, mažėjantys baitai
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RŽM 5:6:5 16 bitų, mažėjantys baitai

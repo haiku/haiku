@@ -1,9 +1,10 @@
-1	lithuanian	x-vnd.Haiku-GIFTranslator	829368084
+1	lithuanian	x-vnd.Haiku-GIFTranslator	2708495435
 Websafe	GIFView		saityno spalvos
 Write interlaced images	GIFView		Naudoti progresinį paveikslų kodavimą
 Optimal	GIFView		optimali
 Greyscale	GIFView		pilkumo tonai
 Be Bitmap Format (GIFTranslator)	GIFTranslator		„Be“ paveikslų formatas (GIF keitiklis)
+GIF image translator	GIFView		GIF paveikslų keitiklis
 GIF image	GIFTranslator		GIF paveikslas
 Write transparent images	GIFView		Naudoti permatomumą
 Palette	GIFView		Paletė
