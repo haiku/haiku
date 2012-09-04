@@ -159,7 +159,7 @@ protected:
 class ReadPage : public SwapTraceEntry {
 public:
 	ReadPage(VMAnonymousCache* cache, page_num_t pageIndex,
-			swap_addr_t swapSlotIndex)
+		swap_addr_t swapSlotIndex)
 		:
 		SwapTraceEntry(cache),
 		fPageIndex(pageIndex),
@@ -183,7 +183,7 @@ private:
 class WritePage : public SwapTraceEntry {
 public:
 	WritePage(VMAnonymousCache* cache, page_num_t pageIndex,
-			swap_addr_t swapSlotIndex)
+		swap_addr_t swapSlotIndex)
 		:
 		SwapTraceEntry(cache),
 		fPageIndex(pageIndex),
@@ -220,7 +220,7 @@ dump_swap_info(int argc, char** argv)
 	kprintf("swap files:\n");
 
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
-			swap_file* file = it.Next();) {
+		swap_file* file = it.Next();) {
 		swap_addr_t total = file->last_slot - file->first_slot;
 		kprintf("  vnode: %p, pages: total: %lu, free: %lu\n",
 			file->vnode, total, file->bmp->free_slots);
@@ -283,9 +283,10 @@ swap_slot_alloc(uint32 count)
 
 	// if this swap file has used more than 90% percent of its space
 	// switch to another
-    if (sSwapFileAlloc->bmp->free_slots
-			< (sSwapFileAlloc->last_slot - sSwapFileAlloc->first_slot) / 10)
+	if (sSwapFileAlloc->bmp->free_slots
+		< (sSwapFileAlloc->last_slot - sSwapFileAlloc->first_slot) / 10) {
 		sSwapFileAlloc = sSwapFileList.GetNext(sSwapFileAlloc);
+	}
 
 	mutex_unlock(&sSwapFileListLock);
 
@@ -297,10 +298,11 @@ static swap_file*
 find_swap_file(swap_addr_t slotIndex)
 {
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
-			swap_file* swapFile = it.Next();) {
+		swap_file* swapFile = it.Next();) {
 		if (slotIndex >= swapFile->first_slot
-				&& slotIndex < swapFile->last_slot)
+			&& slotIndex < swapFile->last_slot) {
 			return swapFile;
+		}
 	}
 
 	panic("find_swap_file(): can't find swap file for slot %ld\n", slotIndex);
@@ -426,7 +428,7 @@ VMAnonymousCache::~VMAnonymousCache()
 {
 	// free allocated swap space and swap block
 	for (off_t offset = virtual_base, toFree = fAllocatedSwapSize;
-			offset < virtual_end && toFree > 0; offset += B_PAGE_SIZE) {
+		offset < virtual_end && toFree > 0; offset += B_PAGE_SIZE) {
 		swap_addr_t slotIndex = _SwapBlockGetAddress(offset >> PAGE_SHIFT);
 		if (slotIndex == SWAP_SLOT_NONE)
 			continue;
@@ -474,8 +476,8 @@ VMAnonymousCache::Resize(off_t newSize, int priority)
 		swap_block* swapBlock = NULL;
 
 		for (page_num_t pageIndex = (newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
-				pageIndex < oldPageCount && fAllocatedSwapSize > 0;
-				pageIndex++) {
+			pageIndex < oldPageCount && fAllocatedSwapSize > 0; pageIndex++) {
+
 			WriteLocker locker(sSwapHashLock);
 
 			// Get the swap slot index for the page.
@@ -718,7 +720,7 @@ VMAnonymousCache::WriteAsync(off_t offset, const generic_io_vec* vecs,
 
 	// create our callback
 	WriteCallback* callback = (flags & B_VIP_IO_REQUEST) != 0
- 		? new(malloc_flags(HEAP_PRIORITY_VIP)) WriteCallback(this, _callback)
+		? new(malloc_flags(HEAP_PRIORITY_VIP)) WriteCallback(this, _callback)
 		: new(std::nothrow) WriteCallback(this, _callback);
 	if (callback == NULL) {
 		if (newSlot) {
@@ -731,8 +733,8 @@ VMAnonymousCache::WriteAsync(off_t offset, const generic_io_vec* vecs,
 		_callback->IOFinished(B_NO_MEMORY, true, 0);
 		return B_NO_MEMORY;
 	}
-// TODO: If the page already had swap space assigned, we don't need an own
-// callback.
+	// TODO: If the page already had swap space assigned, we don't need an own
+	// callback.
 
 	callback->SetTo(pageIndex, slotIndex, newSlot);
 
@@ -1038,7 +1040,7 @@ VMAnonymousCache::_MergePagesSmallerConsumer(VMAnonymousCache* source)
 	// all pages of the source back to the consumer.
 
 	for (VMCachePagesTree::Iterator it = pages.GetIterator();
-			vm_page* page = it.Next();) {
+		vm_page* page = it.Next();) {
 		// If a source page is in the way, remove and free it.
 		vm_page* sourcePage = source->LookupPage(
 			(off_t)page->cache_offset << PAGE_SHIFT);
@@ -1067,9 +1069,9 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 		return;
 
 	for (off_t offset = source->virtual_base
-				& ~(off_t)(B_PAGE_SIZE * SWAP_BLOCK_PAGES - 1);
-			offset < source->virtual_end;
-			offset += B_PAGE_SIZE * SWAP_BLOCK_PAGES) {
+		& ~(off_t)(B_PAGE_SIZE * SWAP_BLOCK_PAGES - 1);
+		offset < source->virtual_end;
+		offset += B_PAGE_SIZE * SWAP_BLOCK_PAGES) {
 
 		WriteLocker locker(sSwapHashLock);
 
@@ -1291,8 +1293,8 @@ void
 swap_init(void)
 {
 	// create swap block cache
-	sSwapBlockCache = create_object_cache("swapblock",
-			sizeof(swap_block), sizeof(void*), NULL, NULL, NULL);
+	sSwapBlockCache = create_object_cache("swapblock", sizeof(swap_block),
+		sizeof(void*), NULL, NULL, NULL);
 	if (sSwapBlockCache == NULL)
 		panic("swap_init(): can't create object cache for swap blocks\n");
 
@@ -1352,8 +1354,9 @@ swap_init_post_modules()
 		size = string ? atoll(string) : 0;
 
 		unload_driver_settings(settings);
-	} else
+	} else {
 		size = (off_t)vm_page_num_pages() * B_PAGE_SIZE * 2;
+	}
 
 	if (size < B_PAGE_SIZE)
 		return;
@@ -1397,7 +1400,7 @@ swap_free_page_swap_space(vm_page* page)
 	cache->fAllocatedSwapSize -= B_PAGE_SIZE;
 	cache->_SwapBlockFree(page->cache_offset, 1);
 
-  	return true;
+	return true;
 }
 
 
@@ -1419,15 +1422,18 @@ swap_total_swap_pages()
 
 	uint32 totalSwapSlots = 0;
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
-			swap_file* swapFile = it.Next();)
+		swap_file* swapFile = it.Next();) {
 		totalSwapSlots += swapFile->last_slot - swapFile->first_slot;
+	}
 
 	mutex_unlock(&sSwapFileListLock);
 
 	return totalSwapSlots;
 }
 
+
 #endif	// ENABLE_SWAP_SUPPORT
+
 
 void
 swap_get_info(struct system_memory_info* info)
