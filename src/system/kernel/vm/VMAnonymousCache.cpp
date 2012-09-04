@@ -1493,7 +1493,11 @@ swap_init_post_modules()
 
 	if (swapAutomatic) {
 		swapEnabled = true;
-		swapSize = (off_t)vm_page_num_pages() * B_PAGE_SIZE * 2;
+		swapSize = (off_t)vm_page_num_pages() * B_PAGE_SIZE;
+		if (swapSize <= (1024 * 1024 * 1024)) {
+			// Memory under 1GB? double the swap
+			swapSize *= 2;
+		}
 	}
 
 	if (!swapEnabled || swapSize < B_PAGE_SIZE)
@@ -1557,25 +1561,18 @@ swap_init_post_modules()
 	const char* swapPath = path.Path();
 
 	// Swap size limits prevent oversized swap files
-	off_t existingSwapSize = 0;
-	struct stat existingSwapStat;
-	if (stat(swapPath, &existingSwapStat) == 0)
-		existingSwapSize = existingSwapStat.st_size;
-
-	off_t freeSpace = info.free_blocks * info.block_size + existingSwapSize;
-	off_t maxSwap = freeSpace;
 	if (swapAutomatic) {
-		// Adjust automatic swap to a maximum of 25% of the free space
-		maxSwap = (off_t)(0.25 * freeSpace);
-	} else {
-		// If user specified, leave 10% of the disk free
-		maxSwap = freeSpace - (off_t)(0.10 * freeSpace);
-		dprintf("%s: Warning: User specified swap file consumes over 90%% of "
-			"the available free space, limiting to 90%%\n", __func__);
-	}
+		off_t existingSwapSize = 0;
+		struct stat existingSwapStat;
+		if (stat(swapPath, &existingSwapStat) == 0)
+			existingSwapSize = existingSwapStat.st_size;
 
-	if (swapSize > maxSwap)
-		swapSize = maxSwap;
+		off_t freeSpace = info.free_blocks * info.block_size + existingSwapSize;
+
+		// Adjust automatic swap to a maximum of 25% of the free space
+		if (swapSize > (freeSpace / 4))
+			swapSize = (freeSpace / 4);
+	}
 
 	// Create swap file
 	int fd = open(swapPath, O_RDWR | O_CREAT | O_NOCACHE, S_IRUSR | S_IWUSR);
