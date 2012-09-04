@@ -1,4 +1,6 @@
 /*
+ * Copyright 2012, Alexander von Gluck IV, kallisti5@unixzen.com.
+ * Copyright 2011, Hamish Morrison, hamish@lavabit.com.
  * Copyright 2008, Zhao Shuai, upczhsh@163.com.
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
@@ -17,13 +19,20 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <FindDirectory.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 
 #include <arch_config.h>
 #include <boot_device.h>
+#include <disk_device_manager/KDiskDevice.h>
+#include <disk_device_manager/KDiskDeviceManager.h>
+#include <disk_device_manager/KDiskSystem.h>
+#include <disk_device_manager/KPartitionVisitor.h>
 #include <driver_settings.h>
 #include <fs/fd.h>
+#include <fs/KPath.h>
+#include <fs_info.h>
 #include <fs_interface.h>
 #include <heap.h>
 #include <kernel_daemon.h>
@@ -68,6 +77,8 @@
 #define SWAP_BLOCK_SHIFT 5		/* 1 << SWAP_BLOCK_SHIFT == SWAP_BLOCK_PAGES */
 #define SWAP_BLOCK_MASK  (SWAP_BLOCK_PAGES - 1)
 
+
+static const char* const kDefaultSwapPath = "/var/swap";
 
 struct swap_file : DoublyLinkedListLinkImpl<swap_file> {
 	int				fd;
@@ -1167,6 +1178,93 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 // #pragma mark -
 
 
+// TODO: This can be removed if we get BFS uuid's
+struct VolumeInfo {
+	char name[B_FILE_NAME_LENGTH];
+	char device[B_FILE_NAME_LENGTH];
+	char filesystem[B_OS_NAME_LENGTH];
+	off_t capacity;
+};
+
+
+class PartitionScorer : public KPartitionVisitor {
+public:
+	PartitionScorer(VolumeInfo& volumeInfo)
+		:
+		fBestPartition(NULL),
+		fBestScore(-1),
+		fVolumeInfo(volumeInfo)
+	{
+	}
+
+	virtual bool VisitPre(KPartition* partition)
+	{
+		if (!partition->ContainsFileSystem())
+			return false;
+
+		KPath path;
+		partition->GetPath(&path);
+
+		int score = 0;
+		if (strcmp(fVolumeInfo.name, partition->ContentName()) == 0)
+			score += 4;
+		if (strcmp(fVolumeInfo.device, path.Path()) == 0)
+			score += 3;
+		if (fVolumeInfo.capacity == partition->Size())
+			score += 2;
+		if (strcmp(fVolumeInfo.filesystem,
+			partition->DiskSystem()->ShortName()) == 0) {
+			score += 1;
+		}
+		if (score >= 4 && score > fBestScore) {
+			fBestPartition = partition;
+			fBestScore = score;
+		}
+
+		return false;
+	}
+
+	KPartition* fBestPartition;
+
+private:
+	int32		fBestScore;
+	VolumeInfo	fVolumeInfo;
+};
+
+
+status_t
+get_mount_point(KPartition* partition, KPath* mountPoint)
+{
+	if (!mountPoint || !partition->ContainsFileSystem())
+		return B_BAD_VALUE;
+
+	const char* volumeName = partition->ContentName();
+	if (!volumeName || strlen(volumeName) == 0)
+		volumeName = partition->Name();
+	if (!volumeName || strlen(volumeName) == 0)
+		volumeName = "unnamed volume";
+
+	char basePath[B_PATH_NAME_LENGTH];
+	int32 len = snprintf(basePath, sizeof(basePath), "/%s", volumeName);
+	for (int32 i = 1; i < len; i++)
+		if (basePath[i] == '/')
+		basePath[i] = '-';
+	char* path = mountPoint->LockBuffer();
+	int32 pathLen = mountPoint->BufferSize();
+	strncpy(path, basePath, pathLen);
+
+	struct stat dummy;
+	for (int i = 1; ; i++) {
+		if (stat(path, &dummy) != 0)
+			break;
+		snprintf(path, pathLen, "%s%d", basePath, i);
+	}
+
+	mountPoint->UnlockBuffer();
+	return B_OK;
+}
+
+
 status_t
 swap_file_add(const char* path)
 {
@@ -1340,47 +1438,161 @@ swap_init_post_modules()
 	if (gReadOnlyBootDevice)
 		return;
 
-	off_t size = 0;
+	bool swapEnabled = true;
+	bool swapAutomatic = true;
+	off_t swapSize = 0;
+	VolumeInfo selectedVolume = {};
 
 	void* settings = load_driver_settings("virtual_memory");
+
 	if (settings != NULL) {
-		if (!get_driver_boolean_parameter(settings, "vm", false, false)) {
-			unload_driver_settings(settings);
-			return;
+		// We pass a lot of information on the swap device, this is mostly to
+		// ensure that we are dealing with the same device that was configured.
+
+		// TODO: Some kind of BFS uuid would be great here :)
+		const char* enabled = get_driver_parameter(settings, "vm", NULL, NULL);
+
+		if (enabled != NULL) {
+			swapEnabled = get_driver_boolean_parameter(settings, "vm",
+				false, false);
+
+			const char* size = get_driver_parameter(settings, "swap_size",
+				NULL, NULL);
+			const char* volume = get_driver_parameter(settings,
+				"swap_volume_name", NULL, NULL);
+			const char* device = get_driver_parameter(settings,
+				"swap_volume_device", NULL, NULL);
+			const char* filesystem = get_driver_parameter(settings,
+				"swap_volume_filesystem", NULL, NULL);
+			const char* capacity = get_driver_parameter(settings,
+				"swap_volume_capacity", NULL, NULL);
+
+			if (size != NULL && device != NULL && volume != NULL
+				&& filesystem != NULL && capacity != NULL) {
+				// User specified a size / volume
+				swapAutomatic = false;
+				swapSize = atoll(size);
+				strncpy(selectedVolume.name, volume,
+					sizeof(selectedVolume.name));
+				strncpy(selectedVolume.device, device,
+					sizeof(selectedVolume.device));
+				strncpy(selectedVolume.filesystem, filesystem,
+					sizeof(selectedVolume.filesystem));
+				selectedVolume.capacity = atoll(capacity);
+			}
 		}
-
-		const char* string = get_driver_parameter(settings, "swap_size", NULL,
-			NULL);
-		size = string ? atoll(string) : 0;
-
 		unload_driver_settings(settings);
-	} else {
-		size = (off_t)vm_page_num_pages() * B_PAGE_SIZE * 2;
 	}
 
-	if (size < B_PAGE_SIZE)
+	if (swapAutomatic) {
+		swapEnabled = true;
+		swapSize = (off_t)vm_page_num_pages() * B_PAGE_SIZE * 2;
+	}
+
+	if (!swapEnabled || swapSize < B_PAGE_SIZE)
 		return;
 
-	int fd = open("/var/swap", O_RDWR | O_CREAT | O_NOCACHE, S_IRUSR | S_IWUSR);
+	dev_t dev = -1;
+
+	if (!swapAutomatic) {
+		KDiskDeviceManager::CreateDefault();
+		KDiskDeviceManager* manager = KDiskDeviceManager::Default();
+		PartitionScorer visitor(selectedVolume);
+
+		KDiskDevice* device;
+		int32 cookie = 0;
+		while ((device = manager->NextDevice(&cookie)) != NULL) {
+			if (device->IsReadOnlyMedia() || device->IsWriteOnce()
+				|| device->IsRemovable()) {
+				continue;
+			}
+			device->VisitEachDescendant(&visitor);
+		}
+
+		if (!visitor.fBestPartition) {
+			dprintf("%s: Can't find configured swap partition '%s'\n",
+				__func__, selectedVolume.name);
+		} else {
+			if (visitor.fBestPartition->IsMounted())
+				dev = visitor.fBestPartition->VolumeID();
+			else {
+				KPath devPath, mountPoint;
+				visitor.fBestPartition->GetPath(&devPath);
+				get_mount_point(visitor.fBestPartition, &mountPoint);
+				const char* mountPath = mountPoint.Path();
+				mkdir(mountPath, S_IRWXU | S_IRWXG | S_IRWXO);
+				dev = _kern_mount(mountPath, devPath.Path(),
+					NULL, 0, NULL, 0);
+				if (dev < 0) {
+					dprintf("%s: Can't mount configured swap partition '%s'\n",
+						__func__, selectedVolume.name);
+				}
+			}
+		}
+	}
+
+	if (dev < 0)
+		dev = gBootDevice;
+
+	KPath path;
+	struct fs_info info;
+	_kern_read_fs_info(dev, &info);
+	if (dev == gBootDevice)
+		path = kDefaultSwapPath;
+	else {
+		vfs_entry_ref_to_path(info.dev, info.root,
+			".", path.LockBuffer(), path.BufferSize());
+		path.UnlockBuffer();
+		path.Append("swap");
+	}
+
+	const char* swapPath = path.Path();
+
+	// Swap size limits prevent oversized swap files
+	off_t existingSwapSize = 0;
+	struct stat existingSwapStat;
+	if (stat(swapPath, &existingSwapStat) == 0)
+		existingSwapSize = existingSwapStat.st_size;
+
+	off_t freeSpace = info.free_blocks * info.block_size + existingSwapSize;
+	off_t maxSwap = freeSpace;
+	if (swapAutomatic) {
+		// Adjust automatic swap to a maximum of 25% of the free space
+		maxSwap = (off_t)(0.25 * freeSpace);
+	} else {
+		// If user specified, leave 10% of the disk free
+		maxSwap = freeSpace - (off_t)(0.10 * freeSpace);
+		dprintf("%s: Warning: User specified swap file consumes over 90%% of "
+			"the available free space, limiting to 90%%\n", __func__);
+	}
+
+	if (swapSize > maxSwap)
+		swapSize = maxSwap;
+
+	// Create swap file
+	int fd = open(swapPath, O_RDWR | O_CREAT | O_NOCACHE, S_IRUSR | S_IWUSR);
 	if (fd < 0) {
-		dprintf("Can't open/create /var/swap: %s\n", strerror(errno));
+		dprintf("%s: Can't open/create %s: %s\n", __func__,
+			swapPath, strerror(errno));
 		return;
 	}
 
 	struct stat stat;
-	stat.st_size = size;
+	stat.st_size = swapSize;
 	status_t error = _kern_write_stat(fd, NULL, false, &stat,
 		sizeof(struct stat), B_STAT_SIZE | B_STAT_SIZE_INSECURE);
 	if (error != B_OK) {
-		dprintf("Failed to resize /var/swap to %lld bytes: %s\n", size,
-			strerror(error));
+		dprintf("%s: Failed to resize %s to %lld bytes: %s\n", __func__,
+			swapPath, swapSize, strerror(error));
 	}
 
 	close(fd);
 
-	error = swap_file_add("/var/swap");
-	if (error != B_OK)
-		dprintf("Failed to add swap file /var/swap: %s\n", strerror(error));
+	error = swap_file_add(swapPath);
+	if (error != B_OK) {
+		dprintf("%s: Failed to add swap file %s: %s\n", __func__, swapPath,
+			strerror(error));
+	}
 }
 
 
