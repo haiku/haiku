@@ -1441,6 +1441,8 @@ swap_init_post_modules()
 	bool swapEnabled = true;
 	bool swapAutomatic = true;
 	off_t swapSize = 0;
+
+	dev_t swapDeviceID = -1;
 	VolumeInfo selectedVolume = {};
 
 	void* settings = load_driver_settings("virtual_memory");
@@ -1479,6 +1481,11 @@ swap_init_post_modules()
 				strncpy(selectedVolume.filesystem, filesystem,
 					sizeof(selectedVolume.filesystem));
 				selectedVolume.capacity = atoll(capacity);
+			} else if (size != NULL) {
+				// Older file format, no location information (assume /var/swap)
+				swapAutomatic = false;
+				swapSize = atoll(size);
+				swapDeviceID = gBootDevice;
 			}
 		}
 		unload_driver_settings(settings);
@@ -1492,9 +1499,8 @@ swap_init_post_modules()
 	if (!swapEnabled || swapSize < B_PAGE_SIZE)
 		return;
 
-	dev_t dev = -1;
-
-	if (!swapAutomatic) {
+	if (!swapAutomatic && swapDeviceID < 0) {
+		// If user-specified swap, and no swap device has been chosen yet...
 		KDiskDeviceManager::CreateDefault();
 		KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 		PartitionScorer visitor(selectedVolume);
@@ -1514,16 +1520,16 @@ swap_init_post_modules()
 				__func__, selectedVolume.name);
 		} else {
 			if (visitor.fBestPartition->IsMounted())
-				dev = visitor.fBestPartition->VolumeID();
+				swapDeviceID = visitor.fBestPartition->VolumeID();
 			else {
 				KPath devPath, mountPoint;
 				visitor.fBestPartition->GetPath(&devPath);
 				get_mount_point(visitor.fBestPartition, &mountPoint);
 				const char* mountPath = mountPoint.Path();
 				mkdir(mountPath, S_IRWXU | S_IRWXG | S_IRWXO);
-				dev = _kern_mount(mountPath, devPath.Path(),
+				swapDeviceID = _kern_mount(mountPath, devPath.Path(),
 					NULL, 0, NULL, 0);
-				if (dev < 0) {
+				if (swapDeviceID < 0) {
 					dprintf("%s: Can't mount configured swap partition '%s'\n",
 						__func__, selectedVolume.name);
 				}
@@ -1531,13 +1537,15 @@ swap_init_post_modules()
 		}
 	}
 
-	if (dev < 0)
-		dev = gBootDevice;
+	if (swapDeviceID < 0)
+		swapDeviceID = gBootDevice;
+
+	// We now have a swapDeviceID which is used for the swap file
 
 	KPath path;
 	struct fs_info info;
-	_kern_read_fs_info(dev, &info);
-	if (dev == gBootDevice)
+	_kern_read_fs_info(swapDeviceID, &info);
+	if (swapDeviceID == gBootDevice)
 		path = kDefaultSwapPath;
 	else {
 		vfs_entry_ref_to_path(info.dev, info.root,
