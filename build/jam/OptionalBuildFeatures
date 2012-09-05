@@ -66,8 +66,8 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 # ICU
 
 # Note ICU isn't actually optional, but is still an external package
-HAIKU_ICU_GCC_2_PACKAGE = icu-4.8.1-x86-gcc2-2011-11-02a.zip ;
-HAIKU_ICU_GCC_4_PACKAGE = icu-4.8.1-x86-gcc4-2011-11-02.zip ;
+HAIKU_ICU_GCC_2_PACKAGE = icu-4.8.1.1-r1a4-x86-gcc2-2012-08-29.zip ;
+HAIKU_ICU_GCC_4_PACKAGE = icu-4.8.1.1-r1a4-x86-gcc4-2012-08-29.zip ;
 HAIKU_ICU_PPC_PACKAGE = icu-4.8.1-ppc-2011-08-20.zip ;
 
 if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
@@ -224,19 +224,19 @@ if $(TARGET_ARCH) = x86 {
 local ffmpegBaseURL = $(baseURL)/lib ;
 if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_FFMPEG_FILE = ffmpeg-0.10.2-x86-gcc4-2012-03-28.zip ;
-		HAIKU_SPEEX_FILE = speex-1.2rc1-x86-gcc4-2012-03-12.zip ;
-		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-x86-gcc4-2012-03-12.zip ;
-		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-x86-gcc4-2012-03-12.zip ;
-		HAIKU_LIBOGG_FILE = libogg-1.3.0-x86-gcc4-2012-03-12.zip ;
-		HAIKU_LIBVPX_FILE = libvpx-1.0.0-x86-gcc4-2012-03-14.zip ;
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10.2-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_SPEEX_FILE = speex-1.2rc1-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_LIBOGG_FILE = libogg-1.3.0-r1a4-x86-gcc4-2012-09-02.zip ;
+		HAIKU_LIBVPX_FILE = libvpx-1.0.0-r1a4-x86-gcc4-2012-09-02.zip ;
 	} else {
-		HAIKU_FFMPEG_FILE = ffmpeg-0.10.2-x86-gcc2-2012-03-28.zip ;
-		HAIKU_SPEEX_FILE = speex-1.2rc1-x86-gcc2-2012-03-11.zip ;
-		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-x86-gcc2-2012-03-11.zip ;
-		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-x86-gcc2-2012-03-11.zip ;
-		HAIKU_LIBOGG_FILE = libogg-1.3.0-x86-gcc2-2012-03-11.zip ;
-		HAIKU_LIBVPX_FILE = libvpx-1.0.0-x86-gcc2-2012-03-14.zip ;
+		HAIKU_FFMPEG_FILE = ffmpeg-0.10.2-r1a4-x86-gcc2-2012-08-30.zip ;
+		HAIKU_SPEEX_FILE = speex-1.2rc1-r1a4-x86-gcc2-2012-08-29.zip ;
+		HAIKU_LIBTHEORA_FILE = libtheora-1.1.1-r1a4-x86-gcc2-2012-08-29.zip ;
+		HAIKU_LIBVORBIS_FILE = libvorbis-1.3.2-r1a4-x86-gcc2-2012-08-29.zip ;
+		HAIKU_LIBOGG_FILE = libogg-1.3.0-r1a4-x86-gcc2-2012-08-29.zip ;
+		HAIKU_LIBVPX_FILE = libvpx-1.0.0-r1a4-x86-gcc2-2012-08-29.zip ;
 	}
 
 	local ffmpegZipFile = [ DownloadFile $(HAIKU_FFMPEG_FILE)
@@ -346,9 +346,9 @@ if $(TARGET_ARCH) = x86 {
 local mikmodBaseURL = http://haiku-files.org/files/optional-packages/lib ;
 if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_MIKMOD_FILE = libmikmod-3.1.11-r1a3-x86-gcc4-2011-05-26.zip ;
+		HAIKU_MIKMOD_FILE = libmikmod-3.1.11-r1a4-x86-gcc4-2012-09-02.zip ;
 	} else {
-		HAIKU_MIKMOD_FILE = libmikmod-3.1.11-r1a3-x86-gcc2-2011-05-19.zip ;
+		HAIKU_MIKMOD_FILE = libmikmod-3.1.11-r1a4-x86-gcc2-2012-08-29.zip ;
 	}
 
 	local mikmodZipFile = [ DownloadFile $(HAIKU_MIKMOD_FILE)
@@ -380,7 +380,7 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 {
 	if $(TARGET_ARCH) = ppc {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-ppc-gcc4-2012-06-26.zip ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86-gcc4-2012-06-15.zip ;
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-r1a4-x86-gcc4-2012-09-02.zip ;
 	} else {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-r1a4-x86-gcc2-2012-08-28.zip ;
 	}
@@ -425,7 +425,7 @@ if [ IsOptionalHaikuImagePackageAdded TagLib ] {
 	HAIKU_BUILD_FEATURE_TAGLIB = 1 ;
 }
 
-HAIKU_TAGLIB_PACKAGE = taglib-1.6.3-r1a3-x86-gcc2-2011-05-20.zip ;
+HAIKU_TAGLIB_PACKAGE = taglib-1.6.3-r1a4-x86-gcc2-2012-09-03.zip ;
 HAIKU_TAGLIB_URL = $(baseURL)/$(HAIKU_TAGLIB_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_TAGLIB) {
