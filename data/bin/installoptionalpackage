@@ -42,8 +42,8 @@ declare alreadyInstalled=""
 # Some Packages cannot be installed,
 # as they require either the source code or compiled binaries
 declare packageIgnoreList="Bluetooth Development DevelopmentMin \
-DevelopmentBase MandatoryPackages UserlandFS Welcome WifiFirmwareScriptData \
-ICU-devel ICU "
+DevelopmentBase ICU-devel ICU MandatoryPackages UserlandFS \
+WebPositive Welcome WifiFirmwareScriptData "
 
 
 function CreateInstallerScript()

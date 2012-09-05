@@ -5,9 +5,10 @@
  *  Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Ryan Leavengood <leavengood@gmail.com>
  */
-#ifndef DECOR_SETTINGS_VIEW_H
-#define DECOR_SETTINGS_VIEW_H
+#ifndef LOOK_AND_FEEL_SETTINGS_VIEW_H
+#define LOOK_AND_FEEL_SETTINGS_VIEW_H
 
 
 #include <DecorInfo.h>
@@ -16,14 +17,15 @@
 
 
 class BButton;
+class BCheckBox;
 class BMenuField;
 class BPopUpMenu;
 
 
-class DecorSettingsView : public BView {
+class LookAndFeelSettingsView : public BView {
 public:
-								DecorSettingsView(const char* name);
-	virtual						~DecorSettingsView();
+								LookAndFeelSettingsView(const char* name);
+	virtual						~LookAndFeelSettingsView();
 
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
@@ -40,6 +42,8 @@ private:
 			void				_BuildDecorMenu();
 			void				_AdoptToCurrentDecor();
 			void				_AdoptInterfaceToCurrentDecor();
+			bool				_GetDoubleScrollbarArrowsSetting();
+			void				_SetDoubleScrollbarArrowsSetting(bool value);
 
 private:
 			DecorInfoUtility	fDecorUtility;
@@ -47,9 +51,11 @@ private:
 			BButton*			fDecorInfoButton;
 			BMenuField*			fDecorMenuField;
 			BPopUpMenu*			fDecorMenu;
+			BCheckBox*			fDoubleScrollbarArrowsCheckBox;
 
 			BString				fSavedDecor;
 			BString				fCurrentDecor;
+			bool				fSavedDoubleArrowsValue;
 };
 
-#endif // DECOR_SETTINGS_VIEW_H
+#endif // LOOK_AND_FEEL_SETTINGS_VIEW_H

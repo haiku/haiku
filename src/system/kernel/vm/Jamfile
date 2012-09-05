@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src system kernel vm ;
 UsePrivateHeaders shared ;
 
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) device_manager ] ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelMergeObject kernel_vm.o :
 	PageCacheLocker.cpp

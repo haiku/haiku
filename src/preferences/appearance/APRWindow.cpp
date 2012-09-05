@@ -21,7 +21,7 @@
 
 #include "AntialiasingSettingsView.h"
 #include "APRView.h"
-#include "DecorSettingsView.h"
+#include "LookAndFeelSettingsView.h"
 #include "defs.h"
 #include "FontView.h"
 
@@ -54,15 +54,15 @@ APRWindow::APRWindow(BRect frame)
 
 	fColorsView = new APRView(B_TRANSLATE("Colors"));
 
-	fDecorSettings = new DecorSettingsView(
-		B_TRANSLATE("Decorators"));
+	fLookAndFeelSettings = new LookAndFeelSettingsView(
+		B_TRANSLATE("Look and feel"));
 
 	fAntialiasingSettings = new AntialiasingSettingsView(
 		B_TRANSLATE("Antialiasing"));
 
 	tabView->AddTab(fFontSettings);
 	tabView->AddTab(fColorsView);
-	tabView->AddTab(fDecorSettings);
+	tabView->AddTab(fLookAndFeelSettings);
 	tabView->AddTab(fAntialiasingSettings);
 
 	_UpdateButtons();
@@ -92,7 +92,7 @@ APRWindow::MessageReceived(BMessage *message)
 			fFontSettings->SetDefaults();
 			fColorsView->SetDefaults();
 			fAntialiasingSettings->SetDefaults();
-			fDecorSettings->SetDefaults();
+			fLookAndFeelSettings->SetDefaults();
 
 			_UpdateButtons();
 			break;
@@ -101,7 +101,7 @@ APRWindow::MessageReceived(BMessage *message)
 			fColorsView->Revert();
 			fAntialiasingSettings->Revert();
 			fFontSettings->Revert();
-			fDecorSettings->Revert();
+			fLookAndFeelSettings->Revert();
 
 			_UpdateButtons();
 			break;
@@ -127,11 +127,11 @@ APRWindow::_IsDefaultable() const
 //	printf("fonts defaultable: %d\n", fFontSettings->IsDefaultable());
 //	printf("colors defaultable: %d\n", fColorsView->IsDefaultable());
 //	printf("AA defaultable: %d\n", fAntialiasingSettings->IsDefaultable());
-//	printf("decor defaultable: %d\n", fDecorSettings->IsDefaultable());
+//	printf("decor defaultable: %d\n", fLookAndFeelSettings->IsDefaultable());
 	return fColorsView->IsDefaultable()
 		|| fFontSettings->IsDefaultable()
 		|| fAntialiasingSettings->IsDefaultable()
-		|| fDecorSettings->IsDefaultable();
+		|| fLookAndFeelSettings->IsDefaultable();
 }
 
 
@@ -141,9 +141,9 @@ APRWindow::_IsRevertable() const
 //	printf("fonts revertable: %d\n", fFontSettings->IsRevertable());
 //	printf("colors revertable: %d\n", fColorsView->IsRevertable());
 //	printf("AA revertable: %d\n", fAntialiasingSettings->IsRevertable());
-//	printf("decor revertable: %d\n", fDecorSettings->IsRevertable());
+//	printf("decor revertable: %d\n", fLookAndFeelSettings->IsRevertable());
 	return fColorsView->IsRevertable()
 		|| fFontSettings->IsRevertable()
 		|| fAntialiasingSettings->IsRevertable()
-		|| fDecorSettings->IsRevertable();
+		|| fLookAndFeelSettings->IsRevertable();
 }

@@ -325,10 +325,15 @@ Playlist::RemoveItem(int32 index, bool careAboutCurrentIndex)
 	_NotifyItemRemoved(index);
 
 	if (careAboutCurrentIndex) {
-		if (index >= CountItems())
-			SetCurrentItemIndex(CountItems() - 1);
-		else if (index <= fCurrentIndex)
-			SetCurrentItemIndex(index - 1);
+		// fCurrentIndex isn't in sync yet, so might be one too large (if the
+		// removed item was above the currently playing item).
+		if (index < fCurrentIndex)
+			SetCurrentItemIndex(fCurrentIndex - 1, false);
+		else if (index == fCurrentIndex) {
+			if (fCurrentIndex == CountItems())
+				fCurrentIndex--;
+			SetCurrentItemIndex(fCurrentIndex, true);
+		}
 	}
 
 	return item;

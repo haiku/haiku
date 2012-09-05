@@ -5,10 +5,11 @@
  *	Authors:
  *		Alexander von Gluck, kallisti5@unixzen.com
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Ryan Leavengood <leavengood@gmail.com>
  */
 
 
-#include "DecorSettingsView.h"
+#include "LookAndFeelSettingsView.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,8 +18,10 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <InterfaceDefs.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -32,18 +35,26 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DecorSettingsView"
+	// This was not renamed to keep from breaking translations
 
 
 static const int32 kMsgSetDecor = 'deco';
 static const int32 kMsgDecorInfo = 'idec';
+static const int32 kMsgDoubleScrollbarArrows = 'dsba';
+
+static const bool kDefaultDoubleScrollbarArrowsSetting = false;
 
 
 //	#pragma mark -
 
 
-DecorSettingsView::DecorSettingsView(const char* name)
+LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 	:
-	BView(name, 0)
+	BView(name, 0),
+	fDecorInfoButton(NULL),
+	fDecorMenuField(NULL),
+	fDecorMenu(NULL),
+	fDoubleScrollbarArrowsCheckBox(NULL)
 {
 	// Decorator menu
 	_BuildDecorMenu();
@@ -53,6 +64,13 @@ DecorSettingsView::DecorSettingsView(const char* name)
 	fDecorInfoButton = new BButton(B_TRANSLATE("About"),
 		new BMessage(kMsgDecorInfo));
 
+	fDoubleScrollbarArrowsCheckBox = new BCheckBox("doubleScrollbarArrows",
+		B_TRANSLATE("Use double scrollbar arrows"),
+		new BMessage(kMsgDoubleScrollbarArrows));
+
+	fSavedDoubleArrowsValue = _GetDoubleScrollbarArrowsSetting();
+	fDoubleScrollbarArrowsCheckBox->SetValue(fSavedDoubleArrowsValue);
+
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	// control layout
@@ -61,20 +79,21 @@ DecorSettingsView::DecorSettingsView(const char* name)
         .Add(fDecorMenuField->CreateMenuBarLayoutItem(), 1, 0)
 		.Add(fDecorInfoButton, 2, 0)
 
-        .Add(BSpaceLayoutItem::CreateGlue(), 0, 3, 2)
-        .SetInsets(10, 10, 10, 10)
-    );
+		.Add(fDoubleScrollbarArrowsCheckBox, 0, 3, 2)
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 4, 2)
+		.SetInsets(10, 10, 10, 10)
+	);
 	// TODO : Decorator Preview Image?
 }
 
 
-DecorSettingsView::~DecorSettingsView()
+LookAndFeelSettingsView::~LookAndFeelSettingsView()
 {
 }
 
 
 void
-DecorSettingsView::AttachedToWindow()
+LookAndFeelSettingsView::AttachedToWindow()
 {
 	if (Parent() != NULL)
 		SetViewColor(Parent()->ViewColor());
@@ -83,11 +102,12 @@ DecorSettingsView::AttachedToWindow()
 
 	fDecorMenu->SetTargetForItems(this);
 	fDecorInfoButton->SetTarget(this);
+	fDoubleScrollbarArrowsCheckBox->SetTarget(this);
 }
 
 
 void
-DecorSettingsView::MessageReceived(BMessage *msg)
+LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case kMsgSetDecor:
@@ -121,10 +141,13 @@ DecorSettingsView::MessageReceived(BMessage *msg)
 			BAlert *infoAlert = new BAlert(B_TRANSLATE("About Decorator"),
 				infoText.String(), B_TRANSLATE("OK"));
 			infoAlert->SetFlags(infoAlert->Flags() | B_CLOSE_ON_ESCAPE);
-			infoAlert->Go(); 
+			infoAlert->Go();
 
 			break;
 		}
+		case kMsgDoubleScrollbarArrows:
+			_SetDoubleScrollbarArrowsSetting(fDoubleScrollbarArrowsCheckBox->Value());
+			break;
 
 		default:
 			BView::MessageReceived(msg);
@@ -134,7 +157,7 @@ DecorSettingsView::MessageReceived(BMessage *msg)
 
 
 void
-DecorSettingsView::_BuildDecorMenu()
+LookAndFeelSettingsView::_BuildDecorMenu()
 {
 	fDecorMenu = new BPopUpMenu(B_TRANSLATE("Choose Decorator"));
 
@@ -163,24 +186,24 @@ DecorSettingsView::_BuildDecorMenu()
 
 
 void
-DecorSettingsView::_SetDecor(const BString& name)
+LookAndFeelSettingsView::_SetDecor(const BString& name)
 {
 	_SetDecor(fDecorUtility.FindDecorator(name));
-}	
+}
 
 
 void
-DecorSettingsView::_SetDecor(DecorInfo* decorInfo)
+LookAndFeelSettingsView::_SetDecor(DecorInfo* decorInfo)
 {
 	if (fDecorUtility.SetDecorator(decorInfo) == B_OK) {
 		_AdoptToCurrentDecor();
 		Window()->PostMessage(kMsgUpdate);
 	}
-}	
+}
 
 
 void
-DecorSettingsView::_AdoptToCurrentDecor()
+LookAndFeelSettingsView::_AdoptToCurrentDecor()
 {
 	fCurrentDecor = fDecorUtility.CurrentDecorator()->Name();
 	if (fSavedDecor.Length() == 0)
@@ -189,7 +212,7 @@ DecorSettingsView::_AdoptToCurrentDecor()
 }
 
 void
-DecorSettingsView::_AdoptInterfaceToCurrentDecor()
+LookAndFeelSettingsView::_AdoptInterfaceToCurrentDecor()
 {
 	BMenuItem* item = fDecorMenu->FindItem(fCurrentDecor);
 	if (item != NULL)
@@ -197,29 +220,60 @@ DecorSettingsView::_AdoptInterfaceToCurrentDecor()
 }
 
 
+bool
+LookAndFeelSettingsView::_GetDoubleScrollbarArrowsSetting()
+{
+	scroll_bar_info info;
+	get_scroll_bar_info(&info);
+
+	return info.double_arrows;
+}
+
+
 void
-DecorSettingsView::SetDefaults()
+LookAndFeelSettingsView::_SetDoubleScrollbarArrowsSetting(bool value)
+{
+	scroll_bar_info info;
+	get_scroll_bar_info(&info);
+
+	info.double_arrows = value;
+	set_scroll_bar_info(&info);
+
+	Window()->PostMessage(kMsgUpdate);
+}
+
+
+void
+LookAndFeelSettingsView::SetDefaults()
 {
 	_SetDecor(fDecorUtility.DefaultDecorator());
+	_SetDoubleScrollbarArrowsSetting(kDefaultDoubleScrollbarArrowsSetting);
+	fDoubleScrollbarArrowsCheckBox->SetValue(
+		kDefaultDoubleScrollbarArrowsSetting);
 }
 
 
 bool
-DecorSettingsView::IsDefaultable()
+LookAndFeelSettingsView::IsDefaultable()
 {
-	return fCurrentDecor != fDecorUtility.DefaultDecorator()->Name();
+	return fCurrentDecor != fDecorUtility.DefaultDecorator()->Name() ||
+		fDoubleScrollbarArrowsCheckBox->Value() !=
+			kDefaultDoubleScrollbarArrowsSetting;
 }
 
 
 bool
-DecorSettingsView::IsRevertable()
+LookAndFeelSettingsView::IsRevertable()
 {
-	return fCurrentDecor != fSavedDecor;
+	return fCurrentDecor != fSavedDecor ||
+		fDoubleScrollbarArrowsCheckBox->Value() != fSavedDoubleArrowsValue;
 }
 
 
 void
-DecorSettingsView::Revert()
+LookAndFeelSettingsView::Revert()
 {
 	_SetDecor(fSavedDecor);
+	_SetDoubleScrollbarArrowsSetting(fSavedDoubleArrowsValue);
+	fDoubleScrollbarArrowsCheckBox->SetValue(fSavedDoubleArrowsValue);
 }

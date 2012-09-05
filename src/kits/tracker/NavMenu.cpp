@@ -130,7 +130,7 @@ void
 SpringLoadedFolderSetMenuStates(const BMenu* menu,
 	const BObjectList<BString>* typeslist)
 {
-	if (!menu || !typeslist)
+	if (!menu || !typeslist || typeslist->IsEmpty())
 		return;
 
 	//	if a types list exists
@@ -263,8 +263,10 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 		fFlags(0),
 		fItemList(0),
 		fContainer(0),
-		fTypesList(list)
+		fTypesList(new BObjectList<BString>(10, true))
 {
+	if (list != NULL)
+		*fTypesList = *list;
 	InitIconPreloader();
 
 	SetFont(be_plain_font);
@@ -292,8 +294,10 @@ BNavMenu::BNavMenu(const char* title, uint32 message,
 		fFlags(0),
 		fItemList(0),
 		fContainer(0),
-		fTypesList(list)
+		fTypesList(new BObjectList<BString>(10, true))
 {
+	if (list != NULL)
+		*fTypesList = *list;
 	InitIconPreloader();
 
 	SetFont(be_plain_font);
@@ -313,6 +317,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message,
 
 BNavMenu::~BNavMenu()
 {
+	delete fTypesList;
 }
 
 
@@ -334,13 +339,6 @@ BNavMenu::AttachedToWindow()
 void
 BNavMenu::DetachedFromWindow()
 {
-	//	does this need to set this to null?
-	//	the parent, handling dnd should set this
-	//	appropriately
-	//
-	//	if this changes, BeMenu and RecentsMenu
-	//	in Deskbar should also change
-	fTypesList = NULL;
 }
 
 
@@ -814,7 +812,10 @@ BNavMenu::SetShowParent(bool show)
 void
 BNavMenu::SetTypesList(const BObjectList<BString>* list)
 {
-	fTypesList = list;
+	if (list != NULL)
+		*fTypesList = *list;
+	else
+		fTypesList->MakeEmpty();
 }
 
 
