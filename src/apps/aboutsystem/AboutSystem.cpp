@@ -1167,12 +1167,12 @@ AboutView::_CreateCreditsView()
 		"Jeremy Rand\n"
 		"Hartmut Reh\n"
 		"Daniel Reinhold\n"
+		"Sergei Reznikov\n"
 		"Chris Roberts\n"
 		"Samuel Rodríguez Pérez\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
 		"Ralf Schülke\n"
-		"Reznikov Sergei\n"
 		"Zousar Shaker\n"
 		"Caitlin Shaw\n"
 		"Alex Smith\n"
@@ -1262,8 +1262,8 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		B_TRANSLATE("The BeGeistert team\n"));
 	fCreditsView->Insert(
-		B_TRANSLATE("Google & their Google Summer of Code and Google Code In "
-			"program\n"));
+		B_TRANSLATE("Google and their Google Summer of Code and Google Code In "
+			"programs\n"));
 	fCreditsView->Insert(
 		B_TRANSLATE("The University of Auckland and Christof Lutteroth\n\n"));
 	fCreditsView->Insert(
