@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	2671941221
+1	russian	x-vnd.Haiku-Appearance	3047172181
 Plain font:	Font view		Простой шрифт:
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
@@ -52,7 +52,6 @@ LCD subpixel	AntialiasingSettingsView		Субпиксельное сглажив
 Selected menu item border	Colors tab		Рамка выделенного пункта меню
 Strong	AntialiasingSettingsView		Сильная
 Panel text	Colors tab		Текст панели
-Decorators	APRWindow		Декораторы
 Monospaced fonts only	AntialiasingSettingsView		Только моноширинные шрифты
 Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
 Fonts	APRWindow		Шрифты

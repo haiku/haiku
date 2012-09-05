@@ -16,9 +16,9 @@ Capture Rate Menu	CodyCam		Képkészítési gyakoriság menü
 File %s # unterminated quote at end of file\n	SettingsHandler		%s fájl # bezáratlan idézőjel a fájl végén\n
 Password:	CodyCam		Jelszó:
 Passive FTP	CodyCam		Passzív FTP
-destination directory expected	CodyCam		nincs megadva célkönyvtár
+destination directory expected	CodyCam		nincs megadva célmappa
 password	CodyCam		jelszó
-Directory:	CodyCam		Könyvtár:
+Directory:	CodyCam		Mappa:
 Every minute	CodyCam		Percenként
 read: %ld\n	SftpClient		olvasás: %ld\n
 Waiting…	CodyCam		Várakozás…
@@ -54,7 +54,7 @@ Cannot set the time source for the video window	CodyCam		Nem lehet beállítani 
 Stop video	CodyCam		Videó leállítása
 Locking the window\n	VideoConsumer.cpp		Ablak zárolása\n
 File %s; Line %ld # %s	SettingsHandler		%s fájl; Sor %ld # %s
-Couldn't find requested directory on server	VideoConsumer.cpp		A megadott könyvtár nem található a kiszolgálón
+Couldn't find requested directory on server	VideoConsumer.cpp		A megadott mappa nem található a kiszolgálón
 Renaming…	VideoConsumer.cpp		Átnevezés…
 Local	CodyCam		Helyi
 Error setting type of output file	VideoConsumer.cpp		Hiba történt a kimeneti fájl típusának megadása során

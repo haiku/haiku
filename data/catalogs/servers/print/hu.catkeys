@@ -4,13 +4,13 @@ Return the number of available transports	PrintServerApp Scripting		Megadja az e
 Return the number of available printers	PrintServerApp Scripting		Megadja az elérhető nyomtatók számát
 Get currently available ports/devices	Transport Scripting		Megadja a jelenleg használható portokat/eszközöket
 Retrieve or select the active printer	PrintServerApp Scripting		Megadja vagy kiválasztja az aktív nyomtatót
-Cancel	PrintServerApp		Mégsem
+Cancel	PrintServerApp		Mégse
 Retrieve a specific printer	PrintServerApp Scripting		Megad egy válaszott nyomtatót
 Page %1 to %2	ConfigWindow		%1 - %2 oldal
 Get name of the printer add-on used for this printer	Printer Scripting		Megadja a nyomtatón használt nyomtatóbővítményt
 Page setup:	ConfigWindow		Oldalbeállítás:
 OK	ConfigWindow		Rendben
-Cancel	ConfigWindow		Mégsem
+Cancel	ConfigWindow		Mégse
 Printer server	ConfigWindow		Nyomtatókiszolgáló
 Page %1 to %2, %3 copies	ConfigWindow		%1 -%2 oldal, %3 példány
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Már létezik egy ilyen nevű nyomtató, de nem található hozzá driver! Felülírja?

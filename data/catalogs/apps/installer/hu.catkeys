@@ -106,7 +106,7 @@ Configure your /boot/grub/menu.lst by launching your favorite editor from a Term
 Boot sector not written because of an internal error.	InstallProgress		A Boot szektorba egy belső hiba miatt nem lehetett írni.
 Additional disk space required: %s	InstallerWindow		Még ennyi hely szükségeltetik: %s
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		MEGJEGYZÉS: Ugyan a merevlemezek elnevezése itt is ugyanúgy működik mint ahogy az a 2.1)-es pontban le van írva, a partíciók elnevezése máshogy működik.\n\n
-Cancel	InstallProgress		Mégsem
+Cancel	InstallProgress		Mégse
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		A Rendszerindító menü és a Lemezkezelő fut…\n\nA telepítés folytatásához zárja be mindkét programot.
 Try installing anyway	InstallProgress		Feltelepítés megpróbálása
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Tehát a fejléc alá, amit nem szabad átírni, írjon be néhány ehhez hasonló sort:\n\n

@@ -57,7 +57,7 @@ Volume name	PartitionList		Kötet neve
 Continue	MainWindow		Folytatás
 Cannot delete the selected partition.	MainWindow		A kijelölt partíció nem törölhető.
 Mount all	MainWindow		Összes csatolása
-Cancel	MainWindow		Mégsem
+Cancel	MainWindow		Mégse
 Delete partition	MainWindow		Partíció törlése
 End: %ld MB	Support		Vége: %ld MB
 Eject	MainWindow		Kiadás
@@ -72,8 +72,8 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 The partition %s is currently mounted.	MainWindow		A(z) „%s” partíció csatolva van.
 Partition size	CreateParamsPanel		A partíció mérete
 Surface test (not implemented)	MainWindow		Felületellenőrzés (még nem működik)
-Cancel	InitParamsPanel		Mégsem
-Cancel	CreateParamsPanel		Mégsem
+Cancel	InitParamsPanel		Mégse
+Cancel	CreateParamsPanel		Mégse
 Format	MainWindow		Formázás
 Parameters	PartitionList		Paraméterek
 Creation of the partition has failed.	MainWindow		Nem sikerült létrehozni a partíciót.

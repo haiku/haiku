@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Appearance	2671941221
+1	japanese	x-vnd.Haiku-Appearance	3047172181
 Plain font:	Font view		標準フォント：
 Control highlight	Colors tab		コントロールのハイライト
 Control border	Colors tab		コントロールの境界
@@ -52,7 +52,6 @@ LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
 Selected menu item border	Colors tab		メニュー選択項目の境界
 Strong	AntialiasingSettingsView		強い
 Panel text	Colors tab		パネルの文字
-Decorators	APRWindow		デコレーター
 Monospaced fonts only	AntialiasingSettingsView		等幅フォントのみ有効
 Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
 Fonts	APRWindow		フォント

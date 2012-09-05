@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	1557879521
+1	polish	x-vnd.Haiku-Appearance	1933110481
 Plain font:	Font view		Czcionka zwykła:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
@@ -51,7 +51,6 @@ LCD subpixel	AntialiasingSettingsView		Podpikselowe LCD
 Selected menu item border	Colors tab		Obramowanie zaznaczonego elementu menu
 Strong	AntialiasingSettingsView		Silny
 Panel text	Colors tab		Tekst panelu
-Decorators	APRWindow		Dekoratory
 Monospaced fonts only	AntialiasingSettingsView		Tylko czcionki o stałej szerokości
 Antialiasing menu	AntialiasingSettingsView		Menu antyaliasingu
 Fonts	APRWindow		Czcionki

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Appearance	2671941221
+1	swedish	x-vnd.Haiku-Appearance	3047172181
 Plain font:	Font view		Vanlig font:
 Control highlight	Colors tab		Framhävd kontroll
 Control border	Colors tab		Kontrollkant
@@ -52,7 +52,6 @@ LCD subpixel	AntialiasingSettingsView		LCD-subpixel
 Selected menu item border	Colors tab		Kantfärg för valt menyalternativ
 Strong	AntialiasingSettingsView		Framhävd
 Panel text	Colors tab		Paneltext
-Decorators	APRWindow		Dekorator
 Monospaced fonts only	AntialiasingSettingsView		Endast typsnitt med fast bredd
 Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
 Fonts	APRWindow		Typsnitt

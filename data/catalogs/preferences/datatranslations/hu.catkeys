@@ -1,18 +1,18 @@
 1	hungarian	x-vnd.Haiku-DataTranslations	3820343452
 DataTranslations	System name		Értelmezők
-Cancel	DataTranslations		Mégsem
+Cancel	DataTranslations		Mégse
 Name:	DataTranslations		Név:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Név: %s \nVerzió: %ld.%ld.%ld\n\nInfo:\n%s\n\nElérési út:\n%s\n
-The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		A(z) '%name' nem lesz feltelepítve, mivel nem tűnik fordítónak.
-Could not install %s:\n%s	DataTranslations		A(z)%s nem telepíthető:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Használja ezt a vezérlőpanelt a fordítók alapértelmezett értékeinek beállításához, amit használniuk kell ha nincs náluk más megadva.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Egy elem '%name' már létezik a Translators mappában! A meglévő fordítót felül kell írni?
-DataTranslations - Note	DataTranslations		DataTranslations - Jegyzet
+Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Név: %s \nVerzió: %ld.%ld.%ld\n\nInformációk:\n%s\n\nÚtvonal:\n%s\n
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Az elem (%name) nem lesz feltelepítve, mivel nem tűnik értelmezőnek.
+Could not install %s:\n%s	DataTranslations		Az elem (%s) nem telepíthető:\n%s
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Használja ezt a vezérlőpanelt az értelmezők alapértelmezett értékeinek beállításához, amit használniuk kell ha nincs náluk más megadva.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Egy elem (%name) már létezik az értelmezők mappájában! Kicseréljem a meglévőt?
+DataTranslations - Note	DataTranslations		Értelemezők - Jegyzet
 Overwrite	DataTranslations		Átírás
-Info:	DataTranslations		Info:
-Info	DataTranslations		Info
-Path:	DataTranslations		Elérési út:
+Info:	DataTranslations		Információk:
+Info	DataTranslations		Információk
+Path:	DataTranslations		Útvonal:
 The new translator has been installed successfully.	DataTranslations		Az új fordító sikeresen telepítve.
-DataTranslations - Error	DataTranslations		DataTranslations -Hiba
+DataTranslations - Error	DataTranslations		Értelmezők -Hiba
 OK	DataTranslations		Rendben
 Version:	DataTranslations		Verzió:

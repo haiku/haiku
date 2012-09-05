@@ -24,7 +24,7 @@ No windows	WindowMenu		Nincsenek ablakok
 Deskbar	System name		Asztalsáv
 Restart system	DeskbarMenu		Rendszer újraindítása
 Large	PreferencesWindow		Nagy
-Auto-raise	PreferencesWindow		Automatikus kiemelés
+Auto-raise	PreferencesWindow		Automatikus előrehozás
 Hide time	TimeView		Idő elrejtése
 Recent folders:	PreferencesWindow		Utolsó mappák:
 Show application expander	PreferencesWindow		Programkiterjesztő mutatása

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Appearance	2671941221
+1	hungarian	x-vnd.Haiku-Appearance	3047172181
 Plain font:	Font view		Alap betűtípus:
 Control highlight	Colors tab		Kiválasztott vezérlőelem
 Control border	Colors tab		Vezérlőelem kerete
@@ -52,7 +52,6 @@ LCD subpixel	AntialiasingSettingsView		LCD-szubpixel
 Selected menu item border	Colors tab		Kiválasztott menüelem szegélye
 Strong	AntialiasingSettingsView		Erős
 Panel text	Colors tab		Panel szövege
-Decorators	APRWindow		Dekorációk
 Monospaced fonts only	AntialiasingSettingsView		Csak rögzített szélességű betűtípusok
 Antialiasing menu	AntialiasingSettingsView		Élsimítási menü
 Fonts	APRWindow		Betűtípusok

@@ -39,7 +39,7 @@ Status: Running	PoorMan		Állapot: Fut
 connections	PoorMan		kapcsolat
 Controls	PoorMan		Vezérlők
 Send file listing if there's no start page	PoorMan		Fájllista küldése ha nincs kezdőlap
-Error Dir	PoorMan		Hiba könyvtár
+Error Dir	PoorMan		Hiba mappa
 Select all	PoorMan		Mind kijelölése
 File	PoorMan		Fájl
 File Logging	PoorMan		Fájlnaplózás

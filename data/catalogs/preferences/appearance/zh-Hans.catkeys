@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	2671941221
+1	english	x-vnd.Haiku-Appearance	3047172181
 Plain font:	Font view		常规字体
 Control highlight	Colors tab		控件亮度
 Control border	Colors tab		控件边界
@@ -52,7 +52,6 @@ LCD subpixel	AntialiasingSettingsView		LCD 亚像素精度
 Selected menu item border	Colors tab		选择菜单项边界
 Strong	AntialiasingSettingsView		强
 Panel text	Colors tab		面板文本
-Decorators	APRWindow		装饰
 Monospaced fonts only	AntialiasingSettingsView		仅等宽字体
 Antialiasing menu	AntialiasingSettingsView		抗锯齿菜单
 Fonts	APRWindow		字体
