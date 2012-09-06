@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +12,7 @@
 
 #include <OS.h>
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,6 +24,58 @@ void get_cpu_type(char *vendorBuffer, size_t vendorSize,
 int32 get_rounded_cpu_speed(void);
 
 #ifdef __cplusplus
+}
+#endif
+
+
+#if __INTEL__
+/*!	Tries to parse an Intel CPU ID string to match our usual naming scheme.
+	Note, this function is not thread safe, and must only be called once
+	at a time.
+*/
+static const char*
+parse_intel(const char* name)
+{
+	static char buffer[49];
+
+	// ignore initial spaces
+	int index = 0;
+	for (; name[index] != '\0'; index++) {
+		if (name[index] != ' ')
+			break;
+	}
+
+	// ignore vendor
+	for (; name[index] != '\0'; index++) {
+		if (name[index] == ' ') {
+			index++;
+			break;
+		}
+	}
+
+	// parse model
+	int outIndex = 0;
+	for (; name[index] != '\0'; index++) {
+		if (!strncmp(&name[index], "(R)", 3)) {
+			outIndex += strlcpy(&buffer[outIndex], "®",
+				sizeof(buffer) - outIndex);
+			index += 2;
+		} else if (!strncmp(&name[index], "(TM)", 4)) {
+			outIndex += strlcpy(&buffer[outIndex], "™",
+				sizeof(buffer) - outIndex);
+			index += 3;
+		} else if (!strncmp(&name[index], " CPU", 4)) {
+			// Cut out the CPU string
+			index += 3;
+		} else if (!strncmp(&name[index], " @", 2)) {
+			// Cut off the remainder
+			break;
+		} else
+			buffer[outIndex++] = name[index];
+	}
+
+	buffer[outIndex] = '\0';
+	return buffer;
 }
 #endif
 
@@ -61,7 +114,7 @@ get_cpu_vendor_string(enum cpu_types type)
 
 
 #ifdef __INTEL__
-/* Parameter 'name' needs to point to an allocated array of 49 characters. */
+/*! Parameter 'name' needs to point to an allocated array of 49 characters. */
 void
 get_cpuid_model_string(char *name)
 {
@@ -345,6 +398,11 @@ get_cpu_model_string(system_info *info)
 #endif	/* __INTEL__ */
 
 		default:
+			if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
+				// Fallback to manual parsing of the model string
+				get_cpuid_model_string(cpuidName);
+				return parse_intel(cpuidName);
+			}
 			return NULL;
 	}
 }
