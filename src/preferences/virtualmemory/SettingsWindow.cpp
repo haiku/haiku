@@ -128,7 +128,7 @@ SettingsWindow::SettingsWindow()
 	if (result == kErrorSettingsNotFound)
 		fSettings.DefaultSwapSettings(false);
 	else if (result == kErrorSettingsInvalid) {
-		int32 choice = (new BAlert("VirtualMemory",
+		int32 choice = (new BAlert(B_TRANSLATE_SYSTEM_NAME("VirtualMemory"),
 			B_TRANSLATE("The settings specified in the settings file "
 			"are invalid. You can load the defaults or quit."),
 			B_TRANSLATE("Load defaults"), B_TRANSLATE("Quit")))->Go();
@@ -138,7 +138,7 @@ SettingsWindow::SettingsWindow()
 		}
 		fSettings.DefaultSwapSettings(false);
 	} else if (result == kErrorVolumeNotFound) {
-		int32 choice = (new BAlert("VirtualMemory",
+		int32 choice = (new BAlert(B_TRANSLATE_SYSTEM_NAME("VirtualMemory"),
 			B_TRANSLATE("The volume specified in the settings file "
 			"could not be found. You can use the boot volume or quit."),
 			B_TRANSLATE("Use boot volume"), B_TRANSLATE("Quit")))->Go();
@@ -238,8 +238,9 @@ SettingsWindow::SettingsWindow()
 	status_t result = fSettings.SwapVolume().InitCheck();
 
 	if (result != B_OK) {
-		BAlert* alert = new BAlert("VirtualMemory", B_TRANSLATE(
-			"The swap volume specified in the settings file is invalid.\n"
+		BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("VirtualMemory"),
+			B_TRANSLATE("The swap volume specified in the settings file is ",
+			"invalid.\n You can keep the current setting or switch to the "
 			"You can keep the current setting or switch to the "
 			"default swap volume."),
 			B_TRANSLATE("Keep"), B_TRANSLATE("Switch"), NULL,
@@ -309,8 +310,8 @@ SettingsWindow::MessageReceived(BMessage* message)
 				// ToDo: maybe we want to remove this possibility in the GUI
 				// as Be did, but I thought a proper warning could be helpful
 				// (for those that want to change that anyway)
-				BAlert* alert = new BAlert("VirtualMemory",
-					B_TRANSLATE(
+				BAlert* alert = new BAlert(
+					B_TRANSLATE_SYSTEM_NAME("VirtualMemory"), B_TRANSLATE(
 					"Disabling virtual memory will have unwanted effects on "
 					"system stability once the memory is used up.\n"
 					"Virtual memory does not affect system performance "
