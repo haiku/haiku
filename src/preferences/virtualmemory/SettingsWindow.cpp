@@ -43,7 +43,7 @@ static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgSwapEnabledUpdate = 'swen';
 static const uint32 kMsgVolumeSelected = 'vlsl';
 static const off_t kMegaByte = 1024 * 1024;
-static dev_t bootDev = -1;
+static dev_t gBootDev = -1;
 
 
 SizeSlider::SizeSlider(const char* name, const char* label,
@@ -116,7 +116,7 @@ SettingsWindow::SettingsWindow()
 		| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 
 {
-	bootDev = dev_for_path("/boot");
+	gBootDev = dev_for_path("/boot");
 	BAlignment align(B_ALIGN_LEFT, B_ALIGN_MIDDLE);
 
 	if (fSettings.ReadWindowSettings() == B_OK)
@@ -146,7 +146,7 @@ SettingsWindow::SettingsWindow()
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			return;
 		}
-		fSettings.SetSwapVolume(bootDev, false);
+		fSettings.SetSwapVolume(gBootDev, false);
 	}
 
 	fSwapEnabledCheckBox = new BCheckBox("enable swap",
@@ -410,7 +410,7 @@ SettingsWindow::_Update()
 		fSizeSlider->SetEnabled(true);
 		item->SetMarked(true);
 		BEntry swapFile;
-		if (bootDev == item->Volume().Device())
+		if (gBootDev == item->Volume().Device())
 			swapFile.SetTo("/var/swap");
 		else {
 			BDirectory root;
