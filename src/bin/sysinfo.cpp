@@ -1,6 +1,6 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
- * Copyright (c) 2002, Carlos Hasan, for Haiku.
+ * Copyright 2004-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002, Carlos Hasan.
  *
  * Distributed under the terms of the MIT license.
  */
@@ -15,8 +15,8 @@
 #include <cpu_type.h>
 
 
-// ToDo: -disable_cpu_sn option is not yet implemented
-// ToDo: most of this file should go into an architecture dependent source file
+// TODO: -disable_cpu_sn option is not yet implemented
+// TODO: most of this file should go into an architecture dependent source file
 #ifdef __INTEL__
 
 struct cache_description {
@@ -196,8 +196,8 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 				if (cacheDescriptors[i] == 0x40) {
 					printf("\tNo integrated L%u cache\n",
 						type >= B_CPU_INTEL_PENTIUM_IV
-						&& (type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86 ?
-							3 : 2);
+						&& (type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86
+							? 3 : 2);
 				} else
 					printf("\t%s\n", sIntelCacheDescriptions[j].description);
 				break;
@@ -242,7 +242,8 @@ print_level2_cache(uint32 reg, const char *name)
 {
 	uint32 size = (reg >> 16) & 0xffff;
 	uint32 ways = (reg >> 12) & 0xf;
-	uint32 linesPerTag = (reg >> 8) & 0xf;		// intel does not define this
+	uint32 linesPerTag = (reg >> 8) & 0xf;
+		// intel does not define this
 	uint32 lineSize = reg & 0xff;
 
 	printf("\t%s: %lu KB, ", name, size);
@@ -295,12 +296,14 @@ print_cache_desc(int32 cpu)
 	print_level2_cache(info.regs.ecx, "L2 cache");
 }
 
+
 static void
 print_intel_cache_desc(int32 cpu)
 {
 	cpuid_info info;
-	
-	// A second parameters needs to be passed to CPUID which determines the cache level to query
+
+	// A second parameters needs to be passed to CPUID which determines the
+	// cache level to query
 	get_cpuid(&info, 0x00000004, cpu);
 
 	putchar('\n');
@@ -459,24 +462,31 @@ print_features(uint32 features)
 #ifdef __INTEL__
 
 static void
-print_processor_signature(system_info *sys_info, cpuid_info *info, const char *prefix)
+print_processor_signature(system_info *sys_info, cpuid_info *info,
+	const char *prefix)
 {
 
 	if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
-		printf("\t%s%sype %lu, family %lu, model %u, stepping %lu, features 0x%08lx\n",
-			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
+		printf("\t%s%sype %lu, family %lu, model %lu, stepping %lu, features "
+			"0x%08lx\n", prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
 			info->eax_1.type,
-			info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
-			info->eax_1.model + (info->eax_1.model == 0xf ? info->eax_1.extended_model << 4 : 0),
+			info->eax_1.family + (info->eax_1.family == 0xf
+				? info->eax_1.extended_family : 0),
+			info->eax_1.model + (info->eax_1.model == 0xf
+				? info->eax_1.extended_model << 4 : 0),
 			info->eax_1.stepping,
 			info->eax_1.features);
-	} else if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
+	} else if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK)
+			== B_CPU_INTEL_x86) {
 		// model calculation is different for INTEL
-		printf("\t%s%sype %lu, family %lu, model %u, stepping %lu, features 0x%08lx\n",
-			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
+		printf("\t%s%sype %lu, family %lu, model %lu, stepping %lu, features "
+			"0x%08lx\n", prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
 			info->eax_1.type,
-			info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
-			info->eax_1.model + ((info->eax_1.family == 0xf || info->eax_1.family == 0x6) ? info->eax_1.extended_model << 4 : 0),
+			info->eax_1.family + (info->eax_1.family == 0xf
+				? info->eax_1.extended_family : 0),
+			info->eax_1.model
+				+ ((info->eax_1.family == 0xf || info->eax_1.family == 0x6)
+					? info->eax_1.extended_model << 4 : 0),
 			info->eax_1.stepping,
 			info->eax_1.features);
 	}
@@ -500,12 +510,10 @@ dump_platform(system_info *info)
 static void
 dump_cpu(system_info *info, int32 cpu)
 {
-	/* references:
-	 *
-	 * http://grafi.ii.pw.edu.pl/gbm/x86/cpuid.html
-	 * http://www.sandpile.org/ia32/cpuid.htm
-	 * http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/TN13.pdf (Duron erratum)
-	 */
+	// References:
+	// http://grafi.ii.pw.edu.pl/gbm/x86/cpuid.html
+	// http://www.sandpile.org/ia32/cpuid.htm
+	// http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/TN13.pdf (Duron erratum)
 
 	cpuid_info baseInfo;
 	if (get_cpuid(&baseInfo, 0, cpu) != B_OK) {
@@ -514,15 +522,18 @@ dump_cpu(system_info *info, int32 cpu)
 	}
 
 	int32 maxStandardFunction = baseInfo.eax_0.max_eax;
-	if (maxStandardFunction >= 500)
-		maxStandardFunction = 0; /* old Pentium sample chips has cpu signature here */
+	if (maxStandardFunction >= 500) {
+		// old Pentium sample chips has cpu signature here
+		maxStandardFunction = 0;
+	}
 
-	/* Extended cpuid */
+	// Extended cpuid
 
 	cpuid_info cpuInfo;
 	get_cpuid(&cpuInfo, 0x80000000, cpu);
 
-	// extended cpuid is only supported if max_eax is greater than the service id
+	// Extended cpuid is only supported if max_eax is greater than the
+	// service id
 	int32 maxExtendedFunction = 0;
 	if (cpuInfo.eax_0.max_eax > 0x80000000)
 		maxExtendedFunction = cpuInfo.eax_0.max_eax & 0xff;
@@ -586,7 +597,8 @@ dump_cpu(system_info *info, int32 cpu)
 				get_cpuid(&cpuInfo, 0x80000007, cpu);
 				print_amd_power_management_features(cpuInfo.regs.edx);
 			}
-		} else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_TRANSMETA_x86)
+		} else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK)
+				== B_CPU_TRANSMETA_x86)
 			print_transmeta_features(cpuInfo.regs.edx);
 	}
 
@@ -595,7 +607,8 @@ dump_cpu(system_info *info, int32 cpu)
 		if (!strncmp(baseInfo.eax_0.vendor_id, "CyrixInstead", 12)) {
 			get_cpuid(&cpuInfo, 0x00000002, cpu);
 			print_intel_cache_descriptors(info->cpu_type, &cpuInfo);
-		} else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
+		} else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK)
+				== B_CPU_INTEL_x86) {
 			// Intel does not support extended function 5 (but it does 6 hmm)
 			print_intel_cache_desc(cpu);
 		} else {
@@ -620,7 +633,8 @@ dump_cpu(system_info *info, int32 cpu)
 		if (flagsInfo.eax_1.features & (1UL << 18)) {
 			get_cpuid(&cpuInfo, 3, cpu);
 			printf("Serial number: %04lx-%04lx-%04lx-%04lx-%04lx-%04lx\n",
-				flagsInfo.eax_1.features >> 16, flagsInfo.eax_1.features & 0xffff,
+				flagsInfo.eax_1.features >> 16,
+				flagsInfo.eax_1.features & 0xffff,
 				cpuInfo.regs.edx >> 16, cpuInfo.regs.edx & 0xffff,
 				cpuInfo.regs.ecx >> 16, cpuInfo.regs.edx & 0xffff);
 		}
@@ -646,8 +660,8 @@ dump_cpus(system_info *info)
 		snprintf(modelString, 32, "(Unknown %x)", info->cpu_type);
 	}
 
-	printf("%ld %s%s%s, revision %04lx running at %LdMHz (ID: 0x%08lx 0x%08lx)\n\n",
-		info->cpu_count,
+	printf("%ld %s%s%s, revision %04lx running at %LdMHz (ID: 0x%08lx "
+		"0x%08lx)\n\n", info->cpu_count,
 		vendor ? vendor : "", vendor ? " " : "", model,
 		info->cpu_revision,
 		info->cpu_clock_speed / 1000000,
