@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PackageInstaller	815030818
+1	russian	x-vnd.Haiku-PackageInstaller	590048695
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
@@ -6,9 +6,9 @@ Continue	PackageInstall		Продолжить
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не удалось установить запрошенный пакет. Возможно это случилось из-за проблем файлами данного пакета. Пожалуйста, обратитесь к поставщику пакета.
 Image not loaded correctly	PackageImageViewer		Изображение некорректно загружено
 Install 	PackageView		Установить 
-No package selected.	PackageInfo		Ни один пакет на выбран.
+No package selected.	PackageInfo		Ни один пакет не выбран.
 Install	PackageView		Установить
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Похоже, что данный пакет уже установлен в вашей системе. Хотите удалить существующий и продолжить установку?
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Данный пакет уже установлен в вашей системе. Хотите удалить существующий и продолжить установку?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Вы хотите запомнить это решение до конца этой установки?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Обнаружилась несоответствие размера файла в пакете. Этот пакет мог бы быть испорчен или быть измененным после его создания. Вы все еще хотите продолжить?
 Error while installing the package\n	PackageView		Ошибка во время установки пакета\n
@@ -21,12 +21,34 @@ Preparing package	PackageInstall		Подготовка пакета
 No package available.	PackageInfo		Нет доступных пакетов.
 none	PackageView		нет
 Stop	PackageStatus		Остановить
+Other…	PackageView		Другой…
+No installation type selected	PackageView		Не выбран тип установки
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Символическая ссылка с именем '%s' уже существует по этому пути.\nЗаменить эту ссылку той, что находится внутри пакета или пропустить ее?
+Installing files and folders	PackageInstall		Установка файлов и папок
 Package installer	PackageView		Установщик пакетов
+Skip all	PackageView		Пропустить все
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Элемент с именем '%s' уже существует по этому пути.\nЗаменить этот файл тем, что находится внутри пакета или пропустить го?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт с именем '%s' уже существует по этому пути.\nЗаменить этот скрипт тем, что находится внутри пакета или пропустить его?
+Running post-installation scripts	PackageInstall		Выполнение постинсталляционных скриптов
+%llu bytes	PackageView		%llu байт
+Skip	PackageView		Пропустить
 %.1f MiB	PackageView		%.1f МБ
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка с именем '%s' уже существует по этому пути.\nЗаменить эту папку той, что находится внутри пакета или пропустить ее?
+The package you requested has been successfully installed on your system.	PackageView		Пакет, который вы просили, был успешно установлен на вашей системе.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Ошибка! \"%s\" не является правильным путем.\n
+Installation type:	PackageView		Тип установки:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Ошибка (%s)! Не удалось открыть \"%s\".\n
+Finishing installation	PackageInstall		Завершение установки
+Installing package	PackageStatus		Установка пакета
 Ask again	PackageView		Спрашивать снова
 Abort	PackageView		Прервать
+Replace all	PackageView		Заменить все
+Decline	PackageTextViewer		Отклонить
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл с именем '%s' уже существует по этому пути.\n Заменить этот файл тем, что находится внутри пакета или пропустить его?
+All existing files will be skipped?	PackageView		Все существующие файлы будут заменены?
 Continue	PackageInfo		Продолжить
 %.1f KiB	PackageView		%.1f КБ
+(%s free)	PackageView		(%s свободно)
 Abort	PackageInfo		Прервать
 PackageInstaller	System name		Установщик пакетов
 Abort	PackageInstall		Прервать

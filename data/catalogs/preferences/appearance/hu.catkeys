@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Appearance	3047172181
+1	hungarian	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		Alap betűtípus:
 Control highlight	Colors tab		Kiválasztott vezérlőelem
 Control border	Colors tab		Vezérlőelem kerete
@@ -39,6 +39,7 @@ Colors	APRWindow		Színek
 Control background	Colors tab		Kiválasztás háttere
 Inactive window tab	Colors tab		Inaktív ablak füle
 Appearance	System name		Megjelenés
+Use double scrollbar arrows	DecorSettingsView		Dupla nyíl használata
 Fixed font:	Font view		Rögzített szélességű betűtípus:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
 Reduce colored edges filter strength:	AntialiasingSettingsView		A színezett betűszélek szűrőjének erősségi szintje:
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		Kiválasztott menüelem szegélye
 Strong	AntialiasingSettingsView		Erős
 Panel text	Colors tab		Panel szövege
 Monospaced fonts only	AntialiasingSettingsView		Csak rögzített szélességű betűtípusok
+Look and feel	APRWindow		Megjelenés
 Antialiasing menu	AntialiasingSettingsView		Élsimítási menü
 Fonts	APRWindow		Betűtípusok
 Glyph hinting:	AntialiasingSettingsView		Glifák körvonala:

@@ -12,7 +12,7 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		O
 %ld files added.	file:ZipOMaticWindow.cpp		%ld tiedostoa lisätty.
 Stopped	file:ZipOMaticWindow.cpp		Pysäytetty
 Archive	file:ZipperThread.cpp		Arkisto
-Error creating archive	file:ZipOMaticWindow.cpp		Virhe luotaessa arkistoa
+Error creating archive	file:ZipOMaticWindow.cpp		Arkiston luonnissa tapahtui virhe
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Suoritat parhaillaan %ld Zip-O-Matic -ohjelmaa.\n\n
 Archive created OK	file:ZipOMaticWindow.cpp		Arkisto luotu valmiiksi
 Stop them	file:ZipOMatic.cpp		Pysäytä ne

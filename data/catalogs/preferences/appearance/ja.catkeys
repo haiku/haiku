@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Appearance	3047172181
+1	japanese	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		標準フォント：
 Control highlight	Colors tab		コントロールのハイライト
 Control border	Colors tab		コントロールの境界
@@ -39,6 +39,7 @@ Colors	APRWindow		色
 Control background	Colors tab		コントロールの背景
 Inactive window tab	Colors tab		非アクティブウィンドウタブ
 Appearance	System name		外観
+Use double scrollbar arrows	DecorSettingsView		スクロールバーに両方向矢印を使用
 Fixed font:	Font view		等幅フォント：
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	古池や A frog jumps in, 水の音。
 Reduce colored edges filter strength:	AntialiasingSettingsView		カラーエッジフィルターの強度を下げる
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		メニュー選択項目の境界
 Strong	AntialiasingSettingsView		強い
 Panel text	Colors tab		パネルの文字
 Monospaced fonts only	AntialiasingSettingsView		等幅フォントのみ有効
+Look and feel	APRWindow		外観
 Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
 Fonts	APRWindow		フォント
 Glyph hinting:	AntialiasingSettingsView		グリフのヒンティング：

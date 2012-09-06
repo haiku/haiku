@@ -1,27 +1,51 @@
-1	russian	x-vnd.Be-PSRV	3030536593
+1	russian	x-vnd.Be-PSRV	3804178793
 Undefined	ConfigWindow		не определены
+Return the number of available transports	PrintServerApp Scripting		Возвращает количество доступных транспортов
+Return the number of available printers	PrintServerApp Scripting		Возвращает количество доступных принтеров
+Get currently available ports/devices	Transport Scripting		Получить доступные в данный момент порты/устройства
+Retrieve or select the active printer	PrintServerApp Scripting		Запросить или выбрать активный принтер
 Cancel	PrintServerApp		Отмена
+Retrieve a specific printer	PrintServerApp Scripting		Запросить указанный принтер
 Page %1 to %2	ConfigWindow		Страница %1 из %2
+Get name of the printer add-on used for this printer	Printer Scripting		Получить имя дополнения принтера, используемого для этого принтера
 Page setup:	ConfigWindow		Настройки печати:
 OK	ConfigWindow		ОК
 Cancel	ConfigWindow		Отмена
+Printer server	ConfigWindow		Сервер печати
 Page %1 to %2, %3 copies	ConfigWindow		Страница %1 из %2, копий: %3
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его драйвер не найден! Заменить?
 Yes	PrintServerApp		Да
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
 Would you like to set one up now?	PrintServerApp		Хотите настроить принтер сейчас?
+A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Портрет
 All pages	ConfigWindow		Все страницы
 There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
 Printer:	ConfigWindow		Принтер:
+A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Выберите принтер
+Show configuration window	PrintServerApp Scripting		Показать окно настройки
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Получить комментарии об этом принтере
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его нельзя использовать! Заменить?
 No	PrintServerApp		Нет
+Get the transport configuration for this printer	Printer Scripting		Получить конфигурацию транспорта для этого принтера
 Landscape	ConfigWindow		Альбом
 There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
+Get name of the transport add-on used for this printer	Printer Scripting		Получить имя транспортного дополнения, используемого для этого принтера
 All pages, %1 copies	ConfigWindow		Все страницы, копий: %1
+Delete a specific printer	PrintServerApp Scripting		Удалить указанный принтер
 Create a new printer	PrintServerApp Scripting		Создать новый принтер
 OK	PrintServerApp		ОК
 Print setup	ConfigWindow		Настройка печати
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Запросить указанный транспорт
+Get name of printer	Printer Scripting		Получить имя принтера
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Получить имя транспорта
+A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Таблоид
 Page setup	ConfigWindow		Настройка печати

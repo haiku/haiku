@@ -2,13 +2,13 @@
 Outline:	ControlView		Контур:
 Size: 50	ControlView		Размер: 50
 Stop cycling	ControlView		Остановить цикл
-Shear: 90	ControlView		Shear: 90
+Shear: 90	ControlView		Сдвиг: 90
 Spacing: 0	ControlView		Интервал: 0
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Поворот: %d
 Shear: %d	ControlView		Сдвиг: %d
 Spacing: %d	ControlView		Интервал: %d
-Cycle fonts	ControlView		Циклрировать шрифты
+Cycle fonts	ControlView		Прокручивать шрифты
 Font:	ControlView		Шрифт:
 Rotation: 0	ControlView		Поворот: 0
 Drawing mode:	ControlView		Режим отрисовки:
@@ -18,5 +18,5 @@ Controls	FontDemo		Управление
 Outline: %d	ControlView		Контур: %d
 Text:	ControlView		Текст:
 Antialiased text	ControlView		Сглаженный текст
-Bounding boxes	ControlView		Ограничивающий параллелепипед
+Bounding boxes	ControlView		Ограничивающие рамки
 Size: %d	ControlView		Размер: %d

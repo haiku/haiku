@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	3047172181
+1	russian	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		Простой шрифт:
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
@@ -39,6 +39,7 @@ Colors	APRWindow		Цвета
 Control background	Colors tab		Фон элемента
 Inactive window tab	Colors tab		Заголовок неактивного окна
 Appearance	System name		Внешний вид
+Use double scrollbar arrows	DecorSettingsView		Использовать двухсторонние стрелки на полосах прокрутки
 Fixed font:	Font view		Моноширинный шрифт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Фильтрация цветных краев:
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		Рамка выделенного пунк
 Strong	AntialiasingSettingsView		Сильная
 Panel text	Colors tab		Текст панели
 Monospaced fonts only	AntialiasingSettingsView		Только моноширинные шрифты
+Look and feel	APRWindow		Вид и поведение
 Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
 Fonts	APRWindow		Шрифты
 Glyph hinting:	AntialiasingSettingsView		Уточнение:
