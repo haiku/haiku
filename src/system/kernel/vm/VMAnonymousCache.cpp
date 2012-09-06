@@ -1,6 +1,4 @@
 /*
- * Copyright 2012, Alexander von Gluck IV, kallisti5@unixzen.com.
- * Copyright 2011, Hamish Morrison, hamish@lavabit.com.
  * Copyright 2008, Zhao Shuai, upczhsh@163.com.
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
@@ -8,6 +6,13 @@
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
+ *
+ * Copyright 2011-2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Hamish Morrison, hamish@lavabit.com
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 
@@ -1456,52 +1461,59 @@ swap_init_post_modules()
 
 		if (enabled != NULL) {
 			swapEnabled = get_driver_boolean_parameter(settings, "vm",
-				false, false);
+				true, false);
+			swapAutomatic = get_driver_boolean_parameter(settings, "swap_auto",
+				true, false);
 
-			const char* size = get_driver_parameter(settings, "swap_size",
-				NULL, NULL);
-			const char* volume = get_driver_parameter(settings,
-				"swap_volume_name", NULL, NULL);
-			const char* device = get_driver_parameter(settings,
-				"swap_volume_device", NULL, NULL);
-			const char* filesystem = get_driver_parameter(settings,
-				"swap_volume_filesystem", NULL, NULL);
-			const char* capacity = get_driver_parameter(settings,
-				"swap_volume_capacity", NULL, NULL);
+			if (swapEnabled && !swapAutomatic) {
+				const char* size = get_driver_parameter(settings, "swap_size",
+					NULL, NULL);
+				const char* volume = get_driver_parameter(settings,
+					"swap_volume_name", NULL, NULL);
+				const char* device = get_driver_parameter(settings,
+					"swap_volume_device", NULL, NULL);
+				const char* filesystem = get_driver_parameter(settings,
+					"swap_volume_filesystem", NULL, NULL);
+				const char* capacity = get_driver_parameter(settings,
+					"swap_volume_capacity", NULL, NULL);
 
-			if (size != NULL && device != NULL && volume != NULL
-				&& filesystem != NULL && capacity != NULL) {
-				// User specified a size / volume
-				swapAutomatic = false;
-				swapSize = atoll(size);
-				strncpy(selectedVolume.name, volume,
-					sizeof(selectedVolume.name));
-				strncpy(selectedVolume.device, device,
-					sizeof(selectedVolume.device));
-				strncpy(selectedVolume.filesystem, filesystem,
-					sizeof(selectedVolume.filesystem));
-				selectedVolume.capacity = atoll(capacity);
-			} else if (size != NULL) {
-				// Older file format, no location information (assume /var/swap)
-				swapAutomatic = false;
-				swapSize = atoll(size);
-				swapDeviceID = gBootDevice;
+				if (size != NULL && device != NULL && volume != NULL
+					&& filesystem != NULL && capacity != NULL) {
+					// User specified a size / volume that seems valid
+					swapAutomatic = false;
+					swapSize = atoll(size);
+					strncpy(selectedVolume.name, volume,
+						sizeof(selectedVolume.name));
+					strncpy(selectedVolume.device, device,
+						sizeof(selectedVolume.device));
+					strncpy(selectedVolume.filesystem, filesystem,
+						sizeof(selectedVolume.filesystem));
+					selectedVolume.capacity = atoll(capacity);
+				} else {
+					// Something isn't right with swap config, go auto
+					swapAutomatic = true;
+					dprintf("%s: virtual_memory configuration is invalid, "
+						"using automatic swap\n", __func__);
+				}
 			}
+			unload_driver_settings(settings);
 		}
-		unload_driver_settings(settings);
 	}
 
 	if (swapAutomatic) {
-		swapEnabled = true;
 		swapSize = (off_t)vm_page_num_pages() * B_PAGE_SIZE;
 		if (swapSize <= (1024 * 1024 * 1024)) {
 			// Memory under 1GB? double the swap
 			swapSize *= 2;
 		}
+		// Automatic swap defaults to the boot device
+		swapDeviceID = gBootDevice;
 	}
 
-	if (!swapEnabled || swapSize < B_PAGE_SIZE)
+	if (!swapEnabled || swapSize < B_PAGE_SIZE) {
+		dprintf("%s: virtual_memory is disabled\n", __func__);
 		return;
+	}
 
 	if (!swapAutomatic && swapDeviceID < 0) {
 		// If user-specified swap, and no swap device has been chosen yet...
