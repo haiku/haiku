@@ -1,7 +1,13 @@
 /*
- * Copyright 2011, Hamish Morrison, hamish@lavabit.com
  * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de
  * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Copyright 2010-2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      Hamish Morrison, hamish@lavabit.com
+ *      Alexander von Gluck, kallisti5@unixzen.com
  */
 #ifndef SETTINGS_WINDOW_H
 #define SETTINGS_WINDOW_H
@@ -66,6 +72,7 @@ private:
 			void			_Update();
 
 			BCheckBox*		fSwapEnabledCheckBox;
+			BCheckBox*		fSwapAutomaticCheckBox;
 			BSlider*		fSizeSlider;
 			BButton*		fDefaultsButton;
 			BButton*		fRevertButton;

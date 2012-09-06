@@ -1,7 +1,13 @@
 /*
- * Copyright 2010-2011, Hamish Morrison, hamish@lavabit.com 
  * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de
  * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Copyright 2010-2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Hamish Morrison, hamish@lavabit.com
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
@@ -41,6 +47,7 @@ static const uint32 kMsgDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgSwapEnabledUpdate = 'swen';
+static const uint32 kMsgSwapAutomaticUpdate = 'swat';
 static const uint32 kMsgVolumeSelected = 'vlsl';
 static const off_t kMegaByte = 1024 * 1024;
 static dev_t gBootDev = -1;
@@ -154,6 +161,11 @@ SettingsWindow::SettingsWindow()
 		new BMessage(kMsgSwapEnabledUpdate));
 	fSwapEnabledCheckBox->SetExplicitAlignment(align);
 
+	fSwapAutomaticCheckBox = new BCheckBox("auto swap",
+		B_TRANSLATE("Choose swap size automatically"),
+		new BMessage(kMsgSwapAutomaticUpdate));
+	fSwapEnabledCheckBox->SetExplicitAlignment(align);
+
 	char sizeStr[16];
 	system_info info;
 	get_system_info(&info);
@@ -204,6 +216,7 @@ SettingsWindow::SettingsWindow()
 	box->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.Add(memoryView)
 		.Add(swapFileView)
+		.Add(fSwapAutomaticCheckBox)
 		.Add(fVolumeMenuField)
 		.Add(fSizeSlider)
 		.Add(fWarningStringView)
@@ -331,6 +344,12 @@ SettingsWindow::MessageReceived(BMessage* message)
 			_Update();
 			break;
 		}
+		case kMsgSwapAutomaticUpdate:
+		{
+			fSettings.SetSwapAutomatic(fSwapAutomaticCheckBox->Value());
+			_Update();
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -404,6 +423,7 @@ void
 SettingsWindow::_Update()
 {
 	fSwapEnabledCheckBox->SetValue(fSettings.SwapEnabled());
+	fSwapAutomaticCheckBox->SetValue(fSettings.SwapAutomatic());
 
 	VolumeMenuItem* item = _FindVolumeMenuItem(fSettings.SwapVolume());
 	if (item != NULL) {
@@ -445,4 +465,14 @@ SettingsWindow::_Update()
 		fWarningStringView->Hide();
 	fRevertButton->SetEnabled(revertable);
 	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+
+	// Automatic Swap depends on swap being enabled
+	fSwapAutomaticCheckBox->SetEnabled(fSettings.SwapEnabled());
+
+	// Manual swap settings depend on enabled swap
+	// and automatic swap being disabled
+	fSizeSlider->SetEnabled(fSettings.SwapEnabled()
+		&& !fSwapAutomaticCheckBox->Value());
+	fVolumeMenuField->SetEnabled(fSettings.SwapEnabled()
+		&& !fSwapAutomaticCheckBox->Value());
 }

@@ -1,7 +1,13 @@
 /*
- * Copyright 2010-2011, Hamish Morrison, hamish@lavabit.com
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de
  * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Copyright 2010-2012 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      Hamish Morrison, hamish@lavabit.com
+ *      Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
@@ -27,6 +33,7 @@ static const off_t kMegaByte = 1024 * 1024;
 Settings::Settings()
 {
 	fDefaultSettings.enabled = true;
+	fDefaultSettings.automatic = true;
 
 	system_info sysInfo;
 	get_system_info(&sysInfo);
@@ -41,6 +48,15 @@ Settings::SetSwapEnabled(bool enabled, bool revertable)
 	fCurrentSettings.enabled = enabled;
 	if (!revertable)
 		fInitialSettings.enabled = enabled;
+}
+
+
+void
+Settings::SetSwapAutomatic(bool automatic, bool revertable)
+{
+	fCurrentSettings.automatic = automatic;
+	if (!revertable)
+		fInitialSettings.automatic = automatic;
 }
 
 
@@ -116,6 +132,8 @@ Settings::ReadSwapSettings()
 		return kErrorSettingsNotFound;
 
 	const char* enabled = get_driver_parameter(settings, "vm", NULL, NULL);
+	const char* automatic = get_driver_parameter(settings, "swap_auto",
+		NULL, NULL);
 	const char* size = get_driver_parameter(settings, "swap_size", NULL, NULL);
 	const char* volume = get_driver_parameter(settings, "swap_volume_name",
 		NULL, NULL);
@@ -126,14 +144,16 @@ Settings::ReadSwapSettings()
 	const char* capacity = get_driver_parameter(settings,
 		"swap_volume_capacity", NULL, NULL);
 
-	if (enabled == NULL	|| size == NULL || device == NULL || volume == NULL
-		|| capacity == NULL || filesystem == NULL)
+	if (enabled == NULL	|| automatic == NULL || size == NULL || device == NULL
+		|| volume == NULL || capacity == NULL || filesystem == NULL)
 		return kErrorSettingsInvalid;
 
 	off_t volCapacity = atoll(capacity);
 
 	SetSwapEnabled(get_driver_boolean_parameter(settings,
-		"vm", false, false));
+		"vm", true, false));
+	SetSwapAutomatic(get_driver_boolean_parameter(settings,
+		"swap_auto", true, false));
 	SetSwapSize(atoll(size));
 	unload_driver_settings(settings);
 
@@ -193,11 +213,12 @@ Settings::WriteSwapSettings()
 	fs_stat_dev(SwapVolume(), &info);
 
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "vm %s\nswap_size %lld\n"
+	snprintf(buffer, sizeof(buffer), "vm %s\nswap_auto %s\nswap_size %lld\n"
 		"swap_volume_name %s\nswap_volume_device %s\n"
 		"swap_volume_filesystem %s\nswap_volume_capacity %lld\n",
-		SwapEnabled() ? "on" : "off", SwapSize(), info.volume_name,
-		info.device_name, info.fsh_name, info.total_blocks * info.block_size);
+		SwapEnabled() ? "on" : "off", SwapAutomatic() ? "yes" : "no",
+		SwapSize(), info.volume_name, info.device_name, info.fsh_name,
+		info.total_blocks * info.block_size);
 
 	file.Write(buffer, strlen(buffer));
 	return B_OK;
@@ -208,6 +229,7 @@ bool
 Settings::IsRevertable()
 {
 	return SwapEnabled() != fInitialSettings.enabled
+		|| SwapAutomatic() != fInitialSettings.automatic
 		|| SwapSize() != fInitialSettings.size
 		|| SwapVolume() != fInitialSettings.volume;
 }
@@ -217,6 +239,7 @@ void
 Settings::RevertSwapSettings()
 {
 	SetSwapEnabled(fInitialSettings.enabled);
+	SetSwapAutomatic(fInitialSettings.automatic);
 	SetSwapSize(fInitialSettings.size);
 	SetSwapVolume(fInitialSettings.volume);
 }
@@ -226,6 +249,7 @@ bool
 Settings::IsDefaultable()
 {
 	return SwapEnabled() != fDefaultSettings.enabled
+		|| SwapAutomatic() != fDefaultSettings.automatic
 		|| SwapSize() != fDefaultSettings.size
 		|| SwapVolume() != fDefaultSettings.volume;
 }
@@ -235,6 +259,7 @@ void
 Settings::DefaultSwapSettings(bool revertable)
 {
 	SetSwapEnabled(fDefaultSettings.enabled);
+	SetSwapAutomatic(fDefaultSettings.automatic);
 	SetSwapSize(fDefaultSettings.size);
 	SetSwapVolume(fDefaultSettings.volume);
 	if (!revertable)
