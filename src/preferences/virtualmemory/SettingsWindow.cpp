@@ -397,8 +397,8 @@ SettingsWindow::_RemoveVolumeMenuItem(dev_t device)
 		fVolumeMenuField->Menu()->RemoveItem(item);
 		delete item;
 		return B_OK;
-	} else
-		return B_ERROR;
+	}
+	return B_ERROR;
 }
 
 
@@ -461,6 +461,7 @@ SettingsWindow::_Update()
 		fWarningStringView->Show();
 	else
 		fWarningStringView->Hide();
+
 	fRevertButton->SetEnabled(revertable);
 	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 
