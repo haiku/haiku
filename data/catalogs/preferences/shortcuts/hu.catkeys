@@ -37,7 +37,7 @@ Quit	ShortcutsWindow		Kilépés
 *MouseDown	ShortcutsWindow		*EgérLe
 Don't save	ShortcutsWindow		Ne mentse
 Multi	ShortcutsSpec		Multi
-Application	ShortcutsWindow		Alkalmazás
+Application	ShortcutsWindow		Program
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Sípolás
 *MoveMouseTo 50% 50%	ShortcutsWindow		*EgérMozgatásIde 50% 50%

@@ -1,12 +1,12 @@
 1	hungarian	x-vnd.Haiku-LaunchBox	3016105370
 New	LaunchBox		Új
-Set description…	LaunchBox		Leírás beállítása…
+Set description…	LaunchBox		Leírás…
 Vertical layout	LaunchBox		Függőleges elrendezés
 OK	LaunchBox		Rendben
 Pad 1	LaunchBox		1. tálca
 last chance	LaunchBox		utolsó esély
 Quit	LaunchBox		Kilépés
-Clear button	LaunchBox		Törlés gomb
+Clear button	LaunchBox		Gomb törlése
 LaunchBox	System name		Indítódoboz
 Ignore double-click	LaunchBox		Dupla kattintás figyelmen kívül hagyása
 Auto-raise	LaunchBox		Automatikus emelés
@@ -16,7 +16,7 @@ Pad	LaunchBox		Tálca
 Icon size	LaunchBox		Ikonméret
 Bummer	LaunchBox		Fenébe
 Cancel	LaunchBox		Mégse
-Remove button	LaunchBox		Eltávolítás gomb
+Remove button	LaunchBox		Gomb eltávolítása
 Horizontal layout	LaunchBox		Vízszintes elrendezés
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNem sikerült a programot elindítani ezzel az aláírással: '%2'.\n\nHiba:
 Failed to launch '%1'.\n\nError:	LaunchBox		Nem sikerült ezt elindítani: '%1'.\n\nHiba:

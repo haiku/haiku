@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	3337401776
+1	japanese	x-vnd.Be-MAIL	1599879742
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
@@ -82,6 +82,7 @@ Only files can be added as attachments.	Mail		添付できるのは、ファイ�
 Previous message	Mail		前のメッセージ
 Attachments:	Mail		添付ファイル:
 Title:	Mail		署名の名称：
+<no account found>	Mail		<アカウントが見つかりません>
 Find…	Mail		検索…
 Accounts…	Mail		アカウントの設定…
 Mail preferences	Mail		メールの設定

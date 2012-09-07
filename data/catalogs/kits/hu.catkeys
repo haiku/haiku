@@ -1,12 +1,12 @@
 1	hungarian	x-vnd.Haiku-libbe	180647795
 Close	AboutWindow		Bezárás
-%3.2f GiB	StringForSize		%3.2f GiB
+%3.2f GiB	StringForSize		%3.2f GB
 Written by:	AboutWindow		Írta:
 About %app%	AboutMenuItem		%app% névjegye
 Cut	TextView		Kivágás
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nem lehetet másolatot létrehozni ehhez: \"%description\".\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nem lehet replikánst létrehozni ehhez: \"%description\".\n%error
 Copy	TextView		Másolás
-%3.2f KiB	StringForSize		%3.2f KiB
+%3.2f KiB	StringForSize		%3.2f KB
 %d bytes	StringForSize		%Ld byte
 About…	AboutWindow		Névjegy…
 Error	PrintJob		Hiba
@@ -14,21 +14,21 @@ No Pages to print!	PrintJob		Nincs nyomtatható oldal!
 OK	Dragger		Rendben
 OK	PrintJob		Rendben
 Green:	ColorControl		Zöld:
-Remove replicant	Dragger		Másolat eltávolítása
+Remove replicant	Dragger		Replikáns eltávolítása
 OK	ZombieReplicantView		Rendben
 Print Server is not responding.	PrintJob		A nyomtatókiszolgáló nem válaszol.
 Paste	TextView		Beillesztés
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
-%.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nem található a másolathoz tartozó alkalmazás. Nincs megadva alkalmazásaláírás.\n%error
+%.2f TiB	StringForSize		%.2f TB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nem található a replikánshoz tartozó program. Nincs megadva programaláírás.\n%error
 Redo	TextView		Újra
 <empty>	Menu		<üres>
 Select All	TextView		Mind kijelölése
 Warning	Dragger		Figyelmeztetés
 Undo	TextView		Visszavonás
 Red:	ColorControl		Vörös:
-%3.2f MiB	StringForSize		%3.2f MiB
+%3.2f MiB	StringForSize		%3.2f MB
 About %app…	Dragger		%app névjegye…
 Error	ZombieReplicantView		Hiba
 Blue:	ColorControl		Kék:
-Can't delete this replicant from its original application. Life goes on.	Dragger		Nem lehet ezt a másolatot törölni az eredeti alkalmazástól, de az élet megy tovább.
+Can't delete this replicant from its original application. Life goes on.	Dragger		Nem lehet ezt a replikánst törölni az eredeti programtól, de az élet megy tovább.

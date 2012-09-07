@@ -6,7 +6,7 @@ Rescan	MainWindow		Frissítés
 OK	MainWindow		Rendben
 Could not aquire partitioning information.	MainWindow		A partíciók állapotát nem lehetett lekérdezni.
 There's no space on the partition where a child partition could be created.	MainWindow		Nincs hely már a partíción, ahol alpartíciót kellene létrehozni.
-%ld MiB	Support		%ld MiB
+%ld MiB	Support		%ld MB
 <empty>	PartitionList		<üres>
 Unable to find the selected partition by ID.	MainWindow		Nincs ilyen azonosítójú partíció.
 Select a partition from the list below.	DiskView		Válasszon partíciót a lenti listából!

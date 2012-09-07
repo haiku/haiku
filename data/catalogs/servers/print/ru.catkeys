@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PSRV	3804178793
+1	russian	x-vnd.Be-PSRV	1761631281
 Undefined	ConfigWindow		не определены
 Return the number of available transports	PrintServerApp Scripting		Возвращает количество доступных транспортов
 Return the number of available printers	PrintServerApp Scripting		Возвращает количество доступных принтеров
@@ -23,6 +23,7 @@ All pages	ConfigWindow		Все страницы
 There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
 Printer:	ConfigWindow		Принтер:
 A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Выберите принтер
@@ -33,6 +34,7 @@ A printer with that name already exists, but it's not usable at all! Replace?	Pr
 No	PrintServerApp		Нет
 Get the transport configuration for this printer	Printer Scripting		Получить конфигурацию транспорта для этого принтера
 Landscape	ConfigWindow		Альбом
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
 There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
 Get name of the transport add-on used for this printer	Printer Scripting		Получить имя транспортного дополнения, используемого для этого принтера
 All pages, %1 copies	ConfigWindow		Все страницы, копий: %1

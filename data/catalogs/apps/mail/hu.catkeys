@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Be-MAIL	1599879742
 View	Mail		Nézet
 %d - Date	Mail		%d - dátum
-Attach attributes:	Mail		Attribútumok csatolása:
+Attach attributes:	Mail		Jellemzők csatolása:
 Inconsistency occurred in the undo/redo buffer.	Mail		Kavarodás történt a visszavon/újra tárolóban.
 An error occurred trying to save the attachment.	Mail		Hiba történt a mellékletek csatolása közben.
 Copy to new	Mail		Másolás újba
@@ -155,10 +155,10 @@ Set to Saved	Mail		Mentésre jelöl
 Open this link	Mail		Hovatkozás megnyitása
 Auto signature:	Mail		Automatikus aláírás:
 Add signature	Mail		Aláírás hozzáfűzése
-Need Tracker to move items to trash	Mail		Szükség van a Tracker-re a szemetesbe mozgatáshoz
+Need Tracker to move items to trash	Mail		Szükség van a Tracker-re a Szemetesbe mozgatáshoz
 Mailing	Mail		Levelezés
 Unread	Mail		Olvasatlan
 Remove quote	Mail		Idézet eltávolítása
-Move to trash	Mail		Áthelyezés a szemetesbe
+Move to trash	Mail		Áthelyezés a Szemetesbe
 Select all	Mail		Összes kijelölése
 An error occurred trying to save this signature.	Mail		Hiba történt az aláírás mentése közben.

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PackageInstaller	590048695
+1	russian	x-vnd.Haiku-PackageInstaller	1396489627
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
@@ -55,3 +55,4 @@ Abort	PackageInstall		Прервать
 Continue	PackageTextViewer		Продолжить
 Replace	PackageView		Заменить
 Installation progress	PackageView		Прогресс установки
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакета не может быть прочитан.\nОдна из возможных причин этого может бы быть то, что требуемый файл не является корректным BeOS .pkg файлом.

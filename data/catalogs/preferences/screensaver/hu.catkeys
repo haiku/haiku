@@ -1,27 +1,27 @@
 1	hungarian	x-vnd.Haiku-ScreenSaver	215605989
-Could not load screen saver	ScreenSaver		A képernyőkímélő betöltése sikertelen
+Could not load screen saver	ScreenSaver		A képernyővédő betöltése sikertelen
 30 seconds	ScreenSaver		30 másodperc
-Start screensaver	ScreenSaver		Képernyőkímélő indítása
+Start screensaver	ScreenSaver		Képernyővédő indítása
 Password…	ScreenSaver		Jelszó…
 Password:	ScreenSaver		Jelszó:
 Password lock	ScreenSaver		Jelszavas zárolás
 Add…	ScreenSaver		Hozzáadás…
-Screensavers	ScreenSaver		Képernyőkímélők
+Screensavers	ScreenSaver		Képernyővédő
 mouse is here	ScreenSaver		az egér itt van
 Display Power Management Signaling not available	ScreenSaver		A kijelző energiakezelési jelzései nem elérhetőek
 ScreenSaver	System name		Képernyővédő
 Test	ScreenSaver		Próba
 General	ScreenSaver		Általános
-Enable screensaver	ScreenSaver		Képernyőkímélő engedélyezése
+Enable screensaver	ScreenSaver		Képernyővédő engedélyezése
 Cancel	ScreenSaver		Mégse
 Turn off screen	ScreenSaver		Képernyő kikapcsolása
 No options available	ScreenSaver		Nincsenek elérhető beállítások
 Password Window	ScreenSaver		Jelszóablak
-Fade now when	ScreenSaver		Elhalványítás ekkor:
-Screensaver settings	ScreenSaver		Képernyőkímélő beállításai
+Fade now when	ScreenSaver		Aktiválás, ha
+Screensaver settings	ScreenSaver		Képernyővédő beállításai
 Passwords don't match. Please try again.	ScreenSaver		A jelszavak nem egyeznek, próbálja újra.
 OK	ScreenSaver		Rendben
-Don't fade when	ScreenSaver		Ne halványítsa el ekkor:
+Don't fade when	ScreenSaver		Letiltás, ha
 Blackness	ScreenSaver		Sötétség
 Use custom password	ScreenSaver		Egyéni jelszó használata
 Done	ScreenSaver		Kész

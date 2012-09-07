@@ -11,14 +11,14 @@ Output file '%filename' created	MediaConverter		A(z) '%filename' kimeneti fájl 
 Output format	MediaConverter		Kimeneti formátum
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld képkocka
 End   [ms]: 	MediaConverter		Vége [ms]:
-MediaConverter	System name		Médiakonverter
+MediaConverter	System name		Médiaátalakító
 No video	Video codecs list		Nincs videó
 Duration:	MediaConverter-FileInfo		Időtartam:
 OK	MediaConverter		Rendben
 Error writing audio frame %Ld	MediaConverter		Hiba történt a %Ld. hang írása közben
-Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl konvertálása közben
+Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl átalakítása közben
 Low	MediaConverter		Alacsony
-Conversion completed	MediaConverter		Konvertálás kész
+Conversion completed	MediaConverter		Átalakítás kész
 Audio:	MediaConverter-FileInfo		Hang:
 OK	MediaConverter-FileInfo		Rendben
  seconds	MediaFileInfo		 másodperc
@@ -33,7 +33,7 @@ No file selected	MediaConverter-FileInfo		Nincs fájl kiválasztva
 Error writing video frame %Ld	MediaConverter		Hiba történt a %Ld. képkocka írása közben
 Select this folder	MediaConverter		E mappa kijelölése
 Continue	MediaConverter		Folytatás
-Encoder parameters	MediaConverter-EncoderWindow		Enkóder paraméterei
+Encoder parameters	MediaConverter-EncoderWindow		Kódoló paraméterei
 Video:	MediaConverter-FileInfo		Videó:
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld képkocka
 %d bit 	MediaFileInfo		%d bit
@@ -57,7 +57,7 @@ Drop media files onto this window	MediaConverter		Húzzon médiafájlokat erre a
 Audio encoding:	MediaConverter		Audió kódolása:
 Audio quality not supported	MediaConverter		Ez a hangminőség nem támogatott
 File	Menu		Fájl
-Convert	MediaConverter		Konvertálás
+Convert	MediaConverter		Átalakítás
 Writing audio track: %ld%% complete	MediaConverter		Audiósáv írása: %ld%% kész
 Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
 Output folder	MediaConverter		Kimeneti mappa

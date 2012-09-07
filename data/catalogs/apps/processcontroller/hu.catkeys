@@ -18,7 +18,7 @@ Processor %d	ProcessController		%d processzor
 ProcessController is already installed in Deskbar.	ProcessController		A Folyamatkezelő már telepítve van az Asztalsávra.
 This is the last active processor...\nYou can't turn it off!	ProcessController		Ez a legutolsó aktív processzor…\nNem lehet leállítani!
 Info	ProcessController		Infó
-Quit application	ProcessController		Kilépés az alkalmazásból
+Quit application	ProcessController		Program leállítása
 Low priority	ProcessController		Alacsony prioritás
 What do you want to do with the thread \"%s\"?	ProcessController		Mit kíván tenni a(z) \"%s\" szállal?
 Gone teams…	ProcessController		Eltűnt csapatok…
@@ -32,7 +32,7 @@ New Terminal	ProcessController		Új terminál
 Urgent priority	ProcessController		Magas prioritás
 About ProcessController…	ProcessController		Folyamatkezelő névjegye…
 Ok!	ProcessController		Rendben!
-Quit an application	ProcessController		Kilépés egy alkalmazásból
+Quit an application	ProcessController		Program leállítása
 Install in Deskbar	ProcessController		Telepítés az Asztalsávra
 Threads and CPU usage	ProcessController		Szálak és processzorhasználat
 Urgent display priority	ProcessController		Magas kijelzési prioritás

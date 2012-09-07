@@ -15,10 +15,10 @@ Backface culling	TeapotWindow		Háttérszűrés
 Z-buffered	TeapotWindow		Z-pufferelt
 File	TeapotWindow		Fájl
 Perspective	TeapotWindow		Perspektíva
-GLTeapot	System name		GLTeapot
+GLTeapot	System name		Teáskanna
 Green	TeapotWindow		Zöld
 Right	TeapotWindow		Jobb
 FPS display	TeapotWindow		FPS megjelenítése
-Add a teapot	TeapotWindow		Teapot hozzáadása
+Add a teapot	TeapotWindow		Teáskanna hozzáadása
 Red	TeapotWindow		Vörös
 Lights	TeapotWindow		Fények

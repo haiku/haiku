@@ -2,7 +2,7 @@
 Loop	RecorderWindow		Ismétlés
 Cannot find default audio hardware	RecorderWindow		Nem található az alapértelmezett hangeszköz
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nem található az új felvételt tároló ideiglenes fájl
-Sample size:	RecorderWindow		Mintavételezés mérete:
+Sample size:	RecorderWindow		Méret:
 Nothing to play	RecorderWindow		Nincs mit lejátszani
 Duration: 	RecorderWindow		Hossz:
 Some of the files don't appear to be audio files	RecorderWindow		A fájlok között van olyan, ami nem hangfájl
@@ -14,7 +14,7 @@ Format:	RecorderWindow		Formátum:
 Sound List	RecorderWindow		Hanglista
 Compression: 	RecorderWindow		Tömörítés:
 Rewind	RecorderWindow		Visszatekerés
-Sample rate:	RecorderWindow		Mintavételezés frekvenciája:
+Sample rate:	RecorderWindow		Frekvencia:
 Invalid audio files	RecorderWindow		Érvénytelen hangfájlok
  seconds	RecorderWindow		 másodperc
 OK	RecorderWindow		Rendben

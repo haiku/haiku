@@ -5,11 +5,11 @@ BSD (4-clause)	AboutView		BSD (4-klauzulás)
 %ld Processors:	AboutView		%ld Processzor:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL és Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Minden jog fenntartva.
-%d MiB total	AboutView		%d MiB összesen
+%d MiB total	AboutView		%d MB összesen
 Michael Phipps (project founder)\n\n	AboutView		Michael Phippsnek (projektalapító)\n\n
 The Haiku-Ports team\n	AboutView		A Haiku-Ports csapatának\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard.  Minden jog fenntartva.
-%d MiB used (%d%%)	AboutView		%d MiB foglalt (%d%%)
+%d MiB used (%d%%)	AboutView		%d MB használt (%d%%)
 Website, marketing & documentation:\n	AboutView		Weboldal, marketing és dokumentáció:\n
 GNU LGPL v2.1	AboutView		GNU LGPL v2.1
 AboutSystem	System name		Névjegy
@@ -28,7 +28,7 @@ Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All r
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		E szoftver része szerzői jog által védettek.\nSzerzői jog © 1996-2006 The FreeType Project. Minden jog fenntartva.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		A Haiku kódjának szerzői jogai a Haiku, Inc.-et vagy, ha nevük a forráskódban külön ki van emelve, a kód egyes íróit illetik. A Haiku® és a HAIKU logo® a Haiku, Inc. bejegyzett védjegye.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nMinden jog fenntartva.
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB összesen, amelyből %inaccessible MiB nem hozzáférhető
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MB összesen, %inaccessible MB nem használható
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard és munkatársai.
 Contributors:\n	AboutView		Közreműködők:\n
 Unknown	AboutView		Ismeretlen
@@ -52,7 +52,7 @@ Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright �
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Minden jog fenntartva.
 Current maintainers:\n	AboutView		Jelenlegi karbantartók:\n
 Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2007 Intel Corporation. Minden jog fenntartva.
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Minden egyedi kód a Haikuban, különösen a kernel és azon kódrészletek, amelyek csatolva vannak programokhoz, az <MIT licenc> alatt érhetőek el. Néhány rendszerkönyvtár tartalmaz harmadik féltől származó kódot, ezek az <LGPL licenc> alatt érhetőek el. A harmadik felekre vonatkozó szerzői jogok alább találhatóak.
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Minden egyedi kód a Haikuban, különösen a kernel és azon kódrészletek, amelyek csatolva vannak programokhoz, az <MIT licenc> alatt érhetőek el. Néhány funkciótár tartalmaz harmadik féltől származó kódot, ezek az <LGPL licenc> alatt érhetőek el. A harmadik felekre vonatkozó szerzői jogok alább találhatóak.
 Time running:	AboutView		Ennyi ideje fut:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Szoftvereket tartalmaz a NetBSD Foundation, Inc-től, és annak közreműködőitől:\nftp, tput\nSzerzői jog © 1996-2008 The NetBSD Foundation, Inc. Minden jog fenntartva.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Szoftvereket tartalmaz a FreeBSD Projecttől, melyek BSD licenc alatt jelentek meg:\ncal, ftpd, ping, telnet, telnetd, traceroute\nSzerzői jog © 1994-2008 The FreeBSD Project. Minden jog fenntartva.

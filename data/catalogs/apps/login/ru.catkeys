@@ -1,13 +1,16 @@
-1	russian	x-vnd.Haiku-Login	3882164699
+1	russian	x-vnd.Haiku-Login	3144304430
 Error: %1	Login App		Ошибка: %1
 Hide password	Login View		Скрыть пароль
 Desktop	Desktop Window		Рабочий стол 
 Invalid login!	Login View		Неправильный логин!
+OK	Login View		OK
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	ошибка %s\n
 Login:	Login View		Имя пользователя:
 Error	Login App		Ошибка
+Unimplemented	Login App		Не реализовано
 Welcome to Haiku	Login Window		Добро пожаловать в Haiku
 Reboot	Login View		Перезагрузить
+Login application for Haiku\nUsage:\n	Login App		Вход в Haiku\nИспользование:\n
 Info	Login App		Информация
 Halt	Login View		Выключение
 Password:	Login View		Пароль:

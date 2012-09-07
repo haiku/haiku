@@ -1,18 +1,18 @@
 1	hungarian	x-vnd.Haiku-PoorMan	1267330937
-Website location	PoorMan		Weboldal helye
+Website location	PoorMan		Oldal helye
 Error Server	PoorMan		Hibakiszolgáló
 Settings…	PoorMan		Beállítások…
 Create PoorMan log	PoorMan		PoorMan napló készítése
 Shutting down.\n	PoorMan		Leállás.\n
-Hits: %lu	PoorMan		Találatok: %lu
+Hits: %lu	PoorMan		Kérések: %lu
 Web folder:	PoorMan		Netes mappa:
 Default	PoorMan		Alapértelmezett
 Save log console selection	PoorMan		Konzolbéli kijelölés mentése
 Run server	PoorMan		Kiszolgáló futtatása
 PoorMan settings	PoorMan		PoorMan beállításai
-Clear hit counter	PoorMan		Találati számláló nullázása
+Clear hit counter	PoorMan		Kérések nullázása
 Copy	PoorMan		Másolás
-Max. simultaneous connections:	PoorMan		Max. egyijű kapcsolat:
+Max. simultaneous connections:	PoorMan		Maximális kapcsolatok száma:
 Start page:	PoorMan		Kezdőlap:
 done.\n	PoorMan		kész.\n
 Create	PoorMan		Készítés

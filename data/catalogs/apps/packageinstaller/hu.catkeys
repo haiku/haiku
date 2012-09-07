@@ -13,7 +13,7 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		A fájlméretek a csomagfájlban nem egyeznek. A csomag korrupt lehet, vagy lehet, hogy az elkészítése után módosították. Biztos folytatni kívánja?
 Error while installing the package\n	PackageView		Hiba történt a csomag telepítése közben\n
 Disclaimer	PackageTextViewer		Jogi nyilatkozat
-%.1f GiB	PackageView		%.1f GiB
+%.1f GiB	PackageView		%.1f GB
 The installation of the package has been aborted.	PackageView		A csomag telepítése meg lett szakítva
 Done	PackageInstall		Kész
 All existing files will be replaced?	PackageView		Minden létező fájl felül legyen írva?
@@ -32,7 +32,7 @@ The script named '%s' already exits in the given path.\nReplace the script with 
 Running post-installation scripts	PackageInstall		Telepítés utáni parancsfájlok futtatása
 %llu bytes	PackageView		%llu byte
 Skip	PackageView		Átugrás
-%.1f MiB	PackageView		%.1f MiB
+%.1f MiB	PackageView		%.1f MB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		A(z) '%s' nevű mappa már létezik a megadott útvonalon.\nLegyen felülírva, vagy ugorjuk át?
 The package you requested has been successfully installed on your system.	PackageView		A kért csomag sikeresen fel lett telepítve a rendszerre.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hiba! A(z) \"%s\" nem érvényes útvonal.\n
@@ -47,7 +47,7 @@ Decline	PackageTextViewer		Visszautasítás
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		A(z) '%s' nevű fájl már létezik a megadott útvonalon.\nLegyen felülírva, vagy ugorjuk át?
 All existing files will be skipped?	PackageView		Minden létező fájl átugrása?
 Continue	PackageInfo		Folytatás
-%.1f KiB	PackageView		%.1f KiB
+%.1f KiB	PackageView		%.1f KB
 (%s free)	PackageView		(%s szabad)
 Abort	PackageInfo		Megszakítás
 PackageInstaller	System name		Csomagtelepítő

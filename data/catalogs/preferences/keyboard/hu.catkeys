@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-Keyboard	1711838804
 Written by Andrew Edward McCall	KeyboardApplication		Írta: Andrew Edward McCall
-Typing test area	KeyboardView		Tesztmező
+Typing test area	KeyboardView		Próba felület
 Defaults	KeyboardWindow		Eredeti
 Key repeat rate	KeyboardView		Karakterismétlődés gyakorisága
 Revert	KeyboardWindow		Visszaállít

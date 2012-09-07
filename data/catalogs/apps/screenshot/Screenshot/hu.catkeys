@@ -12,13 +12,13 @@ Save	ScreenshotWindow		Mentés
 Overwrite	ScreenshotWindow		Felülírás
 Choose folder...	ScreenshotWindow		Mappa kiválasztása…
 Please select	ScreenshotWindow		Kérjük válasszon
-Save as:	ScreenshotWindow		Mentés másként:
+Save as:	ScreenshotWindow		Formátum:
 Copy to clipboard	ScreenshotWindow		Másolás a vágólapra
 Save in:	ScreenshotWindow		Mentés ide:
 screenshot	Screenshot	Base filename of screenshot files	képernyőkép
 New screenshot	ScreenshotWindow		Új képernyőkép
 Artwork folder	ScreenshotWindow		Artwork mappa
-Home folder	ScreenshotWindow		Home mappa
+Home folder	ScreenshotWindow		Saját mappa
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ez a fájl már létezik.\n Biztos felül kívánja írni?
 Settings…	ScreenshotWindow		Beállítások…
 overwrite	ScreenshotWindow		felülírás

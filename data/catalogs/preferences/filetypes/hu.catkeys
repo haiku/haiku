@@ -18,7 +18,7 @@ Add icon…	Icon View		Ikon hozzáadása…
 Multiple files from \"%s\" file type	FileType Window		Több \"%s\" fájltípusú fájl
 Do you want to save the changes?	Application Type Window		Elmenti a változtatásokat?
 File type	FileType Window		Fájltípus
-Could not change attributes	Attribute Window		Nem lehetett módosítani az attribútumokat
+Could not change attributes	Attribute Window		Nem lehetett módosítani a jellemzőket
 Could not retrieve preferred application of this file	Preferred App Menu		Nem található az ehhez a fájlhoz használandó program
 Beta	Application Types Window		Béta
 Extensions:	FileTypes Window		Kiterjesztések:
@@ -39,7 +39,7 @@ Group:	New File Type Window		Csoport:
 Done	Extension Window		Kész
 Application type	Application Type Window		Programtípus
 Done	Type List Window		Kész
-Attribute	Attribute Window		Attribútum
+Attribute	Attribute Window		Jellemző
 Show recognition rule	FileTypes Window		Felismerési szabály megjelenítése
 FileTypes request	Preferred App Menu		Fájltípusok kérés
 Could not open file	FileType Window		Nem lehetett megnyitni a fájlt
@@ -61,7 +61,7 @@ Same as…	FileType Window	The same APPLICATION as ...	Ugyanaz, mint…
 Abort	Application Types Window		Megszakítás
 FileTypes	FileTypes		Fájltípusok
 OK	FileTypes		Rendben
-Extra attributes	FileTypes Window		Extra attribútumok
+Extra attributes	FileTypes Window		Extra jellemzők
 Development	Application Type Window		Fejlesztés
 Edit…	Application Types Window		Szerkesztés…
 Icon	FileType Window		Ikon
@@ -119,7 +119,7 @@ Save request	Application Type Window		Kérés elmentése
 Beta	Application Type Window		Béta
 None	FileTypes Window		Nincs
 Remove	FileTypes Window		Eltávolítás
-Attribute name:	Attribute Window		Attribútum neve:
+Attribute name:	Attribute Window		Jellemző neve:
 Extension	Extension Window		Kiterjesztés
 Add type	New File Type Window		Típus hozzáadása
 Internal name:	Attribute Window		Belső név:
@@ -140,7 +140,7 @@ Cancel	Preferred App Menu		Mégse
 Cancel	FileTypes Window		Mégse
 Select preferred application	FileTypes Window		Használandó program kiválasztása
 Right	Attribute Window	Attribute column alignment in Tracker	Jobbra
-Default application	FileType Window		Alapértelmezett alkalmazás
+Default application	FileType Window		Alapértelmezett program
 Long description:	Application Type Window		Bő leírás:
 FileTypes request	FileTypes Window		Fájltípusok kérés
 Version info	Application Type Window		Verzió információ

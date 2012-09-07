@@ -9,7 +9,7 @@ Case sensitive	FindWindow		Kis- és nagybetűk megkülönböztetése
 Cancel	OpenWindow		Mégse
 Close	AttributeWindow		Bezárás
 File	ProbeView		Fájl
-Attribute	ProbeView		Attribútum
+Attribute	ProbeView		Jellemző
 Floating-point value:	TypeEditors		Lebegőpontos érték:
 16 bit	TypeEditors		16-bites
 Attributes	ProbeView		Attríbútumok
@@ -23,8 +23,8 @@ Boolean	TypeEditors	This is the type of editor	Boolean
 Paste	ProbeView		Beillesztés
 PNG format	TypeEditors		PNG formátum
 Font size	ProbeView		Betűméret
-Attribute type: 	ProbeView		Attribútum típusa
-Attribute	AttributeWindow		Attribútum
+Attribute type: 	ProbeView		Jellemző típusa
+Attribute	AttributeWindow		Jellemző
 8 bit signed value:	TypeEditors		8-bites aláírt érték:
 Number:	TypeEditors		Szám:
 Save	ProbeView		Mentés
@@ -79,7 +79,7 @@ Flattened bitmap	TypeEditors		Lapos bittérkép
 Open file…	FileWindow		Fájl megnyitása…
 Next	ProbeView		Következő
 Close	FileWindow		Bezárás
-Attribute: 	ProbeView		Attribútum:
+Attribute: 	ProbeView		Jellemző:
 Remove from file	AttributeWindow		Eltávolítás a fájlból
 Don't save	ProbeView		Ne mentse
 Previous	ProbeView		Előző
@@ -116,7 +116,7 @@ Mode:	FindWindow		Mód:
 Open device	FileWindow		Eszköz megnyitása
 Could not find search string.	ProbeView		A keresési szöveg nem található.
 16 bit unsigned value:	TypeEditors		16-bites aláíratlan érték:
-Attribute offset: 	ProbeView		Attribútum eltolás:
+Attribute offset: 	ProbeView		Jellemző eltolás:
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Nézet
 Redo	ProbeView		Újra
 File: 	ProbeView		Fájl:

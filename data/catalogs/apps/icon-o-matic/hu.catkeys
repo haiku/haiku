@@ -2,7 +2,7 @@
 Select All	Icon-O-Matic-PathManipulator		Mind kijelölése
 Add Style	Icon-O-Matic-AddStylesCmd		Stílus hozzáadása
 Color (#%02x%02x%02x)	Style name after dropping a color		Szín (#%02x%02x%02x)
-Add	Icon-O-Matic-StylesList		Hozzáasdás
+Add	Icon-O-Matic-StylesList		Hozzáadás
 Move Shape	Icon-O-Matic-MoveShapesCommand		Alakzat mozgatása
 Opening the document failed!	Icon-O-Matic-Main		Nem sikerült megnyitni a dokumentumot!
 Reset transformation	Icon-O-Matic-ShapesList		Transzformáció visszaállítása
@@ -87,7 +87,7 @@ Split	Icon-O-Matic-PathManipulator		Szétvágás
 Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Figyelmeztető vezérlőpontok
 Remove	Icon-O-Matic-StylesList		Eltávolítás
 Add with path & style	Icon-O-Matic-ShapesList		Hozzáadás útvonallal és stílussal együtt
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON attribútum
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON jellemző
 Translation Y	Icon-O-Matic-PropertyNames		Y fordítás
 Rotate	Icon-O-Matic-TransformationBoxStates		Elforgatás
 Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Transzformáció eltávolítása
@@ -116,7 +116,7 @@ Perspective	Icon-O-Matic-TransformersList		Perspektíva
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Alakzat hozzáadása útvonallal és stílussal együtt
 Gradient	Icon-O-Matic-StyleTypes		Átmenet
 Min LOD	Icon-O-Matic-PropertyNames		Min LOD
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON attribútum
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON jellemző
 Invert selection	Icon-O-Matic-Properties		Kijelölés invertálása
 Drop shapes	Icon-O-Matic-ShapesList		Alakzatok eldobása
 Export as…	Icon-O-Matic-Menu-File		Exportálás másként…

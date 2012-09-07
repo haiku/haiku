@@ -7,10 +7,10 @@ Newer versions of GRUB use an extra configuration file to add custom entries to 
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Itt a \"GRUB_HIDDEN_TIMEOUT=0\" sor elé rakjon egy \"#\" jelet ha azt szeretné, hogy a boot menü ténylegesen meg is jelenjen.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés befejeződött! A(z) „%s” lemez bootszektora elkészült. A „Kilépés” gombbal elhagyhatja a telepítőt, vagy új partíciót választhat egy új rendszer telepítéséhez.
 Quit	InstallerApp		Kilépés
-Additional disk space required: 0.0 KiB	InstallerWindow		Még 0.0 KiB hely kell.
+Additional disk space required: 0.0 KiB	InstallerWindow		Még 0.0 KB hely kell.
 With GRUB it's: (hdN,n)\n\n	InstallerApp		A GRUB esetében ez: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
-Stop	InstallerWindow	In alert after pressing Stop	Megállít
+Stop	InstallerWindow	In alert after pressing Stop	Leállítás
 Install progress:  	InstallerWindow		Telepítés állapota:  
 2.2) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Starting Installation.	InstallProgress		A telepítés előkészítése.
@@ -22,7 +22,7 @@ Stop	InstallerWindow		Leállítás
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
 \tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
 OK	InstallerApp		Rendben
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válassza ki a lemezt melyről telepíteni szeretne és válassza ki azt, amelyre telepít. Ha végzett, kattitnson a „Telepítés” gombra.
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válassza ki a lemezt melyről telepíteni szeretne és válassza ki azt, amelyre telepít. Ha végzett, kattitnson a „Mehet” gombra.
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
 Install from:	InstallerWindow		Honnan:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
@@ -30,7 +30,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		FONTOS TUDNIVAL�
 Continue	InstallerWindow	In alert after pressing Stop	Folytatás
 Write boot sector to '%s'	InstallerWindow		Bootszektor írása „%s” helyre
 Collecting copy information.	InstallProgress		Másolás információinak összegyűjtése.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a „Telepítés” gombra.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a „Mehet” gombra.
 Quit Boot Manager and DriveSetup	InstallerWindow		Kilépés a Rendszertöltő menüből és a Lemezkezelőből
 Quit	InstallerWindow		Kilépés
 Welcome to the Haiku Installer!\n\n	InstallerApp		Üdvözöljük a Haiku Telepítőjében!\n\n
@@ -48,17 +48,17 @@ Finishing Installation.	InstallProgress		Telepítés befejezése.
 Restart	InstallerWindow		Újraindítás
 README	InstallerApp		OLVASSEL
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		A céllemezen nincs elég hely a telepítéshez. Válasszon egy másik lemezt vagy csak a szükséges rendszerelemeket telepítse!
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Kérjük, zárja be a Bootkezelő és a Lemezkezelő ablakait még mielőtt a Telepítő ablakát bezárná.
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Kérjük, zárja be a Rendszerválasztó menü és a Lemezkezelő ablakait még mielőtt a Telepítő ablakát bezárná.
 Scanning for disks…	InstallerWindow		Lemezek keresése…
 2.3) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		A lemez nem csatolható. Válasszon egy másikat!
 ?? of ??	InstallerWindow	Unknown progress	??/??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Indítsa el a Lemezbeállító segédprogramot a\nlétező merevlemezek és egyéb adathordozók\npartícionálásához! A partíciókat a Haiku\noperációs rendszer rendszerbetöltőjéhez\n BFS-sel (Be FájlrendSzerrel) kell inicializálni.
-Show optional packages	InstallerWindow		Nem feltétlenül szükséges csomagok megjelenítése
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nincs a telepítéshez alkalmas partíció. Kérem, hozza létre a szükséges partíció(ka)t és legalább egy partíciót BFS-sel (Be FájlrendSzer) inicializáljon!
+Show optional packages	InstallerWindow		Választható csomagok megjelenítése
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nincs a telepítéshez alkalmas partíció. Kérem, hozza létre a szükséges partíció(ka)t és legalább egy partíciót BFS-sel (Be File System) készítsen elő!
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Ezután pedig még egy másik fájlt is át kell írnia, hogy a boot menü tényleg meg is jelenjen:\n\n
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből azt a lemezt, melyre telepíteni szeretne, majd kattintson a „Telepítés” gombra.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből azt a lemezt, melyre telepíteni szeretne, majd kattintson a „Mehet” gombra.
 Unknown Type	InstallProgress	Partition content type	Ismeretlen típus
 <none>	InstallerWindow	No partition available	<nincs>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
@@ -73,8 +73,8 @@ You can't install the contents of a disk onto itself. Please choose a different 
 Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Indításkor a v1.44-es (például Ubuntu 11.04 vagy újabb) a Haiku-t fel fogja ismerni, de külsőként. Ha a Haiku-t hozzá akarja adni a GRUB-hoz, a Terminál-ban adja ki a következőt:\n\n
 Quit DriveSetup	InstallerWindow		Kilépés a Lemezkezelőből
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" jelöli a merevlemez sorszámát, a számok \"0\"-val kezdődnek.\n
-Hide optional packages	InstallerWindow		Nem feltétlenül szükséges csomagok elrejtése
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérem, zárja be a lemezbeállító ablakot!
+Hide optional packages	InstallerWindow		Választható csomagok elrejtése
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérem, zárja be a Lemezkezelő ablakot!
 Restart system	InstallerWindow		Számítógép újraindítása
 OK	InstallerWindow		Rendben
 Set up partitions…	InstallerWindow		Partíciók szerkesztése…
@@ -83,8 +83,8 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Install anyway	InstallProgress		Telepítés folytatása
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Hiba történt és a telepítés nem ment teljesen végbe:\n\nA hiba:  „%s”
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Nyomja meg a „Telepítés” gombot a rendszer „%1s” lemezről „%2s” lemezre telepítéshez!
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		A lemezbeállító fut.\n\nHa végzett, zárja be a lemezbeállítót a telepítés folytatásához!
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Nyomja meg a „Mehet” gombot a rendszer „%1s” lemezről „%2s” lemezre telepítéshez!
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		A Lemezkezelő fut.\n\nHa végzett, zárja be a lemezbeállítót a telepítés folytatásához!
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Jó szórakozást, és köszönjük, hogy kipróbálja a Haikut! Reméljük tetszeni fog!
 OK	InstallProgress		Rendben
 Please choose target	InstallerWindow		Válassza ki a lemezt, melyre telepít!
@@ -97,8 +97,8 @@ If you have not created a partition yet, simply reboot, create the partition usi
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		A GRUB 2-ben az első logikai partíció sorszáma minden esetben \"5\" lesz, függetlenül az elsődeleges partíciók számától.\n\n
 Write boot sector	InstallerWindow		Rendszerbetöltő írása
 Cancel	InstallerWindow		Mégse
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		A lemezbeállítót, mellyel a merevlemez partícióit lehet módosítani, nem sikerült elindítani.
-No optional packages available.	PackagesView		Nincsenek a rendszer feltelepítéséhez nem feltétlenül szükséges csomagok.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		A Lemezkezelőt, mellyel a merevlemez partícióit lehet módosítani, nem sikerült elindítani.
+No optional packages available.	PackagesView		Nincsenek választható csomagok.
 All hard disks start with \"hd\".\n	InstallerApp		A merevlemezek mind \"hd\"-val kezdődnek.\n
 Continue	InstallerApp		Folytatás
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		A programot, ami a Haiku boot menüjét állítaná be, nem sikerült elindítani.

@@ -3,7 +3,7 @@ Slow rotation	ChartWindow		Lassú forgatás
 Pink	ChartWindow		Rózsaszín
 Comet	ChartWindow		Üstökös
 DirectWindow	ChartWindow		KözvetlenAblak
-Orange	ChartWindow		Narancssárga
+Orange	ChartWindow		Narancs
 Refresh rate	ChartWindow		Frissítési gyakoriság
 Blue	ChartWindow		Kék
 Colors	ChartWindow		Színek
@@ -18,7 +18,7 @@ Amas	ChartWindow		Amák
 Yellow	ChartWindow		Sárga
 Off	ChartWindow		Ki
 Chaos	ChartWindow		Káosz
-Full screen	ChartWindow		Teljes képernyő
+Full screen	ChartWindow		Teljes kép
 Spiral	ChartWindow		Spirál
 Slow motion	ChartWindow		Lassítás
  5% (low)	ChartWindow		 5% (alacsony)
@@ -33,8 +33,8 @@ White	ChartWindow		Fehér
 Chart	System name		Grafikon
 Animation:	ChartWindow		Animáció:
 Frames/s	ChartWindow		Képkocka/mp
-Auto demo	ChartWindow		Automata bemutató
-CPU load	ChartWindow		CPU terhelése
+Auto demo	ChartWindow		Bemutató
+CPU load	ChartWindow		CPU terhelés
 DrawBitmap	ChartWindow		BittérképKirajzolás
 Red	ChartWindow		Vörös
 None	ChartWindow		Nincs

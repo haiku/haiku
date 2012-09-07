@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Haiku-IMAP	3892875357
 Destination:	imap_config		Cél:
 status	IMAPFolderConfig		állapot
-Apply	IMAPFolderConfig		Alkalmazás
+Apply	IMAPFolderConfig		Alkalmaz
 IMAP Folders	imap_config		IMAP mappák
 Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAP mappák letöltése, kis türelmet…
 IMAP Folders	IMAPFolderConfig		IMAP mappák

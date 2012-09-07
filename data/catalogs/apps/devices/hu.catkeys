@@ -3,7 +3,7 @@ Manufacturer	DeviceSCSI		Gyártó
 Order by:	DevicesView		Rendezés ez alapján:
 ACPI controller	Device		ACPI vezérlő
 Memory controller	Device		Memóriavezérlő
-Driver used	DevicePCI		Használt eszközkezelő
+Driver used	DevicePCI		Vezérlőprogram
 CD-ROM	DeviceSCSI		CD meghajtó
 ISA bus	Device		ISA port
 ACPI bus	Device		ACPI port
@@ -17,8 +17,8 @@ RBC	DeviceSCSI		RBC
 Detailed	DevicesView		Részletezve
 Category	DevicesView		Kategória
 Quit	DevicesView		Kilépés
-Device paths	Device		Eszközelérési útvonalak
-Scanner	DeviceSCSI		Szkenner
+Device paths	Device		Útvonal
+Scanner	DeviceSCSI		Lapolvasó
 Printer	DeviceSCSI		Nyomtató
 Processor	Device		Processzor
 Optical Drive	DeviceSCSI		Optikai meghajtó
@@ -27,7 +27,7 @@ Bridge	DeviceSCSI		Híd
 unknown	Device		ismeretlen
 ACPI Information	DeviceACPI		ACPI információ
 Generic system peripheral	Device		Általános rendszer periféria
-Not implemented	DevicePCI		Nincs mrgvalósítva
+Not implemented	DevicePCI		Nincs megvalósítva
 Disk Drive	DeviceSCSI		Lemezmeghajtó
 Not implemented	DeviceACPI		Nincs megvalósítva
 Device name	DevicePCI		Eszköznév
@@ -37,9 +37,9 @@ Input device controller	Device		Beviteli eszköz vezérlő
 Network controller	Device		Hálózati vezérlő
 Device class	DeviceSCSI		Eszközosztály
 Device name	DeviceACPI		Eszköznév
-Driver used	Device		Használt illesztőprogram
+Driver used	Device		Vezérlőprogram
 Other	DeviceSCSI		Egyéb
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Eszköznév\t\t\t\t: %Name%\nGyártó\t\t\t: %Manufacturer%\nIllesztőprogram\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Eszköznév\t\t\t\t: %Name%\nGyártó\t\t\t: %Manufacturer%\nVezérlőprogram\t\t\t\t: %DriverUsed%\nÚtvonal\t: %DevicePaths%
 ACPI Thermal Zone	DeviceACPI		ACPI hőzóna
 Communications	DeviceSCSI		Kommunikáció
 Bus	DevicesView		Busz

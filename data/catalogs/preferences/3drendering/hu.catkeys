@@ -6,7 +6,7 @@ GL version:	InfoView		GL-verzió:
 Max. texture units:	Capabilities		Legtöbb elérhető textúrázó egységek száma:
 Renderer name:	InfoView		Renderelő neve:
 Vendor name:	InfoView		Szállító neve:
-Attributes stack size:	Capabilities		Attribútumok veremmérete:
+Attributes stack size:	Capabilities		Jellemzők veremmérete:
 Name stack size:	Capabilities		Névverem mérete:
 Auxiliary buffer(s):	Capabilities		Segédpufferek száma:
 Max. recommended vertex elements:	Capabilities		Maximálisan ajánlott csúcspontegységek száma:

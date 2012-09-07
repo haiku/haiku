@@ -36,7 +36,7 @@ No	NotificationView		Nem
 Title	NotificationView		Cím
 Information	NotificationView		Információ
 Window width:	DisplayView		Ablakszélesség:
-Application	NotificationView		Alkalmazás
+Application	NotificationView		Program
 Enabled	NotificationView		Engedélyezve
 OK	DisplayView		Rendben
 Unknown	NotificationView		Ismeretlen
@@ -46,5 +46,5 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		Értesítések engedélyezése indításkor
 Notifications	PrefletView		Értesítések
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Nem sikerült elérni a kiszolgálót, és ebből következően az InfoPopper telepítése sem volt sikeres.
-Applications	NotificationView		Alkalmazások
+Applications	NotificationView		Programok
 Events are notified	GeneralView		Az eseményekről lesz értesítés

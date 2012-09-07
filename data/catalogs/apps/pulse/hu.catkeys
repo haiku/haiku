@@ -2,7 +2,7 @@
 OK	PrefsWindow		Rendben
 Quit	DeskbarPulseView		Kilépés
 Mini mode	DeskbarPulseView		Mini mód
-Remove replicant	CPUButton		Másolat eltávolítása
+Remove replicant	CPUButton		Replikáns eltávolítása
 Active color	ConfigView		Aktív szín
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Használat: Pulse [--mini] [-w szélesség] [--width=szélesség]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Fade colors	ConfigView		Színek elhalványítása
@@ -26,23 +26,23 @@ Info	PulseApp		Infó
 Info	CPUButton		Infó
 OK	PulseView		Rendben
 Deskbar menu	CPUButton		Asztalsáv menü
-About Pulse…	PulseView		Pulse névjegye…
+About Pulse…	PulseView		Pulzus névjegye…
 Deskbar mode	MiniPulseView		Asztalsáv mód
 Quit	MiniPulseView		Kilépés
-Pulse	System name		Pulse
-Pulse	NormalPulseView		Pulse
+Pulse	System name		Pulzus
+Pulse	NormalPulseView		Pulzus
 %ld MHz	NormalPulseView		%ld MHz
 Deskbar mode	NormalPulseView		Asztalsáv mód
-Pulse	PulseApp		Pulse
+Pulse	PulseApp		Pulzus
 Width of icon:	ConfigView		Ikon szélessége
 You can't disable the last active CPU.	CPUButton		Nem lehet letiltani a legutolsó aktív processzort.
 Normal mode	DeskbarPulseView		Normál mód
 OK	CPUButton		Rendben
-About Pulse…	CPUButton		Pulse névjegye…
+About Pulse…	CPUButton		Pulzus névjegye…
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Nem sikerült eltávolítani az Asztalsávról.\n%s
 Mini mode	NormalPulseView		Mini mód
 Info	DeskbarPulseView		Infó
-Pulse settings	PulseWindow		Pulse beállításai
+Pulse settings	PulseWindow		Pulzus beállításai
 Idle color	ConfigView		Üresjárat színe
 Installing in Deskbar failed\n%s	PulseApp		Nem sikerült telepíteni az Asztalsávra\n%s
 CPU progress bar	NormalPulseView		CPU folyamatsáv

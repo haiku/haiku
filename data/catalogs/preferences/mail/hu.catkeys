@@ -3,30 +3,30 @@ Mail checking	Config Window		Levelek ellenőrzése
 Settings	Config Window		Beállítások
 Never	Config Window	show status window	Soha
 Only when dial-up is connected	Config Window		Csak mikor betárcsázós internet kapcsolva van
-While sending and receiving	Config Window		Küldéskor és fogadáskor
+While sending and receiving	Config Window		Küldéskor / fogadáskor
 days	Config Window		naponként
 Incoming	Config Window		Bejövő
 Server name:	E-Mail		Kiszolgáló neve:
 OK	Config Window		Rendben
-Start mail services on startup	Config Window		A rendszer indításával együtt a levelezés szolgáltatásai is induljanak el
+Start mail services on startup	Config Window		Automatikus indítás
 E-mail address:	E-Mail		E-mail cím:
 Account name:	E-Mail		Fiók neve:
-Account name:	Config Views		Felhasználói név:
+Account name:	Config Views		Fiók neve:
 Create new account	AutoConfigWindow		Új fiók létrehozása
 OK	Config Views		Rendben
 The filter could not be moved. Deleting filter.	Config Views		Nem lehetett áthelyezni a szűrőt. A szűrő törlése.
 Revert	Config Window		Visszaállít
-Login name:	E-Mail		Felhasználói név:
+Login name:	E-Mail		Felhasználó:
 Incoming	E-Mail		Bejövő
 Password:	E-Mail		Jelszó:
 Accounts	Config Window		Fiókok
 Finish	AutoConfigWindow		Befejezés
 Remove	Config Window		Eltávolítás
 Miscellaneous	Config Window		Egyéb
-Show connection status window:	Config Window		Kapcsolat állapotkijelző ablakának kijelzése:
+Show connection status window:	Config Window		Kapcsolat állapotának kijelzése:
 Server Name:	E-Mail		Kiszolgáló neve:
 While sending	Config Window		Küldés közben
-Schedule outgoing mail when dial-up is disconnected	Config Window		Kimenő levelek küldése mikor betárcsázós internet kapcsolat létezik
+Schedule outgoing mail when dial-up is disconnected	Config Window		Kimenő levelek küldése internetre csatlakozáskor
 hours	Config Window		óránként
 Enter a valid e-mail address.	AutoConfigWindow		Írjon be egy valós e-mail címet.
 Add	Config Window		Hozzáadás

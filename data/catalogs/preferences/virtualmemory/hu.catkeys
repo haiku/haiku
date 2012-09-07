@@ -2,7 +2,7 @@
 Turn off	SettingsWindow		Kikapcsol
 GB	SettingsWindow		GB
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		A virtuális memória kikapcsolása egyes esetekkor nem kívánt hatással lehet a rendszer stabilitására.\nAmíg a rendszermemória el nem fogy, addig a virtuális memória használatára nincs szükség.\n\nBiztosan ki szeretné kapcsolni ezt a funkciót?
-Requested swap file size:	SettingsWindow		Az igényelt cserefájl mérete:
+Requested swap file size:	SettingsWindow		Az igényelt fájl mérete:
 Physical memory: 	SettingsWindow		Fizikai memória: 
 Changes will take effect on restart!	SettingsWindow		A változtatások csak újraindítás után válnak érvényessé!
 Defaults	SettingsWindow		Eredeti
@@ -12,7 +12,7 @@ Insufficient space for a swap file.	SettingsWindow		Nincs elég hely a cserefáj
 Keep enabled	SettingsWindow		Tartsa bekapcsolva
 Revert	SettingsWindow		Visszaállít
 VirtualMemory	System name		Virtuális memória
-Current swap file size: 	SettingsWindow		Jelenlegi cserefájl mérete: 
+Current swap file size: 	SettingsWindow		Jelenlegi fájl mérete: 
 OK	VirtualMemoryApp		Rendben
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuális memória\n\tÍrta Axel Dörfler\n\tCopyright 2005, Haiku.\n
 Enable virtual memory	SettingsWindow		Virtuális memória engedélyezése

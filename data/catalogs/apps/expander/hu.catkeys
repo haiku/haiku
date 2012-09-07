@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Kibontás
 Close window when done expanding	ExpanderPreferences		A kibontás végeztével zárja be az ablakot
-Set destination…	ExpanderMenu		Cél választása…
+Set destination…	ExpanderMenu		Célmappa megadása…
 Use:	ExpanderPreferences		Hasznája ezt:
 File expanded	ExpanderWindow		A fájl kibontva
 The destination is read only.	ExpanderWindow		A cél írásvédett.
@@ -42,7 +42,7 @@ Expand	ExpanderWindow		Kibont
 Close	ExpanderMenu		Bezár
 The destination is not a folder.	ExpanderWindow		A cél nem egy mappa.
 Open destination folder after extraction	ExpanderPreferences		Kibontás után nyissa meg a célmappát
-Set source…	ExpanderMenu		Forrás beállítása…
+Set source…	ExpanderMenu		Csomag megadása…
 Select '%s'	DirectoryFilePanel		'%s' kiválasztása
 Show contents	ExpanderMenu		Tartalom megjelenítése
 Stop	ExpanderWindow		Leállítás

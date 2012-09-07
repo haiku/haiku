@@ -3,12 +3,12 @@ Error: %1	Login App		Hiba: %1
 Hide password	Login View		Jelszó elrejtése
 Desktop	Desktop Window		Asztal
 Invalid login!	Login View		Érvénytelen felhasználónév!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tIndítás szerkesztési módban, hogy lehetssen szerkeszteni az asztalt.\n
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tIndítás szerkesztési módban, hogy lehessen szerkeszteni az Asztalt.\n
 OK	Login View		Rendben
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	hiba %s\n
 Login:	Login View		Felhasználónév:
 Error	Login App		Hiba
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Másolatok ráhúzásával szerkesztheti a Bejelentkezés alkalmazás mögött lévő asztalt.\n\nHa kész van, csak lépjen ki az alkalmazásból az Alt-Q gombokkal.
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Replikánsok ráhúzásával szerkesztheti a Bejelentkezés program mögött lévő Asztalt.\n\nHa kész van, csak lépjen ki a programból az Alt-Q gombokkal.
 Unimplemented	Login App		Nincs még megvalósítva
 Welcome to Haiku	Login Window		Üdvözöljük a Haikuban
 Reboot	Login View		Újraindítás

@@ -1,8 +1,16 @@
-1	russian	x-vnd.Haiku-SMTP	2977823007
+1	russian	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		SMTP-сервер:
+STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Ошибка при входе в %serv
+Unencrypted	ConfigView		Без шифрования
 . The server says:\n	smtp		. Сообщение сервера:\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Соединение с сервером…
 Error while opening connection to %serv	smtp		Ошибка при открытии соединения с %serv
+POP3 authentication failed. The server said:\n	smtp		Аутентификация по POP3 не удалась. Сервер сообщил:\n
+Destination:	ConfigView		Место назначения:
 : Connection refused or host not found.	smtp		: Отказ в соединении или хост не найден.
+None	ConfigView		Нет
+POP3 before SMTP	ConfigView		POP3 перед SMTP
+SSL	ConfigView		SSL
+. The server said:\n	smtp		. Сообщение сервера:\n

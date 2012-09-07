@@ -11,7 +11,7 @@ CPU usage (combined)	DataSource		CPU használat (kombinált)
 CPU	DataSource		CPU
 Used memory	DataSource		Használt memória
 Cached memory	DataSource		Gyorsítótárazott memória
-Apps	DataSource		Alkalmazások
+Apps	DataSource		Programok
 Show legend	ActivityView		Magyarázat megjelenítése
 Text clipboard	DataSource		Szöveges vágólap
 Settings	ActivityWindow		Beállítások

@@ -6,7 +6,7 @@ Mount warning	AutoMounter		Csatolási figyelmeztetés
 Mount read/write	AutoMounter		Csatolás olvashatóan és írhatóan
 Mounting volume '%s'\n\n	AutoMounter		'%s' kötet csatolása\n\n
 Cancel	AutoMounter		Mégse
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nem sikerült leválasztani ezt a lemezt: \"%s\"\n\t%s\n\nKényszerítsük a leválasztást?\n\nMegjegyzés: Ha egy alkalmazás épp ír a kötetre, adatvesztés következhet be.\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nem sikerült leválasztani ezt a lemezt: \"%s\"\n\t%s\n\nKényszerítsük a leválasztást?\n\nMegjegyzés: Ha egy program épp ír a kötetre, adatvesztés következhet be.\n
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nem sikerült leválasztani ezt a lemezt: \"%s\"\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		<Névtelen kötet> csatolása folyamatban\n\n
 OK	AutoMounter		Rendben

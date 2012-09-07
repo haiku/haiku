@@ -1,16 +1,19 @@
-1	russian	x-vnd.Be.ChartDemo	3763950818
+1	russian	x-vnd.Be.ChartDemo	986636897
 Slow rotation	ChartWindow		Медленное вращение
 Pink	ChartWindow		Розовый
 Comet	ChartWindow		Комета
+DirectWindow	ChartWindow		DirectWindow
 Orange	ChartWindow		Оранжевый
 Refresh rate	ChartWindow		Частота обновления
 Blue	ChartWindow		Синий
 Colors	ChartWindow		Цвета
 Novas	ChartWindow		Сверхновые
+LineArray	ChartWindow		LineArray
  0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (логарифмическая шкала)
 Free motion	ChartWindow		Свободное движение
 (high) 100% 	ChartWindow		(высокая) 100%
 Green	ChartWindow		Зелёный
+Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 потока
 Yellow	ChartWindow		Жёлтый
 Off	ChartWindow		Отключить
@@ -25,6 +28,7 @@ Status	ChartWindow		Статус
 Star density	ChartWindow		Плотность звезд
 600.0 f/s	ChartWindow		600.0 fps
 Display:	ChartWindow		Отображение:
+Space color	ChartWindow		Цвет космоса
 White	ChartWindow		Белый
 Chart	System name		Чарт
 Animation:	ChartWindow		Анимация:

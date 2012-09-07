@@ -1,5 +1,5 @@
 1	hungarian	x-vnd.Be-PRNT	2674539197
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Nyomtató: %printer_name%\nDriver: %driver%\n
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Nyomtató: %printer_name%\nVezérlő: %driver%\n
 Waiting	JobListView		Várakozás
 Print test page	PrintersWindow		Tesztoldal nyomtatása
 Test Page	TestPageView		Tesztoldal
@@ -10,20 +10,20 @@ Add printer	AddPrinterDialog		Nyomtató hozzáadása
 Green	TestPageView		Zöld
 Printers	PrintersWindow		Nyomtatók
 Default Printer	PrinterListView		Alapértelmezett nyomtató
-Transport: %transport% %transport_address%	PrinterListView		Transzporter: %transport% %transport_address%
+Transport: %transport% %transport_address%	PrinterListView		Csatlakozás: %transport% %transport_address%
 No pending jobs.	PrinterListView		Nincs függő feladat.
 pages	JobListView		oldal
 Printers	System name		Nyomtatók
 Processing	JobListView		Feldolgozás
 Red	TestPageView		Vörös
 Printer name:	AddPrinterDialog		Nyomtató neve:
-Driver: %driver%	PrinterListView		Illesztőprogram: %driver%
+Driver: %driver%	PrinterListView		Vezérlő: %driver%
  pending jobs.	PrinterListView		 függő feladat.
 Black	TestPageView		Fekete
 Restart job	PrintersWindow		Feladat újraindítása
 Add	AddPrinterDialog		Hozzáadás
-Make default	PrintersWindow		Alapértelmezetté tétel
-Transport: %transport% %transport_address%	TestPageView		Transzporter: %transport% %transport_address%
+Make default	PrintersWindow		Legyen alapértelmezett
+Transport: %transport% %transport_address%	TestPageView		Csatlakozás: %transport% %transport_address%
 Cancel job	PrintersWindow		Feladat visszavonása
 Yellow	TestPageView		Sárga
 Blue	TestPageView		Kék
@@ -31,7 +31,7 @@ Blue	TestPageView		Kék
 Remove	PrintersWindow		Eltávolítás
 <pick one>	AddPrinterDialog		<válasszon egyet>
 Add …	PrintersWindow		Hozzáadás…
-Print jobs for 	PrintersWindow		Feladatok ennek:
+Print jobs for 	PrintersWindow		Feladatok ennek: 
 Failed	JobListView		Sikertelen
 %.2f KB	JobListView		%.2f KB
 Magenta	TestPageView		Magenta
@@ -40,5 +40,5 @@ No printer found!	TransportMenu		Nem található nyomtató!
 Print jobs: No printer selected	PrintersWindow		Feladatok: Nincs nyomtató kiválasztva
 Cyan	TestPageView		Cián
 Unknown status	JobListView		Ismeretlen állapot
-Connected to:	AddPrinterDialog		Kapcsolódva ehhez:
+Connected to:	AddPrinterDialog		Csatlakozás:
 Printer type:	AddPrinterDialog		Nyomtató típusa:
