@@ -234,7 +234,6 @@ SettingsWindow::SettingsWindow()
 		BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("VirtualMemory"),
 			B_TRANSLATE("The swap volume specified in the settings file is ",
 			"invalid.\n You can keep the current setting or switch to the "
-			"You can keep the current setting or switch to the "
 			"default swap volume."),
 			B_TRANSLATE("Keep"), B_TRANSLATE("Switch"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
