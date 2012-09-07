@@ -166,24 +166,7 @@ SettingsWindow::SettingsWindow()
 		new BMessage(kMsgSwapAutomaticUpdate));
 	fSwapEnabledCheckBox->SetExplicitAlignment(align);
 
-	char sizeStr[16];
-	system_info info;
-	get_system_info(&info);
-	BString string = B_TRANSLATE("Physical memory: ");
-	string << string_for_size(info.max_pages * B_PAGE_SIZE,	sizeStr,
-		sizeof(sizeStr));
-	BStringView* memoryView = new BStringView("physical memory",
-		string.String());
-	memoryView->SetExplicitAlignment(align);
-
-	system_memory_info memInfo = {};
-	__get_system_info_etc(B_MEMORY_INFO, &memInfo, sizeof(memInfo));
-	string = B_TRANSLATE("Current swap file size: ");
-	string << string_for_size(memInfo.max_swap_space, sizeStr,
-		sizeof(sizeStr));
-	BStringView* swapFileView = new BStringView("current swap size",
-		string.String());
-	swapFileView->SetExplicitAlignment(align);
+	fSwapUsageBar = new BStatusBar("swap usage");
 
 	BPopUpMenu* menu = new BPopUpMenu("volume menu");
 	fVolumeMenuField = new BMenuField("volume menu field",
@@ -214,8 +197,7 @@ SettingsWindow::SettingsWindow()
 	box->SetLabel(fSwapEnabledCheckBox);
 
 	box->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_DEFAULT_SPACING)
-		.Add(memoryView)
-		.Add(swapFileView)
+		.Add(fSwapUsageBar)
 		.Add(fSwapAutomaticCheckBox)
 		.Add(fVolumeMenuField)
 		.Add(fSizeSlider)
@@ -268,6 +250,9 @@ SettingsWindow::SettingsWindow()
 #endif
 
 	_Update();
+
+	// TODO: We may want to run this at an interval
+	_UpdateSwapInfo();
 }
 
 
@@ -305,12 +290,11 @@ SettingsWindow::MessageReceived(BMessage* message)
 			_Update();
 			break;
 		case kMsgSliderUpdate:
-			fSettings.SetSwapSize((off_t)fSizeSlider->Value() * kMegaByte);
+			_RecordChoices();
 			_Update();
 			break;
 		case kMsgVolumeSelected:
-			fSettings.SetSwapVolume(((VolumeMenuItem*)fVolumeMenuField
-				->Menu()->FindMarked())->Volume().Device());
+			_RecordChoices();
 			_Update();
 			break;
 		case kMsgSwapEnabledUpdate:
@@ -338,13 +322,13 @@ SettingsWindow::MessageReceived(BMessage* message)
 				}
 			}
 
-			fSettings.SetSwapEnabled(fSwapEnabledCheckBox->Value());
+			_RecordChoices();
 			_Update();
 			break;
 		}
 		case kMsgSwapAutomaticUpdate:
 		{
-			fSettings.SetSwapAutomatic(fSwapAutomaticCheckBox->Value());
+			_RecordChoices();
 			_Update();
 			break;
 		}
@@ -359,6 +343,8 @@ bool
 SettingsWindow::QuitRequested()
 {
 	fSettings.SetWindowPosition(Frame().LeftTop());
+
+	_RecordChoices();
 	fSettings.WriteWindowSettings();
 	fSettings.WriteSwapSettings();
 	be_app->PostMessage(B_QUIT_REQUESTED);
@@ -414,6 +400,17 @@ SettingsWindow::_FindVolumeMenuItem(dev_t device)
 	}
 
 	return NULL;
+}
+
+
+void
+SettingsWindow::_RecordChoices()
+{
+	fSettings.SetSwapAutomatic(fSwapAutomaticCheckBox->Value());
+	fSettings.SetSwapEnabled(fSwapEnabledCheckBox->Value());
+	fSettings.SetSwapSize((off_t)fSizeSlider->Value() * kMegaByte);
+	fSettings.SetSwapVolume(((VolumeMenuItem*)fVolumeMenuField
+		->Menu()->FindMarked())->Volume().Device());
 }
 
 
@@ -474,4 +471,27 @@ SettingsWindow::_Update()
 		&& !fSwapAutomaticCheckBox->Value());
 	fVolumeMenuField->SetEnabled(fSettings.SwapEnabled()
 		&& !fSwapAutomaticCheckBox->Value());
+}
+
+
+void
+SettingsWindow::_UpdateSwapInfo()
+{
+	system_memory_info memInfo = {};
+	__get_system_info_etc(B_MEMORY_INFO, &memInfo, sizeof(memInfo));
+
+	off_t currentSwapSize = memInfo.max_swap_space;
+	off_t currentSwapUsed = (memInfo.max_swap_space - memInfo.free_swap_space);
+
+	char sizeStr[16];
+	BString swapSizeStr = string_for_size(currentSwapSize, sizeStr,
+		sizeof(sizeStr));
+	BString swapUsedStr = string_for_size(currentSwapUsed, sizeStr,
+		sizeof(sizeStr));
+
+	BString string = swapUsedStr << " / " << swapSizeStr;
+
+	fSwapUsageBar->SetMaxValue(currentSwapSize / kMegaByte);
+	fSwapUsageBar->Update(currentSwapUsed / kMegaByte,
+		B_TRANSLATE("Current Swap:"), string.String());
 }
