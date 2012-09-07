@@ -15,6 +15,7 @@
 
 #include <MenuItem.h>
 #include <Slider.h>
+#include <StatusBar.h>
 #include <Volume.h>
 #include <Window.h>
 
@@ -69,7 +70,9 @@ private:
 			status_t		_RemoveVolumeMenuItem(dev_t device);
 			VolumeMenuItem*	_FindVolumeMenuItem(dev_t device);
 
+			void			_RecordChoices();
 			void			_Update();
+			void			_UpdateSwapInfo();
 
 			BCheckBox*		fSwapEnabledCheckBox;
 			BCheckBox*		fSwapAutomaticCheckBox;
@@ -78,6 +81,7 @@ private:
 			BButton*		fRevertButton;
 			BStringView*	fWarningStringView;
 			BMenuField*		fVolumeMenuField;
+			BStatusBar*		fSwapUsageBar;
 			Settings		fSettings;
 };
 
