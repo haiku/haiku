@@ -126,10 +126,10 @@ SettingsWindow::SettingsWindow()
 	gBootDev = dev_for_path("/boot");
 	BAlignment align(B_ALIGN_LEFT, B_ALIGN_MIDDLE);
 
-	if (fSettings.ReadWindowSettings() == B_OK)
-		MoveTo(fSettings.WindowPosition());
-	else
+	if (fSettings.ReadWindowSettings() != B_OK)
 		CenterOnScreen();
+	else
+		MoveTo(fSettings.WindowPosition());
 
 	status_t result = fSettings.ReadSwapSettings();
 	if (result == kErrorSettingsNotFound)
@@ -243,8 +243,6 @@ SettingsWindow::SettingsWindow()
 	BRect screenFrame = screen.Frame();
 	if (!screenFrame.Contains(fSettings.WindowPosition()))
 		CenterOnScreen();
-	else
-		MoveTo(fSettings.WindowPosition());
 
 #ifdef SWAP_VOLUME_IMPLEMENTED
 	// Validate the volume specified in settings file

@@ -25,7 +25,7 @@
 #include <driver_settings.h>
 
 
-static const char* const kWindowSettingsFile = "VM_data";
+static const char* const kWindowSettingsFile = "virtualmemory_preferences";
 static const char* const kVirtualMemorySettings = "virtual_memory";
 static const off_t kMegaByte = 1024 * 1024;
 
