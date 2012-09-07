@@ -108,8 +108,8 @@ Settings::ReadWindowSettings()
 
 	if (file.Read(&fWindowPosition, sizeof(BPoint)) == sizeof(BPoint))
 		return B_OK;
-	else
-		return B_ERROR;
+
+	return B_ERROR;
 }
 
 
@@ -197,8 +197,8 @@ Settings::ReadSwapSettings()
 
 	if (bestVol < 0)
 		return kErrorVolumeNotFound;
-	else
-		return B_OK;
+
+	return B_OK;
 }
 
 
@@ -218,7 +218,8 @@ Settings::WriteSwapSettings()
 		return B_ERROR;
 
 	fs_info info;
-	fs_stat_dev(SwapVolume(), &info);
+	if (fs_stat_dev(SwapVolume(), &info) != 0)
+		return B_ERROR;
 
 	char buffer[1024];
 	snprintf(buffer, sizeof(buffer), "vm %s\nswap_auto %s\nswap_size %lld\n"
