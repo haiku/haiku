@@ -28,6 +28,7 @@
 static const char* const kWindowSettingsFile = "virtualmemory_preferences";
 static const char* const kVirtualMemorySettings = "virtual_memory";
 static const off_t kMegaByte = 1024 * 1024;
+static const off_t kGigaByte = kMegaByte * 1024;
 
 
 Settings::Settings()
@@ -37,7 +38,14 @@ Settings::Settings()
 
 	system_info sysInfo;
 	get_system_info(&sysInfo);
-	fDefaultSettings.size = (off_t)sysInfo.max_pages * B_PAGE_SIZE * 2;
+
+	fDefaultSettings.size = (off_t)sysInfo.max_pages * B_PAGE_SIZE;
+	if (fDefaultSettings.size <= kGigaByte) {
+		// Memory under 1GB? double the swap
+		// This matches the behaviour of the kernel
+		fDefaultSettings.size *= 2;
+	}
+
 	fDefaultSettings.volume = dev_for_path("/boot");
 }
 
