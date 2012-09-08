@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-WORK	4170489135
+1	russian	x-vnd.Be-WORK	2548258861
 Invalid argument: %s\n	Workspaces		Неверный аргумент: %s\n
 Quit	Workspaces		Выход
 Workspaces	System name		Рабочие столы
@@ -12,3 +12,4 @@ OK	Workspaces		ОК
 Always on top	Workspaces		Всегда сверху
 Live in the Deskbar	Workspaces		Жить в Deskbar
 Show window tab	Workspaces		Показывать заголовок окна
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Использование: %s [опции] [рабочий стол]\nгде \"опции\" это:\n  --notitle\t\tудалить заголовок окна, оставив рамку и возможность изменять размер\n  --noborder\t\tудалить заголовок, рамку и возможность изменять размер\n  --avoidfocus\t\tзащитить окно от получения событий с клавиатуры\n  --alwaysontop\t\tразместить окно поверх других\n  --notmovable\t\tзаблокировать окно от возможности перемещения\n  --autoraise\t\tавтоматически показывать окно когда оно на границе экрана\n  --help\t\tотобразить эту помощь и выйти\nи \"рабочий стол\" это номер рабочего стола на который нужно переключиться (0-31)\n

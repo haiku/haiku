@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Magnify	3515889001
+1	russian	x-vnd.Haiku-Magnify	283320408
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер обмена пуст\n
 Make square	Magnify-Main		Сделать квадрат
 Copy image	Magnify-Main		Копировать изображение
@@ -6,6 +6,7 @@ Magnify help	Magnify-Help		Справка по увеличителю
 usage: magnify [size] (magnify size * size pixels)\n	Console		использование: magnify [размер] (размер увеличителя * размер пикселей)\n
 Stick coordinates	Magnify-Main		Зафиксировать координаты
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Информация:\n  скрыть/показать информацию - скрывает/показывает все эти новые функции\n    примечание: при отображении, появится красная клетка\n      которая означает какие rgb значения пикселя будут отображены\n  добавить/удалить перекрестье - 2 перекрестья могут быть добавлены (или удалены)\n    для того, чтобы помочь выровнять местоположение объектов.\n    Перекрестье отображается в виде синей клетки и синих линий.\n  скрыть/показать стеку - скрывает/показывает сетку, которая разделяет каждый пиксель\n
+  freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		  заморозить - замораживает/размораживает увеличение того места,\n    над чем в данный момент находится курсор\n
 Hide/Show grid	Magnify-Main		Скрыть/показать сетку
 magnify: size must be a multiple of 4\n	Console		увеличитель: размер должен кратным 4\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Основное:\n  32 x 32 - числа в верхнем левом углу отображают\n    число видимых пикселей (ширина x высота)\n  8 пикселей на пиксель - отображает число\n    пикселей используемых для увеличения пикселя\n  R:152 G:52 B:10 - значения RGB для \n    пикселя под красной клеткой\n

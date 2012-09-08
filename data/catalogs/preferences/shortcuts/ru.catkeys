@@ -1,22 +1,46 @@
-1	russian	x-vnd.Haiku-Shortcuts	3228410154
+1	russian	x-vnd.Haiku-Shortcuts	621368175
+Error, NULL state description?\n	ShortcutsSpec		Ошибка, состояние описания NULL?\n
+MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		ОК
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не удалось сохранить список горячих клавиш.
 Cancel	ShortcutsWindow		Отмена
+InsertString	ShortcutsSpec		InsertString
 Append KeySet…	ShortcutsWindow		Добавить список горячих клавиш…
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Клавиша
 Open KeySet…	ShortcutsWindow		Открыть список горячих клавиш…
+MouseUp	ShortcutsSpec		MouseUp
 Revert to saved	ShortcutsWindow		Вернуться к сохраненной версии
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Ваш текст\"
+*MouseUp	ShortcutsWindow		*MouseUp
 (Choose application with file requester)	ShortcutsWindow		(Выбрать программу)
+Window	ShortcutsSpec	Name for modifier on keyboard	Window
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не удалось открыть список горячих клавиш!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+SendMessage	ShortcutsSpec		SendMessage
+MoveMouseTo	ShortcutsSpec		MoveMouseTo
 Save	ShortcutsWindow		Сохранить
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+MouseDown	ShortcutsSpec		MouseDown
 Remove selected shortcut	ShortcutsWindow		Удалить выделенную горячую клавишу
+MouseButton	ShortcutsSpec		MouseButton
 Add new shortcut	ShortcutsWindow		Добавить горячую клавишу
 Save & apply	ShortcutsWindow		Применить
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Совместить
 File	ShortcutsWindow		Файл
+Beep	ShortcutsSpec		Beep
 Quit	ShortcutsWindow		Выход
+*MouseDown	ShortcutsWindow		*MouseDown
 Don't save	ShortcutsWindow		Не сохранять
+Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		Приложение
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Beep
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
 Save KeySet as…	ShortcutsWindow		Сохранить список как…
 Open	ShortcutsWindow		Открыть
 Really quit without saving your changes?	ShortcutsWindow		Сохранить изменения перед выходом?
@@ -24,4 +48,5 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Не удало
 Select	ShortcutsWindow		Выбрать
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не удалось сохранить ваш файл список горячих клавиш!
 Oh no	ShortcutsWindow		О нет
+LaunchHandler	ShortcutsSpec		LaunchHandler
 Shortcuts	System name		Горячие клавиши
