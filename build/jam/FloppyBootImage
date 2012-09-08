@@ -54,9 +54,11 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 
 if $(TARGET_ARCH) = x86_64 {
 	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
-		: ata config_manager dpc pci scsi ;
+		: ata config_manager dpc pci isa scsi $(USB_ONLY)usb ;
 	AddFilesToFloppyBootArchive system add-ons kernel busses ata
-		: generic_ide_pci ;
+		: generic_ide_pci legacy_sata ;
+	AddFilesToFloppyBootArchive system add-ons kernel busses scsi
+		: ahci ;
 	AddFilesToFloppyBootArchive system add-ons kernel file_systems
 		: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 	AddFilesToFloppyBootArchive system add-ons kernel generic
@@ -64,9 +66,17 @@ if $(TARGET_ARCH) = x86_64 {
 	AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
 		: intel session ;
 
+	if $(USB_BOOT) = 1 {
+		AddFilesToFloppyBootArchive system add-ons kernel busses usb
+			: <usb>uhci <usb>ohci <usb>ehci ;
+	}
+
 	AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
 
 	AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
+	if $(USB_BOOT) = 1 {
+		AddDriversToFloppyBootArchive disk usb : usb_disk ;
+	}
 } else {
 	# modules
 	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
@@ -142,8 +152,11 @@ if $(NET_BOOT) = 1 {
 # boot module links
 if $(TARGET_ARCH) = x86_64 {
 	AddBootModuleSymlinksToFloppyBootArchive
-		ata dpc config_manager pci scsi ata_adapter locked_pool scsi_periph
-		generic_x86 generic_ide_pci scsi_cd scsi_disk intel session
+		ata dpc config_manager pci scsi $(USB_ONLY)usb ata_adapter locked_pool
+		scsi_periph generic_x86 ahci generic_ide_pci legacy_sata
+		$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci
+		scsi_cd scsi_disk $(USB_ONLY)usb_disk
+		intel session
 		$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
 	;
 } else {

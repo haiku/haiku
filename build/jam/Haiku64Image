@@ -91,7 +91,7 @@ AddFilesToHaikuImage system add-ons kernel bus_managers
 
 if $(HAIKU_ATA_STACK) = 1 {
 	AddFilesToHaikuImage system add-ons kernel busses ata
-		: generic_ide_pci ;
+		: generic_ide_pci legacy_sata ;
 }
 
 AddFilesToHaikuImage system add-ons kernel busses scsi
@@ -329,7 +329,7 @@ AddFilesToHaikuImage system : haiku_loader ;
 # boot module links
 AddBootModuleSymlinksToHaikuImage
 	$(ATA_ONLY)ata pci config_manager dpc scsi usb $(ATA_ONLY)ata_adapter
-	locked_pool scsi_periph ahci generic_ide_pci
+	locked_pool scsi_periph ahci generic_ide_pci legacy_sata
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
 	intel
