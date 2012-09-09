@@ -2,7 +2,7 @@
 Mail checking	Config Window		Levelek ellenőrzése
 Settings	Config Window		Beállítások
 Never	Config Window	show status window	Soha
-Only when dial-up is connected	Config Window		Csak mikor betárcsázós internet kapcsolva van
+Only when dial-up is connected	Config Window		Csak mikor az internet elérhető
 While sending and receiving	Config Window		Küldéskor / fogadáskor
 days	Config Window		naponként
 Incoming	Config Window		Bejövő

@@ -5,7 +5,7 @@ Asia	Time		Aasia
 \nNow: 	Time		\nNyt:
 Africa	Time		Afrikka
 Stop	Time		Pysäytä
-Could not contact server	Time		Palvelimeen ei voitu ottaa yhteyttä
+Could not contact server	Time		Yhteydenotto palvelimeen epäonnistui
 Australia	Time		Australia
 Preview time:	Time		Esikatseluaika:
 Synchronize	Time		Synkronoi
@@ -38,7 +38,7 @@ The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe t
 Current time:	Time		Nykyinen aika:
 Try all servers	Time		Yritä kaikkia palvelimia
 Time zone	Time		Aikavyöhyke
-Could not create socket	Time		Ei voitu luoda pistoketta
+Could not create socket	Time		Pistokkeen luominen epäonnistui
 Synchronize again	Time		Synkronoi uudelleen
 Network time	Time		Verkkoaika
 Atlantic	Time		Atlantin valtameri

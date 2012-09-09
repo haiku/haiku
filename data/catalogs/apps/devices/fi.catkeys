@@ -79,7 +79,7 @@ SCSI Information	DeviceSCSI		SCSI-tiedot
 Enclosure	DeviceSCSI		Kotelo
 Array	DeviceSCSI		Matriisi
 Bridge	Device		Silta
-Refresh devices	DevicesView		Virkistä laitteita
+Refresh devices	DevicesView		Verestä laitteita
 Unknown device	DevicesView		Tuntematon laite
 Graphics Peripheral	DeviceSCSI		Grafiikkaoheislaite
 Tape Drive	DeviceSCSI		Nauha-asema

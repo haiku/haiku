@@ -1,22 +1,22 @@
 1	finnish	x-vnd.Haiku-Media	1473363280
-Couldn't add volume control in Deskbar: %s\n	Media views		Ei voitu lisätä voimakkuussäädintä Työpöytäpalkkiin: %s\n
+Couldn't add volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen lisääminen Työpöytäpalkkiin epäonnistui: %s\n
 Ready for use…	Media Window		Valmis käytettäväksi…
 Video input:	Media views		Videosyöte:
-Waiting for media_server to quit.	Media Window		Odotetaan media_server-palvelimen poistumista.
+Waiting for media_server to quit.	Media Window		Odotetaan media_server-palvelimen lopettamista.
 Cleaning up.	Media Window		Tyhjennetään.
 Defaults	Media views		Oletukset
 Stopping media server…	Media Window		Pysäytetään mediapalvelin…
-Quit	Media Window		Poistu
+Quit	Media Window		Lopeta
 OK	Media Window		Valmis
 Starting media server…	Media Window		Käynnistetään mediapalvelin…
 Done shutting down.	Media Window		Sulkeminen toteutettu.
 Video settings	Media Window		Videoasetukset
 Video output:	Media views		Videotuloste:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Ei voitu yhdistää mediapalvelimeen.\nHaluaisitko käynnistää sen nyt ?
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Yhdistäminen mediapalvelimeen epäonnistui.\nHaluaisitko käynnistää sen nyt ?
 Restart media services	Media views		Käynnistä mediapalvelut uudelleen
-Couldn't remove volume control in Deskbar: %s\n	Media views		Ei voitu poistaa voimakkuussäädintä Työpöytäpalkissa: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen poistaminen Työpöytäpalkista epäonnistui: %s\n
 Media	System name		Media-asetukset
-Telling media_addon_server to quit.	Media Window		Kehoitetaan media_addon_server-palvelinta poistumaan.
+Telling media_addon_server to quit.	Media Window		Kehoitetaan media_addon_server-palvelinta lopettamaan.
 Audio mixer	Media Window		Äänisekoitin
 This hardware has no controls.	Media Window		Tässä laitteistossa ei ole ohjaimia.
 Audio output:	Media views		Äänituloste:

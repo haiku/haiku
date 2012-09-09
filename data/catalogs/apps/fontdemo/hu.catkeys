@@ -12,7 +12,7 @@ Cycle fonts	ControlView		Betűtípusok váltása
 Font:	ControlView		Betűtípus:
 Rotation: 0	ControlView		Forgatás: 0
 Drawing mode:	ControlView		Kirajzolás módja:
-FontDemo	FontDemo		FontDemo
+FontDemo	FontDemo		Betűk
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Vezérlők
 Outline: %d	ControlView		Körvonal: %d

@@ -12,14 +12,14 @@ Save Playlist	MediaPlayer-PlaylistWindow		Tallenna soittoluettelo
 <no media>	MediaPlayer-InfoWin		<ei mediaa>
 (not supported)	MediaPlayer-InfoWin		(ei ole tuettu)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Mikään tiedostoista, jotka olisit halunnut soittaa, ei näytä olevan mediatiedostoja.
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelon tallentaminen epäonnistui.\n\nVirhe:
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelon tallentaminen epäonnistui.\n\nVirhe: 
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Uusi soitin...
 100% scale	MediaPlayer-Main		100 % skaala
 Subtitle placement:	MediaPlayer-SettingsWindow		Aliotsikon sijainti:
 Close	MediaPlayer-Main		Sulje
 Display Mode	MediaPlayer-InfoWin		Näyttötila
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Joitakin tiedostoja ei voitu siirtää roskakoriin.
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Joidenkin tiedostojen siirtäminen roskakoriin epäonnistui.
 <unknown>	MediaPlayer-InfoWin		<tuntematon>
 Open	MediaPlayer-Main		Avaa
 Next	MediaPlayer-Main		Seuraava
@@ -31,7 +31,7 @@ Medium	MediaPlayer-SettingsWindow		Media
 Close	MediaPlayer-PlaylistWindow		Sulje
 Stereo	MediaPlayer-InfoWin		Stereo
 Open…	MediaPlayer-PlaylistWindow		Avaa...
-Toggle mute.	MediaPlayer-Main		Vuorottele mykistystilaa
+Toggle mute.	MediaPlayer-Main		Vuorottele mykistystilaa.
 Undo	MediaPlayer-PlaylistWindow		Peru
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Käytä laitteistovideokerrostusta, jos se on käytettävissä
 File info…	MediaPlayer-Main		Tiedostotiedot...
@@ -48,7 +48,7 @@ Loop audio	MediaPlayer-SettingsWindow		Äänitiedostosilmukka
 Container	MediaPlayer-InfoWin		Säiliö
 Nothing to Play	MediaPlayer-Main		Ei mitään soitettavaa
 Muted	MediaPlayer-SettingsWindow		Mykistetty
-Quit	MediaPlayer-Main		Poistu
+Quit	MediaPlayer-Main		Lopeta
 Video	MediaPlayer-Main		Video
 Start playing.	MediaPlayer-Main		Aloita soittaminen.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tätä tiedostomuotoa käsittelevää dekooderia ei ole asennettu, tai dekooderilla on vaikeuksia tietyn muotoversion kanssa.
@@ -56,7 +56,7 @@ Import Entry	MediaPlayer-ImportPLItemsCmd		Tuo kappale
 Gets the URI of the currently playing item.	MediaPlayer-Main		Hakee parhaillaan soitettavan kappaleen Internet-resurssin tunnusosoitetta.
 %d Channels	MediaPlayer-InfoWin		%d kanavaa
 400% scale	MediaPlayer-Main		400 % skaala
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelo tallentaminen epäonnistui:\n\nVirhe:
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelon tallentaminen epäonnistui:\n\nVirhe: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Siirrä kappaleita
 Audio	MediaPlayer-Main		Ääni
 Open Playlist	MediaPlayer-PlaylistWindow		Avaa soittoluettelo
@@ -69,13 +69,13 @@ Select all	MediaPlayer-PlaylistWindow		Valitse kaikki
 Move Entry	MediaPlayer-MovePLItemsCmd		Siirrä kappale
 Open	MediaPlayer-PlaylistWindow		Avaa
 Stop playing.	MediaPlayer-Main		Lopeta soittaminen.
-The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa ’%filename’ ei voitu avata.\n\n
-Error: 	MediaPlayer-RemovePLItemsCmd		Virhe:
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedoston ’%filename’ avaaminen epäonnistui.\n\n
+Error: 	MediaPlayer-RemovePLItemsCmd		Virhe: 
 Audio	MediaPlayer-InfoWin		Ääni
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Virhe siirrossa roskakoriin
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Sisäinen virhe (vääränmuotoinen viesti). Soittoluettelon tallentaminen epäonnistui.
 Skip to the previous track.	MediaPlayer-Main		Hyppää edellisen kappaleen yli.
-%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% kohtasi sisäisen virheen. Tiedostoa ei kyetty avaamaan.
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% kohtasi sisäisen virheen. Tiedoston avaus epäonnistui.
 Close window after playing video	MediaPlayer-SettingsWindow		Sulje ikkuna videotiedoston soittamisen jälkeen
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skaalaa elokuvat pehmeästi (ei-kerrostustila)
 OK	MediaPlayer-RemovePLItemsCmd		Valmis
@@ -96,7 +96,7 @@ Remove Entries	MediaPlayer-RemovePLItemsCmd		Poista kappaleita
 Video track	MediaPlayer-Main		Videokappale
 Loop video	MediaPlayer-SettingsWindow		Videotiedostosilmukka
 Attributes	MediaPlayer-Main		Attribuutit
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kaikkia tiedostoja ei voitu siirtää roskakoriin.
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kaikkien tiedostojen siirtäminen roskakoriin epäonnistui.
 <untitled>	PlaylistItem-title		<otsikoton>
 Track	Audio Track Menu		Kappale
 unknown format	MediaPlayer-InfoWin		tuntematon muoto
@@ -108,7 +108,7 @@ Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Siirrä kappaleita roska
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Näyttää kuin mediapalvelin ei olisi käynnisssä.\nHaluaisitko käynnistää sen ?
 Duration	MediaPlayer-InfoWin		Kesto
 Aspect ratio	MediaPlayer-Main		Kuvasuhde
-Error: 	MediaPlayer-Main		Virhe:
+Error: 	MediaPlayer-Main		Virhe: 
 Large	MediaPlayer-SettingsWindow		Suuri
 Bottom of video	MediaPlayer-SettingsWindow		Videon alareuna
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap

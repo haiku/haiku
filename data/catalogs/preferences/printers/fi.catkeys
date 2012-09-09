@@ -1,5 +1,5 @@
 1	finnish	x-vnd.Be-PRNT	2674539197
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tulostin: %printer_name%\nAjuri: %driver%\n
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tulostin: %printer_name%\nAjuri:   %driver%\n
 Waiting	JobListView		Odotetaan
 Print test page	PrintersWindow		Tulosta testisivu
 Test Page	TestPageView		Testisivu
@@ -18,7 +18,7 @@ Processing	JobListView		Käsitellään
 Red	TestPageView		Punainen
 Printer name:	AddPrinterDialog		Tulostinnimi:
 Driver: %driver%	PrinterListView		Ajuri: %driver%
- pending jobs.	PrinterListView		odottavat työt.
+ pending jobs.	PrinterListView		 odottavat työt.
 Black	TestPageView		Musta
 Restart job	PrintersWindow		Käynnistä työ uudelleen
 Add	AddPrinterDialog		Lisää
@@ -31,7 +31,7 @@ Blue	TestPageView		Sininen
 Remove	PrintersWindow		Poista
 <pick one>	AddPrinterDialog		<poimi yksi>
 Add …	PrintersWindow		Lisää ...
-Print jobs for 	PrintersWindow		Tulosta työt kohteelle
+Print jobs for 	PrintersWindow		Tulosta työt kohteelle 
 Failed	JobListView		Epäonnistui
 %.2f KB	JobListView		%.2f kilotavua
 Magenta	TestPageView		Sinipunainen

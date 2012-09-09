@@ -3,7 +3,7 @@ The boot manager has been successfully installed on your system.	BootManagerCont
 After two seconds	DefaultPartitionPage		Kahden sekunnin jälkeen
 Uninstall Boot Manager	UninstallPage	Title	Poista Alkulataushallinta
 At least one partition must be selected!	BootManagerController		Vähintään yksi osio on valittava!
-The old Master Boot Record could not be saved to %s	BootManagerController		Vanhaa Master Boot Record -tietuetta ei voitu tallentaa kohteeseen %s
+The old Master Boot Record could not be saved to %s	BootManagerController		Vanhan Master Boot Record -tietueen tallennus kohteeseen %s epäonnistui
 Restore MBR	BootManagerController	Button	Palauta MBR
 Hard Drive	DrivesPage	Default disk name	Kiintolevy
 USB Drive	DrivesPage	Default disk name	USB-levyasema
@@ -21,7 +21,7 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Next	WizardView	Button	Seuraava
 Uninstallation of boot menu completed	BootManagerController	Title	Alkulatausvalikon poisto onnistui
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Valitse levyasema, johon haluat kohdistaa Alkulataushallinnan asennuksen tai asennuksen poiston.
-Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Määritä oletusosio ja aikavalvonta.\nAlkulatausvalikko lataa oletusosion aikavalvonta-ajan kuluttua, jollet valitse muuta osiota. Voit valita myös alkulatausvalikon odottamaan toistaiseksi, kun valitset osiota.\nPitämällä ’ALT’-näppäin painettuna otat pois käytöstä aikavalvonnan alkulatauksen aikana.
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Määritä oletusosio ja aikavalvonta.\nAlkulatausvalikko lataa oletusosion aikavalvonta-ajan kuluttua, jollet valitse muuta osiota. Voit valita myös alkulatausvalikon odottamaan toistaiseksi, kun valitset osiota.\nPitämällä ’ALT/OPT’-näppäin painettuna otat pois käytöstä aikavalvonnan alkulatauksen aikana.
 After one second	DefaultPartitionPage		Sekunnin jälkeen
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Ensimmäisen kiintolevyn osiotaulu ei ole yhteensopiva Alkulataushallinnan kanssa.\nAlkulataushallinta tarvitsee 2 kilotavua käytettävissä olevaa tilaa ennen ensimmäistä osiota.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Havaittiin seuraavat osiot. Osio sisällytetään alkulatausvalikkoon valitsemalla osion viereinen valintaruutu. Voit myös asettaa osioiden nimet niin kuin haluat niiden näkyvän alkulatausvalikossa.
@@ -52,7 +52,7 @@ Boot Manager is unable to read the partition table!	BootManagerController		Alkul
 Error reading partition table	BootManagerController	Title	Osiotaulun lukemisessa tapahtui virhe
 Installation of boot menu failed	BootManagerController	Title	Alkulatausvalikon asennus epäonnistui
 Backup Master Boot Record	BootManagerController	Title	Varmuuskopioi Master Boot Record
-Quit	DrivesPage	Button	Poistu
+Quit	DrivesPage	Button	Lopeta
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Alkulatausvalikkoa ollaan kirjoittamassa levylle. Oletko varma, että haluat jatkaa?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Vanha Master Boot Record tallennettiin onnistuneesti kohteeseen %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Oletusosio:

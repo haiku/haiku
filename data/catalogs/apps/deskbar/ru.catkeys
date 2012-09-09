@@ -7,7 +7,7 @@ Applications	PreferencesWindow		Приложения
 Time preferences…	TimeView		Настроить часы…
 About Haiku	DeskbarMenu		О системе Haiku
 Recent documents:	PreferencesWindow		Недавние документы:
-Recent applications	DeskbarMenu		Недавние приложения:
+Recent applications	DeskbarMenu		Недавние приложения
 Sort running applications	PreferencesWindow		Сортировать запущенные приложения
 Show time	Tray		Отображать время
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения

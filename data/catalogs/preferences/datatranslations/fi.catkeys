@@ -4,7 +4,7 @@ Cancel	DataTranslations		Peru
 Name:	DataTranslations		Nimi:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Nimi: %s \nVersio: %ld.%ld.%ld\n\nTiedot:\n%s\n\nPolku:\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Kohde ’%name’ ei näytä olevan tietomuunnin ja sitä ei asenneta.
-Could not install %s:\n%s	DataTranslations		Ei voitu asentaa %s:\n%s
+Could not install %s:\n%s	DataTranslations		Kohteen %s asentaminen epäonnistui:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Käytä tätä ohjauspaneelia niiden oletusasetusten asettamiseksi, joita käytetään kun sovellus ei ole määritellyt muita asetuksia.
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Kohde nimeltään ’%name’ on jo olemassa Translator-kansiossa! Pitäisikö olemassa oleva tietomuunnin korvata?
 DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus

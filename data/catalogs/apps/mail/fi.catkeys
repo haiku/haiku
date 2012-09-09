@@ -34,14 +34,14 @@ Signature	Mail		Allekirjoitus
 Find again	Mail		Hae uudelleen
 Bcc:	Mail		Piilokopio:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld koodaamatonta merkkiä. Ehkä eri merkistö toimisi paremmin? Napauta Lähetä-painiketta sen lähettämiseksi silti (korvausmerkkejä käytetään koodaamattomien merkkien paikalla), tai valitse Peru palataksesi ja yritä korjata se.
-Signature:	Mail		Allekirjoitus
+Signature:	Mail		Allekirjoitus:
 Save changes to this signature?	Mail		Tallennetaanko muutokset tähän allekirjoitukseen?
 Cc:	Mail		Kopio:
 Off	Mail		Pois päältä
 Find	Mail		Etsi
 Undo	Mail		Peru
 Date:	Mail		Päivämäärä:
-An error occurred trying to open this signature.	Mail		Tapahtui virhe yritettäessä avata tätä allekirjiotusta.
+An error occurred trying to open this signature.	Mail		Tapahtui virhe yritettäessä avata tätä allekirjoitusta.
 No file attributes, just plain data	Mail		Ei tiedostoattribuutteja, vain pelkkiä tietoja
 Edit queries…	Mail		Muokkaa kyselyjä…
 queries	B_USER_DIRECTORY/mail/queries		kyselyt
@@ -61,9 +61,9 @@ Add enclosure…	Mail		Lisää liite…
 Mail	System name		Sähköposti
 Print…	Mail		Tulosta…
 Warn unencodable:	Mail		Varoita koodaamattomista:
-Quit	Mail		Poistu
+Quit	Mail		Lopeta
 %n - Full name	Mail		%n - Koko nimi
- Read 	Mail		Lue
+ Read 	Mail		 Lue 
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Roskakori
 Default account:	Mail		Oletustili:
@@ -71,11 +71,11 @@ Size:	Mail		Koko:
 Account from mail	Mail		Tili sähköpostiviestistä
 Edit signatures…	Mail		Muokkaa allekirjoituksia…
 New	Mail		Uusi
-Attachments: 	Mail		Liitteet:
+Attachments: 	Mail		Liitteet: 
 On	Mail		Päällä
 Set to %s	Mail		Aseta arvoksi %s
 Forward	Mail		Lähetä edelleen
-E-mail draft could not be saved!	Mail		Sähköpostiviestiluonnosta ei voitu tallentaa!
+E-mail draft could not be saved!	Mail		Sähköpostiviestiluonnoksen tallentaminen epäonnistui!
 %e wrote:\\n	Mail		%e kirjoitti:\\n
 To:	Mail		Vastaanottaja:
 Only files can be added as attachments.	Mail		Vain tiedostoja voi lisätä liitteiksi.
@@ -101,12 +101,12 @@ Show header	Mail		Näytä otsake
 %e - E-mail address	Mail		%e - Sähköpostiosoite
 Resend	Mail		Lähetä uudelleen
 Show raw message	Mail		Näytä raakaviesti
-\\n - Newline	Mail		\\n- Rivinvaihto
+\\n - Newline	Mail		\\n - Rivinvaihto
 Start now	Mail		Aloita nyt
 Close	Mail		Sulje
 No matches	Mail		Ei täsmäyksiä
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Taustaprosessi mail_daemon ei ole käynnissä. Viesti laitetaan jonoon ja lähetetään, kun mail_daemon käynnistyy.
-Really delete this signature? This cannot be undone.	Mail		Poistetaanko tämä allekirjiotus todella? Tätä ei voida perua.
+Really delete this signature? This cannot be undone.	Mail		Poistetaanko tämä allekirjoitus todella? Tätä ei voida perua.
 Open	Mail		Avaa
 draft	B_USER_DIRECTORY/mail/draft		luonnos
 Quote	Mail		Lainaus
@@ -118,7 +118,7 @@ Send message	Mail		Lähetä viesti
 Remove enclosure	Mail		Poista liite
 Account:	Mail		Tili:
 Decoding:	Mail		Purkaminen:
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Ei voitu löytää sovellusta, joka tukee ’Person’-tietotyyppiä
+Sorry, could not find an application that supports the 'Person' data type.	Mail		’Person’-tietotyyppiä tukevan sovelluksen löytäminen epäonnistui.
 Do you wish to send this message before closing?	Mail		Haluatko lähettää tämän viestin ennen sulkemista?
 Delete	Mail		Poista
 Leave as '%s'	Mail		Jätä arvoksi ’%s’
@@ -138,16 +138,16 @@ Queries	Mail		Kyselyt
 Do you wish to save this message as a draft before closing?	Mail		Haluatko tallentaa tämän viestin luonnoksena ennen sulkemista?
 Save	Mail		Tallenna
 Random	Mail		Satunnainen
-Close and 	Mail		Sulje ja
+Close and 	Mail		Sulje ja 
 Save as draft	Mail		Tallenna luonnoksena
-The mail_daemon could not be started:\n\t	Mail		Taustaprosessia mail_daemon ei voitu käynnistää:\n\t
+The mail_daemon could not be started:\n\t	Mail		Taustaprosessin mail_daemon käynnistäminen epäonnistui:\n\t
 Open attachment	Mail		Avaa liite
 sent	B_USER_DIRECTORY/mail/sent		lähetetty
 (Date unavailable)	Mail		(Päivämäärä ei ole saatavilla)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Laita suosikkisähköpostikyselysi ja kyselymallinteet tähän kansioon.
 Reply	Mail		Vastaa
 From:	Mail		Lähettäjä:
-Couldn't open this signature. Sorry.	Mail		Ei voitu avata tätä allekirjoitusta.
+Couldn't open this signature. Sorry.	Mail		Tämän allekirjoituksen avaus epäonnistui.
 Open draft	Mail		Avaa luonnos
 Cut	Mail		Leikkaa
 Check spelling	Mail		Oikolue

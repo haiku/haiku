@@ -2,7 +2,7 @@
 Error, NULL state description?\n	ShortcutsSpec		Virhe, NULL-tilakuvaus?\n
 MoveMouse	ShortcutsSpec		SiirräHiirtä
 OK	ShortcutsWindow		Valmis
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset eivät kyenneet tallentamaan keyset-tiedostoa.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt tallentamaan keyset-tiedostoa.
 Cancel	ShortcutsWindow		Peru
 InsertString	ShortcutsSpec		LisääMerkkijono
 Append KeySet…	ShortcutsWindow		Liitä KeySet-tiedosto…
@@ -28,7 +28,7 @@ MouseDown	ShortcutsSpec		HiiriAlas
 Remove selected shortcut	ShortcutsWindow		Poista valittu pikanäppäin
 MouseButton	ShortcutsSpec		HiiriPainike
 Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin
-Save & apply	ShortcutsWindow		Tallenna ja sovella
+Save & apply	ShortcutsWindow		Tallenna ja käytä
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK ’Tfnd’
 Append	ShortcutsWindow		Liitä
 File	ShortcutsWindow		Tiedosto
@@ -46,7 +46,7 @@ Open	ShortcutsWindow		Avaa
 Really quit without saving your changes?	ShortcutsWindow		Poistutko todella tallentamatta muutoksia?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
 Select	ShortcutsWindow		Valitse
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyenneet tallentamaan KeySet-tiedostoa!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyennyt tallentamaan KeySet-tiedostoa!
 Oh no	ShortcutsWindow		Oh ei
 LaunchHandler	ShortcutsSpec		Käynnistyskäsittelijä
 Shortcuts	System name		Pikanäppäinasetukset

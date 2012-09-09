@@ -24,7 +24,7 @@ Beta	Application Types Window		Beta
 Extensions:	FileTypes Window		Tiedostotarkentimet:
 Select same preferred application as	FileTypes Window		Valitse sama ensisijainen sovellus nimellä
 Save	Application Type Window		Tallenna
-Could not retrieve application signature	Preferred App Menu		Ei voitu noutaa sovelluksen allekirjoitusta
+Could not retrieve application signature	Preferred App Menu		Sovelluksen allekirjoituksen noutaminen epäonnistui
 Add	Extension Window		Lisää
 Select same preferred application as	FileType Window		Valitse sama ensisijainen sovellus nimellä
 Cancel	Attribute Window		Peru
@@ -33,7 +33,7 @@ Removing a file type cannot be reverted.\nAre you sure you want to remove it?	Fi
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Muokattava
 Multiple launch	Application Type Window		Useita käynnistymisiä
 (from application)	FileTypes Window		(sovelluksesta)
-Could not set preferred application	FileTypes Window		Ei voitu asettaa ensisijaista sovellusta
+Could not set preferred application	FileTypes Window		Ensisijaisen sovelluksen asettaminen epäonnistui
 Group:	New File Type Window		Ryhmä:
 %1 application type	Application Type Window		%1-sovellustyyppi
 Done	Extension Window		Valmis
@@ -42,7 +42,7 @@ Done	Type List Window		Valmis
 Attribute	Attribute Window		Attribuutti
 Show recognition rule	FileTypes Window		Näytä tunnistussääntö
 FileTypes request	Preferred App Menu		Tiedostotyyppien pyyntö
-Could not open file	FileType Window		Ei voitu avata tiedostoa
+Could not open file	FileType Window		Tiedoston avaus epäonnistui
 Description:	FileTypes Window		Kuvaus:
 File	FileTypes Window		Tiedosto
 Name:	Application Types Window		Nimi:
@@ -98,7 +98,7 @@ New resource file…	FileTypes Window		Uusi resurssitiedosto…
 Cancel	New File Type Window		Peru
 Icon	FileTypes Window		Kuvake
 Extension:	Extension Window		Tiedostotarkennin:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Kantatyypin poistamista ei voida perua.\nMenetät kaikki tiedostotyypit, jotka polveutuvat tästä kantatyypistä!\n\nOletko varma, että haluat tehdä tämän? Koko ryhmän poistaiseksi pidä vaihto-painiketta alhaalla ja paina ”Poista”.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Kantatyypin poistamista ei voida perua.\nMenetät kaikki tiedostotyypit, jotka polveutuvat tästä kantatyypistä!\n\nOletko varma, että haluat tehdä tämän? Koko ryhmän poistamiseksi pidä vaihto-painiketta alhaalla ja paina ”Poista”.
 Internal name:	FileTypes Window		Sisäinen nimi:
 Add	Attribute Window		Lisää
 Close	Application Type Window		Sulje
@@ -106,7 +106,7 @@ File recognition	FileTypes Window		Tiedostotunnistus
 Remove uninstalled	Application Types Window		Poista poistetut sovellukset
 Center	Attribute Window	Attribute column alignment in Tracker	Keskitä
 Golden master	Application Type Window		Golden master -viitemalli
-Could not open \"%s\":\n%s	FileTypes		Ei voitu avata tiedostoa ”%s”:\n%s
+Could not open \"%s\":\n%s	FileTypes		Tiedoston ”%s” avaus epäonnistui:\n%s
 Alignment:	Attribute Window		Tasaus:
 Left	Attribute Window	Attribute column alignment in Tracker	Vasen
 Cancel	Extension Window		Peru
@@ -148,10 +148,10 @@ Version info	Application Type Window		Versiotiedot
 Version:	Application Types Window		Versio:
 Preferred application	FileTypes Window		Ensisijainen sovellus
 Short description:	Application Type Window		Lyhyt kuvaus:
-File could not be opened	Preferred App Menu		Tiedostoa ei voitu avata
-Could not change file extensions	Extension Window		Ei voitu vaihtaa tiedostotarkentimia
+File could not be opened	Preferred App Menu		Tiedoston avaus epäonnistui
+Could not change file extensions	Extension Window		Tiedostotarkentimien vaihtaminen epäonnistui
 Edit icon…	Icon View		Muokkaa kuvaketta…
 Same as…	FileType Window	The same TYPE as ...	Sama kuin…
 Save into resource file…	Application Type Window		Tallenna resurssitiedostoon…
 Visible	Attribute Window		Näkyvä
-Could not install file type	New File Type Window		Ei voitu asentaa tiedostotyyppiä
+Could not install file type	New File Type Window		Tiedostotyypin asentaminen epäonnistui

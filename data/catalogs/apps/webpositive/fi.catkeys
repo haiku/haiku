@@ -5,8 +5,8 @@ Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
 Cancel	Settings Window		Peru
 Close window	WebPositive Window		Sulje ikkuna
 Quit	WebPositive		Lopeta
-The download could not be opened.	Download Window		Latausta ei kyetty avaamaan.
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Latauskansiota ei kyetty avaamaan.\n\nVirhe: %error
+The download could not be opened.	Download Window		Latauksen avaus epäonnistui.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Latauskansion avaus epäonnistui.\n\nVirhe: %error
 Open location	WebPositive Window		Avaa sijainti
 Clear history	WebPositive Window		Poista historiatiedot
 WebPositive	System name		WebPositive
@@ -49,7 +49,7 @@ Open	Download Window		Avaa
 Reload	WebPositive Window		Lataa uudelleen
 Downloads	Download Window		Lataukset
 Sans serif font:	Settings Window		Sans serif -kirjasin:
-Over %days days left	Download Window		Yli %days  päivää jäljellä
+Over %days days left	Download Window		Yli %days päivää jäljellä
 Forward	WebPositive Window		Lähetä edelleen
 of	Download Window	...as in '12kB of 256kB'	/
 Revert	Settings Window		Palauta
@@ -64,7 +64,7 @@ Reset size	WebPositive Window		Nollaa koko
 Find:	WebPositive Window		Etsi:
 Increase size	WebPositive Window		Kasvata kirjasinkokoa
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Virhe noudettaessa kirjanmerkkikansiota.\n\nVirhe: %error
-Over 1 day left	Download Window		Yli1 päivää jäljellä
+Over 1 day left	Download Window		Yli 1 päivää jäljellä
 Downloads	WebPositive Window		Lataukset
 Requesting %url	WebPositive Window		Pyydetään %url
 Apply	Settings Window		Käytä
@@ -72,7 +72,7 @@ Bookmark info	WebPositive Window		Kirjanmerkkitiedot
 Size:	Font Selection view		Koko:
 Show tabs if only one page is open	Settings Window		Näytä välilehdet vain kun yksi sivu on auki
 About	WebPositive Window		Ohjelmasta
-Finish: 	Download Window	Finishing time	Valmis:
+Finish: 	Download Window	Finishing time	Valmis: 
 Fonts	Settings Window		Kirjasimet
 Close	WebPositive Window		Sulje
 OK	Download Window		Valmis
@@ -110,7 +110,7 @@ Remember username and password for this site	Authentication Panel		Muista tämä
 Earlier	WebPositive Window		Aiempi
 Authentication required	Authentication Panel		Todennus vaaditaan
 Use proxy server to connect to the internet	Settings Window		Käytä välityspalvelinta yhdistämään internettiin
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Latauksia on yhä menossa, haluatko todella poistu WebPositive-ohjelmasta nyt?
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Latauksia on yhä käynnissä, haluatko todella poistu WebPositive-ohjelmasta nyt?
 Auto-hide interface in full screen mode	Settings Window		Piilota käyttöliittymä kokoruutunäyttötilassa automaattisesti
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url epäonnistui
 New tab	WebPositive Window		Uusi välilehti

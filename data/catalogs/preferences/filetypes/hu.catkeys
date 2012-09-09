@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Haiku-FileTypes	2496450458
 Application types…	FileTypes Window		Programtípusok…
 Description:	Application Types Window		Leírás:
-Args only	Application Type Window		Csak argumentumok
+Args only	Application Type Window		Csak paraméterek
 Recognition rule is not valid:\n\n	FileTypes Window		Felismerési szabály érvénytelen:\n\n
 Add group	New File Type Window		Csoport hozzáadása
 Remove	Application Type Window		Eltávolítás
@@ -31,7 +31,7 @@ Cancel	Attribute Window		Mégse
 Icon	Application Type Window		Ikon
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Egy fájltípus eltávolítását nem lehet visszavonni.\nBiztos el akarja távolítani?
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Szerkeszthető
-Multiple launch	Application Type Window		Többszöri indítás
+Multiple launch	Application Type Window		Többször indítható
 (from application)	FileTypes Window		(programból)
 Could not set preferred application	FileTypes Window		Nem lehetett beállítani a használandó programot
 Group:	New File Type Window		Csoport:
@@ -79,7 +79,7 @@ Information	Application Types Window		Információ
 Gamma	Application Types Window		Gamma
 Quit	FileTypes Window		Kilépés
 Select preferred application	FileType Window		előnyben részesített program kiválasztása
-Single launch	Application Type Window		Elindítás egyszer
+Single launch	Application Type Window		Egyszer indítható
 Golden master	Application Types Window		Végleges verzió
 %s file type	FileType Window		%s fájltípusok
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		„%s” program nem támogatja ezt a fájltípust.\nBiztosan ehhez rendeli hozzá?
@@ -89,7 +89,7 @@ Done	Attribute Window		Kész
 no icon	FileTypes Window		nincs ikon
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Verzió
-Background app	Application Type Window		Háttérprogram
+Background app	Application Type Window		Futtatás a háttérben
 Add new group	New File Type Window		Új csoport hozzáadása
 Move down	FileTypes Window		Mozgatás fel
 Cancel	Application Type Window		Mégse
@@ -111,7 +111,7 @@ Alignment:	Attribute Window		Igazítás:
 Left	Attribute Window	Attribute column alignment in Tracker	Bal
 Cancel	Extension Window		Mégse
 Path:	Application Types Window		Útvonal:
-Application flags	Application Type Window		Programjelölők
+Application flags	Application Type Window		Program megjelölése
 Cancel	Type List Window		Mégse
 Move up	FileTypes Window		Mozgatás le
 Description	FileTypes Window		Leírás
@@ -123,7 +123,7 @@ Attribute name:	Attribute Window		Jellemző neve:
 Extension	Extension Window		Kiterjesztés
 Add type	New File Type Window		Típus hozzáadása
 Internal name:	Attribute Window		Belső név:
-Show in Tracker…	Application Types Window		Megjelenítés Trackerben:
+Show in Tracker…	Application Types Window		Megkeresés a Trackerben…
 Final	Application Type Window		Végleges
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Szélesség:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Megjelenítés így:
@@ -141,14 +141,14 @@ Cancel	FileTypes Window		Mégse
 Select preferred application	FileTypes Window		Használandó program kiválasztása
 Right	Attribute Window	Attribute column alignment in Tracker	Jobbra
 Default application	FileType Window		Alapértelmezett program
-Long description:	Application Type Window		Bő leírás:
+Long description:	Application Type Window		Hosszú leírás:
 FileTypes request	FileTypes Window		Fájltípusok kérés
 Version info	Application Type Window		Verzió információ
-(from super type)	FileTypes Window		(szupertípustól)
+(from super type)	FileTypes Window		(szupertípusból)
 Version:	Application Types Window		Verzió:
 Preferred application	FileTypes Window		Használandó program
 Short description:	Application Type Window		Rövid leírás:
-File could not be opened	Preferred App Menu		A fájl nem megnyitható
+File could not be opened	Preferred App Menu		A fájl nem nyitható meg
 Could not change file extensions	Extension Window		Nem lehet átállítani a fájlkiterjesztést
 Edit icon…	Icon View		Ikon szerkesztése…
 Same as…	FileType Window	The same TYPE as ...	Ugyanaz, mint…

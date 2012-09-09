@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	3047172181
+1	finnish	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		Pelkkä kirjasin:
 Control highlight	Colors tab		Kontrollin korostus
 Control border	Colors tab		Kontrollin reuna
@@ -39,6 +39,7 @@ Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
 Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
 Appearance	System name		Ulkoasuasetukset
+Use double scrollbar arrows	DecorSettingsView		Käytä vierintäpalkissa kaksoisnuolia
 Fixed font:	Font view		Tasalevyinen kirjasin:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Vähennä värillisten reunojen suodatuksen vahvuutta:
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
 Strong	AntialiasingSettingsView		Vahva
 Panel text	Colors tab		Paneelin teksti
 Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
+Look and feel	APRWindow		Ulkoasu ja käyttötuntuma
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
 Fonts	APRWindow		Kirjasimet
 Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:

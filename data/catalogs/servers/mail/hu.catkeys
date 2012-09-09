@@ -17,7 +17,7 @@ No new messages	MailDaemon		Nincs új üzenet
 Check for mail now	DeskbarView		Üzenetek ellenőrzése most
 No new messages	DeskbarView		Nincs új üzenet
 %num new messages for %name\n	MailDaemon		%num új üzenet %name számára\n
-Mail daemon status log	MailDaemon		Levelezés daemon állapotának naplója
+Mail daemon status log	MailDaemon		Levelező rendszer állapotának naplója
 Settings…	DeskbarView		Beállítások…
 No new messages.	MailDaemon		Nincs új üzenet.
 Mail status	Notifier		Levelezés állapota

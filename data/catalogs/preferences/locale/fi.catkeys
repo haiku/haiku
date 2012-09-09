@@ -2,7 +2,7 @@
 Available languages	Locale Preflet Window		Käytettävissä olevat kielet
 Negative:	TimeFormatSettings		Negatiivinen:
 already chosen	LanguageListView		jo valittu
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Ei löydy käytettävissä olevia kieliä! Et voi käyttää tätä asetusohjelmaa!
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Käytettävissä olevia kieliä ei löytynyt! Et voi käyttää tätä asetusohjelmaa!
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Työpöytäpalkki ja Seuraaja on käynnistettävä uudelleen, jotta nämä muutokset tulevat voimaan. Haluatko käynnistää ne nyt?
 Long format:	TimeFormatSettings		Pitkä muoto:
 Currency	TimeFormatSettings		Valuutta

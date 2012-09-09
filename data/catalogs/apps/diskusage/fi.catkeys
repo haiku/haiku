@@ -14,7 +14,7 @@ Scan	Status View		Tutki
 file unavailable	Status View		tiedosto ei ole saatavilla
 Get Info	Pie View		Hae tiedot
 DiskUsage	System name		Levyasemakäyttö
- in %d files	Info Window		%d tiedostossa
+ in %d files	Info Window		 %d tiedostossa
 %d files	Status View		%d tiedostoa
 Created	Info Window		Luotu
 Modified	Info Window		Muokattu

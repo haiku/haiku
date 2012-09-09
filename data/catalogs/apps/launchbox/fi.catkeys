@@ -27,7 +27,7 @@ Settings	LaunchBox		Asetukset
 Failed to launch 'something', error in Pad data.	LaunchBox		’Jonkin’ käynnistäminen epäonnistui, virhe alustatiedoissa.
 Pad %1	LaunchBox		Alusta %1
 Close	LaunchBox		Sulje
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Epäonnistuttiin lähettämään ’avaa kansio’-komento Seuraajalle.\n\nVirhe: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Komennon ’avaa kansio’ lähettäminen Seuraajalle epäonnistui.\n\nVirhe: 
 You can drag an icon here.	LaunchBox		Voit raahata kuvakkeen tänne.
 Clone	LaunchBox		Klooni
 launch popup	LaunchBox		käynnistysponnahdusikkuna

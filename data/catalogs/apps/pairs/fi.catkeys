@@ -2,13 +2,13 @@
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\ttekijä: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nSait pelin valmiiksi %num% napsautuksella.\n
 Expert (8x8)	PairsWindow		Guru (8x8)
 Beginner (4x4)	PairsWindow		Aloittelija (4x4)
-Quit game	PairsWindow		Poistu pelistä
+Quit game	PairsWindow		Lopeta peli
 Game	PairsWindow		Peli
 Size	PairsWindow		Koko
 New	PairsWindow		Uusi
 OK	PairsView		Valmis
 Intermediate (6x6)	PairsWindow		Keskitaso (6x6)
-Quit	PairsWindow		Poistu
+Quit	PairsWindow		Lopeta
 Pairs	System name		Parit
 New game	PairsWindow		Uusi peli
 Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Parit-ohjelma ei löydä riittävästi vektorikuvakkeita järjestelmästä; ohjelma tarvitsee vähintään %d kuvaketta.

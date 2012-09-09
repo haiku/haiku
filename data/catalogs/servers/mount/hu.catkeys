@@ -1,17 +1,17 @@
 1	hungarian	x-vnd.Haiku-mount_server	1422362183
 Mount read-only	AutoMounter		Csatolás csak olvashatóként
-Error mounting volume:\n\n%s	AutoMounter		Hiba történt a kötet csatolása közben:\n\n%s
+Error mounting volume:\n\n%s	AutoMounter		Hiba történt a lemez csatolása közben:\n\n%s
 Unmount error	AutoMounter		Leválasztási hiba
 Mount warning	AutoMounter		Csatolási figyelmeztetés
 Mount read/write	AutoMounter		Csatolás olvashatóan és írhatóan
-Mounting volume '%s'\n\n	AutoMounter		'%s' kötet csatolása\n\n
+Mounting volume '%s'\n\n	AutoMounter		Lemez (%s) csatolása\n\n
 Cancel	AutoMounter		Mégse
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nem sikerült leválasztani ezt a lemezt: \"%s\"\n\t%s\n\nKényszerítsük a leválasztást?\n\nMegjegyzés: Ha egy program épp ír a kötetre, adatvesztés következhet be.\n
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nem sikerült leválasztani ezt a lemezt: \"%s\"\n\t%s
-Mounting volume <unnamed volume>\n\n	AutoMounter		<Névtelen kötet> csatolása folyamatban\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nem sikerült leválasztani a lemezt (%s):\n\t%s\n\nKényszerítsük a leválasztást?\n\nMegjegyzés: Ha egy program épp ír a lemezre, adatvesztés következhet be.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nem sikerült leválasztani a lemezt (%s)\n\t%s
+Mounting volume <unnamed volume>\n\n	AutoMounter		<Névtelen lemez> csatolása folyamatban\n\n
 OK	AutoMounter		Rendben
-The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		A kötet fájrendszere nem Haiku fájlrendszer. Erősen ajánlott csak olvashatóan felcsatolni, hogy elkerüljük a Haiku hibái miatti adatvesztést.
-Previous volumes mounted.	AutoMounter		Előző kötetek felcsatolva.
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		A lemez fájrendszere nem Haiku fájlrendszer. Erősen ajánlott csak olvashatóan felcsatolni, hogy elkerüljük a Haiku hibái miatti adatvesztést.
+Previous volumes mounted.	AutoMounter		Legutóbbi lemezek csatolva.
 Mount error	AutoMounter		Csatolási hiba
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Ajánlott az összes többi Haiku kötet csak olvasható módban való csatolása, hogy elkerüljük a Haiku hibái miatti adatvesztést.
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Ajánlott az összes többi Haiku lemezt csak olvasható módban csatolni, hogy elkerüljük a Haiku hibái miatti adatvesztést.
 Force unmount	AutoMounter		Leválasztás kényszerítése

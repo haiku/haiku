@@ -5,7 +5,7 @@ Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
 Add	Icon-O-Matic-StylesList		Lisää
 Move Shape	Icon-O-Matic-MoveShapesCommand		Siirrä hahmo
 Opening the document failed!	Icon-O-Matic-Main		Asiakirjan avaaminen epäonnistui!
-Reset transformation	Icon-O-Matic-ShapesList		Nolla muunnokset
+Reset transformation	Icon-O-Matic-ShapesList		Nollaa muunnokset
 Move Paths	Icon-O-Matic-MovePathsCmd		Siirrä polut
 None	Icon-O-Matic-Properties		Ei mitään
 New	Icon-O-Matic-Menu-File		Uusi
@@ -142,7 +142,7 @@ Move Pivot	Icon-O-Matic-TransformationBoxStates		Siirrä napa
 Path	Icon-O-Matic-Menus		Polku
 Freeze transformation	Icon-O-Matic-ShapesList		Jähmetä muunnos
 File	Icon-O-Matic-Menus		Tiedosto
-Error: 	Icon-O-Matic-Exporter		Virhe:
+Error: 	Icon-O-Matic-Exporter		Virhe: 
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Lisää muuntimet
 Diamond	Icon-O-Matic-StyleTypes		Vinoneliö
 Path	Icon-O-Matic-PropertyNames		Polku

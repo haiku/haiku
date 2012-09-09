@@ -6,18 +6,18 @@ Double-click test area	SettingsView		Duplakattintásos próbaterület
 Revert	MouseWindow		Visszaállít
 ...by Andrew Edward McCall	MouseApplication		Írta: Andrew Edward McCall
 Mouse acceleration	SettingsView		Egérmozdulat gyorsulása
-Click to focus	SettingsView		A fókuszhoz kattintani kell
-Click to focus and raise	SettingsView		Kattintson a fókuszáláshoz és előre hozáshoz
+Click to focus	SettingsView		Kattintás szükséges
+Click to focus and raise	SettingsView		Kattintás szükséges (az előre hozáshoz is)
 3-Button	SettingsView		Háromgombos
 Mouse speed	SettingsView		Egérmozgatás sebessége
-Focus mode:	SettingsView		Fókuszmód:
+Focus mode:	SettingsView		Ablak aktiválása:
 Instant warp	SettingsView		Szünetmentes áthajlás
 Dig Deal	MouseApplication		Dig Deal
 1-Button	SettingsView		Egygombos
 Double-click speed	SettingsView		Duplakattintás sebessége
 Defaults	MouseWindow		Eredeti
-Focus follows mouse	SettingsView		A fókusz az egér helyzetétől függ
-Accept first click	SettingsView		Első kattintás elfogadása
+Focus follows mouse	SettingsView		Ha az egér felette van
+Accept first click	SettingsView		Első kattintásra
 Fast	SettingsView		Gyors
 Normal	SettingsView		Megszokott
 Mouse	System name		Egér

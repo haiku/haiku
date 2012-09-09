@@ -7,7 +7,7 @@ White	TeapotWindow		Valkoinen
 Yellow	TeapotWindow		Keltainen
 Blue	TeapotWindow		Sininen
 Gouraud shading	TeapotWindow		Gouraud-varjostus
-Quit	TeapotWindow		Poistu
+Quit	TeapotWindow		Lopeta
 Filled polygons	TeapotWindow		Täytetyt monikulmiot
 Settings	TeapotWindow		Asetukset
 Fog	TeapotWindow		Sumu

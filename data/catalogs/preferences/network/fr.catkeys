@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Network	2324385456
+1	french	x-vnd.Haiku-Network	365183238
 Choose automatically	EthernetSettingsView		Choisir automatiquement
 Gateway:	EthernetSettingsView		Passerelle :
 Netmask:	EthernetSettingsView		Masque réseau :
@@ -19,3 +19,4 @@ The net_server needs to run for the auto configuration!	EthernetSettingsView		Le
 Disabled	EthernetSettingsView		Désactivé
 Auto-configuring failed: 	EthernetSettingsView		Échec de la configuration automatique : 
 Static	EthernetSettingsView		Statique
+<no adapter>	EthernetSettingsView		<aucun adaptateur>

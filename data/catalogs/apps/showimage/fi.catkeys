@@ -13,12 +13,12 @@ View	Menus		Näkymä
 Full screen	Menus		Kokoruutu
 Go to page	Menus		Siirry sivulle
 Zoom out	Menus		Loitonna
-Quit	Menus		Poistu
+Quit	Menus		Lopeta
 Rotate counterclockwise	Menus		Pyöritä vastapäivään
 High-quality zooming	Menus		Korkealaatuinen rajaus
 Browse	Menus		Selaa
 Edit	Menus		Muokkaa
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ei voitu ladata kuvaa! Puuttuu joko tiedosto tai kuvamuunnin sitä varten.
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kuvan lataus epäonnistui! Puuttuu joko tiedosto tai kuvamuunnin sitä varten.
 First page	Menus		Ensimmäinen sivu
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekuntia
@@ -36,7 +36,7 @@ Next file	Menus		Seuraava tiedosto
 Clear selection	Menus		Tyhjennä valinta
 Close document	ClosePrompt		Sulje asiakirja
 Height: 	PrintOptionsWindow		Korkeus: 
-The file '%s' could not be written.	SaveToFile		Tiedostoa ’%s’ ei voitu kirjoittaa.
+The file '%s' could not be written.	SaveToFile		Tiedoston ’%s’ kirjoittaminen epäonnistui.
 Cancel	ClosePrompt		Peru
 Show tool bar	Menus		Näytä työkalupalkki
 Fit to window	Menus		Sovita ikkunaan

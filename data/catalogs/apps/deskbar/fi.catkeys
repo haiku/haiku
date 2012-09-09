@@ -42,11 +42,11 @@ About this system	DeskbarMenu		Tästä järjestelmästä
 Show calendar…	TimeView		Näytä kalenteri...
 Deskbar preferences…	DeskbarMenu		Työpöytäpalkkiasetukset...
 Expand new applications	PreferencesWindow		Laajenna uudet sovellukset
-Show replicants	DeskbarMenu		Näytä replikantit
+Show replicants	DeskbarMenu		Näytä kopiot
 Hide application names	PreferencesWindow		Piilota sovellusnimet
 Clock	PreferencesWindow		Kello
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Esittelyohjelmat
 Icon size	PreferencesWindow		Kuvakekoko
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Työpöytäappletit
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Työpöytäsovelmat
 Hide all	WindowMenu		Piilota kaikki
-Quit application	WindowMenu		Poistu sovelluksesta
+Quit application	WindowMenu		Lopeta sovellus

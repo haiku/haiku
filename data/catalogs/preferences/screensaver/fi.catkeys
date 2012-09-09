@@ -1,5 +1,5 @@
 1	finnish	x-vnd.Haiku-ScreenSaver	215605989
-Could not load screen saver	ScreenSaver		Ei voitu ladata näytönsäästäjää
+Could not load screen saver	ScreenSaver		Näytönsäästäjän lataus epäonnistui
 30 seconds	ScreenSaver		30 sekuntia
 Start screensaver	ScreenSaver		Käynnistä näytönsäästäjä
 Password…	ScreenSaver		Salasana...
@@ -8,7 +8,7 @@ Password lock	ScreenSaver		Salasanalukitus
 Add…	ScreenSaver		Lisää...
 Screensavers	ScreenSaver		Näytönsäästäjät
 mouse is here	ScreenSaver		hiiri on täällä
-Display Power Management Signaling not available	ScreenSaver		Näytön jännitesyötön hallinnan signalointi ei ole saatavilla
+Display Power Management Signaling not available	ScreenSaver		Näytön jännitesyötön hallinnan signalointi ei ole käytettävissä
 ScreenSaver	System name		Näytönsäästäjäasetukset
 Test	ScreenSaver		Testaa
 General	ScreenSaver		Yleinen

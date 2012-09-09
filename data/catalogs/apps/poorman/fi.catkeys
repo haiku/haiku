@@ -25,14 +25,14 @@ OK	PoorMan		Valmis
 Status: Stopped	PoorMan		Tila: Pysäytetty
 Dir Created	PoorMan		Hakemisto luotu
 Log to file	PoorMan		Loki tiedostoon
-Quit	PoorMan		Poistu
+Quit	PoorMan		Lopeta
 Hits: 0	PoorMan		Osumia: 0
 Save log console	PoorMan		Tallenna lokikonsoli
 Edit	PoorMan		Muokkaa
 Create Log File	PoorMan		Luo lokitiedosto
 Log to console	PoorMan		Kirjaa pääteikkunaan
 Directory: (none)	PoorMan		Hakemisto: (ei mitään)
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Köyhiksen luoma oletus ”public_html” kotikansiossasi.\nTai voi sen sijaan valita yhden omista kansioistasi.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Köyhiksen luoma oletus ”public_html” kotikansiossasi.\nTai voit sen sijaan valita yhden omista kansioistasi.
 Log To Console	PoorMan		Kirjaa konsoliin
 Connections	PoorMan		Yhteydet
 Status: Running	PoorMan		Tila: Suoritetaan
@@ -49,18 +49,18 @@ Select web folder	PoorMan		Valitse webbikansio
 Logging view	PoorMan		Kirjaamisnäkymä
 Logging	PoorMan		Kirjaaminen
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Oletuswebbikansio luotiin osoitteeseen ”/boot/home/public_html”.\nVarmista, että HTML-tiedosto nimeltään ”index.html” on tuossa kansiossa.
-Clear log file	PoorMan		Nolla lokitiedosto
+Clear log file	PoorMan		Nollaa lokitiedosto
 Log file name:	PoorMan		Lokitiedostonimi:
 Directory: 	PoorMan		Hakemisto:
 Log To File	PoorMan		Loki tiedostoon
 Done	PoorMan		Valmis
 Create log file	PoorMan		Luo lokitiedosto
-Starting up... 	PoorMan		Aloitetaan...
+Starting up... 	PoorMan		Aloitetaan... 
 Site	PoorMan		Sivusto
 Cancel	PoorMan		Peru
 Console logging	PoorMan		Pääteikkunakirjaaminen
 Cannot start the server	PoorMan		Palvelinta ei voi käynnistää
 Select	PoorMan		Valitse
-Save console as…	PoorMan		Tallenna konsoli nimellä...
+Save console as…	PoorMan		Tallenna pääteikkuna nimellä...
 PoorMan	System name		Köyhis
-Console Logging	PoorMan		Konsolikirjaaminen
+Console Logging	PoorMan		Pääteikkunakirjaaminen

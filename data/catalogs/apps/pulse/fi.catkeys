@@ -1,8 +1,8 @@
 1	finnish	x-vnd.Haiku-Pulse	2324471783
 OK	PrefsWindow		Valmis
-Quit	DeskbarPulseView		Poistu
+Quit	DeskbarPulseView		Lopeta
 Mini mode	DeskbarPulseView		Minitila
-Remove replicant	CPUButton		Poista replikantti
+Remove replicant	CPUButton		Poista kopio
 Active color	ConfigView		Käytössä oleva väri
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Käyttö: Pulse [--mini] [-w leveys] [--width=leveys]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Fade colors	ConfigView		Haalista värit
@@ -28,7 +28,7 @@ OK	PulseView		Valmis
 Deskbar menu	CPUButton		Työpöytäpalkkivalikko
 About Pulse…	PulseView		Ohjelmasta Pulssi...
 Deskbar mode	MiniPulseView		Työpöytäpalkkitila
-Quit	MiniPulseView		Poistu
+Quit	MiniPulseView		Lopeta
 Pulse	System name		Pulssi
 Pulse	NormalPulseView		Pulssi
 %ld MHz	NormalPulseView		%ld MHz

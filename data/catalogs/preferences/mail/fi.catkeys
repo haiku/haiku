@@ -14,7 +14,7 @@ Account name:	E-Mail		Tilinimi:
 Account name:	Config Views		Tilin nimi:
 Create new account	AutoConfigWindow		Luo uusi tili
 OK	Config Views		Valmis
-The filter could not be moved. Deleting filter.	Config Views		Suodatinta ei voitu siirtää. Poistetaan suodatin.
+The filter could not be moved. Deleting filter.	Config Views		Suodattimen siirtäminen epäonnistui. Poistetaan suodatin.
 Revert	Config Window		Palauta
 Login name:	E-Mail		Kirjautumisnimi:
 Incoming	E-Mail		Tuleva
@@ -33,7 +33,7 @@ Add	Config Window		Lisää
 Account settings	AutoConfigWindow		Tiliasetukset
 E-mail	System name		Sähköpostiasetukset
 never	Config Window	mail checking frequency	ei koskaan
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetuksia ei voitu palauttaa.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetusten palauttaminen epäonnistui.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n
 Real name:	Config Views		Oikea nimi:
 \t\t· Outgoing	Config Window		\t\t· Lähtevä
 Choose Protocol	E-Mail		Valitse yhteyskäytäntö
@@ -51,7 +51,7 @@ Account settings	Config Views		Tiliasetukset
 minutes	Config Window		minuutti
 Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
 Real name:	E-Mail		Oikea nimi:
-Apply	Config Window		Sovella
+Apply	Config Window		Käytä
 Always	Config Window		Aina
 OK	AutoConfigWindow		Valmis
 Add filter	Config Views		Lisää suodatin

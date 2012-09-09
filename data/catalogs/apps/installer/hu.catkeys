@@ -64,7 +64,7 @@ Unknown Type	InstallProgress	Partition content type	Ismeretlen típus
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		A GRUB másképpen nevezi el a merevlemezeket mint a Linux.\n\n
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" jelöli a partíció sorszámát, a számok itt is \"0\"-val kezdődnek.\n
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés kész. A boot szektor ide lett írva: '%s'. Nyomja meg az Újraindítás gombot a gép újraindításához, vagy válasszon ki egy új kötetet még egy telepítés elvégzéséhez.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés kész. A boot szektor ide lett írva: '%s'. Nyomja meg az Újraindítás gombot a gép újraindításához, vagy válasszon ki egy új lemezt még egy telepítés elvégzéséhez.
 Installation canceled.	InstallProgress		A telepítés félbeszakadt.
 Installer	System name		Telepítő
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Magára a már kiválasztott lemezre nem lehet telepíteni. Kérem, válasszon egy másik lemezt!

@@ -1,22 +1,22 @@
 1	hungarian	x-vnd.Haiku-Network	365183238
-Choose automatically	EthernetSettingsView		Választás automatikusan
+Choose automatically	EthernetSettingsView		Automatikus választás
 Gateway:	EthernetSettingsView		Átjáró:
-Netmask:	EthernetSettingsView		Alhálózati maszk:
-DHCP	EthernetSettingsView		DHCP
+Netmask:	EthernetSettingsView		Hálózati maszk:
+DHCP	EthernetSettingsView		DHCP (automatikus)
 DNS #2:	EthernetSettingsView		DNS #2:
 Apply	EthernetSettingsView		Alkalmaz
 OK	EthernetSettingsView		Rendben
 DNS #1:	EthernetSettingsView		DNS #1:
 IP address:	EthernetSettingsView		IP-cím:
-Adapter:	EthernetSettingsView		Adapter:
-Domain:	EthernetSettingsView		Domain:
+Adapter:	EthernetSettingsView		Hálózati kártya:
+Domain:	EthernetSettingsView		Tartomány:
 Revert	EthernetSettingsView		Visszaállít
 <no wireless networks found>	EthernetSettingsView		<nem található vezeték nélküli hálózat>
 Network	System name		Hálózat
-Mode:	EthernetSettingsView		Mód:
+Mode:	EthernetSettingsView		Beállítás:
 Network:	EthernetSettingsView		Hálózat:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		A net_servernek futnia kell az automatikus beállításokhoz!
 Disabled	EthernetSettingsView		Letiltva
 Auto-configuring failed: 	EthernetSettingsView		Az automatikus beállítás nem sikerült: 
-Static	EthernetSettingsView		Állandó
+Static	EthernetSettingsView		Állandó (kézi)
 <no adapter>	EthernetSettingsView		<nincs hálózati kártya>

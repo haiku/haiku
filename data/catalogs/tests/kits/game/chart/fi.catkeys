@@ -11,7 +11,7 @@ Novas	ChartWindow		Novat
 LineArray	ChartWindow		LineArray
  0.6 f/s  (logarythmic scale)	ChartWindow		0,6 f/s (logaritminen skaala)
 Free motion	ChartWindow		Vapaa liike
-(high) 100% 	ChartWindow		(korkea) 100 %
+(high) 100% 	ChartWindow		(korkea) 100 % 
 Green	ChartWindow		Vihreä
 Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 säiettä
@@ -21,12 +21,12 @@ Chaos	ChartWindow		Kaaos
 Full screen	ChartWindow		Kokoruutu
 Spiral	ChartWindow		Spiraali
 Slow motion	ChartWindow		Hidas liike
- 5% (low)	ChartWindow		5 % (alhainen)
+ 5% (low)	ChartWindow		 5 % (alhainen)
 Fast motion	ChartWindow		Nopea liike
 Special	ChartWindow		Erityinen
 Status	ChartWindow		Tila
 Star density	ChartWindow		Tähtitiheys
-600.0 f/s	ChartWindow		600,0 f/s
+600.0 f/s	ChartWindow		600,0 kehystä/s
 Display:	ChartWindow		Näyttö:
 Space color	ChartWindow		Tilaväri
 White	ChartWindow		Valkoinen

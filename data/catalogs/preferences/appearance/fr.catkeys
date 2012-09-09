@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	3047172181
+1	french	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		Police simple :
 Control highlight	Colors tab		Mise en valeur de contrôle
 Control border	Colors tab		Bordure des contrôles
@@ -39,6 +39,7 @@ Colors	APRWindow		Couleurs
 Control background	Colors tab		Arrière plan des contrôles
 Inactive window tab	Colors tab		Titres des fenêtres inactives
 Appearance	System name		Apparence
+Use double scrollbar arrows	DecorSettingsView		Utiliser les ascenseurs à doubles flèches
 Fixed font:	Font view		Police à chasse fixe :
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwis . 0123456789
 Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		Bordure de l'élément sélectionné dans 
 Strong	AntialiasingSettingsView		Épais
 Panel text	Colors tab		Texte des panneaux
 Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
+Look and feel	APRWindow		Aspect et comportement
 Antialiasing menu	AntialiasingSettingsView		Menu lissage
 Fonts	APRWindow		Polices
 Glyph hinting:	AntialiasingSettingsView		Consigne de glyphes :

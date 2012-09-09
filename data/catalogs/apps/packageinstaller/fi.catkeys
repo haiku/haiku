@@ -9,7 +9,7 @@ Install 	PackageView		Asenna
 No package selected.	PackageInfo		Yhtään pakettia ei ole valittu.
 Install	PackageView		Asenna
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Annettu paketti näyttää jo olevan asennettu järjestelmääsi. Haluaisitko poistaa nykyisen paketin ja jatkaa asennusta?
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Haluatko muistaa tämän päätöksen loppuasennuksen aikana?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Haluatko muistaa tämän päätöksen loppuasennuksen aikana?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Pakettitiedoston tiedostokoossa näyttää olevan täsmäämättömyys. Paketti voi olla rikkinäinen tai sitä on muokattu luomisen jälkeen. Haluatko yhä jatkaa?
 Error while installing the package\n	PackageView		Virhe asennettaessa pakettia\n
 Disclaimer	PackageTextViewer		Vastuuvapauslauseke
@@ -37,7 +37,7 @@ The directory named '%s' already exits in the given path.\nReplace the directory
 The package you requested has been successfully installed on your system.	PackageView		Pyytämäsi paketti on asennettu järjestelmääsi onnistuneesti.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Virhe! ”%s” ei ole kelvollinen polku.\n
 Installation type:	PackageView		Asennustyyppi:
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Virhe (%s)! Ei voitu avata ”%s”.\n
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Virhe (%s)! Kohteen ”%s” avaus epäonnistui.\n
 Finishing installation	PackageInstall		Lopetetaan asennus
 Installing package	PackageStatus		Asennetaan pakettia
 Ask again	PackageView		Kysy uudelleen
@@ -55,4 +55,4 @@ Abort	PackageInstall		Keskeytä
 Continue	PackageTextViewer		Jatka
 Replace	PackageView		Korvaa
 Installation progress	PackageView		Asennuksen eteneminen
-The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Pakettitiedostoa ei kyetä lukemaan.\nYksi mahdollinen syy saattaa olla, että pyydetty tiedosto ei ole kelvollinen BeOS .pkg -paketti.
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Pakettitiedoston lukeminen epäonnistui.\nYksi mahdollinen syy saattaa olla, että pyydetty tiedosto ei ole kelvollinen BeOS .pkg -paketti.
