@@ -1640,6 +1640,7 @@ status_t
 init_ipv6()
 {
 	mutex_init(&sRawSocketsLock, "raw sockets");
+	mutex_init(&sFragmentLock, "IPv4 Fragments");
 	mutex_init(&sMulticastGroupsLock, "IPv6 multicast groups");
 	mutex_init(&sReceivingProtocolLock, "IPv6 receiving protocols");
 
@@ -1685,6 +1686,7 @@ err2:
 err1:
 	mutex_destroy(&sReceivingProtocolLock);
 	mutex_destroy(&sMulticastGroupsLock);
+	mutex_destroy(&sFragmentLock);
 	mutex_destroy(&sRawSocketsLock);
 	TRACE("init_ipv6: error %s", strerror(status));
 	return status;
@@ -1709,6 +1711,7 @@ uninit_ipv6()
 	mutex_unlock(&sReceivingProtocolLock);
 
 	mutex_destroy(&sMulticastGroupsLock);
+	mutex_destroy(&sFragmentLock);
 	mutex_destroy(&sRawSocketsLock);
 	mutex_destroy(&sReceivingProtocolLock);
 
