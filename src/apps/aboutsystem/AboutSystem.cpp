@@ -999,7 +999,6 @@ AboutView::_CreateCreditsView()
 		"Ithamar R. Adema\n"
 		"Bruno G. Albuquerque\n"
 		"Stephan Aßmus\n"
-		"Salvatore Benedetto\n"
 		"Stefano Ceccherini\n"
 		"Rudolf Cornelissen\n"
 		"Alexandre Deckner\n"
@@ -1010,25 +1009,19 @@ AboutView::_CreateCreditsView()
 		"René Gollent\n"
 		"Bryce Groff\n"
 		"Colin Günther\n"
-		"Karsten Heimrich\n"
 		"Fredrik Holmqvist\n"
 		"Philippe Houdoin\n"
-		"Maurice Kalinowski\n"
-		"Euan Kirkhope\n"
 		"Ryan Leavengood\n"
 		"Michael Lotz\n"
-		"Brecht Machiels\n"
 		"Matt Madia\n"
 		"Scott McCreary\n"
 		"David McPaul\n"
-		"Wim van der Meer\n"
 		"Fredrik Modéen\n"
 		"Marcus Overhagen\n"
 		"Michael Pfeiffer\n"
 		"François Revol\n"
 		"Philippe Saint-Pierre\n"
 		"John Scipione\n"
-		"Andrej Spielmann\n"
 		"Jonas Sundström\n"
 		"Oliver Tappe\n"
 		"Gerasim Troeglazov\n"
@@ -1046,13 +1039,19 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Andrew Bachmann\n"
+		"Salvatore Benedetto\n"
 		"Tyler Dauwalder\n"
 		"Daniel Furrer\n"
 		"Andre Alves Garzia\n"
+		"Karsten Heimrich\n"
 		"Erik Jaesler\n"
+		"Maurice Kalinowski\n"
+		"Euan Kirkhope\n"
 		"Marcin Konicki\n"
 		"Waldemar Kornewald\n"
 		"Thomas Kurschel\n"
+		"Brecht Machiels\n"
+		"Wim van der Meer\n"
 		"Frans Van Nispen\n"
 		"Adi Oanca\n"
 		"Michael Phipps\n"
@@ -1060,6 +1059,7 @@ AboutView::_CreateCreditsView()
 		"David Reid\n"
 		"Hugo Santos\n"
 		"Alexander G. M. Smith\n"
+		"Andrej Spielmann\n"
 		"Bryan Varner\n"
 		"Nathan Whitehorn\n"
 		"Michael Wilber\n"
@@ -1096,8 +1096,10 @@ AboutView::_CreateCreditsView()
 		"Michael Davidson\n"
 		"David Dengg\n"
 		"John Drinkwater\n"
+		"Yongcong Du\n"
 		"Cian Duffy\n"
 		"Vincent Duvert\n"
+		"Pawel Dziepak\n"
 		"Mikael Eiman\n"
 		"Fredrik Ekdahl\n"
 		"Joshua R. Elsasser\n"
@@ -1112,7 +1114,9 @@ AboutView::_CreateCreditsView()
 		"Deyan Genovski\n"
 		"Pete Goodeve\n"
 		"Lucian Adrian Grijincu\n"
+		"Jessica Hamilton\n"
 		"Sean Healy\n"
+		"Andreas Henriksson\n"
 		"Matthijs Hollemans\n"
 		"Mathew Hounsell\n"
 		"Morgan Howe\n"
@@ -1163,20 +1167,22 @@ AboutView::_CreateCreditsView()
 		"Jeremy Rand\n"
 		"Hartmut Reh\n"
 		"Daniel Reinhold\n"
+		"Sergei Reznikov\n"
 		"Chris Roberts\n"
 		"Samuel Rodríguez Pérez\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
 		"Ralf Schülke\n"
-		"Reznikov Sergei\n"
 		"Zousar Shaker\n"
 		"Caitlin Shaw\n"
+		"Alex Smith\n"
 		"Geoffry Song\n"
 		"Daniel Switkin\n"
 		"Atsushi Takamatsu\n"
 		"James Urquhart\n"
 		"Jason Vandermark\n"
 		"Sandor Vroemisse\n"
+		"Jürgen Wall\n"
 		"Denis Washington\n"
 		"Ulrich Wimboeck\n"
 		"Johannes Wischert\n"
@@ -1188,7 +1194,7 @@ AboutView::_CreateCreditsView()
 		"Zhao Shuai\n");
 	fCreditsView->Insert(
 		B_TRANSLATE("\n" B_UTF8_ELLIPSIS
-			" and probably some more we forgot to mention (sorry!)"
+			"and probably some more we forgot to mention (sorry!)"
 			"\n\n"));
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
@@ -1256,11 +1262,12 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		B_TRANSLATE("The BeGeistert team\n"));
 	fCreditsView->Insert(
-		B_TRANSLATE("Google & their Google Summer of Code program\n"));
+		B_TRANSLATE("Google and their Google Summer of Code and Google Code In "
+			"programs\n"));
 	fCreditsView->Insert(
 		B_TRANSLATE("The University of Auckland and Christof Lutteroth\n\n"));
 	fCreditsView->Insert(
-		B_TRANSLATE("... and the many people making donations!\n\n"));
+		B_TRANSLATE(B_UTF8_ELLIPSIS "and the many people making donations!\n\n"));
 
 	// copyrights for various projects we use
 
