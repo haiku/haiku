@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
 Kill application	Team monitor		Program megszakítása
 Quit application	Team monitor		Program leállítása
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Egy program bezárásához válassza ki azt a fenti listában, majd nyomja meg az „Program megszakítása”, majd pedig a „Program leállítása” gombot.\n\nA CONTROL+ALT+DELETE %ld másodpercig való lenyomva tartásával újraindíthatja a számítógépet.
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Egy program bezárásához válassza ki azt a fenti listában, majd nyomja meg az „Program megszakítása”, majd pedig a „Program leállítása” gombot.\n\nA „Ctrl+Alt+Del” %ld másodpercig való lenyomva tartásával újraindíthatja a számítógépet.
 If the application will not quit you may have to kill it.	Team monitor		Ha a program nem lép ki magától, lehet, hogy szükséges megszakítani azt.
 Force reboot	Team monitor		Újraindítás mindenáron
 Team monitor	Team monitor		Folyamatfigyelő

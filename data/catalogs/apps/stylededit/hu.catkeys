@@ -7,7 +7,7 @@ File	Menus		Fájl
 Lines:	Statistics		Sor:
 Italic	Menus		Dőlt
 Left	Menus		Balra
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Visszaállítja a(z) \"%s\" legutolsó verzióját? 
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Visszaállítja legutolsó verzióját: %s?
 Search backwards	FindandReplaceWindow		Keresés visszafelé
 Size	Menus		Méret
 Save	QuitAlert		Mentés
@@ -17,7 +17,7 @@ Can't undo	Menus		Nem vonható vissza
 Save	Menus		Mentés
 Replace with:	FindandReplaceWindow		Csere erre:
 Cancel	SaveAlert		Mégse
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a(z) \"%s\" fájl nem található.
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl (%s) nem található.
 Case-sensitive	FindandReplaceWindow		Kis- és nagybetűérzékeny
 Green	Menus		Zöld
 Revert to saved…	Menus		Vissza a mentett állapotra…
@@ -28,7 +28,7 @@ Quit	Menus		Kilépés
 Document statistics	Statistics		Dokumentum statisztika
 Cancel	RevertToSavedAlert		Mégse
 Document	Menus		Dokumentum
-Save changes to the document \"%s\"? 	QuitAlert		Menti a(z) \"%s\" változtatásait? 
+Save changes to the document \"%s\"? 	QuitAlert		Menti a dokumentum (%s) változtatásait? 
 Edit	Menus		Szerkesztés
 Font	Menus		Betűtípus
 Replace all	FindandReplaceWindow		Mindet cseréli
@@ -39,7 +39,7 @@ Cancel	FindandReplaceWindow		Mégse
 Close	Menus		Bezárás
 Save	SaveAlert		Mentés
 Words:	Statistics		Szó:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Hiba a(z) \"%s\" betöltése közben:\n\tA formátum nem támogatott
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Hiba történt a betöltés (%s) közben:\n\tA formátum nem támogatott
 OK	RevertToSavedAlert		Rendben
 Don't save	QuitAlert		Ne mentse
 Align	Menus		Igazítás
@@ -56,7 +56,7 @@ Wrap-around search	FindandReplaceWindow		Folyamatos keresés
 Bold	Menus		Félkövér
 Find selection	Menus		Keresés a kijelölésben
 Find:	FindandReplaceWindow		Keresés:
-Error saving \"%s\":\n%s	SaveAlert		Hiba történt \"%s\" mentése közben:\n%s
+Error saving \"%s\":\n%s	SaveAlert		Hiba történt a mentés (%s) közben:\n\t%s
 Copy	Menus		Másolás
 Cut	Menus		Kivágás
 Replace	FindandReplaceWindow		Cserél
@@ -65,9 +65,9 @@ Cancel	QuitAlert		Mégse
 Find…	Menus		Keresés…
 Select all	Menus		Összes kijelölése
 Don't save	SaveAlert		Ne mentsen
-Error loading \"%s\":\n\t%s	LoadAlert		Hiba történt ennek a betöltése közben: \"%s\":\n\t%s
+Error loading \"%s\":\n\t%s	LoadAlert		Hiba történt a betöltés (%s) közben:\n\t%s
 Undo typing	QuitAlert		Gépelés visszavonása
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti a(z) \"%s\" dokumentum változtatásait? 
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti dokumentum (%s) változtatásait? 
 Black	Menus		Fekete
 Untitled 	StyledEditWindow		Névtelen
 OK	SaveAlert		Rendben

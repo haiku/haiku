@@ -15,7 +15,7 @@ Failed to initialize the disk %s!\n	MainWindow		Nem sikerült előkészíteni a 
 The selected disk is read-only.	MainWindow		A kiválasztott lemez nem írható.
 Partition name:	CreateParamsPanel		Partíció neve:
 Initialize	InitParamsPanel		Előkészítés
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarja formázni a partíciót (\"%s\")? A végleleges művelet előtt még egyszer meg kell ezt erősítenie.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarja formázni a partíciót (%s)? A végleleges művelet előtt még egyszer meg kell ezt erősítenie.
 Could not mount partition %s.	MainWindow		A partíció (%s) nem csatolható.
 The partition %s has been successfully formatted.\n	MainWindow		A partíció (%s) hiba nélkül elő lett készítve.\n
 The partition %s is already unmounted.	MainWindow		A partíció (%s) már le van választva!

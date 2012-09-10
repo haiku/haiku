@@ -133,5 +133,5 @@ OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Изменить закладки…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка для этой страницы (%bookmarkName) уже существует.
 New windows:	Settings Window		Новые окна:
-%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен.
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен
 Remove finished	Download Window		Удалить загруженные

@@ -10,7 +10,7 @@ Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nem sikerült leválasztani a lemezt (%s)\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		<Névtelen lemez> csatolása folyamatban\n\n
 OK	AutoMounter		Rendben
-The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		A lemez fájrendszere nem Haiku fájlrendszer. Erősen ajánlott csak olvashatóan felcsatolni, hogy elkerüljük a Haiku hibái miatti adatvesztést.
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		A lemez fájrendszere nem Haiku fájlrendszer. Erősen ajánlott csak olvashatóan csatolni, hogy elkerüljük a Haiku hibái miatti adatvesztést.
 Previous volumes mounted.	AutoMounter		Legutóbbi lemezek csatolva.
 Mount error	AutoMounter		Csatolási hiba
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Ajánlott az összes többi Haiku lemezt csak olvasható módban csatolni, hogy elkerüljük a Haiku hibái miatti adatvesztést.

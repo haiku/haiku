@@ -4,7 +4,7 @@ Close	AboutWindow		Bezárás
 Written by:	AboutWindow		Írta:
 About %app%	AboutMenuItem		%app% névjegye
 Cut	TextView		Kivágás
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nem lehet replikánst létrehozni ehhez: \"%description\".\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nem lehet replikánst létrehozni ehhez: %description.\n%error
 Copy	TextView		Másolás
 %3.2f KiB	StringForSize		%3.2f KB
 %d bytes	StringForSize		%Ld byte

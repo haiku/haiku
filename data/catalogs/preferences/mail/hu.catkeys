@@ -57,5 +57,5 @@ OK	AutoConfigWindow		Rendben
 Add filter	Config Views		Szűrő hozzáadása
 Outgoing	Config Window		Kimenő
 Outgoing mail filters	Config Views		Kimenő levelek szűrői
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nA Hozzáad gombbal hozhat létre új fiókot.\n\nAz Eltávolít gombbal törölhet egy fiókot.\n\nVálasszon ki egy elemet a listából annak beállításainak a módosításához.
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nA „Hozzáad” gombbal hozhat létre új fiókot.\n\nAz „Eltávolít” gombbal törölhet egy fiókot.\n\nVálasszon ki egy elemet a listából annak beállításainak a módosításához.
 Error	Config Window		Hiba

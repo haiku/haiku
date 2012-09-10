@@ -35,9 +35,9 @@ Skip	PackageView		Átugrás
 %.1f MiB	PackageView		%.1f MB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		A(z) '%s' nevű mappa már létezik a megadott útvonalon.\nLegyen felülírva, vagy ugorjuk át?
 The package you requested has been successfully installed on your system.	PackageView		A kért csomag sikeresen fel lett telepítve a rendszerre.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hiba! A(z) \"%s\" nem érvényes útvonal.\n
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hiba! Érvénytelen útvonal: %s.\n
 Installation type:	PackageView		Telepítés típusa:
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Hiba (%s)! A(z) \"%s\" nem nyitható meg.\n
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Hiba (%s)! Nem nyitható meg: %s\n
 Finishing installation	PackageInstall		Telepítés befejezése
 Installing package	PackageStatus		Csomag telepítése
 Ask again	PackageView		Kérdezze újból

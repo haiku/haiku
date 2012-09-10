@@ -112,7 +112,7 @@ Error: 	MediaPlayer-Main		Ошибка:
 Large	MediaPlayer-SettingsWindow		крупный
 Bottom of video	MediaPlayer-SettingsWindow		нижняя часть видео
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
-Stop	MediaPlayer-Main		Стоп
+Stop	MediaPlayer-Main		Остановить
 <unnamed media>	MediaPlayer-InfoWin		<безымянное медиа>
 raw video	MediaPlayer-InfoWin		необработанное видео
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы

@@ -23,7 +23,7 @@ Copy here	Terminal TermView		Másolás ide
 Really close?	Terminal TermWindow		Biztos bezárja?
 Copy	Terminal TermWindow		Másolás
 Window title:	Terminal TermWindow		Ablak címe:
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Ismeretlen beállítás: \"%s\"\n
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Ismeretlen beállítás: %s\n
 %app% settings	Terminal PrefWindow	window title	%app% beállítások
 Cancel	Terminal SetTitleWindow		Mégse
 Increase	Terminal TermWindow		Növelés
@@ -39,14 +39,14 @@ OK	Terminal SetTitleWindow		Rendben
 Background	Terminal AppearancePrefView		Háttér
 Use selection	Terminal FindWindow		Kijelölés használata
 Green on Black	Terminal colors schema		Fekete alapon zöld
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Ez a folyamat még fut: \"%1\".\nHa bezárja a lapot, a folyamat megszakad.
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		A folyamat (%1) még fut.\nHa bezárja a lapot, a folyamat megszakad.
 Size:	Terminal AppearancePrefView		Méret:
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Nem sikerült ezt lefuttatni: \"%command\":\n\t%error
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Nem sikerült lefuttatni: %command\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h     --help                ez a leírás megjelenítése\n  -t     --title                 ablak címének megadása\n  -f     -fullscreen         indítás teljes képernyőben\n
 Full screen	Terminal TermWindow		Teljes képernyő
 Window title…	Terminal TermWindow		Ablak címe…
 Page setup…	Terminal TermWindow		Oldalbeállítás…
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Ezek a folyamatok még futnak: \"%1\".\nHa bezárja a Terminált, a folyamatok megszakadnak.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Ezek a folyamatok még futnak: \n\n\t%1\n\nHa bezárja a Terminált, a folyamatok megszakadnak.
 Insert path	Terminal TermView		Útvonal beszúrása
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\nMinden jog fenntartva 2001-2009 Haiku, Inc.\nMinden jog fenntartva(C) 1999 Kazuho Okui és Takashi Murai.\n\nHasználata: %s [OPCIÓ] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Nincs beírva keresendő szöveg
@@ -58,7 +58,7 @@ Match word	Terminal FindWindow		Szóegyeszés
 Nothing is selected.	Terminal TermWindow		Nincs semmi kijelölve.
 Text not found.	Terminal TermWindow		Nem található a szöveg.
 Find…	Terminal TermWindow		Keresés…
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Ez a folyamat még fut: \"%1\".\nHa bezárja a Terminált, a folyamat megszakad.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		A folyamat (%1) még fut.\nHa bezárja a Terminált, a folyamat megszakad.
 Move here	Terminal TermView		Áthelyezés ide
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAz a mappa amiben a jelenlegi fül az aktív folyamata\n\t\t\tfut épp.Meg lehet adni az elérési út\n\t\t\tkomponenseinek számát. Pl. '%2d' maximum két komponenshez.\n\t%i\t-\tAz ablak indexe.\n\t%p\t-\tA jelenlegi fülben futó folyamat neve.\n\t%t\t-\tA jelenlegi fül címe.\n\t%%\t-\tEgy '%' karakter.
 White on Black	Terminal colors schema		Fekete alapon fehér

@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-ProcessController	2887520383
 Memory usage	ProcessController		Memóriahasználat
-Do you really want to kill the team \"%s\"?	ProcessController		Biztos le kívánja állítani a(z) \"%s\" csapatot?
+Do you really want to kill the team \"%s\"?	ProcessController		Biztosan le kívánja állítani: %s?
 Idle priority	ProcessController		Üresjárat prioritás
 Restart Deskbar	ProcessController		Asztalsáv újraindítása
 Custom priority	ProcessController		Egyéni prioritás
@@ -20,7 +20,7 @@ This is the last active processor...\nYou can't turn it off!	ProcessController		
 Info	ProcessController		Infó
 Quit application	ProcessController		Program leállítása
 Low priority	ProcessController		Alacsony prioritás
-What do you want to do with the thread \"%s\"?	ProcessController		Mit kíván tenni a(z) \"%s\" szállal?
+What do you want to do with the thread \"%s\"?	ProcessController		Mit kíván tenni a szállal: %s?
 Gone teams…	ProcessController		Eltűnt csapatok…
 Lowest active priority	ProcessController		Legalacsonyabb aktív prioritás
 Restart Tracker	ProcessController		Tracker újraindítása

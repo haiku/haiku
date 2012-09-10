@@ -10,7 +10,7 @@ Getting UniqueIDs…	pop3		Получение уникальных иденти�
 : Connection refused or host not found	pop3		: В соединении отказано или сервер не найден
 Error while connecting to server %serv	pop3		Ошибка при соединении с сервером %serv
 Error while authenticating user %user	pop3		Ошибка при авторизации пользователя %user
-Destination:	ConfigView		Назначение:
+Destination:	ConfigView		Папка:
 APOP	ConfigView		APOP
 Sending password…	pop3		Отправка пароля…
 Connect to server…	pop3		Подключение к серверу…

@@ -9,7 +9,7 @@ Some of the files don't appear to be audio files	RecorderWindow		Некотор�
 File info	RecorderWindow		Информация о файле:
 Drop files here	SoundListView		Перенесите сюда файлы
 Input	RecorderWindow		Вход
-Stop	RecorderWindow		Стоп
+Stop	RecorderWindow		Остановить
 Format:	RecorderWindow		Формат:
 Sound List	RecorderWindow		Список звуков
 Compression: 	RecorderWindow		Сжатие: 

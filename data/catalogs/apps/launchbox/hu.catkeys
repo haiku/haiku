@@ -7,7 +7,7 @@ Pad 1	LaunchBox		1. tálca
 last chance	LaunchBox		utolsó esély
 Quit	LaunchBox		Kilépés
 Clear button	LaunchBox		Gomb törlése
-LaunchBox	System name		Indítódoboz
+LaunchBox	System name		Indítósáv
 Ignore double-click	LaunchBox		Dupla kattintás figyelmen kívül hagyása
 Auto-raise	LaunchBox		Automatikus emelés
 Show on all workspaces	LaunchBox		Megjelenítés az összes munkaasztalon
@@ -18,11 +18,11 @@ Bummer	LaunchBox		Fenébe
 Cancel	LaunchBox		Mégse
 Remove button	LaunchBox		Gomb eltávolítása
 Horizontal layout	LaunchBox		Vízszintes elrendezés
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNem sikerült a programot elindítani ezzel az aláírással: '%2'.\n\nHiba:
-Failed to launch '%1'.\n\nError:	LaunchBox		Nem sikerült ezt elindítani: '%1'.\n\nHiba:
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNem sikerült a programot elindítani ezzel az aláírással: %2.\n\nHiba:
+Failed to launch '%1'.\n\nError:	LaunchBox		Nem sikerült elindítani: %1.\n\nHiba:
 Name Panel	LaunchBox		Név panel
 Add button here	LaunchBox		Helyezze a gombokat ide
-Description for '%3'	LaunchBox		A(z) '%3' leírása
+Description for '%3'	LaunchBox		%3 leírása
 Settings	LaunchBox		Beállítások
 Failed to launch 'something', error in Pad data.	LaunchBox		Nem sikerült elindítani valamit, hiba van a tálca adataiban.
 Pad %1	LaunchBox		%1 tálca

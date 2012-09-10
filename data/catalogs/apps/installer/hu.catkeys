@@ -64,7 +64,7 @@ Unknown Type	InstallProgress	Partition content type	Ismeretlen típus
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		A GRUB másképpen nevezi el a merevlemezeket mint a Linux.\n\n
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" jelöli a partíció sorszámát, a számok itt is \"0\"-val kezdődnek.\n
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés kész. A boot szektor ide lett írva: '%s'. Nyomja meg az Újraindítás gombot a gép újraindításához, vagy válasszon ki egy új lemezt még egy telepítés elvégzéséhez.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés kész. A boot szektor ide lett írva: '%s'. Nyomja meg az „Újraindítás” gombot a gép újraindításához, vagy válasszon ki egy új lemezt még egy telepítés elvégzéséhez.
 Installation canceled.	InstallProgress		A telepítés félbeszakadt.
 Installer	System name		Telepítő
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Magára a már kiválasztott lemezre nem lehet telepíteni. Kérem, válasszon egy másik lemezt!
@@ -113,7 +113,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Biztosan félbeszakítja a telepítést?
 Onto:	InstallerWindow		Hova:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Kérjük, zárja be a Rendszerindító menü ablakát még mielőtt a Telepítő ablakát bezárná.
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) A Haiku első indításakor olvassa el az \"Köszöntő\"-t és a \"Felhasználói útmutató\"-t. Ezek megtalálhatóak az Asztalon és a WebPositive könyvjelzői között.\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) A Haiku első indításakor olvassa el az „Köszöntő”-t és a „Felhasználói útmutató”-t. Ezek megtalálhatóak az Asztalon és a WebPositive könyvjelzői között.\n\n
 Tools	InstallerWindow		Eszközök
 The mount point could not be retrieved.	InstallProgress		A csatolási pontot nem lehet meghatározni.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		A lemez, melyre települ a rendszer, nem üres. Még így is nekiáll a telepítésnek?\n\nMegjegyzés: A „rendszer” nevű mappa lesz csak egyedül újból feltelepítve, az öszes többi mappa az új telepítéssel együtt össze lesz vonva. Ahol a fájlok és a linkek már léteznek a célrendszerben, azok a telepítési forráséval lesznek felülírva.

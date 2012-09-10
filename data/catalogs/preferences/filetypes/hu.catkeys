@@ -15,7 +15,7 @@ Choose type	Type List Window		Típus kiválasztása
 New file type	New File Type Window		Új fájltípus
 Rule:	FileTypes Window		Szabály:
 Add icon…	Icon View		Ikon hozzáadása…
-Multiple files from \"%s\" file type	FileType Window		Több \"%s\" fájltípusú fájl
+Multiple files from \"%s\" file type	FileType Window		Több \"%s\" típusú fájl
 Do you want to save the changes?	Application Type Window		Elmenti a változtatásokat?
 File type	FileType Window		Fájltípus
 Could not change attributes	Attribute Window		Nem lehetett módosítani a jellemzőket
@@ -98,7 +98,7 @@ New resource file…	FileTypes Window		Új forrásfájl…
 Cancel	New File Type Window		Mégse
 Icon	FileTypes Window		Ikon
 Extension:	Extension Window		Kiterjesztés:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarja tenni? A teljes csoport eltávolításához tartsa lenyomva a Shift billentyűt és nyomjon az \"Eltávolítás\" gombra.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarja tenni? A teljes csoport eltávolításához tartsa lenyomva a „Shift” billentyűt és nyomjon az „Eltávolítás” gombra.
 Internal name:	FileTypes Window		Belső név:
 Add	Attribute Window		Hozzáadás
 Close	Application Type Window		Bezárás

@@ -32,7 +32,7 @@ Edit	PoorMan		Szerkesztés
 Create Log File	PoorMan		Naplófájl készítése
 Log to console	PoorMan		Naplózás konzolba
 Directory: (none)	PoorMan		Mappa: (nincs)
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérjük, válassza ki a netes mappát a közzétételnek.\n\nA PoorMan létre tud hozna egy alapértelmezett \"public_html\" mappád a home mappán belül.\nVagy pedig választhat egyet a saját mappái közül ehelyett.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérem, válassza ki azt a mappát, ahol az oldal fájljai találhatóak.\n\nA PoorMan létre tud hozni egy alapértelmezett „public_html” mappát a saját mappán belül,\nvagy pedig választhat egyet ehelyett.
 Log To Console	PoorMan		Naplózás konzolba
 Connections	PoorMan		Kapcsolatok
 Status: Running	PoorMan		Állapot: Fut
@@ -48,7 +48,7 @@ File logging	PoorMan		Fájlnaplózás
 Select web folder	PoorMan		Netes mappa kiválasztása
 Logging view	PoorMan		Naplózási nézet
 Logging	PoorMan		Naplózás
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Itt lett létrehozva egy netes mappa: \"/boot/home/public_html.\"\nTegyen bele egy \"index.html\" nevű HTML fájlt!
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Az alapértelmezett mappa létre lett hozva: /boot/home/public_html\nTegyen bele egy „index.html” nevű HTML fájlt!
 Clear log file	PoorMan		Naplófájl ürítése
 Log file name:	PoorMan		Naplófájl neve:
 Directory: 	PoorMan		Mappa:

@@ -33,7 +33,7 @@ There is no installed handler for URL links.	Mail		Az URL-linkeket nem lehet miv
 Signature	Mail		Aláírás
 Find again	Mail		Keresés ismétlése
 Bcc:	Mail		Titkos másolat:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattintson a "Küldés"-re, ha mindenképp el akarja küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térjen vissza, és javítsa ki azt.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattintson a „Küldés”-re, ha mindenképp el akarja küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térjen vissza, és javítsa ki azt.
 Signature:	Mail		Aláírás
 Save changes to this signature?	Mail		Elmenti a módosított aláírást?
 Cc:	Mail		Másolat:

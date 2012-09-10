@@ -6,7 +6,7 @@ OK	SudokuWindow		Rendben
 New	SudokuWindow		Új
 Abort	ProgressWindow		Megszakítás
 Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Nem lehetett megnyitni ezt: \"%s\":\n%s\n
+Could not open \"%s\":\n%s\n	SudokuWindow		Nem lehetett megnyitni: %s\n%s\n
 Easy	SudokuWindow		Könnyű
 Open file…	SudokuWindow		Fájl megnyitása…
 Solve single field	SudokuWindow		Egy mező megoldása

@@ -28,7 +28,7 @@ Attribute	AttributeWindow		Атрибут
 8 bit signed value:	TypeEditors		8-ми битное знаковое значение:
 Number:	TypeEditors		Число:
 Save	ProbeView		Сохранить
-Stop	ProbeView		Стоп
+Stop	ProbeView		Остановить
 Number editor	TypeEditors		Редактор чисел
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шестнадцатеричная
 No type editor available	AttributeWindow		Нет доступного редактора для данного типа

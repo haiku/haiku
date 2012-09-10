@@ -8,7 +8,7 @@ ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Соединение с сервером…
 Error while opening connection to %serv	smtp		Ошибка при открытии соединения с %serv
 POP3 authentication failed. The server said:\n	smtp		Аутентификация по POP3 не удалась. Сервер сообщил:\n
-Destination:	ConfigView		Место назначения:
+Destination:	ConfigView		Папка:
 : Connection refused or host not found.	smtp		: Отказ в соединении или хост не найден.
 None	ConfigView		Нет
 POP3 before SMTP	ConfigView		POP3 перед SMTP
