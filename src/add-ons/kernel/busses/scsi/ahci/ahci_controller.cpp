@@ -131,10 +131,19 @@ AHCIController::Init()
 	fPortCountMax = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
 
 	fPortImplementedMask = fRegs->pi;
+	// reported mask of implemented ports is sometimes empty
 	if (fPortImplementedMask == 0) {
 		fPortImplementedMask = 0xffffffff >> (32 - fPortCountMax);
 		TRACE("ports-implemented mask is zero, using 0x%" B_PRIx32 " instead.\n",
 			fPortImplementedMask);
+	}
+
+	// reported number of ports is sometimes too small
+	int maxPortIndex;
+	maxPortIndex = fls(fPortImplementedMask);
+	if (fPortCountMax < maxPortIndex) {
+		TRACE("reported number of ports is wrong, using %d instead.\n", maxPortIndex);
+		fPortCountMax = maxPortIndex;
 	}
 
 	fPortCountAvail = count_bits_set(fPortImplementedMask);
@@ -169,7 +178,7 @@ AHCIController::Init()
 		goto err;
 	}
 
-	for (int i = 0; i <= fPortCountMax; i++) {
+	for (int i = 0; i < fPortCountMax; i++) {
 		if (fPortImplementedMask & (1 << i)) {
 			fPort[i] = new (std::nothrow)AHCIPort(this, i);
 			if (!fPort[i]) {
@@ -189,7 +198,7 @@ AHCIController::Init()
 	fRegs->ghc |= GHC_IE;
 	FlushPostedWrites();
 
-	for (int i = 0; i <= fPortCountMax; i++) {
+	for (int i = 0; i < fPortCountMax; i++) {
 		if (fPort[i]) {
 			status_t status = fPort[i]->Init2();
 			if (status < B_OK) {
@@ -215,7 +224,7 @@ AHCIController::Uninit()
 {
 	TRACE("AHCIController::Uninit\n");
 
-	for (int i = 0; i <= fPortCountMax; i++) {
+	for (int i = 0; i < fPortCountMax; i++) {
 		if (fPort[i]) {
 			fPort[i]->Uninit();
 			delete fPort[i];
