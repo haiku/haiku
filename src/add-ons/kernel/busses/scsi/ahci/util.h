@@ -20,6 +20,8 @@ status_t sg_memcpy(const physical_entry *sgTable, int sgCount, const void *data,
 
 void swap_words(void *data, size_t size);
 
+int fls(unsigned mask);
+
 #ifdef __cplusplus
 }
 #endif
