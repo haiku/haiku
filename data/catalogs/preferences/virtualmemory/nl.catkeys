@@ -1,20 +1,12 @@
-1	dutch; flemish	x-vnd.Haiku-VirtualMemory	688347876
+1	dutch; flemish	x-vnd.Haiku-VirtualMemory	1828586495
 Turn off	SettingsWindow		Zet uit
-GB	SettingsWindow		GB
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Uitzetten van het virtueel geheugen zal ongewenste effecten hebben op de stabiliteit van het systeem zodra het geheugen is verbruikt.\nHet virtueel geheugen tast de systeemprestatie niet aan totdat dit\n punt is bereikt.\n\nBent u volkomen zeker dat u het wilt uitzetten?
 Requested swap file size:	SettingsWindow		Gewenste grootte wisselbestand:
-Physical memory: 	SettingsWindow		Fysiek geheugen: 
-Changes will take effect on restart!	SettingsWindow		Veranderingen treden op na een herstart!
 Defaults	SettingsWindow		Standaardwaarden
-KB	SettingsWindow		KB
 Use volume:	SettingsWindow		Gebruik gegevensdrager:
-Insufficient space for a swap file.	SettingsWindow		Onvoldoende plaats voor een wisselbestand.
 Keep enabled	SettingsWindow		Toegepast houden
 Revert	SettingsWindow		Herstellen
 VirtualMemory	System name		VirtualMemory
-Current swap file size: 	SettingsWindow		Huidige grootte wisselbestand: 
 OK	VirtualMemoryApp		Oké
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtueelGeheugen\n\tdoor Axel Dörfler\n\tCopyright 2005, Haiku.\n
 Enable virtual memory	SettingsWindow		Virtueel geheugen toepassen
-MB	SettingsWindow		MB
-%Ld B	SettingsWindow		%Ld B

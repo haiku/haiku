@@ -1,20 +1,12 @@
-1	polish	x-vnd.Haiku-VirtualMemory	688347876
+1	polish	x-vnd.Haiku-VirtualMemory	1828586495
 Turn off	SettingsWindow		Wyłącz
-GB	SettingsWindow		GB
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Wyłączenie pamięci wirtualnej może mieć niepożądany wpływ na stabilność systemu, gdy cała dostępna pamięć zostanie zużyta.\nPamięć wirtualna nie wpływa na wydajność systemu, aż do tego momentu.\n\nNa pewno chcesz ją wyłączyc?
 Requested swap file size:	SettingsWindow		Docelowy rozmiar pliku wymiany:
-Physical memory: 	SettingsWindow		Pamięć fizyczna: 
-Changes will take effect on restart!	SettingsWindow		Zmiany zostaną zastosowane po ponownym uruchomieniu!
 Defaults	SettingsWindow		Domyślne
-KB	SettingsWindow		KB
 Use volume:	SettingsWindow		Użyj woluminu:
-Insufficient space for a swap file.	SettingsWindow		Niewystarczająca ilość miejsca na plik wymiany.
 Keep enabled	SettingsWindow		Pozostaw włączoną
 Revert	SettingsWindow		Przywróć
 VirtualMemory	System name		PamięćWirtualna
-Current swap file size: 	SettingsWindow		Obecny rozmiar pliku wymiany: 
 OK	VirtualMemoryApp		OK
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Pamięc wirtualna\n\tstworzona przez Axel Dörfler\n\tCopyright 2005, Haiku.\n
 Enable virtual memory	SettingsWindow		Włącz pamięć wirtualną
-MB	SettingsWindow		MB
-%Ld B	SettingsWindow		%Ld B

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Appearance	3047172181
+1	belarusian	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		Просты шрыфт:
 Control highlight	Colors tab		Выдзяленне кнопак
 Control border	Colors tab		Аблямоўка кнопак
@@ -39,6 +39,7 @@ Colors	APRWindow		Колеры
 Control background	Colors tab		Фон кнопак
 Inactive window tab	Colors tab		Неактыўная ўкладка
 Appearance	System name		Афармленне
+Use double scrollbar arrows	DecorSettingsView		Выкарыстаць двухбаковыя стрэлкі на пракрутках
 Fixed font:	Font view		Роўнашырокі шрыфт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	У рудога вераб’я ў сховішчы пад фатэлем ляжаць нейкія гаючыя зёлкі.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Паменьшыць інтэнсіўнасць фільтру каляровых краёў:
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		Аблямоўка пазначанага 
 Strong	AntialiasingSettingsView		Жырны
 Panel text	Colors tab		Тэкст панэлі
 Monospaced fonts only	AntialiasingSettingsView		Толькі монашырынныя шрыфты
+Look and feel	APRWindow		Выгляд і паводзіны
 Antialiasing menu	AntialiasingSettingsView		Меню згладжвання
 Fonts	APRWindow		Шрыфты
 Glyph hinting:	AntialiasingSettingsView		Хінтынг сімвалаў

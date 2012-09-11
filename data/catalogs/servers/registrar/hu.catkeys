@@ -5,7 +5,7 @@ OK	ShutdownProcess		Rendben
 System is shut down	ShutdownProcess		A rendszer leállt
 It's now safe to turn off the computer.	ShutdownProcess		Most már kikapcsolhatja a számítógépet.
 Cancel	ShutdownProcess		Mégse
-Do you really want to shut down the system?	ShutdownProcess		Biztos le kívánja állítani a rendszert?
+Do you really want to shut down the system?	ShutdownProcess		Biztos, hogy le kívánja állítani a rendszert?
 Asking other processes to quit.	ShutdownProcess		Folyamatok megkérése a leállásra.
 Asking \"%appName%\" to quit.	ShutdownProcess		%appName% megkérése a leállásra.
 %action%?	ShutdownProcess		%action%?
