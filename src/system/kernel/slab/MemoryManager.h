@@ -15,6 +15,7 @@
 #include <util/OpenHashTable.h>
 
 #include "slab_debug.h"
+#include "slab_private.h"
 
 
 class AbstractTraceEntryWithStackTrace;
@@ -161,6 +162,9 @@ private:
 	static	void				_PrepareMetaChunk(MetaChunk* metaChunk,
 									size_t chunkSize);
 
+	static	void				_PushFreeArea(Area* area);
+	static	Area*				_PopFreeArea();
+
 	static	void				_AddArea(Area* area);
 	static	status_t			_AllocateArea(uint32 flags, Area*& _area);
 	static	void				_FreeArea(Area* area, bool areaRemoved,
@@ -232,6 +236,25 @@ private:
 MemoryManager::MaintenanceNeeded()
 {
 	return sMaintenanceNeeded;
+}
+
+
+/*static*/ inline void
+MemoryManager::_PushFreeArea(Area* area)
+{
+	_push(sFreeAreas, area);
+	sFreeAreaCount++;
+}
+
+
+/*static*/ inline MemoryManager::Area*
+MemoryManager::_PopFreeArea()
+{
+	if (sFreeAreaCount == 0)
+		return NULL;
+
+	sFreeAreaCount--;
+	return _pop(sFreeAreas);
 }
 
 
