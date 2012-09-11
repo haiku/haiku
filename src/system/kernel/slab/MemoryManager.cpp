@@ -22,7 +22,6 @@
 #include "kernel_debug_config.h"
 
 #include "ObjectCache.h"
-#include "slab_private.h"
 
 
 //#define TRACE_MEMORY_MANAGER
@@ -849,15 +848,13 @@ MemoryManager::PerformMaintenance()
 			if (_AllocateArea(0, area) != B_OK)
 				return;
 
-			_push(sFreeAreas, area);
-			if (++sFreeAreaCount > 2)
+			_PushFreeArea(area);
+			if (sFreeAreaCount > 2)
 				sMaintenanceNeeded = true;
 		} else {
 			// free until we only have two free ones
-			while (sFreeAreaCount > 2) {
-				Area* area = _pop(sFreeAreas);
-				_FreeArea(area, true, 0);
-			}
+			while (sFreeAreaCount > 2)
+				_FreeArea(_PopFreeArea(), true, 0);
 
 			if (sFreeAreaCount == 0)
 				sMaintenanceNeeded = true;
@@ -956,8 +953,7 @@ MemoryManager::_AllocateChunks(size_t chunkSize, uint32 chunkCount,
 		return B_OK;
 
 	if (sFreeAreas != NULL) {
-		_AddArea(_pop(sFreeAreas));
-		sFreeAreaCount--;
+		_AddArea(_PopFreeArea());
 		_RequestMaintenance();
 
 		_GetChunks(metaChunkList, chunkSize, chunkCount, _metaChunk, _chunk);
@@ -1409,16 +1405,14 @@ MemoryManager::_FreeArea(Area* area, bool areaRemoved, uint32 flags)
 
 	// We want to keep one or two free areas as a reserve.
 	if (sFreeAreaCount <= 1) {
-		_push(sFreeAreas, area);
-		sFreeAreaCount++;
+		_PushFreeArea(area);
 		return;
 	}
 
 	if (area->vmArea == NULL || (flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
 		// This is either early in the boot process or we aren't allowed to
 		// delete the area now.
-		_push(sFreeAreas, area);
-		sFreeAreaCount++;
+		_PushFreeArea(area);
 		_RequestMaintenance();
 		return;
 	}
