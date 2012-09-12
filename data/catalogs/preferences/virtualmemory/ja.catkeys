@@ -1,12 +1,20 @@
-1	japanese	x-vnd.Haiku-VirtualMemory	1828586495
+1	japanese	x-vnd.Haiku-VirtualMemory	1952476689
+Quit	SettingsWindow		終了
 Turn off	SettingsWindow		無効にする
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		仮想メモリを無効にすると、使用可能な物理メモリが少なくなったときにシステムが不安定になることもあります。\n物理メモリが少なくなるまでは仮想メモリがシステムパフォーマンスに影響を与えることはありません。\n\n仮想メモリを本当に無効にしますか？
 Requested swap file size:	SettingsWindow		指定されたスワップサイズ：
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		設定ファイルに指定された設定が不正です。デフォルト設定を読み込むか、またはプログラムを終了することができます。
 Defaults	SettingsWindow		デフォルト
+Current Swap:	SettingsWindow		現在のスワップ：
 Use volume:	SettingsWindow		パーティション：
 Keep enabled	SettingsWindow		有効のままにする
 Revert	SettingsWindow		元に戻す
 VirtualMemory	System name		仮想メモリ
+Choose swap size automatically	SettingsWindow		スワップファイルのサイズを自動で選択する
+Use boot volume	SettingsWindow		起動ボリュームを使用
+Load defaults	SettingsWindow		デフォルト値を読み込む
 OK	VirtualMemoryApp		OK
+Changes will take effect upon reboot.	SettingsWindow		設定の変更は再起動後に有効になります。
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tAxel Dörfler 作\n\tCopyright 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		設定ファイルに指定されたボリュームが見つかりませんでした。起動ボリュームを使用するか、またはプログラムを終了することができます。
 Enable virtual memory	SettingsWindow		仮想メモリを有効にする

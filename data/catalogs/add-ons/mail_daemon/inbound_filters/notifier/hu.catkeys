@@ -1,15 +1,15 @@
 1	hungarian	x-vnd.Haiku-NewMailNotification	3624191291
 %num new message	filter		%num új üzenet
 %num new messages	filter		%num új üzenet
-Keyboard LEDs	ConfigView		Billentyűzet LEDjei
+Keyboard LEDs	ConfigView		billentyűzet-villogás
 You have %num new messages for %name.	filter		%num új üzenet érkezett %name számára.
 You have %num new message for %name.	filter		%num új üzenet érkezett %name számára.
-Log window	ConfigView		Naplóablak
-Central beep	ConfigView		Központi sípolás
-Beep	ConfigView		Sípolás
-Method:	ConfigView		Mód:
-Central alert	ConfigView		Központi jelzés
-Alert	ConfigView		Jelzés
+Log window	ConfigView		naplóablak
+Central beep	ConfigView		központi hangjelzés
+Beep	ConfigView		hangjelzés
+Method:	ConfigView		Művelet:
+Central alert	ConfigView		központi jelzés
+Alert	ConfigView		jelzés
 none	ConfigView		nincs
 New messages	filter		Új üzenetek
 New mails notification	ConfigView		Új üzenet értesítés

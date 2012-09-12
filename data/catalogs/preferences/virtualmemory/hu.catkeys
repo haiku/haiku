@@ -1,12 +1,20 @@
-1	hungarian	x-vnd.Haiku-VirtualMemory	1828586495
+1	hungarian	x-vnd.Haiku-VirtualMemory	1952476689
+Quit	SettingsWindow		Kilépés
 Turn off	SettingsWindow		Kikapcsol
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		A virtuális memória kikapcsolása egyes esetekkor nem kívánt hatással lehet a rendszer stabilitására.\nAmíg a rendszermemória el nem fogy, addig a virtuális memória használatára nincs szükség.\n\nBiztosan ki szeretné kapcsolni ezt a funkciót?
 Requested swap file size:	SettingsWindow		Az igényelt fájl mérete:
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		A beállítások fájlban lévő adatok érvénytelenek. Betöltheti az eredeti beállításokat, vagy kiléphet.
 Defaults	SettingsWindow		Eredeti
-Use volume:	SettingsWindow		Partíció:
+Current Swap:	SettingsWindow		Jelenlegi fájl:
+Use volume:	SettingsWindow		Lemez:
 Keep enabled	SettingsWindow		Tartsa bekapcsolva
 Revert	SettingsWindow		Visszaállít
 VirtualMemory	System name		Virtuális memória
+Choose swap size automatically	SettingsWindow		Automatikusan méretet
+Use boot volume	SettingsWindow		Használja a rendszer lemezt
+Load defaults	SettingsWindow		Eredeti beállítások betöltése
 OK	VirtualMemoryApp		Rendben
+Changes will take effect upon reboot.	SettingsWindow		A változtatások csak újraindítás után válnak érvényessé!
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuális memória\n\tÍrta Axel Dörfler\n\tCopyright 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		A beállítások fájlban megadott lemez nem található. Használhatja a rendszer lemezt, vagy kiléphet.
 Enable virtual memory	SettingsWindow		Virtuális memória engedélyezése

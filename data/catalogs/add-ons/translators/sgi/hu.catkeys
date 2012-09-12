@@ -1,13 +1,13 @@
 1	hungarian	x-vnd.Haiku-SGITranslator	2222378389
 Use compression:	SGIView		Tömörítés fajtája:
 Version %d.%d.%d %s	SGIView		%d.%d.%d %s verzió
-SGITranslator Settings	SGITranslator		SGITranslator beállításai
+SGITranslator Settings	SGITranslator		SGIÉrtelmező beállítások
 None	SGIView		Nincs
 SGI images	SGITranslator		SGI képek
-SGI image translator	SGITranslator		SGI képbeolvasó
+SGI image translator	SGITranslator		SGI kép értelmező
 SGI image	SGITranslator		SGI kép
 RLE	SGIView		RLE
 SGI Settings	SGIMain		SGI beállítások
 \n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\na GIMP SGI bővítmény v1.5 alapján:\n
 written by:\n	SGIView		írta:\n
-SGI image translator	SGIView		SGI képbeolvasó
+SGI image translator	SGIView		SGI kép értelmező

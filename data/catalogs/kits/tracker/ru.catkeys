@@ -68,7 +68,7 @@ Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		�
 Close all in workspace	ContainerWindow		Закрыть все на этом столе
 Empty Trash	ContainerWindow		Очистить корзину
 Name = %name	FindPanel	FindResultTitle	Имя = %name
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Вы уверены, что хотите скопировать или переместить выбранные объект в эту папку?
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Вы уверены, что хотите скопировать или переместить выбранные объекты в эту папку?
 Does not handle file	OpenWithWindow		Не поддерживает этот файл
 Arrange by	ContainerWindow		Выстроить по
 Mount server error	AutoMounterSettings		Ошибка сервера подключения дисков

@@ -33,7 +33,7 @@ There was an error acquiring the partition row.	MainWindow		Hiba történt a par
 You need to select a partition entry from the list.	MainWindow		Válasszon egyet az alábbi partíciók közül!
 The currently selected partition does not have a parent partition.	MainWindow		A kiválasztott partíciónak nincs főpartíciója.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
-Offset: %ld MB	Support		Tartomány: %ld MB
+Offset: %ld MB	Support		Kezdete: %ld MB
 Write changes	MainWindow		Írás a lemezre
 There was an error preparing the disk for modifications.	MainWindow		Hiba történt a változtatások lemezre írása közben.
 The partition %s is already mounted.	MainWindow		A partíció (%s) már csatolva van.

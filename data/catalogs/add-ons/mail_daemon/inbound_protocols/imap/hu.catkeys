@@ -1,5 +1,5 @@
 1	hungarian	x-vnd.Haiku-IMAP	3892875357
-Destination:	imap_config		Cél:
+Destination:	imap_config		Mappa:
 status	IMAPFolderConfig		állapot
 Apply	IMAPFolderConfig		Alkalmaz
 IMAP Folders	imap_config		IMAP mappák

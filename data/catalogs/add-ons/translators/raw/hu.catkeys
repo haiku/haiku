@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.Haiku-RAWTranslator	2229230003
-RAWTranslator Settings	ConfigView		RAW-fordító Beállításai
+1	hungarian	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		RAWÉrtelemző beállítások
 Version %d.%d.%d, %s	ConfigView		%d.%d.%d, %s verzió
-RAW image translator	RAWTranslator		RAW képfordító
+RAW image translator	RAWTranslator		RAW kép értelemző
 RAW Settings	RAWTranslator main		RAW Beállítások
 RAW images	RAWTranslator		RAW képek
+RAW image translator	ConfigView		RAW kép értelemző
 %s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW kép
 Based on Dave Coffin's dcraw 8.63	ConfigView		A Dave Coffin által írt dcraw 8.63 alapján

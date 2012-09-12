@@ -6,10 +6,10 @@ OK	LaunchBox		Rendben
 Pad 1	LaunchBox		1. tálca
 last chance	LaunchBox		utolsó esély
 Quit	LaunchBox		Kilépés
-Clear button	LaunchBox		Gomb törlése
+Clear button	LaunchBox		Gomb kiürítése
 LaunchBox	System name		Indítósáv
 Ignore double-click	LaunchBox		Dupla kattintás figyelmen kívül hagyása
-Auto-raise	LaunchBox		Automatikus emelés
+Auto-raise	LaunchBox		Automatikus előrehozás
 Show on all workspaces	LaunchBox		Megjelenítés az összes munkaasztalon
 Show window border	LaunchBox		Ablak keretének mutatása
 Pad	LaunchBox		Tálca
@@ -21,14 +21,14 @@ Horizontal layout	LaunchBox		Vízszintes elrendezés
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNem sikerült a programot elindítani ezzel az aláírással: %2.\n\nHiba:
 Failed to launch '%1'.\n\nError:	LaunchBox		Nem sikerült elindítani: %1.\n\nHiba:
 Name Panel	LaunchBox		Név panel
-Add button here	LaunchBox		Helyezze a gombokat ide
+Add button here	LaunchBox		Új gomb
 Description for '%3'	LaunchBox		%3 leírása
 Settings	LaunchBox		Beállítások
 Failed to launch 'something', error in Pad data.	LaunchBox		Nem sikerült elindítani valamit, hiba van a tálca adataiban.
 Pad %1	LaunchBox		%1 tálca
 Close	LaunchBox		Bezárás
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nem sikerült elküldeni a Trackernek a 'mappa megnyitása' parancsot.\n\nHiba:
-You can drag an icon here.	LaunchBox		Az ikonok ide húzhatók
+You can drag an icon here.	LaunchBox		Az ikonok ide húzhatóak
 Clone	LaunchBox		Klónozás
 launch popup	LaunchBox		felugró ablak indítása
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Biztos bezárja ezt a tálcát?\n(A tálca nem lesz rögzítve sehol.)

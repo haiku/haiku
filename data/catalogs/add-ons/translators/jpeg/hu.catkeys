@@ -9,8 +9,8 @@ About	JPEGTranslator		Névjegy
 Low	JPEGTranslator		Alacsony
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Fájl összezsugorítása (kicsit ront a minőségen)
 None	JPEGTranslator		Nincs
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bittérkép formátum (JPEGFordító)
-Show warning messages	JPEGTranslator		Rövidített figyelmeztetőüzenetek
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bittérkép Formátum (JPEGÉrtelmező)
+Show warning messages	JPEGTranslator		Figyelmeztető üzenetek megjelenítése
 Output smoothing strength	JPEGTranslator		Kimeneti simítás erőssége
 High	JPEGTranslator		Magas
 Write	JPEGTranslator		Írás

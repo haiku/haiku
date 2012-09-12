@@ -1,15 +1,15 @@
 1	hungarian	x-vnd.Haiku-MatchHeader	1205906732
 <Choose action>	ConfigView		<Válassza ki a műveletet>
-has	ConfigView		van benne:
-Move to	ConfigView		Áthelyzés
-Then	ConfigView		Akkor:
+has	ConfigView		tartalmaz
+Move to	ConfigView		mozgatás ide:
+Then	ConfigView		Akkor
 value (use REGEX: in from of regular expressions like *spam*)	ConfigView		érték (RegEx használatával, mint például *spam*)
 this field is based on the action	ConfigView		ez a mező a műveleten alapszik
-Delete message	ConfigView		Üzenet törlése
+Delete message	ConfigView		az üzenet törlése
 Rule filter	RuleFilter		Szabályszűrő
 <Choose account>	ConfigView		<Válassza ki a fiókot>
-Set flags to	ConfigView		Jelzések állítása erre:
-Set as read	ConfigView		Olvasottnak jelölés
-Reply with	ConfigView		Válaszolás ezzel
+Set flags to	ConfigView		megjelölés:
+Set as read	ConfigView		olvasottnak jelölés
+Reply with	ConfigView		válaszolás:
 If	ConfigView		Ha:
 header (e.g. Subject)	ConfigView		fejléc (pl. tárgy)

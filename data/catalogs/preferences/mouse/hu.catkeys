@@ -6,8 +6,8 @@ Double-click test area	SettingsView		Duplakattintásos próbaterület
 Revert	MouseWindow		Visszaállít
 ...by Andrew Edward McCall	MouseApplication		Írta: Andrew Edward McCall
 Mouse acceleration	SettingsView		Egérmozdulat gyorsulása
-Click to focus	SettingsView		Kattintás szükséges
-Click to focus and raise	SettingsView		Kattintás szükséges (az előre hozáshoz is)
+Click to focus	SettingsView		Kattintással
+Click to focus and raise	SettingsView		Kattintással (az előre hozáshoz is)
 3-Button	SettingsView		Háromgombos
 Mouse speed	SettingsView		Egérmozgatás sebessége
 Focus mode:	SettingsView		Ablak aktiválása:

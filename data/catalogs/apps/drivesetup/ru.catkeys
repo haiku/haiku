@@ -50,7 +50,7 @@ Create	CreateParamsPanel		Создать
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать весь диск? (обычно на диске создают систему разделов)\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
 Device	PartitionList		Устройство
 Disk	MainWindow		Диск
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Вы уверены, что хотите инициализировать выбранный диск? Все данные на этом диске будут потеряны.\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Вы уверены, что хотите инициализировать выбранный диск? Все данные на этом диске будут потеряны.\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.\n
 Device	DiskView		Устройство
 Active	PartitionList		Загрузочный
 Volume name	PartitionList		Имя раздела

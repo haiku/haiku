@@ -23,14 +23,14 @@ Boolean	TypeEditors	This is the type of editor	Bináris
 Paste	ProbeView		Beillesztés
 PNG format	TypeEditors		PNG formátum
 Font size	ProbeView		Betűméret
-Attribute type: 	ProbeView		Jellemző típusa
+Attribute type: 	ProbeView		Jellemző típusa:
 Attribute	AttributeWindow		Jellemző
 8 bit signed value:	TypeEditors		8-bites aláírt érték:
 Number:	TypeEditors		Szám:
 Save	ProbeView		Mentés
 Stop	ProbeView		Leállítás
 Number editor	TypeEditors		Számszerkesztő
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimális
 No type editor available	AttributeWindow		Nincs elérhető típusszerkesztő
 Double precision floating-point value:	TypeEditors		Duplapontosságú lebegőpontos érték:
 Device: 	ProbeView		Eszköz:
@@ -59,7 +59,7 @@ Boolean value:	TypeEditors		Bináris érték:
 8 bit palette	TypeEditors		8-bites paletta
 Fit	ProbeView	Size of fonts, fits to available room	Átméretezés hogy kiférjen
 Probe device	OpenWindow		Eszköz fürkészése
- (native)	ProbeView		%ld (natív)
+ (native)	ProbeView		(natív)
 Unknown format	TypeEditors		Ismeretlen formátum
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimális
 MIME type:	TypeEditors		MIME típus:
@@ -111,7 +111,7 @@ Select all	ProbeView		Összes kijelölése
 Probe file…	OpenWindow		Fájl fürkészése…
 Icon view	TypeEditors		Ikon nézet
 Bookmarks	ProbeView		Könyvjelzők
-Mode:	FindWindow		Mód:
+Mode:	FindWindow		Keresés módja:
 15 bit	TypeEditors		15-bites
 Open device	FileWindow		Eszköz megnyitása
 Could not find search string.	ProbeView		A keresési szöveg nem található.

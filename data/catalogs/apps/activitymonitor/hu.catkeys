@@ -7,7 +7,7 @@ Add graph	ActivityWindow		Grafikon hozzáadása
 Teams	DataSource		Csapatok
 Hide legend	ActivityView		Magyarázat elrejtése
 Network send	DataSource		Küldött adatok
-CPU usage (combined)	DataSource		CPU használat (kombinált)
+CPU usage (combined)	DataSource		Processzor használat (kombinált)
 CPU	DataSource		CPU
 Used memory	DataSource		Használt memória
 Cached memory	DataSource		Gyorsítótárazott memória
@@ -30,14 +30,14 @@ Remove graph	ActivityView		Grafikon eltávolítása
 %.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld s.
 %lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		CPU terhelés
+CPU usage	DataSource		Processzor használat
 Raw clipboard	DataSource		Nyers vágólap
 Sems	DataSource		Szemaforok
 ActivityMonitor	System name		Folyamatmonitor
 Running applications	DataSource		Futó programok
 Semaphores	DataSource		Szemaforok
 Block cache	DataSource		Blokk gyorsítótár
-Swap space	DataSource		Lapozótér
+Swap space	DataSource		Virtuális memória
 Swap	DataSource		Swap
 File	ActivityWindow		Fájl
 usage	DataSource		használat

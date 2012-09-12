@@ -1,12 +1,12 @@
 1	hungarian	x-vnd.Haiku-PPMTranslator	276252412
 PPM Settings	PPMMain		PPM beállítások
-Based on PPMTranslator sample code	PPMTranslator		A PPM fordító mintakódja alapján
+Based on PPMTranslator sample code	PPMTranslator		A PPM értelemző mintakódja alapján
 OK	PPMMain		Rendben
 Grayscale 8 bits	PPMTranslator		Szürekárnyalatos 8-bites
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32-bites
 PPM image	PPMTranslator		PPM kép
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16-bites
-Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bittépkép Formátum (PPMTranslator)
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bittépkép Formátum (PPMÉrtelmező)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32-bites
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32-bites
 PPM image translator	PPMTranslator		PPM kép értelmező
@@ -26,6 +26,6 @@ RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32-bites nagy-endiá
 Input Color Space	PPMTranslator		Bemeneti színskála
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32-bites
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Mintakód copyright 1999, Be Incorporated
-PPMTranslator Settings	PPMTranslator		PPM-fordító Beállításai
-Something is wrong with the PPMTranslator!	PPMMain		Valami nincs rendben a PPM-fordítóval!
+PPMTranslator Settings	PPMTranslator		PPMÉrtelemző beállítások
+Something is wrong with the PPMTranslator!	PPMMain		Valami nincs rendben a PPMÉrtelemzővel!
 System palette 8 bits	PPMTranslator		Rendszerpaletta 8-bites

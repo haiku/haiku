@@ -1,10 +1,10 @@
 1	hungarian	x-vnd.Haiku-libmail	161731481
-Partially download messages larger than	ProtocolConfigView		Részben letöltött levelek, amik ennél nagyobbak:
+Partially download messages larger than	ProtocolConfigView		Letöltési mérethatár:
 Password:	ProtocolConfigView		Jelszó:
-Remove mail from server when deleted	ProtocolConfigView		Levél eltávolítása a kiszolgálóról törléskor
-Mail server:	ProtocolConfigView		Levelezőkiszolgáló:
-Select…	MailKit		Kiválasztás…
-Connection type:	ProtocolConfigView		Kapcsolat típusa:
+Remove mail from server when deleted	ProtocolConfigView		Levél törlése a kiszolgálóról is
+Mail server:	ProtocolConfigView		Kiszolgáló:
+Select…	MailKit		Megnyitás…
+Connection type:	ProtocolConfigView		Biztonság:
 Leave mail on server	ProtocolConfigView		Levelek meghagyása a kiszolgálón
-Username:	ProtocolConfigView		Felhasználói név:
+Username:	ProtocolConfigView		Felhasználó:
 Login type:	ProtocolConfigView		Bejelentkezés típusa:

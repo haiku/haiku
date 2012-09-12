@@ -1,9 +1,9 @@
 1	hungarian	x-vnd.Haiku-EXRTranslator	106859695
 Version %d.%d.%d, %s	ConfigView		%d.%d.%d, %s verzió
-EXR image translator	EXRTranslator		EXR képfordító
+EXR image translator	EXRTranslator		EXR kép értelemző
 Based on OpenEXR (http://www.openexr.com)	ConfigView		Az OpenEXR alapján (http://www.openexr.com)
 EXR Settings	main		EXR beállítások
 EXR images	EXRTranslator		EXR kép
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		a Lucasfilm Entertainment Company Ltd alvállalata
 EXR image	EXRTranslator		EXR kép
-EXR image translator	ConfigView		EXR képfordító
+EXR image translator	ConfigView		EXR kép értelemző

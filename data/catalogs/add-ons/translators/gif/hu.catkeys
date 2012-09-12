@@ -3,8 +3,8 @@ Websafe	GIFView		Websafe
 Write interlaced images	GIFView		Váltottsoros képként ment
 Optimal	GIFView		Optimális
 Greyscale	GIFView		Szürkeárnyalatos
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap formátum (GIFTranslator)
-GIF image translator	GIFView		GIF kép átalakító
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Formátum (GIFÉrtelemző)
+GIF image translator	GIFView		GIF (Graphic Interlaced Format) kép értelemző
 GIF image	GIFTranslator		GIF kép
 Write transparent images	GIFView		Fehér áttetsző képek
 Palette	GIFView		Paletta

@@ -1,12 +1,20 @@
-1	russian	x-vnd.Haiku-VirtualMemory	1828586495
+1	russian	x-vnd.Haiku-VirtualMemory	1952476689
+Quit	SettingsWindow		Выйти
 Turn off	SettingsWindow		Выключить
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Отключение виртуальной памяти может повлиять на стабильность системы, когда вся память будет израсходована.\nВиртуальная память не влияет на производительность системы пока она не используется.\n\nВы уверены, что хотите выключить ее?
 Requested swap file size:	SettingsWindow		Выбранный размер файла подкачки:
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Параметры указанные в файле настроек неверны. Загрузить настройки по умолчанию или выйти?
 Defaults	SettingsWindow		По умолчанию
+Current Swap:	SettingsWindow		Текущий файл подкачки:
 Use volume:	SettingsWindow		Использовать раздел:
 Keep enabled	SettingsWindow		Оставить включенной
 Revert	SettingsWindow		Вернуть
 VirtualMemory	System name		Виртуальная память
+Choose swap size automatically	SettingsWindow		Автоматически выбирать размер файла подкачки
+Use boot volume	SettingsWindow		Использовать загрузочный раздел
+Load defaults	SettingsWindow		По умолчанию
 OK	VirtualMemoryApp		ОК
+Changes will take effect upon reboot.	SettingsWindow		Изменения вступят в силу после перезагрузки.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\n\tразработал Axel Dörfler\n\tCopyright 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Раздел, указанный в файле настроек не был найден. Вы можете использовать загрузочный раздел или выйти.
 Enable virtual memory	SettingsWindow		Включить виртуальную память

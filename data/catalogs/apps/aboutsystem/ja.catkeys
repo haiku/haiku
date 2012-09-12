@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	3952543106
+1	japanese	x-vnd.Haiku-About	2547069165
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprintの著者たち. All rights reserved.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n
 BSD (4-clause)	AboutView		BSD (4条項)
@@ -42,6 +42,7 @@ Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. このソフトウェアの一部はIndependent JPEG Groupの著作物に基づいています.
 Past maintainers:\n	AboutView		過去のメンテナー\n
 \n\nSpecial thanks to:\n	AboutView		\n\n下記の協力者の方々に深く感謝します：\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…おそらく、ここに記載し忘れた方々もいることでしょう (すみません!)\n\n
 Licenses: 	AboutView		ライセンス：
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup GaillyおよびMark Adler.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. All rights reserved.
@@ -53,6 +54,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		稼動時間：
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		次のソフトウェアはNetBSD Foundation, Inc.およびその貢献者らにより開発されたソフトウェアを含みます:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		次のソフトウェアはFreeBSD Projectで開発され、BSDライセンスで公開されているソフトウェアを含みます:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google および彼らの Google Summer of Code と Google Code In programs\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. All rights reserved.
@@ -74,6 +76,7 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyri
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbHおよびThomas Merz. All rights reserved.\nPDFlibおよびPDFlibロゴはPDFlib GmbHの登録商標です.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		次のソフトウェアはGNU Projectによるものであり、GPLおよびLGPLライセンスの下で公開されています:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
+…and the many people making donations!\n\n	AboutView		...寄付をしていただいた大勢の方々!\n\n
 MIT license. All rights reserved.	AboutView		MITライセンス. All rights reserved.
 [Click a license name to read the respective license.]\n\n	AboutView		「各ライセンスを表示するには、ライセンス名をクリックしてください。」\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. All rights reserved.

@@ -3,11 +3,11 @@ LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nem sikerült a mappát beállítani\n
 TIFF image	TIFFTranslator		TIFF kép
 TIFF Library:	TIFFView		TIFF funkciótár:
-TIFF image translator	TIFFView		TIFF képértelmező
+TIFF image translator	TIFFView		TIFF kép értelmező
 None	TIFFView		Nincs
 TIFF images	TIFFTranslator		TIFF képek
-TIFFTranslator Settings	TIFFTranslator		TIFFTranslator beállításai
-TIFF image translator	TIFFTranslator		TIFF képértelmező
+TIFFTranslator Settings	TIFFTranslator		TIFFÉrtelmező beállítások
+TIFF image translator	TIFFTranslator		TIFF kép értelmező
 RLE (Packbits)	TIFFView		RLE
 TIFF Settings	TIFFMain		TIFF beállítások
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: érvénytelen dokumentumindex\n

@@ -12,4 +12,4 @@ Set flags to	ConfigView		Установить флаги в
 Set as read	ConfigView		Отметить как прочитанное
 Reply with	ConfigView		Ответить с
 If	ConfigView		Если
-header (e.g. Subject)	ConfigView		заголовок (например Тема)
+header (e.g. Subject)	ConfigView		заголовок (Subject)

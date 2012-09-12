@@ -5,7 +5,7 @@ Are you sure you want to abort the installation and restart the system?	Installe
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\n\tразработал Jérôme Duval и Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Новые версии GRUB используют дополнительный конфигурационный файл для добавления пользовательских записей в загрузочное меню. Чтобы добавить их, вы должны создать/изменить файл, запустив ваш текстовый редактор из терминала, например так:\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Здесь вы должны закомментировать строку \"GRUB_HIDDEN_TIMEOUT=0\", поставив решетку \"#\" в начале этой строки, для того, чтобы появилось загрузочное меню.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Установка завершена. Загрузочный сектор был записан на раздел '%s'. Нажмите \"Выход\" чтобы закрыть Установщик или выберите другой раздел, если хотите выполнить новую установку.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Установка завершена. Загрузочный сектор был записан на раздел '%s'. Нажмите Выход чтобы закрыть Установщик или выберите другой раздел, если хотите выполнить новую установку.
 Quit	InstallerApp		Выход
 Additional disk space required: 0.0 KiB	InstallerWindow		Требуемое дополнительное пространство: 0.0 Кб
 With GRUB it's: (hdN,n)\n\n	InstallerApp		В GRUB это: (hdN,n)\n\n
@@ -58,13 +58,13 @@ Launch the DriveSetup utility to partition\navailable hard drives and other medi
 Show optional packages	InstallerWindow		Показать опциональные пакеты
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Не были найдены разделы, подходящие для установки. Пожалуйста, подготовьте разделы и инициализируйте хотя бы один из них как Be File System.
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		В дополнение к этому вам необходимо изменить еще один файл для того, чтобы появилось загрузочное меню:\n\n
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберите из выпадающего меню раздел, на который вы хотите установить систему.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберите из выпадающего меню раздел, на который вы хотите установить систему. Затем нажмите \"Начать\".
 Unknown Type	InstallProgress	Partition content type	Неизвестный тип
 <none>	InstallerWindow	No partition available	<нет>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Учтите, что GRUB использует иную схему именования дисков нежели Linux.\n\n
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" это номер раздела, также начинающийся с \"0\".\n
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Установка завершена. Загрузочный сектор был записан на раздел '%s'. Нажмите \"Перезагрузить\" чтобы закрыть перезагрузить компьютер или выберите другой раздел, если хотите выполнить новую установку.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Установка завершена. Загрузочный сектор был записан на раздел '%s'. Нажмите Перезагрузить, чтобы перезагрузить компьютер или выберите другой раздел, если хотите выполнить новую установку.
 Installation canceled.	InstallProgress		Установка отменена.
 Installer	System name		Установщик
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Вы не можете установить содержимое диска на тот же самый диск. Пожалуйста, выберите другой диск.
@@ -83,7 +83,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Install anyway	InstallProgress		Все равно установить
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Возникла ошибка из-за которой установка не была завершена:\n\nОшибка: %s
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Нажмите кнопку \"Начать\" чтобы установить из '%1s' на '%2s'.
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Нажмите кнопку Начать чтобы установить из '%1s' на '%2s'.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Запущена утилита разметки диска (DriveSetup)…\n\nЗакройте ее для продолжения установки.
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Большое спасибо за то, что пробуете Haiku!\nМы очень надеемся, что она вам понравится!
 OK	InstallProgress		ОК

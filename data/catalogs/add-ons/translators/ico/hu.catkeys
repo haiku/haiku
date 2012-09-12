@@ -6,9 +6,9 @@ Valid icon sizes are 16, 32, or 48	ConfigView		Érvényes ikonméretek: 16, 32 �
 Windows icons	ICOTranslator		Windows ikon
 Enforce valid icon sizes	ConfigView		Érvényes ikonméretek kényszerítése
 ICO Settings	main		ICO Beállítások
-Windows icon translator	ICOTranslator		Windows ikonfordító
+Windows icon translator	ICOTranslator		Windows ikon értelemző
 pixels in either direction.	ConfigView		pixel minden irányba
 Write 32 bit images on true color input	ConfigView		32-bites képek írása true color bementre
 Icon	ICOTranslator		Ikon
-ICOTranslator Settings	ConfigView		ICOFordító beállításai
-Windows icon translator	ConfigView		Windows ikonfordító
+ICOTranslator Settings	ConfigView		ICOÉrtelemző beállítások
+Windows icon translator	ConfigView		Windows ikon értelemző

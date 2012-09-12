@@ -11,7 +11,7 @@ Short format:	TimeFormatSettings		Rövid alak:
 Language	Locale Preflet Window		Nyelv
 Preferred languages	Locale Preflet Window		Előnyben részesített nyelvek
 Use month/day-names from preferred language	TimeFormatSettings		Előnyben részesített nyelv hónap- és napneveinek használata
-Formatting	Locale Preflet Window		Formázás
+Formatting	Locale Preflet Window		Formátum
 Locale	Locale Preflet Window		Nyelv
 Numbers	TimeFormatSettings		Számok
 24 hour	TimeFormatSettings		24-órás

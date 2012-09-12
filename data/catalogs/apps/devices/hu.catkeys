@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-Devices	865240481
 Manufacturer	DeviceSCSI		Gyártó
-Order by:	DevicesView		Rendezés ez alapján:
+Order by:	DevicesView		Rendezés alapja:
 ACPI controller	Device		ACPI vezérlő
 Memory controller	Device		Memóriavezérlő
 Driver used	DevicePCI		Vezérlőprogram
@@ -8,13 +8,13 @@ CD-ROM	DeviceSCSI		CD meghajtó
 ISA bus	Device		ISA port
 ACPI bus	Device		ACPI port
 ISA bus	DevicesView		ISA port
-Docking station	Device		Dokkállomás
+Docking station	Device		Dokkolóállomás
 Computer	Device		Számítógép
 Unknown device	Device		Ismeretlen eszköz
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Osztályinformáció:\t\t\t\t: %classInfo%
 Processor	DeviceSCSI		Processzor
 RBC	DeviceSCSI		RBC
-Detailed	DevicesView		Részletezve
+Detailed	DevicesView		Részletek
 Category	DevicesView		Kategória
 Quit	DevicesView		Kilépés
 Device paths	Device		Útvonal
@@ -50,7 +50,7 @@ ACPI System Indicator	DeviceACPI		ACPI rendszerjelző
 None	Device		Nincs
 PCI bus	DevicesView		PCI port
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Osztály információi\t\t\t\t: %classinfo%
-Basic information	DevicesView		Alap információk
+Basic information	DevicesView		Alapvető információk
 PCI Information	DevicePCI		PCI információ
 Manufacturer:	Device		Gyártó:
 ACPI bus	DevicesView		ACPI port
@@ -87,9 +87,9 @@ Bus Information	Device		Busz-információ
 Connection	DevicesView		Csatlakozás
 Generate system information	DevicesView		Rendszerinformáció létrehozása
 Encryption controller	Device		Titkosító vezérlő
-Unclassified device	Device		Nem besorolt eszköz
+Unclassified device	Device		Besorolatlan eszköz
 Device name	DeviceSCSI		Eszköznév
 Card Reader	DeviceSCSI		Kártyaolvasó
 Class info	DevicePCI		Osztály-információk
-Device paths	DevicePCI		Eszközelérési útvonalak
+Device paths	DevicePCI		Eszköz útvonal
 Devices	DevicesView		Eszközök

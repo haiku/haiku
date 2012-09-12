@@ -1,5 +1,5 @@
 1	hungarian	x-vnd.Haiku-SMTP	2740407895
-SMTP server:	ConfigView		SMTP kiszolgáló:
+SMTP server:	ConfigView		Kiszolgáló:
 STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Hiba történt a %serv kiszolgálóra való bejelentkezés közben
 Unencrypted	ConfigView		Titkosítatlan
@@ -8,7 +8,7 @@ ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Csatlakozás a kiszolgálóhoz…
 Error while opening connection to %serv	smtp		Hiba történt a %serv kiszolgálóval való kapcsolat nyitása közben
 POP3 authentication failed. The server said:\n	smtp		A POP3 hitelesítés sikertelen volt. A kiszolgáló válasza:\n
-Destination:	ConfigView		Cél:
+Destination:	ConfigView		Mappa:
 : Connection refused or host not found.	smtp		: kapcsolat visszautasítva, vagy a kiszolgáló nem található.
 None	ConfigView		Nincs
 POP3 before SMTP	ConfigView		POP3 az SMTP előtt

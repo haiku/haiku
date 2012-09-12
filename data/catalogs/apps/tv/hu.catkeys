@@ -12,7 +12,7 @@ Always on top	MainWin		Mindig legyen felül az ablak
 OK	MainWin		Rendben
 Quit	MainWin		Kilépés
 Full screen	MainWin		Teljes képernyő
-Debug	MainWin		Hibaelhárítás
+Debug	MainWin		Hibakeresés
 Scale to native size	MainWin		Méretezés az eredeti méretre
 unknown	MainWin		ismeretlen
 Next channel	MainWin		Következő csatorna

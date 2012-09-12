@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-About	3952543106
+1	hungarian	x-vnd.Haiku-About	2547069165
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 a Gutenprint szerzőitől. Minden jog fenntartva.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrechtnek (NewOS kernel)\n
 BSD (4-clause)	AboutView		BSD (4-klauzulás)
@@ -42,6 +42,7 @@ Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Ez a szoftver részben a Independent JPEG Group munkáján alapszik.
 Past maintainers:\n	AboutView		Régebbi karbantartók:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nKülön köszönet jár:\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… és a többi ember, akiket lehet elfelejtettünk megemlíteni (elnézést!)\n\n
 Licenses: 	AboutView		Licencek: 
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly és Mark Adler.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Minden jog fenntartva.
@@ -53,6 +54,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		Ennyi ideje fut:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Szoftvereket tartalmaz a NetBSD Foundation, Inc-től, és annak közreműködőitől:\nftp, tput\nSzerzői jog © 1996-2008 The NetBSD Foundation, Inc. Minden jog fenntartva.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Szoftvereket tartalmaz a FreeBSD Projecttől, melyek BSD licenc alatt jelentek meg:\ncal, ftpd, ping, telnet, telnetd, traceroute\nSzerzői jog © 1994-2008 The FreeBSD Project. Minden jog fenntartva.
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		A Google "Google Summer of Code" és "Google Code In" programjának\n
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Minden jog fenntartva.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Minden jog fenntartva.
@@ -74,6 +76,7 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyri
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH és Thomas Merz. Minden jog fenntartva.\nA PDFlib és a PDFlib a PDFlib GmbH bejegyzett védjegyei.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Minden jog fenntartva.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Szoftvereket tartalmaz a GNU Projecttől, amelyek GPL és LGPL licencek alatt jelentek meg:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
+…and the many people making donations!\n\n	AboutView		… a rengeteg adományokkal segítő embernek!\n\n
 MIT license. All rights reserved.	AboutView		MIT licenc. Minden jog fenntartva.
 [Click a license name to read the respective license.]\n\n	AboutView		[Kattintson rá a licenc nevére az adott licenc megjelenítéséhez!]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Minden jog fenntartva.

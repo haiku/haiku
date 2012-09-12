@@ -11,7 +11,7 @@ Novas	ChartWindow		Сверхновые
 LineArray	ChartWindow		LineArray
  0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (логарифмическая шкала)
 Free motion	ChartWindow		Свободное движение
-(high) 100% 	ChartWindow		(высокая) 100%
+(high) 100% 	ChartWindow		(высокая) 100% 
 Green	ChartWindow		Зелёный
 Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 потока
@@ -21,7 +21,7 @@ Chaos	ChartWindow		Хаос
 Full screen	ChartWindow		Полноэкранный режим
 Spiral	ChartWindow		Спираль
 Slow motion	ChartWindow		Замедленное движение
- 5% (low)	ChartWindow		5% (низкая)
+ 5% (low)	ChartWindow		 5% (низкая)
 Fast motion	ChartWindow		Быстрое движения
 Special	ChartWindow		Специальный
 Status	ChartWindow		Статус

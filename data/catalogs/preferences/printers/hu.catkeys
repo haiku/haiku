@@ -31,13 +31,13 @@ Blue	TestPageView		Kék
 Remove	PrintersWindow		Eltávolítás
 <pick one>	AddPrinterDialog		<válasszon egyet>
 Add …	PrintersWindow		Hozzáadás…
-Print jobs for 	PrintersWindow		Feladatok ennek: 
+Print jobs for 	PrintersWindow		Feladat lista: 
 Failed	JobListView		Sikertelen
 %.2f KB	JobListView		%.2f KB
 Magenta	TestPageView		Magenta
 Completed	JobListView		Kész
 No printer found!	TransportMenu		Nem található nyomtató!
-Print jobs: No printer selected	PrintersWindow		Feladatok: Nincs nyomtató kiválasztva
+Print jobs: No printer selected	PrintersWindow		Feladatok: nincs nyomtató kiválasztva
 Cyan	TestPageView		Cián
 Unknown status	JobListView		Ismeretlen állapot
 Connected to:	AddPrinterDialog		Csatlakozás:
