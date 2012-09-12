@@ -213,8 +213,8 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				beam-1.2alpha-x86-gcc4-2012-08-11.zip
-				: $(baseURL)/beam-1.2alpha-x86-gcc4-2012-08-11.zip ;
+				beam-1.2alpha-r1a4-x86-gcc4-2012-09-12.zip
+				: $(baseURL)/beam-1.2alpha-r1a4-x86-gcc4-2012-09-12.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
 				beam-1.2alpha-r1a4-x86-gcc2-2012-08-29.zip
@@ -1792,8 +1792,8 @@ if [ IsOptionalHaikuImagePackageAdded Transmission ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				transmission-2.21-r1a4-x86-gcc4-2012-09-03.zip
-				: $(baseURL)/transmission-2.21-r1a4-x86-gcc4-2012-09-03.zip
+				transmission-2.21-r1a4-x86-gcc4-2012-09-12.zip
+				: $(baseURL)/transmission-2.21-r1a4-x86-gcc4-2012-09-12.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
