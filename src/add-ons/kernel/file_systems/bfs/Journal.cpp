@@ -684,10 +684,20 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void* _logEntry)
 /*static*/ void
 Journal::_TransactionIdle(int32 transactionID, int32 event, void* _journal)
 {
-	// The current transaction seems to be idle - flush it
+	// The current transaction seems to be idle - flush it. We can't do this
+	// in this thread, as flushing the log can produce new transaction events.
+	thread_id id = spawn_kernel_thread(&Journal::_FlushLog, "bfs log flusher",
+		B_NORMAL_PRIORITY, _journal);
+	if (id > 0)
+		resume_thread(id);
+}
 
+
+/*static*/ status_t
+Journal::_FlushLog(void* _journal)
+{
 	Journal* journal = (Journal*)_journal;
-	journal->_FlushLog(false, false);
+	return journal->_FlushLog(false, false);
 }
 
 
