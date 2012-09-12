@@ -847,6 +847,13 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage libs tiff : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
+	CopyDirectoryToHaikuImage develop headers : 
+		[ FDirName $(HAIKU_FREETYPE_DIR) develop headers 3rdparty ] ;
+	CopyDirectoryToHaikuImage develop headers : $(HAIKU_JPEG_HEADERS)
+		: 3rdparty ;
+	CopyDirectoryToHaikuImage develop headers : $(HAIKU_LIBPNG_HEADERS)
+		: 3rdparty ;
+
 	# cpp headers
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
 		# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
