@@ -54,7 +54,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		稼動時間：
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		次のソフトウェアはNetBSD Foundation, Inc.およびその貢献者らにより開発されたソフトウェアを含みます:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		次のソフトウェアはFreeBSD Projectで開発され、BSDライセンスで公開されているソフトウェアを含みます:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.
-Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google および彼らの Google Summer of Code と Google Code In programs\n
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google および彼らの Google Summer of Code と Google Code In プログラム\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. All rights reserved.

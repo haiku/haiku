@@ -37,7 +37,7 @@ Offset: %ld MB	Support		Kezdete: %ld MB
 Write changes	MainWindow		Írás a lemezre
 There was an error preparing the disk for modifications.	MainWindow		Hiba történt a változtatások lemezre írása közben.
 The partition %s is already mounted.	MainWindow		A partíció (%s) már csatolva van.
-Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarja formázni a partíciót? Ezt mégegyszer meg kell majd erősítenie a tényleges formázás előtt.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Biztosan formázza a partíciót? Ezt mégegyszer meg kell majd erősítenie a tényleges művelet előtt.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a „%s” lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Biztosan törölni szeretné a kiválasztott partíciót?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Create…	MainWindow		Létrehozás…
@@ -47,7 +47,7 @@ Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíció
 Failed to format the partition %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
 Mount	MainWindow		Csatol
 Create	CreateParamsPanel		Létrehoz
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarja formázni a nyers lemezt? (A legtöbb esetben elő szokták készíteni formázás előtt.) Ezt még egyszer meg kell majd erősítenie.
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Biztosan formázni szeretné a nyers lemezt? (A legtöbb esetben elő szokták készíteni a lemezt formázás előtt.) Ezt még egyszer meg kell majd erősítenie.
 Device	PartitionList		Eszköz
 Disk	MainWindow		Lemez
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Biztosan elő szeretné készíteni a megadott lemezt? Az összes adat el fog veszni. Ezt majd mégegyszer meg kell erősítenie.

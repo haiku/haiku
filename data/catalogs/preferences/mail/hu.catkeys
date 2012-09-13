@@ -37,10 +37,10 @@ never	Config Window	mail checking frequency	soha
 Real name:	Config Views		Valódi név:
 \t\t· Outgoing	Config Window		\t\t· Kimenő
 Choose Protocol	E-Mail		Protokoll választása
-Return address:	Config Views		Feladói cím:
+Return address:	Config Views		Válasz cím:
 Edit mailbox menu…	Config Window		Postafiókmenü szerkesztése…
 Outgoing	E-Mail		Kimenő
-\t\t· E-mail filters	Config Window		\t\t· Email szűrők
+\t\t· E-mail filters	Config Window		\t\t· E-mail szűrők
 Remove	Config Views		Eltávolítás
 \t\t· Incoming	Config Window		\t\t· Bejövő
 Next	AutoConfigWindow		Következő
