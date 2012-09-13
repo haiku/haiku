@@ -48,14 +48,14 @@ if [ IsOptionalHaikuImagePackageAdded AllegroLibs ] {
 			: $(baseURL)/lib/jgmod-0.99-r1a4-x86-gcc4-2012-09-09.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			allegro-4.4.1.1-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/allegro-4.4.1.1-r1a3-x86-gcc2-2011-05-19.zip ;
+			allegro-4.4.1.1-r1a4-x86-gcc2-2012-08-30.zip
+			: $(baseURL)/lib/allegro-4.4.1.1-r1a4-x86-gcc2-2012-08-30.zip ;
 		InstallOptionalHaikuImagePackage
-			dumb-0.9.3-x86-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/dumb-0.9.3-r1a3-x86-gcc2-2011-05-19.zip ;
+			dumb-0.9.3-r1a4-x86-gcc2-2012-08-30.zip
+			: $(baseURL)/lib/dumb-0.9.3-r1a4-x86-gcc2-2012-08-30.zip ;
 		InstallOptionalHaikuImagePackage
-			jgmod-0.99-x86-gcc2-2011-08-02.zip
-			: $(baseURL)/lib/jgmod-0.99-x86-gcc2-2011-08-02.zip ;
+			jgmod-0.99-r1a4-x86-gcc2-2012-08-30.zip
+			: $(baseURL)/lib/jgmod-0.99-r1a4-x86-gcc2-2012-08-30.zip ;
 	}
 }
 
@@ -214,8 +214,8 @@ if [ IsOptionalHaikuImagePackageAdded physfs ] {
 			: : true ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			physfs-2.0.1-r1a3-x86-gcc2-2011-05-19.zip
-			: $(baseURL)/lib/physfs-2.0.1-r1a3-x86-gcc2-2011-05-19.zip
+			physfs-2.0.1-r1a4-x86-gcc2-2012-08-29.zip
+			: $(baseURL)/lib/physfs-2.0.1-r1a4-x86-gcc2-2012-08-29.zip
 			: : true ;
 	}
 }
