@@ -281,7 +281,7 @@ AHCIController::ResetController()
 	if (fPCIVendorID == PCI_VENDOR_INTEL) {
 		// Intel PCS—Port Control and Status
 		// SATA port enable bits must be set
-		int portCount = max_c(fls(fRegs->pi), 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK));
+		int portCount = max_c(fls(fRegs->pi), 1 + (int)((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK));
 		if (portCount > 8) {
 			// TODO: fix this when specification available
 			TRACE("don't know how to enable SATA ports 9 to %d\n", portCount);
