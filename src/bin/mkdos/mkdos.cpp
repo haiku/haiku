@@ -164,11 +164,11 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 	device_geometry biosGeometry;
 	device_geometry deviceGeometry;
 	partition_info 	partitionInfo;
-	
+
 	isRawDevice = 0 != strstr(device, "/raw");
-	hasBiosGeometry = B_OK == ioctl(fd, B_GET_BIOS_GEOMETRY, &biosGeometry);
-	hasDeviceGeometry = B_OK == ioctl(fd, B_GET_GEOMETRY, &deviceGeometry);
-	hasPartitionInfo = B_OK == ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo);
+	hasBiosGeometry = B_OK == ioctl(fd, B_GET_BIOS_GEOMETRY, &biosGeometry, sizeof(biosGeometry));
+	hasDeviceGeometry = B_OK == ioctl(fd, B_GET_GEOMETRY, &deviceGeometry, sizeof(deviceGeometry));
+	hasPartitionInfo = B_OK == ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo, sizeof(partitionInfo));
 
 	if (!isRawDevice && !hasBiosGeometry && !hasDeviceGeometry && !hasPartitionInfo)
 		isRawDevice = true;
