@@ -122,6 +122,10 @@ AHCIController::Init()
 		return B_ERROR;
 	}
 
+	// make sure interrupts are disabled
+	fRegs->ghc &= ~GHC_IE;
+	FlushPostedWrites();
+
 	if (ResetController() < B_OK) {
 		TRACE("controller reset failed\n");
 		goto err;
@@ -193,6 +197,12 @@ AHCIController::Init()
 			}
 		}
 	}
+
+	// clear any pending interrupts
+	uint32 interruptsPending;
+	interruptsPending = fRegs->is;
+	fRegs->is = interruptsPending; 
+	FlushPostedWrites();
 
 	// enable interrupts
 	fRegs->ghc |= GHC_IE;
