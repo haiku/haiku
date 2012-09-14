@@ -68,6 +68,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Man						- standard commands to read man pages
 #	Mercurial				- the distributed version control system
 #	Nano					- the command line text editor
+#	Nanumfont				- Korean monospace font
 #	Neon					- support libraries used for example by SVN
 #	NetFS					- the native networked file system components
 #	NetSurf					- the web browser
@@ -1374,6 +1375,14 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 				: $(baseURL)/nano-2.2.6-r1a4-x86-gcc2-2012-08-28.zip ;
 		}
 	}
+}
+
+
+# Nanumfont
+if [ IsOptionalHaikuImagePackageAdded Nanumfont ] {
+	InstallOptionalHaikuImagePackage
+		nanumfont-2.0-r1a4-x86-gcc2-2012-09-12.zip
+		: $(baseURL)/nanumfont-2.0-r1a4-x86-gcc2-2012-09-12.zip ;
 }
 
 
