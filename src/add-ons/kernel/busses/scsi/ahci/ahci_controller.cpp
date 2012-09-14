@@ -25,8 +25,7 @@ AHCIController::AHCIController(device_node *node,
 	fPCIDeviceID(0xffff),
 	fFlags(0),
 	fCommandSlotCount(0),
-	fPortCountMax(0),
-	fPortCountAvail(0),
+	fPortCount(0),
 	fPortImplementedMask(0),
 	fIRQ(0),
 	fInstanceCheck(-1)
@@ -132,29 +131,27 @@ AHCIController::Init()
 	}
 
 	fCommandSlotCount = 1 + ((fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
-	fPortCountMax = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+	fPortCount = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
 
 	fPortImplementedMask = fRegs->pi;
 	// reported mask of implemented ports is sometimes empty
 	if (fPortImplementedMask == 0) {
-		fPortImplementedMask = 0xffffffff >> (32 - fPortCountMax);
+		fPortImplementedMask = 0xffffffff >> (32 - fPortCount);
 		TRACE("ports-implemented mask is zero, using 0x%" B_PRIx32 " instead.\n",
 			fPortImplementedMask);
 	}
 
 	// reported number of ports is sometimes too small
-	int maxPortIndex;
-	maxPortIndex = fls(fPortImplementedMask);
-	if (fPortCountMax < maxPortIndex) {
-		TRACE("reported number of ports is wrong, using %d instead.\n", maxPortIndex);
-		fPortCountMax = maxPortIndex;
+	int highestPort;
+	highestPort = fls(fPortImplementedMask); // 1-based, 1 to 32
+	if (fPortCount < highestPort) {
+		TRACE("reported number of ports is wrong, using %d instead.\n", highestPort);
+		fPortCount = highestPort;
 	}
-
-	fPortCountAvail = count_bits_set(fPortImplementedMask);
 
 	TRACE("cap: Interface Speed Support: generation %" B_PRIu32 "\n",	(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
 	TRACE("cap: Number of Command Slots: %d (raw %#" B_PRIx32 ")\n",	fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
-	TRACE("cap: Number of Ports: %d (raw %#" B_PRIx32 ")\n",			fPortCountMax, (fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+	TRACE("cap: Number of Ports: %d (raw %#" B_PRIx32 ")\n",			fPortCount, (fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
 	TRACE("cap: Supports Port Multiplier: %s\n",		(fRegs->cap & CAP_SPM) ? "yes" : "no");
 	TRACE("cap: Supports External SATA: %s\n",			(fRegs->cap & CAP_SXS) ? "yes" : "no");
 	TRACE("cap: Enclosure Management Supported: %s\n",	(fRegs->cap & CAP_EMS) ? "yes" : "no");
@@ -172,7 +169,7 @@ AHCIController::Init()
 	TRACE("cap: Supports AHCI mode only: %s\n",			(fRegs->cap & CAP_SAM) ? "yes" : "no");
 	TRACE("ghc: AHCI Enable: %s\n",						(fRegs->ghc & GHC_AE) ? "yes" : "no");
 	TRACE("Ports Implemented Mask: %#08" B_PRIx32 "\n",	fPortImplementedMask);
-	TRACE("Number of Available Ports: %d\n",			fPortCountAvail);
+	TRACE("Number of Available Ports: %d\n",			count_bits_set(fPortImplementedMask));
 	TRACE("AHCI Version %" B_PRIu32 ".%" B_PRIu32 "\n",	fRegs->vs >> 16, fRegs->vs & 0xff);
 	TRACE("Interrupt %u\n",								fIRQ);
 
@@ -182,7 +179,7 @@ AHCIController::Init()
 		goto err;
 	}
 
-	for (int i = 0; i < fPortCountMax; i++) {
+	for (int i = 0; i < fPortCount; i++) {
 		if (fPortImplementedMask & (1 << i)) {
 			fPort[i] = new (std::nothrow)AHCIPort(this, i);
 			if (!fPort[i]) {
@@ -208,7 +205,7 @@ AHCIController::Init()
 	fRegs->ghc |= GHC_IE;
 	FlushPostedWrites();
 
-	for (int i = 0; i < fPortCountMax; i++) {
+	for (int i = 0; i < fPortCount; i++) {
 		if (fPort[i]) {
 			status_t status = fPort[i]->Init2();
 			if (status < B_OK) {
@@ -234,7 +231,7 @@ AHCIController::Uninit()
 {
 	TRACE("AHCIController::Uninit\n");
 
-	for (int i = 0; i < fPortCountMax; i++) {
+	for (int i = 0; i < fPortCount; i++) {
 		if (fPort[i]) {
 			fPort[i]->Uninit();
 			delete fPort[i];
@@ -307,7 +304,7 @@ AHCIController::Interrupt(void *data)
 	if (interruptPending == 0)
 		return B_UNHANDLED_INTERRUPT;
 
-	for (int i = 0; i < self->fPortCountMax; i++) {
+	for (int i = 0; i < self->fPortCount; i++) {
 		if (interruptPending & (1 << i)) {
 			if (self->fPort[i]) {
 				self->fPort[i]->Interrupt();
