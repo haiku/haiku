@@ -12,7 +12,7 @@ About	PowerStatus		пра праграму
 PowerStatus	System name		Статус сілкавання
 PowerStatus	PowerStatus		Статус сілкавання
  mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Інфармацыя пра акумулятар
+Battery info…	PowerStatus		Інфа пра акумулятар…
 Damaged battery	PowerStatus		Пашкоджаны акумулятар
 Show time	PowerStatus		Паказаць час
 Last full charge: 	PowerStatus		Апошняя поўная зарадка: 
@@ -22,7 +22,7 @@ Extended battery info	PowerStatus		Пашыраная інфармацыя пр�
 Current rate: 	PowerStatus		Зараз: 
 discharging	PowerStatus		разраджаецца
 Show text label	PowerStatus		Паказаць тэкставую метку
-About…	PowerStatus		Пра праграму...
+About…	PowerStatus		Пра праграму…
 Model number: 	PowerStatus		Нумар мадэлі: 
 Install in Deskbar	PowerStatus		Усталяваць у Deskbar
  mAh	PowerStatus		 мАг

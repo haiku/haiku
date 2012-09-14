@@ -2,7 +2,7 @@
 Plain font:	Font view		Просты шрыфт:
 Control highlight	Colors tab		Выдзяленне кнопак
 Control border	Colors tab		Аблямоўка кнопак
-Antialiasing type:	AntialiasingSettingsView		Тып згладжвання
+Antialiasing type:	AntialiasingSettingsView		Тып згладжвання:
 Shadow	Colors tab		Цень
 On	AntialiasingSettingsView		Укл.
 Defaults	APRWindow		Прадвызначаныя
@@ -57,4 +57,4 @@ Monospaced fonts only	AntialiasingSettingsView		Толькі монашырын�
 Look and feel	APRWindow		Выгляд і паводзіны
 Antialiasing menu	AntialiasingSettingsView		Меню згладжвання
 Fonts	APRWindow		Шрыфты
-Glyph hinting:	AntialiasingSettingsView		Хінтынг сімвалаў
+Glyph hinting:	AntialiasingSettingsView		Хінтынг сімвалаў:

@@ -12,7 +12,7 @@ Starting media server…	Media Window		Запускаецца медыясерв
 Done shutting down.	Media Window		Медыясервер спынены.
 Video settings	Media Window		Наладкі відэа
 Video output:	Media views		Відэа Выхад:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Немагчыма далучыцца да медыясервера\n Жадаеце яго стартаваць?
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Немагчыма далучыцца да медыясервера.\n Жадаеце яго стартаваць ?
 Restart media services	Media views		Перазапусціць медыясервер
 Couldn't remove volume control in Deskbar: %s\n	Media views		Не ўдалося выдаліць элемент кіравання гучнасцю з Deskbar: %s\n
 Media	System name		Медыя

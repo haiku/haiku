@@ -27,7 +27,7 @@ Can't save preferenes, you probably don't have write access to the settings dire
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Не ўдалося захаваць наладкі.\nМагчыма, вы не маеце доступу да дырэкторыі наладак.
 Yes	NotificationView		Так
 Large icon	DisplayView		Вялікая іконка
-Icon size:	DisplayView		Памер іконкі
+Icon size:	DisplayView		Памер іконкі:
 Hide notifications from screen after	GeneralView		Схаваць паведамленні праз
 Disable notifications	GeneralView		Выключыць паведамленні
 Notifications	System name		Паведамленні

@@ -5,7 +5,7 @@ Idle priority	ProcessController		Прыярытэт спакою
 Restart Deskbar	ProcessController		Перазапусціць Deskbar
 Custom priority	ProcessController		Нестандартны прыярытэт
 Debug thread	ProcessController		Адладжваць паток
-This team is already gone…	ProcessController		Гэтая група ўжо не існуе...
+This team is already gone…	ProcessController		Гэтая група ўжо не існуе…
 Error saving file	ProcessController		Памылка пры захаванні файла
 Real-time priority	ProcessController		Прыярытэт рэальнага часу
 Your setting file could not be saved!\n(%s)	ProcessController		Немагчыма захаваць файл з наладкамі!\n(%s)

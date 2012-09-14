@@ -10,7 +10,7 @@ Use volume:	SettingsWindow		Lemez:
 Keep enabled	SettingsWindow		Tartsa bekapcsolva
 Revert	SettingsWindow		Visszaállít
 VirtualMemory	System name		Virtuális memória
-Choose swap size automatically	SettingsWindow		Automatikusan méretet
+Choose swap size automatically	SettingsWindow		Automatikus méret
 Use boot volume	SettingsWindow		Használja a rendszer lemezt
 Load defaults	SettingsWindow		Eredeti beállítások betöltése
 OK	VirtualMemoryApp		Rendben

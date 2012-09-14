@@ -30,7 +30,7 @@ Blue	TestPageView		Сіні
 1 pending job.	PrinterListView		1 заданне ў чарзе.
 Remove	PrintersWindow		Выдаліць
 <pick one>	AddPrinterDialog		<выберыце адно>
-Add …	PrintersWindow		Дадаць ...
+Add …	PrintersWindow		Дадаць …
 Print jobs for 	PrintersWindow		Заданні друку для 
 Failed	JobListView		Не ўдалося
 %.2f KB	JobListView		%.2f КБ

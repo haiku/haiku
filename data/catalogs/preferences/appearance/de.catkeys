@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Appearance	3047172181
+1	german	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		Normal:
 Control highlight	Colors tab		Steuerelement - Ausgewählt
 Control border	Colors tab		Steuerelement - Rahmen
@@ -39,6 +39,7 @@ Colors	APRWindow		Farben
 Control background	Colors tab		Steuerelement - Hintergrund
 Inactive window tab	Colors tab		Reiter (inaktiv)
 Appearance	System name		Erscheinungsbild
+Use double scrollbar arrows	DecorSettingsView		Scroll-Pfeile paarweise anzeigen
 Fixed font:	Font view		Feste Breite:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Franz jagt im total verwahrlosten Taxi quer durch Bayern.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Farbsaumfilter:
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		Menü - Rahmen (ausgewählt)
 Strong	AntialiasingSettingsView		Stark
 Panel text	Colors tab		Fenster - Text
 Monospaced fonts only	AntialiasingSettingsView		Nur nicht-proportionale Schriften
+Look and feel	APRWindow		Aussehen & Handhabung
 Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
 Fonts	APRWindow		Schriftarten
 Glyph hinting:	AntialiasingSettingsView		Glyph-Hinting:

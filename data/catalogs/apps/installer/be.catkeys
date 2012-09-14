@@ -7,7 +7,7 @@ Newer versions of GRUB use an extra configuration file to add custom entries to 
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Тут вам трэба закаменціраваць страку \"GRUB_HIDDEN_TIMEOUT=0\" з дапамогай \"#\" у яе пачатку, каб убачыць меню запуску.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'.Націсніце Выйсці, каб пакінуць усталёўшчык ці абраць іншы том для новай усталёўкі.
 Quit	InstallerApp		Выйсці
-Additional disk space required: 0.0 KiB	InstallerWindow		Патрэбна яшчэ 0.0 KiB месца на дыску.
+Additional disk space required: 0.0 KiB	InstallerWindow		Патрэбна яшчэ 0.0 KiB месца на дыску
 With GRUB it's: (hdN,n)\n\n	InstallerApp		У GRUB гэта: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Стоп
@@ -33,7 +33,7 @@ Collecting copy information.	InstallProgress		Збіраецца інфарма�
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце зыходны дыск з усплывальнага меню. Потым націсніце \"Пачаць\".
 Quit Boot Manager and DriveSetup	InstallerWindow		Выйсці з Менеджэра Запуску і DriveSetup
 Quit	InstallerWindow		Выйсці
-Welcome to the Haiku Installer!\n\n	InstallerApp		Прывітанне! Гэта ўсталёўшчык Haiku.\n\n
+Welcome to the Haiku Installer!\n\n	InstallerApp		Прывітанне! Гэта ўсталёўшчык Haiku!\n\n
 Boot sector successfully written.	InstallProgress		Загрузачны сектар паспяхова запісаны.
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
 scanning…	InstallerWindow		сканіраванне…
@@ -62,7 +62,7 @@ Choose the disk you want to install onto from the pop-up menu. Then click \"Begi
 Unknown Type	InstallProgress	Partition content type	Невядомы тып
 <none>	InstallerWindow	No partition available	<Няма>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
-You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Вы прыкмеціце, што GRUB выкарыстоўвае схема наймавання дыскаў не такую, як Linux\n\n
+You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Вы прыкмеціце, што GRUB выкарыстоўвае схема наймавання дыскаў не такую, як Linux.\n\n
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" - нумар падзелу, таксама пачынаецца з \"0\".\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'.Націсніце Перазапусціць, каб перазапусціць кампутар ці абрярыце іншы том для яшчэ адной усталёўкі.
 Installation canceled.	InstallProgress		Усталёўка адмененая.

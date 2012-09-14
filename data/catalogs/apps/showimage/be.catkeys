@@ -31,7 +31,7 @@ Rating	Menus		Рэйтынг
 Flip left to right	Menus		Адлюстраваць злева направа
 Show caption in full screen mode	Menus		Паказваць меткі ў паўнаэкранным меню
 DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Адкрыць...
+Open…	Menus		Адкрыць…
 Next file	Menus		Наступны файл
 Clear selection	Menus		Ачысціць выдзяленне
 Close document	ClosePrompt		Закрыць дакумент
@@ -51,7 +51,7 @@ Slide show	Menus		Слайд шоу
 Fit image to page	PrintOptionsWindow		Умясціць выяву на старонцы
 Flip top to bottom	Menus		Адлюстраваць зверху наніз
 Select all	Menus		Выбраць усё
-Zoom factor in %:	PrintOptionsWindow		Мера павелічэння, %
+Zoom factor in %:	PrintOptionsWindow		Мера павелічэння, %:
 Width:	PrintOptionsWindow		Шырыня:
 Image	Menus		Выява
 OK	Alerts		ОК

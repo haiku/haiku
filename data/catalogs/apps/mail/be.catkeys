@@ -2,7 +2,7 @@
 View	Mail		Агляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Атрыбуты ўкладання:
-Inconsistency occurred in the undo/redo buffer.	Mail		Неадпаведнасць ў чарзе аперацый паўтора/адмены
+Inconsistency occurred in the undo/redo buffer.	Mail		Неадпаведнасць ў чарзе аперацый паўтора/адмены.
 An error occurred trying to save the attachment.	Mail		Немагчыма захаваць гэтае ўкладанне.
 Copy to new	Mail		Капіраваць як новае
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Пакінуць як 'Новы'

@@ -47,6 +47,6 @@ Really quit without saving your changes?	ShortcutsWindow		Сапраўды вы�
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог разабраць ваш файл KeySet!
 Select	ShortcutsWindow		Выбраць
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог захаваць ваш файл KeySet!
-Oh no	ShortcutsWindow		О не!
+Oh no	ShortcutsWindow		О не
 LaunchHandler	ShortcutsSpec		АпрацоўшчыкЗапуску
 Shortcuts	System name		Гарачыя клавішы

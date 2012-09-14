@@ -28,7 +28,7 @@ Warning	Dragger		Папярэджанне
 Undo	TextView		Адвярнуць
 Red:	ColorControl		Чырвоны:
 %3.2f MiB	StringForSize		%3.2f МіБ
-About %app…	Dragger		Пра праграму %app
+About %app…	Dragger		Пра праграму %app…
 Error	ZombieReplicantView		Памылка
 Blue:	ColorControl		Сіні:
 Can't delete this replicant from its original application. Life goes on.	Dragger		Не ўдалося выдаліць рэплікант з яго праграмы. Але жыццё працягваецца.

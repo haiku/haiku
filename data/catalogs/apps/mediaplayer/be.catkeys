@@ -14,7 +14,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Захаваць плэйліст
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ніводны з файлаў, якія вы жадалі прайграць, не падобны да медыяфайла.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст.\n\nПамылка: 
 %.3f kHz	MediaPlayer-InfoWin		%.3f кГц
-New player…	MediaPlayer-Main		Новы плеер
+New player…	MediaPlayer-Main		Новы плеер…
 100% scale	MediaPlayer-Main		Маштаб 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Месцазнаходжанне субтытраў:
 Close	MediaPlayer-Main		Закрыць
@@ -30,11 +30,11 @@ Display mode	MediaPlayer-InfoWin		Рэжым паказу
 Medium	MediaPlayer-SettingsWindow		Сярэдняе
 Close	MediaPlayer-PlaylistWindow		Закрыць
 Stereo	MediaPlayer-InfoWin		Стэрэа
-Open…	MediaPlayer-PlaylistWindow		Адкрыць...
+Open…	MediaPlayer-PlaylistWindow		Адкрыць…
 Toggle mute.	MediaPlayer-Main		Укл/Выкл гук.
 Undo	MediaPlayer-PlaylistWindow		Адмяніць
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Карыстацца накладаннямі відэа з апаратным паскарэннем, калі магчыма
-File info…	MediaPlayer-Main		Інфармацыя пра файл...
+File info…	MediaPlayer-Main		Інфармацыя пра файл…
 Pause playback.	MediaPlayer-Main		Прыпыніць прайгранне.
 Overlay	MediaPlayer-InfoWin		Перакрываньне
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Убраць Элемент
@@ -105,7 +105,7 @@ Skip to the next track.	MediaPlayer-Main		Пераскочыць да насту
 Play	MediaPlayer-Main		Прайграць
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элементы ў Сметніцу
 200% scale	MediaPlayer-Main		Маштаб 200%
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Медыясервер, відаць, не запушчаны.\nЗапусціць яго?
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Медыясервер, відаць, не запушчаны.\nЗапусціць яго ?
 Duration	MediaPlayer-InfoWin		Працягласць
 Aspect ratio	MediaPlayer-Main		Суадносіны бакоў
 Error: 	MediaPlayer-Main		Памылка: 

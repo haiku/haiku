@@ -50,7 +50,7 @@ Logging view	PoorMan		Від пратакаліравання
 Logging	PoorMan		Пратакаліраванне
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартны вэб-каталог быў створаны у \"/boot/home/public_html.\"\nПераканайцеся, что там ёсць HTML файл\"index.html\".
 Clear log file	PoorMan		Ачысціць лог-файл
-Log file name:	PoorMan		Імя лог-файла
+Log file name:	PoorMan		Імя лог-файла:
 Directory: 	PoorMan		Дырэкторыя: 
 Log To File	PoorMan		Лог у Файл
 Done	PoorMan		Гатова
@@ -61,6 +61,6 @@ Cancel	PoorMan		Адмена
 Console logging	PoorMan		Пратакол на кансоль
 Cannot start the server	PoorMan		Нельга запусціць сервер
 Select	PoorMan		Выбраць
-Save console as…	PoorMan		Захаваць кансоль як...
+Save console as…	PoorMan		Захаваць кансоль як…
 PoorMan	System name		Валацуга (Web-сервер)
 Console Logging	PoorMan		Пратакаліраванне Кансолі

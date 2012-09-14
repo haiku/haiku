@@ -21,7 +21,7 @@ Invert selection	VolumeWindow		Інвертаваць выдзяленне
 Recent documents	FavoritesMenu		Нядаўнія дакменты
 Modified	QueryPoseView		Зменены
 Created	ContainerWindow		Створаны
-Error %error loading add-On %name.	ContainerWindow		Памылка %error пры загрузцы add-On %name
+Error %error loading add-On %name.	ContainerWindow		Памылка %error пры загрузцы add-On %name.
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Калi вы %ifYouDoAction каталог наладак, %osName можа паводзіць сябе неадэкватна!\n\nВы ўпэўнены што жадаеце зрабіць гэта?
 contains	SelectionWindow		месціць
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Прабачце, вы не можаце захоўваць нешта ў карнявым каталозе сістэмы.
@@ -34,7 +34,7 @@ Handles any %type	OpenWithWindow		Працые з любым %type
 Delete	ContainerWindow		Выдаліць
 32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		Немагчыма размантаваць загрузачны том \"%name\".
-Open with…	ContainerWindow		Адкрыць з дапамогай...
+Open with…	ContainerWindow		Адкрыць з дапамогай…
 Write	FilePermissionsView		Запісаць
 for %num files	InfoWindow		для %num файлаў
 Modified	PoseView		Зменены
@@ -42,7 +42,7 @@ Make active printer	ContainerWindow		Зрабіць актыўным прынт�
 Create link here	ContainerWindow		Стварыць спасылку тут
 Moving: 	StatusWindow		Перамяшчэнне: 
 before	FindPanel		перад
-Error emptying Trash	FSUtils		Памылка пры ачыстцы Сметніцы!
+Error emptying Trash	FSUtils		Памылка пры ачыстцы Сметніцы
 On	FindPanel		На
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		больш за
@@ -50,7 +50,7 @@ Delete	PoseView		Выдаліць
 Select all	ContainerWindow		Выбраць усё
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Прабачце, атрыбут 'Сімвал' не можа мясціць многабайтавы знак.
 Clean up	DeskWindow		Прыбрацца
-You cannot copy or move the root directory.	FSUtils		Вы не можаце капіяваць або перамяшчаць карнявы каталог
+You cannot copy or move the root directory.	FSUtils		Вы не можаце капіяваць або перамяшчаць карнявы каталог.
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed з %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Інвертаваць выдзяленне
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Перайменаваць
@@ -63,7 +63,7 @@ config	B_USER_CONFIG_DIRECTORY		канфігурацыя
 apps	B_APPS_DIRECTORY		праграмы
 Icon view	ContainerWindow		Від іконак
 Size	QueryPoseView		Памер
-Emptying Trash… 	StatusWindow		Ачыстка Сметніцы... 
+Emptying Trash… 	StatusWindow		Ачыстка Сметніцы… 
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Новыя шаблоны Тракера
 Close all in workspace	ContainerWindow		Закрыць усё на гэтым стале
 Empty Trash	ContainerWindow		Ачысціць Сметніцу
@@ -165,7 +165,7 @@ That name is already taken. Please type another one.	InfoWindow		Імя ўжо �
 Sorry, you can't create links in the Trash.	PoseView		Прабачце, вы не можаце свараце спасылкі ў Сметніцы.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Элемент \"%name\" ужо ёсць у каталозе, і можа мясціць\nэлементы з такімі ж імёнамі. Жадаеце замяніць іх файламі з каталога, які вы %verb?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Спасылка \"%name\" на:
-Mount settings…	VolumeWindow		Наладкі мантавання...
+Mount settings…	VolumeWindow		Наладкі мантавання…
 Select…	VolumeWindow		Выбраць…
 All disks	FindPanel		Усе дыскі
 Revert	TrackerSettingsWindow		Вярнуць
@@ -392,14 +392,14 @@ Icon view	DeskWindow		Від іконак
 Select all	QueryContainerWindow		Выбраць усё
 Files cannot be moved or deleted from a read-only volume.	PoseView		Нельга выдаляць або перамяшчаць файла з тома толькі для чытання.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Адбылася памылка пры замене \"%name\". Элемент можа быць заняты або адкрыты.
-You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Нельга запіхнуць Сметніцу, Рабочы Стол або хатні каталог у саму Сметніцу!
+You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Нельга запіхнуць Сметніцу, Рабочы Стол або хатні каталог у саму Сметніцу.
 Owner	FilePermissionsView		Валадар
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Адбылася памылка пры захаванні ў пазначаную папку. Калі ласка, паспрабуйце іншую.
 Restore	ContainerWindow		Аднавіць
 Restoring: 	StatusWindow		Аднаўленне: 
 system	B_SYSTEM_DIRECTORY		сістэма
 Skip	FSUtils		Прапусціць
-Settings…	MountMenu		Наладкі...
+Settings…	MountMenu		Наладкі…
 Recent folders	FavoritesMenu		Нядаўнія каталогі
 Close	ContainerWindow		Закрыць
 Preferred for file	OpenWithWindow		Пажаданая для файла
@@ -410,7 +410,7 @@ OK	FSUtils		ОК
 Paste layout	ContainerWindow		Уставіць макет
 Select	InfoWindow		Выбраць
 Could not update permissions of file \"%name\". %error	FSUtils		Не ўдалося абнавіць правы файла \"%name\". %error
-Select…	FilePanelPriv		Выбраць...
+Select…	FilePanelPriv		Выбраць…
 Don't move files to Trash	SettingsView		Не перамяшчаць файлы ў Сметніцу
 There was an error resolving the link.	Tracker		Адбылася памылка пры разборы спасылкі.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
@@ -435,7 +435,7 @@ Modified	ContainerWindow		Зменены
 Edit Query template	FindPanel		Правіць шаблон Запыту
 Prompt	FSUtils		Падказка
 Edit query	ContainerWindow		Правіць запыт
-Find…	ContainerWindow		Знайсці...
+Find…	ContainerWindow		Знайсці…
 Create a Query	FindPanel		Стварыць Запыт
 Move to Trash	FSUtils		Адправіць у Сметніцу
 Automatic disk mounting	AutoMounterSettings		Аўтаматычнае мантаванне дыскаў

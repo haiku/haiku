@@ -30,7 +30,7 @@ Star density	ChartWindow		Csillagok sűrűsége
 Display:	ChartWindow		Kijelző:
 Space color	ChartWindow		Űr színe
 White	ChartWindow		Fehér
-Chart	System name		Grafikon
+Chart	System name		Világűr
 Animation:	ChartWindow		Animáció:
 Frames/s	ChartWindow		Képkocka/mp
 Auto demo	ChartWindow		Bemutató
