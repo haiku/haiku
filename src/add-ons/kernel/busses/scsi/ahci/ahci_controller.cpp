@@ -284,9 +284,12 @@ AHCIController::ResetController()
 	if (fPCIVendorID == PCI_VENDOR_INTEL) {
 		// Intel PCS—Port Control and Status
 		// SATA port enable bits must be set
-		int portCount = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
-		if (portCount > 8)
-			panic("Intel AHCI: too many SATA ports! Please report at http://dev.haiku-os.org");
+		int portCount = max_c(fls(fRegs->pi), 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK));
+		if (portCount > 8) {
+			// TODO: fix this when specification available
+			TRACE("don't know how to enable SATA ports 9 to %d\n", portCount);
+			portCount = 8;
+		}
 		uint16 pcs = fPCI->read_pci_config(fPCIDevice, 0x92, 2);
 		pcs |= (0xff >> (8 - portCount));
 		fPCI->write_pci_config(fPCIDevice, 0x92, 2, pcs);
