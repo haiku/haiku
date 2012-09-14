@@ -302,11 +302,11 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 	DirectoryCache* cache = cookie->fAttrDir ? fAttrCache : fCache;
 	if (cookie->fSnapshot == NULL) {
 		fFileSystem->Revalidator().Lock();
-		if (cache->Lock() != B_OK) {
-			cache->ResetAndLock();
-		} else {
+		cache->Lock();
+		if (!cache->Valid())
+			cache->Reset();
+		else
 			fFileSystem->Revalidator().RemoveDirectory(cache);
-		}
 
 		cookie->fSnapshot = cache->GetSnapshot();
 		if (cookie->fSnapshot == NULL) {

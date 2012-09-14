@@ -40,11 +40,12 @@ public:
 							DirectoryCache(Inode* inode, bool attr = false);
 							~DirectoryCache();
 
-	inline	status_t		Lock();
+	inline	void			Lock();
 	inline	void			Unlock();
 
-			void			ResetAndLock();
+			void			Reset();
 			void			Trash();
+	inline	bool			Valid();
 
 			status_t		AddEntry(const char* name, ino_t node,
 								bool created = false);
@@ -87,22 +88,24 @@ private:
 };
 
 
-inline status_t
+inline void
 DirectoryCache::Lock()
 {
 	mutex_lock(&fLock);
-	if (fTrashed) {
-		mutex_unlock(&fLock);
-		return B_ERROR;
-	}
-
-	return B_OK;
 }
+
 
 inline void
 DirectoryCache::Unlock()
 {
 	mutex_unlock(&fLock);
+}
+
+
+inline bool
+DirectoryCache::Valid()
+{
+	return !fTrashed;
 }
 
 

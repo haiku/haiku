@@ -42,15 +42,16 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 
 	fFileSystem->InoIdMap()->AddEntry(fi, FileIdToInoT(fileID));
 
-	if (fCache->Lock() == B_OK) {
+	fCache->Lock();
+	if (fCache->Valid()) {
 		if (changeInfo.fAtomic
 			&& fCache->ChangeInfo() == changeInfo.fBefore) {
 			fCache->AddEntry(name, fileID, true);
 			fCache->SetChangeInfo(changeInfo.fAfter);
 		} else if (fCache->ChangeInfo() != changeInfo.fBefore)
 			fCache->Trash();
-		fCache->Unlock();
 	}
+	fCache->Unlock();
 
 	state->fFileSystem = fFileSystem;
 	state->fInfo = fi;

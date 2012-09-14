@@ -70,9 +70,8 @@ DirectoryCache::~DirectoryCache()
 
 
 void
-DirectoryCache::ResetAndLock()
+DirectoryCache::Reset()
 {
-	mutex_lock(&fLock);
 	Trash();
 	fExpireTime = system_time() + kExpirationTime;
 	fTrashed = false;

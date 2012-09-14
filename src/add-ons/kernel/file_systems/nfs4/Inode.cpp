@@ -197,8 +197,9 @@ Inode::LookUp(const char* name, ino_t* id)
 		return result;
 
 	fFileSystem->Revalidator().Lock();
-	if (fCache->Lock() != B_OK) {
-		fCache->ResetAndLock();
+	fCache->Lock();
+	if (!fCache->Valid()) {
+		fCache->Reset();
 		fCache->SetChangeInfo(change);
 	} else {
 		fFileSystem->Revalidator().RemoveDirectory(fCache);
@@ -232,15 +233,16 @@ Inode::Link(Inode* dir, const char* name)
 
 	fFileSystem->InoIdMap()->AddEntry(fi, fInfo.fFileId);
 
-	if (dir->fCache->Lock() == B_OK) {
+	dir->fCache->Lock();
+	if (dir->fCache->Valid()) {
 		if (changeInfo.fAtomic
 			&& dir->fCache->ChangeInfo() == changeInfo.fBefore) {
 			dir->fCache->AddEntry(name, fInfo.fFileId, true);
 			dir->fCache->SetChangeInfo(changeInfo.fAfter);
 		} else if (dir->fCache->ChangeInfo() != changeInfo.fBefore)
 			dir->fCache->Trash();
-		dir->fCache->Unlock();
 	}
+	dir->fCache->Unlock();
 
 	notify_entry_created(fFileSystem->DevId(), dir->ID(), name, ID());
 
@@ -270,15 +272,16 @@ Inode::Remove(const char* name, FileType type, ino_t* id)
 		return result;
 
 	DirectoryCache* cache = type != NF4NAMEDATTR ? fCache : fAttrCache;
-	if (cache->Lock() == B_OK) {
+	cache->Lock();
+	if (cache->Valid()) {
 		if (changeInfo.fAtomic
 			&& fCache->ChangeInfo() == changeInfo.fBefore) {
 			cache->RemoveEntry(name);
 			cache->SetChangeInfo(changeInfo.fAfter);
 		} else if (cache->ChangeInfo() != changeInfo.fBefore)
 			cache->Trash();
-		cache->Unlock();
 	}
+	cache->Unlock();
 
 	fFileSystem->Root()->MakeInfoInvalid();
 	if (id != NULL)
@@ -333,29 +336,31 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 	from->fFileSystem->Root()->MakeInfoInvalid();
 
 	DirectoryCache* cache = attribute ? from->fAttrCache : from->fCache;
-	if (cache->Lock() == B_OK) {
+	cache->Lock();
+	if (cache->Valid()) {
 		if (fromChange.fAtomic
 			&& cache->ChangeInfo() == fromChange.fBefore) {
 			cache->RemoveEntry(fromName);
 			cache->SetChangeInfo(fromChange.fAfter);
 		} else if (cache->ChangeInfo() != fromChange.fBefore)
 			cache->Trash();
-		cache->Unlock();
 	}
+	cache->Unlock();
 
 	if (id != NULL)
 		*id = FileIdToInoT(fileID);
 
 	cache = attribute ? to->fAttrCache : to->fCache;
-	if (cache->Lock() == B_OK) {
+	cache->Lock();
+	if (cache->Valid()) {
 		if (toChange.fAtomic
 			&& cache->ChangeInfo() == toChange.fBefore) {
 			cache->AddEntry(toName, fileID, true);
 			cache->SetChangeInfo(toChange.fAfter);
 		} else if (to->fCache->ChangeInfo() != toChange.fBefore)
 			cache->Trash();
-		cache->Unlock();
 	}
+	cache->Unlock();
 
 	if (attribute) {
 		notify_attribute_changed(from->fFileSystem->DevId(), from->ID(),
@@ -396,14 +401,15 @@ Inode::CreateObject(const char* name, const char* path, int mode, FileType type)
 	if (result != B_OK)
 		return B_OK;
 
-	if (fCache->Lock() == B_OK) {
+	fCache->Lock();
+	if (fCache->Valid()) {
 		if (changeInfo.fAtomic && fCache->ChangeInfo() == changeInfo.fBefore) {
 			fCache->AddEntry(name, fileID, true);
 			fCache->SetChangeInfo(changeInfo.fAfter);
 		} else if (fCache->ChangeInfo() != changeInfo.fBefore)
 			fCache->Trash();
-		fCache->Unlock();
 	}
+	fCache->Unlock();
 
 	notify_entry_created(fFileSystem->DevId(), ID(), name,
 		FileIdToInoT(fileID));

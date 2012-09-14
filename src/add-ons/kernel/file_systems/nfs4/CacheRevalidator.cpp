@@ -86,8 +86,12 @@ CacheRevalidator::_DirectoryCacheRevalidator()
 			continue;
 		}
 
-		if (current->Lock() != B_OK)
+		current->Lock();
+		if (!current->Valid()) {
+			RemoveDirectory(current);
+			current->Unlock();
 			continue;
+		}
 
 		if (current->ExpireTime() > system_time()) {
 			current->Unlock();
@@ -110,7 +114,6 @@ CacheRevalidator::_DirectoryCacheRevalidator()
 		if (current->Revalidate() == B_OK)
 			AddDirectory(current);
 
-		locker.Unlock();
 		current->Unlock();
 	}
 }
