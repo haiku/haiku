@@ -186,12 +186,12 @@ AHCIController::Init()
 		if (fPortImplementedMask & (1 << i)) {
 			fPort[i] = new (std::nothrow)AHCIPort(this, i);
 			if (!fPort[i]) {
-				TRACE("out of memory creating port %d", i);
+				TRACE("out of memory creating port %d\n", i);
 				break;
 			}
 			status_t status = fPort[i]->Init1();
 			if (status < B_OK) {
-				TRACE("init-1 port %d failed", i);
+				TRACE("init-1 port %d failed\n", i);
 				delete fPort[i];
 				fPort[i] = NULL;
 			}
@@ -212,7 +212,7 @@ AHCIController::Init()
 		if (fPort[i]) {
 			status_t status = fPort[i]->Init2();
 			if (status < B_OK) {
-				TRACE("init-2 port %d failed", i);
+				TRACE("init-2 port %d failed\n", i);
 				fPort[i]->Uninit();
 				delete fPort[i];
 				fPort[i] = NULL;

@@ -398,12 +398,12 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 		TRACE("Interface Non Fatal Error\n");
 	}
 	if (is & PORT_INT_OF) {
-		TRACE("Overflow");
+		TRACE("Overflow\n");
 		fResetPort = true;
 		fError = true;
 	}
 	if (is & PORT_INT_IPM) {
-		TRACE("Incorrect Port Multiplier Status");
+		TRACE("Incorrect Port Multiplier Status\n");
 	}
 	if (is & PORT_INT_PRC) {
 		TRACE("PhyReady Change\n");
