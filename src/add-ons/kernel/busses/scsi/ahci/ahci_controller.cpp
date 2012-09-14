@@ -266,6 +266,10 @@ AHCIController::ResetController()
 	uint32 saveCaps = fRegs->cap & (CAP_SMPS | CAP_SSS | CAP_SPM | CAP_EMS | CAP_SXS);
 	uint32 savePI = fRegs->pi;
 
+	// AHCI 1.3: Software may perform an HBA reset prior to initializing the controller
+	//           by setting GHC.AE to ‘1’ and then setting GHC.HR to ‘1’ if desired.
+	fRegs->ghc |= GHC_AE;
+	FlushPostedWrites();
 	fRegs->ghc |= GHC_HR;
 	FlushPostedWrites();
 	if (wait_until_clear(&fRegs->ghc, GHC_HR, 1000000) < B_OK)
