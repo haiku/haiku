@@ -1,11 +1,16 @@
 /*
- * Copyright 2009, François Revol, revol@free.fr.
+ * Copyright 2009-2012 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      François Revol, revol@free.fr
+ *      Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 
-#include "arch_video.h"
+#include "arch_framebuffer.h"
 
+#include <arch/arm/omap3.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
@@ -20,16 +25,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "graphics/omap/omap3_regs.h"
+
+
 //XXX
-extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags);
+extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
+	uint32 flags);
 
-
-#define TRACE_VIDEO
-#ifdef TRACE_VIDEO
-#	define TRACE(x) dprintf x
-#else
-#	define TRACE(x) ;
-#endif
 
 #define write_io_32(a, v) ((*(vuint32 *)a) = v)
 #define read_io_32(a) (*(vuint32 *)a)
@@ -37,13 +39,21 @@ extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, u
 #define dumpr(a) dprintf("LCC:%s:0x%lx\n", #a, read_io_32(a))
 
 
+class ArchFBArmOmap3 : public ArchFramebuffer {
+public:
+							ArchFBArmOmap3(addr_t base);
+							~ArchFBArmOmap3();
+			status_t		Init();
+			status_t		Probe();
+			status_t		SetDefaultMode();
+			status_t		SetVideoMode(int width, int height, int depth);
+};
 
-#if BOARD_CPU_OMAP3
+ArchFBArmOmap3 *arch_get_fb_arm_omap3(addr_t base);
+
+
 //	#pragma mark -
 
-#include "graphics/omap/omap3_regs.h"
-
-extern void *gFrameBufferBase;
 
 struct video_mode {
 	short width, height;
@@ -87,13 +97,15 @@ struct video_mode modes[] = {
 };
 
 
-static inline void setaddr(uint32 reg, unsigned int v)
+static inline void
+setaddr(uint32 reg, unsigned int v)
 {
 	*((volatile uint32 *)(reg)) = v;
 }
 
 
-static inline void modaddr(unsigned int reg, unsigned int m, unsigned int v)
+static inline void
+modaddr(unsigned int reg, unsigned int m, unsigned int v)
 {
 	uint32 o;
 
@@ -104,31 +116,35 @@ static inline void modaddr(unsigned int reg, unsigned int m, unsigned int v)
 }
 
 
-static inline void setreg(uint32 base, unsigned int reg, unsigned int v)
+static inline
+void setreg(uint32 base, unsigned int reg, unsigned int v)
 {
-	*((volatile uint32 *)(base+reg)) = v;
+	*((volatile uint32 *)(base + reg)) = v;
 }
 
 
-static inline uint32 readreg(uint32 base, unsigned int reg)
+static inline
+uint32 readreg(uint32 base, unsigned int reg)
 {
-	return *((volatile uint32 *)(base+reg));
+	return *((volatile uint32 *)(base + reg));
 }
 
 
-static inline void modreg(uint32 base, unsigned int reg, unsigned int m, unsigned int v)
+static inline void
+modreg(uint32 base, unsigned int reg, unsigned int m, unsigned int v)
 {
 	uint32 o;
 
-	o = *((volatile uint32 *)(base+reg));
+	o = *((volatile uint32 *)(base + reg));
 	o &= ~m;
 	o |= v;
-	*((volatile uint32 *)(base+reg)) = o;
+	*((volatile uint32 *)(base + reg)) = o;
 }
 
 
 // init beagle gpio for video
-static void omap_beagle_init(void)
+static void
+omap_beagle_init(void)
 {
 	// setup GPIO stuff, i can't find any references to these
 	setreg(GPIO1_BASE, GPIO_OE, 0xfefffedf);
@@ -137,7 +153,8 @@ static void omap_beagle_init(void)
 }
 
 
-static void omap_clock_init(void)
+static void
+omap_clock_init(void)
 {
 	// sets pixel clock to 72MHz
 
@@ -159,15 +176,18 @@ static void omap_clock_init(void)
 }
 
 
-static void omap_dss_init(void)
+static void
+omap_dss_init(void)
 {
 	setreg(DSS_BASE, DSS_SYSCONFIG, DSS_AUTOIDLE);
 	// Select DSS1 ALWON as clock source
-	setreg(DSS_BASE, DSS_CONTROL, DSS_VENC_OUT_SEL | DSS_DAC_POWERDN_BGZ | DSS_DAC_DEMEN | DSS_VENC_CLOCK_4X_ENABLE);
+	setreg(DSS_BASE, DSS_CONTROL, DSS_VENC_OUT_SEL | DSS_DAC_POWERDN_BGZ
+		| DSS_DAC_DEMEN | DSS_VENC_CLOCK_4X_ENABLE);
 }
 
 
-static void omap_dispc_init(void)
+static void
+omap_dispc_init(void)
 {
 	uint32 DISPC = DISPC_BASE;
 
@@ -213,25 +233,27 @@ static void omap_dispc_init(void)
 }
 
 
-static void omap_set_lcd_mode(int w, int h) {
+static void
+omap_set_lcd_mode(int w, int h)
+{
 	uint32 DISPC = DISPC_BASE;
 	unsigned int i;
 	struct video_mode *m;
 
 	dprintf("omap3: set_lcd_mode %d,%d\n", w, h);
 
-	for (i=0;i<sizeof(modes)/sizeof(modes[0]);i++) {
-		if (w <= modes[i].width 
-		    && h <= modes[i].height)
+	for (i = 0; i < sizeof(modes) / sizeof(modes[0]); i++) {
+		if (w <= modes[i].width
+			&& h <= modes[i].height)
 		goto found;
 	}
 	i -= 1;
 found:
 	m = &modes[i];
-	
+
 	dprintf("omap3: found mode[%s]\n", m->name);
 
-	setreg(DISPC, DISPC_SIZE_LCD, (m->width - 1) | ((m->height-1) << 16));
+	setreg(DISPC, DISPC_SIZE_LCD, (m->width - 1) | ((m->height - 1) << 16));
 	setreg(DISPC, DISPC_TIMING_H, m->dispc_timing_h);
 	setreg(DISPC, DISPC_TIMING_V, m->dispc_timing_v);
 
@@ -240,20 +262,21 @@ found:
 
 	// Tell hardware to update, and wait for it
 	modreg(DISPC, DISPC_CONTROL,
-	      DISPC_GOLCD,
-	      DISPC_GOLCD);
+		DISPC_GOLCD,
+		DISPC_GOLCD);
 
 	while ((readreg(DISPC, DISPC_CONTROL) & DISPC_GOLCD))
 		;
 }
 
 
-static void omap_attach_framebuffer(void *data, int width, int height, int depth)
+static void
+omap_attach_framebuffer(addr_t data, int width, int height, int depth)
 {
 	uint32 DISPC = DISPC_BASE;
-	uint32 gsize = ((height-1)<<16) | (width-1);
+	uint32 gsize = ((height - 1) << 16) | (width - 1);
 
-	dprintf("omap3: attach bitmap (%d,%d) %p to screen\n", width, height, data);
+	dprintf("omap3: attach bitmap (%d,%d) to screen\n", width, height);
 
 	setreg(DISPC, DISPC_GFX_BA0, (uint32)data);
 	setreg(DISPC, DISPC_GFX_BA1, (uint32)data);
@@ -263,23 +286,21 @@ static void omap_attach_framebuffer(void *data, int width, int height, int depth
 	setreg(DISPC, DISPC_GFX_ROW_INC, 1);
 	setreg(DISPC, DISPC_GFX_PIXEL_INC, 1);
 	setreg(DISPC, DISPC_GFX_WINDOW_SKIP, 0);
-	setreg(DISPC, DISPC_GFX_ATTRIBUTES,
-	       DISPC_GFXFORMAT_RGB16
-	       | DISPC_GFXBURSTSIZE_16x32
-	       | DISPC_GFXENABLE);
+	setreg(DISPC, DISPC_GFX_ATTRIBUTES, DISPC_GFXFORMAT_RGB16
+		| DISPC_GFXBURSTSIZE_16x32 | DISPC_GFXENABLE);
 
 	// Tell hardware to update, and wait for it
-	modreg(DISPC, DISPC_CONTROL,
-	       DISPC_GOLCD,
-	       DISPC_GOLCD);
-	
+	modreg(DISPC, DISPC_CONTROL, DISPC_GOLCD, DISPC_GOLCD);
+
 	while ((readreg(DISPC, DISPC_CONTROL) & DISPC_GOLCD))
 		;
 }
 
 
-static void omap_init(void) {
-	dprintf("omap3: video_init()\n");
+status_t
+ArchFBArmOmap3::Init()
+{
+	gKernelArgs.frame_buffer.enabled = true;
 
 	setreg(DISPC_BASE, DISPC_IRQENABLE, 0x00000);
 	setreg(DISPC_BASE, DISPC_IRQSTATUS, 0x1ffff);
@@ -288,64 +309,63 @@ static void omap_init(void) {
 	omap_clock_init();
 	omap_dss_init();
 	omap_dispc_init();
+
+	return B_OK;
 }
 
 
 status_t
-arch_probe_video_mode(void)
+ArchFBArmOmap3::Probe()
 {
+
+#if 0
+	// TODO: More dynamic framebuffer base?
+	if (!fBase) {
+		int err = platform_allocate_region(&gFrameBufferBase,
+			gKernelArgs.frame_buffer.physical_buffer.size, 0, false);
+		if (err < B_OK) return err;
+		gKernelArgs.frame_buffer.physical_buffer.start
+			= (addr_t)gFrameBufferBase;
+		dprintf("video framebuffer: %p\n", gFrameBufferBase);
+	}
+#else
+	gKernelArgs.frame_buffer.physical_buffer.start = fBase;
+#endif
+
 	gKernelArgs.frame_buffer.depth = 16;
 	gKernelArgs.frame_buffer.width = 1024;
 	gKernelArgs.frame_buffer.height = 768;
 	gKernelArgs.frame_buffer.bytes_per_row = gKernelArgs.frame_buffer.width * 2;
-	gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
+	gKernelArgs.frame_buffer.physical_buffer.size
+		= gKernelArgs.frame_buffer.width
 		* gKernelArgs.frame_buffer.height
 		* gKernelArgs.frame_buffer.depth / 8;
 
-#if 0
-	if (!gFrameBufferBase) {
-		int err = platform_allocate_region(&gFrameBufferBase, gKernelArgs.frame_buffer.physical_buffer.size, 0, false);
-		if (err < B_OK) return err;
-		gKernelArgs.frame_buffer.physical_buffer.start = (addr_t)gFrameBufferBase;
-		dprintf("video framebuffer: %p\n", gFrameBufferBase);
-	}
-#else
-	gFrameBufferBase = (void *)0x88000000;
-	gKernelArgs.frame_buffer.physical_buffer.start = (addr_t)gFrameBufferBase;
-#endif
-
-	dprintf("video mode: %ux%ux%u\n", gKernelArgs.frame_buffer.width,
+	TRACE("video mode: %ux%ux%u\n", gKernelArgs.frame_buffer.width,
 		gKernelArgs.frame_buffer.height, gKernelArgs.frame_buffer.depth);
 
-	gKernelArgs.frame_buffer.enabled = true;
-
-	omap_init();
-
 	return B_OK;
 }
 
 
 status_t
-arch_set_video_mode(int width, int height, int depth)
+ArchFBArmOmap3::SetVideoMode(int width, int height, int depth)
 {
-	dprintf("arch_set_video_mode %d,%d @ %d\n", width, height, depth);
+	TRACE("%s: %dx%d@%d\n", __func__, width, height, depth);
 
 	omap_set_lcd_mode(width, height);
-	omap_attach_framebuffer(gFrameBufferBase, width, height, depth);
+	omap_attach_framebuffer(fBase, width, height, depth);
 
 	return B_OK;
 }
 
 
 status_t
-arch_set_default_video_mode()
+ArchFBArmOmap3::SetDefaultMode()
 {
-	dprintf("arch_set_default_video_mode()\n");
+	CALLED();
 
-	return arch_set_video_mode(1024, 768, 16);
+	return SetVideoMode(gKernelArgs.frame_buffer.width,
+		gKernelArgs.frame_buffer.height,
+		gKernelArgs.frame_buffer.depth);
 }
-
-
-#endif
-
-
