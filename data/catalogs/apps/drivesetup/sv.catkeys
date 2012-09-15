@@ -68,7 +68,7 @@ Size	PartitionList		Storlek
 Wipe (not implemented)	MainWindow		Formatera (inte implementerat)
 Validation of the given initialization parameters failed.	MainWindow		Utvärdering av de givna initialiseringsparametrarna misslyckades.
 The selected partition does not contain a partitioning system.	MainWindow		Den valda partitionen innehåller inget partitionssystem.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringarna till disken?\n\nAll data på partitionen kommer att gå förlorad!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringarna till disken?\n\nAll data på partitionen %s kommer att gå förlorad!
 The partition %s is currently mounted.	MainWindow		Partitionen %s är monterad.
 Partition size	CreateParamsPanel		Partitionsstorlek
 Surface test (not implemented)	MainWindow		Yttest (inte implementerat)

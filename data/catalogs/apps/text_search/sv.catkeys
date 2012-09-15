@@ -1,5 +1,5 @@
 1	swedish	x-vnd.Haiku.TextSearch	1180598828
-%s: Not enough room to escape the filename.	Grepper		Saknar utrymme för att koda om filnamnet
+%s: Not enough room to escape the filename.	Grepper		%s: Saknar utrymme för att koda om filnamnet.
 Trim to selection	GrepWindow		Avgränsa sökning till markerade filer
 Follow symbolic links	GrepWindow		Följ symboliska länkar
 Close	GrepWindow		Stäng

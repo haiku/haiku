@@ -1,12 +1,20 @@
-1	swedish	x-vnd.Haiku-VirtualMemory	1828586495
+1	swedish	x-vnd.Haiku-VirtualMemory	1952476689
+Quit	SettingsWindow		Avsluta
 Turn off	SettingsWindow		Stäng av
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Om du stänger av det virtuella minnet så kommer det att orsaka instabilitet i systemet när minnet är fullt.\nVirtuellt minne påverkar inte systemets prestanda när det inte används.\n\nÄr du säker på att du vill inaktivera virtuellt minne?
 Requested swap file size:	SettingsWindow		Begärd växlingsfils storlek:
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Inställningan som finns i settings filen är inte rätt. Du kan ladda standardvärden eller avsluta.
 Defaults	SettingsWindow		Förval
+Current Swap:	SettingsWindow		Aktuell Swap:
 Use volume:	SettingsWindow		Använd volym:
 Keep enabled	SettingsWindow		Behåll aktiverad
 Revert	SettingsWindow		Återgå
 VirtualMemory	System name		VirtuelltMinne
+Choose swap size automatically	SettingsWindow		Välj swap storlek automatiskt
+Use boot volume	SettingsWindow		Använd boot volym
+Load defaults	SettingsWindow		Läs in standardvärden
 OK	VirtualMemoryApp		OK
+Changes will take effect upon reboot.	SettingsWindow		Ändringarna kommer att aktiveras vid omstart.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtuelltMinne\n\tskriven av Axel Dörfler\n\tCopyright 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Volumen som är specificerad i settings filen kunde inte hittas. Du kan ladda standardvärden eller avsluta.
 Enable virtual memory	SettingsWindow		Aktivera virtuellt minne

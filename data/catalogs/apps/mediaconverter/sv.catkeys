@@ -63,6 +63,6 @@ Video quality: %3d%%	MediaConverter		Videokvalité: %3d%%
 Output folder	MediaConverter		Utmapp
 Audio quality: %3d%%	MediaConverter		Ljudkvalité: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ett fel uppstod vid inläsning av filinformationen.\n\nFel:
-Error read video frame %Ld	MediaConverter		Fel vid inläsning av bildruta %ld
+Error read video frame %Ld	MediaConverter		Fel vid inläsning av bildruta %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles kändes inte igen som mediafiler:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rutor

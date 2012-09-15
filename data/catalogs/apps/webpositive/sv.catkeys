@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	1680292693
+1	swedish	x-vnd.Haiku-WebPositive	91091519
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -27,3 +27,11 @@ Next	WebPositive Window		Nästa
 Find next	WebPositive Window		Sök nästa
 Download folder:	Settings Window		Hämtningsmapp:
 Edit	WebPositive Window		Redigera
+Cancel	Authentication Panel		Avbryt
+Match case	WebPositive Window		Exakt jämförelse
+Search page:	Settings Window		Söksida:
+Quit	WebPositive Window		Avsluta
+Cancel	WebPositive Window		Avbryt
+Settings	WebPositive Window		Inställningar
+Paste	URL Bar		Klistra in
+Cancel	Download Window		Avbryt

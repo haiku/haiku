@@ -1,10 +1,11 @@
-1	swedish	x-vnd.Be-MAIL	3894297683
+1	swedish	x-vnd.Be-MAIL	3423874204
 View	Mail		Visa
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Bifoga attribut:
 Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsekvens uppstod i ångra/gör om-bufferten.
 An error occurred trying to save the attachment.	Mail		Ett fel uppstod när den bifogade filen försökte sparas.
 Copy to new	Mail		Kopiera till ny
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lämna som 'Ny'
 Edit	Mail		Redigera
 Print	Mail		Skriv ut
 <none>	Mail		<ingen>
@@ -25,15 +26,81 @@ Expert	Mail		Expert
 Reply account:	Mail		Konto för att svara på e-post:
 Discard	Mail		Kasta bort
 Message	Mail		Meddelande
+Settings…	Mail		Inställningar…
 Reply to sender	Mail		Svara avsändare
 There is no installed handler for URL links.	Mail		Det finns ingen behandlare installerad för att hantera URL-länkar
 Signature	Mail		Signatur
 Find again	Mail		Sök igen
+Bcc:	Mail		Blindkopia:
 Signature:	Mail		Signatur:
+Save changes to this signature?	Mail		Spara ändringar till denna signatur?
+Cc:	Mail		Kopia:
+Off	Mail		Av
+Find	Mail		Sök
 Undo	Mail		Ångra
 Date:	Mail		Datum:
+An error occurred trying to open this signature.	Mail		Ett fel uppstod när signaturen skulle öppnas.
+No file attributes, just plain data	Mail		Inga fil attribut, bara vanlig data
+Edit queries…	Mail		Editera frågor…
+queries	B_USER_DIRECTORY/mail/queries		frågor
 Paste	Mail		Klistra in
 in	B_USER_DIRECTORY/mail/in		i
 Save attachment…	Mail		Spara bilagor...
+Include file attributes in attachments	Mail		Inkludera fil attribut i bifogade filer
+OK	Mail		OK
+Send	Mail		Skicka
+Show icons only	Mail		Visa iconer bara
+Hide	Mail		Dölj
+Forward without attachments	Mail		Vidarebefordra utan bifigade filer
+Previous	Mail		Föregående
+Redo	Mail		Upprepa
+Mail	System name		E-post
 Print…	Mail		Skriv ut…
+Quit	Mail		Avsluta
+%n - Full name	Mail		%n - Hela namnet
+ Read 	Mail		 Läs 
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Trash	Mail		Papperskorg
+Size:	Mail		Storlek:
+Edit signatures…	Mail		Redigera signaturer…
+New	Mail		Nytt
+Attachments: 	Mail		Bilagor: 
+On	Mail		På
+Set to %s	Mail		Ställ in %s
+Forward	Mail		Vidarebefordra
+Find…	Mail		Sök...
+Mail preferences	Mail		E-postinställningar
+Leave same	Mail		Lämna samma
+Page setup…	Mail		Sidinställningar…
+Text wrapping:	Mail		Textradbrytning:
+Revert	Mail		Återgå
+File	Mail		Arkiv
+mail	B_USER_DIRECTORY/mail		e-post
+None	Mail		Ingen
+out	B_USER_DIRECTORY/mail/out		ut
+Show header	Mail		Visa header
+%e - E-mail address	Mail		%e - E-postadress
+Show raw message	Mail		Visa meddelande
+\\n - Newline	Mail		\\n - Ny rad
+Close	Mail		Stäng
+No matches	Mail		Inga träffar
+Open	Mail		Öppna
+User interface	Mail		Användargränssnitt
+Cancel	Mail		Avbryt
+Send message	Mail		Skicka meddelande
+Account:	Mail		Konto:
+Decoding:	Mail		Avkodar:
+Delete	Mail		Ta bort
+Copy	Mail		Kopiera
 Signatures	Mail		Signaturer
+Next	Mail		Nästa
+Use default account	Mail		Använd standardkonto
+Encoding:	Mail		Kodning:
+Font:	Mail		Typsnitt:
+Cut	Mail		Klipp ut
+Check spelling	Mail		Kontrollera stavning
+Open this link	Mail		Öppna denna länk
+Add signature	Mail		Lägg till signatur
+Unread	Mail		Oläst
+Move to trash	Mail		Flytta till papperskorg
+Select all	Mail		Markera alla

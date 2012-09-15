@@ -1,8 +1,9 @@
-1	swedish	x-vnd.Haiku-RAWTranslator	2229230003
+1	swedish	x-vnd.Haiku-RAWTranslator	2975919330
 RAWTranslator Settings	ConfigView		RAW översättare inställningar
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 RAW image translator	RAWTranslator		RAW bildöversättare
 RAW Settings	RAWTranslator main		RAW inställningar
 RAW images	RAWTranslator		RAW bilder
-%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	% RAW bild
+RAW image translator	ConfigView		RAW bildöversättare
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW bild
 Based on Dave Coffin's dcraw 8.63	ConfigView		Baserat på Dave Coffin's dcraw 8.63

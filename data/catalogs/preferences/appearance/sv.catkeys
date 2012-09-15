@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Appearance	3047172181
+1	swedish	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		Vanlig font:
 Control highlight	Colors tab		Framhävd kontroll
 Control border	Colors tab		Kontrollkant
@@ -39,6 +39,7 @@ Colors	APRWindow		Färger
 Control background	Colors tab		Kontrollbakgrund
 Inactive window tab	Colors tab		Flikfärg för inaktiva fönster
 Appearance	System name		Utseende
+Use double scrollbar arrows	DecorSettingsView		Använd dubbelpilarna
 Fixed font:	Font view		Fixerad font:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Flygande bäckasiner söka strax hwila på mjuka tuvor.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Minska färgintensitet på färgade kanter:
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		Kantfärg för valt menyalternativ
 Strong	AntialiasingSettingsView		Framhävd
 Panel text	Colors tab		Paneltext
 Monospaced fonts only	AntialiasingSettingsView		Endast typsnitt med fast bredd
+Look and feel	APRWindow		Utseende och beteende
 Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
 Fonts	APRWindow		Typsnitt
 Glyph hinting:	AntialiasingSettingsView		Betona typsnitt:

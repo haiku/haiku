@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	3952543106
+1	swedish	x-vnd.Haiku-About	2547069165
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Upphovsrätt © 1999-2010 skaparna av Gutenprint. Med ensamrätt.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (och hans NewOS-kärna)\n
 BSD (4-clause)	AboutView		BSD (4-klausul)
@@ -42,6 +42,7 @@ Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Upphovsrätt © 1994-2009 Thomas G. Lane och Guido Vollbeding. Denna programvara är baserat på delar av arbetet av Independent JPEG Group.
 Past maintainers:\n	AboutView		Tidigare projektledare:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nSärskilt tack till:\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…och troligtvis fler. Förlåt om vi glömt någon!\n\n
 Licenses: 	AboutView		Licenser: 
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Upphovsrätt © 1995-2004 Jean-Ioup och Mark Adler.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Upphovsrätt © 2002-2003 Steve Lhomme. Med ensamrätt.
@@ -53,6 +54,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		Tid sedan uppstart:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Innehåller mjukvara utvecklat av The NetBSD Foundation, Inc och dess bidragsgivare:\nftp,tput\nUpphovsrätt © 1996-2008 The NetBSD Foundation, Inc. Med ensamrätt.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Innehåller programvara från FreeBSD Projektet, utgivna under BSD licensen:\ncal, ftpd, ping, telnet, telnetd, traceroute\nUpphobsrätt © 1994-2008 FreeBSD Projektet. Med ensamrätt.
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google och deras Google Summer of Code och Google Code In program\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Upphovsrätt © 1995, 1998-2001 Jef Poskanzer. Med ensamrätt.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Upphovsrätt © 2010-2011 Google Inc. Med ensamrätt.
@@ -74,6 +76,7 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Upphov
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Upphovsrätt © 1997-2006 PDFlib GmbH och Thomas Merz. Med ensamrätt.\nPDFlib och PDFlib logotypen är registrerade varumärken av PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Upphovsrätt © 1991-2000 Silicon Graphics, Inc. Med ensamrätt.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Innehåller programvara från GNU Projektet, utgivet under GPL och LGPL licenserna:\nGNU C Bibilioteket, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nUpphovsrätt © The Free Software Foundation.
+…and the many people making donations!\n\n	AboutView		…och alla de som har skänkt pengar!\n\n
 MIT license. All rights reserved.	AboutView		MIT licens. Med ensamrätt.
 [Click a license name to read the respective license.]\n\n	AboutView		[Klicka på ett licensnamn för att läsa respektive licens.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Upphovsrätt © 2007 Ralink Technology Corporation. Med ensamrätt.
