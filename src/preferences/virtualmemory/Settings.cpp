@@ -166,7 +166,6 @@ Settings::ReadSwapSettings()
 	SetSwapAutomatic(get_driver_boolean_parameter(settings,
 		"swap_auto", true, false));
 	SetSwapSize(atoll(size));
-	unload_driver_settings(settings);
 
 	int32 bestScore = -1;
 	dev_t bestVol = -1;
