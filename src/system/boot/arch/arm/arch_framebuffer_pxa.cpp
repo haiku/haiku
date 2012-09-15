@@ -10,13 +10,13 @@
 
 #include "arch_framebuffer.h"
 
+#include <arch/arm/pxa270.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
 #include <boot/platform/generic/video.h>
-#include <board_config.h>
 #include <util/list.h>
 #include <drivers/driver_settings.h>
 
@@ -101,7 +101,7 @@ dprintf("error %08x\n", err);
 		return B_NO_INIT;
 
 	pixelFormat = bppCode = read_io_32(LCCR3);
-	bppCode = (bppCode >> 26) & 0x08 | (bppCode >> 24) & 0x07;
+	bppCode = ((bppCode >> 26) & 0x08) | ((bppCode >> 24) & 0x07);
 	pixelFormat >>= 30;
 
 	dma = (struct pxa27x_lcd_dma_descriptor *)(read_io_32(FDADR0) & ~0x0f);
@@ -147,7 +147,7 @@ status_t
 ArchFBArmPxa270::SetVideoMode(int width, int height, int depth)
 {
 	dprintf("%s(%d, %d, %d)\n", __FUNCTION__, width, height, depth);
-	status_t err;
+
 	void *fb;
 	uint32 fbSize = width * height * depth / 8;
 	//fb = malloc(800 * 600 * 4 + 16 - 1);

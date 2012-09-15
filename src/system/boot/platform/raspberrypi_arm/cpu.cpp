@@ -10,6 +10,7 @@
 #include <arch/cpu.h>
 #include <arch_kernel.h>
 #include <arch_system_info.h>
+#include <boot/stage2.h>
 
 #include <string.h>
 

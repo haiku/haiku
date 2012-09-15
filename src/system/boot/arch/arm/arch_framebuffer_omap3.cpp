@@ -17,7 +17,6 @@
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
 #include <boot/platform/generic/video.h>
-#include <board_config.h>
 #include <util/list.h>
 #include <drivers/driver_settings.h>
 
