@@ -20,8 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 //XXX
-extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags);
+extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
+	uint32 flags);
 
 
 #define TRACE_VIDEO
@@ -35,7 +37,6 @@ extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, u
 #define read_io_32(a) (*(vuint32 *)a)
 
 #define dumpr(a) dprintf("LCC:%s:0x%lx\n", #a, read_io_32(a))
-
 
 
 #if BOARD_CPU_OMAP3
@@ -87,13 +88,15 @@ struct video_mode modes[] = {
 };
 
 
-static inline void setaddr(uint32 reg, unsigned int v)
+static inline void
+setaddr(uint32 reg, unsigned int v)
 {
 	*((volatile uint32 *)(reg)) = v;
 }
 
 
-static inline void modaddr(unsigned int reg, unsigned int m, unsigned int v)
+static inline void
+modaddr(unsigned int reg, unsigned int m, unsigned int v)
 {
 	uint32 o;
 
@@ -104,31 +107,35 @@ static inline void modaddr(unsigned int reg, unsigned int m, unsigned int v)
 }
 
 
-static inline void setreg(uint32 base, unsigned int reg, unsigned int v)
+static inline
+void setreg(uint32 base, unsigned int reg, unsigned int v)
 {
-	*((volatile uint32 *)(base+reg)) = v;
+	*((volatile uint32 *)(base + reg)) = v;
 }
 
 
-static inline uint32 readreg(uint32 base, unsigned int reg)
+static inline
+uint32 readreg(uint32 base, unsigned int reg)
 {
-	return *((volatile uint32 *)(base+reg));
+	return *((volatile uint32 *)(base + reg));
 }
 
 
-static inline void modreg(uint32 base, unsigned int reg, unsigned int m, unsigned int v)
+static inline void
+modreg(uint32 base, unsigned int reg, unsigned int m, unsigned int v)
 {
 	uint32 o;
 
-	o = *((volatile uint32 *)(base+reg));
+	o = *((volatile uint32 *)(base + reg));
 	o &= ~m;
 	o |= v;
-	*((volatile uint32 *)(base+reg)) = o;
+	*((volatile uint32 *)(base + reg)) = o;
 }
 
 
 // init beagle gpio for video
-static void omap_beagle_init(void)
+static void
+omap_beagle_init(void)
 {
 	// setup GPIO stuff, i can't find any references to these
 	setreg(GPIO1_BASE, GPIO_OE, 0xfefffedf);
@@ -137,7 +144,8 @@ static void omap_beagle_init(void)
 }
 
 
-static void omap_clock_init(void)
+static void
+omap_clock_init(void)
 {
 	// sets pixel clock to 72MHz
 
@@ -159,15 +167,18 @@ static void omap_clock_init(void)
 }
 
 
-static void omap_dss_init(void)
+static void
+omap_dss_init(void)
 {
 	setreg(DSS_BASE, DSS_SYSCONFIG, DSS_AUTOIDLE);
 	// Select DSS1 ALWON as clock source
-	setreg(DSS_BASE, DSS_CONTROL, DSS_VENC_OUT_SEL | DSS_DAC_POWERDN_BGZ | DSS_DAC_DEMEN | DSS_VENC_CLOCK_4X_ENABLE);
+	setreg(DSS_BASE, DSS_CONTROL, DSS_VENC_OUT_SEL | DSS_DAC_POWERDN_BGZ
+		| DSS_DAC_DEMEN | DSS_VENC_CLOCK_4X_ENABLE);
 }
 
 
-static void omap_dispc_init(void)
+static void
+omap_dispc_init(void)
 {
 	uint32 DISPC = DISPC_BASE;
 
@@ -220,18 +231,18 @@ static void omap_set_lcd_mode(int w, int h) {
 
 	dprintf("omap3: set_lcd_mode %d,%d\n", w, h);
 
-	for (i=0;i<sizeof(modes)/sizeof(modes[0]);i++) {
-		if (w <= modes[i].width 
-		    && h <= modes[i].height)
+	for (i = 0; i < sizeof(modes) / sizeof(modes[0]); i++) {
+		if (w <= modes[i].width
+			&& h <= modes[i].height)
 		goto found;
 	}
 	i -= 1;
 found:
 	m = &modes[i];
-	
+
 	dprintf("omap3: found mode[%s]\n", m->name);
 
-	setreg(DISPC, DISPC_SIZE_LCD, (m->width - 1) | ((m->height-1) << 16));
+	setreg(DISPC, DISPC_SIZE_LCD, (m->width - 1) | ((m->height - 1) << 16));
 	setreg(DISPC, DISPC_TIMING_H, m->dispc_timing_h);
 	setreg(DISPC, DISPC_TIMING_V, m->dispc_timing_v);
 
@@ -240,18 +251,19 @@ found:
 
 	// Tell hardware to update, and wait for it
 	modreg(DISPC, DISPC_CONTROL,
-	      DISPC_GOLCD,
-	      DISPC_GOLCD);
+		DISPC_GOLCD,
+		DISPC_GOLCD);
 
 	while ((readreg(DISPC, DISPC_CONTROL) & DISPC_GOLCD))
 		;
 }
 
 
-static void omap_attach_framebuffer(void *data, int width, int height, int depth)
+static void
+omap_attach_framebuffer(void *data, int width, int height, int depth)
 {
 	uint32 DISPC = DISPC_BASE;
-	uint32 gsize = ((height-1)<<16) | (width-1);
+	uint32 gsize = ((height - 1) << 16) | (width - 1);
 
 	dprintf("omap3: attach bitmap (%d,%d) %p to screen\n", width, height, data);
 
@@ -263,22 +275,20 @@ static void omap_attach_framebuffer(void *data, int width, int height, int depth
 	setreg(DISPC, DISPC_GFX_ROW_INC, 1);
 	setreg(DISPC, DISPC_GFX_PIXEL_INC, 1);
 	setreg(DISPC, DISPC_GFX_WINDOW_SKIP, 0);
-	setreg(DISPC, DISPC_GFX_ATTRIBUTES,
-	       DISPC_GFXFORMAT_RGB16
-	       | DISPC_GFXBURSTSIZE_16x32
-	       | DISPC_GFXENABLE);
+	setreg(DISPC, DISPC_GFX_ATTRIBUTES, DISPC_GFXFORMAT_RGB16
+		| DISPC_GFXBURSTSIZE_16x32 | DISPC_GFXENABLE);
 
 	// Tell hardware to update, and wait for it
-	modreg(DISPC, DISPC_CONTROL,
-	       DISPC_GOLCD,
-	       DISPC_GOLCD);
-	
+	modreg(DISPC, DISPC_CONTROL, DISPC_GOLCD, DISPC_GOLCD);
+
 	while ((readreg(DISPC, DISPC_CONTROL) & DISPC_GOLCD))
 		;
 }
 
 
-static void omap_init(void) {
+static void
+omap_init(void)
+{
 	dprintf("omap3: video_init()\n");
 
 	setreg(DISPC_BASE, DISPC_IRQENABLE, 0x00000);
@@ -298,15 +308,18 @@ arch_probe_video_mode(void)
 	gKernelArgs.frame_buffer.width = 1024;
 	gKernelArgs.frame_buffer.height = 768;
 	gKernelArgs.frame_buffer.bytes_per_row = gKernelArgs.frame_buffer.width * 2;
-	gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
+	gKernelArgs.frame_buffer.physical_buffer.size
+		= gKernelArgs.frame_buffer.width
 		* gKernelArgs.frame_buffer.height
 		* gKernelArgs.frame_buffer.depth / 8;
 
 #if 0
 	if (!gFrameBufferBase) {
-		int err = platform_allocate_region(&gFrameBufferBase, gKernelArgs.frame_buffer.physical_buffer.size, 0, false);
+		int err = platform_allocate_region(&gFrameBufferBase,
+			gKernelArgs.frame_buffer.physical_buffer.size, 0, false);
 		if (err < B_OK) return err;
-		gKernelArgs.frame_buffer.physical_buffer.start = (addr_t)gFrameBufferBase;
+		gKernelArgs.frame_buffer.physical_buffer.start
+			= (addr_t)gFrameBufferBase;
 		dprintf("video framebuffer: %p\n", gFrameBufferBase);
 	}
 #else
@@ -347,5 +360,3 @@ arch_set_default_video_mode()
 
 
 #endif
-
-

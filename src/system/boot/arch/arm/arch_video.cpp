@@ -20,8 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 //XXX
-extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags);
+extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
+	uint32 flags);
 
 
 #define TRACE_VIDEO
@@ -35,7 +37,6 @@ extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, u
 #define read_io_32(a) (*(vuint32 *)a)
 
 #define dumpr(a) dprintf("LCC:%s:0x%lx\n", #a, read_io_32(a))
-
 
 
 #if !BOARD_CPU_PXA270 && !BOARD_CPU_OMAP3 && !BOARD_CPU_ARM920T
@@ -64,5 +65,3 @@ arch_set_default_video_mode()
 
 
 #endif
-
-

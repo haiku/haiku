@@ -20,8 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 //XXX
-extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags);
+extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
+	uint32 flags);
 
 
 #define TRACE_VIDEO
@@ -37,9 +39,11 @@ extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, u
 #define dumpr(a) dprintf("LCC:%s:0x%lx\n", #a, read_io_32(a))
 
 
-
 #if BOARD_CPU_ARM920T
+
+
 //	#pragma mark -
+
 
 extern void *gFrameBufferBase;
 
@@ -50,15 +54,18 @@ arch_probe_video_mode(void)
 	gKernelArgs.frame_buffer.width = 1024;
 	gKernelArgs.frame_buffer.height = 768;
 	gKernelArgs.frame_buffer.bytes_per_row = gKernelArgs.frame_buffer.width * 2;
-	gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
+	gKernelArgs.frame_buffer.physical_buffer.size
+		= gKernelArgs.frame_buffer.width
 		* gKernelArgs.frame_buffer.height
 		* gKernelArgs.frame_buffer.depth / 8;
 
 #if 0
 	if (!gFrameBufferBase) {
-		int err = platform_allocate_region(&gFrameBufferBase, gKernelArgs.frame_buffer.physical_buffer.size, 0, false);
+		int err = platform_allocate_region(&gFrameBufferBase,
+			gKernelArgs.frame_buffer.physical_buffer.size, 0, false);
 		if (err < B_OK) return err;
-		gKernelArgs.frame_buffer.physical_buffer.start = (addr_t)gFrameBufferBase;
+		gKernelArgs.frame_buffer.physical_buffer.start
+			= (addr_t)gFrameBufferBase;
 		dprintf("video framebuffer: %p\n", gFrameBufferBase);
 	}
 #else
