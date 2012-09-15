@@ -164,11 +164,11 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 	device_geometry biosGeometry;
 	device_geometry deviceGeometry;
 	partition_info 	partitionInfo;
-	
+
 	isRawDevice = 0 != strstr(device, "/raw");
-	hasBiosGeometry = B_OK == ioctl(fd, B_GET_BIOS_GEOMETRY, &biosGeometry);
-	hasDeviceGeometry = B_OK == ioctl(fd, B_GET_GEOMETRY, &deviceGeometry);
-	hasPartitionInfo = B_OK == ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo);
+	hasBiosGeometry = B_OK == ioctl(fd, B_GET_BIOS_GEOMETRY, &biosGeometry, sizeof(biosGeometry));
+	hasDeviceGeometry = B_OK == ioctl(fd, B_GET_GEOMETRY, &deviceGeometry, sizeof(deviceGeometry));
+	hasPartitionInfo = B_OK == ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo, sizeof(partitionInfo));
 
 	if (!isRawDevice && !hasBiosGeometry && !hasDeviceGeometry && !hasPartitionInfo)
 		isRawDevice = true;
@@ -198,13 +198,16 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 	if (!isRawDevice && !hasPartitionInfo) {
 		fprintf(stderr,"Warning: couldn't get partition information\n");
 	}
-	if (	(hasPartitionInfo && partitionInfo.logical_block_size != 512) 
-		||	(hasBiosGeometry && biosGeometry.bytes_per_sector != 512) 
+	if ((hasBiosGeometry && biosGeometry.bytes_per_sector != 512) 
 		||	(hasDeviceGeometry && deviceGeometry.bytes_per_sector != 512)) {
-		fprintf(stderr,"Error: block size not 512 bytes\n");
+		fprintf(stderr,"Error: geometry block size not 512 bytes\n");
 		close(fd);
 		return B_ERROR;
+	} else if (hasPartitionInfo && partitionInfo.logical_block_size != 512) {
+		printf("partition logical block size is not 512, it's %ld bytes\n",
+			partitionInfo.logical_block_size);
 	}
+
 	if (hasDeviceGeometry && deviceGeometry.read_only) {
 		fprintf(stderr,"Error: this is a read-only device\n");
 		close(fd);
@@ -321,7 +324,7 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 	uint8 biosDriveId;
 
 	// get bios drive-id, or use 0x80
-	if (B_OK != ioctl(fd, B_GET_BIOS_DRIVE_ID, &biosDriveId)) {
+	if (B_OK != ioctl(fd, B_GET_BIOS_DRIVE_ID, &biosDriveId, sizeof(biosDriveId))) {
 		biosDriveId = 0x80;
 	} else {
 		printf("bios drive id: 0x%02x\n", (int)biosDriveId);

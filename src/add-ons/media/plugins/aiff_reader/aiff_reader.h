@@ -33,16 +33,16 @@ class aiffReader : public Reader
 public:
 				aiffReader();
 				~aiffReader();
-	
+
 	const char *Copyright();
-	
+
 	status_t	Sniff(int32 *streamCount);
 
 	void		GetFileFormatInfo(media_file_format *mff);
 
 	status_t	AllocateCookie(int32 streamNumber, void **cookie);
 	status_t	FreeCookie(void *cookie);
-	
+
 	status_t	GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 							  media_format *format, const void **infoBuffer, size_t *infoSize);
 
@@ -54,20 +54,20 @@ public:
 							 const void **chunkBuffer, size_t *chunkSize,
 							 media_header *mediaHeader);
 private:
-	uint32		DecodeFrameRate(void *_80bit_float);
-									 
+	uint32		DecodeFrameRate(const void *_80bit_float);
+
 	BPositionIO *Source() { return fSource; }
-	
+
 private:
 	BPositionIO *	fSource;
-	
+
 	media_format	fFormat;
 	int64			fDataStart;
 	int64			fDataSize;
 
 	int64			fFrameCount;
 	bigtime_t		fDuration;
-	
+
 	bool			fRaw;
 
 	int64			fPosition;

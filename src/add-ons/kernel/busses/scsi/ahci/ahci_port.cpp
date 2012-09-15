@@ -398,12 +398,12 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 		TRACE("Interface Non Fatal Error\n");
 	}
 	if (is & PORT_INT_OF) {
-		TRACE("Overflow");
+		TRACE("Overflow\n");
 		fResetPort = true;
 		fError = true;
 	}
 	if (is & PORT_INT_IPM) {
-		TRACE("Incorrect Port Multiplier Status");
+		TRACE("Incorrect Port Multiplier Status\n");
 	}
 	if (is & PORT_INT_PRC) {
 		TRACE("PhyReady Change\n");
@@ -548,7 +548,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 {
 	TRACE("AHCIPort::ScsiInquiry port %d\n", fIndex);
 
-	scsi_cmd_inquiry *cmd = (scsi_cmd_inquiry *)request->cdb;
+	const scsi_cmd_inquiry *cmd = (const scsi_cmd_inquiry *)request->cdb;
 	scsi_res_inquiry scsiData;
 	ata_device_infoblock ataData;
 
@@ -679,22 +679,50 @@ AHCIPort::ScsiReadCapacity(scsi_ccb *request)
 {
 	TRACE("AHCIPort::ScsiReadCapacity port %d\n", fIndex);
 
-	scsi_cmd_read_capacity *cmd = (scsi_cmd_read_capacity *)request->cdb;
+	const scsi_cmd_read_capacity *cmd = (const scsi_cmd_read_capacity *)request->cdb;
 	scsi_res_read_capacity scsiData;
 
 	if (cmd->pmi || cmd->lba || request->data_length < sizeof(scsiData)) {
 		TRACE("invalid request\n");
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
 		return;
 	}
 
 	TRACE("SectorSize %" B_PRIu32 ", SectorCount 0x%" B_PRIx64 "\n",
 		fSectorSize, fSectorCount);
 
-	if (fSectorCount > 0xffffffff)
-		panic("ahci: SCSI emulation doesn't support harddisks larger than 2TB");
+	scsiData.block_size = B_HOST_TO_BENDIAN_INT32(fSectorSize);
+
+	if (fSectorCount <= 0xffffffff)
+		scsiData.lba = B_HOST_TO_BENDIAN_INT32(fSectorCount - 1);
+	else
+		scsiData.lba = 0xffffffff;
+
+	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData,
+			sizeof(scsiData)) < B_OK) {
+		request->subsys_status = SCSI_DATA_RUN_ERR;
+	} else {
+		request->subsys_status = SCSI_REQ_CMP;
+		request->data_resid = request->data_length - sizeof(scsiData);
+	}
+	gSCSI->finished(request, 1);
+}
+
+
+void
+AHCIPort::ScsiReadCapacity16(scsi_ccb *request)
+{
+	TRACE("AHCIPort::ScsiReadCapacity16 port %d\n", fIndex);
+
+	//const scsi_cmd_read_capacity_long *cmd = (const scsi_cmd_read_capacity_long *)request->cdb;
+	scsi_res_read_capacity_long scsiData;
+
+	TRACE("SectorSize %" B_PRIu32 ", SectorCount 0x%" B_PRIx64 "\n",
+		fSectorSize, fSectorCount);
 
 	scsiData.block_size = B_HOST_TO_BENDIAN_INT32(fSectorSize);
-	scsiData.lba = B_HOST_TO_BENDIAN_INT32(fSectorCount - 1);
+	scsiData.lba = B_HOST_TO_BENDIAN_INT64(fSectorCount - 1);
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData,
 			sizeof(scsiData)) < B_OK) {
@@ -731,6 +759,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount,
 		TRACE("out of memory when allocating read/write request\n");
 		request->subsys_status = SCSI_REQ_ABORTED;
 		gSCSI->finished(request, 1);
+		return;
 	}
 
 	if (fUse48BitCommands) {
@@ -914,13 +943,21 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		case SCSI_OP_READ_CAPACITY:
 			ScsiReadCapacity(request);
 			break;
+		case SCSI_OP_SERVICE_ACTION_IN:
+			if ((request->cdb[1] & 0x1f) == SCSI_SAI_READ_CAPACITY_16)
+				ScsiReadCapacity16(request);
+			else {
+				request->subsys_status = SCSI_REQ_INVALID;
+				gSCSI->finished(request, 1);
+			}
+			break; 
 		case SCSI_OP_SYNCHRONIZE_CACHE:
 			ScsiSynchronizeCache(request);
 			break;
 		case SCSI_OP_READ_6:
 		case SCSI_OP_WRITE_6:
 		{
-			scsi_cmd_rw_6 *cmd = (scsi_cmd_rw_6 *)request->cdb;
+			const scsi_cmd_rw_6 *cmd = (const scsi_cmd_rw_6 *)request->cdb;
 			uint32 position = ((uint32)cmd->high_lba << 16)
 				| ((uint32)cmd->mid_lba << 8) | (uint32)cmd->low_lba;
 			size_t length = cmd->length != 0 ? cmd->length : 256;
@@ -931,7 +968,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		case SCSI_OP_READ_10:
 		case SCSI_OP_WRITE_10:
 		{
-			scsi_cmd_rw_10 *cmd = (scsi_cmd_rw_10 *)request->cdb;
+			const scsi_cmd_rw_10 *cmd = (const scsi_cmd_rw_10 *)request->cdb;
 			uint32 position = B_BENDIAN_TO_HOST_INT32(cmd->lba);
 			size_t length = B_BENDIAN_TO_HOST_INT16(cmd->length);
 			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_10;
@@ -948,7 +985,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		case SCSI_OP_READ_12:
 		case SCSI_OP_WRITE_12:
 		{
-			scsi_cmd_rw_12 *cmd = (scsi_cmd_rw_12 *)request->cdb;
+			const scsi_cmd_rw_12 *cmd = (const scsi_cmd_rw_12 *)request->cdb;
 			uint32 position = B_BENDIAN_TO_HOST_INT32(cmd->lba);
 			size_t length = B_BENDIAN_TO_HOST_INT32(cmd->length);
 			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_12;
@@ -962,9 +999,26 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 			}
 			break;
 		}
+		case SCSI_OP_READ_16:
+		case SCSI_OP_WRITE_16:
+		{
+			const scsi_cmd_rw_16 *cmd = (const scsi_cmd_rw_16 *)request->cdb;
+			uint64 position = B_BENDIAN_TO_HOST_INT64(cmd->lba);
+			size_t length = B_BENDIAN_TO_HOST_INT32(cmd->length);
+			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_16;
+			if (length) {
+				ScsiReadWrite(request, position, length, isWrite);
+			} else {
+				TRACE("AHCIPort::ScsiExecuteRequest error: transfer without "
+					"data!\n");
+				request->subsys_status = SCSI_REQ_INVALID;
+				gSCSI->finished(request, 1);
+			}
+			break;
+		}
 		case SCSI_OP_WRITE_SAME_16:
 		{
-			scsi_cmd_wsame_16 *cmd = (scsi_cmd_wsame_16 *)request->cdb;
+			const scsi_cmd_wsame_16 *cmd = (const scsi_cmd_wsame_16 *)request->cdb;
 
 			// SCSI unmap is used for trim, otherwise we don't support it
 			if (!cmd->unmap) {

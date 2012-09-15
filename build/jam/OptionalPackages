@@ -45,6 +45,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	DevelopmentMin			- development headers, libs, tools, from sources only
 #	DevelopmentPowerPC			- Cross compiling environment for PowerPC
 #	Doxygen					- Generate documentation from source code
+#	Droid					- Font family from Google's Android project
 #	Expat					- XML parsing libraries
 #	Fastdep					- fast dependency generator for C/C++ files
 #	friss					- RSS/ATOM/... feeds reader
@@ -68,6 +69,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Man						- standard commands to read man pages
 #	Mercurial				- the distributed version control system
 #	Nano					- the command line text editor
+#	Nanumfont				- Korean monospace font
 #	Neon					- support libraries used for example by SVN
 #	NetFS					- the native networked file system components
 #	NetSurf					- the web browser
@@ -213,8 +215,8 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				beam-1.2alpha-x86-gcc4-2012-08-11.zip
-				: $(baseURL)/beam-1.2alpha-x86-gcc4-2012-08-11.zip ;
+				beam-1.2alpha-r1a4-x86-gcc4-2012-09-12.zip
+				: $(baseURL)/beam-1.2alpha-r1a4-x86-gcc4-2012-09-12.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
 				beam-1.2alpha-r1a4-x86-gcc2-2012-08-29.zip
@@ -715,8 +717,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 			m4-1.4.16-r1a4-x86-gcc2-2012-08-26.zip
 			: $(baseURL)/m4-1.4.16-r1a4-x86-gcc2-2012-08-26.zip ;
 		InstallOptionalHaikuImagePackage
-			flex-2.5.35-r1a4-x86-gcc2-2012-08-26.zip
-			: $(baseURL)/flex-2.5.35-r1a4-x86-gcc2-2012-08-26.zip ;
+			flex-2.5.35-r1a4-x86-gcc2-2012-09-10.zip
+			: $(baseURL)/flex-2.5.35-r1a4-x86-gcc2-2012-09-10.zip ;
 		InstallOptionalHaikuImagePackage
 			jam-2.5-r1a4-x86-gcc2-2012-08-27.zip
 			: $(baseURL)/jam-2.5-r1a4-x86-gcc2-2012-08-27.zip ;
@@ -846,6 +848,13 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage libs tiff : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
+	CopyDirectoryToHaikuImage develop headers : 
+		[ FDirName $(HAIKU_FREETYPE_DIR) develop headers 3rdparty ] ;
+	CopyDirectoryToHaikuImage develop headers : $(HAIKU_JPEG_HEADERS)
+		: 3rdparty ;
+	CopyDirectoryToHaikuImage develop headers : $(HAIKU_LIBPNG_HEADERS)
+		: 3rdparty ;
+
 	# cpp headers
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
 		# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
@@ -898,8 +907,8 @@ if [ IsOptionalHaikuImagePackageAdded Doxygen ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				doxygen-1.6.3-x86-gcc4-2010-05-17.zip
-				: $(baseURL)/doxygen-1.6.3-x86-gcc4-2010-05-17.zip
+				doxygen-1.6.3-r1a4-x86-gcc4-2012-09-04.zip
+				: $(baseURL)/doxygen-1.6.3-r1a4-x86-gcc4-2012-09-04.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
@@ -908,6 +917,14 @@ if [ IsOptionalHaikuImagePackageAdded Doxygen ] {
 				: : true ;
 		}
 	}
+}
+
+
+# Droid
+if [ IsOptionalHaikuImagePackageAdded Droid ] {
+	InstallOptionalHaikuImagePackage
+		droid-113-r1a4-x86-gcc2-2012-08-27.zip
+		: $(baseURL)/droid-113-r1a4-x86-gcc2-2012-08-27.zip ;
 }
 
 
@@ -954,8 +971,8 @@ if [ IsOptionalHaikuImagePackageAdded friss ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				friss-24-r1a3-x86-gcc4-2011-05-31.zip
-				: $(baseURL)/friss-24-r1a3-x86-gcc4-2011-05-31.zip ;
+				friss-29-r1a4-x86-gcc4-2012-09-09.zip
+				: $(baseURL)/friss-29-r1a4-x86-gcc4-2012-09-09.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
 				friss-29-r1a4-x86-gcc2-2012-08-28.zip
@@ -1141,12 +1158,12 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.7-x86-gcc4-2012-05-19.zip
-				: $(baseURL)/KeymapSwitcher-1.2.7-x86-gcc4-2012-05-19.zip ;
+				KeymapSwitcher-1.2.7-r1a4-x86-gcc4-2012-09-09.zip
+				: $(baseURL)/KeymapSwitcher-1.2.7-r1a4-x86-gcc4-2012-09-09.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.7-x86-gcc2-2012-05-19.zip
-				: $(baseURL)/KeymapSwitcher-1.2.7-x86-gcc2-2012-05-19.zip ;
+				KeymapSwitcher-1.2.7-r1a4-x86-gcc2-2012-08-31.zip
+				: $(baseURL)/KeymapSwitcher-1.2.7-r1a4-x86-gcc2-2012-08-31.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Preferences
 			: /boot/common/bin/KeymapSwitcher ;
@@ -1273,8 +1290,12 @@ if [ IsOptionalHaikuImagePackageAdded LibXSLT ] {
 if [ IsOptionalHaikuImagePackageAdded Links ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Links available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package Links available for gcc4" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			links-2.3pre2-r1a4-x86-gcc4-2012-09-09.zip
+			: $(baseURL)/links-2.3pre2-r1a4-x86-gcc4-2012-09-09.zip ;
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/home/config/bin/links ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			links-2.3pre2-r1a4-x86-gcc2-2012-08-30.zip
@@ -1362,6 +1383,14 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 				: $(baseURL)/nano-2.2.6-r1a4-x86-gcc2-2012-08-28.zip ;
 		}
 	}
+}
+
+
+# Nanumfont
+if [ IsOptionalHaikuImagePackageAdded Nanumfont ] {
+	InstallOptionalHaikuImagePackage
+		nanumfont-2.0-r1a4-x86-gcc2-2012-09-12.zip
+		: $(baseURL)/nanumfont-2.0-r1a4-x86-gcc2-2012-09-12.zip ;
 }
 
 
@@ -1648,13 +1677,13 @@ if [ IsOptionalHaikuImagePackageAdded Rsync ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				rsync-3.0.7-r1a4-x86-gcc4-2012-08-31.zip
-				: $(baseURL)/rsync-3.0.7-r1a4-x86-gcc4-2012-08-31.zip
+				rsync-3.0.7-r1a4-x86-gcc4-2012-09-09.zip
+				: $(baseURL)/rsync-3.0.7-r1a4-x86-gcc4-2012-09-09.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				rsync-3.0.7-r1a4-x86-gcc2-2012-08-29.zip
-				: $(baseURL)/rsync-3.0.7-r1a4-x86-gcc2-2012-08-29.zip
+				rsync-3.0.7-r1a4-x86-gcc2-2012-09-12.zip
+				: $(baseURL)/rsync-3.0.7-r1a4-x86-gcc2-2012-09-12.zip
 				: : true ;
 		}
 	}
@@ -1667,12 +1696,12 @@ if [ IsOptionalHaikuImagePackageAdded Ruby ] {
 		Echo "No optional package Ruby available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			ruby-1.9.1-r1a4-x86-gcc4-2012-08-31.zip
-			: $(baseURL)/ruby-1.9.1-r1a4-x86-gcc4-2012-08-31.zip ;
+			ruby-1.9.1-r1a4-x86-gcc4-2012-09-10.zip
+			: $(baseURL)/ruby-1.9.1-r1a4-x86-gcc4-2012-09-10.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			ruby-1.9.1-r1a4-x86-gcc2-2012-08-29.zip
-			: $(baseURL)/ruby-1.9.1-r1a4-x86-gcc2-2012-08-29.zip ;
+			ruby-1.9.1-r1a4-x86-gcc2-2012-09-10.zip
+			: $(baseURL)/ruby-1.9.1-r1a4-x86-gcc2-2012-09-10.zip ;
 	}
 }
 
@@ -1788,13 +1817,13 @@ if [ IsOptionalHaikuImagePackageAdded Transmission ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				transmission-2.21-r1a4-x86-gcc4-2012-09-03.zip
-				: $(baseURL)/transmission-2.21-r1a4-x86-gcc4-2012-09-03.zip
+				transmission-2.21-r1a4-x86-gcc4-2012-09-12.zip
+				: $(baseURL)/transmission-2.21-r1a4-x86-gcc4-2012-09-12.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				transmission-2.21-r1a4-x86-gcc2-2012-08-30.zip
-				: $(baseURL)/transmission-2.21-r1a4-x86-gcc2-2012-08-30.zip
+				transmission-2.21-r1a4-x86-gcc2-2012-09-05.zip
+				: $(baseURL)/transmission-2.21-r1a4-x86-gcc2-2012-09-05.zip
 				: : true ;
 		}
 	}

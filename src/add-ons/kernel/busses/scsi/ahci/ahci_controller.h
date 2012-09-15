@@ -49,8 +49,7 @@ private:
 	volatile ahci_hba *		fRegs;
 	area_id					fRegsArea;
 	int						fCommandSlotCount;
-	int						fPortCountMax;
-	int						fPortCountAvail;
+	int						fPortCount;
 	uint32					fPortImplementedMask;
 	uint8					fIRQ;
 	AHCIPort *				fPort[32];
