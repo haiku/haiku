@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	3047172181
+1	english	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		常规字体
 Control highlight	Colors tab		控件亮度
 Control border	Colors tab		控件边界
@@ -39,6 +39,7 @@ Colors	APRWindow		颜色
 Control background	Colors tab		控件背景
 Inactive window tab	Colors tab		活动窗口标签
 Appearance	System name		外观
+Use double scrollbar arrows	DecorSettingsView		使用双向滚动栏箭头
 Fixed font:	Font view		等宽字体
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	迅捷的棕毛小狐狸越过了懒惰的大黄狗。
 Reduce colored edges filter strength:	AntialiasingSettingsView		减小彩色边缘滤色强度:
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		选择菜单项边界
 Strong	AntialiasingSettingsView		强
 Panel text	Colors tab		面板文本
 Monospaced fonts only	AntialiasingSettingsView		仅等宽字体
+Look and feel	APRWindow		外观感觉
 Antialiasing menu	AntialiasingSettingsView		抗锯齿菜单
 Fonts	APRWindow		字体
 Glyph hinting:	AntialiasingSettingsView		象形文字微调：

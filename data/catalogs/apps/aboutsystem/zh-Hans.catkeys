@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-About	3952543106
+1	english	x-vnd.Haiku-About	2547069165
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		版权 © 1999-2010 Gutenprint 的所有编写者。版权所有。
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (和他的 NewOS 内核)\n
 BSD (4-clause)	AboutView		BSD（4-条款）
@@ -42,6 +42,7 @@ Copyright © 2006-2012 Kentaro Fukuchi	AboutView		版权所有 © 2006-2012 Kent
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		版权 © 1994-2009, Thomas G. Lane, Guido Vollbeding。本软件基于 Independent JPEG Group 的部分工作。
 Past maintainers:\n	AboutView		先前维护人员：\n
 \n\nSpecial thanks to:\n	AboutView		\n\n特别感谢：\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…而且可能还有一些我们未提及的开发人员（非常抱歉）！\n\n
 Licenses: 	AboutView		协议：
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		版权 © 1995-2004 Jean-loup Gailly 与 Mark Adler。
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		版权 © 2002-2003 Steve Lhomme。版权所有。
@@ -53,6 +54,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		运行时间：
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		包含由 NetBSD Foundation, Inc 及其贡献者所开发的软件：\nftp，tput\n版权 © 1996-2008 The NetBSD Foundation, Inc。版权所有。
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		包含来自 FreeBSD Project 的软件，这些软件在 BSD 协议下发布：\ncal，ftpd，ping，telnet，telnetd，traceroute\n版权 © 1994-2008 The FreeBSD Project。版权所有。
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		谷歌及其编程之夏和Google Code In项目\n
 The Haikuware team and their bounty program\n	AboutView		 Haikuware 小组及其维护程序\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		版权 © 1995, 1998-2001 Jef Poskanzer。版权所有。
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		版权 © 2010-2011 Google Inc。版权所有。
@@ -74,6 +76,7 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		版权
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		版权 © 1997-2006 PDFlib GmbH 与 Thomas Merz。版权所有。 \nPDFlib 和 PDFlib logo 是 PDFlib GmbH 的注册商标。
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		版权所有 © 1991-2000 Silicon Graphic, Inc。保留所有权利。
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		包含来自 GNU 项目的软件，它们在 GPL 和 LGPL 协议下发布：\n GNU C 库，GNU 核心工具，diffutils，findutils，sharutils，gawk，bison，m4，make，gdb，wget，ncurses，termcap，Bourne Again Shell。\n版权 © The Free Software Foundation。
+…and the many people making donations!\n\n	AboutView		…以及其他更多的贡献者!\n\n
 MIT license. All rights reserved.	AboutView		MIT 授权。保留所有权利。
 [Click a license name to read the respective license.]\n\n	AboutView		[点击阅读下述协议。]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		版权 © 2007 Ralink Technology Corporation。版权所有。
