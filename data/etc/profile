@@ -24,7 +24,7 @@ export LC_COLLATE=$LC_MESSAGES
 export LC_CTYPE=$LC_MESSAGES
 export LC_MONETARY=$LC_NUMERIC
 
-alias ls="ls --color"
+alias ls="ls --color=auto"
 alias ll="ls -lA"
 alias la="ls -A"
 alias m="more"
