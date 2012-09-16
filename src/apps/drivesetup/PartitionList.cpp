@@ -288,7 +288,7 @@ PartitionListRow::DevicePath()
 		= dynamic_cast<BBitmapStringField*>(GetField(kDeviceColumn));
 
 	if (stringField == NULL)
-		return "";
+		return NULL;
 
 	return stringField->String();
 }
@@ -330,22 +330,22 @@ PartitionListView::InitiateDrag(BPoint rowPoint, bool wasSelected)
 {
 	PartitionListRow* draggedRow
 		= dynamic_cast<PartitionListRow*>(RowAt(rowPoint));
-	if (draggedRow != NULL) {
-		BRect draggedRowRect;
-		GetRowRect(draggedRow, &draggedRowRect);
+	if (draggedRow == NULL)
+		return false;
 
-		const char* draggedPath = draggedRow->DevicePath();
-		if (draggedPath != NULL) {
-			BMessage *drag = new BMessage(B_MIME_DATA);
-			drag->AddData("text/plain", B_MIME_TYPE, draggedPath, strlen(draggedPath));
+	const char* draggedPath = draggedRow->DevicePath();
+	if (draggedPath == NULL)
+		return false;
 
-			DragMessage(drag, draggedRowRect, NULL);
+	BRect draggedRowRect;
+	GetRowRect(draggedRow, &draggedRowRect);
 
-			return true;
-		}
-	}
+	BMessage dragMessage(B_MIME_DATA);
+	dragMessage.AddData("text/plain", B_MIME_TYPE, draggedPath,
+		strlen(draggedPath));
 
-	return false;
+	DragMessage(&dragMessage, draggedRowRect, NULL);
+	return true;
 }
 
 
