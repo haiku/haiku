@@ -283,16 +283,17 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 }
 
 rule ExtractArchiveToContainer container : directoryTokens : archiveFile
-	: extractedSubDir
+	: extractedSubDir : stripDebugSymbols
 {
 	# ExtractArchiveToContainer <container> : <directory> : <archiveFile>
-	#	: <extractedSubDir> ;
+	#	: <extractedSubDir> : <stripDebugSymbols> ;
 
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) ] ;
 
 	ARCHIVE_FILES_TO_INSTALL on $(directory) += $(archiveFile) ;
 	ARCHIVE_SUBDIR_TO_INSTALL_FROM on $(archiveFile) = $(extractedSubDir) ;
+	ARCHIVE_FILES_TO_STRIP on $(archiveFile) = $(stripDebugSymbols) ;
 }
 
 rule AddDriversToContainer container : relativeDirectoryTokens : targets
@@ -607,6 +608,11 @@ rule CreateContainerExtractFilesScript container : script
 			ARCHIVE_SUBDIR_TO_INSTALL_FROM on $(dummyTarget) =
 				$(extractedSubDir:E=.) ;
 
+			local stripDebugSymbols = [ on $(archiveFile)
+				return $(ARCHIVE_FILES_TO_STRIP) ] ;
+			STRIP_DEBUG_SYMBOLS_FROM_ARCHIVE on $(dummyTarget) =
+				$(stripDebugSymbols) ;
+
 			Depends $(dummyTarget) : $(initScript) $(archiveFile)
 				$(serializationDependency) ;
 			Depends $(script) : $(dummyTarget) ;
@@ -622,7 +628,8 @@ rule CreateContainerExtractFilesScript container : script
 actions AddExtractFileToContainerExtractFilesScript
 {
 	echo extractFile "\"$(2[2])\"" "\"$(TARGET_DIR)\"" \
-		"\"$(ARCHIVE_SUBDIR_TO_INSTALL_FROM)\"" >> $(2[1])
+		"\"$(ARCHIVE_SUBDIR_TO_INSTALL_FROM)\"" \
+		"\"$(STRIP_DEBUG_SYMBOLS_FROM_ARCHIVE)\"" >> $(2[1])
 }
 
 
@@ -729,7 +736,7 @@ rule AddWifiFirmwareToHaikuImage driver : package : archive : extract
 }
 
 rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
-	: extractedSubDir
+	: extractedSubDir : stripDebugSymbols
 {
 	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <alwaysUpdate>
 	#	: <extractedSubDir> ;
@@ -738,7 +745,7 @@ rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
 	# requested.
 	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
 		ExtractArchiveToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
-			: $(archiveFile) : $(extractedSubDir) ;
+			: $(archiveFile) : $(extractedSubDir) : $(stripDebugSymbols) ;
 	}
 }
 
@@ -825,6 +832,7 @@ rule InstallSourceArchive file : url
 }
 
 rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
+	: stripDebugSymbols
 {
 	# download archive file
 	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
@@ -835,8 +843,17 @@ rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
 		# copy onto image
 		AddFilesToHaikuImage _packages_ : $(archiveFile) ;
 	} else {
+		if $(HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES) = 1 {
+			stripDebugSymbols ?= 1 ;
+			# The script will only test for = 1. This is in case someone
+			# manually set the flag 'true'
+			if $(stripDebugSymbols) = true {
+				stripDebugSymbols = 1 ;
+			}
+		}
 		# extract onto image
-		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile) ;
+		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile)
+			: : : $(stripDebugSymbols) ;
 	}
 }
 
@@ -1472,7 +1489,7 @@ actions BuildCDBootPPCImage1 bind MAPS
 	|| \
 	genisoimage -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg \
 		-V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/ppc -prep-boot \
-		ppc/$(>[2]:D=) -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd 
+		ppc/$(>[2]:D=) -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
 	#$(RM) -R $(HAIKU_OUTPUT_DIR)/cd
 }
 

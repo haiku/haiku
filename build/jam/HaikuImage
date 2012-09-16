@@ -892,8 +892,6 @@ AddVariableToScript $(script) : addBuildCompatibilityLibDir
 	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
 AddVariableToScript $(script) : dontClearImage : $(HAIKU_DONT_CLEAR_IMAGE) ;
 AddVariableToScript $(script) : updateOnly : [ IsUpdateHaikuImageOnly ] ;
-AddVariableToScript $(script) : stripOptionalPackageDebugSymbols
-	: $(HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES) ;
 AddTargetVariableToScript $(script) : <build>addattr ;
 AddTargetVariableToScript $(script) : <build>bfs_shell : bfsShell ;
 AddTargetVariableToScript $(script) : <build>fs_shell_command : fsShellCommand ;
