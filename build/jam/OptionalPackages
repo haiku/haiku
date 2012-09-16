@@ -849,7 +849,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage libs tiff : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
-	CopyDirectoryToHaikuImage develop headers : 
+	CopyDirectoryToHaikuImage develop headers :
 		[ FDirName $(HAIKU_FREETYPE_DIR) develop headers 3rdparty ] ;
 	CopyDirectoryToHaikuImage develop headers : $(HAIKU_JPEG_HEADERS)
 		: 3rdparty ;
@@ -2051,11 +2051,13 @@ if [ IsOptionalHaikuImagePackageAdded wpa_supplicant ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			wpa_supplicant-0.7.3-x86-gcc4-2012-04-03.zip
-			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc4-2012-04-03.zip ;
+			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc4-2012-04-03.zip
+			: : : false ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			wpa_supplicant-0.7.3-x86-gcc2-2012-04-03.zip
-			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc2-2012-04-03.zip ;
+			: $(baseURL)/wpa_supplicant-0.7.3-x86-gcc2-2012-04-03.zip
+			: : : false ;
 	}
 }
 
