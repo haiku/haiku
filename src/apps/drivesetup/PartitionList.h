@@ -79,6 +79,7 @@ public:
 									{ return fSize; }
 
 			const char*			DevicePath();
+
 private:
 			partition_id		fPartitionID;
 			partition_id		fParentID;
