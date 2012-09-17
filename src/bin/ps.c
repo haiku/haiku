@@ -29,7 +29,7 @@ printTeamInfo(team_info *teamInfo, bool printHeader)
 			"Uid");
 		
 	printf("%-50s %5ld %8ld %4d %4d\n", teamInfo->args, teamInfo->team,
-		teamInfo->thread_count, teamInfo->uid, teamInfo->gid);
+		teamInfo->thread_count, teamInfo->gid, teamInfo->uid);
 }
 
 

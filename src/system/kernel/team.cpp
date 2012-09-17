@@ -2494,8 +2494,8 @@ fill_team_info(Team* team, team_info* info, size_t size)
 	//info->area_count =
 	info->debugger_nub_thread = team->debug_info.nub_thread;
 	info->debugger_nub_port = team->debug_info.nub_port;
-	//info->uid =
-	//info->gid =
+	info->uid = team->effective_uid;
+	info->gid = team->effective_gid;
 
 	strlcpy(info->args, team->Args(), sizeof(info->args));
 	info->argc = 1;
