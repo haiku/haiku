@@ -1,12 +1,20 @@
-1	french	x-vnd.Haiku-VirtualMemory	1828586495
+1	french	x-vnd.Haiku-VirtualMemory	1952476689
+Quit	SettingsWindow		Quitter
 Turn off	SettingsWindow		Désactiver
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Désactiver la mémoire virtuelle perturbe le système quand la mémoire est pleine.\nLa mémoire virtuelle n'affecte pas les performances avant que ce point soit atteint.\n\nÊtes-vous vraiment sur de vouloir la désactiver ?
 Requested swap file size:	SettingsWindow		Taille demandée pour le fichier d'échange :
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Les paramètres spécifiés dans le fichier de paramètres ne sont pas valides. Vous pouvez charger les valeurs par défaut ou quitter.
 Defaults	SettingsWindow		Par défaut
+Current Swap:	SettingsWindow		Fichier d'échange actuel :
 Use volume:	SettingsWindow		Utiliser le volume :
 Keep enabled	SettingsWindow		Laisser actif
 Revert	SettingsWindow		Défaire
 VirtualMemory	System name		Mémoire Virtuelle
+Choose swap size automatically	SettingsWindow		Choisir la taille du fichier d'échange automatiquement
+Use boot volume	SettingsWindow		Utiliser le volume d'amorçage
+Load defaults	SettingsWindow		Charger les valeurs par défaut
 OK	VirtualMemoryApp		OK
+Changes will take effect upon reboot.	SettingsWindow		Les changements seront pris en compte au redémarrage.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Mémoire Virtuelle\n\tÉcrit par Axel Dörfler\n\tCopyright 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Impossible de trouver le volume indiqué dans le fichier des réglages. Vous pouvez utiliser le volume d'amorçage ou quitter.
 Enable virtual memory	SettingsWindow		Activer la mémoire virtuelle

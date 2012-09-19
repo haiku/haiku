@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	3952543106
+1	french	x-vnd.Haiku-About	2547069165
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 par les auteurs de Gutenprint. Tous droits réservés.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (et son noyau, NewOS)\n
 BSD (4-clause)	AboutView		BSD (4-clauses)
@@ -42,6 +42,7 @@ Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Ce logiciel est basé en partie sur le travail de l'Independent JPEG Group.
 Past maintainers:\n	AboutView		Précédents développeurs :\n
 \n\nSpecial thanks to:\n	AboutView		\n\nRemerciements spéciaux à :\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…et surement d'autres que nous avons oubliés (désolé !)\n\n
 Licenses: 	AboutView		Licences : 
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly et Mark Adler.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Tous droits réservés.
@@ -53,6 +54,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		Temps depuis le démarrage :
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Contient des logiciels développés par la Foundation NetBSD, Inc. et ses contributeurs :\nftp, tput\nCopyright © 1996-2008 La Fondation NetBSD, Inc. Tous droits réservés.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Contient des logiciels du projet FreeBSD, publiés sous la licence BSD :\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 le Projet FreeBSD. Tous droits réservés.
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google et ses programmes Google Summer of Code et Google Code In\n
 The Haikuware team and their bounty program\n	AboutView		L'équipe Haikuware et son programme de récompenses\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Tous droits réservés.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Tous droits réservés.
@@ -74,6 +76,7 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyri
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH et Thomas Merz. Tous droits réservés.\nPDFlib et le logo PDFlib sont des marques déposées de PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Tous droits réservés.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Contient des logiciels du projet GNU, publiés sous les licences GPL et LGPL :\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
+…and the many people making donations!\n\n	AboutView		…et nos nombreux donateurs !\n\n
 MIT license. All rights reserved.	AboutView		La licence MIT. Tous droits réservés.
 [Click a license name to read the respective license.]\n\n	AboutView		[Cliquez sur un nom de licence pour la lire.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Tous droits réservés.

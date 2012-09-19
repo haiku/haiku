@@ -1,0 +1,7 @@
+1	polish	x-vnd.Haiku-WebPositive	2959208268
+Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
+Cancel	Settings Window		Anuluj
+Close window	WebPositive Window		Zamknij okno
+Quit	WebPositive		Zakończ
+The download could not be opened.	Download Window		Pobrania nie można otworzyć.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Folderu pobierania nie można otworzyć\n\nError: %error
