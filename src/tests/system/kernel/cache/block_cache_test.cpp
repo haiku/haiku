@@ -20,6 +20,8 @@
 
 #define TEST_BLOCKS(number, count) \
 	test_blocks(number, count, __LINE__)
+#define TEST_TRANSACTION(id, num, mainNum, subNum) \
+	test_transaction(id, num, mainNum, subNum, __LINE__)
 
 #define TEST_BLOCK_DATA(block, number, type) \
 	if ((block)->type ## _data != NULL && gBlocks[(number)]. type == 0) \
@@ -153,6 +155,28 @@ init_test_blocks()
 	for (uint32 i = 0; i < MAX_BLOCKS; i++) {
 		gBlocks[i].current = i + 1;
 		gBlocks[i].unused = true;
+	}
+}
+
+
+void
+test_transaction(int32 id, int32 numBlocks, int32 numMainBlocks,
+	int32 numSubBlocks, int32 line)
+{
+	MutexLocker locker(&gCache->lock);
+	cache_transaction* transaction = lookup_transaction(gCache, id);
+
+	if (numBlocks != transaction->num_blocks) {
+		error(line, "Transaction %d has wrong num_blocks (is %d, should be "
+			"%d)!", id, transaction->num_blocks, numBlocks);
+	}
+	if (numMainBlocks != transaction->main_num_blocks) {
+		error(line, "Transaction %d has wrong num_blocks (is %d, should be "
+			"%d)!", id, transaction->main_num_blocks, numMainBlocks);
+	}
+	if (numSubBlocks != transaction->sub_num_blocks) {
+		error(line, "Transaction %d has wrong num_blocks (is %d, should be "
+			"%d)!", id, transaction->sub_num_blocks, numSubBlocks);
 	}
 }
 
@@ -391,7 +415,9 @@ test_abort_sub_transaction()
 
 	block_cache_put(gCache, 1);
 
+	TEST_TRANSACTION(id, 2, 2, 1);
 	cache_abort_sub_transaction(gCache, id);
+	TEST_TRANSACTION(id, 2, 2, 0);
 
 	gBlocks[0].write = true;
 	gBlocks[0].is_dirty = false;
@@ -417,7 +443,9 @@ test_abort_sub_transaction()
 	gBlocks[1].is_dirty = true;
 	TEST_BLOCKS(1, 1);
 
+	TEST_TRANSACTION(id, 1, 0, 0);
 	cache_start_sub_transaction(gCache, id);
+	TEST_TRANSACTION(id, 1, 1, 0);
 
 	gBlocks[0].present = true;
 
@@ -427,7 +455,9 @@ test_abort_sub_transaction()
 
 	block_cache_put(gCache, 0);
 
+	TEST_TRANSACTION(id, 2, 1, 1);
 	cache_abort_sub_transaction(gCache, id);
+	TEST_TRANSACTION(id, 1, 1, 0);
 
 	gBlocks[0].write = false;
 	gBlocks[0].is_dirty = false;
@@ -445,9 +475,6 @@ test_abort_sub_transaction()
 void
 test_block_cache_discard()
 {
-	// TODO: test transaction-less block caches
-	// TODO: test read-only block caches
-
 	// Test transactions and block caches
 
 	start_test("Discard in main");
@@ -469,11 +496,14 @@ test_block_cache_discard()
 
 	gBlocks[2].present = false;
 
+	TEST_TRANSACTION(id, 1, 0, 0);
 	block = block_cache_get_empty(gCache, 2, id);
+	TEST_TRANSACTION(id, 2, 0, 0);
 	block_cache_discard(gCache, 2, 1);
 	block_cache_put(gCache, 2);
 
 	cache_end_transaction(gCache, id, NULL, NULL);
+	TEST_TRANSACTION(id, 1, 0, 0);
 	cache_sync_transaction(gCache, id);
 
 	start_test("Discard in sub");
@@ -606,6 +636,8 @@ main(int argc, char** argv)
 {
 	block_cache_init();
 
+	// TODO: test transaction-less block caches
+	// TODO: test read-only block caches
 	test_abort_transaction();
 	test_abort_sub_transaction();
 	test_block_cache_discard();
