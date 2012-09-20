@@ -70,6 +70,7 @@ struct hda_controller {
 	area_id			regs_area;
 	vuint8*			regs;
 	uint32			irq;
+	bool			msi;
 
 	uint16			codec_status;
 	uint32			num_input_streams;
