@@ -11,4 +11,4 @@ pixels in either direction.	ConfigView		ピクセル(縦横とも)です。
 Write 32 bit images on true color input	ConfigView		true colorの入力に対して32 bitイメージを書き出す
 Icon	ICOTranslator		アイコン
 ICOTranslator Settings	ConfigView		ICO トランスレーター設定
-Windows icon translator	ConfigView		Windowsアイコン用トランスレータ
+Windows icon translator	ConfigView		Windowsアイコン用トランスレーター

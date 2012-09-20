@@ -113,7 +113,7 @@ Large	MediaPlayer-SettingsWindow		大
 Bottom of video	MediaPlayer-SettingsWindow		ビデオの下側
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		停止
-<unnamed media>	MediaPlayer-InfoWin		<名前のないメディア>
+<unnamed media>	MediaPlayer-InfoWin		<名前の無いメディア>
 raw video	MediaPlayer-InfoWin		raw ビデオ
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリ不足)。プレイリストの保存に失敗しました。
@@ -136,7 +136,7 @@ Start media server	MediaPlayer-Main		メディアサーバーを起動する
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		全画面表示 / 解除
 ToggleFullscreen	MediaPlayer-Main		全画面表示 / 解除
-<unnamed>	PlaylistItem-name		<名前がない>
+<unnamed>	PlaylistItem-name		<名前が無い>
 Open Clips	MediaPlayer-Main		クリップを開く
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		無し

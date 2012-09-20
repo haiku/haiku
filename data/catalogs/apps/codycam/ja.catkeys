@@ -1,13 +1,13 @@
 1	japanese	x-vnd.Haiku-CodyCam	2416864674
 Capturing Image…	VideoConsumer.cpp		画像を取得中…
-Every 30 seconds	CodyCam		30秒毎
+Every 30 seconds	CodyCam		30 秒ごと
 File name:	CodyCam		ファイル名:
 Last Capture: 	VideoConsumer.cpp		最後のキャプチャ:
 Server login failed	VideoConsumer.cpp		サーバーへのログインに失敗しました
 Remote host has closed the connection.\n	FtpClient		リモートホストが接続を切断しました
 Login:	CodyCam		ログイン:
 Format:	CodyCam		形式:
-Every 2 hours	CodyCam		2時間毎
+Every 2 hours	CodyCam		2 時間ごと
 Closing the window\n	VideoConsumer.cpp		ウィンドウを閉じる\n
 login ID expected	CodyCam		ログイン ID を入力してください
 Rate:	CodyCam		レート:
@@ -19,7 +19,7 @@ Passive FTP	CodyCam		パッシブ FTP
 destination directory expected	CodyCam		出力先ディレクトリを入力してください
 password	CodyCam		パスワード
 Directory:	CodyCam		ディレクトリ:
-Every minute	CodyCam		毎分
+Every minute	CodyCam		1 分ごと
 read: %ld\n	SftpClient		読み込み: %ld\n
 Waiting…	CodyCam		待機中…
 Logging in…	VideoConsumer.cpp		ログイン中…
@@ -29,23 +29,23 @@ Error creating output file	VideoConsumer.cpp		ファイルの出力に失敗し�
 unrecognized upload client specified	CodyCam		不明なアップロードクライアントが指定されています
 File %s ; Line %ld # unterminated quote\n	SettingsHandler		ファイル %s ; 行 %ld # unterminated quote\n
 Output	CodyCam		出力
-Every 15 minutes	CodyCam		15分毎
+Every 15 minutes	CodyCam		15 分ごと
 Cannot find an available video stream	CodyCam		有効なビデオストリームが見つかりません
 Can't find an available connection to the video window	CodyCam		有効な接続がビデオウィンドウ上に見つかりません
 Transmitting…	VideoConsumer.cpp		転送中…
 Cannot get a time source	CodyCam		タイムソースを取得できません
-Every 8 hours	CodyCam		8時間毎
+Every 8 hours	CodyCam		8 時間ごと
 Rename failed	VideoConsumer.cpp		名前の変更に失敗しました
 Cannot start time source!	CodyCam		タイムソースを開始できません
 Cannot register the video window	CodyCam		ビデオウィンドウを登録できません
 CodyCam	System name		CodyCam
-Every 24 hours	CodyCam		24時間毎
+Every 24 hours	CodyCam		24 時間ごと
 unknown command	SettingsHandler		不明なコマンドです
 Video settings	CodyCam		ビデオ設定
 Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		ビデオソースが見つかりません。CodyCam を使うには webcam が必要です。
 still image filename expected	CodyCam		イメージのファイル名を入力してください
 invalid upload client %ld\n	VideoConsumer.cpp		アップロードクライアント %ld が正しくありません\n
-Every 15 seconds	CodyCam		15秒毎
+Every 15 seconds	CodyCam		15 秒ごと
 Error writing output file	VideoConsumer.cpp		ファイルの書き込みに失敗した
 image file format expected	CodyCam		画像ファイルのフォーマットを入力してください
 Cannot set the time source for the video source	CodyCam		ビデオソースにタイムソースをセットできません
@@ -62,11 +62,11 @@ upload client name expected	CodyCam		アップロードクライアントの名�
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		接続しました…
 PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed> (パスワードを送信しました)
-Every 5 minutes	CodyCam		5分毎
+Every 5 minutes	CodyCam		5 分ごと
 read: %d\n	SftpClient		読み込み: %d \n
 OK	CodyCam		OK
 Capture controls	CodyCam		キャプチャ制御
-Every hour	CodyCam		毎時間
+Every hour	CodyCam		1 時間ごと
 Cannot connect the video source to the video window	CodyCam		ビデオソースをビデオウィンドウに接続できません
 capture rate expected	CodyCam		キャプチャレートを入力してください
 Error getting initial latency for the capture node	CodyCam		キャプチャーノードの初期の待ち時間の取得に失敗しました
@@ -76,18 +76,18 @@ Quit	CodyCam		終了
 cmd: '%s'\n	FtpClient		コマンド: '%s'\n
 Never	CodyCam		中止
 Cannot create a video window	CodyCam		ビデオウィンドウを作成できません
-Every 10 minutes	CodyCam		10分毎
+Every 10 minutes	CodyCam		10 分ごと
 Cannot start the video source	CodyCam		ビデオソースを開始できません
 Cannot start the video window	CodyCam		ビデオウィンドウを開始できません
 password expected	CodyCam		パスワードを入力してください
 reply: %d, %d\n	FtpClient		返信: %d, %d\n
 Cannot find the media roster	CodyCam		media roster が見つかりません。
-Every 4 hours	CodyCam		4時間毎
+Every 4 hours	CodyCam		4 時間ごと
 FTP	CodyCam		FTP
 File transmission failed	VideoConsumer.cpp		ファイル転送に失敗しました
 Cannot seek time source!	CodyCam		タイムソースをシークできません!
 File	CodyCam		ファイル
 Image Format Menu	CodyCam		画像形式メニュー
-Every 30 minutes	CodyCam		30分毎
+Every 30 minutes	CodyCam		30 分ごと
 reply: '%s'\n	SftpClient		返信: '%s'\n
 Start video	CodyCam		ビデオを開始

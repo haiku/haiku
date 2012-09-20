@@ -12,4 +12,4 @@ Set flags to	ConfigView		フラグを指定する
 Set as read	ConfigView		既読にする
 Reply with	ConfigView		返事を書く
 If	ConfigView		条件:
-header (e.g. Subject)	ConfigView		ヘッダ(たとえばSubject)
+header (e.g. Subject)	ConfigView		ヘッダー (たとえば Subject)

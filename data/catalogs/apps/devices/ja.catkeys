@@ -73,8 +73,8 @@ Device name	Device		デバイス名
 Manufacturer	Device		製造元
 Name	PropertyList		名前
 Manufacturer	DevicePCI		製造元
-Intelligent controller	Device		インテリジェントコントローラ
-Satellite communications controller	Device		衛星通信コントローラ
+Intelligent controller	Device		インテリジェントコントローラー
+Satellite communications controller	Device		衛星通信コントローラー
 SCSI Information	DeviceSCSI		SCSI 情報
 Enclosure	DeviceSCSI		エンクロージャー
 Array	DeviceSCSI		アレイ
@@ -86,7 +86,7 @@ Tape Drive	DeviceSCSI		テープドライブ
 Bus Information	Device		バス情報
 Connection	DevicesView		接続順
 Generate system information	DevicesView		システム情報を作成
-Encryption controller	Device		暗号化コントローラ
+Encryption controller	Device		暗号化コントローラー
 Unclassified device	Device		未登録のデバイス
 Device name	DeviceSCSI		デバイス名
 Card Reader	DeviceSCSI		カードリーダー

@@ -4,7 +4,7 @@ Settings	Config Window		設定
 Never	Config Window	show status window	表示しない
 Only when dial-up is connected	Config Window		ダイアルアップ接続のときのみ
 While sending and receiving	Config Window		送受信中に
-days	Config Window		日毎にチェック
+days	Config Window		日ごとにチェック
 Incoming	Config Window		受信
 Server name:	E-Mail		サーバー名:
 OK	Config Window		OK
@@ -27,7 +27,7 @@ Show connection status window:	Config Window		通信状況ウィンドウを表�
 Server Name:	E-Mail		サーバー名:
 While sending	Config Window		送信中に
 Schedule outgoing mail when dial-up is disconnected	Config Window		ダイアルアップ接続が切断した時に送信メールを予約する
-hours	Config Window		時間毎にチェック
+hours	Config Window		時間ごとにチェック
 Enter a valid e-mail address.	AutoConfigWindow		有効な E-mail アドレスを入力してください。
 Add	Config Window		追加
 Account settings	AutoConfigWindow		アカウント設定
@@ -40,7 +40,7 @@ Choose Protocol	E-Mail		プロトコルを選択してください
 Return address:	Config Views		返信先アドレス：
 Edit mailbox menu…	Config Window		メールボックスメニューの編集…
 Outgoing	E-Mail		送信
-\t\t· E-mail filters	Config Window		\t\t· メールフィルタ
+\t\t· E-mail filters	Config Window		\t\t· メールフィルター
 Remove	Config Views		削除
 \t\t· Incoming	Config Window		\t\t· 受信
 Next	AutoConfigWindow		次へ
@@ -48,7 +48,7 @@ Check every	Config Window		メールを
 Back	AutoConfigWindow		前へ
 Incoming mail filters	Config Views		受信メールフィルター
 Account settings	Config Views		アカウント設定
-minutes	Config Window		分毎にチェック
+minutes	Config Window		分ごとにチェック
 Error retrieving general settings: %s\n	Config Window		一般設定の読み取り時に次のエラーが発生しました: %s\n
 Real name:	E-Mail		実名：
 Apply	Config Window		適用

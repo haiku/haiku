@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-MediaConverter	296071315
-Video using parameters form settings	MediaConverter		設定のパラメータを使ったビデオ
+Video using parameters form settings	MediaConverter		設定のパラメーターを使ったビデオ
 Video encoding:	MediaConverter		ビデオエンコーディング：
 No audio	Audio codecs list		オーディオ無し
 Error	MediaConverter		エラー
@@ -33,7 +33,7 @@ No file selected	MediaConverter-FileInfo		ファイルが選択されていま�
 Error writing video frame %Ld	MediaConverter		ビデオフレーム %Ld の書き込み時にエラーが発生しました
 Select this folder	MediaConverter		このフォルダーを選択
 Continue	MediaConverter		続ける
-Encoder parameters	MediaConverter-EncoderWindow		エンコーターパラメータ
+Encoder parameters	MediaConverter-EncoderWindow		エンコーターパラメーター
 Video:	MediaConverter-FileInfo		ビデオ：
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld フレーム
 %d bit 	MediaFileInfo		%d ビット
@@ -53,7 +53,7 @@ Error read audio frame %Ld	MediaConverter		オーディオフレーム %Ld の�
 Error launching: %strError%	MediaConverter		起動時にエラーが発生しました： %strError%
 High	MediaConverter		高い
 The file was not recognized as a supported media file:	MediaConverter		次のファイルはサポートされているメディアファイルとして認識されませんでした：
-Drop media files onto this window	MediaConverter		メディアファイルをこのウインドウにドロップしてください
+Drop media files onto this window	MediaConverter		メディアファイルをこのウィンドウにドロップしてください
 Audio encoding:	MediaConverter		オーディオエンコーディング
 Audio quality not supported	MediaConverter		オーディオ品質がサポートされていません
 File	Menu		ファイル

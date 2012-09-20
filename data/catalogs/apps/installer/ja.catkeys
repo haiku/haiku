@@ -3,7 +3,7 @@ So behind the other menu entries towards the bottom of the file, add something s
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		インストールを中止して、システムを再起動しますか？
 \t}\n\n	InstallerApp		\t}\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Haiku インストーラー\n\tJérôme Duval および Stephan Aßmus 作\n\tCopyright 2005-2010, Haiku.\n\n
-Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		新しいバージョンのGRUBは、ブートメニューにカスタム項目を追加するために特別な設定ファイルを使用します。項目をメニューの一番上に表示するには、ターミナルから好みのエディタを起動してファイルを作成または編集する必要があります。\n\n
+Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		新しいバージョンのGRUBは、ブートメニューにカスタム項目を追加するために特別な設定ファイルを使用します。項目をメニューの一番上に表示するには、ターミナルから好みのエディターを起動してファイルを作成するか編集する必要があります。\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		ここで、ブートメニューを実際に表示するために、\"GRUB_HIDDEN_TIMEOUT=0\"の行の先頭に \"#\"を追加して、コメントアウトする必要があります。
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが '%s' に書き込まれました。終了ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
 Quit	InstallerApp		終了
@@ -41,10 +41,10 @@ Set up boot menu	InstallerWindow		ブートメニューの設定
 2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (os-prober v1.44 以降)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		プライマリーパーティションの数にもかかわらず、最初の論理パーティションは常に\"4\"という数字が付きます。\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUBの命名規則はまだ: (hdN,n) です。\n\n
-\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <好みのテキストエディタ> /boot/grub/menu.lst\n\n
+\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <好みのテキストエディター> /boot/grub/menu.lst\n\n
 Abort	InstallerWindow		中断
 Finishing Installation.	InstallProgress		インストールを完了しています。
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <好みのテキストエディタ> /etc/default/grub\n\n
+\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <好みのテキストエディター> /etc/default/grub\n\n
 Restart	InstallerWindow		再起動
 README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		インストール先ディスクの空き容量が不足している可能性があります。他のディスクを選択するか、インストールするオプションを減らしてください。
@@ -85,7 +85,7 @@ An error was encountered and the installation was not completed:\n\nError:  %s	I
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s' から '%2s' へのインストールを開始するには、開始ボタンを押してください。
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup は実行中です。\n\nDriveSetup を終了させてからインストールを続行してください。
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Haikuを試用して頂きありがとうございます。Haikuを堪能してください!そして、Haikuのことを気に入って頂ければ幸いです。
+Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Haikuを試用していただきありがとうございます。Haikuを堪能してください!そして、Haikuのことを気に入って頂ければ幸いです。
 OK	InstallProgress		OK
 Please choose target	InstallerWindow		インストール先の選択
 ???	InstallerWindow	Unknown partition name	???
@@ -102,14 +102,14 @@ No optional packages available.	PackagesView		オプショナルパッケージ�
 All hard disks start with \"hd\".\n	InstallerApp		すべてのディスクは \"hd\" で始まります。\n
 Continue	InstallerApp		続ける
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Haikuブートメニューを設定するアプリケーション、BootManagerを起動できませんでした。
-Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		/boot/grub/menu.lstを好みのエディタで設定します。ターミナルから以下のように入力してください。\n\n
+Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		/boot/grub/menu.lstを好みのエディターで設定します。ターミナルから以下のように入力してください。\n\n
 Boot sector not written because of an internal error.	InstallProgress		内部エラーが発生したため、ブートセクターは更新されていません。
 Additional disk space required: %s	InstallerWindow		必要な追加ディスク容量：%s
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		注意：ハードディスクの命名規則は、2.1)で記載されているものとまだ同じですが、パーティションの命名規則は変わっています。\n\n
 Cancel	InstallProgress		中止
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		ブートマネージャーと DriveSetup が実行中…\n\nインストールを続けるには、両アプリケーションを閉じてください。
 Try installing anyway	InstallProgress		それでもインストールを試みる
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		そのため、以下の見出しは編集する必要はありません。なにか似たものをこれらの行に追加してください。\n\n
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		そのため、以下の見出しは編集する必要はありません。何か似たものをこれらの行に追加してください。\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		本当にインストールを中断してよいですか ?
 Onto:	InstallerWindow		インストール先：
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		ブートマネージャーウィンドウを閉じてから、インストーラーウィンドウを閉じてください。
@@ -119,4 +119,4 @@ The mount point could not be retrieved.	InstallProgress		マウントポイン�
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先パーティションにはデータがあります。それでもインストールしますか？\n\n注意：システムフォルダーはインストール元からそのままクリーンコピーされますが、その他のフォルダーはマージされ、両方のボリュームに存在するファイルやリンクはインストール元のバージョンで上書きされます。
 You can see the correct partition in GParted for example.\n\n\n	InstallerApp		正確なパーティションはGPartedなどで見られます。\n\n\n
 \ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <好みのテキストエディタ> /boot/grub/menu.lst\n\n
+\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <好みのテキストエディター> /boot/grub/menu.lst\n\n

@@ -48,10 +48,10 @@ Close	ProbeView		閉じる
 Number	TypeEditors	This is the type of editor	数値
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	10 進
 16 bit signed value:	TypeEditors		符号つき 16 ビット値：
-String editor	TypeEditors		文字列エディタ
+String editor	TypeEditors		文字列エディター
 of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
 64 bit signed offset:	TypeEditors		符号つき 64 ビットオフセット値：
-Boolean editor	TypeEditors		ブール値エディタ
+Boolean editor	TypeEditors		ブール値エディター
 Copy	ProbeView		コピー
 none	ProbeView	No attributes	属性無し
 Boolean value:	TypeEditors		ブール値：
