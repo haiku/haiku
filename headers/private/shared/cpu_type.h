@@ -192,6 +192,8 @@ get_cpu_model_string(system_info *info)
 			return "604";
 		case B_CPU_PPC_604e:
 			return "604e";
+		default:
+			return NULL;
 #endif	/* __POWERPC__ */
 #if __INTEL__
 		case B_CPU_x86:
@@ -395,7 +397,6 @@ get_cpu_model_string(system_info *info)
 		/* National Semiconductor */
 		case B_CPU_NATIONAL_GEODE_GX1:
 			return "Geode GX1";
-#endif	/* __INTEL__ */
 
 		default:
 			if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
@@ -404,6 +405,7 @@ get_cpu_model_string(system_info *info)
 				return parse_intel(cpuidName);
 			}
 			return NULL;
+#endif	/* __INTEL__ */
 	}
 }
 

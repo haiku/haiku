@@ -16,7 +16,6 @@ set -o errexit
 # dontClearImage
 # isVMwareImage
 # optionalPackageDescriptions
-# stripOptionalPackageDebugSymbols
 #
 # addattr
 # copyattr
@@ -158,10 +157,11 @@ stripDebugInfo()
 
 extractFile()
 {
-	# extractFile <archive> <directory>
+	# extractFile <archive> <directory> <extractedSubDir> <stripDebugSymbols>
 	archiveFile=$1
 	targetExtractedDir=$2
 	extractedSubDir=$3
+	stripDebugSymbols=$4
 
 	echo "Extracting $archiveFile ..."
 
@@ -188,7 +188,7 @@ extractFile()
 		rm $extractDir/.OptionalPackageDescription
 	fi
 
-	if [ "$stripOptionalPackageDebugSymbols" = "1" ]; then
+	if [ "$stripDebugSymbols" = "1" ]; then
 		# strip executables in common/bin
 		if [ -d $extractDir/common/bin ]; then
 			for file in `find $extractDir/common/bin -type f -a -perm +100 \

@@ -77,6 +77,9 @@ public:
 									{ return fOffset; }
 			off_t				Size() const
 									{ return fSize; }
+
+			const char*			DevicePath();
+
 private:
 			partition_id		fPartitionID;
 			partition_id		fParentID;
@@ -92,6 +95,8 @@ public:
 									uint32 resizeMode);
 
 	virtual	void				AttachedToWindow();
+
+	virtual	bool				InitiateDrag(BPoint rowPoint, bool wasSelected);
 
 			PartitionListRow*	FindRow(partition_id id,
 									PartitionListRow* parent = NULL);

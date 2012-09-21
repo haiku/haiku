@@ -3059,6 +3059,8 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 
 			block->transaction_next = NULL;
 			block->transaction = NULL;
+			transaction->num_blocks--;
+
 			if (block->previous_transaction == NULL) {
 				cache->Free(block->original_data);
 				block->original_data = NULL;

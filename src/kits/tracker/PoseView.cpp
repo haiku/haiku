@@ -9324,7 +9324,8 @@ BPoseView::MoveColumnTo(BColumn* src, BColumn* dest)
 		BColumn* column = fColumnList->ItemAt(index);
 		column->SetOffset(offset);
 		last = column;
-		offset = last->Offset() + last->Width() + kTitleColumnExtraMargin;
+		offset = last->Offset() + last->Width() + kTitleColumnExtraMargin
+			- kRoomForLine / 2;
 	}
 
 	// invalidate everything to the right of miny

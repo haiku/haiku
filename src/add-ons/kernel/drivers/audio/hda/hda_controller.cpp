@@ -12,6 +12,8 @@
 
 #include <algorithm>
 
+#include <PCI_x86.h>
+
 #include "driver.h"
 #include "hda_codec_defs.h"
 
@@ -51,6 +53,8 @@ static const struct {
 	// this one is not supported by hardware.
 	// {B_SR_384000, MAKE_RATE(44100, ??, ??), 384000},
 };
+
+static pci_x86_module_info* sPCIx86Module;
 
 
 static inline void
@@ -797,7 +801,7 @@ hda_hw_init(hda_controller* controller)
 	uint16 capabilities, stateStatus, cmd;
 	status_t status;
 
-	/* Map MMIO registers */
+	// Map MMIO registers
 	controller->regs_area = map_physical_memory("hda_hw_regs",
 		controller->pci_info.u.h0.base_registers[0],
 		controller->pci_info.u.h0.base_register_sizes[0], B_ANY_KERNEL_ADDRESS,
@@ -808,7 +812,8 @@ hda_hw_init(hda_controller* controller)
 	}
 
 	cmd = (gPci->read_pci_config)(controller->pci_info.bus,
-		controller->pci_info.device, controller->pci_info.function, PCI_command, 2);
+		controller->pci_info.device, controller->pci_info.function,
+		PCI_command, 2);
 	if (!(cmd & PCI_command_master)) {
 		(gPci->write_pci_config)(controller->pci_info.bus,
 			controller->pci_info.device, controller->pci_info.function,
@@ -816,18 +821,42 @@ hda_hw_init(hda_controller* controller)
 		dprintf("hda: enabling PCI bus mastering\n");
 	}
 
-	/* Absolute minimum hw is online; we can now install interrupt handler */
+	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
+			!= B_OK)
+		sPCIx86Module = NULL;
+
+	// Absolute minimum hw is online; we can now install interrupt handler
+
 	controller->irq = controller->pci_info.u.h0.interrupt_line;
+	controller->msi = false;
+
+	if (sPCIx86Module != NULL && sPCIx86Module->get_msi_count(
+			controller->pci_info.bus, controller->pci_info.device,
+			controller->pci_info.function) >= 1) {
+		// Try MSI first
+		uint8 vector;
+		if (sPCIx86Module->configure_msi(controller->pci_info.bus,
+				controller->pci_info.device, controller->pci_info.function,
+				1, &vector) == B_OK
+			&& sPCIx86Module->enable_msi(controller->pci_info.bus,
+				controller->pci_info.device, controller->pci_info.function)
+					== B_OK) {
+			dprintf("hda: using MSI vector %u\n", vector);
+			controller->irq = vector;
+			controller->msi = true;
+		}
+	}
+
 	status = install_io_interrupt_handler(controller->irq,
 		(interrupt_handler)hda_interrupt_handler, controller, 0);
 	if (status != B_OK)
 		goto no_irq;
 
-	/* TCSEL is reset to TC0 (clear 0-2 bits) */
+	// TCSEL is reset to TC0 (clear 0-2 bits)
 	update_pci_register(controller, PCI_HDA_TCSEL, PCI_HDA_TCSEL_MASK, 0, 1);
 
-	/* Enable snooping for ATI and Nvidia, right now for all their hda-devices,
-	   but only based on guessing. */
+	// Enable snooping for ATI and Nvidia, right now for all their hda-devices,
+	// but only based on guessing.
 	switch (controller->pci_info.vendor_id) {
 		case NVIDIA_VENDORID:
 			update_pci_register(controller, NVIDIA_HDA_TRANSREG,
@@ -854,7 +883,7 @@ hda_hw_init(hda_controller* controller)
 	controller->num_output_streams = GLOBAL_CAP_OUTPUT_STREAMS(capabilities);
 	controller->num_bidir_streams = GLOBAL_CAP_BIDIR_STREAMS(capabilities);
 
-	/* show some hw features */
+	// show some hw features
 	dprintf("hda: HDA v%d.%d, O:%ld/I:%ld/B:%ld, #SDO:%d, 64bit:%s\n",
 		controller->Read8(HDAC_VERSION_MAJOR),
 		controller->Read8(HDAC_VERSION_MINOR),
@@ -863,29 +892,27 @@ hda_hw_init(hda_controller* controller)
 		GLOBAL_CAP_NUM_SDO(capabilities),
 		GLOBAL_CAP_64BIT(capabilities) ? "yes" : "no");
 
-	/* Get controller into valid state */
+	// Get controller into valid state
 	status = reset_controller(controller);
 	if (status != B_OK) {
 		dprintf("hda: reset_controller failed\n");
 		goto reset_failed;
 	}
 
-	/* Setup CORB/RIRB/DMA POS */
+	// Setup CORB/RIRB/DMA POS
 	status = init_corb_rirb_pos(controller);
 	if (status != B_OK) {
 		dprintf("hda: init_corb_rirb_pos failed\n");
 		goto corb_rirb_failed;
 	}
 
-	/*
-	 * Don't enable codec state change interrupts. We don't handle
-	 * them, as we want to use the STATE_STATUS register to identify
-	 * available codecs. We'd have to clear that register in the interrupt
-	 * handler to 'ack' the codec change.
-	 */
+	// Don't enable codec state change interrupts. We don't handle
+	// them, as we want to use the STATE_STATUS register to identify
+	// available codecs. We'd have to clear that register in the interrupt
+	// handler to 'ack' the codec change.
 	controller->Write16(HDAC_WAKE_ENABLE, 0x0);
 
-	/* Enable controller interrupts */
+	// Enable controller interrupts
 	controller->Write32(HDAC_INTR_CONTROL, INTR_CONTROL_GLOBAL_ENABLE
 		| INTR_CONTROL_CONTROLLER_ENABLE);
 
@@ -939,6 +966,11 @@ no_irq:
 	controller->regs_area = B_ERROR;
 	controller->regs = NULL;
 
+	if (sPCIx86Module != NULL) {
+		put_module(B_PCI_X86_MODULE_NAME);
+		sPCIx86Module = NULL;
+	}
+
 error:
 	dprintf("hda: ERROR: %s(%ld)\n", strerror(status), status);
 
@@ -952,7 +984,7 @@ hda_hw_stop(hda_controller* controller)
 {
 	int index;
 
-	/* Stop all audio streams */
+	// Stop all audio streams
 	for (index = 0; index < HDA_MAX_STREAMS; index++) {
 		if (controller->streams[index] && controller->streams[index]->running)
 			hda_stream_stop(controller, controller->streams[index]);
@@ -969,7 +1001,7 @@ hda_hw_uninit(hda_controller* controller)
 	if (controller == NULL)
 		return;
 
-	/* Stop all audio streams */
+	// Stop all audio streams
 	hda_hw_stop(controller);
 
 	if (controller->buffer_ready_sem >= B_OK) {
@@ -979,13 +1011,24 @@ hda_hw_uninit(hda_controller* controller)
 
 	reset_controller(controller);
 
-	/* Disable interrupts, and remove interrupt handler */
+	// Disable interrupts, and remove interrupt handler
 	controller->Write32(HDAC_INTR_CONTROL, 0);
+
+	if (controller->msi) {
+		// Disable MSI
+		sPCIx86Module->disable_msi(controller->pci_info.bus,
+			controller->pci_info.device, controller->pci_info.function);
+	}
 
 	remove_io_interrupt_handler(controller->irq,
 		(interrupt_handler)hda_interrupt_handler, controller);
 
-	/* Delete corb/rirb area */
+	if (sPCIx86Module != NULL) {
+		put_module(B_PCI_X86_MODULE_NAME);
+		sPCIx86Module = NULL;
+	}
+
+	// Delete corb/rirb area
 	if (controller->corb_rirb_pos_area >= 0) {
 		delete_area(controller->corb_rirb_pos_area);
 		controller->corb_rirb_pos_area = B_ERROR;
@@ -994,17 +1037,16 @@ hda_hw_uninit(hda_controller* controller)
 		controller->stream_positions = NULL;
 	}
 
-	/* Unmap registers */
+	// Unmap registers
 	if (controller->regs_area >= 0) {
 		delete_area(controller->regs_area);
 		controller->regs_area = B_ERROR;
 		controller->regs = NULL;
 	}
 
-	/* Now delete all codecs */
+	// Now delete all codecs
 	for (index = 0; index < HDA_MAX_CODECS; index++) {
 		if (controller->codecs[index] != NULL)
 			hda_codec_delete(controller->codecs[index]);
 	}
 }
-
