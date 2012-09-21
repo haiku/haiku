@@ -44,7 +44,7 @@ unknown command	SettingsHandler		невядомая каманда
 Video settings	CodyCam		Наладкі відэа
 Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Немагчыма запусціць крыніцу відэа. Вам патрэбна вэб-камера.
 still image filename expected	CodyCam		імя файла статычнай выявы чаканае
-invalid upload client %ld\n	VideoConsumer.cpp		Неправільны кліент загрузкі %ld\n
+invalid upload client %ld\n	VideoConsumer.cpp		няправільны кліент загрузкі %ld\n
 Every 15 seconds	CodyCam		Кожныя 15 секунд
 Error writing output file	VideoConsumer.cpp		Памылка пры запісу выходнага файла
 image file format expected	CodyCam		фармат файлу выявы чаканы
@@ -73,7 +73,7 @@ Error getting initial latency for the capture node	CodyCam		Памылка пр�
 Send to…	CodyCam		Адпраўлена да…
 on or off expected	Settings	Do not translate 'on' and 'off'	on або off чаканыя
 Quit	CodyCam		Выйсці
-cmd: '%s'\n	FtpClient		cmd: '%s'\n
+cmd: '%s'\n	FtpClient		каманда: '%s'\n
 Never	CodyCam		Ніколі
 Cannot create a video window	CodyCam		Не ўдалося стварыць відэаакно
 Every 10 minutes	CodyCam		Кожныя 10 хвілін

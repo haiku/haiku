@@ -12,7 +12,7 @@ Print	Mail		Друкаваць
 New mail message	Mail		Новае паведамленне
 Automatic	Mail		Аўтаматычна
 Automatically mark mail as read:	Mail		Аўтаматычна пазначаць паведамленні як прачытаныя:
-helpful message	Mail		Карыснае паведамленне
+helpful message	Mail		карыснае паведамленне
 Colored quotes:	Mail		Каляровыя цытаты:
 Subject:	Mail		Тэма:
 Reply to all	Mail		Адкзаць усім
@@ -36,7 +36,7 @@ Bcc:	Mail		Скрытая копія:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
 Signature:	Mail		Подпіс:
 Save changes to this signature?	Mail		Захаваць змены подпісу?
-Cc:	Mail		Cc:
+Cc:	Mail		Копія:
 Off	Mail		Адключыць
 Find	Mail		Шукаць
 Undo	Mail		Вярнуць

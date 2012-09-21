@@ -4,7 +4,7 @@ Error Server	PoorMan		Сервер Памылак
 Settings…	PoorMan		Наладкі…
 Create PoorMan log	PoorMan		Стварыць лог PoorMan
 Shutting down.\n	PoorMan		Выключэнне.\n
-Hits: %lu	PoorMan		Пераходы:%lu
+Hits: %lu	PoorMan		Пераходы: %lu
 Web folder:	PoorMan		Вэб-каталог:
 Default	PoorMan		Прадвызначана
 Save log console selection	PoorMan		Захоўваць выдзяленні кансолі ў лог

@@ -44,7 +44,7 @@ Moving: 	StatusWindow		Перамяшчэнне:
 before	FindPanel		перад
 Error emptying Trash	FSUtils		Памылка пры ачыстцы Сметніцы
 On	FindPanel		На
-MiB	WidgetAttributeText		MiB
+MiB	WidgetAttributeText		МіБ
 greater than	FindPanel		больш за
 Delete	PoseView		Выдаліць
 Select all	ContainerWindow		Выбраць усё
@@ -130,7 +130,7 @@ Cancel	FSUtils		Адмена
 move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	перасунуць
 Edit name	ContainerWindow		Правіць імя
 Show volumes on Desktop	SettingsView		Паказваць тамы на Дэсктопе
-KiB	WidgetAttributeText		KiB
+KiB	WidgetAttributeText		КіБ
 Error %error loading Add-On %name.	ContainerWindow		Памылка %error пры запуску дапаўнення %name.
 Defaults	TrackerSettingsWindow		Прадвызначаныя
 %num items	CountView		%num элементаў
@@ -143,7 +143,7 @@ Edit templates…	TemplatesMenu		Правіць шаблоны…
 Finish: %time - Over %finishtime left	StatusWindow		Завяршэнне: %time - Засталося каля %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Элемент \"%name\" у гэтым каталозе ўжо існуе. Ці жадаеце замяніць яго ствараемай спасылкай?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Прабачце, не хапае месца на томе прызначэння для капіявання выбранага.
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Нельга адкрыць  \"%document\" праграмай \"%app\" (%error). 
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Нельга адкрыць \"%document\" праграмай \"%app\" (%error). 
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Прабачце, захаванне больш чым аднаго элемента не дазволена.
 Searching for disks to mount…	StatusWindow		Пошук дыскаў для мантавання…
 New folder	FSUtils		Новы каталог
@@ -180,7 +180,7 @@ Create relative link	ContainerWindow		Стварыць адносную спас
 Copy	ContainerWindow		Капіяваць
 Size	PoseView		Памер
 Location	OpenWithWindow		Месцазнаходжанне
-Force identify	ContainerWindow		ідэнтыфікаваць прымусова
+Force identify	ContainerWindow		Ідэнтыфікаваць прымусова
 Duplicate	ContainerWindow		Дуплікаваць
 New folder%ld	FSUtils		Новы каталог%ld
 Outline selection rectangle only	SettingsView		Непразрыстае выдзяленне
@@ -209,7 +209,7 @@ You cannot create a link to the root directory.	FSUtils		Вы не можаце 
 48 x 48	ContainerWindow		48 x 48
 Resize to fit	VolumeWindow		Расцягнуць
 Could not find application \"%appname\"	OpenWithWindow		Не ўдалося знайсці праграму \"%appname\"
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбраны элемент нельга адправіць у Сметніцу.  Жадаеце выдаліць іх беззваротна?
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбраны элемент нельга адправіць у Сметніцу. Жадаеце выдаліць іх беззваротна?
 Invert	SelectionWindow		Інвертаваць
 Save Query as template…	FindPanel		Захаваць Запыт як шаблон…
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	перайменуеце
@@ -336,7 +336,7 @@ Clean up	ContainerWindow		Прыбрацца
 after	FindPanel		пасля
 Select…	QueryContainerWindow		Выбраць…
 link	FSUtils	filename link	спасылка
-At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		у %func \nfind_directory() не ўдалося. \nПрычына: %error
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		У %func \nfind_directory() не ўдалося. \nПрычына: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Пазначанае імя недапушчальна. Калі ласка, выберыце іншае.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Вы не можаце перамясціць каталог у яго самога ці ў яго падкаталогі.
 List view	ContainerWindow		Від спісу

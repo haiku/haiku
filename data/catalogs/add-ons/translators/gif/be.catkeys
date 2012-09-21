@@ -11,6 +11,6 @@ Palette	GIFView		Палета
 Use RGB color	GIFView		Выкарыстоўваць RGB колеры
 Use dithering	GIFView		Выкарыстоўваць згладжванне
 GIF Settings	GIFTranslator		Наладкі GIF
-BeOS system	GIFView		сістэма BeOS
+BeOS system	GIFView		Сістэма BeOS
 Automatic (from alpha channel)	GIFView		Аўтаматычна (з альфа каналу)
 Colors	GIFView		Колеры

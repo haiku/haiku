@@ -34,7 +34,7 @@ Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhil
 Received invalid time	Time		Атрыманы несапраўдны час
 Antarctica	Time		Антарктыка
 The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s
-<Other>	Time		<іншае>
+<Other>	Time		<Іншае>
 Current time:	Time		Сапраўдны час:
 Try all servers	Time		Паспрабаваць усе серверы
 Time zone	Time		Часавы пояс

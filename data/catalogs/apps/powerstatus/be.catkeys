@@ -2,23 +2,23 @@
 Design capacity low warning: 	PowerStatus		Паведамленне аб нізкай зыходнай ёмістасці: 
 Show percent	PowerStatus		Паказаць працэнты
 Design capacity: 	PowerStatus		Зыходная ёмістасць: 
- mW	PowerStatus		 mW
+ mW	PowerStatus		 мВт
 Type: 	PowerStatus		Тып: 
 non-rechargeable	PowerStatus		не перазараджальны
 Empty battery slot	PowerStatus		Пусты слот акумулятара
- mV	PowerStatus		 mV
+ mV	PowerStatus		 мВ
 Run in window	PowerStatus		Запускаць у вакне
-About	PowerStatus		пра праграму
+About	PowerStatus		Пра праграму
 PowerStatus	System name		Статус сілкавання
 PowerStatus	PowerStatus		Статус сілкавання
- mWh	PowerStatus		 mWh
+ mWh	PowerStatus		 мВтг
 Battery info…	PowerStatus		Інфа пра акумулятар…
 Damaged battery	PowerStatus		Пашкоджаны акумулятар
 Show time	PowerStatus		Паказаць час
 Last full charge: 	PowerStatus		Апошняя поўная зарадка: 
 Battery unused	PowerStatus		Акумулятар не выкарыстоўваецца
 Extended battery info	PowerStatus		Пашыраная інфармацыя пра акумулятар
- mA	PowerStatus		 mA
+ mA	PowerStatus		 мА
 Current rate: 	PowerStatus		Зараз: 
 discharging	PowerStatus		разраджаецца
 Show text label	PowerStatus		Паказаць тэкставую метку

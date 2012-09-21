@@ -9,7 +9,7 @@ Resampling algorithm	AudioMixer		Алгарытм рэсэмплінгу
 Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Аслабiць выхад мiксеру на 3дБ(як у BeOS R5)
 Display balance control for stereo connections	AudioMixer		Паказаць рэгулятар балансу для стэрэа злучэнняў
 To output	AudioMixer		Выводзіць
-not connected	AudioMixer		Ня злучана
+not connected	AudioMixer		ня злучана
 Refuse input format changes	AudioMixer		Адмова змен ўваходнага фармату
 Drop/repeat samples	AudioMixer		Прапусцiць/паўтарыць сэмплы
 Output channel sources	AudioMixer		Крыніцы выхаднога каналу

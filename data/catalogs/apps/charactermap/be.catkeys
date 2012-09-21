@@ -61,7 +61,7 @@ Sundanese	UnicodeBlocks		Суданскі
 Miscellaneous mathematical symbols A	UnicodeBlocks		Розныя матэматычныя сімвалы A
 Cyrillic supplement	UnicodeBlocks		Кірыліца дапаўненне
 Small form variants	UnicodeBlocks		Варыянты малых форм
-IPA extensions	UnicodeBlocks		пашырэнні IPA
+IPA extensions	UnicodeBlocks		Пашырэнні IPA
 Thaana	UnicodeBlocks		Тана
 Ogham	UnicodeBlocks		Огам
 Combining diacritical marks for symbols	UnicodeBlocks		Камбінаванне дыякрытыных метак для сімвалаў
@@ -119,9 +119,9 @@ Myanmar	UnicodeBlocks		Маянмар
 Latin extended D	UnicodeBlocks		Лацінка пашыраная D
 Byzantine musical symbols	UnicodeBlocks		Візантыйскія музычныя сімвалы
 Oriya	UnicodeBlocks		Oriya
-Tibetan	UnicodeBlocks		Tibetan
+Tibetan	UnicodeBlocks		Тыбецкі
 Ancient Greek numbers	UnicodeBlocks		Старадаўнія грэчаскія лічбы
-Vai	UnicodeBlocks		Vai
+Vai	UnicodeBlocks		Ваі
 Yi Radicals	UnicodeBlocks		Радыкалы Yi
 Cyrillic extended B	UnicodeBlocks		Кірыліца пашыраная B
 Quit	CharacterWindow		Выйсці
@@ -132,9 +132,9 @@ Miscellaneous mathematical symbols B	UnicodeBlocks		Розныя матэмат�
 Cuneiform numbers and punctuation	UnicodeBlocks		Клінапісныя лічбы і пунктуацыя
 Private use area	UnicodeBlocks		Вобласць прыватнага карыстання
 CJK unified ideographs extension B	UnicodeBlocks		Іерогліфы CJK дапаўненне B
-Phags-pa	UnicodeBlocks		Phags-pa
+Phags-pa	UnicodeBlocks		Фагс-па
 Kangxi radicals	UnicodeBlocks		Радыкалы Kangxi
-Dingbats	UnicodeBlocks		Dingbats
+Dingbats	UnicodeBlocks		Аздобныя
 Tai Xuan Jing symbols	UnicodeBlocks		Сімвалы Tai Xuan Jing
 Yi syllables	UnicodeBlocks		Склады Yi
 Buhid	UnicodeBlocks		Бухід
@@ -173,7 +173,7 @@ Phaistos disc	UnicodeBlocks		Фесцкі дыск
 Shavian	UnicodeBlocks		Шавійскі
 CJK compatibility	UnicodeBlocks		Сумяшчальнасць CJK
 Malayalam	UnicodeBlocks		Малаяламскі
-N'Ko	UnicodeBlocks		N'Ko
+N'Ko	UnicodeBlocks		Н'Ко
 Kannada	UnicodeBlocks		Каннада
 Copy as escaped byte string	CharacterView		Капіяваць кадаваным радком
 Phonetic extensions supplement	UnicodeBlocks		Фанетычныя пашырэнні дапаўненні

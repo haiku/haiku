@@ -5,7 +5,7 @@ Are you sure you want to abort the installation and restart the system?	Installe
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tАўтары: Jérôme Duval, Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Новыя версіі GRUB карыстуюць дадатковы канфігурацыйны файл для дадання запісаў у меню загрузкі. Каб дадаць іх даверху, вы павінны стварыць/паправіць файл праз кансольную каманду:\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Тут вам трэба закаменціраваць страку \"GRUB_HIDDEN_TIMEOUT=0\" з дапамогай \"#\" у яе пачатку, каб убачыць меню запуску.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'.Націсніце Выйсці, каб пакінуць усталёўшчык ці абраць іншы том для новай усталёўкі.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'. Націсніце Выйсці, каб пакінуць усталёўшчык ці абраць іншы том для новай усталёўкі.
 Quit	InstallerApp		Выйсці
 Additional disk space required: 0.0 KiB	InstallerWindow		Патрэбна яшчэ 0.0 KiB месца на дыску
 With GRUB it's: (hdN,n)\n\n	InstallerApp		У GRUB гэта: (hdN,n)\n\n
@@ -60,11 +60,11 @@ No partitions have been found that are suitable for installation. Please set up 
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Дадаткова вы павінны паправіць другі файл, каб урэшце паказаць меню загрузкі:\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце пажаданы дыск з выплывальнага меню. Потым клікніце \"Пачаць\".
 Unknown Type	InstallProgress	Partition content type	Невядомы тып
-<none>	InstallerWindow	No partition available	<Няма>
+<none>	InstallerWindow	No partition available	<няма>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Вы прыкмеціце, што GRUB выкарыстоўвае схема наймавання дыскаў не такую, як Linux.\n\n
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" - нумар падзелу, таксама пачынаецца з \"0\".\n
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'.Націсніце Перазапусціць, каб перазапусціць кампутар ці абрярыце іншы том для яшчэ адной усталёўкі.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'. Націсніце Перазапусціць, каб перазапусціць кампутар ці абрярыце іншы том для яшчэ адной усталёўкі.
 Installation canceled.	InstallProgress		Усталёўка адмененая.
 Installer	System name		Усталёўшчык
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Вы не можаце капіяваць файлы на зыходны дыск. Выберыце, калі ласка, іншы.
@@ -89,7 +89,7 @@ Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerAp
 OK	InstallProgress		ОК
 Please choose target	InstallerWindow		Калі ласка, выберыце дыск прызначэння
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Калі вы ўсталёўваеце Haiku на рэальнае жалеза (не на эмулятар), мы рэкамендуем загадзя падрыхтаваць падзел на дыску.Усталёўшчык і утыліта DriveSetup дапамогуць усталяваць на падзеле родную для Haiku файлавую сістэму, але опыці па змене цякучай табліцы падзелаў яшчэ недадакова пратэсціраваныя, таму іх ужыванне не рэкамендуецца.\n
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Калі вы ўсталёўваеце Haiku на рэальнае жалеза (не на эмулятар), мы рэкамендуем загадзя падрыхтаваць падзел на дыску. Усталёўшчык і утыліта DriveSetup дапамогуць усталяваць на падзеле родную для Haiku файлавую сістэму, але опыці па змене цякучай табліцы падзелаў яшчэ недадакова пратэсціраваныя, таму іх ужыванне не рэкамендуецца.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Усталёўшчык зробіць падзел Haiku загрузачным, але не дадасць Haiku да вашага меню загрузкі. Калі у вас ужо ўсталяваны GRUB, вы можаце самастойна дадаць Haiku да яго меню. Гэта робіцца па-рознаму у залежнасці ад вашай версіі загрузчыка.\n\n\n
 Begin	InstallerWindow		Пачаць
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Урэшце, трэба абнавіць меню камандай:\n\n

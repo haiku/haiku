@@ -42,7 +42,7 @@ Green on Black	Terminal colors schema		Залёны на Белым
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Працэс \"%1\" яшчэ актыўны.\nКалі вы закрыеце ўкладку, працэс будзе забіты.
 Size:	Terminal AppearancePrefView		Памер:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Немагчыма выканаць \"%command\":\n\t%error
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               вывесцi дапамогу\n  -t,     --title             задаць загаловак вакна\n  -f,     --fullscreen        запусціць на поўны экран\n
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               вывесцi дапамогу\n  -t,     --title              задаць загаловак вакна\n  -f,     --fullscreen         запусціць на поўны экран\n
 Full screen	Terminal TermWindow		Поўны экран
 Window title…	Terminal TermWindow		Загаловак вакна…
 Page setup…	Terminal TermWindow		Наладкі старонкі…

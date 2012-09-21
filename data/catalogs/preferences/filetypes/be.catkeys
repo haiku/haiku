@@ -53,7 +53,7 @@ Set preferred application	Preferred App Menu		Прызначыць пажада�
 File	Application Type Window		Файл
 Version:	Application Type Window		Версія:
 Select…	FileTypes Window		Выбраць…
-FileTypes request	FileTypes		запыт FileTypes
+FileTypes request	FileTypes		Запыт FileTypes
 Open…	FileTypes Window		Адкрыць…
 Select…	FileType Window		Вылучыць…
 Launch	Application Types Window		Запуск
@@ -69,7 +69,7 @@ Final	Application Types Window		Фінальная
 Development	Application Types Window		Распрацоўная
 Open file	FileTypes		Адчыніць Файл
 Special:	Attribute Window		Спецыяльны:
-Alpha	Application Type Window		Alpha
+Alpha	Application Type Window		Альфа
 Add…	FileTypes Window		Дадаць…
 Signature:	Application Type Window		Подпіс:
 Quit, don't save	Application Type Window		Выйсьці, не захоўваць
@@ -116,7 +116,7 @@ Cancel	Type List Window		Адмена
 Move up	FileTypes Window		Перасунуць уверх
 Description	FileTypes Window		Апісанне
 Save request	Application Type Window		Захаваць запыт
-Beta	Application Type Window		Beta
+Beta	Application Type Window		Бэта
 None	FileTypes Window		Няма
 Remove	FileTypes Window		Выдаліць
 Attribute name:	Attribute Window		Імя атрыбута:
@@ -135,7 +135,7 @@ FileTypes	System name		Тыпы файлаў
 Application types	Application Types Window		Тыпы праграм
 Could not remove file type: %s\n	FileTypes Window		Не ўдалося выдаліць тып файла: %s\n
 Signature:	Application Types Window		Подпіс:
-Gamma	Application Type Window		Gamma
+Gamma	Application Type Window		Гамма
 Cancel	Preferred App Menu		Адмена
 Cancel	FileTypes Window		Адмена
 Select preferred application	FileTypes Window		Выбраць пажаданую праграму

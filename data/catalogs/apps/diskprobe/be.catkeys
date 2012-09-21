@@ -15,7 +15,7 @@ Floating-point value:	TypeEditors		Значэнне з плаваючай зап
 Attributes	ProbeView		Атрыбуты
 Device offset: 	ProbeView		Адступ прылады: 
 Selection	ProbeView		Выдзяленне
-DiskProbe	System name		DiskProbe
+DiskProbe	System name		Рэдактар дыска
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	што: '%.4s'\n\n
 File	FileWindow		Файл
 OK	DiskProbe		Так
@@ -30,7 +30,7 @@ Number:	TypeEditors		Нумар:
 Save	ProbeView		Захаваць
 Stop	ProbeView		Стоп
 Number editor	TypeEditors		Рэдактар нумараў
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шаснаццаткавы
 No type editor available	AttributeWindow		Рэдактар тыпаў недаступны
 Double precision floating-point value:	TypeEditors		Значэнне з плаваючай запятой двайной дакладнасці:
 Device: 	ProbeView		Прылада: 

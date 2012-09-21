@@ -10,7 +10,7 @@ Combine displays:	Screen		Камбінаваць экраны:
 Done	Screen		Гатова
 Set background…	Screen		Прызначыць фон…
 Undo	Screen		Адмяніць
-if needed	Screen		Калі неабходна
+if needed	Screen		калі неабходна
 Screen preferences by the Haiku team	Screen		Наладкі экрана, каманда Haiku
 Screen	System name		Экран
 OK	Screen		ОК
@@ -46,7 +46,7 @@ Screen	Screen		Экран
 %.1f Hz	Screen		%.1f Гц
 8 bits/pixel, 256 colors	Screen		8 бітаў на піксель, 256 колераў
 Apply	Screen		Ужыць
-Refresh rate	Screen		частата абнаўлення
+Refresh rate	Screen		Частата абнаўлення
 %sSerial no.: %s	Screen		%sСерыйны нумар.: %s
 Colors:	Screen		Колеры:
 Video format:	Screen		Фармат відэа:
