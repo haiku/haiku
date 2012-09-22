@@ -225,18 +225,138 @@ PPCOpenFirmware::ShutDown(bool reboot)
 }
 
 
+// #pragma mark - U-Boot + FDT
+
+
+namespace BPrivate {
+
+class PPCUBoot : public PPCPlatform {
+public:
+	PPCUBoot();
+	virtual ~PPCUBoot();
+
+	virtual status_t Init(struct kernel_args *kernelArgs);
+	virtual status_t InitSerialDebug(struct kernel_args *kernelArgs);
+	virtual status_t InitPostVM(struct kernel_args *kernelArgs);
+	virtual status_t InitRTC(struct kernel_args *kernelArgs,
+		struct real_time_data *data);
+
+	virtual char SerialDebugGetChar();
+	virtual void SerialDebugPutChar(char c);
+
+	virtual	void SetHardwareRTC(uint32 seconds);
+	virtual	uint32 GetHardwareRTC();
+
+	virtual	void ShutDown(bool reboot);
+
+private:
+	int	fInput;
+	int	fOutput;
+	int	fRTC;
+};
+
+}	// namespace BPrivate
+
+using BPrivate::PPCUBoot;
+
+
+// constructor
+PPCUBoot::PPCUBoot()
+	: PPCPlatform(PPC_PLATFORM_U_BOOT),
+	  fInput(-1),
+	  fOutput(-1),
+	  fRTC(-1)
+{
+}
+
+// destructor
+PPCUBoot::~PPCUBoot()
+{
+}
+
+// Init
+status_t
+PPCUBoot::Init(struct kernel_args *kernelArgs)
+{
+	return B_ERROR;
+}
+
+// InitSerialDebug
+status_t
+PPCUBoot::InitSerialDebug(struct kernel_args *kernelArgs)
+{
+	return B_ERROR;
+}
+
+// InitPostVM
+status_t
+PPCUBoot::InitPostVM(struct kernel_args *kernelArgs)
+{
+	return B_ERROR;
+}
+
+// InitRTC
+status_t
+PPCUBoot::InitRTC(struct kernel_args *kernelArgs,
+	struct real_time_data *data)
+{
+	return B_ERROR;
+}
+
+// DebugSerialGetChar
+char
+PPCUBoot::SerialDebugGetChar()
+{
+	return 0;
+}
+
+// DebugSerialPutChar
+void
+PPCUBoot::SerialDebugPutChar(char c)
+{
+}
+
+// SetHardwareRTC
+void
+PPCUBoot::SetHardwareRTC(uint32 seconds)
+{
+}
+
+// GetHardwareRTC
+uint32
+PPCUBoot::GetHardwareRTC()
+{
+	return 0;
+}
+
+// ShutDown
+void
+PPCUBoot::ShutDown(bool reboot)
+{
+}
+
+
 // # pragma mark -
 
 
+#define PLATFORM_BUFFER_SIZE MAX(sizeof(PPCOpenFirmware),sizeof(PPCUBoot))
 // static buffer for constructing the actual PPCPlatform
-static char *sPPCPlatformBuffer[sizeof(PPCOpenFirmware)];
+static char *sPPCPlatformBuffer[PLATFORM_BUFFER_SIZE];
 
 status_t
 arch_platform_init(struct kernel_args *kernelArgs)
 {
 	// only OpenFirmware supported for now
-	if (true)
-		sPPCPlatform = new(sPPCPlatformBuffer) PPCOpenFirmware;
+	switch (kernelArgs->arch_args.platform) {
+		case PPC_PLATFORM_OPEN_FIRMWARE:
+			sPPCPlatform = new(sPPCPlatformBuffer) PPCOpenFirmware;
+			break;
+		case PPC_PLATFORM_U_BOOT:
+			sPPCPlatform = new(sPPCPlatformBuffer) PPCUBoot;
+			break;
+		default:
+			return B_ERROR;
+	}
 
 	return sPPCPlatform->Init(kernelArgs);
 }
