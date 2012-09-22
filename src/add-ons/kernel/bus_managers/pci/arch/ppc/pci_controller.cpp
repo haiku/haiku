@@ -11,6 +11,7 @@
 #include "pci_private.h"
 
 #include "openfirmware/pci_openfirmware.h"
+#include "u-boot/pci_u-boot.h"
 
 
 status_t
@@ -19,9 +20,12 @@ pci_controller_init(void)
 	switch (PPCPlatform::Default()->PlatformType()) {
 		case PPC_PLATFORM_OPEN_FIRMWARE:
 			return ppc_openfirmware_pci_controller_init();
-			break;
+		case PPC_PLATFORM_U_BOOT:
+			return ppc_uboot_pci_controller_init();
+		default:
+			panic("pci: unknown platform");
 	}
-	return B_OK;
+	return B_ERROR;
 }
 
 
