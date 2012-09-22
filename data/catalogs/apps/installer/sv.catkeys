@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	1788932451
+1	swedish	x-vnd.Haiku-Installer	1687418094
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Efter de andra menyposterna mot slutet av filen, lägg till något som liknar dessa rader:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet
 \t}\n\n	InstallerApp		\t}\n\n
@@ -82,6 +82,7 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Install anyway	InstallProgress		Installera iallafall
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\t rootnoverify\t \t (hd0,6)\n
 OK	InstallProgress		OK
+Please choose target	InstallerWindow		Välj mål
 ???	InstallerWindow	Unknown partition name	???
 Begin	InstallerWindow		Början
 Write boot sector	InstallerWindow		Skriv boot sektor

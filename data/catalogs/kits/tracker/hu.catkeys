@@ -115,7 +115,7 @@ Add printer…	ContainerWindow		Nyomtató hozzáadása…
 Open	VolumeWindow		Megnyitás
 New folder	ContainerWindow		Új mappa
 Kind	ContainerWindow		Típus
-rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	átnevezni
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	átnevezze
 home	B_USER_DIRECTORY		Saját mappa
 Select…	ContainerWindow		Kijelölés…
 Copy to	ContainerWindow		Másolás
@@ -127,7 +127,7 @@ If you %ifYouDoAction the system folder or its contents, you won't be able to bo
 Save as Query template:	FindPanel		Mentés keresési sablonként:
 preferences	B_PREFERENCES_DIRECTORY		Beállítások
 Cancel	FSUtils		Mégse
-move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	mozgatni
+move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	átmozgassa
 Edit name	ContainerWindow		Név szerkesztése
 Show volumes on Desktop	SettingsView		Lemezek megjelenítése az Asztalon
 KiB	WidgetAttributeText		KB
@@ -305,7 +305,7 @@ Previously mounted disks	AutoMounterSettings		Legutóbb csatolt lemezek
 %Ld B	WidgetAttributeText		%Ld B
 copying	FSUtils		másolás
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hiba történt a mappa másolása közben: %name\n\t%error\n\nSzeretné folytatni?
-move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	mozgatni
+move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	átmozgatja
 Show Disks icon	SettingsView		„Lemezek” ikon megjelenítése
 Mount	VolumeWindow		Csatolás
 Cancel	PoseView		Mégse
@@ -322,7 +322,7 @@ Permissions	ContainerWindow		Engedélyek
 moving	FSUtils		mozgatás
 Identify	InfoWindow		Azonosítás
 Recent folders	ContainerWindow		Legutóbbi mappák
-rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	átnevezi
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	átnevezze
 Close all	ContainerWindow		Összes bezárása
 Include trash	FindPanel		A Szemetesben is
 Query template	FindPanel		Keresés
