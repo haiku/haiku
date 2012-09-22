@@ -11,6 +11,7 @@ struct real_time_data;
 
 enum ppc_platform_type {
 	PPC_PLATFORM_OPEN_FIRMWARE = 0,
+	PPC_PLATFORM_U_BOOT
 };
 
 namespace BPrivate {
