@@ -51,7 +51,6 @@ KernelMergeObject boot_platform_u-boot_common.o :
 	cpu.cpp
 	uimage.cpp
 	video.cpp
-	mmu.cpp
 	fdt_support.cpp
 	$(genericPlatformSources)
 	$(libFDTSources)
