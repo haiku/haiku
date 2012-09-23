@@ -889,7 +889,7 @@ SudokuView::MouseDown(BPoint where)
 				fLastField = field;
 			}
 
-			if (value + 1 != fValueHintValue)
+			if (value + 1 != fValueHintValue && fValueHintValue != ~0UL)
 				_SetValueHintValue(value + 1);
 
 			if (wasCompleted != fField->IsValueCompleted(value + 1))
@@ -1208,17 +1208,14 @@ SudokuView::_DrawHints(uint32 x, uint32 y)
 	for (uint32 j = 0; j < fBlockSize; j++) {
 		for (uint32 i = 0; i < fBlockSize; i++) {
 			uint32 value = j * fBlockSize + i;
-			if (hintMask & (1UL << value)) {
-//				if (value + 1 == fValueHintValue)
-//					SetHighColor(kValueHintBackgroundColor);
-//				else
-					SetHighColor(kHintColor);
-			}else {
+			if ((hintMask & (1UL << value)) != 0) {
+				SetHighColor(kHintColor);
+			} else {
 				if (!showAll)
 					continue;
 
 				if ((fHintFlags & kMarkValidHints) == 0
-					|| validMask & (1UL << value))
+					|| (validMask & (1UL << value)) != 0)
 					SetHighColor(110, 110, 80);
 				else
 					SetHighColor(180, 180, 120);
