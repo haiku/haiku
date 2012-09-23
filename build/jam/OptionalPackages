@@ -580,7 +580,7 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 if [ IsOptionalHaikuImagePackageAdded DemoPackage_Audio ] {
 	InstallOptionalHaikuImagePackage DemoPackage_Audio-0.1-2012-02-19.zip
 		: $(baseURL)/DemoPackage_Audio-0.1-2012-02-19.zip
-		: home ;
+		: ;
 }
 
 
@@ -588,15 +588,15 @@ if [ IsOptionalHaikuImagePackageAdded DemoPackage_Audio ] {
 if [ IsOptionalHaikuImagePackageAdded DemoPackage_Data ] {
 	InstallOptionalHaikuImagePackage DemoPackage_Data-0.1-2012-02-19.zip
 		: $(baseURL)/DemoPackage_Data-0.1-2012-02-19.zip
-		: home ;
+		: ;
 }
 
 
 # DemoPackage_Image
 if [ IsOptionalHaikuImagePackageAdded DemoPackage_Image ] {
-	InstallOptionalHaikuImagePackage DemoPackage_Image-0.1-2012-02-19.zip
-		: $(baseURL)/DemoPackage_Image-0.1-2012-02-19.zip
-		: home ;
+	InstallOptionalHaikuImagePackage DemoPackage_Image-0.2-2012-09-22.zip
+		: $(baseURL)/DemoPackage_Image-0.2-2012-09-22.zip
+		: ;
 }
 
 
@@ -604,7 +604,7 @@ if [ IsOptionalHaikuImagePackageAdded DemoPackage_Image ] {
 if [ IsOptionalHaikuImagePackageAdded DemoPackage_Video ] {
 	InstallOptionalHaikuImagePackage DemoPackage_Video-0.1-2012-02-19.zip
 		: $(baseURL)/DemoPackage_Video-0.1-2012-02-19.zip
-		: home ;
+		: ;
 }
 
 
