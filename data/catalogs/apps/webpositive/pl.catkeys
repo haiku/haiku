@@ -1,7 +1,124 @@
-1	polish	x-vnd.Haiku-WebPositive	2959208268
+1	polish	x-vnd.Haiku-WebPositive	690423602
+Show home button	Settings Window		Pokaż przycisk domowy
+Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
 Cancel	Settings Window		Anuluj
 Close window	WebPositive Window		Zamknij okno
 Quit	WebPositive		Zakończ
 The download could not be opened.	Download Window		Pobrania nie można otworzyć.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Folderu pobierania nie można otworzyć\n\nError: %error
+Open location	WebPositive Window		Otwarcie położenia
+Clear history	WebPositive Window		Wyczyść historię
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Wczoraj
+Start page:	Settings Window		Strona startowa:
+History	WebPositive Window		Historia
+Error opening downloads folder	Download Window		Błąd podczas otwierania folderu pobierania
+Paste	WebPositive Window		Wklej
+Settings	Settings Window		Ustawienia
+%seconds seconds left	Download Window		Pozostało %seconds sekund 
+Confirmation	WebPositive Window		Potwierdzenie
+Window	WebPositive Window		Okno
+Decrease size	WebPositive Window		Zmniejsz wielkość
+Loading %url	WebPositive Window		Ładowanie %url
+Page source	WebPositive Window		Źródło strony
+Next	WebPositive Window		Następna
+Find next	WebPositive Window		Znajdź następne
+Download folder:	Settings Window		Folder pobierania:
+Edit	WebPositive Window		Edytuj
+Over %hours hours left	Download Window		Zostało ponad %hours godzin
+Cancel	Authentication Panel		Anuluj
+Match case	WebPositive Window		Uwzględnij wielkość liter
+Search page:	Settings Window		Strona wyszukiwania:
+Zoom text only	WebPositive Window		Powiększaj tylko tekst
+Close tab	WebPositive Window		Zamknij kartę
+Auto-hide mouse pointer	Settings Window		Auto-chowanie  wskaźnika myszy
+Over 1 hour left	Download Window		Została ponad 1 godzina
+Quit	WebPositive Window		Zakończ
+Full screen	WebPositive Window		Pełny ekran
+Open download error	Download Window		Otwórz błąd pobierania
+Standard font:	Settings Window		Czcionka standardowa:
+Restart	Download Window		Uruchom ponownie
+Open containing folder	Download Window		Otwórz folder zawierający
+New window	WebPositive Window		Nowe okno
+Open	Download Window		Otwórz
+Reload	WebPositive Window		Odśwież 
+Downloads	Download Window		Pobierane
+Over %days days left	Download Window		Zostało ponad %days dni
+Forward	WebPositive Window		Dalej
+of	Download Window	...as in '12kB of 256kB'	z
+Revert	Settings Window		Cofa dokonane zmiany
+Fixed font:	Settings Window		Czcionka o stałej szerokości:
+Cut	WebPositive Window		Wytnij
+Bookmark this page	WebPositive Window		Dodaj zakładkę
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Wystąpił błąd podczas próby pokazania folderu zakładek.\n\nBłąd: %error
+Open downloads folder	Download Window		Otwórz folder pobierania
+Number of days to keep links in History menu:	Settings Window		Liczba dni przechowywania linków w historii:
+Hide	Download Window		Ukryj
+Reset size	WebPositive Window		Resetuj rozmiar
+Find:	WebPositive Window		Znajdź:
+Increase size	WebPositive Window		Zwiększ rozmiar
+Over 1 day left	Download Window		Został ponad 1 dzień
+Downloads	WebPositive Window		Pobieranie
+Apply	Settings Window		Zastosuj
+Bookmark info	WebPositive Window		Informacje o zakładkach
+Size:	Font Selection view		Rozmiar:
+Show tabs if only one page is open	Settings Window		Pokaż karty, nawet jeśli tylko jedna strona jest otwarta
+About	WebPositive Window		O programie
+Finish: 	Download Window	Finishing time	Do zakończenia:
+Fonts	Settings Window		Czcionki
+Close	WebPositive Window		Zamknij
+OK	Download Window		OK
+Page source error	WebPositive Window		Błąd strony źródłowej
+Open blank page	Settings Window		Otwórz pustą stronę
+Cancel	WebPositive Window		Anuluj
+Open all	WebPositive Window		Otwórz wszystko
+Clear	URL Bar		Wyczyść
+Cut	URL Bar		Wytnij
+Clear	WebPositive Window		Wyczyść
+Remove	Download Window		Usuń
+Find	WebPositive Window		Znajdź
+Find previous	WebPositive Window		Znajdź poprzednie
+Settings	WebPositive Window		Ustawienia
+Bookmarks	WebPositive Window		Zakładki
+%minutes minutes	Download Window		%minutes minut
+Paste	URL Bar		Wklej
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Ukryj tekst hasła
+Over 1 minute left	Download Window		Została ponad 1 minuta
+Open start page	Settings Window		Otwórz stronę startową
+Continue downloads	WebPositive		Kontynuowanie pobierania
+Cancel	Download Window		Anuluj
+Open search page	Settings Window		Otwórz stronę wyszukiwania
+Password:	Authentication Panel		Hasło:
+Back	WebPositive Window		Wstecz
+New browser window	Download Window		Nowe okno
+Today	WebPositive Window		Dzisiaj
+1 second left	Download Window		Została 1 sekunda
+Remember username and password for this site	Authentication Panel		Pamiętaj nazwę użytkownika i hasło dla tej strony
+Earlier	WebPositive Window		Wcześniej
+Authentication required	Authentication Panel		Wymagane uwierzytelnienie
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		W toku jest pobieranie, czy na pewno chcesz teraz zamknąć WebPositive?
+Auto-hide interface in full screen mode	Settings Window		Automatyczne ukrywanie interfejsu w trybie pełnoekranowym 
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url nie załadował się
+New tab	WebPositive Window		Nowa karta
+Downloads in progress	WebPositive		Pobieranie jest w toku
+Style:	Font Selection view		Styl:
+General	Settings Window		Ogólne
+View	WebPositive Window		Widok
+Previous	WebPositive Window		Poprzedni
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Wystąpił błąd podczas tworzenia pliku zakładki.\n\nBłąd: %error
+Bookmark error	WebPositive Window		Błąd zakładki
+Do you really want to clear the browsing history?	WebPositive Window		Na pewno chcesz wyczyścić całą historię przeglądania?
+Copy	WebPositive Window		Kopiuj
+Remove missing	Download Window		Usuń brakujące
+Clone current page	Settings Window		Sklonuj bieżącą stronę
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Czy naprawdę chcesz otworzyć wszystkie zakładki %addedCount na raz?
+OK	Authentication Panel		OK
+Copy	URL Bar		Kopiuj
+OK	WebPositive Window		OK
+Manage bookmarks	WebPositive Window		Zarządzanie zakładkami
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Zakładka dla tej strony (%bookmarkName) już istnieje.
+New windows:	Settings Window		Nowe okna:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url załadowany
+Remove finished	Download Window		Usuwanie zakończone

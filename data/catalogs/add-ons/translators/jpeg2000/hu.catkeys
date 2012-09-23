@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-JPEG2000Translator	547915409
 Write	JPEG2000Translator		Írás
-JPEG2000 images	JPEG2000Translator		JPEG2000 képek
+JPEG2000 images	JPEG2000Translator		JPEG2000 kép
 Output only codestream (.jpc)	JPEG2000Translator		Csak a kódfolyam (.jpc) küldése a kimenetre
 Write black-and-white images as RGB24	JPEG2000Translator		Fekete-fehér képek írása RGB24-ként
 Output quality	JPEG2000Translator		Kimeneti minőség

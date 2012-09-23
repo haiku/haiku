@@ -4,5 +4,5 @@ Version %d.%d.%d, %s	ConfigView		%d.%d.%d, %s verzió
 PCXTranslator Settings	ConfigView		PCXÉrtelemző beállítások
 PCX image translator	PCXTranslator		PCX kép értelmező
 PCX %lu bit image	PCXTranslator		PCX %lu-bites kép
-PCX images	PCXTranslator		PCX képek
+PCX images	PCXTranslator		PCX kép
 PCX image translator	ConfigView		PCX kép értelmező

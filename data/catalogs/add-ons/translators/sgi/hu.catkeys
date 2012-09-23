@@ -3,7 +3,7 @@ Use compression:	SGIView		Tömörítés fajtája:
 Version %d.%d.%d %s	SGIView		%d.%d.%d %s verzió
 SGITranslator Settings	SGITranslator		SGIÉrtelmező beállítások
 None	SGIView		Nincs
-SGI images	SGITranslator		SGI képek
+SGI images	SGITranslator		SGI kép
 SGI image translator	SGITranslator		SGI kép értelmező
 SGI image	SGITranslator		SGI kép
 RLE	SGIView		RLE

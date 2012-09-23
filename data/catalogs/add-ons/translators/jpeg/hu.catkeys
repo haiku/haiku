@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-JPEGTranslator	965709535
 Output quality	JPEGTranslator		Kimeneti minőség
-JPEG images	JPEGTranslator		JPEG képek
+JPEG images	JPEGTranslator		JPEG kép
 Prevent colors 'washing out'	JPEGTranslator		Elmosódott színek megelőzése
 JPEG Library Error: %s\n	be_jerror		JPEG funkciótár hiba: %s\n
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Használjon CMYK kódot, úgy, hogy 0 jelenti a 100%-os tintaszintet

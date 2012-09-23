@@ -5,7 +5,7 @@ TIFF image	TIFFTranslator		TIFF kép
 TIFF Library:	TIFFView		TIFF funkciótár:
 TIFF image translator	TIFFView		TIFF kép értelmező
 None	TIFFView		Nincs
-TIFF images	TIFFTranslator		TIFF képek
+TIFF images	TIFFTranslator		TIFF kép
 TIFFTranslator Settings	TIFFTranslator		TIFFÉrtelmező beállítások
 TIFF image translator	TIFFTranslator		TIFF kép értelmező
 RLE (Packbits)	TIFFView		RLE

@@ -8,7 +8,7 @@ Targa image (%d bits RLE colormap)	TGATranslator		Targa kép (%d bites RLE szín
 Targa image (%d bits gray)	TGATranslator		Targa kép (%d bites szürkeárnyalatos)
 Written by the Haiku Translation Kit Team	TGAView		a Haiku Translation Kit csapata készítette
 Targa image (%d bits RLE truecolor)	TGATranslator		Targa kép (%d bites RLE truecolor)
-TGA images	TGATranslator		TGA képek
+TGA images	TGATranslator		TGA kép
 TGATranslator Settings	TGATranslator		TGAÉrtelmező beállítások
 Save with RLE Compression	TGAView		RLE tömörítéssel való mentés
 TGA image translator	TGATranslator		TGA kép értelmező

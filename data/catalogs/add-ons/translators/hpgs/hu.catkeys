@@ -5,8 +5,8 @@ Error: Cannot process plot data %s\n	HPGSTranslator		Hiba: Plot adatok nem feldo
 HPGS image	HPGSTranslator		HPGS kép
 HPGSTranslator Settings	ConfigView		HPGSÉrtelemző beállítások
 Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Hiba: Nem lehet befoglalni plot eszközt az olvasóba: %s\n
-HPGS images	ConfigView		HPGS képek
-HPGS images	HPGSTranslator		HPGS képek
+HPGS images	ConfigView		HPGS kép
+HPGS images	HPGSTranslator		HPGS kép
 no hpgs\n	HPGSTranslator		nem hpgs\n
 HPGS image translator	HPGSTranslator		HPGS kép értelemző
 Write error %s\n	HPGSTranslator		Íráshiba: %s\n
