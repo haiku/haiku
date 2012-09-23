@@ -767,7 +767,7 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 		controller->Write16(HDAC_CORB_WRITE_POS, controller->corb_write_pos);
 		status_t status = acquire_sem_etc(codec->response_sem, queued,
 			B_RELATIVE_TIMEOUT, 50000ULL);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
@@ -958,6 +958,11 @@ corb_rirb_failed:
 	controller->Write32(HDAC_INTR_CONTROL, 0);
 
 reset_failed:
+	if (controller->msi) {
+		sPCIx86Module->disable_msi(controller->pci_info.bus,
+			controller->pci_info.device, controller->pci_info.function);
+	}
+
 	remove_io_interrupt_handler(controller->irq,
 		(interrupt_handler)hda_interrupt_handler, controller);
 
