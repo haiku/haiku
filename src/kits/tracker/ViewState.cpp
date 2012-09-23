@@ -238,8 +238,7 @@ BColumn::ArchiveToMessage(BMessage &message) const
 	message.AddString(kColumnAttrName, fAttrName);
 	message.AddInt32(kColumnAttrHashName, static_cast<int32>(fAttrHash));
 	message.AddInt32(kColumnAttrTypeName, static_cast<int32>(fAttrType));
-	if (fDisplayAs.Length() > 0)
-		message.AddString(kColumnDisplayAsName, fDisplayAs.String());
+	message.AddString(kColumnDisplayAsName, fDisplayAs.String());
 	message.AddBool(kColumnStatFieldName, fStatField);
 	message.AddBool(kColumnEditableName, fEditable);
 }
