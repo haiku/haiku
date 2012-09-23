@@ -349,6 +349,7 @@ MediaWindow::_InitWindow()
 {
 	fListView = new BListView("media_list_view");
 	fListView->SetSelectionMessage(new BMessage(ML_SELECTED_NODE));
+	fListView->SetExplicitMinSize(BSize(140, B_SIZE_UNSET));
 
 	// Add ScrollView to Media Menu for pretty border
 	BScrollView* scrollView = new BScrollView("listscroller",
