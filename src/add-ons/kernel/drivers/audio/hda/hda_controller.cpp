@@ -1006,5 +1006,6 @@ hda_hw_uninit(hda_controller* controller)
 		if (controller->codecs[index] != NULL)
 			hda_codec_delete(controller->codecs[index]);
 	}
+	controller->active_codec = NULL;
 }
 
