@@ -18,15 +18,19 @@ extern "C" {
 
 extern "C" void dump_fdt(const void *fdt);
 
-static const char *sTabTab = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
-#define DS "%.*s"
-#define DA depth - 1, sTabTab
-
 //#define FDT_DUMP_NODES
 //#define FDT_DUMP_PROPS
 //#define FDT_DUMP_PROP_VALUES
 
 
+#ifdef FDT_DUMP_NODES
+static const char *sTabTab = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
+#define DS "%.*s"
+#define DA depth - 1, sTabTab
+#endif
+
+
+#ifdef FDT_DUMP_PROP_VALUES
 static void dump_hex(const char *data, int32 len, int depth)
 {
 	char str[128];
@@ -49,15 +53,12 @@ static void dump_hex(const char *data, int32 len, int depth)
 		dprintf(DS"    %-48.48s	%s\n", DA, str, astr);
 	}
 }
+#endif
 
 
 void dump_fdt(const void *fdt)
 {
-	uint32 *sizes;
-	int i, err, len;
-	int node = -1;
-	int depth = 0;
-	const struct fdt_property *property;
+	int err;
 
 	dprintf("FDT @ %p:\n", fdt);
 	
@@ -83,11 +84,14 @@ void dump_fdt(const void *fdt)
 #ifdef FDT_DUMP_NODES
 	dprintf("fdt tree:\n");
 
+	int node = -1;
+	int depth = 0;
 	while ((node = fdt_next_node(fdt, node, &depth)) >= 0) {
 		dprintf(DS"node at %d: '%s'\n", DA, node,
 			fdt_get_name(fdt, node, NULL));
 #ifdef FDT_DUMP_PROPS
-		int prop;
+		int prop, len;
+		const struct fdt_property *property;
 		prop = fdt_first_property_offset(fdt, node);
 		while (prop >= 0) {
 			property = fdt_get_property_by_offset(fdt, prop, &len);
