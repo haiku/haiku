@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,14 +12,16 @@
 #include "driver.h"
 #include "hda_codec_defs.h"
 
+
 #undef TRACE
 #define TRACE_CODEC
 #ifdef TRACE_CODEC
-#define TRACE(a...) dprintf(a)
+#	define TRACE(a...) dprintf(a)
 #else
-#define TRACE(a...)
+#	define TRACE(a...)
 #endif
 #define ERROR(a...) dprintf(a)
+
 
 #define HDA_ALL 0xffffffff
 #define HDA_QUIRK_GPIO_COUNT	8
@@ -70,6 +72,24 @@ static const char* kConnectionType[] = {
 static const char* kJackColor[] = {
 	"N/A", "Black", "Grey", "Blue", "Green", "Red", "Orange", "Yellow",
 	"Purple", "Pink", "-", "-", "-", "-", "White", "Other"
+};
+
+static const struct {
+	uint32 subsystem_vendor_id, subsystem_id;
+	uint32 codec_vendor_id, codec_id;
+	uint32 quirks, nonquirks;
+} kCodecQuirks[] = {
+	{ HDA_ALL, HDA_ALL, HDA_ALL, HDA_ALL, HDA_QUIRK_IVREF, 0 },
+	{ HDA_ALL, HDA_ALL, HDA_ALL, HDA_ALL, HDA_QUIRK_IVREF, 0 },
+	{ 0x10de, 0xcb79, CIRRUSLOGIC_VENDORID, 0x4206,
+		HDA_QUIRK_GPIO1 | HDA_QUIRK_GPIO3, 0 },		// MacBook Pro 5.5
+	{ 0x8384, 0x7680, SIGMATEL_VENDORID, 0x7680,
+		HDA_QUIRK_GPIO0 | HDA_QUIRK_GPIO1, 0},		// Apple Intel Mac
+	{ 0x106b, 0x00a1, REALTEK_VENDORID, 0x0885,
+		HDA_QUIRK_GPIO0 | HDA_QUIRK_OVREF50, 0},	// MacBook
+	{ 0x106b, 0x00a3, REALTEK_VENDORID, 0x0885,
+		HDA_QUIRK_GPIO0, 0},						// MacBook
+	{ HDA_ALL, HDA_ALL, IDT_VENDORID, 0x76b2, HDA_QUIRK_GPIO0, 0},
 };
 
 
@@ -178,7 +198,7 @@ dump_widget_audio_capabilities(uint32 capabilities)
 	int offset = 0;
 
 	for (uint32 j = 0; j < sizeof(kFlags) / sizeof(kFlags[0]); j++) {
-		if (capabilities & kFlags[j].flag)
+		if ((capabilities & kFlags[j].flag) != 0)
 			offset += sprintf(buffer + offset, "[%s] ", kFlags[j].name);
 	}
 
@@ -299,7 +319,7 @@ static void
 dump_audiogroup_widgets(hda_audio_group* audioGroup)
 {
 	TRACE("\tAudiogroup:\n");
-	/* Iterate over all Widgets and collect info */
+	// Iterate over all widgets and collect info
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
 		uint32 nodeID = audioGroup->widget_start + i;
@@ -331,19 +351,48 @@ dump_audiogroup_widgets(hda_audio_group* audioGroup)
 //	#pragma mark -
 
 
+static void
+hda_codec_get_quirks(hda_codec* codec)
+{
+	codec->quirks = 0;
+
+	uint32 subSystemID = codec->controller->pci_info.u.h0.subsystem_id;
+	uint32 subSystemVendorID
+		= codec->controller->pci_info.u.h0.subsystem_vendor_id;
+
+	for (uint32 i = 0;
+			i < (sizeof(kCodecQuirks) / sizeof(kCodecQuirks[0])); i++) {
+		if (kCodecQuirks[i].subsystem_id != HDA_ALL
+			&& kCodecQuirks[i].subsystem_id != subSystemID)
+			continue;
+		if (kCodecQuirks[i].subsystem_vendor_id != HDA_ALL
+			&& kCodecQuirks[i].subsystem_vendor_id != subSystemVendorID)
+			continue;
+		if (kCodecQuirks[i].codec_vendor_id != HDA_ALL
+			&& kCodecQuirks[i].codec_vendor_id != codec->vendor_id)
+			continue;
+		if (kCodecQuirks[i].codec_id != HDA_ALL
+			&& kCodecQuirks[i].codec_id != codec->product_id)
+			continue;
+
+		codec->quirks |= kCodecQuirks[i].quirks;
+		codec->quirks &= ~kCodecQuirks[i].nonquirks;
+	}
+}
+
+
 static status_t
 hda_get_pm_support(hda_codec* codec, uint32 nodeID, uint32* pm)
 {
 	corb_t verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER,
 		PID_POWERSTATE_SUPPORT);
-	status_t rc;
+
 	uint32 response;
-
-	if ((rc = hda_send_verbs(codec, &verb, &response, 1)) == B_OK) {
+	status_t status = hda_send_verbs(codec, &verb, &response, 1);
+	if (status == B_OK)
 		*pm = response & 0xf;
-	}
 
-	return rc;
+	return status;
 }
 
 
@@ -420,8 +469,7 @@ hda_get_stream_support(hda_codec* codec, uint32 nodeID, uint32* formats,
 static status_t
 hda_widget_get_pm_support(hda_audio_group* audioGroup, hda_widget* widget)
 {
-	return hda_get_pm_support(audioGroup->codec, widget->node_id,
-		&widget->pm);
+	return hda_get_pm_support(audioGroup->codec, widget->node_id, &widget->pm);
 }
 
 
@@ -456,7 +504,7 @@ hda_widget_get_amplifier_capabilities(hda_audio_group* audioGroup,
 				VID_GET_PARAMETER, PID_OUTPUT_AMPLIFIER_CAP);
 			status_t status = hda_send_verbs(audioGroup->codec, &verb,
 				&response, 1);
-			if (status < B_OK)
+			if (status != B_OK)
 				return status;
 
 			widget->capabilities.output_amplifier = response;
@@ -475,7 +523,7 @@ hda_widget_get_amplifier_capabilities(hda_audio_group* audioGroup,
 				VID_GET_PARAMETER, PID_INPUT_AMPLIFIER_CAP);
 			status_t status = hda_send_verbs(audioGroup->codec, &verb,
 				&response, 1);
-			if (status < B_OK)
+			if (status != B_OK)
 				return status;
 
 			widget->capabilities.input_amplifier = response;
@@ -617,7 +665,7 @@ hda_widget_get_associations(hda_audio_group* audioGroup)
 
 
 static uint32
-hda_widget_prepare_pin_ctrl(hda_audio_group* audioGroup, hda_widget *widget,
+hda_widget_prepare_pin_ctrl(hda_audio_group* audioGroup, hda_widget* widget,
 	bool isOutput)
 {
 	uint32 ctrl = 0;
@@ -699,7 +747,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		return B_NO_MEMORY;
 	}
 
-	/* Iterate over all Widgets and collect info */
+	// Iterate over all Widgets and collect info
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
 		uint32 nodeID = audioGroup->widget_start + i;
@@ -713,7 +761,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		widget.type = (hda_widget_type)((capabilities & AUDIO_CAP_TYPE_MASK)
 			>> AUDIO_CAP_TYPE_SHIFT);
 
-		/* Check specific node ids declared as inputs as beepers */
+		// Check specific node ids declared as inputs as beepers
 		switch (codec_id) {
 			case 0x11d41882:
 			case 0x11d41883:
@@ -748,7 +796,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		widget.node_id = nodeID;
 
 		if ((capabilities & AUDIO_CAP_POWER_CONTROL) != 0) {
-			/* We support power; switch us on! */
+			// We support power; switch us on!
 			verbs[0] = MAKE_VERB(audioGroup->codec->addr, nodeID,
 				VID_SET_POWER_STATE, 0);
 			hda_send_verbs(audioGroup->codec, verbs, NULL, 1);
@@ -826,7 +874,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 			uint32 tmp;
 			hda_verb_read(codec, 0x20, VID_GET_PROCESSING_COEFFICIENT, &tmp);
 			hda_verb_write(codec, 0x20, VID_SET_COEFFICIENT_INDEX, 0x7);
-			hda_verb_write(codec, 0x20, VID_SET_PROCESSING_COEFFICIENT, 
+			hda_verb_write(codec, 0x20, VID_SET_PROCESSING_COEFFICIENT,
 				(tmp & 0xf0) == 0x20 ? 0x830 : 0x3030);
 			break;
 		}
@@ -856,7 +904,7 @@ TRACE("      %*soutput: added output widget %ld\n", (int)depth * 2, "", widget->
 		case WT_AUDIO_SELECTOR:
 		{
 			// already used
-			if (widget->flags & WIDGET_FLAG_OUTPUT_PATH) {
+			if ((widget->flags & WIDGET_FLAG_OUTPUT_PATH) != 0) {
 				alreadyUsed = true;
 				return false;
 			}
@@ -898,8 +946,8 @@ hda_widget_find_input_path(hda_audio_group* audioGroup, hda_widget* widget,
 	switch (widget->type) {
 		case WT_PIN_COMPLEX:
 			// already used
-			if ((widget->flags & (WIDGET_FLAG_INPUT_PATH 
-					| WIDGET_FLAG_OUTPUT_PATH)) != 0)
+			if ((widget->flags
+					& (WIDGET_FLAG_INPUT_PATH | WIDGET_FLAG_OUTPUT_PATH)) != 0)
 				return false;
 
 			if (PIN_CAP_IS_INPUT(widget->d.pin.capabilities)) {
@@ -919,8 +967,8 @@ TRACE("      %*sinput: added input widget %ld\n", (int)depth * 2, "", widget->no
 		case WT_AUDIO_SELECTOR:
 		{
 			// already used
-			if ((widget->flags & (WIDGET_FLAG_INPUT_PATH 
-					| WIDGET_FLAG_OUTPUT_PATH)) != 0)
+			if ((widget->flags
+					& (WIDGET_FLAG_INPUT_PATH | WIDGET_FLAG_OUTPUT_PATH)) != 0)
 				return false;
 
 			// search for pin complex in this path
@@ -1209,7 +1257,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 	if (audioGroup == NULL)
 		return B_NO_MEMORY;
 
-	/* Setup minimal info needed by hda_codec_parse_afg */
+	// Setup minimal info needed by hda_codec_parse_afg
 	audioGroup->widget.node_id = audioGroupNodeID;
 	audioGroup->codec = codec;
 	audioGroup->multi = (hda_multi*)calloc(1,
@@ -1220,12 +1268,12 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 	}
 	audioGroup->multi->group = audioGroup;
 
-	/* Parse all widgets in Audio Function Group */
+	// Parse all widgets in Audio Function Group
 	status_t status = hda_codec_parse_audio_group(audioGroup);
 	if (status != B_OK)
 		goto err;
 
-	/* Setup for worst-case scenario; we cannot find any output Pin Widgets */
+	// Setup for worst-case scenario; we cannot find any output Pin Widgets
 	status = ENODEV;
 
 	if (hda_audio_group_build_tree(audioGroup) != B_OK)
@@ -1282,7 +1330,7 @@ hda_audio_group_get_widgets(hda_audio_group* audioGroup, hda_stream* stream)
 					flags == WIDGET_FLAG_OUTPUT_PATH);
 
 TRACE("ENABLE pin widget %ld\n", widget.node_id);
-				/* FIXME: Force Pin Widget to unmute; enable hp/output */
+				// FIXME: Force Pin Widget to unmute; enable hp/output
 				corb_t verb = MAKE_VERB(audioGroup->codec->addr,
 					widget.node_id,
 					VID_SET_PIN_WIDGET_CONTROL, ctrl);
@@ -1358,50 +1406,6 @@ TRACE("UNMUTE/SET INPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
 }
 
 
-static const struct {
-	uint32 subsystem_vendor_id, subsystem_id;
-	uint32 codec_vendor_id, codec_id;
-	uint32 quirks, nonquirks;
-} hda_codec_quirks[] = {
-	{ HDA_ALL, HDA_ALL, HDA_ALL, HDA_ALL, HDA_QUIRK_IVREF, 0 },
-	{ HDA_ALL, HDA_ALL, HDA_ALL, HDA_ALL, HDA_QUIRK_IVREF, 0 },
-	{ 0x10de, 0xcb79, CIRRUSLOGIC_VENDORID, 0x4206, HDA_QUIRK_GPIO1 | HDA_QUIRK_GPIO3, 0 },		// MacBook Pro 5.5
-	{ 0x8384, 0x7680, SIGMATEL_VENDORID, 0x7680, HDA_QUIRK_GPIO0 | HDA_QUIRK_GPIO1, 0},	// Apple Intel Mac
-	{ 0x106b, 0x00a1, REALTEK_VENDORID, 0x0885, HDA_QUIRK_GPIO0 | HDA_QUIRK_OVREF50, 0},	// MacBook
-	{ 0x106b, 0x00a3, REALTEK_VENDORID, 0x0885, HDA_QUIRK_GPIO0, 0},	// MacBook
-	{ HDA_ALL, HDA_ALL, IDT_VENDORID, 0x76b2, HDA_QUIRK_GPIO0, 0},
-};
-
-
-void
-hda_codec_get_quirks(hda_codec* codec)
-{
-	codec->quirks = 0;
-	uint32 subsystem_id = codec->controller->pci_info.u.h0.subsystem_id;
-	uint32 subsystem_vendor_id = codec->controller->pci_info.u.h0.subsystem_vendor_id;
-	uint32 codec_vendor_id = codec->vendor_id;
-	uint32 codec_id = codec->product_id;
-	for (uint32 i = 0; i < (sizeof(hda_codec_quirks)
-		/ sizeof(hda_codec_quirks[0])); i++) {
-		if (hda_codec_quirks[i].subsystem_id != 0xffffffff
-			&& hda_codec_quirks[i].subsystem_id != subsystem_id)
-			continue;
-		if (hda_codec_quirks[i].subsystem_vendor_id != 0xffffffff
-			&& hda_codec_quirks[i].subsystem_vendor_id != subsystem_vendor_id)
-			continue;
-		if (hda_codec_quirks[i].codec_vendor_id != 0xffffffff
-			&& hda_codec_quirks[i].codec_vendor_id != codec_vendor_id)
-			continue;
-		if (hda_codec_quirks[i].codec_id != 0xffffffff
-			&& hda_codec_quirks[i].codec_id != codec_id)
-			continue;
-
-		codec->quirks |= hda_codec_quirks[i].quirks;
-		codec->quirks &= ~(hda_codec_quirks[i].nonquirks);
-	}
-}
-
-
 void
 hda_codec_delete(hda_codec* codec)
 {
@@ -1435,6 +1439,8 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 		return NULL;
 	}
 
+	status_t status;
+
 	codec->controller = controller;
 	codec->addr = codecAddress;
 	codec->response_sem = create_sem(0, "hda_codec_response_sem");
@@ -1465,15 +1471,17 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 		uint32 start : 8;
 		uint32 _reserved2 : 8;
 	} response;
-	corb_t verbs[3];
 
+	corb_t verbs[3];
 	verbs[0] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_VENDOR_ID);
 	verbs[1] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_REVISION_ID);
 	verbs[2] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER,
 		PID_SUB_NODE_COUNT);
 
-	if (hda_send_verbs(codec, verbs, (uint32*)&response, 3) != B_OK) {
-		ERROR("hda: Failed to get vendor and revision parameters\n");
+	status = hda_send_verbs(codec, verbs, (uint32*)&response, 3);
+	if (status != B_OK) {
+		ERROR("hda: Failed to get vendor and revision parameters: %s\n",
+			strerror(status));
 		goto err;
 	}
 
@@ -1489,8 +1497,8 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 		"%lu.%lu.%lu.%lu\n", codecAddress, response.vendor, response.device,
 		response.major, response.minor, response.revision, response.stepping);
 
-	for (uint32 nodeID = response.start; nodeID < response.start
-			+ response.count; nodeID++) {
+	for (uint32 nodeID = response.start;
+			nodeID < response.start + response.count; nodeID++) {
 		uint32 groupType;
 		verbs[0] = MAKE_VERB(codecAddress, nodeID, VID_GET_PARAMETER,
 			PID_FUNCTION_GROUP_TYPE);
@@ -1500,8 +1508,9 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 			goto err;
 		}
 
-		if ((groupType & FUNCTION_GROUP_NODETYPE_MASK) == FUNCTION_GROUP_NODETYPE_AUDIO) {
-			/* Found an Audio Function Group! */
+		if ((groupType & FUNCTION_GROUP_NODETYPE_MASK)
+				== FUNCTION_GROUP_NODETYPE_AUDIO) {
+			// Found an Audio Function Group!
 			status_t status = hda_codec_new_audio_group(codec, nodeID);
 			if (status != B_OK) {
 				ERROR("hda: Failed to setup new audio function group (%s)!\n",
@@ -1521,6 +1530,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	resume_thread(codec->unsol_response_thread);
 
 	return codec;
+
 err:
 	controller->codecs[codecAddress] = NULL;
 	hda_codec_delete(codec);

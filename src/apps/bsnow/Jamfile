@@ -13,5 +13,6 @@ Application BSnow :
 DoCatalogs BSnow :
     x-vnd.mmu_man.BSnow
     :
+    SnowApp.cpp
 	SnowView.cpp
 	;

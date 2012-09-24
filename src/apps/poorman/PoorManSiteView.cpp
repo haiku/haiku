@@ -36,7 +36,7 @@ PoorManSiteView::PoorManSiteView(const char* name)
 	SetSendDirValue(win->DirListFlag());
 
 	// Web Directory Text Control
-	fWebDir = new BTextControl("Web Dir", STR_TXT_DIRECTORY, NULL);
+	fWebDir = new BTextControl(STR_TXT_DIRECTORY, NULL, NULL);
 	SetWebDir(win->WebDir());
 	
 	// Select Web Directory Button
@@ -44,7 +44,7 @@ PoorManSiteView::PoorManSiteView(const char* name)
 		new BMessage(MSG_PREF_SITE_BTN_SELECT));
 	
 	// Index File Name Text Control
-	fIndexFileName = new BTextControl("Index File Name", STR_TXT_INDEX, NULL);
+	fIndexFileName = new BTextControl(STR_TXT_INDEX, NULL, NULL);
 	SetIndexFileName(win->IndexFileName());
 	
 	
