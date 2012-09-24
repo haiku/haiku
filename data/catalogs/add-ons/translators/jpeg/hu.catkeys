@@ -3,7 +3,7 @@ Output quality	JPEGTranslator		Kimeneti minőség
 JPEG images	JPEGTranslator		JPEG kép
 Prevent colors 'washing out'	JPEGTranslator		Elmosódott színek megelőzése
 JPEG Library Error: %s\n	be_jerror		JPEG funkciótár hiba: %s\n
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Használjon CMYK kódot, úgy, hogy 0 jelenti a 100%-os tintaszintet
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Használjon CMYK kódot (0 a 100%-os tintaszint)
 About	JPEGTranslator		Névjegy
 ©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nA IJG funkciótár alapján © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nKen Murchison \"veszteségmentes\" kódolás támogatás-patchéveln\thttp://www.oceana.com/ftp/ljpeg/\n\nMagnus Hellman pár színskála konverziós algoritmusával \n\thttp://www.bebits.com/app/802\n
 Low	JPEGTranslator		Alacsony

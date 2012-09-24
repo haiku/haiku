@@ -5,7 +5,7 @@ Location	MediaPlayer-InfoWin		Útvonal
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		Steam beállításai
 <unknown>	PlaylistItem-album		<ismeretlen>
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Méretvezérlők teljes képernyős módban
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Nagyított vezérlők teljes képernyős módban
 Video	MediaPlayer-InfoWin		Videó
 Subtitle size:	MediaPlayer-SettingsWindow		Felirat mérete:
 Save Playlist	MediaPlayer-PlaylistWindow		Lejátszási lista mentése
@@ -33,7 +33,7 @@ Stereo	MediaPlayer-InfoWin		Sztereó
 Open…	MediaPlayer-PlaylistWindow		Megnyitás…
 Toggle mute.	MediaPlayer-Main		Némítás állítása.
 Undo	MediaPlayer-PlaylistWindow		Visszavonás
-Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardveres videófedők használata ha elérhetőek.
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardveres gyorsítás használata ha elérhető
 File info…	MediaPlayer-Main		Információk…
 Pause playback.	MediaPlayer-Main		Lejátszás szüneteltetése.
 Overlay	MediaPlayer-InfoWin		Overlay
@@ -88,7 +88,7 @@ Import Entries	MediaPlayer-ImportPLItemsCmd		Bejegyzések importálása
 Pause	MediaPlayer-Main		Szüneteltetés
 No aspect correction	MediaPlayer-Main		Nincs képarányjavítás
 Automatically start playing	MediaPlayer-SettingsWindow		Lejátszás indítása automatikusan
-Track	Video Track Menu		Szám
+Track	Video Track Menu		Sáv
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Belső hiba (nem sikerült zárolni). A lejátszási lista mentése sikertelen.
 View options	MediaPlayer-SettingsWindow		Megjelenítési beállítások
 Play mode	MediaPlayer-SettingsWindow		Lejátszás módja
@@ -98,7 +98,7 @@ Loop video	MediaPlayer-SettingsWindow		Videófájl ismétlése
 Attributes	MediaPlayer-Main		Jellemzők
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nem sikerült minden fájlt a Szemetesbe helyezni
 <untitled>	PlaylistItem-title		<névtelen>
-Track	Audio Track Menu		Szám
+Track	Audio Track Menu		Sáv
 unknown format	MediaPlayer-InfoWin		ismeretlen formátum
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nincs mit újra csinálni>
 Skip to the next track.	MediaPlayer-Main		Ugrás a következő számra.
@@ -117,7 +117,7 @@ Stop	MediaPlayer-Main		Leállítás
 raw video	MediaPlayer-InfoWin		nyers videó
 Volume of background clips	MediaPlayer-SettingsWindow		Háttérbeli klippek hangereje
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Belső hiba (nincs elég memória). A lejátszási lista mentése sikertelen.
-Hide interface	MediaPlayer-Main		Csatoló elrejtése
+Hide interface	MediaPlayer-Main		Vezérlők elrejtése
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Bejegyzés másolása
 none	Subtitles menu		nincs 
 Move file to Trash	MediaPlayer-PlaylistWindow		Fájl Szemetesbe helyezése

@@ -2,14 +2,14 @@
 Website location	PoorMan		Oldal helye
 Error Server	PoorMan		Hibakiszolgáló
 Settings…	PoorMan		Beállítások…
-Create PoorMan log	PoorMan		PoorMan napló készítése
+Create PoorMan log	PoorMan		SzegényEmber napló készítése
 Shutting down.\n	PoorMan		Leállás.\n
 Hits: %lu	PoorMan		Kérések: %lu
-Web folder:	PoorMan		Netes mappa:
+Web folder:	PoorMan		Mappa:
 Default	PoorMan		Alapértelmezett
 Save log console selection	PoorMan		Konzolbéli kijelölés mentése
 Run server	PoorMan		Kiszolgáló futtatása
-PoorMan settings	PoorMan		PoorMan beállításai
+PoorMan settings	PoorMan		SzegényEmber beállításai
 Clear hit counter	PoorMan		Kérések nullázása
 Copy	PoorMan		Másolás
 Max. simultaneous connections:	PoorMan		Maximális kapcsolatok száma:
@@ -32,7 +32,7 @@ Edit	PoorMan		Szerkesztés
 Create Log File	PoorMan		Naplófájl készítése
 Log to console	PoorMan		Naplózás konzolba
 Directory: (none)	PoorMan		Mappa: (nincs)
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérem, válassza ki azt a mappát, ahol az oldal fájljai találhatóak.\n\nA PoorMan létre tud hozni egy alapértelmezett „public_html” mappát a saját mappán belül,\nvagy pedig választhat egyet ehelyett.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérem, válassza ki azt a mappát, ahol az oldal fájljai találhatóak.\n\nA SzegényEmber létre tud hozni egy alapértelmezett „public_html” mappát a saját mappán belül,\nvagy pedig választhat egyet ehelyett.
 Log To Console	PoorMan		Naplózás konzolba
 Connections	PoorMan		Kapcsolatok
 Status: Running	PoorMan		Állapot: Fut
@@ -62,5 +62,5 @@ Console logging	PoorMan		Konzoli naplózás
 Cannot start the server	PoorMan		Nem sikerült elindítani a szervert
 Select	PoorMan		Kiválasztás
 Save console as…	PoorMan		Konzol mentése másként…
-PoorMan	System name		PoorMan
+PoorMan	System name		SzegényEmber
 Console Logging	PoorMan		Konzoli naplózás

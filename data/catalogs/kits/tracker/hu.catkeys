@@ -43,7 +43,7 @@ Create link here	ContainerWindow		Hivatkozás készítése ide
 Moving: 	StatusWindow		Áthelyezés:
 before	FindPanel		előtte
 Error emptying Trash	FSUtils		Hiba történt a Szemetes ürítése közben.
-On	FindPanel		Keresés helye
+On	FindPanel		Hol:
 MiB	WidgetAttributeText		MB
 greater than	FindPanel		nagyobb, mint
 Delete	PoseView		Törlés

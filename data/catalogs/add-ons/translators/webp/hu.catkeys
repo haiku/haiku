@@ -3,7 +3,7 @@ Compression method:	ConfigView		Tömörítés módja:
 WebP image translator	ConfigView		WebP kép értelmező
 Based on libwebp v0.1,	ConfigView		A libwebp v0.1 alapján,
 Preset	ConfigView		Beállítások
-WebP images	WebPTranslator		WebP Kkép
+WebP images	WebPTranslator		WebP kép
 WebPTranslator Settings	ConfigView		WebPÉrtelemző beállítások
 Output quality:	ConfigView		Kimenet minősége:
 WebP Settings	main		WebP beállításai
