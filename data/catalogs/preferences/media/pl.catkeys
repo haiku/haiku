@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Media	1473363280
+1	polish	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Nie można dodać sterowania głośnością w Deskbarze: %s\n
 Ready for use…	Media Window		Gotowe do użycia…
 Video input:	Media views		Wejście wideo:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Czyszczenie.
 Defaults	Media views		Domyślne
 Stopping media server…	Media Window		Zatrzymywanie serwera multimediów…
 Quit	Media Window		Zakończ
-OK	Media Window		OK
 Starting media server…	Media Window		Uruchamianie serwera multimediów…
 Done shutting down.	Media Window		Skończono zamykanie.
 Video settings	Media Window		Ustawienia wideo

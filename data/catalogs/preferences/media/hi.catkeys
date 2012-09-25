@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Media	1473363280
+1	hindi	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		डेस्कबार में वोलुम कण्ट्रोल को जोड़ नहीं सके: %s\n
 Ready for use…	Media Window		उपयोग के लिए तैयार...
 Video input:	Media views		वीडियो इनपुट:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		सफाई कर रहे हैं|
 Defaults	Media views		चूक
 Stopping media server…	Media Window		मीडिया सर्वर रोक रहे हैं...
 Quit	Media Window		छोडो
-OK	Media Window		ठीक है
 Starting media server…	Media Window		मीडिया सर्वर शुरू कर रहे हैं...
 Done shutting down.	Media Window		शट डाउन हो गया|
 Video settings	Media Window		वीडियो सेटिंग्स

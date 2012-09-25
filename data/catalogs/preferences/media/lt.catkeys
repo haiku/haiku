@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Media	1473363280
+1	lithuanian	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio patalpinti pranešimų srityje: %s\n
 Ready for use…	Media Window		Pasirengta naudojimui…
 Video input:	Media views		Vaizdo įvestis:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Apsitvarkoma.
 Defaults	Media views		Numatytosios reikšmės
 Stopping media server…	Media Window		Stabdoma įvairialypės terpės tarnyba…
 Quit	Media Window		Baigti darbą
-OK	Media Window		Gerai
 Starting media server…	Media Window		Paleidžiama įvairialypės terpės tarnyba…
 Done shutting down.	Media Window		Išjungta.
 Video settings	Media Window		Vaizdo nuostatos

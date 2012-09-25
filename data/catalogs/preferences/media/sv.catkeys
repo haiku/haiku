@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Media	1473363280
+1	swedish	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Kunde inte lägga till volymkontroll i Deskbar: %s\n
 Ready for use…	Media Window		Redo att användas…
 Video input:	Media views		Videoingång:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Städar upp.
 Defaults	Media views		Förval
 Stopping media server…	Media Window		Avslutar mediaservern…
 Quit	Media Window		Avsluta
-OK	Media Window		Ok
 Starting media server…	Media Window		Startar mediaservern…
 Done shutting down.	Media Window		Färdigavslutad.
 Video settings	Media Window		Videoinställningar

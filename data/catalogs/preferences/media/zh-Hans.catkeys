@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Media	1473363280
+1	english	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		无法添加音量控件到桌面栏：%s\n
 Ready for use…	Media Window		准备使用…
 Video input:	Media views		视频输入:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		清除。
 Defaults	Media views		默认
 Stopping media server…	Media Window		暂停 media server…
 Quit	Media Window		退出
-OK	Media Window		确定
 Starting media server…	Media Window		启动 media server…
 Done shutting down.	Media Window		已关闭。
 Video settings	Media Window		视频设置

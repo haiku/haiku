@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Media	1473363280
+1	belarusian	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Не ўдалося дадаць элемент кіравання гучнасцю у Deskbar: %s\n
 Ready for use…	Media Window		Гатовы да карыстання…
 Video input:	Media views		Відэа ўваход:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Прыборка.
 Defaults	Media views		Прадвызначаныя
 Stopping media server…	Media Window		Спыненне медыясервера…
 Quit	Media Window		Выйсці
-OK	Media Window		ОК
 Starting media server…	Media Window		Запускаецца медыясервер…
 Done shutting down.	Media Window		Медыясервер спынены.
 Video settings	Media Window		Наладкі відэа

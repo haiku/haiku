@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Media	1473363280
+1	dutch; flemish	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet aan Deskbar worden toegevoegd: %s\n
 Ready for use…	Media Window		Klaar voor gebruik...
 Video input:	Media views		Video-invoer:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Bezig met opschonen.
 Defaults	Media views		Standaardwaarden
 Stopping media server…	Media Window		Mediaserver stoppen…
 Quit	Media Window		Afsluiten
-OK	Media Window		Oké
 Starting media server…	Media Window		Mediaserver starten…
 Done shutting down.	Media Window		Uitzetten voltooid.
 Video settings	Media Window		Video-instellingen

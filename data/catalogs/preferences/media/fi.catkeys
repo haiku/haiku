@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Media	1473363280
+1	finnish	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Voimakkuussäätimen lisääminen Työpöytäpalkkiin epäonnistui: %s\n
 Ready for use…	Media Window		Valmis käytettäväksi…
 Video input:	Media views		Videosyöte:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Tyhjennetään.
 Defaults	Media views		Oletukset
 Stopping media server…	Media Window		Pysäytetään mediapalvelin…
 Quit	Media Window		Lopeta
-OK	Media Window		Valmis
 Starting media server…	Media Window		Käynnistetään mediapalvelin…
 Done shutting down.	Media Window		Sulkeminen toteutettu.
 Video settings	Media Window		Videoasetukset

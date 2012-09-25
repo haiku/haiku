@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Media	1473363280
+1	ukrainian	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Неможливо додати регулятор гучності в Deskbar: %s\n
 Ready for use…	Media Window		Готовий для використання…
 Video input:	Media views		Вхід відео:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Очистити.
 Defaults	Media views		По замовчуванню
 Stopping media server…	Media Window		Зупинка Медіа Сервера…
 Quit	Media Window		Вихід
-OK	Media Window		Гаразд
 Starting media server…	Media Window		Запуск Медіа Сервера…
 Done shutting down.	Media Window		Відбувається закриття.
 Video settings	Media Window		Налаштування відео

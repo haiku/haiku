@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Media	1473363280
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Kunne ikke legge til volumkontroll i Deskbar: %s\n
 Ready for use…	Media Window		Klar til bruk…
 Video input:	Media views		Videoinngang:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Rydder opp.
 Defaults	Media views		Forvalg
 Stopping media server…	Media Window		Stopper mediaserveren…
 Quit	Media Window		Avslutt
-OK	Media Window		OK
 Starting media server…	Media Window		Starter mediaserveren…
 Done shutting down.	Media Window		Ferdig avsluttet.
 Video settings	Media Window		Videoinnstillinger

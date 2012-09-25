@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Media	1473363280
+1	greek, modern (1453-)	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Αδυναμία προσθήκης του εργαλείου έντασης ήχου στη Deskbar: %s\n
 Ready for use…	Media Window		Έτοιμο για χρήση…
 Video input:	Media views		Είσοδος βίντεο:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Εκκαθάριση.
 Defaults	Media views		Προεπιλογές
 Stopping media server…	Media Window		Διακοπή εξυπηρετητή πολυμέσων…
 Quit	Media Window		Έξοδος
-OK	Media Window		Εντάξει
 Starting media server…	Media Window		Εκκίνηση εξυπηρετητή πολυμέσων…
 Done shutting down.	Media Window		Τελείωσε ο τερματισμός.
 Video settings	Media Window		Ρυθμίσεις εικόνας
