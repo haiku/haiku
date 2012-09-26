@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	3423874204
+1	swedish	x-vnd.Be-MAIL	3771627078
 View	Mail		Visa
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Bifoga attribut:
@@ -16,6 +16,7 @@ helpful message	Mail		hjälpsamt meddelande
 Colored quotes:	Mail		Färglagda citeringar:
 Subject:	Mail		Ämne:
 Reply to all	Mail		Svara alla
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Område: %name% (Typ: %type%)
 Show icons & labels	Mail		Visa ikoner & etiketter
 Remove attachment	Mail		Ta bort bifogad fil
 Button bar:	Mail		Verktygsfält
@@ -54,6 +55,7 @@ Hide	Mail		Dölj
 Forward without attachments	Mail		Vidarebefordra utan bifigade filer
 Previous	Mail		Föregående
 Redo	Mail		Upprepa
+Add enclosure…	Mail		Lägg till område…
 Mail	System name		E-post
 Print…	Mail		Skriv ut…
 Quit	Mail		Avsluta
@@ -68,7 +70,13 @@ Attachments: 	Mail		Bilagor:
 On	Mail		På
 Set to %s	Mail		Ställ in %s
 Forward	Mail		Vidarebefordra
+%e wrote:\\n	Mail		%e skrev:\\n
+To:	Mail		Till:
+Previous message	Mail		Föregående meddelande
+Attachments:	Mail		Bilagor:
+Title:	Mail		Titel:
 Find…	Mail		Sök...
+Accounts…	Mail		Konto…
 Mail preferences	Mail		E-postinställningar
 Leave same	Mail		Lämna samma
 Page setup…	Mail		Sidinställningar…
@@ -82,24 +90,36 @@ Show header	Mail		Visa header
 %e - E-mail address	Mail		%e - E-postadress
 Show raw message	Mail		Visa meddelande
 \\n - Newline	Mail		\\n - Ny rad
+Start now	Mail		Starta nu
 Close	Mail		Stäng
 No matches	Mail		Inga träffar
 Open	Mail		Öppna
+draft	B_USER_DIRECTORY/mail/draft		utkast
+Quote	Mail		Citat
+Add	Mail		Lägg till
+Next message	Mail		Nästa meddelande
 User interface	Mail		Användargränssnitt
 Cancel	Mail		Avbryt
 Send message	Mail		Skicka meddelande
 Account:	Mail		Konto:
 Decoding:	Mail		Avkodar:
 Delete	Mail		Ta bort
+Leave as '%s'	Mail		Lämna som '%s'
 Copy	Mail		Kopiera
 Signatures	Mail		Signaturer
 Next	Mail		Nästa
 Use default account	Mail		Använd standardkonto
 Encoding:	Mail		Kodning:
 Font:	Mail		Typsnitt:
+Save address	Mail		Spara adress
+Queries	Mail		Sökningar
+Save	Mail		Spara
+From:	Mail		Från:
 Cut	Mail		Klipp ut
 Check spelling	Mail		Kontrollera stavning
+Set to Saved	Mail		Set till Sparad
 Open this link	Mail		Öppna denna länk
+Auto signature:	Mail		Autosignatur:
 Add signature	Mail		Lägg till signatur
 Unread	Mail		Oläst
 Move to trash	Mail		Flytta till papperskorg

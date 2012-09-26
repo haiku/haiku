@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	1687418094
+1	swedish	x-vnd.Haiku-Installer	1655920473
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Efter de andra menyposterna mot slutet av filen, lägg till något som liknar dessa rader:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet
 \t}\n\n	InstallerApp		\t}\n\n
@@ -70,6 +70,7 @@ Installer	System name		Installerare
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Du kan inte installera innehållet av en disk på den själv. Var god välj en annan disk.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" är partitionens nummer, som i GRUB 2 startar med \"1\"\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Starta med os-prober v1.44 (e.g. i Ubuntu 11.04 eller senare), Haiku borde kännas igen utan ändringar. För att lägga till Haiku till GRUB menyn, öppna ett terminalfönster och skriv:\n \n
 Quit DriveSetup	InstallerWindow		Avsluta DiskHantering
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" är hårddiskens nummer, som startar med \"0\".\n
 Hide optional packages	InstallerWindow		Göm valfria paket
@@ -80,16 +81,31 @@ Set up partitions…	InstallerWindow		Ställ in partitioner...
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partitionen kan inte monteras. Var god välj en annan partition.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Starthanteraren körs.\n\nStäng Starthanteraren för att fortsätta med installationen.
 Install anyway	InstallProgress		Installera iallafall
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Ett fel uppstod och installationen slutfördes inte:\n\nFel:  %s
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\t rootnoverify\t \t (hd0,6)\n
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Klicka på Kör för att installera från '%1s' till '%2s'.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Kör DriveSetup…\n\nStäng DriveSetup för att fortsätta med installationen.
+Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Ha kul och tack för att du testar Haiku! Wi hoppas du gillar Haiku!
 OK	InstallProgress		OK
 Please choose target	InstallerWindow		Välj mål
 ???	InstallerWindow	Unknown partition name	???
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Om du vill installera Haiku på riktig hårdvara (inte i en emulator) är det rekomenderat att du skapar och förebereder en hårdisk partion. Installations och DriveSetup programmen kan initiera den existerande partitionen med Haiku egna fil system, men att ändra partitions layouten kanske inte har testats på tillräckligt många olika systemkonfigureringar så vi rekomenderar inte att man använder den.\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Installationen kommer att göra Haiku partitionen bootningsbar, men kommer inte att integrera Haiku till någon existerande boot meny. Om du redan använder GRUB , kan du lägga till Haiku till dess boot meny. Beroende på vilken version av GRUB du använder så görs det på olika sätt.\n\n\n
 Begin	InstallerWindow		Början
+Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Äntligen, dumåste updatera boot menyn genom att skriva:\n\n
+If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Om du inte har skapat en partition än, bara bota om, skapa en partition med en ditt favorit partitions program, boota up i Haiku igen och fortsätt med installationen. Du skulle tex kunna använda GParted Live-CD, den kan också användas för att ändra storlekar på partitioner.\n\n\n
+With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Med GRUB 2 har den första logiska partitionen alltid nummer \"5\", oavsätt antalet primära partitioner.\n\n
 Write boot sector	InstallerWindow		Skriv boot sektor
 Cancel	InstallerWindow		Avbryt
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, applikationen för att konfigurera disk partitioner kunde inte startas.
+No optional packages available.	PackagesView		Inga installationspaket fanns att välja.
+All hard disks start with \"hd\".\n	InstallerApp		Alla hårdiskar startar med \"hd\".\n
 Continue	InstallerApp		Fortsätt
 Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme behövs: %s
 Cancel	InstallProgress		Avbryt
 Try installing anyway	InstallProgress		Försök installera iallafall
 Are you sure you want to to stop the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
+Tools	InstallerWindow		Verktyg
+The mount point could not be retrieved.	InstallProgress		Monteringspunkt kunde inte läsas av.
+\ttitle\t\t\t\tHaiku\n	InstallerApp		\t titel\t \t \t \t Haiku\n
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\t sudo <valfri textredigerare> /etc/grub.d/40_custom\n\n

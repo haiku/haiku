@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	91091519
+1	swedish	x-vnd.Haiku-WebPositive	2298228381
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -30,8 +30,88 @@ Edit	WebPositive Window		Redigera
 Cancel	Authentication Panel		Avbryt
 Match case	WebPositive Window		Exakt jämförelse
 Search page:	Settings Window		Söksida:
+Close tab	WebPositive Window		Stäng flik
+Over 1 hour left	Download Window		Över 1 timme kvar
 Quit	WebPositive Window		Avsluta
+Full screen	WebPositive Window		Helskärm
+Open download error	Download Window		Öppna nerladdnings error
+Standard font:	Settings Window		Standardtypsnitt:
+Restart	Download Window		Starta om
+Proxy server	Settings Window		Proxyserver
+Open containing folder	Download Window		Öppna innehållande mapp
+New window	WebPositive Window		Nytt fönster
+Open	Download Window		Öppna
+Reload	WebPositive Window		Läs om
+Downloads	Download Window		Hämtningar
+Sans serif font:	Settings Window		Sans serif-typsnitt:
+Forward	WebPositive Window		Framåt
+of	Download Window	...as in '12kB of 256kB'	av
+Revert	Settings Window		Återgå
+Fixed font:	Settings Window		Typsnitt med fast breddsteg:
+Cut	WebPositive Window		Klipp ut
+Open downloads folder	Download Window		Öppna nerladdningsmapp
+Hide	Download Window		Dölj
+Reset size	WebPositive Window		Återställ storlek
+Find:	WebPositive Window		Sök:
+Over 1 day left	Download Window		Över 1 dag kvar
+Downloads	WebPositive Window		Nerladdningar
+Requesting %url	WebPositive Window		Begär %url
+Apply	Settings Window		Tillämpa
+Bookmark info	WebPositive Window		Bokmärksinformation
+Size:	Font Selection view		Storlek:
+Show tabs if only one page is open	Settings Window		Visa fliar när endast en sida är öppen
+About	WebPositive Window		Om
+Finish: 	Download Window	Finishing time	Färdig: 
+Fonts	Settings Window		Teckensnitt
+Close	WebPositive Window		Stäng
+OK	Download Window		OK
+Open blank page	Settings Window		Öppna blank sida
+New tabs:	Settings Window		Ny flik
 Cancel	WebPositive Window		Avbryt
+Open all	WebPositive Window		Öppna alla
+Clear	URL Bar		Töm
+Cut	URL Bar		Klipp ut
+Clear	WebPositive Window		Töm
+Remove	Download Window		Ta bort
+Find	WebPositive Window		Sök
+Find previous	WebPositive Window		Sök föregående
 Settings	WebPositive Window		Inställningar
+Proxy server address:	Settings Window		Proxyserveradress:
+Proxy server port:	Settings Window		Port för proxyserver
+Bookmarks	WebPositive Window		Bokmärken
+%minutes minutes	Download Window		%minutes minuter
 Paste	URL Bar		Klistra in
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		gjöm lösenordstext
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Flygande bäckasiner söka strax hwila på mjuka tuvor.
+Over 1 minute left	Download Window		Över 1 minut kvar
+Open start page	Settings Window		Öppna startsida
+Continue downloads	WebPositive		Fortsätt ladda ner
 Cancel	Download Window		Avbryt
+Open search page	Settings Window		Öppna sök sidan
+Password:	Authentication Panel		Lösenord:
+Back	WebPositive Window		Tillbaka
+New browser window	Download Window		Nytt fönster
+Today	WebPositive Window		Idag
+1 second left	Download Window		1 sekund kvar
+Earlier	WebPositive Window		Tidigare
+Authentication required	Authentication Panel		Autentisering krävs
+Use proxy server to connect to the internet	Settings Window		Använd en proxyserver för att ansluta till internet.
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url misslyckades
+New tab	WebPositive Window		Ny flik
+Downloads in progress	WebPositive		Nerladdningar pågår
+Style:	Font Selection view		Stil:
+General	Settings Window		Allmänt
+View	WebPositive Window		Visa
+Previous	WebPositive Window		Föregående
+Bookmark error	WebPositive Window		Bokmärkesfel
+Copy	WebPositive Window		Kopiera
+Remove missing	Download Window		Ta bort saknade
+Clone current page	Settings Window		Kopiera aktuella sida
+OK	Authentication Panel		OK
+Copy	URL Bar		Kopiera
+OK	WebPositive Window		OK
+Manage bookmarks	WebPositive Window		Hantera bokmärken
+New windows:	Settings Window		Nytt fönster:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url färdig
+Remove finished	Download Window		Ta bort färdiga
