@@ -27,7 +27,7 @@ Settings	LaunchBox		Beállítások
 Failed to launch 'something', error in Pad data.	LaunchBox		Nem sikerült elindítani valamit, hiba van a tálca adataiban.
 Pad %1	LaunchBox		%1 tálca
 Close	LaunchBox		Bezárás
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nem sikerült elküldeni a Trackernek a 'mappa megnyitása' parancsot.\n\nHiba:
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nem sikerült elküldeni a Nyomkövetőnek a 'mappa megnyitása' parancsot.\n\nHiba:
 You can drag an icon here.	LaunchBox		Az ikonok ide húzhatóak
 Clone	LaunchBox		Klónozás
 launch popup	LaunchBox		felugró ablak indítása

@@ -28,14 +28,14 @@ Auto-raise	PreferencesWindow		Automatikus előrehozás
 Hide time	TimeView		Idő elrejtése
 Recent folders:	PreferencesWindow		Utolsó mappák:
 Show application expander	PreferencesWindow		Programkiterjesztő mutatása
-Restart Tracker	DeskbarMenu		Tracker újraindítása
+Restart Tracker	DeskbarMenu		Nyomkövető újraindítása
 Close all	WindowMenu		Összes bezárása
 Deskbar preferences	PreferencesWindow		Asztalsáv-beállítások
 Mount	DeskbarMenu		Csatolás
 Small	PreferencesWindow		Kicsi
 Recent applications:	PreferencesWindow		Legutóbbi programok:
 Shutdown…	DeskbarMenu		Leállítás…
-Tracker always first	PreferencesWindow		Tracker mindig az első
+Tracker always first	PreferencesWindow		A Nyomkövető mindig az első
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Beállítások
 Recent folders	DeskbarMenu		Legutóbbi mappák
 About this system	DeskbarMenu		Rendszer névjegye

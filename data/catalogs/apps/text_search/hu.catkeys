@@ -6,7 +6,7 @@ Close	GrepWindow		Bezárás
 Cancel	GrepWindow		Mégse
 The unselected files will be removed from the list.	GrepWindow		A ki nem választott fájlok el lesznek távolítva a listáról.
 Set target…	GrepWindow		Cél megadása…
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Jelölje meg azokat a fájlokat a Trackerben, amelyek kijelölésre kerüljenek.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Válassza ki azokat a fájlokat a Nyomkövetőben, melyek kijelölésre kerüljenek.
 Open files in Pe	GrepWindow		Fájlok megnyitása Pe-ben
 Copy text to clipboard	GrepWindow		Szöveg másolása a vágólapra
 Settings	GrepWindow		Beállítások
@@ -27,7 +27,7 @@ New window	GrepWindow		Új ablak
 Please select the files you wish to keep searching.	GrepWindow		Kérjük, válassza ki azokat a fájlokat amelyekben folytatni kívánja a keresést.
 TextSearch	GrepWindow		Szövegkeresés
 Quit	GrepWindow		Kilépés
-Show files in Tracker	GrepWindow		Fájlok megjelenítése a Trackerben
+Show files in Tracker	GrepWindow		Fájlok megjelenítése a Nyomkövetőben
 Case-sensitive	GrepWindow		Kis- és nagybetűk megkülönböztetése
 Text files only	GrepWindow		Csak szövegfájlokban
 Show lines	GrepWindow		Sorok megjelenítése

@@ -3,7 +3,7 @@ Available languages	Locale Preflet Window		Elérhető nyelvek
 Negative:	TimeFormatSettings		Negatív:
 already chosen	LanguageListView		már ki van választva
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nem található a nyelvi fájl! Sajnos így a beállítópanel nem használható!
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Az Asztalsávot és a Trackert újra kell indítani hogy ez a változtatás érvénybe lépjen. Szeretné most újraindítani őket?
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Az Asztalsávot és a Nyomkövetőt újra kell indítani hogy ez a változtatás érvénybe lépjen. Szeretné most újraindítani őket?
 Long format:	TimeFormatSettings		Hosszú alak:
 Currency	TimeFormatSettings		Pénznem
 Locale	System name		Nyelv
@@ -20,7 +20,7 @@ Restart	Locale Preflet Window		Újraindítás
 Full format:	TimeFormatSettings		Teljes formátum:
 Defaults	Locale Preflet Window		Eredeti
 Cancel	Locale Preflet Window		Mégse
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Az programok és mappák neveinek lefordítása az Asztalsávban és a Trackerben.
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Az programok és mappák neveinek lefordítása az Asztalsávban és a Nyomkövetőben.
 Revert	Locale Preflet Window		Visszaállít
 Medium format:	TimeFormatSettings		Közepes formátum:
 12 hour	TimeFormatSettings		12-órás

@@ -23,7 +23,7 @@ Low priority	ProcessController		Alacsony prioritás
 What do you want to do with the thread \"%s\"?	ProcessController		Mit kíván tenni a szállal: %s?
 Gone teams…	ProcessController		Eltűnt csapatok…
 Lowest active priority	ProcessController		Legalacsonyabb aktív prioritás
-Restart Tracker	ProcessController		Tracker újraindítása
+Restart Tracker	ProcessController		Nyomkövető újraindítása
 Live in the Deskbar	ProcessController		Átrakás az Asztalsávra
 Kill this thread!	ProcessController		Szál leállítása!
 Debug this thread!	ProcessController		Szál hibakeresése!

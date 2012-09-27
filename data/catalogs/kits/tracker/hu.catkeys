@@ -8,7 +8,7 @@ Identify	ContainerWindow		Azonosítás
 Warning space color	SettingsView		Veszély jelzőszíne
 Close	VolumeWindow		Bezárás
 Open	OpenWithWindow		Megnyitás
-Tracker status	StatusWindow		Tracker állapota
+Tracker status	StatusWindow		Nyomkövető állapota
 Eject when unmounting	AutoMounterSettings		Kiadás leválasztáskor
 Window	ContainerWindow		Ablak
 Decrease size	ContainerWindow		Méret csökkentése
@@ -64,7 +64,7 @@ apps	B_APPS_DIRECTORY		Programok
 Icon view	ContainerWindow		Ikon nézet
 Size	QueryPoseView		Méret
 Emptying Trash… 	StatusWindow		Szemetes ürítése…
-Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Új Tracker sablon
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Új Nyomkövető sablon
 Close all in workspace	ContainerWindow		Bezárás minden munkaasztalon
 Empty Trash	ContainerWindow		Szemetes ürítése
 Name = %name	FindPanel	FindResultTitle	Név = %name
@@ -88,7 +88,7 @@ Ignore case	SelectionWindow		Kis- és nagybetű különbségének mellőzése
 is not	FindPanel		nem egyenlő
 OK	AutoMounterSettings		Rendben
 Windows	TrackerSettingsWindow		Ablakok
-Tracker preferences	TrackerSettingsWindow		Tracker beállítása
+Tracker preferences	TrackerSettingsWindow		Nyomkövető beállítása
 Cut	FilePanelPriv		Kivágás
 Replace	FilePanelPriv		Csere
 Select all	VolumeWindow		Mind kijelölése
@@ -219,7 +219,7 @@ Get info	ContainerWindow		Információ
 Error creating link to \"%name\".	FSUtils		Hiba történt a hivatkozás (%name) létrehozása közben.
 Select	SelectionWindow		Kijelölés
 Or	FindPanel		Vagy
-The Tracker must be running to see set the default printer.	PoseView		A Trackernek futnia kell, hogy az alapértelmezett nyomtatót át lehessen állítani.
+The Tracker must be running to see set the default printer.	PoseView		A Nyomkövetőnek futnia kell, hogy az alapértelmezett nyomtatót át lehessen állítani.
 by formula	FindPanel		képlet alapján
 40 x 40	DeskWindow		40 x 40
 Name	PoseView		Név
@@ -314,7 +314,7 @@ You can't move or copy items to read-only volumes.	FSUtils		Írásvédett lemezr
 Unknown	FilePermissionsView		Ismeretlen
 All files and folders	FindPanel		Minden fájl és mappa
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Nem sikerült megnyitni: %document\n\tHiányzó funkciótár: %library.\n
-The Tracker must be running to see Info windows.	PoseView		Az információs ablakok megtekintéséhez futnia kell a Trackernek.
+The Tracker must be running to see Info windows.	PoseView		Az információs ablakok megtekintéséhez futnia kell a Nyomkövetőnek.
 Other	FilePermissionsView		Egyéb
 Query name:	FindPanel		Keresés neve:
 Permissions	ContainerWindow		Engedélyek
