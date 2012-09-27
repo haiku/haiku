@@ -525,7 +525,11 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 	}
 	if (!error)
 		error = lastDescriptorWasClosed ? B_OK : B_BAD_DATA;
-	if (!error) 
-		error = highestMinimumUDFReadRevision <= UDF_MAX_READ_REVISION ? B_OK : B_ERROR;
+	if (error == B_OK
+		&& highestMinimumUDFReadRevision > UDF_MAX_READ_REVISION) {
+		error = B_ERROR;
+		FATAL(("found udf revision 0x%x more than max 0x%x\n",
+			highestMinimumUDFReadRevision, UDF_MAX_READ_REVISION));
+	}
 	RETURN(error);					
 }
