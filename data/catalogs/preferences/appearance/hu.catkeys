@@ -43,7 +43,7 @@ Use double scrollbar arrows	DecorSettingsView		Dupla nyíl használata
 Fixed font:	Font view		Rögzített szélességű betűtípus:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
 Reduce colored edges filter strength:	AntialiasingSettingsView		A színezett betűszélek szűrőjének erősségi szintje:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		A glifakörvonalasítással összevont szubpixel-alapú élsimítás nem használható a Haiku ezen kiadásában, mivel lehetséges szabadalmi viták forrása lehet. E funckió használatához magának kell megépítenie saját Haiku-rendszerét és beállítania bizonyos opciókat a libfreetype konfigurációs fejlécében.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		A betűkép-körvonalasítással összevont szubpixel-alapú élsimítás nem használható a Haiku ezen kiadásában, mivel lehetséges szabadalmi viták forrása lehet. E funckió használatához magának kell megépítenie saját Haiku-rendszerét és beállítania bizonyos opciókat a libfreetype konfigurációs fejlécében.
 Control text	Colors tab		Vezérlőelem szövege
 Tooltip text	Colors tab		Buboréksúgó szövege
 Bold font:	Font view		Félkövér betű:
@@ -57,4 +57,4 @@ Monospaced fonts only	AntialiasingSettingsView		Csak rögzített szélességű b
 Look and feel	APRWindow		Megjelenés
 Antialiasing menu	AntialiasingSettingsView		Élsimítási menü
 Fonts	APRWindow		Betűtípusok
-Glyph hinting:	AntialiasingSettingsView		Glifák körvonala:
+Glyph hinting:	AntialiasingSettingsView		Betűképek körvonala:

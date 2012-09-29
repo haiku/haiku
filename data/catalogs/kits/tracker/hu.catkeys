@@ -48,7 +48,7 @@ MiB	WidgetAttributeText		MB
 greater than	FindPanel		nagyobb, mint
 Delete	PoseView		Törlés
 Select all	ContainerWindow		Mind kijelölése
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Sajnáljuk, de a „Karakter” jellemző nem tartalmazhat többájtos jelet.
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Sajnáljuk, de a „Karakter” jellemző nem tartalmazhat többájtos betűképet.
 Clean up	DeskWindow		Rendrakás
 You cannot copy or move the root directory.	FSUtils		A gyökérmappát nem lehet másolni vagy áthelyezni.
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed / %TotalSize, %BytesPerSecond/mp
