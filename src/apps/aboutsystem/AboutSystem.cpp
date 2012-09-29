@@ -206,6 +206,12 @@ static const Translation gTranslations[] =
 		"Vasco Costa - gluon\n"
 		"Michael Vinícius de Oliveira - michaelvo\n"
 	},
+	{ "pt_BR",
+		"Cabral Bandeira - beyraq\n"
+		"Adriano A. Duarte - Sri_Dhryko\n"
+		"Tiago Matos - tiagoms\n"
+		"Nadilson Santana - nadilsonsantana\n"
+	},
 	{ "ro",
 		"Victor Carbune\n"
 		"Silviu Dureanu\n"
