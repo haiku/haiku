@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	3337401776
+1	french	x-vnd.Be-MAIL	1599879742
 View	Mail		Vue
 %d - Date	Mail		%d - Date
 Attach attributes:	Mail		Attributs du fichier joint :
@@ -82,6 +82,7 @@ Only files can be added as attachments.	Mail		Seuls des fichiers peuvent être j
 Previous message	Mail		Message précédent
 Attachments:	Mail		Pièces jointes :
 Title:	Mail		Titre :
+<no account found>	Mail		<aucun compte trouvé>
 Find…	Mail		Chercher…
 Accounts…	Mail		Comptes…
 Mail preferences	Mail		Préférences du courriel

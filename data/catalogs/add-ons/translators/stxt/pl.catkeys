@@ -1,6 +1,8 @@
-1	polish	x-vnd.Haiku-STXTTranslator	3302294301
+1	polish	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Tekst formatowany Be
 Plain text file	STXTTranslator		Plik czystego tekstu
 STXTTranslator Settings	STXTTranslator		Ustawienia translatora STXT
+StyledEdit file translator	STXTView		Translator plików programu StyledEdit
 StyledEdit files	STXTTranslator		Pliki StyledEdit
+StyledEdit file translator	STXTTranslator		Translator plików programu StyledEdit
 STXT Settings	STXTMain		Ustawienia STXT

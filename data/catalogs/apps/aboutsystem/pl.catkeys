@@ -1,16 +1,17 @@
-1	polish	x-vnd.Haiku-About	2572362883
+1	polish	x-vnd.Haiku-About	1175860482
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 przez autorów Gutenprint. Wszelkie prawa zastrzeżone.
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i jego kernela NewOS)\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i jego kernel NewOS)\n
 BSD (4-clause)	AboutView		BSD (4-klauzulowa licencja BSD)
 %ld Processors:	AboutView		Liczba procesorów %ld:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL oraz Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Wszelkie prawa zastrzeżone.
 %d MiB total	AboutView		%d MiB ogółem
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (twórcy projektu)\n\n
-The Haiku-Ports team\n	AboutView		Zespółu Haiku-Ports\n
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (założyciel projektu)\n\n
+The Haiku-Ports team\n	AboutView		Zespół Haiku-Ports\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. Wszelkie prawa zastrzeżone.
 %d MiB used (%d%%)	AboutView		%d MiB użyte (%d%%)
 Website, marketing & documentation:\n	AboutView		Strona WWW, marketing i dokumentacja:\n
+GNU LGPL v2.1	AboutView		GNU LGPL v2.1
 AboutSystem	System name		OSystemie
 MIT (no promotion)	AboutView		MIT (nie promowany)
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe i inni.
@@ -37,6 +38,7 @@ Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright ©
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Pamięć:
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Wszelkie prawa zastrzeżone.
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. To oprogramowanie jest częściowo oparte na pracach Independent JPEG Group.
 Past maintainers:\n	AboutView		Wcześniejsi współpracownicy:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecjalne podziękowania dla:\n
@@ -51,7 +53,8 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		Czas działania:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Zawiera oprogramowanie wytworzone przez NetBSD Foundation, Inc. oraz ich współpracowników:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. Wszelkie prawa zastrzeżone.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Zawiera oprogramowanie z Projektu FreeBSD, wydanego na licencji BSD:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Wszelkie prawa zastrzeżone.
-The Haikuware team and their bounty program\n	AboutView		Zespółu Haikuware i ich program nagród\n
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google i ich programom Google Summer of Code i Google Code In\n
+The Haikuware team and their bounty program\n	AboutView		Zespół Haikuware i ich program nagród\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Wszelkie prawa zastrzeżone.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Wszelkie prawa zastrzeżone.
 About this system	AboutWindow		O systemie
@@ -63,15 +66,16 @@ Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyri
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Wszelkie prawa zastrzeżone.
 The BeGeistert team\n	AboutView		Grupy BeGeistert\n
-The University of Auckland and Christof Lutteroth\n\n	AboutView		Uniwersytetu w Auckland oraz Christofa Lutterotha\n\n
-Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.
+The University of Auckland and Christof Lutteroth\n\n	AboutView		Uniwersytet w Auckland oraz Christof Lutteroth\n\n
+Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratory, Uniwersytet Tokijski.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Wszelkie prawa zastrzeżone.
 Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Copyright © 2002-2008 Alexander L. Roshal. Wszelkie prawa zastrzeżone.
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Wszelkie prawa zastrzeżone.
 %ld MHz	AboutView		%ld MHz
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH i Thomas Merz. Wszelkie prawa zastrzeżone.\nPDFlib i PDFlib logo są zastrzeżonymi znakami towarowymi PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Wszelkie prawa zastrzeżone.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Zawiera opragramowanie z GNU Project, wydanego na licencjach GPL i LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Zawiera oprogramowanie z GNU Project, wydanego na licencjach GPL i LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
+…and the many people making donations!\n\n	AboutView		...oraz wielu ludziom, którzy wysyłają dotacje!\n\n
 MIT license. All rights reserved.	AboutView		MIT license. Wszelkie prawa zastrzeżone.
 [Click a license name to read the respective license.]\n\n	AboutView		[Kliknij na nazwę licencji, aby wyświetlić jej treść.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Wszelkie prawa zastrzeżone.

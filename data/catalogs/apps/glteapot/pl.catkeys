@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-GLTeapot	3688092856
+1	polish	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Górne
 Lighting	TeapotWindow		Oświetlenie
 Off	TeapotWindow		Wyłącz
@@ -9,6 +9,7 @@ Blue	TeapotWindow		Niebieski
 Gouraud shading	TeapotWindow		Cieniowanie Gourauda
 Quit	TeapotWindow		Wyjdź
 Filled polygons	TeapotWindow		Wypełnione wielokąty
+Settings	TeapotWindow		Ustawienia
 Fog	TeapotWindow		Mgła
 Backface culling	TeapotWindow		Usuwanie niewidocznych powierzchni
 Z-buffered	TeapotWindow		Buforowane Z

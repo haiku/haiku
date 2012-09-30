@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	918781021
+1	polish	x-vnd.Haiku-libtracker	636989061
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -15,7 +15,9 @@ Decrease size	ContainerWindow		Zmniejsz rozmiar
 Mini icon view	VolumeWindow		Widok małych ikon
 You must have at least one attribute showing.	PoseView		Musisz mieć co najmniej jeden pokazany atrybut.
 Permissions	InfoWindow		Uprawnienia
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Odwróć zaznaczenie
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Ostatnio otwierane dokumenty
 Modified	QueryPoseView		Zmodyfikowano
 Created	ContainerWindow		Utworzono

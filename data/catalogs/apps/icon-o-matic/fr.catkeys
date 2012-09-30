@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	4046269783
+1	french	x-vnd.haiku-icon_o_matic	1958317345
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -72,8 +72,10 @@ Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Orner les points de contr�
 Remove	Icon-O-Matic-StylesList		Enlever
 META:ICON Attribute	Icon-O-Matic-SavePanel		Attribut META:ICON
 Rotate	Icon-O-Matic-TransformationBoxStates		Pivoter
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Supprimer une transformation
 Add Transformer	Icon-O-Matic-AddTransformersCmd		Ajouter une transformation
 Remove	Icon-O-Matic-PathsList		Enlever
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Déplacer le point de contrôle
 Pick a color	Icon-O-Matic-ColorPicker		Choisissez une couleur
 Quit	Icon-O-Matic-Menu-File		Quitter
 Export	Icon-O-Matic-Menu-File		Exporter

@@ -68,7 +68,7 @@ UTF-8	Mail	This string is used as a key to set default message compose encoding.
 Trash	Mail		Szemetes
 Default account:	Mail		Alapértelemzett fiók:
 Size:	Mail		Méret:
-Account from mail	Mail		Fiók levél alapján
+Account from mail	Mail		Levél alapján
 Edit signatures…	Mail		Aláírás szerkesztése…
 New	Mail		Új
 Attachments: 	Mail		Mellékletek:

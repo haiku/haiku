@@ -1,12 +1,12 @@
 1	polish	x-vnd.Haiku-Appearance	1933110481
-Plain font:	Font view		Czcionka zwykła:
+Plain font:	Font view		Zwykła czcionka:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
 Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
 Shadow	Colors tab		Cień
 On	AntialiasingSettingsView		Włącz
 Defaults	APRWindow		Ustaw jako domyślne
-Grayscale	AntialiasingSettingsView		Odcienie szarości
+Grayscale	AntialiasingSettingsView		Skala odcieni szarości
 Shine	Colors tab		Połysk
 About	DecorSettingsView		O
 Off	AntialiasingSettingsView		Wyłącz

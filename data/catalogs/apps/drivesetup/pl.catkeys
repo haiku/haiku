@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	2908539543
+1	polish	x-vnd.Haiku-DriveSetup	1100337826
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		Usuń
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranej partycji bedą bezpowrotnie utracone!
@@ -14,6 +14,7 @@ No disk devices have been recognized.	DiskView		Nie rozpoznano żadnych dysków 
 The selected disk is read-only.	MainWindow		Wybrany dysk jest w trybie tylko do odczytu.
 Partition name:	CreateParamsPanel		Nazwa partycji:
 Initialize	InitParamsPanel		Inicjalizacja
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Czy jesteś pewien, że chcesz sformatować tę partycję \\"%s\"? Zostaniesz zapytany o to ponownie, zanim zmiany zostaną zapisane na dysku.
 Could not mount partition %s.	MainWindow		Nie można zamontować partycji %s.
 The partition %s is already unmounted.	MainWindow		Partycja %s została już odmontowana.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Błąd podczas usuwaniu partycji. Żadne zmiany nie zostały zapisane na dysk.
@@ -34,6 +35,7 @@ Offset: %ld MB	Support		Przesunięcie: %ld MB
 Write changes	MainWindow		Zapisz zmiany
 There was an error preparing the disk for modifications.	MainWindow		Wystąpił błąd podczas przygotowywania dysku do modyfikacji.
 The partition %s is already mounted.	MainWindow		Partycja %s jest już zamontowana.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Czy jesteś pewien, że chcesz sformatować tę partycję? Zostaniesz zapytany o to ponownie, zanim zmiany zostaną zapisane na dysku.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na dysku %s bedą bezpowrotnie utracone!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz usunąć wybraną partycje?\n\nWszystkie dane na wybranej partycji zostaną utracone!
 Create…	MainWindow		Utwórz…
@@ -41,8 +43,10 @@ Disk system \"%s\"\" not found!	MainWindow		Typ układu dysku \"%s\"\" nie odnal
 Could not unmount partition %s.	MainWindow		Nie można odmontować partycji %s.
 Mount	MainWindow		Montuj
 Create	CreateParamsPanel		Utwórz
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Czy jesteś pewien, że chcesz sformatować do surowej partycji RAW (większość ludzi najpierw inicjalizuje dysk z jakimś systemem partycjonowania)? Zostaniesz zapytany ponownie o to, zanim zmiany zostaną zapisane na dysku.
 Device	PartitionList		Urządzenie
 Disk	MainWindow		Dysk
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Czy jesteś pewien, że chcesz zainicjalizować zaznaczony dysk? Wszelkie dane zostaną utracone. Zostaniesz zapytany ponownie o to, zanim zmiany zostaną zapisane na dysku.\n
 Device	DiskView		Urządzenie
 Active	PartitionList		Aktywny
 Volume name	PartitionList		Nazwa woluminu
@@ -65,7 +69,9 @@ Partition size	CreateParamsPanel		Rozmiar partycji
 Surface test (not implemented)	MainWindow		Test powierzchni (nie zaimplementowano)
 Cancel	InitParamsPanel		Anuluj
 Cancel	CreateParamsPanel		Anuluj
+Format	MainWindow		Format
 Parameters	PartitionList		Parametry
 Creation of the partition has failed.	MainWindow		Próba utworzenia partycji nie powiodła się.
 The currently selected partition is not empty.	MainWindow		Zaznaczona partycja nie jest pusta.
+Failed to format the partition. No changes have been written to disk.	MainWindow		Błąd podczas usuwaniu partycji. Żadne zmiany nie zostały zapisane na dysku.
 Unmount	MainWindow		Odmontuj

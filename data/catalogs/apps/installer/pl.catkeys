@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Installer	2066726304
+1	polish	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Więc za innymi wpisami na samym dole pliku, dodaj coś podobnego do tych linii:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Na pewno chcesz przerwać instalację i uruchomić ponownie system?
 \t}\n\n	InstallerApp		\t}\n\n
@@ -70,6 +70,7 @@ Installer	System name		Instalator
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nie można zainstalować systemu na nim samym. Proszę wybrać inny dysk.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" to numer partycji, który dla GRUBa 2 zaczyna się od \"1\"\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Począwszy od os-prober v1.44 (np. w Ubuntu 11.04 i późniejsze), Haiku powinno być rozpoznawane od razu. Aby dodać Haiku do menu GRUB, otwórz Terminal i wprowadź:\n\n
 Quit DriveSetup	InstallerWindow		Wyjdź z DriveSetup
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" to numer dysku twardego, zaczynający się od \"0\".\n
 Hide optional packages	InstallerWindow		Schowaj pakiety opcjonalne
@@ -112,6 +113,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Czy na pewno chcesz zatrzymać instalację?
 Onto:	InstallerWindow		Na:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Proszę zamknij okno Boot Managera przed zamknięciem okna Instalatora.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kiedy po raz pierwszy załadujesz poprawnie Haiku, upewnij się, że przeczytasz naszą dokumentację \"Welcome\" i \"Userguide\". Na Pulpicie znajdują się do nich skróty, a w WebPositive zakładki.\n\n
 Tools	InstallerWindow		Narzędzia
 The mount point could not be retrieved.	InstallProgress		Punkt montowania nie mógł zostać odczytany.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Docelowy wolumin nie jest pusty. Czy na pewno chcesz instalować mimo to?\n\nUwaga: Katalog "system" będzie czystą kopią ze źródłowego woluminu, wszystkie inne katalogi zostaną połączone, gdzie pliki i dowiązania które istnieją zarówno na źródłowym i docelowym woluminie zostaną nadpisane wersją z woluminu źródłowego.
