@@ -1,0 +1,20 @@
+1	portuguese (brazil)	x-vnd.Haiku-CPUFrequencyPref	3079996868
+Ok	Status view		Ok
+CPU frequency status view	CPU Frequency View		Status da frequência do CPU
+Set state	Status view		Definir estado
+Defaults	Pref Window		Padrões
+Install replicant into Deskbar	CPU Frequency View		Instalar o replicante na Mesa de Trabalho
+Quit	Status view		Sair
+High performance	Status view		Alto desempenho
+Stepping policy	CPU Frequency View		Política de stepping
+Dynamic performance	Status view		Desempenho dinâmico
+Step up by CPU usage	Color Step View		Aumentar desempenho por uso de CPU
+Dynamic stepping	CPU Frequency View		Stepping dinâmico
+Stepping policy: 	CPU Frequency View		Política de stepping: 
+Integration time [ms]: 	CPU Frequency View		Tempo de integração [ms]: 
+Open Speedstep preferences…	Status view		Preferências de Open Speedstep…
+Revert	Pref Window		Reverter
+Low energy	Status view		Baixa energia
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Não foi possível abrir a Frequência de CPU.\n\nErro: 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		A Frequência do CPU\n\tfoi escrito por Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		Frequência do CPU

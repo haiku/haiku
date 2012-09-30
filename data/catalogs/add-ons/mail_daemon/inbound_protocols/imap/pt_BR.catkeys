@@ -1,0 +1,9 @@
+1	portuguese (brazil)	x-vnd.Haiku-IMAP	3892875357
+Destination:	imap_config		Destino:
+status	IMAPFolderConfig		status
+Apply	IMAPFolderConfig		Aplicar
+IMAP Folders	imap_config		Pastas IMAP
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Buscando pastas IMAP, tenha paciência...
+IMAP Folders	IMAPFolderConfig		Pastas IMAP
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Assinando / Cancelando assinatura de pastas IMAP, tenha paciência...
+Failed to fetch available storage.	IMAPFolderConfig		Falhou ao buscar armazenamento disponível.

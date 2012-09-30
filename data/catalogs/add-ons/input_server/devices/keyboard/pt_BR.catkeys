@@ -1,0 +1,10 @@
+1	portuguese (brazil)	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+Kill application	Team monitor		Matar aplicação
+Quit application	Team monitor		Fechar aplicativo
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Selecione uma aplicação da lista acima e clique um dos botões 'Matar aplicativo' e 'Fechar aplicativo' de maneira a fechá-lo.\n\nPressione CONTROL+ALT+DELETE por %ld segundos para reiniciar.
+If the application will not quit you may have to kill it.	Team monitor		Se a aplicação não fechar, você deve matá-la.
+Force reboot	Team monitor		Forçar a reinicialização
+Team monitor	Team monitor		Monitor de equipe
+(This team is a system component)	Team monitor		(Esta equipe é um componente do sistema)
+Restart the desktop	Team monitor		Reiniciar a área de trabalho
+Cancel	Team monitor		Cancelar

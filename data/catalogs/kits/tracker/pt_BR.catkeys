@@ -1,0 +1,454 @@
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	1319179540
+common	B_COMMON_DIRECTORY		comum
+OK	WidgetAttributeText		OK
+Icon view	VolumeWindow		Em ícones
+Add-ons	FilePanelPriv		Adicionais
+Desktop	Model		Desktop
+Identify	ContainerWindow		Identificar
+Warning space color	SettingsView		Cor do espaço de aviso
+Close	VolumeWindow		Fechar
+Open	OpenWithWindow		Abrir
+Tracker status	StatusWindow		Status do Tracker
+Eject when unmounting	AutoMounterSettings		Ejetar quando desmontar
+Window	ContainerWindow		Janela 
+Decrease size	ContainerWindow		Diminuir tamanho
+Mini icon view	VolumeWindow		Em miniaturas
+You must have at least one attribute showing.	PoseView		Você precisa ao menos de um atributo visível.
+Permissions	InfoWindow		Permissões
+Invert selection	VolumeWindow		Inverter seleção
+Recent documents	FavoritesMenu		Documentos recentes
+Modified	QueryPoseView		Modificado
+Created	ContainerWindow		Criado
+Error %error loading add-On %name.	ContainerWindow		Erro %error carregando adicional %name.
+contains	SelectionWindow		contém
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Desculpe, mas você não pode salvar coisas no menu raiz de seu sistema.
+Show shared volumes on Desktop	SettingsView		Mostrar volumes compartilhados no Desktop
+Paste links	ContainerWindow		Colar links
+Name	OpenWithWindow		Nome
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Não foi possível abrir \"%document\" porque o aplicativo \"%app\" está na Lixeira.
+File	ContainerWindow		Arquivo
+Handles any %type	OpenWithWindow		Lidar com qualquer %tipo
+Delete	ContainerWindow		Deletar
+32 x 32	ContainerWindow		32 x 32
+Cannot unmount the boot volume \"%name\".	FSUtils		Não foi possível desmontar volume de boot \"%name\".
+Open with…	ContainerWindow		Abrir com...
+Write	FilePermissionsView		Escrever
+for %num files	InfoWindow		em %num arquivos
+Modified	PoseView		Modificado
+Make active printer	ContainerWindow		Marcar como impressora ativa
+Create link here	ContainerWindow		Criar atalho aqui
+Moving: 	StatusWindow		Movendo: 
+before	FindPanel		antes
+On	FindPanel		Em
+MiB	WidgetAttributeText		MiB
+greater than	FindPanel		maior que
+Delete	PoseView		Deletar
+Select all	ContainerWindow		Selecionar tudo
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Desculpe, o atributo 'Charactere' não pode armazenar um valor do tipo multi-byte.
+Clean up	DeskWindow		Organizar
+You cannot copy or move the root directory.	FSUtils		Você não pode copiar ou mover o menu raiz
+Invert selection	FilePanelPriv		Inverter seleção
+Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Renomear
+save text	FilePanelPriv		salvar texto
+Select all	FilePanelPriv		Selecionar tudo
+Link to:	InfoWindow		Atalho para:
+Location	ContainerWindow		Local
+Location	QueryPoseView		Local
+config	B_USER_CONFIG_DIRECTORY		configuração
+apps	B_APPS_DIRECTORY		aplicativos
+Icon view	ContainerWindow		Em ícones
+Size	QueryPoseView		Tamanho
+Emptying Trash… 	StatusWindow		Limpando Lixeira...
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novos Modelos do Rastreador
+Close all in workspace	ContainerWindow		Fechar tudo no workspace
+Empty Trash	ContainerWindow		Limpar Lixeira
+Name = %name	FindPanel	FindResultTitle	Nome = %name
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Você tem certeza que deseja mover ou copiar o(s) item(ns) selecionado(s) para esta pasta?
+Does not handle file	OpenWithWindow		Não pode lidar com o arquivo
+Arrange by	ContainerWindow		Ordenar por
+Mount server error	AutoMounterSettings		Erro do servidor de montagem
+Search	FindPanel		Localizar
+Preparing to empty Trash…	StatusWindow		Preparando para limpar a Lixeira...
+Disks	Model		Discos
+Create link	ContainerWindow		Criar atalho
+develop	B_COMMON_DEVELOP_DIRECTORY		desenvolvimento
+Decrease size	DeskWindow		Diminuir tamanho
+Size	ContainerWindow		Tamanho
+All disks	AutoMounterSettings		Todos os discos
+Would you like to find some other suitable application?	FSUtils		Você gostaria de encontrar outro aplicativo que possa servir?
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Bibliotecas faltantes: %library). \n
+no items	CountView		sem itens
+Ignore case	SelectionWindow		ignorar caso
+is not	FindPanel		não é
+OK	AutoMounterSettings		OK
+Windows	TrackerSettingsWindow		Janelas
+Tracker preferences	TrackerSettingsWindow		Preferências do Tracker
+Cut	FilePanelPriv		Recortar
+Replace	FilePanelPriv		Substituir
+Select all	VolumeWindow		Selecionar tudo
+Opens with:	InfoWindow		Abre com:
+Open	ContainerWindow		Abrir
+(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed de %TotalSize, %BytesPerSecond/s)
+Error calculating folder size.	InfoWindow		Erro calculando o tamanho da pasta.
+New folder	FilePanelPriv		Nova pasta
+%name info	InfoWindow	InfoWindow Title	Informações de %name
+Favorites	FavoritesMenu		Favoritos
+Add-ons	VolumeWindow		Adicionais
+(Finish: %time - %finishtime left)	StatusWindow		(Término: %time - %finishtime restante)
+Sorry, you can't copy items to the Trash.	PoseView		Desculpe, você não pode copiar itens para a Lixeira.
+List view	VolumeWindow		Em lista
+matches wildcard expression	SelectionWindow		encaixa na expressão coringa
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	renomear
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Você não pode substituir uma pasta ou um atalho por um arquivo.
+Show space bars on volumes	SettingsView		Mostrar barras de espaço nos volumes
+Invert selection	ContainerWindow		Inverter seleção
+Increase size	DeskWindow		Aumentar tamanho
+Resize to fit	ContainerWindow		Reduzir para caber
+%Ld bytes	WidgetAttributeText		%Ld bytes
+Add printer…	ContainerWindow		Adicionar impressora...
+Open	VolumeWindow		Abrir
+New folder	ContainerWindow		Nova pasta
+Kind	ContainerWindow		Espécie
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	renomear
+home	B_USER_DIRECTORY		home
+Select…	ContainerWindow		Selecionar....
+Copy to	ContainerWindow		Copiar para
+Move to Trash	ContainerWindow		Mover para Lixeira
+Move to	ContainerWindow		Mover para
+Create %s clipping	PoseView		Criar %s recorte
+Set new link target	InfoWindow		Selecione o destino do atalho
+Save as Query template:	FindPanel		Salvar como modelo de Consulta
+preferences	B_PREFERENCES_DIRECTORY		preferências
+Cancel	FSUtils		Cancelar
+move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	mover
+Edit name	ContainerWindow		Editar nome
+Show volumes on Desktop	SettingsView		Mostrar volumes no Desktop
+KiB	WidgetAttributeText		KiB
+Error %error loading Add-On %name.	ContainerWindow		Erro %error ao carregar o Adicional %name.
+Defaults	TrackerSettingsWindow		Padrões
+%num items	CountView		%num itens
+Mini icon view	ContainerWindow		Em miniatura
+Clean up	VolumeWindow		Organizar
+OK	TrackerInitialState		OK
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Não foi possível abrir \"%name\". O arquivo está erroneamente marcado como executável.
+Add-ons	ContainerWindow		Adicionais
+Edit templates…	TemplatesMenu		Editar modelos...
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Um item chamado \"%name\" já existe nesta pasta. Gostaria de substituí-lo pelo link simbólico que está sendo criado?
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Desculpe, não existe espaço livre suficiente no volume de destino para para copiar a seleção.
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Não foi possível abrir \"%document\" com a aplicativo \"%app\" (%error).
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Desculpe, salvar mais de um item não é permitido.
+Searching for disks to mount…	StatusWindow		Procurando discos para montar...
+New folder	FSUtils		Nova pasta
+Free space color	SettingsView		Cor do espaço vazio
+Cut	ContainerWindow		Recortar
+Remove	FindPanel		Remover
+Resize to fit	QueryContainerWindow		Reduzir para caber
+Desktop	TrackerSettingsWindow		Desktop
+Sorry, you can't copy items to the Trash.	FSClipBoard		Desculpe, você não pode copiar itens para a Lixeira.
+by attribute	FindPanel		por atributo.
+Disk mounting during boot	AutoMounterSettings		Montar discos na inicialização
+New Query	FindPanel		Nova Consulta
+Preparing to move items…	StatusWindow		Preparando para mover itens...
+You cannot replace a file with a folder or a symbolic link.	FSUtils		Você não pode substituir um arquivo por uma pasta ou um atalho
+Unmount	InfoWindow		Desmontar
+no supporting apps	OpenWithWindow		Sem aplicativos suportados
+That name is already taken. Please type another one.	InfoWindow		Este nome já foi escolhido. Por favor digite outro.
+Sorry, you can't create links in the Trash.	PoseView		Desculpe, você não pode criar atalhos na Lixeira.
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Um item chamado \"%name\" já existe nesta pasta, e pode conter\nitens com os mesmos nomes. Gostaria de substituí-los com aqueles na pasta que está %verb?
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Atalho \"%name\" para:
+Mount settings…	VolumeWindow		Configurações de montagem...
+Select…	VolumeWindow		Selecionar...
+All disks	FindPanel		Todos os discos
+Revert	TrackerSettingsWindow		Reverter
+Invert selection	QueryContainerWindow		Inverter seleção
+Execute	FilePermissionsView		Executar
+Size	FindPanel		Tamanho
+1 item	CountView		1 item
+Open parent	ContainerWindow		Abrir pasta acima
+Location:	InfoWindow		Local:
+Edit favorites…	FilePanelPriv		Editar favoritos...
+Create relative link	ContainerWindow		Criar atalho
+Copy	ContainerWindow		Copiar
+Size	PoseView		Tamanho
+If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Se %if YouDoAction a pasta home, %osName pode não se comportar apropriadamente! Está seguro de que quer fazer isto? Para %toDoAction a pasta home de qualquer maneira, segure a tecla Shift e clique \"%toConfirmAction\".
+Location	OpenWithWindow		Local
+Force identify	ContainerWindow		Forçar identificação
+Duplicate	ContainerWindow		duplicar
+New folder%ld	FSUtils		Nova pasta%ld
+Outline selection rectangle only	SettingsView		Retângulo de seleção pontilhado
+Select all	DeskWindow		Selecionar tudo
+OK	InfoWindow		OK
+Replace	FSUtils		Substituir
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Você está tentando substituir o item:\n\t%name%dest\nwith:\n\t%name%src\n\nVocê gostaria de substituí-lo com aquele que você %movemode?
+Mini icon view	DeskWindow		Ícones mini
+Error in regular expression:\n\n'%errstring'	PoseView		Erro na expressão regular:\n\n'%errstring'
+Mount all	MountMenu		Montar tudo
+calculating…	InfoWindow		calculando...
+Unmount	VolumeWindow		Desmontar
+Edit name	VolumeWindow		Editar nome
+Mount all disks now	AutoMounterSettings		Montar todos os discos agora
+Untitled bitmap	PoseView		Bitmap sem título
+of %items	StatusWindow		de %items
+Description:	InfoWindow		Descrição
+New	DeskWindow		Novo
+Open	InfoWindow		Abrir
+64 x 64	ContainerWindow		64 x 64
+Replace all	FSUtils		Substituir tudo
+The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		O aplicativo \"%appname\" não suporta este tipo de documento que você está querendo abrir. Você tem certeza que deseja prosseguir? Se você sabe que o aplicativo suporta este tipo de documento, você deveria contatar o criador do aplicativo e perguntá-lo para atualizar seu aplicativo para a lista de tipos de seu documento como suportado.
+Preparing to restore items…	StatusWindow		Preparando para restaurar itens...
+Replace other file	WidgetAttributeText		Substituir outro arquivo
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dos itens selecionados não podem ser movidos para a Lixeira. Você gostaria de deletá-los então? (Esta operação não pode ser desfeita).
+You cannot create a link to the root directory.	FSUtils		Você não pode criar um atalho no diretório raiz.
+48 x 48	ContainerWindow		48 x 48
+Resize to fit	VolumeWindow		Reduzir para caber
+Could not find application \"%appname\"	OpenWithWindow		Não foi possível encontrar o aplicativo \"%appname\"
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		O item selecionado não pode ser movido para a Lixeira. Ao invés disso, você deseja apagá-lo? (Esta operação não pode ser desfeita.)
+Invert	SelectionWindow		Inverter
+Save Query as template…	FindPanel		Salvar como modelo de Consulta...
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	renomear
+Find	FindPanel		Pesquisar
+Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Mover
+Get info	ContainerWindow		Obter info
+Error creating link to \"%name\".	FSUtils		Erro criando link para \"%name\".
+Select	SelectionWindow		Selecionar
+Or	FindPanel		Ou
+The Tracker must be running to see set the default printer.	PoseView		O Tracker precisa estar funcionando parar ver e definir uma impressora padrão.
+by formula	FindPanel		por fórmula
+40 x 40	DeskWindow		40 x 40
+Name	PoseView		Nome
+Group	FilePermissionsView		Grupo
+Version:	InfoWindow		Versão:
+Created:	InfoWindow		Criado:
+If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction as definições de mime, %osName pode não se comportar apropriadamente! Está seguro de que quer fazer isto? Para %toDoAction as definições de mime de qualquer maneira, clique \"%toConfirmAction\".
+\nShould this be fixed?	FSUtils		\nIsso deve ser corrigido?
+Copying: 	StatusWindow		Copiando:
+Capacity:	InfoWindow		Capacidade:
+Delete	FilePanelPriv		Deletar
+Save	FindPanel		Salvar
+copy	FSUtils	filename copy	cópia
+Temporary	FindPanel		Temporário
+Version	OpenWithWindow		Versão
+Default application	InfoWindow		Aplicativo padrão
+Preparing to copy items…	StatusWindow		Preparando para copiar itens...
+Show folder location in title tab	SettingsView		Mostrar local da pasta na barra de títulos
+Proceed	FSUtils		Prosseguir
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Alguns itens já existem nesta pasta com os mesmos nomes dos itens que você quer %verb.\n \nVocê gostaria de substituí-los com aqueles que você vai %verb ou ser perguntado em cada um?
+The mount server could not be contacted.	AutoMounterSettings		O servidor de montagem não pode ser contactado
+Error deleting items	FSUtils		Erro deletando itens
+Create relative link here	ContainerWindow		Criar atalho aqui
+trash	B_TRASH_DIRECTORY		lixeira
+matches regular expression	SelectionWindow		matches regular expression
+Mount settings…	SettingsView		Configurações de montagem...
+Edit name	InfoWindow		Editar nome
+Could not open \"%name\" (%error). 	FSUtils		Não foi possível abrir \"%name\" (%error).
+Paste	ContainerWindow		Colar
+optional	/boot/optional		opcional
+Modified:	InfoWindow		Moficado
+Error moving \"%name\".	FSUtils		Erro movendo \"%name\".
+TiB	WidgetAttributeText		TiB
+40 x 40	ContainerWindow		40 x 40
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		O arquivo \"%name\" já existe na pasta especificada. Deseja substituí-lo?
+Cancel	ContainerWindow		Cancelar
+Only the boot disk	AutoMounterSettings		Somente o disco de inicialização
+Trash	TrackerSettingsWindow		Lixeira
+Unmount	ContainerWindow		Desmontar
+Copy layout	ContainerWindow		Copiar layout
+label too long	PoseView		rótulo é muito longo
+Cancel	Tracker		Cancelar
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Desculpe, você não pode editar este atributo
+Name	ContainerWindow		Nome
+Disk mount settings	AutoMounterSettings		Configurações de montagem de disco
+Reverse order	ContainerWindow		Inverter ordem
+48 x 48	DeskWindow		48 x 48
+OK	OpenWithWindow		OK
+Add current folder	FilePanelPriv		Adicionar a pasta atual
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Símbolo faltando: %symbol). \n
+The target disk does not support creating links.	FSUtils		O disco de destino não suporta a criação de atalhos
+starts with	SelectionWindow		começa com
+Preparing to delete items…	StatusWindow		Preparando para apagar itens...
+Enable type-ahead filtering	SettingsView		Habilitar filtro de autocompletar
+Would you like to find a suitable application to open the file?	FSUtils		Gostaria de localizar um aplicativo adequado para abrir o arquivo?
+There was an error writing the attribute.	WidgetAttributeText		Ocorreu um erro ao gravar o atributo.
+Recalculate folder size	InfoWindow		Recalcular o tamanho da pasta
+Unknown	WidgetAttributeText		Desconhecido
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Não foi possível abrir \"%document\" (Símbolo faltando: %symbol). \n
+by name	FindPanel		por nome
+Creating links: 	StatusWindow		Criando atalhos:
+Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Renomear
+Paused: click to resume or stop	StatusWindow		Pausado: clique para retomar ou parar
+Preferred for %type	OpenWithWindow		Preferido por %type
+GiB	WidgetAttributeText		GiB
+If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction a pasta comum, %osName pode não se comportar apropriadamente! Está seguro de que quer fazer isto? Para %toDoAction a pasta comum de qualquer maneira, segure a tecla Shift e clique \"%toConfirmAction\".
+There was an error deleting \"%name\":\n\t%error	FSUtils		Ocorreu um erro ao deletar \"%name\":\n/t %error
+Paste	FilePanelPriv		Colar
+Copy more	ContainerWindow		Copiar mais
+OK	PoseView		OK
+Read	FilePermissionsView		Ler
+Clean up all	ContainerWindow		Limpar tudo
+New folder	TemplatesMenu		Nova pasta
+Move here	ContainerWindow		Mover aqui
+File	FilePanelPriv		Arquivo
+Real name	ContainerWindow		Nome verdadeiro
+Error moving \"%name\"	FSUtils		Erro ao mover \"%name\"
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Deve-se soltar itens em um dos ícones de disco na janela \"Discos\".
+Cancel	WidgetAttributeText		Cancelar
+Could not find an application to open \"%name\" (%error). 	FSUtils		Não foi possível encontrar um aplicativo para abrir \"%name\" (%error).
+Create a Query template	FindPanel		Criar um modelo de consulta
+Previously mounted disks	AutoMounterSettings		Discos montados anteriormente
+%Ld B	WidgetAttributeText		%Ld bytes
+copying	FSUtils		copiando
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erro ao copiar pasta \"%name\":\n\t %error\n\nGostaria de continuar?
+move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	mover
+Show Disks icon	SettingsView		Mostrar ícone Discos
+Mount	VolumeWindow		Montar
+Cancel	PoseView		Cancelar
+\n\t(%Ld bytes, 	FSUtils		\n\t (%Ld bytes,
+You can't move or copy items to read-only volumes.	FSUtils		Não é possível mover ou copiar itens para volumes em modo somente leitura.
+Unknown	FilePermissionsView		Desconhecido
+All files and folders	FindPanel		Todos os arquivos e pastas
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Não foi possível abrir \"%document\" (Bibliotecas faltando: %library). \n
+The Tracker must be running to see Info windows.	PoseView		O Rastreador deve ser executado par ver a janela de Informações.
+Other	FilePermissionsView		Outro
+Query name:	FindPanel		Nome da consulta:
+Permissions	ContainerWindow		Permissões
+moving	FSUtils		movendo
+Identify	InfoWindow		Identificar
+Recent folders	ContainerWindow		Pastas recentes
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	renomear
+Close all	ContainerWindow		Fechar tudo
+Include trash	FindPanel		Incluir lixeira
+Query template	FindPanel		Modelo de consulta
+Open %name with:	OpenWithWindow		Abrir %name com:
+Empty folder	NavMenu		Pasta vazia
+Copy here	ContainerWindow		Copiar Aqui
+Move to Trash	FilePanelPriv		Mover para o Lixo
+Current folder	ContainerWindow		Pasta atual
+(Finish: %time)	StatusWindow		(Término: %time)
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		O nome especificado já é usado como nome de uma pasta. Por favor escolha outro nome.
+Clean up	ContainerWindow		Limpeza
+after	FindPanel		após
+Select…	QueryContainerWindow		Selecionar…
+link	FSUtils	filename link	vínculo
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Em %func \nfind_directory() falhou. \nRazão: %error
+The specified name is illegal. Please choose another name.	FilePanelPriv		O nome especificado é ilegal. Por favor escolha outro nome.
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		Não é possível mover uma pasta para dentro de si mesma ou para qualquer de suas próprias subpastas.
+List view	ContainerWindow		Visualização em lista
+Handles any file	OpenWithWindow		Lida com qualquer arquivo
+Get info	FilePanelPriv		Obter informações
+32 x 32	DeskWindow		32 x 32
+Cancel	FilePanelPriv		Cancelar
+Disks	DirMenu		Discos
+New folder %ld	FSUtils		Nova pasta %ld
+All BeOS disks	AutoMounterSettings		Todos os discos BeOS
+Used space color	SettingsView		Espaco de cor utilizado
+Sorry, could not create a new folder.	FSUtils		Desculpe, não foi possível criar uma nova pasta.
+multiple disks	FindPanel		múltiplos discos
+Done	AutoMounterSettings		Concluído
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Deve-se soltar itens em um dos ícones de disco na janela \"Discos\".
+Untitled clipping	PoseView		Recorte sem título
+Don't automount	AutoMounterSettings		Não automontar
+Save	FilePanelPriv		Salvar
+To: %dir	StatusWindow		Para: %dir
+Window	FilePanelPriv		Janela
+Find…	VolumeWindow		Localizar…
+Edit name	FilePanelPriv		Editar nome
+Size:	InfoWindow		Tamanho:
+Empty folder	SlowContextPopup		Pasta vazia
+Open selection with:	OpenWithWindow		Abrir seleção com:
+(%bytes bytes)	InfoWindow		(%bytes bytes)
+Preparing to create links…	StatusWindow		Preparando para criar vínculos...
+Show navigator	SettingsView		Mostrar navegador
+Desktop	B_DESKTOP_DIRECTORY		Área de Trabalho
+List folders first	SettingsView		Listar pastas primeiro
+Get info	VolumeWindow		Obter informações
+Name	SelectionWindow		Nome
+Trash	Model		Lixeira
+Favorites	FilePanelPriv		Favoritos
+Name	QueryPoseView		Nome
+Delete	FSUtils		Excluir
+Modified	FindPanel		Modificado
+Error moving \"%name\" to Trash. (%error)	FSUtils		Erro ao mover \"%name\" para a Lixeira. (%error)
+You can't replace a folder with one of its sub-folders.	FSUtils		Não é possível substituir uma pasta com uma de suas subpastas.
+<No recent items>	FavoritesMenu		<Nenhum item recente>
+Preferences…	ContainerWindow		Preferências...
+Move	PoseView		Mover
+Open and make preferred	OpenWithWindow		Abrir e tornar preferido
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Tem certeza de que deseja excluir o(s) item(ns) selecionado(s)? Esta operação não pode ser revertida.
+Add-ons	DeskWindow		Adicionais
+Name	FindPanel		Nome
+And	FindPanel		E
+Select…	DeskWindow		Selecionar...
+Copy	FilePanelPriv		Copiar
+Icon view	DeskWindow		Visualização de ícone
+(Finish: %time - Over %finishtime left)	StatusWindow		(Término: %time - Sobre %finishtime estimado)
+Select all	QueryContainerWindow		Selecionar tudo
+Files cannot be moved or deleted from a read-only volume.	PoseView		Arquivos não podem ser movidos ou excluídos de um volume em modo somente leitura.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ocorreu um problema tentando substituir \"%name\". O item deve estar aberto ou ocupado.
+You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Não é possível colocar a Lixeira ou os diretórios home ou Desktop no lixo.
+Owner	FilePermissionsView		Proprietário
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Ocorreu um problema tentando salvar na pasta especificada. Por favor tente com outra.
+Restore	ContainerWindow		Recuperar
+Restoring: 	StatusWindow		Restaurando:
+system	B_SYSTEM_DIRECTORY		sistema
+Skip	FSUtils		Ignorar
+Settings…	MountMenu		Definições…
+Error emptying Trash!	FSUtils		Erro esvaziando a Lixeira!
+Recent folders	FavoritesMenu		Pastas recentes
+Close	ContainerWindow		Fechar
+Preferred for file	OpenWithWindow		Preferido por arquivo
+Go to parent	FilePanelPriv		Ir para a origem
+Cancel	OpenWithWindow		Cancelar
+That name is too long. Please type another one.	InfoWindow		Este nome é muito longo. Por favor digite outro.
+OK	FSUtils		OK
+Paste layout	ContainerWindow		Colar disposição
+Select	InfoWindow		Selecionar
+Could not update permissions of file \"%name\". %error	FSUtils		Não foi possível atualizar permissões do arquivo \"%name\". %error
+Select…	FilePanelPriv		Selecionar…
+Don't move files to Trash	SettingsView		Não mover arquivos para a Lixeira
+There was an error resolving the link.	Tracker		Ocorreu um erro resolvendo um vínculo.
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction a pasta sistema ou seus conteúdos, não será capaz de inicializar %osName! Está seguro de que quer fazer isto? Para %toDoAction a pasta sistema ou seus conteúdos de qualquer maneira, segure a tecla Shift e clique \"%toConfirmAction\".
+You can't move or copy the trash.	FSUtils		Não é possível mover ou copiar a lixeira.
+ends with	SelectionWindow		finalizar com
+Volume icons	TrackerSettingsWindow		ícones de Volume
+That name is already taken. Please type another one.	WidgetAttributeText		Este nome já pertence a alguém. Por favor digite outro.
+Close	QueryContainerWindow		Fechar
+Formula %formula	FindPanel	FindResultTitle	Fórmula %formula
+Kind:	InfoWindow		Tipo:
+starts with	FindPanel		inicia com
+Increase size	ContainerWindow		Aumentar tamanho
+is	FindPanel		é
+Attributes	ContainerWindow		Atributos
+Handles %type	OpenWithWindow		Manipula %type
+ends with	FindPanel		termina com
+New	ContainerWindow		Novo
+Name matches wildcard expression:###	SelectionWindow		Nome corresponde à expressão especial:###
+less than	FindPanel		menor que
+64 x 64	DeskWindow		64 x 64
+Modified	ContainerWindow		Modificado
+Edit Query template	FindPanel		Editar modelo de Consulta
+Prompt	FSUtils		Prompt
+Edit query	ContainerWindow		Editar consulta
+If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction a pasta configuração, %osName pode não se comportar apropriadamente! Está seguro de que quer fazer isto? Para %toDoAction a pasta configuração de qualquer maneira, clique \"%toConfirmAction\".
+Find…	ContainerWindow		Localizar...
+Create a Query	FindPanel		Criar uma Consulta
+Move to Trash	FSUtils		Mover para a Lixeira
+Automatic disk mounting	AutoMounterSettings		Montagem automática de disco
+Original name	ContainerWindow		Nome original
+Find	FSUtils		Localizar
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erro ao copiar o arquivo \"%name\":\n\t %error\n\nGostaria de continuar?
+Ask before delete	SettingsView		Perguntar antes de excluir
+Single window navigation	SettingsView		Navegação em janela única
+parent folder	NavMenu		pasta de origem
+contains	FindPanel		contém
+Relation	OpenWithWindow		Relação
+Open	FilePanelPriv		Abrir
+Mount	DeskWindow		Montar
+Mount	ContainerWindow		Montar
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilizados -- %free livres)
+Cancel	FSClipBoard		Cancelar
+Cut more	ContainerWindow		Cortar mais
+If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction a pasta definições, %osName pode não se comportar apropriadamente! Esá seguro de que quer fazer isto? Para %toDoAction a pasta definições de qualquer maneira, clique \"%toConfirmAction\".
+Deleting: 	StatusWindow		Excluindo:
+Empty Trash	InfoWindow		Esvaziar Lixeira
+Add	FindPanel		Adicionar

@@ -1,0 +1,62 @@
+1	portuguese (brazil)	x-vnd.Haiku-ShowImage	886873119
+Use as background…	Menus		Utilizar como plano de fundo…
+File	Menus		Arquivo
+Slide delay	Menus		Atraso de deslizamento
+Selection mode	Menus		Modo de seleção
+Zoom in	Menus		Ampliar
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' foi modificado. Deseja fechar o documento?
+Page setup…	Menus		Configurar página...
+Print…	Menus		Imprimir..
+OK	SaveToFile		OK
+Previous page	Menus		Página anterior
+View	Menus		Visualizar
+Full screen	Menus		Tela inteira
+Go to page	Menus		Ir para a página
+Zoom out	Menus		Reduzir
+Quit	Menus		Sair
+Rotate counterclockwise	Menus		Girar em sentido antiorário
+High-quality zooming	Menus		Zoom em alta qualidade
+Browse	Menus		Navegar
+Edit	Menus		Editar
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível carregar a imagem! O arquivo, ou o tradutor de imagem para ele, não existe.
+First page	Menus		Primeira página
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Deseja fechar o documento?
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS segundos
+Leave full screen	Menus		Sair da tela cheia
+Close	Menus		Fechar
+Close	ClosePrompt		Fechar
+Undo	Menus		Desfazer
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar para (em 1/72 polegadas):
+Rating	Menus		Classificação
+Flip left to right	Menus		Inverter da esquerda para direita
+Show caption in full screen mode	Menus		Mostrar legenda no modo de tela inteira
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		Abrir…
+Next file	Menus		Próximo arquivo
+Clear selection	Menus		Limpar seleção
+Close document	ClosePrompt		Fechar documento
+Height: 	PrintOptionsWindow		Altura: 
+The file '%s' could not be written.	SaveToFile		Este arquivo '%s' não pode ser escrito.
+Cancel	ClosePrompt		Cancelar
+Show tool bar	Menus		Mostrar a barra de ferramentas
+Fit to window	Menus		Ajustar à janela
+Print options	PrintOptionsWindow		Opções de impressão
+Copy	Menus		Copiar
+Progress monitor	ProgressWindow		Monitor de progresso
+Last page	Menus		Ultima página
+Stretch to window	Menus		Esticar para a janela
+Previous file	Menus		Arquivo anterior
+ShowImage	System name		Exibir Imagem
+Slide show	Menus		Show de slides
+Fit image to page	PrintOptionsWindow		Ajudar a imagem a página
+Flip top to bottom	Menus		Inverter de cima para baixo
+Select all	Menus		Selecionar tudo
+Zoom factor in %:	PrintOptionsWindow		Fator de zoom em %:
+Width:	PrintOptionsWindow		Largura:
+Image	Menus		Imagem
+OK	Alerts		OK
+Rotate clockwise	Menus		Girar em sentido horário
+Job setup	PrintOptionsWindow		Configurar trabalho
+Original size	Menus		Tamanho original
+Next page	Menus		Próxima página
+Save as…	Menus		Salvar como...

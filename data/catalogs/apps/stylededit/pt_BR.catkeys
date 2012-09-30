@@ -1,0 +1,80 @@
+1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	1508367857
+StyledEdit	System name		Estilo de Edição
+Paste	Menus		Colar
+OK	LoadAlert		OK
+File	Menus		Arquivo
+???	LoadAlert		???
+Lines:	Statistics		Linhas:
+Italic	Menus		Itálico
+Left	Menus		Esquerda
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Reverter para a última versão de \"%s\"?
+Search backwards	FindandReplaceWindow		Pesquisar para trás
+Size	Menus		Tamanho
+Save	QuitAlert		Salvar
+Page setup…	Menus		Configurar página…
+Print…	Menus		Imprimir…
+Can't undo	Menus		Impossível desfazer
+Save	Menus		Salvar
+Replace with:	FindandReplaceWindow		Substituir com:
+Cancel	SaveAlert		Cancelar
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
+Case-sensitive	FindandReplaceWindow		Diferenciar maiúsculas/minúsculas
+Green	Menus		Verde
+Revert to saved…	Menus		Reverter para arquivo salvo...
+Yellow	Menus		Amarelo
+Replace in all windows	FindandReplaceWindow		Substituir em todas as janelas
+Wrap lines	Menus		Quebrar linhas
+Quit	Menus		Sair
+Document statistics	Statistics		Estatísticas do documento
+Cancel	RevertToSavedAlert		Cancelar
+Document	Menus		Documento
+Save changes to the document \"%s\"? 	QuitAlert		Salvar as alterações ao documento \"%s\"? 
+Edit	Menus		Editar
+Font	Menus		Fonte
+Replace all	FindandReplaceWindow		Substituir tudo
+Statistics…	Menus		Estatísticas…
+Default	Open_and_SaveAsPanel		Padrões
+Replace next	Menus		Substituir próximo
+Cancel	FindandReplaceWindow		Cancelar
+Close	Menus		Fechar
+Save	SaveAlert		Salvar
+Words:	Statistics		Palavras:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erro ao carregar \"%s\":\n\t Formato não suportado
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Não salvar
+Align	Menus		Alinhar
+Color	Menus		Cor
+Red	Menus		Vermelho
+Open…	Menus		Abrir...
+Center	Menus		Centralizado
+Blue	Menus		Azul
+Cyan	Menus		Ciano
+OK	Statistics		OK
+Magenta	Menus		Magenta
+New	Menus		Novo
+Wrap-around search	FindandReplaceWindow		Localizar em torno de
+Bold	Menus		Negrito
+Find selection	Menus		Localizar seleção
+Find:	FindandReplaceWindow		Localizar:
+Error saving \"%s\":\n%s	SaveAlert		Erro ao salvar \"%s\":\n%s
+Copy	Menus		Copiar
+Cut	Menus		Recortar
+Replace	FindandReplaceWindow		Substituir
+Find again	Menus		Localizar novamente
+Cancel	QuitAlert		Cancelar
+Find…	Menus		Localizar…
+Select all	Menus		Selecionar tudo
+Don't save	SaveAlert		Não salvar
+Error loading \"%s\":\n\t%s	LoadAlert		Erro ao salvar \"%s\":\n%s
+Undo typing	QuitAlert		Desfazer digitação
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações ao documento \"%s\"?
+Black	Menus		Preto
+Untitled 	StyledEditWindow		Sem título
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Localizar
+Encoding	Open_and_SaveAsPanel		Codificação
+Characters:	Statistics		Caracteres:
+Save as…	Menus		Salvar como...
+Redo typing	QuitAlert		Refazer digitação
+Replace…	Menus		Substituir…
+Right	Menus		Direito

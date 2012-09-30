@@ -1,0 +1,14 @@
+1	portuguese (brazil)	x-vnd.Haiku-Pairs	1981673050
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\t escrito por Ralf Schülke\n\t Direitos reservados 2008-2010, Haiku Inc.\n\nVocê completou o jogo em %num% cliques.\n
+Expert (8x8)	PairsWindow		Expert (8x8)
+Beginner (4x4)	PairsWindow		Iniciante (4x4)
+Quit game	PairsWindow		Sair do jogo
+Game	PairsWindow		Jogo
+Size	PairsWindow		Tamanho
+New	PairsWindow		Novo
+OK	PairsView		OK
+Intermediate (6x6)	PairsWindow		Intermediário (6x6)
+Quit	PairsWindow		Sair
+Pairs	System name		Pares
+New game	PairsWindow		Novo jogo
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pares não encontrou ícones em vetores o suficiente em seu sistema; é preciso pelo menos de %d.

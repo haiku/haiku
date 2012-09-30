@@ -1,0 +1,15 @@
+1	portuguese (brazil)	x-vnd.Haiku-MatchHeader	1205906732
+<Choose action>	ConfigView		<Escolher ação>
+has	ConfigView		tem
+Move to	ConfigView		Mover para
+Then	ConfigView		Então
+value (use REGEX: in from of regular expressions like *spam*)	ConfigView		valor (usar REGEX: a partir de expressões regulares como *spam*)
+this field is based on the action	ConfigView		este campo é baseado na ação
+Delete message	ConfigView		Apagar mensagem
+Rule filter	RuleFilter		Filtro de regra
+<Choose account>	ConfigView		<Escolher conta>
+Set flags to	ConfigView		Definir bandeiras para
+Set as read	ConfigView		Marcar como lida
+Reply with	ConfigView		Responder com
+If	ConfigView		Se
+header (e.g. Subject)	ConfigView		cabeçalho (por ex., Assunto)

@@ -1,0 +1,16 @@
+1	portuguese (brazil)	x-vnd.Haiku-SMTP	2740407895
+SMTP server:	ConfigView		Servidor SMTP:
+STARTTLS	ConfigView		STARTTLS
+Error while logging in to %serv	smtp		Erro ao logar ao %serv
+Unencrypted	ConfigView		Não criptografado
+. The server says:\n	smtp		. O servidor disse:\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		Conectando ao servidor...
+Error while opening connection to %serv	smtp		Erro ao abrir conexão a %serv
+POP3 authentication failed. The server said:\n	smtp		Autenticação POP3 falhou. O servidor disse:\n
+Destination:	ConfigView		Destino:
+: Connection refused or host not found.	smtp		: Conexão recusada ou computador não encontrado.
+None	ConfigView		Nenhum
+POP3 before SMTP	ConfigView		POP3 antes de SMTP
+SSL	ConfigView		SSL
+. The server said:\n	smtp		. O servidor disse:\n

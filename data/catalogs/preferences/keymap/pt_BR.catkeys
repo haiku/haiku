@@ -1,0 +1,38 @@
+1	portuguese (brazil)	x-vnd.Haiku-Keymap	3634277200
+Shift:	Modifier keys window	Shift key role name	Deslocar:
+Revert	Modifier keys window		Reverter
+Key role	Modifier keys window	key roles, e.g. Control, Option, Command	Tecla especial:
+Tilde trigger	Keymap window		Acento til
+Grave trigger	Keymap window		Tecla morta
+Select dead keys	Keymap window		Selecionar teclas de acento
+Cancel	Modifier keys window		Cancelar
+Quit	Keymap window		Sair
+Switch shortcut keys to Haiku mode	Keymap window		Alternar teclas de atalho para o modo Haiku
+Circumflex trigger	Keymap window		Tecla de circunflexo
+Diaeresis trigger	Keymap window		Tecla de trema
+Disabled	Modifier keys window	Do nothing	Desabilitado
+Open…	Keymap window		Abrir...
+System:	Keymap window		Sistema:
+Set modifier keys…	Keymap window		Definir modificador de teclas…
+Option:	Modifier keys window	Option key role name	Opção:
+Switch shortcut keys	Keymap window		Mudas as teclas de atalho
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla shift
+User:	Keymap window		Usuário:
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla control
+Control:	Modifier keys window	Control key role name	Controle:
+Sample and clipboard:	Keymap window		Amostra e área de transferência:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tecla Alt/Opt
+Layout	Keymap window		Disposição
+Switch shortcut keys to Windows/Linux mode	Keymap window		Alternar teclas de atalho para modo Windows/Linux
+Revert	Keymap window		Reverter
+Command:	Modifier keys window	Command key role name	Command:
+Save as…	Keymap window		Salvar como...
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
+File	Keymap window		Arquivo
+Key	Modifier keys window	A computer keyboard key	Tecla
+(Current)	Keymap window		(Atual)
+Font	Keymap window		Fonte
+Keymap	System name		Mapa do teclado
+Set modifier keys	Modifier keys window		Definir teclas modificadoras
+Modifier keys	Modifier keys window		Teclas modificadoras
+Acute trigger	Keymap window		Tecla de acento agudo

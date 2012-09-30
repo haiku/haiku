@@ -1,0 +1,16 @@
+1	portuguese (brazil)	x-vnd.Haiku-TIFFTranslator	237855326
+LZW	TIFFView		LZW
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: não foi possível definir diretório\n
+TIFF image	TIFFTranslator		imagem TIFF
+TIFF Library:	TIFFView		Biblioteca TIFF:
+TIFF image translator	TIFFView		tradutor de imagem TIFF
+None	TIFFView		Nenhum
+TIFF images	TIFFTranslator		imagens TIFF
+TIFFTranslator Settings	TIFFTranslator		Definições do Tradutor TIFF
+TIFF image translator	TIFFTranslator		tradutor de imagem TIFF
+RLE (Packbits)	TIFFView		RLE (Pacote de bits)
+TIFF Settings	TIFFMain		Definições de TIFF
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: indexação de documento inválida\n
+ZIP (Deflate)	TIFFView		ZIP (Extrair)
+Version %d.%d.%d %s	TIFFView		Versão %d.%d.%d %s
+Use Compression:	TIFFView		Usar Compressão:

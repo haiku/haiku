@@ -1,0 +1,66 @@
+1	portuguese (brazil)	x-vnd.Haiku-PoorMan	1267330937
+Website location	PoorMan		Local do sítio web
+Error Server	PoorMan		Erro do Servidor
+Settings…	PoorMan		Definições…
+Create PoorMan log	PoorMan		Criar registro do Pobre Homem
+Shutting down.\n	PoorMan		Desligando.\n
+Hits: %lu	PoorMan		Visitas: %lu
+Web folder:	PoorMan		Pasta da Web:
+Default	PoorMan		Padrão
+Save log console selection	PoorMan		Salvar seleção do console de registro
+Run server	PoorMan		Executar servidor
+PoorMan settings	PoorMan		Definições do Pobre Homem
+Clear hit counter	PoorMan		Limpar contador de visitas
+Copy	PoorMan		Copiar
+Max. simultaneous connections:	PoorMan		Conexões simultâneas máximas:
+Start page:	PoorMan		Página inicial:
+done.\n	PoorMan		concluído.\n
+Create	PoorMan		Criar
+Shutting down.	PoorMan		Desligando.
+Website options	PoorMan		Opções de sítio web
+File Name	PoorMan		Nome do Arquivo
+Clear console log	PoorMan		Limpar registro do console
+Advanced	PoorMan		Avançado
+OK	PoorMan		OK
+Status: Stopped	PoorMan		Status: Parado
+Dir Created	PoorMan		Diretório Criado
+Log to file	PoorMan		Registrar no arquivo
+Quit	PoorMan		Sair
+Hits: 0	PoorMan		Visitas: 0
+Save log console	PoorMan		Salvar console de registro
+Edit	PoorMan		Editar
+Create Log File	PoorMan		Criar Arquivo de Registro
+Log to console	PoorMan		Registrar no console
+Directory: (none)	PoorMan		Diretório: (nenhum)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor escolha a pasta a ser publicada na web.\n\nÉ possível que o Pobre Homem crie um arquivo padrão \"public_html\" na sua pasta home.\nOu selecione um de suas próprias pastas.
+Log To Console	PoorMan		Registrar no Console
+Connections	PoorMan		Conexões
+Status: Running	PoorMan		Status: Executando
+connections	PoorMan		conexões
+Controls	PoorMan		Controles
+Send file listing if there's no start page	PoorMan		Enviar listagem de arquivo se não existir página inicial
+Error Dir	PoorMan		Erro de Diretório
+Select all	PoorMan		Selecionar tudo
+File	PoorMan		Arquivo
+File Logging	PoorMan		Registro de Arquivo
+Save console selections as…	PoorMan		Salvar seleções do console como…
+File logging	PoorMan		Registro de arquivo
+Select web folder	PoorMan		Selecionar pasta web
+Logging view	PoorMan		Visão do registro
+Logging	PoorMan		Registrando
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		A pasta web padrão foi criada em \"/boot/home/public_html.\"\nCertifique-se de existir um arquivo HTML denominado \"index.html\" naquela pasta.
+Clear log file	PoorMan		Limpar arquivo de registro
+Log file name:	PoorMan		Nome do arquivo de registro:
+Directory: 	PoorMan		Diretório:  
+Log To File	PoorMan		Registrar no Arquivo
+Done	PoorMan		Concluído
+Create log file	PoorMan		Criar arquivo de registro
+Starting up... 	PoorMan		Iniciando…
+Site	PoorMan		Sítio
+Cancel	PoorMan		Cancelar
+Console logging	PoorMan		Registro do console
+Cannot start the server	PoorMan		Não é possível iniciar o servidor
+Select	PoorMan		Selecionar
+Save console as…	PoorMan		Salvar console como…
+PoorMan	System name		Pobre Homem
+Console Logging	PoorMan		Registrando Console

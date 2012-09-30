@@ -1,0 +1,58 @@
+1	portuguese (brazil)	x-vnd.Haiku-PackageInstaller	1396489627
+Install to:	PackageView		Instalar em:
+OK	PackageView		OK
+Accept	PackageTextViewer		Aceitar
+Continue	PackageInstall		Continuar
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		O pacote selecionado não pode ser instalado em seu sistema. Provavelmente, houve um problema com o arquivo. Consulte o distribuidor do pacote.
+Image not loaded correctly	PackageImageViewer		Imagem não carregada corretamen
+Install 	PackageView		Instalar 
+No package selected.	PackageInfo		Nenhum pacote selecionado.
+Install	PackageView		Instalar
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		O pacote escolhido parece já ter sido instalado no seu sistema. Gostaria de desinstalar o programa existente e continuar o processo?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Você quer guardar esta decisão pelo resto da instalação?\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Parece haver um erro no tamanho do arquivo do pacote. O pacote pode estar quebrado ou ter sido modificado após sua criação. Quer continuar?
+Error while installing the package\n	PackageView		Erro instalando o pacote\n
+Disclaimer	PackageTextViewer		Aviso
+%.1f GiB	PackageView		%.1f GB
+The installation of the package has been aborted.	PackageView		A instalação do pacote foi cancelada.
+Done	PackageInstall		Feito
+All existing files will be replaced?	PackageView		Todos os arquivos existentes serão substituídos?
+Preparing package	PackageInstall		Preparando pacote
+No package available.	PackageInfo		Nenhum pacote disponível.
+none	PackageView		nenhum
+Stop	PackageStatus		Parar
+Other…	PackageView		Outro…
+No installation type selected	PackageView		Nenhum tipo de instalação selecionado
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		O link simbólico de nome '%s' já existe no caminho especificado.\nSubstituir pelo link deste pacote ou pular esta etapa?
+Installing files and folders	PackageInstall		Instalando arquivos e pastas
+Package installer	PackageView		Instalador de pacotes
+Skip all	PackageView		Ignorar tudo
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		O item de nome '%s' já existe no caminho especificado.\nSubstituir pelo item deste pacote ou pular esta etapa?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		O script de nome '%s' já existe no caminho especificado.\nSubstituir pelo script deste pacote ou pular esta etapa?
+Running post-installation scripts	PackageInstall		Executando scripts pós-instalação
+%llu bytes	PackageView		%llu bytes
+Skip	PackageView		Pular
+%.1f MiB	PackageView		%.1f MB
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		A pasta de nome '%s' já existe no caminho especificado.\nSubstituir pela pasta deste pacote ou pular esta etapa?
+The package you requested has been successfully installed on your system.	PackageView		O pacote requisitado foi instalado com sucesso.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Opa! Erro! \"%s\" não é um caminho válido.\n
+Installation type:	PackageView		Tipo de instalação:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Erro (%s)! Não foi possível abrir \"%s\".\n
+Finishing installation	PackageInstall		Finalizando instalação
+Installing package	PackageStatus		Instalando pacote
+Ask again	PackageView		Perguntar novamente
+Abort	PackageView		Cancelar
+Replace all	PackageView		Substituir tudo
+Decline	PackageTextViewer		Desistir
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		O arquivo de nome '%s' já existe no caminho especificado.\nSubstituir o arquivo existente pelo deste pacote ou pular esta etapa? 
+All existing files will be skipped?	PackageView		Todos os arquivos existentes serão pulados?
+Continue	PackageInfo		Continuar
+%.1f KiB	PackageView		%.1f kB
+(%s free)	PackageView		(%s livre)
+Abort	PackageInfo		Cancelar
+PackageInstaller	System name		Instalador de pacotes
+Abort	PackageInstall		Cancelar
+Continue	PackageTextViewer		Continuar
+Replace	PackageView		Substituir
+Installation progress	PackageView		Progresso da instalação
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		O arquivo do pacote é ilegível.\nUma das possíveis razões é que este não é um arquivo .pkg do BeOS válido.

@@ -1,0 +1,44 @@
+1	portuguese (brazil)	x-vnd.Be-PRNT	2674539197
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nDriver: %driver%\n
+Waiting	JobListView		Aguardando
+Print test page	PrintersWindow		Imprimir página de teste
+Test Page	TestPageView		Página de teste
+Test Page	PrintersWindow		Página de teste
+page	JobListView		página
+Cancel	AddPrinterDialog		Cancelar
+Add printer	AddPrinterDialog		Adicionar impressora
+Green	TestPageView		Verde
+Printers	PrintersWindow		Impressoras
+Default Printer	PrinterListView		Impressora padrão
+Transport: %transport% %transport_address%	PrinterListView		Transporte: %transport% %transport_address%
+No pending jobs.	PrinterListView		Nenhuma tarefa na fila.
+pages	JobListView		páginas
+Printers	System name		Impressoras
+Processing	JobListView		Processando
+Red	TestPageView		Vermelho
+Printer name:	AddPrinterDialog		Nome da impressora:
+Driver: %driver%	PrinterListView		Driver: %driver%
+ pending jobs.	PrinterListView		  trabalhos pendentes.
+Black	TestPageView		Preto
+Restart job	PrintersWindow		Reiniciar tarefa
+Add	AddPrinterDialog		Adicionar
+Make default	PrintersWindow		Tornar padrão
+Transport: %transport% %transport_address%	TestPageView		Transporte: %transport% %transport_adress%
+Cancel job	PrintersWindow		Cancelar tarefa
+Yellow	TestPageView		Amarelo
+Blue	TestPageView		Azul
+1 pending job.	PrinterListView		1 tarefa pendente.
+Remove	PrintersWindow		Remover
+<pick one>	AddPrinterDialog		<escolha uma>
+Add …	PrintersWindow		Adicionar ...
+Print jobs for 	PrintersWindow		Tarefas de impressão para
+Failed	JobListView		Falhou
+%.2f KB	JobListView		%.2fb KB
+Magenta	TestPageView		Magenta
+Completed	JobListView		Completos
+No printer found!	TransportMenu		Nenhuma impressora encontrada!
+Print jobs: No printer selected	PrintersWindow		Tarefas de impressão: nenhuma impressora selecionada.
+Cyan	TestPageView		Ciano
+Unknown status	JobListView		Status desconhecido
+Connected to:	AddPrinterDialog		Conectado a:
+Printer type:	AddPrinterDialog		Tipo de impressora:

@@ -1,0 +1,22 @@
+1	portuguese (brazil)	x-vnd.Haiku-FontDemo	1769653414
+Outline:	ControlView		Contorno:
+Size: 50	ControlView		Tamanho: 50
+Stop cycling	ControlView		Parar ciclo
+Shear: 90	ControlView		Corte: 90
+Spacing: 0	ControlView		Espaçamento: 0
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Rotação: %d
+Shear: %d	ControlView		Corte: %d
+Spacing: %d	ControlView		Espaçamento: %d
+Cycle fonts	ControlView		Fontes de ciclo
+Font:	ControlView		Fonte:
+Rotation: 0	ControlView		Rotação: 0
+Drawing mode:	ControlView		Modo de desenho:
+FontDemo	FontDemo		Demonstração de Fonte
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		Controles
+Outline: %d	ControlView		Contorno: %d
+Text:	ControlView		Texto:
+Antialiased text	ControlView		Texto com antisserrilhamento (suavização)
+Bounding boxes	ControlView		Caixas de delimitação
+Size: %d	ControlView		Tamanho: %d

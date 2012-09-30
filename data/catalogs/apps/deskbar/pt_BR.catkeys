@@ -1,0 +1,52 @@
+1	portuguese (brazil)	x-vnd.Be-TSKB	3197510812
+Power off	DeskbarMenu		Desligar
+Show day of week	PreferencesWindow		Exibir o dia da semana
+Edit menu…	PreferencesWindow		Editar menu...
+Suspend	DeskbarMenu		Suspender
+Applications	PreferencesWindow		Aplicativos
+Time preferences…	TimeView		Preferências de hora…
+About Haiku	DeskbarMenu		Sobre o Haiku
+Recent documents:	PreferencesWindow		Documentos recentes:
+Recent applications	DeskbarMenu		Aplicativos recentes
+Sort running applications	PreferencesWindow		Ordenar aplicativos em execução
+Show time	Tray		Exibir hora
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicativos
+Find…	DeskbarMenu		Localizar…
+Window	PreferencesWindow		Janela
+Menu	PreferencesWindow		Menu
+Recent documents	DeskbarMenu		Documentos recentes
+Show seconds	PreferencesWindow		Exibir segundos
+Auto-hide	PreferencesWindow		Ocultar automaticamente
+Always on top	PreferencesWindow		Sempre no topo
+<Deskbar folder is empty>	DeskbarMenu		<Pasta Deskbar está vazia>
+Show all	WindowMenu		Mostrar tudo
+No windows	WindowMenu		Sem janelas
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Reiniciar sistema
+Large	PreferencesWindow		Grande
+Auto-raise	PreferencesWindow		Auto-levantar
+Hide time	TimeView		Ocultar hora
+Recent folders:	PreferencesWindow		Pastas recentes:
+Show application expander	PreferencesWindow		Mostrar expansor de aplicativo
+Restart Tracker	DeskbarMenu		Reiniciar Rastreador
+Close all	WindowMenu		Fechar tudo
+Deskbar preferences	PreferencesWindow		Preferências da Deskbar
+Mount	DeskbarMenu		Montar
+Small	PreferencesWindow		Pequeno
+Recent applications:	PreferencesWindow		Aplicativos recentes:
+Shutdown…	DeskbarMenu		Desligar…
+Tracker always first	PreferencesWindow		Tracker sempre em primeiro
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferências
+Recent folders	DeskbarMenu		Pastas recentes
+About this system	DeskbarMenu		Sobre este sistema
+Show calendar…	TimeView		Mostrar calendário...
+Deskbar preferences…	DeskbarMenu		Preferências da Deskbar…
+Expand new applications	PreferencesWindow		Expandir novos aplicativos
+Show replicants	DeskbarMenu		Exibir replicantes
+Hide application names	PreferencesWindow		Ocultar nomes de aplicativos
+Clock	PreferencesWindow		Relógio
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstrações
+Icon size	PreferencesWindow		Tamanho do ícone
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Miniaplicativos da área de trabalho
+Hide all	WindowMenu		Ocultar tudo
+Quit application	WindowMenu		Fechar aplicativo

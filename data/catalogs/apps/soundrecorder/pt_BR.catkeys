@@ -1,0 +1,45 @@
+1	portuguese (brazil)	x-vnd.Haiku-SoundRecorder	2149017672
+Loop	RecorderWindow		Repetição
+Cannot find default audio hardware	RecorderWindow		Não é possível encontrar hardware padrão de áudio
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Não é possível encontrar o arquivo temporário criado para conter a nova gravação
+Sample size:	RecorderWindow		Tamanho da amostragem:
+Nothing to play	RecorderWindow		Nada para tocar
+Duration: 	RecorderWindow		Duração: 
+Some of the files don't appear to be audio files	RecorderWindow		Alguns dos arquivos não parecem ser arquivos de áudio
+File info	RecorderWindow		Informações do arquivo
+Drop files here	SoundListView		Soltar arquivos aqui
+Input	RecorderWindow		Entrada
+Stop	RecorderWindow		Parar
+Format:	RecorderWindow		Formato:
+Sound List	RecorderWindow		Lista de Som
+Compression: 	RecorderWindow		Compressão:
+Rewind	RecorderWindow		Retroceder
+Sample rate:	RecorderWindow		Taxa de amostragem:
+Invalid audio files	RecorderWindow		Arquivos de áudio inválidos
+ seconds	RecorderWindow		 segundos
+OK	RecorderWindow		OK
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Não é possível abir o arquivo temporário criado para abrigar a nova gravação
+None of the files appear to be audio files	RecorderWindow		Nenhum dos arquivos parecem ser arquivos de áudio
+Input:	RecorderWindow		Entrada:
+Forward	RecorderWindow		Avançar
+Play	RecorderWindow		Reproduzir
+SoundRecorder	System name		Gravador de Som
+Channels:	RecorderWindow		Canais:
+ bits	RecorderWindow		 bits
+None	RecorderWindow		Nenhum
+Record	RecorderWindow		Gravar
+Sample size: 	RecorderWindow		Tamanho da amostragem:
+Cannot recognize this file as a media file	RecorderWindow		Não é possível reconhecer este arquivo como um arquivo de mídia
+Format: 	RecorderWindow		Formato: 
+File name: 	RecorderWindow		Nome de arquivo:
+Cannot connect to the selected sound input	RecorderWindow		Não é possível conectar à entrada de som selecionada
+Cannot get the file to play	RecorderWindow		Não é possível obter o arquivo para tocar
+Cannot record a sound that long	RecorderWindow		Não é possível gravar um som tão longo
+Duration:	RecorderWindow		Duração:
+Compression:	RecorderWindow		Compressão:
+Cannot find an unused name to use for the new recording	RecorderWindow		Não é possível encontrar um nome não utilizado para a nova gravação
+Channels: 	RecorderWindow		Canais: 
+Save	RecorderWindow		Salvar
+Sample rate: 	RecorderWindow		Taxa de amostragem:
+Cannot connect to media server	RecorderWindow		Não é possível conectar ao servidor de mídia
+File name:	RecorderWindow		Nome de arquivo:

@@ -1,0 +1,21 @@
+1	portuguese (brazil)	x-vnd.Haiku-Network	2324385456
+Choose automatically	EthernetSettingsView		Escolher automaticamente
+Gateway:	EthernetSettingsView		Gateway:
+Netmask:	EthernetSettingsView		Máscara de rede:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Aplicar
+OK	EthernetSettingsView		OK
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		Endereço de IP:
+Adapter:	EthernetSettingsView		Adaptador:
+Domain:	EthernetSettingsView		Domínio:
+Revert	EthernetSettingsView		Reverter
+<no wireless networks found>	EthernetSettingsView		<nenhuma rede sem fio encontrada>
+Network	System name		Rede
+Mode:	EthernetSettingsView		Modo:
+Network:	EthernetSettingsView		Rede:
+The net_server needs to run for the auto configuration!	EthernetSettingsView		É preciso abrir o net_server para efetuar a configuração automática!
+Disabled	EthernetSettingsView		Desativado
+Auto-configuring failed: 	EthernetSettingsView		Auto-configuração falhou: 
+Static	EthernetSettingsView		Estático

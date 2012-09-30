@@ -1,0 +1,68 @@
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	296071315
+Video using parameters form settings	MediaConverter		Vídeo utilizando definições de forma de parâmetros
+Video encoding:	MediaConverter		Codificação de vídeo:
+No audio	Audio codecs list		Sem áudio
+Error	MediaConverter		Erro
+Error loading a file	MediaConverter		Erro ao carregar um arquivo
+File Error	MediaConverter-FileInfo		Erro no Arquivo
+Open…	Menu		Abrir…
+Start [ms]: 	MediaConverter		Início [ms]:
+Output file '%filename' created	MediaConverter		Criado arquivo de saída '%filename'
+Output format	MediaConverter		Formato de saída
+%.1f kHz stereo / %lld frames	MediaFileInfo		%1f kHz estéreo / %lld quadros
+End   [ms]: 	MediaConverter		Fim [ms]:
+MediaConverter	System name		Conversor de Mídia
+No video	Video codecs list		Nenhum vídeo
+Duration:	MediaConverter-FileInfo		Duração:
+OK	MediaConverter		OK
+Error writing audio frame %Ld	MediaConverter		Erro gravando quadro de áudio %Ld
+Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
+Low	MediaConverter		Baixo
+Conversion completed	MediaConverter		Conversão concluída
+Audio:	MediaConverter-FileInfo		Áudio:
+OK	MediaConverter-FileInfo		OK
+ seconds	MediaFileInfo		 segundos
+Source files	MediaConverter		Arquivos fonte
+Cancelling	MediaConverter		Cancelando
+%d byte 	MediaFileInfo		%d byte
+Error loading files	MediaConverter		Erro ao carregar arquivos
+Cancel	MediaConverter		Cancelar
+None available	Video codecs		Nenhum disponível
+Conversion cancelled	MediaConverter		Conversão cancelada
+No file selected	MediaConverter-FileInfo		Nenhum arquivo selecionado
+Error writing video frame %Ld	MediaConverter		Erro gravando quadro de vídeo %Ld
+Select this folder	MediaConverter		Selecionar esta pasta
+Continue	MediaConverter		Continuar
+Encoder parameters	MediaConverter-EncoderWindow		Parâmetros do codificador
+Video:	MediaConverter-FileInfo		Vídeo:
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld quadros
+%d bit 	MediaFileInfo		%d bit
+Error creating '%filename'	MediaConverter		Erro ao criar '%filename'
+Video quality not supported	MediaConverter		Qualidade de vídeo não suportada
+Cancelling…	MediaConverter		Cancelando…
+File details	MediaConverter		Detalhes do arquivo
+Select	MediaConverter		Selecionar
+Writing video track: %ld%% complete	MediaConverter		Gravando trilha de vídeo: %ld%% concluído
+Quit	Menu		Sair
+Preview	MediaConverter		Pré-visualização
+File format:	MediaConverter		Formato de arquivo:
+None available	Audio codecs		Nenhum disponível
+MediaConverter+:SaveDirectory	MediaConverter		Conversor de Mídia+:Salvar Diretório
+Error read audio frame %Ld	MediaConverter		Erro ao ler quadro de áudio %Ld
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canal / %lld quadros
+Error launching: %strError%	MediaConverter		Erro ao lançar: %strError%
+High	MediaConverter		Alto
+The file was not recognized as a supported media file:	MediaConverter		O arquivo não foi reconhecido como um arquivo de mídia suportado:
+Drop media files onto this window	MediaConverter		Soltar arquivos de mídia sobre esta janela
+Audio encoding:	MediaConverter		Codificação de áudio:
+Audio quality not supported	MediaConverter		Qualidade de áudio não suportada
+File	Menu		Arquivo
+Convert	MediaConverter		Converter
+Writing audio track: %ld%% complete	MediaConverter		Gravando trilha de áudio: %ld%% concluído
+Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
+Output folder	MediaConverter		Pasta de saída
+Audio quality: %3d%%	MediaConverter		Qualidade de áudio: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Um erro ocorreu lendo as informações do arquivo.\n\nErro :
+Error read video frame %Ld	MediaConverter		Erro ao ler quadro de vídeo %Ld
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles arquivos não foram reconhecidos como arquivos de mídia suportados:
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld quadros

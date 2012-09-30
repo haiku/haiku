@@ -1,0 +1,20 @@
+1	portuguese (brazil)	x-vnd.mmu_man.filepanel	1802971238
+display a load/save file panel\n	FilePanelApp		mostrar um painel de arquivos carregados/salvos
+options:\n	FilePanelApp		opções:\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		uso: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t --kind\t tipos de entradas que podem ser abertas (sabor): qualquer combinação de f, d, s (arquivo (padrão), diretório, vínculo simbólico)\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		uso: %s [-h]     [-d pasta]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a padrão]      [-f padrão]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t --directory\t abrir em <pasta>\n
+%s not a valid option\n	FilePanelApp		%s não é uma opção válida\n
+short\tlong\tdescription\n	FilePanelApp		descrição curta\t longa\t\n
+%s: this option requires a parameter\n	FilePanelApp		%s: esta opção requer o parâmetro\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t --load\t usa um FilePanel carregado (padrão)\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t --forbid\t não implementado\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t --save\t usa um FilePanel salvo\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t --name\t estabelece o nome padrão para salvar\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t --modal\t torna o FilePanel modal\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t --help\t mostra a ajuda\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t --allow\t não implementado\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t --single\t permite ser selecionado apenas 1 arquivo\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t --title\t ajusta título da janela do FilePanel\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NÃO IMPLEMENTADO\n

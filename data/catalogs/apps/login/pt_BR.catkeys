@@ -1,0 +1,21 @@
+1	portuguese (brazil)	x-vnd.Haiku-Login	1678631300
+Error: %1	Login App		Erro: %1
+Hide password	Login View		Ocultar senha
+Desktop	Desktop Window		Área de trabalho
+Invalid login!	Login View		Autenticação inválida!
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t Lançar em modo de edição em prateleira para permitir a customização da área de trabalho.\n
+OK	Login View		OK
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	erro %s\n
+Login:	Login View		Autenticação:
+Error	Login App		Erro
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		É possível customizar a área de trabalho mostrada por trás do aplicativo de Autenticação soltando replicantes sobre ele.\n\nQuando terminar, apenas feche o aplicativo (Alt+Q).
+Unimplemented	Login App		Não implementado
+Welcome to Haiku	Login Window		Bem-vindo ao Haiku
+Reboot	Login View		Reinicializar
+Login application for Haiku\nUsage:\n	Login App		Aplicativo de autenticação para Haiku\nUtilização:\n
+Info	Login App		Informações
+Halt	Login View		Desligar
+ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	Validar Autenticação: %s\n
+Password:	Login View		Senha:
+OK	Login App		OK
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Não torna modal a janela\n

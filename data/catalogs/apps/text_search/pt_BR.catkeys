@@ -1,0 +1,33 @@
+1	portuguese (brazil)	x-vnd.Haiku.TextSearch	1180598828
+%s: Not enough room to escape the filename.	Grepper		%s. Não há espaço suficiente para escapar o nome do arquivo.
+Trim to selection	GrepWindow		Reduzir para seleção
+Follow symbolic links	GrepWindow		Seguir atalhos
+Close	GrepWindow		Fechar
+Cancel	GrepWindow		Cancelar
+The unselected files will be removed from the list.	GrepWindow		Os arquivos não selecionados irão ser removidos da lista.
+Set target…	GrepWindow		Estabelecer objetivo…
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Por favor selecione os arquivos que você deseja ter selecionados por você no Tracker
+Open files in Pe	GrepWindow		Abrir os arquivos no Pe
+Copy text to clipboard	GrepWindow		Copiar texto para a Área de Transferência
+Settings	GrepWindow		Configurações
+Select all	GrepWindow		Selecionar tudo
+OK	GrepWindow		OK
+Skip folders starting with a dot	GrepWindow		Ignorar pastas iniciando com um ponto
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME não pode abrir uma ou mais pastas
+Escape search text	GrepWindow		Escapar texto de procura
+Search	GrepWindow		Localizar
+Open selection	GrepWindow		Abrir seleção
+Look in sub-folders	GrepWindow		Procurar nas sub-pastas
+Actions	GrepWindow		Ações
+File	GrepWindow		Arquivo
+Encoding	GrepWindow		Codificação
+History	GrepWindow		Histórico
+%s: There was a problem running grep.	Grepper		%s: Houve um problema ao executar o grep.
+New window	GrepWindow		Nova janela
+Please select the files you wish to keep searching.	GrepWindow		Por favor selecione os arquivos em que deseja que a procura continue.
+TextSearch	GrepWindow		Localizador de Texto
+Quit	GrepWindow		Sair
+Show files in Tracker	GrepWindow		Mostrar arquivos no Tracker
+Case-sensitive	GrepWindow		Diferenciar maiúsculas e minúsculas
+Text files only	GrepWindow		Somente arquivos de texto
+Show lines	GrepWindow		Mostrar linhas

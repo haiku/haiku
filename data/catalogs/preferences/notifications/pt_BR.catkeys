@@ -1,0 +1,50 @@
+1	portuguese (brazil)	x-vnd.Haiku-Notifications	3631903554
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Um erro ocorreu salvando as preferências.\nÉ possível que esteja executando fora do espaço de disco.
+Notifications	GeneralView		Notificações
+seconds of inactivity	GeneralView		segundos de inatividade
+Revert	PrefletWin		Reverter
+Mini icon	DisplayView		Mini ícone
+Enable notifications	GeneralView		Habilitar notificações
+Error	NotificationView		Erro
+OK	GeneralView		OK
+Events are not notified	GeneralView		Eventos não são notificados
+Save	PrefletWin		Salvar
+Type	NotificationView		Tipo
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Notificações não podem ser paradas porque o servidor não pode ser alcançado.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Não é possível habilitar as notificações porque o servidor não pôde ser encontrado.\nIsto significa que a instalação do InfoPopper não foi completada com sucesso.
+OK	NotificationView		OK
+Important	NotificationView		Importante
+Cannot disable notifications because the server can't be reached.	GeneralView		Não foi possível desabilitar as notificações porque o servidor não pode ser alcançado.
+Progress	NotificationView		Progresso
+Last Received	NotificationView		Último Recebido
+General	PrefletView		Geral
+Display	PrefletView		Tela
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Não é possível habilitar notificações em tempo de inicialização, provavelmente não há permissão de escrita para o diretório de definições de inicialização.
+Search:	NotificationView		Pesquisar:
+The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		O servidor de notificações não pode ser encontrado.\nUma possível causa é uma instalação não concluída corretamente
+Allowed	NotificationView		Permitido
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Não é possível salvar as preferências, provavelmente não há acesso de escrita ao diretório de definições ou o disco está cheio.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Houve um problema salvando as preferências.\nÉ possível que não haja acesso de escrita ao diretório de definições.
+Yes	NotificationView		Sim
+Large icon	DisplayView		Ícone grande
+Icon size:	DisplayView		Tamanho do ícone:
+Hide notifications from screen after	GeneralView		Ocultar notificações da tela após
+Disable notifications	GeneralView		Desabilitar notificações
+Notifications	System name		Notificações
+Notifications	NotificationView		Notificações
+No	NotificationView		Não
+Title	NotificationView		Título
+Information	NotificationView		Informação
+Window width:	DisplayView		Largura da janela:
+Application	NotificationView		Aplicativo
+Enabled	NotificationView		Habilitado
+OK	DisplayView		OK
+Unknown	NotificationView		Desconhecido
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Não é possível salvar as preferências, provavelmente não há acesso de escrita ao diretório de definições de inicialização.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Houve um problema salvando as preferências.\nÉ possível que não haja acesso de escrita ao diretório de definições.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Houve um problema salvando as preferências.\nÉ possível que não haja acesso de escrita ao diretório de definições.
+Enable notifications at startup	GeneralView		Habilitar notificações ao iniciar
+Notifications	PrefletView		Notificações
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		O servidor de notificações não pode ser encontrado, isto significa que a instalação do InfoPopper não foi completada com sucesso.
+Applications	NotificationView		Aplicativos
+Events are notified	GeneralView		Eventos são notificados

@@ -1,0 +1,4 @@
+1	portuguese (brazil)	x-vnd.Haiku-debug_server	1035915338
+OK	DebugServer		OK
+Debug	DebugServer		Depurar
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		A aplicação:\n\n      %app\n\nencontrou um erro que a impede de continuar. Haiku irá fechar a aplicação.

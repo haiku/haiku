@@ -1,0 +1,61 @@
+1	portuguese (brazil)	x-vnd.Haiku-Mail	2592587573
+Mail checking	Config Window		Checar mail
+Settings	Config Window		Configurações
+Never	Config Window	show status window	Nunca
+Only when dial-up is connected	Config Window		Somente quando estiver conectado
+While sending and receiving	Config Window		Enquanto envia e recebe
+days	Config Window		dias
+Incoming	Config Window		Recebido
+Server name:	E-Mail		Nome do servidor:
+OK	Config Window		OK
+Start mail services on startup	Config Window		Iniciar serviços de mail na inicialização
+E-mail address:	E-Mail		Endereço de correio eletrônico:
+Account name:	E-Mail		Nome da conta:
+Account name:	Config Views		Nome da conta
+Create new account	AutoConfigWindow		Criar nova conta
+OK	Config Views		OK
+The filter could not be moved. Deleting filter.	Config Views		O filtro não pode ser movido. Deletando filtro.
+Revert	Config Window		Reverter
+Login name:	E-Mail		Nome de login
+Incoming	E-Mail		Recebido
+Password:	E-Mail		Senha:
+Accounts	Config Window		Contas
+Finish	AutoConfigWindow		Concluir
+Remove	Config Window		Remover
+Miscellaneous	Config Window		Detalhes
+Show connection status window:	Config Window		Mostrar janela de status de conexão:
+Server Name:	E-Mail		Nome do servidor:
+While sending	Config Window		Enquanto envia
+Schedule outgoing mail when dial-up is disconnected	Config Window		Agendar saída de mail quando estiver desconectado
+hours	Config Window		horas
+Enter a valid e-mail address.	AutoConfigWindow		Digite um endereço de correio válido.
+Add	Config Window		Adicionar
+Account settings	AutoConfigWindow		Definições de conta
+E-mail	System name		Correio eletrônico
+never	Config Window	mail checking frequency	nunca
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAs configurações gerais não puderam ser revertidas.\n\Erro ao ler as configurações gerais:\n%s\n
+Real name:	Config Views		Nome real:
+\t\t· Outgoing	Config Window		\t \t · Enviado
+Choose Protocol	E-Mail		Escolher Protocolo
+Return address:	Config Views		Endereço de retorno:
+Edit mailbox menu…	Config Window		Editar menu da caixa de mail...
+Outgoing	E-Mail		Enviado
+\t\t· E-mail filters	Config Window		\t \t · Filtros de correio
+Remove	Config Views		Remover
+\t\t· Incoming	Config Window		\t \t· Recebido
+Next	AutoConfigWindow		Próximo
+Check every	Config Window		Checar periodicamente
+Back	AutoConfigWindow		Voltar
+Incoming mail filters	Config Views		Filtros de mail recebidos
+Account settings	Config Views		Configurações da conta
+minutes	Config Window		minutos
+Error retrieving general settings: %s\n	Config Window		Erro ao ler as configurações gerais: %s\n
+Real name:	E-Mail		Nome verdadeiro:
+Apply	Config Window		Aplicar
+Always	Config Window		Sempre
+OK	AutoConfigWindow		OK
+Add filter	Config Views		Adicionar filtro
+Outgoing	Config Window		Enviado
+Outgoing mail filters	Config Views		Filtros de mail enviados
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCrie uma nova conta com o botão Adicionar.\n\nRemova uma conta com o botão Remover no item selecionado.\n\nSelecione um item na lista para mudar suas configurações.
+Error	Config Window		Erro

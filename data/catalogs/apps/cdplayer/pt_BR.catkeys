@@ -1,0 +1,14 @@
+1	portuguese (brazil)	x-vnd.Haiku-CDPlayer	592310631
+CDPlayer	System name		CDPlayer
+CD	CDPlayer		CD
+Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disco: %ld:%.2ld / %ld:%.2ld
+OK	CDPlayer		Ok
+Track %whichTrack%: %trackAt%	CDPlayer		Faixa %whichTrack%: %trackAt%
+Audio CD	CDPlayer		CD de Áudio
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Aparentemente não há leitores de CD no seu computador ou softwares que os possa utilizar. Lamento.
+Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Faixa: %ld:%.2ld / %ld:%.2ld
+Track: 88:88 / 88:88	CDPlayer		Faixa: 88:88 / 88:88
+Track: --:-- / --:--	CDPlayer		Faixa: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Disco: 88:88 / 88:88
+Disc: --:-- / --:--	CDPlayer		Disco: --:-- / --:--
+CD drive is empty	CDPlayer		O drive de CD está vazio

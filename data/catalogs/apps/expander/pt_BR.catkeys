@@ -1,0 +1,49 @@
+1	portuguese (brazil)	x-vnd.Haiku-Expander	2398100010
+Expand	ExpanderMenu		Expandir
+Close window when done expanding	ExpanderPreferences		Fechar a janela quando concluída a expansão
+Set destination…	ExpanderMenu		Selecionar destino…
+Use:	ExpanderPreferences		Uso:
+File expanded	ExpanderWindow		Arquivo expandido
+The destination is read only.	ExpanderWindow		O destino é somente para leitura.
+Expander: Open	ExpanderWindow		Expansor: Abrir
+ is not supported	ExpanderWindow		não é suportado
+Expander settings	ExpanderPreferences		Definições do expansor
+Select current	DirectoryFilePanel		Selecione o atual
+Source	ExpanderWindow		Fonte
+Error when expanding archive	ExpanderWindow		Erro ao expandir conjunto de arquivos
+Hide contents	ExpanderWindow		Esconder conteúdo
+Cancel	ExpanderWindow		Cancelar
+Automatically expand files	ExpanderPreferences		Expandir arquivos automaticamente
+Creating listing for '%s'	ExpanderWindow		Criando lista para '%s'
+Continue	ExpanderWindow		Continuar
+Destination folder	ExpanderPreferences		Pasta de destino
+The destination folder does not exist.	ExpanderWindow		A pasta de destino não existe.
+Other	ExpanderPreferences		Outro
+Cancel	ExpanderPreferences		Cancelar
+Expansion	ExpanderPreferences		Expansão
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Tem certeza que deseja parar de expandir este \narquivo? Os itens expandidos podem não estar completos.
+Select	DirectoryFilePanel		Selecionar
+Same directory as source (archive) file	ExpanderPreferences		Mesmo diretório como arquivo fonte (conjunto de arquivos)
+Expanding '%s'	ExpanderWindow		Expandindo '%s'
+Settings	ExpanderMenu		Configurações
+Settings…	ExpanderMenu		Configurações…
+Expander: Choose destination	DirectoryFilePanel		Expansor: Escolher destino
+Select	ExpanderPreferences		Selecionar
+Show contents	ExpanderWindow		Mostrar o conteúdo
+Automatically show contents listing	ExpanderPreferences		Exibir automaticamente lista do conteúdo
+OK	ExpanderPreferences		OK
+Leave destination folder path empty	ExpanderPreferences		Deixar caminho da pasta de destino vazio
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		A pasta foi movida, renomeada ou não\é suportada.
+The file doesn't exist	ExpanderWindow		O arquivo não existe
+Stop	ExpanderMenu		Parar
+File	ExpanderMenu		Arquivo
+Expander	System name		Expansor
+Expand	ExpanderWindow		Expandir
+Close	ExpanderMenu		Fechar
+The destination is not a folder.	ExpanderWindow		O destino não é uma pasta.
+Open destination folder after extraction	ExpanderPreferences		Abrir a pasta de destino após a extração
+Set source…	ExpanderMenu		Definir fonte…
+Select '%s'	DirectoryFilePanel		Selecionar '%s'
+Show contents	ExpanderMenu		Mostrar o conteúdo
+Stop	ExpanderWindow		Parar
+Destination	ExpanderWindow		Destino

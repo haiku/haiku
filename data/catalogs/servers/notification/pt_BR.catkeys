@@ -1,0 +1,8 @@
+1	portuguese (brazil)	x-vnd.Haiku-notification_server	906000487
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Não foi possível iniciar o monitor de filtro. Alterações de filtro "ao vivo" desabilitadas.
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Não foi possível iniciar o monitor de configurações de tela.\nAlterações de filtro "ao vivo" desabilitadas.
+Darn.	NotificationWindow		Droga.
+Warning	NotificationWindow		Aviso
+OK	NotificationWindow		OK
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Não foi possível iniciar o monitor de configurações gerais.\nAlterações de filtro "ao vivo" desabilitadas.
+Notification	NotificationWindow		Notificação

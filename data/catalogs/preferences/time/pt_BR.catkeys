@@ -1,0 +1,44 @@
+1	portuguese (brazil)	x-vnd.Haiku-Time	3249243267
+GMT (UNIX compatible)	Time		GMT (compatível com UNIX)
+OK	Time		OK
+Asia	Time		Ásia
+\nNow: 	Time		\nAgora:
+Africa	Time		África
+Stop	Time		Parar
+Could not contact server	Time		Não foi possível contatar o servidor
+Australia	Time		Austrália
+Preview time:	Time		Pré-visualização de tempo:
+Synchronize	Time		Sincronizar
+Revert	Time		Reverter
+Pacific	Time		Pacífico
+Add	Time		Adicionar
+Date and time	Time		Data e hora
+about	Time		sobre
+Local time (Windows compatible)	Time		Hora local (compatível com Windows)
+Message receiving failed	Time		Falha ao receber a mensagem
+Set time zone	Time		Definir fuso horário
+Waiting for answer failed	Time		Espera por resposta falhou
+Hardware clock set to:	Time		Relógio de hardware definido para:
+The following error occured while synchronizing:r\n%s	Time		Ocorreu o seguinte erro ao sincronizar:r\n%s
+Europe	Time		Europa
+Remove	Time		Remover
+Time	Time		Hora
+Indian	Time		Índico
+Sending request failed	Time		Falha ao enviar solicitação
+Arctic	Time		Ártico
+Time	System name		Hora
+America	Time		América
+Reset	Time		Restaurar
+Synchronize at boot	Time		Sincronizar ao inicializar
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Hora & Data, escrito por:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nDireitos reservados 2004-2012, Haiku.
+Received invalid time	Time		Recebida hora inválida
+Antarctica	Time		Antártica
+The following error occured while synchronizing:r\n%s: %s	Time		Ocorreu o seguinte erro ao sincronizar:r\n%s: %s
+<Other>	Time		<Outro>
+Current time:	Time		Hora atual:
+Try all servers	Time		Tentar todos os servidores
+Time zone	Time		Fuso horário
+Could not create socket	Time		Não foi possível criar o socket
+Synchronize again	Time		Sincronizar novamente
+Network time	Time		Hora da rede
+Atlantic	Time		Atlântico
