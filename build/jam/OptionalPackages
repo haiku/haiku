@@ -296,13 +296,11 @@ if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
 		Echo "No optional package BeZillaBrowser available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage
-				BeZillaBrowser-2.0.0.22pre-x86-gcc4-2012-04-04.zip
-				: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc4-2012-04-04.zip ;
+			Echo "No optional package BeZillaBrowser available for gcc4" ;
  		} else {
 			InstallOptionalHaikuImagePackage
-				BeZillaBrowser-2.0.0.22pre-x86-gcc2-2012-04-02.zip
-				: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc2-2012-04-02.zip ;
+				BeZillaBrowser-2.0.0.22pre-r1a4-2012-09-30.zip
+				: $(baseURL)/BeZillaBrowser-2.0.0.22pre-r1a4-2012-09-30.zip ;
  		}
  		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
