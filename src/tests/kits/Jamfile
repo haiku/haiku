@@ -5,6 +5,7 @@ SubInclude HAIKU_TOP src tests kits device ;
 SubInclude HAIKU_TOP src tests kits game ;
 SubInclude HAIKU_TOP src tests kits interface ;
 SubInclude HAIKU_TOP src tests kits locale ;
+SubInclude HAIKU_TOP src tests kits mail ;
 SubInclude HAIKU_TOP src tests kits media ;
 SubInclude HAIKU_TOP src tests kits midi ;
 SubInclude HAIKU_TOP src tests kits net ;

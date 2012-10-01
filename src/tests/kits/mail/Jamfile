@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src tests kits mail ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders mail shared ;
+
+SimpleTest header_test :
+	header_test.cpp
+
+	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) mail
+;
