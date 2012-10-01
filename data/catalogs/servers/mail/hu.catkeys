@@ -1,23 +1,23 @@
 1	hungarian	x-vnd.Be-POST	1091177030
-Fetching mail for %name	Notifier		%name üzeneteinek fogadása
+Fetching mail for %name	Notifier		%name leveleinek fogadása
 Check for mails only	DeskbarView		Csak a levelek lekérdezése
 Send pending mails	DeskbarView		Függőben lévő levelek küldése
-New Messages	MailDaemon		Új üzenetek
+New Messages	MailDaemon		Új levelek
 <no accounts>	DeskbarView		<nincs fiók>
-%num new messages	DeskbarView		%num új üzenet
+%num new messages	DeskbarView		%num új levél
 Mail status	MailDaemon		Levelezés állapota
 Shutdown mail services	DeskbarView		Levelezés szolgáltatásainak leállítása
-%num new message	DeskbarView		%num új üzenet
-Sending mail for %name	Notifier		%name üzeneteinek küldése
-%num new messages.	MailDaemon		%num új üzenet.
-%num new message.	MailDaemon		%num új üzenet.
-Create new message…	DeskbarView		Új üzenet…
-%num new message for %name\n	MailDaemon		%num új üzenet %name számára\n
-No new messages	MailDaemon		Nincs új üzenet
-Check for mail now	DeskbarView		Üzenetek ellenőrzése most
-No new messages	DeskbarView		Nincs új üzenet
-%num new messages for %name\n	MailDaemon		%num új üzenet %name számára\n
+%num new message	DeskbarView		%num új levél
+Sending mail for %name	Notifier		%name leveleinek küldése
+%num new messages.	MailDaemon		%num új levél.
+%num new message.	MailDaemon		%num új levél.
+Create new message…	DeskbarView		Új levél írása…
+%num new message for %name\n	MailDaemon		%num új levél %name számára\n
+No new messages	MailDaemon		Nincs új levél
+Check for mail now	DeskbarView		Levelek ellenőrzése most
+No new messages	DeskbarView		Nincs új levél
+%num new messages for %name\n	MailDaemon		%num új levél %name számára\n
 Mail daemon status log	MailDaemon		Levelező rendszer állapotának naplója
 Settings…	DeskbarView		Beállítások…
-No new messages.	MailDaemon		Nincs új üzenet.
+No new messages.	MailDaemon		Nincs új levél.
 Mail status	Notifier		Levelezés állapota

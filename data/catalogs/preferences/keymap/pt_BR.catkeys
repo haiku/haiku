@@ -1,7 +1,6 @@
-1	portuguese (brazil)	x-vnd.Haiku-Keymap	3634277200
+1	portuguese (brazil)	x-vnd.Haiku-Keymap	1823733883
 Shift:	Modifier keys window	Shift key role name	Deslocar:
 Revert	Modifier keys window		Reverter
-Key role	Modifier keys window	key roles, e.g. Control, Option, Command	Tecla especial:
 Tilde trigger	Keymap window		Acento til
 Grave trigger	Keymap window		Tecla morta
 Select dead keys	Keymap window		Selecionar teclas de acento
@@ -29,7 +28,6 @@ Command:	Modifier keys window	Command key role name	Command:
 Save as…	Keymap window		Salvar como...
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
 File	Keymap window		Arquivo
-Key	Modifier keys window	A computer keyboard key	Tecla
 (Current)	Keymap window		(Atual)
 Font	Keymap window		Fonte
 Keymap	System name		Mapa do teclado

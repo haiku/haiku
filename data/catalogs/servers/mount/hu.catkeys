@@ -1,9 +1,9 @@
 1	hungarian	x-vnd.Haiku-mount_server	1422362183
-Mount read-only	AutoMounter		Csatolás csak olvashatóként
+Mount read-only	AutoMounter		Csak olvashatóként
 Error mounting volume:\n\n%s	AutoMounter		Hiba történt a lemez csatolása közben:\n\n%s
 Unmount error	AutoMounter		Leválasztási hiba
 Mount warning	AutoMounter		Csatolási figyelmeztetés
-Mount read/write	AutoMounter		Csatolás olvashatóan és írhatóan
+Mount read/write	AutoMounter		Írhatóként is
 Mounting volume '%s'\n\n	AutoMounter		Lemez (%s) csatolása\n\n
 Cancel	AutoMounter		Mégse
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nem sikerült leválasztani a lemezt (%s):\n\t%s\n\nKényszerítsük a leválasztást?\n\nMegjegyzés: Ha egy program épp ír a lemezre, adatvesztés következhet be.\n

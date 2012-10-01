@@ -9,7 +9,7 @@ Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status
 Edit	Mail		Szerkesztés
 Print	Mail		Nyomtatás
 <none>	Mail		<nincs>
-New mail message	Mail		Új üzenet
+New mail message	Mail		Új levél írása
 Automatic	Mail		Automatikus
 Automatically mark mail as read:	Mail		Automatikusan olvasottként jelölés:
 helpful message	Mail		segítőkész üzenet
@@ -18,7 +18,7 @@ Subject:	Mail		Tárgy:
 Reply to all	Mail		Válasz mindenkinek
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Ebben: %name% (Típus: %type%)
 Show icons & labels	Mail		Ikonok és feliratok
-Remove attachment	Mail		Csatolmányok eltávolítása
+Remove attachment	Mail		Eltávolítás
 Button bar:	Mail		Gombsor:
 spam	B_USER_DIRECTORY/mail/spam		spam
 Beginner	Mail		Kezdő
@@ -26,7 +26,7 @@ Don't save	Mail		Ne mentse
 Expert	Mail		Haladó
 Reply account:	Mail		Válaszcím:
 Discard	Mail		Elvet
-Message	Mail		Üzenet
+Message	Mail		Levél
 Settings…	Mail		Beállítások…
 Reply to sender	Mail		Válasz a feladónak
 There is no installed handler for URL links.	Mail		Az URL-linkeket nem lehet mivel lekezelni.
@@ -42,13 +42,13 @@ Find	Mail		Keresés
 Undo	Mail		Visszavon
 Date:	Mail		Dátum:
 An error occurred trying to open this signature.	Mail		Hiba történt az aláírás megnyitásakor.
-No file attributes, just plain data	Mail		Nincsenek kiegészítő információk, csak egyszerű adat.
+No file attributes, just plain data	Mail		Csak maga a fájl csatolása.
 Edit queries…	Mail		Lekérdezés szerkesztése…
 queries	B_USER_DIRECTORY/mail/queries		Lekérdezések
 Paste	Mail		Beillesztés
 in	B_USER_DIRECTORY/mail/in		Bejövő
-Save attachment…	Mail		Melléklet mentése…
-Include file attributes in attachments	Mail		A melléklet kiegészítő információinak megőrzése
+Save attachment…	Mail		Mentés…
+Include file attributes in attachments	Mail		Csatolás egy külön fájlként.
 OK	Mail		Rendben
 Send	Mail		Küldés
 Show icons only	Mail		Csak ikonok megjelenítése
@@ -76,10 +76,10 @@ On	Mail		Be
 Set to %s	Mail		Megjelölés: %s
 Forward	Mail		Tovább
 E-mail draft could not be saved!	Mail		Hiba történt a piszkozat mentése közben!
-%e wrote:\\n	Mail		%e írta:\\n
+%e wrote:\\n	Mail		%e:\\n
 To:	Mail		Címzett:
 Only files can be added as attachments.	Mail		Csak fájlok adhatóak a levélhez mellékletként.
-Previous message	Mail		Előző üzenet
+Previous message	Mail		Előző levél
 Attachments:	Mail		Mellékletek:
 Title:	Mail		Cím:
 <no account found>	Mail		<nem található fiók>
@@ -100,7 +100,7 @@ out	B_USER_DIRECTORY/mail/out		Kimenő
 Show header	Mail		Fejléc megjelenítése
 %e - E-mail address	Mail		%e - E-mail cím
 Resend	Mail		Újraküldés
-Show raw message	Mail		A nyers üzenet megjelenítése
+Show raw message	Mail		A nyers levél megjelenítése
 \\n - Newline	Mail		\\n - Új sor
 Start now	Mail		Kezdés most
 Close	Mail		Bezárás
@@ -111,15 +111,15 @@ Open	Mail		Megnyitás
 draft	B_USER_DIRECTORY/mail/draft		piszkozat
 Quote	Mail		Idézet
 Add	Mail		Hozzáadás
-Next message	Mail		Következő üzenet
+Next message	Mail		Következő levél
 User interface	Mail		Felhasználói felület
 Cancel	Mail		Mégse
-Send message	Mail		Üzenet küldése
+Send message	Mail		Levél küldése
 Remove enclosure	Mail		Melléklet eltávolítása
 Account:	Mail		Felhasználói fiók:
-Decoding:	Mail		Dekódolás:
+Decoding:	Mail		Kódolás:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Sajnálom, de nem található olyan program, ami támogatja a 'Névjegy' formátumot.
-Do you wish to send this message before closing?	Mail		Elküldi az üzenetet bezárás előtt?
+Do you wish to send this message before closing?	Mail		Elküldi az levelet bezárás előtt?
 Delete	Mail		Törlés
 Leave as '%s'	Mail		Hadja %sként
 Copy	Mail		Másolás
@@ -138,10 +138,10 @@ Queries	Mail		Lekérdezések
 Do you wish to save this message as a draft before closing?	Mail		Biztosan menti piszkozatként bezárás előtt?
 Save	Mail		Mentés
 Random	Mail		Véletlen
-Close and 	Mail		Bezárás és 
+Close and 	Mail		Bezárás és …
 Save as draft	Mail		Mentés piszkozatként
 The mail_daemon could not be started:\n\t	Mail		A mail_daemon nem indítható:\n\t
-Open attachment	Mail		Melléklet megnyitása
+Open attachment	Mail		Megnyitás
 sent	B_USER_DIRECTORY/mail/sent		Elküldött
 (Date unavailable)	Mail		(A dátum nem elérhető)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Helyezze a kedvenc lekérdezéseket és a lekérdezési sablonokat ebbe a mappába.

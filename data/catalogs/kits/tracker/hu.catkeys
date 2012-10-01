@@ -167,7 +167,7 @@ An item named \"%name\" already exists in this folder, and may contain\nitems wi
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	%name hivatkozása:
 Mount settings…	VolumeWindow		Csatolási beállítások…
 Select…	VolumeWindow		Kijelölés…
-All disks	FindPanel		Összes lemez
+All disks	FindPanel		Mindenhol
 Revert	TrackerSettingsWindow		Visszaállít
 Invert selection	QueryContainerWindow		Kijelölés megfordítása
 Execute	FilePermissionsView		Futtatás
@@ -369,7 +369,7 @@ Show navigator	SettingsView		A navigátor megjelenítése
 Desktop	B_DESKTOP_DIRECTORY		Asztal
 List folders first	SettingsView		A mappákat listázza elsőként
 Get info	VolumeWindow		Információ
-Name	SelectionWindow		Név
+Name	SelectionWindow		A név
 Trash	Model		Szemetes
 Favorites	FilePanelPriv		Kedvencek
 Name	QueryPoseView		Név

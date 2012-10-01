@@ -1,9 +1,9 @@
 1	hungarian	x-vnd.Haiku-SpamFilter	1975155212
-or empty e-mail	SpamFilterConfig		vagy üres e-mail
-Spam Filter (AGMS Bayesian)	SpamFilter		Spamszűrő (AGMS Bayesian)
-Genuine below and uncertain above:	SpamFilterConfig		Engedélyezett ezalatt és bizonytalan efölött:
+or empty e-mail	SpamFilterConfig		vagy üres levél
+Spam Filter (AGMS Bayesian)	SpamFilter		Kéretlen levél szűrő (AGMS Bayesian)
+Genuine below and uncertain above:	SpamFilterConfig		Valódi ezalatt és bizonytalan efölött:
 Spam above:	SpamFilterConfig		Spam efölött:
 Add spam rating to start of subject	SpamFilterConfig		Spam kiértékelés hozzáillesztése a tárgy elejéhez
-Learn from all incoming e-mail	SpamFilterConfig		Tanulás minden bejövő e-mailből
-Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Sajnáljuk, nem sikerült elindítani a spamdbm programot, amivel a kiszolgáló beállításait lehetne módosítani.
+Learn from all incoming e-mail	SpamFilterConfig		Tanulás minden bejövő levélből
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Sajnálom, nem sikerült elindítani a spamdbm programot, amivel a kiszolgáló beállításait lehetne módosítani.
 Close	SpamFilterConfig		Bezárás

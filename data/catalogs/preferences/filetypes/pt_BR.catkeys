@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-FileTypes	473999706
+1	portuguese (brazil)	x-vnd.Haiku-FileTypes	2037267651
 Application types…	FileTypes Window		Tipos de aplicativo...
 Description:	Application Types Window		Descrição:
 Args only	Application Type Window		Somente argumentos
@@ -85,7 +85,6 @@ The application \"%s\" does not support this file type.\nAre you sure you want t
 Type:	Attribute Window		Tipo:
 Removing uninstalled application types	Application Types Window		Remover tipos de aplicativos não instalados
 Done	Attribute Window		Concluído
-Set Preferred Application	Preferred App Menu		Selecionar aplicativo preferido
 no icon	FileTypes Window		sem ícone
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Versão

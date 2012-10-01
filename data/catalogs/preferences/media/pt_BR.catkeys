@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Media	1473363280
+1	portuguese (brazil)	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Não foi possível adicionar controle de volume ao Deskbar: %s\n
 Ready for use…	Media Window		Pronto para usar...
 Video input:	Media views		Entrada de vídeo:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Limpando.
 Defaults	Media views		Padrões
 Stopping media server…	Media Window		Parando o servidor de mídia...
 Quit	Media Window		Sair
-OK	Media Window		OK
 Starting media server…	Media Window		Iniciando o servidor multimídia...
 Done shutting down.	Media Window		Desligado.
 Video settings	Media Window		Definições de vídeo

@@ -1,12 +1,7 @@
-1	portuguese (brazil)	x-vnd.Haiku-GLInfo	1191322311
+1	portuguese (brazil)	x-vnd.Haiku-GLInfo	3678488342
 Capability	Capabilities		Recurso
 Information	InfoView		Informação
-Gallium Software Pipe	OpenGLView		Pipe do Software Gallium
-Software Rasterizer	OpenGLView		Software renderizador
-Automatic	OpenGLView		Automático
 GL Info	System name		Informações GL
-3D Rendering Engine:	OpenGLView		Motor de Renderização 3D:
-Gallium LLVM Pipe	OpenGLView		Pipe LLVM do Gallium
 Capabilities	Capabilities		Recursos
 Maximum convolution	Capabilities		Convolução máxima
 Available extensions	Extensions		Extensões disponíveis

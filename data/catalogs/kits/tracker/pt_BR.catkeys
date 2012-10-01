@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	1319179540
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	1294519032
 common	B_COMMON_DIRECTORY		comum
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Em ícones
@@ -88,13 +88,11 @@ Replace	FilePanelPriv		Substituir
 Select all	VolumeWindow		Selecionar tudo
 Opens with:	InfoWindow		Abre com:
 Open	ContainerWindow		Abrir
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed de %TotalSize, %BytesPerSecond/s)
 Error calculating folder size.	InfoWindow		Erro calculando o tamanho da pasta.
 New folder	FilePanelPriv		Nova pasta
 %name info	InfoWindow	InfoWindow Title	Informações de %name
 Favorites	FavoritesMenu		Favoritos
 Add-ons	VolumeWindow		Adicionais
-(Finish: %time - %finishtime left)	StatusWindow		(Término: %time - %finishtime restante)
 Sorry, you can't copy items to the Trash.	PoseView		Desculpe, você não pode copiar itens para a Lixeira.
 List view	VolumeWindow		Em lista
 matches wildcard expression	SelectionWindow		encaixa na expressão coringa
@@ -170,7 +168,6 @@ Edit favorites…	FilePanelPriv		Editar favoritos...
 Create relative link	ContainerWindow		Criar atalho
 Copy	ContainerWindow		Copiar
 Size	PoseView		Tamanho
-If you %ifYouDoAction the home folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Se %if YouDoAction a pasta home, %osName pode não se comportar apropriadamente! Está seguro de que quer fazer isto? Para %toDoAction a pasta home de qualquer maneira, segure a tecla Shift e clique \"%toConfirmAction\".
 Location	OpenWithWindow		Local
 Force identify	ContainerWindow		Forçar identificação
 Duplicate	ContainerWindow		duplicar
@@ -194,7 +191,6 @@ New	DeskWindow		Novo
 Open	InfoWindow		Abrir
 64 x 64	ContainerWindow		64 x 64
 Replace all	FSUtils		Substituir tudo
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		O aplicativo \"%appname\" não suporta este tipo de documento que você está querendo abrir. Você tem certeza que deseja prosseguir? Se você sabe que o aplicativo suporta este tipo de documento, você deveria contatar o criador do aplicativo e perguntá-lo para atualizar seu aplicativo para a lista de tipos de seu documento como suportado.
 Preparing to restore items…	StatusWindow		Preparando para restaurar itens...
 Replace other file	WidgetAttributeText		Substituir outro arquivo
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dos itens selecionados não podem ser movidos para a Lixeira. Você gostaria de deletá-los então? (Esta operação não pode ser desfeita).
@@ -219,7 +215,6 @@ Name	PoseView		Nome
 Group	FilePermissionsView		Grupo
 Version:	InfoWindow		Versão:
 Created:	InfoWindow		Criado:
-If you %ifYouDoAction the mime settings, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction as definições de mime, %osName pode não se comportar apropriadamente! Está seguro de que quer fazer isto? Para %toDoAction as definições de mime de qualquer maneira, clique \"%toConfirmAction\".
 \nShould this be fixed?	FSUtils		\nIsso deve ser corrigido?
 Copying: 	StatusWindow		Copiando:
 Capacity:	InfoWindow		Capacidade:
@@ -278,7 +273,6 @@ Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Renomear
 Paused: click to resume or stop	StatusWindow		Pausado: clique para retomar ou parar
 Preferred for %type	OpenWithWindow		Preferido por %type
 GiB	WidgetAttributeText		GiB
-If you %ifYouDoAction the common folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction a pasta comum, %osName pode não se comportar apropriadamente! Está seguro de que quer fazer isto? Para %toDoAction a pasta comum de qualquer maneira, segure a tecla Shift e clique \"%toConfirmAction\".
 There was an error deleting \"%name\":\n\t%error	FSUtils		Ocorreu um erro ao deletar \"%name\":\n/t %error
 Paste	FilePanelPriv		Colar
 Copy more	ContainerWindow		Copiar mais
@@ -323,7 +317,6 @@ Empty folder	NavMenu		Pasta vazia
 Copy here	ContainerWindow		Copiar Aqui
 Move to Trash	FilePanelPriv		Mover para o Lixo
 Current folder	ContainerWindow		Pasta atual
-(Finish: %time)	StatusWindow		(Término: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		O nome especificado já é usado como nome de uma pasta. Por favor escolha outro nome.
 Clean up	ContainerWindow		Limpeza
 after	FindPanel		após
@@ -380,7 +373,6 @@ And	FindPanel		E
 Select…	DeskWindow		Selecionar...
 Copy	FilePanelPriv		Copiar
 Icon view	DeskWindow		Visualização de ícone
-(Finish: %time - Over %finishtime left)	StatusWindow		(Término: %time - Sobre %finishtime estimado)
 Select all	QueryContainerWindow		Selecionar tudo
 Files cannot be moved or deleted from a read-only volume.	PoseView		Arquivos não podem ser movidos ou excluídos de um volume em modo somente leitura.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ocorreu um problema tentando substituir \"%name\". O item deve estar aberto ou ocupado.
@@ -392,7 +384,6 @@ Restoring: 	StatusWindow		Restaurando:
 system	B_SYSTEM_DIRECTORY		sistema
 Skip	FSUtils		Ignorar
 Settings…	MountMenu		Definições…
-Error emptying Trash!	FSUtils		Erro esvaziando a Lixeira!
 Recent folders	FavoritesMenu		Pastas recentes
 Close	ContainerWindow		Fechar
 Preferred for file	OpenWithWindow		Preferido por arquivo
@@ -407,7 +398,6 @@ Select…	FilePanelPriv		Selecionar…
 Don't move files to Trash	SettingsView		Não mover arquivos para a Lixeira
 There was an error resolving the link.	Tracker		Ocorreu um erro resolvendo um vínculo.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction a pasta sistema ou seus conteúdos, não será capaz de inicializar %osName! Está seguro de que quer fazer isto? Para %toDoAction a pasta sistema ou seus conteúdos de qualquer maneira, segure a tecla Shift e clique \"%toConfirmAction\".
 You can't move or copy the trash.	FSUtils		Não é possível mover ou copiar a lixeira.
 ends with	SelectionWindow		finalizar com
 Volume icons	TrackerSettingsWindow		ícones de Volume
@@ -429,7 +419,6 @@ Modified	ContainerWindow		Modificado
 Edit Query template	FindPanel		Editar modelo de Consulta
 Prompt	FSUtils		Prompt
 Edit query	ContainerWindow		Editar consulta
-If you %ifYouDoAction the config folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction a pasta configuração, %osName pode não se comportar apropriadamente! Está seguro de que quer fazer isto? Para %toDoAction a pasta configuração de qualquer maneira, clique \"%toConfirmAction\".
 Find…	ContainerWindow		Localizar...
 Create a Query	FindPanel		Criar uma Consulta
 Move to Trash	FSUtils		Mover para a Lixeira
@@ -448,7 +437,6 @@ Mount	ContainerWindow		Montar
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilizados -- %free livres)
 Cancel	FSClipBoard		Cancelar
 Cut more	ContainerWindow		Cortar mais
-If you %ifYouDoAction the settings folder, %osName may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction a pasta definições, %osName pode não se comportar apropriadamente! Esá seguro de que quer fazer isto? Para %toDoAction a pasta definições de qualquer maneira, clique \"%toConfirmAction\".
 Deleting: 	StatusWindow		Excluindo:
 Empty Trash	InfoWindow		Esvaziar Lixeira
 Add	FindPanel		Adicionar

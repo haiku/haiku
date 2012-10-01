@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-POST	2300302075
+1	portuguese (brazil)	x-vnd.Be-POST	2566871483
 Fetching mail for %name	Notifier		Buscando correio para %name
 Check for mails only	DeskbarView		Apenas verificar correio
 Send pending mails	DeskbarView		Enviar correio pendente
@@ -9,7 +9,6 @@ Mail status	MailDaemon		Status do correio
 Shutdown mail services	DeskbarView		Desligar serviços de correio
 %num new message	DeskbarView		%num nova mensagem
 Sending mail for %name	Notifier		Enviando correio para %name
-Preferences…	DeskbarView		Preferências...
 %num new messages.	MailDaemon		%num novas mensagens.
 %num new message.	MailDaemon		%num nova mensagem.
 Create new message…	DeskbarView		Criar nova mensagem…

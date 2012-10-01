@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Appearance	2558216842
+1	portuguese (brazil)	x-vnd.Haiku-Appearance	3882211276
 Plain font:	Font view		Fonte plana:
 Control highlight	Colors tab		Realce do controle
 Control border	Colors tab		Borda do controle
@@ -16,8 +16,6 @@ Inactive window tab text	Colors tab		Texto da aba de janela inativa
 About Decorator	DecorSettingsView		Sobre o Decorador
 Failure	Colors tab		Falha
 Hinting menu	AntialiasingSettingsView		Menu de sugestão
-Window Decorator	APRWindow		Decorador de Janela
-Window Decorator:	DecorSettingsView		Decorador de Janela:
 Document background	Colors tab		Plano de fundo do documento
 Revert	APRWindow		Reverter
 Window tab	Colors tab		Aba da janela
