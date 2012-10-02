@@ -386,8 +386,8 @@ if [ IsOptionalHaikuImagePackageAdded Caya ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
 			InstallOptionalHaikuImagePackage
-				caya-278-r1a4-x86-gcc4-2012-10-01.zip
-				: $(baseURL)/caya-278-r1a4-x86-gcc4-2012-10-01.zip
+				caya-279-r1a4-x86-gcc4-2012-10-02.zip
+				: $(baseURL)/caya-279-r1a4-x86-gcc4-2012-10-02.zip
 				: : true ;
 			InstallOptionalHaikuImagePackage
 				caya-gpl-protocols-36-r1a4-x86-gcc4-2012-10-01.zip
