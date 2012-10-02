@@ -1459,7 +1459,7 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 # Ocaml
 if [ IsOptionalHaikuImagePackageAdded OCaml ] {
 	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Neon available for $(TARGET_ARCH)" ;
+		Echo "No optional package OCaml available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
