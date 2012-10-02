@@ -10,6 +10,7 @@ OptionalPackageDependencies ArmyKnife : TagLib ;
 OptionalPackageDependencies Beam : LibIconv LibLayout OpenSSL PCRE ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies BurnItNow : CDRecord ;
+OptionalPackageDependencies Caya : Expat ;
 OptionalPackageDependencies CDRecord : GetText LibIconv ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
