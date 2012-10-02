@@ -383,12 +383,12 @@ if [ IsOptionalHaikuImagePackageAdded Caya ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
 			InstallOptionalHaikuImagePackage
-				caya-264-r1a4-x86-gcc4-2012-08-31.zip
-				: $(baseURL)/caya-264-r1a4-x86-gcc4-2012-08-31.zip
+				caya-278-r1a4-x86-gcc4-2012-10-01.zip
+				: $(baseURL)/caya-278-r1a4-x86-gcc4-2012-10-01.zip
 				: : true ;
 			InstallOptionalHaikuImagePackage
-				caya-gpl-protocols-35-r1a4-x86-gcc4-2012-09-03.zip
-				: $(baseURL)/caya-gpl-protocols-35-r1a4-x86-gcc4-2012-09-03.zip
+				caya-gpl-protocols-36-r1a4-x86-gcc4-2012-10-01.zip
+				: $(baseURL)/caya-gpl-protocols-36-r1a4-x86-gcc4-2012-10-01.zip
 				: : true ;
 			AddSymlinkToHaikuImage home config be Applications
 				: /boot/apps/Caya/Caya ;
@@ -1456,19 +1456,26 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 }
 
 
-# OCaml
+# Ocaml
 if [ IsOptionalHaikuImagePackageAdded OCaml ] {
 	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package OCaml available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package OCaml available for gcc4" ;
+		Echo "No optional package Neon available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage
-			ocaml-3.11.1-r1a1-x86-gcc2-2009-09-06.zip
-			: $(baseURL)/ocaml-3.11.1-r1a1-x86-gcc2-2009-09-06.zip ;
-		InstallOptionalHaikuImagePackage
-			camlp5-5.12-r1a1-x86-gcc2-2009-09-06.zip
-			: $(baseURL)/camlp5-5.12-r1a1-x86-gcc2-2009-09-06.zip ;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				ocaml-4.00.0-r1a4-x86-gcc4-2012-09-30.zip
+				: $(baseURL)/ocaml-4.00.0-r1a4-x86-gcc4-2012-09-30.zip ;
+			InstallOptionalHaikuImagePackage
+				camlp5-6.06-r1a4-x86-gcc4-2012-09-30.zip
+				: $(baseURL)/camlp5-6.06-r1a4-x86-gcc4-2012-09-30.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				ocaml-4.00.0-r1a4-x86-gcc2-2012-09-27.zip
+				: $(baseURL)/ocaml-4.00.0-r1a4-x86-gcc2-2012-09-27.zip ;
+			InstallOptionalHaikuImagePackage
+				camlp5-6.06-r1a4-x86-gcc2-2012-09-27.zip
+				: $(baseURL)/camlp5-6.06-r1a4-x86-gcc2-2012-09-27.zip ;
+		}
 	}
 }
 
@@ -1497,12 +1504,12 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				openssh-6.0p1-r1a4-x86-gcc4-2012-08-30.zip
-				: $(baseURL)/openssh-6.0p1-r1a4-x86-gcc4-2012-08-30.zip ;
+				openssh-6.0p1-r1a4-x86-gcc4-2012-09-29.zip
+				: $(baseURL)/openssh-6.0p1-r1a4-x86-gcc4-2012-09-29.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				openssh-6.0p1-r1a4-x86-gcc2-2012-08-28.zip
-				: $(baseURL)/openssh-6.0p1-r1a4-x86-gcc2-2012-08-28.zip ;
+				openssh-6.0p1-r1a4-x86-gcc2-2012-09-28.zip
+				: $(baseURL)/openssh-6.0p1-r1a4-x86-gcc2-2012-09-28.zip ;
 		}
 
 		AddUserToHaikuImage sshd : 1001 : 100 : /var/empty : /bin/true
@@ -1888,18 +1895,16 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage vim-7.3-x86-gcc4-2011-12-23.zip
-				:  $(baseURL)/vim-7.3-x86-gcc4-2011-12-23.zip
+			InstallOptionalHaikuImagePackage vim-7.3-r1a4-x86-gcc4-2012-09-26.zip
+				:  $(baseURL)/vim-7.3-r1a4-x86-gcc4-2012-09-26.zip
 				: : true ;
 		} else {
-			InstallOptionalHaikuImagePackage vim-7.3-x86-gcc2-2011-12-23.zip
-				:  $(baseURL)/vim-7.3-x86-gcc2-2011-12-23.zip
+			InstallOptionalHaikuImagePackage vim-7.3-r1a4-x86-gcc2-2012-09-26.zip
+				:  $(baseURL)/vim-7.3-r1a4-x86-gcc2-2012-09-26.zip
 				: : true ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/common/bin/gvim ;
-		# TODO: move this symlink to the archive
-		AddSymlinkToHaikuImage common bin : vim : vi ;
 	}
 }
 
