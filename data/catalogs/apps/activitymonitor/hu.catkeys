@@ -22,7 +22,7 @@ Page faults	DataSource		Laphibák
 Sending	DataSource		Küldés
 Cache	DataSource		Gyorsítótár
 %.1f faults/s	DataSource		%.1f hiba/s
-Update time interval:	SettingsWindow		Frissítési időköz
+Update time interval:	SettingsWindow		Frissítési gyakoriság:
 TX	DataSource	Shorter version for Sending	Adás
 Quit	ActivityWindow		Kilépés
 Block cache memory	DataSource		Blokk gyorsítótár
