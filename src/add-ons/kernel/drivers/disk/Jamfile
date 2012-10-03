@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers disk ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers disk acpi_loader ;
 SubInclude HAIKU_TOP src add-ons kernel drivers disk floppy ;
 SubInclude HAIKU_TOP src add-ons kernel drivers disk scsi ;
 SubInclude HAIKU_TOP src add-ons kernel drivers disk usb ;
