@@ -2,7 +2,7 @@
 Use as background…	Menus		Beállítás háttérnek…
 File	Menus		Fájl
 Slide delay	Menus		Képváltás közti szünet
-Selection mode	Menus		Kijelölés módja
+Selection mode	Menus		Kijelölés mód
 Zoom in	Menus		Nagyítás
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum megváltozott. Biztosan be szeretné zárni?
 Page setup…	Menus		Oldalbeállítás…
@@ -28,7 +28,7 @@ Close	ClosePrompt		Bezárás
 Undo	Menus		Visszavonás
 Resize to (in 1/72 inches):	PrintOptionsWindow		Átméretezés (1/72 colban):
 Rating	Menus		Értékelés
-Flip left to right	Menus		Balról jobbra hajtás
+Flip left to right	Menus		Balról jobbra tükrözés
 Show caption in full screen mode	Menus		Felirat mutatása teljes képernyős módban
 DPI:	PrintOptionsWindow		DPI:
 Open…	Menus		Megnyitás…
@@ -49,7 +49,7 @@ Previous file	Menus		Előző fájl
 ShowImage	System name		Képmegjelenítő
 Slide show	Menus		Bemutató
 Fit image to page	PrintOptionsWindow		Kép oldalhoz illesztése
-Flip top to bottom	Menus		Fentről lefelé hajlítás
+Flip top to bottom	Menus		Fentről lefelé tükrözés
 Select all	Menus		Összes kiválasztása
 Zoom factor in %:	PrintOptionsWindow		Nagyítás mértéke százalékban:
 Width:	PrintOptionsWindow		Szélesség:

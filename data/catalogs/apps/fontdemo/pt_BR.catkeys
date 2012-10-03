@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-FontDemo	1769653414
+1	portuguese (brazil)	x-vnd.Haiku-FontDemo	1300625863
 Outline:	ControlView		Contorno:
 Size: 50	ControlView		Tamanho: 50
 Stop cycling	ControlView		Parar ciclo
@@ -12,7 +12,6 @@ Cycle fonts	ControlView		Fontes de ciclo
 Font:	ControlView		Fonte:
 Rotation: 0	ControlView		Rotação: 0
 Drawing mode:	ControlView		Modo de desenho:
-FontDemo	FontDemo		Demonstração de Fonte
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Controles
 Outline: %d	ControlView		Contorno: %d

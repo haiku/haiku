@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-FontDemo	1769653414
+1	japanese	x-vnd.Haiku-FontDemo	1300625863
 Outline:	ControlView		アウトライン:
 Size: 50	ControlView		サイズ: 50
 Stop cycling	ControlView		循環の中止
@@ -12,7 +12,6 @@ Cycle fonts	ControlView		フォントを循環させる
 Font:	ControlView		フォント:
 Rotation: 0	ControlView		回転: 0
 Drawing mode:	ControlView		描画モード:
-FontDemo	FontDemo		FontDemo
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		コントロール
 Outline: %d	ControlView		アウトライン: %d

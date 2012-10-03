@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-FontDemo	1769653414
+1	lithuanian	x-vnd.Haiku-FontDemo	1300625863
 Outline:	ControlView		Apvadas:
 Size: 50	ControlView		Dydis: 50
 Stop cycling	ControlView		Nebekeisti šriftų
@@ -12,7 +12,6 @@ Cycle fonts	ControlView		Cikliškai keisti šriftus
 Font:	ControlView		Šriftas:
 Rotation: 0	ControlView		Pasukimas: 0
 Drawing mode:	ControlView		Piešimo būdas:
-FontDemo	FontDemo		Šriftų demonstracija
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Valdikliai
 Outline: %d	ControlView		Apvadas: %d
