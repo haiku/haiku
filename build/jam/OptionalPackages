@@ -1457,7 +1457,7 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 }
 
 
-# Ocaml
+# OCaml
 if [ IsOptionalHaikuImagePackageAdded OCaml ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OCaml available for $(TARGET_ARCH)" ;
