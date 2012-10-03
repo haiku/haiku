@@ -1132,6 +1132,7 @@ AboutView::_CreateCreditsView()
 		"Jian Jiang\n"
 		"Ma Jie\n"
 		"Carwyn Jones\n"
+		"Prasad Joshi\n"
 		"Vasilis Kaoutsis\n"
 		"James Kim\n"
 		"Shintaro Kinugawa\n"
