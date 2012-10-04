@@ -206,8 +206,15 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	fInterruptEndpoints[0]->next_physical_endpoint
 		= fDummyIsochronous->physical_address;
 
-	// Disable all interrupts before handoff/reset
-	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS);
+	// When the handover from SMM takes place, all interrupts are routed to the
+	// OS. As we don't yet have an interrupt handler installed at this point,
+	// this may cause interrupt storms if the firmware does not disable the
+	// interrupts during handover. Therefore we disable interrupts before
+	// requesting ownership. We have to keep the ownership change interrupt
+	// enabled though, as otherwise the SMM will not be notified of the
+	// ownership change request we trigger below.	
+	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS &
+		~OHCI_OWNERSHIP_CHANGE) ;
 
 	// Determine in what context we are running (Kindly copied from FreeBSD)
 	uint32 control = _ReadReg(OHCI_CONTROL);
@@ -221,9 +228,12 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		}
 
 		if ((control & OHCI_INTERRUPT_ROUTING) != 0) {
-			TRACE_ERROR("smm does not respond. resetting...\n");
-			_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
-			snooze(USB_DELAY_BUS_RESET);
+			TRACE_ERROR("smm does not respond.\n");
+			
+			// TODO: Enable this reset as soon as the non-specified
+			// reset a few lines later is replaced by a better solution.
+			//_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
+			//snooze(USB_DELAY_BUS_RESET);
 		} else
 			TRACE_ALWAYS("ownership change successful\n");
 	} else {
@@ -231,8 +241,8 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		snooze(USB_DELAY_BUS_RESET);
 	}
 
-	// This reset should not be necessary according to the OHCI spec, but
-	// without it some controllers do not start.
+	// TODO: This reset delays system boot time. It should not be necessary
+	// according to the OHCI spec, but without it some controllers don't start.
 	_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
 	snooze(USB_DELAY_BUS_RESET);
 
