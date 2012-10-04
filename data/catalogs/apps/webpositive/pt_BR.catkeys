@@ -1,0 +1,73 @@
+1	portuguese (brazil)	x-vnd.Haiku-WebPositive	939289977
+Show home button	Settings Window		Exibir botão home
+Username:	Authentication Panel		Nome de Usuário:
+Copy URL to clipboard	Download Window		Copiar URL para a área de transferência
+Cancel	Settings Window		Cancelar
+Close window	WebPositive Window		Fechar janela
+Quit	WebPositive		Sair
+The download could not be opened.	Download Window		O item baixado não pôde ser aberto.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	A pasta de itens baixados não pôde ser aberta.\n\nErro: %error
+Open location	WebPositive Window		Abrir local
+Clear history	WebPositive Window		Limpar histórico
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Ontem
+Default standard font size:	Settings Window		Tamanho padrão da fonte principal:
+Start page:	Settings Window		Página inicial:
+History	WebPositive Window		Histórico
+Error opening downloads folder	Download Window		Erro ao abrir pasta de itens baixados
+Find next	WebPositive Window		Localizar próximo
+Download folder:	Settings Window		Pasta de itens baixados:
+Edit	WebPositive Window		Editar
+Over %hours hours left	Download Window		Mais de %hours horas restantes
+Cancel	Authentication Panel		Cancelar
+Match case	WebPositive Window		Coincidir com caso
+Search page:	Settings Window		Página de pesquisa:
+Zoom text only	WebPositive Window		Ampliar texto apenas
+Default fixed font size:	Settings Window		Tamanho de fonte fixa padrão:
+Open containing folder	Download Window		Abrir pasta de contenção
+New window	WebPositive Window		Nova janela
+Open	Download Window		Abrir
+Reload	WebPositive Window		Recarregar
+Downloads	Download Window		Itens baixados
+Sans serif font:	Settings Window		Fonte sem serifa:
+Over %days days left	Download Window		Mais de %days dias restantes
+Forward	WebPositive Window		Avançar
+of	Download Window	...as in '12kB of 256kB'	de
+Find:	WebPositive Window		Localizar:
+Increase size	WebPositive Window		Aumentar o tamanho
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Ocorreu um erro recuperando a pasta de marcadores.\n\nErro: %error
+Over 1 day left	Download Window		Mais de 1 dia restante
+Downloads	WebPositive Window		Itens baixados
+Requesting %url	WebPositive Window		Solicitando %url
+Apply	Settings Window		Aplicar
+Bookmark info	WebPositive Window		Informações de marcador
+Size:	Font Selection view		Tamanho:
+Cancel	WebPositive Window		Cancelar
+Open all	WebPositive Window		Abrir tudo
+Clear	URL Bar		Limpar
+Cut	URL Bar		Cortar
+Clear	WebPositive Window		Limpar
+Remove	Download Window		Remover
+Find	WebPositive Window		Localizar
+Find previous	WebPositive Window		Localizar anterior
+Settings	WebPositive Window		Definições
+Open start page	Settings Window		Abrir página inicial
+Continue downloads	WebPositive		Continuar a baixar
+Cancel	Download Window		Cancelar
+Open search page	Settings Window		Abrir página de pesquisa
+Password:	Authentication Panel		Senha:
+Back	WebPositive Window		Voltar
+New browser window	Download Window		Nova janela do navegador
+Today	WebPositive Window		Hoje
+1 second left	Download Window		1 segundo restante
+Style:	Font Selection view		Estilo:
+General	Settings Window		Geral
+View	WebPositive Window		Visualizar
+Previous	WebPositive Window		Anterior
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Ocorreu um erro ao criar o arquivo de marcador.\n\nErro: %error
+Bookmark error	WebPositive Window		Erro de marcador
+Do you really want to clear the browsing history?	WebPositive Window		Deseja realmente limpar o histórico de navegação?
+Copy	WebPositive Window		Copiar
+Open bookmarks confirmation	WebPositive Window		Abrir confirmação de marcadores
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url concluído
+Remove finished	Download Window		Remover concluído

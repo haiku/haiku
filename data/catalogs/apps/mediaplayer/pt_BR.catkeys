@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	1547644353
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	2969013755
 raw audio	MediaPlayer-InfoWin		áudio não processado
 Location	MediaPlayer-InfoWin		Local
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -97,6 +97,7 @@ Video track	MediaPlayer-Main		Faixa de vídeo
 Loop video	MediaPlayer-SettingsWindow		Repetir vídeo
 Attributes	MediaPlayer-Main		Atributos
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Todos os arquivos não puderam ser movidos para a Lixeira.
+<untitled>	PlaylistItem-title		<sem título>
 Track	Audio Track Menu		Faixa
 unknown format	MediaPlayer-InfoWin		formato desconhecido
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nada para refazer>

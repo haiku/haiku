@@ -1,12 +1,20 @@
-1	portuguese (brazil)	x-vnd.Haiku-VirtualMemory	1828586495
+1	portuguese (brazil)	x-vnd.Haiku-VirtualMemory	1952476689
+Quit	SettingsWindow		Sair
 Turn off	SettingsWindow		Desligar
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desabilitar a memória virtual irá trazer efeitos indesejados na estabilidade do sistema assim que a memória estiver cheia.\nA memória virtual não irá afetar a performance do sistema até que isso aconteça.\n\nTem certeza que deseja desligá-la?
 Requested swap file size:	SettingsWindow		Tamanho necessário do arquivo de troca:
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		As definições especificadas no arquivo de definições são inválidas. É possível carregar o padrão ou sair.
 Defaults	SettingsWindow		Padrões
+Current Swap:	SettingsWindow		Troca Corrente:
 Use volume:	SettingsWindow		Volume em uso:
 Keep enabled	SettingsWindow		Manter habilitado
 Revert	SettingsWindow		Reverter
 VirtualMemory	System name		MemóriaVirtual
+Choose swap size automatically	SettingsWindow		Escolher tamanho de troca automaticamente
+Use boot volume	SettingsWindow		Utilizar inicialização de volume
+Load defaults	SettingsWindow		Carregar padrão
 OK	VirtualMemoryApp		OK
+Changes will take effect upon reboot.	SettingsWindow		As alterações serão efetuadas após reiniciar o computador.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Memória Virtual\n\tescrito por Axel Dörfler\n\tCopyright 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		O volume especificado no arquivo de definições não pôde ser encontrado. É possível utilizar o volume de inicialização ou sair.
 Enable virtual memory	SettingsWindow		Habilitar memória virtual

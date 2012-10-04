@@ -1,8 +1,9 @@
-1	portuguese (brazil)	x-vnd.Haiku-Keymap	1823733883
+1	portuguese (brazil)	x-vnd.Haiku-Keymap	4022885915
 Shift:	Modifier keys window	Shift key role name	Deslocar:
 Revert	Modifier keys window		Reverter
 Tilde trigger	Keymap window		Acento til
 Grave trigger	Keymap window		Tecla morta
+Role	Modifier keys window	As in the role of a modifier key	Função
 Select dead keys	Keymap window		Selecionar teclas de acento
 Cancel	Modifier keys window		Cancelar
 Quit	Keymap window		Sair
@@ -17,6 +18,7 @@ Option:	Modifier keys window	Option key role name	Opção:
 Switch shortcut keys	Keymap window		Mudas as teclas de atalho
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla shift
 User:	Keymap window		Usuário:
+Key	Modifier keys window	As in a computer keyboard key	Tecla
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla control
 Control:	Modifier keys window	Control key role name	Controle:
 Sample and clipboard:	Keymap window		Amostra e área de transferência:

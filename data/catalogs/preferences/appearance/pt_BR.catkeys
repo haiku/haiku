@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Appearance	3882211276
+1	portuguese (brazil)	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		Fonte plana:
 Control highlight	Colors tab		Realce do controle
 Control border	Colors tab		Borda do controle
@@ -27,9 +27,11 @@ Window border	Colors tab		Margem da janela
 Window tab text	Colors tab		Texto da aba da Janela
 Document text	Colors tab		Texto do documento
 Navigation pulse	Colors tab		Navegação de pulso
+Window decorator:	DecorSettingsView		Decorador de janela:
 Selected menu item text	Colors tab		Texto do item do menu selecionado
 Menu background	Colors tab		Plano de fundo de menu
 OK	DecorSettingsView		OK
+Control mark	Colors tab		Marca de controle
 Size:	Font Selection view		Tamanho:
 Panel background	Colors tab		Plano de fundo do painel
 Menu font:	Font view		Fonte de menu:
@@ -37,6 +39,7 @@ Colors	APRWindow		Cores
 Control background	Colors tab		Plano de fundo do controle
 Inactive window tab	Colors tab		Aba da janela inativa
 Appearance	System name		Aparência
+Use double scrollbar arrows	DecorSettingsView		Utilizar setas duplas da barra de rolagem
 Fixed font:	Font view		Fonte de largura fixa:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Yuri viu um pequeno jabuti xereta e dez cegonhas felizes comendo kiwi.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reduzir a força do filtro de bordas coloridas:
@@ -51,6 +54,7 @@ Selected menu item border	Colors tab		Borda do item de menu selecionado
 Strong	AntialiasingSettingsView		Forte
 Panel text	Colors tab		Texto de janela de diálogo
 Monospaced fonts only	AntialiasingSettingsView		Apenas fontes monoespaçadas
+Look and feel	APRWindow		Olhar e sentir
 Antialiasing menu	AntialiasingSettingsView		Menu de suavização de serrilhado
 Fonts	APRWindow		Fontes
 Glyph hinting:	AntialiasingSettingsView		Sugestão de glifo:
