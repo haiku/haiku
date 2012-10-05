@@ -3,7 +3,7 @@ raw audio	MediaPlayer-InfoWin		nyers audio
 Location	MediaPlayer-InfoWin		Útvonal
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikai)
 %d kHz	MediaPlayer-InfoWin		%d kHz
-Stream settings	MediaPlayer-Main		Steam beállításai
+Stream settings	MediaPlayer-Main		Film beállításai
 <unknown>	PlaylistItem-album		<ismeretlen>
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Nagyított vezérlők teljes képernyős módban
 Video	MediaPlayer-InfoWin		Videó
@@ -135,7 +135,7 @@ Edit	MediaPlayer-PlaylistWindow		Szerkesztés
 Start media server	MediaPlayer-Main		Médiakiszolgáló indítása
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Teljes képernyő.
-ToggleFullscreen	MediaPlayer-Main		Teljesképernyő
+ToggleFullscreen	MediaPlayer-Main		Teljes képernyő
 <unnamed>	PlaylistItem-name		<névtelen>
 Open Clips	MediaPlayer-Main		Klippek megnyitása
 OK	MediaPlayer-PlaylistWindow		Rendben
