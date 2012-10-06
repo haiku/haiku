@@ -1,8 +1,0 @@
-1	brazilian_portuguese	x-vnd.Haiku-CPUFrequencyPref	1149286520
-CPU frequency status view	CPU Frequency View		Status da frequência do CPU
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		A Frequência do CPU\n\tfoi escrito por Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-Defaults	Pref Window		Padrões
-Install replicant into Deskbar	CPU Frequency View		Instalar o replicante na Mesa de Trabalho
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Não foi possível abrir a Frequência de CPU.\n\nErro: 
-Low energy	Status view		Baixa energia
-Set state	Status view		Definir estado

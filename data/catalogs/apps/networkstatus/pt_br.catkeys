@@ -1,6 +1,0 @@
-1	brazilian_portuguese	x-vnd.Haiku-NetworkStatus	2726673031
-Configuring	NetworkStatusView		Configurando
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao abrir as preferências de Rede.\n\nErro:
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Opções do Status de Rede:\n\t--deskbar\tautomaticamente adicionar replicante na Deskbar\n\t--ajuda\t\timprimir esta informação e sair\n
-NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		Status de Rede\n\tescrito por %1 e Hugo Santos\n\t%2, Haiku, Inc.\n
-Open network preferences…	NetworkStatusView		Abrir preferências de Rede...
