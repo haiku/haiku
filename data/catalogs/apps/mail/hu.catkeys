@@ -87,7 +87,7 @@ Find…	Mail		Keresés…
 Accounts…	Mail		Fiókok…
 Mail preferences	Mail		Beállítások
 Initial spell check mode:	Mail		Helyesírás ellenőrzése:
-Leave same	Mail		Hadja azonosan
+Leave same	Mail		Hagyja azonosan
 Page setup…	Mail		Oldalbeállítás…
 Text wrapping:	Mail		Szöveg tördelése:
 Revert	Mail		Visszaállít
@@ -121,7 +121,7 @@ Decoding:	Mail		Kódolás:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Sajnálom, de nem található olyan program, ami támogatja a 'Névjegy' formátumot.
 Do you wish to send this message before closing?	Mail		Elküldi az levelet bezárás előtt?
 Delete	Mail		Törlés
-Leave as '%s'	Mail		Hadja %sként
+Leave as '%s'	Mail		Hagyja %sként
 Copy	Mail		Másolás
 Mail couldn't find its dictionary.	Mail		Nem található a szótár.
 Reply preamble:	Mail		Válasz:
