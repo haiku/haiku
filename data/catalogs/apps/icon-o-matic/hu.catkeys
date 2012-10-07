@@ -5,7 +5,7 @@ Color (#%02x%02x%02x)	Style name after dropping a color		Szín (#%02x%02x%02x)
 Add	Icon-O-Matic-StylesList		Hozzáadás
 Move Shape	Icon-O-Matic-MoveShapesCommand		Alakzat mozgatása
 Opening the document failed!	Icon-O-Matic-Main		Nem sikerült megnyitni a dokumentumot!
-Reset transformation	Icon-O-Matic-ShapesList		Transzformáció visszaállítása
+Reset transformation	Icon-O-Matic-ShapesList		Átalakítás visszaállítása
 Move Paths	Icon-O-Matic-MovePathsCmd		Útvonalak mozgatása
 None	Icon-O-Matic-Properties		Nincs
 New	Icon-O-Matic-Menu-File		Új
@@ -15,21 +15,21 @@ Stroke	Transformation		Kihúzás
 Save Icon	Dialog title		Ikon mentése
 Closed	Icon-O-Matic-PropertyNames		Zárt
 Remove Path	Icon-O-Matic-RemovePathsCmd		Útvonal eltávolítása
-Add shape with path	Icon-O-Matic-Menu-Shape		Alakzat hozzáadása az útvonallal együtt
+Add shape with path	Icon-O-Matic-Menu-Shape		Hozzáadás útvonallal
 Select	Icon-O-Matic-Properties		Kijelölés
 Height	Icon-O-Matic-PropertyNames		Magasság
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Transzformációk eltávolítása
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Átalakítók eltávolítása
 Width	Icon-O-Matic-PropertyNames		Szélesség
-Transformation	Icon-O-Matic-TransformationBoxStates		Transzformáció
+Transformation	Icon-O-Matic-TransformationBoxStates		Átalakítás
 Duplicate	Icon-O-Matic-ShapesList		Megkettőzés
 <unkown property>	Icon-O-Matic-PropertyNames		<ismeretlen tulajdonság> 
-Linear	Icon-O-Matic-StyleTypes		Lineáris
+Linear	Icon-O-Matic-StyleTypes		Egyenes
 Assign Path	Icon-O-Matic-AddPathsCmd		Útvonal hozzárendelés
 Move	Icon-O-Matic-TransformationBoxStates		Áthelyezés
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Vezérlőpontok tükrözése
 warning	Icon-O-Matic-SVGExport		figyelmeztetés
 Copy	Icon-O-Matic-Properties		Másolás
-Miter Limit	Icon-O-Matic-PropertyNames		Miter korlát
+Miter Limit	Icon-O-Matic-PropertyNames		Süveg korlát
 OK	Icon-O-Matic-ColorPicker		Rendben
 Remove Control Point	Icon-O-Matic-RemovePointsCmd		Vezérlőpont eltávolítása
 Bleep!	Exporter - Continue in error dialog		Bíííp!
@@ -41,40 +41,40 @@ Scale Y	Icon-O-Matic-PropertyNames		Y skála
 Add Control Point	Icon-O-Matic-AddPointCmd		Vezérlőpont hozzáadása
 Untitled	Icon-O-Matic-Main		Névtelen
 Multi Set 	Multi Set (property name)		Többszörös beállítás
-any of the other lists to	Empty property list - 2nd line		a többi erre listáz:
+any of the other lists to	Empty property list - 2nd line		a többi listában
 Save as…	Icon-O-Matic-Menu-File		Mentés másként…
 Change Color	Icon-O-Matic-SetColorCmd		Szín váltása
 Style	Icon-O-Matic-Menus		Stílus
 <modify path>	Icon-O-Matic-PathCmd		<útvonal módosítása>
 Opening the icon failed!	Icon-O-Matic-Main		Az ikon megnyitása sikertelen!
 Error: 	Icon-O-Matic-Main		Hiba:
-Rotate indices backwards	Icon-O-Matic-PathsList		Indexek forgatása vissza
+Rotate indices backwards	Icon-O-Matic-PathsList		Forgatás balra
 Name	Icon-O-Matic-PropertyNames		Név
 bad news	Icon-O-Matic-Exporter		rossz hír
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nincs mit visszavonni>
 Off	Icon-O-Matic-Menu-Settings		Ki
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Alakzat rögzítése
-PNG Set	Icon-O-Matic-SavePanel		PNG beállítás
+PNG Set	Icon-O-Matic-SavePanel		PNG összeállítás
 Joins	Icon-O-Matic-PropertyNames		Csatlakozási pontok
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Stílus eltávolítása
 Scale X	Icon-O-Matic-PropertyNames		X skála
 Set 	Set (property name)		Beállítás
 Cancel	Icon-O-Matic-SVGExport		Mégse
-Add shape with style	Icon-O-Matic-Menu-Shape		Alakzat hozzáadása stílussal
+Add shape with style	Icon-O-Matic-Menu-Shape		Hozzáadás stílussal
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Alakzat eltávolítása
 Reverse	Icon-O-Matic-PathsList		Megfordítás
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF forráskód
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Transzformációk visszaállítása
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Átalakítások visszaállítása
 Settings	Icon-O-Matic-Menus		Beállítások
 All	Icon-O-Matic-Properties		Összes
 Multi Paste Properties	Icon-O-Matic-Properties		Többször beillesztés tulajdonsága
 Undo	Icon-O-Matic-Main		Visszavonás
-Click on a shape above	Empty transformers list - 1st line		Kattintson egy alakzatra fent
+Click on a shape above	Empty transformers list - 1st line		Kattintson egy alakzatra
 Add Shape	Icon-O-Matic-AddShapesCmd		Alakzat hozzáadása
 Contour	Transformation		Körvonal
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nincs mit újra végrehajtani>
 Perspective	Transformation		Perspektíva
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transzformáló áthelyezése
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Átalakító áthelyezése
 Opacity	Icon-O-Matic-PropertyNames		Átlátszóság
 Add with path	Icon-O-Matic-ShapesList		Hozzáadás útvonallal együtt
 Gradient type	Icon-O-Matic-StyleTypes		Színátmenet típusa
@@ -82,7 +82,7 @@ Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Mégse
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Vezérlőpont módosítása
 Saving your document failed!	Icon-O-Matic-Exporter		A dokumentum mentése sikertelen volt!
-edit it's properties here.	Empty property list - 3rd line		itt szerkesztheti a tulajdonságait.
+edit it's properties here.	Empty property list - 3rd line		a tulajdonságok szerkesztéséhez.
 Split	Icon-O-Matic-PathManipulator		Szétvágás
 Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Figyelmeztető vezérlőpontok
 Remove	Icon-O-Matic-StylesList		Eltávolítás
@@ -90,9 +90,9 @@ Add with path & style	Icon-O-Matic-ShapesList		Hozzáadás útvonallal és stíl
 META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON jellemző
 Translation Y	Icon-O-Matic-PropertyNames		Y fordítás
 Rotate	Icon-O-Matic-TransformationBoxStates		Elforgatás
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Transzformáció eltávolítása
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Átalakító eltávolítása
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Útvonal jelzőinek elforgatása
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Transzformáció hozzáadása
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Átalakító hozzáadása
 Remove	Icon-O-Matic-PathsList		Eltávolítás
 Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Figyelmeztető vezérlőpontok
 Pick a color	Icon-O-Matic-ColorPicker		Szín kiválasztása
@@ -100,7 +100,7 @@ Quit	Icon-O-Matic-Menu-File		Kilépés
 Export	Icon-O-Matic-Menu-File		Exportálás
 No	Icon-O-Matic-StyledTextImport		Nem
 Save changes to current icon?	Icon-O-Matic-Menu-Settings		Mentsük a jelenlegi ikon változtatásait?
-Rotate indices forwards	Icon-O-Matic-PathsList		Indexek forgatása előre
+Rotate indices forwards	Icon-O-Matic-PathsList		Forgatás jobbra
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Útvonal hozzárendelésének törlése
 load error	Icon-O-Matic-SVGImport		betöltési hiba
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Alakzatok áthelyezése
@@ -113,25 +113,25 @@ Settings…	Icon-O-Matic-SavePanel		Beállítások…
 Remove	Icon-O-Matic-PathManipulator		Eltávolítás
 Radial	Icon-O-Matic-StyleTypes		Sugaras
 Perspective	Icon-O-Matic-TransformersList		Perspektíva
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Alakzat hozzáadása útvonallal és stílussal együtt
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Hozzáadás útvonallal és stílussal
 Gradient	Icon-O-Matic-StyleTypes		Átmenet
-Min LOD	Icon-O-Matic-PropertyNames		Min LOD
+Min LOD	Icon-O-Matic-PropertyNames		Min RSz
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON jellemző
-Invert selection	Icon-O-Matic-Properties		Kijelölés invertálása
+Invert selection	Icon-O-Matic-Properties		Kijelölés megfordítása
 Drop shapes	Icon-O-Matic-ShapesList		Alakzatok eldobása
 Export as…	Icon-O-Matic-Menu-File		Exportálás másként…
-Transformation	Transformation		Transzformáció
-Click on an object in	Empty property list - 1st line		Kattintson egy objektumra ebben:
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Transzformációk áthelyezése
+Transformation	Transformation		Átalakítás
+Click on an object in	Empty property list - 1st line		Kattintson egy objektumra
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Átalakítók áthelyezése
 Move Styles	Icon-O-Matic-MoveStylesCmd		Stílusok áthelyezése
-Reset transformation	Icon-O-Matic-StylesList		Transzformáció visszaállítása
-Max LOD	Icon-O-Matic-PropertyNames		Max LOD
-Transformer	Icon-O-Matic-Menus		Transzformáció
+Reset transformation	Icon-O-Matic-StylesList		Átalakítás visszaállítása
+Max LOD	Icon-O-Matic-PropertyNames		Max RSz
+Transformer	Icon-O-Matic-Menus		Átalaktító
 Flip	Icon-O-Matic-PathManipulator		Tükrözés
 Conic	Icon-O-Matic-StyleTypes		Kúpos
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Vezérlőpontok szétvágása
 Save	Icon-O-Matic-Menu-Settings		Mentés
-Add empty	Icon-O-Matic-ShapesList		Üres hozzáadása
+Add empty	Icon-O-Matic-ShapesList		Hozzáadás
 Close	Icon-O-Matic-Menu-File		Bezárás
 Cancel	Icon-O-Matic-ColorPicker		Mégse
 Paste	Icon-O-Matic-Properties		Beillesztés
@@ -140,15 +140,15 @@ Translation X	Icon-O-Matic-PropertyNames		X fordítás
 Properties	Icon-O-Matic-Menus		Tulajdonságok
 Move Pivot	Icon-O-Matic-TransformationBoxStates		Forgatási pont áthelyezése
 Path	Icon-O-Matic-Menus		Útvonal
-Freeze transformation	Icon-O-Matic-ShapesList		Transzformáció rögzítése
+Freeze transformation	Icon-O-Matic-ShapesList		Átalakítás rögzítése
 File	Icon-O-Matic-Menus		Fájl
 Error: 	Icon-O-Matic-Exporter		Hiba:
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Transzformációk hozzáadása
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Átalakítók hozzáadása
 Diamond	Icon-O-Matic-StyleTypes		Rombusz
 Path	Icon-O-Matic-PropertyNames		Útvonal
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nem sikerült SVG dokumentumként megnyitni ezt: '%s'.\n\nHiba: %s
 Discard	Icon-O-Matic-Menu-Settings		Elvetés
-Swatches	Icon-O-Matic-Menus		Színminták
+Swatches	Icon-O-Matic-Menus		Paletta
 <unavailable>	Icon-O-Matic-StyleTypes		<nem elérhető>
 Rotation	Icon-O-Matic-PropertyNames		Elforgatás
 Add with style	Icon-O-Matic-ShapesList		Hozzáadás stílussal együtt
@@ -159,7 +159,7 @@ Bummer	Cancel button - error alert		Fenébe
 Snap to grid	Icon-O-Matic-Menu-Settings		Rácshoz illesztés
 Remove	Icon-O-Matic-ShapesList		Eltávolítás
 Yes	Icon-O-Matic-StyledTextImport		Igen
-Transformation	Icon-O-Matic-TransformersList		Transzformáció
+Transformation	Icon-O-Matic-TransformersList		Átalakítás
 Save image	Icon-O-Matic-SavePanel		Kép mentése
 Add Styles	Icon-O-Matic-AddStylesCmd		Stílusok hozzáadása
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Vezérlőpontok eltávolítása
@@ -168,7 +168,7 @@ Add rect	Icon-O-Matic-PathsList		Téglalap hozzáadása
 Edit	Icon-O-Matic-Menus		Szerkesztés
 Duplicate	Icon-O-Matic-StylesList		Megkettőzés
 Caps	Icon-O-Matic-PropertyNames		Vonalvég
-Transform	Icon-O-Matic-PathManipulator		Transzformálás
+Transform	Icon-O-Matic-PathManipulator		Átalakítás
 Add Paths	Icon-O-Matic-AddPathsCmd		Útvonalak hozzáadása
 Style type	Icon-O-Matic-StyleTypes		Stílus típusa
 too big	Icon-O-Matic-StyledTextImport		túl nagy
@@ -181,8 +181,8 @@ Redo	Icon-O-Matic-Main		Újra
 Assign Paths	Icon-O-Matic-AddPathsCmd		Útvonalak hozzárendelése
 OK	Icon-O-Matic-SVGImport		Rendben
 Multi paste	Icon-O-Matic-Properties		Többszörös beillesztés
-to attach transformers.	Empty transformers list - 2nd line		transzformerek csatolásához.
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Transzformáció visszaállítása
+to attach transformers.	Empty transformers list - 2nd line		átalakító hozzáadásához.
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Átalakítás visszaállítása
 Reverse Path	Icon-O-Matic-ReversePathCmd		Útvonal megfordítása
 Scale	Icon-O-Matic-TransformationBoxStates		Méretezés
 Duplicate	Icon-O-Matic-PathsList		Megkettőzés
@@ -199,4 +199,4 @@ Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Útvonal törlése
 Rounding	Icon-O-Matic-PropertyNames		Kerekítés
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Alakzatok eltávolítása
 Clean up	Icon-O-Matic-PathsList		Tisztítás
-Detect Orient.	Icon-O-Matic-PropertyNames		Tájolás erzékelése
+Detect Orient.	Icon-O-Matic-PropertyNames		Tájolás árzékelése
