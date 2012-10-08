@@ -275,13 +275,10 @@ BDeskWindow::CreatePoseView(Model* model)
 void
 BDeskWindow::AddWindowContextMenus(BMenu* menu)
 {
-	BMenuItem* item;
-
 	BRoster roster;
 	if (!roster.IsRunning(kDeskbarSignature)) {
-		item = new BMenuItem(B_TRANSLATE("Restart Deskbar"),
-			new BMessage(kRestartDeskbar));
-		menu->AddItem(item);
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Restart Deskbar"),
+			new BMessage(kRestartDeskbar)));
 		menu->AddSeparatorItem();
 	}
 
@@ -298,7 +295,7 @@ BDeskWindow::AddWindowContextMenus(BMenu* menu)
 
 	BMessage* message = new BMessage(kIconMode);
 	message->AddInt32("size", 32);
-	item = new BMenuItem(B_TRANSLATE("32 x 32"), message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("32 x 32"), message);
 	item->SetMarked(PoseView()->IconSizeInt() == 32);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
