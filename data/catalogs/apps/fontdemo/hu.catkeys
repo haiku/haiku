@@ -1,12 +1,12 @@
-1	hungarian	x-vnd.Haiku-FontDemo	1300625863
+1	hungarian	x-vnd.Haiku-FontDemo	3522850500
 Outline:	ControlView		Körvonal:
 Size: 50	ControlView		Méret: 50
 Stop cycling	ControlView		Váltakozás megállítása
-Shear: 90	ControlView		Nyírás: 90
+Shear: 90	ControlView		Dőlésszög: 90
 Spacing: 0	ControlView		Térköz: 0
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Forgatás: %d
-Shear: %d	ControlView		Nyírás: %d
+Shear: %d	ControlView		Dőlésszög: %d
 Spacing: %d	ControlView		Térköz: %d
 Cycle fonts	ControlView		Betűtípusok váltása
 Font:	ControlView		Betűtípus:
@@ -14,6 +14,7 @@ Rotation: 0	ControlView		Forgatás: 0
 Drawing mode:	ControlView		Kirajzolás módja:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Vezérlők
+FontDemo	System name		Betűk
 Outline: %d	ControlView		Körvonal: %d
 Text:	ControlView		Szöveg:
 Antialiased text	ControlView		Szöveg élsimítása

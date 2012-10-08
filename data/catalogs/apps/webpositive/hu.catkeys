@@ -25,7 +25,7 @@ Serif font:	Settings Window		Serif betűtípus:
 Loading %url	WebPositive Window		%url betöltése
 Page source	WebPositive Window		Oldal forrása
 Next	WebPositive Window		Következő
-Find next	WebPositive Window		Következő keresése
+Find next	WebPositive Window		Következő találat
 Download folder:	Settings Window		Letöltések helye:
 Edit	WebPositive Window		Szerkesztés
 Over %hours hours left	Download Window		Több, mint %hours óra van hátra
@@ -50,7 +50,7 @@ Reload	WebPositive Window		Újratöltés
 Downloads	Download Window		Letöltések
 Sans serif font:	Settings Window		Sans serif betűtípus:
 Over %days days left	Download Window		Több, mint %days nap van hátra
-Forward	WebPositive Window		Előre
+Forward	WebPositive Window		Következő
 of	Download Window	...as in '12kB of 256kB'	/
 Revert	Settings Window		Visszaállít
 Fixed font:	Settings Window		Rögzített szélességű betűtípus:
@@ -102,7 +102,7 @@ Continue downloads	WebPositive		Letöltések folytatása
 Cancel	Download Window		Mégse
 Open search page	Settings Window		Keresőoldal megnyitása
 Password:	Authentication Panel		Jelszó:
-Back	WebPositive Window		Vissza
+Back	WebPositive Window		Előző
 New browser window	Download Window		Új böngészőablak
 Today	WebPositive Window		Ma
 1 second left	Download Window		1 másodperc van hátra
@@ -117,7 +117,7 @@ New tab	WebPositive Window		Új fül
 Downloads in progress	WebPositive		Letöltés folyamatban
 Style:	Font Selection view		Stílus:
 General	Settings Window		Általános
-View	WebPositive Window		Megjelenítés
+View	WebPositive Window		Nézet
 Previous	WebPositive Window		Előző
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hiba történt a könyvjelző létrehozásakor.\n\nHiba: %error
 Bookmark error	WebPositive Window		Könyvjelző hiba
@@ -130,7 +130,7 @@ Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't 
 OK	Authentication Panel		Rendben
 Copy	URL Bar		Másolás
 OK	WebPositive Window		Rendben
-Manage bookmarks	WebPositive Window		Könyjelzők kezelése
+Manage bookmarks	WebPositive Window		Könyvjelzők kezelése
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ehhez az oldalhoz (%bookmarkName) már tartozik könyvjelző.
 New windows:	Settings Window		Új ablak:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url betöltése kész
