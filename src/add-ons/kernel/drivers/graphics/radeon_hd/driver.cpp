@@ -137,6 +137,7 @@ const struct supported_device {
 	//	Radeon 4330		- RV710
 	{0x954f, 3, 2, RADEON_RV710, CHIP_IGP, "Radeon HD 4300"},
 	{0x9552, 3, 2, RADEON_RV710, CHIP_IGP, "Radeon HD 4300"},
+	{0x9553, 3, 2, RADEON_RV710, CHIP_IGP, "Radeon HD 4500"},
 	{0x9555, 3, 2, RADEON_RV710, CHIP_STD, "Radeon HD 4350"},
 	{0x9540, 3, 2, RADEON_RV710, CHIP_STD, "Radeon HD 4550"},
 	{0x9452, 3, 2, RADEON_RV730, CHIP_STD, "AMD FireStream 9250"},
