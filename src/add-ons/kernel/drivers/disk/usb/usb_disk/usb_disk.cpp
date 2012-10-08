@@ -1,18 +1,23 @@
 /*
- * Copyright 2008-2010, Haiku Inc. All rights reserved.
+ * Copyright 2008-2012, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  */
 
-#include <ByteOrder.h>
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <string.h>
+
 #include "usb_disk.h"
+
+#include <ByteOrder.h>
+#include <Drivers.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <fs/devfs.h>
+
 #include "usb_disk_scsi.h"
 
 
@@ -463,7 +468,7 @@ usb_disk_request_sense(device_lun *lun)
 				TRACE_ALWAYS("request_sense: media changed\n");
 				lun->media_changed = true;
 				lun->media_present = true;
-				
+
 				return B_DEV_MEDIA_CHANGED;
 			}
 			// fall through
@@ -1058,17 +1063,17 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 					break;
 			}
 
-			device_geometry *geometry = (device_geometry *)buffer;
-			geometry->bytes_per_sector = lun->block_size;
-			geometry->cylinder_count = lun->block_count;
-			geometry->sectors_per_track = geometry->head_count = 1;
-			geometry->device_type = lun->device_type;
-			geometry->removable = lun->removable;
-			geometry->read_only = lun->write_protected;
-			geometry->write_once = (lun->device_type == B_WORM);
+			device_geometry geometry;
+			devfs_compute_geometry_size(&geometry, lun->block_count,
+				lun->block_size);
+
+			geometry.device_type = lun->device_type;
+			geometry.removable = lun->removable;
+			geometry.read_only = lun->write_protected;
+			geometry.write_once = lun->device_type == B_WORM;
 			TRACE("B_GET_GEOMETRY: %ld sectors at %ld bytes per sector\n",
-				geometry->cylinder_count, geometry->bytes_per_sector);
-			result = B_OK;
+				geometry.cylinder_count, geometry.bytes_per_sector);
+			result = user_memcpy(buffer, &geometry, sizeof(device_geometry));
 			break;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2012, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -19,6 +19,8 @@
 
 #include <string.h>
 #include <stdlib.h>
+
+#include <fs/devfs.h>
 
 #include "dma_resources.h"
 #include "IORequest.h"
@@ -65,7 +67,7 @@ static device_manager_info* sDeviceManager;
 
 
 static status_t
-update_capacity(das_driver_info *device)
+update_capacity(das_driver_info* device)
 {
 	TRACE("update_capacity()\n");
 
@@ -88,20 +90,12 @@ get_geometry(das_handle* handle, device_geometry* geometry)
 	das_driver_info* info = handle->info;
 
 	status_t status = update_capacity(info);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
-	geometry->bytes_per_sector = info->block_size;
-	if (info->capacity > UINT_MAX) {
-		// TODO this doesn't work for capacity greater than 35TB
-		geometry->sectors_per_track = 256;
-		geometry->cylinder_count = info->capacity / (256 * 32);
-		geometry->head_count = 32;
-	} else {
-		geometry->sectors_per_track = 1;
-		geometry->cylinder_count = info->capacity;
-		geometry->head_count = 1;
-	}
+
+	devfs_compute_geometry_size(geometry, info->capacity, info->block_size);
+
 	geometry->device_type = B_DISK;
 	geometry->removable = info->removable;
 
