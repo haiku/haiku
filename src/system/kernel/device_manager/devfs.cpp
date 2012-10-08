@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -26,6 +26,7 @@
 #include <debug.h>
 #include <elf.h>
 #include <FindDirectory.h>
+#include <fs/devfs.h>
 #include <fs/KPath.h>
 #include <fs/node_monitor.h>
 #include <kdevice_manager.h>
@@ -1498,17 +1499,16 @@ devfs_ioctl(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, uint32 op,
 				device_geometry geometry;
 				status_t status = vnode->stream.u.dev.device->Control(
 					cookie->device_cookie, op, &geometry, length);
-				if (status < B_OK)
+				if (status != B_OK)
 					return status;
 
 				// patch values to match partition size
-				geometry.sectors_per_track = 0;
 				if (geometry.bytes_per_sector == 0)
 					geometry.bytes_per_sector = 512;
-				geometry.sectors_per_track = partition->info.size
-					/ geometry.bytes_per_sector;
-				geometry.head_count = 1;
-				geometry.cylinder_count = 1;
+
+				devfs_compute_geometry_size(&geometry,
+					partition->info.size / geometry.bytes_per_sector,
+					geometry.bytes_per_sector);
 
 				return user_memcpy(buffer, &geometry, sizeof(device_geometry));
 			}
@@ -2204,6 +2204,21 @@ devfs_unpublish_device(BaseDevice* device, bool disconnect)
 
 	put_vnode(sDeviceFileSystem->volume, node->id);
 	return status;
+}
+
+
+void
+devfs_compute_geometry_size(device_geometry* geometry, uint64 blockCount,
+	uint32 blockSize)
+{
+	if (blockCount > UINT32_MAX)
+		geometry->head_count = (blockCount + UINT32_MAX - 1) / UINT32_MAX;
+	else
+		geometry->head_count = 1;
+
+	geometry->cylinder_count = 1;
+	geometry->sectors_per_track = blockCount / geometry->head_count;
+	geometry->bytes_per_sector = blockSize;
 }
 
 
