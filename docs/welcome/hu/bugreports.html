@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"> 
+<head>
+<!-- 
+ *
+ * Copyright 2008-2012, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Niels Reedijk, Matt Madia and Ingo Weinhold who wrote
+ *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="all" />
+	<title>Hibák jelentése</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/bugreports.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bugreports.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bugreports.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bugreports.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bugreports.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bugreports.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/bugreports.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bugreports.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/bugreports.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/bugreports.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/bugreports.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/bugreports.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/bugreports.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+    <a href="../welcome_hu.html" class="uplink">Welcome</a>
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td><a href="#account">Trac azonosító létrehozása</a><br />
+                <a href="#report">Hibajelentés készítése</a><br />
+                <a href="#app">Program hibák</a><br />
+                  <a href="#server">Kiszolgáló/szolgáltatás hibák</a><br />
+                  <a href="#kernel">Kernel hibák</a><br />
+                  <a href="#kdl">Kernel Debugging Land - KDL</a><br />
+                  <a href="#syslog">Rendszer napló</a><br />
+                  <a href="#onscreen">Hibakeresés a képernyőn</a><br />
+                  <a href="#hardware">Eszköz/vezérlő hibák</a><br />
+                  <a href="#next">Hogyan tovább?</a></td></tr>
+</table>
+
+<h1>Hibák jelentése</h1>
+
+<p>Mivel a fejlesztők nem tudnak minden konfigurációt, az operációs rendszerben minden eshetőséget kipróbálni, ezért a felhasználók visszajelzésére támaszkodunk, arra, hogy náluk hogyan működnek a dolgok, milyen kimenetet kapnak. Mivel a Haiku még fiatal, ezért nagy valószínűséggel találkozol majd valamilyen hibával. Megköszönjük, ha fordítasz időt a feltárt hibák jelzésére. Együtt képesek leszünk a Haiku hiáinak javítására.</p>
+<p>A hibakeresőnél vedd figyelembe a <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Bug Tracker Etiquette</a>-ben leírtakat.</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="account" name="accout">Trac azonosító létrehozása</a></h2>
+<p>Egy probléma jelentéséhez szükség van  egy <a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku Hibakövető</a> azonosítóra.<br />
+Új felhasználó létrehozáskor szükséges egy <b>e-mail cím megadása</b>. Ha regsiztráció után nem érkezik meg az ellenőrző/visszaigazoló levél, akkor ellenőrizni kell a <b>kéretlen levelek mappáját</b>, mert gyakran oda kerül.</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="report" name="report">Hibajelentés készítése</a></h2>
+<p>Mielőtt jelentesz egy hibát, előtte <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">győződj meg</a>, hogy még nem létezik róla jelentés. Szintén használható a <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">kereső</a> is.<br />
+Miután megbizonyosodtál róla, hogy a hiba egyedi, akkor azt a lehető legpontosabban, legrészletesebben le kell írni:</p>
+<ul>
+	<li><p>Próbáld meg a hibát a legújabb verzión is előidézni. Előre elkészített képfájlok is a <a href="http://haiku-files.org/">rendelkezésre állnak</a>.</p></li>
+	<li><p>Add meg az alapvető információkat arra vonatkozóan, hogy miként használtad a Haiku-t (például valós gépen vagy emulátoron (VMWare, QEMU), stb.).</p></li>
+	<li><p>Említsd meg, melyik <acronym title="Subversion, az általunk használt forráskód-kezelő">SVN</acronym> verziót használod. Ezt az információt megtalálod a <span class="menu">Haiku névjegyé</span>n az Asztalsávon. Szintén szükséges a Haiku típusának (gcc2, gcc4, gcc2hybrid, gcc4hybrid) megadása. Ez a letöltött képfájl nevéből is kiderülthet, mert tartalmazzák azt.</p></li>
+	<li><p>Írd le a tapasztalt problémát. Próbáld meg olyan pontosan, ahogy tudod: mi és hogyan viselkedett, és mire számítottál.</p></li>
+	<li><p>Írd le, hogy milyen lépések szükségesek ahhoz, hogy a hibát meg tudjuk ismételni. Ez a lépés segít a fejlesztőknek.</p></li>
+	<li><p>Mellékelj annyi információt, amennyit csak tudsz. Ha ez a grafikus felület, vagy egy program hibája, akkor készíts egy képernyőképet a <span class="key">PRINT</span> billentyű lenyomásával.</p></li>
+</ul>
+	
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="app" name="app">Program hibák</a></h2>
+<p>Ha egy program meghibásodott, akkor a hibakereső a megjelenített üzenetből is előhívható. Ekkor megnyílik egy Terminál ablak a gdb-t (GNU hibakereső) futtatva. A <span class="cli">bt</span>-t kiadva létrehozhatunk egy "visszakövetést", aminek az eredményét a jelentéshez kell mellékelni (azt is, amit a <span class="cli">bt</span> előtt kaptál).</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="server" name="server">Kiszolgáló/szolgáltatás hibák</a></h2>
+<p>Amikor egy létfontosságú szolgáltatás, mint például az alkalmazás szolgáltatás (app_server), a registrar vagy a bemeneti eszköz szolgáltatás (input_server) hibásodik meg, akkor nem valószínű, hogy a szokásos üzenetet kapod majd. Ehelyett a teljes képernyő egy Terminálhoz hasonló képernyőre változik, ahol a hibakereső folyamat elindul, és az üzenetek ott jelennek meg. Lehetséges, hogy az egér mozgatható, ekkor azonban az egér-kurzor törli a fehér képernyőn lévő információt. A programok továbbra is futnak (például a Folyamatkezelő vagy az óra az Ásztalsávon), amik szintén törölhetik a fehér képernyőt.<br />
+Attól, hogy kicsit kényelmetlen, minden épp úgy működik, mint a programhibák esetében. A legfontosabb a hiba visszakövetése (<span class="cli">bt</span> parancs). Erről a képernyőről készíthetsz egy képet is egy digitális fényképezőgéppel, itt ugyanis nem használható a kijelölés és másolás.</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="kernel" name="kernel">Kernel hibák</a></h2>
+<p>A kernel hibák a legsúlyosabbak, és ugyanakkor a legnehezebb felderíteni is azokat. Különféle eshetőségek lehetnek, melyek leginkább a kernelel vagy egy vezérlőprogramal kapcsolatos:</p>
+<ul>
+<li><p>A rendszer saját magától belép a kernel hibakereső felületére (KDL). A képernyő felső része törlődik, fehér hátteret kap és néhány sornyi szöveg is megjelenik. A második sor a "<i>Welcome to Kernel Debugging Land...</i>" (üdvözöllek a kernel hibakeresőben), az e feletti sor pedig a hibakeresőbe való belépés okát adja meg.</p></li>
+<li><p>A rendszer spontán újraindul.</p></li>
+<li><p>A rendszer teljesen használhatatlan ("lefagy"). Nem tudod mozgatni az egeret, és a képernyőt sem frissíti semmi. Fontos megpróbálni, hogy be tudunk-e lépni a KDL-be az <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (a <span class="key">SysReq</span> az a <span class="key">PRINT</span> sok billentyűzeten) kombinációval. Várj körülbelül egy percet, hogy történik-e valami.</p></li>
+<li><p>A rendszer nem megfelelően indul. Néha újraindul vagy megáll egy adott ponton (például egy indító képernyő egyik ikonjának felvillanásakor). Később ismét megpróbálható a <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> kombináció.</p></li>
+<li><p>A teljes rendszer, vagy bizonyos eszközök nem működnek megfelelően. Például nagyon lelassul vagy valami egyártalán nem működik. Ha egy eszköz nem működik, akkor elsőként azt kell kideríteni, hogy egyártalán támogatott eszközről van-e szó (például levelező listán vagy fórumon ajánlott megkérdezni).</p></li>
+</ul>
+<p>Ne feledd, hogy csak az utolsó pont utal eszköz hibára, azonban más problémát is okozhat egy eszközvezérlő hibája. Ha gyanítod, hogy a hibát egy adott vezérlő okozza, akkor ellenőrizd le, hogy mi változik, ha az eszközt vagy a vezérlőt eltávolítod vagy letiltod. Plldául, ha a Wifi-re gyanakszol, akkor próbáld meg kideríteni, hogy a BIOS-ban letiltható-e. Ha nem, akkor a gyanús vezérlőt töröld a rendszerből (a <span class="path">/boot/system/add-ons/kernel/drivers/bin</span> mappából).</p>
+
+<h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="kdl" name="kdl">Kernel Debugging Land - KDL (Kernel Hibakereső Felület)</a></h3>
+<p>Ha a rendszer nem lép be automatikusan a KDL-be, akkor a <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> kombinációval manuálisan is beléphetsz oda.<br />
+Ne feledd, megeshet, hogy a billentyűzeted nem fog működni a KDL-ben. A PS/2 billentyűzet biztosan, az USB csak akkor, ha UHCI vezérlőre van csatlakoztatva. USB OHCI jelenleg nem használható.</p>
+<p>A KDL egyfajta shell. Itt néhány parancsot is használhatunk. Az alábbi parancsok érdekesek lehetnek:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="cli">bt</span> (sc)</td><td> </td><td>A hiba visszakövetése. Ha egy hiba miatt kerülsz a KDL-be, akkor ezt alapból kiadja az.</td></tr>
+<tr><td><span class="cli">ints</span></td><td> </td><td>A kezelt és nem kezelt eszköz-megszakítások megjelenítése.</td></tr>
+<tr><td class="onelinetop"><span class="cli">co</span> (continue)</td><td> </td><td>Ha lehetséges, akkor kilép a hibakeresőből, és folytatja a normális működést.</td></tr>
+<tr><td><span class="cli">reboot</span></td><td> </td><td>Azonnal újraindítja a rendszert. Minden nem mentett adatot elveszítesz. Azokat is, amit bár elmentettél, de még nem lett a lemezre írva.</td></tr>
+</table>
+<p>További információk a <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Welcome to Kernel Debugging Land</a> oldalon.</p>
+<p>A KDL kimenete a soros porta is kiküldésre kerül (márha rendelkezünk vele). Egy kábelel egy másik számítógéphez kötve a terminálból egy program segítségével megkaphatjuk a kimenetet illetve a naplót. Ha nem tudunk kilépni a KDL-ből, akkor a napló sem kerül mentésre. Ekkor egy opció is a rendelkezésünkre áll betöltéskor (további információk alább).</p>
+<p>QR-kód létrehozására is lehetőségünk van a KDL-ből, amit felhasználhatunk például okos telefonnal. További információk a <a href="http://www.haiku-os.org/blog/mmlr/2012-07-01_qr_encode_your_kdl_output">QR Encode your KDL Output</a> oldalán.</p>
+
+<h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="syslog" name="syslog">Rendszer napló</a></h3>
+<p><b>Ez az előnyben részesített módszer egy nem indítható rendszer információinak összegyűjtésére.</b><br />
+A syslog (a rendszer napló rövid neve) értékes információkat tartalmaz arról, hogy mi történt a rendszerben beleértve a KDL kimenetét is. Általában jó ötlet és hasznos is a jelentéshez csatolása. A naplót a <span class="path">/boot/common/var/log/syslog</span> fájl tartalmazza. Mivel a fájl írásához működő rendszerre van szükség, ezért megeshet, hogy a legújabb üzenetek nem kerülnek bele a naplóba, főként, ha kernel probléma adódik (például ha a KDL nem válaszol, nem használható).</p>
+<p>Ha az <span class="menu">Enable debug syslog</span> (hibakereső naplózás engedélyezése) engedélyezve van a rendszertöltő <span class="menu">Select debug options</span> (hibakereső opciók) menüjében, akkor a rendszer a naplót megőrzi a memóriában. Alap esetben ez az opció engedélyezve van. A napló megőrzése annyit jelent, hogy a rendszer újraindításkor továbbra is elérhető marad a rendszertöltő menübe való belépéskor. Egy operációs rendszer betöltése (a Haiku biztosan, a többi pedig valószínűleg) törli ezt az információt. Tehát, be kell lépni indításkor a menübe a <span class="key">SHIFT</span> lenyomása közben.<br />
+A rendszertöltő menü <span class="menu">Select output options</span> (hibakereső opciók) menüjében most megjelenik további opció két is: <span class="menu">Display syslog from previous session</span> (a legutóbbi napló megjelenítése) és a <span class="menu">Save syslog from previous session</span> (a legutóbbi napló mentése). Az előbbi a naplót a képernyőn jeleníti meg, az utóbbi pedig elmenti azt a lemezre. Ne feledd, hogy jelenleg csak a FAT32-es fájlrendszerű lemezek használhatóak mentésre. Ha USB lemezre akarod menteni és elfelejtetted azt időben csatlakoztatni, akkor csatlakoztasd, majd nyugodtan indítsd újra a gépet, és próbáld meg akkor menteni a naplót. De ismételten: véletlenül se indíts egy operációs rendszert amíg el nem mented a naplót, mert különben elvész az.</p>
+
+<h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="onscreen" name="onscreen">Hibakeresés a képernyőn</a></h3>
+<p><b>A képernyőn történő hibakeresés csak egy megadott hiba esetében hasznos, és időigényes. Ne használd, ha nem szükséges.</b><br />
+Ez akkor fontos, ha a Haiku nem tud elindulni és a <span class="menu">hibakereső naplózás</span> valamiért nem működik. Mielőtt a Haiku logó megjelenik, tartsd lenyomva a <span class="key">SHIFT</span>-et a rendszertöltőbe való belépéshez. Válasszd a <span class="menu">Select safe mode options</span> (hibakereső opciók) menüt, majd azon belül az <span class="menu">[ ] Enable on screen debug output</span> (képernyőn történő hibakeresés engedélyezése) opciót. (Megjegyzés: több opció is haszálható betöltéskor. Ha a Haiku indításakor egy vagy több opciót is használsz, akkor azokat is említsd meg.)<br />
+Végül válaszd a <span class="menu">Return to main menu</span> (visszatérés a főmenübe), majd a <span class="menu">Continue booting</span> (betöltés folytatása) menüpontot.<br />
+Egy vagy több oldalnyi szöveg is megjelenik majd a képernyőn, amiből csak az utolsó néhány sort szükséges a jelentéshez csatolni. További információk a <a href="../../../userguide/hu/bootloader.html">Rendszertöltő</a> fejezetben.</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="hardware" name="hardware">Eszköz/vezérlő hibák</a></h2>
+<p>Ha eszközhibával/vezérlővel van dolgunk, akkor az alábbi információkat is ajánlott csatolni szöveges fájlként:</p>
+
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td>- <span class="cli">listdev</span></td><td> </td><td>Részletes lista az eszközökről/összetevőkről a pci és a gyártó azonosítójával együtt. Hasonló a Linux <span class="cli">lshw</span> és <span class="cli">lspci</span> parancsához.</td></tr>
+<tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>USB-vel kapcsolatos hiba esetén. Hasonló a <span class="cli">lsusb</span>-hez.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Az elsődleges napló, amit a Haiku használ, amibe az indításkori üzenetek is bekerülnek. Az <span class="cli">open</span> használatával a naplóból egy adott részt is kimásolhatunk, mert az egy szövegszerksztőben nyílik meg.</td></tr>
+<tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Az összes használt eszközvezérlő.</td></tr>
+<tr><td>- <span class="cli">ints</span></td><td> </td><td>Csak a <i>Kernel Debugging Land</i>-ben haszálatos (lásd fejjebb). A megszakítások használatát jeleníti meg. Elvileg nem lehet túl sok amit megosztva használnak az eszközök.</td></tr>
+<tr><td colspan="3">- Hibakeresés a képernyőn (indításkori biztonsági opció).</td></tr>
+</table>
+
+<p>Az elős 4 parancsot a Terminálban kell kiadni. Kiegészítve a <span class="cli"> &gt; output.txt</span> paraméterrel, a parancsok kimenete nem a képernyőre, hanem egy "output.txt" (kimenet) nevű fájlba kerül, amit a jelentéshez csatolhatunk vagy levélhez mellékelhetünk.</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="next" name="next">Hogyan tovább?</a></h2>
+<p>Miután jeleztél egy hibát, egy fejlesztő megnézi azt, és osztályozza. Ne feledd, hogy minden fejlesztő önkéntes, így néha egy jelentés megválaszolatlan marad egy ideig. 
+Ha új információk is rendelkezésre állnak, akkor azt is a jelentéshez ajánlott csatolni, így a probléma megoldása felgyorsulhat.</p>
+<p>Ne feledd azt sem, hogy a hiba jelentése nem csak annyiból ál, hogy jelented, és kész. Mikor jelentesz egy hibát, akkor Te is a Haiku fejlesztésének részévé válasz. A fejlesztők is tehetnek fel kérdéseket miközben próbálják kijavítani a hibát. Kérünk, hogy a válaszaiddal segítsd a munkánkat. Ha egy jelentés 'kész', akkor az 'fixed' (javított) jelölést kap.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <a href="../welcome_hu.html" class="uplink">Welcome</a>
+</span></div>
+</div>
+
+</body>
+</html>

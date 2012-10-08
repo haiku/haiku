@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2012, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Asztalsáv (Deskbar)</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/deskbar.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/deskbar.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/deskbar.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/deskbar.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/deskbar.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/deskbar.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/deskbar.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/deskbar.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/deskbar.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/deskbar.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/deskbar.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/deskbar.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="tracker-add-ons.html">Nyomkövető kiegészítők</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="filetypes.html">Fájltípusok</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#deskbar-menu">Asztalsáv menü</a><br />
+	<a href="#tray">A Polc</a><br />
+	<a href="#list-of-apps">Futó programok listája</a>
+</td></tr>
+</table>
+
+<h1>Asztalsáv (Deskbar)</h1>
+
+<p>Az Asztalsáv egy kis panel, ami alap esetben a jobb felső sarokban helyezkedik el. Ez a Haiku megfelelője a Windows Tálcájának. 3 része van: a menü, ahol a programok és beállítások találhatóak, a polc, az órával és a többi eszközzel, és a futó programok listája.</p>
+<img src="images/deskbar-images/positions.png" alt="positions" />
+<p>Az Asztalsáv bármelyik sarokba illetve a képernyő aljára és a tetejére húzható a markoló segítségével. Továbbá nem csak a pozíció, hanem a mérete is módosítható: lehet kompakt vagy teljes.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="deskbar-menu" name="deskbar-menu">Asztalsáv menü</a></h2>
+<p>A menü megnyílik, ha az Asztalsávon a logóra kattintunk:</p>
+<img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
+<ul>
+<li><p><b>Haiku névjegye...</b> - Alapvető rendszer és jogi információk.</p></li>
+
+<li><p><b>Keresés...</b> - A <a href="queries.html">Kereső</a> panel megnyitása.</p></li>
+<li><p><b>Replikánsok megjelenítése</b> - A kis <a href="gui.html#replicants">Replikáns</a> jelek megjelenítése/elrejtése, aminek segítségével mozgatható, eltávolítható egy replikáns.</p></li>
+<li><p><b>Csatolás</b> - Ez az opció megegyezik az Asztal helyi menüjével (további információk a <a href="tracker.html#mounting-volumes">Lemezek csatolása</a> fejezetben).</p></li>
+<li><p><b>Asztalsáv-beállítások...</b> - Az Asztalsáv beállításai (információk lejjebb).</p></li>
+<li><p><b>Leállítás</b> - A rendszer <span class="menu">Újraindítás</span>a vagy <span class="menu">Kikapcsolás</span>a.</p></li>
+<li><p><b>Legutóbbi dokumentumok, mappák, programok</b> - A legutóbb megnyitott dokumentumok, mappák illetve programok listája (bővebben az <span class="menu">Asztalsáv beállítások</span> részben alább).</p></li>
+<li><p><b>Programok, Bemutatók, Asztali kisalkalmazások, Beállítások</b> - Az elérhető programok, bemutatók és beállítások listája.<br />További bejegyzéseket hozhatsz létre bármilyen elemhez (programhoz, mappához, fájlhoz, kereséshez, stb.), amihez hivatkozást készítesz a <span class="path">~/config/be</span> mappába.</p></li>
+</ul>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Asztalsáv beállításai</h3>
+<img src="images/deskbar-images/configure.png" alt="configure.png" />
+<ul>
+<li><p><b>Menü</b><br />
+Megadható az utolsó dokumentumok, mappák illetve programok száma, amik majd megjelennek a menüben, vagy egyártalán megjelenjen-e vagy sem.<br />
+A <span class="button">Menü szerkesztése...</span> gomb megnyomásával megnyílik a <span class="path">/boot/home/config/be/</span> mappa. Itt megtaláljuk a menüben megjelenő összes mappát és hivatkozást, melyek alap esetben a <span class="menu">Programok</span>, <span class="menu">Bemutatók</span>, <span class="menu">Asztali alkalmazások</span>, és a <span class="menu">Beállítások</span>.<br />
+Ezek a bejegyzések törölhetőek vagy újak adhatóak hozzá.</p>
+<p>A legegyszerűbb az, ha oda húzzuk a hivatkozást, ahol meg akarjuk, hogy jelenjen a menüben.</p></li>
+<li><p><b>Ablak</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Mindig felül</span></td><td> </td><td>Az Asztalsáv mindig a többi ablak előtt van.</td></tr>
+<tr><td><span class="menu">Automatikus előrehozás</span></td><td> </td><td>Az Asztalsáv előre hozása ha az egér felé kerül.</td></tr>
+<tr><td><span class="menu">Automatikus elrejtés</span></td><td> </td><td>Az Asztalsáv mérete lecsökken mindössze néhány képpontra, majd előjön ha az egér felé kerül.</td></tr>
+</table></li>
+<li><p><b>Programok</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Futó programok rendezése</span></td><td> </td><td>A futó programok listájának ABC sorrend szerinti rendezése.</td></tr>
+<tr><td><span class="menu">A Nyomkövető mindig az első</span></td><td> </td><td>A Nyomkövető mindig az első a futó programok listájában.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Programkiterjesztő mutatása</span></td><td> </td><td>Egy kis kapcsoló megjelenítése a program neve mellett, amivel megjeleníthetjük/elrejthetjük a programhoz tartozó ablakok listáját a program neve alatt.</td></tr>
+<tr><td><span class="menu">Új programok kibontása</span></td><td> </td><td>Az újonnan indított programok ablak-listájának automatikus megjelenítése.</td></tr>
+<tr><td><span class="menu">Programnevek elrejtése</span></td><td> </td><td>A futó programok listájában a programok neveinek elrejtése.</td></tr>
+<tr><td><span class="menu">Ikon mérete</span></td><td> </td><td>A futó programok listájában a programikonok mérete. </td></tr>
+</table></li>
+<li><p><b>Óra</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Másodpercek megjelenítése</span></td><td> </td><td>A Polcon a másodpercek megjelenítése az óra mellett.</td></tr>
+<tr><td><span class="menu">A hét napjának mutatása</span></td><td> </td><td>A hét napjának nevének megjelenítése az óra mellett.</td></tr>
+</table></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tray" name="tray">A Polc</a></h2>
+<img src="images/deskbar-images/calendar.png" alt="calendar.png" />
+<p>Többek között a Polc egy órát is tartalmaz. Az egeret az óra felett tartava megjelenik az aktuális dátum. A bal egérgombbal megjelenik egy naptár is. Jobb gombbal pedig az óra megjeleníthető/elrejthető, illetve beállíthatjuk az <a href="preferences/time.html">Idő</a>t.</p>
+<p>Bármelyik program elhelyezhető a polcon ikon formájában. A levelező rendszer másik ikont jelenít meg ha új levél érkezik, és egy menüvel is rendelkezik, ahonan például új levelet készíthetünk. A <span class="app">Folyamatkezelő</span> egy másik példa, hogy miként jeleníthetünk meg információkat a polcon (processzor/memória használat) és hogy hogyan lehet még menüt hozzáadni.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-apps" name="list-of-apps">Futó programok listája</a></h2>
+<img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
+<p>A programok között könnyedén válthatunk, csak az adott program egy ablakára kell kattintani. Jobb egérgombbal pedig elrejthető, bezárható az ablak vagy az egész program.</p>
+<p>Ha engedélyeztük a programkiterjesztőt, akkor azzal megjeleníthetjük illetve elrejthetjük a programhoz tartozó ablakok listáját közvetlenül a program alatt.</p>
+<p>Az ablakok melletti ikonok információt adnak az ablak állapotáról. A fehér ikon jelzi, hogy az ablak látható, a szürke ikon pedig azt, hogy el van rejtve. A három vonal az ikon előtt arról informál minket, hogy az ablak nem a jelenlegi munkaasztalon található.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="tracker-add-ons.html">Nyomkövető kiegészítők</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="filetypes.html">Fájltípusok</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>VirtualMemory</title>
+	<title>Virtuaalimuistiasetukset</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -38,33 +40,34 @@
 <li><a href="../../zh_CN/preferences/virtualmemory.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/virtualmemory.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/preferences/virtualmemory.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/preferences/virtualmemory.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/preferences/virtualmemory.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/preferences/virtualmemory.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="touchpad.html">Touchpad</a> 
+ «  <a href="touchpad.html">Levyhiiri</a> 
 ::  <a href="../preferences.html" class="uplink">Asetukset</a>
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory</h2>
+<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />Virtuaalimuistiasetukset</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
-<span class="path">~/config/settings/VM_data</span> - Stores the panel's window position.</td></tr>
+<span class="path">~/config/settings/VM_data</span> - Tallentaa paneelin ikkunan sijainnin.</td></tr>
 </table>
-<p>Virtual memory let's the system swap out memory to harddisk, if the RAM can be used more sensibly for other things. So, even if you have lots of RAM, providing virtual memory is never a bad idea.</p>
+<p>Virtuaalimuisti sallii käyttää levyn näennäismuistia, jos RAM-muistia voidaan käyttää herkemmin muihin asioihin. Jopa silloin kun RAM-muistia on runsaasti, virtuaalimuistin tarjoaminen ei ole koskaan huono ajatus.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>You can set the size to even more than your physical memory size if needed. With today's huge harddisks, assigning the physical memory size shouldn't be a problem. Still, you can quickly adjust the size if your free space ever runs low. In that case you should also have a look at <a href="../applications/diskusage.html">DiskUsage</a> to find out what's eating up your diskspace.</p>
-<p>Normally, the swap file's written to your boot partition. If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file. Simply another partition on the same harddisk with your system/data won't help.<br />
-Upgrading your RAM is of course the most effective way to go...</p>
+<p>Tarvittaessa voit asettaa koon jopa suuremmaksi kun fyysinen muistisi. Nykyisillä valtavilla kiintolevyillä liitetyn fyysisen muistin koko ei ole pulma. Siti voit nopeasti säätää kokoa, jos vapaa tila joskus loppuu. Siinä tapauksessa kannattaa katsoa <a href="../applications/diskusage.html">Levyasemakäyttö</a>-sovelluksella, että mikä syö levytilaasi.</p>
+<p>Normaalisti näennäistiedosto kirjoitetaan alkulatausosiollesi. Jos usein törmäät levyn roskaantumiseen siksi, että virtuaalimuistijärjestelmä lisää ja poistaa muistia, voit kokeilla näennäismuistille erillistä kiintolevyä. Saman kiintolevyn toinen osio järjestelmällesi tai tiedoillesi ei yksinkertaisesti auta.<br />
+RAM-muistin kasvattaminen olisi tietysti tehokkain tapa...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Oletukset</span></td><td> </td><td>nollaa kaikki oletusarvoihin.</td></tr>
-<tr><td><span class="button">Palauta</span></td><td> </td><td>brings back the settings that were active when you started the VirtualMemory preferences.</td></tr>
+<tr><td><span class="button">Palauta</span></td><td> </td><td>palauttaa takaisin asetukset, jotka olivat voimassa kun Virtuaalimuistiasetukset-sovellus käynnistettiin.</td></tr>
 </table>
 
 </div>
@@ -73,7 +76,7 @@ Upgrading your RAM is of course the most effective way to go...</p>
 <!--
 <div class="nav">
 <div class="inner"><span>
- «  <a href="touchpad.html">Touchpad</a> 
+ «  <a href="touchpad.html">Levyhiiri</a> 
 ::  <a href="../preferences.html" class="uplink">Asetukset</a>
 </span></div>
 </div>

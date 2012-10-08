@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Fájlrendszer felépítése</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/filesystem-layout.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/filesystem-layout.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/filesystem-layout.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/filesystem-layout.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/filesystem-layout.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/filesystem-layout.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/filesystem-layout.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filesystem-layout.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/filesystem-layout.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/filesystem-layout.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/filesystem-layout.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/filesystem-layout.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/filesystem-layout.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/filesystem-layout.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="bootloader.html">Rendszertöltő</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="gui.html">A Haiku felhasználói felülete</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Fájlrendszer felépítése</h1>
+
+<p>A Haiku fájlrendszer felépítése elég jó átlátható, a fájlok és mappák nevei nem bonyolultak, egyértelmű neveik vannak. A rendszer számára fontos fájlok és mappák védve vannak a véletlen felhasználói hibáktól, és erre kapunk is figyelemztetést:</p>
+<img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
+<img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
+<p>A második típusú figyelmeztetés akkor jelenik meg, ha átnevezni vagy törölni szeretnénk a rendszer mappáján belül. Itt az "<span class="button">Átnevezés</span>" gomb csak akkor lesz elérhető, ha a <span class="key">SHIFT</span>-et is lenyomjuk.</p>
+<p>Alapvetően 3 rész különíthető el a gyökér mappából kiindulva a rendszer-lemezen:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>A rendszer található itt. Nem ajánlott a módosítása!</td></tr>
+<tr><td><span class="path">/boot/common/</span></td><td> </td><td>A felhasználók közös fájljai.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>A felhasználó saját mappája. A saját beállításaid és fájljaid itt találhatóak.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="system" name="system">A rendszer mappa - <span class="path">/boot/system/</span></a></h2>
+<p>Az BeOS elődje után a Haiku rendszer mappája is a <span class="path">/boot/beos/</span>. Ezt régebbi dokumentációkban is megtalálod (például az eredeti BeBook-ban).<br />
+Bármi is legyen a neve, a tartalmát nem ajánlott módosítani. A Haiku összes frissítése hozzáadhat, törölhet illetve felülírhat bene bármit. Ha bármit hozzá szeretnél adni a rendszerhez, például új kiegészítőket, vagy eszközvezérlőket, akkor azokat megteheted a <span class="path">/boot/home/</span> mappán belül, vagy ha szükséges, akkor az összes felhasználóra érvényes <span class="path">/boot/common/</span> mappában. Mivel a Haiku még nem rendelkezik felhasználók támogatásával, így jelenleg nincs különbség, ugyanis csak egy felhasználó és egy <i>home</i> mappa található. De ha a későbbiekben már a felhasználók kezelése működik, akkor már tudjuk, hogy mit és hogyan is kezelhetünk.</p>
+<p>Nos; tegyük fel, hogy egy új értelemzőt szeretnél telepíteni a legújabb képformátumhoz, amit egyszerűen <b>nem</b> másolhatod a rendszer mappába. Emlékezz rá: ne módosítsd!<br />
+Így ennek a tükörképébe helyezheted azt a <span class="path">/boot/common/</span> vagy <span class="path">/boot/home/config/</span> mappán belül.</p>
+<p>Ebben a példában a rendszer mappa a</p>
+<p><span class="path">/boot/system/add-ons/Translators/</span></p>
+<p>Tehát, ennek a "tükörképe" a</p>
+<p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
+vagy<br />
+<span class="path">/boot/common/add-ons/Translators/</span></p>
+<p>Ennek a megoldásnak másik előnye is van: ha egy komponens meghibásodik (például eszköz vezérlők esetében), akkor választhatjuk a "<i>Disable user add-ons</i>" opciót a <a href="bootloader.html">Rendszertöltő</a> menüjében, és így a hibás összetevő nélkül indíthatjuk a gépet.</p>
+<p>A legtöbb esetben nem találkozunk ilyen problémával, mivel a programok megbízható forrásból származnak, és tartalmaznak egy telepítő eljárást, ami megoldja a telepítést.<br />
+<!--
+If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
+</p>
+<p><i>TODO.... Table to be added ....</i>
+<table>
+</table>
+-->
+</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="common" name="common">A közös mappa - <span class="path">/boot/common/</span></a></h2>
+<p>A Haiku még nem többfelhasználós rendszer. Ha ez már megvalósításra kerül, akkor minden felhasználónak lesz egy <i>home</i> mappája, ami a többiek számára nem hozzáférhető. Minden program vagy a rendszerhez adott kiegészítő és adat ami minden felhasználónak elérhető kell, hogy legyen, azokat a <span class="path">/boot/common/</span> mappán belülre kell másolni.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="home" name="home">A saját mappa - <span class="path">/boot/home/</span></a></h2>
+<p>Ez a mappa a részedre lett létrehozva. Ide kedvedre másolhatsz illetve innen törölhetsz bármilyen fájlt vagy mappát. Mindazonáltal nem ajánlott a <span class="path">~/config/</span> mappa tartalmát módosítani. <i>Lehetőséged van</i> kitörölni a <span class="path">~/config/settings/</span> mappát anélkül, hogy a rendszer működésképtelenné válna, de ki akarná az összes beállítását illetve a programok adatait törölni? Mindenesetre a rendszer figyelmeztet mindket a végrehajtás előtt a fennt említett üzenetek egyikével.</p>
+<p>A <span class="path">~/config/add-ons/</span> mappán belül, ami a tükörképe a rendszer kiegészítőket tartalmazó mappájának, van néhány "érdekes" mappa. (A hullámosvonal ("<tt>~</tt>") egy hivatkozás a "<span class="path">/boot/home/</span>" mappára a Terminálban, így nem kell azt mindig kiírni.)</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
+<td>Alap esetben itt találhatóak a levelek.</td></tr>
+
+<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
+<td>A <a href="queries.html">Lekérdezések</a> tárolására szolgál, alap esetben csak ideiglenesen, 7 napig.</td></tr>
+
+<tr><td><span class="path">~/config/be/</span></td><td> </td>
+<td>Ez is egy BeOS örökség. A <span class="path">be</span> mappa tartalmazza az <a href="deskbar.html#deskbar-menu">Asztalsáv menü</a>ben megjelenő mappákat. Ehhez adhatunk hozzá vagy törölhetünk fájlokat, mappákat, hivatkozásokat illetve lekérdezéseket.</td></tr>
+
+<tr><td><span class="path">~/config/bin/</span></td><td> </td>
+<td>A rendszer mappa kiegészítéseként a <span class="path">/boot/system/bin/</span> mappa tartalmazza a felhasználó által megadott parancssori programokat.</td></tr>
+
+<tr><td><span class="path">~/config/boot/</span></td><td> </td>
+<td>Ebben a mappában találhatóak a <a href="bash-scripting.html#user-scripts">Felhasználói szkriptek</a> amik a rendszer indításakor, leállításakor és a leállítás végeztével hajtódnak végre.</td></tr>
+
+<tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
+<td>Az automatikusan induló programok vagy dokumentumok hivatkozásait tartalmazza.</td></tr>
+
+<tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
+<td>Egyszerűen csak másold ide a TrueType vagy a Postscript formátumú betűtípusokat.</td></tr>
+
+<tr><td><span class="path">~/config/settings/</span></td><td> </td>
+<td>Itt találhatóak a programok beállításai és néhány rendszer-beállítás fájlja. Néhány program a saját mappáján belül tarja a beállításait, a többi egyszerűen csak ide rakja őket.</td></tr>
+
+<tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
+<td>A <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> adatbázis mappája minden <a href="filetypes.html">fájltípust</a> és azok beállításait tartalmazza.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
+<td>Egy érdekes fájlt találhatunk itt: a <span class="cli">kernel</span> alacsony szintű konfigurálási lehetőséget biztosít például az <acronym title="Symmetric Multi Processing">SMP</acronym> kikapcsolására, bekapcsolhatjuk a soros porti hibakeresést vagy engedélyezhetjük az energia-kezelést. Minden konfigurációs sor úgy aktiválható, hogy töröljük a sor elején lévő "<tt>#</tt>"-et. Csak óvatosan!</td></tr>
+
+<tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
+<td>A Nyomkövető beállításain kívül még néhány érdekes mappa is található itt:</td></tr>
+
+<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Az új mappa alapértelmezett sablonja, mely tartalmazza a megjelenítési és a rendezési beállításokat illetve az ablak méretét. Minden új létrehozott mappa ezt a sablont használja majd.</td></tr>
+
+<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Megadható a különféle fájltípusokhoz a lekérdezések eredményeinek megjelenése. További információk a <a href="queries.html#result-window">Lekérdezések: Az eredmény ablak</a> fejezetben.</td></tr>
+
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Készíts hivatkozásokat ebbe a mappába a "kedvenc" mappáiról, hogy elérhetőek legyenek azok a megnyitás és mentés ablakokban. További információk <a href="gui.html#favorites-recent">A Haiku felhasználói felülete: Kedvencek és legutóbbi mappák</a> fejezetben.</td></tr>
+
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Különböző fájltípusokhoz hozhatsz létre sablonokat, melyek a Nyomkövető <span class="menu">Fájl | Új...</span> menüjéből érhetőek el. További információk a <a href="tracker.html#working-with-files">Nyomkövető: Munka a fájlokkal</a> fejezetben.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="bootloader.html">Rendszertöltő</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="gui.html">A Haiku felhasználói felülete</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

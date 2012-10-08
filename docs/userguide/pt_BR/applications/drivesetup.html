@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Configuração de Unidade</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/drivesetup.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/drivesetup.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/drivesetup.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/drivesetup.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/drivesetup.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/drivesetup.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/drivesetup.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/drivesetup.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/drivesetup.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/drivesetup.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/drivesetup.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/drivesetup.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/drivesetup.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="diskusage.html">Uso do Disco</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="expander.html">Expander</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
+
+<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />Configuração de Unidade</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
+</table>
+<p><br /></p>
+<p>Configuração de Unidade é uma ferramenta para criar, excluir e inicializar partições. Neste momento ela não pode redimensionar ou mover partições existentes, então será preciso ou um volume não particionado (talvez uma unidade USB externa ou outro disco rígido) ou realizar uma configuração inicial com uma ferramenta como o <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> para obter espaço para outra partição.</p>
+<img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
+<p>No topo está uma representação gráfica de todas as partições dentro do dispositivo escolhido na lista abaixo dela. Além de um máximo de 4 partições primárias, cada uma delas pode conter um número de partições extendidas/lógicas. Pode ser necessário expandir esta lista com o widget +/- que aparece, neste caso, na frente do dispositivo para ver mais detalhes de cada partição lógica.</p>
+<p>Pode-se selecionar uma partição da lista e montá-la ou desmontá-la com os comandos do menu <span class="menu">Partição</span> ou pressionando <span class="key">ALT</span> <span class="key">M</span> ou <span class="key">ALT</span> <span class="key">U</span>.</p>
+<p>Também é possível excluir completamente uma partição com <span class="menu">Partição | Excluir</span>.<br />
+O que nos traz isso:</p>
+<div class="box-stop">Lidar com a criação/exclusão/inicialização de partições é um negócio muito perigoso. Sempre cheque duas vezes para ter certeza de que está fazendo certo e sempre mantenha uma cópia de segurança atualizada de seus dados no caso de algo sair errado!</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="creating" name="creating">Criando uma nova partição</a></h2>
+<div class="box-info">Se planeja usar o disco inteiro como uma partição, por exemplo um pendrive USB ou um cartão Compact Flash, pode pular a criação de uma partição e proceder direto para a <a href="#initializing">Inicialização</a>.</div>
+<p>Quando encontrar espaço não formatado na unidade, como acima <tt>&lt;empty&gt;</tt>, pode criar uma nova partição neste espaço com <span class="menu">Partição | Criar...</span>(<span class="key">ALT</span> <span class="key">C</span>).</p>
+<img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
+<p>Aparecerá esta caixa de diálogo que permite ajustar o tamanho e o tipo da partição. Escolha <span class="menu">Be File System</span> se deseja usar a partição para uma instalação do Haiku ou se deseja utilizar todas as interessantes funcionalidades do Haiku nela, como atributos e consultas. Observe que outros sistemas operacionais podem não ser capazes de acessar a partição.</p>
+<p>If you have created a primary partition instead of just another extended/logical partition within one, the above dialog also displays an <span class="menu">Active partition</span> checkbox. You'll have to check that, if you'll use that partition to boot a Haiku installation.</p>
+<p>Before you can use, or even mount the newly created partition, it has to be initialized with a filesystem.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="initializing" name="initializing">Initializing a partition</a></h2>
+<p>Only unmounted partitions can be initialized by using the <span class="menu">Partition | Initialize</span> menu.</p>
+<img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
+<p>Here you set the name for the partition and it's blocksize. 2048 bytes per block are recommended, but you can choose larger or smaller sizes if you have these very specific needs.<br />
+Initializing will destroy all data on that partition!</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="diskusage.html">Uso do Disco</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="expander.html">Expander</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

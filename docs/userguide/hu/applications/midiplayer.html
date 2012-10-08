@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Gerard Stanczak (Google Code-In student)
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Midilejátszó</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/midiplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/midiplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/midiplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/midiplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/midiplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/midiplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/midiplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/midiplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/midiplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/midiplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/midiplayer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/midiplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/midiplayer.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="mediaplayer.html">Médialejátszó</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="packageinstaller.html">Csomagtelepítő</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />Midilejátszó (MidiPlayer)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/MidiPlayer</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
+</table>
+<p><br /></p>
+<p>Ahogy a neve is mutatja, a Midilejátszó midi zene lejátszására való. A midi egy speciális formátum, ugyanis nem tartalmazza a digitális, kódolt zenét, hanem csak a leírását.<br />
+A fájl mérete általában kicsi, viszont függ a használt eszköz-tártól is ("Hangszereknek" is hívják), így a méret akár elég nagy is lehet. Ugyanakkor ezek a Hangszerek mérete is elég nagy lehet attól függően, hogy mennyi és milyen minőségű hangszer-mintát tárolnak.</p>
+<div class="box-info"><p>A Haiku alap esetben nem rendelkezik Hangszerekkel, mert ezek elég nagy méretűek, és csak néhány ember használja. Akik pedig használnak, azoknak már van minőségi vagy egyéni Hangszere. Ahhoz, hogy egyártalán hallj <i>valamit</i>, egy kiegészítő csomagot kell telepíteni. A Terminálban add ki a következő parancsot: <tt>installoptionalpackage TimGMSoundFont</tt></p>
+<p>Ha más hangokat szeretnél használni, akkor készíts egy hivatkozást a <tt>/boot/system/data/synth</tt> mappába, és nevezzd el <tt>big_synth.sy</tt>-re.</p></div>
+<img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
+<p>A Midilejátszó felülette nagyon egyszerű. Csak indítsunk el egy midi fájlt, vagy húzzuk a lejátszó ablakába, és máris indul a lejátszás. Módosíthatjuk a hangerőt, és még visszhangot is adhatunk hozzá a <span class="menu">Visszhang</span> menüből. Az ablak felső részében pedig egy oszcilloszkóp található.</p>
+
+</div>
+</div>
+<!--
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="mediaplayer.html">Médialejátszó</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="packageinstaller.html">Csomagtelepítő</a>  »
+</span></div>
+</div>
+-->
+</body>
+</html>

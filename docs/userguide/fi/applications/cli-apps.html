@@ -40,6 +40,8 @@
 <li><a href="../../zh_CN/applications/cli-apps.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/cli-apps.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -82,7 +84,7 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">filepanel</span> näyttää lataus- ja tallennustiedostopaneelin ja sallii käyttäjän valita tiedoston tai sijainnin. Paluuarvona saat valitun tiedoston tai kansion polun. Käytettävissä on useita parametreja, esimerkiksi aloituskansion asettaminen, ikkunan otsikko, oletusnimi tallennettaessa tai rajoitukset sallituissa tiedostotyypeissä. Tämä on esimerkki</p>
-<pre class="terminal">filepanel -s -t "Tallenna tiedostosi logfile" -d ~/config/settings -n Fantastic.log</pre>
+<pre class="terminal">filepanel -s -t "Tallenna lokitiedostosi" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
@@ -104,8 +106,8 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> voi asentaa kuvakkeen mille tahansa tiedostolle, kansiolle, kyselylle tai sovellukselle Työpöytäpalkin tarjottimelle. Se tarjoaa myös mahdollisuuden tiettyjen toimintojen suorittamiseen kontekstivalikosta napsauttamalla hiiren oikealla painikkeella kuvaketta. Esimerkkinä, yritä tätä lisäämällä komentorivisovellus <span class="app">screenshot</span> eri valitsimilla ("<tt>\</tt>" ensimmäisellä rivillä on vain rivinvaihto Pääteikkunassa):</p>
-<pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
-"cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
+<pre class="terminal"> desklink "cmd=Aktivoi ikkuna (2s):/bin/screenshot --window --border --delay 2" \
+"cmd=Poista replikantti:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr></table>

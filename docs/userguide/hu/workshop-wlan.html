@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2012, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Műhely: vezeték nélküli hálózat</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/workshop-wlan.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-wlan.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workshop-wlan.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workshop-wlan.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workshop-wlan.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workshop-wlan.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/workshop-wlan.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/workshop-wlan.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/workshop-wlan.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/workshop-wlan.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/workshop-wlan.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/workshop-wlan.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/workshop-wlan.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="workshop-email.html">Workshop: Managing Email</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#firmware">Használható eszköz működére bírása</a><br />
+	<a href="#gui">Csatlakozás vezeték nélküli hálózathoz</a><br />
+	<a href="#commandline">Kapcsolódás a parancssorból</a><br />
+	<a href="#tips">Tippek</a>
+</td></tr>
+</table>
+
+<h1>Műhely: vezeték nélküli hálózat</h1>
+
+<p>Manapság az internet mindennapi szükségletünkké vált. A hálózati eszközök sokfélesége miatt az azokhoz tartozó vezérlők frissen tartsása szinte lehetetlen ilyen kis project esetében, mint a Haiku, ami a <a href="http://www.freebsd.org">FreeBSD</a> kompatibilis hálózati struktúrát használja a vezérlőkhöz.<br />
+Bár ez a módszer biztosítja az eszközök jelentős részének a használatát, azonban sajnos nem az összes jelenleg is elérhetőt. Egy <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">interneten megtalálható listában</a> ellenőrizhetjük, hogy melyek a jelenleg használható eszközök, illetve vessünk egy pillantást a <a href="http://www.freebsd.org/releases/9.0R/hardware.html#WLAN">FreeBSD 9's release hardware notes</a> oldálra is.</p>
+<div class="box-info">Jelenleg csak a PCI, PCI-X, PCI-Express, Mini PCI, és a Mini PCI-Express eszközök működhetnek.<br />
+A PCMCIA, a CardBus, az ExpressCard, az USB és az ISA esetében további fejlesztésekre van szükség.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="firmware" name="firmware">Használható eszköz működére bírása</a></h2>
+<p>Még ha az első akadályt le is küzdöttük (használható eszközünk van), akkor is adódhatnak problémák a vezeték nélküli eszközökkel kapcsolatban, ugyanis azokhoz szükség van bináris, eszköz-vezértlő fájlokra (firmware) is. A Haiku nem tartalmazhat néhány ilyen fájlt, ugyanis jogi akadája van. Ugyanakkor, a Haiku tartalmaz egy szkriptet, amivel telölthetjük a szükséges fájlokat.
+Tehát, ha vezeték nélküli hálózatot akarsz használni, akkor elsőként ajánlott ezt a szkriptet használni, hogy meglegyen minden szükséges fájl.</p>
+<p>Ehhez a következő parancsot kell kiadni a Terminálban:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>Itt el kell olvasni a használati feltételeket, és elfogadásuk után telepíthetjük a fájlokat.</p>
+
+<p>Ha nem rendelkezel internet kapcsolattal, hogy letöltsd a fájlokat, akkor van egy másik megoldás is.
+További információk a <a href="#tips">Tippek</a>nél alább.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="gui" name="gui">Csatlakozás vezeték nélküli hálózathoz</a></h2>
+<p>Alap esetben a Haiku az első nyílt hálózathoz automatikusan csatlakozni fog. A <a href="desktop-applets/networkstatus.html">Hálózat állapot</a> kisalkalmazásból választhatunk másik hálózatot is.</p>
+<p>Jobb gombbal kattitnva az ikonon az Asztalsávon válasszuk ki a használni kívánt nyilvános hálózatot (amelyik "SSID"-je látható) a menüből.</p>
+<img src="images/workshop-wlan-images/join-network.png" alt="join-network.png" />
+<p>Ekkor kapunk egy ablakot, ahol a biztonság típusát (WPA/WPA2, WEP, Open (nyílt, nem védett)) és a jelszót megadva a <span class="button">Rendben</span> gombra kattintás után elkezdődik a bejelentkezés a hálózatra.<br />Ez az eszköz és a hálózat tulajdonságaitól fuggően hosszabb időt is igénybe vehet. A folyamat aktuális állapotáról az információs ablak tájékoztat minket (FIGYELEM: jelenleg ha a Nyelvi beállításoknál a mappa és fájlnevek lefordítása be van jelölve, akkor ez nem jelenik meg!):</p>
+<img src="images/workshop-wlan-images/join-status.gif" alt="join-network.gif" />
+<p>Mikor azt látjuk, hogy "Kész." és az Asztalsávon a Hálózat állapota ikonja zöld pöttyre változik, akkor a kapcsolódás sikeres volt. Ha "Nincs kapcsolat." üzenetet kapunk, és egy sárga háromszög jelenik meg az Asztalsávon, akkor lehetséges, hogy rossz jelszót adtunk meg.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="commandline" name="commandline">Kapcsolódás a parancssorból</a></h2>
+<p>Ha a parancssort részesíted előnyben, vagy szkriptet akarsz írni, esetleg a <span class="path">~/config/boot/UserBootscript</span>-et akarod használni, hogy automatikusan kapcsolódj a hálózathoz, akkor az <tt>ifconfig</tt> parancsot kell használni.</p>
+<p>A Terminálban adjuk ki az alábbi parancsot:</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
+name                             address              signal  auth
+haiku-top                        01:d0:19:a6:88:42        30  WPA
+ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
+<p>Persze, a saját hálózati kártyánk útvonalát kell megadni.<br />
+A parancs eredményeként megkapjuk a nyilvános hálózatok neveit (SSID), az egyedi azonosítójukat (MAC), a jelerősséget, illetve a biztonság típusát.</p>
+<p>A csatlakozáshoz meg kell adni a hálózati kártyát, mint első paramétert, majd az SSID-t és a jelszót a "join" (csatlakozás) opció után:</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join {SSID} {jelszó}</pre>
+<p>Előtte persze meg kell győződni arról, hogy a hálózati kártya már megfelelően működik miután elindítottuk a rendszert, ugyanis ellenkező esetben a rendszer az <tt>ifconfig</tt> parancsot figyelment kívül hagyja. Az eszköztől és a hálózattól függően ez hosszabb ideig is eltarthat, ezért ajánlott figyelni az információs ablakban megjelenő üzeneteket...</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">Tippek</a></h2>
+<ul><li><p>Ha nem rendelkezünk a Haiku alatt működő internetkapcsolattal, és nem tudjuk letölteni a vezeték nélküli hálózathoz szükséges "formware"-eket, akkor itt van néhány hasznos informcáió. Ezek a fájlok más operációs rendszer alatt is letölthetőek, majd a Haiku-t elindítva azokat a megfelelő helyre kell másolni, majd elindítani a <span class="cli">install-wifi-firmwares.sh</span> szkriptet.</p>
+
+<ul>
+<li><p>Ezt a két fájlt a <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/</span> mappába kell másolni:<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2">http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2</a><br />
+		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h</a></p>
+</li>
+<li><p>Ezt a fájlt a <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/bits</span> mappába kell másolni:<br />
+		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h</a></p>
+</li>
+<li><p>Ezt a fájl a <span class="path">/boot/system/data/firmware/broadcom43xx/</span> mappába kell másolni:<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o">http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o</a></p>
+</li>
+<li><p>Ezt a fájlt a <span class="path">/boot/system/data/firmware/marvell88w8335/</span> mappába kell másolni:<br />
+		- <a href="http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz">http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz</a></p>
+</li>
+</ul>
+<p>Miután a fennti fájlok a helyükön vannak, a Terminálban indítsuk el a szkriptet:</p>
+<pre class="terminal">install-wifi-firmwares.sh</pre>
+<p>A feltételek elolvasása és elfogadása után az összes "firmware"-t telepíteni kell.</p>
+</li></ul>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="workshop-email.html">Műhely: levelek kezelése</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="applications.html">Programok</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2012, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Interface Gráfica de Usuário (GUI) do Haiku</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/gui.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/gui.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/gui.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/gui.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/gui.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/gui.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/gui.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/gui.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/gui.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/gui.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/gui.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/gui.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/gui.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="filesystem-layout.html">Disposição do sistema de arquivos</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="workspaces.html">Workspaces</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Índice</td></tr>
+<tr class="index"><td>
+		<a href="#move-resize">Fácil deslocamento e redimensionamento</a><br />
+                <a href="#stack-tile">Empilhar e encaixar (Stack &amp; Tile)</a><br />
+                <a href="#open-save-panel">Caixas de diálogo Abrir e Salvar </a><br />
+                <a href="#replicants">Replicantes</a></td></tr>
+</table>
+
+<h1>Interface Gráfica de Usuário (GUI) do Haiku</h1>
+
+<p>A interface gráfica de usuário do Haiku é uma parte integrante do sistema. Diferentemente dos sistemas operacionais baseados em Unix, não existe um gerenciador de janelas separado e inicializar apenas dentro de um console de linha de comendo não é possível. Estando o foco do Haiku no usuário final, isto não é considerado necessário.</p>
+<p>Como você provavelmente tem experiência com outros ambientes gráficos, vamos pular o básico como menus, menus de contexto com clique no botão direito do mouse, arrastar e soltar, etc. Ao invés disso, vamos ter uma visão sobre alguns aspectos únicos da GUI do Haiku.</p>
+<img src="images/gui-images/gui.png" alt="gui.png" />
+<p>Existem apenas umas poucas coisas na GUI do Haiku que não são óbvias e fazem jus a uma explanação.</p>
+<ol>
+<li><p>O Deskbar é o menu "Iniciar" do Haiku e a barra de tarefas, se você quiser. Veja o tópico <a href="deskbar.html">Deskbar</a>.</p></li>
+<li>A guia amarela oferece mais do que um nome de programa ou o nome de um arquivo de documento:
+<ul><li>Você pode movê-lo ao segurar a tecla <span class="key">SHIFT</span> enquanto a arrasta para outra posição, habilitando empilhar uma quantidade de janelas e convenientemente acessando-as por suas guias.</li>
+<li>Pode-se minimizar uma janela com um clique duplo em sua guia (ou com <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). Essa janela oculta pode ser acessada por sua entrada no <a href="deskbar.html">Deskbar</a> ou <a href="twitcher.html">Twitcher</a>.</li>
+<li>Pode-se enviar uma janela para trás com um clique no botão direito do mouse em sua guia (ou seu contorno).</li></ul></li>
+<li><p>O botão fechar.</p></li>
+<li><p>O botão "zoom" (ou <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Na maioria dos aplicativos, isto expande uma janela para o tamanho máximo. Entretanto, isso não é obrigatório. A janela do Rastreador (Tracker), por exemplo, irá redimensionar para melhor ajustar os conteúdos.</p></li>
+<li><p>O contorna da janela. Arrastando com o botão esquerdo do mouse move a janela, com o botão direito redimensiona.</p></li>
+<li><p>O canto de redimensionamento.</p></li>
+</ol>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="move-resize" name="move-resize">Uma maneira rápida de mover e redimensionar janelas</a></h2>
+<p>Mover e redimensionar janelas é uma grande parte da interação com vários aplicativos rodando de forma concorrente. Ao invés de apontar para a pequena guia amarela ou para a ainda menor borda da janela, existe uma maneira mais conveniente de mover uma janela. Também, somando-se ao seu pequeno tamanho, o canto de redimensionamento tem outra limitação: ele apenas permite redimensionar e na direção do canto direito mais abaixo. <br />Arraste com o botão direito do mouse um contorno para redimensionar trabalhos, mas novamente terá que procurar com cuidado.</p>
+<p>Para responder a estas questões, Haiku proporciona uma solução clara usando a combinação de teclas de gerenciamento de janela <span class="key">CTRL</span> <span class="key">ALT</span> e o mouse. Veja também o capítulo <a href="keyboard-shortcuts.html#general">Atalhos e combinações de teclas</a> para mais atalhos relativos a gerenciamento de janela.</p>
+<img src="images/gui-images/resizing.png" alt="resizing.png" />
+<p>Apertando e segurando <span class="key">CTRL</span> <span class="key">ALT</span> irá realçar os contornos da  janela próximos ao cursor do mouse. Mova o mouse em direção à outra borda para mudar o alvo. Clicar e arrastar com o <i>botão direito do mouse</i> irá redimensionar a janela ao longo do(s) contorno(s) realçado(s).</p>
+<p>Pressione <span class="key">CTRL</span> <span class="key">ALT</span> e clique e arraste com o <i>botão esquerdo do mouse</i> em qualquer área da janela para movê-la. Um rápido clique com o <i>botão direito do mouse</i> a enviará para trás.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="stack-tile" name="stack-tile">Empilhar e Encaixar (Stack &amp; Tile)</a></h2>
+<p>A interface de usuário do Haiku oferece uma característica única que evidencia o fato de que as janelas possuem uma guia amarela ao invés de uma barra de título que abrange toda a largura, para um uso perfeito. Chama-se "Empilhar e Encaixar (Stack &amp; Tile)".<br />
+No exemplo abaixo, uma janela do Rastreador (Tracker) com marcadores está encaixado à esquerda de uma janela do WebPositivo, o qual está empilhado com outra janela do Rastreador (Tracker) mostrando a pasta fonte <tt>haiku</tt>. Nesta animação, o usuário clica nas guias das janelas empilhadas para alternadamente trazer uma ou outra para a frente.</p> 
+<img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
+<p>Conectado assim, o grupo de janelas pode ser movido e redimensionado junto - um belo arranjo para trabalhar em um ambiente mais centrado ao projeto. Ao invés de procurar pela janela certa do navegador com a documentação, do editor e do Rastreador (Tracker) e talvez um correio relativo ao projeto no qual está trabalhando, apenas empilhe-os e encaixe-os juntos.</p>
+<p>Fazer o arranjo real de janelas é fácil: Pressione <span class="key">OPT</span> ou <span class="key">SUPER</span> (botão do Windows) enquanto arrasta uma janela pela sua guia para outra guia de janela ou borda até que ela esteja realçada. Neste momento, solte o botão do mouse.</p>
+<p>Empilhar e Encaixar (Stack &amp; Tile) consiste de duas partes relacionadas.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
+<td><p>"<i>Empilhar</i>" é colocar janelas no topo umas das outras, movendo automaticamente as guias amarelas para a posição.<br />
+Enquanto pressiona <span class="key">OPT</span> ou <span class="key">SUPER</span>, as guias mudam de cor quando se sobrepõem; solte a janela para realizar o empilhamento.</p></td></tr></table>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
+<tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
+<td><p>"<i>Encaixar</i>" significa colar janelas horizontalmente ou verticalmente.<br />
+Novamente, enquanto pressiona <span class="key">OPT</span> ou <span class="key">SUPER</span>, os contornos que irão se fundir quando soltar a janela mudam de cor quando se aproximam um do outro.</p></td></tr></table>
+<p>A separação é feita da mesma maneira, pressionando <span class="key">OPT</span> ou <span class="key">SUPER</span> enquanto arrasta uma janela pela sua guia para fora do grupo.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="open-save-panel" name="open-save-panel">Caixas de diálogo Abrir e Salvar</a></h2>
+<p>Ao abrir ou salvar um arquivo de qualquer aplicativo, uma caixa de diálogo como esta aparece:</p>
+<img src="images/gui-images/open-save.png" alt="open-save.png" />
+<p>Ela tem todas as coisas usuais: Uma lista de arquivos da pasta corrente para escolher, no caso de uma caixa de diálogo Salvar, um campo de texto para especificar um nome de arquivo e um menu pop-up para diferentes formatos de arquivo e suas definições.<br />
+Pode-se escolher as pastas de destino no menu pop-up acima da lista de arquivos.</p>
+<p>Se já existe uma janela do Rastreador (Tracker) com o local para um arquivo aberto, pode-se simplesmente arrastar também qualquer arquivo ou a representação da pasta (ou seja, o símbolo na extremidade direita da barra de menu) para dentro da caixa de diálogo. Isto alterna a caixa para aquele novo local.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Atalhos de teclado</a></h3>
+<p>Muitos atalhos nas caixas de diálogo Abrir e Salvar são os mesmos utilizados no Rastreador (Tracker). Além dos comandos que também estão disponíveis através do menu <span class="menu">Arquivo</span>, existem alguns poucos que não são tão óbvios:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>Cria uma nova pasta.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>Permite renomear o registro selecionado.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>Move para a pasta de origem.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td>Move para dentro da pasta selecionada.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>Vai para a Área de Trabalho.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Vai para a pasta Home.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="favorites-recent" name="favorites-recent">Favoritos e pastas recentes</a></h3>
+<p>O menu <span class="menu">Favoritos</span> nas caixas de diálogo Abrir e Salvar mostra pastas recentemente acessadas e locais favoritos que podem ser definidas por você mesmo. Como indicado pela pequena seta, pode-se também usar estes locais para navegar avançando na estrutura através dos submenus.</p>
+<img src="images/gui-images/favorites.png" alt="favorites.png" />
+<p>Para adicionar um Favorito, simplesmente navegue para seu destino e escolha <span class="menu">Favoritos | Adicionar pasta atual</span>. Doravante ela aparecerá em todas as caixas de diálogo abrir/salvar. Para remover um Favorito, escolha <span class="menu">Favoritos | Configurar favoritos...</span> e deletar sua entrada.<br />
+Todos os Favoritos são mantidos em <span class="path">/boot/home/config/settings/Tracker/Go/</span>. Lá, é possível adicionar e remover vínculos a arquivos e pastas diretamente.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="replicants" name="replicants">Replicantes</a></h2>
+<p>Replicantes são pequenas partes fechadas de aplicativos que pode ser integrados a outros programas. Habilitados quando a opção <span class="menu">Mostrar replicantes</span> do Deskbar está ativa,  reconhece-se uma parte replicante de um aplicativo por sua pequena alça, normalmente no canto direito inferior:</p>
+<img src="../images/gui-images/replicant.png" alt="replicant.png" />
+<p>O local que mais aceita Replicantes é a Área de Trabalho: simplesmente arraste e solte a pequena alça sobre ela. A partir desse momento passa a fazer parte da Área de Trabalho e o aplicativo de origem do Replicante não pode ser iniciado por ela.<br />
+Um clique com o botão direito do mouse em uma alça Replicante oferece um menu de contexto que mostra a janela <span class="menu">Sobre</span> do aplicativo de origem e a opção <span class="menu">Remover replicante</span>.</p>
+<div class="box-info">Caso tenha dificuldades com um Replicante na Área de Trabalho e não consiga livrar-se dele, exclua <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Lamentavelmente, isto removerá <i>todos</i> os Replicantes da Área de Trabalho.</div>
+<p>Exemplos de aplicativos replicáveis são os gráficos do <a href="applications/activitymonitor.html">Monitor de Atividade</a>, o <a href="workspaces.html">miniaplicativo Workspaces</a> ou a <a href="applications/deskcalc.html">Calculadora de Mesa</a>.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="filesystem-layout.html">Disposição do sistema de arquivos</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="workspaces.html">Workspaces</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

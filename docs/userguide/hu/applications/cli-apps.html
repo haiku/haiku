@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Parancssori programok</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/cli-apps.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/cli-apps.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/cli-apps.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/cli-apps.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/cli-apps.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/cli-apps.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/cli-apps.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-specifikus parancssori programok</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Útvonal:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+</table>
+<p><br /></p>
+<p>Az összes, Haiku-val érkező parancssori program a <span class="path">/boot/system/bin</span> és a <span class="path">/boot/common/bin</span> mappában található. A saját programjaidat ajánlott a <span class="path">~/config/bin</span> mappába másolni. Ezek az útvonalak mind szerepelnek a PATH (keresési útvonal) változóban, és e miatt a benne lévő programokat a rendszer automatikusan megtalálja.<br />
+Az alábbi lista nem teljes, nem talátalmazza az összes programot, csak a leghasznosabbakat mutatja be. Nézz szét nyugodtan, hogy mi található a <span class="path">bin/</span> mappákban. Ezeket a programokat a <tt>--help</tt> paraméterrel indítva kaphatunk egy kis segítséget, hogy milyen opciók érhetőek el a programhoz, illetve hogy hogyan kell azt használni.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-attributes" name="cli-attributes">Jellemzőkhöz: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>Ezek a parancsok a jellemzők megjelenítésére, kiolvasására, hozzáadására vagy törlésére használhatóak.
+Ezek a meta adatok csak BFS fájlrendszerrel rendelkező lemezeken érhetőek el. A fájlok másolása más fájlrendszerre ezen adatok elvesztésével jár!<br />
+További információk a <a href="../attributes.html#attributes-terminal">Jellemzők a Terminálban</a> című fejezetben.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-index" name="cli-index">Indexeléshez: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>Ezen parancsok használatával kilistázhatóak, létrehozhatóak és törölhetőek az indexeket.<br />
+További információk az <a href="../index.html">Indexek</a> fejezetben.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-scripting" name="cli-scripting">Hasznos parancsok szkriptekhez</a></h3>
+<p>Itt található néhány parancssori program, amik kifejezetten szkriptekhez készültek (további információk a <a href="../bash-scripting.html">Bash és szkriptek</a> fejezetben).</p>
+<table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>Az <span class="cli">alert</span> felkínálja a lehetőséget egy figyelmeztető ablak megjelenítésére egyéni szöveggel, ikonnal és 3 gombbal. Eredmény képpen visszaadja a lenyomott gomb címét és a visszatérési kódot (0-val kezdődően). Példa:</p>
+<pre class="terminal">alert --idea "RemekProgram(tm) telepítés kész! Szeretne készíteni egy hivatkozást hozzá?" \
+"Az Asztalra" "Az Asztalsávba" "Nem kérek"</pre>
+<p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
+</td></tr>
+<tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>A <span class="cli">filepanel</span> lehetőséget nyújt arra, hogy kiválasztjuk egy fájl vagy mappa helyét megnyitás vagy mentés céljából. Az ablak bezárása után megkapjuk a kiválasztott fájl vagy mappa útvonalát. Több paraméter is elérhető, például az induló mappa, az ablak címe, mentés esetén a fájl neve, és az engedélyezett fájltípusok. Példa:</p>
+<pre class="terminal">filepanel -s -t "Mentse el a naplót" -d ~/config/settings -n Napló.log</pre>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>A <span class="cli">waitfor</span> egy hasznos kis program, aminek segítségével várhatunk egy program elindításáig, vagy bezárásig.</p>
+</td></tr>
+<tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>A <span class="cli">query</span> a kereső panel parancssori megfelelője. A leggyorsabb módja a kereső feltételeknek a generálására az, ha a kereső panelben a <span class="menu">képlet alapján</span> készítjük el a keresési szabályt, majd azt dupla idézőjel (<tt>"</tt>) közé rakva bemásoljuk a <span class="cli">query</span> parancs után paraméternek a Terminálba vagy a szkriptbe.</p>
+</td></tr></table>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-other" name="cli-other">További parancsok</a></h3>
+
+<table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
+		<td><p>A <span class="cli">checkfs</span> egy fontos program, ami a fájlrendszer hibáit ellenőrzi. Egyszerűen csak adjuk meg a lemez nevét, és az összes fájlt le fogja ellenőrizni.</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>Az <span class="cli">open</span> egy hasznos kis program. Használatával bármilyen fájl megnyitható a hozzárendelt programmal, vagy megadhatjuk neki egy program azonosítóját, így anélkül is indíthatunk programot, hogy tudnánk az útvonalát. Ugyan úgy működik internet címekkel is és "virtuális" mappákkal: <tt>.</tt> a jelenlegi mappa és <tt>..</tt> a szülő mappa, melyek a Nyomkövetőben nyílnak meg.</p>
+</td></tr>
+<tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>A <span class="cli">desklink</span> lehetőséget ad arra, hogy bármilyen fájlt, mappát, lekérdezést vagy programot az Asztzalsávra, a Polra helyezzünk. Továbbá lehetőségünk van helyi menüvel is ellátni azt. Az alábbi példa a <span class="app">screenshot</span> programot használja néhány opcióval (a "<tt>\</tt>" az első sor végén a sortörést jelzi a Terminálban):</p>
+<pre class="terminal">desklink "cmd=Aktív ablak (2mp):/bin/screenshot --window --border --delay 2" \
+"cmd=Replikáns törlése:desklink --remove=screenshot" /bin/screenshot
+</pre>
+<p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
+</td></tr></table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="list-cli-apps.html">Parancsok listája</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Programok</a> 
+</span></div>
+</div>
+
+</body>
+</html>

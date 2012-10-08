@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Értelmezők</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/preferences/datatranslations.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/datatranslations.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/datatranslations.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/datatranslations.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/datatranslations.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/datatranslations.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/datatranslations.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/datatranslations.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/datatranslations.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/datatranslations.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/datatranslations.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/datatranslations.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/preferences/datatranslations.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/preferences/datatranslations.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="backgrounds.html">Hátterek</a> 
+::  <a href="../preferences.html" class="uplink">Beállítások</a> 
+::  <a href="deskbar.html">Asztalsáv (Deskbar)</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />Értelmezők (DataTranslations)</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Beállítások</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/*</span> - minden értelmező ide menti a módosított beállításait<br />
+<span class="path">~/config/settings/system/DataTranslations settings</span> - az ablak pozícióját tartalmazza</td></tr>
+</table>
+<p>Minden program lehetőséget nyújt arra, hogy bármilyen formátumot megnyisson, illetve elmentsen, amihez rendelkezünk értelmezővel. Az értelemzők tulajdonságai, beállításai ezen a felületen módosíthatóak.</p>
+<p><br /></p>
+<img src="../images/prefs-images/datatranslations.png" alt="datatranslations.png" />
+<p>A formátumoktól függően minden értelmező egyedi beállításokkal rendelkezik. Ezen kívül az <span class="button">Információk</span> gombot lenyomva jogi illetve elérhetőségi információkat is kaphatunk.<br />
+Az alábbi táblázat összefoglalja az alapértelmezett értelmezőket és a leggyakoribb opcióit.</p>
+<table summary="translators" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">BMP kép</span></td><td>24 bites, tömörítetlen, áttetszőség nem támogatott</td></tr>
+<tr><td><span class="menu">EXR kép</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym> nagy dinamikus tartományú (HDR) formátum</td></tr>
+<tr><td><span class="menu">GIF kép</span></td><td>8 bites, veszteséges tömörítés, áttetszőség támogatása<br />
+A fájl mérete csökkenthető a színek számának korlátozásával.<br />
+Készíthetünk áttesztő képeket is: ekkor vagy automatikusan az alfa csatorna lesz használva, vagy manuálisan is megadható az RGB színkód, mint áttesztő szín.</td></tr>
+<tr><td><span class="menu">JPEG2000 kép</span></td><td>24 bites, tömörített, áttetszőség nem támogatott<br />
+Csak a kimenet minőségére kell figyelni.</td></tr>
+<tr><td><span class="menu">JPEG kép</span></td><td>24 bites, tömörített, áttetszőség nem támogatott<br />
+A kimeneten lehet finomítani, viszont ekkor a kép elmosódhat.</td></tr>
+<tr><td><span class="menu">PCX kép</span></td><td>24 bites, tömörítetlen, áttetszőség nem támogatott, PC Paintbrush Exchange formátum</td></tr>
+<tr><td><span class="menu">PNG kép</span></td><td>32 bites, veszteségmentes tömörítés, áttetszőség támogatása</td></tr>
+<tr><td><span class="menu">PPM kép</span></td><td>24 bites, tömörítetlen, áttetszőség nem támogatott, Portable PixMap formátum</td></tr>
+<tr><td><span class="menu">RAW (nyers) kép</span></td><td>maximum 48 bites, tömörítetlen, áttetszőség nem támogatott</td></tr>
+<tr><td><span class="menu">RTF szöveg</span></td><td>Formázott szöveg</td></tr>
+<tr><td><span class="menu">SGI kép</span></td><td>24 bites, veszteségmentes tömörítés támogatása, áttetszőség támogatása</td></tr>
+<tr><td><span class="menu">StyledEdit szöveg</span></td><td>Formázott szöveg</td></tr>
+<tr><td><span class="menu">TGA kép</span></td><td>32 bites, veszteségmentes tömörítés támogatása, áttetszőség támogatása</td></tr>
+<tr><td><span class="menu">TIFF kép</span></td><td>24 bites, veszteségmentes tömörítés támogatása, rétegek támogatása, áttetszőség támogatása</td></tr>
+<tr><td class="onelinetop"><span class="menu">WonderBrush kép</span></td><td>32 bites, rétegek támogatása, áttetszőség támogatása, vektoros/képpontos adat</td></tr>
+</table>
+<p><br /></p>
+<div class="box-info">Képernyőképek, grafikonok, fekete és fehér képek illetve olyan képek, amik csupán néhány színt tartalmaznak vagy kis méretű képek esetében ajánlott GIF-ként (maximum 256 szín) vagy PNG-ként (több millió szín) elmneteni. JPEG esetében tömörítési hibák is előfordul(hat)nak, de a kép mérete kisebb lesz.</div>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="backgrounds.html">Hátterek</a> 
+::  <a href="../preferences.html" class="uplink">Beállítások</a> 
+::  <a href="deskbar.html">Asztalsáv (Deskbar)</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>LemezFürkész</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/diskprobe.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/diskprobe.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/diskprobe.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/diskprobe.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/diskprobe.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/diskprobe.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/diskprobe.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/diskprobe.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/diskprobe.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/diskprobe.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/diskprobe.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/diskprobe.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/diskprobe.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/diskprobe.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="deskcalc.html">Számológép</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="diskusage.html">Lemez-használat</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/diskprobe-icon_64.png" alt="diskprobe-icon_64.png" width="64" height="64" />LemezFürkész (DiskProbe)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/DiskProbe</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/DiskProbe_data</span></td></tr>
+</table>
+<p><br /></p>
+<p>A LemezFürkész egy hexadecimális szerkesztő és nézegető, ezen kívül pedig fájlokat és lemezeket tud módosítani bájt szinten. A használatával legyünk óvatosak, mert könnyedén okozhatunk problémát!</p>
+<div class="box-warning">Fájl esetében mindig biztonsági másolatból dolgozzunk, lemezek esetében pedig különösen oda kell figyelni.</div>
+<p>A program elindítása után választanunk kell, hogy egy fájllal vagy lemezzel akarunk dolgozni. Ezt követően a következő felület fogad minket:</p>
+<p><img id="diskprobe" src="../images/apps-images/diskprobe.png" alt="diskprobe.png" /></p>
+<p>A fő nézet mindig egy blokknyi adatot tartalmaz, aminek a mérete módosítható a <span class="menu">Nézet | Blokkméret</span> menüben. Bal oldalon a blokk lenyomata található, középen a hexadecimális értékek, és jobb oldalon pedig azok szöveges megfelelője ASCII karakterekkel.<br />
+A blokkok közt a fenti csuszkával mozoghatunk, vagy az <span class="key">ALT</span> <span class="key">←</span> és <span class="key">ALT</span> <span class="key">→</span> billentyűkkel, a hexadecimális és az szöveges oszlop között pedig a <span class="key">TAB</span> lenyomásával válthatunk.</p>
+<p>A <span class="menu">Blokk | Kijelölés</span> menü nem csak a kijelölést mutatja különféle endiánokkal (és hexadecimális vagy decimális formában, ami megadható a <span class="menu">Nézet | Számrendszer</span> menüben), de a kijelölés blokk-lenyomatát is, ahová mindjárt oda is ugorhatunk. Ez az opció nem érhető el, hogyha a pozíció kívül esik a fájlon/eszközön.<br />
+</p>
+<p>Ha az éppen megnyitott fájlnak jellemzői is vannak, akkor a <span class="menu">Jellemzők</span> menü használtó azok megnyitására egy új ablakban. Itt látható például a másolásvédelmi jellemzője a <span class="app">Névjegy</span> programnak:
+</p><p><img id="diskprobe-attribute" src="../images/apps-images/diskprobe-about-attr.png" alt="diskprobe-about-attr.png" /></p>
+<p>A jellemző típusától függően különféle szerkesztőket kaphatunk a jellemzőkhöz az állandóan használható <i>Nyers szerkesztő</i> mellett. Például a szöveg és a MIME típusok szerkeszthetőek, az ikonok megjeleníthetőek.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="deskcalc.html">Számológép</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="diskusage.html">Lemez-használat</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

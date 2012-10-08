@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Nyomkövető (Tracker)</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/tracker.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/tracker.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/tracker.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/tracker.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/tracker.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/tracker.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/tracker.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/tracker.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="teammonitor.html">Folyamatfigyelő (Team Monitor)</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="tracker-add-ons.html">Nyomkövető kiegészítők</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#mounting-volumes">Lemezek csatolása</a><br />
+	<a href="#navigating">Navigálás</a><br />
+	<a href="#appearance">Megjelenés</a><br />
+	<a href="#tracker-preferences">Beállítások</a><br />
+	<a href="#working-with-files">Munka a fájlokkal</a><br />
+	<a href="#transaction-status">Folyamatjelző</a>
+</td></tr>
+</table>
+
+<h1>Nyomkövető (Tracker)</h1>
+
+<p>A Nyomkövető egy grafikus felület a fájlokhoz. Használatával új fájlokat és mappákat hozhatunk létre vagy kereshetünk; elindíthatunk, átnevezhetünk, másolhatunk vagy törölhetünk már meglévőket.</p>
+<p>Programként (az Asztal mindössze egy teljes képernyős ablak a háttérben), mint az összes többi, a Nyomkövető is megjelenik az Asztalsávon, és ezt is be lehez zárni, illetve újra lehet indítani. A legegyszerűbb módja a meghibásodott Nyomkövető (ugyanakkor az Asztalsáv) újraindításának az, ha a <a href="teammonitor.html">Folyamatfigyelő</a>ben tesszük azt meg.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="mounting-volumes" name="mounting-volumes">Lemezek csatolása</a></h2>
+<p>Hogy hozzáférjünk a merevlemezekhez, CD-hez, USB lemezekhez, stb., elsőként csatolni kell, így a rendszer már használni tudja azt. Ezt megtehetjük az Asztalon vagy egy lemezen jobb gombbal kattitnva, majd a <span class="menu">Csatolás</span> menüből a szükségeset kiválasztva. Ugyan ilyen <span class="menu">Csatolás</span> menü található az Asztalsávon is.</p>
+<img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
+<p>Egy <span class="menu">Beállítások</span> menü is a rendelkezésünkre állt, így megadható, hogy ne kelljen minden esetben kézzel csatolni a szükséges lemezeket.<br />
+A fenti beállítás alapján a rendszer az összes elérhető BeOS lemezt automatikusan csatolni fogja, ugyanakkor indításkor a legutóbb használt lemezeket is csatolja majd.</p>
+<div class="box-warning">Miután eltávolítunk egy lemezt a gépből, előtte le kell választani azt. Ez a lépés garantálja, hogy minden adatátvitel sikeres volt. Ellenkező esetben adatvesztés történhet a lemezen!</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="navigating" name="navigating">Navigálás</a></h2>
+<p>Alap esetben ha duplán kattintunk egy mappán, akkor a Nyomkövető megnyit egy új ablakot. Ezzel a megoldással gyorsan túlzsúfolt lehet az Asztalunk.<br />
+Ez megelőzhető: tartsuk lenyomva az <span class="key">OPT</span> billentyűt, így a szülő mappa ablaka automatikusan bezárul.<br />
+Ez ugyan úgy igaz a billentyűzettel való navigálás esetén is. További információk a <a href="keyboard-shortcuts.html">Billentyűzet-kombinációk</a> fejezetben.</p>
+<p>A mappákkal történő munka a Nyomkövető egyik funkciója, épp úgy, mint a fájlkezelők esetében a többi operációs rendszernél. A Haiku-ban a Nyomkövetőnek van néhány sajátossága, ami növeli a hatékonyságot.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Menü navigáció</a></h3>
+<p>Ahelyett, hogy az almappákon végig kattintgatnánk, van erre egy egyszerűbb módszer is:</p>
+<img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
+<!-- screenshot needs updating to show /boot/system/documentation -->
+<p>Egy mappán jobb gombbal kattintva a hagyományos helyi menü tetején találunk egy almenüt, amivel navigálhatunk az adott mappán belül. Csak mennjünk végig az egész hierarchián, amíg meg nem találjuk az adott fájlt vagy mappát, amire szükségünk van. A fenti példában a <span class="path">/boot/apps/BePDF/</span> mappa tartalmát látjuk.<br />
+Ha egy fájlt megfogva hajtjuk ezt végre, akkor az abba a mappába kerül áthelyezésre, amelyikbe dobjuk (amelyiken az egér gombját felengedjük).</p>
+<p>Hasonló érhető el minden Nyomkövető ablakból is:</p>
+<img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
+<p>Kattintsunk a bal alsó sarokban található területre, ahol a megjelenített elemek száma látható, és ekkor megjelenik egy almenü, ahol szintről szintre megjelennek a mappák ahol a jelenlegi mappa található. Innen pedig szintén navigálhatunk a megjelenő mappákon belül.</p>
+<p>Itt megjegyzendő, hogy az Asztal mindig is a legfelső szintnek fele meg, ahol a lemezek is megjelennek. Tehát, ha egy másik lemezre szeretnénk menni, akkor elsőként a legfelső szintre kell navigálni, vagyis az Asztalra, és onnan már mehetünk a másik lemezre.</p><br />
+<p>Ugyan ez az almenü-navigáció jelenik meg, amikor egy fájlt egy mappa fölé húzunk. Miután rövid ideig felette tartjuk, a menü megjelenik, és így megkereshetjük azt, amelyikre szükségünk van. Ha a jobb egér gombbal indítottuk el a navigációt, akkor választhatunk másolás, mozgatás vagy hivatkozás létrehozása között az egér gombjának felengedése után.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="type-ahead" name="type-ahead">Fájlra ugrás billentyű leütés hatására</a></h3>
+<p>Ismerősnek tűnhet ez a funkció a más operációs rendszereken használatos fájlkezelőkből: az első néhány karaktert leütve az első egyező találatra ugrik a fájlálistában. A Haiku egy lépéssel tovább megy. Ha nincs olyan bejegyzés, ami a leütött karakterekkel kezdődik, akkor a bejegyzés nevében keres tovább, így ha a neve tartalmazza a megadott karaktereket, akkor arra a bejegyzésre ugrik amit elsőként így megtalál. Ha így sem talál egyet sem, akkor a jellemzők következnek.</p>
+<img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
+<p>A fenti példában sok olyan fájl van, ami "welcome"-al kezdődik, így ezt begépelve nem jutunk eredményre. Azonban, ha már a "hu" szót írjuk be, akkor már a "welcome_hu.html" nevű fájlra ugrik. A beírt karakterek a bal alsó sarokban jelennek meg, ott ahol normál esetben a bejegyzések száma látható. Egy másodperccel a karakter leütése után az ablak visszavált normál módra, így új keresés indítható.</p>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="type-ahead-filter" name="type-ahead-filter">Gépelés közbeni szűrés</a></h3>
+<p>Ahelyett, hogy egy fájlra ugranánk gépelés közben, arra is lehetőségünk van, hogy a keresésnek nem megfelelő találatok ne jelenjenek meg a listában. Ezzel a megoldással könnyedén lehet szűrni azokat a mappákat is, amelyek sok bejegyzést tartalmaznak. A <span class="key">SHIFT</span> <span class="key">SPACE</span>, mint elválasztó használatával több szóra is szűrhetünk egyszerre.<br />
+Ellentétben a billentyű leütésekor a fájlra ugró megoldással, itt a szűrés befejezéséhez vagy az <span class="key">ESC</span>-et kell leütni, vagy pedig az ablakot be kell zárni (illetve, ha egy ablakos böngészést használunk, akkor lépjünk egy szinttel fejjebb).<br />
+Ez a típusú szűrés beállítható a <a href="#tracker-preferences.html">Nyomkövető beállítások</a>nál.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="appearance" name="appearance">Megjelenés</a></h2>
+<img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
+<p>A Nyomkövető ablakok három különféle megjelenítést tesznek lehetővé, melyeket az <span class="menu">Ablak</span> menüben érünk el:</p>
+<ul>
+<li><p><span class="menu">Ikon nézet</span> (<span class="key">ALT</span> <span class="key">1</span>) - Nagy ikonok, melynek a mérete módosítható az almenüből, illetve az <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span> kombinációval.</p></li>
+<li><p><span class="menu">Mini ikon nézet</span> (<span class="key">ALT</span> <span class="key">2</span>) - Kicsi ikonok.</p></li>
+<li><p><span class="menu">Lista nézet</span> (<span class="key">ALT</span> <span class="key">3</span>) - Részletes lista a fájlokról a <i>jellemzők</i> megtekintésével illetve elrejtéssel. (További információk a <a href="attributes.html">Jellemzők</a> fejezetben.)</p></li>
+</ul>
+<p>Az <span class="menu">Ablak</span> menü több más funkciót is tartalmaz:</p>
+<ul>
+<li><p><span class="menu">Átméretezés hogy elférjen</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Az ablakot az ideális méretűre méretezi.</p></li>
+<li><p><span class="menu">Rendezés...</span> - Csak ikon és mini ikon nézetben érhető el, mikoris az alábbi lehetőségek közül választhatunk:</p>
+	<ul>
+	<li><p><span class="menu">Név</span>, <span class="menu">Valódi név</span>, <span class="menu">Méret</span>, <span class="menu">Módosítva</span>, <span class="menu">Létrehozva</span>, <span class="menu">Típus</span>, <span class="menu">Hely</span>, <span class="menu">Engedélyek</span></p></li>
+	<li><p><span class="menu">Fordított sorrend</span> - A rendezés irányának megváltoztatása.</p></li>
+	<li _translation_id="4339"><p><span class="menu">Rendrakás</span> (<span class="key">ALT</span> <span class="key">K</span>) - Az összes ikon egy képzeletbeli rácshoz való illesztése. A <span class="key">SHIFT</span>-et lenyomva tartva a menü átvált az <span class="menu">Összes rendezésé</span>re, ami ezen kívül még a megadott feltétel szerint sorba is rendezi azt.</p></li>
+	</ul></li>
+<li><p><span class="menu">Kijelölés...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - A fájlok kijelölése <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">általános kifejezés</a> alapján.</p></li>
+<li><p><span class="menu">Bezárás</span> (<span class="key">ALT</span> <span class="key">W</span>) - Az ablak bezárása. Tartsuk lenyomva a <span class="key">SHIFT</span> billentyűt és a menüben az <span class="menu">Összes bezárása</span> jelenik meg, ami az összes Nyomkövető ablakot bezárja.</p></li>
+<li><p><span class="menu">Bezárás minden munkaasztalon</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Az összes Nyomkövető ablakot bezárja a jelenlegi munkaasztalon. Ez hasznos lehet, ha elfelejtjük az <span class="key">OPT</span> billentyűt lenyomva tartani miközben megnyitjuk az újabb mappákat amivel "rendetlenséget" hagyunk magunk után.</p></li>
+</ul>
+<p>Néha csak néhány ikont szeretnénk rendezni anélkül, hogy a teljes <span class="menu">Rendrakás</span>t (<span class="key">ALT</span> <span class="key">K</span>) elvégeznénk. Ebben az esetben válasszuk ki a rendezni kívánt ikonokat, és mozgassuk azokat az új helyükre. Mielőtt oda húznánk az ikonokat, tartsuk lenyomva az <span class="key">ALT</span> billentyűt. Így az ikonok a rácshoz lesznek igazítva.</p>
+<p>A funkciók többsége magától értetődő.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tracker-preferences" name="tracker-preferences">Beállítások</a></h3>
+<p>Az <span class="menu">Ablak | Beálítások...</span> menü megnyit egy panelt, ahol több beállítás is található amik talán nem egészen egyértelműek. Mivel az összes beállítás módosítása élő, így azonnali eredménnyel jár.
+<br />Az alábbi beállítások érhetőek el:</p>
+<ul>
+<li><p><span class="menu">Asztal</span> - Eldönthetjük, hogy az összes csatolt lemez közvetlenül az Asztalon jelenjen meg, vagy egy külön ablakban, mely a Lemezek ikonnal nyithat meg.</p></li>
+<li><p><span class="menu">Ablakok</span> - Itt állítható be az <span class="menu">Egyablakos navigáció</span>, aminek hatására egy mappa megnyitásakor annak tartalma ugyan azon mappában jelenik meg. Ez nem ugyan az, mint amikor kattintás közben lenyomva tartjuk az <span class="key">OPT</span> billentyűt, mint már említettük, ugyanis most elveszítjük az ablak méretét és pozícióját is.
+<br /><br /></p>
+<img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
+<p>Mielőtt egy ablakos módba váltunk, ha az kézenfekvőbb, akkor azt ajánljuk, hogy előtte ki kell próbálni azt, ugyanis nem biztos, hogy sokkal gyorsabb lesz, mint az alap beállítás. Másrészről az egy ablakos böngészés egy <i>Navigátor</i> használatát is lehetővé teszi, ahová beírhatunk, másolhatunk vagy beilleszthetünk útvonal címet, továbbá tartalmaz egy vissza, előre és egy szinttel fejjebb gombot is.</p> 
+<p>A <span class="menu">Gépelés közbeni szűrés engedélyezése</span> funkció aktiválásával az ablak tartalmának szűrésekor az a bejegyzés (fájlnév vagy jellemző) jelenik majd meg, ami megfelel a szűrés feltételeinek. További részletek <a href="#type-ahead-filter">fejjebb</a>.</p></li>
+<li><p><span class="menu">Szemetes</span> - A fájlok törlésének módja.</p></li>
+<li><p><span class="menu">Lemez ikonok</span> - Megadható annak a sávnak a színe, ami a lemez ikonja mellett jelzi a lemez kihasználtságát.</p></li>
+</ul>
+<p>Ez a panel szintén elérhető <span class="app">Nyomkövető</span> néven az Asztalsáv <span class="menu">Beállítások</span> menüjében.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="working-with-files" name="working-with-files">Munka a fájlokkal</a></h2>
+<p>Ha aktiválunk egy fájlt, akkor a <span class="menu">Fájl</span> menüben lévő parancsok nagyrésze a helyi menüben is megtalálható.</p>
+<p>Mind mindig, a parancsok itt is egyértelműek.</p>
+<ul>
+<li><p><span class="menu">Keresés...</span> - Egy fájl vagy mappa megkeresése. További információk a <a href="queries.html">Lekérdezések</a> fejezetben.</p></li>
+<li><p><span class="menu">Új</span> - Készíthetünk új fájlt vagy mappát <i>sablon</i> alapján.
+<br /><br /></p>
+<img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
+<p>A <span class="menu">Sablonok szerkesztése...</span> megnyitja a <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> mappát. Az ebben a mappában létrehozott fájlok fognak megjelenni sablonként az <span class="menu">Új</span> menüben A sablon alapján kap a fájl egy nevet, illetve a jellemzői is megegyeznek a sablonéval. Jelen példában van egy "Text" fájlunk, aminek a típusa <tt>text/plain</tt>. További információk a <a href="filetypes.html">Fájltípusok</a> fejezetben.</p></li>
+<li><p><span class="menu">Megnyitás ezzel...</span> - Ez a menü tartalmazza az összes programot, ami kezelni tudja az adott fájlt.
+<br /><br /></p>
+<img src="images/tracker-images/open-with.png" alt="open-with.png" />
+
+<p>A listában az alapértelmezett program be van jelölve (az, ami dupla kattintással a fájlon megnyitja azt). A listában elsőként azok a programok jelennek meg, amik pontosan az adott típusú fájlok kezelésére szolgálnak, esetünkben: <tt>text/plain</tt>. Sorban ezek után jönnek azok a programok, melyek a fájl fő típusát kezelik (esetünkben: <tt>text/*</tt>). Végül pedig a listában azok jelennek meg, melyek bármit is tudnak kezdeni a fájllal. Ha nem egy programon kattintunk a menüben, hanem magán a <span class="menu">Megnyitás ezzel...</span> menün, akkor egy új panel nyílik meg:</p>
+<br /><br />
+<img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
+<p>Itt megintcsak megtaláljuk azokat a programokat, melyek a menüben is megjelentek. Egyet kiválasztva, majd a <span class="button">Megnyitás és előnyben részesítés</span> gombra nyomva megadható, hogy az összes ugyan ilyen típusú fájlt (esetünkben a <tt>text/plain</tt> típus) az adott programmal nyíssuk meg a későbbiekben.</p></li>
+<li><span class="menu">Információk</span>
+<br /><br />
+<img src="images/tracker-images/get-info.png" alt="get-info" />
+<p>Ez a panel információkat szolgáltat a kijelölt fájlról, lehetőséget nyújt az előnyben részesített program módosítására, és a panel alsó részének kinyitásakor a fájl engedélyei és tulajdonosa is változtatható. Az útvonalon kattitnva pedig megnyílik az a Nyomkövetőben.</p></li>
+<li><p><span class="menu">Név szerkesztése</span>, <span class="menu">Megdupláz</span> és <span class="menu">Mozgatás a Szemetesbe</span> - Egy fájl átnevezése, megduplázása vagy a Szemetesbe helyezése.</p></li>
+<li><p><span class="menu">Mozgatás</span>, <span class="menu">Másolás</span> és <span class="menu">Hivatkozás létrehozása</span> - Az almenün keresztül navigálva eljutunk abba a mappába, ahová a fájlt át szeretnénk másolni, mozgatni, vagy ahová hivatkozást szeretnénk létrehozni hozzá. A <span class="key">SHIFT</span>-et lenyomva tartva mikor megnyitjuk a menüt, relatív hivatkozás létrehozására lesz lehetőségünk.</p></li>
+<li><p><span class="menu">Kivágás</span>, <span class="menu">Másolás</span> és <span class="menu">Beillesztés</span> - A vágólap használatával kivághatunk, másolhatunk egy bejegyzést a mappából vagy beilleszthetünk egy bejegyzést a jelenlegi mappába. A <span class="key">SHIFT</span>-et lenyomva tartva pedig megjelenik a <span class="menu">Több kivágása/másolása</span> menü, ami több fájlon engedi elvégezni ezeket a műveleteket, amiket majd később beszúrhatunk egy másik mappába. Szintén a <span class="key">SHIFT</span>-et lenyomva tartva a kimásolt fájloknak a hivatkozását a vágólapra másolhatjuk.</p></li>
+<li><p><span class="menu">Azonosítás</span> -  Meghatározza a fájlok típusát, ha jelenleg még nem azonosítottak, például ha az internetről töltöttük le azt  <span class="cli">wget</span> használatával, ami nem állítja be letöltés után a fájl típusát. A menü megnyitásakor a <span class="key">SHIFT</span>-et lenyomva ez megváltozik <span class="menu">Kényszerített azonosítás</span>ra, ami megállapítja a fájl típusát, és kijavítja azt hibás típus esetén.</p></li>
+<li><p><span class="menu">Kiegészítők</span> - Az összes alap Nyomkövető kiegészítő és azok, melyek az adott fájlt képesek kezelni. További információk a <a href="tracker-add-ons.html">Nyomkövető kiegészítők</a> fejezetben.</p></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="transaction-status" name="transaction-status">Folyamatjelző</a></h2>
+<p>Amikor fájlt másolsz, mozgatsz, vagy törölsz, akkor a Nyomkövető egy folyamatjelzőt jelenít meg. Ha egyszerre több művelet is folyamatban van, akkor minden művelet egy külön folyamatjelzőt kap.</p>
+<img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
+<p>A jobb oldalon két gomb is található, melyekkel megállítható vagy leállítható az adtt művelet. Néha szükség lehet hosszabb folyamatok megállítására. Például ha gyorsan el kell indítanunk egy nagy programot. Nagy mennyiségű adatok másolásakor a lemez sok írást/olvasást végez, így lelassítja a munkát.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="teammonitor.html">Folyamatfigyelő (Team Monitor)</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="tracker-add-ons.html">Nyomkövető kiegészítők</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

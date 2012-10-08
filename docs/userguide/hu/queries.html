@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Lekérdezések</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/queries.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/queries.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/queries.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/queries.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/queries.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/queries.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/queries.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/queries.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/queries.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/queries.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/queries.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/queries.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/queries.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="index.html">Index</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="workshop-filetypes+attributes.html">Műhely</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#find-window">A kereső ablak</a><br />
+	<a href="#basic-query">Egyszerű lekérdezések - "név szerint"</a><br />
+	<a href="#adv-query">Összetett lekérdezések - "jellemzők szerint"</a><br />
+	<a href="#more-adv-query">Még összetettebb lekérdezések - "képlet alapján"</a><br />
+	<a href="#result-window">Az eredmény ablak</a><br />
+	<a href="#query-template">Keresési sablonok</a>
+</td></tr>
+</table>
+
+<h1>Lekérdezések</h1>
+
+<p>A lekérdezés nem más, mint fájlok keresése jellemzők alapján, és végrehajtható mind a Nyomkövetőben, mind a Terminálban. A lékérdezések (keresések) a <span class="path">/boot/home/queries/</span> mappában kerülnek eltárolásra, és alap esetben 7 nap után törli azokat a rendszer. Itt megjegyzendő, hogy ezek a keresések nem egy állandó eredmény tárolnak, hanem azok megnyitásakor a rendszer újra és újra végrehajtja a keresést.<br />
+Persze, nem csak e módon kaphatjuk meg a keresések eredményét. A <a href="tracker.html#navigating">menü navigációnak</a> köszönhetően egy elmentett keresésen jobb gombbal kattintva a helyi menüben is megjelenik a keresés eredménye.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="find-window" name="find-window">A kereső ablak</a></h2>
+<p>Új keresés indítható az Asztalsáv <span class="menu">Keresés...</span> menüjéből, bármely Nyomkövető ablakból, az Asztalról vagy épp az <span class="key">ALT</span> <span class="key">F</span> kombinációval. Minden esetben egy kereső ablakkal találkozunk:</p>
+<img src="images/queries-images/basic-query.png" alt="basic-query.png" />
+<ol>
+<li><p>Előző vagy mentett keresések megnyitása, vagy a jelenlegi paraméterek mentése <a href="#query-template">keresési sablon</a>ként.</p></li>
+<li><p>Keresés <span class="menu">Minden fájl és mappa</span> között, vagy megadott típusú fájlokban.</p></li>
+<li>A keresés módjának meghatározása:<ul>
+    <li><span class="menu">név szerint</span> - egyszerű keresés fájl vagy mappa nevek alapján</li>
+    <li><span class="menu">jellemző szerint</span> - keresés egy vagy több jellemző alapján</li>
+    <li><span class="menu">képlet alapján</span> - összetett keresési lehetőséget nyújt</li></ul></li>
+<li><p>Melyik lemezen keressen a rendszer.</p></li>
+<li><p>A keresés feltétele.</p></li>
+<li><p>További opciók megjelenítése/elrejtése..</p></li>
+<li><p>Az opció bejelölésekor a keresés csak <span class="menu">Ideiglenes</span>en kerül eltárolásra, és 7 nap után automatikusan törlődni fog.</p></li>
+<li><p>A rendszer <span class="menu">A Szemetesben is</span> keresni fog.</p></li>
+<li><p>Lehetőségünk van a keresésnek egy elnevezést is adni.</p></li>
+<li><p>Ezt az ikont bármely Nyomkövető ablakba történő húzásával a keresés gyorsan eltárolható. Ezt a jobb gombbal végrehajtva sablonként menti el a program a keresést.</p></li>
+</ol>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="basic-query" name="basic-query">Egyszerű lekérdezések - "név szerint"</a></h2>
+<p>Hacsak egyszerűen egy fájl vagy mappa nevében akarunk keresni a csatolt lemezeken, akkor a keresés módja <span class="menu">név szerint</span> történik. Ekkor csak a feltételt kell beírni a mezőbe, és lenyomni az <span class="key">ENTER</span>-t.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="adv-query" name="adv-query">Összetett lekérdezések - "jellemző szerint"</a></h2>
+<p>Egy új összetett keresés indítható, ha először megadjuk a fájl típusát, és a jellemző szerinti módot választjuk. Ehhez persze a jellemzőknek <a href="index.html">indexelve</a> kell lenniük.</p>
+<img src="images/queries-images/query-window.png" alt="query-window.png" />
+<p>A példában a fájl típusa a <span class="menu">Minden fájl és mappa</span> helyett <span class="menu">text | E-mail</span> és a keresés módja <span class="menu">jellemző szerint</span>.</p>
+<p>Ekkor megjelenik egy menü, egy beviteli mező és egy  <span class="button">Hozzáadás</span> és <span class="button">Eltávolítás</span> gomb. A menüből ki kell választanunk azt a jellemzőt, amire keresni szeretnénk. A <span class="button">Hozzáadás</span> és az <span class="button">Eltávolítás</span> gombbal további jellemzők is hozzáadhatóak, vagy meglévők törölhetőek. Több jellemző között És és Vagy kapcsolat közül választhatunk.</p>
+<p>Most hajtsunk végre egy keresést a leveleinkre:</p>
+<img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
+<p>Így néz ki egy keresési ablak, ha azokra a levelekre akarunk keresni, ahol a feladó neve tartalmazza a "trac" szót, a levél állapota új ("New"), és a levél tárgyában vagy a "Translator" vagy az "About" szó található.<br />
+Kereshetünk időben is: "last 2 months" (utóbbi 2 hónapban), "today" (ma), "yesterday" (tegnap), "Monday" (hétfőn) vagy "last Monday" (a legutóbbi hétfőn, vagy "last 2 minutes/hours/days/weeks" (az utóbbi 2 percben/órában/napon/héten).<br />
+Ez egy jó megoldás a keresés eredményének a számának a csökkentésére..</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="more-adv-query" name="more-adv-query">Még összetettebb lekérdezések - "képlet alapján"</a></h2>
+<p>Kézzel megírni egy keresési képletet hosszadalmas és nem is igazán praktikus.</p>
+<p>Ha már megadtunk minden jellemzőt és feltételt, akkor a <span class="menu">képlet alapján</span> mód választásakor megkapjuk az annak megfelelő képletet:</p>
+<img src="images/queries-images/formula-query.png" alt="formula-query.png" />
+<p>Kicsit olvashatóbb formában:</p>
+<pre>(((((MAIL:from=="*[tT][rR][aA][cC]*")
+       &amp;&amp;(MAIL:status=="[nN][eE][wW]"))
+       &amp;&amp;(MAIL:subject=="*[tT][rR][aA][nN][sS][lL][aA][tT][oO][rR]*"))
+       &amp;&amp;(MAIL:subject=="*[aA][bB][oO][uU][tT]*"))
+       &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
+<p>Mire is használható mindez?</p>
+<ul>
+<li><p>Levélben, fórumon vagy IRC-n keresztül is megosztható másokkal.</p></li>
+<li><p><span class="menu">Jellemzők</span> módban megadva a feltételeket miután átváltunk <span class="menu">képlet</span> módra a kapott szöveg (képlet) már felhasználható a parancssorban, így például szkriptek írásánál is.</p></li>
+<li><p>Tovább hangolható a képlet, ha helyettesítő karaktereket is használunk, figyelünk a betű-érzékenységre illetve ellentétes feltételeket adunk meg. Például: "<tt>==</tt>" helyett "<tt>!=</tt>" az És tagadásaként. Csupán az alapokat kell elsajátítanunk a <a href="http://hu.wikipedia.org/wiki/Regul%C3%A1ris_kifejez%C3%A9s" class="external free" title="Wikipedia: Regular expression">reguláris kifejezés</a> oldalon és esetleg egy kis szkriptelési ismereteket is szereznünk kell.</p></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="result-window" name="result-window">Az eredmény ablak</a></h2>
+<p>A keresés indítása után a kereső ablakot felcseréli az eredmény ablak. Itt egy példa a "server" szót tartalmazó találatokra:</p>
+<img src="images/queries-images/result-window.png" alt="result-window.png" />
+<p>A szürke háttértől függetlenül ez az ablak épp úgy működik, mint bármely Nyomkövető ablak. Néhány dolog talán még jobban is:</p>
+<ul>
+<li><p>Egy találat mappája megnyithat ha az útvonalon kattintunk.</p></li>
+<li><p>A <span class="menu">Fájl | Keresés szerkesztése</span> menüvel vagy az <span class="key">ALT</span> <span class="key">G</span> kombinációval visszajutunk a kereső ablakba, ahol módosíthatjuk a feltételeket.</p></li>
+<li><p>A keresés élő, vagyis például ha egy fájl, ami megfelel a keresési feltételnek és megjelenik a keresés helyén (azon a lemezen, ahol keresünk) vagy épp eltűnik onnan, akkor a változást azonnal látjuk az ablakban.</p></li>
+</ul>
+<p>Az eredmény ablak megjelenését a keresett fájltípusnak megfelelően alakíthatjuk ki. Ezt akár úgy is megtehetjük, hogy egy meglévő mappát megnyitunk, aminek megfelelő az elrendezése (a megfelelő oszlopok jelennek meg), és azt átmásoljuk a <span class="menu">Jellemzők | Elrendezés másolása</span> menüvel.</p>
+<p>Nyissuk meg a <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span> mappát, majd hozzunk létre egy új mappát <i>csoport/fájltípus</i> néven, ahol a "per" jelet kicseréljük egy aláhúzás jellel, például "audio_x-mp3". Ezután ezt megnyitva a <span class="menu">Jellemzők | Elrendezés beillesztése</span> menüt választva az előbb másolt elrendezést alkalmazhatjuk ezen a mappán.</p>
+
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-template" name="query-template">Keresési sablonok</a></h2>
+<p>Ha egy elmentett keresésen duplán kattintunk, akkor azonnal elkezdődik a keresés és mindjárt a keresés eredményét látjuk. Ugyanakkor nem biztos, hogy <i>épp ezeket</i> a keresési paramétereket akarjuk használni, hanem csak kicsit hangolni szeretnénk rajta.<br />
+A <span class="menu">Keresés mentése sablonként...</span> menüt választva (az <a href="#find-window">1-es pont</a> az első képen) vagy az ikont (10-es pont) egy Nyomkövető ablakba húzva jobb gombbal készíthetünk sablont. Ezen duplán kattitnva nem az eredmény ablakot nyitja meg, hanem a kereső ablakot lehetőséget adva a feltételek módosítására.</p>
+<p>Bárhová is hozzunk létre sablonokat, az megjelenik a kereső ablak menüjében.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="index.html">Index</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="workshop-filetypes+attributes.html">Műhely</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

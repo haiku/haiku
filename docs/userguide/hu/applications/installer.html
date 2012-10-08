@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Telepítő</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/installer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/installer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/installer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/installer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/installer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/installer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/installer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/installer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/installer.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="magnify.html">Nagyító</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Telepítő (Installer)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><i>Nincs</i></td></tr>
+</table>
+<p><br /></p>
+<p>A telepítő a Haiku egy megadott lemezre/partícióra másolására szolgál.<br />
+Indítás után fontos információk jelennek meg. Ez nem csak egy szerződés, ugyanis más fontos információt is tartalmaz:</p>
+<ul>
+<li><p>Ez csak egy alfa-állapotú szoftver. Készíts biztonsági másolatot az adataidról!</p></li>
+<li><p>A telepítő előkészített partíciót igényel. Használhatod a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a>-t vagy hasonló programot amíg a Haiku Lemezkezelője nem érik meg eléggé a feladatra.</p></li>
+<li>A Haiku manuálisan hozzáadható a <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>rendszertöltőhöz. Erről bővebben olvashatsz az interneten elérhető <a href="http://www.haiku-os.org/get-haiku/installation-guide">leírás</a>ban.</li>
+</ul>
+<p><br /><br /></p>
+<p><span class="button">Folytatás</span>, után az alábbi ablak fogad minket:</p>
+<img src="../images/apps-images/installer.png" alt="installer.png" />
+<p>Az első menüben meg kell adnunk a telepítés forrását. Jelenleg ez egy már telepített Haiku, vagy telepítő CD illetve USB lemez lehet.<br />
+A második menüben pedig a telepítés helyét kell kiválasztanunk. Ez a lemez/partíció felül lesz írva, és szükséges telepítés előtt előkészíteni például a GParted-el.</p>
+<p>A <i>Választható csomagok megjelenítése</i>-n kattintva ha vannak, akkor további csomagokati s telepíthetünk a Haiku-val együtt.</p>
+<p>Győzödjünk meg arról, hogy a megfelelő partíciót választottuk ki a telepítés helyének. Kattintson a <span class="button">Partíciók szerkesztése…</span> gombra a <a href="drivesetup.html">Lemezkezelő</a> megnyitásához a lemezek/partíciók ellenőrzéséhez és az információik megtekintéséhez.</p>
+<p> A <span class="button">Mehet</span> gomb megnyomásakor a telepítési folyamat elkezdődik, ami gyakorlatilag mindent átmásol (a <span class="path">home/</span> és a <span class="path">common/</span> mappákat is) a cél lemezre, majd indíthatóvá teszi azt.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tools" name="tools">Eszközök</a></h2>
+<p>A telepítés végeztével a partíció automatikusan indítható lesz. Ugyanakkor megeshet, hogy más operációs rendszerek vagy partícionáló programok (véletlenül) felülírják a rendszertöltőt a Haiku lemezen. Ebben az esetben indítsuk el újra a telepítőt. Válasszuk ki a telepített Haiku-t a <span class="menu">Hova</span> listából, majd pedig a <span class="menu">Rendszerbetöltő írása</span> menüpontot az <span class="menu">Eszközök</span> menüből, hogy újra indíthatóvá tegyük azt.</p>
+<p>A másik elem az <span class="menu">Eszközök</span> menüben a <span class="menu">Rendszerválasztó beállítása</span>, mely a rendszertöltőben egy menüt helyez el, minek segítségével választhatunk a telepített operációs rendszerek közül indításkor. További információk a <a href="bootmanager.html">Rendszerválasztó</a> fejezetben.<br />
+Nem szükséges a <span class="app">Rendszerválasztó</span> használata, ha már használunk másik rendszerválasztót, mint például a GRUB-ot, ahol manuálisan kell hozzáadnuk a listához a Haiku-t, illetve akkor sem szükségez, ha csak Haiku fut a gépen.</p>
+
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="magnify.html">Nagyító</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

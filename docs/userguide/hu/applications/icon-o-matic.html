@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!--
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Style-Type" content="text/css" />
+        <meta name="robots" content="all" />
+        <title>Icon-O-Matic</title>
+        <link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/icon-o-matic.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/icon-o-matic.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/icon-o-matic.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/icon-o-matic.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/icon-o-matic.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/icon-o-matic.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/icon-o-matic.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/icon-o-matic.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/icon-o-matic.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/icon-o-matic.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/icon-o-matic.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/icon-o-matic.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/icon-o-matic.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/icon-o-matic.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="expander.html">Kicsomagoló</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="installer.html">Telepítő</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td><a href="#bitmap-vector">BeOS bittérkép és Haiku vektoros ikon összevetése</a><br />
+                <a href="#icons-attributes">Az ikon jellemző</a><br />
+                <a href="#i-o-m">Ikon készítése az Icon-O-Matic használatával</a><br />
+                  <a href="#i-o-m-path">Útvonal</a><br />
+                  <a href="#i-o-m-shape">Formák</a><br />
+                  <a href="#i-o-m-style">Stílus</a><br />
+                  <a href="#i-o-m-transformer">Átalakító</a><br />
+                  <a href="#i-o-m-save">Ikon mentése</a><br />
+                  <a href="#i-o-m-tips">Tippek és trükkök</a></td></tr>
+</table>
+
+<h2><img src="../../images/apps-images/icon-o-matic-icon_64.png" alt="icon-o-matic-icon_64.png" width="64" height="64" />Icon-O-Matic</h2>
+
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/Icon-O-Matic</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/Icon-O-Matic</span></td></tr>
+</table>
+
+<p><br /></p>
+
+<p>Mielőtt az Icon-O-Matic használatával foglalkoznánk, előtte néhány mondat a Haiku ikonjairól.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="bitmap-vector" name="bitmap-vector">BeOS bittérkép és Haiku vektoros ikon összevetése</a></h2>
+<p>A BeOS bittérképes ikonjaival ellentétben a Haiku vektoros ikonokat használ. A Haiku Vector Icon Format (HVIF) a kis méretre és a gyors kirajzolásra lett optimalizálva. Éppen ezért az ikonok nagy része <i>sokkal</i> kisebb, mint a bittérkép vagy az SVG formátumúak esetén. Továbbá a BeOS 8 bites (256 szín) ikonjaival ellentétben a Haiku esetében nincs ilyen korlátozás.<br />
+Nézzük meg például a Terminál ikonját:</p>
+<table border="0" cellpadding="10">
+        <tr align="center"><td><b>Bittérkép</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
+        <tr align="center"><td><img src="../../images/apps-images/i-o-m-terminal-bitmap32.png" alt="i-o-m-terminal-bitmap32" width="32" height="32" /> <img src="../../images/apps-images/i-o-m-terminal-bitmap16.png" alt="i-o-m-terminal-bitmap16" width="16" height="16" /></td><td style="width:100px"><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td><td><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td></tr>
+        <tr align="center"><td>1,024 bájt<br />+ 256 bájt</td><td> 7,192 bájt </td><td> 768 bájt </td></tr>
+</table>
+<p>Itt érdemes megjegyezni, hogy a BeOS 2 fajta ikont használt, egy 16x16 és egy 32x32 képpont méretűt, hogy megfeleőlen nézzen ki mind Lista nézetben, mint pedig Ikon nézetben.</p>
+<p>Erre persze semmi szükség nincs vektoros ikonok használatakor. A vektoros ikonok méretezhetősége is sokkal jobb mint a bittérképeseké. (Megjegyzés: a BeOS csak 16x16 és 32x32 képpont méretű ikonokkal rendelkezett.)</p>
+<table border="0" cellpadding="10">
+        <tr align="center"><td> </td><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td><td><b>128x128</b></td></tr>
+        <tr align="center"><td><b>Bittérkép</b></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap16.png" alt="i-o-m-bitmap16" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap32.png" alt="i-o-m-bitmap32" width="32" height="32" /></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap64.png" alt="i-o-m-bitmap64" width="64" height="64" /></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap128.png" alt="i-o-m-bitmap128" width="128" height="128" /></td></tr>
+        <tr align="center"><td><b>Vektor</b></td>
+                <td><img src="../../images/apps-images/i-o-m-vector16.png" alt="i-o-m-vector16" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-vector32.png" alt="i-o-m-vector32" width="32" height="32" /></td>
+                <td><img src="../../images/apps-images/i-o-m-vector64.png" alt="i-o-m-vector64" width="64" height="64" /></td>
+                <td><img src="../../images/apps-images/i-o-m-vector128.png" alt="i-o-m-vector128" width="128" height="128" /></td></tr>
+
+</table>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="icons-attributes" name="icons-attributes">Az ikon jellemző</a></h2>
+<p>Az ikonokat a fájl jellemzőjeként tárolja a rendszer. Ugyanakkor, ez nem azt jelenti, hogy minden fájlnak rendelkezni-e kell ikon jellemzővel, ugyanis például az adatfájlok ikonjait a Nyomkövető a fájltípusok alapján jeleníti meg. Hogy rendszer szinten módosítsuk egy fájltípus ikonját, ahhoz a <span class="app">Fájltípusok</span> beállításait kell használni. Ha csak egy fájlnak akarjuk módosítani az ikonját, akkor használjuk a fájl <span class="app">Fájltípusok</span> kiegészítőjét. További információk a <a href="../filetypes.html">Fájltípusok</a> fejezetben.</p>
+<div class="box-info">Jellemző révén vegyük figyelembe, hogy csak a kiegészítő (meta) adatokat használni képes fájlrendszerek tudják megőrizni ezeket az ikonokat. Tehát, ha nem BFS lemezre másolunk fájlokat, akkor előtte csomagoljuk be azokat, más különben az ikonok és minden jellemző elvész.</div>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m" name="i-o-m">Ikon készítése az Icon-O-Matic használatával</a></h2>
+<p>Az Icon-O-Matic a Haiku ikonszereksztője, ami képes a készített képet HVIF, SVG vagy PNG formátumba menteni. Az ikon közvetlenül egy fájl jellemzőjeként vagy forrásfájlként is elmenthető. Mivel a program a HVIF formátumra szabott, a működése is erre összpontosul.</p>
+<p>A hagyományos vektor-grafikai programokkal ellentétben nem kell foglalkozni a különböző objektumokkal, mint az útvonalakkal, hosszal, színekkel, stb. Az objektumok ("alakzatok") inkább a közös útvonalakból és színekből ("stílusok") állnak össze, és mindegyiknek bizonyos tulajdonságaik is megadhatóak. Az elemek ezen fajta használata a titka a HVIF hatékonyságának. Bár, ez az ikon készítésekor néhány korlátozást eredményez, azért vannak előnyei is.<br />
+Például több objektum is módosítható együtt egy útvonal újrahasználásával. Gondoljunk csak egy objektumra és annak árnyékára. A közös útvonaluk módosításakor maga az objektum és az árnyéka is automatikusan módosul.</p>
+
+<p>Az Icon-O-Matic indításakor az alábbi ablakot kapjuk:</p>
+<img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
+
+<p>Hogy készítsünk egy objektumot, ahhoz szükségünk van alakzatra, útvonalra és stílusra. Ezekből akár többet is készíthetünk az <span class="menu">Alakzat</span> menüben. Minden objektumtípus (Útvonal, Alakzat, Átalakítás, Stílus) rendelkezik egy menüvel amiben többek között néhány parancs is megtalálható. Minden elemnek van több opciója is, melyek a <span class="menu">Tulajdonság</span> nézetben jelennek meg.</p>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-path" name="i-o-m-path">Útvonal</a></h3>
+<p>Egy útvonal több pontból áll, melyek vonallal vagy ívvel vannak összekötve. Egy pont hozzáadásakor vagy törlésekor az útvonalnak ki kell lennie jelölve a listában.</p>
+
+<p>Egyszerűen csak kattintsunk a vászonba az első pont megadásához. Miközben megadunk egy pontot, döntsük el, hogy egyenes vonalat hozunk majd létre, vagy ívet: egy egyszerű kattintás egyenes vonalat, míg az egér gombjának lenyomvatartása és az egér mozgatása ívet eredményez. Persze, ezt a későbbiekben is módosíthatjuk.</p>
+
+<img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" />
+
+<p>Hogy az "A"-ból "B"-t kapjunk, ahhoz néhány pontot át kell alakítani szögletes pontból íves pontra. Ekkor tartsuk lenyomva az <span class="key">ALT</span> billentyűt miközben egy ponton kattintunk és elhúzzuk a foggantyút. Ez egy szimmetrikus ívet eredményez: az egyik foggantyú mozgása követi a másikét. Ha a foggantyúkat egymástól függetlenül akarjuk mozgatni, akkor az <span class="key">ALT</span> lenyomásával mozgassuk a foggantyút.<br />
+Ugyan ezen a módon válthatunk íves-pontról szögletes pontra, miközben az <span class="key">ALT</span>-ot lenyomva tartjuk.</p>
+
+<p>Egy pont mozgatásához egyszerűen csak kattintsunk rá, és mozgassunk azt. Ha több pontot is ki akarunk választani, akkor tartsuk lenyomva a <span class="key">SHIFT</span>-et és rajzoljunk egy négyzetet. A kielölt pontok piros kerettel vannak jelölve (a szokásos fekete helyett).<br />
+Egy pont beszúrásához kattintsunk két pont közti összekötő vonalra.<br />
+A kijelölt pontok a <span class="key">DEL</span> lenyomásával törölhetőek vagy bármely ponton kattintva a <span class="key">CTRL</span> lenyomásával törölhető az (csak az az egy).</p>
+
+<p>A küllönféle egér kurzor az alábbi műveleteket jelzi:</p>
+<table summary="Mouse pointer states, Path" border="0" cellpadding="10">
+        <tr align="center">
+                <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-path" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-insert.png" alt="i-o-m-pointer-insert" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-add.png" alt="i-o-m-pointer-add" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-delete.png" alt="i-o-m-pointer-delete" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-bezier.png" alt="i-o-m-pointer-bezier" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-select.png" alt="i-o-m-pointer-select" width="16" height="16" /></td>
+        </tr>
+        <tr align="center">
+                <td>Pont mozgatása</td>
+                <td>Pont beszúrása</td>
+                <td>Pont hozzáadása</td>
+                <td>Pont törlése<br /><span class="key">CTRL</span></td>
+                <td>Szögletes↔Ív<br /><span class="key">ALT</span></td>
+                <td>Pontok kijelölése<br /><span class="key">SHIFT</span></td>
+        </tr>
+</table>
+<p>Egy pont (vagy kijelölt pontok) helyi menüjében a következőket találjuk:</p>
+<table summary="Path context" border="0" cellspacing="0" cellpadding="2">
+<tr><td class="onelinetop"><span class="menu">Mind kijelölése</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>A jelenlegi útvonal összes pontjának kijelölése. (A vászonon kattintva.)</td></tr>
+<tr><td><span class="menu">Átalakítás</span></td><td><span class="key">T</span></td><td>Az (összes kijelölt) pontot egy átalakító dobozva teszi, így azok egyszerre mozgathatóak, méretezhetőek és forgathatóak. Átalakítás után az <span class="key">ENTER</span> leütésével befejezhetjük a műveletet. Ez épp úgy működik, mint az alakzatok esetében, amiről a későbbiekben lesz szó.</td></tr>
+<tr><td><span class="menu">Szétvágás</span></td><td></td><td>A kijelölt pontból kettőt csinál, amik egymáson helyezkednek majd el a vágás után.</td></tr>
+<tr><td><span class="menu">Tükrözés</span></td><td></td><td>A kijelölt pontok elforgatása 180°-al. Ez csak az íves pontokon használható.</td></tr>
+<tr><td><span class="menu">Eltávolítás</span></td><td><span class="key">DEL</span></td><td>A kijelölt pont eltávolítása.</td></tr>
+</table>
+
+<h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Útvonal menü</a></h4>
+<p>Az <span class="menu">Útvonal</span> menü tartalmaz néhány nyilvánvaló bejegyzést, mint a<span class="menu">Téglalap hozzáadása</span>, a <span class="menu">Kör hozzáadása</span>, a <span class="menu">Megkettőzés</span> vagy az <span class="menu">Eltávolítás</span>. Ezekhez viszont némi magyarázat szükséges:</p>
+
+<table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Megfordítás</span></td><td style="width:15px;"></td><td>Ha az útvonal nem "zárt" (lásd alább), a vászonon kattintáskor minden esetben egy új pont jön létre a legutóbbihoz kapcsolva. A "Megfordítás" ezzel szembem az első ponthoz kapcsolja az újat.</td></tr>
+<tr><td><span class="menu">Tisztítás</span></td><td></td><td>Ez hasznos megnyitott SVG képek esetén a felesleges pontok törléséhez.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Forgatás jobbra</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Az útvonal forgatása. Ez akkor látványos, ha nem zárt útvonalat forgatunk. Tehát, ha az útvonal így néz ki: ⊂, akkor a következőképpen fog fordulni: ⊂ ∩ ⊃ ∪.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Forgatás balra</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Ugyan az, mint a másik, csak az ellenkező irányba.</td></tr>
+</table>
+
+<h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Útvonal tulajdonságai</a></h4>
+<p>A <span class="menu">Tulajdonságok</span> az ablak bal alsó részén a jelenleg kijelölt objektum elérhető beállításait tartalmazza. Az útvonalnak kettő szerkeszthető van: <span class="menu">Név</span> és hogy <span class="menu">Zárt</span> vagy nem.</p>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-shape" name="i-o-m-shape">Alakzat</a></h3>
+<p>Az alakzat egy vagy több útvonal és azok stílusának a csoportja, ami megjelenik a vásznon. A csoportosítás az útvonalak és a stílusok előtti jelölőnégyzettel történhet: csak jelöljük ki az alakzatot, és válasszuk ki a kívánt útvonalat és stílust.</p>
+<p>Egy alakzat határozza meg, hogy az útvonalat és a stílust hogyan használjuk. Például, az objektum ki van-e töltve vagy nem. Továbbá, az alakzat mozgatható, forgatható vagy átméretezhető anélkül, hogy egy útvonalhoz is hozzá nyúlnánk. Így, egy egyszerű útvonalat újra használhatunk és kaphatunk különféle, de egymáshoz kapcsolódó alakzatot.</p>
+
+<img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape" />
+
+<p>Ha egy alakzat ki van jelölve, akkor egy téglalap jelenik meg körülötte. Attól függően, hogy mely részén fogjuk meg, az alakzatot mozgathatjuk, átméretezhetjük vagy körbeforgathatjuk a középpontja körül, amit akár mozgathatunk is. A <span class="key">SHIFT</span> lenyomva tartásával mozgatáskor az irányt rögzíthetjük, forgatáskor pedig 45°-ban korlátozhatjuk azt illetve a méretarányt is megtarthatjuk méretezéskor. Az egér kurzor szintén jelzi a jelenlegi műveletet:</p>
+<table summary="Mouse pointer states, Shape" border="0" cellpadding="10">
+        <tr align="center">
+                <td><img src="../../images/apps-images/i-o-m-pointer-move-shape.png" alt="i-o-m- move-shape" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-resize.png" alt="i-o-m-pointer-resize" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-rotate.png" alt="i-o-m-pointer-rotate" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-rotation" width="16" height="16" /></td>
+        </tr>
+        <tr align="center">
+                <td>Mozgatás</td>
+                <td>Átméretezés</td>
+                <td>Forgatás</td>
+                <td>Forgatási pont<br />mozgatása</td>
+        </tr>
+</table>
+
+<p>Az alakzatok egymás felett helyezkednek el, mindegyik egy külön rétegen. Hogy változtassunk a régetek sorrendjén, a listában a régetegeket másik pozícióba kell húzni.</p>
+
+<h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">Alakzat menü</a></h4>
+<p>Az <span class="menu">Alakzat</span> menü az alábbi lehetőségeket nyújtja: <span class="menu">Hozzáadás, Hozzáadás útvonallal, Hozzáadás stílussal, Hozzáadás útvonallal és stílussal, Megkettőzés</span> és <span class="menu">Eltávolítás</span>. Továbbá:</p>
+<table summary="Shape menu" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Átalakítások visszaállítása</span></td><td style="width:15px;"></td><td>Az alakzaton alkalmazott összes mozgatás, méretezés és forgatás visszavonása.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Átalakítás rögzítése</span></td><td></td><td>Egy alakzat átalakításakor a hozzá rendelt útvonal(ak) eredeti pozíciója megmarad. Ha több alakzat is használja ugyan azt az útvonalat, akkor válasszuk a <span class="menu">Beállítások | Rácshoz illesztés</span> menüt, hogy pontosan megadjuk a pontokat.<br />
+Ha nem, akkor az "Átalakítás rögzítése" a jelenlegi alakzathoz rendelt útvonal(ak) átalakításaira lesz érvényes. Egy esetleges "Átalakítás visszaállítása" erre az új állapotra történik majd.</td></tr>
+</table>
+
+<h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Alakzat tulajdonságai</a></h4>
+<p>A <span class="menu">Név</span> és a <span class="menu">Tulajdonságok</span> menün kívül még az alábbi is a rendelkezésünkre áll:</p>
+
+<table summary="Shape properties" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Min RSz</span></td><td></td><td>Minimális részletességi szint</td></tr>
+<tr><td><span class="menu">Max RSz</span></td><td></td><td>Maximális részletességi szint</td></tr>
+</table>
+
+<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Részletességi szint</a></h5>
+<table summary="LOD example" border="0" cellpadding="10">
+        <tr align="center"><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td></tr>
+        <tr align="center">
+                <td><img src="../../images/apps-images/i-o-m-lod-icon_16.png" alt="i-o-m-lod-icon_16" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-lod-icon_32.png" alt="i-o-m-lod-icon_32" width="32" height="32" /></td>
+                <td><img src="../../images/apps-images/i-o-m-lod-icon_64.png" alt="i-o-m-lod-icon_64" width="64" height="64" /></td></tr>
+</table>
+<p>Ahogy látjuk, nincsenek számok a BeVexed 16 képpontos verziójában.
+Ez az alakzat "Részletességi szint" (RSz) beállításának köszönhető.<br />
+A részletességi szinttel szabályozható az alakzatok megjelenése a méret függvényében. Így azokat a részleteket kihagyhatjuk, melyek csak nagy méretű ikon esetén jelennek meg jól.</p>
+<p>Tehát, hogy is működik: az 1.0 RSz 64 képpontos ikon méretére lett meghatározva. Hogy megkapjuk az ikon méretének megfelelő RSz-t, egyszerűen csak el kell osztani azt 64-el. Például 16 képpontos ikon mérete esetében az RSz 16/64 = 0.25. Egy alakzat nem lesz látható a <span class="menu">Min RSz</span> alatt és a <span class="menu">Max RSz</span> felett.</p>
+<p>Ha beállítjuk egy alakzat <span class="menu">Min RSz</span> értékét 0.0-ra és a <span class="menu">Max RSz</span> értékét 0.5-re, akkor az azt jelenti, hogy az alakzat csak a maximum 32 képpont méretű ikon esetében jelenik meg. Ha a 32 képpontos ikont is ki akarjuk zárni, akkor az értéket 0.5-től kisebbre kell állítani, például 0.49-re.</p>
+<p>Az RSz nem csak kizárásra használható, hanem például ha szükséges, akkor a méret függvényében változhatnak a szélességek is. Ekkor csak meg kell kettőzni az alakzatot, elvégezni a szükséges módosításokat, majd mind a két esetben az RSz-t úgy megadni, hogy hol az egy egyik, hogy a másik jelenjen meg. Ekkor akaratlanul is bekövetkezhet egy kis zavart, ha az alakzatok RSz-ei között átfedés van. Ez azt eredményezi, hogy néhány méret esetén mind a kettő látható...<br />
+Például, ha az első alakzat csak 48-tól kisebb képpont méretű ikon esetében jelenik meg, akkor a második 48 képpont felett (RSz: 48/64 = 0.75):</p>
+
+<table summary="LOD values example" border="0" cellpadding="5">
+<tr align="center"><td></td><td colspan="2"><b>Helyes</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Hibás!</b></td></tr>
+<tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Alakzat 1</b></td><td>Min RSz</td><td>0.00</td><td>Min RSz</td><td>0.00</td></tr>
+<tr style="background-color:#F1F1F1"><td>Max RSz</td><td><span style="background-color:#33FF33">0.74</span></td><td>Max RSz</td><td><span style="background-color:#FF9977">0.75</span></td></tr>
+<tr><td colspan="6"></td></tr>
+<tr style="background-color:#F8F8F8"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Alakzat 2</b></td><td>Min RSz</td><td>0.75</td><td>Min RSz</td><td>0.75</td></tr>
+<tr style="background-color:#F8F8F8"><td>Max RSz</td><td>4.00</td><td>Max RSz</td><td>4.00</td></tr>
+</table>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-style" name="i-o-m-style">Stílus</a></h3>
+<p>A stílus lehet egyszerű szín, vagy átmenet.<br />
+A <span class="menu">Paletta</span> előre megadott színein felül egyénit is "kikeverhetünk". Az alsó csuszkával pedig az alfa-csatornát tudjuk megadni (áttetszőség).</p>
+<img src="../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients" />
+<p>Gyorsan készíthetünk egy új stílust ha kikeverünk egy színt, és a stílusok listájába dobjuk.</p>
+<p>Ha egy átmenetet akarunk készíteni, akkor meg kell adni annak típusát (<span class="menu">Egyenes</span>, <span class="menu">Sugaras</span>, <span class="menu">Rombusz</span>, <span class="menu">Kúpos</span>) és a kezdő és záró színt. Ezt megtehetjük, ha egy színt az átmenet alatti nyílra (színre) húzunk.<br />
+Természetesen, ezek a színek tetszés szerint mozgathatóak is. További színeket hozzáadhatunk, ehhez csak duplán kell kattintani az átmeneten. A <span class="key">DEL</span> lenyomásával pedig törölhető a kijelölt szín.</p>
+<p>Az átmenetet mozgathatjuk, átméretezhetjük és forgathatjuk az átmenetet jelképező dobozzal a vásznon addig, amíg el nem érjük a megfelelő eredményt. Ezek a műveletek épp úgy működnek, mint az alakzatok esetében.</p>
+
+<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Stílus menü</a></h4>
+<p>A <span class="menu">Stílus</span> menü a szokásos elemeket tartalmazza: <span class="menu">Hozzáadás</span>, <span class="menu">Megkettőzés</span>, <span class="menu">Eltávolítás</span> és <span class="menu">Átalakítás visszaállítása</span>.</p>
+
+<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Stílus tulajdonságai</a></h4>
+<p>A <span class="menu">Név</span> az egyetlen <span class="menu">Tulajdonság</span>.</p>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-transformer" name="i-o-m-transformer">Átalakító</a></h3>
+<p>Egy alakzatnak lehetnek átalakítói, melyek módosítját a megjelenését. Ezekkel finom változtatásokat hajthatunk végre.</p>
+
+<h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Átalakító menüje</a></h4>
+<table summary=" Transformer Add menu" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Körvonal</span></td><td></td><td>Egy körvonalat ad az alakzathoz.</td></tr>
+<tr><td><span class="menu">Kihúzás</span></td><td></td><td>Kiemeli az útvonalat az alakzat sílussal való kitöltése helyett.</td></tr>
+</table>
+
+<p>Az átalakítók függvényében változik a tulajdonságok listája.</p>
+
+<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Átalakító tulajdonságai</a></h4>
+<p>Az átalakítóhoz a <span class="menu">Név</span> és a <span class="menu">Szélesség</span> beállításain túl az alábbiakat is módosíthatjuk a <span class="menu">Tulajdonságok</span> között:</p>
+<table summary="Transformer properties" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Vonalvég</span></td><td style="width:15px;"></td><td><i>Kihúzás esetén</i>. A vonalvégek megadása: <span class="menu">Lapos</span>, <span class="menu">Kerek</span> vagy <span class="menu">Szögletes</span>.</td></tr>
+<tr><td><span class="menu">Tájolás érzékelése</span></td><td></td><td><i>Körvonal esetén</i>. A körvonal az útvonalon belül vagy azon kívül helyezkedik el.</td></tr>
+<tr><td><span class="menu">Csatlakozási pontok</span></td><td></td><td>A pontok vonalhoz kapcsolódása: <span class="menu">Süveg</span>, <span class="menu">Kerek</span> vagy <span class="menu">Kúp</span>.</td></tr>
+<tr><td><span class="menu">Süveg korlát</span></td><td></td><td>Csak ha a fenti <span class="menu">Csatlakozási pontok</span> "Süveg"-ként vannak megadva. Ez a beállítás befolyásolja a szüveg megjelenését a csatlakozási pontok esetén. </td></tr>
+</table>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-save" name="i-o-m-save">Ikon mentése</a></h3>
+<p>A program ablaka rendelkezik a hagyományos menüvel: <span class="menu">Fájl</span>, <span class="menu">Szerkesztés</span>, <span class="menu">Beállítások</span>. Ezek elég egyértelműek, így most csak a mentésről lesz szó.</p>
+<p>A <span class="menu">Fájl | Mentés másként...</span> egy speciális Icon-O-Matic formátumba menti el az ikont néhány további információval, mint például útvonal, alakzat illetve stílus nevek. Ezeket az információkat helytakarékosság miatt eltávolítjuk az ikon mentésekor. Így ez egy remek ötlet, hogy ezekről az adatokról készüljön egy biztonsági másolat, mivel a későbbiekben már csak az objektumok neveit (például "&lt;path&gt;/&lt;shape&gt;/&lt;style&gt;") látjuk majd, aminek az értelmezése elég fárasztó lehet.</p>
+
+<p>A <span class="menu">Fájl | Exportálás másként...</span> hasonló mentés panelt nyit meg, de itt már a formátum választó menü is elérhető:</p>
+<table summary="file formats" border="0" cellspacing="0" cellpadding="2">
+<tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku Vector Icon Format</td></tr>
+<tr><td>HVIF RDef</td><td></td><td>Programozók által használt forrásfájl</td></tr>
+<tr><td>HVIF forráskód</td><td></td><td>Programozók által használt forráskód</td></tr>
+<tr><td>SVG</td><td></td><td>Mentés SVG képként</td></tr>
+<tr><td>PNG összeállítás</td><td></td><td>Mentés 64 képpont méretű PNG képként</td></tr>
+<tr><td>PNG YxY</td><td></td><td>Mentés 16, 32 és 64 képpont méretű PNG képként</td></tr>
+<tr><td>BEOS:ICON jellemző</td><td></td><td>Mentés közvetlenül egy kiválasztott fájl ikon jellemzőjeként</td></tr>
+<tr><td>META:ICON jellemző</td><td></td><td>Csatolás közvetlenül egy kiválasztott fájlhoz kiegészítő (meta) adatként</td></tr>
+</table>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-tips" name="i-o-m-tips">Tippek és trükkök</a></h3>
+<p>Néhány dolgot észbe kell tartani a program használatakor, illetve akad néhány jó ötlet is a használathoz:</p>
+<ul>
+<li><p>Az <a href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/icon_guidelines/index.html">Icon Guidelines</a> (leírás az ikonokhoz) tartalmazza a Haiku alatt használt ikonok karakterisztikáját, mint például a színeket, vagy az árnyékokat.</p></li>
+<li><p>Próbáljuk meg minimalizálni a használt útvonalak számát, ugyanis ezek befolyásolják a fájl méretét. Ha lehet, használjuk újra az útvonalakat és inkább használjunk módosított alakzatokat azok átalakítása helyet. Az átmenetek okos használatával szintén takaríthatunk meg helyet.</p></li>
+<li><p>Ha csak lehetséges, használjuk a Rácshoz illesztést a <span class="menu">Beállítások</span> menüből az útvonalak szerkesztésekor. Ha az útvonal pontjai a 64x64-es rácshoz illeszkednek, akkor azzal a méret csökkenthető. Akkor is jobb megjelenést kapunk, ha a pontokat a képpontok határához igazítjuk. Például fontos, hogy a jelentősebb körvonalakat egymáshoz igazítsuk a 16x16-os rácshoz.</p></li>
+<li><p>Ellenőrizzük le az előnézeti mezőben, hogy helyesen jelenik-e meg az ikon 16x16-os méretben. Ajánlott a <a href="#i-o-m-shape-lod">Részletességi szint</a> használata, amiről az Alakzat részben volt szó.</p></li>
+<li><p>A karakterek ikonhoz adásának van egy egyszerű módja (ugyanis a program nem tartalmaz túl sok eszközt a szerkesztéshez). Csak írjuk meg a szöveget egy szövegszerkesztőben, például a StyledEdit-ben, állítsuk be a megfelelő betűtípust és stílust, majd dobjuk be az Icon-O-Matic ablakba, vagy használjuk a vágólapot. Ebből a program létrehozza az alakzatot és az útvonalakat.</p></li>
+<li><p>Ha egy vagy több útvonalat rendelünk egy alakzathoz, akkor azok egymás területeit is átfedik. Ha egy útvonal egy másikon belül helyezkedik el, akkor az egy lyukat eredményez az alakzatban.</p></li>
+<li><p>A vászon kicsinyíthető vagy nagyítható az egér görgőjével, illetve mozgatható a középső gombbal vagy a bal egérgombbal a <span class="key">SZÓKÖZ</span> lenyomva tartása közben.</p></li>
+</ul>
+
+
+<!--
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-workshops" name="i-o-m-workshops">Workshops</a></h3>
+<p>The above is of course quite theoretical. The best way to learn using Icon-O-Matic is by experimenting. To get you started and once more show the basics, have a look at these short clips:</p>
+<ul>
+<li><a href="">Paths</a></li>
+<li><a href="">Shapes</a></li>
+<li><a href="">Styles</a></li>
+<li><a href="">Transformers</a></li>
+<li><a href="">Optimizing icons</a></li>
+<li><a href=""></a></li>
+</ul>
+-->
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="expander.html">Kicsomagoló</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="installer.html">Telepítő</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Installer</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/installer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/installer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/installer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/installer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/installer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/installer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/installer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/installer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/installer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/installer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/installer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/installer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="magnify.html">Magnify</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
+
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><i>nenhuma</i></td></tr>
+</table>
+<p><br /></p>
+<p>The Installer is used to copy Haiku onto another volume.<br />
+Upon launch it displays a start window with important information. It's not a mindless EULA you're used to click away in the blink of an eye, it states:</p>
+<ul>
+<li><p>This is alpha-quality software. Make backups or suffer the consequences!</p></li>
+<li><p>The Installer needs a prepared partition. You may have to use a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> or a similar tool until Haiku's DriveSetup is mature enough to handle this task.</p></li>
+<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
+</ul>
+<p><br /><br /></p>
+<p>Once you acknowledged with <span class="button">Continue</span>, you're presented with the main window:</p>
+<img src="../images/apps-images/installer.png" alt="installer.png" />
+<p>In the first pop-up menu you choose the source for the installation. It can be a currently installed Haiku or can come from an install CD or USB drive, etc.<br />
+The second pop-up menu specifies the target for the installation. This target partition/volume will be completely overwritten and has to be set aside beforehand by a partitioning tool like GParted.</p>
+<p>Clicking the little expander widget will <i>Show optional packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
+<p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
+<p><span class="button">Begin</span> starts the installation procedure, which basically copies everything but the <span class="path">home/</span> and <span class="path">common/</span> folder onto the target volume and makes it bootable.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tools" name="tools">Tools</a></h2>
+<p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please choose target</span> menu and select <span class="menu">Write boot sector</span> from the <span class="menu">Tools</span> menu to make it bootable again.</p>
+<p>The other item in the <span class="menu">Tools</span> menu is used to <span class="menu">Set up a boot menu</span> that puts a menu in the boot sector to choose what operating system to boot. See topic <a href="bootmanager.html">BootManager</a> for more information.<br />
+ You don't need to run the <span class="app">BootManager</span> if you already use a bootmanager like GRUB, in which case you have to add Haiku manually (see above), or Haiku runs exclusively on your machine.</p>
+
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="magnify.html">Magnify</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

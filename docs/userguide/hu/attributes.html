@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Jellemzők</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/attributes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/attributes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/attributes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/attributes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/attributes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/attributes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/attributes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/attributes.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="filetypes.html">Fájltípusok</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="index.html">Index</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Jellemzők</h1>
+
+<p>A jellemzők azok adatmezők, amik a fájlhoz tartoznak, ám mégsem a fájl részei, például a méret számításánál nem játszanak szerepet, és anélkül másolhatóak, vagy módosíthatóak, hogy a fájlhoz hozzányúlnánk. A rendszer ezeket a jellemzőket használja például a fájl mérete, típusa vagy az utolsó módosítás idejének tárolására. Ez hasonlít a többi operációs rendszerben megszokottakhoz.</p>
+<p>Amiben különbözik az az, hogy bármilyen jellemzőt bármilyen fájlhoz hozzá tudunk adni, és megjeleníteni, szerkeszteni is tudjuk egy Nyomkövető ablakban. Pontosan meg kell határozni a fájlhoz adandó jellemző típusát (például string (szöveg), integer (szám) vagy time (idő)), a nevét és leírást.</p>
+<p>A fájlnak ugyanakkor nem kell, hogy legyen bármilyen tartalma. Példának nézzük meg ezeket a névjegyeket:</p>
+<img src="images/attributes-images/people.png" alt="people.png" />
+<br />
+<p>Amint látja, ezek mind 0 méretű fájlok hozzájuk csatolt jellemzőkkel, ahol "Erős István" E-mail jellemzője éppen szerkesztés alatt áll a Nyomkövetőben.</p>
+<p>Ha ezeket a jellemzőket még indexeljük is, mint a névjegyeket, leveleket vagy audió fájlokat alap esetben, akkor ezek szintén kereshetőek lesznek a Haiku gyors kereső rendszerében.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="attributes-tracker" name="attributes-tracker">Jellemzők a Nyomkövetőben</a></h2>
+<p>A jellemzők megjelenítése nagyon hasonlít egy adatbázis- vagy táblázatkezelőhöz. A Nyomkövetőben megadható, hogy mely jellemzők jelenjenek meg (oszlopok) és hogy hogyan akarjuk rendezni a fájlokat (sorokat).</p>
+<p>Ehhez nyissunk meg egy Nyomkövető ablakot, kattintsunk a <span class="menu">Jellemzők</span> menüre, és válasszuk ki azt, amit meg szeretnénk jeleníteni. Ezen kívül az oszlopfejléceken jobb gombbal kattitntva is ki meg tudjuk őket adni. Az oszlopokat is átrendezhetjük, csupán az egérrel mozgassuk az oszlopfejléceket. A nem kívánt oszlopot kihúzva az ablakból gyorsan eltüntethetjük azt.</p>
+<p>A két oszlop közti vonalon duplán kattintva az oszlopok szélessége az optimális méretre állíthatóak.</p>
+<p>Az oszlopfejlécen kattintva növekvő vagy csökkenő sorrendbe rendezhetjük a listát. Másodlagos rendezés is megadható, ehhez csupán lenyomva kell tartani a <span class="key">SHIFT</span> billentyűt, mialatt az egérrel az következő oszlopon kattintunk. Épp úgy lehet például a névjegyeket egyidejűleg rendezni cég szerint és név szerint. A fenti képernyőképen látható is erre egy példa. A másodlagos rendezés halvány színű jellel van feltüntetve az oszlopfejlécen.</p>
+<p>Ezen jellemzők szerkesztése épp olyan egyszerű, mint átnevezni egy fájlt: csak kattintsunk egy bejegyzésen, vagy nyomjuk le az <span class="key">ALT</span> <span class="key">E</span> kombinációt, majd keressük meg a módosítandó jellemzőt a <span class="key">TAB</span> és <span class="key">SHIFT</span> <span class="key">TAB</span> billentyűkkel. <span class="key">ESC</span> lenyomásakor a szerkesztés félbeszakad a módosítások mentése nélkül.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="attributes-terminal" name="attributes-terminal">Jellemzők a Terminálban</a></h2>
+<p>Ha a parancssort részesíted előnyben, vagy szkriptek írását tervezed, akkor több parancs is a rendelkezésedre áll, amikkel kezelni tudod a jellemzőket a Terminálban.</p>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="listattr" name="listattr">listattr</a></h3>
+<p>A <span class="cli">listattr</span> megjeleníti a fájl összes jellemzőjét a hozzájuk tartozó adatok nélkül.</p>
+<pre>használat: listattr 'fájl' ['fájl' ...]</pre>
+<p>Például:</p>
+<pre class="terminal"> ~/people -&gt;listattr Ecet\ Tibor
+File: Ecet Tibor
+        Type       Size  Name                                
+----------------------------------------------------------
+ MIME String        21  "BEOS:TYPE"
+        Text        11  "META:name"
+        Text         7  "META:nickname"
+        Text         1  "META:company"
+        Text        14  "META:country"
+        Text         6  "META:state"
+        Text         5  "META:zip"
+        Text         7  "META:city"
+        Text        15  "META:address"
+        Text        17  "META:hphone"
+        Text         1  "META:wphone"
+        Text         1  "META:fax"
+        Text         1  "META:url"
+        Text        21  "META:email"
+        Text        12  "META:group"
+
+    Raw Data        20  "_trk/pinfo_le"
+ 
+140 bytes total in attributes.</pre>
+<p>Azon túl, hogy a "<tt>META:*</tt>" jellemzők tartalmazzák a névjegy adatait, két másik jellemzőt is kezel a rendszer:</p>
+<ul>
+<li><p>A <tt>BEOS:TYPE</tt> tartalmazza a fájl típusát, mint <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> szöveget, esetünkben "<tt>application/x-person</tt>". Ez alapján megkapjuk az alapértelmezett ikont és a programot, mely kezeli a fájlt.</p></li>
+<li><p>A "<tt>_trk/pinfo_le</tt>" jellemző tartalmazza a Tracker-ben az ikon pozícióját.</p></li></ul>
+<div class="box-info">Magyarázatra szorul a vissza-perjel a névben. A Terminálban a speciális karaktereket, mint például <tt>'"*\$?!</tt> kilépő karakterrel kell "jelölni". A szóköz a névben épp ilyen. Tehát, a vissza-perjel (kilépő karakter) az a szóköz előtt van, nem pedig a név után.</div>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="catattr" name="catattr">catattr</a></h3>
+<p>A <span class="cli">catattr</span> megjeleníti a megadott jellemzőhöz tartozó adatot.</p>
+<pre>használat: catattr [--raw|-r] jellenző_neve fájl1 [fájl2...]</pre>
+<p>Például:</p>
+<pre class="terminal"> ~/people -&gt;catattr META:city Ecet\ Tibor
+Ecet Tibor : string : Hatvan</pre>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="addattr" name="addattr">addattr</a></h3>
+<p>Az <span class="cli">addattr</span> hozzáad egy jellemzőt a fájlhoz és/vagy adatokkal tölti fel.</p>
+<pre>használat: addattr [-t type] jellemző érték fájl1 [fájl2...]
+    vagy: addattr [-f érték-fájlból] [-t type] jellemző fájl1 [fájl2...]
+ 
+         A typus ezek egyike:
+                 string, mime, int, llong, float, double, bool, icon, raw
+                 vagy szám-érték (például 0x1234, 42, 'ABCD', ...)
+         Az alapértelmezett a "string"</pre>
+<p>Nos, tegyük fel, hogy Tibor elválal egy állást a Cukor Kft-nél, így most feltöltünk egy eddig üres jellemzőt adattal (aminek a típusa "string" (szöveg)):</p>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Cukor\ Kft Ecet\ Tibor
+</pre>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="rmattr" name="rmattr">rmattr</a></h3>
+<p>Az <span class="cli">rmattr</span> egy teljes jellemzőt kitöröl a fájlból.</p>
+
+<pre>használat: rmattr [-p] jellemző fájl1 [fájl2...]
+         'jellemző' a fájl egyik jellemzőjének a neve
+         Ha a '-p' meg van adva, akkor a 'jellemző' mintaként szolgál.</pre>
+<p>Például a "Fax" jellemzőt üresen is hagyhatjuk, de teljesen ki is törölhetjük azt:</p>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Ecet\ Tibor</pre>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="copyattr" name="copyattr">copyattr</a></h3>
+<p>A <span class="cli">copyattr</span> jellemzőket másol egy vagy több fájlból egy másik fájlba. Alap esetben a fájl tartalma <b>nem</b> kerül átmásolásra.</p>
+<pre>használat: copyattr &lt;opciók&gt; &lt;honnan&gt; [ ... ] &lt;hova&gt;</pre>
+
+<p>Ha a jellemzők másolásával együtt magát a fájlt is át szeretné másolni, akkor adja meg a "<span class="cli">-d</span>" vagy a "<span class="cli">--data</span>" opciót is.</p>
+
+<p><br /></p>
+<p>További segítséget kaphatsz ezekről a parancsokról, illetve az opciókról ha a parancs után megadod a "<span class="cli">-h</span>" vagy a "<span class="cli">--help</span>" opciót.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="filetypes.html">Fájltípusok</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="index.html">Index</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

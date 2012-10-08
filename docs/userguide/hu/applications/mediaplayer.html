@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!--
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *		Szymon Barczak (Google Code-In student)
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Médialejátszó</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/mediaplayer.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/mediaplayer.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/mediaplayer.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/mediaplayer.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/mediaplayer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/mediaplayer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/mediaplayer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/mediaplayer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/mediaplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/mediaplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/mediaplayer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/mediaplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/mediaplayer.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/mediaplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="mail.html">Levelezés</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="midiplayer.html">Midilejátszó</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />Médialejátszó (MediaPlayer)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/MediaPlayer</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
+</table>
+<p><br /></p>
+<p>A Médialejátszó az alapértelmezett zene és videó lejátszó program. Az <a href="http://www.ffmpeg.org/">ffmpeg</a>-nek köszönhetően a formátumok széles palettája támogatott. Bár a felület egyszerű, mégis az összes főbb vezérlőt tartalmazza:</p>
+<img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
+<p>A csuszka a folyamatjelzőn a lejátszási pozíciót jelzi, és azzal módosítható is az, az egeret pedig felette tartva megjelenik az aktuális lejátszási idő és a hátralévő idő. A jobb oldalon lévő időre kattintva válthatunk az aktuális idő, a teljes hossz és a hátralévő idő között.<br />
+Alatta találhatóak a hagyományos vezérlők (előző, lejátszás/folyatás, megállítás, leállítás, következő). Majd a hangerőszabályzó (a hangszóró ikonra kattintva elnémíthatjuk a lejátszót) és a VU-méter foglal helyet.</p>
+
+<h2>Audió és videó lejátszás</h2>
+<p>Mivel az audió lejátszásnak nincs semmilyen különösebb funkciója, ezért a videó részének a leírását taglaljuk.</p>
+<img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
+<p>Minden média-fájlról hasznos információkat kaphatunk az <span class="menu">Információk...</span> (<span class="key">ALT</span> <span class="key">I</span>) menüpontból. Ekkor az összes információt megkapjuk a megnyitott fájlról, mint például az időtartamot, a hang és a videó-sáv tulajdonságait.</p>
+<p>A leggyakoribb funkciók a videó-terület helyi menüjéből is elérhetőek. Ez igaz a teljes képernyős módra is.<br />
+A <span class="menu">Videó</span> menü alatt találjuk a méretező opciókat, illetve a méret-arány módosítását. A méretarány általában az eredeti, a <span class="menu">videó beállítása szerinti</span> arány a legmegfelelőbb beállítás.</p>
+<p>A lejátszó használni tudja az <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> formátumú feliratokat. Hogy megjelenjen(ek) a <span class="menu">Feliratok</span> menüben, a fájl nevet úgy kell meghatározni, hogy a név eleje egyezzen a videó nevével, majd a nyelv azonosítója/elnevezése, végül pedig a ".srt" kiterjesztés (nem pedig a videó fájl kitejesztése). Például:</p>
+<pre>Film.avi
+Film.Magyar.srt
+Film.English.srt
+Film.Français.srt</pre>
+<p>A több hangsávot tartalmazó videók esetében a különféle hangsávok közül az <span class="menu">Audiósáv</span> almenüből választhatunk. A <span class="menu">Videó | Sáv</span> menüben választhatunk több videósáv közül, ha egynél több áll a rendelkezésünkre.</p>
+<p><span class="menu">Teljes képernyő</span>s módba válthatunk (<span class="key">ALT</span> <span class="key">ENTER</span> vagy <span class="key">F</span> vagy dupla-kattintás), a <span class="menu">Vezérlők elrejtésé</span>vel (<span class="key">ALT</span> <span class="key">H</span> vagy dupla kattintás jobb gombbal) elrejthetjük a lejátszó keretét és a vezérlőit illetve megadhatjuk, hogy az ablak <span class="menu">Mindig felül legyen</span> (<span class="key">ALT</span> <span class="key">A</span>).</p>
+
+<h2>Lejátszólista</h2>
+<p>A <span class="menu">Médialejátszó | Lejátszási lista...</span> (<span class="key">ALT</span> <span class="key">P</span>) megnyit egy ablakot, ahol a jelenleg a listához adott fájlokat látjuk. Duplakattintással a fájlon annak lejátszása elindul.</p>
+<img src="../images/apps-images/mediaplayer-playlist.png" alt="mediaplayer-playlist.png" />
+<p>Új fájlokat is hozzáadhatunk (az ablakba húzással), illetve a meglévőket áthelyezhetjük a listában azok mozgatásával. A <span class="menu">Szerkesztés</span> menüből <span class="menu">Véletlenszerű</span>en rendezhetjük a listát vagy az <span class="menu">Eltávolítás</span>sal (<span class="key">DEL</span>) egy bejegyzést törölhetünk a listából, vagy akár a <span class="menu">Fájl Szemetesbe helyezésé</span>t (<span class="key">ALT</span> <span class="key">T</span>) is választhatjuk a kijelölt fájlnak.</p>
+<p>Természetesen, a listát meg is őrizhetjük a <span class="menu">Mentés</span> menüvel, illetve a <span class="menu">Megnyitás</span>sal vagy a fájlon való dupla kattintással újra betölthetjük azt.</p>
+
+<h2>Beállítások</h2>
+<p>Néhány beállítási lehetőséget kapunk a beállítások panelen:</p>
+<img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
+<p>Az első szakasz, a <span class="menu">Lejátszás módja</span>, magától értetődő. A lejátszás indítása automatikusan, az ablak bezárása a lejátszás végeztével illetve a lejátszás ismétlése.</p>
+<p>A következő szakasz a <span class="menu">Megjelenítési beállítások</span>.<br />
+Bejelölhető a <span class="menu">Hardveres gyorsítás használata ha elérhető</span>, ami lehetővé teszi a CPU terheltségének csökkentését, de csak akkor működik, ha egy videó ablak van megnyitva, illetve ha a grafikus kártya és a vezérlője támogatja azt.<br />
+Méretezéskor illetve teljes képernyős módban a <span class="menu">Filmek simított átméretezése</span>kor nagyon gyorsan frissül a kép a jobb minőség érdekében, míg ellenkező esetben a kép képpont-blokkokra eshet szét.<br />
+A <span class="menu">Nagyított vezérlők teljes képernyős módban</span> opciót ha engedélyezzük, akkor jelentősen nagyobb vezérlő elemeket kapunk a videóhoz teljes képernyős módban.<br />
+A <span class="menu">Felirat mérete</span> és a <span class="menu">Felirat helye</span> is módosítható. Megjelenhet <span class="menu">A videó alján</span>, amikor mindig a kép előtt jelenik meg. Illetve <span class="menu">A képernyő alján</span>, amivel lehetőségünk van arra, hogy az ablakot átméretezve a film alatti fekete sávon jelenljen meg a szöveg.</p>
+<p>Az utolsó beállítási lehetőség pedig a hangerőre vonatkozik, mikoris a lejátszó a háttérben van, tehát az ablak nem aktív. Ez lehet <span class="menu">Teljes hangerő</span>, <span class="menu">Alacsony hangerő</span> vagy <span class="menu">Némítva</span>.</p>
+
+<h2>Vezérlés billentyűzettel</h2>
+<p>A lejátszó a billentyűzettel is vezérelhető.</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">Z</span></td><td style="width:15px;"></td><td>Ugrás az előző számra</td></tr>
+<tr><td><span class="key">X</span></td><td></td><td>Lejátszás</td></tr>
+<tr><td><span class="key">C</span></td><td></td><td>Megállítás</td></tr>
+<tr><td><span class="key">V</span></td><td></td><td>Leállítás</td></tr>
+<tr><td><span class="key">B</span></td><td></td><td>A következő számra ugrás</td></tr>
+</table>
+<p>Ezek a gombok a vezérlőelemekhez vannak rendelve. Ezek mindig a billentyűzet első sorában a bal oldalról indulva találhatóak függetlenül a billentyűzet kiosztásától. A felső billentyűk az amerikai koisztás alapján értendőek.</p>
+<table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
+<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>Előre tekerés</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">→</span></td><td></td><td>10 másodpercet ugrik előre</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>30 másodpercet ugrik előre</td></tr>
+<tr><td align="right"><span class="key">←</span></td><td></td><td>Vissza tekerés</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>10 másodpercet ugrik vissza</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>30 másodpercet ugrik vissza</td></tr>
+
+<tr><td align="right"><span class="key">↑</span></td><td></td><td>Hangerő növelése</td></tr>
+<tr><td align="right"><span class="key">↓</span></td><td></td><td>Hangerő csökkentése</td></tr>
+
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>Az előző számra ugrás</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>A következő számra ugrás</td></tr>
+
+<tr><td align="right"><span class="key">Spacebar</span></td><td></td><td>Lejátszás/megállítás</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Teljes képernyős illetve ablak módba váltás (illetve a videón dupla kattintással)</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="mail.html">Levelezés</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="midiplayer.html">Midilejátszó</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Fájltípusok</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/filetypes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/filetypes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/filetypes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/filetypes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/filetypes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/filetypes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/filetypes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filetypes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/filetypes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/filetypes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/filetypes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/filetypes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/filetypes.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="deskbar.html">Asztalsáv (Deskbar)</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="attributes.html">Jellemzők</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Fájltípusok</h1>
+
+<p>A Windows-tól eltérően a Haiku-nál nem számít a 3 betűs kiterjesztés a fájlnál (például: .txt, .jpg, .mp3). A kiterjesztést a rendszer csak a végső esetben veszi figyelembe. A Haiku esetében a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> típus a használatos, épp úgy, mint az interneten.</p>
+<div class="box-info">Bár a Haiku esetében nem indokolt a fájl kiterjesztése, ne feledjük, hogy ha megosztjuk másokkal a fájt (például USB lemezen, vagy levélben), akkor a többi operációs rendszer már igényli a kiterjesztések meglétét, így azt hozzá kell adnunk a fájlhoz. Máskülönben a többi felhasználó nem tudja majd használni a fájlt a saját rendszerén.</div>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="specific-file" name="specific-file">Egy fájl típusának megadása</a></h2>
+<p>Egy fájlnak a típusa, az ikonja, illetve a hozzá társított program is megváltoztatható. Ehhez csak ki kell jelölni a fájlt, és a <span class="menu">Fájltípusok</span> kiegészítőt választani.</p>
+<img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="filetype" id="filetype">A fájl típusa</a></h3>
+<p>A fenti képen egy PNG fájl információit láthatjuk, aminek a MIME azonosítója image/png. Tegyük fel, hogy tudjuk, hogy ez egy GIF fájl és nem PNG. Ezt egyszerűen módosíthatjuk azzal, ha beírjuk a típus pontos nevét, vagy az alábbi két gombot használjuk:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Kiválasztás...</span></td><td> </td><td>A fájltípusok hierarchikus listájában keressük meg az <tt>image | GIF Image</tt> típust.</td></tr>
+<tr><td><span class="button">Ugyanaz, mint...</span></td><td> </td><td>Egy fájl ablakban keressünk egy olyan fájlt, aminek ugyan az a típusa, mint amit szeretnék adni a fájlnak..</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="preferred-app" name="preferred-app">Előnyben részesített program</a></h3>
+<p>Ez a menü tartalmazza azoknak a programoknak a listáját, amik kezelni tudják az adott fájlt. Itt kiválaszthatod azt a programot, ami automatikusan megnyílik, amikor duplán kattintunk egy fájlon. Lehetőséged van például a HTML fájlt egy böngésző helyett szövegszerkesztőhöz társítani. Minden HTML fájl továbbra is böngészőben nyílik meg, csak ez az egy fog szövegszerkesztőben.</p>
+
+<p>Az <span class="menu">Alapértelmezett program</span> az egyik, amit globálisan, minden fájlra be lehet állítani. Ha nem találod a listában a használni kívánt programot, akkor a <span class="button">Kiválasztás...</span> és a <span class="button">Ugyanaz, mint...</span> gombok segítségével megadhatsz másikat is, épp úgy, mint "A fájl típusa" esetében.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="icon" name="icon">Az ikon</a></h3>
+<p>Felmerülhet a kérdés, hogy miért üres az ikon helye a jobb felső részben: a fájlok általában a rendszerben beállított, a fájltípusnak megfelelő ikont használják. Arra is lehetőségünk van, hogy megnyitjuk a <span class="app">Fájltípus</span> kiegészítőjét egy másik fájlnak is, majd az ikonját áthúzzuk a saját fájlunknak az ikonjához. Vagy, duplán kattintva az ikon mezőben létrehozhatjuk vagy szerkeszthetjük annak az ikonját. További információk az <a href="applications/icon-o-matic.html">Icon-O-Matic</a> fejezetben.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings-apps" name="settings-apps">Programok speciális beállításai</a></h2>
+<p>Ha a <span class="app">Fájltípusok</span> kiegészítőt egy programmal nyitjuk meg (esetünkben: <span class="app">StyledEdit</span>), akkor az alábbi ablakot kapjuk:</p>
+<img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
+<p>A felső mezőben a szabványos MIME típus helyett a program aláírása (egyéni azonosítója) látható. Segítségével a rendszer könnyedén megtalálja a programot, bárhol is legyen az.</p>
+<p>Ez alatt a program különféle megjelölései találhatóak, amik a program működését szabályozzák:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Egyszer indítható</span></td><td> </td><td>A program (maga a programfájl) egy időben csak egyszer futhat. Azonban, ha a programnak több példánya is van, akkor azok persze futhatnak párhuzamosan.</td></tr>
+<tr><td><span class="menu">Többször indítható</span></td><td> </td><td>A program többször is elindítható egy időben.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Kivételes indítás</span></td><td> </td><td>Kizárólag csak egy program futhat az adott program azonosítójával.</td></tr>
+<tr><td><span class="menu">Csak paraméterek</span></td><td> </td><td>Ez az opció azt jelzi, hogy a program nem reagál semmilyen rendszer szintű üzenetre.</td></tr>
+<tr><td><span class="menu">Futtatás a háttérben</span></td><td> </td><td>A program nem jelenik meg a <a href="twitcher.html">Programváltó</a>ban vagy a futó programok listájában az Asztalsávon.</td></tr>
+</table>
+<p>Alább látható egy lista a programmal használható fájltípusokkal. Hozzáadhatsz (vagy törölhetsz) egy fájltípust, ha úgy gondolod, hogy az adott program tudja azt kezelni. Ennek eredményeként a program megjelenik az előnyben részesített programok listájában, vagy a Tracker <span class="menu">Megnyitás ezzel...</span> listájában is, ha az adott típusú fájlon jobb gombbal kattintunk.</p>
+<p>Végül pedig az ablak alján a verzió és a leírás, másolásvédelmi információ található. Mind a program aláírását (egyéni azonosítóját) is, ezt is a program készítője határozza meg, és nem ajánlott módosítani azt.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filetypes-preferences" name="filetypes-preferences">Általános beállítások a Fájltípusok beállítások panelen</a></h2>
+<p>A <span class="app">Fájltípusok</span> beállítások esetében nem külön fájlonként, hanem általánosságban módosíthatóak a beállítások. Módosítható az ikon, az előnyben részesített program, hozzáadható, törölhető illetve módosítható egy egész fájltípus és annak a jellemzői. Továbbá egyéni fájltípust is létrehozhat.</p>
+<p>Minden fájltípus és a hozzájuk tartozó beállítás a <span class="path">/boot/home/config/settings/beos_mime/</span> mappában található. Mielőtt módosítanád ennek a tartalmát, előtte mindenképp ajánlott róla készíteni egy másolatot...</p>
+<p>További információkat találhatsz a <span class="app">Fájltípusok</span> beállításairól a <a href="workshop-filetypes+attributes.html">Műhely: fájltípusok, jellemzők, indexek és lekérdezések</a> fejezetben.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="deskbar.html">Asztalsáv (Deskbar)</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="attributes.html">Jellemzők</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

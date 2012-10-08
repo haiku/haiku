@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"> 
+<head>
+<!-- 
+ *
+ * Copyright 2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Maciej Bałuta  (Google Code-In student)
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Hálózat állapot</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/desktop-applets/networkstatus.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/desktop-applets/networkstatus.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/desktop-applets/networkstatus.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/desktop-applets/networkstatus.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/desktop-applets/networkstatus.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/desktop-applets/networkstatus.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/desktop-applets/networkstatus.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/desktop-applets/networkstatus.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/desktop-applets/networkstatus.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/desktop-applets/networkstatus.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/desktop-applets/networkstatus.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/desktop-applets/networkstatus.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/desktop-applets/networkstatus.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/desktop-applets/networkstatus.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="launchbox.html">Indítósáv</a> 
+::  <a href="../desktop-applets.html" class="uplink">Asztalsáv kisalkalmazásai</a> 
+::  <a href="powerstatus.html">Energiaállapot</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />Hálózat állapot (NetworkStatus)</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Asztali kisalkalmazások</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/NetworkStatus</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><i>Nincs</i></td></tr>
+</table>
+<p>A Hálózat állapot kisalkalmazás a hálózati kapcsolat állapotát jelzi. Ha még nem fut, akkor a indításkor meg fogja kérdezni, hogy ablakban akarjuk-e futtatni, vagy az Asztalsávra szeretnénk helyezni. Ablakban futtatva lehetőségünk van átméretezni azt, vagy <a href="../gui.html#replicants">Replikáns</a>ként használni.<br />
+Ha már telepítve van, akkor a helyi menüvel vezérelhető.</p>
+<p><img src="../images/networkstatus-images/applet.png" alt="NetworkStatus applet" /><br />
+Az első szakasz tartalmazza az összes hálózati kártyát, azok neveit és állapotát. Bármelyiken kattitnva egy üzenet ablakban megkapjuk a kátya adatait (például az IP-t).<br />
+A kártyák alatti listában az elérhető vezeték nélküli hálózatokat (amiket az első vezeték nélküli hálózati kártya talált) találjuk a nevükkel és a jelerőséggel. További információk a <a href="..\workshop-wlan.html">Műhely: vezeték nélküli hálózat</a> fejelzetben.<br />
+Végül pedig a <span class="menu">Hálózati beállítások megnyitása...</span> menüpont segítségével módosíthatjuk azokat a <a href="../preferences/network.html">Hálózat</a> beállítása panelen illetve a <span class="menu">Bezárás</span> menüvel kiléphetünk a programból.</p>
+
+<h2>Állapot ikonok</h2>
+<table summary="status icons" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Kész</td><td>A hálózati kapcsolat létrejött.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Konfigurálás</td><td>Kapcsolódás folyamatban.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>Hiányos beállítás</td><td>Néhány beállítás még hiányzik (további információkat talál a <a href="../preferences/network.html">Hálózat</a> fejezetben).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>Nincs kapcsolat</td><td>Nincs hálózati kapcsolat (vagy nincsen kábel bedugva, vagy nincs elérhető vezeték nélküli hálózat).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>Nincsen hálózati kártya a gépben (vagy az is lehet, hogy a rendszer nem találja meg, mert nincs hozzá vezérlőprogram).</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="launchbox.html">Indítósáv</a> 
+::  <a href="../desktop-applets.html" class="uplink">Asztalsáv kisalkalmazásai</a> 
+::  <a href="powerstatus.html">Energiaállapot</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Műhely: levelek kezelése</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/workshop-email.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-email.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workshop-email.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workshop-email.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workshop-email.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workshop-email.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/workshop-email.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/workshop-email.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/workshop-email.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/workshop-email.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/workshop-email.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/workshop-email.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/workshop-email.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/workshop-email.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="queries.html">Queries</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#mailsystem">A Haiku levelező rendszere</a><br />
+	<a href="#statuses">Egyéni állapotok használata</a><br />
+	<a href="#queries">Lekérdezések használata</a><br />
+	<a href="#tips">További tippek</a>
+</td></tr>
+</table>
+
+<h1>Műhely: levelek kezelése</h1>
+
+<p>Ebben a fejezetben a levelek kezelését tárgyaljuk Haiku alatt. A leírtak alapja egy már beállított levelező rendszer. A beállításokat már minden bizonnyal elvégezted az <a href="preferences/e-mail.html">E-Mail</a> beállítások panelen. Ezen kívül minden bizonnyal már valamilyen szinten ismered a Haiuk levelező programját (<a href="applications/mail.html">Levelezés</a>).</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="mailsystem" name="mailsystem">A Haiku levelező rendszere</a></h2>
+<p>Ha egy másik operációs rendszert használtál eddig, akkor valószínűleg valamelyik ismertebb programot már használtad, mint például a Microsoft Outlook vagy a Mozilla Thunderbird. Használat előtt azok esetében is el kell végezni néhány beállítást. Ezen kívül egyedi adatbázist használ a névjegyek és a levelek tárolására.<br />
+A levelező program lecserélése nem egyszerű dolog. Exportálni/importálni és átalakítani kell. Ezen kívül egyszerre egynél több program használatánál is adódhatnak problémáink.</p>
+<p>A Haiku levelező rendszere ettől igen eltérő. Például több részből áll össze.</p>
+<p>A legfontosabb rész a <span class="app">mail_daemon</span> (levelező szolgáltatás), ami a komunikációért felel a rendszer és a kiszolgáló között. Az <a href="preferences/e-mail.html">E-Mail</a> beállítások panelen lehet megadni és konfigurálni az e-mail fiókokat és a levelező szolgáltatást.</p>
+<p>Minden levél egy fájlként kerül eltárolásra, ahol a levél információi (mint például a feladó, tárgy, dátum) és annak állapot (például új, megválaszolt, elküldött) BFS jellemzőkként lesznek megadva. Ezek a jellemzők pedig segítenek a levelek keresésében/szűrésében..</p>
+<img src="images/workshop-email-images/browsing.png" alt="browsing.png" /> 
+<p>Mivel minden levél egy fájl, azok listázása és böngészése/használata épp úgy működik, mint bármely más fájl esetén (mint például egy mappában lévő képek és azok megnyitása a <a href="applications/showimage.html">Képmegjelenítő</a>vel). A Nyomkövető ablakot ha megnyitva hagyjuk, akkor látni fogjuk, hogy épp melyik levelet olvassuk, miközben a Levelezés programban lépegetünk a levelek között.<br />
+És mivel a levelek önálló fájlok, így ha nem a Haiku <a href="applications/mail.html">Levelezés</a> programját használjuk, akkor sem ütközünk semmilyen akadályba.</p>
+<p>Ehhez hasonlóan új levél létrehozásakor szintén készül egy fájl, amit szintén a mail_daemon kezel és küld el. Az ismerősök kezelése pedig a <a href="applications/people.html">Névjegyek</a>kel történik.</p>
+<p>Dióhéjban: míg más levelező programok maguk kezelik a kommunikációt a kiszolgálóval, a levelek tárolását, megjelenítését, és a levelek kezelését (keresés, szűrés), addig a Haiku jelentősen kisebb programokat használ, amik fájlrendszer szinten kezeli a leveleket:</p>
+<ul>
+<li><p>A <span class="app">mail_daemon</span> fogadja/küldi a leveleket.</p></li>
+<li><p>Nyomkövető ablak és lekérdezések segítenek a keresésben és a megjelenítésben.</p></li>
+<li><p>A <span class="app">Levelezés</span> használatos a levelek megtekintésére és új levelek írására. A <span class="app">Névjegyek</span> program pedig rendszer szintű névjegykezelést kínál.</p></li>
+</ul>
+<p>A Nyomkövető és a lekérdezések használata különösen hasznos. Az itt szerzett tapasztalat más fájlokkal való probléma megoldásában is segíthet. Legyen szó képekről, zenéről, videóról, névjegyről vagy bármi más dokumentumról, a Nyomkövető áll a fájlkezelés középpontjában.<br />
+Ugyanakkor a fájlrendszer bármely területén történő fejlesztés nem csak a levelezés hanem az összes többi program számára is használható.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="status" name="status">Egyéni állapotok használata</a></h2>
+<p>Amikor az újonnan érkezett levelek közt böngészel, akkor megeshet, hogy valamelyikkel majd csak később akarsz komolyabban foglalkozni. Ekkor a Leveleés <span class="menu">Bezár és... | Hadja Újként</span> menüjét választva a levél megmarad az "<i>Új levelek</i>" között...</p>
+<p>Persze az is egy megoldás, hogy elkezdünk válaszolni egy levélre, és az elmentjük piszkozatként. De akkor, ha nem akarunk válaszolni a levélre, csak később olvasni azt, akkor ez nem a legjobb megoldás.</p>
+<img src="images/workshop-email-images/status.png" alt="status.png" /> 
+<p>Sokkal jobb megoldás az, ha a <span class="menu">Bezárás és... | Megjelöl...</span> menüben létrehozunk egy új állapotot, és azt haszánljuk a levelek kategorizálására. Például, adhatunk a levélnek egy "<i>Később</i>" állapotot, és ha lesz több időnk, akkor majd rákeresünk erre az állapotra.<br />
+Vagy, egyedi állapotot adhatunk a különféle munkákkal kapcsolatos leveleknek is. Például, készíthetünk egy "<i>HUG</i>" állaptot (a "Haiku user guide" rövidítéseként), ami minden, a Haiku felhasználói útmutatóval kapcsolatos levélnek megadható.<br />
+Minden esetben próbáljunk rövid állapot-nevet megadni, így a Nyomkövető ablak állapot oszlopában mindig el fog férni.</p>
+<p>Nem szükséges megnyitni a leveleket a <span class="app">Levelezés</span> programban az állapotuk módosításához. A <span class="app">Mark as Read </span> (Olvasottnak jelöl) és a <span class="app">Mark as...</span> (Megjelöl, mint...) Nyomkövető kiegészítőket használhatjuk a kijelölt leveleken, és egy lépésben módosítható azok állapota.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="queries" name="queries">Lekérdezések használata</a></h2>
+<p>A levelek számára meg kell adni egy mappát, így minden levelünk egy helyen lesz majd. Csakhogy idővel a mappa túlzsúfolttá válik, és a levelek betöltése és a rendezése is hosszabb ideig tartana. Ezen kívül pedig általában nem is törődünk a 2 évvel ezelőtti levelekkel...</p>
+<div class="box-info">A sok fájlt tartalmazó mappák beolvasása hosszú ideig tarthat, és a fájlok rendezése is időbe telhet. Ha meg akarsz nyitni egy sok fájlt tartalmazó mappát, akkor lerövidítheted a várakozási időt, ha közben a Nyomkövető ablakot "eltünteted", például elrejted vagy egy másik munkaasztalra rakod át. A <a href="applications/processcontroller.html">Folyamatkezelő</a>vel a processzor használata is megfigyelhető.</div>
+<p>A <a href="queries.html">Lekérdezések</a> a megmentőink!</p>
+<p>A lekérdezések használatával leszűkíthetjük a levelek listáját. Például az Asztalsávon megjelenő ikon is lekérdezéseket használ.</p>
+<img src="images/workshop-email-images/daemon-in-deskbar.png" alt="daemon-in-deskbar.png" /> 
+<p>Az <span class="menu">Open Draft</span> (Piszkozatok) almenüben találhatóak azok a levelek, melyek állapota "<i>Draft</i>" (piszkozat), amit a <span class="app">Levelezés</span> adott meg, amikor elmentettük a levelet.</p>
+<p>Az <span class="menu">Open Inbox Folder</span> (Bejövő levelek) és az <span class="menu">Open Mail Folder</span> (levelek mappájának megnyitása) mindössze egy hivatkozás.</p>
+<p>A <span class="menu"># új levél</span> almenü egy lekérdezés azokra a levelekre, melyek állapota "<i>New</i>" (Új). Ugyan ez a lekérdezés adja meg az új levelek számát is a menü nevében..</p>
+
+<p>Egyéni lekérdezés illetve mappa is hozzáadható a menühöz, ha azt a <span class="path">~/config/settings/Mail/Menu Links</span> mappába másoljuk, vagy ha ide készítünk egy hivatkozást.</p>
+<div class="box-info">A <span class="path">~/config/settings/Mail/mailbox</span> lekérdezés egy speciális eset: ez megnyílik, amikor a bal gombbal kattintunk a postaláda ikonon az Asztalsávon. Ha ezt meg akarjuk változtatni, akkor csak cserélhetük ki egy másik fájlal (vagy a fájl hivatkozásával), és nevezzük el "<i>mailbox</i>"-nak. Nem fontos, hogy lekérdezés legyen. Lehet akár egy program hivatkozása is.</div>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-examples" name="query-examples">Példa lekérdezésre</a></h3>
+<p>Néhány keresési minta:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="10">
+<tr align="center"><td><img src="images/workshop-email-images/query-1.png" alt="query-1.png" /><br />
+Egyéni ("<i>Másolat</i>") állapottal rendelkező levelek.</td>
+<td><img src="images/workshop-email-images/query-2.png" alt="query-2.png" /><br />
+A legutóbbi két nap levelei.</td></tr>
+
+<tr align="center"><td><img src="images/workshop-email-images/query-3.png" alt="query-3.png" /><br />
+Az utóbbi 2 hétben a Haiku i18n-től érkezett levelek.</td>
+<td><img src="images/workshop-email-images/query-4.png" alt="query-4.png" /><br />
+Az utóbbi 12 órában érkezett levelek, melyek tárgya tartalmazza a "guide" szót.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">További tippek</a></h2>
+<ul>
+<li><p>Ha nem mentünk el egy lekérdezést "<i>Keresés</i>ként", hanem inkább "<i>Keresési sablon</i>ként", akkor nem fog megjelenni a találat ablak, de a kereső ablak igen. Ezzel a megoldással a keresés könnyedén módosítható, például a keresés idejét "<i>2 days</i>" (2 napról) "<i>3 days</i>" (3 napra).</p></li>
+<li><p>A "gépelés közbeni szűrő" engedélyezésekor (a <a href="tracker.html#tracker-preferences">Nyomkövető</a> beállításainál) lehetőségünk van arra, hogy a keresés eredményei között még nyorsabban megtaláljuk azt, amit akarunk. Gyakran elég lekérdezni az utóbbi 3 nap leveleit és abban használni a gépelés közbeni szűrést, így még hatékonyabban tudjuk azt használi. A lényeg az, hogy nem kell megadnunk, hogy mely jellemzőben keressünk, ugyanis így az összes megjelenített mezőben keresni tudunk.</p></li>
+<li><p>A <a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> egy remek kis program, ami a megadott levelek között megkeresi az összes, melynek azonos a tárgya, a feladója, stb. A <span class="app">Levelezés</span> program <span class="menu">Lekérdezések</span> menüjéből is ezt a funkciót érhetjük el.</p></li>
+</ul>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="queries.html">Lekérdezések</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="applications.html">Programok</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Daniel Marth
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Parancsok listája</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/list-cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/list-cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/list-cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/list-cli-apps.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/list-cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/list-cli-apps.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/list-cli-apps.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/list-cli-apps.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/list-cli-apps.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/list-cli-apps.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/list-cli-apps.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/list-cli-apps.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/list-cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/list-cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+<a href="../applications.html#cli-apps" class="uplink">Applications</a>
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Parancssori programok listája</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Útvonal:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+</table>
+<p><br /></p>
+<p>A Haiku-val érkező parancssori programok a <span class="path">/boot/system/bin</span> vagy a <span class="path">/boot/common/bin</span> mappában találhatóak. Az általunk telepített programokat ajánlott a <span class="path">~/config/bin</span> mappában elhelyezni. Ezen útvonalak megtalálhatóak a PATH változóban is, így automatikusan megtalálhatjuk őket, nem kell hozzá tudnunk az útvonalat.<br />
+Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez egy rövid leírás is tartozik, azonban részletesebb segítséget is kaphatunk, ha a programot a <tt>--help</tt> paraméterrel indítjuk.</p>
+<p><br /></p>
+<p>Index:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
+<p><br /></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Az audió és videó kiegészítők használatát figyelő szolgáltatás indítása. </td></tr>
+<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Nyelvi beállítások.</td></tr>
+<tr><td><tt>[</tt></td><td> </td><td>Igaz (true) vagy hamis (false) visszaadása összehasonlításkor.</td></tr>
+<tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
+<tr><td><tt>addattr</tt></td><td> </td><td>Egy jellemzőt fájlba írása. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>alert</tt></td><td> </td><td>Megjelenít egy üzenet ablakot. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>arp</tt></td><td> </td><td>A rendszer ARP-tárának kezelése.</td></tr>
+<tr><td><tt>awk</tt></td><td> </td><td>Ugyan az, mint a <tt>gawk</tt>.</td></tr>
+<tr><td><tt>base64</tt></td><td> </td><td>Base64-es kódolás/dekódolás. </td></tr>
+<tr><td><tt>basename</tt></td><td> </td><td>Megadja egy fájl teljes elérési útvonalából a mappa nevét.</td></tr>
+<tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
+<tr><td><tt>bc</tt></td><td> </td><td>Egy precíz számológép.</td></tr>
+<tr><td><tt>beep</tt></td><td> </td><td>Figyelmeztető hang megszólaltatása.</td></tr>
+<tr><td><tt>BootManager</tt></td><td> </td><td>Rendszerválasztó menü telpítése/törlése.</td></tr>
+<tr><td><tt>bunzip2</tt></td><td> </td><td>Ugyan az, mint a <tt>bzip2</tt>.</td></tr>
+<tr><td><tt>bzip2</tt></td><td> </td><td>Fájl tömörítő.</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C++ fordító.</td></tr>
+<tr><td><tt>cal</tt></td><td> </td><td>Naptár megjelenítése.</td></tr>
+<tr><td><tt>cat</tt></td><td> </td><td>Fájlok összefűzése, illetve a fájlok tartalmának megjelenítése.</td></tr>
+<tr><td><tt>catattr</tt></td><td> </td><td>Egy fájl jellemzőjének megjelenítése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>cc</tt></td><td> </td><td>C fordító.</td></tr>
+<tr><td><tt>checkfs</tt></td><td> </td><td>Ellenőrzi és kijavítja a fájlrendszer hibáit. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>checkitout</tt></td><td> </td><td>A forráskód ellenőrzése az azt tároló URL-ével.</td></tr>
+<tr><td><tt>chgrp</tt></td><td> </td><td>Egy fájlt birtokló csoport módosítása.</td></tr>
+<tr><td><tt>chmod</tt></td><td> </td><td>A fájl engedélyeinek módosítása.</td></tr>
+<tr><td><tt>chop</tt></td><td> </td><td>A fájl kisebb szeletekre történő darabolása.</td></tr>
+<tr><td><tt>chown</tt></td><td> </td><td>A fájl tulajdonosának módosítása.</td></tr>
+<tr><td><tt>chroot</tt></td><td> </td><td>Egy parancs futtatása egy megadott gyökér-mappában. </td></tr>
+<tr><td><tt>cksum</tt></td><td> </td><td>Egy fájl CRC ellenőrzés eredményét és a bájtok számát jeleníti meg. </td></tr>
+<tr><td><tt>clear</tt></td><td> </td><td>A Terminál ablak ürítése.</td></tr>
+<tr><td><tt>clockconfig</tt></td><td> </td><td>Az óra beállításainak megjelenítése.</td></tr>
+<tr><td><tt>cmp</tt></td><td> </td><td>Fájlok bájtról-bájtra történő összehasolítása.</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>-</td></tr>
+<tr><td><tt>comm</tt></td><td> </td><td>Rendezett fájl sorról-sorra történő összehasonlítása.</td></tr>
+<tr><td><tt>compress</tt></td><td> </td><td>Adatok tömörítése.</td></tr>
+<tr><td><tt>consoled</tt></td><td> </td><td>Konzol szolgáltatás.</td></tr>
+<tr><td><tt>copyattr</tt></td><td> </td><td>A jellemzőket vagy azok egy részét egy vagy több fájlból egy újba másolja. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>cp</tt></td><td> </td><td>Fájlok/mappák másolása.</td></tr>
+<tr><td><tt>csplit</tt></td><td> </td><td>Egy fájl darabolása a megadott minta alapján.</td></tr>
+<tr><td><tt>ctags</tt></td><td> </td><td>Egy index-fájlt hoz létre az egy fájlban talált különféle nyelvi objektumokból.</td></tr>
+<tr><td><tt>cut</tt></td><td> </td><td>A fájl minden sorából megjeleníti a szakaszokat.</td></tr>
+<tr><td><tt>date</tt></td><td> </td><td>A jelenlegi dátum és idő megjelenítése/módosítása.</td></tr>
+<tr><td><tt>dc</tt></td><td> </td><td>Parancssori számológép.</td></tr>
+<tr><td><tt>dd</tt></td><td> </td><td>Nyers adat másolása, illetve átalakítási és formázási műveletek. </td></tr>
+<tr><td><tt>desklink</tt></td><td> </td><td>Egy elem az Asztalsáv Polcára helyezése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>df</tt></td><td> </td><td>Csatolt lemezek kihasználtsága.</td></tr>
+<tr><td><tt>diff</tt></td><td> </td><td>Fájlok sorról-sorra történő összehasonlítása.</td></tr>
+<tr><td><tt>diff3</tt></td><td> </td><td>3 fájl sorról-sorra történő összehasonlítása.</td></tr>
+<tr><td><tt>dircolors</tt></td><td> </td><td>Az <tt>ls</tt>-hez a színek beállítása.</td></tr>
+<tr><td><tt>dirname</tt></td><td> </td><td>Megadja egy fájl teljes elérési útvonalából a mappa nevét.</td></tr>
+<tr><td><tt>draggers</tt></td><td> </td><td>A replikánsok jelölőjének megjelenítése/elrejtése.</td></tr>
+<tr><td><tt>driveinfo</tt></td><td> </td><td>A számítógép összetevőinek információi.</td></tr>
+<tr><td><tt>dstcheck</tt></td><td> </td><td>Óraátállításkor egy üzenetet jelenít meg.</td></tr>
+<tr><td><tt>du</tt></td><td> </td><td>A lemezhasználat kiszámítása mappákra bontva. </td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>-</td></tr>
+<tr><td><tt>echo</tt></td><td> </td><td>Egy sornyi szöveg megjelenítése.</td></tr>
+<tr><td><tt>egrep</tt></td><td> </td><td>Ugyan az, mint a <tt>grep</tt>.</td></tr>
+<tr><td><tt>eject</tt></td><td> </td><td>Eltávolítható eszköz kiadása.</td></tr>
+<tr><td><tt>env</tt></td><td> </td><td>A program futtatása egy módosított környezetben. </td></tr>
+<tr><td><tt>error</tt></td><td> </td><td>A hibakódokhoz a megfelelő szöveges üzenet megjelenítése.</td></tr>
+<tr><td><tt>expand</tt></td><td> </td><td>A tabulátorok szóközzé alakítása.</td></tr>
+<tr><td><tt>expr</tt></td><td> </td><td>Egy képlet eredményének megjelenítése.</td></tr>
+<tr><td colspan="3"><a id="F" name="F"><h2>F</h2></a></td></tr>
+<tr><td><tt>factor</tt></td><td> </td><td>Az egész számok prímtényezői.</td></tr>
+<tr><td><tt>false</tt></td><td> </td><td>A sikertelen műveletet jelzi, "1"-et ad eredményül.</td></tr>
+<tr><td><tt>fdinfo</tt></td><td> </td><td>A rendszerben használt fájlok leíróinak információi. </td></tr>
+<tr><td><tt>ffm</tt></td><td> </td><td>Az ablak egérrel történő aktiválásának módját módosítja. </td></tr>
+<tr><td><tt>fgrep</tt></td><td> </td><td>Ugyan az, mint a <tt>grep</tt>.</td></tr>
+<tr><td><tt>filepanel</tt></td><td> </td><td>A megnyitás/mentés panel megjelenítése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>find</tt></td><td> </td><td>Egy fájl megkeresése a fájlrendszerben.</td></tr>
+<tr><td><tt>finddir</tt></td><td> </td><td>A rendszer által deffiniált mappa megkeresése.</td></tr>
+<tr><td><tt>fmt</tt></td><td> </td><td>Egy fájl bekezdéseinek újraformázása.</td></tr>
+<tr><td><tt>fold</tt></td><td> </td><td>Egy fájl bemeneti sorainak tördelése.</td></tr>
+<tr><td><tt>fortune</tt></td><td> </td><td>Véletlenszerű, remélhetőleg érdekes mondatok.</td></tr>
+<tr><td><tt>frcode</tt></td><td> </td><td>Az updatedb által elindított program, mely a fájlnevek listáját tömöríti.</td></tr>
+<tr><td><tt>freetype-config</tt></td><td> </td><td>A FreeType fordítói információi programozók számára.</td></tr>
+<tr><td><tt>ftp</tt></td><td> </td><td>Fájl átviteli program.</td></tr>
+<tr><td><tt>ftpd</tt></td><td> </td><td>FTP szolgáltatás.</td></tr>
+<tr><td><tt>funzip</tt></td><td> </td><td>Egy csomag első elemét megjeleníti.</td></tr>
+<tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire vezérlő program.</td></tr>
+<tr><td><tt>gawk</tt></td><td> </td><td>Mintakereső és feldolgozó.</td></tr>
+<tr><td><tt>gdb</tt></td><td> </td><td>GNU hibakereső.</td></tr>
+<tr><td><tt>getlimits</tt></td><td> </td><td>A platform-független határértékek megjelenítése (szkriptek írásánal hasznos). </td></tr>
+<tr><td><tt>grep</tt></td><td> </td><td>Minta keresése.</td></tr>
+<tr><td><tt>groups</tt></td><td> </td><td>A felhasználók csoporttagságát jeleníti meg.</td></tr>
+<tr><td><tt>gunzip</tt></td><td> </td><td>Ugyan az, mint a <tt>gzip</tt>.</td></tr>
+<tr><td><tt>gzexe</tt></td><td> </td><td>Futtatható fájlok ki- illetve becsomagolása.</td></tr>
+<tr><td><tt>gzip</tt></td><td> </td><td>Fájlok ki- illetve becsomagolása.</td></tr>
+<tr><td><tt>hd</tt></td><td> </td><td>Hexadecimális kiírás.</td></tr>
+<tr><td><tt>head</tt></td><td> </td><td>Egy fájl első sorának megjelenítése.</td></tr>
+<tr><td><tt>hey</tt></td><td> </td><td>Grafikus programok használata szkriptekkel.</td></tr>
+<tr><td><tt>hostname</tt></td><td> </td><td>A rendszer nevének megadása/megjelenítése.</td></tr>
+<tr><td><tt>id</tt></td><td> </td><td>A felhasználó és a csoport információi.</td></tr>
+<tr><td><tt>ident</tt></td><td> </td><td>Egy fájl RCS kulcsszavainak azonosítása.</td></tr>
+<tr><td><tt>ifconfig</tt></td><td> </td><td>Hálózati kártyák beállítása.</td></tr>
+<tr><td><tt>install</tt></td><td> </td><td>A fájlok megfelelő helyre másolása a futó rendszer megzavarása nélkül.</td></tr>
+<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>A különféle vezeték nélküli hálózati kártyák vezérlőprogramjának telepítése.</td></tr>
+<tr><td><tt>installoptionalpackage</tt></td><td> </td><td>Egy ideiglenes megoldás a kiegészítő csomagok telepítésére.</td></tr>
+<tr><td><tt>installsound</tt></td><td> </td><td>Új hang-esemény hozzáadása a Hangok beállítások panelhez. </td></tr>
+<tr><td><tt>iroster</tt></td><td> </td><td>Bemeneti eszközök listája.</td></tr>
+<tr><td><tt>isvolume</tt></td><td> </td><td>Csatolt lemezek információi.</td></tr>
+<tr><td><tt>join</tt></td><td> </td><td>Minden pár bemeneti sorhoz egyértelmű azonosító hozzárendelése, majd kiírása.</td></tr>
+<tr><td colspan="3"><a id="K" name="K"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>K</h2></a></td></tr>
+<tr><td><tt>kernel_debugger</tt></td><td> </td><td>A kernel hibakeresőjébe lépés.</td></tr>
+<tr><td><tt>keymap</tt></td><td> </td><td>Billentyűzet-kiosztások betöltése/elmentése.</td></tr>
+<tr><td><tt>kill</tt></td><td> </td><td>A kilépés parancs elküldése egy programnak.</td></tr>
+<tr><td><tt>less</tt></td><td> </td><td>Egy fájl megjelenítése.</td></tr>
+<tr><td><tt>lessecho</tt></td><td> </td><td>A paraméterek és a helyettesítő karakterek (mint például a * és a ? egy fájlnévben) megjelenítése.</td></tr>
+<tr><td><tt>lesskey</tt></td><td> </td><td>A less számára a kötelező kulcs megadása.</td></tr>
+<tr><td><tt>link</tt></td><td> </td><td>Hivatkozás létrehozása.</td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>-</td></tr>
+<tr><td><tt>listarea</tt></td><td> </td><td>A jelenleg futó programok terület-információi. </td></tr>
+<tr><td><tt>listattr</tt></td><td> </td><td>Egy fájl jellemzőinek megjelenítése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>listdev</tt></td><td> </td><td>A számítógépben található eszközök listája.</td></tr>
+<tr><td><tt>listimage</tt></td><td> </td><td>A futó programok kép-információinak listája.</td></tr>
+<tr><td><tt>listport</tt></td><td> </td><td>A rendszer által kezelt nyitott portok listája programonként. </td></tr>
+<tr><td><tt>listres</tt></td><td> </td><td>Egy fájl kiegészítő adatainak megjelenítése.</td></tr>
+<tr><td><tt>listsem</tt></td><td> </td><td>A megadott program jelzőinek listája.</td></tr>
+<tr><td><tt>listusb</tt></td><td> </td><td>USB eszközök listája.</td></tr>
+<tr><td><tt>ln</tt></td><td> </td><td>Hivatkozás létrehozása.</td></tr>
+<tr><td><tt>locale</tt></td><td> </td><td>Az előnyben részesített nyelv megjelenítése, annak LC_CTYPE-ja és az előnyben részesített formátum-beállítások.</td></tr>
+<tr><td><tt>locate</tt></td><td> </td><td>Egy fájl megkeresése.</td></tr>
+<tr><td><tt>logger</tt></td><td> </td><td>Egy üzenet küldése a rendszer-naplóba.</td></tr>
+<tr><td><tt>login</tt></td><td> </td><td>Új munkamenet indítása a rendszerben.</td></tr>
+<tr><td><tt>logname</tt></td><td> </td><td>A jelenlegi felhasználó neve.</td></tr>
+<tr><td><tt>ls</tt></td><td> </td><td>Egy mappa tartalma.</td></tr>
+<tr><td><tt>lsindex</tt></td><td> </td><td>A jelenlegi lemez/partíció indexelt jellemzőinek megjelenítése.  <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>mail2mbox</tt></td><td> </td><td>BeOS e-mail-fájlok Unix postafiók fájlokká alakítás. </td></tr>
+<tr><td><tt>make</tt></td><td> </td><td>GNU make program.</td></tr>
+<tr><td><tt>makebootable</tt></td><td> </td><td>A megadott BFS lemez/partíció indítható tétele (a boot-kód az első két szektorba másolása).</td></tr>
+<tr><td><tt>mbox2mail</tt></td><td> </td><td>Unix postafiók fájlok BeOS e-mail-fájlokká alakítása.</td></tr>
+<tr><td><tt>md5sum</tt></td><td> </td><td>MD5 ellenőrzés.</td></tr>
+<tr><td><tt>merge</tt></td><td> </td><td>Fájl egyesítése.</td></tr>
+<tr><td><tt>message</tt></td><td> </td><td>Egy BMessage fájl megjelenítése.</td></tr>
+<tr><td><tt>mimeset</tt></td><td> </td><td>A fájl MIME típusának megadása.</td></tr>
+<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile főggőségi fájl létrehozása.</td></tr>
+<tr><td><tt>mkdir</tt></td><td> </td><td>Mappa létrehozása.</td></tr>
+<tr><td><tt>mkdos</tt></td><td> </td><td>FAT partíció formázása.</td></tr>
+<tr><td><tt>mkfifo</tt></td><td> </td><td>named csövek létrehozása.</td></tr>
+<tr><td><tt>mkfs</tt></td><td> </td><td>Fájlrendszer létrehozása.</td></tr>
+<tr><td><tt>mkindex</tt></td><td> </td><td>Új index létrehozása egy jellemzőhöz.  <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>mktemp</tt></td><td> </td><td>Biztonságos úton hoz létre ideiglenes fájlt vagy mappát.</td></tr>
+<tr><td><tt>modifiers</tt></td><td> </td><td>A jelenlegi (lenyomott) módosító billentyűk.</td></tr>
+<tr><td><tt>more</tt></td><td> </td><td>Ugyan az, mint a <tt>less</tt>. </td></tr>
+<tr><td><tt>mount</tt></td><td> </td><td>Egy fájlrendszer csatolása.</td></tr>
+<tr><td><tt>mount_nfs</tt></td><td> </td><td>NFS partíció csatolása.</td></tr>
+<tr><td><tt>mountvolume</tt></td><td> </td><td>Egy lemez csatolása név alapján.</td></tr>
+<tr><td><tt>mv</tt></td><td> </td><td>Mozgat/átnevez egy fájlt.</td></tr>
+<tr><td><tt>netcat</tt></td><td> </td><td>TCP és UDP program.</td></tr>
+<tr><td><tt>netstat</tt></td><td> </td><td>A hálózati kapcsolatok, útválasztó táblák, hálózati kártya-statisztika és további információk megjelenítése. </td></tr>
+<tr><td><tt>nl</tt></td><td> </td><td>Egy fájl tartalmának megjelenítése sorszámokkal együtt.</td></tr>
+<tr><td><tt>nohup</tt></td><td> </td><td>Egy program futtatása a megszakítás-jel figyelmen kívül hagyásával (futtatás a háttérben).</td></tr>
+<tr><td><tt>nproc</tt></td><td> </td><td>A rendelkezésre álló feldolgozó egységek megjelenítése.</td></tr>
+<tr><td><tt>od</tt></td><td> </td><td>Egy fájl egyértelmű megfelelőjének kiírása.</td></tr>
+<tr><td><tt>open</tt></td><td> </td><td>Egy program/fájl megnyitása a parancssorból. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
+<tr><td><tt>passwd</tt></td><td> </td><td>A felhasználó jelszavának létrehozása/módosítása.</td></tr>
+<tr><td><tt>paste</tt></td><td> </td><td>Fájlok megfelelő sorainak megjelenítése tablulátorral tagolva.</td></tr>
+<tr><td><tt>patch</tt></td><td> </td><td>Egy diff fájl alkalmazása az eredeti fájlon.</td></tr>
+<tr><td><tt>pathchk</tt></td><td> </td><td>Érvénytelen és nem portolható fájlnevek ellenőrzése.</td></tr>
+<tr><td><tt>pc</tt></td><td> </td><td>Programozók számológépe.</td></tr>
+<tr><td><tt>ping</tt></td><td> </td><td>ICMP-viszhang-kérés küldése egy másik gépre a hálózaton.</td></tr>
+<tr><td><tt>play</tt></td><td> </td><td>Egy zene CD szám lejátszása.</td></tr>
+<tr><td><tt>playfile</tt></td><td> </td><td>Egy audió-fájl lejátszása.</td></tr>
+<tr><td><tt>playsound</tt></td><td> </td><td>Egy audió-fájl lejátszása.</td></tr>
+<tr><td><tt>playwav</tt></td><td> </td><td>WAV fájl lejátszása.</td></tr>
+<tr><td><tt>pr</tt></td><td> </td><td>Fájl oldalakra vagy oszlopokra tagolása.</td></tr>
+<tr><td><tt>printenv</tt></td><td> </td><td>Egy környezeti változó megjelenítése.</td></tr>
+<tr><td><tt>printf</tt></td><td> </td><td>Adat formázása és megjelenítése.</td></tr>
+<tr><td><tt>prio</tt></td><td> </td><td>Egy folyamat prioritásának módosítása.</td></tr>
+<tr><td><tt>profile</tt></td><td> </td><td>A profil száljai.</td></tr>
+<tr><td><tt>ps</tt></td><td> </td><td>Futó programok listája.</td></tr>
+<tr><td><tt>ptx</tt></td><td> </td><td>Egy fájl szavainak a permutált indexének a megjelenítése a tartalommal együtt.</td></tr>
+<tr><td><tt>pwd</tt></td><td> </td><td>A jelenlegi mappa megjelenítése.</td></tr>
+<tr><td><tt>query</tt></td><td> </td><td>A Nyomkövető "keresés képlet alapján" parancssori megfelelője.  <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>quit</tt></td><td> </td><td>Egy program bezárása.</td></tr>
+<tr><td><tt>rc</tt></td><td> </td><td>Forrás-fordító.</td></tr>
+<tr><td><tt>readlink</tt></td><td> </td><td>Egy hivatkozás céljának megjelenítése.</td></tr>
+<tr><td><tt>reindex</tt></td><td> </td><td>Létező fájlok jellemzőit új indexbe rakja. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>release</tt></td><td> </td><td>Egy jelző elengedése.</td></tr>
+<tr><td><tt>renice</tt></td><td> </td><td>Egy folyamat prioritásánal módosítása.</td></tr>
+<tr><td><tt>rlog</tt></td><td> </td><td>RCS fájl napló-üzenetei és egyéb információi.</td></tr>
+<tr><td><tt>rm</tt></td><td> </td><td>Fájlok/mappák törlése.</td></tr>
+<tr><td><tt>rmattr</tt></td><td> </td><td>Egy jellemző törlése a fájlból.  <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>rmdir</tt></td><td> </td><td>Mappák törlése.</td></tr>
+<tr><td><tt>rmindex</tt></td><td> </td><td>Egy jellemző eltávolítása az indexből. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>roster</tt></td><td> </td><td>Futó programok információi.</td></tr>
+<tr><td><tt>route</tt></td><td> </td><td>Hálózati útvonalak megjelenítése/módosítása.</td></tr>
+<tr><td><tt>safemode</tt></td><td> </td><td>A rendszer biztonsági módban fut-e vagy sem.</td></tr>
+<tr><td><tt>screen_blanker</tt></td><td> </td><td>Képernyővédő indítása.</td></tr>
+<tr><td><tt>screenmode</tt></td><td> </td><td>A monitor módjának megjelenítése/beállítása.</td></tr>
+<tr><td><tt>sdiff</tt></td><td> </td><td>Megjeleníti vagy összefűzi a különbségeket 2 fájl között.</td></tr>
+<tr><td><tt>seq</tt></td><td> </td><td>Számsorozatok.</td></tr>
+<tr><td><tt>setdecor</tt></td><td> </td><td>Dekoráció megadása/megjelenítése.</td></tr>
+<tr><td><tt>setgcc</tt></td><td> </td><td>A gcc verziójának megjelenítése/megadása.</td></tr>
+<tr><td><tt>settype</tt></td><td> </td><td>Egy fájl MIME típusának, aláírásának és az előnyben részesített programjának megadása.</td></tr>
+<tr><td><tt>setversion</tt></td><td> </td><td>Egy fájl verziójának megjelenítése.</td></tr>
+<tr><td><tt>setvolume</tt></td><td> </td><td>A rendszerhangok hangerejének megadása.</td></tr>
+<tr><td><tt>setwep</tt></td><td> </td><td>A vezeték nélküli hálózatok WEP-kódolásának megadása.</td></tr>
+<tr><td><tt>sh</tt></td><td> </td><td>Ugyan az, mint a <tt>bash</tt>. </td></tr>
+<tr><td><tt>sha1sum</tt></td><td> </td><td>SHA1 ellenőrzés.</td></tr>
+<tr><td><tt>shar</tt></td><td> </td><td>Shell csomagok létrehozása.</td></tr>
+<tr><td><tt>shred</tt></td><td> </td><td>Ismételten felülír egy fájlt.</td></tr>
+<tr><td><tt>shuf</tt></td><td> </td><td>A bemeneti sorok véletlenszerű permutációja.</td></tr>
+<tr><td><tt>shutdown</tt></td><td> </td><td>A számítógép leállítása.</td></tr>
+<tr><td><tt>sleep</tt></td><td> </td><td>Néhány másodpercig felfüggeszti a folyamat.</td></tr>
+<tr><td><tt>sort</tt></td><td> </td><td>A fájlok sorbarendezett megjelenítése.</td></tr>
+<tr><td><tt>spamdbm</tt></td><td> </td><td>A levelek kéretlennek vagy valósnak jelölése.</td></tr>
+<tr><td><tt>split</tt></td><td> </td><td>Egy fájl megadott méretűre darabolása.</td></tr>
+<tr><td><tt>stat</tt></td><td> </td><td>A fájl vagy a fájlrendszer állapota.</td></tr>
+<tr><td><tt>strace</tt></td><td> </td><td>Egy szál vagy egy program rendszerhívásainak végigkövetése.</td></tr>
+<tr><td><tt>stty</tt></td><td> </td><td>Megjeleníti/megadja a terminál karakterisztikáját.</td></tr>
+<tr><td><tt>su</tt></td><td> </td><td>A jelenlegi felhasználó módosítása.</td></tr>
+<tr><td><tt>sum</tt></td><td> </td><td>Az ellenőrzés eredményét és a blokkok számát jeleníti meg fájlonként.</td></tr>
+<tr><td><tt>sync</tt></td><td> </td><td>A lemez változásainak véglegesítése, a szuper blokk frissítése.</td></tr>
+<tr><td><tt>sysinfo</tt></td><td> </td><td>A rendszer információinak megjelenítése.</td></tr>
+<tr><td colspan="3"><a id="T" name="T"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>T</h2></a></td></tr>
+<tr><td><tt>tac</tt></td><td> </td><td>Összefűzi és megjeleníti a fájlokat az utolsó sorral kezdve.</td></tr>
+<tr><td><tt>tail</tt></td><td> </td><td>Egy fájl utolsó 10 sora.</td></tr>
+<tr><td><tt>tcpdump</tt></td><td> </td><td>A hálózati forgalom kiírása.</td></tr>
+<tr><td><tt>tcptester</tt></td><td> </td><td>-</td></tr>
+<tr><td><tt>tee</tt></td><td> </td><td>Adato ír (vagy hozzáfűz) egy fájlba a bemenetről.</td></tr>
+<tr><td><tt>telnet</tt></td><td> </td><td>Felhasználói felület a telnet protokolhoz.</td></tr>
+<tr><td><tt>telnetd</tt></td><td> </td><td>Telnet szolgáltatás.</td></tr>
+<tr><td><tt>test</tt></td><td> </td><td>Igaz (true) vagy hamis (false) visszaadása összehasonlításkor.</td></tr>
+<tr><td><tt>timeout</tt></td><td> </td><td>Elindít egy programot, majd megadott idő után megszakítja azt.</td></tr>
+<tr><td><tt>top</tt></td><td> </td><td>A futó szálakat és a processzor-használatot jeleníti meg.</td></tr>
+<tr><td><tt>touch</tt></td><td> </td><td>A fájl időbéjegét (a módosítás idejét) módosítja.</td></tr>
+<tr><td><tt>tput</tt></td><td> </td><td>Terminál indítása vagy lekérdezés a terminfo adatbázisból.</td></tr>
+<tr><td><tt>tr</tt></td><td> </td><td>Lefordítja, összenyomja és/vagy törli a karaktereket a bemenetről.</td></tr>
+<tr><td><tt>traceroute</tt></td><td> </td><td>A hálózaton áthaladó csomagok útját írja ki.</td></tr>
+<tr><td><tt>translate</tt></td><td> </td><td>Az értelmezőket használva átalakítja a fájlt.</td></tr>
+<tr><td><tt>trash</tt></td><td> </td><td>A fájlok a Szemetesbe mozgatása vagy visszaállítása onnan.</td></tr>
+<tr><td><tt>true</tt></td><td> </td><td>A sikeres eredményt jelzi "0"-ával.</td></tr>
+<tr><td><tt>truncate</tt></td><td> </td><td>Növeli vagy csökkenti egy fájl méretét.</td></tr>
+<tr><td><tt>tsort</tt></td><td> </td><td>Topológiai rendezés.</td></tr>
+<tr><td><tt>tty</tt></td><td> </td><td>A fájl nevének megjelenítése, amivel a terminál kapcsolódik a bemenethez.</td></tr>
+<tr><td><tt>uname</tt></td><td> </td><td>Rendszerinformációk.</td></tr>
+<tr><td><tt>unchop</tt></td><td> </td><td>A <tt>chop</tt> által feldarabolt fájlok egyesítése. </td></tr>
+<tr><td><tt>unexpand</tt></td><td> </td><td>Szóközök tabulátorrá alakítása.</td></tr>
+<tr><td><tt>uniq</tt></td><td> </td><td>A bemetet egyező szomszédos sorait kiírja.</td></tr>
+<tr><td><tt>unlink</tt></td><td> </td><td>Egy megadott fájl törlése.</td></tr>
+<tr><td><tt>unmount</tt></td><td> </td><td>Lemezek leválasztása.</td></tr>
+<tr><td><tt>unrar</tt></td><td> </td><td>Rar fájlok kicsomagolása.</td></tr>
+<tr><td><tt>unshar</tt></td><td> </td><td>Shar fájlok kicsomagolása.</td></tr>
+<tr><td><tt>untrash</tt></td><td> </td><td>Ugyan az, mint a <tt>trash</tt>. </td></tr>
+<tr><td><tt>unzip</tt></td><td> </td><td>Zip fájlok kicsomagolása.</td></tr>
+<tr><td><tt>unzipsfx</tt></td><td> </td><td>Meglévő zip csomagok önkibontóvá alakítása.</td></tr>
+<tr><td><tt>updatedb</tt></td><td> </td><td>A lokalizációs adatbázis frissítése.</td></tr>
+<tr><td><tt>uptime</tt></td><td> </td><td>A rendszer indítása óta eltelt és a jelenlegi idő.</td></tr>
+<tr><td><tt>urlwrapper</tt></td><td> </td><td>Széttördeli az URL MIME típusát a parancssor vagy azok a programok számára, melyek nem kezelik azokat.</td></tr>
+<tr><td><tt>useradd</tt></td><td> </td><td>Felhasználó létrehozása.</td></tr>
+<tr><td><tt>uudecode</tt></td><td> </td><td>uuencode-al kódolt fájl dekódolása.</td></tr>
+<tr><td><tt>uuencode</tt></td><td> </td><td>Egy fájl kódolása, így már küldhető egy levél mellékleteként.</td></tr>
+<tr><td><tt>vdir</tt></td><td> </td><td>Fájlok információi.</td></tr>
+<tr><td><tt>version</tt></td><td> </td><td>Egy fájl verziója.</td></tr>
+<tr><td><tt>vmstat</tt></td><td> </td><td>A virtuális memória információi.</td></tr>
+<tr><td><tt>waitfor</tt></td><td> </td><td>Várakozás a megadott szál megjelenéséig. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
+<tr><td><tt>watch</tt></td><td> </td><td>Egy program időszakos futtatása.</td></tr>
+<tr><td><tt>wc</tt></td><td> </td><td>Egy fájlban lévő bekezdések, szavak és karakterek (bájtok) száma.</td></tr>
+<tr><td><tt>wget</tt></td><td> </td><td>HTTP-n, HTTPS-en vagy FTP-n keresztüli fájl-letöltés.</td></tr>
+<tr><td><tt>which</tt></td><td> </td><td>Egy parancs megkeresése.</td></tr>
+<tr><td><tt>whoami</tt></td><td> </td><td>A jelenlegi felhasználói név megjelenítése.</td></tr>
+<tr><td><tt>xargs</tt></td><td> </td><td>Egy program végrehajtása az összegyűjtött paraméterek listájával.</td></tr>
+<tr><td><tt>xres</tt></td><td> </td><td>Források megjelenítése és módosítása.</td></tr>
+<tr><td><tt>yes</tt></td><td> </td><td>Egy szöveg ismételt kiírása megszakításig.</td></tr>
+<tr><td><tt>zcat</tt></td><td> </td><td>Ugyan az, mint a <tt>gzip</tt>.</td></tr>
+<tr><td><tt>zcmp</tt></td><td> </td><td>Ugyan az, mint a <tt>zdiff</tt>. </td></tr>
+<tr><td><tt>zdiff</tt></td><td> </td><td>Tömörített fájlok összehasonlítása.</td></tr>
+<tr><td><tt>zforce</tt></td><td> </td><td>A fájlok ".gz" kiterjesztése az újratömörítés nélkül.</td></tr>
+<tr><td><tt>zgrep</tt></td><td> </td><td>A megadott minta alapján keres a tömörített fájlokban.</td></tr>
+<tr><td><tt>zip</tt></td><td> </td><td>Zip csomaghoz új elem hozzáadása vagy meglévő cserélése.</td></tr>
+<tr><td><tt>zipcloak</tt></td><td> </td><td>Kódol minden kódolatlan elemet a zip csomagban.</td></tr>
+<tr><td><tt>zipgrep</tt></td><td> </td><td>A megadott szöveg vagy minta megkeresése egy zip csomagban.</td></tr>
+<tr><td><tt>zipinfo</tt></td><td> </td><td>Ugyan az, mint a <tt>unzip</tt>.</td></tr>
+<tr><td><tt>zipnote</tt></td><td> </td><td>A zip fájlok tartalmának megjelenítése.</td></tr>
+<tr><td><tt>zipsplit</tt></td><td> </td><td>Zip csomagok kisebb darabokra darabolása.</td></tr>
+<tr><td><tt>zmore</tt></td><td> </td><td>Ugyan az, mint a <tt>more</tt>, de egy tömörített fájl tömörítetlen tartalmán.</td></tr>
+<tr><td><tt>znew</tt></td><td> </td><td>A .Z fájlok újratömörítése .gz (gzip) csomaggá.</td></tr>
+</table>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+<a href="../applications.html#cli-apps" class="uplink">Programok</a>
+::  <a href="cli-apps.html">Haiku-specific commands</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

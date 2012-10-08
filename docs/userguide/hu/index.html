@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Index</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/index.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/index.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/index.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/index.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/index.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/index.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/index.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/index.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/index.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/index.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/index.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/index.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/index.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/index.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="attributes.html">Jellemzők</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="queries.html">Lekérdezések</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Index</h1>
+
+<p>A <a href="attributes.html">Jellemzők</a> és a <a href="queries.html">Lekérdezések</a> kulcsfontosságú részei a Haiku-nak. Míg a jellemzők magukban is hasznosak, a fájl kiegészítő információit jelenítik meg, kereséshez (lekérdezéshez) azonban már inxedekelni kell őket. Az indexek a jellemzőket egy kereső táblába rakják, ami a keresést nagyon gyorsá teszi.<br />
+Az index a fájlrendszer részét képezi, és minden lemezen/partíción elkülönítve van tárolva.</p>
+
+<h2>
+Indexel kapcsolatos parancsok a Terminálban</h2> 
+<p>Több parancs is rendelkezésünkre áll az indexek kezelsére:</p>
+<ul> 
+<li><b>lsindex</b> - Megjeleníti az aktuális lemezen lévő indexelt jellemzőket.<br />
+Alap esetben ezek a jellemzőket indexeli a rendszer:</li>
+</ul>
+<pre class="terminal"> ~ -&gt;lsindex 
+BEOS:APP_SIG 
+MAIL:account 
+MAIL:cc 
+MAIL:chain 
+MAIL:draft 
+MAIL:flags 
+MAIL:from 
+MAIL:name 
+MAIL:pending_chain 
+MAIL:priority 
+MAIL:reply 
+MAIL:status 
+MAIL:subject 
+MAIL:thread 
+MAIL:to 
+MAIL:when 
+META:address 
+META:city 
+META:company 
+META:country 
+META:email 
+META:fax 
+META:group 
+META:hphone 
+META:name 
+META:nickname 
+META:state 
+META:url 
+META:wphone 
+META:zip 
+_signature 
+_status 
+_trk/qrylastchange 
+_trk/recentQuery 
+be:deskbar_item_status 
+last_modified 
+name 
+size 
+</pre>
+<ul>
+<li><b>mkindex</b> - Új jellemő hozzáadása az indexhez a lemezen. </li>
+</ul>
+<pre>használat: mkindex [opciók] &lt;jellemző&gt; 
+Új index létrehozása a megadott jellemzőhöz. 
+ 
+  -d, --volume=ÚTVONAL  annak a lemeznek az útvonala, ahová az indexet hozzá akarjuk adni, 
+                        alap esetben ez az aktuális lemez 
+  -t, --type=TÍPUS      az indexelni kívánt jellemző típusa, mely a következő lehet:
+                        "int", "llong", "string", "float", "double". 
+                        ha nem adunk meg semmit, akor "string" (szöveg) lesz 
+      --copy-from       annak a lemeznek az útvonala, ahonnan az indexet másolni akarjuk 
+  -v, --verbose         a létrehozás folyamata közbeni információk megjelenítése 
+
+</pre>
+<p>Csak az <b>új</b> fájl (azokkal a jellemzőkkel) kerülnek bele az indexbe!<br />
+Már létező fájlokat kézzel kell hozzáadni úgy, hogy átmásoljuk majd töröljük utána az eredetit. Alternatív megoldásként használhatjuk a <span class="cli">reindex</span> parancsot is. 
+</p>
+<ul>
+<li><b>reindex</b> - Egy meglévő fájl jellemzőit a lemez/partíció újonnan készített indexébe rakja. </li>
+</ul>
+<pre>használat: reindex [-rvf] útvonal &lt;fájlok/mappák listája&gt; 
+  -r    a mappák almappáit is indexeli
+  -v    a létrehozás folyamata közbeni információk megjelenítése
+  -f    létrehozza/frissíti az összes indexet a forrás lemezről,
+        a "útvonal" a forráslemez útvonala
+
+</pre>
+<ul>
+<li><b>rmindex</b> - Eltávolít egy jellemzőt a lemez/partíció indexéből.</li>
+</ul>
+<pre>használat: rmindex [OCIÓK]... INDEX_NEVE 
+ 
+Törli az INDEX_NEVE nevű indexet a lemezről. Miután ez elkészült,
+a rendszer már nem fogja tudni megkeresni a fájlokat az INDEX_NEVE nevű jellemző alapján. 
+ 
+  -d, --volume=ÚTVONAL  annak a lemeznek az útvonal, ahonnan az indexet törölni szeretnénk
+  -h, --help            ez a segítség megjelenítése 
+  -p, --pattern         az INDEX_NEVE egy minta 
+  -v, --verbose         az eltávolítási folyamata közbeni információk megjelenítése  
+ 
+Az INDEX_NEVE egy fájl jellemzőjének a neve. 
+ 
+Ha nicns lemez megadva, akkor a jelenlegi lemez lesz használva.</pre>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="attributes.html">Jellemzők</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="queries.html">Lekérdezések</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

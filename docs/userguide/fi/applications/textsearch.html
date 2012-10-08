@@ -40,6 +40,8 @@
 <li><a href="../../zh_CN/applications/textsearch.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/textsearch.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/applications/textsearch.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/textsearch.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/textsearch.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/textsearch.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,7 +53,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />Tekstihaku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -64,22 +65,22 @@
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
-<p>You enter a search string in the text box on top and hit <span class="key">RETURN</span> or click <span class="button">Search</span> to start. If <span class="menu">Show lines</span> is checked, the hits are automatically expanded to show the lines of the file containing the search string.</p>
+<p>Aloitat kirjoittamalla hakumerkkijonon teksti-ikkunaan ylhäällä ja napauttamalla <span class="key">Enter</span>-näppäintä tai napsauttamalla <span class="button">Etsi</span>-painiketta. Jos <span class="menu">Näytä rivit</span> on valittuna, osumat laajennetaan automaattisesti näyttämään hakumerkkijonon sisältävät tiedoston rivit.</p>
 
-<p>Only a few words on some of the otherwise self-explaining menu items:</p>
+<p>Vain muutama sana muuten itsestäänselvistä valikkoriveistä:</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
 <tr><td colspan="5"><h3>Tiedostovalikko</h3></td></tr>
 <tr><td class="onelinetop"><span class="menu">Uusi ikkuna</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Avaa uuden ikkunan, jossa voit kirjoittaa toisen merkkijonon ja etsiä sitä samoista tiedostoista/kansioista.</td></tr>
 <tr><td><span class="menu">Aseta kohde...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Valitaan uusi tiedostojen ja kansioiden joukko etsittäväksi.</td></tr>
 <tr><td colspan="5"><h3>Toimintovalikko</h3></td></tr>
 <tr><td><span class="menu">Karsi-valinta</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Poistaa kaikki rivit luettelosta, joka ei ole nykyisin valittu.</td></tr>
-<tr><td><span class="menu">Avaa-valinta</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
+<tr><td><span class="menu">Avaa-valinta</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Avaa nykyiset valitut tiedostot ensijaisella sovelluksella (sama kuin kaksoisnapsauttamalla). Jos se on tekstieditori, joka tukee sitä  (kuten Pe), voit hypätä tarkalleen sille riville, josta hakumerkkijono löytyi.</td></tr>
 <tr><td><span class="menu">Avaa tiedostoja Seuraajassa</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Avaa nykyisin valittujen tiedostojen sijainnin Seuraajassa.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Kopioi tekstin leikepöydälle</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Kopioi nykyisen valinnan leikepöydälle.</td></tr>
 <tr><td colspan="5"><h3>Asetukset-valikko</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Ohita kansiot, jotka alkavat pisteellä</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Vain tekstitiedostot</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">Ohita kansiot, jotka alkavat pisteellä</span></td><td> </td><td>Tämä on hyödyllinen työskenteltäessä "unixy"-ympäristössä, missä usein hallinnointitiedostot piilotetaan "<tt>.folders/</tt>"-kansioiden sisälle. Versionhallintajärjestelmät, kuten SVN ja CVS ovat esimerkkejä sovelluksista, jotka käyttävät tätä ja niitä käytetään laajalti Haikussa.</td></tr>
+<tr><td colspan="3"><span class="menu">Koodinvaihtohakumerkkijono</span></td><td> </td><td>Tekstihaku käyttää komentorivityökalua <span class="cli">grep</span>. Sitä varten erikoismerkit, kuten <tt>'"*\$?!</tt> ja välilyönnnit ilmaistaan koodinvaihtomerkillä <tt>\</tt>. Tämän aktivoinnin poistaminen tarkoittaa, että sinun on tehtävä tämä itse, mutta vaihdossa sinulle myönnetään <a href="http://fi.wikipedia.org/wiki/S%C3%A4%C3%A4nn%C3%B6llinen_lauseke" class="external free" title="Wikipedia: säännöllinen lauseke" rel="nofollow">säännöllisten lausekkeiden</a> voima.</td></tr>
+<tr><td colspan="3"><span class="menu">Vain tekstitiedostot</span></td><td> </td><td>Tekstihaku on nykyisin hyödyllinen etsittäessä merkkijonoja pelkistä tekstitiedostoista. Tämä asetuksen poistaminen saa tekstihaun kuitenkin etsimään sitä kaikentyyppisistä tiedostoista.</td></tr>
 <tr><td colspan="5"><h3>Historiavalikko</h3></td></tr>
 <tr><td colspan="4"></td><td>Sisältää äskettäin käytetyt etsintämerkkijonot.</td></tr>
 <tr><td colspan="5"><h3>Koodausvalikko</h3></td></tr>

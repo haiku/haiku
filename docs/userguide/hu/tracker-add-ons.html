@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Nyomkövető kiegészítők</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/tracker-add-ons.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/tracker-add-ons.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/tracker-add-ons.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/tracker-add-ons.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/tracker-add-ons.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/tracker-add-ons.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/tracker-add-ons.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/tracker-add-ons.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/tracker-add-ons.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/tracker-add-ons.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/tracker-add-ons.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/tracker-add-ons.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/tracker-add-ons.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/tracker-add-ons.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="tracker.html">Nyomkövető (Tracker)</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="keyboard-shortcuts.html">Billentyű-kombinációk</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Nyomkövető kiegészítők</h1>
+
+<p>A programok különféle kiegészítőket telepíthetnek a gépre, amik egyszerűen előhívhatóak a kijelölt fájlokkal a Nyomkövetőben. Csak azok jelennek meg a <span class="menu">Kiegészítők</span> közt, amik tudják kezelni a kiválasztott fájltípust. Ezek szintén elérhetőek a <span class="menu">Fájl</span> menüben a Nyomkövető ablakban. Néhány kiegészítőnek nem szükséges, hogy egy fájlon nyissuk meg (tehát fájl-függetlenek), így mindig megtaláljuk őket a listában.</p>
+<p>A Nyomkövető kiegészítők, vagy olyan programok hivatkozásai, amik kiegészítőként is működhetnek, az alábbi 3 mappába telepíthetőek (további információk a <a href="filesystem-layout.html">Fájlrendszer felépítése</a> fejezetben):</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td>A rendszer kiegészítői.</td></tr>
+<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>Az összes felhasználó számára elérhető kiegészítők.</td></tr>
+<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>Csak a jelenlegi felhasználó kiegészítői.</td></tr>
+</table>
+<p>A kiegészítő neve végződhet egy kötőjellel és egy nagy betűvel, így billentyű kombinációval is előhívhatóak. Például a <span class="app">Cél mappa megnyitása-O</span> az <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span> kombinációval is előhívható.<br />
+Természetesen, meg kell gondolni, hogy milyen betűt választunk, ugyanis nem lehet azonos betű megadva két kiegészítőnek.</p>
+
+<h2><a id="system-add-ons" name="system-add-ons">A Haiku Nyomkövető kiegészítői</a></h2>
+<p>A következő kiegészítők a Haiku részeit képezik:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
+	<tr><td class="onelinetop"><b>Hátterek</b><i>-B</i></td>
+		<td valign="top">Megnyitja a <a href="preferences/backgrounds.html">Hátterek</a> beállítások panelt, ahol megtudjuk változtatni az Asztal vagy bármely mappa háttérszínét és a háttérképét. Egy képen való előhívásakor a kép automatikusan megnyitásra kerül, mint háttérkép a beállítások panelen.</td></tr>
+	<tr><td class="onelinetop"><b>Lemezhasználat</b><i>-I</i></td>
+		<td valign="top">Elindítja a <a href="applications/diskusage.html">Lemezhasználat</a> nevű programot a kiválasztott mappával, mint kiindulási mappával.</td></tr>
+	<tr><td class="onelinetop"><b>Fájltípusok</b><i>-F</i></td>
+		<td valign="top">Egy fájlon megnyitva a fájlhoz tartozó <a href="filetypes.html">Fájltípus</a> panelt hívja elő, egyéb esetben pedig a Fájltípusok beállítás panel jelenik meg.</td></tr>
+	<tr><td class="onelinetop"><b>Cél mappa megnyitása</b><i>-O</i></td>
+		<td valign="top">Csak fájl-hivatkozáson használható. Megnyitja a hivatkozott fájlt tartalmazó mappát.</td></tr>
+	<tr><td class="onelinetop"><b>Szövegkeresés</b><i>-G</i></td>
+		<td valign="top">A <a href="applications/textsearch.html">Szövegkeresés</a> programot elindítva a keresés a megadott mappában (és a almappákban) történik.</td></tr>
+	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
+		<td valign="top">Kijelölt fájlok esetében azok becsomagolásra kerülnek egy zip csomagba, egyéb esetben csak a csomagoló ablak jelenik meg, amibe belehúzással csomagolhatunk be fájlokat.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="tracker.html">Nyomkövető (Tracker)</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="keyboard-shortcuts.html">Billentyű-kombinációk</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

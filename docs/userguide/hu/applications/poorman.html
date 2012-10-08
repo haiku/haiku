@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>SzegényEmber</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/poorman.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/poorman.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/poorman.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/poorman.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/poorman.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/poorman.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/poorman.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/poorman.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/poorman.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/poorman.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/poorman.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/poorman.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/poorman.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/poorman.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="people.html">Névjegyek</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="screenshot.html">Képernyőkép</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/poorman-icon_64.png" alt="poorman-icon_64.png" width="64" height="64" />SzegényEmber (PoorMan)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/PoorMan</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/PoorMan Settings</span></td></tr>
+</table>
+<p><br /></p>
+<p>A SzegényEmber egy remek kis internetes kiszolgáló (webserver), melyet könnyen beállíthatunk. Természetesen nem tartalmaz semmilyen speciális funkciót, vagy beállítást, éppen innen is ered a neve: SzegényEmber kiszolgálója.</p>
+<p>Első indításkor a program megkérdezi, hogy mely mappát szeretnénk használni a kiszolgálni kívánt tartalom számára. Ha az <span class="button">Alapértelmezett</span>et választjuk, akkor egy új mappát fog létrehozni (<span class="path">/boot/home/public_html</span>). Kezdőoldalnak egy <span class="cli">index.html</span> nevű HTML fájlnak léteznie kell a mappában.</p>
+<p>A program lényegében egy konzol ablakból áll, mely tartalmazza a program naplóját is. Ezen kívül informálódhatunk a kiszolgáló állapotáról, a mappáról, és a kérések számáról. A beállítások a <span class="menu">Szerkesztés | Beállítások...</span> menüből érhetőek el:
+</p>
+<p><img id="poorman" src="../images/apps-images/poorman.png" alt="poorman.png" /></p>
+<p>A beállítások ablak 3 részre osztható:</p>
+<p>Az <span class="menu">Oldal</span> fülön módosíthatjuk a kiszolgálandó mappa helyét, a kezdőoldal nevét, illetve azt, hogy ha nem található kezdőoldal a mappában, akkor az oldalon a mappa tartalma megjelenjen-e vagy sem.<br />
+A <span class="menu">Naplózás</span> fülön ki- illetve bekapcsolhatjuk a naplózást a konzolba, vagy megadhatunk egy külön naplófájlt is.<br />
+<span class="menu">Haladó</span> beállítások esetén pedig a maximális egyidejű kapcsolatok számát tudjuk szabályozni.</p>
+<p>A konzol ablakban lévő menüelemek magától értetődőek. Ahol például elmenthetjük a konzolon látott naplót, vagy épp kiüríthetjük azt, leállíthatjuk/elindíthatjuk a kiszolgálót, illetve lenullázhatjuk a kapcsolatok számát.</p>
+
+<div class="box-info">Ha ki szeretnénk próbálni, hogy egyártalán működik-e, akkor csak meg kell adni a <span class="path">/boot/apps/BePDF/docs/</span> mappában lévő <span class="cli">index.html</span> fájlt, mint kezdőoldalt. Ezután a böngészőbe írjuk be a 127.0.0.1 címet, ami a saját gépünk magára mutató azonosítója.</div>
+
+</div>
+</div>
+<!--
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="people.html">Névjegyek</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="screenshot.html">Képernyőkép</a>  »
+</span></div>
+</div>
+-->
+</body>
+</html>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"> 
+<head>
+<!-- 
+ *
+ * Copyright 2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Maciej Bałuta  (Google Code-In student)
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>NetworkStatus</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/desktop-applets/networkstatus.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/desktop-applets/networkstatus.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/desktop-applets/networkstatus.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/desktop-applets/networkstatus.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/desktop-applets/networkstatus.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/desktop-applets/networkstatus.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/desktop-applets/networkstatus.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/desktop-applets/networkstatus.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/desktop-applets/networkstatus.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/desktop-applets/networkstatus.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/desktop-applets/networkstatus.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/desktop-applets/networkstatus.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/desktop-applets/networkstatus.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../en/desktop-applets/networkstatus.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="launchbox.html">LaunchBox</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="powerstatus.html">PowerStatus</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
+
+<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />NetworkStatus</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/NetworkStatus</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><i>nenhuma</i></td></tr>
+</table>
+<p>NetworkStatus shows the status of your network connections. If not yet running, launching the applet will ask if it should open in window mode or live in the Deskbar. In window mode you're able to resize the icon by resizing the window and use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
+Wherever installed, it's operated via a right-click context menu.</p>
+<p><img src="../images/networkstatus-images/applet.png" alt="NetworkStatus applet" /><br />
+The first section contains all network devices' names and their state. Clicking on such an entry brings up a window showing its IP, broadcast and netmask address.<br />
+Below is a list of all wireless networks found by the first wireless adapter and an indicator of their signal strength. Have a look at the <a href="..\workshop-wlan.html">Workshop: Wireless networking</a> for more information on how to set up a connection.<br />
+Lastly, you can <span class="menu">Open network preferences...</span> to change your <a href="../preferences/network.html">network configuration</a> or <span class="menu">Quit</span> the applet.</p>
+
+<h2>Status icons</h2>
+<table summary="status icons" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Ready</td><td>Link is established.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Configuring</td><td>Connecting in progress.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>No stateful configuration</td><td>Some settings are missing (check <a href="../preferences/network.html">IP configuration</a>).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>No link</td><td>There is no physical connection (probably the network cable is not connected and wireless networks are unavailable).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>There are no network adapters available (if you are sure that at least one is connected, there are probably no drivers yet).</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="launchbox.html">LaunchBox</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="powerstatus.html">PowerStatus</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

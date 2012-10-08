@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Maciej Bałuta  (Google Code-In student)
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Folyamatkezelő</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/desktop-applets/processcontroller.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/desktop-applets/processcontroller.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/desktop-applets/processcontroller.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/desktop-applets/processcontroller.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/desktop-applets/processcontroller.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/desktop-applets/processcontroller.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/desktop-applets/processcontroller.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/desktop-applets/processcontroller.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/desktop-applets/processcontroller.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/desktop-applets/processcontroller.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/desktop-applets/processcontroller.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/desktop-applets/processcontroller.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/desktop-applets/processcontroller.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/desktop-applets/processcontroller.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="powerstatus.html">Energiaállapot</a> 
+::  <a href="../desktop-applets.html" class="uplink">Asztalsáv kisalkalmazásai</a> 
+::  <a href="workspaces.html">Munkaasztalok (Workspaces)</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />Folyamatkezelő (ProcessController)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Asztali kisalkalmazások</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><i>Nincs</i></td></tr>
+</table>
+
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />A program elsődleges feladata a processzor(ok) és a memória kihasználtságának kijelzése. Ezen kívül lehetőséget nyújt a különféle folyamatok figyelésére, azok prioritásának módosítására, illetve a bezárásukra hiba esetén. Több processzoros gép esetén a processzorok/magok akár ki is kapcsolhatóak. Amikor a Nyomkövető és az Asztalsáv meghibásodik, akkor azokat a menüből újra is indíthatjuk.</p>
+<p>A bal oldali kijelző a processzor-használatot, míg a jobb oldali a memória használatát mutatja. A kijelzők száma a gépben található processzorok/magok számától függőn változhat.</p>
+<p>Ha még nem fut a Folyamatkezelő, akkor indításkor megkérdezi, hogy ablakban fussun vagy az Asztalsávon helyezkedjen el. Ha ablakban fut, akkor azt átméretezhetjük, és akár <a href="../gui.html#replicants">Replikáns</a>ként is használhatjuk.<br />
+Bárhogy is fusson, egy helyi menü a rendelkezésünkre áll.<br />
+Ha törölni szeretnénk a programot a Polcról, akkor csak kattintsunk az <span class="menu">Átrakás az Asztalsávra</span> elemen a menüben.</p>
+<h2>Kilépés a programból</h2>
+<img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
+<p>Egy program/folyamat bezárásához csak annak nevére kell kattintani a <span class="menu">Program leállítása</span> menüben. Ez a művelet megegyezik azzal, amikor a program bezárás gombján kattintunk. Arra azonban ügyelni kell, hogy a rendszer folyamatait (például *_server, *_daemon) ne zárjuk be, mert akkor annak működése veszélybe kerülhet. </p>
+<h2>Memória-használat</h2>
+<img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
+<p>A memória-használat kijelzése pontatlan lehet.</p>
+<p>Ez a menü lehetőséget nyújt a különböző folyamatok memória használatának figyelésére. A folyamat mellett két oszlop is található: az első a fenntartott írható memóriát, a második pedig az összes memóriát jelzi (például a funkciótárak által használt memóriát is).</p>
+<p>Az első sor, a <i>Rendszer erőforrásai és gyorsítótárai...</i>, a rendszer és az összes program által használt memóriára vonatkozik. A kék sáv hossza a fizikai memória mennyiségének függvénye. A további sorok a programok memória használatát jelzik. A sávok hossza a jelenlegi memória használat függvéyében változik, és a rendelkezésre álló memória mennyiségén alapul.</p>
+<table>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Az adott program által használt (írható) memória.</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>A memória a csak olvasható területet is beleszámítva (amiket a programok egymás közt megosztanak).</td></tr>
+</table>
+
+<h2>Processzor és szál használat</h2>
+<p>Ez a menü arra ad lehetőséget, hogy a szálak prioritását módosítsuk, a programokat leállítsuk vagy hibát keressünk bennük.</p>
+<div class="box-stop">Ezek a műveletek adatvesztéshez vagy a rendszer instabilitásához vezethetnek. Csak óvatosan!</div>
+<img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
+<table>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel kód</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Felhasználói kód</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Szál üresjáratban</td></tr>
+</table>
+<p>Az első szinten a futó programok találhatóak. A rajtuk való kattintással bezárhatóak. A sáv sötétkék része a kernel kódban töltött idő, a világoskék a felhasználói kódban, míg a zöld az üresjáratban eltöltött időt jelzi. A kékkel teljesen kitöltött sáv esetében az adott program használja ki a processzor összes erőforrását.</p>
+<p>A második szint a program száljait mutatja. Az ezen való kattintással vagy hibát kereshetünk, vagy megszakíthatjuk azt. Ha a sáv teljesen kékkel van kitöltve, akkor a szál egy processzort/magot lefoglal.</p>
+<p>Az utolsó szinttel a szál prioritása módosítható. Csak óvatosan! Egy óvatlan mozdulat, és a szál máris az ellentétes mértékben fogja kihasználni a processzort. A processzor idő növekedése az alacsony prioritás eredménye. A prioritással nem ajánlott játszadozni, ugyanis a program készítőjének a dolga, hogy megfelelőt használjon a programja. Ha szükséges, akkor lépj kapcsolatba vele.
+</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+«  <a href="powerstatus.html">Energiaállapot</a> 
+::  <a href="../desktop-applets.html" class="uplink">Asztalsáv kisalkalmazásai</a> 
+::  <a href="workspaces.html">Munkaasztalok (Workspaces)</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

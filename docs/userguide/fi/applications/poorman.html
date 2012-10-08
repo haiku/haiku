@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>PoorMan</title>
+	<title>Köyhis</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -38,38 +40,39 @@
 <li><a href="../../zh_CN/applications/poorman.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/poorman.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/applications/poorman.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/poorman.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/poorman.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/poorman.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="people.html">Ihmiset</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
-::  <a href="screenshot.html">Screenshot</a>  »
+::  <a href="screenshot.html">Näytönkaappaus</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/apps-images/poorman-icon_64.png" alt="poorman-icon_64.png" width="64" height="64" />PoorMan</h2>
+<h2><img src="../../images/apps-images/poorman-icon_64.png" alt="poorman-icon_64.png" width="64" height="64" />Köyhis</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/PoorMan</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/PoorMan Settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>PoorMan is a nice little webserver that's extremly easy to set up. Naturally it doesn't offer any advanced features like other heavy duty server software, it's after all only a poor man's webserver.</p>
-<p>Upon its first launch, PoorMan asks for the folder that is about to be served to the web. If you go with the <span class="button">Default</span>, a new folder <span class="path">/boot/home/public_html</span> is created for you. As a start page a HTML file named by default <span class="cli">index.html</span> has to be present there.</p>
-<p>PoorMan presents itself with a simple console that logs its activity. Then, there's status information if the server is running, which folder is being served, and a hit counter. Settings are changed with <span class="menu">Edit | Settings...</span>:
+<p>Köyhis on näppärä pieni webbipalvelin, joka on äärimmäisen helppoa konfiguroida. Luonnollisesti se ei tarjoa mitään edistyneitä ominaisuuksia, kuten raskasta kuormaa palvelevat palvelinohjelmistot, se on vain köyhän miehen webbipalvelin.</p>
+<p>Ensimmäisen käynnistyksen yhteydessä Köyhis kysyy kansiota, josta palvellaan webbiä. Jos etenet painikkeella <span class="button">Oletus</span>, uusi kansio <span class="path">/boot/home/public_html</span> luodaan sinulle. Aloitussivuna HTML-tiedosto nimetään oletuksena siten, että <span class="cli">index.html</span>-tiedoston on oltava siellä.</p>
+<p>Köyhis esittlee itsensä yksinkertaisessa pääteikkunassa, joka lokikirjaa sen aktiviteetin. Sitten siellä on tilatietoa siitä, onko palvelin käynnissä, mitä kansiota palvellaan ja osumalaskuri. Asetuksia vaihdetaan valikossa <span class="menu">Muokkaa | Asetukset...</span>:
 </p>
 <p><img id="poorman" src="../images/apps-images/poorman.png" alt="poorman.png" /></p>
-<p>The settings panel is divided into three tabs:</p>
-<p>In <span class="menu">Site</span> you can select another folder to serve, enter another start page and have the option to send a file listing if the start page isn't present.<br />
-<span class="menu">Logging</span> lets you de/activate logging to the console or optionally to a separate logfile.<br />
-The <span class="menu">Advanced</span> tab holds the setting for the maximum simultaneous connections.</p>
-<p>The menu items of the console window are all self-explanatory. With them you can e.g. save (parts) of the console output, clear the console or logging file and start/stop the server or clear the hit counter.</p>
+<p>Asetuspaneeli jaetaan kolmeen välilehteen:</p>
+<p>Valikossa <span class="menu">Sivusto</span> voit valita toisen kansion palvelemisen, kirjoittaa toisen aloitussivun ja siellä on valitsin tiedostoluettelon lähettämiseksi, jos aloitussivua ei ole.<br />
+Valikko <span class="menu">Kirjaaminen</span> sallii sinun sulkea/avata lokikirjauksen pääteikkunaan tai vaihtoehtoisesti erilliseen lokitiedostoon.<br />
+Välilehti <span class="menu">Lisäasetukset</span> sisältää asetuksen samanaikaisten yhteyksien enimmäismäärästä.</p>
+<p>Pääteikkunan valikkorivit ovat itsestäänselviä. Niillä voit esimerkiksi tallentaa pääteikkunan (osa)tulosteita, tyhjentää pääteikkunan tai käynnistää/sammuttaa palvelimen ja nollata osumalaskurin.</p>
 
-<div class="box-info">If you want to try out if PoorMan's working, choose <span class="path">/boot/apps/BePDF/docs/</span> as folder and <span class="cli">index.html</span> as start page. Then point your browser to the URL 127.0.0.1, which is your local host.</div>
+<div class="box-info">Jos haluat kokeilla Köyhiksen toimintaa, valitse <span class="path">/boot/apps/BePDF/docs/</span> kansioksi ja <span class="cli">index.html</span> aloitussivuksi. Aseta sitten selaimesi verkko-osoitteeksi 127.0.0.1, mikä on paikallinen verkkokoneesi.</div>
 
 </div>
 </div>
@@ -78,7 +81,7 @@ The <span class="menu">Advanced</span> tab holds the setting for the maximum sim
 <div class="inner"><span>
  «  <a href="people.html">Ihmiset</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
-::  <a href="screenshot.html">Screenshot</a>  »
+::  <a href="screenshot.html">Näytönkaappaus</a>  »
 </span></div>
 </div>
 -->

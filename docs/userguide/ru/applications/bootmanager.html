@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Rodastahm Islamov
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>BootManager</title>
+	<title>Загрузчик (BootManager)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -38,6 +40,8 @@
 <li><a href="../../pt_PT/applications/bootmanager.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../fi/applications/bootmanager.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/applications/bootmanager.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/bootmanager.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/bootmanager.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/bootmanager.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -49,45 +53,44 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
-<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />BootManager</h2>
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Загрузчик (BootManager)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally started from Installer's <span class="menu">Tools</span> menu</i></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
-<tr><td>Settings:</td><td></td><td><i>none</i><br />MBR backups are saved by default in <span class="path">~/config/settings/bootman/</span></td></tr>
+<tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><i>Отсутствует в меню Deskbar, обычно запускается из меню <span class="menu">Иструменты</span> во время установки системы</i>.</td></tr>
+<tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
+<tr><td>Настройки хранятся по адресу:</td><td></td><td>резервные копии MBR по умолчнию хранятся: <span class="path">~/config/settings/bootman/</span></td></tr>
 </table>
 <p><br /></p>
-<p>If you don't add the Haiku partition to an existing boot manager like GRUB, BootManager can install a small boot menu in the Master Boot Record (MBR) that looks something like this:</p>
+<p>Если вы не добавили раздел с Haiku в ваш менеджер загрузок (например, GRUB), то при помощи Загрузчика (BootManager) вы сможете установить простенькое меню загрузки в MBR, которое будет выглядеть следующим образом:</p>
 <img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
-<div class="box-info">Boot Manager isn't yet tested very well and still has a few restrictions that it will complain about if they aren't met: the menu can only be installed on your first harddisk and there has to be a 2KiB space after the Master Boot Record (MBR).</div>
-<p>BootManager guides you through the installation process of the boot menu.</p>
+<div class="box-info">Загрузчик (Boot Manager) ещё не достаточно протестирован, поэтому имеются некоторые ограничения: загрузочное меню может быть установлена только на ваш первый жёсткий диск, а также должно находится 2 Кбайта свободного места после MBR.</div>
+<p>Загрузчик (BootManager) проведёт вас по всем процессу установки загрузочного меню.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="1-drives" id="1-drives">Choosing the destination drive</a></h2>
+<a name="1-drives" id="1-drives">Выбор диска</a></h2>
 <img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
-<p>The BootManager starts off with a list of all available drives from which you choose the destination. If there's already a boot menu on that drive, the <span class="button">Uninstall</span> button becomes active, leading you through the simple procedure to restore a formerly backed-up MBR, thereby removing the boot menu again.<br />
-Otherwise, choose <span class="button">Install</span> to continue.</p>
+<p>Сразу после запуска Загрузчик (BootManager) предложит вам список всех доступных дисков, на которые можно установить загрузочное меню. Если загрузочное меню уже существует на диске, то кнопка <span class="button">Удалить</span> станет активной, нажав которую вы запустить процедуру восстановления ранее созданной резервной копии MBR, вернув которую вы восстановите старую MBR и удалите существующее загрузочное меню.<br />
+В противном случае, выберите <span class="button">Установить</span>.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="2-backup" id="2-backup">Backing up the Master Boot Record (MBR)</a></h2>
-<p>In case anything goes wrong or you want to remove the boot menu again, the Master Boot Record (MBR) is now saved. This is obviously a very important step, make sure you don't accidentally overwrite some other MBR-backup maybe from some earlier experimentation, for example!</p>
+<a name="2-backup" id="2-backup">Создание резервной копии MBR</a></h2>
+<p>В случае, если что-то пойдёт не так, или если вы хотите удалить загрузочное меню и вернуть старую MBR, то на этом шаге можно сделать резервную копию MBR текущей. Это, безусловно, очень важный шаг, поэтому убедитесь, что вы случайно не перезапишете старые резервные копии MBR, которые могли остаться от старых экспериментов.</p>
 <img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
 <img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
-<p>Just select a destination for the backup file "<tt>MBR</tt>" or leave the default path. After clicking <span class="button">Next</span> you'll get a confirmation if the backup was successful.</p>
+<p>Выберите место сохранения резервной копии "<tt>MBR</tt>" либо оставьте стандартный путь сохранения. После того, как вы нажмёте на кнопку <span class="button">Продолжить</span>, получите извещение о том, что резервная копия сохранена успешно.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="3-menu" id="3-menu">Configuring the boot menu</a></h2>
+<a name="3-menu" id="3-menu">Настройка загрузочного меню</a></h2>
 <img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
 <img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
-<p>Next you're presented with a list of all partitions on the destination drive. By setting checkmarks you decide what entries will appear in the boot menu, the text boxes allow you to rename an entry.</p>
-<p>After that, you pick from the pop-up menu which partition will be booted from by default and set a timeout with the slider below. Here, "<i>Immediately</i>" will skip the boot menu entirely, "<i>Never</i>" will just stop at the boot menu. You can override the timeout setting by holding <span class="key">ALT</span> while booting.</p>
+<p>Далее вы увидите список всех разделов на выбранном вами диске. Установив флажок напротив того или иного раздела, тем самым вы добавите его в загрузочное меню. Текстовые поля рядом с флажками позволяют задать название для пунктов загрузочного меню.</p>
+<p>Далее всплывающее окно позволит установить время задержки с помощью ползунка. Установив ползунок в значение "<i>Немедленно</i>" загрузка будет происходит моментально т.е. вы не сможете выбрать какой-либо пункт меню. Значение же "<i>Никогда</i>", напротив, остановит загрузку на стадии загрузочного меню до тех пор, пока вы не выберите один из пунктов. Изменить настройки задержки загрузки можно удерживая клавишу <span class="key">ALT</span> во время загрузки.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="4-mbr" id="4-mbr">Writing the boot menu</a></h2>
+<a name="4-mbr" id="4-mbr">Запись загрузочного меню</a></h2>
 <img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
 <img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
-<p>Before the boot menu is written to the MBR, you'll get a summary of your configuration and then one last chance to abort the operation. Don't worry though, as long as you keep the MBR backup safe, you can easily revert the changes. Should things get thoroughly messed up, you can always boot from a Haiku install CD or USB stick and write back the MBR backup with BootManager.</p>
+<p>Перед тем, как записать загрузочное меню в MBR, вам будет представлена последняя возможность проверить, всё ли правильно вы указали, и если что-то не так исправить или вовсе прервать операцию. Если после записи ничего не работает и ничего не загружается, то вы можете загрузить Haiku с USB-носителя или с CD и восстановить MBR из резервной копии при помощи Загрузчика (BootManager).</p>
 
 </div>
 </div>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2012, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>A Haiku felhasználói felülete</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/gui.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/gui.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/gui.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/gui.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/gui.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/gui.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/gui.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/gui.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/gui.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/gui.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/gui.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/gui.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/gui.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="filesystem-layout.html">Fájlrendszer felépítése</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="workspaces.html">Munkaasztalok (Workspaces)</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+		<a href="#move-resize">Könnyű mozgatás és méretezés</a><br />
+                <a href="#stack-tile">Halmozás és csempézés</a><br />
+                <a href="#open-save-panel">Megnyitás és mentés panel</a><br />
+                <a href="#replicants">Replikánsok</a></td></tr>
+</table>
+
+<h1>A Haiku felhasználói felülete</h1>
+
+<p>A Haiku grafikus felhasználói felülete a rendszer részét képezi. Ellentétben a Unix-szerű operációs rendszerekkel, nincs különálló ablakkezelő, és éppen ezért a csak parancssoros indítás sem lehetséges. A Haiku elsősorban az asztali felhasználóra összpontosít.</p>
+<p>Minden bizonnyal már rendelkezel más grafikus környezetbeli ismerekkel, ezért most nem térünk ki a "szabványokra", mint például a menük, helyi menük, az egérrel való munka, stb. Most pedig nézzük át a Haiku felületének sajátosságait.</p>
+<img src="images/gui-images/gui.png" alt="gui.png" />
+<p>Csupán néhány dolog jellemző a Haiku felületére, ami magyarázatra szorul.</p>
+<ol>
+<li><p>A Haiku "Start menüje" az Asztalsáv. További információk az <a href="deskbar.html">Asztalsáv</a> fejezetben.</p></li>
+<li>A sárga fül nem csak egy program vagy egy fájl neve:
+<ul><li>Mozgathatjuk a <span class="key">SHIFT</span> lenyomva tartásával, így lehetővé téve több ablak halmozását.</li>
+<li>Az ablak elrejthető (az Asztalsávra kicsinyíthető), ha duplán kattintunk a fülön (vagy a <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> kombinációval). A már elrejtett ablakok hozzáférhetőek az <a href="deskbar.html">Asztalsáv</a>on illetve a <a href="twitcher.html">Programváltó</a>ban.</li>
+<li>Az ablak háttérbe küldhető, ha a fülön (vagy az ablak keretén) a jobb gombbal kattintunk.</li></ul></li>
+<li><p>Bezárás gomb.</p></li>
+<li><p>Az ablak maximalizálására szolgáló gomb (<span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span> kombináció). A legtöbb programban az ablak teljes képernyőre történő átméretezésére szolgál. Azonban nem csak erre használható. A Nyomkövető például az ablakot a tartalom megjelenítésére optimalizált méretűre méretezi át.</p></li>
+<li><p>Az ablak kerete. A bal oldali keret az ablak mozgatására, a jobb oldali pedig az ablak átméretezésére szolgál.</p></li>
+<li><p>Méretező sarok.</p></li>
+</ol>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="move-resize" name="move-resize">Könnyű mozgatás és méretezés</a></h2>
+<p>Az ablakok mozgatása és méretezése egy fontos része a programmal való interaktivitásnak. Ennek a kis sárga fülön és a vékony keret használatán túl van más módja is. A méretező sarok kis mérete miatt annak is megvannak a maga korlátai: csak az ablak átméretezésére van lehetőség a jobb alsó sarok irányába. <br />A jobb oldali keret a méretezésre szintén használható, de pontosan kell célozni az egérrel.</p>
+<p>Ezen problémák kiküszöbölésére a Haiku különféle ablakkezelő kombinációkat tud használni a <span class="key">CTRL</span> <span class="key">ALT</span> és az egér használatával. További információk a <a href="keyboard-shortcuts.html#general">Billentyűzet-kombinációk</a> fejezetben.</p>
+<img src="images/gui-images/resizing.png" alt="resizing.png" />
+<p>A <span class="key">CTRL</span> <span class="key">ALT</span> lenyomásakor  az egérhez közeli ablakkeret kiemelésre kerül. Mozgasd az egeret a többi keret felé, hogy másik keret legyen kijelölve. Kattints a <i>jobb egér gombbal</i> és mozgasd azt az ablak átméretezéséhez a kijelölt keret mentén.</p>
+<p>Tartsd a <span class="key">CTRL</span> <span class="key">ALT</span> billentyűt és a <i>bal egér gombot</i> lenyomva majd mozgasd azt az ablak bármely részén az ablak mozgatásához. Gyors duplakattintás a <i>jobb egér gombbal</i> pedig hátraküldi azt.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="stack-tile" name="stack-tile">Halmozás és csempézés</a></h2>
+<p>A Haiku egy egyedi lehetőséget nyújt a teljes ablakhosszúságú fejléccel ellentétben a füles stílusú ablakfejléccel. Ez a "Halmozás és csempézés".<br />
+Mint azt az alábbi példa mutatja, a Nyomkövető ablak a könyvjelzőkkel és a WebPositive ablak csempeszerűen illeszkenek egymáshoz. Ugyanakkor a WebPositive maga pedig egy másik Nyomkövető ablakkal (<tt>Saját mappa</tt>) van csoportba ("halomba") rendezve. A kép jól mutatja, hogy miként válthatunk a két ablak közt.</p> 
+<img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
+<p>Az ehhez hasonló halmozáskor az ablakok mozgatása és méretezése együtt történik. Ez remek lehetőség arra, ha egy feladat több részét együtt akarjuk kezelni. Például, ha van egy böngésző ablak a dokumentációnak, egy másik ablak a szövegszerkesztőnek, egy harmadik, Nyomkövető ablak a fájloknak, illetve egy feladathoz tartozó levél is meg van nyitva, akkor ezt mind egyként kezelhetjük.</p>
+<p>Az ablakok összerendezése egyszerű: tartsuk lenyomva az <span class="key">OPT</span> billentyűt mialatt az egyik ablakot a fülénél fogva a másik ablak füléhez közel húzzuk, vagy a keretet a másik keretig addig, amíg a színe át nem vált, majd engedjük fel az egér gombját.</p>
+<p>A halmozás és a csempézés két részből áll.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
+<td><p>A <i>halmozás</i>hoz az ablakokat a füleknél egymás fölé kell húzni, ezután automatikusan a fülek a megfelelő pozícióba kerülnek.<br />
+Az <span class="key">OPT</span> billentyű lenyomása mellett a fülek színe megváltozik; ekkor csak engedjük el az ablakot a halmozáshoz.</p></td></tr></table>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
+<tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
+<td><p>A "<i>csempézés</i>" annyit jelent, hogy az ablakokat függőlegesen vagy vízszintesen egymáshoz "ragasszuk".<br />
+Itt is az <span class="key">OPT</span> billentyű lenyomva tartásánál mikor az ablakok egymás közelébe kerülnek, a szomszédos keretek színe megváltozik (melyek összeragadnak).</p></td></tr></table>
+<p>A szétválasztás hasonló módon történik, csak lenyomva kell tartani az <span class="key">OPT</span> gombot, mialatt az ablakot kihúzzuk a csoportból.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="open-save-panel" name="open-save-panel">Megnyitás és mentés panel</a></h2>
+<p>Megnyitáskor és mentéskor egy ehhez hasonló ablakot kapunk:</p>
+<img src="images/gui-images/open-save.png" alt="open-save.png" />
+<p>Itt megkapjuk a kiválasztott mappa tartalmát, mentés ablak esetében pedig egy beviteli mezőt is, ahová be tudjuk írni a fájl nevét, továbbá egy menüt is, amiben különféle típust választhatunk a fájl mentésekor.<br />
+Gyorsan a felsőbb szintű mappába juthatunk a lista feletti menüből.</p>
+<p>Ha már megvan nyitva egy Nyomkövető ablak, ahonnan meg akarjuk nyitni a fájlt, egyszerűen csak húzzuk az ablakba az útvonal megfelelőjét, vagyis vagy a másik ablakból egy mappát (akár egy fájlt), vagy a kis ikont a jobb felső sarokban. Ekkor a megnyitás/mentés ablakban lévő útvonal megváltozik a belehúzott útvonallal.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Billentyű kombinációk</a></h3>
+<p>Sok kombináció rendelkezésünkre áll a megnyitás és mentés ablakokban, amik megegyeznek a Nyomkövető ablakban használatosakkal. Azon túlmenően, amik a <span class="menu">Fájl</span> menüből elérhetőek, néhány parancs nem teljesen nyilvánvaló:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>Új mappa létrehozása.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>A kijelölt bejegyzés átnevezése.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>Egy szinttel fejjeb lépünk</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> vagy <span class="key">ENTER</span></td><td></td><td>A kijelölt mappába lépés.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>Az Asztalra ugrás.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>A Saját mappára ugrás.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="favorites-recent" name="favorites-recent">Kedvencek és legutóbbi mappák</a></h3>
+<p>A <span class="menu">Kedvencek</span> menü a megnyitás és mentés ablakban tartalmazza a legutóbbi mappákat és a kedvenc helyeket, amiket magunk adhatunk meg. Ahogy azt a kis nyíl jelzi, ezek is használhatóak a navigálás során, ezek almenüjében is megjelenik a mappa tartalma.</p>
+<img src="images/gui-images/favorites.png" alt="favorites.png" />
+<p>Egy kedvenc mappa hozzáadásához egyszerűen csak keressük meg azt a mappát, és válasszuk a <span class="menu">Kedvencek | Jelenlegi mappa hozzáadása</span> menüt. Mostmár ez minden megnyitás/mentés ablakban megjelenik. Törlés esetében pedig a <span class="menu">Kedvencek | Kedvencek szerkesztése...</span> kiválasztásával töröljük a már feleslegessé vált bejegyzést.<br />
+A kedvencek a <span class="path">/boot/home/config/settings/Tracker/Go/</span> mappában találhatóak. Tehát, akár egyszerű hivatkozás létrehozásával is adhatunk hozzá kedvenc fájlt vagy mappát.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="replicants" name="replicants">Replikánsok</a></h2>
+<p>A replikánsok egy program egyéni felülettel rendelkező részei, amiket más programokban felhasználhatunk. Az Asztalsáv <span class="menu">Replikánsok megjelenítése</span> bejelölésével a programok replikánsait jelző kis kéz szerű jel megjelenik, mely általában a jobb alsó sarokban található:</p>
+<img src="../images/gui-images/replicant.png" alt="replicant.png" />
+<p>A legkiválóbb hely a replikánsok tárolására az Asztal: egyszerűen csak húzzuk rá a kis kezet. Mostmár az Asztal részét képezi, és a replikáns programja már nem is kell, hogy fusson.<br />
+A jobb gombbal kattintva a replikáns jelén kapunk egy helyi menüt, amiben az eredeti program <span class="menu">Névjegye</span> és a <span class="menu">Replikáns eltávolítása</span> gombot találjuk.</p>
+<div class="box-info">Ha bármi problémája van az Asztalra dobott replikánssal, akkor csak töröld ki a <span class="path">~/config/settings/Tracker/tracker_shelf</span> bejegyzést. Sajnos ezzel az <i>összes</i> replikáns törlődik az Asztalról.</div>
+<p>A replikáns programokra remek példa a <a href="applications/activitymonitor.html">Folyamatmonitor</a> grafikonjai, a <a href="workspaces.html">Munkaasztalok kisalkalmazás</a> vagy a <a href="applications/deskcalc.html">Számológép</a>.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="filesystem-layout.html">Fájlrendszer felépítése</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="workspaces.html">Munkaasztalok (Workspaces)</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

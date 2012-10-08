@@ -40,6 +40,8 @@
 <li><a href="../zh_CN/tracker.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/tracker.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../sk/tracker.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/tracker.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/tracker.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,7 +53,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -68,131 +69,132 @@
 
 <h1>Seuraaja</h1>
 
-<p>The Tracker is the graphical interface to all your files. It lets you create new files and folders or find, launch or rename as well as copy or delete existing ones.</p>
-<p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.</p>
+<p>Seuraaja on graafinen käyttöliittymä kaikille tiedostoillesi. Se sallii sinun luoda uusia tiedostoja ja kansioita sekä löytää, käynnistää ja nimetä uudelleen samoin kuin kopioida tai poistaa olemassa olevia tiedostoja ja kansioita.</p>
+<p>Koska kyseessä on vain muiden kaltainen sovellus (Työpöytä kuvakkeineen on vain taustalla oleva kokonäyttöikkuna), Seuraaja näkyy ikkunoineen Työpöytäpalkissa ja se voidaan sulkea ja käynnistää uudelleen. Helpoin tapa poistua tai käynnistää uudelleen kaatunut tai jäätynyt Seuraaja (tai kuriton Työpöytäpalkki) on <a href="teammonitor.html">Ryhmävalvonta</a>-sovelluksen kutsuminen.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mounting-volumes" name="mounting-volumes">Liitetään taltioita</a></h2>
-<p>In order to access a harddisk, CD, USB stick etc., you first have to mount the volume, that is, let the system know it's there. This is done with a right-click on the Desktop or an already mounted volume (like the boot disk) and choosing the volume from the <span class="menu">Mount</span> submenu. You find the same <span class="menu">Mount</span> menu in the Deskbar.</p>
+<p>Jotta käyttäjä pääsee käsiksi kiintolevyyn, CD-levyyn, USB-tikkuun jne., käyttäjän on ensin liitettävä taltio, toisin sanoen kerrottava järjestelmälle, että se on olemassa. Tämä tehdään avaamalla Työpöydälla tai jo liitetyn taltion (kuten alkulatauslevy) päällä hiiren kakkospainikkeella <span class="menu">Liitä</span>-alivalikon. Löydät saman alivalikon Työpöytäpalkin <span class="menu">Liitä</span>-valikosta.</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>There are also <span class="menu">Settings</span> so you don't have to mount everything manually after every bootup.<br />
-The above settings will automatically mount any storage device you connect/insert and also mount all disks on bootup that were mounted previously.</p>
-<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
+<p>Löydät myös valikon <span class="menu">Asetukset</span> niin että sinun ei tarvitse liittää kaikkia manuaalisesti jokaisen alkulatauksen jälkeen.<br />
+Yllä oleva asetus liittää automaattisesti jokaisen tallennuslaitteen, jonka liität tai lisäät ja liittää alkulatauksen yhteydessä myös kaikki levyt, jotka oli liitetty aiemmin.</p>
+<div class="box-warning">Ennen kuin poistat esimerkiksi kiintolevyn tai USB-tikun, varmistu, että olet poistanut taltion onnistuneesti. Tämä takaa, että kaikki tiedonsiirrot ovat päättyneet onnistuneesti. Muussa tapauksessa tietoja voi kadota tai levy rikkoutuu!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="navigating" name="navigating">Navigoidaan</a></h2>
-<p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br />
-You can prevent that by holding down the <span class="key">OPT</span> key, which automatically closes the parent window.<br />
-This is also true for keyboard navigation. For more on that, see topic <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
-<p>Moving through your folders is one of Trackers main purposes, just like the file managers on other platforms. Haiku's Tracker has some unique features that will help you doing that efficiently.</p>
+<p>Kun oletuksena kaksoisnapsautat kansiota, Seuraaja avaa uuden ikkunan, mutta jättää ylemmän tason ikkunan avoimeksi. Tämä voi nopeasti johtaa työpöydän täyttymiseen ikkunoilla.<br />
+Voit estää tämä pitämällä alhaalla <span class="key">OPT</span>-painiketta, mikä sulkee automaattisesti ylemmän tason ikkunan.<br />
+Tämä pätee myös näppäinnavigoinnissa. Katso lisätietoja aiheesta  <a href="keyboard-shortcuts.html">Pikanäppäimet ja näppäinyhdistelmät</a>.</p>
+<p>Kansioiden läpi kulkeminen on yksi Seuraajien päätarkoitus aivan kuin tiedostohallinnoilla muilla alustoilla. Haikun Seuraajassa on joitakin ainutlaatuisia ominaisuuksia, jotka opastavat sen tehokkaaseen tekemiseen.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Siirrytään alas alivalikoihin</a></h3>
-<p>Instead of double-clicking your way down folder after folder, there's a better way to drill down:</p>
+<p>Sen sijaan, että kaksoisnapsautellaan kansio kansiolta alaspäin kansioiden hierarkiapuussa, on olemassa parempi tapa siirtyä alaspäin:</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
-<p>Right-click onto a folder, and at the top of the usual context menu you'll find a submenu of the current folder that let's you navigate down a level. Just move down the hierarchy until you find the file or folder you're looking for and click on it to open it. The above shows the contents of the folder <span class="path">/boot/home/config/</span>.<br />
-If you do the above while dragging a file with you, it will be moved to where you eventually drop it.</p>
-<p>A similar method can be used from any Tracker window:</p>
+<p>Hiiren kakkospainikkeen napsauttaminen kansion päällä tuo näkyviin tavallisen asiayhteysvalikon, jonka ylimmäisenä on nykyisen kansion alivalikko, jonka antaa sinulle mahdollisuuden navigoida tason alaspäin. Siirrä hiiren kohdistinta vain alaspäin hierarkiassa, kunnes löydät tiedoston  tai kansion, jota olet etsimässä ja avaa se napsauttamalla. Yllä näytetään kansion <span class="path">/boot/home/config/</span> sisältö.<br />
+Jos teet ylläkerrotun ollessasi raahaamassa tiedostoa, se siirretään sinne, minne sen mahdollisesti pudotat.</p>
+<p>Samanlaista menetelmää voidaan käyttää mistä tahansa Seuraaja-ikkunasta:</p>
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
-<p>Click on the area in the lower left, where the number of items is listed, and you'll get submenus for every level above your current location. From there you can drill down through the folders as usual.</p>
-<p>Note, that the Desktop is always the topmost level as that is where Tracker shows mounted volumes. So, if you want to go to another disk, you first have to navigate to the top (Desktop) and cross over to your other disk from there.</p><br />
-<p>You'll get the same submenu-navigating when you drag a file over a folder. After a short while of hovering, a submenu pops up and you can drill down to your destination. If you initiated the drag with the right mousebutton, you can choose between copying, moving or linking the file when you release the mouse.</p>
+<p>Napsauta vasemmalla alhaalla olevaa aluetta, jossa on lueteltu kohteiden lukumäärä, ja saat näkyviin alivalikon, jossa näkyy kaikki nykyisen tason alapuolella olevat tasot. Sieltä voi kairautua alaspäin kansioiden lävitse kuten tavallisesti.</p>
+<p>Huomaa, että Työpöytä on aina ylin taso, koska se on paikka, jossa Seuraaja näyttää liitetyt taltiot. Jos haluat vielä yhden levyaseman, sinun on ensin navigoitava ylimmäksi (Työpöydälle) ja hypätä siellä toiselle levylle.</p><br />
+<p>Saat saman alivalikkonavigoinnin kun raahaat tiedostoa kansion päällä. Hiiren osoittimen pitäminen hetken kohteen päällä saa alivalikon ponnahtamaan näkyviin ja voit siirtyä alaspäin kohteeseesi. Jos aloita raahaamisen hiiren kakkospainikkeella, voit valita kopioinnin, siirtämisen tai tiedoston linkittämisen, joka toteutuu, kun päästät irti hiirellä.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="type-ahead" name="type-ahead">Hypätään tiedostoihin nimeä kirjoitettaessa</a></h3>
-<p>You may be familiar with the concept from file managers of other operating systems: typing the first few letters of a filename will jump to the first file matching these starting characters. Haiku took the idea a step further. If there isn't a file starting with those letters it will jump to the first file including the string anywhere in its name. And if there's nothing with the string in its filename, the attributes are searched next.</p>
+<p>Eräs konsepti on ehkä tuttu muiden käyttöjärjestelmiem tiedostohallinnasta:
+tiedostonimen muutaman ensimmäisen kirjaimen kirjoittaminen aiheuttaa hyppäämisen ensimmäiseen tiedostoon, jonka nimen alusta löytyvät nuo kirjaimet. Haiku vei idean askeleen pitemmälle. Jos kirjaimia ei löydy tiedoston nimen alusta, niin se hyppää ensimmäiseen tiedostoon, jossa kirjaimet ovat missä paikassa tahansa. Ja jos kirjaimia ei löydy tiedostonimestä, niin seuraavaksi etsitään tiedostojen attribuutit.</p>
 <img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
-<p>In the above example, there are many files starting with "Haiku logo", rendering simpler approaches to typing ahead quite useless. In Haiku however, typing "web" jumps right to its first occurence in "Haiku logo - website". The characters you enter appear in the bottom left corner where you normally find the item count of all files in the folder. A second after entering a character, the display jumps back to normal and you're ready for a new type ahead search.</p>
+<p>Yllä olevassa esimerkissä on useita tiedostoja, jotka alkavat "Haiku logo", renderoinnin yksinkertainen eteenpäin kirjoittaminen on aika tehotonta. Haikussa kirjaimet "web" kirjoittamalla hypätään juuri sen ensimmäiseen ilmentymään tiedostossa "Haiku logo - website". Kirjoittamasi kirjaimet ilmaantuvat vasempaan alakulmaan, jossa normaalisti löytyy tiedosto- ja hakemistokohteiden lukumäärä. Sekunti kirjainten kirjoittamisen jälkeen, näyttö hyppää takaisin normaalitilaan ja olet valmis kirjoittamaan uuden haun.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="type-ahead-filter" name="type-ahead-filter">Nimenkirjoitussuodatus</a></h3>
-<p>Instead of jumping to a file while typing, there's also the option to filter out all files not matching your type-ahead string. This can improve clarity dramatically, especially when dealing with crowded folders. By using <span class="key">SHIFT</span> <span class="key">SPACE</span> as delimiter, you can even filter on multiple strings.<br />
-Contrary to type-ahead jumping, the filtering will stick until you press <span class="key">ESC</span> or close the window (or leave the folder if you're using Single Window Navigation).<br />
-This type-ahead filtering is set in the <a href="#tracker-preferences.html">Tracker preferences</a>.</p>
+<p>Sen sijaan, että hypätään tiedostoon nimen kirjoittamisen yhteydessä, olemassa on myös valitsin, jolla voidaan suodattaa pois kaikki tiedostot, jotka eivät täsmää kirjoittamiisi merkkeihin. Tämä parantaa selvyyttä dramaatttisesti, erityisesti kansioissa, joissa on paljon tiedostoa. Käyttämällä näppäimiä <span class="key">VAIHTO</span> <span class="key">VÄLILYÖNTI</span> erottimena, voit kirjoittaa jopa useita merkkijonoja.<br />
+Päinvastoin kuin haun eteneminen kirjoittamisen aikana, suodatus jää toteutumatta kunnes painat näppäintä <span class="key">ESC</span> tai suljet ikkunan (tai poistut kansiosta, jota olet käyttänyt yhden ikkunan navigoinnissa).<br />
+Tämä nimenkirjoitussuodatus asetetaan <a href="#tracker-preferences.html">Seuraaja-asetuksissa</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="appearance" name="appearance">Ulkoasu</a></h2>
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
-<p>Tracker windows offer three different viewing modes from the <span class="menu">Window</span> menu:</p>
+<p>Seuraaja-ikkunat tarjoavat kolme erilaista näkymätilaa <span class="menu">Ikkuna</span>-valikosta:</p>
 <ul>
-<li><p><span class="menu">Icon view</span> (<span class="key">ALT</span> <span class="key">1</span>) - Big icons, you can change the size from the submenu or in/decrease their size with <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
-<li><p><span class="menu">Mini icon view</span> (<span class="key">ALT</span> <span class="key">2</span>) - Small icons.</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide available <i>attributes</i>. (See topic <a href="attributes.html">Attributes</a>.)</p></li>
+<li><p><span class="menu">Kuvakenäkymä</span> (<span class="key">ALT</span> <span class="key">1</span>) - Suuret kuvakkeet,  voit vaihtaa kokoa alivalikosta tai kasvattaa tai pienentää niiden kokoa näppäimillä <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
+<li><p><span class="menu">Minikuvakenäkymä</span> (<span class="key">ALT</span> <span class="key">2</span>) - Pienet kuvakkeet.</p></li>
+<li><p><span class="menu">Luettelonäkymä</span> (<span class="key">ALT</span> <span class="key">3</span>) - Tiedostojesi yksityiskohtainen luettelo, jossa voit näyttää tai piilottaa käytettävissä olevat <i>attribuutit</i>. (Katso aihe <a href="attributes.html">Attribuutit</a>.)</p></li>
 </ul>
-<p>The <span class="menu">Window</span> menu offers a number of other functions:</p>
+<p><span class="menu">Ikkuna</span>-valikko  tarjoaa lukuisia muita funktioita:</p>
 <ul>
-<li><p><span class="menu">Resize window</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Resizes the window to its ideal size.</p></li>
-<li><p><span class="menu">Arrange by...</span> - Only available in Icon or Mini icon view, a submenu allows to set the sorting order to various properties:</p>
+<li><p><span class="menu">Muuta koko sopimaan</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Muuttaa ikkunan kokoa sen ihannekokoon.</p></li>
+<li><p><span class="menu">Järjestä:</span> - Käytettävissä vain Kuvake- tai minikuvakenäkymässä, alivalikko sallii lajittelujärjestyksen asettamisen seuraaviin ominaisuuksiin:</p>
 	<ul>
-	<li><p><span class="menu">Name</span>, <span class="menu">Real name</span>, <span class="menu">Size</span>, <span class="menu">Modified</span>, <span class="menu">Created</span>, <span class="menu">Kind</span>, <span class="menu">Location</span>, <span class="menu">Permissions</span></p></li>
-	<li><p><span class="menu">Reverse order</span> - Inverts the sorting order</p></li>
-	<li _translation_id="4339"><p><span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean up all</span> which additionally sorts all icons according to the above selected criterium.</p></li>
+	<li><p><span class="menu">Nimi</span>, <span class="menu">Oikea nimi</span>, <span class="menu">Koko</span>, <span class="menu">Muokattu</span>, <span class="menu">Luotu</span>, <span class="menu">Tyyppi</span>, <span class="menu">Sijainti</span>, <span class="menu">Käyttöoikeudet</span></p></li>
+	<li><p><span class="menu">Käänteinen järjestys</span> - Kääntää lajittelujärjestyksen päinvastaiseksi</p></li>
+	<li _translation_id="4339"><p><span class="menu">Siivous</span> (<span class="key">ALT</span> <span class="key">K</span>) - Tasaa kaikki kuvakkeet näkymättömän rasteriin. Pidä alhaalla näppäintä <span class="key">VAIHTO</span> ja valikoksi tulee <span class="menu">Siivoa kaikki</span>, mikä lisäksi lajittelee kaikki kuvakkeet yllä valitun kriteerin mukaisesti.</p></li>
 	</ul></li>
-<li><p><span class="menu">Select...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expression</a>.</p></li>
-<li><p><span class="menu">Close</span> (<span class="key">ALT</span> <span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close all</span> which closes every Tracker window.</p></li>
-<li><p><span class="menu">Close all in workspace</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">OPT</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
+<li><p><span class="menu">Valitse...</span> (<span class="key">VAIHTO</span> <span class="key">ALT</span> <span class="key">A</span>) - Valitse tiedostot <a href="http://fi.wikipedia.org/wiki/S%C3%A4%C3%A4nn%C3%B6llinen_lauseke" class="external free" title="Wikipedia: Säännöllinen lauseke">säännöllisten lausekkeiden</a> mukaisesti.</p></li>
+<li><p><span class="menu">Sulje</span> (<span class="key">ALT</span> <span class="key">W</span>) - Sulkee ikkunan. Pidä alhaalla <span class="key">VAIHTO</span>-näppäin ja valikoksi tulee <span class="menu">Sulje kaikki</span>, joka sulkee jokaisen Seuraaja-ikkunan.</p></li>
+<li><p><span class="menu">Sulje kaikki työtilassa</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Sulkee jokaisen Seuraaja-ikkunan nykyisessä työtilasssa. Hyödyllinen pikanäppäin, jos unohdat pitää alhaalla <span class="key">Alt Gr</span>-näppäintä kun napsauttelet kansion läpi ja kaikki yhä auki olevat Seuraaja-ikkunat sotkevat työtilaasi.</p></li>
 </ul>
-<p>Sometimes you just want to rearrange a few icons without doing a complete <span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>). In that case, you select these icons and start to drag them to their new location. Before you drop them there, keep <span class="key">ALT</span> pressed. This will align the icons to the invisible grid.</p>
-<p>The rest of the functions are pretty self-explanatory, leaving the Tracker preferences.</p>
+<p>Joskus haluat vain järjestää muutaman kuvakkeen tekemättä täydellistä <span class="menu">Siivousta</span> (<span class="key">ALT</span> <span class="key">K</span>). Valitse siinä tapauksessa nämä kuvakkeet ja aloita raahaamaan niitä niiden uuteen sijaintipaikkaan. Ennen kuin pudotat ne sinne, pidä näppäin <span class="key">ALT</span> painettuna. Tämä tasaa kuvakkeet näkymättömään rasteriin.</p>
+<p>Loput funktioista ovat aika itsestäänselviä, siirrytään Seuraaja-asetuksiin.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tracker-preferences" name="tracker-preferences">Seuraaja-asetukset</a></h3>
-<p><span class="menu">Window | Preferences...</span> opens a panel that offers a number of settings that, where not obvious, should become clear once tried out. Since all settings are applied live, you'll immediately see the changes.
-<br />So, in short, the not so obvious settings:</p>
+<p><span class="menu">Ikkuna | Asetukset...</span> avaa paneelin, joka tarjoaa lukuisia asetuksia jotka, missä ei ole ilmeistä, pitäisi tulla selväksi yhdellä yrityksellä. Koska kaikki asetukset toteutetaan välittömästti, näet muutokset heti.
+<br />Joten lyhyesti ei niin ilmeiset asetukset:</p>
 <ul>
-<li><p><span class="menu">Desktop</span> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</p></li>
-<li><p><span class="menu">Windows</span> - You can set <span class="menu">Single window navigation</span>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of it's parent folder. This is not the same as clicking while holding the <span class="key">OPT</span> key, as described above, because you'll lose the per window saved position and size.
+<li><p><span class="menu">Työpöytä</span> - Päättää, että ilmaantuvatko liitetyt levyt suoraan Työpöydälle vai ikkunaan sen jälkeen kun napsautetaan yhtä Työpöydällä olevaa Levy-kuvaketta.</p></li>
+<li><p><span class="menu">Ikkunat</span> - Voit asettaa <span class="menu">Yhden ikkunan navigoinnin</span>, toisin sanoen kansion kaksoisnapsauttaminen ei avaa sitä omaan ikkunaan, vaan jo avoimen ikkunan sisälle, korvaten ylemmän tason kansionäkymän. Tämä ei ole sama kuin napsauttaminen samalla kuin pidetään <span class="key">Alt Gr</span>-näppäintä, kuten yllä kuvattiin, koska menetät ikkunakohtaisen tallennetun sijainnin ja koon.
 <br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>Before you switch Tracker to Single Window Navigation mode, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy &amp; paste a path name and use back, forward and up buttons.</p> 
-<p>Activating <span class="menu">Type-ahead filtering</span> will filter the contents of a Tracker window while you type to only display the files matching your string in their name or any currently displayed attribute. See <a href="#type-ahead-filter">above</a>.</p></li>
-<li><p><span class="menu">Trash</span> - Set the behavior when deleting a file.</p></li>
-<li><p><span class="menu">Volume icons</span> - Set the color of an optional indicator of free space that's shown besides a disk's icon.</p></li>
+<p>Ennen yhden ikkunan navigointitilaan vaihtamista, koska se voi tuntua sinusta tutumpaa, suosittelemme ensin kokeilemaan valikkoperustaista selaamista, koska se voi itse asiassa olla paljon nopeampaa, kun siihen vain tottuu. Toisaalta yhden ikkunan navigointi tarjoaa <i>Navigaattorin</i>, jossa voit kirjoittaa tai kopioida ja liittää polkunimen sekä käyttää paluu-, eteenpäin- ja ylöspäin -painikkeita.</p> 
+<p>Activoimalla <span class="menu">Kirjoittamisen aikainen suodatus</span> Seuraaja-ikkuna sisältö suodatetaan samalla kun kirjoitat näyttäen vain tiedostonimet tai kaikki parhaillaan näytetyt attribuutit, jotka täsmäävät merkkijonoosi. Katso <a href="#type-ahead-filter">yllä</a>.</p></li>
+<li><p><span class="menu">Roskakori</span> - Aseta käyttäytyminen tiedostoja poistettaessa.</p></li>
+<li><p><span class="menu">Taltiokuvakkeet</span> - Aseta vapaan tilan valinnaisen indikaattorin väri, joka näytetään levykuvakkeen vieressä.</p></li>
 </ul>
-<p>This panel, by the way, is also available as <span class="app">Tracker</span> from Deskbar's <span class="menu">Preferences</span>.</p>
+<p>Tämä paneeli on muuten käytettävissä myös <span class="app">Seuraaja</span>ssa Työpöytäpalkin <span class="menu">Asetukset</span>-valikosta.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="working-with-files" name="working-with-files">Työskentely tiedostoilla</a></h2>
-<p>When invoked on a selected file, most of the <span class="menu">File</span> menu commands are also offered in the context menu by right-clicking that file.</p>
-<p>As usual the commands are pretty clear.</p>
+<p>Kun kutsutaan valitun tiedoston kautta, useimmat <span class="menu">Tiedosto</span>-valikon komennoista tarjotaan myös asiayhteysvalikosta hiiren kakkospainikkeen napsautuksella tuohon tiedostoon.</p>
+<p>Kuten tavallista, komennot ovat aika selviä.</p>
 <ul>
-<li><p><span class="menu">Find...</span> - Find a file or folder. See topic <a href="queries.html">Query</a> for more info.</p></li>
-<li><p><span class="menu">New</span> - Create a new folder or any other file based on a <i>template</i>.
+<li><p><span class="menu">Etsi...</span> - Etsi tiedosto tai kansio. Katso lisätietoja aiheesta <a href="queries.html">Kysely</a>.</p></li>
+<li><p><span class="menu">Uusi</span> - Luo uuden kansion tai minkä tahansa muun tiedostoon perustuvan <i>mallinteen</i>.
 <br /><br /></p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
-<p>Choosing <span class="menu">Edit templates...</span> opens the folder <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <span class="menu">New</span> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
-<li><p><span class="menu">Open with...</span> - A submenu offers all applications that can handle this filetype.
+<p>Valitsemalla <span class="menu">Muokkaa mallinnetta...</span> avataan kansio <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Luomalla tiedoston tuohon kansioon tarjotaan tiedostotyyppiä tiedostonimellä ja muilla attribuuteilla valikossa <span class="menu">Uusi</span>. Tässä siinä on tiedosto "Text" tiedostotyypillä <tt>text/plain</tt>. Katso lisätietoja aiheesta <a href="filetypes.html">Tiedostotyypit</a>.</p></li>
+<li><p><span class="menu">Avaa ohjelmalla...</span> - Alivalikko tarjoaa kaikki sovellukset, jotka voivat käsitellä tätä tiedostotyyppiä.
 <br /><br /></p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
 
-<p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu lists first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <span class="menu">Open with...</span> entry instead, a panel opens:</p>
+<p>Ensisijainen sovellus, joka avautuu hiiren kaksoisnapsautuksella, on merkitty aktiiviksi. Tämä alivalikko luettelee ensin ne sovellukset, jotka pystyvät käsittelemään tarkalleen tiedostotyyppiä, tässä tapauksessa tekstitiedostoa, tyyppi <tt>text/plain</tt>. Seuraavaksi tulee kaikki sovellukset, jotka voivat käsitellä yleensä ylempää tyyppiä, here <tt>text/*</tt>. Viimeisenä luettelossa on ne sovellukset, jotka voivat käsitellä mitä tiedostoa tahansa. Jos et napsauta sovellusta alivalikossa, vaan sen sijaan valikkoriviä <span class="menu">Avaa sovelluksella...</span>, avautuu paneeli:</p>
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
-<p>Here you'll again find the programs that were listed in the submenu. By selecting one and clicking the <span class="button">Open and make preferred</span> button, you changed the preferred application for every file of that filetype, here <tt>text/plain</tt>.</p></li>
-<li><span class="menu">Get info</span>
+<p>Tässä löydät taas alivalikossa luetellut sovellukset. Valitsemalla yhden ja napsauttamalla painiketta <span class="button">Avaa ja tee ensisijaiseksi</span>, vaihdat ensisijaisen sovelluksen jokaiselle tuon tiedostotyypin tiedostolle, tässä <tt>text/plain</tt>.</p></li>
+<li><span class="menu">Hae tiedot</span>
 <br /><br />
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>The panel presents info on the selected file and lets you set the default application and, after you expanded that part of the panel, permissions and owner. Clicking on the path will open it in a Tracker window.</p></li>
-<li><p><span class="menu">Edit name</span>, <span class="menu">Duplicate</span> and <span class="menu">Move to trash</span> - lets you rename or duplicate a file or put the selected file(s) to the trash.</p></li>
-<li><p><span class="menu">Move to</span>, <span class="menu">Copy to</span> and <span class="menu">Create link</span> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
-<li><p><span class="menu">Cut</span>, <span class="menu">Copy</span> and <span class="menu">Paste</span> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <span class="menu">Copy/Cut more</span> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>
-<li><p><span class="menu">Identify</span> - will sniff out and set the type of files if they didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to <span class="menu">Force identify</span> which identifies the filetype and corrects it if it was false before.</p></li>
-<li><p><span class="menu">Add-Ons</span> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</p></li>
+<p>Paneeli esittää tietoja valitusta tiedostosta ja sen jälkeen kun olet laajentanut paneelin osaa, myös käyttöoikeuksista ja omistajasta. Polun napsauttaminen avaa sen Seuraaja-ikkunassa.</p></li>
+<li><p><span class="menu">Muokkaa nimeä</span>, <span class="menu">Kaksoiskappale</span> ja <span class="menu">Siirrä roskakoriin</span> - sallivat sinun nimetä uudelleen tiedoston tai tehdä siitä kaksoiskappaleen tai laittaa valitut tiedostot roskakoriin.</p></li>
+<li><p><span class="menu">Siirrä kohteeseen</span>, <span class="menu">Kopioi kohteeseen</span> ja <span class="menu">Luo linkki</span> - sallivat sinun siirtää, kopioida tai linkittää valittuja tiedostoja käyttäen alivalikon navigointimenetelmää. Pitämällä kutsuttaessa näppäintä <span class="key">VAIHTO</span> alhaalla valikko tarjoaa valitsimen suhteellisen linkin luomiseen.</p></li>
+<li><p><span class="menu">Leikka</span>, <span class="menu">Kopioi</span> ja <span class="menu">Liitä</span> - sallii sinun leikata, kopioida ja liittää tiedostoja leikepöytää käyttäen. Pitämällä näppäintä <span class="key">VAIHTO</span> alhaalla kutsuttaessa valikkoa voit <span class="menu">Kopioi/Leikkaa lisää</span> tiedostoja, ehkä jostain toisesta kansiosta, jotka voit liittää jonnekin muualle myöhemmin. Pitämällä näppäintä <span class="key">VAIHTO</span> alhaalla voit liittää kopioidut tiedostot leikepöydälle linkkeinä.</p></li>
+<li><p><span class="menu">Tunnista</span> - nuuskii ja asettaa tiedostojen tyypin, jos niillä ei ole tyyppiä aiemmin, esimerkiksi jos siirrät tiedoston sovelluksella <span class="cli">wget</span>, joka ei aseta itse tiedostotyyppiä. Pitämällä näppäintä <span class="key">VAIHTO</span> alhaalla valikko kutsuttaessa riviksi vaihtuu <span class="menu">Pakota tunnistus</span>, joka tunnistaa tiedostotyypin ja korjaa sen, jos se oli aiemmin väärä.</p></li>
+<li><p><span class="menu">Lisäosat</span> - tarjoaa sinulle kaikki yleiset Seuraaja-lisäosat ja ne, jotka osaavat käsitellä valittuja tiedostoja. Katso lisätietoja aiheesta <a href="tracker-add-ons.html">Seuraaja-lisäosat</a>.</p></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="transaction-status" name="transaction-status">Tapahtumatila</a></h2>
-<p>When you copy, move or delete files, Tracker shows its progress with a status window. If you initiate more than one transaction, each job gets its own status display.</p>
+<p>Kun kopioit, siirrät ja poistat tiedostoja, Seuraaja näyttää edistymisen tilaikkunassa. Jos aloitat useamman kuin yhden tapahtuman, jokainen työ saa oman tilanäytön.</p>
 <img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
-<p>To the right are two buttons to pause or stop a transaction entirely. Sometimes it can be useful to temporarily pause a large transaction. For example, you may need to quickly launch a large application. Copying large amounts of data chokes your harddisk's IO bandwidth and thus delays your workflow.</p>
+<p>Oikealla on kaksi painiketta tapahtuman tauottamiseksi tai pysäyttämiseksi kokonaan. Joskus voi olla hyödyllistä tilapäisesti pysäyttää laaja tapahtuma. Sinun on ehkä esimerkiksi käynnistettävä laajempi sovellus. Suuren tietomäärän kopioiminen tukkii kiintolevysi siirtokaistanleveyden ja siten viivyttää työkulkuasi.</p>
 
 </div>
 </div>

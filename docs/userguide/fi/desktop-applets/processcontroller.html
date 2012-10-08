@@ -10,12 +10,14 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ProcessController</title>
+	<title>Prosessivalvonta</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -39,10 +41,12 @@
 <li><a href="../../zh_CN/desktop-applets/processcontroller.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/desktop-applets/processcontroller.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/desktop-applets/processcontroller.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/desktop-applets/processcontroller.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/desktop-applets/processcontroller.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/desktop-applets/processcontroller.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="powerstatus.html">PowerStatus</a> 
+ «  <a href="powerstatus.html">Virtatila</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Työpöytäsovelmat</a> 
 ::  <a href="workspaces.html">Työtilat</a>  »
 </span></div>
@@ -50,45 +54,44 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
+<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />Prosessivalvonta</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Työpöytäappletit</span></td></tr>
+<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Työpöytäsovelmat</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><i>ei mitään</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
-<p>Indicators on the left show each CPU's usage, while the bar on the right shows the memory consumption. Remember that the number of indicators depend on the number of processors/cores in the computer.</p>
-<p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.<br />
-To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
-<h2>Quit an application</h2>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />Prosessivalvonta-sovelman päätehtävä on näyttää prosessori(e)n aktiviteetti ja käytetyn muistin määrän. Se sallii yksittäisten ryhmien valvonnan, niiden prioriteetin vaihtamisen, ja niiden tappamisen, jos ohjelma jumittuu. Moniprosessoriympäristössä se sallii sinun ottaa pois käytöstä yksittäisiä prosessoreita tai prosessoriytimiä. Kun Seuraaja tai Työpöytäpalkki kaatuu, voit käynnistää ne uudelleen Prosessivalvonnan valikosta.</p>
+<p>Indikaattorit vasemmalla näyttävät jokaisen prosessorin käytön, samalla kun palkit oikealla näyttävät muistikulutuksen. Muista, että indikaattoreiden lukumäärä riippuu tietokoneen prosessorien/prosessoriytimien lukumäärästä.</p>
+<p>Jos Prosessivalvonta ei ole vielä käynnissä, ohjelma kysyy, että avataanko sovellus ikkunatilasssa vain suorana lähetysenä Työpöytäpalkissa. Ikkunatilassa voit muuttaa palkkinäytön kokoa muuttamalla ikkunan kokoa ja käyttämällä sitten <a href="../gui.html#replicants">Replikantti</a>-kahvaa sen raahaamiseksi Työpöydälle.<br />
+Kun se on asennettu, se toimii hiiren kakkospainikkeen asiayhteysvalikosta.<br />
+Sovelman poistamiseksi Työpöytäpalkista, poista valinta <span class="menu">Suora lähetys Työpöytäpalkista</span> asiayhteysvalikossa.</p>
+<h2>Poistu sovelluksesta</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>To quit an application just choose its name from the <span class="menu">Quit an application</span> menu. This is a clean way to close app, just like  clicking its close button. Be careful not to quit system processes like servers or daemons, however. Your system may stop working reliably. </p>
-<h2>Memory usage</h2>
+<p>Sovelluksesta poistumiseksi valitse sen nimi <span class="menu">Poistu sovelluksesta</span>-valikosta. Tämä on siisti tapa sovelluksen sulkemiseen, aivan kuin napsautettaisiin sulje-painiketta. Ole kuitenkin varovainen, että et sulje järjestelmäprosesseja kuten palvelimia tai taustaprosesseja. Järjestelmäsi saatta lakata toimimasta luotettavasti. </p>
+<h2>Muistikäyttö</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
-<p>Monitoring memory usage can be rather inaccurate.</p>
-<p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the actually used part of the memory.</p>
+<p>Muistinkäytön valvonta voi olla melko epätarkkaa.</p>
+<p>Tämä valikko sallii sinun valvoa järjestelmäsi eri ryhmien muistikäyttöä. Ryhmän nimen vieressä on kaksi saraketta: ensimmäisenä varatun kirjoitettavan muistin määrä, kun taas toinen näyttää kaiken kirjoitussuojatun muistitilan (esimerkiksi jaetut kirjastot).</p>
+<p>Ensimmäinen rivi <i>Järjestelmäresurssit ja välimuistit...</i> näyttää järjestelmän ja kaikkien sovellusten käyttämän muistin yhteismäärän. Sinisen palkin pituus perustuu tietokoneesi fyysisen muistin yhteismäärään. Seuraava rivi näyttää jokaisen prosessin käyttämän muistin määrän. Huomaa, että palkin pituus perustuu vain todelliseen käytetyn muistin määrään.</p>
 <table>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Vain tietyn sovelluksen käyttämä muisti (kirjoitusoikeudella)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Kirjoitussuojatun tilan sisältävä muisti (voidaan jakaa muiden sovellusten kanssa)</td></tr>
 </table>
 
-<h2>Threads and CPU usage</h2>
-<p>This menu allows you to change thread priorities, kill teams or debug them.</p>
-<div class="box-stop">Changes via the commands in this menu reach deep into the system and can cause data loss and system instability. Keep that mouse hand steady!</div>
+<h2>Säikeet ja prosessorikäyttö</h2>
+<p>Tämä valikko sallii sinun vaihtaa säikeen prioriteettejä, tappaa ryhmiä ja vikajäljittää niitä.</p>
+<div class="box-stop">Muutokset näiden valikkokomentojen kautta ulottuvat syvälle järjestelmään ja voivat aiheuttaa tietojen katoamista ja järjestelmän epästabiilisuutta. Pidä hiirikäsi vakaana!</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
-	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel code</td></tr>
-	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User code</td></tr>
-	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Idle thread</td></tr>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Käyttöjärjestelmäydinkoodia</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Käyttäjäkoodia</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Joutosäie</td></tr>
 </table>
-<p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
-<p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
-<p>The last level of the menu allows you to change a thread's priority. Be careful with that! As a rule of thumb the priority of a thread should be inverse its CPU usage. That is, the more it tries to claim CPU time, the lower should be it's priority. In general, don't mess with an app's priorities; contact its author, that's his business.
+<p>Ensimmäisellä tasolla näet ryhmänimet. Yhtä napsauttamalla voit tappaa koko ryhmän. Palkin tummansininen osa on käyttöjärjestelmäydinkoodissa käytetty aika, vaaleansininen on käyttäjäkoodiaika, vihreä osa on joutosäieaika. Jos palkki on kokonaan sininen, se tarkoittaa että ryhmä käyttää kaiken prosessointitehon.</p>
+<p>Toinen taso näyttää ryhmän tietyt säikeet. Napsauttamalla yhtä voit vikajäljittää tai tappaa sen. Jos palkki on kokonaan sininen, niin se tarkoittaa, että säie on saanut prosessorin/prosessoriytimen kuormituksen maksimikuormitukseen.</p>
+<p>Viimeisin valikkotaso sallii sinun vaihtaa säikeen prioriteettia. Ole huolellinen siinä! Peukalosääntönä on, että säikeen prioriteetin tulisi olla prosesssorikäytön käänteisarvo. Tämä tarkoittaa, että mitä mitä enemmän se yrittää käyttää prosessoriaikaa, sitä alhaisempi sen prioriteetin tulisi olla. Yleensä, älä sotke sovellusten prioriteetteja; ota yhteyttä sovelluksen kehittäjään, se on hänen tehtävänsä.
 </p>
 
 </div>
@@ -96,7 +99,7 @@ To remove the applet again from the Deskbar, uncheck <span class="menu">Live in 
 
 <div class="nav">
 <div class="inner"><span>
-«  <a href="powerstatus.html">PowerStatus</a> 
+«  <a href="powerstatus.html">Virtatila</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Työpöytäsovelmat</a> 
 ::  <a href="workspaces.html">Työtilat</a>  »
 </span></div>

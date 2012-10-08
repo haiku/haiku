@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Rendszerválasztó</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/bootmanager.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/bootmanager.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/bootmanager.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/bootmanager.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/bootmanager.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/bootmanager.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/bootmanager.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/bootmanager.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/bootmanager.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/bootmanager.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/bootmanager.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/bootmanager.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/bootmanager.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/bootmanager.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="activitymonitor.html">Folyamatmonitor</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="cdplayer.html">CDLejátszó</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Rendszerválasztó (BootManager)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><i>Nincs bejegyzés, normál esetben a Telepítő <span class="menu">Eszközök</span> menüjéből érhető el.</i></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><i>Nincs.</i><br />Az MBR biztonsági mentései alapértelmezetten a <span class="path">~/config/settings/bootman/</span> mappában találhatóak.</td></tr>
+</table>
+<p><br /></p>
+<p>Ha a Haiku-t nem egy már létező menühöz adod hozzá (például a GRUB-hoz), akkor ezzel a programmal telepíthetünk egy egyszerű menüt a fő rendszertöltőbe (MBR), ami nagyjából így néz ki:</p>
+<img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
+<div class="box-info">A Rendszerválasztó jelenleg nincs minden eshetőségre kipróbálva, és még mindig van néhány korlátozás benne, mint például a menü csak az első lemezre telepíthető, és ott is lenni-e kell 2KB helynek is a fő rendszertöltő, a Master Boot Record (MBR) után.</div>
+<p>A program végig utasításokat ad, hogy mit és hogyan is csináljunk.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="1-drives" id="1-drives">A cél lemez kiválasztása</a></h2>
+<img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
+<p>A Rendszerválasztó indítása után a listában megjelenik az összes elérhető lemez, ahonnan ki kell választanunk azt, ahová telepíteni szeretnénk a menüt. Ha már létezik a kiválasztott lemezen egy menü, akkor az <span class="button">Eltávolítás</span> gomb aktívvá válik, így lehetőségünk van a fő rendszertöltőt (MBR) visszaállítáani, vagyis a menüt törölni.<br />
+Egyébként válasszuk a <span class="button">Telepítés</span> gombot.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="2-backup" id="2-backup">A fő rendszertöltő (MBR) biztonsági másolata</a></h2>
+<p>Arra az esetre, ha valami probléma történik, és el akarjuk távolítani a menüt, az eredeti fő rendszertöltőről (MBR) most készül egy biztonsági mentés. Ez nyilván egy igen fontos lépés, így bizonyosodj meg róla, hogy nem írsz felül egy másik biztonsági mentést, mert arra is szükséged lehet!</p>
+<img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
+<img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
+<p>Csak meg kell adni, hogy hová mentsük a biztonsági fájlt (<tt>MBR</tt>) vagy az alapból megadottat is meghagyhatjuk. Miután a <span class="button">Következő</span>re kattintunk, kapni fogunk egy megerősítést, hogy sikeres lett-e a mentés.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="3-menu" id="3-menu">A menü beállítása</a></h2>
+<img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
+<img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
+<p>Most a lemezen található összes partíciót megkapjuk a listában. Jelöljük be azokat, amiket szeretnénk a menüben látni, és szükség esetén a megjelenítendő nevet is módosítsuk, mely alap esetben a lemez/partíció neve.</p>
+<p>Következő lépésként a menüből válaszuk ki, hogy melyik rendszer induljon el automatikusan, és adjuk meg, hogy mennyi legyen a késleltetés az indítás előtt. Itt az "<i>Azonnal</i>" a menüt egy az egyben ki is hagyja, a "<i>Soha</i>" pedig megáll a menüben. A beállított késleltetést felül is bírálhatjuk az <span class="key">ALT</span> billentyű lenyomva tartásával.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="4-mbr" id="4-mbr">A menü felírása</a></h2>
+<img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
+<img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
+<p>Mielőtt a menü felírásra kerül, kapunk egy összesítést a választott beállításokról, és egy utolsó esélyt, hogy megszakítsuk a műveletet. Ne aggódj, addig nincs semmi probléma, amíg az eredeti fő rendszertöltőről (MBR) biztonságban van a készített másolat, így bámikor visszaállítható az. Ha probléma adódik, akkor még mindig lehetőségünk van telepítő CD-ről vagy USB-ről visszaállítani a biztonsági mentést.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="activitymonitor.html">Folyamatmonitor</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="cdplayer.html">CDLejátszó</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

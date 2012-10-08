@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		tiagoms
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Uso do Disco</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/diskusage.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/diskusage.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/diskusage.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/diskusage.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/diskusage.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/diskusage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/diskusage.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/diskusage.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/diskusage.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/diskusage.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/diskusage.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/diskusage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/diskusage.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="diskprobe.html">DiskProbe</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="drivesetup.html">Configuração de Unidade</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />Uso do Disco</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
+</table>
+<p><br /></p>
+<p>O Uso do Disco mostra graficamente como o espaço nos volumes de disco está sendo utilizado.<br />
+Uma ferramenta útil para responder à pergunta, "<i>Para onde foi todo o meu espaço em disco?</i>".</p>
+<p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
+<p>Os círculos concêntricos representam diferentes níveis na hierarquia do sistema de arquivos. Acima, o círculo no centro representa a pasta <span class="path">/boot/home/</span>. Cada segmento do anel imediatamente externo àquele círculo é um arquivo ou pasta sob  <span class="path">/boot/home/</span>. Cada segmento mais distante nos leva a um nível mais profundo na hierarquia de arquivos. Pode ser necessário redimensionar a janela para acomodar pastas muito profundas.</p>
+<p>Acima do gráfico há um menu pop-up que permite alternar entre todos os volumes montados. Antes que o uso de disco de um volume possa ser exibido, ele deve ser analisado. Como isto pode tomar um tempo para discos maiores, pode-se examinar outro volume enquanto a análise é feita em segundo plano.</p>
+<div class="box-info"><ul>
+<li>Se a representação gráfica de um arquivo ou pasta compreende menos de dois graus de um círculo, ele é excluído da exibição.</li>
+<li>O número de arquivos que é relatado para uma pasta inclui arquivos em subpastas também. Uma pasta conta como um arquivo.</li>
+<li>O Uso do Disco ignora vínculos simbólicos.</li>
+</ul></div>
+<p>Conforme mova o mouse sobre um segmento, informações sobre aquele arquivo ou pasta aparece na barra de status na base da janela.</p>
+<p>Clicar com o botão direito do mouse em um segmento abre um menu de contexto para  <span class="menu">Obter Infomeções</span>, <span class="menu">Abrir</span> (com Rastreador  [Tracker]), <span class="menu">Abrir com</span> outro aplicativo adequado ou <span class="menu">Reexaminar</span> aquela pasta em particular.<br />
+Clicar com o botão esquerdo do mouse um segmento faz daquele arquivo/pasta o centro do círculo.<br />
+Clicar com o botão esquerdo do mouse o centro do círculo faz subir um nível acima.</p>
+<p>Pode-se arrastar arquivos e pastas do Uso do Disco para outros aplicativos ou para a Área de Trabalho ou outra janela do Rastreador (Tracker) para copiar. Inversamente, volumes e pastas soltos na janela do Uso do Disco irá focar diretamente neles, tornando-os o novo centro do círculo.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="diskprobe.html">DiskProbe</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="drivesetup.html">Configuração de Unidade</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

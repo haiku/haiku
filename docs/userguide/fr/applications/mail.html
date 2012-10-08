@@ -40,6 +40,8 @@
 <li><a href="../../pt_PT/applications/mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../fi/applications/mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/applications/mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/mail.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/mail.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -55,9 +57,9 @@
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
-<tr class="index"><td><a href="#reading">Reading messages</a><br />
-	<a href="#creating">Creating new messages</a><br />
-	<a href="#preferences">Preferences</a></td></tr>
+<tr class="index"><td><a href="#reading">Lecture des messages</a><br />
+	<a href="#creating">Créer des nouveaux messages</a><br />
+	<a href="#preferences">Préférences</a></td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png" width="64" height="64" />Mail</h2>
@@ -65,29 +67,29 @@
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/Mail</span></td></tr>
 <tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/Mail/</span><br />
-<span class="path">~/config/settings/Mail/Menu Links/</span> - Objects put here appear in the mailbox' context menu<br />
-<span class="path">~/config/settings/Mail/signatures/</span> - Location to store signatures<br />
-<span class="path">~/config/settings/Mail/status/</span> - Location to store custom statuses</td></tr>
+<span class="path">~/config/settings/Mail/Menu Links/</span> - Les objets mis ici apparaissent dans le menu contextuel de la boite de réception<br />
+<span class="path">~/config/settings/Mail/signatures/</span> - Emplacement pour  stocker les signatures<br />
+<span class="path">~/config/settings/Mail/status/</span> - Emplacement pour  stocker les statuts personnels</td></tr>
 </table>
 <p><br /></p>
 <p>Mail is Haiku's default viewer and editor of emails. It has nothing to do with the actual fetching and sending of mails, which is done by the mail_daemon and can be configured via the <a href="../preferences/e-mail.html">E-mail</a> preferences.</p>
 <p>This page is a general overview of the application Mail. For more information how email in Haiku works, refer to the <a href="../workshop-email.html">Workshop on managing email</a>.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="reading" name="reading">Reading messages</a></h2>
-<p>You double-click an email file to open it in Mail. The interface is quite simple:</p>
+<a id="reading" name="reading">Lecture des messages</a></h2>
+<p>L'ouverture d'un fichier de courrier se fait par un double-clic. L'interface est assez simple :</p>
 <img src="../images/apps-images/mail-read.png" alt="email-read.png" /> 
 <p>A menu and optional tool bar on top, with an area of the interesting attributes of a mail (to, from, subject, date) below that, and then the actual body of the mail. If the mail appears with strange characters or empty, try to change the <span class="menu">Decoding</span> from the pop-up menu.</p>
 <p>If there are files attached to an email, they are listed at the end of the message. A right-click on one opens a context menu to <span class="menu">Save attachment...</span> or <span class="menu">Open attachment</span>. You can also drag &amp; drop directly to the Desktop or another Tracker window.</p>
-<p>Most of the menu and tool bar items are pretty self-explaining, so we'll concentrate just on the highlights.</p>
+<p>La plupart des menus et des éléments de la barre d'outils étant assez explicites, Nous allons nous concentrer sur les points phares.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>File</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>File (Fichier)</h3>
 <p>When you close the window of a new mail, its status is normally switched from "New" to "Read". But you can set other statuses as well, by choosing from the <span class="menu">Close and...</span> submenu. There you'll also find the option <span class="menu">Set to...</span> to create your own custom statuses, which are saved under <span class="path">~/config/settings/Mail/status/</span>.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Edit</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Edit (Édition)</h3>
 <p>Here you'll find an item to open Mail's <span class="menu">Preferences...</span> (<a href="#preferences">see below</a>) and a shortcut to manage your <span class="menu">Accounts...</span>, which will open the <a href="../preferences/e-mail.html">E-mail</a> preference panel.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>View</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>View (Vue)</h3>
 <p>You'll only seldomly need these two items, if at all:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Show header</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>Shows the complete header of a mail, in case you need to track down the path of your mail, for example.</td></tr>
@@ -106,12 +108,12 @@
 <p>When you've opened an email from a Tracker or query result window, <span class="menu">Previous message</span> and <span class="menu">Next message</span> will move to the previous/next email in the list.</p>
 <p><span class="menu">Save address</span> collects all email addresses from the header and the actual email body in a submenu. Choosing an address will open the <a href="people.html">People</a> application in order to complete and save the contact information.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Queries</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Queries (Requêtes)</h3>
 <p>This doesn't work yet, but is intended to hold queries that would show all mail related to the currently open mail, like all from the same sender or same subject/thread.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating new messages</a></h2>
+<a id="creating" name="creating">Créer des nouveaux messages</a></h2>
 <p>A new email is created by invoking the <span class="menu">New mail message</span> menu or the corresponding icon from the tool bar of an open email. Or you just start the Mail application or choose <span class="menu">Create new message...</span> from the context menu of the mailbox icon in the Deskbar.</p>
 <img src="../images/apps-images/mail-write.png" alt="email-write.png" /> 
 <p>The window is pretty similar to the one when reading mails. The menu and tool bar items are slightly different and the text boxes have to be filled with the recipient's email address, subject and so on, of course.</p>
@@ -121,10 +123,10 @@
 <span class="menu">To</span>, <span class="menu">CC</span>, and <span class="menu">BCC</span> are pop-up menus. They contain all email addresses on your system found by a query for <a href="people.html">People</a> files. Their "Group" attribute will sort them in corresponding submenus.</p>
 <p>Again, we'll focus on the more interesting features in the menus.</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>File</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>File (Fichier)</h3>
 <p>With <span class="menu">Save as draft</span> you can store your work so far and come back to it later. To load it again, choose it from the <span class="menu">Open draft</span> submenu that will list the result of a query for all mails with the status "Draft".</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Edit</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Edit (Édition)</h3>
 <p><span class="menu">Quote</span> and <span class="menu">Remove quote</span> or their respective shortcuts <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> are used to add/remove a level of quoting by adjusting the number of "&gt;" symbols in front of quoted lines. Just select some text in all the lines you want un/quoted and invoke the menu item.</p>
 
 <img src="../images/apps-images/mail-spellcheck.png" alt="email-spellcheck.png" /> 
@@ -143,19 +145,19 @@ Right-clicking such a word opens a context menu offering suggestions to correct 
 
 <img src="../images/apps-images/mail-attachments.png" alt="email-attachments.png" /> 
 
-<p>File attachments are listed below the header section. You can remove a file by invoking a context menu or by selecting it and pressing <span class="key">DEL</span>.</p>
+<p>Les fichiers joints sont listés sous la section d'entête. Vous pouvez retirer un mail en invoquant le menu contextuel ou en le sélectionnant avant de presser la touche <span class="key">Suppr</span>.</p>
 
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Queries</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Queries (Requêtes)</h3>
 <p>This doesn't work yet, but is intended to hold queries that would show all mail related to the currently open mail, like all to the same recipient or same subject/thread.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preferences" name="preferences">Preferences</a></h2>
+<a id="preferences" name="preferences">Préférences</a></h2>
 <img src="../images/apps-images/mail-preferences.png" alt="email-preferences.png" /> 
-<p>Mail's preferences come in two parts:</p>
+<p>Les préférences de courrier se présentent en deux parties :</p>
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>User interface</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>User interface (Interface utilisateur)</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Button bar</span></td><td style="width:10px;"></td><td>Options to show labels under the icons or hide the tool bar completely.</td></tr>
 <tr><td><span class="menu">Font</span></td><td></td><td>Sets the type of font used for the email text.</td></tr>
@@ -166,7 +168,7 @@ Right-clicking such a word opens a context menu offering suggestions to correct 
 </table>
 
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Mailing</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Mailing (Publipostage)</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Default account</span></td><td style="width:10px;"></td><td>If you have several email accounts, this specifies which to use by default when creating a new message.</td></tr>
 <tr><td><span class="menu">Reply account</span></td><td></td><td>When you reply to a mail, you can either always <span class="menu">Use default account</span> set in the pop-up menu above, or use the <span class="menu">Account from mail</span>, which will send the mail from the same account that received the original message.</td></tr>

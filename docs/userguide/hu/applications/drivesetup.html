@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Lemezkezelő</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/drivesetup.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/drivesetup.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/drivesetup.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/drivesetup.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/drivesetup.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/drivesetup.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/drivesetup.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/drivesetup.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/drivesetup.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/drivesetup.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/drivesetup.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/drivesetup.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/drivesetup.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="diskusage.html">Lemezhasználat</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="expander.html">Kicsomagoló</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />Lemezkezelő (DriveSetup)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
+</table>
+<p><br /></p>
+<p>A lemezkezelő használatával partíciókat hozhatunk létre vagy törölhetünk. Jelenleg nem tudunk meglévő partíciót átméretezni vagy mozgatni, tehát vagy egy partícionálatlan lemezt kell használnunk, vagy (talán egy USB lemezt vagy egy másik merevlemezt) elő kell készítenünk egy külső programmal. Például a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> használatával hozzuk létre a partíciókat.</p>
+<img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
+<p>A felső részben a kiválasztott lemez partícióinak grafikus megjelenítése látható. Bár maximálisan 4 elsődleges partíciónk lehet, azokon belül több logikai partíció is található. A partíciók részletei a lemezek előtti +/- jellel tekinthetőek meg a listában.</p>
+<p>A listában kiválaszthatjuk a partíciókat, és csatolhatjuk, leválaszthatjuk őket a <span class="menu">Partíció</span> menüből, vagy az <span class="key">ALT</span> <span class="key">M</span> vagy  <span class="key">ALT</span> <span class="key">U</span> kombinációval.</p>
+<p>Meglévő partíciókat törölhetünk is a <span class="menu">Partíció | Törlés</span> menüpontjával.<br /></p>
+<div class="box-stop">A partíciók létrehozása/törlése/előkészítése veszélyes folyamat. Mindig ellenőrizzük le kétszer is, hogy biztosan a jó partícióval dolgozunk-e, illetve a fájlokról is van-e biztonsági másolatunk!</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="creating" name="creating">Új partíció létrehozása</a></h2>
+<div class="box-info">Ha azt tervezed, hogy a teljes lemezt egy partícióként használod, például USB lemezek vagy memória kártyák esetében,akkor a partíciók létrehozását ki is hagyhatod, mindjárt <a href="#initializing">előkészítheted</a> azt.</div>
+<p>Ha a lemezen formázatlan területet találsz, páldául <tt>&lt;üres&gt;</tt> partíciót, akkor egy újat hozhatsz létre erre a területre a <span class="menu">Partíció | Létrehozás...</span>(<span class="key">ALT</span> <span class="key">C</span>) menüjéből.</p>
+<img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
+<p>Ekkor egy ablak jelenik meg, ahol megadhatjuk a partíció méretét és típusát. Válasszuk a <span class="menu">Be File System</span> típust ha Haiku számára akarjuk létrehozni azt. Itt megjegyzendő, hogy más operációs rendszerek nem feltétlen férnek majd hozzá a létrehozott lemezhez.</p>
+<p>Ha elsődleges partíciót hozunk létre, nem pedig egy  már meglévőn belül logikait, akkor a fenti ablakban megjelenik egy <span class="menu">Aktív partíció</span> jelölő négyzet is. Ezt be kell jelölni, ha a Haiku-t szeretnénk indítani a gépen.</p>
+<p>Mielőtt használni szeretnénk az újonnan létrehozott partíciót, előtte formázni kell egy adott fájlrendszerre.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="initializing" name="initializing">Partíció előkészítése</a></h2>
+<p>Csak leválasztott partíciókat lehet előkészíteni a <span class="menu">Partíció | Formázás</span> menü használatával.</p>
+<img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
+<p>Most meg kell adnia a partíció nevét és a blokk-méretét. 2048 bájt blokkonként ajánlott, de ezen kívül kisebb és nagyobb méretet is választhatunk a felhasználástól függően.<br />
+Az előkészítéskor az öszes adat el fog veszni a partícióról!</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="diskusage.html">Lemezhasználat</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="expander.html">Kicsomagoló</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

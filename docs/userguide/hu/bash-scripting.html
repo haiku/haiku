@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Bash és szkriptek</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/bash-scripting.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bash-scripting.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bash-scripting.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bash-scripting.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bash-scripting.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bash-scripting.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/bash-scripting.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bash-scripting.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/bash-scripting.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/bash-scripting.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/bash-scripting.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/bash-scripting.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/bash-scripting.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="preferences.html">Beállítások</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+<!-- ::  <a href="filesystem-layout.html">Fájlrendszer felépítése</a>  » -->
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Bash és szkriptek</h1>
+
+<p>A "szkriptelés" automatikus folyamatok összessége, melyeket szövegként adhatunk meg, és menthetünk egy szöveges fájlba, amiket "szkripteknek" hívunk. Minden alkalommal, amikor szkripteket futtatunk, a parancsok lépésről lépésre hajtódnak végre, épp úgy, mint amikor azokat a <a href="applications/terminal.html">Terminál</a>ban adjuk ki kézzel.<br />
+A szkriptek az egyszerű parancsok futtatásától az összetettebb kódokig nagyon jól használhatóak.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="bash" name="bash">A Bash</a></h2>
+<p>Alapvetően a legtöbb shell támogatja a szkripteket. Azt ajánljuk, hogy a BASH-el ismerked meg, ugyanis a Haiku is azt használja. Annak köszönhetően, hogy ez egy igen elterjedt shell, rengeteg interneten elérhető anyagot találunk hozzá. Például egy remek dokumentációt is, melyet Johan Jansson készített: <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="scripting-bible" name="scripting-bible">A Szkriptelés Bibliája</a></h2>
+<p>Miután megtanultas az alapokat a bash-ben való munkával kapcsolatosan, itt az ideje annak, hogy belevesd magad a szkriptelés világába. Ezzel kapcsolatosan is rengeteg információt, oktatóanyagot találsz az interneten és a könyvesboltokban is. Egy remek, kifejezetten Haiku-hoz készített interneten elérhető anyagot is tudunk ajánlani, Scot Hacker BeOS Bible című könyvéből <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>).</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Szkriptek Haiku alatt</a></h2>
+<p>Haiku alatt a rendszer folyamatosan használ szkripteket. Az indítás és a leállítás tipikus szkriptelési folyamat. Ezek a felhasználó által is módosíthatóak.<br />
+Ha még nem léteznek a fájlok, akkor nyugodtan létrehozhatjuk őket. Egyébként egyszerűen csak adjuk hozzá a parancsokat, amiket futtatni szeretne.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="userbootscript" name="userbootscript">UserBootscript</a></h3>
+<p>A <span class="path">/boot/home/config/boot/UserBootscript</span> akkor indul el, ha a rendszer befejezte a rendszertöltési folyamatot. Például számtalan programot indíthatunk automatikusan minden rendszertöltéskor:</p>
+<pre># Start LaunchBox
+/boot/system/apps/LaunchBox &amp;
+
+# Start Workspaces Applet
+/boot/system/apps/Workspaces &amp;</pre>
+<p>Itt megjegyezném, hogy az "<tt>&amp;</tt>" jellel végződő parancsok a háttérben fognak elindulni, és ott is futnak, amíg nem végeznek.</p>
+
+<p>Egy alternatív megoldás a programok rendszertöltéskori elindítására az, ha a programot berakjuk a <span class="path">/boot/home/config/boot/launch</span> mappába. Ez úgy tehetjük meg, hogy a programon jobb gombbal kattintunk, és a helyi menüből a <span class="menu">Hivatkozás létrehozása</span> menüben <a href="tracker.html#navigating">megkeressük</a> ezt a mappát.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownscript" name="usershutdownscript">UserShutdownScript</a></h3>
+<p>A <span class="path">/boot/home/config/boot/UserShutdownScript</span> a rendszer leállásakor elsőként indul el. Ha a szkript nem nullát ad vissza eredményként, akkor a rendszer megszakítja a leállítást.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript</a></h3>
+<p>A <span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> a leállítási folyamat végezetével indul el. Itt megjegyezném, hogy a legtöbb rendszer-folyamat addigra már leáll.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="preferences.html">Beállítások</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+<!-- ::  <a href="filesystem-layout.html">Fájlrendszer felépítése</a>  » -->
+</span></div>
+</div>
+
+</body>
+</html>

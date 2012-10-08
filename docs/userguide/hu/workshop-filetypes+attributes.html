@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Műhely: fájltípusok, jellemzők, indexek és lekérdezések</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/workshop-filetypes+attributes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-filetypes+attributes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workshop-filetypes+attributes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workshop-filetypes+attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workshop-filetypes+attributes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workshop-filetypes+attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/workshop-filetypes+attributes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/workshop-filetypes+attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/workshop-filetypes+attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/workshop-filetypes+attributes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/workshop-filetypes+attributes.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/workshop-filetypes+attributes.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="queries.html">Lekérdezések</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="applications.html">Programok</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#preparations">Előkészítés</a><br />
+	<a href="#custom-filetype">Egyéni fájltípus létrehozása</a><br />
+	<a href="#icon">Icon</a><br />
+        <a href="#file-recognition">Fájl azonosítása</a><br />
+	<a href="#description">Leírás</a><br />
+	<a href="#pref_app">Előnyben részesített programok</a><br />
+	<a href="#extra_attribute">További jellemzők</a><br />
+	<a href="#indexing">Indexelés</a><br />
+	<a href="#filling-data">Adatok megadása</a><br />
+	<a href="#query-db">Lekérdezés az adatbázisból</a>
+</td></tr>
+</table>
+
+<h1>Műhely: fájltípusok, jellemzők, indexek és lekérdezések</h1>
+
+<p>Ebben a témakörben bemutatjuk a <a href="attributes.html">Jellemzők</a>, a <a href="queries.html">Lekérdezések</a>, az <a href="index.html">Index</a> és az egyéni <a href="filetypes.html">Fájltípusok</a> használatát. Példaként egy DVD adatbázis hozunk létre.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="preparations" name="preparations">Előkészítés</a></h2>
+<p>Elsőként el kell dönteni, hogy milyen típusú fájlra és milyen jellemzőkre van szükségünk. Használhatunk <span class="app">WebPositive</span> könyvjelzőket, amik már úgyis tartalmazzák a film IMDB címét, de most inkább a film borítóképét vegyük alapul.<br />
+Ehhez a képhez pedig több jellemzőt is hozzá kell adni.
+Itt most el kell düntenünk, hogy milyen adatot is tároljunk az adatbázisban, és azoknak milyen legyen a típusa. Kereséskor a számokkal (int, float) kicsit eltérően tudunk dolgozni, mint a szöveggel (&lt;/=/&gt; szám esetében, és egyenlő/tartalmaz/eleje szöveg esetében).</p>
+<p>Az alábbi jellemzőket szeretném látni a DVD filmjeimhez:</p>
+<ul>
+<li>Cím</li>
+<li>Kategória</li>
+<li>URL, például az IMDB-n</li>
+<li>Rendező</li>
+<li>Kiadó</li>
+<li>Értékelés</li>
+<li>Stúdió</li>
+<li>És például, hogy ki kérte kölcsön</li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="custom-filetype" name="custom-filetype">Egyéni fájltípus létrehozása</a></h2>
+<p>Elsőként nyissuk meg a <span class="app">Fájltípusok</span> beállításokat, majd kattintsunk a <span class="button">Hozzáadás...</span> gombra a lista alatt. Ekkor kapunk egy kis ablakot, ahol meg kell adni a MIME csoportot, amin belül majd a fájltípus megtalálható lesz. Persze, egy teljesen új csoport is létrehozható. Esetünkben ezt most tegyük az "<i>applications</i>" csoportba és adjuk meg a <i>DVDdb</i>-t, mint "belső nevet".</p>
+<img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
+<p>Ekkor az új fájltípus már megjelenik az ablakban:</p>
+<img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="icon" name="icon">Ikon</a></h3>
+<p>Az ikonon duplán kattintva az megnyílik az  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> ablakban, ahol a fájltípusnak megfelelőt létre lehet hozni. Persze, egy másik típus ikonja is idehúzható, mint egy meglévő módosításának kiindulópontja.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="file-recognition" name="file-recognition">Fájl azonosítása</a></h3>
+<p>Különféle kiterjesztések is adhatóak a típushoz, mint például .txt, .jpg, .mp3 annak érdekében, hogy a kiterjesztés alapján is felismerhetőek legyenek. Ez akkor is hasznos lehet, hogyha olyan fájlokkal dolgozunk, amik nem rendelkeznek MIME azonosítóval. Jelen példában erre nincs szükség.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="description" name="description">Leírás</a></h3>
+<ul>
+<li><i>Típus neve</i> - Ez jelenik meg például a Jellemzők menüben a Nyomkövető ablakban..</li>
+<li><i>Leírás</i> - Részletesebb információ a megadása.</li>
+</ul>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="pref_app" name="pref_app">Előnyben részesített programok</a></h3>
+<p>Ez a menü tartalmazza azon programok listáját, amik a típust kezelni tudják. Itt megadható, hogy a fájl melyik programmal nyíljon meg ha duplán kattintunk azon.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="button">Kiválasztás...</span></td><td> </td><td>Egy fájl-ablakot nyit meg, ahol kiválaszthatjuk azt a programot, amivel meg akarjuk nyitni az adott típust. Ebben az esetben például megadhatjuk a <span class="app">Képmegjelenítő</span>t, hogy megjelenítse a DVD borítóképét.</td></tr>
+<tr><td class="onelinetop"><span class="button">Ugyanaz, mint...</span></td><td> </td><td>Megnyit egy fájl-ablakot, amiben kiválaszthatunk egy olyan fájlt, amit a kívánt program nyit meg, így ezt a típust is azt fogja megnyitni.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="extra_attribute" name="extra_attribute">További jellemzők</a></h3>
+<p>Itt megadhatunk minden, olyan további jellemzőket, amiket használni akarunk. A <span class="button">Hozzáadás...</span> gombon kattitnva az alábbi ablakot kapjuk:</p>
+<img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
+<ul>
+<li><p><i>Jellemző neve</i> - Ez jelenik meg például egy oszlop neveként a Nyomkövető ablakban.</p></li>
+<li><p><i>Belső név</i> - Indexeléskor és kereséskor használt név.</p></li>
+<li><i>Típus</i> - Megadja a jelleníző adat-típusát, hogym ilyen jellegű adatot tárol majd, és hogy kereséskor hogyan lehet rá hivatkozni.
+    <ul>
+    <li><span class="menu">String</span> - egyszerű szöveg</li>
+    <li><span class="menu">Boolean</span> - bináris adat, mely lehet 1 vagy 0</li>
+    <li><span class="menu">Integer</span> - egyész számok az alábbi tartományokban:
+        <ul>
+        <li><span class="menu">8 bit</span>: ± 255</li>
+        <li><span class="menu">16 bit</span>: ± 65,535</li>
+        <li><span class="menu">32 bit</span>: ± 4,294,967,295</li>
+        <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
+        </ul>
+    </li>
+    <li><span class="menu">Float</span> - lebegőpontos számok, egy tizedes jegyig</li>
+    <li><span class="menu">Double</span> - lebegőpontos számok, két tizedes jegyig</li>
+    <li><span class="menu">Time</span> - dátum és idő formátum</li>
+    </ul>
+</li>
+</ul>
+<ul>
+<li><i>Látható</i> - Csak a négyzet bejelölésekor jelenik meg a jellemző a Nyomkövető ablakban. Mivel a Nyomkövető lesz a adatbázisunk felülete, így ezt be kell jelölni, majd néhány megjelenítési beállítást is meg kell adni:<ul>
+    <li><span class="menu">Megjelenítés így</span> - Hagyjuk "Default"-on (alapértelmezett). A későbbiekben több típus is választható, mint például sáv.</li>
+    <li><span class="menu">Szerkeszthető</span> - A jellemző szerkeszthetősége a Nyomkövető ablakban.</li>
+    <li><span class="menu">Szélesség</span> - A jellemzőhöz tartozó oszlop alapértelmezett szélessége.</li>
+    <li><span class="menu">Igazítás</span> - Az oszlop igazítása balra, középre vagy jobbra.</li>
+</ul></li></ul>
+<p>Ezek után adjuk meg a következő jellemzőket:</p>
+<table summary="DVDdb Attributes" cellpadding="10" border="1">
+<tr><th>Belső név</th><th>Jellemző típusa</th><th>indexelt?</th><th>Leírás</th></tr>
+<tr><td>DVDdb:title</td>	<td>egyszerű szöveg</td>		<td>igen</td>	<td>Cím</td></tr>
+<tr><td>DVDdb:genre</td>	<td>egyszerű szöveg</td>		<td>igen</td>	<td>Kategória</td></tr>
+<tr><td>DVDdb:url</td>		<td>egyszerű szöveg</td>		<td>nem</td>	<td>URL</td></tr>
+<tr><td>DVDdb:cast</td>		<td>egyszerű szöveg</td>		<td>igen</td>	<td>Rendező</td></tr>
+<tr><td>DVDdb:author</td>		<td>egyszerű szöveg</td>		<td>nem</td>	<td>Kiadó</td></tr>
+<tr><td>DVDdb:rating</td>	<td>32 bites szám</td>		<td>igen</td>	<td>Értékelés</td></tr>
+<tr><td>DVDdb:studio</td>	<td>egyszerű szöveg</td>		<td>nem</td>	<td>Stúdió</td></tr>
+<tr><td>DVDdb:lent</td>		<td>egyszerű szöveg</td>		<td>igen</td>	<td>Kinél van</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="indexing" name="indexing">Indexelés</a></h2>
+<p>Mielőtt adatot adnánk a mi kis DVD adatbázisunkhoz, előtte néhány jellemzőt az <a href="index.html">Index</a>hez kell adnunk. Csak az indexel jellemzők használhatóak a <a href="queries.html">Lekérdezések</a>nél.<br />
+El kell döntenünk azt is, hogy miket akarunk majd a jövőben keresni. Tehát, hogy ne kelljen majd megkérdezni, hogy "Vajon milyen filmjeim vannak a Brad Wright rendezésével?" vagy azt, hogy "Van-e rossz értékeléssel rendelkező természetfilmem?".</p>
+<p>Ezekre a kérdésekre a következő jellemzőket kell indexelnünk:</p>
+<table summary="Attribute Type" cellpadding="10" border="1">
+<tr><th>Belső név</th><th>Jellemző típusa</th></tr>
+<tr><td>DVDdb:title</td><td>egyszerű szöveg</td></tr>
+<tr><td>DVDdb:genre</td><td>egyszerű szöveg</td></tr>
+<tr><td>DVDdb:cast</td><td>egyszerű szöveg</td></tr>
+<tr><td>DVDdb:rating</td><td>32 bites szám</td></tr>
+</table>
+
+<p>Az indexeléshez pedig a következő sorokat kell kiadni a Terminálban:</p>
+<pre class="terminal">mkindex -t string DVDdb:title
+mkindex -t string DVDdb:genre
+mkindex -t string DVDdb:cast
+mkindex -t int DVDdb:rating</pre>
+<p>A <span class="cli">-t</span> opció a jellemző típusát adja meg, ami az értékelés kivételével (ami "int" (szám)) mind "string" (szöveg).</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filling-data" name="filling-data">Adatok megadása</a></h2>
+<p>Nos, minden előkészülettel végeztünk, mostmár hozzáadhatjuk az adatokat az adatbázisunkhoz.<br />
+Mivel az alap fájlunk egy borító-kép, ezért az interneten keressük meg (például az IMDB-n) és mentsük le azt egy mappába, ahol majd az adatbázisunkat fogjuk tárolni.</p>
+<p>A mappát megnyitva azt látjuk, hogy van egy kép benne. Jobb gombbal kattitnva a fájlon, a típusát meg kell változtatnunk <tt>application/DVDdb</tt> típusra a <span class="app">Fájltípus kiegészítőben</span>. További információ a <a href="filetypes.html">Fájltípusok</a> fejezetben.</p>
+<p>Most pedig válasszuk ki, hogy mely jellemzők jelenjenek meg. Ezt megtehetjük a <span class="menu">Jellemzők</span> menüből vagy az oszlopfejléceken, majd az oszlopokat is átrendezhetjük kedvünkre:</p>
+<img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
+<p>Egy üres jellemzőn kattintva (vagy <span class="key">ALT</span> <span class="key">E</span>) a szerkesztő módba jutunk. A <span class="key">TAB</span> és a <span class="key">SHIFT</span> <span class="key">TAB</span> kombinációval válthatunk a mezők (jellemzők) között.</p>
+<p>A példánk alapján az adatbázis feltöltése egy kép letöltésével kezdődik az internetről, majd annak a típusát módosítjuk. Azonban van más, elegánsabb módja is a folyamatnak. Csak másoljunk egy üres fájlt a mi fájltípusunkkal a <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> mappába, és nevezzük át DVDdb-re. Ezzel létrehoztunk egy sablont.</p>
+<p>Egy Nyomkövető ablakban jobb gombbal kattintva, egy új bejegyzést találunk majd az <span class="menu">Új...</span> almenüben.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-db" name="query-db">Lekérdezés az adatbázisból</a></h2>
+<p>Néhány óra után már egy remek kis adatbázist összehoztunk, így más tudunk keresgélni a filmek között, például megkereshetjük az akciófilmeket.</p>
+<p>Készíthetünk egy lekérdezést csak egy adott fájltípusra is, és a keresési eredményeket is hozzáigazíthatjuk ahhoz.<br />
+Nyissuk meg a DVDdb fájlokat tartalmazó mappát és rendezzük el az oszlopokat ahogy szeretnénk, hogy megjelenjenek. Ezt a megjelenést másoljuk a <span class="menu">Jellemzők | Elrendezés másolása</span> menüvel.</p>
+<p>Most nyissuk meg a <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span> mappát, hozzunk létre egy új mappát és nevezzük át a <i>csoport/fájltípus</i> formátumára, de itt cseréljük ki a "per" jelet egy aláhúzásra; vagyis, ebben az esetben "applications_DVDdb" lesz a mappa neve.</p>
+<p>Végül a mappát megnyitva és a <span class="menu">Jellemzők | Elrendezés beillesztése</span> menüt választva az alábbi eredményt kapjuk:</p>
+<img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="queries.html">Lekérdezések</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="applications.html">Programok</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

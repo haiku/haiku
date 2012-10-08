@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2010-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *		Gerard Stanczak (Google Code-In student)
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Nyelv</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/preferences/locale.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/locale.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/locale.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/locale.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/locale.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/locale.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/locale.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/locale.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/locale.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/locale.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/locale.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/locale.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/preferences/locale.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/preferences/locale.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="keymap.html">Keymap</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="media.html">Media</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/prefs-images/locale-icon_64.png" alt="locale-icon_64.png" width="64" height="64" />Nyelv (Locale)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Beállítások</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/preferences/Locale</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/Locale settings</span></td></tr>
+</table>
+<p><br /></p>
+<p>A Haiku nyelvi rendszere nem csak egyszerűen annyiból áll, hogy a szövegek lefordításra kerülnek, hanem például a formátumok, a dátum és az idő is az általunk megadott nyelvnek megfelelően jelenik meg.</p>
+<div class="box-info">Ha szeretnél segíteni a fordításban, vagy egy jelenleg még nem létező fordítást szeretnél elkezdeni, akkor vedd fel velünk a kapcsoaltot a <a href="http://www.freelists.org/list/haiku-i18n">Haiku-i18n levelezőlistán</a>.</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Nyelv</h2>
+<p>A Haiku már jelenleg is több nyelvhez tartalmaz fordítást, de sajnos még nem mindegyik teljes. Éppen ezért több nyelvet is választhatunk előnyben részesített nyelvként. Ha egy szöveg fordítása hiányzik, akkor az a következő előnyben részesített nyelv alapján kerül lefordításra. Ha valamelyik szöveget egyártalán nem tudja lefordítani a rendszer, akkor automatikusan az angol szöveg jelenik meg (mégha az nem is szerepel a listában).</p>
+<img src="../images/prefs-images/locale-language.png" alt="locale-language.png" />
+<p>A fenti példában az előnyben részesített nyelv a Magyar. A második az Olasz, és ha a lefordítandó szöveg ott is hiányzik, akkor az Angolt veszi figyelembe.<br />
+Amint látjuk, egy nyelvnek több változata is lehet, melyeket a nyelv kibontásával jeleníthetünk meg.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Formátum</h2>
+<p>A <span class="menu">Formátum</span> lapon a dátum és idő formátumát, valamint a szám illetve a pénz formátumot állíthatjuk be a választott előnyben részesített nyelvtől függetlenül.</p>
+<img src="../images/prefs-images/locale-formatting.png" alt="locale-formatting.png" />
+<p>Példul Te lehetsz Magyar, aki Olasz nyelvterületen dolgozik Svájcban. Tehát, az elsődleges nyelv a Magyar, de a szám és a pénz formátuma épp olyan, mint a munkahelyen, Svájci/Olasz.<br />
+Arra is lehetőségünk van, hogy a nap és a hónap neveit (vagyis, például a fájlok módosítási dátumát) is lefordítsuk a kiválasztott nyelvre. Ehhez jelöljük be az <span class="menu">Előnyben részesített nyelv hónap- és napneveinek használata</span> jelölő négyzetet.</p>
+<p>Bár a fenti példa nem mondható általánosnak, mégis remekül jelzi, hogy milyen rugalmas a rendszerünk.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Opciók</h2>
+<p>Az utolsó fülre kattintva mindössze egy módosítási lehetőségünk van: <span class="menu">Az programok és mappák neveinek lefordítása az Asztalsávban és a Nyomkövetőben.</span>. Ezt az opciót csak akkor jelöljük be, ha a felület nyelvének megfelelően a programok és a fontosabb mappák nevét is le akarjuk fordítani. FIGYELEM: jelenleg ezt a megoldást nem minden program támogatja ezt, így ha valamelyik nem indul, akkor kapcsoljuk ki ezt az opciót.</p>
+<p><br /> </p>
+<p>A módosítások azonnal életbe lépnek, habár a jelenleg futó programokat lehet, hogy újra kell indítani, hogy a választott nyelvnek megfelelően jelenjen meg.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Eredeti</span></td><td> </td><td>Az eredeti beállítások megadása.</td></tr>
+<tr><td><span class="button">Visszaállít</span></td><td> </td><td>A panel megnyitásakori állapot vsszaállítása.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="keymap.html">Billentyűzetkiosztás</a> 
+::  <a href="../preferences.html" class="uplink">Beállítások</a> 
+::  <a href="media.html">Média</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

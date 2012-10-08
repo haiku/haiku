@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Rendszertöltő</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/bootloader.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bootloader.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bootloader.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bootloader.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/bootloader.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/bootloader.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/bootloader.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="filesystem-layout.html">Fájlrendszer felépítése</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Rendszertöltő</h1>
+
+<p>A Haiku rendszertöltő segíthet megtalálni a számítógép hibáit, illetve kiválaszthatjuk az indítani kívánt rendszert, ha több Haiku is elérhető (például CD-n vagy USB-n).<br />
+Ez akkor is hasznos lehet, ha valamely telepített összetevő miatt a rendszer nem tud elindulni. A <i>Disable user add-ons (felhasználói kiegészítők tiltása)</i> opció használatával például a rendszer a felhasználó által telepített eszközvezérlők betöltése nélkül indítható.</p>
+<p>A rendszertöltőbe való belépéshez tartsuk lenyomva a <span class="key">SHIFT</span> billentyűt, mielőtt a Haiku betöltési folyamat elindul (mielőtt megjelenik a Haiku logó). Ha rendszerválasztó menü is van telepítve, akkor tartsuk lenyomva a <span class="key">SHIFT</span>-et mielőtt kiválasztjuk az indítandó rendszert. Ha csak Haiku van a gépünkön, akkor ajánlott már akkor lenyomva tartani a billentyűt, amikor még a BIOS üzenetei vannak a képernyőn.</p>
+<p><br /></p>
+<p>Ha már ott vagyunk, akkor a következő menüket látjuk:</p>
+<table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
+<tr><td><b>Select boot volume</b><br />Rendszer kiválasztása</td><td> </td><td>Az indítandó Haiku kiválasztása.</td></tr>
+<tr><td><b>Select safe mode options</b><br />Biztonsági opciók
+</td><td> </td><td>A következő opciók közül választhatunk ha ki akarjuk deríteni, hogy mivel van a hiba. Ha kijelölünk egy opciót, akkor látunk egy rövid leírást a képernyő alján.
+<p><i>- Safe mode (biztonsági mód)</i><br />
+<i>- Disable user add-ons (felhasználói kiegészítők tiltása)</i><br />
+<i>- Disable IDE DMA (DMA tiltása)</i><br />
+<i>- Use fail-safe video mode (biztonsági videó mód)</i><br />
+<i>- Disable IO-APIC (IO-APIC tiltása)</i><br />
+<i>- Disable LOCAL APIC (helyi APIC tiltása)</i><br />
+<i>- Don't call the BIOS (BIOS hívások tiltása)</i><br />
+<i>- Disable APM (APM tiltása)</i><br />
+<i>- Disable ACPI (ACPI tiltása)</i>
+</p></td></tr>
+<tr><td><b>Select debug options</b><br />Hibakereső opciók
+</td><td> </td><td>Az alábbi opciók segítséghetnek a hiba keresésben illetve a hiba jelentésében. Szintén kapunk egy kis leírást a képernyő alján ha kiválasztunk egy opciót.
+<p><i>- Enable serial debug output (sorosporti hibakeresés engedélyezése)</i><br />
+<i>- Enable on screen debug output (képernyőn történő hibakeresés engedélyezése)</i><br />
+<i>- Enable debug syslog (hibakereső naplózás engedélyezése)</i>
+</p>
+<p>Ha a "debug syslog" (hibakereső naplózás) engedélyezve van, hiba utáni újraindítás esetén a következő opciók is megjelennek:</p>
+<p><i>- Display syslog from previous session (a legutóbbi napló megjelenítése)</i><br />
+<i>- Save syslog from previous session (a legutóbbi napló elmentése)</i>
+</p></td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b><br />Biztonsági videó mód választása</td><td> </td><td>Ha bejelöljük a <i>Use fail-safe video mode</i>-ot (biztonsági videó mód), akkor kiválaszthatjuk a felbontást és a színmélységet.</td></tr>
+</table>
+<p><br /></p>
+<p>Ha bejelöltük a megfelelő opciókat, utána térjünk vissza a főmenübe, majd folytassuk a betöltést. Ez a következő képernyőt eredményezi:</p>
+<img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
+
+<p>Ha minden rendben megy, akkor az összes szimbólum gyorsan bekapcsol.<br />
+A különféle szimbólumok az alábbi betöltési szakaszokat jelölik:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>A modulok betöltése.</td></tr>
+	<tr><td><b>Lemez nagyítóval</b></td><td> </td><td>A gyökér fájlrendszer (<span class="path">/</span>) és az eszközök fájlrendszer (<span class="path">/dev</span>) létrehozása.</td></tr>
+	<tr><td><b>Csatolókártya</b></td><td> </td><td>Eszközkezelő betöltése.</td></tr>
+	<tr><td><b>Rendszerlemez</b></td><td> </td><td>Rendszerlemez csatolása.</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>Processzor-függő modulok betöltése.</td></tr>
+	<tr><td><b>Mappa</b></td><td> </td><td>Alrendszerek betöltése.</td></tr>
+	<tr><td><b>Rakéta</b></td><td> </td><td>A betöltő-szkript elindítja a rendszert.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="filesystem-layout.html">Fájlrendszer felépítése</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

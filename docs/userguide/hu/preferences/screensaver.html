@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Képernyővédő</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/preferences/screensaver.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/screensaver.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/screensaver.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/screensaver.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/screensaver.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/screensaver.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/screensaver.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/screensaver.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/screensaver.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/screensaver.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/screensaver.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/screensaver.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/preferences/screensaver.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/preferences/screensaver.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="screen.html">Képernyő</a> 
+::  <a href="../preferences.html" class="uplink">Beállítások</a> 
+::  <a href="sounds.html">Hangok</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />Képernyővédő (ScreenSaver)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Beállítások</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
+</table>
+
+<p>A beállítások 2 részre oszthatóak:
+</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="fade" id="fade">Aktiválás</a></h2>
+<img src="../images/prefs-images/screensaver-fade.png" alt="screensaver-fade.png" />
+<br />
+<p>A felső jelölőnégyzettel ki- illetve bekapcsolhatjuk a képernyővédőt.<br />
+Az alatta taláható csuszkával pedig megadható az aktiválás késleltetése.
+</p>
+<p>A következő 2 csuszka az aktiválás után hasznos:<br />
+- az első megadja, hogy mikor kapcsoljon ki a monitor<br />
+- a második pedig megadja, hogy mennyi idő után kérjen jelszót a feloldáshoz.
+</p>
+<p>Az alsó két képernyőn bármelyik sarokba kattintva megadható, hogy mikor kapcsoljon be, illetve mikor ne kapcsoljon be a képernyővédő, amikor az egér az adott sarokban van. A képernyők közepén kattinva kikapcsolható ez a funkció.
+</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="screensavers" id="modules">Képernyővédők</a></h2>
+<img src="../images/prefs-images/screensaver-modules.png" alt="screensaver-modules.png" />
+<br />
+<p>A második fülön találhatóak az elérhető képernyővédők és az esetleges beállítások. Ezek azonnal ki is próbálhatóak a <span class="button">Teszt</span> gombbal, illetve további képernyővédők is adhatóak a listához a <span class="button">Hozzáad...</span> gombra kattintva, vagy ha behúzzuk azt a listába. Természetesen a megfelelő mappába (<span class="path">/boot/common/add-ons/Screen Savers/</span> vagy <span class="path">/boot/home/config/add-ons/Screen Savers/</span>) is behúzhatjuk az új képernyővédőt. (További információk a <a href="../filesystem-layout.html">Fájlrendszer felépítése</a> fejezetben).
+</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="screen.html">Képernyő</a> 
+::  <a href="../preferences.html" class="uplink">Beállítások</a> 
+::  <a href="sounds.html">Hangok</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

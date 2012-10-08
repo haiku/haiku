@@ -40,6 +40,8 @@
 <li><a href="../../zh_CN/applications/mail.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/applications/mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/mail.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/mail.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,7 +53,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -107,81 +108,81 @@
 <p><span class="menu">Tallenna osoite</span> kerää kaikki sähköpostiosoitteet otsakkeesta ja todellisesta sähköpostiviestin rungosta alivalikossa. Osoitteen valitseminen avaa <a href="people.html">Ihmiset</a>-sovelluksen, jossa voit täydentää ja tallentaa yhteystietoja.</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Kyselyt</h3>
-<p>This doesn't work yet, but is intended to hold queries that would show all mail related to the currently open mail, like all from the same sender or same subject/thread.</p>
+<p>Tämä ei vielä toimi, mutta tarkoitus on säilyttää kyselyjä, jotka näyttäisivät kaikki parhaillaan avoinna olevaan sähköpostiviestiin liittyvät sähköpostiviestit, kuten kaikki saman lähettäjän viestit tai saman aiheen/säikeen viestit.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">Uusien sähköpostiviestien luominen</a></h2>
-<p>A new email is created by invoking the <span class="menu">New mail message</span> menu or the corresponding icon from the tool bar of an open email. Or you just start the Mail application or choose <span class="menu">Create new message...</span> from the context menu of the mailbox icon in the Deskbar.</p>
+<p>Uusi sähköpostiviesti luodaan kutsumalla <span class="menu">Uusi sähköpostiviesti</span>-valikkoa tai vastaavaa kuvaketta avoimen sähköpostiviestin työkalupalkista. Tai voit käynnistää Sähköposti-sovelluksen tai valita <span class="menu">Luo uusi viesti...</span> Työpöytäpalkin sähköpostikuvakkeen asiayhteysvalikosta.</p>
 <img src="../images/apps-images/mail-write.png" alt="email-write.png" /> 
-<p>The window is pretty similar to the one when reading mails. The menu and tool bar items are slightly different and the text boxes have to be filled with the recipient's email address, subject and so on, of course.</p>
-<p><span class="menu">Cc</span> is short for the anachronistic term "<i>carbon copy</i>" and results in copies of your mail being sent to the listed people. The difference to just listing a buch of addresses in the "To" field is, that you don't directly address the cc'ed people, thereby signaling that you probably don't expect an answer of them.<br />
-<span class="menu">Bcc</span> means "<i>blind carbon copy</i>" which does practically the same as "Cc", but hides the recipients from each other.</p>
-<p>You can enter several recipients by separating their addresses with a comma.
-<span class="menu">To</span>, <span class="menu">CC</span>, and <span class="menu">BCC</span> are pop-up menus. They contain all email addresses on your system found by a query for <a href="people.html">People</a> files. Their "Group" attribute will sort them in corresponding submenus.</p>
-<p>Again, we'll focus on the more interesting features in the menus.</p>
+<p>Ikkuna on melko samanlainen kuin se, jossa luetaan sähköpostia. Valikko ja työkalupalkki on lievästi erilainen ja teksti-ikkunat on täytetty tietysti vastaanottajien sähköpostiosoitteilla, aiheella ja niin edelleen.</p>
+<p><span class="menu">Kopio</span>-valikossa on luettelo sähköpostiviestin kopion vastaanottajista "<i>carbon copy</i>". Erona "Vastaanottaja"-kenttään on, että Kopio-luettelossa olevien vastaanottajien ei odoteta vastaavan viestiin.<br />
+<span class="menu">Piilokopio</span>-tarkoittaa viestikopiota, joka ei näy muille vastaanottajille, vaan piilottaa "Kopio"-vastaanottajat toisiltaan.</p>
+<p>Voit kirjoittaa useita vastaanottajia erottelemalla vastaanottajat pilkulla.
+<span class="menu">Vastaanottaja</span>, <span class="menu">Kopio</span>, ja <span class="menu">Piilokopio</span> ovat ponnahdusvalikkoja. Ne sisältävät kaikki sähköpostiosoitteet, jotka sinun järjestelmässäsi löytyvät <a href="people.html">Ihmiset</a>-tiedostojen kyselyllä. Niiden "Ryhmä"-attribuutti lajittelee ne vastaaviin alivalkioihin.</p>
+<p>Keskitymme taas valikkojen mielenkiintoisimpiin ominaisuuksiin.</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Tiedosto</h3>
-<p>With <span class="menu">Save as draft</span> you can store your work so far and come back to it later. To load it again, choose it from the <span class="menu">Open draft</span> submenu that will list the result of a query for all mails with the status "Draft".</p>
+<p>Valikolla <span class="menu">Tallenna luonnoksena</span> voit tallentaa työsi toistaiseksi ja tulla siihen takaisin myöhemmin. Sen lataamiseksi uudelleen valitse se alivalikosta <span class="menu">Avaa luonnos</span>, joka luettelee kaikki sähköpostiviestit kyselytilalla "Luonnos".</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Muokkaa</h3>
-<p><span class="menu">Quote</span> and <span class="menu">Remove quote</span> or their respective shortcuts <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> are used to add/remove a level of quoting by adjusting the number of "&gt;" symbols in front of quoted lines. Just select some text in all the lines you want un/quoted and invoke the menu item.</p>
+<p><span class="menu">Lainaa</span> ja <span class="menu">Poista lainaus</span> tai niiden vastaavat pikanäppäimet <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> käytetään lisäämään/poistamaan lainaustaso säätämällä numeroa "&gt;" symboleja lainausrivien edesssä. Valitse vain jokin tekstiin kaikki ne rivit, jotka haluat lainata ja tai poistaa lainauksesta ja kutsu valikkokohdetta.</p>
 
 <img src="../images/apps-images/mail-spellcheck.png" alt="email-spellcheck.png" /> 
 
-<p><span class="menu">Check spelling</span> currently only offers corrections of English texts by marking wrong or unknown words red and showing them in italic.
-Right-clicking such a word opens a context menu offering suggestions to correct the word or to <span class="menu">Add</span> it to the accepted vocabulary.</p>
-<p>Then, there are again the items to open Mail's <span class="menu">Preferences...</span> (<a href="#preferences">see below</a>) and a shortcut to managing your <span class="menu">Accounts...</span>, which will open the <a href="../preferences/e-mail.html">E-mail</a> preference panel.</p>
+<p><span class="menu">Tarkista oikeinkirjoitus</span> tarjoaa nykyisin vain englanninkielisten tekstin oikeinkirjoituksen tarkistusta merkitsemällä väärät  ja tuntemattomat sanat punaisella värillä ja näyttämällä ne kursivoituna.
+Sellaisen sanan avaaminen hiiren kakkospainikkeella avaa asiayhteysvalikon, joka tarjoaa suosituksia sanan korjaamiseksi tai <span class="menu">Lisää</span> sen hyväksyttyyn sanastoon.</p>
+<p>Sitten on taas kohteita avata Sähköposti-ohjelman <span class="menu">Asetukset...</span>-valikko (<a href="#preferences">katso alla</a>) ja pikanäppäin <span class="menu">Tilit...</span>, joka avaa <a href="../preferences/e-mail.html">Sähköpostiasetukset</a>-paneelin.</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Viesti</h3>
 <p>Valikolla <span class="menu">Lisää allekirjoitus</span> voit lisätä ennakolta määritellyn tekstin sähköpostiviestisi loppuun. Sen alivalikosta voit valita tietyn tekstin tai <span class="menu">Satunnaisen</span>.</p>
 
 <img src="../images/apps-images/mail-signature.png" alt="email-signature.png" /> 
 
-<p>You create new or edit existing signatures with <span class="menu">Edit signatures...</span>, which will open a window where you enter the text itself and the title of your new sig. There, in the <span class="menu">Signature</span> menu, you find items to <span class="menu">Open</span> a specific signature or <span class="menu">Save</span> or <span class="menu">Delete</span> the currently loaded one, Signatures should be saved in <span class="path">~/config/settings/Mail/signatures</span>.</p>
-<p>Use <span class="menu">Add enclosure...</span> and <span class="menu">Remove enclosure</span> to add/remove files as attachments. You can also drag &amp; drop files from a Tracker window. Be careful though to drop those in the header section (To/From/Subject area at the top) or they'll get pasted into the email body if they are text files.</p>
+<p>Luot uuden tai muokkaat olemassaolevan allekirjoituksen valikolla <span class="menu">Muokkaa allekirjoituksia...</span>, mikä avaa ikkunan, missä kirjoitat itse tekstin ja uuden allekirjoituksensi otsikon. Valikosta <span class="menu">Allekirjoitus</span> löydät alivalikot <span class="menu">Avaa</span> tietyn allekirjoituksen avaamiseksi tai <span class="menu">Tallenna</span> tallentamiseksi tai <span class="menu">Poista</span> parhaillaan ladatun allekirjoituksen poistamiseksi. Allekirjoitukset pitäisi tallentaa kansioon <span class="path">~/config/settings/Mail/signatures</span>.</p>
+<p>Käytä <span class="menu">Lisää liite...</span> ja <span class="menu">Poista liite</span> tiedostojen lisäämiseksi tai poistamiseksi liitteinä. Voit myös raahata ja pudottaa tiedostot Seuraaja-ikkunasta. Ole varovainen niiden pudottamisessa (Vastaanottaja/Lähettäjä/Aihe -alueella ylhäällä) tai ne liitetään sähköpostitiedoston runkoon, jos ne ovat tekstitiedostoja.</p>
 
 <img src="../images/apps-images/mail-attachments.png" alt="email-attachments.png" /> 
 
-<p>File attachments are listed below the header section. You can remove a file by invoking a context menu or by selecting it and pressing <span class="key">DEL</span>.</p>
+<p>Tiedostoliitteet on lueteltu otsakelohkon alla. Voit poistaa tiedoston kutsumalla asiayhteysvalikkoa tai valitsemalla sen ja painamalla painiketta <span class="key">DEL</span>.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Kyselyt</h3>
-<p>This doesn't work yet, but is intended to hold queries that would show all mail related to the currently open mail, like all to the same recipient or same subject/thread.</p>
+<p>Tämä ei vielä toimi, mutta se on tarkoitettu säilyttämään kyselyt, jotka näyttävät kaikki parhaillaan avoinna olevaan sähköpostiviestiin liittyvät sähköpostiviestit, kuten kaikki saman lähettäjän tai samaa aihetta tai säiettä koskevat viestit.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preferences" name="preferences">Asetukset</a></h2>
 <img src="../images/apps-images/mail-preferences.png" alt="email-preferences.png" /> 
-<p>Mail's preferences come in two parts:</p>
+<p>Sähköpostiasetukset ovat kahdessa osassa:</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Käyttöliittymä</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Button bar</span></td><td style="width:10px;"></td><td>Options to show labels under the icons or hide the tool bar completely.</td></tr>
-<tr><td><span class="menu">Font</span></td><td></td><td>Sets the type of font used for the email text.</td></tr>
-<tr><td><span class="menu">Size</span></td><td></td><td>Sets the font size.</td></tr>
-<tr><td><span class="menu">Colored quotes</span></td><td></td><td>Colors different levels of quotation.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Initial spell check mode</span></td><td></td><td>Turns the spell checker on/off on startup.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Automatically mark mail as read</span></td><td></td><td>If you close an email with the Status "New", you can have it automatically marked as "Read".</td></tr>
+<tr><td><span class="menu">Painikepalkki</span></td><td style="width:10px;"></td><td>Valitsimet näyttävät nimiöt kuvakkeiden alla tai piilottavat työkalupalkin kokonaan.</td></tr>
+<tr><td><span class="menu">Kirjasin</span></td><td></td><td>Asettaa sähköpostiviestin tekstissä käytetyn kirjasintyypin.</td></tr>
+<tr><td><span class="menu">Koko</span></td><td></td><td>Asettaa kirjasinkoon.</td></tr>
+<tr><td><span class="menu">Väritetyt lainaukset</span></td><td></td><td>Värittää lainausten eri tasot.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Alustava oikeinkirjoitustarkistustila</span></td><td></td><td>Ottaa käyttöön tai pois käytöstä oikeinkirjoituksen tarkistuksen käynnistymisen yhteydessä.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Merkitse sähköpostiviestit automaattisesti luetuiksi</span></td><td></td><td>Jos suljet sähköpostiviestin, jonka tila on "Uusi", se merkitään automaattisesti tilaan "Luettu".</td></tr>
 </table>
 
 <h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Mailing</h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Sähköpostin käyttö</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Default account</span></td><td style="width:10px;"></td><td>If you have several email accounts, this specifies which to use by default when creating a new message.</td></tr>
-<tr><td><span class="menu">Reply account</span></td><td></td><td>When you reply to a mail, you can either always <span class="menu">Use default account</span> set in the pop-up menu above, or use the <span class="menu">Account from mail</span>, which will send the mail from the same account that received the original message.</td></tr>
-<tr><td><span class="menu">Reply preamble</span></td><td></td><td>This is inserted before the quoted text in your reply. You can use various variables from the pop-up menu next to the text field. Example: "<i>Hello %n!\n\nOn %d you wrote:\n</i>" produces this:
-<pre>Hello Dr. Hawking!
+<tr><td><span class="menu">Oletustili</span></td><td style="width:10px;"></td><td>Jos sinulla on useita sähköpostitilejä, tämä määrittää, mitä niistä käytetään oletuksena kun luodaan uusi sähköpostiviesti.</td></tr>
+<tr><td><span class="menu">Vastaustili</span></td><td></td><td>Kun vastaat sähköpostiviestiin, voit joko aina valita <span class="menu">Käytä oletustiliä</span>, joka asetettiin yllä ponnahdusvalikossa, tai käyttää <span class="menu">Tili sähköpostiviestistä</span>, mikä lähettää sähköpostiviestin samalle tilille, jolta sen vastaanotit.</td></tr>
+<tr><td><span class="menu">Vastauksen esipuhe</span></td><td></td><td>Tämä lisätään ennen vastauksesi lainattua tekstiä. Voit käyttää erilaisia muuttujia tekstikentän viereisestä ponnahdusvalikosta. Esimerkki: "<i>Hei %n!\n\n%d kirjoitit:\n</i>" tuottaa tämän:
+<pre>Hei Dr. Hawking!
 
-On Mon, 18 Jan 1998 02:55:16 +0800 you wrote:
+Mon, 18 Jan 1998 02:55:16 +0800 kirjoitit:
 &gt; so thanks again for the inspiration concerning the cosmological constant.
-&gt; ...and the rest of the quoted text following...</pre></td></tr>
-<tr><td><span class="menu">Auto signature</span></td><td></td><td>Adds a signature automatically to the end of the mail.</td></tr>
-<tr><td><span class="menu">Encoding</span></td><td></td><td>Sets the default encoding.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Warn unencodable</span></td><td></td><td>If your mail contains characters that can't be encoded with the currently set encoding method, you can turn on being warned about that. That gives you the opportunity to change the encoding before sending. Otherwise unencodable characters are replaced by rectangle symbols.</td></tr>
-<tr><td><span class="menu">Text wrapping</span></td><td></td><td>Inserts line-breaks every 76 characters which makes mails easier to read.</td></tr>
-<tr><td><span class="menu">Attach attributes</span></td><td></td><td>You can choose to send BFS' attributes of a file alongside the attachments. This is nice for other Haiku users, as they'll get a "complete" file (think artist, album, title attributes of MP3 files), but may cause confusion (or even suspicion) with others, who will wonder what the additional "BeOS Attributes" attachment might be...<br />
-Should you opt not to send attributes with your attachments, remember zip up your files before you send them or you'll strip away BFS attributes.</td></tr>
+&gt; ...ja loput lainatusta tekstistä seuraa...</pre></td></tr>
+<tr><td><span class="menu">Automaattinen allekirjoitus</span></td><td></td><td>Lisää allekirjoituksen automaattisesti sähköpostiviestin loppuun.</td></tr>
+<tr><td><span class="menu">Koodaus</span></td><td></td><td>Asettaa oletuskoodauksen.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Varoita koodaamattomista</span></td><td></td><td>Jos sähköpostiviestisi sisältää merkkijä, joita ei voida koodata nykyisellä asetetulla koodausmenetelmällä, voit laittaa päälle varoituksen siitä. Se antaa sinulla mahdollisuuden vaihtaa koodausta ennen lähetystä. Muussa tapauksessa koodaamattomat merkit korvataan neliösymboleilla.</td></tr>
+<tr><td><span class="menu">Tekstin rivittäminen</span></td><td></td><td>Lisää rivinvaihdon joka 76. merkiksi, mikä helpottaa sähköpostiviestien lukemista.</td></tr>
+<tr><td><span class="menu">Liitä attribuutit</span></td><td></td><td>Voit valita BFS:n tiedostoattribuuttien lähettämisen liitteen mukana. Tämä on mukavaa muille Haiku-käyttäjille, koska he saavat "täydellisen" tiedoston (ajattele MP3-tiedostojen artisti-, albumi-, otsikkoattribuutteja), mutta ne voivat aiheuttaa hämmennystä (tai jopa epäluuloa) muille, jotka ihmettelevät, että mitä ylimääräiset "BeOS-attribuutti"-liitteet mahtavat olla...<br />
+Jos valitset, että et lähetä attribuutteja liitteiden mukana, muista tiivistää tiedostosi zip-tiedostoiksi ennen niiden lähettämistä tai BFS-attribuutit riisutaan tiedostoista.</td></tr>
 </table>
 
 </div>

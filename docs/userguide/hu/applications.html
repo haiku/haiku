@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<meta name="robots" content="all" />
+	<title>Programok</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../fr/applications.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/applications.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/applications.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/applications.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/applications.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/applications.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/applications.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/applications.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/applications.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/applications.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/applications.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/applications.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../pt_BR/applications.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../en/applications.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="workshop-filetypes+attributes.html">Műhely</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="desktop-applets.html">Asztalsáv kisalkalmazásai</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Programok</h1>
+
+<p>Mielőtt elmerülnénk a Haiku programjaiban, nézzük meg, hogyan telepíthetjük a letöltött programokat (például egy, az <a href="../../welcome/welcome_hu.html#software">üdvözlőoldal</a>on feltüntetett oldalról), illetve hogyan távolíthatjuk el őkek.</p>
+<div class="box-info">Lehetőség szerint csak Haiku alatt csomagoljuk ki a fájlokat. Ha Windows vagy Linux alatt történik a kicsomagolás, és csak később akarjuk átmásolni Haiku-ra a fájlokat, akkor az összes jellemző tulajdonság elvész, ugyanis a többi operációs rendszer nem támogatja a meta-adatokat.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="install" name="install">Programok telepítése</a></h2>
+<p>A Haiku programok minden esetben becsomagolva érkeznek. A legtöbb esetben ezek ZIP csomagok, de néhány régi program még BeOS Software Valet (PKG) formátumú. A Software Valet lehetőséget nyújtott szkriptek futtatására, tehát elindítása után csak ki kellett választani a lemezt, és a többit a telepítő már elvégezte.<br />
+ZIP csomag esetében megnyitva azt a <span class="app">Kicsomagoló</span>ban, csak ki kell választani a célt, és kicsomagolni. Mint a <a href="filesystem-layout.html">Fájlrendszer felépítése</a> fejezetben említésre került, a cél mappa a következő lehet:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>Programok az összes felhasználó számára.</td></tr>
+<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>Csak az aktuális felhasználó programjai.</td></tr>
+</table>
+<p>Az elkülönítésnek persze csak akkor lesz értelme, ha a Haiku már támogatni fogja a felhasználók kezelését.</p>
+<p>A kicsomagolás után ajánlott belenézni az újonnan létrehozott mappába, ugyanis gyakran találunk ott fontos leírásokat.</p>
+<p>Néhány programhoz további konfigurálás is szükséges. Például a <a href="tracker-add-ons.html">Nyomkövető kiegészítők</a>et, <a href="preferences/datatranslations.html">Értelmezők</a>et vagy egyéb kiegészítőket csak be kell másolni a megfelelő mappába. Néhány esetben szkriptet használhatunk (gyakran <span class="cli">.sh</span> kiterjesztéssel) például <span class="cli">install</span>, amit csak el kell indítani, és a szkript elvégez minden műveletet.<br />
+Néha pedig egy mappa-hivatkozást találunk, ami a cél mappát jelöli (például: <span class="cli">drag [filename] here...</span>). Vagyis, csak követni kell a leírást ("húzd ide"), és már kész is.</p>
+<p>A legtöbb esetben a kicsomagolás után semmi dolgunk nincs.<br />
+Az <a href="deskbar.html">Asztalsáv</a> vagy az <a href="desktop-applets/launchbox.html">Indítósáv</a> leírásai tartalmaznak információkat, hogy hogyan lehet létrehozni indító ikonokat az új programokhoz.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="uninstall" name="uninstall">Programok eltávolítása</a></h2>
+<p>Ha a telepítés szkript használatával történt, akkor valószínű, hogy egy eltávolító szkript is található a program mellett. Ebben az esetben csak azt kell elindítani.<br />
+Egyébként egyszerűen csak töröljük a programot.</p>
+<p>Persze; ebben az esetben maradhatnak vissza konfigurációs fájlok a <span class="path">~/config/settings</span> mappában. Ezek megtarthatóak arra az esetre, ha a későbbiekben újra szeretnénk telepíteni az adott programot. Ez igaz arra az esetre is, amikor a telepítés során egy mappába kelett behúzni azokat ("<span class="cli">drag [filename] here...</span>").</p>
+<p>Az egyik leggyorsabb módszer az, ha rákeresünk a program nevére. Ekkor megkaphatjuk az összes fájlt illetve mappát, ami az adott programmal kapcsolatos. Tehát, csak válasszuk ki, majd töröljük a program fájljait.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-apps" name="list-of-apps">Haiku programok</a></h2>
+<p>A Haiku sok kicsi, ugyanakkor hasznos programot tartalmaz. A programok a <span class="path">/boot/system/apps/</span> vagy a <span class="path">/boot/common/apps/</span> mappában találhatóak. Azok a programok, amik nem egy adatfájl megnyitásával indíthatóak (például a Képmegjelenítő egy kép megnyitásakor) azokat megtaláljuk a <span class="menu">Programok</span> menüben az Asztalsávon.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">Folyamatmonitor</a></td><td style="width:10px;"> </td>
+		<td valign="top">A rendszer terheltségét/kihasználtságát jeleníti meg grafikonon.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">Rendszerválasztó</a></td><td> </td>
+		<td valign="top">Rendszerválasztó menü telepítése a lemezre.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CDLejátszó</a></td><td> </td>
+		<td valign="top">CD lejátszó.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">Karaktertábla</a></td><td> </td>
+		<td valign="top">Unicode karaktertábla megjelenítése.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>
+		<td valign="top">Web-kamerával készített kép feltöltése a megadott kiszolgálóra.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">Számológép</a></td><td> </td>
+		<td valign="top">Többfunkciós számológép.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html">LemezFürkész</a></td><td> </td>
+		<td valign="top">Hexadecimális szerkesztő.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html">Lemezhasználat</a></td><td> </td>
+		<td valign="top">Vizuálisan megjeleníti a mappák használatát.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">Lemezkezelő</a></td><td> </td>
+		<td valign="top">Lemez/partíció kezelő program.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Kicsomagoló</a></td><td> </td>
+		<td valign="top">Ismert csomagolt fájlok kicsomagolása.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
+		<td valign="top">Haiku vektoros ikonok készítése.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Telepítő</a></td><td> </td>
+		<td valign="top">A Haiku telepítésére szolgáló program.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Nagyító</a></td><td> </td>
+		<td valign="top">Az egérkurzor körüli terület nagyítására szolgáló program.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Levelezés</a></td><td> </td>
+		<td valign="top">Levelező kliens.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">Médialejátszó</a></td><td> </td>
+		<td valign="top">Multimédia lejátszó az összes támogatott formátumhoz.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">Midilejátszó</a></td><td> </td>
+		<td valign="top">MIDI fájlok lejátszása.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">Csomagtelepítő</a></td><td> </td>
+		<td valign="top">BeOS formátumú (PKG) csomagok telepítője.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">Névjegyek</a></td><td> </td>
+		<td valign="top">Névjegykezelő.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">SzegényEmber</a></td><td> </td>
+		<td valign="top">Egyszerű web-kiszolgáló.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Képernyőkép</a></td><td> </td>
+		<td valign="top">Képernyőkép-készítő program.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">Képmegjelenítő</a></td><td> </td>
+		<td valign="top">Egyszerű képnézegető.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">Hangfelvevő</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Hangrözgítő vonalbemenethez vagy mikrofonhoz.</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
+		<td valign="top">Egyszerű szövegszerkesztő.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Terminál</a></td><td> </td>
+		<td valign="top">Felület a bash shell-hez.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/textsearch-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/textsearch.html">Szövegkeresés</a></td><td> </td>
+		<td valign="top">Szöveg-kereső program.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">TV</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Analóg TV program.</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/webpositive-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/webpositive.html">WebPositive</a></td><td> </td>
+		<td valign="top">Alapértelmezett böngésző.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-apps" name="cli-apps">Haiku parancssori alalmazások</a></h2>
+<p>A szokásos parancsssori alkalmazások mellett, melyek a bash "tartozékai", vagy szükségesek a POSIX-kompatibilitás miatt, néhány Haiku-specifikus program is rendelkezésünkre áll.
+Ezek a programok szintén használhatóak szkript írásakor is. További információk a <a href="bash-scripting.html">Bash és szkriptek</a> fejezetben.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/list-cli-apps.html">Az összes parancssori alkalmazás</a></td><td> </td></tr>
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Haiku-specifikus parancsssori alkalmazások</a></td><td> </td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-bundled-apps" name="list-of-bundled-apps">A rendszerrel együtt érkező programok</a></h2>
+<p>Az alábbi listában található néhány program, amik a Haiku-project keretében vannak karbantartva, és melyek a rendszerrel együtt érkeznek. Az ezekkel kapcsolatos hibákat illetve kéréseket a program illetékeséhez kell címezni.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td style="width:10px;"> </td>
+		<td valign="top"><acronym title="Portable Document Format">PDF</acronym> megjelenítő.</td></tr>
+<!--	<tr><td style="width:24px;"><img src="../images/apps-images/bezillabrowser-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="270"><a href="applications/bezillabrowser.html">BeZillaBrowser</a></td><td> </td>
+		<td valign="top" _translation_id="271">A web browser based on Mozilla's source code.</td></tr> -->
+	<tr><td style="width:24px;"><img src="../images/apps-images/pe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/pe.html">Pe</a></td><td> </td>
+		<td valign="top">Egy fejlett szövegszerkesztő szintaktikai színezéssel és még sok hasznos funkcióval.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/vision-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/vision.html">Vision</a></td><td> </td>
+		<td valign="top"><acronym title="Internet Relay Chat">IRC</acronym> kliens.</td></tr>
+<!--	<tr><td style="width:24px;"><img src="../images/apps-images/vlc-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="276"><a href="applications/vlc.html">VLC media player</a></td><td> </td>
+		<td valign="top" _translation_id="277">VideoLAN's media player.</td></tr> -->
+	<tr><td style="width:24px;"><img src="../images/apps-images/wonderbrush-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/wonderbrush.html">WonderBrush</a></td><td> </td>
+		<td valign="top">A YellowBite grafikai programja.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="workshop-filetypes+attributes.html">Műhely</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="desktop-applets.html">Asztalsáv kisalkalmazásai</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2012, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Shortcuts and key combinations</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/keyboard-shortcuts.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/keyboard-shortcuts.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/keyboard-shortcuts.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/keyboard-shortcuts.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/keyboard-shortcuts.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/keyboard-shortcuts.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/keyboard-shortcuts.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/keyboard-shortcuts.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/keyboard-shortcuts.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/keyboard-shortcuts.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/keyboard-shortcuts.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/keyboard-shortcuts.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/keyboard-shortcuts.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../en/keyboard-shortcuts.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="deskbar.html">Deskbar</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
+
+<h1>Shortcuts and key combinations</h1>
+
+<p>By default, Haiku's shortcut key, to invoke commands from menus for example, is not the usual <span class="key">CTRL</span> key, but <span class="key">ALT</span> instead. This has historical reasons, because the BeOS was inspired somewhat by MacOS. After you get used to it, it actually has advantages as e.g. <span class="key">ALT</span> <span class="key">C</span> and <span class="key">ALT</span> <span class="key">V</span> integrate seamlessly into the <acronym title="Bourne Again Shell">bash</acronym> shell of the Terminal, where <span class="key">CTRL</span> <span class="key">C</span> quits the running process.</p>
+<p>In any case, you can switch to the maybe more familiar <span class="key">CTRL</span> key in the <a href="preferences/keymap.html">Keymap</a> preferences. The user guide always describes the default configuration with the command key being <span class="key">ALT</span>.</p>
+<p>If you're in doubt which keys are the <span class="key">OPT</span> or <span class="key">MENU</span> keys on your particular keymap/keyboard-layout, again use the <a href="preferences/keymap.html">Keymap</a> preferences. There you can see what keystroke is sent when you press a key on your keyboard.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="general" name="general">General shortcuts</a></h2>
+<p>Here's a table of many of the most commonly used shortcuts that are always available, even if there isn't a corresponding menu:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Switches to <a href="workspaces.html">Workspace</a> X (<span class="key">Fx</span> is the function key corresponding to that workspace). Take the active window with you by adding <span class="key">SHIFT</span></td></tr>
+<tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Navigates spatially the rows/columns of the available workspaces. Add <span class="key">SHIFT</span> to take the active window with you.</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>Holding <span class="key">OPT</span> while dragging a window near another window's tab or border will stack or tile them (see chapter <a href="gui.html#stack-tile">GUI</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + left mouse</td><td></td><td>Click and drag with left mouse button to move a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + right mouse</td><td></td><td>Click and drag with right mouse button to resize a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Zooms a window to an alternative size (maximum size for most applications).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>Minimizes the active window.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Hides (minimizes) all windows of the active application.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Pulls the active window to the front (only applicable with the mouse setting <a href="preferences/mouse.html">Focus Follows Mouse</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Sends the active window to the back. </td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Hold down to bring up the <a href="twitcher.html">Twitcher</a>.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>Opens the <a href="teammonitor.html">Team Monitor</a>.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>Enters the menu bar (leave with <span class="key">ESC</span>).</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Copies the selection to the  clipboard.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>Cuts the selection to the clipboard.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>Pastes the clipboard's contents.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>Closes the active window.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>Quits an application.</td></tr>
+<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Takes a screenshot with zero delay and launches the <a href="applications/screenshot.html">Screenshot</a> panel.</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Takes a screenshot silently (without opening the panel), while still respecting the last used settings.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Also takes a screenshot silently with the saved settings, but instead of saving it as a file, it's just copied to the clipboard.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tracker-navigation" name="tracker-navigation">Shortcuts for Tracker navigation</a></h2>
+<p>Additionally to the general shortcuts, here are some more for navigating with Tracker:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:15px;"></td><td>Opens the parent folder.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td>Opens the selected folder.</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>Holding it while opening a folder will automatically close the parent folder. This also works when navigating with the mouse.</td></tr>
+<tr><td><span class="key">MENU</span></td><td></td><td>Opens the Deskbar menu (leave with <span class="key">ESC</span>).</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Undo last action. The undo history is only limited by the available memory. Note, this only works for actions on the file itself, changed attributes and permission settings can't be undone with this. Also, once a file is removed from <i>Trash</i> it's gone for good.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">Z</span></td><td></td><td>Redo the action you just reverted with <span class="key">ALT</span> <span class="key">Z</span>.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="terminal" name="terminal">Shortcuts in Terminal</a></h2>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td style="width:15px;"></td><td>Opens another Terminal session in a new window.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td></td><td>Opens another Terminal session in a new tab.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">1</span>, <span class="key">2</span>, <span class="key">3</span> ...</td><td></td><td>Switches to the corresponding tab.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">TAB</span></td><td></td><td>Switches to the next Terminal window.</td></tr>
+<tr><td><span class="key">SHIFT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>Switches to the tab to the left/right.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>Moves the current tab left/right.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">+</span> / <span class="key">-</span></td><td></td><td>Increase/Decrease font size.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Enter/leave fullscreen mode.</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Scrolls the Terminal output up/down one line.</td></tr>
+<tr><td class="onelinetop"><span class="key"> SHIFT</span> <span class="key">Page↑</span> / <span class="key">Page↓</span></td><td></td><td> Scrolls the Terminal output up/down one page.</td></tr>
+<tr><td><span class="key">TAB</span></td><td></td><td>Tab-completion. After entering a few letters, press <span class="key">TAB</span> once to auto-complete a filename or path. If there is more than one match, it stops where the name starts to differ and you have to provide some more letters to further distinguish them. You can also press <span class="key">TAB</span> twice to have all matches listed.</td></tr>
+<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Moves up or down in a history of all previously entered commands.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Bash history. All the commands you enter
+are stored in the file <span class="path">~/.bash_history</span>. Press <span class="key">CTRL</span> <span class="key">R</span> and start to enter a command and you'll be provided with the first match from the bash history. Keep pressing <span class="key">CTRL</span> <span class="key">R</span> until you find the right command line and press <span class="key">ENTER</span> to execute it.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">C</span></td><td></td><td>Stops the currently running command.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">D</span></td><td></td><td>Closes the current Terminal session.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="other-combos" name="other-combos">Other key combinations</a></h2>
+<p>You can add or remove items to/from a selection by holding down a modifier key while clicking on a entry (or file in case of Tracker).</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>This will select everything between the first selected item and the one you click on.</td></tr>
+<tr><td><span class="key">ALT</span></td><td></td><td>Adds or removes the item you're clicking on from the selection.</td></tr>
+</table>
+<p>In a Tracker window, if you just start typing, Tracker scrolls to and selects the file that best fits your incremental search. If there's no file starting with your typed letters, files that contain the search string anywhere in their name or other displayed attributes are selected. This search is <i>not</i> case-sensitive.<br />
+The letters you type appear at the bottom-left, where normally the number of items is listed. After a second it reverts back and you could start a new incremental search.<br />
+Instead of jumping to the first occurrence of your search string, Tracker can be configured to filter out all non-matching files. See the topic on <a href="tracker.html#tracker-preferences">type-ahead filtering</a>.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="deskbar.html">Deskbar</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

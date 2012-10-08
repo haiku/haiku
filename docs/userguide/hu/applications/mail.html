@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Levelezés</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/mail.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/mail.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/mail.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/mail.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/mail.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/mail.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/mail.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/mail.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/mail.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="magnify.html">Nagyító</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="mediaplayer.html">Médialejátszó</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td><a href="#reading">Levelek olvasása</a><br />
+	<a href="#creating">Levél írása</a><br />
+	<a href="#preferences">Beállítások</a></td></tr>
+</table>
+
+<h2><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png" width="64" height="64" />Levelezés (Mail)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/Mail</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/Mail/</span><br />
+<span class="path">~/config/settings/Mail/Menu Links/</span> - a leveles láda helyi menüjének tartalma<br />
+<span class="path">~/config/settings/Mail/signatures/</span> - aláírások tárolása<br />
+<span class="path">~/config/settings/Mail/status/</span> - egyéni állapotok tárolása</td></tr>
+</table>
+<p><br /></p>
+<p>A levelezés a Haiku alapértelmezett levélkezelő programja. A levelek lekérdezését és küldését nem a program, hanem a mail_daemon (levelező rendszer) végzi, mely az <a href="../preferences/e-mail.html">E-mail</a> beállításainál konfigurálható.</p>
+<p>Ezen az oldalon a levelező program használatát taglaljuk. További információk a <a href="../workshop-email.html">Műhely: levelek kezelése</a> fejezetben.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="reading" name="reading">Levelek olvasása</a></h2>
+<p>Egy levélen duplán kattintva megnyílik az a Levelezés programban. A program felülete elég egyszerű:</p>
+<img src="../images/apps-images/mail-read.png" alt="email-read.png" /> 
+<p>Az ablak része a menü és a gombsor legfelül, a levél jellemzői a gombsor alatt (cémzett, feladó, cím, dátum) és maga a levél szövege. Ha a levélben érdekes karaktereket találunk vagy épp üres, akkor próbáljuk meg módosítani a karakterkódolást a <span class="menu">Kódolás</span> menüből.</p>
+<p>Ha a levél mellékleteket is tartalmaz, akkor azok a levél végén jelennek meg. Az ezek helyi menüjéből válszthatjuk a <span class="menu">Mentés...</span> vagy a <span class="menu">Megnyitás</span> opciót. A mellékletek közvetlenül az Asztalra vagy bármelyik Nyomkövető ablakba húzhatóak.</p>
+<p>A menü elég egyértelmű, így csak a lényeges dolgokat emeljük ki.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Fájl</h3>
+<p>Az ablak bezárásakor ha az egy új levelet tartalmaz, akkor a levél állapota automatikusan olvasottra változik. Ugyanakkor a levél állapotát mi magunk is megadhatjuk a <span class="menu">Bezárás és ...</span> almenüből. Itt találunk egy <span class="menu">Megjelölés...</span> menüt, ahol több egyéni állapotot is készíthetünk, melyek a <span class="path">~/config/settings/Mail/status/</span> mappában találhatóak majd.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Szerkesztés</h3>
+<p>Itt található a <span class="menu">Beállítások...</span> (<a href="#preferences">lásd lejjebb</a>) és a <span class="menu">Fiókok...</span> menü, ami megnyitja az <a href="../preferences/e-mail.html">E-mail</a> beállítások panelt.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Nézet</h3>
+<p>Néha a következőkre is szükségünk lehet:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Fejléc megjelenítése</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>A levél teljes fejlécét megjeleníti. Ez akkor lehet hasznos, ha például vissza akarjuk követni a levél útját.</td></tr>
+<tr><td class="onelinetop"><span class="menu">A nyers levél megjelenítése</span></td><td></td><td></td><td>A levél eredeti, nyers állapota. Például az összes vezérlő karakterrel és a program formázása nélkül.</td></tr>
+</table>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Levél</h3>
+<p>A különféle válaszolási módok magyarázatra szorulhatnak.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Válasz</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td style="width:10px;"></td><td>Válasz küldése arra a címre, ahonnan a levél érkezett. MEGJEGYZÉS: Abban az esetben, ha egy levelező listáról kaptuk a levelet, akkor a válasz <i>nem</i> csak a feladónak, hanem a listára is el lesz küldve!</td></tr>
+<tr><td class="onelinetop"><span class="menu">Válasz a feladónak</span></td><td><span class="key">OPT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>Ebben az esetben a levél kizárólag a feladónak lesz elküldve (annak aki a "From" mezőben szerepel).</td></tr>
+<tr><td><span class="menu">Válasz mindenkinek</span></td><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span></td><td></td><td>Válasz mindenkinek, aki a levélen szerepel (a feladónak és a másolatok ("cc") is).</td></tr>
+</table>
+<div class="box-info">Ha kijelölünk egy szövegrészt a levélben mielőtt válaszolunk rá, akkor csak az adott részt fogja idézni a program a válasz levélben. Ez egy nagyon hasznos kis funkció, ha például ki akarjuk emelni a lényeget az eredeti levélből...</div>
+<p>A <span class="menu">Tovább</span>, <span class="menu">Újraküldés</span> és a <span class="menu">Másolás újba</span> magától értetődőek.</p>
+<p>Amikor egy levelet a Nyomkövetőből vagy egy lekérdezésből nyitunk meg, akkor az <span class="menu">Előző levél</span>tel és a <span class="menu">Következő levél</span>lel lépegethetünk a levelek között, amik a listában szerepelnek.</p>
+<p>A <span class="menu">Cím mentése</span> összegyűjti a levélben található összes e-mail címet egy almenübe. Innen egy címet kiválasztva megnyílik a <a href="people.html">Névjegyek</a> program, amiben további információkat is megadhatunk.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Lekérdezések</h3>
+<p>Jelenleg ez a funkció még nem működik, de a későbbiekben ezt arra tudjuk majd használni, hogy különféle lekérdezésekkel a jelenleg megnyitott levélhez hasonlóakat (például azonos feladó vagy tárgy) megkapjuk.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="creating" name="creating">Levél írása</a></h2>
+<p>Új levél készítésekor csak válasszuk az <span class="menu">Új levél írása</span> menüt vagy a gombsoron kattintsunk az "Új" gombra. Ezen kívül vagy eleve csak indítsuk el a Levelezést vagy pedig az <span class="menu">Új levél írása...</span> menüt válasszuk az Asztalsáv postaláda ikonjának menüjéből.</p>
+<img src="../images/apps-images/mail-write.png" alt="email-write.png" /> 
+<p>Az ablak felépítése lényegében ugyan az, mint a levelek olvasásakor. A menü és a gombsor kicsit különböznek és a beviteli mezők (a címzettek, a címe, stb.) is szerkeszthetőek.</p>
+<p>A <span class="menu">Másolat</span> (vagy ismertebben "Cc" - <i>carbon copy</i>) mező címzettjei mind másolatot kapnak a levélből. A külömbség a címzett és a másolat közt az, hogy a levél kifejezetten a címzettnek szól, a többiek számára csak informális a levél, az esetleges választ nem tőlük várjuk.<br />
+A <span class="menu">Titkos másolat</span> pedig "<i>rejtett másolatot</i>" jelent, vagyis ugyan úgy másolatot kapnak a levélből, viszont egymást nem látják a címzettek.</p>
+<p>Több cím megadása vesszővel elválasztva történhet.
+A <span class="menu">Címzett</span>, a <span class="menu">Másolat</span>, és a <span class="menu">Titkos másolat</span> mind egy előugró menü, melyek tartalmazzák az összes e-mail címet, amik a rendszerben találhatóak. Ezeket a <a href="people.html">Névjegyek</a> fájljainak keresésével gyújti össze a program. A "Csoport" jellemzők alapján pedig a csoport tagjait egy almenüben találhatóak majd.</p>
+<p>A menükön belül pedig találhatunk még érdekes funkciókat.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Fájl</h3>
+<p>A <span class="menu">Mentés piszkozatként</span> menüvel a levelet elmentheted, majd később bármikor folytathatod annak szerkesztését. Betöltéshez csak ki kell választani a szükségeset a <span class="menu">Piszkozat megnyitása</span> almenüből, ahová a program összegyűjti a "Draft" (piszkozat) állapotú leveleket.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Szerkesztés</h3>
+<p>Az <span class="menu">Idézet</span> és az <span class="menu">Idézet eltávolítása</span> menü vagy az azoknak megfelelő kombinációk (<span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span>) az idézet szintjének megadására szolgálnak a "&gt;" szimbólum használatával az idézett sorok előtt. Csak jelöljük ki a megfelelő sorokat, és használjuk a menüelemeket.</p>
+
+<img src="../images/apps-images/mail-spellcheck.png" alt="email-spellcheck.png" /> 
+
+<p>A <span class="menu">Helyesírás-ellenőrzés</span> jelenleg csak angol nyelven érhető el. A hibásnak vélt vagy ismeretlen szavakat pirosan és dőlten jelzi a program.
+Ezen szavak helyi menüjében javaslatokat kaphatunk a szó kicserélésére, illetve felvehetjük azt a szótárba a <span class="menu">Hozzáadás</span>ra kattintva.</p>
+<p>Itt található megintcsak a <span class="menu">Beállítások...</span> (<a href="#preferences">lásd lejjebb</a>) és a <span class="menu">Fiókok...</span> menü, ami megnyitja az <a href="../preferences/e-mail.html">E-mail</a> beállítások panelt.</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Levél</h3>
+<p>Az <span class="menu">Aláírás hozzáfűzésé</span>vel egy előre megadott aláírást tudunk a levél végéhez hozzáfűzni.
+Itt az almenüben kiválaszthatunk egy konkrétat vagy a program <span class="menu">Véletlen</span>szerűen választ egyet.</p>
+
+<img src="../images/apps-images/mail-signature.png" alt="email-signature.png" /> 
+
+<p>Új aláírást létrehozni illetve meglévőt szerkeszteni az  <span class="menu">Aláírás szerkesztése...</span> menüből lehet. Ekkor egy új ablakot kapunk, ahol egy elnevezést kell megadnunk az aláírásnak, és alatta pedig magát a szöveges aláírást. Itt az <span class="menu">Aláírás</span> menüben a <span class="menu">Megnyitás</span>nál egy már meglévőt megnyithatunk, a <span class="menu">Mentés</span> vagy a <span class="menu">Törlés</span> menüvel pedig a jelenleg megnyitottat tudjuk eltárolni a <span class="path">~/config/settings/Mail/signatures</span> mappában, illetve törölhetjük is onnan..</p>
+<p>Használd a <span class="menu">Melléklet hozzáadása...</span> illetve a <span class="menu">Melléklet eltávolítása</span> menüt fájl levélhez történő hozzáadására vagy törlésére. A Nyomkövető ablakból szintén bedobhatjuk a fájl a levélbe. Arra azonban ügyelni kell, hogy a fájlt a fejléc-részbe (a címzettek listája, stb.) dobjuk, ugyanis ha egy szöveges fájlt a levél-részre húzunk akkor annak tartalmát a program szövegként illeszti a levélbe.</p>
+
+<img src="../images/apps-images/mail-attachments.png" alt="email-attachments.png" /> 
+
+<p>A mellékletek a fejléc-rész alatt találhatóak. Egy melléklet törlése a helyi menüjéből történhet, vagy egyszerűen csak a <span class="key">DEL</span> megnyomásával miután kijelöltük a törlendő fájlt.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Lekérdezések</h3>
+<p>Jelenleg ez a funkció még nem működik, de arra szolgál, hogy a levélhez kapcsolódó további levelek (például azonos feladótól származók) megjelennek majd a listában.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="preferences" name="preferences">Beállítások</a></h2>
+<img src="../images/apps-images/mail-preferences.png" alt="email-preferences.png" /> 
+<p>A beállítások két részre oszthatóak:</p>
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Felhasználói felület</h3>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Gombsor</span></td><td style="width:10px;"></td><td>Feliratok megjelenítése az ikonokon, vagy akár a gombok elrejtése.</td></tr>
+<tr><td><span class="menu">Betűtípus</span></td><td></td><td>A levél szövegének betűtípusa.</td></tr>
+<tr><td><span class="menu">Méret</span></td><td></td><td>Betűméret megadása.</td></tr>
+<tr><td><span class="menu">Színezett idézetek</span></td><td></td><td>Az idézetek külön színnel jelölése.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Helyesírás ellenőrzése</span></td><td></td><td>A helyesírás ellenőrzésének ki- illetve bekapcsolása.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Automatikusan olvasottként jelölés</span></td><td></td><td>"Új" állapotú levél bezárásakor a program automatikusan "Olvasott"-nak jelöli azt.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Levelezés</h3>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Alapértelmezett fiók</span></td><td style="width:10px;"></td><td>Ha több fiókkal is rendelkezel, akkor megadható, hogy levél írásakor melyiket használja a program.</td></tr>
+<tr><td><span class="menu">Válaszcím</span></td><td></td><td>Amikor válaszolsz egy levélre, akkor, megadható egy <span class="menu">Alapértelmezett fiók</span>, ellenkező esetben a feladó a <span class="menu">Levél alapján</span> lesz megadva (tehát, amelyik fióknak lett küldve, az lesz a feladó).</td></tr>
+<tr><td><span class="menu">Válasz</span></td><td></td><td>Ez a szöveg kerül majd az idézett szöveg elé a levélre történő válaszoláskor. Különféle változók is használhatóak, melyekről az előugró menüből informálódhatunk. Például: "<i>Tisztelt %n!\n\nEzt írta %d-kor:\n</i>" ezt fogja eredményezni:
+<pre>Tisztelt Dr. Hawking!
+
+Ezt írta Mon, 18 Jan 1998 02:55:16 +0800-kor:
+&gt; so thanks again for the inspiration concerning the cosmological constant.
+&gt; ...and the rest of the quoted text following...</pre></td></tr>
+<tr><td><span class="menu">Automatikus aláírás</span></td><td></td><td>Aláírás automatikus csatolása a levél végére.</td></tr>
+<tr><td><span class="menu">Kódolás</span></td><td></td><td>Az alapértelmezett karakterkódolás megadása.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Figyelmeztetés nem kódolható szövegnél</span></td><td></td><td>Ha a levél olyan karaktereket tartalmaz, amiket a megadott karakterkódolással a pogram nem tud kódolni, akkor kaphatunk egy figyelmeztetést. Ekkor lehetőségünk van módosítani a kódolást küldés előtt. Ellenkező esetben a program a nem kódolható karaktereket egy téglalappal helyettesíti.</td></tr>
+<tr><td><span class="menu">Szöveg tördelése</span></td><td></td><td>Minden 76. karakter után egy sortörést szúr be, így a levél könnyebben olvasható.</td></tr>
+<tr><td><span class="menu">Jellemzők csatolása</span></td><td></td><td>Megadható, hogy egy fájl BFS jellemzői külön legyenek csatolva a levélhez. Ez nagyon hasznos lehet más Haiku-t használók számára, mivel megkapják a "teljes" fájlt (például az előadó, az album és a cím jellemzőit az MP3 fájlokkal együtt), ami azonban elgondolkodtathat más felhasználókat, hogy vajon mi lehet az a "BeOS Attributes" melléklet a levélben...<br />
+Persze, választható az is, hogy a jellemzők nem kerülnek csatolásra, ekkor azonban ne feledjük el becsomagolni a fájlt küldés előtt, ha a jellemzőket is meg akarjuk tartani.</td></tr>
+</table>
+
+</div>
+</div>
+
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="magnify.html">Nagyító</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="mediaplayer.html">Médialejátszó</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

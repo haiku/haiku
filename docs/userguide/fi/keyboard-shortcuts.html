@@ -40,6 +40,8 @@
 <li><a href="../zh_CN/keyboard-shortcuts.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/keyboard-shortcuts.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../sk/keyboard-shortcuts.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/keyboard-shortcuts.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/keyboard-shortcuts.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../en/keyboard-shortcuts.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,53 +53,52 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h1>Pikanäppäimet ja näppäinyhdistelmät</h1>
 
-<p>By default, Haiku's shortcut key, to invoke commands from menus for example, is not the usual <span class="key">CTRL</span> key, but <span class="key">ALT</span> instead. This has historical reasons, because the BeOS was inspired somewhat by MacOS. After you get used to it, it actually has advantages as e.g. <span class="key">ALT</span> <span class="key">C</span> and <span class="key">ALT</span> <span class="key">V</span> integrate seamlessly into the <acronym title="Bourne Again Shell">bash</acronym> shell of the Terminal, where <span class="key">CTRL</span> <span class="key">C</span> quits the running process.</p>
-<p>In any case, you can switch to the maybe more familiar <span class="key">CTRL</span> key in the <a href="preferences/keymap.html">Keymap</a> preferences. The user guide always describes the default configuration with the command key being <span class="key">ALT</span>.</p>
-<p>If you're in doubt which keys are the <span class="key">OPT</span> or <span class="key">MENU</span> keys on your particular keymap/keyboard-layout, again use the <a href="preferences/keymap.html">Keymap</a> preferences. There you can see what keystroke is sent when you press a key on your keyboard.</p>
+<p>Haikun oletuspikanäppäin esimerkiksi komentojen kutsumiseksi valikosta ei ole tavallinen <span class="key">CTRL</span>-näppäin, vaan sen sijaan <span class="key">ALT</span>-näppäin. Tällä on historiallisia syitä MacOS antoi vaikutteita BeOS-käyttöjärjestelmään. Kun siihen tottuu, siitä on etua, esim.: <span class="key">ALT</span> <span class="key">C</span> ja <span class="key">ALT</span> <span class="key">V</span> integroituvat saumattomasi Pääteikkunan <acronym title="Bourne Again Shell">bash</acronym>-komentotulkkiin, missä <span class="key">CTRL</span> <span class="key">C</span> poistuu suoritettavasta prosessista.</p>
+<p>Joka tapauksessa voit vaihtaa tutumpaan <span class="key">CTRL</span>-näppäimeen <a href="preferences/keymap.html">Näppäimistökuvaus</a>-sovelluksessa. Käyttöopas kuvaa oletusasetuksen, jossa komentonäppäin on <span class="key">ALT</span>.</p>
+<p>Jos sinulla on epäilystä siitä, että mikä näppäin <span class="key">Alt Gr</span> tai <span class="key">MENU</span> tietyssä näppäinkuvauksessa tai näppäimistöasettelusssa, käytä taas <a href="preferences/keymap.html">Näppäimistökuvaus</a>-sovellusta. Siellä näet, että mikä näppäinlyönti lähetetään, kun painat näppäimistön näppäintä.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="general" name="general">Yleiset pikanäppäimet</a></h2>
-<p>Here's a table of many of the most commonly used shortcuts that are always available, even if there isn't a corresponding menu:</p>
+<p>Tässä on luettelo monista yleisesti käytetyistä pikanäppäimistä, jotka ova käytettävissä, vaikka niille ei ole aina vastaavaa valikkoa:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Switches to <a href="workspaces.html">Workspace</a> X (<span class="key">Fx</span> is the function key corresponding to that workspace). Take the active window with you by adding <span class="key">SHIFT</span></td></tr>
-<tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Navigates spatially the rows/columns of the available workspaces. Add <span class="key">SHIFT</span> to take the active window with you.</td></tr>
-<tr><td><span class="key">OPT</span></td><td></td><td>Holding <span class="key">OPT</span> while dragging a window near another window's tab or border will stack or tile them (see chapter <a href="gui.html#stack-tile">GUI</a>).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + left mouse</td><td></td><td>Click and drag with left mouse button to move a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + right mouse</td><td></td><td>Click and drag with right mouse button to resize a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Zooms a window to an alternative size (maximum size for most applications).</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Vaihtaa <a href="workspaces.html">Työtila</a> X:ään (<span class="key">Fx</span> on funktionäppäin, joka vastaa työtilaa). Ota aktiivi ikkuna mukanasi lisäämällä yhdistelmään <span class="key">VAIHTO</span>-näppäimen</td></tr>
+<tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Navigoi avaruudellisesti käytettävissä olevien työtilojen rivejä tai sarakkeita. Lisää yhdistelmään <span class="key">VAIHTO</span> niin saat aktiivin ikkunan mukanasi.</td></tr>
+<tr><td><span class="key">Alt Gr/OPT</span></td><td></td><td>Näppäimen <span class="key">Alt Gr</span> pitäminen alhaalla raahattaessa ikkuna lähelle toisen ikkunan välilehteä tai reunaa aiheuttaa niiden pinoamisen tai asettumisen rinnakkaisiksi tiiliksi (katso kappale <a href="gui.html#stack-tile">Haikun graafinen käyttöliittymä</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + hiiren ykköspainike</td><td></td><td>Napsauttaminen ja raahaaminen hiiren ykköspainikkeella siirtää ikkunan (see chapter <a href="gui.html#move-resize">Haikun graafinen käyttöliittymä</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + hiiren kakkospainike</td><td></td><td>Napsauttaminen ja raahaaminen hiiren kakkospainikkeella muuttaa ikkunan koon (see chapter <a href="gui.html#move-resize">Haikun graafinen käyttöliittymä</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Loitontaa tai lähentää ikkunan toisen kokoiseksi (useimmissa sovelluksissa enimmäiskokoon).</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>Minimoi aktiivin ikkunan.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Hides (minimizes) all windows of the active application.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Pulls the active window to the front (only applicable with the mouse setting <a href="preferences/mouse.html">Focus Follows Mouse</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Piilottaa (minimoi) aktiivin sovelluksen kaikki ikkunat.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Vetää aktiivin ikkunan päällimmäiseksi (käytössä vain hiiriasetuksella <a href="preferences/mouse.html">Kohdistus seuraa hiirtä</a>).</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Lähettää aktiivin ikkunan taustalle. </td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Hold down to bring up the <a href="twitcher.html">Twitcher</a>.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>Opens the <a href="teammonitor.html">Team Monitor</a>.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>Enters the menu bar (leave with <span class="key">ESC</span>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Alhaalla pitäminen tuo näkyviin <a href="twitcher.html">Vaihtaja</a>-sovelluksen.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>Avaa <a href="teammonitor.html">Ryhmävalvonta</a>-sovelluksen.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>Siirtyy valikkopalkkiin (poistuu <span class="key">ESC</span>-näppäimellä).</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Kopioi valinnan leikepöydälle.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>Leikkaa valinnan leikepöydälle.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>Liittää leikepöydän sisällön.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>Sulkee aktiivin ikkunan.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>Sulkee sovelluksen.</td></tr>
-<tr><td><span class="key">PrtScr</span></td><td style="width:15px;"></td><td>Takes a screenshot with zero delay and launches the <a href="applications/screenshot.html">Screenshot</a> panel.</td></tr>
-<tr><td class="onelinetop"><span class="key">VAIHTO</span> <span class="key">PrtScr</span></td><td></td><td>Takes a screenshot silently (without opening the panel), while still respecting the last used settings.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PrtScr</span></td><td></td><td>Also takes a screenshot silently with the saved settings, but instead of saving it as a file, it's just copied to the clipboard.</td></tr>
+<tr><td><span class="key">PrtScr</span></td><td style="width:15px;"></td><td>Ottaa näytönkaappauksen viipeellä nolla ja käynnistää <a href="applications/screenshot.html">Näytönkaappaus</a>-paneelin.</td></tr>
+<tr><td class="onelinetop"><span class="key">VAIHTO</span> <span class="key">PrtScr</span></td><td></td><td>Ottaa näytönkaappauksen hiljaa (avaamatta paneelia) samalla kun sovellus yhä kunnioittaa viimeksi käytettyjä asetuksia.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PrtScr</span></td><td></td><td>Myös tämä ottaa näytönkaappauksen hiljaa talletuilla asetuksilla, mutta tiedostoon tallentamisen sijasta kopioi sen vain leikepöydälle.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tracker-navigation" name="tracker-navigation">Seuraaja-navigoinnin pikanäppäimet</a></h2>
-<p>Additionally to the general shortcuts, here are some more for navigating with Tracker:</p>
+<p>Lisäksi Seuraaja-navigoinnissa on joitakin yleisiä pikanäppäimiä:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:15px;"></td><td>Avaa ylätason kansion.</td></tr>
 <tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> tai <span class="key">ENTER</span></td><td></td><td>Avaa valitun kansion.</td></tr>
-<tr><td><span class="key">OPT</span></td><td></td><td>Holding it while opening a folder will automatically close the parent folder. This also works when navigating with the mouse.</td></tr>
-<tr><td><span class="key">MENU</span></td><td></td><td>Opens the Deskbar menu (leave with <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Undo last action. The undo history is only limited by the available memory. Note, this only works for actions on the file itself, changed attributes and permission settings can't be undone with this. Also, once a file is removed from <i>Trash</i> it's gone for good.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">VAIHTO</span> <span class="key">Z</span></td><td></td><td>Redo the action you just reverted with <span class="key">ALT</span> <span class="key">Z</span>.</td></tr>
+<tr><td><span class="key">Alt Gr/OPT</span></td><td></td><td>Pitämällä näppäintä alhaalla kansiota avatessa ylemmän tason kansio sulkeutuu automaattisesti. Tämä toimii myös navigoitaessa hiirellä.</td></tr>
+<tr><td><span class="key">MENU</span></td><td></td><td>Avaa Työpöytäpalkin (poistuu <span class="key">ESC</span>-näppäimellä).</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Peru viimeisin toiminto. Perumishistoriaa rajoittaa vain käytettävissä oleva muisti. Huomaa, tämä toimii vain itse tiedostotoiminnoille, muuttuneet attribuutit ja käyttöoikeusasetukset ei voida perua tällä. Myös kun tiedoston on siirretty <i>Roskakori</i>in, niin se on mennyt iäksi.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">VAIHTO</span> <span class="key">Z</span></td><td></td><td>Tee juuri palautettu toiminto uudelleen näppäimillä <span class="key">ALT</span> <span class="key">Z</span>.</td></tr>
 </table>
 
 <h2>
@@ -107,32 +108,31 @@
 <tr><td><span class="key">ALT</span> <span class="key">N</span></td><td style="width:15px;"></td><td>Avaa toisen Pääteikkunaistunnon uudessa ikkunassa.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">T</span></td><td></td><td>Avaa toisen Pääteikkunaistunnon uudessa välilehdessä.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">1</span>, <span class="key">2</span>, <span class="key">3</span> ...</td><td></td><td>Vaihtaa vastaavaan välilehteen.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">TAB</span></td><td></td><td>Vaihtaa seuraavaan Pääteikkuna-ikkunaan.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">SARKAIN</span></td><td></td><td>Vaihtaa seuraavaan Pääteikkuna-ikkunaan.</td></tr>
 <tr><td><span class="key">VAIHTO</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>Vaihtaa välilehteen vasemmalla tai oikealla.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">VAIHTO</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>Siirtää nykyisen välilehden vasemmalle tai oikealle.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">+</span> / <span class="key">-</span></td><td></td><td>Kasvattaa tai pienentää kirjasinkokoa.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Kokoruutunäyttöön siirtyminen tai siitä poistuminen.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Scrolls the Terminal output up/down one line.</td></tr>
-<tr><td class="onelinetop"><span class="key"> SHIFT</span> <span class="key">Page↑</span> / <span class="key">Page↓</span></td><td></td><td> Scrolls the Terminal output up/down one page.</td></tr>
-<tr><td><span class="key">TAB</span></td><td></td><td>Tab-completion. After entering a few letters, press <span class="key">TAB</span> once to auto-complete a filename or path. If there is more than one match, it stops where the name starts to differ and you have to provide some more letters to further distinguish them. You can also press <span class="key">TAB</span> twice to have all matches listed.</td></tr>
-<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Moves up or down in a history of all previously entered commands.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Bash history. All the commands you enter
-are stored in the file <span class="path">~/.bash_history</span>. Press <span class="key">CTRL</span> <span class="key">R</span> and start to enter a command and you'll be provided with the first match from the bash history. Keep pressing <span class="key">CTRL</span> <span class="key">R</span> until you find the right command line and press <span class="key">ENTER</span> to execute it.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">C</span></td><td></td><td>Stops the currently running command.</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Vierittää Pääteikkunan tulostuksen rivin ylöspäin tai alaspäin.</td></tr>
+<tr><td class="onelinetop"><span class="key"> VAIHTO</span> <span class="key">PgUp</span> / <span class="key">PgDn</span></td><td></td><td>Vierittää Pääteikkunan tulosteen sivun ylöspäin tai alaspäin.</td></tr>
+<tr><td><span class="key">SARKAIN</span></td><td></td><td>Sarkain-täydentäminen. Paina muutaman kirjaimen kirjoittamisen jälkeen <span class="key">SARKAIN</span>-näppäintä kerran, mikä täydentää tiedostonimen tai -polu. Jos on useampia kuin yksi täsmäys, se pysähtyy siellä, missä nimi eroaa ja sinun on tarjottava lisäkirjaimia niiden jatkoerottelemiseksi. Voit myös painaa <span class="key">SARKAIN</span>-näppäintä kahdesti saadaksesi luettelon kaikista täsmäävistä.</td></tr>
+<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Siirtyy ylös tai alas kaikkien aiemmin kirjoitettujen komentojen historiassa.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Bash-historia. Kaikki kirjoitetut komennot tallennetaan tiedostoon <span class="path">~/.bash_history</span>. Paina näppäimiä <span class="key">CTRL</span> <span class="key">R</span> ja aloita komennon kirjoittaminen, ja sinulle tarjotaan esimmäistä täsmäystä bash-historiasta. Pidä näppäimet <span class="key">CTRL</span> <span class="key">R</span> alhaalla kunnes löydät oikean komentorivikomennon ja painat <span class="key">ENTER</span>-näppäintä sen suorittamiseksi.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">C</span></td><td></td><td>Pysäyttää parhaillaan suoritettavan komennon.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">D</span></td><td></td><td>Sulkee nykyisen Pääteikkuna-istunnon.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="other-combos" name="other-combos">Muut näppäinyhdistelmät</a></h2>
-<p>You can add or remove items to/from a selection by holding down a modifier key while clicking on a entry (or file in case of Tracker).</p>
+<p>Voit lisätä tai poistaa riviä valinnasta pitämällä alhaalla muunnosnäppäintä samalla kun napsautetaan riviä (tai Seuraaja-tapauksessa tiedostoa).</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">VAIHTO</span></td><td style="width:15px;"></td><td>This will select everything between the first selected item and the one you click on.</td></tr>
-<tr><td><span class="key">ALT</span></td><td></td><td>Adds or removes the item you're clicking on from the selection.</td></tr>
+<tr><td><span class="key">VAIHTO</span></td><td style="width:15px;"></td><td>Tämä valitsee kaikki ensimmäisen valitun rivin ja parhaillaan napsautetun välillä.</td></tr>
+<tr><td><span class="key">ALT</span></td><td></td><td>Lisää tai poistaa valitun rivin valinnasta.</td></tr>
 </table>
-<p>In a Tracker window, if you just start typing, Tracker scrolls to and selects the file that best fits your incremental search. If there's no file starting with your typed letters, files that contain the search string anywhere in their name or other displayed attributes are selected. This search is <i>not</i> case-sensitive.<br />
-The letters you type appear at the bottom-left, where normally the number of items is listed. After a second it reverts back and you could start a new incremental search.<br />
-Instead of jumping to the first occurrence of your search string, Tracker can be configured to filter out all non-matching files. See the topic on <a href="tracker.html#tracker-preferences">type-ahead filtering</a>.</p>
+<p>Jos aloitat juuri kirjoittamisen Seuraaja-ikkunassa, Seuraaja vierittää edelleen ja valitsee tiedoston, joka parhaiten sopii askelkasvatushakuu. Jos ei ole tiedostoja, joiden nimi alkaa kirjoitetuilla kirjaimilla, näytetään tiedostot, joiden nimessä tai muussa näytetyssä attribuutissa on kirjoitetut kirjaimet missä kohtaa tahansa. Tämä haku <i>ei</i> ole kirjainkoosta riippuvaa.<br />
+Kirjoittamasi kirjaimet ilmaantuvat alhaalle vasemmalle, missä on normaalisti lueteltujen kohteiden määrä. Sekunnin kuluttua se palaa takaisin ja voisit alkaa uuden askelkasvatusetsinnän.<br />
+Sen sijaan että hyppäisin hakumerkkijonon ensimmäiseen ilmentymään, Seuraaja voidaan asettaa suodattamaan pois kaikki ei täsmäävät tiedostot. Katso aiheesta <a href="tracker.html#tracker-preferences">kirjoita eteenpäin -suodatus</a>.</p>
 
 </div>
 </div>

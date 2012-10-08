@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2011, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>E-mail</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/preferences/e-mail.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/e-mail.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/e-mail.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/e-mail.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/e-mail.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/e-mail.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/e-mail.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/e-mail.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/e-mail.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/e-mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/e-mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/e-mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/preferences/e-mail.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="deskbar.html">Asztalsáv (Deskbar)</a> 
+::  <a href="../preferences.html" class="uplink">Beállítások</a> 
+::  <a href="filetypes.html">Fájltípusok</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#creating">E-mail fiók létrehozása</a><br />
+	<a href="#account-settings">Fiók beállításai</a><br />
+	<a href="#incoming">Bejövő levelek beállítása</a><br />
+	<a href="#outgoing">Kimenő levelek beállítása</a><br />
+	<a href="#filters">Figyelmeztetések és szűrők</a><br />
+	<a href="#settings">Levelező-rendszer beállítása</a>
+</td></tr>
+</table>
+
+<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />E-mail</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Beállítások</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
+</table>
+<p>A Haiku rendelkezik egy levelező rendszerrel (mail_daemon-ként is ismert), ami megadott időközönként letölti a leveleket, és egyenként elmenti egy szöveges fájlba. Letöltéskor a program a levél alapján beállítja annak jellemzőit, például a feladót, címzettet, tárgyat, stb. Ezután már készíthetünk rá lekérdezést is. Ezzel a megoldással könnyen válthatunk a levelező programok között, ugyanis az adatok és a beállítások ugyan azok maradnak.<br />
+A konfigurálást az E-Mail beállítások panelen hatjhatjuk végre.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="creating" name="creating">E-mail fiók létrehozása</a></h2>
+<p>Nézzük végig a felhasználói fiók beállításának lépéset.<br />
+A <span class="button">Hozzáadás</span> gomb megnyomásával létrehozunk egy új, üres fiókot. Ekkor megnyílik egy panel, ahol a hozzáférési adatokat kell megadnunk:</p>
+<img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
+<p>Elsőként válasszuk ki, hogy hogyan akarjuk a leveleinket letölteni: <span class="menu">POP3</span> vagy <span class="menu">IMAP</span> protokol használatával.</p>
+<p>Ezután meg kell adnunk az <i>E-mail címet</i>, a <i>felhasználói nevet</i> és <i>jelszót</i>, a <i>fiók elnevezését</i> és az Ön <i>valódi nevét</i>.</p>
+<p>Ha az e-mail címed egy ismert szolgáltatónál van, akkor a Haiku ismeri annak technikai adatait, mint például a kiszolgáló IP-címét. Egyéb esetben, kattintsunk a <span class="button">Következő</span> gombra, ahol megadhatjuk ezeket az adatokat:</p>
+<img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
+<p>Elsőként adjuk meg a <i>kiszolgáló nevét</i>, a <i>bejelentkezés</i> és a <i>biztonság</i> típusát mind a bejövő, mind pedig a kimenő levelek esetében. A szükséges információk megtalálhatóak a szolgálató oldalán.<br />
+Alább további információkat kaphatunk a különféle beállításokról és opciókról.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="account-settings" name="account-settings">Fiók beállításai</a></h2>
+<p>A bal oldalon a fiók nevének kiválasztásakor néhány alap beállítás módosíható:</p>
+<img src="../images/prefs-images/e-mail-accounts.png" alt="e-mail-accounts.png" />
+<p>A <i>Fiók neve</i> egy elnevezés, ami megjelenik például az e-mail beállításoknál, illetve az értesítés-ablakokban. A <i>Valódi név</i> az, ami megjelenik a levél címzettjénél, mint feladó. A <i>Válasz cím</i> pedig az az e-mail cím, amire az Ön által küldött levélre válaszoláskor megszeretné azt kapni. Ez általában megegyezik azzal a címmel, amiről küldi a levelet.</p>
+<p>Ha az e-mail fiókot csak küldésre vagy fogadásra szeretné használni, akkor a fiók nevén jobb gombbal kattintva ki- illetve bekapcsolhatja a megfelelő funkciót.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="incoming" name="incoming">Bejövő levelek beállítása</a></h2>
+<p>Kattintson a <span class="menu">Bejövő</span> listaelemre az e-mial fiók neve alatt a bejövő levelek beállításához.</p>
+<img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
+<p>Az első beállítás a <span class="menu">Kiszolgáló</span>, ahonnan a bejövő leveleket fogadja. Ha a szolgáltató egyéni portot használ, akkor azt is meg kell adni a kiszolgáló neve után kettősponttal elválasztva. Például: <tt>mail.szolgaltato.hu:1400</tt>.</p>
+<p>Ezután a hozzáférési információkat adhatjuk meg: a <i>Felhasználó</i>t és a <i>Jelszó</i>t, és szükség esetén a <i>Bejelentkezés típusá</i>t is módsíthatjuk, ami lehet <span class="menu">Sima szöveg</span> illetve <span class="menu">APOP</span>.</p>
+<p><i>POP3</i> használatakor ha több számítógépen is letöltjük a leveleinket, akkor ajánlott bejelölni a <span class="menu">Levelek meghagyása a kiszolgálón</span>, és a <span class="menu">Levelek törlése a kiszolgálóról is</span> opciót.</p>
+<p><i>IMAP</i> esetében pedig, ajánlott bejelölni a <span class="menu">Levelek törlése a kiszolgálóról is</span> opciót. Továbbá, megadhatja az <span class="menu">IMAP mappák</span>at, hogy csak az adott mappákat és almappákat szinkronizálja.</p>
+<p>Arra is van lehetőségünk, hogy megadjuk a <span class="menu">Letöltési mérethatár</span>t. Ha a levél mérete nagyobb a megadottnál, akkor csak a levél fejléce töltődik le, majd eldöntheti, hogy letölti-e a levél többi részét vagy sem. FIGYELEM: jelenleg ha lassú az internetünk, akkor ezt az opciót ki kell kapcsolni, mert külünben a levélnek csak a fejléce fog letöltődni.</p>
+<p>A bejövő levelek mappájának <i>Útvonala</i> is módosítható (alapértelemzett: <span class="path">/boot/home/mail/in/</span>), ami hasznos lehet, ha több fiókkal is rendelkezünk, és mindegyik levelet külön akarjuk tárolni. Ugyanakkor a lekérdezések használatával is hasonló eredményt kaphatunk.</p>
+
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="outgoing" name="outgoing">Kimenő levelek beállítása</a></h2>
+<p>A <span class="menu">Kimenő</span> listaelemre kattintva a levélküldési beállításokat adhatjuk meg.</p>
+<img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
+<p>Elsőként a <i>Kiszolgáló</i> címét adjuk meg. Mint a bejövő leveleknél, itt is megadható a port. Például: <tt>mail.szolgaltato.hu:1200</tt>.</p>
+<p>Ha szükséges bejelentkezni a küldés előtt, akkor válasszuk ki a <i>Bejelentkezés típusa</i> listából az <span class="menu">ESMTP</span>)-t, majd adja meg a felhasználói nevet és a jelszót is. A másik lehetőség az, amikor a szolgáltató azonosítás céljából az új levelek ellenőrzését kéri küldés előtt: <span class="menu">POP3 az SMTP előtt</span>.</p>
+<p>Itt is szintén megadhatjuk az <i>Útvonalá</i>t az elküldött levelek mappájának (alapértelmezett: <span class="path">/boot/home/mail/out/</span>).</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filters" name="filters">Figyelmeztetések és szűrők</a></h2>
+<p>Az új levelekhez figyelmeztetéseket és szűrőket is állíthatunk be az <span class="menu">E-Mail szűrők</span> listaelemre kattitnva. Több szűrő is hozzáadható a listához, amiknek a sorrendje határozza meg a kiválasztott műveletek végrehatását. A sorrend pedig a listában lévő szűrők mozgatásával módosítható.<br />
+Jelenleg három <span class="menu">Bejövő levél szűrő</span> áll a rendelkezésünkre. Miután a szűrőt hozzáadjuk a listához, jelöljük ki azt hogy meg tudjuk adni a hozzá tartozó beállításokat.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Kéretlen levél szűrő (AGMS Bayesian)</h3>
+<img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
+<p>A kéretlen levelek szűrése sztatisztikai alapon osztályozza a leveleket. Minden esetben egy 0 és 1 közötti értéket rendel a levelekhez, majd eldönthetjük, hogy mekkora értéktől jelölje a levelet kéretlennek.<br />
+Ezt az értéket hozzáfűzhetjük a levél címéhez is.<br /> A levél szűrő tanulni is képes minden bejövő levélből. Természetesen nekünk kell megtanítanunk a programnak, hogy mely levelek azok, melyek hibásan lettek kéretlennek jelölve. További információk a <span class="app">Levelezés</span> leírásánál.</p>
+<p>A <span class="menu">Szabály szűrő</span>vel együtt automatikusan kigyomlálhatjuk a kéretlen leveleket.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Szabály szűrő</h3>
+<img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
+<p>Ez a szűrő a levél fejlécét hasonlítja össze a megadott feltétellel, és végrehajtja a megadott műveletet is.<br />
+Az első oszlopban lévő mezőket ellenőrizheti a szűrő. Érvényes mezőnevek:</p>
+<table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
+		<td>A feladó neve.</td></tr>
+	<tr><td><span class="menu">From</span></td><td> </td>
+		<td>A feladó e-mail címe.</td></tr>
+	<tr><td><span class="menu">To</span></td><td> </td>
+		<td>A címzett e-mail címe.</td></tr>
+	<tr><td><span class="menu">Reply to</span></td><td> </td>
+		<td>A levélben megadott válasz-cím.</td></tr>
+	<tr><td><span class="menu">When</span></td><td> </td>
+		<td>A levél fogadásának ideje.</td></tr>
+	<tr><td><span class="menu">Subject</span></td><td> </td>
+		<td>A levél tárgya.</td></tr>
+	<tr><td><span class="menu">Cc</span></td><td> </td>
+		<td>Azok a címek, akik másolatot kaptak a levélből.</td></tr>
+	<tr><td><span class="menu">Account</span></td><td> </td>
+		<td>Fiók neve.</td></tr>
+	<tr><td><span class="menu">Status</span></td><td> </td>
+		<td>A levél aktuális állapota. Alap esetben ez lehet: "Read" (olvasott), "Replied" (megválaszolt), "Sent" (elküldött), "Forwarded" (továbbított), "New" (új), vagy bármi, amit Te határoztál meg. Ugyanakkor amíg meg nem változtatod azt, a levelező rendszer újnak jelöl minden beérkezett levelet.</td></tr>
+	<tr><td><span class="menu">Priority</span></td><td> </td>
+		<td>Fontosság (például: "urgent" (sürgős)).</td></tr>
+	<tr><td><span class="menu">Thread</span></td><td> </td>
+		<td>Lényegében ugyan az, mint a "Subject" (tárgy), de a jelölések nélkül: például Re: vagy Fwd:.</td></tr>
+	<tr><td><span class="menu">Classification group</span></td><td> </td>
+		<td>Az alapján, hogy a kéretlen levél szűrő miként sorolta be, lehet üres (nem besorolt) vagy tartalmazhatja a "Genuine" (valós) illtve "Spam" (kérelten) jelzőt.</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Spam/Genuine estimate</span></td><td> </td>
+		<td>Ez egy olyan szám, amit a kéretlen levél szűrő állapított meg a levélhez. Ez a szám tudományos formában jelenik meg, ahol a  1.065e-12 az jelenti, hogy a 1.065 osztva 10 a tizenkettedikennel, ami ebben az esetben 0.000000000001065.</td></tr>
+</table>
+<p>A második beviteli mező tartalmazza a keresendő mintát. Itt megadhatunk <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">általános kifejezéseket</a>, melyek remekül variálhatóak, de sajnos sokszor nagyon is túlbonyolíthatóak. Kicsit utána olvasva rájön, hogy nem is olyan bonyolult a keresési minták használata.</p>
+<p>Az előugró menüből megadhatunk egy műveletet, amit a rendszer végrehajt a minta egyezésekor. Elmozgathatjuk vagy törölhetjük a levelet, "Olvasott"-nak vagy más állapotúnak jelölhetjük, vagy beállíthatjuk, hogy melyik fiókból fogunk válaszolni rá.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Figyelemztetés új levelek érkezésekor</h3>
+<img src="../images/prefs-images/e-mail-filter-notification.png" alt="e-mail-filter-notification.png" />
+<p>Több módon is kaphatunk értesítést új levelek érkezésekor. A <span class="menu">Művelet</span> menüben több, kombinálható lehetőség közül is válaszhatunk:</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">nincs</span></td><td style="width:5px;"> </td>
+		<td>Nincs figyelmeztetés.</td></tr>
+	<tr><td><span class="menu">hangjelzés</span></td><td> </td>
+		<td>Lejátsza azt a hangot, ami az "Új E-mail" eseményhez lett beállítva a <a href="sounds.html">Hangok</a> beállításánál <i>minden egyes</i> levél érkezésekor.</td></tr>
+	<tr><td><span class="menu">jelzés</span></td><td> </td>
+		<td>Egy üzenet-ablakot jelenít meg <i>minden egyes</i> új levél érkezésekor.</td></tr>
+	<tr><td><span class="menu">billentyűzet-villogás</span></td><td> </td>
+		<td>A nagy betűk (Caps Lock) LED villogtatása.</td></tr>
+	<tr><td class="onelinetop"><span class="menu">központi jelzés</span></td><td> </td>
+		<td><i>Egy</i> üzenet-ablakot jelenít meg mindig, amikor levél érkezik.</td></tr>
+	<tr><td><span class="menu">központi hangjelzés</span></td><td> </td>
+		<td>Lejátsza azt a hangot, ami az "Új E-mail" eseményhez lett beállítva a <a href="sounds.html">Hangok</a> beállításánál, de csak <i>egyszer</i>, amikor levél érkezik.</td></tr>
+	<tr><td><span class="menu">napló ablak</span></td><td> </td>
+		<td>A naplóablak megjelenítése.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Kimenő levelek szűrője</h3>
+<p>Jelenleg csak egy szűrő áll rendelkezésre a kimenő levelek esetében: <span class="cli">fortune</span>.
+<br />Ezzel a levél elküldése előtt véletlenszerűen egy vicces "szerecse sütit" csatolhatunk hozzá. Akár ki is próbálhatod, ha a Terminálban kiadod a <span class="cli">fortune</span> parancsot.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings" name="settings">Levelező-rendszer beállítása</a></h2>
+<p>A bejövő és kimenő kiszolgálók és a szűrők beállítása után most lássuk, hogy a levelező rendszer milyen beállításokkal rendelkezik.</p>
+<img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
+<p>A <i>Levelek ellenőrzése</i> részben beállíthatjuk, hogy milyen gyakorisággal ellenőrizze az új leveleket.<br />
+Ha betárcsázós internettel rendelkezünk, ajánlott bejelölni a <span class="menu">Csak mikor az internet elérhető</span> és a <span class="menu">Kimenő levelek küldése internetre csatlakozáskor</span> jelölőnégyzetet az állandó ellenőrzés elkerülése érdekében.</p>
+<p>A levelező rendszer rendelkezik egy állapot ablakkal, ami megadható, hogy mikor jelenjen meg: <span class="menu">Soha</span>, <span class="menu">Küldés közben</span>, <span class="menu">Küldéskor / fogadáskor</span> vagy <span class="menu">Mindig</span>.</p>
+<p>Győződjünk meg arról is, hogy az <span class="menu">Automatikus indítás</span> be legyen jelölve, ugyanis csak akkor fogja tudni használni a levelező rendszer szolgáltatásaikat.</p>
+<img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
+<p>A <span class="menu">Postafiókmenü szerkesztése…</span> megnyitja a <span class="path">/boot/home/config/Mail/Menu Links/</span> mappát. Minden mappa és lekérdezés(!) vagy azok hivatkozása, ami ebben a mappában szerepel, az megjelenik a postaláda ikon helyi menüjében a Polcon az Asztalsávon.</p>
+<p>A menüből ezen kívül az alábbiakat is elérjük: <span class="menu">Új üzenet...</span>, <span class="menu">Üzenetek ellenőrzése most</span> és <span class="menu">Beállítások...</span>.</p>
+<p>A <span class="key">SHIFT</span> lenyomva tartásával a menü megnyitásakor további funkciók is elérhetőek:</p>
+<table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">Csak a levelek lekérdezése</span></td><td style="width:5px;"> </td>
+		<td>Egy almenüt kapunk, ahol egy fiók új leveleit ellenőrizhetjük le.</td></tr>
+	<tr><td><span class="menu">Függőben lévő levelek küldése</span></td><td> </td>
+		<td>A még el nem küldött leveleket küldi el, de nem keres új leveleket.</td></tr>
+	<tr><td><span class="menu">Levelezés szolgáltatásainak leállítása</span></td><td> </td>
+		<td>A teljes levelező rendszer (mail_daemon) leállítása.</td></tr>
+</table>
+<p>Maga a postaláda ikonja is jelzi az új leveleket: az ikon megváltozik egy levéllel teli postaládára.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="deskbar.html">Asztalsáv (Deskbar)</a> 
+::  <a href="../preferences.html" class="uplink">Beállítások</a> 
+::  <a href="filetypes.html">Fájltípusok</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

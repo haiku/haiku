@@ -16,7 +16,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>StyledEdit</title>
+	<title>Tyylitetty editori</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -40,6 +40,8 @@
 <li><a href="../../zh_CN/applications/stylededit.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/stylededit.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/applications/stylededit.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/stylededit.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/stylededit.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/stylededit.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,18 +53,17 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
+<h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />Tyylitetty editori</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><i>ei mitään</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit is Haiku's simple text editor. Although it saves files in plain text format, additional attributes are written in order to have limited formatting capabilities when viewed with StyledEdit.</p>
+<p>Tyylitetty editori on Haikun yksinkertainen tekstieditori. Vaikka se tallentaa tiedostoja puhtaassa tekstimuodossa, tallentamisen yhteydessä kirjoitetaan lisäattribuutteja, jotka tarjoavat Tyylitetylle editorille rajoitetut muotoiluominaisuudet.</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
-<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <span class="cli">listattr</span>:</p>
+<p>Jos sinua kiinnostaa, lisäattribuutit näyttävät seuraavan näköisiltä, kun niitä tutkitaan Pääteikkunan komennolla <span class="cli">listattr</span>:</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -74,10 +75,10 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>As you can see, all the formatting options from StyledEdit's menu are present: line wrapping (on/off) and alignment (left/center/right), each in one attribute. Styles (font, size, color) of each letter mangled into another.</p>
-<div class="box-info">Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</div>
-<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <span class="cli">ReadMe.txt</span>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
-<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <span class="menu">Font</span> menu. Line wrapping and alignment from the <span class="menu">Document</span> menu only work on the whole file.</p>
+<p>Kuten voit nähdä, kaikki Tyylitetyn editorin valikon muotoiluvalitsimet ovat mukana: rivittäminen (päälle/pois päältä) ja tasaus (vasemmalle/keskelle/oikealle), jokainen yhdessä attribuutissa. Jokaisen kirjaimen tyylit (kirjasin, koko, väri) on runnottu yhteen attribuuttiin.</p>
+<div class="box-info">Koska nämä attribuutit ovat BFS-tiedostojärjestelmän ominaisuus, tämä tarkoittaa, että muilla alustoilla tiedosto näkyy pelkkänä tekstitiedostona ja kaikki muotoilu myös kadotetaan, kun tiedosto tallennetaan ei-BFS-osiolle. Yllä olevat attribuutit yksinkertaisesti riisutaan pois ja jäljelle jää vain tavallinen tekstitiedosto.</div>
+<p>Joka tapauksessa on kiva idea, kun on mahdollista värittää tekstiä eri kirjasimilla ja kirjainkoola samalla kun ollaan normaalitekstissä. Esimerkiksi tiedosto <span class="cli">ReadMe.txt</span> on luettava komentotulkissa kaikilla alustalla ja siinä on silti hiukan tyyliä, kun sitä katsotaan Haikussa kaksoisnapsautuksella.</p>
+<p>Tyylitetyn editorin käyttö on itse asiassa niin yksinkertaista, että ohitamme jokaisen tavallisen valikkorivin selittämisen. Kirjoita vain teksti, valitse sitten sanat, jotka haluat muotoilla ja käytä valikkoa <span class="menu">Kirjasin</span>. Rivittäminen ja tasaus valikosta <span class="menu">Asiakirja</span> toimii vain koko tiedostolle.</p>
 
 </div>
 </div>

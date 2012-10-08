@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Workshop: Managing Email</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/workshop-email.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-email.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workshop-email.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workshop-email.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workshop-email.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workshop-email.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/workshop-email.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/workshop-email.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/workshop-email.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/workshop-email.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/workshop-email.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/workshop-email.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/workshop-email.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../en/workshop-email.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="queries.html">Queries</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Índice</td></tr>
+<tr class="index"><td>
+	<a href="#mailsystem">Haiku's mail system</a><br />
+	<a href="#statuses">Using custom statuses</a><br />
+	<a href="#queries">Using queries</a><br />
+	<a href="#tips">More tips</a>
+</td></tr>
+</table>
+
+<h1>Workshop: Managing Email</h1>
+
+<p>This workshop takes a look on how to manage email under Haiku. It assumes that the email services are correctly configured with the <a href="preferences/e-mail.html">E-Mail</a> preferences and you're familiar with the basic features of the <a href="applications/mail.html">Mail</a> application.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="mailsystem" name="mailsystem">Haiku's mail system</a></h2>
+<p>If you come to Haiku from other operating systems, you're probably used to big applications like MS Outlook or Mozilla's Thunderbird. You have to configure them by entering all the info on mail server addresses etc. and they use their own contacts database. They take care of sending and fetching email and store them in some big special file.<br />
+Changing you email client can be a hassle with quite some ex/importing and converting going on. Using more than one client in parallel to check out what else is available is also not without the occasional kerfuffle.</p>
+<p>Haiku's mail system is different. It breaks down into smaller separate modules.</p>
+<p>There's the <span class="app">mail_daemon</span> that takes care of the communication with your mail servers. The <a href="preferences/e-mail.html">E-Mail</a> preferences is the one central point to configure your email accounts and how often they're checked, for example.</p>
+<p>Every message that is fetched or sent is saved as one single email file, with its header information (like sender, subject, date) and status (like New, Replied, Sent) in BFS attributes. This enables searching/filtering them with Haiku's fast queries.</p>
+<img src="images/workshop-email-images/browsing.png" alt="browsing.png" /> 
+<p>With every email being in a separate file, viewing them becomes just as easy as browsing through a folder (or query result) of images with <a href="applications/showimage.html">ShowImage</a>. Leaving the Tracker window open, you'll see the moving selection of the currently viewed file while you use the previous/next button to move through them.<br />
+As they are independent files, using a viewer other than Haiku's <a href="applications/mail.html">Mail</a> causes no problems whatsoever.</p>
+<p>Similarly, creating a new message results in just another file that is handed to the mail_daemon that takes care of sending it off. Contact management is deferred to the <a href="applications/people.html">People</a> application.</p>
+<p>In a nutshell, where other mail clients do everything, from communicating with the mail servers to providing a view with all your mails and tools to search and filter them, Haiku uses a chain of smaller tools and general file management:</p>
+<ul>
+<li><p>The <span class="app">mail_daemon</span> to fetch/send mail and save them as normal files.</p></li>
+<li><p>Tracker windows and queries to find and show email files.</p></li>
+<li><p>The <span class="app">Mail</span> application to view email files and create new messages relying on system-wide contact management by the <span class="app">People</span> app.</p></li>
+</ul>
+<p>Especially using Tracker and queries to manage emails is a powerful idea. The experience you gain can be transferred to any other problem that is dealing with files. Be it images, music, video, contacts or any other documents, using Tracker is at the core of all file managing.<br />
+Also, improvements in any of these system areas benefit not just emailing, but all applications that make use of them.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="status" name="status">Using custom statuses</a></h2>
+<p>When you browse through your newly arrived email, you may want to come back to some of them later to think about it in more depth. While you could use Mail's menu <span class="menu">Close and | Leave as New</span> to keep them in your "<i>New messages</i>" query, things tend to pile up that way...</p>
+<p>One solution is of course to just start a reply and save it as draft. But if you don't expect to write a reply and just want to re-read the mail later, that isn't ideal.</p>
+<img src="images/workshop-email-images/status.png" alt="status.png" /> 
+<p>Better use <span class="menu">Close and | Set to...</span> to create a new status and use that to categorize your mail. For example, you could call the status "<i>Later</i>", and then query for that when you find more time.<br />
+Or you use different statuses for specific projects. For example, I created a status "<i>HUG</i>" (for "Haiku user guide") under which I collect every mail that may influence the contents of the user guide, like commit messages about code changes that alter or introduce some feature or anything else I feel could improve the user guide.<br />
+In any case, try to keep the status name short. That way it always fits in a normally wide "Status" column in Tracker.</p>
+<p>You don't have to open an email with the <span class="app">Mail</span> application to set its status. With the Tracker add-ons <span class="app">Mark as Read </span> and <span class="app">Mark as...</span> you can select some email files and set their status in one go.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="queries" name="queries">Using queries</a></h2>
+<p>Sure, you specify a folder to store all your email, you can open it et voilà,  there's all you mail. But over time the folder becomes crowded and showing all will take longer and longer as thousands of files and their attributes have to be parsed and sorted. Also, most of the time you don't really care about two year old emails of Nigerian princes and their inheritory trouble ...</p>
+<div class="box-info">A lot of time when populating a folder is spent on putting files read from disk into the correct sorting order and displaying that in the window. If you do have to open a folder with a huge number of files, you can shorten the wait by making the Tracker window "invisible", i.e. either minimize it or change to another workspace. Watch <a href="applications/processcontroller.html">ProcessController</a> to see how it affects CPU usage.</div>
+<p><a href="queries.html">Queries</a>, to the rescue!</p>
+<p>By using queries, you can narrow down the view of your mails. Actually, the mailbox icon in the Deskbar uses queries.</p>
+<img src="images/workshop-email-images/daemon-in-deskbar.png" alt="daemon-in-deskbar.png" /> 
+<p>The <span class="menu">Open Draft</span> submenu does a query for the status "<i>Draft</i>", which is set by <span class="app">Mail</span> when you save a message.</p>
+<p><span class="menu">Open Inbox Folder</span> and <span class="menu">Open Mail Folder</span> are just links to regular folders (and not very useful in my opinion).</p>
+<p>The <span class="menu"># new messages</span> submenu is populated by a query for email with the status "<i>New</i>" (that same query is used to change the mailbox icon to show some letters in it, by the way).</p>
+
+<p>You can add your own queries (or folders, applications, scripts etc.) to that context menu too, by putting them or links to them into <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
+<div class="box-info">The query <span class="path">~/config/settings/Mail/mailbox</span> is a special case: It is executed when left-clicking the mailbox icon in the Deskbar. If you want to change that behavior, you can replace it with any other file (or link to a file), just name it "<i>mailbox</i>". It doesn't have to be a query, a link to a folder of queries or a script or application works just as well.</div>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-examples" name="query-examples">Query examples</a></h3>
+<p>Here are a few examples of useful queries:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="10">
+<tr align="center"><td><img src="images/workshop-email-images/query-1.png" alt="query-1.png" /><br />
+This finds all mails with the custom status "<i>Later</i>".</td>
+<td><img src="images/workshop-email-images/query-2.png" alt="query-2.png" /><br />
+This finds all mails of the past 2 days.</td></tr>
+
+<tr align="center"><td><img src="images/workshop-email-images/query-3.png" alt="query-3.png" /><br />
+This finds all mails by Ingo Weinhold of the past 2 weeks.</td>
+<td><img src="images/workshop-email-images/query-4.png" alt="query-4.png" /><br />
+This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">More tips</a></h2>
+<ul>
+<li><p>If you don't save a query as "<i>Query</i>" but as "<i>Query template</i>", invoking it won't show the result window, but the Find... window instead. That way you can easily exchange the search string for the subject or sender, for example, or change a "<i>2 days</i>" time limit to "<i>3 days</i>".</p></li>
+<li><p>Activating "type-ahead filtering" in <a href="tracker.html#tracker-preferences">Tracker's preferences</a> allows you to very quickly filter a query result even further. Often it's enough to query for all mails of the last 3 days and go with type-ahead filtering from there. The big advantage is, that you don't have to exactly specify which attribute to search for, as all displayed are considered when filtering.</p></li>
+<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> is a nifty little application that will query for all mails with the same subject/sender/time-frame etc. of a dropped email. Kind of what the <span class="menu">Queries</span> menu in the <span class="app">Mail</span> app is supposed to do.</p></li>
+</ul>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="queries.html">Queries</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="applications.html">Aplicativos</a>  »
+</span></div>
+</div>
+
+</body>
+</html>
