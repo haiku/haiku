@@ -1,7 +1,8 @@
 /*
- * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
- * Copyright 2008, Salvatore Benedetto, salvatore.benedetto@gmail.com.
+ * Copyright 2012, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2010, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2008, Salvatore Benedetto, salvatore.benedetto@gmail.com.
+ * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -80,13 +81,14 @@ udf_identify_partition(int fd, partition_data *partition, void **_cookie)
 		partition->offset, partition->size, partition->content_size,
 		partition->block_size));
 
+	primary_volume_descriptor primaryVolumeDescriptor;
 	logical_volume_descriptor logicalVolumeDescriptor;
 	partition_descriptor partitionDescriptors[kMaxPartitionDescriptors];
 	uint8 descriptorCount = kMaxPartitionDescriptors;
 	uint32 blockShift;
 	status_t error = udf_recognize(fd, partition->offset, partition->size,
-		partition->block_size, blockShift, logicalVolumeDescriptor,
-		partitionDescriptors, descriptorCount);
+		partition->block_size, blockShift, primaryVolumeDescriptor,
+		logicalVolumeDescriptor, partitionDescriptors, descriptorCount);
 	if (error != B_OK)
 		return -1;
 
@@ -293,8 +295,12 @@ udf_read_stat(fs_volume *_volume, fs_vnode *node, struct stat *stat)
 	// File times. For now, treat the modification time as creation
 	// time as well, since true creation time is an optional extended
 	// attribute, and supporting EAs is going to be a PITA. ;-)
-	stat->st_atime = icb->AccessTime();
-	stat->st_mtime = stat->st_ctime = stat->st_crtime = icb->ModificationTime();
+	icb->GetAccessTime(stat->st_atim);
+	icb->GetModificationTime(stat->st_mtim);
+	icb->GetModificationTime(stat->st_ctim);
+	icb->GetModificationTime(stat->st_crtim);
+	//icb->GetChangeTime(stat->st_ctim);
+	//icb->GetCreationTime(stat->st_crtim);
 
 	TRACE(("udf_read_stat: mode = 0x%x, st_ino: %Ld\n", stat->st_mode,
 		stat->st_ino));
@@ -343,6 +349,8 @@ udf_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 		((Volume *)volume->private_volume)->ID(), pos, *length));
 
 	Icb *icb = (Icb *)vnode->private_node;
+	DEBUG_INIT_ETC("udf_read", ("ID = %ld, pos = %lld, length = %lu",
+		((Volume *)volume->private_volume)->ID(), pos, *length));
 
 //	if (!inode->HasUserAccessableStream()) {
 //		*_length = 0;
@@ -385,6 +393,8 @@ static status_t
 udf_open_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 {
 	TRACE(("udf_open_dir: volume = %p, vnode = %p\n", volume, vnode));
+	DEBUG_INIT_ETC("udf_open_dir", ("ID = %ld",
+		((Volume *)volume->private_volume)->ID()));
 
 	if (!volume || !vnode || !cookie)
 		RETURN(B_BAD_VALUE);
@@ -443,6 +453,8 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 	Icb *dir = (Icb *)vnode->private_node;
 	DirectoryIterator *iterator = (DirectoryIterator *)cookie;
 
+	DEBUG_INIT_ETC("udf_read_dir", ("ID = %ld", volume->ID()));
+
 	if (dir != iterator->Parent()) {
 		TRACE_ERROR(("udf_read_dir: Icb does not match parent Icb of given "
 			"DirectoryIterator! (iterator->Parent = %p)\n", iterator->Parent()));
@@ -474,6 +486,8 @@ udf_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	TRACE(("udf_rewind_dir: volume = %p, vnode = %p, cookie = %p\n",
 		volume, vnode, cookie));
+	DEBUG_INIT_ETC("udf_rewind_dir", ("ID = %ld",
+		((Volume *)volume->private_volume)->ID()));
 
 	if (!volume || !vnode || !cookie)
 		RETURN(B_BAD_VALUE);
@@ -604,6 +618,8 @@ udf_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+			init_entities();
+			return B_OK;
 		case B_MODULE_UNINIT:
 			return B_OK;
 		default:
