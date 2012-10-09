@@ -45,7 +45,7 @@ local shared_files =
 	tif_zip.c 
 	;
 
-Includes [ FGristFiles tif_jpeg.c ]
+Includes [ FGristFiles tif_jpeg.c tif_ojpeg.c ]
 	: $(HAIKU_JPEG_HEADERS_DEPENDENCY) ;
 
 Objects $(shared_files) ;
