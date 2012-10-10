@@ -215,6 +215,16 @@ WindowArea::_UpdateConstraintValues()
 		if (maxHeight < maxH)
 			maxHeight = maxH;
 	}
+	// the current solver don't like big values
+	const int32 kMaxSolverValue = 5000;
+	if (minWidth > kMaxSolverValue)
+		minWidth = kMaxSolverValue;
+	if (minHeight > kMaxSolverValue)
+		minHeight = kMaxSolverValue;
+	if (maxWidth > kMaxSolverValue)
+		maxWidth = kMaxSolverValue;
+	if (maxHeight > kMaxSolverValue)
+		maxHeight = kMaxSolverValue;
 
 	topWindow->AddDecorator(&minWidth, &maxWidth, &minHeight, &maxHeight);
 	fMinWidthConstraint->SetRightSide(minWidth);
@@ -501,14 +511,10 @@ WindowArea::_MoveToSAT(SATWindow* triggerWindow)
 	if (topWindow == NULL)
 		return;
 
-	int32 workspace = triggerWindow->GetWindow()->CurrentWorkspace();
-	Desktop* desktop = triggerWindow->GetWindow()->Desktop();
-
 	BRect frameSAT(LeftVar()->Value() - kMakePositiveOffset,
 		TopVar()->Value() - kMakePositiveOffset,
 		RightVar()->Value() - kMakePositiveOffset,
 		BottomVar()->Value() - kMakePositiveOffset);
-
 	topWindow->AdjustSizeLimits(frameSAT);
 
 	BRect frame = topWindow->CompleteWindowFrame();
@@ -518,11 +524,12 @@ WindowArea::_MoveToSAT(SATWindow* triggerWindow)
 	float deltaByX = round(frameSAT.right - frame.right);
 	float deltaByY = round(frameSAT.bottom - frame.bottom);
 
+	int32 workspace = triggerWindow->GetWindow()->CurrentWorkspace();
+	Desktop* desktop = triggerWindow->GetWindow()->Desktop();
 	desktop->MoveWindowBy(topWindow->GetWindow(), deltaToX, deltaToY,
 		workspace);
 	// Update frame to the new position
 	desktop->ResizeWindowBy(topWindow->GetWindow(), deltaByX, deltaByY);
-
 
 	UpdateSizeConstaints(frameSAT);
 }
