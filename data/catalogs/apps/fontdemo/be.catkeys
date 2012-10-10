@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-FontDemo	1300625863
+1	belarusian	x-vnd.Haiku-FontDemo	3522850500
 Outline:	ControlView		Абрыс:
 Size: 50	ControlView		Памер: 50
 Stop cycling	ControlView		Спынiць цыкл
@@ -14,6 +14,7 @@ Rotation: 0	ControlView		Паварот: 0
 Drawing mode:	ControlView		Рэжым малявання:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Кiраванне
+FontDemo	System name		FontDemo
 Outline: %d	ControlView		Абрыс: %d
 Text:	ControlView		Тэкст:
 Antialiased text	ControlView		Згладжаны тэкст
