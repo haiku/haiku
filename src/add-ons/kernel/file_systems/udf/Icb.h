@@ -1,4 +1,5 @@
 /*
+ * Copyright 2012, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008, Salvatore Benedetto, salvatore.benedetto@gmail.com.
  * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
  * Distributed under the terms of the MIT License.
@@ -96,14 +97,15 @@ public:
 	uint64						Length() { return _FileEntry()->information_length(); }
 	mode_t						Mode() { return (IsDirectory() ? S_IFDIR : S_IFREG)
 									| S_IRUSR | S_IRGRP | S_IROTH; }
-	time_t						AccessTime();
-	time_t						ModificationTime();
+	void 						GetAccessTime(struct timespec &timespec) const;
+	void 						GetModificationTime(struct timespec &timespec) const;
 
 	uint8						*AllocationDescriptors()
 									{ return _AbstractEntry()->AllocationDescriptors(); }
 	uint32						AllocationDescriptorsSize()
 									{ return _AbstractEntry()->AllocationDescriptorsLength(); }
 
+	status_t					FindBlock(uint32 logicalBlock, off_t &block);
 	status_t					Read(off_t pos, void *buffer, size_t *length,
 									uint32 *block = NULL);
 
@@ -120,15 +122,17 @@ public:
 	Volume						*GetVolume() const { return fVolume; }
 
 private:
-	AbstractFileEntry			*_AbstractEntry() { return (_Tag().id()
+	AbstractFileEntry			*_AbstractEntry() const { return (_Tag().id()
 									== TAGID_EXTENDED_FILE_ENTRY)
 									? (AbstractFileEntry *)&fExtendedEntry
 									: (AbstractFileEntry *)&fFileEntry; }
 
-	descriptor_tag				&_Tag() { return ((icb_header *)fData.Block())->tag(); }
-	icb_entry_tag				&_IcbTag() { return ((icb_header *)fData.Block())->icb_tag(); }
-	file_icb_entry				*_FileEntry() { return (file_icb_entry *)fData.Block(); }
-	extended_file_icb_entry		&_ExtendedEntry() { return *(extended_file_icb_entry *)fData.Block(); }
+	descriptor_tag				&_Tag() const { return ((icb_header *)fData.Block())->tag(); }
+	icb_entry_tag				&_IcbTag() const { return ((icb_header *)fData.Block())->icb_tag(); }
+	file_icb_entry				*_FileEntry() const
+		{ return (file_icb_entry *)fData.Block(); }
+	extended_file_icb_entry		*_ExtendedEntry() const
+		{ return (extended_file_icb_entry *)fData.Block(); }
 
 	template<class DescriptorList>
 	status_t					_GetFileMap(DescriptorList &list, off_t offset,
@@ -143,6 +147,7 @@ private:
 	status_t					fInitStatus;
 	ino_t						fId;
 	SinglyLinkedList<DirectoryIterator>		fIteratorList;
+	uint16						fPartition;
 	FileEntry<file_icb_entry> 				fFileEntry;
 	FileEntry<extended_file_icb_entry>		fExtendedEntry;
 	void *						fFileCache;

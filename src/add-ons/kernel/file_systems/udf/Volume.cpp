@@ -1,4 +1,5 @@
 /*
+ * Copyright 2012, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008, Salvatore Benedetto, salvatore.benedetto@gmail.com
  * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
  * Distributed under the terms of the MIT License.
@@ -8,6 +9,7 @@
 
 #include "Icb.h"
 #include "MemoryChunk.h"
+#include "MetadataPartition.h"
 #include "PhysicalPartition.h"
 #include "Recognition.h"
 
@@ -62,6 +64,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 		return device;
 	}
 
+	DEBUG_INIT_ETC("Volume", ("deviceName: %s", deviceName));
 	status_t status = B_OK;
 
 	// If the device is actually a normal file, try to disable the cache
@@ -84,8 +87,8 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 	// Run through the volume recognition and descriptor sequences to
 	// see if we have a potentially valid UDF volume on our hands
 	status = udf_recognize(device, offset, length, blockSize, blockShift,
-				logicalVolumeDescriptor, partitionDescriptors,
-				partitionDescriptorCount);
+				fPrimaryVolumeDescriptor, logicalVolumeDescriptor,
+				partitionDescriptors, partitionDescriptorCount);
 
 	// Set up the block cache
 	if (!status) {
@@ -163,8 +166,43 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 				TRACE(("map type: metadata\n"));
 				metadata_partition_map* map =
 					reinterpret_cast<metadata_partition_map*>(header);
-				metadataCount++;
-				(void)map;	// kill the warning for now
+				
+				
+				// Find the corresponding partition descriptor
+				partition_descriptor *descriptor = NULL;
+				for (uint8 j = 0; j < partitionDescriptorCount; j++) {
+					if (map->partition_number() ==
+						partitionDescriptors[j].partition_number()) {
+						descriptor = &partitionDescriptors[j];
+						break;
+					}
+				}
+				Partition *parent = _GetPartition(map->partition_number());
+				// Create and add the partition
+				if (descriptor != NULL && parent != NULL) {
+					MetadataPartition *partition
+						= new(nothrow) MetadataPartition(this,
+							map->partition_number(), *parent,
+							map->metadata_file_location(),
+							map->metadata_mirror_file_location(),
+							map->metadata_bitmap_file_location(),
+							map->allocation_unit_size(),
+							map->alignment_unit_size(),
+							map->flags() & 1);
+					status = partition ? partition->InitCheck() : B_NO_MEMORY;
+					if (!status) {
+						TRACE(("Volume::Mount: adding MetadataPartition()"));
+						status = _SetPartition(i, partition);
+						if (status == B_OK)
+							metadataCount++;
+					} else {
+						TRACE_ERROR(("Volume::Mount: metadata partition "
+							"creation failed! 0x%lx\n", status));
+					}
+				} else {
+					TRACE_ERROR(("Volume::Mount: no matching partition descriptor found!\n"));
+					status = B_ERROR;
+				}
 			} else {
 				TRACE(("map type: unrecognized (`%.23s')\n",
 				       typeId.identifier()));
@@ -180,9 +218,9 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 	// Do some checking as to what sorts of partitions we've actually found.
 	if (!status) {
 		status = (physicalCount == 1 && virtualCount == 0
-		         && sparableCount == 0 && metadataCount == 0)
+		         && sparableCount == 0)
 		        || (physicalCount == 2 && virtualCount == 0
-		           && sparableCount == 0 && metadataCount == 0)
+		           && sparableCount == 0)
 		        ? B_OK : B_ERROR;
 		if (status) {
 			TRACE(("Invalid partition layout found:\n"));
@@ -293,6 +331,8 @@ status_t
 Volume::MapBlock(long_address address, off_t *mappedBlock)
 {
 	TRACE(("Volume::MapBlock: partition = %d, block = %ld, mappedBlock = %p\n",
+		address.partition(), address.block(), mappedBlock));
+	DEBUG_INIT_ETC("Volume", ("partition = %d, block = %ld, mappedBlock = %p",
 		address.partition(), address.block(), mappedBlock));
 	status_t error = mappedBlock ? B_OK : B_BAD_VALUE;
 	if (!error) {

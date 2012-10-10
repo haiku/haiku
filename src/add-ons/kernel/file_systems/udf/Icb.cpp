@@ -1,6 +1,7 @@
 /*
- * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
+ * Copyright 2012, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2010, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -104,6 +105,7 @@ Icb::Icb(Volume *volume, long_address address)
 	fData(volume),
 	fInitStatus(B_NO_INIT),
 	fId(to_vnode_id(address)),
+	fPartition(address.partition()),
 	fFileEntry(&fData),
 	fExtendedEntry(&fData),
 	fFileCache(NULL),
@@ -177,17 +179,105 @@ Icb::InitCheck()
 }
 
 
-time_t
-Icb::AccessTime()
+void
+Icb::GetAccessTime(struct timespec &timespec) const
 {
-	return make_time(_FileEntry()->access_date_and_time());
+	timestamp ts;
+	if ((_Tag().id() == TAGID_EXTENDED_FILE_ENTRY))
+		ts = _ExtendedEntry()->access_date_and_time();
+	else
+		ts = _FileEntry()->access_date_and_time();
+
+	if (decode_time(ts, timespec) != B_OK) {
+		decode_time(
+			fVolume->PrimaryVolumeDescriptor()->recording_date_and_time(),
+			timespec);
+	}
 }
 
 
-time_t
-Icb::ModificationTime()
+void
+Icb::GetModificationTime(struct timespec &timespec) const
 {
-	return make_time(_FileEntry()->modification_date_and_time());
+	timestamp ts;
+	if ((_Tag().id() == TAGID_EXTENDED_FILE_ENTRY))
+		ts = _ExtendedEntry()->modification_date_and_time();
+	else
+		ts = _FileEntry()->modification_date_and_time();
+
+	if (decode_time(ts, timespec) != B_OK) {
+		decode_time(
+			fVolume->PrimaryVolumeDescriptor()->recording_date_and_time(),
+			timespec);
+	}
+}
+
+
+status_t
+Icb::FindBlock(uint32 logicalBlock, off_t &block)
+{
+	off_t pos = logicalBlock << fVolume->BlockShift();
+	if (uint64(pos) >= Length()) {
+		block = -1;
+		return B_ERROR;
+	}
+
+	DEBUG_INIT_ETC("Icb", ("pos: %lld", pos));
+
+	status_t status = B_OK;
+	long_address extent;
+	bool isEmpty = false;
+		
+	switch (_IcbTag().descriptor_flags()) {
+		case ICB_DESCRIPTOR_TYPE_SHORT: {
+			TRACE(("Icb::FindBlock: descriptor type -> short\n"));
+			AllocationDescriptorList<ShortDescriptorAccessor> list(this,
+				ShortDescriptorAccessor(fPartition));
+			status = list.FindExtent(pos, &extent, &isEmpty);
+			if (status != B_OK) {
+				TRACE_ERROR(("Icb::FindBlock: error finding extent for offset %Ld. "
+					"status = 0x%lx `%s'\n", pos, status, strerror(status)));
+			}
+			break;
+		}
+
+		case ICB_DESCRIPTOR_TYPE_LONG: {
+			TRACE(("Icb::FindBlock: descriptor type -> long\n"));
+			AllocationDescriptorList<LongDescriptorAccessor> list(this);
+			status = list.FindExtent(pos, &extent, &isEmpty);
+			if (status != B_OK) {
+				TRACE_ERROR(("Icb::FindBlock: error finding extent for offset %Ld. "
+					"status = 0x%lx `%s'\n", pos, status, strerror(status)));
+			}
+			break;
+		}
+
+		case ICB_DESCRIPTOR_TYPE_EXTENDED: {
+			TRACE(("Icb::FindBlock: descriptor type -> extended\n"));
+//			AllocationDescriptorList<ExtendedDescriptorAccessor> list(this, ExtendedDescriptorAccessor(0));
+//			RETURN(_Read(list, pos, buffer, length, block));
+			RETURN(B_ERROR);
+			break;
+		}
+
+		case ICB_DESCRIPTOR_TYPE_EMBEDDED: {
+			TRACE(("Icb::FindBlock: descriptor type: embedded\n"));
+			RETURN(B_ERROR);
+			break;
+		}
+
+		default:
+			TRACE(("Icb::FindBlock: invalid icb descriptor flags! (flags = %d)\n",
+				_IcbTag().descriptor_flags()));
+			RETURN(B_BAD_VALUE);
+			break;
+	}
+
+	if (status == B_OK) {
+		block = extent.block();
+		TRACE(("Icb::FindBlock: block %lld\n", block));
+	}
+	return status;
 }
 
 
@@ -205,13 +295,16 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 		return B_OK;
 	}
 
+	DEBUG_INIT_ETC("Icb", ("pos: %lld, length: %ld", pos, *length));
+
 	if (fFileCache != NULL)
 		return file_cache_read(fFileCache, NULL, pos, buffer, length);
 
 	switch (_IcbTag().descriptor_flags()) {
 		case ICB_DESCRIPTOR_TYPE_SHORT: {
 			TRACE(("Icb::Read: descriptor type -> short\n"));
-			AllocationDescriptorList<ShortDescriptorAccessor> list(this, ShortDescriptorAccessor(0));
+			AllocationDescriptorList<ShortDescriptorAccessor> list(this,
+				ShortDescriptorAccessor(fPartition));
 			RETURN(_Read(list, pos, buffer, length, block));
 			break;
 		}
@@ -445,7 +538,7 @@ Icb::Find(const char *filename, ino_t *id)
 	TRACE(("Icb::Find: filename = `%s', id = %p\n", filename, id));
 
 	if (!filename || !id)
-		RETURN(B_BAD_VALUE);
+		return B_BAD_VALUE;
 
 	DirectoryIterator *i;
 	status_t status = GetDirectoryIterator(&i);
