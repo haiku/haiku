@@ -1,9 +1,9 @@
 1	hungarian	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		Rendben
-CPU frequency status view	CPU Frequency View		A processzor órajelmutatója
+CPU frequency status view	CPU Frequency View		Processzor-frekvencia állapota
 OK	Status view		Rendben
 Set state	Status view		Órajel beállítása
-Defaults	Pref Window		Alapértelmezés
+Defaults	Pref Window		Eredeti
 Install replicant into Deskbar	CPU Frequency View		Replikáns telepítése az Asztalsávba
 Quit	Status view		Kilépés
 High performance	Status view		Nagy teljesítmény
@@ -16,6 +16,6 @@ Integration time [ms]: 	CPU Frequency View		Alkalmazkodás ideje [ms]:
 Open Speedstep preferences…	Status view		Fokozatszabályozási beállító megnyitása…
 Revert	Pref Window		Visszaállít
 Low energy	Status view		Alacsony energiafogyasztás
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Nem sikerült a processzorórajel-szabályozót elindítani.\n\nHibaok:
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Processzor-órajelbeállító\n\tÍrta: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-CPUFrequency	System name		CPUFrequency
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Nem sikerült a Processzor-frekvencia elindítása.\n\nHiba:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Processzor-frekvencia\n\tÍrta: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency	System name		Processzor-frekvencia

@@ -187,7 +187,7 @@ Outline selection rectangle only	SettingsView		Körvonal csak a kijelölés tég
 Select all	DeskWindow		Összes kijelölése
 OK	InfoWindow		Rendben
 Replace	FSUtils		Csere
-You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Ezt az elemet fogja most felülírni:\n\t%name%dest\nezzel:\n\t%name%src\n\nBiztos felül kívánja írni azzal amit most akar %movemode?
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Ezt az elemet akarja most felülírni:\n\n\t%name %dest\nezzel:\n\t%name %src\n\nBiztos felül kívánja írni azzal amit most akar %movemode?
 Mini icon view	DeskWindow		Mini ikon nézet
 Error in regular expression:\n\n'%errstring'	PoseView		Hiba az általános kifejezésben:\n\n'%errstring'
 Mount all	MountMenu		Összes csatolása
@@ -231,7 +231,7 @@ Copying: 	StatusWindow		Másolás:
 Capacity:	InfoWindow		Kapacitás:
 Delete	FilePanelPriv		Törlés
 Save	FindPanel		Mentés
-copy	FSUtils	filename copy	másolása
+copy	FSUtils	filename copy	másolata
 Temporary	FindPanel		Ideiglenes megőrzés
 Version	OpenWithWindow		Verzió
 Default application	InfoWindow		Alapértelmezett program
@@ -303,7 +303,7 @@ Could not find an application to open \"%name\" (%error). 	FSUtils		Nem találha
 Create a Query template	FindPanel		Keresési sablon készítése
 Previously mounted disks	AutoMounterSettings		Legutóbb csatolt lemezek
 %Ld B	WidgetAttributeText		%Ld B
-copying	FSUtils		másolás
+copying	FSUtils		másolni
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hiba történt a mappa másolása közben: %name\n\t%error\n\nSzeretné folytatni?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	átmozgatja
 Show Disks icon	SettingsView		„Lemezek” ikon megjelenítése
@@ -319,7 +319,7 @@ Other	FilePermissionsView		Egyéb
 Query name:	FindPanel		Keresés neve:
 Permissions	ContainerWindow		Engedélyek
 96 x 96	ContainerWindow		95 × 95
-moving	FSUtils		mozgatás
+moving	FSUtils		mozgatni
 Identify	InfoWindow		Azonosítás
 Recent folders	ContainerWindow		Legutóbbi mappák
 rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	átnevezze
