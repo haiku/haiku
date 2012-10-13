@@ -6,5 +6,5 @@ Addon vst_host.media_addon :
 	VSTHost.cpp
 	VSTAddOn.cpp
 	VSTNode.cpp
-	: be media
+	: be media $(TARGET_LIBSTDC++)
 ;
