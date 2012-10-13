@@ -17,4 +17,5 @@ SubInclude HAIKU_TOP src add-ons media media-add-ons usb_webcam ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons video_producer_demo ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons videowindow ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons video_mixer ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons equalizer ;
 
