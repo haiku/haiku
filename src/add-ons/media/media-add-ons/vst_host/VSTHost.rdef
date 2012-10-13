@@ -1,0 +1,15 @@
+/*
+ * VSTHost.rdef
+ */
+
+resource app_signature "application/x-vnd.vst_host.media_addon";
+
+resource app_version {
+	major  = 0,
+	middle = 0,
+	minor  = 2,
+	variety = 0,
+	internal = 0,
+	short_info = "0.0.2",
+	long_info = "VST Loader media add-on."
+};

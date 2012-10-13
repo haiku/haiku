@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons media media-add-ons vst_host ;
+
+AddResources vst_host.media_addon : VSTHost.rdef ;
+
+Addon vst_host.media_addon :
+	VSTHost.cpp
+	VSTAddOn.cpp
+	VSTNode.cpp
+	: be media
+;
