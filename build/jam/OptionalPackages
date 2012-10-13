@@ -658,21 +658,21 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	# gcc and binutils
 	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
 		InstallOptionalHaikuImagePackage
-			gcc-2.95.3-x86-gcc2-2011-11-22.zip
-			: $(baseURL)/gcc-2.95.3-x86-gcc2-2011-11-22.zip ;
+			gcc-2.95.3-r1a4-x86-gcc2-2012-10-12.zip
+			: $(baseURL)/gcc-2.95.3-r1a4-x86-gcc2-2012-10-12.zip ;
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
 		# symlink to the appropriate system/lib[/gcc2] folder
 		AddSymlinkToHaikuHybridImage
-			develop abi x86 gcc2 tools gcc-2.95.3-haiku-111122 lib
+			develop abi x86 gcc2 tools gcc-2.95.3-haiku-121012 lib
 			: /system/lib libstdc++.r4.so : : true ;
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
 		InstallOptionalHaikuImagePackage
-			gcc-4.6.2-x86-gcc4-2012-01-21.zip
-			: $(baseURL)/gcc-4.6.2-x86-gcc4-2012-01-21.zip ;
+			gcc-4.6.3-r1a4-x86-gcc4-2012-10-12.zip
+			: $(baseURL)/gcc-4.6.3-r1a4-x86-gcc4-2012-10-12.zip ;
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 4 {
@@ -684,7 +684,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 		local libs = libstdc++.so libsupc++.so ;
 		for lib in $(libs) {
 			AddSymlinkToHaikuHybridImage
-				develop abi x86 gcc4 tools gcc-4.6.2-haiku-120121 lib
+				develop abi x86 gcc4 tools gcc-4.6.3-haiku-121012 lib
 				: /system/lib $(lib) : : true ;
 		}
 	}
