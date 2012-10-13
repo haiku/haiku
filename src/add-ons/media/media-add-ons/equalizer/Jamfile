@@ -6,5 +6,5 @@ Addon equalizer.media_addon :
 	Equalizer.cpp
 	EqualizerAddOn.cpp
 	EqualizerNode.cpp
-	: be media
+	: be media $(TARGET_LIBSTDC++)
 ;
