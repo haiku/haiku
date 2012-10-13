@@ -144,6 +144,8 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
 	video_window_demo.media_addon
 	firewire_dv.media_addon
 	#legacy.media_addon
+	equalizer.media_addon
+	vst_host.media_addon
 ;
 SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(X86_ONLY)ffmpeg raw_decoder ;
 SYSTEM_ADD_ONS_PRINT =
