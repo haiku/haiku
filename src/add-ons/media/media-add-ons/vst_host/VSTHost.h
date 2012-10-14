@@ -1,7 +1,8 @@
 /*
- * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com. All rights reserved.
+ * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com.
+ * All rights reserved.
  * Distributed under the terms of the MIT License.
- */
+ */ 
  
 #ifndef __VST_HOST_H__
 #define __VST_HOST_H__
@@ -60,8 +61,10 @@
 struct VSTEffect
 {
 		int 			cookie;
-		int32 			(*dispatcher)(struct VSTEffect*, int32, int32, int32, void*, float);
-		void 			(*process)(struct VSTEffect*, float**, float**, int32);
+		int32 			(*dispatcher)(struct VSTEffect*, int32, 
+								int32, int32, void*, float);
+		void 			(*process)(struct VSTEffect*, float**,
+								float**, int32);
 		void 			(*setParameter)(struct VSTEffect*, int32, float);
 		float 			(*getParameter)(struct VSTEffect*, int32);
 		int32 			numPrograms;
@@ -77,7 +80,8 @@ struct VSTEffect
 		void*			_notused_pointer4;
 		int32 			ID;
 		char 			_notused_block2[4];
-		void 			(*processReplacing)(struct VSTEffect*, float**, float**, int);
+		void 			(*processReplacing)(struct VSTEffect*,
+								float**, float**, int);
 };
 
 //typedefs
@@ -162,8 +166,8 @@ private:
 		BString			fVendorString;
 		BString			fProductString;
 		BList			fParameters;
-		float			**inputs;
-		float			**outputs;
+		float**			inputs;
+		float**			outputs;
 };
 
 #endif //__VST_HOST_H__
