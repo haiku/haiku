@@ -1,5 +1,6 @@
 /*
- * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com. All rights reserved.
+ * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com.
+ * All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -35,85 +36,85 @@ class EqualizerNode : public	BBufferConsumer,
 {	
 public:
 	virtual 				~EqualizerNode();
-							EqualizerNode(BMediaAddOn *pAddOn=NULL);
+							EqualizerNode(BMediaAddOn* pAddOn = NULL);
 	//BMediaNode
 public:
-	virtual		BMediaAddOn *AddOn(int32 *id) const;
-	virtual		status_t 	HandleMessage(int32 code, const void *data,	size_t size);
+	virtual		BMediaAddOn *AddOn(int32* id) const;
+	virtual		status_t 	HandleMessage(int32 code, const void* data,	size_t size);
 protected:
 	virtual 	void 		NodeRegistered();
 	//BControllable
 public:	
-	virtual 	status_t 	GetParameterValue(int32 id,	bigtime_t *lastChangeTime,
-									void *value, size_t *size);
+	virtual 	status_t 	GetParameterValue(int32 id,	bigtime_t* lastChangeTime,
+								void* value, size_t* size);
 	virtual 	void 		SetParameterValue(int32 id,	bigtime_t changeTime,
-									const void *value, size_t size);
+								const void* value, size_t size);
 	//BBufferConsumer
 public:
-	virtual 	void 		BufferReceived(BBuffer *buffer);									
+	virtual 	void 		BufferReceived(BBuffer* buffer);									
 	virtual 	status_t 	AcceptFormat(const media_destination &dst,
-							media_format *format);
-	virtual 	status_t 	GetNextInput(int32 *cookie,	media_input *input);
+								media_format* format);
+	virtual 	status_t 	GetNextInput(int32* cookie,	media_input* input);
 	virtual 	void 		DisposeInputCookie(int32 cookie);
 	virtual 	status_t 	FormatChanged(const media_source &src,
-									const media_destination &dst,
+								const media_destination &dst,
 							int32 change_tag, const media_format &format);
 	virtual 	void 		ProducerDataStatus(const media_destination &dst,
-									int32 status,
-									bigtime_t when);	
+								int32 status,
+								bigtime_t when);	
 	virtual 	status_t 	GetLatencyFor(const media_destination &dst,
-							bigtime_t *latency,
-							media_node_id *time_src);		
+								bigtime_t* latency,
+								media_node_id* time_src);		
 	virtual 	status_t 	Connected(const media_source &src, 
-									const media_destination &dst,
-									const media_format &format,
-									media_input *input);
+								const media_destination &dst,
+								const media_format &format,
+								media_input* input);
 	virtual 	void 		Disconnected(const media_source &src,
-									const media_destination &dst);
+								const media_destination &dst);
 	//BBufferProducer
 public:
 	virtual 	status_t 	FormatSuggestionRequested(media_type type,
-									int32 quality, media_format *format);
+								int32 quality, media_format* format);
 	virtual 	status_t 	FormatProposal(const media_source &src,
-									media_format *format);
+								media_format* format);
 	virtual 	status_t 	FormatChangeRequested(const media_source &src,
-									const media_destination &dst,
-									media_format *format,
-									int32* _deprecated_);
+								const media_destination &dst,
+								media_format* format,
+								int32* _deprecated_);
 	virtual 	void 		LateNoticeReceived(const media_source &src,
-									bigtime_t late,	bigtime_t when);
-	virtual 	status_t	GetNextOutput(int32 *cookie, media_output *output);
+								bigtime_t late,	bigtime_t when);
+	virtual 	status_t	GetNextOutput(int32 *cookie, media_output* output);
 	virtual 	status_t 	DisposeOutputCookie(int32 cookie);
 	virtual 	status_t	SetBufferGroup(const media_source &src,
-									BBufferGroup *group);
+								BBufferGroup* group);
 	virtual 	status_t 	PrepareToConnect(const media_source &src,
-									const media_destination &dst,
-									media_format *format, media_source *source,
-									char *name);
+								const media_destination &dst,
+								media_format* format, media_source* source,
+								char* name);
 	virtual 	void 		Connect(status_t status,
-									const media_source &src,
-									const media_destination &dst,
-									const media_format &format,
-									char* name);
+								const media_source &src,
+								const media_destination &dst,
+								const media_format &format,
+								char* name);
 	virtual		void 		Disconnect(const media_source &src,
-									const media_destination &dst);		
+								const media_destination &dst);		
 	virtual 	void 		EnableOutput(const media_source &src,
-									bool enabled, int32* _deprecated_);
-	virtual 	status_t 	GetLatency(bigtime_t *outLatency);
+								bool enabled, int32* _deprecated_);
+	virtual 	status_t 	GetLatency(bigtime_t* outLatency);
 	virtual 	void 		LatencyChanged(	const media_source &src,
-									const media_destination &dst,
-									bigtime_t latency, uint32 flags);
+								const media_destination &dst,
+								bigtime_t latency, uint32 flags);
 	//BMediaEventLooper	
 protected:
 	virtual 	bigtime_t 	OfflineTime();
 	//EqualizerNode
 protected:
-	virtual 	void 		HandleEvent(const media_timed_event *event,
-									bigtime_t late,
-									bool realTimeEvent=false);
-				void 		ParameterEventProcessing(const media_timed_event *event);		
+	virtual 	void 		HandleEvent(const media_timed_event* event,
+								bigtime_t late,
+								bool realTimeEvent = false);
+				void 		ParameterEventProcessing(const media_timed_event* event);		
 				status_t 	ValidateFormat(const media_format &preferredFormat,
-									media_format &format);
+								media_format &format);
 				void 		SetOutputFormat(media_format &format);
 	virtual 	void 		InitParameterValues(void);
 	virtual 	void 		InitParameterWeb(void);
@@ -122,8 +123,8 @@ protected:
 	virtual 	void 		FilterBuffer(BBuffer* pBuffer);
 	
 private:
-	BMediaAddOn				*fAddOn;
-	BParameterWeb			*fWeb;
+	BMediaAddOn*			fAddOn;
+	BParameterWeb*			fWeb;
 	
 	Equalizer				fEqualizer;
 	

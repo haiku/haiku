@@ -1,5 +1,6 @@
 /*
- * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com. All rights reserved.
+ * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com.
+ * All rights reserved.
  * Distributed under the terms of the MIT License.
  */
  
@@ -54,7 +55,7 @@ Equalizer::PreAmp(void)
 void
 Equalizer::SetBand(int band, double value)
 {	
-	if(band < 0 || band >= BandCount()) {
+	if (band < 0 || band >= BandCount()) {
 		return;
 	}
 	fBands[band] = value;
@@ -64,7 +65,7 @@ Equalizer::SetBand(int band, double value)
 double
 Equalizer::Band(int band)
 {
-	if(band < 0 || band >= BandCount()) {
+	if (band < 0 || band >= BandCount()) {
 		return 0.0;
 	}
 	return fBands[band];
@@ -79,16 +80,16 @@ Equalizer::BandCount(void)
 float
 Equalizer::BandFrequency(int band)
 {
-	if(band < 0 || band >= BandCount()) {
+	if (band < 0 || band >= BandCount()) {
 		return 0.0;
 	}	
 	return fFrequency[band];
 }
 
 void
-Equalizer::ProcessBuffer(float *buffer, int samples)
+Equalizer::ProcessBuffer(float* buffer, int samples)
 {
-   if(!fActivated || samples <= 0) {
+   if (!fActivated || samples <= 0) {
         return;
    }
 

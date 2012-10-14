@@ -1,7 +1,8 @@
 /*
- * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com. All rights reserved.
+ * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com.
+ * All rights reserved.
  * Distributed under the terms of the MIT License.
- */
+ */ 
 
 #ifndef __VST_NODE_H__
 #define __VST_NODE_H__
@@ -40,7 +41,8 @@ class VSTNode : public	BBufferConsumer,
 				public	BMediaEventLooper {	
 public:
 	virtual 				~VSTNode();
-							VSTNode(BMediaAddOn *addon, const char *name, const char* path);
+							VSTNode(BMediaAddOn *addon, const char *name,
+								const char* path);
 	//BMediaNode
 public:
 	virtual		BMediaAddOn *AddOn(int32 *id) const;

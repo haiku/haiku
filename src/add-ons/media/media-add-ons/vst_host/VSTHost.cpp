@@ -1,7 +1,8 @@
 /*
- * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com. All rights reserved.
+ * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com.
+ * All rights reserved.
  * Distributed under the terms of the MIT License.
- */
+ */ 
  
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,12 +13,12 @@
 #include "VSTHost.h"
 
 static int32 VHostCallback(VSTEffect* effect, int32 opcode, int32 index,
-						   		int32 value, void* ptr, float opt);
+	int32 value, void* ptr, float opt);
 
 //Trim string
 static void
 TrimString(BString *string) {
-	char *str = string->LockBuffer(256);
+	char* str = string->LockBuffer(256);
     uint32 k = 0;
     uint32 i = 0;
     for(i=0; str[i]!='\0';) {
@@ -36,7 +37,7 @@ TrimString(BString *string) {
 }
 
 //VST Parameter class
-VSTParameter::VSTParameter(VSTPlugin *plugin, int index)
+VSTParameter::VSTParameter(VSTPlugin* plugin, int index)
 {
 	fIndex = index;
 	fEffect = plugin->Effect();
@@ -74,21 +75,22 @@ VSTParameter::VSTParameter(VSTPlugin *plugin, int index)
 	int test_cnt = 0;
 	for(int tst_val = 0; tst_val < VST_PARAM_TEST_COUNT; tst_val++){
 		float v = (float)tst_val / (float)VST_PARAM_TEST_COUNT;
-		if(tst_val >= VST_PARAM_TEST_COUNT - 1) {
-			v=1.0;
+		if (tst_val >= VST_PARAM_TEST_COUNT - 1) {
+			v = 1.0;
 		}
 		fEffect->setParameter(fEffect, index, v);
 		float new_value = fEffect->getParameter(fEffect, index);
-		bool  valtest = false;
+		bool valtest = false;
 		for(int i = 0; i < test_cnt; i++) {
-			if(fabs(test_values[i] - new_value) < delta) {
+			if (fabs(test_values[i] - new_value) < delta) {
 				valtest = true;
 				break;
 			}
 		}
-		if(valtest == false) {
+		if (valtest == false) {
 			test_values[test_cnt] = new_value;
-			fEffect->dispatcher(fEffect, VST_GET_PARAM_STR, index, 0, test_disp[test_cnt], 0);
+			fEffect->dispatcher(fEffect, VST_GET_PARAM_STR, index,
+				0, test_disp[test_cnt], 0);
 			test_cnt++;
 		}
 	}
@@ -97,25 +99,25 @@ VSTParameter::VSTParameter(VSTPlugin *plugin, int index)
 	fEffect->setParameter(fEffect, index, val);
 		
 	//detect param type
-	if(test_cnt == 2) {
+	if (test_cnt == 2) {
 		fType = VST_PARAM_CHECKBOX;
 		
-		DropListValue *min_item = new DropListValue();
+		DropListValue* min_item = new DropListValue();
 		min_item->Value = 0.0;
 		min_item->Index = 0;
 		min_item->Name = fMinValue;
 		fDropList.AddItem(min_item);
 		
-		DropListValue *max_item = new DropListValue();
+		DropListValue* max_item = new DropListValue();
 		max_item->Value = 1.0;
 		max_item->Index = 1;
 		max_item->Name = fMaxValue;
 		fDropList.AddItem(max_item);		
-	} else if(test_cnt > 2 && test_cnt < VST_PARAM_TEST_COUNT / 2) {
+	} else if (test_cnt > 2 && test_cnt < VST_PARAM_TEST_COUNT / 2) {
 		fType = VST_PARAM_DROPLIST;
 		
 		for(int i = 0; i < test_cnt; i++) {
-			DropListValue *item = new DropListValue();
+			DropListValue* item = new DropListValue();
 			item->Value = test_values[i];
 			item->Index = i;
 			item->Name = test_disp[i];
@@ -132,29 +134,29 @@ VSTParameter::~VSTParameter()
 }
 
 BString*
-VSTParameter::ValidateValues(BString *string)
+VSTParameter::ValidateValues(BString* string)
 {	
-	if(string->Length() == 0) {
+	if (string->Length() == 0) {
 		return string;
 	}
 		
 	bool isNum = true;
 	
 	const char *ptr = string->String();
-	for(;*ptr!=0;ptr++) {
+	for(; *ptr!=0; ptr++) {
 		char ch = *ptr;
-		if(!((ch >= '0' && ch <= '9') || ch == '.' || ch == '-')) {
+		if (!((ch >= '0' && ch <= '9') || ch == '.' || ch == '-')) {
 			isNum = false;
 			break;
 		}
 	}
 	
-	if(isNum) {
+	if (isNum) {
 		float val = atof(string->String());
 
-		if(val <= -pow(2, 31)) {
+		if (val <= -pow(2, 31)) {
 			string->SetTo("-∞");
-		} else if(val >= pow(2, 31)) {
+		} else if (val >= pow(2, 31)) {
 			string->SetTo("∞");
 		} else {
 			char temp[256];
@@ -163,9 +165,9 @@ VSTParameter::ValidateValues(BString *string)
 		}
 	} else {
 		TrimString(string);
-		if(*string == "oo" || *string == "inf")
+		if (*string == "oo" || *string == "inf")
 			string->SetTo("∞");
-		if(*string == "-oo" || *string == "-inf")
+		if (*string == "-oo" || *string == "-inf")
 			string->SetTo("-∞");
 		
 	}	
@@ -181,8 +183,8 @@ VSTParameter::ListCount(void)
 DropListValue*
 VSTParameter::ListItemAt(int index)
 {
-	DropListValue *item = NULL;
-	if(index >= 0 && index < fDropList.CountItems()) {
+	DropListValue* item = NULL;
+	if (index >= 0 && index < fDropList.CountItems()) {
 		item = (DropListValue*)fDropList.ItemAt(index);
 	}
 	return item;
@@ -193,14 +195,14 @@ float
 VSTParameter::Value()
 {	
 	float value = fEffect->getParameter(fEffect, fIndex);
-	if(fType == VST_PARAM_DROPLIST) {
+	if (fType == VST_PARAM_DROPLIST) {
 		//scan for near value
 		int	min_index = 0;
 		float min_delta = 1.0;
 		for(int i = 0; i < fDropList.CountItems(); i++) {
-			DropListValue *item = (DropListValue*)fDropList.ItemAt(i);
+			DropListValue* item = (DropListValue*)fDropList.ItemAt(i);
 			float delta	= fabs(item->Value - value);
-			if(delta <= min_delta) {
+			if (delta <= min_delta) {
 				min_delta = delta;
 				min_index = i;
 			}
@@ -214,14 +216,14 @@ VSTParameter::Value()
 void
 VSTParameter::SetValue(float value)
 {
-	if(value == fLastValue) {
+	if (value == fLastValue) {
 		return;
 	}
 	
-	if(fType == VST_PARAM_DROPLIST) {
+	if (fType == VST_PARAM_DROPLIST) {
 		//take value by index
 		int index = (int)round(value);
-		if(index >= 0 && index < fDropList.CountItems()) {
+		if (index >= 0 && index < fDropList.CountItems()) {
 			DropListValue *item = (DropListValue*)fDropList.ItemAt(index);
 			value = item->Value;
 			fLastValue = index;
@@ -305,24 +307,25 @@ VSTPlugin::LoadModule(const char *path)
 	char vendorString[256] = {0};
 	char productString[256] = {0};
 
-	if(fActive) {
+	if (fActive) {
 		return VST_ERR_ALREADY_LOADED;
 	}
 
 	fPath = BPath(path);
 	
 	fModule = load_add_on(path);
-	if(fModule <= 0) {
+	if (fModule <= 0) {
 		return VST_ERR_NOT_LOADED;
 	}
 
-	if(get_image_symbol(fModule, "main_plugin", B_SYMBOL_TYPE_TEXT, (void**)&VSTMainProc) != B_OK) {
+	if (get_image_symbol(fModule, "main_plugin", B_SYMBOL_TYPE_TEXT,
+			(void**)&VSTMainProc) != B_OK) {
 		unload_add_on(fModule);
 		return VST_ERR_NO_MAINPROC;
 	}		
 	
 	fEffect = VSTMainProc(VHostCallback);
-	if(fEffect==NULL) {
+	if (fEffect==NULL) {
 		unload_add_on(fModule);
 		return VST_ERR_NOT_LOADED;
 	}
@@ -363,7 +366,7 @@ VSTPlugin::LoadModule(const char *path)
 int
 VSTPlugin::UnLoadModule(void)
 {
-	if(!fActive || fModule <= 0) {
+	if (!fActive || fModule <= 0) {
 		return VST_ERR_NOT_LOADED;
 	}
 	fEffect->dispatcher(fEffect, VST_STATE_CHANGED, 0, 0, 0, 0);
@@ -419,27 +422,27 @@ VSTPlugin::Path(void)
 int
 VSTPlugin::ReAllocBuffers(void)
 {
-	if(inputs!=NULL) {
+	if (inputs != NULL) {
 		for(int32 i = 0; i < fInputChannels; i++)	{
 			delete inputs[i];
 		}		
 	}
 	
-	if(outputs!=NULL) {
+	if (outputs != NULL) {
 		for(int32 i = 0; i < fOutputChannels; i++)	{
 			delete outputs[i];
 		}		
 	}
 	
-	if(fInputChannels > 0) {
+	if (fInputChannels > 0) {
 		inputs = new float*[fInputChannels];
 		for(int32 i = 0; i < fInputChannels; i++)	{
 			inputs[i] = new float[fBlockSize]; 
-			memset (inputs[i], 0, fBlockSize * sizeof(float)); 
+			memset(inputs[i], 0, fBlockSize * sizeof(float)); 
 		}
 	} 
  
-	if(fOutputChannels > 0) { 
+	if (fOutputChannels > 0) { 
 		outputs = new float*[fOutputChannels];
 		for(int32_t i = 0; i < fOutputChannels; i++) {
 			outputs[i] = new float[fBlockSize];
@@ -464,9 +467,9 @@ VSTPlugin::ParametersCount(void)
 VSTParameter*
 VSTPlugin::Parameter(int index)
 {
-	VSTParameter *param = NULL;
+	VSTParameter* param = NULL;
 	
-	if(index >= 0 && index < fParameters.CountItems()) {
+	if (index >= 0 && index < fParameters.CountItems()) {
 		param = (VSTParameter*)fParameters.ItemAt(index);
 	}
 	
@@ -508,15 +511,15 @@ void
 VSTPlugin::Process(float *buffer, int samples, int channels)
 {	
 	//todo: full channels remapping needed
-	float *src = buffer;
+	float* src = buffer;
 	
-	if(channels == fInputChannels) { //channel to channel
+	if (channels == fInputChannels) { //channel to channel
 		for(int j = 0; j < samples; j++) {
 			for(int c = 0; c < fInputChannels; c++) {
 				inputs[c][j] = *src++;
 			}
 		}
-	} else if( channels == 1) {	//from mone to multichannel
+	} else if ( channels == 1) {	//from mone to multichannel
 		for(int j = 0; j < samples; j++, src++) {
 			for(int c = 0; c < fInputChannels; c++) {
 				inputs[c][j] = *src;
@@ -526,15 +529,15 @@ VSTPlugin::Process(float *buffer, int samples, int channels)
 		
 	fEffect->processReplacing(fEffect, inputs, outputs, fBlockSize);
 	
-	float *dst = buffer;
+	float* dst = buffer;
 	
-	if(channels == fOutputChannels) { //channel to channel
+	if (channels == fOutputChannels) { //channel to channel
 		for(int j = 0; j < samples; j++) {
 			for(int c = 0; c < fOutputChannels; c++) {				
 				*dst++ = outputs[c][j];
 			}	
 		}
-	} else if(channels == 1) {  //from multichannel to mono
+	} else if (channels == 1) {  //from multichannel to mono
 		for(int j = 0; j < samples; j++, dst++) {
 			float mix = 0;
 			for(int c = 0; c < fOutputChannels; c++) {				
@@ -546,14 +549,15 @@ VSTPlugin::Process(float *buffer, int samples, int channels)
 }
 
 static int32 
-VHostCallback(VSTEffect* effect, int32 opcode, int32 index, int32 value, void* ptr, float opt)
+VHostCallback(VSTEffect* effect, int32 opcode, int32 index, int32 value,
+	void* ptr, float opt)
 {
 	intptr_t result = 0;
  
 	switch(opcode)
 	{
 		case VST_MASTER_PRODUCT:
-			if(ptr) {
+			if (ptr) {
 				strcpy((char*)ptr, "VSTHost Media AddOn");
 				result = 1;
 			}

@@ -1,7 +1,8 @@
 /*
- * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com. All rights reserved.
+ * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com.
+ * All rights reserved.
  * Distributed under the terms of the MIT License.
- */
+ */ 
 
 #include <Entry.h>
 #include <Directory.h>
@@ -41,7 +42,7 @@ VSTAddOn::~VSTAddOn()
 }
 	
 status_t 
-VSTAddOn::InitCheck(const char **text) 
+VSTAddOn::InitCheck(const char** text) 
 {
 	return B_OK;
 }
@@ -52,9 +53,10 @@ VSTAddOn::CountFlavors()
 	return fPluginsList.CountItems();
 }
 
-status_t VSTAddOn::GetFlavorAt( int32 idx,	const flavor_info **info) 
+status_t
+VSTAddOn::GetFlavorAt(int32 idx, const flavor_info** info) 
 {
-	if(idx < 0 || idx >= fPluginsList.CountItems())
+	if (idx < 0 || idx >= fPluginsList.CountItems())
 		return B_ERROR;
 		
 	VSTPlugin *plugin = (VSTPlugin*)fPluginsList.ItemAt(idx);	
@@ -89,33 +91,33 @@ status_t VSTAddOn::GetFlavorAt( int32 idx,	const flavor_info **info)
 }
 
 BMediaNode* 
-VSTAddOn::InstantiateNodeFor(const flavor_info *info, BMessage *config, 
-								  status_t *err) 
+VSTAddOn::InstantiateNodeFor(const flavor_info* info, BMessage* config,
+								  status_t* err)
 {
-	VSTPlugin *plugin = (VSTPlugin*)fPluginsList.ItemAt(info->internal_id);
-	VSTNode *node = new VSTNode(this, plugin->ModuleName(), plugin->Path());
+	VSTPlugin* plugin = (VSTPlugin*)fPluginsList.ItemAt(info->internal_id);
+	VSTNode* node = new VSTNode(this, plugin->ModuleName(), plugin->Path());
 	return node;
 }
 
 int
-VSTAddOn::ScanPluginsFolders(const char *path, bool make_dir)
+VSTAddOn::ScanPluginsFolders(const char* path, bool make_dir)
 {
 	BEntry ent;
 
 	BDirectory dir(path);
-	if(dir.InitCheck() != B_OK) {
+	if (dir.InitCheck() != B_OK) {
 		create_directory(path, 0755);
 		return 0;
 	}
 
 	while(dir.GetNextEntry(&ent) == B_OK) {
 		BPath p(&ent);
-		if(ent.IsDirectory()) {
+		if (ent.IsDirectory()) {
 			ScanPluginsFolders(p.Path());
 		} else {
-			VSTPlugin *plugin = new VSTPlugin();
+			VSTPlugin* plugin = new VSTPlugin();
 			int ret = plugin->LoadModule(p.Path());
-			if(ret == B_OK) {
+			if (ret == B_OK) {
 				plugin->UnLoadModule();
 				fPluginsList.AddItem(plugin);				
 			} else {
@@ -127,7 +129,7 @@ VSTAddOn::ScanPluginsFolders(const char *path, bool make_dir)
 }
 
 status_t 
-VSTAddOn::GetConfigurationFor(BMediaNode *node, BMessage *message)
+VSTAddOn::GetConfigurationFor(BMediaNode* node, BMessage* message)
 {
 	return B_OK;
 }
@@ -139,7 +141,7 @@ VSTAddOn::WantsAutoStart()
 }
 
 status_t 	
-VSTAddOn::AutoStart(int count, BMediaNode **node,	int32 *id, bool *more)
+VSTAddOn::AutoStart(int count, BMediaNode** node, int32* id, bool* more)
 { 
 	return B_OK; 
 }
