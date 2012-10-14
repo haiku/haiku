@@ -1,6 +1,6 @@
 #!/usr/bin/vmware
 config.version = "8"
-virtualHW.version = "3"
+virtualHW.version = "6"
 
 MemAllowAutoScaleDown = "false"
 MemTrimRate = "-1"
