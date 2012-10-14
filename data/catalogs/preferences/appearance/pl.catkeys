@@ -1,11 +1,11 @@
-1	polish	x-vnd.Haiku-Appearance	1933110481
+1	polish	x-vnd.Haiku-Appearance	670044279
 Plain font:	Font view		Zwykła czcionka:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
 Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
 Shadow	Colors tab		Cień
 On	AntialiasingSettingsView		Włącz
-Defaults	APRWindow		Ustaw jako domyślne
+Defaults	APRWindow		Ustaw domyślne
 Grayscale	AntialiasingSettingsView		Skala odcieni szarości
 Shine	Colors tab		Połysk
 About	DecorSettingsView		O
@@ -38,6 +38,7 @@ Colors	APRWindow		Kolory
 Control background	Colors tab		Tło kontrolki
 Inactive window tab	Colors tab		Nieaktywna zakładka okna
 Appearance	System name		Wygląd
+Use double scrollbar arrows	DecorSettingsView		Użyj podwójnych strzałek paska przewijania
 Fixed font:	Font view		Czcionka o stałej szerokości:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Koń i żółw grali w kości z piękną ćmą u źródła.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Zmniejszenie siły kolorowych filtrów krawędzi:

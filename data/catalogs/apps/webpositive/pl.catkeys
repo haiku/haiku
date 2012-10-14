@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	690423602
+1	polish	x-vnd.Haiku-WebPositive	3016944326
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -44,6 +44,7 @@ New window	WebPositive Window		Nowe okno
 Open	Download Window		Otwórz
 Reload	WebPositive Window		Odśwież 
 Downloads	Download Window		Pobierane
+Sans serif font:	Settings Window		Czcionka bezszeryfowa:
 Over %days days left	Download Window		Zostało ponad %days dni
 Forward	WebPositive Window		Dalej
 of	Download Window	...as in '12kB of 256kB'	z
@@ -58,8 +59,10 @@ Hide	Download Window		Ukryj
 Reset size	WebPositive Window		Resetuj rozmiar
 Find:	WebPositive Window		Znajdź:
 Increase size	WebPositive Window		Zwiększ rozmiar
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Wystąpił błąd podczas otwierania katalogu zakładek.\n\nBłąd: %error
 Over 1 day left	Download Window		Został ponad 1 dzień
 Downloads	WebPositive Window		Pobieranie
+Requesting %url	WebPositive Window		Odpytywanie %url
 Apply	Settings Window		Zastosuj
 Bookmark info	WebPositive Window		Informacje o zakładkach
 Size:	Font Selection view		Rozmiar:
@@ -71,6 +74,7 @@ Close	WebPositive Window		Zamknij
 OK	Download Window		OK
 Page source error	WebPositive Window		Błąd strony źródłowej
 Open blank page	Settings Window		Otwórz pustą stronę
+New tabs:	Settings Window		Nowa karta:
 Cancel	WebPositive Window		Anuluj
 Open all	WebPositive Window		Otwórz wszystko
 Clear	URL Bar		Wyczyść
@@ -85,6 +89,7 @@ Bookmarks	WebPositive Window		Zakładki
 Paste	URL Bar		Wklej
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Ukryj tekst hasła
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Zażółć gęślą jaźń.
 Over 1 minute left	Download Window		Została ponad 1 minuta
 Open start page	Settings Window		Otwórz stronę startową
 Continue downloads	WebPositive		Kontynuowanie pobierania
@@ -111,6 +116,7 @@ There was an error creating the bookmark file.\n\nError: %error	WebPositive Wind
 Bookmark error	WebPositive Window		Błąd zakładki
 Do you really want to clear the browsing history?	WebPositive Window		Na pewno chcesz wyczyścić całą historię przeglądania?
 Copy	WebPositive Window		Kopiuj
+Open bookmarks confirmation	WebPositive Window		Otwórz zatwierdzone zakładki
 Remove missing	Download Window		Usuń brakujące
 Clone current page	Settings Window		Sklonuj bieżącą stronę
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Czy naprawdę chcesz otworzyć wszystkie zakładki %addedCount na raz?
@@ -121,4 +127,4 @@ Manage bookmarks	WebPositive Window		Zarządzanie zakładkami
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Zakładka dla tej strony (%bookmarkName) już istnieje.
 New windows:	Settings Window		Nowe okna:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url załadowany
-Remove finished	Download Window		Usuwanie zakończone
+Remove finished	Download Window		Usuń zakończone
