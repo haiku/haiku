@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2012, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -64,10 +64,11 @@ protected:
 			void				MD5Digest(unsigned char *in, char *out);
 
 private:
-			status_t			_UniqueIDs();
+			status_t			_RetrieveUniqueIDs();
 			void				_ReadManifest();
 			void				_WriteManifest();
 
+private:
 			BString				fLog;
 			int32				fNumMessages;
 			size_t				fMailDropSize;

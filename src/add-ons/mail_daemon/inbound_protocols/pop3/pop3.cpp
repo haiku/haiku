@@ -1,12 +1,14 @@
 /*
- * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2012, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
  * Distributed under the terms of the MIT License.
  */
 
+
 //! POP3Protocol - implementation of the POP3 protocol
+
 
 #include "pop3.h"
 
@@ -46,8 +48,12 @@
 #define B_TRANSLATION_CONTEXT "pop3"
 
 
-static void NotHere(BStringList &that, BStringList &otherList,
-	BStringList *results)
+#define POP3_RETRIEVAL_TIMEOUT 60000000
+#define CRLF	"\r\n"
+
+
+static void
+NotHere(BStringList& that, BStringList& otherList, BStringList* results)
 {
 	for (int32 i = 0; i < otherList.CountStrings(); i++) {
 		if (!that.HasString(otherList.StringAt(i)))
@@ -56,8 +62,7 @@ static void NotHere(BStringList &that, BStringList &otherList,
 }
 
 
-#define POP3_RETRIEVAL_TIMEOUT 60000000
-#define CRLF	"\r\n"
+// #pragma mark -
 
 
 POP3Protocol::POP3Protocol(BMailAccountSettings* settings)
@@ -92,8 +97,8 @@ POP3Protocol::~POP3Protocol()
 status_t
 POP3Protocol::Connect()
 {
-	status_t error = Open(fSettings.FindString("server"), fSettings.FindInt32("port"),
-				fSettings.FindInt32("flavor"));
+	status_t error = Open(fSettings.FindString("server"),
+		fSettings.FindInt32("port"), fSettings.FindInt32("flavor"));
 	if (error != B_OK)
 		return error;
 
@@ -147,7 +152,7 @@ POP3Protocol::SyncMessages()
 	}
 
 	ReportProgress(0, 1, B_TRANSLATE("Getting UniqueIDs" B_UTF8_ELLIPSIS));
-	error = _UniqueIDs();
+	error = _RetrieveUniqueIDs();
 	if (error < B_OK) {
 		ResetProgress();
 		Disconnect();
@@ -226,9 +231,8 @@ POP3Protocol::SyncMessages()
 		ReportProgress(0, 1);
 
 		if (file.WriteAttr("MAIL:unique_id", B_STRING_TYPE, 0, uid,
-			strlen(uid)) < 0) {
+				strlen(uid)) < 0)
 			error = B_ERROR;
-		}
 
 		file.WriteAttr("MAIL:size", B_INT32_TYPE, 0, &size, sizeof(int32));
 
@@ -255,7 +259,7 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 	if (error < B_OK)
 		return error;
 
-	error = _UniqueIDs();
+	error = _RetrieveUniqueIDs();
 	if (error < B_OK) {
 		Disconnect();
 		return error;
@@ -314,7 +318,7 @@ POP3Protocol::DeleteMessage(const entry_ref& ref)
 	if (error < B_OK)
 		return error;
 
-	error = _UniqueIDs();
+	error = _RetrieveUniqueIDs();
 	if (error < B_OK) {
 		Disconnect();
 		return error;
@@ -380,7 +384,7 @@ POP3Protocol::Open(const char* server, int port, int)
 			BNetworkAddress(server, port));
 	} else {
 		fServerConnection = new(std::nothrow) BSocket(BNetworkAddress(
-			server,	port));
+			server, port));
 	}
 
 	if (fServerConnection == NULL)
@@ -416,22 +420,19 @@ POP3Protocol::Open(const char* server, int port, int)
 
 
 status_t
-POP3Protocol::Login(const char *uid, const char *password, int method)
+POP3Protocol::Login(const char* uid, const char* password, int method)
 {
 	status_t err;
 
-	BString error_msg, userString;
-	error_msg << B_TRANSLATE("Error while authenticating user %user");
-
-	userString << uid;
-	error_msg.ReplaceFirst("%user", userString);
+	BString errorMessage(B_TRANSLATE("Error while authenticating user %user"));
+	errorMessage.ReplaceFirst("%user", uid);
 
 	if (method == 1) {	//APOP
 		int32 index = fLog.FindFirst("<");
 		if(index != B_ERROR) {
 			ReportProgress(0, 0, B_TRANSLATE("Sending APOP authentication"
 				B_UTF8_ELLIPSIS));
-			int32 end = fLog.FindFirst(">",index);
+			int32 end = fLog.FindFirst(">", index);
 			BString timestamp("");
 			fLog.CopyInto(timestamp, index, end - index + 1);
 			timestamp += password;
@@ -445,15 +446,15 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 
 			err = SendCommand(cmd.String());
 			if (err != B_OK) {
-				error_msg << B_TRANSLATE(". The server said:\n") << fLog;
-				ShowError(error_msg.String());
+				errorMessage << B_TRANSLATE(". The server said:\n") << fLog;
+				ShowError(errorMessage.String());
 				return err;
 			}
 
 			return B_OK;
 		} else {
-			error_msg << B_TRANSLATE(": The server does not support APOP.");
-			ShowError(error_msg.String());
+			errorMessage << B_TRANSLATE(": The server does not support APOP.");
+			ShowError(errorMessage.String());
 			return B_NOT_ALLOWED;
 		}
 	}
@@ -465,8 +466,8 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 
 	err = SendCommand(cmd.String());
 	if (err != B_OK) {
-		error_msg << B_TRANSLATE(". The server said:\n") << fLog;
-		ShowError(error_msg.String());
+		errorMessage << B_TRANSLATE(". The server said:\n") << fLog;
+		ShowError(errorMessage.String());
 		return err;
 	}
 
@@ -477,8 +478,8 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 
 	err = SendCommand(cmd.String());
 	if (err != B_OK) {
-		error_msg << B_TRANSLATE(". The server said:\n") << fLog;
-		ShowError(error_msg.String());
+		errorMessage << B_TRANSLATE(". The server said:\n") << fLog;
+		ShowError(errorMessage.String());
 		return err;
 	}
 
@@ -494,9 +495,10 @@ POP3Protocol::Stat()
 	if (SendCommand("STAT" CRLF) < B_OK)
 		return B_ERROR;
 
-	int32 messages, dropSize;
+	int32 messages;
+	int32 dropSize;
 	if (sscanf(fLog.String(), "+OK %" B_SCNd32" %" B_SCNd32, &messages,
-		&dropSize) < 2)
+			&dropSize) < 2)
 		return B_ERROR;
 
 	fNumMessages = messages;
@@ -530,10 +532,10 @@ void
 POP3Protocol::CheckForDeletedMessages()
 {
 	{
-		//---Delete things from the manifest no longer on the server
-		BStringList temp;
-		NotHere(fUniqueIDs, fManifest, &temp);
-		fManifest.Remove(temp);
+		// Delete things from the manifest no longer on the server
+		BStringList list;
+		NotHere(fUniqueIDs, fManifest, &list);
+		fManifest.Remove(list);
 	}
 
 	if (!fSettings.FindBool("delete_remote_when_local")
@@ -580,42 +582,42 @@ POP3Protocol::CheckForDeletedMessages()
 
 
 status_t
-POP3Protocol::Retrieve(int32 message, BPositionIO *write_to)
+POP3Protocol::Retrieve(int32 message, BPositionIO* to)
 {
-	status_t returnCode;
 	BString cmd;
 	cmd << "RETR " << message + 1 << CRLF;
-	returnCode = RetrieveInternal(cmd.String(), message, write_to, true);
-	ReportProgress(0 /* bytes */, 1 /* messages */);
+	status_t status = RetrieveInternal(cmd.String(), message, to, true);
+	ReportProgress(0, 1);
 
-	if (returnCode == B_OK) { // Some debug code.
-		int32 message_len = MessageSize(message);
- 		write_to->Seek (0, SEEK_END);
-		if (write_to->Position() != message_len) {
-			printf ("POP3Protocol::Retrieve Note: message size is %" B_PRIdOFF
-				", was expecting %" B_PRId32 ", for message #%" B_PRId32 ".  "
-				"Could be a transmission error or a bad POP server "
+	if (status == B_OK) {
+		// Check if the actual message size matches the expected one
+		int32 size = MessageSize(message);
+ 		to->Seek(0, SEEK_END);
+		if (to->Position() != size) {
+			printf("POP3Protocol::Retrieve Note: message size is %" B_PRIdOFF
+				", was expecting %" B_PRId32 ", for message #%" B_PRId32
+				".  Could be a transmission error or a bad POP server "
 				"implementation (does it remove escape codes when it counts "
-				"size?).\n", write_to->Position(), message_len, message);
+				"size?).\n", to->Position(), size, message);
 		}
 	}
 
-	return returnCode;
+	return status;
 }
 
 
 status_t
-POP3Protocol::GetHeader(int32 message, BPositionIO *write_to)
+POP3Protocol::GetHeader(int32 message, BPositionIO* to)
 {
 	BString cmd;
 	cmd << "TOP " << message + 1 << " 0" << CRLF;
-	return RetrieveInternal(cmd.String(),message,write_to, false);
+	return RetrieveInternal(cmd.String(), message, to, false);
 }
 
 
 status_t
-POP3Protocol::RetrieveInternal(const char *command, int32 message,
-	BPositionIO *write_to, bool post_progress)
+POP3Protocol::RetrieveInternal(const char* command, int32 message,
+	BPositionIO* to, bool postProgress)
 {
 	const int bufSize = 1024 * 30;
 
@@ -629,14 +631,14 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		amountToReceive = bufSize - 1;
 
 	BString bufBString; // Used for auto-dealloc on return feature.
-	char *buf = bufBString.LockBuffer (bufSize);
+	char* buf = bufBString.LockBuffer(bufSize);
 	int amountInBuffer = 0;
 	int amountReceived;
 	int testIndex;
-	char *testStr;
+	char* testStr;
 	bool cont = true;
 	bool flushWholeBuffer = false;
-	write_to->Seek(0,SEEK_SET);
+	to->Seek(0, SEEK_SET);
 
 	if (SendCommand(command) != B_OK)
 		return B_ERROR;
@@ -656,8 +658,8 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 			amountToReceive);
 
 		if (amountReceived < 0) {
-			fLog = strerror(errno);
-			return errno;
+			fLog = strerror(amountReceived);
+			return amountReceived;
 		}
 		if (amountReceived == 0) {
 			fLog = "POP3 data supposedly ready to receive but not received!";
@@ -719,16 +721,17 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 			// comparison continuity, in case the line starting with a period
 			// crosses a buffer boundary.
 			if (amountInBuffer > 4) {
-				write_to->Write(buf, amountInBuffer - 4);
-				if (post_progress)
-					ReportProgress(amountInBuffer - 4,0);
+				to->Write(buf, amountInBuffer - 4);
+				if (postProgress)
+					ReportProgress(amountInBuffer - 4, 0);
 				memmove (buf, buf + amountInBuffer - 4, 4);
 				amountInBuffer = 4;
 			}
-		} else { // Dump everything - end of message or flushing the whole buffer.
-			write_to->Write(buf, amountInBuffer);
-			if (post_progress)
-				ReportProgress(amountInBuffer,0);
+		} else {
+			// Dump everything - end of message or flushing the whole buffer.
+			to->Write(buf, amountInBuffer);
+			if (postProgress)
+				ReportProgress(amountInBuffer, 0);
 			amountInBuffer = 0;
 		}
 	}
@@ -747,9 +750,9 @@ POP3Protocol::Delete(int32 num)
 #if DEBUG
 	puts(fLog.String());
 #endif
-	/* The mail is just marked as deleted and removed from the server when
-	sending the QUIT command. Because of that the message number stays the same
-	and we keep the uid in the uid list. */
+	// The mail is just marked as deleted and removed from the server when
+	// sending the QUIT command. Because of that the message number stays
+	// the same and we keep the uid in the uid list.
 }
 
 
@@ -761,7 +764,7 @@ POP3Protocol::MessageSize(int32 index)
 
 
 int32
-POP3Protocol::ReceiveLine(BString &line)
+POP3Protocol::ReceiveLine(BString& line)
 {
 	int32 len = 0;
 	bool flag = false;
@@ -780,9 +783,9 @@ POP3Protocol::ReceiveLine(BString &line)
 
 		bytesReceived = fServerConnection->Read((char*)&c, 1);
 		if (bytesReceived < 0)
-			return errno;
+			return bytesReceived;
 
-		if (c == '\n' || bytesReceived == 0 /* EOF */)
+		if (c == '\n' || bytesReceived == 0)
 			break;
 
 		if (c == '\r') {
@@ -805,25 +808,19 @@ POP3Protocol::ReceiveLine(BString &line)
 status_t
 POP3Protocol::SendCommand(const char* cmd)
 {
-	//printf(cmd);
 	// Flush any accumulated garbage data before we send our command, so we
 	// don't misinterrpret responses from previous commands (that got left over
 	// due to bugs) as being from this command.
-
 	while (fServerConnection->WaitForReadable(1000) == B_OK) {
-		int amountReceived;
-		char tempString [1024];
-
-		amountReceived = fServerConnection->Read(tempString,
-			sizeof(tempString) - 1);
+		char buffer[4096];
+		ssize_t amountReceived = fServerConnection->Read(buffer,
+			sizeof(buffer) - 1);
 		if (amountReceived < 0)
-			return errno;
+			return amountReceived;
 
-		tempString [amountReceived] = 0;
-		printf ("POP3Protocol::SendCommand Bug!  Had to flush %d bytes: %s\n",
-			amountReceived, tempString);
-		//if (amountReceived == 0)
-		//	break;
+		buffer[amountReceived] = 0;
+		printf("POP3Protocol::SendCommand Bug! Had to flush %" B_PRIdSSIZE
+			" bytes: %s\n", amountReceived, buffer);
 	}
 
 	if (fServerConnection->Write(cmd, ::strlen(cmd)) < 0) {
@@ -834,28 +831,21 @@ POP3Protocol::SendCommand(const char* cmd)
 	}
 
 	fLog = "";
-	status_t err = B_OK;
+	int32 length = ReceiveLine(fLog);
+	if (length <= 0 || fLog.ICompare("+OK", 3) == 0)
+		return B_OK;
 
-	while (true) {
-		int32 len = ReceiveLine(fLog);
-		if (len <= 0 || fLog.ICompare("+OK", 3) == 0)
-			break;
-
-		if (fLog.ICompare("-ERR", 4) == 0) {
-			printf("POP3Protocol::SendCommand \"%s\" got error message "
-				"from server: %s\n", cmd, fLog.String());
-			err = B_ERROR;
-			break;
-		} else {
-			printf("POP3Protocol::SendCommand \"%s\" got nonsense message "
-				"from server: %s\n", cmd, fLog.String());
-			err = B_BAD_VALUE;
-				// If it's not +OK, and it's not -ERR, then what the heck
-				// is it? Presume an error
-			break;
-		}
+	if (fLog.ICompare("-ERR", 4) == 0) {
+		printf("POP3Protocol::SendCommand \"%s\" got error message "
+			"from server: %s\n", cmd, fLog.String());
+		return B_ERROR;
 	}
-	return err;
+
+	printf("POP3Protocol::SendCommand \"%s\" got nonsense message "
+		"from server: %s\n", cmd, fLog.String());
+	return B_BAD_DATA;
+		// If it's not +OK, and it's not -ERR, then what the heck
+		// is it? Presume an error
 }
 
 
@@ -883,7 +873,7 @@ POP3Protocol::MD5Digest(unsigned char *in, char *asciiDigest)
 
 
 status_t
-POP3Protocol::_UniqueIDs()
+POP3Protocol::_RetrieveUniqueIDs()
 {
 	fUniqueIDs.MakeEmpty();
 
@@ -928,9 +918,9 @@ void
 POP3Protocol::_ReadManifest()
 {
 	fManifest.MakeEmpty();
-	BString attr_name = "MAIL:";
-	attr_name << fAccountSettings.AccountID() << ":manifest";
-	//--- In case someone puts multiple accounts in the same directory
+	BString attribute = "MAIL:";
+	attribute << fAccountSettings.AccountID() << ":manifest";
+		// In case someone puts multiple accounts in the same directory
 
 	BNode node(fDestinationDir);
 	if (node.InitCheck() != B_OK)
@@ -941,15 +931,11 @@ POP3Protocol::_ReadManifest()
 	// be found on the first run as it will be later created by
 	// the INBOX system filter.
 	attr_info info;
-	/*status_t status = node.GetAttrInfo(attr_name.String(), &info);
-	printf("read manifest3 status %i\n", (int)status);
-	status = node.GetAttrInfo(attr_name.String(), &info);
-	printf("read manifest3 status2 %i\n", (int)status);*/
-	if (node.GetAttrInfo(attr_name.String(), &info) != B_OK)
+	if (node.GetAttrInfo(attribute.String(), &info) != B_OK || info.size == 0)
 		return;
 
 	void* flatmanifest = malloc(info.size);
-	node.ReadAttr(attr_name.String(), fManifest.TypeCode(), 0,
+	node.ReadAttr(attribute.String(), fManifest.TypeCode(), 0,
 		flatmanifest, info.size);
 	fManifest.Unflatten(fManifest.TypeCode(), flatmanifest, info.size);
 	free(flatmanifest);
@@ -959,9 +945,9 @@ POP3Protocol::_ReadManifest()
 void
 POP3Protocol::_WriteManifest()
 {
-	BString attr_name = "MAIL:";
-	attr_name << fAccountSettings.AccountID() << ":manifest";
-		//--- In case someone puts multiple accounts in the same directory
+	BString attribute = "MAIL:";
+	attribute << fAccountSettings.AccountID() << ":manifest";
+		// In case someone puts multiple accounts in the same directory
 	BNode node(fDestinationDir);
 	if (node.InitCheck() != B_OK) {
 		ShowError("Error while saving account manifest: cannot use "
@@ -969,11 +955,11 @@ POP3Protocol::_WriteManifest()
 		return;
 	}
 
-	node.RemoveAttr(attr_name.String());
+	node.RemoveAttr(attribute.String());
 	ssize_t manifestsize = fManifest.FlattenedSize();
 	void* flatmanifest = malloc(manifestsize);
 	fManifest.Flatten(flatmanifest, manifestsize);
-	status_t err = node.WriteAttr(attr_name.String(),
+	status_t err = node.WriteAttr(attribute.String(),
 		fManifest.TypeCode(), 0, flatmanifest, manifestsize);
 	if (err < 0) {
 		BString error = "Error while saving account manifest: ";
