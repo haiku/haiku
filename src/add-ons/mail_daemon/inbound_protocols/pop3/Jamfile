@@ -12,7 +12,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 local sources =
 	ConfigView.cpp
 	MessageIO.cpp
-	pop3.cpp
+	POP3.cpp
 	md5c.c
 ;
 
@@ -42,5 +42,5 @@ DoCatalogs POP3 :
 	x-vnd.Haiku-POP3
 	:
 	ConfigView.cpp
-	pop3.cpp
+	POP3.cpp
 ;

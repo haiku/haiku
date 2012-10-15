@@ -10,7 +10,7 @@
 //! POP3Protocol - implementation of the POP3 protocol
 
 
-#include "pop3.h"
+#include "POP3.h"
 
 #include <errno.h>
 #include <netdb.h>

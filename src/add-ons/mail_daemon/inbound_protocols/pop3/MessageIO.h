@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2012, Haiku, Inc. All rights reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  */
 #ifndef MAIL_MESSAGE_IO_H
@@ -10,7 +10,7 @@
 #include <Message.h>
 #include <Path.h>
 
-#include "pop3.h"
+#include "POP3.h"
 
 
 class BMailMessageIO : public BPositionIO {
@@ -19,7 +19,6 @@ public:
 									BPositionIO* dumpTo, int32 messageID);
 								~BMailMessageIO();
 
-		//----BPositionIO
 	virtual	ssize_t				ReadAt(off_t pos, void* buffer,
 									size_t amountToRead);
 	virtual	ssize_t				WriteAt(off_t pos, const void* buffer,
