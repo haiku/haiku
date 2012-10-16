@@ -10,8 +10,7 @@
 #define MAX_CHANNELS 8
 #define EQ_BANDS 10
 
-class Equalizer
-{
+class Equalizer {
 public:
 			Equalizer();
 			~Equalizer();

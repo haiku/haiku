@@ -10,8 +10,7 @@
 #include <MediaAddOn.h>
 #include "VSTHost.h"
 
-class VSTAddOn : public BMediaAddOn 
-{
+class VSTAddOn : public BMediaAddOn {
 public:
 	virtual		 			~VSTAddOn();
 	explicit 				VSTAddOn(image_id image);

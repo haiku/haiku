@@ -23,7 +23,8 @@ VSTNode::~VSTNode()
 }
 
 VSTNode::VSTNode(BMediaAddOn* addon, const char* name, const char* path)
-				: BMediaNode(name),
+				:
+				BMediaNode(name),
 				BBufferConsumer(B_MEDIA_RAW_AUDIO),
 				BBufferProducer(B_MEDIA_RAW_AUDIO),
 				BControllable(),
@@ -41,9 +42,8 @@ VSTNode::VSTNode(BMediaAddOn* addon, const char* name, const char* path)
 BMediaAddOn* 
 VSTNode::AddOn(int32* id) const 
 {
-	if(fAddOn) {
+	if(fAddOn)
 		*id = 0;
-	}
 	return fAddOn;
 }
 
@@ -100,10 +100,8 @@ status_t
 VSTNode::GetParameterValue(int32 id, bigtime_t* lastChangeTime, void* value,
 	size_t *size)
 {
-	if (*size < sizeof(float) ||
-	    *size < sizeof(int32)) {
+	if (*size < sizeof(float) || *size < sizeof(int32))
 		return B_NO_MEMORY;
-	}
 
 	type_code v_type = B_FLOAT_TYPE;
 	
@@ -130,12 +128,13 @@ VSTNode::GetParameterValue(int32 id, bigtime_t* lastChangeTime, void* value,
 		int32 idx = id - P_PARAM;
 		if (idx >= 0 && idx < fPlugin->ParametersCount()) {
 			VSTParameter *param = fPlugin->Parameter(idx);
-			if (v_type == B_FLOAT_TYPE) {
+
+			if (v_type == B_FLOAT_TYPE)
 				*(float*)value = param->Value();
-			}
-			if (v_type == B_INT32_TYPE) {
+
+			if (v_type == B_INT32_TYPE)
 				*(int32*)value = (int32)ceil(param->Value());
-			}
+
 			*lastChangeTime = param->LastChangeTime();
 			return B_OK;
 		}
@@ -178,20 +177,18 @@ VSTNode::BufferReceived(BBuffer* buffer)
 	status_t err = SendBuffer(buffer, fOutputMedia.source,
 		fOutputMedia.destination);
 		
-	if (err < B_OK) {
+	if (err < B_OK)
 		buffer->Recycle();
-	}
 }
 
 status_t 
 VSTNode::AcceptFormat(const media_destination &dst, media_format* format)
 {
-	if (dst != fInputMedia.destination) {
+	if (dst != fInputMedia.destination)
 		return B_MEDIA_BAD_DESTINATION;
-	}
-	if (format->type != B_MEDIA_RAW_AUDIO) {
+
+	if (format->type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
-	}
 
 	ValidateFormat(
 		(fFormat.u.raw_audio.format != media_raw_audio_format::wildcard.format) ?
@@ -203,9 +200,9 @@ VSTNode::AcceptFormat(const media_destination &dst, media_format* format)
 status_t 
 VSTNode::GetNextInput(int32* cookie, media_input* input)
 {
-	if (*cookie) {
+	if (*cookie)
 		return B_BAD_INDEX;
-	}
+
 	++*cookie;
 	*input = fInputMedia;
 	return B_OK;
@@ -227,18 +224,16 @@ void
 VSTNode::ProducerDataStatus(const media_destination &dst, int32 status,
 	bigtime_t when)
 {
-	if (fOutputMedia.destination != media_destination::null) {
+	if (fOutputMedia.destination != media_destination::null)
 		SendDataStatus(status, fOutputMedia.destination, when);
-	}
 }
 
 status_t 
 VSTNode::GetLatencyFor( const media_destination &dst, bigtime_t* latency,
 	media_node_id* outTimeSource)
 {
-	if (dst != fInputMedia.destination) {
+	if (dst != fInputMedia.destination)
 		return B_MEDIA_BAD_DESTINATION;
-	}
 
 	*latency = fDownstreamLatency + fProcessLatency;
 	*outTimeSource = TimeSource()->ID();
@@ -250,12 +245,11 @@ VSTNode::Connected(const media_source& source,
 	const media_destination& destination, const media_format& format,
 	media_input* input)
 {
-	if (destination != fInputMedia.destination) {
+	if (destination != fInputMedia.destination)
 		return B_MEDIA_BAD_DESTINATION;
-	}
-	if (fInputMedia.source != media_source::null) {
+
+	if (fInputMedia.source != media_source::null)
 		return B_MEDIA_ALREADY_CONNECTED;
-	}
 
 	fInputMedia.source = source;
 	fInputMedia.format = format;
@@ -268,13 +262,14 @@ VSTNode::Connected(const media_source& source,
 void 
 VSTNode::Disconnected(const media_source &src, const media_destination &dst)
 {
-	if(fInputMedia.source!=src || dst!=fInputMedia.destination) {
+	if(fInputMedia.source!=src || dst!=fInputMedia.destination)
 		return;
-	}
+	
 	fInputMedia.source = media_source::null;
-	if(fOutputMedia.destination == media_destination::null) {
+	
+	if(fOutputMedia.destination == media_destination::null)
 		fFormat.u.raw_audio = media_raw_audio_format::wildcard;
-	}
+		
 	fInputMedia.format = fFormat;
 }
 
@@ -283,28 +278,25 @@ status_t
 VSTNode::FormatSuggestionRequested(media_type type, int32 quality,
 	media_format* format)
 {
-	if (type != B_MEDIA_RAW_AUDIO) {
+	if (type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
-	}
 
-	if (fFormat.u.raw_audio.format != media_raw_audio_format::wildcard.format) {
+	if (fFormat.u.raw_audio.format != media_raw_audio_format::wildcard.format)
 		*format = fFormat;	
-	} else {
+	else
 		*format = fPreferredFormat;
-	}
+		
 	return B_OK;
 }
 
 status_t 
 VSTNode::FormatProposal(const media_source &src, media_format* format)
 {
-	if (src != fOutputMedia.source) {
+	if (src != fOutputMedia.source)
 		return B_MEDIA_BAD_SOURCE;
-	}
 
-	if (format->type != B_MEDIA_RAW_AUDIO) {
+	if (format->type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
-	}
 
 	ValidateFormat(
 		(fFormat.u.raw_audio.format != media_raw_audio_format::wildcard.format) ?
@@ -324,18 +316,18 @@ void
 VSTNode::LateNoticeReceived(const media_source &src, 
 	bigtime_t late, bigtime_t when)
 {
-	if (src != fOutputMedia.source || fInputMedia.source == media_source::null) {
+	if (src != fOutputMedia.source || fInputMedia.source == media_source::null)
 		return;
-	}	
+
 	NotifyLateProducer(fInputMedia.source, late, when);
 }
 
 status_t
 VSTNode::GetNextOutput(int32 *cookie, media_output* output)
 {
-	if (*cookie) {
+	if (*cookie)
 		return B_BAD_INDEX;
-	}
+
 	++*cookie;
 	*output = fOutputMedia;
 	return B_OK;
@@ -353,12 +345,12 @@ VSTNode::SetBufferGroup(const media_source &src, BBufferGroup* group)
 	status_t ret;
 	int32 changeTag;
 
-	if (src != fOutputMedia.source) {
+	if (src != fOutputMedia.source)
 		return B_MEDIA_BAD_SOURCE;
-	}
-	if (fInputMedia.source == media_source::null) {
+
+	if (fInputMedia.source == media_source::null)
 		return B_ERROR;
-	}
+
 	ret = SetOutputBuffersFor(fInputMedia.source, fInputMedia.destination,
 		group, 0, &changeTag);
 		
@@ -371,25 +363,21 @@ VSTNode::PrepareToConnect( const media_source &src, const media_destination &dst
 {
 	status_t ret = B_OK;
 	
-	if (src != fOutputMedia.source) {
+	if (src != fOutputMedia.source)
 		return B_MEDIA_BAD_SOURCE;
-	}
 
-	if (format->type != B_MEDIA_RAW_AUDIO) {
+	if (format->type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
-	}
 	
-	if (fOutputMedia.destination != media_destination::null) {
+	if (fOutputMedia.destination != media_destination::null)
 		return B_MEDIA_ALREADY_CONNECTED;
-	}
 
 	ret = ValidateFormat(
 		(fFormat.u.raw_audio.format != media_raw_audio_format::wildcard.format) ?
 		fFormat : fPreferredFormat, *format);
 	
-	if (ret < B_OK) {
+	if (ret < B_OK)
 		return ret;
-	}
 
 	SetOutputFormat(*format);
 
@@ -445,19 +433,16 @@ VSTNode::Connect(status_t status, const media_source &src,
 void 
 VSTNode::Disconnect(const media_source &src, const media_destination &dst) 
 {
-	if (src != fOutputMedia.source) {
+	if (src != fOutputMedia.source)
 		return;
-	}
 
-	if (dst != fOutputMedia.destination) {
+	if (dst != fOutputMedia.destination)
 		return;
-	}
 
 	fOutputMedia.destination = media_destination::null;
 
-	if (fInputMedia.source == media_source::null) {
+	if (fInputMedia.source == media_source::null)
 		fFormat.u.raw_audio = media_raw_audio_format::wildcard;
-	}
 
 	fOutputMedia.format = fFormat;
 }
@@ -465,9 +450,9 @@ VSTNode::Disconnect(const media_source &src, const media_destination &dst)
 void 
 VSTNode::EnableOutput(const media_source &src, bool enabled, int32* _deprecated_)
 {
-	if (src != fOutputMedia.source) {
+	if (src != fOutputMedia.source)
 		return;
-	}
+		
 	fOutputMediaEnabled = enabled;
 }
 
@@ -482,9 +467,8 @@ void
 VSTNode::LatencyChanged(const media_source &src, const media_destination &dst,
 	bigtime_t latency, uint32 flags)
 {
-	if (src != fOutputMedia.source || dst != fOutputMedia.destination) {
+	if (src != fOutputMedia.source || dst != fOutputMedia.destination)
 		return;
-	}
 
 	fDownstreamLatency = latency;
 	SetEventLatency(fDownstreamLatency + fProcessLatency);
@@ -507,9 +491,8 @@ void
 VSTNode::HandleEvent(const media_timed_event *event, bigtime_t late,
 	bool realTime)
 {	
-	if(event->type == BTimedEventQueue::B_PARAMETER) {
+	if(event->type == BTimedEventQueue::B_PARAMETER)
 		ParameterEventProcessing(event);
-	}
 }
 
 void 
@@ -535,7 +518,7 @@ VSTNode::ParameterEventProcessing(const media_timed_event* event)
 	
 	if (v_type == B_FLOAT_TYPE)
 		value = *((float*)event->pointer);
-	if (v_type == B_INT32_TYPE) {		
+	if (v_type == B_INT32_TYPE) {
 		value32 = *((int32*)event->pointer);
 		value = (float)value32;
 	}
@@ -574,40 +557,35 @@ VSTNode::ValidateFormat(const media_format &preferredFormat,
 	const media_raw_audio_format &pref = preferredFormat.u.raw_audio;
 
 	if(pref.frame_rate != wild.frame_rate && f.frame_rate != pref.frame_rate) {
-		if(f.frame_rate != wild.frame_rate) {
+		if(f.frame_rate != wild.frame_rate)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.frame_rate = pref.frame_rate;
 	}
 
 	if(pref.channel_count != wild.channel_count &&
 		f.channel_count != pref.channel_count) {
-		if(f.channel_count != wild.channel_count) {
+		if(f.channel_count != wild.channel_count)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.channel_count = pref.channel_count;
 	}
 
 	if(pref.format != wild.format && f.format != pref.format) {
-		if(f.format != wild.format) {
+		if(f.format != wild.format)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.format = pref.format;
 	}
 
 	if(pref.byte_order != wild.byte_order &&
 		f.byte_order != pref.byte_order) {
-		if(f.byte_order != wild.byte_order) {
+		if(f.byte_order != wild.byte_order)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.byte_order = pref.byte_order;
 	}
 
 	if(pref.buffer_size != wild.buffer_size &&
 		f.buffer_size != pref.buffer_size) {
-		if(f.buffer_size != wild.buffer_size) {
+		if(f.buffer_size != wild.buffer_size)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.buffer_size = pref.buffer_size;
 	}
 	
@@ -621,26 +599,26 @@ VSTNode::SetOutputFormat(media_format &format)
 	media_raw_audio_format &f = format.u.raw_audio;
 	media_raw_audio_format &w = media_raw_audio_format::wildcard;
 
-	if (f.frame_rate == w.frame_rate) {
+	if (f.frame_rate == w.frame_rate)
 		f.frame_rate = 44100.0;
-	}
+		
 	if (f.channel_count == w.channel_count) {
-		if(fInputMedia.source != media_source::null) {
+		if(fInputMedia.source != media_source::null)
 			f.channel_count = fInputMedia.format.u.raw_audio.channel_count;
-		} else {
+		else
 			f.channel_count = fPlugin->Channels(VST_OUTPUT_CHANNELS);
-		}
 	}
-	if (f.format == w.format) {
+
+	if (f.format == w.format)
 		f.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	}
+
 	if (f.byte_order == w.format) {
 		f.byte_order = (B_HOST_IS_BENDIAN) ?
 			B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
 	}
-	if (f.buffer_size == w.buffer_size) {
+	
+	if (f.buffer_size == w.buffer_size)
 		f.buffer_size = BUFF_SIZE;
-	}
 }
 
 void 
@@ -744,29 +722,29 @@ VSTNode::InitParameterWeb()
 						B_MEDIA_NO_TYPE, str.String(), B_GENERIC);	
 
 	str.SetTo("Effect name: ");
-	if (strlen(fPlugin->EffectName()) != 0) {
+	if (strlen(fPlugin->EffectName()) != 0)
 		str.Append(fPlugin->EffectName());
-	} else {
+	else
 		str.Append("not specified");
-	}	
+
 	label = fAboutGroup->MakeNullParameter(P_ABOUT + 1, 
 						B_MEDIA_NO_TYPE, str.String(), B_GENERIC);
 	
 	str.SetTo("Vendor: ");
-	if (strlen(fPlugin->Vendor()) != 0) {
+	if (strlen(fPlugin->Vendor()) != 0)
 		str.Append(fPlugin->Vendor());
-	} else {
+	else
 		str.Append("not specified");
-	}		
+		
 	label = fAboutGroup->MakeNullParameter(P_ABOUT + 2, 
 						B_MEDIA_NO_TYPE, str.String(), B_GENERIC);
 	
 	str.SetTo("Product: ");
-	if (strlen(fPlugin->Product()) != 0) {
+	if (strlen(fPlugin->Product()) != 0)
 		str.Append(fPlugin->Product());
-	} else {
+	else
 		str.Append("not specified");
-	}
+
 	label = fAboutGroup->MakeNullParameter(P_ABOUT + 3,
 						B_MEDIA_NO_TYPE, str.String(), B_GENERIC);
 
@@ -796,9 +774,8 @@ VSTNode::InitFilter()
 bigtime_t 
 VSTNode::GetFilterLatency()
 {
-	if (fOutputMedia.destination == media_destination::null) {
+	if (fOutputMedia.destination == media_destination::null)
 		return 0LL;
-	}
 
 	BBufferGroup* temp_group =
 		new BBufferGroup(fOutputMedia.format.u.raw_audio.buffer_size, 1);

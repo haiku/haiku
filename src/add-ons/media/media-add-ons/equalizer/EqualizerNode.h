@@ -32,8 +32,7 @@ class BBufferGroup;
 class EqualizerNode : public	BBufferConsumer,
 					 public	BBufferProducer,
 					 public	BControllable,
-					 public	BMediaEventLooper 
-{	
+					 public	BMediaEventLooper {	
 public:
 	virtual 				~EqualizerNode();
 							EqualizerNode(BMediaAddOn* pAddOn = NULL);
