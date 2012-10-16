@@ -55,9 +55,9 @@ Equalizer::PreAmp(void)
 void
 Equalizer::SetBand(int band, double value)
 {	
-	if (band < 0 || band >= BandCount()) {
+	if (band < 0 || band >= BandCount())
 		return;
-	}
+
 	fBands[band] = value;
 	RecalcGains();
 }
@@ -65,9 +65,9 @@ Equalizer::SetBand(int band, double value)
 double
 Equalizer::Band(int band)
 {
-	if (band < 0 || band >= BandCount()) {
+	if (band < 0 || band >= BandCount())
 		return 0.0;
-	}
+
 	return fBands[band];
 }
 
@@ -80,18 +80,17 @@ Equalizer::BandCount(void)
 float
 Equalizer::BandFrequency(int band)
 {
-	if (band < 0 || band >= BandCount()) {
+	if (band < 0 || band >= BandCount())
 		return 0.0;
-	}	
+
 	return fFrequency[band];
 }
 
 void
 Equalizer::ProcessBuffer(float* buffer, int samples)
 {
-   if (!fActivated || samples <= 0) {
+   if (!fActivated || samples <= 0)
         return;
-   }
 
    for(int i = 0; i < fChannels; i++) {
 		float *g = fGainVector[i];
@@ -130,15 +129,14 @@ void
 Equalizer::RecalcGains(void)
 {
     float adjust[EQ_BANDS];
-    for(int i = 0; i < BandCount(); i++) {
+    
+    for(int i = 0; i < BandCount(); i++)
         adjust[i] = fPreAmp + fBands[i];
-    }
 
-    for(int c = 0; c < MAX_CHANNELS; c++) {
-    	for(int i = 0; i<BandCount(); i++) {
+    for(int c = 0; c < MAX_CHANNELS; c++)
+    	for(int i = 0; i<BandCount(); i++)
      	   fGainVector[c][i] = pow(10, adjust[i] / 20) - 1;
-    	}
-    }
+
     fActivated = true;
 }
 

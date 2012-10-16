@@ -574,40 +574,35 @@ EqualizerNode::ValidateFormat(const media_format &preferred_format,
 	const media_raw_audio_format &pref = preferred_format.u.raw_audio;
 
 	if(pref.frame_rate != wild.frame_rate && f.frame_rate != pref.frame_rate) {
-		if(f.frame_rate != wild.frame_rate) {
+		if(f.frame_rate != wild.frame_rate)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.frame_rate = pref.frame_rate;
 	}
 
 	if(pref.channel_count != wild.channel_count &&
 		f.channel_count != pref.channel_count) {
-		if(f.channel_count != wild.channel_count) {
+		if(f.channel_count != wild.channel_count)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.channel_count = pref.channel_count;
 	}
 
 	if(pref.format != wild.format && f.format != pref.format) {
-		if(f.format != wild.format) {
+		if(f.format != wild.format)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.format = pref.format;
 	}
 
 	if(pref.byte_order != wild.byte_order &&
 		f.byte_order != pref.byte_order) {
-		if(f.byte_order != wild.byte_order) {
+		if(f.byte_order != wild.byte_order)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.byte_order = pref.byte_order;
 	}
 
 	if(pref.buffer_size != wild.buffer_size &&
 		f.buffer_size != pref.buffer_size) {
-		if(f.buffer_size != wild.buffer_size) {
+		if(f.buffer_size != wild.buffer_size)
 			ret = B_MEDIA_BAD_FORMAT;
-		}
 		f.buffer_size = pref.buffer_size;
 	}
 	
@@ -625,22 +620,22 @@ EqualizerNode::SetOutputFormat(media_format &format)
 		f.frame_rate = 44100.0;
 	}
 	if (f.channel_count == w.channel_count) {
-		if(fInputMedia.source != media_source::null) {
+		if(fInputMedia.source != media_source::null)
 			f.channel_count = fInputMedia.format.u.raw_audio.channel_count;
-		} else {
+		else
 			f.channel_count = 2;
-		}
 	}
-	if (f.format == w.format) {
+
+	if (f.format == w.format)
 		f.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	}
+
 	if (f.byte_order == w.format) {
 		f.byte_order = (B_HOST_IS_BENDIAN) ?
 			B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
 	}
-	if (f.buffer_size == w.buffer_size) {
+
+	if (f.buffer_size == w.buffer_size)
 		f.buffer_size = BUFF_SIZE;
-	}
 }
 
 

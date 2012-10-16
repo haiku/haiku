@@ -16,7 +16,9 @@ extern "C" _EXPORT BMediaAddOn* make_media_addon(image_id image)
 	return new VSTAddOn(image);
 }
 
-VSTAddOn::VSTAddOn(image_id image) : BMediaAddOn(image)
+VSTAddOn::VSTAddOn(image_id image)
+	:
+	BMediaAddOn(image)
 {
 	const char vst_subdir[]={"media/vstplugins"};
 
@@ -120,9 +122,8 @@ VSTAddOn::ScanPluginsFolders(const char* path, bool make_dir)
 			if (ret == B_OK) {
 				plugin->UnLoadModule();
 				fPluginsList.AddItem(plugin);				
-			} else {
+			} else
 				delete plugin;
-			}
 		}
 	}
 	return 0;

@@ -18,7 +18,9 @@ EqualizerAddOn::~EqualizerAddOn()
 {	
 }
 
-EqualizerAddOn::EqualizerAddOn(image_id image) : BMediaAddOn(image)
+EqualizerAddOn::EqualizerAddOn(image_id image) 
+	:
+	BMediaAddOn(image)
 {
 }
 	

@@ -9,8 +9,7 @@
 
 #include <MediaAddOn.h>
 
-class EqualizerAddOn : public BMediaAddOn 
-{
+class EqualizerAddOn : public BMediaAddOn {
 public:
 	virtual		 			~EqualizerAddOn();
 	explicit 				EqualizerAddOn(image_id image);

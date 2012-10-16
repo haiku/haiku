@@ -24,14 +24,12 @@ TrimString(BString *string) {
     for(i=0; str[i]!='\0';) {
         if (isspace(str[i])) {
             k = i;
-            for(uint32 j = i; j < strlen(str) - 1; j++) {
+            for(uint32 j = i; j < strlen(str) - 1; j++)
                 str[j] = str[j + 1];
-            }
             str[strlen(str) - 1] = '\0';
             i = k;
-        } else {
+        } else
             i++;
-        }
     }
     string->UnlockBuffer();
 }
@@ -73,12 +71,14 @@ VSTParameter::VSTParameter(VSTPlugin* plugin, int index)
 	float test_values[VST_PARAM_TEST_COUNT];
 	float delta = 1.0 / (float)VST_PARAM_TEST_COUNT;
 	int test_cnt = 0;
-	for(int tst_val = 0; tst_val < VST_PARAM_TEST_COUNT; tst_val++){
+	for(int tst_val = 0; tst_val < VST_PARAM_TEST_COUNT; tst_val++) {
 		float v = (float)tst_val / (float)VST_PARAM_TEST_COUNT;
-		if (tst_val >= VST_PARAM_TEST_COUNT - 1) {
+
+		if (tst_val >= VST_PARAM_TEST_COUNT - 1)
 			v = 1.0;
-		}
+
 		fEffect->setParameter(fEffect, index, v);
+
 		float new_value = fEffect->getParameter(fEffect, index);
 		bool valtest = false;
 		for(int i = 0; i < test_cnt; i++) {
@@ -136,9 +136,8 @@ VSTParameter::~VSTParameter()
 BString*
 VSTParameter::ValidateValues(BString* string)
 {	
-	if (string->Length() == 0) {
+	if (string->Length() == 0)
 		return string;
-	}
 		
 	bool isNum = true;
 	
@@ -184,9 +183,8 @@ DropListValue*
 VSTParameter::ListItemAt(int index)
 {
 	DropListValue* item = NULL;
-	if (index >= 0 && index < fDropList.CountItems()) {
+	if (index >= 0 && index < fDropList.CountItems())
 		item = (DropListValue*)fDropList.ItemAt(index);
-	}
 	return item;
 }
 
@@ -216,9 +214,8 @@ VSTParameter::Value()
 void
 VSTParameter::SetValue(float value)
 {
-	if (value == fLastValue) {
+	if (value == fLastValue)
 		return;
-	}
 	
 	if (fType == VST_PARAM_DROPLIST) {
 		//take value by index
@@ -307,16 +304,14 @@ VSTPlugin::LoadModule(const char *path)
 	char vendorString[256] = {0};
 	char productString[256] = {0};
 
-	if (fActive) {
+	if (fActive)
 		return VST_ERR_ALREADY_LOADED;
-	}
 
 	fPath = BPath(path);
 	
 	fModule = load_add_on(path);
-	if (fModule <= 0) {
+	if (fModule <= 0)
 		return VST_ERR_NOT_LOADED;
-	}
 
 	if (get_image_symbol(fModule, "main_plugin", B_SYMBOL_TYPE_TEXT,
 			(void**)&VSTMainProc) != B_OK) {
@@ -366,9 +361,9 @@ VSTPlugin::LoadModule(const char *path)
 int
 VSTPlugin::UnLoadModule(void)
 {
-	if (!fActive || fModule <= 0) {
+	if (!fActive || fModule <= 0)
 		return VST_ERR_NOT_LOADED;
-	}
+
 	fEffect->dispatcher(fEffect, VST_STATE_CHANGED, 0, 0, 0, 0);
 	fEffect->dispatcher(fEffect, VST_CLOSE, 0, 0, 0, 0);
 	
@@ -423,15 +418,13 @@ int
 VSTPlugin::ReAllocBuffers(void)
 {
 	if (inputs != NULL) {
-		for(int32 i = 0; i < fInputChannels; i++)	{
+		for(int32 i = 0; i < fInputChannels; i++)
 			delete inputs[i];
-		}		
 	}
 	
 	if (outputs != NULL) {
-		for(int32 i = 0; i < fOutputChannels; i++)	{
+		for(int32 i = 0; i < fOutputChannels; i++)
 			delete outputs[i];
-		}		
 	}
 	
 	if (fInputChannels > 0) {
@@ -469,9 +462,8 @@ VSTPlugin::Parameter(int index)
 {
 	VSTParameter* param = NULL;
 	
-	if (index >= 0 && index < fParameters.CountItems()) {
+	if (index >= 0 && index < fParameters.CountItems())
 		param = (VSTParameter*)fParameters.ItemAt(index);
-	}
 	
 	return param;
 }
@@ -515,15 +507,13 @@ VSTPlugin::Process(float *buffer, int samples, int channels)
 	
 	if (channels == fInputChannels) { //channel to channel
 		for(int j = 0; j < samples; j++) {
-			for(int c = 0; c < fInputChannels; c++) {
+			for(int c = 0; c < fInputChannels; c++)
 				inputs[c][j] = *src++;
-			}
 		}
 	} else if ( channels == 1) {	//from mone to multichannel
 		for(int j = 0; j < samples; j++, src++) {
-			for(int c = 0; c < fInputChannels; c++) {
+			for(int c = 0; c < fInputChannels; c++)
 				inputs[c][j] = *src;
-			}
 		}
 	}
 		
@@ -533,16 +523,14 @@ VSTPlugin::Process(float *buffer, int samples, int channels)
 	
 	if (channels == fOutputChannels) { //channel to channel
 		for(int j = 0; j < samples; j++) {
-			for(int c = 0; c < fOutputChannels; c++) {				
+			for(int c = 0; c < fOutputChannels; c++)
 				*dst++ = outputs[c][j];
-			}	
 		}
 	} else if (channels == 1) {  //from multichannel to mono
 		for(int j = 0; j < samples; j++, dst++) {
 			float mix = 0;
-			for(int c = 0; c < fOutputChannels; c++) {				
+			for(int c = 0; c < fOutputChannels; c++)
 				mix += outputs[c][j];
-			}	
 			*dst = mix / (float)fOutputChannels;
 		}		
 	}
