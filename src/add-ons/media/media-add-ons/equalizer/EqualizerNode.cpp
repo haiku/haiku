@@ -136,9 +136,9 @@ EqualizerNode::SetParameterValue(int32 id, bigtime_t time, const void* value,
 	if (id == P_PREAMP || id == P_BYPASS || id == P_MUTE
 		|| (id >= P_BANDS && id < P_BANDS + fEqualizer.BandCount())) {
 		media_timed_event ev(time, BTimedEventQueue::B_PARAMETER, (void*)value,
-							BTimedEventQueue::B_NO_CLEANUP, size, id, "EQ");
+			BTimedEventQueue::B_NO_CLEANUP, size, id, (char*)"EQ");
+		//dirty hack for parameter processing (mediakit bug????)
 		ParameterEventProcessing(&ev);
-			//dirty hack for parameter processing (mediakit bug????)
 		EventQueue()->AddEvent(ev);		
 	}
 }
@@ -394,21 +394,19 @@ EqualizerNode::PrepareToConnect(const media_source &src,
 
 void
 EqualizerNode::Connect(status_t status, const media_source &src,
-	const media_destination &dst, const media_format &format, char* outName)
+	const media_destination &dst, const media_format &format, char* name)
 {
-	status_t err;
 	if (status < B_OK) {
 		fOutputMedia.destination = media_destination::null;
 		return;
 	}
 
-	strncpy(outName, fOutputMedia.name, B_MEDIA_NAME_LENGTH);
+	strncpy(name, fOutputMedia.name, B_MEDIA_NAME_LENGTH);
 	fOutputMedia.destination = dst;
 	fFormat = format;
 
 	media_node_id timeSource;
-	err = FindLatencyFor(fOutputMedia.destination, &fDownstreamLatency,
-		&timeSource);
+	FindLatencyFor(fOutputMedia.destination, &fDownstreamLatency, &timeSource);
 	
 	InitFilter();
 
@@ -561,52 +559,58 @@ EqualizerNode::ParameterEventProcessing(const media_timed_event* event)
 
 
 status_t
-EqualizerNode::ValidateFormat(const media_format &preferredFormat,
-	media_format &format)
+EqualizerNode::ValidateFormat(const media_format &preferred_format,
+							media_format &proposed_format)
 {
 	status_t ret = B_OK;
 		
-	if (format.type != B_MEDIA_RAW_AUDIO) {
-		format = preferredFormat;
+	if (proposed_format.type != B_MEDIA_RAW_AUDIO) {
+		proposed_format = preferred_format;
 		return B_MEDIA_BAD_FORMAT;
 	}
 
 	media_raw_audio_format &wild = media_raw_audio_format::wildcard;
-	media_raw_audio_format &f = format.u.raw_audio;
-	const media_raw_audio_format &pref = format.u.raw_audio;
+	media_raw_audio_format &f = proposed_format.u.raw_audio;
+	const media_raw_audio_format &pref = preferred_format.u.raw_audio;
 
-	if (pref.frame_rate != wild.frame_rate && f.frame_rate != pref.frame_rate) {
-		if (f.frame_rate != wild.frame_rate)
+	if(pref.frame_rate != wild.frame_rate && f.frame_rate != pref.frame_rate) {
+		if(f.frame_rate != wild.frame_rate) {
 			ret = B_MEDIA_BAD_FORMAT;
+		}
 		f.frame_rate = pref.frame_rate;
 	}
 
-	if (pref.channel_count != wild.channel_count
-		&& f.channel_count != pref.channel_count) {
-		if (f.channel_count != wild.channel_count)
+	if(pref.channel_count != wild.channel_count &&
+		f.channel_count != pref.channel_count) {
+		if(f.channel_count != wild.channel_count) {
 			ret = B_MEDIA_BAD_FORMAT;
+		}
 		f.channel_count = pref.channel_count;
 	}
 
-	if (pref.byte_order != wild.byte_order && f.byte_order != pref.byte_order) {
-		if (f.byte_order != wild.byte_order)
+	if(pref.format != wild.format && f.format != pref.format) {
+		if(f.format != wild.format) {
 			ret = B_MEDIA_BAD_FORMAT;
-		f.byte_order = pref.byte_order;
-	}
-
-	if (pref.format != wild.format && f.format != pref.format) {
-		if (f.format != wild.format)
-			ret = B_MEDIA_BAD_FORMAT;
+		}
 		f.format = pref.format;
 	}
 
-	if (pref.buffer_size != wild.buffer_size
-		&& f.buffer_size != pref.buffer_size) {
-		if (f.buffer_size != wild.buffer_size)
+	if(pref.byte_order != wild.byte_order &&
+		f.byte_order != pref.byte_order) {
+		if(f.byte_order != wild.byte_order) {
 			ret = B_MEDIA_BAD_FORMAT;
-		f.buffer_size = pref.buffer_size;
+		}
+		f.byte_order = pref.byte_order;
 	}
 
+	if(pref.buffer_size != wild.buffer_size &&
+		f.buffer_size != pref.buffer_size) {
+		if(f.buffer_size != wild.buffer_size) {
+			ret = B_MEDIA_BAD_FORMAT;
+		}
+		f.buffer_size = pref.buffer_size;
+	}
+	
 	return ret;
 }
 
@@ -617,25 +621,26 @@ EqualizerNode::SetOutputFormat(media_format &format)
 	media_raw_audio_format &f = format.u.raw_audio;
 	media_raw_audio_format &w = media_raw_audio_format::wildcard;
 
-	if (f.frame_rate == w.frame_rate)
+	if (f.frame_rate == w.frame_rate) {
 		f.frame_rate = 44100.0;
-	
-	if (f.channel_count == w.channel_count) {
-		if (fInputMedia.source != media_source::null)
-			f.channel_count = fInputMedia.format.u.raw_audio.channel_count;
-		else
-			f.channel_count = 2;
 	}
-	
-	if (f.format == w.format)
+	if (f.channel_count == w.channel_count) {
+		if(fInputMedia.source != media_source::null) {
+			f.channel_count = fInputMedia.format.u.raw_audio.channel_count;
+		} else {
+			f.channel_count = 2;
+		}
+	}
+	if (f.format == w.format) {
 		f.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	
-	if (f.byte_order == w.format)
-		f.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN
-			: B_MEDIA_LITTLE_ENDIAN;
-	
-	if (f.buffer_size == w.buffer_size)
+	}
+	if (f.byte_order == w.format) {
+		f.byte_order = (B_HOST_IS_BENDIAN) ?
+			B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
+	}
+	if (f.buffer_size == w.buffer_size) {
 		f.buffer_size = BUFF_SIZE;
+	}
 }
 
 

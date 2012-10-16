@@ -113,8 +113,8 @@ protected:
 								bigtime_t late,
 								bool realTimeEvent = false);
 				void 		ParameterEventProcessing(const media_timed_event* event);		
-				status_t 	ValidateFormat(const media_format &preferredFormat,
-								media_format &format);
+				status_t 	ValidateFormat(const media_format &preferred_format,
+								media_format &proposed_format);
 				void 		SetOutputFormat(media_format &format);
 	virtual 	void 		InitParameterValues(void);
 	virtual 	void 		InitParameterWeb(void);
