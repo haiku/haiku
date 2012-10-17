@@ -1627,8 +1627,8 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				perl-5.10.1-r1a3-x86-gcc4-2011-05-24.zip
-				: $(baseURL)/perl-5.10.1-r1a3-x86-gcc4-2011-05-24.zip
+				perl-5.10.1-r1a4-x86-gcc4-2012-10-17.zip
+				: $(baseURL)/perl-5.10.1-r1a4-x86-gcc4-2012-10-17.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
