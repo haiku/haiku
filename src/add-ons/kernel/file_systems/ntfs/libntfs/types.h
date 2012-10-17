@@ -120,5 +120,13 @@ typedef enum {
 #define STATUS_KEEP_SEARCHING			(-3)
 #define STATUS_NOT_FOUND			(-4)
 
+/*
+ *	Force alignment in a struct if required by processor
+ */
+union ALIGNMENT {
+	u64 u64align;
+	void *ptralign;
+} ;
+
 #endif /* defined _NTFS_TYPES_H */
 

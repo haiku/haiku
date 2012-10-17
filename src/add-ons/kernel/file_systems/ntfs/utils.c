@@ -4,6 +4,7 @@
  * Copyright (c) 2002-2005 Richard Russon
  * Copyright (c) 2003-2006 Anton Altaparmakov
  * Copyright (c) 2003 Lode Leroy
+ * Copyright (c) 2005-2007 Yura Pakhuchiy
  *
  * A set of shared functions for ntfs utilities
  *
@@ -69,6 +70,7 @@
 #include "volume.h"
 #include "debug.h"
 #include "dir.h"
+/* #include "version.h" */
 #include "logging.h"
 #include "misc.h"
 
@@ -80,9 +82,120 @@ const char *ntfs_gpl = "This program is free software, released under the GNU "
 	"\"COPYING\" distributed with this program, or online at:\n"
 	"http://www.gnu.org/copyleft/gpl.html\n";
 
+static const char *invalid_ntfs_msg =
+"The device '%s' doesn't have a valid NTFS.\n"
+"Maybe you selected the wrong device? Or the whole disk instead of a\n"
+"partition (e.g. /dev/hda, not /dev/hda1)? Or the other way around?\n";
+
+static const char *corrupt_volume_msg =
+"NTFS is inconsistent. Run chkdsk /f on Windows then reboot it TWICE!\n"
+"The usage of the /f parameter is very IMPORTANT! No modification was\n"
+"made to NTFS by this software.\n";
+
+static const char *hibernated_volume_msg =
+"The NTFS partition is hibernated. Please resume Windows and turned it \n"
+"off properly, so mounting could be done safely.\n";
+
+static const char *unclean_journal_msg =
+"Access is denied because the NTFS journal file is unclean. Choices are:\n"
+" A) Shutdown Windows properly.\n"
+" B) Click the 'Safely Remove Hardware' icon in the Windows taskbar\n"
+"    notification area before disconnecting the device.\n"
+" C) Use 'Eject' from Windows Explorer to safely remove the device.\n"
+" D) If you ran chkdsk previously then boot Windows again which will\n"
+"    automatically initialize the journal.\n"
+" E) Submit 'force' option (WARNING: This solution it not recommended).\n"
+" F) ntfsmount: Mount the volume read-only by using the 'ro' mount option.\n";
+
+static const char *opened_volume_msg =
+"Access is denied because the NTFS volume is already exclusively opened.\n"
+"The volume may be already mounted, or another software may use it which\n"
+"could be identified for example by the help of the 'fuser' command.\n";
+
+static const char *dirty_volume_msg =
+"Volume is scheduled for check.\n"
+"Please boot into Windows TWICE, or use the 'force' option.\n"
+"NOTE: If you had not scheduled check and last time accessed this volume\n"
+"using ntfsmount and shutdown system properly, then init scripts in your\n"
+"distribution are broken. Please report to your distribution developers\n"
+"(NOT to us!) that init scripts kill ntfsmount or mount.ntfs-fuse during\n"
+"shutdown instead of proper umount.\n";
+
+static const char *fakeraid_msg =
+"You seem to have a SoftRAID/FakeRAID hardware and must use an activated,\n"
+"different device under /dev/mapper, (e.g. /dev/mapper/nvidia_eahaabcc1)\n"
+"to mount NTFS. Please see the 'dmraid' documentation for help.\n";
 
 /**
- * utils_valid_device - Perform some safety checks on the device, before we start
+ * utils_set_locale
+ */
+#ifndef __HAIKU__
+int utils_set_locale(void)
+{
+	const char *locale;
+
+	locale = setlocale(LC_ALL, "");
+	if (!locale) {
+		locale = setlocale(LC_ALL, NULL);
+		ntfs_log_error("Failed to set locale, using default '%s'.\n",
+				locale);
+		return 1;
+	} else {
+		return 0;
+	}
+}
+#endif
+
+/**
+ * linux-ntfs's ntfs_mbstoucs has different semantics, so we emulate it with
+ * ntfs-3g's.
+ */
+int ntfs_mbstoucs_libntfscompat(const char *ins,
+		ntfschar **outs, int outs_len)
+{
+	if(!outs) {
+		errno = EINVAL;
+		return -1;
+	}
+	else if(*outs != NULL) {
+		/* Note: libntfs's mbstoucs implementation allows the caller to
+		 * specify a preallocated buffer while libntfs-3g's always
+		 * allocates the output buffer.
+		 */
+		ntfschar *tmpstr = NULL;
+		int tmpstr_len;
+
+		tmpstr_len = ntfs_mbstoucs(ins, &tmpstr);
+		if(tmpstr_len >= 0) {
+			if((tmpstr_len + 1) > outs_len) {
+				/* Doing a realloc instead of reusing tmpstr
+				 * because it emulates libntfs's mbstoucs more
+				 * closely. */
+				ntfschar *re_outs = realloc(*outs,
+					sizeof(ntfschar)*(tmpstr_len + 1));
+				if(!re_outs)
+					tmpstr_len = -1;
+				else
+					*outs = re_outs;
+			}
+
+			if(tmpstr_len >= 0) {
+				/* The extra character is the \0 terminator. */
+				memcpy(*outs, tmpstr,
+					sizeof(ntfschar)*(tmpstr_len + 1));
+			}
+
+			free(tmpstr);
+		}
+
+		return tmpstr_len;
+	}
+	else
+		return ntfs_mbstoucs(ins, outs);
+}
+
+/**
+ * utils_valid_device - Perform some safety checks on the device, before start
  * @name:   Full pathname of the device/file to work with
  * @force:  Continue regardless of problems
  *
@@ -98,7 +211,7 @@ int utils_valid_device(const char *name, int force)
 	struct stat st;
 
 #ifdef __CYGWIN32__
-	/* FIXME: This doesn't work for Cygwin, so just return success for now... */
+	/* FIXME: This doesn't work for Cygwin, so just return success. */
 	return 1;
 #endif
 	if (!name) {
@@ -107,37 +220,30 @@ int utils_valid_device(const char *name, int force)
 	}
 
 	if (stat(name, &st) == -1) {
-		if (errno == ENOENT) {
+		if (errno == ENOENT)
 			ntfs_log_error("The device %s doesn't exist\n", name);
-		} else {
-			ntfs_log_perror("Error getting information about %s", name);
-		}
+		else
+			ntfs_log_perror("Error getting information about %s",
+					name);
 		return 0;
-	}
-
-	if (!S_ISBLK(st.st_mode) && !S_ISREG(st.st_mode)) {
-		ntfs_log_warning("%s is not a block device, "
-				 "nor regular file.\n", name);
-		if (!force) {
-			ntfs_log_error("Use the force option to work with other"
-				       " file types, for your own risk!\n");
-			return 0;
-		}
-		ntfs_log_warning("Forced to continue.\n");
 	}
 
 	/* Make sure the file system is not mounted. */
 	if (ntfs_check_if_mounted(name, &mnt_flags)) {
-		ntfs_log_perror("Failed to determine whether %s is mounted", name);
+		ntfs_log_perror("Failed to determine whether %s is mounted",
+				name);
 		if (!force) {
-			ntfs_log_error("Use the force option to ignore this error.\n");
+			ntfs_log_error("Use the force option to ignore this "
+					"error.\n");
 			return 0;
 		}
 		ntfs_log_warning("Forced to continue.\n");
 	} else if (mnt_flags & NTFS_MF_MOUNTED) {
-		ntfs_log_warning("The device %s, is mounted.\n", name);
 		if (!force) {
-			ntfs_log_error("Use the force option to work a mounted filesystem.\n");
+			ntfs_log_error("%s", opened_volume_msg);
+			ntfs_log_error("You can use force option to avoid this "
+					"check, but this is not recommended\n"
+					"and may lead to data corruption.\n");
 			return 0;
 		}
 		ntfs_log_warning("Forced to continue.\n");
@@ -149,7 +255,7 @@ int utils_valid_device(const char *name, int force)
 /**
  * utils_mount_volume - Mount an NTFS volume
  */
-ntfs_volume * utils_mount_volume(const char *device, unsigned long flags, BOOL force)
+ntfs_volume * utils_mount_volume(const char *device, unsigned long flags)
 {
 	ntfs_volume *vol;
 
@@ -158,34 +264,55 @@ ntfs_volume * utils_mount_volume(const char *device, unsigned long flags, BOOL f
 		return NULL;
 	}
 
-	if (!utils_valid_device(device, force))
+	/* Porting notes:
+	 *
+	 * libntfs-3g does not have the 'force' flag in ntfs_mount_flags.
+	 * The 'force' flag in libntfs bypasses two safety checks when mounting
+	 * read/write:
+	 *   1. Do not mount when the VOLUME_IS_DIRTY flag in
+	 *      VOLUME_INFORMATION is set.
+	 *   2. Do not mount when the logfile is unclean.
+	 *
+	 * libntfs-3g only has safety check number 2. The dirty flag is simply
+	 * ignored because we are confident that we can handle a dirty volume.
+	 * So we treat MS_RECOVER like NTFS_MNT_FORCE, knowing that the first
+	 * check is always bypassed.
+	 */
+
+	if (!utils_valid_device(device, flags & MS_RECOVER))
 		return NULL;
 
 	vol = ntfs_mount(device, flags);
 	if (!vol) {
-		ntfs_log_perror("Couldn't mount device '%s'", device);
-		if (errno == EPERM)
-			ntfs_log_error("Windows was hibernated.  Try to mount "
-					"volume in windows, shut down and try "
-					"again.\n");
-		if (errno == EOPNOTSUPP)
-			ntfs_log_error("Windows did not shut down properly.  "
-					"Try to mount volume in windows, "
-					"shut down and try again.\n");
+		ntfs_log_perror("Failed to mount '%s'", device);
+		if (errno == EINVAL)
+			ntfs_log_error(invalid_ntfs_msg, device);
+		else if (errno == EIO)
+			ntfs_log_error("%s", corrupt_volume_msg);
+		else if (errno == EPERM)
+			ntfs_log_error("%s", hibernated_volume_msg);
+		else if (errno == EOPNOTSUPP)
+			ntfs_log_error("%s", unclean_journal_msg);
+		else if (errno == EBUSY)
+			ntfs_log_error("%s", opened_volume_msg);
+		else if (errno == ENXIO)
+			ntfs_log_error("%s", fakeraid_msg);
 		return NULL;
 	}
 
+	/* Porting notes:
+	 * libntfs-3g does not record whether the volume log file was dirty
+	 * before mount, so we can only warn if the VOLUME_IS_DIRTY flag is set
+	 * in VOLUME_INFORMATION. */
 	if (vol->flags & VOLUME_IS_DIRTY) {
-		ntfs_log_warning("Volume is dirty.\n");
-		if (!force) {
-			ntfs_log_error("Run chkdsk and try again, or use the "
-					"force option.\n");
+		if (!(flags & MS_RECOVER)) {
+			ntfs_log_error("%s", dirty_volume_msg);
 			ntfs_umount(vol, FALSE);
 			return NULL;
 		}
-		ntfs_log_warning("Forced to continue.\n");
+		ntfs_log_error("WARNING: Dirty volume mount was forced by the "
+				"'force' mount option.\n");
 	}
-
 	return vol;
 }
 
@@ -222,6 +349,8 @@ int utils_parse_size(const char *value, s64 *size, BOOL scale)
 		return 0;
 	}
 
+	ntfs_log_debug("Parsing size '%s'.\n", value);
+
 	result = strtoll(value, &suffix, 0);
 	if (result < 0 || errno == ERANGE) {
 		ntfs_log_error("Invalid size '%s'.\n", value);
@@ -252,6 +381,7 @@ int utils_parse_size(const char *value, s64 *size, BOOL scale)
 		}
 	}
 
+	ntfs_log_debug("Parsed size = %lld.\n", result);
 	*size = result;
 	return 1;
 }
@@ -386,11 +516,12 @@ ATTR_RECORD * find_first_attribute(const ATTR_TYPES type, MFT_RECORD *mft)
  * if parent is 5 (/) stop
  * get inode of parent
  */
+#define max_path 20
 int utils_inode_get_name(ntfs_inode *inode, char *buffer, int bufsize)
 {
 	// XXX option: names = posix/win32 or dos
 	// flags: path, filename, or both
-	const int max_path = 20;
+
 
 	ntfs_volume *vol;
 	ntfs_attr_search_ctx *ctx;
@@ -442,10 +573,10 @@ int utils_inode_get_name(ntfs_inode *inode, char *buffer, int bufsize)
 			    &names[i], 0) < 0) {
 				char *temp;
 				ntfs_log_error("Couldn't translate filename to current locale.\n");
-				temp = ntfs_malloc(64);
+				temp = ntfs_malloc(30);
 				if (!temp)
 					return 0;
-				sprintf(temp, "<MFT%llu>", (unsigned
+				snprintf(temp, 30, "<MFT%llu>", (unsigned
 						long long)inode->mft_no);
 				names[i] = temp;
 			}
@@ -483,7 +614,7 @@ int utils_inode_get_name(ntfs_inode *inode, char *buffer, int bufsize)
 		if (!names[i])
 			continue;
 
-		len = sprintf(buffer + offset, "%c%s", PATH_SEP, names[i]); //bufsize - offset, 
+		len = snprintf(buffer + offset, bufsize - offset, "%c%s", PATH_SEP, names[i]);
 		if (len >= (bufsize - offset)) {
 			ntfs_log_error("Pathname was truncated.\n");
 			break;
@@ -500,66 +631,7 @@ int utils_inode_get_name(ntfs_inode *inode, char *buffer, int bufsize)
 
 	return 1;
 }
-
-
-int utils_inode_get_ucsfilename(ntfs_inode *inode,ntfschar **uname, int *size)
-{
-	// XXX option: names = posix/win32 or dos
-	// flags: path, filename, or both
-
-	ntfs_volume *vol;
-	ntfs_attr_search_ctx *ctx;
-	ATTR_RECORD *rec;
-	FILE_NAME_ATTR *attr;
-
-	int name_space;
-	int res=B_NO_ERROR;
-
-	*uname=NULL;
-	
-	
-	if (!inode || !uname || !size) {
-		res = EINVAL;
-		return 0;
-	}
-
-	vol = inode->vol;
-
-	ctx = ntfs_attr_get_search_ctx(inode, NULL);
-	if (!ctx) {
-			res = EINVAL;
-			return res;
-	}
-
-	name_space = 4;
-	while ((rec = find_attribute(AT_FILE_NAME, ctx)))
-	{
-			/* We know this will always be resident. */
-			attr = (FILE_NAME_ATTR *) ((char *) rec + le16_to_cpu(rec->value_offset));
-
-			if (attr->file_name_type > name_space) { //XXX find the ...
-				continue;
-			}
-
-			name_space = attr->file_name_type;
-
-			if(*uname!=NULL)free(*uname);
-			*uname=(ntfschar*)ntfs_malloc(attr->file_name_length);
-			if(*uname==NULL)
-			 {
-			 	res = EINVAL;
-				goto exit;
-			 }
-			 
-			memcpy(*uname,attr->file_name, attr->file_name_length);		
-			*size = attr->file_name_length;	
-	}
-	
-exit:
-	ntfs_attr_put_search_ctx(ctx);	
-	
-	return res;
-}
+#undef max_path
 
 /**
  * utils_attr_get_name
@@ -578,45 +650,44 @@ int utils_attr_get_name(ntfs_volume *vol, ATTR_RECORD *attr, char *buffer, int b
 
 	attrdef = ntfs_attr_find_in_attrdef(vol, attr->type);
 	if (attrdef) {
-		name = NULL;
+		name    = NULL;
 		namelen = ntfs_ucsnlen(attrdef->name, sizeof(attrdef->name));
 		if (ntfs_ucstombs(attrdef->name, namelen, &name, 0) < 0) {
-			ntfs_log_error("Couldn't translate attribute type to current locale.\n");
+			ntfs_log_error("Couldn't translate attribute type to "
+					"current locale.\n");
 			// <UNKNOWN>?
 			return 0;
 		}
-		len = sprintf(buffer, "%s", name);
+		len = snprintf(buffer, bufsize, "%s", name);
 	} else {
 		ntfs_log_error("Unknown attribute type 0x%02x\n", attr->type);
-		len = sprintf(buffer, "<UNKNOWN>");
+		len = snprintf(buffer, bufsize, "<UNKNOWN>");
 	}
 
 	if (len >= bufsize) {
 		ntfs_log_error("Attribute type was truncated.\n");
-		free(name);
 		return 0;
 	}
 
 	if (!attr->name_length) {
-		free(name);
 		return 0;
 	}
 
 	buffer  += len;
 	bufsize -= len;
 
-	free(name);
-	name = NULL;
+	name    = NULL;
 	namelen = attr->name_length;
 	if (ntfs_ucstombs((ntfschar *)((char *)attr + attr->name_offset),
-	    namelen, &name, 0) < 0) {
-		ntfs_log_error("Couldn't translate attribute name to current locale.\n");
+				namelen, &name, 0) < 0) {
+		ntfs_log_error("Couldn't translate attribute name to current "
+				"locale.\n");
 		// <UNKNOWN>?
-		len = sprintf(buffer, "<UNKNOWN>");
+		len = snprintf(buffer, bufsize, "<UNKNOWN>");
 		return 0;
 	}
 
-	len = sprintf(buffer, "(%s)", name);
+	len = snprintf(buffer, bufsize, "(%s)", name);
 	free(name);
 
 	if (len >= bufsize) {
@@ -638,7 +709,10 @@ int utils_attr_get_name(ntfs_volume *vol, ATTR_RECORD *attr, char *buffer, int b
  *
  * This function has a static buffer in which it caches a section of $Bitmap.
  * If the lcn, being tested, lies outside the range, the buffer will be
- * refreshed.
+ * refreshed. @bmplcn stores offset to the first bit (in bits) stored in the
+ * buffer.
+ *
+ * NOTE: Be very carefull with shifts by 3 everywhere in this function.
  *
  * Return:  1  Cluster is in use
  *	    0  Cluster is free space
@@ -647,8 +721,7 @@ int utils_attr_get_name(ntfs_volume *vol, ATTR_RECORD *attr, char *buffer, int b
 int utils_cluster_in_use(ntfs_volume *vol, long long lcn)
 {
 	static unsigned char buffer[512];
-	static long long bmplcn = -sizeof(buffer) - 1;	/* Which bit of $Bitmap is in the buffer */
-
+	static long long bmplcn = -(sizeof(buffer) << 3);
 	int byte, bit;
 	ntfs_attr *attr;
 
@@ -658,7 +731,8 @@ int utils_cluster_in_use(ntfs_volume *vol, long long lcn)
 	}
 
 	/* Does lcn lie in the section of $Bitmap we already have cached? */
-	if ((lcn < bmplcn) || (lcn >= (bmplcn + (sizeof(buffer) << 3)))) {
+	if ((lcn < bmplcn)
+	    || (lcn >= (long long)(bmplcn + (sizeof(buffer) << 3)))) {
 		ntfs_log_debug("Bit lies outside cache.\n");
 		attr = ntfs_attr_open(vol->lcnbmp_ni, AT_DATA, AT_UNNAMED, 0);
 		if (!attr) {
@@ -670,7 +744,8 @@ int utils_cluster_in_use(ntfs_volume *vol, long long lcn)
 		memset(buffer, 0xFF, sizeof(buffer));
 		bmplcn = lcn & (~((sizeof(buffer) << 3) - 1));
 
-		if (ntfs_attr_pread(attr, (bmplcn>>3), sizeof(buffer), buffer) < 0) {
+		if (ntfs_attr_pread(attr, (bmplcn >> 3), sizeof(buffer),
+					buffer) < 0) {
 			ntfs_log_perror("Couldn't read $Bitmap");
 			ntfs_attr_close(attr);
 			return -1;
@@ -682,7 +757,9 @@ int utils_cluster_in_use(ntfs_volume *vol, long long lcn)
 
 	bit  = 1 << (lcn & 7);
 	byte = (lcn >> 3) & (sizeof(buffer) - 1);
-	ntfs_log_debug("cluster = %lld, bmplcn = %lld, byte = %d, bit = %d, in use %d\n", lcn, bmplcn, byte, bit, buffer[byte] & bit);
+	ntfs_log_debug("cluster = %lld, bmplcn = %lld, byte = %d, bit = %d, "
+			"in use %d\n", lcn, bmplcn, byte, bit, buffer[byte] &
+			bit);
 
 	return (buffer[byte] & bit);
 }
@@ -707,19 +784,19 @@ int utils_cluster_in_use(ntfs_volume *vol, long long lcn)
 int utils_mftrec_in_use(ntfs_volume *vol, MFT_REF mref)
 {
 	static u8 buffer[512];
-	static s64 bmpmref = -sizeof(buffer) - 1; /* Which bit of $BITMAP is in the buffer */
-
+	static s64 bmpmref = -(sizeof(buffer) << 3) - 1; /* Which bit of $BITMAP is in the buffer */
 	int byte, bit;
+
+	ntfs_log_trace("Entering.\n");
 
 	if (!vol) {
 		errno = EINVAL;
 		return -1;
 	}
 
-	ntfs_log_trace("entering\n");
 	/* Does mref lie in the section of $Bitmap we already have cached? */
-	if (((s64)MREF(mref) < bmpmref) || ((s64)MREF(mref) >= (bmpmref +
-			(sizeof(buffer) << 3)))) {
+	if (((s64)MREF(mref) < bmpmref)
+	    || ((s64)MREF(mref) >= (s64)(bmpmref + (sizeof(buffer) << 3)))) {
 		ntfs_log_debug("Bit lies outside cache.\n");
 
 		/* Mark the buffer as not in use, in case the read is shorter. */
@@ -791,20 +868,19 @@ int utils_is_metadata(ntfs_inode *inode)
 
 	file = inode->mrec;
 	if (file && (file->base_mft_record != 0)) {
-		num = MREF(file->base_mft_record);
+		num = MREF_LE(file->base_mft_record);
 		if (__metadata(vol, num) == 1)
 			return 1;
 	}
-	file = inode->mrec;
 
 	rec = find_first_attribute(AT_FILE_NAME, inode->mrec);
 	if (!rec)
 		return -1;
 
 	/* We know this will always be resident. */
-	attr = (FILE_NAME_ATTR *) ((char *) rec + le16_to_cpu(rec->value_offset));
+	attr = (FILE_NAME_ATTR *)((char *)rec + le16_to_cpu(rec->value_offset));
 
-	num = MREF(attr->parent_directory);
+	num = MREF_LE(attr->parent_directory);
 	if ((num != FILE_root) && (__metadata(vol, num) == 1))
 		return 1;
 
@@ -890,7 +966,7 @@ struct mft_search_ctx * mft_get_search_ctx(ntfs_volume *vol)
 		return NULL;
 	}
 
-	ctx = calloc(1, sizeof *ctx);
+	ctx = (struct mft_search_ctx*)calloc(1, sizeof *ctx);
 
 	ctx->mft_num = -1;
 	ctx->vol = vol;
@@ -997,7 +1073,7 @@ int mft_next_record(struct mft_search_ctx *ctx)
 
 			ctx->flags_match |= FEMR_NOT_IN_USE;
 
-			ctx->inode = calloc(1, sizeof(*ctx->inode));
+			ctx->inode = (ntfs_inode*)calloc(1, sizeof(*ctx->inode));
 			if (!ctx->inode) {
 				ntfs_log_error("Out of memory.  Aborting.\n");
 				return -1;
@@ -1047,7 +1123,7 @@ int mft_next_record(struct mft_search_ctx *ctx)
 }
 
 /**
- * ntfs_get_parent_ref - find mft reference of parent directory of an inode
+ * ntfs_mft_get_parent_ref - find mft reference of parent directory of an inode
  * @ni:		ntfs inode whose parent directory to find
  *
  * Find the parent directory of the ntfs inode @ni. To do this, find the first
@@ -1064,7 +1140,7 @@ int mft_next_record(struct mft_search_ctx *ctx)
  * Return the mft reference of the parent directory on success or -1 on error
  * with errno set to the error code.
  */
-MFT_REF ntfs_get_parent_ref(ntfs_inode *ni)
+MFT_REF ntfs_mft_get_parent_ref(ntfs_inode *ni)
 {
 	MFT_REF mref;
 	ntfs_attr_search_ctx *ctx;
@@ -1082,21 +1158,21 @@ MFT_REF ntfs_get_parent_ref(ntfs_inode *ni)
 	if (!ctx)
 		return ERR_MREF(-1);
 	if (ntfs_attr_lookup(AT_FILE_NAME, AT_UNNAMED, 0, 0, 0, NULL, 0, ctx)) {
-		ntfs_log_debug("No file name found in inode 0x%llx. Corrupt "
-				"inode.\n", (unsigned long long)ni->mft_no);
+		ntfs_log_error("No file name found in inode %lld\n", 
+			       (unsigned long long)ni->mft_no);
 		goto err_out;
 	}
 	if (ctx->attr->non_resident) {
-		ntfs_log_debug("File name attribute must be resident. Corrupt inode "
-				"0x%llx.\n", (unsigned long long)ni->mft_no);
+		ntfs_log_error("File name attribute must be resident (inode "
+			       "%lld)\n", (unsigned long long)ni->mft_no);
 		goto io_err_out;
 	}
 	fn = (FILE_NAME_ATTR*)((u8*)ctx->attr +
 			le16_to_cpu(ctx->attr->value_offset));
 	if ((u8*)fn +	le32_to_cpu(ctx->attr->value_length) >
 			(u8*)ctx->attr + le32_to_cpu(ctx->attr->length)) {
-		ntfs_log_debug("Corrupt file name attribute in inode 0x%llx.\n",
-				(unsigned long long)ni->mft_no);
+		ntfs_log_error("Corrupt file name attribute in inode %lld.\n",
+			       (unsigned long long)ni->mft_no);
 		goto io_err_out;
 	}
 	mref = le64_to_cpu(fn->parent_directory);
@@ -1110,3 +1186,5 @@ err_out:
 	errno = eo;
 	return ERR_MREF(-1);
 }
+
+

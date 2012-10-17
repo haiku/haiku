@@ -41,6 +41,7 @@ typedef enum {
 	ND_ReadOnly,	/* 1: Device is read-only. */
 	ND_Dirty,	/* 1: Device is dirty, needs sync. */
 	ND_Block,	/* 1: Device is a block device. */
+	ND_Sync,	/* 1: Device is mounted with "-o sync" */
 } ntfs_device_state_bits;
 
 #define  test_ndev_flag(nd, flag)	   test_bit(ND_##flag, (nd)->d_state)
@@ -62,6 +63,10 @@ typedef enum {
 #define NDevBlock(nd)		 test_ndev_flag(nd, Block)
 #define NDevSetBlock(nd)	  set_ndev_flag(nd, Block)
 #define NDevClearBlock(nd)	clear_ndev_flag(nd, Block)
+
+#define NDevSync(nd)		 test_ndev_flag(nd, Sync)
+#define NDevSetSync(nd)		  set_ndev_flag(nd, Sync)
+#define NDevClearSync(nd)	clear_ndev_flag(nd, Sync)
 
 /**
  * struct ntfs_device -
@@ -102,6 +107,7 @@ struct ntfs_device_operations {
 extern struct ntfs_device *ntfs_device_alloc(const char *name, const long state,
 		struct ntfs_device_operations *dops, void *priv_data);
 extern int ntfs_device_free(struct ntfs_device *dev);
+extern int ntfs_device_sync(struct ntfs_device *dev);
 
 extern s64 ntfs_pread(struct ntfs_device *dev, const s64 pos, s64 count,
 		void *b);
