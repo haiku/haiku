@@ -161,7 +161,7 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	}
 
 	// try mount
-	ntVolume = utils_mount_volume(devpath, MS_RDONLY, true);
+	ntVolume = utils_mount_volume(devpath, MS_RDONLY | MS_RECOVER);
 	if (!ntVolume) {
 		ERROR("fs_identify_partition: mount failed\n");
 		return -1;
@@ -257,7 +257,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		ns->flags |= B_FS_IS_READONLY;
 	}
 
-	ns->ntvol = utils_mount_volume(device, mountFlags, true);
+	ns->ntvol = utils_mount_volume(device, mountFlags | MS_RECOVER);
 	if (ns->ntvol != NULL)
 		result = B_NO_ERROR;
 	else
@@ -530,7 +530,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 			goto exit;
 
 		newNode->vnid = vnid;
-		newNode->parent_vnid = ntfs_get_parent_ref(ni);
+		newNode->parent_vnid = ntfs_mft_get_parent_ref(ni);
 
 		if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
 			set_mime(newNode, ".***");
