@@ -1898,15 +1898,11 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// clipping constraints for the view
-	BRegion clipping;
-	view->GetClippingRegion(&clipping);
+	// save the clipping constraints of the view
+	view->PushState();
 
-	// intersect constraints with updateRect
-	BRegion updateClipping(updateRect);
-	clipping.IntersectWith(&updateClipping);
-
-	// clip to the intersection
+	// set cliping constraints to updateRect
+	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
 
 	// outer edge colors
@@ -2046,7 +2042,8 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			frameShadowColor, frameShadowColor, borders);
 	}
 
-	view->ConstrainClippingRegion(NULL);
+	// restore the clipping constraints of the view
+	view->PopState();
 }
 
 
@@ -2172,15 +2169,11 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// clipping constraints for the view
-	BRegion clipping;
-	view->GetClippingRegion(&clipping);
+	// save the clipping constraints of the view
+	view->PushState();
 
-	// intersect constraints with updateRect
-	BRegion updateClipping(updateRect);
-	clipping.IntersectWith(&updateClipping);
-
-	// clip to the intersection
+	// set cliping constraints to updateRect
+	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
 
 	// inner bevel colors
@@ -2288,8 +2281,8 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	// fill in the background
 	view->FillRect(rect, fillGradient);
 
-	// reset clipping constraints
-	view->ConstrainClippingRegion(NULL);
+	// restore the clipping constraints of the view
+	view->PopState();
 }
 
 
