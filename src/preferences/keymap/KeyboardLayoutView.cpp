@@ -625,17 +625,12 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		be_control_look->DrawButtonFrame(view, rect, updateRect,
 			4.0f, 4.0f, 0.0f, 0.0f, base, background,
 			pressed ? BControlLook::B_ACTIVATED : 0);
-
-		view->ConstrainClippingRegion(&region);
-
 		be_control_look->DrawButtonBackground(view, rect, updateRect,
 			4.0f, 4.0f, 0.0f, 0.0f, base,
 			pressed ? BControlLook::B_ACTIVATED : 0);
 
 		rect.left = missingRect.right;
 		_GetAbbreviatedKeyLabelIfNeeded(view, rect, key, text, sizeof(text));
-
-		view->ConstrainClippingRegion(&region);
 
 		be_control_look->DrawLabel(view, text, rect, updateRect,
 			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
@@ -652,9 +647,6 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 			0.0f, 0.0f, 4.0f, 0.0f, base, background,
 			pressed ? BControlLook::B_ACTIVATED : 0,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_BOTTOM_BORDER);
-
-		view->ConstrainClippingRegion(&region);
-
 		be_control_look->DrawButtonBackground(view, rect, updateRect,
 			0.0f, 0.0f, 4.0f, 0.0f, base,
 			pressed ? BControlLook::B_ACTIVATED : 0,
@@ -675,9 +667,6 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 			pressed ? BControlLook::B_ACTIVATED : 0,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER
 				| BControlLook::B_BOTTOM_BORDER);
-
-		view->ConstrainClippingRegion(&region);
-
 		be_control_look->DrawButtonBackground(view, rect, updateRect,
 			0.0f, 0.0f, 4.0f, 4.0f, base,
 			pressed ? BControlLook::B_ACTIVATED : 0,
