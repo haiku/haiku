@@ -953,10 +953,13 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 			} else
 				result = errno;
 		}
+		ntfs_inode_close(ni);
 	} else {
-		le32 securid = 0;
+		le32 securid = const_cpu_to_le32(0);
 		ni = ntfs_create(bi, securid, uname, unameLength, S_IFREG);
 		if (ni)	{
+			NInoSetDirty(ni);
+
 			*_vnid = MREF(ni->mft_no);
 
 			newNode = (vnode*)ntfs_calloc(sizeof(vnode));
@@ -965,19 +968,23 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 			 	goto exit;
 			}
 
+			if (ntfs_inode_close_in_dir(ni, bi)) {
+				result = EINVAL;
+				goto exit;
+			}
+
 			newNode->vnid = *_vnid;
 			newNode->parent_vnid = MREF(bi->mft_no);
 			set_mime(newNode, name);
 
 			result = B_NO_ERROR;
-			result = publish_vnode(_vol, *_vnid, (void*)newNode,&gNTFSVnodeOps,
+			result = publish_vnode(_vol, *_vnid, (void*)newNode, &gNTFSVnodeOps,
 				S_IFREG, 0);
-
-			ntfs_mark_free_space_outdated(ns);
-			fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);
-
-			notify_entry_created(ns->id, MREF(bi->mft_no), name, *_vnid);
-
+					
+			ntfs_mark_free_space_outdated(ns);			
+			fs_ntfs_update_times(_vol, bi, NTFS_UPDATE_MCTIME);
+			
+			notify_entry_created(ns->id, MREF(bi->mft_no), name, *_vnid);			
 		} else
 			result = errno;
 	}
@@ -990,8 +997,6 @@ exit:
 
 	if (na)
 		ntfs_attr_close(na);
-	if (ni)
-		ntfs_inode_close(ni);
 	if (bi)
 		ntfs_inode_close(bi);
 	free(uname);
@@ -1423,7 +1428,7 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 	ntfs_inode *ni = NULL;
 	ntfs_inode *bi = NULL;
 	status_t result = B_NO_ERROR;
-	le32 securid = 0;
+	le32 securid = const_cpu_to_le32(0);
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERROR("ntfs is read-only\n");
@@ -1460,11 +1465,18 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 	if (ni)	{
 		ino_t vnid = MREF(ni->mft_no);
 
+		NInoSetDirty(ni);
+	
 		newNode = (vnode*)ntfs_calloc(sizeof(vnode));
 		if (newNode == NULL) {
 		 	result = ENOMEM;
 		 	goto exit;
 		}
+		
+		if (ntfs_inode_close_in_dir(ni, bi)) {
+			result = EINVAL;
+			goto exit;
+		}		
 
 		newNode->vnid = vnid;
 		newNode->parent_vnid = MREF(bi->mft_no);
@@ -1473,18 +1485,15 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 		result = publish_vnode(_vol, vnid, (void*)newNode, &gNTFSVnodeOps,
 			S_IFDIR, 0);
 
-		put_vnode(_vol, MREF(ni->mft_no));
+		put_vnode(_vol, vnid);
 
 		ntfs_mark_free_space_outdated(ns);
-		fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);
-
+		fs_ntfs_update_times(_vol, bi, NTFS_UPDATE_MCTIME);
 		notify_entry_created(ns->id, MREF(bi->mft_no), name, vnid);
 	} else
 		result = errno;
 
 exit:
-	if (ni)
-		ntfs_inode_close(ni);
 	if (bi)
 		ntfs_inode_close(bi);
 	free(uname);
