@@ -1,8 +1,9 @@
-1	belarusian	x-vnd.Haiku-TGATranslator	2221210336
+1	belarusian	x-vnd.Haiku-TGATranslator	3289993499
 Targa image (%d bits truecolor)	TGATranslator		Выява Targa (%d бітаў поўнaкаляровы)
 Version %d.%d.%d %s	TGAView		Версія %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Игнараваць альфа канал TGA
 Targa image (%d bits colormap)	TGATranslator		Выява Targa (палета колераў %d бітаў)
+TGA image translator	TGAView		Канвертар выяваў TGA
 Targa image (%d bits RLE colormap)	TGATranslator		Выява Targa (палета колераў RLE %d бітаў)
 Targa image (%d bits gray)	TGATranslator		Выява Targa (адценні шэрага %d бітаў)
 Written by the Haiku Translation Kit Team	TGAView		Распрацаваны Haiku Translation Kit Team
