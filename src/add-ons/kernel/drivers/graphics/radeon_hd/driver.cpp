@@ -189,11 +189,6 @@ const struct supported_device {
 	{0x689c, 4, 0, RADEON_HEMLOCK, CHIP_STD, "Radeon HD 5900"},
 
 	// Fusion APUS
-	/* R1A4 branch change: Disable APU's as external Display
-     * Port bridges don't yet function. Users of these cards
-     * will see only a black screen at boot.
-     */
-	#if 0
 	//  Palm
 	{0x9804, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6250"},
 	{0x9805, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6290"},
@@ -201,6 +196,11 @@ const struct supported_device {
 	{0x9802, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 	{0x9803, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 	{0x9806, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6320"},
+	/* R1A4 branch change: Disable APU's as external Display
+	 * Port bridges don't yet function. Users of these cards
+	 * will see only a black screen at boot.
+	 */
+	#if 0
 	//  Sumo (no VGA / LVDS!, only DP)
 	{0x9640, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6550D"},
 	{0x9641, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD SUMO M"},
