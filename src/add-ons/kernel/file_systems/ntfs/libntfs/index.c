@@ -701,7 +701,7 @@ int ntfs_index_lookup(const void *key, const int key_len, ntfs_index_context *ic
 	if (ni->vol->cluster_size <= icx->block_size)
 		icx->vcn_size_bits = ni->vol->cluster_size_bits;
 	else
-		icx->vcn_size_bits = ni->vol->sector_size_bits;
+		icx->vcn_size_bits = NTFS_BLOCK_SIZE_BITS;
 			/* get the appropriate collation function */
 	icx->collate = ntfs_get_collate_function(ir->collation_rule);
 	if (!icx->collate) {
@@ -1121,6 +1121,7 @@ static int ntfs_ir_reparent(ntfs_index_context *icx)
 	INDEX_ENTRY *ie;
 	INDEX_BLOCK *ib = NULL;
 	VCN new_ib_vcn;
+	int ix_root_size;
 	int ret = STATUS_ERROR;
 
 	ntfs_log_trace("Entering\n");
@@ -1150,6 +1151,7 @@ static int ntfs_ir_reparent(ntfs_index_context *icx)
 	if (ntfs_ib_write(icx, ib))
 		goto clear_bmp;
 	
+retry :
 	ir = ntfs_ir_lookup(icx->ni, icx->name, icx->name_len, &ctx);
 	if (!ir)
 		goto clear_bmp;
@@ -1164,12 +1166,32 @@ static int ntfs_ir_reparent(ntfs_index_context *icx)
 	ir->index.index_length = cpu_to_le32(le32_to_cpu(ir->index.entries_offset)
 					     + le16_to_cpu(ie->length));
 	ir->index.allocated_size = ir->index.index_length;
-	
+	ix_root_size = sizeof(INDEX_ROOT) - sizeof(INDEX_HEADER)
+			+ le32_to_cpu(ir->index.allocated_size);
 	if (ntfs_resident_attr_value_resize(ctx->mrec, ctx->attr,
-			sizeof(INDEX_ROOT) - sizeof(INDEX_HEADER) +
-			le32_to_cpu(ir->index.allocated_size)))
+					ix_root_size)) {
+			/*
+			 * When there is no space to build a non-resident
+			 * index, we may have to move the root to an extent
+			 */
+		if ((errno == ENOSPC)
+		    && !ctx->al_entry
+		    && !ntfs_inode_add_attrlist(icx->ni)) {
+			ntfs_attr_put_search_ctx(ctx);
+			ctx = (ntfs_attr_search_ctx*)NULL;
+			ir = ntfs_ir_lookup(icx->ni, icx->name, icx->name_len,
+							&ctx);
+			if (ir
+			    && !ntfs_attr_record_move_away(ctx, ix_root_size
+				    - le32_to_cpu(ctx->attr->value_length))) {
+				ntfs_attr_put_search_ctx(ctx);
+				ctx = (ntfs_attr_search_ctx*)NULL;
+				goto retry;
+			}
+		}
 		/* FIXME: revert index root */
 		goto clear_bmp;
+	}
 	/*
 	 *  FIXME: do it earlier if we have enough space in IR (should always),
 	 *  so in error case we wouldn't lose the IB.

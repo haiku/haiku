@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons media media-add-ons equalizer ;
+
+AddResources equalizer.media_addon : Equalizer.rdef ;
+
+Addon equalizer.media_addon :
+	Equalizer.cpp
+	EqualizerAddOn.cpp
+	EqualizerNode.cpp
+	: be media $(TARGET_LIBSTDC++)
+;

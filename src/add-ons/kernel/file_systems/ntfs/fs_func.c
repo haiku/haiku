@@ -161,7 +161,7 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	}
 
 	// try mount
-	ntVolume = utils_mount_volume(devpath, MS_RDONLY, true);
+	ntVolume = utils_mount_volume(devpath, MS_RDONLY | MS_RECOVER);
 	if (!ntVolume) {
 		ERROR("fs_identify_partition: mount failed\n");
 		return -1;
@@ -257,7 +257,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		ns->flags |= B_FS_IS_READONLY;
 	}
 
-	ns->ntvol = utils_mount_volume(device, mountFlags, true);
+	ns->ntvol = utils_mount_volume(device, mountFlags | MS_RECOVER);
 	if (ns->ntvol != NULL)
 		result = B_NO_ERROR;
 	else
@@ -530,7 +530,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 			goto exit;
 
 		newNode->vnid = vnid;
-		newNode->parent_vnid = ntfs_get_parent_ref(ni);
+		newNode->parent_vnid = ntfs_mft_get_parent_ref(ni);
 
 		if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
 			set_mime(newNode, ".***");
@@ -636,13 +636,19 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 	if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
 		// Directory
 		stbuf->st_mode = FS_DIR_MODE;
-		na = ntfs_attr_open(ni, AT_INDEX_ALLOCATION, NTFS_INDEX_I30, 4);
-		if (na) {
-			stbuf->st_size = na->data_size;
-			stbuf->st_blocks = na->allocated_size >> 9;
-			ntfs_attr_close(na);
+		/* get index size, if not known */
+		if (!test_nino_flag(ni, KnownSize)) {
+			na = ntfs_attr_open(ni, AT_INDEX_ALLOCATION, NTFS_INDEX_I30, 4);
+			if (na) {
+				ni->data_size = na->data_size;
+				ni->allocated_size = na->allocated_size;
+				set_nino_flag(ni, KnownSize);
+				ntfs_attr_close(na);
+			}
 		}
-		stbuf->st_nlink = 1;
+		stbuf->st_size = ni->data_size;
+		stbuf->st_blocks = ni->allocated_size >> 9;
+		stbuf->st_nlink = 1;	/* Make find(1) work */
 	} else {
 		// Regular or Interix (INTX) file
 		stbuf->st_mode = FS_FILE_MODE;
@@ -953,10 +959,13 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 			} else
 				result = errno;
 		}
+		ntfs_inode_close(ni);
 	} else {
-		le32 securid = 0;
+		le32 securid = const_cpu_to_le32(0);
 		ni = ntfs_create(bi, securid, uname, unameLength, S_IFREG);
 		if (ni)	{
+			NInoSetDirty(ni);
+
 			*_vnid = MREF(ni->mft_no);
 
 			newNode = (vnode*)ntfs_calloc(sizeof(vnode));
@@ -965,19 +974,23 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 			 	goto exit;
 			}
 
+			if (ntfs_inode_close_in_dir(ni, bi)) {
+				result = EINVAL;
+				goto exit;
+			}
+
 			newNode->vnid = *_vnid;
 			newNode->parent_vnid = MREF(bi->mft_no);
 			set_mime(newNode, name);
 
 			result = B_NO_ERROR;
-			result = publish_vnode(_vol, *_vnid, (void*)newNode,&gNTFSVnodeOps,
+			result = publish_vnode(_vol, *_vnid, (void*)newNode, &gNTFSVnodeOps,
 				S_IFREG, 0);
-
-			ntfs_mark_free_space_outdated(ns);
-			fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);
-
-			notify_entry_created(ns->id, MREF(bi->mft_no), name, *_vnid);
-
+					
+			ntfs_mark_free_space_outdated(ns);			
+			fs_ntfs_update_times(_vol, bi, NTFS_UPDATE_MCTIME);
+			
+			notify_entry_created(ns->id, MREF(bi->mft_no), name, *_vnid);			
 		} else
 			result = errno;
 	}
@@ -990,8 +1003,6 @@ exit:
 
 	if (na)
 		ntfs_attr_close(na);
-	if (ni)
-		ntfs_inode_close(ni);
 	if (bi)
 		ntfs_inode_close(bi);
 	free(uname);
@@ -1423,7 +1434,7 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 	ntfs_inode *ni = NULL;
 	ntfs_inode *bi = NULL;
 	status_t result = B_NO_ERROR;
-	le32 securid = 0;
+	le32 securid = const_cpu_to_le32(0);
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERROR("ntfs is read-only\n");
@@ -1460,11 +1471,18 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 	if (ni)	{
 		ino_t vnid = MREF(ni->mft_no);
 
+		NInoSetDirty(ni);
+	
 		newNode = (vnode*)ntfs_calloc(sizeof(vnode));
 		if (newNode == NULL) {
 		 	result = ENOMEM;
 		 	goto exit;
 		}
+		
+		if (ntfs_inode_close_in_dir(ni, bi)) {
+			result = EINVAL;
+			goto exit;
+		}		
 
 		newNode->vnid = vnid;
 		newNode->parent_vnid = MREF(bi->mft_no);
@@ -1473,18 +1491,15 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 		result = publish_vnode(_vol, vnid, (void*)newNode, &gNTFSVnodeOps,
 			S_IFDIR, 0);
 
-		put_vnode(_vol, MREF(ni->mft_no));
+		put_vnode(_vol, vnid);
 
 		ntfs_mark_free_space_outdated(ns);
-		fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);
-
+		fs_ntfs_update_times(_vol, bi, NTFS_UPDATE_MCTIME);
 		notify_entry_created(ns->id, MREF(bi->mft_no), name, vnid);
 	} else
 		result = errno;
 
 exit:
-	if (ni)
-		ntfs_inode_close(ni);
 	if (bi)
 		ntfs_inode_close(bi);
 	free(uname);

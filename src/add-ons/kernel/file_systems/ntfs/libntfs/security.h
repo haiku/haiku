@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004      Anton Altaparmakov
  * Copyright (c) 2005-2006 Szabolcs Szakacsits
- * Copyright (c) 2007-2008 Jean-Pierre Andre
+ * Copyright (c) 2007-2010 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -85,6 +85,7 @@ struct CACHED_PERMISSIONS_LEGACY {
 	struct CACHED_PERMISSIONS_LEGACY *previous;
 	void *variable;
 	size_t varsize;
+	union ALIGNMENT payload[0];
 		/* above fields must match "struct CACHED_GENERIC" */
 	u64 mft_no;
 	struct CACHED_PERMISSIONS perm;
@@ -99,6 +100,7 @@ struct CACHED_SECURID {
 	struct CACHED_SECURID *previous;
 	void *variable;
 	size_t varsize;
+	union ALIGNMENT payload[0];
 		/* above fields must match "struct CACHED_GENERIC" */
 	uid_t uid;
 	gid_t gid;
@@ -135,6 +137,7 @@ struct PERMISSIONS_CACHE {
 enum {
 	SECURITY_DEFAULT,	/* rely on fuse for permissions checking */
 	SECURITY_RAW,		/* force same ownership/permissions on files */
+	SECURITY_ACL,		/* enable Posix ACLs (when compiled in) */
 	SECURITY_ADDSECURIDS,	/* upgrade old security descriptors */
 	SECURITY_STATICGRPS,	/* use static groups for access control */
 	SECURITY_WANTED		/* a security related option was present */
@@ -181,6 +184,7 @@ struct POSIX_SECURITY {
 	int defcnt;
 	int firstdef;
 	u16 tagsset;
+	s32 alignment[0];
 	struct POSIX_ACL acl;
 } ;
         
@@ -346,7 +350,7 @@ INDEX_ENTRY *ntfs_read_sii(struct SECURITY_API *scapi,
 INDEX_ENTRY *ntfs_read_sdh(struct SECURITY_API *scapi,
 		INDEX_ENTRY *entry);
 struct SECURITY_API *ntfs_initialize_file_security(const char *device,
-                                int flags);
+                                unsigned long flags);
 BOOL ntfs_leave_file_security(struct SECURITY_API *scx);
 
 int ntfs_get_usid(struct SECURITY_API *scapi, uid_t uid, char *buf);

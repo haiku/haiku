@@ -78,7 +78,7 @@ Area::Bottom() const
  * @param left	the left tab of the area
  */
 void
-Area::SetLeft(XTab* left)
+Area::SetLeft(BReference<XTab> left)
 {
 	fLeft = left;
 
@@ -97,7 +97,7 @@ Area::SetLeft(XTab* left)
  * @param right	the right tab of the area
  */
 void
-Area::SetRight(XTab* right)
+Area::SetRight(BReference<XTab> right)
 {
 	fRight = right;
 
@@ -114,7 +114,7 @@ Area::SetRight(XTab* right)
  * Sets the top tab of the area.
  */
 void
-Area::SetTop(YTab* top)
+Area::SetTop(BReference<YTab> top)
 {
 	fTop = top;
 
@@ -131,7 +131,7 @@ Area::SetTop(YTab* top)
  * Sets the bottom tab of the area.
  */
 void
-Area::SetBottom(YTab* bottom)
+Area::SetBottom(BReference<YTab> bottom)
 {
 	fBottom = bottom;
 

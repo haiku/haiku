@@ -1027,6 +1027,7 @@ AboutView::_CreateCreditsView()
 		"Fredrik Modéen\n"
 		"Marcus Overhagen\n"
 		"Michael Pfeiffer\n"
+		"Joseph R. Prostko\n"
 		"François Revol\n"
 		"Philippe Saint-Pierre\n"
 		"John Scipione\n"

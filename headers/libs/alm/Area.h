@@ -56,10 +56,10 @@ public:
 			XTab*				Right() const;
 			YTab*				Top() const;
 			YTab*				Bottom() const;
-			void				SetLeft(XTab* left);
-			void				SetRight(XTab* right);
-			void				SetTop(YTab* top);
-			void				SetBottom(YTab* bottom);
+			void				SetLeft(BReference<XTab> left);
+			void				SetRight(BReference<XTab> right);
+			void				SetTop(BReference<YTab> top);
+			void				SetBottom(BReference<YTab> bottom);
 
 			Row*				GetRow() const;
 			Column*				GetColumn() const;

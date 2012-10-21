@@ -806,6 +806,9 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
+	// save the clipping constraints of the view
+	view->PushState();
+
 	// separate the bar in two sides
 	float sliderPosition;
 	BRect leftBarSide = rect;
@@ -847,8 +850,8 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 
 	view->PopState();
 
-	// reset clipping constraints
-	view->ConstrainClippingRegion(NULL);
+	// restore the clipping constraints of the view
+	view->PopState();
 }
 
 
@@ -1309,15 +1312,11 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// clipping constraints for the view
-	BRegion clipping;
-	view->GetClippingRegion(&clipping);
+	// save the clipping constraints of the view
+	view->PushState();
 
-	// intersect constraints with updateRect
-	BRegion updateClipping(updateRect);
-	clipping.IntersectWith(&updateClipping);
-
-	// clip to the intersection
+	// set clipping constraints to updateRect
+	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
 
 	rgb_color edgeShadowColor;
@@ -1396,8 +1395,8 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 
 	view->FillRect(rect, fillGradient);
 
-	// reset clipping constraints
-	view->ConstrainClippingRegion(NULL);
+	// restore the clipping constraints of the view
+	view->PopState();
 }
 
 
@@ -1898,15 +1897,11 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// clipping constraints for the view
-	BRegion clipping;
-	view->GetClippingRegion(&clipping);
+	// save the clipping constraints of the view
+	view->PushState();
 
-	// intersect constraints with updateRect
-	BRegion updateClipping(updateRect);
-	clipping.IntersectWith(&updateClipping);
-
-	// clip to the intersection
+	// set clipping constraints to updateRect
+	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
 
 	// outer edge colors
@@ -2046,7 +2041,8 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			frameShadowColor, frameShadowColor, borders);
 	}
 
-	view->ConstrainClippingRegion(NULL);
+	// restore the clipping constraints of the view
+	view->PopState();
 }
 
 
@@ -2172,15 +2168,11 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// clipping constraints for the view
-	BRegion clipping;
-	view->GetClippingRegion(&clipping);
+	// save the clipping constraints of the view
+	view->PushState();
 
-	// intersect constraints with updateRect
-	BRegion updateClipping(updateRect);
-	clipping.IntersectWith(&updateClipping);
-
-	// clip to the intersection
+	// set clipping constraints to updateRect
+	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
 
 	// inner bevel colors
@@ -2288,8 +2280,8 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	// fill in the background
 	view->FillRect(rect, fillGradient);
 
-	// reset clipping constraints
-	view->ConstrainClippingRegion(NULL);
+	// restore the clipping constraints of the view
+	view->PopState();
 }
 
 
@@ -2365,15 +2357,11 @@ BControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// clipping constraints for the view
-	BRegion clipping;
-	view->GetClippingRegion(&clipping);
+	// save the clipping constraints of the view
+	view->PushState();
 
-	// intersect constraints with updateRect
-	BRegion updateClipping(updateRect);
-	clipping.IntersectWith(&updateClipping);
-
-	// clip to the intersection
+	// set clipping constraints to updateRect
+	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
 
 	// frame colors
@@ -2547,8 +2535,8 @@ BControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 	// fill in the background
 	view->FillRect(rect, fillGradient);
 
-	// reset clipping constraints
-	view->ConstrainClippingRegion(NULL);
+	// restore the clipping constraints of the view
+	view->PopState();
 }
 
 
