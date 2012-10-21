@@ -352,11 +352,15 @@ void
 Volume::_Unset()
 {
 	DEBUG_INIT("Volume");
+	// delete our partitions
+	for (int i = 0; i < UDF_MAX_PARTITION_MAPS; i++)
+		_SetPartition(i, NULL);
 	fFSVolume->id = 0;
 	if (fDevice >= 0) {
 		block_cache_delete(fBlockCache, true);	
 		close(fDevice);
 	}
+	fBlockCache = NULL;
 	fDevice = -1;
 	fMounted = false;
 	fOffset = 0;
@@ -364,9 +368,6 @@ Volume::_Unset()
 	fBlockSize = 0;
 	fBlockShift = 0;
 	fName.SetTo("", 0);
-	// delete our partitions
-	for (int i = 0; i < UDF_MAX_PARTITION_MAPS; i++)
-		_SetPartition(i, NULL);
 }
 
 /*! \brief Sets the partition associated with the given number after
