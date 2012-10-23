@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	2052381345
+1	japanese	x-vnd.Haiku-WebPositive	1513721873
 Show home button	Settings Window		ホームボタンを表示する
 Username:	Authentication Panel		ユーザー名：
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
@@ -107,6 +107,7 @@ New browser window	Download Window		新規ブラウザウィンドウ
 Today	WebPositive Window		今日
 1 second left	Download Window		残り 1 秒
 Remember username and password for this site	Authentication Panel		このサイトのユーザー名とパスワードを記憶する
+Earlier	WebPositive Window		6 日以上前
 Authentication required	Authentication Panel		認証が必要です
 Use proxy server to connect to the internet	Settings Window		インターネット接続にプロキシーサーバーを使用する。
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ダウンロードが進行中です。WebPositive を今終了してもよいですか?
