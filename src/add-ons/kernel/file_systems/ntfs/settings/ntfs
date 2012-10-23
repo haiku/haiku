@@ -6,3 +6,4 @@
 hide_sys_files	true
 read_only	false
 no_atime	true
+fake_attributes	true
