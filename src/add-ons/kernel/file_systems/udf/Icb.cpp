@@ -183,7 +183,7 @@ void
 Icb::GetAccessTime(struct timespec &timespec) const
 {
 	timestamp ts;
-	if ((_Tag().id() == TAGID_EXTENDED_FILE_ENTRY))
+	if (_Tag().id() == TAGID_EXTENDED_FILE_ENTRY)
 		ts = _ExtendedEntry()->access_date_and_time();
 	else
 		ts = _FileEntry()->access_date_and_time();
@@ -200,7 +200,7 @@ void
 Icb::GetModificationTime(struct timespec &timespec) const
 {
 	timestamp ts;
-	if ((_Tag().id() == TAGID_EXTENDED_FILE_ENTRY))
+	if (_Tag().id() == TAGID_EXTENDED_FILE_ENTRY)
 		ts = _ExtendedEntry()->modification_date_and_time();
 	else
 		ts = _FileEntry()->modification_date_and_time();
@@ -214,7 +214,7 @@ Icb::GetModificationTime(struct timespec &timespec) const
 
 
 status_t
-Icb::FindBlock(uint32 logicalBlock, off_t &block)
+Icb::FindBlock(uint32 logicalBlock, off_t &block, bool &recorded)
 {
 	off_t pos = logicalBlock << fVolume->BlockShift();
 	if (uint64(pos) >= Length()) {
@@ -227,9 +227,11 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block)
 	status_t status = B_OK;
 	long_address extent;
 	bool isEmpty = false;
+	recorded = false;
 		
 	switch (_IcbTag().descriptor_flags()) {
-		case ICB_DESCRIPTOR_TYPE_SHORT: {
+		case ICB_DESCRIPTOR_TYPE_SHORT:
+		{
 			TRACE(("Icb::FindBlock: descriptor type -> short\n"));
 			AllocationDescriptorList<ShortDescriptorAccessor> list(this,
 				ShortDescriptorAccessor(fPartition));
@@ -241,7 +243,8 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block)
 			break;
 		}
 
-		case ICB_DESCRIPTOR_TYPE_LONG: {
+		case ICB_DESCRIPTOR_TYPE_LONG:
+		{
 			TRACE(("Icb::FindBlock: descriptor type -> long\n"));
 			AllocationDescriptorList<LongDescriptorAccessor> list(this);
 			status = list.FindExtent(pos, &extent, &isEmpty);
@@ -252,7 +255,8 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block)
 			break;
 		}
 
-		case ICB_DESCRIPTOR_TYPE_EXTENDED: {
+		case ICB_DESCRIPTOR_TYPE_EXTENDED:
+		{
 			TRACE(("Icb::FindBlock: descriptor type -> extended\n"));
 //			AllocationDescriptorList<ExtendedDescriptorAccessor> list(this, ExtendedDescriptorAccessor(0));
 //			RETURN(_Read(list, pos, buffer, length, block));
@@ -260,7 +264,8 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block)
 			break;
 		}
 
-		case ICB_DESCRIPTOR_TYPE_EMBEDDED: {
+		case ICB_DESCRIPTOR_TYPE_EMBEDDED:
+		{
 			TRACE(("Icb::FindBlock: descriptor type: embedded\n"));
 			RETURN(B_ERROR);
 			break;
@@ -275,6 +280,7 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block)
 
 	if (status == B_OK) {
 		block = extent.block();
+		recorded = extent.type() == EXTENT_TYPE_RECORDED;
 		TRACE(("Icb::FindBlock: block %lld\n", block));
 	}
 	return status;
@@ -301,7 +307,8 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 		return file_cache_read(fFileCache, NULL, pos, buffer, length);
 
 	switch (_IcbTag().descriptor_flags()) {
-		case ICB_DESCRIPTOR_TYPE_SHORT: {
+		case ICB_DESCRIPTOR_TYPE_SHORT:
+		{
 			TRACE(("Icb::Read: descriptor type -> short\n"));
 			AllocationDescriptorList<ShortDescriptorAccessor> list(this,
 				ShortDescriptorAccessor(fPartition));
@@ -309,14 +316,16 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 			break;
 		}
 
-		case ICB_DESCRIPTOR_TYPE_LONG: {
+		case ICB_DESCRIPTOR_TYPE_LONG:
+		{
 			TRACE(("Icb::Read: descriptor type -> long\n"));
 			AllocationDescriptorList<LongDescriptorAccessor> list(this);
 			RETURN(_Read(list, pos, buffer, length, block));
 			break;
 		}
 
-		case ICB_DESCRIPTOR_TYPE_EXTENDED: {
+		case ICB_DESCRIPTOR_TYPE_EXTENDED:
+		{
 			TRACE(("Icb::Read: descriptor type -> extended\n"));
 //			AllocationDescriptorList<ExtendedDescriptorAccessor> list(this, ExtendedDescriptorAccessor(0));
 //			RETURN(_Read(list, pos, buffer, length, block));
@@ -324,7 +333,8 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 			break;
 		}
 
-		case ICB_DESCRIPTOR_TYPE_EMBEDDED: {
+		case ICB_DESCRIPTOR_TYPE_EMBEDDED:
+		{
 			TRACE(("Icb::Read: descriptor type: embedded\n"));
 			RETURN(B_ERROR);
 			break;

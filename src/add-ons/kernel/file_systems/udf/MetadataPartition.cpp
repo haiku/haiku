@@ -31,8 +31,16 @@ MetadataPartition::MetadataPartition(Volume *volume,
 	fMetadataIcb = new(nothrow) Icb(volume, address);
 	if (fMetadataIcb == NULL || fMetadataIcb->InitCheck() != B_OK)
 		fInitStatus = B_NO_MEMORY;
+	else
+		fInitStatus = B_OK;
 
-	fInitStatus = B_OK;
+	address.set_to(metadataMirrorFileLocation, fPartition);
+	
+	fMetadataMirrorIcb = new(nothrow) Icb(volume, address);
+	if (fMetadataMirrorIcb == NULL
+		|| fMetadataMirrorIcb->InitCheck() != B_OK) {
+		fInitStatus = B_NO_MEMORY;
+	}
 }
 
 /*! \brief Destroys the MetadataPartition object.
@@ -48,9 +56,17 @@ status_t
 MetadataPartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 {
 	off_t block = 0;
-	status_t status = fMetadataIcb->FindBlock(logicalBlock, block);
+	bool isRecorded;
+	status_t status = fMetadataIcb->FindBlock(logicalBlock, block, isRecorded);
 	if (status != B_OK)
 		return status;
+	if (!isRecorded) {
+		status = fMetadataMirrorIcb->FindBlock(logicalBlock, block, isRecorded);
+		if (status != B_OK)
+			return status;
+		if (!isRecorded)
+			return B_BAD_DATA;
+	}
 	return fParentPartition.MapBlock(block, physicalBlock);
 }
 
