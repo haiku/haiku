@@ -261,7 +261,10 @@ LocaleWindow::LocaleWindow()
 
 	tabView->AddTab(languageTab);
 	tabView->AddTab(countryTab);
-	tabView->AddTab(optionsTab);
+	// Diable the option tab for R1A4. See http://dev.haiku-os.org/ticket/9026
+	// ***************************
+	//tabView->AddTab(optionsTab);
+	// ***************************
 
 	BButton* button
 		= new BButton(B_TRANSLATE("Defaults"), new BMessage(kMsgDefaults));
