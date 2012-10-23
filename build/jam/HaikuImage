@@ -631,7 +631,8 @@ AddFilesToHaikuImage system add-ons locale catalogs
 	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 AddFilesToHaikuHybridImage system add-ons locale catalogs
 	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) : : true ;
-AddFilesToHaikuImage system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
+# IMAP is disabled for R1A4. See #9080
+AddFilesToHaikuImage system add-ons mail_daemon inbound_protocols : POP3 ;
 AddFilesToHaikuImage system add-ons mail_daemon outbound_protocols : SMTP ;
 AddFilesToHaikuImage system add-ons mail_daemon inbound_filters
 	: MatchHeader SpamFilter NewMailNotification ;
