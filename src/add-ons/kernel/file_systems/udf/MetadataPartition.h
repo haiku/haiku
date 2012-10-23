@@ -44,6 +44,7 @@ private:
 	bool fMetadataIsDuplicated;
 	status_t fInitStatus;
 	Icb	*fMetadataIcb;
+	Icb	*fMetadataMirrorIcb;
 };
 
 #endif	// _UDF_METADATA_PARTITION_H
