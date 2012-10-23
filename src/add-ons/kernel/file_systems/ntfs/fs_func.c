@@ -38,6 +38,7 @@
 #include <KernelExport.h>
 
 #include "attributes.h"
+#include "fake_attributes.h"
 #include "lock.h"
 #include "ntfs.h"
 #include "volume_util.h"
@@ -404,6 +405,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		.state = NF_FreeClustersOutdate | NF_FreeMFTOutdate,
 		.show_sys_files = false,
 		.ro = false,
+		.fake_attrib = false,
 		.flags = 0
 	};
 
@@ -419,12 +421,29 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		"false"), "false") != 0;
 	ns->noatime = strcasecmp(get_driver_parameter(handle, "no_atime", "true",
 		"true"), "true") == 0;
+	ns->fake_attrib = strcasecmp(get_driver_parameter(handle, "fake_attributes",
+		"false", "false"), "false") != 0;
 	unload_driver_settings(handle);
 
 	if (ns->ro || (flags & B_MOUNT_READ_ONLY) != 0
 		|| is_device_read_only(device)) {
 		mountFlags |= MS_RDONLY;
 		ns->flags |= B_FS_IS_READONLY;
+	}
+
+	if (ns->fake_attrib) {
+		gNTFSVnodeOps.open_attr_dir = fake_open_attrib_dir;
+		gNTFSVnodeOps.close_attr_dir = fake_close_attrib_dir;
+		gNTFSVnodeOps.free_attr_dir_cookie = fake_free_attrib_dir_cookie;
+		gNTFSVnodeOps.read_attr_dir = fake_read_attrib_dir;
+		gNTFSVnodeOps.rewind_attr_dir = fake_rewind_attrib_dir;
+		gNTFSVnodeOps.create_attr = NULL;
+		gNTFSVnodeOps.open_attr = fake_open_attrib;
+		gNTFSVnodeOps.close_attr = fake_close_attrib;
+		gNTFSVnodeOps.free_attr_cookie = fake_free_attrib_cookie;
+		gNTFSVnodeOps.read_attr = fake_read_attrib;
+		gNTFSVnodeOps.read_attr_stat = fake_read_attrib_stat;
+		gNTFSVnodeOps.write_attr = fake_write_attrib;
 	}
 
 	ns->ntvol = utils_mount_volume(device, mountFlags | MS_RECOVER);
@@ -701,18 +720,19 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 
 		newNode->vnid = vnid;
 		newNode->parent_vnid = ntfs_mft_get_parent_ref(ni);
-
-		if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
-			set_mime(newNode, ".***");
-		else {
-			name = (char*)malloc(MAX_PATH);
-			if (name != NULL) {
-				if (utils_inode_get_name(ni, name, MAX_PATH) == 1)
-					set_mime(newNode, name);
-				free(name);
+		
+		if (ns->fake_attrib) {
+			if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
+				set_mime(newNode, ".***");
+			else {
+				name = (char*)malloc(MAX_PATH);
+				if (name != NULL) {
+					if (utils_inode_get_name(ni, name, MAX_PATH) == 1)
+						set_mime(newNode, name);
+					free(name);
+				}
 			}
 		}
-
 		_node->private_node = newNode;
 	} else
 		result = ENOMEM;
@@ -1149,7 +1169,9 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 
 			newNode->vnid = *_vnid;
 			newNode->parent_vnid = MREF(bi->mft_no);
-			set_mime(newNode, name);
+			
+			if (ns->fake_attrib)
+				set_mime(newNode, name);
 
 			ni->flags |= FILE_ATTR_ARCHIVE;
 			ntfs_inode_update_mbsname(bi, name, ni->mft_no);
@@ -1511,7 +1533,7 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name,
 	int unameLength;
 	int utargetLength;
 	status_t result = B_NO_ERROR;
-	int fmode;
+	int fmode = FS_FILE_MODE;
 	le32 securid = 0;
 
 	LOCK_VOL(ns);
@@ -1557,12 +1579,13 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name,
 	symnode->vnid = MREF(sym->mft_no);
 	symnode->parent_vnid = MREF(bi->mft_no);
 
-	if (sym->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
-		set_mime(symnode, ".***");
-		fmode = FS_DIR_MODE;
-	} else {
-		set_mime(symnode, name);
-		fmode = FS_FILE_MODE;
+	if (ns->fake_attrib) {
+		if (sym->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
+			set_mime(symnode, ".***");
+			fmode = FS_DIR_MODE;
+		} else {
+			set_mime(symnode, name);
+		}
 	}
 
 	result = publish_vnode(_vol, MREF(sym->mft_no), symnode, &gNTFSVnodeOps,
@@ -1655,7 +1678,9 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 
 		newNode->vnid = vnid;
 		newNode->parent_vnid = MREF(bi->mft_no);
-		set_mime(newNode, ".***");
+		
+		if (ns->fake_attrib)
+			set_mime(newNode, ".***");
 		
 		ni->flags |= FILE_ATTR_ARCHIVE;
 		ntfs_inode_update_mbsname(bi, name, ni->mft_no);
@@ -1761,6 +1786,13 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *name,
 				
 		fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_CTIME);
 		fs_ntfs_update_times(_vol, dir_ni, NTFS_UPDATE_MCTIME);
+
+		if (ns->fake_attrib) {
+			if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
+				set_mime(file, ".***");
+			else
+				set_mime(file, newname);
+		}
 				
 		ntfs_inode_close(dir_ni);             
 		ntfs_inode_close(ni);
@@ -1769,7 +1801,8 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *name,
 
 		ntfs_remove(_vol, parent, name);
 
-		file->parent_vnid = newparent;		
+		file->parent_vnid = newparent;
+		
 		put_vnode(_vol, file->vnid);
 				
 		notify_entry_moved(ns->id, parent, name, newparent, newname, ino);

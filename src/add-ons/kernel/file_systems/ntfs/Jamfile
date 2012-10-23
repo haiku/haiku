@@ -9,6 +9,7 @@ UsePrivateHeaders kernel ;
 
 KernelAddon ntfs :
 	attributes.c
+	fake_attributes.c
 	mime_table.c
 	utils.c
 	ntfsdir.c

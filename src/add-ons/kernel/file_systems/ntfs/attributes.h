@@ -14,9 +14,6 @@
 
 #include "ntfs.h"
 
-
-status_t set_mime(vnode *node, const char *filename);
-
 status_t fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 	uint32 type, int openMode, void** _cookie);
 status_t fs_open_attrib_dir(fs_volume *_vol, fs_vnode *_node, void **_cookie);
