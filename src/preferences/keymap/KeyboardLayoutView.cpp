@@ -672,6 +672,10 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		region.Exclude(bottomLeft);
 		view->ConstrainClippingRegion(&region);
 
+		// Fill in the rect with the background color
+		SetHighColor(background);
+		FillRect(rect);
+
 		// draw the button background
 		BRect bgRect = rect.InsetByCopy(2, 2);
 		be_control_look->DrawButtonBackground(view, bgRect, updateRect,
