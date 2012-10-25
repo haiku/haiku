@@ -119,6 +119,7 @@ typedef struct nspace {
 	long 		free_mft;
 	BOOL 		ro;
 	BOOL 		show_sys_files;
+	BOOL		fake_attrib;
 	BOOL 		silent;
 	BOOL 		force;
 	BOOL 		debug;

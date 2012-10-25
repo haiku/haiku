@@ -105,7 +105,8 @@ public:
 	uint32						AllocationDescriptorsSize()
 									{ return _AbstractEntry()->AllocationDescriptorsLength(); }
 
-	status_t					FindBlock(uint32 logicalBlock, off_t &block);
+	status_t					FindBlock(uint32 logicalBlock, off_t &block,
+									bool &recorded);
 	status_t					Read(off_t pos, void *buffer, size_t *length,
 									uint32 *block = NULL);
 

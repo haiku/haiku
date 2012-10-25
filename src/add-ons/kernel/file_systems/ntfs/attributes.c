@@ -25,41 +25,6 @@
 
 //TODO: notify*()
 
-
-int32 kBeOSTypeCookie = 0x1234;
-
-
-status_t
-set_mime(vnode *node, const char *filename)
-{
-	struct ext_mime *p;
-	int32 namelen, ext_len;
-
-	TRACE("set_mime - for [%s]\n", filename);
-
-	node->mime = NULL;
-
-	namelen = strlen(filename);
-
-	for (p = mimes; p->extension; p++) {
-		ext_len = strlen(p->extension);
-
-		if (namelen <= ext_len)
-			continue;
-
-		if (filename[namelen-ext_len-1] != '.')
-			continue;
-		
-		if (!strcasecmp(filename + namelen - ext_len, p->extension))
-			break;
-	}
-
-	node->mime = p->mime;
-
-	return B_NO_ERROR;
-}
-
-
 status_t
 fs_open_attrib_dir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 {

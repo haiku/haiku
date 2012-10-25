@@ -613,8 +613,10 @@ void
 Area::_UpdateMaxSizeConstraint(BSize max)
 {
 	if (!fLayoutItem->IsVisible()) {
-		fMaxContentHeight->SetRightSide(B_SIZE_UNLIMITED);
-		fMaxContentWidth->SetRightSide(B_SIZE_UNLIMITED);
+		if (fMaxContentHeight != NULL)
+			fMaxContentHeight->SetRightSide(B_SIZE_UNLIMITED);
+		if (fMaxContentWidth != NULL)
+			fMaxContentWidth->SetRightSide(B_SIZE_UNLIMITED);
 		return;
 	}
 
