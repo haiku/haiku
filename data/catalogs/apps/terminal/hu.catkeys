@@ -6,7 +6,7 @@ OK	Terminal TermWindow		Rendben
 New Terminal	Terminal TermWindow		Új terminál
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Sajnos, a terminálnak nem sikerült elindítani a shellt.
 Text size	Terminal TermWindow		Betűméret
-Match case	Terminal FindWindow		Kis- és nagybetűk megkülönböztetése
+Match case	Terminal FindWindow		Betűérzékeny
 Quit	Terminal TermWindow		Kilépés
 Use default shell	Terminal Shell		Alapértelmezett shell használata
 Confirm exit if active programs exist	Terminal AppearancePrefView		Kilépés megerősítése ha van futó program

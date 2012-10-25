@@ -5,7 +5,7 @@ File offset: 	ProbeView		Fájl lenyomat:
 Find again	ProbeView		Keresés tovább
 Text	FindWindow		Szöveg
 Find…	ProbeView		Keresés…
-Case sensitive	FindWindow		Kis- és nagybetű megkülönböztetése
+Case sensitive	FindWindow		Betűérzékeny
 Cancel	OpenWindow		Mégse
 Close	AttributeWindow		Bezárás
 File	ProbeView		Fájl

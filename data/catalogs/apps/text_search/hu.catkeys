@@ -28,6 +28,6 @@ Please select the files you wish to keep searching.	GrepWindow		Kérjük, válas
 TextSearch	GrepWindow		Szövegkeresés
 Quit	GrepWindow		Kilépés
 Show files in Tracker	GrepWindow		Fájlok megjelenítése a Nyomkövetőben
-Case-sensitive	GrepWindow		Kis- és nagybetűk megkülönböztetése
+Case-sensitive	GrepWindow		Betűérzékeny
 Text files only	GrepWindow		Csak szövegfájlokban
 Show lines	GrepWindow		Sorok megjelenítése

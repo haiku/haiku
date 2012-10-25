@@ -18,7 +18,7 @@ Save	Menus		Mentés
 Replace with:	FindandReplaceWindow		Csere erre:
 Cancel	SaveAlert		Mégse
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl (%s) nem található.
-Case-sensitive	FindandReplaceWindow		Kis- és nagybetűérzékeny
+Case-sensitive	FindandReplaceWindow		Betűérzékeny
 Green	Menus		Zöld
 Revert to saved…	Menus		Vissza a mentett állapotra…
 Yellow	Menus		Sárga
