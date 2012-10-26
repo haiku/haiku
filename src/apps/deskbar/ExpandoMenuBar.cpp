@@ -63,7 +63,7 @@ All rights reserved.
 #include "WindowMenuItem.h"
 
 
-const float kDefaultDeskbarMenuWidth = 50.0f;
+const float kMinMenuItemWidth = 50.0f;
 const float kSepItemWidth = 5.0f;
 const float kIconPadding = 8.0f;
 
@@ -85,7 +85,7 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 	fDrawLabel(drawLabel),
 	fShowTeamExpander(static_cast<TBarApp*>(be_app)->Settings()->superExpando),
 	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
-	fDeskbarMenuWidth(kDefaultDeskbarMenuWidth),
+	fDeskbarMenuWidth(kMinMenuItemWidth),
 	fBarView(bar),
 	fPreviousDragTargetItem(NULL),
 	fLastClickItem(NULL)
@@ -682,7 +682,7 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 		- fDeskbarMenuWidth - kSepItemWidth;
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
-	float minItemWidth = fDrawLabel ? iconOnlyWidth + fDeskbarMenuWidth
+	float minItemWidth = fDrawLabel ? iconOnlyWidth + kMinMenuItemWidth
 									: iconOnlyWidth;
 	float maxItemWidth = sMinimumWindowWidth + iconSize - kMinimumIconSize;
 	float menuWidth = maxItemWidth * CountItems() + fDeskbarMenuWidth
@@ -800,9 +800,14 @@ TExpandoMenuBar::CheckForSizeOverrun()
 	if (count < 0)
 		return false;
 
-	float menuWidth = ItemAt(count)->Frame().right + fDeskbarMenuWidth
-		+ kSepItemWidth + 1;
-	float maxWidth = fBarView->DragRegion()->Frame().left - 1;
+	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
+	float minItemWidth = fDrawLabel ? iconOnlyWidth + kMinMenuItemWidth
+									: iconOnlyWidth;
+	float menuWidth = minItemWidth * CountItems() + fDeskbarMenuWidth
+		+ kSepItemWidth;
+	float maxWidth = fBarView->DragRegion()->Frame().left
+		- fDeskbarMenuWidth - kSepItemWidth;
 	return menuWidth > maxWidth;
 }
 
