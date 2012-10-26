@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2012, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,8 @@
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
+
+#include <new>
 
 #include <BeBuild.h>
 #include <DataIO.h>
@@ -146,6 +148,8 @@ class BMessage {
 							const void *data, ssize_t numBytes,
 							bool isFixedSize = true, int32 count = 1);
 
+		status_t		Append(const BMessage &message);
+
 		// Removing data
 		status_t		RemoveData(const char *name, int32 index = 0);
 		status_t		RemoveName(const char *name);
@@ -268,6 +272,7 @@ class BMessage {
 
 		void			*operator new(size_t size);
 		void			*operator new(size_t, void *pointer);
+		void			*operator new(size_t, const std::nothrow_t &noThrow);
 		void			operator delete(void *pointer, size_t size);
 
 		// Private, reserved, or obsolete
