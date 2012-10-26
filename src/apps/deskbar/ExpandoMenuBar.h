@@ -104,11 +104,8 @@ class TExpandoMenuBar : public BMenuBar {
 		float fDeskbarMenuWidth;
 
 		TBarView* fBarView;
-		int32 fFirstApp;
 
-		TBarMenuTitle* fDeskbarMenuItem;
-		TTeamMenuItem* fSeparatorItem;
-		TTeamMenuItem* fPreviousDragTargetItem;
+		TTeamMenuItem* 		fPreviousDragTargetItem;
 
 		TTeamMenuItem*		fLastMousedOverItem;
 		BMenuItem*			fLastClickItem;

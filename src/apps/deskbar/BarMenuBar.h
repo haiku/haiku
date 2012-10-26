@@ -63,6 +63,9 @@ class TBarMenuBar : public BMenuBar {
 		void AddTeamMenu();
 		void RemoveTeamMenu();
 
+		void AddSeperatorItem();
+		void RemoveSeperatorItem();
+
 		void InitTrackingHook(bool (* hookfunction)(BMenu*, void*), void* state,
 			bool both = false);
 
@@ -70,6 +73,7 @@ class TBarMenuBar : public BMenuBar {
 		TBarView* fBarView;
 		TBarMenuTitle* fDeskbarMenuItem;
 		TBarMenuTitle* fAppListMenuItem;
+		TTeamMenuItem* fSeparatorItem;
 };
 
 

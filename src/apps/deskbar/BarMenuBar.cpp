@@ -51,6 +51,8 @@ All rights reserved.
 #include "TeamMenu.h"
 
 
+const float kSepItemWidth = 5.0f;
+
 TBarMenuBar::TBarMenuBar(TBarView* bar, BRect frame, const char* name)
 	: BMenuBar(frame, name, B_FOLLOW_NONE, B_ITEMS_IN_ROW, false),
 	fBarView(bar),
@@ -86,11 +88,15 @@ TBarMenuBar::SmartResize(float width, float height)
 
 	width -= 1;
 
-	int32 count = CountItems();
-	if (fDeskbarMenuItem)
-		fDeskbarMenuItem->SetWidthHeight(width / count, height);
-	if (fAppListMenuItem)
-		fAppListMenuItem->SetWidthHeight(width / count, height);
+	if (fSeparatorItem)
+		fDeskbarMenuItem->SetWidthHeight(width - kSepItemWidth, height);
+	else {
+		int32 count = CountItems();
+		if (fDeskbarMenuItem)
+			fDeskbarMenuItem->SetWidthHeight(width / count, height);
+		if (fAppListMenuItem)
+			fAppListMenuItem->SetWidthHeight(width / count, height);
+	}
 
 	InvalidateLayout();
 }
@@ -122,6 +128,40 @@ TBarMenuBar::RemoveTeamMenu()
 		RemoveItem((BMenuItem*)fAppListMenuItem);
 		delete fAppListMenuItem;
 		fAppListMenuItem = NULL;
+	}
+
+	BRect frame = Frame();
+	SmartResize(frame.Width(), frame.Height());
+}
+
+
+void
+TBarMenuBar::AddSeperatorItem()
+{
+	if (CountItems() > 1)
+		return;
+
+	BRect frame(Frame());
+	delete fSeparatorItem;
+
+	fSeparatorItem = new TTeamMenuItem(kSepItemWidth,
+		frame.Height() - 2, false);
+	AddItem(fSeparatorItem);
+	fSeparatorItem->SetEnabled(false);
+	SmartResize(frame.Width() - 1.0f, frame.Height());
+}
+
+
+void
+TBarMenuBar::RemoveSeperatorItem()
+{
+	if (CountItems() < 2)
+		return;
+
+	if (fSeparatorItem) {
+		RemoveItem((BMenuItem*)fSeparatorItem);
+		delete fSeparatorItem;
+		fSeparatorItem = NULL;
 	}
 
 	BRect frame = Frame();

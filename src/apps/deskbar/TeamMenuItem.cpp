@@ -240,7 +240,7 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 			if (fDrawLabel && iconBounds.Width() > 32)
 				*height += fLabelAscent + fLabelDescent;
 		} else {
-			*height = iconBounds.Height() - kVPad * 8;
+			*height = iconBounds.Height() + kVPad * 4;
 		}
 	}
 	*height += 2;

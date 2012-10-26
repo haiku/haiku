@@ -79,7 +79,7 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 	bool vertical, bool drawLabel)
 	:
 	BMenuBar(frame, name, B_FOLLOW_NONE,
-		vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW, vertical),
+		vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW),
 	fVertical(vertical),
 	fOverflow(false),
 	fDrawLabel(drawLabel),
@@ -87,7 +87,6 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
 	fDeskbarMenuWidth(kDefaultDeskbarMenuWidth),
 	fBarView(bar),
-	fFirstApp(0),
 	fPreviousDragTargetItem(NULL),
 	fLastClickItem(NULL)
 {
@@ -137,24 +136,10 @@ TExpandoMenuBar::AttachedToWindow()
 	// top or bottom mode, add deskbar menu and sep for menubar tracking
 	// consistency
 	if (!fVertical) {
-		TDeskbarMenu* beMenu = new TDeskbarMenu(fBarView);
-		TBarWindow::SetDeskbarMenu(beMenu);
 		const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
 			R_LeafLogoBitmap);
 		if (logoBitmap != NULL)
 			fDeskbarMenuWidth = logoBitmap->Bounds().Width() + 16;
-
-		fDeskbarMenuItem = new TBarMenuTitle(fDeskbarMenuWidth,
-			Frame().Height(), logoBitmap, beMenu, true);
-		AddItem(fDeskbarMenuItem);
-
-		fSeparatorItem = new TTeamMenuItem(kSepItemWidth, itemHeight, fVertical);
-		AddItem(fSeparatorItem);
-		fSeparatorItem->SetEnabled(false);
-		fFirstApp = 2;
-	} else {
-		fDeskbarMenuItem = NULL;
-		fSeparatorItem = NULL;
 	}
 
 	if (settings->sortRunningApps)
@@ -169,7 +154,7 @@ TExpandoMenuBar::AttachedToWindow()
 				&& !strcmp(barInfo->sig, kTrackerSignature)) {
 				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
 					barInfo->name, barInfo->sig, itemWidth, itemHeight,
-					fDrawLabel, fVertical), fFirstApp);
+					fDrawLabel, fVertical), 0);
 			} else {
 				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
 					barInfo->name, barInfo->sig, itemWidth, itemHeight,
@@ -526,20 +511,15 @@ TExpandoMenuBar::MouseUp(BPoint where)
 bool
 TExpandoMenuBar::InDeskbarMenu(BPoint loc) const
 {
-	if (!fVertical) {
-		if (fDeskbarMenuItem && fDeskbarMenuItem->Frame().Contains(loc))
-			return true;
-	} else {
-		TBarWindow* window = dynamic_cast<TBarWindow*>(Window());
-		if (window) {
-			if (TDeskbarMenu* bemenu = window->DeskbarMenu()) {
-				bool inDeskbarMenu = false;
-				if (bemenu->LockLooper()) {
-					inDeskbarMenu = bemenu->Frame().Contains(loc);
-					bemenu->UnlockLooper();
-				}
-				return inDeskbarMenu;
+	TBarWindow* window = dynamic_cast<TBarWindow*>(Window());
+	if (window) {
+		if (TDeskbarMenu* bemenu = window->DeskbarMenu()) {
+			bool inDeskbarMenu = false;
+			if (bemenu->LockLooper()) {
+				inDeskbarMenu = bemenu->Frame().Contains(loc);
+				bemenu->UnlockLooper();
 			}
+			return inDeskbarMenu;
 		}
 	}
 
@@ -558,7 +538,7 @@ TExpandoMenuBar::TeamItemAtPoint(BPoint point, BMenuItem** _item)
 	TTeamMenuItem* lastApp = NULL;
 	int32 count = CountItems();
 
-	for (int32 i = fFirstApp; i < count; i++) {
+	for (int32 i = 0; i < count; i++) {
 		BMenuItem* item = ItemAt(i);
 
 		if (dynamic_cast<TTeamMenuItem*>(item) != NULL)
@@ -604,11 +584,11 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 		itemWidth, itemHeight, fDrawLabel, fVertical);
 
 	if (settings->trackerAlwaysFirst && !strcmp(signature, kTrackerSignature))
-		AddItem(item, fFirstApp);
+		AddItem(item, 0);
 	else if (settings->sortRunningApps) {
 		TTeamMenuItem* teamItem
-			= dynamic_cast<TTeamMenuItem*>(ItemAt(fFirstApp));
-		int32 firstApp = fFirstApp;
+			= dynamic_cast<TTeamMenuItem*>(ItemAt(0));
+		int32 firstApp = 0;
 
 		// if Tracker should always be the first item, we need to skip it
 		// when sorting in the current item
@@ -648,7 +628,7 @@ void
 TExpandoMenuBar::AddTeam(team_id team, const char* signature)
 {
 	int32 count = CountItems();
-	for (int32 i = fFirstApp; i < count; i++) {
+	for (int32 i = 0; i < count; i++) {
 		// Only add to team menu items
 		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
 			if (strcasecmp(item->Signature(), signature) == 0) {
@@ -665,7 +645,7 @@ void
 TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 {
 	int32 count = CountItems();
-	for (int32 i = fFirstApp; i < count; i++) {
+	for (int32 i = 0; i < count; i++) {
 		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
 			if (item->Teams()->HasItem((void*)team)) {
 				item->Teams()->RemoveItem(team);
@@ -698,61 +678,51 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 	if (fBarView->Vertical())
 		return;
 
+	float maxWidth = fBarView->DragRegion()->Frame().left
+		- fDeskbarMenuWidth - kSepItemWidth;
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-	float maxContentWidth = sMinimumWindowWidth + iconSize - kMinimumIconSize;
-
-	// There are 2 extra items:
-	//     The Be Menu
-	//     The little separator item
-	int32 count = CountItems() - 2;
-	float maxWidth = Frame().Width() - fDeskbarMenuWidth - kSepItemWidth * 2;
-	float fullWidth = maxContentWidth * count + fDeskbarMenuWidth
-		+ kSepItemWidth;
 	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
+	float minItemWidth = fDrawLabel ? iconOnlyWidth + fDeskbarMenuWidth
+									: iconOnlyWidth;
+	float maxItemWidth = sMinimumWindowWidth + iconSize - kMinimumIconSize;
+	float menuWidth = maxItemWidth * CountItems() + fDeskbarMenuWidth
+		+ kSepItemWidth;
 
 	bool reset = false;
 	float newWidth = 0.0f;
 
-	if (delta >= 0 && fullWidth > maxWidth) {
+	if (delta >= 0 && menuWidth > maxWidth) {
 		fOverflow = true;
 		reset = true;
-		if (fDrawLabel)
-			newWidth = floorf(maxWidth / count);
-		else
-			newWidth = iconOnlyWidth;
+		newWidth = floorf(maxWidth / CountItems());
 	} else if (delta < 0 && fOverflow) {
 		reset = true;
-		if (fullWidth > maxWidth) {
-			if (fDrawLabel)
-				newWidth = floorf(maxWidth / count);
-			else
-				newWidth = iconOnlyWidth;
-		} else
-			newWidth = maxContentWidth;
+		if (menuWidth > maxWidth)
+			newWidth = floorf(maxWidth / CountItems());
+		else
+			newWidth = maxItemWidth;
 	}
 
-	if (newWidth > maxContentWidth)
-		newWidth = maxContentWidth;
-
-	if (newWidth < iconOnlyWidth)
-		newWidth = iconOnlyWidth;
+	if (newWidth > maxItemWidth)
+		newWidth = maxItemWidth;
+	else if (newWidth < minItemWidth)
+		newWidth = minItemWidth;
 
 	if (reset) {
 		SetMaxContentWidth(newWidth);
-		if (newWidth == maxContentWidth)
+		if (newWidth == maxItemWidth)
 			fOverflow = false;
 		InvalidateLayout();
 
-		for (int32 index = fFirstApp; ; index++) {
+		for (int32 index = 0; ; index++) {
 			TTeamMenuItem* item = (TTeamMenuItem*)ItemAt(index);
 			if (!item)
 				break;
 
-			if (!fDrawLabel && newWidth > iconOnlyWidth) {
+			if (!fDrawLabel && newWidth > iconOnlyWidth)
 				item->SetOverrideWidth(iconOnlyWidth);
-			} else {
+			else
 				item->SetOverrideWidth(newWidth);
-			}
 		}
 
 		Invalidate();
@@ -788,9 +758,9 @@ TExpandoMenuBar::DrawBackground(BRect)
 	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
 	rgb_color vlight = tint_color(menuColor, B_LIGHTEN_2_TINT);
 
-	int32 last = CountItems() - 1;
-	if (last >= 0)
-		bounds.left = ItemAt(last)->Frame().right + 1;
+	int32 count = CountItems() - 1;
+	if (count >= 0)
+		bounds.left = ItemAt(count)->Frame().right + 1;
 	else
 		bounds.left = 0;
 
@@ -820,12 +790,20 @@ TExpandoMenuBar::DrawBackground(BRect)
 bool
 TExpandoMenuBar::CheckForSizeOverrun()
 {
-	BRect screenFrame = (BScreen(Window())).Frame();
-
-	if (fVertical)
+	if (fVertical) {
+		BRect screenFrame = (BScreen(Window())).Frame();
 		return Window()->Frame().bottom > screenFrame.bottom;
-	else
-		return Frame().right > fBarView->DragRegion()->Frame().left;
+	}
+
+	// horizontal
+	int32 count = CountItems() - 1;
+	if (count < 0)
+		return false;
+
+	float menuWidth = ItemAt(count)->Frame().right + fDeskbarMenuWidth
+		+ kSepItemWidth + 1;
+	float maxWidth = fBarView->DragRegion()->Frame().left - 1;
+	return menuWidth > maxWidth;
 }
 
 

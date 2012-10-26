@@ -42,6 +42,7 @@ All rights reserved.
 
 #include <AppFileInfo.h>
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <LocaleRoster.h>
@@ -71,6 +72,7 @@ const int32 kDefaultRecentAppCount = 10;
 const int32 kMenuTrackMargin = 20;
 
 const uint32 kUpdateOrientation = 'UpOr';
+const float kSepItemWidth = 5.0f;
 
 
 class BarViewMessageFilter : public BMessageFilter
@@ -349,49 +351,47 @@ TBarView::MouseDown(BPoint where)
 void
 TBarView::PlaceDeskbarMenu()
 {
-	// top or bottom, full
-	if (!fVertical && fBarMenuBar != NULL) {
-		fBarMenuBar->RemoveSelf();
-		delete fBarMenuBar;
-		fBarMenuBar = NULL;
+	// Calculate the size of the deskbar menu
+	BRect menuFrame(Bounds());
+	if (fVertical)
+		menuFrame.bottom = menuFrame.top + kMenuBarHeight;
+	else {
+		menuFrame.bottom = menuFrame.top
+			+ static_cast<TBarApp*>(be_app)->IconSize() + 4;
 	}
 
-	// top or bottom expando mode has Be menu built in for tracking
-	// only for vertical mini or expanded
-	// mini mode will have team menu added as part of BarMenuBar
-	if (fVertical && fBarMenuBar == NULL) {
+	if (fBarMenuBar == NULL) {
 		// create the Be menu
-		BRect mbarFrame(Bounds());
-		mbarFrame.bottom = mbarFrame.top + kMenuBarHeight;
-		fBarMenuBar = new TBarMenuBar(this, mbarFrame, "BarMenuBar");
+		fBarMenuBar = new TBarMenuBar(this, menuFrame, "BarMenuBar");
 		AddChild(fBarMenuBar);
 	}
 
-	// if there isn't a bemenu at this point,
-	// DB should be in top/bottom mode, else error
-	if (fBarMenuBar == NULL)
-		return;
-
 	float width = sMinimumWindowWidth;
 	BPoint loc(B_ORIGIN);
-	BRect menuFrame(fBarMenuBar->Frame());
 
 	if (fState == kFullState) {
 		fBarMenuBar->RemoveTeamMenu();
+		fBarMenuBar->RemoveSeperatorItem();
 		// TODO: Magic constants need explanation
 		width = 8 + 16 + 8;
+		fBarMenuBar->SmartResize(width, menuFrame.Height());
 		loc = Bounds().LeftTop();
 	} else if (fState == kExpandoState) {
-		// shows apps below tray
 		fBarMenuBar->RemoveTeamMenu();
-		if (fVertical)
+		if (fVertical) {
+			// shows apps below tray
+			fBarMenuBar->RemoveSeperatorItem();
 			width += 1;
-		else
-			width = floorf(width) / 2;
+		} else {
+			// shows apps to the right of bemenu
+			fBarMenuBar->AddSeperatorItem();
+			width = floorf(width) / 2 + kSepItemWidth;
+		}
 		loc = Bounds().LeftTop();
 	} else {
 		// mini mode, DeskbarMenu next to team menu
 		fBarMenuBar->AddTeamMenu();
+		fBarMenuBar->RemoveSeperatorItem();
 	}
 
 	fBarMenuBar->SmartResize(width, menuFrame.Height());
@@ -491,6 +491,10 @@ TBarView::PlaceApplicationBar()
 		expandoFrame.top = 0;
 		int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 		expandoFrame.bottom = iconSize + 4;
+
+		if (fBarMenuBar != NULL)
+			expandoFrame.left = fBarMenuBar->Frame().Width();
+
 		if (fTrayLocation != 0)
 			expandoFrame.right = fDragRegion->Frame().left - 1;
 		else
@@ -505,8 +509,6 @@ TBarView::PlaceApplicationBar()
 		fVertical, !hideLabels && fState != kFullState);
 
 	fInlineScrollView = new TInlineScrollView(menuScrollFrame, fExpando,
-		fVertical ? expandoFrame.top : expandoFrame.left,
-		fVertical ? screenFrame.bottom : expandoFrame.right,
 		fVertical ? B_VERTICAL : B_HORIZONTAL);
 	AddChild(fInlineScrollView);
 

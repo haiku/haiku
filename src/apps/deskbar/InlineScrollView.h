@@ -13,15 +13,14 @@
 
 #include <View.h>
 
-class BLayout;
-class ScrollArrow;
-class BPoint;
 
+class BLayout;
+class BPoint;
+class ScrollArrow;
 
 class TInlineScrollView : public BView {
 public:
 								TInlineScrollView(BRect frame, BView* target,
-									float beginLimit, float endLimit,
 									enum orientation orientation = B_VERTICAL);
 	virtual						~TInlineScrollView();
 
@@ -33,7 +32,8 @@ public:
 				bool			HasScrollers() const;
 
 				void			SetSmallStep(float step);
-				void			GetSteps(float* _smallStep, float* _largeStep) const;
+				void			GetSteps(float* _smallStep,
+										 float* _largeStep) const;
 				void			ScrollBy(const float& step);
 
 private:
@@ -44,9 +44,6 @@ private:
 				float			fScrollStep;
 				float			fScrollValue;
 				float			fScrollLimit;
-
-				float			fBeginLimit;
-				float			fEndLimit;
 
 				int32			fOrientation;
 };

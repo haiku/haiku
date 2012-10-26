@@ -314,7 +314,7 @@ RightScrollArrow::MouseDown(BPoint where)
 
 
 TInlineScrollView::TInlineScrollView(BRect frame, BView* target,
-	float beginLimit, float endLimit, enum orientation orientation)
+	enum orientation orientation)
 	:
 	BView(frame, "inline scroll view", B_FOLLOW_NONE, 0),
 	fTarget(target),
@@ -323,8 +323,6 @@ TInlineScrollView::TInlineScrollView(BRect frame, BView* target,
 	fScrollStep(kDefaultScrollStep),
 	fScrollValue(0),
 	fScrollLimit(0),
-	fBeginLimit(beginLimit),
-	fEndLimit(endLimit),
 	fOrientation(orientation)
 {
 }
@@ -388,11 +386,11 @@ TInlineScrollView::AttachScrollers()
 
 	if (HasScrollers()) {
 		if (fOrientation == B_VERTICAL) {
-			fScrollLimit = Window()->Frame().bottom + 2 * kScrollerDimension
-				- fEndLimit;
+			fScrollLimit = fTarget->Bounds().Height()
+				- (frame.Height() - 2 * kScrollerDimension);
 		} else {
-			fScrollLimit = fTarget->Frame().right + 2 * kScrollerDimension
-				- fEndLimit;
+			fScrollLimit = fTarget->Bounds().Width()
+				- (frame.Width() - 2 * kScrollerDimension);
 		}
 		return;
 	}
@@ -416,8 +414,8 @@ TInlineScrollView::AttachScrollers()
 
 		fTarget->MoveBy(0, kScrollerDimension);
 
-		fScrollLimit = Window()->Frame().bottom + 2 * kScrollerDimension
-			- fEndLimit;
+		fScrollLimit = fTarget->Bounds().Height()
+			- (frame.Height() - 2 * kScrollerDimension);
 	} else {
 		if (fBeginScrollArrow == NULL) {
 			fBeginScrollArrow = new LeftScrollArrow(
@@ -435,8 +433,8 @@ TInlineScrollView::AttachScrollers()
 
 		fTarget->MoveBy(kScrollerDimension, 0);
 
-		fScrollLimit = fTarget->Frame().right + 2 * kScrollerDimension
-			- fEndLimit;
+		fScrollLimit = fTarget->Bounds().Width()
+			- (frame.Width() - 2 * kScrollerDimension);
 	}
 
 	fBeginScrollArrow->SetEnabled(false);
