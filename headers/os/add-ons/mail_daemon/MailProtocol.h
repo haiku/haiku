@@ -21,18 +21,18 @@
 #include <MailSettings.h>
 
 
-class MailNotifier {
+class BMailNotifier {
 public:
-	virtual						~MailNotifier() {}
+	virtual						~BMailNotifier() {}
 
-	virtual MailNotifier*		Clone() = 0;
+	virtual BMailNotifier*		Clone() = 0;
 
 	virtual	void				ShowError(const char* error) = 0;
 	virtual	void				ShowMessage(const char* message) = 0;
 
-	virtual void				SetTotalItems(int32 items) = 0;
-	virtual void				SetTotalItemsSize(int32 size) = 0;
-	virtual	void				ReportProgress(int bytes, int messages,
+	virtual void				SetTotalItems(uint32 items) = 0;
+	virtual void				SetTotalItemsSize(uint64 size) = 0;
+	virtual	void				ReportProgress(uint32 messages, uint64 bytes,
 									const char* message = NULL) = 0;
 	virtual void				ResetProgress(const char* message = NULL) = 0;
 };
@@ -86,7 +86,7 @@ public:
 			//! Does not delete handler
 			bool				RemoveHandler(BHandler* handler);
 
-			void				SetMailNotifier(MailNotifier* mailNotifier);
+			void				SetMailNotifier(BMailNotifier* mailNotifier);
 
 	virtual	void				ShowError(const char* error);
 	virtual	void				ShowMessage(const char* message);
@@ -126,7 +126,7 @@ protected:
 			void				LoadFilters(MailAddonSettings& settings);
 
 			BMailAccountSettings	fAccountSettings;
-			MailNotifier*		fMailNotifier;
+			BMailNotifier*		fMailNotifier;
 
 private:
 			MailFilter*			_LoadFilter(AddonSettings* filterSettings);

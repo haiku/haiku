@@ -18,7 +18,7 @@ Server mail_daemon :
 	LEDAnimation.cpp
 	MailDaemon.cpp
 	main.cpp
-	Notifier.cpp
+	DefaultNotifier.cpp
 	: be libmail.so tracker localestub [ TargetLibstdc++ ]
 		$(TARGET_NETWORK_LIBS)
 ;
@@ -28,5 +28,5 @@ DoCatalogs mail_daemon :
 	:
 	DeskbarView.cpp
 	MailDaemon.cpp
-	Notifier.cpp
+	DefaultNotifier.cpp
 ;

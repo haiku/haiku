@@ -185,7 +185,7 @@ MailProtocol::RemoveHandler(BHandler* handler)
 
 
 void
-MailProtocol::SetMailNotifier(MailNotifier* mailNotifier)
+MailProtocol::SetMailNotifier(BMailNotifier* mailNotifier)
 {
 	delete fMailNotifier;
 	fMailNotifier = mailNotifier;

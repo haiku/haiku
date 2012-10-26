@@ -1,16 +1,16 @@
 /*
- * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2012, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
 
 
+#include "DefaultNotifier.h"
+
 #include <Catalog.h>
 #include <IconUtils.h>
 #include <MailDaemon.h>
 #include <Roster.h>
-
-#include "Notifier.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -30,12 +30,9 @@ DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
 	fTotalSize(0),
 	fSizeDone(0)
 {
-	BString desc;
-	if (fIsInbound == true)
-		desc << B_TRANSLATE("Fetching mail for %name");
-	else
-		desc << B_TRANSLATE("Sending mail for %name");
-    desc.ReplaceFirst("%name", fAccountName);
+	BString desc(fIsInbound ? B_TRANSLATE("Fetching mail for %name")
+		: B_TRANSLATE("Sending mail for %name"));
+	desc.ReplaceFirst("%name", fAccountName);
 
 	BString identifier;
 	identifier << accountName << inbound;
@@ -59,10 +56,11 @@ DefaultNotifier::~DefaultNotifier()
 }
 
 
-MailNotifier*
+BMailNotifier*
 DefaultNotifier::Clone()
 {
-	return new DefaultNotifier(fAccountName, fIsInbound, fErrorWindow, fShowMode);
+	return new DefaultNotifier(fAccountName, fIsInbound, fErrorWindow,
+		fShowMode);
 }
 
 
@@ -81,7 +79,7 @@ DefaultNotifier::ShowMessage(const char* message)
 
 
 void
-DefaultNotifier::SetTotalItems(int32 items)
+DefaultNotifier::SetTotalItems(uint32 items)
 {
 	fTotalItems = items;
 	BString progress;
@@ -91,7 +89,7 @@ DefaultNotifier::SetTotalItems(int32 items)
 
 
 void
-DefaultNotifier::SetTotalItemsSize(int32 size)
+DefaultNotifier::SetTotalItemsSize(uint64 size)
 {
 	fTotalSize = size;
 	fNotification.SetProgress(fSizeDone / (float)fTotalSize);
@@ -99,7 +97,8 @@ DefaultNotifier::SetTotalItemsSize(int32 size)
 
 
 void
-DefaultNotifier::ReportProgress(int bytes, int messages, const char* message)
+DefaultNotifier::ReportProgress(uint32 messages, uint64 bytes,
+	const char* message)
 {
 	fSizeDone += bytes;
 	if (fTotalSize > 0)
@@ -107,11 +106,10 @@ DefaultNotifier::ReportProgress(int bytes, int messages, const char* message)
 	else if (fTotalItems > 0) {
 		// No size information available
 		// Report progress in terms of message count instead
-		
 		fNotification.SetProgress(fItemsDone / (float)fTotalItems);
 	} else {
 		// No message count information either
-		// TODO we should use a B_INFORMATION_NOTIFICATION here, but it is not
+		// TODO: we should use a B_INFORMATION_NOTIFICATION here, but it is not
 		// possible to change the BNotification type after creating it...
 		fNotification.SetProgress(0);
 	}
@@ -119,7 +117,6 @@ DefaultNotifier::ReportProgress(int bytes, int messages, const char* message)
 	fItemsDone += messages;
 
 	BString progress;
-
 	progress << message << "\t";
 
 	if (fTotalItems > 0)
