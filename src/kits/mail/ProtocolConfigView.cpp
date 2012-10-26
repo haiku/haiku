@@ -1,5 +1,5 @@
 /*
- * Copyright 20011, Haiku Inc. All Rights Reserved.
+ * Copyright 2011-2012, Haiku Inc. All Rights Reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -15,6 +15,7 @@
 
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <GridLayout.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -29,7 +30,14 @@
 #define B_TRANSLATION_CONTEXT "ProtocolConfigView"
 
 
-const char* kPartialDownloadLimit = "partial_download_limit";
+static const char* kPartialDownloadLimit = "partial_download_limit";
+
+static const uint32 kMsgLeaveOnServer = 'lmos';
+static const uint32 kMsgNoPassword = 'none';
+static const uint32 kMsgNeedPassword = 'some';
+
+
+namespace BPrivate {
 
 
 BodyDownloadConfig::BodyDownloadConfig()
@@ -62,13 +70,11 @@ BodyDownloadConfig::BodyDownloadConfig()
 
 
 void
-BodyDownloadConfig::SetTo(MailAddonSettings& addonSettings)
+BodyDownloadConfig::SetTo(BMailProtocolSettings& settings)
 {
-	const BMessage* settings = &addonSettings.Settings();
-
 	int32 limit = 0;
-	if (settings->HasInt32(kPartialDownloadLimit))
-		limit = settings->FindInt32(kPartialDownloadLimit);
+	if (settings.HasInt32(kPartialDownloadLimit))
+		limit = settings.FindInt32(kPartialDownloadLimit);
 	if (limit < 0) {
 		fPartialBox->SetValue(B_CONTROL_OFF);
 		fSizeBox->SetText("0");
@@ -122,375 +128,303 @@ BodyDownloadConfig::Archive(BMessage* into, bool) const
 }
 
 
-namespace {
-
-//--------------------Support functions and #defines---------------
-#define enable_control(name) if (FindView(name) != NULL) ((BControl *)(FindView(name)))->SetEnabled(true)
-#define disable_control(name) if (FindView(name) != NULL) ((BControl *)(FindView(name)))->SetEnabled(false)
-
-BTextControl *AddTextField (BRect &rect, const char *name, const char *label);
-BMenuField *AddMenuField (BRect &rect, const char *name, const char *label);
-float FindWidestLabel(BView *view);
-
-static float sItemHeight;
-
-inline const char *
-TextControl(BView *parent,const char *name)
-{
-	BTextControl *control = (BTextControl *)(parent->FindView(name));
-	if (control != NULL)
-		return control->Text();
-
-	return "";
-}
+// #pragma mark -
 
 
-BTextControl *
-AddTextField(BRect &rect, const char *name, const char *label)
-{
-	BTextControl *text_control = new BTextControl(rect,name,label,"",NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-//	text_control->SetDivider(be_plain_font->StringWidth(label));
-	rect.OffsetBy(0,sItemHeight);
-	return text_control;
-}
-
-
-BMenuField *AddMenuField (BRect &rect, const char *name, const char *label) {
-	BPopUpMenu *menu = new BPopUpMenu("Select");
-	BMenuField *control = new BMenuField(rect,name,label,menu,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	control->SetDivider(be_plain_font->StringWidth(label) + 6);
-	rect.OffsetBy(0,sItemHeight);
-	return control;
-}
-
-
-inline BCheckBox *
-AddCheckBox(BRect &rect, const char *name, const char *label, BMessage *msg = NULL)
-{
-	BCheckBox *control = new BCheckBox(rect,name,label,msg);
-	rect.OffsetBy(0,sItemHeight);
-	return control;
-}
-
-
-inline void
-SetTextControl(BView *parent, const char *name, const char *text)
-{
-	BTextControl *control = (BTextControl *)(parent->FindView(name));
-	if (control != NULL)
-		control->SetText(text);
-}
-
-
-float
-FindWidestLabel(BView *view)
-{
-	float width = 0;
-	for (int32 i = view->CountChildren();i-- > 0;) {
-		if (BControl *control = dynamic_cast<BControl *>(view->ChildAt(i))) {
-			float labelWidth = control->StringWidth(control->Label());
-			if (labelWidth > width)
-				width = labelWidth;
-		}
-	}
-	return width;
-}
-
-} // unnamed namspace
-
-
-//----------------Real code----------------------
-BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask)
+MailProtocolConfigView::MailProtocolConfigView(uint32 optionsMask)
 	:
-	BView (BRect(0,0,100,20), "protocol_config_view", B_FOLLOW_LEFT
-		| B_FOLLOW_TOP, B_WILL_DRAW),
+	BView("protocol_config_view", B_WILL_DRAW),
+	fHostControl(NULL),
+	fUserControl(NULL),
+	fPasswordControl(NULL),
+	fLeaveOnServerCheckBox(NULL),
+	fRemoveFromServerCheckBox(NULL),
 	fBodyDownloadConfig(NULL)
 {
-	BRect rect(5,5,245,25);
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	// determine font height
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-	sItemHeight = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 13;
-	rect.bottom = rect.top - 2 + sItemHeight;
+	BGridLayout* layout = new BGridLayout();
+	SetLayout(layout);
 
-	if (options_mask & B_MAIL_PROTOCOL_HAS_HOSTNAME)
-		AddChild(AddTextField(rect, "host", B_TRANSLATE("Mail server:")));
+	if ((optionsMask & B_MAIL_PROTOCOL_HAS_HOSTNAME) != 0) {
+		fHostControl = _AddTextControl(layout, "host",
+			B_TRANSLATE("Mail server:"));
+	}
+	if ((optionsMask & B_MAIL_PROTOCOL_HAS_USERNAME) != 0) {
+		fUserControl = _AddTextControl(layout, "user",
+			B_TRANSLATE("Username:"));
+	}
 
-	if (options_mask & B_MAIL_PROTOCOL_HAS_USERNAME)
-		AddChild(AddTextField(rect, "user", B_TRANSLATE("Username:")));
-
-	if (options_mask & B_MAIL_PROTOCOL_HAS_PASSWORD) {
-		BTextControl *control = AddTextField(rect, "pass",
+	if ((optionsMask & B_MAIL_PROTOCOL_HAS_PASSWORD) != 0) {
+		fPasswordControl = _AddTextControl(layout, "pass",
 			B_TRANSLATE("Password:"));
-		control->TextView()->HideTyping(true);
-		AddChild(control);
+		fPasswordControl->TextView()->HideTyping(true);
 	}
 
-	if (options_mask & B_MAIL_PROTOCOL_HAS_FLAVORS)
-		AddChild(AddMenuField(rect, "flavor", B_TRANSLATE("Connection type:")));
-
-	if (options_mask & B_MAIL_PROTOCOL_HAS_AUTH_METHODS)
-		AddChild(AddMenuField(rect, "auth_method", B_TRANSLATE("Login type:")));
-
-	// set divider
-	float width = FindWidestLabel(this);
-	for (int32 i = CountChildren();i-- > 0;) {
-		if (BTextControl *text = dynamic_cast<BTextControl *>(ChildAt(i)))
-			text->SetDivider(width + 6);
+	if ((optionsMask & B_MAIL_PROTOCOL_HAS_FLAVORS) != 0) {
+		fFlavorField = _AddMenuField(layout, "flavor",
+			B_TRANSLATE("Connection type:"));
 	}
 
-	if (options_mask & B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER) {
-		AddChild(AddCheckBox(rect, "leave_mail_on_server",
-			B_TRANSLATE("Leave mail on server"), new BMessage('lmos')));
-		BCheckBox* box = AddCheckBox(rect, "delete_remote_when_local",
-			B_TRANSLATE("Remove mail from server when deleted"));
-		box->SetEnabled(false);
-		AddChild(box);
+	if ((optionsMask & B_MAIL_PROTOCOL_HAS_AUTH_METHODS) != 0) {
+		fAuthenticationField = _AddMenuField(layout, "auth_method",
+			B_TRANSLATE("Login type:"));
 	}
 
-	if (options_mask & B_MAIL_PROTOCOL_PARTIAL_DOWNLOAD) {
+	if ((optionsMask & B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER) != 0) {
+		fLeaveOnServerCheckBox = new BCheckBox("leave_mail_on_server",
+			B_TRANSLATE("Leave mail on server"),
+			new BMessage(kMsgLeaveOnServer));
+		layout->AddView(fLeaveOnServerCheckBox, 0, layout->CountRows(), 2);
+
+		fRemoveFromServerCheckBox = new BCheckBox("delete_remote_when_local",
+			B_TRANSLATE("Remove mail from server when deleted"), NULL);
+		fRemoveFromServerCheckBox->SetEnabled(false);
+		layout->AddView(fRemoveFromServerCheckBox, 0, layout->CountRows(), 2);
+	}
+
+	if ((optionsMask & B_MAIL_PROTOCOL_PARTIAL_DOWNLOAD) != 0) {
 		fBodyDownloadConfig = new BodyDownloadConfig();
-		fBodyDownloadConfig->MoveBy(0, rect.bottom + 5);
-		AddChild(fBodyDownloadConfig);
-	}
-
-	// resize views
-	float height;
-	GetPreferredSize(&width,&height);
-	ResizeTo(width,height);
-	for (int32 i = CountChildren();i-- > 0;) {
-		// this doesn't work with BTextControl, does anyone know why? -- axeld.
-		if (BView *view = ChildAt(i))
-			view->ResizeTo(width - 10,view->Bounds().Height());
+		layout->AddView(fBodyDownloadConfig, 0, layout->CountRows(), 2);
 	}
 }
 
 
-BMailProtocolConfigView::~BMailProtocolConfigView()
+MailProtocolConfigView::~MailProtocolConfigView()
 {
 }
 
 
 void
-BMailProtocolConfigView::SetTo(MailAddonSettings& settings)
+MailProtocolConfigView::SetTo(BMailProtocolSettings& settings)
 {
- 	const BMessage* archive = &settings.Settings();
+	BString host = settings.FindString("server");
+	if (settings.HasInt32("port"))
+		host << ':' << settings.FindInt32("port");
 
-	BString host = archive->FindString("server");
-	if (archive->HasInt32("port"))
-		host << ':' << archive->FindInt32("port");
+	if (fHostControl != NULL)
+		fHostControl->SetText(host.String());
+	if (fUserControl != NULL)
+		fUserControl->SetText(settings.FindString("username"));
 
-	SetTextControl(this,"host", host.String());
-	SetTextControl(this,"user", archive->FindString("username"));
+	if (fPasswordControl != NULL) {
+		char* password = get_passwd(&settings, "cpasswd");
+		if (password != NULL) {
+			fPasswordControl->SetText(password);
+			delete[] password;
+		} else
+			fPasswordControl->SetText(settings.FindString("password"));
+	}
 
-	char *password = get_passwd(archive, "cpasswd");
-	if (password) {
-		SetTextControl(this,"pass", password);
-		delete[] password;
-	} else
-		SetTextControl(this,"pass", archive->FindString("password"));
+	if (settings.HasInt32("flavor") && fFlavorField != NULL) {
+		if (BMenuItem* item = fFlavorField->Menu()->ItemAt(
+				settings.FindInt32("flavor")))
+			item->SetMarked(true);
+	}
 
-	if (archive->HasInt32("flavor")) {
-		BMenuField *menu = (BMenuField *)(FindView("flavor"));
-		if (menu != NULL) {
-			if (BMenuItem *item = menu->Menu()->ItemAt(archive->FindInt32("flavor")))
-				item->SetMarked(true);
+	if (settings.HasInt32("auth_method") && fAuthenticationField != NULL) {
+		if (BMenuItem* item = fAuthenticationField->Menu()->ItemAt(
+				settings.FindInt32("auth_method"))) {
+			item->SetMarked(true);
+			_SetCredentialsEnabled(item->Command() != kMsgNoPassword);
 		}
 	}
 
-	if (archive->HasInt32("auth_method")) {
-		BMenuField *menu = (BMenuField *)(FindView("auth_method"));
-		if (menu != NULL) {
-			if (BMenuItem *item = menu->Menu()->ItemAt(archive->FindInt32("auth_method"))) {
-				item->SetMarked(true);
-				if (item->Command() != 'none') {
-					enable_control("user");
-					enable_control("pass");
-				}
-			}
-		}
+	if (fLeaveOnServerCheckBox != NULL) {
+		fLeaveOnServerCheckBox->SetValue(settings.FindBool(
+			"leave_mail_on_server") ? B_CONTROL_ON : B_CONTROL_OFF);
 	}
 
-
-	BCheckBox *box = (BCheckBox *)(FindView("leave_mail_on_server"));
-	if (box != NULL)
-		box->SetValue(archive->FindBool("leave_mail_on_server") ? B_CONTROL_ON : B_CONTROL_OFF);
-
-	box = (BCheckBox *)(FindView("delete_remote_when_local"));
-	if (box != NULL) {
-		box->SetValue(archive->FindBool("delete_remote_when_local") ? B_CONTROL_ON : B_CONTROL_OFF);
-
-		if (archive->FindBool("leave_mail_on_server"))
-			box->SetEnabled(true);
-		else
-			box->SetEnabled(false);
+	if (fRemoveFromServerCheckBox != NULL) {
+		fRemoveFromServerCheckBox->SetValue(settings.FindBool(
+			"delete_remote_when_local") ? B_CONTROL_ON : B_CONTROL_OFF);
+		fRemoveFromServerCheckBox->SetEnabled(
+			settings.FindBool("leave_mail_on_server"));
 	}
 
-	if (fBodyDownloadConfig)
+	if (fBodyDownloadConfig != NULL)
 		fBodyDownloadConfig->SetTo(settings);
 }
 
 
 void
-BMailProtocolConfigView::AddFlavor(const char *label)
+MailProtocolConfigView::AddFlavor(const char* label)
 {
-	BMenuField *menu = (BMenuField *)(FindView("flavor"));
-	if (menu != NULL) {
-		menu->Menu()->AddItem(new BMenuItem(label,NULL));
-		if (menu->Menu()->FindMarked() == NULL)
-			menu->Menu()->ItemAt(0)->SetMarked(true);
+	if (fFlavorField != NULL) {
+		fFlavorField->Menu()->AddItem(new BMenuItem(label, NULL));
+
+		if (fFlavorField->Menu()->FindMarked() == NULL)
+			fFlavorField->Menu()->ItemAt(0)->SetMarked(true);
 	}
 }
 
 
 void
-BMailProtocolConfigView::AddAuthMethod(const char *label,bool needUserPassword)
+MailProtocolConfigView::AddAuthMethod(const char* label, bool needUserPassword)
 {
-	BMenuField *menu = (BMenuField *)(FindView("auth_method"));
-	if (menu != NULL) {
-		BMenuItem *item = new BMenuItem(label,new BMessage(needUserPassword ? 'some' : 'none'));
+	if (fAuthenticationField != NULL) {
+		fAuthenticationField->Menu()->AddItem(new BMenuItem(label,
+			new BMessage(needUserPassword
+				? kMsgLeaveOnServer : kMsgNoPassword)));
 
-		menu->Menu()->AddItem(item);
-
-		if (menu->Menu()->FindMarked() == NULL) {
-			menu->Menu()->ItemAt(0)->SetMarked(true);
-			MessageReceived(menu->Menu()->ItemAt(0)->Message());
+		if (fAuthenticationField->Menu()->FindMarked() == NULL) {
+			BMenuItem* item = fAuthenticationField->Menu()->ItemAt(0);
+			item->SetMarked(true);
+			MessageReceived(item->Message());
 		}
 	}
 }
 
 
-void
-BMailProtocolConfigView::AttachedToWindow()
+BGridLayout*
+MailProtocolConfigView::Layout() const
 {
-	BMenuField *menu = (BMenuField *)(FindView("auth_method"));
-	if (menu != NULL)
-		menu->Menu()->SetTargetForItems(this);
-
-	BCheckBox *box = (BCheckBox *)(FindView("leave_mail_on_server"));
-	if (box != NULL)
-		box->SetTarget(this);
+	return (BGridLayout*)BView::GetLayout();
 }
 
 
 void
-BMailProtocolConfigView::MessageReceived(BMessage *msg)
+MailProtocolConfigView::AttachedToWindow()
 {
-	switch (msg->what) {
-		case 'some':
-			enable_control("user");
-			enable_control("pass");
+	if (fAuthenticationField != NULL)
+		fAuthenticationField->Menu()->SetTargetForItems(this);
+
+	if (fLeaveOnServerCheckBox != NULL)
+		fLeaveOnServerCheckBox->SetTarget(this);
+}
+
+
+void
+MailProtocolConfigView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgNeedPassword:
+			_SetCredentialsEnabled(true);
 			break;
-		case 'none':
-			disable_control("user");
-			disable_control("pass");
+		case kMsgNoPassword:
+			_SetCredentialsEnabled(false);
 			break;
 
-		case 'lmos':
-			if (msg->FindInt32("be:value") == 1) {
-				enable_control("delete_remote_when_local");
-			} else {
-				disable_control("delete_remote_when_local");
-			}
+		case kMsgLeaveOnServer:
+			fRemoveFromServerCheckBox->SetEnabled(
+				message->FindInt32("be:value") == B_CONTROL_ON);
 			break;
 	}
 }
 
 
 status_t
-BMailProtocolConfigView::Archive(BMessage *into, bool deep) const
+MailProtocolConfigView::Archive(BMessage* into, bool deep) const
 {
-	const char *host = TextControl((BView *)this,"host");
-	int32 port = -1;
-	BString host_name = host;
-	if (host_name.FindFirst(':') > -1) {
-		port = atol(host_name.String() + host_name.FindFirst(':') + 1);
-		host_name.Truncate(host_name.FindFirst(':'));
+	if (fHostControl != NULL) {
+		int32 port = -1;
+		BString hostName = fHostControl->Text();
+		if (hostName.FindFirst(':') > -1) {
+			port = atol(hostName.String() + hostName.FindFirst(':') + 1);
+			hostName.Truncate(hostName.FindFirst(':'));
+		}
+
+		if (into->ReplaceString("server", hostName.String()) != B_OK)
+			into->AddString("server", hostName.String());
+
+		// since there is no need for the port option, remove it here
+		into->RemoveName("port");
+		if (port != -1)
+			into->AddInt32("port", port);
+	} else {
+		into->RemoveName("server");
+		into->RemoveName("port");
 	}
 
-	if (into->ReplaceString("server",host_name.String()) != B_OK)
-		into->AddString("server",host_name.String());
-
-	// since there is no need for the port option, remove it here
-	into->RemoveName("port");
-	if (port != -1)
-		into->AddInt32("port",port);
-
-	if (into->ReplaceString("username",TextControl((BView *)this,"user")) != B_OK)
-		into->AddString("username",TextControl((BView *)this,"user"));
+	if (fUserControl != NULL) {
+		if (into->ReplaceString("username", fUserControl->Text()) != B_OK)
+			into->AddString("username", fUserControl->Text());
+	} else
+		into->RemoveName("username");
 
 	// remove old unencrypted passwords
 	into->RemoveName("password");
 
-	set_passwd(into,"cpasswd",TextControl((BView *)this,"pass"));
+	if (fPasswordControl != NULL)
+		set_passwd(into, "cpasswd", fPasswordControl->Text());
+	else
+		into->RemoveName("cpasswd");
 
-	BMenuField *field;
-	int32 index = -1;
+	_StoreIndexOfMarked(*into, "flavor", fFlavorField);
+	_StoreIndexOfMarked(*into, "auth_method", fAuthenticationField);
 
-	if ((field = (BMenuField *)(FindView("flavor"))) != NULL) {
-		BMenuItem *item = field->Menu()->FindMarked();
-		if (item != NULL)
-			index = field->Menu()->IndexOf(item);
-	}
+	_StoreCheckBox(*into, "leave_mail_on_server", fLeaveOnServerCheckBox);
+	_StoreCheckBox(*into, "delete_remote_when_local",
+		fRemoveFromServerCheckBox);
 
-	if (into->ReplaceInt32("flavor",index) != B_OK)
-		into->AddInt32("flavor",index);
+	if (fBodyDownloadConfig != NULL)
+		return fBodyDownloadConfig->Archive(into, deep);
 
-	index = -1;
-
-	if ((field = (BMenuField *)(FindView("auth_method"))) != NULL) {
-		BMenuItem *item = field->Menu()->FindMarked();
-		if (item != NULL)
-			index = field->Menu()->IndexOf(item);
-	}
-
-	if (into->ReplaceInt32("auth_method",index) != B_OK)
-		into->AddInt32("auth_method",index);
-
-	if (FindView("leave_mail_on_server") != NULL) {
-		BControl* control = (BControl*)FindView("leave_mail_on_server");
-		bool on = (control->Value() == B_CONTROL_ON);
-		if (into->ReplaceBool("leave_mail_on_server", on) != B_OK)
-			into->AddBool("leave_mail_on_server", on);
-
-		control = (BControl*)FindView("delete_remote_when_local");
-		on = (control->Value() == B_CONTROL_ON);
-		if (into->ReplaceBool("delete_remote_when_local", on)) {
-			into->AddBool("delete_remote_when_local", on);
-		}
-	} else {
-		if (into->ReplaceBool("leave_mail_on_server", false) != B_OK)
-			into->AddBool("leave_mail_on_server", false);
-
-		if (into->ReplaceBool("delete_remote_when_local", false) != B_OK)
-			into->AddBool("delete_remote_when_local", false);
-	}
-
-	if (fBodyDownloadConfig)
-		fBodyDownloadConfig->Archive(into, deep);
 	return B_OK;
 }
 
 
-void
-BMailProtocolConfigView::GetPreferredSize(float *width, float *height)
+BTextControl*
+MailProtocolConfigView::_AddTextControl(BGridLayout* layout, const char* name,
+	const char* label)
 {
-	float minWidth = 250;
-	if (BView *view = FindView("delete_remote_when_local")) {
-		float ignore;
-		view->GetPreferredSize(&minWidth,&ignore);
-	}
-	if (minWidth < 250)
-		minWidth = 250;
-	*width = minWidth + 10;
-	*height = (CountChildren() * sItemHeight) + 5;
+	BTextControl* control = new BTextControl(name, label, "", NULL);
+	int32 row = layout->CountRows();
+	layout->AddItem(control->CreateLabelLayoutItem(), 0, row);
+	layout->AddItem(control->CreateTextViewLayoutItem(), 1, row);
+	return control;
+}
 
-	if (fBodyDownloadConfig) {
-		float bodyW, bodyH;
-		fBodyDownloadConfig->GetPreferredSize(&bodyW, &bodyH);
-		*height+= bodyH;
+
+BMenuField*
+MailProtocolConfigView::_AddMenuField(BGridLayout* layout, const char* name,
+	const char* label)
+{
+	BPopUpMenu* menu = new BPopUpMenu("");
+	BMenuField* field = new BMenuField(name, label, menu);
+	int32 row = layout->CountRows();
+	layout->AddItem(field->CreateLabelLayoutItem(), 0, row);
+	layout->AddItem(field->CreateMenuBarLayoutItem(), 1, row);
+	return field;
+}
+
+
+void
+MailProtocolConfigView::_StoreIndexOfMarked(BMessage& message, const char* name,
+	BMenuField* field) const
+{
+	int32 index = -1;
+	if (field != NULL) {
+		BMenuItem* item = field->Menu()->FindMarked();
+		if (item != NULL)
+			index = field->Menu()->IndexOf(item);
+	}
+	if (message.ReplaceInt32(name, index) != B_OK)
+		message.AddInt32(name, index);
+}
+
+
+void
+MailProtocolConfigView::_StoreCheckBox(BMessage& message, const char* name,
+	BCheckBox* checkBox) const
+{
+	bool value = checkBox != NULL && checkBox->Value() == B_CONTROL_ON;
+	if (value) {
+		if (message.ReplaceBool(name, value) != B_OK)
+			message.AddBool(name, value);
+	} else
+		message.RemoveName(name);
+}
+
+
+void
+MailProtocolConfigView::_SetCredentialsEnabled(bool enabled)
+{
+	if (fUserControl != NULL && fPasswordControl != NULL) {
+		fUserControl->SetEnabled(enabled);
+		fPasswordControl->SetEnabled(enabled);
 	}
 }
 
+
+}	// namespace BPrivate

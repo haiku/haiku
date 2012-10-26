@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2012, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -9,10 +9,11 @@
 
 #include <Button.h>
 #include <Catalog.h>
+#include <GridLayout.h>
+#include <Path.h>
 #include <TextControl.h>
 
-#include <MailAddon.h>
-#include <Path.h>
+#include <MailFilter.h>
 
 #include <FileConfigView.h>
 #include <ProtocolConfigView.h>
@@ -25,31 +26,32 @@
 #define B_TRANSLATION_CONTEXT "imap_config"
 
 
+using namespace BPrivate;
+
+
 const uint32 kMsgOpenIMAPFolder = '&OIF';
 
 
-class ConfigView : public BMailProtocolConfigView {
+class ConfigView : public MailProtocolConfigView {
 public:
-								ConfigView(MailAddonSettings& settings,
-									BMailAccountSettings& accountSettings);
+								ConfigView(BMailAccountSettings& settings);
 	virtual						~ConfigView();
-	virtual	status_t			Archive(BMessage *into, bool deep = true) const;
-	virtual	void				GetPreferredSize(float *width, float *height);
+
+	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual void				AttachedToWindow();
 
 private:
-			BMailFileConfigView* fFileView;
-			BButton*			fIMAPFolderButton;
-			MailAddonSettings&	fAddonSettings;
+			MailFileConfigView*	fFileView;
+			BButton*			fFolderButton;
+			BMailProtocolSettings& fSettings;
 };
 
 
-ConfigView::ConfigView(MailAddonSettings& settings,
-	BMailAccountSettings& accountSettings)
+ConfigView::ConfigView(BMailAccountSettings& settings)
 	:
-	BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME
+	MailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME
 		| B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
 		| B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
 		| B_MAIL_PROTOCOL_PARTIAL_DOWNLOAD
@@ -57,39 +59,31 @@ ConfigView::ConfigView(MailAddonSettings& settings,
 	 	| B_MAIL_PROTOCOL_HAS_FLAVORS
 #endif
 	 ),
-	 fAddonSettings(settings)
+	 fSettings(settings.InboundSettings())
 {
 #ifdef USE_SSL
 	AddFlavor(B_TRANSLATE("No encryption"));
 	AddFlavor(B_TRANSLATE("SSL"));
 #endif
 
-	SetTo(settings);
+	SetTo(settings.InboundSettings());
 
 	((BControl*)(FindView("leave_mail_on_server")))->SetValue(B_CONTROL_ON);
 	((BControl*)(FindView("leave_mail_on_server")))->Hide();
 
-	BRect frame = FindView("delete_remote_when_local")->Frame();
-
-	((BControl*)(FindView("delete_remote_when_local")))->SetEnabled(true);
-	((BControl*)(FindView("delete_remote_when_local")))->MoveBy(0, -25);
-
-	fIMAPFolderButton = new BButton(frame, "IMAP Folders", B_TRANSLATE(
+	fFolderButton = new BButton("IMAP Folders", B_TRANSLATE(
 		"IMAP Folders"), new BMessage(kMsgOpenIMAPFolder));
-	AddChild(fIMAPFolderButton);
-
-	frame.right -= 10;
+	Layout()->AddView(fFolderButton, 0, Layout()->CountRows(), 2);
 
 	BPath defaultFolder = BPrivate::default_mail_directory();
-	defaultFolder.Append(accountSettings.Name());
+	defaultFolder.Append(settings.Name());
 
-	fFileView = new BMailFileConfigView(B_TRANSLATE("Destination:"),
+	fFileView = new MailFileConfigView(B_TRANSLATE("Destination:"),
 		"destination", false, defaultFolder.Path());
-	fFileView->SetTo(&settings.Settings(), NULL);
-	AddChild(fFileView);
-	fFileView->MoveBy(0, frame.bottom + 5);
+	fFileView->SetTo(&settings.InboundSettings(), NULL);
 
-	ResizeToPreferred();
+	Layout()->AddView(fFileView, 0, Layout()->CountRows(),
+		Layout()->CountColumns());
 }
 
 
@@ -99,18 +93,10 @@ ConfigView::~ConfigView()
 
 
 status_t
-ConfigView::Archive(BMessage *into, bool deep) const
+ConfigView::Archive(BMessage* into, bool deep) const
 {
 	fFileView->Archive(into, deep);
-	return BMailProtocolConfigView::Archive(into, deep);
-}
-
-
-void
-ConfigView::GetPreferredSize(float *width, float *height)
-{
-	BMailProtocolConfigView::GetPreferredSize(width,height);
-	*height -= 20;
+	return MailProtocolConfigView::Archive(into, deep);
 }
 
 
@@ -129,7 +115,7 @@ ConfigView::MessageReceived(BMessage* message)
 		}
 
 		default:
-			BMailProtocolConfigView::MessageReceived(message);
+			MailProtocolConfigView::MessageReceived(message);
 	}
 }
 
@@ -137,7 +123,7 @@ ConfigView::MessageReceived(BMessage* message)
 void
 ConfigView::AttachedToWindow()
 {
-	fIMAPFolderButton->SetTarget(this);
+	fFolderButton->SetTarget(this);
 }
 
 
@@ -145,8 +131,7 @@ ConfigView::AttachedToWindow()
 
 
 BView*
-instantiate_config_panel(MailAddonSettings& settings,
-	BMailAccountSettings& accountSettings)
+instantiate_protocol_config_panel(BMailAccountSettings& settings)
 {
-	return new ConfigView(settings, accountSettings);
+	return new ConfigView(settings);
 }

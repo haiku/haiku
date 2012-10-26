@@ -1,8 +1,13 @@
-/* New Mail Notification - notifies incoming e-mail
- *
+/*
+ * Copyright 2004-2015, Haiku, Inc. All rights reserved.
  * Copyright 2001, Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
-*/
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+
+//!	Notifies incoming e-mail
 
 
 #include <Alert.h>
@@ -14,7 +19,7 @@
 #include <Path.h>
 #include <String.h>
 
-#include <MailAddon.h>
+#include <MailFilter.h>
 
 #include "ConfigView.h"
 
@@ -23,33 +28,44 @@
 #define B_TRANSLATION_CONTEXT "filter"
 
 
-class NotifyFilter : public MailFilter
-{
+class NotifyFilter : public BMailFilter {
 public:
-								NotifyFilter(MailProtocol& protocol,
-									AddonSettings* settings);
+								NotifyFilter(BMailProtocol& protocol,
+									BMailAddOnSettings* settings);
+
+	virtual BString				DescriptiveName() const;
 
 			void				HeaderFetched(const entry_ref& ref,
 									BFile* file);
-			void				MailboxSynced(status_t status);
+			void				MailboxSynchronized(status_t status);
+
 private:
 			int32				fStrategy;
 			int32				fNNewMessages;
 };
 
 
-NotifyFilter::NotifyFilter(MailProtocol& protocol, AddonSettings* settings)
+NotifyFilter::NotifyFilter(BMailProtocol& protocol,
+	BMailAddOnSettings* settings)
 	:
-	MailFilter(protocol, settings),
+	BMailFilter(protocol, settings),
 	fNNewMessages(0)
 {
-	fStrategy = settings->Settings().FindInt32("notification_method");
+	fStrategy = settings->FindInt32("notification_method");
+}
+
+
+BString
+NotifyFilter::DescriptiveName() const
+{
+	return filter_name();
 }
 
 
 void
 NotifyFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 {
+	// TODO: do not use MAIL:status here!
 	char statusString[256];
 	if (file->ReadAttr("MAIL:status", B_STRING_TYPE, 0, statusString, 256) < 0)
 		return;
@@ -59,17 +75,17 @@ NotifyFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 
 
 void
-NotifyFilter::MailboxSynced(status_t status)
+NotifyFilter::MailboxSynchronized(status_t status)
 {
 	if (fNNewMessages == 0)
 		return;
 
-	if (fStrategy & do_beep)
+	if ((fStrategy & NOTIFY_BEEP) != 0)
 		system_beep("New E-mail");
 
-	if (fStrategy & alert) {
-		static BMessageFormat format(B_TRANSLATE(
-			"You have {0, plural, one{# new message} other{# new messages}} "
+	if ((fStrategy & NOTIFY_ALERT) != 0) {
+		BMessageFormat format(B_TRANSLATE(
+			"You have {0, plural, one{One new message} other{# new messages}} "
 			"for %account."));
 
 		BString text;
@@ -83,13 +99,13 @@ NotifyFilter::MailboxSynced(status_t status)
 		alert->Go(NULL);
 	}
 
-	if (fStrategy & blink_leds)
+	if ((fStrategy & NOTIFY_BLINK_LEDS) != 0)
 		be_app->PostMessage('mblk');
 
-	if (fStrategy & one_central_beep)
+	if ((fStrategy & NOTIFY_CENTRAL_BEEP) != 0)
 		be_app->PostMessage('mcbp');
 
-	if (fStrategy & big_doozy_alert) {
+	if ((fStrategy & NOTIFY_CENTRAL_ALERT) != 0) {
 		BMessage msg('numg');
 		msg.AddInt32("num_messages", fNNewMessages);
 		msg.AddString("name", fMailProtocol.AccountSettings().Name());
@@ -97,9 +113,9 @@ NotifyFilter::MailboxSynced(status_t status)
 		be_app->PostMessage(&msg);
 	}
 
-	if (fStrategy & log_window) {
-		static BMessageFormat format(B_TRANSLATE("{0, plural, "
-			"one{# new message} other{# new messages}}"));
+	if ((fStrategy & NOTIFY_NOTIFICATION) != 0) {
+		BMessageFormat format(B_TRANSLATE("{0, plural, "
+			"one{One new message} other{# new messages}}"));
 
 		BString message;
 		format.Format(message, fNNewMessages);
@@ -110,8 +126,18 @@ NotifyFilter::MailboxSynced(status_t status)
 }
 
 
-MailFilter*
-instantiate_mailfilter(MailProtocol& protocol, AddonSettings* settings)
+// #pragma mark -
+
+
+BString
+filter_name()
+{
+	return B_TRANSLATE("New mails notification");
+}
+
+
+BMailFilter*
+instantiate_filter(BMailProtocol& protocol, BMailAddOnSettings* settings)
 {
 	return new NotifyFilter(protocol, settings);
 }

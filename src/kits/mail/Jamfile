@@ -25,6 +25,7 @@ local sources =
 	MailComponent.cpp
 	MailContainer.cpp
 	MailDaemon.cpp
+	MailFilter.cpp
 	MailMessage.cpp
 	MailProtocol.cpp
 	MailSettings.cpp

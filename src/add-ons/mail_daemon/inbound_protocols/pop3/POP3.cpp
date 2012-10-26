@@ -65,15 +65,15 @@ NotHere(BStringList& that, BStringList& otherList, BStringList* results)
 // #pragma mark -
 
 
-POP3Protocol::POP3Protocol(BMailAccountSettings* settings)
+POP3Protocol::POP3Protocol(const BMailAccountSettings& settings)
 	:
-	InboundProtocol(settings),
+	BInboundMailProtocol(settings),
 	fNumMessages(-1),
 	fMailDropSize(0),
 	fServerConnection(NULL)
 {
 	printf("POP3Protocol::POP3Protocol(BMailAccountSettings* settings)\n");
-	fSettings = fAccountSettings.InboundSettings().Settings();
+	fSettings = fAccountSettings.InboundSettings();
 
 	fUseSSL = fSettings.FindInt32("flavor") == 1 ? true : false;
 
@@ -145,13 +145,15 @@ POP3Protocol::SyncMessages()
 
 	SetTotalItems(2);
 	ReportProgress(0, 1, B_TRANSLATE("Connect to server" B_UTF8_ELLIPSIS));
+
 	status_t error = Connect();
-	if (error < B_OK) {
+	if (error != B_OK) {
 		ResetProgress();
 		return error;
 	}
 
 	ReportProgress(0, 1, B_TRANSLATE("Getting UniqueIDs" B_UTF8_ELLIPSIS));
+
 	error = _RetrieveUniqueIDs();
 	if (error < B_OK) {
 		ResetProgress();
@@ -256,11 +258,11 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 	SetTotalItems(1);
 
 	status_t error = Connect();
-	if (error < B_OK)
+	if (error != B_OK)
 		return error;
 
 	error = _RetrieveUniqueIDs();
-	if (error < B_OK) {
+	if (error != B_OK) {
 		Disconnect();
 		return error;
 	}
@@ -354,14 +356,10 @@ POP3Protocol::Open(const char* server, int port, int)
 	fLog = "";
 
 	// Prime the error message
-	BString error_msg, servString;
-	error_msg << B_TRANSLATE("Error while connecting to server %serv");
-
-	servString << server;
-	error_msg.ReplaceFirst("%serv", servString);
-
+	BString errorMessage(B_TRANSLATE("Error while connecting to server %serv"));
+	errorMessage.ReplaceFirst("%serv", server);
 	if (port != 110)
-		error_msg << ":" << port;
+		errorMessage << ":" << port;
 
 	uint32 hostIP = inet_addr(server);
 		// first see if we can parse it as a numeric address
@@ -371,8 +369,8 @@ POP3Protocol::Open(const char* server, int port, int)
 	}
 
 	if (hostIP == 0) {
-		error_msg << B_TRANSLATE(": Connection refused or host not found");
-		ShowError(error_msg.String());
+		errorMessage << B_TRANSLATE(": Connection refused or host not found");
+		ShowError(errorMessage.String());
 
 		return B_NAME_NOT_FOUND;
 	}
@@ -397,19 +395,19 @@ POP3Protocol::Open(const char* server, int port, int)
 
 	if (err < 0) {
 		fServerConnection->Disconnect();
-		error_msg << ": " << strerror(err);
-		ShowError(error_msg.String());
+		errorMessage << ": " << strerror(err);
+		ShowError(errorMessage.String());
 		return B_ERROR;
 	}
 
 	if (strncmp(line.String(), "+OK", 3) != 0) {
 		if (line.Length() > 0) {
-			error_msg << B_TRANSLATE(". The server said:\n")
+			errorMessage << B_TRANSLATE(". The server said:\n")
 				<< line.String();
 		} else
-			error_msg << B_TRANSLATE(": No reply.\n");
+			errorMessage << B_TRANSLATE(": No reply.\n");
 
-		ShowError(error_msg.String());
+		ShowError(errorMessage.String());
 		fServerConnection->Disconnect();
 		return B_ERROR;
 	}
@@ -877,11 +875,9 @@ POP3Protocol::_RetrieveUniqueIDs()
 {
 	fUniqueIDs.MakeEmpty();
 
-	status_t ret = B_OK;
-
-	ret = SendCommand("UIDL" CRLF);
-	if (ret != B_OK)
-		return ret;
+	status_t status = SendCommand("UIDL" CRLF);
+	if (status != B_OK)
+		return status;
 
 	BString result;
 	int32 uidOffset;
@@ -897,20 +893,20 @@ POP3Protocol::_RetrieveUniqueIDs()
 	if (SendCommand("LIST" CRLF) != B_OK)
 		return B_ERROR;
 
-	int32 b;
 	while (ReceiveLine(result) > 0) {
 		if (result.ByteAt(0) == '.')
 			break;
 
-		b = result.FindLast(" ");
-		if (b >= 0)
-			b = atol(&(result.String()[b]));
+		int32 index = result.FindLast(" ");
+		int32 size;
+		if (index >= 0)
+			size = atol(&result.String()[index]);
 		else
-			b = 0;
-		fSizes.AddItem((void *)(addr_t)b);
+			size = 0;
+		fSizes.AddItem((void*)size);
 	}
 
-	return ret;
+	return B_OK;
 }
 
 
@@ -975,15 +971,15 @@ POP3Protocol::_WriteManifest()
 //	#pragma mark -
 
 
-InboundProtocol*
-instantiate_inbound_protocol(BMailAccountSettings* settings)
+BInboundMailProtocol*
+instantiate_inbound_protocol(const BMailAccountSettings& settings)
 {
 	return new POP3Protocol(settings);
 }
 
 
 status_t
-pop3_smtp_auth(BMailAccountSettings* settings)
+pop3_smtp_auth(const BMailAccountSettings& settings)
 {
 	POP3Protocol protocol(settings);
 	protocol.Connect();

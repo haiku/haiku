@@ -1,33 +1,36 @@
 /*
- * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2012, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  */
 
 
+//#include <assert.h>
 #include <stdio.h>
-#include <fs_attr.h>
 #include <stdlib.h>
-#include <assert.h>
+
+#include <fs_attr.h>
 
 #include <Alert.h>
 #include <Directory.h>
 #include <FindDirectory.h>
-#include <Query.h>
 #include <E-mail.h>
+#include <Locker.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <Query.h>
 #include <Roster.h>
 #include <String.h>
 #include <StringList.h>
 #include <VolumeRoster.h>
 
-#include <mail_util.h>
-#include <MailAddon.h>
+#include <MailFilter.h>
 #include <MailDaemon.h>
 #include <MailProtocol.h>
 #include <MailSettings.h>
+
+#include <mail_util.h>
 
 #include "HaikuMailFormatFilter.h"
 
@@ -48,64 +51,16 @@ const uint32 kMsgInit = '&Ini';
 const uint32 kMsgSendMessage = '&SeM';
 
 
-MailFilter::MailFilter(MailProtocol& protocol, AddonSettings* settings)
+BMailProtocol::BMailProtocol(const BMailAccountSettings& settings)
 	:
-	fMailProtocol(protocol),
-	fAddonSettings(settings)
+	fAccountSettings(settings),
+	fMailNotifier(NULL)
 {
-}
-
-
-MailFilter::~MailFilter()
-{
-}
-
-
-void
-MailFilter::HeaderFetched(const entry_ref& ref, BFile* file)
-{
-}
-
-
-void
-MailFilter::BodyFetched(const entry_ref& ref, BFile* file)
-{
-}
-
-
-void
-MailFilter::MailboxSynced(status_t status)
-{
-}
-
-
-void
-MailFilter::MessageReadyToSend(const entry_ref& ref, BFile* file)
-{
-}
-
-
-void
-MailFilter::MessageSent(const entry_ref& ref, BFile* file)
-{
-}
-
-
-// #pragma mark -
-
-
-MailProtocol::MailProtocol(BMailAccountSettings* settings)
-	:
-	fMailNotifier(NULL),
-	fProtocolThread(NULL)
-{
-	fAccountSettings = *settings;
-
 	AddFilter(new HaikuMailFormatFilter(*this, settings));
 }
 
 
-MailProtocol::~MailProtocol()
+BMailProtocol::~BMailProtocol()
 {
 	delete fMailNotifier;
 
@@ -118,205 +73,118 @@ MailProtocol::~MailProtocol()
 }
 
 
-BMailAccountSettings&
-MailProtocol::AccountSettings()
+const BMailAccountSettings&
+BMailProtocol::AccountSettings() const
 {
 	return fAccountSettings;
 }
 
 
 void
-MailProtocol::SetProtocolThread(MailProtocolThread* protocolThread)
-{
-	if (fProtocolThread) {
-		fProtocolThread->Lock();
-		for (int i = 0; i < fHandlerList.CountItems(); i++)
-			fProtocolThread->RemoveHandler(fHandlerList.ItemAt(i));
-		fProtocolThread->Unlock();
-	}
-
-	fProtocolThread = protocolThread;
-
-	if (!fProtocolThread)
-		return;
-
-	fProtocolThread->Lock();
-	for (int i = 0; i < fHandlerList.CountItems(); i++)
-		fProtocolThread->AddHandler(fHandlerList.ItemAt(i));
-	fProtocolThread->Unlock();
-
-	AddedToLooper();
-}
-
-
-MailProtocolThread*
-MailProtocol::Looper()
-{
-	return fProtocolThread;
-}
-
-
-bool
-MailProtocol::AddHandler(BHandler* handler)
-{
-	if (!fHandlerList.AddItem(handler))
-		return false;
-	if (fProtocolThread) {
-		fProtocolThread->Lock();
-		fProtocolThread->AddHandler(handler);
-		fProtocolThread->Unlock();
-	}
-	return true;
-}
-
-
-bool
-MailProtocol::RemoveHandler(BHandler* handler)
-{
-	if (!fHandlerList.RemoveItem(handler))
-		return false;
-	if (fProtocolThread) {
-		fProtocolThread->Lock();
-		fProtocolThread->RemoveHandler(handler);
-		fProtocolThread->Unlock();
-	}
-	return true;
-}
-
-
-void
-MailProtocol::SetMailNotifier(BMailNotifier* mailNotifier)
+BMailProtocol::SetMailNotifier(BMailNotifier* mailNotifier)
 {
 	delete fMailNotifier;
 	fMailNotifier = mailNotifier;
 }
 
 
-void
-MailProtocol::ShowError(const char* error)
+BMailNotifier*
+BMailProtocol::MailNotifier() const
 {
-	if (fMailNotifier)
-		fMailNotifier->ShowError(error);
-}
-
-
-void
-MailProtocol::ShowMessage(const char* message)
-{
-	if (fMailNotifier)
-		fMailNotifier->ShowMessage(message);
-}
-
-
-void
-MailProtocol::SetTotalItems(int32 items)
-{
-	if (fMailNotifier)
-		fMailNotifier->SetTotalItems(items);
-}
-
-
-void
-MailProtocol::SetTotalItemsSize(int32 size)
-{
-	if (fMailNotifier)
-		fMailNotifier->SetTotalItemsSize(size);
-}
-
-
-void
-MailProtocol::ReportProgress(int bytes, int messages, const char* message)
-{
-	if (fMailNotifier)
-		fMailNotifier->ReportProgress(bytes, messages, message);
-}
-
-
-void
-MailProtocol::ResetProgress(const char* message)
-{
-	if (fMailNotifier)
-		fMailNotifier->ResetProgress(message);
+	return fMailNotifier;
 }
 
 
 bool
-MailProtocol::AddFilter(MailFilter* filter)
+BMailProtocol::AddFilter(BMailFilter* filter)
 {
+	BLocker locker(this);
 	return fFilterList.AddItem(filter);
 }
 
 
 int32
-MailProtocol::CountFilter()
+BMailProtocol::CountFilter() const
 {
+	BLocker locker(this);
 	return fFilterList.CountItems();
 }
 
 
-MailFilter*
-MailProtocol::FilterAt(int32 index)
+BMailFilter*
+BMailProtocol::FilterAt(int32 index) const
 {
+	BLocker locker(this);
 	return fFilterList.ItemAt(index);
 }
 
 
-MailFilter*
-MailProtocol::RemoveFilter(int32 index)
+BMailFilter*
+BMailProtocol::RemoveFilter(int32 index)
 {
+	BLocker locker(this);
 	return fFilterList.RemoveItemAt(index);
 }
 
 
 bool
-MailProtocol::RemoveFilter(MailFilter* filter)
+BMailProtocol::RemoveFilter(BMailFilter* filter)
 {
+	BLocker locker(this);
 	return fFilterList.RemoveItem(filter);
 }
 
 
 void
-MailProtocol::NotifyNewMessagesToFetch(int32 nMessages)
+BMailProtocol::MessageReceived(BMessage* message)
 {
-	ResetProgress();
-	SetTotalItems(nMessages);
-}
+	switch (message->what) {
+		case kMsgMoveFile:
+		{
+			entry_ref file;
+			message->FindRef("file", &file);
+			entry_ref dir;
+			message->FindRef("directory", &dir);
+			BDirectory directory(&dir);
+			MoveMessage(file, directory);
+			break;
+		}
 
+		case kMsgDeleteFile:
+		{
+			entry_ref file;
+			message->FindRef("file", &file);
+			DeleteMessage(file);
+			break;
+		}
 
-void
-MailProtocol::NotifyHeaderFetched(const entry_ref& ref, BFile* data)
-{
-	for (int i = 0; i < fFilterList.CountItems(); i++)
-		fFilterList.ItemAt(i)->HeaderFetched(ref, data);
-}
+		case kMsgFileRenamed:
+		{
+			entry_ref from;
+			message->FindRef("from", &from);
+			entry_ref to;
+			message->FindRef("to", &to);
+			FileRenamed(from, to);
+			break;
+		}
 
+		case kMsgFileDeleted:
+		{
+			node_ref node;
+			message->FindInt32("device",&node.device);
+			message->FindInt64("node", &node.node);
+			FileDeleted(node);
+			break;
+		}
 
-void
-MailProtocol::NotifyBodyFetched(const entry_ref& ref, BFile* data)
-{
-	for (int i = 0; i < fFilterList.CountItems(); i++)
-		fFilterList.ItemAt(i)->BodyFetched(ref, data);
-}
-
-
-void
-MailProtocol::NotifyMessageReadyToSend(const entry_ref& ref, BFile* data)
-{
-	for (int i = 0; i < fFilterList.CountItems(); i++)
-		fFilterList.ItemAt(i)->MessageReadyToSend(ref, data);
-}
-
-
-void
-MailProtocol::NotifyMessageSent(const entry_ref& ref, BFile* data)
-{
-	for (int i = 0; i < fFilterList.CountItems(); i++)
-		fFilterList.ItemAt(i)->MessageSent(ref, data);
+		default:
+			BLooper::MessageReceived(message);
+	}
 }
 
 
 status_t
-MailProtocol::MoveMessage(const entry_ref& ref, BDirectory& dir)
+BMailProtocol::MoveMessage(const entry_ref& ref, BDirectory& dir)
 {
 	BEntry entry(&ref);
 	return entry.MoveTo(&dir);
@@ -324,7 +192,7 @@ MailProtocol::MoveMessage(const entry_ref& ref, BDirectory& dir)
 
 
 status_t
-MailProtocol::DeleteMessage(const entry_ref& ref)
+BMailProtocol::DeleteMessage(const entry_ref& ref)
 {
 	BEntry entry(&ref);
 	return entry.Remove();
@@ -332,36 +200,122 @@ MailProtocol::DeleteMessage(const entry_ref& ref)
 
 
 void
-MailProtocol::FileRenamed(const entry_ref& from, const entry_ref& to)
+BMailProtocol::FileRenamed(const entry_ref& from, const entry_ref& to)
 {
-
 }
 
 
 void
-MailProtocol::FileDeleted(const node_ref& node)
+BMailProtocol::FileDeleted(const node_ref& node)
 {
-
 }
 
 
 void
-MailProtocol::LoadFilters(MailAddonSettings& settings)
+BMailProtocol::ShowError(const char* error)
+{
+	if (MailNotifier() != NULL)
+		MailNotifier()->ShowError(error);
+}
+
+
+void
+BMailProtocol::ShowMessage(const char* message)
+{
+	if (MailNotifier() != NULL)
+		MailNotifier()->ShowMessage(message);
+}
+
+
+void
+BMailProtocol::SetTotalItems(uint32 items)
+{
+	if (MailNotifier() != NULL)
+		MailNotifier()->SetTotalItems(items);
+}
+
+
+void
+BMailProtocol::SetTotalItemsSize(uint64 size)
+{
+	if (MailNotifier() != NULL)
+		MailNotifier()->SetTotalItemsSize(size);
+}
+
+
+void
+BMailProtocol::ReportProgress(uint32 messages, uint64 bytes,
+	const char* message)
+{
+	if (MailNotifier() != NULL)
+		MailNotifier()->ReportProgress(messages, bytes, message);
+}
+
+
+void
+BMailProtocol::ResetProgress(const char* message)
+{
+	if (MailNotifier() != NULL)
+		MailNotifier()->ResetProgress(message);
+}
+
+
+void
+BMailProtocol::NotifyNewMessagesToFetch(int32 count)
+{
+	ResetProgress();
+	SetTotalItems(count);
+}
+
+
+void
+BMailProtocol::NotifyHeaderFetched(const entry_ref& ref, BFile* data)
+{
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		fFilterList.ItemAt(i)->HeaderFetched(ref, data);
+}
+
+
+void
+BMailProtocol::NotifyBodyFetched(const entry_ref& ref, BFile* data)
+{
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		fFilterList.ItemAt(i)->BodyFetched(ref, data);
+}
+
+
+void
+BMailProtocol::NotifyMessageReadyToSend(const entry_ref& ref, BFile* data)
+{
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		fFilterList.ItemAt(i)->MessageReadyToSend(ref, data);
+}
+
+
+void
+BMailProtocol::NotifyMessageSent(const entry_ref& ref, BFile* data)
+{
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		fFilterList.ItemAt(i)->MessageSent(ref, data);
+}
+
+
+void
+BMailProtocol::LoadFilters(const BMailProtocolSettings& settings)
 {
 	for (int i = 0; i < settings.CountFilterSettings(); i++) {
-		AddonSettings* filterSettings = settings.FilterSettingsAt(i);
-		MailFilter* filter = _LoadFilter(filterSettings);
-		if (!filter)
-			continue;
-		AddFilter(filter);
+		BMailAddOnSettings* filterSettings = settings.FilterSettingsAt(i);
+		BMailFilter* filter = _LoadFilter(filterSettings);
+		if (filter != NULL)
+			AddFilter(filter);
 	}
 }
 
 
-MailFilter*
-MailProtocol::_LoadFilter(AddonSettings* filterSettings)
+BMailFilter*
+BMailProtocol::_LoadFilter(BMailAddOnSettings* filterSettings)
 {
-	const entry_ref& ref = filterSettings->AddonRef();
+	const entry_ref& ref = filterSettings->AddOnRef();
 	map<entry_ref, image_id>::iterator it = fFilterImages.find(ref);
 	image_id image;
 	if (it != fFilterImages.end())
@@ -374,209 +328,42 @@ MailProtocol::_LoadFilter(AddonSettings* filterSettings)
 	if (image < 0)
 		return NULL;
 
-	MailFilter* (*instantiate_mailfilter)(MailProtocol& protocol,
-		AddonSettings* settings);
-	if (get_image_symbol(image, "instantiate_mailfilter",
-		B_SYMBOL_TYPE_TEXT, (void **)&instantiate_mailfilter)
-			!= B_OK) {
+	BMailFilter* (*instantiate_filter)(BMailProtocol& protocol,
+		BMailAddOnSettings* settings);
+	if (get_image_symbol(image, "instantiate_filter", B_SYMBOL_TYPE_TEXT,
+			(void**)&instantiate_filter) != B_OK) {
 		unload_add_on(image);
 		return NULL;
 	}
 
 	fFilterImages[ref] = image;
-	return (*instantiate_mailfilter)(*this, filterSettings);
+	return (*instantiate_filter)(*this, filterSettings);
 }
 
 
 // #pragma mark -
 
 
-InboundProtocol::InboundProtocol(BMailAccountSettings* settings)
+BInboundMailProtocol::BInboundMailProtocol(const BMailAccountSettings& settings)
 	:
-	MailProtocol(settings)
+	BMailProtocol(settings)
 {
 	LoadFilters(fAccountSettings.InboundSettings());
 }
 
 
-InboundProtocol::~InboundProtocol()
+BInboundMailProtocol::~BInboundMailProtocol()
 {
-
-}
-
-
-status_t
-InboundProtocol::AppendMessage(const entry_ref& ref)
-{
-	return false;
-}
-
-
-status_t
-InboundProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
-{
-	BNode node(&ref);
-	return write_read_attr(node, flag);
-}
-
-
-// #pragma mark -
-
-
-OutboundProtocol::OutboundProtocol(BMailAccountSettings* settings)
-	:
-	MailProtocol(settings)
-{
-	LoadFilters(fAccountSettings.OutboundSettings());
-}
-
-
-OutboundProtocol::~OutboundProtocol()
-{
-
-}
-
-
-// #pragma mark -
-
-
-MailProtocolThread::MailProtocolThread(MailProtocol* protocol)
-	:
-	fMailProtocol(protocol)
-{
-	PostMessage(kMsgInit);
 }
 
 
 void
-MailProtocolThread::SetStopNow()
-{
-	fMailProtocol->SetStopNow();
-}
-
-
-void
-MailProtocolThread::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case kMsgInit:
-			fMailProtocol->SetProtocolThread(this);
-			break;
-
-		case kMsgMoveFile:
-		{
-			entry_ref file;
-			message->FindRef("file", &file);
-			entry_ref dir;
-			message->FindRef("directory", &dir);
-			BDirectory directory(&dir);
-			fMailProtocol->MoveMessage(file, directory);
-			break;
-		}
-
-		case kMsgDeleteFile:
-		{
-			entry_ref file;
-			message->FindRef("file", &file);
-			fMailProtocol->DeleteMessage(file);
-			break;
-		}
-
-		case kMsgFileRenamed:
-		{
-			entry_ref from;
-			message->FindRef("from", &from);
-			entry_ref to;
-			message->FindRef("to", &to);
-			fMailProtocol->FileRenamed(from, to);
-			break;
-		}
-
-		case kMsgFileDeleted:
-		{
-			node_ref node;
-			message->FindInt32("device",&node.device);
-			message->FindInt64("node", &node.node);
-			fMailProtocol->FileDeleted(node);
-			break;
-		}
-
-		default:
-			BLooper::MessageReceived(message);
-	}
-}
-
-
-void
-MailProtocolThread::TriggerFileMove(const entry_ref& ref, BDirectory& dir)
-{
-	BMessage message(kMsgMoveFile);
-	message.AddRef("file", &ref);
-	BEntry entry;
-	dir.GetEntry(&entry);
-	entry_ref dirRef;
-	entry.GetRef(&dirRef);
-	message.AddRef("directory", &dirRef);
-	PostMessage(&message);
-}
-
-
-void
-MailProtocolThread::TriggerFileDeletion(const entry_ref& ref)
-{
-	BMessage message(kMsgDeleteFile);
-	message.AddRef("file", &ref);
-	PostMessage(&message);
-}
-
-
-void
-MailProtocolThread::TriggerFileRenamed(const entry_ref& from,
-	const entry_ref& to)
-{
-	BMessage message(kMsgFileRenamed);
-	message.AddRef("from", &from);
-	message.AddRef("to", &to);
-	PostMessage(&message);
-}
-
-
-void
-MailProtocolThread::TriggerFileDeleted(const node_ref& node)
-{
-	BMessage message(kMsgFileDeleted);
-	message.AddInt32("device", node.device);
-	message.AddInt64("node", node.node);
-	PostMessage(&message);
-}
-
-
-// #pragma mark -
-
-
-InboundProtocolThread::InboundProtocolThread(InboundProtocol* protocol)
-	:
-	MailProtocolThread(protocol),
-	fProtocol(protocol)
-{
-
-}
-
-
-InboundProtocolThread::~InboundProtocolThread()
-{
-	fProtocol->SetProtocolThread(NULL);
-}
-
-
-void
-InboundProtocolThread::MessageReceived(BMessage* message)
+BInboundMailProtocol::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgSyncMessages:
 		{
-			status_t status = fProtocol->SyncMessages();
-			_NotiyMailboxSynced(status);
+			NotiyMailboxSynchronized(SyncMessages());
 			break;
 		}
 
@@ -584,7 +371,7 @@ InboundProtocolThread::MessageReceived(BMessage* message)
 		{
 			entry_ref ref;
 			message->FindRef("ref", &ref);
-			status_t status = fProtocol->FetchBody(ref);
+			status_t status = FetchBody(ref);
 
 			BMessenger target;
 			if (message->FindMessenger("target", &target) != B_OK)
@@ -602,7 +389,7 @@ InboundProtocolThread::MessageReceived(BMessage* message)
 			entry_ref ref;
 			message->FindRef("ref", &ref);
 			read_flags read = (read_flags)message->FindInt32("read");
-			fProtocol->MarkMessageAsRead(ref, read);
+			MarkMessageAsRead(ref, read);
 			break;
 		}
 
@@ -610,7 +397,7 @@ InboundProtocolThread::MessageReceived(BMessage* message)
 		{
 			entry_ref ref;
 			message->FindRef("ref", &ref);
-			fProtocol->DeleteMessage(ref);
+			DeleteMessage(ref);
 			break;
 		}
 
@@ -618,91 +405,59 @@ InboundProtocolThread::MessageReceived(BMessage* message)
 		{
 			entry_ref ref;
 			message->FindRef("ref", &ref);
-			fProtocol->AppendMessage(ref);
+			AppendMessage(ref);
 			break;
 		}
 
 		default:
-			MailProtocolThread::MessageReceived(message);
+			BMailProtocol::MessageReceived(message);
 			break;
 	}
 }
 
 
-void
-InboundProtocolThread::SyncMessages()
+status_t
+BInboundMailProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
 {
-	PostMessage(kMsgSyncMessages);
+	BNode node(&ref);
+	return write_read_attr(node, flag);
+}
+
+
+status_t
+BInboundMailProtocol::AppendMessage(const entry_ref& ref)
+{
+	return B_OK;
 }
 
 
 void
-InboundProtocolThread::FetchBody(const entry_ref& ref, BMessenger* listener)
+BInboundMailProtocol::NotiyMailboxSynchronized(status_t status)
 {
-	BMessage message(kMsgFetchBody);
-	message.AddRef("ref", &ref);
-	if (listener)
-		message.AddMessenger("target", *listener);
-	PostMessage(&message);
-}
-
-
-void
-InboundProtocolThread::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
-{
-	BMessage message(kMsgMarkMessageAsRead);
-	message.AddRef("ref", &ref);
-	message.AddInt32("read", flag);
-	PostMessage(&message);
-}
-
-
-void
-InboundProtocolThread::DeleteMessage(const entry_ref& ref)
-{
-	BMessage message(kMsgDeleteMessage);
-	message.AddRef("ref", &ref);
-	PostMessage(&message);
-}
-
-
-void
-InboundProtocolThread::AppendMessage(const entry_ref& ref)
-{
-	BMessage message(kMsgAppendMessage);
-	message.AddRef("ref", &ref);
-	PostMessage(&message);
-}
-
-
-void
-InboundProtocolThread::_NotiyMailboxSynced(status_t status)
-{
-	for (int i = 0; i < fProtocol->CountFilter(); i++)
-		fProtocol->FilterAt(i)->MailboxSynced(status);
+	for (int32 i = 0; i < CountFilter(); i++)
+		FilterAt(i)->MailboxSynchronized(status);
 }
 
 
 // #pragma mark -
 
 
-OutboundProtocolThread::OutboundProtocolThread(OutboundProtocol* protocol)
+BOutboundMailProtocol::BOutboundMailProtocol(
+	const BMailAccountSettings& settings)
 	:
-	MailProtocolThread(protocol),
-	fProtocol(protocol)
+	BMailProtocol(settings)
 {
-
+	LoadFilters(fAccountSettings.OutboundSettings());
 }
 
 
-OutboundProtocolThread::~OutboundProtocolThread()
+BOutboundMailProtocol::~BOutboundMailProtocol()
 {
-	fProtocol->SetProtocolThread(NULL);
 }
 
 
 void
-OutboundProtocolThread::MessageReceived(BMessage* message)
+BOutboundMailProtocol::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgSendMessage:
@@ -715,23 +470,11 @@ OutboundProtocolThread::MessageReceived(BMessage* message)
 				mails.push_back(ref);
 			}
 			size_t size = message->FindInt32("size");
-			fProtocol->SendMessages(mails, size);
+			SendMessages(mails, size);
 			break;
 		}
 
 		default:
-			MailProtocolThread::MessageReceived(message);
+			BMailProtocol::MessageReceived(message);
 	}
-}
-
-
-void
-OutboundProtocolThread::SendMessages(const std::vector<entry_ref>& mails,
-	size_t totalBytes)
-{
-	BMessage message(kMsgSendMessage);
-	for (unsigned int i = 0; i < mails.size(); i++)
-		message.AddRef("ref", &mails[i]);
-	message.AddInt32("size", totalBytes);
-	PostMessage(&message);
 }

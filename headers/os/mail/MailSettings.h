@@ -1,6 +1,8 @@
 /*
+ * Copyright 2004-2012, Haiku Inc. All rights reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011 Clemens Zeidler.
+ *
  * Distributed under the terms of the MIT License.
  */
 #ifndef MAIL_SETTINGS_H
@@ -77,49 +79,49 @@ private:
 };
 
 
-class AddonSettings {
+class BMailAddOnSettings : public BMessage {
 public:
-								AddonSettings();
+								BMailAddOnSettings();
+	virtual						~BMailAddOnSettings();
 
-			bool				Load(const BMessage& message);
-			bool				Save(BMessage& message);
+	virtual status_t			Load(const BMessage& message);
+	virtual	status_t			Save(BMessage& message);
 
-			void				SetAddonRef(const entry_ref& ref);
-	const	entry_ref&			AddonRef() const;
+			void				SetAddOnRef(const entry_ref& ref);
+			const entry_ref&	AddOnRef() const;
 
-	const	BMessage&			Settings() const;
-			BMessage&			EditSettings();
-
-			bool				HasBeenModified();
+	virtual	bool				HasBeenModified() const;
 
 private:
-			BMessage			fSettings;
-			entry_ref			fAddonRef;
-
-			bool				fModified;
+			BMessage			fOriginalSettings;
+			entry_ref			fRef;
+			entry_ref			fOriginalRef;
 };
 
 
-class MailAddonSettings : public AddonSettings {
+class BMailProtocolSettings : public BMailAddOnSettings {
 public:
-			bool				Load(const BMessage& message);
-			bool				Save(BMessage& message);
+								BMailProtocolSettings();
+	virtual						~BMailProtocolSettings();
 
-			int32				CountFilterSettings();
+	virtual	status_t			Load(const BMessage& message);
+	virtual	status_t			Save(BMessage& message);
+
+			int32				CountFilterSettings() const;
 			int32				AddFilterSettings(const entry_ref* ref = NULL);
-			bool				RemoveFilterSettings(int32 index);
+			void				RemoveFilterSettings(int32 index);
 			bool				MoveFilterSettings(int32 from, int32 to);
-			AddonSettings*		FilterSettingsAt(int32 index);
+			BMailAddOnSettings*	FilterSettingsAt(int32 index) const;
 
-			bool				HasBeenModified();
+	virtual	bool				HasBeenModified() const;
 
 private:
-			std::vector<AddonSettings>	fFiltersSettings;
+			BObjectList<BMailAddOnSettings> fFiltersSettings;
 };
 
 
 class BMailAccountSettings {
-	public:
+public:
 								BMailAccountSettings();
 								BMailAccountSettings(BEntry account);
 								~BMailAccountSettings();
@@ -127,24 +129,26 @@ class BMailAccountSettings {
 			status_t			InitCheck() { return fStatus; }
 
 			void				SetAccountID(int32 id);
-			int32				AccountID();
+			int32				AccountID() const;
 
 			void				SetName(const char* name);
-	const	char*				Name() const;
+			const char*			Name() const;
 
 			void				SetRealName(const char* realName);
-	const	char*				RealName() const;
+			const char*			RealName() const;
 
 			void				SetReturnAddress(const char* returnAddress);
-	const	char*				ReturnAddress() const;
+			const char*			ReturnAddress() const;
 
-			bool				SetInboundAddon(const char* name);
-			bool				SetOutboundAddon(const char* name);
-	const	entry_ref&			InboundPath() const;
-	const	entry_ref&			OutboundPath() const;
+			bool				SetInboundAddOn(const char* name);
+			bool				SetOutboundAddOn(const char* name);
+			const entry_ref&	InboundAddOnRef() const;
+			const entry_ref&	OutboundAddOnRef() const;
 
-			MailAddonSettings&	InboundSettings();
-			MailAddonSettings&	OutboundSettings();
+			BMailProtocolSettings& InboundSettings();
+			const BMailProtocolSettings& InboundSettings() const;
+			BMailProtocolSettings& OutboundSettings();
+			const BMailProtocolSettings& OutboundSettings() const;
 
 			bool				HasInbound();
 			bool				HasOutbound();
@@ -158,9 +162,9 @@ class BMailAccountSettings {
 			status_t			Save();
 			status_t			Delete();
 
-			bool				HasBeenModified();
+			bool				HasBeenModified() const;
 
-	const	BEntry&				AccountFile();
+			const BEntry&		AccountFile() const;
 
 private:
 			status_t			_CreateAccountFilePath();
@@ -175,8 +179,8 @@ private:
 			BString				fRealName;
 			BString				fReturnAdress;
 
-			MailAddonSettings	fInboundSettings;
-			MailAddonSettings	fOutboundSettings;
+			BMailProtocolSettings fInboundSettings;
+			BMailProtocolSettings fOutboundSettings;
 
 			bool				fInboundEnabled;
 			bool				fOutboundEnabled;

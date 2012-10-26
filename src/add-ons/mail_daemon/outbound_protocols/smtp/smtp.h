@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2012, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -11,10 +11,9 @@
 
 #include <String.h>
 
-#include <MailAddon.h>
+#include <MailFilter.h>
 #include <MailProtocol.h>
 #include <MailSettings.h>
-
 
 #ifdef USE_SSL
 #	include <openssl/ssl.h>
@@ -22,9 +21,9 @@
 #endif
 
 
-class SMTPProtocol : public OutboundProtocol {
+class SMTPProtocol : public BOutboundMailProtocol {
 public:
-								SMTPProtocol(BMailAccountSettings* settings);
+								SMTPProtocol(BMailAccountSettings& settings);
 								~SMTPProtocol();
 
 			status_t			Connect();
@@ -33,7 +32,6 @@ public:
 			status_t			SendMessages(const std::vector<entry_ref>&
 									mails, size_t totalBytes);
 
-			//----Perfectly good holdovers from the old days
 			status_t			Open(const char *server, int port, bool esmtp);
 			void				Close();
 			status_t			Login(const char *uid, const char *password);
@@ -53,12 +51,12 @@ private:
 			int32				fAuthType;
 
 #ifdef USE_SSL
-		SSL_CTX *ctx;
-		SSL *ssl;
-		BIO *sbio;
+			SSL_CTX*			ctx;
+			SSL*				ssl;
+			BIO*				sbio;
 
-		bool use_ssl;
-		bool use_STARTTLS;
+			bool				use_ssl;
+			bool				use_STARTTLS;
 #endif
 
 			status_t			fStatus;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2012, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -62,6 +62,16 @@
 #else
 #	define D(x) ;
 #endif
+
+
+// Authentication types recognized. Not all methods are implemented.
+enum AuthType {
+	LOGIN		= 1,
+	PLAIN		= 1 << 2,
+	CRAM_MD5	= 1 << 3,
+	DIGEST_MD5	= 1 << 4
+};
+
 
 using namespace std;
 
@@ -233,34 +243,27 @@ SplitChallengeIntoMap(BString str, map<BString,BString>& m)
 }
 
 
-// Authentication types recognized. Not all methods are implemented.
-enum AuthType {
-	LOGIN		= 1,
-	PLAIN		= 1 << 2,
-	CRAM_MD5	= 1 << 3,
-	DIGEST_MD5	= 1 << 4
-};
+// #pragma mark -
 
 
-SMTPProtocol::SMTPProtocol(BMailAccountSettings* settings)
+SMTPProtocol::SMTPProtocol(BMailAccountSettings& settings)
 	:
-	OutboundProtocol(settings),
+	BOutboundMailProtocol(settings),
 	fAuthType(0)
 {
-	fSettingsMessage = settings->OutboundSettings().Settings();
+	fSettingsMessage = settings.OutboundSettings();
 }
 
 
 SMTPProtocol::~SMTPProtocol()
 {
-
 }
 
 
 status_t
 SMTPProtocol::Connect()
 {
-	BString error_msg;
+	BString errorMessage;
 	int32 authMethod = fSettingsMessage.FindInt32("auth_method");
 
 	status_t status = B_ERROR;
@@ -271,9 +274,9 @@ SMTPProtocol::Connect()
 		// to the SMTP server first...
 		status_t status = _POP3Authentication();
 		if (status < B_OK) {
-			error_msg << B_TRANSLATE("POP3 authentication failed. The server "
-				"said:\n") << fLog;
-			ShowError(error_msg.String());
+			errorMessage << B_TRANSLATE("POP3 authentication failed. The "
+				"server said:\n") << fLog;
+			ShowError(errorMessage.String());
 			return status;
 		}
 	}
@@ -281,19 +284,22 @@ SMTPProtocol::Connect()
 	status = Open(fSettingsMessage.FindString("server"),
 		fSettingsMessage.FindInt32("port"), authMethod == 1);
 	if (status < B_OK) {
-		error_msg << B_TRANSLATE("Error while opening connection to %serv");
-		error_msg.ReplaceFirst("%serv", fSettingsMessage.FindString("server"));
+		errorMessage << B_TRANSLATE("Error while opening connection to %serv");
+		errorMessage.ReplaceFirst("%serv",
+			fSettingsMessage.FindString("server"));
 
 		if (fSettingsMessage.FindInt32("port") > 0)
-			error_msg << ":" << fSettingsMessage.FindInt32("port");
+			errorMessage << ":" << fSettingsMessage.FindInt32("port");
 
 		// << strerror(err) - BNetEndpoint sucks, we can't use this;
 		if (fLog.Length() > 0)
-			error_msg << B_TRANSLATE(". The server says:\n") << fLog;
-		else
-			error_msg << B_TRANSLATE(": Connection refused or host not found.");
+			errorMessage << B_TRANSLATE(". The server says:\n") << fLog;
+		else {
+			errorMessage
+				<< B_TRANSLATE(": Connection refused or host not found.");
+		}
 
-		ShowError(error_msg.String());
+		ShowError(errorMessage.String());
 
 		return status;
 	}
@@ -303,13 +309,12 @@ SMTPProtocol::Connect()
 	delete[] password;
 
 	if (status != B_OK) {
-		//-----This is a really cool kind of error message. How can we make it work for POP3?
-		error_msg << B_TRANSLATE("Error while logging in to %serv")
+		errorMessage << B_TRANSLATE("Error while logging in to %serv")
 			<< B_TRANSLATE(". The server said:\n") << fLog;
+		errorMessage.ReplaceFirst("%serv",
+			fSettingsMessage.FindString("server"));
 
-		error_msg.ReplaceFirst("%serv", fSettingsMessage.FindString("server"));
-
-		ShowError(error_msg.String());
+		ShowError(errorMessage.String());
 	}
 	return B_OK;
 }
@@ -549,23 +554,23 @@ SMTPProtocol::_SendMessage(const entry_ref& mail)
 status_t
 SMTPProtocol::_POP3Authentication()
 {
-	const entry_ref& entry = fAccountSettings.InboundPath();
+	const entry_ref& entry = fAccountSettings.InboundAddOnRef();
 	if (strcmp(entry.name, "POP3") != 0)
 		return B_ERROR;
 
-	status_t (*pop3_smtp_auth)(BMailAccountSettings*);
+	status_t (*pop3_smtp_auth)(const BMailAccountSettings&);
 
 	BPath path(&entry);
 	image_id image = load_add_on(path.Path());
 	if (image < 0)
 		return B_ERROR;
 	if (get_image_symbol(image, "pop3_smtp_auth",
-		B_SYMBOL_TYPE_TEXT, (void **)&pop3_smtp_auth) != B_OK) {
+			B_SYMBOL_TYPE_TEXT, (void **)&pop3_smtp_auth) != B_OK) {
 		unload_add_on(image);
 		image = -1;
 		return B_ERROR;
 	}
-	status_t status = (*pop3_smtp_auth)(&fAccountSettings);
+	status_t status = (*pop3_smtp_auth)(fAccountSettings);
 	unload_add_on(image);
 	return status;
 }
@@ -1047,8 +1052,8 @@ SMTPProtocol::SendCommand(const char *cmd)
 // #pragma mark -
 
 
-OutboundProtocol*
-instantiate_outbound_protocol(BMailAccountSettings* settings)
+BOutboundMailProtocol*
+instantiate_outbound_protocol(BMailAccountSettings& settings)
 {
 	return new SMTPProtocol(settings);
 }

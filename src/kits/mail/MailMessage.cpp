@@ -1,9 +1,10 @@
 /*
+ * Copyright 2007-2012, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2004 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2007, 2010, Haiku Inc. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
  */
+
 
 //! The main general purpose mail message class
 
@@ -926,8 +927,7 @@ BEmailMessage::Send(bool sendNow)
 	}
 
 	BString path;
-	if (account->OutboundSettings().Settings().FindString("path", &path)
-			!= B_OK) {
+	if (account->OutboundSettings().FindString("path", &path) != B_OK) {
 		BPath defaultMailOutPath;
 		if (find_directory(B_USER_DIRECTORY, &defaultMailOutPath) != B_OK
 			|| defaultMailOutPath.Append("mail/out") != B_OK)

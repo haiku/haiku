@@ -1,7 +1,8 @@
 /*
- * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2012, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -76,15 +77,23 @@ sanitize_white_space(BString& string)
 // #pragma mark -
 
 
-HaikuMailFormatFilter::HaikuMailFormatFilter(MailProtocol& protocol,
-	BMailAccountSettings* settings)
+HaikuMailFormatFilter::HaikuMailFormatFilter(BMailProtocol& protocol,
+	const BMailAccountSettings& settings)
 	:
-	MailFilter(protocol, NULL),
-	fAccountID(settings->AccountID()),
-	fAccountName(settings->Name())
+	BMailFilter(protocol, NULL),
+	fAccountID(settings.AccountID()),
+	fAccountName(settings.Name())
 {
-	const BMessage* outboundSettings = &settings->OutboundSettings().Settings();
-	outboundSettings->FindString("destination", &fOutboundDirectory);
+	const BMessage& outboundSettings = settings.OutboundSettings();
+	outboundSettings.FindString("destination", &fOutboundDirectory);
+}
+
+
+BString
+HaikuMailFormatFilter::DescriptiveName() const
+{
+	// This will not be called by the UI; no need to translate it
+	return "built-in";
 }
 
 
@@ -225,7 +234,11 @@ HaikuMailFormatFilter::MessageSent(const entry_ref& ref, BFile* file)
 	if (!fOutboundDirectory.IsEmpty()) {
 		create_directory(fOutboundDirectory, 755);
 		BDirectory dir(fOutboundDirectory);
-		fMailProtocol.Looper()->TriggerFileMove(ref, dir);
+		// TODO:
+//		fMailProtocol.Looper()->TriggerFileMove(ref, dir);
+		BEntry entry(&ref);
+		entry.MoveTo(&dir);
+		// TODO: report error (via BMailProtocol::MailNotifier())
 	}
 }
 

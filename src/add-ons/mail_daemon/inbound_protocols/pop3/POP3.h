@@ -15,20 +15,20 @@
 #include <DataIO.h>
 #include <List.h>
 #include <String.h>
+#include <StringList.h>
 #include <View.h>
 
-#include "MailAddon.h"
-#include "MailProtocol.h"
-#include "MailSettings.h"
-#include <StringList.h>
+#include <MailProtocol.h>
+#include <MailSettings.h>
 
 
 class BSocket;
 
 
-class POP3Protocol : public InboundProtocol {
+class POP3Protocol : public BInboundMailProtocol {
 public:
-								POP3Protocol(BMailAccountSettings* settings);
+								POP3Protocol(
+									const BMailAccountSettings& settings);
 								~POP3Protocol();
 
 			status_t			Connect();
@@ -86,7 +86,7 @@ private:
 };
 
 
-extern "C" status_t pop3_smtp_auth(BMessage& settings);
+extern "C" status_t pop3_smtp_auth(const BMailAccountSettings& settings);
 
 
 #endif	/* POP3_H */
