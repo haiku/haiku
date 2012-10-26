@@ -47,13 +47,13 @@ public:
 									AddonSettings* settings);
 	virtual						~MailFilter();
 
-	//! Message hooks if filter is installed to a inbound protocol
+	//! Message hooks if filter is installed to an inbound protocol
 	virtual	void				HeaderFetched(const entry_ref& ref,
 									BFile* file);
 	virtual	void				BodyFetched(const entry_ref& ref, BFile* file);
 	virtual void				MailboxSynced(status_t status);
 
-	//! Message hooks if filter is installed to a outbound protocol
+	//! Message hooks if filter is installed to an outbound protocol
 	virtual	void				MessageReadyToSend(const entry_ref& ref,
 									BFile* file);
 	virtual	void				MessageSent(const entry_ref& ref,
