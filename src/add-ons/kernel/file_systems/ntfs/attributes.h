@@ -33,6 +33,7 @@ status_t fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *cookie,
 	off_t pos, void *buffer, size_t *_length);
 status_t fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *cookie,
 	off_t pos,	const void *buffer, size_t *_length);
+status_t fs_remove_attrib(fs_volume *_vol, fs_vnode *_node, const char* name);
 	
 #endif // NTFS_ATTRIBUTES_H
 

@@ -22,12 +22,13 @@
 #include "mime_table.h"
 
 int32 kBeOSTypeCookie = 0x1234;
+char *kFailBackMime = {"application/octet-stream"};
 
 status_t set_mime(vnode *node, const char *filename)
 {
 	struct ext_mime *p;
 	int32 namelen, ext_len;
-	node->mime = NULL;
+	node->mime = kFailBackMime;
 	namelen = strlen(filename);
 
 	for (p=mimes; p->extension; p++) {
@@ -67,7 +68,7 @@ fake_open_attrib_dir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 	
 exit:
 
-	TRACE("fs_open_attrdir - EXIT, result is %s\n", strerror(result));
+	TRACE("fake_open_attrdir - EXIT, result is %s\n", strerror(result));
 	
 	UNLOCK_VOL(ns);
 	
@@ -134,7 +135,7 @@ fake_rewind_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	TRACE("fake_rewind_attrcookie  - ENTER\n");
 
 	if (_cookie == NULL) {
-		TRACE("fake_rewind_attrcookie - error: fs_rewind_attrcookie"
+		TRACE("fake_rewind_attrcookie - error: fake_rewind_attrcookie"
 			  "called with null cookie\n");
 		result =  EINVAL;
 		goto	exit;
@@ -172,7 +173,7 @@ fake_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 		
 		entry->d_ino = node->vnid;
 		entry->d_dev = ns->id;
-		entry->d_reclen = 10;
+		entry->d_reclen = sizeof(struct dirent)+10;
 		strcpy(entry->d_name, "BEOS:TYPE");
 	}
 
@@ -195,14 +196,15 @@ fake_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
 
 	LOCK_VOL(ns);
 	
-	TRACE("fake_open_attrib - ENTER\n");
+	TRACE("fake_open_attrib - ENTER (name = [%s])\n",name);
 
-	if (strcmp(name, "BEOS:TYPE")) {
+	if (strcmp(name, "BEOS:TYPE") != 0) {
 		result = ENOENT;
 		goto	exit;
 	}
 	
 	if (node->mime == NULL)	{
+		TRACE("fake_open_attrib - MIME = NULL\n");
 		result = ENOENT;
 		goto	exit;
 	}
