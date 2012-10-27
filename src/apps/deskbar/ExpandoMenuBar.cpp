@@ -808,6 +808,7 @@ TExpandoMenuBar::CheckForSizeOverrun()
 		+ kSepItemWidth;
 	float maxWidth = fBarView->DragRegion()->Frame().left
 		- fDeskbarMenuWidth - kSepItemWidth;
+
 	return menuWidth > maxWidth;
 }
 
@@ -819,9 +820,12 @@ TExpandoMenuBar::SizeWindow(int32 delta)
 	// code the resize method will be centered in one place
 	// thus, the same behavior (good or bad) will be used
 	// wherever window sizing is done
-	if (fVertical)
-		fBarView->SizeWindow(BScreen(Window()).Frame());
-	else
+	if (fVertical) {
+		BRect screenFrame = (BScreen(Window())).Frame();
+		fBarView->SizeWindow(screenFrame);
+		fBarView->PositionWindow(screenFrame);
+		fBarView->CheckForScrolling();
+	} else
 		CheckItemSizes(delta);
 }
 

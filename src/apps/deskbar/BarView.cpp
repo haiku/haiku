@@ -516,6 +516,8 @@ TBarView::PlaceApplicationBar()
 
 	SizeWindow(screenFrame);
 	PositionWindow(screenFrame);
+	CheckForScrolling();
+
 	Window()->UpdateIfNeeded();
 	Invalidate();
 }
@@ -578,8 +580,6 @@ TBarView::SizeWindow(BRect screenFrame)
 	float windowWidth, windowHeight;
 	GetPreferredWindowSize(screenFrame, &windowWidth, &windowHeight);
 	Window()->ResizeTo(windowWidth, windowHeight);
-
-	CheckForScrolling();
 }
 
 
@@ -609,7 +609,7 @@ TBarView::PositionWindow(BRect screenFrame)
 void
 TBarView::CheckForScrolling()
 {
-	if (fExpando != NULL) {
+	if (fInlineScrollView != NULL && fExpando != NULL) {
 		if (fExpando->CheckForSizeOverrun())
 			fInlineScrollView->AttachScrollers();
 		else
@@ -719,8 +719,6 @@ TBarView::ExpandItems()
 
 	// Clean up the expanded items list
 	RemoveExpandedItems();
-
-	fExpando->SizeWindow(1);
 }
 
 
