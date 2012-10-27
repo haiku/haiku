@@ -33,8 +33,8 @@
 #include <sys/stat.h>
 
 
-//callback function for readdir()
-static int _ntfs_dirent_filler(void *_dirent, const ntfschar *name,
+static int
+_ntfs_dirent_filler(void *_dirent, const ntfschar *name,
 	const int name_len, const int name_type, const s64 pos, const MFT_REF mref,
 	const unsigned dt_type)
 {
@@ -45,42 +45,64 @@ static int _ntfs_dirent_filler(void *_dirent, const ntfschar *name,
 		return 0;
 
 	if (MREF(mref) == FILE_root || MREF(mref) >= FILE_first_user
-			||	cookie->show_sys_files) {
-	 	  if (cookie->readed == 1) {
-	 	  	cookie->pos=pos;
-	 	  	cookie->readed = 0;
-			return -1;
-	 	  } else {
-			if (ntfs_ucstombs(name, name_len, &filename, 0) >= 0) {
-				if (filename) {
-					strcpy(cookie->name,filename);
-				    cookie->ino=MREF(mref);
-				    cookie->readed = 1;
-		    		free(filename);
-		    		return 0;
-				}
+		|| cookie->show_sys_files) {
+		int len = ntfs_ucstombs(name, name_len, &filename, 0);
+		if (len >= 0 && filename != NULL) {			 
+			cache_entry* new_entry =
+				(cache_entry*)ntfs_calloc(sizeof(cache_entry));
+			if (new_entry == NULL) {
+				free(filename);
+				return -1;
+			}
+			
+			new_entry->ent = 
+				(struct dirent*)ntfs_calloc(sizeof(struct dirent) + len);
+			new_entry->ent->d_dev = cookie->dev_id;
+			new_entry->ent->d_ino = MREF(mref);
+			memcpy(new_entry->ent->d_name,filename, len + 1);
+			new_entry->ent->d_reclen =  sizeof(struct dirent) + len;
+			
+			if(cookie->cache_root == NULL || cookie->entry == NULL) {
+				cookie->cache_root = new_entry;
+				cookie->entry = cookie->cache_root;
+				cookie->entry->next = NULL;
+			} else {
+				cookie->entry->next = (void*)new_entry;
+				cookie->entry = cookie->entry->next;
+				cookie->entry->next = NULL;
 			}
 
-			return -1;
+		   	free(filename);
+		   	return 0;
 		}
+		return -1;
 	}
-
 	return 0;
 }
 
 
 status_t
-fs_free_dircookie(fs_volume *_vol, fs_vnode *vnode, void *cookie)
+fs_free_dircookie(fs_volume *_vol, fs_vnode *vnode, void *_cookie)
 {
 	nspace		*ns = (nspace*)_vol->private_volume;
-
-	LOCK_VOL(ns);
+	dircookie	*cookie = (dircookie*)_cookie;
+	
+	LOCK_VOL(ns);	
 	TRACE("fs_free_dircookie - ENTER\n");
-	if (cookie != NULL)
+	
+	if (cookie != NULL) {
+		cache_entry *entry = cookie->cache_root;
+		for(;entry!=NULL;) {
+			cache_entry *next = entry->next;
+			if(entry->ent != NULL)
+				free(entry->ent);
+			free(entry);
+			entry = next;
+		}
 		free(cookie);
+	}
 
 	TRACE("fs_free_dircookie - EXIT\n");
-
 	UNLOCK_VOL(ns);
 
 	return B_NO_ERROR;
@@ -93,11 +115,10 @@ fs_opendir(fs_volume *_vol, fs_vnode *_node, void** _cookie)
 	nspace		*ns = (nspace*)_vol->private_volume;
 	vnode		*node = (vnode*)_node->private_node;
 	dircookie	*cookie = NULL;
-	int			result = B_NO_ERROR;
 	ntfs_inode	*ni = NULL;
+	int			result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
-
 	TRACE("fs_opendir - ENTER\n");
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
@@ -114,21 +135,19 @@ fs_opendir(fs_volume *_vol, fs_vnode *_node, void** _cookie)
 	cookie = (dircookie*)ntfs_calloc(sizeof(dircookie));
 	if (cookie != NULL) {
 		cookie->pos = 0;
-		cookie->ino = 0;
-		cookie->readed = 0;
-		cookie->last = 0;
-		cookie->name[0] = 0;
+		cookie->dev_id = ns->id;
 		cookie->show_sys_files = ns->show_sys_files;
+		cookie->cache_root = NULL;
+		cookie->entry = cookie->cache_root;
 		*_cookie = (void*)cookie;
 	} else
 		result = ENOMEM;
 
 exit:
-	if (ni)
+	if (ni != NULL)
 		ntfs_inode_close(ni);
 
 	TRACE("fs_opendir - EXIT\n");
-
 	UNLOCK_VOL(ns);
 
 	return result;
@@ -138,32 +157,7 @@ exit:
 status_t
 fs_closedir(fs_volume *_vol, fs_vnode *_node, void *cookie)
 {
-	nspace		*ns = (nspace*)_vol->private_volume;
-	vnode		*node = (vnode*)_node->private_node;
-	int			result = B_NO_ERROR;
-	ntfs_inode	*ni = NULL;
-
-	LOCK_VOL(ns);
-
-	TRACE("fs_closedir - ENTER\n");
-
-	ni = ntfs_inode_open(ns->ntvol, node->vnid);
-	if (ni == NULL) {
-			result = ENOENT;
-			goto exit;
-	}
-
-	fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_ATIME);
-
-exit:
-	if (ni)
-		ntfs_inode_close(ni);
-
-	TRACE("fs_closedir - EXIT\n");
-
-	UNLOCK_VOL(ns);
-
-	return result;
+	return B_NO_ERROR;
 }
 
 
@@ -174,12 +168,12 @@ fs_readdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 	nspace		*ns = (nspace*)_vol->private_volume;
 	vnode		*node = (vnode*)_node->private_node;
 	dircookie	*cookie = (dircookie*)_cookie;
-	uint32 		nameLength = bufsize - sizeof(struct dirent), realLen;
-	int 		result = B_NO_ERROR;
 	ntfs_inode	*ni = NULL;
 
-	LOCK_VOL(ns);
+	uint32 		nameLength = bufsize - sizeof(struct dirent), realLen;
+	int 		result = B_NO_ERROR;
 
+	LOCK_VOL(ns);
 	TRACE("fs_readdir - ENTER (sizeof(buf)=%d, bufsize=%d, num=%d\n",
 		sizeof(buf), bufsize, *num);
 
@@ -188,36 +182,47 @@ fs_readdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 		goto exit;
 	}
 
-	if (cookie->readed == 1 || cookie->last == 1) {
-		 result = ENOENT;
-		 goto exit;
-	}
-
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
 	if (ni == NULL) {
-		ERROR("fs_readdir - dir not opened\n");
+		TRACE("fs_readdir - dir not opened\n");
 		result = ENOENT;
 		goto exit;
 	}
 
-	result = ntfs_readdir(ni, &cookie->pos, cookie,
-		(ntfs_filldir_t)_ntfs_dirent_filler);
+	if(cookie->cache_root == NULL) {
+		cookie->entry = NULL;
+		result = ntfs_readdir(ni, &cookie->pos, cookie,
+			(ntfs_filldir_t)_ntfs_dirent_filler);
+		cookie->entry = cookie->cache_root;
+		if(result) {
+			result = ENOENT;
+			goto exit;			
+		}			
+	}	
 
+	if(cookie->entry == NULL) {
+		result = ENOENT;
+		goto exit;
+	}
+	
+	if(cookie->entry->ent == NULL) {
+		result = ENOENT;
+		goto exit;
+	}	
+	
 	realLen = nameLength > 255 ? 255 : nameLength;
+
 	buf->d_dev = ns->id;
-	buf->d_ino = cookie->ino;
-	strlcpy(buf->d_name, cookie->name, realLen + 1);
+	buf->d_ino = cookie->entry->ent->d_ino;
+	strlcpy(buf->d_name, cookie->entry->ent->d_name, realLen + 1);
 	buf->d_reclen = sizeof(struct dirent) + realLen;
-
-	if (result == 0)
-		cookie->last = 1;
-
-	result = B_NO_ERROR;
+	
+	cookie->entry = (cache_entry*)cookie->entry->next;
 
 	TRACE("fs_readdir - FILE: [%s]\n",buf->d_name);
 
 exit:
-	if (ni)
+	if (ni != NULL)
 		ntfs_inode_close(ni);
 
 	if (result == B_NO_ERROR)
@@ -228,8 +233,7 @@ exit:
 	if (result == ENOENT)
 		result = B_NO_ERROR;
 
-	TRACE("fs_readdir - EXIT result (%s)\n", strerror(result));
-
+	TRACE("fs_readdir - EXIT num=%d result (%s)\n",*num, strerror(result));
 	UNLOCK_VOL(ns);
 
 	return result;
@@ -244,19 +248,26 @@ fs_rewinddir(fs_volume *_vol, fs_vnode *vnode, void *_cookie)
 	int			result = EINVAL;
 
 	LOCK_VOL(ns);
-
 	TRACE("fs_rewinddir - ENTER\n");
+	
 	if (cookie != NULL) {
+		cache_entry *entry = cookie->cache_root;
+		for(;entry!=NULL;) {
+			cache_entry *next = entry->next;
+			if(entry->ent != NULL)
+				free(entry->ent);
+			free(entry);
+			entry = next;
+		}
 		cookie->pos = 0;
-		cookie->ino = 0;
-		cookie->readed = 0;
-		cookie->last = 0;
-		cookie->name[0] = 0;
+		cookie->dev_id = ns->id;
+		cookie->show_sys_files = ns->show_sys_files;
+		cookie->cache_root = NULL;
+		cookie->entry = cookie->cache_root;
 		result = B_NO_ERROR;
 	}
 
 	TRACE("fs_rewinddir - EXIT, result is %s\n", strerror(result));
-
 	UNLOCK_VOL(ns);
 
 	return result;
