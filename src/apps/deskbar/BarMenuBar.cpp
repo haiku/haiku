@@ -170,17 +170,17 @@ TBarMenuBar::RemoveSeperatorItem()
 
 
 void
-TBarMenuBar::Draw(BRect rect)
+TBarMenuBar::Draw(BRect updateRect)
 {
 	// want to skip the fancy BMenuBar drawing code.
-	BMenu::Draw(rect);
+	BMenu::Draw(updateRect);
 }
 
 
 void
-TBarMenuBar::DrawBackground(BRect rect)
+TBarMenuBar::DrawBackground(BRect updateRect)
 {
-	BMenu::DrawBackground(rect);
+	BMenu::DrawBackground(updateRect);
 }
 
 

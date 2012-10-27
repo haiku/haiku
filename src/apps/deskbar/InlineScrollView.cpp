@@ -146,11 +146,23 @@ UpScrollArrow::MouseDown(BPoint where)
 		return;
 
 	TInlineScrollView* parent = dynamic_cast<TInlineScrollView*>(Parent());
+	if (parent == NULL)
+		return;
 
-	if (parent != NULL) {
-		parent->ScrollBy(-kDefaultScrollStep);
-		snooze(5000);
-	}
+	float smallStep;
+	float largeStep;
+	parent->GetSteps(&smallStep, &largeStep);
+
+	BMessage* message = Window()->CurrentMessage();
+	int32 modifiers = 0;
+	message->FindInt32("modifiers", &modifiers);
+	// pressing the option/command/control key scrolls faster
+	if ((modifiers & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0)
+		parent->ScrollBy(-largeStep);
+	else
+		parent->ScrollBy(-smallStep);
+
+	snooze(5000);
 }
 
 
@@ -200,11 +212,23 @@ DownScrollArrow::MouseDown(BPoint where)
 
 	TInlineScrollView* grandparent
 		= dynamic_cast<TInlineScrollView*>(Parent()->Parent());
+	if (grandparent == NULL)
+		return;
 
-	if (grandparent != NULL) {
-		grandparent->ScrollBy(kDefaultScrollStep);
-		snooze(5000);
-	}
+	float smallStep;
+	float largeStep;
+	grandparent->GetSteps(&smallStep, &largeStep);
+
+	BMessage* message = Window()->CurrentMessage();
+	int32 modifiers = 0;
+	message->FindInt32("modifiers", &modifiers);
+	// pressing the option/command/control key scrolls faster
+	if ((modifiers & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0)
+		grandparent->ScrollBy(largeStep);
+	else
+		grandparent->ScrollBy(smallStep);
+
+	snooze(5000);
 }
 
 
@@ -251,11 +275,23 @@ LeftScrollArrow::MouseDown(BPoint where)
 		return;
 
 	TInlineScrollView* parent = dynamic_cast<TInlineScrollView*>(Parent());
+	if (parent == NULL)
+		return;
 
-	if (parent != NULL) {
-		parent->ScrollBy(-kDefaultScrollStep);
-		snooze(5000);
-	}
+	float smallStep;
+	float largeStep;
+	parent->GetSteps(&smallStep, &largeStep);
+
+	BMessage* message = Window()->CurrentMessage();
+	int32 modifiers = 0;
+	message->FindInt32("modifiers", &modifiers);
+	// pressing the option/command/control key scrolls faster
+	if ((modifiers & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0)
+		parent->ScrollBy(-largeStep);
+	else
+		parent->ScrollBy(-smallStep);
+
+	snooze(5000);
 }
 
 
@@ -304,11 +340,23 @@ RightScrollArrow::MouseDown(BPoint where)
 
 	TInlineScrollView* grandparent
 		= dynamic_cast<TInlineScrollView*>(Parent()->Parent());
+	if (grandparent == NULL)
+		return;
 
-	if (grandparent != NULL) {
-		grandparent->ScrollBy(kDefaultScrollStep);
-		snooze(5000);
-	}
+	float smallStep;
+	float largeStep;
+	grandparent->GetSteps(&smallStep, &largeStep);
+
+	BMessage* message = Window()->CurrentMessage();
+	int32 modifiers = 0;
+	message->FindInt32("modifiers", &modifiers);
+	// pressing the option/command/control key scrolls faster
+	if ((modifiers & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0)
+		grandparent->ScrollBy(largeStep);
+	else
+		grandparent->ScrollBy(smallStep);
+
+	snooze(5000);
 }
 
 
@@ -318,7 +366,7 @@ RightScrollArrow::MouseDown(BPoint where)
 TInlineScrollView::TInlineScrollView(BRect frame, BView* target,
 	enum orientation orientation)
 	:
-	BView(frame, "inline scroll view", B_FOLLOW_NONE, 0),
+	BView(frame, "inline scroll view", B_FOLLOW_NONE, B_WILL_DRAW),
 	fTarget(target),
 	fBeginScrollArrow(NULL),
 	fEndScrollArrow(NULL),
@@ -372,6 +420,15 @@ TInlineScrollView::DetachedFromWindow()
 
 	if (fEndScrollArrow != NULL)
 		fEndScrollArrow->RemoveSelf();
+}
+
+
+void
+TInlineScrollView::Draw(BRect updateRect)
+{
+	BRect frame = Bounds();
+	be_control_look->DrawButtonBackground(this, frame, updateRect,
+		ui_color(B_MENU_BACKGROUND_COLOR));
 }
 
 
@@ -481,7 +538,8 @@ TInlineScrollView::DetachScrollers()
 bool
 TInlineScrollView::HasScrollers() const
 {
-	return fTarget != NULL && fBeginScrollArrow != NULL && fEndScrollArrow != NULL;
+	return fTarget != NULL && fBeginScrollArrow != NULL
+		&& fEndScrollArrow != NULL;
 }
 
 
@@ -498,10 +556,7 @@ TInlineScrollView::GetSteps(float* _smallStep, float* _largeStep) const
 	if (_smallStep != NULL)
 		*_smallStep = fScrollStep;
 	if (_largeStep != NULL) {
-		if (fTarget != NULL)
-			*_largeStep = fTarget->Frame().Height() - fScrollStep;
-		else
-			*_largeStep = fScrollStep * 2;
+		*_largeStep = fScrollStep * 3;
 	}
 }
 

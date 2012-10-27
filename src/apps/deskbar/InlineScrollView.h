@@ -27,6 +27,8 @@ public:
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
 
+	virtual	void				Draw(BRect updateRect);
+
 				void			AttachScrollers();
 				void			DetachScrollers();
 				bool			HasScrollers() const;

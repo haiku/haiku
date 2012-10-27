@@ -741,14 +741,14 @@ TExpandoMenuBar::MenuLayout() const
 
 
 void
-TExpandoMenuBar::Draw(BRect update)
+TExpandoMenuBar::Draw(BRect updateRect)
 {
-	BMenu::Draw(update);
+	BMenu::Draw(updateRect);
 }
 
 
 void
-TExpandoMenuBar::DrawBackground(BRect)
+TExpandoMenuBar::DrawBackground(BRect updateRect)
 {
 	if (fVertical)
 		return;
