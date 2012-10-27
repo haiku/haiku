@@ -22,7 +22,7 @@ Conversion completed	MediaConverter		Конвертация завершена
 Audio:	MediaConverter-FileInfo		Аудио:
 OK	MediaConverter-FileInfo		ОК
  seconds	MediaFileInfo		 секунд
-Source files	MediaConverter		Исходящие файлы
+Source files	MediaConverter		Исходные файлы
 Cancelling	MediaConverter		Отменяется
 %d byte 	MediaFileInfo		%d байт 
 Error loading files	MediaConverter		Ошибка при загрузке файлов
