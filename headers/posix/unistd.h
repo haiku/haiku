@@ -220,7 +220,7 @@ extern int		execle(const char *path, const char *arg , ... /*, char **envp */);
 extern int		exect(const char *path, char *const *argv);
 extern int		execvp(const char *file, char *const *argv);
 
-extern void		_exit(int status);
+extern void		_exit(int status) __attribute__ ((noreturn));
 
 extern pid_t	tcgetpgrp(int fd);
 extern int		tcsetpgrp(int fd, pid_t pgrpid);
