@@ -683,8 +683,9 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
 	float minItemWidth = fDrawLabel ? iconOnlyWidth + kMinMenuItemWidth
-									: iconOnlyWidth;
-	float maxItemWidth = sMinimumWindowWidth + iconSize - kMinimumIconSize;
+									: iconOnlyWidth - kIconPadding;
+	float maxItemWidth = fDrawLabel ? sMinimumWindowWidth + iconSize
+		- kMinimumIconSize : iconOnlyWidth;
 	float menuWidth = maxItemWidth * CountItems() + fDeskbarMenuWidth
 		+ kSepItemWidth;
 
@@ -716,13 +717,10 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 
 		for (int32 index = 0; ; index++) {
 			TTeamMenuItem* item = (TTeamMenuItem*)ItemAt(index);
-			if (!item)
+			if (item == NULL)
 				break;
 
-			if (!fDrawLabel && newWidth > iconOnlyWidth)
-				item->SetOverrideWidth(iconOnlyWidth);
-			else
-				item->SetOverrideWidth(newWidth);
+			item->SetOverrideWidth(newWidth);
 		}
 
 		Invalidate();
@@ -803,7 +801,7 @@ TExpandoMenuBar::CheckForSizeOverrun()
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
 	float minItemWidth = fDrawLabel ? iconOnlyWidth + kMinMenuItemWidth
-									: iconOnlyWidth;
+									: iconOnlyWidth - kIconPadding;
 	float menuWidth = minItemWidth * CountItems() + fDeskbarMenuWidth
 		+ kSepItemWidth;
 	float maxWidth = fBarView->DragRegion()->Frame().left
