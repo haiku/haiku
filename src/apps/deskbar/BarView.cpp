@@ -389,8 +389,8 @@ TBarView::PlaceDeskbarMenu()
 		loc = Bounds().LeftTop();
 	} else {
 		// mini mode, DeskbarMenu next to team menu
-		fBarMenuBar->AddTeamMenu();
 		fBarMenuBar->RemoveSeperatorItem();
+		fBarMenuBar->AddTeamMenu();
 	}
 
 	fBarMenuBar->SmartResize(width, menuFrame.Height());
