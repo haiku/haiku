@@ -387,6 +387,22 @@ template <class _FLT> complex<_FLT>
 template <class _FLT> complex<_FLT>
   sqrt (const complex<_FLT>&) __attribute__ ((const));
 
+template <class _FLT> inline complex<_FLT>
+tan (const complex<_FLT>& x)
+{
+  return sin (x) / cos (x);
+}
+template <class _FLT> inline complex<_FLT>
+tanh (const complex<_FLT>& x)
+{
+  return sinh (x) / cosh (x);
+}
+template <class _FLT> inline complex<_FLT>
+log10 (const complex<_FLT>& x)
+{
+  return log (x) / log (10.0);
+}
+
 template <class _FLT> istream& operator >> (istream&, complex<_FLT>&);
 template <class _FLT> ostream& operator << (ostream&, const complex<_FLT>&);
 } // extern "C++"
