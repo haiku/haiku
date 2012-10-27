@@ -120,7 +120,8 @@ UpScrollArrow::~UpScrollArrow()
 void
 UpScrollArrow::Draw(BRect updateRect)
 {
-	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+		B_DARKEN_1_TINT));
 
 	if (IsEnabled())
 		SetHighColor(0, 0, 0);
@@ -171,7 +172,8 @@ DownScrollArrow::~DownScrollArrow()
 void
 DownScrollArrow::Draw(BRect updateRect)
 {
-	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+		B_DARKEN_1_TINT));
 
 	if (IsEnabled())
 		SetHighColor(0, 0, 0);

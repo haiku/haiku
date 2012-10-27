@@ -42,7 +42,6 @@ All rights reserved.
 
 #include <AppFileInfo.h>
 #include <Bitmap.h>
-#include <ControlLook.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <LocaleRoster.h>
