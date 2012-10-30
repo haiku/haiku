@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -39,7 +39,7 @@ RFC3501Encoding::RFC3501Encoding()
 	if (!kInverseBase64Initialized) {
 		// This is not thread safe, but it's not harmful
 		for (size_t i = 0; i < sizeof(kBase64Alphabet); i++)
-			kInverseBase64Alphabet[kBase64Alphabet[i]] = i + 1;
+			kInverseBase64Alphabet[(int)kBase64Alphabet[i]] = i + 1;
 		kInverseBase64Initialized = true;
 	}
 }

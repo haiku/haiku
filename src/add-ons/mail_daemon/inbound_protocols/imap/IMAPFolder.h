@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 
 #include <Entry.h>
+#include <Node.h>
 #include <Handler.h>
 #include <String.h>
 
