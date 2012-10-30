@@ -4,8 +4,8 @@
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef MAIL_DAEMON_APP_H
-#define MAIL_DAEMON_APP_H
+#ifndef MAIL_DAEMON_APPLICATION_H
+#define MAIL_DAEMON_APPLICATION_H
 
 
 #include <map>
@@ -41,10 +41,10 @@ struct account_protocols {
 typedef std::map<int32, account_protocols> AccountMap;
 
 
-class MailDaemonApp : public BApplication {
+class MailDaemonApplication : public BApplication {
 public:
-								MailDaemonApp();
-	virtual						~MailDaemonApp();
+								MailDaemonApplication();
+	virtual						~MailDaemonApplication();
 
 	virtual void				ReadyToRun();
 	virtual	void				RefsReceived(BMessage* message);
@@ -113,4 +113,4 @@ private:
 };
 
 
-#endif // MAIL_DAEMON_APP_H
+#endif // MAIL_DAEMON_APPLICATION_H
