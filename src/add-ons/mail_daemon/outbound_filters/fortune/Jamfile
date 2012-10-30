@@ -9,7 +9,7 @@ AddResources Fortune : Fortune.rdef ;
 
 Addon Fortune :
 	ConfigView.cpp
-	filter.cpp
+	FortuneFilter.cpp
 	:
 	be libmail.so localestub [ TargetLibsupc++ ]
 ;
@@ -18,5 +18,5 @@ DoCatalogs Fortune :
 	x-vnd.Haiku-Fortune
 	:
 	ConfigView.cpp
-	filter.cpp
+	FortuneFilter.cpp
 ;

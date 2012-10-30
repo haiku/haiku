@@ -6,7 +6,7 @@
  */
 
 
-#include "ConfigView.h"
+#include "NotifierConfigView.h"
 
 #include <Catalog.h>
 #include <CheckBox.h>
@@ -22,13 +22,13 @@
 
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "ConfigView"
+#define B_TRANSLATION_CONTEXT "NotifierConfigView"
 
 
 const uint32 kMsgNotifyMethod = 'nomt';
 
 
-ConfigView::ConfigView()
+NotifierConfigView::NotifierConfigView()
 	:
 	BView("notifier_config", 0)
 {
@@ -55,7 +55,7 @@ ConfigView::ConfigView()
 
 
 void
-ConfigView::AttachedToWindow()
+NotifierConfigView::AttachedToWindow()
 {
 	if (BMenuField *field = dynamic_cast<BMenuField *>(FindView("notify")))
 		field->Menu()->SetTargetForItems(this);
@@ -63,7 +63,7 @@ ConfigView::AttachedToWindow()
 
 
 void
-ConfigView::SetTo(const BMessage *archive)
+NotifierConfigView::SetTo(const BMessage *archive)
 {
 	int32 method = archive->FindInt32("notification_method");
 	if (method < 0)
@@ -82,7 +82,7 @@ ConfigView::SetTo(const BMessage *archive)
 
 
 void
-ConfigView::UpdateNotifyText()
+NotifierConfigView::UpdateNotifyText()
 {
 	BMenuField *field;
 	if ((field = dynamic_cast<BMenuField *>(FindView("notify"))) == NULL)
@@ -105,7 +105,7 @@ ConfigView::UpdateNotifyText()
 
 
 void
-ConfigView::MessageReceived(BMessage *msg)
+NotifierConfigView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case kMsgNotifyMethod:
@@ -125,7 +125,7 @@ ConfigView::MessageReceived(BMessage *msg)
 
 
 status_t
-ConfigView::Archive(BMessage *into, bool /*deep*/) const
+NotifierConfigView::Archive(BMessage *into, bool /*deep*/) const
 {
 	int32 method = 0;
 
@@ -151,7 +151,7 @@ ConfigView::Archive(BMessage *into, bool /*deep*/) const
 BView*
 instantiate_filter_config_panel(BMailAddOnSettings& settings)
 {
-	ConfigView *view = new ConfigView();
+	NotifierConfigView *view = new NotifierConfigView();
 	view->SetTo(&settings);
 	return view;
 }

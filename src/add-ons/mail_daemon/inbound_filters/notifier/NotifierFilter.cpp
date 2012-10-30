@@ -21,11 +21,11 @@
 
 #include <MailFilter.h>
 
-#include "ConfigView.h"
+#include "NotifierConfigView.h"
 
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "filter"
+#define B_TRANSLATION_CONTEXT "NotifierFilter"
 
 
 class NotifyFilter : public BMailFilter {

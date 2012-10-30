@@ -4,8 +4,8 @@
  *
  * Distributed under the terms of the MIT License.
  */
-#ifndef CONFIG_VIEW_H
-#define CONFIG_VIEW_H
+#ifndef NOTIFIER_CONFIG_VIEW_H
+#define NOTIFIER_CONFIG_VIEW_H
 
 
 #include <View.h>
@@ -21,9 +21,9 @@ enum {
 };
 
 
-class ConfigView : public BView {
+class NotifierConfigView : public BView {
 public:
-								ConfigView();
+								NotifierConfigView();
 
 			void				SetTo(const BMessage *archive);
 
@@ -36,4 +36,4 @@ public:
 };
 
 
-#endif	// CONFIG_VIEW_H
+#endif	// NOTIFIER_CONFIG_VIEW_H
