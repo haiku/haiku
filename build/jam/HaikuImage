@@ -87,18 +87,18 @@ SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
 	libgame.so $(X86_ONLY)libGL.so libgnu.so
-	$(HAIKU_JPEG_CURRENT_LIB)
 	libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
-	$(HAIKU_LIBPNG_CURRENT_LIB)
 	<revisioned>libroot.so libroot-addon-icu.so
 	libscreensaver.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
-	$(HAIKU_ZLIB_CURRENT_LIB)
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
-	$(HAIKU_FREETYPE_CURRENT_LIB)
 ;
 PRIVATE_SYSTEM_LIBS =
+	$(HAIKU_JPEG_CURRENT_LIB)
+	$(HAIKU_LIBPNG_CURRENT_LIB)
+	$(HAIKU_ZLIB_CURRENT_LIB) 
+	$(HAIKU_FREETYPE_CURRENT_LIB)
 	libalm.so
 	libfluidsynth.so
 	libilmimf.so
@@ -332,6 +332,13 @@ SYSTEM_LIBS_ALIASES =
 	libnetapi.so
 	$(SYSTEM_LIBS_LIBGL_ALIASES)
 	$(SYSTEM_LIBS_LIBBE_ALIASES)
+;
+
+OPTIONAL_LIBS_ALIASES =
+	$(HAIKU_FREETYPE_CURRENT_LINK)
+	$(HAIKU_JPEG_CURRENT_LINK)
+	$(HAIKU_LIBPNG_CURRENT_LINK)
+	$(HAIKU_ZLIB_CURRENT_LINK)
 ;
 
 # libfreetype.so links to the current freetype lib

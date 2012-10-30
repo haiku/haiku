@@ -782,7 +782,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 
 	# library symlinks
 	local lib ;
-	for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs) {
+	for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs)
+		$(OPTIONAL_LIBS_ALIASES) {
 		AddSymlinkToHaikuHybridImage $(abiDirTokens) lib
 			: /system/lib $(lib:BS) : : true ;
 		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
