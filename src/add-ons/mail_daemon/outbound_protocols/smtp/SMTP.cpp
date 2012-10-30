@@ -10,7 +10,7 @@
 //!	Implementation of the SMTP protocol
 
 
-#include "smtp.h"
+#include "SMTP.h"
 
 #include <map>
 
