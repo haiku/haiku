@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2012, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -21,27 +21,20 @@
 #include <MailProtocol.h>
 
 #include "LEDAnimation.h"
-#include "Notifier.h"
+#include "DefaultNotifier.h"
 
 
 class BNotification;
+struct send_mails_info;
 
 
 struct account_protocols {
-	account_protocols() {
-		inboundImage = -1;
-		inboundThread = NULL;
-		inboundProtocol = NULL;
-		outboundImage = -1;
-		outboundThread = NULL;
-		outboundProtocol = NULL;
-	}
+	account_protocols();
+
 	image_id				inboundImage;
-	InboundProtocolThread*	inboundThread;
-	InboundProtocol*		inboundProtocol;
+	BInboundMailProtocol*	inboundProtocol;
 	image_id				outboundImage;
-	OutboundProtocolThread*	outboundThread;
-	OutboundProtocol*		outboundProtocol;
+	BOutboundMailProtocol*	outboundProtocol;
 };
 
 
@@ -72,19 +65,23 @@ private:
 			void				_InitAccounts();
 			void				_InitAccount(BMailAccountSettings& settings);
 			void				_ReloadAccounts(BMessage* message);
-			void				_RemoveAccount(AccountMap::const_iterator it);
+			void				_RemoveAccount(
+									const account_protocols& account);
 
-			InboundProtocol*	_CreateInboundProtocol(
+			BInboundMailProtocol* _CreateInboundProtocol(
 									BMailAccountSettings& settings,
 									image_id& image);
-			OutboundProtocol*	_CreateOutboundProtocol(
+			BOutboundMailProtocol* _CreateOutboundProtocol(
 									BMailAccountSettings& settings,
 									image_id& image);
 
-			InboundProtocolThread*	_FindInboundProtocol(int32 account);
-			OutboundProtocolThread*	_FindOutboundProtocol(int32 account);
+			BInboundMailProtocol* _InboundProtocol(int32 account);
+			BOutboundMailProtocol* _OutboundProtocol(int32 account);
 
 			void				_UpdateAutoCheck(bigtime_t interval);
+
+			void				_AddMessage(send_mails_info& info,
+									const BEntry& entry, const BNode& node);
 
 	static	bool				_IsPending(BNode& node);
 	static	bool				_IsEntryInTrash(BEntry& entry);

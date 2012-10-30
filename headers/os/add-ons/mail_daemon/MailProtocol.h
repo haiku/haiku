@@ -1,16 +1,16 @@
-/* Protocol - the base class for protocol filters
- *
+/*
+ * Copyright 2004-2012, Haiku, Inc. All Rights Reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011 Clemens Zeidler. All rights reserved.
-*/
-#ifndef MAIL_PROTOCOL_H
-#define MAIL_PROTOCOL_H
+ *
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _MAIL_PROTOCOL_H
+#define _MAIL_PROTOCOL_H
 
 
 #include <map>
-#include <vector>
 
-#include <Handler.h>
 #include <Looper.h>
 #include <OS.h>
 #include <ObjectList.h>
@@ -22,6 +22,7 @@
 
 
 class BMailFilter;
+class BView;
 
 
 class BMailNotifier {
@@ -41,7 +42,7 @@ public:
 };
 
 
-class BMailProtocol : BLooper {
+class BMailProtocol : public BLooper {
 public:
 								BMailProtocol(
 									const BMailAccountSettings& settings);
@@ -73,6 +74,12 @@ public:
 			// Convenience methods that call the BMailNotifier
 			void				ShowError(const char* error);
 			void				ShowMessage(const char* message);
+
+#if __GNUC__ > 2
+			// Unhide virtual base methods
+			using BHandler::AddFilter;
+			using BHandler::RemoveFilter;
+#endif
 
 protected:
 		 	void				SetTotalItems(uint32 items);
@@ -136,9 +143,8 @@ public:
 
 	virtual void				MessageReceived(BMessage* message);
 
-	virtual	status_t			SendMessages(
-									const std::vector<entry_ref>& mails,
-									size_t totalBytes) = 0;
+	virtual	status_t			SendMessages(const BMessage& message,
+									off_t totalBytes) = 0;
 };
 
 
@@ -151,4 +157,4 @@ extern "C" _EXPORT BView* instantiate_protocol_config_panel(
 	BMailAccountSettings& settings);
 
 
-#endif // MAIL_PROTOCOL_H
+#endif	// _MAIL_PROTOCOL_H

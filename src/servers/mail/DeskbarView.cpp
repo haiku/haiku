@@ -1,7 +1,12 @@
-/* DeskbarView - mail_daemon's deskbar menu and view
- *
+/*
+ * Copyright 2004-2012, Haiku Inc. All Rights Reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
  */
+
+
+//!	mail_daemon's deskbar menu and view
 
 
 #include "DeskbarView.h"
@@ -38,6 +43,8 @@
 #include <E-mail.h>
 #include <MailDaemon.h>
 #include <MailSettings.h>
+
+#include <MailPrivate.h>
 
 #include "DeskbarViewIcons.h"
 
@@ -209,7 +216,8 @@ status_t DeskbarView::Archive(BMessage *data,bool deep) const
 }
 
 
-void DeskbarView::Draw(BRect /*updateRect*/)
+void
+DeskbarView::Draw(BRect /*updateRect*/)
 {
 	if (fBitmaps[fStatus] == NULL)
 		return;
@@ -223,18 +231,17 @@ void DeskbarView::Draw(BRect /*updateRect*/)
 void
 DeskbarView::MessageReceived(BMessage* message)
 {
-	switch(message->what)
-	{
+	switch (message->what) {
 		case MD_CHECK_SEND_NOW:
 			// also happens in DeskbarView::MouseUp() with
 			// B_TERTIARY_MOUSE_BUTTON pressed
-			BMailDaemon::CheckAndSendQueuedMail();
+			BMailDaemon().CheckAndSendQueuedMail();
 			break;
 		case MD_CHECK_FOR_MAILS:
-			BMailDaemon::CheckMail(message->FindInt32("account"));
+			BMailDaemon().CheckMail(message->FindInt32("account"));
 			break;
 		case MD_SEND_MAILS:
-			BMailDaemon::SendQueuedMail();
+			BMailDaemon().SendQueuedMail();
 			break;
 
 		case MD_OPEN_NEW:
@@ -282,12 +289,12 @@ DeskbarView::MessageReceived(BMessage* message)
 						fNewMessages--;
 					break;
 			}
-			fStatus = (fNewMessages > 0) ? kStatusNewMail : kStatusNoMail;
+			fStatus = fNewMessages > 0 ? kStatusNewMail : kStatusNoMail;
 			Invalidate();
 			break;
 		}
 		case B_QUIT_REQUESTED:
-			BMailDaemon::Quit();
+			BMailDaemon().Quit();
 			break;
 
 		// open received files in the standard mail application
@@ -364,38 +371,34 @@ DeskbarView::Pulse()
 void
 DeskbarView::MouseUp(BPoint pos)
 {
-	if (fLastButtons & B_PRIMARY_MOUSE_BUTTON) {
-		if (OpenWithTracker(B_USER_SETTINGS_DIRECTORY, "Mail/mailbox")
-			!= B_OK) {
-			entry_ref ref;
-			_GetNewQueryRef(ref);
+	if ((fLastButtons & B_PRIMARY_MOUSE_BUTTON) !=0
+		&& OpenWithTracker(B_USER_SETTINGS_DIRECTORY, "Mail/mailbox") != B_OK) {
+		entry_ref ref;
+		_GetNewQueryRef(ref);
 
-			BMessenger trackerMessenger(kTrackerSignature);
-			BMessage message(B_REFS_RECEIVED);
-			message.AddRef("refs", &ref);
+		BMessenger trackerMessenger(kTrackerSignature);
+		BMessage message(B_REFS_RECEIVED);
+		message.AddRef("refs", &ref);
 
-			trackerMessenger.SendMessage(&message);
-		}
+		trackerMessenger.SendMessage(&message);
 	}
 
-	if (fLastButtons & B_TERTIARY_MOUSE_BUTTON)
-		BMailDaemon::CheckMail();
+	if ((fLastButtons & B_TERTIARY_MOUSE_BUTTON) != 0)
+		BMailDaemon().CheckMail();
 }
 
 
 void
 DeskbarView::MouseDown(BPoint pos)
 {
-	Looper()->CurrentMessage()->FindInt32("buttons",&fLastButtons);
+	Looper()->CurrentMessage()->FindInt32("buttons", &fLastButtons);
 
-	if (fLastButtons & B_SECONDARY_MOUSE_BUTTON) {
+	if ((fLastButtons & B_SECONDARY_MOUSE_BUTTON) != 0) {
 		ConvertToScreen(&pos);
 
 		BPopUpMenu* menu = _BuildMenu();
-		if (menu) {
-			menu->Go(pos, true, true, BRect(pos.x - 2, pos.y - 2,
-				pos.x + 2, pos.y + 2), true);
-		}
+		menu->Go(pos, true, true, BRect(pos.x - 2, pos.y - 2,
+			pos.x + 2, pos.y + 2), true);
 	}
 }
 
@@ -563,7 +566,7 @@ DeskbarView::_BuildMenu()
 	}
 
 	BMailAccounts accounts;
-	if (modifiers() & B_SHIFT_KEY) {
+	if ((modifiers() & B_SHIFT_KEY) != 0) {
 		BMenu *accountMenu = new BMenu(B_TRANSLATE("Check for mails only"));
 		BFont font;
 		menu->GetFont(&font);
@@ -611,7 +614,7 @@ DeskbarView::_BuildMenu()
 
 	for (int32 i = menu->CountItems(); i-- > 0;) {
 		item = menu->ItemAt(i);
-		if (item && (msg = item->Message()) != NULL) {
+		if (item != NULL && (msg = item->Message()) != NULL) {
 			if (msg->what == B_REFS_RECEIVED)
 				item->SetTarget(tracker);
 			else

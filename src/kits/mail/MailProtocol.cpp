@@ -31,14 +31,14 @@
 #include <MailSettings.h>
 
 #include <mail_util.h>
+#include <MailPrivate.h>
 
 #include "HaikuMailFormatFilter.h"
 
 
-using std::map;
+using namespace BPrivate;
 
 
-const uint32 kMsgSyncMessages = '&SyM';
 const uint32 kMsgDeleteMessage = '&DeM';
 const uint32 kMsgAppendMessage = '&ApM';
 
@@ -67,7 +67,7 @@ BMailProtocol::~BMailProtocol()
 	for (int i = 0; i < fFilterList.CountItems(); i++)
 		delete fFilterList.ItemAt(i);
 
-	map<entry_ref, image_id>::iterator it = fFilterImages.begin();
+	std::map<entry_ref, image_id>::iterator it = fFilterImages.begin();
 	for (; it != fFilterImages.end(); it++)
 		unload_add_on(it->second);
 }
@@ -316,7 +316,7 @@ BMailFilter*
 BMailProtocol::_LoadFilter(BMailAddOnSettings* filterSettings)
 {
 	const entry_ref& ref = filterSettings->AddOnRef();
-	map<entry_ref, image_id>::iterator it = fFilterImages.find(ref);
+	std::map<entry_ref, image_id>::iterator it = fFilterImages.find(ref);
 	image_id image;
 	if (it != fFilterImages.end())
 		image = it->second;
@@ -461,18 +461,8 @@ BOutboundMailProtocol::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgSendMessage:
-		{
-			std::vector<entry_ref> mails;
-			for (int32 i = 0; ;i++) {
-				entry_ref ref;
-				if (message->FindRef("ref", i, &ref) != B_OK)
-					break;
-				mails.push_back(ref);
-			}
-			size_t size = message->FindInt32("size");
-			SendMessages(mails, size);
+			SendMessages(*message, message->FindInt64("bytes"));
 			break;
-		}
 
 		default:
 			BMailProtocol::MessageReceived(message);

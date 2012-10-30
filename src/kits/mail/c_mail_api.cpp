@@ -1,8 +1,13 @@
-/* C-mail API - compatibility function (stubs) for the old mail kit
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-** Copyright 2011 Clemens Zeidler. All rights reserved.
-*/
+/*
+ * Copyright 2004-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2001, Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2011, Clemens Zeidler. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+
+//!	C-mail API - compatibility function (stubs) for the old mail kit
 
 
 #include <stdlib.h>
@@ -22,14 +27,14 @@
 
 
 _EXPORT status_t
-check_for_mail(int32 * incoming_count)
+check_for_mail(int32* _incomingCount)
 {
-	status_t err = BMailDaemon::CheckMail(true);
-	if (err < B_OK)
-		return err;
+	status_t status = BMailDaemon().CheckMail();
+	if (status != B_OK)
+		return status;
 
-	if (incoming_count != NULL)
-		*incoming_count = BMailDaemon::CountNewMessages(true);
+	if (_incomingCount != NULL)
+		*_incomingCount = BMailDaemon().CountNewMessages(true);
 
 	return B_OK;
 }
@@ -38,7 +43,7 @@ check_for_mail(int32 * incoming_count)
 _EXPORT status_t
 send_queued_mail(void)
 {
-	return BMailDaemon::SendQueuedMail();
+	return BMailDaemon().SendQueuedMail();
 }
 
 

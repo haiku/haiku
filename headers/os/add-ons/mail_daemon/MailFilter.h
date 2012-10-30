@@ -2,8 +2,8 @@
  * Copyright 2011-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef MAIL_FILTER_H
-#define MAIL_FILTER_H
+#ifndef _MAIL_FILTER_H
+#define _MAIL_FILTER_H
 
 
 #include "MailProtocol.h"
@@ -47,4 +47,4 @@ extern "C" BMailFilter* instantiate_filter(BMailProtocol& protocol,
 extern "C" BString filter_name();
 
 
-#endif	// MAIL_FILTER_H
+#endif	// _MAIL_FILTER_H

@@ -329,29 +329,33 @@ SMTPProtocol::Disconnect()
 
 //! Process EMail to be sent
 status_t
-SMTPProtocol::SendMessages(const std::vector<entry_ref>& mails,
-	size_t totalBytes)
+SMTPProtocol::SendMessages(const BMessage& message, off_t totalBytes)
 {
-	status_t status = Connect();
+	type_code type;
+	int32 count;
+	status_t status = message.GetInfo("ref", &type, &count);
 	if (status != B_OK)
 		return status;
 
-	for (unsigned int i = 0; i < mails.size(); i++) {
-		status = _SendMessage(mails[i]);
+	SetTotalItems(count);
+	SetTotalItemsSize(totalBytes);
 
+	status = Connect();
+	if (status != B_OK)
+		return status;
+
+	entry_ref ref;
+	for (int32 i = 0; message.FindRef("ref", i++, &ref) == B_OK;) {
+		status = _SendMessage(ref);
 		if (status != B_OK) {
 			BString error;
-			error << "An error occurred while sending the message " <<
-				mails[i].name << ":\n" << fLog;
+			error << "An error occurred while sending the message "
+				<< ref.name << ":\n" << fLog;
 			ShowError(error.String());
 
 			ResetProgress();
 			break;
 		}
-		off_t size = 0;
-		const entry_ref& ref = mails[i];
-		BNode(&ref).GetSize(&size);
-		ReportProgress(size, 1);
 	}
 
 	Disconnect();
@@ -521,10 +525,10 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
 
 status_t
-SMTPProtocol::_SendMessage(const entry_ref& mail)
+SMTPProtocol::_SendMessage(const entry_ref& ref)
 {
 	// open read write to be able to manipulate in MessageReadyToSend hook
-	BFile file(&mail, B_READ_WRITE);
+	BFile file(&ref, B_READ_WRITE);
 	status_t status = file.InitCheck();
 	if (status != B_OK)
 		return status;
@@ -534,7 +538,7 @@ SMTPProtocol::_SendMessage(const entry_ref& mail)
 
 	const char *from = header.FindString("MAIL:from");
 	const char *to = header.FindString("MAIL:recipients");
-	if (!to)
+	if (to == NULL)
 		to = header.FindString("MAIL:to");
 
 	if (to == NULL || from == NULL) {
@@ -542,11 +546,16 @@ SMTPProtocol::_SendMessage(const entry_ref& mail)
 		return B_ERROR;
 	}
 
-	NotifyMessageReadyToSend(mail, &file);
+	NotifyMessageReadyToSend(ref, &file);
 	status = Send(to, from, &file);
 	if (status != B_OK)
 		return status;
-	NotifyMessageSent(mail, &file);
+	NotifyMessageSent(ref, &file);
+
+	off_t size = 0;
+	file.GetSize(&size);
+	ReportProgress(size, 1);
+
 	return B_OK;
 }
 

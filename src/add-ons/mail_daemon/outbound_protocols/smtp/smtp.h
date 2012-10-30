@@ -24,13 +24,13 @@
 class SMTPProtocol : public BOutboundMailProtocol {
 public:
 								SMTPProtocol(BMailAccountSettings& settings);
-								~SMTPProtocol();
+	virtual						~SMTPProtocol();
 
 			status_t			Connect();
 			void				Disconnect();
 
-			status_t			SendMessages(const std::vector<entry_ref>&
-									mails, size_t totalBytes);
+	virtual	status_t			SendMessages(const BMessage& message,
+									off_t totalBytes);
 
 			status_t			Open(const char *server, int port, bool esmtp);
 			void				Close();
@@ -42,7 +42,7 @@ public:
 			status_t			SendCommand(const char *cmd);
 
 private:
-			status_t			_SendMessage(const entry_ref& mail);
+			status_t			_SendMessage(const entry_ref& ref);
 			status_t			_POP3Authentication();
 
 			int					fSocket;

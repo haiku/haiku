@@ -1,6 +1,7 @@
 /*
  * Copyright 2011-2012, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,6 +12,8 @@
 #include <IconUtils.h>
 #include <MailDaemon.h>
 #include <Roster.h>
+
+#include <MailPrivate.h>
 
 
 #undef B_TRANSLATION_CONTEXT

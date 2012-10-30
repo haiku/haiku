@@ -1,71 +1,92 @@
-/* Daemon - talking to the mail daemon
-**
-** Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2004-2012, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
-
-#include <Messenger.h>
-#include <Message.h>
-#include <List.h>
 
 #include <MailDaemon.h>
-#include <MailSettings.h>
 
-#include <string.h>
+#include <List.h>
+#include <MailSettings.h>
+#include <Messenger.h>
+#include <Message.h>
+#include <Roster.h>
+
+#include <MailPrivate.h>
+
+
+using namespace BPrivate;
+
+
+BMailDaemon::BMailDaemon()
+	:
+	fDaemon(B_MAIL_DAEMON_SIGNATURE)
+{
+}
+
+
+BMailDaemon::~BMailDaemon()
+{
+}
+
+
+bool
+BMailDaemon::IsRunning()
+{
+	return fDaemon.IsValid();
+}
 
 
 status_t
 BMailDaemon::CheckMail(int32 accountID)
 {
-	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
-	if (!daemon.IsValid())
+	if (!fDaemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
 	BMessage message(kMsgCheckMessage);
 	message.AddInt32("account", accountID);
-	return daemon.SendMessage(&message);
+	return fDaemon.SendMessage(&message);
 }
 
 
 status_t
 BMailDaemon::CheckAndSendQueuedMail(int32 accountID)
 {
-	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
-	if (!daemon.IsValid())
+	if (!fDaemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
 	BMessage message(kMsgCheckAndSend);
 	message.AddInt32("account", accountID);
-	return daemon.SendMessage(&message);
+	return fDaemon.SendMessage(&message);
 }
 
 
 status_t
 BMailDaemon::SendQueuedMail()
 {
-	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
-	if (!daemon.IsValid())
+	if (!fDaemon.IsValid())
 		return B_MAIL_NO_DAEMON;
-	
-	return daemon.SendMessage(kMsgSendMessages);
+
+	return fDaemon.SendMessage(kMsgSendMessages);
 }
 
 
 int32
-BMailDaemon::CountNewMessages(bool wait_for_fetch_completion)
+BMailDaemon::CountNewMessages(bool waitForFetchCompletion)
 {
-	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
-	if (!daemon.IsValid())
+	if (!fDaemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
 	BMessage reply;
 	BMessage first(kMsgCountNewMessages);
 
-	if (wait_for_fetch_completion)
+	if (waitForFetchCompletion)
 		first.AddBool("wait_for_fetch_done",true);
-		
-	daemon.SendMessage(&first, &reply);	
-		
+
+	fDaemon.SendMessage(&first, &reply);
+
 	return reply.FindInt32("num_new_messages");
 }
 
@@ -73,8 +94,7 @@ BMailDaemon::CountNewMessages(bool wait_for_fetch_completion)
 status_t
 BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, read_flags flag)
 {
-	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
-	if (!daemon.IsValid())
+	if (!fDaemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
 	BMessage message(kMsgMarkMessageAsRead);
@@ -82,15 +102,14 @@ BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, read_flags flag)
 	message.AddRef("ref", &ref);
 	message.AddInt32("read", flag);
 
-	return daemon.SendMessage(&message);
+	return fDaemon.SendMessage(&message);
 }
 
 
 status_t
 BMailDaemon::FetchBody(const entry_ref& ref, BMessenger* listener)
 {
-	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
-	if (!daemon.IsValid())
+	if (!fDaemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
 	BMessage message(kMsgFetchBody);
@@ -99,16 +118,22 @@ BMailDaemon::FetchBody(const entry_ref& ref, BMessenger* listener)
 		message.AddMessenger("target", *listener);
 
 	BMessage reply;
-	return daemon.SendMessage(&message, &reply);
+	return fDaemon.SendMessage(&message, &reply);
 }
 
 
 status_t
 BMailDaemon::Quit()
 {
-	BMessenger daemon(B_MAIL_DAEMON_SIGNATURE);
-	if (!daemon.IsValid())
+	if (!fDaemon.IsValid())
 		return B_MAIL_NO_DAEMON;
-	
-	return daemon.SendMessage(B_QUIT_REQUESTED);
+
+	return fDaemon.SendMessage(B_QUIT_REQUESTED);
+}
+
+
+status_t
+BMailDaemon::Launch()
+{
+	return be_roster->Launch(B_MAIL_DAEMON_SIGNATURE);
 }

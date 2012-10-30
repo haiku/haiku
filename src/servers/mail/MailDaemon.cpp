@@ -33,23 +33,75 @@
 #include <MailMessage.h>
 #include <MailSettings.h>
 
+#include <MailPrivate.h>
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MailDaemon"
 
 
-using std::map;
-using std::vector;
-
-
 struct send_mails_info {
 	send_mails_info()
 	{
-		totalSize = 0;
+		bytes = 0;
 	}
 
-	vector<entry_ref>	files;
-	off_t				totalSize;
+	BMessage	files;
+	off_t		bytes;
+};
+
+
+class InboundMessenger : public BMessenger {
+public:
+	InboundMessenger(BInboundMailProtocol* protocol)
+		:
+		BMessenger(protocol)
+	{
+	}
+
+	status_t FetchBody(const entry_ref& ref, BMessenger* replyTo)
+	{
+		BMessage message(kMsgFetchBody);
+		message.AddRef("ref", &ref);
+		if (replyTo != NULL)
+			message.AddMessenger("target", *replyTo);
+
+		return SendMessage(&message);
+	}
+
+	status_t MarkAsRead(const entry_ref& ref, read_flags flag)
+	{
+		BMessage message(kMsgMarkMessageAsRead);
+		message.AddRef("ref", &ref);
+		message.AddInt32("read", flag);
+
+		return SendMessage(&message);
+	}
+
+	status_t SynchronizeMessages()
+	{
+		BMessage message(kMsgSyncMessages);
+		return SendMessage(&message);
+	}
+};
+
+
+class OutboundMessenger : public BMessenger {
+public:
+	OutboundMessenger(BOutboundMailProtocol* protocol)
+		:
+		BMessenger(protocol)
+	{
+	}
+
+	status_t SendMessages(const BMessage& files, off_t totalBytes)
+	{
+		BMessage message(kMsgSendMessages);
+		message.Append(files);
+		message.AddInt64("bytes", totalBytes);
+
+		return SendMessage(&message);
+	}
 };
 
 
@@ -103,7 +155,20 @@ addAttribute(BMessage& msg, const char* name, const char* publicName,
 }
 
 
-//	#pragma mark -
+// #pragma mark -
+
+
+account_protocols::account_protocols()
+	:
+	inboundImage(-1),
+	inboundProtocol(NULL),
+	outboundImage(-1),
+	outboundProtocol(NULL)
+{
+}
+
+
+// #pragma mark -
 
 
 MailDaemonApp::MailDaemonApp()
@@ -129,12 +194,13 @@ MailDaemonApp::~MailDaemonApp()
 	for (int32 i = 0; i < fQueries.CountItems(); i++)
 		delete fQueries.ItemAt(i);
 
+	while (!fAccounts.empty()) {
+		_RemoveAccount(fAccounts.begin()->second);
+		fAccounts.erase(fAccounts.begin());
+	}
+
 	delete fLEDAnimation;
 	delete fNotification;
-
-	AccountMap::const_iterator it = fAccounts.begin();
-	for (; it != fAccounts.end(); it++)
-		_RemoveAccount(it);
 }
 
 
@@ -218,15 +284,16 @@ MailDaemonApp::RefsReceived(BMessage* message)
 				sizeof(account)) < 0)
 			continue;
 
-		InboundProtocolThread* protocolThread = _FindInboundProtocol(account);
-		if (protocolThread == NULL)
+		BInboundMailProtocol* protocol = _InboundProtocol(account);
+		if (protocol == NULL)
 			continue;
 
 		BMessenger target;
-		BMessenger* messenger = &target;
+		BMessenger* replyTo = &target;
 		if (message->FindMessenger("target", &target) != B_OK)
-			messenger = NULL;
-		protocolThread->FetchBody(ref, messenger);
+			replyTo = NULL;
+
+		InboundMessenger(protocol).FetchBody(ref, replyTo);
 	}
 }
 
@@ -276,11 +343,10 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 			if (msg->FindRef("ref", &ref) != B_OK)
 				break;
 			read_flags read = (read_flags)msg->FindInt32("read");
-			AccountMap::iterator it = fAccounts.find(account);
-			if (it == fAccounts.end())
-				break;
-			InboundProtocolThread* inboundThread = it->second.inboundThread;
-			inboundThread->MarkMessageAsRead(ref, read);
+
+			BInboundMailProtocol* protocol = _InboundProtocol(account);
+			if (protocol != NULL)
+				InboundMessenger(protocol).MarkAsRead(ref, read);
 			break;
 		}
 
@@ -447,18 +513,20 @@ MailDaemonApp::GetNewMessages(BMessage* msg)
 {
 	int32 account = -1;
 	if (msg->FindInt32("account", &account) == B_OK && account >= 0) {
-		InboundProtocolThread* protocol = _FindInboundProtocol(account);
+		// Check the single requested account
+		BInboundMailProtocol* protocol = _InboundProtocol(account);
 		if (protocol != NULL)
-			protocol->SyncMessages();
+			InboundMessenger(protocol).SynchronizeMessages();
 		return;
 	}
 
-	// else check all accounts
-	AccountMap::const_iterator it = fAccounts.begin();
-	for (; it != fAccounts.end(); it++) {
-		InboundProtocolThread* protocol = it->second.inboundThread;
+	// Check all accounts
+
+	AccountMap::const_iterator iterator = fAccounts.begin();
+	for (; iterator != fAccounts.end(); iterator++) {
+		BInboundMailProtocol* protocol = iterator->second.inboundProtocol;
 		if (protocol != NULL)
-			protocol->SyncMessages();
+			InboundMessenger(protocol).SynchronizeMessages();
 	}
 }
 
@@ -469,7 +537,7 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 	BVolumeRoster roster;
 	BVolume volume;
 
-	map<int32, send_mails_info> messages;
+	std::map<int32, send_mails_info> messages;
 
 	int32 account = -1;
 	if (msg->FindInt32("account", &account) != B_OK)
@@ -507,55 +575,34 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 				if (!_IsPending(node))
 					continue;
 
-				int32 messageAccount;
 				if (node.ReadAttr(B_MAIL_ATTR_ACCOUNT_ID, B_INT32_TYPE, 0,
-					&messageAccount, sizeof(int32)) < 0)
-					messageAccount = -1;
+						&account, sizeof(int32)) < 0)
+					account = -1;
 
-				off_t size = 0;
-				node.GetSize(&size);
-				entry_ref ref;
-				entry.GetRef(&ref);
-
-				messages[messageAccount].files.push_back(ref);
-				messages[messageAccount].totalSize += size;
+				_AddMessage(messages[account], entry, node);
 			}
 		}
 	} else {
+		// Send the requested message only
 		const char* path;
 		if (msg->FindString("message_path", &path) != B_OK)
 			return;
 
-		off_t size = 0;
-		if (BNode(path).GetSize(&size) != B_OK)
-			return;
 		BEntry entry(path);
-		entry_ref ref;
-		entry.GetRef(&ref);
-
-		messages[account].files.push_back(ref);
-		messages[account].totalSize += size;
+		_AddMessage(messages[account], entry, BNode(&entry));
 	}
 
-	map<int32, send_mails_info>::iterator iter = messages.begin();
-	for (; iter != messages.end(); iter++) {
-		OutboundProtocolThread* protocolThread = _FindOutboundProtocol(
-			iter->first);
-		if (!protocolThread)
+	std::map<int32, send_mails_info>::iterator iterator = messages.begin();
+	for (; iterator != messages.end(); iterator++) {
+		BOutboundMailProtocol* protocol = _OutboundProtocol(iterator->first);
+		if (protocol == NULL)
 			continue;
 
-		send_mails_info& info = iter->second;
-		if (info.files.size() == 0)
+		send_mails_info& info = iterator->second;
+		if (info.bytes == 0)
 			continue;
 
-		MailProtocol* protocol = protocolThread->Protocol();
-
-		protocolThread->Lock();
-		protocol->SetTotalItems(info.files.size());
-		protocol->SetTotalItemsSize(info.totalSize);
-		protocolThread->Unlock();
-
-		protocolThread->SendMessages(iter->second.files, info.totalSize);
+		OutboundMessenger(protocol).SendMessages(info.files, info.bytes);
 	}
 }
 
@@ -630,48 +677,38 @@ void
 MailDaemonApp::_InitAccount(BMailAccountSettings& settings)
 {
 	account_protocols account;
+
 	// inbound
 	if (settings.IsInboundEnabled()) {
 		account.inboundProtocol = _CreateInboundProtocol(settings,
 			account.inboundImage);
-	} else {
-		account.inboundProtocol = NULL;
 	}
-	if (account.inboundProtocol) {
+	if (account.inboundProtocol != NULL) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), true,
 			fErrorLogWindow, fNotifyMode);
 		account.inboundProtocol->SetMailNotifier(notifier);
-
-		account.inboundThread = new InboundProtocolThread(
-			account.inboundProtocol);
-		account.inboundThread->Run();
+		account.inboundProtocol->Run();
 	}
 
 	// outbound
 	if (settings.IsOutboundEnabled()) {
 		account.outboundProtocol = _CreateOutboundProtocol(settings,
 			account.outboundImage);
-	} else {
-		account.outboundProtocol = NULL;
 	}
-	if (account.outboundProtocol) {
+	if (account.outboundProtocol != NULL) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), false,
 			fErrorLogWindow, fNotifyMode);
 		account.outboundProtocol->SetMailNotifier(notifier);
-
-		account.outboundThread = new OutboundProtocolThread(
-			account.outboundProtocol);
-		account.outboundThread->Run();
+		account.outboundProtocol->Run();
 	}
 
 	printf("account name %s, id %i, in %p, out %p\n", settings.Name(),
 		(int)settings.AccountID(), account.inboundProtocol,
 		account.outboundProtocol);
-	if (!account.inboundProtocol && !account.outboundProtocol)
-		return;
-	fAccounts[settings.AccountID()] = account;
-}
 
+	if (account.inboundProtocol != NULL || account.outboundProtocol != NULL)
+		fAccounts[settings.AccountID()] = account;
+}
 
 
 void
@@ -688,9 +725,12 @@ MailDaemonApp::_ReloadAccounts(BMessage* message)
 
 	for (int i = 0; i < countFound; i++) {
 		int32 account = message->FindInt32("account", i);
-		AccountMap::const_iterator it = fAccounts.find(account);
-		if (it != fAccounts.end())
-			_RemoveAccount(it);
+		AccountMap::iterator found = fAccounts.find(account);
+		if (found != fAccounts.end()) {
+			_RemoveAccount(found->second);
+			fAccounts.erase(found);
+		}
+
 		BMailAccountSettings* settings = accounts.AccountByID(account);
 		if (settings != NULL)
 			_InitAccount(*settings);
@@ -699,89 +739,88 @@ MailDaemonApp::_ReloadAccounts(BMessage* message)
 
 
 void
-MailDaemonApp::_RemoveAccount(AccountMap::const_iterator it)
+MailDaemonApp::_RemoveAccount(const account_protocols& account)
 {
-	BMessage reply;
-	if (it->second.inboundThread) {
-		it->second.inboundThread->SetStopNow();
-		BMessenger(it->second.inboundThread).SendMessage(B_QUIT_REQUESTED,
-			&reply);
+	if (account.inboundProtocol != NULL) {
+		account.inboundProtocol->Lock();
+		account.inboundProtocol->Quit();
+
+		unload_add_on(account.inboundImage);
 	}
-	if (it->second.outboundThread) {
-		it->second.outboundThread->SetStopNow();
-		BMessenger(it->second.outboundThread).SendMessage(B_QUIT_REQUESTED,
-			&reply);
+
+	if (account.outboundProtocol != NULL) {
+		account.outboundProtocol->Lock();
+		account.outboundProtocol->Quit();
+
+		unload_add_on(account.outboundImage);
 	}
-	delete it->second.inboundProtocol;
-	delete it->second.outboundProtocol;
-	unload_add_on(it->second.inboundImage);
-	unload_add_on(it->second.outboundImage);
-	fAccounts.erase(it->first);
 }
 
 
-InboundProtocol*
+BInboundMailProtocol*
 MailDaemonApp::_CreateInboundProtocol(BMailAccountSettings& settings,
 	image_id& image)
 {
-	const entry_ref& entry = settings.InboundPath();
-	InboundProtocol* (*instantiate_protocol)(BMailAccountSettings*);
+	const entry_ref& entry = settings.InboundAddOnRef();
+	BInboundMailProtocol* (*instantiateProtocol)(BMailAccountSettings*);
 
 	BPath path(&entry);
 	image = load_add_on(path.Path());
 	if (image < 0)
 		return NULL;
+
 	if (get_image_symbol(image, "instantiate_inbound_protocol",
-			B_SYMBOL_TYPE_TEXT, (void**)&instantiate_protocol) != B_OK) {
+			B_SYMBOL_TYPE_TEXT, (void**)&instantiateProtocol) != B_OK) {
 		unload_add_on(image);
 		image = -1;
 		return NULL;
 	}
-	return (*instantiate_protocol)(&settings);
+	return instantiateProtocol(&settings);
 }
 
 
-OutboundProtocol*
+BOutboundMailProtocol*
 MailDaemonApp::_CreateOutboundProtocol(BMailAccountSettings& settings,
 	image_id& image)
 {
-	const entry_ref& entry = settings.OutboundPath();
-	OutboundProtocol* (*instantiate_protocol)(BMailAccountSettings*);
+	const entry_ref& entry = settings.OutboundAddOnRef();
+	BOutboundMailProtocol* (*instantiateProtocol)(BMailAccountSettings*);
 
 	BPath path(&entry);
 	image = load_add_on(path.Path());
 	if (image < 0)
 		return NULL;
+
 	if (get_image_symbol(image, "instantiate_outbound_protocol",
-			B_SYMBOL_TYPE_TEXT, (void**)&instantiate_protocol) != B_OK) {
+			B_SYMBOL_TYPE_TEXT, (void**)&instantiateProtocol) != B_OK) {
 		unload_add_on(image);
 		image = -1;
 		return NULL;
 	}
-	return (*instantiate_protocol)(&settings);
+	return instantiateProtocol(&settings);
 }
 
 
-InboundProtocolThread*
-MailDaemonApp::_FindInboundProtocol(int32 account)
+BInboundMailProtocol*
+MailDaemonApp::_InboundProtocol(int32 account)
 {
-	AccountMap::iterator it = fAccounts.find(account);
-	if (it == fAccounts.end())
+	AccountMap::iterator found = fAccounts.find(account);
+	if (found == fAccounts.end())
 		return NULL;
-	return it->second.inboundThread;
+	return found->second.inboundProtocol;
 }
 
 
-OutboundProtocolThread*
-MailDaemonApp::_FindOutboundProtocol(int32 account)
+BOutboundMailProtocol*
+MailDaemonApp::_OutboundProtocol(int32 account)
 {
 	if (account < 0)
 		account = BMailSettings().DefaultOutboundAccount();
 
-	AccountMap::iterator it = fAccounts.find(account);
-	if (it == fAccounts.end())
+	AccountMap::iterator found = fAccounts.find(account);
+	if (found == fAccounts.end())
 		return NULL;
-	return it->second.outboundThread;
+	return found->second.outboundProtocol;
 }
 
 
@@ -799,6 +838,19 @@ MailDaemonApp::_UpdateAutoCheck(bigtime_t interval)
 	} else {
 		delete fAutoCheckRunner;
 		fAutoCheckRunner = NULL;
+	}
+}
+
+
+void
+MailDaemonApp::_AddMessage(send_mails_info& info, const BEntry& entry,
+	const BNode& node)
+{
+	entry_ref ref;
+	off_t size;
+	if (node.GetSize(&size) == B_OK && entry.GetRef(&ref) == B_OK) {
+		info.files.AddRef("ref", &ref);
+		info.bytes += size;
 	}
 }
 

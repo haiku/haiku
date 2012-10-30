@@ -1,45 +1,40 @@
-#ifndef MAIL_DAEMON_H
-#define MAIL_DAEMON_H
-/* Daemon - talking to the mail daemon
- *
- * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
-*/
+/*
+ * Copyright 2012, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _MAIL_DAEMON_H
+#define _MAIL_DAEMON_H
 
 
 #include <E-mail.h>
-
-
-#define B_MAIL_DAEMON_SIGNATURE "application/x-vnd.Be-POST"
-
-const uint32 kMsgCheckAndSend = 'mbth';
-const uint32 kMsgCheckMessage = 'mnow';
-const uint32 kMsgSendMessages = 'msnd';
-const uint32 kMsgSettingsUpdated = 'mrrs';
-const uint32 kMsgAccountsChanged = 'macc';
-const uint32 kMsgSetStatusWindowMode = 'shst';
-const uint32 kMsgCountNewMessages = 'mnum';
-const uint32 kMsgMarkMessageAsRead = 'mmar';
-const uint32 kMsgFetchBody = 'mfeb';
-const uint32 kMsgBodyFetched = 'mbfe';
-
-
-class BMessenger;
+#include <Messenger.h>
 
 
 class BMailDaemon {
 public:
-	//! accountID = -1 means check all accounts
-	static status_t				CheckMail(int32 accountID = -1);
-	static status_t				CheckAndSendQueuedMail(int32 accountID = -1);
-	static status_t				SendQueuedMail();
-	static int32				CountNewMessages(
+								BMailDaemon();
+	virtual						~BMailDaemon();
+
+			bool				IsRunning();
+
+			status_t			CheckMail(int32 accountID = -1);
+			status_t			CheckAndSendQueuedMail(int32 accountID = -1);
+
+			status_t			SendQueuedMail();
+
+			int32				CountNewMessages(
 									bool waitForFetchCompletion = false);
-	static status_t				MarkAsRead(int32 account, const entry_ref& ref,
+			status_t			MarkAsRead(int32 account, const entry_ref& ref,
 									read_flags flag = B_READ);
-	static status_t				FetchBody(const entry_ref& ref,
+			status_t			FetchBody(const entry_ref& ref,
 									BMessenger* listener = NULL);
-	static status_t				Quit();
+
+			status_t			Quit();
+			status_t			Launch();
+
+private:
+			BMessenger			fDaemon;
 };
 
-#endif	// MAIL_DAEMON_H
+
+#endif	// _MAIL_DAEMON_H

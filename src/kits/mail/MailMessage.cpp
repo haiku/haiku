@@ -35,6 +35,8 @@
 #include <mail_util.h>
 #include <StringList.h>
 
+#include <MailPrivate.h>
+
 
 //-------Change the following!----------------------
 #define mime_boundary "----------Zoidberg-BeMail-temp--------"
