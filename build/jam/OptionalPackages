@@ -861,9 +861,9 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
 		# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
 		CopyDirectoryToHaikuImage $(abiDirTokens) headers
-			: [ FDirName $(HAIKU_TOP) headers cpp ] : : -x .svn ;
+			: [ FDirName $(HAIKU_TOP) headers cpp ] ;
 		CopyDirectoryToAlternativeGCCArchive $(abiDirTokens) headers
-			: [ FDirName $(HAIKU_TOP) headers cpp ] : : -x .svn ;
+			: [ FDirName $(HAIKU_TOP) headers cpp ] ;
 	}
 }
 
@@ -1980,10 +1980,10 @@ if [ IsOptionalHaikuImagePackageAdded WebPositiveBookmarks ] {
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 	CopyDirectoryToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs welcome ]
-		: welcome : -x .svn ;
+		: welcome ;
 	CopyDirectoryToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs userguide ]
-		: userguide : -x .svn ;
+		: userguide ;
 }
 
 

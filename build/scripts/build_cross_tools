@@ -109,7 +109,7 @@ copy_headers()
 	sourceDir=$1
 	targetDir=$2
 
-	headers="`find $sourceDir -name \*\.h | grep -v /.svn`"
+	headers="`find $sourceDir -name \*\.h`"
 	headers="`echo $headers | sed -e s@$sourceDir/@@g`"
 	for f in $headers; do
 		headerTargetDir=$targetDir/`dirname $f`

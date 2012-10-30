@@ -705,7 +705,7 @@ rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
 
 	CopyDirectoryToHaikuImage home HaikuSources
 		: [ FDirName $(HAIKU_TOP) $(dirTokens) ]
-		: : -x .svn : $(alwaysUpdate) ;
+		: : : $(alwaysUpdate) ;
 }
 
 rule AddHeaderDirectoryToHaikuImage dirTokens : dirName : alwaysUpdate
@@ -715,7 +715,7 @@ rule AddHeaderDirectoryToHaikuImage dirTokens : dirName : alwaysUpdate
 
 	CopyDirectoryToHaikuImage develop headers
 		: [ FDirName $(HAIKU_TOP) headers $(dirTokens) ]
-		: $(dirName) : -x .svn : $(alwaysUpdate) ;
+		: $(dirName) : : $(alwaysUpdate) ;
 }
 
 rule AddWifiFirmwareToHaikuImage driver : package : archive : extract
