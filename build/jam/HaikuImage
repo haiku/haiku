@@ -94,7 +94,7 @@ SYSTEM_LIBS =
 	<revisioned>libroot.so libroot-addon-icu.so
 	libscreensaver.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
-	libz.so
+	$(HAIKU_ZLIB_CURRENT_LIB)
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 	$(HAIKU_FREETYPE_CURRENT_LIB)
 ;
@@ -351,6 +351,12 @@ AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LIB:BS)
 	: $(HAIKU_JPEG_CURRENT_LINK) : : true ;
 AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LINK)
 	: libjpeg.so : : true ;
+
+# zlib.so links to the current zlib
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LIB:BS)
+	: $(HAIKU_ZLIB_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LINK)
+	: libzlib.so : : true ;
 
 # servers
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;

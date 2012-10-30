@@ -5,10 +5,13 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 # Include support sub folder
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators wonderbrush support ] ;
 
-UseLibraryHeaders zlib ;
+UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources WonderBrushTranslator : WonderBrushTranslator.rdef ;
+
+Includes [ FGristFiles bitmap_compression.cpp ]
+	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
 
 Translator WonderBrushTranslator :
 	Canvas.cpp
@@ -23,8 +26,8 @@ Translator WonderBrushTranslator :
 	blending.cpp
 	lab_convert.cpp
 
-	: be translation z libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	: be translation $(HAIKU_ZLIB_LIB) libtranslatorsutils.a
+	$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: true
 ;
 
