@@ -26,7 +26,6 @@ const uint32 kMsgSetStatusWindowMode = 'shst';
 const uint32 kMsgCountNewMessages = 'mnum';
 const uint32 kMsgMarkMessageAsRead = 'mmar';
 const uint32 kMsgFetchBody = 'mfeb';
-const uint32 kMsgBodyFetched = 'mbfe';
 const uint32 kMsgSyncMessages = '&SyM';
 
 

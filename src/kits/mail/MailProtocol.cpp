@@ -377,7 +377,7 @@ BInboundMailProtocol::MessageReceived(BMessage* message)
 			if (message->FindMessenger("target", &target) != B_OK)
 				break;
 
-			BMessage message(kMsgBodyFetched);
+			BMessage message(B_MAIL_BODY_FETCHED);
 			message.AddInt32("status", status);
 			message.AddRef("ref", &ref);
 			target.SendMessage(&message);

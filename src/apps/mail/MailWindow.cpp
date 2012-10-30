@@ -832,7 +832,7 @@ TMailWindow::MarkMessageRead(entry_ref* message, read_flags flag)
 	// preserve the read position in the node attribute
 	PreserveReadingPos(true);
 
-	BMailDaemon::MarkAsRead(account, *message, flag);
+	BMailDaemon().MarkAsRead(account, *message, flag);
 }
 
 
@@ -957,7 +957,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 {
 	bool wasReadMsg = false;
 	switch (msg->what) {
-		case kMsgBodyFetched:
+		case B_MAIL_BODY_FETCHED:
 		{
 			status_t status = msg->FindInt32("status");
 			if (status != B_OK) {
@@ -2474,9 +2474,10 @@ TMailWindow::Send(bool now)
 			int32 start = alert->Go();
 
 			if (start == 0) {
-				result = be_roster->Launch("application/x-vnd.Be-POST");
+				BMailDaemon daemon;
+				result = daemon.Launch();
 				if (result == B_OK) {
-					BMailDaemon::SendQueuedMail();
+					daemon.SendQueuedMail();
 				} else {
 					errorMessage
 						<< B_TRANSLATE("The mail_daemon could not be "
@@ -2837,7 +2838,7 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 
 	if (strcmp(mimeType, B_PARTIAL_MAIL_TYPE) == 0) {
 		BMessenger listener(this);
-		BMailDaemon::FetchBody(*ref, &listener);
+		BMailDaemon().FetchBody(*ref, &listener);
 		fileInfo.GetType(mimeType);
 		_SetDownloading(true);
 	} else

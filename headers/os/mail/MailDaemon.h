@@ -10,6 +10,11 @@
 #include <Messenger.h>
 
 
+enum {
+	B_MAIL_BODY_FETCHED = '_Mbf'
+};
+
+
 class BMailDaemon {
 public:
 								BMailDaemon();
