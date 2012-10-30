@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons mail_daemon outbound_filters fortune ;
 
-
 UsePrivateHeaders mail shared ;
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 
@@ -19,4 +18,5 @@ DoCatalogs Fortune :
 	x-vnd.Haiku-Fortune
 	:
 	ConfigView.cpp
+	filter.cpp
 ;

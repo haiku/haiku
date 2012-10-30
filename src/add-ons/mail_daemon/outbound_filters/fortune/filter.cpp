@@ -1,15 +1,21 @@
-/* Add Fortune - adds fortunes to your mail
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2004-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2001, Dr. Zoidberg Enterprises. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+
+//!	Adds fortunes to your mail
 
 
 #include "ConfigView.h"
 
+#include <Catalog.h>
 #include <Message.h>
 #include <Entry.h>
 #include <String.h>
-#include <MailAddon.h>
+#include <MailFilter.h>
 #include <MailMessage.h>
 
 #include <stdio.h>
@@ -17,21 +23,35 @@
 #include "NodeMessage.h"
 
 
-class FortuneFilter : public MailFilter
-{
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FortuneFilter"
+
+
+class FortuneFilter : public BMailFilter {
 public:
-								FortuneFilter(MailProtocol& protocol,
-									AddonSettings* settings);
-			void				MessageReadyToSend(const entry_ref& ref,
+								FortuneFilter(BMailProtocol& protocol,
+									BMailAddOnSettings* settings);
+
+	virtual BString				DescriptiveName() const;
+
+	virtual	void				MessageReadyToSend(const entry_ref& ref,
 									BFile* file);
 };
 
 
-FortuneFilter::FortuneFilter(MailProtocol& protocol, AddonSettings* settings)
+FortuneFilter::FortuneFilter(BMailProtocol& protocol,
+	BMailAddOnSettings* settings)
 	:
-	MailFilter(protocol, settings)
+	BMailFilter(protocol, settings)
 {
 
+}
+
+
+BString
+FortuneFilter::DescriptiveName() const
+{
+	return filter_name();
 }
 
 
@@ -41,22 +61,21 @@ FortuneFilter::MessageReadyToSend(const entry_ref& ref, BFile* file)
 	// What we want to do here is to change the message body. To do that we use the
 	// framework we already have by creating a new BEmailMessage based on the
 	// BPositionIO, changing the message body and rendering it back to disk. Of course
-	// this method ends up not being super-efficient, but it works. Ideas on how to 
+	// this method ends up not being super-efficient, but it works. Ideas on how to
 	// improve this are welcome.
 	BString	fortuneFile;
 	BString	tagLine;
 
-	const BMessage* settings = &fAddonSettings->Settings();
 	// Obtain relevant settings
-	settings->FindString("fortune_file", &fortuneFile);
-	settings->FindString("tag_line", &tagLine);
-	
+	fSettings->FindString("fortune_file", &fortuneFile);
+	fSettings->FindString("tag_line", &tagLine);
+
 	// Add command to be executed
 	fortuneFile.Prepend("/bin/fortune ");
-	
+
 	char buffer[768];
 	FILE *fd;
-	
+
 	fd = popen(fortuneFile.String(), "r");
 	if (!fd) {
 		printf("Could not open pipe to fortune!\n");
@@ -83,18 +102,28 @@ FortuneFilter::MessageReadyToSend(const entry_ref& ref, BFile* file)
 }
 
 
-MailFilter*
-instantiate_mailfilter(MailProtocol& protocol, AddonSettings* settings)
+// #pragma mark -
+
+
+BString
+filter_name()
+{
+	return B_TRANSLATE("Fortune");
+}
+
+
+BMailFilter*
+instantiate_filter(BMailProtocol& protocol, BMailAddOnSettings* settings)
 {
 	return new FortuneFilter(protocol, settings);
 }
 
 
 BView*
-instantiate_filter_config_panel(AddonSettings& settings)
+instantiate_filter_config_panel(BMailAddOnSettings& settings)
 {
-	ConfigView *view = new ConfigView();
-	view->SetTo(&settings.Settings());
+	ConfigView* view = new ConfigView();
+	view->SetTo(&settings);
 
 	return view;
 }
