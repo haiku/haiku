@@ -210,7 +210,6 @@ FileToAttrName(const char* path)
 }
 
 
-
 status_t
 Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 	OpenDirCookie* cookie, uint64* _change, bool attribute)

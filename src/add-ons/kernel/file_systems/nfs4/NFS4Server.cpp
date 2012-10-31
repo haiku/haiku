@@ -209,7 +209,7 @@ NFS4Server::_StartRenewing()
 
 	fThreadCancel = false;
 	fThread = spawn_kernel_thread(&NFS4Server::_RenewalThreadStart,
-									"NFSv4 Renewal", B_NORMAL_PRIORITY, this);
+		"NFSv4 Renewal", B_NORMAL_PRIORITY, this);
 	if (fThread < B_OK)
 		return fThread;
 

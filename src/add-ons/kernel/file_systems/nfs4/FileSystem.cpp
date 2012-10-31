@@ -138,12 +138,12 @@ FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
 	fs->fExpireType = values[1].fData.fValue32;
 
 	// FATTR4_FSID is mandatory
-	FileSystemId* fsid =
-		reinterpret_cast<FileSystemId*>(values[2].fData.fPointer);
+	FileSystemId* fsid
+		= reinterpret_cast<FileSystemId*>(values[2].fData.fPointer);
 
 	if (count == 4 && values[3].fAttribute == FATTR4_FS_LOCATIONS) {
-		FSLocations* locs =
-			reinterpret_cast<FSLocations*>(values[3].fData.fLocations);
+		FSLocations* locs
+			= reinterpret_cast<FSLocations*>(values[3].fData.fLocations);
 
 		fs->fPath = strdup(locs->fRootPath);
 	} else
@@ -230,8 +230,8 @@ FileSystem::Migrate(const RPC::Server* serv)
 	if (result != B_OK)
 		return result;
 
-	FSLocations* locs =
-		reinterpret_cast<FSLocations*>(values[0].fData.fLocations);
+	FSLocations* locs
+		= reinterpret_cast<FSLocations*>(values[0].fData.fLocations);
 
 	RPC::Server* server = fServer;
 	PeerAddress addr = fServer->ID();

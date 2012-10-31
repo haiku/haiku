@@ -36,17 +36,17 @@ enum {
 };
 
 enum AcceptStat {
-	SUCCESS       = 0, /* RPC executed successfully       */
-	PROG_UNAVAIL  = 1, /* remote hasn't exported program  */
-	PROG_MISMATCH = 2, /* remote can't support version #  */
-	PROC_UNAVAIL  = 3, /* program can't support procedure */
-	GARBAGE_ARGS  = 4, /* procedure can't decode params   */
-	SYSTEM_ERR    = 5  /* e.g. memory allocation failure  */
+	SUCCESS			= 0, /* RPC executed successfully		*/
+	PROG_UNAVAIL	= 1, /* remote hasn't exported program	*/
+	PROG_MISMATCH	= 2, /* remote can't support version #	*/
+	PROC_UNAVAIL	= 3, /* program can't support procedure	*/
+	GARBAGE_ARGS	= 4, /* procedure can't decode params	*/
+	SYSTEM_ERR		= 5  /* e.g. memory allocation failure	*/
 };
 
 enum RejectStat {
-	RPC_MISMATCH = 0, /* RPC version number != 2          */
-	AUTH_ERROR = 1    /* remote can't authenticate caller */
+	RPC_MISMATCH	= 0,	/* RPC version number != 2			*/
+	AUTH_ERROR		= 1		/* remote can't authenticate caller	*/
 };
 
 enum AuthFlavour {

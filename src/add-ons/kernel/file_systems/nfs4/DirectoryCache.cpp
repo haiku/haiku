@@ -128,6 +128,7 @@ DirectoryCache::AddEntry(const char* name, ino_t node, bool created)
 	return B_OK;
 }
 
+
 void
 DirectoryCache::RemoveEntry(const char* name)
 {
@@ -244,8 +245,8 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 		bool found = false;
 		NameCacheEntry* prev = NULL;
 		while (oldCurrent != NULL) {
-			if (oldCurrent->fNode == newCurrent->fNode &&
-				strcmp(oldCurrent->fName, newCurrent->fName) == 0) {
+			if (oldCurrent->fNode == newCurrent->fNode
+				&& strcmp(oldCurrent->fName, newCurrent->fName) == 0) {
 				found = true;
 				break;
 			}

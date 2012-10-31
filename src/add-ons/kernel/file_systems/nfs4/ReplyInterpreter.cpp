@@ -158,7 +158,6 @@ ReplyInterpreter::Create(uint64* before, uint64* after, bool& atomic)
 }
 
 
-
 // Bit Twiddling Hacks
 // http://graphics.stanford.edu/~seander/bithacks.html
 static inline uint32 CountBits(uint32 v)
@@ -555,7 +554,7 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	uint32* count)
 {
 	uint32 bcount = fReply->Stream().GetUInt();
-	uint32 *bitmap = new(std::nothrow) uint32[bcount];
+	uint32* bitmap = new(std::nothrow) uint32[bcount];
 	if (bitmap == NULL)
 		return B_NO_MEMORY;
 
@@ -667,8 +666,8 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		for (uint32 i = 0; i < locs->fCount; i++) {
 			locs->fLocations[i].fRootPath = sFlattenPathname(stream);
 			locs->fLocations[i].fCount = stream.GetUInt();
-			locs->fLocations[i].fLocations =
-				new const char*[locs->fLocations[i].fCount];
+			locs->fLocations[i].fLocations
+				= new const char*[locs->fLocations[i].fCount];
 			for (uint32 j = 0; j < locs->fLocations[i].fCount; j++)
 				locs->fLocations[i].fLocations[j] = stream.GetString();
 		}

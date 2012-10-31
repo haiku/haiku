@@ -284,8 +284,8 @@ Inode::CloseAttr(OpenAttrCookie* cookie)
 
 
 status_t
-Inode::ReadDirect(OpenStateCookie* cookie, off_t pos, void* buffer, size_t* _length,
-	bool* eof)
+Inode::ReadDirect(OpenStateCookie* cookie, off_t pos, void* buffer,
+	size_t* _length, bool* eof)
 {
 	*eof = false;
 	uint32 size = 0;
@@ -327,7 +327,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 
 status_t
 Inode::WriteDirect(OpenStateCookie* cookie, off_t pos, const void* _buffer,
-	size_t *_length)
+	size_t* _length)
 {
 	uint32 size = 0;
 	const char* buffer = reinterpret_cast<const char*>(_buffer);
@@ -370,7 +370,7 @@ Inode::WriteDirect(OpenStateCookie* cookie, off_t pos, const void* _buffer,
 
 status_t
 Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
-	size_t *_length)
+	size_t* _length)
 {
 	struct stat st;
 	status_t result = Stat(&st);

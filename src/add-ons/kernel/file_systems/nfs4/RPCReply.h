@@ -16,7 +16,7 @@ namespace RPC {
 
 class Reply {
 public:
-								Reply(void *buffer, int size);
+								Reply(void* buffer, int size);
 								~Reply();
 
 	inline	uint32				GetXID();

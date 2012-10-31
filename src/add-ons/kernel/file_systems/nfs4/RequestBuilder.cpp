@@ -837,8 +837,8 @@ RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
 		return;
 	}
 
-	Attribute* attrs =
-		reinterpret_cast<Attribute*>(malloc(sizeof(Attribute) * count));
+	Attribute* attrs
+		= reinterpret_cast<Attribute*>(malloc(sizeof(Attribute) * count));
 	for (uint32 i = 0; i < count; i++)
 		attrs[i] = static_cast<Attribute>(attr[i].fAttribute);
 	_AttrBitmap(stream, attrs, count);
@@ -885,8 +885,8 @@ RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
 	if (i < count && attr[i].fAttribute == FATTR4_TIME_ACCESS_SET) {
 		str.AddInt(1);		// SET_TO_CLIENT_TIME4
 
-		struct timespec* ts =
-			reinterpret_cast<timespec*>(attr[i].fData.fPointer);
+		struct timespec* ts
+			= reinterpret_cast<timespec*>(attr[i].fData.fPointer);
 		str.AddHyper(ts->tv_sec);
 		str.AddUInt(ts->tv_nsec);
 
@@ -896,8 +896,8 @@ RequestBuilder::_EncodeAttrs(XDR::WriteStream& stream, AttrValue* attr,
 	if (i < count && attr[i].fAttribute == FATTR4_TIME_MODIFY_SET) {
 		str.AddInt(1);		// SET_TO_CLIENT_TIME4
 
-		struct timespec* ts =
-			reinterpret_cast<timespec*>(attr[i].fData.fPointer);
+		struct timespec* ts
+			= reinterpret_cast<timespec*>(attr[i].fData.fPointer);
 		str.AddHyper(ts->tv_sec);
 		str.AddUInt(ts->tv_nsec);
 

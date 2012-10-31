@@ -82,12 +82,12 @@ public:
 					status_t	Read(OpenFileCookie* cookie, off_t pos,
 									void* buffer, size_t* length);
 					status_t	Write(OpenFileCookie* cookie, off_t pos,
-									const void* buffer, size_t *_length);
+									const void* buffer, size_t* _length);
 
 					status_t	ReadDirect(OpenStateCookie* cookie, off_t pos,
 									void* buffer, size_t* length, bool* eof);
 					status_t	WriteDirect(OpenStateCookie* cookie, off_t pos,
-									const void* buffer, size_t *_length);
+									const void* buffer, size_t* _length);
 
 					status_t	CreateDir(const char* name, int mode);
 					status_t	OpenDir(OpenDirCookie* cookie);

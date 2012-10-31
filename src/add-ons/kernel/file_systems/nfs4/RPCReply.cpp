@@ -17,7 +17,7 @@
 using namespace RPC;
 
 
-Reply::Reply(void *buffer, int size)
+Reply::Reply(void* buffer, int size)
 	:
 	fError(B_OK),
 	fStream(buffer, size),

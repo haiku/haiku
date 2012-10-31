@@ -123,7 +123,7 @@ OpenState::_ReleaseLockOwner(LockOwner* owner)
 		if (result != B_OK)
 			return result;
 
-		ReplyInterpreter &reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
 		if (HandleErrors(reply.NFS4Error(), server))
 			continue;
@@ -191,7 +191,7 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 
 		result = reply.Open(fStateID, &fStateSeq, &confirm, &delegation);
 		if (result != B_OK) {
-	 		fFileSystem->OpenOwnerSequenceUnlock(sequence);
+			fFileSystem->OpenOwnerSequenceUnlock(sequence);
 			return result;
 		}
 
@@ -241,7 +241,7 @@ OpenState::_ReclaimLocks(uint64 newClientID)
 			if (result != B_OK)
 				break;
 
-			ReplyInterpreter &reply = request.Reply();
+			ReplyInterpreter& reply = request.Reply();
 
 			if (HandleErrors(reply.NFS4Error(), server))
 				continue;

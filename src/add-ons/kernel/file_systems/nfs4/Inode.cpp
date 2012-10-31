@@ -39,7 +39,7 @@ Inode::Inode()
 
 
 status_t
-Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
+Inode::CreateInode(FileSystem* fs, const FileInfo& fi, Inode** _inode)
 {
 	Inode* inode = NULL;
 	if (fs->Root() == NULL)
@@ -104,8 +104,8 @@ Inode::CreateInode(FileSystem* fs, const FileInfo &fi, Inode** _inode)
 		size = values[2].fData.fValue64;
 
 		// FATTR4_FSID is mandatory
-		FileSystemId* fsid =
-			reinterpret_cast<FileSystemId*>(values[3].fData.fPointer);
+		FileSystemId* fsid
+			= reinterpret_cast<FileSystemId*>(values[3].fData.fPointer);
 		if (*fsid != fs->FsId()) {
 			delete[] values;
 			return B_ENTRY_NOT_FOUND;
@@ -653,6 +653,7 @@ Inode::CheckLockType(short ltype, uint32 mode)
 	}
 }
 
+
 status_t
 Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
 {
@@ -684,6 +685,7 @@ Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
 
 	return B_OK;
 }
+
 
 status_t
 Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,

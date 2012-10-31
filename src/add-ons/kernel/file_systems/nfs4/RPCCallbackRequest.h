@@ -17,7 +17,7 @@ namespace RPC {
 
 class CallbackRequest {
 public:
-								CallbackRequest(void *buffer, int size);
+								CallbackRequest(void* buffer, int size);
 								~CallbackRequest();
 
 	inline	uint32				XID();

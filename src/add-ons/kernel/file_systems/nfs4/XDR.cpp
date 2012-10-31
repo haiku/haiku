@@ -277,7 +277,7 @@ WriteStream::AddString(const char* str, uint32 maxlen)
 
 
 status_t
-WriteStream::AddOpaque(const void *ptr, uint32 size)
+WriteStream::AddOpaque(const void* ptr, uint32 size)
 {
 	uint32 real_size = _RealSize(size);
 	status_t err = _CheckResize(real_size + sizeof(uint32));

@@ -33,8 +33,8 @@ GetAddrInfo(const char* buffer)
 	const char* service = buffer[nodeSize] == '\0' ? NULL : buffer + nodeSize;
 	uint32 serviceSize = service != NULL ? strlen(service) + 1 : 1;
 
-	const struct addrinfo* hints =
-		reinterpret_cast<const addrinfo*>(buffer + nodeSize + serviceSize);
+	const struct addrinfo* hints
+		= reinterpret_cast<const addrinfo*>(buffer + nodeSize + serviceSize);
 
 	struct addrinfo* ai;
 	status_t result = getaddrinfo(node, service, hints, &ai);

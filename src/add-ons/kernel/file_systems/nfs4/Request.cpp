@@ -28,8 +28,8 @@ Request::Send(Cookie* cookie)
 status_t
 Request::_SendUDP(Cookie* cookie)
 {
-	RPC::Reply *rpl = NULL;
-	RPC::Request *rpc;
+	RPC::Reply* rpl = NULL;
+	RPC::Request* rpc;
 
 	status_t result = fServer->SendCallAsync(fBuilder.Request(), &rpl, &rpc);
 	if (result != B_OK)
@@ -87,8 +87,8 @@ Request::_SendUDP(Cookie* cookie)
 status_t
 Request::_SendTCP(Cookie* cookie)
 {
-	RPC::Reply *rpl = NULL;
-	RPC::Request *rpc;
+	RPC::Reply* rpl = NULL;
+	RPC::Request* rpc;
 
 	status_t result;
 	int attempts = 0;

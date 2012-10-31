@@ -94,8 +94,8 @@ WorkQueue::WorkingThread()
 
 		status_t result = wait_for_objects(object, 2);
 
-		if (result < B_OK ||
-			(object[0].events & B_EVENT_ACQUIRE_SEMAPHORE) != 0) {
+		if (result < B_OK
+			|| (object[0].events & B_EVENT_ACQUIRE_SEMAPHORE) != 0) {
 			return result;
 		} else if ((object[1].events & B_EVENT_ACQUIRE_SEMAPHORE) == 0)
 			continue;

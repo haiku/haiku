@@ -105,16 +105,16 @@ RelocateEntries(struct addrinfo* addr)
 		uint64 nextOffset = reinterpret_cast<uint64>(current->ai_next);
 
 		if (current->ai_addr != NULL) {
-			current->ai_addr =
-				reinterpret_cast<sockaddr*>(generalOffset + addrOffset);
+			current->ai_addr
+				= reinterpret_cast<sockaddr*>(generalOffset + addrOffset);
 		}
 
 		if (current->ai_canonname != NULL)
 			current->ai_canonname = generalOffset + nameOffset;
 
 		if (current->ai_next != NULL) {
-			current->ai_next =
-				reinterpret_cast<addrinfo*>(generalOffset + nextOffset);
+			current->ai_next
+				= reinterpret_cast<addrinfo*>(generalOffset + nextOffset);
 		}
 
 		current = current->ai_next;
@@ -150,8 +150,8 @@ GetAddrInfo(const char* node, const char* service,
 	if (hints != NULL)
 		memcpy(buffer + off, hints, sizeof(*hints));
 	else {
-		struct addrinfo *nullHints =
-			reinterpret_cast<struct addrinfo*>(buffer + off);
+		struct addrinfo *nullHints
+			= reinterpret_cast<struct addrinfo*>(buffer + off);
 		memset(nullHints, 0, sizeof(*nullHints));
 		nullHints->ai_family = AF_UNSPEC;
 	}
@@ -190,7 +190,7 @@ GetAddrInfo(const char* node, const char* service,
 			continue;
 		}
 
-		struct addrinfo *addr;
+		struct addrinfo* addr;
 		switch (code) {
 			case MsgReply:
 				addr = reinterpret_cast<struct addrinfo*>(reply);
@@ -222,6 +222,7 @@ dns_resolver_std_ops(int32 op, ...)
 			return B_ERROR;
 	}
 }
+
 
 static dns_resolver_module sDNSResolverModule = {
 	{

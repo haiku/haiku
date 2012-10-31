@@ -132,13 +132,13 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 
 	PeerAddress address;
 	MountConfiguration config;
-	char *path;
+	char* path;
 	result = ParseArguments(args, &address, &path, &config);
 	if (result != B_OK)
 		return result;
 	MemoryDeleter pathDeleter(path);
 
-	RPC::Server *server;
+	RPC::Server* server;
 	result = gRPCServerManager->Acquire(&server, address, CreateNFS4Server);
 	if (result != B_OK)
 		return result;
@@ -1065,7 +1065,7 @@ static file_system_module_info sNFSv4ModuleInfo = {
 };
 
 module_info* modules[] = {
-	(module_info* )&sNFSv4ModuleInfo,
+	(module_info*)&sNFSv4ModuleInfo,
 	NULL,
 };
 

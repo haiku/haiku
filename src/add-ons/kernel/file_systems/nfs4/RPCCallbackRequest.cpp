@@ -18,7 +18,7 @@
 using namespace RPC;
 
 
-CallbackRequest::CallbackRequest(void *buffer, int size)
+CallbackRequest::CallbackRequest(void* buffer, int size)
 	:
 	fError(B_BAD_VALUE),
 	fRPCError(GARBAGE_ARGS),

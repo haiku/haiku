@@ -173,8 +173,8 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 			return result;
 
 		// FATTR4_FSID is mandatory
-		FileSystemId* fsid =
-			reinterpret_cast<FileSystemId*>(values[0].fData.fPointer);
+		FileSystemId* fsid
+			= reinterpret_cast<FileSystemId*>(values[0].fData.fPointer);
 		if (*fsid != fFileSystem->FsId()) {
 			delete[] values;
 			return B_ENTRY_NOT_FOUND;
@@ -562,8 +562,8 @@ NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 
 		// Verify if the file we want to open is the file this Inode
 		// represents.
-		if (fFileSystem->IsAttrSupported(FATTR4_FILEID) ||
-			fFileSystem->ExpireType() == FH4_PERSISTENT) {
+		if (fFileSystem->IsAttrSupported(FATTR4_FILEID)
+			|| fFileSystem->ExpireType() == FH4_PERSISTENT) {
 			reply.PutFH();
 			result = reply.LookUp();
 			if (result != B_OK) {
@@ -1004,7 +1004,7 @@ NFS4Inode::TestLock(OpenFileCookie* cookie, LockType* type, uint64* position,
 		if (result != B_OK)
 			return result;
 
-		ReplyInterpreter &reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 		if (HandleErrors(reply.NFS4Error(), serv, cookie))
 			continue;
 
@@ -1043,7 +1043,7 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 			return result;
 		}
 
-		ReplyInterpreter &reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
 		sequence += IncrementSequence(reply.NFS4Error());
 
@@ -1087,7 +1087,7 @@ NFS4Inode::ReleaseLock(OpenFileCookie* cookie, LockInfo* lockInfo)
 		if (result != B_OK)
 			return result;
 
-		ReplyInterpreter &reply = request.Reply();
+		ReplyInterpreter& reply = request.Reply();
 
 		reply.PutFH();
 		result = reply.LockU(lockInfo);

@@ -48,6 +48,7 @@ CacheRevalidator::Lock()
 	mutex_lock(&fDirectoryCachesLock);
 }
 
+
 inline void
 CacheRevalidator::Unlock()
 {
@@ -75,4 +76,4 @@ CacheRevalidator::RemoveDirectory(DirectoryCache* cache)
 
 
 #endif	// CACHEREVALIDATOR_H
-			
+
