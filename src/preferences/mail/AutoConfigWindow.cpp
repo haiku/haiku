@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2012, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -174,7 +174,7 @@ AutoConfigWindow::GenerateBasicAccount()
 	fAccount->SetRealName(fAccountInfo.name.String());
 	fAccount->SetReturnAddress(fAccountInfo.email.String());
 
-	BMessage& inboundArchive = fAccount->InboundSettings().EditSettings();
+	BMessage& inboundArchive = fAccount->InboundSettings();
 	inboundArchive.MakeEmpty();
 	BString inServerName;
 	int32 authType = 0;
@@ -182,12 +182,12 @@ AutoConfigWindow::GenerateBasicAccount()
 	if (fAccountInfo.inboundType == IMAP) {
 		inServerName = fAccountInfo.providerInfo.imap_server;
 		ssl = fAccountInfo.providerInfo.ssl_imap;
-		fAccount->SetInboundAddon("IMAP");
+		fAccount->SetInboundAddOn("IMAP");
 	} else {
 		inServerName = fAccountInfo.providerInfo.pop_server;
 		authType = fAccountInfo.providerInfo.authentification_pop;
 		ssl = fAccountInfo.providerInfo.ssl_pop;
-		fAccount->SetInboundAddon("POP3");
+		fAccount->SetInboundAddOn("POP3");
 	}
 	inboundArchive.AddString("server", inServerName);
 	inboundArchive.AddInt32("auth_method", authType);
@@ -197,9 +197,9 @@ AutoConfigWindow::GenerateBasicAccount()
 	inboundArchive.AddBool("leave_mail_on_server", true);
 	inboundArchive.AddBool("delete_remote_when_local", true);
 
-	BMessage& outboundArchive = fAccount->OutboundSettings().EditSettings();
+	BMessage& outboundArchive = fAccount->OutboundSettings();
 	outboundArchive.MakeEmpty();
-	fAccount->SetOutboundAddon("SMTP");
+	fAccount->SetOutboundAddOn("SMTP");
 	outboundArchive.AddString("server",
 		fAccountInfo.providerInfo.smtp_server);
 	outboundArchive.AddString("username", fAccountInfo.loginName);

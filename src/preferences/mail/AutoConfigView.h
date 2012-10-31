@@ -1,10 +1,11 @@
 /*
- * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2012, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
 #ifndef AUTO_CONFIG_VIEW_H
 #define AUTO_CONFIG_VIEW_H
+
 
 #include "AutoConfig.h"
 #include "ConfigViews.h"
@@ -22,16 +23,14 @@ const int32 kProtokollChangedMsg	=	'?pch';
 const int32 kServerChangedMsg		=	'?sch';
 
 
-enum protocol_type
-{
+enum protocol_type {
 	POP,
 	IMAP,
 	SMTP
 };
 
 
-struct account_info
-{
+struct account_info {
 	protocol_type	inboundType;
 	entry_ref		inboundProtocol;
 	entry_ref		outboundProtocol;
@@ -44,50 +43,51 @@ struct account_info
 };
 
 
-class AutoConfigView : public BBox
-{
-	public:
-						AutoConfigView(BRect rect, AutoConfig &config);
-						
-		virtual void	AttachedToWindow();
-		virtual void	MessageReceived(BMessage *msg);
+class AutoConfigView : public BBox {
+public:
+								AutoConfigView(BRect rect, AutoConfig& config);
 
-		bool			GetBasicAccountInfo(account_info &info);
-		bool			IsValidMailAddress(BString email);
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage *msg);
 
-	private:
-		BMenuField*		SetupProtocolView(BRect rect);
-		status_t		GetSMTPAddonRef(entry_ref *ref);
+			bool				GetBasicAccountInfo(account_info &info);
+			bool				IsValidMailAddress(BString email);
 
-		BString			ExtractLocalPart(const char* email);
-		void			ProposeUsername();
+private:
+			BMenuField*			_SetupProtocolView(BRect rect);
+			status_t			_GetSMTPAddonRef(entry_ref *ref);
 
-		entry_ref		fSMTPAddonRef;
-		BMenuField		*fInProtocolsField;
-		BTextControl	*fNameView;
-		BTextControl	*fAccountNameView;
-		BTextControl	*fEmailView;
-		BTextControl	*fLoginNameView;
-		BTextControl	*fPasswordView;
+			BString				_ExtractLocalPart(const char* email);
+			void				_ProposeUsername();
 
-		// ref to the parent autoconfig so you only ones read the database
-		AutoConfig		&fAutoConfig;
+private:
+			entry_ref			fSMTPAddonRef;
+			BMenuField*			fInProtocolsField;
+			BTextControl*		fNameView;
+			BTextControl*		fAccountNameView;
+			BTextControl*		fEmailView;
+			BTextControl*		fLoginNameView;
+			BTextControl*		fPasswordView;
+
+			// ref to the parent autoconfig so you only ones read the database
+			AutoConfig&			fAutoConfig;
 };
 
 
-class ServerSettingsView : public BView
-{
+class ServerSettingsView : public BView {
 public:
 								ServerSettingsView(BRect rect,
-									const account_info &info);
+									const account_info& info);
 								~ServerSettingsView();
-			void				GetServerInfo(account_info &info);
+			void				GetServerInfo(account_info& info);
 
 private:
-			void				DetectMenuChanges();
-			void				GetAuthEncrMenu(entry_ref protocol,
-									BMenuField **authField,
-									BMenuField **sslField);
+			void				_DetectMenuChanges();
+			void				_GetAuthEncrMenu(entry_ref protocol,
+									BMenuField** authField,
+									BMenuField** sslField);
+
+private:
 			bool				fInboundAccount;
 			bool				fOutboundAccount;
 			BTextControl*		fInboundNameView;
@@ -106,4 +106,4 @@ private:
 };
 
 
-#endif
+#endif	// AUTO_CONFIG_VIEW_H

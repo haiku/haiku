@@ -1,5 +1,8 @@
 /*
+ * Copyright 2007-2012, Haiku, Inc. All rights reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
  */
 
 
@@ -43,26 +46,28 @@ const uint32 kMsgProtocolChanged = 'prch';
 
 
 BView*
-CreateConfigView(entry_ref addon, MailAddonSettings& settings,
-	BMailAccountSettings& accountSettings, image_id* image)
+CreateConfigView(const entry_ref& addon, BMailProtocolSettings& settings,
+	BMailAccountSettings& accountSettings, image_id& image)
 {
-	BView* (*instantiate_config)(MailAddonSettings& settings,
+	BView* (*instantiateConfig)(BMailProtocolSettings& settings,
 		BMailAccountSettings& accountSettings);
 	BPath path(&addon);
-	*image = load_add_on(path.Path());
+	image = load_add_on(path.Path());
 	if (image < 0)
 		return NULL;
 
-	if (get_image_symbol(*image, "instantiate_config_panel", B_SYMBOL_TYPE_TEXT,
-		(void **)&instantiate_config) != B_OK) {
-		unload_add_on(*image);
-		*image = -1;
+	if (get_image_symbol(image, "instantiate_config_panel", B_SYMBOL_TYPE_TEXT,
+			(void **)&instantiateConfig) != B_OK) {
+		unload_add_on(image);
+		image = -1;
 		return NULL;
 	}
 
-	BView* view = (*instantiate_config)(settings, accountSettings);
-	return view;
+	return instantiateConfig(settings, accountSettings);
 }
+
+
+// #pragma mark -
 
 
 AccountConfigView::AccountConfigView(BRect rect, BMailAccountSettings* account)
@@ -159,13 +164,13 @@ InProtocolsConfigView::InProtocolsConfigView(BMailAccountSettings* account)
 	fConfigView(NULL)
 {
 	BString label = "Can't find protocol.";
-	entry_ref protocol = fAccount->InboundPath();
-	MailAddonSettings& inboundSettings = fAccount->InboundSettings();
+	entry_ref protocol = fAccount->InboundAddOnRef();
+	BMailProtocolSettings& inboundSettings = fAccount->InboundSettings();
 
 	fConfigView = CreateConfigView(protocol, inboundSettings, *account,
-		&fImageID);
+		fImageID);
 
-	if (fConfigView) {
+	if (fConfigView != NULL) {
 		float w = fConfigView->Bounds().Width();
 		float h = fConfigView->Bounds().Height();
 		fConfigView->MoveTo(3, 13);
@@ -195,7 +200,9 @@ InProtocolsConfigView::DetachedFromWindow()
 	BMessage settings;
 	if (fConfigView->Archive(&settings) != B_OK)
 		return;
-	fAccount->InboundSettings().EditSettings() = settings;
+
+	fAccount->InboundSettings().MakeEmpty();
+	fAccount->InboundSettings().Append(settings);
 
 	RemoveChild(fConfigView);
 	delete fConfigView;
@@ -211,12 +218,12 @@ OutProtocolsConfigView::OutProtocolsConfigView(BMailAccountSettings* account)
 	fConfigView(NULL)
 {
 	BString label = "Can't find protocol.";
-	entry_ref protocol = fAccount->OutboundPath();
-	MailAddonSettings& outboundSettings = fAccount->OutboundSettings();
+	entry_ref protocol = fAccount->OutboundAddOnRef();
+	BMailProtocolSettings& outboundSettings = fAccount->OutboundSettings();
 	fConfigView = CreateConfigView(protocol, outboundSettings, *account,
-		&fImageID);
+		fImageID);
 
-	if (fConfigView) {
+	if (fConfigView != NULL) {
 		float w = fConfigView->Bounds().Width();
 		float h = fConfigView->Bounds().Height();
 		fConfigView->MoveTo(3, 13);
@@ -247,7 +254,9 @@ OutProtocolsConfigView::DetachedFromWindow()
 	BMessage settings;
 	if (fConfigView->Archive(&settings) != B_OK)
 		return;
-	fAccount->OutboundSettings().EditSettings() = settings;
+
+	fAccount->OutboundSettings().MakeEmpty();
+	fAccount->OutboundSettings().Append(settings);
 
 	RemoveChild(fConfigView);
 	delete fConfigView;

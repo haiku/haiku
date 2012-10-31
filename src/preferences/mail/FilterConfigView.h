@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2012, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -12,13 +12,12 @@
 
 #include <Box.h>
 #include <Button.h>
-#include <image.h>
 #include <ListView.h>
+#include <MailSettings.h>
 #include <Message.h>
 #include <MenuField.h>
 
-#include "FilterAddonList.h"
-#include "MailSettings.h"
+#include "FilterList.h"
 
 
 class FilterConfigBox;
@@ -35,18 +34,19 @@ public:
 			void				MessageReceived(BMessage *msg);
 
 private:
-			MailAddonSettings*	_GetCurrentMailSettings();
-			FilterAddonList*	_GetCurrentFilterAddonList();
+			BMailProtocolSettings* _MailSettings();
+			::FilterList*		_FilterList();
 
 			void				_SelectFilter(int32 index);
 			void				_SetDirection(direction direction);
 			void				_SaveConfig(int32 index);
 
-			BMailAccountSettings&	fAccount;
+private:
+			BMailAccountSettings& fAccount;
 			direction			fDirection;
 
-			FilterAddonList		fInboundFilters;
-			FilterAddonList		fOutboundFilters;
+			::FilterList		fInboundFilters;
+			::FilterList		fOutboundFilters;
 
 			BMenuField*			fChainsField;
 			BListView*			fListView;

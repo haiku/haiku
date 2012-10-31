@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2012, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -180,7 +180,7 @@ private:
 
 class FilterConfigBox : public BBox {
 public:
-	FilterConfigBox(BString& label, BView* child)
+	FilterConfigBox(const BString& label, BView* child)
 		:
 		BBox(BRect(0,0,100,100)),
 		fChild(child)
@@ -194,7 +194,7 @@ public:
 	}
 
 	status_t
-	ArchiveAddon(BMessage* into) const
+	ArchiveAddOn(BMessage* into) const
 	{
 		return fChild->Archive(into);
 	}
@@ -203,7 +203,7 @@ private:
 			BView*				fChild;
 };
 
-    
+
 //	#pragma mark -
 
 
@@ -211,8 +211,8 @@ FiltersConfigView::FiltersConfigView(BRect rect, BMailAccountSettings& account)
 	:
 	BBox(rect),
 	fAccount(account),
-	fDirection(kIncomming),
-	fInboundFilters(kIncomming, false),
+	fDirection(kIncoming),
+	fInboundFilters(kIncoming, false),
 	fOutboundFilters(kOutgoing, false),
 	fFilterView(NULL),
 	fCurrentIndex(-1)
@@ -224,7 +224,7 @@ FiltersConfigView::FiltersConfigView(BRect rect, BMailAccountSettings& account)
 	msg = new BMessage(kMsgChainSelected);
 	item = new BMenuItem(B_TRANSLATE("Incoming mail filters"), msg);
 	menu->AddItem(item);
-	msg->AddInt32("direction", kIncomming);
+	msg->AddInt32("direction", kIncoming);
 	item->SetMarked(true);
 
 	msg = new BMessage(kMsgChainSelected);
@@ -302,14 +302,14 @@ FiltersConfigView::_SelectFilter(int32 index)
 
 	if (index >= 0) {
 		// add new config view
-		AddonSettings* filterSettings = _GetCurrentMailSettings()
-			->FilterSettingsAt(index);
-		if (filterSettings) {
-			FilterAddonList* addons = _GetCurrentFilterAddonList();
-			BView* view = addons->CreateConfigView(*filterSettings);
-			if (view) {
+		BMailAddOnSettings* filterSettings
+			= _MailSettings()->FilterSettingsAt(index);
+		if (filterSettings != NULL) {
+			::FilterList* filters = _FilterList();
+			BView* view = filters->CreateConfigView(*filterSettings);
+			if (view != NULL) {
 				BString name;
-				addons->GetDescriptiveName(filterSettings->AddonRef(), name);
+				filters->GetDescriptiveName(filterSettings->AddOnRef(), name);
 				fFilterView = new FilterConfigBox(name, view);
 				Parent()->AddChild(fFilterView);
 			}
@@ -319,7 +319,7 @@ FiltersConfigView::_SelectFilter(int32 index)
 	fCurrentIndex = index;
 
 	// re-layout the view containing the config view
-	if (CenterContainer *container = dynamic_cast<CenterContainer *>(Parent()))
+	if (CenterContainer* container = dynamic_cast<CenterContainer*>(Parent()))
 		container->Layout();
 
 	if (Parent())
@@ -339,19 +339,19 @@ FiltersConfigView::_SetDirection(direction direction)
 	}
 
 	fDirection = direction;
-	MailAddonSettings* addonSettings = _GetCurrentMailSettings();
-	FilterAddonList* addons = _GetCurrentFilterAddonList();
-	addons->Reload();
+	BMailProtocolSettings* protocolSettings = _MailSettings();
+	::FilterList* filters = _FilterList();
+	filters->Reload();
 
-	for (int32 i = 0; i < addonSettings->CountFilterSettings(); i++) {
-		AddonSettings* filterSettings = addonSettings->FilterSettingsAt(i);
-		if (addons->FindInfo(filterSettings->AddonRef()) < 0) {
-			addonSettings->RemoveFilterSettings(i);
+	for (int32 i = 0; i < protocolSettings->CountFilterSettings(); i++) {
+		BMailAddOnSettings* settings = protocolSettings->FilterSettingsAt(i);
+		if (filters->InfoIndexFor(settings->AddOnRef()) < 0) {
+			protocolSettings->RemoveFilterSettings(i);
 			i--;
 			continue;
 		}
 		BString name = "Unnamed Filter";
-		addons->GetDescriptiveName(filterSettings->AddonRef(), name);
+		filters->GetDescriptiveName(settings->AddOnRef(), name);
 		fListView->AddItem(new BStringItem(name));
 	}
 
@@ -362,11 +362,11 @@ FiltersConfigView::_SetDirection(direction direction)
 		delete item;
 	}
 
-	addons->Reload();
-	for (int32 i = 0; i < addons->CountFilterAddons(); i++) {
-		FilterAddonInfo& info = addons->FilterAddonAt(i);
+	filters->Reload();
+	for (int32 i = 0; i < filters->CountInfos(); i++) {
+		FilterInfo& info = filters->InfoAt(i);
 		BString name;
-		addons->GetDescriptiveName(i, name);
+		filters->GetDescriptiveName(i, name);
 
 		BMessage* msg = new BMessage(kMsgAddFilter);
 		msg->AddRef("filter", &info.ref);
@@ -417,14 +417,14 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 			if (msg->FindRef("filter", &ref) < B_OK)
 				break;
 
-			FilterAddonList* filterAddons = _GetCurrentFilterAddonList();
-			int32 index = filterAddons->FindInfo(ref);
+			::FilterList* filters = _FilterList();
+			int32 index = filters->InfoIndexFor(ref);
 			if (index < 0)
 				break;
-			_GetCurrentMailSettings()->AddFilterSettings(&ref);
+			_MailSettings()->AddFilterSettings(&ref);
 
 			BString name;
-			filterAddons->GetDescriptiveName(index, name);
+			filters->GetDescriptiveName(index, name);
 			fListView->AddItem(new BStringItem(name));
 			break;
 		}
@@ -433,13 +433,11 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 			int32 index = fListView->CurrentSelection();
 			if (index < 0)
 				break;
-			BStringItem *item = (BStringItem *)fListView->RemoveItem(index);
+			BStringItem* item = (BStringItem*)fListView->RemoveItem(index);
 			delete item;
 
 			_SelectFilter(-1);
-
-			MailAddonSettings* mailSettings = _GetCurrentMailSettings();
-			mailSettings->RemoveFilterSettings(index);
+			_MailSettings()->RemoveFilterSettings(index);
 			break;
 		}
 		case kMsgFilterSelected:
@@ -458,8 +456,7 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 			if (from == to)
 				break;
 
-			MailAddonSettings* mailSettings = _GetCurrentMailSettings();
-			if (!mailSettings->MoveFilterSettings(from, to)) {
+			if (!_MailSettings()->MoveFilterSettings(from, to)) {
 				BAlert* alert = new BAlert("E-mail",
 					B_TRANSLATE("The filter could not be moved. Deleting "
 					"filter."), B_TRANSLATE("OK"));
@@ -467,7 +464,7 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 				alert->Go();
 				fListView->RemoveItem(to);
 				break;
-			}    
+			}
 
 			break;
 		}
@@ -478,19 +475,19 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 }
 
 
-MailAddonSettings*
-FiltersConfigView::_GetCurrentMailSettings()
+BMailProtocolSettings*
+FiltersConfigView::_MailSettings()
 {
-	if (fDirection == kIncomming)
+	if (fDirection == kIncoming)
 		return &fAccount.InboundSettings();
 	return &fAccount.OutboundSettings();
 }
 
 
-FilterAddonList*
-FiltersConfigView::_GetCurrentFilterAddonList()
+FilterList*
+FiltersConfigView::_FilterList()
 {
-	if (fDirection == kIncomming)
+	if (fDirection == kIncoming)
 		return &fInboundFilters;
 	return &fOutboundFilters;
 }
@@ -499,10 +496,9 @@ FiltersConfigView::_GetCurrentFilterAddonList()
 void
 FiltersConfigView::_SaveConfig(int32 index)
 {
-	if (fFilterView) {
-		AddonSettings* filterSettings = _GetCurrentMailSettings()
-			->FilterSettingsAt(index);
-		if (filterSettings)
-			fFilterView->ArchiveAddon(&filterSettings->EditSettings());
+	if (fFilterView != NULL) {
+		BMailAddOnSettings* settings = _MailSettings()->FilterSettingsAt(index);
+		if (settings != NULL)
+			fFilterView->ArchiveAddOn(settings);
 	}
 }

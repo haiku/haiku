@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src preferences mail ;
 
-
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 UsePrivateHeaders mail ;
 
@@ -17,7 +16,7 @@ local sources =
 	CenterContainer.cpp
 	ConfigViews.cpp
 	ConfigWindow.cpp
-	FilterAddonList.cpp
+	FilterList.cpp
 	DNSQuery.cpp
 	FilterConfigView.cpp
 	main.cpp

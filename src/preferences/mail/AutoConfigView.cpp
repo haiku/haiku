@@ -40,12 +40,12 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	// protocol view
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
-	fInProtocolsField = SetupProtocolView(BRect(topLeft, rightDown));
+	fInProtocolsField = _SetupProtocolView(BRect(topLeft, rightDown));
 	if (fInProtocolsField)
 		AddChild(fInProtocolsField);
 
 	// search for smtp ref
-	GetSMTPAddonRef(&fSMTPAddonRef);
+	_GetSMTPAddonRef(&fSMTPAddonRef);
 
 	// email view
 	topLeft.y += stepSize;
@@ -105,14 +105,12 @@ AutoConfigView::AttachedToWindow()
 void
 AutoConfigView::MessageReceived(BMessage *msg)
 {
-	BString text, login;
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case kEMailChangedMsg:
 		{
-			text = fLoginNameView->Text();
+			BString text = fLoginNameView->Text();
 			if (text == "")
-				ProposeUsername();
+				_ProposeUsername();
 			fLoginNameView->MakeFocus();
 			fLoginNameView->TextView()->SelectAll();
 
@@ -159,9 +157,9 @@ AutoConfigView::GetBasicAccountInfo(account_info &info)
 
 
 BMenuField*
-AutoConfigView::SetupProtocolView(BRect rect)
+AutoConfigView::_SetupProtocolView(BRect rect)
 {
-	BPopUpMenu *menu = new BPopUpMenu(B_TRANSLATE("Choose Protocol"));
+	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("Choose Protocol"));
 
 	for (int i = 0; i < 2; i++) {
 		BPath path;
@@ -202,10 +200,11 @@ AutoConfigView::SetupProtocolView(BRect rect)
 
 
 status_t
-AutoConfigView::GetSMTPAddonRef(entry_ref *ref)
+AutoConfigView::_GetSMTPAddonRef(entry_ref *ref)
 {
 	directory_which which[] = {
 		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
 		B_BEOS_ADDONS_DIRECTORY
 	};
 
@@ -229,24 +228,21 @@ AutoConfigView::GetSMTPAddonRef(entry_ref *ref)
 
 
 BString
-AutoConfigView::ExtractLocalPart(const char* email)
+AutoConfigView::_ExtractLocalPart(const char* email)
 {
-	BString emailS(email);
-	BString localPart;
-	int32 at = emailS.FindLast("@");
-	emailS.CopyInto(localPart, 0, at);
-	return localPart;
+	const char* at = strrchr(email, '@');
+	return BString(email, at - email);
 }
 
 
 void
-AutoConfigView::ProposeUsername()
+AutoConfigView::_ProposeUsername()
 {
 	const char* email = fEmailView->Text();
 	provider_info info;
 	status_t status = fAutoConfig.GetInfoFromMailAddress(email, &info);
 	if (status == B_OK) {
-		BString localPart = ExtractLocalPart(email);
+		BString localPart = _ExtractLocalPart(email);
 		switch (info.username_pattern) {
 			case 0:
 				// username is the mail address
@@ -324,7 +320,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 
 	box->AddChild(fInboundNameView);
 
-	GetAuthEncrMenu(info.inboundProtocol, &fInboundAuthMenu,
+	_GetAuthEncrMenu(info.inboundProtocol, &fInboundAuthMenu,
 		&fInboundEncryptionMenu);
 	if (fInboundAuthMenu != NULL) {
 		int authID = info.providerInfo.authentification_pop;
@@ -379,7 +375,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 
 	box->AddChild(fOutboundNameView);
 
-	GetAuthEncrMenu(info.outboundProtocol, &fOutboundAuthMenu,
+	_GetAuthEncrMenu(info.outboundProtocol, &fOutboundAuthMenu,
 		&fOutboundEncryptionMenu);
 	if (fOutboundAuthMenu != NULL) {
 		BMenuItem *item = fOutboundAuthMenu->Menu()->ItemAt(
@@ -468,12 +464,12 @@ ServerSettingsView::GetServerInfo(account_info &info)
 				= fOutboundEncryptionMenu->Menu()->IndexOf(item);
 		}
 	}
-	DetectMenuChanges();
+	_DetectMenuChanges();
 }
 
 
 void
-ServerSettingsView::DetectMenuChanges()
+ServerSettingsView::_DetectMenuChanges()
 {
 	bool changed = false;
 	if (fInboundAuthMenu != NULL) {
@@ -505,12 +501,12 @@ ServerSettingsView::DetectMenuChanges()
 
 
 void
-ServerSettingsView::GetAuthEncrMenu(entry_ref protocol,
-	BMenuField **authField, BMenuField **sslField)
+ServerSettingsView::_GetAuthEncrMenu(entry_ref protocol,
+	BMenuField** authField, BMenuField** sslField)
 {
 	BMailAccountSettings dummySettings;
 	BView *view = CreateConfigView(protocol, dummySettings.InboundSettings(),
-		dummySettings, &fImageId);
+		dummySettings, fImageId);
 
 	*authField = (BMenuField *)view->FindView("auth_method");
 	*sslField = (BMenuField *)view->FindView("flavor");

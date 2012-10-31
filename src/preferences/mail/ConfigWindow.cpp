@@ -49,6 +49,8 @@
 #include <MailDaemon.h>
 #include <MailSettings.h>
 
+#include <MailPrivate.h>
+
 #include "AutoConfigWindow.h"
 #include "CenterContainer.h"
 
@@ -530,7 +532,7 @@ ConfigWindow::_SaveSettings()
 	fConfigView->DeleteChildren();
 
 	// collect changed accounts
-	BMessage changedAccounts(kMsgAccountsChanged);
+	BMessage changedAccounts(BPrivate::kMsgAccountsChanged);
 	for (int32 i = 0; i < fAccounts.CountItems(); i++) {
 		BMailAccountSettings* account = fAccounts.ItemAt(i);
 		if (account && account->HasBeenModified())
@@ -601,10 +603,10 @@ ConfigWindow::_SaveSettings()
 			fAccounts.ItemAt(i)->Save();
 	}
 
-	BMessenger messenger("application/x-vnd.Be-POST");
+	BMessenger messenger(B_MAIL_DAEMON_SIGNATURE);
 	if (messenger.IsValid()) {
 		// server should reload general settings
-		messenger.SendMessage(kMsgSettingsUpdated);
+		messenger.SendMessage(BPrivate::kMsgSettingsUpdated);
 		// notify server about changed accounts
 		messenger.SendMessage(&changedAccounts);
 	}
