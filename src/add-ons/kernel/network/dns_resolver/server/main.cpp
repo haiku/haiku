@@ -25,27 +25,13 @@ port_id		gReplyPort;
 
 
 status_t
-GetAddrInfo(const char* buffer)
+Serialize(char** _reply, uint32* _totalSize, const struct addrinfo* ai)
 {
-	const char* node = buffer[0] == '\0' ? NULL : buffer;
-	uint32 nodeSize = node != NULL ? strlen(node) + 1 : 1;
-
-	const char* service = buffer[nodeSize] == '\0' ? NULL : buffer + nodeSize;
-	uint32 serviceSize = service != NULL ? strlen(service) + 1 : 1;
-
-	const struct addrinfo* hints
-		= reinterpret_cast<const addrinfo*>(buffer + nodeSize + serviceSize);
-
-	struct addrinfo* ai;
-	status_t result = getaddrinfo(node, service, hints, &ai);
-	if (result != B_OK)
-		return write_port(gReplyPort, MsgError, &result, sizeof(result));
-
 	uint32 addrsSize = ai == NULL ? 0 : sizeof(addrinfo);
 	uint32 namesSize = 0;
 	uint32 socksSize = 0;
 
-	addrinfo* current = ai;
+	const struct addrinfo* current = ai;
 	while (current != NULL) {
 		if (current->ai_canonname != NULL)
 			namesSize += strlen(current->ai_canonname) + 1;
@@ -62,46 +48,78 @@ GetAddrInfo(const char* buffer)
 
 	uint32 totalSize = addrsSize + namesSize + socksSize;
 	char* reply = reinterpret_cast<char*>(malloc(totalSize));
-	if (reply == NULL) {
-		free(reply);
-
-		result = B_NO_MEMORY;
-		return write_port(gReplyPort, MsgError, &result, sizeof(result));
-	}
+	if (reply == NULL)
+		return B_NO_MEMORY;
 
 	uint32 addrPos = 0;
 	uint32 namePos = addrsSize;
 	uint32 sockPos = addrsSize + namesSize;
 
+	struct addrinfo temp;
+
 	current = ai;
 	while (current != NULL) {
+		memcpy(&temp, current, sizeof(addrinfo));
+
 		if (current->ai_canonname != NULL) {
 			strcpy(reply + namePos, current->ai_canonname);
 			uint32 nSize = strlen(current->ai_canonname) + 1;
-			current->ai_canonname = reinterpret_cast<char*>(namePos);
+			temp.ai_canonname = reinterpret_cast<char*>(namePos);
 			namePos += nSize;
 		}
 		if (current->ai_addr != NULL) {
 			if (current->ai_family == AF_INET) {
 				memcpy(reply + sockPos, current->ai_addr, sizeof(sockaddr_in));
-				current->ai_addr = reinterpret_cast<sockaddr*>(sockPos);
+				temp.ai_addr = reinterpret_cast<sockaddr*>(sockPos);
 				sockPos += sizeof(sockaddr_in);
 			} else {
 				memcpy(reply + sockPos, current->ai_addr, sizeof(sockaddr_in6));
-				current->ai_addr = reinterpret_cast<sockaddr*>(sockPos);
+				temp.ai_addr = reinterpret_cast<sockaddr*>(sockPos);
 				sockPos += sizeof(sockaddr_in6);
 			}
 		}
 
 		addrinfo* next = current->ai_next;
 		if (next != NULL)
-			current->ai_next = reinterpret_cast<addrinfo*>(addrPos) + 1;
-		memcpy(reply + addrPos, current, sizeof(addrinfo));
+			temp.ai_next = reinterpret_cast<addrinfo*>(addrPos) + 1;
+		else
+			temp.ai_next = NULL;
+
+		memcpy(reply + addrPos, &temp, sizeof(addrinfo));
 		addrPos += sizeof(addrinfo);
 
 		current = next;
 	}
 
+	*_reply = reply;
+	*_totalSize = totalSize;
+	return B_OK;
+}
+
+
+status_t
+GetAddrInfo(const char* buffer)
+{
+	const char* node = buffer[0] == '\0' ? NULL : buffer;
+	uint32 nodeSize = node != NULL ? strlen(node) + 1 : 1;
+
+	const char* service = buffer[nodeSize] == '\0' ? NULL : buffer + nodeSize;
+	uint32 serviceSize = service != NULL ? strlen(service) + 1 : 1;
+
+	const struct addrinfo* hints
+		= reinterpret_cast<const addrinfo*>(buffer + nodeSize + serviceSize);
+
+	struct addrinfo* ai;
+	status_t result = getaddrinfo(node, service, hints, &ai);
+	if (result != B_OK)
+		return write_port(gReplyPort, MsgError, &result, sizeof(result));
+
+	uint32 totalSize;
+	char* reply;
+	result = Serialize(&reply, &totalSize, ai);
+	freeaddrinfo(ai);
+	if (result != B_OK)
+		return write_port(gReplyPort, MsgError, &result, sizeof(result));
 	return write_port(gReplyPort, MsgReply, reply, totalSize);
 }
 
