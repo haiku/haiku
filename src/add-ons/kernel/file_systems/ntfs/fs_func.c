@@ -43,6 +43,7 @@
 #include "ntfs.h"
 #include "volume_util.h"
 
+static const char* kNTFSUntitled = {"NTFS Untitled"};
 
 typedef struct identify_cookie {
 	NTFS_BOOT_SECTOR boot;
@@ -225,10 +226,10 @@ float
 fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
 	NTFS_BOOT_SECTOR boot;
-	identify_cookie *cookie;
+	char devpath[MAX_PATH];
+	identify_cookie *cookie = NULL;
 	ntfs_volume *ntVolume;
 	uint8 *buf = (uint8*)&boot;
-	char devpath[256];
 
 	// read in the boot sector
 	TRACE("fs_identify_partition: read in the boot sector\n");
@@ -249,19 +250,6 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 		return -1;
 	}
 
-	// get path for device
-	if (!ioctl(fd, B_GET_PATH_FOR_DEVICE, devpath)) {
-		ERROR("fs_identify_partition: couldn't get path for device\n");
-		return -1;
-	}
-
-	// try mount
-	ntVolume = utils_mount_volume(devpath, MS_RDONLY | MS_RECOVER);
-	if (!ntVolume) {
-		ERROR("fs_identify_partition: mount failed\n");
-		return -1;
-	}
-
 	// allocate identify_cookie
 	cookie = (identify_cookie *)malloc(sizeof(identify_cookie));
 	if (!cookie) {
@@ -269,14 +257,20 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 		return -1;
 	}
 
+	strcpy(cookie->label, kNTFSUntitled);
+
+	// try get path for device
+	if (ioctl(fd, B_GET_PATH_FOR_DEVICE, devpath)) {
+		// try mount
+		ntVolume = utils_mount_volume(devpath, MS_RDONLY | MS_RECOVER);
+		if (ntVolume != NULL) {
+			if (ntVolume->vol_name && ntVolume->vol_name[0] != '\0')
+				strcpy(cookie->label, ntVolume->vol_name);
+			ntfs_umount(ntVolume, true);
+		}	
+	}
+
 	memcpy(&cookie->boot, &boot, 512);
-
-	strcpy(cookie->label, "NTFS Volume");
-
-	if (ntVolume->vol_name && ntVolume->vol_name[0] != '\0')
-		strcpy(cookie->label, ntVolume->vol_name);
-
-	ntfs_umount(ntVolume, true);
 
 	*_cookie = cookie;
 
@@ -474,7 +468,7 @@ fs_rfsstat(fs_volume *_vol, struct fs_info *fss)
 			break;
 	}
 	if (i < 0)
-		strcpy(fss->volume_name, "NTFS Untitled");
+		strcpy(fss->volume_name, kNTFSUntitled);
 	else
 		fss->volume_name[i + 1] = 0;
 
@@ -662,7 +656,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		
 		if (ns->fake_attrib) {
 			if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
-				set_mime(newNode, ".***");
+				set_mime(newNode, NULL);
 			else {
 				name = (char*)malloc(MAX_PATH);
 				if (name != NULL) {
