@@ -1126,11 +1126,11 @@ exit:
 
 
 status_t
-fs_read(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf,
+fs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset, void *buf,
 	size_t *len)
 {
 	nspace *ns = (nspace*)_vol->private_volume;
-	vnode *node = (vnode*)_dir->private_node;
+	vnode *node = (vnode*)_node->private_node;
 	ntfs_inode *ni = NULL;
 	ntfs_attr *na = NULL;
 	size_t  size = *len;
@@ -1206,11 +1206,11 @@ exit2:
 
 
 status_t
-fs_write(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset,
+fs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset,
 	const void *buf, size_t *len)
 {
 	nspace *ns = (nspace*)_vol->private_volume;
-	vnode *node = (vnode*)_dir->private_node;
+	vnode *node = (vnode*)_node->private_node;
 	filecookie *cookie = (filecookie*)_cookie;
 	ntfs_inode *ni = NULL;
 	ntfs_attr *na = NULL;
@@ -1264,7 +1264,7 @@ fs_write(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset,
 		if (ntfs_attr_truncate(na, offset + size))
 			size = na->data_size - offset;
 		else
-			notify_stat_changed(ns->id, MREF(ni->mft_no), B_STAT_SIZE);
+			notify_stat_changed(ns->id, node->vnid, B_STAT_SIZE);
 	}
 
 	while (size) {

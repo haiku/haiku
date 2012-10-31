@@ -92,9 +92,9 @@ fs_free_dircookie(fs_volume *_vol, fs_vnode *vnode, void *_cookie)
 	
 	if (cookie != NULL) {
 		cache_entry *entry = cookie->cache_root;
-		for(;entry!=NULL;) {
+		while (entry != NULL) {
 			cache_entry *next = entry->next;
-			if(entry->ent != NULL)
+			if (entry->ent != NULL)
 				free(entry->ent);
 			free(entry);
 			entry = next;
@@ -176,7 +176,7 @@ fs_readdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 	LOCK_VOL(ns);
 	TRACE("fs_readdir - ENTER (sizeof(buf)=%d, bufsize=%d, num=%d\n",
 		sizeof(buf), bufsize, *num);
-
+		
 	if (!ns || !node || !cookie || !num || bufsize < sizeof(*buf)) {
 	 	result = EINVAL;
 		goto exit;
@@ -241,7 +241,7 @@ exit:
 
 
 status_t
-fs_rewinddir(fs_volume *_vol, fs_vnode *vnode, void *_cookie)
+fs_rewinddir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
 	nspace		*ns = (nspace*)_vol->private_volume;
 	dircookie	*cookie = (dircookie*)_cookie;
@@ -252,9 +252,9 @@ fs_rewinddir(fs_volume *_vol, fs_vnode *vnode, void *_cookie)
 	
 	if (cookie != NULL) {
 		cache_entry *entry = cookie->cache_root;
-		for(;entry!=NULL;) {
+		while (entry != NULL) {
 			cache_entry *next = entry->next;
-			if(entry->ent != NULL)
+			if (entry->ent != NULL)
 				free(entry->ent);
 			free(entry);
 			entry = next;

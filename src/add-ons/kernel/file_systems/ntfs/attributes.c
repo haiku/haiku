@@ -422,8 +422,7 @@ exit:
 status_t
 fs_close_attrib(fs_volume *_vol, fs_vnode *_node, void *cookie)
 {
-	vnode *node = (vnode*)_node->private_node;
-	TRACE("%s vnid: %d\n", __FUNCTION__, node->vnid);
+	TRACE("%s vnid: %d\n", __FUNCTION__, ((vnode*)_node->private_node)->vnid);
 	return B_NO_ERROR;
 }
 
