@@ -346,7 +346,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 	ns->noatime = strcasecmp(get_driver_parameter(handle, "no_atime", "true",
 		"true"), "true") == 0;
 	ns->fake_attrib = strcasecmp(get_driver_parameter(handle, "fake_attributes",
-		"false", "false"), "false") != 0;
+		"true", "true"), "true") == 0;
 	unload_driver_settings(handle);
 
 	if (ns->ro || (flags & B_MOUNT_READ_ONLY) != 0
@@ -361,7 +361,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		gNTFSVnodeOps.free_attr_dir_cookie = fake_free_attrib_dir_cookie;
 		gNTFSVnodeOps.read_attr_dir = fake_read_attrib_dir;
 		gNTFSVnodeOps.rewind_attr_dir = fake_rewind_attrib_dir;
-		gNTFSVnodeOps.create_attr = NULL;
+		gNTFSVnodeOps.create_attr = fake_create_attrib;
 		gNTFSVnodeOps.open_attr = fake_open_attrib;
 		gNTFSVnodeOps.close_attr = fake_close_attrib;
 		gNTFSVnodeOps.free_attr_cookie = fake_free_attrib_cookie;
@@ -369,6 +369,20 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		gNTFSVnodeOps.read_attr_stat = fake_read_attrib_stat;
 		gNTFSVnodeOps.write_attr = fake_write_attrib;
 		gNTFSVnodeOps.remove_attr = NULL;
+	} else {
+		gNTFSVnodeOps.open_attr_dir = fs_open_attrib_dir;
+		gNTFSVnodeOps.close_attr_dir = fs_close_attrib_dir;
+		gNTFSVnodeOps.free_attr_dir_cookie = fs_free_attrib_dir_cookie;
+		gNTFSVnodeOps.read_attr_dir = fs_read_attrib_dir;
+		gNTFSVnodeOps.rewind_attr_dir = fs_rewind_attrib_dir;
+		gNTFSVnodeOps.create_attr = fs_create_attrib;
+		gNTFSVnodeOps.open_attr = fs_open_attrib;
+		gNTFSVnodeOps.close_attr = fs_close_attrib;
+		gNTFSVnodeOps.free_attr_cookie = fs_free_attrib_cookie;
+		gNTFSVnodeOps.read_attr = fs_read_attrib;
+		gNTFSVnodeOps.read_attr_stat = fs_read_attrib_stat;
+		gNTFSVnodeOps.write_attr = fs_write_attrib;
+		gNTFSVnodeOps.remove_attr = fs_remove_attrib;		
 	}
 
 	ns->ntvol = utils_mount_volume(device, mountFlags | MS_RECOVER);
@@ -1088,7 +1102,7 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 			}
 
 			newNode->vnid = vnid;
-			newNode->parent_vnid = MREF(dir_ni->mft_no);
+			newNode->parent_vnid = dir->vnid;
 			
 			ni->flags |= FILE_ATTR_ARCHIVE;
 			NInoSetDirty(ni);
@@ -1102,10 +1116,17 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 			}				
 
 			*_vnid = vnid;
-					
-			ntfs_mark_free_space_outdated(ns);						
-			fs_ntfs_update_times(_vol, dir_ni, NTFS_UPDATE_MCTIME);			
-			notify_entry_created(ns->id, MREF(dir_ni->mft_no), name, *_vnid);			
+
+			if (ns->fake_attrib) {
+				if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
+					set_mime(newNode, NULL);
+				else
+					set_mime(newNode, name);
+			}
+
+			ntfs_mark_free_space_outdated(ns);	
+			fs_ntfs_update_times(_vol, dir_ni, NTFS_UPDATE_MCTIME);	
+			notify_entry_created(ns->id, dir->vnid, name, vnid);
 		} else
 			result = errno;
 	}
@@ -1703,13 +1724,13 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *name,
 
 		if (ns->fake_attrib) {
 			if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
-				set_mime(file, ".***");
+				set_mime(file, NULL);
 			else
 				set_mime(file, newname);
 			notify_attribute_changed(ns->id, file->vnid, "BEOS:TYPE",
 				B_ATTR_CHANGED);
 		}
-				
+
 		ntfs_inode_close(dir_ni);             
 		ntfs_inode_close(ni);
 		

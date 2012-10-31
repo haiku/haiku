@@ -21,14 +21,27 @@
 #include "fake_attributes.h"
 #include "mime_table.h"
 
-int32 kBeOSTypeCookie = 0x1234;
+int32 kOpenTypeCookie = 0;
+int32 kCloseTypeCookie = 1;
+int32 kSetTypeCookie = 0x1234;
+int32 kFreeTypeCookie = 0x87654321;
+
 char *kFailBackMime = {"application/octet-stream"};
+char *kDirectoryMime = {"application/x-vnd.Be-directory"};
+
 
 status_t set_mime(vnode *node, const char *filename)
 {
 	struct ext_mime *p;
-	int32 namelen, ext_len;
+	int32 namelen;
+	int32 ext_len;
 	node->mime = kFailBackMime;
+	
+	if (filename == NULL)
+	 {
+	 	node->mime = kDirectoryMime;
+	 	return B_NO_ERROR;
+	 }
 	namelen = strlen(filename);
 
 	for (p=mimes; p->extension; p++) {
@@ -64,7 +77,7 @@ fake_open_attrib_dir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 		goto	exit;
 	}
 	
-	*(int32 *)(*_cookie) = 0;
+	*(int32 *)(*_cookie) = kOpenTypeCookie;
 	
 exit:
 
@@ -75,6 +88,7 @@ exit:
 	return result;
 }
 
+
 status_t 
 fake_close_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
@@ -84,7 +98,7 @@ fake_close_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 	LOCK_VOL(ns);
 
-	*(int32 *)_cookie = 1;
+	*(int32 *)_cookie = kCloseTypeCookie;
 	
 	TRACE("fake_close_attrdir - EXIT\n");
 	
@@ -92,6 +106,7 @@ fake_close_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	
 	return B_NO_ERROR;
 }
+
 
 status_t 
 fake_free_attrib_dir_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
@@ -110,7 +125,7 @@ fake_free_attrib_dir_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 		goto	exit;
 	}
 	
-	*(int32 *)_cookie = 0x87654321;
+	*(int32 *)_cookie = kFreeTypeCookie;
 	free(_cookie);
 
 exit:
@@ -122,6 +137,7 @@ exit:
 	
 	return result;
 }
+
 
 status_t 
 fake_rewind_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
@@ -141,7 +157,7 @@ fake_rewind_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 		goto	exit;
 	}
 	
-	*(uint32 *)_cookie = 0;
+	*(uint32 *)_cookie = kOpenTypeCookie;
 
 exit:
 
@@ -168,16 +184,16 @@ fake_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 
 	*num = 0;
 
-	if ((*cookie == 0) && (node->mime)) {
+	if ((*cookie == kOpenTypeCookie) && (node->mime)) {
 		*num = 1;
 		
 		entry->d_ino = node->vnid;
 		entry->d_dev = ns->id;
-		entry->d_reclen = sizeof(struct dirent)+10;
+		entry->d_reclen = sizeof(struct dirent) + 10;
 		strcpy(entry->d_name, "BEOS:TYPE");
 	}
 
-	*cookie = 1;
+	*cookie = kCloseTypeCookie;
 
 	TRACE("fake_read_attrdir - EXIT\n");
 
@@ -187,29 +203,45 @@ fake_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 }
 
 status_t
+fake_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
+	uint32 type, int openMode, void** _cookie)
+{
+	nspace *ns = (nspace *)_vol->private_volume;
+	int	result = B_NO_ERROR;
+
+	LOCK_VOL(ns);
+	
+	TRACE("fake_create_attrib - ENTER (name = [%s])\n",name);
+
+	if (strcmp(name, "BEOS:TYPE") != 0)
+		goto	exit;
+
+	*_cookie = &kSetTypeCookie;
+	
+exit:
+
+	TRACE("fake_create_attrib - EXIT, result is %s\n", strerror(result));
+
+	UNLOCK_VOL(ns);
+		
+	return result;	
+}
+
+status_t
 fake_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
 	int openMode, void **_cookie)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
-	vnode *node = (vnode *)_node->private_node;	
 	int	result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
 	
 	TRACE("fake_open_attrib - ENTER (name = [%s])\n",name);
 
-	if (strcmp(name, "BEOS:TYPE") != 0) {
-		result = ENOENT;
+	if (strcmp(name, "BEOS:TYPE") != 0)
 		goto	exit;
-	}
-	
-	if (node->mime == NULL)	{
-		TRACE("fake_open_attrib - MIME = NULL\n");
-		result = ENOENT;
-		goto	exit;
-	}
 
-	*_cookie = &kBeOSTypeCookie;
+	*_cookie = &kSetTypeCookie;
 	
 exit:
 
@@ -240,25 +272,23 @@ fake_read_attrib_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	struct stat *stat)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
-	vnode *node = (vnode *)_node->private_node;
+	vnode *node = (vnode *)_node->private_node;	
 	int	result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
 
 	TRACE("fake_read_attr_stat - ENTER\n");
 
-	if (_cookie != &kBeOSTypeCookie) {
-		result = ENOENT;
-		goto	exit;
-	}
-
-	if (node->mime == NULL) {
+	if (_cookie != &kSetTypeCookie) {
 		result = ENOENT;
 		goto	exit;
 	}
 	
 	stat->st_type = MIME_STRING_TYPE;
-	stat->st_size = strlen(node->mime) + 1;
+	if (node->mime == NULL)
+		stat->st_size = 0;
+	else
+		stat->st_size = strlen(node->mime) + 1;
 
 exit:
 
@@ -276,7 +306,7 @@ fake_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	off_t pos,void *buffer, size_t *_length)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
-	vnode *node = (vnode *)_node->private_node;
+	vnode *node = (vnode *)_node->private_node;		
 
 	int	result = B_NO_ERROR;
 
@@ -284,7 +314,7 @@ fake_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 
 	TRACE("fake_read_attr - ENTER\n");
 
-	if (_cookie != &kBeOSTypeCookie) {
+	if (_cookie != &kSetTypeCookie) {
 		result = ENOENT;
 		goto	exit;
 	}
@@ -317,23 +347,5 @@ status_t
 fake_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	const void *buffer, size_t *_length)
 {
-	nspace *ns = (nspace *)_vol->private_volume;
-
-	int	result = B_NO_ERROR;
-	
-	LOCK_VOL(ns);
-	
-	TRACE("fake_write_attr - ENTER\n");
-
-	*_length = 0;
-
-	if (_cookie != &kBeOSTypeCookie) {
-		result = ENOSYS;
-	}
-	
-	TRACE("fake_write_attrib - EXIT, result is %s\n", strerror(result));
-
-	UNLOCK_VOL(ns);
-		
-	return result;
+	return B_NO_ERROR;
 }
