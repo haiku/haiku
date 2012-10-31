@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	1655920473
+1	swedish	x-vnd.Haiku-Installer	303957964
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Efter de andra menyposterna mot slutet av filen, lägg till något som liknar dessa rader:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet
 \t}\n\n	InstallerApp		\t}\n\n
@@ -105,6 +105,7 @@ Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme beh�
 Cancel	InstallProgress		Avbryt
 Try installing anyway	InstallProgress		Försök installera iallafall
 Are you sure you want to to stop the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
+Onto:	InstallerWindow		På:
 Tools	InstallerWindow		Verktyg
 The mount point could not be retrieved.	InstallProgress		Monteringspunkt kunde inte läsas av.
 \ttitle\t\t\t\tHaiku\n	InstallerApp		\t titel\t \t \t \t Haiku\n
