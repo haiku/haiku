@@ -508,69 +508,49 @@ exit:
 
 
 status_t
-fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *vnid)
+fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *_vnid)
 {
 	nspace *ns = (nspace*)_vol->private_volume;
 	vnode *baseNode = (vnode*)_dir->private_node;
 	vnode *newNode = NULL;
-	ntfschar *uname = NULL;
-	ntfs_inode *dir_ni = NULL;
 	status_t result = B_NO_ERROR;
-	int uname_len;
 
 	LOCK_VOL(ns);
 
 	TRACE("fs_walk - ENTER : find for \"%s\"\n",file);
 
-	if (ns == NULL || _dir == NULL || file == NULL || vnid == NULL) {
+	if (ns == NULL || _dir == NULL || file == NULL || _vnid == NULL) {
 		result = EINVAL;
 		goto exit;
 	}
 
 	if (!strcmp(file, ".")) {
-		*vnid = baseNode->vnid;
-		if (get_vnode(_vol, *vnid, (void**)&newNode) != 0)
+		*_vnid = baseNode->vnid;
+		if (get_vnode(_vol, *_vnid, (void**)&newNode) != 0)
 			result = ENOENT;
 	} else if (!strcmp(file, "..") && baseNode->vnid != FILE_root) {
-		*vnid = baseNode->parent_vnid;
-		if (get_vnode(_vol, *vnid, (void**)&newNode) != 0)
+		*_vnid = baseNode->parent_vnid;
+		if (get_vnode(_vol, *_vnid, (void**)&newNode) != 0)
 			result = ENOENT;
 	} else {
-		uname = ntfs_calloc(MAX_PATH);
-		uname_len = ntfs_mbstoucs(file, &uname);
-		if (uname_len < 0) {
-			result = EILSEQ;
+		ino_t vnid = ntfs_inode_lookup(_vol, baseNode->vnid, file);
+
+		if (vnid == (u64)-1) {
+			result = errno;
 			goto exit;
 		}
 
-		dir_ni = ntfs_inode_open(ns->ntvol, baseNode->vnid);
-		if (dir_ni == NULL) {
-			result = ENOENT;
-			goto exit;
-		}
-
-		*vnid = MREF(ntfs_inode_lookup_by_name(dir_ni, uname, uname_len));
-		TRACE("fs_walk - VNID = %d\n",*vnid);
-
-		ntfs_inode_close(dir_ni);
-
-		if (*vnid == (u64)-1) {
-			result = EINVAL;
-			goto exit;
-		}
-
-		if (get_vnode(_vol, *vnid, (void**)&newNode) != 0)
+		if (get_vnode(_vol, vnid, (void**)&newNode) != 0)
 			result = ENOENT;
 
 		if (newNode!=NULL)
 			newNode->parent_vnid = baseNode->vnid;
+			
+		*_vnid = vnid;
 	}
 
 exit:
 	TRACE("fs_walk - EXIT, result is %s\n", strerror(result));
-
-	if (uname)
-		free(uname);
 
 	UNLOCK_VOL(ns);
 
