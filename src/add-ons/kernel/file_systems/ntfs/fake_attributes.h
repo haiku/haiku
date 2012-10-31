@@ -24,6 +24,8 @@ status_t fake_rewind_attrib_dir(fs_volume *_vol, fs_vnode *_node,
 	void *_cookie);
 status_t fake_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	struct dirent *buf, size_t bufsize, uint32 *num);
+status_t fake_create_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
+	uint32 type, int openMode, void** _cookie);
 status_t fake_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
 	int openMode, void **_cookie);
 status_t fake_close_attrib(fs_volume *_vol, fs_vnode *_node, void *cookie);
