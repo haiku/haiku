@@ -74,6 +74,8 @@ WorkQueue::EnqueueJob(JobType type, void* args)
 status_t
 WorkQueue::LaunchWorkingThread(void* object)
 {
+	ASSERT(object != NULL);
+
 	WorkQueue* queue = reinterpret_cast<WorkQueue*>(object);
 	return queue->WorkingThread();
 }
@@ -115,6 +117,7 @@ WorkQueue::DequeueJob()
 	MutexLocker locker(fQueueLock);
 
 	WorkQueueEntry* entry = fQueue.RemoveHead();
+	ASSERT(entry != NULL);
 
 	void* args = entry->fArguments;
 	switch (entry->fType) {
@@ -133,6 +136,7 @@ WorkQueue::DequeueJob()
 void
 WorkQueue::JobRecall(DelegationRecallArgs* args)
 {
+	ASSERT(args != NULL);
 	args->fDelegation->GetInode()->RecallDelegation(args->fTruncate);
 }
 
@@ -140,6 +144,8 @@ WorkQueue::JobRecall(DelegationRecallArgs* args)
 void
 WorkQueue::JobIO(IORequestArgs* args)
 {
+	ASSERT(args != NULL);
+
 	uint64 offset = io_request_offset(args->fRequest);
 	uint64 length = io_request_length(args->fRequest);
 

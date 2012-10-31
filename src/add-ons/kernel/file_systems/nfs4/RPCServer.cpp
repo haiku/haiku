@@ -38,6 +38,8 @@ RequestManager::~RequestManager()
 void
 RequestManager::AddRequest(Request* request)
 {
+	ASSERT(request != NULL);
+
 	MutexLocker _(fLock);
 	if (fQueueTail != NULL)
 		fQueueTail->fNext = request;
@@ -81,6 +83,9 @@ Server::Server(Connection* connection, PeerAddress* address)
 	fCallback(NULL),
 	fXID(rand() << 1)
 {
+	ASSERT(connection != NULL);
+	ASSERT(address != NULL);
+
 	mutex_init(&fCallbackLock, NULL);
 
 	_StartListening();
@@ -129,6 +134,9 @@ Server::_StartListening()
 status_t
 Server::SendCall(Call* call, Reply** reply)
 {
+	ASSERT(call != NULL);
+	ASSERT(reply != NULL);
+
 	Request* req;
 	status_t result = SendCallAsync(call, reply, &req);
 	if (result != B_OK)
@@ -149,6 +157,10 @@ Server::SendCall(Call* call, Reply** reply)
 status_t
 Server::SendCallAsync(Call* call, Reply** reply, Request** request)
 {
+	ASSERT(call != NULL);
+	ASSERT(reply != NULL);
+	ASSERT(request != NULL);
+
 	if (fThreadError != B_OK)
 		return fThreadError;
 
@@ -175,6 +187,9 @@ Server::SendCallAsync(Call* call, Reply** reply, Request** request)
 status_t
 Server::ResendCallAsync(Call* call, Request* request)
 {
+	ASSERT(call != NULL);
+	ASSERT(request != NULL);
+
 	if (fThreadError != B_OK) {
 		fRequests.FindRequest(request->fXID);
 		delete request;
@@ -196,6 +211,8 @@ Server::ResendCallAsync(Call* call, Request* request)
 status_t
 Server::WakeCall(Request* request)
 {
+	ASSERT(request != NULL);
+
 	Request* req = fRequests.FindRequest(request->fXID);
 	if (req == NULL)
 		return B_OK;
@@ -281,6 +298,8 @@ Server::_Listener()
 status_t
 Server::_ListenerThreadStart(void* object)
 {
+	ASSERT(object != NULL);
+
 	Server* server = reinterpret_cast<Server*>(object);
 	return server->_Listener();
 }
@@ -304,6 +323,9 @@ status_t
 ServerManager::Acquire(Server** _server, const PeerAddress& address,
 	ProgramData* (*createPrivateData)(Server*))
 {
+	ASSERT(_server != NULL);
+	ASSERT(createPrivateData != NULL);
+
 	status_t result;
 
 	MutexLocker locker(fLock);
@@ -357,6 +379,8 @@ ServerManager::Acquire(Server** _server, const PeerAddress& address,
 void
 ServerManager::Release(Server* server)
 {
+	ASSERT(server != NULL);
+
 	MutexLocker _(fLock);
 	ServerNode* node = _Find(server->ID());
 	if (node != NULL) {
@@ -391,6 +415,8 @@ ServerManager::_Find(const PeerAddress& address)
 void
 ServerManager::_Delete(ServerNode* node)
 {
+	ASSERT(node != NULL);
+
 	bool found = false;
 	ServerNode* previous = NULL;
 	ServerNode* current = fRoot;
@@ -452,6 +478,8 @@ ServerManager::_Delete(ServerNode* node)
 ServerNode*
 ServerManager::_Insert(ServerNode* node)
 {
+	ASSERT(node != NULL);
+
 	ServerNode* previous = NULL;
 	ServerNode* current = fRoot;
 	while (current != NULL) {

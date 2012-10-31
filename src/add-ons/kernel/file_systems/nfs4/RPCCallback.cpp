@@ -26,6 +26,8 @@ Callback::Callback(Server* server)
 status_t
 Callback::EnqueueRequest(CallbackRequest* request, Connection* connection)
 {
+	ASSERT(request != NULL);
+	ASSERT(connection != NULL);
 	return fServer->PrivateData()->ProcessCallback(request, connection);
 }
 

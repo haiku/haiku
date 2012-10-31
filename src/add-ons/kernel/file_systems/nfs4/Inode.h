@@ -187,6 +187,7 @@ Inode::Type() const
 inline FileSystem*
 Inode::GetFileSystem() const
 {
+	ASSERT(fFileSystem != NULL);
 	return fFileSystem;
 }
 
@@ -201,6 +202,7 @@ Inode::FileCache()
 inline void
 Inode::SetOpenState(OpenState* state)
 {
+	ASSERT(state != NULL);
 	MutexLocker _(fStateLock);
 	fOpenState = state;
 }

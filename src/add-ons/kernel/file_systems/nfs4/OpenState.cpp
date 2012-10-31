@@ -112,6 +112,8 @@ OpenState::DeleteLock(LockInfo* lock)
 status_t
 OpenState::_ReleaseLockOwner(LockOwner* owner)
 {
+	ASSERT(owner != NULL);
+
 	do {
 		RPC::Server* server = fFileSystem->Server();
 		Request request(server, fFileSystem);

@@ -9,6 +9,7 @@
 
 #include "RPCCall.h"
 
+#include <debug.h>
 #include <util/kernel_cpp.h>
 
 #include "RPCDefs.h"
@@ -25,6 +26,9 @@ Call::Call()
 Call*
 Call::Create(uint32 proc, const Auth* creds, const Auth* ver)
 {
+	ASSERT(creds != NULL);
+	ASSERT(ver != NULL);
+
 	Call* call = new(std::nothrow) Call;
 	if (call == NULL)
 		return NULL;

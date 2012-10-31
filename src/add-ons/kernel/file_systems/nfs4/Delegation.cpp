@@ -21,6 +21,7 @@ Delegation::Delegation(const OpenDelegationData& data, Inode* inode,
 	fInode(inode),
 	fAttribute(attribute)
 {
+	ASSERT(inode != NULL);
 }
 
 

@@ -16,6 +16,8 @@
 status_t
 NFS4Inode::GetChangeInfo(uint64* change, bool attrDir)
 {
+	ASSERT(change != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -84,6 +86,8 @@ NFS4Inode::CommitWrites()
 status_t
 NFS4Inode::Access(uint32* allowed)
 {
+	ASSERT(allowed != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -112,6 +116,11 @@ status_t
 NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 	FileHandle* handle, bool parent)
 {
+	ASSERT(name != NULL);
+	ASSERT(change != NULL);
+	ASSERT(fileID != NULL);
+	ASSERT(handle != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -197,6 +206,10 @@ NFS4Inode::LookUp(const char* name, uint64* change, uint64* fileID,
 status_t
 NFS4Inode::Link(Inode* dir, const char* name, ChangeInfo* changeInfo)
 {
+	ASSERT(dir != NULL);
+	ASSERT(name != NULL);
+	ASSERT(changeInfo != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -229,6 +242,9 @@ NFS4Inode::Link(Inode* dir, const char* name, ChangeInfo* changeInfo)
 status_t
 NFS4Inode::ReadLink(void* buffer, size_t* length)
 {
+	ASSERT(buffer != NULL);
+	ASSERT(length != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -260,6 +276,9 @@ NFS4Inode::ReadLink(void* buffer, size_t* length)
 status_t
 NFS4Inode::GetStat(AttrValue** values, uint32* count, OpenAttrCookie* cookie)
 {
+	ASSERT(values != NULL);
+	ASSERT(count != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -295,6 +314,8 @@ NFS4Inode::GetStat(AttrValue** values, uint32* count, OpenAttrCookie* cookie)
 status_t
 NFS4Inode::WriteStat(OpenState* state, AttrValue* attrs, uint32 attrCount)
 {
+	ASSERT(attrs != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -333,6 +354,13 @@ NFS4Inode::RenameNode(Inode* from, Inode* to, const char* fromName,
 	const char* toName, ChangeInfo* fromChange, ChangeInfo* toChange,
 	uint64* fileID, bool attribute)
 {
+	ASSERT(from != NULL);
+	ASSERT(to != NULL);
+	ASSERT(fromName != NULL);
+	ASSERT(toName != NULL);
+	ASSERT(fromChange != NULL);
+	ASSERT(toChange != NULL);
+
 	do {
 		RPC::Server* serv = from->fFileSystem->Server();
 		Request request(serv, from->fFileSystem);
@@ -419,6 +447,12 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 	ChangeInfo* changeInfo, uint64* fileID, FileHandle* handle,
 	OpenDelegationData* delegation)
 {
+	ASSERT(name != NULL);
+	ASSERT(state != NULL);
+	ASSERT(changeInfo != NULL);
+	ASSERT(handle != NULL);
+	ASSERT(delegation != NULL);
+
 	bool confirm;
 	status_t result;
 
@@ -511,6 +545,9 @@ NFS4Inode::CreateFile(const char* name, int mode, int perms, OpenState* state,
 status_t
 NFS4Inode::OpenFile(OpenState* state, int mode, OpenDelegationData* delegation)
 {
+	ASSERT(state != NULL);
+	ASSERT(delegation != NULL);
+
 	bool confirm;
 	status_t result;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
@@ -612,6 +649,10 @@ status_t
 NFS4Inode::OpenAttr(OpenState* state, const char* name, int mode,
 	OpenDelegationData* delegation, bool create)
 {
+	ASSERT(name != NULL);
+	ASSERT(state != NULL);
+	ASSERT(delegation != NULL);
+
 	bool confirm;
 	status_t result;
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
@@ -669,6 +710,11 @@ status_t
 NFS4Inode::ReadFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 	uint32* length, void* buffer, bool* eof)
 {
+	ASSERT(state != NULL);
+	ASSERT(length != NULL);
+	ASSERT(buffer != NULL);
+	ASSERT(eof != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -700,6 +746,9 @@ status_t
 NFS4Inode::WriteFile(OpenStateCookie* cookie, OpenState* state, uint64 position,
 	uint32* length, const void* buffer, bool commit)
 {
+	ASSERT(state != NULL);
+	ASSERT(length != NULL);
+	ASSERT(buffer != NULL);
 
 	do {
 		RPC::Server* serv = fFileSystem->Server();
@@ -736,6 +785,10 @@ NFS4Inode::CreateObject(const char* name, const char* path, int mode,
 	FileType type, ChangeInfo* changeInfo, uint64* fileID, FileHandle* handle,
 	bool parent)
 {
+	ASSERT(name != NULL);
+	ASSERT(changeInfo != NULL);
+	ASSERT(handle != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -814,6 +867,9 @@ status_t
 NFS4Inode::RemoveObject(const char* name, FileType type, ChangeInfo* changeInfo,
 	uint64* fileID)
 {
+	ASSERT(name != NULL);
+	ASSERT(changeInfo != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -890,6 +946,10 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 	bool* eof, uint64* change, uint64* dirCookie, uint64* dirCookieVerf,
 	bool attribute)
 {
+	ASSERT(dirents != NULL);
+	ASSERT(count != NULL);
+	ASSERT(eof != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -960,6 +1020,8 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 status_t
 NFS4Inode::OpenAttrDir(FileHandle* handle)
 {
+	ASSERT(handle != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -992,6 +1054,11 @@ status_t
 NFS4Inode::TestLock(OpenFileCookie* cookie, LockType* type, uint64* position,
 	uint64* length, bool& conflict)
 {
+	ASSERT(cookie != NULL);
+	ASSERT(type != NULL);
+	ASSERT(position != NULL);
+	ASSERT(length != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -1026,6 +1093,9 @@ NFS4Inode::TestLock(OpenFileCookie* cookie, LockType* type, uint64* position,
 status_t
 NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 {
+	ASSERT(cookie != NULL);
+	ASSERT(lockInfo != NULL);
+
 	uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 	do {
 		MutexLocker ownerLocker(lockInfo->fOwner->fLock);
@@ -1073,6 +1143,9 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 status_t
 NFS4Inode::ReleaseLock(OpenFileCookie* cookie, LockInfo* lockInfo)
 {
+	ASSERT(cookie != NULL);
+	ASSERT(lockInfo != NULL);
+
 	do {
 		MutexLocker ownerLocker(lockInfo->fOwner->fLock);
 

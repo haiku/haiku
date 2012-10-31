@@ -60,6 +60,9 @@ FileSystem::~FileSystem()
 static const char*
 GetPath(const char* root, const char* path)
 {
+	ASSERT(root != NULL);
+	ASSERT(path != NULL);
+
 	int slash = 0;
 	int i;
 	for (i = 0; path[i] != '\0'; i++) {
@@ -78,9 +81,13 @@ GetPath(const char* root, const char* path)
 
 
 status_t
-FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
+FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* fsPath,
 	dev_t id, const MountConfiguration& configuration)
 {
+	ASSERT(_fs != NULL);
+	ASSERT(serv != NULL);
+	ASSERT(fsPath != NULL);
+
 	FileSystem* fs = new(std::nothrow) FileSystem(configuration);
 	if (fs == NULL)
 		return B_NO_MEMORY;
@@ -187,7 +194,7 @@ FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
 	fs->fRoot = reinterpret_cast<RootInode*>(inode);
 
 	fs->NFSServer()->AddFileSystem(fs);
-	*pfs = fs;
+	*_fs = fs;
 
 	fsDeleter.Detach();
 	return B_OK;
@@ -197,6 +204,8 @@ FileSystem::Mount(FileSystem** pfs, RPC::Server* serv, const char* fsPath,
 status_t
 FileSystem::GetInode(ino_t id, Inode** _inode)
 {
+	ASSERT(_inode != NULL);
+
 	FileInfo fi;
 	status_t result = fInoIdMap.GetFileInfo(&fi, id);
 	if (result == B_ENTRY_NOT_FOUND)
@@ -218,6 +227,8 @@ FileSystem::GetInode(ino_t id, Inode** _inode)
 status_t
 FileSystem::Migrate(const RPC::Server* serv)
 {
+	ASSERT(serv != NULL);
+
 	MutexLocker _(fOpenLock);
 	if (serv != fServer)
 		return B_OK;
@@ -295,6 +306,8 @@ FileSystem::OpenFilesUnlock()
 void
 FileSystem::AddOpenFile(OpenState* state)
 {
+	ASSERT(state != NULL);
+
 	MutexLocker _(fOpenLock);
 
 	fOpenFiles.InsertBefore(fOpenFiles.Head(), state);
@@ -306,6 +319,8 @@ FileSystem::AddOpenFile(OpenState* state)
 void
 FileSystem::RemoveOpenFile(OpenState* state)
 {
+	ASSERT(state != NULL);
+
 	MutexLocker _(fOpenLock);
 
 	fOpenFiles.Remove(state);
@@ -332,6 +347,8 @@ FileSystem::DelegationsUnlock()
 void
 FileSystem::AddDelegation(Delegation* delegation)
 {
+	ASSERT(delegation != NULL);
+
 	MutexLocker _(fDelegationLock);
 
 	fDelegationList.InsertBefore(fDelegationList.Head(), delegation);
@@ -344,6 +361,8 @@ FileSystem::AddDelegation(Delegation* delegation)
 void
 FileSystem::RemoveDelegation(Delegation* delegation)
 {
+	ASSERT(delegation != NULL);
+
 	MutexLocker _(fDelegationLock);
 
 	fDelegationList.Remove(delegation);

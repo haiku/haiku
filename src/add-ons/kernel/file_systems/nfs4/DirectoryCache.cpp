@@ -21,6 +21,7 @@ NameCacheEntry::NameCacheEntry(const char* name, ino_t node)
 	fNode(node),
 	fName(strdup(name))
 {
+	ASSERT(name != NULL);
 }
 
 
@@ -55,6 +56,8 @@ DirectoryCache::DirectoryCache(Inode* inode, bool attr)
 	fAttrDir(attr),
 	fTrashed(true)
 {
+	ASSERT(inode != NULL);
+
 	mutex_init(&fLock, NULL);
 }
 
@@ -97,6 +100,8 @@ DirectoryCache::Trash()
 status_t
 DirectoryCache::AddEntry(const char* name, ino_t node, bool created)
 {
+	ASSERT(name != NULL);
+
 	NameCacheEntry* entry = new(std::nothrow) NameCacheEntry(name, node);
 	if (entry == NULL)
 		return B_NO_MEMORY;
@@ -132,6 +137,8 @@ DirectoryCache::AddEntry(const char* name, ino_t node, bool created)
 void
 DirectoryCache::RemoveEntry(const char* name)
 {
+	ASSERT(name != NULL);
+
 	SinglyLinkedList<NameCacheEntry>::Iterator iterator
 		= fNameCache.GetIterator();
 	NameCacheEntry* previous = NULL;
@@ -229,6 +236,9 @@ void
 DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 	DirectoryCacheSnapshot* newSnapshot)
 {
+	ASSERT(newSnapshot != NULL);
+	ASSERT(oldSnapshot != NULL);
+
 	MutexLocker _(newSnapshot->fLock);
 
 	SinglyLinkedList<NameCacheEntry>::Iterator oldIt

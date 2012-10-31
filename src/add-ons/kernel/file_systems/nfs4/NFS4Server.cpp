@@ -24,6 +24,8 @@ NFS4Server::NFS4Server(RPC::Server* serv)
 	fFileSystems(NULL),
 	fServer(serv)
 {
+	ASSERT(serv != NULL);
+
 	mutex_init(&fClientIdLock, NULL);
 	mutex_init(&fFSLock, NULL);
 	mutex_init(&fThreadStartLock, NULL);
@@ -78,6 +80,8 @@ NFS4Server::ServerRebooted(uint64 clientId)
 void
 NFS4Server::AddFileSystem(FileSystem* fs)
 {
+	ASSERT(fs != NULL);
+
 	MutexLocker _(fFSLock);
 	fs->fPrev = NULL;
 	fs->fNext = fFileSystems;
@@ -93,6 +97,8 @@ NFS4Server::AddFileSystem(FileSystem* fs)
 void
 NFS4Server::RemoveFileSystem(FileSystem* fs)
 {
+	ASSERT(fs != NULL);
+
 	MutexLocker _(fFSLock);
 	if (fs == fFileSystems)
 		fFileSystems = fs->fNext;
@@ -270,6 +276,7 @@ NFS4Server::_Renewal()
 status_t
 NFS4Server::_RenewalThreadStart(void* ptr)
 {
+	ASSERT(ptr != NULL);
 	NFS4Server* server = reinterpret_cast<NFS4Server*>(ptr);
 	return server->_Renewal();
 }
@@ -279,6 +286,9 @@ status_t
 NFS4Server::ProcessCallback(RPC::CallbackRequest* request,
 	Connection* connection)
 {
+	ASSERT(request != NULL);
+	ASSERT(connection != NULL);
+
 	RequestInterpreter req(request);
 	ReplyBuilder reply(request->XID());
 
@@ -311,6 +321,9 @@ NFS4Server::ProcessCallback(RPC::CallbackRequest* request,
 status_t
 NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
 {
+	ASSERT(request != NULL);
+	ASSERT(reply != NULL);
+
 	uint32 stateID[3];
 	uint32 stateSeq;
 	bool truncate;
@@ -352,6 +365,9 @@ NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
 status_t
 NFS4Server::CallbackGetAttr(RequestInterpreter* request, ReplyBuilder* reply)
 {
+	ASSERT(request != NULL);
+	ASSERT(reply != NULL);
+
 	FileHandle handle;
 	int mask;
 

@@ -153,6 +153,7 @@ FileSystem::ExpireType() const
 inline RPC::Server*
 FileSystem::Server()
 {
+	ASSERT(fServer != NULL);
 	return fServer;
 }
 
@@ -160,6 +161,7 @@ FileSystem::Server()
 inline NFS4Server*
 FileSystem::NFSServer()
 {
+	ASSERT(fServer->PrivateData() != NULL);
 	return reinterpret_cast<NFS4Server*>(fServer->PrivateData());
 }
 
@@ -167,6 +169,7 @@ FileSystem::NFSServer()
 inline const char*
 FileSystem::Path() const
 {
+	ASSERT(fPath != NULL);
 	return fPath;
 }
 

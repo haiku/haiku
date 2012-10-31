@@ -27,6 +27,8 @@ Inode::CreateDir(const char* name, int mode)
 status_t
 Inode::OpenDir(OpenDirCookie* cookie)
 {
+	ASSERT(cookie != NULL);
+
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
 
@@ -48,6 +50,8 @@ Inode::OpenDir(OpenDirCookie* cookie)
 status_t
 Inode::OpenAttrDir(OpenDirCookie* cookie)
 {
+	ASSERT(cookie != NULL);
+
 	cookie->fFileSystem = fFileSystem;
 	cookie->fSpecial = 0;
 	cookie->fSnapshot = NULL;
@@ -116,6 +120,9 @@ status_t
 Inode::FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 	uint32 size)
 {
+	ASSERT(de != NULL);
+	ASSERT(name != NULL);
+
 	uint32 nameSize = strlen(name);
 	const uint32 entSize = sizeof(struct dirent);
 
@@ -137,6 +144,8 @@ Inode::FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 status_t
 Inode::ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 {
+	ASSERT(de != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);
@@ -189,6 +198,8 @@ Inode::ReadDirUp(struct dirent* de, uint32 pos, uint32 size)
 static char*
 FileToAttrName(const char* path)
 {
+	ASSERT(path != NULL);
+
 	char* name = strdup(path);
 	if (name == NULL)
 		return NULL;
@@ -214,6 +225,8 @@ status_t
 Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 	OpenDirCookie* cookie, uint64* _change, bool attribute)
 {
+	ASSERT(_snapshot != NULL);
+
 	DirectoryCacheSnapshot* snapshot = new DirectoryCacheSnapshot;
 	if (snapshot == NULL)
 		return B_NO_MEMORY;
@@ -292,6 +305,10 @@ status_t
 Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 	OpenDirCookie* cookie)
 {
+	ASSERT(_buffer != NULL);
+	ASSERT(_count != NULL);
+	ASSERT(cookie != NULL);
+
 	if (cookie->fEOF) {
 		*_count = 0;
 		return B_OK;

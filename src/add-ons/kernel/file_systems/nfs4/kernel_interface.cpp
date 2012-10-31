@@ -14,6 +14,7 @@
 #include <fs_interface.h>
 
 #include "Connection.h"
+#include "Debug.h"
 #include "FileSystem.h"
 #include "IdMap.h"
 #include "Inode.h"

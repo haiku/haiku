@@ -41,6 +41,9 @@ Inode::Inode()
 status_t
 Inode::CreateInode(FileSystem* fs, const FileInfo& fi, Inode** _inode)
 {
+	ASSERT(fs != NULL);
+	ASSERT(_inode != NULL);
+
 	Inode* inode = NULL;
 	if (fs->Root() == NULL)
 		inode = new(std::nothrow) RootInode;
@@ -175,6 +178,9 @@ Inode::RevalidateFileCache()
 status_t
 Inode::LookUp(const char* name, ino_t* id)
 {
+	ASSERT(name != NULL);
+	ASSERT(id != NULL);
+
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
 
@@ -218,6 +224,9 @@ Inode::LookUp(const char* name, ino_t* id)
 status_t
 Inode::Link(Inode* dir, const char* name)
 {
+	ASSERT(dir != NULL);
+	ASSERT(name != NULL);
+
 	ChangeInfo changeInfo;
 	status_t result = NFS4Inode::Link(dir, name, &changeInfo);
 	if (result != B_OK)
@@ -253,6 +262,8 @@ Inode::Link(Inode* dir, const char* name)
 status_t
 Inode::Remove(const char* name, FileType type, ino_t* id)
 {
+	ASSERT(name != NULL);
+
 	MemoryDeleter nameDeleter;
 	if (type == NF4NAMEDATTR) {
 		status_t result = LoadAttrDirHandle();
@@ -303,6 +314,11 @@ status_t
 Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 	bool attribute, ino_t* id)
 {
+	ASSERT(from != NULL);
+	ASSERT(fromName != NULL);
+	ASSERT(to != NULL);
+	ASSERT(toName != NULL);
+
 	if (from->fFileSystem != to->fFileSystem)
 		return B_DONT_DO_THAT;
 
@@ -386,6 +402,9 @@ Inode::CreateLink(const char* name, const char* path, int mode)
 status_t
 Inode::CreateObject(const char* name, const char* path, int mode, FileType type)
 {
+	ASSERT(name != NULL);
+	ASSERT(type != NF4LNK || path != NULL);
+
 	ChangeInfo changeInfo;
 	uint64 fileID;
 	FileHandle handle;
@@ -455,6 +474,8 @@ Inode::Access(int mode)
 status_t
 Inode::Stat(struct stat* st, OpenAttrCookie* attr)
 {
+	ASSERT(st != NULL);
+
 	if (attr != NULL)
 		return GetStat(st, attr);
 
@@ -479,6 +500,8 @@ Inode::Stat(struct stat* st, OpenAttrCookie* attr)
 status_t
 Inode::GetStat(struct stat* st, OpenAttrCookie* attr)
 {
+	ASSERT(st != NULL);
+
 	AttrValue* values;
 	uint32 count;
 	status_t result = NFS4Inode::GetStat(&values, &count, attr);
@@ -566,6 +589,8 @@ Inode::GetStat(struct stat* st, OpenAttrCookie* attr)
 status_t
 Inode::WriteStat(const struct stat* st, uint32 mask, OpenAttrCookie* cookie)
 {
+	ASSERT(st != NULL);
+
 	status_t result;
 	AttrValue attr[6];
 	uint32 i = 0;
@@ -616,6 +641,7 @@ Inode::WriteStat(const struct stat* st, uint32 mask, OpenAttrCookie* cookie)
 
 	if (cookie == NULL) {
 		MutexLocker stateLocker(fStateLock);
+		ASSERT(fOpenState != NULL);
 		result = NFS4Inode::WriteStat(fOpenState, attr, i);
 		stateLocker.Unlock();
 
@@ -657,6 +683,9 @@ Inode::CheckLockType(short ltype, uint32 mode)
 status_t
 Inode::TestLock(OpenFileCookie* cookie, struct flock* lock)
 {
+	ASSERT(cookie != NULL);
+	ASSERT(lock != NULL);
+
 	if (lock->l_type == F_UNLCK)
 		return B_OK;
 
@@ -691,6 +720,9 @@ status_t
 Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 	bool wait)
 {
+	ASSERT(cookie != NULL);
+	ASSERT(lock != NULL);
+
 	OpenState* state = cookie->fOpenState;
 
 	status_t result = CheckLockType(lock->l_type, cookie->fMode);
@@ -732,6 +764,9 @@ Inode::AcquireLock(OpenFileCookie* cookie, const struct flock* lock,
 status_t
 Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 {
+	ASSERT(cookie != NULL);
+	ASSERT(lock != NULL);
+
 	SyncAndCommit();
 
 	LockInfo* prev = NULL;
@@ -782,6 +817,8 @@ Inode::ReleaseLock(OpenFileCookie* cookie, const struct flock* lock)
 status_t
 Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 {
+	ASSERT(cookie != NULL);
+
 	SyncAndCommit();
 
 	OpenState* state = cookie->fOpenState;
@@ -816,6 +853,8 @@ status_t
 Inode::ChildAdded(const char* name, uint64 fileID,
 	const FileHandle& fileHandle)
 {
+	ASSERT(name != NULL);
+
 	fFileSystem->Root()->MakeInfoInvalid();
 
 	FileInfo fi;
@@ -840,6 +879,8 @@ Inode::Name() const
 void
 Inode::SetDelegation(Delegation* delegation)
 {
+	ASSERT(delegation != NULL);
+
 	WriteLocker _(fDelegationLock);
 
 	fMetaCache.InvalidateStat();

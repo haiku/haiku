@@ -69,6 +69,8 @@ InodeIdMap::RemoveEntry(ino_t id)
 inline status_t
 InodeIdMap::GetFileInfo(FileInfo* fi, ino_t id)
 {
+	ASSERT(fi != NULL);
+
 	MutexLocker _(fLock);
 	AVLTreeMap<ino_t, FileInfo>::Iterator it = fMap.Find(id);
 	if (!it.HasCurrent())

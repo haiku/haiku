@@ -18,6 +18,8 @@
 status_t
 FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 {
+	ASSERT(_path != NULL);
+
 	char* path = strdup(_path);
 	if (path == NULL)
 		return B_NO_MEMORY;
@@ -49,6 +51,8 @@ FileInfo::ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 status_t
 FileInfo::CreateName(const char* dirPath, const char* name)
 {
+	ASSERT(name != NULL);
+
 	free(const_cast<char*>(fName));
 	fName = strdup(name);
 	if (fName == NULL)
@@ -81,6 +85,8 @@ FileInfo::CreateName(const char* dirPath, const char* name)
 status_t
 FileInfo::UpdateFileHandles(FileSystem* fs)
 {
+	ASSERT(fs != NULL);
+
 	Request request(fs->Server(), fs);
 	RequestBuilder& req = request.Builder();
 

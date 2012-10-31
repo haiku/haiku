@@ -15,6 +15,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <AutoDeleter.h>
 #include <util/kernel_cpp.h>
 #include <net/dns_resolver.h>
 
@@ -81,6 +82,8 @@ PeerAddress::ProtocolString() const
 void
 PeerAddress::SetProtocol(const char* protocol)
 {
+	ASSERT(protocol != NULL);
+
 	if (strcmp(protocol, "tcp") == 0)
 		fProtocol = IPPROTO_TCP;
 	else if (strcmp(protocol, "udp") == 0)
@@ -189,6 +192,9 @@ PeerAddress::InAddrSize() const
 status_t
 PeerAddress::ResolveName(const char* name, PeerAddress* address)
 {
+	ASSERT(name != NULL);
+	ASSERT(address != NULL);
+
 	address->fProtocol = IPPROTO_TCP;
 
 	// getaddrinfo() is very expensive when called from kernel, so we do not
@@ -284,6 +290,8 @@ ConnectionBase::~ConnectionBase()
 status_t
 ConnectionBase::GetLocalAddress(PeerAddress* address)
 {
+	ASSERT(address != NULL);
+
 	address->fProtocol = fPeerAddress.fProtocol;
 
 	socklen_t addressSize = sizeof(address->fAddress);
@@ -295,11 +303,14 @@ ConnectionBase::GetLocalAddress(PeerAddress* address)
 status_t
 ConnectionStream::Send(const void* buffer, uint32 size)
 {
+	ASSERT(buffer != NULL);
+
 	status_t result;
 
-	uint32* buf = (uint32*)malloc(size + sizeof(uint32));
+	uint32* buf = reinterpret_cast<uint32*>(malloc(size + sizeof(uint32)));
 	if (buf == NULL)
 		return B_NO_MEMORY;
+	MemoryDeleter _(buf);
 
 	buf[0] = htonl(size | LAST_FRAGMENT);
 	memcpy(buf + 1, buffer, size);
@@ -315,14 +326,10 @@ ConnectionStream::Send(const void* buffer, uint32 size)
 	mutex_unlock(&fSocketLock);
 	if (result < 0) {
 		result = errno;
-		free(buf);
 		return result;
-	} else if (result == 0) {
-		free(buf);
+	} else if (result == 0)
 		return B_IO_ERROR;
-	}
 
-	free(buf);
 	return B_OK;
 }
 
@@ -330,6 +337,9 @@ ConnectionStream::Send(const void* buffer, uint32 size)
 status_t
 ConnectionPacket::Send(const void* buffer, uint32 size)
 {
+	ASSERT(buffer != NULL);
+	ASSERT(size < 65535);
+
 	// send on DGRAM sockets is atomic. No need to lock.
 	status_t result = send(fSocket, buffer,  size, 0);
 	if (result < 0)
@@ -341,6 +351,9 @@ ConnectionPacket::Send(const void* buffer, uint32 size)
 status_t
 ConnectionStream::Receive(void** _buffer, uint32* _size)
 {
+	ASSERT(_buffer != NULL);
+	ASSERT(_size != NULL);
+
 	status_t result;
 
 	uint32 size = 0;
@@ -420,6 +433,9 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 status_t
 ConnectionPacket::Receive(void** _buffer, uint32* _size)
 {
+	ASSERT(_buffer != NULL);
+	ASSERT(_size != NULL);
+
 	status_t result;
 	int32 size = MAX_PACKET_SIZE;
 	void* buffer = malloc(size);
@@ -482,6 +498,8 @@ Connection::CreateObject(const PeerAddress& address)
 status_t
 Connection::Connect(Connection **_connection, const PeerAddress& address)
 {
+	ASSERT(_connection != NULL);
+
 	Connection* conn = CreateObject(address);
 	if (conn == NULL)
 		return B_NO_MEMORY;
@@ -509,6 +527,9 @@ status_t
 Connection::SetTo(Connection **_connection, int socket,
 	const PeerAddress& address)
 {
+	ASSERT(_connection != NULL);
+	ASSERT(socket != -1);
+
 	Connection* conn = CreateObject(address);
 	if (conn == NULL)
 		return B_NO_MEMORY;
@@ -637,6 +658,8 @@ ConnectionBase::Disconnect()
 status_t
 ConnectionListener::Listen(ConnectionListener** listener, uint16 port)
 {
+	ASSERT(listener != NULL);
+
 	int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sock < 0)
 		return errno;
@@ -684,6 +707,8 @@ ConnectionListener::Listen(ConnectionListener** listener, uint16 port)
 status_t
 ConnectionListener::AcceptConnection(Connection** connection)
 {
+	ASSERT(connection != NULL);
+
 	object_wait_info object[2];
 	object[0].object = fWaitCancel;
 	object[0].type = B_OBJECT_TYPE_SEMAPHORE;

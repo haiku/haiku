@@ -36,6 +36,7 @@ LockInfo::LockInfo(LockOwner* owner)
 	:
 	fOwner(owner)
 {
+	ASSERT(owner != NULL);
 	fOwner->fUseCount++;
 }
 
@@ -86,6 +87,8 @@ Cookie::~Cookie()
 status_t
 Cookie::RegisterRequest(RPC::Request* req)
 {
+	ASSERT(req != NULL);
+
 	RequestEntry* ent = new RequestEntry;
 	if (ent == NULL)
 		return B_NO_MEMORY;
@@ -102,6 +105,8 @@ Cookie::RegisterRequest(RPC::Request* req)
 status_t
 Cookie::UnregisterRequest(RPC::Request* req)
 {
+	ASSERT(req != NULL);
+
 	MutexLocker _(fRequestLock);
 	RequestEntry* ent = fRequests;
 	RequestEntry* prev = NULL;
@@ -148,6 +153,8 @@ OpenFileCookie::OpenFileCookie()
 void
 OpenFileCookie::AddLock(LockInfo* lock)
 {
+	ASSERT(lock != NULL);
+
 	lock->fCookieNext = fLocks;
 	fLocks = lock;
 }
@@ -158,8 +165,10 @@ OpenFileCookie::RemoveLock(LockInfo* lock, LockInfo* prev)
 {
 	if (prev != NULL)
 		prev->fCookieNext = lock->fCookieNext;
-	else
+	else {
+		ASSERT(prev == NULL && fLocks == lock);
 		fLocks = lock->fCookieNext;
+	}
 }
 
 

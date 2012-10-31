@@ -46,6 +46,7 @@ Request::Request(RPC::Server* server, FileSystem* fileSystem)
 	fServer(server),
 	fFileSystem(fileSystem)
 {
+	ASSERT(server != NULL);
 }
 
 

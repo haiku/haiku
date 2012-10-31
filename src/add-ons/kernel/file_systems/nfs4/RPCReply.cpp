@@ -9,6 +9,7 @@
 
 #include "RPCReply.h"
 
+#include <debug.h>
 #include <util/kernel_cpp.h>
 
 #include "RPCDefs.h"
@@ -23,6 +24,8 @@ Reply::Reply(void* buffer, int size)
 	fStream(buffer, size),
 	fBuffer(buffer)
 {
+	ASSERT(buffer != NULL);
+
 	fXID = fStream.GetUInt();
 	if (fStream.GetInt() != REPLY) {
 		fError = B_BAD_VALUE;

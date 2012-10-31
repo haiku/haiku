@@ -35,6 +35,8 @@ RootInode::~RootInode()
 status_t
 RootInode::ReadInfo(struct fs_info* info)
 {
+	ASSERT(info != NULL);
+
 	status_t result = _UpdateInfo();
 	if (result != B_OK)
 		return result;
@@ -172,6 +174,8 @@ RootInode::ProbeMigration()
 status_t
 RootInode::GetLocations(AttrValue** attrv)
 {
+	ASSERT(attrv != NULL);
+
 	do {
 		RPC::Server* server = fFileSystem->Server();
 		Request request(server, fFileSystem);
@@ -209,6 +213,7 @@ RootInode::GetLocations(AttrValue** attrv)
 const char*
 RootInode::Name() const
 {
+	ASSERT(fName != NULL);
 	return fName;
 }
 

@@ -11,6 +11,8 @@
 
 #include <stdlib.h>
 
+#include <debug.h>
+
 #include "NFS4Defs.h"
 #include "RPCDefs.h"
 
@@ -25,6 +27,8 @@ CallbackRequest::CallbackRequest(void* buffer, int size)
 	fStream(buffer, size),
 	fBuffer(buffer)
 {
+	ASSERT(buffer != NULL);
+
 	fXID = fStream.GetUInt();
 
 	if (fStream.GetUInt() != CALL)

@@ -50,6 +50,8 @@ CallbackServer::~CallbackServer()
 status_t
 CallbackServer::RegisterCallback(Callback* callback)
 {
+	ASSERT(callback != NULL);
+
 	status_t result = StartServer();
 	if (result != B_OK)
 		return result;
@@ -88,6 +90,8 @@ CallbackServer::RegisterCallback(Callback* callback)
 status_t
 CallbackServer::UnregisterCallback(Callback* callback)
 {
+	ASSERT(callback != NULL);
+
 	int32 id = callback->ID();
 
 	WriteLocker _(fArrayLock);
@@ -161,6 +165,8 @@ CallbackServer::StopServer()
 status_t
 CallbackServer::NewConnection(Connection* connection)
 {
+	ASSERT(connection != NULL);
+
 	ConnectionEntry* entry = new ConnectionEntry;
 	entry->fConnection = connection;
 	entry->fPrev = NULL;
@@ -205,6 +211,8 @@ CallbackServer::NewConnection(Connection* connection)
 status_t
 CallbackServer::ReleaseConnection(ConnectionEntry* entry)
 {
+	ASSERT(entry != NULL);
+
 	MutexLocker _(fConnectionLock);
 	if (entry->fNext != NULL)
 		entry->fNext->fPrev = entry->fPrev;
@@ -222,6 +230,8 @@ CallbackServer::ReleaseConnection(ConnectionEntry* entry)
 status_t
 CallbackServer::ConnectionThreadLauncher(void* object)
 {
+	ASSERT(object != NULL);
+
 	void** objects = reinterpret_cast<void**>(object);
 	CallbackServer* server = reinterpret_cast<CallbackServer*>(objects[0]);
 	ConnectionEntry* entry = reinterpret_cast<ConnectionEntry*>(objects[1]);
@@ -234,6 +244,8 @@ CallbackServer::ConnectionThreadLauncher(void* object)
 status_t
 CallbackServer::ConnectionThread(ConnectionEntry* entry)
 {
+	ASSERT(entry != NULL);
+
 	Connection* connection = entry->fConnection;
 	CallbackReply* reply;
 
@@ -287,6 +299,8 @@ CallbackServer::ConnectionThread(ConnectionEntry* entry)
 status_t
 CallbackServer::ListenerThreadLauncher(void* object)
 {
+	ASSERT(object != NULL);
+
 	CallbackServer* server = reinterpret_cast<CallbackServer*>(object);
 	return server->ListenerThread();
 }

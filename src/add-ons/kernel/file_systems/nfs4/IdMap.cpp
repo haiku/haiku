@@ -38,6 +38,7 @@ IdMap::~IdMap()
 uid_t
 IdMap::GetUserId(const char* owner)
 {
+	ASSERT(owner != NULL);
 	return _GetValue<uid_t>(owner, MsgNameToUID);
 }
 
@@ -45,6 +46,7 @@ IdMap::GetUserId(const char* owner)
 gid_t
 IdMap::GetGroupId(const char* ownerGroup)
 {
+	ASSERT(ownerGroup != NULL);
 	return _GetValue<gid_t>(ownerGroup, MsgNameToGID);
 }
 
@@ -67,6 +69,8 @@ template<typename T>
 T
 IdMap::_GetValue(const char* buffer, int32 code)
 {
+	ASSERT(buffer != NULL);
+
 	MutexLocker _(fLock);
 	do {
 		status_t result = write_port(fRequestPort, MsgNameToUID, buffer,

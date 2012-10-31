@@ -63,6 +63,8 @@ RootInode::IOSize()
 inline void
 RootInode::SetName(const char* name)
 {
+	ASSERT(name != NULL);
+
 	free(const_cast<char*>(fName));
 	fName = strdup(name);
 }

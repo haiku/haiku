@@ -143,6 +143,9 @@ status_t
 NFS4Object::ConfirmOpen(const FileHandle& fh, OpenState* state,
 	uint32* sequence)
 {
+	ASSERT(state != NULL);
+	ASSERT(sequence != NULL);
+
 	do {
 		RPC::Server* serv = fFileSystem->Server();
 		Request request(serv, fFileSystem);

@@ -21,6 +21,7 @@ MetadataCache::MetadataCache(Inode* inode)
 	fInode(inode),
 	fInited(false)
 {
+	ASSERT(inode != NULL);
 	mutex_init(&fLock, NULL);
 }
 
@@ -34,6 +35,8 @@ MetadataCache::~MetadataCache()
 status_t
 MetadataCache::GetStat(struct stat* st)
 {
+	ASSERT(st != NULL);
+
 	MutexLocker _(fLock);
 	if (fForceValid || fExpire > time(NULL)) {
 		// Do not touch other members of struct stat
@@ -79,6 +82,8 @@ MetadataCache::GrowFile(size_t newSize)
 status_t
 MetadataCache::GetAccess(uid_t uid, uint32* allowed)
 {
+	ASSERT(allowed != NULL);
+
 	MutexLocker _(fLock);
 	AVLTreeMap<uid_t, AccessEntry>::Iterator it = fAccessCache.Find(uid);
 	if (!it.HasCurrent())
@@ -141,6 +146,9 @@ void
 MetadataCache::NotifyChanges(const struct stat* oldStat,
 	const struct stat* newStat)
 {
+	ASSERT(oldStat != NULL);
+	ASSERT(newStat != NULL);
+
 	uint32 flags = 0;
 	if (oldStat->st_size != newStat->st_size)
 		flags |= B_STAT_SIZE;

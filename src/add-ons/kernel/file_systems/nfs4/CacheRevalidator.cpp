@@ -59,6 +59,8 @@ CacheRevalidator::_StartRevalidator()
 status_t
 CacheRevalidator::_DirectoryRevalidatorStart(void* object)
 {
+	ASSERT(object != NULL);
+
 	CacheRevalidator* revalidator = reinterpret_cast<CacheRevalidator*>(object);
 	revalidator->_DirectoryCacheRevalidator();
 	return B_OK;
