@@ -841,7 +841,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 
 	# BSD and GNU compatibility headers
 	AddHeaderDirectoryToHaikuImage compatibility bsd : bsd ;
-	AddHeaderDirectoryToHaikuImage compatibility gnu : 3rdparty ;
+	AddHeaderDirectoryToHaikuImage compatibility gnu : gnu ;
 
 	# third party libs headers
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
