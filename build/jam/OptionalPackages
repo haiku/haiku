@@ -1651,8 +1651,8 @@ if [ IsOptionalHaikuImagePackageAdded Puri ] {
 		Echo "No optional package Puri for gcc2" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			puri-0.3.9.1-r1a4-x86-gcc4-2012-08-31.zip
-			: $(baseURL)/puri-0.3.9.1-r1a4-x86-gcc4-2012-08-31.zip ;
+			puri-0.3.9.1-x86-gcc4-2012-11-01.zip
+			: $(baseURL)/puri-0.3.9.1-x86-gcc4-2012-11-01.zip ;
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/Puri/Puri ;
 	}
