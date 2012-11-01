@@ -25,7 +25,9 @@
 #include "RPCServer.h"
 #include "WorkQueue.h"
 
+#ifdef DEBUG
 #define TRACE_NFS4
+#endif
 
 #ifdef TRACE_NFS4
 static mutex	gTraceLock	= MUTEX_INITIALIZER(NULL);
@@ -33,7 +35,7 @@ static mutex	gTraceLock	= MUTEX_INITIALIZER(NULL);
 #define TRACE(x...)	\
 	{	\
 		mutex_lock(&gTraceLock);	\
-		dprintf("%s(): ", __FUNCTION__);	\
+		dprintf("nfs4: %s(): ", __FUNCTION__);	\
 		dprintf(x);	\
 		dprintf("\n");	\
 		mutex_unlock(&gTraceLock);	\
@@ -251,9 +253,12 @@ nfs4_read_fs_info(fs_volume* volume, struct fs_info* info)
 static status_t
 nfs4_lookup(fs_volume* volume, fs_vnode* dir, const char* name, ino_t* _id)
 {
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
 	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
-
+	
 	TRACE("volume = %p, dir = %llu, name = %s", volume, inode->ID(), name);
+
+	ReadLocker(fs->fRemoveNodeLock);
 
 	status_t result = inode->LookUp(name, _id);
 	if (result != B_OK)
@@ -262,7 +267,9 @@ nfs4_lookup(fs_volume* volume, fs_vnode* dir, const char* name, ino_t* _id)
 	void* ptr;
 
 	TRACE("*_id = %llu", *_id);
-	return get_vnode(volume, *_id, &ptr);
+	result = get_vnode(volume, *_id, &ptr);
+	unremove_vnode(volume, *_id);
+	return result;
 }
 
 
@@ -485,8 +492,11 @@ static status_t
 nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
 
 	TRACE("volume = %p, dir = %llu, name = %s", volume, inode->ID(), name);
+
+	WriteLocker(fs->fRemoveNodeLock);
 
 	ino_t id;
 	status_t result = inode->Remove(name, NF4REG, &id);
@@ -503,10 +513,13 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 {
 	Inode* fromInode = reinterpret_cast<Inode*>(fromDir->private_node);
 	Inode* toInode = reinterpret_cast<Inode*>(toDir->private_node);
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
 
 	TRACE("volume = %p, fromDir = %llu, toDir = %llu, fromName = %s, "	\
 		"toName = %s", volume, fromInode->ID(), toInode->ID(), fromName,
 		toName);
+
+	ReadLocker(fs->fRemoveNodeLock);
 
 	ino_t id;
 	status_t result = Inode::Rename(fromInode, toInode, fromName, toName, false,
@@ -517,6 +530,8 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 	Inode* child;
 	result = get_vnode(volume, id, reinterpret_cast<void**>(&child));
 	if (result == B_OK) {
+		unremove_vnode(volume, id);
+
 		child->fInfo.fParent = toInode->fInfo.fHandle;
 		child->fInfo.CreateName(toInode->fInfo.fPath, toName);
 	}
@@ -564,9 +579,12 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	*_cookie = cookie;
 
 	Inode* inode = reinterpret_cast<Inode*>(dir->private_node);
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
 
 	TRACE("volume = %p, dir = %llu, name = %s, openMode = %d, perms = %d",
 		volume, inode->ID(), name, openMode, perms);
+
+	ReadLocker(fs->fRemoveNodeLock);
 
 	OpenDelegationData data;
 	status_t result = inode->Create(name, openMode, perms, cookie, &data,
@@ -591,7 +609,8 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 			delete cookie;
 			return result;
 		}
-	}
+	} else
+		unremove_vnode(volume, *_newVnodeID);
 
 	child->SetOpenState(cookie->fOpenState);
 
@@ -732,7 +751,11 @@ static status_t
 nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 {
 	Inode* inode = reinterpret_cast<Inode*>(parent->private_node);
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+
 	TRACE("volume = %p, parent = %llu, name = %s", volume, inode->ID(), name);
+	WriteLocker(fs->fRemoveNodeLock);
+
 	ino_t id;
 	status_t result = inode->Remove(name, NF4DIR, &id);
 	if (result != B_OK)

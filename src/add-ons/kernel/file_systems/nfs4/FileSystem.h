@@ -78,6 +78,8 @@ public:
 
 			FileSystem*			fNext;
 			FileSystem*			fPrev;
+
+			rw_lock				fRemoveNodeLock;
 private:
 								FileSystem(const MountConfiguration& config);
 

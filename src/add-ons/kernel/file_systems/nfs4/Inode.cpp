@@ -281,6 +281,8 @@ Inode::Remove(const char* name, FileType type, ino_t* id)
 	status_t result = NFS4Inode::RemoveObject(name, type, &changeInfo, &fileID);
 	if (result != B_OK)
 		return result;
+	if (type != NF4NAMEDATTR)
+		fFileSystem->InoIdMap()->MarkRemoved(fileID);
 
 	DirectoryCache* cache = type != NF4NAMEDATTR ? fCache : fAttrCache;
 	cache->Lock();
