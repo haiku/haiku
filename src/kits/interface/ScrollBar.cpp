@@ -1173,7 +1173,7 @@ BScrollBar::Draw(BRect updateRect)
 	float hmiddle = rect.Width() / 2;
 	float vmiddle = rect.Height() / 2;
 
-	BRect middleMark = BRect(
+	BRect middleKnob = BRect(
 		rect.left + hmiddle
 			- (fOrientation == B_HORIZONTAL ? hextent : vextent),
 		rect.top + vmiddle
@@ -1184,33 +1184,33 @@ BScrollBar::Draw(BRect updateRect)
 			+ (fOrientation == B_HORIZONTAL ? vextent : hextent));
 
 	if (fOrientation == B_HORIZONTAL) {
-		BRect leftMark = middleMark.OffsetByCopy(hextent * -4, 0);
-		if (leftMark.left > rect.left + hextent) {
-			be_control_look->DrawButtonBackground(this, leftMark, updateRect,
+		BRect leftKnob = middleKnob.OffsetByCopy(hextent * -4, 0);
+		if (leftKnob.left > rect.left + hextent) {
+			be_control_look->DrawButtonBackground(this, leftKnob, updateRect,
 				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 		}
 
-		BRect rightMark = middleMark.OffsetByCopy(hextent * 4, 0);
-		if (rightMark.right < rect.right - hextent) {
-			be_control_look->DrawButtonBackground(this, rightMark, updateRect,
+		BRect rightKnob = middleKnob.OffsetByCopy(hextent * 4, 0);
+		if (rightKnob.right < rect.right - hextent) {
+			be_control_look->DrawButtonBackground(this, rightKnob, updateRect,
 				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 		}
 	} else {
-		BRect topMark = middleMark.OffsetByCopy(0, hextent * -4);
-		if (topMark.top > rect.top + vextent) {
-			be_control_look->DrawButtonBackground(this, topMark, updateRect,
+		BRect topKnob = middleKnob.OffsetByCopy(0, hextent * -4);
+		if (topKnob.top > rect.top + vextent) {
+			be_control_look->DrawButtonBackground(this, topKnob, updateRect,
 				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 		}
 
-		BRect bottomMark = middleMark.OffsetByCopy(0, hextent * 4);
-		if (bottomMark.bottom < rect.bottom - vextent) {
-			be_control_look->DrawButtonBackground(this, bottomMark, updateRect,
+		BRect bottomKnob = middleKnob.OffsetByCopy(0, hextent * 4);
+		if (bottomKnob.bottom < rect.bottom - vextent) {
+			be_control_look->DrawButtonBackground(this, bottomKnob, updateRect,
 				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 		}
 	}
 
-	// draw middle mark last because it modifies middleMark
-	be_control_look->DrawButtonBackground(this, middleMark, updateRect,
+	// draw middle mark last because it modifies middleKnob
+	be_control_look->DrawButtonBackground(this, middleKnob, updateRect,
 		normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 }
 
