@@ -1152,6 +1152,66 @@ BScrollBar::Draw(BRect updateRect)
 			FillRect(rect);
 		}
 	}
+
+	bool square = false;
+	int32 hextent = 0;
+	int32 vextent = 0;
+
+	if (square) {
+		hextent = 2;
+		vextent = 2;
+	} else {
+		hextent = 1;
+		vextent = 3;
+	}
+
+	// draw the marks on the scrollbar thumb
+	int32 flags = 0;
+	if (!enabled)
+		flags |= BControlLook::B_DISABLED;
+
+	float hmiddle = rect.Width() / 2;
+	float vmiddle = rect.Height() / 2;
+
+	BRect middleMark = BRect(
+		rect.left + hmiddle
+			- (fOrientation == B_HORIZONTAL ? hextent : vextent),
+		rect.top + vmiddle
+			- (fOrientation == B_HORIZONTAL ? vextent : hextent),
+		rect.left + hmiddle
+			+ (fOrientation == B_HORIZONTAL ? hextent : vextent),
+		rect.top + vmiddle
+			+ (fOrientation == B_HORIZONTAL ? vextent : hextent));
+
+	if (fOrientation == B_HORIZONTAL) {
+		BRect leftMark = middleMark.OffsetByCopy(hextent * -4, 0);
+		if (leftMark.left > rect.left + hextent) {
+			be_control_look->DrawButtonBackground(this, leftMark, updateRect,
+				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
+		}
+
+		BRect rightMark = middleMark.OffsetByCopy(hextent * 4, 0);
+		if (rightMark.right < rect.right - hextent) {
+			be_control_look->DrawButtonBackground(this, rightMark, updateRect,
+				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
+		}
+	} else {
+		BRect topMark = middleMark.OffsetByCopy(0, hextent * -4);
+		if (topMark.top > rect.top + vextent) {
+			be_control_look->DrawButtonBackground(this, topMark, updateRect,
+				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
+		}
+
+		BRect bottomMark = middleMark.OffsetByCopy(0, hextent * 4);
+		if (bottomMark.bottom < rect.bottom - vextent) {
+			be_control_look->DrawButtonBackground(this, bottomMark, updateRect,
+				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
+		}
+	}
+
+	// draw middle mark last because it modifies middleMark
+	be_control_look->DrawButtonBackground(this, middleMark, updateRect,
+		normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 }
 
 
