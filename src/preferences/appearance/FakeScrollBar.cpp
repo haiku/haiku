@@ -148,30 +148,30 @@ FakeScrollBar::Draw(BRect updateRect)
 
 	// draw the scrollbar thumb knobs
 	bool square = fKnobStyle == B_KNOB_STYLE_DOTS;
-	int32 hextent = 0;
-	int32 vextent = 0;
+	int32 knobWidth = 0;
+	int32 knobHeight = 0;
 
 	if (square) {
-		hextent = 2;
-		vextent = 2;
+		knobWidth = 2;
+		knobHeight = 2;
 	} else {
-		hextent = 1;
-		vextent = 3;
+		knobWidth = 1;
+		knobHeight = 3;
 	}
 
 	float hmiddle = bgRect.Width() / 2;
 	float vmiddle = bgRect.Height() / 2;
 
-	BRect middleKnob = BRect(bgRect.left + hmiddle - hextent,
-		bgRect.top + vmiddle - vextent,
-		bgRect.left + hmiddle + hextent,
-		bgRect.top + vmiddle + vextent);
+	BRect middleKnob = BRect(bgRect.left + hmiddle - knobWidth,
+		bgRect.top + vmiddle - knobHeight,
+		bgRect.left + hmiddle + knobWidth,
+		bgRect.top + vmiddle + knobHeight);
 
-	BRect leftKnob = middleKnob.OffsetByCopy(hextent * -4, 0);
+	BRect leftKnob = middleKnob.OffsetByCopy(knobWidth * -4, 0);
 	be_control_look->DrawButtonBackground(this, leftKnob, updateRect,
 		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
 
-	BRect rightKnob = middleKnob.OffsetByCopy(hextent * 4, 0);
+	BRect rightKnob = middleKnob.OffsetByCopy(knobWidth * 4, 0);
 	be_control_look->DrawButtonBackground(this, rightKnob, updateRect,
 		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
 

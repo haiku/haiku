@@ -1159,15 +1159,15 @@ BScrollBar::Draw(BRect updateRect)
 
 	// draw the scrollbar thumb knobs
 	bool square = fPrivateData->fScrollBarInfo.knob == B_KNOB_STYLE_DOTS;
-	int32 hextent = 0;
-	int32 vextent = 0;
+	int32 knobWidth = 0;
+	int32 knobHeight = 0;
 
 	if (square) {
-		hextent = 2;
-		vextent = 2;
+		knobWidth = 2;
+		knobHeight = 2;
 	} else {
-		hextent = 1;
-		vextent = 3;
+		knobWidth = 1;
+		knobHeight = 3;
 	}
 
 	int32 flags = 0;
@@ -1179,35 +1179,35 @@ BScrollBar::Draw(BRect updateRect)
 
 	BRect middleKnob = BRect(
 		rect.left + hmiddle
-			- (fOrientation == B_HORIZONTAL ? hextent : vextent),
+			- (fOrientation == B_HORIZONTAL ? knobWidth : knobHeight),
 		rect.top + vmiddle
-			- (fOrientation == B_HORIZONTAL ? vextent : hextent),
+			- (fOrientation == B_HORIZONTAL ? knobHeight : knobWidth),
 		rect.left + hmiddle
-			+ (fOrientation == B_HORIZONTAL ? hextent : vextent),
+			+ (fOrientation == B_HORIZONTAL ? knobWidth : knobHeight),
 		rect.top + vmiddle
-			+ (fOrientation == B_HORIZONTAL ? vextent : hextent));
+			+ (fOrientation == B_HORIZONTAL ? knobHeight : knobWidth));
 
 	if (fOrientation == B_HORIZONTAL) {
-		BRect leftKnob = middleKnob.OffsetByCopy(hextent * -4, 0);
-		if (leftKnob.left > rect.left + hextent) {
+		BRect leftKnob = middleKnob.OffsetByCopy(knobWidth * -4, 0);
+		if (leftKnob.left > rect.left + knobWidth) {
 			be_control_look->DrawButtonBackground(this, leftKnob, updateRect,
 				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 		}
 
-		BRect rightKnob = middleKnob.OffsetByCopy(hextent * 4, 0);
-		if (rightKnob.right < rect.right - hextent) {
+		BRect rightKnob = middleKnob.OffsetByCopy(knobWidth * 4, 0);
+		if (rightKnob.right < rect.right - knobWidth) {
 			be_control_look->DrawButtonBackground(this, rightKnob, updateRect,
 				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 		}
 	} else {
-		BRect topKnob = middleKnob.OffsetByCopy(0, hextent * -4);
-		if (topKnob.top > rect.top + vextent) {
+		BRect topKnob = middleKnob.OffsetByCopy(0, knobWidth * -4);
+		if (topKnob.top > rect.top + knobHeight) {
 			be_control_look->DrawButtonBackground(this, topKnob, updateRect,
 				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 		}
 
-		BRect bottomKnob = middleKnob.OffsetByCopy(0, hextent * 4);
-		if (bottomKnob.bottom < rect.bottom - vextent) {
+		BRect bottomKnob = middleKnob.OffsetByCopy(0, knobWidth * 4);
+		if (bottomKnob.bottom < rect.bottom - knobHeight) {
 			be_control_look->DrawButtonBackground(this, bottomKnob, updateRect,
 				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 		}
