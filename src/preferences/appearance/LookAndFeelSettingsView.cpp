@@ -85,9 +85,9 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 
 	fSavedDoubleArrowsValue = _DoubleScrollBarArrows();
 
-	fArrowStyleSingle = new FakeScrollBar(true, false, KNOB_STYLE_LINES,
+	fArrowStyleSingle = new FakeScrollBar(true, false, B_KNOB_STYLE_LINES,
 		new BMessage(kMsgArrowStyleSingle));
-	fArrowStyleDouble = new FakeScrollBar(true, true, KNOB_STYLE_LINES,
+	fArrowStyleDouble = new FakeScrollBar(true, true, B_KNOB_STYLE_LINES,
 		new BMessage(kMsgArrowStyleDouble));
 
 	BView* arrowStyleView;
@@ -111,11 +111,11 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 	BBox* knobStyleBox = new BBox("knob style");
 	knobStyleBox->SetLabel(B_TRANSLATE("Knob style"));
 
-	fKnobStyleNone = new FakeScrollBar(false, false, KNOB_STYLE_NONE,
+	fKnobStyleNone = new FakeScrollBar(false, false, B_KNOB_STYLE_NONE,
 		new BMessage(kMsgKnobStyleNone));
-	fKnobStyleDots = new FakeScrollBar(false, false, KNOB_STYLE_DOTS,
+	fKnobStyleDots = new FakeScrollBar(false, false, B_KNOB_STYLE_DOTS,
 		new BMessage(kMsgKnobStyleDots));
-	fKnobStyleLines = new FakeScrollBar(false, false, KNOB_STYLE_LINES,
+	fKnobStyleLines = new FakeScrollBar(false, false, B_KNOB_STYLE_LINES,
 		new BMessage(kMsgKnobStyleLines));
 
 	BView* knobStyleView;
@@ -184,15 +184,15 @@ LookAndFeelSettingsView::AttachedToWindow()
 		fArrowStyleSingle->SetValue(B_CONTROL_ON);
 
 	switch (fSavedKnobStyleValue) {
-		case KNOB_STYLE_NONE:
+		case B_KNOB_STYLE_NONE:
 			fKnobStyleNone->SetValue(B_CONTROL_ON);
 			break;
 
-		case KNOB_STYLE_DOTS:
+		case B_KNOB_STYLE_DOTS:
 			fKnobStyleDots->SetValue(B_CONTROL_ON);
 			break;
 
-		case KNOB_STYLE_LINES:
+		case B_KNOB_STYLE_LINES:
 			fKnobStyleLines->SetValue(B_CONTROL_ON);
 			break;
 	}
@@ -249,15 +249,15 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 			break;
 
 		case kMsgKnobStyleNone:
-			_SetScrollBarKnobStyle(KNOB_STYLE_NONE);
+			_SetScrollBarKnobStyle(B_KNOB_STYLE_NONE);
 			break;
 
 		case kMsgKnobStyleDots:
-			_SetScrollBarKnobStyle(KNOB_STYLE_DOTS);
+			_SetScrollBarKnobStyle(B_KNOB_STYLE_DOTS);
 			break;
 
 		case kMsgKnobStyleLines:
-			_SetScrollBarKnobStyle(KNOB_STYLE_LINES);
+			_SetScrollBarKnobStyle(B_KNOB_STYLE_LINES);
 			break;
 
 		default:
@@ -379,15 +379,15 @@ LookAndFeelSettingsView::_SetScrollBarKnobStyle(int32 knobStyle)
 	set_scroll_bar_info(&info);
 
 	switch (knobStyle) {
-		case KNOB_STYLE_NONE:
+		case B_KNOB_STYLE_NONE:
 			fKnobStyleNone->SetValue(B_CONTROL_ON);
 			break;
 
-		case KNOB_STYLE_DOTS:
+		case B_KNOB_STYLE_DOTS:
 			fKnobStyleDots->SetValue(B_CONTROL_ON);
 			break;
 
-		case KNOB_STYLE_LINES:
+		case B_KNOB_STYLE_LINES:
 			fKnobStyleLines->SetValue(B_CONTROL_ON);
 			break;
 	}
@@ -401,7 +401,7 @@ LookAndFeelSettingsView::IsDefaultable()
 {
 	return fCurrentDecor != fDecorUtility.DefaultDecorator()->Name()
 		|| _DoubleScrollBarArrows() != false
-		|| _ScrollBarKnobStyle() != KNOB_STYLE_DOTS;
+		|| _ScrollBarKnobStyle() != B_KNOB_STYLE_DOTS;
 }
 
 
@@ -410,7 +410,7 @@ LookAndFeelSettingsView::SetDefaults()
 {
 	_SetDecor(fDecorUtility.DefaultDecorator());
 	_SetDoubleScrollBarArrows(false);
-	_SetScrollBarKnobStyle(KNOB_STYLE_DOTS);
+	_SetScrollBarKnobStyle(B_KNOB_STYLE_DOTS);
 }
 
 

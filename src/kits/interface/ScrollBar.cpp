@@ -1154,11 +1154,11 @@ BScrollBar::Draw(BRect updateRect)
 		}
 	}
 
-	if (fPrivateData->fScrollBarInfo.knob == KNOB_STYLE_NONE)
+	if (fPrivateData->fScrollBarInfo.knob == B_KNOB_STYLE_NONE)
 		return;
 
 	// draw the scrollbar thumb knobs
-	bool square = fPrivateData->fScrollBarInfo.knob == KNOB_STYLE_DOTS;
+	bool square = fPrivateData->fScrollBarInfo.knob == B_KNOB_STYLE_DOTS;
 	int32 hextent = 0;
 	int32 vextent = 0;
 

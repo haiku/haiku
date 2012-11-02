@@ -20,10 +20,11 @@
 
 
 enum {
-	KNOB_STYLE_NONE = 0,
-	KNOB_STYLE_DOTS,
-	KNOB_STYLE_LINES
+	B_KNOB_STYLE_NONE = 0,
+	B_KNOB_STYLE_DOTS,
+	B_KNOB_STYLE_LINES
 };
+
 
 class BScrollBar : public BView {
 public:

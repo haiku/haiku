@@ -143,11 +143,11 @@ FakeScrollBar::Draw(BRect updateRect)
 	be_control_look->DrawButtonBackground(this, bgRect, updateRect,
 		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
 
-	if (fKnobStyle == KNOB_STYLE_NONE)
+	if (fKnobStyle == B_KNOB_STYLE_NONE)
 		return;
 
 	// draw the scrollbar thumb knobs
-	bool square = fKnobStyle == KNOB_STYLE_DOTS;
+	bool square = fKnobStyle == B_KNOB_STYLE_DOTS;
 	int32 hextent = 0;
 	int32 vextent = 0;
 
