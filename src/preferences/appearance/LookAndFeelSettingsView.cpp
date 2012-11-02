@@ -92,12 +92,13 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 
 	BView* arrowStyleView;
 	arrowStyleView = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 0)
+		.AddGroup(B_VERTICAL, 1)
 			.Add(new BStringView("single", B_TRANSLATE("Single:")))
 			.Add(fArrowStyleSingle)
 			.Add(new BStringView("spacer", ""))
 			.Add(new BStringView("double", B_TRANSLATE("Double:")))
 			.Add(fArrowStyleDouble)
+			.Add(BSpaceLayoutItem::CreateVerticalStrut(0))
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
