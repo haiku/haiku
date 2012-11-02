@@ -168,16 +168,12 @@ FakeScrollBar::Draw(BRect updateRect)
 		bgRect.top + vmiddle + vextent);
 
 	BRect leftKnob = middleKnob.OffsetByCopy(hextent * -4, 0);
-	if (leftKnob.left > bgRect.left + hextent) {
-		be_control_look->DrawButtonBackground(this, leftKnob, updateRect,
-			normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
-	}
+	be_control_look->DrawButtonBackground(this, leftKnob, updateRect,
+		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
 
 	BRect rightKnob = middleKnob.OffsetByCopy(hextent * 4, 0);
-	if (rightKnob.right < bgRect.right - hextent) {
-		be_control_look->DrawButtonBackground(this, rightKnob, updateRect,
-			normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
-	}
+	be_control_look->DrawButtonBackground(this, rightKnob, updateRect,
+		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
 
 	// draw middle knob last because it modifies middleKnob
 	be_control_look->DrawButtonBackground(this, middleKnob, updateRect,
