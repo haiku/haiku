@@ -31,7 +31,7 @@ typedef enum {
 FakeScrollBar::FakeScrollBar(bool drawArrows, bool doubleArrows,
 	int32 knobStyle, BMessage* message)
 	:
-	BControl("FakeScrollBar", NULL, message, B_WILL_DRAW),
+	BControl("FakeScrollBar", NULL, message, B_WILL_DRAW | B_NAVIGABLE),
 	fDrawArrows(drawArrows),
 	fDoubleArrows(doubleArrows),
 	fKnobStyle(knobStyle)
@@ -53,16 +53,32 @@ FakeScrollBar::Draw(BRect updateRect)
 
 	rgb_color normal = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-	if (Value() == B_CONTROL_ON)
-		SetHighColor(ui_color(B_CONTROL_MARK_COLOR));
-	else
-		SetHighColor(normal);
+	if (IsFocus()) {
+		// draw the focus indicator
+		SetHighColor(ui_color(B_NAVIGATION_BASE_COLOR));
+		StrokeRect(bounds);
+		bounds.InsetBy(1.0, 1.0);
 
-	// Draw the selected border (2px)
-	StrokeRect(bounds);
-	bounds.InsetBy(1.0, 1.0);
-	StrokeRect(bounds);
-	bounds.InsetBy(1.0, 1.0);
+		// Draw the selected border (1px)
+		if (Value() == B_CONTROL_ON)
+			SetHighColor(ui_color(B_CONTROL_MARK_COLOR));
+		else
+			SetHighColor(normal);
+
+		StrokeRect(bounds);
+		bounds.InsetBy(1.0, 1.0);
+	} else {
+		// Draw the selected border (2px)
+		if (Value() == B_CONTROL_ON)
+			SetHighColor(ui_color(B_CONTROL_MARK_COLOR));
+		else
+			SetHighColor(normal);
+
+		StrokeRect(bounds);
+		bounds.InsetBy(1.0, 1.0);
+		StrokeRect(bounds);
+		bounds.InsetBy(1.0, 1.0);
+	}
 
 	// draw a gap (1px)
 	SetHighColor(normal);
