@@ -47,6 +47,11 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	if (status == 0 || status == 0xffffffff ||
 	    (sc->msk_pflags & MSK_FLAG_SUSPEND) != 0 ||
 	    (status & sc->msk_intrmask) == 0) {
+
+		/* Clear possibly spurious TWSI IRQ, see FreeBSD r234666. */
+		if ((status & Y2_IS_TWSI_RDY) != 0)
+			CSR_WRITE_4(sc, B2_I2C_IRQ, 1);
+
 		CSR_WRITE_4(sc, B0_Y2_SP_ICR, 2);
 		return 0;
 	}
