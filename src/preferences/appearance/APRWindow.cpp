@@ -50,19 +50,19 @@ APRWindow::APRWindow(BRect frame)
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
 
+	fLookAndFeelSettings = new LookAndFeelSettingsView(
+		B_TRANSLATE("Look and feel"));
+
 	fFontSettings = new FontView(B_TRANSLATE("Fonts"));
 
 	fColorsView = new APRView(B_TRANSLATE("Colors"));
 
-	fLookAndFeelSettings = new LookAndFeelSettingsView(
-		B_TRANSLATE("Look and feel"));
-
 	fAntialiasingSettings = new AntialiasingSettingsView(
 		B_TRANSLATE("Antialiasing"));
 
+	tabView->AddTab(fLookAndFeelSettings);
 	tabView->AddTab(fFontSettings);
 	tabView->AddTab(fColorsView);
-	tabView->AddTab(fLookAndFeelSettings);
 	tabView->AddTab(fAntialiasingSettings);
 
 	_UpdateButtons();
