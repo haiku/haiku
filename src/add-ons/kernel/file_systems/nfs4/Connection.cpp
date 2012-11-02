@@ -372,6 +372,9 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 	object[1].events = B_EVENT_READ;
 
 	do {
+		object[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
+		object[1].events = B_EVENT_READ;
+
 		result = wait_for_objects(object, 2);
 		if (result < B_OK
 			|| (object[0].events & B_EVENT_ACQUIRE_SEMAPHORE) != 0) {
@@ -383,7 +386,7 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 		// There is only one listener thread per connection. No need to lock.
 		uint32 received = 0;
 		do {
-			result = recv(fSocket, &record_size + received,
+			result = recv(fSocket, ((uint8*)&record_size) + received,
 							sizeof(record_size) - received, 0);
 			received += result;
 		} while (result > 0 && received < sizeof(record_size));
@@ -397,6 +400,8 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 		}
 
 		record_size = ntohl(record_size);
+		ASSERT(record_size > 0);
+
 		last_one = static_cast<int32>(record_size) < 0;
 		record_size &= LAST_FRAGMENT - 1;
 
@@ -417,6 +422,9 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 			result = errno;
 			free(buffer);
 			return result;
+		} else if (result == 0) {
+			free(buffer);
+			return ECONNABORTED;
 		}
 
 		size += record_size;
@@ -453,6 +461,9 @@ ConnectionPacket::Receive(void** _buffer, uint32* _size)
 	object[1].events = B_EVENT_READ;
 
 	do {
+		object[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
+		object[1].events = B_EVENT_READ;
+
 		result = wait_for_objects(object, 2);
 		if (result < B_OK
 			|| (object[0].events & B_EVENT_ACQUIRE_SEMAPHORE) != 0) {
@@ -719,6 +730,9 @@ ConnectionListener::AcceptConnection(Connection** connection)
 	object[1].events = B_EVENT_READ;
 
 	do {
+		object[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
+		object[1].events = B_EVENT_READ;
+
 		status_t result = wait_for_objects(object, 2);
 		if (result < B_OK
 			|| (object[0].events & B_EVENT_ACQUIRE_SEMAPHORE) != 0) {

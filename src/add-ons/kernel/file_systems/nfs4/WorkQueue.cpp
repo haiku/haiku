@@ -115,8 +115,8 @@ void
 WorkQueue::DequeueJob()
 {
 	MutexLocker locker(fQueueLock);
-
 	WorkQueueEntry* entry = fQueue.RemoveHead();
+	locker.Unlock();
 	ASSERT(entry != NULL);
 
 	void* args = entry->fArguments;

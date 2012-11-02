@@ -265,7 +265,7 @@ Server::_Listener()
 {
 	status_t result;
 	uint32 size;
-	void* buffer;
+	void* buffer = NULL;
 
 	while (!fThreadCancel) {
 		result = fConnection->Receive(&buffer, &size);
@@ -275,7 +275,8 @@ Server::_Listener()
 			fThreadError = result;
 			return result;
 		}
-		
+
+		ASSERT(buffer != NULL && size > 0);
 		Reply* reply = new(std::nothrow) Reply(buffer, size);
 		if (reply == NULL) {
 			free(buffer);
