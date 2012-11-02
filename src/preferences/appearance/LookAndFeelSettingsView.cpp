@@ -3,8 +3,9 @@
  *  Distributed under the terms of the MIT license.
  *
  *	Authors:
- *		Alexander von Gluck, kallisti5@unixzen.com
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Alexander von Gluck <kallisti5@unixzen.com>
+ *		John Scipione <jscipione@gmail.com>
  *		Ryan Leavengood <leavengood@gmail.com>
  */
 
@@ -22,15 +23,22 @@
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <InterfaceDefs.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <RadioButton.h>
+#include <ScrollBar.h>
+#include <StringView.h>
+#include <Size.h>
 #include <Slider.h>
 #include <SpaceLayoutItem.h>
+#include <StringView.h>
 #include <TextView.h>
 
 #include "APRWindow.h"
+#include "FakeScrollBar.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -40,9 +48,17 @@
 
 static const int32 kMsgSetDecor = 'deco';
 static const int32 kMsgDecorInfo = 'idec';
-static const int32 kMsgDoubleScrollbarArrows = 'dsba';
 
-static const bool kDefaultDoubleScrollbarArrowsSetting = false;
+static const int32 kMsgDoubleScrollBarArrows = 'dsba';
+
+static const int32 kMsgArrowStyleSingle = 'mass';
+static const int32 kMsgArrowStyleDouble = 'masd';
+
+static const int32 kMsgKnobStyleNone = 'mksn';
+static const int32 kMsgKnobStyleDots = 'mksd';
+static const int32 kMsgKnobStyleLines = 'mksl';
+
+static const bool kDefaultDoubleScrollBarArrowsSetting = false;
 
 
 //	#pragma mark -
@@ -53,8 +69,7 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 	BView(name, 0),
 	fDecorInfoButton(NULL),
 	fDecorMenuField(NULL),
-	fDecorMenu(NULL),
-	fDoubleScrollbarArrowsCheckBox(NULL)
+	fDecorMenu(NULL)
 {
 	// Decorator menu
 	_BuildDecorMenu();
@@ -64,24 +79,79 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 	fDecorInfoButton = new BButton(B_TRANSLATE("About"),
 		new BMessage(kMsgDecorInfo));
 
-	fDoubleScrollbarArrowsCheckBox = new BCheckBox("doubleScrollbarArrows",
-		B_TRANSLATE("Use double scrollbar arrows"),
-		new BMessage(kMsgDoubleScrollbarArrows));
+	// scrollbar arrow style
+	BBox* arrowStyleBox = new BBox("arrow style");
+	arrowStyleBox->SetLabel(B_TRANSLATE("Arrow style"));
 
-	fSavedDoubleArrowsValue = _GetDoubleScrollbarArrowsSetting();
-	fDoubleScrollbarArrowsCheckBox->SetValue(fSavedDoubleArrowsValue);
+	fSavedDoubleArrowsValue = _DoubleScrollBarArrows();
+
+	fArrowStyleSingle = new FakeScrollBar(true, false, B_KNOB_STYLE_LINES,
+		new BMessage(kMsgArrowStyleSingle));
+	fArrowStyleDouble = new FakeScrollBar(true, true, B_KNOB_STYLE_LINES,
+		new BMessage(kMsgArrowStyleDouble));
+
+	BView* arrowStyleView;
+	arrowStyleView = BLayoutBuilder::Group<>()
+		.AddGroup(B_VERTICAL, 1)
+			.Add(new BStringView("single", B_TRANSLATE("Single:")))
+			.Add(fArrowStyleSingle)
+			.Add(new BStringView("spacer", ""))
+			.Add(new BStringView("double", B_TRANSLATE("Double:")))
+			.Add(fArrowStyleDouble)
+			.Add(BSpaceLayoutItem::CreateVerticalStrut(0))
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.End()
+		.View();
+	arrowStyleBox->AddChild(arrowStyleView);
+
+	// scrollbar knob style
+	fSavedKnobStyleValue = _ScrollBarKnobStyle();
+
+	BBox* knobStyleBox = new BBox("knob style");
+	knobStyleBox->SetLabel(B_TRANSLATE("Knob style"));
+
+	fKnobStyleNone = new FakeScrollBar(false, false, B_KNOB_STYLE_NONE,
+		new BMessage(kMsgKnobStyleNone));
+	fKnobStyleDots = new FakeScrollBar(false, false, B_KNOB_STYLE_DOTS,
+		new BMessage(kMsgKnobStyleDots));
+	fKnobStyleLines = new FakeScrollBar(false, false, B_KNOB_STYLE_LINES,
+		new BMessage(kMsgKnobStyleLines));
+
+	BView* knobStyleView;
+	knobStyleView = BLayoutBuilder::Group<>()
+		.AddGroup(B_VERTICAL, 0)
+			.Add(fKnobStyleNone)
+			.Add(new BStringView("spacer", ""))
+			.Add(fKnobStyleDots)
+			.Add(new BStringView("spacer", ""))
+			.Add(fKnobStyleLines)
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.End()
+		.View();
+	knobStyleBox->AddChild(knobStyleView);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	// control layout
-	AddChild(BGridLayoutBuilder(10, 10)
-		.Add(fDecorMenuField->CreateLabelLayoutItem(), 0, 0)
-        .Add(fDecorMenuField->CreateMenuBarLayoutItem(), 1, 0)
-		.Add(fDecorInfoButton, 2, 0)
-
-		.Add(fDoubleScrollbarArrowsCheckBox, 0, 3, 2)
-		.Add(BSpaceLayoutItem::CreateGlue(), 0, 4, 2)
-		.SetInsets(10, 10, 10, 10)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+			.Add(BGridLayoutBuilder(B_USE_DEFAULT_SPACING,
+					B_USE_DEFAULT_SPACING)
+				.Add(fDecorMenuField->CreateLabelLayoutItem(), 0, 0)
+		        .Add(fDecorMenuField->CreateMenuBarLayoutItem(), 1, 0)
+				.Add(fDecorInfoButton, 2, 0)
+			)
+			.Add(new BStringView("label", B_TRANSLATE("Scroll bars:")))
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+				.Add(arrowStyleBox)
+				.Add(knobStyleBox)
+			.End()
+			.AddGlue()
+		.End()
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	);
 	// TODO : Decorator Preview Image?
 }
@@ -102,7 +172,30 @@ LookAndFeelSettingsView::AttachedToWindow()
 
 	fDecorMenu->SetTargetForItems(this);
 	fDecorInfoButton->SetTarget(this);
-	fDoubleScrollbarArrowsCheckBox->SetTarget(this);
+	fArrowStyleSingle->SetTarget(this);
+	fArrowStyleDouble->SetTarget(this);
+	fKnobStyleNone->SetTarget(this);
+	fKnobStyleDots->SetTarget(this);
+	fKnobStyleLines->SetTarget(this);
+
+	if (fSavedDoubleArrowsValue)
+		fArrowStyleDouble->SetValue(B_CONTROL_ON);
+	else
+		fArrowStyleSingle->SetValue(B_CONTROL_ON);
+
+	switch (fSavedKnobStyleValue) {
+		case B_KNOB_STYLE_NONE:
+			fKnobStyleNone->SetValue(B_CONTROL_ON);
+			break;
+
+		case B_KNOB_STYLE_DOTS:
+			fKnobStyleDots->SetValue(B_CONTROL_ON);
+			break;
+
+		case B_KNOB_STYLE_LINES:
+			fKnobStyleLines->SetValue(B_CONTROL_ON);
+			break;
+	}
 }
 
 
@@ -117,6 +210,7 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 				_SetDecor(newDecor);
 			break;
 		}
+
 		case kMsgDecorInfo:
 		{
 			DecorInfo* decor = fDecorUtility.FindDecorator(fCurrentDecor);
@@ -145,8 +239,25 @@ LookAndFeelSettingsView::MessageReceived(BMessage *msg)
 
 			break;
 		}
-		case kMsgDoubleScrollbarArrows:
-			_SetDoubleScrollbarArrowsSetting(fDoubleScrollbarArrowsCheckBox->Value());
+
+		case kMsgArrowStyleSingle:
+			_SetDoubleScrollBarArrows(false);
+			break;
+
+		case kMsgArrowStyleDouble:
+			_SetDoubleScrollBarArrows(true);
+			break;
+
+		case kMsgKnobStyleNone:
+			_SetScrollBarKnobStyle(B_KNOB_STYLE_NONE);
+			break;
+
+		case kMsgKnobStyleDots:
+			_SetScrollBarKnobStyle(B_KNOB_STYLE_DOTS);
+			break;
+
+		case kMsgKnobStyleLines:
+			_SetScrollBarKnobStyle(B_KNOB_STYLE_LINES);
 			break;
 
 		default:
@@ -221,7 +332,7 @@ LookAndFeelSettingsView::_AdoptInterfaceToCurrentDecor()
 
 
 bool
-LookAndFeelSettingsView::_GetDoubleScrollbarArrowsSetting()
+LookAndFeelSettingsView::_DoubleScrollBarArrows()
 {
 	scroll_bar_info info;
 	get_scroll_bar_info(&info);
@@ -231,15 +342,66 @@ LookAndFeelSettingsView::_GetDoubleScrollbarArrowsSetting()
 
 
 void
-LookAndFeelSettingsView::_SetDoubleScrollbarArrowsSetting(bool value)
+LookAndFeelSettingsView::_SetDoubleScrollBarArrows(bool doubleArrows)
 {
 	scroll_bar_info info;
 	get_scroll_bar_info(&info);
 
-	info.double_arrows = value;
+	info.double_arrows = doubleArrows;
 	set_scroll_bar_info(&info);
 
+	if (doubleArrows)
+		fArrowStyleDouble->SetValue(B_CONTROL_ON);
+	else
+		fArrowStyleSingle->SetValue(B_CONTROL_ON);
+
 	Window()->PostMessage(kMsgUpdate);
+}
+
+
+int32
+LookAndFeelSettingsView::_ScrollBarKnobStyle()
+{
+	scroll_bar_info info;
+	get_scroll_bar_info(&info);
+
+	return info.knob;
+}
+
+
+void
+LookAndFeelSettingsView::_SetScrollBarKnobStyle(int32 knobStyle)
+{
+	scroll_bar_info info;
+	get_scroll_bar_info(&info);
+
+	info.knob = knobStyle;
+	set_scroll_bar_info(&info);
+
+	switch (knobStyle) {
+		case B_KNOB_STYLE_NONE:
+			fKnobStyleNone->SetValue(B_CONTROL_ON);
+			break;
+
+		case B_KNOB_STYLE_DOTS:
+			fKnobStyleDots->SetValue(B_CONTROL_ON);
+			break;
+
+		case B_KNOB_STYLE_LINES:
+			fKnobStyleLines->SetValue(B_CONTROL_ON);
+			break;
+	}
+
+	Window()->PostMessage(kMsgUpdate);
+}
+
+
+bool
+LookAndFeelSettingsView::IsDefaultable()
+{
+	return fCurrentDecor != fDecorUtility.DefaultDecorator()->Name()
+		|| _DoubleScrollBarArrows() != false
+		|| _ScrollBarKnobStyle() != B_KNOB_STYLE_DOTS;
 }
 
 
@@ -247,26 +409,17 @@ void
 LookAndFeelSettingsView::SetDefaults()
 {
 	_SetDecor(fDecorUtility.DefaultDecorator());
-	_SetDoubleScrollbarArrowsSetting(kDefaultDoubleScrollbarArrowsSetting);
-	fDoubleScrollbarArrowsCheckBox->SetValue(
-		kDefaultDoubleScrollbarArrowsSetting);
-}
-
-
-bool
-LookAndFeelSettingsView::IsDefaultable()
-{
-	return fCurrentDecor != fDecorUtility.DefaultDecorator()->Name() ||
-		fDoubleScrollbarArrowsCheckBox->Value() !=
-			kDefaultDoubleScrollbarArrowsSetting;
+	_SetDoubleScrollBarArrows(false);
+	_SetScrollBarKnobStyle(B_KNOB_STYLE_DOTS);
 }
 
 
 bool
 LookAndFeelSettingsView::IsRevertable()
 {
-	return fCurrentDecor != fSavedDecor ||
-		fDoubleScrollbarArrowsCheckBox->Value() != fSavedDoubleArrowsValue;
+	return fCurrentDecor != fSavedDecor
+		|| _DoubleScrollBarArrows() != fSavedDoubleArrowsValue
+		|| _ScrollBarKnobStyle() != fSavedKnobStyleValue;
 }
 
 
@@ -274,6 +427,6 @@ void
 LookAndFeelSettingsView::Revert()
 {
 	_SetDecor(fSavedDecor);
-	_SetDoubleScrollbarArrowsSetting(fSavedDoubleArrowsValue);
-	fDoubleScrollbarArrowsCheckBox->SetValue(fSavedDoubleArrowsValue);
+	_SetScrollBarKnobStyle(fSavedKnobStyleValue);
+	_SetDoubleScrollBarArrows(fSavedDoubleArrowsValue);
 }

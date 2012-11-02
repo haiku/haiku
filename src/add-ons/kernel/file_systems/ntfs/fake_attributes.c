@@ -28,6 +28,7 @@ int32 kFreeTypeCookie = 0x87654321;
 
 char *kFailBackMime = {"application/octet-stream"};
 char *kDirectoryMime = {"application/x-vnd.Be-directory"};
+char *kAttrTypeName = {"BEOS:TYPE"};
 
 
 status_t set_mime(vnode *node, const char *filename)
@@ -35,7 +36,7 @@ status_t set_mime(vnode *node, const char *filename)
 	struct ext_mime *p;
 	int32 namelen;
 	int32 ext_len;
-	node->mime = kFailBackMime;
+	node->mime = NULL;
 	
 	if (filename == NULL)
 	 {
@@ -56,7 +57,10 @@ status_t set_mime(vnode *node, const char *filename)
 		if (!strcasecmp(filename + namelen - ext_len, p->extension))
 			break;
 	}
-	node->mime = p->mime;
+	if(p->mime==NULL)
+		node->mime = kFailBackMime;
+	else
+		node->mime = p->mime;
 	return B_NO_ERROR;
 }
 
@@ -189,8 +193,8 @@ fake_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 		
 		entry->d_ino = node->vnid;
 		entry->d_dev = ns->id;
-		entry->d_reclen = sizeof(struct dirent) + 10;
-		strcpy(entry->d_name, "BEOS:TYPE");
+		entry->d_reclen = sizeof(struct dirent) + strlen(kAttrTypeName);
+		strcpy(entry->d_name, kAttrTypeName);
 	}
 
 	*cookie = kCloseTypeCookie;
@@ -207,24 +211,19 @@ fake_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 	uint32 type, int openMode, void** _cookie)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
-	int	result = B_NO_ERROR;
-
+		
 	LOCK_VOL(ns);
 	
 	TRACE("fake_create_attrib - ENTER (name = [%s])\n",name);
 
-	if (strcmp(name, "BEOS:TYPE") != 0)
-		goto	exit;
-
-	*_cookie = &kSetTypeCookie;
+	if (strcmp(name, kAttrTypeName) == 0)
+		*_cookie = &kSetTypeCookie;
 	
-exit:
-
-	TRACE("fake_create_attrib - EXIT, result is %s\n", strerror(result));
+	TRACE("fake_create_attrib - EXIT\n");
 
 	UNLOCK_VOL(ns);
 		
-	return result;	
+	return B_NO_ERROR;	
 }
 
 status_t
@@ -232,18 +231,16 @@ fake_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
 	int openMode, void **_cookie)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
-	int	result = B_NO_ERROR;
-
+	status_t result = B_NO_ERROR;
+		
 	LOCK_VOL(ns);
 	
 	TRACE("fake_open_attrib - ENTER (name = [%s])\n",name);
 
-	if (strcmp(name, "BEOS:TYPE") != 0)
-		goto	exit;
-
-	*_cookie = &kSetTypeCookie;
-	
-exit:
+	if (strcmp(name, kAttrTypeName) == 0)
+		*_cookie = &kSetTypeCookie;
+	else
+		result = ENOENT;
 
 	TRACE("fake_open_attrib - EXIT, result is %s\n", strerror(result));
 

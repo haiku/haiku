@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2011, Haiku Inc. All rights reserved.
+ * Copyright 2005-2012, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -245,8 +245,15 @@ void *
 BMessage::operator new(size_t size)
 {
 	DEBUG_FUNCTION_ENTER2;
-	void *pointer = sMsgCache->Get(size);
-	return pointer;
+	return sMsgCache->Get(size);
+}
+
+
+void *
+BMessage::operator new(size_t size, const std::nothrow_t &noThrow)
+{
+	DEBUG_FUNCTION_ENTER2;
+	return sMsgCache->Get(size);
 }
 
 
@@ -2619,6 +2626,34 @@ BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 		free(buffer);
 
 	return error;
+}
+
+
+status_t
+BMessage::Append(const BMessage &other)
+{
+	field_header *field = other.fFields;
+	for (uint32 i = 0; i < other.fHeader->field_count; i++, field++) {
+		const char *name = (const char *)(other.fData + field->offset);
+		const void *data = (const void *)(other.fData + field->offset
+			+ field->name_length);
+		bool isFixed = (field->flags & FIELD_FLAG_FIXED_SIZE) != 0;
+		size_t size = field->data_size / field->count;
+
+		for (uint32 j = 0; j < field->count; j++) {
+			if (!isFixed)
+				size = *(uint32 *)data;
+
+			status_t status = AddData(name, field->type, data, size,
+				isFixed != 0, 1);
+			if (status != B_OK)
+				return status;
+
+			data = (const void *)((const char *)data + size
+				+ (isFixed ? 0 : sizeof(uint32)));
+		}
+	}
+	return B_OK;
 }
 
 

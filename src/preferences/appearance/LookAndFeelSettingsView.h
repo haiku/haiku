@@ -2,9 +2,10 @@
  *  Copyright 2010-2012 Haiku, Inc. All rights reserved.
  *  Distributed under the terms of the MIT license.
  *
- *  Authors:
- *      Alexander von Gluck, kallisti5@unixzen.com
+ *	Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Alexander von Gluck <kallisti5@unixzen.com>
+ *		John Scipione <jscipione@gmail.com>
  *		Ryan Leavengood <leavengood@gmail.com>
  */
 #ifndef LOOK_AND_FEEL_SETTINGS_VIEW_H
@@ -20,7 +21,7 @@ class BButton;
 class BCheckBox;
 class BMenuField;
 class BPopUpMenu;
-
+class FakeScrollBar;
 
 class LookAndFeelSettingsView : public BView {
 public:
@@ -30,10 +31,11 @@ public:
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
 
-			void				SetDefaults();
-			void				Revert();
 			bool				IsDefaultable();
+			void				SetDefaults();
+
 			bool				IsRevertable();
+			void				Revert();
 
 private:
 			void				_SetDecor(const BString& name);
@@ -42,8 +44,12 @@ private:
 			void				_BuildDecorMenu();
 			void				_AdoptToCurrentDecor();
 			void				_AdoptInterfaceToCurrentDecor();
-			bool				_GetDoubleScrollbarArrowsSetting();
-			void				_SetDoubleScrollbarArrowsSetting(bool value);
+
+			bool				_DoubleScrollBarArrows();
+			void				_SetDoubleScrollBarArrows(bool doubleArrows);
+
+			int32				_ScrollBarKnobStyle();
+			void				_SetScrollBarKnobStyle(int32 knobStyle);
 
 private:
 			DecorInfoUtility	fDecorUtility;
@@ -51,11 +57,19 @@ private:
 			BButton*			fDecorInfoButton;
 			BMenuField*			fDecorMenuField;
 			BPopUpMenu*			fDecorMenu;
-			BCheckBox*			fDoubleScrollbarArrowsCheckBox;
+
+			FakeScrollBar*		fArrowStyleSingle;
+			FakeScrollBar*		fArrowStyleDouble;
+
+			FakeScrollBar*		fKnobStyleNone;
+			FakeScrollBar*		fKnobStyleDots;
+			FakeScrollBar*		fKnobStyleLines;
 
 			BString				fSavedDecor;
 			BString				fCurrentDecor;
+
 			bool				fSavedDoubleArrowsValue;
+			int32				fSavedKnobStyleValue;
 };
 
 #endif // LOOK_AND_FEEL_SETTINGS_VIEW_H

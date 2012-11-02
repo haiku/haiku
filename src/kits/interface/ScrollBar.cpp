@@ -846,6 +846,7 @@ BScrollBar::Draw(BRect updateRect)
 		EndLineArray();
 	} else
 		StrokeRect(bounds);
+
 	bounds.InsetBy(1.0, 1.0);
 
 	bool enabled = fPrivateData->fEnabled && fMin < fMax
@@ -1152,6 +1153,69 @@ BScrollBar::Draw(BRect updateRect)
 			FillRect(rect);
 		}
 	}
+
+	if (fPrivateData->fScrollBarInfo.knob == B_KNOB_STYLE_NONE)
+		return;
+
+	// draw the scrollbar thumb knobs
+	bool square = fPrivateData->fScrollBarInfo.knob == B_KNOB_STYLE_DOTS;
+	int32 knobWidth = 0;
+	int32 knobHeight = 0;
+
+	if (square) {
+		knobWidth = 2;
+		knobHeight = 2;
+	} else {
+		knobWidth = 1;
+		knobHeight = 3;
+	}
+
+	int32 flags = 0;
+	if (!enabled)
+		flags |= BControlLook::B_DISABLED;
+
+	float hmiddle = rect.Width() / 2;
+	float vmiddle = rect.Height() / 2;
+
+	BRect middleKnob = BRect(
+		rect.left + hmiddle
+			- (fOrientation == B_HORIZONTAL ? knobWidth : knobHeight),
+		rect.top + vmiddle
+			- (fOrientation == B_HORIZONTAL ? knobHeight : knobWidth),
+		rect.left + hmiddle
+			+ (fOrientation == B_HORIZONTAL ? knobWidth : knobHeight),
+		rect.top + vmiddle
+			+ (fOrientation == B_HORIZONTAL ? knobHeight : knobWidth));
+
+	if (fOrientation == B_HORIZONTAL) {
+		BRect leftKnob = middleKnob.OffsetByCopy(knobWidth * -4, 0);
+		if (leftKnob.left > rect.left + knobWidth) {
+			be_control_look->DrawButtonBackground(this, leftKnob, updateRect,
+				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
+		}
+
+		BRect rightKnob = middleKnob.OffsetByCopy(knobWidth * 4, 0);
+		if (rightKnob.right < rect.right - knobWidth) {
+			be_control_look->DrawButtonBackground(this, rightKnob, updateRect,
+				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
+		}
+	} else {
+		BRect topKnob = middleKnob.OffsetByCopy(0, knobWidth * -4);
+		if (topKnob.top > rect.top + knobHeight) {
+			be_control_look->DrawButtonBackground(this, topKnob, updateRect,
+				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
+		}
+
+		BRect bottomKnob = middleKnob.OffsetByCopy(0, knobWidth * 4);
+		if (bottomKnob.bottom < rect.bottom - knobHeight) {
+			be_control_look->DrawButtonBackground(this, bottomKnob, updateRect,
+				normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
+		}
+	}
+
+	// draw middle knob last because it modifies middleKnob
+	be_control_look->DrawButtonBackground(this, middleKnob, updateRect,
+		normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 }
 
 
