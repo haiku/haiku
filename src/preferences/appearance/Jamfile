@@ -10,6 +10,7 @@ Preference Appearance :
 	APRMain.cpp
 	AntialiasingSettingsView.cpp
 	LookAndFeelSettingsView.cpp
+	FakeScrollBar.cpp
 	FontSelectionView.cpp
 	FontView.cpp
 	APRView.cpp
