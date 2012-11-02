@@ -19,6 +19,12 @@
 #define DISABLES_ON_WINDOW_DEACTIVATION 1
 
 
+enum {
+	KNOB_STYLE_NONE = 0,
+	KNOB_STYLE_DOTS,
+	KNOB_STYLE_LINES
+};
+
 class BScrollBar : public BView {
 public:
 								BScrollBar(BRect frame, const char* name,

@@ -846,6 +846,7 @@ BScrollBar::Draw(BRect updateRect)
 		EndLineArray();
 	} else
 		StrokeRect(bounds);
+
 	bounds.InsetBy(1.0, 1.0);
 
 	bool enabled = fPrivateData->fEnabled && fMin < fMax
@@ -1153,7 +1154,11 @@ BScrollBar::Draw(BRect updateRect)
 		}
 	}
 
-	bool square = false;
+	if (fPrivateData->fScrollBarInfo.knob == KNOB_STYLE_NONE)
+		return;
+
+	// draw the scrollbar thumb knobs
+	bool square = fPrivateData->fScrollBarInfo.knob == KNOB_STYLE_DOTS;
 	int32 hextent = 0;
 	int32 vextent = 0;
 
@@ -1165,7 +1170,6 @@ BScrollBar::Draw(BRect updateRect)
 		vextent = 3;
 	}
 
-	// draw the marks on the scrollbar thumb
 	int32 flags = 0;
 	if (!enabled)
 		flags |= BControlLook::B_DISABLED;
@@ -1209,7 +1213,7 @@ BScrollBar::Draw(BRect updateRect)
 		}
 	}
 
-	// draw middle mark last because it modifies middleKnob
+	// draw middle knob last because it modifies middleKnob
 	be_control_look->DrawButtonBackground(this, middleKnob, updateRect,
 		normal, flags, BControlLook::B_ALL_BORDERS, fOrientation);
 }
