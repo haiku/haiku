@@ -51,10 +51,17 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 		return 0;
 	}
 
+	sc->haiku_interrupt_status = status;
 	return 1;
 }
 
 
-NO_HAIKU_REENABLE_INTERRUPTS();
+void
+HAIKU_REENABLE_INTERRUPTS(device_t dev)
+{
+	struct msk_softc *sc = device_get_softc(dev);
+	CSR_WRITE_4(sc, B0_Y2_SP_ICR, 2);
+}
+
 
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE | FBSD_SWI_TASKQUEUE);
