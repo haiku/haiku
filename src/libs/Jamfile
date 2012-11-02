@@ -24,4 +24,4 @@ SubInclude HAIKU_TOP src libs termcap ;
 SubInclude HAIKU_TOP src libs tiff ;
 SubInclude HAIKU_TOP src libs udis86 ;
 SubInclude HAIKU_TOP src libs util ;
-SubInclude HAIKU_TOP src libs zlib ;
+

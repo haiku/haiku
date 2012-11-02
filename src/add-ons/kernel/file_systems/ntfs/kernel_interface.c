@@ -156,7 +156,7 @@ fs_vnode_ops gNTFSVnodeOps = {
 	&fs_read_attrib_stat,
 	NULL,	//&fs_write_attr_stat,
 	NULL,	//&fs_rename_attr,
-	NULL,	//&fs_remove_attr,
+	&fs_remove_attrib,
 };
 
 

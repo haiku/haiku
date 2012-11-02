@@ -56,7 +56,7 @@ Addon ffmpeg :
 
 	be
 	media
-	libz.a
+	$(HAIKU_ZLIB_LIB)
 	$(TARGET_LIBSUPC++)
 	$(TARGET_NETWORK_LIBS)
 ;

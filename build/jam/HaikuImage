@@ -87,18 +87,18 @@ SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
 	libgame.so $(X86_ONLY)libGL.so libgnu.so
-	$(HAIKU_JPEG_CURRENT_LIB)
 	libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
-	$(HAIKU_LIBPNG_CURRENT_LIB)
 	<revisioned>libroot.so libroot-addon-icu.so
 	libscreensaver.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
-	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
-	$(HAIKU_FREETYPE_CURRENT_LIB)
 ;
 PRIVATE_SYSTEM_LIBS =
+	$(HAIKU_JPEG_CURRENT_LIB)
+	$(HAIKU_LIBPNG_CURRENT_LIB)
+	$(HAIKU_ZLIB_CURRENT_LIB) 
+	$(HAIKU_FREETYPE_CURRENT_LIB)
 	libalm.so
 	libfluidsynth.so
 	libilmimf.so
@@ -334,6 +334,13 @@ SYSTEM_LIBS_ALIASES =
 	$(SYSTEM_LIBS_LIBBE_ALIASES)
 ;
 
+OPTIONAL_LIBS_ALIASES =
+	$(HAIKU_FREETYPE_CURRENT_LINK)
+	$(HAIKU_JPEG_CURRENT_LINK)
+	$(HAIKU_LIBPNG_CURRENT_LINK)
+	$(HAIKU_ZLIB_CURRENT_LINK)
+;
+
 # libfreetype.so links to the current freetype lib
 AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
 	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
@@ -351,6 +358,12 @@ AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LIB:BS)
 	: $(HAIKU_JPEG_CURRENT_LINK) : : true ;
 AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LINK)
 	: libjpeg.so : : true ;
+
+# zlib.so links to the current zlib
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LIB:BS)
+	: $(HAIKU_ZLIB_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LINK)
+	: libzlib.so : : true ;
 
 # servers
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
@@ -724,42 +737,42 @@ AddDirectoryToHaikuImage home config settings printers "Save as PDF"
 # PDF Writer enconding files
 CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) src add-ons print drivers pdf encoding ]
-	: "PDF Writer" : -x .svn -x Jamfile ;
+	: "PDF Writer" : -x Jamfile ;
 
 # Gutenprint data files
 CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) src libs print libgutenprint src xml ]
-	: gutenprint : -x .svn -x *.c -x Makefile.am -x Makefile.in ;
+	: gutenprint : -x *.c -x Makefile.am -x Makefile.in ;
 
 # dvb channel settings
 CopyDirectoryToHaikuImage home config settings Media
 	: [ FDirName $(HAIKU_TOP) data settings media dvb ]
-	: dvb : -x .svn -x Jamfile ;
+	: dvb : -x Jamfile ;
 
 # licenses
 CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) data system data licenses ]
-	: licenses : -x .svn ;
+	: licenses ;
 
 # Copy documentation as per DiskUsage's license requirement.
 CopyDirectoryToHaikuImage system documentation
 	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]
-	: diskusage : -x .svn ;
+	: diskusage ;
 
 # Copy documentation as per PDFlib Lite's license requirement.
 CopyDirectoryToHaikuImage system documentation
 	: [ FDirName $(HAIKU_TOP) src libs pdflib doc ]
-	: pdflib : -x .svn ;
+	: pdflib ;
 
 # Copy sample programs as per PDFlib Lite's license requirement.
 CopyDirectoryToHaikuImage develop sample-code
 	: [ FDirName $(HAIKU_TOP) src libs pdflib bind pdflib ]
-	: pdflib : -x .svn ;
+	: pdflib ;
 
 # Copy Mesa3D GL headers into image
 if $(TARGET_ARCH) = x86 {
 	CopyDirectoryToHaikuImage develop headers os opengl
-		: [ FDirName $(HAIKU_MESA_HEADERS) GL ] : : -x .svn ;
+		: [ FDirName $(HAIKU_MESA_HEADERS) GL ] ;
 }
 
 #pragma mark - Optional Packages

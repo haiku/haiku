@@ -36,6 +36,7 @@
 #include <errno.h>
 #if (defined(__BEOS__) || defined(__HAIKU__))
 #include <png.h>
+#define png_infopp_NULL (png_infopp)NULL
 #else
 #include <libpng12/png.h>
 #endif

@@ -1,12 +1,15 @@
 SubDir HAIKU_TOP src kits package ;
 
-UseLibraryHeaders zlib ;
+UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
 
 UsePrivateHeaders
 	kernel
 	shared ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+
+Includes [ FGristFiles ZlibCompressionBase.cpp ]
+	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
 
 HPKG_SOURCES =
 	AttributeDataReader.cpp
@@ -72,5 +75,5 @@ SharedLibrary libpackage.so
 
 	$(HPKG_SOURCES)
 	:
-	libshared.a be z $(TARGET_LIBSTDC++)
+	libshared.a be $(HAIKU_ZLIB_LIB) $(TARGET_LIBSTDC++)
 ;

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons translators png ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UseLibraryHeaders zlib ;
+UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
 UseHeaders $(HAIKU_LIBPNG_HEADERS) : true ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
@@ -20,7 +20,8 @@ Translator PNGTranslator :
 	PNGTranslator.cpp
 	PNGView.cpp
 
-	: be translation $(HAIKU_LIBPNG_LIB) z libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	: be translation $(HAIKU_LIBPNG_LIB) $(HAIKU_ZLIB_LIB)
+		$(TARGET_LIBSUPC++) libtranslatorsutils.a 
 		$(HAIKU_LOCALE_LIBS)
 	: true
 ;

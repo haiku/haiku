@@ -782,7 +782,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 
 	# library symlinks
 	local lib ;
-	for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs) {
+	for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs)
+		$(OPTIONAL_LIBS_ALIASES) {
 		AddSymlinkToHaikuHybridImage $(abiDirTokens) lib
 			: /system/lib $(lib:BS) : : true ;
 		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
@@ -846,7 +847,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs termcap : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs tiff : 3rdparty ;
-	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
 	CopyDirectoryToHaikuImage develop headers :
 		[ FDirName $(HAIKU_FREETYPE_DIR) develop headers 3rdparty ] ;
@@ -854,14 +854,16 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 		: 3rdparty ;
 	CopyDirectoryToHaikuImage develop headers : $(HAIKU_LIBPNG_HEADERS)
 		: 3rdparty ;
+	CopyDirectoryToHaikuImage develop headers : $(HAIKU_ZLIB_HEADERS)
+		: 3rdparty ;
 
 	# cpp headers
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
 		# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
 		CopyDirectoryToHaikuImage $(abiDirTokens) headers
-			: [ FDirName $(HAIKU_TOP) headers cpp ] : : -x .svn ;
+			: [ FDirName $(HAIKU_TOP) headers cpp ] ;
 		CopyDirectoryToAlternativeGCCArchive $(abiDirTokens) headers
-			: [ FDirName $(HAIKU_TOP) headers cpp ] : : -x .svn ;
+			: [ FDirName $(HAIKU_TOP) headers cpp ] ;
 	}
 }
 
@@ -1978,10 +1980,10 @@ if [ IsOptionalHaikuImagePackageAdded WebPositiveBookmarks ] {
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 	CopyDirectoryToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs welcome ]
-		: welcome : -x .svn ;
+		: welcome ;
 	CopyDirectoryToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs userguide ]
-		: userguide : -x .svn ;
+		: userguide ;
 }
 
 
