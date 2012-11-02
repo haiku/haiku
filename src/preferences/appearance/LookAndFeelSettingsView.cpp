@@ -342,15 +342,15 @@ LookAndFeelSettingsView::_DoubleScrollBarArrows()
 
 
 void
-LookAndFeelSettingsView::_SetDoubleScrollBarArrows(bool on)
+LookAndFeelSettingsView::_SetDoubleScrollBarArrows(bool doubleArrows)
 {
 	scroll_bar_info info;
 	get_scroll_bar_info(&info);
 
-	info.double_arrows = on;
+	info.double_arrows = doubleArrows;
 	set_scroll_bar_info(&info);
 
-	if (on)
+	if (doubleArrows)
 		fArrowStyleDouble->SetValue(B_CONTROL_ON);
 	else
 		fArrowStyleSingle->SetValue(B_CONTROL_ON);

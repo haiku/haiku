@@ -28,8 +28,8 @@ public:
 
 	virtual	void			SetValue(int32 value);
 
-			void			SetDoubleArrows(bool doublearrows);
-			void			SetKnobStyle(uint32 style);
+			void			SetDoubleArrows(bool doubleArrows);
+			void			SetKnobStyle(uint32 knobStyle);
 
 			void			SetFromScrollBarInfo(const scroll_bar_info &info);
 

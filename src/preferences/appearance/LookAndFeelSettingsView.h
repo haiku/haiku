@@ -46,7 +46,7 @@ private:
 			void				_AdoptInterfaceToCurrentDecor();
 
 			bool				_DoubleScrollBarArrows();
-			void				_SetDoubleScrollBarArrows(bool on);
+			void				_SetDoubleScrollBarArrows(bool doubleArrows);
 
 			int32				_ScrollBarKnobStyle();
 			void				_SetScrollBarKnobStyle(int32 knobStyle);

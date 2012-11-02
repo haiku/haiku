@@ -270,17 +270,17 @@ FakeScrollBar::SetValue(int32 value)
 
 
 void
-FakeScrollBar::SetDoubleArrows(bool doublearrows)
+FakeScrollBar::SetDoubleArrows(bool doubleArrows)
 {
-	fDoubleArrows = doublearrows;
+	fDoubleArrows = doubleArrows;
 	Invalidate();
 }
 
 
 void
-FakeScrollBar::SetKnobStyle(uint32 style)
+FakeScrollBar::SetKnobStyle(uint32 knobStyle)
 {
-	fKnobStyle = style;
+	fKnobStyle = knobStyle;
 	Invalidate();
 }
 
