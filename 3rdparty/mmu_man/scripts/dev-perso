@@ -164,7 +164,7 @@ dev() {
 	test -n "$DEVUPCMD" && history -s "$DEVUPCMD"
 
 	# spice up terminal window title for git, add current branch name
-	test -d .git && PROMPT_COMMAND='echo -en "\033]0;['$DEVPROJ':`git branch | sed "/^[^*]/d;s/^\*\s//"`:${PWD##*/}]\a"'
+	test -d .git && PROMPT_COMMAND='echo -en "\033]0;['$DEVPROJ':`git branch 2>/dev/null | sed "/^[^*]/d;s/^\*\s//"`:${PWD##*/}]\a"'
 }
 
 complete -W complete -W "$(dev)" dev
