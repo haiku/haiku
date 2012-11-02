@@ -36,6 +36,7 @@
 
 #include <driver_settings.h>
 #include <KernelExport.h>
+#include <disk_device_manager.h>
 
 #include "attributes.h"
 #include "fake_attributes.h"
@@ -43,11 +44,11 @@
 #include "ntfs.h"
 #include "volume_util.h"
 
-static const char* kNTFSUntitled = {"NTFS Untitled"};
+static const char* kNTFSUnnamed = {"NTFS Unnamed"};
 
 typedef struct identify_cookie {
 	NTFS_BOOT_SECTOR boot;
-	char label[256];
+	char label[MAX_PATH];
 } identify_cookie;
 
 
@@ -257,10 +258,11 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 		return -1;
 	}
 
-	strcpy(cookie->label, kNTFSUntitled);
+	cookie->label[0]='\0';
+	memcpy(&cookie->boot, &boot, 512);
 
-	// try get path for device
-	if (ioctl(fd, B_GET_PATH_FOR_DEVICE, devpath)) {
+	// get path for device
+	if (ioctl(fd, B_GET_PATH_FOR_DEVICE, devpath) != 0) {
 		// try mount
 		ntVolume = utils_mount_volume(devpath, MS_RDONLY | MS_RECOVER);
 		if (ntVolume != NULL) {
@@ -270,7 +272,26 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 		}	
 	}
 
-	memcpy(&cookie->boot, &boot, 512);
+	// generate a more or less descriptive name for unnamed volume
+	if (cookie->label[0]=='\0') {		
+		double size;
+		off_t diskSize = sle64_to_cpu(boot.number_of_sectors)
+			* le16_to_cpu(boot.bpb.bytes_per_sector);
+		off_t divisor = 1ULL << 40;
+		char unit = 'T';
+		if (diskSize < divisor) {
+			divisor = 1UL << 30;
+			unit = 'G';
+			if (diskSize < divisor) {
+				divisor = 1UL << 20;
+				unit = 'M';
+			}
+		}
+
+		size = (double)((10 * diskSize + divisor - 1) / divisor);
+		snprintf(cookie->label, MAX_PATH - 1, "%g %cB NTFS File System",
+			size / 10, unit);
+	}
 
 	*_cookie = cookie;
 
@@ -468,7 +489,7 @@ fs_rfsstat(fs_volume *_vol, struct fs_info *fss)
 			break;
 	}
 	if (i < 0)
-		strcpy(fss->volume_name, kNTFSUntitled);
+		strcpy(fss->volume_name, kNTFSUnnamed);
 	else
 		fss->volume_name[i + 1] = 0;
 
