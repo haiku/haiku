@@ -61,7 +61,6 @@ extern bool helpFileWasFound;
 #define kScanRefresh				'gSRF'
 #define kScanProgress				'gSPR'
 #define kScanDone					'gSDN'
-#define kOutdatedMsg				'gOUT'
 
 #define deg2rad(x) (2.0 * M_PI * (x) / 360.0)
 #define rad2deg(x) (360.0 * (x) / (2.0 * M_PI))

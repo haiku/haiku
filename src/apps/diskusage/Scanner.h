@@ -11,7 +11,6 @@
 
 
 #include <string>
-#include <vector>
 
 #include <Looper.h>
 #include <Message.h>
@@ -50,7 +49,6 @@ public:
 			dev_t				Device() const
 									{ return fVolume->Device(); }
 			void				RequestQuit();
-			bool				IsOutdated();
 
 private:
 			void				_RunScan(FileInfo *startInfo);
@@ -73,10 +71,6 @@ private:
 			string				fTask;
 			bool				fBusy;
 			bool				fQuitRequested;
-
-			bool				fIsWatching;
-
-			std::vector<entry_ref*>	fModifiedEntries;
 };
 
 #endif // SCANNER_H

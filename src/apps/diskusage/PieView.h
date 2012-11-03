@@ -91,8 +91,7 @@ private:
 			bool				fClicked;
 			bool				fDragging;
 			BPoint				fDragStart;
-			FileInfo*			fClickedFile;
-			bool				fOutdated;			
+			FileInfo*			fClickedFile;		
 };
 
 #endif // PIE_VIEW_H

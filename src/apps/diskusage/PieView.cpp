@@ -135,8 +135,7 @@ PieView::PieView(BVolume* volume)
 	fVolume(volume),
 	fMouseOverInfo(),
 	fClicked(false),
-	fDragging(false),
-	fOutdated(false)
+	fDragging(false)
 {
 	fMouseOverMenu = new BPopUpMenu(kEmptyStr, false, false);
 	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Get Info"), NULL),
@@ -188,7 +187,6 @@ PieView::MessageReceived(BMessage* message)
 				else
 					_ShowVolume(fVolume);
 
-				fOutdated = false;
 				Invalidate();
 			}
 			break;
@@ -197,15 +195,6 @@ PieView::MessageReceived(BMessage* message)
 		case kScanDone:
 		{
 			Invalidate();
-			break;
-		}
-
-		case kOutdatedMsg:
-		{
-			if (!fScanner->IsBusy()) {
-				fOutdated = true;
-				Invalidate();
-			}
 			break;
 		}
 
@@ -250,11 +239,9 @@ PieView::MouseUp(BPoint where)
 		if (info != NULL) {
 			if (info == fScanner->CurrentDir()) {
 				fScanner->ChangeDir(info->parent);
-				fOutdated = fScanner->IsOutdated();
 				Invalidate();
 			} else if (info->children.size() > 0) {
 				fScanner->ChangeDir(info);
-				fOutdated = fScanner->IsOutdated();
 				Invalidate();
 			}
 		}
@@ -415,21 +402,6 @@ PieView::_DrawPieChart(BRect updateRect)
 	}
 	_DrawDirectory(pieRect, currentDir, 0.0, 0.0,
 		colorIdx % kBasePieColorCount, 0);
-
-	if (fOutdated) {
-
-		BRect b = Bounds();
-
-		float strWidth = StringWidth(B_TRANSLATE("Outdated view"));
-		float bx = (b.Width() - strWidth - kSmallHMargin);
-
-		struct font_height fh;
-		be_plain_font->GetHeight(&fh);
-
-		float by = (b.Height() - ceil(fh.descent) - kSmallVMargin);
-		SetHighColor(0x00, 0x00, 0x00);
-		DrawString(B_TRANSLATE("Outdated view"), BPoint(bx, by));
-	}
 }
 
 
