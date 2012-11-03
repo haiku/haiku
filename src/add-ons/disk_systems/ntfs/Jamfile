@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons disk_systems ntfs ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared storage ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems ntfs ] ;
+
+AddResources <disk_system>ntfs : NTFSAddOn.rdef ;
+
+Addon <disk_system>ntfs :
+	NTFSAddOn.cpp
+	InitializeParameterEditor.cpp
+
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) libshared.a
+;
