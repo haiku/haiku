@@ -310,7 +310,7 @@ term_setflags(EditLine *el)
 /* term_init():
  *	Initialize the terminal stuff
  */
-protected int
+int
 term_init(EditLine *el)
 {
 
@@ -341,7 +341,7 @@ term_init(EditLine *el)
 /* term_end():
  *	Clean up the terminal stuff
  */
-protected void
+void
 term_end(EditLine *el)
 {
 
@@ -507,7 +507,7 @@ term_free_display(EditLine *el)
  *	move to line <where> (first line == 0)
  * 	as efficiently as possible
  */
-protected void
+void
 term_move_to_line(EditLine *el, int where)
 {
 	int del;
@@ -563,7 +563,7 @@ term_move_to_line(EditLine *el, int where)
 /* term_move_to_char():
  *	Move to the character position specified
  */
-protected void
+void
 term_move_to_char(EditLine *el, int where)
 {
 	int del, i;
@@ -652,7 +652,7 @@ mc_again:
 /* term_overwrite():
  *	Overstrike num characters
  */
-protected void
+void
 term_overwrite(EditLine *el, const char *cp, int n)
 {
 	if (n <= 0)
@@ -694,7 +694,7 @@ term_overwrite(EditLine *el, const char *cp, int n)
 /* term_deletechars():
  *	Delete num characters
  */
-protected void
+void
 term_deletechars(EditLine *el, int num)
 {
 	if (num <= 0)
@@ -736,7 +736,7 @@ term_deletechars(EditLine *el, int num)
  *	Puts terminal in insert character mode or inserts num
  *	characters in the line
  */
-protected void
+void
 term_insertwrite(EditLine *el, char *cp, int num)
 {
 	if (num <= 0)
@@ -797,7 +797,7 @@ term_insertwrite(EditLine *el, char *cp, int num)
 /* term_clear_EOL():
  *	clear to end of line.  There are num characters to clear
  */
-protected void
+void
 term_clear_EOL(EditLine *el, int num)
 {
 	int i;
@@ -815,7 +815,7 @@ term_clear_EOL(EditLine *el, int num)
 /* term_clear_screen():
  *	Clear the screen
  */
-protected void
+void
 term_clear_screen(EditLine *el)
 {				/* clear the whole screen and home */
 
@@ -836,7 +836,7 @@ term_clear_screen(EditLine *el)
 /* term_beep():
  *	Beep the way the terminal wants us
  */
-protected void
+void
 term_beep(EditLine *el)
 {
 	if (GoodStr(T_bl))
@@ -851,7 +851,7 @@ term_beep(EditLine *el)
 /* term_clear_to_bottom():
  *	Clear to the bottom of the screen
  */
-protected void
+void
 term_clear_to_bottom(EditLine *el)
 {
 	if (GoodStr(T_cd))
@@ -861,7 +861,7 @@ term_clear_to_bottom(EditLine *el)
 }
 #endif
 
-protected void
+void
 term_get(EditLine *el, const char **term)
 {
 	*term = el->el_term.t_name;
@@ -871,7 +871,7 @@ term_get(EditLine *el, const char **term)
 /* term_set():
  *	Read in the terminal capabilities from the requested terminal
  */
-protected int
+int
 term_set(EditLine *el, const char *term)
 {
 	int i;
@@ -960,7 +960,7 @@ term_set(EditLine *el, const char *term)
  *	Return the new window size in lines and cols, and
  *	true if the size was changed.
  */
-protected int
+int
 term_get_size(EditLine *el, int *lins, int *cols)
 {
 
@@ -996,7 +996,7 @@ term_get_size(EditLine *el, int *lins, int *cols)
 /* term_change_size():
  *	Change the size of the terminal
  */
-protected int
+int
 term_change_size(EditLine *el, int lins, int cols)
 {
 	/*
@@ -1112,7 +1112,7 @@ term_reset_arrow(EditLine *el)
 /* term_set_arrow():
  *	Set an arrow key binding
  */
-protected int
+int
 term_set_arrow(EditLine *el, const char *name, key_value_t *fun, int type)
 {
 	fkey_t *arrow = el->el_term.t_fkey;
@@ -1131,7 +1131,7 @@ term_set_arrow(EditLine *el, const char *name, key_value_t *fun, int type)
 /* term_clear_arrow():
  *	Clear an arrow key binding
  */
-protected int
+int
 term_clear_arrow(EditLine *el, const char *name)
 {
 	fkey_t *arrow = el->el_term.t_fkey;
@@ -1149,7 +1149,7 @@ term_clear_arrow(EditLine *el, const char *name)
 /* term_print_arrow():
  *	Print the arrow key bindings
  */
-protected void
+void
 term_print_arrow(EditLine *el, const char *name)
 {
 	int i;
@@ -1166,7 +1166,7 @@ term_print_arrow(EditLine *el, const char *name)
 /* term_bind_arrow():
  *	Bind the arrow keys
  */
-protected void
+void
 term_bind_arrow(EditLine *el)
 {
 	el_action_t *map;
@@ -1223,7 +1223,7 @@ term_bind_arrow(EditLine *el)
 /* term__putc():
  *	Add a character
  */
-protected int
+int
 term__putc(int c)
 {
 
@@ -1234,7 +1234,7 @@ term__putc(int c)
 /* term__flush():
  *	Flush output
  */
-protected void
+void
 term__flush(void)
 {
 
@@ -1245,7 +1245,7 @@ term__flush(void)
 /* term_telltc():
  *	Print the current termcap characteristics
  */
-protected int
+int
 /*ARGSUSED*/
 term_telltc(EditLine *el, int argc __unused, 
     const char **argv __unused)
@@ -1281,7 +1281,7 @@ term_telltc(EditLine *el, int argc __unused,
 /* term_settc():
  *	Change the current terminal characteristics
  */
-protected int
+int
 /*ARGSUSED*/
 term_settc(EditLine *el, int argc __unused,
     const char **argv)
@@ -1358,7 +1358,7 @@ term_settc(EditLine *el, int argc __unused,
 /* term_echotc():
  *	Print the termcap string out with variable substitution
  */
-protected int
+int
 /*ARGSUSED*/
 term_echotc(EditLine *el, int argc __unused,
     const char **argv)

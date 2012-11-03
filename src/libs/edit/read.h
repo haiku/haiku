@@ -49,10 +49,10 @@ typedef struct el_read_t {
 	el_rfunc_t	read_char;	/* Function to read a character */
 } el_read_t;
  
-protected int		read_init(EditLine *);
-protected void		read_prepare(EditLine *);
-protected void		read_finish(EditLine *);
-protected int		el_read_setfn(EditLine *, el_rfunc_t);
-protected el_rfunc_t	el_read_getfn(EditLine *);
+int		read_init(EditLine *);
+void		read_prepare(EditLine *);
+void		read_finish(EditLine *);
+int		el_read_setfn(EditLine *, el_rfunc_t);
+el_rfunc_t	el_read_getfn(EditLine *);
 
 #endif /* _h_el_read */

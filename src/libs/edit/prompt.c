@@ -77,7 +77,7 @@ prompt_default_r(EditLine *el __unused)
  * 	literal escape sequences in the prompt and we want a
  *	bit to flag them
  */
-protected void
+void
 prompt_print(EditLine *el, int op)
 {
 	el_prompt_t *elp;
@@ -99,7 +99,7 @@ prompt_print(EditLine *el, int op)
 /* prompt_init():
  *	Initialize the prompt stuff
  */
-protected int
+int
 prompt_init(EditLine *el)
 {
 
@@ -116,7 +116,7 @@ prompt_init(EditLine *el)
 /* prompt_end():
  *	Clean up the prompt stuff
  */
-protected void
+void
 /*ARGSUSED*/
 prompt_end(EditLine *el __unused)
 {
@@ -126,7 +126,7 @@ prompt_end(EditLine *el __unused)
 /* prompt_set():
  *	Install a prompt printing function
  */
-protected int
+int
 prompt_set(EditLine *el, el_pfunc_t prf, int op)
 {
 	el_prompt_t *p;
@@ -151,7 +151,7 @@ prompt_set(EditLine *el, el_pfunc_t prf, int op)
 /* prompt_get():
  *	Retrieve the prompt printing function
  */
-protected int
+int
 prompt_get(EditLine *el, el_pfunc_t *prf, int op)
 {
 

@@ -54,7 +54,7 @@ private void ch__clearmacro(EditLine *);
 /* cv_undo():
  *	Handle state for the vi undo command
  */
-protected void
+void
 cv_undo(EditLine *el)
 {
 	c_undo_t *vu = &el->el_chared.c_undo;
@@ -78,7 +78,7 @@ cv_undo(EditLine *el)
 /* cv_yank():
  *	Save yank/delete data for paste
  */
-protected void
+void
 cv_yank(EditLine *el, const char *ptr, int size)
 {
 	c_kill_t *k = &el->el_chared.c_kill;
@@ -91,7 +91,7 @@ cv_yank(EditLine *el, const char *ptr, int size)
 /* c_insert():
  *	Insert num characters
  */
-protected void
+void
 c_insert(EditLine *el, int num)
 {
 	char *cp;
@@ -113,7 +113,7 @@ c_insert(EditLine *el, int num)
 /* c_delafter():
  *	Delete num characters after the cursor
  */
-protected void
+void
 c_delafter(EditLine *el, int num)
 {
 
@@ -139,7 +139,7 @@ c_delafter(EditLine *el, int num)
 /* c_delafter1():
  *	Delete the character after the cursor, do not yank
  */
-protected void
+void
 c_delafter1(EditLine *el)
 {
 	char *cp;
@@ -154,7 +154,7 @@ c_delafter1(EditLine *el)
 /* c_delbefore():
  *	Delete num characters before the cursor
  */
-protected void
+void
 c_delbefore(EditLine *el, int num)
 {
 
@@ -182,7 +182,7 @@ c_delbefore(EditLine *el, int num)
 /* c_delbefore1():
  *	Delete the character before the cursor, do not yank
  */
-protected void
+void
 c_delbefore1(EditLine *el)
 {
 	char *cp;
@@ -197,7 +197,7 @@ c_delbefore1(EditLine *el)
 /* ce__isword():
  *	Return if p is part of a word according to emacs
  */
-protected int
+int
 ce__isword(int p)
 {
 	return (isalnum(p) || strchr("*?_-.[]~=", p) != NULL);
@@ -207,7 +207,7 @@ ce__isword(int p)
 /* cv__isword():
  *	Return if p is part of a word according to vi
  */
-protected int
+int
 cv__isword(int p)
 {
 	if (isalnum(p) || p == '_')
@@ -221,7 +221,7 @@ cv__isword(int p)
 /* cv__isWord():
  *	Return if p is part of a big word according to vi
  */
-protected int
+int
 cv__isWord(int p)
 {
 	return (!isspace(p));
@@ -231,7 +231,7 @@ cv__isWord(int p)
 /* c__prev_word():
  *	Find the previous word
  */
-protected char *
+char *
 c__prev_word(char *p, char *low, int n, int (*wtest)(int))
 {
 	p--;
@@ -255,7 +255,7 @@ c__prev_word(char *p, char *low, int n, int (*wtest)(int))
 /* c__next_word():
  *	Find the next word
  */
-protected char *
+char *
 c__next_word(char *p, char *high, int n, int (*wtest)(int))
 {
 	while (n--) {
@@ -273,7 +273,7 @@ c__next_word(char *p, char *high, int n, int (*wtest)(int))
 /* cv_next_word():
  *	Find the next word vi style
  */
-protected char *
+char *
 cv_next_word(EditLine *el, char *p, char *high, int n, int (*wtest)(int))
 {
 	int test;
@@ -302,7 +302,7 @@ cv_next_word(EditLine *el, char *p, char *high, int n, int (*wtest)(int))
 /* cv_prev_word():
  *	Find the previous word vi style
  */
-protected char *
+char *
 cv_prev_word(char *p, char *low, int n, int (*wtest)(int))
 {
 	int test;
@@ -331,7 +331,7 @@ cv_prev_word(char *p, char *low, int n, int (*wtest)(int))
  * 	A '$' by itself means a big number; "$-" is for negative; '^' means 1.
  * 	Return p pointing to last char used.
  */
-protected char *
+char *
 c__number(
     char *p,	/* character position */
     int *num,	/* Return value	*/
@@ -362,7 +362,7 @@ c__number(
 /* cv_delfini():
  *	Finish vi delete action
  */
-protected void
+void
 cv_delfini(EditLine *el)
 {
 	int size;
@@ -401,7 +401,7 @@ cv_delfini(EditLine *el)
 /* ce__endword():
  *	Go to the end of this word according to emacs
  */
-protected char *
+char *
 ce__endword(char *p, char *high, int n)
 {
 	p++;
@@ -422,7 +422,7 @@ ce__endword(char *p, char *high, int n)
 /* cv__endword():
  *	Go to the end of this word according to vi
  */
-protected char *
+char *
 cv__endword(char *p, char *high, int n, int (*wtest)(int))
 {
 	int test;
@@ -444,7 +444,7 @@ cv__endword(char *p, char *high, int n, int (*wtest)(int))
 /* ch_init():
  *	Initialize the character editor
  */
-protected int
+int
 ch_init(EditLine *el)
 {
 	c_macro_t *ma = &el->el_chared.c_macro;
@@ -500,7 +500,7 @@ ch_init(EditLine *el)
 /* ch_reset():
  *	Reset the character editor
  */
-protected void
+void
 ch_reset(EditLine *el, int mclear)
 {
 	el->el_line.cursor		= el->el_line.buffer;
@@ -541,7 +541,7 @@ ch__clearmacro(el)
  *	Enlarge line buffer to be able to hold twice as much characters.
  *	Returns 1 if successful, 0 if not.
  */
-protected int
+int
 ch_enlargebufs(el, addlen)
 	EditLine *el;
 	size_t addlen;
@@ -627,7 +627,7 @@ ch_enlargebufs(el, addlen)
 /* ch_end():
  *	Free the data structures used by the editor
  */
-protected void
+void
 ch_end(EditLine *el)
 {
 	el_free((ptr_t) el->el_line.buffer);
@@ -691,7 +691,7 @@ el_deletestr(EditLine *el, int n)
 /* c_gets():
  *	Get a string
  */
-protected int
+int
 c_gets(EditLine *el, char *buf, const char *prompt)
 {
 	char ch;
@@ -756,7 +756,7 @@ c_gets(EditLine *el, char *buf, const char *prompt)
 /* c_hpos():
  *	Return the current horizontal position of the cursor
  */
-protected int
+int
 c_hpos(EditLine *el)
 {
 	char *ptr;

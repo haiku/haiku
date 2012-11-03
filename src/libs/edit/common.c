@@ -48,7 +48,7 @@ __FBSDID("$FreeBSD: src/lib/libedit/common.c,v 1.11 2005/08/09 13:37:59 stefanf 
  *	Indicate end of file
  *	[^D]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_end_of_file(EditLine *el, int c __unused)
 {
@@ -63,7 +63,7 @@ ed_end_of_file(EditLine *el, int c __unused)
  *	Add character to the line
  *	Insert a character [bound to all insert keys]
  */
-protected el_action_t
+el_action_t
 ed_insert(EditLine *el, int c)
 {
 	int count = el->el_state.argument;
@@ -105,7 +105,7 @@ ed_insert(EditLine *el, int c)
  *	Delete from beginning of current word to cursor
  *	[M-^?] [^W]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_delete_prev_word(EditLine *el, int c __unused)
 {
@@ -133,7 +133,7 @@ ed_delete_prev_word(EditLine *el, int c __unused)
  *	Delete character under cursor
  *	[^D] [x]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_delete_next_char(EditLine *el, int c __unused)
 {
@@ -184,7 +184,7 @@ ed_delete_next_char(EditLine *el, int c __unused)
  *	Cut to the end of line
  *	[^K] [^K]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_kill_line(EditLine *el, int c __unused)
 {
@@ -205,7 +205,7 @@ ed_kill_line(EditLine *el, int c __unused)
  *	Move cursor to the end of line
  *	[^E] [^E]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_move_to_end(EditLine *el, int c __unused)
 {
@@ -228,7 +228,7 @@ ed_move_to_end(EditLine *el, int c __unused)
  *	Move cursor to the beginning of line
  *	[^A] [^A]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_move_to_beg(EditLine *el, int c __unused)
 {
@@ -252,7 +252,7 @@ ed_move_to_beg(EditLine *el, int c __unused)
  *	Exchange the character to the left of the cursor with the one under it
  *	[^T] [^T]
  */
-protected el_action_t
+el_action_t
 ed_transpose_chars(EditLine *el, int c)
 {
 
@@ -277,7 +277,7 @@ ed_transpose_chars(EditLine *el, int c)
  *	Move to the right one character
  *	[^F] [^F]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_next_char(EditLine *el, int c __unused)
 {
@@ -306,7 +306,7 @@ ed_next_char(EditLine *el, int c __unused)
  *	Move to the beginning of the current word
  *	[M-b] [b]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_prev_word(EditLine *el, int c __unused)
 {
@@ -332,7 +332,7 @@ ed_prev_word(EditLine *el, int c __unused)
  *	Move to the left one character
  *	[^B] [^B]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_prev_char(EditLine *el, int c __unused)
 {
@@ -357,7 +357,7 @@ ed_prev_char(EditLine *el, int c __unused)
  *	Add the next character typed verbatim
  *	[^V] [^V]
  */
-protected el_action_t
+el_action_t
 ed_quoted_insert(EditLine *el, int c)
 {
 	int num;
@@ -377,7 +377,7 @@ ed_quoted_insert(EditLine *el, int c)
 /* ed_digit():
  *	Adds to argument or enters a digit
  */
-protected el_action_t
+el_action_t
 ed_digit(EditLine *el, int c)
 {
 
@@ -405,7 +405,7 @@ ed_digit(EditLine *el, int c)
  *	Digit that starts argument
  *	For ESC-n
  */
-protected el_action_t
+el_action_t
 ed_argument_digit(EditLine *el, int c)
 {
 
@@ -429,7 +429,7 @@ ed_argument_digit(EditLine *el, int c)
  *	Indicates unbound character
  *	Bound to keys that are not assigned
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_unassigned(EditLine *el, int c __unused)
 {
@@ -446,7 +446,7 @@ ed_unassigned(EditLine *el, int c __unused)
  *	Tty interrupt character
  *	[^C]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_tty_sigint(EditLine *el __unused, 
 	      int c __unused)
@@ -460,7 +460,7 @@ ed_tty_sigint(EditLine *el __unused,
  *	Tty delayed suspend character
  *	[^Y]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_tty_dsusp(EditLine *el __unused, 
 	     int c __unused)
@@ -474,7 +474,7 @@ ed_tty_dsusp(EditLine *el __unused,
  *	Tty flush output characters
  *	[^O]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_tty_flush_output(EditLine *el __unused, 
 		    int c __unused)
@@ -488,7 +488,7 @@ ed_tty_flush_output(EditLine *el __unused,
  *	Tty quit character
  *	[^\]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_tty_sigquit(EditLine *el __unused, 
 	       int c __unused)
@@ -502,7 +502,7 @@ ed_tty_sigquit(EditLine *el __unused,
  *	Tty suspend character
  *	[^Z]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_tty_sigtstp(EditLine *el __unused, 
 	       int c __unused)
@@ -516,7 +516,7 @@ ed_tty_sigtstp(EditLine *el __unused,
  *	Tty disallow output characters
  *	[^S]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_tty_stop_output(EditLine *el __unused, 
 		   int c __unused)
@@ -530,7 +530,7 @@ ed_tty_stop_output(EditLine *el __unused,
  *	Tty allow output characters
  *	[^Q]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_tty_start_output(EditLine *el __unused, 
 		    int c __unused)
@@ -544,7 +544,7 @@ ed_tty_start_output(EditLine *el __unused,
  *	Execute command
  *	[^J]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_newline(EditLine *el, int c __unused)
 {
@@ -560,7 +560,7 @@ ed_newline(EditLine *el, int c __unused)
  *	Delete the character to the left of the cursor
  *	[^?]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_delete_prev_char(EditLine *el, int c __unused)
 {
@@ -580,7 +580,7 @@ ed_delete_prev_char(EditLine *el, int c __unused)
  *	Clear screen leaving current line at the top
  *	[^L]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_clear_screen(EditLine *el, int c __unused)
 {
@@ -595,7 +595,7 @@ ed_clear_screen(EditLine *el, int c __unused)
  *	Redisplay everything
  *	^R
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_redisplay(EditLine *el __unused, 
 	     int c __unused)
@@ -609,7 +609,7 @@ ed_redisplay(EditLine *el __unused,
  *	Erase current line and start from scratch
  *	[^G]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_start_over(EditLine *el, int c __unused)
 {
@@ -623,7 +623,7 @@ ed_start_over(EditLine *el, int c __unused)
  *	First character in a bound sequence
  *	Placeholder for external keys
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_sequence_lead_in(EditLine *el __unused, 
 		    int c __unused)
@@ -637,7 +637,7 @@ ed_sequence_lead_in(EditLine *el __unused,
  *	Move to the previous history line
  *	[^P] [k]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_prev_history(EditLine *el, int c __unused)
 {
@@ -675,7 +675,7 @@ ed_prev_history(EditLine *el, int c __unused)
  *	Move to the next history line
  *	[^N] [j]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_next_history(EditLine *el, int c __unused)
 {
@@ -702,7 +702,7 @@ ed_next_history(EditLine *el, int c __unused)
  *	Search previous in history for a line matching the current
  *	next search history [M-P] [K]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_search_prev_history(EditLine *el, int c __unused)
 {
@@ -770,7 +770,7 @@ ed_search_prev_history(EditLine *el, int c __unused)
  *	Search next in history for a line matching the current
  *	[M-N] [J]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_search_next_history(EditLine *el, int c __unused)
 {
@@ -824,7 +824,7 @@ ed_search_next_history(EditLine *el, int c __unused)
  *	Move up one line
  *	Could be [k] [^p]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_prev_line(EditLine *el, int c __unused)
 {
@@ -867,7 +867,7 @@ ed_prev_line(EditLine *el, int c __unused)
  *	Move down one line
  *	Could be [j] [^n]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_next_line(EditLine *el, int c __unused)
 {
@@ -901,7 +901,7 @@ ed_next_line(EditLine *el, int c __unused)
  *	Editline extended command
  *	[M-X] [:]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 ed_command(EditLine *el, int c __unused)
 {

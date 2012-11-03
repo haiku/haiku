@@ -49,10 +49,10 @@ typedef struct el_prompt_t {
 	coord_t		p_pos;	/* position in the line after prompt	*/
 } el_prompt_t;
 
-protected void	prompt_print(EditLine *, int);
-protected int	prompt_set(EditLine *, el_pfunc_t, int);
-protected int	prompt_get(EditLine *, el_pfunc_t *, int);
-protected int	prompt_init(EditLine *);
-protected void	prompt_end(EditLine *);
+void	prompt_print(EditLine *, int);
+int	prompt_set(EditLine *, el_pfunc_t, int);
+int	prompt_get(EditLine *, el_pfunc_t *, int);
+int	prompt_init(EditLine *);
+void	prompt_end(EditLine *);
 
 #endif /* _h_el_prompt */

@@ -73,7 +73,7 @@ private const struct {
 /* parse_line():
  *	Parse a line and dispatch it
  */
-protected int
+int
 parse_line(EditLine *el, const char *line)
 {
 	const char **argv;
@@ -133,7 +133,7 @@ el_parse(EditLine *el, int argc, const char *argv[])
  *	Parse a string of the form ^<char> \<odigit> \<char> and return
  *	the appropriate character or -1 if the escape is not valid
  */
-protected int
+int
 parse__escape(const char **ptr)
 {
 	const char *p;
@@ -211,7 +211,7 @@ parse__escape(const char **ptr)
 /* parse__string():
  *	Parse the escapes from in and put the raw string out
  */
-protected char *
+char *
 parse__string(char *out, const char *in)
 {
 	char *rv = out;
@@ -249,7 +249,7 @@ parse__string(char *out, const char *in)
  *	Return the command number for the command string given
  *	or -1 if one is not found
  */
-protected int
+int
 parse_cmd(EditLine *el, const char *cmd)
 {
 	el_bindings_t *b;
