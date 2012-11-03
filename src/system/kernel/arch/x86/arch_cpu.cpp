@@ -154,7 +154,7 @@ acpi_shutdown(bool rebootSystem)
 		status = acpi->prepare_sleep_state(ACPI_POWER_STATE_OFF, NULL, 0);
 		if (status == B_OK) {
 			//cpu_status state = disable_interrupts();
-			status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF, 0);
+			status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
 			//restore_interrupts(state);
 		}
 	}
