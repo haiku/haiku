@@ -701,19 +701,24 @@ BScrollBar::MouseDown(BPoint where)
 
 	// hit test for arrows or empty area
 	float scrollValue = 0.0;
+
+	// pressing the shift key scrolls faster
+	float buttonStepSize
+		= (modifiers() & B_SHIFT_KEY) != 0 ? fLargeStep : fSmallStep;
+
 	fPrivateData->fButtonDown = _ButtonFor(where);
 	switch (fPrivateData->fButtonDown) {
 		case ARROW1:
-			scrollValue = -fSmallStep;
+			scrollValue = -buttonStepSize;
 			break;
 		case ARROW2:
-			scrollValue = fSmallStep;
+			scrollValue = buttonStepSize;
 			break;
 		case ARROW3:
-			scrollValue = -fSmallStep;
+			scrollValue = -buttonStepSize;
 			break;
 		case ARROW4:
-			scrollValue = fSmallStep;
+			scrollValue = buttonStepSize;
 			break;
 		case NOARROW:
 			// we hit the empty area, figure out which side of the thumb
