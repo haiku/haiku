@@ -289,7 +289,7 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 		}
 
 		size = (double)((10 * diskSize + divisor - 1) / divisor);
-		snprintf(cookie->label, MAX_PATH - 1, "%g %cB NTFS File System",
+		snprintf(cookie->label, MAX_PATH - 1, "%g %cB NTFS Volume",
 			size / 10, unit);
 	}
 
