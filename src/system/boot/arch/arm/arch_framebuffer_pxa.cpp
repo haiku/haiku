@@ -32,15 +32,19 @@ extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
 
 class ArchFBArmPxa270 : public ArchFramebuffer {
 public:
-							ArchFBArmPxa270(addr_t base);
-							~ArchFBArmPxa270();
+							ArchFBArmPxa270(addr_t base)
+								: ArchFramebuffer(base) {}
+							~ArchFBArmPxa270() {}
 			status_t		Init();
 			status_t		Probe();
 			status_t		SetDefaultMode();
 			status_t		SetVideoMode(int width, int height, int depth);
 };
 
-ArchFBArmPxa270 *arch_get_fb_arm_pxa270(addr_t base);
+extern "C" ArchFramebuffer *arch_get_fb_arm_pxa270(addr_t base)
+{
+	return new ArchFBArmPxa270(base);
+}
 
 
 //  #pragma mark -
@@ -97,8 +101,13 @@ dprintf("error %08x\n", err);
 	struct pxa27x_lcd_dma_descriptor *dma;
 
 	// check if LCD controller is enabled
-	if (!(read_io_32(LCCR0) | 0x00000001))
+	if (!(read_io_32(LCCR0) & 0x00000001)) {
+		// not enabled, so return suggested mode
+		gKernelArgs.frame_buffer.depth = 32;
+		gKernelArgs.frame_buffer.width = 640;
+		gKernelArgs.frame_buffer.height = 480;
 		return B_NO_INIT;
+	}
 
 	pixelFormat = bppCode = read_io_32(LCCR3);
 	bppCode = ((bppCode >> 26) & 0x08) | ((bppCode >> 24) & 0x07);
@@ -126,7 +135,7 @@ dprintf("error %08x\n", err);
 			return B_ERROR;
 	}
 
-	gKernelArgs.frame_buffer.physical_buffer.start = (dma->fdadr & ~0x0f);
+	gKernelArgs.frame_buffer.physical_buffer.start = (dma->fsadr & ~0x0f);
 	gKernelArgs.frame_buffer.width = (read_io_32(LCCR1) & ((1 << 10) - 1)) + 1;
 	gKernelArgs.frame_buffer.height = (read_io_32(LCCR2) & ((1 << 10) - 1)) + 1;
 	gKernelArgs.frame_buffer.bytes_per_row = gKernelArgs.frame_buffer.width
@@ -150,12 +159,6 @@ ArchFBArmPxa270::SetVideoMode(int width, int height, int depth)
 
 	void *fb;
 	uint32 fbSize = width * height * depth / 8;
-	//fb = malloc(800 * 600 * 4 + 16 - 1);
-	//fb = (void *)(((uint32)fb) & ~(0x0f));
-	//fb = scratch - 800;
-	//fb = (void *)0xa0000000;
-
-//	fBase = scratch - 800;
 
 	fb = (void*)fBase;
 
@@ -168,8 +171,8 @@ ArchFBArmPxa270::SetVideoMode(int width, int height, int depth)
 
 	// if not already enabled, set a default mode
 	if (!(read_io_32(LCCR0) & 0x00000001)) {
-		int bpp = 0x09; // 24 bpp
-		int pdfor = 0x3; // Format 4: RGB888 (no alpha bit)
+		int bpp;
+		int pdfor;
 		dprintf("Setting video mode\n");
 		switch (depth) {
 			case 4:
@@ -201,7 +204,7 @@ ArchFBArmPxa270::SetVideoMode(int width, int height, int depth)
 		dumpr(LCCR3);
 		dumpr(LCCR4);
 	} else
-		return EALREADY; // for now
+		return B_OK; // assume we're already setup
 
 	// clear the video memory
 	memset((void *)fb, 0, fbSize);

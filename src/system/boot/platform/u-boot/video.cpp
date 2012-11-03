@@ -14,6 +14,7 @@
 #include <boot/platform/generic/video.h>
 #include <util/list.h>
 #include <drivers/driver_settings.h>
+#include <board_config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,13 +77,9 @@ platform_blit4(addr_t frameBuffer, const uint8 *data, uint16 width,
 extern "C" void
 platform_switch_to_logo(void)
 {
-	CALLED();
 	// in debug mode, we'll never show the logo
 	if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) != 0)
 		return;
-
-	//XXX: not yet, DISABLED
-	return;
 
 	status_t err;
 
@@ -95,30 +92,28 @@ platform_switch_to_logo(void)
 
 		err = video_display_splash(gFramebuffer->Base());
 	}
-	#warning U-Boot:TODO
 }
 
 
 extern "C" void
 platform_switch_to_text_mode(void)
 {
-	CALLED();
-	#warning U-Boot:TODO
 }
 
 
 extern "C" status_t
 platform_init_video(void)
 {
-	CALLED();
-
 #ifdef __ARM__
 	#if defined(BOARD_CPU_ARM920T)
+		extern ArchFramebuffer *arch_get_fb_arm_920(addr_t base);
 		gFramebuffer = arch_get_fb_arm_920(0x88000000);
 	#elif defined(BOARD_CPU_OMAP3)
+		extern ArchFramebuffer *arch_get_fb_arm_omap3(addr_t base);
 		gFramebuffer = arch_get_fb_arm_omap3(0x88000000);
 	#elif defined(BOARD_CPU_PXA270)
-		gFramebuffer = arch_get_fb_arm_pxa270(0xA4000000);
+		ArchFramebuffer *arch_get_fb_arm_pxa270(addr_t base);
+		gFramebuffer = arch_get_fb_arm_pxa270(0xA3000000);
 	#endif
 #endif
 
@@ -126,10 +121,6 @@ platform_init_video(void)
 		gFramebuffer->Probe();
 		gFramebuffer->Init();
 	}
-
-	//XXX for testing
-	//platform_switch_to_logo();
-	//return arch_probe_video_mode();
 
 	return B_OK;
 }

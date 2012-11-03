@@ -40,15 +40,20 @@ extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
 
 class ArchFBArmOmap3 : public ArchFramebuffer {
 public:
-							ArchFBArmOmap3(addr_t base);
-							~ArchFBArmOmap3();
+							ArchFBArmOmap3(addr_t base)
+								: ArchFramebuffer(base) {}
+							~ArchFBArmOmap3() {}
+
 			status_t		Init();
 			status_t		Probe();
 			status_t		SetDefaultMode();
 			status_t		SetVideoMode(int width, int height, int depth);
 };
 
-ArchFBArmOmap3 *arch_get_fb_arm_omap3(addr_t base);
+extern "C" ArchFramebuffer *arch_get_fb_arm_omap3(addr_t base)
+{
+	return new ArchFBArmOmap3(base);
+}
 
 
 //	#pragma mark -
