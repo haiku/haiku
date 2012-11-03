@@ -378,9 +378,9 @@ public:
 			bool				HasRef(const char* name, int32 n = 0) const;
 			bool				HasMessage(const char* name, int32 n = 0) const;
 			bool				HasFlat(const char* name,
-									const BFlattenable* ) const;
+									const BFlattenable* object) const;
 			bool				HasFlat(const char* name, int32 n,
-									const BFlattenable* ) const;
+									const BFlattenable* object) const;
 			bool				HasData(const char* name, type_code ,
 									int32 n = 0) const;
 			BRect				FindRect(const char* name, int32 n = 0) const;
@@ -393,6 +393,97 @@ public:
 			bool				FindBool(const char* name, int32 n = 0) const;
 			float				FindFloat(const char* name, int32 n = 0) const;
 			double				FindDouble(const char* name, int32 n = 0) const;
+
+	// Convenience methods
+			bool				GetBool(const char* name,
+									bool defaultValue) const;
+			bool				GetBool(const char* name, int32 index,
+									bool defaultValue) const;
+			int8				GetInt8(const char* name,
+									int8 defaultValue) const;
+			int8				GetInt8(const char* name, int32 index,
+									int8 defaultValue) const;
+			uint8				GetUInt8(const char* name,
+									uint8 defaultValue) const;
+			uint8				GetUInt8(const char* name, int32 index,
+									uint8 defaultValue) const;
+			int16				GetInt16(const char* name,
+									int16 defaultValue) const;
+			int16				GetInt16(const char* name, int32 index,
+									int16 defaultValue) const;
+			uint16				GetUInt16(const char* name,
+									uint16 defaultValue) const;
+			uint16				GetUInt16(const char* name, int32 index,
+									uint16 defaultValue) const;
+			int32				GetInt32(const char* name,
+									int32 defaultValue) const;
+			int32				GetInt32(const char* name, int32 index,
+									int32 defaultValue) const;
+			uint32				GetUInt32(const char* name,
+									uint32 defaultValue) const;
+			uint32				GetUInt32(const char* name, int32 index,
+									uint32 defaultValue) const;
+			int64				GetInt64(const char* name,
+									int64 defaultValue) const;
+			int64				GetInt64(const char* name, int32 index,
+									int64 defaultValue) const;
+			uint64				GetUInt64(const char* name,
+									uint64 defaultValue) const;
+			uint64				GetUInt64(const char* name, int32 index,
+									uint64 defaultValue) const;
+			float				GetFloat(const char* name,
+									float defaultValue) const;
+			float				GetFloat(const char* name, int32 index,
+									float defaultValue) const;
+			double				GetDouble(const char* name,
+									double defaultValue) const;
+			double				GetDouble(const char* name, int32 index,
+									double defaultValue) const;
+			void*				GetPointer(const char* name,
+									const void* defaultValue) const;
+			void*				GetPointer(const char* name, int32 index,
+									const void* defaultValue) const;
+			const char*			GetString(const char* name,
+									const char* defaultValue) const;
+			const char*			GetString(const char* name, int32 index,
+									const char* defaultValue) const;
+			BAlignment			GetAlignment(const char* name, int32 index,
+									const BAlignment& defaultValue) const;
+			BAlignment			GetAlignment(const char* name,
+									const BAlignment& defaultValue) const;
+			BRect				GetRect(const char* name, int32 index,
+									const BRect& defaultValue) const;
+			BRect				GetRect(const char* name,
+									const BRect& defaultValue) const;
+			BPoint				GetPoint(const char* name, int32 index,
+									const BPoint& defaultValue) const;
+			BPoint				GetPoint(const char* name,
+									const BPoint& defaultValue) const;
+			BSize				GetSize(const char* name, int32 index,
+									const BSize& defaultValue) const;
+			BSize				GetSize(const char* name,
+									const BSize& defaultValue) const;
+
+	// fixed size fields only
+			status_t			SetBool(const char* name, bool value);
+			status_t			SetInt8(const char* name, int8 value);
+			status_t			SetUInt8(const char* name, uint8 value);
+			status_t			SetInt16(const char* name, int16 value);
+			status_t			SetUInt16(const char* name, uint16 value);
+			status_t			SetInt32(const char* name, int32 value);
+			status_t			SetUInt32(const char* name, uint32 value);
+			status_t			SetInt64(const char* name, int64 value);
+			status_t			SetUInt64(const char* name, uint64 value);
+			status_t			SetPointer(const char* name, const void* value);
+			status_t			SetFloat(const char* name, float value);
+			status_t			SetDouble(const char* name, double value);
+			status_t			SetAlignment(const char* name,
+									const BAlignment& value);
+			status_t			SetPoint(const char* name, const BPoint& value);
+			status_t			SetRect(const char* name, const BRect& value);
+			status_t			SetSize(const char* name, const BSize& value);
+			status_t			SetData(const char* name, type_code type,
+									const void* data, ssize_t numBytes);
 
 	class Private;
 	struct message_header;
