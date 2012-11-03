@@ -44,7 +44,7 @@
 #include "ntfs.h"
 #include "volume_util.h"
 
-static const char* kNTFSUnnamed = {"NTFS Unnamed"};
+extern int	mkntfs_main(const char *devpath, const char *label);
 
 typedef struct identify_cookie {
 	NTFS_BOOT_SECTOR boot;
@@ -272,27 +272,6 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 		}	
 	}
 
-	// generate a more or less descriptive name for unnamed volume
-	if (cookie->label[0]=='\0') {		
-		double size;
-		off_t diskSize = sle64_to_cpu(boot.number_of_sectors)
-			* le16_to_cpu(boot.bpb.bytes_per_sector);
-		off_t divisor = 1ULL << 40;
-		char unit = 'T';
-		if (diskSize < divisor) {
-			divisor = 1UL << 30;
-			unit = 'G';
-			if (diskSize < divisor) {
-				divisor = 1UL << 20;
-				unit = 'M';
-			}
-		}
-
-		size = (double)((10 * diskSize + divisor - 1) / divisor);
-		snprintf(cookie->label, MAX_PATH - 1, "%g %cB NTFS Volume",
-			size / 10, unit);
-	}
-
 	*_cookie = cookie;
 
 	return 0.8f;
@@ -318,6 +297,42 @@ fs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 {
 	identify_cookie *cookie = (identify_cookie *)_cookie;
 	free(cookie);
+}
+
+
+uint32
+fs_get_supported_operations(partition_data* partition, uint32 mask)
+{
+	return B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+		| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+		| B_DISK_SYSTEM_SUPPORTS_WRITING;
+}
+
+
+status_t
+fs_initialize(int fd, partition_id partitionID, const char* name,
+	const char* parameterString, off_t partitionSize, disk_job_id job)
+{	
+	char devpath[MAX_PATH];
+	status_t result = B_OK;
+
+	TRACE("fs_initialize - [%s] - [%s]\n",name, parameterString);
+	
+	update_disk_device_job_progress(job, 0);
+		
+	if (ioctl(fd, B_GET_PATH_FOR_DEVICE, devpath) != 0) {
+		mkntfs_main(devpath, name);
+	} else {
+		return B_BAD_VALUE;
+	}
+
+	result = scan_partition(partitionID);
+	if (result != B_OK)
+		return result;
+
+	update_disk_device_job_progress(job, 1);
+
+	return result;
 }
 
 
@@ -488,9 +503,24 @@ fs_rfsstat(fs_volume *_vol, struct fs_info *fss)
 		if (fss->volume_name[i] != ' ')
 			break;
 	}
-	if (i < 0)
-		strcpy(fss->volume_name, kNTFSUnnamed);
-	else
+	if (i < 0) {
+		double size;
+		off_t diskSize = ns->ntvol->nr_clusters	* ns->ntvol->cluster_size;
+		off_t divisor = 1ULL << 40;
+		char unit = 'T';
+		if (diskSize < divisor) {
+			divisor = 1UL << 30;
+			unit = 'G';
+			if (diskSize < divisor) {
+				divisor = 1UL << 20;
+				unit = 'M';
+			}
+		}
+
+		size = (double)((10 * diskSize + divisor - 1) / divisor);
+		snprintf(fss->volume_name, sizeof(fss->volume_name), "%g %cB NTFS Volume",
+			size / 10, unit);	
+	} else
 		fss->volume_name[i + 1] = 0;
 
 	strcpy(fss->fsh_name, "NTFS");
