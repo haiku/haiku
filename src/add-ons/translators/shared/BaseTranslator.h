@@ -43,13 +43,6 @@
 #include <View.h>
 #include "TranslatorSettings.h"
 
-#ifndef min
-#define min(a,b) ((a < b) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a,b) ((a > b) ? (a) : (b))
-#endif
-
 class BaseTranslator : public BTranslator {
 public:
 	BaseTranslator(const char *name, const char *info,

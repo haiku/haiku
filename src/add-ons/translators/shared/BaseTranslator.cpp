@@ -30,13 +30,16 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+#include "BaseTranslator.h"
+
 #include <string.h>
 #include <stdio.h>
+
+#include <algorithm>
 
 #include <Catalog.h>
 #include <Locale.h>
 
-#include "BaseTranslator.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "BaseTranslator"
@@ -546,7 +549,8 @@ BaseTranslator::translate_from_bits_to_bits(BPositionIO *inSource,
 				if (writ < 0)
 					break;
 				remaining -= static_cast<uint32>(writ);
-				rd = inSource->Read(buf, min(1024, remaining));
+				rd = inSource->Read(buf, std::min(1024UL, 
+					remaining));
 			}
 
 			if (remaining > 0)
