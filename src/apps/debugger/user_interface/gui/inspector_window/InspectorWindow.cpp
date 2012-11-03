@@ -52,6 +52,11 @@ InspectorWindow::InspectorWindow(::Team* team, UserInterfaceListener* listener,
 
 InspectorWindow::~InspectorWindow()
 {
+	if (fCurrentBlock != NULL)
+	{
+		fCurrentBlock->RemoveListener(this);
+		fCurrentBlock->ReleaseReference();
+	}
 }
 
 
