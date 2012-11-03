@@ -65,6 +65,7 @@ HAIKU_INCLUDE_SOURCES=0
 $urlLine
 $sslPkgLine
 $sslUrlLine
+$webkitFileLine
 declare -a functionArgs
 expanderRulesFile=`finddir B_COMMON_DATA_DIRECTORY`/expander.rules
 if [ -f \${expanderRulesFile} ] ; then
@@ -686,13 +687,17 @@ function ConvertJamToBash()
 	#icuDevelPkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
 	#ConvertVariableDeclarationLines "$regExp" 'icuDevelPkgLine'
 
-	local regExp='/^HAIKU_OPENSSL_PACKAGE/p'
+	local regExp="/^\s*HAIKU_OPENSSL_PACKAGE = .*-gcc${HAIKU_GCC_VERSION[1]}-/p"
 	sslPkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
 	ConvertVariableDeclarationLines "$regExp" 'sslPkgLine'
 
 	local regExp='/^HAIKU_OPENSSL_URL/p'
 	sslUrlLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
 	ConvertVariableDeclarationLines "$regExp" 'sslUrlLine'
+
+	local regExp='/^HAIKU_WEBKIT_FILE/p'
+	webkitFileLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	ConvertVariableDeclarationLines "$regExp" 'webkitFileLine'
 
 	local regExp='/^local\ baseURL/p'
 	urlLine=`sed -n -e "$regExp" ${baseDir}/OptionalPackages`
