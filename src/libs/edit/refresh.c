@@ -132,7 +132,7 @@ re_addc(EditLine *el, int c)
 /* re_putc():
  *	Draw the character given
  */
-protected void
+void
 re_putc(EditLine *el, int c, int shift)
 {
 
@@ -180,7 +180,7 @@ re_putc(EditLine *el, int c, int shift)
  *	virtual image. The routine to re-draw a line can be replaced
  *	easily in hopes of a smarter one being placed there.
  */
-protected void
+void
 re_refresh(EditLine *el)
 {
 	int i, rhdiff;
@@ -316,7 +316,7 @@ re_refresh(EditLine *el)
 /* re_goto_bottom():
  *	 used to go to last used screen line
  */
-protected void
+void
 re_goto_bottom(EditLine *el)
 {
 
@@ -952,7 +952,7 @@ re__copy_and_pad(char *dst, const char *src, size_t width)
 /* re_refresh_cursor():
  *	Move to the new cursor position
  */
-protected void
+void
 re_refresh_cursor(EditLine *el)
 {
 	char *cp, c;
@@ -1062,7 +1062,7 @@ re_fastputc(EditLine *el, int c)
  *	we added just one char, handle it fast.
  *	Assumes that screen cursor == real cursor
  */
-protected void
+void
 re_fastaddc(EditLine *el)
 {
 	char c;
@@ -1099,7 +1099,7 @@ re_fastaddc(EditLine *el)
 /* re_clear_display():
  *	clear the screen buffers so that new new prompt starts fresh.
  */
-protected void
+void
 re_clear_display(EditLine *el)
 {
 	int i;
@@ -1115,7 +1115,7 @@ re_clear_display(EditLine *el)
 /* re_clear_lines():
  *	Make sure all lines are *really* blank
  */
-protected void
+void
 re_clear_lines(EditLine *el)
 {
 

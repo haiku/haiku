@@ -141,28 +141,28 @@ typedef struct el_chared_t {
 #include "fcns.h"
 
 
-protected int	 cv__isword(int);
-protected int	 cv__isWord(int);
-protected void	 cv_delfini(EditLine *);
-protected char	*cv__endword(char *, char *, int, int (*)(int));
-protected int	 ce__isword(int);
-protected void	 cv_undo(EditLine *);
-protected void	 cv_yank(EditLine *, const char *, int);
-protected char	*cv_next_word(EditLine*, char *, char *, int, int (*)(int));
-protected char	*cv_prev_word(char *, char *, int, int (*)(int));
-protected char	*c__next_word(char *, char *, int, int (*)(int));
-protected char	*c__prev_word(char *, char *, int, int (*)(int));
-protected void	 c_insert(EditLine *, int);
-protected void	 c_delbefore(EditLine *, int);
-protected void	 c_delbefore1(EditLine *);
-protected void	 c_delafter(EditLine *, int);
-protected void	 c_delafter1(EditLine *);
-protected int	 c_gets(EditLine *, char *, const char *);
-protected int	 c_hpos(EditLine *);
+int	 cv__isword(int);
+int	 cv__isWord(int);
+void	 cv_delfini(EditLine *);
+char	*cv__endword(char *, char *, int, int (*)(int));
+int	 ce__isword(int);
+void	 cv_undo(EditLine *);
+void	 cv_yank(EditLine *, const char *, int);
+char	*cv_next_word(EditLine*, char *, char *, int, int (*)(int));
+char	*cv_prev_word(char *, char *, int, int (*)(int));
+char	*c__next_word(char *, char *, int, int (*)(int));
+char	*c__prev_word(char *, char *, int, int (*)(int));
+void	 c_insert(EditLine *, int);
+void	 c_delbefore(EditLine *, int);
+void	 c_delbefore1(EditLine *);
+void	 c_delafter(EditLine *, int);
+void	 c_delafter1(EditLine *);
+int	 c_gets(EditLine *, char *, const char *);
+int	 c_hpos(EditLine *);
 
-protected int	 ch_init(EditLine *);
-protected void	 ch_reset(EditLine *, int);
-protected int	 ch_enlargebufs(EditLine *, size_t);
-protected void	 ch_end(EditLine *);
+int	 ch_init(EditLine *);
+void	 ch_reset(EditLine *, int);
+int	 ch_enlargebufs(EditLine *, size_t);
+void	 ch_end(EditLine *);
 
 #endif /* _h_el_chared */

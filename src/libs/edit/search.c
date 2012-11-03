@@ -60,7 +60,7 @@ __FBSDID("$FreeBSD: src/lib/libedit/search.c,v 1.10 2005/08/07 20:51:52 stefanf 
 /* search_init():
  *	Initialize the search stuff
  */
-protected int
+int
 search_init(EditLine *el)
 {
 
@@ -79,7 +79,7 @@ search_init(EditLine *el)
 /* search_end():
  *	Initialize the search stuff
  */
-protected void
+void
 search_end(EditLine *el)
 {
 
@@ -103,7 +103,7 @@ regerror(const char *msg)
 /* el_match():
  *	Return if string matches pattern
  */
-protected int
+int
 el_match(const char *str, const char *pat)
 {
 #if defined (REGEX)
@@ -148,7 +148,7 @@ el_match(const char *str, const char *pat)
 /* c_hmatch():
  *	 return True if the pattern matches the prefix
  */
-protected int
+int
 c_hmatch(EditLine *el, const char *str)
 {
 #ifdef SDEBUG
@@ -163,7 +163,7 @@ c_hmatch(EditLine *el, const char *str)
 /* c_setpat():
  *	Set the history seatch pattern
  */
-protected void
+void
 c_setpat(EditLine *el)
 {
 	if (el->el_state.lastcmd != ED_SEARCH_PREV_HISTORY &&
@@ -194,7 +194,7 @@ c_setpat(EditLine *el)
 /* ce_inc_search():
  *	Emacs incremental search
  */
-protected el_action_t
+el_action_t
 ce_inc_search(EditLine *el, int dir)
 {
 	static const char STRfwd[] = {'f', 'w', 'd', '\0'},
@@ -440,7 +440,7 @@ ce_inc_search(EditLine *el, int dir)
 /* cv_search():
  *	Vi search.
  */
-protected el_action_t
+el_action_t
 cv_search(EditLine *el, int dir)
 {
 	char ch;
@@ -514,7 +514,7 @@ cv_search(EditLine *el, int dir)
 /* ce_search_line():
  *	Look for a pattern inside a line
  */
-protected el_action_t
+el_action_t
 ce_search_line(EditLine *el, int dir)
 {
 	char *cp = el->el_line.cursor;
@@ -556,7 +556,7 @@ ce_search_line(EditLine *el, int dir)
 /* cv_repeat_srch():
  *	Vi repeat search
  */
-protected el_action_t
+el_action_t
 cv_repeat_srch(EditLine *el, int c)
 {
 
@@ -582,7 +582,7 @@ cv_repeat_srch(EditLine *el, int c)
 /* cv_csearch():
  *	Vi character search
  */
-protected el_action_t
+el_action_t
 cv_csearch(EditLine *el, int direction, int ch, int count, int tflag)
 {
 	char *cp;

@@ -45,7 +45,7 @@ __FBSDID("$FreeBSD: src/lib/libedit/emacs.c,v 1.10 2005/08/09 13:37:59 stefanf E
  *	Delete character under cursor or list completions if at end of line
  *	[^D]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_delete_or_list(EditLine *el, int c __unused)
 {
@@ -82,7 +82,7 @@ em_delete_or_list(EditLine *el, int c __unused)
  *	Cut from cursor to end of current word
  *	[M-d]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_delete_next_word(EditLine *el, int c __unused)
 {
@@ -111,7 +111,7 @@ em_delete_next_word(EditLine *el, int c __unused)
  *	Paste cut buffer at cursor position
  *	[^Y]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_yank(EditLine *el, int c __unused)
 {
@@ -146,7 +146,7 @@ em_yank(EditLine *el, int c __unused)
  *	Cut the entire line and save in cut buffer
  *	[^U]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_kill_line(EditLine *el, int c __unused)
 {
@@ -168,7 +168,7 @@ em_kill_line(EditLine *el, int c __unused)
  *	Cut area between mark and cursor and save in cut buffer
  *	[^W]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_kill_region(EditLine *el, int c __unused)
 {
@@ -201,7 +201,7 @@ em_kill_region(EditLine *el, int c __unused)
  *	Copy area between mark and cursor to cut buffer
  *	[M-W]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_copy_region(EditLine *el, int c __unused)
 {
@@ -231,7 +231,7 @@ em_copy_region(EditLine *el, int c __unused)
  *	Exchange the two characters before the cursor
  *	Gosling emacs transpose chars [^T]
  */
-protected el_action_t
+el_action_t
 em_gosmacs_transpose(EditLine *el, int c)
 {
 
@@ -250,7 +250,7 @@ em_gosmacs_transpose(EditLine *el, int c)
  *	Move next to end of current word
  *	[M-f]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_next_word(EditLine *el, int c __unused)
 {
@@ -275,7 +275,7 @@ em_next_word(EditLine *el, int c __unused)
  *	Uppercase the characters from cursor to end of current word
  *	[M-u]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_upper_case(EditLine *el, int c __unused)
 {
@@ -299,7 +299,7 @@ em_upper_case(EditLine *el, int c __unused)
  *	Capitalize the characters from cursor to end of current word
  *	[M-c]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_capitol_case(EditLine *el, int c __unused)
 {
@@ -331,7 +331,7 @@ em_capitol_case(EditLine *el, int c __unused)
  *	Lowercase the characters from cursor to end of current word
  *	[M-l]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_lower_case(EditLine *el, int c __unused)
 {
@@ -355,7 +355,7 @@ em_lower_case(EditLine *el, int c __unused)
  *	Set the mark at cursor
  *	[^@]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_set_mark(EditLine *el, int c __unused)
 {
@@ -369,7 +369,7 @@ em_set_mark(EditLine *el, int c __unused)
  *	Exchange the cursor and mark
  *	[^X^X]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_exchange_mark(EditLine *el, int c __unused)
 {
@@ -386,7 +386,7 @@ em_exchange_mark(EditLine *el, int c __unused)
  *	Universal argument (argument times 4)
  *	[^U]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_universal_argument(EditLine *el, int c __unused)
 {				/* multiply current argument by 4 */
@@ -403,7 +403,7 @@ em_universal_argument(EditLine *el, int c __unused)
  *	Add 8th bit to next character typed
  *	[<ESC>]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_meta_next(EditLine *el, int c __unused)
 {
@@ -416,7 +416,7 @@ em_meta_next(EditLine *el, int c __unused)
 /* em_toggle_overwrite():
  *	Switch from insert to overwrite mode or vice versa
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_toggle_overwrite(EditLine *el, int c __unused)
 {
@@ -430,7 +430,7 @@ em_toggle_overwrite(EditLine *el, int c __unused)
 /* em_copy_prev_word():
  *	Copy current word to cursor
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_copy_prev_word(EditLine *el, int c __unused)
 {
@@ -457,7 +457,7 @@ em_copy_prev_word(EditLine *el, int c __unused)
 /* em_inc_search_next():
  *	Emacs incremental next search
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_inc_search_next(EditLine *el, int c __unused)
 {
@@ -470,7 +470,7 @@ em_inc_search_next(EditLine *el, int c __unused)
 /* em_inc_search_prev():
  *	Emacs incremental reverse search
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_inc_search_prev(EditLine *el, int c __unused)
 {
@@ -484,7 +484,7 @@ em_inc_search_prev(EditLine *el, int c __unused)
  *	Delete the character to the left of the cursor
  *	[^?]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 em_delete_prev_char(EditLine *el, int c __unused)
 {

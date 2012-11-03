@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2006-2012 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BSD_SYS_CDEFS_H_
@@ -11,10 +11,6 @@
 
 #define __FBSDID(x)
 #define __unused
-
-#ifndef __cplusplus
-#	define protected
-#endif
 
 #define __printflike(a, b)	__attribute__ ((format (__printf__, (a), (b))))
 #define __printf0like(a, b)

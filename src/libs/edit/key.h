@@ -64,18 +64,18 @@ typedef struct el_key_t {
 #undef key_clear
 #undef key_print
 
-protected int		 key_init(EditLine *);
-protected void		 key_end(EditLine *);
-protected key_value_t	*key_map_cmd(EditLine *, int);
-protected key_value_t	*key_map_str(EditLine *, char *);
-protected void		 key_reset(EditLine *);
-protected int		 key_get(EditLine *, char *, key_value_t *);
-protected void		 key_add(EditLine *, const char *, key_value_t *, int);
-protected void		 key_clear(EditLine *, el_action_t *, const char *);
-protected int		 key_delete(EditLine *, const char *);
-protected void		 key_print(EditLine *, const char *);
-protected void	         key_kprint(EditLine *, const char *, key_value_t *,
+int		 key_init(EditLine *);
+void		 key_end(EditLine *);
+key_value_t	*key_map_cmd(EditLine *, int);
+key_value_t	*key_map_str(EditLine *, char *);
+void		 key_reset(EditLine *);
+int		 key_get(EditLine *, char *, key_value_t *);
+void		 key_add(EditLine *, const char *, key_value_t *, int);
+void		 key_clear(EditLine *, el_action_t *, const char *);
+int		 key_delete(EditLine *, const char *);
+void		 key_print(EditLine *, const char *);
+void	         key_kprint(EditLine *, const char *, key_value_t *,
     int);
-protected char		*key__decode_str(const char *, char *, const char *);
+char		*key__decode_str(const char *, char *, const char *);
 
 #endif /* _h_el_key */
