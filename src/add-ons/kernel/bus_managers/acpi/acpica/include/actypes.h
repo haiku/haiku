@@ -14,7 +14,7 @@
  * 2. License
  *
  * 2.1. This is your license from Intel Corp. under its intellectual property
- * rights.  You may have additional license terms from the party that provided
+ * rights. You may have additional license terms from the party that provided
  * you this software, covering your right to use that party's intellectual
  * property rights.
  *
@@ -31,7 +31,7 @@
  * offer to sell, and import the Covered Code and derivative works thereof
  * solely to the minimum extent necessary to exercise the above copyright
  * license, and in no event shall the patent license extend to any additions
- * to or modifications of the Original Intel Code.  No other license or right
+ * to or modifications of the Original Intel Code. No other license or right
  * is granted directly or by implication, estoppel or otherwise;
  *
  * The above copyright and patent license is granted only if the following
@@ -43,11 +43,11 @@
  * Redistribution of source code of any substantial portion of the Covered
  * Code or modification with rights to further distribute source must include
  * the above Copyright Notice, the above License, this list of Conditions,
- * and the following Disclaimer and Export Compliance provision.  In addition,
+ * and the following Disclaimer and Export Compliance provision. In addition,
  * Licensee must cause all Covered Code to which Licensee contributes to
  * contain a file documenting the changes Licensee made to create that Covered
- * Code and the date of any change.  Licensee must include in that file the
- * documentation of any changes made by any predecessor Licensee.  Licensee
+ * Code and the date of any change. Licensee must include in that file the
+ * documentation of any changes made by any predecessor Licensee. Licensee
  * must include a prominent statement that the modification is derived,
  * directly or indirectly, from Original Intel Code.
  *
@@ -55,7 +55,7 @@
  * Redistribution of source code of any substantial portion of the Covered
  * Code or modification without rights to further distribute source must
  * include the following Disclaimer and Export Compliance provision in the
- * documentation and/or other materials provided with distribution.  In
+ * documentation and/or other materials provided with distribution. In
  * addition, Licensee may not authorize further sublicense of source of any
  * portion of the Covered Code, and must include terms to the effect that the
  * license from Licensee to its licensee is limited to the intellectual
@@ -80,10 +80,10 @@
  * 4. Disclaimer and Export Compliance
  *
  * 4.1. INTEL MAKES NO WARRANTY OF ANY KIND REGARDING ANY SOFTWARE PROVIDED
- * HERE.  ANY SOFTWARE ORIGINATING FROM INTEL OR DERIVED FROM INTEL SOFTWARE
- * IS PROVIDED "AS IS," AND INTEL WILL NOT PROVIDE ANY SUPPORT,  ASSISTANCE,
- * INSTALLATION, TRAINING OR OTHER SERVICES.  INTEL WILL NOT PROVIDE ANY
- * UPDATES, ENHANCEMENTS OR EXTENSIONS.  INTEL SPECIFICALLY DISCLAIMS ANY
+ * HERE. ANY SOFTWARE ORIGINATING FROM INTEL OR DERIVED FROM INTEL SOFTWARE
+ * IS PROVIDED "AS IS," AND INTEL WILL NOT PROVIDE ANY SUPPORT, ASSISTANCE,
+ * INSTALLATION, TRAINING OR OTHER SERVICES. INTEL WILL NOT PROVIDE ANY
+ * UPDATES, ENHANCEMENTS OR EXTENSIONS. INTEL SPECIFICALLY DISCLAIMS ANY
  * IMPLIED WARRANTIES OF MERCHANTABILITY, NONINFRINGEMENT AND FITNESS FOR A
  * PARTICULAR PURPOSE.
  *
@@ -92,14 +92,14 @@
  * COSTS OF PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, OR FOR ANY INDIRECT,
  * SPECIAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THIS AGREEMENT, UNDER ANY
  * CAUSE OF ACTION OR THEORY OF LIABILITY, AND IRRESPECTIVE OF WHETHER INTEL
- * HAS ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES.  THESE LIMITATIONS
+ * HAS ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. THESE LIMITATIONS
  * SHALL APPLY NOTWITHSTANDING THE FAILURE OF THE ESSENTIAL PURPOSE OF ANY
  * LIMITED REMEDY.
  *
  * 4.3. Licensee shall not export, either directly or indirectly, any of this
  * software or system incorporating such software without first obtaining any
  * required license or other approval from the U. S. Department of Commerce or
- * any other agency or department of the United States Government.  In the
+ * any other agency or department of the United States Government. In the
  * event Licensee exports any such software from the United States or
  * re-exports any such software from a foreign destination, Licensee shall
  * ensure that the distribution and export/re-export of the software is in
@@ -526,10 +526,14 @@ typedef UINT64                          ACPI_INTEGER;
 #define ACPI_PHYSADDR_TO_PTR(i)         ACPI_TO_POINTER(i)
 #define ACPI_PTR_TO_PHYSADDR(i)         ACPI_TO_INTEGER(i)
 
+/* Optimizations for 4-character (32-bit) ACPI_NAME manipulation */
+
 #ifndef ACPI_MISALIGNMENT_NOT_SUPPORTED
 #define ACPI_COMPARE_NAME(a,b)          (*ACPI_CAST_PTR (UINT32, (a)) == *ACPI_CAST_PTR (UINT32, (b)))
+#define ACPI_MOVE_NAME(dest,src)        (*ACPI_CAST_PTR (UINT32, (dest)) = *ACPI_CAST_PTR (UINT32, (src)))
 #else
 #define ACPI_COMPARE_NAME(a,b)          (!ACPI_STRNCMP (ACPI_CAST_PTR (char, (a)), ACPI_CAST_PTR (char, (b)), ACPI_NAME_SIZE))
+#define ACPI_MOVE_NAME(dest,src)        (ACPI_STRNCPY (ACPI_CAST_PTR (char, (dest)), ACPI_CAST_PTR (char, (src)), ACPI_NAME_SIZE))
 #endif
 
 
@@ -590,13 +594,6 @@ typedef UINT64                          ACPI_INTEGER;
  */
 #define ACPI_SLEEP_TYPE_MAX             0x7
 #define ACPI_SLEEP_TYPE_INVALID         0xFF
-
-/*
- * Sleep/Wake flags
- */
-#define ACPI_NO_OPTIONAL_METHODS        0x00 /* Do not execute any optional methods */
-#define ACPI_EXECUTE_GTS                0x01 /* For enter sleep interface */
-#define ACPI_EXECUTE_BFS                0x02 /* For leave sleep prep interface */
 
 /*
  * Standard notify values
@@ -881,8 +878,7 @@ typedef UINT8                           ACPI_ADR_SPACE_TYPE;
 /* Sleep function dispatch */
 
 typedef ACPI_STATUS (*ACPI_SLEEP_FUNCTION) (
-    UINT8                   SleepState,
-    UINT8                   Flags);
+    UINT8                   SleepState);
 
 typedef struct acpi_sleep_functions
 {
@@ -1185,22 +1181,22 @@ UINT32 (*ACPI_INTERFACE_HANDLER) (
 #define ACPI_UUID_LENGTH                16
 
 
-/* Structures used for device/processor HID, UID, CID */
+/* Structures used for device/processor HID, UID, CID, and SUB */
 
-typedef struct acpi_device_id
+typedef struct acpi_pnp_device_id
 {
     UINT32                          Length;             /* Length of string + null */
     char                            *String;
 
-} ACPI_DEVICE_ID;
+} ACPI_PNP_DEVICE_ID;
 
-typedef struct acpi_device_id_list
+typedef struct acpi_pnp_device_id_list
 {
     UINT32                          Count;              /* Number of IDs in Ids array */
     UINT32                          ListSize;           /* Size of list, including ID strings */
-    ACPI_DEVICE_ID                  Ids[1];             /* ID array */
+    ACPI_PNP_DEVICE_ID              Ids[1];             /* ID array */
 
-} ACPI_DEVICE_ID_LIST;
+} ACPI_PNP_DEVICE_ID_LIST;
 
 /*
  * Structure returned from AcpiGetObjectInfo.
@@ -1218,9 +1214,10 @@ typedef struct acpi_device_info
     UINT8                           LowestDstates[5];   /* _SxW values: 0xFF indicates not valid */
     UINT32                          CurrentStatus;      /* _STA value */
     UINT64                          Address;            /* _ADR value */
-    ACPI_DEVICE_ID                  HardwareId;         /* _HID value */
-    ACPI_DEVICE_ID                  UniqueId;           /* _UID value */
-    ACPI_DEVICE_ID_LIST             CompatibleIdList;   /* _CID list <must be last> */
+    ACPI_PNP_DEVICE_ID              HardwareId;         /* _HID value */
+    ACPI_PNP_DEVICE_ID              UniqueId;           /* _UID value */
+    ACPI_PNP_DEVICE_ID              SubsystemId;        /* _SUB value */
+    ACPI_PNP_DEVICE_ID_LIST         CompatibleIdList;   /* _CID list <must be last> */
 
 } ACPI_DEVICE_INFO;
 
@@ -1234,11 +1231,12 @@ typedef struct acpi_device_info
 #define ACPI_VALID_ADR                  0x02
 #define ACPI_VALID_HID                  0x04
 #define ACPI_VALID_UID                  0x08
-#define ACPI_VALID_CID                  0x10
-#define ACPI_VALID_SXDS                 0x20
-#define ACPI_VALID_SXWS                 0x40
+#define ACPI_VALID_SUB                  0x10
+#define ACPI_VALID_CID                  0x20
+#define ACPI_VALID_SXDS                 0x40
+#define ACPI_VALID_SXWS                 0x80
 
-/* Flags for _STA method */
+/* Flags for _STA return value (CurrentStatus above) */
 
 #define ACPI_STA_DEVICE_PRESENT         0x01
 #define ACPI_STA_DEVICE_ENABLED         0x02

@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Module Name: nsload - namespace loading/expanding/contracting procedures
+ * Module Name: utxfinit - External interfaces for ACPICA initialization
  *
  *****************************************************************************/
 
@@ -113,315 +113,318 @@
  *
  *****************************************************************************/
 
-#define __NSLOAD_C__
+
+#define __UTXFINIT_C__
 
 #include "acpi.h"
 #include "accommon.h"
+#include "acevents.h"
 #include "acnamesp.h"
-#include "acdispat.h"
+#include "acdebug.h"
 #include "actables.h"
 
-
-#define _COMPONENT          ACPI_NAMESPACE
-        ACPI_MODULE_NAME    ("nsload")
-
-/* Local prototypes */
-
-#ifdef ACPI_FUTURE_IMPLEMENTATION
-ACPI_STATUS
-AcpiNsUnloadNamespace (
-    ACPI_HANDLE             Handle);
-
-static ACPI_STATUS
-AcpiNsDeleteSubtree (
-    ACPI_HANDLE             StartHandle);
-#endif
+#define _COMPONENT          ACPI_UTILITIES
+        ACPI_MODULE_NAME    ("utxfinit")
 
 
-#ifndef ACPI_NO_METHOD_EXECUTION
 /*******************************************************************************
  *
- * FUNCTION:    AcpiNsLoadTable
- *
- * PARAMETERS:  TableIndex      - Index for table to be loaded
- *              Node            - Owning NS node
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Load one ACPI table into the namespace
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiNsLoadTable (
-    UINT32                  TableIndex,
-    ACPI_NAMESPACE_NODE     *Node)
-{
-    ACPI_STATUS             Status;
-
-
-    ACPI_FUNCTION_TRACE (NsLoadTable);
-
-
-    /*
-     * Parse the table and load the namespace with all named
-     * objects found within. Control methods are NOT parsed
-     * at this time. In fact, the control methods cannot be
-     * parsed until the entire namespace is loaded, because
-     * if a control method makes a forward reference (call)
-     * to another control method, we can't continue parsing
-     * because we don't know how many arguments to parse next!
-     */
-    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /* If table already loaded into namespace, just return */
-
-    if (AcpiTbIsTableLoaded (TableIndex))
-    {
-        Status = AE_ALREADY_EXISTS;
-        goto Unlock;
-    }
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "**** Loading table into namespace ****\n"));
-
-    Status = AcpiTbAllocateOwnerId (TableIndex);
-    if (ACPI_FAILURE (Status))
-    {
-        goto Unlock;
-    }
-
-    Status = AcpiNsParseTable (TableIndex, Node);
-    if (ACPI_SUCCESS (Status))
-    {
-        AcpiTbSetTableLoadedFlag (TableIndex, TRUE);
-    }
-    else
-    {
-        (void) AcpiTbReleaseOwnerId (TableIndex);
-    }
-
-Unlock:
-    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
-
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /*
-     * Now we can parse the control methods. We always parse
-     * them here for a sanity check, and if configured for
-     * just-in-time parsing, we delete the control method
-     * parse trees.
-     */
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "**** Begin Table Method Parsing and Object Initialization\n"));
-
-    Status = AcpiDsInitializeObjects (TableIndex, Node);
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "**** Completed Table Method Parsing and Object Initialization\n"));
-
-    return_ACPI_STATUS (Status);
-}
-
-
-#ifdef ACPI_OBSOLETE_FUNCTIONS
-/*******************************************************************************
- *
- * FUNCTION:    AcpiLoadNamespace
+ * FUNCTION:    AcpiInitializeSubsystem
  *
  * PARAMETERS:  None
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Load the name space from what ever is pointed to by DSDT.
- *              (DSDT points to either the BIOS or a buffer.)
+ * DESCRIPTION: Initializes all global variables. This is the first function
+ *              called, so any early initialization belongs here.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiNsLoadNamespace (
+AcpiInitializeSubsystem (
     void)
 {
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE (AcpiLoadNameSpace);
+    ACPI_FUNCTION_TRACE (AcpiInitializeSubsystem);
 
 
-    /* There must be at least a DSDT installed */
+    AcpiGbl_StartupFlags = ACPI_SUBSYSTEM_INITIALIZE;
+    ACPI_DEBUG_EXEC (AcpiUtInitStackPtrTrace ());
 
-    if (AcpiGbl_DSDT == NULL)
-    {
-        ACPI_ERROR ((AE_INFO, "DSDT is not in memory"));
-        return_ACPI_STATUS (AE_NO_ACPI_TABLES);
-    }
+    /* Initialize the OS-Dependent layer */
 
-    /*
-     * Load the namespace. The DSDT is required,
-     * but the SSDT and PSDT tables are optional.
-     */
-    Status = AcpiNsLoadTableByType (ACPI_TABLE_ID_DSDT);
+    Status = AcpiOsInitialize ();
     if (ACPI_FAILURE (Status))
     {
+        ACPI_EXCEPTION ((AE_INFO, Status, "During OSL initialization"));
         return_ACPI_STATUS (Status);
     }
 
-    /* Ignore exceptions from these */
+    /* Initialize all globals used by the subsystem */
 
-    (void) AcpiNsLoadTableByType (ACPI_TABLE_ID_SSDT);
-    (void) AcpiNsLoadTableByType (ACPI_TABLE_ID_PSDT);
-
-    ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
-        "ACPI Namespace successfully loaded at root %p\n",
-        AcpiGbl_RootNode));
-
-    return_ACPI_STATUS (Status);
-}
-#endif
-
-#ifdef ACPI_FUTURE_IMPLEMENTATION
-/*******************************************************************************
- *
- * FUNCTION:    AcpiNsDeleteSubtree
- *
- * PARAMETERS:  StartHandle         - Handle in namespace where search begins
- *
- * RETURNS      Status
- *
- * DESCRIPTION: Walks the namespace starting at the given handle and deletes
- *              all objects, entries, and scopes in the entire subtree.
- *
- *              Namespace/Interpreter should be locked or the subsystem should
- *              be in shutdown before this routine is called.
- *
- ******************************************************************************/
-
-static ACPI_STATUS
-AcpiNsDeleteSubtree (
-    ACPI_HANDLE             StartHandle)
-{
-    ACPI_STATUS             Status;
-    ACPI_HANDLE             ChildHandle;
-    ACPI_HANDLE             ParentHandle;
-    ACPI_HANDLE             NextChildHandle;
-    ACPI_HANDLE             Dummy;
-    UINT32                  Level;
-
-
-    ACPI_FUNCTION_TRACE (NsDeleteSubtree);
-
-
-    ParentHandle = StartHandle;
-    ChildHandle  = NULL;
-    Level        = 1;
-
-    /*
-     * Traverse the tree of objects until we bubble back up
-     * to where we started.
-     */
-    while (Level > 0)
+    Status = AcpiUtInitGlobals ();
+    if (ACPI_FAILURE (Status))
     {
-        /* Attempt to get the next object in this scope */
-
-        Status = AcpiGetNextObject (ACPI_TYPE_ANY, ParentHandle,
-                                    ChildHandle, &NextChildHandle);
-
-        ChildHandle = NextChildHandle;
-
-        /* Did we get a new object? */
-
-        if (ACPI_SUCCESS (Status))
-        {
-            /* Check if this object has any children */
-
-            if (ACPI_SUCCESS (AcpiGetNextObject (ACPI_TYPE_ANY, ChildHandle,
-                                    NULL, &Dummy)))
-            {
-                /*
-                 * There is at least one child of this object,
-                 * visit the object
-                 */
-                Level++;
-                ParentHandle = ChildHandle;
-                ChildHandle  = NULL;
-            }
-        }
-        else
-        {
-            /*
-             * No more children in this object, go back up to
-             * the object's parent
-             */
-            Level--;
-
-            /* Delete all children now */
-
-            AcpiNsDeleteChildren (ChildHandle);
-
-            ChildHandle = ParentHandle;
-            Status = AcpiGetParent (ParentHandle, &ParentHandle);
-            if (ACPI_FAILURE (Status))
-            {
-                return_ACPI_STATUS (Status);
-            }
-        }
+        ACPI_EXCEPTION ((AE_INFO, Status, "During initialization of globals"));
+        return_ACPI_STATUS (Status);
     }
 
-    /* Now delete the starting object, and we are done */
+    /* Create the default mutex objects */
 
-    AcpiNsRemoveNode (ChildHandle);
-    return_ACPI_STATUS (AE_OK);
+    Status = AcpiUtMutexInitialize ();
+    if (ACPI_FAILURE (Status))
+    {
+        ACPI_EXCEPTION ((AE_INFO, Status, "During Global Mutex creation"));
+        return_ACPI_STATUS (Status);
+    }
+
+    /*
+     * Initialize the namespace manager and
+     * the root of the namespace tree
+     */
+    Status = AcpiNsRootInitialize ();
+    if (ACPI_FAILURE (Status))
+    {
+        ACPI_EXCEPTION ((AE_INFO, Status, "During Namespace initialization"));
+        return_ACPI_STATUS (Status);
+    }
+
+    /* Initialize the global OSI interfaces list with the static names */
+
+    Status = AcpiUtInitializeInterfaces ();
+    if (ACPI_FAILURE (Status))
+    {
+        ACPI_EXCEPTION ((AE_INFO, Status, "During OSI interfaces initialization"));
+        return_ACPI_STATUS (Status);
+    }
+
+    /* If configured, initialize the AML debugger */
+
+    ACPI_DEBUGGER_EXEC (Status = AcpiDbInitialize ());
+    return_ACPI_STATUS (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiInitializeSubsystem)
 
 
 /*******************************************************************************
  *
- *  FUNCTION:       AcpiNsUnloadNameSpace
+ * FUNCTION:    AcpiEnableSubsystem
  *
- *  PARAMETERS:     Handle          - Root of namespace subtree to be deleted
+ * PARAMETERS:  Flags               - Init/enable Options
  *
- *  RETURN:         Status
+ * RETURN:      Status
  *
- *  DESCRIPTION:    Shrinks the namespace, typically in response to an undocking
- *                  event. Deletes an entire subtree starting from (and
- *                  including) the given handle.
+ * DESCRIPTION: Completes the subsystem initialization including hardware.
+ *              Puts system into ACPI mode if it isn't already.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiNsUnloadNamespace (
-    ACPI_HANDLE             Handle)
+AcpiEnableSubsystem (
+    UINT32                  Flags)
 {
-    ACPI_STATUS             Status;
+    ACPI_STATUS             Status = AE_OK;
 
 
-    ACPI_FUNCTION_TRACE (NsUnloadNameSpace);
+    ACPI_FUNCTION_TRACE (AcpiEnableSubsystem);
 
 
-    /* Parameter validation */
+#if (!ACPI_REDUCED_HARDWARE)
 
-    if (!AcpiGbl_RootNode)
+    /* Enable ACPI mode */
+
+    if (!(Flags & ACPI_NO_ACPI_ENABLE))
     {
-        return_ACPI_STATUS (AE_NO_NAMESPACE);
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "[Init] Going into ACPI mode\n"));
+
+        AcpiGbl_OriginalMode = AcpiHwGetMode();
+
+        Status = AcpiEnable ();
+        if (ACPI_FAILURE (Status))
+        {
+            ACPI_WARNING ((AE_INFO, "AcpiEnable failed"));
+            return_ACPI_STATUS (Status);
+        }
     }
 
-    if (!Handle)
+    /*
+     * Obtain a permanent mapping for the FACS. This is required for the
+     * Global Lock and the Firmware Waking Vector
+     */
+    Status = AcpiTbInitializeFacs ();
+    if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
+        ACPI_WARNING ((AE_INFO, "Could not map the FACS table"));
+        return_ACPI_STATUS (Status);
     }
 
-    /* This function does the real work */
+#endif /* !ACPI_REDUCED_HARDWARE */
 
-    Status = AcpiNsDeleteSubtree (Handle);
+    /*
+     * Install the default OpRegion handlers. These are installed unless
+     * other handlers have already been installed via the
+     * InstallAddressSpaceHandler interface.
+     */
+    if (!(Flags & ACPI_NO_ADDRESS_SPACE_INIT))
+    {
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "[Init] Installing default address space handlers\n"));
+
+        Status = AcpiEvInstallRegionHandlers ();
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
+    }
+
+#if (!ACPI_REDUCED_HARDWARE)
+    /*
+     * Initialize ACPI Event handling (Fixed and General Purpose)
+     *
+     * Note1: We must have the hardware and events initialized before we can
+     * execute any control methods safely. Any control method can require
+     * ACPI hardware support, so the hardware must be fully initialized before
+     * any method execution!
+     *
+     * Note2: Fixed events are initialized and enabled here. GPEs are
+     * initialized, but cannot be enabled until after the hardware is
+     * completely initialized (SCI and GlobalLock activated) and the various
+     * initialization control methods are run (_REG, _STA, _INI) on the
+     * entire namespace.
+     */
+    if (!(Flags & ACPI_NO_EVENT_INIT))
+    {
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "[Init] Initializing ACPI events\n"));
+
+        Status = AcpiEvInitializeEvents ();
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
+    }
+
+    /*
+     * Install the SCI handler and Global Lock handler. This completes the
+     * hardware initialization.
+     */
+    if (!(Flags & ACPI_NO_HANDLER_INIT))
+    {
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "[Init] Installing SCI/GL handlers\n"));
+
+        Status = AcpiEvInstallXruptHandlers ();
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
+    }
+
+#endif /* !ACPI_REDUCED_HARDWARE */
 
     return_ACPI_STATUS (Status);
 }
-#endif
-#endif
+
+ACPI_EXPORT_SYMBOL (AcpiEnableSubsystem)
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiInitializeObjects
+ *
+ * PARAMETERS:  Flags               - Init/enable Options
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Completes namespace initialization by initializing device
+ *              objects and executing AML code for Regions, buffers, etc.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiInitializeObjects (
+    UINT32                  Flags)
+{
+    ACPI_STATUS             Status = AE_OK;
+
+
+    ACPI_FUNCTION_TRACE (AcpiInitializeObjects);
+
+
+    /*
+     * Run all _REG methods
+     *
+     * Note: Any objects accessed by the _REG methods will be automatically
+     * initialized, even if they contain executable AML (see the call to
+     * AcpiNsInitializeObjects below).
+     */
+    if (!(Flags & ACPI_NO_ADDRESS_SPACE_INIT))
+    {
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "[Init] Executing _REG OpRegion methods\n"));
+
+        Status = AcpiEvInitializeOpRegions ();
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
+    }
+
+    /*
+     * Execute any module-level code that was detected during the table load
+     * phase. Although illegal since ACPI 2.0, there are many machines that
+     * contain this type of code. Each block of detected executable AML code
+     * outside of any control method is wrapped with a temporary control
+     * method object and placed on a global list. The methods on this list
+     * are executed below.
+     */
+    AcpiNsExecModuleCodeList ();
+
+    /*
+     * Initialize the objects that remain uninitialized. This runs the
+     * executable AML that may be part of the declaration of these objects:
+     * OperationRegions, BufferFields, Buffers, and Packages.
+     */
+    if (!(Flags & ACPI_NO_OBJECT_INIT))
+    {
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "[Init] Completing Initialization of ACPI Objects\n"));
+
+        Status = AcpiNsInitializeObjects ();
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
+    }
+
+    /*
+     * Initialize all device objects in the namespace. This runs the device
+     * _STA and _INI methods.
+     */
+    if (!(Flags & ACPI_NO_DEVICE_INIT))
+    {
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "[Init] Initializing ACPI Devices\n"));
+
+        Status = AcpiNsInitializeDevices ();
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
+    }
+
+    /*
+     * Empty the caches (delete the cached objects) on the assumption that
+     * the table load filled them up more than they will be at runtime --
+     * thus wasting non-paged memory.
+     */
+    Status = AcpiPurgeCachedObjects ();
+
+    AcpiGbl_StartupFlags |= ACPI_INITIALIZED_OK;
+    return_ACPI_STATUS (Status);
+}
+
+ACPI_EXPORT_SYMBOL (AcpiInitializeObjects)
