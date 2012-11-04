@@ -16,7 +16,7 @@ Server mail_daemon :
 	DeskbarView.cpp
 	ErrorLogWindow.cpp
 	LEDAnimation.cpp
-	MailDaemon.cpp
+	MailDaemonApplication.cpp
 	main.cpp
 	DefaultNotifier.cpp
 	: be libmail.so tracker localestub [ TargetLibstdc++ ]
@@ -27,6 +27,6 @@ DoCatalogs mail_daemon :
 	x-vnd.Be-POST
 	:
 	DeskbarView.cpp
-	MailDaemon.cpp
+	MailDaemonApplication.cpp
 	DefaultNotifier.cpp
 ;
