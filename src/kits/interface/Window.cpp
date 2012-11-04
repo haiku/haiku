@@ -1859,6 +1859,13 @@ BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage* message,
 }
 
 
+bool
+BWindow::HasShortcut(uint32 key, uint32 modifiers)
+{
+	return _FindShortcut(key, modifiers) != NULL;
+}
+
+
 void
 BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
 {
