@@ -426,11 +426,32 @@ BMailAddOnSettings::~BMailAddOnSettings()
 status_t
 BMailAddOnSettings::Load(const BMessage& message)
 {
-	const char* path = NULL;
-	if (message.FindString("add-on path", &path) != B_OK)
+	const char* pathString = NULL;
+	if (message.FindString("add-on path", &pathString) != B_OK)
 		return B_BAD_VALUE;
 
-	status_t status = get_ref_for_path(path, &fRef);
+	BPath path(pathString);
+	if (!path.IsAbsolute()) {
+		directory_which which[] = {
+			B_USER_ADDONS_DIRECTORY,
+			B_COMMON_ADDONS_DIRECTORY,
+			B_SYSTEM_ADDONS_DIRECTORY
+		};
+
+		for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
+			status_t status = find_directory(which[i], &path);
+			if (status != B_OK)
+				continue;
+
+			path.Append("mail_daemon");
+			path.Append(pathString);
+
+			if (BEntry(path.Path()).Exists())
+				break;
+		}
+	}
+
+	status_t status = get_ref_for_path(path.Path(), &fRef);
 	if (status != B_OK)
 		return status;
 
@@ -450,7 +471,7 @@ status_t
 BMailAddOnSettings::Save(BMessage& message)
 {
 	BPath path(&fRef);
-	status_t status = message.AddString("add-on path", path.Path());
+	status_t status = message.AddString("add-on path", _RelativizePath(path));
 	if (status == B_OK)
 		status = message.AddMessage("settings", this);
 	if (status != B_OK)
@@ -481,6 +502,22 @@ BMailAddOnSettings::HasBeenModified() const
 {
 	return fRef != fOriginalRef
 		|| !fOriginalSettings.HasSameData(*this, true, true);
+}
+
+
+/*!	Cuts off the ".../add-ons/mail_daemon" part of the provided \a path
+	in case it exists. Otherwise, the complete path will be returned.
+*/
+const char*
+BMailAddOnSettings::_RelativizePath(const BPath& path) const
+{
+	const char* string = path.Path();
+	const char* parentDirectory = "/mail_daemon/";
+	const char* at = strstr(string, parentDirectory);
+	if (at == NULL)
+		return string;
+
+	return at + strlen(parentDirectory);
 }
 
 

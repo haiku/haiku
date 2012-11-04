@@ -93,6 +93,9 @@ public:
 	virtual	bool				HasBeenModified() const;
 
 private:
+			const char*			_RelativizePath(const BPath& path) const;
+
+private:
 			BMessage			fOriginalSettings;
 			entry_ref			fRef;
 			entry_ref			fOriginalRef;
