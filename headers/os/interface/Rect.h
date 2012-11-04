@@ -1,15 +1,15 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_RECT_H
 #define	_RECT_H
 
 
+#include <math.h>
+
 #include <Point.h>
 #include <Size.h>
-
-#include <math.h>
 
 
 class BRect {
@@ -54,16 +54,16 @@ public:
 	// Expression transformations
 			BRect&				InsetBySelf(BPoint inset);
 			BRect&				InsetBySelf(float dx, float dy);
-			BRect				InsetByCopy(BPoint inset);
-			BRect				InsetByCopy(float dx, float dy);
+			BRect				InsetByCopy(BPoint inset) const;
+			BRect				InsetByCopy(float dx, float dy) const;
 			BRect&				OffsetBySelf(BPoint offset);
 			BRect&				OffsetBySelf(float dx, float dy);
-			BRect				OffsetByCopy(BPoint offset);
-			BRect				OffsetByCopy(float dx, float dy);
+			BRect				OffsetByCopy(BPoint offset) const;
+			BRect				OffsetByCopy(float dx, float dy) const;
 			BRect&				OffsetToSelf(BPoint offset);
 			BRect&				OffsetToSelf(float dx, float dy);
-			BRect				OffsetToCopy(BPoint offset);
-			BRect				OffsetToCopy(float dx, float dy);
+			BRect				OffsetToCopy(BPoint offset) const;
+			BRect				OffsetToCopy(float dx, float dy) const;
 
 	// Comparison
 			bool				operator==(BRect r) const;
@@ -120,7 +120,7 @@ inline
 BRect::BRect()
 	:
 	left(0),
-	top(0),	
+	top(0),
 	right(-1),
 	bottom(-1)
 {
