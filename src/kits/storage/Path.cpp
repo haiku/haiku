@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku Inc.
+ * Copyright 2002-2012, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,10 +7,12 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  */
 
+
 /*!
 	\file Path.cpp
 	BPath implementation.
 */
+
 
 #include <Path.h>
 
@@ -399,6 +401,16 @@ BPath::GetParent(BPath* path) const
 	parentPath[length] = '\0';
 
 	return path->SetTo(parentPath);
+}
+
+
+bool
+BPath::IsAbsolute() const
+{
+	if (InitCheck() != B_OK)
+		return false;
+
+	return fName[0] == '/';
 }
 
 
