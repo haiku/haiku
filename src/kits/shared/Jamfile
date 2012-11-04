@@ -26,6 +26,7 @@ StaticLibrary libshared.a :
 	Keymap.cpp
 	LongAndDragTrackingFilter.cpp
 	NaturalCompare.cpp
+	PromptWindow.cpp
 	QueryFile.cpp
 	RWLockManager.cpp
 	SHA256.cpp
