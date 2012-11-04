@@ -143,7 +143,7 @@ MailProtocolConfigView::MailProtocolConfigView(uint32 optionsMask)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BGridLayout* layout = new BGridLayout();
+	BGridLayout* layout = new BGridLayout(0.f);
 	SetLayout(layout);
 
 	if ((optionsMask & B_MAIL_PROTOCOL_HAS_HOSTNAME) != 0) {
