@@ -4587,6 +4587,16 @@ BView::SetExplicitPreferredSize(BSize size)
 
 
 void
+BView::SetExplicitSize(BSize size)
+{
+	fLayoutData->fMinSize = size;
+	fLayoutData->fMaxSize = size;
+	fLayoutData->fPreferredSize = size;
+	InvalidateLayout();
+}
+
+
+void
 BView::SetExplicitAlignment(BAlignment alignment)
 {
 	fLayoutData->fAlignment = alignment;

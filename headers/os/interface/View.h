@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_VIEW_H
@@ -537,6 +537,7 @@ public:
 			void				SetExplicitMinSize(BSize size);
 			void				SetExplicitMaxSize(BSize size);
 			void				SetExplicitPreferredSize(BSize size);
+			void				SetExplicitSize(BSize size);
 			void				SetExplicitAlignment(BAlignment alignment);
 
 			BSize				ExplicitMinSize() const;
@@ -752,5 +753,6 @@ BView::SetLowColor(uchar r, uchar g, uchar b, uchar a)
 	color.alpha = a;
 	SetLowColor(color);
 }
+
 
 #endif // _VIEW_H
