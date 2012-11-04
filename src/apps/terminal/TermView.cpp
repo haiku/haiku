@@ -54,6 +54,7 @@
 #include <Window.h>
 
 #include "InlineInput.h"
+#include "PrefHandler.h"
 #include "Shell.h"
 #include "ShellParameters.h"
 #include "TermConst.h"
@@ -1096,9 +1097,11 @@ TermView::_DetachShell()
 void
 TermView::_Activate()
 {
+	bool blinkCursor = PrefHandler::Default()->getBool(PREF_BLINK_CURSOR);
+
 	fActive = true;
 
-	if (fCursorBlinkRunner == NULL) {
+	if (fCursorBlinkRunner == NULL && blinkCursor) {
 		BMessage blinkMessage(kBlinkCursor);
 		fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
 			BMessenger(this), &blinkMessage, kCursorBlinkInterval);
