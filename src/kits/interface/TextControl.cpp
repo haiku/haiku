@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku Inc.
+ * Copyright 2001-2012, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,11 +8,13 @@
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
+
 /*!	BTextControl displays text that can act like a control. */
 
-#include <string.h>
 
 #include <TextControl.h>
+
+#include <string.h>
 
 #include <AbstractLayoutItem.h>
 #include <ControlLook.h>
@@ -82,8 +84,11 @@ public:
 	virtual	BSize				BasePreferredSize();
 	virtual	BAlignment			BaseAlignment();
 
+			BRect				FrameInParent() const;
+
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	static	BArchivable*		Instantiate(BMessage* from);
+
 private:
 			BTextControl*		fParent;
 			BRect				fFrame;
@@ -108,6 +113,8 @@ public:
 	virtual	BSize				BaseMaxSize();
 	virtual	BSize				BasePreferredSize();
 	virtual	BAlignment			BaseAlignment();
+
+			BRect				FrameInParent() const;
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	static	BArchivable*		Instantiate(BMessage* from);
@@ -425,13 +432,17 @@ BTextControl::Draw(BRect updateRect)
 		be_control_look->DrawTextControlBorder(this, rect, updateRect, base,
 			flags);
 
-		rect = Bounds();
-		rect.right = fDivider - kLabelInputSpacing;
-//		rect.right = fText->Frame().left - 2;
-//		rect.right -= 3;//be_control_look->DefaultLabelSpacing();
-		be_control_look->DrawLabel(this, Label(), rect, updateRect,
-			base, flags, BAlignment(fLabelAlign, B_ALIGN_MIDDLE));
+		if (Label() != NULL) {
+			if (fLayoutData->label_layout_item != NULL) {
+				rect = fLayoutData->label_layout_item->FrameInParent();
+			} else {
+				rect = Bounds();
+				rect.right = fDivider - kLabelInputSpacing;
+			}
 
+			be_control_look->DrawLabel(this, Label(), rect, updateRect,
+				base, flags, BAlignment(fLabelAlign, B_ALIGN_MIDDLE));
+		}
 		return;
 	}
 
@@ -524,9 +535,8 @@ BTextControl::Draw(BRect updateRect)
 void
 BTextControl::MouseDown(BPoint where)
 {
-	if (!fText->IsFocus()) {
+	if (!fText->IsFocus())
 		fText->MakeFocus(true);
-	}
 }
 
 
@@ -892,23 +902,28 @@ BTextControl::DoLayout()
 	if (size.height < fLayoutData->min.height)
 		size.height = fLayoutData->min.height;
 
+	BRect dirty(fText->Frame());
+	BRect textFrame;
+
 	// divider
 	float divider = 0;
-	if (fLayoutData->label_layout_item && fLayoutData->text_view_layout_item) {
-		// We have layout items. They define the divider location.
-		divider = fLayoutData->text_view_layout_item->Frame().left
-			- fLayoutData->label_layout_item->Frame().left;
+	if (fLayoutData->text_view_layout_item != NULL) {
+		if (fLayoutData->label_layout_item != NULL) {
+			// We have layout items. They define the divider location.
+			divider = fabs(fLayoutData->text_view_layout_item->Frame().left
+				- fLayoutData->label_layout_item->Frame().left);
+		}
+		textFrame = fLayoutData->text_view_layout_item->FrameInParent();
 	} else {
-		if (fLayoutData->label_width > 0)
-			divider = fLayoutData->label_width + 5;
+		if (fLayoutData->label_width > 0) {
+			divider = fLayoutData->label_width
+				+ be_control_look->DefaultLabelSpacing();
+		}
+		textFrame.Set(divider, 0, size.width, size.height);
 	}
 
-	// text view
-	BRect dirty(fText->Frame());
-	BRect textFrame(divider + kFrameMargin, kFrameMargin,
-		size.width - kFrameMargin, size.height - kFrameMargin);
-
 	// place the text view and set the divider
+	textFrame.InsetBy(kFrameMargin, kFrameMargin);
 	BLayoutUtils::AlignInFrame(fText, textFrame);
 
 	fDivider = divider;
@@ -1071,7 +1086,6 @@ BTextControl::_InitData(const char* label, const BMessage* archive)
 
 	if (label)
 		fDivider = floorf(bounds.Width() / 2.0f);
-
 }
 
 
@@ -1139,8 +1153,14 @@ BTextControl::_LayoutTextView()
 {
 	CALLED();
 
-	BRect frame = Bounds();
-	frame.left = fDivider;
+	BRect frame;
+	if (fLayoutData->text_view_layout_item != NULL) {
+		frame = fLayoutData->text_view_layout_item->FrameInParent();
+	} else {
+		frame = Bounds();
+		frame.left = fDivider;
+	}
+
 	// we are stroking the frame around the text view, which
 	// is 2 pixels wide
 	frame.InsetBy(kFrameMargin, kFrameMargin);
@@ -1160,17 +1180,26 @@ BTextControl::_UpdateFrame()
 {
 	CALLED();
 
-	if (fLayoutData->label_layout_item && fLayoutData->text_view_layout_item) {
-		BRect labelFrame = fLayoutData->label_layout_item->Frame();
+	if (fLayoutData->text_view_layout_item != NULL) {
 		BRect textFrame = fLayoutData->text_view_layout_item->Frame();
+		BRect labelFrame;
+		if (fLayoutData->label_layout_item != NULL)
+			labelFrame = fLayoutData->label_layout_item->Frame();
 
-		// update divider
-		fDivider = textFrame.left - labelFrame.left;
+		BRect frame;
+		if (labelFrame.IsValid()) {
+			frame = textFrame | labelFrame;
 
-		MoveTo(labelFrame.left, labelFrame.top);
+			// update divider
+			fDivider = fabs(textFrame.left - labelFrame.left);
+		} else {
+			frame = textFrame;
+			fDivider = 0;
+		}
+
+		MoveTo(frame.left, frame.top);
 		BSize oldSize = Bounds().Size();
-		ResizeTo(textFrame.left + textFrame.Width() - labelFrame.left,
-			textFrame.top + textFrame.Height() - labelFrame.top);
+		ResizeTo(frame.Width(), frame.Height());
 		BSize newSize = Bounds().Size();
 
 		// If the size changes, ResizeTo() will trigger a relayout, otherwise
@@ -1203,8 +1232,10 @@ BTextControl::_ValidateLayoutData()
 
 	// compute the minimal divider
 	float divider = 0;
-	if (fLayoutData->label_width > 0)
-		divider = fLayoutData->label_width + 5;
+	if (fLayoutData->label_width > 0) {
+		divider = fLayoutData->label_width
+			+ be_control_look->DefaultLabelSpacing();
+	}
 
 	// If we shan't do real layout, we let the current divider take influence.
 	if (!(Flags() & B_SUPPORTS_LAYOUT))
@@ -1306,7 +1337,8 @@ BTextControl::LabelLayoutItem::BaseMinSize()
 	if (!fParent->Label())
 		return BSize(-1, -1);
 
-	return BSize(fParent->fLayoutData->label_width + 5,
+	return BSize(fParent->fLayoutData->label_width
+			+ be_control_look->DefaultLabelSpacing(),
 		fParent->fLayoutData->label_height);
 }
 
@@ -1329,6 +1361,13 @@ BAlignment
 BTextControl::LabelLayoutItem::BaseAlignment()
 {
 	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
+}
+
+
+BRect
+BTextControl::LabelLayoutItem::FrameInParent() const
+{
+	return fFrame.OffsetByCopy(-fParent->Frame().left, -fParent->Frame().top);
 }
 
 
@@ -1456,6 +1495,13 @@ BAlignment
 BTextControl::TextViewLayoutItem::BaseAlignment()
 {
 	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
+}
+
+
+BRect
+BTextControl::TextViewLayoutItem::FrameInParent() const
+{
+	return fFrame.OffsetByCopy(-fParent->Frame().left, -fParent->Frame().top);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_TEXT_CONTROL_H
@@ -8,6 +8,7 @@
 
 #include <Control.h>
 #include <TextView.h>
+
 
 class BLayoutItem;
 namespace BPrivate {
@@ -22,14 +23,14 @@ public:
 									BMessage* message,
 									uint32 resizeMode
 										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
-									uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BTextControl(const char* name,
 									const char* label, const char* initialText,
 									BMessage* message,
-									uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BTextControl(const char* label,
 									const char* initialText,
-									BMessage* message); 
+									BMessage* message);
 	virtual						~BTextControl();
 
 								BTextControl(BMessage* archive);
