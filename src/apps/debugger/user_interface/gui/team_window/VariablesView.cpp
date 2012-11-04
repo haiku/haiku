@@ -955,15 +955,15 @@ VariablesView::VariableTableModel::ValueNodeChanged(ValueNodeChild* nodeChild,
 		return;
 
 	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-
 	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
 	if (modelNode == NULL)
 		return;
 
-	if (oldNode != NULL)
+	if (oldNode != NULL) {
 		ValueNodeChildrenDeleted(oldNode);
-	ValueNodeChildrenCreated(newNode);
-	fContainerListener->ModelNodeValueRequested(modelNode);
+		ValueNodeChildrenCreated(newNode);
+		fContainerListener->ModelNodeValueRequested(modelNode);
+	}
 }
 
 
