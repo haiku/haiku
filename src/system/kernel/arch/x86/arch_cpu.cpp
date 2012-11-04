@@ -392,7 +392,7 @@ init_double_fault(int cpuNum)
 static void
 dump_feature_string(int currentCPU, cpu_ent *cpu)
 {
-	char features[256];
+	char features[384];
 	features[0] = 0;
 
 	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)
