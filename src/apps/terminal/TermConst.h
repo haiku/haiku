@@ -131,6 +131,7 @@ static const char* const PREF_SHELL = "Shell";
 static const char* const PREF_TEXT_ENCODING = "Text encoding";
 static const char* const PREF_GUI_LANGUAGE = "Language";
 
+static const char* const PREF_BLINK_CURSOR = "Blink the cursor";
 static const char* const PREF_WARN_ON_EXIT = "Warn on exit";
 
 static const char* const PREF_TAB_TITLE = "Tab title";
