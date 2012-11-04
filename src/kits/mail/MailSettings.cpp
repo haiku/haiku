@@ -51,30 +51,24 @@ BMailSettings::InitCheck() const
 
 
 status_t
-BMailSettings::Save(bigtime_t /*timeout*/)
+BMailSettings::Save()
 {
-	status_t ret;
-	//
-	// Find chain-saving directory
-	//
-
 	BPath path;
-	ret = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (ret != B_OK) {
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK) {
 		fprintf(stderr, "Couldn't find user settings directory: %s\n",
-			strerror(ret));
-		return ret;
+			strerror(status));
+		return status;
 	}
 
 	path.Append("Mail");
 
-	status_t result = BPrivate::WriteMessageFile(fData, path,
-		"new_mail_daemon");
-	if (result < B_OK)
-		return result;
+	status = BPrivate::WriteMessageFile(fData, path, "new_mail_daemon");
+	if (status != B_OK)
+		return status;
 
-	BMessenger(B_MAIL_DAEMON_SIGNATURE).SendMessage('mrrs');
-
+	BMessenger(B_MAIL_DAEMON_SIGNATURE).SendMessage(
+		BPrivate::kMsgSettingsUpdated);
 	return B_OK;
 }
 
@@ -82,39 +76,39 @@ BMailSettings::Save(bigtime_t /*timeout*/)
 status_t
 BMailSettings::Reload()
 {
-	status_t ret;
+	// Try directories from most specific to least
+	directory_which which[] = {
+		B_USER_SETTINGS_DIRECTORY,
+		B_COMMON_SETTINGS_DIRECTORY};
+	status_t status = B_ENTRY_NOT_FOUND;
 
-	BPath path;
-	ret = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (ret != B_OK) {
-		fprintf(stderr, "Couldn't find user settings directory: %s\n",
-			strerror(ret));
-		return ret;
+	for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
+		BPath path;
+		status = find_directory(which[i], &path);
+		if (status != B_OK)
+			continue;
+
+		path.Append("Mail/new_mail_daemon");
+		BFile file;
+		status = file.SetTo(path.Path(), B_READ_ONLY);
+		if (status != B_OK)
+			continue;
+
+		// read settings
+		BMessage settings;
+		status = settings.Unflatten(&file);
+		if (status != B_OK) {
+			fprintf(stderr, "Couldn't read settings from '%s': %s\n",
+				path.Path(), strerror(status));
+			continue;
+		}
+
+		// clobber old settings
+		fData = settings;
+		return B_OK;
 	}
 
-	path.Append("Mail/new_mail_daemon");
-
-	// open
-	BFile settings(path.Path(),B_READ_ONLY);
-	ret = settings.InitCheck();
-	if (ret != B_OK) {
-		fprintf(stderr, "Couldn't open settings file '%s': %s\n",
-			path.Path(), strerror(ret));
-		return ret;
-	}
-
-	// read settings
-	BMessage tmp;
-	ret = tmp.Unflatten(&settings);
-	if (ret != B_OK) {
-		fprintf(stderr, "Couldn't read settings from '%s': %s\n",
-			path.Path(), strerror(ret));
-		return ret;
-	}
-
-	// clobber old settings
-	fData = tmp;
-	return B_OK;
+	return status;
 }
 
 

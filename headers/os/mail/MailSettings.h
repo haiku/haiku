@@ -35,7 +35,7 @@ public:
 								BMailSettings();
 								~BMailSettings();
 
-			status_t			Save(bigtime_t timeout = B_INFINITE_TIMEOUT);
+			status_t			Save();
 			status_t			Reload();
 			status_t			InitCheck() const;
 
