@@ -7,6 +7,7 @@
 #include <Window.h>
 
 
+class BMenu;
 class TermView;
 
 
@@ -15,10 +16,12 @@ class SerialWindow: public BWindow
 	public:
 		SerialWindow();
 
+		void MenusBeginning();
 		void MessageReceived(BMessage* message);
 
 	private:
 		TermView* fTermView;
+		BMenu* fConnectionMenu;
 
 		static const char* kWindowTitle;
 };

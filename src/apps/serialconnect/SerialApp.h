@@ -4,6 +4,10 @@
  */
 
 
+#ifndef _SERIALAPP_H_
+#define _SERIALAPP_H_
+
+
 #include <Application.h>
 #include <SerialPort.h>
 
@@ -33,5 +37,7 @@ enum messageConstants {
 	kMsgOpenPort  = 'open',
 	kMsgDataRead  = 'dare',
 	kMsgDataWrite = 'dawr',
+	kMsgSettings  = 'stty',
 };
 
+#endif
