@@ -16,7 +16,7 @@
 class FakeScrollBar : public BControl {
 public:
 							FakeScrollBar(bool drawArrows, bool doubleArrows,
-								int32 knobStyle, BMessage* message);
+								BMessage* message);
 							~FakeScrollBar(void);
 
 	virtual	void			MouseDown(BPoint point);

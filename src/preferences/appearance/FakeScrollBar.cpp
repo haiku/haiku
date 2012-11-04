@@ -29,12 +29,11 @@ typedef enum {
 
 
 FakeScrollBar::FakeScrollBar(bool drawArrows, bool doubleArrows,
-	int32 knobStyle, BMessage* message)
+	BMessage* message)
 	:
 	BControl("FakeScrollBar", NULL, message, B_WILL_DRAW | B_NAVIGABLE),
 	fDrawArrows(drawArrows),
-	fDoubleArrows(doubleArrows),
-	fKnobStyle(knobStyle)
+	fDoubleArrows(doubleArrows)
 {
 	SetExplicitMinSize(BSize(160, 20));
 	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 20));
@@ -141,42 +140,6 @@ FakeScrollBar::Draw(BRect updateRect)
 
 	// fill the clickable surface of the thumb
 	be_control_look->DrawButtonBackground(this, bgRect, updateRect,
-		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
-
-	if (fKnobStyle == B_KNOB_STYLE_NONE)
-		return;
-
-	// draw the scrollbar thumb knobs
-	bool square = fKnobStyle == B_KNOB_STYLE_DOTS;
-	int32 knobWidth = 0;
-	int32 knobHeight = 0;
-
-	if (square) {
-		knobWidth = 2;
-		knobHeight = 2;
-	} else {
-		knobWidth = 1;
-		knobHeight = 3;
-	}
-
-	float hmiddle = bgRect.Width() / 2;
-	float vmiddle = bgRect.Height() / 2;
-
-	BRect middleKnob = BRect(bgRect.left + hmiddle - knobWidth,
-		bgRect.top + vmiddle - knobHeight,
-		bgRect.left + hmiddle + knobWidth,
-		bgRect.top + vmiddle + knobHeight);
-
-	BRect leftKnob = middleKnob.OffsetByCopy(knobWidth * -4, 0);
-	be_control_look->DrawButtonBackground(this, leftKnob, updateRect,
-		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
-
-	BRect rightKnob = middleKnob.OffsetByCopy(knobWidth * 4, 0);
-	be_control_look->DrawButtonBackground(this, rightKnob, updateRect,
-		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
-
-	// draw middle knob last because it modifies middleKnob
-	be_control_look->DrawButtonBackground(this, middleKnob, updateRect,
 		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
 }
 
