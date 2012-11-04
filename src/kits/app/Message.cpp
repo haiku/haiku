@@ -2729,16 +2729,17 @@ BMessage::Append(const BMessage &other)
 		size_t size = field->data_size / field->count;
 
 		for (uint32 j = 0; j < field->count; j++) {
-			if (!isFixed)
+			if (!isFixed) {
 				size = *(uint32 *)data;
+				data = (const void *)((const char *)data + sizeof(uint32));
+			}
 
 			status_t status = AddData(name, field->type, data, size,
-				isFixed != 0, 1);
+				isFixed, 1);
 			if (status != B_OK)
 				return status;
 
-			data = (const void *)((const char *)data + size
-				+ (isFixed ? 0 : sizeof(uint32)));
+			data = (const void *)((const char *)data + size);
 		}
 	}
 	return B_OK;
