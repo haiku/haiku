@@ -154,7 +154,7 @@ acpi_shutdown(bool rebootSystem)
 		status = acpi->prepare_sleep_state(ACPI_POWER_STATE_OFF, NULL, 0);
 		if (status == B_OK) {
 			//cpu_status state = disable_interrupts();
-			status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF, 0);
+			status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
 			//restore_interrupts(state);
 		}
 	}
@@ -392,7 +392,7 @@ init_double_fault(int cpuNum)
 static void
 dump_feature_string(int currentCPU, cpu_ent *cpu)
 {
-	char features[256];
+	char features[384];
 	features[0] = 0;
 
 	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)

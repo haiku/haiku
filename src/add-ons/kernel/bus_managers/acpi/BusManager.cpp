@@ -664,14 +664,14 @@ prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 
 
 status_t
-enter_sleep_state(uint8 state, uint8 flags)
+enter_sleep_state(uint8 state)
 {
 	ACPI_STATUS status;
 
-	TRACE("enter_sleep_state %d with flags %d\n", state, flags);
+	TRACE("enter_sleep_state %d\n", state);
 
 	cpu_status cpu = disable_interrupts();
-	status = AcpiEnterSleepState(state, flags);
+	status = AcpiEnterSleepState(state);
 	restore_interrupts(cpu);
 	panic("AcpiEnterSleepState should not return.");
 	if (status != AE_OK)

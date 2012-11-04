@@ -1,0 +1,15 @@
+/*
+ * NTFSAddOn.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-NTFSAddOn";
+
+resource app_version {
+	major  = 0,
+	middle = 0,
+	minor  = 1,
+	variety = 0,
+	internal = 0,
+	short_info = "0.0.1",
+	long_info = "Haiku NTFS disk add-on."
+};

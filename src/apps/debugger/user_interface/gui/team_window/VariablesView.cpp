@@ -17,6 +17,7 @@
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
+#include <PromptWindow.h>
 
 #include "table/TableColumns.h"
 
@@ -32,10 +33,12 @@
 #include "StackFrameValues.h"
 #include "TableCellValueRenderer.h"
 #include "Team.h"
+#include "TeamDebugInfo.h"
 #include "Thread.h"
 #include "Tracing.h"
 #include "TypeComponentPath.h"
 #include "TypeHandlerRoster.h"
+#include "TypeLookupConstraints.h"
 #include "Value.h"
 #include "ValueHandler.h"
 #include "ValueHandlerRoster.h"
@@ -265,6 +268,23 @@ public:
 			return false;
 
 		child->AcquireReference();
+		return true;
+	}
+
+	bool RemoveChild(ModelNode* child)
+	{
+		if (!fChildren.RemoveItem(child))
+			return false;
+
+		child->ReleaseReference();
+		return true;
+	}
+
+	bool RemoveAllChildren()
+	{
+		for (int32 i = 0; i < fChildren.CountItems(); i++)
+			RemoveChild(fChildren.ItemAt(i));
+
 		return true;
 	}
 
@@ -935,7 +955,15 @@ VariablesView::VariableTableModel::ValueNodeChanged(ValueNodeChild* nodeChild,
 		return;
 
 	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-// TODO:...
+	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
+	if (modelNode == NULL)
+		return;
+
+	if (oldNode != NULL) {
+		ValueNodeChildrenDeleted(oldNode);
+		ValueNodeChildrenCreated(newNode);
+		fContainerListener->ModelNodeValueRequested(modelNode);
+	}
 }
 
 
@@ -986,7 +1014,21 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 		return;
 
 	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-// TODO:...
+
+	// check whether we know the node
+	ValueNodeChild* nodeChild = node->NodeChild();
+	if (nodeChild == NULL)
+		return;
+
+	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
+	if (modelNode == NULL)
+		return;
+
+	for (int32 i = 0; i < modelNode->CountChildren(); i++) {
+		BReference<ModelNode> childNode = modelNode->ChildAt(i);
+		modelNode->RemoveChild(childNode);
+		fNodeTable.Remove(childNode);
+	}
 }
 
 
@@ -1574,6 +1616,56 @@ VariablesView::MessageReceived(BMessage* message)
 			Looper()->PostMessage(message);
 			break;
 		}
+		case MSG_SHOW_TYPECAST_NODE_PROMPT:
+		{
+			BMessage* promptMessage = new(std::nothrow) BMessage(
+				MSG_TYPECAST_NODE);
+
+			if (promptMessage == NULL)
+				return;
+
+			ObjectDeleter<BMessage> messageDeleter(promptMessage);
+			promptMessage->AddPointer("node", fVariableTable
+				->SelectionModel()->NodeAt(0));
+			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
+				"Specify Type", "Type: ", BMessenger(this), promptMessage);
+			if (promptWindow == NULL)
+				return;
+
+			messageDeleter.Detach();
+			promptWindow->CenterOnScreen();
+			promptWindow->Show();
+			break;
+		}
+		case MSG_TYPECAST_NODE:
+		{
+			ModelNode* node = NULL;
+			if (message->FindPointer("node", reinterpret_cast<void **>(&node)) != B_OK)
+				return;
+			TeamDebugInfo* info = fThread->GetTeam()->DebugInfo();
+			if (info == NULL)
+				return;
+
+			Type* type = NULL;
+			if (info->LookupTypeByName(message->FindString("text"),
+				TypeLookupConstraints(), type) != B_OK) {
+				// TODO: notify user
+				return;
+			}
+
+			ValueNode* valueNode = NULL;
+			if (TypeHandlerRoster::Default()->CreateValueNode(
+				node->NodeChild(), type, valueNode) != B_OK) {
+				return;
+			}
+
+			ValueNode* previousNode = node->NodeChild()->Node();
+			BReference<ValueNode> nodeRef(previousNode);
+			node->NodeChild()->SetNode(valueNode);
+			fVariableTableModel->ValueNodeChanged(node->NodeChild(),
+				previousNode, valueNode	);
+			break;
+		}
 		case MSG_VALUE_NODE_CHANGED:
 		{
 			ValueNodeChild* nodeChild;
@@ -1884,7 +1976,22 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	if (!actions->AddItem(item))
 		return B_NO_MEMORY;
 
+	message = new(std::nothrow)BMessage(MSG_SHOW_TYPECAST_NODE_PROMPT);
+	if (message == NULL)
+		return B_NO_MEMORY;
+
+	item = new(std::nothrow) ActionMenuItem("Cast as" B_UTF8_ELLIPSIS,
+		message);
+	if (item == NULL)
+		return B_NO_MEMORY;
+
+	messageDeleter.Detach();
+
+	if (!actions->AddItem(item))
+		return B_NO_MEMORY;
+
 	actionDeleter.Detach();
+
 	return B_OK;
 }
 
