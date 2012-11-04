@@ -38,6 +38,7 @@ PromptWindow::PromptWindow(const char* title, const char* label,
 	fTextControl->SetTarget(this);
 	acceptButton->SetTarget(this);
 	cancelButton->SetTarget(this);
+	fTextControl->MakeFocus(true);
 }
 
 
@@ -70,12 +71,15 @@ PromptWindow::MessageReceived(BMessage* message)
 status_t
 PromptWindow::SetTarget(BMessenger messenger)
 {
-	return fTextControl->SetTarget(messenger);
+	fTarget = messenger;
+	return B_OK;
 }
 
 
 status_t
 PromptWindow::SetMessage(BMessage* message)
 {
-	return fTextControl->SetMessage(message);
+	delete fMessage;
+	fMessage = message;
+	return B_OK;
 }
