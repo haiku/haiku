@@ -961,8 +961,8 @@ VariablesView::VariableTableModel::ValueNodeChanged(ValueNodeChild* nodeChild,
 
 	if (oldNode != NULL) {
 		ValueNodeChildrenDeleted(oldNode);
-		ValueNodeChildrenCreated(newNode);
-		fContainerListener->ModelNodeValueRequested(modelNode);
+		newNode->CreateChildren();
+		NotifyNodeChanged(modelNode);
 	}
 }
 
@@ -1026,6 +1026,11 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 
 	for (int32 i = 0; i < modelNode->CountChildren(); i++) {
 		BReference<ModelNode> childNode = modelNode->ChildAt(i);
+		TreeTablePath treePath;
+		if (GetTreePath(childNode, treePath)) {
+			int32 index = treePath.RemoveLastComponent();
+			NotifyNodesRemoved(treePath, index, 1);
+		}
 		modelNode->RemoveChild(childNode);
 		fNodeTable.Remove(childNode);
 	}
@@ -1641,29 +1646,25 @@ VariablesView::MessageReceived(BMessage* message)
 		{
 			ModelNode* node = NULL;
 			if (message->FindPointer("node", reinterpret_cast<void **>(&node)) != B_OK)
-				return;
+				break;
 			TeamDebugInfo* info = fThread->GetTeam()->DebugInfo();
 			if (info == NULL)
-				return;
+				break;
 
 			Type* type = NULL;
 			if (info->LookupTypeByName(message->FindString("text"),
 				TypeLookupConstraints(), type) != B_OK) {
 				// TODO: notify user
-				return;
+				break;
 			}
 
 			ValueNode* valueNode = NULL;
 			if (TypeHandlerRoster::Default()->CreateValueNode(
 				node->NodeChild(), type, valueNode) != B_OK) {
-				return;
+				break;
 			}
 
-			ValueNode* previousNode = node->NodeChild()->Node();
-			BReference<ValueNode> nodeRef(previousNode);
 			node->NodeChild()->SetNode(valueNode);
-			fVariableTableModel->ValueNodeChanged(node->NodeChild(),
-				previousNode, valueNode	);
 			break;
 		}
 		case MSG_VALUE_NODE_CHANGED:
