@@ -367,13 +367,28 @@ actions DataFileToSourceFile1
 rule DownloadLocatedFile target : url
 {
 	URL on $(target) = $(url) ;
+	# HACK
+	local downloadCache = /dev/null ;
+
+	if $(HAIKU_DOWNLOAD_CACHE) {
+		downloadCache = $(HAIKU_DOWNLOAD_CACHE) ;
+	}
+
+	local basePath =
+		$(downloadCache)/$(TARGET_ARCH)-gcc$(HAIKU_GCC_VERSION[1]) ;
+	CACHED_PATH on $(target) =
+		$(basePath)/$(target:G=) ;
 
 	DownloadLocatedFile1 $(target) ;
 }
 
 actions DownloadLocatedFile1
 {
-	wget -O "$(1)" $(URL)
+	test -e '$(CACHED_PATH)' && cp "$(CACHED_PATH)" "$(1)" && echo "(cached)" \
+		&& return 0
+	wget -O "$(1)" $(URL) || return $?
+	test -d "`dirname "$(CACHED_PATH)"`" && cp "$(1)" "$(CACHED_PATH)" \
+		&& echo "(copied to cache)" || true
 }
 
 rule DownloadFile file : url
