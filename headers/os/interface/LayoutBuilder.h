@@ -111,6 +111,7 @@ public:
 	inline	ThisBuilder&		SetExplicitMinSize(BSize size);
 	inline	ThisBuilder&		SetExplicitMaxSize(BSize size);
 	inline	ThisBuilder&		SetExplicitPreferredSize(BSize size);
+	inline	ThisBuilder&		SetExplicitAlignment(BAlignment alignment);
 
 	inline						operator BGroupLayout*();
 
@@ -206,6 +207,7 @@ public:
 	inline	ThisBuilder&		SetExplicitMinSize(BSize size);
 	inline	ThisBuilder&		SetExplicitMaxSize(BSize size);
 	inline	ThisBuilder&		SetExplicitPreferredSize(BSize size);
+	inline	ThisBuilder&		SetExplicitAlignment(BAlignment alignment);
 
 	inline						operator BGridLayout*();
 
@@ -643,6 +645,15 @@ Group<ParentBuilder>::SetExplicitPreferredSize(BSize size)
 
 
 template<typename ParentBuilder>
+typename Group<ParentBuilder>::ThisBuilder&
+Group<ParentBuilder>::SetExplicitAlignment(BAlignment alignment)
+{
+	fLayout->SetExplicitAlignment(alignment);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
 Group<ParentBuilder>::operator BGroupLayout*()
 {
 	return fLayout;
@@ -951,6 +962,15 @@ typename Grid<ParentBuilder>::ThisBuilder&
 Grid<ParentBuilder>::SetExplicitPreferredSize(BSize size)
 {
 	fLayout->SetExplicitPreferredSize(size);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetExplicitAlignment(BAlignment alignment)
+{
+	fLayout->SetExplicitAlignment(alignment);
 	return *this;
 }
 
