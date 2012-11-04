@@ -294,9 +294,11 @@ private:
 			void				_ResetTextRect();
 
 			void				_HandleBackspace();
-			void				_HandleArrowKey(uint32 inArrowKey);
+			void				_HandleArrowKey(uint32 inArrowKey,
+									bool commandKeyDown = false);
 			void				_HandleDelete();
-			void				_HandlePageKey(uint32 inPageKey);
+			void				_HandlePageKey(uint32 inPageKey,
+									bool commandKeyDown = false);
 			void				_HandleAlphaKey(const char* bytes,
 									int32 numBytes);
 
@@ -451,8 +453,10 @@ private:
 			float				fMinTextRectWidth;
 			LayoutData*			fLayoutData;
 			int32				fLastClickOffset;
+			bool				fInstalledNavigateWordwiseShortcuts;
+			bool				fInstalledNavigateToTopOrBottomShortcuts;
 
-			uint32				_reserved[7];
+			uint32				_reserved[6];
 };
 
 #endif	// _TEXTVIEW_H
