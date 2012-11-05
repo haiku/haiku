@@ -20,6 +20,7 @@ class TermView: public BView
 		void Draw(BRect updateRect);
 		void GetPreferredSize(float* width, float* height);
 		void KeyDown(const char* bytes, int32 numBytes);
+		void FrameResized(float width, float height);
 		void PushBytes(const char* bytes, const size_t length);
 		
 	private:

@@ -15,7 +15,7 @@
 
 TermView::TermView()
 	:
-	BView("TermView", B_WILL_DRAW)
+	BView("TermView", B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	font_height height;
 	GetFontHeight(&height);
@@ -52,6 +52,10 @@ void TermView::Draw(BRect updateRect)
 	VTermPos pos;
 	font_height height;
 	GetFontHeight(&height);
+
+	int availableRows, availableCols;
+	vterm_get_size(fTerm, &availableRows, &availableCols);
+
 	for (pos.row = updatedChars.start_row; pos.row <= updatedChars.end_row;
 			pos.row++) {
 		float x = updatedChars.start_col * fFontWidth + kBorderSpacing;
@@ -60,8 +64,8 @@ void TermView::Draw(BRect updateRect)
 
 		for (pos.col = updatedChars.start_col;
 				pos.col <= updatedChars.end_col;) {
-			if (pos.col < 0 || pos.row < 0 || pos.col >= kDefaultWidth 
-					|| pos.row >= kDefaultHeight) {
+			if (pos.col < 0 || pos.row < 0 || pos.col >= availableCols 
+					|| pos.row >= availableRows) {
 				DrawString(" ");
 				pos.col ++;
 			} else {
@@ -99,6 +103,14 @@ void TermView::KeyDown(const char* bytes, int32 numBytes)
 	BMessage* keyEvent = new BMessage(kMsgDataWrite);
 	keyEvent->AddData("data", B_RAW_TYPE, bytes, numBytes);
 	be_app_messenger.SendMessage(keyEvent);
+}
+
+
+void TermView::FrameResized(float width, float height)
+{
+	VTermRect newSize = PixelsToGlyphs(BRect(0, 0, width - 2 * kBorderSpacing,
+		height - 2 * kBorderSpacing));
+	vterm_set_size(fTerm, newSize.end_row, newSize.end_col);
 }
 
 
