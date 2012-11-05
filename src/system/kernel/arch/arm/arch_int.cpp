@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2010, Haiku Inc. All rights reserved.
+ * Copyright 2003-2012, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  * 		Axel Dörfler <axeld@pinc-software.de>
  * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  * 		François Revol <revol@free.fr>
+ *              Ithamar R. Adema <ithamar@upgrade-android.com>
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
@@ -30,27 +31,35 @@
 #include <string.h>
 
 
-//#define TRACE_ARCH_INT
+#define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
 
-/*typedef void (*m68k_exception_handler)(void);
-#define M68K_EXCEPTION_VECTOR_COUNT 256
-#warning M68K: align on 4 ?
-//m68k_exception_handler gExceptionVectors[M68K_EXCEPTION_VECTOR_COUNT];
-m68k_exception_handler *gExceptionVectors;
+#define VECTORPAGE_SIZE		64
+#define USER_VECTOR_ADDR_LOW	0x00000000
+#define USER_VECTOR_ADDR_HIGH	0xffff0000
 
-// defined in arch_exceptions.S
-extern "C" void __m68k_exception_noop(void);
-extern "C" void __m68k_exception_common(void);
-*/
-extern int __irqvec_start;
-extern int __irqvec_end;
+#define PXA_INTERRUPT_PHYS_BASE	0x40D00000
+#define PXA_INTERRUPT_SIZE	0x00000034
 
-//extern"C" void m68k_exception_tail(void);
+#define PXA_ICIP	0x00
+#define PXA_ICMR	0x01
+#define PXA_ICFP	0x03
+#define PXA_ICMR2	0x28
+
+static area_id sPxaInterruptArea;
+static uint32 *sPxaInterruptBase;
+
+extern int _vectors_start;
+extern int _vectors_end;
+
+static area_id sVectorPageArea;
+static void *sVectorPageAddress;
+static area_id sUserVectorPageArea;
+static void *sUserVectorPageAddress;
 
 // current fault handler
 addr_t gFaultHandler;
@@ -59,35 +68,48 @@ addr_t gFaultHandler;
 // threads yet.
 struct iframe_stack gBootFrameStack;
 
-// interrupt controller interface (initialized
-// in arch_int_init_post_device_manager())
-//static struct interrupt_controller_module_info *sPIC;
-//static void *sPICCookie;
+
+uint32
+mmu_read_c1()
+{
+	uint32 controlReg = 0;
+	asm volatile("MRC p15, 0, %[c1out], c1, c0, 0":[c1out] "=r" (controlReg));
+	return controlReg;
+}
+
+
+void
+mmu_write_c1(uint32 value)
+{
+	asm volatile("MCR p15, 0, %[c1in], c1, c0, 0"::[c1in] "r" (value));
+}
 
 
 void
 arch_int_enable_io_interrupt(int irq)
 {
-	#warning ARM WRITEME
-	//if (!sPIC)
-	//	return;
+	TRACE(("arch_int_enable_io_interrupt(%d)\n", irq));
 
-	// TODO: I have no idea, what IRQ type is appropriate.
-	//sPIC->enable_io_interrupt(sPICCookie, irq, IRQ_TYPE_LEVEL);
-//	M68KPlatform::Default()->EnableIOInterrupt(irq);
+	if (irq <= 31) {
+		sPxaInterruptBase[PXA_ICMR] |= 1 << irq;
+		return;
+	}
+
+	sPxaInterruptBase[PXA_ICMR2] |= 1 << (irq - 32);
 }
 
 
 void
 arch_int_disable_io_interrupt(int irq)
 {
-	#warning ARM WRITEME
+	TRACE(("arch_int_disable_io_interrupt(%d)\n", irq));
 
-	//if (!sPIC)
-	//	return;
+	if (irq <= 31) {
+		sPxaInterruptBase[PXA_ICMR] &= ~(1 << irq);
+		return;
+	}
 
-	//sPIC->disable_io_interrupt(sPICCookie, irq);
-//	M68KPlatform::Default()->DisableIOInterrupt(irq);
+	sPxaInterruptBase[PXA_ICMR2] &= ~(1 << (irq - 32));
 }
 
 
@@ -97,60 +119,67 @@ arch_int_disable_io_interrupt(int irq)
 static void
 print_iframe(struct iframe *frame)
 {
-	#if 0
-	dprintf("r0-r3:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r0, frame->r1,
-		frame->r2, frame->r3);
-	dprintf("r4-r7:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r4, frame->r5,
-		frame->r6, frame->r7);
-	dprintf("r8-r11:  0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r8, frame->r9,
-		frame->r10, frame->r11);
-	dprintf("r12-r15: 0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->r12, frame->r13,
-		frame->a6, frame->a7);
-	dprintf("      pc 0x%08lx         sr 0x%08lx\n", frame->pc, frame->sr);
-	#endif
-
-	#warning ARM WRITEME
 }
 
 
 status_t
 arch_int_init(kernel_args *args)
 {
-	#if 0
-	status_t err;
-	addr_t vbr;
-	int i;
+	// see if high vectors are enabled
+	if (mmu_read_c1() & (1<<13))
+		dprintf("High vectors already enabled\n");
+	else {
+		mmu_write_c1(mmu_read_c1() | (1<<13));
 
-	gExceptionVectors = (m68k_exception_handler *)args->arch_args.vir_vbr;
+		if (!(mmu_read_c1() & (1<<13)))
+			dprintf("Unable to enable high vectors!\n");
+		else
+			dprintf("Enabled high vectors\n");
+       }
 
-	/* fill in the vector table */
-	for (i = 0; i < M68K_EXCEPTION_VECTOR_COUNT; i++)
-		gExceptionVectors[i] = &__m68k_exception_common;
+	return B_OK;
+}
 
-	vbr = args->arch_args.phys_vbr;
-	/* point VBR to the new table */
-	asm volatile  ("movec %0,%%vbr" : : "r"(vbr):);
-	#endif
-	#warning ARM WRITEME
+status_t
+arch_int_init_post_vm(kernel_args *args)
+{
+	// create a read/write kernel area
+	sVectorPageArea = create_area("vectorpage", (void **)&sVectorPageAddress,
+		B_ANY_ADDRESS, VECTORPAGE_SIZE, B_FULL_LOCK,
+		B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA);
+
+	if (sVectorPageArea < 0)
+		panic("vector page could not be created!");
+
+	// clone it at a fixed address with user read/only permissions
+	sUserVectorPageAddress = (addr_t*)USER_VECTOR_ADDR_HIGH;
+	sUserVectorPageArea = clone_area("user_vectorpage",
+		(void **)&sUserVectorPageAddress, B_EXACT_ADDRESS,
+		B_READ_AREA | B_EXECUTE_AREA, sVectorPageArea);
+
+	if (sUserVectorPageArea < 0)
+		panic("user vector page @ %p could not be created (%lx)!", sVectorPageAddress, sUserVectorPageArea);
+
+	// copy vectors into the newly created area
+	memcpy(sVectorPageAddress, &_vectors_start, VECTORPAGE_SIZE);
+
+	sPxaInterruptArea = map_physical_memory("pxa_intc", PXA_INTERRUPT_PHYS_BASE,
+		PXA_INTERRUPT_SIZE, 0, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&sPxaInterruptBase);
+
+	if (sPxaInterruptArea < 0)
+		return sPxaInterruptArea;
+
+	sPxaInterruptBase[PXA_ICMR] = 0;
+	sPxaInterruptBase[PXA_ICMR2] = 0;
 
 	return B_OK;
 }
 
 
 status_t
-arch_int_init_post_vm(kernel_args *args)
-{
-	status_t err;
-	// err = M68KPlatform::Default()->InitPIC(args);
-	#warning ARM WRITEME
-
-	return err;
-}
-
-
-status_t
 arch_int_init_io(kernel_args* args)
 {
+	TRACE(("arch_int_init_io(%p)\n", args));
 	return B_OK;
 }
 
@@ -158,8 +187,53 @@ arch_int_init_io(kernel_args* args)
 status_t
 arch_int_init_post_device_manager(struct kernel_args *args)
 {
-	// no PIC found
-	panic("arch_int_init_post_device_manager(): Found no supported PIC!");
-
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+extern "C" void arch_arm_undefined(struct iframe *iframe)
+{
+	panic("Undefined instruction!");
+}
+
+extern "C" void arch_arm_syscall(struct iframe *iframe)
+{
+	panic("Software interrupt!\n");
+}
+
+extern "C" void arch_arm_data_abort(struct iframe *iframe)
+{
+	addr_t newip;
+	status_t res = vm_page_fault(iframe->r2 /* FAR */, iframe->r4 /* lr */,
+		true /* TODO how to determine read/write? */,
+		false /* only kernelspace for now */,
+		&newip);
+
+	if (res != B_HANDLED_INTERRUPT) {
+		panic("Data Abort: %08x %08x %08x %08x (res=%lx)", iframe->r0 /* spsr */, 
+			iframe->r1 /* FSR */, iframe->r2 /* FAR */,
+			iframe->r4 /* lr */,
+			res);
+	} else {
+		//panic("vm_page_fault was ok (%08lx/%08lx)!", iframe->r2 /* FAR */, iframe->r0 /* spsr */);
+	}
+}
+
+extern "C" void arch_arm_prefetch_abort(struct iframe *iframe)
+{
+	panic("Prefetch Abort: %08x %08x %08x", iframe->r0, iframe->r1, iframe->r2);
+}
+
+extern "C" void arch_arm_irq(struct iframe *iframe)
+{
+	for (int i=0; i < 32; i++)
+		if (sPxaInterruptBase[PXA_ICIP] & (1 << i))
+			int_io_interrupt_handler(i, true);
+}
+
+extern "C" void arch_arm_fiq(struct iframe *iframe)
+{
+	for (int i=0; i < 32; i++)
+		if (sPxaInterruptBase[PXA_ICIP] & (1 << i))
+			dprintf("arch_arm_fiq: help me, FIQ %d was triggered but no FIQ support!\n", i);
 }
