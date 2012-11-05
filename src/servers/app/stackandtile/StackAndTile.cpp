@@ -129,16 +129,42 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 		if (!wasPressed && fSATKeyPressed)
 			_StartSAT();
 	}
-// switch off group navigation because it clashes with tracker...
-return false;
-	if (!SATKeyPressed() || (modifiers & B_COMMAND_KEY) == 0
-		|| what != B_KEY_DOWN)
+
+	if (!SATKeyPressed() || what != B_KEY_DOWN)
 		return false;
 
 	const int kArrowKeyUp = 87;
 	const int kArrowKeyDown = 98;
+	const int kArrowKeyLeft = 97;
+	const int kArrowKeyRight = 99;
 
 	switch (key) {
+		case kArrowKeyLeft:
+		case kArrowKeyRight:
+		{
+			SATWindow* frontWindow = GetSATWindow(fDesktop->FocusWindow());
+			SATGroup* currentGroup = NULL;
+			if (frontWindow)
+				currentGroup = frontWindow->GetGroup();
+			int32 groupSize = currentGroup->CountItems();
+			if (!currentGroup || groupSize <= 1)
+				return false;
+
+			for (int32 i = 0; i < groupSize; i++) {
+				SATWindow* targetWindow = currentGroup->WindowAt(i);
+				if (targetWindow == frontWindow) {
+					if (key == kArrowKeyLeft && i > 0) {
+						targetWindow = currentGroup->WindowAt(i - 1);
+					} else if (key == kArrowKeyRight && i < groupSize - 1) {
+						targetWindow = currentGroup->WindowAt(i + 1);
+					}
+					_ActivateWindow(targetWindow);
+					return true;
+				}
+			}
+			break;
+		}
+
 		case kArrowKeyDown:
 		{
 			SATWindow* frontWindow = GetSATWindow(fDesktop->FocusWindow());
