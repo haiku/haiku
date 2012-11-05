@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -135,23 +135,17 @@
 #define PCI_HDA_TCSEL					0x44
 #define PCI_HDA_TCSEL_MASK				0xf8
 
-#define ATI_HDA_MISC_CNTR2			0x42
+#define ATI_HDA_MISC_CNTR2				0x42
 #define ATI_HDA_MISC_CNTR2_MASK   		0xf8
 #define ATI_HDA_ENABLE_SNOOP      		0x02
 #define NVIDIA_HDA_OSTRM_COH			0x4c
 #define NVIDIA_HDA_ISTRM_COH			0x4d
 #define NVIDIA_HDA_ENABLE_COHBIT		0x01
-#define NVIDIA_HDA_TRANSREG			0x4e
+#define NVIDIA_HDA_TRANSREG				0x4e
 #define NVIDIA_HDA_TRANSREG_MASK		0xf0
 #define NVIDIA_HDA_ENABLE_COHBITS		0x0f
-#define INTEL_SCH_HDA_DEVC			0x78
+#define INTEL_SCH_HDA_DEVC				0x78
 #define INTEL_SCH_HDA_DEVC_SNOOP		0x800
-
-#define ATI_VENDORID		0x1002
-#define INTEL_VENDORID		0x8086
-#define INTEL_SCH_DEVICEID	0x811b
-#define NVIDIA_VENDORID		0x10de
-
 
 
 typedef uint32 corb_t;
