@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -80,7 +80,7 @@ count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 			default:
 				FATAL("%s: Unhandled pheader type in count 0x%lx\n",
 					imagePath, pheaders->p_type);
-				return B_BAD_DATA;
+				break;
 		}
 	}
 
