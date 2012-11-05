@@ -48,7 +48,7 @@ property_info main_prop_list[] = {
 };
 
 
-const float kCloseSize				= 8;
+const float kCloseSize				= 6;
 const float kExpandSize				= 8;
 const float kPenSize				= 1;
 const float kEdgePadding			= 2;

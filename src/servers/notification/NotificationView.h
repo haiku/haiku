@@ -52,6 +52,7 @@ public:
 
 private:
 			void				_CalculateSize();
+			void				_DrawCloseButton(const BRect& updateRect);
 
 			struct LineInfo {
 				BFont	font;
@@ -68,10 +69,9 @@ private:
 			BMessageRunner*		fRunner;
 
 			BBitmap*			fBitmap;
-
 			LineInfoList		fLines;
-
 			float				fHeight;
+			bool				fCloseClicked;
 };
 
 #endif	// _NOTIFICATION_VIEW_H
