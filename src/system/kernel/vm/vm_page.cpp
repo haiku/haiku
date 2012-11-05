@@ -3862,13 +3862,13 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 			page_num_t offsetStart = start + sPhysicalPageOffset;
 
 			// enforce alignment
-			if ((offsetStart & alignmentMask) != 0) {
+			if (alignmentMask != 0 && (offsetStart & alignmentMask) != 0) {
 				offsetStart = ((offsetStart + alignmentMask) & ~alignmentMask)
 					- sPhysicalPageOffset;
 			}
 
 			// enforce boundary
-			if (offsetStart << boundaryShift
+			if (boundaryShift != 0 && offsetStart << boundaryShift
 					!= (offsetStart + length - 1) << boundaryShift) {
 				offsetStart = (offsetStart + length - 1) << boundaryShift
 					>> boundaryShift;
@@ -3887,7 +3887,10 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 			}
 
 			dprintf("vm_page_allocate_page_run(): Failed to allocate run of "
-				"length %" B_PRIuPHYSADDR " in second iteration!", length);
+				"length %" B_PRIuPHYSADDR " (%" B_PRIuPHYSADDR " %"
+				B_PRIuPHYSADDR ") in second iteration (align: %" B_PRIuPHYSADDR
+				" boundary: %" B_PRIuPHYSADDR ") !", length, requestedStart,
+				end, restrictions->alignment, restrictions->boundary);
 
 			freeClearQueueLocker.Unlock();
 			vm_page_unreserve_pages(&reservation);
@@ -3916,7 +3919,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 			freeClearQueueLocker.Lock();
 		}
 
-		start += i + 1;
+		start += max_c(i, alignmentMask) + 1;
 	}
 }
 
