@@ -34,6 +34,7 @@
 #define ALIGN(size, align)	(((size) + align - 1) & ~(align - 1))
 #define PAGE_ALIGN(size)	(((size) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1))
 
+
 static const struct {
 	uint32 multi_rate;
 	uint32 hw_rate;
@@ -53,6 +54,7 @@ static const struct {
 	// this one is not supported by hardware.
 	// {B_SR_384000, MAKE_RATE(44100, ??, ??), 384000},
 };
+
 
 static pci_x86_module_info* sPCIx86Module;
 
@@ -830,6 +832,9 @@ hda_hw_init(hda_controller* controller)
 	controller->irq = controller->pci_info.u.h0.interrupt_line;
 	controller->msi = false;
 
+	// TODO: temporarily disabled, as at least on my hardware audio becomes
+	// flaky after this.
+/*
 	if (sPCIx86Module != NULL && sPCIx86Module->get_msi_count(
 			controller->pci_info.bus, controller->pci_info.device,
 			controller->pci_info.function) >= 1) {
@@ -846,6 +851,7 @@ hda_hw_init(hda_controller* controller)
 			controller->msi = true;
 		}
 	}
+*/
 
 	status = install_io_interrupt_handler(controller->irq,
 		(interrupt_handler)hda_interrupt_handler, controller, 0);
