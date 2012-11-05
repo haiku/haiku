@@ -18,6 +18,7 @@
 
 
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <GroupLayout.h>
 #include <LayoutUtils.h>
 #include <MessageRunner.h>
@@ -58,7 +59,8 @@ NotificationView::NotificationView(NotificationWindow* win,
 	fNotification(notification),
 	fTimeout(timeout),
 	fRunner(NULL),
-	fBitmap(NULL)
+	fBitmap(NULL),
+	fCloseClicked(false)
 {
 	if (fNotification->Icon() != NULL)
 		fBitmap = new BBitmap(fNotification->Icon());
@@ -271,19 +273,7 @@ NotificationView::Draw(BRect updateRect)
 	rgb_color detailCol = ui_color(B_CONTROL_BORDER_COLOR);
 	detailCol = tint_color(detailCol, B_LIGHTEN_2_TINT);
 
-	// Draw the close widget
-	BRect closeRect = Bounds();
-	closeRect.InsetBy(2 * kEdgePadding, 2 * kEdgePadding);
-	closeRect.left = closeRect.right - kCloseSize;
-	closeRect.bottom = closeRect.top + kCloseSize;
-
-	PushState();
-		SetHighColor(detailCol);
-		StrokeRoundRect(closeRect, kSmallPadding, kSmallPadding);
-		BRect closeCross = closeRect.InsetByCopy(kSmallPadding, kSmallPadding);
-		StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
-		StrokeLine(closeCross.LeftBottom(), closeCross.RightTop());
-	PopState();
+	_DrawCloseButton(updateRect);
 
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	BPoint left(Bounds().left, Bounds().top);
@@ -291,6 +281,39 @@ NotificationView::Draw(BRect updateRect)
 	StrokeLine(left, right);
 
 	Sync();
+}
+
+
+void
+NotificationView::_DrawCloseButton(const BRect& updateRect)
+{
+	PushState();
+	BRect closeRect = Bounds();
+
+	closeRect.InsetBy(3 * kEdgePadding, 3 * kEdgePadding);
+	closeRect.left = closeRect.right - kCloseSize;
+	closeRect.bottom = closeRect.top + kCloseSize;
+
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	float tint = B_DARKEN_2_TINT;
+
+	if (fCloseClicked) {
+		BRect buttonRect(closeRect.InsetByCopy(-4, -4));
+		be_control_look->DrawButtonFrame(this, buttonRect, updateRect,
+			base, base,
+			BControlLook::B_ACTIVATED | BControlLook::B_BLEND_FRAME);
+		be_control_look->DrawButtonBackground(this, buttonRect, updateRect,
+			base, BControlLook::B_ACTIVATED);
+		tint *= 1.2;
+		closeRect.OffsetBy(1, 1);
+	}
+
+	base = tint_color(base, tint);
+	SetHighColor(base);
+	SetPenSize(2);
+	StrokeLine(closeRect.LeftTop(), closeRect.RightBottom());
+	StrokeLine(closeRect.LeftBottom(), closeRect.RightTop());
+	PopState();
 }
 
 
@@ -355,6 +378,8 @@ NotificationView::MouseDown(BPoint point)
 					be_roster->Launch(fNotification->OnClickApp(), &messages);
 				else
 					be_roster->Launch(fNotification->OnClickFile(), &messages);
+			} else {
+				fCloseClicked = true;
 			}
 
 			// Remove the info view after a click
