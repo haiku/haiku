@@ -1645,18 +1645,19 @@ VariablesView::MessageReceived(BMessage* message)
 		case MSG_TYPECAST_NODE:
 		{
 			ModelNode* node = NULL;
-			if (message->FindPointer("node", reinterpret_cast<void **>(&node)) != B_OK)
-				break;
-			TeamDebugInfo* info = fThread->GetTeam()->DebugInfo();
-			if (info == NULL)
-				break;
-
-			Type* type = NULL;
-			if (info->LookupTypeByName(message->FindString("text"),
-				TypeLookupConstraints(), type) != B_OK) {
-				// TODO: notify user
+			if (message->FindPointer("node", reinterpret_cast<void **>(&node))
+				!= B_OK) {
 				break;
 			}
+
+			Type* type = NULL;
+			BString typeName = message->FindString("text");
+			if (typeName.Length() == 0)
+				break;
+
+
+			if (_ParseInputType(typeName, type) != B_OK)
+				break;
 
 			ValueNode* valueNode = NULL;
 			if (TypeHandlerRoster::Default()->CreateValueNode(
@@ -2136,6 +2137,89 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 	}
 
 	return B_OK;
+}
+
+
+status_t
+VariablesView::_ParseInputType(const BString& typeName,
+	Type*& _resultType) const
+{
+	status_t result = B_OK;
+	Type* baseType = NULL;
+
+	TeamDebugInfo* info = fThread->GetTeam()->DebugInfo();
+	if (info == NULL)
+		return B_NO_MEMORY;
+
+	BString parsedName = typeName;
+	BString baseTypeName;
+	parsedName.RemoveAll(" ");
+
+	// TODO: this is fairly C/C++-specific and should probably be
+	// language-agnostic in the long run
+	int32 modifierIndex = -1;
+	for (int32 i = parsedName.Length() - 1; i >= 0; i--) {
+		if (parsedName[i] == '*' || parsedName[i] == '&')
+			modifierIndex = i;
+	}
+
+	if (modifierIndex >= 0) {
+		parsedName.CopyInto(baseTypeName, 0, modifierIndex);
+		parsedName.Remove(0, modifierIndex);
+	} else
+		baseTypeName = parsedName;
+
+	result = info->LookupTypeByName(baseTypeName, TypeLookupConstraints(),
+		baseType);
+	if (result != B_OK)
+		return result;
+
+	BReference<Type> typeRef;
+	typeRef.SetTo(baseType, true);
+
+	if (!parsedName.IsEmpty()) {
+		AddressType* derivedType = NULL;
+		// walk the list of modifiers trying to add each.
+		for (int32 i = 0; i < parsedName.Length(); i++) {
+			address_type_kind typeKind;
+			switch (parsedName[i]) {
+				case '*':
+				{
+					typeKind = DERIVED_TYPE_POINTER;
+					break;
+				}
+				case '&':
+				{
+					typeKind = DERIVED_TYPE_REFERENCE;
+					break;
+				}
+				default:
+				{
+					return B_BAD_VALUE;
+				}
+
+			}
+
+			if (derivedType == NULL) {
+				result = baseType->CreateDerivedAddressType(typeKind,
+					derivedType);
+			} else {
+				result = derivedType->CreateDerivedAddressType(typeKind,
+					derivedType);
+			}
+
+			if (result != B_OK)
+				return result;
+			typeRef.SetTo(derivedType, true);
+		}
+
+		_resultType = derivedType;
+	} else
+		_resultType = baseType;
+
+	typeRef.Detach();
+
+	return result;
 }
 
 
