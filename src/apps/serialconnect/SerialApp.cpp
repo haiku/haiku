@@ -4,16 +4,21 @@
  */
 
 
-#include <stdio.h>
-
 #include "SerialApp.h"
+
+#include <stdio.h>
+#include <string.h>
+
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
 
 #include "SerialWindow.h"
 
 
 SerialApp::SerialApp()
-	:
-	BApplication(SerialApp::kApplicationSignature)
+	: BApplication(SerialApp::kApplicationSignature)
+	, fLogFile(NULL)
 {
 	fWindow = new SerialWindow();
 
@@ -21,6 +26,12 @@ SerialApp::SerialApp()
 	thread_id id = spawn_thread(PollSerial, "Serial port poller",
 		B_LOW_PRIORITY, this);
 	resume_thread(id);
+}
+
+
+SerialApp::~SerialApp()
+{
+	delete fLogFile;
 }
 
 
@@ -51,6 +62,19 @@ void SerialApp::MessageReceived(BMessage* message)
 			// forward the message to the window, which will display the
 			// incoming data
 			fWindow->PostMessage(message);
+
+			if (fLogFile)
+			{
+				const char* bytes;
+				ssize_t length;
+				message->FindData("data", B_RAW_TYPE, (const void**)&bytes,
+					&length);
+				if(fLogFile->Write(bytes, length) != length)
+				{
+					puts("### WRITE ERROR");
+				}
+			}
+
 			break;
 		}
 		case kMsgDataWrite:
@@ -61,6 +85,27 @@ void SerialApp::MessageReceived(BMessage* message)
 			message->FindData("data", B_RAW_TYPE, (const void**)&bytes, &size);
 			fSerialPort.Write(bytes, size);
 			break;
+		}
+		case kMsgLogfile:
+		{
+			entry_ref parent;
+			const char* filename;
+
+			if (message->FindRef("directory", &parent) == B_OK
+				&& message->FindString("name", &filename) == B_OK)
+			{
+				delete fLogFile;
+				BDirectory directory(&parent);
+				fLogFile = new BFile(&directory, filename,
+					B_WRITE_ONLY | B_CREATE_FILE | B_OPEN_AT_END);
+				status_t error = fLogFile->InitCheck();
+				if(error != B_OK)
+				{
+					puts(strerror(error));
+				}
+			} else {
+				debugger("Invalid BMessage received");
+			}
 		}
 		case kMsgSettings:
 		{

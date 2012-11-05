@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include <FilePanel.h>
 #include <GroupLayout.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -19,9 +20,9 @@
 
 
 SerialWindow::SerialWindow()
-	:
-	BWindow(BRect(100, 100, 400, 400), SerialWindow::kWindowTitle,
+	: BWindow(BRect(100, 100, 400, 400), SerialWindow::kWindowTitle,
 		B_DOCUMENT_WINDOW, B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS)
+	, fLogFilePanel(NULL)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL, 0.0f));
 
@@ -32,17 +33,29 @@ SerialWindow::SerialWindow()
 	AddChild(fTermView);
 
 	fConnectionMenu = new BMenu("Connection");
-	fConnectionMenu->SetRadioMode(true);
-
-	BMenu* editMenu = new BMenu("Edit");
+	BMenu* fileMenu = new BMenu("File");
 	BMenu* settingsMenu = new BMenu("Settings");
 
+	fConnectionMenu->SetRadioMode(true);
+
 	menuBar->AddItem(fConnectionMenu);
-	menuBar->AddItem(editMenu);
+	menuBar->AddItem(fileMenu);
 	menuBar->AddItem(settingsMenu);
 
 	// TODO edit menu - what's in it ?
+	//BMenu* editMenu = new BMenu("Edit");
+	//menuBar->AddItem(editMenu);
 	
+	BMenuItem* logFile = new BMenuItem("Log to file" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgLogfile));
+	fileMenu->AddItem(logFile);
+	BMenuItem* xmodemSend = new BMenuItem("X/Y/ZModem send" B_UTF8_ELLIPSIS,
+		NULL);
+	fileMenu->AddItem(xmodemSend);
+	BMenuItem* xmodemReceive = new BMenuItem(
+		"X/Y/Zmodem receive" B_UTF8_ELLIPSIS, NULL);
+	fileMenu->AddItem(xmodemReceive);
+
 	// Configuring all this by menus may be a bit unhandy. Make a setting
 	// window instead ?
 	BMenu* baudRate = new BMenu("Baud rate"); 
@@ -159,7 +172,13 @@ SerialWindow::SerialWindow()
 	CenterOnScreen();
 }
 
-#include <stdio.h>
+
+
+SerialWindow::~SerialWindow()
+{
+	delete fLogFilePanel;
+}
+
 
 void SerialWindow::MenusBeginning()
 {
@@ -214,6 +233,17 @@ void SerialWindow::MessageReceived(BMessage* message)
 			ssize_t length;
 			message->FindData("data", B_RAW_TYPE, (const void**)&bytes, &length);
 			fTermView->PushBytes(bytes, length);
+			break;
+		}
+		case kMsgLogfile:
+		{
+			// Let's lazy init the file panel
+			if(fLogFilePanel == NULL) {
+				fLogFilePanel = new BFilePanel(B_SAVE_PANEL, &be_app_messenger,
+					NULL, B_FILE_NODE, false);
+				fLogFilePanel->SetMessage(message);
+			}
+			fLogFilePanel->Show();
 			break;
 		}
 		default:

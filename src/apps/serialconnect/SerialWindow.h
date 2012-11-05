@@ -15,6 +15,7 @@ class SerialWindow: public BWindow
 {
 	public:
 		SerialWindow();
+		~SerialWindow();
 
 		void MenusBeginning();
 		void MessageReceived(BMessage* message);
@@ -22,6 +23,7 @@ class SerialWindow: public BWindow
 	private:
 		TermView* fTermView;
 		BMenu* fConnectionMenu;
+		BFilePanel* fLogFilePanel;
 
 		static const char* kWindowTitle;
 };

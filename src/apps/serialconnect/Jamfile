@@ -16,6 +16,6 @@ Application SerialConnect :
 	state.c
 	unicode.c
 	vterm.c
-	: be device $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be device tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 ;
 
