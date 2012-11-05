@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -421,6 +421,40 @@ DebuggerInterface::UninstallBreakpoint(target_addr_t address)
 	message.address = (void*)(addr_t)address;
 
 	return write_port(fNubPort, B_DEBUG_MESSAGE_CLEAR_BREAKPOINT,
+		&message, sizeof(message));
+}
+
+
+status_t
+DebuggerInterface::InstallWatchpoint(target_addr_t address, uint32 type,
+	int32 length)
+{
+	DebugContextGetter contextGetter(fDebugContextPool);
+
+	debug_nub_set_watchpoint message;
+	message.reply_port = contextGetter.Context()->reply_port;
+	message.address = (void*)(addr_t)address;
+	message.type = type;
+	message.length = length;
+
+	debug_nub_set_watchpoint_reply reply;
+
+	status_t error = send_debug_message(contextGetter.Context(),
+		B_DEBUG_MESSAGE_SET_WATCHPOINT, &message, sizeof(message), &reply,
+		sizeof(reply));
+	return error == B_OK ? reply.error : error;
+}
+
+
+status_t
+DebuggerInterface::UninstallWatchpoint(target_addr_t address)
+{
+	DebugContextGetter contextGetter(fDebugContextPool);
+
+	debug_nub_clear_watchpoint message;
+	message.address = (void*)(addr_t)address;
+
+	return write_port(fNubPort, B_DEBUG_MESSAGE_CLEAR_WATCHPOINT,
 		&message, sizeof(message));
 }
 
