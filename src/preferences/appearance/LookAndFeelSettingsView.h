@@ -48,9 +48,6 @@ private:
 			bool				_DoubleScrollBarArrows();
 			void				_SetDoubleScrollBarArrows(bool doubleArrows);
 
-			int32				_ScrollBarKnobStyle();
-			void				_SetScrollBarKnobStyle(int32 knobStyle);
-
 private:
 			DecorInfoUtility	fDecorUtility;
 
@@ -61,15 +58,10 @@ private:
 			FakeScrollBar*		fArrowStyleSingle;
 			FakeScrollBar*		fArrowStyleDouble;
 
-			FakeScrollBar*		fKnobStyleNone;
-			FakeScrollBar*		fKnobStyleDots;
-			FakeScrollBar*		fKnobStyleLines;
-
 			BString				fSavedDecor;
 			BString				fCurrentDecor;
 
 			bool				fSavedDoubleArrowsValue;
-			int32				fSavedKnobStyleValue;
 };
 
 #endif // LOOK_AND_FEEL_SETTINGS_VIEW_H

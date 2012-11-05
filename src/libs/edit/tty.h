@@ -456,14 +456,14 @@ typedef struct {
 
 typedef unsigned char ttychar_t[NN_IO][C_NCC];
 
-protected int	tty_init(EditLine *);
-protected void	tty_end(EditLine *);
-protected int	tty_stty(EditLine *, int, const char **);
-protected int	tty_rawmode(EditLine *);
-protected int	tty_cookedmode(EditLine *);
-protected int	tty_quotemode(EditLine *);
-protected int	tty_noquotemode(EditLine *);
-protected void	tty_bind_char(EditLine *, int);
+int	tty_init(EditLine *);
+void	tty_end(EditLine *);
+int	tty_stty(EditLine *, int, const char **);
+int	tty_rawmode(EditLine *);
+int	tty_cookedmode(EditLine *);
+int	tty_quotemode(EditLine *);
+int	tty_noquotemode(EditLine *);
+void	tty_bind_char(EditLine *, int);
 
 typedef struct {
     ttyperm_t t_t;

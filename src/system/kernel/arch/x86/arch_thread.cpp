@@ -317,7 +317,7 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 {
 	addr_t* stackTop = (addr_t*)_stackTop;
 
-	TRACE(("arch_thread_init_kthread_stack: stack top %p, function %, data: "
+	TRACE(("arch_thread_init_kthread_stack: stack top %p, function %p, data: "
 		"%p\n", stackTop, function, data));
 
 	// push the function argument, a pointer to the data

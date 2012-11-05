@@ -4,10 +4,15 @@
  */
 
 
+#ifndef _SERIALAPP_H_
+#define _SERIALAPP_H_
+
+
 #include <Application.h>
 #include <SerialPort.h>
 
 
+class BFile;
 class SerialWindow;
 
 
@@ -15,6 +20,7 @@ class SerialApp: public BApplication
 {
 	public:
 		SerialApp();
+		~SerialApp();
 		void ReadyToRun();
 		void MessageReceived(BMessage* message);
 
@@ -22,6 +28,7 @@ class SerialApp: public BApplication
 		BSerialPort fSerialPort;
 		sem_id fSerialLock;
 		SerialWindow* fWindow;
+		BFile* fLogFile;
 
 		static status_t PollSerial(void*);
 
@@ -30,8 +37,11 @@ class SerialApp: public BApplication
 
 
 enum messageConstants {
-	kMsgOpenPort  = 'open',
 	kMsgDataRead  = 'dare',
 	kMsgDataWrite = 'dawr',
+	kMsgLogfile   = 'logf',
+	kMsgOpenPort  = 'open',
+	kMsgSettings  = 'stty',
 };
 
+#endif

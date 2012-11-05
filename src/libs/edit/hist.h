@@ -67,11 +67,11 @@ typedef struct el_history_t {
 #define	HIST_LOAD(el, fname)	HIST_FUN(el, H_LOAD fname)
 #define	HIST_SAVE(el, fname)	HIST_FUN(el, H_SAVE fname)
 
-protected int		hist_init(EditLine *);
-protected void		hist_end(EditLine *);
-protected el_action_t	hist_get(EditLine *);
-protected int		hist_set(EditLine *, hist_fun_t, ptr_t);
-protected int		hist_command(EditLine *, int, const char **);
-protected int		hist_enlargebuf(EditLine *, size_t, size_t);
+int		hist_init(EditLine *);
+void		hist_end(EditLine *);
+el_action_t	hist_get(EditLine *);
+int		hist_set(EditLine *, hist_fun_t, ptr_t);
+int		hist_command(EditLine *, int, const char **);
+int		hist_enlargebuf(EditLine *, size_t, size_t);
 
 #endif /* _h_el_hist */

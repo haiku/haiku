@@ -93,7 +93,7 @@ private int		 key__decode_char(char *, int, int);
 /* key_init():
  *	Initialize the key maps
  */
-protected int
+int
 key_init(EditLine *el)
 {
 
@@ -108,7 +108,7 @@ key_init(EditLine *el)
 /* key_end():
  *	Free the key maps
  */
-protected void
+void
 key_end(EditLine *el)
 {
 
@@ -121,7 +121,7 @@ key_end(EditLine *el)
 /* key_map_cmd():
  *	Associate cmd with a key value
  */
-protected key_value_t *
+key_value_t *
 key_map_cmd(EditLine *el, int cmd)
 {
 
@@ -133,7 +133,7 @@ key_map_cmd(EditLine *el, int cmd)
 /* key_map_str():
  *	Associate str with a key value
  */
-protected key_value_t *
+key_value_t *
 key_map_str(EditLine *el, char *str)
 {
 
@@ -147,7 +147,7 @@ key_map_str(EditLine *el, char *str)
  *	initializes el->el_key.map with arrow keys
  *	[Always bind the ansi arrow keys?]
  */
-protected void
+void
 key_reset(EditLine *el)
 {
 
@@ -165,7 +165,7 @@ key_reset(EditLine *el)
  *      Returns NULL in val.str and XK_STR for no match.
  *      The last character read is returned in *ch.
  */
-protected int
+int
 key_get(EditLine *el, char *ch, key_value_t *val)
 {
 
@@ -179,7 +179,7 @@ key_get(EditLine *el, char *ch, key_value_t *val)
  *      existing key. Ntype specifies if code is a command, an
  *      out str or a unix command.
  */
-protected void
+void
 key_add(EditLine *el, const char *key, key_value_t *val, int ntype)
 {
 
@@ -207,7 +207,7 @@ key_add(EditLine *el, const char *key, key_value_t *val, int ntype)
 /* key_clear():
  *
  */
-protected void
+void
 key_clear(EditLine *el, el_action_t *map, const char *in)
 {
 
@@ -224,7 +224,7 @@ key_clear(EditLine *el, el_action_t *map, const char *in)
  *      Delete the key and all longer keys staring with key, if
  *      they exists.
  */
-protected int
+int
 key_delete(EditLine *el, const char *key)
 {
 
@@ -245,7 +245,7 @@ key_delete(EditLine *el, const char *key)
  *	Print the binding associated with key key.
  *	Print entire el->el_key.map if null
  */
-protected void
+void
 key_print(EditLine *el, const char *key)
 {
 
@@ -565,7 +565,7 @@ node_enum(EditLine *el, key_node_t *ptr, int cnt)
  *	Print the specified key and its associated
  *	function specified by val
  */
-protected void
+void
 key_kprint(EditLine *el, const char *key, key_value_t *val, int ntype)
 {
 	el_bindings_t *fp;
@@ -643,7 +643,7 @@ key__decode_char(char *buf, int cnt, int ch)
 /* key__decode_str():
  *	Make a printable version of the ey
  */
-protected char *
+char *
 key__decode_str(const char *str, char *buf, const char *sep)
 {
 	char *b;

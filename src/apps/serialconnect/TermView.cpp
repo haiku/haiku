@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 
+#include <Entry.h>
+#include <File.h>
 #include <Layout.h>
 
 #include "SerialApp.h"
@@ -15,7 +17,7 @@
 
 TermView::TermView()
 	:
-	BView("TermView", B_WILL_DRAW)
+	BView("TermView", B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	font_height height;
 	GetFontHeight(&height);
@@ -52,6 +54,10 @@ void TermView::Draw(BRect updateRect)
 	VTermPos pos;
 	font_height height;
 	GetFontHeight(&height);
+
+	int availableRows, availableCols;
+	vterm_get_size(fTerm, &availableRows, &availableCols);
+
 	for (pos.row = updatedChars.start_row; pos.row <= updatedChars.end_row;
 			pos.row++) {
 		float x = updatedChars.start_col * fFontWidth + kBorderSpacing;
@@ -60,13 +66,35 @@ void TermView::Draw(BRect updateRect)
 
 		for (pos.col = updatedChars.start_col;
 				pos.col <= updatedChars.end_col;) {
-			if (pos.col < 0 || pos.row < 0 || pos.col >= kDefaultWidth 
-					|| pos.row >= kDefaultHeight) {
+			if (pos.col < 0 || pos.row < 0 || pos.col >= availableCols 
+					|| pos.row >= availableRows) {
 				DrawString(" ");
 				pos.col ++;
 			} else {
 				VTermScreenCell cell;
 				vterm_screen_get_cell(fTermScreen, pos, &cell);
+
+				rgb_color foreground, background;
+				foreground.red = cell.fg.red;
+				foreground.green = cell.fg.green;
+				foreground.blue = cell.fg.blue;
+				background.red = cell.bg.red;
+				background.green = cell.bg.green;
+				background.blue = cell.bg.blue;
+
+				if(cell.attrs.reverse) {
+					SetLowColor(foreground);
+					SetViewColor(foreground);
+					SetHighColor(background);
+				} else {
+					SetLowColor(background);
+					SetViewColor(background);
+					SetHighColor(foreground);
+				}
+
+				BPoint penLocation = PenLocation();
+				FillRect(BRect(penLocation.x, penLocation.y - height.ascent,
+					penLocation.x + cell.width * fFontWidth, penLocation.y), B_SOLID_LOW);
 
 				if (cell.chars[0] == 0) {
 					DrawString(" ");
@@ -82,6 +110,14 @@ void TermView::Draw(BRect updateRect)
 			}
 		}
 	}
+}
+
+
+void TermView::FrameResized(float width, float height)
+{
+	VTermRect newSize = PixelsToGlyphs(BRect(0, 0, width - 2 * kBorderSpacing,
+		height - 2 * kBorderSpacing));
+	vterm_set_size(fTerm, newSize.end_row, newSize.end_col);
 }
 
 
@@ -102,10 +138,33 @@ void TermView::KeyDown(const char* bytes, int32 numBytes)
 }
 
 
+void TermView::MessageReceived(BMessage* message)
+{
+	switch(message->what)
+	{
+		case 'DATA':
+		{
+			entry_ref ref;
+			if(message->FindRef("refs", &ref) == B_OK)
+			{
+				// The user just dropped a file on us
+				// TODO send it by XMODEM or so
+			}
+			break;
+		}
+		default:
+			BView::MessageReceived(message);
+	}
+}
+
+
 void TermView::PushBytes(const char* bytes, size_t length)
 {
 	vterm_push_bytes(fTerm, bytes, length);
 }
+
+
+//#pragma mark -
 
 
 VTermRect TermView::PixelsToGlyphs(BRect pixels) const

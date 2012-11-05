@@ -61,9 +61,9 @@
 typedef void (*el_signalhandler_t)(int);
 typedef el_signalhandler_t *el_signal_t;
 
-protected void	sig_end(EditLine*);
-protected int	sig_init(EditLine*);
-protected void	sig_set(EditLine*);
-protected void	sig_clr(EditLine*);
+void	sig_end(EditLine*);
+int	sig_init(EditLine*);
+void	sig_set(EditLine*);
+void	sig_clr(EditLine*);
 
 #endif /* _h_el_sig */

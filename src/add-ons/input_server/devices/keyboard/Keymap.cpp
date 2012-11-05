@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 
 
 static void
-print_key(char* chars, int32 offset)
+print_key(char* chars, int32 offset, bool last = false)
 {
 	int size = chars[offset++];
 
@@ -53,7 +53,8 @@ print_key(char* chars, int32 offset)
 		}
 	}
 
-	fputs("\t", stdout);
+	if (!last)
+		fputs("\t", stdout);
 }
 
 
@@ -91,7 +92,7 @@ Keymap::DumpKeymap()
 		print_key(fChars, fKeys.caps_map[i]);
 		print_key(fChars, fKeys.caps_shift_map[i]);
 		print_key(fChars, fKeys.option_caps_map[i]);
-		print_key(fChars, fKeys.option_caps_shift_map[i]);
+		print_key(fChars, fKeys.option_caps_shift_map[i], true);
 		fputs("\n", stdout);
 	}
 }

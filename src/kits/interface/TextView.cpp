@@ -194,6 +194,14 @@ static const float kHorizontalScrollBarStep = 10.0;
 static const float kVerticalScrollBarStep = 12.0;
 
 
+enum {
+	NAVIGATE_TO_PREVIOUS_WORD	= '_NVP',
+	NAVIGATE_TO_NEXT_WORD		= '_NVN',
+	NAVIGATE_TO_TOP				= '_NVT',
+	NAVIGATE_TO_BOTTOM			= '_NVB',
+};
+
+
 static property_info sPropertyList[] = {
 	{
 		"selection",
@@ -1030,6 +1038,20 @@ BTextView::MessageReceived(BMessage *message)
 		case _DISPOSE_DRAG_:
 			if (fEditable)
 				_TrackDrag(fWhere);
+			break;
+
+		case NAVIGATE_TO_PREVIOUS_WORD:
+			_HandleArrowKey(B_LEFT_ARROW, true);
+			break;
+		case NAVIGATE_TO_NEXT_WORD:
+			_HandleArrowKey(B_RIGHT_ARROW, true);
+			break;
+
+		case NAVIGATE_TO_TOP:
+			_HandlePageKey(B_HOME, true);
+			break;
+		case NAVIGATE_TO_BOTTOM:
+			_HandlePageKey(B_END, true);
 			break;
 
 		default:
@@ -3216,6 +3238,9 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	fLines = new LineBuffer;
 	fStyles = new StyleBuffer(&font, initialColor);
 
+	fInstalledNavigateWordwiseShortcuts = false;
+	fInstalledNavigateToTopOrBottomShortcuts = false;
+
 	// We put these here instead of in the constructor initializer list
 	// to have less code duplication, and a single place where to do changes
 	// if needed.
@@ -3298,7 +3323,7 @@ BTextView::_HandleBackspace()
 	\param inArrowKey The code for the pressed key.
 */
 void
-BTextView::_HandleArrowKey(uint32 inArrowKey)
+BTextView::_HandleArrowKey(uint32 inArrowKey, bool commandKeyDown)
 {
 	// return if there's nowhere to go
 	if (fText->Length() == 0)
@@ -3313,7 +3338,6 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 		message->FindInt32("modifiers", &modifiers);
 
 	bool shiftDown = modifiers & B_SHIFT_KEY;
-	bool ctrlDown = modifiers & B_CONTROL_KEY;
 
 	int32 lastClickOffset = fCaretOffset;
 	switch (inArrowKey) {
@@ -3324,7 +3348,7 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 				fCaretOffset = fSelStart;
 			else {
 				fCaretOffset
-					= ctrlDown
+					= commandKeyDown
 						? _PreviousWordStart(fCaretOffset - 1)
 						: _PreviousInitialByte(fCaretOffset);
 				if (shiftDown && fCaretOffset != lastClickOffset) {
@@ -3350,7 +3374,7 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 				fCaretOffset = fSelEnd;
 			else {
 				fCaretOffset
-					= ctrlDown
+					= commandKeyDown
 						? _NextWordEnd(fCaretOffset)
 						: _NextInitialByte(fCaretOffset);
 				if (shiftDown && fCaretOffset != lastClickOffset) {
@@ -3475,7 +3499,7 @@ BTextView::_HandleDelete()
 	\param inPageKey The page key which has been pressed.
 */
 void
-BTextView::_HandlePageKey(uint32 inPageKey)
+BTextView::_HandlePageKey(uint32 inPageKey, bool commandKeyDown)
 {
 	int32 mods = 0;
 	BMessage *currentMessage = Window()->CurrentMessage();
@@ -3483,7 +3507,6 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 		currentMessage->FindInt32("modifiers", &mods);
 
 	bool shiftDown = mods & B_SHIFT_KEY;
-	bool ctrlDown = mods & B_CONTROL_KEY;
 	STELine* line = NULL;
 	int32 selStart = fSelStart;
 	int32 selEnd = fSelEnd;
@@ -3496,7 +3519,7 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 				break;
 			}
 
-			if (ctrlDown) {
+			if (commandKeyDown) {
 				_ScrollTo(0, 0);
 				fCaretOffset = 0;
 			} else {
@@ -3529,7 +3552,7 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 				break;
 			}
 
-			if (ctrlDown) {
+			if (commandKeyDown) {
 				_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
 				fCaretOffset = fText->Length();
 			} else {
@@ -5044,6 +5067,25 @@ BTextView::_Activate()
 	GetMouse(&where, &buttons, false);
 	if (Bounds().Contains(where))
 		_TrackMouse(where, NULL);
+
+	if (Window() != NULL) {
+		if (!Window()->HasShortcut(B_LEFT_ARROW, B_COMMAND_KEY)
+		&& !Window()->HasShortcut(B_RIGHT_ARROW, B_COMMAND_KEY)) {
+			Window()->AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY,
+				new BMessage(NAVIGATE_TO_PREVIOUS_WORD), this);
+			Window()->AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY,
+				new BMessage(NAVIGATE_TO_NEXT_WORD), this);
+			fInstalledNavigateWordwiseShortcuts = true;
+		}
+		if (!Window()->HasShortcut(B_HOME, B_COMMAND_KEY)
+		&& !Window()->HasShortcut(B_END, B_COMMAND_KEY)) {
+			Window()->AddShortcut(B_HOME, B_COMMAND_KEY,
+				new BMessage(NAVIGATE_TO_TOP), this);
+			Window()->AddShortcut(B_END, B_COMMAND_KEY,
+				new BMessage(NAVIGATE_TO_BOTTOM), this);
+			fInstalledNavigateToTopOrBottomShortcuts = true;
+		}
+	}
 }
 
 
@@ -5062,6 +5104,19 @@ BTextView::_Deactivate()
 			Highlight(fSelStart, fSelEnd);
 	} else
 		_HideCaret();
+
+	if (Window() != NULL) {
+		if (fInstalledNavigateWordwiseShortcuts) {
+			Window()->RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY);
+			Window()->RemoveShortcut(B_RIGHT_ARROW, B_COMMAND_KEY);
+			fInstalledNavigateWordwiseShortcuts = false;
+		}
+		if (fInstalledNavigateToTopOrBottomShortcuts) {
+			Window()->RemoveShortcut(B_HOME, B_COMMAND_KEY);
+			Window()->RemoveShortcut(B_END, B_COMMAND_KEY);
+			fInstalledNavigateToTopOrBottomShortcuts = false;
+		}
+	}
 }
 
 

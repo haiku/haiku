@@ -27,8 +27,8 @@ FUNCTION_END(arch_int_enable_interrupts)
  */
 FUNCTION(arch_int_disable_interrupts):
         mrs     r0, cpsr
-        orr     r0, r0, #(1<<7)
-        msr     cpsr_c, r0
+        orr     r1, r0, #(1<<7)
+        msr     cpsr_c, r1
         bx      lr
 FUNCTION_END(arch_int_disable_interrupts)
 
@@ -37,8 +37,8 @@ FUNCTION_END(arch_int_disable_interrupts)
  */
 FUNCTION(arch_int_restore_interrupts):
 	mrs     r1, cpsr
-	orr	r0,r0, #(1<<7)
-	bic     r1, r1,#(1<<7) 
+	and	r0, r0, #(1<<7)
+	bic     r1, r1, #(1<<7) 
         orr     r1, r1, r0
         msr     cpsr_c, r1
 	bx 	lr
@@ -49,10 +49,19 @@ FUNCTION_END(arch_int_restore_interrupts)
 FUNCTION(arch_int_are_interrupts_enabled):
         mrs     r0, cpsr
         and     r0, r0, #(1<<7)		/*read the I bit*/
-	cmp 	r0,#0
-	moveq	r0,#1
-	movne	r0,#0
+	cmp 	r0, #0
+	moveq	r0, #1
+	movne	r0, #0
 	bx 	lr
 FUNCTION_END(arch_int_are_interrupts_enabled)
 
 
+/* void arm_context_switch(struct arch_thread* oldState,
+	struct arch_thread* newState); */
+FUNCTION(arm_context_switch):
+	stmfd   sp!, { r0-r12, lr }
+	str	sp, [r0]
+	ldr	sp, [r1]
+	ldmfd   sp!, { r0-r12, lr }
+	bx	lr
+FUNCTION_END(arm_context_switch)

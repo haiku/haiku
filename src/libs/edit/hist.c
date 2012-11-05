@@ -42,7 +42,7 @@
 /* hist_init():
  *	Initialization function.
  */
-protected int
+int
 hist_init(EditLine *el)
 {
 
@@ -60,7 +60,7 @@ hist_init(EditLine *el)
 /* hist_end():
  *	clean up history;
  */
-protected void
+void
 hist_end(EditLine *el)
 {
 
@@ -72,7 +72,7 @@ hist_end(EditLine *el)
 /* hist_set():
  *	Set new history interface
  */
-protected int
+int
 hist_set(EditLine *el, hist_fun_t fun, ptr_t ptr)
 {
 
@@ -86,7 +86,7 @@ hist_set(EditLine *el, hist_fun_t fun, ptr_t ptr)
  *	Get a history line and update it in the buffer.
  *	eventno tells us the event to get.
  */
-protected el_action_t
+el_action_t
 hist_get(EditLine *el)
 {
 	const char *hp;
@@ -144,7 +144,7 @@ hist_get(EditLine *el)
 /* hist_command()
  *	process a history command
  */
-protected int
+int
 hist_command(EditLine *el, int argc, const char **argv)
 {
 	const char *str;
@@ -181,7 +181,7 @@ hist_command(EditLine *el, int argc, const char **argv)
  *	Enlarge history buffer to specified value. Called from el_enlargebufs().
  *	Return 0 for failure, 1 for success.
  */
-protected int
+int
 /*ARGSUSED*/
 hist_enlargebuf(EditLine *el, size_t oldsz, size_t newsz)
 {

@@ -594,6 +594,8 @@ ARMVMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
 		| ((entry & ARM_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 #else
 	*_flags = B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA;
+	if (*_physical != 0)
+		*_flags |= PAGE_PRESENT;
 #endif
 	pinner.Unlock();
 

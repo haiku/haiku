@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2009-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_LAYOUT_BUILDER_H
@@ -108,6 +108,11 @@ public:
 	inline	ThisBuilder&		SetInsets(float horizontal, float vertical);
 	inline	ThisBuilder&		SetInsets(float insets);
 
+	inline	ThisBuilder&		SetExplicitMinSize(BSize size);
+	inline	ThisBuilder&		SetExplicitMaxSize(BSize size);
+	inline	ThisBuilder&		SetExplicitPreferredSize(BSize size);
+	inline	ThisBuilder&		SetExplicitAlignment(BAlignment alignment);
+
 	inline						operator BGroupLayout*();
 
 private:
@@ -188,6 +193,9 @@ public:
 									int32 row, int32 columnCount = 1,
 									int32 rowCount = 1);
 
+	inline	ThisBuilder&		AddGlue(int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+
 	inline	ThisBuilder&		SetColumnWeight(int32 column, float weight);
 	inline	ThisBuilder&		SetRowWeight(int32 row, float weight);
 
@@ -195,6 +203,11 @@ public:
 									float bottom);
 	inline	ThisBuilder&		SetInsets(float horizontal, float vertical);
 	inline	ThisBuilder&		SetInsets(float insets);
+
+	inline	ThisBuilder&		SetExplicitMinSize(BSize size);
+	inline	ThisBuilder&		SetExplicitMaxSize(BSize size);
+	inline	ThisBuilder&		SetExplicitPreferredSize(BSize size);
+	inline	ThisBuilder&		SetExplicitAlignment(BAlignment alignment);
 
 	inline						operator BGridLayout*();
 
@@ -605,6 +618,42 @@ Group<ParentBuilder>::SetInsets(float insets)
 
 
 template<typename ParentBuilder>
+typename Group<ParentBuilder>::ThisBuilder&
+Group<ParentBuilder>::SetExplicitMinSize(BSize size)
+{
+	fLayout->SetExplicitMinSize(size);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Group<ParentBuilder>::ThisBuilder&
+Group<ParentBuilder>::SetExplicitMaxSize(BSize size)
+{
+	fLayout->SetExplicitMaxSize(size);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Group<ParentBuilder>::ThisBuilder&
+Group<ParentBuilder>::SetExplicitPreferredSize(BSize size)
+{
+	fLayout->SetExplicitPreferredSize(size);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Group<ParentBuilder>::ThisBuilder&
+Group<ParentBuilder>::SetExplicitAlignment(BAlignment alignment)
+{
+	fLayout->SetExplicitAlignment(alignment);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
 Group<ParentBuilder>::operator BGroupLayout*()
 {
 	return fLayout;
@@ -835,6 +884,17 @@ Grid<ParentBuilder>::AddSplit(BSplitView* splitView, int32 column, int32 row,
 
 template<typename ParentBuilder>
 typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::AddGlue(int32 column, int32 row, int32 columnCount,
+	int32 rowCount)
+{
+	fLayout->AddItem(BSpaceLayoutItem::CreateGlue(), column, row, columnCount,
+		rowCount);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
 Grid<ParentBuilder>::SetColumnWeight(int32 column, float weight)
 {
 	fLayout->SetColumnWeight(column, weight);
@@ -875,6 +935,42 @@ typename Grid<ParentBuilder>::ThisBuilder&
 Grid<ParentBuilder>::SetInsets(float insets)
 {
 	fLayout->SetInsets(insets);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetExplicitMinSize(BSize size)
+{
+	fLayout->SetExplicitMinSize(size);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetExplicitMaxSize(BSize size)
+{
+	fLayout->SetExplicitMaxSize(size);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetExplicitPreferredSize(BSize size)
+{
+	fLayout->SetExplicitPreferredSize(size);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetExplicitAlignment(BAlignment alignment)
+{
+	fLayout->SetExplicitAlignment(alignment);
 	return *this;
 }
 

@@ -1,8 +1,9 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010-2012, Haiku, Inc.
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #include <LayoutItem.h>
 
@@ -43,6 +44,15 @@ BLayout*
 BLayoutItem::Layout() const
 {
 	return fLayout;
+}
+
+
+void
+BLayoutItem::SetExplicitSize(BSize size)
+{
+	SetExplicitMinSize(size);
+	SetExplicitMaxSize(size);
+	SetExplicitPreferredSize(size);
 }
 
 
@@ -122,7 +132,7 @@ BLayoutItem::AlignInFrame(BRect frame)
 
 		float minHeight;
 		GetHeightForWidth(frame.Width(), &minHeight, NULL, NULL);
-		
+
 		frame.bottom = frame.top + max_c(frame.Height(), minHeight);
 		maxSize.height = minHeight;
 	}
@@ -178,7 +188,7 @@ BLayoutItem::SetLayout(BLayout* layout)
 			BView::Private(view).RegisterLayoutItem(this);
 		}
 	}
-	
+
 	if (fLayout)
 		AttachedToLayout();
 }

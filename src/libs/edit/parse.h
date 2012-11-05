@@ -40,9 +40,9 @@
 #ifndef _h_el_parse
 #define	_h_el_parse
 
-protected int	 parse_line(EditLine *, const char *);
-protected int	 parse__escape(const char **);
-protected char	*parse__string(char *, const char *);
-protected int	 parse_cmd(EditLine *, const char *);
+int	 parse_line(EditLine *, const char *);
+int	 parse__escape(const char **);
+char	*parse__string(char *, const char *);
+int	 parse_cmd(EditLine *, const char *);
 
 #endif /* _h_el_parse */

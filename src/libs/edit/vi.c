@@ -113,7 +113,7 @@ cv_paste(EditLine *el, int c)
  *	Vi paste previous deletion to the right of the cursor
  *	[p]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_paste_next(EditLine *el, int c __unused)
 {
@@ -126,7 +126,7 @@ vi_paste_next(EditLine *el, int c __unused)
  *	Vi paste previous deletion to the left of the cursor
  *	[P]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_paste_prev(EditLine *el, int c __unused)
 {
@@ -139,7 +139,7 @@ vi_paste_prev(EditLine *el, int c __unused)
  *	Vi move to the previous space delimited word
  *	[B]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_prev_big_word(EditLine *el, int c)
 {
@@ -164,7 +164,7 @@ vi_prev_big_word(EditLine *el, int c)
  *	Vi move to the previous word
  *	[b]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_prev_word(EditLine *el, int c __unused)
 {
@@ -189,7 +189,7 @@ vi_prev_word(EditLine *el, int c __unused)
  *	Vi move to the next space delimited word
  *	[W]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_next_big_word(EditLine *el, int c)
 {
@@ -213,7 +213,7 @@ vi_next_big_word(EditLine *el, int c)
  *	Vi move to the next word
  *	[w]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_next_word(EditLine *el, int c __unused)
 {
@@ -237,7 +237,7 @@ vi_next_word(EditLine *el, int c __unused)
  *	Vi change case of character under the cursor and advance one character
  *	[~]
  */
-protected el_action_t
+el_action_t
 vi_change_case(EditLine *el, int c)
 {
 	int i;
@@ -268,7 +268,7 @@ vi_change_case(EditLine *el, int c)
  *	Vi change prefix command
  *	[c]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_change_meta(EditLine *el, int c __unused)
 {
@@ -285,7 +285,7 @@ vi_change_meta(EditLine *el, int c __unused)
  *	Vi enter insert mode at the beginning of line
  *	[I]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_insert_at_bol(EditLine *el, int c __unused)
 {
@@ -301,7 +301,7 @@ vi_insert_at_bol(EditLine *el, int c __unused)
  *	Vi replace character under the cursor with the next character typed
  *	[r]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_replace_char(EditLine *el, int c __unused)
 {
@@ -320,7 +320,7 @@ vi_replace_char(EditLine *el, int c __unused)
  *	Vi enter replace mode
  *	[R]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_replace_mode(EditLine *el, int c __unused)
 {
@@ -336,7 +336,7 @@ vi_replace_mode(EditLine *el, int c __unused)
  *	Vi replace character under the cursor and enter insert mode
  *	[s]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_substitute_char(EditLine *el, int c __unused)
 {
@@ -351,7 +351,7 @@ vi_substitute_char(EditLine *el, int c __unused)
  *	Vi substitute entire line
  *	[S]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_substitute_line(EditLine *el, int c __unused)
 {
@@ -369,7 +369,7 @@ vi_substitute_line(EditLine *el, int c __unused)
  *	Vi change to end of line
  *	[C]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_change_to_eol(EditLine *el, int c __unused)
 {
@@ -387,7 +387,7 @@ vi_change_to_eol(EditLine *el, int c __unused)
  *	Vi enter insert mode
  *	[i]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_insert(EditLine *el, int c __unused)
 {
@@ -402,7 +402,7 @@ vi_insert(EditLine *el, int c __unused)
  *	Vi enter insert mode after the cursor
  *	[a]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_add(EditLine *el, int c __unused)
 {
@@ -427,7 +427,7 @@ vi_add(EditLine *el, int c __unused)
  *	Vi enter insert mode at end of line
  *	[A]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_add_at_eol(EditLine *el, int c __unused)
 {
@@ -443,7 +443,7 @@ vi_add_at_eol(EditLine *el, int c __unused)
  *	Vi delete prefix command
  *	[d]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_delete_meta(EditLine *el, int c __unused)
 {
@@ -456,7 +456,7 @@ vi_delete_meta(EditLine *el, int c __unused)
  *	Vi move to the end of the current space delimited word
  *	[E]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_end_big_word(EditLine *el, int c)
 {
@@ -480,7 +480,7 @@ vi_end_big_word(EditLine *el, int c)
  *	Vi move to the end of the current word
  *	[e]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_end_word(EditLine *el, int c __unused)
 {
@@ -504,7 +504,7 @@ vi_end_word(EditLine *el, int c __unused)
  *	Vi undo last change
  *	[u]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_undo(EditLine *el, int c __unused)
 {
@@ -530,7 +530,7 @@ vi_undo(EditLine *el, int c __unused)
  *	Vi enter command mode (use alternative key bindings)
  *	[<ESC>]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_command_mode(EditLine *el, int c __unused)
 {
@@ -555,7 +555,7 @@ vi_command_mode(EditLine *el, int c __unused)
  *	Vi move to the beginning of line
  *	[0]
  */
-protected el_action_t
+el_action_t
 vi_zero(EditLine *el, int c)
 {
 
@@ -575,7 +575,7 @@ vi_zero(EditLine *el, int c)
  * 	Vi move to previous character (backspace)
  *	[^H] in insert mode only
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_delete_prev_char(EditLine *el, int c __unused)
 {
@@ -593,7 +593,7 @@ vi_delete_prev_char(EditLine *el, int c __unused)
  *	Vi list choices for completion or indicate end of file if empty line
  *	[^D]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_list_or_eof(EditLine *el, int c __unused)
 {
@@ -631,7 +631,7 @@ vi_list_or_eof(EditLine *el, int c __unused)
  *	Vi cut from beginning of line to cursor
  *	[^U]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_kill_line_prev(EditLine *el, int c __unused)
 {
@@ -652,7 +652,7 @@ vi_kill_line_prev(EditLine *el, int c __unused)
  *	Vi search history previous
  *	[?]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_search_prev(EditLine *el, int c __unused)
 {
@@ -665,7 +665,7 @@ vi_search_prev(EditLine *el, int c __unused)
  *	Vi search history next
  *	[/]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_search_next(EditLine *el, int c __unused)
 {
@@ -678,7 +678,7 @@ vi_search_next(EditLine *el, int c __unused)
  *	Vi repeat current search in the same search direction
  *	[n]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_repeat_search_next(EditLine *el, int c __unused)
 {
@@ -695,7 +695,7 @@ vi_repeat_search_next(EditLine *el, int c __unused)
  *	[N]
  */
 /*ARGSUSED*/
-protected el_action_t
+el_action_t
 vi_repeat_search_prev(EditLine *el, int c __unused)
 {
 
@@ -712,7 +712,7 @@ vi_repeat_search_prev(EditLine *el, int c __unused)
  *	Vi move to the character specified next
  *	[f]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_next_char(EditLine *el, int c __unused)
 {
@@ -724,7 +724,7 @@ vi_next_char(EditLine *el, int c __unused)
  *	Vi move to the character specified previous
  *	[F]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_prev_char(EditLine *el, int c __unused)
 {
@@ -736,7 +736,7 @@ vi_prev_char(EditLine *el, int c __unused)
  *	Vi move up to the character specified next
  *	[t]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_to_next_char(EditLine *el, int c __unused)
 {
@@ -748,7 +748,7 @@ vi_to_next_char(EditLine *el, int c __unused)
  *	Vi move up to the character specified previous
  *	[T]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_to_prev_char(EditLine *el, int c __unused)
 {
@@ -760,7 +760,7 @@ vi_to_prev_char(EditLine *el, int c __unused)
  *	Vi repeat current character search in the same search direction
  *	[;]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_repeat_next_char(EditLine *el, int c __unused)
 {
@@ -774,7 +774,7 @@ vi_repeat_next_char(EditLine *el, int c __unused)
  *	Vi repeat current character search in the opposite search direction
  *	[,]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_repeat_prev_char(EditLine *el, int c __unused)
 {
@@ -792,7 +792,7 @@ vi_repeat_prev_char(EditLine *el, int c __unused)
  *	Vi go to matching () {} or []
  *	[%]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_match(EditLine *el, int c)
 {
@@ -839,7 +839,7 @@ vi_match(EditLine *el, int c)
  *	Vi undo all changes to line
  *	[U]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_undo_line(EditLine *el, int c)
 {
@@ -853,7 +853,7 @@ vi_undo_line(EditLine *el, int c)
  *	[|]
  * NB netbsd vi goes to screen column 'n', posix says nth character
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_to_column(EditLine *el, int c)
 {
@@ -867,7 +867,7 @@ vi_to_column(EditLine *el, int c)
  *	Vi yank to end of line
  *	[Y]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_yank_end(EditLine *el, int c)
 {
@@ -881,7 +881,7 @@ vi_yank_end(EditLine *el, int c)
  *	Vi yank
  *	[y]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_yank(EditLine *el, int c)
 {
@@ -893,7 +893,7 @@ vi_yank(EditLine *el, int c)
  *	Vi comment out current command
  *	[#]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_comment_out(EditLine *el, int c)
 {
@@ -911,7 +911,7 @@ vi_comment_out(EditLine *el, int c)
  * NB: posix implies that we should enter insert mode, however
  * this is against historical precedent...
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_alias(EditLine *el, int c)
 {
@@ -943,7 +943,7 @@ vi_alias(EditLine *el, int c)
  *	Vi go to specified history file line.
  *	[G]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_to_history_line(EditLine *el, int c)
 {
@@ -988,7 +988,7 @@ vi_to_history_line(EditLine *el, int c)
  *	Vi edit history line with vi
  *	[v]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_histedit(EditLine *el, int c)
 {
@@ -1044,7 +1044,7 @@ vi_histedit(EditLine *el, int c)
  * Who knows where this one came from!
  * '_' in vi means 'entire current line', so 'cc' is a synonym for 'c_'
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_history_word(EditLine *el, int c)
 {
@@ -1093,7 +1093,7 @@ vi_history_word(EditLine *el, int c)
  *	Vi redo last non-motion command
  *	[.]
  */
-protected el_action_t
+el_action_t
 /*ARGSUSED*/
 vi_redo(EditLine *el, int c)
 {

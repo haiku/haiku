@@ -522,7 +522,7 @@ tty_setup(EditLine *el)
 	return (0);
 }
 
-protected int
+int
 tty_init(EditLine *el)
 {
 
@@ -537,7 +537,7 @@ tty_init(EditLine *el)
 /* tty_end():
  *	Restore the tty to its original settings
  */
-protected void
+void
 /*ARGSUSED*/
 tty_end(EditLine *el __unused)
 {
@@ -834,7 +834,7 @@ tty__setchar(struct termios *td, unsigned char *s)
 /* tty_bind_char():
  *	Rebind the editline functions
  */
-protected void
+void
 tty_bind_char(EditLine *el, int force)
 {
 
@@ -880,7 +880,7 @@ tty_bind_char(EditLine *el, int force)
 /* tty_rawmode():
  * 	Set terminal into 1 character at a time mode.
  */
-protected int
+int
 tty_rawmode(EditLine *el)
 {
 
@@ -1008,7 +1008,7 @@ tty_rawmode(EditLine *el)
 /* tty_cookedmode():
  *	Set the tty back to normal mode
  */
-protected int
+int
 tty_cookedmode(EditLine *el)
 {				/* set tty in normal setup */
 
@@ -1034,7 +1034,7 @@ tty_cookedmode(EditLine *el)
 /* tty_quotemode():
  *	Turn on quote mode
  */
-protected int
+int
 tty_quotemode(EditLine *el)
 {
 	if (el->el_tty.t_mode == QU_IO)
@@ -1069,7 +1069,7 @@ tty_quotemode(EditLine *el)
 /* tty_noquotemode():
  *	Turn off quote mode
  */
-protected int
+int
 tty_noquotemode(EditLine *el)
 {
 
@@ -1090,7 +1090,7 @@ tty_noquotemode(EditLine *el)
 /* tty_stty():
  *	Stty builtin
  */
-protected int
+int
 /*ARGSUSED*/
 tty_stty(EditLine *el, int argc __unused, const char **argv)
 {
