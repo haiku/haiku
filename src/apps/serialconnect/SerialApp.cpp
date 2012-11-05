@@ -71,7 +71,7 @@ void SerialApp::MessageReceived(BMessage* message)
 					&length);
 				if(fLogFile->Write(bytes, length) != length)
 				{
-					puts("### WRITE ERROR");
+					// TODO error handling
 				}
 			}
 
@@ -83,6 +83,11 @@ void SerialApp::MessageReceived(BMessage* message)
 			ssize_t size;
 
 			message->FindData("data", B_RAW_TYPE, (const void**)&bytes, &size);
+
+			if (bytes[0] == '\n') {
+				size = 2;
+				bytes = "\r\n";
+			}
 			fSerialPort.Write(bytes, size);
 			break;
 		}
