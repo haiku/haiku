@@ -26,7 +26,7 @@ static const uint32 kModifierKeys = B_SHIFT_KEY | B_CAPS_LOCK | B_CONTROL_KEY
 
 
 static void
-print_key(char *chars, int32 offset)
+print_key(char *chars, int32 offset, bool last = false)
 {
 	int size = chars[offset++];
 
@@ -53,7 +53,8 @@ print_key(char *chars, int32 offset)
 		}
 	}
 
-	fputs("\t", stdout);
+	if (!last)
+		fputs("\t", stdout);
 }
 
 
@@ -110,7 +111,7 @@ Keymap::DumpKeymap()
 		print_key(fChars, fKeys.caps_map[i]);
 		print_key(fChars, fKeys.caps_shift_map[i]);
 		print_key(fChars, fKeys.option_caps_map[i]);
-		print_key(fChars, fKeys.option_caps_shift_map[i]);
+		print_key(fChars, fKeys.option_caps_shift_map[i], true);
 		fputs("\n", stdout);
 	}
 }
