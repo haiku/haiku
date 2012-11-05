@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copryight 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_TYPES_H
@@ -106,6 +107,10 @@ public:
 	virtual	const BString&		ID() const;
 	virtual	const BString&		Name() const;
 	virtual	target_size_t		ByteSize() const;
+
+	virtual status_t			CreateDerivedAddressType(
+									address_type_kind kind,
+									AddressType*& _resultType);
 
 	virtual	status_t			ResolveObjectDataLocation(
 									const ValueLocation& objectLocation,

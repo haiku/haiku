@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copryight 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -222,6 +223,21 @@ target_size_t
 DwarfType::ByteSize() const
 {
 	return fByteSize;
+}
+
+
+status_t
+DwarfType::CreateDerivedAddressType(address_type_kind addressType,
+	AddressType*& _resultType)
+{
+	DwarfAddressType* resultType = new(std::nothrow)
+		DwarfAddressType(fTypeContext, fName, NULL, addressType, this);
+
+	if (resultType == NULL)
+		return B_NO_MEMORY;
+
+	_resultType = resultType;
+	return B_OK;
 }
 
 
