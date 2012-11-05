@@ -18,9 +18,10 @@ class TermView: public BView
 
 		void AttachedToWindow();
 		void Draw(BRect updateRect);
+		void FrameResized(float width, float height);
 		void GetPreferredSize(float* width, float* height);
 		void KeyDown(const char* bytes, int32 numBytes);
-		void FrameResized(float width, float height);
+		void MessageReceived(BMessage* message);
 		void PushBytes(const char* bytes, const size_t length);
 		
 	private:
