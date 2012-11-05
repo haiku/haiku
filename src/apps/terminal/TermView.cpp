@@ -887,6 +887,14 @@ TermView::SetTextColor(rgb_color fore, rgb_color back)
 
 
 void
+TermView::SetCursorColor(rgb_color fore, rgb_color back)
+{
+	fCursorForeColor = fore;
+	fCursorBackColor = back;
+}
+
+
+void
 TermView::SetSelectColor(rgb_color fore, rgb_color back)
 {
 	fSelectForeColor = fore;
@@ -1143,13 +1151,8 @@ TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 
 	// Selection check.
 	if (cursor) {
-		rgb_fore.red = 255 - rgb_fore.red;
-		rgb_fore.green = 255 - rgb_fore.green;
-		rgb_fore.blue = 255 - rgb_fore.blue;
-
-		rgb_back.red = 255 - rgb_back.red;
-		rgb_back.green = 255 - rgb_back.green;
-		rgb_back.blue = 255 - rgb_back.blue;
+		rgb_fore = fCursorForeColor;
+		rgb_back = fCursorBackColor;
 	} else if (mouse) {
 		rgb_fore = fSelectForeColor;
 		rgb_back = fSelectBackColor;
@@ -1225,15 +1228,8 @@ TermView::_DrawCursor()
 	} else {
 		if (selected)
 			SetHighColor(fSelectBackColor);
-		else {
-			rgb_color color = kTermColorTable[IS_BACKCOLOR(attr)];
-			if (cursorVisible) {
-				color.red = 255 - color.red;
-				color.green = 255 - color.green;
-				color.blue = 255 - color.blue;
-			}
-			SetHighColor(color);
-		}
+		else
+			SetHighColor(fCursorBackColor);
 
 		FillRect(rect);
 	}

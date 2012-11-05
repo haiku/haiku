@@ -77,6 +77,7 @@ public:
 									int *rows, int *columns);
 
 			void				SetTextColor(rgb_color fore, rgb_color back);
+			void				SetCursorColor(rgb_color fore, rgb_color back);
 			void				SetSelectColor(rgb_color fore, rgb_color back);
 
 			int					Encoding() const;
@@ -255,6 +256,8 @@ private:
 			InlineInput*		fInline;
 
 			// Color and Attribute.
+			rgb_color			fCursorForeColor;
+			rgb_color			fCursorBackColor;
 			rgb_color			fSelectForeColor;
 			rgb_color			fSelectBackColor;
 
