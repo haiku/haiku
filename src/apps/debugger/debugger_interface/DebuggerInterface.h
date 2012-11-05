@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUGGER_INTERFACE_H
@@ -47,6 +47,10 @@ public:
 
 	virtual	status_t			InstallBreakpoint(target_addr_t address);
 	virtual	status_t			UninstallBreakpoint(target_addr_t address);
+
+	virtual status_t			InstallWatchpoint(target_addr_t address,
+									uint32 type, int32 length);
+	virtual status_t			UninstallWatchpoint(target_addr_t address);
 
 	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos);
 	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos);
