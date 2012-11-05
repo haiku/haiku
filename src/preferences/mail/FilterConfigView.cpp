@@ -12,12 +12,12 @@
 #include <Bitmap.h>
 #include <Box.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
 
-#include "CenterContainer.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Config Views"
@@ -35,12 +35,11 @@ const uint32 kMsgItemDragged = 'itdr';
 
 class DragListView : public BListView {
 public:
-	DragListView(BRect frame, const char *name,
+	DragListView(const char* name,
 			list_view_type type = B_SINGLE_SELECTION_LIST,
-			 uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			 BMessage *itemMovedMsg = NULL)
+			 BMessage* itemMovedMsg = NULL)
 		:
-		BListView(frame, name, type, resizingMode),
+		BListView(name, type),
 		fDragging(false),
 		fItemMovedMessage(itemMovedMsg)
 	{
@@ -207,9 +206,9 @@ private:
 //	#pragma mark -
 
 
-FiltersConfigView::FiltersConfigView(BRect rect, BMailAccountSettings& account)
+FiltersConfigView::FiltersConfigView(BMailAccountSettings& account)
 	:
-	BBox(rect),
+	BBox("filters"),
 	fAccount(account),
 	fDirection(kIncoming),
 	fInboundFilters(kIncoming, false),
@@ -217,64 +216,44 @@ FiltersConfigView::FiltersConfigView(BRect rect, BMailAccountSettings& account)
 	fFilterView(NULL),
 	fCurrentIndex(-1)
 {
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING);
+	BView* contents = new BView(NULL, 0);
+	AddChild(contents);
 
-	BMessage* msg;
-	BMenuItem *item;
-	msg = new BMessage(kMsgChainSelected);
-	item = new BMenuItem(B_TRANSLATE("Incoming mail filters"), msg);
-	menu->AddItem(item);
+	BMessage* msg = new BMessage(kMsgChainSelected);
 	msg->AddInt32("direction", kIncoming);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("Incoming mail filters"), msg);
 	item->SetMarked(true);
+	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING);
+	menu->AddItem(item);
 
 	msg = new BMessage(kMsgChainSelected);
+	msg->AddInt32("direction", kOutgoing);
 	item = new BMenuItem(B_TRANSLATE("Outgoing mail filters"), msg);
 	menu->AddItem(item);
-	msg->AddInt32("direction", kOutgoing);
 
-	fChainsField = new BMenuField(BRect(0, 0, 200, 40), NULL, NULL, menu);
+	fChainsField = new BMenuField(NULL, NULL, menu);
 	fChainsField->ResizeToPreferred();
 	SetLabel(fChainsField);
 
-	// determine font height
-	font_height fontHeight;
-	fChainsField->GetFontHeight(&fontHeight);
-	int32 height = (int32)(fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading) + 5;
-
-	rect = Bounds().InsetByCopy(10, 10);
-	rect.top += 18;
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom = rect.top + 4 * height + 2;
-	fListView = new DragListView(rect, NULL, B_SINGLE_SELECTION_LIST,
-		B_FOLLOW_ALL, new BMessage(kMsgFilterMoved));
-	AddChild(new BScrollView(NULL, fListView, B_FOLLOW_ALL, 0, false, true));
-	rect.right += B_V_SCROLL_BAR_WIDTH;
-
-//	fListView->Select(gSettings.formats.IndexOf(format));
+	fListView = new DragListView(NULL, B_SINGLE_SELECTION_LIST,
+		new BMessage(kMsgFilterMoved));
 	fListView->SetSelectionMessage(new BMessage(kMsgFilterSelected));
-
-	rect.top = rect.bottom + 8;
-	rect.bottom = rect.top + height;
-	BRect sizeRect = rect;
-	sizeRect.right = sizeRect.left + 30
-		+ fChainsField->StringWidth(B_TRANSLATE("Add filter"));
 
 	menu = new BPopUpMenu(B_TRANSLATE("Add filter"));
 	menu->SetRadioMode(false);
 
-	fAddField = new BMenuField(rect, NULL, NULL, menu);
-	fAddField->ResizeToPreferred();
-	AddChild(fAddField);
+	fAddField = new BMenuField(NULL, NULL, menu);
 
-	sizeRect.left = sizeRect.right + 5;
-	sizeRect.right = sizeRect.left + 30
-		+ fChainsField->StringWidth(B_TRANSLATE("Remove"));
-	sizeRect.top--;
-	AddChild(fRemoveButton = new BButton(sizeRect, NULL, B_TRANSLATE("Remove"),
-		new BMessage(kMsgRemoveFilter), B_FOLLOW_BOTTOM));
+	fRemoveButton = new BButton(NULL, B_TRANSLATE("Remove"),
+		new BMessage(kMsgRemoveFilter));
 
-	ResizeTo(Bounds().Width(), sizeRect.bottom + 10);
+	BLayoutBuilder::Group<>(contents, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(new BScrollView(NULL, fListView, 0, false, true))
+		.AddGroup(B_HORIZONTAL)
+			.Add(fAddField)
+			.Add(fRemoveButton)
+			.AddGlue();
 
 	_SetDirection(fDirection);
 }
@@ -282,7 +261,6 @@ FiltersConfigView::FiltersConfigView(BRect rect, BMailAccountSettings& account)
 
 FiltersConfigView::~FiltersConfigView()
 {
-
 }
 
 
@@ -317,10 +295,6 @@ FiltersConfigView::_SelectFilter(int32 index)
 	}
 
 	fCurrentIndex = index;
-
-	// re-layout the view containing the config view
-	if (CenterContainer* container = dynamic_cast<CenterContainer*>(Parent()))
-		container->Layout();
 
 	if (Parent())
 		Parent()->Show();
@@ -414,7 +388,7 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 		case kMsgAddFilter:
 		{
 			entry_ref ref;
-			if (msg->FindRef("filter", &ref) < B_OK)
+			if (msg->FindRef("filter", &ref) != B_OK)
 				break;
 
 			::FilterList* filters = _FilterList();
@@ -443,7 +417,7 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 		case kMsgFilterSelected:
 		{
 			int32 index = -1;
-			if (msg->FindInt32("index",&index) < B_OK)
+			if (msg->FindInt32("index",&index) != B_OK)
 				break;
 
 			_SelectFilter(index);
@@ -478,18 +452,15 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 BMailProtocolSettings*
 FiltersConfigView::_MailSettings()
 {
-	if (fDirection == kIncoming)
-		return &fAccount.InboundSettings();
-	return &fAccount.OutboundSettings();
+	return fDirection == kIncoming
+		? &fAccount.InboundSettings() : &fAccount.OutboundSettings();
 }
 
 
 FilterList*
 FiltersConfigView::_FilterList()
 {
-	if (fDirection == kIncoming)
-		return &fInboundFilters;
-	return &fOutboundFilters;
+	return fDirection == kIncoming ? &fInboundFilters : &fOutboundFilters;
 }
 
 

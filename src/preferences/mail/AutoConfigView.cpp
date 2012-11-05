@@ -505,8 +505,8 @@ ServerSettingsView::_GetAuthEncrMenu(entry_ref protocol,
 	BMenuField** authField, BMenuField** sslField)
 {
 	BMailAccountSettings dummySettings;
-	BView *view = CreateConfigView(protocol, dummySettings.InboundSettings(),
-		dummySettings, fImageId);
+	BView *view = new BStringView("", "Not here!");//CreateConfigView(protocol, dummySettings.InboundSettings(),
+//		dummySettings, fImageId);
 
 	*authField = (BMenuField *)view->FindView("auth_method");
 	*sslField = (BMenuField *)view->FindView("flavor");

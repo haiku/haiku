@@ -13,7 +13,6 @@ local sources =
 	AutoConfig.cpp
 	AutoConfigView.cpp
 	AutoConfigWindow.cpp
-	CenterContainer.cpp
 	ConfigViews.cpp
 	ConfigWindow.cpp
 	FilterList.cpp

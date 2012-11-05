@@ -24,21 +24,14 @@ class BButton;
 struct entry_ref;
 
 
-class ProtocolsConfigView;
-
-
-BView* CreateConfigView(const entry_ref& ref, BMailProtocolSettings& settings,
-	BMailAccountSettings& accountSettings, image_id& image);
-
-
 class AccountConfigView : public BBox {
 public:
-								AccountConfigView(BRect rect,
-									BMailAccountSettings *account);
+								AccountConfigView(
+									BMailAccountSettings* account);
 
 	virtual void				DetachedFromWindow();
 	virtual void				AttachedToWindow();
-	virtual void				MessageReceived(BMessage *msg);
+	virtual void				MessageReceived(BMessage* message);
 
 			void				UpdateViews();
 
@@ -46,32 +39,28 @@ private:
 			BTextControl*		fNameControl;
 			BTextControl*		fRealNameControl;
 			BTextControl*		fReturnAddressControl;
-			BMailAccountSettings	*fAccount;
+			BMailAccountSettings* fAccount;
 };
 
 
-class InProtocolsConfigView : public BBox {
+class ProtocolConfigView : public BBox {
 public:
-								InProtocolsConfigView(
-									BMailAccountSettings* account);
+								ProtocolConfigView(
+									BMailAccountSettings& accountSettings,
+									const entry_ref& ref,
+									BMailProtocolSettings& settings);
 
 			void 				DetachedFromWindow();
-private:
-			BMailAccountSettings*	fAccount;
-			BView*				fConfigView;
-			image_id			fImageID;
-};
 
-
-class OutProtocolsConfigView : public BBox {
-public:
-								OutProtocolsConfigView(
-									BMailAccountSettings* account);
-			void 				DetachedFromWindow();
 private:
-			BMailAccountSettings*	fAccount;
+			status_t			_CreateConfigView(const entry_ref& ref,
+									BMailProtocolSettings& settings,
+									BMailAccountSettings& accountSettings);
+
+private:
+			BMailProtocolSettings& fSettings;
 			BView*				fConfigView;
-			image_id			fImageID;
+			image_id			fImage;
 };
 
 

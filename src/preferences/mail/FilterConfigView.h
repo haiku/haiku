@@ -25,7 +25,7 @@ class FilterConfigBox;
 
 class FiltersConfigView : public BBox {
 public:
-								FiltersConfigView(BRect rect,
+								FiltersConfigView(
 									BMailAccountSettings& account);
 								~FiltersConfigView();
 

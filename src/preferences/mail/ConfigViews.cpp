@@ -10,22 +10,22 @@
 
 
 #include "ConfigViews.h"
-#include "CenterContainer.h"
 
-#include <TextControl.h>
-#include <ListView.h>
-#include <PopUpMenu.h>
-#include <MenuField.h>
-#include <MenuItem.h>
-#include <Button.h>
-#include <Looper.h>
-#include <Path.h>
 #include <Alert.h>
+#include <Button.h>
+#include <Catalog.h>
+#include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
-#include <Directory.h>
-#include <Catalog.h>
+#include <ListView.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
+#include <Looper.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <Path.h>
+#include <PopUpMenu.h>
+#include <TextControl.h>
 
 #include <string.h>
 
@@ -45,72 +45,35 @@ const uint32 kMsgAccountNameChanged = 'anmc';
 const uint32 kMsgProtocolChanged = 'prch';
 
 
-BView*
-CreateConfigView(const entry_ref& addon, BMailProtocolSettings& settings,
-	BMailAccountSettings& accountSettings, image_id& image)
-{
-	BView* (*instantiateConfig)(BMailProtocolSettings& settings,
-		BMailAccountSettings& accountSettings);
-	BPath path(&addon);
-	image = load_add_on(path.Path());
-	if (image < 0)
-		return NULL;
-
-	if (get_image_symbol(image, "instantiate_config_panel", B_SYMBOL_TYPE_TEXT,
-			(void **)&instantiateConfig) != B_OK) {
-		unload_add_on(image);
-		image = -1;
-		return NULL;
-	}
-
-	return instantiateConfig(settings, accountSettings);
-}
-
-
 // #pragma mark -
 
 
-AccountConfigView::AccountConfigView(BRect rect, BMailAccountSettings* account)
+AccountConfigView::AccountConfigView(BMailAccountSettings* account)
 	:
-	BBox(rect),
+	BBox("account"),
 	fAccount(account)
 {
 	SetLabel(B_TRANSLATE("Account settings"));
 
-	rect = Bounds().InsetByCopy(8, 8);
-	rect.top += 10;
-	CenterContainer *view = new CenterContainer(rect, false);
-	view->SetSpacing(5);
+	fNameControl = new BTextControl(NULL, B_TRANSLATE("Account name:"), NULL,
+		new BMessage(kMsgAccountNameChanged));
+	fRealNameControl = new BTextControl(NULL, B_TRANSLATE("Real name:"), NULL,
+		NULL);
+	fReturnAddressControl = new BTextControl(NULL,
+		B_TRANSLATE("Return address:"), NULL, NULL);
 
-	// determine font height
-	font_height fontHeight;
-	view->GetFontHeight(&fontHeight);
-	int32 height = (int32)(fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading) + 5;
+	BView* contents = new BView(NULL, 0);
+	AddChild(contents);
 
-	rect = view->Bounds();
-	rect.bottom = height + 5;
-
-	float labelWidth = view->StringWidth(B_TRANSLATE("Account name:")) + 6;
-
-	view->AddChild(fNameControl = new BTextControl(rect, NULL,
-		B_TRANSLATE("Account name:"), NULL,
-		new BMessage(kMsgAccountNameChanged)));
-	fNameControl->SetDivider(labelWidth);
-	view->AddChild(fRealNameControl = new BTextControl(rect, NULL,
-		B_TRANSLATE("Real name:"), NULL, NULL));
-	fRealNameControl->SetDivider(labelWidth);
-	view->AddChild(fReturnAddressControl = new BTextControl(rect, NULL,
-		B_TRANSLATE("Return address:"), NULL, NULL));
-	fReturnAddressControl->SetDivider(labelWidth);
-//			control->TextView()->HideTyping(true);
-
-	float w, h;
-	view->GetPreferredSize(&w, &h);
-	ResizeTo(w + 15, h + 22);
-	view->ResizeTo(w, h);
-
-	AddChild(view);
+	BLayoutBuilder::Grid<>(contents, 0.f)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(fNameControl->CreateLabelLayoutItem(), 0, 0)
+		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 0)
+		.Add(fRealNameControl->CreateLabelLayoutItem(), 0, 1)
+		.Add(fRealNameControl->CreateTextViewLayoutItem(), 1, 1)
+		.Add(fReturnAddressControl->CreateLabelLayoutItem(), 0, 2)
+		.Add(fReturnAddressControl->CreateTextViewLayoutItem(), 1, 2)
+		.AddGlue(0, 3);
 }
 
 
@@ -154,46 +117,41 @@ AccountConfigView::UpdateViews()
 }
 
 
-//	#pragma mark -
+// #pragma mark -
 
 
-InProtocolsConfigView::InProtocolsConfigView(BMailAccountSettings* account)
+ProtocolConfigView::ProtocolConfigView(BMailAccountSettings& accountSettings,
+	const entry_ref& ref, BMailProtocolSettings& settings)
 	:
-	BBox(BRect(0, 0, 100, 100)),
-	fAccount(account),
+	BBox("protocol"),
+	fSettings(settings),
 	fConfigView(NULL)
 {
-	BString label = "Can't find protocol.";
-	entry_ref protocol = fAccount->InboundAddOnRef();
-	BMailProtocolSettings& inboundSettings = fAccount->InboundSettings();
-
-	fConfigView = CreateConfigView(protocol, inboundSettings, *account,
-		fImageID);
+	status_t status = _CreateConfigView(ref, settings, accountSettings);
+	BView* view = fConfigView;
 
 	if (fConfigView != NULL) {
-		float w = fConfigView->Bounds().Width();
-		float h = fConfigView->Bounds().Height();
-		fConfigView->MoveTo(3, 13);
-		ResizeTo(w + 6, h + 16);
-		AddChild(fConfigView);
+		SetLabel(ref.name);
+	} else {
+		BString text(B_TRANSLATE("An error occurred while creating the "
+			"config view: %error."));
+		text.ReplaceAll("%error", strerror(status));
+		view = new BStringView("error", text.String());
 
-		fConfigView->MoveTo(3, 21);
-		ResizeBy(0, 8);
-		if (CenterContainer *container
-			= dynamic_cast<CenterContainer *>(Parent())) {
-			container->Layout();
-		}
-		label = protocol.name;
-
-		fConfigView->MoveTo(3, 21);
-		ResizeBy(0, 8);
+		SetLabel(B_TRANSLATE("Error!"));
 	}
-	SetLabel(label);
+
+	BView* contents = new BView(NULL, 0);
+	AddChild(contents);
+
+	BLayoutBuilder::Group<>(contents, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(view);
 }
 
 
 void
-InProtocolsConfigView::DetachedFromWindow()
+ProtocolConfigView::DetachedFromWindow()
 {
 	if (fConfigView == NULL)
 		return;
@@ -201,65 +159,34 @@ InProtocolsConfigView::DetachedFromWindow()
 	if (fConfigView->Archive(&settings) != B_OK)
 		return;
 
-	fAccount->InboundSettings().MakeEmpty();
-	fAccount->InboundSettings().Append(settings);
+	fSettings.MakeEmpty();
+	fSettings.Append(settings);
 
 	RemoveChild(fConfigView);
 	delete fConfigView;
 	fConfigView = NULL;
-	unload_add_on(fImageID);
+	unload_add_on(fImage);
 }
 
 
-OutProtocolsConfigView::OutProtocolsConfigView(BMailAccountSettings* account)
-	:
-	BBox(BRect(0, 0, 100, 100)),
-	fAccount(account),
-	fConfigView(NULL)
+status_t
+ProtocolConfigView::_CreateConfigView(const entry_ref& ref,
+	BMailProtocolSettings& settings, BMailAccountSettings& accountSettings)
 {
-	BString label = "Can't find protocol.";
-	entry_ref protocol = fAccount->OutboundAddOnRef();
-	BMailProtocolSettings& outboundSettings = fAccount->OutboundSettings();
-	fConfigView = CreateConfigView(protocol, outboundSettings, *account,
-		fImageID);
+	BView* (*instantiateConfig)(BMailProtocolSettings& settings,
+		BMailAccountSettings& accountSettings);
+	BPath path(&ref);
+	image_id image = load_add_on(path.Path());
+	if (image < 0)
+		return image;
 
-	if (fConfigView != NULL) {
-		float w = fConfigView->Bounds().Width();
-		float h = fConfigView->Bounds().Height();
-		fConfigView->MoveTo(3, 13);
-		ResizeTo(w + 6, h + 16);
-		AddChild(fConfigView);
-
-		fConfigView->MoveTo(3, 21);
-		ResizeBy(0, 8);
-		if (CenterContainer *container
-			= dynamic_cast<CenterContainer *>(Parent())) {
-			container->Layout();
-		}
-		label = protocol.name;
-
-		fConfigView->MoveTo(3, 21);
-		ResizeBy(0, 8);
+	if (get_image_symbol(image, "instantiate_protocol_config_panel",
+			B_SYMBOL_TYPE_TEXT, (void**)&instantiateConfig) != B_OK) {
+		unload_add_on(image);
+		return B_BAD_VALUE;
 	}
 
-	SetLabel(label);
-}
-
-
-void
-OutProtocolsConfigView::DetachedFromWindow()
-{
-	if (fConfigView == NULL)
-		return;
-	BMessage settings;
-	if (fConfigView->Archive(&settings) != B_OK)
-		return;
-
-	fAccount->OutboundSettings().MakeEmpty();
-	fAccount->OutboundSettings().Append(settings);
-
-	RemoveChild(fConfigView);
-	delete fConfigView;
-	fConfigView = NULL;
-	unload_add_on(fImageID);
+	fImage = image;
+	fConfigView = instantiateConfig(settings, accountSettings);
+	return B_OK;
 }

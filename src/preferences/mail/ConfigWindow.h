@@ -1,10 +1,12 @@
+/*
+ * Copyright 2004-2012, Haiku Inc. All rights reserved.
+ * Copyright 2001, Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
+ *
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef CONFIG_WINDOW_H
 #define CONFIG_WINDOW_H
-/* ConfigWindow - main eMail config window
- *
- * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
-*/
 
 
 #include <Window.h>
@@ -24,8 +26,7 @@ class BMailSettings;
 class CenterContainer;
 
 
-enum item_types
-{
+enum item_types {
 	ACCOUNT_ITEM = 0,
 	INBOUND_ITEM,
 	OUTBOUND_ITEM,
@@ -66,7 +67,7 @@ public:
 			void				AccountUpdated(BMailAccountSettings* account);
 
 private:
-			void				_MakeHowToView();
+			BView*				_BuildHowToView();
 
 			void				_LoadSettings();
 			void				_LoadAccounts();
@@ -81,18 +82,17 @@ private:
 			void				_RemoveAccountFromListView(
 									BMailAccountSettings* account);
 			void				_AccountSelected(AccountItem* item);
+			void				_ReplaceConfigView(BView* view);
 
+private:
 			BListView*			fAccountsListView;
-			BMailAccountSettings*	fLastSelectedAccount;
-			CenterContainer*	fConfigView;
+			BMailAccountSettings* fLastSelectedAccount;
+			BView*				fConfigView;
 			BButton*			fRemoveButton;
 
+			BCheckBox*			fCheckMailCheckBox;
 			BTextControl*		fIntervalControl;
-			BMenuField*			fIntervalUnitField;
-			BCheckBox*			fPPPActiveCheckBox;
-			BCheckBox*			fPPPActiveSendCheckBox;
 			BMenuField*			fStatusModeField;
-			BCheckBox*			fAutoStartCheckBox;
 
 			bool				fSaveSettings;
 			BObjectList<BMailAccountSettings>	fAccounts;
