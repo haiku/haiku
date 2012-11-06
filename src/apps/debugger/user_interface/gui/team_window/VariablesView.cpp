@@ -23,12 +23,16 @@
 
 #include "ActionMenuItem.h"
 #include "Architecture.h"
+#include "FileSourceCode.h"
+#include "Function.h"
 #include "FunctionID.h"
 #include "FunctionInstance.h"
 #include "GuiSettingsUtils.h"
 #include "MessageCodes.h"
 #include "Register.h"
 #include "SettingsMenu.h"
+#include "SourceLanguage.h"
+#include "StackTrace.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
 #include "TableCellValueRenderer.h"
@@ -1645,16 +1649,27 @@ VariablesView::MessageReceived(BMessage* message)
 		case MSG_TYPECAST_NODE:
 		{
 			ModelNode* node = NULL;
-			if (message->FindPointer("node", reinterpret_cast<void **>(&node)) != B_OK)
+			if (message->FindPointer("node", reinterpret_cast<void **>(&node))
+				!= B_OK) {
 				break;
-			TeamDebugInfo* info = fThread->GetTeam()->DebugInfo();
-			if (info == NULL)
-				break;
+			}
 
 			Type* type = NULL;
-			if (info->LookupTypeByName(message->FindString("text"),
-				TypeLookupConstraints(), type) != B_OK) {
-				// TODO: notify user
+			BString typeExpression = message->FindString("text");
+			if (typeExpression.Length() == 0)
+				break;
+
+			FileSourceCode* code = fStackFrame->Function()->GetFunction()
+				->GetSourceCode();
+			if (code == NULL)
+				break;
+
+			SourceLanguage* language = code->GetSourceLanguage();
+			if (language == NULL)
+				break;
+
+			if (language->ParseTypeExpression(typeExpression,
+				fThread->GetTeam()->DebugInfo(), type) != B_OK) {
 				break;
 			}
 

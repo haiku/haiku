@@ -87,6 +87,15 @@ Type::ResolveRawType(bool nextOneOnly) const
 }
 
 
+status_t
+Type::CreateDerivedAddressType(address_type_kind kind,
+	AddressType*& _resultType)
+{
+	_resultType = NULL;
+	return B_ERROR;
+}
+
+
 // #pragma mark - PrimitiveType
 
 

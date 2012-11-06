@@ -75,6 +75,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	const char* kColorTable[] = {
 		B_TRANSLATE("Text"),
 		B_TRANSLATE("Background"),
+		B_TRANSLATE("Cursor text"),
+		B_TRANSLATE("Cursor background"),
 		B_TRANSLATE("Selected text"),
 		B_TRANSLATE("Selected background"),
 		NULL

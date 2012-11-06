@@ -61,6 +61,7 @@ Application Debugger :
 	TeamMemoryBlockManager.cpp
 	TeamDebugger.cpp
 	ThreadHandler.cpp
+	WatchpointManager.cpp
 	Worker.cpp
 
 	# arch
@@ -140,6 +141,7 @@ Application Debugger :
 	TypeComponentPath.cpp
 	TypeLookupConstraints.cpp
 	Variable.cpp
+	Watchpoint.cpp
 
 	# settings
 	BreakpointSetting.cpp
@@ -148,6 +150,7 @@ Application Debugger :
 	TeamSettings.cpp
 	TeamUiSettings.cpp
 	TeamUiSettingsFactory.cpp
+	WatchpointSetting.cpp
 
 	# settings/generic
 	Setting.cpp

@@ -31,7 +31,8 @@ AppGroupView::AppGroupView(NotificationWindow* win, const char* label)
 	BGroupView("appGroup", B_VERTICAL, 0),
 	fLabel(label),
 	fParent(win),
-	fCollapsed(false)
+	fCollapsed(false),
+	fCloseClicked(false)
 {
 	SetFlags(Flags() | B_WILL_DRAW);
 
@@ -78,14 +79,7 @@ AppGroupView::Draw(BRect updateRect)
 	SetPenSize(kPenSize);
 
 	// Draw the dismiss widget
-	BRect closeCross = fCloseRect;
-	closeCross.InsetBy(kSmallPadding, kSmallPadding);
-	rgb_color detailCol = ui_color(B_CONTROL_BORDER_COLOR);
-	detailCol = tint_color(detailCol, B_LIGHTEN_2_TINT);
-
-	StrokeRoundRect(fCloseRect, kSmallPadding, kSmallPadding);
-	StrokeLine(closeCross.LeftTop(), closeCross.RightBottom());
-	StrokeLine(closeCross.RightTop(), closeCross.LeftBottom());
+	_DrawCloseButton(updateRect);
 
 	// Draw the label
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
@@ -97,6 +91,39 @@ AppGroupView::Draw(BRect updateRect)
 
 	DrawString(label.String(), BPoint(fCollapseRect.right + 2 * kEdgePadding,
 				fCloseRect.bottom));
+}
+
+
+void
+AppGroupView::_DrawCloseButton(const BRect& updateRect)
+{
+	PushState();
+	BRect closeRect = Bounds();
+
+	closeRect.InsetBy(7, 7);
+	closeRect.left = closeRect.right - kCloseSize;
+	closeRect.bottom = closeRect.top + kCloseSize;
+
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	float tint = B_DARKEN_2_TINT;
+
+	if (fCloseClicked) {
+		BRect buttonRect(closeRect.InsetByCopy(-4, -4));
+		be_control_look->DrawButtonFrame(this, buttonRect, updateRect,
+			base, base,
+			BControlLook::B_ACTIVATED | BControlLook::B_BLEND_FRAME);
+		be_control_look->DrawButtonBackground(this, buttonRect, updateRect,
+			base, BControlLook::B_ACTIVATED);
+		tint *= 1.2;
+		closeRect.OffsetBy(1, 1);
+	}
+
+	base = tint_color(base, tint);
+	SetHighColor(base);
+	SetPenSize(2);
+	StrokeLine(closeRect.LeftTop(), closeRect.RightBottom());
+	StrokeLine(closeRect.LeftBottom(), closeRect.RightTop());
+	PopState();
 }
 
 

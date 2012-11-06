@@ -77,6 +77,9 @@ using namespace BPrivate ; // BCharacterSet stuff
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Terminal TermWindow"
 
+// actually an arrow
+#define UTF8_ENTER "\xe2\x86\xb5"
+
 
 // #pragma mark - TermViewContainerView
 
@@ -795,14 +798,17 @@ TermWindow::MessageReceived(BMessage *message)
 				float mbHeight = fMenuBar->Bounds().Height() + 1;
 				fSavedFrame = Frame();
 				BScreen screen(this);
-				for (int32 i = fTabView->CountTabs() - 1; i >=0 ; i--)
-					_TermViewAt(i)->ScrollBar()->ResizeBy(0, (B_H_SCROLL_BAR_HEIGHT - 1));
+
+				for (int32 i = fTabView->CountTabs() - 1; i >= 0 ; i--)
+					_TermViewAt(i)->ScrollBar()->ResizeBy(0,
+						(B_H_SCROLL_BAR_HEIGHT - 1));
 
 				fMenuBar->Hide();
 				fTabView->ResizeBy(0, mbHeight);
 				fTabView->MoveBy(0, -mbHeight);
 				fSavedLook = Look();
-				// done before ResizeTo to work around a Dano bug (not erasing the decor)
+				// done before ResizeTo to work around a Dano bug
+				// (not erasing the decor)
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
 				ResizeTo(screen.Frame().Width()+1, screen.Frame().Height()+1);
 				MoveTo(screen.Frame().left, screen.Frame().top);
@@ -812,8 +818,11 @@ TermWindow::MessageReceived(BMessage *message)
 				_ActiveTermView()->DisableResizeView();
 				float mbHeight = fMenuBar->Bounds().Height() + 1;
 				fMenuBar->Show();
-				for (int32 i = fTabView->CountTabs() - 1; i >=0 ; i--)
-					_TermViewAt(i)->ScrollBar()->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 1));
+
+				for (int32 i = fTabView->CountTabs() - 1; i >= 0 ; i--)
+					_TermViewAt(i)->ScrollBar()->ResizeBy(0,
+						-(B_H_SCROLL_BAR_HEIGHT - 1));
+
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
 				fTabView->ResizeBy(0, -mbHeight);
@@ -1018,6 +1027,8 @@ TermWindow::_SetTermColors(TermViewContainerView* containerView)
 	TermView *termView = containerView->GetTermView();
 	termView->SetTextColor(handler->getRGB(PREF_TEXT_FORE_COLOR), background);
 
+	termView->SetCursorColor(handler->getRGB(PREF_CURSOR_FORE_COLOR),
+		handler->getRGB(PREF_CURSOR_BACK_COLOR));
 	termView->SetSelectColor(handler->getRGB(PREF_SELECT_FORE_COLOR),
 		handler->getRGB(PREF_SELECT_BACK_COLOR));
 }
@@ -1646,6 +1657,16 @@ TermWindow::_UpdateSessionTitle(int32 index)
 		fTitle.title = windowTitle;
 		SetTitle(fTitle.title);
 	}
+
+	// If fullscreen, add a tooltip with the title and a keyboard shortcut hint
+	if (fFullScreen) {
+		BString toolTip(fTitle.title);
+		toolTip += "\n(";
+		toolTip += B_TRANSLATE("Full screen");
+		toolTip += " (ALT " UTF8_ENTER "))";
+		termView->SetToolTip(toolTip.String());
+	} else
+		termView->SetToolTip((const char *)NULL);
 }
 
 
