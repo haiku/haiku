@@ -1681,6 +1681,8 @@ VariablesView::MessageReceived(BMessage* message)
 				break;
 			}
 
+			// TODO: we need to also persist/restore the casted state
+			// in VariableViewState
 			node->NodeChild()->SetNode(valueNode);
 			break;
 		}
