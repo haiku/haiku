@@ -45,6 +45,8 @@
 #include "ValueNode.h"
 #include "ValueNodeContainer.h"
 #include "Variable.h"
+#include "WatchpointManager.h"
+#include "WatchpointSetting.h"
 
 // #pragma mark - ImageHandler
 
@@ -142,6 +144,7 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fFileManager(NULL),
 	fWorker(NULL),
 	fBreakpointManager(NULL),
+	fWatchpointManager(NULL),
 	fMemoryBlockManager(NULL),
 	fDebugEventListener(-1),
 	fUserInterface(userInterface),
@@ -199,6 +202,7 @@ TeamDebugger::~TeamDebugger()
 	delete fImageHandlers;
 
 	delete fBreakpointManager;
+	delete fWatchpointManager;
 	delete fMemoryBlockManager;
 	delete fWorker;
 	delete fTeam;
@@ -301,6 +305,16 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return B_NO_MEMORY;
 
 	error = fBreakpointManager->Init();
+	if (error != B_OK)
+		return error;
+
+	// create the watchpoint manager
+	fWatchpointManager = new(std::nothrow) WatchpointManager(fTeam,
+		fDebuggerInterface);
+	if (fWatchpointManager == NULL)
+		return B_NO_MEMORY;
+
+	error = fWatchpointManager->Init();
 	if (error != B_OK)
 		return error;
 
@@ -460,6 +474,46 @@ TeamDebugger::MessageReceived(BMessage* message)
 					_HandleClearUserBreakpoint(breakpoint);
 				else
 					_HandleClearUserBreakpoint(address);
+			}
+
+			break;
+		}
+
+		case MSG_SET_WATCHPOINT:
+		case MSG_CLEAR_WATCHPOINT:
+		{
+			Watchpoint* watchpoint = NULL;
+			BReference<Watchpoint> watchpointReference;
+			uint64 address = 0;
+			uint32 type = 0;
+			int32 length = 0;
+
+			if (message->FindPointer("watchpoint", (void**)&watchpoint)
+					== B_OK) {
+				watchpointReference.SetTo(watchpoint, true);
+			} else if (message->FindUInt64("address", &address) != B_OK)
+				break;
+
+			if (message->what == MSG_SET_WATCHPOINT) {
+				if (watchpoint == NULL && (message->FindUInt32("type", &type)
+							!= B_OK
+						|| message->FindInt32("length", &length) != B_OK)) {
+					break;
+				}
+
+				bool enabled;
+				if (message->FindBool("enabled", &enabled) != B_OK)
+					enabled = true;
+
+				if (watchpoint != NULL)
+					_HandleSetWatchpoint(watchpoint, enabled);
+				else
+					_HandleSetWatchpoint(address, type, length, enabled);
+			} else {
+				if (watchpoint != NULL)
+					_HandleClearWatchpoint(watchpoint);
+				else
+					_HandleClearWatchpoint(address);
 			}
 
 			break;
@@ -692,6 +746,54 @@ TeamDebugger::ClearBreakpointRequested(UserBreakpoint* breakpoint)
 	if (message.AddPointer("breakpoint", breakpoint) == B_OK
 		&& PostMessage(&message) == B_OK) {
 		breakpointReference.Detach();
+	}
+}
+
+
+void
+TeamDebugger::SetWatchpointRequested(target_addr_t address, uint32 type,
+	int32 length, bool enabled)
+{
+	BMessage message(MSG_SET_WATCHPOINT);
+	message.AddUInt64("address", (uint64)address);
+	message.AddUInt32("type", type);
+	message.AddInt32("length", length);
+	message.AddBool("enabled", enabled);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::SetWatchpointEnabledRequested(Watchpoint* watchpoint,
+	bool enabled)
+{
+	BMessage message(MSG_SET_WATCHPOINT);
+	BReference<Watchpoint> watchpointReference(watchpoint);
+	if (message.AddPointer("watchpoint", watchpoint) == B_OK
+		&& message.AddBool("enabled", enabled) == B_OK
+		&& PostMessage(&message) == B_OK) {
+		watchpointReference.Detach();
+	}
+}
+
+
+void
+TeamDebugger::ClearWatchpointRequested(target_addr_t address)
+{
+	BMessage message(MSG_CLEAR_WATCHPOINT);
+	message.AddUInt64("address", (uint64)address);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::ClearWatchpointRequested(Watchpoint* watchpoint)
+{
+	BMessage message(MSG_CLEAR_WATCHPOINT);
+	BReference<Watchpoint> watchpointReference(watchpoint);
+	if (message.AddPointer("watchpoint", watchpoint) == B_OK
+		&& PostMessage(&message) == B_OK) {
+		watchpointReference.Detach();
 	}
 }
 
@@ -1310,6 +1412,59 @@ TeamDebugger::_HandleClearUserBreakpoint(UserBreakpoint* breakpoint)
 
 
 void
+TeamDebugger::_HandleSetWatchpoint(target_addr_t address, uint32 type,
+	int32 length, bool enabled)
+{
+	Watchpoint* watchpoint = new(std::nothrow) Watchpoint(address, type,
+		length);
+
+	if (watchpoint == NULL)
+		return;
+	BReference<Watchpoint> watchpointRef(watchpoint, true);
+
+	_HandleSetWatchpoint(watchpoint, enabled);
+}
+
+
+void
+TeamDebugger::_HandleSetWatchpoint(Watchpoint* watchpoint, bool enabled)
+{
+	status_t error = fWatchpointManager->InstallWatchpoint(watchpoint,
+		enabled);
+	if (error != B_OK) {
+		_NotifyUser("Install Watchpoint", "Failed to install watchpoint: %s",
+			strerror(error));
+	}
+}
+
+
+void
+TeamDebugger::_HandleClearWatchpoint(target_addr_t address)
+{
+	TRACE_CONTROL("TeamDebugger::_HandleClearWatchpoint(%#" B_PRIx64 ")\n",
+		address);
+
+	AutoLocker< ::Team> locker(fTeam);
+
+	Watchpoint* watchpoint = fTeam->WatchpointAtAddress(address);
+	if (watchpoint == NULL)
+		return;
+	BReference<Watchpoint> watchpointReference(watchpoint);
+
+	locker.Unlock();
+
+	_HandleClearWatchpoint(watchpoint);
+}
+
+
+void
+TeamDebugger::_HandleClearWatchpoint(Watchpoint* watchpoint)
+{
+	fWatchpointManager->UninstallWatchpoint(watchpoint);
+}
+
+
+void
 TeamDebugger::_HandleInspectAddress(target_addr_t address,
 	TeamMemoryBlock::Listener* listener)
 {
@@ -1426,6 +1581,21 @@ TeamDebugger::_LoadSettings()
 		// install it
 		fBreakpointManager->InstallUserBreakpoint(breakpoint,
 			breakpointSetting->IsEnabled());
+	}
+
+	// create the saved watchpoints;
+	for (int32 i = 0; const WatchpointSetting* watchpointSetting
+			= fTeamSettings.WatchpointAt(i); i++) {
+		Watchpoint* watchpoint = new(std::nothrow) Watchpoint(
+			watchpointSetting->Address(), watchpointSetting->Type(),
+			watchpointSetting->Length());
+		if (watchpoint == NULL)
+			return;
+		BReference<Watchpoint> watchpointReference(watchpoint, true);
+
+		// install it
+		fWatchpointManager->InstallWatchpoint(watchpoint,
+			watchpointSetting->IsEnabled());
 	}
 
 	const TeamUiSettings* uiSettings = fTeamSettings.UiSettingFor(

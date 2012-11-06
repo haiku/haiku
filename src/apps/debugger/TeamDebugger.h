@@ -24,6 +24,7 @@ class FileManager;
 class SettingsManager;
 class TeamDebugInfo;
 class TeamMemoryBlockManager;
+class WatchpointManager;
 
 
 class TeamDebugger : public BLooper, private UserInterfaceListener,
@@ -67,6 +68,14 @@ private:
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
+	virtual	void				SetWatchpointRequested(target_addr_t address,
+									uint32 type, int32 length, bool enabled);
+	virtual	void				SetWatchpointEnabledRequested(
+									Watchpoint *watchpoint, bool enabled);
+	virtual	void				ClearWatchpointRequested(target_addr_t address);
+	virtual	void				ClearWatchpointRequested(
+									Watchpoint* breakpoint);
+
 	virtual void				InspectRequested(target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
 	virtual	bool				UserInterfaceQuitRequested(
@@ -123,6 +132,13 @@ private:
 			void				_HandleClearUserBreakpoint(
 									UserBreakpoint* breakpoint);
 
+			void				_HandleSetWatchpoint(target_addr_t address,
+									uint32 type, int32 length, 	bool enabled);
+			void				_HandleSetWatchpoint(
+									Watchpoint* watchpoint, bool enabled);
+			void				_HandleClearWatchpoint(	target_addr_t address);
+			void				_HandleClearWatchpoint(Watchpoint* watchpoint);
+
 			void				_HandleInspectAddress(
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
@@ -151,6 +167,7 @@ private:
 			FileManager*		fFileManager;
 			Worker*				fWorker;
 			BreakpointManager*	fBreakpointManager;
+			WatchpointManager*	fWatchpointManager;
 			TeamMemoryBlockManager*
 								fMemoryBlockManager;
 			thread_id			fDebugEventListener;
