@@ -31,7 +31,7 @@
 #include <string.h>
 
 
-#define TRACE_ARCH_INT
+//#define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
 #	define TRACE(x) dprintf x
 #else
@@ -61,28 +61,9 @@ static void *sVectorPageAddress;
 static area_id sUserVectorPageArea;
 static void *sUserVectorPageAddress;
 
-// current fault handler
-addr_t gFaultHandler;
-
 // An iframe stack used in the early boot process when we don't have
 // threads yet.
 struct iframe_stack gBootFrameStack;
-
-
-uint32
-mmu_read_c1()
-{
-	uint32 controlReg = 0;
-	asm volatile("MRC p15, 0, %[c1out], c1, c0, 0":[c1out] "=r" (controlReg));
-	return controlReg;
-}
-
-
-void
-mmu_write_c1(uint32 value)
-{
-	asm volatile("MCR p15, 0, %[c1in], c1, c0, 0"::[c1in] "r" (value));
-}
 
 
 void
@@ -117,28 +98,31 @@ arch_int_disable_io_interrupt(int irq)
 
 
 static void
-print_iframe(struct iframe *frame)
+print_iframe(const char *event, struct iframe *frame)
 {
+	if (event)
+		dprintf("Exception: %s\n", event);
+
+	dprintf("R00=%08lx R01=%08lx R02=%08lx R03=%08lx\n"
+		"R04=%08lx R05=%08lx R06=%08lx R07=%08lx\n",
+		frame->r0, frame->r1, frame->r2, frame->r3,
+		frame->r4, frame->r5, frame->r6, frame->r7);
+	dprintf("R08=%08lx R09=%08lx R10=%08lx R11=%08lx\n"
+		"R12=%08lx R13=%08lx R14=%08lx CPSR=%08lx\n",
+		frame->r8, frame->r9, frame->r10, frame->r11,
+		frame->r12, frame->usr_sp, frame->usr_lr, frame->spsr);
 }
 
 
 status_t
 arch_int_init(kernel_args *args)
 {
-	// see if high vectors are enabled
-	if (mmu_read_c1() & (1<<13))
-		dprintf("High vectors already enabled\n");
-	else {
-		mmu_write_c1(mmu_read_c1() | (1<<13));
-
-		if (!(mmu_read_c1() & (1<<13)))
-			dprintf("Unable to enable high vectors!\n");
-		else
-			dprintf("Enabled high vectors\n");
-       }
-
 	return B_OK;
 }
+
+
+extern "C" void arm_vector_init(void);
+
 
 status_t
 arch_int_init_post_vm(kernel_args *args)
@@ -163,6 +147,20 @@ arch_int_init_post_vm(kernel_args *args)
 	// copy vectors into the newly created area
 	memcpy(sVectorPageAddress, &_vectors_start, VECTORPAGE_SIZE);
 
+	arm_vector_init();
+
+	// see if high vectors are enabled
+	if (mmu_read_c1() & (1<<13))
+		dprintf("High vectors already enabled\n");
+	else {
+		mmu_write_c1(mmu_read_c1() | (1<<13));
+
+		if (!(mmu_read_c1() & (1<<13)))
+			dprintf("Unable to enable high vectors!\n");
+		else
+			dprintf("Enabled high vectors\n");
+       }
+
 	sPxaInterruptArea = map_physical_memory("pxa_intc", PXA_INTERRUPT_PHYS_BASE,
 		PXA_INTERRUPT_SIZE, 0, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&sPxaInterruptBase);
 
@@ -179,7 +177,6 @@ arch_int_init_post_vm(kernel_args *args)
 status_t
 arch_int_init_io(kernel_args* args)
 {
-	TRACE(("arch_int_init_io(%p)\n", args));
 	return B_OK;
 }
 
@@ -193,35 +190,103 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 
 extern "C" void arch_arm_undefined(struct iframe *iframe)
 {
-	panic("Undefined instruction!");
+	print_iframe("Undefined Instruction", iframe);
+	panic("not handled!");
 }
 
 extern "C" void arch_arm_syscall(struct iframe *iframe)
 {
-	panic("Software interrupt!\n");
+	print_iframe("Software interrupt", iframe);
 }
 
-extern "C" void arch_arm_data_abort(struct iframe *iframe)
+extern "C" void arch_arm_data_abort(struct iframe *frame)
 {
-	addr_t newip;
-	status_t res = vm_page_fault(iframe->r2 /* FAR */, iframe->r4 /* lr */,
-		true /* TODO how to determine read/write? */,
-		false /* only kernelspace for now */,
-		&newip);
+	Thread *thread = thread_get_current_thread();
+	bool isUser = (frame->spsr & 0x1f) == 0x10;
+	addr_t far = arm_get_far();
+	bool isWrite = true;
+	addr_t newip = 0;
 
-	if (res != B_HANDLED_INTERRUPT) {
-		panic("Data Abort: %08x %08x %08x %08x (res=%lx)", iframe->r0 /* spsr */, 
-			iframe->r1 /* FSR */, iframe->r2 /* FAR */,
-			iframe->r4 /* lr */,
-			res);
-	} else {
-		//panic("vm_page_fault was ok (%08lx/%08lx)!", iframe->r2 /* FAR */, iframe->r0 /* spsr */);
+#ifdef TRACE_ARCH_INT
+	print_iframe("Data Abort", frame);
+#endif
+
+	if (debug_debugger_running()) {
+		// If this CPU or this thread has a fault handler, we're allowed to be
+		// here.
+		if (thread != NULL) {
+			cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
+
+			if (cpu->fault_handler != 0) {
+				kprintf("CPU fault handler set! %p %p\n",
+					(void*)cpu->fault_handler, (void*)cpu->fault_handler_stack_pointer);
+				debug_set_page_fault_info(far, frame->pc,
+					isWrite ? DEBUG_PAGE_FAULT_WRITE : 0);
+				frame->svc_sp = cpu->fault_handler_stack_pointer;
+				frame->pc = cpu->fault_handler;
+				return;
+			}
+
+			if (thread->fault_handler != 0) {
+				kprintf("ERROR: thread::fault_handler used in kernel "
+					"debugger!\n");
+				debug_set_page_fault_info(far, frame->pc,
+						isWrite ? DEBUG_PAGE_FAULT_WRITE : 0);
+				frame->pc = thread->fault_handler;
+				return;
+			}
+		}
+
+		// otherwise, not really
+		panic("page fault in debugger without fault handler! Touching "
+			"address %p from pc %p\n", (void *)far, (void *)frame->pc);
+		return;
+	} else if ((frame->spsr & (1 << 7)) != 0) {
+		// interrupts disabled
+
+		// If a page fault handler is installed, we're allowed to be here.
+		// TODO: Now we are generally allowing user_memcpy() with interrupts
+		// disabled, which in most cases is a bug. We should add some thread
+		// flag allowing to explicitly indicate that this handling is desired.
+		if (thread && thread->fault_handler != 0) {
+			if (frame->pc != thread->fault_handler) {
+				frame->pc = thread->fault_handler;
+				return;
+			}
+
+			// The fault happened at the fault handler address. This is a
+			// certain infinite loop.
+			panic("page fault, interrupts disabled, fault handler loop. "
+				"Touching address %p from pc %p\n", (void*)far,
+				(void*)frame->pc);
+		}
+
+		// If we are not running the kernel startup the page fault was not
+		// allowed to happen and we must panic.
+		panic("page fault, but interrupts were disabled. Touching address "
+			"%p from pc %p\n", (void *)far, (void *)frame->pc);
+		return;
+	} else if (thread != NULL && thread->page_faults_allowed < 1) {
+		panic("page fault not allowed at this place. Touching address "
+			"%p from pc %p\n", (void *)far, (void *)frame->pc);
+		return;
+	}
+
+	enable_interrupts();
+
+	vm_page_fault(far, frame->pc, isWrite, isUser, &newip);
+
+	if (newip != 0) {
+		// the page fault handler wants us to modify the iframe to set the
+		// IP the cpu will return to to be this ip
+		frame->pc = newip;
 	}
 }
 
 extern "C" void arch_arm_prefetch_abort(struct iframe *iframe)
 {
-	panic("Prefetch Abort: %08x %08x %08x", iframe->r0, iframe->r1, iframe->r2);
+	print_iframe("Prefetch Abort", iframe);
+	panic("not handled!");
 }
 
 extern "C" void arch_arm_irq(struct iframe *iframe)

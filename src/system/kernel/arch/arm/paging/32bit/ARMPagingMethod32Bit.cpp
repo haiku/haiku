@@ -30,7 +30,7 @@
 #include "paging/arm_physical_page_mapper_large_memory.h"
 
 
-#define TRACE_ARM_PAGING_METHOD_32_BIT
+//#define TRACE_ARM_PAGING_METHOD_32_BIT
 #ifdef TRACE_ARM_PAGING_METHOD_32_BIT
 #	define TRACE(x...) dprintf(x)
 #else

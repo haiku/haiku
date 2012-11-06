@@ -10,21 +10,38 @@
 
 #include <asm_defs.h>
 
+#include "asm_offsets.h"
+
 .text
 
+
+/* int mmu_read_c1(void); */
+FUNCTION(mmu_read_c1):
+	mrc	p15, 0, r0, c1, c0, 0
+	bx	lr
+FUNCTION_END(mmu_read_c1)
+
+
+/* void mmu_write_c1(int val); */
+FUNCTION(mmu_write_c1):
+	mcr	p15, 0, r0, c1, c0, 0
+	bx	lr
+FUNCTION_END(mmu_write_c1)
+
+
+/* NOTE: the I bit in cpsr (bit 7) is *set* to disable... */
 
 
 /* void arch_int_enable_interrupts(void) */
 FUNCTION(arch_int_enable_interrupts):
         mrs     r0, cpsr
-        bic     r0, r0, #(1<<7)         /* clear the I bit */
+        bic     r0, r0, #(1<<7)
         msr     cpsr_c, r0
         bx      lr
 FUNCTION_END(arch_int_enable_interrupts)
 
 
-/* int arch_int_disable_interrupts(void) 
- */
+/* int arch_int_disable_interrupts(void) */
 FUNCTION(arch_int_disable_interrupts):
         mrs     r0, cpsr
         orr     r1, r0, #(1<<7)
@@ -33,8 +50,7 @@ FUNCTION(arch_int_disable_interrupts):
 FUNCTION_END(arch_int_disable_interrupts)
 
 
-/* void arch_int_restore_interrupts(int oldState) 
- */
+/* void arch_int_restore_interrupts(int oldState) */
 FUNCTION(arch_int_restore_interrupts):
 	mrs     r1, cpsr
 	and	r0, r0, #(1<<7)
@@ -65,3 +81,57 @@ FUNCTION(arm_context_switch):
 	ldmfd   sp!, { r0-r12, lr }
 	bx	lr
 FUNCTION_END(arm_context_switch)
+
+/* addr_t arm_get_fsr(void); */
+FUNCTION(arm_get_fsr):
+	mrc	p15, 0, r0, c5, c0, 0		@ get FSR
+	bx	lr
+FUNCTION_END(arm_get_fsr)
+
+/* addr_t arm_get_far(void); */
+FUNCTION(arm_get_far):
+	mrc	p15, 0, r0, c6, c0, 0		@ get FAR
+	bx	lr
+FUNCTION_END(arm_get_far)
+
+/*!	\fn void arch_debug_call_with_fault_handler(cpu_ent* cpu,
+		jmp_buf jumpBuffer, void (*function)(void*), void* parameter)
+
+	Called by debug_call_with_fault_handler() to do the dirty work of setting
+	the fault handler and calling the function. If the function causes a page
+	fault, the arch_debug_call_with_fault_handler() calls longjmp() with the
+	given \a jumpBuffer. Otherwise it returns normally.
+
+	debug_call_with_fault_handler() has already saved the CPU's fault_handler
+	and fault_handler_stack_pointer and will reset them later, so
+	arch_debug_call_with_fault_handler() doesn't need to care about it.
+
+	\param cpu The \c cpu_ent for the current CPU.
+	\param jumpBuffer Buffer to be used for longjmp().
+	\param function The function to be called.
+	\param parameter The parameter to be passed to the function to be called.
+*/
+FUNCTION(arch_debug_call_with_fault_handler):
+	stmfd   sp!, { r4, lr }
+
+	// Set fault handler address, and fault handler stack pointer address. We
+	// don't need to save the previous values, since that's done by the caller.
+	ldr	r4, =1f
+	str	r4, [ r0, #CPU_ENT_fault_handler ]
+	str	sp, [ r0, #CPU_ENT_fault_handler_stack_pointer ]
+	mov	r4, r1
+
+	// call the function
+	mov	r0, r3
+	blx	r2
+
+	// regular return
+	ldmfd   sp!, { r4, lr }
+	bx	lr
+
+	// fault -- return via longjmp(jumpBuffer, 1)
+1:
+	mov	r0, r4
+	mov	r1, #1
+	bl	longjmp
+FUNCTION_END(arch_debug_call_with_fault_handler)

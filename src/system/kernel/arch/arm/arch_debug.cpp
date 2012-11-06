@@ -251,14 +251,9 @@ arch_debug_stack_trace(void)
 void *
 arch_debug_get_caller(void)
 {
-#warning ARM:IMPLEMENT
-	// TODO: implement me
-	//return __builtin_frame_address(1);
-//	struct stack_frame *frame;
-	//frame = __builtin_frame_address(0);
-//	frame = get_current_stack_frame();
-//	return (void *)frame->previous->return_address;
-	return NULL;
+	/* Return the thread id as the kernel (for example the lock code) actually
+	   gets a somewhat valid indication of the caller back. */
+	return (void*) thread_get_current_thread_id();
 }
 
 
@@ -316,17 +311,7 @@ arch_debug_init(kernel_args *args)
 }
 
 
-void
-arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
-	void (*function)(void*), void* parameter)
-{
-	// TODO: Implement fault handling! Most likely in assembly.
-	// (see src/system/kernel/arch/x86/arch_x86.S)
-
-	// For now, just call the function and hope we don't crash :P
-	function(parameter);
-}
-
+/* arch_debug_call_with_fault_handler is in arch_asm.S */
 
 void
 arch_debug_unset_current_thread(void)
