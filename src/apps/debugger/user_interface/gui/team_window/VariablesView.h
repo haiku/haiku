@@ -72,6 +72,9 @@ private:
 			void				_RequestNodeValue(ModelNode* node);
 			status_t			_GetContextActionsForNode(ModelNode* node,
 									ContextActionList* actions);
+			status_t			_AddContextAction(const char* action,
+									uint32 what, ContextActionList* actions,
+									BMessage*& _message);
 			void				_FinishContextMenu(bool force);
 			void				_SaveViewState() const;
 			void				_RestoreViewState();

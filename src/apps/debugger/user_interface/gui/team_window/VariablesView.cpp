@@ -11,6 +11,8 @@
 
 #include <new>
 
+#include <debugger.h>
+
 #include <Looper.h>
 #include <PopUpMenu.h>
 #include <ToolTip.h>
@@ -1682,6 +1684,22 @@ VariablesView::MessageReceived(BMessage* message)
 			node->NodeChild()->SetNode(valueNode);
 			break;
 		}
+		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
+		{
+			ModelNode* node = reinterpret_cast<ModelNode*>(
+				fVariableTable->SelectionModel()->NodeAt(0));
+			ValueLocation* location = node->NodeChild()->Location();
+			ValuePieceLocation piece = location->PieceAt(0);
+			if (piece.type != VALUE_PIECE_LOCATION_MEMORY)
+				break;
+
+			BMessage looperMessage(*message);
+			looperMessage.AddUInt64("address", piece.address);
+			looperMessage.AddInt32("length", piece.size);
+			looperMessage.AddUInt32("type", B_DATA_READ_WRITE_WATCHPOINT);
+			Looper()->PostMessage(&looperMessage);
+			break;
+		}
 		case MSG_VALUE_NODE_CHANGED:
 		{
 			ValueNodeChild* nodeChild;
@@ -1975,34 +1993,45 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	if (location->PieceAt(0).type != VALUE_PIECE_LOCATION_MEMORY)
 		return B_OK;
 
-	BMessage* message = new BMessage(MSG_SHOW_INSPECTOR_WINDOW);
-	if (message == NULL)
-		return B_NO_MEMORY;
+	BMessage* message = NULL;
+	status_t result = _AddContextAction("Inspect", MSG_SHOW_INSPECTOR_WINDOW,
+		actions, message);
+	if (result != B_OK)
+		return result;
 
-	ObjectDeleter<BMessage> messageDeleter(message);
 	message->AddUInt64("address", location->PieceAt(0).address);
 
-	ActionMenuItem* item = new(std::nothrow) ActionMenuItem("Inspect",
-		message);
+	result = _AddContextAction("Cast as" B_UTF8_ELLIPSIS,
+		MSG_SHOW_TYPECAST_NODE_PROMPT, actions, message);
+	if (result != B_OK)
+		return result;
+
+	result = _AddContextAction("Watch" B_UTF8_ELLIPSIS,
+		MSG_SHOW_WATCH_VARIABLE_PROMPT, actions, message);
+	if (result != B_OK)
+		return result;
+
+	return B_OK;
+}
+
+
+status_t
+VariablesView::_AddContextAction(const char* action, uint32 what,
+	ContextActionList* actions, BMessage*& _message)
+{
+	_message = new BMessage(what);
+	if (_message == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<BMessage> messageDeleter(_message);
+
+	ActionMenuItem* item = new(std::nothrow) ActionMenuItem(action,
+		_message);
 	if (item == NULL)
 		return B_NO_MEMORY;
 
 	messageDeleter.Detach();
 	ObjectDeleter<ActionMenuItem> actionDeleter(item);
-	if (!actions->AddItem(item))
-		return B_NO_MEMORY;
-
-	message = new(std::nothrow)BMessage(MSG_SHOW_TYPECAST_NODE_PROMPT);
-	if (message == NULL)
-		return B_NO_MEMORY;
-
-	item = new(std::nothrow) ActionMenuItem("Cast as" B_UTF8_ELLIPSIS,
-		message);
-	if (item == NULL)
-		return B_NO_MEMORY;
-
-	messageDeleter.Detach();
-
 	if (!actions->AddItem(item))
 		return B_NO_MEMORY;
 
