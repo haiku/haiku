@@ -169,7 +169,8 @@ void
 ARMPagingMethod32Bit::PhysicalPageSlotPool::Map(phys_addr_t physicalAddress,
 	addr_t virtualAddress)
 {
-	page_table_entry& pte = fPageTable[(virtualAddress - fVirtualBase) / B_PAGE_SIZE];
+	page_table_entry& pte = fPageTable[
+		(virtualAddress - fVirtualBase) / B_PAGE_SIZE];
 	pte = (physicalAddress & ARM_PTE_ADDRESS_MASK)
 		| ARM_PTE_TYPE_SMALL_PAGE;
 
@@ -298,7 +299,7 @@ ARMPagingMethod32Bit::Init(kernel_args* args,
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_GLOBAL_PAGES);
 	}
 #endif
-	TRACE("vm_translation_map_init: done\n");
+	TRACE("ARMPagingMethod32Bit::Init(): done\n");
 
 	*_physicalPageMapper = fPhysicalPageMapper;
 	return B_OK;
