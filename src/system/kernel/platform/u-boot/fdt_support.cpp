@@ -15,6 +15,10 @@ extern "C" {
 #include <libfdt_env.h>
 };
 
+#ifndef _BOOT_MODE
+/* the bootloader has it in asm code to avoid it ending up in .bss */
+void *gFDT;
+#endif
 
 extern "C" void dump_fdt(const void *fdt);
 

@@ -248,7 +248,7 @@ Depends haiku-mmc-image : haiku-$(HAIKU_BOOT_BOARD).mmc ;
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
-SEARCH on [ FGristFiles openfirmware.cpp ]
+SEARCH on [ FGristFiles openfirmware.cpp fdt_support.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel platform u-boot ] ;
 
 SEARCH on [ FGristFiles $(libFDTSources) ]
