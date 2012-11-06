@@ -106,9 +106,7 @@ BTitledColumn::FontHeight() const
 float
 BTitledColumn::GetPreferredWidth(BField *_field, BView* parent) const
 {
-	BFont font;
-	parent->GetFont(&font);
-	return font.StringWidth(fTitle.String()) + 2 * kTEXT_MARGIN;
+	return parent->StringWidth(fTitle.String()) + 2 * kTEXT_MARGIN;
 }
 
 
@@ -202,11 +200,7 @@ float
 BStringColumn::GetPreferredWidth(BField *_field, BView* parent) const
 {
 	BStringField* field = static_cast<BStringField*>(_field);
-	BFont font;
-	parent->GetFont(&font);
-	float width = font.StringWidth(field->String()) + 2 * kTEXT_MARGIN;
-	float parentWidth = BTitledColumn::GetPreferredWidth(_field, parent);
-	return max_c(width, parentWidth);
+	return parent->StringWidth(field->String()) + 2 * kTEXT_MARGIN;
 }
 
 
