@@ -3862,9 +3862,8 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 			page_num_t offsetStart = start + sPhysicalPageOffset;
 
 			// enforce alignment
-			if (alignmentMask != 0 && (offsetStart & alignmentMask) != 0) {
-				offsetStart = ((offsetStart + alignmentMask) & ~alignmentMask)
-					- sPhysicalPageOffset;
+			if ((offsetStart & alignmentMask) != 0) {
+				offsetStart = (offsetStart + alignmentMask) & ~alignmentMask;
 			}
 
 			// enforce boundary
@@ -3919,7 +3918,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 			freeClearQueueLocker.Lock();
 		}
 
-		start += max_c(i, alignmentMask) + 1;
+		start += i + 1;
 	}
 }
 
