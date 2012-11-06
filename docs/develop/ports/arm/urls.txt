@@ -1,0 +1,3 @@
+* FDT
+http://elinux.org/images/4/4e/Glikely-powerpc-porting-guide.pdf
+http://ols.fedoraproject.org/OLS/Reprints-2008/likely2-reprint.pdf
