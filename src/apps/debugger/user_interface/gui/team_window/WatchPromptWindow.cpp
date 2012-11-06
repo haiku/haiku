@@ -114,8 +114,8 @@ WatchPromptWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_SET_WATCHPOINT:
 		{
-			target_addr_t address;
-			int32 length;
+			target_addr_t address = 0;
+			int32 length = 0;
 			ExpressionParser parser;
 			parser.SetSupportHexInput(true);
 			BString errorMessage;
