@@ -44,6 +44,7 @@
 #include "TypeComponentPath.h"
 #include "UserInterface.h"
 #include "Variable.h"
+#include "WatchPromptWindow.h"
 
 
 enum {
@@ -246,6 +247,27 @@ TeamWindow::MessageReceived(BMessage* message)
 			fInspectorWindow = NULL;
 			break;
 
+		}
+		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
+		{
+			target_addr_t address;
+			uint32 type;
+			int32 length;
+
+			if (message->FindUInt64("address", &address) != B_OK
+				|| message->FindUInt32("type", &type) != B_OK
+				|| message->FindInt32("length", &length) != B_OK) {
+				break;
+			}
+
+			try {
+				WatchPromptWindow* window = WatchPromptWindow::Create(address,
+					type, length, fListener);
+				window->Show();
+			} catch (...) {
+				// TODO: notify user
+			}
+			break;
 		}
 		case B_REFS_RECEIVED:
 		{

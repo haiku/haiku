@@ -211,6 +211,7 @@ Application Debugger :
 	TeamWindow.cpp
 	ThreadListView.cpp
 	VariablesView.cpp
+	WatchPromptWindow.cpp
 
 	# user_interface/gui/util
 	ActionMenuItem.cpp
