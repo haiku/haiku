@@ -328,4 +328,62 @@ OffsetToCopy__5BRectff(BRect* self, float dx, float dy)
 }
 
 
-#endif	// __GNUC__ == 2
+#elif __GNUC__ == 4
+// TODO: remove this when new GCC 4 packages have to be built anyway
+
+
+extern "C" BRect
+_ZN5BRect11InsetByCopyE6BPoint(BRect* self, BPoint point)
+{
+	BRect copy(*self);
+	copy.InsetBy(point);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect11InsetByCopyEff(BRect* self, float dx, float dy)
+{
+	BRect copy(*self);
+	copy.InsetBy(dx, dy);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect12OffsetByCopyE6BPoint(BRect* self, BPoint point)
+{
+	BRect copy(*self);
+	copy.OffsetBy(point);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect12OffsetByCopyEff(BRect* self, float dx, float dy)
+{
+	BRect copy(*self);
+	copy.OffsetBy(dx, dy);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect12OffsetToCopyE6BPoint(BRect* self, BPoint point)
+{
+	BRect copy(*self);
+	copy.OffsetTo(point);
+	return copy;
+}
+
+
+extern "C" BRect
+_ZN5BRect12OffsetToCopyEff(BRect* self, float dx, float dy)
+{
+	BRect copy(*self);
+	copy.OffsetTo(dx, dy);
+	return copy;
+}
+
+
+#endif	// __GNUC__ == 4
