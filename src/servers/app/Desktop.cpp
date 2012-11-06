@@ -1357,21 +1357,30 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	AutoWriteLocker _(fWindowLock);
 
 	Window* topWindow = window->TopLayerStackWindow();
-	if (topWindow)
+	if (topWindow != NULL)
 		window = topWindow;
 
 	if (workspace == -1)
 		workspace = fCurrentWorkspace;
 	if (!window->IsVisible() || workspace != fCurrentWorkspace) {
 		if (workspace != fCurrentWorkspace) {
-			// move the window on another workspace - this doesn't change it's
-			// current position
-			if (window->Anchor(workspace).position == kInvalidWindowPosition)
-				window->Anchor(workspace).position = window->Frame().LeftTop();
+			WindowStack* stack = window->GetWindowStack();
+			if (stack != NULL) {
+				for (int32 s = 0; s < stack->CountWindows(); s++) {
+					Window* stackWindow = stack->WindowAt(s);
+					// move the window on another workspace - this doesn't
+					// change it's current position
+					if (stackWindow->Anchor(workspace).position
+						== kInvalidWindowPosition) {
+						stackWindow->Anchor(workspace).position
+							= stackWindow->Frame().LeftTop();
+					}
 
-			window->Anchor(workspace).position += BPoint(x, y);
-			window->SetCurrentWorkspace(workspace);
-			_WindowChanged(window);
+					stackWindow->Anchor(workspace).position += BPoint(x, y);
+					stackWindow->SetCurrentWorkspace(workspace);
+					_WindowChanged(stackWindow);
+				}
+			}
 		} else
 			window->MoveBy((int32)x, (int32)y);
 
@@ -1532,11 +1541,16 @@ Desktop::SetWindowWorkspaces(Window* window, uint32 workspaces)
 	if (window->IsNormal() && workspaces == B_CURRENT_WORKSPACE)
 		workspaces = workspace_to_workspaces(CurrentWorkspace());
 
-	uint32 oldWorkspaces = window->Workspaces();
+	WindowStack* stack = window->GetWindowStack();
+	if (stack != NULL) {
+		for (int32 s = 0; s < stack->CountWindows(); s++) {
+			window = stack->LayerOrder().ItemAt(s);
 
-	window->WorkspacesChanged(oldWorkspaces, workspaces);
-	_ChangeWindowWorkspaces(window, oldWorkspaces, workspaces);
-
+			uint32 oldWorkspaces = window->Workspaces();
+			window->WorkspacesChanged(oldWorkspaces, workspaces);
+			_ChangeWindowWorkspaces(window, oldWorkspaces, workspaces);
+		}
+	}
 	UnlockAllWindows();
 }
 
@@ -3415,18 +3429,25 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 				// But only normal windows are following
 				uint32 oldWorkspaces = movedWindow->Workspaces();
 
-				_Windows(previousIndex).RemoveWindow(movedWindow);
-				_Windows(index).AddWindow(movedWindow,
-					movedWindow->Frontmost(_Windows(index).FirstWindow(),
-					index));
+				WindowStack* stack = movedWindow->GetWindowStack();
+				if (stack != NULL) {
+					for (int32 s = 0; s < stack->CountWindows(); s++) {
+						Window* stackWindow = stack->LayerOrder().ItemAt(s);
 
+						_Windows(previousIndex).RemoveWindow(stackWindow);
+						_Windows(index).AddWindow(stackWindow,
+							stackWindow->Frontmost(
+								_Windows(index).FirstWindow(), index));
+
+						// send B_WORKSPACES_CHANGED message
+						stackWindow->WorkspacesChanged(oldWorkspaces,
+							stackWindow->Workspaces());
+					}
+				}
 				// TODO: subset windows will always flicker this way
 
 				movedMouseEventWindow = true;
 
-				// send B_WORKSPACES_CHANGED message
-				movedWindow->WorkspacesChanged(oldWorkspaces,
-					movedWindow->Workspaces());
 				NotifyWindowWorkspacesChanged(movedWindow,
 					movedWindow->Workspaces());
 			} else {

@@ -368,10 +368,13 @@ StackAndTile::WindowWorkspacesChanged(Window* window, uint32 workspaces)
 	if (desktop == NULL)
 		return;
 
-	for (int i = 0; i < group->CountItems(); i++) {
-		SATWindow* listWindow = group->WindowAt(i);
-		if (listWindow != satWindow)
-			desktop->SetWindowWorkspaces(listWindow->GetWindow(), workspaces);
+	const WindowAreaList& areaList = group->GetAreaList();
+	for (int32 i = 0; i < areaList.CountItems(); i++) {
+		WindowArea* area = areaList.ItemAt(i);
+		if (area->WindowList().HasItem(satWindow))
+			continue;
+		SATWindow* topWindow = area->TopWindow();
+		desktop->SetWindowWorkspaces(topWindow->GetWindow(), workspaces);
 	}
 }
 
