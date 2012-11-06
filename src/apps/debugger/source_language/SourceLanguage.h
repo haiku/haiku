@@ -9,7 +9,10 @@
 #include <Referenceable.h>
 
 
+class BString;
 class SyntaxHighlighter;
+class TeamTypeInformation;
+class Type;
 
 
 class SourceLanguage : public BReferenceable {
@@ -21,6 +24,10 @@ public:
 	virtual	SyntaxHighlighter*	GetSyntaxHighlighter() const;
 									// returns a reference,
 									// may return NULL, if not available
+
+	virtual status_t			ParseTypeExpression(const BString &expression,
+									TeamTypeInformation* info,
+									Type*& _resultType) const;
 };
 
 

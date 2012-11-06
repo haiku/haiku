@@ -82,9 +82,6 @@ private:
 									VariablesViewState* viewState, void* parent,
 									TreeTablePath& path);
 
-			status_t			_ParseInputType(const BString& typeName,
-									Type*& _outputType) const;
-
 private:
 			Thread*				fThread;
 			StackFrame*			fStackFrame;
