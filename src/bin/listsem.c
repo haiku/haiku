@@ -85,29 +85,31 @@ int main(int argc, char **argv)
 	}
 
 	for (i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
+		if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
 			fprintf(stderr, "Usage:  %s [-s semid]  [teamid]\n", argv[0]);
-			fputs("        List the semaphores allocated by the specified\n", stderr);
-			fputs("        team, or all teams if none is specified.\n", stderr);
+			fputs("        List the semaphores allocated by the specified\n",
+				stderr);
+			fputs("        team, or all teams if none is specified.\n",
+				stderr);
 			fputs("\n", stderr);
-			fputs("        The -s option displays the sem_info data for a\n", stderr);
+			fputs("        The -s option displays the sem_info data for a\n",
+				stderr);
 			fputs("        specified semaphore.\n", stderr);
 			return 0;
-		} else if (!strcmp(argv[i], "-s")) {
+		} else if (strcmp(argv[i], "-s") == 0) {
 			if (argc < i + 2)
 				printf("-s used without associated sem id\n");
 			else {
-				sem_id sem = atoi(argv[i+1]);
+				sem_id id = atoi(argv[i + 1]);
+				sem_info info;
+				if (get_sem_info(id, &info) == B_OK) {
+					print_header(NULL);
+					print_sem_info(&info);
+				} else
+					printf("semaphore %ld unknown\n\n", id);
 
+				i++;
 			}
-			int semID = atoi(argv[i+1]);
-			sem_info info;
-			if (get_sem_info(semID, &info) == B_OK) {
-				print_header(NULL);
-				print_sem_info(&info);
-			} else
-				printf("semaphore %ld unknown\n\n", semID);
-			i++;
 		} else {
 			team_id team;
 			team = atoi(argv[i]);
