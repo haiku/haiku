@@ -16,6 +16,10 @@ enum {
 	MSG_CLEAR_BREAKPOINT						= 'cbrk',
 	MSG_ENABLE_BREAKPOINT						= 'ebrk',
 	MSG_DISABLE_BREAKPOINT						= 'dbrk',
+	MSG_SET_WATCHPOINT							= 'swpt',
+	MSG_CLEAR_WATCHPOINT						= 'cwpt',
+	MSG_ENABLE_WATCHPOINT						= 'ewpt',
+	MSG_DISABLE_WATCHPOINT						= 'dwpt',
 
 	MSG_THREAD_STATE_CHANGED					= 'tsch',
 	MSG_THREAD_CPU_STATE_CHANGED				= 'tcsc',

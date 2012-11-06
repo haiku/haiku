@@ -27,6 +27,7 @@ class UserInterfaceListener;
 class ValueNode;
 class ValueNodeContainer;
 class Variable;
+class Watchpoint;
 
 
 enum user_notification_type {
@@ -99,6 +100,17 @@ public:
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint) = 0;
 									// TODO: Consolidate those!
+
+	virtual	void				SetWatchpointRequested(target_addr_t address,
+									uint32 type, int32 length,
+									bool enabled) = 0;
+	virtual	void				SetWatchpointEnabledRequested(
+									Watchpoint* watchpoint,
+									bool enabled) = 0;
+	virtual	void				ClearWatchpointRequested(
+									target_addr_t address) = 0;
+	virtual	void				ClearWatchpointRequested(
+									Watchpoint* watchpoint) = 0;
 
 	virtual void				InspectRequested(
 									target_addr_t address,
