@@ -20,7 +20,7 @@ template<typename AddressType>
 struct of_region {
 	AddressType base;
 	uint32 size;
-};
+} _PACKED;
 
 struct of_arguments {
 	const char	*name;
