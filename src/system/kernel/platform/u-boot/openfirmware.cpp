@@ -7,11 +7,43 @@
 #include <platform/openfirmware/openfirmware.h>
 
 #include <stdarg.h>
+#include <KernelExport.h>
+
+extern "C" {
+#include <fdt.h>
+#include <libfdt.h>
+#include <libfdt_env.h>
+};
 
 
 // FIXME: HACK: until we support multiple platforms at once in the kernel.
 
+extern void *gFDT;
 int gChosen;
+
+
+static int fdt2of(int err)
+{
+	if (err >= 0)
+		return err;
+	switch (err) {
+		case -FDT_ERR_NOTFOUND:
+		case -FDT_ERR_EXISTS:
+		case -FDT_ERR_NOSPACE:
+		case -FDT_ERR_BADOFFSET:
+		case -FDT_ERR_BADPATH:
+		case -FDT_ERR_BADPHANDLE:
+		case -FDT_ERR_BADSTATE:
+		case -FDT_ERR_TRUNCATED:
+		case -FDT_ERR_BADMAGIC:
+		case -FDT_ERR_BADVERSION:
+		case -FDT_ERR_BADSTRUCTURE:
+		case -FDT_ERR_BADLAYOUT:
+		case -FDT_ERR_INTERNAL:
+		default:
+			return OF_FAILED;
+	}
+}
 
 
 status_t
@@ -49,7 +81,18 @@ of_call_method(int handle, const char *method, int numArgs, int numReturns, ...)
 int
 of_finddevice(const char *device)
 {
-	return OF_FAILED;
+	const char *name = device;
+	int node;
+
+	if (device == NULL)
+		return OF_FAILED;
+
+	if (device[0] != '/' && fdt_get_alias(gFDT, device))
+		name = fdt_get_alias(gFDT, device);
+
+	node = fdt_path_offset(gFDT, name);
+dprintf("of_finddevice('%s') name='%s' node=%d ret=%d\n", device, name, node, fdt2of(node));
+	return fdt2of(node);
 }
 
 
@@ -108,7 +151,13 @@ of_instance_to_package(int instance)
 int
 of_getprop(int package, const char *property, void *buffer, int bufferSize)
 {
-	return OF_FAILED;
+int oldSize = bufferSize;
+	const void *p = fdt_getprop(gFDT, package, property, &bufferSize);
+dprintf("of_getprop(%d, '%s', , %d) =%p sz=%d ret=%d\n", package, property, oldSize, p, bufferSize, fdt2of(bufferSize));
+	if (p == NULL)
+		return fdt2of(bufferSize);
+	memcpy(buffer, p, bufferSize);
+	return bufferSize;
 }
 
 
@@ -137,6 +186,32 @@ int
 of_package_to_path(int package, char *pathBuffer, int bufferSize)
 {
 	return OF_FAILED;
+}
+
+
+/** given the package provided, get the number of cells
++   in the reg property
++ */
+
+int32
+of_address_cells(int package) {
+	uint32 address_cells;
+	if (of_getprop(package, "#address-cells",
+		&address_cells, sizeof(address_cells)) == OF_FAILED)
+		return OF_FAILED;
+
+	return address_cells;
+}
+
+
+int32
+of_size_cells(int package) {
+	uint32 size_cells;
+	if (of_getprop(package, "#size-cells",
+		&size_cells, sizeof(size_cells)) == OF_FAILED)
+		return OF_FAILED;
+
+	return size_cells;
 }
 
 

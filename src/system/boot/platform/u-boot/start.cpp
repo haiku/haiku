@@ -18,6 +18,7 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <platform_arch.h>
+#include <platform/openfirmware/openfirmware.h>
 
 #include <string.h>
 
@@ -198,6 +199,9 @@ start_raw(int argc, const char **argv)
 			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
 			}
 		}
+
+		// also initialize the OpenFirmware wrapper
+		of_init(NULL);
 	}
 
 	// if we get passed a uimage, try to find the second blob
