@@ -14,6 +14,7 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <arch_kernel.h>
+#include <platform/openfirmware/openfirmware.h>
 #ifdef __ARM__
 #include <arm_mmu.h>
 #endif
@@ -25,6 +26,8 @@
 
 #include <string.h>
 
+int32 of_address_cells(int package);
+int32 of_size_cells(int package);
 
 //#define TRACE_MMU
 #ifdef TRACE_MMU
@@ -595,10 +598,118 @@ mmu_init_for_kernel(void)
 }
 
 
+//XXX:move this
+static status_t
+find_physical_memory_ranges(size_t &total)
+{
+	int memory = -1;
+	int package;
+	dprintf("checking for memory...\n");
+	if (of_getprop(gChosen, "memory", &memory, sizeof(int)) == OF_FAILED)
+		package = of_finddevice("/memory");
+	else
+		package = of_instance_to_package(memory);
+	if (package == OF_FAILED)
+		return B_ERROR;
+
+	total = 0;
+
+	// Memory base addresses are provided in 32 or 64 bit flavors
+	// #address-cells and #size-cells matches the number of 32-bit 'cells'
+	// representing the length of the base address and size fields
+	int root = of_finddevice("/");
+	int32 regAddressCells = of_address_cells(root);
+	int32 regSizeCells = of_size_cells(root);
+	if (regAddressCells == OF_FAILED || regSizeCells == OF_FAILED) {
+		dprintf("finding base/size length counts failed, assume 32-bit.\n");
+		regAddressCells = 1;
+		regSizeCells = 1;
+	}
+
+	// NOTE : Size Cells of 2 is possible in theory... but I haven't seen it yet.
+	if (regAddressCells > 2 || regSizeCells > 1) {
+		panic("%s: Unsupported OpenFirmware cell count detected.\n"
+		"Address Cells: %" B_PRId32 "; Size Cells: %" B_PRId32
+		" (CPU > 64bit?).\n", __func__, regAddressCells, regSizeCells);
+		return B_ERROR;
+	}
+
+	// On 64-bit PowerPC systems (G5), our mem base range address is larger
+	if (regAddressCells == 2) {
+		struct of_region<uint64> regions[64];
+		int count = of_getprop(package, "reg", regions, sizeof(regions));
+		if (count == OF_FAILED)
+			count = of_getprop(memory, "reg", regions, sizeof(regions));
+		if (count == OF_FAILED)
+			return B_ERROR;
+		count /= sizeof(regions[0]);
+
+		for (int32 i = 0; i < count; i++) {
+			if (regions[i].size <= 0) {
+				dprintf("%ld: empty region\n", i);
+				continue;
+			}
+			dprintf("%" B_PRIu32 ": base = %" B_PRIu64 ","
+				"size = %" B_PRIu32 "\n", i, regions[i].base, regions[i].size);
+
+			total += regions[i].size;
+
+			if (insert_physical_memory_range((addr_t)regions[i].base,
+					regions[i].size) != B_OK) {
+				dprintf("cannot map physical memory range "
+					"(num ranges = %" B_PRIu32 ")!\n",
+					gKernelArgs.num_physical_memory_ranges);
+				return B_ERROR;
+			}
+		}
+		return B_OK;
+	}
+
+	// Otherwise, normal 32-bit PowerPC G3 or G4 have a smaller 32-bit one
+	struct of_region<uint32> regions[64];
+	int count = of_getprop(package, "reg", regions, sizeof(regions));
+	if (count == OF_FAILED)
+		count = of_getprop(memory, "reg", regions, sizeof(regions));
+	if (count == OF_FAILED)
+		return B_ERROR;
+	count /= sizeof(regions[0]);
+
+	for (int32 i = 0; i < count; i++) {
+		if (regions[i].size <= 0) {
+			dprintf("%ld: empty region\n", i);
+			continue;
+		}
+		dprintf("%" B_PRIu32 ": base = %" B_PRIu32 ","
+			"size = %" B_PRIu32 "\n", i, regions[i].base, regions[i].size);
+
+		total += regions[i].size;
+
+		if (insert_physical_memory_range((addr_t)regions[i].base,
+				regions[i].size) != B_OK) {
+			dprintf("cannot map physical memory range "
+				"(num ranges = %" B_PRIu32 ")!\n",
+				gKernelArgs.num_physical_memory_ranges);
+			return B_ERROR;
+		}
+	}
+
+	return B_OK;
+}
+
+
 extern "C" void
 mmu_init(void)
 {
 	TRACE(("mmu_init\n"));
+
+	// get map of physical memory (fill in kernel_args structure)
+
+	size_t total;
+	if (find_physical_memory_ranges(total) != B_OK) {
+		dprintf("Error: could not find physical memory ranges!\n");
+		return /*B_ERROR*/;
+	}
+	dprintf("total physical memory = %" B_PRId32 "MB\n", total / (1024 * 1024));
 
 #ifdef __ARM__
 	mmu_write_C1(mmu_read_C1() & ~((1<<29)|(1<<28)|(1<<0)));
