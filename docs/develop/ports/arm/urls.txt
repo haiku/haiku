@@ -1,3 +1,5 @@
 * FDT
+http://www.denx.de/wiki/U-Boot/UBootFdtInfo
+http://wiki.freebsd.org/FlattenedDeviceTree#Supporting_library_.28libfdt.29
 http://elinux.org/images/4/4e/Glikely-powerpc-porting-guide.pdf
 http://ols.fedoraproject.org/OLS/Reprints-2008/likely2-reprint.pdf
