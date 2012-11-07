@@ -401,10 +401,12 @@ function GetBuildFile()
 		echo "Fetching ${buildfile} ..."
 		cd ${baseDir}
 		local baseURL=http://cgit.haiku-os.org/haiku/plain
-		local revisionTag=`uname -v | awk '{print $1}' | sed -e 's/-.*//'`
-			# the sed invocation above drops potential dirty markers off the
-			# revision tag
-		local url="${baseURL}/build/jam/${buildfile}?id=${revisionTag}"
+		#local revisionTag=`uname -v | awk '{print $1}' | sed -e 's/-.*//'`
+		#	# the sed invocation above drops potential dirty markers off the
+		#	# revision tag
+		#local url="${baseURL}/build/jam/${buildfile}?id=${revisionTag}"
+		# PULL PACKAGES FROM R1A4 BRANCH! #9122
+		local url="${baseURL}/build/jam/${buildfile}?h=r1alpha4"
 		wget -q ${url} -O ${buildfile} \
 			|| ErrorExit "...failed to download $buildfile"
 	fi
