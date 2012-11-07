@@ -89,6 +89,9 @@ mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $tmpIncludeDir \
 	$tmpLibDir || exit 1
 mkdir -p $installDir/lib/gcc-lib/i586-pc-haiku/$haikuRequiredLegacyGCCVersion
 
+# force the POSIX locale, as the build (makeinfo) might choke otherwise
+export LC_ALL=POSIX
+
 # build binutils
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
