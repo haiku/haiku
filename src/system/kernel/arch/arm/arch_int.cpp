@@ -218,8 +218,6 @@ extern "C" void arch_arm_data_abort(struct iframe *frame)
 			cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
 
 			if (cpu->fault_handler != 0) {
-				kprintf("CPU fault handler set! %p %p\n",
-					(void*)cpu->fault_handler, (void*)cpu->fault_handler_stack_pointer);
 				debug_set_page_fault_info(far, frame->pc,
 					isWrite ? DEBUG_PAGE_FAULT_WRITE : 0);
 				frame->svc_sp = cpu->fault_handler_stack_pointer;
