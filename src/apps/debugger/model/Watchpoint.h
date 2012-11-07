@@ -6,6 +6,7 @@
 #define WATCHPOINT_H
 
 
+#include <ObjectList.h>
 #include <Referenceable.h>
 
 #include "types/Types.h"
@@ -47,6 +48,9 @@ private:
 			bool				fInstalled;
 			bool				fEnabled;
 };
+
+
+typedef BObjectList<Watchpoint> WatchpointList;
 
 
 #endif	// WATCHPOINT_H

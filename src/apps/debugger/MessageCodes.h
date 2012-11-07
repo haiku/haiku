@@ -29,6 +29,7 @@ enum {
 	MSG_IMAGE_FILE_CHANGED						= 'ifch',
 	MSG_FUNCTION_SOURCE_CODE_CHANGED			= 'fnsc',
 	MSG_USER_BREAKPOINT_CHANGED					= 'ubrc',
+	MSG_WATCHPOINT_CHANGED						= 'wapc',
 	MSG_DEBUGGER_EVENT							= 'dbge',
 	MSG_LOAD_SETTINGS							= 'ldst',
 

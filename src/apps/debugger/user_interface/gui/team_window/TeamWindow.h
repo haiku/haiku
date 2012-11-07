@@ -95,6 +95,15 @@ private:
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
 
+	virtual	void				WatchpointSelectionChanged(
+									Watchpoint* Watchpoint);
+	virtual	void				SetWatchpointEnabledRequested(
+									Watchpoint* breakpoint,
+									bool enabled);
+	virtual	void				ClearWatchpointRequested(
+									Watchpoint* watchpoint);
+
+
 	// SourceView::Listener
 	virtual	void				SetBreakpointRequested(target_addr_t address,
 									bool enabled);
@@ -116,6 +125,8 @@ private:
 									const Team::ImageEvent& event);
 	virtual	void				UserBreakpointChanged(
 									const Team::UserBreakpointEvent& event);
+	virtual	void				WatchpointChanged(
+									const Team::WatchpointEvent& event);
 
 	// Function::Listener
 	virtual	void				FunctionSourceCodeChanged(Function* function);
@@ -142,6 +153,8 @@ private:
 			void				_HandleSourceCodeChanged();
 			void				_HandleUserBreakpointChanged(
 									UserBreakpoint* breakpoint);
+			void				_HandleWatchpointChanged(
+									Watchpoint* watchpoint);
 			void				_HandleResolveMissingSourceFile(entry_ref&
 									locatedPath);
 
