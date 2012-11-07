@@ -66,7 +66,7 @@
 <p>A jobb oldalon az billentyűzetednek megfelelője látható. Minden billentyű leütésekor a fenti billentyűzeten is megjelenik az, és az adott karakter az alatta lévő <i>Próba és vágólap</i> mezőbe kerül. Innen pedig kimásolhatóak a vágólapra, majd onnan bárhová beilleszthetők.<br />
 A panel nem csupán a kiosztás beállítására használható, hanem a speciális karaktereket is könnyedén megtalálhatjuk a billentyűzeten. Például, ha "Francia" kiosztást választunk, akkor megkereshetjük a "ç" karaktert, majd egy levélbe másolhatjuk azt: François. (Ugyanakkor más kiosztásnál is megtalálhatjuk a "cedil" karaktert...)</p>
 <p>A módosító billentyűk leütésekor, mint például <span class="key">SHIFT</span>, <span class="key">CONTROL</span> vagy <span class="key">OPTION</span> a megjelenített billentyűzetet azonnal megváltoztatja.</p>
-<p>Ekkor kék színnel is jelennek meg billentyűk. Ezek a <i>Beragadó billentyűk</i>, ami módosíthatja a leütés után a billentyűt. Ha az egérrel kattintunk a kék billentyűn, akkor sárga színnek jelölve megjelennek a módosítható billentyűk. Újra kattintás után minden visszaáll normális kiosztásra. Például ilyen billentyűk az é, az ñ, az ó vagy az ë.</p>
+<p>Ekkor kék színnel is jelennek meg billentyűk. Ezek a <i>Beragadó billentyűk</i>, ami módosíthatja a leütés után a billentyűt. Ha az egérrel kattintunk a kék billentyűn, akkor sárga színnel jelölve megjelennek a módosítható billentyűk. Újra kattintás után minden visszaáll normális kiosztásra. Például ilyen billentyűk az é, az ñ, az ó vagy az ë.</p>
 <p>A billentyűzet alatt további két opció található:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Beragadó gombok kiválasztása</span></td><td> </td><td>A fennt említett kék billentyűk megadása.</td></tr>
@@ -82,13 +82,13 @@ Ha elkészültünk, akkor a <span class="menu">Fájl | Mentés...</span> menüve
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="advanced-keymapping" name="advanced-keymapping">Komolyabb kiosztás-módosítás</a></h2>
 <p>Van egy másik módja is a kiosztás személyre szabásának. Ekkor szöveges fájlként szerkeszthetjük a billentyűk hexadecimális kódjait.</p>
-<p>A jelenlegi kiosztást elmenthetjk az alábbi parancs segítségével a Teminálban:</p>
+<p>A jelenlegi kiosztást elmenthetjük az alábbi parancs segítségével a Teminálban:</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
 <p>Az elkészült szöveges fájl bármely szövegszerkesztőben megnyitható. Győződjünk meg arról, hogy rögzített betűtípust használunk, így biztosan nem fogjuk eltéveszteni a fájlban tárolt adatokat.<br />
 A fájl elején egy kis magyarázat található a stilizált billentyűzetre a hexadecimális értékekkel együtt. Ez alatt az aktuális társítások találhatóak minden értékhez. Ugyan azokat a módosításokat érhetjük el itt is, mint a beállítások panelen, talán még kicsit többet is. Ha a billentyűzetén néhány speciális szimbólum is található, akkor itt könnyen aktiválhatjuk azokat. Ezek egy külön billentyűként is vagy kombinációként is használhatóak. Arra azonban nincs lehetőség, hogy például a hangerőt növeljük vagy csökkentsük, illetve elindítsunk néhány programot. Erre használható például a <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">Parancsgombok</a> program.</p>
 <p>Miután végeztünk, elmenthetjük és betölthetjük a módosításokat a következő parancs kiadásával:</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
-<p>Hogy ezt a kiosztást betöltsük a Billentyűzetkioszts panelbe előtte bináris formátummá kell azt alakítani:</p>
+<p>Ahhoz, hogy ezt a kiosztást betöltsük a Billentyűzetkiosztás panelba, előtte bináris formátumúvá kell azt alakítani:</p>
 <pre class="terminal">keymap -c &lt; MyKeymap</pre>
 <p>Ennek eredményeként egy <span class="cli">keymap.out</span> nevű fájl készül, amit már betölthetünk a beállítások panel <span class="menu">Megnyitás...</span> menüben. Ugyanakkor a parancssorból is megtehető ez a lépés: <span class="cli">keymap -l &lt; keymap.out</span></p>
 <p>Ez egy példa a szöveges fájlra:</p>

@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		tiagoms
+ *		Francisco Dourado
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workspaces Applet</title>
+	<title>Miniaplicativo Workspaces</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -46,7 +47,7 @@
 </ul>
 <span>
  «  <a href="processcontroller.html">ProcessController</a> 
-::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
 </span></div>
 </div>
 
@@ -55,31 +56,31 @@
 <div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 <h1><img src="../../images/desktop-applets-images/workspaces-icon_64.png" alt="workspaces-icon_64.png" width="64" height="64" /><a name="applet" id="applet">Workspaces</a></h1>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Miniaplicativos da área de trabalho</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/Workspaces</span></td></tr>
 <tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/Workspaces_settings</span> - Stores the panel's window position.</td></tr>
+<span class="path">~/config/settings/Workspaces_settings</span> - Armazena a posição da janela do painel.</td></tr>
 </table>
 <p><br /></p>
 <img src="../images/workspaces-images/workspaces.png" alt="workspaces.png" />
-<p>You find the Workspaces applet with the other <span class="menu">Desktop applets</span> in the Deskbar. It shows a miniature version of all workspaces. There are several options available from the context menu of the applet's window, which are all pretty self-explaining.<br />
-<span class="menu">Change workspace count...</span> will open the <a href="../preferences/screen.html">Screen</a> preferences where you set the number of workspaces and their arrangement (how many rows and columns).</p>
+<p>Você vai encontrar o miniaplicativo Workspaces juntamente com outros nos <span class="menu">miniaplicativos da Área de Trabalho</span> no Deskbar. Ele mostra uma versão em miniatura de todos os espaços de trabalho. Existem várias opções disponíveis no menu de contexto da janela do aplicativo, são todas muito auto-explicativas.<br />
+<span class="menu">Mudando a quantidade de espaços de trabalho...</span> abrirá as preferências de <a href="../preferences/screen.html">Tela</a> onde você pode mudar o número dos espaços de trabalho e a forma como são arranjadas (quantas linhas e colunas).</p>
 <p>Since the applet is a <a href="../gui.html#replicants">Replicant</a>, you can resize the window as desired and then drag&amp;drop it by its handle onto the desktop (make sure <span class="menu">Show replicants</span> is activated in the Deskbar menu). Hold <span class="key">SHIFT</span> while resizing to keep your screen's aspect ratio.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="moving" name="moving">Moving windows between workspaces</a></h2>
-<p>To move a window, you grab it in the Workspaces applet and simply drag it to another workspace. This has the advantage, that you can move it without leaving your current desktop. Of course, that only works well when there aren't too many windows in a workspace and your target isn't obscured by other windows. Another possibility is to grab a window by its tab and just holding on to it while switching workspaces with <span class="key">ALT</span> <span class="key">Fx</span>.</p>
-<p>For more information on workspaces in general and more keyboard shortcuts, see topic <a href="../workspaces.html">Workspaces</a>.</p>
+<a id="moving" name="moving">Movendo-se pelos espaços de trabalho</a></h2>
+<p>Para mover uma janela, você simplesmente deve arrastá-la para outra área de trabalho virtual dentro do Workspaces.  A vantagem disso é que você não precisa sair da atual área de trabalho.  Claro que isso só funciona bem quando não há muitas janelas na área de trabalho e quando seu alvo não está sob outra janela.   Outra possibilidade é pegar a aba da janela e segurá-la enquanto se muda de área de trabalho clicando <span class="key">ALT</span> <span class="key">Fx</span>.</p>
+<p>Para mais informações  e mais atalhos de teclado sobre espaços de trabalho em geral,  leia o tópico <a href="../workspaces.html">Workspaces</a>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="special" name="special">Special functionality</a></h2>
-<p>The Workspaces applet provides some additional functionality when clicking on a window while holding certain modifier keys:</p>
+<a id="special" name="special">Funcionalidade especial</a></h2>
+<p>O Workspaces oferece algumas funcionalidades adicionais quando a gente clica numa janela segurando essas teclas:</p>
 <table summary="functionality-thru-modifiers" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">CTRL</span></td><td style="width:15px;"></td><td>Brings the window to the front.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">SHIFT</span></td><td></td><td>Minimizes the window.</td></tr>
-<tr><td><span class="key">OPT</span></td><td></td><td>Sends the window to the back.</td></tr>
+<tr><td><span class="key">CTRL</span></td><td style="width:15px;"></td><td>Traz a janela para o primeiro plano.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">SHIFT</span></td><td></td><td>Minimiza a janela.</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>Manda a janela pro plano de fundo.</td></tr>
 </table>
 
 </div>
@@ -88,7 +89,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="processcontroller.html">ProcessController</a> 
-::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="../desktop-applets.html" class="uplink">Miniaplicativos da Área de Trabalho</a> 
 </span></div>
 </div>
 

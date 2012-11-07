@@ -11,6 +11,8 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		tiagoms
+ *		Adriano Duarte
+ *		Francisco Dourado
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -48,7 +50,7 @@
 <span>
  «  <a href="workshop-filetypes+attributes.html">Oficina</a> 
 ::  <a href="contents.html" class="uplink">Conteúdo</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+::  <a href="desktop-applets.html">Miniaplicativos da Área de Trabalho</a>  »
 </span></div>
 </div>
 
@@ -58,22 +60,22 @@
 
 <h1>Aplicativos</h1>
 
-<p>Before diving into all the applications that come with Haiku, let's have a more detailed look at how to install and uninstall programs you downloaded somewhere, for example from a site mentioned on the <a href="../../welcome/welcome_pt_BR.html#software">Welcome</a> page.</p>
-<div class="box-info">You should only unpack/install archives within Haiku. If you extract a package under Linux or Windows, for example, and just copy the folder over to Haiku later, all the vital attributes are stripped, because those operating systems don't normally handle meta data.</div>
+<p>Antes de mergulharmos dentro de todos os aplicativos que vem com o Haiku, vamos dar uma olhada detalhada em como instalar e desinstalar programas que foram baixados de algum lugar, por exemplo de um sítio mencionado na página <a href="../../welcome/welcome_pt_BR.html#software">Boas Vindas</a>.</p>
+<div class="box-info">Deve-se descompactar/instalar arquivos somente dentro do Haiku. Se extrair um pacote no Linux ou Windows, por exemplo, e apenas copiar a pasta no Haiku depois, todos os atributos vitais são perdidos, porque aqueles sistemas operacionais normalmente não lidam com metadados.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="install" name="install">Instalando aplicativos</a></h2>
-<p>Haiku software always comes as an archive. Most of the time it's a ZIP, some old BeOS packages come in Software Valet's PKG format. Software Valet was able to automatically execute installation scripts, so after double-clicking you just select a destination folder and everything's taken care of.<br />
-If it's a ZIP archive, double-clicking opens <span class="app">Expander</span> where you also set the destination and unpack it. As explained in the topic <a href="filesystem-layout.html">Filesystem layout</a>, that destination is either</p>
+<p>Software do Haiku sempre vem como um conjunto de arquivos. Na maior parte do tempo é um ZIP, alguns antigos pacotes BeOS vem em formato de software personalizado PKG. O software personalizado era capaz de automaticamente executar scripts de instalação, então após um duplo clique apenas se escolhia a pasta de destino e tudo era feito.<br />
+Se for um arquivo ZIP, duplo clique abre o <span class="app">Expansor</span> onde também se define o destino e o descompacta. Como explicado no tópico <a href="filesystem-layout.html">Disposição do sistema de arquivos</a>, aquele destino ou é</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td> for applications available to every user</td></tr>
-<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td> for applications only available to yourself</td></tr>
+<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>para aplicativos disponíveis para todos os usuários</td></tr>
+<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>para aplicativos disponíveis apenas para si mesmo</td></tr>
 </table>
-<p>This distinction will only become relevant once Haiku gets multi-user support, of course.</p>
-<p>Once the archive is unpacked, you should have a look into the newly created folder. Often you find ReadMe files or other documentation of interest.</p>
-<p>Some programs need further configurations. For example, <a href="tracker-add-ons.html">Tracker Add-Ons</a>, <a href="preferences/datatranslations.html">Translators</a> or other system enhancing components have to be put into the right folders. Either you'll find a little script file (often with the suffix <span class="cli">.sh</span>) like <span class="cli">install</span> that you simply double click to have all taken care of.<br />
-Sometimes you'll find folders that link to the correct destination named "<span class="cli">drag [filename] here...</span>". So, you simply follow that instruction and you're done.</p>
+<p>Naturalmente, esta distinção se tornará relevante apenas quando o Haiku tiver suporte a multiusuário.</p>
+<p>Uma vez que o arquivo é descompactado, deverá dar uma olhada dentrp da pasta recém-criada. Geralmente encontramos arquivos LeiaMe ou outra documentação de interesse.</p>
+<p>Alguns programas necessitam de configurações adicionais. Por exemplo, <a href="tracker-add-ons.html">Adicionais do Rastreador</a>, <a href="preferences/datatranslations.html">Tradutores</a> ou outros componentes de aprimoramento do sistema tem que ser postos nas pastas certas. Ou encontrar um pequeno arquivo de script (frequentemente com o suxifo <span class="cli">.sh</span>) como <span class="cli">instalar</span> que basta um duplo clique para fazer tudo.<br />
+Algumas vezes encontramos pastas que vinculam para o destino correto denominado "<span class="cli">arraste [nome do arquivo] aqui...</span>". Então, simplesmente siga aquela instrução e estará feito.</p>
 <p>Most of the time, however, nothing of the sort is necessary and you're done after unpacking.<br />
 Topics <a href="deskbar.html">Deskbar</a> or <a href="desktop-applets/launchbox.html">LaunchBox</a> describe how to add shortcuts to your newly installed application.</p>
 
@@ -95,7 +97,7 @@ Otherwise, uninstalling is simply done by deleting the application's folder.</p>
 	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">BootManager</a></td><td> </td>
 		<td valign="top">A tool to install a boot menu in the Master Boot Record (MBR) of a drive.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CDPlayer</a></td><td> </td>
-		<td valign="top">Um reprodutor de CDs de audio.</td></tr>
+		<td valign="top">Um reprodutor de CDs de áudio.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">CharacterMap</a></td><td> </td>
 		<td valign="top">An application that shows the Unicode character map.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>
@@ -111,9 +113,9 @@ Otherwise, uninstalling is simply done by deleting the application's folder.</p>
 	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Expander</a></td><td> </td>
 		<td valign="top">A tool to unpack common archives.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
-		<td valign="top">An app to create Haiku's vector icons.</td></tr>
+		<td valign="top">Um aplicativo pra criar ícones vetorias do Haiku.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Installer</a></td><td> </td>
-		<td valign="top">The tool to install Haiku to a partition.</td></tr>
+		<td valign="top">Ferramenta para instalar o Haiku numa partição.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Magnify</a></td><td> </td>
 		<td valign="top">A magnified view of the area around your mouse pointer.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
@@ -121,27 +123,27 @@ Otherwise, uninstalling is simply done by deleting the application's folder.</p>
 	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
 		<td valign="top">A player for all supported audio/video files.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
-		<td valign="top">A player for MIDI files.</td></tr>
+		<td valign="top">Um player pra arquivos MIDI.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">PackageInstaller</a></td><td> </td>
-		<td valign="top">Installer for BeOS packages in PKG format.</td></tr>
+		<td valign="top">Instalador de pacotes do BeOS no formato PKG.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">People</a></td><td> </td>
 		<td valign="top">Um gerenciador de contatos.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">PoorMan</a></td><td> </td>
 		<td valign="top">Um servidor web simples.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
-		<td valign="top">A tool to take screenshots.</td></tr>
+		<td valign="top">Uma ferramenta para gerar capturas de tela.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
 		<td valign="top">Um visualizador de imagens simples.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
-		<td valign="top"><span style="color:silver">A tool to record audio from line-in or a microphone. [<i>still missing</i>]</span></td></tr>
+		<td valign="top"><span style="color:silver">A tool to record audio from line-in or a microphone. [<i>ainda está faltando</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
 		<td valign="top">Um editor de texto simples.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Terminal</a></td><td> </td>
-		<td valign="top">Access to the bash.</td></tr>
+		<td valign="top">Acesso ao bash.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/textsearch-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/textsearch.html">TextSearch</a></td><td> </td>
-		<td valign="top">A search tool for text files.</td></tr>
+		<td valign="top">Uma ferramenta de busca para arquivos de texto.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">TV</a></td><td> </td>
-		<td valign="top"><span style="color:silver">A viewer for analog TV. [<i>still missing</i>]</span></td></tr>
+		<td valign="top"><span style="color:silver">Visualisador para TV analógica.  [<i>ainda está faltando</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/webpositive-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/webpositive.html">WebPositive</a></td><td> </td>
 		<td valign="top">Um navegador web nativo.</td></tr>
 </table>
@@ -181,7 +183,7 @@ Otherwise, uninstalling is simply done by deleting the application's folder.</p>
 <div class="inner"><span>
  «  <a href="workshop-filetypes+attributes.html">Oficina</a> 
 ::  <a href="contents.html" class="uplink">Conteúdo</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+::  <a href="desktop-applets.html">Miniaplicativos da Área de Trabalho</a>  »
 </span></div>
 </div>
 

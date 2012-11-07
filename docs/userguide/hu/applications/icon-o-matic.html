@@ -163,17 +163,17 @@ A kijelölt pontok a <span class="key">DEL</span> lenyomásával törölhetőek 
 <p>Egy pont (vagy kijelölt pontok) helyi menüjében a következőket találjuk:</p>
 <table summary="Path context" border="0" cellspacing="0" cellpadding="2">
 <tr><td class="onelinetop"><span class="menu">Mind kijelölése</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>A jelenlegi útvonal összes pontjának kijelölése. (A vászonon kattintva.)</td></tr>
-<tr><td><span class="menu">Átalakítás</span></td><td><span class="key">T</span></td><td>Az (összes kijelölt) pontot egy átalakító dobozva teszi, így azok egyszerre mozgathatóak, méretezhetőek és forgathatóak. Átalakítás után az <span class="key">ENTER</span> leütésével befejezhetjük a műveletet. Ez épp úgy működik, mint az alakzatok esetében, amiről a későbbiekben lesz szó.</td></tr>
+<tr><td><span class="menu">Átalakítás</span></td><td><span class="key">T</span></td><td>Az (összes kijelölt) pontot egy átalakító dobozba teszi, így azok egyszerre mozgathatóak, méretezhetőek és forgathatóak. Átalakítás után az <span class="key">ENTER</span> leütésével befejezhetjük a műveletet. Ez épp úgy működik, mint az alakzatok esetében, amiről a későbbiekben lesz szó.</td></tr>
 <tr><td><span class="menu">Szétvágás</span></td><td></td><td>A kijelölt pontból kettőt csinál, amik egymáson helyezkednek majd el a vágás után.</td></tr>
 <tr><td><span class="menu">Tükrözés</span></td><td></td><td>A kijelölt pontok elforgatása 180°-al. Ez csak az íves pontokon használható.</td></tr>
 <tr><td><span class="menu">Eltávolítás</span></td><td><span class="key">DEL</span></td><td>A kijelölt pont eltávolítása.</td></tr>
 </table>
 
 <h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Útvonal menü</a></h4>
-<p>Az <span class="menu">Útvonal</span> menü tartalmaz néhány nyilvánvaló bejegyzést, mint a<span class="menu">Téglalap hozzáadása</span>, a <span class="menu">Kör hozzáadása</span>, a <span class="menu">Megkettőzés</span> vagy az <span class="menu">Eltávolítás</span>. Ezekhez viszont némi magyarázat szükséges:</p>
+<p>Az <span class="menu">Útvonal</span> menü tartalmaz néhány nyilvánvaló bejegyzést, mint a <span class="menu">Téglalap hozzáadása</span>, <span class="menu">Kör hozzáadása</span>, <span class="menu">Megkettőzés</span> vagy <span class="menu">Eltávolítás</span>. Ezekhez viszont némi magyarázat szükséges:</p>
 
 <table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Megfordítás</span></td><td style="width:15px;"></td><td>Ha az útvonal nem "zárt" (lásd alább), a vászonon kattintáskor minden esetben egy új pont jön létre a legutóbbihoz kapcsolva. A "Megfordítás" ezzel szembem az első ponthoz kapcsolja az újat.</td></tr>
+<tr><td><span class="menu">Megfordítás</span></td><td style="width:15px;"></td><td>Ha az útvonal nem "zárt" (lásd alább), a vászonon kattintáskor minden esetben egy új pont jön létre a legutóbbihoz kapcsolva. A "Megfordítás" ezzel szemben az első ponthoz kapcsolja az újat.</td></tr>
 <tr><td><span class="menu">Tisztítás</span></td><td></td><td>Ez hasznos megnyitott SVG képek esetén a felesleges pontok törléséhez.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Forgatás jobbra</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Az útvonal forgatása. Ez akkor látványos, ha nem zárt útvonalat forgatunk. Tehát, ha az útvonal így néz ki: ⊂, akkor a következőképpen fog fordulni: ⊂ ∩ ⊃ ∪.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Forgatás balra</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Ugyan az, mint a másik, csak az ellenkező irányba.</td></tr>
@@ -316,7 +316,7 @@ Természetesen, ezek a színek tetszés szerint mozgathatóak is. További szín
 <a id="i-o-m-tips" name="i-o-m-tips">Tippek és trükkök</a></h3>
 <p>Néhány dolgot észbe kell tartani a program használatakor, illetve akad néhány jó ötlet is a használathoz:</p>
 <ul>
-<li><p>Az <a href="http://svn.haiku-os.org/haiku/haiku/trunk/docs/icon_guidelines/index.html">Icon Guidelines</a> (leírás az ikonokhoz) tartalmazza a Haiku alatt használt ikonok karakterisztikáját, mint például a színeket, vagy az árnyékokat.</p></li>
+<li><p>Az <a href="http://www.haiku-os.org/development/icon-guidelines/">Icon Guidelines</a> (leírás az ikonokhoz) tartalmazza a Haiku alatt használt ikonok karakterisztikáját, mint például a színeket, vagy az árnyékokat.</p></li>
 <li><p>Próbáljuk meg minimalizálni a használt útvonalak számát, ugyanis ezek befolyásolják a fájl méretét. Ha lehet, használjuk újra az útvonalakat és inkább használjunk módosított alakzatokat azok átalakítása helyet. Az átmenetek okos használatával szintén takaríthatunk meg helyet.</p></li>
 <li><p>Ha csak lehetséges, használjuk a Rácshoz illesztést a <span class="menu">Beállítások</span> menüből az útvonalak szerkesztésekor. Ha az útvonal pontjai a 64x64-es rácshoz illeszkednek, akkor azzal a méret csökkenthető. Akkor is jobb megjelenést kapunk, ha a pontokat a képpontok határához igazítjuk. Például fontos, hogy a jelentősebb körvonalakat egymáshoz igazítsuk a 16x16-os rácshoz.</p></li>
 <li><p>Ellenőrizzük le az előnézeti mezőben, hogy helyesen jelenik-e meg az ikon 16x16-os méretben. Ajánlott a <a href="#i-o-m-shape-lod">Részletességi szint</a> használata, amiről az Alakzat részben volt szó.</p></li>

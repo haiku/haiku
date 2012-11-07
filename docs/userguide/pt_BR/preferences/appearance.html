@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		tiagoms
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Appearance</title>
+	<title>Aparência</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -46,15 +47,14 @@
 </ul>
 <span>
     <a href="../preferences.html" class="uplink">Preferências</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+::  <a href="backgrounds.html">Papel de Parede</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
-<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Appearance</h2>
+<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Aparência</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferências</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
@@ -68,62 +68,62 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="fonts" name="fonts">Fontes</a></h2>
 <img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
-<p>Haiku defines three standard fonts for different purposes. You set plain, bold and fixed font types and sizes that will be used throughout the system. Besides these, there's also a separate setting for the font used in menus.</p>
+<p>O Haiku define três fontes padrão para diferentes propósitos. Pode-se definir tipos de fontes planas, negrito e fixas e tamanhos que serão utilizados em todo o sistema. Além disso, existe também uma definição separada para aos fontes usadas nos menus.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">Instalando novas fontes</a></h3>
-<p>You install new fonts by copying them into their respective user folder, i.e. <span class="path">/boot/common/data/fonts/</span> or <span class="path">/boot/home/config/data/fonts/</span> (see topic <a href="../filesystem-layout.html">Filesystem layout</a>).</p>
+<p>Instale novas fontes copiando-as para dentro de suas respectivas pastas de usuário, ou seja <span class="path">/boot/common/data/fonts/</span> ou <span class="path">/boot/home/config/data/fonts/</span> (veja o tópico <a href="../filesystem-layout.html">Disposição do sistema de arquivos</a>).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Cores</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>In the <span class="menu">Colors</span> tab, you can change the colors of different parts of the user interface. The color well accepts drag&amp;drops from other programs, letting you drag colors over from e.g. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> or the <span class="app">Backgrounds</span> panel.</p>
+<p>Na guia <span class="menu">Cores</span>, pode-se mudar as cores de diferentes partes da interface de usuário. A cor aceita arrastar e soltar de outros programas, permitindo arrastar cores, por exemplo, do <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> ou da caixa de diálogo do <span class="app">Papel de Parede</span>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="decorators" name="decorators">Decoração de janelas</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>Decorators determine the look and feel of windows and all GUI elements. Currently Haiku comes with only one default decorator. Should you find and install other decorators, you can choose a different one from the pop-up menu.</p>
+<p>Decoração determina a aparência de janelas e todos os elementos da interface de usuário. Atualmente o Haiku vem com apenas uma decoração padrão. Se localizar e instalar outras decorações, pode-se escolher um diferente a partir do menu pop-up.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="antialiasing" name="antialiasing">Antialiasing</a></h2>
+<a id="antialiasing" name="antialiasing">Antisserrilhamento</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>The tab <span class="menu">Antialiasing</span> provides different settings for how things are rendered on screen.</p>
+<p>A guia <span class="menu">Antisserrilhamento</span> oferece diferentes definições sobre como as coisas são renderizadas na tela.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Glyph hinting</h3>
-<p>An activated <span class="menu">Glyph hinting</span> aligns all letters in such a way that their vertical and horizontal edges rest exactly between two pixels. The result is a perfect contrast, especially when dealing with black on white. Text appears crisper. There's also a setting for <span class="menu">Monospaced fonts only</span> that's especially helpful with low resolution devices like netbooks. Small fonts can look pretty bad when hinting is turned on, but with this setting you still have the advantage of hinting for text editors and Terminal.</p>
-<p>See the difference hinting makes with these magnified screenshots:</p>
+Sugestão de glifo</h3>
+<p>Uma <span class="menu">Sugestão de glifo</span> ativada alinha todas as letras de tal modo que suas bordas verticais e horizontais fiquem exatamente entre dois pixels. O resultado é um contraste perfeito, especialmente ao lidar com preto sobre branco. O texto aparece mais nítido. Existe também uma definição para <span class="menu">Apenas fontes monoespaçadas</span> que é especialmente útil em dispositivos com baixa resolução como netbooks. Fontes pequenas podem ficar muito ruins quando a alusão está ligada, mas com esta definição ainda terá a vantagem da alusão para editores de texto e o Terminal.</p>
+<p>Veja a diferença que a alusão produz com estas telas ampliadas:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting: on</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Sugestão: desligada</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Sugestão: ligada</td></tr>
 </table>
-<p>It should be pointed out that all the <span class="app">Magnify</span> windows on this page are of course rendered themselves with the different options as well. So, you get a real world impression of the settings by comparing, for example, the bold yellow tab title or the text "33 x 15 @ 8 pixels/pixel".</p>
+<p>Deve-se salientar que todas as janelas de <span class="app">Ampliação</span> nesta página são naturalmente processadas com as diferentes opções apresentadas. Então, tenha uma impressão real das definições pela comparação, por exemplo, com o título em negrito da guia amarela ou o texto "33 x 15 @ 8 pixels/pixel".</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Antialiasing type</h3>
-<p>Another technique to improve rendering is <i>Antialiasing</i>, which supports all vector graphics as well as text. It smooths lines by changing the color of certain pixels. There are two methods for that:</p>
-<p><span class="menu">Grayscale</span> changes the intensity of pixels at the edge.<br />
-<span class="menu">LCD subpixel</span> does an even better job, especially with (high resolution) LCD monitors. Instead of the intensity of a pixel, it changes its color which moves an edge by a fraction of a pixel, because LCD displays produce every pixel with a red, green and blue component.</p>
-<p>Again, the two different methods with magnified screenshots:</p>
+Tipo de antisserrilhamento</h3>
+<p>Outra técnica para melhorar a renderização é o <i>Antisserrilhamento</i>, que suporta todos os gráficos vetoriais assim como texto. Ele suaviza as linhas pela mudança de cor de certos pixels. Existem dois métodos para isso:</p>
+<p><span class="menu">Escala de cinza</span> muda a intensidade dos pixels nas bordas.<br />
+<span class="menu">Subpixel LCD</span> faz um trabalho ainda melhor, especialmente com monitores LCD (alta resolução). Ao invés da intensidade de um pixel, Ele muda sua cor, o que move uma borda por uma fração de um pixel, porque telas LCD produzem cada pixel com um componente vermelho, verde e azul.</p>
+<p>Novamente, os dois diferentes métodos com telas ampliadas:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Grayscale, Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, Hinting: off</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Escala de cinza, Sugestão: desligada</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />Subpixel LCD, Sugestão: desligada</td></tr>
 </table>
-<p>Subpixel based antialiasing adds a slight colored shine to objects. Something not everyone tolerates. In Haiku you can mix the two antialiasing methods and find the right setting for you by using a slider.</p>
-<div class="box-info">The subpixel based antialiasing in combination with the glyph hinting is subject of a software patent and is therefore not available by default. Depending on where in the world you live, you may get an unlocked version. Sorry about that. Talk with your representative.</div>
-<p>If you do activate hinting plus LCD subpixel rendering by changing the source and recompiling, this is how it looks compared to hinting with Grayscale:</p>
+<p>Antisserrilhamento baseado em subpixel adiciona um suave brilho colorido aos objetos. Algo não tolerado por todos. No Haiku pode-se misturar os dois métodos de antisserrilhamento e encontrar a definição certa pelo uso de um botão deslizante.</p>
+<div class="box-info">O antisserrilhamento baseado em subpixel em combinação com a sugestão de glifo é objeto de uma patente de software e, por isso, não é disponível por padrão. A depender de em qual parte do mundo resida, poderá ter uma versão desbloqueada. Desculpe-nos por isso. Converse com seu representante.</div>
+<p>Se ativar a sugestão mais a renderização por subpixel LCD pela mudança da fonte e recompilar, esta é a aparência comparada com a sugestão com Escala de cinza:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Grayscale, Hinting: on</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD subpixel, Hinting: on</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Escala de cinza, Sugestão: ligada</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />Subpixel LCD, Sugestão: ligada</td></tr>
 </table>
 <p><br /></p>
-<p>At the bottom of the panel are two buttons:</p>
+<p>Na base da caixa de diálogo estão dois botões:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Appearance preferences.</td></tr>
+<tr><td><span class="button">Padrão</span></td><td> </td><td>redefine tudo para os valores padrão.</td></tr>
+<tr><td><span class="button">Reverter</span></td><td> </td><td>traz de volta as definições que estavam ativas quando iniciou as preferências da Aparência.</td></tr>
 </table>
 
 </div>
@@ -132,7 +132,7 @@ Antialiasing type</h3>
 <div class="nav">
 <div class="inner"><span>
     <a href="../preferences.html" class="uplink">Preferências</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+::  <a href="backgrounds.html">Papel de Parede</a>  »
 </span></div>
 </div>
 

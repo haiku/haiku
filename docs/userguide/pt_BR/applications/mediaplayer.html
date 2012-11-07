@@ -10,12 +10,14 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  *		Szymon Barczak (Google Code-In student)
+ * Translators:
+ *		Adriano Duarte
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>MediaPlayer</title>
+	<title>Tocador de Mídia</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -54,30 +56,30 @@
 <div>
 <div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
-<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />MediaPlayer</h2>
+<h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />Tocador de Mídia</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/MediaPlayer</span></td></tr>
 <tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>MediaPlayer is the default player for all audio and video files. Thanks to it's <a href="http://www.ffmpeg.org/">ffmpeg</a> backend, a plethora of widely used formats are supported. Its simple interface has all the controls you'd expect:</p>
+<p>O Tocador de Mídia é o tocador padrão para todos os arquivos de áudio e vídeo. Graças ao seu backend <a href="http://www.ffmpeg.org/">ffmpeg</a>, um grande número de formatos amplamente utilizados são suportados. Sua interface simples possui todos os controles esperados:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
-<p>The slider of the progress bar allows you to quickly skim to a position, resting the mouse over it shows the current and remaining time of the clip. Clicking on the time display to the right of it, toggles between length, current and remaining time.<br />
-Below that you find the usual controls to skip to the previous track, play/pause, stop and jump to the next track. Then comes a volume control (clicking the speaker symbol toggles muting) and a VU meter.</p>
+<p>A botão deslizante da barra de progresso permite rapidamente mover a uma posição, deixar o mouse sobre ele mostra o tempo atual e restante do clipe. Clicando na exibição de tempo à direita dele, alterna entre tempo total, atual e restante.<br />
+Abaixo encontram-se os controles usuais para pular para a faixa anterior, tocar/pausar, parar e saltar para a próxima faixa. Então segue o controle de volume (clicando no símbolo do alto-falante alterna para mudo) e um indicador  VU.</p>
 
-<h2>Audio and video playback</h2>
-<p>Since there aren't any specific features for for audio playback, we'll go straight to video or general features.</p>
+<h2>Reprodução de áudio e vídeo</h2>
+<p>Uma vez que não existem quaisquer funcionalidades específicas para reprodução de áudio, iremos direto para as funcionalidades de vídeo ou gerais.</p>
 <img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
-<p>Available to all media is the <span class="menu">File info...</span> (<span class="key">ALT</span> <span class="key">I</span>). It shows information about the currently loaded file, like playing time or details of the audio/video track and its codec.</p>
-<p>Most of the often used commands from the menus are also available from a right-click context menu on the video area. Convenient when in full-screen mode.<br />
-Under <span class="menu">Video</span> you'll find options to zoom the window to various levels or force the aspect ratio to some standard values. Leaving the aspect ration to the default <span class="menu">Stream settings</span> should work best for correctly encoded files.</p>
-<p>MediaPlayer supports subtitles in <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> format. To have them show up under <span class="menu">Subtitles</span>, their filenames have to be identical to their video file, with a suffixed language name and ".srt" instead of the video's extension. For example:</p>
-<pre>MyMovie.avi
-MyMovie.Deutsch.srt
-MyMovie.English.srt
-MyMovie.Français.srt</pre>
-<p>Multiple audio tracks, most often used for several languages inside one video file, are available from the <span class="menu">Audio track</span> submenu. The <span class="menu">Video | Track</span> submenu offers the same when having multiple video streams available.</p>
+<p>Disponível para todas as mídias está a <span class="menu">Informação de arquivo...</span> (<span class="key">ALT</span> <span class="key">I</span>). Ela exibe informações sobre o arquivo atualmente carregado, como tempo de exibição ou detalhes da faixa de áudio/vídeo e seu codec.</p>
+<p>A maioria dos comandos frequentemente utilizados dos menus estão também disponíveis a partir do menu de contexto, com clique no botão direito do mouse, na área do vídeo. Útil quando em modo de tela cheia.<br />
+Em <span class="menu">Vídeo</span> podemos encontrar opções para ampliar a janela em vários níveis ou forçar a taxa de aspecto para alguns valores padrão. Deixando a taxa de aspecto para as <span class="menu">Definições de fluxo</span> padrão, deverá trabalhar melhor para os arquivos corretamente codificados.</p>
+<p>O Tocador de Mídia suporta legendas em formato <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a>. Para tê-las exibidas sob o menu <span class="menu">Legendas</span>, seus nomes de arquivos tem que ser idênticos ao de seus arquivos de vídeo, com um nome de idioma sufixado e a extensão ".srt" ao invés da extensão do vídeo. Por exemplo:</p>
+<pre>MeuFilme.avi
+MeuFilme.Alemao.srt
+MeuFilme.Ingles.srt
+MeuFilme.Frances.srt</pre>
+<p>Faixas de áudio múltiplas, muito frequentemente utilizadas por vários idiomas dentro de um único arquivo de vídeo, estão disoníveis a partir do submenu <span class="menu">Faixa de áudio</span>. O submernu <span class="menu">Vídeo | Faixa</span> oferece o mesmo quando existem múltiplas transmissões de vpideo disponíveis.</p>
 <p>You can toggle the <span class="menu">Full screen</span> mode (<span class="key">ALT</span> <span class="key">ENTER</span> or <span class="key">F</span> or a double left-click), hide MediaPlayer's window borders and controls with <span class="menu">Hide interface</span> (<span class="key">ALT</span> <span class="key">H</span> or a double right-click) or have it's window <span class="menu">Always on top</span> (<span class="key">ALT</span> <span class="key">A</span>).</p>
 
 <h2>Playlists</h2>

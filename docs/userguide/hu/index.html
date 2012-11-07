@@ -56,12 +56,12 @@
 
 <h1>Index</h1>
 
-<p>A <a href="attributes.html">Jellemzők</a> és a <a href="queries.html">Lekérdezések</a> kulcsfontosságú részei a Haiku-nak. Míg a jellemzők magukban is hasznosak, a fájl kiegészítő információit jelenítik meg, kereséshez (lekérdezéshez) azonban már inxedekelni kell őket. Az indexek a jellemzőket egy kereső táblába rakják, ami a keresést nagyon gyorsá teszi.<br />
+<p>A <a href="attributes.html">Jellemzők</a> és a <a href="queries.html">Lekérdezések</a> kulcsfontosságú részei a Haiku-nak. Míg a jellemzők magukban is hasznosak, a fájl kiegészítő információit jelenítik meg, kereséshez (lekérdezéshez) azonban már indexelni kell őket. Az indexek a jellemzőket egy kereső táblába rakják, ami a keresést nagyon gyorsá teszi.<br />
 Az index a fájlrendszer részét képezi, és minden lemezen/partíción elkülönítve van tárolva.</p>
 
 <h2>
 Indexel kapcsolatos parancsok a Terminálban</h2> 
-<p>Több parancs is rendelkezésünkre áll az indexek kezelsére:</p>
+<p>Több parancs is rendelkezésünkre áll az indexek kezelésére:</p>
 <ul> 
 <li><b>lsindex</b> - Megjeleníti az aktuális lemezen lévő indexelt jellemzőket.<br />
 Alap esetben ezek a jellemzőket indexeli a rendszer:</li>
@@ -107,7 +107,7 @@ name
 size 
 </pre>
 <ul>
-<li><b>mkindex</b> - Új jellemő hozzáadása az indexhez a lemezen. </li>
+<li><b>mkindex</b> - Új jellemző hozzáadása az indexhez a lemezen. </li>
 </ul>
 <pre>használat: mkindex [opciók] &lt;jellemző&gt; 
 Új index létrehozása a megadott jellemzőhöz. 
@@ -121,7 +121,7 @@ size
   -v, --verbose         a létrehozás folyamata közbeni információk megjelenítése 
 
 </pre>
-<p>Csak az <b>új</b> fájl (azokkal a jellemzőkkel) kerülnek bele az indexbe!<br />
+<p>Csak az <b>új</b> fájlok (azokkal a jellemzőkkel) kerülnek bele az indexbe!<br />
 Már létező fájlokat kézzel kell hozzáadni úgy, hogy átmásoljuk majd töröljük utána az eredetit. Alternatív megoldásként használhatjuk a <span class="cli">reindex</span> parancsot is. 
 </p>
 <ul>
@@ -149,7 +149,7 @@ a rendszer már nem fogja tudni megkeresni a fájlokat az INDEX_NEVE nevű jelle
  
 Az INDEX_NEVE egy fájl jellemzőjének a neve. 
  
-Ha nicns lemez megadva, akkor a jelenlegi lemez lesz használva.</pre>
+Ha nincs lemez megadva, akkor a jelenlegi lemez lesz használva.</pre>
 
 </div>
 </div>

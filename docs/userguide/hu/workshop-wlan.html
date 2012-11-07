@@ -69,14 +69,14 @@
 <h1>Műhely: vezeték nélküli hálózat</h1>
 
 <p>Manapság az internet mindennapi szükségletünkké vált. A hálózati eszközök sokfélesége miatt az azokhoz tartozó vezérlők frissen tartsása szinte lehetetlen ilyen kis project esetében, mint a Haiku, ami a <a href="http://www.freebsd.org">FreeBSD</a> kompatibilis hálózati struktúrát használja a vezérlőkhöz.<br />
-Bár ez a módszer biztosítja az eszközök jelentős részének a használatát, azonban sajnos nem az összes jelenleg is elérhetőt. Egy <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">interneten megtalálható listában</a> ellenőrizhetjük, hogy melyek a jelenleg használható eszközök, illetve vessünk egy pillantást a <a href="http://www.freebsd.org/releases/9.0R/hardware.html#WLAN">FreeBSD 9's release hardware notes</a> oldálra is.</p>
+Bár ez a módszer biztosítja az eszközök jelentős részének a használatát, azonban sajnos nem az összes jelenleg is elérhetőt. Egy <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">interneten megtalálható listában</a> ellenőrizhetjük, hogy melyek a jelenleg használható eszközök, illetve vessünk egy pillantást a <a href="http://www.freebsd.org/releases/9.0R/hardware.html#WLAN">FreeBSD 9's release hardware notes</a> oldalára is.</p>
 <div class="box-info">Jelenleg csak a PCI, PCI-X, PCI-Express, Mini PCI, és a Mini PCI-Express eszközök működhetnek.<br />
 A PCMCIA, a CardBus, az ExpressCard, az USB és az ISA esetében további fejlesztésekre van szükség.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="firmware" name="firmware">Használható eszköz működére bírása</a></h2>
-<p>Még ha az első akadályt le is küzdöttük (használható eszközünk van), akkor is adódhatnak problémák a vezeték nélküli eszközökkel kapcsolatban, ugyanis azokhoz szükség van bináris, eszköz-vezértlő fájlokra (firmware) is. A Haiku nem tartalmazhat néhány ilyen fájlt, ugyanis jogi akadája van. Ugyanakkor, a Haiku tartalmaz egy szkriptet, amivel telölthetjük a szükséges fájlokat.
+<p>Még ha az első akadályt le is küzdöttük (használható eszközünk van), akkor is adódhatnak problémák a vezeték nélküli eszközökkel kapcsolatban, ugyanis azokhoz szükség van bináris, eszköz-vezértlő fájlokra (firmware) is. A Haiku nem tartalmazhat néhány ilyen fájlt, ugyanis jogi akadája van. Ugyanakkor, a Haiku tartalmaz egy szkriptet, amivel letölthetjük a szükséges fájlokat.
 Tehát, ha vezeték nélküli hálózatot akarsz használni, akkor elsőként ajánlott ezt a szkriptet használni, hogy meglegyen minden szükséges fájl.</p>
 <p>Ehhez a következő parancsot kell kiadni a Terminálban:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
@@ -113,7 +113,7 @@ A parancs eredményeként megkapjuk a nyilvános hálózatok neveit (SSID), az e
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">Tippek</a></h2>
-<ul><li><p>Ha nem rendelkezünk a Haiku alatt működő internetkapcsolattal, és nem tudjuk letölteni a vezeték nélküli hálózathoz szükséges "formware"-eket, akkor itt van néhány hasznos informcáió. Ezek a fájlok más operációs rendszer alatt is letölthetőek, majd a Haiku-t elindítva azokat a megfelelő helyre kell másolni, majd elindítani a <span class="cli">install-wifi-firmwares.sh</span> szkriptet.</p>
+<ul><li><p>Ha nem rendelkezünk a Haiku alatt működő internetkapcsolattal, és nem tudjuk letölteni a vezeték nélküli hálózathoz szükséges "firmware"-eket, akkor itt van néhány hasznos információ. Ezek a fájlok más operációs rendszer alatt is letölthetőek, majd a Haiku-t elindítva azokat a megfelelő helyre kell másolni, majd elindítani a <span class="cli">install-wifi-firmwares.sh</span> szkriptet.</p>
 
 <ul>
 <li><p>Ezt a két fájlt a <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/</span> mappába kell másolni:<br />
