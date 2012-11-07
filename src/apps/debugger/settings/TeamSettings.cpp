@@ -119,6 +119,24 @@ TeamSettings::SetTo(const BMessage& archive)
 		}
 	}
 
+	// add watchpoints
+	for (int32 i = 0; archive.FindMessage("watchpoints", i, &childArchive)
+			== B_OK; i++) {
+		WatchpointSetting* watchpointSetting
+			= new(std::nothrow) WatchpointSetting;
+		if (watchpointSetting == NULL)
+			return B_NO_MEMORY;
+
+		error = watchpointSetting->SetTo(childArchive);
+		if (error == B_OK && !fWatchpoints.AddItem(watchpointSetting))
+			error = B_NO_MEMORY;
+		if (error != B_OK) {
+			delete watchpointSetting;
+			return error;
+		}
+	}
+
+
 	// add UI settings
 	for (int32 i = 0; archive.FindMessage("uisettings", i, &childArchive)
 		== B_OK; i++) {
@@ -151,6 +169,17 @@ TeamSettings::WriteTo(BMessage& archive) const
 			return error;
 
 		error = archive.AddMessage("breakpoints", &childArchive);
+		if (error != B_OK)
+			return error;
+	}
+
+	for (int32 i = 0; WatchpointSetting* watchpoint = fWatchpoints.ItemAt(i);
+			i++) {
+		error = watchpoint->WriteTo(childArchive);
+		if (error != B_OK)
+			return error;
+
+		error = archive.AddMessage("watchpoints", &childArchive);
 		if (error != B_OK)
 			return error;
 	}
@@ -255,6 +284,16 @@ TeamSettings::operator=(const TeamSettings& other)
 		}
 	}
 
+	for (int32 i = 0; WatchpointSetting* watchpoint
+			= other.fWatchpoints.ItemAt(i); i++) {
+		WatchpointSetting* clonedWatchpoint
+			= new WatchpointSetting(*watchpoint);
+		if (!fWatchpoints.AddItem(clonedWatchpoint)) {
+			delete clonedWatchpoint;
+			throw std::bad_alloc();
+		}
+	}
+
 	for (int32 i = 0; TeamUiSettings* uiSetting
 			= other.fUiSettings.ItemAt(i); i++) {
 		TeamUiSettings* clonedSetting
@@ -277,10 +316,16 @@ TeamSettings::_Unset()
 		delete breakpoint;
 	}
 
+	for (int32 i = 0; WatchpointSetting* watchpoint = fWatchpoints.ItemAt(i);
+			i++) {
+		delete watchpoint;
+	}
+
 	for (int32 i = 0; TeamUiSettings* uiSetting = fUiSettings.ItemAt(i); i++)
 		delete uiSetting;
 
 	fBreakpoints.MakeEmpty();
+	fWatchpoints.MakeEmpty();
 	fUiSettings.MakeEmpty();
 
 	fTeamName.Truncate(0);
