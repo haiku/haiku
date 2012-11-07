@@ -33,7 +33,7 @@
 
 using std::nothrow;
 
-#define kPartitionTypeNTFS "NTFS File System"
+#define kPartitionTypeNTFS "NT File System"
 
 static const uint32 kDiskSystemFlags =
 	0

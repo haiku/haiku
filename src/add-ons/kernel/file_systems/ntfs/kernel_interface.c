@@ -169,7 +169,7 @@ static file_system_module_info sNTFSFileSystem = {
 	},
 
 	"ntfs",				// short_name
-	"NTFS File System",	// pretty_name
+	"NT File System",	// pretty_name
 	B_DISK_SYSTEM_SUPPORTS_INITIALIZING
 	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
 	| B_DISK_SYSTEM_SUPPORTS_WRITING,	// DDM flags

@@ -82,7 +82,7 @@ InitializeNTFSEditor::PartitionNameChanged(const char* name)
 void
 InitializeNTFSEditor::_CreateViewControls()
 {
-	fNameTC = new BTextControl("Name:", "Haiku", NULL);
+	fNameTC = new BTextControl("Name:", "New NTFS Volume", NULL);
 	fNameTC->SetModificationMessage(new BMessage(MSG_NAME_CHANGED));
 	// TODO find out what is the max length for this specific FS partition name
 	fNameTC->TextView()->SetMaxBytes(31);
