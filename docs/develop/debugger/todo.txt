@@ -1,0 +1,14 @@
+- Need the ability to save crash reports.
+- CLI needs to be more fully implemented.
+- General expression evaluation parser. Once implemented, should supplant the primitive one currently used for C/C++ typecasting support, as well as being exposed for user expression input.
+- Conditional breakpoint/watchpoints. Contingent on above general expression parser.
+- Remote debug interface support.
+- Kernel debug support.
+- Architecture needs to be able to report back the hardware debugging capabilities/limitations of the target platform.
+- WatchpointManager needs to be able to use the aforementioned information from Architecture in order to more intelligently
+  manage/restrict watchpoint usage (especially once expression watchpoints come into play).
+- More complete DWARF3/4 support.
+- x86-64 support.
+- Support for retrieving/displaying function return values (arch-specific).
+- Syntax highlighting in source view.
+- Detection of mouse hovering over a variable in SourceView and showing value in tooltip (probably requires expression parsing support).
