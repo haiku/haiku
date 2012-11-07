@@ -46,7 +46,7 @@
 #include "ValueNodeContainer.h"
 #include "Variable.h"
 #include "WatchpointManager.h"
-#include "WatchpointSetting.h"
+
 
 // #pragma mark - ImageHandler
 
@@ -1581,21 +1581,6 @@ TeamDebugger::_LoadSettings()
 		// install it
 		fBreakpointManager->InstallUserBreakpoint(breakpoint,
 			breakpointSetting->IsEnabled());
-	}
-
-	// create the saved watchpoints;
-	for (int32 i = 0; const WatchpointSetting* watchpointSetting
-			= fTeamSettings.WatchpointAt(i); i++) {
-		Watchpoint* watchpoint = new(std::nothrow) Watchpoint(
-			watchpointSetting->Address(), watchpointSetting->Type(),
-			watchpointSetting->Length());
-		if (watchpoint == NULL)
-			return;
-		BReference<Watchpoint> watchpointReference(watchpoint, true);
-
-		// install it
-		fWatchpointManager->InstallWatchpoint(watchpoint,
-			watchpointSetting->IsEnabled());
 	}
 
 	const TeamUiSettings* uiSettings = fTeamSettings.UiSettingFor(

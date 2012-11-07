@@ -150,7 +150,6 @@ Application Debugger :
 	TeamSettings.cpp
 	TeamUiSettings.cpp
 	TeamUiSettingsFactory.cpp
-	WatchpointSetting.cpp
 
 	# settings/generic
 	Setting.cpp

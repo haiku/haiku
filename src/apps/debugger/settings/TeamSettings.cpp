@@ -18,7 +18,6 @@
 #include "TeamUiSettings.h"
 #include "TeamUiSettingsFactory.h"
 #include "UserBreakpoint.h"
-#include "WatchpointSetting.h"
 
 
 TeamSettings::TeamSettings()
@@ -71,23 +70,6 @@ TeamSettings::SetTo(Team* team)
 		}
 	}
 
-	// add watchpoints
-	for (int32 i = 0; Watchpoint* watchpoint = team->WatchpointAt(i); i++) {
-		WatchpointSetting* watchpointSetting
-			= new(std::nothrow) WatchpointSetting;
-		if (watchpointSetting == NULL)
-			return B_NO_MEMORY;
-
-		status_t error = watchpointSetting->SetTo(*watchpoint,
-			watchpoint->IsEnabled());
-		if (error == B_OK && !fWatchpoints.AddItem(watchpointSetting))
-			error = B_NO_MEMORY;
-		if (error != B_OK) {
-			delete watchpointSetting;
-			return error;
-		}
-	}
-
 	return B_OK;
 }
 
@@ -118,24 +100,6 @@ TeamSettings::SetTo(const BMessage& archive)
 			return error;
 		}
 	}
-
-	// add watchpoints
-	for (int32 i = 0; archive.FindMessage("watchpoints", i, &childArchive)
-			== B_OK; i++) {
-		WatchpointSetting* watchpointSetting
-			= new(std::nothrow) WatchpointSetting;
-		if (watchpointSetting == NULL)
-			return B_NO_MEMORY;
-
-		error = watchpointSetting->SetTo(childArchive);
-		if (error == B_OK && !fWatchpoints.AddItem(watchpointSetting))
-			error = B_NO_MEMORY;
-		if (error != B_OK) {
-			delete watchpointSetting;
-			return error;
-		}
-	}
-
 
 	// add UI settings
 	for (int32 i = 0; archive.FindMessage("uisettings", i, &childArchive)
@@ -173,17 +137,6 @@ TeamSettings::WriteTo(BMessage& archive) const
 			return error;
 	}
 
-	for (int32 i = 0; WatchpointSetting* watchpoint = fWatchpoints.ItemAt(i);
-			i++) {
-		error = watchpoint->WriteTo(childArchive);
-		if (error != B_OK)
-			return error;
-
-		error = archive.AddMessage("watchpoints", &childArchive);
-		if (error != B_OK)
-			return error;
-	}
-
 	for (int32 i = 0; TeamUiSettings* uiSetting = fUiSettings.ItemAt(i);
 			i++) {
 		error = uiSetting->WriteTo(childArchive);
@@ -210,20 +163,6 @@ const BreakpointSetting*
 TeamSettings::BreakpointAt(int32 index) const
 {
 	return fBreakpoints.ItemAt(index);
-}
-
-
-int32
-TeamSettings::CountWatchpoints() const
-{
-	return fWatchpoints.CountItems();
-}
-
-
-const WatchpointSetting*
-TeamSettings::WatchpointAt(int32 index) const
-{
-	return fWatchpoints.ItemAt(index);
 }
 
 
@@ -284,16 +223,6 @@ TeamSettings::operator=(const TeamSettings& other)
 		}
 	}
 
-	for (int32 i = 0; WatchpointSetting* watchpoint
-			= other.fWatchpoints.ItemAt(i); i++) {
-		WatchpointSetting* clonedWatchpoint
-			= new WatchpointSetting(*watchpoint);
-		if (!fWatchpoints.AddItem(clonedWatchpoint)) {
-			delete clonedWatchpoint;
-			throw std::bad_alloc();
-		}
-	}
-
 	for (int32 i = 0; TeamUiSettings* uiSetting
 			= other.fUiSettings.ItemAt(i); i++) {
 		TeamUiSettings* clonedSetting
@@ -316,16 +245,10 @@ TeamSettings::_Unset()
 		delete breakpoint;
 	}
 
-	for (int32 i = 0; WatchpointSetting* watchpoint = fWatchpoints.ItemAt(i);
-			i++) {
-		delete watchpoint;
-	}
-
 	for (int32 i = 0; TeamUiSettings* uiSetting = fUiSettings.ItemAt(i); i++)
 		delete uiSetting;
 
 	fBreakpoints.MakeEmpty();
-	fWatchpoints.MakeEmpty();
 	fUiSettings.MakeEmpty();
 
 	fTeamName.Truncate(0);
