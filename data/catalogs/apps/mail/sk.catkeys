@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-MAIL	849531913
+1	slovak	x-vnd.Be-MAIL	1599879742
 View	Mail		Zobraziť
 %d - Date	Mail		%d - Dátum
 Attach attributes:	Mail		Pripojiť atribúty:
@@ -27,6 +27,7 @@ Expert	Mail		Expert
 Reply account:	Mail		Účet na odpoveď:
 Discard	Mail		Zahodiť
 Message	Mail		Správa
+Settings…	Mail		Nastavenia…
 Reply to sender	Mail		Odpovedať odosielateľovi
 There is no installed handler for URL links.	Mail		Neexistuje žiadna nainštalovaná obsluha odkazov URL.
 Signature	Mail		Podpis
@@ -81,6 +82,7 @@ Only files can be added as attachments.	Mail		Ako prílohy možno pridať iba s�
 Previous message	Mail		Predošlá správa
 Attachments:	Mail		Prílohy:
 Title:	Mail		Názov:
+<no account found>	Mail		<žiaden účet nebol nájdený>
 Find…	Mail		Nájsť…
 Accounts…	Mail		Účty…
 Mail preferences	Mail		Predvoľby pošty

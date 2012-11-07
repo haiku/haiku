@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Appearance	3047172181
+1	slovak	x-vnd.Haiku-Appearance	165414445
 Plain font:	Font view		Základné písmo:
 Control highlight	Colors tab		Zvýraznenie ovládacieho prvku
 Control border	Colors tab		Okraj ovládacieho prvku
@@ -39,6 +39,7 @@ Colors	APRWindow		Farby
 Control background	Colors tab		Pozadie ovládacieho prvku
 Inactive window tab	Colors tab		Záložka neaktívneho okna
 Appearance	System name		Vzhľad
+Use double scrollbar arrows	DecorSettingsView		Použiť dvojité šípky posuvníkov
 Fixed font:	Font view		Písmo s pevnou šírkou:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Kŕdeľ ďatľov učí koňa obhrýzať kôru a žrať mäso.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Zmenšiť silu filtra farebných hrán:
@@ -53,6 +54,7 @@ Selected menu item border	Colors tab		Okraj vybranej položky menu
 Strong	AntialiasingSettingsView		Hrubý
 Panel text	Colors tab		Text panelu
 Monospaced fonts only	AntialiasingSettingsView		Iba písma s pevnou šírkou znaku
+Look and feel	APRWindow		Správanie a vzhľad
 Antialiasing menu	AntialiasingSettingsView		Menu antialiasing
 Fonts	APRWindow		Písma
 Glyph hinting:	AntialiasingSettingsView		Tipy grafém:
