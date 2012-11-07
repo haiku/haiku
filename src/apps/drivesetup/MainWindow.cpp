@@ -873,7 +873,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 
 	// TODO: diskSystem.IsFileSystem() seems like a better fit here?
 	if (diskSystemName == "Be File System"
-		|| diskSystemName == "NTFS File System") {
+		|| diskSystemName == "NT File System") {
 		InitParamsPanel* panel = new InitParamsPanel(this, diskSystemName,
 			partition);
 		if (panel->Go(name, parameters) == GO_CANCELED)
