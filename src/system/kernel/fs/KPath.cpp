@@ -193,7 +193,7 @@ KPath::DetachBuffer()
 }
 
 
-const char *
+const char*
 KPath::Leaf() const
 {
 	if (!fBuffer)
@@ -212,7 +212,7 @@ KPath::Leaf() const
 
 
 status_t
-KPath::ReplaceLeaf(const char *newLeaf)
+KPath::ReplaceLeaf(const char* newLeaf)
 {
 	const char *leaf = Leaf();
 	if (!leaf)
