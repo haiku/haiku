@@ -74,6 +74,12 @@ WatchpointManager::InstallWatchpoint(Watchpoint* watchpoint,
 			watchpoint->SetInstalled(false);
 	}
 
+	if (error == B_OK) {
+		if (fTeam->WatchpointAtAddress(watchpoint->Address()) == NULL)
+			fTeam->AddWatchpoint(watchpoint);
+		fTeam->NotifyWatchpointChanged(watchpoint);
+	}
+
 	return error;
 }
 
@@ -84,12 +90,16 @@ WatchpointManager::UninstallWatchpoint(Watchpoint* watchpoint)
 	AutoLocker<BLocker> installLocker(fLock);
 	AutoLocker<Team> teamLocker(fTeam);
 
+	fTeam->RemoveWatchpoint(watchpoint);
+
 	if (!watchpoint->IsInstalled())
 		return;
 
 	status_t error = fDebuggerInterface->UninstallWatchpoint(
 		watchpoint->Address());
 
-	if (error == B_OK)
+	if (error == B_OK) {
 		watchpoint->SetInstalled(false);
+		fTeam->NotifyWatchpointChanged(watchpoint);
+	}
 }
