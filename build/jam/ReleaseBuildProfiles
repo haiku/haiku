@@ -25,6 +25,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 			WebPositive WonderBrush ;
 		AddOptionalHaikuImagePackages Development Git OpenSSH OpenSSL ;
 		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook XZ-Utils ;
+		AddOptionalHaikuImagePackages KeymapSwitcher ;
 		AddOptionalHaikuImagePackages wpa_supplicant ;
 	}
 
