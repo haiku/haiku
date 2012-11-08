@@ -91,12 +91,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoHide = new BCheckBox(B_TRANSLATE("Auto-hide"),
 		new BMessage(kAutoHide));
 
-	// Clock controls
-	fShowSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
-		new BMessage(kShowSeconds));
-	fShowDayOfWeek = new BCheckBox(B_TRANSLATE("Show day of week"),
-		new BMessage(kShowDayOfWeek));
-
 	// Get settings from BarApp
 	TBarApp* barApp = static_cast<TBarApp*>(be_app);
 	desk_settings* settings = barApp->Settings();
@@ -156,16 +150,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoRaise->SetValue(settings->autoRaise);
 	fWindowAutoHide->SetValue(settings->autoHide);
 
-	// Clock settings
-	TReplicantTray* replicantTray = barApp->BarView()->ReplicantTray();
-	if (replicantTray->Time() != NULL) {
-		fShowSeconds->SetValue(replicantTray->Time()->ShowSeconds());
-		fShowDayOfWeek->SetValue(replicantTray->Time()->ShowDayOfWeek());
-	} else {
-		fShowSeconds->SetValue(settings->showSeconds);
-		fShowDayOfWeek->SetValue(settings->showDayOfWeek);
-	}
-
 	EnableDisableDependentItems();
 
 	// Targets
@@ -179,19 +163,14 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoRaise->SetTarget(be_app);
 	fWindowAutoHide->SetTarget(be_app);
 
-	fShowSeconds->SetTarget(replicantTray);
-	fShowDayOfWeek->SetTarget(replicantTray);
-
 	// Layout
 	fMenuBox = new BBox("fMenuBox");
 	fAppsBox = new BBox("fAppsBox");
 	fWindowBox = new BBox("fWindowBox");
-	fClockBox = new BBox("fClockBox");
 
 	fMenuBox->SetLabel(B_TRANSLATE("Menu"));
 	fAppsBox->SetLabel(B_TRANSLATE("Applications"));
 	fWindowBox->SetLabel(B_TRANSLATE("Window"));
-	fClockBox->SetLabel(B_TRANSLATE("Clock"));
 
 	BView* view;
 	view = BLayoutBuilder::Group<>()
@@ -252,25 +231,12 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		.View();
 	fWindowBox->AddChild(view);
 
-	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 0)
-			.Add(fShowSeconds)
-			.Add(fShowDayOfWeek)
-			.AddGlue()
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-			.End()
-		.View();
-	fClockBox->AddChild(view);
-
 	BLayoutBuilder::Group<>(this)
-		.AddGrid(5, 5)
-			.Add(fMenuBox, 0, 0)
-			.Add(fWindowBox, 1, 0)
-			.Add(fAppsBox, 0, 1)
-			.Add(fClockBox, 1, 1)
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+			.Add(fMenuBox)
+			.Add(fAppsBox)
+			.Add(fWindowBox)
+			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 		.End();
 

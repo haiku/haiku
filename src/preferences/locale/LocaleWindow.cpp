@@ -295,6 +295,10 @@ void
 LocaleWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_LOCALE_CHANGED:
+			fFormatView->MessageReceived(message);
+			break;
+
 		case kMsgDefaults:
 			_Defaults();
 			break;
@@ -478,8 +482,7 @@ LocaleWindow::Show()
 void
 LocaleWindow::_SettingsChanged()
 {
-	bool haveAnythingToRevert = fFormatView->IsReversible() || _IsReversible();
-	fRevertButton->SetEnabled(haveAnythingToRevert);
+	fRevertButton->SetEnabled(fFormatView->IsReversible() || _IsReversible());
 }
 
 

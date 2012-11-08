@@ -19,6 +19,7 @@
 #include <TabView.h>
 
 #include "BaseView.h"
+#include "ClockView.h"
 #include "DateTimeView.h"
 #include "NetworkTimeView.h"
 #include "TimeMessages.h"
@@ -79,6 +80,7 @@ TTimeWindow::MessageReceived(BMessage* message)
 			fDateTimeView->MessageReceived(message);
 			fTimeZoneView->MessageReceived(message);
 			fNetworkTimeView->MessageReceived(message);
+			fClockView->MessageReceived(message);
 			fRevertButton->SetEnabled(false);
 			break;
 
@@ -90,6 +92,15 @@ TTimeWindow::MessageReceived(BMessage* message)
 
 		case kMsgChange:
 			_SetRevertStatus();
+			break;
+
+		case kSelectClockTab:
+			// focus the clock tab (last one)
+			fTabView->Select(fTabView->CountTabs() - 1);
+			break;
+
+		case kShowHideTime:
+			fClockView->MessageReceived(message);
 			break;
 
 		default:
@@ -107,17 +118,19 @@ TTimeWindow::_InitWindow()
 	fDateTimeView = new DateTimeView(B_TRANSLATE("Date and time"));
 	fTimeZoneView = new TimeZoneView(B_TRANSLATE("Time zone"));
 	fNetworkTimeView = new NetworkTimeView(B_TRANSLATE("Network time"));
+	fClockView = new ClockView(B_TRANSLATE("Clock"));
 
 	fBaseView = new TTimeBaseView("baseView");
 	fBaseView->StartWatchingAll(fDateTimeView);
 	fBaseView->StartWatchingAll(fTimeZoneView);
 
-	BTabView* tabView = new BTabView("tabView");
-	tabView->AddTab(fDateTimeView);
-	tabView->AddTab(fTimeZoneView);
-	tabView->AddTab(fNetworkTimeView);
+	fTabView = new BTabView("tabView");
+	fTabView->AddTab(fDateTimeView);
+	fTabView->AddTab(fTimeZoneView);
+	fTabView->AddTab(fNetworkTimeView);
+	fTabView->AddTab(fClockView);
 
-	fBaseView->AddChild(tabView);
+	fBaseView->AddChild(fTabView);
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert));
@@ -166,5 +179,6 @@ TTimeWindow::_SetRevertStatus()
 {
 	fRevertButton->SetEnabled(fDateTimeView->CheckCanRevert()
 		|| fTimeZoneView->CheckCanRevert()
-		|| fNetworkTimeView->CheckCanRevert());
+		|| fNetworkTimeView->CheckCanRevert()
+		|| fClockView->CheckCanRevert());
 }

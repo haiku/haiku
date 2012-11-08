@@ -37,6 +37,8 @@ All rights reserved.
 
 
 #include "NavMenu.h"
+#include "PreferencesWindow.h"
+	// for message constants
 
 
 class TBarView;

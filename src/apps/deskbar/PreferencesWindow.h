@@ -23,11 +23,6 @@ const uint32 kResizeTeamIcons		= 'RTIs';
 const uint32 kAutoRaise				= 'AtRs';
 const uint32 kAutoHide				= 'AtHd';
 
-const uint32 kShowHideTime			= 'ShTm';
-const uint32 kShowSeconds			= 'SwSc';
-const uint32 kShowDayOfWeek			= 'SwDw';
-
-
 class BBox;
 class BButton;
 class BCheckBox;
@@ -51,7 +46,6 @@ public:
 private:
 			BBox*			fMenuBox;
 			BBox*			fAppsBox;
-			BBox*			fClockBox;
 			BBox*			fWindowBox;
 
 			BCheckBox*		fMenuRecentDocuments;
@@ -72,9 +66,6 @@ private:
 			BCheckBox*		fWindowAlwaysOnTop;
 			BCheckBox*		fWindowAutoRaise;
 			BCheckBox*		fWindowAutoHide;
-
-			BCheckBox*		fShowSeconds;
-			BCheckBox*		fShowDayOfWeek;
 };
 
 

@@ -65,6 +65,11 @@ void
 LocalePreflet::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_LOCALE_CHANGED:
+			BLocaleRoster::Default()->Refresh();
+			fLocaleWindow->PostMessage(message);
+			break;
+
 		case kMsgRestartTrackerAndDeskbar:
 			if (message->FindInt32("which") == 1) {
 				_RestartApp("application/x-vnd.Be-TRAK");

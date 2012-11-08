@@ -223,6 +223,11 @@ TBarView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_LOCALE_CHANGED:
+		case kShowHideTime:
+		case kShowSeconds:
+		case kShowDayOfWeek:
+		case kShowTimeZone:
+		case kGetClockSettings:
 			fReplicantTray->MessageReceived(message);
 			break;
 

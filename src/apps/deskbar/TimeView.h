@@ -41,7 +41,28 @@ All rights reserved.
 #include <Messenger.h>
 #include <View.h>
 
-#include "PreferencesWindow.h" // For message constants
+
+// open Time preferences
+const uint32 kChangeTime = 'ChTm';
+
+// pop the calendar
+const uint32 kShowCalendar = 'ShCa';
+
+// show or hide clock
+const uint32 kShowHideTime = 'ShTm';
+
+// show seconds
+const uint32 kShowSeconds = 'SwSc';
+
+// show day of week
+const uint32 kShowDayOfWeek = 'SwDw';
+
+// show time zone
+const uint32 kShowTimeZone = 'SwTz';
+
+// get clock settings to send to Time prefs
+const uint32 kGetClockSettings = 'GCkS';
+
 
 
 class BCountry;
@@ -53,9 +74,7 @@ class _EXPORT	TTimeView;
 
 class TTimeView : public BView {
 public:
-								TTimeView(float maxWidth, float height,
-									bool use24HourClock, bool showSeconds,
-									bool showDayOfWeek);
+								TTimeView(float maxWidth, float height);
 								TTimeView(BMessage* data);
 								~TTimeView();
 
@@ -77,14 +96,14 @@ public:
 				bool			Orientation() const;
 				void			SetOrientation(bool o);
 
-				bool			Use24HourClock() const;
-				void			SetUse24HourClock(bool use24HourClock);
-
 				bool			ShowSeconds() const;
 				void			SetShowSeconds(bool show);
 
 				bool			ShowDayOfWeek() const;
 				void			SetShowDayOfWeek(bool show);
+
+				bool			ShowTimeZone() const;
+				void			SetShowTimeZone(bool show);
 
 				void			ShowCalendar(BPoint where);
 
@@ -116,9 +135,12 @@ private:
 				float			fHeight;
 				bool			fOrientation; // vertical = true
 
+				bool			fOverrideLocale;
 				bool			fUse24HourClock;
 				bool			fShowSeconds;
 				bool			fShowDayOfWeek;
+				bool			fShowTimeZone;
+
 				BString			fTimeFormat;
 
 				BPoint			fTimeLocation;
