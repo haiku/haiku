@@ -3831,8 +3831,8 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 	ASSERT(((alignmentMask + 1) & alignmentMask) == 0);
 		// alignment must be a power of 2
 
-	// compute the boundary shift
-	uint32 boundaryShift = 0;
+	// compute the boundary mask
+	uint32 boundaryMask = 0;
 	if (restrictions->boundary != 0) {
 		page_num_t boundary = restrictions->boundary / B_PAGE_SIZE;
 		// boundary must be a power of two and not less than alignment and
@@ -3841,8 +3841,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 		ASSERT(boundary >= alignmentMask + 1);
 		ASSERT(boundary >= length);
 
-		while ((boundary >>= 1) > 0)
-			boundaryShift++;
+		boundaryMask = -boundary;
 	}
 
 	vm_page_reservation reservation;
@@ -3858,19 +3857,17 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 	int useCached = freePages > 0 && (page_num_t)freePages > 2 * length ? 0 : 1;
 
 	for (;;) {
-		if (alignmentMask != 0 || boundaryShift != 0) {
+		if (alignmentMask != 0 || boundaryMask != 0) {
 			page_num_t offsetStart = start + sPhysicalPageOffset;
 
 			// enforce alignment
-			if ((offsetStart & alignmentMask) != 0) {
+			if ((offsetStart & alignmentMask) != 0)
 				offsetStart = (offsetStart + alignmentMask) & ~alignmentMask;
-			}
 
 			// enforce boundary
-			if (boundaryShift != 0 && offsetStart << boundaryShift
-					!= (offsetStart + length - 1) << boundaryShift) {
-				offsetStart = (offsetStart + length - 1) << boundaryShift
-					>> boundaryShift;
+			if (boundaryMask != 0 && ((offsetStart ^ (offsetStart 
+				+ length - 1)) & boundaryMask) != 0) {
+				offsetStart = (offsetStart + length - 1) & boundaryMask;
 			}
 
 			start = offsetStart - sPhysicalPageOffset;
