@@ -363,7 +363,7 @@ AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LINK)
 AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LIB:BS)
 	: $(HAIKU_ZLIB_CURRENT_LINK) : : true ;
 AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LINK)
-	: libzlib.so : : true ;
+	: libz.so : : true ;
 
 # servers
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
