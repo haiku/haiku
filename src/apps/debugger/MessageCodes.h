@@ -29,6 +29,7 @@ enum {
 	MSG_IMAGE_FILE_CHANGED						= 'ifch',
 	MSG_FUNCTION_SOURCE_CODE_CHANGED			= 'fnsc',
 	MSG_USER_BREAKPOINT_CHANGED					= 'ubrc',
+	MSG_WATCHPOINT_CHANGED						= 'wapc',
 	MSG_DEBUGGER_EVENT							= 'dbge',
 	MSG_LOAD_SETTINGS							= 'ldst',
 
@@ -53,7 +54,8 @@ enum {
 	MSG_INSPECTOR_WINDOW_CLOSED					= 'irwc',
 	MSG_INSPECT_ADDRESS							= 'isad',
 	MSG_SHOW_TYPECAST_NODE_PROMPT				= 'stnp',
-	MSG_TYPECAST_NODE							= 'tyno'
+	MSG_TYPECAST_NODE							= 'tyno',
+	MSG_SHOW_WATCH_VARIABLE_PROMPT				= 'swvp'
 };
 
 

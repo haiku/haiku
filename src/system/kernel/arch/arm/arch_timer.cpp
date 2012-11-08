@@ -19,6 +19,15 @@
 #include <arch/timer.h>
 #include <arch/cpu.h>
 
+
+//#define TRACE_ARCH_TIMER
+#ifdef TRACE_ARCH_TIMER
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 #define PXA_TIMERS_PHYS_BASE	0x40A00000
 #define PXA_TIMERS_SIZE		0x000000C0
 #define PXA_TIMERS_INTERRUPT	7 /* OST_4_11 */
@@ -29,7 +38,6 @@
 #define PXA_OSMR4		0x20
 #define PXA_OMCR4		0x30
 
-#define TRACE(x)	//dprintf x
 
 static area_id sPxaTimersArea;
 static uint32 *sPxaTimersBase;
@@ -48,7 +56,7 @@ pxa_timer_interrupt(void *data)
 void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
-	TRACE(("arch_timer_set_hardware_timer(%lld): %p\n", timeout, sPxaTimersBase));
+	TRACE(("arch_timer_set_hardware_timer(%lld)\n", timeout));
 
 	if (sPxaTimersBase) {
 		sPxaTimersBase[PXA_OIER] |= (1 << 4);
@@ -62,7 +70,7 @@ arch_timer_set_hardware_timer(bigtime_t timeout)
 void
 arch_timer_clear_hardware_timer()
 {
-	TRACE(("arch_timer_clear_hardware_timer: %p\n", sPxaTimersBase));
+	TRACE(("arch_timer_clear_hardware_timer\n"));
 
 	if (sPxaTimersBase) {
 		sPxaTimersBase[PXA_OMCR4] = 0; // disable our timer

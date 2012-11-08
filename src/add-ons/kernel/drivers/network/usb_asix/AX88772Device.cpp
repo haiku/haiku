@@ -368,12 +368,6 @@ AX88772Device::_SetupAX88772()
 
 	snooze(150000);
 
-	result = WriteRXControlRegister(0);
-	if (result != B_OK) {
-		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
-		return result;
-	}
-
 	return B_OK;
 }
 
@@ -449,12 +443,6 @@ AX88772Device::_SetupAX88772A()
 	if (result != B_OK)
 		return result;
 
-	result = WriteRXControlRegister(0);
-	if (result != B_OK) {
-		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
-		return result;
-	}
-
 	fIPG[0] = 0x15;
 	fIPG[1] = 0x16;
 	fIPG[2] = 0x1A;
@@ -480,12 +468,6 @@ AX88772Device::_SetupAX88772B()
 	result = _WakeupPHY();
 	if (result != B_OK)
 		return result;
-
-	result = WriteRXControlRegister(0);
-	if (result != B_OK) {
-		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
-		return result;
-	}
 
 	fIPG[0] = 0x15;
 	fIPG[1] = 0x16;
@@ -513,6 +495,9 @@ AX88772Device::StartDevice()
 				"%d bytes of %d written.\n", actualLength, sizeof(fIPG));
 
 	}
+	
+	uint16 rxcontrol = 0;
+	
 	// AX88772B uses different maximum frame burst configuration.
 	if (fDeviceInfo.fType == DeviceInfo::AX88772B) {
 		result = gUSBModule->send_request(fDevice,
@@ -526,9 +511,11 @@ AX88772Device::StartDevice()
 			TRACE_ALWAYS("Error of writing frame burst:%#010x\n", result);
 			return result;
 		}
+		
+		rxcontrol = RXCTL_USB_MFB;
 	}
 
-	uint16 rxcontrol = RXCTL_START | RXCTL_BROADCAST;
+	rxcontrol |= RXCTL_START | RXCTL_BROADCAST;
 	result = WriteRXControlRegister(rxcontrol);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n",

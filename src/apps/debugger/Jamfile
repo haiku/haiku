@@ -9,11 +9,14 @@ UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) controllers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_managers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) jobs ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings generic ] ;
@@ -55,14 +58,7 @@ SourceHdrs
 ;
 
 Application Debugger :
-	BreakpointManager.cpp
 	Debugger.cpp
-	Jobs.cpp
-	TeamMemoryBlockManager.cpp
-	TeamDebugger.cpp
-	ThreadHandler.cpp
-	WatchpointManager.cpp
-	Worker.cpp
 
 	# arch
 	Architecture.cpp
@@ -74,6 +70,15 @@ Application Debugger :
 	# arch/x86
 	ArchitectureX86.cpp
 	CpuStateX86.cpp
+
+	# controllers
+	TeamDebugger.cpp
+	ThreadHandler.cpp
+
+	# debug_managers
+	BreakpointManager.cpp
+	TeamMemoryBlockManager.cpp
+	WatchpointManager.cpp
 
 	# debug_info
 	BasicFunctionDebugInfo.cpp
@@ -117,6 +122,15 @@ Application Debugger :
 	ObjectID.cpp
 	FunctionParameterID.cpp
 
+	# jobs
+	GetCPUStateJob.cpp
+	GetStackTraceJob.cpp
+	GetThreadStateJob.cpp
+	LoadImageDebugInfoJob.cpp
+	LoadSourceCodeJob.cpp
+	ResolveValueNodeJob.cpp
+	RetrieveMemoryBlockJob.cpp
+
 	# model
 	Breakpoint.cpp
 	DisassembledCode.cpp
@@ -150,7 +164,6 @@ Application Debugger :
 	TeamSettings.cpp
 	TeamUiSettings.cpp
 	TeamUiSettingsFactory.cpp
-	WatchpointSetting.cpp
 
 	# settings/generic
 	Setting.cpp
@@ -211,6 +224,7 @@ Application Debugger :
 	TeamWindow.cpp
 	ThreadListView.cpp
 	VariablesView.cpp
+	WatchPromptWindow.cpp
 
 	# user_interface/gui/util
 	ActionMenuItem.cpp
@@ -236,6 +250,7 @@ Application Debugger :
 	BitBuffer.cpp
 	IntegerFormatter.cpp
 	StringUtils.cpp
+	Worker.cpp
 
 	# value
 	TypeHandler.cpp

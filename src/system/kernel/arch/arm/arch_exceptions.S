@@ -9,6 +9,49 @@
 
 #include <asm_defs.h>
 
+#define CPSR_MODE_MASK	0x1f
+#define CPSR_MODE_USR	0x10
+#define CPSR_MODE_FIQ	0x11
+#define CPSR_MODE_IRQ	0x12
+#define CPSR_MODE_SVC	0x13
+#define CPSR_MODE_ABT	0x17
+#define CPSR_MODE_UND	0x1b
+
+/* The following two macros are taken from FreeBSD... */
+
+	.macro PUSHFRAMEINSVC
+	stmdb   sp, {r0-r3}		/* Save 4 registers */
+	mov     r0, lr			/* Save xxx32 r14 */
+	mov     r1, sp			/* Save xxx32 sp */
+	mrs     r3, spsr		/* Save xxx32 spsr */
+	mrs     r2, cpsr		/* Get the CPSR */
+	bic     r2, r2, #(CPSR_MODE_MASK)/* Fix for SVC mode */
+	orr     r2, r2, #(CPSR_MODE_SVC)
+	msr     cpsr_c, r2		/* Punch into SVC mode */
+	mov     r2, sp			/* Save SVC sp */
+	str     r0, [sp, #-4]!		/* Push return address */
+	str     lr, [sp, #-4]!		/* Push SVC lr */
+	str     r2, [sp, #-4]!		/* Push SVC sp */
+	msr     spsr_all, r3		/* Restore correct spsr */
+	ldmdb   r1, {r0-r3}		/* Restore 4 regs from xxx mode */
+	sub     sp, sp, #(4*15)		/* Adjust the stack pointer */
+	stmia   sp, {r0-r12}		/* Push the user mode registers */
+	add     r0, sp, #(4*13)		/* Adjust the stack pointer */
+	stmia   r0, {r13-r14}^		/* Push the user mode registers */
+	mov     r0, r0			/* NOP for previous instruction */
+	mrs     r0, spsr_all
+	str     r0, [sp, #-4]!		/* Save spsr */
+	.endm
+
+	.macro PULLFRAMEFROMSVCANDEXIT
+	ldr     r0, [sp], #0x0004	/* Get the SPSR from stack */
+	msr     spsr_all, r0		/* restore SPSR */
+	ldmia   sp, {r0-r14}^		/* Restore registers (usr mode) */
+	mov     r0, r0			/* NOP for previous instruction */
+	add     sp, sp, #(4*15)		/* Adjust the stack pointer */
+	ldmia   sp, {sp, lr, pc}^	/* Restore lr and exit */
+	.endm
+
 	.text
 
 .globl _vectors_start
@@ -43,134 +86,139 @@ _vectors_end:
 
 
 	.rept	64
-	.word	0xaabbccdd	
+	.word	0xdeadbeef
 	.endr
 abort_stack:
-	.word	.
+	.word	. - 4
+	.word	0xdeadbeef
+
+	.rept	64
+	.word	0xcafebabe
+	.endr
+irq_stack:
+	.word	. - 4
+	.word	0xcafebabe
+
+	.rept	64
+	.word	0xaaaabbbb
+	.endr
+fiq_stack:
+	.word	. - 4
+	.word	0xaaaabbbb
+
+	.rept	64
+	.word	0xccccdddd
+	.endr
+und_stack:
+	.word	. - 4
+	.word	0xccccdddd
+
 
 FUNCTION(arm_undefined):
-	stmfd 	sp!, { r0-r12, r14 }
-	sub		sp, sp, #12
-	mov		r0, sp
-	mrs		r1, spsr
-	stmia	r0, { r1, r13-r14 }
-	b		arch_arm_undefined
-	b		.
+	PUSHFRAMEINSVC
+
+	mov	r0, sp
+	bl	arch_arm_undefined
+
+	PULLFRAMEFROMSVCANDEXIT
+FUNCTION_END(arm_undefined)
+
 
 FUNCTION(arm_syscall):
-	stmfd 	sp!, { r0-r12, r14 }
-	sub		sp, sp, #12
-	mov		r0, sp
-	mrs		r1, spsr
-	stmia	r0, { r1, r13-r14 }
-	b		arch_arm_syscall
-	b		.
-	
+	PUSHFRAMEINSVC
+
+	mov	r0, sp
+	bl	arch_arm_syscall
+
+	PULLFRAMEFROMSVCANDEXIT
+FUNCTION_END(arm_syscall)
+
+
 FUNCTION(arm_prefetch_abort):
-	ldr	sp, abort_stack
-	stmfd 	sp!, { r0-r12, r14 }
-	sub		sp, sp, #12
-	mov		r0, sp
-	mrs		r1, spsr
-	stmia	r0, { r1, r13-r14 }
-	b		arch_arm_prefetch_abort
-	b		.
+#ifdef __XSCALE__
+	nop				/* Make absolutely sure any pending */
+	nop				/* imprecise aborts have occurred. */
+#endif
+ 	add	lr, lr, #4
+	PUSHFRAMEINSVC
+
+	mov	r0, sp
+	bl	arch_arm_prefetch_abort
+
+	PULLFRAMEFROMSVCANDEXIT
+FUNCTION_END(arm_prefetch_abort)
+
 
 FUNCTION(arm_data_abort):
-	ldr	sp, abort_stack
-	/* XXX only deals with interrupting supervisor mode */
+#ifdef __XSCALE__
+	nop                             /* Make absolutely sure any pending */
+	nop                             /* imprecise aborts have occurred. */
+#endif
+	sub	lr, lr, #8		/* Adjust the lr */
+	PUSHFRAMEINSVC
 
-	/* save r4-r6 and use as a temporary place to save while we switch into supervisor mode */
-	stmia	r13, { r4-r6 }
-	mov	r4, r13
-	sub	r5, lr, #8
-	mrs	r6, spsr
-
-	/* move into supervisor mode. irq/fiq disabled */
-	msr	cpsr_c, #0x13
-
-	/* save the return address */
-	stmfd	sp!, { r5 }
-
-	/* save C trashed regs, supervisor lr */
-	stmfd	sp!, { r0-r3, r12, lr }
-
-	/* save spsr */
-	stmfd	sp!, { r6 }
-
-	/* restore r4-r6 */
-	ldmia	r4, { r4-r6 }
-
-	/* call into higher level code */
-        mrc     p15, 0, r2, c5, c0, 0           @ get FSR
-        mrc     p15, 0, r3, c6, c0, 0           @ get FAR
-	sub	sp, sp, #20
-	mov	r0, sp /* iframe */
-	stmia	r0, { r6,r2,r3,r4,r5 }
+	mov	r0, sp
 	bl	arch_arm_data_abort
-	add	sp, sp, #20
 
-	/* restore spsr */
-	ldmfd	sp!, { r0 }
-	msr     spsr_cxsf, r0
+	PULLFRAMEFROMSVCANDEXIT
 
-	/* restore back to where we came from */
-	ldmfd	sp!, { r0-r3, r12, lr, pc }^
 
 FUNCTION(arm_reserved):
 	b	.
-	
+FUNCTION_END(arm_reserved)
+
 FUNCTION(arm_irq):
-	ldr	sp, abort_stack
-	/* XXX only deals with interrupting supervisor mode */
+	sub	lr, lr, #4
+	PUSHFRAMEINSVC
 
-	/* save r4-r6 and use as a temporary place to save while we switch into supervisor mode */
-	stmia	r13, { r4-r6 }
-	mov	r4, r13
-	sub	r5, lr, #4
-	mrs	r6, spsr
-
-	/* move into supervisor mode. irq/fiq disabled */
-	msr	cpsr_c, #(3<<6 | 0x13)
-
-	/* save the return address */
-	stmfd	sp!, { r5 }
-
-	/* save C trashed regs, supervisor lr */
-	stmfd	sp!, { r0-r3, r12, lr }
-
-	/* save spsr */
-	stmfd	sp!, { r6 }
-
-	/* restore r4-r6 */
-	ldmia	r4, { r4-r6 }
-
-	/* call into higher level code */
 	mov	r0, sp /* iframe */
 	bl	arch_arm_irq
 
-	/* restore spsr */
-	ldmfd	sp!, { r0 }
-	msr     spsr_cxsf, r0
+	PULLFRAMEFROMSVCANDEXIT
+FUNCTION_END(arm_irq)
 
-	/* restore back to where we came from */
-	ldmfd	sp!, { r0-r3, r12, lr, pc }^
 
-.bss
-.align 2
-	.global irq_save_spot
-irq_save_spot:
-	.word	0	/* r4 */
-	.word	0	/* r5 */
-	.word	0	/* r6 */
-	
-.text
 FUNCTION(arm_fiq):
-	ldr	sp, abort_stack
 	sub	lr, lr, #4
-	stmfd	sp!, { r0-r3, r12, lr }
+	PUSHFRAMEINSVC
 
+	mov	r0, sp /* iframe */
 	bl	arch_arm_fiq
 	
-	ldmfd	sp!, { r0-r3, r12, pc }^
+	PULLFRAMEFROMSVCANDEXIT
+FUNCTION_END(arm_fiq)
 
+
+
+FUNCTION(arm_vector_init):
+	mrs	r1, cpsr
+	bic	r1, r1, #CPSR_MODE_MASK
+
+	/* move into modes and set initial sp */
+	mov	r0, r1
+	orr	r0, r0, #CPSR_MODE_FIQ
+	msr	cpsr_c, r0
+	ldr	sp, fiq_stack
+
+	mov	r0, r1
+	orr	r0, r0, #CPSR_MODE_IRQ
+	msr	cpsr_c, r0
+	ldr	sp, irq_stack
+
+	mov	r0, r1
+	orr	r0, r0, #CPSR_MODE_ABT
+	msr	cpsr_c, r0
+	ldr	sp, abort_stack
+
+	mov	r0, r1
+	orr	r0, r0, #CPSR_MODE_UND
+	msr	cpsr_c, r0
+	ldr	sp, und_stack
+
+	/* ... and return back to supervisor mode */
+	mov	r0, r1
+	orr	r0, r0, #CPSR_MODE_SVC
+	msr	cpsr_c, r0
+
+	bx	lr
+FUNCTION_END(arm_vector_init)

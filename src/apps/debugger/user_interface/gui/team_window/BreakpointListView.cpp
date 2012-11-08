@@ -18,9 +18,10 @@
 #include "GuiSettingsUtils.h"
 #include "LocatableFile.h"
 #include "table/TableColumns.h"
+#include "TargetAddressTableColumn.h"
 #include "Team.h"
 #include "UserBreakpoint.h"
-#include "TargetAddressTableColumn.h"
+#include "Watchpoint.h"
 
 
 // #pragma mark - BreakpointsTableModel
@@ -32,16 +33,18 @@ public:
 		:
 		fTeam(team)
 	{
-		Update(NULL);
+		UpdateBreakpoint(NULL);
+		UpdateWatchpoint(NULL);
 	}
 
 	~BreakpointsTableModel()
 	{
 		fTeam = NULL;
-		Update(NULL);
+		UpdateBreakpoint(NULL);
+		UpdateWatchpoint(NULL);
 	}
 
-	bool Update(UserBreakpoint* changedBreakpoint)
+	bool UpdateBreakpoint(UserBreakpoint* changedBreakpoint)
 	{
 		if (fTeam == NULL) {
 			for (int32 i = 0;
@@ -93,6 +96,59 @@ public:
 		return true;
 	}
 
+	bool UpdateWatchpoint(Watchpoint* changedWatchpoint)
+	{
+		if (fTeam == NULL) {
+			for (int32 i = 0;
+				Watchpoint* watchpoint = fWatchpoints.ItemAt(i);
+				i++) {
+				watchpoint->ReleaseReference();
+			}
+			fWatchpoints.MakeEmpty();
+
+			return true;
+		}
+
+		AutoLocker<Team> locker(fTeam);
+
+		int32 breakpointCount = fBreakpoints.CountItems();
+		int32 index = 0;
+		int32 teamIndex = 0;
+		Watchpoint* newWatchpoint = fTeam->WatchpointAt(teamIndex);
+		// remove no longer existing breakpoints
+		while (Watchpoint* oldWatchpoint = fWatchpoints.ItemAt(index)) {
+			if (oldWatchpoint == newWatchpoint) {
+				if (oldWatchpoint == changedWatchpoint)
+					NotifyRowsChanged(index + breakpointCount, 1);
+				index++;
+				teamIndex++;
+				newWatchpoint = fTeam->WatchpointAt(teamIndex);
+			} else {
+				// TODO: Not particularly efficient!
+				fWatchpoints.RemoveItemAt(index);
+				oldWatchpoint->ReleaseReference();
+				NotifyRowsRemoved(index + breakpointCount, 1);
+			}
+		}
+
+		// add new breakpoints
+		int32 countBefore = fWatchpoints.CountItems();
+		while (newWatchpoint != NULL) {
+			if (!fWatchpoints.AddItem(newWatchpoint))
+				return false;
+
+			newWatchpoint->AcquireReference();
+			teamIndex++;
+			newWatchpoint = fTeam->WatchpointAt(teamIndex);
+		}
+
+		int32 count = fWatchpoints.CountItems();
+		if (count > countBefore)
+			NotifyRowsAdded(countBefore + breakpointCount, count - countBefore);
+
+		return true;
+	}
+
 	virtual int32 CountColumns() const
 	{
 		return 5;
@@ -100,10 +156,33 @@ public:
 
 	virtual int32 CountRows() const
 	{
-		return fBreakpoints.CountItems();
+		return fBreakpoints.CountItems() + fWatchpoints.CountItems();
 	}
 
 	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& value)
+	{
+		int32 breakpointCount = fBreakpoints.CountItems();
+		if (rowIndex < breakpointCount)
+			return _GetBreakpointValueAt(rowIndex, columnIndex, value);
+
+		return _GetWatchpointValueAt(rowIndex - breakpointCount, columnIndex,
+			value);
+	}
+
+	UserBreakpoint* BreakpointAt(int32 index) const
+	{
+		return fBreakpoints.ItemAt(index);
+	}
+
+	Watchpoint* WatchpointAt(int32 index) const
+	{
+		return fWatchpoints.ItemAt(index - fBreakpoints.CountItems());
+	}
+
+private:
+
+	bool _GetBreakpointValueAt(int32 rowIndex, int32 columnIndex,
+		BVariant &value)
 	{
 		UserBreakpoint* breakpoint = fBreakpoints.ItemAt(rowIndex);
 		if (breakpoint == NULL)
@@ -145,14 +224,36 @@ public:
 		}
 	}
 
-	UserBreakpoint* BreakpointAt(int32 index) const
+	bool _GetWatchpointValueAt(int32 rowIndex, int32 columnIndex,
+		BVariant& value)
 	{
-		return fBreakpoints.ItemAt(index);
+		Watchpoint* watchpoint = fWatchpoints.ItemAt(rowIndex);
+		if (watchpoint == NULL)
+			return false;
+
+		switch (columnIndex) {
+			case 0:
+				value.SetTo((int32)watchpoint->IsEnabled());
+				return true;
+			case 1:
+				value.SetTo("Watchpoint");
+				return true;
+			case 2:
+				return false;
+			case 3:
+				return false;
+			case 4:
+				value.SetTo(watchpoint->Address());
+				return true;
+			default:
+				return false;
+		}
 	}
 
 private:
 	Team*						fTeam;
 	BObjectList<UserBreakpoint>	fBreakpoints;
+	BObjectList<Watchpoint>		fWatchpoints;
 };
 
 
@@ -202,7 +303,8 @@ BreakpointListView::UnsetListener()
 
 
 void
-BreakpointListView::SetBreakpoint(UserBreakpoint* breakpoint)
+BreakpointListView::SetBreakpoint(UserBreakpoint* breakpoint,
+	Watchpoint* watchpoint)
 {
 	if (breakpoint == fBreakpoint)
 		return;
@@ -232,7 +334,14 @@ BreakpointListView::SetBreakpoint(UserBreakpoint* breakpoint)
 void
 BreakpointListView::UserBreakpointChanged(UserBreakpoint* breakpoint)
 {
-	fBreakpointsTableModel->Update(breakpoint);
+	fBreakpointsTableModel->UpdateBreakpoint(breakpoint);
+}
+
+
+void
+BreakpointListView::WatchpointChanged(Watchpoint* watchpoint)
+{
+	fBreakpointsTableModel->UpdateWatchpoint(watchpoint);
 }
 
 
@@ -271,8 +380,13 @@ BreakpointListView::TableSelectionChanged(Table* table)
 	TableSelectionModel* selectionModel = table->SelectionModel();
 	UserBreakpoint* breakpoint = fBreakpointsTableModel->BreakpointAt(
 		selectionModel->RowAt(0));
-
-	fListener->BreakpointSelectionChanged(breakpoint);
+	if (breakpoint != NULL)
+		fListener->BreakpointSelectionChanged(breakpoint);
+	else {
+		Watchpoint* watchpoint = fBreakpointsTableModel->WatchpointAt(
+			selectionModel->RowAt(0));
+		fListener->WatchpointSelectionChanged(watchpoint);
+	}
 }
 
 

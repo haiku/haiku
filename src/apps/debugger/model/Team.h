@@ -145,6 +145,8 @@ public:
 									TargetAddressRange range,
 									BObjectList<Watchpoint>& watchpoints)
 										const;
+			const WatchpointList& Watchpoints() const
+									{ return fWatchpoints; }
 
 			status_t			GetStatementAtAddress(target_addr_t address,
 									FunctionInstance*& _function,
@@ -187,7 +189,6 @@ private:
 
 			typedef BObjectList<Breakpoint> BreakpointList;
 			typedef DoublyLinkedList<Listener> ListenerList;
-			typedef BObjectList<Watchpoint> WatchpointList;
 
 private:
 			void				_NotifyThreadAdded(Thread* thread);

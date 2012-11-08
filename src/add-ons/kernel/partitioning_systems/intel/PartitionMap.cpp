@@ -118,7 +118,7 @@ static const struct partition_type kPartitionTypes[] = {
     { 0x85, /*"Linux extendend partition"*/INTEL_EXTENDED_PARTITION_NAME,
     false },
     { 0x86, "NTFS volume set", false }, 
-    { 0x87, "NTFS volume set", false }, 
+    { 0x87, "NTFS volume set", true }, 
     { 0x88, "Linux plaintext", false }, 
     { 0x8e, "Linux LVM", false }, 
     { 0x93, "Amoeba", false }, 

@@ -18,7 +18,6 @@
 #include "TeamUiSettings.h"
 #include "TeamUiSettingsFactory.h"
 #include "UserBreakpoint.h"
-#include "WatchpointSetting.h"
 
 
 TeamSettings::TeamSettings()
@@ -67,23 +66,6 @@ TeamSettings::SetTo(Team* team)
 			error = B_NO_MEMORY;
 		if (error != B_OK) {
 			delete breakpointSetting;
-			return error;
-		}
-	}
-
-	// add watchpoints
-	for (int32 i = 0; Watchpoint* watchpoint = team->WatchpointAt(i); i++) {
-		WatchpointSetting* watchpointSetting
-			= new(std::nothrow) WatchpointSetting;
-		if (watchpointSetting == NULL)
-			return B_NO_MEMORY;
-
-		status_t error = watchpointSetting->SetTo(*watchpoint,
-			watchpoint->IsEnabled());
-		if (error == B_OK && !fWatchpoints.AddItem(watchpointSetting))
-			error = B_NO_MEMORY;
-		if (error != B_OK) {
-			delete watchpointSetting;
 			return error;
 		}
 	}
@@ -181,20 +163,6 @@ const BreakpointSetting*
 TeamSettings::BreakpointAt(int32 index) const
 {
 	return fBreakpoints.ItemAt(index);
-}
-
-
-int32
-TeamSettings::CountWatchpoints() const
-{
-	return fWatchpoints.CountItems();
-}
-
-
-const WatchpointSetting*
-TeamSettings::WatchpointAt(int32 index) const
-{
-	return fWatchpoints.ItemAt(index);
 }
 
 

@@ -3610,6 +3610,7 @@ msk_intr(void *xsc)
 	sc = xsc;
 	MSK_LOCK(sc);
 
+#ifndef __HAIKU__
 	/* Reading B0_Y2_SP_ISRC2 masks further interrupts. */
 	status = CSR_READ_4(sc, B0_Y2_SP_ISRC2);
 	if (status == 0 || status == 0xffffffff ||
@@ -3619,6 +3620,9 @@ msk_intr(void *xsc)
 		MSK_UNLOCK(sc);
 		return;
 	}
+#else
+	status = sc->haiku_interrupt_status;
+#endif
 
 	sc_if0 = sc->msk_if[MSK_PORT_A];
 	sc_if1 = sc->msk_if[MSK_PORT_B];
@@ -3655,8 +3659,10 @@ msk_intr(void *xsc)
 	if ((status & Y2_IS_STAT_BMU) != 0 && domore == 0)
 		CSR_WRITE_4(sc, STAT_CTRL, SC_STAT_CLR_IRQ);
 
+#ifndef __HAIKU__
 	/* Reenable interrupts. */
 	CSR_WRITE_4(sc, B0_Y2_SP_ICR, 2);
+#endif
 
 	if (ifp0 != NULL && (ifp0->if_drv_flags & IFF_DRV_RUNNING) != 0 &&
 	    !IFQ_DRV_IS_EMPTY(&ifp0->if_snd))

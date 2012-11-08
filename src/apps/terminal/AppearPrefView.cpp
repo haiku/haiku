@@ -83,7 +83,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	};
 
 	fBlinkCursor = new BCheckBox(
-		B_TRANSLATE("Blink the cursor"),
+		B_TRANSLATE("Blinking cursor"),
 			new BMessage(MSG_BLINK_CURSOR_CHANGED));
 
 	fWarnOnExit = new BCheckBox(

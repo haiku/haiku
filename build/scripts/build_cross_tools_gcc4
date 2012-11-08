@@ -110,6 +110,8 @@ mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $tmpIncludeDir \
 	$tmpLibDir || exit 1
 mkdir -p $installDir/lib/gcc/$haikuMachine/$gccVersion
 
+# force the POSIX locale, as the build (makeinfo) might choke otherwise
+export LC_ALL=POSIX
 
 # build binutils
 cd $binutilsObjDir

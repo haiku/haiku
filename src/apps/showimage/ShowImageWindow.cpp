@@ -727,7 +727,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 					strCaption << i;
 
 					BMenuItem* item = new BMenuItem(strCaption.String(), goTo,
-						B_SHIFT_KEY, shortcut);
+						shortcut, B_SHIFT_KEY);
 					if (currentPage == i)
 						item->SetMarked(true);
 					fGoToPageMenu->AddItem(item);

@@ -92,6 +92,9 @@ Team::~Team()
 	for (int32 i = 0; Breakpoint* breakpoint = fBreakpoints.ItemAt(i); i++)
 		breakpoint->ReleaseReference();
 
+	for (int32 i = 0; Watchpoint* watchpoint = fWatchpoints.ItemAt(i); i++)
+		watchpoint->ReleaseReference();
+
 	while (Image* image = fImages.RemoveHead())
 		image->ReleaseReference();
 

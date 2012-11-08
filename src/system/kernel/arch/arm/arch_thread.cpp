@@ -28,7 +28,7 @@
 
 #include <string.h>
 
-#define TRACE_ARCH_THREAD
+//#define TRACE_ARCH_THREAD
 #ifdef TRACE_ARCH_THREAD
 #	define TRACE(x) dprintf x
 #else

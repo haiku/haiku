@@ -15,7 +15,6 @@ class BMessage;
 class Team;
 class BreakpointSetting;
 class TeamUiSettings;
-class WatchpointSetting;
 
 
 class TeamSettings {
@@ -34,9 +33,6 @@ public:
 			int32				CountBreakpoints() const;
 			const BreakpointSetting* BreakpointAt(int32 index) const;
 
-			int32				CountWatchpoints() const;
-			const WatchpointSetting* WatchpointAt(int32 index) const;
-
 			int32				CountUiSettings() const;
 			const TeamUiSettings*	UiSettingAt(int32 index) const;
 			const TeamUiSettings*	UiSettingFor(const char* id) const;
@@ -48,14 +44,12 @@ public:
 private:
 			typedef BObjectList<BreakpointSetting> BreakpointList;
 			typedef BObjectList<TeamUiSettings> UiSettingsList;
-			typedef BObjectList<WatchpointSetting> WatchpointList;
 
 private:
 			void				_Unset();
 
 private:
 			BreakpointList		fBreakpoints;
-			WatchpointList		fWatchpoints;
 			UiSettingsList		fUiSettings;
 			BString				fTeamName;
 };
