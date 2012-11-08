@@ -1,0 +1,90 @@
+SubDir HAIKU_TOP src add-ons translators icns ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UseHeaders $(HAIKU_LIBPNG_HEADERS) : true ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) openjpeg ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) libicns ] ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
+	#for BaseTranslator.h and friends
+	
+# Let Jam know where to find some of our source files
+SEARCH_SOURCE += [ FDirName $(SUBDIR) openjpeg ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) libicns ] ;
+
+SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
+
+local openjpeg_files = 
+	bio.c
+	cio.c
+	dwt.c
+	event.c
+	image.c
+	j2k.c
+	j2k_lib.c
+	jp2.c
+	jpt.c
+	mct.c
+	mqc.c
+	openjpeg.c
+	pi.c
+	raw.c
+	t1.c
+	t2.c
+	tcd.c
+	tgt.c
+	cidx_manager.c
+	phix_manager.c
+	ppix_manager.c
+	thix_manager.c
+	tpix_manager.c
+	;
+
+ObjectCcFlags [ FGristFiles $(openjpeg_files:S=$(SUFOBJ)) ] : -w ;
+
+local libicns_files = 
+	icns_debug.c
+	icns_element.c
+	icns_family.c
+	icns_image.c
+	icns_io.c
+	icns_jp2.c
+	icns_png.c
+	icns_rle24.c
+	icns_utils.c
+	;
+
+ObjectCcFlags [ FGristFiles $(libicns_files:S=$(SUFOBJ)) ] : -w ;
+
+AddResources ICNSTranslator : ICNSTranslator.rdef ;
+
+Translator ICNSTranslator :
+
+	# ICNSTranslator
+	ICNSTranslator.cpp
+	ICNSLoader.cpp
+	ConfigView.cpp
+	main.cpp
+
+	$(openjpeg_files)
+	
+	$(libicns_files)
+
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	$(HAIKU_LIBPNG_LIB) $(HAIKU_LOCALE_LIBS)
+	: true
+;
+
+DoCatalogs ICNSTranslator :
+	x-vnd.Haiku-ICNSTranslator
+	:
+	ICNSTranslator.h
+	ICNSTranslator.cpp
+;
+
+Package haiku-translationkit-cvs :
+	ICNSTranslator :
+	boot home config add-ons Translators ;
+
