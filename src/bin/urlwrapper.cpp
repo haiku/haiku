@@ -222,6 +222,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	const char* failc = " || read -p 'Press any key'";
 	const char* pausec = " ; read -p 'Press any key'";
 	char* args[] = { (char *)"/bin/sh", (char *)"-c", NULL, NULL};
+	status_t err;
 
 	BPrivate::Support::BUrl url(argv[1]);
 
@@ -500,6 +501,25 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 			return;
 		m.AddRef("refs", &ref);
 		be_roster->Launch(kTrackerSig, &m);
+		return;
+	}
+
+	if (proto == "doi") {
+		BString url("http://dx.doi.org/");
+		BString mimetype;
+
+		url << full;
+		BPrivate::Support::BUrl u(url.String());
+		args[0] = const_cast<char*>("urlwrapper"); //XXX
+		args[1] = (char*)u.String();
+		args[2] = NULL;
+		mimetype = kURLHandlerSigBase;
+		mimetype += u.Proto();
+
+		err = be_roster->Launch(mimetype.String(), 1, args + 1);
+		if (err != B_OK && err != B_ALREADY_RUNNING)
+			err = be_roster->Launch(kAppSig, 1, args + 1);
+		// TODO: handle errors
 		return;
 	}
 
