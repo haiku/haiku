@@ -139,7 +139,10 @@ ICNSTranslator::DerivedIdentify(BPositionIO *stream,
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = ICNS_IN_QUALITY;
 	info->capability = ICNS_IN_CAPABILITY;
-	snprintf(info->name, sizeof(info->name), "Apple icon");
+	BString iconName("Apple icon");
+	if (documentCount > 1)
+		iconName << " #" << documentIndex;
+	snprintf(info->name, sizeof(info->name), iconName.String());
 	strcpy(info->MIME, kICNSMimeType);
 
 	return B_OK;
