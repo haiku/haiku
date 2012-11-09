@@ -223,6 +223,7 @@ ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 	icns_type_t iconType = icns_get_type_from_image_info(iconInfo);
 	
 	if (iconType == ICNS_NULL_TYPE) {
+		delete bits;
 		free(fIconFamily);
 		fIconFamily = NULL;
 		return;
@@ -278,6 +279,8 @@ ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 		free(fIconFamily);
 		fIconFamily = NULL;
 	}
+	
+	delete bits;
 }
 
 
