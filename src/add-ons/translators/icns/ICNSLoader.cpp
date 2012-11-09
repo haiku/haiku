@@ -60,6 +60,9 @@ ICNSLoader::ICNSLoader(BPositionIO *stream)
 	stream->Seek(0, SEEK_END);
 	fStreamSize = stream->Position();
 	stream->Seek(0, SEEK_SET);
+	
+	if (fStreamSize <= 0)
+		return;
 		
 	uint8* icnsDataBuffer = new uint8[fStreamSize];
 	size_t readedBytes = stream->Read(icnsDataBuffer,fStreamSize);
@@ -67,8 +70,11 @@ ICNSLoader::ICNSLoader(BPositionIO *stream)
 	fIconFamily = NULL;
 	int status = icns_import_family_data(readedBytes, icnsDataBuffer,
 		&fIconFamily);
-	if (status != 0)
+	
+	if (status != 0) {
+		delete icnsDataBuffer;		
 		return;
+	}
 
 	icns_byte_t *dataPtr = (icns_byte_t*)fIconFamily;
 	off_t dataOffset = sizeof(icns_type_t) + sizeof(icns_size_t);
@@ -89,10 +95,10 @@ ICNSLoader::ICNSLoader(BPositionIO *stream)
 		}		
 		dataOffset += iconElement.elementSize;
 	}
-		
+			
 	fFormatList.SortItems(compareTypes);
 	
-	delete icnsDataBuffer;	
+	delete icnsDataBuffer;
 
 	fLoaded = true;	
 }
@@ -275,7 +281,7 @@ ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 		icns_free_image(&icnsMask);
 	}	
 		
-	if(!fCreated) {
+	if (!fCreated) {
 		free(fIconFamily);
 		fIconFamily = NULL;
 	}
@@ -297,9 +303,11 @@ ICNSSaver::SaveData(BPositionIO *target)
 	icns_size_t dataSize;
 	icns_byte_t *dataPtrOut;
 	icns_export_family_data(fIconFamily, &dataSize, &dataPtrOut);
-	target->Write(dataPtrOut, dataSize);
-	
-	return B_OK;
+	if (dataSize != 0 && dataPtrOut != NULL) {
+		if (target->Write(dataPtrOut, dataSize) == dataSize);
+			return B_OK;
+	}
+	return B_ERROR;
 }
 
 

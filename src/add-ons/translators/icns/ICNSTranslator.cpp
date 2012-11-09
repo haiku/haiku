@@ -191,7 +191,7 @@ ICNSTranslator::DerivedTranslate(BPositionIO *source,
 			if (!icnsFile.IsLoaded() || icnsFile.IconsCount() <= 0)
 				return B_NO_TRANSLATOR;
 
-			int32 documentIndex = 0;
+			int32 documentIndex = 1;
 			
 			if (ioExtension) {
 				if (ioExtension->FindInt32(DOCUMENT_INDEX, &documentIndex) != B_OK)
