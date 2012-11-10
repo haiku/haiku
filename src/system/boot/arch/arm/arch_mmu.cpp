@@ -6,7 +6,7 @@
  */
 
 
-#include "mmu.h"
+#include "arch_mmu.h"
 
 #include <boot/platform.h>
 #include <boot/stdio.h>
@@ -14,9 +14,7 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <arch_kernel.h>
-#ifdef __ARM__
 #include <arm_mmu.h>
-#endif
 #include <kernel.h>
 
 #include <board_config.h>
@@ -38,8 +36,6 @@
 	// Define this to print the memory map to serial debug,
 	// You also need to define ENABLE_SERIAL in serial.cpp
 	// for output to work.
-
-#ifdef __ARM__
 
 
 /*
@@ -541,7 +537,6 @@ mmu_free(void *virtualAddress, size_t size)
 		sNextVirtualAddress -= size;
 	}
 }
-#endif
 
 
 /*!	Sets up the final and kernel accessible GDT and IDT tables.
@@ -553,7 +548,6 @@ mmu_init_for_kernel(void)
 {
 	TRACE(("mmu_init_for_kernel\n"));
 
-#ifdef __ARM__
 	// save the memory we've physically allocated
 	gKernelArgs.physical_allocated_range[0].size
 		= sNextPhysicalAddress - gKernelArgs.physical_allocated_range[0].start;
@@ -591,7 +585,6 @@ mmu_init_for_kernel(void)
 		}
 	}
 #endif
-#endif
 }
 
 
@@ -600,7 +593,6 @@ mmu_init(void)
 {
 	TRACE(("mmu_init\n"));
 
-#ifdef __ARM__
 	mmu_write_C1(mmu_read_C1() & ~((1<<29)|(1<<28)|(1<<0)));
 		// access flag disabled, TEX remap disabled, mmu disabled
 
@@ -647,7 +639,6 @@ mmu_init(void)
 
 	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
-#endif
 }
 
 
@@ -658,25 +649,19 @@ extern "C" status_t
 platform_allocate_region(void **_address, size_t size, uint8 protection,
 	bool /*exactAddress*/)
 {
-#ifdef __ARM__
 	void *address = mmu_allocate(*_address, size);
 	if (address == NULL)
 		return B_NO_MEMORY;
 
 	*_address = address;
 	return B_OK;
-#else
-	return B_ERROR;
-#endif
 }
 
 
 extern "C" status_t
 platform_free_region(void *address, size_t size)
 {
-#ifdef __ARM__
 	mmu_free(address, size);
-#endif
 	return B_OK;
 }
 
@@ -693,7 +678,6 @@ platform_release_heap(struct stage2_args *args, void *base)
 status_t
 platform_init_heap(struct stage2_args *args, void **_base, void **_top)
 {
-#ifdef __ARM__
 	void *heap = (void *)get_next_physical_address(args->heap_size);
 	if (heap == NULL)
 		return B_NO_MEMORY;
@@ -701,7 +685,4 @@ platform_init_heap(struct stage2_args *args, void **_base, void **_top)
 	*_base = heap;
 	*_top = (void *)((int8 *)heap + args->heap_size);
 	return B_OK;
-#else
-	return B_ERROR;
-#endif
 }

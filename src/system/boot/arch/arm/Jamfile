@@ -30,6 +30,9 @@ KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	arch_framebuffer_920.cpp
 	arch_framebuffer_pxa.cpp
 	arch_framebuffer_omap3.cpp
+	arch_cpu.cpp
+	arch_mmu.cpp
+	arch_start_kernel.S
 	$(librootArchObjects)
 	: -fno-pic
 	:

@@ -14,7 +14,6 @@
 #include <boot/platform.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>
-#include "mmu.h"
 
 #include <string.h>
 
