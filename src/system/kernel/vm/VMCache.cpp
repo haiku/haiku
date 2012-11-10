@@ -679,7 +679,7 @@ VMCache::Delete()
 		page->SetCacheRef(NULL);
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
-			oldPage->physical_page_number));
+			page->physical_page_number));
 		DEBUG_PAGE_ACCESS_START(page);
 		vm_page_free(this, page);
 	}
@@ -928,7 +928,7 @@ VMCache::WaitForPageEvents(vm_page* page, uint32 events, bool relock)
 void
 VMCache::AddConsumer(VMCache* consumer)
 {
-	TRACE(("add consumer vm cache %p to cache %p\n", consumer, cache));
+	TRACE(("add consumer vm cache %p to cache %p\n", consumer, this));
 	AssertLocked();
 	consumer->AssertLocked();
 

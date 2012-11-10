@@ -25,6 +25,7 @@ resource(1, "BEOS:FILE_TYPES") message
 	"types" = "application/x-vnd.Be.URL.ssh",
 	"types" = "application/x-vnd.Be.URL.ftp",
 	"types" = "application/x-vnd.Be.URL.sftp",
-	"types" = "application/x-vnd.Be.URL.finger"
+	"types" = "application/x-vnd.Be.URL.finger",
+	"types" = "application/x-vnd.Be.URL.doi"
 };
 

@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system boot platform raspberrypi_arm ;
 
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_ARCH) ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
@@ -29,10 +30,8 @@ KernelMergeObject boot_platform_raspberrypi_arm.o :
 	gpio.cpp
 	keyboard.cpp
 	menu.cpp
-	mmu.cpp
 	serial.cpp
 	video.cpp
-	arch_start_kernel.S
 
 	$(genericPlatformSources)
 	: -fno-pic

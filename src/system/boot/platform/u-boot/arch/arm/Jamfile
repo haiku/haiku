@@ -11,12 +11,6 @@ SubDirC++Flags -fno-rtti ;
 KernelMergeObject boot_platform_u-boot_arm.o :
 	# must come first to have _start_* at correct locations
 	shell.S
-
-	arch_mmu.cpp
-	#arch_cpu_asm.S
-	arch_start_kernel.S
-	arch_cpu.cpp
-	#mmu.cpp
 	: -fno-pic
 ;
 
