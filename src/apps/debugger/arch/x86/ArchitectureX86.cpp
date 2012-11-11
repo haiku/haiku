@@ -620,8 +620,9 @@ ArchitectureX86::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
 	// two available for watchpoints.
 	_maxRegisterCount = 2;
 
-	// x86 only supports write watchpoints.
-	_watchpointCapabilityFlags = WATCHPOINT_CAPABILITY_FLAG_WRITE;
+	// x86 only supports write and read/write watchpoints.
+	_watchpointCapabilityFlags = WATCHPOINT_CAPABILITY_FLAG_WRITE
+		| WATCHPOINT_CAPABILITY_FLAG_READ_WRITE;
 
 	return B_OK;
 }
