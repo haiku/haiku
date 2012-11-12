@@ -2550,6 +2550,7 @@ DEFINE_SET_GET_FUNCTIONS(uint64, UInt64, B_UINT64_TYPE);
 DEFINE_SET_GET_FUNCTIONS(bool, Bool, B_BOOL_TYPE);
 DEFINE_SET_GET_FUNCTIONS(float, Float, B_FLOAT_TYPE);
 DEFINE_SET_GET_FUNCTIONS(double, Double, B_DOUBLE_TYPE);
+DEFINE_SET_GET_FUNCTIONS(const char *, String, B_STRING_TYPE);
 
 #undef DEFINE_SET_GET_FUNCTION
 
@@ -3202,6 +3203,13 @@ status_t
 BMessage::SetString(const char* name, const char* value)
 {
 	return SetData(name, B_STRING_TYPE, value, strlen(value) + 1);
+}
+
+
+status_t
+BMessage::SetString(const char *name, const BString& value)
+{
+	return SetData(name, B_STRING_TYPE, value.String(), value.Length() + 1);
 }
 
 
