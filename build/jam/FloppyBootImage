@@ -3,12 +3,15 @@
 
 local X86_ONLY = ;
 local PPC_ONLY = ;
+local ARM_ONLY = ;
 if $(TARGET_ARCH) = x86 {
 	X86_ONLY = "" ;
 } else if $(TARGET_ARCH) = ppc {
 	X86_ONLY = ;
 } else if $(TARGET_ARCH) = m68k {
 	X86_ONLY = ;
+} else if $(TARGET_ARCH) = arm {
+	ARM_ONLY = "" ;
 }
 
 local GPL_ONLY = ;
@@ -80,6 +83,7 @@ if $(TARGET_ARCH) = x86 {
 
 # drivers
 AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
+AddNewDriversToFloppyBootArchive disk : $(ARM_ONLY)norflash ;
 if $(USB_BOOT) = 1 {
 	AddDriversToFloppyBootArchive disk usb : usb_disk ;
 }
@@ -122,7 +126,7 @@ AddBootModuleSymlinksToFloppyBootArchive
 	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
 	it8211
 	$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci
-	scsi_cd scsi_disk $(USB_ONLY)usb_disk
+	scsi_cd scsi_disk $(USB_ONLY)usb_disk $(ARM_ONLY)norflash
 	intel session
 	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
 	$(BOOT_ADD_ONS_NET)
