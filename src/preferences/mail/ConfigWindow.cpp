@@ -831,13 +831,13 @@ ConfigWindow::_AccountSelected(AccountItem* item)
 			break;
 
 		case INBOUND_ITEM:
-			view = new ProtocolConfigView(*account, account->InboundAddOnRef(),
-				account->InboundSettings());
+			view = new ProtocolSettingsView(account->InboundAddOnRef(),
+				*account, account->InboundSettings());
 			break;
 
 		case OUTBOUND_ITEM:
-			view = new ProtocolConfigView(*account, account->OutboundAddOnRef(),
-				account->OutboundSettings());
+			view = new ProtocolSettingsView(account->OutboundAddOnRef(),
+				*account, account->OutboundSettings());
 			break;
 
 		case FILTER_ITEM:

@@ -12,8 +12,11 @@
 #include <Box.h>
 #include <image.h>
 
-#include "MailSettings.h"
+#include <MailSettingsView.h>
+#include <MailSettings.h>
+
 #include <ProtocolConfigView.h>
+
 #include "FilterConfigView.h"
 
 
@@ -43,23 +46,22 @@ private:
 };
 
 
-class ProtocolConfigView : public BBox {
+class ProtocolSettingsView : public BBox {
 public:
-								ProtocolConfigView(
-									BMailAccountSettings& accountSettings,
-									const entry_ref& ref,
+								ProtocolSettingsView(const entry_ref& ref,
+									const BMailAccountSettings& accountSettings,
 									BMailProtocolSettings& settings);
 
 			void 				DetachedFromWindow();
 
 private:
-			status_t			_CreateConfigView(const entry_ref& ref,
-									BMailProtocolSettings& settings,
-									BMailAccountSettings& accountSettings);
+			status_t			_CreateSettingsView(const entry_ref& ref,
+									const BMailAccountSettings& accountSettings,
+									BMailProtocolSettings& settings);
 
 private:
 			BMailProtocolSettings& fSettings;
-			BView*				fConfigView;
+			BMailSettingsView*	fSettingsView;
 			image_id			fImage;
 };
 

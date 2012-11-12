@@ -15,10 +15,8 @@
 class SpamFilter : public BMailFilter {
 public:
 								SpamFilter(BMailProtocol& protocol,
-									BMailAddOnSettings* settings);
+									const BMailAddOnSettings& settings);
 	virtual						~SpamFilter();
-
-	virtual BString				DescriptiveName() const;
 
 	virtual	void				HeaderFetched(const entry_ref& ref,
 									BFile* file);

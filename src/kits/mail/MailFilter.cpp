@@ -6,7 +6,8 @@
 #include <MailFilter.h>
 
 
-BMailFilter::BMailFilter(BMailProtocol& protocol, BMailAddOnSettings* settings)
+BMailFilter::BMailFilter(BMailProtocol& protocol,
+	const BMailAddOnSettings* settings)
 	:
 	fMailProtocol(protocol),
 	fSettings(settings)

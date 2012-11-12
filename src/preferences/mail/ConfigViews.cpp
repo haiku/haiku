@@ -120,17 +120,18 @@ AccountConfigView::UpdateViews()
 // #pragma mark -
 
 
-ProtocolConfigView::ProtocolConfigView(BMailAccountSettings& accountSettings,
-	const entry_ref& ref, BMailProtocolSettings& settings)
+ProtocolSettingsView::ProtocolSettingsView(const entry_ref& ref,
+	const BMailAccountSettings& accountSettings,
+	BMailProtocolSettings& settings)
 	:
 	BBox("protocol"),
 	fSettings(settings),
-	fConfigView(NULL)
+	fSettingsView(NULL)
 {
-	status_t status = _CreateConfigView(ref, settings, accountSettings);
-	BView* view = fConfigView;
+	status_t status = _CreateSettingsView(ref, accountSettings, settings);
+	BView* view = fSettingsView;
 
-	if (fConfigView != NULL) {
+	if (status == B_OK) {
 		SetLabel(ref.name);
 	} else {
 		BString text(B_TRANSLATE("An error occurred while creating the "
@@ -151,30 +152,33 @@ ProtocolConfigView::ProtocolConfigView(BMailAccountSettings& accountSettings,
 
 
 void
-ProtocolConfigView::DetachedFromWindow()
+ProtocolSettingsView::DetachedFromWindow()
 {
-	if (fConfigView == NULL)
+	if (fSettingsView == NULL)
 		return;
+
 	BMessage settings;
-	if (fConfigView->Archive(&settings) != B_OK)
+	if (fSettingsView->Archive(&settings) != B_OK)
 		return;
 
 	fSettings.MakeEmpty();
 	fSettings.Append(settings);
 
-	RemoveChild(fConfigView);
-	delete fConfigView;
-	fConfigView = NULL;
+	RemoveChild(fSettingsView);
+	delete fSettingsView;
+	fSettingsView = NULL;
 	unload_add_on(fImage);
 }
 
 
 status_t
-ProtocolConfigView::_CreateConfigView(const entry_ref& ref,
-	BMailProtocolSettings& settings, BMailAccountSettings& accountSettings)
+ProtocolSettingsView::_CreateSettingsView(const entry_ref& ref,
+	const BMailAccountSettings& accountSettings,
+	BMailProtocolSettings& settings)
 {
-	BView* (*instantiateConfig)(BMailProtocolSettings& settings,
-		BMailAccountSettings& accountSettings);
+	BMailSettingsView* (*instantiateConfig)(
+		const BMailAccountSettings& accountSettings,
+		BMailProtocolSettings& settings);
 	BPath path(&ref);
 	image_id image = load_add_on(path.Path());
 	if (image < 0)
@@ -187,6 +191,6 @@ ProtocolConfigView::_CreateConfigView(const entry_ref& ref,
 	}
 
 	fImage = image;
-	fConfigView = instantiateConfig(settings, accountSettings);
+	fSettingsView = instantiateConfig(accountSettings, settings);
 	return B_OK;
 }

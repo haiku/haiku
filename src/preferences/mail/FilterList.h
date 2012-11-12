@@ -8,7 +8,7 @@
 
 
 #include <MailSettings.h>
-#include <View.h>
+#include <MailSettingsView.h>
 
 
 enum direction {
@@ -20,32 +20,46 @@ enum direction {
 struct FilterInfo {
 	image_id		image;
 	entry_ref		ref;
+	BMailSettingsView* (*instantiateSettingsView)(
+		const BMailAccountSettings& accountSettings,
+		const BMailAddOnSettings& settings);
+	BString			(*name)(
+		const BMailAccountSettings& accountSettings,
+		const BMailAddOnSettings* settings);
 };
 
 
 class FilterList {
 public:
-								FilterList(direction dir,
-									bool loadOnStart = true);
+								FilterList(direction dir);
 								~FilterList();
 
 			void				Reload();
 
-			int32				CountInfos();
-			FilterInfo&			InfoAt(int32 index);
+			int32				CountInfos() const;
+			const FilterInfo&	InfoAt(int32 index) const;
+			int32				InfoIndexFor(const entry_ref& ref) const;
 
-			bool				GetDescriptiveName(int32 index, BString& name);
-			bool				GetDescriptiveName(const entry_ref& ref,
-									BString& name);
+			BString				SimpleName(int32 index,
+									const BMailAccountSettings& settings) const;
+			BString				SimpleName(const entry_ref& ref,
+									const BMailAccountSettings& settings) const;
+			BString				DescriptiveName(int32 index,
+									const BMailAccountSettings& settings,
+									const BMailAddOnSettings* settings) const;
+			BString				DescriptiveName(const entry_ref& ref,
+									const BMailAccountSettings& settings,
+									const BMailAddOnSettings* settings) const;
 
-			BView*				CreateConfigView(BMailAddOnSettings& settings);
-
-			int32				InfoIndexFor(const entry_ref& ref);
+			BMailSettingsView*	CreateSettingsView(
+									const BMailAccountSettings& accountSettings,
+									const BMailAddOnSettings& settings);
 
 private:
 			void				_MakeEmpty();
-			void				_LoadAddOn(BEntry& entry);
+			status_t			_LoadAddOn(BEntry& entry);
 
+private:
 			direction			fDirection;
 			std::vector<FilterInfo> fList;
 };

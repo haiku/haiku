@@ -29,6 +29,7 @@ local sources =
 	MailMessage.cpp
 	MailProtocol.cpp
 	MailSettings.cpp
+	MailSettingsView.cpp
 	NodeMessage.cpp
 	numailkit.cpp
 	ProtocolConfigView.cpp

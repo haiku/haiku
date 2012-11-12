@@ -12,6 +12,7 @@
 #include <LayoutBuilder.h>
 #include <MailFilter.h>
 #include <MailSettings.h>
+#include <MailSettingsView.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -20,7 +21,7 @@
 
 #include <FileConfigView.h>
 
-#include "RuleFilter.h"
+#include "MatchHeaderSettings.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -33,13 +34,15 @@ using namespace BPrivate;
 static const uint32 kMsgActionChanged = 'actC';
 
 
-class RuleFilterConfig : public BView {
+class RuleFilterConfig : public BMailSettingsView {
 public:
-								RuleFilterConfig(const BMessage& settings);
+								RuleFilterConfig(
+									const BMailAddOnSettings& settings);
+
+	virtual status_t			SaveInto(BMailAddOnSettings& settings) const;
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AttachedToWindow();
-	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
 
 private:
 			void				_SetVisible(BView* view, bool visible);
@@ -57,48 +60,38 @@ private:
 };
 
 
-RuleFilterConfig::RuleFilterConfig(const BMessage& settings)
+RuleFilterConfig::RuleFilterConfig(const BMailAddOnSettings& addOnSettings)
 	:
-	BView("rulefilter_config", 0),
+	BMailSettingsView("rulefilter_config"),
 	fActionMenu(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	if (settings.HasInt32("do_what"))
-		fAction = settings.FindInt32("do_what");
-	else
-		fAction = -1;
+	MatchHeaderSettings settings(addOnSettings);
+	fAction = settings.Action();
 
 	fAttributeControl = new BTextControl("attr", B_TRANSLATE("If"),
 		B_TRANSLATE("header (e.g. Subject)"), NULL);
-	if (settings.HasString("attribute"))
-		fAttributeControl->SetText(settings.FindString("attribute"));
+	fAttributeControl->SetText(settings.Attribute());
 
 	fRegexControl = new BTextControl("regex", B_TRANSLATE("has"),
-		B_TRANSLATE("value (use REGEX: in from of regular expressions like "
+		B_TRANSLATE("value (use REGEX: in front of regular expressions like "
 			"*spam*)"), NULL);
-	if (settings.HasString("regex"))
-		fRegexControl->SetText(settings.FindString("regex"));
+	fRegexControl->SetText(settings.Expression());
 
 	fFileControl = new FileControl("arg", NULL,
 		B_TRANSLATE("this field is based on the action"));
 	if (BControl* control = (BControl*)fFileControl->FindView("select_file"))
 		control->SetEnabled(false);
-	if (fAction == ACTION_MOVE_TO && settings.HasString("argument"))
-		fFileControl->SetText(settings.FindString("argument"));
+	fFileControl->SetText(settings.MoveTarget());
 
 	fFlagsControl = new BTextControl("flags", NULL, NULL);
-	if (fAction == ACTION_SET_FLAGS_TO && settings.HasString("argument"))
-		fFlagsControl->SetText(settings.FindString("argument"));
+	fFlagsControl->SetText(settings.SetFlagsTo());
 
 	// Populate account menu
 
 	fAccountMenu = new BPopUpMenu(B_TRANSLATE("<Choose account>"));
-
-	if (fAction == ACTION_REPLY_WITH)
-		fAccountID = settings.FindInt32("argument");
-	else
-		fAccountID = -1;
+	fAccountID = settings.ReplyAccount();
 
 	BMailAccounts accounts;
 	for (int32 i = 0; i < accounts.CountAccounts(); i++) {
@@ -145,7 +138,7 @@ RuleFilterConfig::RuleFilterConfig(const BMessage& settings)
 		fActionMenu->AddItem(new BMenuItem(kActions[i].label, message));
 	}
 
-	BMenuField* actionField = new BMenuField("do_what", B_TRANSLATE("Then"),
+	BMenuField* actionField = new BMenuField("action", B_TRANSLATE("Then"),
 		fActionMenu);
 
 	// Build layout
@@ -166,30 +159,42 @@ RuleFilterConfig::RuleFilterConfig(const BMessage& settings)
 }
 
 
+status_t
+RuleFilterConfig::SaveInto(BMailAddOnSettings& settings) const
+{
+	int32 action = fActionMenu->IndexOf(fActionMenu->FindMarked());
+	settings.SetInt32("action", action);
+	settings.SetString("attribute", fAttributeControl->Text());
+	settings.SetString("regex", fRegexControl->Text());
+
+	switch (action) {
+		case ACTION_MOVE_TO:
+			settings.SetString("move target", fFileControl->Text());
+			break;
+
+		case ACTION_SET_FLAGS_TO:
+			settings.SetString("set flags", fFlagsControl->Text());
+			break;
+
+		case ACTION_REPLY_WITH:
+		{
+			BMenuItem* item = fAccountMenu->FindMarked();
+			if (item != NULL) {
+				settings.SetInt32("account",
+					item->Message()->FindInt32("account id"));
+			}
+			break;
+		}
+	}
+
+	return B_OK;
+}
+
+
 void
 RuleFilterConfig::AttachedToWindow()
 {
 	fActionMenu->SetTargetForItems(this);
-}
-
-
-status_t
-RuleFilterConfig::Archive(BMessage *into, bool deep) const
-{
-	into->MakeEmpty();
-	into->AddInt32("do_what", fActionMenu->IndexOf(fActionMenu->FindMarked()));
-	into->AddString("attribute", fAttributeControl->Text());
-	into->AddString("regex", fRegexControl->Text());
-	if (into->FindInt32("do_what") == ACTION_REPLY_WITH) {
-		BMenuItem* item = fAccountMenu->FindMarked();
-		if (item != NULL) {
-			into->AddInt32("argument",
-				item->Message()->FindInt32("account id"));
-		}
-	} else
-		into->AddString("argument", fFileControl->Text());
-
-	return B_OK;
 }
 
 
@@ -224,8 +229,9 @@ RuleFilterConfig::_SetVisible(BView* view, bool visible)
 // #pragma mark -
 
 
-BView*
-instantiate_filter_config_panel(BMailAddOnSettings& settings)
+BMailSettingsView*
+instantiate_filter_settings_view(const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings& settings)
 {
 	return new RuleFilterConfig(settings);
 }

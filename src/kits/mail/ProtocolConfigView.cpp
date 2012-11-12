@@ -394,7 +394,7 @@ MailProtocolConfigView::_StoreIndexOfMarked(BMessage& message, const char* name,
 	BMenuField* field) const
 {
 	int32 index = -1;
-	if (field != NULL) {
+	if (field != NULL && field->Menu() != NULL) {
 		BMenuItem* item = field->Menu()->FindMarked();
 		if (item != NULL)
 			index = field->Menu()->IndexOf(item);

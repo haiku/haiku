@@ -30,7 +30,7 @@ const uint32 kMsgNotifyMethod = 'nomt';
 
 NotifierConfigView::NotifierConfigView()
 	:
-	BView("notifier_config", 0)
+	BMailSettingsView("notifier_config")
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -55,14 +55,6 @@ NotifierConfigView::NotifierConfigView()
 
 
 void
-NotifierConfigView::AttachedToWindow()
-{
-	if (BMenuField *field = dynamic_cast<BMenuField *>(FindView("notify")))
-		field->Menu()->SetTargetForItems(this);
-}
-
-
-void
 NotifierConfigView::SetTo(const BMessage *archive)
 {
 	int32 method = archive->FindInt32("notification_method");
@@ -77,12 +69,38 @@ NotifierConfigView::SetTo(const BMessage *archive)
 		BMenuItem *item = field->Menu()->ItemAt(i);
 		item->SetMarked((method & (1L << i)) != 0);
 	}
-	UpdateNotifyText();
+	_UpdateNotifyText();
+}
+
+
+status_t
+NotifierConfigView::SaveInto(BMailAddOnSettings& settings) const
+{
+	int32 method = 0;
+
+	BMenuField *field;
+	if ((field = dynamic_cast<BMenuField *>(FindView("notify"))) != NULL) {
+		for (int32 i = field->Menu()->CountItems(); i-- > 0;) {
+			BMenuItem *item = field->Menu()->ItemAt(i);
+			if (item->IsMarked())
+				method |= 1L << i;
+		}
+	}
+
+	return settings.SetInt32("notification_method", method);
 }
 
 
 void
-NotifierConfigView::UpdateNotifyText()
+NotifierConfigView::AttachedToWindow()
+{
+	if (BMenuField *field = dynamic_cast<BMenuField *>(FindView("notify")))
+		field->Menu()->SetTargetForItems(this);
+}
+
+
+void
+NotifierConfigView::_UpdateNotifyText()
 {
 	BMenuField *field;
 	if ((field = dynamic_cast<BMenuField *>(FindView("notify"))) == NULL)
@@ -115,7 +133,7 @@ NotifierConfigView::MessageReceived(BMessage *msg)
 				break;
 
 			item->SetMarked(!item->IsMarked());
-			UpdateNotifyText();
+			_UpdateNotifyText();
 			break;
 		}
 		default:
@@ -124,34 +142,14 @@ NotifierConfigView::MessageReceived(BMessage *msg)
 }
 
 
-status_t
-NotifierConfigView::Archive(BMessage *into, bool /*deep*/) const
-{
-	int32 method = 0;
-
-	BMenuField *field;
-	if ((field = dynamic_cast<BMenuField *>(FindView("notify"))) != NULL) {
-		for (int32 i = field->Menu()->CountItems(); i-- > 0;) {
-			BMenuItem *item = field->Menu()->ItemAt(i);
-			if (item->IsMarked())
-				method |= 1L << i;
-		}
-	}
-
-	if (into->ReplaceInt32("notification_method", method) != B_OK)
-		into->AddInt32("notification_method", method);
-
-	return B_OK;
-}
-
-
 // #pragma mark -
 
 
-BView*
-instantiate_filter_config_panel(BMailAddOnSettings& settings)
+BMailSettingsView*
+instantiate_filter_settings_view(const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings& settings)
 {
-	NotifierConfigView *view = new NotifierConfigView();
+	NotifierConfigView* view = new NotifierConfigView();
 	view->SetTo(&settings);
 	return view;
 }

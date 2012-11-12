@@ -18,6 +18,8 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <LayoutBuilder.h>
+#include <MailFilter.h>
+#include <MailSettingsView.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <Roster.h>
@@ -27,7 +29,6 @@
 #include <Entry.h>
 #include <Path.h>
 
-#include <MailFilter.h>
 #include <FileConfigView.h>
 
 
@@ -35,11 +36,11 @@
 #define B_TRANSLATION_CONTEXT "SpamFilterConfig"
 
 
-class SpamFilterConfig : public BView {
+class SpamFilterConfig : public BMailSettingsView {
 public:
 								SpamFilterConfig(const BMessage* settings);
 
-	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual status_t			SaveInto(BMailAddOnSettings& settings) const;
 
 private:
 			BCheckBox*			fSubjectHintCheckBox;
@@ -54,7 +55,7 @@ private:
 
 SpamFilterConfig::SpamFilterConfig(const BMessage* settings)
 	:
-	BView("spamfilter_config", 0),
+	BMailSettingsView("spamfilter_config"),
 	fSubjectHintCheckBox(NULL),
 	fAutoTrainingCheckBox(NULL),
 	fGenuineCutoffRatioTextControl(NULL),
@@ -116,27 +117,27 @@ SpamFilterConfig::SpamFilterConfig(const BMessage* settings)
 
 
 status_t
-SpamFilterConfig::Archive(BMessage* into, bool /*deep*/) const
+SpamFilterConfig::SaveInto(BMailAddOnSettings& settings) const
 {
-	into->MakeEmpty();
+	settings.MakeEmpty();
 
-	status_t status = into->AddBool("AddMarkerToSubject",
+	status_t status = settings.AddBool("AddMarkerToSubject",
 		fSubjectHintCheckBox->Value() == B_CONTROL_ON);
 
 	if (status == B_OK) {
-		status = into->AddBool("AutoTraining",
+		status = settings.AddBool("AutoTraining",
 			fAutoTrainingCheckBox->Value() == B_CONTROL_ON);
 	}
 	if (status == B_OK) {
-		status = into->AddBool("NoWordsMeansSpam",
+		status = settings.AddBool("NoWordsMeansSpam",
 			fNoWordsMeansSpamCheckBox->Value() == B_CONTROL_ON);
 	}
 	if (status == B_OK) {
-		status = into->AddFloat("GenuineCutoffRatio",
+		status = settings.AddFloat("GenuineCutoffRatio",
 			atof(fGenuineCutoffRatioTextControl->Text()));
 	}
 	if (status == B_OK) {
-		status = into->AddFloat("SpamCutoffRatio",
+		status = settings.AddFloat("SpamCutoffRatio",
 			atof(fSpamCutoffRatioTextControl->Text()));
 	}
 
@@ -147,8 +148,9 @@ SpamFilterConfig::Archive(BMessage* into, bool /*deep*/) const
 // #pragma mark -
 
 
-BView*
-instantiate_filter_config_panel(BMailAddOnSettings& settings)
+BMailSettingsView*
+instantiate_filter_settings_view(const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings& settings)
 {
 	return new SpamFilterConfig(&settings);
 }

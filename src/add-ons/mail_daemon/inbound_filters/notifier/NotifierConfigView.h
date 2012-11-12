@@ -8,7 +8,7 @@
 #define NOTIFIER_CONFIG_VIEW_H
 
 
-#include <View.h>
+#include <MailSettingsView.h>
 
 
 enum {
@@ -21,18 +21,19 @@ enum {
 };
 
 
-class NotifierConfigView : public BView {
+class NotifierConfigView : public BMailSettingsView {
 public:
 								NotifierConfigView();
 
 			void				SetTo(const BMessage *archive);
 
-	virtual	status_t			Archive(BMessage *into, bool deep = true) const;
+	virtual status_t			SaveInto(BMailAddOnSettings& settings) const;
 
 	virtual void				AttachedToWindow();
 	virtual void				MessageReceived(BMessage *msg);
 
-			void				UpdateNotifyText();
+private:
+			void				_UpdateNotifyText();
 };
 
 

@@ -31,9 +31,7 @@
 class NotifyFilter : public BMailFilter {
 public:
 								NotifyFilter(BMailProtocol& protocol,
-									BMailAddOnSettings* settings);
-
-	virtual BString				DescriptiveName() const;
+									const BMailAddOnSettings& settings);
 
 			void				HeaderFetched(const entry_ref& ref,
 									BFile* file);
@@ -46,19 +44,12 @@ private:
 
 
 NotifyFilter::NotifyFilter(BMailProtocol& protocol,
-	BMailAddOnSettings* settings)
+	const BMailAddOnSettings& settings)
 	:
-	BMailFilter(protocol, settings),
+	BMailFilter(protocol, &settings),
 	fNNewMessages(0)
 {
-	fStrategy = settings->FindInt32("notification_method");
-}
-
-
-BString
-NotifyFilter::DescriptiveName() const
-{
-	return filter_name();
+	fStrategy = settings.FindInt32("notification_method");
 }
 
 
@@ -130,14 +121,15 @@ NotifyFilter::MailboxSynchronized(status_t status)
 
 
 BString
-filter_name()
+filter_name(const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings* addOnSettings)
 {
 	return B_TRANSLATE("New mails notification");
 }
 
 
 BMailFilter*
-instantiate_filter(BMailProtocol& protocol, BMailAddOnSettings* settings)
+instantiate_filter(BMailProtocol& protocol, const BMailAddOnSettings& settings)
 {
 	return new NotifyFilter(protocol, settings);
 }

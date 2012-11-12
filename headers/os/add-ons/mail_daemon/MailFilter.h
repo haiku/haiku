@@ -11,16 +11,14 @@
 
 
 class BMailProtocol;
-class BView;
+class BMailSettingsView;
 
 
 class BMailFilter {
 public:
 								BMailFilter(BMailProtocol& protocol,
-									BMailAddOnSettings* settings);
+									const BMailAddOnSettings* settings);
 	virtual						~BMailFilter();
-
-	virtual BString				DescriptiveName() const = 0;
 
 	// Message hooks if filter is installed to an inbound protocol
 	virtual	void				HeaderFetched(const entry_ref& ref,
@@ -36,15 +34,18 @@ public:
 
 protected:
 			BMailProtocol&		fMailProtocol;
-			BMailAddOnSettings*	fSettings;
+			const BMailAddOnSettings* fSettings;
 };
 
 
 // Your filter needs to export these hooks in order to be picked up
-extern "C" BView* instantiate_filter_config_panel(BMailAddOnSettings& settings);
+extern "C" BMailSettingsView* instantiate_filter_settings_view(
+	const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings& settings);
+extern "C" BString filter_name(const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings* settings);
 extern "C" BMailFilter* instantiate_filter(BMailProtocol& protocol,
-	BMailAddOnSettings* settings);
-extern "C" BString filter_name();
+	const BMailAddOnSettings& settings);
 
 
 #endif	// _MAIL_FILTER_H

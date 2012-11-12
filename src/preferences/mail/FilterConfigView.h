@@ -20,7 +20,7 @@
 #include "FilterList.h"
 
 
-class FilterConfigBox;
+class FilterSettingsView;
 
 
 class FiltersConfigView : public BBox {
@@ -52,9 +52,10 @@ private:
 			BListView*			fListView;
 			BMenuField*			fAddField;
 			BButton*			fRemoveButton;
-			FilterConfigBox*	fFilterView;
+			FilterSettingsView*	fFilterView;
 
 			int32				fCurrentIndex;
 };
 
-#endif //FILTER_CONFIG_VIEW_H
+
+#endif // FILTER_CONFIG_VIEW_H

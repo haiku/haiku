@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2012, Haiku, Inc. All rights reserved.
  * Copyright 2002 Alexander G. M. Smith.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -45,23 +45,17 @@ static const char* kAGMSBayesBeepUncertainName = "SpamFilter-Uncertain";
 static const char* kServerSignature = "application/x-vnd.agmsmith.spamdbm";
 
 
-SpamFilter::SpamFilter(BMailProtocol& protocol, BMailAddOnSettings* settings)
+SpamFilter::SpamFilter(BMailProtocol& protocol,
+	const BMailAddOnSettings& settings)
 	:
-	BMailFilter(protocol, settings)
+	BMailFilter(protocol, &settings)
 {
-	if (settings->FindBool("AddMarkerToSubject", &fAddSpamToSubject) != B_OK)
-		fAddSpamToSubject = false;
-	if (settings->FindBool("AutoTraining", &fAutoTraining) != B_OK)
-		fAutoTraining = true;
-	if (settings->FindFloat("GenuineCutoffRatio", &fGenuineCutoffRatio) != B_OK)
-		fGenuineCutoffRatio = 0.01f;
-	if (settings->FindBool("NoWordsMeansSpam", &fNoWordsMeansSpam) != B_OK)
-		fNoWordsMeansSpam = true;
-	if (settings->FindBool("QuitServerWhenFinished",
-			&fQuitServerWhenFinished) != B_OK)
-		fQuitServerWhenFinished = false;
-	if (settings->FindFloat("SpamCutoffRatio", &fSpamCutoffRatio) != B_OK)
-		fSpamCutoffRatio = 0.99f;
+	fAddSpamToSubject = settings.GetBool("AddMarkerToSubject", false);
+	fAutoTraining = settings.GetBool("AutoTraining", true);
+	fGenuineCutoffRatio = settings.GetFloat("GenuineCutoffRatio", 0.01f);
+	fNoWordsMeansSpam = settings.GetBool("NoWordsMeansSpam", true);
+	fQuitServerWhenFinished = settings.GetBool("QuitServerWhenFinished", false);
+	fSpamCutoffRatio = settings.GetFloat("SpamCutoffRatio", 0.99f);
 }
 
 
@@ -69,13 +63,6 @@ SpamFilter::~SpamFilter()
 {
 	if (fQuitServerWhenFinished)
 		fMessengerToServer.SendMessage(B_QUIT_REQUESTED);
-}
-
-
-BString
-SpamFilter::DescriptiveName() const
-{
-	return filter_name();
 }
 
 
@@ -327,14 +314,15 @@ SpamFilter::_AddSpamToSubject(BNode* file, float spamRatio)
 
 
 BString
-filter_name()
+filter_name(const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings* addOnSettings)
 {
 	return B_TRANSLATE("Bayesian Spam Filter");
 }
 
 
 BMailFilter*
-instantiate_filter(BMailProtocol& protocol, BMailAddOnSettings* settings)
+instantiate_filter(BMailProtocol& protocol, const BMailAddOnSettings& settings)
 {
 	return new SpamFilter(protocol, settings);
 }

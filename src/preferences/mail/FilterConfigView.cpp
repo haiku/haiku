@@ -177,29 +177,30 @@ private:
 //	#pragma mark -
 
 
-class FilterConfigBox : public BBox {
+class FilterSettingsView : public BBox {
 public:
-	FilterConfigBox(const BString& label, BView* child)
+	FilterSettingsView(const BString& label, BMailSettingsView* settingsView)
 		:
-		BBox(BRect(0,0,100,100)),
-		fChild(child)
+		BBox("filter"),
+		fSettingsView(settingsView)
 	{
 		SetLabel(label);
-		float w = child->Bounds().Width();
-		float h = child->Bounds().Height();
-		child->MoveTo(3, 13);
-		ResizeTo(w + 6, h + 16);
-		AddChild(child);
+
+		BView* contents = new BView("contents", 0);
+		AddChild(contents);
+
+		BLayoutBuilder::Group<>(contents, B_VERTICAL)
+			.SetInsets(B_USE_DEFAULT_SPACING)
+			.Add(fSettingsView);
 	}
 
-	status_t
-	ArchiveAddOn(BMessage* into) const
+	status_t SaveInto(BMailAddOnSettings& settings) const
 	{
-		return fChild->Archive(into);
+		return fSettingsView->SaveInto(settings);
 	}
 
 private:
-			BView*				fChild;
+			BMailSettingsView*	fSettingsView;
 };
 
 
@@ -211,8 +212,8 @@ FiltersConfigView::FiltersConfigView(BMailAccountSettings& account)
 	BBox("filters"),
 	fAccount(account),
 	fDirection(kIncoming),
-	fInboundFilters(kIncoming, false),
-	fOutboundFilters(kOutgoing, false),
+	fInboundFilters(kIncoming),
+	fOutboundFilters(kOutgoing),
 	fFilterView(NULL),
 	fCurrentIndex(-1)
 {
@@ -284,11 +285,12 @@ FiltersConfigView::_SelectFilter(int32 index)
 			= _MailSettings()->FilterSettingsAt(index);
 		if (filterSettings != NULL) {
 			::FilterList* filters = _FilterList();
-			BView* view = filters->CreateConfigView(*filterSettings);
+			BMailSettingsView* view = filters->CreateSettingsView(fAccount,
+				*filterSettings);
 			if (view != NULL) {
-				BString name;
-				filters->GetDescriptiveName(filterSettings->AddOnRef(), name);
-				fFilterView = new FilterConfigBox(name, view);
+				fFilterView = new FilterSettingsView(
+					filters->DescriptiveName(filterSettings->AddOnRef(),
+						fAccount, NULL), view);
 				Parent()->AddChild(fFilterView);
 			}
 		}
@@ -320,31 +322,30 @@ FiltersConfigView::_SetDirection(direction direction)
 	for (int32 i = 0; i < protocolSettings->CountFilterSettings(); i++) {
 		BMailAddOnSettings* settings = protocolSettings->FilterSettingsAt(i);
 		if (filters->InfoIndexFor(settings->AddOnRef()) < 0) {
+			fprintf(stderr, "Removed missing filter: %s\n",
+				settings->AddOnRef().name);
 			protocolSettings->RemoveFilterSettings(i);
 			i--;
 			continue;
 		}
-		BString name = "Unnamed Filter";
-		filters->GetDescriptiveName(settings->AddOnRef(), name);
-		fListView->AddItem(new BStringItem(name));
+
+		fListView->AddItem(new BStringItem(filters->DescriptiveName(
+			settings->AddOnRef(), fAccount, settings)));
 	}
 
 	// remove old filter items
-	BMenu *menu = fAddField->Menu();
+	BMenu* menu = fAddField->Menu();
 	for (int32 i = menu->CountItems(); i-- > 0;) {
 		BMenuItem *item = menu->RemoveItem(i);
 		delete item;
 	}
 
-	filters->Reload();
 	for (int32 i = 0; i < filters->CountInfos(); i++) {
-		FilterInfo& info = filters->InfoAt(i);
-		BString name;
-		filters->GetDescriptiveName(i, name);
+		const FilterInfo& info = filters->InfoAt(i);
 
 		BMessage* msg = new BMessage(kMsgAddFilter);
 		msg->AddRef("filter", &info.ref);
-		BMenuItem *item = new BMenuItem(name, msg);
+		BMenuItem* item = new BMenuItem(filters->SimpleName(i, fAccount), msg);
 		menu->AddItem(item);
 	}
 
@@ -391,15 +392,12 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 			if (msg->FindRef("filter", &ref) != B_OK)
 				break;
 
-			::FilterList* filters = _FilterList();
-			int32 index = filters->InfoIndexFor(ref);
+			int32 index = _MailSettings()->AddFilterSettings(&ref);
 			if (index < 0)
 				break;
-			_MailSettings()->AddFilterSettings(&ref);
 
-			BString name;
-			filters->GetDescriptiveName(index, name);
-			fListView->AddItem(new BStringItem(name));
+			fListView->AddItem(new BStringItem(_FilterList()->DescriptiveName(
+				ref, fAccount, _MailSettings()->FilterSettingsAt(index))));
 			break;
 		}
 		case kMsgRemoveFilter:
@@ -470,6 +468,6 @@ FiltersConfigView::_SaveConfig(int32 index)
 	if (fFilterView != NULL) {
 		BMailAddOnSettings* settings = _MailSettings()->FilterSettingsAt(index);
 		if (settings != NULL)
-			fFilterView->ArchiveAddOn(settings);
+			fFilterView->SaveInto(*settings);
 	}
 }

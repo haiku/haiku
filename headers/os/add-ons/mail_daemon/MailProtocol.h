@@ -22,6 +22,7 @@
 
 
 class BMailFilter;
+class BMailSettingsView;
 class BView;
 
 
@@ -103,7 +104,7 @@ protected:
 									const BMailProtocolSettings& settings);
 
 private:
-			BMailFilter*		_LoadFilter(BMailAddOnSettings* filterSettings);
+			BMailFilter*		_LoadFilter(const BMailAddOnSettings& settings);
 
 protected:
 			const BMailAccountSettings fAccountSettings;
@@ -149,12 +150,14 @@ public:
 
 
 // Your protocol needs to export these hooks in order to be picked up
-extern "C" _EXPORT BInboundMailProtocol* instantiate_inbound_protocol(
+extern "C" BInboundMailProtocol* instantiate_inbound_protocol(
 	const BMailAccountSettings& settings);
-extern "C" _EXPORT BOutboundMailProtocol* instantiate_outbound_protocol(
+extern "C" BOutboundMailProtocol* instantiate_outbound_protocol(
 	const BMailAccountSettings& settings);
-extern "C" _EXPORT BView* instantiate_protocol_config_panel(
-	BMailAccountSettings& settings);
+
+extern "C" BMailSettingsView* instantiate_protocol_settings_view(
+	const BMailAccountSettings& accountSettings,
+	const BMailProtocolSettings& settings);
 
 
 #endif	// _MAIL_PROTOCOL_H

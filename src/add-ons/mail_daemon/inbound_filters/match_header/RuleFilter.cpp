@@ -22,20 +22,25 @@
 
 #include <MailProtocol.h>
 
+#include "MatchHeaderSettings.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "RuleFilter"
 
 
-RuleFilter::RuleFilter(BMailProtocol& protocol, BMailAddOnSettings* settings)
+RuleFilter::RuleFilter(BMailProtocol& protocol,
+	const BMailAddOnSettings& addOnSettings)
 	:
-	BMailFilter(protocol, settings)
+	BMailFilter(protocol, &addOnSettings)
 {
+	MatchHeaderSettings settings(addOnSettings);
+
 	// attribute is adapted to our "capitalize-each-word-in-the-header" policy
-	settings->FindString("attribute", &fAttribute);
+	fAttribute = settings.Attribute();
 	fAttribute.CapitalizeEachWord();
 
-	settings->FindString("regex", &fExpression);
+	fExpression = settings.Expression();
 	int32 index = fExpression.FindFirst("REGEX:");
 	if (index == B_ERROR || index > 0)
 		EscapeRegexTokens(fExpression);
@@ -44,20 +49,10 @@ RuleFilter::RuleFilter(BMailProtocol& protocol, BMailAddOnSettings* settings)
 
 	fMatcher.SetPattern(fExpression, false);
 
-	settings->FindString("argument", &fArg);
-	settings->FindInt32("do_what", (int32*)&fAction);
-	if (fAction == ACTION_REPLY_WITH)
-		settings->FindInt32("argument", &fReplyAccount);
-}
-
-
-BString
-RuleFilter::DescriptiveName() const
-{
-	BString name(B_TRANSLATE("Match \"%attribute\" against \"%regex\""));
-	name.ReplaceAll("%attribute", fAttribute);
-	name.ReplaceAll("%regex", fExpression);
-	return name;
+	fAction = settings.Action();
+	fMoveTarget = settings.MoveTarget();
+	fSetFlags = settings.SetFlagsTo();
+	fReplyAccount = settings.ReplyAccount();
 }
 
 
@@ -89,7 +84,7 @@ RuleFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 	switch (fAction) {
 		case ACTION_MOVE_TO:
 		{
-			BDirectory dir(fArg);
+			BDirectory dir(fMoveTarget);
 			// TODO: move is currently broken!
 //			fMailProtocol.Looper()->TriggerFileMove(ref, dir);
 			break;
@@ -100,7 +95,7 @@ RuleFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 			break;
 
 		case ACTION_SET_FLAGS_TO:
-			file->WriteAttrString("MAIL:filter_flags", &fArg);
+			file->WriteAttrString("MAIL:filter_flags", &fSetFlags);
 			break;
 
 		case ACTION_REPLY_WITH:
@@ -126,14 +121,25 @@ RuleFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 
 
 BString
-filter_name()
+filter_name(const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings* addOnSettings)
 {
-	return B_TRANSLATE("Rule filter");
+	if (addOnSettings != NULL) {
+		MatchHeaderSettings settings(*addOnSettings);
+		if (settings.Attribute() != NULL && settings.Expression() != NULL) {
+			BString name(
+				B_TRANSLATE("Match \"%attribute\" against \"%regex\""));
+			name.ReplaceAll("%attribute", settings.Attribute());
+			name.ReplaceAll("%regex", settings.Expression());
+			return name;
+		}
+	}
+	return B_TRANSLATE("Match header");
 }
 
 
 BMailFilter*
-instantiate_filter(BMailProtocol& protocol, BMailAddOnSettings* settings)
+instantiate_filter(BMailProtocol& protocol, const BMailAddOnSettings& settings)
 {
 	return new RuleFilter(protocol, settings);
 }

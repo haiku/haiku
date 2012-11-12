@@ -460,6 +460,8 @@ BMailAddOnSettings::Load(const BMessage& message)
 
 	MakeEmpty();
 	Append(settings);
+puts("settings:");
+settings.PrintToStream();
 
 	fOriginalSettings = *this;
 	fOriginalRef = fRef;

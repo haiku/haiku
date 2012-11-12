@@ -305,7 +305,7 @@ BMailProtocol::LoadFilters(const BMailProtocolSettings& settings)
 {
 	for (int i = 0; i < settings.CountFilterSettings(); i++) {
 		BMailAddOnSettings* filterSettings = settings.FilterSettingsAt(i);
-		BMailFilter* filter = _LoadFilter(filterSettings);
+		BMailFilter* filter = _LoadFilter(*filterSettings);
 		if (filter != NULL)
 			AddFilter(filter);
 	}
@@ -313,9 +313,9 @@ BMailProtocol::LoadFilters(const BMailProtocolSettings& settings)
 
 
 BMailFilter*
-BMailProtocol::_LoadFilter(BMailAddOnSettings* filterSettings)
+BMailProtocol::_LoadFilter(const BMailAddOnSettings& settings)
 {
-	const entry_ref& ref = filterSettings->AddOnRef();
+	const entry_ref& ref = settings.AddOnRef();
 	std::map<entry_ref, image_id>::iterator it = fFilterImages.find(ref);
 	image_id image;
 	if (it != fFilterImages.end())
@@ -328,16 +328,16 @@ BMailProtocol::_LoadFilter(BMailAddOnSettings* filterSettings)
 	if (image < 0)
 		return NULL;
 
-	BMailFilter* (*instantiate_filter)(BMailProtocol& protocol,
-		BMailAddOnSettings* settings);
+	BMailFilter* (*instantiateFilter)(BMailProtocol& protocol,
+		const BMailAddOnSettings& settings);
 	if (get_image_symbol(image, "instantiate_filter", B_SYMBOL_TYPE_TEXT,
-			(void**)&instantiate_filter) != B_OK) {
+			(void**)&instantiateFilter) != B_OK) {
 		unload_add_on(image);
 		return NULL;
 	}
 
 	fFilterImages[ref] = image;
-	return (*instantiate_filter)(*this, filterSettings);
+	return instantiateFilter(*this, settings);
 }
 
 
