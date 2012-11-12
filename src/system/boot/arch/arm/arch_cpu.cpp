@@ -70,7 +70,7 @@ boot_arch_cpu_init(void)
 	status_t err = check_cpu_features();
 
 	if (err != B_OK) {
-		panic("You need a Pentium or higher in order to boot!\n");
+		panic("Retire your old Acorn and get something modern to boot!\n");
 		return err;
 	}
 
