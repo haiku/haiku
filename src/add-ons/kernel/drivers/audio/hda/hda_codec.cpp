@@ -1011,6 +1011,7 @@ TRACE("build output tree: %suse mixer\n", useMixer ? "" : "don't ");
 
 		int device = CONF_DEFAULT_DEVICE(widget.d.pin.config);
 		if (device != PIN_DEV_HEAD_PHONE_OUT
+			&& device != PIN_DEV_DIGITAL_OTHER_OUT
 			&& device != PIN_DEV_SPEAKER
 			&& device != PIN_DEV_LINE_OUT)
 			continue;

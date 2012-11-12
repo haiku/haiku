@@ -892,12 +892,14 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 		|| data->return_record_buffers < STREAM_MIN_BUFFERS)
 		data->return_record_buffers = STREAM_MIN_BUFFERS;
 
-	if (data->return_playback_buffer_size == 0) {
+	if (data->return_playback_buffer_size == 0
+		&& audioGroup->playback_stream != NULL) {
 		data->return_playback_buffer_size = default_buffer_length_for_rate(
 			audioGroup->playback_stream->sample_rate);
 	}
 
-	if (data->return_record_buffer_size == 0) {
+	if (data->return_record_buffer_size == 0
+		&& audioGroup->record_stream != NULL) {
 		data->return_record_buffer_size = default_buffer_length_for_rate(
 				audioGroup->record_stream->sample_rate);
 	}
