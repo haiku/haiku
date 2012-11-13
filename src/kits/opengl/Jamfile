@@ -19,7 +19,9 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 
+SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
 Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
 
 UseHeaders [ FDirName $(HAIKU_MESA_DIR) include ] ;
@@ -41,6 +43,9 @@ if $(HAIKU_GCC_VERSION[1]) < 3 {
 
 
 SharedLibrary libGL.so : $(sources) :
+	# GLU
+	$(HAIKU_GLU_LIBS)
+
 	# Glut
 	<opengl>glut.o
 

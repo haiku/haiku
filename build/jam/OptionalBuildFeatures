@@ -180,6 +180,29 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 }
 
 
+# GLU (GL Utilities)
+if $(TARGET_ARCH) = x86 {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_GLU_FILE = glu-9.0-x86-gcc4-2012-11-13.zip ;
+	} else {
+		HAIKU_GLU_FILE = glu-9.0-x86-gcc2-2012-11-13.zip ;
+	}
+
+	local zipFile = [ DownloadFile $(HAIKU_GLU_FILE)
+		: $(baseURL)/lib/$(HAIKU_GLU_FILE) ] ;
+
+	HAIKU_GLU_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+		$(HAIKU_GLU_FILE:B) ] ;
+	HAIKU_GLU_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_GLU_DIR)
+		: develop/headers/os/opengl/GL : $(zipFile) : extracted-glu-headers ] ;
+	HAIKU_GLU_LIBS = [ ExtractArchive $(HAIKU_GLU_DIR)
+		: system/lib/libGLU.a : $(zipFile) : extracted-glu ] ;
+	HAIKU_GLU_HEADERS = [ FDirName $(HAIKU_GLU_DIR) develop headers os opengl ] ;
+} else {
+	Echo "GLU not yet available on $(TARGET_ARCH)" ;
+}
+
+
 # Mesa
 if $(TARGET_ARCH) = x86 {
 	local glslObject ;
@@ -205,7 +228,6 @@ if $(TARGET_ARCH) = x86 {
 
 	HAIKU_MESA_LIBS = [ ExtractArchive $(HAIKU_MESA_DIR)
 		:
-		lib.haiku/libglu.a
 		$(galliumObjects)
 		lib.haiku/libglapi.a
 		$(glslObject)
@@ -214,6 +236,9 @@ if $(TARGET_ARCH) = x86 {
 		: extracted-mesa ] ;
 
 	HAIKU_MESA_HEADERS = [ FDirName $(HAIKU_MESA_DIR) include ] ;
+
+	Depends $(HAIKU_MESA_HEADERS_DEPENDENCY) : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
+	Depends $(HAIKU_MESA_LIBS) : $(HAIKU_GLU_LIBS) ;
 
 } else {
 	Echo "Mesa 3D rendering support not available on $(TARGET_ARCH)" ;
