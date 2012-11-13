@@ -1,6 +1,10 @@
 /*
  * Copyright 2007-2012 Haiku, Inc.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ryan Leavengood <leavengood@gmail.com>
+ *		John Scipione <jscipione@gmail.com>
  */
 #ifndef B_ABOUT_WINDOW_H
 #define B_ABOUT_WINDOW_H
