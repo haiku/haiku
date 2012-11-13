@@ -17,7 +17,7 @@ Application NetworkStatus :
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
 
-	: be $(HAIKU_LOCALE_LIBS) $(icon_libs) $(TARGET_NETWORK_LIBS)
+	: be libshared.a $(HAIKU_LOCALE_LIBS) $(icon_libs) $(TARGET_NETWORK_LIBS)
 		libbnetapi.so $(TARGET_LIBSTDC++)
 	: NetworkStatus.rdef NetworkStatusIcons.rdef
 ;
