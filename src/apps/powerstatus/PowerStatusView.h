@@ -15,6 +15,7 @@
 #include "DriverInterface.h"
 
 
+class BAboutWindow;
 class BFile;
 
 
@@ -53,6 +54,7 @@ private:
 
 protected:
 			PowerStatusDriverInterface*	fDriverInterface;
+			BAboutWindow*   fAboutWindow;
 
 			bool			fShowLabel;
 			bool			fShowTime;

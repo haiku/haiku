@@ -148,13 +148,14 @@ NetworkStatusView::~NetworkStatusView()
 void
 NetworkStatusView::_Init()
 {
+	fAboutWindow = NULL;
+
 	for (int i = 0; i < kStatusCount; i++) {
 		fTrayIcons[i] = NULL;
 		fNotifyIcons[i] = NULL;
 	}
 
 	_UpdateBitmaps();
-	fAboutWindow = NULL;
 }
 
 

@@ -16,7 +16,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <Alert.h>
+#include <AboutWindow.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <ControlLook.h>
