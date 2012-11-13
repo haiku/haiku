@@ -492,9 +492,10 @@ TBarView::PlaceApplicationBar()
 		if (fBarMenuBar != NULL)
 			expandoFrame.left = fBarMenuBar->Frame().Width();
 
-		if (fTrayLocation != 0)
-			expandoFrame.right = fDragRegion->Frame().left - 1;
-		else
+		if (fTrayLocation != 0 && fDragRegion != NULL) {
+			expandoFrame.right = screenFrame.Width()
+				- fDragRegion->Frame().Width() - 1;
+		} else
 			expandoFrame.right = screenFrame.Width();
 
 		menuScrollFrame = expandoFrame;
