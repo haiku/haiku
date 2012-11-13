@@ -1298,9 +1298,6 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 		fKeypadModeScientificItem = new BMenuItem(B_TRANSLATE("Scientific"),
 			new BMessage(MSG_OPTIONS_KEYPAD_MODE_SCIENTIFIC), '2');
 	}
-	BMenuItem* aboutItem
-		= new BMenuItem(B_TRANSLATE("About DeskCalc" B_UTF8_ELLIPSIS),
-			new BMessage(B_ABOUT_REQUESTED));
 
 	// apply current settings
 	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
@@ -1325,8 +1322,6 @@ CalcView::_CreatePopUpMenu(bool addKeypadModeMenuItems)
 		fPopUpMenu->AddItem(fKeypadModeScientificItem);
 		_MarkKeypadItems(fOptions->keypad_mode);
 	}
-	fPopUpMenu->AddSeparatorItem();
-	fPopUpMenu->AddItem(aboutItem);
 }
 
 
