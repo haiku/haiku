@@ -445,18 +445,15 @@ TBarView::PlaceApplicationBar()
 {
 	if (fInlineScrollView != NULL)
 		fInlineScrollView->DetachScrollers();
-
-	if (fExpando != NULL) {
-		SaveExpandedItems();
-		fExpando->RemoveSelf();
-		delete fExpando;
-		fExpando = NULL;
-	}
-
-	if (fInlineScrollView != NULL) {
 		fInlineScrollView->RemoveSelf();
 		delete fInlineScrollView;
 		fInlineScrollView = NULL;
+	}
+
+	if (fExpando != NULL) {
+		SaveExpandedItems();
+		delete fExpando;
+		fExpando = NULL;
 	}
 
 	BRect screenFrame = (BScreen(Window())).Frame();
