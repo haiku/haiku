@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2012, Haiku, Inc. All rights reserved.
  * Copyright 2002, François Revol, revol@free.fr.
  * This file is distributed under the terms of the MIT License.
  *
@@ -11,7 +11,7 @@
  */
 
 
-#include <Alert.h>
+#include <AboutWindow.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <Deskbar.h>
@@ -119,6 +119,7 @@ class WorkspacesView : public BView {
 
 		BView*	fParentWhichDrawsOnChildren;
 		BRect	fCurrentFrame;
+		BAboutWindow*   fAboutWindow;
 };
 
 class WorkspacesWindow : public BWindow {
@@ -341,7 +342,8 @@ WorkspacesView::WorkspacesView(BRect frame, bool showDragger=true)
 	BView(frame, kDeskbarItemName, B_FOLLOW_ALL,
 		kWorkspacesViewFlag | B_FRAME_EVENTS),
 	fParentWhichDrawsOnChildren(NULL),
-	fCurrentFrame(frame)
+	fCurrentFrame(frame),
+	fAboutWindow(NULL)
 {
 	if(showDragger) {
 		frame.OffsetTo(B_ORIGIN);
@@ -358,7 +360,8 @@ WorkspacesView::WorkspacesView(BMessage* archive)
 	:
 	BView(archive),
 	fParentWhichDrawsOnChildren(NULL),
-	fCurrentFrame(Frame())
+	fCurrentFrame(Frame()),
+	fAboutWindow(NULL)
 {
 	// Just in case we are instantiated from an older archive...
 	SetFlags(Flags() | B_FRAME_EVENTS);
@@ -371,6 +374,8 @@ WorkspacesView::WorkspacesView(BMessage* archive)
 
 WorkspacesView::~WorkspacesView()
 {
+	if (fAboutWindow != NULL)
+		fAboutWindow->Quit();
 }
 
 
@@ -400,28 +405,34 @@ WorkspacesView::Archive(BMessage* archive, bool deep) const
 void
 WorkspacesView::_AboutRequested()
 {
-	BString text = B_TRANSLATE("Workspaces\n"
-		"written by %1, and %2.\n\n"
-		"Copyright %3, Haiku.\n\n"
-		"Send windows behind using the Option key. "
-		"Move windows to front using the Control key.\n");
-	text.ReplaceFirst("%1", "François Revol, Axel Dörfler");
-	text.ReplaceFirst("%2", "Matt Madia");
-	text.ReplaceFirst("%3", "2002-2008");
-		
-	BAlert *alert = new BAlert("about", text.String(), B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
-	BFont font;
+	if (fAboutWindow == NULL) {
+		const char* authors[] = {
+			"Axel Dörfler",
+			"Oliver \"Madison\" Kohl",
+			"Matt Madia",
+			"François Revol",
+			NULL
+		};
 
-	view->SetStylable(true);
+		const char* extraCopyrights[] = {
+			"2002 François Revol",
+			NULL
+		};
 
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 10, &font);
+		const char* extraInfo = "Send windows behind using the Option key. "
+			"Move windows to front using the Control key.\n";
 
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go();
+		fAboutWindow = new BAboutWindow(
+			B_TRANSLATE_SYSTEM_NAME("Workspaces"), kSignature);
+		fAboutWindow->AddCopyright(2002, "Haiku, Inc.",
+			extraCopyrights);
+		fAboutWindow->AddAuthors(authors);
+		fAboutWindow->AddExtraInfo(extraInfo);
+		fAboutWindow->Show();
+	} else if (fAboutWindow->IsHidden())
+		fAboutWindow->Show();
+	else
+		fAboutWindow->Activate();
 }
 
 
