@@ -33,14 +33,29 @@ struct iframe {
 	uint32 pc;
 } _PACKED;
 
-typedef struct arch_cpu_info {
-} arch_cpu_info;
+/**! Values for arch_cpu_info.arch */
+enum {
+	ARCH_ARM_PRE_ARM7,
+	ARCH_ARM_v3,
+	ARCH_ARM_v4,
+	ARCH_ARM_v4T,
+	ARCH_ARM_v5,
+	ARCH_ARM_v5T,
+	ARCH_ARM_v5TE,
+	ARCH_ARM_v5TEJ,
+	ARCH_ARM_v6
+};
 
-extern int arch_cpu_type;
-extern int arch_fpu_type;
-extern int arch_mmu_type;
-extern int arch_platform;
-extern int arch_machine;
+typedef struct arch_cpu_info {
+	/* For a detailed interpretation of these values,
+	   see "The System Control coprocessor",
+	   "Main ID register" in your ARM ARM */
+	int implementor;
+	int part_number;
+	int revision;
+	int variant;
+	int arch;
+} arch_cpu_info;
 
 #ifdef __cplusplus
 extern "C" {
