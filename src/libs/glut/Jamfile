@@ -55,6 +55,9 @@ if $(HAIKU_GCC_VERSION[1]) < 3 {
 }
 
 
+# Ensure GLU dependency is met
+Includes [ FGristFiles $(sourcesCc) $(sourcesCpp) ]
+	: $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
 # Ensure Mesa dependency is met
 Includes [ FGristFiles $(sourcesCc) $(sourcesCpp) ]
 	: $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
