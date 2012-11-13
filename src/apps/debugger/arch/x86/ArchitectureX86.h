@@ -63,6 +63,7 @@ public:
 
 	virtual	status_t			GetWatchpointDebugCapabilities(
 									int32& _maxRegisterCount,
+									int32& _maxBytesPerRegister,
 									uint8& _watchpointCapabilityFlags);
 
 private:

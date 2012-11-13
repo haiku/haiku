@@ -613,12 +613,13 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 
 status_t
 ArchitectureX86::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
-	uint8& _watchpointCapabilityFlags)
+	int32& _maxBytesPerRegister, uint8& _watchpointCapabilityFlags)
 {
 	// while x86 technically has 4 hardware debug registers, one is reserved by
 	// the kernel, and one is required for breakpoint support, which leaves
 	// two available for watchpoints.
 	_maxRegisterCount = 2;
+	_maxBytesPerRegister = 4;
 
 	// x86 only supports write and read/write watchpoints.
 	_watchpointCapabilityFlags = WATCHPOINT_CAPABILITY_FLAG_WRITE
