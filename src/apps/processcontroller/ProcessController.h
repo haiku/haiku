@@ -45,6 +45,7 @@ class ProcessController : public BView {
 		static	ProcessController* Instantiate(BMessage* data);
 		virtual	status_t Archive(BMessage *data, bool deep = true) const;
 
+		void			AboutRequested();
 		void			Update();
 		void			DefaultColors();
 

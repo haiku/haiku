@@ -426,32 +426,38 @@ ProcessController::MessageReceived(BMessage *message)
 		}
 
 		case B_ABOUT_REQUESTED:
-			if (fAboutWindow == NULL) {
-				const char* extraCopyrights[] = {
-					"1997-2001 Georges-Edouard Berenger",
-					NULL
-				};
-
-				const char* authors[] = {
-					"Georges-Edouard Berenger",
-					NULL
-				};
-
-				fAboutWindow = new BAboutWindow(
-					B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
-				fAboutWindow->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
-				fAboutWindow->AddAuthors(authors);
-				fAboutWindow->Show();
-			} else if (fAboutWindow->IsHidden())
-				fAboutWindow->Show();
-			else
-				fAboutWindow->Activate();
-
+			AboutRequested();
 			break;
 
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+void
+ProcessController::AboutRequested()
+{
+	if (fAboutWindow == NULL) {
+		const char* extraCopyrights[] = {
+			"1997-2001 Georges-Edouard Berenger",
+			NULL
+		};
+
+		const char* authors[] = {
+			"Georges-Edouard Berenger",
+			NULL
+		};
+
+		fAboutWindow = new BAboutWindow(
+			B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
+		fAboutWindow->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
+		fAboutWindow->AddAuthors(authors);
+		fAboutWindow->Show();
+	} else if (fAboutWindow->IsHidden())
+		fAboutWindow->Show();
+	else
+		fAboutWindow->Activate();
 }
 
 
