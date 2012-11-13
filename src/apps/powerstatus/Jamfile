@@ -13,7 +13,7 @@ Application PowerStatus :
 	PowerStatusWindow.cpp
 	PowerStatusView.cpp
 	PowerStatus.cpp
-	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: PowerStatus.rdef
 ;
 DoCatalogs PowerStatus :
