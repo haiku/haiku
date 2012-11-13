@@ -217,7 +217,8 @@ TExpandoMenuBar::MessageReceived(BMessage* message)
 	TTeamMenuItem* item;
 
 	switch (message->what) {
-		case B_SOME_APP_LAUNCHED: {
+		case B_SOME_APP_LAUNCHED:
+		{
 			BList* teams = NULL;
 			message->FindPointer("teams", (void**)&teams);
 
