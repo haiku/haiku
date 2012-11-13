@@ -15,38 +15,43 @@
 
 #include <ExpressionParser.h>
 
+#include "Architecture.h"
 #include "MessageCodes.h"
 #include "UserInterface.h"
 #include "Watchpoint.h"
 
 
-WatchPromptWindow::WatchPromptWindow(target_addr_t address, uint32 type,
-	int32 length, UserInterfaceListener* listener)
+WatchPromptWindow::WatchPromptWindow(Architecture* architecture,
+	target_addr_t address, uint32 type, int32 length,
+	UserInterfaceListener* listener)
 	:
 	BWindow(BRect(), "Edit Watchpoint", B_FLOATING_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fInitialAddress(address),
 	fInitialType(type),
 	fInitialLength(length),
+	fArchitecture(architecture),
 	fAddressInput(NULL),
 	fLengthInput(NULL),
 	fTypeField(NULL),
 	fListener(listener)
 {
+	fArchitecture->AcquireReference();
 }
 
 
 WatchPromptWindow::~WatchPromptWindow()
 {
+	fArchitecture->ReleaseReference();
 }
 
 
 WatchPromptWindow*
-WatchPromptWindow::Create(target_addr_t address, uint32 type, int32 length,
-	UserInterfaceListener* listener)
+WatchPromptWindow::Create(Architecture* architecture, target_addr_t address,
+	uint32 type, int32 length, UserInterfaceListener* listener)
 {
-	WatchPromptWindow* self = new WatchPromptWindow(address, type, length,
-		listener);
+	WatchPromptWindow* self = new WatchPromptWindow(architecture, address,
+		type, length, listener);
 
 	try {
 		self->_Init();
@@ -69,10 +74,29 @@ WatchPromptWindow::_Init()
 	text.SetToFormat("%" B_PRId32, fInitialLength);
 	fLengthInput = new BTextControl("Length:", text, NULL);
 
+	int32 maxDebugRegisters = 0;
+	int32 maxBytesPerRegister = 0;
+	uint8 debugCapabilityFlags = 0;
+	fArchitecture->GetWatchpointDebugCapabilities(maxDebugRegisters,
+		maxBytesPerRegister, debugCapabilityFlags);
+
 	BMenu* typeMenu = new BMenu("Watch Type");
-	typeMenu->AddItem(new BMenuItem("Read", NULL));
-	typeMenu->AddItem(new BMenuItem("Write", NULL));
-	typeMenu->AddItem(new BMenuItem("Read/Write", NULL));
+
+	BMenuItem* watchTypeItem = new BMenuItem("Read", NULL);
+	watchTypeItem->SetEnabled(
+		(debugCapabilityFlags & WATCHPOINT_CAPABILITY_FLAG_READ) != 0);
+	typeMenu->AddItem(watchTypeItem);
+
+	watchTypeItem = new BMenuItem("Write", NULL);
+	watchTypeItem->SetEnabled(
+		(debugCapabilityFlags & WATCHPOINT_CAPABILITY_FLAG_WRITE) != 0);
+	typeMenu->AddItem(watchTypeItem);
+
+	watchTypeItem = new BMenuItem("Read/Write", NULL);
+	watchTypeItem->SetEnabled(
+		(debugCapabilityFlags & WATCHPOINT_CAPABILITY_FLAG_READ_WRITE) != 0);
+	typeMenu->AddItem(watchTypeItem);
+
 	fTypeField = new BMenuField("Type:", typeMenu);
 	BLayoutItem* labelItem = fTypeField->CreateLabelLayoutItem();
 	labelItem->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));

@@ -11,6 +11,7 @@
 #include "types/Types.h"
 
 
+class Architecture;
 class BTextControl;
 class Watchpoint;
 class BMenuField;
@@ -20,14 +21,15 @@ class UserInterfaceListener;
 class WatchPromptWindow : public BWindow
 {
 public:
-			// edit existing watchpoint
-								WatchPromptWindow(target_addr_t address,
-									uint32 type, int32 length,
+								WatchPromptWindow(Architecture* architecture,
+									target_addr_t address, uint32 type,
+									int32 length,
 									UserInterfaceListener* listener);
 
 								~WatchPromptWindow();
 
-	static	WatchPromptWindow*	Create(target_addr_t address, uint32 type,
+	static	WatchPromptWindow*	Create(Architecture* architecture,
+									target_addr_t address, uint32 type,
 									int32 length,
 									UserInterfaceListener* listener);
 									// throws
@@ -45,6 +47,7 @@ private:
 			target_addr_t		fInitialAddress;
 			uint32				fInitialType;
 			int32				fInitialLength;
+			Architecture*		fArchitecture;
 			BTextControl*		fAddressInput;
 			BTextControl*		fLengthInput;
 			BMenuField*			fTypeField;
