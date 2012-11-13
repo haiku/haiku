@@ -135,7 +135,8 @@ PieView::PieView(BVolume* volume)
 	fVolume(volume),
 	fMouseOverInfo(),
 	fClicked(false),
-	fDragging(false)
+	fDragging(false),
+	fUpdateFileAt(false)
 {
 	fMouseOverMenu = new BPopUpMenu(kEmptyStr, false, false);
 	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Get Info"), NULL),
@@ -239,9 +240,13 @@ PieView::MouseUp(BPoint where)
 		if (info != NULL) {
 			if (info == fScanner->CurrentDir()) {
 				fScanner->ChangeDir(info->parent);
+				fLastWhere = where;
+				fUpdateFileAt = true;
 				Invalidate();
 			} else if (info->children.size() > 0) {
 				fScanner->ChangeDir(info);
+				fLastWhere = where;
+				fUpdateFileAt = true;
 				Invalidate();
 			}
 		}
@@ -301,6 +306,10 @@ PieView::Draw(BRect updateRect)
 			_DrawPieChart(updateRect);
 			if (fWindow != NULL)
 				fWindow->SetRescanEnabled(true);
+			if (fUpdateFileAt) {
+				fWindow->ShowInfo(_FileAt(fLastWhere));
+				fUpdateFileAt = false;
+			}
 		}
 	}
 }
