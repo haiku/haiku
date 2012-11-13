@@ -681,12 +681,13 @@ void
 uninit_timers(void)
 {
 	delete_sem(sTimerWaitSem);
-	mutex_lock(&sTimerLock);
-
-	mutex_destroy(&sTimerLock);
 
 	status_t status;
 	wait_for_thread(sTimerThread, &status);
+
+	mutex_lock(&sTimerLock);
+
+	mutex_destroy(&sTimerLock);
 
 	remove_debugger_command("net_timer", dump_timer);
 }
