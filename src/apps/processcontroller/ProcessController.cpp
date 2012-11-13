@@ -1,7 +1,7 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org
-	Copyright (c) 2006-2009, Haiku, Inc. All rights reserved.
+	Copyright (c) 2006-2012, Haiku, Inc. All rights reserved.
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
@@ -440,6 +440,7 @@ ProcessController::AboutRequested()
 {
 	if (fAboutWindow == NULL) {
 		const char* extraCopyrights[] = {
+			"2004 beunited.org",
 			"1997-2001 Georges-Edouard Berenger",
 			NULL
 		};
