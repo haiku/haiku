@@ -475,6 +475,9 @@ public:
 			status_t			SetInt64(const char* name, int64 value);
 			status_t			SetUInt64(const char* name, uint64 value);
 			status_t			SetPointer(const char* name, const void* value);
+			status_t			SetString(const char* name, const char* string);
+			status_t			SetString(const char* name,
+									const BString& string);
 			status_t			SetFloat(const char* name, float value);
 			status_t			SetDouble(const char* name, double value);
 			status_t			SetAlignment(const char* name,

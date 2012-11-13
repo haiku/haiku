@@ -335,10 +335,10 @@ SYSTEM_LIBS_ALIASES =
 ;
 
 OPTIONAL_LIBS_ALIASES =
-	$(HAIKU_FREETYPE_CURRENT_LINK)
-	$(HAIKU_JPEG_CURRENT_LINK)
-	$(HAIKU_LIBPNG_CURRENT_LINK)
-	$(HAIKU_ZLIB_CURRENT_LINK)
+	libfreetype.so
+	libjpeg.so
+	libpng.so
+	libz.so
 ;
 
 # libfreetype.so links to the current freetype lib

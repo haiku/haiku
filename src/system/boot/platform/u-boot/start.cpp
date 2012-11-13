@@ -173,10 +173,32 @@ start_raw(int argc, const char **argv)
 	args.arguments = NULL;
 	args.platform.boot_tgz_data = NULL;
 	args.platform.boot_tgz_size = 0;
+	args.platform.fdt_data = NULL;
+	args.platform.fdt_size = 0;
+
+	// if we get passed a uimage, try to find the third blob only if we do not have FDT data yet
+	if (gUImage != NULL
+		&& !gFDT
+		&& image_multi_getimg(gUImage, 2,
+			(uint32*)&args.platform.fdt_data,
+			&args.platform.fdt_size)) {
+		// found a blob, assume it is FDT data, when working on a platform
+		// which does not have an FDT enabled U-Boot
+		gFDT = args.platform.fdt_data;
+	}
 
 	serial_init(gFDT);
 	console_init();
 	cpu_init();
+
+	if (args.platform.fdt_data) {
+		dprintf("Found FDT from uimage @ %p, %" B_PRIu32 " bytes\n",
+			args.platform.fdt_data, args.platform.fdt_size);
+	} else if (gFDT) {
+		/* Fixup args so we can pass the gFDT on to the kernel */
+		args.platform.fdt_data = gFDT;
+		args.platform.fdt_size = fdt_totalsize(gFDT);
+	}
 
 	// if we get passed an FDT, check /chosen for initrd
 	if (gFDT != NULL) {

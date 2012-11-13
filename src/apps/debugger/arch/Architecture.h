@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ARCHITECTURE_H
@@ -35,6 +35,13 @@ class TeamMemory;
 enum {
 	STACK_GROWTH_DIRECTION_POSITIVE = 0,
 	STACK_GROWTH_DIRECTION_NEGATIVE
+};
+
+
+enum {
+	WATCHPOINT_CAPABILITY_FLAG_READ = 1,
+	WATCHPOINT_CAPABILITY_FLAG_WRITE = 2,
+	WATCHPOINT_CAPABILITY_FLAG_READ_WRITE = 4
 };
 
 
@@ -104,6 +111,12 @@ public:
 									int32 maxStackDepth = -1,
 									bool useExistingTrace = false);
 										// team is not locked
+
+	virtual	status_t			GetWatchpointDebugCapabilities(
+									int32& _maxRegisterCount,
+									int32& _maxBytesPerRegister,
+									uint8& _watchpointCapabilityFlags) = 0;
+
 
 protected:
 			TeamMemory*			fTeamMemory;

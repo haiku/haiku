@@ -8,17 +8,19 @@
 
 #include <stdlib.h>
 
-#include <AboutWindow.h>
 #include <Application.h>
 
 #include "ActivityWindow.h"
 
+
+const char* kAppName = B_TRANSLATE_SYSTEM_NAME("ActivityMonitor");
 const char* kSignature = "application/x-vnd.Haiku-ActivityMonitor";
 
 
 ActivityMonitor::ActivityMonitor()
 	: BApplication(kSignature)
 {
+	fWindow = new ActivityWindow();
 }
 
 
@@ -30,7 +32,6 @@ ActivityMonitor::~ActivityMonitor()
 void
 ActivityMonitor::ReadyToRun()
 {
-	fWindow = new ActivityWindow();
 	fWindow->Show();
 }
 
@@ -52,20 +53,6 @@ ActivityMonitor::MessageReceived(BMessage* message)
 void
 ActivityMonitor::AboutRequested()
 {
-	ShowAbout();
-}
-
-
-/*static*/ void
-ActivityMonitor::ShowAbout()
-{
-	const char* kAuthors[] = {
-		"Axel Dörfler",
-		NULL
-	};
-
-	BAboutWindow aboutWindow(B_TRANSLATE_SYSTEM_NAME("ActivityMonitor"), 2008, kAuthors);
-	aboutWindow.Show();
 }
 
 

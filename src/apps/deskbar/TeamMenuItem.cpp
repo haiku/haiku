@@ -240,7 +240,7 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 			if (fDrawLabel && iconBounds.Width() > 32)
 				*height += fLabelAscent + fLabelDescent;
 		} else {
-			*height = iconBounds.Height() - kVPad * 8;
+			*height = iconBounds.Height() + kVPad * 4;
 		}
 	}
 	*height += 2;
@@ -559,7 +559,7 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 				sub->SetExpanded(true, myindex + childIndex);
 
 				if (resizeWindow)
-					parent->SizeWindow();
+					parent->SizeWindow(-1);
 			}
 		}
 	} else {
@@ -581,7 +581,7 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 			sub->SetExpanded(false, 0);
 
 			if (resizeWindow)
-				parent->SizeWindow();
+				parent->SizeWindow(1);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org
-	Copyright (c) 2006-2009, Haiku, Inc. All rights reserved.
+	Copyright (c) 2006-2012, Haiku, Inc. All rights reserved.
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
@@ -204,6 +204,10 @@ ProcessController::~ProcessController()
 
 	delete fMessageRunner;
 	gPCView = NULL;
+
+	// replicant deleted, destroy the about window
+	if (fAboutWindow != NULL)
+		fAboutWindow->Quit();
 }
 
 
@@ -217,10 +221,11 @@ ProcessController::Init()
 	memset(fCPUTimes, 0, sizeof(fCPUTimes));
 	memset(fPrevActive, 0, sizeof(fPrevActive));
 	fPrevTime = 0;
+	fAboutWindow = NULL;
 }
 
 
-ProcessController *
+ProcessController*
 ProcessController::Instantiate(BMessage *data)
 {
 	if (!validate_instantiation(data, kClassName))
@@ -433,15 +438,27 @@ ProcessController::MessageReceived(BMessage *message)
 void
 ProcessController::AboutRequested()
 {
-	const char* authors[] = {
-		"Georges-Edouard Berenger",
-		NULL
-	};
+	if (fAboutWindow == NULL) {
+		const char* extraCopyrights[] = {
+			"2004 beunited.org",
+			"1997-2001 Georges-Edouard Berenger",
+			NULL
+		};
 
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("ProcessController"), 2007, authors,
-		"Copyright 1997-2001\n"
-		"Georges-Edouard Berenger.");
-	about.Show();
+		const char* authors[] = {
+			"Georges-Edouard Berenger",
+			NULL
+		};
+
+		fAboutWindow = new BAboutWindow(
+			B_TRANSLATE_SYSTEM_NAME("ProcessController"), kSignature);
+		fAboutWindow->AddCopyright(2007, "Haiku, Inc.", extraCopyrights);
+		fAboutWindow->AddAuthors(authors);
+		fAboutWindow->Show();
+	} else if (fAboutWindow->IsHidden())
+		fAboutWindow->Show();
+	else
+		fAboutWindow->Activate();
 }
 
 

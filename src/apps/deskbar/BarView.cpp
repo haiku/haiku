@@ -58,6 +58,7 @@ All rights reserved.
 #include "DeskbarUtils.h"
 #include "ExpandoMenuBar.h"
 #include "FSUtils.h"
+#include "InlineScrollView.h"
 #include "ResourceSet.h"
 #include "StatusView.h"
 #include "TeamMenuItem.h"
@@ -70,6 +71,7 @@ const int32 kDefaultRecentAppCount = 10;
 const int32 kMenuTrackMargin = 20;
 
 const uint32 kUpdateOrientation = 'UpOr';
+const float kSepItemWidth = 5.0f;
 
 
 class BarViewMessageFilter : public BMessageFilter
@@ -130,6 +132,7 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		uint32 state, float)
 	: BView(frame, "BarView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	fInlineScrollView(NULL),
 	fBarMenuBar(NULL),
 	fExpando(NULL),
 	fTrayLocation(1),
@@ -347,47 +350,47 @@ TBarView::MouseDown(BPoint where)
 void
 TBarView::PlaceDeskbarMenu()
 {
-	// top or bottom, full
-	if (!fVertical && fBarMenuBar) {
-		fBarMenuBar->RemoveSelf();
-		delete fBarMenuBar;
-		fBarMenuBar = NULL;
+	// Calculate the size of the deskbar menu
+	BRect menuFrame(Bounds());
+	if (fVertical)
+		menuFrame.bottom = menuFrame.top + kMenuBarHeight;
+	else {
+		menuFrame.bottom = menuFrame.top
+			+ static_cast<TBarApp*>(be_app)->IconSize() + 4;
 	}
 
-	// top or bottom expando mode has Be menu built in for tracking
-	// only for vertical mini or expanded
-	// mini mode will have team menu added as part of BarMenuBar
-	if (fVertical && !fBarMenuBar) {
+	if (fBarMenuBar == NULL) {
 		// create the Be menu
-		BRect mbarFrame(Bounds());
-		mbarFrame.bottom = mbarFrame.top + kMenuBarHeight;
-		fBarMenuBar = new TBarMenuBar(this, mbarFrame, "BarMenuBar");
+		fBarMenuBar = new TBarMenuBar(this, menuFrame, "BarMenuBar");
 		AddChild(fBarMenuBar);
-	}
-
-	// if there isn't a bemenu at this point,
-	// DB should be in top/bottom mode, else error
-	if (!fBarMenuBar)
-		return;
+	} else
+		fBarMenuBar->SmartResize(-1, -1);
 
 	float width = sMinimumWindowWidth;
 	BPoint loc(B_ORIGIN);
-	BRect menuFrame(fBarMenuBar->Frame());
+
 	if (fState == kFullState) {
 		fBarMenuBar->RemoveTeamMenu();
+		fBarMenuBar->RemoveSeperatorItem();
 		// TODO: Magic constants need explanation
 		width = 8 + 16 + 8;
+		fBarMenuBar->SmartResize(width, menuFrame.Height());
 		loc = Bounds().LeftTop();
 	} else if (fState == kExpandoState) {
-		// shows apps below tray
 		fBarMenuBar->RemoveTeamMenu();
-		if (fVertical)
+		if (fVertical) {
+			// shows apps below tray
+			fBarMenuBar->RemoveSeperatorItem();
 			width += 1;
-		else
-			width = floorf(width) / 2;
+		} else {
+			// shows apps to the right of bemenu
+			fBarMenuBar->AddSeperatorItem();
+			width = floorf(width) / 2 + kSepItemWidth;
+		}
 		loc = Bounds().LeftTop();
 	} else {
 		// mini mode, DeskbarMenu next to team menu
+		fBarMenuBar->RemoveSeperatorItem();
 		fBarMenuBar->AddTeamMenu();
 	}
 
@@ -441,9 +444,16 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 void
 TBarView::PlaceApplicationBar()
 {
+	SaveExpandedItems();
+
+	if (fInlineScrollView != NULL) {
+		fInlineScrollView->DetachScrollers();
+		fInlineScrollView->RemoveSelf();
+		delete fInlineScrollView;
+		fInlineScrollView = NULL;
+	}
+
 	if (fExpando != NULL) {
-		SaveExpandedItems();
-		fExpando->RemoveSelf();
 		delete fExpando;
 		fExpando = NULL;
 	}
@@ -458,6 +468,7 @@ TBarView::PlaceApplicationBar()
 	}
 
 	BRect expandoFrame(0, 0, 0, 0);
+	BRect menuScrollFrame(0, 0, 0, 0);
 	if (fVertical) {
 		// top left/right
 		if (fTrayLocation != 0)
@@ -470,28 +481,45 @@ TBarView::PlaceApplicationBar()
 			expandoFrame.right = fBarMenuBar->Frame().Width();
 		else
 			expandoFrame.right = sMinimumWindowWidth;
+
+		menuScrollFrame = expandoFrame;
+		menuScrollFrame.bottom = screenFrame.bottom;
 	} else {
 		// top or bottom
 		expandoFrame.top = 0;
 		int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 		expandoFrame.bottom = iconSize + 4;
-		if (fTrayLocation != 0)
-			expandoFrame.right = fDragRegion->Frame().left - 1;
-		else
+
+		if (fBarMenuBar != NULL)
+			expandoFrame.left = fBarMenuBar->Frame().Width();
+
+		if (fTrayLocation != 0 && fDragRegion != NULL) {
+			expandoFrame.right = screenFrame.Width()
+				- fDragRegion->Frame().Width() - 1;
+		} else
 			expandoFrame.right = screenFrame.Width();
+
+		menuScrollFrame = expandoFrame;
 	}
 
 	bool hideLabels = ((TBarApp*)be_app)->Settings()->hideLabels;
 
 	fExpando = new TExpandoMenuBar(this, expandoFrame, "ExpandoMenuBar",
 		fVertical, !hideLabels && fState != kFullState);
-	AddChild(fExpando);
+
+	fInlineScrollView = new TInlineScrollView(menuScrollFrame, fExpando,
+		fVertical ? B_VERTICAL : B_HORIZONTAL);
+	AddChild(fInlineScrollView);
 
 	if (fVertical)
 		ExpandItems();
 
 	SizeWindow(screenFrame);
 	PositionWindow(screenFrame);
+	fExpando->DoLayout();
+		// force menu to autosize
+	CheckForScrolling();
+
 	Window()->UpdateIfNeeded();
 	Invalidate();
 }
@@ -522,7 +550,12 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 		} else if (fState == kExpandoState) {
 			if (fVertical) {
 				// top left or right
-				windowHeight = fExpando->Frame().bottom;
+				if (fTrayLocation != 0)
+					windowHeight = fDragRegion->Frame().bottom + 1;
+				else
+					windowHeight = fBarMenuBar->Frame().bottom + 1;
+
+				windowHeight += fExpando->Bounds().Height();
 			} else {
 				// top or bottom, full
 				fExpando->CheckItemSizes(0);
@@ -549,8 +582,6 @@ TBarView::SizeWindow(BRect screenFrame)
 	float windowWidth, windowHeight;
 	GetPreferredWindowSize(screenFrame, &windowWidth, &windowHeight);
 	Window()->ResizeTo(windowWidth, windowHeight);
-	if (fExpando)
-		fExpando->CheckForSizeOverrun();
 }
 
 
@@ -574,6 +605,18 @@ TBarView::PositionWindow(BRect screenFrame)
 		moveLoc.y = screenFrame.bottom - windowHeight;
 
 	Window()->MoveTo(moveLoc);
+}
+
+
+void
+TBarView::CheckForScrolling()
+{
+	if (fInlineScrollView != NULL && fExpando != NULL) {
+		if (fExpando->CheckForSizeOverrun())
+			fInlineScrollView->AttachScrollers();
+		else
+			fInlineScrollView->DetachScrollers();
+	}
 }
 
 
@@ -678,8 +721,6 @@ TBarView::ExpandItems()
 
 	// Clean up the expanded items list
 	RemoveExpandedItems();
-
-	fExpando->SizeWindow();
 }
 
 

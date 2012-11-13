@@ -5,14 +5,14 @@ resource app_name_catalog_entry "x-vnd.Haiku-DeskCalc:System name:DeskCalc";
 
 resource app_version {
 	major  = 2,
-	middle = 2,
+	middle = 4,
 	minor  = 0,
 
-	variety = B_APPV_ALPHA,
+	variety = B_APPV_FINAL,
 	internal = 1,
 
 	short_info = "DeskCalc",
-	long_info = "DeskCalc ©2006-2012 Haiku, Inc."
+	long_info = "DeskCalc ©1997, 1998 R3 Software Ltd. ©2006-2012 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;
@@ -31,4 +31,3 @@ resource vector_icon {
 	$"011001178400040A010102000A050105000A06030806071001178122040A0201"
 	$"03000A030104000A0706090A0B0D0E0C100117810004"
 };
-

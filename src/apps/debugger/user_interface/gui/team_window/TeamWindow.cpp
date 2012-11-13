@@ -261,8 +261,9 @@ TeamWindow::MessageReceived(BMessage* message)
 			}
 
 			try {
-				WatchPromptWindow* window = WatchPromptWindow::Create(address,
-					type, length, fListener);
+				WatchPromptWindow* window = WatchPromptWindow::Create(
+					fTeam->GetArchitecture(), address, type, length,
+					fListener);
 				window->Show();
 			} catch (...) {
 				// TODO: notify user
