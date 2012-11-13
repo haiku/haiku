@@ -515,6 +515,8 @@ TBarView::PlaceApplicationBar()
 
 	SizeWindow(screenFrame);
 	PositionWindow(screenFrame);
+	fExpando->DoLayout();
+		// force menu to autosize
 	CheckForScrolling();
 
 	Window()->UpdateIfNeeded();
