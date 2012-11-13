@@ -1,10 +1,11 @@
 /*
- * Copyright 2012, Haiku.
+ * Copyright 2012, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ithamar R. Adema <ithamar@upgrade-android.com>
  */
+
 
 #include <drivers/device_manager.h>
 #include <drivers/KernelExport.h>
