@@ -134,7 +134,7 @@ AboutView::AboutView(const char* appName, const char* signature)
 	fVersionView = new BStringView("version", AppVersion(signature));
 
 	fInfoView = new BTextView("info", B_WILL_DRAW);
-	fInfoView->SetExplicitMinSize(BSize(210.0, 100.0));
+	fInfoView->SetExplicitMinSize(BSize(210.0, 160.0));
 	fInfoView->MakeEditable(false);
 	fInfoView->SetWordWrap(true);
 	fInfoView->SetInsets(5.0, 5.0, 5.0, 5.0);
@@ -255,7 +255,7 @@ AboutView::AppIcon(const char* signature)
 
 
 BAboutWindow::BAboutWindow(const char* appName, const char* signature)
-	:	BWindow(BRect(0.0, 0.0, 200.0, 140.0), appName, B_TITLED_WINDOW,
+	:	BWindow(BRect(0.0, 0.0, 200.0, 200.0), appName, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
