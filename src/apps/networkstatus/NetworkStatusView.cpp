@@ -139,7 +139,6 @@ NetworkStatusView::NetworkStatusView(BMessage* archive)
 
 NetworkStatusView::~NetworkStatusView()
 {
-	// replicant deleted, destroy the about window
 	if (fAboutWindow != NULL)
 		fAboutWindow->Quit();
 }
