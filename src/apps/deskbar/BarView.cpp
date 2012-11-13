@@ -363,7 +363,8 @@ TBarView::PlaceDeskbarMenu()
 		// create the Be menu
 		fBarMenuBar = new TBarMenuBar(this, menuFrame, "BarMenuBar");
 		AddChild(fBarMenuBar);
-	}
+	} else
+		fBarMenuBar->SmartResize(-1, -1);
 
 	float width = sMinimumWindowWidth;
 	BPoint loc(B_ORIGIN);
@@ -443,7 +444,7 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 void
 TBarView::PlaceApplicationBar()
 {
-	if (fInlineScrollView != NULL)
+	if (fInlineScrollView != NULL) {
 		fInlineScrollView->DetachScrollers();
 		fInlineScrollView->RemoveSelf();
 		delete fInlineScrollView;
