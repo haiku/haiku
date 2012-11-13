@@ -444,6 +444,8 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 void
 TBarView::PlaceApplicationBar()
 {
+	SaveExpandedItems();
+
 	if (fInlineScrollView != NULL) {
 		fInlineScrollView->DetachScrollers();
 		fInlineScrollView->RemoveSelf();
@@ -452,7 +454,6 @@ TBarView::PlaceApplicationBar()
 	}
 
 	if (fExpando != NULL) {
-		SaveExpandedItems();
 		delete fExpando;
 		fExpando = NULL;
 	}
