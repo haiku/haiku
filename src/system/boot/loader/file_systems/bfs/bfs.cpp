@@ -54,7 +54,7 @@ Volume::Volume(boot::Partition *partition)
 #endif
 	}
 
-	TRACE(("bfs: we do have a valid super block (name = %s)!\n", fSuperBlock.name));
+	TRACE(("bfs: we do have a valid superblock (name = %s)!\n", fSuperBlock.name));
 
 	fRootNode = new(nothrow) BFS::Directory(*this, Root());
 	if (fRootNode == NULL)

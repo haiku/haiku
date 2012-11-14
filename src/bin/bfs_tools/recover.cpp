@@ -709,7 +709,7 @@ usage(char *name)
 		"\t-i\trecreate indices on target disk\n"
 		"\t-d\tdump missing and recreated i-nodes\n"
 		"\t-r\tdisk access in raw mode (use only if the partition table is invalid)\n"
-		"\t-s\trecreate super block and exit (for experts only, don't use this\n"
+		"\t-s\trecreate superblock and exit (for experts only, don't use this\n"
 		"\t\tif you don't know what you're doing)\n"
 		"\t-v\tverbose output\n", name);
 	exit(-1);
@@ -804,15 +804,15 @@ main(int argc, char **argv)
 	bool recreatedSuperBlock = false;
 
 	if (disk.ValidateSuperBlock() < B_OK) {
-		fprintf(stderr, "The disk's super block is corrupt!\n");
+		fprintf(stderr, "The disk's superblock is corrupt!\n");
 		if (disk.RecreateSuperBlock() < B_OK) {
-			fprintf(stderr, "Can't recreate the disk's super block, sorry!\n");
+			fprintf(stderr, "Can't recreate the disk's superblock, sorry!\n");
 			return -1;
 		}
 		recreatedSuperBlock = true;
 	}
 	if (gVerbose) {
-		puts("\n*** The super block:\n");
+		puts("\n*** The superblock:\n");
 		dump_super_block(disk.SuperBlock());
 	}
 
@@ -825,7 +825,7 @@ main(int argc, char **argv)
 		status_t status = disk.WriteAt(512, disk.SuperBlock(),
 			sizeof(disk_super_block));
 		if (status < B_OK) {
-			fprintf(stderr, "Could not write super block: %s!\n",
+			fprintf(stderr, "Could not write superblock: %s!\n",
 				strerror(status));
 			return 1;
 		}

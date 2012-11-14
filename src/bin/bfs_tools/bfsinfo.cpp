@@ -118,7 +118,7 @@ main(int argc, char **argv)
 	if (argc < 2 || !strcmp(argv[1], "--help")) {
 		char *filename = strrchr(argv[0],'/');
 		fprintf(stderr,"usage: %s [-srib] <device> [allocation_group start]\n"
-				"\t-s\tdump super block\n"
+				"\t-s\tdump superblock\n"
 				"\t-r\tdump root node\n"
 				"       the following options need the allocation_group/start "
 					"parameters:\n"
@@ -214,7 +214,7 @@ main(int argc, char **argv)
 	}
 
 	if (disk.ValidateSuperBlock() < B_OK) {
-		fprintf(stderr, "The disk's super block is corrupt (or it's not a BFS "
+		fprintf(stderr, "The disk's superblock is corrupt (or it's not a BFS "
 			"device)!\n");
 		return 0;
 	}

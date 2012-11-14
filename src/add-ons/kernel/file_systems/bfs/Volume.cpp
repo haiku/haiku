@@ -4,7 +4,7 @@
  */
 
 
-//! super block, mounting, etc.
+//! superblock, mounting, etc.
 
 
 #include "Attribute.h"
@@ -342,13 +342,13 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (opener.IsReadOnly())
 		fFlags |= VOLUME_READ_ONLY;
 
-	// read the super block
+	// read the superblock
 	if (Identify(fDevice, &fSuperBlock) != B_OK) {
-		FATAL(("invalid super block!\n"));
+		FATAL(("invalid superblock!\n"));
 		return B_BAD_VALUE;
 	}
 
-	// initialize short hands to the super block (to save byte swapping)
+	// initialize short hands to the superblock (to save byte swapping)
 	fBlockSize = fSuperBlock.BlockSize();
 	fBlockShift = fSuperBlock.BlockShift();
 	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();
@@ -633,7 +633,7 @@ Volume::CheckSuperBlock(const uint8* data, uint32* _offset)
 	}
 
 #ifndef BFS_LITTLE_ENDIAN_ONLY
-	// For PPC, the super block might be located at offset 0
+	// For PPC, the superblock might be located at offset 0
 	superBlock = (disk_super_block*)data;
 	if (superBlock->IsValid()) {
 		if (_offset != NULL)
@@ -692,11 +692,11 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 
 	off_t numBlocks = deviceSize / blockSize;
 
-	// create valid super block
+	// create valid superblock
 
 	fSuperBlock.Initialize(name, numBlocks, blockSize);
 
-	// initialize short hands to the super block (to save byte swapping)
+	// initialize short hands to the superblock (to save byte swapping)
 	fBlockSize = fSuperBlock.BlockSize();
 	fBlockShift = fSuperBlock.BlockShift();
 	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();

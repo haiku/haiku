@@ -1,4 +1,4 @@
-/* sync - update the super block
+/* sync - update the superblock
    Copyright (C) 1994-2004, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ usage (int status)
     {
       printf (_("Usage: %s [OPTION]\n"), program_name);
       fputs (_("\
-Force changed blocks to disk, update the super block.\n\
+Force changed blocks to disk, update the superblock.\n\
 \n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);

@@ -76,7 +76,7 @@ kernel_interface
 general stuff
 
  - There are also some comments with a leading "ToDo:" directly in the code which may not be mentioned here.
- - implement mkbfs (try to do it in OpenBeOS style directly - only write the super block from user space)
+ - implement mkbfs (try to do it in OpenBeOS style directly - only write the superblock from user space)
 
 
 -----

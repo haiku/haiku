@@ -209,7 +209,7 @@ Volume::Initialize(const char* name)
 	transaction.KeepNode(fRootDirectory);
 	fRootDirectory->SetHardLinks(1);
 
-	// write the super block
+	// write the superblock
 	Block block;
 	if (!block.GetZero(this, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE,
 			transaction)) {
@@ -432,7 +432,7 @@ Volume::SetName(const char* name)
 	// we lock the volume now, to keep the locking order (transaction -> volume)
 	MutexLocker locker(fLock);
 
-	// update the super block
+	// update the superblock
 	Block block;
 	if (!block.GetWritable(this, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE,
 			transaction)) {

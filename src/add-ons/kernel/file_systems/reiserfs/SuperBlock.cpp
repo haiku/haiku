@@ -30,12 +30,12 @@ using std::nothrow;
 
 /*!
 	\class DirEntry
-	\brief Represents the on-disk structure for super block of the FS.
+	\brief Represents the on-disk structure for superblock of the FS.
 
 	There exist two versions of the structure and this class can deal with both
 	of them. This class can also handle a very old layout that puts the super
 	block in a different location. The Init() methods tries to find and read
-	the super block from disk.
+	the superblock from disk.
 */
 
 // read_super_block
@@ -47,13 +47,13 @@ read_super_block(int device, off_t offset, const char *magic,
 {
 	super_block_t *superBlock = NULL;
 	status_t error = B_OK;
-	// allocate memory for the super block
+	// allocate memory for the superblock
 	if (error == B_OK) {
 		superBlock = new(nothrow) super_block_t;
 		if (!superBlock)
 			error = B_NO_MEMORY;
 	}
-	// read the super block
+	// read the superblock
 	if (error == B_OK) {
 		size_t size = sizeof(super_block_t);
 		if (read_pos(device, offset, superBlock, size) != (int32)size)

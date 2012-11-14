@@ -286,7 +286,7 @@ main(int argc, char** argv)
 	}
 
 	if (disk.ValidateSuperBlock() != B_OK) {
-		fprintf(stderr, "The disk's super block is corrupt!\n");
+		fprintf(stderr, "The disk's superblock is corrupt!\n");
 		return -1;
 	}
 
@@ -307,7 +307,7 @@ main(int argc, char** argv)
 			disk.Log().allocation_group, disk.Log().start,
 			disk.Log().length);
 	} else if (block < 1) {
-		printf("Super Block intersects\n");
+		printf("Superblock intersects\n");
 	} else if (block < 1 + disk.BitmapSize()) {
 		printf("Block bitmap intersects (start %d, end %lu)\n", 1,
 			disk.BitmapSize());

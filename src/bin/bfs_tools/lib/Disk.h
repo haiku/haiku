@@ -1,6 +1,6 @@
 #ifndef DISK_H
 #define DISK_H
-/* Disk - handles BFS super block, disk access etc.
+/* Disk - handles BFS superblock, disk access etc.
 **
 ** Copyright (c) 2001-2003 pinc Software. All Rights Reserved.
 */

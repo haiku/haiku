@@ -57,7 +57,7 @@ static inline C max(const C &a, const C &b) { return (a > b ? a : b); }
 	\brief Represents a volume.
 
 	The Volume class bundles all functionality related to a volume.
-	It knows the super block and has some basic functionality needed
+	It knows the superblock and has some basic functionality needed
 	for handling VNodes. Actually it should be the layer that provides the
 	abstraction from VNodes. The design is not strict in this respect
 	(the whole thing evolved while I was in the process of understanding
@@ -97,7 +97,7 @@ Volume::Identify(int fd, partition_data *partition)
 	if (fDevice < 0)
 		return B_ERROR;
 
-	// read and analyze super block
+	// read and analyze superblock
 	return _ReadSuperBlock();
 }
 
@@ -130,7 +130,7 @@ Volume::Mount(fs_volume *fsVolume, const char *path)
 		if (fDevice < 0)
 			SET_ERROR(error, errno);
 	}
-	// read and analyze super block
+	// read and analyze superblock
 	if (error == B_OK)
 		error = _ReadSuperBlock();
 
@@ -534,12 +534,12 @@ Volume::_ReadSuperBlock()
 		error = B_NO_MEMORY;
 	// check FS state
 	if (error == B_OK && fSuperBlock->GetState() != REISERFS_VALID_FS) {
-		FATAL(("The super block indicates a non-valid FS! Bailing out."));
+		FATAL(("The superblock indicates a non-valid FS! Bailing out."));
 		error = B_ERROR;
 	}
 	// check FS version
 	if (error == B_OK && fSuperBlock->GetVersion() > REISERFS_VERSION_2) {
-		FATAL(("The super block indicates a version greater than 2 (%u)! "
+		FATAL(("The superblock indicates a version greater than 2 (%u)! "
 			   "Bailing out.", fSuperBlock->GetVersion()));
 		error = B_ERROR;
 	}
