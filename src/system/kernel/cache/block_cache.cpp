@@ -1272,7 +1272,7 @@ BlockWriter::_BlockDone(cached_block* block, hash_iterator* iterator)
 			block->original_data = NULL;
 		}
 
-		// Has the previous transation been finished with that write?
+		// Has the previous transaction been finished with that write?
 		if (--previous->num_blocks == 0) {
 			TRACE(("cache transaction %ld finished!\n", previous->id));
 			T(Action("written", fCache, previous));
