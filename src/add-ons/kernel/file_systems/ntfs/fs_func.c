@@ -321,10 +321,11 @@ fs_initialize(int fd, partition_id partitionID, const char* name,
 	update_disk_device_job_progress(job, 0);
 		
 	if (ioctl(fd, B_GET_PATH_FOR_DEVICE, devpath) != 0) {
-		mkntfs_main(devpath, name);
-	} else {
+		result = mkntfs_main(devpath, name);
+		if (result != 0)
+			return result;
+	} else
 		return B_BAD_VALUE;
-	}
 
 	result = scan_partition(partitionID);
 	if (result != B_OK)
