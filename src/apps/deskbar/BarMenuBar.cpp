@@ -133,8 +133,7 @@ TBarMenuBar::RemoveTeamMenu()
 
 	bool removed = false;
 
-	if (fAppListMenuItem != NULL
-		&& RemoveItem(static_cast<BMenuItem*>(fAppListMenuItem))) {
+	if (fAppListMenuItem != NULL && RemoveItem(fAppListMenuItem)) {
 		delete fAppListMenuItem;
 		fAppListMenuItem = NULL;
 		SmartResize(-1, -1);
@@ -177,8 +176,7 @@ TBarMenuBar::RemoveSeperatorItem()
 
 	bool removed = false;
 
-	if (fSeparatorItem != NULL
-		&& RemoveItem(static_cast<BMenuItem*>(fSeparatorItem))) {
+	if (fSeparatorItem != NULL && RemoveItem(fSeparatorItem)) {
 		delete fSeparatorItem;
 		fSeparatorItem = NULL;
 		SmartResize(-1, -1);
