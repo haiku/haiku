@@ -102,11 +102,11 @@ TBarMenuBar::SmartResize(float width, float height)
 }
 
 
-void
+bool
 TBarMenuBar::AddTeamMenu()
 {
 	if (CountItems() > 1)
-		return;
+		return false;
 
 	BRect frame(Frame());
 
@@ -114,33 +114,42 @@ TBarMenuBar::AddTeamMenu()
 	fAppListMenuItem = new TBarMenuTitle(0.0f, 0.0f,
 		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_TeamIcon), new TTeamMenu());
 
-	if (AddItem(fAppListMenuItem)) {
+	bool added = AddItem(fAppListMenuItem);
+
+	if (added)
 		SmartResize(frame.Width() - 1.0f, frame.Height());
-	} else
+	else
 		SmartResize(frame.Width(), frame.Height());
+
+	return added;
 }
 
 
-void
+bool
 TBarMenuBar::RemoveTeamMenu()
 {
 	if (CountItems() < 2)
-		return;
+		return false;
+
+	bool removed = false;
 
 	if (fAppListMenuItem != NULL
 		&& RemoveItem(static_cast<BMenuItem*>(fAppListMenuItem))) {
 		delete fAppListMenuItem;
 		fAppListMenuItem = NULL;
 		SmartResize(-1, -1);
+		removed = true;
 	}
+
+	return removed;
 }
 
 
-void
+bool
 TBarMenuBar::AddSeperatorItem()
 {
 	if (CountItems() > 1)
-		return;
+		return false;
 
 	BRect frame(Frame());
 
@@ -149,25 +158,34 @@ TBarMenuBar::AddSeperatorItem()
 		frame.Height() - 2, false);
 	fSeparatorItem->SetEnabled(false);
 
-	if (AddItem(fSeparatorItem))
+	bool added = AddItem(fSeparatorItem);
+
+	if (added)
 		SmartResize(frame.Width() - 1.0f, frame.Height());
 	else
 		SmartResize(frame.Width(), frame.Height());
+
+	return added;
 }
 
 
-void
+bool
 TBarMenuBar::RemoveSeperatorItem()
 {
 	if (CountItems() < 2)
-		return;
+		return false;
+
+	bool removed = false;
 
 	if (fSeparatorItem != NULL
 		&& RemoveItem(static_cast<BMenuItem*>(fSeparatorItem))) {
 		delete fSeparatorItem;
 		fSeparatorItem = NULL;
 		SmartResize(-1, -1);
+		removed = true;
 	}
+
+	return removed;
 }
 
 
