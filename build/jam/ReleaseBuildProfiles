@@ -1,8 +1,8 @@
-DefineBuildProfile alpha-raw : image : "haiku-alpha.image" ;
-DefineBuildProfile alpha-vmware : vmware-image : "haiku-alpha.vmdk" ;
-DefineBuildProfile alpha-cd : cd-image : "haiku-alpha.iso" ;
+DefineBuildProfile alpha-raw : image : "haiku-r1alpha4.image" ;
+DefineBuildProfile alpha-vmware : vmware-image : "haiku-r1alpha4.vmdk" ;
+DefineBuildProfile alpha-cd : cd-image : "haiku-r1alpha4.iso" ;
 DefineBuildProfile alpha-anyboot : anyboot-image
-	: "haiku-alpha-anyboot.image" ;
+	: "haiku-r1alpha4-anyboot.image" ;
 DefineBuildProfile nightly-raw : image : "haiku-nightly.image" ;
 DefineBuildProfile nightly-vmware : vmware-image : "haiku-nightly.vmdk" ;
 DefineBuildProfile nightly-cd : cd-image : "haiku-nightly.iso" ;
@@ -11,13 +11,13 @@ DefineBuildProfile nightly-anyboot : anyboot-image
 
 switch $(HAIKU_BUILD_PROFILE) {
 	case "alpha-*" : {
-		Echo Building Haiku R1/alpha ;
+		Echo Building Haiku R1/alpha 4 ;
 		HAIKU_ROOT_USER_NAME = user ;
 		HAIKU_ROOT_USER_REAL_NAME = "Yourself" ;
 		AddGroupToHaikuImage party : 101 : user sshd ;
 		HAIKU_IMAGE_HOST_NAME = shredder ;
 		HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES = 1 ;
-		HAIKU_IMAGE_SIZE = 695 ;
+		HAIKU_IMAGE_SIZE = 690 ;
 
 		AddOptionalHaikuImagePackages TimGMSoundFont TrackerNewTemplates
 			WQY-MicroHei ;

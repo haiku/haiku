@@ -41,7 +41,7 @@ scsi0.present = "false"
 floppy0.present = "false"
 
 ide0:0.present = "true"
-ide0:0.fileName = "haiku-alpha.vmdk"
+ide0:0.fileName = "haiku-r1alpha4.vmdk"
 ide0:0.deviceType = "disk"
 ide0:0.mode = "persistent"
 ide0:0.redo = ""
