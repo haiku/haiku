@@ -253,6 +253,13 @@ hash_remove_current(struct hash_table *table, struct hash_iterator *iterator)
 			} else {
 				table->table[index] = (struct hash_element *)NEXT(table,
 					element);
+
+				// We need to rewind the bucket, as hash_next() advances to the
+				// next bucket when iterator->current is NULL. With this we
+				// basically move the iterator between the end of the last
+				// bucket and before the start of this one so hash_next()
+				// doesn't skip the rest of this bucket.
+				iterator->bucket--;
 			}
 
 			table->num_elements--;
