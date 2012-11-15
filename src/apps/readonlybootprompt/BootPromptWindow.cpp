@@ -224,10 +224,10 @@ BootPromptWindow::MessageReceived(BMessage* message)
 
 				// Select default keymap by language
 				BLanguage language(item->Language());
-				BMenuItem* item = _KeymapItemForLanguage(language);
-				if (item != NULL) {
-					item->SetMarked(true);
-					_ActivateKeymap(item->Message());
+				BMenuItem* keymapItem = _KeymapItemForLanguage(language);
+				if (keymapItem != NULL) {
+					keymapItem->SetMarked(true);
+					_ActivateKeymap(keymapItem->Message());
 				}
 			}
 			// Calling it here is a cheap way of preventing the user to have

@@ -30,6 +30,10 @@ struct BAbstractLayout::Proxy {
 	{
 	}
 
+	virtual ~Proxy()
+	{
+	}
+
 	virtual	BSize		MinSize() const = 0;
 	virtual void		SetMinSize(const BSize&) = 0;
 

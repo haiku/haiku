@@ -1328,7 +1328,7 @@ MenuItem<ParentBuilder>::MenuItem(ParentBuilder* parentBuilder, BMenu* menu,
 	Menu<ParentBuilder>(menu),
 	fMenuItem(item)
 {
-	SetParent(parentBuilder);
+	this->SetParent(parentBuilder);
 }
 
 
