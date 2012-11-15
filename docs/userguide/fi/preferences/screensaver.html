@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ScreenSaver</title>
+	<title>Näytönsäästäjäasetukset</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -38,10 +40,12 @@
 <li><a href="../../zh_CN/preferences/screensaver.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/screensaver.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/preferences/screensaver.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/preferences/screensaver.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/preferences/screensaver.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/preferences/screensaver.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="screen.html">Screen</a> 
+ «  <a href="screen.html">Näyttöasetukset</a> 
 ::  <a href="../preferences.html" class="uplink">Asetukset</a> 
 ::  <a href="sounds.html">Äänet</a>  »
 </span></div>
@@ -49,38 +53,35 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
-<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />ScreenSaver</h2>
+<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />Näytönsäästäjäasetukset</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
 </table>
 
-<p>The panel of the ScreenSaver preferences is split into two tabs:
-</p>
+<p>Näytönsäästäjäasetukset-paneeli on jaettu kahteen välilehteen:</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="fade" id="fade">Fade</a></h2>
+<a name="fade" id="fade">Yleinen</a></h2>
 <img src="../images/prefs-images/screensaver-fade.png" alt="screensaver-fade.png" />
 <br />
-<p>The top checkbox enables/disables the screen saver.<br />
-With the slider below it, you control after how long an idle time the screen saver kicks in.
+<p>Ylin valintaruutu ottaa käyttöön tai poistaa käytöstä näytönsäästäjän.<br />
+Sen alla olevalla liukukytkimellä voit ohjata, kuinka pitkän odotusajan jälkeen näytönsäästäjä käynnistyy.
 </p>
-<p>The next two sliders are only usable after you activated their checkboxes:<br />
-One slider determines after how many minutes the screen is powered off.<br />
-The other, after how many minutes you need a password to unlock your machine.
+<p>Kaksi seuraavaa liukukytkintä ovat käytettävissä vain jos ne aktivoidaan valintaruuduilla:<br />
+Yksi liukukytkin määrittää, että kuinka monen minuutin kuluttua näyttö sammutetaan.<br />
+Toinen liukukytkin määrittää, kuinka monen minuutin kuluttua tietokoneistunto pitää käynnistää salasanalla.
 </p>
-<p>By clicking into different corners of the two screens at the bottom, you tell the system when to immediately start the screen saver or when to prevent it from kicking in when you rest the mouse in the indicated corner. Click in the middle of the screens to disable that feature again.
-</p>
+<p>Napsauttamalla kahden näytön eri kulmiin alhaalla kerrot järjestelmälle, milloin sen on käynnistettävä näytönsäästäjä heti ja milloin estää sen käynnistymisen kun hiiren kohdistin on osoitetun kulman päällä. Näytön keskustaan napsauttaminen ottaa tämän ominaisuuden pois käytöstä.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="screensavers" id="modules">Screensavers</a></h2>
+<a name="screensavers" id="modules">Näytönsäästäjät</a></h2>
 <img src="../images/prefs-images/screensaver-modules.png" alt="screensaver-modules.png" />
 <br />
-<p>The second tab shows a list of all installed screen savers and their individual settings. You can test your settings with the <span class="button">Test</span> button below the list and add more screen savers with the <span class="button">Add...</span> button beside it. Another way to install new screen savers is by a simple drag&amp;drop into the list. Of course, you can also copy/delete its file in its respective user folder, i.e. <span class="path">/boot/common/add-ons/Screen Savers/</span> or <span class="path">/boot/home/config/add-ons/Screen Savers/</span> (see topic <a href="../filesystem-layout.html">Filesystem layout</a>).
+<p>Toinen välilehti näyttää asennettujen näytönsäästäjien luettelon ja niiden yksilölliset asetukset. Voit testata niitä luettelon alapuolella olevalla <span class="button">Testaa</span>-painikkeella ja lisätä näytönsäästäjiä viereisellä <span class="button">Lisää...</span>-painikkeella. Toinen tapa asentaa näytönsäästäjä on yksinkertaisesti raahata ja pudottaa se luetteloon. Tietysti voit kopioida tai poistaa tiedoston vastaavasta käyttäjäkansiosta, toisin sanoen <span class="path">/boot/common/add-ons/Screen Savers/</span> tai <span class="path">/boot/home/config/add-ons/Screen Savers/</span> (katso aihe <a href="../filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a>).
 </p>
 
 </div>
@@ -88,7 +89,7 @@ The other, after how many minutes you need a password to unlock your machine.
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="screen.html">Screen</a> 
+ «  <a href="screen.html">Näyttöasetukset</a> 
 ::  <a href="../preferences.html" class="uplink">Asetukset</a> 
 ::  <a href="sounds.html">Äänet</a>  »
 </span></div>

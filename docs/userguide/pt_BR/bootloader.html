@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Inicializador do Sistema</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/bootloader.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bootloader.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bootloader.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bootloader.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/bootloader.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/bootloader.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/bootloader.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/bootloader.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="filesystem-layout.html">Disposição do sistema de arquivos</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Inicializador do Sistema</h1>
+
+<p>O Inicializador do Sistema Haiku pode ser útil quando ocorrer algum problema de hardware ou deseja escolher qual instalação do Haiku vai inicializar, caso tenha mais de uma (pode ser através de CD ou de um pendrive USB).<br />
+Ele também é útil para remover um componente de software que, após ter sido instalado, impeça a inicialização do sistema, A opção <i>Desabilitar adicionais de usuário</i>, mencionada abaixo, irá iniciar o Haiku sem carregar componentes instalados pelo usuário, por exemplo um driver.</p>
+<p>Para entrar nas opções do Inicializador do Sistema, aperte e mantenha pressionada a tecla <span class="key">SHIFT</span> antes do início do processo de inicialização. Se houver um gerenciador de inicialização instalado, você pode começar segurando <span class="key">SHIFT</span> antes de chamar a entrada de inicialização para o Haiku. Se o Haiku é o único sistema operacional instalado na máquina, você pode iniciar segurando a tecla enquanto ainda vê as mensagens de inicialização do BIOS.</p>
+<p><br /></p>
+<p>Uma vez lá, são oferecidos quatro menus:</p>
+<table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
+<tr><td><b>Selecionar volume de inicialização</b></td><td> </td><td>Escolha qual instalação do Haiku a iniciar.</td></tr>
+<tr><td><b>Selecionar opções de modo seguro</b><br />
+</td><td> </td><td>Existem muitas opções a tentar no caso de problemas com o hardware. Quando deslocando a barra de seleção para uma opção, uma explicação curta aparece na base da tela.
+<p><i>- Modo seguro</i><br />
+<i>- Desabilitar adicionais de usuário</i><br />
+<i>- Desabilitar IDE DMA</i><br />
+<i>- Usar modo de vídeo livre de falhas</i><br />
+<i>- Desabilltar IO-APIC</i><br />
+<i>- Desabilitar LOCAL APIC</i><br />
+<i>- Não chamar a BIOS</i><br />
+<i>- Desabilitar APM</i><br />
+<i>- Desabilitar ACPI</i>
+</p></td></tr>
+<tr><td><b>Selecionar opções de depuração</b><br />
+</td><td> </td><td>Aqui encontram-se diversas opções que ajudam a depurar ou obter detalhes para um relatório de erros. Novamente, uma explanação curta para cada opção é mostrada na base da tela.
+<p><i>- Habilitar saída serial de depuração</i><br />
+<i>- Habilitar saída de depuração na tela</i><br />
+<i>- Habilitar relatório de sistema da depuração</i>
+</p>
+<p>Se o "relatório de sistema da depuração" é habilitado, uma reinicialização a quente após um erro mostra estas opções adicionais:</p>
+<p><i>- Mostrar relatório de sistema de uma sessão prévia</i><br />
+<i>- Salvar relatório de sistema de uma sessão prévia</i>
+</p></td></tr>
+<tr><td class="onelinetop"><b>Selecionar modo de vídeo livre de falhas</b></td><td> </td><td>Se tiver ativado a opção <i>Usar modo de vídeo livre de falhas</i>, poderá definir resolução e profundidade de cor.</td></tr>
+</table>
+<p><br /></p>
+<p>Após ativar uma ou mais opções, retorne ao menu principal e continue a inicialização, que apresentará esta tela:</p>
+<img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
+
+<p>Se tudo estiver OK, um símbolo após o outro rapidamente se acenderão.<br />
+Os diferentes símbolos grosseiramente correspondem aos seguintes estágios de inicialização:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><b>Átomo</b></td><td style="width:10px;"> </td><td>Inicializando módulos.</td></tr>
+	<tr><td><b>Disco + lupa</b></td><td> </td><td>Criando rootfs (<span class="path">/</span>) e montando devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Placa de expansão</b></td><td> </td><td>Inicializando gerenciador de dispositivos.</td></tr>
+	<tr><td><b>Disco de inicialização</b></td><td> </td><td>Montando disco de inicialização.</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>Carregando módulos específicos da CPU.</td></tr>
+	<tr><td><b>Pasta</b></td><td> </td><td>Inicilização final de subsistemas.</td></tr>
+	<tr><td><b>Foguete</b></td><td> </td><td>Script de inicialização carregando o sistema.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="filesystem-layout.html">Disposição do sistema de arquivos</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

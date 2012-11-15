@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Dancsó Róbert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Terminál</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Használati útmutató</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/hu.png" alt="" /> Magyar</li>
+<li><a href="../../fr/applications/terminal.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/terminal.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/terminal.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/terminal.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/terminal.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/terminal.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/terminal.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/terminal.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/terminal.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/terminal.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/terminal.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/terminal.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../pt_BR/applications/terminal.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../en/applications/terminal.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="stylededit.html">StyledEdit</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="textsearch.html">Szövegkeresés</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminál (Terminal)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
+<tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
+<tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
+<span class="path">~/.profile</span> - a <span class="path">/boot/common/etc/profile</span> fájl kibővítése/felülírása<br />
+<span class="path">~/.inputrc</span> - a <span class="path">/boot/common/etc/inputrc</span> fájl kibővítése/felülírása</td></tr>
+</table>
+<p><br /></p>
+<p>A Terminál a Haiku bash (Bourne Again Shell) felületete.</p>
+<p>Ehhez kapcsolódik a <a href="../bash-scripting.html">Bash és szkriptek</a> (néhány internet hivatkozás, leírások) és a <a href="cli-apps.html">Haiku-specifikus parancssori programok</a> témakör. Itt most csak magára, a Terminálra koncentrálunk.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="windows-tabs" name="windows-tabs">Ablakok és lapok</a></h2>
+<p>Szükség szerint bármennyi Terminál elindítható vagy a program újbóli elindításával, vagy pedig az <span class="key">ALT</span> <span class="key">N</span> kombinációval egy már futó programból. Továbbá fülek/lapok is használhatóak, amit az <span class="key">ALT</span> <span class="key">T</span> lenyomásával adhatunk egy meglévő ablakhoz.</p>
+<img src="../images/apps-images/terminal.png" alt="terminal.png" />
+<br />
+<p>A lap-fül sorában egy üres területen duplán kattintva megnyithatunk egy új lapot; magán a lap-fülön duplán kattintva pedig kapunk egy ablakot, ahol új nevet adhatunk a lapnak. A beviteli mezőn tartva az egeret kaphatunk egy kis segítséget a használható %-al jelölt változókról.<br />
+Alap esetben, <tt>%1d: %p</tt>, a fülön az aktuális mappa neve, egy <tt>:</tt>, mint tagóló karakter és a jelenleg futó program neve látható (vagy <tt>--</tt>  ha épp nem futtatunk semmit a Terminálban). Mint azt a fenti képen is láthatjuk, hogy az első lapon épp FTP-t használunk az <span class="path">Asztal</span>on, a másikon pedig a <span class="path">/</span> mappában vagyunk.<br />
+A <span class="menu">Szerkesztés | Ablak címe...</span> menüvel magának a Terminál ablaknak a címe módosítható épp úgy, mint a lap esetében.</p>
+<p>A lap-füleken jobb gombbal kattintva kapunk egy menüt: <span class="menu">Lap bezárása</span>, <span class="menu">Többi lap bezárása</span> vagy <span class="menu">Lap címének szerkesztése...</span> (épp úgy, mint dupla kattintáskor).</p>
+<p>A Terminál ablak épp úgy méretezheztő, mint bármely más ablak. Ugyanakkor előre beállított méretet is választhatunk a <span class="menu">Beállítások | Ablak mérete</span> menüből. Az <span class="key">ALT</span> <span class="key">ENTER</span> lenyomásakor pedig teljes képernyőre válthatunk.</p>
+<p>Az ablak mérete és a karakterkódolás csak a <span class="menu">Beállítások | Mentés alapértelemzettként</span> menüre nyomva őrizhető meg.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings" name="settings">Beállítások</a></h2>
+<p>A <span class="menu">Beállítások | Beállítások...</span> menü megnyit egy panelt, ahol a Terminál alapbeállíátsai módosíthatóak.</p>
+<img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
+<br />
+<p>A beállítások első részében különféle "képleteket" látunk, amivel megadható a lap és az ablak alapértelmezett címe. Ezeken a mezőkön is szintén kapunk egy kis segítséget ha az egérrel felettük maradunk. Alább a betűtípust, a betű méretét és a különféle színösszeállításokat találjuk. Itt választhatunk néhány előre megadott összeállításból, mint például: <span class="menu">Fehér alapon fekete</span> vagy <span class="menu">Fekete alapon fehér</span> vagy készíthetünk <span class="menu">Egyéni</span> összeállítást is az alsó színválasztó használatával.<br />
+A <span class="menu">Kilépés megerősítése ha van futó program</span> jelölőnégyzet bejelölésével kapunk egy figyelmeztetést mielőtt bezárnánk az ablakot miközben még éppen fut program benne.<br />
+Több profil is létrehozható külön-külön fájlba mentve, amin duplán kattintva a profil beállításaival megnyílik egy új Terminál.<br />
+A <span class="button">Rendben</span> megnyomásával ezeket a beállításokat a program elmenti alapértelmezettként.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="shortcuts" name="shortcuts">Billentyűzet parancsok</a></h2>
+<p>A hasznos kombinációk listája a <a href="../keyboard-shortcuts.html#terminal">Billentyűzet-kombinációk</a> fejezetben található.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="customization" name="customization">Bash személyre szabása</a></h2>
+<p>Számtalan lehetőség van a bash konfigurálására. Két fájl kifejezetten fontos a felhasználók számára: <span class="cli">.profile</span> és <span class="cli">.inputrc</span><br />
+Mind a kettőt a <span class="path">home/</span> mappában kell létrehozni, és a <span class="path">/boot/common/etc/</span> mappában lévő eredeti fájlok tartalmát átmásolni az újonnan létrehozottakba.</p>
+
+<h3>.profile</h3>
+<p>A <span class="cli">.profile</span> minden alkalommal betöltődik mikor egy új Terminált nyitunk meg. Ebben minden, a bash-el kapcsolatos működési és megjelenítési beállítás megtalálható. További információk találhatóak az interneten.</p>
+<p>A Haiku/BeOS Tip Server is tartalmaz néhány ötletet, amin elindulhatunk. Például:</p>
+<ul>
+<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Customize your Terminal prompt</a> - A prompt személyre szabása</li>
+<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">More prompt customizations</a> - További személyre szabás</li>
+<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Enhancing bash</a> - A bash konfigurálása</li>
+<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Custom keyboard shortcuts</a> - Egyéni kombinációk</li>
+</ul>
+<p><a href="http://betips.net/index.php?s=.profile">Itt</a> még többet találsz.</p>
+
+<h3>.inputrc</h3>
+<p>Az <span class="cli">.inputrc</span>-vel billentyű-módosításokat hajthatunk végre. Mivel a Haiku a leghasznosabb alap beállításokat használja, így valószínű, hogy nem kell ezzel foglalkoznunk. Ha valami speciális dologra van szükségünk, akkor az interneten kapunk információt, például a <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a> oldalon.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="hints" name="hints">Javaslatok a Terminállal való munkához</a></h2>
+<ul><li><p>Egy fájl vagy mappa a Terminál ablakba húzásakor a program annak útvonalát illeszti a jelenlegi pozícióba. Ha a jobb gombbal húzzuk azt az ablakba, akkor további lehetőségünk is van a megjelenő helyi menüből:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Útvonal beszúrása</span></td><td> </td><td>A behúzott fájl/mappa útvonalának beillesztése (megyegyezik a fájl/mappa bal gombbal való behúzásával).</td></tr>
+<tr><td><span class="menu">Mappa váltása</span></td><td> </td><td>A jelnlegi mappa módosítása a behúzott fájl/mappa útvonalával.</td></tr>
+<tr><td><span class="menu">Hivatkozás létrehozása</span></td><td> </td><td>Hivatkozás létrehozása a Terminál jelenlegi mappájába.</td></tr>
+<tr><td><span class="menu">Mozgatás</span></td><td> </td><td>A behúzott fájl/mappa a Terminál jelenlegi mappájába mozgatása.</td></tr>
+<tr><td><span class="menu">Másolás</span></td><td> </td><td>A behúzott fájl/mappa a Terminál jelenlegi mappájába másolása.</td></tr>
+</table></li>
+<li><p>Bármilyen fájl megnyitható az alapértelmezett programmal a <span class="cli">open <i>[fájlnév]</i></span> paranccsal. Ez szintén működik a jelenlegi mappa ("<span class="cli">.</span>") és a szülő mappa ("<span class="cli">..</span>") megfelelőjével is, amikor az adott mappa fog megnyílni a Nyomkövetőben. Tehát, a jelenlegi mappa megnyitásához az alábbi parancsot kell kiadni:</p>
+<pre class="terminal">open .</pre>
+</li></ul>
+
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="stylededit.html">StyledEdit</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
+::  <a href="textsearch.html">Szövegkeresés</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -41,18 +41,19 @@
 <li><a href="../../zh_CN/applications/mediaplayer.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/mediaplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/applications/mediaplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/mediaplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/mediaplayer.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/mediaplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="mail.html">Sähköposti</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
-::  <a href="midiplayer.html">MidiPlayer</a>  »
+::  <a href="midiplayer.html">Midi-soitin</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />Mediasoitin</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,42 +64,42 @@
 <p><br /></p>
 <p>Mediasoitin on kaikkien ääni- ja videotiedostojen oletussoitin. Kiitos sen <a href="http://www.ffmpeg.org/">ffmpeg</a>-taustaohjelman, se tukee laajaa joukkoa käytettyjä tiedostomuotoja. Sen yksinkertaisessa käyttöliittymässä on kaikki odottamasi ohjainpainikkeet:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
-<p>The slider of the progress bar allows you to quickly skim to a position, resting the mouse over it shows the current and remaining time of the clip. Clicking on the time display to the right of it, toggles between length, current and remaining time.<br />
-Below that you find the usual controls to skip to the previous track, play/pause, stop and jump to the next track. Then comes a volume control (clicking the speaker symbol toggles muting) and a VU meter.</p>
+<p>Edistymispalkin liukukytkin sallii sinun vaihtaa nopeasti sijaintia. Hiiren kohdistimen pitäminen palkin päällä näyttää nykyisen ajan ja leikkeen jäljellä olevan ajan. Oikealla olevan aika-näytön napsauttaminen vuorottelee pituuden, nykyisen ja jäljellä olevan ajan välillä.<br />
+Sen alta löydät tavalliset ohjaimet paluuseen edelliseen kappaleeseen, soitolle, tauolle, pysähtymiselle ja siirtymiselle seuraavaan kappaleeseen. Sitten on äänenvoimakkuuden säädin (kaiutinsymbolin napsauttaminen vuorottelee mykistämistä) ja voltti-/jännitemittari.</p>
 
-<h2>Audio and video playback</h2>
-<p>Since there aren't any specific features for for audio playback, we'll go straight to video or general features.</p>
+<h2>Ääni- ja videosoitto</h2>
+<p>Koska äänisoitossa ei ole mitään erikoisominaisuuksia, siirrymme suoraan videoon ja yleisiin ominaisuuksiin.</p>
 <img src="../images/apps-images/mediaplayer-info.png" alt="mediaplayer-info.png" />
-<p>Available to all media is the <span class="menu">File info...</span> (<span class="key">ALT</span> <span class="key">I</span>). It shows information about the currently loaded file, like playing time or details of the audio/video track and its codec.</p>
-<p>Most of the often used commands from the menus are also available from a right-click context menu on the video area. Convenient when in full-screen mode.<br />
-Under <span class="menu">Video</span> you'll find options to zoom the window to various levels or force the aspect ratio to some standard values. Leaving the aspect ration to the default <span class="menu">Stream settings</span> should work best for correctly encoded files.</p>
-<p>MediaPlayer supports subtitles in <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a> format. To have them show up under <span class="menu">Subtitles</span>, their filenames have to be identical to their video file, with a suffixed language name and ".srt" instead of the video's extension. For example:</p>
+<p>Kaikille medioille on käytettävissä valikko <span class="menu">Tiedostotiedot...</span> (<span class="key">ALT</span> <span class="key">I</span>). Se näyttää tiedot parhaillaan ladatusta tiedostosta, kuten soittoajan tai ääni- tai videokappaleen yksityiskohdata ja sen koodekin.</p>
+<p>Useimmin käytetyt valikkokomennot ovat käytettävissä myös videoalueella hiiren kakkospainikkeen asiayhteysvalikosta. Se näppärää, kun ollaan kokonäyttötilassa.<br />
+Valikon <span class="menu">Video</span> alta löydät valitsimia kaventaa tai laajentaa ikkunaa eri tasoille tai pakottamiseksi vaioarvoiseen kuvasuhteisiin. Kuvasuhteen jättämiseksi oletukseen <span class="menu">Virta-asetukset</span> pitäisi toimia parhaiten oikein koodatuilla tiedostoilla.</p>
+<p>Mediasoitin tukee aliotsikoita <a href="http://en.wikipedia.org/wiki/SubRip">SRT</a>-muodossa. Jotta ne näkyvät valikon <span class="menu">Aliotsakkeet</span> alla, niiden tiedostonimet ovat samat kuin niiden videotiedostonimet, kielinimitarkentimella ja tarkentimella ".srt" eikä videotarkentimella. Esimerkiksi:</p>
 <pre>MyMovie.avi
 MyMovie.Deutsch.srt
 MyMovie.English.srt
 MyMovie.Français.srt</pre>
-<p>Multiple audio tracks, most often used for several languages inside one video file, are available from the <span class="menu">Audio track</span> submenu. The <span class="menu">Video | Track</span> submenu offers the same when having multiple video streams available.</p>
-<p>You can toggle the <span class="menu">Full screen</span> mode (<span class="key">ALT</span> <span class="key">ENTER</span> or <span class="key">F</span> or a double left-click), hide MediaPlayer's window borders and controls with <span class="menu">Hide interface</span> (<span class="key">ALT</span> <span class="key">H</span> or a double right-click) or have it's window <span class="menu">Always on top</span> (<span class="key">ALT</span> <span class="key">A</span>).</p>
+<p>Moniäänikappaleet, useimmiten käytetty useaa kieltä varten yhden videotiedoston sisällä, ovat käytettävissä alivalikosta <span class="menu">Ääniraita</span>. Alivalikko <span class="menu">Video | Kappale</span> tarjoaa saman, kun useita videovirtoja on käytettävissä.</p>
+<p>Voit vuorotella <span class="menu">Koko näyttö</span>-tilaa (<span class="key">ALT</span> <span class="key">ENTER</span> tai <span class="key">F</span> tai hiiren ykköspainikkeen kaksoisnapsautuksella), piilottaa Mediasoittimen ikkunarajat ja ohjaimet <span class="menu">Piilota käyttöliittymä</span> (<span class="key">ALT</span> <span class="key">H</span> tai hiiren kakkospainikkeen kaksoisnapsautuksella) tai pitää sen ikkunaa <span class="menu">Aina päällimmäisenä</span> (<span class="key">ALT</span> <span class="key">A</span>).</p>
 
-<h2>Playlists</h2>
-<p><span class="menu">MediaPlayer | Playlist...</span> (<span class="key">ALT</span> <span class="key">P</span>) opens a window with the files currently queued up for playback. Double-clicking an entry starts playing it.</p>
+<h2>Soittoluettelot</h2>
+<p><span class="menu">Mediasoitin | Soittoluettelo...</span> (<span class="key">ALT</span> <span class="key">P</span>) avaa ikkunan, jossa näkyy soittamista odottavien tiedostojen jono. Rivin kaksoisnapsautus aloittaa sen soittamisen.</p>
 <img src="../images/apps-images/mediaplayer-playlist.png" alt="mediaplayer-playlist.png" />
-<p>You can add more files by dropping them into the list and rearrange their position via drag &amp; drop. From the <span class="menu">Edit</span> menu you can <span class="menu">Randomize</span> or <span class="menu">Remove</span> (<span class="key">DEL</span>) an entry from the list or delete the actual file with <span class="menu">Move to Trash</span> (<span class="key">ALT</span> <span class="key">T</span>).</p>
-<p>Of course, you can <span class="menu">Save</span> a playlist and later <span class="menu">Open</span> it again, or start it with simply double-clicking the playlist file.</p>
+<p>Voit lisätä lisää tiedostoja pudottamalla ne luetteloon ja järjestämällä niiden sijainti raahaa ja pudota -toiminnolla. Valikosta <span class="menu">Muokkaa</span> voit <span class="menu">Satunnaista00</span>a tai <span class="menu">Poista</span>a (<span class="key">DEL</span>) luettelorivin tai poistaa todellisen tiedoston valikkolla <span class="menu">Siirrä roskakoriin</span> (<span class="key">ALT</span> <span class="key">T</span>).</p>
+<p>Voit tietysti tallentaa valikolla <span class="menu">Tallenna</span> soittoluettelon ja myöhemmin avata se uudelleen valikolla <span class="menu">Avaa</span>, tai aloittaa se yksinkertaisesti kaksoisnapsauttamalla soittoluettelotiedostoa.</p>
 
-<h2>Settings</h2>
-<p>There are several settings to fine-tune MediaPlayer's behavior:</p>
+<h2>Asetukset</h2>
+<p>Mediasoittimen käyttäytymisen hienosäätöön on useita asetuksia:</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
-<p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining. Start playback automatically, close windows when finished or play clips in a loop.</p>
-<p>Next are different <span class="menu">View options</span>.<br />
-You can opt to <span class="menu">Use hardware overlay if available</span>, which cuts down CPU usage but only works for one video window and needs a supporting video card driver.<br />
-You can <span class="menu">Scale movies smoothly</span> (when not in overlay mode) which uses very fast filtering to smooth over otherwise blocky pixels when zooming video or watching in full-screen mode.<br />
-<span class="menu">Scale controls in full-screen mode</span> if you prefer slightly bigger controls, maybe because you watch the screen from a bit farther away when in full-screen mode.<br />
-Then there are settings for <span class="menu">Subtitle size</span> and <span class="menu">Subtitle placement</span>. They can be shown at the <span class="menu">Bottom of video</span>, which will always have them overlayed over the picture. Or <span class="menu">Bottom of window</span>, which allows you to resize the window vertically and have the subtitles appear in the black bar at the bottom instead.</p>
-<p>The last setting determines the volume of clips whose windows are not currently active. You can have them all blaring at <span class="menu">Full volume</span>, at less confusing <span class="menu">Low volume</span> or quietly <span class="menu">Muted</span>.</p>
+<p>Ensimmäinen kohta, <span class="menu">Soittotila</span>, on aika itsestäänselvä. Aloita soittaminen automaattisesti, sulje ikkunat kun lopetetaan tai soita leikkeitä silmukassa.</p>
+<p>Seuraavana on erilainen <span class="menu">Katso valitsimia</span>.<br />
+Voit valita <span class="menu">Käytä laitteistovideokerrosta, jos se on käytettävissä</span>, mikä alentaa suoritinkäyttöä, mutta toimii vain yhdessä videoikkunassa ja tarvitsee tukevan videokorttiajurin.<br />
+Voit valita <span class="menu">Skaalaa elokuvat pehmeästi</span> (kun ei olla kerrostustilassa) mikä käyttää hyvin nopeaa suodatusta pehmentäen muuten lohkomaisia pikseleitä, kun kavennetaan videonäkymää tai katsotaan kokonäyttötilassa.<br />
+<span class="menu">Skaalausohjaimet kokonäyttötilassa</span> jos pidät parempana hiukan isompia ohjaimia, ehkä katselet näyttöä hiukan kauempaa kokonäyttötilassa.<br />
+Sitten on asetukset <span class="menu">Aliotsikkokoko</span> ja <span class="menu">Aliotsikon sijainti</span>. Ne voidaan näyttää <span class="menu">Videon alareuna</span>ssa, jossa ne ovat aina kuvan päällä. Tai <span class="menu">Ikkunan alareuna</span>, mikä sallii sinun muuttaa ikkunan kokoa pystysuoraan ja näyttää aliotsikot sen sijaan alhaalla mustana palkkina.</p>
+<p>Viimeinen asetus määrittelee äänenvoimakkuuden niille leikkeille, jotka eivät ole parhaillaan aktiviisia. Voit kailottaa niitä kaikkia voimakkuudella <span class="menu">Täysi äänenvoimakkuus</span>, vähemmän häiritsevällä <span class="menu">Alenna äänenvoimakkuutta</span> tai hiljentää <span class="menu">Mykistä</span>.</p>
 
-<h2>Keyboard controls</h2>
-<p>MediaPlayer offers convenient key combinations to control playback without using the mouse.</p>
+<h2>Näppäimistöohjaimet</h2>
+<p>Mediasoitin tarjoaa näppäriä näppäinyhdistelmiä soiton ohjaamiseksi ilman hiiren käyttöä.</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="key">Z</span></td><td style="width:15px;"></td><td>Hyppää edelliseen kappaleeseen</td></tr>
 <tr><td><span class="key">X</span></td><td></td><td>Soita</td></tr>
@@ -106,23 +107,23 @@ Then there are settings for <span class="menu">Subtitle size</span> and <span cl
 <tr><td><span class="key">V</span></td><td></td><td>Pysäytä</td></tr>
 <tr><td><span class="key">B</span></td><td></td><td>Hyppää seuraavaan kappaleeseen</td></tr>
 </table>
-<p>These keys are assigned to the functions of the control buttons. They are always the bottom left letter keys on the keyboard, i.e. they are used independently of your current keymapping. The above keys correspond to a standard US-american keymap.</p>
+<p>Nämä näppäimet on liitetty ohjainpainikkeiden toimintoihin. Ne ovat aina näppäimistön vasemman alakulman näppäimiä, toisin sanoen riippumattomia nykyisestä näppäinkuvauksesta. Yllä olevat näppäimet vastaavat vakiota US-amerikkalaista näppäinkuvausta.</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
-<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>Seek forwards</td></tr>
-<tr><td align="right"><span class="key">VAIHTO</span> <span class="key">→</span></td><td></td><td>Jump forwards 10 seconds</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>Jump forwards 30 seconds</td></tr>
-<tr><td align="right"><span class="key">←</span></td><td></td><td>Seek backwards</td></tr>
-<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>Jump backwards 10 seconds</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>Jump backwards 30 seconds</td></tr>
+<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>Etsi eteenpäin</td></tr>
+<tr><td align="right"><span class="key">VAIHTO</span> <span class="key">→</span></td><td></td><td>Hyppää eteenpäin 10 sekuntia</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>Hyppää eteenpäin 30 sekuntia</td></tr>
+<tr><td align="right"><span class="key">←</span></td><td></td><td>Etsi taaksepäin</td></tr>
+<tr><td align="right"><span class="key">VAIHTO</span> <span class="key">←</span></td><td></td><td>Hyppää taaksepäin 10 sekuntia</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>Hyppää taaksepäin 30 sekuntia</td></tr>
 
 <tr><td align="right"><span class="key">↑</span></td><td></td><td>Kasvata äänenvoimakkuutta</td></tr>
 <tr><td align="right"><span class="key">↓</span></td><td></td><td>Pienennä äänenvoimakkuutta</td></tr>
 
-<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>Skip to previous Track</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>Skip to next Track</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>Hyppää edelliseen Kappaleeseen</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>Hyppää seuraavaan Kappaleeseen</td></tr>
 
-<tr><td align="right"><span class="key">Välilyöntipainike</span></td><td></td><td>Toggle play/pause</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Toggle full-screen mode (also done by double left-clicking the video area)</td></tr>
+<tr><td align="right"><span class="key">Välilyöntipainike</span></td><td></td><td>Vuorottele soita/tauko -tiloja</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Vuorottele kokonäyttötila (tehdän myös kaksoisnapsauttamalla hiiren ykköspainikkeella videoaluetta)</td></tr>
 </table>
 
 </div>
@@ -132,7 +133,7 @@ Then there are settings for <span class="menu">Subtitle size</span> and <span cl
 <div class="inner"><span>
  «  <a href="mail.html">Sähköposti</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
-::  <a href="midiplayer.html">MidiPlayer</a>  »
+::  <a href="midiplayer.html">Midi-soitin</a>  »
 </span></div>
 </div>
 

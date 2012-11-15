@@ -40,6 +40,8 @@
 <li><a href="../zh_CN/queries.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/queries.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../sk/queries.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/queries.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/queries.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../en/queries.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,105 +53,104 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
 <tr class="index"><td>
-	<a href="#find-window">The Find window</a><br />
-	<a href="#basic-query">Basic queries - "by Name"</a><br />
-	<a href="#adv-query">Advanced queries - "by Attribute"</a><br />
-	<a href="#more-adv-query">Even more advanced queries - "by Formula"</a><br />
-	<a href="#result-window">The result window</a><br />
-	<a href="#query-template">Query Templates</a>
+	<a href="#find-window">Etsintäikkuna</a><br />
+	<a href="#basic-query">Peruskyselyt - "nimellä"</a><br />
+	<a href="#adv-query">Kehittyneemmät kyselyt - "attribuutilla"</a><br />
+	<a href="#more-adv-query">Vielä edistyneemmät kyselyt - "kaavalla"</a><br />
+	<a href="#result-window">Tulosikkuna</a><br />
+	<a href="#query-template">Kyselymallinteet</a>
 </td></tr>
 </table>
 
 <h1>Kyselyt</h1>
 
-<p>A query is a file search based on file attributes and can be performed within Tracker or in Terminal. Queries are saved in <span class="path">/boot/home/queries/</span> and by default last seven days before being purged. Note, these aren't static result lists of your search, but are the query formulas which trigger a new search whenever you open them.<br />
-Even better, you don't have to double-click to re-do a query. You can <a href="tracker.html#navigating">drill down</a> a saved query just like any folder by right-clicking on it and navigating through the submenus.</p>
+<p>Kysely on tiedostoattribuutteihin perustuva tiedostohaku ja se voidaan suorittaa Seuraajassa tai Pääteikkunassa. Kyselyt tallennetaan kansioon <span class="path">/boot/home/queries/</span> ja säilytetään oletuksena viimeiset seitsemän päivää ennen tyhjentämistä. Huomaa, että nämä eivät ole hakusi staattisia tuloksia, vaan kyselylomakkeita, jotka liipaisevat uuden haun aina avattaessa.<br />
+Mikä parempaa, sinun ei tarvitse kaksoisnapsauttaa kyselyn tekemiseksi uudelleen. Voit <a href="tracker.html#navigating">porautua</a> tallennettuuun kyselyyn aivan kuin mihin tahansa kansioon napsauttamalla hiiren kakkospainikkeella ja navigoimalla alivalikoiden lävitse.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="find-window" name="find-window">Etsintäikkuna</a></h2>
-<p>You start a query by invoking the <span class="menu">Find...</span> menu either from the Deskbar menu or any Tracker window or the Desktop (which is actually a fullscreen Tracker window). The shortcut is <span class="key">ALT</span> <span class="key">F</span>. You're presented with the Find window:</p>
+<p>Aloitat haun kutsumalla <span class="menu">Etsi...</span>-valikkoa joko Työpöytäpalkista tai mistä tahansa Seuraaja-ikkunasta tai Työpöydältä (mikä on itse asiassa kokonäytön kokoinen Seuraaja-ikkuna). Pikanäpppäin on <span class="key">ALT</span> <span class="key">F</span>. Sinulle esitellään Haku-ikkuna:</p>
 <img src="images/queries-images/basic-query.png" alt="basic-query.png" />
 <ol>
-<li><p>Select recent or saved queries or save the current search parameters as <a href="#query-template">Query Template</a>.</p></li>
-<li><p>Narrow down your search from <span class="menu">All files and folders</span> to specific file types.</p></li>
-<li>Define the search method:<ul>
-    <li><span class="menu">by Name</span> - a basic search by file or folder name</li>
-    <li><span class="menu">by Attribute</span> - an advanced search, you specify search terms for one or more attributes</li>
-    <li><span class="menu">by Formula</span> - an even more advanced search, you can fine-tune a complex query term</li></ul></li>
-<li><p>Select which drives to search on.</p></li>
-<li><p>Enter the search term.</p></li>
-<li><p>The expander hides/unhides the additional options.</p></li>
-<li><p>Uncheck the <span class="menu">Temporary</span>  checkbox if you don't want this query self-destruct after 7 days.</p></li>
-<li><p>Check if your query is supposed to <span class="menu">Include trash</span>.</p></li>
-<li><p>Optionally, enter a name for this query if you want to save it.</p></li>
-<li><p>You can drag&amp;drop the icon anywhere to save a query. Doing that with the right mouse button, offers the option to save as template.</p></li>
+<li><p>Valitse nykyiset tai tallennetut kyselyt tai tallenna nykyiset hakuparametrit <a href="#query-template">Kyselymallinteena</a>.</p></li>
+<li><p>Kavenna etsintäaluetta valikosta <span class="menu">Kaikki tiedostot ja kansiot</span> tiettyyn tiedostotyyppiin.</p></li>
+<li>Määritä hakumenetelmä:<ul>
+    <li><span class="menu">Nimellä</span> - perushaku tiedosto- tai kansionimellä</li>
+    <li><span class="menu">Attribuutilla</span> - edistynyt haku, määritä hakutermeiksi yksi tai useampia attribuutteja</li>
+    <li><span class="menu">Kaavalla</span> - vieläkin edistyneempi haku, voit hienosäätää mutkikkaita hakutermejä</li></ul></li>
+<li><p>Valitse levyasema, jolta etsitään.</p></li>
+<li><p>Kirjoita hakutermi.</p></li>
+<li><p>Laajentaja piilottaa/paljastaa lisävalitsimet.</p></li>
+<li><p>Ota pois valintaruutu <span class="menu">Tilapäinen</span>, jos et halua kyselyn katoavan automaattisesti 7 päivän jälkeen.</p></li>
+<li><p>Valitse valintaruutu <span class="menu">Sisällytä roskakori</span>, jos haluat etsiä myös roskakorista.</p></li>
+<li><p>Valinnainen, kirjoita nimi tälle kyselylle, jos haluat tallentaa sen.</p></li>
+<li><p>Kyselyn tallentamiseksi voit raahata ja pudottaa kuvakkeen minne tahansa. Kun sen tekee hiiren kakkospainikkeella, valikko tarjoaa tallentamisen mallinteena.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="basic-query" name="basic-query">Peruskyselyt - "nimellä"</a></h2>
-<p>If you simply want to find all files and folders on your mounted disks that match a certain pattern, simply leave the search method at <span class="menu">by Name</span>, enter the search term into the text box and press <span class="key">ENTER</span>.</p>
+<p>Jos haluat yksinkertaisesti löytää kaikki ne tiedostot ja kansiot liitetyiltä levyiltä, jotka täsmäävät tiettyyn hakulauseeseen, jätä hakumenetelmäksi vain  <span class="menu">Nimellä</span>, kirjoita hakutermi teksti-ikkunaan ja paina <span class="key">ENTER</span>-näppäintä.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="adv-query" name="adv-query">Kehittyneemmät kyselyt - "attribuutilla"</a></h2>
-<p>You can create more advanced queries by searching within the attributes of specific file types. For that to work, these attributes have to be <a href="index.html">indexed</a>.</p>
+<p>Voit luoda edistyneempiä kyselyjä etsimällä tiettyjen tiedostotyyppien attribuuttisen sisältä. Jotta tämä toimisi, attribuutit on <a href="index.html">indeksoitava</a>.</p>
 <img src="images/queries-images/query-window.png" alt="query-window.png" />
-<p>You start by setting the filetype from <span class="menu">All files and folders</span> to, for example, <span class="menu">Text | E-mail</span> and change the search method to <span class="menu">by Attribute</span>.</p>
-<p>This adds a pop-up menu to the left of the textbox and the buttons <span class="button">Add</span> and <span class="button">Remove</span> under that. From the menu you choose which attribute to query. With <span class="button">Add</span> and <span class="button">Remove</span> you can query additional attributes or remove them again. These attributes can be logically linked with AND/OR.</p>
-<p>Let's do an email query as an example:</p>
+<p>Käynnistät tiedostotyypin asettamisen esimerkiksi valinnasta <span class="menu">Kaikki tiedostot ja kansiot</span> valintaan <span class="menu">Teksti | Sähköposti</span> ja hakumenettelyn vaihto valintaan <span class="menu">Attribuuteilla</span>.</p>
+<p>Tämä lisää ponnahdusvalikon teksti-ikkunan vasemmalle puolelle ja painikkeet <span class="button">Lisää</span> ja <span class="button">Poista</span> sen alle. Valikosta voi valita, että mitä attribuuttia kyselee. Painikkeilla <span class="button">Lisää</span> ja <span class="button">Poista</span> voit kysellä lisäattribuutteja ja poistaa niitä taas. Nämä attribuutit linkitetään loogisesti binaarilogiikan AND- tai OR-tiloilla.</p>
+<p>Tehkäämme sähköpostikysely esimerkkinä:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>This is your Find window when you're looking for all emails Clara Botters has sent to you in the last two months that had in the subject "vibraphone" or "skepticality".<br />
-As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
-A good way to cut down the number of search results.</p>
+<p>Tämä on Haku-ikkunasi, kun etsit kaikkia niitä sähköpostiviestejä, jotka Clara Botters on lähettänyt sinulle viimeisen kahden kuukauden aikana ja joissa aiheena on "vibraphone" tai "skepticality".<br />
+Kuten näet, aikaperustaisten attribuuttien kautta hakeminen tukee joitakin hyödyllisiä lauseita: paitsi "viimeiset 2 kuukautta", voisit käyttää myös "tänään", "eilen", "maanantai" tai "viime maanantai" (mikä olisi maanantai viime viikolla), tai "viimeiset 2 minuuttia/tuntia/päivää/viikkoa".<br />
+Hyvä tapa rajoittaa hakutulosten lukumäärää.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="more-adv-query" name="more-adv-query">Vielä edistyneemmät kyselyt - "kaavalla"</a></h2>
-<p>Typing in a formula query by hand is daunting and really quite unpractical. It still has its uses.</p>
-<p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to <span class="menu">by Formula</span> mode and be overwhelmed by this one line query string:</p>
+<p>Kaavakyselyn kirjoittaminen käsin on puuduttavaa ja todella aika epäkäytännöllistä. Mutta sillä on silti käyttöä.</p>
+<p>Ota yllä oleva kysely attribuutilla Claran niistä sähköpostiviesteistä, jotka koskevatt vibrafonista jne. Jos sinulla on kaikki attribuutit ja niiden hakutermit asetettuna, yritä vaihtaa <span class="menu">Kaavalla</span>-tilaan ja saat näkyviin tämän yksirivisen kyselymerkkijonon:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
-<p>Once more as text, edited for readability:</p>
+<p>Vielä kerran kun teksti on muokattu luettavammaksi:</p>
 <pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
        &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
        ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
-<p>What's the use?</p>
+<p>Mihin käyttöön?</p>
 <ul>
-<li><p>You could copy and paste the string into an email, forum or IRC for others to use or debug.</p></li>
-<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string to use for a query in Terminal or a script.</p></li>
-<li><p>You can fine tune your query by inserting parenthesis where needed, make parts case-sensitive or negate logical combinations by changing. e.g. "<tt>==</tt>" to "<tt>!=</tt>" for a NOT AND. All you need is a basic understanding of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expressions</a> and maybe some scripting basics.</p></li>
+<li><p>Voisit kopioida ja liittää merkkijonon sähköpostiviestiin, foorumille tai IRC-kanavalle toisten käyttöön vianjäljitystä varten.</p></li>
+<li><p>Voit käyttää tätä menetelmää kyselyn rakentamiseki <span class="menu">Attribuutti</span>-tilassa ja vaihtaa sitten <span class="menu">Kaava</span>-tilaan hakumerkkijonojen helpompaa tuottamista varten Pääteikkunassa tai skriptissä käyttöä varten.</p></li>
+<li><p>Voit hienosäätää kyselyäsi lisäämällä lainausmerkkejä milloin tarvetta ilmenee, tekemällä osan kirjainkoosta riippuvaksi tai muuttamalla loogisen yhdistelmän negaatioksi "<tt>==</tt>"-muodosta "<tt>!=</tt>"-muotoon NOT AND. Tarvitset ainoastaan <a href="http://fi.wikipedia.org/wiki/S%C3%A4%C3%A4nn%C3%B6llinen_lauseke" class="external free" title="Wikipedia: Säännöllinen lauseke">säännöllisten lausekkeiden</a> ja ehkä joidenkin skriptausperusteiden ymmärtämistä.</p></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="result-window" name="result-window">Tulosikkuna</a></h2>
-<p>After you start a search, the Find window will be replaced by a result window. Here is an example that queried for "server":</p>
+<p>Haun käynnistymisen jälkeen Etsi-ikkuna korvautuu tulosikkunalla. Tässä on esimerkki, jossa hakuterminä on "server":</p>
 <img src="images/queries-images/result-window.png" alt="result-window.png" />
-<p>Besides the gray background, result windows work exactly like any other Tracker window. Some things are worth noting:</p>
+<p>Lukuunottamatta harmaa taustaa tulosikkunat ovat tarkalleen samanlaisia kuin muut Seuraaja-ikkunat. Jotkut asiat ovat mainitsemisen arvoisia:</p>
 <ul>
-<li><p>You can open the location of a file or folder by double clicking on its path attribute.</p></li>
-<li><p>With <span class="menu">File | Edit query</span> or <span class="key">ALT</span> <span class="key">G</span> you get back to your Find window to refine your query.</p></li>
-<li><p>A query is live, i.e. if a file that matches your search criteria appears or disappears from your system, this change is reflected in your results in real-time.</p></li>
+<li><p>Voit avata tiedoston tai kansion sijainnin kaksoisnapsauttamalla sen polkuattribuuttia.</p></li>
+<li><p>Valikolla <span class="menu">Tiedosto | Muokkaa kyselyä</span> tai näppäimillä <span class="key">ALT</span> <span class="key">G</span> pääset takaisin Etsi-ikunaan ja voit parannella kyselyäsi.</p></li>
+<li><p>Kysely on elossa, toisin sanoen, jos tiedosto, joka täsmää hakuukriteeriisi, ilmaantuu tai katoaa järjestelmästäsi, tämä muutos heijastuu tulokseesi ajantasaisesti.</p></li>
 </ul>
-<p>You can assign a sensible attribute layout for query results of a specific filetype. Open a folder containing files of the filetype you'd like to create a template for and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy layout</span>.</p>
-<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder named <i>group/filetype</i>, replacing the slash with an underscore, e.g. "audio_x-mp3". Open the new folder and paste in the previously copied layout with <span class="menu">Attributes | Paste layout</span>.</p>
+<p>Voit liittää järkevän attribuuttiasettelun tietyn tiedostotyypin kyselytulokseen. Avaa kansio, joka sisältää ne tiedostotyyppitiedostot, joille haluat luoda mallinteen ja järjestää attribuutit siten kuin haluat kyselytuloksesi esitettävän. Kopioi tämä asettelu valikolla <span class="menu">Attribuutit | Kopioi asettelu</span>.</p>
+<p>Avaa <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, luo uusi kansio nimellä <i>group/filetype</i>, korvaten kauttaviivan alaviivalla, esimerkiksi "audio_x-mp3". Avaa uusi kansio ja liitä aiemmin kopioitu asettelu <span class="menu">Attribuutit | Liitä asettelu</span>-valikolla.</p>
 
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="query-template" name="query-template">Kyselymallinteet</a></h2>
-<p>If you double click a saved query, the file search is at once started and the result window opens immediately. However, you may not want to search with these <i>exact</i> search parameters, but use it as starting point to only slightly tweak the formula.<br />
-By using the <span class="menu">Save query as template</span> menu item (see <a href="#find-window">(1) in screenshot</a> at the top) or drag&amp;dropping the icon (10) anywhere with the right mouse button, you can create just such a template. Double clicking it won't open a result window, but the Find panel, giving you the opportunity to quickly change search strings or add/remove attributes.</p>
-<p>Wherever you choose to save query templates, they'll be listed in the Find panel's menu of recent queries.</p>
+<p>Jos kaksoisnapsautat tallennettua kyselyä, tiedostohaku käynnistyy taas kerran ja tulosikkuna avautuu välittömästi. Et ehkä kuitenkaan halua etsiä <i>tarkalleen</i> näillä hakuparametreilla, vaan käyttää sitä vain hiukan muotoillun kaavan aloituspisteenä.<br />
+Käyttämällä <span class="menu">Tallenna kysely mallinteena</span>-valikkorivillä (katso <a href="#find-window">(1) näytönkaappauksessa</a> ylhäällä) tai raahaamalla ja pudottamalla kuvakkeen (10) minne tahansa hiiren kakkospainikkeella, voit luoda juuri sellaisen mallinteen. Sen kaksoisnapsauttaminen ei avaa tulosikkunaa, vaan Etsi-paneelin, antaen mahdollisuuden nopeasti vaihtaa hakumerkkijonoja ja lisätä tai poistaa attribuutteja.</p>
+<p>Milloin valitset kyselyn tallentamisen mallinteena, ne luetellaan Etsi-paneelin äskettäisten kyselyjen valikossa.</p>
 </div>
 </div>
 

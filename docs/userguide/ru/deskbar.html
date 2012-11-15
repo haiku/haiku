@@ -43,6 +43,8 @@
 <li><a href="../pt_PT/deskbar.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../fi/deskbar.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sk/deskbar.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/deskbar.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,10 +56,9 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Индексация</td></tr>
+<tr class="heading"><td>Содержание</td></tr>
 <tr class="index"><td>
 	<a href="#deskbar-menu">Меню</a><br />
 	<a href="#tray">Трей</a><br />
@@ -77,10 +78,10 @@
 <p>Меню раскроется после того, как вы щелкните мышью по верхней области Deskbar:</p>
 <img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
 <ul>
-<li><p><b>Об этой системе...</b> - Показывает информацию о системе, лицензиях и проекте Haiku.</p></li>
+<li><p><b>О системе Haiku</b> - Показывает информацию о системе, лицензиях и проекте Haiku.</p></li>
 
 <li><p><b>Найти...</b> - Открывает диалог <a href="queries.html">запросов</a>.</p></li>
-<li><p><b>Отображать репликанты</b> - Активизирует\деактивизирует отображение <a href="gui.html#replicants">репликантов</a>.</p></li>
+<li><p><b>Отображать репликанты</b> - Активирует\деактивирует отображение <a href="gui.html#replicants">репликантов</a>.</p></li>
 <li><p><b>Подключить</b> - Предлагает те же самые опции, что и меню при правом щелчке мыши по Рабочему столу (для более подробного изучения обратитесь к теме <a href="tracker.html#mounting-volumes">Подключение разделов</a>).</p></li>
 <li><p><b>Настроить Deskbar...</b> - Открывает окно с настройками Deskbar (описано ниже).</p></li>
 <li><p><b>Завершение работы...</b> - Предлагает опции: <span class="menu">Перезагрузить компьютер </span> и <span class="menu">Выключить компьютер</span>.</p></li>
@@ -97,25 +98,22 @@
 Кнопка <span class="button">Изменить меню</span> откроет папку <span class="path">/boot/home/config/be/</span>. В ней вы найдете файлы и папки, которые отображаются в Deskbar, по умолчанию это <span class="menu">Приложения (Applications)</span>, <span class="menu">Демо (Demos)</span>, <span class="menu">Апплеты (Deskbar Applets)</span>, и <span class="menu">Настройки (Preferences)</span>.<br />
 Вы можете добавить или удалить элементы, такие как ссылки на приложения, документы, папки и даже запросы путем простого копирования или удаления.</p>
 <p>Есть ещё более простой способ - просто перенесите файл, папку, ссылку на приложений или запрос прямо в  Deskbar.</p></li>
-<li><p><b>Window</b></p>
+<li><p><b>Окно</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Always on top</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
-<tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
-<tr><td><span class="menu">Auto-hide</span></td><td> </td><td>The Deskbar is reduced to only a few pixels and only pops up if the mouse pointer touches them.</td></tr>
+<tr><td><span class="menu">Всегда сверху</span></td><td> </td><td>Deskbar отображается поверх всегда поверх всех окон.</td></tr>
+<tr><td><span class="menu">Всплывать при наведении</span></td><td> </td><td>Deskbar появляется поверх окон, если указатель мыши коснется его.</td></tr>
 </table></li>
-<li><p><b>Applications</b></p>
+<li><p><b>Приложения</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Sort running applications</span></td><td> </td><td>Sorts the list of running programs alphabetically.</td></tr>
-<tr><td><span class="menu">Tracker always first</span></td><td> </td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Show application expander</span></td><td> </td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
-<tr><td><span class="menu">Expand new applications</span></td><td> </td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
-<tr><td><span class="menu">Hide application names</span></td><td> </td><td>Removes the text labels of running applications.</td></tr>
-<tr><td><span class="menu">Icon size</span></td><td> </td><td>Adjusts the icon size of running applications. </td></tr>
+<tr><td><span class="menu">Сортировать запущенные приложения</span></td><td> </td><td>Сортировать список запущенных приложений по алфавиту.</td></tr>
+<tr><td><span class="menu">Tracker всегда первый</span></td><td> </td><td>Если даже включена сортировка, Tracker будет отображаться первым в списке запущенных приложений.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Отображать список окон приложений</span></td><td> </td><td>После активации, справа от названия приложения в списке запущенных приложений Deskbar, будет отображаться стрелочка, которая позволяет разворачивать/сворачивать список окон приложения.</td></tr>
+<tr><td><span class="menu">Раскрывать список окон при запуске</span></td><td> </td><td>После запуска автоматически будет раскрываться список окон приложения .</td></tr>
 </table></li>
-<li><p><b>Clock</b></p>
+<li><p><b>Часы</b></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Show seconds</span></td><td> </td><td>Adds the display of seconds to the clock.</td></tr>
-<tr><td><span class="menu">Show day of week</span></td><td> </td><td>Adds the abbreviation of the weekday to the clock.</td></tr>
+<tr><td><span class="menu">Отображать секунды</span></td><td> </td><td>Добавляет к часам отображение секунд.</td></tr>
+<tr><td><span class="menu">Отображать день недели</span></td><td> </td><td>Добавляет к часам аббревиатуру дня недели.</td></tr>
 </table></li>
 </ul>
 

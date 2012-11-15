@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Disposição do sistema de arquivos</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../fr/filesystem-layout.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/filesystem-layout.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/filesystem-layout.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/filesystem-layout.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/filesystem-layout.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/filesystem-layout.html"><img src="../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../jp/filesystem-layout.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filesystem-layout.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/filesystem-layout.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/filesystem-layout.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../fi/filesystem-layout.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../sk/filesystem-layout.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/filesystem-layout.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../en/filesystem-layout.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="bootloader.html">Inicializador do Sistema</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="gui.html">Interface Gráfica de Usuário (GUI) do Haiku</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Disposição do sistema de arquivos</h1>
+
+<p>A disposição do sistema de arquivos do Haiku é totalmente transparente, procurando sempre usar nomes inteligíveis para arquivos e pastas, que não obrigam o usuário a adivinhar do que se trata. Arquivos e pastas que são importantes para o funcionamento do sistema são protegidos de ações acidentais pela exibição de um dos seguintes alertas:</p>
+<img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
+<img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
+<p>O segundo alerta aparece caso tente renomear ou deletar algo na hierarquia do sistema. Aqui, o botão "<span class="button">Rename</span>" somente estará disponível quando o usuário estiver segurando a tecla <span class="key">SHIFT</span>.</p>
+<p>Geralmente, existem três ramificações separadas partindo da pasta raiz do volume de inicialização:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>pertence ao sistema. Não mexa!</td></tr>
+<tr><td><span class="path">/boot/common/</span></td><td> </td><td>abriga arquivos que são compartilhados entre usuários.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>é sua pasta pessoal, que contém seus dados e configurações.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="system" name="system">A pasta system - <span class="path">/boot/system/</span></a></h2>
+<p>No BeOS, antecessor do Haiku, esta pasta era chamada <span class="path">/boot/beos/</span>. Esta denominação ainda pode ser encontrada em alguns documentos antigos (por exemplo, o BeBook original).<br />
+Seja como for que se denomine, não se deve alterar seu conteúdo. Toda atualização do Haiku pode adicionar, remover ou sobrescrever qualquer coisa lá dentro. Se deseja adicionar funcionalidades, sejam outros adicionais do Rastreador (Tracker), Tradutores ou mesmo outro driver de dispositivo, instale-os na estrutura da sua pasta <span class="path">/boot/home/</span> ou, supondo que os deseje disponíveis para todos os usuários, na pasta <span class="path">/boot/common/</span>. Enquanto o Haiku não é multiusuário, essa diferenciação não possui efeito prático, uma vez que existe apenas um usuário com uma pasta <i>home</i>. Mas desde que, finalmente, haja suporte para mais usuários, faz sentido aprender a maneira certa desde o início.</p>
+<p>Então, digamos que deseje instalar um novo Tradutor para o mais recente formato de imagem, <b>não</b> simplesmente copie para a pasta system respectiva. Lembre-se: Não mexa!<br />
+Ao invés disso, ponha a estrutura espelhada na pasta <span class="path">/boot/common/</span> ou na pasta <span class="path">/boot/home/config/</span>.</p>
+<p>Em nosso exemplo, a localização para Tradutores na pasta system deveria ser</p>
+<p><span class="path">/boot/system/add-ons/Translators/</span></p>
+<p>Então, a pasta "espelho" do usuário é igualmente</p>
+<p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
+ou<br />
+<span class="path">/boot/common/add-ons/Translators/</span></p>
+<p>Isso tem outra vantagem: se o componente instalado mexer em alguma coisa (o que pode acontecer ao instalar drivers de dispositivo), será possível selecionar "<i>Desabilitar adicionais de usuário</i>" do menu do <a href="bootloader.html">Inicializador do sistema</a> e assim inicializar sempre sem o componente problemático.</p>
+<p>A maior parte do tempo, entretanto, você não irá lidar com essas coisas, já que todo software oriundo de uma fonte confiável deve incluir uma rotina de instalação que cuide disso. <br />
+<!--
+Se você quer saber mais sobre como as coisas funcionam no Haiku, dê uma olhada neste quadro da pasta system:
+</p>
+<p><i>A FAZER.... Tabela para ser adicionada ....</i>
+<table>
+</table>
+-->
+</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="common" name="common">A pasta common - <span class="path">/boot/common/</span></a></h2>
+<p>Haiku não é um sistema multiusuário ainda. Sendo assim, todo usuário tem sua própria pasta <i>home</i> que não é acessível a ninguém mais. Todo aplicativo ou componente acrescentado, como adicionais do Rastreador (Tracker), Tradutores, etc., bem como quaisquer dados que se deseje compartilhar entre diferentes usuários, devem ser inseridos em <span class="path">/boot/common/</span>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="home" name="home">A pasta home - <span class="path">/boot/home/</span></a></h2>
+<p>Esta pasta pertence a você. Aqui podem ser criados e excluídos os arquivos e pastas que desejar. Entretanto, não deve mexer demais no diretório <span class="path">~/config/</span> e suas subpastas. É <i>possível</i> excluir, por exemplo, a pasta <span class="path">~/config/settings/</span> sem danificar o sistema operacional em si, mas quem quer perder todas as suas configurações e ajustes dos aplicativos? Em todo caso, o sistema avisará com os alertas mencionados no topo desta página.</p>
+<p>Além da pasta <span class="path">~/config/add-ons/</span>, a qual espelha a pasta de adicionais do sistema para componentes outros como os descritos acima, existem mais algumas poucas pastas de interesse. (A propósito, o til ("<tt>~</tt>") é um atalho para sua pasta home, então não é preciso escrever sempre "<span class="path">/boot/home/</span>" no Terminal.)</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
+<td>Por padrão, é onde seus correios são mantidos.</td></tr>
+
+<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
+<td><a href="queries.html">Consultas</a> são armazenadas temporariamente por 7 dias, por padrão, nesta pasta.</td></tr>
+
+<tr><td><span class="path">~/config/be/</span></td><td> </td>
+<td>Mais uma vez do nosso legado do BeOS, a pasta <span class="path">be</span> contém o que é mostrado no <a href="deskbar.html#deskbar-menu">menu do Deskbar</a>. Pode-se adicionar e remover itens colocando arquivos, pastas, vínculos ou consultas nesta pasta.</td></tr>
+
+<tr><td><span class="path">~/config/bin/</span></td><td> </td>
+<td>Complementa a pasta de sistema <span class="path">/boot/system/bin/</span> e abriga todos os programas de linha de comando.</td></tr>
+
+<tr><td><span class="path">~/config/boot/</span></td><td> </td>
+<td>Esta pasta é o local para aqueles <a href="bash-scripting.html#user-scripts">Scripts de Usuário</a> que são executados antes ou depois que o sistema inicializa ou é desligado.</td></tr>
+
+<tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
+<td>Vínculos para programas ou documentos nesta pasta são automaticamente lançados a cada inicialização do sistema.</td></tr>
+
+<tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
+<td>Simplesmente copie uma fonte TrueType ou Postscript para esta pasta e ela estará disponível imediatamente.</td></tr>
+
+<tr><td><span class="path">~/config/settings/</span></td><td> </td>
+<td>Esta pasta contém as definições de todas as aplicações e certas configurações para o sistema. Algumas aplicações gerenciam suas definições em subpastas próprias, outras simplesmente colocam seu arquivo de configuração aqui.</td></tr>
+
+<tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
+<td>Neste banco de dados <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> o Haiku mantém uma lista de todos os diferentes <a href="filetypes.html">tipos de arquivos</a> e suas definições.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
+<td>Existe um arquivo de definições que pode ser de interesse: <span class="cli">kernel</span> oferece algumas configurações de baixo nível tais como desabilitar <acronym title="Symmetric Multi Processing">SMP</acronym>, ativar depuração serial ou habilitar gerenciamento avançado de energia. Ativa-se a linha de configuração removendo o símbolo de comentário "<tt>#</tt>". Tenha muito cuidado aqui!</td></tr>
+
+<tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
+<td>Além dos vários arquivos de definição para o Rastreador (Tracker), existem algumas subpastas interessantes:</td></tr>
+
+<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Mostra e organiza todos os atributos e o tamanho da janela ao seu gosto. Toda nova pasta que for criada a usará como modelo.</td></tr>
+
+<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Pode-se definir a disposição da janela do resultado de consulta para certos tipos de arquivo. Veja o tópico  <a href="queries.html#result-window">Consulta: A janela de resultado</a>.</td></tr>
+
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Ponha vínculos para seus locais favoritos aqui para torná-los disponíveis, por exemplo abrir e salvar painéis. Veja o tópico <a href="gui.html#favorites-recent">Interface Gráfica de Usuário (GUI) do Haiku: Favoritos e pastas recentes</a>.</td></tr>
+
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Adicione um modelo para qualquer tipo de arquivo, o qual estará, então, disponível a partir do menu <span class="menu">Arquivo | Novo...</span> do Rastreador (Tracker). Veja o tópico <a href="tracker.html#working-with-files">Rastreador (Tracker): trabalhando com arquivos</a>.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="bootloader.html">Inicializador do Sistema</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
+::  <a href="gui.html">Interface Gráfica de Usuário (GUI) do Haiku</a>  »
+</span></div>
+</div>
+
+</body>
+</html>
