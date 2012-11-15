@@ -30,7 +30,7 @@ typedef struct {
 	void* converter;
 	char charset[64];
 	unsigned int count;
-	char data[1024 + 8];	// 1024 bytes for data, 8 for alignment space
+	char data[1024 + 8];	/* 1024 bytes for data, 8 for alignment space */
 } mbstate_t;
 
 
