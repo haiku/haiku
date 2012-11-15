@@ -42,7 +42,7 @@ const float	kMinButtonWidth		= 60.0;
 
 const float	kProgBarWidth		= 150.0;
 const float	kProgBarHeight		= 16.0;
-const float	kReportInterval		= 2.5;
+const float	kReportInterval		= 0.0025;
 
 const float	kDefaultPieSize		= 400.0;
 const float	kPieCenterSize		= 80.0;
@@ -57,6 +57,7 @@ extern bool helpFileWasFound;
 
 #define kMenuSelectVol				'gMSV'
 #define kBtnRescan					'gBRF'
+#define kBtnCancel					'gCAN'
 #define kBtnHelp					'gHLP'
 #define kScanRefresh				'gSRF'
 #define kScanProgress				'gSPR'

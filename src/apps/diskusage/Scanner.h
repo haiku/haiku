@@ -35,12 +35,13 @@ public:
 			VolumeSnapshot*		Snapshot() const
 									{ return fBusy ? NULL : fSnapshot; }
 			void				Refresh(FileInfo* startInfo = NULL);
+			void				Cancel();
 			bool				IsBusy() const
 									{ return fBusy; }
 			const char*			Task() const
 									{ return fTask.c_str(); }
 			float				Progress() const
-									{ return min_c(100.0, fProgress); }
+									{ return min_c(1.0, fProgress); }
 			FileInfo*			CurrentDir() const
 									{ return fBusy ? NULL : fSnapshot->currentDir; }
 			void				ChangeDir(FileInfo* info)
@@ -71,6 +72,8 @@ private:
 			string				fTask;
 			bool				fBusy;
 			bool				fQuitRequested;
+
+			VolumeSnapshot*		fPreviousSnapshot;
 };
 
 #endif // SCANNER_H

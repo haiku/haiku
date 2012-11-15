@@ -97,16 +97,18 @@ StatusView::~StatusView()
 
 
 void
-StatusView::SetRescanEnabled(bool enabled)
+StatusView::EnableRescan()
 {
-	fRefreshBtn->SetEnabled(enabled);
+	fRefreshBtn->SetLabel(B_TRANSLATE("Rescan"));
+	fRefreshBtn->SetMessage(new BMessage(kBtnRescan));
 }
 
 
 void
-StatusView::SetBtnLabel(const char* label)
+StatusView::EnableCancel()
 {
-	fRefreshBtn->SetLabel(label);
+	fRefreshBtn->SetLabel(B_TRANSLATE("Abort"));
+	fRefreshBtn->SetMessage(new BMessage(kBtnCancel));
 }
 
 

@@ -24,8 +24,8 @@ public:
 	virtual						~StatusView();
 
 			void				ShowInfo(const FileInfo* info);
-			void				SetBtnLabel(const char* label);
-			void				SetRescanEnabled(bool enabled);
+			void				EnableRescan();
+			void				EnableCancel();
 
 private:
 			BStringView*		fPathView;

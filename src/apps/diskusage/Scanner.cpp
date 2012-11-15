@@ -35,7 +35,8 @@ Scanner::Scanner(BVolume *v, BHandler *handler)
 	fDesiredPath(),
 	fTask(),
 	fBusy(false),
-	fQuitRequested(false)
+	fQuitRequested(false),
+	fPreviousSnapshot(NULL)
 {
 	Run();
 }
@@ -89,6 +90,16 @@ Scanner::Refresh(FileInfo* startInfo)
 
 
 void
+Scanner::Cancel()
+{
+	if (!fBusy)
+		return;
+
+	fQuitRequested = true;
+}
+
+
+void
 Scanner::SetDesiredPath(string &path)
 {
 	fDesiredPath = path;
@@ -133,22 +144,29 @@ Scanner::_DirectoryContains(FileInfo* currentDir, entry_ref* ref)
 void
 Scanner::_RunScan(FileInfo* startInfo)
 {
+	fPreviousSnapshot = fSnapshot;
+	fQuitRequested = false;
 	BString stringScan(B_TRANSLATE("Scanning %refName%"));
 
 	if (startInfo == NULL || startInfo == fSnapshot->rootDir) {
-		delete fSnapshot;
 		fSnapshot = new VolumeSnapshot(fVolume);
 		stringScan.ReplaceFirst("%refName%", fSnapshot->name.c_str());
 		fTask = stringScan.String();
 		fVolumeBytesInUse = fSnapshot->capacity - fSnapshot->freeBytes;
 		fVolumeBytesScanned = 0;
 		fProgress = 0.0;
-		fLastReport = -100.0;
+		fLastReport = -1.0;
 
 		BDirectory root;
 		fVolume->GetRootDirectory(&root);
 		fSnapshot->rootDir = _GetFileInfo(&root, NULL);
-
+		if (fSnapshot->rootDir == NULL) {
+			delete fSnapshot;
+			fSnapshot = fPreviousSnapshot;
+			fBusy = false;
+			fListener.SendMessage(&fDoneMessage);
+			return;
+		}
 		FileInfo* freeSpace = new FileInfo;
 		freeSpace->pseudo = true;
 		BString string(B_TRANSLATE("Free on %refName%"));
@@ -166,14 +184,21 @@ Scanner::_RunScan(FileInfo* startInfo)
 		fTask = stringScan.String();
 		fVolumeBytesInUse = fSnapshot->capacity - fSnapshot->freeBytes;
 		fVolumeBytesScanned = fVolumeBytesInUse - startInfo->size; //best guess
-		fProgress = 100.0 * fVolumeBytesScanned / fVolumeBytesInUse;
-		fLastReport = -100.0;
+		fProgress = fVolumeBytesScanned / fVolumeBytesInUse;
+		fLastReport = -1.0;
 
 		BDirectory startDir(&startInfo->ref);
 		if (startDir.InitCheck() == B_OK) {
 			FileInfo *parent = startInfo->parent;
 			vector<FileInfo *>::iterator i = parent->children.begin();
 			FileInfo* newInfo = _GetFileInfo(&startDir, parent);
+			if (newInfo == NULL) {
+				delete fSnapshot;
+				fSnapshot = fPreviousSnapshot;
+				fBusy = false;
+				fListener.SendMessage(&fDoneMessage);
+				return;				
+			}
 			while (i != parent->children.end() && *i != startInfo)
 				i++;
 
@@ -206,7 +231,7 @@ Scanner::_GetFileInfo(BDirectory* dir, FileInfo* parent)
 
 	while (true) {
 		if (fQuitRequested)
-			break;
+			return NULL;
 
 		if (dir->GetNextEntry(&entry) == B_ENTRY_NOT_FOUND)
 			break;
@@ -223,7 +248,7 @@ Scanner::_GetFileInfo(BDirectory* dir, FileInfo* parent)
 
 			// Send a progress report periodically.
 			fVolumeBytesScanned += child->size;
-			fProgress = 100.0 * fVolumeBytesScanned / fVolumeBytesInUse;
+			fProgress = (float)fVolumeBytesScanned / fVolumeBytesInUse;
 			if (fProgress - fLastReport > kReportInterval) {
 				fLastReport = fProgress;
 				fListener.SendMessage(&fProgressMessage);

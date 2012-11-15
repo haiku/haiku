@@ -181,23 +181,26 @@ void
 PieView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kBtnCancel:
+			if (fScanner != NULL)
+				fScanner->Cancel();
+			break;
 		case kBtnRescan:
 			if (fVolume != NULL) {
 				if (fScanner != NULL)
 					fScanner->Refresh();
 				else
 					_ShowVolume(fVolume);
-
+				fWindow->EnableCancel();
 				Invalidate();
 			}
 			break;
-
-		case kScanProgress:
+		
 		case kScanDone:
-		{
+			fWindow->EnableRescan();
+		case kScanProgress:
 			Invalidate();
 			break;
-		}
 
 		default:
 			BView::MessageReceived(message);
@@ -300,12 +303,8 @@ PieView::Draw(BRect updateRect)
 		if (fScanner->IsBusy()) {
 			// Show progress of scanning.
 			_DrawProgressBar(updateRect);
-			if (fWindow != NULL)
-				fWindow->SetRescanEnabled(false);
-		} else {
+		} else if (fScanner->Snapshot() != NULL) {
 			_DrawPieChart(updateRect);
-			if (fWindow != NULL)
-				fWindow->SetRescanEnabled(true);
 			if (fUpdateFileAt) {
 				fWindow->ShowInfo(_FileAt(fLastWhere));
 				fUpdateFileAt = false;
@@ -362,8 +361,7 @@ PieView::_DrawProgressBar(BRect updateRect)
 	float by = floorf((b.top + b.Height() - kProgBarHeight) / 2.0);
 	float ex = bx + kProgBarWidth;
 	float ey = by + kProgBarHeight;
-	float mx = bx + floorf((kProgBarWidth - 2.0)
-		* fScanner->Progress() / 100.0 + 0.5);
+	float mx = bx + floorf((kProgBarWidth - 2.0) * fScanner->Progress() + 0.5);
 
 	const rgb_color kBarColor = {50, 150, 255, 255};
 	BRect barFrame(bx, by, ex, ey);
