@@ -54,3 +54,5 @@ static __huge_val_t __huge_val = { __HUGE_VAL_bytes };
 # define HUGE_VAL	(__huge_val.__d)
 
 #endif	/* GCC.  */
+
+#define HUGE_VALF HUGE_VAL
