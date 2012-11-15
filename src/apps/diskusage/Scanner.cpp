@@ -212,7 +212,7 @@ Scanner::_RunScan(FileInfo* startInfo)
 			delete startInfo;
 		}
 	}
-
+	delete fPreviousSnapshot;
 	fBusy = false;
 	_ChangeToDesired();
 	fListener.SendMessage(&fDoneMessage);
