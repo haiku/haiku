@@ -41,6 +41,8 @@
 <li><a href="../zh_CN/bugreports.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/bugreports.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../sk/bugreports.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/bugreports.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/bugreports.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -50,10 +52,9 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>Hakemisto</td></tr>
 <tr class="index"><td><a href="#account">Trac-tilin saaminen</a><br />
                 <a href="#report">Vikailmoituksen luominen</a><br />
                 <a href="#app">Sovellusviat</a><br />
@@ -61,7 +62,7 @@
                   <a href="#kernel">Käyttöjärjestelmäydinviat</a><br />
                   <a href="#kdl">Kernel Debugging Land - KDL</a><br />
                   <a href="#syslog">Järjestelmäloki</a><br />
-                  <a href="#onscreen">On screen debug output</a><br />
+                  <a href="#onscreen">Vikajäljitystulostus näytölle</a><br />
                   <a href="#hardware">Laitteisto-/Ajuriviat</a><br />
                   <a href="#next">Mitä seuraavaksi?</a></td></tr>
 </table>
@@ -106,60 +107,58 @@ Paitsi että kaikki on rumempaa ja epämukavampaa, sama koskee myös sovellusvik
 <li><p>Järjestelmä alkulatautuu itsestään.</p></li>
 <li><p>Järjestelmä jäätyy täysin. Et voi siirtää hiiren osoitinta ja mikään sovellus ei enää toimi. Tärkeä testi siinä tilanteessa on, että pystytkö siirtymään KDL:ään pikanäppäimellä <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> mikä on <span class="key">PRINT</span> useimmissa näppäimistöissä). Odota vähintään minuutti nähdeksesi, että tapahtuuko jotain.</p></li>
 <li><p>Järjestelmä ei alkulataa oikein. Se voi alkulatautua itsestään tai pysähtyä jossain vaiheessa (esimerkiksi jonkun alkaulatausnäytön kuvakkeen kohdalla). Yritä jälkimmäisessä tapauksessa myös <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
-<li><p>The whole system or some piece of hardware doesn't behave correctly. For example, it could be very slow, errors occur, or something doesn't work at all. If some hardware doesn't work at all, the first obvious check is whether Haiku supports it at all at the moment (e.g. ask on a mailing list or a forum).</p></li>
+<li><p>Koko järjestelmä tai joku laitteiston osa ei toimi kunnolla. Esimerkiksi se voisi olla hyvin hidas, tapahtuu virheitä, tai jokin ei toimi ollenkaan. Jos  jokin laite ei toimi ollenkaan, ensimmäinen ilmeinen tarkistus on, että tukeeko Haiku sitä ylimalkaan tällä hetkellä (esim.: kysy sähköpostituslistalta tai foorumilta).</p></li>
 </ul>
-<p>Note that while only the last point seems to indicate hardware relation, all the other symptoms could be caused by a bug in a hardware driver as well. If you have a suspicion what piece of hardware or corresponding driver might have to do with the problem, check whether removing/disabling the hardware or the driver makes a difference. For example, if you suspect Wifi you may find that your BIOS has an option to disable it. Or if not, you could remove the responsible Wifi driver from your Haiku installation (in <span class="path">/boot/system/add-ons/kernel/drivers/bin</span>).</p>
+<p>Huomaa että vaikka ainoastaan viimeinen kohta tuntuu viittaavan laittoistovikaan, kaikki muutkin oireet voivat johtua myös viasta laitteistoajurissa. Jos sinulla on epäilyjä, että mikä laitteiston osa tai vastaava ajuri aiheuttaa pulmia, tarkista, että eroaako tilanne, jos poistat tai otat pois käytöstä laitteen tai ajurin. Esimerkiksi jos epäilet Wifi-verkkoa, saatat huomata, että BIOS-asetuksissa voidaan ottaa se pois käytöstä. Tai jos ei, niin voisit poistaa vastuullisen Wifi-ajurin Haiku-asennuksestasi (kansiossa <span class="path">/boot/system/add-ons/kernel/drivers/bin</span>).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="kdl" name="kdl">Kernel Debugging Land - KDL</a></h3>
-<p>If the system hasn't entered KDL by itself, you can do that intentionally by invoking the keyboard shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.<br />
-Note that in KDL your keyboard may not work. PS/2 keyboards always do, USB keyboards connected via UHCI controllers do only, if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
-<p>KDL itself is a kind of a shell. One can execute commands that print information about the system. The following commands might be of interest:</p>
+<a id="kdl" name="kdl">Käyttöjärjestelmäytimen viajäljitysalue - KDL</a></h3>
+<p>Jos järjestelmä ei ole siirtynyt KDL-tilaan itsestään, voit tehdä sen tarkoituksellisesti pikanäppäimillä <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.<br />
+Huomaa, että KDL-tilassa näppäimistösi ei ehkä toimi. PS/2-näppäimistöt toimivat aina, UCHI-ohjaimen kautta yhdistetyt USB-näppäimistöt toimivat vain jos jos KDL-tilaan on siirrytty näppäimistön avulla vähintään kerran. USB OHCI ei tällä hetkellä tueta.</p>
+<p>KDL itse on erään tyyppinen komentotulkki. Käyttäjä voi suorittaa komentoja, jotka tulostavat tietoja järjestelmästä. Seuraavat komennot saattavat olla kiinnostavia:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (eli sc)</td><td> </td><td>Prints a back trace. If the system entered KDL on its on volition, always enter that one.</td></tr>
-<tr><td><span class="cli">ints</span></td><td> </td><td>Shows the handled and unhandled hardware interrupts.</td></tr>
-<tr><td class="onelinetop"><span class="cli">co</span> (eli jatka)</td><td> </td><td>Leaves the kernel debugger and continues normal operation of the system, if that is possible.</td></tr>
-<tr><td><span class="cli">reboot</span></td><td> </td><td>Reboots the system immediately. You will lose all unsaved data and even those that have been saved, but have not yet been written back to disk.</td></tr>
+<tr><td><span class="cli">bt</span> (eli sc)</td><td> </td><td>Tulostaa paluujäljen. Jos järjestelmä siirtyy KDL-tilaan omasta tahdostaan, kirjoita aina tämä komento.</td></tr>
+<tr><td><span class="cli">ints</span></td><td> </td><td>Näyttää käsitellyt ja käsittelemättömät laitteistokeskeytykset.</td></tr>
+<tr><td class="onelinetop"><span class="cli">co</span> (eli jatka)</td><td> </td><td>Jättää järjestelmävianjäljittimen ja jatkaa normaalia järjestelmän toimintaa, jos se on mahdollista.</td></tr>
+<tr><td><span class="cli">reboot</span></td><td> </td><td>Alkulataa järjestelmän välittömästi. Menetät kaiken tallentamattomat tiedot ja vieläpä nuo, jotka on tallennettu, mutta joita ei ole vielä kirjoitettu levylle.</td></tr>
 </table>
-<p>For more information, see the article <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Welcome to Kernel Debugging Land</a>.</p>
-<p>The KDL output is written to the serial port (if you have one, a respective cable, and a second computer to connect with, you can capture the output there via a terminal program) and to the syslog. If you can't leave KDL it won't be written to the syslog file, though. There's a boot loader debug option that allows you to capture it nonetheless (see below).</p>
-<p>You can generate QR codes from KDL output that can then be converted to text using smartphones or similar devices. See the blog post <a href="http://www.haiku-os.org/blog/mmlr/2012-07-01_qr_encode_your_kdl_output">QR Encode your KDL Output</a> on how to get data out of KDL using that feature.</p>
+<p>Katso lisätietoja artikkelista <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Tervetuloa vikajäljitysalueelle</a>.</p>
+<p>KDL-tuloste kirjoitetaan sarjaporttiin (jos sinulla on sellainen, vastaavaan kaapeliin ja toiseen tietokoneeseen, voit kaapata tulosteen siellä pääteikkunan kautta) ja syslog-järjestelmälokiin. Jos et voi poistua KDL:stä, sitä ei kuitenkaan voida kirjoittaa järjestelmälokiin. Alkulatausvianjäljitysvalitsin mahdollistaa sen tallentamisen kaikesta huolimatta (katso alla).</p>
+<p>Voit tuottaa QR-koodeja KDL-tulosteesta, joka voidaan muuntaa tekstiksi käyttäen älypuhelimia ja vastaavia laitteita. Katso blogikirjoitusta <a href="http://www.haiku-os.org/blog/mmlr/2012-07-01_qr_encode_your_kdl_output">QR-koodaa KDL-tulosteesi</a> siitä kuinka saat ulos tietoja KDL:sta käyttäen tätä ominaisuutta.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="syslog" name="syslog">Syslog</a></h3>
-<p><b>This is the preferred method for gaining information from a non-booting system.</b><br />
-The syslog (short for system log) contains valuable information about what has happened in your system, including the output of KDL sessions. It's usually a good idea to attach it to the kernel related Trac ticket. The syslog is written to the file <span class="path">/boot/common/var/log/syslog</span>. Since writing to a file requires a working system, the most recent output might not have made it to the syslog when a kernel problem occurs (particularly on spontaneous reboots or uncontinuable KDL sessions).</p>
-<p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog somewhat persistent in memory. By default the option is enabled. "Somewhat persistent" means that it survives a reset and will still be accessible when you enter the boot loader menu directly afterwards. Booting an operating system (Haiku definitely, others likely) destroys the information, though. So you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
-In the boot loader's <span class="menu">Debug menu</span> you should now find the entries <span class="menu">Display syslog from previous session</span> and <span class="menu">Save syslog from previous session</span>. The former displays the syslog on screen, the latter allows you to save it as a file to disk. Note that at the moment only FAT32 volumes are supported for saving the file. If you want to use a USB stick, but have plugged it in too late so that it isn't recognized yet, you can reset the machine and re-enter the boot loader menu. But again: Don't accidentally boot any operating system or the data will be lost.</p>
+<a id="syslog" name="syslog">Järjestelmäloki</a></h3>
+<p><b>Tämä on ensijainen menetelmä tietojen keräämiseksi ei-alkuladattavasta järjestelmästä.</b><br />
+Syslog-järjestelmäloki (syslog on lyhenne englanninkielisestä lokinimestä system log) sisältää arvokkaita tietoja siitä, mitä järjestelmässäsi tapahtui, mukaanlukien KDL-istunnot. On tavallisesti hyvä ajatus liittää se käyttöjärjestelmäydinaiheiseen Trac-lippuun. Järjestelmäloki kirjoitetaan tiedostoon <span class="path">/boot/common/var/log/syslog</span>. Koska kirjoittaminen tiedostoon vaatii toimivan järjestelmän, kaikkein viimeisin tulostustapahtuma ei ehkä ehdi järjestelmälokiin ennen käyttöjärjestelmäytimen pulman ilmaantumista (erityisesti spontaaneissa järjestelmän uudelleenkäynnistymisissä ja KDL-istunnoissa, joita ei voi jatkaa).</p>
+<p>Valitsin <span class="menu">Ota käyttöön vianjäljitysjärjestelmäloki</span> alkulataajan <span class="menu">Vianjäljitys</span>-valikossa tekee syslog-järjestelmälokista jossain määrin pysyvän muistissa. Valitsin on oletuksena käytössä. "Jossain määrin pysyvä" tarkoittaa, että se selviää järjestelmän nollauksesta ja on edelleen saatavilla kun siirryt alkulatausvalikkoon heti sen jälkeen. Järjestelmän alkulataus (Haiku ehdottomasti, muut todennäköisesti) tuhoavat kuitenkin tiedon. Joten sinun on siirryttävä alkulatausvalikkoon pitämällä alkulatauksen aikana alhaalla <span class="key">VAIHTO</span>-näppäintä.<br />
+Alkulataajan <span class="menu">Vianjäljitys</span>-valikossa sinun pitäisi nyt löytää rivit <span class="menu">Näytä järjestelmäloki edellisestä istunnosta</span> ja <span class="menu">Tallenna järjestelmäloki edellisestä istunnosta</span>. Edellinen näyttää järjestelmälokin näytöllä, jälkimmäinen sallii sinun tallentaa sen tiedostona levylle. Huomaa, että tällä hetkellä vain FAT32-taltioita tuetaan tiedostontallentamisessa. Jos haluat käyttää USB-tikkua, mutta olet liittänyt sen järjestelmään niin myöhään, että sitä ei ole vielä tunnistettu, voit nollata koneen ja siirtyä uudelleen alkulatausvalikkoon. Mutta taas: Älä vahingossa alkulataa mitään käyttöjärjestelmää tai tiedot katoavat.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="onscreen" name="onscreen">On screen debug output</a></h3>
-<p><b>The on-screen debug output is useful only for debugging very specific issues and is known to have (timing) issues. Don't use it, if you don't have to.</b><br />
-This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog option</span> doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
-Finally select <span class="menu">Return to main menu</span> and then <span class="menu">Continue booting</span>.<br />
-One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../../userguide/fi/bootloader.html">Boot Loader</a>.</p>
+<a id="onscreen" name="onscreen">Vikajäljitystulostus näytölle</a></h3>
+<p><b>Vianjäljitystulostus näytölle on hyödyllinen vain hyvin erikoisten kohteiden vianjäljityksessä ja siinä tiedetään olevan (ajoitus) pulmia.</b><br />
+Se on ajankohtainen vain kun Haikun alkulataus epäonnistuu ja valikkovalinta <span class="menu">Vikajäljitä järjestelmäloki</span> ei jostain syystä toimi. Pidä ennen Haikun alkulatauslogon ilmaantumistta alhaalla <span class="key">VAIHTO</span>-näppäintä päästäksesi alkulatausvalikkoon. Valitse <span class="menu">Valitse turvatila</span>-valitsimet. Lähellä alareunaa luetelleaan <span class="menu">[ ] Ota käyttöön vikajäljitystulostus näytölle</span>. (Huomaa: Toiset valitsime voivat olla käytössä yrityksenä alkuladata Haiku. Jos Haiku alkulatautuu vain kun yksi tai useampi valitsin on käytössä, varmista, että mainitset ne).<br />
+Valitse lopuksi <span class="menu">Paluu päävalikkoon</span> ja sitten <span class="menu">Jatka alkulatausta</span>.<br />
+Yksi tai useampia tekstisivuja näytetään näytölle, vain muutama harva viimeinen rivi on liitettävä vikailmoituslippuun. Tässä on lisätietoja <a href="../../../userguide/fi/bootloader.html">Alkulataaja</a>sta.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">Laitteisto/ajuriviat</a></h2>
-<p>When dealing with a hardware/driver related bug, you should attach the following information as text files:</p>
+<p>Kun ollaan tekemisissä laitteisto- tai ajurivikojen kanssa, sinun pitäisi liittää seuraavia tietoja tekstitiedostona:</p>
 
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td>- <span class="cli">listdev</span></td><td> </td><td>A detailed listing of your hardware, including vendor and pci id's, similar to Linux' <span class="cli">lshw</span> and <span class="cli">lspci</span>.</td></tr>
-<tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>Assuming its a USB related issue, similar to <span class="cli">lsusb</span>.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
-<tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Lists all used drivers.</td></tr>
-<tr><td>- <span class="cli">ints</span></td><td> </td><td>Only available within <i>Kernel Debugging Land</i> (see above). Shows interrupt usage. There shouldn't be too many that are shared by different devices.</td></tr>
-<tr><td colspan="3">- On screen debug output (a safe mode boot time option).</td></tr>
+<tr><td>- <span class="cli">listdev</span></td><td> </td><td>Yksityiskohtainen luettelo laitteistostasi, mukaanlukien valmistaja- ja pci-tunnisteet, samanlainen kuin Linuxin <span class="cli">lshw</span> ja <span class="cli">lspci</span>.</td></tr>
+<tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>Otaksutaan sen olevan USB:hen liittyvä pulma, sama kuin <span class="cli">lsusb</span>.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haikun ensisijainen järjestelmäloki, sukua alkulatauksen aikaiselle vianjäljitykselle. Komennolla <span class="cli">open</span> voit poimia olennaisen osan järjestelmälokista testieditorissa.</td></tr>
+<tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Luettelee kaikki käytetyt ajurit.</td></tr>
+<tr><td>- <span class="cli">ints</span></td><td> </td><td>Käytettävissä vain <i>Käyttöjärjestelmäytimen vianjäljitysalueella</i> (katso yllä). Näyttää keskeytysten käytön. Eri laitteiden kesken jaettuja keskeytyksiä ei pitäisi olla montaa.</td></tr>
+<tr><td colspan="3">- Vianjäljitystulostus näytölle (alkulatausvalitsin turvatilassa).</td></tr>
 </table>
 
-<p>The first four commands are entered into Terminal. Add a <span class="cli"> &gt; output.txt</span> after a command, and it's piped into a text file called "output.txt" that you can attach to your bug report or email.</p>
+<p>Neljä ensimmäistä komentoa kirjoitetaan Pääteikkunassa. Lisää <span class="cli"> &gt; output.txt</span> komennon jälkeen ja se putkitetaan tekstitiedostoon, jonka nimi on "output.txt", jonka voit liittää vikailmoitukseesi tai sähköpostiviestiisi.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="next" name="next">Mitä seuraavaksi?</a></h2>
-<p>After the bug has been reported, a developer will look at your bug and try to classify it. Remember, we are all volunteers, and as such, sometimes a bug report might go unanswered for a while. Adding new information when it becomes available usually helps getting a bug picked up quicker, but do not try to 'bump' the bug up by adding
-non-descriptive comments.</p>
-<p>Remember, reporting a bug is not something you spend a little time on and then you are done. If you reported a bug, then you are part of the Haiku development process. Developers might come up with questions while they are trying to fix your bug. Please stay around to answer these. Consider your participation 'done' when the bug is marked
-as 'fixed'.</p>
+<p>Vikailmoituksen tekemisen jälkeen kehittäjä tutkii vikaa ja yrittää luokitella sen. Muista, että olemme kaikki vapaaehtoisia ja sellaisena joskus vikailmoitus voi olla vastaamattomana jonkin aikaa. Lisätietojen lisääminen silloin kun sellaista ilmenee, auttaa tavallisesti vian poimimista käsiteltäväksi nopeammin, mutta älä yritä 'töniä' vikaa lisäämällä ei-kuvaavia kommentteja.</p>
+<p>Muista, että vika ei ole jotain, johon käytät pikkuisen aikaa ja sitten kaikki on tehty. Jos ilmoitat viasta, olet osa Haikun kehitysprosessia. Kehittäjät saattavat esittää kysymyksiä yrittäessään korjata vikaa. Pysyttele tavoitettavissa vastataksesi kysymyksiin. Katso osanottamisesi -tehdyksi' kun vika on merkitty 'fixed'.</p>
 
 </div>
 </div>

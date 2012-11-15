@@ -67,6 +67,9 @@
 #ifdef HAVE_LINUX_HDREG_H
 #include <linux/hdreg.h>
 #endif
+#ifdef __HAIKU__
+#include <Drivers.h>
+#endif
 
 #include "types.h"
 #include "mst.h"
@@ -588,6 +591,24 @@ s64 ntfs_device_size_get(struct ntfs_device *dev, int block_size)
 				(unsigned long long) blocks);
 			return blocks * sector_size / block_size;
 		}
+	}
+#endif
+#ifdef __HAIKU__
+	{
+		off_t size = 0;
+
+		partition_info partitionInfo;
+		device_geometry geometry;
+		
+		if (dev->d_ops->ioctl(dev, B_GET_PARTITION_INFO, &partitionInfo) == 0)
+			size = partitionInfo.size;
+		else if (dev->d_ops->ioctl(dev, B_GET_GEOMETRY, &geometry) == 0) {
+			size = (off_t)geometry.cylinder_count * geometry.sectors_per_track
+				* geometry.head_count * geometry.bytes_per_sector;
+		}
+		
+		if (size > 0)
+			return (s64)size / block_size;
 	}
 #endif
 	/*

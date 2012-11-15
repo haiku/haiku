@@ -10,12 +10,14 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>NetworkStatus</title>
+	<title>Verkkotila</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -39,39 +41,40 @@
 <li><a href="../../zh_CN/desktop-applets/networkstatus.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/desktop-applets/networkstatus.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/desktop-applets/networkstatus.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/desktop-applets/networkstatus.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/desktop-applets/networkstatus.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/desktop-applets/networkstatus.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="launchbox.html">LaunchBox</a> 
+ «  <a href="launchbox.html">Käynnistysikkuna</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Työpöytäsovelmat</a> 
-::  <a href="powerstatus.html">PowerStatus</a>  »
+::  <a href="powerstatus.html">Virtatila</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />NetworkStatus</h2>
+<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />Verkkotila</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Työpöytäappletit</span></td></tr>
+<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Työpöytäsovelmat</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/NetworkStatus</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><i>ei mitään</i></td></tr>
 </table>
-<p>NetworkStatus shows the status of your network connections. If not yet running, launching the applet will ask if it should open in window mode or live in the Deskbar. In window mode you're able to resize the icon by resizing the window and use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever installed, it's operated via a right-click context menu.</p>
-<p><img src="../images/networkstatus-images/applet.png" alt="NetworkStatus applet" /><br />
-The first section contains all network devices' names and their state. Clicking on such an entry brings up a window showing its IP, broadcast and netmask address.<br />
-Below is a list of all wireless networks found by the first wireless adapter and an indicator of their signal strength. Have a look at the <a href="..\workshop-wlan.html">Workshop: Wireless networking</a> for more information on how to set up a connection.<br />
-Lastly, you can <span class="menu">Open network preferences...</span> to change your <a href="../preferences/network.html">network configuration</a> or <span class="menu">Quit</span> the applet.</p>
+<p>Verkkotila näyttää verkkoyhteyksiesi tilan. Jos sovelma ei ole vielä käynnissä, niin se kysyy käynnistymisen yhteydessä, että avataanko se ikkunatilassa vai Työpöytäpalkissa. Ikkunatilassa kykenet muuttamaan kuvakkeen kokoa ja käyttämään <a href="../gui.html#replicants">Replikantti</a>-kahvaa raahaamaan se Työpöydälle.<br />
+Milloin se on asennettu, se t oimii hiiren kakkospainikkeen asiayhteysvalikosta.</p>
+<p><img src="../images/networkstatus-images/applet.png" alt="Verkkotilasovelma" /><br />
+Ensimmäinen lohko sisältää kaikkien verkkolaitteiden nimet ja niiden tilat. Sellaista riviä napsauttamalla näkyviin tulee ikkuna, joka näyttää sen IP-osoitteen, lähetys- ja verkkopeiteosoitteen.<br />
+Alla on luettelo ensimmäisen langattoman verkkoadapterin löytämistä langattomista verkoista ja signaalivoimakkuden indikaattori. Katso lisää <a href="..\workshop-wlan.html">Työpaja: Langattomat verkot</a> siitä kuinka yhteys asetetaan.<br />
+Viimeiseksi voit valikosta <span class="menu">Avaa verkkoasetukset...</span> vaihtaa <a href="../preferences/network.html">verkkoasetuksesi</a> tai <span class="menu">Poistu</span>a sovelmasta.</p>
 
-<h2>Status icons</h2>
+<h2>Tilakuvakkeet</h2>
 <table summary="status icons" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Ready</td><td>Link is established.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Configuring</td><td>Connecting in progress.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>No stateful configuration</td><td>Some settings are missing (check <a href="../preferences/network.html">IP configuration</a>).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>No link</td><td>There is no physical connection (probably the network cable is not connected and wireless networks are unavailable).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>There are no network adapters available (if you are sure that at least one is connected, there are probably no drivers yet).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Valmis</td><td>Yhteys on perustettu.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Asetetaan</td><td>Yhteydenotto käynnissä.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>Ei tilallista asetusta</td><td>Jotkut asetukset puuttuvat (tarkista <a href="../preferences/network.html">IP-asetukset</a>).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>Ei yhteyttä</td><td>Ei ole fyysistä yhteyttä (verkkokaapeli ei ole ehkä yhdistetty tai langaton verkko ei ole käytettävissä).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>Verkkoadaptereita ei ole käytettävissä (jos olet varma, että ainakin yksi on yhdistetty, niin luultavasti ei ole vielä ajureita).</td></tr>
 </table>
 
 </div>
@@ -79,9 +82,9 @@ Lastly, you can <span class="menu">Open network preferences...</span> to change 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="launchbox.html">LaunchBox</a> 
+ «  <a href="launchbox.html">Käynnistysikkuna</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Työpöytäsovelmat</a> 
-::  <a href="powerstatus.html">PowerStatus</a>  »
+::  <a href="powerstatus.html">Virtatila</a>  »
 </span></div>
 </div>
 

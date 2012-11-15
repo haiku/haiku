@@ -12,6 +12,7 @@
  *		Szymon Barczak (Google Code-In student)
  * Translators:
  *		Rodastahm Islamov
+ *		PoZorro
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -41,6 +42,8 @@
 <li><a href="../../pt_PT/applications/mediaplayer.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../fi/applications/mediaplayer.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/applications/mediaplayer.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/mediaplayer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/mediaplayer.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/mediaplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -58,10 +61,10 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/MediaPlayer</span></td></tr>
-<tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
+<tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>Медиаплеер - приложение для воспроизведения видео и аудио файлов. Спасибо команде <a href="http://www.ffmpeg.org/">ffmpeg</a>,  благодаря им проигрыватель поддерживает большинство форматов . Графический интерфейс медиаплеера довольно прост:</p>
+<p>Медиаплеер - приложение для воспроизведения видео и аудио файлов. Спасибо команде <a href="http://www.ffmpeg.org/">ffmpeg</a>: благодаря им проигрыватель поддерживает большинство форматов . Графический интерфейс медиаплеера довольно прост:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
 <p>Шкала прогресса позволяет быстро перейти к определённому моменту. Если удерживать некоторе время курсор мыши над этой шкалой, то появится подсказка отображающая сколько времени прошло с начала воспроизведения и сколько осталось до конца. Справа от шкалы находится время оставшееся до 
 конца воспроизведения, однако сделать так чтоб вместо него отображалось время прошедшее с начала проигрывания, или длину клипа. Для этого просто щёлкните по этому месту.<br />
@@ -91,9 +94,9 @@
 <p>Рассмотрим параметры для настройки МедиаПлеера:</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
 <p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining. Start playback automatically, close windows when finished or play clips in a loop.</p>
-<p>Next are different <span class="menu">View options</span>.<br />
-You can opt to <span class="menu">Use hardware overlay if available</span>, which cuts down CPU usage but only works for one video window and needs a supporting video card driver.<br />
-You can <span class="menu">Scale movies smoothly</span> (when not in overlay mode) which uses very fast filtering to smooth over otherwise blocky pixels when zooming video or watching in full-screen mode.<br />
+<p>Далее идут различные <span class="menu">Настройки вида</span>.<br />
+Вы можете выбрать пункт <span class="menu">Использовать аппаратный видеооверлей, если возможно</span>, позволяющий понизить нагрузку на процессор, но работающий только для одного окна и требующий драйвер видеокарты, поддерживающий данную возможность.<br />
+Вы можете выбрать <span class="menu">плавное масштабирование видео</span> (в режиме без оверлея) использующее очень быструю фильтрацию для сглаживания, в противном случае при изменении размера видео, или просмотра в полноэкранном режиме появляются блочные пиксели.<br />
 <span class="menu">Scale controls in full-screen mode</span> if you prefer slightly bigger controls, maybe because you watch the screen from a bit farther away when in full-screen mode.<br />
 Then there are settings for <span class="menu">Subtitle size</span> and <span class="menu">Subtitle placement</span>. They can be shown at the <span class="menu">Bottom of video</span>, which will always have them overlayed over the picture. Or <span class="menu">Bottom of window</span>, which allows you to resize the window vertically and have the subtitles appear in the black bar at the bottom instead.</p>
 <p>The last setting determines the volume of clips whose windows are not currently active. You can have them all blaring at <span class="menu">Full volume</span>, at less confusing <span class="menu">Low volume</span> or quietly <span class="menu">Muted</span>.</p>

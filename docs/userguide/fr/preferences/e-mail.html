@@ -41,6 +41,8 @@
 <li><a href="../../pt_PT/preferences/e-mail.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../fi/preferences/e-mail.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../../sk/preferences/e-mail.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/preferences/e-mail.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/preferences/e-mail.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -57,12 +59,12 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-	<a href="#creating">Creating a new e-mail account</a><br />
-	<a href="#account-settings">Account settings</a><br />
-	<a href="#incoming">Setting up incoming e-mail</a><br />
-	<a href="#outgoing">Setting up outgoing e-mail</a><br />
-	<a href="#filters">Notifications and e-mail filters</a><br />
-	<a href="#settings">Setting up the Mail Service</a>
+	<a href="#creating">Créer un nouveau compte e-mail</a><br />
+	<a href="#account-settings">Réglages du compte</a><br />
+	<a href="#incoming">Réglages pour la réception des e-mails</a><br />
+	<a href="#outgoing">Réglages pour l'envoi des e-mails</a><br />
+	<a href="#filters">Notifications et  filtres de réceptions</a><br />
+	<a href="#settings">Configurer le service de messagerie</a>
 </td></tr>
 </table>
 
@@ -84,7 +86,7 @@ Cliquez sur le bouton <span class="button">Add</span> pour créer un nouveau com
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
 <p>Commencez par choisir entre les protocoles <span class="menu">POP3</span> ou <span class="menu">IMAP</span> pour accéder a votre serveur de messagerie.</p>
 <p>Indiquez ensuite votre <i>E-mail Address</i> (Adresse email), <i>Login Name</i> (Nom d’utilisateur) et <i>Password</i> (Mot de passe), donnez un nom à votre compte dans le champ <i>Account Name</i> et votre <i>Real Name</i> (Nom réel).</p>
-<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses. If that is not the case, clicking <span class="button">Next</span> will open another window to enter this information by hand:</p>
+<p>Si vous avez ouvert une boite chez l'un des principaux hébergeurs de messagerie, Haiku connaît déjà automatiquement tous les détails des paramètres comme par exemple, l'adresses IP des serveurs. Si ce n’est pas le cas, cliquez sur<span class="button">Next</span>(Suivant) pour entrez manuellement ces informations.</p>
 <img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
 <p>You first set the <i>Server name</i>, <i>Login type</i> and <i>Connection type</i> for the incoming mail, below that for the outgoing mail. You should find the necessary information on your email provider's website.<br />
 See below for more info about the various settings and additional options.</p>
@@ -92,8 +94,8 @@ See below for more info about the various settings and additional options.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account-settings" name="account-settings">Réglages du compte</a></h2>
-<p>By selecting the name of an account in the left list, you can change some general settings:</p>
-<img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
+<p>En sélectionnant le nom d'une boite dans la liste de gauche vous pouvez modifier certains réglages généraux :</p>
+<img src="../images/prefs-images/e-mail-accounts.png" alt="e-mail-accounts.png" />
 <p>The <i>Account name</i> is the name that's shown for example in the list of accounts in the E-mail preferences. <i>Real name</i> is the name someone sees when she gets mail from you. <i>Return address</i> is the email address that is used when someone replies to your mail. Normally that is the same address you've sent your email from.</p>
 <p>If you'd like to use an email account to only send or only receive email, you can de/activate that usage by right-clicking the account's name in the leftside list to set the checkmarks accordingly.</p>
 
@@ -106,8 +108,9 @@ See below for more info about the various settings and additional options.</p>
 <p>First is the <span class="menu">Mail server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
 <p>Then you enter your login information, <i>Login name</i> and <i>Password</i>, and if necessary change the <i>Login type</i> from the default <span class="menu">Plain text</span> to <span class="menu">APOP</span> for authentication.</p>
 <p>Si vous utilisez le protocol <i>POP3</i> et récupérez vos emails depuis plusieurs ordinateurs, vous pourrez activer les options <span class="menu">Leave mail on server</span> (Laisser les messages sur les serveur) et <span class="menu">Remove mail from server when deleted</span> (Supprimer les emails du serveur lorsqu’ils sont supprimés localement).</p>
-<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify <span class="menu">IMAP folders</span> to only synchronize with a specific folder and its subfolders.</p>
-<p>Also, you can opt to only <span class="menu">Partially download messages larger than</span> a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
+<p>En revanche, si vous utilisez le protocole <i>IMAP</i>, vous aurez l’option <span class="menu">Remove mail from server when deleted</span> pour répercuter les suppressions sur le serveur. Vous pouvez spécifier <span class="menu">IMAP folders</span> (Dossiers IMAP) pour ne synchroniser qu'un dossier précis avec ses sous-dossiers.</p>
+<p>Enfin, vous pouvez choisir de ne télécharger que partiellement les messages dont la taille dépasserait une certaine limite via l’option <span class="menu">Partially download messages</span>
+Si un message entre dans cette catégorie, seule son en-tête sera téléchargée. Vous pourrez décider de télécharger le contenu du message après avoir vérifié son objet et son expéditeur, ce qui est utile si vous avez une connexion bas débit.</p>
 <p>Vous pouvez changer l’emplacement (<i>Destination</i>) de votre boîte de réception (par défaut : <span class="path">/boot/home/mail/in/</span>), ce qui vous permet de séparer les mails de plusieurs compte dans des dossiers différents. Néanmoins, les requêtes pourraient s’acquitter de cette tâche.</p>
 
 
@@ -116,19 +119,20 @@ See below for more info about the various settings and additional options.</p>
 <a id="outgoing" name="outgoing">Détail des réglages pour l'envoi des e-mails</a></h2>
 <p>Cliquez sur <span class="menu">Outgoing</span> pour régler les paramètres d’envoi des emails.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>First is the <i>SMTP server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
+<p>En premier, vous avez l’adresse du serveur SMTP (<i>SMTP Server</i>) utilisée pour les messages sortants.
+Tout comme pour le serveur de messages sortants, vous pouvez spécifier selon vos besoins, un port particulier, par exemple <tt>mail.votre-fournisseur.org:1200</tt>.</p>
 <p>Si le serveur d’envoi nécessite une authentification, réglez <i>Login Type</i> à <span class="menu">ESMTP</span> et entrez votre nom d’utilisateur et mot de passe. L’autre méthode d’authentification (<span class="menu">POP3 before SMTP</span>, POP3 avant SMTP) est également utilisée par certains fournisseurs d’email.</p>
-<p>As with incoming mail, you can also change the <i>Destination</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
+<p>De même que pour les messages entrants, vous pouvez changer l’emplacement (<i>Destination</i>) de votre boîte d’envoi (par défaut : <span class="path">/boot/home/mail/out/</span>).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">Notifications et autres filtres de réceptions</a></h2>
+<a id="filters" name="filters">Notifications et filtres de réceptions</a></h2>
 <p>Notifications for newly arrived email and methods to sort and filter emails are found in <span class="menu">E-Mail filters</span> under an account's name. You can add any number of filters that are applied one after the other and rearrange them by drag&amp;dropping them to their new position.<br />
 Currently there are three <span class="menu">Incoming mail filters</span> you can add. After adding a filter, you have to select it to see its options.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Spam filter (AGMS Bayesian)</h3>
+Filtre anti-pourriel (AGMS Bayesian)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
 <p>Le filtre anti-pourriel utilise des méthodes statistiques pour identifier un email comme étant indésirable. Il attribue à chaque message une valeur entre 0 et 1 et vous permet de choisir dans quel intervalle un mail sera considéré comme légitime ou bien pourriel.<br />
 L’option <span class="button">Add spam rating to start of Subject</span> permet d’ajouter cette « note » au début du sujet des messages reçus.<br />
@@ -193,7 +197,7 @@ Notification des nouveaux mails</h3>
 	<tr><td><span class="menu">Central beep</span></td><td> </td>
 		<td>Plays the sound file of the "New E-mail" event set in the <a href="sounds.html">Sounds</a> preferences <i>once</i> for new mail</td></tr>
 	<tr><td><span class="menu">Log window</span></td><td> </td>
-		<td>Shows the log window</td></tr>
+		<td>Affiche le fenêtre du journal</td></tr>
 </table>
 
 <h3>

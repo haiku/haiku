@@ -40,10 +40,12 @@
 <li><a href="../../zh_CN/applications/terminal.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/terminal.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/applications/terminal.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/terminal.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/terminal.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/terminal.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="stylededit.html">StyledEdit</a> 
+ «  <a href="stylededit.html">Tyylitetty editori</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
 ::  <a href="textsearch.html">Tekstihaku</a>  »
 </span></div>
@@ -51,7 +53,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Pääteikkuna</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -68,63 +69,63 @@
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="windows-tabs" name="windows-tabs">Ikkunat ja välilehdet</a></h2>
-<p>You can open as many Terminals as needed, either each in it's own window by simply launching more Terminals or with <span class="key">ALT</span> <span class="key">N</span> from an already running Terminal. Or you use Terminal's tabbed view and open more tabs with <span class="key">ALT</span> <span class="key">T</span>.</p>
+<p>Voit avata niin monta Pääteikkunaa kuin tarvitset, joko jokainen omana ikkunana käynnistämällä Pääteikkuna tai näppäimillä <span class="key">ALT</span> <span class="key">N</span> jo käynnissä olevasta Pääteikkunasta. Tai voit käyttää Pääteikkunan välilehtinäkymää ja avata lisää välilehtiä näppäimillä <span class="key">ALT</span> <span class="key">T</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
-By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
-Via <span class="menu">Edit | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
-<p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.</p>
-<p>A Terminal window can be resized like any other window or you use the presets from the <span class="menu">Settings | Window size</span> menu. <span class="key">ALT</span> <span class="key">ENTER</span> toggles fullscreen mode.</p>
-<p>Changed window size and text encoding are only kept choosing <span class="menu">Settings | Save as default</span>.</p>
+<p>Kaksoisnapsautus välilehtipalkin tyhjään osaan avaa uuden välilehden; kaksoisnapsautus välilehteen avaa valintaikkunan otsikon uudelleennimeämiseksi. Käytettävissä on useita työkaluvihjeessä selitettyjä %-suunniteltuja muuttujia, kun siirrät hiiren osoittimen tekstikentän yläpuolelle.<br />
+Oletuksena, <tt>%1d: %p</tt>, välilehti näyttää nykyisen kansion ja, erotettuna merkillä <tt>:</tt>, parhaillaan suoritettavan prosessin nimen (tai <tt>--</tt> jos se on vain suoritettava komentotulkki, luultavasti joutokäynnissä). Yllä oleva näytönkaappaus näyttää ensimmäisen välilehden FTP-istunnolla <span class="path">Työpöytä</span>-kansiossa ja toisen välilehden joutokäynnissä <span class="path">koti</span>-kansiossa.<br />
+Valikon <span class="menu">Muokkaa | Ikkunaotsikko...</span> Pääteikkunaotssikkoa voidaan muokata samalla tavoin.</p>
+<p>Välilehden napsauttaminen hiiren kakkospainikkeella näyttää asiayhteysvalikon <span class="menu">Sulje välilehti</span>, <span class="menu">Sulje muut välilehdet</span> tai, kuten kaksoisnapsautuksessa, <span class="menu">Muokkaa välilehtiotsikkoa...</span>.</p>
+<p>Pääteikkunan kokoa voidaan muuttaa kuten kaikkia muitakin ikkunoita tai voit käyttää uudelleenasetuksia valikosta <span class="menu">Asetukset | Ikkunakoko</span>. Näppäimet <span class="key">ALT</span> <span class="key">ENTER</span> vaihtavat kokonäyttötilaan.</p>
+<p>Vaihdettu ikkunakoko ja tekstikoodaus säilyy vain valitsemalla <span class="menu">Asetukset | Tallenna oletuksena</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Asetukset</a></h2>
-<p><span class="menu">Settings | Settings...</span> opens a panel to configure the standard settings of a Terminal.</p>
+<p><span class="menu">Asetukset | Asetukset...</span> avaa paneelin Pääteikkunan vakioasetusten asettamiseksi.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>It starts off with the "formulas" for naming tab and window titles. Again, tooltips show the available variables. Below that you set font type, font size and the different text and background colors. You can choose a pre-defined color schema like <span class="menu">Black on white</span> or <span class="menu">White on black</span> or create a <span class="menu">Custom</span> one using the color picker below.<br />
-Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.<br />
-You can save different settings as separate profiles, which on double-click open an accordingly configured Terminal.<br />
-Pressing <span class="button">OK</span> will save the current settings as default.</p>
+<p>Se alkaa "kaavoina" välilehti- ja ikkunaotsikoiden nimeämiseksi. Taas työkaluvihjeet näyttävät käytettävissä olevat muuttuja. Sen alla voit asettaa kirjasintyypin, kirjasinkoon ja erilaiset teksti- ja taustavärit. Voit valita esiasetetun värikaavan, kuten <span class="menu">Musta valkoisella</span> tai <span class="menu">Valkoinen mustalla</span> tai luoda <span class="menu">Oma</span>n käyttämällä alla olevaa väripoimijaa.<br />
+Aktivoi valintaruutu <span class="menu">Vahvista poistuminen, jos aktiiviohjelmasta poistutaan</span> ja sinua varoitetaan kun Pääteikkuna yritetään sulkea silloin, kun sovellusta vielä suoritetaan.<br />
+Voit tallentaa erilaisia asetuksia erillisinä profiileina, joiden kaksoisnapsauttaminen aukaisee vastaavalla tavalla asetetun Pääteikkunan.<br />
+Painamalla painiketta <span class="button">Valmis</span> nykyiset asetukset tallennetaan oletuksena.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
-<p>You'll find a list of useful shortcuts in <a href="../keyboard-shortcuts.html#terminal">Shortcuts and key combinations</a>.</p>
+<a id="shortcuts" name="shortcuts">Näppäimistön pikanäppäimet</a></h2>
+<p>Löydät hyödyllisten pikanäppäimien luettelon asiakirjasta <a href="../keyboard-shortcuts.html#terminal">Pikanäppäimet ja näppäinyhdistelmät</a>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="customization" name="customization">Bash customization</a></h2>
-<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/common/etc/</span>.</p>
+<a id="customization" name="customization">Bash-räätälöinti</a></h2>
+<p>Unixista tulevan bash-komentotulkin räätälöimiseksi on lukemattomia mahdollisuuksia. Sitä varten kaksi tiedostoa on käyttäjille erityisen tärkeittä: <span class="cli">.profile</span> ja <span class="cli">.inputrc</span><br />
+Molemmat tiedostot voidaan luoda <span class="path">home/</span>-kansioon ja niillä voidaan lisätä tai korvata järjestelmäoletukset, jotka on määritelty hakemistossa <span class="path">/boot/common/etc/</span>.</p>
 
 <h3>.profile</h3>
-<p>The <span class="cli">.profile</span> is loaded every time you open a new Terminal. It sets all kinds of aliases and variables that will affect bash's behavior and appearance. You'll find many online resources that will detail all possibilities.</p>
-<p>The Haiku/BeOS Tip Server has quite a few tips to get you started, for example:</p>
+<p>Tiedosto <span class="cli">.profile</span> ladataan joka kerta avattaessa Pääteikkunaa. Se asettaa kaikentyyppisiä alias-määrittelyjä ja muuttujia, jotka vaikuttavat bash-komentotulkin käyttäytymiseen ja ulkonäköön. Löydät monia verkkoresursseja, jotka kertovat yksityiskohtaisesti kaikista mahdollisuuksista.</p>
+<p>Haiku/BeOS-vihjepalvelimessa on esimerkiksi muutamia vihjeitä, joilla voit aloittaa:</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Customize your Terminal prompt</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">More prompt customizations</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Enhancing bash</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Custom keyboard shortcuts</a></li>
+<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Räätälöi Pääteikkuna-kehotteesi</a></li>
+<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Lisää kehoteräätälöintiä</a></li>
+<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Bash-komentotulkin laajentaminen</a></li>
+<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Omat näppäimistön pikanäppäimet</a></li>
 </ul>
-<p>There are more, <a href="http://betips.net/index.php?s=.profile">have a look</a>.</p>
+<p>Mahdollisuuksia on vielä lisää, <a href="http://betips.net/index.php?s=.profile">vilkaise tänne</a>.</p>
 
 <h3>.inputrc</h3>
-<p>The <span class="cli">.inputrc</span> deals with keybindings. Since Haiku provides useful defaults, you probably don't have to mess with these more involved settings. If you do have special needs here, consult one of the many online resources, e.g. <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
+<p>Tiedosto <span class="cli">.inputrc</span> käsittelee näppäinsidoksia. Koska Haiku tarjoaa hyödyllisiä oletusarvoja, sinun ei luultavasti tarvitse sotkeutua näihin kietoutuneempiin asetuksiin. Jos sinulla on tässä erikoistarpeita, perehdy moniin verkkoresursseihin, esim.: <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hints" name="hints">Vihjeitä Pääteikkunatyöskentelystä</a></h2>
-<ul><li><p>Dragging a file or folder from a Tracker window into the Terminal will insert its path at the location of the cursor. Dragging with the right mouse button offers additional actions in a context menu:</p>
+<ul><li><p>Tiedoston tai kansion raahaaminen Seuraaja-ikkunasta Pääteikkunaan lisää sen kohdistimen osoittamaan sijaintiin. Raahaaminen hiiren kakkospainikkeen asiayhteysvalikosta tarjoaa lisätoimintoja:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Insert path</span></td><td> </td><td>Inserts the location of the file, same as drag&amp;dropping with the left mouse button.</td></tr>
-<tr><td><span class="menu">Change directory</span></td><td> </td><td>Changes to the folder of the dragged file.</td></tr>
-<tr><td><span class="menu">Create link here</span></td><td> </td><td>Creates a link to the dragged file in the current working directory of the Terminal.</td></tr>
-<tr><td><span class="menu">Move here</span></td><td> </td><td>Moves the dragged file into the current working directory of the Terminal.</td></tr>
-<tr><td><span class="menu">Copy here</span></td><td> </td><td>Copies the dragged file into the current working directory of the Terminal.</td></tr>
+<tr><td><span class="menu">Lisää polku</span></td><td> </td><td>Lisää tiedoston sijainnin, sama kuin raahata ja pudottaa hiiren ykköspainikkeella.</td></tr>
+<tr><td><span class="menu">Vaihda hakemisto</span></td><td> </td><td>Vaihtaa raahatun tiedoston kansion.</td></tr>
+<tr><td><span class="menu">Luo linkki tähän</span></td><td> </td><td>Luo linkin raahattuun tiedostoon Pääteikkunan nykyisessä työhakemistossa.</td></tr>
+<tr><td><span class="menu">Siirrä tänne</span></td><td> </td><td>Siirtää raahatun tiedoston Pääteikkunan nykyiseen työhakemistoon.</td></tr>
+<tr><td><span class="menu">Kopioi tänne</span></td><td> </td><td>Kopioi raahatun tiedoston Pääteikkunan nykyiseen työhakemistoon.</td></tr>
 </table></li>
-<li><p>You can open any file with its preferred application with the command <span class="cli">open <i>[filename]</i></span>. This also works with the representation of the current ("<span class="cli">.</span>") and parent ("<span class="cli">..</span>") folder which then open in a Tracker window. So, to open the current working directory, you type:</p>
+<li><p>Voit avata minkä tahansa tiedoston ensisijaisella sovelluksella komenolla <span class="cli">open <i>[tiedostonimi]</i></span>. Tämä toimii myös nykyisen ("<span class="cli">.</span>") ja yläkansion ("<span class="cli">..</span>") esitystavalla, joka avautuu silloin Seuraaja-ikkunassa. Joten kirjoita nykyisen työhakemiston avaamiseksi:</p>
 <pre class="terminal">open .</pre>
 </li></ul>
 
@@ -134,7 +135,7 @@ Both files can be created in the <span class="path">home/</span> folder and add 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="stylededit.html">StyledEdit</a> 
+ «  <a href="stylededit.html">Tyylitetty editori</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
 ::  <a href="textsearch.html">Tekstihaku</a>  »
 </span></div>

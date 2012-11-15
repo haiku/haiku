@@ -248,6 +248,7 @@ ControlsView::VolumeTabView::MessageReceived(BMessage* message)
 			}
 			break;
 
+		case kBtnCancel:
 		case kBtnRescan:
 			ViewForTab(Selection())->MessageReceived(message);
 			break;
@@ -361,6 +362,7 @@ ControlsView::MessageReceived(BMessage* msg)
 			fVolumeTabView->MessageReceived(msg);
 			break;
 
+		case kBtnCancel:
 		case kBtnRescan:
 			fVolumeTabView->MessageReceived(msg);
 			break;
@@ -385,10 +387,18 @@ ControlsView::ShowInfo(const FileInfo* info)
 
 
 void
-ControlsView::SetRescanEnabled(bool enabled)
+ControlsView::EnableRescan()
 {
 	((VolumeView*)fVolumeTabView->ViewForTab(
-		fVolumeTabView->Selection()))->SetRescanEnabled(enabled);
+		fVolumeTabView->Selection()))->EnableRescan();
+}
+
+
+void
+ControlsView::EnableCancel()
+{
+	((VolumeView*)fVolumeTabView->ViewForTab(
+		fVolumeTabView->Selection()))->EnableCancel();
 }
 
 

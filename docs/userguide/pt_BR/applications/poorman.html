@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Adriano Duarte
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Pobre Homem</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guia do Usuário</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/pt_BR.png" alt="" /> Português (Brazil)</li>
+<li><a href="../../fr/applications/poorman.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/poorman.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/poorman.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/poorman.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/poorman.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/poorman.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/applications/poorman.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/poorman.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/poorman.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/poorman.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/applications/poorman.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/applications/poorman.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/poorman.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../en/applications/poorman.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="people.html">Pessoas</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="screenshot.html">Screenshot</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/poorman-icon_64.png" alt="poorman-icon_64.png" width="64" height="64" />Pobre Homem</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
+<tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/PoorMan</span></td></tr>
+<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/PoorMan Settings</span></td></tr>
+</table>
+<p><br /></p>
+<p>Pobre Homem é um pequeno e agradável servidor web uqe é extremamente fácil de configurar. Naturalmente ele não oferece quaisquer recursos avançados como outros servidores mais parrudos, afinal é apenas um servidor web de um pobre homem.</p>
+<p>Ao executar pela primeira vez, o Pobre Homem pergunta pela pasta que será disponibilizada na web. Se utilizar o botão <span class="button">Default</span>, uma nova pasta <span class="path">/boot/home/public_html</span> é criada. Como uma página inicial de um arquivo HTML é nomeada por padrão <span class="cli">index.html</span>, ela já estará presente lá.</p>
+<p>Pobre Homem apresenta a si mesmo com um console simples que registra sua atividade. Então, há informações sobre o status se o servidor estiver em execução, qual pasta está sendo disponibilizada, e um contador de visitas. Definições são alteradas em <span class="menu">Editar | Definições...</span>:
+</p>
+<p><img id="poorman" src="../images/apps-images/poorman.png" alt="poorman.png" /></p>
+<p>A janela de diálogo de definições é dividida em três guias:</p>
+<p>Em <span class="menu">Sítio</span> selecione outra pasta para disponibilizar, informe outra página inicial e tenha a opçao de enviar uma lista de arquivos se a página inicial não estiver presente.<br />
+<span class="menu">Registrar</span> permite (des)ativar registro para o console ou opcionalmente para um arquivo de registro separado.<br />
+A guia <span class="menu">Avançado</span> detém a definição para o máximo de conexões simultâneas.</p>
+<p>Os itens de menu do console são todas auto-explicativas. Com elas pode-se, por exemplo, salvar (partes de) uma saída do console, limpar o console ou arquivo de registro e iniciar/parar o servidor ou limpar o contador de visitas.</p>
+
+<div class="box-info">Se deseja ver se o Pobre Home está trabalhando, escolha <span class="path">/boot/apps/BePDF/docs/</span> como pasta e <span class="cli">index.html</span> como página inicial. Então aponte seu navegador para o endereço 127.0.0.1, que é a sua máquina local.</div>
+
+</div>
+</div>
+<!--
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="people.html">Pessoas</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos</a> 
+::  <a href="screenshot.html">Screenshot</a>  »
+</span></div>
+</div>
+-->
+</body>
+</html>

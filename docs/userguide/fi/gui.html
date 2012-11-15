@@ -40,6 +40,8 @@
 <li><a href="../zh_CN/gui.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/gui.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../sk/gui.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/gui.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/gui.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -58,7 +60,7 @@
 		<a href="#move-resize">Helppo siirtäminen ja koon muuttaminen</a><br />
                 <a href="#stack-tile">Pinoa ja laatoita</a><br />
                 <a href="#open-save-panel">Avaus- ja tallentamispaneelit</a><br />
-                <a href="#replicants">Replikantit</a></td></tr>
+                <a href="#replicants">Kopiot</a></td></tr>
 </table>
 
 <h1>Haikun graafinen käyttöliittymä</h1>
@@ -71,7 +73,7 @@
 <li><p>Työpöytäpalkki on Haikuns "Käynnistä"-valikko ja tehtäväpakki, jos niin haluat. Katso aihetta <a href="deskbar.html">Työpöytäpalkki</a>.</p></li>
 <li>Keltainen välilehti tarjoaa muutakin kuin vain ohjelman nimen tai asiakirjan tiedostonimen:
 <ul><li>Voit siirtää ikkunaa pitämällä <span class="key">VAIHTO</span>-näppäimen alhaalla raahatessasi sitä toiseen paikkaan, ottaen käyttöön lukuisien ikkunoiden pinoamisen ja pääset kätevästi käsiksi niihin niiden nimetyn välilehden kautta.</li>
-<li>Muutat ikkunan minimikokoiseksi kaksoisnapsauttamalla sen välilehteä (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> -näppäimillä). Sellainen piilotettu ikkuna voidaan kutsua valitsemalla sen valikkorivi <a href="deskbar.html">Työpöytäpalkissa</a> tai <a href="twitcher.html">Twitcher</a>-ohjelmassa.</li>
+<li>Muutat ikkunan minimikokoiseksi kaksoisnapsauttamalla sen välilehteä (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> -näppäimillä). Sellainen piilotettu ikkuna voidaan kutsua valitsemalla sen valikkorivi <a href="deskbar.html">Työpöytäpalkissa</a> tai <a href="twitcher.html">Vaihtaja</a>-ohjelmassa.</li>
 <li>Voit lähettää ikkunan taustalle napsauttamalla sen välilehteä (tai sen reunaa) hiiren oikealla painikkeella.</li></ul></li>
 <li><p>Sulje-painike.</p></li>
 <li><p>Laajentamispainike (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). useimmissa sovelluksissa, laajentaa ikkunan maksimikokoon. Sen ei kuintenkaan tarvitse tehdä sitä. Seuraaja-ikkunat esimerkiksi muuttavat kokoaan parhaiten sisältöön sopivaan kokoon.</p></li>
@@ -95,17 +97,17 @@
 Alla olevassa esimerkissä, Seuraaja-ikkuna kirjanmerkillä on laatoitettu WebPositive-ikkunan viereen, mikä itse on pinottu toisen Seuraajaikkunan kanssa, mikä näyttää lähdekansion <tt>haiku</tt>. Tässä animaatiossa käyttäjä napsauttaa pinoikkunan välilehtiä tuoden ne vuorotellen etualalle.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
 <p>Tällä tavalla yhdistetty ikkunoiden ryhmää voidaan siirtää ja sen kokoa voidaan muuttaa yhdessä - näppärä järjestely työskenneltäessä hankekeskeisemmässä ympäristössä. Oikean selainikkunan etsimisen sijasta dokumentaatio, editori ja seuraajaikkunat ja ehkä hankkeeseen liittyvät sähköpostiviestit voidaan vain pinota ja laatoittaa yhteen.</p>
-<p>Ikkunoiden todellisen järjestelyn tekeminen on helppoa. Pidä alhaalla <span class="key">OPT</span>-näppäintä samalla kun raahaat ikkunaa välilehdestä toisen ikkunan välilehden tai reunan viereen, kunnes se korostuu ja vapauta sitten hiiren painike.</p>
+<p>Ikkunoiden todellisen järjestelyn tekeminen on helppoa. Pidä alhaalla <span class="key">Alt Gr/OPT</span>-näppäintä samalla kun raahaat ikkunaa välilehdestä toisen ikkunan välilehden tai reunan viereen, kunnes se korostuu ja vapauta sitten hiiren painike.</p>
 <p>Pino ja laatoitus sisältää kaksi asiaan littyvää osaa.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
 <td><p>"<i>Pinoaminen</i>" on ikkunoiden laittamista toistensa päälle, jolloin keltaiset välilehdet siirtyvät automaattisesti oikeaan paikkaan.<br />
-Kun pidetään alhaalla <span class="key">OPT</span>-painiketta, välilehdet vaihtavat väriä, kun niiden päälle siirretään ikkuna; pudota sitten ikkuna pinoamisen aloittamiseksi.</p></td></tr></table>
+Kun pidetään alhaalla <span class="key">Alt Gr/OPT</span>-painiketta, välilehdet vaihtavat väriä, kun niiden päälle siirretään ikkuna; pudota sitten ikkuna pinoamisen aloittamiseksi.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Laatoitus</i>" ikkunoiden liimaamista yhteen vaakasuoraan tai pystysuoraan.<br />
-Taas pitämällä alhaalla <span class="key">OPT</span>-näppäintä reunat, jotka liimautuvat yhteen, kun pudotat ikkunan, vaihtavat väriä, kun tuot ne kyllin lähelle toisiaan.</p></td></tr></table>
-<p>Ikkunoiden erottaminen tehdään samalla tavalla, pitämällä <span class="key">OPT</span>-näppäin alhaalla samalla kun ikkuna vedetään välilehdestä kiinnipitäen pois ryhmästä.</p>
+<td><p>"<i>Laatoittaminen</i>" tarkoittaa ikkunoiden liimaamista vaakasuorassa tai pystysuorassa yhteen.<br />
+Pidä taas alhaalla painiketta <span class="key">Alt Gr/OPT</span>, ja ne reunat, jotka hitsautuvat yhteen, vaihtavat väriä, kun pudotat ikkunan lähelle toista ikkunaa.</p></td></tr></table>
+<p>Ikkunoiden erottaminen tehdään samalla tavalla, pitämällä <span class="key">Alt Gr/OPT</span>-näppäin alhaalla samalla kun ikkuna vedetään välilehdestä kiinnipitäen pois ryhmästä.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -137,12 +139,12 @@ Taas pitämällä alhaalla <span class="key">OPT</span>-näppäintä reunat, jot
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="replicants" name="replicants">Replikantit</a></h2>
-<p>Replikantit ovat pieniä itsensä sisältäviä sovellusosia, jotka on integroitu toisiin sovelluksiin. Edellyttäen, että Seuraajan valitsin <span class="menu">Näytä  replikantit</span> on aktivoitu, tunnistat sovelluksen replikanttiosan pienestä kahvasta, joka on normaalisti oikeassa alakulmassa:</p>
+<a id="replicants" name="replicants">Kopiot</a></h2>
+<p>Kopiot ovat pieniä itsensä sisältäviä sovellusosia, jotka on integroitu toisiin sovelluksiin. Edellyttäen, että Seuraajan valitsin <span class="menu">Näytä  kopiot</span> on aktivoitu, tunnistat sovelluksen kopio-osan pienestä kahvasta, joka on normaalisti oikeassa alakulmassa:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>Huomioonherättävin paikka, joka hyväksyy Replikantit on Työpöytä. Yksinkertaisesti rahaat ja pudotat pienen kahvan sille. Siitä alkaen se on osa Työpöytää ja sovellus, josta Replikantti on lähtöisin, ei tarvitse käynnistyä toimiakseen.<br />Hiiren oikean painikkeen painallus Replikanttikahvassa tarjoaa asiayhteysvalikon, joka näyttää alkuperäsovelluksen <span class="menu">Ohjelmasta</span>-ikkunan ja <span class="menu">Poista replikantti</span>-valikon.</p>
-<div class="box-info">Jos koet vaikeuksia Replikantin kanssa Työpöydällä ja et pääse niistä eroon, poista <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Valitettavasti tämä poistaa <i>kaikki</i> Replikantit Työpöydältä.</div>
-<p>Esimerkkejä replikoitavista sovelluksista ovat  <a href="applications/activitymonitor.html">Aktiviteettivalvontar</a>-ohjelman graafit, <a href="workspaces.html">Työtilat-sovelma</a> tai <a href="applications/deskcalc.html">Työpöytälaskin</a>.</p>
+<p>Huomioonherättävin paikka, joka hyväksyy Kopiot on Työpöytä. Yksinkertaisesti rahaat ja pudotat pienen kahvan sille. Siitä alkaen se on osa Työpöytää ja sovellus, josta Kopio on lähtöisin, ei tarvitse käynnistyä toimiakseen.<br />Hiiren oikean painikkeen painallus Kopiokahvassa tarjoaa asiayhteysvalikon, joka näyttää alkuperäsovelluksen <span class="menu">Ohjelmasta</span>-ikkunan ja <span class="menu">Poista kopio</span>-valikon.</p>
+<div class="box-info">Jos koet vaikeuksia Kopion kanssa Työpöydällä ja et pääse niistä eroon, poista <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Valitettavasti tämä poistaa <i>kaikki</i> Kopiot Työpöydältä.</div>
+<p>Esimerkkejä kopioitavista sovelluksista ovat  <a href="applications/activitymonitor.html">Aktiviteettivalvonta</a>-ohjelman graafit, <a href="workspaces.html">Työtilat-sovelma</a> tai <a href="applications/deskcalc.html">Työpöytälaskin</a>.</p>
 </div>
 </div>
 

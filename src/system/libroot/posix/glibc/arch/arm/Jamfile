@@ -1,0 +1,47 @@
+SubDir HAIKU_TOP src system libroot posix glibc arch arm ;
+
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc math ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+
+SubDirHdrs $(HAIKU_TOP) src system libroot posix glibc arch generic ;
+
+UsePrivateHeaders libroot ;
+
+if $(OPTIM) = -O0 {
+	OPTIM = -O ;
+}
+
+# don't compile with debugging
+DEBUG = 0 ;
+
+SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
+
+local genericSources =
+	lshift.c rshift.c submul_1.c
+	s_finite.c s_finitef.c
+	add_n.c sub_n.c
+	addmul_1.c mul_1.c
+	
+	cmp.c dbl2mpn.c divrem.c 
+	mpn2dbl.c mpn2flt.c mpn2ldbl.c
+	mul.c mul_n.c
+	s_isinf.c s_isinff.c
+	s_isnan.c s_isnanf.c
+	s_signbit.c s_signbitf.c s_signbitl.c
+;
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
+	$(genericSources)
+;
+
+MergeObjectFromObjects posix_gnu_arch_$(TARGET_ARCH).o : :
+	posix_gnu_arch_$(TARGET_ARCH)_generic.o
+;
+
+SEARCH on [ FGristFiles $(genericSources) ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch generic ] ;

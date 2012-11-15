@@ -10,12 +10,14 @@
  * Authors:
  *		Maciej Bałuta (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>PowerStatus</title>
+	<title>Virtatila</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -39,6 +41,8 @@
 <li><a href="../../zh_CN/desktop-applets/powerstatus.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/desktop-applets/powerstatus.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/desktop-applets/powerstatus.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/desktop-applets/powerstatus.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/desktop-applets/powerstatus.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/desktop-applets/powerstatus.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -51,38 +55,37 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/desktop-applets-images/powerstatus-icon_64.png" alt="powerstatus-icon_64.png" width="64" height="64" />PowerStatus</h2>
+<h2><img src="../../images/desktop-applets-images/powerstatus-icon_64.png" alt="powerstatus-icon_64.png" width="64" height="64" />Virtatila</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Työpöytäappletit</span></td></tr>
+<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Työpöytäsovelmat</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/PowerStatus</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/PowerStatus settings</span></td></tr>
 </table>
-<p>PowerStatus shows information about the battery level, so it's only useful on mobile computers. If not yet running, launching the applet will ask if it should open in window mode or live in the Deskbar. In window mode you're able to resize the icon by resizing the window and use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever installed, it's operated via a right-click context menu.</p>
-<p>Note: PowerStatus requires a working ACPI support.</p>
+<p>Virtatila näyttää tietoja akkutasosta, joten se on hyödyllinen vain sylimikroissa. Jos se ei ole vielä käynnissä, sovelman käynnistyessä kysytään, että avantaanko ohjelma ikkunatilassa vai Työpöytäpalkissa live-tilassa. Ikkunatilassa kykenet muuttamaan kuvakkeen kokoa muuttamalla ikkunan kokoa ja käyttämällä <a href="../gui.html#replicants">Replikantti</a>-kahvaa sen raahaamiseksi Työpöydälle.<br />
+Milloin sovelma on asennettu, sitä käytetään hiiren kakkospainikkeen asiayhteysvalikosta.</p>
+<p>Huomaa: Virtatila vaatii toimivan ACPI-tuen.</p>
 <img src="../images/powerstatus-images/applet.png" alt="PowerStatus applet" />
-<p>The context menu offers these options:</p>
+<p>Asiayhteysvalikko tarjoaa nämä valitsimet:</p>
 <table summary="options" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><span class="menu">Show text label</span></td><td style="width:10px"></td><td>Shows battery level in percent or remaining time.</td></tr>
-	<tr><td><span class="menu">Show status icon</span></td><td></td><td>Shows icon of the applet.</td></tr>
-	<tr><td class="onelinetop"><span class="menu">Show percent / time</span></td><td></td><td>Switch between showing battery level in percent or remaining time (<span class="menu">Show text label</span> has to be active).</td></tr>
-	<tr><td><span class="menu">Battery info...</span></td><td></td><td>Shows the extended battery info window.</td></tr>
-	<tr><td><span class="menu">About...</span></td><td></td><td>Shows the About window.</td></tr>
-	<tr><td><span class="menu">Quit</span></td><td></td><td>Quits the PowerStatus applet.</td></tr>
+	<tr><td><span class="menu">Näytä tekstinimiö</span></td><td style="width:10px"></td><td>Näyttää akkutason prosenttina tai jäljelläolevan aikana.</td></tr>
+	<tr><td><span class="menu">Näytä tilakuvake</span></td><td></td><td>Näyttää sovelman kuvakkeen.</td></tr>
+	<tr><td class="onelinetop"><span class="menu">Näytä aika</span></td><td></td><td>Vuorottelee akkutason näyttämisen prosentteina tai jäljellä olevana aikana (<span class="menu">Näytä tekstinimiö</span> on oltava aktiivinen).</td></tr>
+	<tr><td><span class="menu">Akkutiedot..</span></td><td></td><td>Näyttää laajennetun akkutiedot-ikkunan.</td></tr>
+	<tr><td><span class="menu">Ohjelmasta...</span></td><td></td><td>Näyttää Ohjelmasta-ikkunan.</td></tr>
+	<tr><td><span class="menu">Poistu</span></td><td></td><td>Poistuu Virtatila-sovelmasta.</td></tr>
 
 </table>
-<p>When <span class="menu">Show text label</span> is active, the battery level is shown in brackets while charging.</p>
+<p>Kun <span class="menu">Näytä tekstinimiö</span> on aktiivinen, akkutaso näytetään ladattaessa hakasulkeissa.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="networkstatus.html">NetworkStatus</a> 
+ «  <a href="networkstatus.html">Verkkotila</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Työpöytäsovelmat</a> 
-::  <a href="processcontroller.html">ProcessController</a>  »
+::  <a href="processcontroller.html">Prosessivalvonta</a>  »
 </span></div>
 </div>
 

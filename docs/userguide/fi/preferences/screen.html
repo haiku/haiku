@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Screen</title>
+	<title>Näyttöasetukset</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -38,44 +40,45 @@
 <li><a href="../../zh_CN/preferences/screen.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/preferences/screen.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/preferences/screen.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/preferences/screen.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/preferences/screen.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/preferences/screen.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="printers.html">Printers</a> 
+ «  <a href="printers.html">Tulostimet</a> 
 ::  <a href="../preferences.html" class="uplink">Asetukset</a> 
-::  <a href="screensaver.html">ScreenSaver</a>  »
+::  <a href="screensaver.html">Näytönsäästäjäasetukset</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/prefs-images/screen-icon_64.png" alt="screen-icon_64.png" width="64" height="64" />Screen</h2>
+<h2><img src="../../images/prefs-images/screen-icon_64.png" alt="screen-icon_64.png" width="64" height="64" />Näyttöasetukset</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/preferences/Screen</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/kernel/drivers/vesa</span> - Only when running in VESA mode.<br />
-<span class="path">~/config/settings/Screen_data</span> - Stores the panel's window position.</td></tr>
+<span class="path">~/config/settings/kernel/drivers/vesa</span> - Vain kun suoritetaan VESA-tilassa.<br />
+<span class="path">~/config/settings/Screen_data</span> - Tallentaa paneelin ikkunasijainnin.</td></tr>
 </table>
-<p>Each of your <a href="../workspaces.html">workspaces</a> can have its own resolution, color depth and refresh rate.</p>
+<p>Jokaisella <a href="../workspaces.html">työtilallasi</a> voi ola oma resoluutio, värisyvyys ja virkistystaajuus.</p>
 <img src="../images/prefs-images/screen.png" alt="screen.png" />
-<p>The top menu specifies if your changes are applied only to the current or to all workspaces. Depending on your graphics card, the other menus contain all supported resolution, color depth and refresh rate settings.</p>
-<p>After clicking on <span class="button">Apply</span>, the graphics mode is changed and an alert appears, asking you to keep or cancel the changes. If you don't answer that alert, the graphics mode reverts after 12 seconds to the previous setting. Maybe you couldn't see the alert because your monitor didn't support the setting.</p>
-<p>To the left, you see a representation of your screen with the manufacturer and model it reports and it's resolution in dots per inch (dpi). Hovering the mouse pointer over it shows a tooltip with the name of graphics card if it's supported by a driver. Otherwise it says "VESA", the quick fallback solution that works with pretty much every hardware.</p>
-<p><span class="button">Revert</span> brings back the setting that was active when you started the Screen preferences.</p>
-<div class="box-info">While Haiku's VESA mode performs very well, you may experience some limitations. You may not be able to drive your widescreen display in its native resolution, resulting in a somewhat blurred picture. There may also be limitations with regard to available color depths and refresh rates.</div>
-<p>To the bottom left you can set the number of workspaces and arrange them in columns and rows and open the <a href="backgrounds.html">Backgrounds</a> preferences.</p>
+<p>Ylimmässä valikossa määrität, että koskeeko muutokset vain nykyistä työtilaa vai kaikkia työtiloja. Grafiikkakortistasi riippuen toiset valikot sisältävät kaikki tuetut resoluutio-, värisyvyys- ja virkistystaajuusasetukset.</p>
+<p>Painikkeen <span class="button">Sovella</span> napsauttamisen jälkeen grafiikkatila vaihtuu ja näkyviin ilmaantuu hälytysikkuna, joka kysyy, että pidetäänkö vai hylätäänkö muutokset. Jos et vastaa tuohon hälytykseen, grafiikkatila palaa entisiin asetuksiin 12 sekunnin kuluttua. Et ehkä näe hälytysikkunaa, jos näyttösi ei tue asetuksia.</p>
+<p>Vasemmalla näet näyttösi esittelyn sillä valmistajalla ja mallilla, jonka se ilmoittaa ja sen resoluution pisteinä per tuuma (dpi). Hiiren kohdistimen pitäminen sen yllä näyttää työkaluvihjeen, joka kertoo grafiikkakortin nimen ja mitä ajuria se tukee. Muussa tapauksessa se sanoo "VESA", nopea vararatkaisu, joka toimi lähes jokaisessa laitteessa.</p>
+<p><span class="button">Palauta</span> tuo takaisin ne asetukset, jotka olivat aktiivisia, kun Näyttöasetukset-sovellus käynnistettiin.</p>
+<div class="box-info">Vaikka Haikun VESA-tila toimii oikein hyvin, saatat kokea joitakin rajoituksia. Et ehkä kykene käyttämään taulunäyttöä sen omalla resoluutiolla, mikä aiheutta hiukan hämärän kuvan. Tilassa on myös rajoituksia koskien käytettävissä olevia värisyvyyksiä ja virkistystaajuuksia.</div>
+<p>Vasemmalla alhaalla voit asettaa työtilojen lukumäärän ja järjestää ne sarakkeisiin ja riveihin sekä avata <a href="backgrounds.html">Tausta-asetukset</a>-sovelluksen.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="printers.html">Printers</a> 
+ «  <a href="printers.html">Tulostimet</a> 
 ::  <a href="../preferences.html" class="uplink">Asetukset</a> 
-::  <a href="screensaver.html">ScreenSaver</a>  »
+::  <a href="screensaver.html">Näytönsäästäjäasetukset</a>  »
 </span></div>
 </div>
 

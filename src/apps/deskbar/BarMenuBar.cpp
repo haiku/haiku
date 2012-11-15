@@ -88,7 +88,7 @@ TBarMenuBar::SmartResize(float width, float height)
 
 	width -= 1;
 
-	if (fSeparatorItem)
+	if (fSeparatorItem != NULL)
 		fDeskbarMenuItem->SetWidthHeight(width - kSepItemWidth, height);
 	else {
 		int32 count = CountItems();
@@ -102,70 +102,88 @@ TBarMenuBar::SmartResize(float width, float height)
 }
 
 
-void
+bool
 TBarMenuBar::AddTeamMenu()
 {
 	if (CountItems() > 1)
-		return;
+		return false;
 
 	BRect frame(Frame());
-	delete fAppListMenuItem;
 
+	delete fAppListMenuItem;
 	fAppListMenuItem = new TBarMenuTitle(0.0f, 0.0f,
 		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_TeamIcon), new TTeamMenu());
-	AddItem(fAppListMenuItem);
-	SmartResize(frame.Width() - 1.0f, frame.Height());
+
+	bool added = AddItem(fAppListMenuItem);
+
+	if (added)
+		SmartResize(frame.Width() - 1.0f, frame.Height());
+	else
+		SmartResize(frame.Width(), frame.Height());
+
+	return added;
 }
 
 
-void
+bool
 TBarMenuBar::RemoveTeamMenu()
 {
 	if (CountItems() < 2)
-		return;
+		return false;
 
-	if (fAppListMenuItem) {
-		RemoveItem((BMenuItem*)fAppListMenuItem);
+	bool removed = false;
+
+	if (fAppListMenuItem != NULL && RemoveItem(fAppListMenuItem)) {
 		delete fAppListMenuItem;
 		fAppListMenuItem = NULL;
+		SmartResize(-1, -1);
+		removed = true;
 	}
 
-	BRect frame = Frame();
-	SmartResize(frame.Width(), frame.Height());
+	return removed;
 }
 
 
-void
+bool
 TBarMenuBar::AddSeperatorItem()
 {
 	if (CountItems() > 1)
-		return;
+		return false;
 
 	BRect frame(Frame());
-	delete fSeparatorItem;
 
+	delete fSeparatorItem;
 	fSeparatorItem = new TTeamMenuItem(kSepItemWidth,
 		frame.Height() - 2, false);
-	AddItem(fSeparatorItem);
 	fSeparatorItem->SetEnabled(false);
-	SmartResize(frame.Width() - 1.0f, frame.Height());
+
+	bool added = AddItem(fSeparatorItem);
+
+	if (added)
+		SmartResize(frame.Width() - 1.0f, frame.Height());
+	else
+		SmartResize(frame.Width(), frame.Height());
+
+	return added;
 }
 
 
-void
+bool
 TBarMenuBar::RemoveSeperatorItem()
 {
 	if (CountItems() < 2)
-		return;
+		return false;
 
-	if (fSeparatorItem) {
-		RemoveItem((BMenuItem*)fSeparatorItem);
+	bool removed = false;
+
+	if (fSeparatorItem != NULL && RemoveItem(fSeparatorItem)) {
 		delete fSeparatorItem;
 		fSeparatorItem = NULL;
+		SmartResize(-1, -1);
+		removed = true;
 	}
 
-	BRect frame = Frame();
-	SmartResize(frame.Width(), frame.Height());
+	return removed;
 }
 
 

@@ -40,6 +40,8 @@
 <li><a href="../zh_CN/workshop-filetypes+attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../pt_PT/workshop-filetypes+attributes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../sk/workshop-filetypes+attributes.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/workshop-filetypes+attributes.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/workshop-filetypes+attributes.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,94 +53,93 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
 <tr class="index"><td>
-	<a href="#preparations">Preparations</a><br />
-	<a href="#custom-filetype">Creating a custom filetype</a><br />
-	<a href="#icon">Icon</a><br />
-        <a href="#file-recognition">File recognition</a><br />
-	<a href="#description">Description</a><br />
-	<a href="#pref_app">Preferred Application</a><br />
-	<a href="#extra_attribute">Extra Attributes</a><br />
-	<a href="#indexing">Indexing</a><br />
-	<a href="#filling-data">Filling in the data</a><br />
-	<a href="#query-db">Querying the database</a>
+	<a href="#preparations">Esikäsittelyt</a><br />
+	<a href="#custom-filetype">Oman tiedostotyypin luominen</a><br />
+	<a href="#icon">Kuvake</a><br />
+        <a href="#file-recognition">Tiedostotunnistus</a><br />
+	<a href="#description">Kuvaus</a><br />
+	<a href="#pref_app">Ensisijainen sovellus</a><br />
+	<a href="#extra_attribute">Lisäattribuutit</a><br />
+	<a href="#indexing">Indeksointi</a><br />
+	<a href="#filling-data">Tietojen lisääminen</a><br />
+	<a href="#query-db">Tietokannan kysely</a>
 </td></tr>
 </table>
 
 <h1>Työpaja: Tiedostotyypit, attribuutit, indeksi ja kyselyt</h1>
 
-<p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.</p>
+<p>Tämä on työpaja valikkojen <a href="attributes.html">Attribuutit</a>, <a href="queries.html">Kyselyt</a>, <a href="index.html">Indeksi</a> ja <a href="filetypes.html">Tiedostotyypit</a>-räätälöinnin käyttämisestä. Esimerkkinä rakennamme tietokannan DVD-kirjaston seuraamiseksi.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preparations" name="preparations">Preparations</a></h2>
-<p>Let's first decide what filetype and attributes would serve our needs. Originally, I wanted to use a Bookmark file with a link to the movie's IMdB page, but Haiku doesn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at the moment, so I came up with this: The file itself will be a JPEG image for the movie cover.<br />
-To that we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
-<p>Here are the attributes I'd like to see for my DVDs:</p>
+<a id="preparations" name="preparations">Esikäsittelyt</a></h2>
+<p>Päättäkäämme aluksi, mikä tiedostotyyppi ja mitkä attribuutit palvelisivat tarpeitamme. Alunperin halusin käyttää Kirjanmerkki-tiedostoa linkillä elokuvien IMdB-sivulle, mutta Haikussa ei ole tällä hetkellä "kirjanmerkittävää" webbiselainta kuten BeOS-käyttöjärjestelmän <span class="app">NetPositive</span>, joten tulin tähän: Tiedosto itse on JPEG-kuva elokuvan kannesta.<br />
+Siihen lisäämme pari attribuuttia. Tässä haluamme päättää, haluammeko kysellä sitä myöhemmin (silloin meidän olisi lisättävä se indeksiin) ja jos niin, mitä attribuuttityyppiä sen pitäisi olla. Numerot (int, float) voidaan evaloida eri tavalla kuin teksti (&lt;/=/&gt; vs. on/sisältää/alkaa jollakin).</p>
+<p>Tässä on attribuutit, jotka haluaisin nähdä DVD:stäni:</p>
 <ul>
 <li>Elokuvaotsikko</li>
-<li>Genre</li>
-<li>URL to e.g. IMdB</li>
-<li>Director/Cast</li>
-<li>Plot</li>
-<li>My rating from 1 to 10</li>
-<li>Coordinates in my shelf, e.g. A2, B3, so I find the DVD also in Real Life :)</li>
-<li>If so, who's borrowed the disk...</li>
+<li>Tyylilaji</li>
+<li>Verkko-osoite esimerkiksi IMdB-sivulle</li>
+<li>Ohjaaja/Näyttelijät</li>
+<li>Juoni</li>
+<li>Arvosanani 1 ... 10</li>
+<li>Koordinaatit omassa hyllyssäni, esimerkiksi A2, B3, jotta löydän DVD:n myös oikeassa elämässä :)</li>
+<li>Jos niin, kuka on lainannut levyn...</li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="custom-filetype" name="custom-filetype">Oman tiedostotyypin luominen</a></h2>
-<p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
+<p>Aloita <span class="app">Tiedostotyypit</span>-asetukset, ja napsauta painiketta <span class="button">Lisää...</span> vasemmalla olevan hierarkialuettelon alla. Pieni valintaikkuna avautuu ja voit määritellä, missä MIME-ryhmässä uusi tiedostotyyppisi sijaitsee. Voit myös luoda kokonaan uuden ryhmän. Laittakaamme se "<i>sovelluksiin</i>" ja asetaan "Sisäiseksi nimeksi" <i>DVDdb</i>.</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
-<p>Now, a panel for your new DVDdb filetype opens:</p>
+<p>Nyt avautuu paneeli uudelle DVDdb-tiedostotyypillesi:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="icon" name="icon">Kuvake</a></h3>
-<p>Double-click the icon well to open  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
+<p>Kaksoisnapsauta kuvakelähdettä avataksesi  <a href="applications/icon-o-matic.html">Kuvakemaatti</a>-sovelluksen tiedostotyyppisi kuvakkeen suunnittelemiseksi. Voit myös raahata ja pudottaa kuvakkeen toisentyyppisestä kuvakelähteestä, ehkä alkuna muokatulle versiolle.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="file-recognition" name="file-recognition">Tiedostotunnistus</a></h3>
-<p>You can add suffixes like .txt, .jpg, .mp3 to recognize files by their extention. Useful when working with files from systems without MIME typing. We don't need that for our example.</p>
+<p>Voit lisätä loppuliitteitä kuten .txt, .jpg, .mp3 tiedostojen tunnistamiseksi tarkentimen avulla. Ne ovat hyödyllisiä, kun työskennellään tiedostojen kanssa, jotka ovat lähtiöisin järjestelmistä ilman MIME-tyypitystä. Emme tarvitse sitä esimerkissämme.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="description" name="description">Kuvaus</a></h3>
 <ul>
-<li><i>Type name</i> - Appears e.g. in the Attribute menu of Tracker windows and the "Kind" attribute of a file.</li>
-<li><i>Description</i> - A bit more detailed description.</li>
+<li><i>Tyyppinimi</i> - Ilmaantuu esimerkiksi Seuraaja-ikkunoiden Attribuutti-valikkoon ja tiedoston "Tyyppi"-attribuuttiin.</li>
+<li><i>Kuvaus</i> - Hiukan yksityiskohtaisempi kuvaus.</li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="pref_app" name="pref_app">Ensisijainen sovellus</a></h3>
-<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
+<p>Tämä ponnahdusvalikko näyttää kaikkien niiden sovellusten luettelon, jotka voivat käsitellä tätä tiettyä tiedostotyyppiä. Tästä voimme valita, että mikä ohjelma avaisi tämän tietyn tiedoston, kun sitä kaksoisnapsautetaan.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">Valitse...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
-<tr><td class="onelinetop"><span class="button">Sama kuin...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+<tr><td><span class="button">Valitse...</span></td><td> </td><td>avaa tiedostovalintaikkunan, jolla voit valita sovelluksen, joka avaa tämän tyyppisen tiedoston. Tässä asetamme <span class="app">Kuvakatselin</span>-ohjelman näyttämään DVD:n kannen.</td></tr>
+<tr><td class="onelinetop"><span class="button">Sama kuin...</span></td><td> </td><td>avaa tiedostonvalintaikkunan, jossa valitset minkä tahansa tiedoston, jolla on jo ensisijainen sovellus asetettuna samaksi, jota haluat itse käyttää.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="extra_attribute" name="extra_attribute">Lisäattribuutit</a></h3>
-<p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
+<p>Tässä kirjoitamme kaikki omat attribuutit, joista päätimme esikäsittelyssämme. Painikkeen <span class="button">Lisää...</span> napsauttaminen avaa paneelin:</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
-<li><p><i>Attribute name</i> - Appears e.g. as the column heading in Tracker windows.</p></li>
-<li><p><i>Internal name</i> - Is used for indexing and querying the attribute.</p></li>
-<li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
+<li><p><i>Attribuuttinimi</i> - näkyy esimerkiksi Seuraaja-ikkunoiden sarakeotsakkeissa.</p></li>
+<li><p><i>Sisäinen nimi</i> - Käytetään attribuutin indeksointiin ja kyselyyn.</p></li>
+<li><i>Tyyppi</i> - Määrittää arvon, jonka attribuutti voi sisältää ja siten kuinka sitä voidaan kysellä.
     <ul>
-    <li><span class="menu">String</span> for normal text</li>
-    <li><span class="menu">Boolean</span> for binary data: 0 or 1</li>
-    <li><span class="menu">Integer</span> for integer numbers with different ranges:
+    <li><span class="menu">String</span> normaalille tekstille</li>
+    <li><span class="menu">Boolean</span> binaaritiedolle: 0 tai 1</li>
+    <li><span class="menu">Integer</span> eri lukualueiden kokonaisluvuille:
         <ul>
         <li><span class="menu">8 bit</span>: ± 255</li>
         <li><span class="menu">16 bit</span>: ± 65,535</li>
@@ -146,38 +147,38 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
         <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
         </ul>
     </li>
-    <li><span class="menu">Float</span> for floatingpoint numbers, single precision</li>
-    <li><span class="menu">Double</span> for floatingpoint numbers, double precision</li>
-    <li><span class="menu">Time</span> for time and date format</li>
+    <li><span class="menu">Float</span> liukulukunumeroille, perustarkkuus</li>
+    <li><span class="menu">Double</span> liukulukunumeroille, kaksoistarkkuus</li>
+    <li><span class="menu">Time</span> ajalle ja päimäärämuodoille</li>
     </ul>
 </li>
 </ul>
 <ul>
-<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>
-    <li><span class="menu">Display as</span> - Leave on "Default". In the future more option will become available, e.g. a bar or stars for a rating etc.</li>
-    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
-    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
-    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
+<li><i>Näkyvä</i> - Tämä valintaruutu määrittää, onko attribuutti ollenkaan näkyvä Seuraajan ikkunassa. Koska Seuraaja on käyttöliitymä DVD-tietokantaamme, merkitsemme sen ja määritämme sen ulkoasun valikoilla:<ul>
+    <li><span class="menu">Näytä kohteena</span> - Jätä arvoon "Oletus". Tulevaisuudessa on käytettävissä lisää valitsimia, esimerkiksi palkki tai tähdet arvosanoja varten jne.</li>
+    <li><span class="menu">Muokattava</span> - Määrittää, onko attribuutti muokattava Seuraajassa.</li>
+    <li><span class="menu">Leveys</span> - Attribuuttisarakkeen oletusleveys Seuraajassa.</li>
+    <li><span class="menu">Tasaus</span> - Attribuutti voidaan näyttää vasemmalle, keskelle tai oikealle tasattuna.</li>
 </ul></li></ul>
-<p>Now, insert all the info for our attributes:</p>
+<p>Lisää nyt kaikki tietomme attribuutteihimme:</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
 <tr><th>Sisäinen nimi</th><th>Attribuuttityyppi</th><th>indeksoitu?</th><th>Kuvaus</th></tr>
 <tr><td>DVDdb:title</td>	<td>text</td>		<td>kyllä</td>	<td>Elokuvaotsikko</td></tr>
-<tr><td>DVDdb:genre</td>	<td>text</td>		<td>kyllä</td>	<td>Genre</td></tr>
+<tr><td>DVDdb:genre</td>	<td>text</td>		<td>kyllä</td>	<td>Tyylilaji</td></tr>
 <tr><td>DVDdb:url</td>		<td>text</td>		<td>ei</td>	<td>Verkko-osoite</td></tr>
-<tr><td>DVDdb:cast</td>		<td>text</td>		<td>kyllä</td>	<td>Director/Cast</td></tr>
-<tr><td>DVDdb:plot</td>		<td>text</td>		<td>ei</td>	<td>Plot</td></tr>
+<tr><td>DVDdb:cast</td>		<td>text</td>		<td>kyllä</td>	<td>Ohjaaja/Näyttelijät</td></tr>
+<tr><td>DVDdb:plot</td>		<td>text</td>		<td>ei</td>	<td>Juoni</td></tr>
 <tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>kyllä</td>	<td>Arvosana 1 ... 10</td></tr>
-<tr><td>DVDdb:coord</td>	<td>text</td>		<td>ei</td>	<td>Shelf</td></tr>
-<tr><td>DVDdb:lent</td>		<td>text</td>		<td>kyllä</td>	<td>Lent to</td></tr>
+<tr><td>DVDdb:coord</td>	<td>text</td>		<td>ei</td>	<td>Hylly</td></tr>
+<tr><td>DVDdb:lent</td>		<td>text</td>		<td>kyllä</td>	<td>Lainattu henkilölle</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="indexing" name="indexing">Indeksointi</a></h2>
-<p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
-So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
-<p>This leaves these attributes:</p>
+<p>Ennen kuin alamme kirjoittaa tietoja pieneen DVD-tietokantaamme, meidän pitäisi lisätä tietyt attribuuti <a href="index.html">Indeksiin</a>. Vain indeksoidut attribuutit voivat käyttää Haikun nopeita <a href="queries.html">Kyselyjä</a>.<br />
+Joten mitä etsimme tulevaisuudessa? Emme luultavasti kysy "Mitä on hyllyni B4-koordinaatissa?" tai "Sisältääkö IMdB-verkko-osoite tai elokuvan juoni sanan 'pope-shenooda'?".</p>
+<p>Tämä jättää nämä attribuutit:</p>
 <table summary="Attribute Type" cellpadding="10" border="1">
 <tr><th>Sisäinen nimi</th><th>Attribuuttityyppi</th></tr>
 <tr><td>DVDdb:title</td><td>text</td></tr>
@@ -186,33 +187,33 @@ So, what will we be searching in the future? We probably won't ask "What's in th
 <tr><td>DVDdb:rating</td><td>int-32</td></tr>
 </table>
 
-<p>To index them, we open a Terminal and simply add one attribute after the other:</p>
+<p>Niiden indeksoimiseksi avaamme Pääteikkunan ja lisäämme yksinkertaisesti yhden attribuutin kerrallaan toisten perään.</p>
 <pre class="terminal">mkindex -t string DVDdb:title
 mkindex -t string DVDdb:genre
 mkindex -t string DVDdb:cast
 mkindex -t int DVDdb:rating</pre>
-<p>The <span class="cli">-t</span> option defines the type of attribute, which is "string" for all but the rating, which is an integer number.</p>
+<p>Valitsin <span class="cli">-t</span> määrittelee attribuuttityypin, joka on "string"-merkkijono kaikille muille kuin arvosanoille, jotka ovat kokonaislukuja.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filling-data" name="filling-data">Filling in the data</a></h2>
-<p>Now, everything's set and we can begin putting some data into our base.<br />
-Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
-<p>Opening that folder we see a typical Tracker window with one JPEG in it. Right-clicking it, we change its filetype to <tt>application/DVDdb</tt> with the <span class="app">Filetype Addon</span>. There's more info on this in the <a href="filetypes.html">Filetypes</a> document.</p>
-<p>Now, we activate all our DVDdb attributes from the <span class="menu">Attributes</span> menu of the Tracker window and rearrange the columns to our taste:</p>
+<a id="filling-data" name="filling-data">Tietojen lisääminen</a></h2>
+<p>Nyt kaikki asetukset on tehty ja voimme aloittaa tietojen syöttämisen tietokantaamme.<br />
+Koska perustiedostomme on kansikuva, siirrymme johonkin verkkoresurssiin kuten IMdB, etsimään ensimmäistä elokuvaamme ja tallennamme kannen tai elokuvan julisteen siihen uuteen kansioon, jossa haluamme säilyttää DVDdb-tiedostojamme.</p>
+<p>Avaamalla tuon kansion näemme tyypillisen Seuraja-ikkunan, jossa on yksi JPEG-tiedosto. Napsautamme sitä hiiren kakkospainikkeella, vaihdamme sen tiedostotyypiksi <tt>application/DVDdb</tt> liitännäisellä <span class="app">Tiedostotyyppiliitännäinen</span>. Lisätietoja tästä on <a href="filetypes.html">Tiedostotyypit</a>-asiakirjassa.</p>
+<p>Nyt aktivoimme kaikki DVDdb-attribuutit Seuraajan <span class="menu">Attribuutit</span>-valikosta ja järjestämme sarakkeet mielemme mukaan:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
-<p>By clicking on a yet empty attribute (or pressing <span class="key">ALT</span> <span class="key">E</span>) we enter editing mode and fill each attribute. With <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> you can navigate between attributes.</p>
-<p>In our example, we usually start with a downloaded JPG cover and change its type to applications/DVDdb. There's another elegant way to produce a file to work with. Just copy an empty file of our filetype to <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> and rename it to DVDdb.</p>
-<p>Right-clicking into a Tracker window, you'll find a new entry under <span class="menu">New...</span> besides the default "New folder".</p>
+<p>Napsauttamalla vielä tyhjää attribuuttia (tai painaalla <span class="key">ALT</span> <span class="key">E</span> -näppäimiä) siirrymme muokkaustilaan ja täytämme jokaisen attribuutin. Näppäimillä <span class="key">SARKAIN</span> ja <span class="key">VAIHTO</span> <span class="key">SARKAIN</span> voit navigoida attribuuttien välillä.</p>
+<p>Esimerkissämme aloitamme tavallisesti lataamalla JPG-kannen ja vaihdamme sen tyypiksi applications/DVDdb. On toinen elegantti tapa tuottaa tiedosto, jolla työskentelemme. Kopioi vain tiedostotyyppimme tyhjä tiedosto hakemistoon <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> ja nimeä se uudelleen DVDdb-nimiseksi.</p>
+<p>Napsauttamalla Seuraaja-ikkunaa hiiren kakkospainikkeella löydät valikon <span class="menu">Uusi...</span> alta uuden rivin oletusarvon "Uusi kansio" lisäksi.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-db" name="query-db">Querying the database</a></h2>
-<p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
-<p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
-Open the folder containing your DVDdb files and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy layout</span>.</p>
-<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores; in our case "applications_DVDdb".</p>
-<p>Open the new folder and paste in the layout with <span class="menu">Attributes | Paste layout</span>. Voilà:</p>
+<a id="query-db" name="query-db">Tietokannan kysely</a></h2>
+<p>Usean tunnin työähkimisen jälkeen meillä on pieni sievä tietokanta, jota voit kysellä löytääksesi kaikki Christina Ricci -elokuvasi, joiden arvosana on 7+ ...  :)</p>
+<p>Voit liittää tiettyyn tiedostotyyppiin järkevän attribuutti asettelun.<br />
+Avaa DVDdb-tiedostosi sisältävä kansio ja järjestä attribuutit niin kuin haluat kyselyn tulokset esitettävän. Kopioi tämä asettelu valikolla <span class="menu">Attribuutit | Kopio asettelu</span>.</p>
+<p>Avaa <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, luo uusi kansio ja nimeä se uudelleen <i>ryhmä/tiedostotyyppi</i>-määrittelyllä, korvaten kauttaviivat alaviivoilla; meidän tapauksessa "applications_DVDdb".</p>
+<p>Avaa uusi kansio ja liitä asettelussa <span class="menu">Attribuutit | Liitä asettelu</span>. Voilà:</p>
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
 </div>

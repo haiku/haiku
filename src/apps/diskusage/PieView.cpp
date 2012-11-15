@@ -136,7 +136,7 @@ PieView::PieView(BVolume* volume)
 	fMouseOverInfo(),
 	fClicked(false),
 	fDragging(false),
-	fOutdated(false)
+	fUpdateFileAt(false)
 {
 	fMouseOverMenu = new BPopUpMenu(kEmptyStr, false, false);
 	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Get Info"), NULL),
@@ -181,33 +181,26 @@ void
 PieView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kBtnCancel:
+			if (fScanner != NULL)
+				fScanner->Cancel();
+			break;
 		case kBtnRescan:
 			if (fVolume != NULL) {
 				if (fScanner != NULL)
 					fScanner->Refresh();
 				else
 					_ShowVolume(fVolume);
-
-				fOutdated = false;
+				fWindow->EnableCancel();
 				Invalidate();
 			}
 			break;
-
-		case kScanProgress:
+		
 		case kScanDone:
-		{
+			fWindow->EnableRescan();
+		case kScanProgress:
 			Invalidate();
 			break;
-		}
-
-		case kOutdatedMsg:
-		{
-			if (!fScanner->IsBusy()) {
-				fOutdated = true;
-				Invalidate();
-			}
-			break;
-		}
 
 		default:
 			BView::MessageReceived(message);
@@ -250,11 +243,13 @@ PieView::MouseUp(BPoint where)
 		if (info != NULL) {
 			if (info == fScanner->CurrentDir()) {
 				fScanner->ChangeDir(info->parent);
-				fOutdated = fScanner->IsOutdated();
+				fLastWhere = where;
+				fUpdateFileAt = true;
 				Invalidate();
 			} else if (info->children.size() > 0) {
 				fScanner->ChangeDir(info);
-				fOutdated = fScanner->IsOutdated();
+				fLastWhere = where;
+				fUpdateFileAt = true;
 				Invalidate();
 			}
 		}
@@ -308,12 +303,12 @@ PieView::Draw(BRect updateRect)
 		if (fScanner->IsBusy()) {
 			// Show progress of scanning.
 			_DrawProgressBar(updateRect);
-			if (fWindow != NULL)
-				fWindow->SetRescanEnabled(false);
-		} else {
+		} else if (fScanner->Snapshot() != NULL) {
 			_DrawPieChart(updateRect);
-			if (fWindow != NULL)
-				fWindow->SetRescanEnabled(true);
+			if (fUpdateFileAt) {
+				fWindow->ShowInfo(_FileAt(fLastWhere));
+				fUpdateFileAt = false;
+			}
 		}
 	}
 }
@@ -366,8 +361,7 @@ PieView::_DrawProgressBar(BRect updateRect)
 	float by = floorf((b.top + b.Height() - kProgBarHeight) / 2.0);
 	float ex = bx + kProgBarWidth;
 	float ey = by + kProgBarHeight;
-	float mx = bx + floorf((kProgBarWidth - 2.0)
-		* fScanner->Progress() / 100.0 + 0.5);
+	float mx = bx + floorf((kProgBarWidth - 2.0) * fScanner->Progress() + 0.5);
 
 	const rgb_color kBarColor = {50, 150, 255, 255};
 	BRect barFrame(bx, by, ex, ey);
@@ -415,21 +409,6 @@ PieView::_DrawPieChart(BRect updateRect)
 	}
 	_DrawDirectory(pieRect, currentDir, 0.0, 0.0,
 		colorIdx % kBasePieColorCount, 0);
-
-	if (fOutdated) {
-
-		BRect b = Bounds();
-
-		float strWidth = StringWidth(B_TRANSLATE("Outdated view"));
-		float bx = (b.Width() - strWidth - kSmallHMargin);
-
-		struct font_height fh;
-		be_plain_font->GetHeight(&fh);
-
-		float by = (b.Height() - ceil(fh.descent) - kSmallVMargin);
-		SetHighColor(0x00, 0x00, 0x00);
-		DrawString(B_TRANSLATE("Outdated view"), BPoint(bx, by));
-	}
 }
 
 

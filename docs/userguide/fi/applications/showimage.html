@@ -16,7 +16,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ShowImage</title>
+	<title>Kuvakatselin</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -40,10 +40,12 @@
 <li><a href="../../zh_CN/applications/showimage.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
 <li><a href="../../pt_PT/applications/showimage.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../sk/applications/showimage.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/applications/showimage.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/applications/showimage.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../en/applications/showimage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="screenshot.html">Screenshot</a> 
+ «  <a href="screenshot.html">Näytönkaappaus</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
 ::  <a href="soundrecorder.html">Ääninauhuri</a>  »
 </span></div>
@@ -51,50 +53,49 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />ShowImage</h2>
+<h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />Kuvakatselin</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><i>Ei löydy Työpöytäpalkista, käynnistetään normaalisti kaksoisnapsauttamalla tuettua tiedostoa.</i></td></tr>
 <tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/ShowImage</span></td></tr>
 <tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/ShowImage_settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>ShowImage allows you to view images in all formats that are supported through <a href="../preferences/datatranslation.html">DataTranslators</a>. New formats are automatically recognized when their translator is added to the system. This has been done for Haiku's vector icon files, WonderBrush images or when WebP images became available, for example.<br />
-ShowImage provides minimal editing features to crop, rotate and flip images and to save them in another format.</p>
+<p>Kuvakatselin sallii sinun katsella kuvatiedostoja kaikisssa muodoissa, jotka <a href="../preferences/datatranslation.html">Tietomuuntimet</a> tukevat. Uudet muodot tunnistetaan automaattisesti, kun niiden muuntimet lisätään järjestelmään. Tämä on tehty esimerkiksi Haikun vektorikuvaketiedostoille, WonderBrush-kuville tai kun WebP-kuvat tulivat käytettäviksi.<br />
+Kuvakatselin tarjoaa minimaalisia editointiominaisuuksia karsimalla, kiertämällä tai kääntämällä kuvia ja tallentaen niitä toisiin muotoihin.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Katsotaan</h2>
 <img src="../images/apps-images/showimage-view.jpg" alt="showimage-view.jpg" />
-<p>The <span class="menu">View</span> menu offers to start a <span class="menu">Slide show</span> of all images in a folder (or query result window) and set a <span class="menu">Slide delay</span> from 2 to 20 seconds.</p>
-<p>Other commands apply to the currently displayed image (without changing the size of the window):<br />
-<span class="menu">Original size</span> shows the image with a 100% zoom factor.<br />
-<span class="menu">Fit to window</span> shrinks the image back into the window fame, e.g. after having zoomed into it or after resizing the window.<br />
-<span class="menu">Zoom in</span> and <span class="menu">Zoom out</span> move into and out of the image in 10% steps. Zooming is also done with the mouse wheel; to pan an image bigger than the window, simply left-click and drag your mouse around.</p>
-<p>Two settings don't just apply to the currently displayed image and are remembered when browsing from one image to the next:<br />
-<span class="menu">High quality zooming</span> applies a very fast filter when zooming to reduce jagged lines and produce a smoother result.<br />
-<span class="menu">Stretch to window</span> will stretch smaller images to fill the current window frame.</p>
-<p>Then there's a <span class="menu">Full screen</span> mode with an option to <span class="menu">Show caption in full screen mode</span> which overlays the file name at the bottom of the image.</p>
-<p>Lastly, <span class="menu">Show tool bar</span> will show/hide the graphical controls:</p>
+<p><span class="menu">Näkymä</span>-valikko tarjoaa aluksi kansion kaikkien kuvatiedostojen <span class="menu">Diaesityksen</span> (tai kyselytulosikkunan) ja asettaa <span class="menu">Esitysviiveen</span> 2:sta sekunnista 20:een sekuntiin.</p>
+<p>Muut komennot koskevat parhaillaan näytettävää kuvatiedostoa (muuttamatta ikkunan kokoa):<br />
+<span class="menu">Alkuperäinen koko</span> näyttää kuvan 100 prosentin loitonnustekijällä.<br />
+<span class="menu">Sovi ikkunaan</span> supistaa kuvan takaisin ikkunakehykseen, esim.: sen jälkeen kun siihen on loitonnuttu tai ikkunan koon muuttamisen jälkeen.<br />
+<span class="menu">Lähennä</span> ja <span class="menu">Loitonna</span> laajentavat ja kaventavat kuvaa 10 prosentin askelin. Loitontaminen ja lähentäminen tehdään hiiren rullauspainikkeella; kuvan venyttämiseksi suuremmaksi kuin ikkuna sinun on yksinkertaisesti napsautettava kuvaa hiiren ykköspainikkeella ja raahattava hiirtä ympäriinsä.</p>
+<p>Kaksi asetusta ei koske parhaillaan näytettävää kuvaa ja ne on muistettava kun selataan kuvia peräkkäin:<br />
+<span class="menu">Korkealaatuinen loitonnus</span> soveltaa hyvin nopeaa suodatusta, kun loitonnus vähentää särmikkäitä viivoja ja tuottaa pehmeämmän tuloksen.<br />
+<span class="menu">Venytä ikkunaan</span> venyttää pienemmät kuvat täyttämään nykyisen ikkunakehyksen.</p>
+<p>Sitten on <span class="menu">Kokonäyttö</span>-tila valitsimella <span class="menu">Näytä kuvakaappaus kokonäyttötilassa</span>  joka korvaa kuvan alalaidan tiedostonimen.</p>
+<p>Viimeiseksi, <span class="menu">Näytä työkalupalkki</span> näyttää tai piilottaa graafiset ohjauskomponentit:</p>
 <img src="../images/apps-images/showimage-toolbar.png" alt="showimage-toolbar.png" />
-<p>From left to right: Previous image, next image, start slide show (in full screen mode), selection mode, original size, fit to window, zoom in, zoom out.</p>
-<p>Most of the more often used commands are also available from a right-click context menu on the image. Convenient when in full-screen mode.</p>
+<p>Vasemmalta oikealle: Edellinen kuvat, seuraava kuva, aloita diaesitys (kokonäyttötilassa), valintatila, alkuperäinen koko, sovita ikkunaan, lähennä, loitonna.</p>
+<p>Useimmat yleisimmin käytetyistä komennoista on saatavilla asiayhteysvalikosta napsauttamalla hiiren kakkospainikketta kuvan päällä. Näppärää, kun ollaan kokonäyttötilassa.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Selataan</h2>
 <img src="../images/apps-images/showimage-browse.jpg" alt="showimage-browse.jpg" />
-<p>After opening an image you can quickly browse through all the other images in its folder (or query result window) by pressing <span class="key">↑</span>/<span class="key">↓</span> or <span class="key">←</span>/<span class="key">→</span>. You can see the selection change accordingly in the Tracker window.</p>
-<p>There is a quick way to open the folder of the current image and even navigate to its parent and subfolders. It works just like with <a href="../tracker.html#drill-down">drill-down navigating</a> in Tracker by clicking in the info area in the status bar that shows size and format of the current image.</p>
-<p>Looking at the <span class="menu">Browse</span> menu, shows another type of browsing: Some image formats, like TIFF, can contain several pages in one file. Commands like <span class="menu">First page</span> and <span class="menu">Next page</span> let you navigate those pages.</p>
+<p>Kuvan avaamisen jälkeen voit nopeasti selata lävitse kaikki muut kuvat samassa kansiossa (tai kyselytulosikkunassa) painamalla näppäimiä <span class="key">↑</span>/<span class="key">↓</span> tai <span class="key">←</span>/<span class="key">→</span>. Voit nähdä, kuinka valinta vaihtuu vastaavasti Seuraaja-ikkunassa.</p>
+<p>On eräs nopea tapa avata nykyisen kuvan kansio ja jopa navigoida sen yläkansioon ja alikansioon. Se toimii juuri kuin <a href="../tracker.html#drill-down">alasporautumisnavigointi</a> Seuraajassa napsauttamalla tilapalkin tietoaluetta, joka näyttää nykyisen kuvan koon ja muodon.</p>
+<p>Valikon <span class="menu">Selaa</span> katsominen näyttää toisen selaustyypin: Jotkut kuvamuodot, kuten TIFF, voivat sisältää useita sivuja yhdessä tiedostossa. Komennot kuten <span class="menu">Ensimmäinen sivu</span> ja <span class="menu">Seuraava sivu</span> sallivat sinun navigoida noilla sivuilla.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Muokataan</h2>
 <img src="../images/apps-images/showimage-edit.jpg" alt="showimage-edit.jpg" />
-<p>The <span class="menu">Image</span> menu offers the few image manipulations necessary for an image viewer: rotating and flipping the image. Note however, that the actual image data won't be changed. Only an attribute is added to the file so it'll be shown rotated or flipped the next time you open it.</p>
-<p><span class="menu">Use as backgroud...</span> will open the <a href="../preferences/backgrounds.html">Backgrounds</a> preferences to set the current picture as image for your workspaces.</p>
-<p>Cropping is another feature that's needed sometimes. To define the frame to cut to, you can switch to <span class="menu">Selection mode</span> from the <span class="menu">Edit</span> menu and drag out a box with your left mouse button. If you don't want to change modes first, you can create this box in "normal mode" by simply holding <span class="key">CTRL</span> while left-click-dragging, which otherwise would just pan the image around.<br />
-<span class="menu">Clear selection</span> or <span class="key">ESC</span> will remove the selection box.</p>
-<p>The following chapter shows how to actually save the cropped area.</p>
+<p><span class="menu">Kuva</span>-valikko  tarjoaa muutamia kuvakatseluun välttämättömiä manipulaatioita: kuvan kiertoa ja kääntämistä. Huomaa kuitenkin, että todellinen kuvatiedosto ei muutu. Tiedostoon lisätään vain attribuutti niin että ne näytetään pyöritettynä tai käännettynä kun avaat sen seuraavan kerran.</p>
+<p><span class="menu">Käytä taustana...</span> avaa asetusohjelman <a href="../preferences/backgrounds.html">Tausta-asetukset</a> kuvan asettamiseksi taustakuvaksi työtilaasi.</p>
+<p>Rajaus on eräs toisinaan tarvittu ominaisuus. Leikattavan kehyksen rajaamiseksi voit vaihtaa <span class="menu">Valintatila</span>an valikosta <span class="menu">Muokkaa</span> ja raahata ruutu hiiren ykköspainikkeella. Jos ett halua ensin vaihtaa tilaa, voit luoda tämän ruudun "normaalitilassa" pitämällä yksinkertaisesti alhaalla näppäintä <span class="key">CTRL</span> samalla kun raahaat hiiren ykköspainikkeella, mikä normaalisti siirtää kuvaa sivusuunnasa.<br />
+<span class="menu">Nolla valinta</span> tai näppäin <span class="key">ESC</span> poistaa valintaruudun.</p>
+<p>Seuraava kappale näyttää kuinka itse asiassa tallennetaan rajattu alue.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Tallennetaan ja muunnetaan</h2>
-<p>To save or convert an image into any available format, you can invoke the normal <span class="menu">Save as...</span> item from the <span class="menu">File</span> menu, select the format and choose a file name.<br />
-Often quicker, especially when the Tracker window with the destination folder is already open, is using drag &amp; drop.</p>
+<p>Kuvan tallentamiseksi tai muuntamiseksi kaikkiin käytettävissä oleviin muotoihin voit kutsua normaalin <span class="menu">Tallenna nimellä...</span>-valikkorivin valikosta <span class="menu">Tiedosto</span> sekä valita muodon ja tiedostonimen.<br />
+Usein vielä nopeampaa, erityisesti jos Seuraaja-ikkuna on jo avoinna, on raahaa ja pudota -toiminnon käyttäminen.</p>
 <img src="../images/apps-images/showimage-dnd.jpg" alt="showimage-dnd.jpg" />
-<p>This is also how the above mentioned cropping is finalized. Either select a frame as described above, or choose <span class="menu">Edit | Select all</span> for the whole image. Then drag &amp; drop the selection onto the Desktop or any Tracker window to create a new image clipping in the same format of the original image.</p>
-<p>To save in another file format, do the dragging with the right mouse button and choose a format from the context menu when dropping the image.</p>
+<p>Näin yllä mainittu rajaaminen lopetetaan. Joko valitaan yllä kuvattu kehys, tai valitaan <span class="menu">Muokka | Valitse kaikki</span> koko kuvalle. Raahaa ja pudota valinta Työpöydälle tai mihin tahansa Seuraaja-ikkunaan uuden kuvaleikkauksen luomiseksi samassa muodossa kuin alkuperäinen kuva.</p>
+<p>Toisen tiedostomuodon tallentamiseksi raahaa hiiren kakkospainikkeella ja valitse muoto asiayhteysvalikosta tiedostoa pudotettaessa.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Pikanäppäimet</h2>
 <p>Tässä on hyödyllisimpien pikanäppäinten luettelo:</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
@@ -105,8 +106,8 @@ Often quicker, especially when the Tracker window with the destination folder is
 <tr><td><span class="key">-</span></td><td></td><td>Loitonna</td></tr>
 <tr><td><span class="key">0</span></td><td></td><td>Alkuperäinen koko (100% loitonnus/lähennys)</td></tr>
 <tr><td><span class="key">1</span></td><td></td><td>Sovita ikkunaan</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Toggle full screen mode (also via doubleclick)</td></tr>
-<tr><td><span class="key">CTRL</span></td><td></td><td>While holding <span class="key">CTRL</span> you can create a selection frame without explicitly switching to selection mode.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Vaihtele kokonäyttötilaa (myös kaksoisnapsautuksen kautta)</td></tr>
+<tr><td><span class="key">CTRL</span></td><td></td><td>Pitämällä alhaalla näppäintä <span class="key">CTRL</span> voit luoda valintakehyksen vaihtamatta valintatilaa eksplisiittisesti.</td></tr>
 </table>
 
 </div>
@@ -114,7 +115,7 @@ Often quicker, especially when the Tracker window with the destination folder is
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="screenshot.html">Screenshot</a> 
+ «  <a href="screenshot.html">Näytönkaappaus</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
 ::  <a href="soundrecorder.html">Ääninauhuri</a>  »
 </span></div>

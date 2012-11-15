@@ -4768,14 +4768,41 @@ done:
  * mkntfs_main
  */
 int	mkntfs_main(const char *devpath, const char *label)
-{
+{	
+	//reset global variables
+	g_buf = NULL;
+	g_mft_bitmap_byte_size = 0;
+	g_mft_bitmap = NULL;
+	g_lcn_bitmap_byte_size = 0;
+	g_dynamic_buf_size = 0;
+	g_dynamic_buf = NULL;
+	g_rl_mft = NULL;
+	g_rl_mft_bmp = NULL;
+	g_rl_mftmirr = NULL;
+	g_rl_logfile = NULL;
+	g_rl_boot = NULL;
+	g_rl_bad = NULL;
+	g_index_block = NULL;
+	g_vol = NULL;
+	g_mft_size = 0;
+	g_mft_lcn = 0;
+	g_mftmirr_lcn = 0;
+	g_logfile_lcn = 0;
+	g_logfile_size = 0;
+	g_mft_zone_end = 0;	
+	g_num_bad_blocks = 0;
+	g_bad_blocks = NULL;
+	g_allocation = NULL;
+	
+	//init default options
 	mkntfs_init_options(&opts);	
-	
-	opts.dev_name = (char*)devpath;
-	opts.label = (char*)label;
-	
+
+	opts.dev_name = devpath;
+	opts.label = label;
+
 	opts.force = TRUE;
 	opts.quick_format = TRUE;
-	
+
 	return mkntfs_redirect(&opts);
 }
+

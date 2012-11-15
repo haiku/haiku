@@ -60,11 +60,11 @@ class TBarMenuBar : public BMenuBar {
 		void DrawBackground(BRect);
 		void SmartResize(float width = -1.0f, float height = -1.0f);
 
-		void AddTeamMenu();
-		void RemoveTeamMenu();
+		bool AddTeamMenu();
+		bool RemoveTeamMenu();
 
-		void AddSeperatorItem();
-		void RemoveSeperatorItem();
+		bool AddSeperatorItem();
+		bool RemoveSeperatorItem();
 
 		void InitTrackingHook(bool (* hookfunction)(BMenu*, void*), void* state,
 			bool both = false);
