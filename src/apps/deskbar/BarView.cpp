@@ -160,6 +160,7 @@ TBarView::~TBarView()
 {
 	delete fDragMessage;
 	delete fCachedTypesList;
+	delete fBarMenuBar;
 
 	RemoveExpandedItems();
 }
