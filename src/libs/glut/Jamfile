@@ -62,9 +62,9 @@ Includes [ FGristFiles $(sourcesCc) $(sourcesCpp) ]
 Includes [ FGristFiles $(sourcesCc) $(sourcesCpp) ]
 	: $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
 
-MergeObject <opengl>glut.o :
-	# C++ sources
+SharedLibrary libglut.so :
 	$(sourcesCpp)
-	# C sources
 	$(sourcesCc)
+	:
+	GL game be $(TARGET_LIBSTDC++)
 ;

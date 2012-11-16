@@ -86,8 +86,8 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo $(X86_ONLY)GLTeapot
 SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
-	libgame.so $(X86_ONLY)libGL.so libgnu.so
-	libmail.so libmedia.so libmidi.so libmidi2.so
+	libgame.so $(X86_ONLY)libGL.so $(X86_ONLY)libglut.so
+	libgnu.so libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
 	<revisioned>libroot.so libroot-addon-icu.so
 	libscreensaver.so
@@ -305,9 +305,8 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 }
 
 
-# libGL.so has GLU (like BeOS) *and* GLUT API built-in
-SYSTEM_LIBS_LIBGL_ALIASES
-	= libGLU.so libglut.so ;
+# libGL.so has GLU (like BeOS) built-in
+SYSTEM_LIBS_LIBGL_ALIASES = libGLU.so ;
 
 if $(TARGET_ARCH) = x86 {
 	local lib ;
