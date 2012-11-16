@@ -34,11 +34,12 @@ local genericSources =
 	s_isnan.c s_isnanf.c
 	s_signbit.c s_signbitf.c s_signbitl.c
 
-	s_floor.c
+	s_floor.c s_floorf.c
 	s_ceil.c s_ceilf.c
 	s_modf.c
 	w_pow.c e_pow.c slowpow.c
-	e_exp.c slowexp.c
+	w_exp.c e_exp.c slowexp.c
+	s_frexp.c s_expm1.c
 	dosincos.c
 	doasin.c
 	sincos32.c
@@ -51,10 +52,15 @@ local genericSources =
 	e_asin.c w_asin.c
 	e_log10.c w_log10.c
 	e_acos.c w_acos.c
-	e_atan2.c w_atan2.c mpatan2.c mpatan.c mptan.c mpsqrt.c
+	e_atan2.c w_atan2.c mpatan2.c mpatan.c mptan.c mpsqrt.c w_sqrt.c w_sqrtf.c
 	e_fmod.c w_fmod.c
 	e_log.c w_log.c
+	e_cosh.c w_cosh.c
+	e_sinh.c w_sinh.c
 	s_ldexp.c s_ldexpf.c
+	s_scalbnf.c s_scalbn.c
+	s_copysign.c
+	s_tanh.c
 ;
 
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
@@ -63,6 +69,7 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
 
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_others.o :
 	e_sqrt.c
+	e_sqrtf.c
 ;
 
 MergeObjectFromObjects posix_gnu_arch_$(TARGET_ARCH).o : :
