@@ -56,7 +56,8 @@ const float kSepItemWidth = 5.0f;
 TBarMenuBar::TBarMenuBar(TBarView* bar, BRect frame, const char* name)
 	: BMenuBar(frame, name, B_FOLLOW_NONE, B_ITEMS_IN_ROW, false),
 	fBarView(bar),
-	fAppListMenuItem(NULL)
+	fAppListMenuItem(NULL),
+	fSeparatorItem(NULL)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 
