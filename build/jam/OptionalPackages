@@ -1100,9 +1100,7 @@ if [ IsOptionalHaikuImagePackageAdded HGrep ] {
 
 # ICU
 if [ IsOptionalHaikuImagePackageAdded ICU ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package ICU available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) = 2 {
 			# unzip gcc2
 			InstallOptionalHaikuImagePackage $(HAIKU_ICU_GCC_2_PACKAGE)
@@ -1126,6 +1124,12 @@ if [ IsOptionalHaikuImagePackageAdded ICU ] {
 					: system lib gcc2 ;
 			}
 		}
+	} else if $(TARGET_ARCH) = arm {
+		InstallOptionalHaikuImagePackage $(HAIKU_ICU_ARM_PACKAGE)
+			: $(baseURL)/(HAIKU_ICU_ARM_PACKAGE)
+			: system lib ;
+	} else {
+		Echo "No optional package ICU available for $(TARGET_ARCH)" ;
 	}
 }
 
