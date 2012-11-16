@@ -88,7 +88,6 @@ TTimeView::TTimeView(float maxWidth, float height, bool use24HourClock,
 	fLastTimeStr[0] = 0;
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
-	UpdateTimeFormat();
 
 	fLocale = *BLocale::Default();
 }
@@ -385,7 +384,24 @@ TTimeView::ShowCalendar(BPoint where)
 void
 TTimeView::GetCurrentTime()
 {
-	fLocale.FormatTime(fCurrentTimeStr, 64, fCurrentTime, fTimeFormat);
+	char tmp[sizeof(fCurrentTimeStr)];
+	ssize_t offset = 0;
+
+	if (fShowSeconds) {
+		fLocale.FormatTime(tmp, sizeof(fCurrentTimeStr), fCurrentTime,
+			B_MEDIUM_TIME_FORMAT);
+	} else {
+		fLocale.FormatTime(tmp, sizeof(fCurrentTimeStr), fCurrentTime,
+			B_SHORT_TIME_FORMAT);
+	}
+
+	if (fShowDayOfWeek) {
+		BString timeFormat("eee ");
+		offset = fLocale.FormatTime(fCurrentTimeStr, sizeof(fCurrentTimeStr),
+			fCurrentTime, timeFormat);
+	}
+
+	strlcpy(fCurrentTimeStr + offset, tmp, sizeof(fCurrentTimeStr) - offset);
 }
 
 
@@ -394,7 +410,8 @@ TTimeView::GetCurrentDate()
 {
 	char tmp[64];
 
-	fLocale.FormatDate(tmp, 64, fCurrentTime, B_FULL_DATE_FORMAT);
+	fLocale.FormatDate(tmp, sizeof(fCurrentDateStr), fCurrentTime,
+		B_FULL_DATE_FORMAT);
 
 	// remove leading 0 from date when month is less than 10 (MM/DD/YY)
 	// or remove leading 0 from date when day is less than 10 (DD/MM/YY)
@@ -460,7 +477,6 @@ void
 TTimeView::Update()
 {
 	fLocale = *BLocale::Default();
-	UpdateTimeFormat();
 
 	GetCurrentTime();
 	GetCurrentDate();
@@ -471,27 +487,4 @@ TTimeView::Update()
 
 	if (fParent != NULL)
 		fParent->Invalidate();
-}
-
-
-void
-TTimeView::UpdateTimeFormat()
-{
-	BString timeFormat;
-
-	if (fShowDayOfWeek)
-		timeFormat.Append("eee ");
-
-	if (fUse24HourClock)
-		timeFormat.Append("H:mm");
-	else
-		timeFormat.Append("h:mm");
-
-	if (fShowSeconds)
-		timeFormat.Append(":ss");
-
-	if (!fUse24HourClock)
-		timeFormat.Append(" a");
-
-	fTimeFormat = timeFormat;
 }
