@@ -61,6 +61,7 @@ local genericSources =
 	s_scalbnf.c s_scalbn.c
 	s_copysign.c
 	s_tanh.c
+	s_lround.c s_lroundf.c s_round.c s_roundf.c
 ;
 
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
