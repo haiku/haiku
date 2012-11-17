@@ -384,31 +384,35 @@ TTimeView::ShowCalendar(BPoint where)
 void
 TTimeView::GetCurrentTime()
 {
-	char tmp[sizeof(fCurrentTimeStr)];
 	ssize_t offset = 0;
 
-	if (fShowSeconds) {
-		fLocale.FormatTime(tmp, sizeof(fCurrentTimeStr), fCurrentTime,
-			B_MEDIUM_TIME_FORMAT);
-	} else {
-		fLocale.FormatTime(tmp, sizeof(fCurrentTimeStr), fCurrentTime,
-			B_SHORT_TIME_FORMAT);
-	}
+	// ToDo: Check to see if we should write day of week after time for locale
 
 	if (fShowDayOfWeek) {
 		BString timeFormat("eee ");
 		offset = fLocale.FormatTime(fCurrentTimeStr, sizeof(fCurrentTimeStr),
 			fCurrentTime, timeFormat);
+
+		if (offset < 0) {
+			// error occured, attempt to overwrite with current time
+			// (this should not ever happen)
+			fLocale.FormatTime(fCurrentTimeStr, sizeof(fCurrentTimeStr),
+				fCurrentTime,
+				fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
+			return;
+		}
 	}
 
-	strlcpy(fCurrentTimeStr + offset, tmp, sizeof(fCurrentTimeStr) - offset);
+	fLocale.FormatTime(fCurrentTimeStr + offset,
+		sizeof(fCurrentTimeStr) - offset, fCurrentTime,
+		fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
 }
 
 
 void
 TTimeView::GetCurrentDate()
 {
-	char tmp[64];
+	char tmp[sizeof(fCurrentTimeStr)];
 
 	fLocale.FormatDate(tmp, sizeof(fCurrentDateStr), fCurrentTime,
 		B_FULL_DATE_FORMAT);
