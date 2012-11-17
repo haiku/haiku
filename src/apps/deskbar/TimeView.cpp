@@ -412,7 +412,7 @@ TTimeView::GetCurrentTime()
 void
 TTimeView::GetCurrentDate()
 {
-	char tmp[sizeof(fCurrentTimeStr)];
+	char tmp[sizeof(fCurrentDateStr)];
 
 	fLocale.FormatDate(tmp, sizeof(fCurrentDateStr), fCurrentTime,
 		B_FULL_DATE_FORMAT);
