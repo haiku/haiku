@@ -1,5 +1,5 @@
 SubDir HAIKU_TOP src tests kits opengl glinfo ;
-
+SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 # For GCC2
