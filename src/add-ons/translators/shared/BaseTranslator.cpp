@@ -549,7 +549,7 @@ BaseTranslator::translate_from_bits_to_bits(BPositionIO *inSource,
 				if (writ < 0)
 					break;
 				remaining -= static_cast<uint32>(writ);
-				rd = inSource->Read(buf, std::min(1024UL, 
+				rd = inSource->Read(buf, std::min((uint32)1024,
 					remaining));
 			}
 
