@@ -18,20 +18,16 @@ class Thread;
 class DebugReportGenerator : public BReferenceable
 {
 public:
-								DebugReportGenerator(::Team* team,
-									Architecture* architecture);
+								DebugReportGenerator(::Team* team);
 								~DebugReportGenerator();
 
-			void				Init();
+			status_t			Init();
 
-	static	DebugReportGenerator* Create(::Team* team,
-									Architecture* architecture);
+	static	DebugReportGenerator* Create(::Team* team);
 
 			status_t			GenerateReport(const entry_ref& outputPath);
 
 private:
-			void				_Init();
-
 			status_t			_GenerateReportHeader(BString& output);
 			status_t			_DumpLoadedImages(BString& output);
 			status_t			_DumpRunningThreads(BString& output);

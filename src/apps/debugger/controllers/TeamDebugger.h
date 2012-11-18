@@ -20,6 +20,7 @@
 
 
 class DebuggerInterface;
+class DebugReportGenerator;
 class FileManager;
 class SettingsManager;
 class TeamDebugInfo;
@@ -78,6 +79,9 @@ private:
 
 	virtual void				InspectRequested(target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
+
+	virtual void				DebugReportRequested(entry_ref* targetPath);
+
 	virtual	bool				UserInterfaceQuitRequested(
 									QuitOption quitOption);
 
@@ -143,6 +147,9 @@ private:
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
 
+			void				_HandleGenerateDebugReport(
+									const entry_ref& target);
+
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);
 
 			status_t			_AddImage(const ImageInfo& imageInfo,
@@ -170,6 +177,8 @@ private:
 			WatchpointManager*	fWatchpointManager;
 			TeamMemoryBlockManager*
 								fMemoryBlockManager;
+			DebugReportGenerator*
+								fReportGenerator;
 			thread_id			fDebugEventListener;
 			UserInterface*		fUserInterface;
 	volatile bool				fTerminating;

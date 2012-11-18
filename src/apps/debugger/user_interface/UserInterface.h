@@ -14,6 +14,8 @@
 #include "Types.h"
 
 
+class entry_ref;
+
 class CpuState;
 class FunctionInstance;
 class Image;
@@ -115,6 +117,8 @@ public:
 	virtual void				InspectRequested(
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener) = 0;
+
+	virtual void				DebugReportRequested(entry_ref* path) = 0;
 
 	virtual	bool				UserInterfaceQuitRequested(
 									QuitOption quitOption

@@ -21,12 +21,11 @@
 #include "UiUtils.h"
 
 
-DebugReportGenerator::DebugReportGenerator(::Team* team,
-	Architecture* architecture)
+DebugReportGenerator::DebugReportGenerator(::Team* team)
 	:
 	BReferenceable(),
 	fTeam(team),
-	fArchitecture(architecture)
+	fArchitecture(team->GetArchitecture())
 {
 	fArchitecture->AcquireReference();
 }
@@ -38,19 +37,21 @@ DebugReportGenerator::~DebugReportGenerator()
 }
 
 
-void
+status_t
 DebugReportGenerator::Init()
 {
+	// TODO: anything needed here?
+	return B_OK;
 }
 
 
 DebugReportGenerator*
-DebugReportGenerator::Create(::Team* team, Architecture* architecture)
+DebugReportGenerator::Create(::Team* team)
 {
-	DebugReportGenerator* self = new DebugReportGenerator(team, architecture);
+	DebugReportGenerator* self = new DebugReportGenerator(team);
 
 	try {
-		self->_Init();
+		self->Init();
 	} catch (...) {
 		delete self;
 		throw;
@@ -89,16 +90,15 @@ DebugReportGenerator::GenerateReport(const entry_ref& outputPath)
 }
 
 
-void
-DebugReportGenerator::_Init()
-{
-
-}
-
-
 status_t
 DebugReportGenerator::_GenerateReportHeader(BString& _output)
 {
+	AutoLocker<Team> locker(fTeam);
+
+	BString data;
+	data.SetToFormat("Debug information for team %s (%" B_PRId32 "):\n\n");
+	_output << data;
+
 	return B_OK;
 }
 

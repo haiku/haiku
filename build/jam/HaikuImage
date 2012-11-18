@@ -248,7 +248,7 @@ AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
 	: $(ATA_ONLY)ata_adapter $(X86_ONLY)bios dpc $(IDE_ONLY)ide_adapter
-		locked_pool mpu401 scsi_periph <module>tty ;
+		locked_pool mpu401 scsi_periph <module>tty ; #$(X86_ONLY)cpuidle ;
 AddFilesToHaikuImage system add-ons kernel partitioning_systems
 	: amiga_rdb apple efi_gpt intel session ;
 AddFilesToHaikuImage system add-ons kernel interrupt_controllers
@@ -262,6 +262,7 @@ if $(TARGET_ARCH) = x86 {
 AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToHaikuImage power : $(X86_ONLY)enhanced_speedstep ;
 AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_battery ;
+#AddNewDriversToHaikuImage power : $(X86_ONLY)x86_cpuidle ;
 
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf null
