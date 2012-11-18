@@ -13,7 +13,7 @@ local defines = [ FDefines _BOOT_MODE ] ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags -fno-rtti $(defines) ;
 
-KernelStaticLibrary boot_fatfs :
+BootStaticLibrary boot_fatfs :
 	fatfs.cpp
 	Volume.cpp
 	CachedBlock.cpp

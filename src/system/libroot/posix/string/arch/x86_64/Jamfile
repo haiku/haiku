@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src system libroot posix string arch x86_64 ;
+
+UsePrivateSystemHeaders ;
+
+MergeObject posix_string_arch_$(TARGET_ARCH).o :
+	arch_string.S
+;
+

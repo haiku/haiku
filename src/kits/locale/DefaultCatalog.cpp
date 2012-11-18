@@ -359,7 +359,7 @@ DefaultCatalog::WriteToFile(const char *path)
 		return res;
 
 	BMallocIO mallocIO;
-	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, 256L));
+	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, (int32)256));
 		// set a largish block-size in order to avoid reallocs
 	res = Flatten(&mallocIO);
 	if (res == B_OK) {
@@ -390,7 +390,7 @@ DefaultCatalog::WriteToAttribute(const entry_ref &appOrAddOnRef)
 		return res;
 
 	BMallocIO mallocIO;
-	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, 256L));
+	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, (int32)256));
 		// set a largish block-size in order to avoid reallocs
 	res = Flatten(&mallocIO);
 
@@ -421,7 +421,7 @@ DefaultCatalog::WriteToResource(const entry_ref &appOrAddOnRef)
 		return res;
 
 	BMallocIO mallocIO;
-	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, 256L));
+	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, (int32)256));
 		// set a largish block-size in order to avoid reallocs
 	res = Flatten(&mallocIO);
 

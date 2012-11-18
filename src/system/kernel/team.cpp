@@ -976,7 +976,7 @@ ProcessGroup::ProcessGroup(pid_t id)
 
 ProcessGroup::~ProcessGroup()
 {
-	TRACE(("ProcessGroup::~ProcessGroup(): id = %ld\n", group->id));
+	TRACE(("ProcessGroup::~ProcessGroup(): id = %" B_PRId32 "\n", id));
 
 	// If the group is in the orphaned check list, remove it.
 	MutexLocker orphanedCheckLocker(sOrphanedCheckLock);
@@ -1114,38 +1114,39 @@ static void
 _dump_team_info(Team* team)
 {
 	kprintf("TEAM: %p\n", team);
-	kprintf("id:               %ld (%#lx)\n", team->id, team->id);
+	kprintf("id:               %" B_PRId32 " (%#" B_PRIx32 ")\n", team->id,
+		team->id);
 	kprintf("serial_number:    %" B_PRId64 "\n", team->serial_number);
 	kprintf("name:             '%s'\n", team->Name());
 	kprintf("args:             '%s'\n", team->Args());
 	kprintf("hash_next:        %p\n", team->hash_next);
 	kprintf("parent:           %p", team->parent);
 	if (team->parent != NULL) {
-		kprintf(" (id = %ld)\n", team->parent->id);
+		kprintf(" (id = %" B_PRId32 ")\n", team->parent->id);
 	} else
 		kprintf("\n");
 
 	kprintf("children:         %p\n", team->children);
 	kprintf("num_threads:      %d\n", team->num_threads);
 	kprintf("state:            %d\n", team->state);
-	kprintf("flags:            0x%lx\n", team->flags);
+	kprintf("flags:            0x%" B_PRIx32 "\n", team->flags);
 	kprintf("io_context:       %p\n", team->io_context);
 	if (team->address_space)
 		kprintf("address_space:    %p\n", team->address_space);
-	kprintf("user data:        %p (area %ld)\n", (void*)team->user_data,
-		team->user_data_area);
+	kprintf("user data:        %p (area %" B_PRId32 ")\n",
+		(void*)team->user_data, team->user_data_area);
 	kprintf("free user thread: %p\n", team->free_user_threads);
 	kprintf("main_thread:      %p\n", team->main_thread);
 	kprintf("thread_list:      %p\n", team->thread_list);
-	kprintf("group_id:         %ld\n", team->group_id);
-	kprintf("session_id:       %ld\n", team->session_id);
+	kprintf("group_id:         %" B_PRId32 "\n", team->group_id);
+	kprintf("session_id:       %" B_PRId32 "\n", team->session_id);
 }
 
 
 static int
 dump_team_info(int argc, char** argv)
 {
-	team_id id = -1;
+	ulong arg;
 	bool found = false;
 
 	if (argc < 2) {
@@ -1157,10 +1158,10 @@ dump_team_info(int argc, char** argv)
 		return 0;
 	}
 
-	id = strtoul(argv[1], NULL, 0);
-	if (IS_KERNEL_ADDRESS(id)) {
+	arg = strtoul(argv[1], NULL, 0);
+	if (IS_KERNEL_ADDRESS(arg)) {
 		// semi-hack
-		_dump_team_info((Team*)id);
+		_dump_team_info((Team*)arg);
 		return 0;
 	}
 
@@ -1168,7 +1169,7 @@ dump_team_info(int argc, char** argv)
 	for (TeamTable::Iterator it = sTeamHash.GetIterator();
 		Team* team = it.Next();) {
 		if ((team->Name() && strcmp(argv[1], team->Name()) == 0)
-			|| team->id == id) {
+			|| team->id == (team_id)arg) {
 			_dump_team_info(team);
 			found = true;
 			break;
@@ -1176,7 +1177,7 @@ dump_team_info(int argc, char** argv)
 	}
 
 	if (!found)
-		kprintf("team \"%s\" (%ld) doesn't exist!\n", argv[1], id);
+		kprintf("team \"%s\" (%" B_PRId32 ") doesn't exist!\n", argv[1], (team_id)arg);
 	return 0;
 }
 
@@ -1184,11 +1185,12 @@ dump_team_info(int argc, char** argv)
 static int
 dump_teams(int argc, char** argv)
 {
-	kprintf("team           id  parent      name\n");
+	kprintf("%-*s       id  %-*s    name\n", B_PRINTF_POINTER_WIDTH, "team",
+		B_PRINTF_POINTER_WIDTH, "parent");
 
 	for (TeamTable::Iterator it = sTeamHash.GetIterator();
 		Team* team = it.Next();) {
-		kprintf("%p%7ld  %p  %s\n", team, team->id, team->parent, team->Name());
+		kprintf("%p%7" B_PRId32 "  %p  %s\n", team, team->id, team->parent, team->Name());
 	}
 
 	return 0;
@@ -1480,7 +1482,8 @@ team_create_thread_start_internal(void* args)
 	team = thread->team;
 	cache_node_launched(teamArgs->arg_count, teamArgs->flat_args);
 
-	TRACE(("team_create_thread_start: entry thread %ld\n", thread->id));
+	TRACE(("team_create_thread_start: entry thread %" B_PRId32 "\n",
+		thread->id));
 
 	// Main stack area layout is currently as follows (starting from 0):
 	//
@@ -1602,8 +1605,8 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	const char* path = flatArgs[0];
 
-	TRACE(("load_image_internal: name '%s', args = %p, argCount = %ld\n",
-		path, flatArgs, argCount));
+	TRACE(("load_image_internal: name '%s', args = %p, argCount = %" B_PRId32
+		"\n", path, flatArgs, argCount));
 
 	// cut the path from the main thread name
 	const char* threadName = strrchr(path, '/');
@@ -1802,8 +1805,9 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	const char* threadName;
 	thread_id nubThreadID = -1;
 
-	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %ld\n",
-		path, argCount, envCount, team->id));
+	TRACE(("exec_team(path = \"%s\", argc = %" B_PRId32 ", envCount = %"
+		B_PRId32 "): team %" B_PRId32 "\n", path, argCount, envCount,
+		team->id));
 
 	T(ExecTeam(path, argCount, flatArgs, envCount, flatArgs + argCount + 1));
 
@@ -1938,9 +1942,10 @@ fork_team(void)
 	struct area_info info;
 	thread_id threadID;
 	status_t status;
-	int32 cookie;
+	ssize_t areaCookie;
+	int32 imageCookie;
 
-	TRACE(("fork_team(): team %ld\n", parentTeam->id));
+	TRACE(("fork_team(): team %" B_PRId32 "\n", parentTeam->id));
 
 	if (parentTeam == team_get_kernel_team())
 		return B_NOT_ALLOWED;
@@ -2026,8 +2031,8 @@ fork_team(void)
 	// TODO: should be able to handle stack areas differently (ie. don't have
 	// them copy-on-write)
 
-	cookie = 0;
-	while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+	areaCookie = 0;
+	while (get_next_area_info(B_CURRENT_TEAM, &areaCookie, &info) == B_OK) {
 		if (info.area == parentTeam->user_data_area) {
 			// don't clone the user area; just create a new one
 			status = create_team_user_data(team);
@@ -2054,7 +2059,7 @@ fork_team(void)
 
 	if (thread->user_thread == NULL) {
 #if KDEBUG
-		panic("user data area not found, parent area is %ld",
+		panic("user data area not found, parent area is %" B_PRId32,
 			parentTeam->user_data_area);
 #endif
 		status = B_ERROR;
@@ -2073,8 +2078,9 @@ fork_team(void)
 
 	// copy image list
 	image_info imageInfo;
-	cookie = 0;
-	while (get_next_image_info(parentTeam->id, &cookie, &imageInfo) == B_OK) {
+	imageCookie = 0;
+	while (get_next_image_info(parentTeam->id, &imageCookie, &imageInfo)
+			== B_OK) {
 		image_id image = register_image(team, &imageInfo, sizeof(imageInfo));
 		if (image < 0)
 			goto err5;
@@ -2237,7 +2243,7 @@ job_control_entry::~job_control_entry()
 		ProcessGroup* group = sGroupHash.Lookup(group_id);
 		if (group == NULL) {
 			panic("job_control_entry::~job_control_entry(): unknown group "
-				"ID: %ld", group_id);
+				"ID: %" B_PRId32, group_id);
 			return;
 		}
 
@@ -2302,7 +2308,8 @@ wait_for_child(pid_t child, uint32 flags, siginfo_t& _info)
 	struct job_control_entry* freeDeathEntry = NULL;
 	status_t status = B_OK;
 
-	TRACE(("wait_for_child(child = %ld, flags = %ld)\n", child, flags));
+	TRACE(("wait_for_child(child = %" B_PRId32 ", flags = %" B_PRId32 ")\n",
+		child, flags));
 
 	T(WaitForChild(child, flags));
 
@@ -4076,7 +4083,7 @@ _user_load_image(const char* const* userFlatArgs, size_t flatArgsSize,
 	int32 argCount, int32 envCount, int32 priority, uint32 flags,
 	port_id errorPort, uint32 errorToken)
 {
-	TRACE(("_user_load_image: argc = %ld\n", argCount));
+	TRACE(("_user_load_image: argc = %" B_PRId32 "\n", argCount));
 
 	if (argCount < 1)
 		return B_BAD_VALUE;

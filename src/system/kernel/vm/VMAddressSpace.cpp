@@ -195,8 +195,9 @@ VMAddressSpace::Create(team_id teamID, addr_t base, size_t size, bool kernel,
 		return status;
 	}
 
-	TRACE(("VMAddressSpace::Create(): team %ld (%skernel): %#lx bytes starting at "
-		"%#lx => %p\n", teamID, kernel ? "" : "!", size, base, addressSpace));
+	TRACE(("VMAddressSpace::Create(): team %" B_PRId32 " (%skernel): %#lx "
+		"bytes starting at %#lx => %p\n", teamID, kernel ? "" : "!", size,
+		base, addressSpace));
 
 	// create the corresponding translation map
 	status = arch_vm_translation_map_create_map(kernel,
@@ -343,8 +344,9 @@ VMAddressSpace::_DumpCommand(int argc, char** argv)
 /*static*/ int
 VMAddressSpace::_DumpListCommand(int argc, char** argv)
 {
-	kprintf("   address      id         base          end   area count   "
-		" area size\n");
+	kprintf("  %*s      id     %*s     %*s   area count    area size\n",
+		B_PRINTF_POINTER_WIDTH, "address", B_PRINTF_POINTER_WIDTH, "base",
+		B_PRINTF_POINTER_WIDTH, "end");
 
 	AddressSpaceTable::Iterator it = sAddressSpaceTable.GetIterator();
 	while (VMAddressSpace* space = it.Next()) {

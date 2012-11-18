@@ -224,9 +224,9 @@ Settings::WriteSwapSettings()
 		return B_ERROR;
 
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "vm %s\nswap_auto %s\nswap_size %lld\n"
-		"swap_volume_name %s\nswap_volume_device %s\n"
-		"swap_volume_filesystem %s\nswap_volume_capacity %lld\n",
+	snprintf(buffer, sizeof(buffer), "vm %s\nswap_auto %s\nswap_size %"
+		B_PRIdOFF "\nswap_volume_name %s\nswap_volume_device %s\n"
+		"swap_volume_filesystem %s\nswap_volume_capacity %" B_PRIdOFF "\n",
 		SwapEnabled() ? "on" : "off", SwapAutomatic() ? "yes" : "no",
 		SwapSize(), info.volume_name, info.device_name, info.fsh_name,
 		info.total_blocks * info.block_size);

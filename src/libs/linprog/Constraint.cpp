@@ -335,7 +335,7 @@ Constraint::ToString() const
 	BString string;
 	string << "Constraint ";
 	string << fLabel;
-	string << "(" << (int32)this << "): ";
+	string << "(" << (addr_t)this << "): ";
 
 	for (int i = 0; i < fLeftSide->CountItems(); i++) {
 		Summand* s = static_cast<Summand*>(fLeftSide->ItemAt(i));

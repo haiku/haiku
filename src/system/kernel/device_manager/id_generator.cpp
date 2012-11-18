@@ -225,7 +225,7 @@ dm_free_id(const char* name, uint32 id)
 	// make sure it's really allocated
 	// (very important to keep <num_ids> in sync
 	if ((generator->alloc_map[id / 8] & (1 << (id & 7))) == 0) {
-		dprintf("id %ld of generator %s wasn't allocated\n", id,
+		dprintf("id %" B_PRIu32 " of generator %s wasn't allocated\n", id,
 			generator->name);
 
 		release_generator(generator);

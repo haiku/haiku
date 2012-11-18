@@ -403,8 +403,9 @@ dump_port_list(int argc, char** argv)
 			|| (name != NULL && strstr(port->lock.name, name) == NULL))
 			continue;
 
-		kprintf("%p %8ld %4ld %9ld %9ld %8ld %6ld  %s\n", port,
-			port->id, port->capacity, port->read_count, port->write_count,
+		kprintf("%p %8" B_PRId32 " %4" B_PRId32 " %9" B_PRIu32 " %9" B_PRId32
+			" %8" B_PRId32 " %6" B_PRId32 "  %s\n", port, port->id,
+			port->capacity, port->read_count, port->write_count,
 			port->total_count, port->owner, port->lock.name);
 	}
 
@@ -416,20 +417,20 @@ static void
 _dump_port_info(Port* port)
 {
 	kprintf("PORT: %p\n", port);
-	kprintf(" id:              %ld\n", port->id);
+	kprintf(" id:              %" B_PRId32 "\n", port->id);
 	kprintf(" name:            \"%s\"\n", port->lock.name);
-	kprintf(" owner:           %ld\n", port->owner);
-	kprintf(" capacity:        %ld\n", port->capacity);
-	kprintf(" read_count:      %ld\n", port->read_count);
-	kprintf(" write_count:     %ld\n", port->write_count);
-	kprintf(" total count:     %ld\n", port->total_count);
+	kprintf(" owner:           %" B_PRId32 "\n", port->owner);
+	kprintf(" capacity:        %" B_PRId32 "\n", port->capacity);
+	kprintf(" read_count:      %" B_PRIu32 "\n", port->read_count);
+	kprintf(" write_count:     %" B_PRId32 "\n", port->write_count);
+	kprintf(" total count:     %" B_PRId32 "\n", port->total_count);
 
 	if (!port->messages.IsEmpty()) {
 		kprintf("messages:\n");
 
 		MessageList::Iterator iterator = port->messages.GetIterator();
 		while (port_message* message = iterator.Next()) {
-			kprintf(" %p  %08lx  %ld\n", message, message->code, message->size);
+			kprintf(" %p  %08" B_PRIx32 "  %ld\n", message, message->code, message->size);
 		}
 	}
 
@@ -463,7 +464,8 @@ dump_port_info(int argc, char** argv)
 		int32 num = parse_expression(argv[1]);
 		Port* port = sPorts.Lookup(num);
 		if (port == NULL) {
-			kprintf("port %ld (%#lx) doesn't exist!\n", num, num);
+			kprintf("port %" B_PRId32 " (%#" B_PRIx32 ") doesn't exist!\n",
+				num, num);
 			return 0;
 		}
 		_dump_port_info(port);
@@ -1180,7 +1182,7 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 	// determine tail & get the length of the message
 	port_message* message = port->messages.Head();
 	if (message == NULL) {
-		panic("port %ld: no messages found\n", port->id);
+		panic("port %" B_PRId32 ": no messages found\n", port->id);
 		return B_ERROR;
 	}
 
@@ -1289,7 +1291,7 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 	// determine tail & get the length of the message
 	port_message* message = port->messages.Head();
 	if (message == NULL) {
-		panic("port %ld: no messages found\n", port->id);
+		panic("port %" B_PRId32 ": no messages found\n", port->id);
 		return B_ERROR;
 	}
 

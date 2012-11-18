@@ -20,8 +20,13 @@ typedef signed short		__haiku_std_int16;
 typedef unsigned short		__haiku_std_uint16;
 typedef signed int			__haiku_std_int32;
 typedef unsigned int		__haiku_std_uint32;
+#ifdef __HAIKU_ARCH_64_BIT
+typedef signed long			__haiku_std_int64;
+typedef unsigned long		__haiku_std_uint64;
+#else
 typedef signed long long	__haiku_std_int64;
 typedef unsigned long long	__haiku_std_uint64;
+#endif
 
 typedef __haiku_std_int8	__haiku_int8;
 typedef __haiku_std_uint8	__haiku_uint8;
@@ -38,17 +43,12 @@ typedef __haiku_std_int64	__haiku_int64;
 typedef __haiku_std_uint64	__haiku_uint64;
 
 /* address types */
-#ifdef __HAIKU_ARCH_64_BIT
-	typedef	__haiku_int64	__haiku_saddr_t;
-	typedef	__haiku_uint64	__haiku_addr_t;
-#else
-	typedef	__haiku_int32	__haiku_saddr_t;
-	typedef	__haiku_uint32	__haiku_addr_t;
-#endif
+typedef signed long int		__haiku_saddr_t;
+typedef	unsigned long int	__haiku_addr_t;
 
 #ifdef __HAIKU_ARCH_PHYSICAL_64_BIT
-	typedef	__haiku_int64	__haiku_phys_saddr_t;
-	typedef	__haiku_uint64	__haiku_phys_addr_t;
+	typedef __haiku_int64	__haiku_phys_saddr_t;
+	typedef __haiku_uint64	__haiku_phys_addr_t;
 #else
 	typedef	__haiku_int32	__haiku_phys_saddr_t;
 	typedef	__haiku_uint32	__haiku_phys_addr_t;
@@ -76,20 +76,20 @@ typedef __haiku_std_uint64	__haiku_uint64;
 
 /* printf()/scanf() format prefixes */
 #define	__HAIKU_STD_PRI_PREFIX_32	""
-#define	__HAIKU_STD_PRI_PREFIX_64	"ll"
+#ifdef __HAIKU_ARCH_64_BIT
+#	define	__HAIKU_STD_PRI_PREFIX_64	"l"
+#else
+#	define	__HAIKU_STD_PRI_PREFIX_64	"ll"
+#endif
 
 #ifdef __HAIKU_BEOS_COMPATIBLE_TYPES
-#	define	__HAIKU_PRI_PREFIX_32	"l"
+#	define	__HAIKU_PRI_PREFIX_32		"l"
 #else
-#	define	__HAIKU_PRI_PREFIX_32	__HAIKU_STD_PRI_PREFIX_32
+#	define	__HAIKU_PRI_PREFIX_32		__HAIKU_STD_PRI_PREFIX_32
 #endif
-#define	__HAIKU_PRI_PREFIX_64		__HAIKU_STD_PRI_PREFIX_64
+#define	__HAIKU_PRI_PREFIX_64			__HAIKU_STD_PRI_PREFIX_64
 
-#ifdef __HAIKU_ARCH_64_BIT
-#	define __HAIKU_PRI_PREFIX_ADDR	__HAIKU_PRI_PREFIX_64
-#else
-#	define __HAIKU_PRI_PREFIX_ADDR	__HAIKU_PRI_PREFIX_32
-#endif
+#define __HAIKU_PRI_PREFIX_ADDR			"l"
 
 #ifdef __HAIKU_ARCH_PHYSICAL_64_BIT
 #	define __HAIKU_PRI_PREFIX_PHYS_ADDR	__HAIKU_PRI_PREFIX_64

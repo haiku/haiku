@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 
+#include <vm/vm_types.h>
+
 
 struct kernel_args;
 struct VMPhysicalPageMapper;
@@ -30,7 +32,7 @@ public:
 									addr_t virtualAddress,
 									phys_addr_t physicalAddress,
 									uint8 attributes,
-									phys_addr_t (*get_free_page)(kernel_args*))
+									page_num_t (*get_free_page)(kernel_args*))
 										= 0;
 
 	virtual	bool				IsKernelPageAccessible(addr_t virtualAddress,

@@ -8,12 +8,12 @@
 
 #include <KernelExport.h>
 #include <PCI.h>
+#include <drivers/bios.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 #include <graphic_driver.h>
 #include <boot_item.h>
-#include <arch/x86/vm86.h>
 
 #include "DriverInterface.h"
 
@@ -249,52 +249,60 @@ GetEdidFromBIOS(edid1_raw& edidRaw)
 #define ADDRESS_SEGMENT(address) ((addr_t)(address) >> 4)
 #define ADDRESS_OFFSET(address) ((addr_t)(address) & 0xf)
 
-	vm86_state vmState;
-
-	status_t status = vm86_prepare(&vmState, 0x2000);
+	bios_module_info* biosModule;
+	status_t status = get_module(B_BIOS_MODULE_NAME, (module_info**)&biosModule);
 	if (status != B_OK) {
-		TRACE("GetEdidFromBIOS(); vm86_prepare() failed, status: 0x%lx\n",
+		TRACE("GetEdidFromBIOS(): failed to get BIOS module: 0x%" B_PRIx32 "\n",
 			status);
 		return status;
 	}
 
-	vmState.regs.eax = 0x4f15;
-	vmState.regs.ebx = 0;		// 0 = report DDC service
-	vmState.regs.ecx = 0;
-	vmState.regs.es = 0;
-	vmState.regs.edi = 0;
+	bios_state* state;
+	status = biosModule->prepare(&state);
+	if (status != B_OK) {
+		TRACE("GetEdidFromBIOS(): bios_prepare() failed: 0x%" B_PRIx32 "\n",
+			status);
+		put_module(B_BIOS_MODULE_NAME);
+		return status;
+	}
 
-	status = vm86_do_int(&vmState, 0x10);
+	bios_regs regs = {};
+	regs.eax = 0x4f15;
+	regs.ebx = 0;			// 0 = report DDC service
+	regs.ecx = 0;
+	regs.es = 0;
+	regs.edi = 0;
+
+	status = biosModule->interrupt(state, 0x10, &regs);
 	if (status == B_OK) {
 		// AH contains the error code, and AL determines whether or not the
 		// function is supported.
-		if (vmState.regs.eax != 0x4f)
+		if (regs.eax != 0x4f)
 			status = B_NOT_SUPPORTED;
 
 		// Test if DDC is supported by the monitor.
-		if ((vmState.regs.ebx & 3) == 0)
+		if ((regs.ebx & 3) == 0)
 			status = B_NOT_SUPPORTED;
 	}
 
 	if (status == B_OK) {
-		// According to the author of the vm86 functions, the address of any
-		// object to receive data must be >= 0x1000 and within the ram size
-		// specified in the second argument of the vm86_prepare() call above.
-		// Thus, the address of the struct to receive the EDID info is set to
-		// 0x1000.
+		edid1_raw* edid = (edid1_raw*)biosModule->allocate_mem(state,
+			sizeof(edid1_raw));
+		if (edid == NULL) {
+			status = B_NO_MEMORY;
+			goto out;
+		}
 
-		edid1_raw* edid = (edid1_raw*)0x1000;
+		regs.eax = 0x4f15;
+		regs.ebx = 1;		// 1 = read EDID
+		regs.ecx = 0;
+		regs.edx = 0;
+		regs.es  = ADDRESS_SEGMENT(edid);
+		regs.edi = ADDRESS_OFFSET(edid);
 
-		vmState.regs.eax = 0x4f15;
-		vmState.regs.ebx = 1;		// 1 = read EDID
-		vmState.regs.ecx = 0;
-		vmState.regs.edx = 0;
-		vmState.regs.es  = ADDRESS_SEGMENT(edid);
-		vmState.regs.edi = ADDRESS_OFFSET(edid);
-
-		status = vm86_do_int(&vmState, 0x10);
+		status = biosModule->interrupt(state, 0x10, &regs);
 		if (status == B_OK) {
-			if (vmState.regs.eax != 0x4f) {
+			if (regs.eax != 0x4f) {
 				status = B_NOT_SUPPORTED;
 			} else {
 				// Copy the EDID info to the caller's location, and compute the
@@ -322,8 +330,9 @@ GetEdidFromBIOS(edid1_raw& edidRaw)
 		}
 	}
 
-	vm86_cleanup(&vmState);
-
+out:
+	biosModule->finish(state);
+	put_module(B_BIOS_MODULE_NAME);
 	return status;
 }
 
@@ -336,31 +345,40 @@ SetVesaDisplayMode(uint16 mode)
 #define SET_MODE_MASK				0x01ff
 #define SET_MODE_LINEAR_BUFFER		(1 << 14)
 
-	vm86_state vmState;
-
-	status_t status = vm86_prepare(&vmState, 0x2000);
+	bios_module_info* biosModule;
+	status_t status = get_module(B_BIOS_MODULE_NAME, (module_info**)&biosModule);
 	if (status != B_OK) {
-		TRACE("SetVesaDisplayMode(); vm86_prepare() failed, status: 0x%lx\n",
-			status);
+		TRACE("SetVesaDisplayMode(0x%x): failed to get BIOS module: 0x%" B_PRIx32
+			"\n", mode, status);
 		return status;
 	}
 
-	vmState.regs.eax = 0x4f02;
-	vmState.regs.ebx = (mode & SET_MODE_MASK) | SET_MODE_LINEAR_BUFFER;
-
-	status = vm86_do_int(&vmState, 0x10);
+	bios_state* state;
+	status = biosModule->prepare(&state);
 	if (status != B_OK) {
-		TRACE("SetVesaDisplayMode(0x%x): vm86_do_int failed\n", mode);
+		TRACE("SetVesaDisplayMode(0x%x): bios_prepare() failed: 0x%" B_PRIx32
+			"\n", mode, status);
+		put_module(B_BIOS_MODULE_NAME);
+		return status;
 	}
 
-	if (status == B_OK && (vmState.regs.eax & 0xffff) != 0x4f) {
-		TRACE("SetVesaDisplayMode(0x%x): BIOS returned 0x%04lx\n", mode,
-			vmState.regs.eax & 0xffff);
+	bios_regs regs = {};
+	regs.eax = 0x4f02;
+	regs.ebx = (mode & SET_MODE_MASK) | SET_MODE_LINEAR_BUFFER;
+
+	status = biosModule->interrupt(state, 0x10, &regs);
+	if (status != B_OK) {
+		TRACE("SetVesaDisplayMode(0x%x): BIOS interrupt failed\n", mode);
+	}
+
+	if (status == B_OK && (regs.eax & 0xffff) != 0x4f) {
+		TRACE("SetVesaDisplayMode(0x%x): BIOS returned 0x%04" B_PRIx32 "\n",
+			mode, regs.eax & 0xffff);
 		status = B_ERROR;
 	}
 
-	vm86_cleanup(&vmState);
-
+	biosModule->finish(state);
+	put_module(B_BIOS_MODULE_NAME);
 	return status;
 }
 

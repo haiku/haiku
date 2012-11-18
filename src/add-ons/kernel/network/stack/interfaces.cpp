@@ -148,7 +148,7 @@ dump_local(int argc, char** argv)
 	size_t i = 0;
 	while (InterfaceAddress* address = iterator.Next()) {
 		address->Dump(++i);
-		dprintf("    hash:          %lu\n",
+		dprintf("    hash:          %" B_PRIu32 "\n",
 			address->domain->address_module->hash_address(address->local,
 				false));
 	}

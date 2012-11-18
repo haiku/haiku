@@ -486,7 +486,7 @@ TSwitchManager::MessageReceived(BMessage* message)
 			message->FindInt32("team", &teamID);
 
 			while ((tinfo = (TTeamGroup*)fGroupList.ItemAt(i)) != NULL) {
-				if (tinfo->TeamList()->HasItem((void*)teamID)) {
+				if (tinfo->TeamList()->HasItem((void*)(addr_t)teamID)) {
 					fGroupList.RemoveItem(i);
 
 					if (OKToUse(tinfo)) {
@@ -555,8 +555,8 @@ TSwitchManager::MessageReceived(BMessage* message)
 			for (int32 i = 0; i < fGroupList.CountItems(); i++) {
 				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
 				if (strcasecmp(tinfo->Signature(), signature) == 0) {
-					if (!(tinfo->TeamList()->HasItem((void*)team)))
-						tinfo->TeamList()->AddItem((void*)team);
+					if (!(tinfo->TeamList()->HasItem((void*)(addr_t)team)))
+						tinfo->TeamList()->AddItem((void*)(addr_t)team);
 					break;
 				}
 			}
@@ -569,8 +569,8 @@ TSwitchManager::MessageReceived(BMessage* message)
 
 			for (int32 i = 0; i < fGroupList.CountItems(); i++) {
 				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
-				if (tinfo->TeamList()->HasItem((void*)team)) {
-					tinfo->TeamList()->RemoveItem((void*)team);
+				if (tinfo->TeamList()->HasItem((void*)(addr_t)team)) {
+					tinfo->TeamList()->RemoveItem((void*)(addr_t)team);
 					break;
 				}
 			}
@@ -638,7 +638,7 @@ TSwitchManager::_SortApps()
 		// find team
 		TTeamGroup* info = NULL;
 		for (int32 j = 0; (info = (TTeamGroup*)groups.ItemAt(j)) != NULL; j++) {
-			if (info->TeamList()->HasItem((void*)teams[i])) {
+			if (info->TeamList()->HasItem((void*)(addr_t)teams[i])) {
 				groups.RemoveItem(j);
 				break;
 			}
@@ -720,7 +720,7 @@ TSwitchManager::FindTeam(team_id teamID, int32* index)
 	int i = 0;
 	TTeamGroup* info;
 	while ((info = (TTeamGroup*)fGroupList.ItemAt(i)) != NULL) {
-		if (info->TeamList()->HasItem((void*)teamID)) {
+		if (info->TeamList()->HasItem((void*)(addr_t)teamID)) {
 			*index = i;
 			return info;
 		}
@@ -953,7 +953,7 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 			result = false;
 		} else {
 			result = true;
-			be_roster->ActivateApp((team_id)teamGroup->TeamList()->ItemAt(0));
+			be_roster->ActivateApp((addr_t)teamGroup->TeamList()->ItemAt(0));
 		}
 
 		ASSERT(windowInfo);
@@ -1013,8 +1013,8 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 			break;
 		}
 		if (matchWindowInfo->server_token != windowInfo->server_token
-			&& teamGroup->TeamList()->HasItem((void*)matchWindowInfo->team))
-			windowsToActivate.AddItem((void*)matchWindowInfo->server_token);
+			&& teamGroup->TeamList()->HasItem((void*)(addr_t)matchWindowInfo->team))
+			windowsToActivate.AddItem((void*)(addr_t)matchWindowInfo->server_token);
 
 		free(matchWindowInfo);
 	}
@@ -1025,7 +1025,7 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 	// order.
 	int32 i = windowsToActivate.CountItems() - 1;
 	for (; i >= 0; i--) {
-		int32 wid = (int32) windowsToActivate.ItemAt(i);
+		int32 wid = (addr_t)windowsToActivate.ItemAt(i);
 		do_window_action(wid, B_BRING_TO_FRONT, BRect(0, 0, 0, 0), false);
 	}
 
@@ -1068,7 +1068,7 @@ TSwitchManager::QuitApp()
 	// send the quit request to all teams in this group
 
 	for (int32 i = teamGroup->TeamList()->CountItems(); i-- > 0;) {
-		team_id team = (team_id)teamGroup->TeamList()->ItemAt(i);
+		team_id team = (addr_t)teamGroup->TeamList()->ItemAt(i);
 		app_info info;
 		if (be_roster->GetRunningAppInfo(team, &info) == B_OK) {
 			if (!strcasecmp(info.signature, kTrackerSignature)) {
@@ -1091,7 +1091,7 @@ TSwitchManager::HideApp()
 	TTeamGroup* teamGroup = (TTeamGroup*)fGroupList.ItemAt(fCurrentIndex);
 
 	for (int32 i = teamGroup->TeamList()->CountItems(); i-- > 0;) {
-		team_id team = (team_id)teamGroup->TeamList()->ItemAt(i);
+		team_id team = (addr_t)teamGroup->TeamList()->ItemAt(i);
 		app_info info;
 		if (be_roster->GetRunningAppInfo(team, &info) == B_OK)
 			do_minimize_team(BRect(), team, false);
@@ -1124,7 +1124,7 @@ TSwitchManager::WindowInfo(int32 groupIndex, int32 windowIndex)
 		if (windowInfo) {
 			// skip hidden/special windows
 			if (IsWindowOK(windowInfo)
-				&& (teamGroup->TeamList()->HasItem((void*)windowInfo->team))) {
+				&& (teamGroup->TeamList()->HasItem((void*)(addr_t)windowInfo->team))) {
 				// this window belongs to the team!
 				if (matches == windowIndex) {
 					// we found it!
@@ -1154,7 +1154,7 @@ TSwitchManager::CountWindows(int32 groupIndex, bool )
 	int32 result = 0;
 
 	for (int32 i = 0; ; i++) {
-		team_id	teamID = (team_id)teamGroup->TeamList()->ItemAt(i);
+		team_id	teamID = (addr_t)teamGroup->TeamList()->ItemAt(i);
 		if (teamID == 0)
 			break;
 
@@ -1206,7 +1206,7 @@ TSwitchManager::SwitchWindow(team_id team, bool, bool activate)
 	for (int32 i = count - 1; i >= 0; i--) {
 		client_window_info* windowInfo = get_window_info(tokens[i]);
 		if (windowInfo && IsVisibleInCurrentWorkspace(windowInfo)
-			&& teamGroup->TeamList()->HasItem((void*)windowInfo->team)) {
+			&& teamGroup->TeamList()->HasItem((void*)(addr_t)windowInfo->team)) {
 			fWindowID = windowInfo->server_token;
 			if (activate)
 				ActivateWindow(windowInfo->server_token);

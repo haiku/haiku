@@ -22,6 +22,7 @@
 #include "hpet.h"
 #include "interrupts.h"
 #include "keyboard.h"
+#include "long.h"
 #include "mmu.h"
 #include "multiboot.h"
 #include "serial.h"
@@ -72,15 +73,73 @@ platform_boot_options(void)
 }
 
 
+/*!	Target function of the SMP trampoline code.
+	The trampoline code should have the pgdir and a gdt set up for us,
+	along with us being on the final stack for this processor. We need
+	to set up the local APIC and load the global idt and gdt. When we're
+	done, we'll jump into the kernel with the cpu number as an argument.
+*/
+static void
+smp_start_kernel(void)
+{
+	uint32 curr_cpu = smp_get_current_cpu();
+	struct gdt_idt_descr idt_descr;
+	struct gdt_idt_descr gdt_descr;
+
+	//TRACE(("smp_cpu_ready: entry cpu %ld\n", curr_cpu));
+
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+		gKernelArgs.kernel_image.Pointer());
+
+	// Important.  Make sure supervisor threads can fault on read only pages...
+	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
+	asm("cld");
+	asm("fninit");
+
+	// Set up the final idt
+	idt_descr.limit = IDT_LIMIT - 1;
+	idt_descr.base = (uint32 *)(addr_t)gKernelArgs.arch_args.vir_idt;
+
+	asm("lidt	%0;"
+		: : "m" (idt_descr));
+
+	// Set up the final gdt
+	gdt_descr.limit = GDT_LIMIT - 1;
+	gdt_descr.base = (uint32 *)gKernelArgs.arch_args.vir_gdt;
+
+	asm("lgdt	%0;"
+		: : "m" (gdt_descr));
+
+	asm("pushl  %0; "					// push the cpu number
+		"pushl 	%1;	"					// kernel args
+		"pushl 	$0x0;"					// dummy retval for call to main
+		"pushl 	%2;	"					// this is the start address
+		"ret;		"					// jump.
+		: : "g" (curr_cpu), "g" (&gKernelArgs),
+			"g" (image->elf_header.e_entry));
+
+	panic("kernel returned!\n");
+}
+
+
 extern "C" void
 platform_start_kernel(void)
 {
+	// 64-bit kernel entry is all handled in long.cpp
+	if (gKernelArgs.kernel_image->elf_class == ELFCLASS64) {
+		long_start_kernel();
+		return;
+	}
+
 	static struct kernel_args *args = &gKernelArgs;
 		// something goes wrong when we pass &gKernelArgs directly
 		// to the assembler inline below - might be a bug in GCC
 		// or I don't see something important...
 	addr_t stackTop
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
+
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+		gKernelArgs.kernel_image.Pointer());
 
 	smp_init_other_cpus();
 	debug_cleanup();
@@ -89,10 +148,9 @@ platform_start_kernel(void)
 	// We're about to enter the kernel -- disable console output.
 	stdout = NULL;
 
-	smp_boot_other_cpus();
+	smp_boot_other_cpus(smp_start_kernel);
 
-	dprintf("kernel entry at %lx\n",
-		gKernelArgs.kernel_image.elf_header.e_entry);
+	dprintf("kernel entry at %lx\n", image->elf_header.e_entry);
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
@@ -102,7 +160,7 @@ platform_start_kernel(void)
 		"pushl 	$0x0;"					// dummy retval for call to main
 		"pushl 	%1;	"					// this is the start address
 		"ret;		"					// jump.
-		: : "g" (args), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
+		: : "g" (args), "g" (image->elf_header.e_entry));
 
 	panic("kernel returned!\n");
 }

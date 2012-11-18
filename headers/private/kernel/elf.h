@@ -9,6 +9,7 @@
 #define _KERNEL_ELF_H
 
 
+#include <elf_common.h>
 #include <thread.h>
 #include <image.h>
 
@@ -49,9 +50,9 @@ status_t elf_add_memory_image_symbol(image_id id, const char* name,
 			addr_t address, size_t size, int32 type);
 status_t elf_init(struct kernel_args *args);
 
-status_t _user_read_kernel_image_symbols(image_id id,
-			struct Elf32_Sym* symbolTable, int32* _symbolCount,
-			char* stringTable, size_t* _stringTableSize, addr_t* _imageDelta);
+status_t _user_read_kernel_image_symbols(image_id id, elf_sym* symbolTable,
+			int32* _symbolCount, char* stringTable, size_t* _stringTableSize,
+			addr_t* _imageDelta);
 
 #ifdef __cplusplus
 }

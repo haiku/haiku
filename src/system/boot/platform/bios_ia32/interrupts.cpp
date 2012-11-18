@@ -17,7 +17,7 @@
 #include <boot/platform/generic/text_console.h>
 
 #include <arch_cpu.h>
-#include <descriptors.h>
+#include <arch/x86/descriptors.h>
 
 #include "debug.h"
 #include "keyboard.h"
@@ -81,11 +81,6 @@ struct interrupt_frame {
 	uint32 eip;
 	uint32 cs;
 	uint32 eflags;
-};
-
-struct interrupt_descriptor {
-	uint32 a;
-	uint32 b;
 };
 
 

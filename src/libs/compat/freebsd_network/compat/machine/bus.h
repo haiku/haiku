@@ -120,7 +120,11 @@
 #define I386_BUS_SPACE_MEM			1
 
 #define BUS_SPACE_MAXADDR_32BIT		0xffffffff
-#define BUS_SPACE_MAXADDR			0xffffffff
+#ifdef __x86_64__
+#	define BUS_SPACE_MAXADDR		0xffffffffffffffffull
+#else
+#	define BUS_SPACE_MAXADDR		0xffffffff
+#endif
 
 #define BUS_SPACE_MAXSIZE_32BIT		0xffffffff
 #define BUS_SPACE_MAXSIZE			0xffffffff

@@ -134,10 +134,10 @@ find_self(entry_ref& ref)
 	int32 cookie = 0;
 	image_info info;
 	while (get_next_image_info (0, &cookie, &info) == B_OK) {
-		if (((uint32)info.text <= (uint32)move_to_deskbar
-			&& (uint32)info.text + (uint32)info.text_size > (uint32)move_to_deskbar)
-			|| ((uint32)info.data <= (uint32)move_to_deskbar
-			&& (uint32)info.data + (uint32)info.data_size > (uint32)move_to_deskbar)) {
+		if (((addr_t)info.text <= (addr_t)move_to_deskbar
+			&& (addr_t)info.text + (size_t)info.text_size > (addr_t)move_to_deskbar)
+			|| ((addr_t)info.data <= (addr_t)move_to_deskbar
+			&& (addr_t)info.data + (size_t)info.data_size > (addr_t)move_to_deskbar)) {
 			if (get_ref_for_path (info.name, &ref) == B_OK)
 				return;
 		}

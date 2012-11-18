@@ -96,7 +96,7 @@ extern status_t		set_area_protection(area_id id, uint32 newProtection);
 
 /* system private, use macros instead */
 extern status_t		_get_area_info(area_id id, area_info *areaInfo, size_t size);
-extern status_t		_get_next_area_info(team_id team, int32 *cookie,
+extern status_t		_get_next_area_info(team_id team, ssize_t *cookie,
 						area_info *areaInfo, size_t size);
 
 #define get_area_info(id, areaInfo) \
@@ -645,7 +645,7 @@ typedef enum cpu_types {
 
 #define B_CPU_x86_VENDOR_MASK	0xff00
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 typedef union {
 	struct {
 		uint32	max_eax;
@@ -713,7 +713,8 @@ typedef enum platform_types {
 	B_MK_61_PLATFORM,
 	B_NINTENDO_64_PLATFORM,
 	B_AMIGA_PLATFORM,
-	B_ATARI_PLATFORM
+	B_ATARI_PLATFORM,
+	B_64_BIT_PC_PLATFORM
 } platform_type;
 
 typedef struct {

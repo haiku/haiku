@@ -557,7 +557,7 @@ BShelf::~BShelf()
 
 	while (fReplicants.CountItems() > 0) {
 		replicant_data *data = (replicant_data *)fReplicants.ItemAt(0);
-		fReplicants.RemoveItem(0L);
+		fReplicants.RemoveItem((int32)0);
 		delete data;
 	}
 }
@@ -1003,7 +1003,7 @@ BShelf::ReplicantAt(int32 index, BView **_view, uint32 *_uniqueID,
 		if (_view)
 			*_view = NULL;
 		if (_uniqueID)
-			*_uniqueID = ~0UL;
+			*_uniqueID = ~(uint32)0;
 		if (_error)
 			*_error = B_BAD_INDEX;
 

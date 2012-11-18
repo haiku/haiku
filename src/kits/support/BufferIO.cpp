@@ -71,7 +71,7 @@ BBufferIO::ReadAt(off_t pos, void* buffer, size_t size)
 	// If the data we are looking for is not in the buffer...
 	if (size > fBufferUsed
 		|| pos < fBufferStart
-		|| pos > fBufferStart + fBufferUsed
+		|| pos > fBufferStart + (off_t)fBufferUsed
 		|| pos + size > fBufferStart + fBufferUsed) {
 		if (fBufferIsDirty) {
 			// If there are pending writes, do them.
@@ -119,7 +119,7 @@ BBufferIO::WriteAt(off_t pos, const void* buffer, size_t size)
 	}
 
 	// If we want to write beyond the cached data...
-	if (pos > fBufferStart + fBufferUsed
+	if (pos > fBufferStart + (off_t)fBufferUsed
 		|| pos < fBufferStart) {
 		ssize_t read;
 		off_t where = pos;
@@ -245,7 +245,7 @@ BBufferIO::PrintToStream() const
 {
 	printf("stream %p\n", fStream);
 	printf("buffer %p\n", fBuffer);
-	printf("start  %lld\n", fBufferStart);
+	printf("start  %" B_PRId64 "\n", fBufferStart);
 	printf("used   %ld\n", fBufferUsed);
 	printf("phys   %ld\n", fBufferSize);
 	printf("dirty  %s\n", (fBufferIsDirty) ? "true" : "false");

@@ -74,9 +74,9 @@ find_own_image()
 	int32 cookie = 0;
 	image_info info;
 	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &info) == B_OK) {
-		if (((uint32)info.text <= (uint32)find_own_image
-			&& (uint32)info.text + (uint32)info.text_size
-				> (uint32)find_own_image)) {
+		if (((addr_t)info.text <= (addr_t)find_own_image
+			&& (addr_t)info.text + (addr_t)info.text_size
+				> (addr_t)find_own_image)) {
 			// found our own image
 			return info.id;
 		}
@@ -635,8 +635,8 @@ pmap_kextract(vm_offset_t virtualAddress)
 	physical_entry entry;
 	status_t status = get_memory_map((void *)virtualAddress, 1, &entry, 1);
 	if (status < B_OK) {
-		panic("fbsd compat: get_memory_map failed for %p, error %08lx\n",
-			(void *)virtualAddress, status);
+		panic("fbsd compat: get_memory_map failed for %p, error %08" B_PRIx32
+			"\n", (void *)virtualAddress, status);
 	}
 
 	return (vm_paddr_t)entry.address;

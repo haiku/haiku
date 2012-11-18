@@ -23,7 +23,7 @@ SFHash::SFHash(int size) {
 	fatalerror = false;
 	this->size = size;
 	iterate_pos = iterate_depth = 0;
-	main_array = (HashItem **)malloc(this->size * 4);
+	main_array = (HashItem **)malloc(this->size * sizeof(HashItem *));
 
     if (main_array == NULL) {
 		fatalerror = true;

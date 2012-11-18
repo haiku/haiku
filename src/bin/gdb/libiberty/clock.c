@@ -66,7 +66,7 @@ number of seconds used.
 
 /* FIXME: should be able to declare as clock_t. */
 
-long
+clock_t
 clock ()
 {
 #ifdef HAVE_GETRUSAGE

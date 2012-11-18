@@ -301,7 +301,7 @@ typedef struct {
 	uint32	head_physical_descriptor;	// Queue head physical pointer
 	uint32	next_physical_endpoint;		// Physical pointer to the next endpoint
 	// Software part
-	addr_t	physical_address;			// Physical pointer to this address
+	uint32	physical_address;			// Physical pointer to this address
 	void	*tail_logical_descriptor;	// Queue tail logical pointer
 	void	*next_logical_endpoint;		// Logical pointer to the next endpoint
 	mutex	*lock;						// Protects tail changes and checks
@@ -340,7 +340,7 @@ typedef struct {
 	uint32	next_physical_descriptor;	// Physical pointer next descriptor
 	uint32	last_physical_byte_address;	// Physical pointer to buffer end
 	// Software part
-	addr_t	physical_address;			// Physical address of this descriptor
+	uint32	physical_address;			// Physical address of this descriptor
 	size_t	buffer_size;				// Size of the buffer
 	void	*buffer_logical;			// Logical pointer to the buffer
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
@@ -395,7 +395,7 @@ typedef struct {
 	uint32		last_byte_address;			// Physical buffer end
 	uint16		offset[OHCI_ITD_NOFFSET];	// Buffer offsets
 	// Software part
-	addr_t		physical_address;			// Physical address of this descriptor
+	uint32		physical_address;			// Physical address of this descriptor
 	void		*next_logical_descriptor;	// Logical pointer next descriptor
 	void		*next_done_descriptor;		// Used for collision in the hash table
 } ohci_isochronous_td;

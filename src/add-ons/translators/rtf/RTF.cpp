@@ -104,16 +104,16 @@ string_array_compare(const char *key, const char **array)
 static void
 dump(Element &element, int32 level = 0)
 {
-	printf("%03ld (%p):", level, &element);
+	printf("%03" B_PRId32 " (%p):", level, &element);
 	for (int32 i = 0; i < level; i++)
 		printf("  ");
 
 	if (RTF::Header *header = dynamic_cast<RTF::Header *>(&element)) {
-		printf("<RTF header, major version %ld>\n", header->Version());
+		printf("<RTF header, major version %" B_PRId32 ">\n", header->Version());
 	} else if (RTF::Command *command = dynamic_cast<RTF::Command *>(&element)) {
 		printf("<Command: %s", command->Name());
 		if (command->HasOption())
-			printf(", Option %ld", command->Option());
+			printf(", Option %" B_PRId32, command->Option());
 		puts(">");
 	} else if (RTF::Text *text = dynamic_cast<RTF::Text *>(&element)) {
 		printf("<Text>");
@@ -285,7 +285,7 @@ Group::Group()
 Group::~Group()
 {
 	Element *element;
-	while ((element = (Element *)fElements.RemoveItem(0L)) != NULL) {
+	while ((element = (Element *)fElements.RemoveItem((int32)0)) != NULL) {
 		delete element;
 	}
 }

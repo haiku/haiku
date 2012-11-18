@@ -200,7 +200,7 @@ ScalarValueSetting::Value() const
 void
 ScalarValueSetting::GetValueAsString(char* buffer) const
 {
-	sprintf(buffer, "%ld", fValue);
+	sprintf(buffer, "%" B_PRId32, fValue);
 }
 
 
@@ -212,7 +212,7 @@ ScalarValueSetting::Handle(const char* const* argv)
 
 	int32 newValue;
 	if ((*argv)[0] == '0' && (*argv)[1] == 'x')
-		sscanf(*argv,"%lx",&newValue);
+		sscanf(*argv, "%" B_PRIx32, &newValue);
 	else
 		newValue = atoi(*argv);
 
@@ -253,14 +253,14 @@ HexScalarValueSetting::HexScalarValueSetting(const char* name,
 void
 HexScalarValueSetting::GetValueAsString(char* buffer) const
 {
-	sprintf(buffer, "0x%08lx", fValue);
+	sprintf(buffer, "0x%08" B_PRIx32, fValue);
 }
 
 
 void
 HexScalarValueSetting::SaveSettingValue(Settings* settings)
 {
-	settings->Write("0x%08lx", fValue);
+	settings->Write("0x%08" B_PRIx32, fValue);
 }
 
 

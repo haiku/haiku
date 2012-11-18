@@ -664,8 +664,8 @@ IOOperation::Dump() const
 	kprintf("  parent:           %p\n", fParent);
 	kprintf("  status:           %s\n", strerror(fStatus));
 	kprintf("  dma buffer:       %p\n", fDMABuffer);
-	kprintf("  offset:           %-8Ld (original: %Ld)\n", fOffset,
-		fOriginalOffset);
+	kprintf("  offset:           %-8" B_PRIdOFF " (original: %" B_PRIdOFF ")\n",
+		fOffset, fOriginalOffset);
 	kprintf("  length:           %-8" B_PRIuGENADDR " (original: %"
 		B_PRIuGENADDR ")\n", fLength, fOriginalLength);
 	kprintf("  transferred:      %" B_PRIuGENADDR "\n", fTransferredBytes);
@@ -1162,8 +1162,8 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 	uint8* buffer = (uint8*)_buffer;
 
 	if (offset < fOffset || offset + (off_t)size > fOffset + (off_t)fLength) {
-		panic("IORequest::_CopyData(): invalid range: (%lld, %lu)", offset,
-			size);
+		panic("IORequest::_CopyData(): invalid range: (%" B_PRIdOFF ", %lu)",
+			offset, size);
 		return B_BAD_VALUE;
 	}
 
@@ -1281,19 +1281,19 @@ IORequest::Dump() const
 	kprintf("  status:            %s\n", strerror(fStatus));
 	kprintf("  mutex:             %p\n", &fLock);
 	kprintf("  IOBuffer:          %p\n", fBuffer);
-	kprintf("  offset:            %Ld\n", fOffset);
+	kprintf("  offset:            %" B_PRIdOFF "\n", fOffset);
 	kprintf("  length:            %" B_PRIuGENADDR "\n", fLength);
 	kprintf("  transfer size:     %" B_PRIuGENADDR "\n", fTransferSize);
 	kprintf("  relative offset:   %" B_PRIuGENADDR "\n", fRelativeParentOffset);
-	kprintf("  pending children:  %ld\n", fPendingChildren);
-	kprintf("  flags:             %#lx\n", fFlags);
-	kprintf("  team:              %ld\n", fTeam);
-	kprintf("  thread:            %ld\n", fThread);
+	kprintf("  pending children:  %" B_PRId32 "\n", fPendingChildren);
+	kprintf("  flags:             %#" B_PRIx32 "\n", fFlags);
+	kprintf("  team:              %" B_PRId32 "\n", fTeam);
+	kprintf("  thread:            %" B_PRId32 "\n", fThread);
 	kprintf("  r/w:               %s\n", fIsWrite ? "write" : "read");
 	kprintf("  partial transfer:  %s\n", fPartialTransfer ? "yes" : "no");
 	kprintf("  finished cvar:     %p\n", &fFinishedCondition);
 	kprintf("  iteration:\n");
-	kprintf("    vec index:       %lu\n", fVecIndex);
+	kprintf("    vec index:       %" B_PRIu32 "\n", fVecIndex);
 	kprintf("    vec offset:      %" B_PRIuGENADDR "\n", fVecOffset);
 	kprintf("    remaining bytes: %" B_PRIuGENADDR "\n", fRemainingBytes);
 	kprintf("  callbacks:\n");

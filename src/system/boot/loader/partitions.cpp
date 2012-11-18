@@ -268,8 +268,8 @@ Partition::_Mount(file_system_module_info *module, Directory **_fileSystem)
 status_t
 Partition::Mount(Directory **_fileSystem, bool isBootDevice)
 {
-	if (isBootDevice && gKernelArgs.boot_volume.GetBool(
-			BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
+	if (isBootDevice && gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE,
+			false)) {
 		return _Mount(&gTarFileSystemModule, _fileSystem);
 	}
 
@@ -293,8 +293,8 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 	// if we were not booted from the real boot device, we won't scan
 	// the device we were booted from (which is likely to be a slow
 	// floppy or CD)
-	if (isBootDevice && gKernelArgs.boot_volume.GetBool(
-			BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
+	if (isBootDevice && gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE,
+			false)) {
 		return B_ENTRY_NOT_FOUND;
 	}
 

@@ -83,7 +83,7 @@ static int SiS19X_DebuggerCommand(int argc, char** argv)
 	}
 
 	if (cardId >= numCards) {
-		kprintf("%lld - invalid index.\n", cardId);
+		kprintf("%" B_PRId64 " - invalid index.\n", cardId);
 		kprintf(usageInfo);
 		return 0;
 	}

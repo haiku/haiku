@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system kernel arch arm ;
 
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) board $(TARGET_BOOT_BOARD) ] ;
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;

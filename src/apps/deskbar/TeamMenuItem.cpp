@@ -90,7 +90,7 @@ TTeamMenuItem::InitData(BList* team, BBitmap* icon, char* name, char* sig,
 	fSig = sig;
 	if (fName == NULL) {
 		char temp[32];
-		snprintf(temp, sizeof(temp), "team %ld", (int32)team->ItemAt(0));
+		snprintf(temp, sizeof(temp), "team %ld", (addr_t)team->ItemAt(0));
 		fName = strdup(temp);
 	}
 

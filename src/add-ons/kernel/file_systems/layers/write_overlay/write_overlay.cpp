@@ -265,7 +265,7 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 		fIsDataModified(false),
 		fFileCache(NULL)
 {
-	TRACE("inode created %lld\n", fInodeNumber);
+	TRACE("inode created %" B_PRIdINO "\n", fInodeNumber);
 
 	recursive_lock_init(&fLock, "write overlay inode lock");
 	if (superVnode != NULL)
@@ -290,7 +290,7 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 
 OverlayInode::~OverlayInode()
 {
-	TRACE("inode destroyed %lld\n", fInodeNumber);
+	TRACE("inode destroyed %" B_PRIdINO "\n", fInodeNumber);
 	if (fFileCache != NULL)
 		file_cache_delete(fFileCache);
 

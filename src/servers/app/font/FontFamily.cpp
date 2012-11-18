@@ -17,7 +17,7 @@
 #include <FontPrivate.h>
 
 
-const uint32 kInvalidFamilyFlags = ~0UL;
+const uint32 kInvalidFamilyFlags = ~(uint32)0;
 
 
 static int

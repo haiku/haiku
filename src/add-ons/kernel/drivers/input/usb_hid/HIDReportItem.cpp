@@ -180,14 +180,14 @@ HIDReportItem::PrintToStream(uint32 indentLevel)
 	indent[indentLevel] = 0;
 
 	TRACE_ALWAYS("%sHIDReportItem %p\n", indent, this);
-	TRACE_ALWAYS("%s\tbyte offset: %lu\n", indent, fByteOffset);
+	TRACE_ALWAYS("%s\tbyte offset: %" B_PRIu32 "\n", indent, fByteOffset);
 	TRACE_ALWAYS("%s\tshift: %u\n", indent, fShift);
-	TRACE_ALWAYS("%s\tmask: 0x%08lx\n", indent, fMask);
+	TRACE_ALWAYS("%s\tmask: 0x%08" B_PRIx32 "\n", indent, fMask);
 	TRACE_ALWAYS("%s\thas data: %s\n", indent, fHasData ? "yes" : "no");
 	TRACE_ALWAYS("%s\tarray: %s\n", indent, fArray ? "yes" : "no");
 	TRACE_ALWAYS("%s\trelative: %s\n", indent, fRelative ? "yes" : "no");
-	TRACE_ALWAYS("%s\tminimum: %lu\n", indent, fMinimum);
-	TRACE_ALWAYS("%s\tmaximum: %lu\n", indent, fMaximum);
-	TRACE_ALWAYS("%s\tusage minimum: 0x%08lx\n", indent, fUsageMinimum);
-	TRACE_ALWAYS("%s\tusage maximum: 0x%08lx\n", indent, fUsageMaximum);
+	TRACE_ALWAYS("%s\tminimum: %" B_PRIu32 "\n", indent, fMinimum);
+	TRACE_ALWAYS("%s\tmaximum: %" B_PRIu32 "\n", indent, fMaximum);
+	TRACE_ALWAYS("%s\tusage minimum: 0x%08" B_PRIx32 "\n", indent, fUsageMinimum);
+	TRACE_ALWAYS("%s\tusage maximum: 0x%08" B_PRIx32 "\n", indent, fUsageMaximum);
 }

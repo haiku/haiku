@@ -580,7 +580,7 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 	if (totalItems > 0) {
 		char totalStr[32];
 		buffer.SetTo(B_TRANSLATE("of %items"));
-		snprintf(totalStr, sizeof(totalStr), "%ld", totalItems);
+		snprintf(totalStr, sizeof(totalStr), "%" B_PRId32, totalItems);
 		buffer.ReplaceFirst("%items", totalStr);
 	}
 

@@ -23,7 +23,7 @@ local genericPlatformSources =
 #	video_splash.cpp
 ;
 
-KernelMergeObject boot_platform_routerboard_mipsel.o :
+BootMergeObject boot_platform_routerboard_mipsel.o :
 	console.cpp
 	cpu.cpp
 	debug.c

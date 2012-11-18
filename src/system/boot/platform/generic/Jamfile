@@ -5,7 +5,7 @@ UsePrivateKernelHeaders ;
 
 SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
 
-KernelStaticLibrary boot_platform_generic :
+BootStaticLibrary boot_platform_generic :
 	text_menu.cpp
 	video_blit.cpp
 	video_splash.cpp

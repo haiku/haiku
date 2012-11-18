@@ -839,7 +839,8 @@ BChannelSlider::_DrawThumbs()
 			// draw some kind of current value tool tip
 			if (fCurrentChannel != -1 && fMinPoint != 0) {
 				char valueString[32];
-				snprintf(valueString, 32, "%ld", ValueFor(fCurrentChannel));
+				snprintf(valueString, 32, "%" B_PRId32,
+					ValueFor(fCurrentChannel));
 				float stringWidth = fBackingView->StringWidth(valueString);
 				float width = max_c(10.0, stringWidth);
 				BRect valueRect(0.0, 0.0, width, 10.0);

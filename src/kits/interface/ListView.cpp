@@ -498,7 +498,7 @@ BListView::MouseDown(BPoint point)
 		doubleClick = true;
 
 	if (doubleClick && index >= fFirstSelected && index <= fLastSelected) {
-		fTrack->drag_start.Set(LONG_MAX, LONG_MAX);
+		fTrack->drag_start.Set(INT32_MAX, INT32_MAX);
 		Invoke();
 		return;
 	}

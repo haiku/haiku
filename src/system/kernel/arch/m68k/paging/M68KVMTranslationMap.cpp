@@ -128,7 +128,7 @@ M68KVMTranslationMap::Flush()
 
 		if (fIsKernelMap) {
 			smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
-				(uint32)fInvalidPages, fInvalidPagesCount, 0, NULL,
+				(addr_t)fInvalidPages, fInvalidPagesCount, 0, NULL,
 				SMP_MSG_FLAG_SYNC);
 		} else {
 			int cpu = smp_get_current_cpu();
@@ -136,7 +136,7 @@ M68KVMTranslationMap::Flush()
 				& ~((uint32)1 << cpu);
 			if (cpuMask != 0) {
 				smp_send_multicast_ici(cpuMask, SMP_MSG_INVALIDATE_PAGE_LIST,
-					(uint32)fInvalidPages, fInvalidPagesCount, 0, NULL,
+					(addr_t)fInvalidPages, fInvalidPagesCount, 0, NULL,
 					SMP_MSG_FLAG_SYNC);
 			}
 		}

@@ -15,6 +15,7 @@
 #include <OS.h>
 
 #include <elf32.h>
+#include <elf64.h>
 
 
 // #pragma mark - runtime loader libroot interface
@@ -100,13 +101,13 @@ typedef struct image_t {
 
 	// pointer to symbol participation data structures
 	uint32				*symhash;
-	struct Elf32_Sym	*syms;
+	elf_sym				*syms;
 	char				*strtab;
-	struct Elf32_Rel	*rel;
+	elf_rel				*rel;
 	int					rel_len;
-	struct Elf32_Rela	*rela;
+	elf_rela			*rela;
 	int					rela_len;
-	struct Elf32_Rel	*pltrel;
+	elf_rel				*pltrel;
 	int					pltrel_len;
 
 	uint32				num_needed;
@@ -114,20 +115,20 @@ typedef struct image_t {
 
 	// versioning related structures
 	uint32				num_version_definitions;
-	struct Elf32_Verdef	*version_definitions;
+	elf_verdef			*version_definitions;
 	uint32				num_needed_versions;
-	struct Elf32_Verneed *needed_versions;
-	Elf32_Versym		*symbol_versions;
+	elf_verneed			*needed_versions;
+	elf_versym			*symbol_versions;
 	elf_version_info	*versions;
 	uint32				num_versions;
 
 #ifdef __cplusplus
-	struct Elf32_Sym*	(*find_undefined_symbol)(struct image_t* rootImage,
+	elf_sym*			(*find_undefined_symbol)(struct image_t* rootImage,
 							struct image_t* image,
 							const SymbolLookupInfo& lookupInfo,
 							struct image_t** foundInImage);
 #else
-	struct Elf32_Sym*	(*find_undefined_symbol)(struct image_t* rootImage,
+	elf_sym*			(*find_undefined_symbol)(struct image_t* rootImage,
 							struct image_t* image,
 							const struct SymbolLookupInfo* lookupInfo,
 							struct image_t** foundInImage);
@@ -152,12 +153,12 @@ typedef struct image_queue_t {
 #define	IMAGE_FLAG_RTLD_MASK			0x03
 			// RTLD_{LAZY,NOW} | RTLD_{LOCAL,GLOBAL}
 
-#define STRING(image, offset) ((char *)(&(image)->strtab[(offset)]))
+#define STRING(image, offset) ((char*)(&(image)->strtab[(offset)]))
 #define SYMNAME(image, sym) STRING(image, (sym)->st_name)
-#define SYMBOL(image, num) ((struct Elf32_Sym *)&(image)->syms[num])
+#define SYMBOL(image, num) (&(image)->syms[num])
 #define HASHTABSIZE(image) ((image)->symhash[0])
-#define HASHBUCKETS(image) ((unsigned int *)&(image)->symhash[2])
-#define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
+#define HASHBUCKETS(image) ((unsigned int*)&(image)->symhash[2])
+#define HASHCHAINS(image) ((unsigned int*)&(image)->symhash[2+HASHTABSIZE(image)])
 
 
 // The name of the area the runtime loader creates for debugging purposes.

@@ -13,7 +13,7 @@
 #include "pci.h"
 
 #define PCI_VERBOSE	1
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 // enabling it makes the pci bus_manager binary about 1MB
 // some other platforms have issues with floppy image size...
 // TODO: Move this define to BuildSetup?
@@ -42,11 +42,13 @@ print_pci2pci_bridge_info(const pci_info *info, bool verbose)
 	uint32 io_limit = (((uint32)info->u.h1.io_limit & 0xf0) << 8) + 0xfff;
 	if (info->u.h1.io_limit & 1)
 		 io_limit += info->u.h1.io_limit_upper16 << 16;
-	TRACE(("PCI:   I/O window %04lx-%04lx\n", io_base, io_limit));
+	TRACE(("PCI:   I/O window %04" B_PRIx32 "-%04" B_PRIx32 "\n", io_base,
+		io_limit));
 	uint32 memory_base = ((uint32)info->u.h1.memory_base & 0xfff0) << 16;
 	uint32 memory_limit = (((uint32)info->u.h1.memory_limit & 0xfff0) << 16)
 		+ 0xfffff;
-	TRACE(("PCI:   memory window %04lx-%04lx\n", memory_base, memory_limit));
+	TRACE(("PCI:   memory window %04" B_PRIx32 "-%04" B_PRIx32 "\n",
+		memory_base, memory_limit));
 	uint64 prefetchable_memory_base =
 		((uint32)info->u.h1.prefetchable_memory_base & 0xfff0) << 16;
 	if (info->u.h1.prefetchable_memory_base & 1) {
@@ -60,18 +62,19 @@ print_pci2pci_bridge_info(const pci_info *info, bool verbose)
 		prefetchable_memory_limit +=
 			(uint64)info->u.h1.prefetchable_memory_limit_upper32 << 32;
 	}
-	TRACE(("PCI:   prefetchable memory window %016llx-%016llx\n",
+	TRACE(("PCI:   prefetchable memory window %016" B_PRIx64 "-%016" B_PRIx64 "\n",
 		prefetchable_memory_base, prefetchable_memory_limit));
 	TRACE(("PCI:   bridge_control %04x, secondary_status %04x\n",
 			info->u.h1.bridge_control, info->u.h1.secondary_status));
 	TRACE(("PCI:   interrupt_line %02x, interrupt_pin %02x\n",
 			info->u.h1.interrupt_line, info->u.h1.interrupt_pin));
-	TRACE(("PCI:   ROM base host %08lx, pci %08lx, size ??\n",
+	TRACE(("PCI:   ROM base host %08" B_PRIx32 ", pci %08" B_PRIx32 ", size ??\n",
 			info->u.h1.rom_base, info->u.h1.rom_base_pci));
 	for (int i = 0; i < 2; i++)
-		TRACE(("PCI:   base reg %d: host %08lx, pci %08lx, size %08lx, flags %02x\n",
-			i, info->u.h1.base_registers[i], info->u.h1.base_registers_pci[i],
-			info->u.h1.base_register_sizes[i], info->u.h1.base_register_flags[i]));
+		TRACE(("PCI:   base reg %d: host %08" B_PRIx32 ", pci %08" B_PRIx32 ", "
+			"size %08" B_PRIx32 ", flags %02x\n", i, info->u.h1.base_registers[i],
+			info->u.h1.base_registers_pci[i], info->u.h1.base_register_sizes[i],
+			info->u.h1.base_register_flags[i]));
 }
 
 
@@ -79,18 +82,20 @@ static void
 print_pci2cardbus_bridge_info(const pci_info *info, bool verbose)
 {
 	TRACE(("PCI:   subsystem_id %04x, subsystem_vendor_id %04x\n",
-			info->u.h2.subsystem_id, info->u.h2.subsystem_vendor_id));
-	TRACE(("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x, secondary_latency %02x\n",
-			info->u.h2.primary_bus, info->u.h2.secondary_bus, info->u.h2.subordinate_bus, info->u.h2.secondary_latency));
+		info->u.h2.subsystem_id, info->u.h2.subsystem_vendor_id));
+	TRACE(("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x, "
+		"secondary_latency %02x\n", info->u.h2.primary_bus,
+		info->u.h2.secondary_bus, info->u.h2.subordinate_bus,
+		info->u.h2.secondary_latency));
 	TRACE(("PCI:   bridge_control %04x, secondary_status %04x\n",
-			info->u.h2.bridge_control, info->u.h2.secondary_status));
-	TRACE(("PCI:   memory_base_upper32  %08lx, memory_base  %08lx\n",
-		info->u.h2.memory_base_upper32, info->u.h2.memory_base));
-	TRACE(("PCI:   memory_limit_upper32 %08lx, memory_limit %08lx\n",
-		info->u.h2.memory_limit_upper32, info->u.h2.memory_limit));
-	TRACE(("PCI:   io_base_upper32  %08lx, io_base  %08lx\n",
+		info->u.h2.bridge_control, info->u.h2.secondary_status));
+	TRACE(("PCI:   memory_base_upper32  %08" B_PRIx32 ", memory_base  %08"
+		B_PRIx32 "\n", info->u.h2.memory_base_upper32, info->u.h2.memory_base));
+	TRACE(("PCI:   memory_limit_upper32 %08" B_PRIx32 ", memory_limit %08"
+		B_PRIx32 "\n", info->u.h2.memory_limit_upper32, info->u.h2.memory_limit));
+	TRACE(("PCI:   io_base_upper32  %08" B_PRIx32 ", io_base  %08" B_PRIx32 "\n",
 		info->u.h2.io_base_upper32, info->u.h2.io_base));
-	TRACE(("PCI:   io_limit_upper32 %08lx, io_limit %08lx\n",
+	TRACE(("PCI:   io_limit_upper32 %08" B_PRIx32 ", io_limit %08" B_PRIx32 "\n",
 		info->u.h2.io_limit_upper32, info->u.h2.io_limit));
 }
 
@@ -98,16 +103,20 @@ print_pci2cardbus_bridge_info(const pci_info *info, bool verbose)
 static void
 print_generic_info(const pci_info *info, bool verbose)
 {
-	TRACE(("PCI:   ROM base host %08lx, pci %08lx, size %08lx\n",
-			info->u.h0.rom_base, info->u.h0.rom_base_pci, info->u.h0.rom_size));
-	TRACE(("PCI:   cardbus_CIS %08lx, subsystem_id %04x, subsystem_vendor_id %04x\n",
-			info->u.h0.cardbus_cis, info->u.h0.subsystem_id, info->u.h0.subsystem_vendor_id));
-	TRACE(("PCI:   interrupt_line %02x, interrupt_pin %02x, min_grant %02x, max_latency %02x\n",
-			info->u.h0.interrupt_line, info->u.h0.interrupt_pin, info->u.h0.min_grant, info->u.h0.max_latency));
+	TRACE(("PCI:   ROM base host %08" B_PRIx32 ", pci %08" B_PRIx32 ", size "
+		"%08" B_PRIx32 "\n", info->u.h0.rom_base, info->u.h0.rom_base_pci,
+		info->u.h0.rom_size));
+	TRACE(("PCI:   cardbus_CIS %08" B_PRIx32 ", subsystem_id %04x, "
+		"subsystem_vendor_id %04x\n", info->u.h0.cardbus_cis,
+		info->u.h0.subsystem_id, info->u.h0.subsystem_vendor_id));
+	TRACE(("PCI:   interrupt_line %02x, interrupt_pin %02x, min_grant %02x, "
+		"max_latency %02x\n", info->u.h0.interrupt_line, info->u.h0.interrupt_pin,
+		info->u.h0.min_grant, info->u.h0.max_latency));
 	for (int i = 0; i < 6; i++)
-		TRACE(("PCI:   base reg %d: host %08lx, pci %08lx, size %08lx, flags %02x\n",
-			i, info->u.h0.base_registers[i], info->u.h0.base_registers_pci[i],
-			info->u.h0.base_register_sizes[i], info->u.h0.base_register_flags[i]));
+		TRACE(("PCI:   base reg %d: host %08" B_PRIx32 ", pci %08" B_PRIx32 ", "
+			"size %08" B_PRIx32 ", flags %02x\n", i, info->u.h0.base_registers[i],
+			info->u.h0.base_registers_pci[i], info->u.h0.base_register_sizes[i],
+			info->u.h0.base_register_flags[i]));
 }
 
 

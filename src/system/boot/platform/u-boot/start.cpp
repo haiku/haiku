@@ -97,7 +97,10 @@ abort(void)
 extern "C" void
 platform_start_kernel(void)
 {
-	addr_t kernelEntry = gKernelArgs.kernel_image.elf_header.e_entry;
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+		gKernelArgs.kernel_image.Pointer());
+
+	addr_t kernelEntry = image->elf_header.e_entry;
 	addr_t stackTop
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
@@ -106,8 +109,7 @@ platform_start_kernel(void)
 	mmu_init_for_kernel();
 //	smp_boot_other_cpus();
 
-	dprintf("kernel entry at %lx\n",
-		gKernelArgs.kernel_image.elf_header.e_entry);
+	dprintf("kernel entry at %lx\n", kernelEntry);
 
 	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry,
 		stackTop);

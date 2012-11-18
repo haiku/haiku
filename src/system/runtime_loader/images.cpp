@@ -23,8 +23,16 @@
 #include "runtime_loader_private.h"
 
 
-#define RLD_PROGRAM_BASE 0x00200000
-	/* keep in sync with app ldscript */
+// keep in sync with app ldscript
+#ifdef __x86_64__
+	// runtime_loader potentially occupies 0x200000 - 0x600000 due to large
+	// page segment alignment.
+#	define RLD_PROGRAM_BASE	0x600000
+#	define MAX_PAGE_SIZE	0x200000
+#else
+#	define RLD_PROGRAM_BASE	0x200000
+#	define MAX_PAGE_SIZE	B_PAGE_SIZE
+#endif
 
 
 bool gInvalidImageIDs;
@@ -50,7 +58,7 @@ update_image_id(image_t* image)
 		}
 	}
 
-	FATAL("Could not update image ID %ld after fork()!\n", image->id);
+	FATAL("Could not update image ID %" B_PRId32 " after fork()!\n", image->id);
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -319,7 +327,7 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 
 	// Check whether the segments have an unreasonable amount of unused space
 	// inbetween.
-	if (reservedSize > length + 8 * 1024)
+	if (reservedSize > length + MAX_PAGE_SIZE * 2)
 		return B_BAD_DATA;
 
 	// reserve that space and allocate the areas from that one
@@ -330,7 +338,7 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 	for (uint32 i = 0; i < image->num_regions; i++) {
 		char regionName[B_OS_NAME_LENGTH];
 
-		snprintf(regionName, sizeof(regionName), "%s_seg%lu%s",
+		snprintf(regionName, sizeof(regionName), "%s_seg%" B_PRIu32 "%s",
 			baseName, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
 		get_image_region_load_address(image, i,

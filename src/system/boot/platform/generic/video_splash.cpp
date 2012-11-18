@@ -151,7 +151,7 @@ video_display_splash(addr_t frameBuffer)
 			uncompress(kSplashIcons8BitCompressedImage,
 				sizeof(kSplashIcons8BitCompressedImage),
 				gKernelArgs.boot_splash, uncompressedSize);
-			lowerHalfIconImage = gKernelArgs.boot_splash
+			lowerHalfIconImage = (uint8 *)gKernelArgs.boot_splash
 				+ (kSplashIconsWidth * iconsHalfHeight);
 		break;
 		default:	// 24bits is assumed here
@@ -164,7 +164,7 @@ video_display_splash(addr_t frameBuffer)
 			uncompress(kSplashIcons24BitCompressedImage,
 				sizeof(kSplashIcons24BitCompressedImage),
 				gKernelArgs.boot_splash, uncompressedSize);
-			lowerHalfIconImage = gKernelArgs.boot_splash
+			lowerHalfIconImage = (uint8 *)gKernelArgs.boot_splash
 				+ (kSplashIconsWidth * iconsHalfHeight) * 3;
 		break;
 	}

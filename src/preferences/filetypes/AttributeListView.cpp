@@ -82,7 +82,7 @@ name_for_type(BString& string, type_code type, const char* displayAs)
 			buffer[i] = '.';
 	}
 
-	snprintf(buffer + 6, sizeof(buffer), " (0x%lx)", type);
+	snprintf(buffer + 6, sizeof(buffer), " (0x%" B_PRIx32 ")", type);
 	string = buffer;
 }
 
@@ -278,7 +278,7 @@ AttributeListView::SetTo(BMimeType* type)
 	// Remove the current items but remember them for now. Also remember
 	// the currently selected item.
 	BObjectList<AttributeItem> previousItems(CountItems(), true);
-	while (AttributeItem* item = (AttributeItem*)RemoveItem(0L))
+	while (AttributeItem* item = (AttributeItem*)RemoveItem((int32)0))
 		previousItems.AddItem(item);
 
 	// fill it again

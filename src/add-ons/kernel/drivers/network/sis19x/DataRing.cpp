@@ -197,8 +197,8 @@ DataRing<TxDescriptor, TxDescriptorsCount>::Dump()
 {
 	int32 count = 0;
 	get_sem_count(fSemaphore, &count);
-	kprintf("Tx:[count:%ld] head:%lu tail:%lu dirty:%lu\n",
-			count, fHead, fTail, fHead - fTail);
+	kprintf("Tx:[count:%" B_PRId32 "] head:%" B_PRIu32 " tail:%" B_PRIu32 " "
+			"dirty:%" B_PRIu32 "\n", count, fHead, fTail, fHead - fTail);
 
 	kprintf("\tPktSize\t\tCmdStat\t\tBufPtr\t\tEOD\n");
 
@@ -206,8 +206,9 @@ DataRing<TxDescriptor, TxDescriptorsCount>::Dump()
 		volatile TxDescriptor& D = fDescriptors[i];
 		char marker = ((fTail % TxDescriptorsCount) == i) ? '=' : ' ';
 		marker = ((fHead % TxDescriptorsCount) == i) ? '>' : marker;
-		kprintf("%02lx %c\t%08lx\t%08lx\t%08lx\t%08lx\n", i, marker,
-				D.fPacketSize, D.fCommandStatus, D.fBufferPointer, D.fEOD);
+		kprintf("%02lx %c\t%08" B_PRIx32 "\t%08" B_PRIx32 "\t%08" B_PRIx32
+				"\t%08" B_PRIx32 "\n", i, marker, D.fPacketSize,
+				D.fCommandStatus, D.fBufferPointer, D.fEOD);
 	}
 }
 
@@ -335,8 +336,8 @@ DataRing<RxDescriptor, RxDescriptorsCount>::Dump()
 {
 	int32 count = 0;
 	get_sem_count(fSemaphore, &count);
-	kprintf("Rx:[count:%ld] head:%lu tail:%lu dirty:%lu\n",
-			count, fHead, fTail, fHead - fTail);
+	kprintf("Rx:[count:%" B_PRId32 "] head:%" B_PRIu32 " tail:%" B_PRIu32 " "
+			"dirty:%" B_PRIu32 "\n", count, fHead, fTail, fHead - fTail);
 
 	for (size_t i = 0; i < 2; i++) {
 		kprintf("\tStatSize\tPktInfo\t\tBufPtr\t\tEOD      %c",
@@ -344,7 +345,8 @@ DataRing<RxDescriptor, RxDescriptorsCount>::Dump()
 	}
 
 	for (size_t i = 0; i < RxDescriptorsCount / 2; i++) {
-		const char* mask = "%02lx %c\t%08lx\t%08lx\t%08lx\t%08lx %c";
+		const char* mask = "%02" B_PRIx32 " %c\t%08" B_PRIx32 "\t%08" B_PRIx32
+			"\t%08" B_PRIx32 "\t%08" B_PRIx32 " %c";
 
 		for (size_t ii = 0; ii < 2; ii++) {
 			size_t index = ii == 0 ? i : (i + RxDescriptorsCount / 2);

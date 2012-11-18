@@ -406,7 +406,8 @@ InstalledTypes::_BuildInstalledTypesList()
 					// Add this supertype
 					std::map<std::string, Supertype>::iterator i;
 					if (_AddSupertype(supertype, i) != B_OK)
-						DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList() -- Error adding supertype '%s': 0x%lx\n",
+						DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList()"
+							" -- Error adding supertype '%s': 0x%" B_PRIx32 "\n",
 							supertype, err));
 					Supertype &supertypeRef = fSupertypes[supertype];
 
@@ -435,7 +436,8 @@ InstalledTypes::_BuildInstalledTypesList()
 									// Add the subtype
 									if (_AddSubtype(supertypeRef, type.String()
 											+ subStart + 1) != B_OK) {
-										DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList() -- Error adding subtype '%s/%s': 0x%lx\n",
+										DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList()"
+											" -- Error adding subtype '%s/%s': 0x%" B_PRIx32 "\n",
 											supertype, type.String() + subStart + 1, err));
 									}
 								}

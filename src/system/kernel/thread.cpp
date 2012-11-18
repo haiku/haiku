@@ -365,7 +365,7 @@ Thread::Init(bool idleThread)
 		return error;
 
 	char temp[64];
-	snprintf(temp, sizeof(temp), "thread_%ld_retcode_sem", id);
+	snprintf(temp, sizeof(temp), "thread_%" B_PRId32 "_retcode_sem", id);
 	exit.sem = create_sem(0, temp);
 	if (exit.sem < 0)
 		return exit.sem;
@@ -814,8 +814,8 @@ create_thread_user_stack(Team* team, Thread* thread, void* _stackBase,
 
 		size_t areaSize = PAGE_ALIGN(stackSize + TLS_SIZE + additionalSize);
 
-		snprintf(nameBuffer, B_OS_NAME_LENGTH, "%s_%ld_stack", thread->name,
-			thread->id);
+		snprintf(nameBuffer, B_OS_NAME_LENGTH, "%s_%" B_PRId32 "_stack",
+			thread->name, thread->id);
 
 		virtual_address_restrictions virtualRestrictions = {};
 		if (thread->id == team->id) {
@@ -913,8 +913,8 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 
 	// create the kernel stack
 	char stackName[B_OS_NAME_LENGTH];
-	snprintf(stackName, B_OS_NAME_LENGTH, "%s_%ld_kstack", thread->name,
-		thread->id);
+	snprintf(stackName, B_OS_NAME_LENGTH, "%s_%" B_PRId32 "_kstack",
+		thread->name, thread->id);
 	thread->kernel_stack_area = create_area(stackName,
 		(void **)&thread->kernel_stack_base, B_ANY_KERNEL_ADDRESS,
 		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES  * B_PAGE_SIZE,
@@ -1404,7 +1404,7 @@ make_thread_unreal(int argc, char **argv)
 
 		if (thread->priority > B_DISPLAY_PRIORITY) {
 			thread->priority = thread->next_priority = B_NORMAL_PRIORITY;
-			kprintf("thread %ld made unreal\n", thread->id);
+			kprintf("thread %" B_PRId32 " made unreal\n", thread->id);
 		}
 	}
 
@@ -1440,12 +1440,12 @@ set_thread_prio(int argc, char **argv)
 		if (thread->id != id)
 			continue;
 		thread->priority = thread->next_priority = prio;
-		kprintf("thread %ld set to priority %ld\n", id, prio);
+		kprintf("thread %" B_PRId32 " set to priority %" B_PRId32 "\n", id, prio);
 		found = true;
 		break;
 	}
 	if (!found)
-		kprintf("thread %ld (%#lx) not found\n", id, id);
+		kprintf("thread %" B_PRId32 " (%#" B_PRIx32 ") not found\n", id, id);
 
 	return 0;
 }
@@ -1473,12 +1473,12 @@ make_thread_suspended(int argc, char **argv)
 			continue;
 
 		thread->next_state = B_THREAD_SUSPENDED;
-		kprintf("thread %ld suspended\n", id);
+		kprintf("thread %" B_PRId32 " suspended\n", id);
 		found = true;
 		break;
 	}
 	if (!found)
-		kprintf("thread %ld (%#lx) not found\n", id, id);
+		kprintf("thread %" B_PRId32 " (%#" B_PRIx32 ") not found\n", id, id);
 
 	return 0;
 }
@@ -1506,13 +1506,13 @@ make_thread_resumed(int argc, char **argv)
 
 		if (thread->state == B_THREAD_SUSPENDED) {
 			scheduler_enqueue_in_run_queue(thread);
-			kprintf("thread %ld resumed\n", thread->id);
+			kprintf("thread %" B_PRId32 " resumed\n", thread->id);
 		}
 		found = true;
 		break;
 	}
 	if (!found)
-		kprintf("thread %ld (%#lx) not found\n", id, id);
+		kprintf("thread %" B_PRId32 " (%#" B_PRIx32 ") not found\n", id, id);
 
 	return 0;
 }
@@ -1540,7 +1540,7 @@ drop_into_debugger(int argc, char **argv)
 	if (err)
 		kprintf("drop failed\n");
 	else
-		kprintf("thread %ld dropped into user debugger\n", id);
+		kprintf("thread %" B_PRId32 " dropped into user debugger\n", id);
 
 	return 0;
 }
@@ -1594,8 +1594,10 @@ state_to_text(Thread *thread, int32 state)
 static void
 print_thread_list_table_head()
 {
-	kprintf("thread         id  state     wait for   object  cpu pri  stack    "
-		"  team  name\n");
+	kprintf("%-*s       id  state     wait for  %-*s    cpu pri  %-*s   team  "
+		"name\n",
+		B_PRINTF_POINTER_WIDTH, "thread", B_PRINTF_POINTER_WIDTH, "object",
+		B_PRINTF_POINTER_WIDTH, "stack");
 }
 
 
@@ -1603,8 +1605,8 @@ static void
 _dump_thread_info(Thread *thread, bool shortInfo)
 {
 	if (shortInfo) {
-		kprintf("%p %6ld  %-10s", thread, thread->id, state_to_text(thread,
-			thread->state));
+		kprintf("%p %6" B_PRId32 "  %-10s", thread, thread->id,
+			state_to_text(thread, thread->state));
 
 		// does it block on a semaphore or a condition variable?
 		if (thread->state == B_THREAD_WAITING) {
@@ -1613,42 +1615,44 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 				{
 					sem_id sem = (sem_id)(addr_t)thread->wait.object;
 					if (sem == thread->msg.read_sem)
-						kprintf("                    ");
-					else
-						kprintf("sem  %12ld   ", sem);
+						kprintf("%*s", B_PRINTF_POINTER_WIDTH + 15, "");
+					else {
+						kprintf("sem       %-*" B_PRId32,
+							B_PRINTF_POINTER_WIDTH + 5, sem);
+					}
 					break;
 				}
 
 				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
-					kprintf("cvar   %p   ", thread->wait.object);
+					kprintf("cvar      %p   ", thread->wait.object);
 					break;
 
 				case THREAD_BLOCK_TYPE_SNOOZE:
-					kprintf("                    ");
+					kprintf("%*s", B_PRINTF_POINTER_WIDTH + 15, "");
 					break;
 
 				case THREAD_BLOCK_TYPE_SIGNAL:
-					kprintf("signal              ");
+					kprintf("signal%*s", B_PRINTF_POINTER_WIDTH + 9, "");
 					break;
 
 				case THREAD_BLOCK_TYPE_MUTEX:
-					kprintf("mutex  %p   ", thread->wait.object);
+					kprintf("mutex     %p   ", thread->wait.object);
 					break;
 
 				case THREAD_BLOCK_TYPE_RW_LOCK:
-					kprintf("rwlock %p   ", thread->wait.object);
+					kprintf("rwlock    %p   ", thread->wait.object);
 					break;
 
 				case THREAD_BLOCK_TYPE_OTHER:
-					kprintf("other               ");
+					kprintf("other%*s", B_PRINTF_POINTER_WIDTH + 10, "");
 					break;
 
 				default:
-					kprintf("???    %p   ", thread->wait.object);
+					kprintf("???       %p   ", thread->wait.object);
 					break;
 			}
 		} else
-			kprintf("        -           ");
+			kprintf("-%*s", B_PRINTF_POINTER_WIDTH + 14, "");
 
 		// on which CPU does it run?
 		if (thread->cpu)
@@ -1656,7 +1660,7 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 		else
 			kprintf(" -");
 
-		kprintf("%4ld  %p%5ld  %s\n", thread->priority,
+		kprintf("%4" B_PRId32 "  %p%5" B_PRId32 "  %s\n", thread->priority,
 			(void *)thread->kernel_stack_base, thread->team->id,
 			thread->name != NULL ? thread->name : "<NULL>");
 
@@ -1668,13 +1672,15 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	struct thread_death_entry *death = NULL;
 
 	kprintf("THREAD: %p\n", thread);
-	kprintf("id:                 %ld (%#lx)\n", thread->id, thread->id);
+	kprintf("id:                 %" B_PRId32 " (%#" B_PRIx32 ")\n", thread->id,
+		thread->id);
 	kprintf("serial_number:      %" B_PRId64 "\n", thread->serial_number);
 	kprintf("name:               \"%s\"\n", thread->name);
 	kprintf("hash_next:          %p\nteam_next:          %p\nq_next:             %p\n",
 		thread->hash_next, thread->team_next, thread->queue_next);
-	kprintf("priority:           %ld (next %ld, I/O: %ld)\n", thread->priority,
-		thread->next_priority, thread->io_priority);
+	kprintf("priority:           %" B_PRId32 " (next %" B_PRId32 ", "
+		"I/O: %" B_PRId32 ")\n", thread->priority, thread->next_priority,
+		thread->io_priority);
 	kprintf("state:              %s\n", state_to_text(thread, thread->state));
 	kprintf("next_state:         %s\n", state_to_text(thread, thread->next_state));
 	kprintf("cpu:                %p ", thread->cpu);
@@ -1682,11 +1688,11 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 		kprintf("(%d)\n", thread->cpu->cpu_num);
 	else
 		kprintf("\n");
-	kprintf("sig_pending:        %#llx (blocked: %#llx"
-		", before sigsuspend(): %#llx)\n",
-		(long long)thread->ThreadPendingSignals(),
-		(long long)thread->sig_block_mask,
-		(long long)thread->sigsuspend_original_unblocked_mask);
+	kprintf("sig_pending:        %#" B_PRIx64 " (blocked: %#" B_PRIx64
+		", before sigsuspend(): %#" B_PRIx64 ")\n",
+		(int64)thread->ThreadPendingSignals(),
+		(int64)thread->sig_block_mask,
+		(int64)thread->sigsuspend_original_unblocked_mask);
 	kprintf("in_kernel:          %d\n", thread->in_kernel);
 
 	if (thread->state == B_THREAD_WAITING) {
@@ -1699,7 +1705,7 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 				if (sem == thread->msg.read_sem)
 					kprintf("data\n");
 				else
-					kprintf("semaphore %ld\n", sem);
+					kprintf("semaphore %" B_PRId32 "\n", sem);
 				break;
 			}
 
@@ -1736,25 +1742,26 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	kprintf("fault_handler:      %p\n", (void *)thread->fault_handler);
 	kprintf("team:               %p, \"%s\"\n", thread->team,
 		thread->team->Name());
-	kprintf("  exit.sem:         %ld\n", thread->exit.sem);
-	kprintf("  exit.status:      %#lx (%s)\n", thread->exit.status, strerror(thread->exit.status));
+	kprintf("  exit.sem:         %" B_PRId32 "\n", thread->exit.sem);
+	kprintf("  exit.status:      %#" B_PRIx32 " (%s)\n", thread->exit.status,
+		strerror(thread->exit.status));
 	kprintf("  exit.waiters:\n");
 	while ((death = (struct thread_death_entry*)list_get_next_item(
 			&thread->exit.waiters, death)) != NULL) {
-		kprintf("\t%p (thread %ld)\n", death, death->thread);
+		kprintf("\t%p (thread %" B_PRId32 ")\n", death, death->thread);
 	}
 
-	kprintf("kernel_stack_area:  %ld\n", thread->kernel_stack_area);
+	kprintf("kernel_stack_area:  %" B_PRId32 "\n", thread->kernel_stack_area);
 	kprintf("kernel_stack_base:  %p\n", (void *)thread->kernel_stack_base);
-	kprintf("user_stack_area:    %ld\n", thread->user_stack_area);
+	kprintf("user_stack_area:    %" B_PRId32 "\n", thread->user_stack_area);
 	kprintf("user_stack_base:    %p\n", (void *)thread->user_stack_base);
 	kprintf("user_local_storage: %p\n", (void *)thread->user_local_storage);
 	kprintf("user_thread:        %p\n", (void *)thread->user_thread);
 	kprintf("kernel_errno:       %#x (%s)\n", thread->kernel_errno,
 		strerror(thread->kernel_errno));
-	kprintf("kernel_time:        %Ld\n", thread->kernel_time);
-	kprintf("user_time:          %Ld\n", thread->user_time);
-	kprintf("flags:              0x%lx\n", thread->flags);
+	kprintf("kernel_time:        %" B_PRId64 "\n", thread->kernel_time);
+	kprintf("user_time:          %" B_PRId64 "\n", thread->user_time);
+	kprintf("flags:              0x%" B_PRIx32 "\n", thread->flags);
 	kprintf("architecture dependant section:\n");
 	arch_thread_dump_info(&thread->arch_info);
 }
@@ -1778,11 +1785,11 @@ dump_thread_info(int argc, char **argv)
 
 	for (; argi < argc; argi++) {
 		const char *name = argv[argi];
-		int32 id = strtoul(name, NULL, 0);
+		ulong arg = strtoul(name, NULL, 0);
 
-		if (IS_KERNEL_ADDRESS(id)) {
+		if (IS_KERNEL_ADDRESS(arg)) {
 			// semi-hack
-			_dump_thread_info((Thread *)id, shortInfo);
+			_dump_thread_info((Thread *)arg, shortInfo);
 			continue;
 		}
 
@@ -1790,7 +1797,7 @@ dump_thread_info(int argc, char **argv)
 		bool found = false;
 		for (ThreadHashTable::Iterator it = sThreadHash.GetIterator();
 				Thread* thread = it.Next();) {
-			if (!strcmp(name, thread->name) || thread->id == id) {
+			if (!strcmp(name, thread->name) || thread->id == (thread_id)arg) {
 				_dump_thread_info(thread, shortInfo);
 				found = true;
 				break;
@@ -1798,7 +1805,7 @@ dump_thread_info(int argc, char **argv)
 		}
 
 		if (!found)
-			kprintf("thread \"%s\" (%ld) doesn't exist!\n", name, id);
+			kprintf("thread \"%s\" (%" B_PRId32 ") doesn't exist!\n", name, (thread_id)arg);
 	}
 
 	return 0;
@@ -1881,8 +1888,8 @@ thread_exit(void)
 	struct thread_debug_info debugInfo;
 	team_id teamID = team->id;
 
-	TRACE(("thread %ld exiting w/return code %#lx\n", thread->id,
-		thread->exit.status));
+	TRACE(("thread %" B_PRId32 " exiting w/return code %#" B_PRIx32 "\n",
+		thread->id, thread->exit.status));
 
 	if (!are_interrupts_enabled())
 		panic("thread_exit() called with interrupts disabled!\n");
@@ -2087,7 +2094,8 @@ thread_exit(void)
 			kernelTeam->Unlock();
 		}
 
-		TRACE(("thread_exit: thread %ld now a kernel thread!\n", thread->id));
+		TRACE(("thread_exit: thread %" B_PRId32 " now a kernel thread!\n",
+			thread->id));
 	}
 
 	free(threadDeathEntry);
@@ -2224,7 +2232,7 @@ thread_at_kernel_entry(bigtime_t now)
 {
 	Thread *thread = thread_get_current_thread();
 
-	TRACE(("thread_at_kernel_entry: entry thread %ld\n", thread->id));
+	TRACE(("thread_at_kernel_entry: entry thread %" B_PRId32 "\n", thread->id));
 
 	// track user time
 	SpinLocker threadTimeLocker(thread->time_lock);
@@ -2247,7 +2255,7 @@ thread_at_kernel_exit(void)
 {
 	Thread *thread = thread_get_current_thread();
 
-	TRACE(("thread_at_kernel_exit: exit thread %ld\n", thread->id));
+	TRACE(("thread_at_kernel_exit: exit thread %" B_PRId32 "\n", thread->id));
 
 	handle_signals(thread);
 
@@ -2271,7 +2279,8 @@ thread_at_kernel_exit_no_signals(void)
 {
 	Thread *thread = thread_get_current_thread();
 
-	TRACE(("thread_at_kernel_exit_no_signals: exit thread %ld\n", thread->id));
+	TRACE(("thread_at_kernel_exit_no_signals: exit thread %" B_PRId32 "\n",
+		thread->id));
 
 	// track kernel time
 	bigtime_t now = system_time();
@@ -2526,7 +2535,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 
 	if (status == B_OK) {
 		// this should never happen as the thread deletes the semaphore on exit
-		panic("could acquire exit_sem for thread %ld\n", id);
+		panic("could acquire exit_sem for thread %" B_PRId32 "\n", id);
 	} else if (status == B_BAD_SEM_ID) {
 		// this is the way the thread normally exits
 		status = B_OK;
@@ -2693,7 +2702,7 @@ thread_init(kernel_args *args)
 		area_info info;
 		char name[64];
 
-		sprintf(name, "idle thread %lu", i + 1);
+		sprintf(name, "idle thread %" B_PRIu32, i + 1);
 		thread = new(&sIdleThreads[i]) Thread(name,
 			i == 0 ? team_get_kernel_team_id() : -1, &gCPU[i]);
 		if (thread == NULL || thread->Init(true) != B_OK) {
@@ -2707,7 +2716,7 @@ thread_init(kernel_args *args)
 		thread->priority = thread->next_priority = B_IDLE_PRIORITY;
 		thread->state = B_THREAD_RUNNING;
 		thread->next_state = B_THREAD_READY;
-		sprintf(name, "idle thread %lu kstack", i + 1);
+		sprintf(name, "idle thread %" B_PRIu32 " kstack", i + 1);
 		thread->kernel_stack_area = find_area(name);
 
 		if (get_area_info(thread->kernel_stack_area, &info) != B_OK)

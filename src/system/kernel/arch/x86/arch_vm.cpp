@@ -656,7 +656,11 @@ arch_vm_init_post_area(kernel_args *args)
 		return B_NO_MEMORY;
 	}
 
+#ifndef __x86_64__
 	return bios_init();
+#else
+	return B_OK;
+#endif
 }
 
 
@@ -667,8 +671,8 @@ arch_vm_init_end(kernel_args *args)
 	TRACE(("arch_vm_init_endvm: entry\n"));
 
 	// throw away anything in the kernel_args.pgtable[] that's not yet mapped
-	vm_free_unused_boot_loader_range(KERNEL_BASE,
-		args->arch_args.virtual_end - KERNEL_BASE);
+	vm_free_unused_boot_loader_range(KERNEL_LOAD_BASE,
+		args->arch_args.virtual_end - KERNEL_LOAD_BASE);
 
 	return B_OK;
 }

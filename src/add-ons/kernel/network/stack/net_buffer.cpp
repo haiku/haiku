@@ -610,7 +610,7 @@ dump_buffer(net_buffer* _buffer)
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	dprintf("buffer %p, size %" B_PRIu32 ", flags %" B_PRIx32 ", stored header "
-		"%" B_PRIu32 ", interface address %p\n", buffer, buffer->size,
+		"%" B_PRIuSIZE ", interface address %p\n", buffer, buffer->size,
 		buffer->flags, buffer->stored_header_length, buffer->interface_address);
 
 	dump_address("source", buffer->source, buffer->interface_address);
@@ -652,11 +652,11 @@ dump_net_buffer(int argc, char** argv)
 static int
 dump_net_buffer_stats(int argc, char** argv)
 {
-	kprintf("allocated data headers: %7ld / %7ld, peak %7ld\n",
-		sAllocatedDataHeaderCount, sEverAllocatedDataHeaderCount,
+	kprintf("allocated data headers: %7" B_PRId32 " / %7" B_PRId32 ", peak %7"
+		B_PRId32 "\n", sAllocatedDataHeaderCount, sEverAllocatedDataHeaderCount,
 		sMaxAllocatedDataHeaderCount);
-	kprintf("allocated net buffers:  %7ld / %7ld, peak %7ld\n",
-		sAllocatedNetBufferCount, sEverAllocatedNetBufferCount,
+	kprintf("allocated net buffers:  %7" B_PRId32 " / %7" B_PRId32 ", peak %7"
+		B_PRId32 "\n", sAllocatedNetBufferCount, sEverAllocatedNetBufferCount,
 		sMaxAllocatedNetBufferCount);
 	return 0;
 }

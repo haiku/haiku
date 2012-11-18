@@ -43,7 +43,7 @@ dumpRawData(const char *buffer, size_t size)
 
 	while (dumpPosition < size) {
 		// Position for this line
-		printf("0x%06lx:  ", dumpPosition);
+		printf("0x%06" B_PRIx32 ":  ", dumpPosition);
 
 		// Print the bytes in form of hexadecimal numbers
 		for (uint32 i = 0; i < kChunkSize; i++) {
@@ -88,7 +88,7 @@ type_to_string(uint32 type)
 		sprintf(buffer, "'%c%c%c%c'", value[0], value[1], value[2],
 			value[3]);
 	} else
-		sprintf(buffer, "0x%08lx", type);
+		sprintf(buffer, "0x%08" B_PRIx32, type);
 
 	return buffer;
 }
@@ -218,28 +218,28 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 
 	switch (info.type) {
 		case B_INT8_TYPE:
-			printf("%d\n", *((int8*)buffer));
+			printf("%" B_PRId8 "\n", *((int8*)buffer));
 			break;
 		case B_UINT8_TYPE:
-			printf("%u\n", *((uint8*)buffer));
+			printf("%" B_PRIu8 "\n", *((uint8*)buffer));
 			break;
 		case B_INT16_TYPE:
-			printf("%d\n", *((int16*)buffer));
+			printf("%" B_PRId16 "\n", *((int16*)buffer));
 			break;
 		case B_UINT16_TYPE:
-			printf("%u\n", *((uint16*)buffer));
+			printf("%" B_PRIu16 "\n", *((uint16*)buffer));
 			break;
 		case B_INT32_TYPE:
-			printf("%ld\n", *((int32*)buffer));
+			printf("%" B_PRId32 "\n", *((int32*)buffer));
 			break;
 		case B_UINT32_TYPE:
-			printf("%lu\n", *((uint32*)buffer));
+			printf("%" B_PRIu32 "\n", *((uint32*)buffer));
 			break;
 		case B_INT64_TYPE:
-			printf("%Ld\n", *((int64*)buffer));
+			printf("%" B_PRId64 "\n", *((int64*)buffer));
 			break;
 		case B_UINT64_TYPE:
-			printf("%Lu\n", *((uint64*)buffer));
+			printf("%" B_PRIu64 "\n", *((uint64*)buffer));
 			break;
 		case B_FLOAT_TYPE:
 			printf("%f\n", *((float*)buffer));

@@ -35,11 +35,11 @@ static const size_t kInitialHeapSize = 65536;
 
 
 struct free_chunk {
-	uint32		size;
+	size_t		size;
 	free_chunk	*next;
 
-	uint32 Size() const;
-	free_chunk *Split(uint32 splitSize);
+	size_t Size() const;
+	free_chunk *Split(size_t splitSize);
 	bool IsTouching(free_chunk *link);
 	free_chunk *Join(free_chunk *link);
 	void Remove(free_chunk *previous = NULL);
@@ -50,7 +50,7 @@ struct free_chunk {
 };
 
 
-static uint32 sAvailable;
+static size_t sAvailable;
 static free_chunk sFreeAnchor;
 
 
@@ -58,10 +58,10 @@ static free_chunk sFreeAnchor;
  *	in this chunk.
  */
 
-uint32
+size_t
 free_chunk::Size() const
 {
-	return size - sizeof(uint32);
+	return size - sizeof(size_t);
 }
 
 
@@ -70,13 +70,13 @@ free_chunk::Size() const
  */
 
 free_chunk *
-free_chunk::Split(uint32 splitSize)
+free_chunk::Split(size_t splitSize)
 {
-	free_chunk *chunk = (free_chunk *)((uint8 *)this + sizeof(uint32) + splitSize);
-	chunk->size = size - splitSize - sizeof(uint32);
+	free_chunk *chunk = (free_chunk *)((uint8 *)this + sizeof(size_t) + splitSize);
+	chunk->size = size - splitSize - sizeof(size_t);
 	chunk->next = next;
 
-	size = splitSize + sizeof(uint32);
+	size = splitSize + sizeof(size_t);
 
 	return chunk;
 }
@@ -167,7 +167,7 @@ free_chunk::AllocatedAddress() const
 free_chunk *
 free_chunk::SetToAllocated(void *allocated)
 {
-	return (free_chunk *)((uint8 *)allocated - sizeof(uint32));
+	return (free_chunk *)((uint8 *)allocated - sizeof(size_t));
 }
 
 
@@ -183,7 +183,7 @@ add_area(size_t size)
 	if (area < B_OK)
 		return area;
 
-	sAvailable += size - sizeof(uint32);
+	sAvailable += size - sizeof(size_t);
 
 	// declare the whole heap as one chunk, and add it
 	// to the free list
@@ -198,7 +198,7 @@ add_area(size_t size)
 
 
 static status_t
-grow_heap(uint32 bytes)
+grow_heap(size_t bytes)
 {
 	// align the area size to an 32768 bytes boundary
 	bytes = (bytes + 32767) & ~32767;
@@ -295,10 +295,10 @@ restart:
 		goto restart;
 	}
 
-	if (chunk->Size() > size + sizeof(free_chunk) + 4) {
+	if (chunk->Size() > size + sizeof(free_chunk) + sizeof(size_t)) {
 		// if this chunk is bigger than the requested size,
 		// we split it to form two chunks (with a minimal
-		// size of 4 allocatable bytes).
+		// size of sizeof(size_t) allocatable bytes).
 
 		free_chunk *freeChunk = chunk->Split(size);
 		last->next = freeChunk;
@@ -312,7 +312,7 @@ restart:
 		last->next = chunk->next;
 	}
 
-	sAvailable -= size + sizeof(uint32);
+	sAvailable -= size + sizeof(size_t);
 
 	return chunk->AllocatedAddress();
 }

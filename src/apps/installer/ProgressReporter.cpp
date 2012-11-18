@@ -69,8 +69,8 @@ ProgressReporter::StartTimer()
 {
 	fStartTime = system_time();
 
-	printf("%lld bytes to write in %lld files\n", fBytesToWrite,
-		fItemsToWrite);
+	printf("%" B_PRIdOFF " bytes to write in %" B_PRId64 " files\n",
+		fBytesToWrite, fItemsToWrite);
 
 	if (fMessage) {
 		BMessage message(*fMessage);

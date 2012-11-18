@@ -181,7 +181,7 @@ MIMEManager::MessageReceived(BMessage *message)
 					err = fDatabase.GuessMimeType(&ref, &str);
 				else if (err == B_NAME_NOT_FOUND) {
 					const void *data;
-					int32 dataSize;
+					ssize_t dataSize;
 					err = message->FindData("data", B_RAW_TYPE, &data,
 						&dataSize);
 					if (!err)
@@ -290,8 +290,8 @@ MIMEManager::MessageReceived(BMessage *message)
 		}
 
 		default:
-			printf("MIMEMan: msg->what == %lx (%.4s)\n", message->what,
-				(char*)&(message->what));
+			printf("MIMEMan: msg->what == %" B_PRIx32 " (%.4s)\n",
+				message->what, (char*)&(message->what));
 			BLooper::MessageReceived(message);
 			break;
 	}

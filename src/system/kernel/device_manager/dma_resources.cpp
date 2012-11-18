@@ -79,7 +79,7 @@ DMABuffer::Dump() const
 	kprintf("  bounce buffer:      %p (physical %#" B_PRIxPHYSADDR ")\n",
 		fBounceBuffer->address, fBounceBuffer->physical_address);
 	kprintf("  bounce buffer size: %" B_PRIxPHYSADDR "\n", fBounceBuffer->size);
-	kprintf("  vecs:               %lu\n", fVecCount);
+	kprintf("  vecs:               %" B_PRIu32 "\n", fVecCount);
 
 	for (uint32 i = 0; i < fVecCount; i++) {
 		kprintf("    [%" B_PRIu32 "] %#" B_PRIxGENADDR ", %" B_PRIuGENADDR "\n",

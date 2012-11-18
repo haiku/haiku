@@ -8,6 +8,7 @@
 
 #include <arch_config.h>
 #include <DiskDeviceDefs.h>
+#include <elf_common.h>
 #include <image.h>
 #include <OS.h>
 
@@ -21,7 +22,6 @@ extern "C" {
 
 struct attr_info;
 struct dirent;
-struct Elf32_Sym;
 struct fd_info;
 struct fd_set;
 struct fs_info;
@@ -226,7 +226,7 @@ extern status_t		_kern_get_image_info(image_id id, image_info *info,
 extern status_t		_kern_get_next_image_info(team_id team, int32 *cookie,
 						image_info *info, size_t size);
 extern status_t		_kern_read_kernel_image_symbols(image_id id,
-						struct Elf32_Sym* symbolTable, int32* _symbolCount,
+						elf_sym* symbolTable, int32* _symbolCount,
 						char* stringTable, size_t* _stringTableSize,
 						addr_t* _imageDelta);
 
@@ -253,7 +253,7 @@ extern int			_kern_open_dir_entry_ref(dev_t device, ino_t inode,
 extern int			_kern_open_dir(int fd, const char *path);
 extern int			_kern_open_parent_dir(int fd, char *name,
 						size_t nameLength);
-extern status_t		_kern_fcntl(int fd, int op, uint32 argument);
+extern status_t		_kern_fcntl(int fd, int op, size_t argument);
 extern status_t		_kern_fsync(int fd);
 extern status_t		_kern_flock(int fd, int op);
 extern off_t		_kern_seek(int fd, off_t pos, int seekType);
@@ -411,7 +411,7 @@ extern status_t		_kern_delete_area(area_id area);
 extern area_id		_kern_area_for(void *address);
 extern area_id		_kern_find_area(const char *name);
 extern status_t		_kern_get_area_info(area_id area, area_info *info);
-extern status_t		_kern_get_next_area_info(team_id team, int32 *cookie,
+extern status_t		_kern_get_next_area_info(team_id team, ssize_t *cookie,
 						area_info *info);
 extern status_t		_kern_resize_area(area_id area, size_t newSize);
 extern area_id		_kern_transfer_area(area_id area, void **_address,
@@ -534,7 +534,7 @@ extern void			_kern_clear_caches(void *address, size_t length,
 extern bool			_kern_cpu_enabled(int32 cpu);
 extern status_t		_kern_set_cpu_enabled(int32 cpu, bool enabled);
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 // our only x86 only syscall
 extern status_t		_kern_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
 #endif

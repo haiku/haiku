@@ -3,7 +3,7 @@
 
 #if defined(__INTEL__)
 #  include <arch/x86/fenv.h>
-#elif defined(_x86_64_)
+#elif defined(__x86_64__)
 #  include <arch/x86_64/fenv.h>
 #elif defined(__ARM__)
 #  include <arch/arm/fenv.h>

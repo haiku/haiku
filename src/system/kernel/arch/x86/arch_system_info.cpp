@@ -50,7 +50,7 @@ get_cpuid(cpuid_info *info, uint32 eaxRegister, uint32 forCPU)
 	//	that the CPU supports cpuid.
 
 	if (!get_cpuid_for(info, smp_get_current_cpu(), eaxRegister, forCPU)) {
-		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)info,
+		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)info,
 			eaxRegister, forCPU, (void *)get_cpuid_for, SMP_MSG_FLAG_SYNC);
 	}
 
@@ -68,7 +68,11 @@ arch_get_system_info(system_info *info, size_t size)
 	// - various cpu_info
 	info->cpu_clock_speed = sCpuClockSpeed;
 	// - bus_clock_speed
+#ifdef __x86_64__
+	info->platform_type = B_64_BIT_PC_PLATFORM;
+#else
 	info->platform_type = B_AT_CLONE_PLATFORM;
+#endif
 
 	// ToDo: clock speeds could be retrieved via SMBIOS/DMI
 	return B_OK;

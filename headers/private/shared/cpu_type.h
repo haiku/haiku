@@ -28,7 +28,7 @@ int32 get_rounded_cpu_speed(void);
 #endif
 
 
-#if __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 /*!	Tries to parse an Intel CPU ID string to match our usual naming scheme.
 	Note, this function is not thread safe, and must only be called once
 	at a time.
@@ -87,7 +87,7 @@ get_cpu_vendor_string(enum cpu_types type)
 	/* We're not that nice here. */
 	return "IBM/Motorola";
 #endif
-#if __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 	/* Determine x86 vendor name */
 	switch (type & B_CPU_x86_VENDOR_MASK) {
 		case B_CPU_INTEL_x86:
@@ -113,7 +113,7 @@ get_cpu_vendor_string(enum cpu_types type)
 }
 
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 /*! Parameter 'name' needs to point to an allocated array of 49 characters. */
 void
 get_cpuid_model_string(char *name)
@@ -168,16 +168,16 @@ get_cpuid_model_string(char *name)
 		}
 	}
 }
-#endif	/* __INTEL__ */
+#endif	/* __INTEL__ || __x86_64__ */
 
 
 const char *
 get_cpu_model_string(system_info *info)
 {
-#if __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 	char cpuidName[49];
 		/* for use with get_cpuid_model_string() */
-#endif	/* __INTEL__ */
+#endif	/* __INTEL__ || __x86_64__ */
 
 	/* Determine CPU type */
 	switch (info->cpu_type) {
@@ -195,7 +195,7 @@ get_cpu_model_string(system_info *info)
 		default:
 			return NULL;
 #endif	/* __POWERPC__ */
-#if __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 		case B_CPU_x86:
 			return "Unknown x86";
 
@@ -405,7 +405,7 @@ get_cpu_model_string(system_info *info)
 				return parse_intel(cpuidName);
 			}
 			return NULL;
-#endif	/* __INTEL__ */
+#endif	/* __INTEL__ || __x86_64__ */
 	}
 }
 

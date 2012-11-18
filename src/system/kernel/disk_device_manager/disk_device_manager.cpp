@@ -174,11 +174,11 @@ create_child_partition(partition_id partitionID, int32 index, off_t offset,
 				== B_OK) {
 			return child->PartitionData();
 		} else {
-			DBG(OUT("  creating child (%ld, %ld) failed\n", partitionID,
-			index));
+			DBG(OUT("  creating child (%" B_PRId32 ", %" B_PRId32 ") failed\n",
+				partitionID, index));
 		}
 	} else
-		DBG(OUT("  partition %ld not found\n", partitionID));
+		DBG(OUT("  partition %" B_PRId32 " not found\n", partitionID));
 
 	return NULL;
 }
@@ -244,8 +244,8 @@ get_default_partition_content_name(partition_id partitionID,
 	// do one digit precision.
 	uint64 result = uint64(size * 10 + 0.5);
 
-	snprintf(buffer, bufferSize, "%s Volume (%ld.%ld %sB)", fileSystemName,
-		int32(result / 10), int32(result % 10), suffixes[index]);
+	snprintf(buffer, bufferSize, "%s Volume (%" B_PRId32 ".%" B_PRId32 " %sB)",
+		fileSystemName, int32(result / 10), int32(result % 10), suffixes[index]);
 
 	return B_OK;
 }

@@ -535,17 +535,17 @@ dump_rw_lock_info(int argc, char** argv)
 
 	kprintf("rw lock %p:\n", lock);
 	kprintf("  name:            %s\n", lock->name);
-	kprintf("  holder:          %ld\n", lock->holder);
-	kprintf("  count:           %#lx\n", lock->count);
+	kprintf("  holder:          %" B_PRId32 "\n", lock->holder);
+	kprintf("  count:           %#" B_PRIx32 "\n", lock->count);
 	kprintf("  active readers   %d\n", lock->active_readers);
 	kprintf("  pending readers  %d\n", lock->pending_readers);
-	kprintf("  owner count:     %#lx\n", lock->owner_count);
-	kprintf("  flags:           %#lx\n", lock->flags);
+	kprintf("  owner count:     %#" B_PRIx32 "\n", lock->owner_count);
+	kprintf("  flags:           %#" B_PRIx32 "\n", lock->flags);
 
 	kprintf("  waiting threads:");
 	rw_lock_waiter* waiter = lock->waiters;
 	while (waiter != NULL) {
-		kprintf(" %ld/%c", waiter->thread->id, waiter->writer ? 'w' : 'r');
+		kprintf(" %" B_PRId32 "/%c", waiter->thread->id, waiter->writer ? 'w' : 'r');
 		waiter = waiter->next;
 	}
 	kputs("\n");
@@ -679,7 +679,7 @@ _mutex_lock(mutex* lock, bool schedulerLocked)
 		lock->holder = thread_get_current_thread_id();
 		return B_OK;
 	} else if (lock->holder == thread_get_current_thread_id()) {
-		panic("_mutex_lock(): double lock of %p by thread %ld", lock,
+		panic("_mutex_lock(): double lock of %p by thread %" B_PRId32, lock,
 			lock->holder);
 	} else if (lock->holder == 0)
 		panic("_mutex_lock(): using unitialized lock %p", lock);
@@ -723,9 +723,9 @@ _mutex_unlock(mutex* lock, bool schedulerLocked)
 
 #if KDEBUG
 	if (thread_get_current_thread_id() != lock->holder) {
-		panic("_mutex_unlock() failure: thread %ld is trying to release "
-			"mutex %p (current holder %ld)\n", thread_get_current_thread_id(),
-			lock, lock->holder);
+		panic("_mutex_unlock() failure: thread %" B_PRId32 " is trying to "
+			"release mutex %p (current holder %" B_PRId32 ")\n",
+			thread_get_current_thread_id(), lock, lock->holder);
 		return;
 	}
 #else
@@ -798,7 +798,7 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 		lock->holder = thread_get_current_thread_id();
 		return B_OK;
 	} else if (lock->holder == thread_get_current_thread_id()) {
-		panic("_mutex_lock(): double lock of %p by thread %ld", lock,
+		panic("_mutex_lock(): double lock of %p by thread %" B_PRId32, lock,
 			lock->holder);
 	} else if (lock->holder == 0)
 		panic("_mutex_lock(): using unitialized lock %p", lock);
@@ -889,7 +889,7 @@ dump_mutex_info(int argc, char** argv)
 	kprintf("  name:            %s\n", lock->name);
 	kprintf("  flags:           0x%x\n", lock->flags);
 #if KDEBUG
-	kprintf("  holder:          %ld\n", lock->holder);
+	kprintf("  holder:          %" B_PRId32 "\n", lock->holder);
 #else
 	kprintf("  count:           %ld\n", lock->count);
 #endif
@@ -897,7 +897,7 @@ dump_mutex_info(int argc, char** argv)
 	kprintf("  waiting threads:");
 	mutex_waiter* waiter = lock->waiters;
 	while (waiter != NULL) {
-		kprintf(" %ld", waiter->thread->id);
+		kprintf(" %" B_PRId32, waiter->thread->id);
 		waiter = waiter->next;
 	}
 	kputs("\n");

@@ -27,7 +27,7 @@ TMenuItemGroup::~TMenuItemGroup()
 	
 	if (fMenu == NULL) {
 		BMenuItem* item;
-		while ((item = RemoveItem(0L)) != NULL)
+		while ((item = RemoveItem((int32)0)) != NULL)
 			delete item;
 	}
 }
@@ -176,7 +176,7 @@ TGroupedMenu::TGroupedMenu(const char* name)
 TGroupedMenu::~TGroupedMenu()
 {
 	TMenuItemGroup* group;
-	while ((group = static_cast<TMenuItemGroup*>(fGroups.RemoveItem(0L)))
+	while ((group = static_cast<TMenuItemGroup*>(fGroups.RemoveItem((int32)0)))
 			!= NULL) {
 		delete group;
 	}

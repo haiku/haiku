@@ -19,13 +19,13 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 #SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-KernelMergeObject boot_platform_amiga_m68k_shell.o :
+BootMergeObject boot_platform_amiga_m68k_shell.o :
 	shell.S
 	: -Wa,--pcrel
 ;
 
 
-KernelMergeObject boot_platform_amiga_m68k_other.o :
+BootMergeObject boot_platform_amiga_m68k_other.o :
 #	shell.S
 	start.cpp
 	rom_calls.cpp
@@ -54,7 +54,7 @@ KernelMergeObject boot_platform_amiga_m68k_other.o :
 ;
 
 
-KernelMergeObject boot_platform_amiga_m68k.o :
+BootMergeObject boot_platform_amiga_m68k.o :
 	: :
 	boot_platform_amiga_m68k_shell.o
 	boot_platform_amiga_m68k_other.o

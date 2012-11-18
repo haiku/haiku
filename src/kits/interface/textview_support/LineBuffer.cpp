@@ -94,7 +94,7 @@ BTextView::LineBuffer::PixelToLine(float pixel) const
 
 
 void
-BTextView::LineBuffer::BumpOrigin(float delta, long index)
+BTextView::LineBuffer::BumpOrigin(float delta, int32 index)
 {
 	for (long i = index; i < fItemCount; i++)
 		fBuffer[i].origin += delta;

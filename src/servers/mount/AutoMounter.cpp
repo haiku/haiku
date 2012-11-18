@@ -718,7 +718,7 @@ AutoMounter::_UnmountAndEjectVolume(BMessage* message)
 		if (status == B_OK)
 			status = volume.GetName(name);
 		if (status < B_OK)
-			snprintf(name, sizeof(name), "device:%ld", device);
+			snprintf(name, sizeof(name), "device:%" B_PRIdDEV, device);
 
 		BPath path;
 		if (status == B_OK) {

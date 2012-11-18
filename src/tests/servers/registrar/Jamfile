@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src tests servers registrar ;
 
 UsePublicHeaders [ FDirName add-ons registrar ] ;
-UseArchHeaders $(TARGET_ARCH) ;
+UseArchHeaders $(TARGET_KERNEL_ARCH) ;
 
 # some test programs
 

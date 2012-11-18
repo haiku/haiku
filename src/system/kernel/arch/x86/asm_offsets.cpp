@@ -44,20 +44,31 @@ dummy()
 	DEFINE_OFFSET_MACRO(THREAD, Thread, kernel_stack_top);
 	DEFINE_OFFSET_MACRO(THREAD, Thread, fault_handler);
 
+#ifdef __x86_64__
+	// struct arch_thread
+	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, syscall_rsp);
+	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, user_rsp);
+	DEFINE_OFFSET_MACRO(ARCH_THREAD, arch_thread, current_stack);
+#endif
+
 	// struct iframe
 	DEFINE_SIZEOF_MACRO(IFRAME, iframe);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, cs);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, eax);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, edx);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, orig_eax);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, ax);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, dx);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, di);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, si);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, vector);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, eip);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, ip);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, flags);
-	DEFINE_OFFSET_MACRO(IFRAME, iframe, user_esp);
-
-	// struct vm86_iframe
-	DEFINE_SIZEOF_MACRO(VM86_IFRAME, vm86_iframe);
-	DEFINE_OFFSET_MACRO(VM86_IFRAME, vm86_iframe, flags);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, user_sp);
+#ifdef __x86_64__
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, r8);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, r9);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, r10);
+#else
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, orig_eax);
+#endif
 
 	// struct syscall_info
 	DEFINE_SIZEOF_MACRO(SYSCALL_INFO, syscall_info);
@@ -76,6 +87,7 @@ dummy()
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, context);
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, user_data);
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, handler);
+	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, siginfo_handler);
 
 	// struct ucontext_t
 	DEFINE_OFFSET_MACRO(UCONTEXT_T, __ucontext_t, uc_mcontext);

@@ -147,8 +147,8 @@ MessageLooper::_MessageLooper()
 			// that shouldn't happen, it's our port
 			char name[256];
 			_GetLooperName(name, 256);
-			printf("MessageLooper \"%s\": Someone deleted our message port %ld, %s!\n",
-				name, receiver.Port(), strerror(status));
+			printf("MessageLooper \"%s\": Someone deleted our message port %"
+				B_PRId32 ", %s!\n", name, receiver.Port(), strerror(status));
 			break;
 		}
 

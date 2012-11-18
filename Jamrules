@@ -44,6 +44,7 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) DocumentationRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) FileRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HeadersRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) KernelRules ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) BootRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) ImageRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) MainBuildRules ] ;

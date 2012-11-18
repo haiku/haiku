@@ -99,7 +99,7 @@ size_string(int64 size)
 	static char string[64];
 
 	if (size < 1024)
-		sprintf(string, "%Ld", size);
+		sprintf(string, "%" B_PRId64, size);
 	else {
 		const char* units[] = {"K", "M", "G", NULL};
 		int32 i = -1;

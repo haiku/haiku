@@ -26,7 +26,7 @@ IntPoint::ConstrainTo(const IntRect& r)
 void
 IntPoint::PrintToStream() const
 {
-	printf("IntPoint(x:%ld, y:%ld)\n", x, y);
+	printf("IntPoint(x:%" B_PRId32 ", y:%" B_PRId32 ")\n", x, y);
 }
 
 

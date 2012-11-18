@@ -218,7 +218,8 @@ get_domain(struct net_buffer* buffer)
 status_t
 icmp6_receive_data(net_buffer *buffer)
 {
-	TRACE(("ICMPv6 received some data, buffer length %lu\n", buffer->size));
+	TRACE(("ICMPv6 received some data, buffer length %" B_PRIu32 "\n",
+		buffer->size));
 
 	net_domain* domain = get_domain(buffer);
 	if (domain == NULL)

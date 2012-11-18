@@ -115,10 +115,10 @@ PCApplication::ReadyToRun()
 	// quit other eventually running instances
 	BList list;
 	be_roster->GetAppList(kSignature, &list);
-	long count = list.CountItems();
+	int32 count = list.CountItems();
 	if (count > 1) {
-		for (long i = 0; i < count - 1; i++) {
-			BMessenger* otherme = new BMessenger(NULL, (team_id)list.ItemAt(i));
+		for (int32 i = 0; i < count - 1; i++) {
+			BMessenger* otherme = new BMessenger(NULL, (addr_t)list.ItemAt(i));
 			BMessage* message = new BMessage(B_QUIT_REQUESTED);
 			otherme->SendMessage(message);
 			delete otherme;

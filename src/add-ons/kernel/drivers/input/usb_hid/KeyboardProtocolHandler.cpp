@@ -425,7 +425,7 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 			return B_OK;
 	}
 
-	TRACE_ALWAYS("keyboard device unhandled control 0x%08lx\n", op);
+	TRACE_ALWAYS("keyboard device unhandled control 0x%08" B_PRIx32 "\n", op);
 	return B_ERROR;
 }
 

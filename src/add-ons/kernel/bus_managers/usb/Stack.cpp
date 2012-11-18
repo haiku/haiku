@@ -278,24 +278,25 @@ Stack::BusManagerAt(int32 index) const
 
 
 status_t
-Stack::AllocateChunk(void **logicalAddress, void **physicalAddress, size_t size)
+Stack::AllocateChunk(void **logicalAddress, phys_addr_t *physicalAddress,
+	size_t size)
 {
 	return fAllocator->Allocate(size, logicalAddress, physicalAddress);
 }
 
 
 status_t
-Stack::FreeChunk(void *logicalAddress, void *physicalAddress, size_t size)
+Stack::FreeChunk(void *logicalAddress, phys_addr_t physicalAddress,
+	size_t size)
 {
 	return fAllocator->Deallocate(size, logicalAddress, physicalAddress);
 }
 
 
 area_id
-Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
+Stack::AllocateArea(void **logicalAddress, phys_addr_t *physicalAddress, size_t size,
 	const char *name)
 {
-// TODO: physicalAddress should be a phys_addr_t*!
 	TRACE("allocating %ld bytes for %s\n", size, name);
 
 	void *logAddress;
@@ -323,10 +324,10 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 		*logicalAddress = logAddress;
 
 	if (physicalAddress)
-		*physicalAddress = (void*)(addr_t)physicalEntry.address;
+		*physicalAddress = (phys_addr_t)physicalEntry.address;
 
-	TRACE("area = %ld, size = %ld, log = %p, phy = %#" B_PRIxPHYSADDR "\n",
-		area, size, logAddress, physicalEntry.address);
+	TRACE("area = %" B_PRId32 ", size = %" B_PRIuSIZE ", log = %p, phy = %#"
+		B_PRIxPHYSADDR "\n", area, size, logAddress, physicalEntry.address);
 	return area;
 }
 

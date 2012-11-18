@@ -965,7 +965,7 @@ FileTypesWindow::QuitRequested()
 {
 	BMessage update(kMsgSettingsChanged);
 	update.AddRect("file_types_frame", Frame());
-	update.AddFloat("left_split_weight", fMainSplitView->ItemWeight(0L));
+	update.AddFloat("left_split_weight", fMainSplitView->ItemWeight((int32)0));
 	update.AddFloat("right_split_weight", fMainSplitView->ItemWeight(1));
 	be_app_messenger.SendMessage(&update);
 

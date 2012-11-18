@@ -209,7 +209,8 @@ IntRect::OffsetToCopy(int32 dx, int32 dy)
 void
 IntRect::PrintToStream() const
 {
-	printf("IntRect(l:%ld, t:%ld, r:%ld, b:%ld)\n", left, top, right, bottom);
+	printf("IntRect(l:%" B_PRId32 ", t:%" B_PRId32 ", r:%" B_PRId32 ", b:%"
+		B_PRId32 ")\n", left, top, right, bottom);
 }
 
 

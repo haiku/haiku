@@ -40,9 +40,6 @@ main(stage2_args *args)
 	gKernelArgs.keep_debug_output_buffer = true;
 #endif
 
-	// construct boot_volume KMessage explicitely
-	new(&gKernelArgs.boot_volume) KMessage;
-
 	add_stage2_driver_settings(args);
 
 	platform_init_video();
@@ -123,16 +120,16 @@ main(stage2_args *args)
 			// clone the boot_volume KMessage into kernel accessible memory
 			// note, that we need to 4 byte align the buffer and thus allocate
 			// 3 more bytes
-			KMessage& bootVolume = gKernelArgs.boot_volume;
-			void* buffer = kernel_args_malloc(bootVolume.ContentSize() + 3);
+			void* buffer = kernel_args_malloc(gBootVolume.ContentSize() + 3);
 			if (!buffer) {
 				panic("Could not allocate memory for the boot volume kernel "
 					"arguments");
 			}
 
 			buffer = (void*)(((addr_t)buffer + 3) & ~(addr_t)0x3);
-			memcpy(buffer, bootVolume.Buffer(), bootVolume.ContentSize());
-			bootVolume.SetTo(buffer, bootVolume.ContentSize());
+			memcpy(buffer, gBootVolume.Buffer(), gBootVolume.ContentSize());
+			gKernelArgs.boot_volume = buffer;
+			gKernelArgs.boot_volume_size = gBootVolume.ContentSize();
 
 			// ToDo: cleanup, heap_release() etc.
 			platform_start_kernel();

@@ -117,8 +117,8 @@ static int32 sSourceOverrides[ISA_INTERRUPT_COUNT];
 static void
 print_ioapic(struct ioapic& ioapic)
 {
-	dprintf("io-apic %u has range %u-%u, %u entries, version 0x%08lx, "
-		"apic-id %u\n", ioapic.number, ioapic.global_interrupt_base,
+	dprintf("io-apic %u has range %u-%u, %u entries, version 0x%08" B_PRIx32
+		", apic-id %u\n", ioapic.number, ioapic.global_interrupt_base,
 		ioapic.global_interrupt_last, ioapic.max_redirection_entry + 1,
 		ioapic.version, ioapic.apic_id);
 }
@@ -385,7 +385,7 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 static int32
 ioapic_source_override_handler(void* data)
 {
-	int32 vector = (int32)data;
+	int32 vector = (addr_t)data;
 	bool levelTriggered = ioapic_is_level_triggered_interrupt(vector);
 	return int_io_interrupt_handler(vector, levelTriggered);
 }
@@ -404,9 +404,10 @@ acpi_enumerate_ioapics(acpi_table_madt* madt)
 			case ACPI_MADT_TYPE_IO_APIC:
 			{
 				acpi_madt_io_apic* info = (acpi_madt_io_apic*)apicEntry;
-				dprintf("found io-apic with address 0x%08lx, global "
-					"interrupt base %lu, apic-id %u\n", (uint32)info->Address,
-					(uint32)info->GlobalIrqBase, info->Id);
+				dprintf("found io-apic with address 0x%08" B_PRIx32 ", global "
+					"interrupt base %" B_PRIu32 ", apic-id %u\n",
+					(uint32)info->Address, (uint32)info->GlobalIrqBase,
+					info->Id);
 
 				struct ioapic* ioapic
 					= (struct ioapic*)malloc(sizeof(struct ioapic));
@@ -423,8 +424,8 @@ acpi_enumerate_ioapics(acpi_table_madt* madt)
 				ioapic->registers = NULL;
 				ioapic->next = NULL;
 
-				dprintf("mapping io-apic %u at physical address %p\n",
-					ioapic->number, (void*)info->Address);
+				dprintf("mapping io-apic %u at physical address %#" B_PRIx32
+					"\n", ioapic->number, (uint32)info->Address);
 				status_t status = ioapic_map_ioapic(*ioapic, info->Address);
 				if (status != B_OK) {
 					free(ioapic);
@@ -446,8 +447,9 @@ acpi_enumerate_ioapics(acpi_table_madt* madt)
 			{
 				acpi_madt_nmi_source* info
 					= (acpi_madt_nmi_source*)apicEntry;
-				dprintf("found nmi source global irq %lu, flags 0x%04x\n",
-					(uint32)info->GlobalIrq, (uint16)info->IntiFlags);
+				dprintf("found nmi source global irq %" B_PRIu32 ", flags "
+					"0x%04x\n", (uint32)info->GlobalIrq,
+					(uint16)info->IntiFlags);
 
 				struct ioapic* ioapic = find_ioapic(info->GlobalIrq);
 				if (ioapic == NULL) {
@@ -517,8 +519,8 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 				acpi_madt_interrupt_override* info
 					= (acpi_madt_interrupt_override*)apicEntry;
 				dprintf("found interrupt override for bus %u, source irq %u, "
-					"global irq %lu, flags 0x%08lx\n", info->Bus,
-					info->SourceIrq, (uint32)info->GlobalIrq,
+					"global irq %" B_PRIu32 ", flags 0x%08" B_PRIx32 "\n",
+					info->Bus, info->SourceIrq, (uint32)info->GlobalIrq,
 					(uint32)info->IntiFlags);
 
 				if (info->SourceIrq >= ISA_INTERRUPT_COUNT) {
@@ -545,8 +547,9 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 			{
 				acpi_madt_nmi_source* info
 					= (acpi_madt_nmi_source*)apicEntry;
-				dprintf("found nmi source global irq %lu, flags 0x%04x\n",
-					(uint32)info->GlobalIrq, (uint16)info->IntiFlags);
+				dprintf("found nmi source global irq %" B_PRIu32 ", flags "
+					"0x%04x\n", (uint32)info->GlobalIrq,
+					(uint16)info->IntiFlags);
 
 				struct ioapic* ioapic = find_ioapic(info->GlobalIrq);
 				if (ioapic == NULL)
