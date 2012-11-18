@@ -340,6 +340,7 @@ HAIKU_BOOT_CCFLAGS += -finline -fno-builtin ;
 HAIKU_BOOT_C++FLAGS += -finline -fno-builtin -fno-exceptions ;
 
 if $(HAIKU_GCC_VERSION[1]) >= 3 {
+	HAIKU_BOOT_C++FLAGS += -fno-use-cxa-atexit ;
 	HAIKU_KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
 }
 
