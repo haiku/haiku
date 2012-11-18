@@ -132,6 +132,7 @@ public:
 									BMessage* message);
 			void				AddShortcut(uint32 key, uint32 modifiers,
 									BMessage* message, BHandler* target);
+			bool				HasShortcut(uint32 key, uint32 modifiers);
 			void				RemoveShortcut(uint32 key, uint32 modifiers);
 
 			void				SetDefaultButton(BButton* button);

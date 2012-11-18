@@ -12,6 +12,7 @@
 #include <vector>
 
 #ifdef __HAIKU__
+#	include <AboutWindow.h>
 #	include <AbstractLayoutItem.h>
 #	include <ControlLook.h>
 #endif
@@ -175,6 +176,7 @@ const uint32 kMsgToggleDataSource = 'tgds';
 const uint32 kMsgToggleLegend = 'tglg';
 const uint32 kMsgUpdateResolution = 'ures';
 
+extern const char* kAppName;
 extern const char* kSignature;
 
 
@@ -598,6 +600,10 @@ ActivityView::~ActivityView()
 {
 	delete fOffscreen;
 	delete fSystemInfoHandler;
+
+	// replicant deleted, destroy the about window
+	if (fAboutWindow != NULL)
+		fAboutWindow->Quit();
 }
 
 
@@ -641,6 +647,8 @@ ActivityView::_Init(const BMessage* settings)
 	const char* name;
 	for (int32 i = 0; settings->FindString("source", i, &name) == B_OK; i++)
 		AddDataSource(DataSource::FindSource(name), settings);
+
+	fAboutWindow = NULL;
 }
 
 
@@ -1104,7 +1112,21 @@ ActivityView::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
-			ActivityMonitor::ShowAbout();
+			if (fAboutWindow == NULL) {
+				const char* authors[] = {
+					"Axel Dörfler",
+					NULL
+				};
+
+				fAboutWindow = new BAboutWindow(kAppName, kSignature);
+				fAboutWindow->AddCopyright(2008, "Haiku, Inc.");
+				fAboutWindow->AddAuthors(authors);
+				fAboutWindow->Show();
+			} else if (fAboutWindow->IsHidden())
+				fAboutWindow->Show();
+			else
+				fAboutWindow->Activate();
+
 			break;
 
 		case kMsgUpdateResolution:

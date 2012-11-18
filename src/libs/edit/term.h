@@ -81,29 +81,29 @@ typedef struct {
 #define	A_K_EN		5
 #define	A_K_NKEYS	6
 
-protected void	term_move_to_line(EditLine *, int);
-protected void	term_move_to_char(EditLine *, int);
-protected void	term_clear_EOL(EditLine *, int);
-protected void	term_overwrite(EditLine *, const char *, int);
-protected void	term_insertwrite(EditLine *, char *, int);
-protected void	term_deletechars(EditLine *, int);
-protected void	term_clear_screen(EditLine *);
-protected void	term_beep(EditLine *);
-protected int	term_change_size(EditLine *, int, int);
-protected int	term_get_size(EditLine *, int *, int *);
-protected int	term_init(EditLine *);
-protected void	term_bind_arrow(EditLine *);
-protected void	term_print_arrow(EditLine *, const char *);
-protected int	term_clear_arrow(EditLine *, const char *);
-protected int	term_set_arrow(EditLine *, const char *, key_value_t *, int);
-protected void	term_end(EditLine *);
-protected void	term_get(EditLine *, const char **);
-protected int	term_set(EditLine *, const char *);
-protected int	term_settc(EditLine *, int, const char **);
-protected int	term_telltc(EditLine *, int, const char **);
-protected int	term_echotc(EditLine *, int, const char **);
-protected int	term__putc(int);
-protected void	term__flush(void);
+void	term_move_to_line(EditLine *, int);
+void	term_move_to_char(EditLine *, int);
+void	term_clear_EOL(EditLine *, int);
+void	term_overwrite(EditLine *, const char *, int);
+void	term_insertwrite(EditLine *, char *, int);
+void	term_deletechars(EditLine *, int);
+void	term_clear_screen(EditLine *);
+void	term_beep(EditLine *);
+int	term_change_size(EditLine *, int, int);
+int	term_get_size(EditLine *, int *, int *);
+int	term_init(EditLine *);
+void	term_bind_arrow(EditLine *);
+void	term_print_arrow(EditLine *, const char *);
+int	term_clear_arrow(EditLine *, const char *);
+int	term_set_arrow(EditLine *, const char *, key_value_t *, int);
+void	term_end(EditLine *);
+void	term_get(EditLine *, const char **);
+int	term_set(EditLine *, const char *);
+int	term_settc(EditLine *, int, const char **);
+int	term_telltc(EditLine *, int, const char **);
+int	term_echotc(EditLine *, int, const char **);
+int	term__putc(int);
+void	term__flush(void);
 
 /*
  * Easy access macros

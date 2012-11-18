@@ -11,31 +11,40 @@
 
 #include <new>
 
+#include <debugger.h>
+
 #include <Looper.h>
 #include <PopUpMenu.h>
 #include <ToolTip.h>
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
+#include <PromptWindow.h>
 
 #include "table/TableColumns.h"
 
 #include "ActionMenuItem.h"
 #include "Architecture.h"
+#include "FileSourceCode.h"
+#include "Function.h"
 #include "FunctionID.h"
 #include "FunctionInstance.h"
 #include "GuiSettingsUtils.h"
 #include "MessageCodes.h"
 #include "Register.h"
 #include "SettingsMenu.h"
+#include "SourceLanguage.h"
+#include "StackTrace.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
 #include "TableCellValueRenderer.h"
 #include "Team.h"
+#include "TeamDebugInfo.h"
 #include "Thread.h"
 #include "Tracing.h"
 #include "TypeComponentPath.h"
 #include "TypeHandlerRoster.h"
+#include "TypeLookupConstraints.h"
 #include "Value.h"
 #include "ValueHandler.h"
 #include "ValueHandlerRoster.h"
@@ -265,6 +274,23 @@ public:
 			return false;
 
 		child->AcquireReference();
+		return true;
+	}
+
+	bool RemoveChild(ModelNode* child)
+	{
+		if (!fChildren.RemoveItem(child))
+			return false;
+
+		child->ReleaseReference();
+		return true;
+	}
+
+	bool RemoveAllChildren()
+	{
+		for (int32 i = 0; i < fChildren.CountItems(); i++)
+			RemoveChild(fChildren.ItemAt(i));
+
 		return true;
 	}
 
@@ -935,7 +961,15 @@ VariablesView::VariableTableModel::ValueNodeChanged(ValueNodeChild* nodeChild,
 		return;
 
 	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-// TODO:...
+	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
+	if (modelNode == NULL)
+		return;
+
+	if (oldNode != NULL) {
+		ValueNodeChildrenDeleted(oldNode);
+		newNode->CreateChildren();
+		NotifyNodeChanged(modelNode);
+	}
 }
 
 
@@ -986,7 +1020,26 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 		return;
 
 	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
-// TODO:...
+
+	// check whether we know the node
+	ValueNodeChild* nodeChild = node->NodeChild();
+	if (nodeChild == NULL)
+		return;
+
+	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
+	if (modelNode == NULL)
+		return;
+
+	for (int32 i = 0; i < modelNode->CountChildren(); i++) {
+		BReference<ModelNode> childNode = modelNode->ChildAt(i);
+		TreeTablePath treePath;
+		if (GetTreePath(childNode, treePath)) {
+			int32 index = treePath.RemoveLastComponent();
+			NotifyNodesRemoved(treePath, index, 1);
+		}
+		modelNode->RemoveChild(childNode);
+		fNodeTable.Remove(childNode);
+	}
 }
 
 
@@ -1574,6 +1627,81 @@ VariablesView::MessageReceived(BMessage* message)
 			Looper()->PostMessage(message);
 			break;
 		}
+		case MSG_SHOW_TYPECAST_NODE_PROMPT:
+		{
+			BMessage* promptMessage = new(std::nothrow) BMessage(
+				MSG_TYPECAST_NODE);
+
+			if (promptMessage == NULL)
+				return;
+
+			ObjectDeleter<BMessage> messageDeleter(promptMessage);
+			promptMessage->AddPointer("node", fVariableTable
+				->SelectionModel()->NodeAt(0));
+			PromptWindow* promptWindow = new(std::nothrow) PromptWindow(
+				"Specify Type", "Type: ", BMessenger(this), promptMessage);
+			if (promptWindow == NULL)
+				return;
+
+			messageDeleter.Detach();
+			promptWindow->CenterOnScreen();
+			promptWindow->Show();
+			break;
+		}
+		case MSG_TYPECAST_NODE:
+		{
+			ModelNode* node = NULL;
+			if (message->FindPointer("node", reinterpret_cast<void **>(&node))
+				!= B_OK) {
+				break;
+			}
+
+			Type* type = NULL;
+			BString typeExpression = message->FindString("text");
+			if (typeExpression.Length() == 0)
+				break;
+
+			FileSourceCode* code = fStackFrame->Function()->GetFunction()
+				->GetSourceCode();
+			if (code == NULL)
+				break;
+
+			SourceLanguage* language = code->GetSourceLanguage();
+			if (language == NULL)
+				break;
+
+			if (language->ParseTypeExpression(typeExpression,
+				fThread->GetTeam()->DebugInfo(), type) != B_OK) {
+				break;
+			}
+
+			ValueNode* valueNode = NULL;
+			if (TypeHandlerRoster::Default()->CreateValueNode(
+				node->NodeChild(), type, valueNode) != B_OK) {
+				break;
+			}
+
+			// TODO: we need to also persist/restore the casted state
+			// in VariableViewState
+			node->NodeChild()->SetNode(valueNode);
+			break;
+		}
+		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
+		{
+			ModelNode* node = reinterpret_cast<ModelNode*>(
+				fVariableTable->SelectionModel()->NodeAt(0));
+			ValueLocation* location = node->NodeChild()->Location();
+			ValuePieceLocation piece = location->PieceAt(0);
+			if (piece.type != VALUE_PIECE_LOCATION_MEMORY)
+				break;
+
+			BMessage looperMessage(*message);
+			looperMessage.AddUInt64("address", piece.address);
+			looperMessage.AddInt32("length", piece.size);
+			looperMessage.AddUInt32("type", B_DATA_READ_WRITE_WATCHPOINT);
+			Looper()->PostMessage(&looperMessage);
+			break;
+		}
 		case MSG_VALUE_NODE_CHANGED:
 		{
 			ValueNodeChild* nodeChild;
@@ -1867,15 +1995,40 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	if (location->PieceAt(0).type != VALUE_PIECE_LOCATION_MEMORY)
 		return B_OK;
 
-	BMessage* message = new BMessage(MSG_SHOW_INSPECTOR_WINDOW);
-	if (message == NULL)
-		return B_NO_MEMORY;
+	BMessage* message = NULL;
+	status_t result = _AddContextAction("Inspect", MSG_SHOW_INSPECTOR_WINDOW,
+		actions, message);
+	if (result != B_OK)
+		return result;
 
-	ObjectDeleter<BMessage> messageDeleter(message);
 	message->AddUInt64("address", location->PieceAt(0).address);
 
-	ActionMenuItem* item = new(std::nothrow) ActionMenuItem("Inspect",
-		message);
+	result = _AddContextAction("Cast as" B_UTF8_ELLIPSIS,
+		MSG_SHOW_TYPECAST_NODE_PROMPT, actions, message);
+	if (result != B_OK)
+		return result;
+
+	result = _AddContextAction("Watch" B_UTF8_ELLIPSIS,
+		MSG_SHOW_WATCH_VARIABLE_PROMPT, actions, message);
+	if (result != B_OK)
+		return result;
+
+	return B_OK;
+}
+
+
+status_t
+VariablesView::_AddContextAction(const char* action, uint32 what,
+	ContextActionList* actions, BMessage*& _message)
+{
+	_message = new BMessage(what);
+	if (_message == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<BMessage> messageDeleter(_message);
+
+	ActionMenuItem* item = new(std::nothrow) ActionMenuItem(action,
+		_message);
 	if (item == NULL)
 		return B_NO_MEMORY;
 
@@ -1885,6 +2038,7 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 		return B_NO_MEMORY;
 
 	actionDeleter.Detach();
+
 	return B_OK;
 }
 

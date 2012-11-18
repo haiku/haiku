@@ -28,8 +28,6 @@ AddVariableToScript $(script) : isCD : 1 ;
 AddVariableToScript $(script) : cdLabel : $(HAIKU_CD_LABEL) ;
 AddVariableToScript $(script) : addBuildCompatibilityLibDir
 	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
-AddVariableToScript $(script) : stripOptionalPackageDebugSymbols
-	: $(HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES) ;
 AddTargetVariableToScript $(script) : <build>addattr ;
 AddTargetVariableToScript $(script) : <build>copyattr ;
 AddTargetVariableToScript $(script) : <build>rc ;

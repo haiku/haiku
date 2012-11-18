@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Be-POST	2300302075
+1	hindi	x-vnd.Be-POST	2566871483
 Fetching mail for %name	Notifier		मेल खोज रहें है %name
 Check for mails only	DeskbarView		केवल मेंल के लिए चेक करें
 Send pending mails	DeskbarView		बची हुई मेल को भेजें
@@ -9,7 +9,6 @@ Mail status	MailDaemon		मेल की स्थति
 Shutdown mail services	DeskbarView		मिल सर्विसेस बंद कर दीजिए
 %num new message	DeskbarView		%num नया सन्देश 
 Sending mail for %name	Notifier		मेल भेज रहें है %name
-Preferences…	DeskbarView		वरीयताएँ...
 %num new messages.	MailDaemon		%num नया सन्देश.
 %num new message.	MailDaemon		%num नया सन्देश.
 Create new message…	DeskbarView		नया सन्देश बनाने के लिए

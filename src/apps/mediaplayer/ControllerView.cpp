@@ -89,14 +89,6 @@ ControllerView::MessageReceived(BMessage* message)
 // #pragma mark -
 
 
-uint32
-ControllerView::EnabledButtons()
-{
-	// TODO: superflous
-	return 0xffffffff;
-}
-
-
 void
 ControllerView::TogglePlaying()
 {

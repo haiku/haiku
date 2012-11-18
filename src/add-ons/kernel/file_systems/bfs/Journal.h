@@ -60,7 +60,9 @@ private:
 								int32 event, void* _logEntry);
 	static	void			_TransactionIdle(int32 transactionID, int32 event,
 								void* _journal);
+	static	status_t		_FlushLog(void* _journal);
 
+private:
 			Volume*			fVolume;
 			recursive_lock	fLock;
 			Transaction*	fOwner;

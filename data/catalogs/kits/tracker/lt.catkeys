@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1868621245
+1	lithuanian	x-vnd.Haiku-libtracker	918781021
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -367,7 +367,6 @@ Modified	FindPanel		Modifikavimo data
 Error moving \"%name\" to Trash. (%error)	FSUtils		Klaida perkeliant „%name“ į Šiukšlinę (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Aplanko pakeisti vienu jo poaplankių negalima.
 <No recent items>	FavoritesMenu		<Paskiausių objektų nėra>
-Preferences…	ContainerWindow		Nuostatos…
 Move	PoseView		Perkelti
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ar tikrai norite pašalinti pažymėtus objektus? Neužmirškite, jog šis veiksmas negrįžtamas.

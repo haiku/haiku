@@ -17,7 +17,7 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_debug_console.cpp
 	arch_debug.cpp
 	arch_elf.cpp
-#	arch_exceptions.S
+	arch_exceptions.S
 	arch_int.cpp
 	arch_platform.cpp
 	arch_real_time_clock.cpp

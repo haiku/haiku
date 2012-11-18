@@ -224,7 +224,7 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		if (partition->ContainsFileSystem())
 			SetField(new BStringField(partition->Type()), kFilesystemColumn);
 		else
-			SetField(new BStringField(kUnavailableString), kFilesystemColumn);		
+			SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	}
 
@@ -250,7 +250,7 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 			delete_driver_settings(handle);
 		}
-		
+
 		SetField(new BStringField(parameters), kParametersColumn);
 	} else {
 		SetField(new BStringField(kUnavailableString), kParametersColumn);
@@ -278,6 +278,19 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 	char sizeString[1024];
 	SetField(new BStringField(string_for_size(size, sizeString,
 		sizeof(sizeString))), kSizeColumn);
+}
+
+
+const char*
+PartitionListRow::DevicePath()
+{
+	BBitmapStringField* stringField
+		= dynamic_cast<BBitmapStringField*>(GetField(kDeviceColumn));
+
+	if (stringField == NULL)
+		return NULL;
+
+	return stringField->String();
 }
 
 
@@ -309,6 +322,30 @@ PartitionListView::AttachedToWindow()
 {
 	Inherited::AttachedToWindow();
 	PartitionColumn::InitTextMargin(ScrollView());
+}
+
+
+bool
+PartitionListView::InitiateDrag(BPoint rowPoint, bool wasSelected)
+{
+	PartitionListRow* draggedRow
+		= dynamic_cast<PartitionListRow*>(RowAt(rowPoint));
+	if (draggedRow == NULL)
+		return false;
+
+	const char* draggedPath = draggedRow->DevicePath();
+	if (draggedPath == NULL)
+		return false;
+
+	BRect draggedRowRect;
+	GetRowRect(draggedRow, &draggedRowRect);
+
+	BMessage dragMessage(B_MIME_DATA);
+	dragMessage.AddData("text/plain", B_MIME_TYPE, draggedPath,
+		strlen(draggedPath));
+
+	DragMessage(&dragMessage, draggedRowRect, NULL);
+	return true;
 }
 
 

@@ -18,5 +18,5 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
 
 SimpleTest GLUTGameMode :
 	$(sources)
-	: be GL
+	: be GL libglut.so
 ;

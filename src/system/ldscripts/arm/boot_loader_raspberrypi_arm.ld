@@ -11,10 +11,22 @@ UND_STACK_SIZE	= 0;
 
 SECTIONS
 {
+	/*
+	 * Raspberry Pi boot logic:
+	 * start.elf loads the kernel specified in config.txt
+	 * if a dtb exists, it is loaded at 0x100 and the kernel at 0x8000
+	 * else if disable_commandline_tags true, set kernel load address to 0x0
+	 * else load kernel at 0x8000 and put atags at 0x100
+	 */
+
 	. = BOARD_LOADER_BASE;
 
-	/* text/read-only data */
-	.text :	{
+	/* .init is a stub that jumps to code at .text */
+	.init : {
+		*(.init)
+	}
+
+	.text 0x8000 : {
 		CREATE_OBJECT_SYMBOLS
 		*(.text .text.* .gnu.linkonce.t.*)
 		*(.plt)

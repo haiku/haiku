@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1776686592
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	826846368
 common	B_COMMON_DIRECTORY		felles
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvisning
@@ -362,7 +362,6 @@ Modified	FindPanel		Endret
 Error moving \"%name\" to Trash. (%error)	FSUtils		Feil ved flytting av \"%name\" til søppelkurv. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Du kan ikke erstatte en mappe med en av sine undermapper.
 <No recent items>	FavoritesMenu		<Ingen nylige elementer>
-Preferences…	ContainerWindow		Innstillinger...
 Move	PoseView		Flytt
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Er du sikker på at du vil slette valgte element(er)? Du kan ikke angre på denne handlingen.

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Be-POST	2300302075
+1	greek, modern (1453-)	x-vnd.Be-POST	2566871483
 Fetching mail for %name	Notifier		Κατέβασμα μηνυμάτων από %name
 Check for mails only	DeskbarView		Ελεγχος για νέα μηνύματα μόνο
 Send pending mails	DeskbarView		Αποστολή αλληλογραφίας στην ουρά
@@ -9,7 +9,6 @@ Mail status	MailDaemon		Κατάσταση αλληλογραφίας
 Shutdown mail services	DeskbarView		Κλείσιμο υπηρεσιών αλληλογραφίας
 %num new message	DeskbarView		%num νέο μήνυμα
 Sending mail for %name	Notifier		Αποστολή μηνύματος από %name
-Preferences…	DeskbarView		Επιλογές...
 %num new messages.	MailDaemon		%num καινούργια μηνύματα.
 %num new message.	MailDaemon		%num καινούργια μηνύματα.
 Create new message…	DeskbarView		Δημιουργία μηνύματος...

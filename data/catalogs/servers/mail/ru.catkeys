@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-POST	734840027
+1	russian	x-vnd.Be-POST	1091177030
 Fetching mail for %name	Notifier		Получение почты для %name
 Check for mails only	DeskbarView		Только проверить почту
 Send pending mails	DeskbarView		Отправить почту в ожидании
@@ -6,6 +6,7 @@ New Messages	MailDaemon		Новые сообщения
 <no accounts>	DeskbarView		<нет аккаунтов>
 %num new messages	DeskbarView		%num новых сообщений
 Mail status	MailDaemon		Статус почты
+Shutdown mail services	DeskbarView		Выключить почтовые службы
 %num new message	DeskbarView		%num новое сообщение
 Sending mail for %name	Notifier		Отправка почты для %name
 %num new messages.	MailDaemon		%num новых сообщений.
@@ -16,5 +17,7 @@ No new messages	MailDaemon		Нет новых сообщений
 Check for mail now	DeskbarView		Проверить почту
 No new messages	DeskbarView		Нет новых сообщений
 %num new messages for %name\n	MailDaemon		У вас есть %num новых сообщений для %name\n
+Mail daemon status log	MailDaemon		Журнал почтового демона
+Settings…	DeskbarView		Настройки…
 No new messages.	MailDaemon		Нет новых сообщений.
 Mail status	Notifier		Статус почты

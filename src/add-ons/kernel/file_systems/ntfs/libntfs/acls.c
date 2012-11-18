@@ -4,7 +4,7 @@
  *	This module is part of ntfs-3g library, but may also be
  *	integrated in tools running over Linux or Windows
  *
- * Copyright (c) 2007-2009 Jean-Pierre Andre
+ * Copyright (c) 2007-2010 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -528,9 +528,7 @@ gid_t ntfs_find_group(const struct MAPPING* groupmapping, const SID * gsid)
 {
 	gid_t gid;
 	const struct MAPPING *p;
-	int gsidsz;
 
-	gsidsz = ntfs_sid_size(gsid);
 	p = groupmapping;
 	while (p && p->xid && !ntfs_same_sid(gsid, p->sid))
 		p = p->next;
@@ -1907,7 +1905,6 @@ static int buildacls_posix(struct MAPPING* const mapping[],
 	const SID *sid;
 	int acecnt;
 	int usidsz;
-	int gsidsz;
 	int wsidsz;
 	int asidsz;
 	int ssidsz;
@@ -1915,7 +1912,6 @@ static int buildacls_posix(struct MAPPING* const mapping[],
 	le32 grants;
 
 	usidsz = ntfs_sid_size(usid);
-	gsidsz = ntfs_sid_size(gsid);
 	wsidsz = ntfs_sid_size(worldsid);
 	asidsz = ntfs_sid_size(adminsid);
 	ssidsz = ntfs_sid_size(systemsid);
@@ -3138,7 +3134,6 @@ static int norm_ownadmin_permissions_posix(struct POSIX_SECURITY *posix_desc,
 	u16 tag;
 	u16 tagsset;
 	struct POSIX_ACE *pxace;
-	int acccnt;
 	mode_t denywrld;
 	mode_t allow;
 	mode_t deny;
@@ -3147,7 +3142,6 @@ static int norm_ownadmin_permissions_posix(struct POSIX_SECURITY *posix_desc,
 
 	mode = 0;
 	pxace = posix_desc->acl.ace;
-	acccnt = posix_desc->acccnt;
 	tagsset = 0;
 	denywrld = 0;
 		/*
@@ -3887,12 +3881,10 @@ struct POSIX_SECURITY *ntfs_build_permissions_posix(
 int ntfs_build_permissions(const char *securattr,
 			const SID *usid, const SID *gsid, BOOL isdir)
 {
-	const SECURITY_DESCRIPTOR_RELATIVE *phead;
 	int perm;
 	BOOL adminowns;
 	BOOL groupowns;
 
-	phead = (const SECURITY_DESCRIPTOR_RELATIVE*)securattr;
 	adminowns = ntfs_same_sid(usid,adminsid)
 	         || ntfs_same_sid(gsid,adminsid);
 	groupowns = !adminowns && ntfs_same_sid(gsid,usid);
@@ -3921,6 +3913,7 @@ static unsigned long atoul(const char *p)
 	return (v);
 }
 #endif
+
 
 /*
  *		Build an internal representation of a SID
@@ -3965,35 +3958,6 @@ static SID *encodesid(const char *sidstr)
 }
 
 /*
- *			Early logging before the logs are redirected
- *
- *	(not quite satisfactory : this appears before the ntfs-g banner,
- *	and with a different pid)
- */
-
-static void log_early_error(const char *format, ...)
-		__attribute__((format(printf, 1, 2)));
-
-static void log_early_error(const char *format, ...)
-{
-#ifndef	__HAIKU__
-	va_list args;
-
-	va_start(args, format);
-#ifdef HAVE_SYSLOG_H
-	openlog("ntfs-3g", LOG_PID, LOG_USER);
-	ntfs_log_handler_syslog(NULL, NULL, 0,
-		NTFS_LOG_LEVEL_ERROR, NULL,
-		format, args);
-#else
-	vfprintf(stderr,format,args);
-#endif
-	va_end(args);
-#endif	
-}
-
-
-/*
  *		Get a single mapping item from buffer
  *
  *	Always reads a full line, truncating long lines
@@ -4006,7 +3970,6 @@ static struct MAPLIST *getmappingitem(FILEREADER reader, void *fileid,
 {
 	int src;
 	int dst;
-	char *p;
 	char *q;
 	char *pu;
 	char *pg;
@@ -4040,7 +4003,6 @@ static struct MAPLIST *getmappingitem(FILEREADER reader, void *fileid,
 		if (gotend) {
 			pu = pg = (char*)NULL;
 			/* decompose into uid, gid and sid */
-			p = item->maptext;
 			item->uidstr = item->maptext;
 			item->gidstr = strchr(item->uidstr, ':');
 			if (item->gidstr) {
@@ -4055,7 +4017,7 @@ static struct MAPLIST *getmappingitem(FILEREADER reader, void *fileid,
 			if (pu && pg)
 				*pu = *pg = '\0';
 			else {
-				log_early_error("Bad mapping item \"%s\"\n",
+				ntfs_log_early_error("Bad mapping item \"%s\"\n",
 					item->maptext);
 				free(item);
 				item = (struct MAPLIST*)NULL;
@@ -4184,7 +4146,7 @@ struct MAPPING *ntfs_do_user_mapping(struct MAPLIST *firstitem)
 				if (pwd)
 					uid = pwd->pw_uid;
 				else
-					log_early_error("Invalid user \"%s\"\n",
+					ntfs_log_early_error("Invalid user \"%s\"\n",
 						item->uidstr);
 			}
 		}
@@ -4264,7 +4226,7 @@ struct MAPPING *ntfs_do_group_mapping(struct MAPLIST *firstitem)
 					if (grp)
 						gid = grp->gr_gid;
 					else
-						log_early_error("Invalid group \"%s\"\n",
+						ntfs_log_early_error("Invalid group \"%s\"\n",
 							item->gidstr);
 				}
 			}

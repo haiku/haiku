@@ -531,7 +531,7 @@ el_beep(EditLine *el)
 /* el_editmode()
  *	Set the state of EDIT_DISABLED from the `edit' command.
  */
-protected int
+int
 /*ARGSUSED*/
 el_editmode(EditLine *el, int argc, const char **argv)
 {

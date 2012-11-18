@@ -23,10 +23,11 @@ static const uint32 MSG_COLOR_SCHEMA_CHANGED			= 'mccs';
 
 static const uint32 MSG_TAB_TITLE_SETTING_CHANGED		= 'mtts';
 static const uint32 MSG_WINDOW_TITLE_SETTING_CHANGED	= 'mwts';
+static const uint32 MSG_BLINK_CURSOR_CHANGED			= 'mbcc';
 static const uint32 MSG_WARN_ON_EXIT_CHANGED			= 'mwec';
 static const uint32 MSG_COLS_CHANGED					= 'mccl';
 static const uint32 MSG_ROWS_CHANGED					= 'mcrw';
-static const uint32 MSG_HISTORY_CHANGED 				= 'mhst';
+static const uint32 MSG_HISTORY_CHANGED					= 'mhst';
 
 static const uint32 MSG_PREF_MODIFIED					= 'mpmo';
 
@@ -71,6 +72,7 @@ private:
 									const color_schema** schemas,
 									const color_schema* defaultItemName);
 
+			BCheckBox*			fBlinkCursor;
 			BCheckBox*			fWarnOnExit;
 			BMenuField*			fFont;
 			BMenuField*			fFontSize;

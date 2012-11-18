@@ -7,9 +7,7 @@
 #ifndef	LINEAR_SPEC_H
 #define	LINEAR_SPEC_H
 
-#include <math.h>
-
-#include <List.h>
+#include <ObjectList.h>
 #include <OS.h>
 #include <Referenceable.h>
 #include <Size.h>
@@ -36,7 +34,7 @@ class SolverInterface {
 public:
 								SolverInterface(LinearSpec* linSpec);
 
-	virtual						~SolverInterface() {}
+	virtual						~SolverInterface();
 
 	virtual ResultType			Solve() = 0;
 
@@ -49,11 +47,9 @@ public:
 	virtual	bool				LeftSideChanged(Constraint* constraint) = 0;
 	virtual	bool				RightSideChanged(Constraint* constraint) = 0;
 	virtual	bool				OperatorChanged(Constraint* constraint) = 0;
+	virtual	bool				PenaltiesChanged(Constraint* constraint) = 0;
 
 	virtual bool				SaveModel(const char* fileName) = 0;
-
-	virtual	BSize				MinSize(Variable* width, Variable* height) = 0;
-	virtual	BSize				MaxSize(Variable* width, Variable* height) = 0;
 
 	virtual	ResultType			FindMins(const VariableList* variables) = 0;
 	virtual	ResultType			FindMaxs(const VariableList* variables) = 0;
@@ -63,7 +59,23 @@ public:
 									const Constraint** _max) const = 0;
 
 protected:
+			bool				AddConstraint(Constraint* constraint,
+									bool notifyListener);
+			bool				RemoveConstraint(Constraint* constraint,
+									bool deleteConstraint, bool notifyListener);
+			
 			LinearSpec*			fLinearSpec; 
+};
+
+
+class SpecificationListener {
+public:
+	virtual						~SpecificationListener();
+
+	virtual	void				VariableAdded(Variable* variable);
+	virtual	void				VariableRemoved(Variable* variable);
+	virtual void				ConstraintAdded(Constraint* constraint);
+	virtual void				ConstraintRemoved(Constraint* constraint);
 };
 
 
@@ -74,6 +86,10 @@ class LinearSpec : public BReferenceable {
 public:
 								LinearSpec();
 	virtual						~LinearSpec();
+
+			/*! Does not takes ownership of the listener. */
+			bool				AddListener(SpecificationListener* listener);
+			bool				RemoveListener(SpecificationListener* listener);
 
 			Variable*			AddVariable();
 			bool				AddVariable(Variable* variable);
@@ -88,46 +104,31 @@ public:
 									bool deleteConstraint = true);
 
 			Constraint*			AddConstraint(SummandList* summands,
-									OperatorType op, double rightSide);
-			Constraint*			AddConstraint(double coeff1, Variable* var1,
-									OperatorType op, double rightSide);
-			Constraint*			AddConstraint(double coeff1, Variable* var1,
-									double coeff2, Variable* var2,
-									OperatorType op, double rightSide);
-			Constraint*			AddConstraint(double coeff1, Variable* var1,
-									double coeff2, Variable* var2,
-									double coeff3, Variable* var3,
-									OperatorType op, double rightSide);
-			Constraint*			AddConstraint(double coeff1, Variable* var1,
-									double coeff2, Variable* var2,
-									double coeff3, Variable* var3,
-									double coeff4, Variable* var4,
-									OperatorType op, double rightSide);
-
-			Constraint*			AddConstraint(SummandList* summands,
 									OperatorType op, double rightSide,
-									double penaltyNeg, double penaltyPos);
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
 			Constraint*			AddConstraint(double coeff1, Variable* var1,
 									OperatorType op, double rightSide,
-									double penaltyNeg, double penaltyPos);
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
 			Constraint*			AddConstraint(double coeff1, Variable* var1,
 									double coeff2, Variable* var2,
 									OperatorType op, double rightSide,
-									double penaltyNeg, double penaltyPos);
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
 			Constraint*			AddConstraint(double coeff1, Variable* var1,
 									double coeff2, Variable* var2,
 									double coeff3, Variable* var3,
 									OperatorType op, double rightSide,
-									double penaltyNeg, double penaltyPos);
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
 			Constraint*			AddConstraint(double coeff1, Variable* var1,
 									double coeff2, Variable* var2,
 									double coeff3, Variable* var3,
 									double coeff4, Variable* var4,
 									OperatorType op, double rightSide,
-									double penaltyNeg, double penaltyPos);
-
-			BSize				MinSize(Variable* width, Variable* height);
-			BSize				MaxSize(Variable* width, Variable* height);
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
 
 			ResultType			FindMins(const VariableList* variables);
 			ResultType			FindMaxs(const VariableList* variables);
@@ -151,9 +152,18 @@ public:
 
 protected:
 	friend class Constraint;
- 			bool				UpdateLeftSide(Constraint* constraint);
+	friend class SolverInterface;
+
+ 			bool				UpdateLeftSide(Constraint* constraint,
+ 									const SummandList* oldSummands);
 			bool				UpdateRightSide(Constraint* constraint);
 			bool				UpdateOperator(Constraint* constraint);
+			bool				UpdatePenalties(Constraint* constraint);
+
+			bool				AddConstraint(Constraint* constraint,
+									bool notifyListener);
+			bool				RemoveConstraint(Constraint* constraint,
+									bool deleteConstraint, bool notifyListener);
 private:
 			/*! Check if all entries != NULL otherwise delete the list and its
 			entries. */
@@ -162,6 +172,9 @@ private:
 									OperatorType op, double rightSide,
 									double penaltyNeg, double penaltyPos);
 
+			void				_AddConstraintRef(Variable* var);
+			void				_RemoveConstraintRef(Variable* var);
+			
 			VariableList		fVariables;
 			VariableList		fUsedVariables;
 			ConstraintList		fConstraints;
@@ -169,6 +182,8 @@ private:
 			bigtime_t 			fSolvingTime;
 
 			SolverInterface*	fSolver;
+
+			BObjectList<SpecificationListener>	fListeners;
 };
 
 }	// namespace LinearProgramming

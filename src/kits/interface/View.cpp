@@ -4587,6 +4587,16 @@ BView::SetExplicitPreferredSize(BSize size)
 
 
 void
+BView::SetExplicitSize(BSize size)
+{
+	fLayoutData->fMinSize = size;
+	fLayoutData->fMaxSize = size;
+	fLayoutData->fPreferredSize = size;
+	InvalidateLayout();
+}
+
+
+void
 BView::SetExplicitAlignment(BAlignment alignment)
 {
 	fLayoutData->fAlignment = alignment;
@@ -5711,11 +5721,11 @@ BView::ScrollWithMouseWheelDelta(BScrollBar* scrollBar, float delta)
 	float smallStep, largeStep;
 	scrollBar->GetSteps(&smallStep, &largeStep);
 
-	// pressing the option/command/control key scrolls faster
-	if (modifiers()
-			& (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) {
+	// pressing the shift key scrolls faster (following the pseudo-standard set
+	// by other desktop environments).
+	if ((modifiers() & B_SHIFT_KEY) != 0)
 		delta *= largeStep;
-	} else
+	else
 		delta *= smallStep * 3;
 
 	scrollBar->SetValue(scrollBar->Value() + delta);

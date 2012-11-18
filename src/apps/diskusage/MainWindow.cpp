@@ -51,9 +51,8 @@ void
 MainWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kBtnCancel:
 		case kBtnRescan:
-			fControlsView->MessageReceived(message);
-			break;
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
 			fControlsView->MessageReceived(message);
@@ -83,9 +82,16 @@ MainWindow::QuitRequested()
 
 
 void
-MainWindow::SetRescanEnabled(bool enabled)
+MainWindow::EnableRescan()
 {
-	fControlsView->SetRescanEnabled(enabled);
+	fControlsView->EnableRescan();
+}
+
+
+void
+MainWindow::EnableCancel()
+{
+	fControlsView->EnableCancel();
 }
 
 

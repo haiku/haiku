@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	1301055003
+1	belarusian	x-vnd.Haiku-libtracker	2606149823
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -164,6 +164,7 @@ no supporting apps	OpenWithWindow		няма падыходзячых прагр�
 That name is already taken. Please type another one.	InfoWindow		Імя ўжо занятае. Калі ласка, выберыце іншае.
 Sorry, you can't create links in the Trash.	PoseView		Прабачце, вы не можаце свараце спасылкі ў Сметніцы.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Элемент \"%name\" ужо ёсць у каталозе, і можа мясціць\nэлементы з такімі ж імёнамі. Жадаеце замяніць іх файламі з каталога, які вы %verb?
+Tracker preferences…	ContainerWindow		Наладкі Трэкера…
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Спасылка \"%name\" на
 Mount settings…	VolumeWindow		Наладкі мантавання...
 Select…	VolumeWindow		Выбраць...
@@ -378,7 +379,6 @@ Modified	FindPanel		Зменены
 Error moving \"%name\" to Trash. (%error)	FSUtils		Памылка пры адпраўцы \"%name\" да Сметніцы. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Вы не можаце замяніць каталог адным з яго падкаталогаў.
 <No recent items>	FavoritesMenu		<Няма нядаўніх элементаў>
-Preferences…	ContainerWindow		Наладкі...
 Move	PoseView		Перамясціць
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Вы ўпэўненыя, что жадаеце беззваротна выдаліць выбраны(я) элемент(ы)?

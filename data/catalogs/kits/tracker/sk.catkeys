@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1574172506
+1	slovak	x-vnd.Haiku-libtracker	624332282
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -377,7 +377,6 @@ Modified	FindPanel		Zmenené
 Error moving \"%name\" to Trash. (%error)	FSUtils		Chyba pri presúvaní „%name“ do Koša. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Nemôžete nahradiť priečinok jedným z jeho podpriečinkov.
 <No recent items>	FavoritesMenu		<Žiadne nedávne položky>
-Preferences…	ContainerWindow		Predvoľby…
 Move	PoseView		Presunúť
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ste si istí, že chcete zmazať vybrané položky? Túto operáciu nemožno vrátiť.

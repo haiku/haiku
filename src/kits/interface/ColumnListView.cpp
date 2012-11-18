@@ -62,6 +62,7 @@ All rights reserved.
 #include <Region.h>
 #include <ScrollBar.h>
 #include <String.h>
+#include <SupportDefs.h>
 #include <Window.h>
 
 #include <ObjectListPrivate.h>
@@ -4783,16 +4784,20 @@ float
 OutlineView::GetColumnPreferredWidth(BColumn* column)
 {
 	float preferred = 0.0;
-	for (RecursiveOutlineIterator iterator(&fRows); iterator.CurrentRow();
-		iterator.GoToNext()) {
-		BRow* row = iterator.CurrentRow();
+	for (RecursiveOutlineIterator iterator(&fRows); BRow* row =
+		iterator.CurrentRow(); iterator.GoToNext()) {
 		BField* field = row->GetField(column->fFieldID);
 		if (field) {
-			float width = column->GetPreferredWidth(field, this);
-			if (preferred < width)
-				preferred = width;
+			float width = column->GetPreferredWidth(field, this)
+				+ iterator.CurrentLevel() * kOutlineLevelIndent;
+			preferred = max_c(preferred, width);
 		}
 	}
+
+	BString name;
+	column->GetColumnName(&name);
+	preferred = max_c(preferred, StringWidth(name));
+
 	// Constrain to preferred width. This makes the method do a little
 	// more than asked, but it's for convenience.
 	if (preferred < column->MinWidth())

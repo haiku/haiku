@@ -6,10 +6,10 @@
 
 
 #include "console.h"
-#include "cpu.h"
+#include "arch_cpu.h"
 #include "gpio.h"
 #include "keyboard.h"
-#include "mmu.h"
+#include "arch_mmu.h"
 #include "serial.h"
 
 #include <KernelExport.h>
@@ -38,7 +38,7 @@ extern int main(stage2_args *args);
 void _start(void);
 
 // Adjusted during mmu_init
-addr_t gPeripheralBase = PERIPHERAL_BASE;
+addr_t gPeripheralBase = DEVICE_BASE;
 
 
 static void

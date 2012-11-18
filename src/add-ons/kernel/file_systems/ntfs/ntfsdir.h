@@ -24,14 +24,20 @@
 #include "ntfs.h"
 
 
+typedef struct cache_entry {
+	struct dirent *ent;
+	struct cache_entry *next;
+} cache_entry;
+
+
 typedef struct dircookie {
 	u64					pos;
-	int					readed;		
-	int					last;
-	ino_t				ino;
-	BOOL 				show_sys_files;	
-	char 				name[MAX_PATH];
+	dev_t				dev_id;
+	BOOL 				show_sys_files;
+	cache_entry 		*cache_root;
+	cache_entry 		*entry;
 } dircookie;
+
 
 status_t	fs_closedir(fs_volume *volume, fs_vnode *vnode, void *cookie);
 status_t	fs_free_dircookie(fs_volume *volume, fs_vnode *vnode, void *cookie);

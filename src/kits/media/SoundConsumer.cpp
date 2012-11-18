@@ -35,18 +35,15 @@ namespace BPrivate {
 //	other such debugging aids. By contrast, DEBUG turns on extra debugging
 //	in some programs.
 #if !NDEBUG
-#define FPRINTF fprintf
-#else
-#define FPRINTF (void)
+#define TRACE_SOUNDCONSUMER
 #endif
 
 //	Comment out the FPRINTF part of these lines to reduce verbiage.
 //	Enabling MESSAGE will kill performance on slower machines, because it
 //	prints for each message received (including each buffer).
-#define TRACE_SOUNDCONSUMER
 #ifdef TRACE_SOUNDCONSUMER
-#define NODE FPRINTF
-#define MESSAGE FPRINTF
+#define NODE fprintf
+#define MESSAGE fprintf
 #else
 #define NODE(x...)
 #define MESSAGE(x...)
@@ -628,7 +625,7 @@ SoundConsumer::ServiceThread()
 				Notify(B_OP_TIMED_OUT, timeout);
 		} else {
 			//	Other errors are bad.
-			FPRINTF(stderr, "SoundConsumer: error %#010lx\n", err);
+			MESSAGE(stderr, "SoundConsumer: error %#010lx\n", err);
 			bad++;
 			//	If we receive three bad reads with no good messages inbetween,
 			//	things are probably not going to improve (like the port

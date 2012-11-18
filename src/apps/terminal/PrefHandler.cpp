@@ -44,6 +44,8 @@ static const pref_defaults kTermDefaults[] = {
 
 	{ PREF_TEXT_FORE_COLOR,		"  0,   0,   0" },
 	{ PREF_TEXT_BACK_COLOR,		"255, 255, 255" },
+	{ PREF_CURSOR_FORE_COLOR,	"  0,   0,   0" },
+	{ PREF_CURSOR_BACK_COLOR,	"255, 200,   0" },
 	{ PREF_SELECT_FORE_COLOR,	"255, 255, 255" },
 	{ PREF_SELECT_BACK_COLOR,	"  0,   0,   0" },
 
@@ -61,6 +63,7 @@ static const pref_defaults kTermDefaults[] = {
 
 	{ PREF_TAB_TITLE,			"%1d: %p" },
 	{ PREF_WINDOW_TITLE,		"Terminal %i: %t" },
+	{ PREF_BLINK_CURSOR,		PREF_TRUE },
 	{ PREF_WARN_ON_EXIT,		PREF_TRUE },
 
 	{ NULL, NULL},

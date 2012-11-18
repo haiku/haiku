@@ -70,6 +70,7 @@ private:
 			bool				fIsPlaying;
 			bool				fIsFullscreen;
 			bool				fFullscreenControlsVisible;
+			bool				fFirstPulseAfterFullscreen;
 			uint8				fSendHideCounter;
 			bigtime_t			fLastMouseMove;
 

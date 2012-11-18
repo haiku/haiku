@@ -30,7 +30,8 @@ public:
 	virtual						~VolumeView();
 
 	virtual	void				MessageReceived(BMessage* message);
-			void				SetRescanEnabled(bool enabled);
+			void				EnableRescan();
+			void				EnableCancel();
 			void				SetPath(BPath path);
 			void				ShowInfo(const FileInfo* info);
 

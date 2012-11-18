@@ -50,6 +50,7 @@ template<typename Addressing> status_t
 MulticastGroupInterface<Addressing>::Drop()
 {
 	fAddresses.Clear();
+	Addressing::LeaveGroup(this);
 	fFilterMode = kInclude;
 	return B_OK;
 }

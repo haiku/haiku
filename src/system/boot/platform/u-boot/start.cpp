@@ -21,6 +21,12 @@
 
 #include <string.h>
 
+extern "C" {
+#include <fdt.h>
+#include <libfdt.h>
+#include <libfdt_env.h>
+};
+
 
 #define HEAP_SIZE (128 * 1024)
 
@@ -50,6 +56,7 @@ extern "C" int main(stage2_args *args);
 extern "C" void _start(void);
 extern "C" int start_raw(int argc, const char **argv);
 extern "C" void dump_uimage(struct image_header *image);
+extern "C" void dump_fdt(const void *fdt);
 
 // declared in shell.S
 // those are initialized to NULL but not in the BSS
@@ -167,17 +174,62 @@ start_raw(int argc, const char **argv)
 	args.arguments = NULL;
 	args.platform.boot_tgz_data = NULL;
 	args.platform.boot_tgz_size = 0;
+	args.platform.fdt_data = NULL;
+	args.platform.fdt_size = 0;
 
-	serial_init();
+	// if we get passed a uimage, try to find the third blob only if we do not have FDT data yet
+	if (gUImage != NULL
+		&& !gFDT
+		&& image_multi_getimg(gUImage, 2,
+			(uint32*)&args.platform.fdt_data,
+			&args.platform.fdt_size)) {
+		// found a blob, assume it is FDT data, when working on a platform
+		// which does not have an FDT enabled U-Boot
+		gFDT = args.platform.fdt_data;
+	}
+
+	serial_init(gFDT);
 	console_init();
 	cpu_init();
+
+	if (args.platform.fdt_data) {
+		dprintf("Found FDT from uimage @ %p, %" B_PRIu32 " bytes\n",
+			args.platform.fdt_data, args.platform.fdt_size);
+	} else if (gFDT) {
+		/* Fixup args so we can pass the gFDT on to the kernel */
+		args.platform.fdt_data = gFDT;
+		args.platform.fdt_size = fdt_totalsize(gFDT);
+	}
+
+	// if we get passed an FDT, check /chosen for initrd
+	if (gFDT != NULL) {
+		int node = fdt_path_offset(gFDT, "/chosen");
+		const void *prop;
+		int len;
+		phys_addr_t initrd_start = 0, initrd_end = 0;
+
+		if (node >= 0) {
+			prop = fdt_getprop(gFDT, node, "linux,initrd-start", &len);
+			if (prop && len == 4)
+				initrd_start = fdt32_to_cpu(*(uint32_t *)prop);
+			prop = fdt_getprop(gFDT, node, "linux,initrd-end", &len);
+			if (prop && len == 4)
+				initrd_end = fdt32_to_cpu(*(uint32_t *)prop);
+			if (initrd_end > initrd_start) {
+				args.platform.boot_tgz_data = (void *)initrd_start;
+				args.platform.boot_tgz_size = initrd_end - initrd_start;
+		dprintf("Found boot tgz from FDT @ %p, %" B_PRIu32 " bytes\n",
+			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
+			}
+		}
+	}
 
 	// if we get passed a uimage, try to find the second blob
 	if (gUImage != NULL
 		&& image_multi_getimg(gUImage, 1,
 			(uint32*)&args.platform.boot_tgz_data,
 			&args.platform.boot_tgz_size)) {
-		dprintf("Found boot tgz @ %p, %" B_PRIu32 " bytes\n",
+		dprintf("Found boot tgz from uimage @ %p, %" B_PRIu32 " bytes\n",
 			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
 	}
 
@@ -188,11 +240,13 @@ start_raw(int argc, const char **argv)
 			dprintf("argv[%d] @%lx = '%s'\n", i, (uint32)argv[i], argv[i]);
 		dprintf("os: %d\n", (int)gUBootOS);
 		dprintf("gd @ %p\n", gUBootGlobalData);
-		dprintf("gd->bd @ %p\n", gUBootGlobalData->bd);
+		if (gUBootGlobalData)
+			dprintf("gd->bd @ %p\n", gUBootGlobalData->bd);
 		//dprintf("fb_base %p\n", (void*)gUBootGlobalData->fb_base);
-		dprintf("uimage @ %p\n", gUImage);
 		if (gUImage)
 			dump_uimage(gUImage);
+		if (gFDT)
+			dump_fdt(gFDT);
 	}
 	
 	mmu_init();

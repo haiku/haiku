@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1301055003
+1	german	x-vnd.Haiku-libtracker	2606149823
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -164,6 +164,7 @@ no supporting apps	OpenWithWindow		keine unterstützenden Anwendungen
 That name is already taken. Please type another one.	InfoWindow		Dieser Name wird bereits verwendet. Bitte einen anderen wählen.
 Sorry, you can't create links in the Trash.	PoseView		Im Papierkorb können leider keine Verknüpfungen erstellt werden.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ein Objekt mit dem Namen \"%name\" existiert bereits in diesem Ordner und könnte\nObjekte mit gleichen Namen enthalten. Sollen sie mit denen des Ordners ersetzt werden, der %verb werden soll?
+Tracker preferences…	ContainerWindow		Tracker-Einstellungen…
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Verknüpfe \"%name\" mit:
 Mount settings…	VolumeWindow		Einhänge-Einstellungen…
 Select…	VolumeWindow		Auswählen…
@@ -378,7 +379,6 @@ Modified	FindPanel		Geändert
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fehler beim Verschieben von \"%name\" in den Papierkorb. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Ordner können nicht mit einem seiner Unterordner ersetzt werden.
 <No recent items>	FavoritesMenu		<Keine letzten Objekte>
-Preferences…	ContainerWindow		Einstellungen…
 Move	PoseView		Verschieben
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Sollen die ausgewählten Objekte wirklich gelöscht werden? Diese Aktion kann nicht rückgängig gemacht werden.

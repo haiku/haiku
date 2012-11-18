@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-GLTeapot	2890609668
+1	english	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		上部中心
 Lighting	TeapotWindow		灯光
 Off	TeapotWindow		关闭
@@ -13,7 +13,6 @@ Fog	TeapotWindow		模糊
 Backface culling	TeapotWindow		隐面消除
 Z-buffered	TeapotWindow		Z-缓冲
 File	TeapotWindow		文件
-Options	TeapotWindow		选项
 Perspective	TeapotWindow		透视
 GLTeapot	System name		GL 茶壶
 Green	TeapotWindow		绿色

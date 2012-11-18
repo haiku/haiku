@@ -13,7 +13,7 @@
 #include <InterfaceDefs.h>
 
 
-static const int32 kNumColors = 32;
+static const int32 kNumColors = 34;
 
 struct server_read_only_memory {
 	rgb_color	colors[kNumColors];
@@ -26,10 +26,10 @@ static inline int32
 color_which_to_index(color_which which)
 {
 	// NOTE: this must be kept in sync with InterfaceDefs.h color_which!
-	if (which <= B_CONTROL_MARK_COLOR)
+	if (which <= B_LIST_SELECTED_ITEM_TEXT_COLOR)
 		return which - 1;
 	if (which >= B_SUCCESS_COLOR && which <= B_FAILURE_COLOR)
-		return which - B_SUCCESS_COLOR + B_CONTROL_MARK_COLOR;
+		return which - B_SUCCESS_COLOR + B_LIST_SELECTED_ITEM_TEXT_COLOR;
 
 	return -1;
 }
@@ -39,11 +39,11 @@ static inline color_which
 index_to_color_which(int32 index)
 {
 	if (index >= 0 && index < kNumColors) {
-		if ((color_which)index < B_CONTROL_MARK_COLOR)
+		if ((color_which)index < B_LIST_SELECTED_ITEM_TEXT_COLOR)
 			return (color_which)(index + 1);
 		else {
 			return (color_which)(index + B_SUCCESS_COLOR
-			  - B_CONTROL_MARK_COLOR);
+			  - B_LIST_SELECTED_ITEM_TEXT_COLOR);
 		}
 	}
 

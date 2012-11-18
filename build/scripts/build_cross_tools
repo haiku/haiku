@@ -89,12 +89,15 @@ mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $tmpIncludeDir \
 	$tmpLibDir || exit 1
 mkdir -p $installDir/lib/gcc-lib/i586-pc-haiku/$haikuRequiredLegacyGCCVersion
 
+# force the POSIX locale, as the build (makeinfo) might choke otherwise
+export LC_ALL=POSIX
+
 # build binutils
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
 	--prefix=$installDir --target=i586-pc-haiku --disable-nls \
 	--enable-shared=yes --disable-werror || exit 1
-make $additionalMakeArgs || exit 1
+make -j1 $additionalMakeArgs || exit 1
 make $additionalMakeArgs install || exit 1
 
 PATH=$PATH:$installDir/bin
@@ -109,7 +112,7 @@ copy_headers()
 	sourceDir=$1
 	targetDir=$2
 
-	headers="`find $sourceDir -name \*\.h | grep -v /.svn`"
+	headers="`find $sourceDir -name \*\.h`"
 	headers="`echo $headers | sed -e s@$sourceDir/@@g`"
 	for f in $headers; do
 		headerTargetDir=$targetDir/`dirname $f`
@@ -154,7 +157,7 @@ eval "sed $sedExpr Makefile.bak > Makefile" || exit 1
 rm Makefile.bak
 
 # make gcc
-make cross || {
+make -j1 cross || {
 	echo "ERROR: Building gcc failed." >&2
 	exit 1
 }

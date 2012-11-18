@@ -534,12 +534,12 @@ test_strftime(const char* locale, const strftime_data data[])
 	setlocale(LC_TIME, locale);
 	printf("strftime for '%s'\n", locale);
 
-	time_t nowSecs = 1279391169;	// pure magic
-	tm* now = localtime(&nowSecs);
+	time_t testTimeInSecs = 1279391169;	// Sat Jul 17 18:26:09 2010 UTC
+	tm* testTime = localtime(&testTimeInSecs);
 	int problemCount = 0;
 	for(int i = 0; data[i].format != NULL; ++i) {
 		char buf[100];
-		strftime(buf, 100, data[i].format, now);
+		strftime(buf, 100, data[i].format, testTime);
 		if (strcmp(buf, data[i].result) != 0) {
 			printf("\tPROBLEM: strftime(\"%s\") = \"%s\" (expected \"%s\")\n",
 				data[i].format, buf, data[i].result);
@@ -643,6 +643,135 @@ test_strftime()
 	test_strftime("nb_NO", strftime_nb);
 }
 
+
+// #pragma mark - strftime -----------------------------------------------------
+
+
+struct strptime_data {
+	const char* format;
+	const char* dateString;
+};
+
+
+void
+test_strptime(const char* locale, const strptime_data data[])
+{
+	setlocale(LC_TIME, locale);
+	printf("strptime for '%s'\n", locale);
+
+	time_t expectedTimeInSecs = 1279391169;	// Sat Jul 17 18:26:09 2010 UTC
+	int problemCount = 0;
+	for(int i = 0; data[i].format != NULL; ++i) {
+		struct tm resultTime;
+		if (strptime(data[i].dateString, data[i].format, &resultTime) == NULL) {
+			printf("\tPROBLEM: strptime(\"%s\", \"%s\") failed\n",
+				data[i].dateString, data[i].format);
+			problemCount++;
+		} else {
+			time_t resultTimeInSecs = mktime(&resultTime);
+			if (resultTimeInSecs != expectedTimeInSecs) {
+				printf("\tPROBLEM: strptime(\"%s\", \"%s\") = \"%d\" (expected \"%d\")\n",
+					data[i].dateString, data[i].format, resultTimeInSecs, expectedTimeInSecs);
+				problemCount++;
+			}
+		}
+	}
+	if (problemCount)
+		printf("\t%d problem(s) found!\n", problemCount);
+	else
+		printf("\tall fine\n");
+}
+
+
+void
+test_strptime()
+{
+	setenv("TZ", "GMT", 1);
+
+	const strptime_data strptime_posix[] = {
+		{ "%c", "Sat Jul 17 18:26:09 2010" },
+		{ "%x", "07/17/10" },
+		{ "%X", "18:26:09" },
+		{ "%a", "Sat" },
+		{ "%A", "Saturday" },
+		{ "%b", "Jul" },
+		{ "%B", "July" },
+		{ NULL, NULL }
+	};
+	test_strptime("POSIX", strptime_posix);
+
+	const strptime_data strptime_de[] = {
+		{ "%c", "Samstag, 17. Juli 2010 18:26:09 GMT" },
+		{ "%x", "17.07.2010" },
+		{ "%X", "18:26:09" },
+		{ "%a", "Sa." },
+		{ "%A", "Samstag" },
+		{ "%b", "Jul" },
+		{ "%B", "Juli" },
+		{ NULL, NULL }
+	};
+	test_strptime("de_DE.UTF-8", strptime_de);
+
+	const strptime_data strptime_hr[] = {
+		{ "%c", "subota, 17. srpnja 2010. 18:26:09 GMT" },
+		{ "%x", "17. 07. 2010." },
+		{ "%X", "18:26:09" },
+		{ "%a", "sub" },
+		{ "%A", "subota" },
+		{ "%b", "srp" },
+		{ "%B", "srpnja" },
+		{ NULL, NULL }
+	};
+	test_strptime("hr_HR.ISO8859-2", strptime_hr);
+
+	const strptime_data strptime_gu[] = {
+		{ "%c", "શનિવાર, 17 જુલાઈ, 2010 06:26:09 PM GMT" },
+		{ "%x", "17 જુલાઈ, 2010" },
+		{ "%X", "06:26:09 PM" },
+		{ "%a", "શનિ" },
+		{ "%A", "શનિવાર" },
+		{ "%b", "જુલાઈ" },
+		{ "%B", "જુલાઈ" },
+		{ NULL, NULL }
+	};
+	test_strptime("gu_IN", strptime_gu);
+
+	const strptime_data strptime_it[] = {
+		{ "%c", "sabato 17 luglio 2010 18:26:09 GMT" },
+		{ "%x", "17/lug/2010" },
+		{ "%X", "18:26:09" },
+		{ "%a", "sab" },
+		{ "%A", "sabato" },
+		{ "%b", "lug" },
+		{ "%B", "luglio" },
+		{ NULL, NULL }
+	};
+	test_strptime("it_IT", strptime_it);
+
+	const strptime_data strptime_nl[] = {
+		{ "%c", "zaterdag 17 juli 2010 18:26:09 GMT" },
+		{ "%x", "17 jul. 2010" },
+		{ "%X", "18:26:09" },
+		{ "%a", "za" },
+		{ "%A", "zaterdag" },
+		{ "%b", "jul." },
+		{ "%B", "juli" },
+		{ NULL, NULL }
+	};
+	test_strptime("nl_NL", strptime_nl);
+
+	const strptime_data strptime_nb[] = {
+		{ "%c", "kl. 18:26:09 GMT lørdag 17. juli 2010" },
+		{ "%x", "17. juli 2010" },
+		{ "%X", "18:26:09" },
+		{ "%a", "lør." },
+		{ "%A", "lørdag" },
+		{ "%b", "juli" },
+		{ "%B", "juli" },
+		{ NULL, NULL }
+	};
+	test_strptime("nb_NO", strptime_nb);
+}
 
 // #pragma mark - ctype --------------------------------------------------------
 
@@ -2087,6 +2216,7 @@ main(void)
 	test_setlocale();
 	test_localeconv();
 	test_strftime();
+	test_strptime();
 	test_ctype();
 	test_wctype();
 	test_wctrans();

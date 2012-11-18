@@ -16,7 +16,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <Alert.h>
+#include <AboutWindow.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -77,6 +77,8 @@ PowerStatusView::PowerStatusView(BMessage* archive)
 
 PowerStatusView::~PowerStatusView()
 {
+	if (fAboutWindow != NULL)
+		fAboutWindow->Quit();
 }
 
 
@@ -95,6 +97,8 @@ void
 PowerStatusView::_Init()
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
+
+	fAboutWindow = NULL;
 
 	fShowLabel = true;
 	fShowTime = false;
@@ -503,13 +507,15 @@ PowerStatusReplicant::PowerStatusReplicant(BMessage* archive)
 
 PowerStatusReplicant::~PowerStatusReplicant()
 {
-	if (fMessengerExist) {
+	if (fMessengerExist)
 		delete fExtWindowMessenger;
-	}
 
 	fDriverInterface->StopWatching(this);
 	fDriverInterface->Disconnect();
 	fDriverInterface->ReleaseReference();
+
+	if (fAboutWindow != NULL)
+		fAboutWindow->Quit();
 
 	_SaveSettings();
 }
@@ -621,22 +627,23 @@ PowerStatusReplicant::MouseDown(BPoint point)
 void
 PowerStatusReplicant::_AboutRequested()
 {
-	BAlert* alert = new BAlert(B_TRANSLATE("About"),
-		B_TRANSLATE("PowerStatus\n"
-			"written by Axel Dörfler, Clemens Zeidler\n"
-			"Copyright 2006, Haiku, Inc.\n"), B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
-	BFont font;
+	if (fAboutWindow == NULL) {
+		const char* authors[] = {
+			"Axel Dörfler",
+			"Alexander von Gluck",
+			"Clemens Zeidler",
+			NULL
+		};
 
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, strlen(B_TRANSLATE("PowerStatus")), &font);
-
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go();
+		fAboutWindow = new BAboutWindow(
+			B_TRANSLATE_SYSTEM_NAME("PowerStatus"), kSignature);
+		fAboutWindow->AddCopyright(2006, "Haiku, Inc.");
+		fAboutWindow->AddAuthors(authors);
+		fAboutWindow->Show();
+	} else if (fAboutWindow->IsHidden())
+		fAboutWindow->Show();
+	else
+		fAboutWindow->Activate();
 }
 
 

@@ -113,6 +113,8 @@ mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $stdcxxObjDir \
 	$tmpIncludeDir $tmpLibDir || exit 1
 mkdir -p $installDir/lib/gcc/$haikuMachine/$gccVersion
 
+# force the POSIX locale, as the build (makeinfo) might choke otherwise
+export LC_ALL=POSIX
 
 # build binutils
 cd $binutilsObjDir
@@ -133,7 +135,7 @@ copy_headers()
 	sourceDir=$1
 	targetDir=$2
 
-	headers="$(find $sourceDir -name \*\.h | grep -v /.svn)"
+	headers="$(find $sourceDir -name \*\.h)"
 	headers="$(echo $headers | sed -e s@$sourceDir/@@g)"
 	for f in $headers; do
 		headerTargetDir=$targetDir/$(dirname $f)

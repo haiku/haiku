@@ -246,8 +246,8 @@ void BluetoothServer::MessageReceived(BMessage* message)
 	if (status != B_WOULD_BLOCK) {
 		reply.AddInt32("status", status);
 		message->SendReply(&reply);
-		printf("Sending reply message for->\n");
-		message->PrintToStream();
+//		printf("Sending reply message for->\n");
+//		message->PrintToStream();
 	}
 }
 

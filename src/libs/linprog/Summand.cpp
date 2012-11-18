@@ -9,6 +9,28 @@
 #include "Variable.h"
 
 
+Summand::Summand(Summand* summand)
+	:
+	fCoeff(summand->Coeff()),
+	fVar(summand->Var())
+{
+}
+
+
+Summand::Summand(double coeff, Variable* var)
+	:
+	fCoeff(coeff),
+	fVar(var)
+{
+}
+
+
+Summand::~Summand()
+{
+
+}
+
+
 /**
  * Gets the summmand's coefficient.
  * 
@@ -61,24 +83,4 @@ int32
 Summand::VariableIndex()
 {
 	return fVar->Index();
-}
-
-
-/**
- * Destructor.
- */
-Summand::~Summand()
-{
-
-}
-
-
-/**
- * Constructor.
- */
-Summand::Summand(double coeff, Variable* var)
-{
-	fCoeff = coeff;
-	fVar = var;
-	fUsedInPenaltyFunction = false;
 }

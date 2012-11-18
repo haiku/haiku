@@ -7,24 +7,15 @@
 
 
 #include <Application.h>
-#include <Catalog.h>
-#include <Locale.h>
-
-class VMSettings;
 
 
 class VirtualMemory : public BApplication {
-	public:
-		VirtualMemory();
-		virtual ~VirtualMemory();
+public:
+					VirtualMemory();
+	virtual			~VirtualMemory();
 
-		virtual void ReadyToRun();
-		virtual void AboutRequested();
-
-	private:
-		void GetCurrentSettings(bool& enabled, off_t& size);
-
-		VMSettings *fSettings;	
+	virtual	void	ReadyToRun();
+	virtual	void	AboutRequested();
 };
-	
+
 #endif	/* VIRTUAL_MEMORY_H */

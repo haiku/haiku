@@ -44,6 +44,7 @@
 #include "TypeComponentPath.h"
 #include "UserInterface.h"
 #include "Variable.h"
+#include "WatchPromptWindow.h"
 
 
 enum {
@@ -247,6 +248,28 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 
 		}
+		case MSG_SHOW_WATCH_VARIABLE_PROMPT:
+		{
+			target_addr_t address;
+			uint32 type;
+			int32 length;
+
+			if (message->FindUInt64("address", &address) != B_OK
+				|| message->FindUInt32("type", &type) != B_OK
+				|| message->FindInt32("length", &length) != B_OK) {
+				break;
+			}
+
+			try {
+				WatchPromptWindow* window = WatchPromptWindow::Create(
+					fTeam->GetArchitecture(), address, type, length,
+					fListener);
+				window->Show();
+			} catch (...) {
+				// TODO: notify user
+			}
+			break;
+		}
 		case B_REFS_RECEIVED:
 		{
 			entry_ref locatedPath;
@@ -332,6 +355,18 @@ TeamWindow::MessageReceived(BMessage* message)
 
 			_HandleUserBreakpointChanged(breakpoint);
 			break;
+		}
+
+		case MSG_WATCHPOINT_CHANGED:
+		{
+			Watchpoint* watchpoint;
+			if (message->FindPointer("watchpoint", (void**)&watchpoint) != B_OK)
+				break;
+			BReference<Watchpoint> watchpointReference(watchpoint, true);
+
+			_HandleWatchpointChanged(watchpoint);
+			break;
+
 		}
 
 		case MSG_FUNCTION_SOURCE_CODE_CHANGED:
@@ -563,6 +598,28 @@ TeamWindow::ClearBreakpointRequested(target_addr_t address)
 
 
 void
+TeamWindow::WatchpointSelectionChanged(Watchpoint* watchpoint)
+{
+	fBreakpointsView->SetBreakpoint(NULL, watchpoint);
+}
+
+
+void
+TeamWindow::SetWatchpointEnabledRequested(Watchpoint* watchpoint,
+	bool enabled)
+{
+	fListener->SetWatchpointEnabledRequested(watchpoint, enabled);
+}
+
+
+void
+TeamWindow::ClearWatchpointRequested(Watchpoint* watchpoint)
+{
+	fListener->ClearWatchpointRequested(watchpoint);
+}
+
+
+void
 TeamWindow::ValueNodeValueRequested(CpuState* cpuState,
 	ValueNodeContainer* container, ValueNode* valueNode)
 {
@@ -614,6 +671,18 @@ TeamWindow::UserBreakpointChanged(const Team::UserBreakpointEvent& event)
 	if (message.AddPointer("breakpoint", event.GetBreakpoint()) == B_OK
 		&& PostMessage(&message) == B_OK) {
 		breakpointReference.Detach();
+	}
+}
+
+
+void
+TeamWindow::WatchpointChanged(const Team::WatchpointEvent& event)
+{
+	BMessage message(MSG_WATCHPOINT_CHANGED);
+	BReference<Watchpoint> watchpointReference(event.GetWatchpoint());
+	if (message.AddPointer("watchpoint", event.GetWatchpoint()) == B_OK
+		&& PostMessage(&message) == B_OK) {
+		watchpointReference.Detach();
 	}
 }
 
@@ -901,7 +970,7 @@ TeamWindow::_SetActiveBreakpoint(UserBreakpoint* breakpoint)
 		_ScrollToActiveFunction();
 	}
 
-	fBreakpointsView->SetBreakpoint(fActiveBreakpoint);
+	fBreakpointsView->SetBreakpoint(fActiveBreakpoint, NULL);
 }
 
 
@@ -1241,6 +1310,13 @@ TeamWindow::_HandleUserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	fSourceView->UserBreakpointChanged(breakpoint);
 	fBreakpointsView->UserBreakpointChanged(breakpoint);
+}
+
+
+void
+TeamWindow::_HandleWatchpointChanged(Watchpoint* watchpoint)
+{
+	fBreakpointsView->WatchpointChanged(watchpoint);
 }
 
 

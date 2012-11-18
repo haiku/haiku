@@ -52,9 +52,16 @@ VolumeView::~VolumeView()
 
 
 void
-VolumeView::SetRescanEnabled(bool enabled)
+VolumeView::EnableRescan()
 {
-	fStatusView->SetRescanEnabled(enabled);
+	fStatusView->EnableRescan();
+}
+
+
+void
+VolumeView::EnableCancel()
+{
+	fStatusView->EnableCancel();
 }
 
 
@@ -62,7 +69,7 @@ void
 VolumeView::SetPath(BPath path)
 {
 	fPieView->SetPath(path);
-	fStatusView->SetBtnLabel(B_TRANSLATE("Rescan"));
+	EnableRescan();
 }
 
 
@@ -70,9 +77,9 @@ void
 VolumeView::MessageReceived(BMessage* msg)
 {
 	switch(msg->what) {
+		case kBtnCancel:
 		case kBtnRescan:
 			fPieView->MessageReceived(msg);
-			fStatusView->SetBtnLabel(B_TRANSLATE("Rescan"));
 			break;
 
 		default:

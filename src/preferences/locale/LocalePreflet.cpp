@@ -21,6 +21,7 @@
 #define B_TRANSLATION_CONTEXT "Locale Preflet"
 
 
+const char* kAppName = B_TRANSLATE("Locale");
 const char* kSignature = "application/x-vnd.Haiku-Locale";
 
 
@@ -29,13 +30,13 @@ class LocalePreflet : public BApplication {
 							LocalePreflet();
 		virtual				~LocalePreflet();
 
-		virtual	void		AboutRequested();
 		virtual	void		MessageReceived(BMessage* message);
 
 private:
 		status_t			_RestartApp(const char* signature) const;
 		
 		LocaleWindow*		fLocaleWindow;
+		BAboutWindow*		fAboutWindow;
 };
 
 
@@ -44,30 +45,19 @@ private:
 
 LocalePreflet::LocalePreflet()
 	:
-	BApplication(kSignature)
+	BApplication(kSignature),
+	fLocaleWindow(new LocaleWindow()),
+	fAboutWindow(NULL)
 {
-	fLocaleWindow = new LocaleWindow();
-
 	fLocaleWindow->Show();
 }
 
 
 LocalePreflet::~LocalePreflet()
 {
-}
-
-
-void
-LocalePreflet::AboutRequested()
-{
-	const char* authors[] = {
-		"Axel Dörfler",
-		"Adrien Destugues",
-		"Oliver Tappe",
-		NULL
-	};
-	BAboutWindow about(B_TRANSLATE("Locale"), 2005, authors);
-	about.Show();
+	// replicant deleted, destroy the about window
+	if (fAboutWindow != NULL)
+		fAboutWindow->Quit();
 }
 
 
@@ -81,7 +71,27 @@ LocalePreflet::MessageReceived(BMessage* message)
 				_RestartApp("application/x-vnd.Be-TSKB");
 			}
 			break;
-		
+
+		case B_ABOUT_REQUESTED:
+			if (fAboutWindow == NULL) {
+				const char* authors[] = {
+					"Axel Dörfler",
+					"Adrien Destugues",
+					"Oliver Tappe",
+					NULL
+				};
+
+				fAboutWindow = new BAboutWindow(kAppName, kSignature);
+				fAboutWindow->AddCopyright(2005, "Haiku, Inc.");
+				fAboutWindow->AddAuthors(authors);
+				fAboutWindow->Show();
+			} else if (fAboutWindow->IsHidden())
+				fAboutWindow->Show();
+			else
+				fAboutWindow->Activate();
+
+			break;
+
 		default:
 			BApplication::MessageReceived(message);
 			break;

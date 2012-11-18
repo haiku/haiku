@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1301055003
+1	finnish	x-vnd.Haiku-libtracker	351214779
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -378,7 +378,6 @@ Modified	FindPanel		Muokattu
 Error moving \"%name\" to Trash. (%error)	FSUtils		Virhe siirrettäessä kohdetta ”%name” roskakoriin. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Et voi korvata kansiota yhdellä sen alikansioista.
 <No recent items>	FavoritesMenu		<Ei nykyisiä kohteita>
-Preferences…	ContainerWindow		Asetukset...
 Move	PoseView		Siirrä
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Oletko varma, että haluat poistaa valitut kohteet? Tätä toimintoa ei voi palauttaa.

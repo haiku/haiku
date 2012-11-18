@@ -88,18 +88,14 @@ acpi_std_ops(int32 op,...)
 			ACPI_STATUS status;
 			ACPI_OBJECT arg;
 			ACPI_OBJECT_LIST parameter;
-			uint32 flags;
 			void *settings;
 			bool acpiDisabled = false;
-			bool acpiAvoidFullInit = false;
 			AcpiGbl_CopyDsdtLocally = true;
 
 			settings = load_driver_settings("kernel");
 			if (settings != NULL) {
 				acpiDisabled = !get_driver_boolean_parameter(settings, "acpi",
 					true, true);
-				acpiAvoidFullInit = get_driver_boolean_parameter(settings,
-					"acpi_avoid_full_init", false, false);
 				unload_driver_settings(settings);
 			}
 
@@ -186,10 +182,6 @@ acpi_std_ops(int32 op,...)
 
 			AcpiEvaluateObject(NULL, "\\_PIC", &parameter, NULL);
 
-			flags = acpiAvoidFullInit ?
-					ACPI_NO_DEVICE_INIT | ACPI_NO_OBJECT_INIT :
-					ACPI_FULL_INITIALIZATION;
-
 			// FreeBSD seems to pass in the above flags here as
 			// well but specs don't define ACPI_NO_DEVICE_INIT
 			// and ACPI_NO_OBJECT_INIT here.
@@ -200,7 +192,7 @@ acpi_std_ops(int32 op,...)
 				goto err;
 			}
 
-			status = AcpiInitializeObjects(flags);
+			status = AcpiInitializeObjects(ACPI_FULL_INITIALIZATION);
 			if (ACPI_FAILURE(status)) {
 				ERROR("AcpiInitializeObjects failed (%s)\n",
 					AcpiFormatException(status));
@@ -672,14 +664,14 @@ prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 
 
 status_t
-enter_sleep_state(uint8 state, uint8 flags)
+enter_sleep_state(uint8 state)
 {
 	ACPI_STATUS status;
 
-	TRACE("enter_sleep_state %d with flags %d\n", state, flags);
+	TRACE("enter_sleep_state %d\n", state);
 
 	cpu_status cpu = disable_interrupts();
-	status = AcpiEnterSleepState(state, flags);
+	status = AcpiEnterSleepState(state);
 	restore_interrupts(cpu);
 	panic("AcpiEnterSleepState should not return.");
 	if (status != AE_OK)

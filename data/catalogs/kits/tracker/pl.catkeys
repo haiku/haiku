@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	1868621245
+1	polish	x-vnd.Haiku-libtracker	918781021
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -367,7 +367,6 @@ Modified	FindPanel		Zmodyfikowano
 Error moving \"%name\" to Trash. (%error)	FSUtils		Błąd przy przenoszeniu \"%name\" do Kosza. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Nie możesz podmienić folderu jednym z jego podfolderów.
 <No recent items>	FavoritesMenu		<Brak ostatnio otwieranych obiektów>
-Preferences…	ContainerWindow		Ustawienia…
 Move	PoseView		Przenieś
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Jesteś pewien, że chcesz usunąć zaznaczone obiekty? Ta operacja nie może być cofnięta.

@@ -266,13 +266,14 @@ LocalDeviceImpl::HandleExpectedRequest(struct hci_event_header* event,
 void
 LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 {
+/*
 
 	printf("### Incoming event: len = %d\n", event->elen);
 	for (int16 index = 0; index < event->elen + 2; index++) {
 		printf("%x:", ((uint8*)event)[index]);
 	}
 	printf("### \n");
-
+*/
 	BMessage* request = NULL;
 	int32 eventIndexLocation;
 
@@ -344,6 +345,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 	int16 opcodeExpected;
 	BMessage reply;
+	status_t status;
 
 	// Handle command complete information
 	request->FindInt16("opcodeExpected", index, &opcodeExpected);
@@ -383,8 +385,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				"Reply for Local Version %x\n", version->status);
 
 			reply.AddInt8("status", version->status);
-			printf("Sending reply ... %ld\n", request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request);
@@ -407,8 +410,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 			reply.AddInt8("status", pageTimeout->status);
 			reply.AddInt32("result", pageTimeout->page_timeout);
-			printf("Sending reply ... %ld\n", request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request);
@@ -457,8 +461,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				"Reply for Local Features %x\n", features->status);
 
 			reply.AddInt8("status", features->status);
-			printf("Sending reply ... %ld\n", request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request);
@@ -492,8 +497,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 
 			reply.AddInt8("status", buffer->status);
-			printf("Sending reply ... %ld\n", request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request);
@@ -515,8 +521,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				"Read bdaddr status = %x\n", readbdaddr->status);
 
 			reply.AddInt8("status", readbdaddr->status);
-			printf("Sending reply ... %ld\n", request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request);
@@ -542,8 +549,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 
 			reply.AddInt8("status", classDev->status);
-			printf("Sending reply ... %ld\n", request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request);
@@ -565,8 +573,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				readLocalName->status);
 
 			reply.AddInt8("status", readLocalName->status);
-			printf("Sending reply ... %ld\n", request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request);
@@ -582,8 +591,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				*statusReply);
 
 			reply.AddInt8("status", *statusReply);
-			printf("Sending reply ... %ld\n", request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request/*, HCI_EVENT_CMD_COMPLETE, opcodeExpected*/);
@@ -600,8 +610,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				*statusReply);
 
 			reply.AddInt8("status", *statusReply);
-			printf("Sending reply ... %ld\n",request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request, HCI_EVENT_CMD_COMPLETE, opcodeExpected);
@@ -620,8 +631,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 				linkKeyRetrieval->max_num_keys, linkKeyRetrieval->num_keys_read);
 
 			reply.AddInt8("status", linkKeyRetrieval->status);
-			printf("Sending reply ... %ld\n",request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			ClearWantedEvent(request);
 			break;
@@ -642,6 +654,30 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 			break;
 		}
 
+		case  PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_SCAN_ENABLE):
+		{
+			struct hci_read_scan_enable* scanEnable
+				= JumpEventHeader<struct hci_read_scan_enable,
+				struct hci_ev_cmd_complete>(event);
+
+			if (scanEnable->status == BT_OK) {
+				fProperties->AddInt8("scan_enable", scanEnable->enable);
+
+				Output::Instance()->Postf(BLACKBOARD_LD(GetID()), "enable = %x\n",
+					scanEnable->enable);
+			}
+
+			reply.AddInt8("status", scanEnable->status);
+			reply.AddInt8("scan_enable", scanEnable->enable);
+			status = request->SendReply(&reply);
+			printf("Sending reply. scan_enable = %d\n", scanEnable->enable);
+			// debug reply.PrintToStream();
+
+			// This request is not gonna be used anymore
+			ClearWantedEvent(request);
+			break;
+		}
+
 		// place here all CC that just replies a uint8 status
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_RESET):
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE):
@@ -657,7 +693,8 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 			Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for %s status %x\n",
 				__FUNCTION__, BluetoothCommandOpcode(opcodeExpected), *(uint8*)(event + 1));
 
-			request->SendReply(&reply);
+			status = request->SendReply(&reply);
+			printf("Sending reply write ... %ld\n", status);
 
 			ClearWantedEvent(request);
 			break;
@@ -678,6 +715,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 
 	int16 opcodeExpected;
 	BMessage reply;
+	status_t status;
 
 	// Handle command complete information
 	request->FindInt16("opcodeExpected", index, &opcodeExpected);
@@ -695,8 +733,9 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 				"Inquiry status %x\n", event->status);
 
 			reply.AddInt8("status", event->status);
-			printf("Sending reply ... %ld\n", request->SendReply(&reply));
-			reply.PrintToStream();
+			status = request->SendReply(&reply);
+			//printf("Sending reply ... %ld\n", status);
+			// debug reply.PrintToStream();
 
 			ClearWantedEvent(request, HCI_EVENT_CMD_STATUS,
 				PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
@@ -713,8 +752,9 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 					"Command Status for remote friendly name %x\n", event->status);
 
 				reply.AddInt8("status", event->status);
-				printf("Sending reply ... %ld\n", request->SendReply(&reply));
-				reply.PrintToStream();
+				status = request->SendReply(&reply);
+				//printf("Sending reply ... %ld\n", status);
+				// debug reply.PrintToStream();
 
 				ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, opcodeExpected);
 			}
@@ -770,7 +810,8 @@ LocalDeviceImpl::InquiryResult(uint8* numberOfResponses, BMessage* request)
 		info++;
 	}
 
-	printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));
+	status_t status = request->SendReply(&reply);
+	printf("%s: Sending reply ... %ld\n",__FUNCTION__, status);
 }
 
 
@@ -780,7 +821,8 @@ LocalDeviceImpl::InquiryComplete(uint8* status, BMessage* request)
 	BMessage reply(BT_MSG_INQUIRY_COMPLETED);
 
 	reply.AddInt8("status", *status);
-	printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));
+	status_t stat = request->SendReply(&reply);
+	printf("%s: Sending reply ... %ld\n",__FUNCTION__, stat);
 
 	ClearWantedEvent(request);
 }
@@ -805,8 +847,9 @@ LocalDeviceImpl::RemoteNameRequestComplete(
 		bdaddrUtils::ToString(remotename->bdaddr),
 		BluetoothError(remotename->status));
 
-	printf("Sending reply ... %ld\n", request->SendReply(&reply));
-	reply.PrintToStream();
+	status_t status = request->SendReply(&reply);
+	printf("Sending reply ... %ld\n", status);
+	// debug reply.PrintToStream();
 
 	// This request is not gonna be used anymore
 	ClearWantedEvent(request);
@@ -877,7 +920,8 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event,
 
 	} else {
 		Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
-			"%s: failed with error %s\n", __FUNCTION__, BluetoothError(event->status));
+			"%s: failed with error %s\n", __FUNCTION__, 
+			BluetoothError(event->status));
 	}
 
 	// it was expected
@@ -888,8 +932,9 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event,
 		if (event->status == BT_OK)
 			reply.AddInt16("handle", event->handle);
 
-		request->SendReply(&reply);
-		reply.PrintToStream();
+		status_t status = request->SendReply(&reply);
+		printf("%s: Sending reply ... %ld\n",__FUNCTION__, status);
+		// debug reply.PrintToStream();
 
 		// This request is not gonna be used anymore
 		ClearWantedEvent(request);
@@ -910,8 +955,9 @@ LocalDeviceImpl::DisconnectionComplete(
 		BMessage reply;
 		reply.AddInt8("status", event->status);
 
-		request->SendReply(&reply);
-		reply.PrintToStream();
+		status_t status = request->SendReply(&reply);
+		printf("%s: Sending reply ... %ld\n",__FUNCTION__, status);
+		// debug reply.PrintToStream();
 
 		ClearWantedEvent(request);
 	}

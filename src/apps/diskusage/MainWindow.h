@@ -26,7 +26,8 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
-			void				SetRescanEnabled(bool enabled);
+			void				EnableRescan();
+			void				EnableCancel();
 			BVolume*			FindDeviceFor(dev_t device,
 									bool invoke = false);
 

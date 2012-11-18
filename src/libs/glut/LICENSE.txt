@@ -1,0 +1,42 @@
+On 2012-11-15 4:04 pm, Mark Kilgard wrote:
+Alex,
+
+> Ideally, if you gave permission to license the GLUT code MIT it would make my life easier... but that of course is your decision. :)
+ 
+Please feel free to use the GLUT code any way you please for
+commercial or non-commercial use.  Put whatever license you want other
+than a GPL.  There's no warrantee for the code of course.
+
+Good luck with your project.
+ 
+- Mark
+ 
+> -----Original Message-----
+> From: Alexander von Gluck IV [mailto:kallisti5@unixzen.com] 
+> Sent: Thursday, November 15, 2012 1:45 PM
+> To: Mark Kilgard
+> Subject: BeOS GLUT
+> 
+> Good afternoon!
+> 
+> I'm one of the developers of the Haiku project. (Open Source MIT
+> licensed re-implementation of BeOS)
+> 
+> At the moment, we have the unmodified GLUT source code in our tree to
+> ensure binary compatibility with BeOS (GLUT was present in libGL.so on
+> BeOS R5). However, our developers feel anxious distributing any
+> modified sources or binaries of GLUT given the licensing terms present
+> when the last public version was released.
+> 
+> I would like to know if you would be willing to give Haiku permission
+> to modify GLUT and distribute it to ensure the best GL compatibility.
+> The license notated in the code was a little unclear and I wanted to
+> make 100% sure we were following your wishes.
+> 
+> Ideally, if you gave permission to license the GLUT code MIT it would
+> make my life easier... but that of course is your decision. :)
+> 
+> http://cgit.haiku-os.org/haiku/tree/src/libs/glut
+> 
+> Thanks for your time.
+>   -- Alexander von Gluck IV

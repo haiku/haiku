@@ -17,3 +17,11 @@ SourceLanguage::GetSyntaxHighlighter() const
 {
 	return NULL;
 }
+
+
+status_t
+SourceLanguage::ParseTypeExpression(const BString &expression,
+	TeamTypeInformation* info, Type*& _resultType) const
+{
+	return B_NOT_SUPPORTED;
+}

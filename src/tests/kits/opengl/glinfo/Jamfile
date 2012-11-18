@@ -24,11 +24,14 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
-Preference GLInfo
-	: $(sources)
-	: be GL translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
-		$(TARGET_LIBSUPC++)
-	: GLInfo.rdef
+Preference GLInfo :
+	$(sources)
+	:
+	be GL libglut.so 
+	translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
+	$(TARGET_LIBSUPC++)
+	:
+	GLInfo.rdef
 ;
 
 DoCatalogs GLInfo :

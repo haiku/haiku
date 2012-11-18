@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-POST	2300302075
+1	polish	x-vnd.Be-POST	2566871483
 Fetching mail for %name	Notifier		Pobieranie poczty dla %name
 Check for mails only	DeskbarView		Sprawdź tylko pocztę
 Send pending mails	DeskbarView		Wyślij oczekującą pocztę
@@ -9,7 +9,6 @@ Mail status	MailDaemon		Status poczty
 Shutdown mail services	DeskbarView		Wyłącz usługi poczty
 %num new message	DeskbarView		%num nowa wiadomość
 Sending mail for %name	Notifier		Wysyłanie poczty dla %name
-Preferences…	DeskbarView		Preferencje…
 %num new messages.	MailDaemon		%num nowych wiadomości.
 %num new message.	MailDaemon		%num nowa wiadomość.
 Create new message…	DeskbarView		Utwórz nową wiadomość…

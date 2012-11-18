@@ -1,0 +1,21 @@
+* Figure out how to get page flags (modified/accessed) and implement it ;)
+	use unmapped/read-only mappings to trigger soft faults
+	   for tracking used/modified flags for ARMv5 and ARMv6
+
+* Fix serial port mapping. Currently kernel uses the haiku_loader identity
+  mapping for it, but this lives in user virtual address space...
+  (Need to not use identity mapping in haiku_loader but just
+  map_physical_memory() there too so it can be handed over without issues).
+
+* Seperate ARM architecture/System-On-Chip IP code. Needed very early on 
+  (Interrupt Controller, Timer IP block). Should use FDT for this too.
+
+* Use FDT to remove all the seperate board definitions in the build. Use a 
+  "minimal ARM architecture version" as the compile flag for ARM support. 
+  This to be able to optimize a kernel build for a specific SoC (or family).
+
+* Research stack unwinding to implement backtrace support for KDL & friends.
+
+* Add KDL hangman to the boot floppy image for more enjoyment during porting....
+
+* Userland...........

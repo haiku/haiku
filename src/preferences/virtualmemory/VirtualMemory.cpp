@@ -8,6 +8,7 @@
 #include "SettingsWindow.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <TextView.h>
 
 

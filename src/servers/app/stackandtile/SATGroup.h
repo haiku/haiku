@@ -220,11 +220,9 @@ private:
 			Constraint*			fMinHeightConstraint;
 			Constraint*			fMaxWidthConstraint;
 			Constraint*			fMaxHeightConstraint;
-			Constraint*			fKeepMaxWidthConstraint;
-			Constraint*			fKeepMaxHeightConstraint;
 			Constraint*			fWidthConstraint;
 			Constraint*			fHeightConstraint;
-			
+
 			MagneticBorder		fMagneticBorder;
 };
 

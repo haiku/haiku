@@ -18,9 +18,20 @@ UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BO
 	local defines = _BOOT_MODE ;
 
 	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -g3 ;
-	SubDirC++Flags $(defines) -fno-rtti -g3 ;
+	SubDirCcFlags $(defines) -g3 -O0 ;
+	SubDirC++Flags $(defines) -fno-rtti -g3 -O0 ;
 }
+
+UseLibraryHeaders [ FDirName libfdt ] ;
+
+local libFDTSources =
+	fdt.c
+	fdt_ro.c
+	fdt_rw.c
+	fdt_strerror.c
+	fdt_sw.c
+	fdt_wip.c
+;
 
 # we fake NetBSD since we don't have an OS ID yet for uimage,
 # and we also fake a netbsd loader anyway.
@@ -40,8 +51,9 @@ BootMergeObject boot_platform_u-boot_common.o :
 	cpu.cpp
 	uimage.cpp
 	video.cpp
-	mmu.cpp
+	fdt_support.cpp
 	$(genericPlatformSources)
+	$(libFDTSources)
 
 
 	: -fno-pic
@@ -234,6 +246,9 @@ Depends haiku-mmc-image : haiku-$(HAIKU_BOOT_BOARD).mmc ;
 
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+
+SEARCH on [ FGristFiles $(libFDTSources) ]
+	= [ FDirName $(HAIKU_TOP) src libs libfdt ] ;
 
 # Tell the build system to where stage1.bin can be found, so it can be used
 # elsewhere.

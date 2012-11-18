@@ -32,6 +32,7 @@ public:
 	virtual	void				SetExplicitMinSize(BSize size) = 0;
 	virtual	void				SetExplicitMaxSize(BSize size) = 0;
 	virtual	void				SetExplicitPreferredSize(BSize size) = 0;
+			void				SetExplicitSize(BSize size);
 	virtual	void				SetExplicitAlignment(BAlignment alignment) = 0;
 
 	virtual	bool				IsVisible() = 0;

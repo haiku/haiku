@@ -12,6 +12,8 @@
 struct platform_stage2_args {
 	void *boot_tgz_data;
 	uint32 boot_tgz_size;
+	void *fdt_data;
+	uint32 fdt_size;
 };
 
 #endif	/* KERNEL_BOOT_PLATFORM_UBOOT_STAGE2_H */

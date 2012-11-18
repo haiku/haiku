@@ -38,7 +38,6 @@ public:
 						~ControllerView();
 
 	// TransportControlGroup interface
-	virtual	uint32		EnabledButtons();
 	virtual	void		TogglePlaying();
 	virtual	void		Stop();
 	virtual	void		Rewind();

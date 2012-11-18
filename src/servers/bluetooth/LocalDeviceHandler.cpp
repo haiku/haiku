@@ -65,7 +65,7 @@ LocalDeviceHandler::AddWantedEvent(BMessage* msg)
 {
 	fEventsWanted.Lock();
 	// TODO: review why it is needed to replicate the msg
-	printf("Adding request... %p\n", msg);
+//	printf("Adding request... %p\n", msg);
 	fEventsWanted.AddMessage(msg);
 	fEventsWanted.Unlock();
 }
@@ -134,6 +134,7 @@ finish:
 BMessage*
 LocalDeviceHandler::FindPetition(uint16 event, uint16 opcode, int32* indexFound)
 {
+	//debug data
 	int16 eventFound;
 	int16 opcodeFound;
 	int32 eventIndex;
@@ -142,29 +143,29 @@ LocalDeviceHandler::FindPetition(uint16 event, uint16 opcode, int32* indexFound)
 	// for each Petition
 	for (int32 index = 0 ; index < fEventsWanted.CountMessages() ; index++) {
 		BMessage* msg = fEventsWanted.FindMessage(index);
-		printf("%s:Petition %ld ... of %ld msg #%p\n", __FUNCTION__, index,
-			fEventsWanted.CountMessages(), msg);
-		msg->PrintToStream();
+//		printf("%s:Petition %ld ... of %ld msg #%p\n", __FUNCTION__, index,
+//			fEventsWanted.CountMessages(), msg);
+//		msg->PrintToStream();
 		eventIndex = 0;
 
 		// for each Event
 		while (msg->FindInt16("eventExpected", eventIndex, &eventFound) == B_OK ) {
 			if (eventFound == event) {
 
-				printf("%s:Event %d found@%ld...", __FUNCTION__, event, eventIndex);
+//				printf("%s:Event %d found@%ld...", __FUNCTION__, event, eventIndex);
 				// there is an opcode specified..
 				if (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound)
 					== B_OK) {
 					// ensure the opcode
 					if ((uint16)opcodeFound != opcode) {
-						printf("%s:opcode does not match %d\n",
-							__FUNCTION__, opcode);
+//						printf("%s:opcode does not match %d\n",
+//							__FUNCTION__, opcode);
 						eventIndex++;
 						continue;
 					}
-					printf("Opcode matches %d\n", opcode);
+//					printf("Opcode matches %d\n", opcode);
 				} else {
-					printf("No opcode specified\n");
+//					printf("No opcode specified\n");
 				}
 
 				fEventsWanted.Unlock();
@@ -175,7 +176,7 @@ LocalDeviceHandler::FindPetition(uint16 event, uint16 opcode, int32* indexFound)
 			eventIndex++;
 		}
 	}
-	printf("%s:Event %d not found\n", __FUNCTION__, event);
+//	printf("%s:Event %d not found\n", __FUNCTION__, event);
 
 	fEventsWanted.Unlock();
 	return NULL;

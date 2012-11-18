@@ -8,9 +8,12 @@ SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) raw ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 	#for BaseTranslator.h and friends
 
-UseLibraryHeaders jpeg ;
+UseHeaders $(HAIKU_JPEG_HEADERS) : true ;
 
 AddResources JPEGTranslator : JPEGTranslator.rdef ;
+
+Includes [ FGristFiles be_jdatadst.cpp be_jerror.cpp ]
+	: $(HAIKU_JPEG_HEADERS_DEPENDENCY) ;
 
 Translator JPEGTranslator :
 	be_jdatadst.cpp
@@ -18,8 +21,8 @@ Translator JPEGTranslator :
 	be_jerror.cpp
 	exif_parser.cpp
 	JPEGTranslator.cpp
-	: be translation libtranslatorsutils.a libjpeg.so $(TARGET_LIBSTDC++)
-	$(HAIKU_LOCALE_LIBS)
+	: be translation libtranslatorsutils.a $(HAIKU_JPEG_LIB)
+	$(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: true
 ;
 
@@ -32,7 +35,4 @@ DoCatalogs JPEGTranslator :
 	be_jerror.cpp
 ;
 
-Package haiku-translationkit-cvs :
-	JPEGTranslator :
-	boot home config add-ons Translators ;
 

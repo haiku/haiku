@@ -16,6 +16,8 @@
 
 #include <map>
 
+
+class BAboutWindow;
 class BMessageRunner;
 class BNetworkInterface;
 
@@ -64,6 +66,7 @@ class NetworkStatusView : public BView {
 
 		std::map<BString, int32>
 						fInterfaceStatuses;
+		BAboutWindow*   fAboutWindow;
 		bool			fInDeskbar;
 		BBitmap*		fTrayIcons[kStatusCount];
 		BBitmap*		fNotifyIcons[kStatusCount];

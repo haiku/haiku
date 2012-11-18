@@ -32,6 +32,7 @@
 #include <MutableLocaleRoster.h>
 #include <Node.h>
 #include <Path.h>
+#include <Roster.h>
 #include <String.h>
 #include <TimeZone.h>
 
@@ -514,7 +515,19 @@ BLocaleRoster::GetLocalizedFileName(BString& localizedFileName,
 	if (status != B_OK)
 		return status;
 
-	BCatalog catalog(ref);
+	// Try to get entry_ref for signature from above
+	BRoster roster;
+	entry_ref catalogRef;
+	// The signature is missing application/
+	signature.Prepend("application/");
+	status = roster.FindApp(signature, &catalogRef);
+	if (status != B_OK) {
+		log_team(LOG_ERR, "Could not find the entry_ref for signature %s"
+				" to load a catalog.", signature.String());
+		return status;
+	}
+
+	BCatalog catalog(catalogRef);
 	const char* temp = catalog.GetString(string, context);
 
 	if (temp == NULL)

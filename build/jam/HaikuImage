@@ -33,7 +33,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bfsinfo
 	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
 	csplit cut date dc dd desklink df diff diff3 dircolors dirname
-	draggers driveinfo dstcheck du dumpcatalog
+	diskimage draggers driveinfo dstcheck du dumpcatalog
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
 	ftp ftpd funzip fwcontrol
@@ -86,19 +86,19 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo $(X86_ONLY)GLTeapot
 SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
-	libgame.so $(X86_ONLY)libGL.so libgnu.so
-	libjpeg.so
-	libmail.so libmedia.so libmidi.so libmidi2.so
+	libgame.so $(X86_ONLY)libGL.so $(X86_ONLY)libglut.so
+	libgnu.so libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
-	libpng.so
 	<revisioned>libroot.so libroot-addon-icu.so
 	libscreensaver.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
-	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
-	$(HAIKU_FREETYPE_CURRENT_LIB)
 ;
 PRIVATE_SYSTEM_LIBS =
+	$(HAIKU_JPEG_CURRENT_LIB)
+	$(HAIKU_LIBPNG_CURRENT_LIB)
+	$(HAIKU_ZLIB_CURRENT_LIB) 
+	$(HAIKU_FREETYPE_CURRENT_LIB)
 	libalm.so
 	libfluidsynth.so
 	libilmimf.so
@@ -129,7 +129,7 @@ SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
 	PCXTranslator PNGTranslator PPMTranslator
 	RAWTranslator RTFTranslator SGITranslator STXTTranslator TGATranslator
-	TIFFTranslator WebPTranslator WonderBrushTranslator
+	TIFFTranslator WebPTranslator WonderBrushTranslator ICNSTranslator
 ;
 SYSTEM_ADD_ONS_LOCALE_CATALOGS = <catalog-addon>plaintext ;
 SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
@@ -144,6 +144,8 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
 	video_window_demo.media_addon
 	firewire_dv.media_addon
 	#legacy.media_addon
+	equalizer.media_addon
+	vst_host.media_addon
 ;
 SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(X86_ONLY)ffmpeg raw_decoder ;
 SYSTEM_ADD_ONS_PRINT =
@@ -303,9 +305,8 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 }
 
 
-# libGL.so has GLU (like BeOS) *and* GLUT API built-in
-SYSTEM_LIBS_LIBGL_ALIASES
-	= libGLU.so libglut.so ;
+# libGL.so has GLU (like BeOS) built-in
+SYSTEM_LIBS_LIBGL_ALIASES = libGLU.so ;
 
 if $(TARGET_ARCH) = x86 {
 	local lib ;
@@ -332,11 +333,36 @@ SYSTEM_LIBS_ALIASES =
 	$(SYSTEM_LIBS_LIBBE_ALIASES)
 ;
 
+OPTIONAL_LIBS_ALIASES =
+	libfreetype.so
+	libjpeg.so
+	libpng.so
+	libz.so
+;
+
 # libfreetype.so links to the current freetype lib
 AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
 	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
 AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LINK)
 	: libfreetype.so : : true ;
+
+# libpng.so links to the current libpng
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_LIBPNG_CURRENT_LIB:BS)
+	: $(HAIKU_LIBPNG_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_LIBPNG_CURRENT_LINK)
+	: libpng.so : : true ;
+
+# libjpeg.so links to the current libjpeg
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LIB:BS)
+	: $(HAIKU_JPEG_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_JPEG_CURRENT_LINK)
+	: libjpeg.so : : true ;
+
+# zlib.so links to the current zlib
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LIB:BS)
+	: $(HAIKU_ZLIB_CURRENT_LINK) : : true ;
+AddSymlinkToHaikuHybridImage system lib : $(HAIKU_ZLIB_CURRENT_LINK)
+	: libz.so : : true ;
 
 # servers
 AddFilesToHaikuImage system servers : $(SYSTEM_SERVERS) ;
@@ -667,7 +693,7 @@ AddFilesToHaikuImage system add-ons Screen\ Savers
 	: $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
 
 AddFilesToHaikuImage system add-ons disk_systems
-	: <disk_system>intel <disk_system>bfs ;
+	: <disk_system>intel <disk_system>bfs <disk_system>ntfs ;
 
 # decorators
 AddDirectoryToHaikuImage home config add-ons decorators ;
@@ -710,42 +736,42 @@ AddDirectoryToHaikuImage home config settings printers "Save as PDF"
 # PDF Writer enconding files
 CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) src add-ons print drivers pdf encoding ]
-	: "PDF Writer" : -x .svn -x Jamfile ;
+	: "PDF Writer" : -x Jamfile ;
 
 # Gutenprint data files
 CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) src libs print libgutenprint src xml ]
-	: gutenprint : -x .svn -x *.c -x Makefile.am -x Makefile.in ;
+	: gutenprint : -x *.c -x Makefile.am -x Makefile.in ;
 
 # dvb channel settings
 CopyDirectoryToHaikuImage home config settings Media
 	: [ FDirName $(HAIKU_TOP) data settings media dvb ]
-	: dvb : -x .svn -x Jamfile ;
+	: dvb : -x Jamfile ;
 
 # licenses
 CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) data system data licenses ]
-	: licenses : -x .svn ;
+	: licenses ;
 
 # Copy documentation as per DiskUsage's license requirement.
 CopyDirectoryToHaikuImage system documentation
 	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]
-	: diskusage : -x .svn ;
+	: diskusage ;
 
 # Copy documentation as per PDFlib Lite's license requirement.
 CopyDirectoryToHaikuImage system documentation
 	: [ FDirName $(HAIKU_TOP) src libs pdflib doc ]
-	: pdflib : -x .svn ;
+	: pdflib ;
 
 # Copy sample programs as per PDFlib Lite's license requirement.
 CopyDirectoryToHaikuImage develop sample-code
 	: [ FDirName $(HAIKU_TOP) src libs pdflib bind pdflib ]
-	: pdflib : -x .svn ;
+	: pdflib ;
 
 # Copy Mesa3D GL headers into image
 if $(TARGET_ARCH) = x86 {
 	CopyDirectoryToHaikuImage develop headers os opengl
-		: [ FDirName $(HAIKU_MESA_HEADERS) GL ] : : -x .svn ;
+		: [ FDirName $(HAIKU_MESA_HEADERS) GL ] ;
 }
 
 #pragma mark - Optional Packages
@@ -892,8 +918,6 @@ AddVariableToScript $(script) : addBuildCompatibilityLibDir
 	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
 AddVariableToScript $(script) : dontClearImage : $(HAIKU_DONT_CLEAR_IMAGE) ;
 AddVariableToScript $(script) : updateOnly : [ IsUpdateHaikuImageOnly ] ;
-AddVariableToScript $(script) : stripOptionalPackageDebugSymbols
-	: $(HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES) ;
 AddTargetVariableToScript $(script) : <build>addattr ;
 AddTargetVariableToScript $(script) : <build>bfs_shell : bfsShell ;
 AddTargetVariableToScript $(script) : <build>fs_shell_command : fsShellCommand ;

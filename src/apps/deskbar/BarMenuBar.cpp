@@ -51,10 +51,13 @@ All rights reserved.
 #include "TeamMenu.h"
 
 
+const float kSepItemWidth = 5.0f;
+
 TBarMenuBar::TBarMenuBar(TBarView* bar, BRect frame, const char* name)
 	: BMenuBar(frame, name, B_FOLLOW_NONE, B_ITEMS_IN_ROW, false),
 	fBarView(bar),
-	fAppListMenuItem(NULL)
+	fAppListMenuItem(NULL),
+	fSeparatorItem(NULL)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -86,61 +89,117 @@ TBarMenuBar::SmartResize(float width, float height)
 
 	width -= 1;
 
-	int32 count = CountItems();
-	if (fDeskbarMenuItem)
-		fDeskbarMenuItem->SetWidthHeight(width / count, height);
-	if (fAppListMenuItem)
-		fAppListMenuItem->SetWidthHeight(width / count, height);
+	if (fSeparatorItem != NULL)
+		fDeskbarMenuItem->SetWidthHeight(width - kSepItemWidth, height);
+	else {
+		int32 count = CountItems();
+		if (fDeskbarMenuItem)
+			fDeskbarMenuItem->SetWidthHeight(width / count, height);
+		if (fAppListMenuItem)
+			fAppListMenuItem->SetWidthHeight(width / count, height);
+	}
 
 	InvalidateLayout();
 }
 
 
-void
+bool
 TBarMenuBar::AddTeamMenu()
 {
 	if (CountItems() > 1)
-		return;
+		return false;
 
 	BRect frame(Frame());
-	delete fAppListMenuItem;
 
+	delete fAppListMenuItem;
 	fAppListMenuItem = new TBarMenuTitle(0.0f, 0.0f,
 		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_TeamIcon), new TTeamMenu());
-	AddItem(fAppListMenuItem);
-	SmartResize(frame.Width() - 1.0f, frame.Height());
+
+	bool added = AddItem(fAppListMenuItem);
+
+	if (added)
+		SmartResize(frame.Width() - 1.0f, frame.Height());
+	else
+		SmartResize(frame.Width(), frame.Height());
+
+	return added;
 }
 
 
-void
+bool
 TBarMenuBar::RemoveTeamMenu()
 {
 	if (CountItems() < 2)
-		return;
+		return false;
 
-	if (fAppListMenuItem) {
-		RemoveItem((BMenuItem*)fAppListMenuItem);
+	bool removed = false;
+
+	if (fAppListMenuItem != NULL && RemoveItem(fAppListMenuItem)) {
 		delete fAppListMenuItem;
 		fAppListMenuItem = NULL;
+		SmartResize(-1, -1);
+		removed = true;
 	}
 
-	BRect frame = Frame();
-	SmartResize(frame.Width(), frame.Height());
+	return removed;
+}
+
+
+bool
+TBarMenuBar::AddSeperatorItem()
+{
+	if (CountItems() > 1)
+		return false;
+
+	BRect frame(Frame());
+
+	delete fSeparatorItem;
+	fSeparatorItem = new TTeamMenuItem(kSepItemWidth,
+		frame.Height() - 2, false);
+	fSeparatorItem->SetEnabled(false);
+
+	bool added = AddItem(fSeparatorItem);
+
+	if (added)
+		SmartResize(frame.Width() - 1.0f, frame.Height());
+	else
+		SmartResize(frame.Width(), frame.Height());
+
+	return added;
+}
+
+
+bool
+TBarMenuBar::RemoveSeperatorItem()
+{
+	if (CountItems() < 2)
+		return false;
+
+	bool removed = false;
+
+	if (fSeparatorItem != NULL && RemoveItem(fSeparatorItem)) {
+		delete fSeparatorItem;
+		fSeparatorItem = NULL;
+		SmartResize(-1, -1);
+		removed = true;
+	}
+
+	return removed;
 }
 
 
 void
-TBarMenuBar::Draw(BRect rect)
+TBarMenuBar::Draw(BRect updateRect)
 {
 	// want to skip the fancy BMenuBar drawing code.
-	BMenu::Draw(rect);
+	BMenu::Draw(updateRect);
 }
 
 
 void
-TBarMenuBar::DrawBackground(BRect rect)
+TBarMenuBar::DrawBackground(BRect updateRect)
 {
-	BMenu::DrawBackground(rect);
+	BMenu::DrawBackground(updateRect);
 }
 
 

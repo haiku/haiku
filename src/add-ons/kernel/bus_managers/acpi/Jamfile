@@ -171,6 +171,7 @@ local utilities_src =
 	uttrack.c
 	utxface.c
 	utxferror.c
+	utxfinit.c
 	utxfmutex.c
 	;
 

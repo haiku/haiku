@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	2834665561
+1	japanese	x-vnd.Be-MAIL	3337401776
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
@@ -27,6 +27,7 @@ Expert	Mail		上級者
 Reply account:	Mail		返信アカウント：
 Discard	Mail		破棄
 Message	Mail		メッセージ
+Settings…	Mail		設定…
 Reply to sender	Mail		差出人に返信
 There is no installed handler for URL links.	Mail		URL リンク用ハンドラがインストールされていません。
 Signature	Mail		署名
@@ -38,7 +39,6 @@ Save changes to this signature?	Mail		署名の変更を確定し保存します
 Cc:	Mail		Cc:
 Off	Mail		オフ
 Find	Mail		検索
-Preferences…	Mail		メールの設定…
 Undo	Mail		元に戻す
 Date:	Mail		日付：
 An error occurred trying to open this signature.	Mail		この署名を開くときにエラーが発生しました。

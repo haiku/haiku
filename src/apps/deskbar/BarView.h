@@ -65,12 +65,12 @@ const float kStatusHeight = 22.0f;
 const float kHiddenDimension = 1.0f;
 const float kMaxPreventHidingDist = 80.0f;
 
-
 class BShelf;
 class TBarMenuBar;
 class TExpandoMenuBar;
 class TReplicantTray;
 class TDragRegion;
+class TInlineScrollView;
 class TTeamMenuItem;
 
 
@@ -148,6 +148,8 @@ class TBarView : public BView {
 		void PositionWindow(BRect screenFrame);
 		void AddExpandedItem(const char* signature);
 
+		void CheckForScrolling();
+
 		TExpandoMenuBar* ExpandoMenuBar() const;
 		TBarMenuBar* BarMenuBar() const;
 		TDragRegion* DragRegion() const { return fDragRegion; }
@@ -168,6 +170,7 @@ class TBarView : public BView {
 		void ExpandItems();
 		void _ChangeState(BMessage* message);
 
+		TInlineScrollView* fInlineScrollView;
 		TBarMenuBar* fBarMenuBar;
 		TExpandoMenuBar* fExpando;
 

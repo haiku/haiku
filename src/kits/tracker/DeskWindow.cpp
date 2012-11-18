@@ -39,6 +39,7 @@ All rights reserved.
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -274,6 +275,13 @@ BDeskWindow::CreatePoseView(Model* model)
 void
 BDeskWindow::AddWindowContextMenus(BMenu* menu)
 {
+	BRoster roster;
+	if (!roster.IsRunning(kDeskbarSignature)) {
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Restart Deskbar"),
+			new BMessage(kRestartDeskbar)));
+		menu->AddSeparatorItem();
+	}
+
 	TemplatesMenu* tempateMenu = new TemplatesMenu(PoseView(),
 		B_TRANSLATE("New"));
 

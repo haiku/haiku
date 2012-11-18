@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-FontDemo	3756411221
+1	french	x-vnd.Haiku-FontDemo	1769653414
 Outline:	ControlView		Contour :
 Size: 50	ControlView		Taille : 50
 Stop cycling	ControlView		Arrêter de boucler
@@ -11,6 +11,8 @@ Spacing: %d	ControlView		Espacement : %d
 Cycle fonts	ControlView		Polices en boucle
 Font:	ControlView		Police :
 Rotation: 0	ControlView		Rotation : 0
+Drawing mode:	ControlView		Mode de dessin :
+FontDemo	FontDemo		FontDemo
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Contrôles
 Outline: %d	ControlView		Contour : %d

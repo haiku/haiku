@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	2834665561
+1	finnish	x-vnd.Be-MAIL	849531913
 View	Mail		Näkymä
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
@@ -38,7 +38,6 @@ Save changes to this signature?	Mail		Tallennetaanko muutokset tähän allekirjo
 Cc:	Mail		Kopio:
 Off	Mail		Pois päältä
 Find	Mail		Etsi
-Preferences…	Mail		Asetukset…
 Undo	Mail		Peru
 Date:	Mail		Päivämäärä:
 An error occurred trying to open this signature.	Mail		Tapahtui virhe yritettäessä avata tätä allekirjiotusta.

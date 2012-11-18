@@ -1,11 +1,13 @@
+/*
+ * Copyright 1994-1997 Mark Kilgard, All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      Mark Kilgard
+ */
 #ifndef __glutint_h__
 #define __glutint_h__
 
-/* Copyright (c) Mark J. Kilgard, 1994, 1997, 1998. */
-
-/* This program is freely distributable without licensing fees
-   and is provided without guarantee or warrantee expressed or
-   implied. This program is -not- in the public domain. */
 
 #if defined(__CYGWIN32__)
 #include <sys/time.h>

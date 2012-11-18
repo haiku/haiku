@@ -20,7 +20,7 @@
 class APRView;
 class AntialiasingSettingsView;
 class FontView;
-class DecorSettingsView;
+class LookAndFeelSettingsView;
 
 
 class APRWindow : public BWindow {
@@ -39,7 +39,7 @@ private:
 
 		AntialiasingSettingsView* fAntialiasingSettings;
 		FontView*			fFontSettings;
-		DecorSettingsView*	fDecorSettings;
+		LookAndFeelSettingsView*	fLookAndFeelSettings;
 };
 
 

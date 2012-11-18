@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Managing Email</title>
+	<title>Atelier : Gérer son courrier</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -38,6 +40,8 @@
 <li><a href="../pt_PT/workshop-email.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../fi/workshop-email.html"><img src="../images/flags/fi.png" alt="" />Suomi</a></li>
 <li><a href="../sk/workshop-email.html"><img src="../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../hu/workshop-email.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../pt_BR/workshop-email.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../en/workshop-email.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -63,7 +67,7 @@
 </td></tr>
 </table>
 
-<h1>Workshop: Managing Email</h1>
+<h1>Atelier : Gérer son courrier</h1>
 
 <p>This workshop takes a look on how to manage email under Haiku. It assumes that the email services are correctly configured with the <a href="preferences/e-mail.html">E-Mail</a> preferences and you're familiar with the basic features of the <a href="applications/mail.html">Mail</a> application.</p>
 
@@ -101,7 +105,7 @@ In any case, try to keep the status name short. That way it always fits in a nor
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="queries" name="queries">Using queries</a></h2>
+<a id="queries" name="queries">Utiliser les requêtes</a></h2>
 <p>Sure, you specify a folder to store all your email, you can open it et voilà,  there's all you mail. But over time the folder becomes crowded and showing all will take longer and longer as thousands of files and their attributes have to be parsed and sorted. Also, most of the time you don't really care about two year old emails of Nigerian princes and their inheritory trouble ...</p>
 <div class="box-info">A lot of time when populating a folder is spent on putting files read from disk into the correct sorting order and displaying that in the window. If you do have to open a folder with a huge number of files, you can shorten the wait by making the Tracker window "invisible", i.e. either minimize it or change to another workspace. Watch <a href="applications/processcontroller.html">ProcessController</a> to see how it affects CPU usage.</div>
 <p><a href="queries.html">Queries</a>, to the rescue!</p>
@@ -116,7 +120,7 @@ In any case, try to keep the status name short. That way it always fits in a nor
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-examples" name="query-examples">Query examples</a></h3>
+<a id="query-examples" name="query-examples">Exemples de requêtes</a></h3>
 <p>Here are a few examples of useful queries:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="10">
 <tr align="center"><td><img src="images/workshop-email-images/query-1.png" alt="query-1.png" /><br />
@@ -132,7 +136,7 @@ This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">More tips</a></h2>
+<a id="tips" name="tips">Conseils supplémentaires</a></h2>
 <ul>
 <li><p>If you don't save a query as "<i>Query</i>" but as "<i>Query template</i>", invoking it won't show the result window, but the Find... window instead. That way you can easily exchange the search string for the subject or sender, for example, or change a "<i>2 days</i>" time limit to "<i>3 days</i>".</p></li>
 <li><p>Activating "type-ahead filtering" in <a href="tracker.html#tracker-preferences">Tracker's preferences</a> allows you to very quickly filter a query result even further. Often it's enough to query for all mails of the last 3 days and go with type-ahead filtering from there. The big advantage is, that you don't have to exactly specify which attribute to search for, as all displayed are considered when filtering.</p></li>

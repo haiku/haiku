@@ -52,6 +52,7 @@ enum {
 };
 
 
+class AddressType;
 class ArrayIndexPath;
 class BString;
 class Type;
@@ -116,6 +117,12 @@ public:
 	virtual	Type*				ResolveRawType(bool nextOneOnly) const;
 									// strips modifiers and typedefs (only one,
 									// if requested)
+
+
+	// TODO: also need the ability to derive array types
+	virtual status_t			CreateDerivedAddressType(
+									address_type_kind kind,
+									AddressType*& _resultType);
 
 	virtual	status_t			ResolveObjectDataLocation(
 									const ValueLocation& objectLocation,

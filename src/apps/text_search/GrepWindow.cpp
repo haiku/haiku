@@ -1049,6 +1049,10 @@ GrepWindow::_OnReportResult(BMessage* message)
 		// also reported (count == 0).
 		item = fSearchResults->RemoveResults(ref, count == 0);
 	}
+
+	if (count == 0)
+		return;
+
 	if (item == NULL) {
 		item = new ResultItem(ref);
 		fSearchResults->AddItem(item);

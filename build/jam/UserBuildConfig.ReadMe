@@ -63,6 +63,7 @@ HAIKU_IMAGE_DIR		= /tmp ;
 HAIKU_IMAGE_SIZE	= 100 ;
 
 # Enable stripping the debug symbols from optional packages.
+# Note, some optional packages may override this to prevent stripping.
 HAIKU_STRIP_DEBUG_FROM_OPTIONAL_PACKAGES = 1 ;
 
 # Set image volume label to "Walter". Default label is "Haiku".

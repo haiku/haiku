@@ -47,7 +47,6 @@ WindowArea::WindowArea(Crossing* leftTop, Crossing* rightTop,
 	fWidthConstraint(NULL),
 	fHeightConstraint(NULL)
 {
-
 }
 
 
@@ -216,6 +215,16 @@ WindowArea::_UpdateConstraintValues()
 		if (maxHeight < maxH)
 			maxHeight = maxH;
 	}
+	// the current solver don't like big values
+	const int32 kMaxSolverValue = 5000;
+	if (minWidth > kMaxSolverValue)
+		minWidth = kMaxSolverValue;
+	if (minHeight > kMaxSolverValue)
+		minHeight = kMaxSolverValue;
+	if (maxWidth > kMaxSolverValue)
+		maxWidth = kMaxSolverValue;
+	if (maxHeight > kMaxSolverValue)
+		maxHeight = kMaxSolverValue;
 
 	topWindow->AddDecorator(&minWidth, &maxWidth, &minHeight, &maxHeight);
 	fMinWidthConstraint->SetRightSide(minWidth);
@@ -320,6 +329,12 @@ WindowArea::PropagateToGroup(SATGroup* group)
 	if (!newLeftTop || !newRightTop || !newLeftBottom || !newRightBottom)
 		return false;
 
+	// hold a ref to the crossings till we cleaned up everything
+	BReference<Crossing> oldLeftTop = fLeftTopCrossing;
+	BReference<Crossing> oldRightTop = fRightTopCrossing;
+	BReference<Crossing> oldLeftBottom = fLeftBottomCrossing;
+	BReference<Crossing> oldRightBottom = fRightBottomCrossing;
+
 	fLeftTopCrossing = newLeftTop;
 	fRightTopCrossing = newRightTop;
 	fLeftBottomCrossing = newLeftBottom;
@@ -331,6 +346,7 @@ WindowArea::PropagateToGroup(SATGroup* group)
 	// manage constraints
 	if (Init(group) == false)
 		return false;
+
 	oldGroup->fWindowAreaList.RemoveItem(this);
 	for (int32 i = 0; i < fWindowList.CountItems(); i++) {
 		SATWindow* window = fWindowList.ItemAt(i);
@@ -360,12 +376,15 @@ WindowArea::MoveToTopLayer(SATWindow* window)
 void
 WindowArea::_UninitConstraints()
 {
-	delete fMinWidthConstraint;
-	delete fMinHeightConstraint;
-	delete fMaxWidthConstraint;
-	delete fMaxHeightConstraint;
-	delete fWidthConstraint;
-	delete fHeightConstraint;
+	LinearSpec* linearSpec = fGroup->GetLinearSpec();
+
+	linearSpec->RemoveConstraint(fMinWidthConstraint, true);
+	linearSpec->RemoveConstraint(fMinHeightConstraint, true);
+	linearSpec->RemoveConstraint(fMaxWidthConstraint, true);
+	linearSpec->RemoveConstraint(fMaxHeightConstraint, true);
+	linearSpec->RemoveConstraint(fWidthConstraint, true);
+	linearSpec->RemoveConstraint(fHeightConstraint, true);
+
 	fMinWidthConstraint = NULL;
 	fMinHeightConstraint = NULL;
 	fMaxWidthConstraint = NULL;
@@ -492,14 +511,10 @@ WindowArea::_MoveToSAT(SATWindow* triggerWindow)
 	if (topWindow == NULL)
 		return;
 
-	int32 workspace = triggerWindow->GetWindow()->CurrentWorkspace();
-	Desktop* desktop = triggerWindow->GetWindow()->Desktop();
-
 	BRect frameSAT(LeftVar()->Value() - kMakePositiveOffset,
 		TopVar()->Value() - kMakePositiveOffset,
 		RightVar()->Value() - kMakePositiveOffset,
 		BottomVar()->Value() - kMakePositiveOffset);
-
 	topWindow->AdjustSizeLimits(frameSAT);
 
 	BRect frame = topWindow->CompleteWindowFrame();
@@ -509,11 +524,12 @@ WindowArea::_MoveToSAT(SATWindow* triggerWindow)
 	float deltaByX = round(frameSAT.right - frame.right);
 	float deltaByY = round(frameSAT.bottom - frame.bottom);
 
+	int32 workspace = triggerWindow->GetWindow()->CurrentWorkspace();
+	Desktop* desktop = triggerWindow->GetWindow()->Desktop();
 	desktop->MoveWindowBy(topWindow->GetWindow(), deltaToX, deltaToY,
 		workspace);
 	// Update frame to the new position
 	desktop->ResizeWindowBy(topWindow->GetWindow(), deltaByX, deltaByY);
-
 
 	UpdateSizeConstaints(frameSAT);
 }
@@ -1157,14 +1173,12 @@ SATGroup::_SplitGroupIfNecessary(WindowArea* removedArea)
 	while (_FindConnectedGroup(neighbourWindows, removedArea, newGroup)) {
 		STRACE_SAT("Connected group found; %i window(s)\n",
 			(int)newGroup.CountItems());
-
 		if (newGroup.CountItems() == 1
 			&& newGroup.ItemAt(0)->WindowList().CountItems() == 1) {
 			SATWindow* window = newGroup.ItemAt(0)->WindowList().ItemAt(0);
 			RemoveWindow(window);
 			_EnsureGroupIsOnScreen(window->GetGroup());
-		}
-		else if (ownGroupProcessed)
+		} else if (ownGroupProcessed)
 			_SpawnNewGroup(newGroup);
 		else {
 			_EnsureGroupIsOnScreen(this);

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CodyCam	2499223827
+1	french	x-vnd.Haiku-CodyCam	2416864674
 Capturing Image…	VideoConsumer.cpp		Capture d'une image…
 Every 30 seconds	CodyCam		Toutes les 30 secondes
 File name:	CodyCam		Nom du fichier :
@@ -85,6 +85,7 @@ Cannot find the media roster	CodyCam		Impossible de trouver le diagramme des mé
 Every 4 hours	CodyCam		Toutes les 4 heures
 FTP	CodyCam		FTP
 File transmission failed	VideoConsumer.cpp		Erreur dans la transmission du fichier
+Cannot seek time source!	CodyCam		Impossible de positionner la référence de temps !
 File	CodyCam		Fichier
 Image Format Menu	CodyCam		Menu de formats d'images
 Every 30 minutes	CodyCam		Toutes les 30 minutes

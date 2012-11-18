@@ -257,7 +257,7 @@ u64 ntfs_inode_lookup_by_name(ntfs_inode *dir_ni,
 	u8 *index_end;
 	ntfs_attr *ia_na;
 	int eo, rc;
-	u32 index_block_size, index_vcn_size;
+	u32 index_block_size;
 	u8 index_vcn_size_bits;
 
 	ntfs_log_trace("Entering\n");
@@ -356,7 +356,7 @@ u64 ntfs_inode_lookup_by_name(ntfs_inode *dir_ni,
 		ntfs_attr_put_search_ctx(ctx);
 		if (mref)
 			return mref;
-		ntfs_log_debug("Entry not found.\n");
+		ntfs_log_debug("Entry not found - between root entries.\n");
 		errno = ENOENT;
 		return -1;
 	} /* Child node present, descend into it. */
@@ -378,11 +378,9 @@ u64 ntfs_inode_lookup_by_name(ntfs_inode *dir_ni,
 
 	/* Determine the size of a vcn in the directory index. */
 	if (vol->cluster_size <= index_block_size) {
-		index_vcn_size = vol->cluster_size;
 		index_vcn_size_bits = vol->cluster_size_bits;
 	} else {
-		index_vcn_size = vol->sector_size;
-		index_vcn_size_bits = vol->sector_size_bits;
+		index_vcn_size_bits = NTFS_BLOCK_SIZE_BITS;
 	}
 
 	/* Get the starting vcn of the index_block holding the child node. */
@@ -1039,7 +1037,7 @@ int ntfs_readdir(ntfs_inode *dir_ni, s64 *pos,
 	INDEX_ENTRY *ie;
 	INDEX_ALLOCATION *ia = NULL;
 	int rc, ir_pos, bmp_buf_size, bmp_buf_pos, eo;
-	u32 index_block_size, index_vcn_size;
+	u32 index_block_size;
 	u8 index_block_size_bits, index_vcn_size_bits;
 
 	ntfs_log_trace("Entering.\n");
@@ -1131,11 +1129,9 @@ int ntfs_readdir(ntfs_inode *dir_ni, s64 *pos,
 	}
 	index_block_size_bits = ffs(index_block_size) - 1;
 	if (vol->cluster_size <= index_block_size) {
-		index_vcn_size = vol->cluster_size;
 		index_vcn_size_bits = vol->cluster_size_bits;
 	} else {
-		index_vcn_size = vol->sector_size;
-		index_vcn_size_bits = vol->sector_size_bits;
+		index_vcn_size_bits = NTFS_BLOCK_SIZE_BITS;
 	}
 
 	/* Are we jumping straight into the index allocation attribute? */
@@ -1517,7 +1513,7 @@ static ntfs_inode *__ntfs_create(ntfs_inode *dir_ni, le32 securid,
 		else
 			ir->clusters_per_index_block = 
 					ni->vol->indx_record_size >>
-					ni->vol->sector_size_bits;
+					NTFS_BLOCK_SIZE_BITS;
 		ir->index.entries_offset = cpu_to_le32(sizeof(INDEX_HEADER));
 		ir->index.index_length = cpu_to_le32(index_len);
 		ir->index.allocated_size = cpu_to_le32(index_len);
@@ -1812,7 +1808,7 @@ search:
 	while (!ntfs_attr_lookup(AT_FILE_NAME, AT_UNNAMED, 0, CASE_SENSITIVE,
 			0, NULL, 0, actx)) {
 		char *s;
-		BOOL case_sensitive = IGNORE_CASE;
+		IGNORE_CASE_BOOL case_sensitive = IGNORE_CASE;
 
 		errno = 0;
 		fn = (FILE_NAME_ATTR*)((u8*)actx->attr +
@@ -1844,8 +1840,9 @@ search:
 				       (long long unsigned)MREF_LE(fn->parent_directory));
 			continue;
 		}
-		     
-		if (fn->file_name_type == FILE_NAME_POSIX || case_sensitive_match)
+		if (case_sensitive_match
+		    || ((fn->file_name_type == FILE_NAME_POSIX)
+			&& NVolCaseSensitive(ni->vol)))
 			case_sensitive = CASE_SENSITIVE;
 		
 		if (ntfs_names_are_equal(fn->file_name, fn->file_name_length,
@@ -2507,24 +2504,24 @@ int ntfs_set_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni,
 	int res = 0;
 	int longlen = 0;
 	int shortlen = 0;
-	char newname[MAX_DOS_NAME_LENGTH + 1];
+	char newname[3*MAX_DOS_NAME_LENGTH + 1];
 	ntfschar oldname[MAX_DOS_NAME_LENGTH];
 	int oldlen;
-	ntfs_volume *vol;
-	u64 fnum;
 	u64 dnum;
 	BOOL closed = FALSE;
 	ntfschar *shortname = NULL;
 	ntfschar longname[NTFS_MAX_NAME_LEN];
 
-	vol = ni->vol;
-	fnum = ni->mft_no;
-		/* convert the string to the NTFS wide chars */
-	if (size > MAX_DOS_NAME_LENGTH)
-		size = MAX_DOS_NAME_LENGTH;
+		/* copy the string to insert a null char, and truncate */
+	if (size > 3*MAX_DOS_NAME_LENGTH)
+		size = 3*MAX_DOS_NAME_LENGTH;
 	strncpy(newname, value, size);
+		/* a long name may be truncated badly and be untranslatable */
 	newname[size] = 0;
+		/* convert the string to the NTFS wide chars, and truncate */
 	shortlen = ntfs_mbstoucs(newname, &shortname);
+	if (shortlen > MAX_DOS_NAME_LENGTH)
+		shortlen = MAX_DOS_NAME_LENGTH;
 			/* make sure the short name has valid chars */
 	if ((shortlen < 0) || ntfs_forbidden_chars(shortname,shortlen)) {
 		ntfs_inode_close_in_dir(ni,dir_ni);

@@ -96,7 +96,6 @@ private:
 				void			CalculateTextPlacement();
 				void			ShowTimeOptions(BPoint);
 				void			Update();
-				void			UpdateTimeFormat();
 
 				BView*			fParent;
 				bool			fNeedToUpdate;

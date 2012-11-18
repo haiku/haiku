@@ -1,8 +1,7 @@
-1	lithuanian	x-vnd.Haiku-WebPTranslator	3630570850
+1	lithuanian	x-vnd.Haiku-WebPTranslator	2427600890
 Compression method:	ConfigView		Glaudinimo būdas:
 Based on libwebp v0.1,	ConfigView		Sukurta „libwebp v0.1“ pagrindu,
 Preset	ConfigView		Ruošinys
-WebP Images	ConfigView		WebP paveikslai
 WebP images	WebPTranslator		WebP paveikslai
 WebPTranslator Settings	ConfigView		WebP keitiklio nuostatos
 Output quality:	ConfigView		Išvesties kokybė:

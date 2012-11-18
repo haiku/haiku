@@ -1,8 +1,14 @@
+.section .init
 .globl _start
 _start:
 	b jmp_loader
 
-.balign 0x8000, 0
+.section .text
+	/* Start "safe" code area.
+	 * 0x4000 minimum safe area
+	 * defined in boot_loader_raspberrypi_arm.ld
+	 */
+
 jmp_loader:
 	/* Start Haiku loader */
 

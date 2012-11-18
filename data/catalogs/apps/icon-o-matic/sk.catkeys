@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	4233739176
+1	slovak	x-vnd.haiku-icon_o_matic	3088916408
 Select All	Icon-O-Matic-PathManipulator		Vybrať všetky
 Add Style	Icon-O-Matic-AddStylesCmd		Pridať štýl
 Color (#%02x%02x%02x)	Style name after dropping a color		Farba (#%02x%02x%02x)
@@ -192,7 +192,6 @@ Overwrite	Icon-O-Matic-SVGExport		Prepísať
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Zmraziť tvary
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Rozdeliť riadiaci bod
 Open…	Icon-O-Matic-Menu-File		Otvoriť…
-Options	Icon-O-Matic-Menus		Možnosti
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farba (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Upraviť farebný prechod
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Vyčistiť cestu

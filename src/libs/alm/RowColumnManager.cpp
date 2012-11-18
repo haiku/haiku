@@ -193,7 +193,8 @@ RowColumnManager::_UpdateConstraints(Row* row)
 	if (prefSize >= 0) {
 		if (row->fPrefSizeConstraint == NULL) {
 			row->fPrefSizeConstraint = fLinearSpec->AddConstraint(1,
-			row->fBottom, -1, row->fTop, kEQ, prefSize, weight, weight);
+				row->fBottom, -1, row->fTop, kEQ, prefSize, weight, weight);
+			row->fPrefSizeConstraint->SetLabel("Pref Height");
 		} else {
 			row->fPrefSizeConstraint->SetRightSide(prefSize);
 			row->fPrefSizeConstraint->SetPenaltyNeg(weight);
@@ -216,6 +217,7 @@ RowColumnManager::_UpdateConstraints(Column* column)
 			column->fPrefSizeConstraint = fLinearSpec->AddConstraint(1,
 				column->fRight, -1, column->fLeft, kEQ, prefSize, weight,
 				weight);
+			column->fPrefSizeConstraint->SetLabel("Pref Width");
 		} else {
 			column->fPrefSizeConstraint->SetRightSide(prefSize);
 			column->fPrefSizeConstraint->SetPenaltyNeg(weight);

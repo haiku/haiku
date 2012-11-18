@@ -15,7 +15,6 @@
 
 #include <Catalog.h>
 #include <Directory.h>
-#include <PathMonitor.h>
 
 #include "DiskUsage.h"
 
@@ -37,8 +36,7 @@ Scanner::Scanner(BVolume *v, BHandler *handler)
 	fTask(),
 	fBusy(false),
 	fQuitRequested(false),
-	fIsWatching(false),
-	fModifiedEntries()
+	fPreviousSnapshot(NULL)
 {
 	Run();
 }
@@ -46,17 +44,7 @@ Scanner::Scanner(BVolume *v, BHandler *handler)
 
 Scanner::~Scanner()
 {
-	if (fIsWatching) {
-		BPrivate::BPathMonitor::StopWatching(BMessenger(this, this));
-		fIsWatching = false;
-	}
 	delete fSnapshot;
-
-	while (fModifiedEntries.size() != 0) {
-		entry_ref* entry = *fModifiedEntries.begin();
-		delete entry;
-		fModifiedEntries.erase(fModifiedEntries.begin());
-	}
 }
 
 
@@ -70,38 +58,6 @@ Scanner::MessageReceived(BMessage* message)
 			if (message->FindPointer(kNameFilePtr, (void **)&startInfo) 
 				== B_OK)
 				_RunScan(startInfo);
-			break;
-		}
-
-		case B_PATH_MONITOR:
-		{
-			dev_t device;
-			ino_t directory;
-			const char* name = "";
-			const char* path;
-
-			if (((message->FindInt32("device", &device) != B_OK)
-					|| (message->FindInt64("directory", &directory) != B_OK)
-					|| (message->FindString("name", &name) != B_OK))
-				&& ((message->FindString("path", &path) != B_OK)
-					|| (message->FindInt32("device", &device) != B_OK)))
-				return;
-
-			entry_ref* reportedEntry;
-			if (strlen(name) > 0)
-				reportedEntry = new entry_ref(device, directory, name);
-			else {
-				BEntry entry(path);
-				reportedEntry = new entry_ref();
-				entry.GetRef(reportedEntry);
-			}
-
-			fModifiedEntries.push_back(reportedEntry);
-
-			if (IsOutdated()) {
-				BMessage msg(kOutdatedMsg);
-				fListener.SendMessage(&msg);
-			}
 			break;
 		}
 
@@ -120,12 +76,6 @@ Scanner::Refresh(FileInfo* startInfo)
 
 	fBusy = true;
 
-	while (fModifiedEntries.size() != 0) {
-		entry_ref* entry = *fModifiedEntries.begin();
-		delete entry;
-		fModifiedEntries.erase(fModifiedEntries.begin());
-	}
-
 	// Remember the current directory, if any, so we can return to it after
 	// the scanning is done.
 	if (fSnapshot != NULL && fSnapshot->currentDir != NULL)
@@ -136,6 +86,16 @@ Scanner::Refresh(FileInfo* startInfo)
 	BMessage msg(kScanRefresh);
 	msg.AddPointer(kNameFilePtr, startInfo);
 	PostMessage(&msg);
+}
+
+
+void
+Scanner::Cancel()
+{
+	if (!fBusy)
+		return;
+
+	fQuitRequested = true;
 }
 
 
@@ -165,27 +125,6 @@ Scanner::RequestQuit()
 }
 
 
-bool
-Scanner::IsOutdated()
-{
-	FileInfo* currentDir = (fSnapshot->currentDir != NULL ?
-		fSnapshot->currentDir : fSnapshot->rootDir);
-
-	BDirectory currentDirectory(&(currentDir->ref));
-	
-	bool isOutdated = currentDirectory.InitCheck() != B_OK;
-
-	vector<entry_ref*>::iterator i = fModifiedEntries.begin();
-	while (!isOutdated && i != fModifiedEntries.end()) {
-		BEntry entry(*i);
-		isOutdated = _DirectoryContains(currentDir, *i)
-			|| currentDirectory.Contains(&entry);
-		i++;
-	}
-	return isOutdated;
-}
-
-
 // #pragma mark - private
 
 
@@ -205,22 +144,29 @@ Scanner::_DirectoryContains(FileInfo* currentDir, entry_ref* ref)
 void
 Scanner::_RunScan(FileInfo* startInfo)
 {
+	fPreviousSnapshot = fSnapshot;
+	fQuitRequested = false;
 	BString stringScan(B_TRANSLATE("Scanning %refName%"));
 
 	if (startInfo == NULL || startInfo == fSnapshot->rootDir) {
-		delete fSnapshot;
 		fSnapshot = new VolumeSnapshot(fVolume);
 		stringScan.ReplaceFirst("%refName%", fSnapshot->name.c_str());
 		fTask = stringScan.String();
 		fVolumeBytesInUse = fSnapshot->capacity - fSnapshot->freeBytes;
 		fVolumeBytesScanned = 0;
 		fProgress = 0.0;
-		fLastReport = -100.0;
+		fLastReport = -1.0;
 
 		BDirectory root;
 		fVolume->GetRootDirectory(&root);
 		fSnapshot->rootDir = _GetFileInfo(&root, NULL);
-
+		if (fSnapshot->rootDir == NULL) {
+			delete fSnapshot;
+			fSnapshot = fPreviousSnapshot;
+			fBusy = false;
+			fListener.SendMessage(&fDoneMessage);
+			return;
+		}
 		FileInfo* freeSpace = new FileInfo;
 		freeSpace->pseudo = true;
 		BString string(B_TRANSLATE("Free on %refName%"));
@@ -238,14 +184,21 @@ Scanner::_RunScan(FileInfo* startInfo)
 		fTask = stringScan.String();
 		fVolumeBytesInUse = fSnapshot->capacity - fSnapshot->freeBytes;
 		fVolumeBytesScanned = fVolumeBytesInUse - startInfo->size; //best guess
-		fProgress = 100.0 * fVolumeBytesScanned / fVolumeBytesInUse;
-		fLastReport = -100.0;
+		fProgress = fVolumeBytesScanned / fVolumeBytesInUse;
+		fLastReport = -1.0;
 
 		BDirectory startDir(&startInfo->ref);
 		if (startDir.InitCheck() == B_OK) {
 			FileInfo *parent = startInfo->parent;
 			vector<FileInfo *>::iterator i = parent->children.begin();
 			FileInfo* newInfo = _GetFileInfo(&startDir, parent);
+			if (newInfo == NULL) {
+				delete fSnapshot;
+				fSnapshot = fPreviousSnapshot;
+				fBusy = false;
+				fListener.SendMessage(&fDoneMessage);
+				return;				
+			}
 			while (i != parent->children.end() && *i != startInfo)
 				i++;
 
@@ -259,17 +212,7 @@ Scanner::_RunScan(FileInfo* startInfo)
 			delete startInfo;
 		}
 	}
-
-	if (!fIsWatching) {
-		string path;
-		fSnapshot->rootDir->GetPath(path);
-
-		BPrivate::BPathMonitor::StartWatching(path.c_str(),
-			B_WATCH_ALL | B_WATCH_RECURSIVELY, BMessenger(this, this));
-
-		fIsWatching = true;
-	}
-
+	delete fPreviousSnapshot;
 	fBusy = false;
 	_ChangeToDesired();
 	fListener.SendMessage(&fDoneMessage);
@@ -288,7 +231,7 @@ Scanner::_GetFileInfo(BDirectory* dir, FileInfo* parent)
 
 	while (true) {
 		if (fQuitRequested)
-			break;
+			return NULL;
 
 		if (dir->GetNextEntry(&entry) == B_ENTRY_NOT_FOUND)
 			break;
@@ -305,7 +248,7 @@ Scanner::_GetFileInfo(BDirectory* dir, FileInfo* parent)
 
 			// Send a progress report periodically.
 			fVolumeBytesScanned += child->size;
-			fProgress = 100.0 * fVolumeBytesScanned / fVolumeBytesInUse;
+			fProgress = (float)fVolumeBytesScanned / fVolumeBytesInUse;
 			if (fProgress - fLastReport > kReportInterval) {
 				fLastReport = fProgress;
 				fListener.SendMessage(&fProgressMessage);

@@ -16,6 +16,7 @@
 #include "Thread.h"
 #include "ThreadInfo.h"
 #include "UserBreakpoint.h"
+#include "Watchpoint.h"
 
 
 // team event types
@@ -33,7 +34,11 @@ enum {
 
 	TEAM_EVENT_BREAKPOINT_ADDED,
 	TEAM_EVENT_BREAKPOINT_REMOVED,
-	TEAM_EVENT_USER_BREAKPOINT_CHANGED
+	TEAM_EVENT_USER_BREAKPOINT_CHANGED,
+
+	TEAM_EVENT_WATCHPOINT_ADDED,
+	TEAM_EVENT_WATCHPOINT_REMOVED,
+	TEAM_EVENT_WATCHPOINT_CHANGED
 };
 
 
@@ -55,10 +60,11 @@ class UserBreakpoint;
 class Team {
 public:
 			class Event;
-			class ThreadEvent;
-			class ImageEvent;
 			class BreakpointEvent;
+			class ImageEvent;
+			class ThreadEvent;
 			class UserBreakpointEvent;
+			class WatchpointEvent;
 			class Listener;
 
 public:
@@ -127,6 +133,21 @@ public:
 			const UserBreakpointList& UserBreakpoints() const
 									{ return fUserBreakpoints; }
 
+			bool				AddWatchpoint(Watchpoint* watchpoint);
+									// takes over reference (also on error)
+			void				RemoveWatchpoint(Watchpoint* watchpoint);
+									// releases its own reference
+			int32				CountWatchpoints() const;
+			Watchpoint*			WatchpointAt(int32 index) const;
+			Watchpoint*			WatchpointAtAddress(
+									target_addr_t address) const;
+			void				GetWatchpointsInAddressRange(
+									TargetAddressRange range,
+									BObjectList<Watchpoint>& watchpoints)
+										const;
+			const WatchpointList& Watchpoints() const
+									{ return fWatchpoints; }
+
 			status_t			GetStatementAtAddress(target_addr_t address,
 									FunctionInstance*& _function,
 									Statement*& _statement);
@@ -158,8 +179,13 @@ public:
 			void				NotifyUserBreakpointChanged(
 									UserBreakpoint* breakpoint);
 
+			// watchpoint related service methods
+			void				NotifyWatchpointChanged(
+									Watchpoint* watchpoint);
+
 private:
 			struct BreakpointByAddressPredicate;
+			struct WatchpointByAddressPredicate;
 
 			typedef BObjectList<Breakpoint> BreakpointList;
 			typedef DoublyLinkedList<Listener> ListenerList;
@@ -169,9 +195,6 @@ private:
 			void				_NotifyThreadRemoved(Thread* thread);
 			void				_NotifyImageAdded(Image* image);
 			void				_NotifyImageRemoved(Image* image);
-			void				_NotifyBreakpointAdded(Breakpoint* breakpoint);
-			void				_NotifyBreakpointRemoved(
-									Breakpoint* breakpoint);
 
 private:
 			BLocker				fLock;
@@ -185,6 +208,7 @@ private:
 			ThreadList			fThreads;
 			ImageList			fImages;
 			BreakpointList		fBreakpoints;
+			WatchpointList		fWatchpoints;
 			UserBreakpointList	fUserBreakpoints;
 			ListenerList		fListeners;
 };
@@ -237,6 +261,18 @@ protected:
 };
 
 
+class Team::WatchpointEvent : public Event {
+public:
+								WatchpointEvent(uint32 type, Team* team,
+									Watchpoint* watchpoint);
+
+			Watchpoint*			GetWatchpoint() const	{ return fWatchpoint; }
+
+protected:
+			Watchpoint*			fWatchpoint;
+};
+
+
 class Team::UserBreakpointEvent : public Event {
 public:
 								UserBreakpointEvent(uint32 type, Team* team,
@@ -275,6 +311,13 @@ public:
 									const Team::BreakpointEvent& event);
 	virtual	void				UserBreakpointChanged(
 									const Team::UserBreakpointEvent& event);
+
+	virtual	void				WatchpointAdded(
+									const Team::WatchpointEvent& event);
+	virtual	void				WatchpointRemoved(
+									const Team::WatchpointEvent& event);
+	virtual	void				WatchpointChanged(
+									const Team::WatchpointEvent& event);
 };
 
 

@@ -75,10 +75,16 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	const char* kColorTable[] = {
 		B_TRANSLATE("Text"),
 		B_TRANSLATE("Background"),
+		B_TRANSLATE("Cursor text"),
+		B_TRANSLATE("Cursor background"),
 		B_TRANSLATE("Selected text"),
 		B_TRANSLATE("Selected background"),
 		NULL
 	};
+
+	fBlinkCursor = new BCheckBox(
+		B_TRANSLATE("Blinking cursor"),
+			new BMessage(MSG_BLINK_CURSOR_CHANGED));
 
 	fWarnOnExit = new BCheckBox(
 		B_TRANSLATE("Confirm exit if active programs exist"),
@@ -141,6 +147,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		.AddGlue()
 		.Add(fColorControl = new BColorControl(BPoint(10, 10),
 			B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
+		.Add(fBlinkCursor)
 		.Add(fWarnOnExit);
 
 	fTabTitle->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
@@ -157,6 +164,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fColorControl->SetValue(
 		PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 
+	fBlinkCursor->SetValue(PrefHandler::Default()->getBool(PREF_BLINK_CURSOR));
 	fWarnOnExit->SetValue(PrefHandler::Default()->getBool(PREF_WARN_ON_EXIT));
 
 	BTextControl* redInput = (BTextControl*)fColorControl->ChildAt(0);
@@ -205,6 +213,7 @@ AppearancePrefView::AttachedToWindow()
 {
 	fTabTitle->SetTarget(this);
 	fWindowTitle->SetTarget(this);
+	fBlinkCursor->SetTarget(this);
 	fWarnOnExit->SetTarget(this);
 
 	fFontSize->Menu()->SetTargetForItems(this);
@@ -291,6 +300,15 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 		case MSG_COLOR_FIELD_CHANGED:
 			fColorControl->SetValue(PrefHandler::Default()->getRGB(
 				fColorField->Menu()->FindMarked()->Label()));
+			break;
+
+		case MSG_BLINK_CURSOR_CHANGED:
+			if (PrefHandler::Default()->getBool(PREF_BLINK_CURSOR)
+				!= fBlinkCursor->Value()) {
+					PrefHandler::Default()->setBool(PREF_BLINK_CURSOR,
+						fBlinkCursor->Value());
+					modified = true;
+			}
 			break;
 
 		case MSG_WARN_ON_EXIT_CHANGED:

@@ -31,4 +31,6 @@ KernelStaticLibrary libntfs.a :
 	unistr.c
 	unix_io.c
 	volume.c
+	realpath.c
+	xattrs.c
 ;

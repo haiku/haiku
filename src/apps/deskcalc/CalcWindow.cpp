@@ -21,6 +21,7 @@
 #include <Dragger.h>
 #include <Screen.h>
 
+#include "CalcApplication.h"
 #include "CalcOptions.h"
 #include "CalcView.h"
 
@@ -31,8 +32,8 @@
 
 CalcWindow::CalcWindow(BRect frame, BMessage* settings)
 	:
-	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("DeskCalc"), B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ANCHORED_ON_ACTIVATE)
+	BWindow(frame, kAppName, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS
+		| B_NOT_ANCHORED_ON_ACTIVATE)
 {
 	// create calculator view with calculator description and
 	// desktop background color

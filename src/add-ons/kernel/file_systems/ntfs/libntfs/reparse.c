@@ -200,8 +200,13 @@ static u64 ntfs_fix_file_name(ntfs_inode *dir_ni, ntfschar *uname,
 				 */
 				lemref = entry->indexed_file;
 				mref = le64_to_cpu(lemref);
-				for (i=0; i<found->file_name_length; i++)
-					uname[i] = found->file_name[i];
+				if (NVolCaseSensitive(vol) || !vol->locase) {
+					for (i=0; i<found->file_name_length; i++)
+						uname[i] = found->file_name[i];
+				} else {
+					for (i=0; i<found->file_name_length; i++)
+						uname[i] = vol->locase[found->file_name[i]];
+				}
 			}
 		}
 		ntfs_index_ctx_put(icx);

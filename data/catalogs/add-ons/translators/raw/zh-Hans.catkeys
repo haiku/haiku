@@ -1,7 +1,6 @@
-1	english	x-vnd.Haiku-RAWTranslator	1938728039
+1	english	x-vnd.Haiku-RAWTranslator	2229230003
 RAWTranslator Settings	ConfigView		RAW 转换器设置
 Version %d.%d.%d, %s	ConfigView		版本 %d.%d.%d, %s
-RAW Images	ConfigView		RAW 图像
 RAW image translator	RAWTranslator		RAW 图像转换器
 RAW Settings	RAWTranslator main		RAW 设置
 RAW images	RAWTranslator		RAW 图像

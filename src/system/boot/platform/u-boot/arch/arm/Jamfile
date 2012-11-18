@@ -11,14 +11,8 @@ SubDirC++Flags -fno-rtti ;
 BootMergeObject boot_platform_u-boot_arm.o :
 	# must come first to have _start_* at correct locations
 	shell.S
-
-	#arch_mmu.cpp
-	#arch_cpu_asm.S
-	arch_start_kernel.S
-	arch_cpu.cpp
-	#mmu.cpp
 	: -fno-pic
 ;
 
-#SEARCH on [ FGristFiles arch_cpu_asm.S arch_mmu.cpp ]
+#SEARCH on [ FGristFiles arch_cpu_asm.S ]
 #    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;

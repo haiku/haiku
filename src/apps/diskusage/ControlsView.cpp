@@ -73,8 +73,8 @@ VolumeTab::IconWidth() const
 void
 VolumeTab::DrawLabel(BView* owner, BRect frame)
 {
-	owner->SetDrawingMode(B_OP_OVER);
 	if (fIcon != NULL) {
+		owner->SetDrawingMode(B_OP_OVER);
 		owner->MovePenTo(frame.left + kSmallHMargin,
 			(frame.top + frame.bottom - fIcon->Bounds().Height()) / 2.0);
 		owner->DrawBitmap(fIcon);
@@ -188,13 +188,9 @@ ControlsView::VolumeTabView::TabFrame(int32 index) const
 			oldToShave = toShave;
 			for (int32 i = 0; i < countTabs; i++) {
 				float iconWidth = ((VolumeTab*)TabAt(i))->IconWidth();
-				float newMargin = margins[i] - averageToShave;
-
-				toShave -= averageToShave;
-				if (newMargin < minimumMargin + iconWidth) {
-					toShave += minimumMargin - newMargin + iconWidth;
-					newMargin = minimumMargin + iconWidth;
-				}
+				float newMargin = max_c(margins[i] - averageToShave,
+					minimumMargin + iconWidth);
+				toShave -= margins[i] - newMargin;			
 				margins[i] = newMargin;
 			}
 		} while (toShave > 0 && oldToShave != toShave);
@@ -248,6 +244,7 @@ ControlsView::VolumeTabView::MessageReceived(BMessage* message)
 			}
 			break;
 
+		case kBtnCancel:
 		case kBtnRescan:
 			ViewForTab(Selection())->MessageReceived(message);
 			break;
@@ -361,6 +358,7 @@ ControlsView::MessageReceived(BMessage* msg)
 			fVolumeTabView->MessageReceived(msg);
 			break;
 
+		case kBtnCancel:
 		case kBtnRescan:
 			fVolumeTabView->MessageReceived(msg);
 			break;
@@ -385,10 +383,18 @@ ControlsView::ShowInfo(const FileInfo* info)
 
 
 void
-ControlsView::SetRescanEnabled(bool enabled)
+ControlsView::EnableRescan()
 {
 	((VolumeView*)fVolumeTabView->ViewForTab(
-		fVolumeTabView->Selection()))->SetRescanEnabled(enabled);
+		fVolumeTabView->Selection()))->EnableRescan();
+}
+
+
+void
+ControlsView::EnableCancel()
+{
+	((VolumeView*)fVolumeTabView->ViewForTab(
+		fVolumeTabView->Selection()))->EnableCancel();
 }
 
 

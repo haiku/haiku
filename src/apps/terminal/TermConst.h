@@ -103,6 +103,8 @@ static const char* const PREF_HALF_FONT_SIZE = "Half Font Size";
 
 static const char* const PREF_TEXT_FORE_COLOR = "Text";
 static const char* const PREF_TEXT_BACK_COLOR = "Background";
+static const char* const PREF_CURSOR_FORE_COLOR = "Cursor text";
+static const char* const PREF_CURSOR_BACK_COLOR = "Cursor background";
 static const char* const PREF_SELECT_FORE_COLOR = "Selected text";
 static const char* const PREF_SELECT_BACK_COLOR = "Selected background";
 
@@ -131,6 +133,7 @@ static const char* const PREF_SHELL = "Shell";
 static const char* const PREF_TEXT_ENCODING = "Text encoding";
 static const char* const PREF_GUI_LANGUAGE = "Language";
 
+static const char* const PREF_BLINK_CURSOR = "Blinking cursor";
 static const char* const PREF_WARN_ON_EXIT = "Warn on exit";
 
 static const char* const PREF_TAB_TITLE = "Tab title";

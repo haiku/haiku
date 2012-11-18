@@ -1,7 +1,6 @@
-1	ukrainian	x-vnd.Haiku-RAWTranslator	1938728039
+1	ukrainian	x-vnd.Haiku-RAWTranslator	2229230003
 RAWTranslator Settings	ConfigView		Настройки Перетворювача RAW
 Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
-RAW Images	ConfigView		Зображення RAW
 RAW image translator	RAWTranslator		Перетворювач зображень RAW
 RAW Settings	RAWTranslator main		Настройки RAW
 RAW images	RAWTranslator		Зображення RAW

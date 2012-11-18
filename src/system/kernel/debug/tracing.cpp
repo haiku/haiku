@@ -1,6 +1,7 @@
 /*
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +14,7 @@
 
 #include <arch/debug.h>
 #include <debug.h>
+#include <debug_heap.h>
 #include <elf.h>
 #include <int.h>
 #include <kernel.h>
@@ -141,22 +143,37 @@ print_stack_trace(struct tracing_stack_trace* stackTrace,
 	if (stackTrace == NULL || stackTrace->depth <= 0)
 		return;
 
+	static const size_t kBufferSize = 256;
+	char* buffer = (char*)debug_malloc(kBufferSize);
+
 	for (int32 i = 0; i < stackTrace->depth; i++) {
 		addr_t address = stackTrace->return_addresses[i];
 
 		const char* symbol;
+		const char* demangledName = NULL;
 		const char* imageName;
 		bool exactMatch;
 		addr_t baseAddress;
 
 		if (elf_debug_lookup_symbol_address(address, &baseAddress, &symbol,
 				&imageName, &exactMatch) == B_OK) {
-			print("  %p  %s + 0x%lx (%s)%s\n", (void*)address, symbol,
+
+			if (buffer != NULL) {
+				bool isObjectMethod;
+				demangledName = debug_demangle_symbol(symbol, buffer,
+					kBufferSize, &isObjectMethod);
+			}
+
+			print("  %p  %s + 0x%lx (%s)%s\n", (void*)address,
+				demangledName != NULL ? demangledName : symbol,
 				address - baseAddress, imageName,
 				exactMatch ? "" : " (nearest)");
 		} else
 			print("  %p\n", (void*)address);
 	}
+
+	if (buffer != NULL)
+		debug_free(buffer);
 }
 
 

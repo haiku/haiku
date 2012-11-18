@@ -59,7 +59,7 @@ private int	read_getcmd(EditLine *, el_action_t *, char *);
 /* read_init():
  *	Initialize the read stuff
  */
-protected int
+int
 read_init(EditLine *el)
 {
 	/* builtin read_char */
@@ -72,7 +72,7 @@ read_init(EditLine *el)
  *	Set the read char function to the one provided.
  *	If it is set to EL_BUILTIN_GETCFN, then reset to the builtin one.
  */
-protected int
+int
 el_read_setfn(EditLine *el, el_rfunc_t rc)
 {
 	el->el_read.read_char = (rc == EL_BUILTIN_GETCFN) ? read_char : rc;
@@ -84,7 +84,7 @@ el_read_setfn(EditLine *el, el_rfunc_t rc)
  *	return the current read char function, or EL_BUILTIN_GETCFN
  *	if it is the default one
  */
-protected el_rfunc_t
+el_rfunc_t
 el_read_getfn(EditLine *el)
 {
        return (el->el_read.read_char == read_char) ?
@@ -348,7 +348,7 @@ el_getc(EditLine *el, char *cp)
 	return (num_read);
 }
 
-protected void
+void
 read_prepare(EditLine *el)
 {
 	if (el->el_flags & HANDLE_SIGNALS)
@@ -369,7 +369,7 @@ read_prepare(EditLine *el)
 		term__flush();
 }
 
-protected void
+void
 read_finish(EditLine *el)
 {
 	if ((el->el_flags & UNBUFFERED) == 0)

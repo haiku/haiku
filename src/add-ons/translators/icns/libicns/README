@@ -1,0 +1,118 @@
+===============================================================================
+README for libicns 0.8.1 - June 14, 2012
+Copyright (C) 2001-2012 Mathew Eis <mathew@eisbox.net>
+
+Other individuals have supported the development of libicns; they are credited
+in the source files where their respective contibutions have been made.
+
+===============================================================================
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.
+
+===============================================================================
+This package include the following libraries and utilities:
+1) libicns - A library for the translation of the icns format
+2) icns2png - A utility for converting icns files into png images
+3) icontainer2icns - A utility for extracting icns files from icontainer packs
+
+You should be able to get the latest version at http://sf.net/projects/icns
+
+===============================================================================
+libicns is a library for manipulation of the Mac OS icns resource format, also
+known as the IconFamily resource type. It can read and write files from the
+Mac OS X icns format, as well as read from Mac OS resource files and macbinary
+encoded Mac OS resource forks.
+
+As of release 0.5.9, it can fully manipulate any 128x128 and smaller 32-bit
+icons, and has partial support for manipulating 8-bit, 4-bit, and 1-bit icons.
+
+When linked with Jasper, it also has full support for 256x256 and 512x512
+icon sizes within the icon family.
+
+As of release 0.8.0, it can read the PNG format introduced with OS X Lion 10.7
+
+
+Please see DEVNOTES for more information on how to use libicns
+
+===============================================================================
+Using icns2png
+
+icns2png -x OmniWeb.icns
+Converting OmniWeb.icns to OmniWeb_128x128x32.png...
+
+This will result in a file OmniWeb_128x128x32.png with a 128x128 icon from OmniWeb.icns.
+
+Run icns2png --help for more detailed information.
+
+===============================================================================
+Using icontainer2icns
+
+icontainer2icns foo.icontainer
+
+This will end up with a couple of icns files identified by the iContainer ID
+and the iContainer name in a (new) folder carrying the icontainer name
+(without any suffix)
+
+===============================================================================
+NOTICE: icontainer2icns is NOT related to www.iconfactory.com - though it
+decodes this library type. They are NOT involved, please don't bother them
+with bug reports.
+
+For bug/wishes regarding icontainer2icns mailto: baghira-style@gmx.net
+
+===============================================================================
+Understanding the Mac OS X Icons
+
+Mac OS X Icon files come in two formats - icns files, and icns resources
+embedded with rsrc files. They may also be stored in a macbinary encoded
+rsrc files, or applesingle/appledouble encoded rsrc files
+
+libicns (and icns2png) can decode all five storage formats
+
+The .icns files are much easier to deal with, since they are in a format that
+can be easily accesed from Linux/UNIX/Windows.
+
+You can however access the icons from the resource files. OS X Icons like
+those from http://interfacelift.com/icons-mac/ are compressed in .sit files.
+These files can be uncompressed using Aladdin Stuffit Expander for Linux,
+which can be obtained from http://www.stuffit.com/unix/index.html
+
+When unstuffing, be sure to use a command similar to the following:
+
+unstuff --text=auto --macbinary=auto --eol=unix icons.hqx.sit
+
+This will help ensure that the resource forks are uncompressed into
+MacBinary files, so that icns2png can read them.
+
+If there are resource forks in the files, when stuffit decompresses them,
+it will create two files from the one mac file. For example, if the mac
+file was named "Gnu", the resulting decomressed files will be
+"Gnu", and "Gnu_1". The "Snowflake_1" file is the resource
+fork. This is the file you will want to extract the icon from. The file
+"Gnu" does not contain any icon data. If, however, there is no
+"Gnu_1", then the file may be in the .icns format, and you will
+extract the icon from "Gnu" - resulting in a file "Gnu.png"
+
+It is really fairly simple, once you get the hang of it - you will also
+notice that if the icon was in the resource fork, then the other main
+file will be etremely small, sometimes even 0k.
+
+The underlying data in both of the files is similar - they both hold the
+following icon data (Although most icons to not have a complete set):
+16x12 pixels - 1 bit mask - 1, 4, or 8 bit icon
+16x16 pixels - 1 or 8 bit mask - 1, 4, 8 or 24 bit icon
+32x32 pixels - 1 or 8 bit mask - 1, 4, 8, or 24 bit icon
+64x64 pixels - 1 or 8 bit mask - 1, 4, 8, or 24 bit icon
+128x128 pixels - 8 bit mask - 24 bit icon

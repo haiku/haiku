@@ -63,13 +63,13 @@ typedef struct el_map_t {
 #define	MAP_EMACS	0
 #define	MAP_VI		1
 
-protected int	map_bind(EditLine *, int, const char **);
-protected int	map_init(EditLine *);
-protected void	map_end(EditLine *);
-protected void	map_init_vi(EditLine *);
-protected void	map_init_emacs(EditLine *);
-protected int	map_set_editor(EditLine *, char *);
-protected int	map_get_editor(EditLine *, const char **);
-protected int	map_addfunc(EditLine *, const char *, const char *, el_func_t);
+int	map_bind(EditLine *, int, const char **);
+int	map_init(EditLine *);
+void	map_end(EditLine *);
+void	map_init_vi(EditLine *);
+void	map_init_emacs(EditLine *);
+int	map_set_editor(EditLine *, char *);
+int	map_get_editor(EditLine *, const char **);
+int	map_addfunc(EditLine *, const char *, const char *, el_func_t);
 
 #endif /* _h_el_map */

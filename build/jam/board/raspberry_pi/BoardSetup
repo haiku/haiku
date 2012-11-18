@@ -7,7 +7,7 @@ HAIKU_BOOT_PLATFORM = raspberrypi_arm ;
 # Various hardcoded addresses
 #
 
-HAIKU_BOARD_LOADER_BASE = 0x32000000 ;
+HAIKU_BOARD_LOADER_BASE = 0x0 ;
 
 #
 # Flash image

@@ -16,8 +16,6 @@ BCatalogData::BCatalogData(const char* signature, const char* language,
 	fFingerprint(fingerprint),
 	fNext(NULL)
 {
-	fLanguageName.ToLower();
-		// canonicalize language-name to lowercase
 }
 
 

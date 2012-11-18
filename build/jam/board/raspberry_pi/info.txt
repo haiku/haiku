@@ -1,4 +1,5 @@
 Setting up the Haiku boot partition
+-------------------------------------
 
 partition 1 -- FAT32, bootable flag, type 'c'
 partition 2 -- BeFS, Haiku filesystem, type 'eb'
@@ -7,7 +8,7 @@ The boot partition must contain the following files to boot Haiku:
 * bootcode.bin : 2nd stage bootloader, starts with SDRAM disabled
 * loader.bin : 3rd stage bootloader, starts with SDRAM enabled
 * start.elf: The GPU binary firmware image, provided by the foundation.
-* kernel.img: Haiku Loader (haiku_loader)
+* haiku_loader: Haiku Loader
 * config.txt: A configuration file read by the GPU.
 
 Optional files:
@@ -20,4 +21,13 @@ Additional GPU firmware images, rename over start.elf to use them:
   - this is the default
 * arm224_start.elf : 224M ARM, 32M GPU split
   - (use this for Linux only with no 3D or video processing.
-    Its enough for the 1080p framebuffer, but not much else)
+	Enough for the 1080p framebuffer, but not much else)
+
+Building
+-------------------------------------
+jam -q -sHAIKU_BOOT_BOARD=raspberry_pi -sHAIKU_BOOT_PLATFORM=raspberrypi_arm haiku_loader
+
+config.txt options
+-------------------------------------
+kernel=haiku_loader
+disable_commandline_tags=1

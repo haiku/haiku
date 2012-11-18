@@ -2520,6 +2520,9 @@ struct msk_softc {
 	int			msk_process_limit;
 	int			msk_stat_cons;
 	struct mtx		msk_mtx;
+#ifdef __HAIKU__
+	uint32_t	haiku_interrupt_status;
+#endif
 };
 
 #define	MSK_LOCK(_sc)		mtx_lock(&(_sc)->msk_mtx)

@@ -15,6 +15,7 @@ BootMergeObject boot_libroot.o :
 	LocaleData.cpp
 	qsort.c
 	kernel_vsprintf.cpp
+	memchr.c
 	memcmp.c
 	memmove.c
 	strdup.c

@@ -1,13 +1,16 @@
+/*
+ * Copyright 1994-1997 Mark Kilgard, All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      Mark Kilgard
+ */
 #ifndef __glutbitmap_h__
 #define __glutbitmap_h__
 
-/* Copyright (c) Mark J. Kilgard, 1994. */
-
-/* This program is freely distributable without licensing fees 
-   and is provided without guarantee or warrantee expressed or 
-   implied. This program is -not- in the public domain. */
 
 #include <GL/glut.h>
+
 
 typedef struct {
   const GLsizei width;
@@ -26,5 +29,6 @@ typedef struct {
 } BitmapFontRec, *BitmapFontPtr;
 
 typedef void *GLUTbitmapFont;
+
 
 #endif /* __glutbitmap_h__ */

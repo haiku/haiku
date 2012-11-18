@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	3736361491
+1	polish	x-vnd.haiku-icon_o_matic	2591538723
 Select All	Icon-O-Matic-PathManipulator		Zaznacz wszystko
 Add Style	Icon-O-Matic-AddStylesCmd		Dodanie stylu
 Color (#%02x%02x%02x)	Style name after dropping a color		Kolor (#%02x%02x%02x)
@@ -191,7 +191,6 @@ Overwrite	Icon-O-Matic-SVGExport		Nadpisz
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Zamrożenie kształtów
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Podzielenie punktów kontrolnych
 Open…	Icon-O-Matic-Menu-File		Otwórz…
-Options	Icon-O-Matic-Menus		Opcje
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Kolor (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Edycję gradientu
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Czyszczenie ścieżki

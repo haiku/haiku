@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	3736361491
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	2591538723
 Select All	Icon-O-Matic-PathManipulator		Alles selecteren
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
 Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#02x%02x%02x)
@@ -191,7 +191,6 @@ Overwrite	Icon-O-Matic-SVGExport		Overschrijven
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Vormen bevriezen
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Controlepunt splitsen
 Open…	Icon-O-Matic-Menu-File		Openen...
-Options	Icon-O-Matic-Menus		Opties
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Kleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Gradiënt aanpassen
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pad opruimen

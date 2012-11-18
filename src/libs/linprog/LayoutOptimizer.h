@@ -21,6 +21,9 @@ void zero_matrix(double** A, int m, int n);
 int compute_dependencies(double** a, int m, int n, bool* independent);
 
 
+bool is_soft(Constraint* constraint);
+
+
 class LayoutOptimizer {
 public:
 								LayoutOptimizer(const ConstraintList& list,

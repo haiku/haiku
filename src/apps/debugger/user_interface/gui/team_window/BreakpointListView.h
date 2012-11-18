@@ -13,6 +13,7 @@
 
 class Team;
 class UserBreakpoint;
+class Watchpoint;
 
 
 class BreakpointListView : public BGroupView, private TableListener {
@@ -29,9 +30,13 @@ public:
 
 			void				UnsetListener();
 
-			void				SetBreakpoint(UserBreakpoint* breakpoint);
+			void				SetBreakpoint(UserBreakpoint* breakpoint,
+									Watchpoint* watchpoint);
+
 			void				UserBreakpointChanged(
 									UserBreakpoint* breakpoint);
+			void				WatchpointChanged(
+									Watchpoint* breakpoint);
 
 			void				LoadSettings(const BMessage& settings);
 			status_t			SaveSettings(BMessage& settings);
@@ -48,6 +53,7 @@ private:
 private:
 			Team*				fTeam;
 			UserBreakpoint*		fBreakpoint;
+			Watchpoint*			fWatchpoint;
 			Table*				fBreakpointsTable;
 			BreakpointsTableModel* fBreakpointsTableModel;
 			Listener*			fListener;
@@ -60,6 +66,9 @@ public:
 
 	virtual	void				BreakpointSelectionChanged(
 									UserBreakpoint* breakpoint) = 0;
+
+	virtual	void				WatchpointSelectionChanged(
+									Watchpoint* watchpoint) = 0;
 };
 
 

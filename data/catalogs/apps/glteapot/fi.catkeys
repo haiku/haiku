@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-GLTeapot	2890609668
+1	finnish	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		Ylempi keskikohta
 Lighting	TeapotWindow		Valaistus
 Off	TeapotWindow		Valot pois
@@ -13,7 +13,6 @@ Fog	TeapotWindow		Sumu
 Backface culling	TeapotWindow		Taustakulman häivytys
 Z-buffered	TeapotWindow		Z-puskuroitu
 File	TeapotWindow		Tiedosto
-Options	TeapotWindow		Valitsimet
 Perspective	TeapotWindow		Perspektiivi
 GLTeapot	System name		GL-teekannu
 Green	TeapotWindow		Vihreä

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-GLTeapot	2890609668
+1	dutch; flemish	x-vnd.Haiku-GLTeapot	3688092856
 Upper center	TeapotWindow		Middenboven
 Lighting	TeapotWindow		Verlichting
 Off	TeapotWindow		Uit
@@ -13,7 +13,6 @@ Fog	TeapotWindow		Mist
 Backface culling	TeapotWindow		Backface culling
 Z-buffered	TeapotWindow		Z-gebufferd
 File	TeapotWindow		Bestand
-Options	TeapotWindow		Opties
 Perspective	TeapotWindow		Perspectief
 GLTeapot	System name		GLTeapot
 Green	TeapotWindow		Groen

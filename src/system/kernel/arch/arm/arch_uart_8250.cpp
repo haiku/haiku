@@ -6,10 +6,12 @@
  *		François Revol, revol@free.fr
  */
 
-#include <debug.h>
+
+#include <arch/arm/reg.h>
 #include <arch/generic/debug_uart_8250.h>
-#include <new>
 #include <board_config.h>
+#include <debug.h>
+#include <new>
 
 
 class ArchUART8250 : public DebugUART8250 {

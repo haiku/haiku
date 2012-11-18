@@ -442,7 +442,7 @@ hda_create_control_for_complex(hda_multi* multi, uint32* index, uint32 parent,
 		return;
 	}
 
-	if ((widget.type & WT_AUDIO_MIXER) != 0) {
+	if (widget.type == WT_AUDIO_MIXER) {
 		hda_create_channel_control(multi, index, parent, 0,
 			widget, true, widget.capabilities.input_amplifier, 0, gain, mute);
 		if (!gain && !mute) {
@@ -451,8 +451,7 @@ hda_create_control_for_complex(hda_multi* multi, uint32* index, uint32 parent,
 		}
 	}
 
-	if ((widget.type & WT_AUDIO_OUTPUT) == 0
-		&& widget.num_inputs > 0) {
+	if (widget.type != WT_AUDIO_OUTPUT && widget.num_inputs > 0) {
 		hda_widget& child = *hda_audio_group_get_widget(audioGroup,
 			widget.inputs[widget.active_input]);
 		hda_create_control_for_complex(multi, index, parent, child, gain, mute);
@@ -542,6 +541,12 @@ hda_create_controls_list(hda_multi* multi)
 		bool gain = true, mute = true;
 		hda_create_channel_control(multi, &index, parent2, 0,
 			widget, true, capabilities, 0, gain, mute);
+
+		if (widget.num_inputs > 1) {
+			TRACE("  create mux for nid %lu\n", widget.node_id);
+			hda_create_mux_control(multi, &index, parent2, widget);
+			continue;
+		}
 
 		hda_widget *mixer = hda_audio_group_get_widget(audioGroup,
 			widget.inputs[0]);
@@ -887,12 +892,14 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 		|| data->return_record_buffers < STREAM_MIN_BUFFERS)
 		data->return_record_buffers = STREAM_MIN_BUFFERS;
 
-	if (data->return_playback_buffer_size == 0) {
+	if (data->return_playback_buffer_size == 0
+		&& audioGroup->playback_stream != NULL) {
 		data->return_playback_buffer_size = default_buffer_length_for_rate(
 			audioGroup->playback_stream->sample_rate);
 	}
 
-	if (data->return_record_buffer_size == 0) {
+	if (data->return_record_buffer_size == 0
+		&& audioGroup->record_stream != NULL) {
 		data->return_record_buffer_size = default_buffer_length_for_rate(
 				audioGroup->record_stream->sample_rate);
 	}

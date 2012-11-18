@@ -47,7 +47,8 @@
  *	EIO	Multi sector transfer error was detected. Magic of the NTFS
  *		record in @b will have been set to "BAAD".
  */
-int ntfs_mst_post_read_fixup(NTFS_RECORD *b, const u32 size)
+int ntfs_mst_post_read_fixup_warn(NTFS_RECORD *b, const u32 size,
+					BOOL warn)
 {
 	u16 usa_ofs, usa_count, usn;
 	u16 *usa_pos, *data_pos;
@@ -63,9 +64,14 @@ int ntfs_mst_post_read_fixup(NTFS_RECORD *b, const u32 size)
 			(u32)(usa_ofs + (usa_count * 2)) > size ||
 			(size >> NTFS_BLOCK_SIZE_BITS) != usa_count) {
 		errno = EINVAL;
-		ntfs_log_perror("%s: magic: 0x%08x  size: %d  usa_ofs: %d  "
-				"usa_count: %d", __FUNCTION__, *(le32 *)b,
-				size, usa_ofs, usa_count);
+		if (warn) {
+			ntfs_log_perror("%s: magic: 0x%08lx  size: %ld "
+					"  usa_ofs: %d  usa_count: %u",
+					 __FUNCTION__,
+					(long)le32_to_cpu(*(le32 *)b),
+					(long)size, (int)usa_ofs,
+					(unsigned int)usa_count);
+		}
 		return -1;
 	}
 	/* Position of usn in update sequence array. */
@@ -116,6 +122,16 @@ int ntfs_mst_post_read_fixup(NTFS_RECORD *b, const u32 size)
 		data_pos += NTFS_BLOCK_SIZE/sizeof(u16);
 	}
 	return 0;
+}
+
+/*
+ *		Deprotect multi sector transfer protected data
+ *	with a warning if an error is found.
+ */
+
+int ntfs_mst_post_read_fixup(NTFS_RECORD *b, const u32 size)
+{
+	return (ntfs_mst_post_read_fixup_warn(b,size,TRUE));
 }
 
 /**

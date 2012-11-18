@@ -88,7 +88,6 @@ TTimeView::TTimeView(float maxWidth, float height, bool use24HourClock,
 	fLastTimeStr[0] = 0;
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
-	UpdateTimeFormat();
 
 	fLocale = *BLocale::Default();
 }
@@ -385,16 +384,38 @@ TTimeView::ShowCalendar(BPoint where)
 void
 TTimeView::GetCurrentTime()
 {
-	fLocale.FormatTime(fCurrentTimeStr, 64, fCurrentTime, fTimeFormat);
+	ssize_t offset = 0;
+
+	// ToDo: Check to see if we should write day of week after time for locale
+
+	if (fShowDayOfWeek) {
+		BString timeFormat("eee ");
+		offset = fLocale.FormatTime(fCurrentTimeStr, sizeof(fCurrentTimeStr),
+			fCurrentTime, timeFormat);
+
+		if (offset < 0) {
+			// error occured, attempt to overwrite with current time
+			// (this should not ever happen)
+			fLocale.FormatTime(fCurrentTimeStr, sizeof(fCurrentTimeStr),
+				fCurrentTime,
+				fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
+			return;
+		}
+	}
+
+	fLocale.FormatTime(fCurrentTimeStr + offset,
+		sizeof(fCurrentTimeStr) - offset, fCurrentTime,
+		fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
 }
 
 
 void
 TTimeView::GetCurrentDate()
 {
-	char tmp[64];
+	char tmp[sizeof(fCurrentDateStr)];
 
-	fLocale.FormatDate(tmp, 64, fCurrentTime, B_FULL_DATE_FORMAT);
+	fLocale.FormatDate(tmp, sizeof(fCurrentDateStr), fCurrentTime,
+		B_FULL_DATE_FORMAT);
 
 	// remove leading 0 from date when month is less than 10 (MM/DD/YY)
 	// or remove leading 0 from date when day is less than 10 (DD/MM/YY)
@@ -460,7 +481,6 @@ void
 TTimeView::Update()
 {
 	fLocale = *BLocale::Default();
-	UpdateTimeFormat();
 
 	GetCurrentTime();
 	GetCurrentDate();
@@ -471,27 +491,4 @@ TTimeView::Update()
 
 	if (fParent != NULL)
 		fParent->Invalidate();
-}
-
-
-void
-TTimeView::UpdateTimeFormat()
-{
-	BString timeFormat;
-
-	if (fShowDayOfWeek)
-		timeFormat.Append("eee ");
-
-	if (fUse24HourClock)
-		timeFormat.Append("H:mm");
-	else
-		timeFormat.Append("h:mm");
-
-	if (fShowSeconds)
-		timeFormat.Append(":ss");
-
-	if (!fUse24HourClock)
-		timeFormat.Append(" a");
-
-	fTimeFormat = timeFormat;
 }

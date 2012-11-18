@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -606,6 +606,24 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 			breakpointAllowed, line)) {
 		return B_NO_MEMORY;
 	}
+
+	return B_OK;
+}
+
+
+status_t
+ArchitectureX86::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
+	int32& _maxBytesPerRegister, uint8& _watchpointCapabilityFlags)
+{
+	// while x86 technically has 4 hardware debug registers, one is reserved by
+	// the kernel, and one is required for breakpoint support, which leaves
+	// two available for watchpoints.
+	_maxRegisterCount = 2;
+	_maxBytesPerRegister = 4;
+
+	// x86 only supports write and read/write watchpoints.
+	_watchpointCapabilityFlags = WATCHPOINT_CAPABILITY_FLAG_WRITE
+		| WATCHPOINT_CAPABILITY_FLAG_READ_WRITE;
 
 	return B_OK;
 }

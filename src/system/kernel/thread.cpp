@@ -1284,9 +1284,8 @@ common_getrlimit(int resource, struct rlimit * rlp)
 
 		case RLIMIT_STACK:
 		{
-			Thread *thread = thread_get_current_thread();
-			rlp->rlim_cur = thread->user_stack_size;
-			rlp->rlim_max = thread->user_stack_size;
+			rlp->rlim_cur = USER_MAIN_THREAD_STACK_SIZE;
+			rlp->rlim_max = USER_MAIN_THREAD_STACK_SIZE;
 			return B_OK;
 		}
 

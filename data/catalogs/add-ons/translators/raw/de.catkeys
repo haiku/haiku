@@ -1,7 +1,6 @@
-1	german	x-vnd.Haiku-RAWTranslator	1938728039
+1	german	x-vnd.Haiku-RAWTranslator	2229230003
 RAWTranslator Settings	ConfigView		RAWTranslator-Einstellungen
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
-RAW Images	ConfigView		RAW-Bilder
 RAW image translator	RAWTranslator		RAW-Bild-Translator
 RAW Settings	RAWTranslator main		RAW-Einstellungen
 RAW images	RAWTranslator		RAW-Bilder

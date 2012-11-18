@@ -43,8 +43,12 @@ print_formatting_conventions()
 {
 	BFormattingConventions conventions;
 	BLocale::Default()->GetFormattingConventions(&conventions);
-	printf("%s_%s.UTF-8\n", conventions.LanguageCode(),
-		conventions.CountryCode());
+	if (conventions.CountryCode() != NULL) {
+		printf("%s_%s.UTF-8\n", conventions.LanguageCode(),
+			conventions.CountryCode());
+	} else {
+		printf("%s.UTF-8\n", conventions.LanguageCode());
+	}
 }
 
 
@@ -53,12 +57,15 @@ print_time_conventions()
 {
 	BFormattingConventions conventions;
 	BLocale::Default()->GetFormattingConventions(&conventions);
-	if (conventions.UseStringsFromPreferredLanguage()) {
-		printf("%s_%s.UTF-8@strings=messages\n", conventions.LanguageCode(),
-			conventions.CountryCode());
+	if (conventions.CountryCode() != NULL) {
+		printf("%s_%s.UTF-8%s\n", conventions.LanguageCode(),
+			conventions.CountryCode(),
+			conventions.UseStringsFromPreferredLanguage()
+				? "@strings=messages" : "");
 	} else {
-		printf("%s_%s.UTF-8\n", conventions.LanguageCode(),
-			conventions.CountryCode());
+		printf("%s.UTF-8%s\n", conventions.LanguageCode(),
+			conventions.UseStringsFromPreferredLanguage()
+				? "@strings=messages" : "");
 	}
 }
 

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	4242202911
+1	english	x-vnd.Haiku-libtracker	3292362687
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -363,7 +363,6 @@ Modified	FindPanel		修改
 Error moving \"%name\" to Trash. (%error)	FSUtils		移动 \"%name\" 到垃圾箱出错。（%error）
 You can't replace a folder with one of its sub-folders.	FSUtils		您无法替换目录为其子目录。
 <No recent items>	FavoritesMenu		<无最近项目>
-Preferences…	ContainerWindow		首选项...
 Move	PoseView		移动
 Open and make preferred	OpenWithWindow		打开并创建首选
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		您确定要删除选中项目？该操作将无法恢复。

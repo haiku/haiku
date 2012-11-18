@@ -27,7 +27,6 @@
 
 #include "mmu.h"
 #include "acpi.h"
-#include "hpet.h"
 
 
 #define NO_SMP 0

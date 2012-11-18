@@ -5,10 +5,6 @@
 
 
 #include "video.h"
-//XXX
-#ifdef __ARM__
-#include "arch_video.h"
-#endif
 
 #include <arch/cpu.h>
 #include <boot/stage2.h>
@@ -18,20 +14,16 @@
 #include <boot/platform/generic/video.h>
 #include <util/list.h>
 #include <drivers/driver_settings.h>
+#include <board_config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "arch_framebuffer.h"
 
-#define TRACE_VIDEO
-#ifdef TRACE_VIDEO
-#	define TRACE(x) dprintf x
-#else
-#	define TRACE(x) ;
-#endif
 
-void *gFrameBufferBase = NULL;
+ArchFramebuffer *gFramebuffer = NULL;
 
 
 //	#pragma mark -
@@ -66,7 +58,6 @@ video_mode_menu()
 }
 
 
-
 //	#pragma mark -
 
 
@@ -77,56 +68,59 @@ platform_set_palette(const uint8 *palette)
 
 
 extern "C" void
-platform_blit4(addr_t frameBuffer, const uint8 *data, uint16 width, uint16 height,
-	uint16 imageWidth, uint16 left, uint16 top)
+platform_blit4(addr_t frameBuffer, const uint8 *data, uint16 width,
+	uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
 }
+
 
 extern "C" void
 platform_switch_to_logo(void)
 {
-	TRACE(("%s()\n", __FUNCTION__));
 	// in debug mode, we'll never show the logo
 	if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) != 0)
 		return;
 
-	//XXX: not yet, DISABLED
-	return;
-
 	status_t err;
 
-#ifdef __ARM__
-	err = arch_set_default_video_mode();
-	dprintf("set video mode: 0x%08x\n", err);
-	if (err < B_OK)
-		return;
-#endif
+	if (gFramebuffer != NULL) {
+		err = gFramebuffer->SetDefaultMode();
+		if (err < B_OK) {
+			ERROR("Framebuffer SetDefaultMode failed!\n");
+			return;
+		}
 
-	err = video_display_splash((addr_t)gFrameBufferBase);
-	dprintf("video_display_splash: 0x%08x\n", err);
-	#warning U-Boot:TODO
+		err = video_display_splash(gFramebuffer->Base());
+	}
 }
 
 
 extern "C" void
 platform_switch_to_text_mode(void)
 {
-	TRACE(("%s()\n", __FUNCTION__));
-	#warning U-Boot:TODO
 }
 
 
 extern "C" status_t
 platform_init_video(void)
 {
-	TRACE(("%s()\n", __FUNCTION__));
-    	#warning U-Boot:TODO
 #ifdef __ARM__
-	arch_probe_video_mode();
+	#if defined(BOARD_CPU_ARM920T)
+		extern ArchFramebuffer *arch_get_fb_arm_920(addr_t base);
+		gFramebuffer = arch_get_fb_arm_920(0x88000000);
+	#elif defined(BOARD_CPU_OMAP3)
+		extern ArchFramebuffer *arch_get_fb_arm_omap3(addr_t base);
+		gFramebuffer = arch_get_fb_arm_omap3(0x88000000);
+	#elif defined(BOARD_CPU_PXA270)
+		ArchFramebuffer *arch_get_fb_arm_pxa270(addr_t base);
+		gFramebuffer = arch_get_fb_arm_pxa270(0xA3000000);
+	#endif
 #endif
-	//XXX for testing
-	//platform_switch_to_logo();
-	//return arch_probe_video_mode();
-	//return B_OK;
-}
 
+	if (gFramebuffer != NULL) {
+		gFramebuffer->Probe();
+		gFramebuffer->Init();
+	}
+
+	return B_OK;
+}

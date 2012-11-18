@@ -208,4 +208,4 @@ private const struct el_bindings_t el_func_help[] = {
       "Editline extended command" },
 };
 
-protected const el_bindings_t* help__get(){ return el_func_help; }
+const el_bindings_t* help__get(){ return el_func_help; }

@@ -35,12 +35,15 @@ public:
 			const BString&		Group() const;
 
 private:
+			void				_DrawCloseButton(const BRect& updateRect);
+
 			BString				fLabel;
 			NotificationWindow*	fParent;
 			infoview_t			fInfo;
 			bool				fCollapsed;
 			BRect				fCloseRect;
 			BRect				fCollapseRect;
+			bool				fCloseClicked;
 };
 
 #endif	// _APP_GROUP_VIEW_H

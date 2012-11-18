@@ -31,7 +31,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/usr.sbin/fwcontrol/fwdv.c,v 1.7 2007/06/17 10:20:55 simokawa Exp $
+ * $FreeBSD: src/usr.sbin/fwcontrol/fwdv.c$
  */
 #include <sys/param.h>
 #ifndef __HAIKU__
@@ -119,7 +119,7 @@ dvrecv(int d, const char *filename, char ich, int count)
 	} else {
 		fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0660);
 		if (fd == -1)
-			err(EX_NOINPUT, filename);
+			err(EX_NOINPUT, "%s", filename);
 	}
 	buf = malloc(RBUFSIZE);
 	pad = malloc(DSIZE*MAXBLOCKS);
@@ -224,7 +224,7 @@ again:
 					if (npad < 0)
 						npad += nb;
 					fprintf(stderr, "\n%d blocks padded\n",
-								npad);
+					    npad);
 					npad *= DSIZE;
 					wbuf[vec].iov_base = pad;
 					wbuf[vec++].iov_len = npad;
@@ -255,7 +255,7 @@ next:
 		if (vec > 0)
 			writev(fd, wbuf, vec);
 	}
-	if(fd != STDOUT_FILENO)
+	if (fd != STDOUT_FILENO)
 		close(fd);
 	fprintf(stderr, "\n");
 }
@@ -279,7 +279,7 @@ dvsend(int d, const char *filename, char ich, int count)
 
 	fd = open(filename, O_RDONLY);
 	if (fd == -1)
-		err(EX_NOINPUT, filename);
+		err(EX_NOINPUT, "%s", filename);
 
 	pbuf = malloc(DSIZE * TNBUF);
 	bzero(wbuf, sizeof(wbuf));

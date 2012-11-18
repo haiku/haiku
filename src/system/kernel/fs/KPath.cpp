@@ -107,12 +107,12 @@ KPath::InitCheck() const
 
 
 status_t
-KPath::SetPath(const char *path, bool normalize, bool traverseLeafLink)
+KPath::SetPath(const char* path, bool normalize, bool traverseLeafLink)
 {
-	if (!fBuffer)
+	if (fBuffer == NULL)
 		return B_NO_INIT;
 
-	if (path) {
+	if (path != NULL) {
 		if (normalize) {
 			// normalize path
 			status_t error = vfs_normalize_path(path, fBuffer, fBufferSize,
@@ -148,10 +148,10 @@ KPath::Path() const
 }
 
 
-char *
+char*
 KPath::LockBuffer()
 {
-	if (!fBuffer || fLocked)
+	if (fBuffer == NULL || fLocked)
 		return NULL;
 
 	fLocked = true;
@@ -193,7 +193,7 @@ KPath::DetachBuffer()
 }
 
 
-const char *
+const char*
 KPath::Leaf() const
 {
 	if (!fBuffer)
@@ -212,9 +212,9 @@ KPath::Leaf() const
 
 
 status_t
-KPath::ReplaceLeaf(const char *newLeaf)
+KPath::ReplaceLeaf(const char* newLeaf)
 {
-	const char *leaf = Leaf();
+	const char* leaf = Leaf();
 	if (!leaf)
 		return B_NO_INIT;
 
@@ -237,7 +237,7 @@ bool
 KPath::RemoveLeaf()
 {
 	// get the leaf -- bail out, if not initialized or only the "/" is left
-	const char *leaf = Leaf();
+	const char* leaf = Leaf();
 	if (!leaf || leaf == fBuffer)
 		return false;
 
@@ -252,12 +252,12 @@ KPath::RemoveLeaf()
 
 
 status_t
-KPath::Append(const char *component, bool isComponent)
+KPath::Append(const char* component, bool isComponent)
 {
 	// check initialization and parameter
-	if (!fBuffer)
+	if (fBuffer == NULL)
 		return B_NO_INIT;
-	if (!component)
+	if (component == NULL)
 		return B_BAD_VALUE;
 	if (fPathLength == 0)
 		return SetPath(component);

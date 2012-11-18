@@ -1,6 +1,7 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org 
+	Copyright (C) 2004 beunited.org
+	Copyright (c) 2006-2012, Haiku, Inc. All rights reserved.
 
 	This library is free software; you can redistribute it and/or 
 	modify it under the terms of the GNU Lesser General Public 
@@ -25,6 +26,7 @@
 #include <View.h>
 
 
+class BAboutWindow;
 class BMessageRunner;
 class ThreadBarMenu;
 
@@ -58,6 +60,7 @@ class ProcessController : public BView {
 	private:
 		void			Init();
 
+		BAboutWindow*	fAboutWindow;
 		bool			fTemp;
 		float			fMemoryUsage;
 		float			fLastBarHeight[B_MAX_CPU_COUNT];

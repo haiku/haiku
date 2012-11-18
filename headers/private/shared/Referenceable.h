@@ -140,12 +140,22 @@ public:
 
 	bool operator==(const BReference<Type>& other) const
 	{
-		return (fObject == other.fObject);
+		return fObject == other.fObject;
+	}
+
+	bool operator==(const Type* other) const
+	{
+		return fObject == other;
 	}
 
 	bool operator!=(const BReference<Type>& other) const
 	{
-		return (fObject != other.fObject);
+		return fObject != other.fObject;
+	}
+
+	bool operator!=(const Type* other) const
+	{
+		return fObject != other;
 	}
 
 private:

@@ -609,81 +609,87 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		be_control_look->DrawLabel(view, text, rect, updateRect,
 			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 	} else if (key->shape == kEnterKeyShape) {
-		BRegion region(rect);
-		BRect originalRect = rect;
-		BRect missingRect = rect;
+		BRect topLeft = rect;
+		BRect topRight = rect;
+		BRect bottomLeft = rect;
+		BRect bottomRight = rect;
 
 		// TODO: for some reason, this does not always equal the bottom of
 		// the other keys...
-		missingRect.top = floorf(rect.top
+		bottomLeft.top = floorf(rect.top
 			+ fLayout->DefaultKeySize().height * fFactor - fGap - 1);
-		missingRect.right = floorf(missingRect.left
+		bottomLeft.right = floorf(rect.left
 			+ (key->frame.Width() - key->second_row) * fFactor - fGap - 2);
-		region.Exclude(missingRect);
-		view->ConstrainClippingRegion(&region);
 
-		be_control_look->DrawButtonFrame(view, rect, updateRect,
-			4.0f, 4.0f, 0.0f, 0.0f, base, background,
-			pressed ? BControlLook::B_ACTIVATED : 0);
+		topLeft.bottom = bottomLeft.top;
+		topLeft.right = bottomLeft.right + 1;
+			// add one to make the borders meet
 
-		view->ConstrainClippingRegion(&region);
+		topRight.bottom = topLeft.bottom;
+		topRight.left = topLeft.right;
 
-		be_control_look->DrawButtonBackground(view, rect, updateRect,
-			4.0f, 4.0f, 0.0f, 0.0f, base,
-			pressed ? BControlLook::B_ACTIVATED : 0);
+		bottomRight.top = bottomLeft.top;
+		bottomRight.left = bottomLeft.right;
 
-		rect.left = missingRect.right;
-		_GetAbbreviatedKeyLabelIfNeeded(view, rect, key, text, sizeof(text));
-
-		view->ConstrainClippingRegion(&region);
-
-		be_control_look->DrawLabel(view, text, rect, updateRect,
-			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
-
-		missingRect.right--;
-		missingRect.top -= 2;
-		region.Set(missingRect);
-		view->ConstrainClippingRegion(&region);
-
-		rect = originalRect;
-		rect.bottom = missingRect.top + 2;
-
-		be_control_look->DrawButtonFrame(view, rect, updateRect,
-			0.0f, 0.0f, 4.0f, 0.0f, base, background,
+		// draw top left corner
+		be_control_look->DrawButtonFrame(view, topLeft, updateRect,
+			4.0f, 0.0f, 4.0f, 0.0f, base, background,
 			pressed ? BControlLook::B_ACTIVATED : 0,
-			BControlLook::B_LEFT_BORDER | BControlLook::B_BOTTOM_BORDER);
-
-		view->ConstrainClippingRegion(&region);
-
-		be_control_look->DrawButtonBackground(view, rect, updateRect,
-			0.0f, 0.0f, 4.0f, 0.0f, base,
+			BControlLook::B_LEFT_BORDER | BControlLook::B_TOP_BORDER
+				| BControlLook::B_BOTTOM_BORDER);
+		be_control_look->DrawButtonBackground(view, topLeft, updateRect,
+			4.0f, 0.0f, 4.0f, 0.0f, base,
 			pressed ? BControlLook::B_ACTIVATED : 0,
-			BControlLook::B_LEFT_BORDER | BControlLook::B_BOTTOM_BORDER);
+			BControlLook::B_LEFT_BORDER | BControlLook::B_TOP_BORDER
+				| BControlLook::B_BOTTOM_BORDER);
 
-		missingRect.left = missingRect.right;
-		missingRect.right++;
-		missingRect.top += 2;
-		region.Set(missingRect);
-		view->ConstrainClippingRegion(&region);
+		// draw top right corner
+		be_control_look->DrawButtonFrame(view, topRight, updateRect,
+			0.0f, 4.0f, 0.0f, 0.0f, base, background,
+			pressed ? BControlLook::B_ACTIVATED : 0,
+			BControlLook::B_TOP_BORDER | BControlLook::B_RIGHT_BORDER);
+		be_control_look->DrawButtonBackground(view, topRight, updateRect,
+			0.0f, 4.0f, 0.0f, 0.0f, base,
+			pressed ? BControlLook::B_ACTIVATED : 0,
+			BControlLook::B_TOP_BORDER | BControlLook::B_RIGHT_BORDER);
 
-		rect = originalRect;
-		rect.left = missingRect.right - 2;
-		rect.top = missingRect.top - 2;
-
-		be_control_look->DrawButtonFrame(view, rect, updateRect,
+		// draw bottom right corner
+		be_control_look->DrawButtonFrame(view, bottomRight, updateRect,
 			0.0f, 0.0f, 4.0f, 4.0f, base, background,
 			pressed ? BControlLook::B_ACTIVATED : 0,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER
-				| BControlLook::B_BOTTOM_BORDER);
-
-		view->ConstrainClippingRegion(&region);
-
-		be_control_look->DrawButtonBackground(view, rect, updateRect,
+				 | BControlLook::B_BOTTOM_BORDER);
+		be_control_look->DrawButtonBackground(view, bottomRight, updateRect,
 			0.0f, 0.0f, 4.0f, 4.0f, base,
 			pressed ? BControlLook::B_ACTIVATED : 0,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER
-				| BControlLook::B_BOTTOM_BORDER);
+				 | BControlLook::B_BOTTOM_BORDER);
 
+		// clip out the bottom left corner
+		bottomLeft.right += 1;
+		bottomLeft.top -= 2;
+		BRegion region(rect);
+		region.Exclude(bottomLeft);
+		view->ConstrainClippingRegion(&region);
+
+		// Fill in the rect with the background color
+		SetHighColor(background);
+		FillRect(rect);
+
+		// draw the button background
+		BRect bgRect = rect.InsetByCopy(2, 2);
+		be_control_look->DrawButtonBackground(view, bgRect, updateRect,
+			4.0f, 4.0f, 0.0f, 4.0f, base,
+			pressed ? BControlLook::B_ACTIVATED : 0);
+
+		rect.left = bottomLeft.right;
+		_GetAbbreviatedKeyLabelIfNeeded(view, rect, key, text, sizeof(text));
+
+		// draw the button label
+		be_control_look->DrawLabel(view, text, rect, updateRect,
+			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+
+		// reset the clipping region
 		view->ConstrainClippingRegion(NULL);
 	}
 }

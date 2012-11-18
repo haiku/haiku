@@ -57,7 +57,7 @@ DesktopSettingsPrivate::_SetDefaults()
 
 	// init scrollbar info
 	fScrollBarInfo.proportional = true;
-	fScrollBarInfo.double_arrows = true;
+	fScrollBarInfo.double_arrows = false;
 	fScrollBarInfo.knob = 1;
 		// look of the knob (R5: (0, 1, 2), 1 = default)
 	fScrollBarInfo.min_knob_size = 15;
