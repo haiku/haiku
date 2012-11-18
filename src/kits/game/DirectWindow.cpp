@@ -365,7 +365,7 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	if (IsLocked() || !_LockDirect())
 		return B_ERROR;
 
-	if (fInDirectConnect) {
+	if (!fInDirectConnect) {
 		_UnlockDirect();
 		return B_ERROR;
 	}
