@@ -12,6 +12,7 @@
 
 #include <new>
 
+#include <Entry.h>
 #include <Message.h>
 
 #include <AutoLocker.h>
@@ -22,6 +23,7 @@
 #include "BreakpointSetting.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
+#include "DebugReportGenerator.h"
 #include "FileManager.h"
 #include "Function.h"
 #include "FunctionID.h"
@@ -146,6 +148,7 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fBreakpointManager(NULL),
 	fWatchpointManager(NULL),
 	fMemoryBlockManager(NULL),
+	fReportGenerator(NULL),
 	fDebugEventListener(-1),
 	fUserInterface(userInterface),
 	fTerminating(false),
@@ -204,6 +207,7 @@ TeamDebugger::~TeamDebugger()
 	delete fBreakpointManager;
 	delete fWatchpointManager;
 	delete fMemoryBlockManager;
+	delete fReportGenerator;
 	delete fWorker;
 	delete fTeam;
 	delete fFileManager;
@@ -324,6 +328,15 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return B_NO_MEMORY;
 
 	error = fMemoryBlockManager->Init();
+	if (error != B_OK)
+		return error;
+
+	// create the debug report generator
+	fReportGenerator = new(std::nothrow) DebugReportGenerator(fTeam);
+	if (fReportGenerator == NULL)
+		return B_NO_MEMORY;
+
+	error = fReportGenerator->Init();
 	if (error != B_OK)
 		return error;
 
@@ -532,6 +545,14 @@ TeamDebugger::MessageReceived(BMessage* message)
 				&address) == B_OK) {
 				_HandleInspectAddress(address, listener);
 			}
+			break;
+		}
+
+		case MSG_GENERATE_DEBUG_REPORT:
+		{
+			entry_ref ref;
+			if (message->FindRef("target", &ref) == B_OK)
+				_HandleGenerateDebugReport(ref);
 			break;
 		}
 
@@ -805,6 +826,15 @@ TeamDebugger::InspectRequested(target_addr_t address,
 	BMessage message(MSG_INSPECT_ADDRESS);
 	message.AddUInt64("address", address);
 	message.AddPointer("listener", listener);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::DebugReportRequested(entry_ref* targetPath)
+{
+	BMessage message(MSG_GENERATE_DEBUG_REPORT);
+	message.AddRef("target", targetPath);
 	PostMessage(&message);
 }
 
@@ -1499,6 +1529,13 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 	} else
 		memoryBlock->NotifyDataRetrieved();
 
+}
+
+
+void
+TeamDebugger::_HandleGenerateDebugReport(const entry_ref& ref)
+{
+	fReportGenerator->GenerateReport(ref);
 }
 
 
