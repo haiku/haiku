@@ -569,7 +569,7 @@ Keymap::SaveAsSource(const char* name)
 	_SaveSourceText(file, &textRuns);
 
 	if (textRuns != NULL) {
-		ssize_t dataSize;
+		int32 dataSize;
 		void* data = BTextView::FlattenRunArray(textRuns, &dataSize);
 		if (data != NULL) {
 			BNode node(name);

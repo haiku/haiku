@@ -39,7 +39,7 @@ static uint32 sAPICVersions[B_MAX_CPU_COUNT];
 
 
 static int32
-i386_ici_interrupt(void *data)
+x86_ici_interrupt(void *data)
 {
 	// genuine inter-cpu interrupt
 	int cpu = smp_get_current_cpu();
@@ -49,10 +49,10 @@ i386_ici_interrupt(void *data)
 
 
 static int32
-i386_spurious_interrupt(void *data)
+x86_spurious_interrupt(void *data)
 {
 	// spurious interrupt
-	TRACE(("spurious interrupt on cpu %ld\n", smp_get_current_cpu()));
+	TRACE(("spurious interrupt on cpu %" B_PRId32 "\n", smp_get_current_cpu()));
 
 	// spurious interrupts must not be acknowledged as it does not expect
 	// a end of interrupt - if we still do it we would loose the next best
@@ -62,10 +62,10 @@ i386_spurious_interrupt(void *data)
 
 
 static int32
-i386_smp_error_interrupt(void *data)
+x86_smp_error_interrupt(void *data)
 {
 	// smp error interrupt
-	TRACE(("smp error interrupt on cpu %ld\n", smp_get_current_cpu()));
+	TRACE(("smp error interrupt on cpu %" B_PRId32 "\n", smp_get_current_cpu()));
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -91,9 +91,9 @@ arch_smp_init(kernel_args *args)
 	if (args->num_cpus > 1) {
 		// I/O interrupts start at ARCH_INTERRUPT_BASE, so all interrupts are shifted
 		reserve_io_interrupt_vectors(3, 0xfd - ARCH_INTERRUPT_BASE);
-		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &i386_ici_interrupt, NULL, B_NO_LOCK_VECTOR);
-		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &i386_smp_error_interrupt, NULL, B_NO_LOCK_VECTOR);
-		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &i386_spurious_interrupt, NULL, B_NO_LOCK_VECTOR);
+		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &x86_ici_interrupt, NULL, B_NO_LOCK_VECTOR);
+		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &x86_smp_error_interrupt, NULL, B_NO_LOCK_VECTOR);
+		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &x86_spurious_interrupt, NULL, B_NO_LOCK_VECTOR);
 	}
 
 	return B_OK;
@@ -104,7 +104,8 @@ status_t
 arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
 {
 	// set up the local apic on the current cpu
-	TRACE(("arch_smp_init_percpu: setting up the apic on cpu %ld\n", cpu));
+	TRACE(("arch_smp_init_percpu: setting up the apic on cpu %" B_PRId32 "\n",
+		cpu));
 	apic_per_cpu_init(args, cpu);
 
 	// setup FPU and SSE if supported
@@ -154,7 +155,7 @@ arch_smp_send_ici(int32 target_cpu)
 		asm volatile ("pause;");
 
 	if (timeout == 0)
-		panic("arch_smp_send_ici: timeout, target_cpu %ld", target_cpu);
+		panic("arch_smp_send_ici: timeout, target_cpu %" B_PRId32, target_cpu);
 
 	restore_interrupts(state);
 }

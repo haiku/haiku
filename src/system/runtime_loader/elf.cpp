@@ -18,7 +18,6 @@
 
 #include <OS.h>
 
-#include <elf32.h>
 #include <syscalls.h>
 #include <util/kernel_cpp.h>
 
@@ -70,7 +69,7 @@ static const char *
 find_dt_rpath(image_t *image)
 {
 	int i;
-	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
+	elf_dyn *d = (elf_dyn *)image->dynamic_ptr;
 
 	for (i = 0; d[i].d_tag != DT_NULL; i++) {
 		if (d[i].d_tag == DT_RPATH)
@@ -84,7 +83,7 @@ find_dt_rpath(image_t *image)
 static status_t
 load_immediate_dependencies(image_t *image)
 {
-	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
+	elf_dyn *d = (elf_dyn *)image->dynamic_ptr;
 	bool reportErrors = report_errors();
 	status_t status = B_OK;
 	uint32 i, j;
@@ -670,7 +669,7 @@ get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
 	// iterate through all the hash buckets until we've found the one
 	for (i = 0; i < HASHTABSIZE(image); i++) {
 		for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
-			struct Elf32_Sym *symbol = &image->syms[j];
+			elf_sym *symbol = &image->syms[j];
 
 			if (count == num) {
 				const char* symbolName = SYMNAME(image, symbol);
@@ -680,9 +679,9 @@ get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
 				void* location = (void*)(symbol->st_value
 					+ image->regions[0].delta);
 				int32 type;
-				if (ELF32_ST_TYPE(symbol->st_info) == STT_FUNC)
+				if (symbol->Type() == STT_FUNC)
 					type = B_SYMBOL_TYPE_TEXT;
-				else if (ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT)
+				else if (symbol->Type() == STT_OBJECT)
 					type = B_SYMBOL_TYPE_DATA;
 				else
 					type = B_SYMBOL_TYPE_ANY;
@@ -721,14 +720,14 @@ get_nearest_symbol_at_address(void* address, image_id* _imageID,
 		return B_BAD_VALUE;
 	}
 
-	struct Elf32_Sym* foundSymbol = NULL;
+	elf_sym* foundSymbol = NULL;
 	addr_t foundLocation = (addr_t)NULL;
 
 	bool found = false;
 	for (uint32 i = 0; i < HASHTABSIZE(image) && !found; i++) {
 		for (int32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
 				j = HASHCHAINS(image)[j]) {
-			struct Elf32_Sym *symbol = &image->syms[j];
+			elf_sym *symbol = &image->syms[j];
 			addr_t location = symbol->st_value + image->regions[0].delta;
 
 			if (location <= (addr_t)address	&& location >= foundLocation) {
@@ -753,9 +752,9 @@ get_nearest_symbol_at_address(void* address, image_id* _imageID,
 		*_symbolName = SYMNAME(image, foundSymbol);
 
 		if (_type != NULL) {
-			if (ELF32_ST_TYPE(foundSymbol->st_info) == STT_FUNC)
+			if (foundSymbol->Type() == STT_FUNC)
 				*_type = B_SYMBOL_TYPE_TEXT;
-			else if (ELF32_ST_TYPE(foundSymbol->st_info) == STT_OBJECT)
+			else if (foundSymbol->Type() == STT_OBJECT)
 				*_type = B_SYMBOL_TYPE_DATA;
 			else
 				*_type = B_SYMBOL_TYPE_ANY;
@@ -831,14 +830,14 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 	if (handle == RTLD_DEFAULT || handle == RLD_GLOBAL_SCOPE) {
 		// look in the default scope
 		image_t* image;
-		Elf32_Sym* symbol = find_undefined_symbol_global(gProgramImage,
+		elf_sym* symbol = find_undefined_symbol_global(gProgramImage,
 			gProgramImage,
 			SymbolLookupInfo(symbolName, B_SYMBOL_TYPE_ANY, NULL,
 				LOOKUP_FLAG_DEFAULT_VERSION),
 			&image);
 		if (symbol != NULL) {
 			*_location = (void*)(symbol->st_value + image->regions[0].delta);
-			int32 symbolType = ELF32_ST_TYPE(symbol->st_info) == STT_FUNC
+			int32 symbolType = symbol->Type() == STT_FUNC
 				? B_SYMBOL_TYPE_TEXT : B_SYMBOL_TYPE_DATA;
 			patch_defined_symbol(image, symbolName, _location, &symbolType);
 			status = B_OK;
@@ -864,7 +863,7 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 			bool hitCallerImage = false;
 			set_image_flags_recursively(callerImage, RFLAG_USE_FOR_RESOLVING);
 
-			Elf32_Sym* candidateSymbol = NULL;
+			elf_sym* candidateSymbol = NULL;
 			image_t* candidateImage = NULL;
 
 			image_t* image = get_loaded_images().head;
@@ -883,14 +882,14 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 					continue;
 				}
 
-				struct Elf32_Sym *symbol = find_symbol(image,
+				elf_sym *symbol = find_symbol(image,
 					SymbolLookupInfo(symbolName, B_SYMBOL_TYPE_TEXT, NULL,
 						LOOKUP_FLAG_DEFAULT_VERSION));
 				if (symbol == NULL)
 					continue;
 
 				// found a symbol
-				bool isWeak = ELF32_ST_BIND(symbol->st_info) == STB_WEAK;
+				bool isWeak = symbol->Bind() == STB_WEAK;
 				if (candidateImage == NULL || !isWeak) {
 					candidateSymbol = symbol;
 					candidateImage = image;
@@ -932,7 +931,7 @@ status_t
 get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 {
 	uint32 i, j, searchIndex = *cookie;
-	struct Elf32_Dyn *dynamicSection;
+	elf_dyn *dynamicSection;
 	image_t *image;
 
 	if (_name == NULL)
@@ -946,7 +945,7 @@ get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 		return B_BAD_IMAGE_ID;
 	}
 
-	dynamicSection = (struct Elf32_Dyn *)image->dynamic_ptr;
+	dynamicSection = (elf_dyn *)image->dynamic_ptr;
 	if (dynamicSection == NULL || image->num_needed <= searchIndex) {
 		rld_unlock();
 		return B_ENTRY_NOT_FOUND;
@@ -976,15 +975,14 @@ get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 
 /*! Read and verify the ELF header */
 status_t
-elf_verify_header(void *header, int32 length)
+elf_verify_header(void *header, size_t length)
 {
 	int32 programSize, sectionSize;
 
-	if (length < (int32)sizeof(struct Elf32_Ehdr))
+	if (length < sizeof(elf_ehdr))
 		return B_NOT_AN_EXECUTABLE;
 
-	return parse_elf_header((struct Elf32_Ehdr *)header, &programSize,
-		&sectionSize);
+	return parse_elf_header((elf_ehdr *)header, &programSize, &sectionSize);
 }
 
 
@@ -1029,7 +1027,7 @@ rldelf_init(void)
 
 	// create the debug area
 	{
-		int32 size = TO_PAGE_SIZE(sizeof(runtime_loader_debug_area));
+		size_t size = TO_PAGE_SIZE(sizeof(runtime_loader_debug_area));
 
 		runtime_loader_debug_area *area;
 		area_id areaID = _kern_create_area(RUNTIME_LOADER_DEBUG_AREA_NAME,

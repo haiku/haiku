@@ -5,6 +5,7 @@
 local X86_ONLY = ;
 local PPC_ONLY = ;
 local M68K_ONLY = ;
+local ARM_ONLY = ;
 if $(TARGET_ARCH) = x86 {
 	X86_ONLY = "" ;
 } else if $(TARGET_ARCH) = ppc {
@@ -86,8 +87,8 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo $(X86_ONLY)GLTeapot
 SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
-	libgame.so $(X86_ONLY)libGL.so libgnu.so
-	libmail.so libmedia.so libmidi.so libmidi2.so
+	libgame.so $(X86_ONLY)libGL.so $(X86_ONLY)libglut.so
+	libgnu.so libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
 	<revisioned>libroot.so libroot-addon-icu.so
 	libscreensaver.so
@@ -246,8 +247,8 @@ AddFilesToHaikuImage system add-ons kernel debugger
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
-	: $(ATA_ONLY)ata_adapter dpc $(IDE_ONLY)ide_adapter locked_pool mpu401
-		scsi_periph <module>tty ;
+	: $(ATA_ONLY)ata_adapter $(X86_ONLY)bios dpc $(IDE_ONLY)ide_adapter
+		locked_pool mpu401 scsi_periph <module>tty ; #$(X86_ONLY)cpuidle ;
 AddFilesToHaikuImage system add-ons kernel partitioning_systems
 	: amiga_rdb apple efi_gpt intel session ;
 AddFilesToHaikuImage system add-ons kernel interrupt_controllers
@@ -261,6 +262,7 @@ if $(TARGET_ARCH) = x86 {
 AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToHaikuImage power : $(X86_ONLY)enhanced_speedstep ;
 AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_battery ;
+#AddNewDriversToHaikuImage power : $(X86_ONLY)x86_cpuidle ;
 
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf null
@@ -305,9 +307,8 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 }
 
 
-# libGL.so has GLU (like BeOS) *and* GLUT API built-in
-SYSTEM_LIBS_LIBGL_ALIASES
-	= libGLU.so libglut.so ;
+# libGL.so has GLU (like BeOS) built-in
+SYSTEM_LIBS_LIBGL_ALIASES = libGLU.so ;
 
 if $(TARGET_ARCH) = x86 {
 	local lib ;

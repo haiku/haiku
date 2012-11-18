@@ -46,9 +46,6 @@ SharedLibrary libGL.so : $(sources) :
 	# GLU
 	$(HAIKU_GLU_LIBS)
 
-	# Glut
-	<opengl>glut.o
-
 	# Mesa libraries (from Mesa optional package):
 	$(HAIKU_MESA_LIBS)
 

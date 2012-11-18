@@ -312,7 +312,7 @@ Fifo::Dequeue(bool clone)
 }
 
 
-ssize_t
+status_t
 Fifo::Clear()
 {
 	return base_fifo_clear(this);
@@ -632,7 +632,7 @@ dump_timer(int argc, char** argv)
 		if (timer == NULL)
 			break;
 
-		kprintf("%p  %p  %p  %Ld\n", timer, timer->hook, timer->data,
+		kprintf("%p  %p  %p  %" B_PRId64 "\n", timer, timer->hook, timer->data,
 			timer->due > 0 ? timer->due - system_time() : -1);
 	}
 

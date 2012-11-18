@@ -38,9 +38,9 @@ void
 IORequestOwner::Dump() const
 {
 	kprintf("IORequestOwner at %p\n", this);
-	kprintf("  team:     %ld\n", team);
-	kprintf("  thread:   %ld\n", thread);
-	kprintf("  priority: %ld\n", priority);
+	kprintf("  team:     %" B_PRId32 "\n", team);
+	kprintf("  thread:   %" B_PRId32 "\n", thread);
+	kprintf("  priority: %" B_PRId32 "\n", priority);
 
 	kprintf("  requests:");
 	for (IORequestList::ConstIterator it = requests.GetIterator();
@@ -654,7 +654,7 @@ IOSchedulerSimple::_Scheduler()
 				if (request == NULL) {
 					resourcesAvailable = false;
 if (operationCount == 0)
-panic("no more requests for owner %p (thread %ld)", owner, owner->thread);
+panic("no more requests for owner %p (thread %" B_PRId32 ")", owner, owner->thread);
 					break;
 				}
 

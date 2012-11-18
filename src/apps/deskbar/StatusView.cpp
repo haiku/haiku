@@ -95,10 +95,11 @@ float sMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
 static void
 DumpItem(DeskbarItemInfo* item)
 {
-	printf("is addon: %i, id: %li\n", item->isAddOn, item->id);
-	printf("entry_ref:  %ld, %Ld, %s\n", item->entryRef.device,
-		item->entryRef.directory, item->entryRef.name);
-	printf("node_ref:  %ld, %Ld\n", item->nodeRef.device, item->nodeRef.node);
+	printf("is addon: %i, id: %" B_PRId32 "\n", item->isAddOn, item->id);
+	printf("entry_ref:  %" B_PRIdDEV ", %" B_PRIdINO ", %s\n",
+		item->entryRef.device, item->entryRef.directory, item->entryRef.name);
+	printf("node_ref:  %" B_PRIdDEV ", %" B_PRIdINO "\n", item->nodeRef.device,
+		item->nodeRef.node);
 }
 
 
@@ -1428,7 +1429,7 @@ TDragRegion::DragRegion() const
 void
 TDragRegion::MouseDown(BPoint thePoint)
 {
-	ulong buttons;
+	uint32 buttons;
 	BPoint where;
 	BRect dragRegion(DragRegion());
 

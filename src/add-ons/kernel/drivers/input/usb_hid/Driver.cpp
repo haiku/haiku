@@ -62,7 +62,7 @@ usb_hid_device_added(usb_device device, void **cookie)
 	// ensure default configuration is set
 	status_t result = gUSBModule->set_configuration(device, config);
 	if (result != B_OK) {
-		TRACE_ALWAYS("set_configuration() failed 0x%08lx\n", result);
+		TRACE_ALWAYS("set_configuration() failed 0x%08" B_PRIx32 "\n", result);
 		return result;
 	}
 
@@ -78,8 +78,8 @@ usb_hid_device_added(usb_device device, void **cookie)
 	for (size_t i = 0; i < config->interface_count; i++) {
 		const usb_interface_info *interface = config->interface[i].active;
 		uint8 interfaceClass = interface->descr->interface_class;
-		TRACE("interface %lu: class: %u; subclass: %u; protocol: %u\n",
-			i, interfaceClass, interface->descr->interface_subclass,
+		TRACE("interface %" B_PRIuSIZE ": class: %u; subclass: %u; protocol: "
+			"%u\n",	i, interfaceClass, interface->descr->interface_subclass,
 			interface->descr->interface_protocol);
 
 		// check for quirky devices first
@@ -128,7 +128,7 @@ usb_hid_device_added(usb_device device, void **cookie)
 					char pathBuffer[128];
 					const char *basePath = handler->BasePath();
 					while (true) {
-						sprintf(pathBuffer, "%s%ld", basePath, index++);
+						sprintf(pathBuffer, "%s%" B_PRId32, basePath, index++);
 						if (gDeviceList->FindDevice(pathBuffer) == NULL) {
 							// this name is still free, use it
 							handler->SetPublishPath(strdup(pathBuffer));
@@ -149,7 +149,7 @@ usb_hid_device_added(usb_device device, void **cookie)
 	if (!devicesFound)
 		return B_ERROR;
 
-	*cookie = (void *)parentCookie;
+	*cookie = (void *)(addr_t)parentCookie;
 	return B_OK;
 }
 
@@ -158,8 +158,8 @@ status_t
 usb_hid_device_removed(void *cookie)
 {
 	mutex_lock(&sDriverLock);
-	int32 parentCookie = (int32)cookie;
-	TRACE("device_removed(%ld)\n", parentCookie);
+	int32 parentCookie = (int32)(addr_t)cookie;
+	TRACE("device_removed(%" B_PRId32 ")\n", parentCookie);
 
 	for (int32 i = 0; i < gDeviceList->CountDevices(); i++) {
 		ProtocolHandler *handler = (ProtocolHandler *)gDeviceList->DeviceAt(i);

@@ -8,13 +8,13 @@
 
 #include <KernelExport.h>
 #include <PCI.h>
+#ifdef __HAIKU__
+#include <drivers/bios.h>
+#endif	// __HAIKU__
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 #include <graphic_driver.h>
-#ifdef __HAIKU__
-#include <arch/x86/vm86.h>
-#endif	// __HAIKU__
 
 #include "DriverInterface.h"
 
@@ -493,51 +493,60 @@ GetEdidFromBIOS(edid1_raw& edidRaw)
 #define ADDRESS_SEGMENT(address) ((addr_t)(address) >> 4)
 #define ADDRESS_OFFSET(address) ((addr_t)(address) & 0xf)
 
-	vm86_state vmState;
-
-	status_t status = vm86_prepare(&vmState, 0x2000);
+	bios_module_info* biosModule;
+	status_t status = get_module(B_BIOS_MODULE_NAME, (module_info**)&biosModule);
 	if (status != B_OK) {
-		TRACE("GetEdidFromBIOS(); vm86_prepare() failed, status: %lx\n", status);
+		TRACE("GetEdidFromBIOS(): failed to get BIOS module: 0x%" B_PRIx32 "\n",
+			status);
 		return status;
 	}
 
-	vmState.regs.eax = 0x4f15;
-	vmState.regs.ebx = 0;		// 0 = report DDC service
-	vmState.regs.ecx = 0;
-	vmState.regs.es = 0;
-	vmState.regs.edi = 0;
+	bios_state* state;
+	status = biosModule->prepare(&state);
+	if (status != B_OK) {
+		TRACE("GetEdidFromBIOS(): bios_prepare() failed: 0x%" B_PRIx32 "\n",
+			status);
+		put_module(B_BIOS_MODULE_NAME);
+		return status;
+	}
 
-	status = vm86_do_int(&vmState, 0x10);
+	bios_regs regs = {};
+	regs.eax = 0x4f15;
+	regs.ebx = 0;			// 0 = report DDC service
+	regs.ecx = 0;
+	regs.es = 0;
+	regs.edi = 0;
+
+	status = biosModule->interrupt(state, 0x10, &regs);
 	if (status == B_OK) {
 		// AH contains the error code, and AL determines whether or not the
 		// function is supported.
-		if (vmState.regs.eax != 0x4f)
+		if (regs.eax != 0x4f)
 			status = B_NOT_SUPPORTED;
 
 		// Test if DDC is supported by the monitor.
-		if ((vmState.regs.ebx & 3) == 0)
+		if ((regs.ebx & 3) == 0)
 			status = B_NOT_SUPPORTED;
 	}
 
 	if (status == B_OK) {
-		// According to the author of the vm86 functions, the address of any
-		// object to receive data must be >= 0x1000 and within the ram size
-		// specified in the second argument of the vm86_prepare() call above.
-		// Thus, the address of the struct to receive the EDID info is set to
-		// 0x1000.
+		edid1_raw* edid = (edid1_raw*)biosModule->allocate_mem(state,
+			sizeof(edid1_raw));
+		if (edid == NULL) {
+			status = B_NO_MEMORY;
+			goto out;
+		}
 
-		edid1_raw* edid = (edid1_raw*)0x1000;
+		regs.eax = 0x4f15;
+		regs.ebx = 1;		// 1 = read EDID
+		regs.ecx = 0;
+		regs.edx = 0;
+		regs.es  = ADDRESS_SEGMENT(edid);
+		regs.edi = ADDRESS_OFFSET(edid);
 
-		vmState.regs.eax = 0x4f15;
-		vmState.regs.ebx = 1;		// 1 = read EDID
-		vmState.regs.ecx = 0;
-		vmState.regs.edx = 0;
-		vmState.regs.es  = ADDRESS_SEGMENT(edid);
-		vmState.regs.edi = ADDRESS_OFFSET(edid);
-
-		status = vm86_do_int(&vmState, 0x10);
+		status = biosModule->interrupt(state, 0x10, &regs);
 		if (status == B_OK) {
-			if (vmState.regs.eax != 0x4f) {
+			if (regs.eax != 0x4f) {
 				status = B_NOT_SUPPORTED;
 			} else {
 				// Copy the EDID info to the caller's location, and compute the
@@ -565,9 +574,11 @@ GetEdidFromBIOS(edid1_raw& edidRaw)
 		}
 	}
 
-	vm86_cleanup(&vmState);
+out:
+	biosModule->finish(state);
+	put_module(B_BIOS_MODULE_NAME);
 
-	TRACE("GetEdidFromBIOS() status: 0x%lx\n", status);
+	TRACE("GetEdidFromBIOS() status: 0x%" B_PRIx32 "\n", status);
 	return status;
 }
 

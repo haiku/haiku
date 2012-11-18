@@ -55,7 +55,8 @@ static void scsi_insert_new_request( scsi_device_info *device,
 {
 	scsi_ccb *first, *last, *before, *next;
 	
-	SHOW_FLOW( 3, "inserting new_request=%p, pos=%Ld", new_request, new_request->sort );
+	SHOW_FLOW( 3, "inserting new_request=%p, pos=%" B_PRId64, new_request,
+		new_request->sort );
 	
 	first = device->queued_reqs;
 	
@@ -65,7 +66,7 @@ static void scsi_insert_new_request( scsi_device_info *device,
 		return;
 	}
 	
-	SHOW_FLOW( 3, "first=%p, pos=%Ld, last_pos=%Ld", 
+	SHOW_FLOW( 3, "first=%p, pos=%" B_PRId64 ", last_pos=%" B_PRId64, 
 		first, first->sort, device->last_sort );
 
 	// don't let syncs bypass others
@@ -153,7 +154,7 @@ static void scsi_insert_new_request( scsi_device_info *device,
 		return;
 	}
 	
-	SHOW_FLOW( 1, "inserting after %p (pos=%Ld) and before %p (pos=%Ld)", 
+	SHOW_FLOW( 1, "inserting after %p (pos=%" B_PRId64 ") and before %p (pos=%" B_PRId64 ")", 
 		before, before->sort, next, next->sort );
 
 	// if we haven't found a proper position, we automatically insert 

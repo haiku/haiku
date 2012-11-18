@@ -341,7 +341,7 @@ Services::_StopService(struct service& service)
 
 	// Shutdown the running server, if any
 	if (service.process != -1) {
-		printf("  Sending SIGTERM to process %ld\n", service.process);
+		printf("  Sending SIGTERM to process %" B_PRId32 "\n", service.process);
 		kill(-service.process, SIGTERM);
 	}
 

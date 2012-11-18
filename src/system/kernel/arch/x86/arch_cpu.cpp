@@ -1,10 +1,10 @@
 /*
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
- *
  */
 
 
@@ -21,17 +21,14 @@
 #include <debug.h>
 #include <elf.h>
 #include <smp.h>
-#include <tls.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
 #include <arch_system_info.h>
 #include <arch/x86/apic.h>
-#include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
 
-#include "interrupts.h"
 #include "paging/X86PagingStructures.h"
 #include "paging/X86VMTranslationMap.h"
 
@@ -94,11 +91,11 @@ struct set_mtrrs_parameter {
 };
 
 
-extern "C" void reboot(void);
-	// from arch_x86.S
+extern "C" void x86_reboot(void);
+	// from arch.S
 
-void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
 void (*gCpuIdleFunc)(void);
+void (*gX86SwapFPUFunc)(void* oldState, const void* newState) = x86_noop_swap;
 bool gHasSSE = false;
 
 static uint32 sCpuRendezvous;
@@ -106,13 +103,11 @@ static uint32 sCpuRendezvous2;
 static uint32 sCpuRendezvous3;
 static vint32 sTSCSyncRendezvous;
 
-segment_descriptor *gGDT = NULL;
-
 /* Some specials for the double fault handler */
 static uint8* sDoubleFaultStacks;
 static const size_t kDoubleFaultStackSize = 4096;	// size per CPU
 
-static x86_cpu_module_info *sCpuModule;
+static x86_cpu_module_info* sCpuModule;
 
 
 extern "C" void memcpy_generic(void* dest, const void* source, size_t count);
@@ -187,10 +182,10 @@ enable_caches()
 
 
 static void
-set_mtrr(void *_parameter, int cpu)
+set_mtrr(void* _parameter, int cpu)
 {
-	struct set_mtrr_parameter *parameter
-		= (struct set_mtrr_parameter *)_parameter;
+	struct set_mtrr_parameter* parameter
+		= (struct set_mtrr_parameter*)_parameter;
 
 	// wait until all CPUs have arrived here
 	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
@@ -244,7 +239,7 @@ set_mtrrs(void* _parameter, int cpu)
 
 
 static void
-init_mtrrs(void *_unused, int cpu)
+init_mtrrs(void* _unused, int cpu)
 {
 	// wait until all CPUs have arrived here
 	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
@@ -293,7 +288,7 @@ x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 
 
 status_t
-x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
+x86_get_mtrr(uint32 index, uint64* _base, uint64* _length, uint8* _type)
 {
 	// the MTRRs are identical on all CPUs, so it doesn't matter
 	// on which CPU this runs
@@ -320,10 +315,12 @@ x86_set_mtrrs(uint8 defaultType, const x86_mtrr_info* infos, uint32 count)
 void
 x86_init_fpu(void)
 {
+	// All x86_64 CPUs support SSE, don't need to bother checking for it.
+#ifndef __x86_64__
 	if (!x86_check_feature(IA32_FEATURE_FPU, FEATURE_COMMON)) {
 		// No FPU... time to install one in your 386?
 		dprintf("%s: Warning: CPU has no reported FPU.\n", __func__);
-		gX86SwapFPUFunc = i386_noop_swap;
+		gX86SwapFPUFunc = x86_noop_swap;
 		return;
 	}
 
@@ -332,65 +329,25 @@ x86_init_fpu(void)
 		dprintf("%s: CPU has no SSE... just enabling FPU.\n", __func__);
 		// we don't have proper SSE support, just enable FPU
 		x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
-		gX86SwapFPUFunc = i386_fnsave_swap;
+		gX86SwapFPUFunc = x86_fnsave_swap;
 		return;
 	}
+#endif
+
 	dprintf("%s: CPU has SSE... enabling FXSR and XMM.\n", __func__);
 
 	// enable OS support for SSE
 	x86_write_cr4(x86_read_cr4() | CR4_OS_FXSR | CR4_OS_XMM_EXCEPTION);
 	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
 
-	gX86SwapFPUFunc = i386_fxsave_swap;
+	gX86SwapFPUFunc = x86_fxsave_swap;
 	gHasSSE = true;
-}
-
-
-static void
-load_tss(int cpu)
-{
-	short seg = ((TSS_BASE_SEGMENT + cpu) << 3) | DPL_KERNEL;
-	asm("movw  %0, %%ax;"
-		"ltr %%ax;" : : "r" (seg) : "eax");
-}
-
-
-static void
-init_double_fault(int cpuNum)
-{
-	// set up the double fault TSS
-	struct tss *tss = &gCPU[cpuNum].arch.double_fault_tss;
-
-	memset(tss, 0, sizeof(struct tss));
-	size_t stackSize;
-	tss->sp0 = (uint32)x86_get_double_fault_stack(cpuNum, &stackSize);
-	tss->sp0 += stackSize;
-	tss->ss0 = KERNEL_DATA_SEG;
-	read_cr3(tss->cr3);
-		// copy the current cr3 to the double fault cr3
-	tss->eip = (uint32)&double_fault;
-	tss->es = KERNEL_DATA_SEG;
-	tss->cs = KERNEL_CODE_SEG;
-	tss->ss = KERNEL_DATA_SEG;
-	tss->esp = tss->sp0;
-	tss->ds = KERNEL_DATA_SEG;
-	tss->fs = KERNEL_DATA_SEG;
-	tss->gs = KERNEL_DATA_SEG;
-	tss->ldt_seg_selector = 0;
-	tss->io_map_base = sizeof(struct tss);
-
-	// add TSS descriptor for this new TSS
-	uint16 tssSegmentDescriptorIndex = DOUBLE_FAULT_TSS_BASE_SEGMENT + cpuNum;
-	set_tss_descriptor(&gGDT[tssSegmentDescriptorIndex],
-		(addr_t)tss, sizeof(struct tss));
-
-	x86_set_task_gate(cpuNum, 8, tssSegmentDescriptorIndex << 3);
 }
 
 
 #if DUMP_FEATURE_STRING
 static void
-dump_feature_string(int currentCPU, cpu_ent *cpu)
+dump_feature_string(int currentCPU, cpu_ent* cpu)
 {
 	char features[384];
 	features[0] = 0;
@@ -549,10 +506,10 @@ dump_feature_string(int currentCPU, cpu_ent *cpu)
 #endif	// DUMP_FEATURE_STRING
 
 
-static int
+static void
 detect_cpu(int currentCPU)
 {
-	cpu_ent *cpu = get_cpu_struct();
+	cpu_ent* cpu = get_cpu_struct();
 	char vendorString[17];
 	cpuid_info cpuid;
 
@@ -659,15 +616,13 @@ detect_cpu(int currentCPU)
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);
 #endif
-
-	return 0;
 }
 
 
 bool
 x86_check_feature(uint32 feature, enum x86_feature_type type)
 {
-	cpu_ent *cpu = get_cpu_struct();
+	cpu_ent* cpu = get_cpu_struct();
 
 #if 0
 	int i;
@@ -695,8 +650,8 @@ x86_get_double_fault_stack(int32 cpu, size_t* _size)
 int32
 x86_double_fault_get_cpu(void)
 {
-	uint32 stack = x86_read_ebp();
-	return (stack - (uint32)sDoubleFaultStacks) / kDoubleFaultStackSize;
+	addr_t stack = x86_get_stack_frame();
+	return (stack - (addr_t)sDoubleFaultStacks) / kDoubleFaultStackSize;
 }
 
 
@@ -704,11 +659,8 @@ x86_double_fault_get_cpu(void)
 
 
 status_t
-arch_cpu_preboot_init_percpu(kernel_args *args, int cpu)
+arch_cpu_preboot_init_percpu(kernel_args* args, int cpu)
 {
-	// A simple nop FPU call until x86_init_fpu
-	gX86SwapFPUFunc = i386_noop_swap;
-
 	// On SMP system we want to synchronize the CPUs' TSCs, so system_time()
 	// will return consistent values.
 	if (smp_get_num_cpus() > 1) {
@@ -755,7 +707,7 @@ amdc1e_noarat_idle(void)
 static bool
 detect_amdc1e_noarat()
 {
-	cpu_ent *cpu = get_cpu_struct();
+	cpu_ent* cpu = get_cpu_struct();
 
 	if (cpu->arch.vendor != VENDOR_AMD)
 		return false;
@@ -770,26 +722,12 @@ detect_amdc1e_noarat()
 
 
 status_t
-arch_cpu_init_percpu(kernel_args *args, int cpu)
+arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
+	// Load descriptor tables for this CPU.
+	x86_descriptors_init_percpu(args, cpu);
+
 	detect_cpu(cpu);
-
-	// load the TSS for this cpu
-	// note the main cpu gets initialized in arch_cpu_init_post_vm()
-	if (cpu != 0) {
-		load_tss(cpu);
-
-		// set the IDT
-		struct {
-			uint16	limit;
-			void*	address;
-		} _PACKED descriptor = {
-			256 * 8 - 1,	// 256 descriptors, 8 bytes each (-1 for "limit")
-			x86_get_idt(cpu)
-		};
-
-		asm volatile("lidt	%0" : : "m"(descriptor));
-	}
 
 	if (!gCpuIdleFunc) {
 		if (detect_amdc1e_noarat())
@@ -807,18 +745,25 @@ arch_cpu_init_percpu(kernel_args *args, int cpu)
 		}
 	}
 
-	return 0;
+	return B_OK;
 }
 
 
 status_t
-arch_cpu_init(kernel_args *args)
+arch_cpu_init(kernel_args* args)
 {
 	// init the TSC -> system_time() conversion factors
 
 	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
 	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
 
+#ifdef __x86_64__
+	// The x86_64 system_time() implementation uses 64-bit multiplication and
+	// therefore shifting is not necessary for low frequencies (it's also not
+	// too likely that there'll be any x86_64 CPUs clocked under 1GHz).
+	__x86_setup_system_time((uint64)conversionFactor << 32,
+		conversionFactorNsecs);
+#else
 	if (conversionFactorNsecs >> 32 != 0) {
 		// the TSC frequency is < 1 GHz, which forces us to shift the factor
 		__x86_setup_system_time(conversionFactor, conversionFactorNsecs >> 16,
@@ -827,24 +772,19 @@ arch_cpu_init(kernel_args *args)
 		// the TSC frequency is >= 1 GHz
 		__x86_setup_system_time(conversionFactor, conversionFactorNsecs, false);
 	}
+#endif
+
+	// Initialize descriptor tables.
+	x86_descriptors_init(args);
 
 	return B_OK;
 }
 
 
 status_t
-arch_cpu_init_post_vm(kernel_args *args)
+arch_cpu_init_post_vm(kernel_args* args)
 {
 	uint32 i;
-
-	// account for the segment descriptors
-	gGDT = (segment_descriptor *)args->arch_args.vir_gdt;
-	create_area("gdt", (void **)&gGDT, B_EXACT_ADDRESS, B_PAGE_SIZE,
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
-	// currently taken out of the build, because it's not yet used (and assumes
-	// (a fixed number of used GDT entries)
-	//i386_selector_init(gGDT);  // pass the new gdt
 
 	// allocate an area for the double fault stacks
 	virtual_address_restrictions virtualRestrictions = {};
@@ -856,38 +796,17 @@ arch_cpu_init_post_vm(kernel_args *args)
 		&virtualRestrictions, &physicalRestrictions,
 		(void**)&sDoubleFaultStacks);
 
+	// More descriptor table setup.
+	x86_descriptors_init_post_vm(args);
+
 	X86PagingStructures* kernelPagingStructures
 		= static_cast<X86VMTranslationMap*>(
 			VMAddressSpace::Kernel()->TranslationMap())->PagingStructures();
 
-	// setup task-state segments
+	// Set active translation map on each CPU.
 	for (i = 0; i < args->num_cpus; i++) {
-		// initialize the regular and double fault tss stored in the per-cpu
-		// structure
-		memset(&gCPU[i].arch.tss, 0, sizeof(struct tss));
-		gCPU[i].arch.tss.ss0 = KERNEL_DATA_SEG;
-		gCPU[i].arch.tss.io_map_base = sizeof(struct tss);
-
-		// add TSS descriptor for this new TSS
-		set_tss_descriptor(&gGDT[TSS_BASE_SEGMENT + i],
-			(addr_t)&gCPU[i].arch.tss, sizeof(struct tss));
-
-		// initialize the double fault tss
-		init_double_fault(i);
-
-		// init active translation map
 		gCPU[i].arch.active_paging_structures = kernelPagingStructures;
 		kernelPagingStructures->AddReference();
-	}
-
-	// set the current hardware task on cpu 0
-	load_tss(0);
-
-	// setup TLS descriptors (one for every CPU)
-
-	for (i = 0; i < args->num_cpus; i++) {
-		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_SIZE,
-			DT_DATA_WRITEABLE, DPL_USER);
 	}
 
 	if (!apic_available())
@@ -899,18 +818,18 @@ arch_cpu_init_post_vm(kernel_args *args)
 
 
 status_t
-arch_cpu_init_post_modules(kernel_args *args)
+arch_cpu_init_post_modules(kernel_args* args)
 {
 	// initialize CPU module
 
-	void *cookie = open_module_list("cpu");
+	void* cookie = open_module_list("cpu");
 
 	while (true) {
 		char name[B_FILE_NAME_LENGTH];
 		size_t nameLength = sizeof(name);
 
 		if (read_next_module_name(cookie, name, &nameLength) != B_OK
-			|| get_module(name, (module_info **)&sCpuModule) == B_OK)
+			|| get_module(name, (module_info**)&sCpuModule) == B_OK)
 			break;
 	}
 
@@ -964,9 +883,9 @@ arch_cpu_init_post_modules(kernel_args *args)
 
 
 void
-i386_set_tss_and_kstack(addr_t kstack)
+arch_cpu_user_TLB_invalidate(void)
 {
-	get_cpu_struct()->arch.tss.sp0 = kstack;
+	x86_write_cr3(x86_read_cr3());
 }
 
 
@@ -1015,8 +934,13 @@ arch_cpu_shutdown(bool rebootSystem)
 	if (acpi_shutdown(rebootSystem) == B_OK)
 		return B_OK;
 
-	if (!rebootSystem)
+	if (!rebootSystem) {
+#ifndef __x86_64__
 		return apm_shutdown();
+#else
+		return B_NOT_SUPPORTED;
+#endif
+	}
 
 	cpu_status state = disable_interrupts();
 
@@ -1027,7 +951,7 @@ arch_cpu_shutdown(bool rebootSystem)
 	snooze(500000);
 
 	// if that didn't help, try it this way
-	reboot();
+	x86_reboot();
 
 	restore_interrupts(state);
 	return B_ERROR;
@@ -1042,7 +966,7 @@ arch_cpu_idle(void)
 
 
 void
-arch_cpu_sync_icache(void *address, size_t length)
+arch_cpu_sync_icache(void* address, size_t length)
 {
 	// instruction cache is always consistent on x86
 }
@@ -1051,15 +975,23 @@ arch_cpu_sync_icache(void *address, size_t length)
 void
 arch_cpu_memory_read_barrier(void)
 {
+#ifdef __x86_64__
+	asm volatile("lfence" : : : "memory");
+#else
 	asm volatile ("lock;" : : : "memory");
 	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
+#endif
 }
 
 
 void
 arch_cpu_memory_write_barrier(void)
 {
+#ifdef __x86_64__
+	asm volatile("sfence" : : : "memory");
+#else
 	asm volatile ("lock;" : : : "memory");
 	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
+#endif
 }
 

@@ -258,7 +258,7 @@ FontSelectionView::_BuildSizesMenu()
 			continue;
 
 		char label[32];
-		snprintf(label, sizeof(label), "%ld", size);
+		snprintf(label, sizeof(label), "%" B_PRId32, size);
 
 		BMessage* message = new BMessage(kMsgSetSize);
 		message->AddInt32("size", size);
@@ -297,7 +297,7 @@ void
 FontSelectionView::_SelectCurrentSize(bool select)
 {
 	char label[16];
-	snprintf(label, sizeof(label), "%ld", (int32)fCurrentFont.Size());
+	snprintf(label, sizeof(label), "%" B_PRId32, (int32)fCurrentFont.Size());
 
 	BMenuItem* item = fSizesMenu->FindItem(label);
 	if (item != NULL)

@@ -37,8 +37,8 @@ ptsname(int masterFD)
 	static char buffer[32];
 	
 	char letter = 'p';
-	snprintf(buffer, sizeof(buffer), "/dev/tt/%c%lx", char(letter + index / 16),
-		index % 16);
+	snprintf(buffer, sizeof(buffer), "/dev/tt/%c%" B_PRIx32,
+		char(letter + index / 16), index % 16);
 
 	return buffer;
 }

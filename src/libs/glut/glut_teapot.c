@@ -1,5 +1,10 @@
-
-/* Copyright (c) Mark J. Kilgard, 1994. */
+/*
+ * Copyright 1994-1997 Mark Kilgard, All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      Mark Kilgard
+ */
 
 /**
 (c) Copyright 1993, Silicon Graphics, Inc.
@@ -44,7 +49,9 @@ Graphics, Inc., 2011 N.  Shoreline Blvd., Mountain View, CA
 OpenGL(TM) is a trademark of Silicon Graphics, Inc.
 */
 
+
 #include "glutint.h"
+
 
 /* Rim, body, lid, and bottom data must be reflected in x and
    y; handle and spout data across the y axis only.  */

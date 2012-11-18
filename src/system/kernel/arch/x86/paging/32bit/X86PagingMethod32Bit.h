@@ -31,7 +31,7 @@ public:
 									addr_t virtualAddress,
 									phys_addr_t physicalAddress,
 									uint8 attributes,
-									phys_addr_t (*get_free_page)(kernel_args*));
+									page_num_t (*get_free_page)(kernel_args*));
 
 	virtual	bool				IsKernelPageAccessible(addr_t virtualAddress,
 									uint32 protection);

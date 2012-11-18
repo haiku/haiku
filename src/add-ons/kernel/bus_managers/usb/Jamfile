@@ -28,8 +28,7 @@ KernelStaticLibrary libusb.a :
 	Object.cpp
 	PhysicalMemoryAllocator.cpp
 	$(compatSources)
-	: -fno-pic
-;	
+;
 
 KernelAddon usb :
 	usb.cpp

@@ -26,7 +26,11 @@ typedef uint32_t in_addr_t;
  * and we are not allowed to import all the BeOS types here.
  */
 #ifndef htonl
-	extern unsigned long __swap_int32(unsigned long);	/* private */
+#	ifdef __HAIKU_BEOS_COMPATIBLE_TYPES
+		extern unsigned long __swap_int32(unsigned long);	/* private */
+#	else
+		extern unsigned int __swap_int32(unsigned int);	/* private */
+#	endif
 	extern uint16_t __swap_int16(uint16_t);	/* private */
 #	if BYTE_ORDER == LITTLE_ENDIAN
 #		define htonl(x) ((uint32_t)__swap_int32(x))

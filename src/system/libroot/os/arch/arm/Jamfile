@@ -9,6 +9,7 @@ MergeObject os_arch_$(TARGET_ARCH).o :
 	atomic.S
 	byteorder.S
 	system_time.c
+	stack_frame.c
 	thread.c
 	time.c
 	tls.c

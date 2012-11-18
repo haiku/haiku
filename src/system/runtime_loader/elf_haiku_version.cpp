@@ -20,7 +20,7 @@
 
 
 static bool
-analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
+analyze_object_gcc_version(int fd, image_t* image, elf_ehdr& eheader,
 	int32 sheaderSize, char* buffer, size_t bufferSize)
 {
 	if (sheaderSize > (int)bufferSize) {
@@ -38,8 +38,8 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 	}
 
 	// load the string section
-	Elf32_Shdr* sectionHeader
-		= (Elf32_Shdr*)(buffer + eheader.e_shstrndx * eheader.e_shentsize);
+	elf_shdr* sectionHeader
+		= (elf_shdr*)(buffer + eheader.e_shstrndx * eheader.e_shentsize);
 
 	if (sheaderSize + sectionHeader->sh_size > bufferSize) {
 		FATAL("%s: Buffer not big enough for section string section\n",
@@ -60,7 +60,7 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 	off_t commentOffset = 0;
 	size_t commentSize = 0;
 	for (uint32 i = 0; i < eheader.e_shnum; i++) {
-		sectionHeader = (Elf32_Shdr*)(buffer + i * eheader.e_shentsize);
+		sectionHeader = (elf_shdr*)(buffer + i * eheader.e_shentsize);
 		const char* sectionName = sectionStrings + sectionHeader->sh_name;
 		if (sectionHeader->sh_name != 0
 			&& strcmp(sectionName, ".comment") == 0) {
@@ -189,16 +189,16 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 
 
 void
-analyze_image_haiku_version_and_abi(int fd, image_t* image, Elf32_Ehdr& eheader,
+analyze_image_haiku_version_and_abi(int fd, image_t* image, elf_ehdr& eheader,
 	int32 sheaderSize, char* buffer, size_t bufferSize)
 {
 	// Haiku API version
-	struct Elf32_Sym* symbol = find_symbol(image,
+	elf_sym* symbol = find_symbol(image,
 		SymbolLookupInfo(B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME,
 			B_SYMBOL_TYPE_DATA));
 	if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
 		&& symbol->st_value > 0
-		&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
+		&& symbol->Type() == STT_OBJECT
 		&& symbol->st_size >= sizeof(uint32)) {
 		image->api_version
 			= *(uint32*)(symbol->st_value + image->regions[0].delta);
@@ -211,7 +211,7 @@ analyze_image_haiku_version_and_abi(int fd, image_t* image, Elf32_Ehdr& eheader,
 			B_SYMBOL_TYPE_DATA));
 	if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
 		&& symbol->st_value > 0
-		&& ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT
+		&& symbol->Type() == STT_OBJECT
 		&& symbol->st_size >= sizeof(uint32)) {
 		image->abi = *(uint32*)(symbol->st_value + image->regions[0].delta);
 	} else

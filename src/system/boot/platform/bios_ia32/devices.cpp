@@ -167,7 +167,7 @@ static bool sBlockDevicesAdded = false;
 static void
 check_cd_boot(BIOSDrive *drive)
 {
-	gKernelArgs.boot_volume.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
+	gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
 
 	if (drive->DriveID() != 0)
 		return;
@@ -185,7 +185,7 @@ check_cd_boot(BIOSDrive *drive)
 
 	specification_packet *packet = (specification_packet *)kDataSegmentScratch;
 	if (packet->media_type != 0)
-		gKernelArgs.boot_volume.SetInt32(BOOT_METHOD, BOOT_METHOD_CD);
+		gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_CD);
 
 #if 0
 	dprintf("got CD boot spec:\n");
@@ -841,8 +841,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	}
 
 	TRACE(("boot drive size: %Ld bytes\n", drive->Size()));
-	gKernelArgs.boot_volume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE,
-		gBootedFromImage);
+	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, gBootedFromImage);
 
 	return B_OK;
 }
@@ -888,8 +887,8 @@ platform_register_boot_device(Node *device)
 
 	check_cd_boot(drive);
 
-	gKernelArgs.boot_volume.SetInt64("boot drive number", drive->DriveID());
-	gKernelArgs.boot_volume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
+	gBootVolume.SetInt64("boot drive number", drive->DriveID());
+	gBootVolume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 		&drive->Identifier(), sizeof(disk_identifier));
 
 	return B_OK;

@@ -1760,7 +1760,8 @@ MemoryManager::_CheckMetaChunk(MetaChunk* metaChunk)
 /*static*/ int
 MemoryManager::_DumpRawAllocations(int argc, char** argv)
 {
-	kprintf("area        meta chunk  chunk  base        size (KB)\n");
+	kprintf("%-*s    meta chunk  chunk  %-*s    size (KB)\n",
+		B_PRINTF_POINTER_WIDTH, "area", B_PRINTF_POINTER_WIDTH, "base");
 
 	size_t totalSize = 0;
 
@@ -1792,8 +1793,8 @@ MemoryManager::_DumpRawAllocations(int argc, char** argv)
 		}
 	}
 
-	kprintf("total:                                     %9" B_PRIuSIZE "\n",
-		totalSize / 1024);
+	kprintf("total:%*s%9" B_PRIuSIZE "\n", (2 * B_PRINTF_POINTER_WIDTH) + 21,
+		"", totalSize / 1024);
 
 	return 0;
 }
@@ -1970,7 +1971,8 @@ MemoryManager::_DumpArea(int argc, char** argv)
 /*static*/ int
 MemoryManager::_DumpAreas(int argc, char** argv)
 {
-	kprintf("      base        area   meta      small   medium  large\n");
+	kprintf("  %*s    %*s   meta      small   medium  large\n",
+		B_PRINTF_POINTER_WIDTH, "base", B_PRINTF_POINTER_WIDTH, "area");
 
 	size_t totalTotalSmall = 0;
 	size_t totalUsedSmall = 0;
@@ -2035,7 +2037,7 @@ MemoryManager::_DumpAreas(int argc, char** argv)
 	kprintf("  medium:   %" B_PRIuSIZE "/%" B_PRIuSIZE "\n", totalUsedMedium,
 		totalTotalMedium);
 	kprintf("  large:    %" B_PRIuSIZE "\n", totalUsedLarge);
-	kprintf("  memory:   %" B_PRIuSIZE "/%" B_PRIuSIZE " KB\n",
+	kprintf("  memory:   %" B_PRIuSIZE "/%" B_PRIu32 " KB\n",
 		(totalUsedSmall * SLAB_CHUNK_SIZE_SMALL
 			+ totalUsedMedium * SLAB_CHUNK_SIZE_MEDIUM
 			+ totalUsedLarge * SLAB_CHUNK_SIZE_LARGE) / 1024,

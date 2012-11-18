@@ -59,9 +59,9 @@ static off_t sWarnMemoryLimit;
 static off_t sCriticalMemoryLimit;
 
 // address space limits
-static const off_t kMinNoteSpaceLimit		= 128 * 1024 * 1024;
-static const off_t kMinWarnSpaceLimit		= 64 * 1024 * 1024;
-static const off_t kMinCriticalSpaceLimit	= 32 * 1024 * 1024;
+static const size_t kMinNoteSpaceLimit		= 128 * 1024 * 1024;
+static const size_t kMinWarnSpaceLimit		= 64 * 1024 * 1024;
+static const size_t kMinCriticalSpaceLimit	= 32 * 1024 * 1024;
 
 
 static int32 sLowPagesState = B_NO_LOW_RESOURCE;
@@ -310,8 +310,8 @@ dump_handlers(int argc, char** argv)
 			handler->resources & B_KERNEL_RESOURCE_SEMAPHORES ? 's' : ' ',
 			handler->resources & B_KERNEL_RESOURCE_ADDRESS_SPACE ? 'a' : ' ');
 
-		kprintf("%p  %p   %s      %4ld  %s\n", handler->function, handler->data,
-			resources, handler->priority, symbol);
+		kprintf("%p  %p   %s      %4" B_PRId32 "  %s\n", handler->function,
+			handler->data, resources, handler->priority, symbol);
 	}
 
 	return 0;

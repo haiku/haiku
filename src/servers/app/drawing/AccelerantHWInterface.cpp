@@ -962,7 +962,7 @@ AccelerantHWInterface::GetMonitorInfo(monitor_info* info)
 	memset(info, 0, sizeof(monitor_info));
 	strlcpy(info->vendor, edid.vendor.manufacturer, sizeof(info->vendor));
 	if (edid.vendor.serial != 0) {
-		snprintf(info->serial_number, sizeof(info->serial_number), "%lu",
+		snprintf(info->serial_number, sizeof(info->serial_number), "%" B_PRIu32,
 			edid.vendor.serial);
 	}
 	info->product_id = edid.vendor.prod_id;

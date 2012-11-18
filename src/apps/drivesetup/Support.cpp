@@ -28,14 +28,14 @@ void
 dump_partition_info(const BPartition* partition)
 {
 	char size[1024];
-	printf("\tOffset(): %Ld\n", partition->Offset());
+	printf("\tOffset(): %" B_PRIdOFF "\n", partition->Offset());
 	printf("\tSize(): %s\n", string_for_size(partition->Size(), size,
 		sizeof(size)));
 	printf("\tContentSize(): %s\n", string_for_size(partition->ContentSize(),
 		size, sizeof(size)));
-	printf("\tBlockSize(): %ld\n", partition->BlockSize());
-	printf("\tIndex(): %ld\n", partition->Index());
-	printf("\tStatus(): %ld\n\n", partition->Status());
+	printf("\tBlockSize(): %" B_PRId32 "\n", partition->BlockSize());
+	printf("\tIndex(): %" B_PRId32 "\n", partition->Index());
+	printf("\tStatus(): %" B_PRId32 "\n\n", partition->Status());
 	printf("\tContainsFileSystem(): %s\n",
 		partition->ContainsFileSystem() ? "true" : "false");
 	printf("\tContainsPartitioningSystem(): %s\n\n",
@@ -44,12 +44,12 @@ dump_partition_info(const BPartition* partition)
 	printf("\tIsReadOnly(): %s\n", partition->IsReadOnly() ? "true" : "false");
 	printf("\tIsMounted(): %s\n", partition->IsMounted() ? "true" : "false");
 	printf("\tIsBusy(): %s\n\n", partition->IsBusy() ? "true" : "false");
-	printf("\tFlags(): %lx\n\n", partition->Flags());
+	printf("\tFlags(): %" B_PRIx32 "\n\n", partition->Flags());
 	printf("\tName(): %s\n", partition->Name());
 	printf("\tContentName(): %s\n", partition->ContentName());
 	printf("\tType(): %s\n", partition->Type());
 	printf("\tContentType(): %s\n", partition->ContentType());
-	printf("\tID(): %lx\n\n", partition->ID());
+	printf("\tID(): %" B_PRIx32 "\n\n", partition->ID());
 }
 
 

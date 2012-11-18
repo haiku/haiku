@@ -20,6 +20,7 @@
 #include "Image.h"
 #include "StackTrace.h"
 #include "TargetAddressTableColumn.h"
+#include "UiUtils.h"
 
 
 // #pragma mark - FramesTableModel
@@ -77,30 +78,9 @@ public:
 				return true;
 			case 2:
 			{
-				Image* image = frame->GetImage();
-				FunctionInstance* function = frame->Function();
-				if (image == NULL && function == NULL) {
-					value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
-					return true;
-				}
-
-				BString name;
-				target_addr_t baseAddress;
-				if (function != NULL) {
-					name = function->PrettyName();
-					baseAddress = function->Address();
-				} else {
-					name = image->Name();
-					baseAddress = image->Info().TextBase();
-				}
-
-				char offset[32];
-				snprintf(offset, sizeof(offset), " + %#" B_PRIx64,
-					frame->InstructionPointer() - baseAddress);
-
-				name << offset;
-				value.SetTo(name.String());
-
+				char buffer[512];
+				value.SetTo(UiUtils::FunctionNameForFrame(frame, buffer,
+						sizeof(buffer)));
 				return true;
 			}
 			default:

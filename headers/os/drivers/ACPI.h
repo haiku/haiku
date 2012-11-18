@@ -133,6 +133,7 @@ typedef struct acpi_data {
 
 enum {
 	ACPI_ALLOCATE_BUFFER = -1,
+	ACPI_ALLOCATE_LOCAL_BUFFER = -2,
 };
 
 
@@ -261,6 +262,10 @@ struct acpi_module_info {
 	/* Table Access */
 	status_t	(*get_table)(const char *signature, uint32 instance,
 					void **tableHeader);
+
+	/* Register Access */
+	status_t	(*read_bit_register)(uint32 regid, uint32 *val);
+	status_t	(*write_bit_register)(uint32 regid, uint32 val);
 };
 
 

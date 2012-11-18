@@ -229,7 +229,7 @@ BCountView::Draw(BRect updateRect)
 		else {
 			itemString.SetTo(B_TRANSLATE("%num items"));
 			char numString[256];
-			snprintf(numString, sizeof(numString), "%ld", fLastCount);
+			snprintf(numString, sizeof(numString), "%" B_PRId32, fLastCount);
 			itemString.ReplaceFirst("%num", numString);
 		}
 	}

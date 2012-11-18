@@ -55,7 +55,8 @@ enum {
 	MSG_INSPECT_ADDRESS							= 'isad',
 	MSG_SHOW_TYPECAST_NODE_PROMPT				= 'stnp',
 	MSG_TYPECAST_NODE							= 'tyno',
-	MSG_SHOW_WATCH_VARIABLE_PROMPT				= 'swvp'
+	MSG_SHOW_WATCH_VARIABLE_PROMPT				= 'swvp',
+	MSG_GENERATE_DEBUG_REPORT					= 'gdrp'
 };
 
 

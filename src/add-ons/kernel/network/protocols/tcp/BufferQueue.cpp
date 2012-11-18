@@ -310,8 +310,8 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 	if (source == NULL)
 		panic("we should have had that data...");
 	if (tcp_sequence(source->sequence) > sequence) {
-		panic("source %p, sequence = %lu (%lu)\n", source, source->sequence,
-			sequence.Number());
+		panic("source %p, sequence = %" B_PRIu32 " (%" B_PRIu32 ")\n", source,
+			source->sequence, sequence.Number());
 	}
 
 	// clone the data
@@ -481,8 +481,8 @@ BufferQueue::Dump() const
 	SegmentList::ConstIterator iterator = fList.GetIterator();
 	int32 number = 0;
 	while (net_buffer* buffer = iterator.Next()) {
-		kprintf("      %ld. buffer %p, sequence %lu, size %lu\n", ++number,
-			buffer, buffer->sequence, buffer->size);
+		kprintf("      %" B_PRId32 ". buffer %p, sequence %" B_PRIu32 ", size %"
+			B_PRIu32 "\n", ++number, buffer, buffer->sequence, buffer->size);
 	}
 }
 

@@ -823,10 +823,10 @@ ScreenWindow::_UpdateWorkspaceButtons()
 	BPrivate::get_workspaces_layout(&columns, &rows);
 
 	char text[32];
-	snprintf(text, sizeof(text), "%ld", columns);
+	snprintf(text, sizeof(text), "%" B_PRId32, columns);
 	fColumnsControl->SetText(text);
 
-	snprintf(text, sizeof(text), "%ld", rows);
+	snprintf(text, sizeof(text), "%" B_PRId32, rows);
 	fRowsControl->SetText(text);
 
 	_GetColumnRowButton(true, false)->SetEnabled(columns != 1 && rows != 32);
@@ -1107,8 +1107,8 @@ ScreenWindow::_WriteVesaModeFile(const screen_mode& mode) const
 		return status;
 
 	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "mode %ld %ld %ld\n",
-		mode.width, mode.height, mode.BitsPerPixel());
+	snprintf(buffer, sizeof(buffer), "mode %" B_PRId32 " %" B_PRId32 " %"
+		B_PRId32 "\n", mode.width, mode.height, mode.BitsPerPixel());
 
 	ssize_t bytesWritten = file.Write(buffer, strlen(buffer));
 	if (bytesWritten < B_OK)

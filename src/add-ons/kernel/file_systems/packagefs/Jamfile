@@ -89,7 +89,7 @@ KernelAddon packagefs
 	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
 	$(libSharedSources)
 
-	: $(HAIKU_STATIC_LIBSUPC++) libz.a
+	: $(HAIKU_KERNEL_LIBSUPC++) libz.a
 ;
 
 

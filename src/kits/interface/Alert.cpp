@@ -697,7 +697,7 @@ BAlert::_CreateButton(int32 which, const char* label)
 	rect.bottom = rect.top;
 
 	char name[32];
-	snprintf(name, sizeof(name), "_b%ld_", which);
+	snprintf(name, sizeof(name), "_b%" B_PRId32 "_", which);
 
 	BButton* button = new(std::nothrow) BButton(rect, name, label, message,
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);

@@ -443,7 +443,8 @@ BLooper::Quit()
 
 	if (!IsLocked()) {
 		printf("ERROR - you must Lock a looper before calling Quit(), "
-			"team=%ld, looper=%s\n", Team(), Name() ? Name() : "unnamed");
+			"team=%" B_PRId32 ", looper=%s\n", Team(),
+			Name() ? Name() : "unnamed");
 	}
 
 	// Try to lock
@@ -547,7 +548,7 @@ BLooper::IsLocked() const
 	}
 
 	uint32 stack;
-	return ((uint32)&stack & ~(B_PAGE_SIZE - 1)) == fCachedStack
+	return ((addr_t)&stack & ~(B_PAGE_SIZE - 1)) == fCachedStack
 		|| find_thread(NULL) == fOwner;
 }
 
@@ -1338,7 +1339,7 @@ BLooper::check_lock()
 	// It is used in situations where it's clear that the looper is valid,
 	// ie. from handlers
 	uint32 stack;
-	if (((uint32)&stack & ~(B_PAGE_SIZE - 1)) == fCachedStack
+	if (((addr_t)&stack & ~(B_PAGE_SIZE - 1)) == fCachedStack
 		|| fOwner == find_thread(NULL))
 		return;
 

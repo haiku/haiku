@@ -14,7 +14,7 @@ SubDirC++Flags -fno-rtti $(defines) ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs zlib ] ;
 
 
-KernelStaticLibrary boot_zlib :
+BootStaticLibrary boot_zlib :
 	inflate.c
 	inffast.c
 	inftrees.c
@@ -25,7 +25,7 @@ KernelStaticLibrary boot_zlib :
 	;
 
 
-KernelStaticLibrary boot_tarfs :
+BootStaticLibrary boot_tarfs :
 	tarfs.cpp
 	: -fno-pic
 	;

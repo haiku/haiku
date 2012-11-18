@@ -7,7 +7,6 @@
 
 #include <SupportDefs.h>
 
-int i386_smp_interrupt(int vector);
 void arch_smp_ack_interrupt(void);
 status_t arch_smp_set_apic_timer(bigtime_t relativeTimeout);
 status_t arch_smp_clear_apic_timer(void);

@@ -545,7 +545,7 @@ SSlider::SSlider(const char* name, const char* label,
 const char*
 SSlider::UpdateText() const
 {
-	snprintf(fStatusLabel, sizeof(fStatusLabel), "%ld", Value());
+	snprintf(fStatusLabel, sizeof(fStatusLabel), "%" B_PRId32, Value());
 	return fStatusLabel;
 }
 

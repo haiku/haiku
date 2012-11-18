@@ -73,11 +73,11 @@ status_t get_library_symbol(void* handle, void* caller, const char* symbolName,
 	void** _location);
 status_t get_next_image_dependency(image_id id, uint32* cookie,
 	const char** _name);
-int resolve_symbol(image_t* rootImage, image_t* image, struct Elf32_Sym* sym,
+int resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 	SymbolLookupCache* cache, addr_t* sym_addr);
 
 
-status_t elf_verify_header(void* header, int32 length);
+status_t elf_verify_header(void* header, size_t length);
 void rldelf_init(void);
 void rldexport_init(void);
 status_t elf_reinit_after_fork(void);

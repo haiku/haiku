@@ -91,7 +91,7 @@ cmd_expr(int argc, char **argv)
 
 	uint64 result;
 	if (evaluate_debug_expression(argv[1], &result, false)) {
-		kprintf("%llu (0x%llx)\n", result, result);
+		kprintf("%" B_PRIu64 " (0x%" B_PRIx64 ")\n", result, result);
 		set_debug_variable("_", result);
 	}
 
@@ -108,7 +108,7 @@ cmd_error(int argc, char **argv)
 	}
 
 	int32 error = parse_expression(argv[1]);
-	kprintf("error 0x%lx: %s\n", error, strerror(error));
+	kprintf("error 0x%" B_PRIx32 ": %s\n", error, strerror(error));
 
 	return 0;
 }
@@ -291,8 +291,8 @@ cmd_wc(int argc, char** argv)
 	const char* line = argv[1];
 	if (line == NULL) {
 		// last run -- print results
-		kprintf("%10lld %10lld %10lld\n", userData->lines, userData->words,
-			userData->chars);
+		kprintf("%10" B_PRIu64 " %10" B_PRIu64 " %10" B_PRIu64 "\n",
+			userData->lines, userData->words, userData->chars);
 		return 0;
 	}
 

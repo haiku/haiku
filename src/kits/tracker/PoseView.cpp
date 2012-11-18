@@ -212,7 +212,7 @@ BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode,
 	fVScrollBar(NULL),
 	fModel(model),
 	fActivePose(NULL),
-	fExtent(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN),
+	fExtent(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
 	fPoseList(new PoseList(40, true)),
 	fFilteredPoseList(new PoseList()),
 	fVSPoseList(new PoseList()),
@@ -229,9 +229,9 @@ BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode,
 	fDropTarget(NULL),
 	fAlreadySelectedDropTarget(NULL),
 	fSelectionHandler(be_app),
-	fLastClickPt(LONG_MAX, LONG_MAX),
+	fLastClickPt(INT32_MAX, INT32_MAX),
 	fLastClickedPose(NULL),
-	fLastExtent(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN),
+	fLastExtent(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
 	fTitleView(NULL),
 	fRefFilter(NULL),
 	fAutoScrollInc(20),
@@ -4549,7 +4549,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel, BPose* target
 				return false;
 
 			// find the text
-			int32 textLength;
+			ssize_t textLength;
 			const char* text;
 			if (message->FindData(kPlainTextMimeType, B_MIME_TYPE, (const void**)&text,
 				&textLength) != B_OK)
@@ -4576,12 +4576,13 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel, BPose* target
 
 			// pick up TextView styles if available and save them with the file
 			const text_run_array* textRuns = NULL;
-			int32 dataSize = 0;
+			ssize_t dataSize = 0;
 			if (message->FindData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
 				(const void**)&textRuns, &dataSize) == B_OK && textRuns && dataSize) {
 				// save styles the same way StyledEdit does
-				void* data = BTextView::FlattenRunArray(textRuns, &dataSize);
-				file.WriteAttr("styles", B_RAW_TYPE, 0, data, (size_t)dataSize);
+				int32 tmpSize = dataSize;
+				void* data = BTextView::FlattenRunArray(textRuns, &tmpSize);
+				file.WriteAttr("styles", B_RAW_TYPE, 0, data, (size_t)tmpSize);
 				free(data);
 			}
 
@@ -7227,7 +7228,7 @@ BPoseView::WasDoubleClick(const BPose* pose, BPoint point)
 		&& fabs(delta.x) < kDoubleClickTresh
 		&& fabs(delta.y) < kDoubleClickTresh
 		&& pose == fLastClickedPose) {
-		fLastClickPt.Set(LONG_MAX, LONG_MAX);
+		fLastClickPt.Set(INT32_MAX, INT32_MAX);
 		fLastClickedPose = NULL;
 		if (fTextWidgetToCheck != NULL)
 			fTextWidgetToCheck->CancelWait();
@@ -7526,7 +7527,7 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList** oldList)
 		if (selectionRect.Intersects(poseRect)) {
 			bool selected = pose->IsSelected();
 			pose->Select(!fSelectionList->HasItem(pose));
-			newList->AddItem((void*)index);
+			newList->AddItem((void*)(addr_t)index);
 				// this sucks, need to clean up using a vector class instead
 				// of BList
 
@@ -7548,9 +7549,9 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList** oldList)
 	// on those which are no longer enclosed
 	count = (*oldList)->CountItems();
 	for (int32 index = 0; index < count; index++) {
-		int32 oldIndex = (int32)(*oldList)->ItemAt(index);
+		int32 oldIndex = (addr_t)(*oldList)->ItemAt(index);
 
-		if (!newList->HasItem((void*)oldIndex)) {
+		if (!newList->HasItem((void*)(addr_t)oldIndex)) {
 			BPose* pose = poseList->ItemAt(oldIndex);
 			pose->Select(!pose->IsSelected());
 			loc.Set(0, oldIndex * fListElemHeight);
@@ -7590,7 +7591,7 @@ BPoseView::SelectPosesIconMode(BRect selectionRect, BList** oldList)
 			if (selectionRect.Intersects(poseRect)) {
 				bool selected = pose->IsSelected();
 				pose->Select(!fSelectionList->HasItem(pose));
-				newList->AddItem((void*)index);
+				newList->AddItem((void*)(addr_t)index);
 
 				if ((selected != pose->IsSelected())
 					&& poseRect.Intersects(bounds)) {
@@ -7611,9 +7612,9 @@ BPoseView::SelectPosesIconMode(BRect selectionRect, BList** oldList)
 	// on those which are no longer enclosed
 	count = (*oldList)->CountItems();
 	for (int32 index = 0; index < count; index++) {
-		int32 oldIndex = (int32)(*oldList)->ItemAt(index);
+		int32 oldIndex = (addr_t)(*oldList)->ItemAt(index);
 
-		if (!newList->HasItem((void*)oldIndex)) {
+		if (!newList->HasItem((void*)(addr_t)oldIndex)) {
 			BPose* pose = fVSPoseList->ItemAt(oldIndex);
 			pose->Select(!pose->IsSelected());
 			BRect poseRect(pose->CalcRect(this));

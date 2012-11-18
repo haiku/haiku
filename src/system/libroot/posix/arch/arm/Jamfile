@@ -1,10 +1,16 @@
 SubDir HAIKU_TOP src system libroot posix arch arm ;
 
+
+UsePrivateHeaders [ FDirName system arch $(TARGET_ARCH) ] ;
+
 local genericSources =
+	setjmp_save_sigs.c
 ;
 
 MergeObject posix_arch_$(TARGET_ARCH).o :
 	fenv.c
+	sigsetjmp.S
+	siglongjmp.S
 
 	$(genericSources)
 ;

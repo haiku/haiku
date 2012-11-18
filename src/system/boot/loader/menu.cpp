@@ -481,7 +481,7 @@ user_menu_boot_volume(Menu* menu, MenuItem* item)
 	bootItem->Select(true);
 	bootItem->SetData(item->Data());
 
-	gKernelArgs.boot_volume.SetBool(BOOT_VOLUME_USER_SELECTED, true);
+	gBootVolume.SetBool(BOOT_VOLUME_USER_SELECTED, true);
 	return true;
 }
 
@@ -534,7 +534,7 @@ debug_menu_display_current_log(Menu* menu, MenuItem* item)
 static bool
 debug_menu_display_previous_syslog(Menu* menu, MenuItem* item)
 {
-	ring_buffer* buffer = (ring_buffer*)gKernelArgs.debug_output;
+	ring_buffer* buffer = (ring_buffer*)gKernelArgs.debug_output.Pointer();
 	if (buffer == NULL)
 		return true;
 
@@ -595,7 +595,8 @@ save_previous_syslog_to_volume(Directory* directory)
 		return fd;
 	}
 
-	ring_buffer* syslogBuffer = (ring_buffer*)gKernelArgs.debug_output;
+	ring_buffer* syslogBuffer
+		= (ring_buffer*)gKernelArgs.debug_output.Pointer();
 	iovec vecs[2];
 	int32 vecCount = ring_buffer_get_vecs(syslogBuffer, vecs);
 	if (vecCount > 0) {
@@ -712,7 +713,7 @@ add_boot_volume_menu(Directory* bootVolume)
 	menu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
 	item->SetType(MENU_ITEM_NO_CHOICE);
 
-	if (gKernelArgs.boot_volume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false))
+	if (gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false))
 		menu->SetChoiceText("CD-ROM or hard drive");
 
 	return menu;
@@ -747,8 +748,8 @@ add_safe_mode_menu()
 	// check whether we have memory beyond 4 GB
 	bool hasMemoryBeyond4GB = false;
 	for (uint32 i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
-		phys_addr_range& range = gKernelArgs.physical_memory_range[i];
-		if (range.start >= (phys_addr_t)1 << 32) {
+		addr_range& range = gKernelArgs.physical_memory_range[i];
+		if (range.start >= (uint64)1 << 32) {
 			hasMemoryBeyond4GB = true;
 			break;
 		}
@@ -899,7 +900,8 @@ add_debug_menu()
 			"Displays the debug info the boot loader has logged.");
 	}
 
-	ring_buffer* syslogBuffer = (ring_buffer*)gKernelArgs.debug_output;
+	ring_buffer* syslogBuffer
+		= (ring_buffer*)gKernelArgs.debug_output.Pointer();
 	if (syslogBuffer != NULL && ring_buffer_readable(syslogBuffer) > 0) {
 		if (!currentLogItemVisible)
 			menu->AddSeparatorItem();

@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src system glue arch x86_64 ;
+
+KernelObjects
+	crti.S
+	crtn.S
+	;
+

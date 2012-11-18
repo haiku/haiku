@@ -41,7 +41,7 @@ show_memory_totals(void)
 static void
 list_areas_for_id(team_id id)
 {	
-	int32 cookie = 0;
+	ssize_t cookie = 0;
 	team_info teamInfo;
 	area_info areaInfo;
 

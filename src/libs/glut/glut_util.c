@@ -1,9 +1,11 @@
+/*
+ * Copyright 1994-1997 Mark Kilgard, All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      Mark Kilgard
+ */
 
-/* Copyright (c) Mark J. Kilgard, 1994. */
-
-/* This program is freely distributable without licensing fees
-   and is provided without guarantee or warrantee expressed or
-   implied. This program is -not- in the public domain. */
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -11,6 +13,7 @@
 #include <stdio.h>
 
 #include "glutint.h"
+
 
 /* strdup is actually not a standard ANSI C or POSIX routine
    so implement a private one for GLUT.  OpenVMS does not have a

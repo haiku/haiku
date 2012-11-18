@@ -13,7 +13,7 @@ Includes [ FGristFiles kernel_c++_structs.h ]
 SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 
 KernelStaticLibrary libfreebsd_network.a :
-	bus.c
+	bus.cpp
 	callout.cpp
 	clock.c
 	compat.c

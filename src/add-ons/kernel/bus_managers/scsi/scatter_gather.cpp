@@ -51,7 +51,7 @@ fill_temp_sg(scsi_ccb *ccb)
 	if (mapped_len != ccb->data_length)
 		goto too_complex;
 
-	if (dma_boundary != ~0UL || ccb->data_length > max_sg_block_size) {
+	if (dma_boundary != ~(uint32)0 || ccb->data_length > max_sg_block_size) {
 		// S/G list may not be controller-compatible:
 		// we have to split offending entries
 		SHOW_FLOW(3, "Checking violation of dma boundary 0x%x and entry size 0x%x",
@@ -64,7 +64,7 @@ fill_temp_sg(scsi_ccb *ccb)
 			max_len = (dma_boundary + 1) -
 				(temp_sg[cur_idx].address & dma_boundary);
 			// restrict size per sg item
-			max_len = std::min(max_len, max_sg_block_size);
+			max_len = std::min(max_len, (addr_t)max_sg_block_size);
 
 			SHOW_FLOW(4, "addr=%#" B_PRIxPHYSADDR ", size=%x, max_len=%x, "
 				"idx=%d, num=%d", temp_sg[cur_idx].address,
@@ -107,7 +107,8 @@ create_temp_sg(scsi_ccb *ccb)
 	physical_entry *temp_sg;
 	status_t res;
 
-	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%lu", ccb, ccb->data, ccb->data_length);
+	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%" B_PRIu32, ccb, ccb->data,
+		ccb->data_length);
 
 	ccb->sg_list = temp_sg = (physical_entry*)locked_pool->alloc(temp_sg_pool);
 	if (temp_sg == NULL) {

@@ -73,14 +73,14 @@ MakeNodeFromName(node_ref* node, char* name)
 static inline void
 MakeRefName(char* refName, const node_ref* node)
 {
-	sprintf(refName, "r%ld_%Ld", node->device, node->node);
+	sprintf(refName, "r%" B_PRIdDEV "_%" B_PRIdINO, node->device, node->node);
 }
 
 
 static inline void
 MakeModeName(char* modeName, const node_ref* node)
 {
-	sprintf(modeName, "m%ld_%Ld", node->device, node->node);
+	sprintf(modeName, "m%" B_PRIdDEV "_%" B_PRIdINO, node->device, node->node);
 }
 
 
@@ -702,7 +702,7 @@ BClipboardRefsWatcher::RemoveNodesByDevice(dev_t device)
 	BMessage* clip = be_clipboard->Data();
 	if (clip != NULL) {
 		char deviceName[6];
-		sprintf(deviceName, "r%ld_", device);
+		sprintf(deviceName, "r%" B_PRIdDEV "_", device);
 
 		int32 index = 0;
 		char* refName;

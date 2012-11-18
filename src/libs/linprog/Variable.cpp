@@ -173,7 +173,7 @@ Variable::ToString() const
 			string << "(invalid)";
 	} else {
 		if (!fIsValid)
-			string << "(invalid," << (int32)this << ")";
+			string << "(invalid," << (addr_t)this << ")";
 		else
 			string << Index() << ": ";
 	}

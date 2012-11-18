@@ -72,6 +72,7 @@ Application Debugger :
 	CpuStateX86.cpp
 
 	# controllers
+	DebugReportGenerator.cpp
 	TeamDebugger.cpp
 	ThreadHandler.cpp
 

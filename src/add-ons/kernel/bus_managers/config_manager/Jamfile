@@ -7,4 +7,5 @@ KernelAddon config_manager :
 	: config_manager_arch.a
 	;
 
-SubInclude HAIKU_TOP src add-ons kernel bus_managers config_manager arch $(TARGET_ARCH) ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers config_manager arch
+	$(TARGET_KERNEL_ARCH) ;

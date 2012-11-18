@@ -93,8 +93,8 @@ main(int argc, char** argv)
 		BVolume volume(volumeDevice);
 		status_t ret = volume.InitCheck();
 		if (ret != B_OK) {
-			fprintf(stderr, "%s: failed to get BVolume for device %ld: %s\n",
-				argv[0], volumeDevice, strerror(ret));
+			fprintf(stderr, "%s: failed to get BVolume for device %" B_PRIdDEV
+				": %s\n", argv[0], volumeDevice, strerror(ret));
 			return 1;
 		}
 
@@ -103,8 +103,8 @@ main(int argc, char** argv)
 		BPartition* partition;
 		ret = roster.FindPartitionByVolume(volume, &diskDevice, &partition);
 		if (ret != B_OK) {
-			fprintf(stderr, "%s: failed to get partition for device %ld: %s\n",
-				argv[0], volumeDevice, strerror(ret));
+			fprintf(stderr, "%s: failed to get partition for device %" B_PRIdDEV
+				": %s\n", argv[0], volumeDevice, strerror(ret));
 			return 1;
 		}
 		// check this option directly and not via fs_stat_dev()
@@ -122,8 +122,8 @@ main(int argc, char** argv)
 
 		return 0;
 	} else {
-		fprintf(stderr, "%s: can't get information about dev_t: %ld\n",
-			argv[0], volumeDevice);
+		fprintf(stderr, "%s: can't get information about dev_t: %" B_PRIdDEV
+			"\n", argv[0], volumeDevice);
 		return 1;
 	}
 }

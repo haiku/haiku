@@ -221,7 +221,7 @@ hpet_init(struct kernel_args *args)
 		return B_ERROR;
 
 	if (sHPETRegs == NULL) {
-		sHPETRegs = (struct hpet_regs *)args->arch_args.hpet;
+		sHPETRegs = (struct hpet_regs *)args->arch_args.hpet.Pointer();
 		if (vm_map_physical_memory(B_SYSTEM_TEAM, "hpet",
 			(void **)&sHPETRegs, B_EXACT_ADDRESS, B_PAGE_SIZE,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,

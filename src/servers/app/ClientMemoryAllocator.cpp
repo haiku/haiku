@@ -189,14 +189,14 @@ ClientMemoryAllocator::Free(block* freeBlock)
 void
 ClientMemoryAllocator::Dump()
 {
-	debug_printf("Application %ld, %s: chunks:\n", fApplication->ClientTeam(),
-		fApplication->Signature());
+	debug_printf("Application %" B_PRId32 ", %s: chunks:\n",
+		fApplication->ClientTeam(), fApplication->Signature());
 
 	chunk_list::Iterator iterator = fChunks.GetIterator();
 	int32 i = 0;
 	while (struct chunk* chunk = iterator.Next()) {
-		debug_printf("  [%4ld] %p, area %ld, base %p, size %lu\n", i++, chunk,
-			chunk->area, chunk->base, chunk->size);
+		debug_printf("  [%4" B_PRId32 "] %p, area %" B_PRId32 ", base %p, "
+			"size %lu\n", i++, chunk, chunk->area, chunk->base, chunk->size);
 	}
 
 	debug_printf("free blocks:\n");
@@ -204,8 +204,8 @@ ClientMemoryAllocator::Dump()
 	block_list::Iterator blockIterator = fFreeBlocks.GetIterator();
 	i = 0;
 	while (struct block* block = blockIterator.Next()) {
-		debug_printf("  [%6ld] %p, chunk %p, base %p, size %lu\n", i++, block,
-			block->chunk, block->base, block->size);
+		debug_printf("  [%6" B_PRId32 "] %p, chunk %p, base %p, size %lu\n",
+			i++, block, block->chunk, block->base, block->size);
 	}
 }
 
@@ -254,8 +254,8 @@ ClientMemoryAllocator::_AllocateChunk(size_t size, bool& newArea)
 #ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 		strcpy(name, "client heap");
 #else
-		snprintf(name, sizeof(name), "heap:%ld:%s", fApplication->ClientTeam(),
-			fApplication->SignatureLeaf());
+		snprintf(name, sizeof(name), "heap:%" B_PRId32 ":%s",
+			fApplication->ClientTeam(), fApplication->SignatureLeaf());
 #endif
 		area_id area = create_area(name, (void**)&address, B_ANY_ADDRESS, size,
 			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);

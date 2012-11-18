@@ -199,7 +199,7 @@ static	pci_module_info *			sPCIModule;
 
 		// Periodic transfer framelist and interrupt entries
 		area_id						fPeriodicFrameListArea;
-		addr_t *					fPeriodicFrameList;
+		uint32 *					fPeriodicFrameList;
 		interrupt_entry *			fInterruptEntries;
 		ehci_itd **					fItdEntries;
 		ehci_sitd **				fSitdEntries;

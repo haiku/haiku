@@ -10,7 +10,6 @@
 
 
 struct kernel_args;
-struct vm_translation_map_ops;
 
 
 class TranslationMapPhysicalPageMapper {

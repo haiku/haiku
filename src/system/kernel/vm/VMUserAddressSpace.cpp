@@ -203,7 +203,8 @@ VMUserAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 	// also be resized in that area
 	// TODO: if there is free space after the reserved area, it could
 	// be used as well...
-	return next->id == RESERVED_AREA_ID && next->cache_offset <= area->Base()
+	return next->id == RESERVED_AREA_ID
+		&& (uint64)next->cache_offset <= (uint64)area->Base()
 		&& next->Base() + (next->Size() - 1) >= newEnd;
 }
 
@@ -218,7 +219,7 @@ VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
 	VMUserArea* next = fAreas.GetNext(area);
 	if (next != NULL && next->Base() <= newEnd) {
 		if (next->id != RESERVED_AREA_ID
-			|| next->cache_offset > area->Base()
+			|| (uint64)next->cache_offset > (uint64)area->Base()
 			|| next->Base() + (next->Size() - 1) < newEnd) {
 			panic("resize situation for area %p has changed although we "
 				"should have the address space lock", area);
@@ -361,11 +362,11 @@ VMUserAddressSpace::Dump() const
 
 	for (VMUserAreaList::ConstIterator it = fAreas.GetIterator();
 			VMUserArea* area = it.Next();) {
-		kprintf(" area 0x%lx: ", area->id);
+		kprintf(" area 0x%" B_PRIx32 ": ", area->id);
 		kprintf("base_addr = 0x%lx ", area->Base());
 		kprintf("size = 0x%lx ", area->Size());
 		kprintf("name = '%s' ", area->name);
-		kprintf("protection = 0x%lx\n", area->protection);
+		kprintf("protection = 0x%" B_PRIx32 "\n", area->protection);
 	}
 }
 
@@ -460,8 +461,8 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 	bool foundSpot = false;
 
 	TRACE(("VMUserAddressSpace::_InsertAreaSlot: address space %p, start "
-		"0x%lx, size %ld, end 0x%lx, addressSpec %ld, area %p\n", this, start,
-		size, end, addressSpec, area));
+		"0x%lx, size %ld, end 0x%lx, addressSpec %" B_PRIu32 ", area %p\n",
+		this, start, size, end, addressSpec, area));
 
 	// do some sanity checking
 	if (start < fBase || size == 0 || end > fEndAddress
@@ -513,8 +514,8 @@ second_chance:
 			// find a hole big enough for a new area
 			if (last == NULL) {
 				// see if we can build it at the beginning of the virtual map
-				addr_t alignedBase = ROUNDUP(fBase, alignment);
-				if (is_valid_spot(fBase, alignedBase, size,
+				addr_t alignedBase = ROUNDUP(start, alignment);
+				if (is_valid_spot(start, alignedBase, size,
 						next == NULL ? end : next->Base())) {
 					foundSpot = true;
 					area->SetBase(alignedBase);

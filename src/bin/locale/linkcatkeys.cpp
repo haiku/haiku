@@ -180,7 +180,7 @@ main(int argc, char **argv)
 	if (showSummary) {
 		int32 count = targetCatalog.CountItems();
 		if (count) {
-			fprintf(stderr, "%ld key%s found and written to %s\n",
+			fprintf(stderr, "%" B_PRId32 " key%s found and written to %s\n",
 				count, (count==1 ? "": "s"), outputFile.String());
 		} else
 			fprintf(stderr, "no keys found\n");

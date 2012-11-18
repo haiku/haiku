@@ -607,7 +607,7 @@ PictureDataWriter::BeginOp(const int16 &op)
 	fData->Write(&op, sizeof(op));
 	
 	// Init the size of the opcode block to 0
-	size_t size = 0;
+	int32 size = 0;
 	fData->Write(&size, sizeof(size));
 }
 
@@ -625,8 +625,8 @@ PictureDataWriter::EndOp()
 	// The size of the op is calculated like this:
 	// current position on the stream minus the position on the stack,
 	// minus the space occupied by the op code itself (int16)
-	// and the space occupied by the size field (size_t) 
-	size_t size = curPos - stackPos - sizeof(size_t) - sizeof(int16);
+	// and the space occupied by the size field (int32)
+	int32 size = curPos - stackPos - sizeof(int32) - sizeof(int16);
 
 	// Size was set to 0 in BeginOp()
 	// Now we overwrite it with the correct value

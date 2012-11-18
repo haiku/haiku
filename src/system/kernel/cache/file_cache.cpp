@@ -555,7 +555,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		generic_addr_t last = vecs[vecCount - 1].base
 			+ vecs[vecCount - 1].length - B_PAGE_SIZE;
 
-		if (offset + pageOffset + bufferSize == ref->cache->virtual_end) {
+		if ((off_t)(offset + pageOffset + bufferSize) == ref->cache->virtual_end) {
 			// the space in the page after this write action needs to be cleaned
 			vm_memset_physical(last + lastPageOffset, 0,
 				B_PAGE_SIZE - lastPageOffset);
@@ -724,7 +724,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	size_t size = *_size;
 	offset -= pageOffset;
 
-	if (offset + pageOffset + size > fileSize) {
+	if ((off_t)(offset + pageOffset + size) > fileSize) {
 		// adapt size to be within the file's offsets
 		size = fileSize - pageOffset - offset;
 		*_size = size;
@@ -951,7 +951,7 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 	file_cache_ref* ref = ((VMVnodeCache*)cache)->FileCacheRef();
 	off_t fileSize = cache->virtual_end;
 
-	if (offset + size > fileSize)
+	if ((off_t)(offset + size) > fileSize)
 		size = fileSize - offset;
 
 	// "offset" and "size" are always aligned to B_PAGE_SIZE,
@@ -1088,7 +1088,7 @@ file_cache_init_post_boot_device(void)
 
 	if (get_module("file_cache/launch_speedup/v1",
 			(module_info**)&sCacheModule) == B_OK) {
-		dprintf("** opened launch speedup: %Ld\n", system_time());
+		dprintf("** opened launch speedup: %" B_PRId64 "\n", system_time());
 	}
 	return B_OK;
 }

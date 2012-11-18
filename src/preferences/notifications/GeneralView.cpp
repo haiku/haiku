@@ -239,7 +239,7 @@ GeneralView::Load()
 	int32 timeout;
 	if (settings.FindInt32(kTimeoutName, &timeout) != B_OK)
 		timeout = kDefaultTimeout;
-	(void)sprintf(buffer, "%ld", timeout);
+	(void)sprintf(buffer, "%" B_PRId32, timeout);
 	fTimeout->SetText(buffer);
 
 	return B_OK;

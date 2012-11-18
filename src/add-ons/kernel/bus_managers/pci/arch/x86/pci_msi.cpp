@@ -163,7 +163,7 @@ pci_enable_msi(uint8 virtualBus, uint8 _device, uint8 function)
 	gPCI->WriteConfig(device, info->capability_offset + PCI_msi_control, 2,
 		info->control_value);
 
-	dprintf("msi enabled: 0x%04lx\n",
+	dprintf("msi enabled: 0x%04" B_PRIx32 "\n",
 		gPCI->ReadConfig(device, info->capability_offset + PCI_msi_control, 2));
 	return B_OK;
 }

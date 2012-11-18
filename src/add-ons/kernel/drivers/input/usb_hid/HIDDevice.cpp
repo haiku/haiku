@@ -273,7 +273,8 @@ HIDDevice::MaybeScheduleTransfer()
 	status_t result = gUSBModule->queue_interrupt(fInterruptPipe,
 		fTransferBuffer, fTransferBufferSize, _TransferCallback, this);
 	if (result != B_OK) {
-		TRACE_ALWAYS("failed to schedule interrupt transfer 0x%08lx\n", result);
+		TRACE_ALWAYS("failed to schedule interrupt transfer 0x%08" B_PRIx32 "\n",
+			result);
 		return result;
 	}
 

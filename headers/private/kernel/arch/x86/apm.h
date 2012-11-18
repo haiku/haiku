@@ -7,7 +7,7 @@
 
 #include <SupportDefs.h>
 
-#include <apm_defs.h>
+#include <arch/x86/apm_defs.h>
 
 
 struct kernel_args;
@@ -50,6 +50,7 @@ typedef struct apm_info {
 
 
 #ifndef _BOOT_MODE
+#ifndef __x86_64__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,6 +61,7 @@ status_t apm_init(struct kernel_args *args);
 #ifdef __cplusplus
 }
 #endif
+#endif	// !__x86_64__
 #endif	// !_BOOT_MODE
 
 #endif	/* KERNEL_APM_H */

@@ -18,7 +18,8 @@
 #include <platform_kernel_args.h>
 #include <arch_kernel_args.h>
 
-#include <util/KMessage.h>
+#include <util/FixedWidthPointer.h>
+
 
 #define CURRENT_KERNEL_ARGS_VERSION	1
 #define MAX_KERNEL_ARGS_RANGE		20
@@ -43,28 +44,30 @@ typedef struct kernel_args {
 	uint32		kernel_args_size;
 	uint32		version;
 
-	struct preloaded_image kernel_image;
-	struct preloaded_image *preloaded_images;
+	FixedWidthPointer<struct preloaded_image> kernel_image;
+	FixedWidthPointer<struct preloaded_image> preloaded_images;
 
-	uint32			num_physical_memory_ranges;
-	phys_addr_range	physical_memory_range[MAX_PHYSICAL_MEMORY_RANGE];
-	uint32			num_physical_allocated_ranges;
-	phys_addr_range	physical_allocated_range[MAX_PHYSICAL_ALLOCATED_RANGE];
-	uint32			num_virtual_allocated_ranges;
-	addr_range		virtual_allocated_range[MAX_VIRTUAL_ALLOCATED_RANGE];
-	uint32			num_kernel_args_ranges;
-	addr_range		kernel_args_range[MAX_KERNEL_ARGS_RANGE];
-	uint64			ignored_physical_memory;
+	uint32		num_physical_memory_ranges;
+	addr_range	physical_memory_range[MAX_PHYSICAL_MEMORY_RANGE];
+	uint32		num_physical_allocated_ranges;
+	addr_range	physical_allocated_range[MAX_PHYSICAL_ALLOCATED_RANGE];
+	uint32		num_virtual_allocated_ranges;
+	addr_range	virtual_allocated_range[MAX_VIRTUAL_ALLOCATED_RANGE];
+	uint32		num_kernel_args_ranges;
+	addr_range	kernel_args_range[MAX_KERNEL_ARGS_RANGE];
+	uint64		ignored_physical_memory;
 
 	uint32		num_cpus;
 	addr_range	cpu_kstack[MAX_BOOT_CPUS];
 
-	KMessage	boot_volume;
+	// boot volume KMessage data
+	FixedWidthPointer<void> boot_volume;
+	int32		boot_volume_size;
 
-	struct driver_settings_file *driver_settings;
+	FixedWidthPointer<struct driver_settings_file> driver_settings;
 
 	struct {
-		phys_addr_range	physical_buffer;
+		addr_range	physical_buffer;
 		uint32	bytes_per_row;
 		uint16	width;
 		uint16	height;
@@ -72,12 +75,12 @@ typedef struct kernel_args {
 		bool	enabled;
 	} frame_buffer;
 
-	void		*vesa_modes;
+	FixedWidthPointer<void> vesa_modes;
 	uint16		vesa_modes_size;
 	uint8		vesa_capabilities;
-	void		*edid_info;
+	FixedWidthPointer<void> edid_info;
 
-	void		*debug_output;
+	FixedWidthPointer<void> debug_output;
 	uint32		debug_size;
 	bool		keep_debug_output_buffer;
 
@@ -85,8 +88,8 @@ typedef struct kernel_args {
 	arch_kernel_args arch_args;
 
 	// bootsplash data
-	uint8 		*boot_splash;
+	FixedWidthPointer<uint8> boot_splash;
 
-} kernel_args;
+} _PACKED kernel_args;
 
 #endif	/* KERNEL_BOOT_KERNEL_ARGS_H */

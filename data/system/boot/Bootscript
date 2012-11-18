@@ -96,6 +96,12 @@ fi
 # We must wait for the app_server and registrar to be ready
 launch $SERVERS/registrar _roster_thread_	# launch registrar
 
+# If app_server doesn't exist, just run consoled.
+if [ ! -f "/boot/$SERVERS/app_server" ]; then
+	/bin/consoled
+	exit
+fi
+
 launch $SERVERS/debug_server				# launch debug_server
 
 # Init Network

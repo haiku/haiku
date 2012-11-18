@@ -41,7 +41,7 @@ uname(struct utsname *info)
 	strlcat(info->version, systemInfo.kernel_build_date, sizeof(info->version));
 	strlcat(info->version, " ", sizeof(info->version));
 	strlcat(info->version, systemInfo.kernel_build_time, sizeof(info->version));
-	snprintf(info->release, sizeof(info->release), "%lld",
+	snprintf(info->release, sizeof(info->release), "%" B_PRId64,
 		systemInfo.kernel_version);
 
 	// TODO: make this better
@@ -54,6 +54,9 @@ uname(struct utsname *info)
 			break;
 		case B_AT_CLONE_PLATFORM:
 			platform = "BePC";
+			break;
+		case B_64_BIT_PC_PLATFORM:
+			platform = "x86_64";
 			break;
 		default:
 			platform = "unknown";

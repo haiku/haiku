@@ -246,7 +246,7 @@ void
 MemoryBarMenuItem::BarUpdate()
 {
 	area_info areaInfo;
-	int32 cookie = 0;
+	ssize_t cookie = 0;
 	int64 lram_size = 0;
 	int64 lwram_size = 0;
 	bool exists = false;

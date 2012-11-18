@@ -250,8 +250,8 @@ ata_adapter_prepare_dma(ata_adapter_channel_info *channel,
 		writeToDevice ? "write" : "read", sgListCount);
 
 	for (i = sgListCount - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sgList) {
-		prd->address = B_HOST_TO_LENDIAN_INT32((uint32)pci->ram_address(device,
-			(void*)(addr_t)sgList->address));
+		prd->address = B_HOST_TO_LENDIAN_INT32((uint32)(addr_t)pci->ram_address(
+			device, (void*)(addr_t)sgList->address));
 		// 0 means 64K - this is done automatically be discarding upper 16 bits
 		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sgList->size);
 		prd->EOT = i == 0;
@@ -266,8 +266,8 @@ ata_adapter_prepare_dma(ata_adapter_channel_info *channel,
 
 	pci->write_io_32(device, channel->bus_master_base + ATA_BM_PRDT_ADDRESS,
 		(pci->read_io_32(device, channel->bus_master_base + ATA_BM_PRDT_ADDRESS) & 3)
-		| (B_HOST_TO_LENDIAN_INT32((uint32)pci->ram_address(device,
-			(void *)channel->prdt_phys)) & ~3));
+		| (B_HOST_TO_LENDIAN_INT32((uint32)(addr_t)pci->ram_address(device,
+			(void*)(addr_t)channel->prdt_phys)) & ~3));
 
 	// reset interrupt and error signal
 	status = pci->read_io_8(device, channel->bus_master_base

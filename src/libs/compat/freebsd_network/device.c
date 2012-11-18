@@ -41,7 +41,7 @@ compat_open(const char *name, uint32 flags, void **cookie)
 		return B_ERROR;
 
 	ifp = gDevices[i];
-	if_printf(ifp, "compat_open(0x%lx)\n", flags);
+	if_printf(ifp, "compat_open(0x%" B_PRIx32 ")\n", flags);
 
 	if (atomic_or(&ifp->open_count, 1)) {
 		put_module(NET_STACK_MODULE_NAME);

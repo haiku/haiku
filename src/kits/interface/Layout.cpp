@@ -222,7 +222,7 @@ bool
 BLayout::RemoveItem(BLayoutItem* item)
 {
 	int32 index = IndexOfItem(item);
-	return (index >= 0 ? RemoveItem(index) : false);
+	return (index >= 0 ? RemoveItem(index) != NULL : false);
 }
 
 

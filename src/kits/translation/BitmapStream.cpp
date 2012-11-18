@@ -82,13 +82,13 @@ BBitmapStream::ReadAt(off_t pos, void* buffer, size_t size)
 		return B_NO_INIT;
 	if (size == 0)
 		return B_OK;
-	if (pos >= fSize || pos < 0 || buffer == NULL)
+	if (pos >= (off_t)fSize || pos < 0 || buffer == NULL)
 		return B_BAD_VALUE;
 
 	ssize_t toRead;
 	void *source;
 
-	if (pos < sizeof(TranslatorBitmap)) {
+	if (pos < (off_t)sizeof(TranslatorBitmap)) {
 		toRead = sizeof(TranslatorBitmap) - pos;
 		source = (reinterpret_cast<uint8 *>(fBigEndianHeader)) + pos;
 	} else {
@@ -122,7 +122,7 @@ BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 {
 	if (size == 0)
 		return B_OK;
-	if (!data || pos < 0 || pos > fSize)
+	if (!data || pos < 0 || pos > (off_t)fSize)
 		return B_BAD_VALUE;
 
 	ssize_t written = 0;
@@ -131,7 +131,7 @@ BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 		void *dest;
 		// We depend on writing the header separately in detecting
 		// changes to it
-		if (pos < sizeof(TranslatorBitmap)) {
+		if (pos < (off_t)sizeof(TranslatorBitmap)) {
 			toWrite = sizeof(TranslatorBitmap) - pos;
 			dest = (reinterpret_cast<uint8 *> (&fHeader)) + pos;
 		} else {
@@ -153,7 +153,7 @@ BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 		written += toWrite;
 		data = (reinterpret_cast<const uint8 *> (data)) + toWrite;
 		size -= toWrite;
-		if (pos > fSize)
+		if (pos > (off_t)fSize)
 			fSize = pos;
 		// If we change the header, the rest needs to be reset
 		if (pos == sizeof(TranslatorBitmap)) {
@@ -185,7 +185,7 @@ BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 					return error;
 				}
 				if ((uint32)fBitmap->BytesPerRow() != fHeader.rowBytes) {
-					fprintf(stderr, "BitmapStream %ld %ld\n",
+					fprintf(stderr, "BitmapStream %" B_PRId32 " %" B_PRId32 "\n",
 						fBitmap->BytesPerRow(), fHeader.rowBytes);
 					return B_MISMATCHED_VALUES;
 				}
@@ -218,7 +218,7 @@ BBitmapStream::Seek(off_t position, uint32 seekMode)
 	else if (seekMode == SEEK_END)
 		position += fSize;
 
-	if (position < 0 || position > fSize)
+	if (position < 0 || position > (off_t)fSize)
 		return B_BAD_VALUE;
 
 	fPosition = position;
@@ -257,7 +257,7 @@ BBitmapStream::SetSize(off_t size)
 {
 	if (size < 0)
 		return B_BAD_VALUE;
-	if (fBitmap && (size > fHeader.dataSize + sizeof(TranslatorBitmap)))
+	if (fBitmap && (size > (off_t)(fHeader.dataSize + sizeof(TranslatorBitmap))))
 		return B_BAD_VALUE;
 	// Problem:
 	// What if someone calls SetSize() before writing the header,

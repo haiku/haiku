@@ -330,9 +330,9 @@ BRegion::PrintToStream() const
 {
 	Frame().PrintToStream();
 
-	for (long i = 0; i < fCount; i++) {
+	for (int32 i = 0; i < fCount; i++) {
 		clipping_rect *rect = &fData[i];
-		printf("data[%ld] = BRect(l:%" B_PRId32 ".0, t:%" B_PRId32
+		printf("data[%" B_PRId32 "] = BRect(l:%" B_PRId32 ".0, t:%" B_PRId32
 			".0, r:%" B_PRId32 ".0, b:%" B_PRId32 ".0)\n",
 			i, rect->left, rect->top, rect->right - 1, rect->bottom - 1);
 	}
@@ -361,7 +361,7 @@ BRegion::OffsetBy(int32 x, int32 y)
 
 	if (fCount > 0) {
 		if (fData != &fBounds) {
-			for (long i = 0; i < fCount; i++)
+			for (int32 i = 0; i < fCount; i++)
 				offset_rect(fData[i], x, y);
 		}
 
@@ -545,7 +545,7 @@ BRegion::_AdoptRegionData(BRegion& region)
 		able to hold.
 */
 bool
-BRegion::_SetSize(long newSize)
+BRegion::_SetSize(int32 newSize)
 {
 	// we never shrink the size
 	newSize = max_c(fDataSize, newSize);

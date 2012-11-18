@@ -203,8 +203,8 @@ ps2_dev_publish(ps2_dev *dev)
 				}
 				snooze(timeout / 20);
 			}
-			TRACE("ps2: publishing %s: parent %s is %s; wait time %Ld\n",
-				dev->name, dev->parent_dev->name, 
+			TRACE("ps2: publishing %s: parent %s is %s; wait time %" B_PRId64
+				"\n", dev->name, dev->parent_dev->name, 
 				status == B_OK ? "enabled" : "busy", system_time() - start);
 		}
 
@@ -219,7 +219,8 @@ ps2_dev_publish(ps2_dev *dev)
 
 	dev->active = true;
 
-	INFO("ps2: devfs_publish_device %s, status = 0x%08lx\n", dev->name, status);
+	INFO("ps2: devfs_publish_device %s, status = 0x%08" B_PRIx32 "\n",
+		dev->name, status);
 }
 
 
@@ -239,8 +240,8 @@ ps2_dev_unpublish(ps2_dev *dev)
 	if ((dev->flags & PS2_FLAG_ENABLED) && dev->disconnect)
 		dev->disconnect(dev);
 
-	INFO("ps2: devfs_unpublish_device %s, status = 0x%08lx\n", dev->name,
-		status);
+	INFO("ps2: devfs_unpublish_device %s, status = 0x%08" B_PRIx32 "\n",
+		dev->name, status);
 }
 
 
@@ -370,7 +371,8 @@ standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
 
 	res = get_sem_count(dev->result_sem, &sem_count);
 	if (res == B_OK && sem_count != 0) {
-		TRACE("ps2: ps2_dev_command: sem_count %ld, fixing!\n", sem_count);
+		TRACE("ps2: ps2_dev_command: sem_count %" B_PRId32 ", fixing!\n",
+			sem_count);
 		if (sem_count > 0)
 			acquire_sem_etc(dev->result_sem, sem_count, 0, 0);
 		else
@@ -423,8 +425,8 @@ standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
 		if (res != B_OK)
 			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 
-		TRACE("ps2: ps2_dev_command wait for ack res 0x%08lx, wait-time %Ld\n",
-			res, system_time() - start);
+		TRACE("ps2: ps2_dev_command wait for ack res 0x%08" B_PRIx32 ", "
+			"wait-time %" B_PRId64 "\n", res, system_time() - start);
 
 		if (atomic_get(&dev->flags) & PS2_FLAG_ACK) {
 			TRACE("ps2: ps2_dev_command got ACK\n");
@@ -458,15 +460,15 @@ standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
 				res = B_IO_ERROR;
 			}
 
-			TRACE("ps2: ps2_dev_command wait for input res 0x%08lx, "
-				"wait-time %Ld\n", res, system_time() - start);
+			TRACE("ps2: ps2_dev_command wait for input res 0x%08" B_PRIx32 ", "
+				"wait-time %" B_PRId64 "\n", res, system_time() - start);
 
 			for (i = 0; i < in_count; i++)
 				TRACE("ps2: ps2_dev_command rx: 0x%02x\n", in[i]);
 		}
 	}
 
-	TRACE("ps2: ps2_dev_command result 0x%08lx\n", res);
+	TRACE("ps2: ps2_dev_command result 0x%08" B_PRIx32 "\n", res);
 
 	return res;
 }

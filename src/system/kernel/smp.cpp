@@ -58,9 +58,9 @@
 struct smp_msg {
 	struct smp_msg	*next;
 	int32			message;
-	uint32			data;
-	uint32			data2;
-	uint32			data3;
+	addr_t			data;
+	addr_t			data2;
+	addr_t			data3;
 	void			*data_ptr;
 	uint32			flags;
 	int32			ref_count;
@@ -234,10 +234,10 @@ dump_ici_messages(int argc, char** argv)
 		message = message->next;
 	}
 
-	kprintf("ICI broadcast messages: %ld, first: %p\n", count,
+	kprintf("ICI broadcast messages: %" B_PRId32 ", first: %p\n", count,
 		sBroadcastMessages);
-	kprintf("  done:         %ld\n", doneCount);
-	kprintf("  unreferenced: %ld\n", unreferencedCount);
+	kprintf("  done:         %" B_PRId32 "\n", doneCount);
+	kprintf("  unreferenced: %" B_PRId32 "\n", unreferencedCount);
 
 	// count per-CPU messages
 	for (int32 i = 0; i < sNumCPUs; i++) {
@@ -248,8 +248,8 @@ dump_ici_messages(int argc, char** argv)
 			message = message->next;
 		}
 
-		kprintf("CPU %ld messages: %ld, first: %p\n", i, count,
-			sCPUMessages[i]);
+		kprintf("CPU %" B_PRId32 " messages: %" B_PRId32 ", first: %p\n", i,
+			count, sCPUMessages[i]);
 	}
 
 	return 0;
@@ -271,15 +271,15 @@ dump_ici_message(int argc, char** argv)
 	smp_msg* message = (smp_msg*)(addr_t)address;
 	kprintf("ICI message %p:\n", message);
 	kprintf("  next:        %p\n", message->next);
-	kprintf("  message:     %ld\n", message->message);
-	kprintf("  data:        %ld\n", message->data);
-	kprintf("  data2:       %ld\n", message->data2);
-	kprintf("  data3:       %ld\n", message->data3);
+	kprintf("  message:     %" B_PRId32 "\n", message->message);
+	kprintf("  data:        0x%lx\n", message->data);
+	kprintf("  data2:       0x%lx\n", message->data2);
+	kprintf("  data3:       0x%lx\n", message->data3);
 	kprintf("  data_ptr:    %p\n", message->data_ptr);
-	kprintf("  flags:       %lx\n", message->flags);
-	kprintf("  ref_count:   %lx\n", message->ref_count);
+	kprintf("  flags:       %" B_PRIx32 "\n", message->flags);
+	kprintf("  ref_count:   %" B_PRIx32 "\n", message->ref_count);
 	kprintf("  done:        %s\n", message->done ? "true" : "false");
-	kprintf("  proc_bitmap: %lx\n", message->proc_bitmap);
+	kprintf("  proc_bitmap: %" B_PRIx32 "\n", message->proc_bitmap);
 
 	return 0;
 }
@@ -361,7 +361,7 @@ acquire_spinlock(spinlock* lock)
 		oldValue = atomic_or((int32*)lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock: attempt to acquire lock %p twice on "
-				"non-SMP system (last caller: %p, value %ld)", lock,
+				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
 				find_lock_caller(lock), oldValue);
 		}
 
@@ -458,7 +458,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 		oldValue = atomic_or((int32*)lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
-				"non-SMP system (last caller: %p, value %ld)", lock,
+				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
 				find_lock_caller(lock), oldValue);
 		}
 
@@ -716,8 +716,7 @@ process_pending_ici(int32 currentCPU)
 
 	switch (msg->message) {
 		case SMP_MSG_INVALIDATE_PAGE_RANGE:
-			arch_cpu_invalidate_TLB_range((addr_t)msg->data,
-				(addr_t)msg->data2);
+			arch_cpu_invalidate_TLB_range(msg->data, msg->data2);
 			break;
 		case SMP_MSG_INVALIDATE_PAGE_LIST:
 			arch_cpu_invalidate_TLB_list((addr_t*)msg->data, (int)msg->data2);
@@ -755,7 +754,7 @@ process_pending_ici(int32 currentCPU)
 		}
 
 		default:
-			dprintf("smp_intercpu_int_handler: got unknown message %ld\n",
+			dprintf("smp_intercpu_int_handler: got unknown message %" B_PRId32 "\n",
 				msg->message);
 			break;
 	}
@@ -861,8 +860,8 @@ smp_intercpu_int_handler(int32 cpu)
 
 
 void
-smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2,
-	uint32 data3, void* dataPointer, uint32 flags)
+smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
+	addr_t data3, void* dataPointer, uint32 flags)
 {
 	struct smp_msg *msg;
 
@@ -921,8 +920,8 @@ smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2,
 
 
 void
-smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, uint32 data,
-	uint32 data2, uint32 data3, void *dataPointer, uint32 flags)
+smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, addr_t data,
+	addr_t data2, addr_t data3, void *dataPointer, uint32 flags)
 {
 	if (!sICIEnabled)
 		return;
@@ -984,7 +983,7 @@ smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, uint32 data,
 
 
 void
-smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
+smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 	void *dataPointer, uint32 flags)
 {
 	struct smp_msg *msg;
@@ -1052,7 +1051,7 @@ smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 
 void
 smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
-	uint32 data, uint32 data2, uint32 data3, void *dataPointer, uint32 flags)
+	addr_t data, addr_t data2, addr_t data3, void *dataPointer, uint32 flags)
 {
 	if (!sICIEnabled)
 		return;
@@ -1276,7 +1275,7 @@ call_all_cpus(void (*func)(void*, int), void* cookie)
 	}
 
 	if (smp_get_num_cpus() > 1) {
-		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)cookie,
+		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
 			0, 0, (void*)func, SMP_MSG_FLAG_ASYNC);
 	}
 
@@ -1300,7 +1299,7 @@ call_all_cpus_sync(void (*func)(void*, int), void* cookie)
 	}
 
 	if (smp_get_num_cpus() > 1) {
-		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)cookie,
+		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (addr_t)cookie,
 			0, 0, (void*)func, SMP_MSG_FLAG_SYNC);
 	}
 
