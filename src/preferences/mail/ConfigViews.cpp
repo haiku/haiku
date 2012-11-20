@@ -164,7 +164,8 @@ ProtocolSettingsView::DetachedFromWindow()
 	fSettings.MakeEmpty();
 	fSettings.Append(settings);
 
-	RemoveChild(fSettingsView);
+	// We need to remove the settings view before unloading its add-on
+	fSettingsView->RemoveSelf();
 	delete fSettingsView;
 	fSettingsView = NULL;
 	unload_add_on(fImage);
