@@ -450,137 +450,10 @@ public:
 
 private:
 	template<typename EhdrType, typename ShdrType>
-	void _ParseELFHeader()
-	{
-		// read ELF header
-		EhdrType fileHeader;
-		Read(0, &fileHeader, sizeof(EhdrType), "Failed to read ELF header.");
-
-		// check data encoding (endianess)
-		switch (fileHeader.e_ident[EI_DATA]) {
-			case ELFDATA2LSB:
-				fHostEndianess = (htonl(1) != 1);
-				break;
-			case ELFDATA2MSB:
-				fHostEndianess = (htonl(1) == 1);
-				break;
-			default:
-			case ELFDATANONE:
-				throw Exception(EIO, "Unsupported ELF data encoding.");
-				break;
-		}
-
-		// get the header values
-		fELFHeaderSize	= GetValue(fileHeader.e_ehsize);
-		fSectionHeaderTableOffset = GetValue(fileHeader.e_shoff);
-		fSectionHeaderSize	= GetValue(fileHeader.e_shentsize);
-		fSectionHeaderCount = GetValue(fileHeader.e_shnum);
-		bool hasSectionHeaderTable = (fSectionHeaderTableOffset != 0);
-
-		// check the sanity of the header values
-		// ELF header size
-		if (fELFHeaderSize < sizeof(EhdrType)) {
-			throw Exception(EIO,
-				"Invalid ELF header: invalid ELF header size: %lu.",
-				fELFHeaderSize);
-		}
-
-		// section header table offset and entry count/size
-		if (hasSectionHeaderTable) {
-			if (fSectionHeaderTableOffset < (off_t)fELFHeaderSize
-				|| fSectionHeaderTableOffset > fFileSize) {
-				throw Exception(EIO, "Invalid ELF header: invalid section "
-								"header table offset: %llu.",
-								fSectionHeaderTableOffset);
-			}
-			size_t sectionHeaderTableSize
-				= fSectionHeaderSize * fSectionHeaderCount;
-			if (fSectionHeaderSize < (off_t)sizeof(ShdrType)
-				|| fSectionHeaderTableOffset + (off_t)sectionHeaderTableSize
-					> fFileSize) {
-				throw Exception(EIO, "Invalid ELF header: section header "
-								"table exceeds file: %llu.",
-								fSectionHeaderTableOffset
-									+ sectionHeaderTableSize);
-			}
-
-
-			// load section header string section
-			uint16_t sectionHeaderStringSectionIndex
-				= GetValue(fileHeader.e_shstrndx);
-			if (sectionHeaderStringSectionIndex != SHN_UNDEF) {
-				if (sectionHeaderStringSectionIndex >= fSectionHeaderCount) {
-					throw Exception(EIO, "Invalid ELF header: invalid section "
-									"header string section index: %u.",
-									sectionHeaderStringSectionIndex);
-				}
-
-				// get the section info
-				SectionInfo info;
-				if (_ReadSectionHeader<ShdrType>(sectionHeaderStringSectionIndex,
-						info)) {
-					fSectionHeaderStrings = new char[info.size + 1];
-					Read(info.offset, fSectionHeaderStrings, info.size,
-						"Failed to read section header string section.");
-					fSectionHeaderStringsLength = info.size;
-					// null-terminate to be on the safe side
-					fSectionHeaderStrings[info.size] = '\0';
-				}
-			}
-		}
-	}
+	void _ParseELFHeader();
 
 	template<typename ShdrType>
-	bool _ReadSectionHeader(int index, SectionInfo& info)
-	{
-		off_t shOffset = fSectionHeaderTableOffset
-			+ index * fSectionHeaderSize;
-		ShdrType sectionHeader;
-		Read(shOffset, &sectionHeader, sizeof(ShdrType),
-			"Failed to read ELF section header.");
-
-		// get the header values
-		uint32_t type		= GetValue(sectionHeader.sh_type);
-		off_t offset		= GetValue(sectionHeader.sh_offset);
-		size_t size			= GetValue(sectionHeader.sh_size);
-		uint32_t nameIndex	= GetValue(sectionHeader.sh_name);
-
-		// check the values
-		// SHT_NULL marks the header unused,
-		if (type == SHT_NULL)
-			return false;
-
-		// SHT_NOBITS sections take no space in the file
-		if (type != SHT_NOBITS) {
-			if (offset < (off_t)fELFHeaderSize || offset > fFileSize) {
-				throw Exception(EIO, "Invalid ELF section header: "
-								"invalid section offset: %llu.", offset);
-			}
-			off_t sectionEnd = offset + size;
-			if (sectionEnd > fFileSize) {
-				throw Exception(EIO, "Invalid ELF section header: "
-								"section exceeds file: %llu.", sectionEnd);
-			}
-		}
-
-		// get name, if we have a string section
-		if (fSectionHeaderStrings) {
-			if (nameIndex >= (uint32_t)fSectionHeaderStringsLength) {
-				throw Exception(EIO, "Invalid ELF section header: "
-								"invalid name index: %lu.", nameIndex);
-			}
-			info.name = fSectionHeaderStrings + nameIndex;
-		} else {
-			info.name = "";
-		}
-
-		info.type = type;
-		info.offset = offset;
-		info.size = size;
-
-
-		return true;
-	}
+	bool _ReadSectionHeader(int index, SectionInfo& info);
 
 	// _SwapUInt16
 	static inline uint16_t _SwapUInt16(uint16_t value)
@@ -655,6 +528,141 @@ template<>
 uint64_t ELFObject::GetValue(uint64_t& value)
 {
 	return (fHostEndianess ? value : _SwapUInt64(value));
+}
+
+
+template<typename EhdrType, typename ShdrType>
+void ELFObject::_ParseELFHeader()
+{
+	// read ELF header
+	EhdrType fileHeader;
+	Read(0, &fileHeader, sizeof(EhdrType), "Failed to read ELF header.");
+
+	// check data encoding (endianess)
+	switch (fileHeader.e_ident[EI_DATA]) {
+		case ELFDATA2LSB:
+			fHostEndianess = (htonl(1) != 1);
+			break;
+		case ELFDATA2MSB:
+			fHostEndianess = (htonl(1) == 1);
+			break;
+		default:
+		case ELFDATANONE:
+			throw Exception(EIO, "Unsupported ELF data encoding.");
+			break;
+	}
+
+	// get the header values
+	fELFHeaderSize	= GetValue(fileHeader.e_ehsize);
+	fSectionHeaderTableOffset = GetValue(fileHeader.e_shoff);
+	fSectionHeaderSize	= GetValue(fileHeader.e_shentsize);
+	fSectionHeaderCount = GetValue(fileHeader.e_shnum);
+	bool hasSectionHeaderTable = (fSectionHeaderTableOffset != 0);
+
+	// check the sanity of the header values
+	// ELF header size
+	if (fELFHeaderSize < sizeof(EhdrType)) {
+		throw Exception(EIO,
+			"Invalid ELF header: invalid ELF header size: %lu.",
+			fELFHeaderSize);
+	}
+
+	// section header table offset and entry count/size
+	if (hasSectionHeaderTable) {
+		if (fSectionHeaderTableOffset < (off_t)fELFHeaderSize
+			|| fSectionHeaderTableOffset > fFileSize) {
+			throw Exception(EIO, "Invalid ELF header: invalid section "
+							"header table offset: %llu.",
+							fSectionHeaderTableOffset);
+		}
+		size_t sectionHeaderTableSize
+			= fSectionHeaderSize * fSectionHeaderCount;
+		if (fSectionHeaderSize < (off_t)sizeof(ShdrType)
+			|| fSectionHeaderTableOffset + (off_t)sectionHeaderTableSize
+				> fFileSize) {
+			throw Exception(EIO, "Invalid ELF header: section header "
+							"table exceeds file: %llu.",
+							fSectionHeaderTableOffset
+								+ sectionHeaderTableSize);
+		}
+
+
+		// load section header string section
+		uint16_t sectionHeaderStringSectionIndex
+			= GetValue(fileHeader.e_shstrndx);
+		if (sectionHeaderStringSectionIndex != SHN_UNDEF) {
+			if (sectionHeaderStringSectionIndex >= fSectionHeaderCount) {
+				throw Exception(EIO, "Invalid ELF header: invalid section "
+								"header string section index: %u.",
+								sectionHeaderStringSectionIndex);
+			}
+
+			// get the section info
+			SectionInfo info;
+			if (_ReadSectionHeader<ShdrType>(sectionHeaderStringSectionIndex,
+					info)) {
+				fSectionHeaderStrings = new char[info.size + 1];
+				Read(info.offset, fSectionHeaderStrings, info.size,
+					"Failed to read section header string section.");
+				fSectionHeaderStringsLength = info.size;
+				// null-terminate to be on the safe side
+				fSectionHeaderStrings[info.size] = '\0';
+			}
+		}
+	}
+}
+	
+	
+template<typename ShdrType>
+bool ELFObject::_ReadSectionHeader(int index, SectionInfo& info)
+{
+	off_t shOffset = fSectionHeaderTableOffset
+		+ index * fSectionHeaderSize;
+	ShdrType sectionHeader;
+	Read(shOffset, &sectionHeader, sizeof(ShdrType),
+		"Failed to read ELF section header.");
+
+	// get the header values
+	uint32_t type		= GetValue(sectionHeader.sh_type);
+	off_t offset		= GetValue(sectionHeader.sh_offset);
+	size_t size			= GetValue(sectionHeader.sh_size);
+	uint32_t nameIndex	= GetValue(sectionHeader.sh_name);
+
+	// check the values
+	// SHT_NULL marks the header unused,
+	if (type == SHT_NULL)
+		return false;
+
+	// SHT_NOBITS sections take no space in the file
+	if (type != SHT_NOBITS) {
+		if (offset < (off_t)fELFHeaderSize || offset > fFileSize) {
+			throw Exception(EIO, "Invalid ELF section header: "
+							"invalid section offset: %llu.", offset);
+		}
+		off_t sectionEnd = offset + size;
+		if (sectionEnd > fFileSize) {
+			throw Exception(EIO, "Invalid ELF section header: "
+							"section exceeds file: %llu.", sectionEnd);
+		}
+	}
+
+	// get name, if we have a string section
+	if (fSectionHeaderStrings) {
+		if (nameIndex >= (uint32_t)fSectionHeaderStringsLength) {
+			throw Exception(EIO, "Invalid ELF section header: "
+							"invalid name index: %lu.", nameIndex);
+		}
+		info.name = fSectionHeaderStrings + nameIndex;
+	} else {
+		info.name = "";
+	}
+
+	info.type = type;
+	info.offset = offset;
+	info.size = size;
+
+
+	return true;
 }
 
 
