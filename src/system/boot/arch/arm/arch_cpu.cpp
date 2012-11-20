@@ -26,29 +26,31 @@
 #	define TRACE(x) ;
 #endif
 
-/*! check_cpu_features
- *
- * Please note the fact that ARM7 and ARMv7 are two different things ;)
- * ARMx is a specific ARM CPU core instance, while ARMvX refers to the
- * ARM architecture specification version....
- *
- * Most of the architecture versions we're detecting here we will probably
- * never run on, just included for completeness sake... ARMv5 and up are
- * the likely ones for us to support (as they all have some kind of MMU).
- */
-
+/*! Detect ARM core version and features.
+    Please note the fact that ARM7 and ARMv7 are two different things ;)
+    ARMx is a specific ARM CPU core instance, while ARMvX refers to the
+    ARM architecture specification version....
+ 
+    Most of the architecture versions we're detecting here we will probably
+    never run on, just included for completeness sake... ARMv5 and up are
+    the likely ones for us to support (as they all have some kind of MMU).
+*/
 static status_t
 check_cpu_features()
 {
 	uint32 result = 0;
-	int arch, variant = 0, part = 0, revision = 0, implementor = 0;
+	int arch;
+	int variant = 0;
+	int part = 0;
+	int revision = 0;
+	int implementor = 0;
 
 	asm volatile("MRC p15, 0, %[c1out], c0, c0, 0":[c1out] "=r" (result));
 
 	implementor = (result >> 24) & 0xff;
 
 	if (!(result & (1 << 19))) {
-		switch((result >> 12) & 0xf) {
+		switch ((result >> 12) & 0xf) {
 			case 0:	/* early ARMv3 or even older */
 				arch = ARCH_ARM_PRE_ARM7;
 				break;
@@ -84,7 +86,6 @@ check_cpu_features()
 	return B_OK;
 }
 
-//	#pragma mark -
 
 extern "C" void
 arch_spin(bigtime_t microseconds)
