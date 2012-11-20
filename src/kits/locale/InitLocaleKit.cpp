@@ -3,8 +3,6 @@
  * The required mimetypes and attribute-indices are created here.
  */
 
-#include <syslog.h>
-
 #include <fs_attr.h>
 #include <fs_index.h>
 #include <Volume.h>
@@ -35,19 +33,8 @@ static void EnsureIndexExists(const char *attrName)
 	if (volRoster.GetBootVolume(&bootVol) != B_OK)
 		return;
 	struct index_info idxInfo;
-	if (fs_stat_index(bootVol.Device(), attrName, &idxInfo) != 0) {
-		status_t res = fs_create_index(bootVol.Device(), attrName,
-			B_STRING_TYPE, 0);
-		if (res == 0) {
-			log_team(LOG_INFO,
-				"successfully created the required index for attribute %s",
-				attrName);
-		} else {
-			log_team(LOG_ERR,
-				"failed to create the required index for attribute %s (%s)",
-				attrName, strerror(res));
-		}
-	}
+	if (fs_stat_index(bootVol.Device(), attrName, &idxInfo) != 0)
+		fs_create_index(bootVol.Device(), attrName, B_STRING_TYPE, 0);
 }
 
 
@@ -121,10 +108,6 @@ SetupCatalogBasics()
 
 		if (res == B_OK)
 			res = mt.Install();
-	}
-	if (res != B_OK) {
-		log_team(LOG_ERR, "Could not install mimetype %s (%s)",
-			DefaultCatalog::kCatMimeType, strerror(res));
 	}
 }
 

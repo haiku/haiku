@@ -13,7 +13,6 @@
 #include <set>
 
 #include <pthread.h>
-#include <syslog.h>
 
 #include <AppFileInfo.h>
 #include <Application.h>
@@ -91,13 +90,8 @@ CatalogAddOnInfo::MakeSureItsLoaded()
 				B_SYMBOL_TYPE_TEXT, (void**)&fCreateFunc);
 			get_image_symbol(fAddOnImage, "get_available_languages",
 				B_SYMBOL_TYPE_TEXT, (void**)&fLanguagesFunc);
-			log_team(LOG_DEBUG, "catalog-add-on %s has been loaded",
-				fName.String());
-		} else {
-			log_team(LOG_DEBUG, "could not load catalog-add-on %s (%s)",
-				fName.String(), strerror(fAddOnImage));
+		} else
 			return false;
-		}
 	} else if (fIsEmbedded) {
 		// The built-in catalog still has to provide this function
 		fLanguagesFunc = default_catalog_get_available_languages;
@@ -115,8 +109,6 @@ CatalogAddOnInfo::UnloadIfPossible()
 		fInstantiateFunc = NULL;
 		fCreateFunc = NULL;
 		fLanguagesFunc = NULL;
-//		log_team(LOG_DEBUG, "catalog-add-on %s has been unloaded",
-//			fName.String());
 	}
 }
 
@@ -176,7 +168,6 @@ RosterData::~RosterData()
 	BAutolock lock(fLock);
 
 	_CleanupCatalogAddOns();
-	closelog();
 }
 
 
@@ -320,11 +311,6 @@ RosterData::SetFilesystemTranslationPreferred(bool preferred)
 status_t
 RosterData::_Initialize()
 {
-	openlog_team("liblocale.so", LOG_PID, LOG_USER);
-#ifndef DEBUG
-	setlogmask_team(LOG_UPTO(LOG_WARNING));
-#endif
-
 	status_t result = _InitializeCatalogAddOns();
 	if (result != B_OK)
 		return result;
@@ -429,16 +415,8 @@ RosterData::_InitializeCatalogAddOns()
 								priority = *prioPtr;
 								node.WriteAttr(kPriorityAttr, B_INT8_TYPE, 0,
 									&priority, sizeof(int8));
-							} else {
-								log_team(LOG_ERR,
-									"couldn't get priority for add-on %s\n",
-									fullAddOnPath.String());
 							}
 							unload_add_on(image);
-						} else {
-							log_team(LOG_ERR,
-								"couldn't load add-on %s, error: %s\n",
-								fullAddOnPath.String(), strerror(image));
 						}
 					}
 
@@ -793,11 +771,8 @@ MutableLocaleRoster::LoadSystemCatalog(BCatalog* catalog) const
 		}
 	}
 
-	if (!found) {
-		log_team(LOG_DEBUG, "Unable to find libbe-image!");
-
+	if (!found)
 		return B_ERROR;
-	}
 
 	// load the catalog for libbe into the given catalog
 	entry_ref ref;

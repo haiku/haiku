@@ -14,7 +14,6 @@
 #include <set>
 
 #include <assert.h>
-#include <syslog.h>
 
 #include <Autolock.h>
 #include <Bitmap.h>
@@ -521,11 +520,8 @@ BLocaleRoster::GetLocalizedFileName(BString& localizedFileName,
 	// The signature is missing application/
 	signature.Prepend("application/");
 	status = roster.FindApp(signature, &catalogRef);
-	if (status != B_OK) {
-		log_team(LOG_ERR, "Could not find the entry_ref for signature %s"
-				" to load a catalog.", signature.String());
+	if (status != B_OK)
 		return status;
-	}
 
 	BCatalog catalog(catalogRef);
 	const char* temp = catalog.GetString(string, context);
@@ -562,11 +558,8 @@ BLocaleRoster::_GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 		}
 	}
 
-	if (!found) {
-		log_team(LOG_DEBUG, "Catalog %x doesn't belong to any image!",
-			catalog);
+	if (!found)
 		return catalog;
-	}
 
 	// load the catalog for this mimetype and return it to the app
 	entry_ref ref;

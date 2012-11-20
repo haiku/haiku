@@ -6,8 +6,6 @@
 
 #include <Catalog.h>
 
-#include <syslog.h>
-
 #include <Application.h>
 #include <Autolock.h>
 #include <CatalogData.h>
