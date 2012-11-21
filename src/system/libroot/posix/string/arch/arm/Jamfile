@@ -5,6 +5,6 @@ UsePrivateSystemHeaders ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 MergeObject posix_string_arch_$(TARGET_ARCH).o :
-	memcpy.c
+	arch_string.S
 	memset.c
 ;
