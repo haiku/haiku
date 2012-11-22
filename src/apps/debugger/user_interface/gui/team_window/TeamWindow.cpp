@@ -10,7 +10,9 @@
 #include <stdio.h>
 
 #include <Button.h>
+#include <DateTime.h>
 #include <FilePanel.h>
+#include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -215,6 +217,32 @@ void
 TeamWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_GENERATE_DEBUG_REPORT:
+		{
+			try {
+				BPath path;
+				BPath teamPath(fTeam->Name());
+				find_directory(B_DESKTOP_DIRECTORY, &path);
+				BDateTime currentTime;
+				currentTime.SetTime_t(time(NULL));
+				BString filename;
+				filename.SetToFormat("%s-%" B_PRId32 "-debug-%02"
+					B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 "-%02"
+					B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 ".report",
+					teamPath.Leaf(), fTeam->ID(), currentTime.Date().Day(),
+					currentTime.Date().Month(), currentTime.Date().Year(),
+					currentTime.Time().Hour(), currentTime.Time().Minute(),
+					currentTime.Time().Second());
+				path.Append(filename);
+				entry_ref ref;
+				status_t result = get_ref_for_path(path.Path(), &ref);
+				if (result == B_OK)
+					fListener->DebugReportRequested(&ref);
+			} catch (...) {
+				// TODO: notify user
+			}
+			break;
+		}
 		case MSG_SHOW_INSPECTOR_WINDOW:
 		{
 			if (fInspectorWindow) {
@@ -799,6 +827,10 @@ TeamWindow::_Init()
 	item->SetTarget(this);
 	menu = new BMenu("Tools");
 	fMenuBar->AddItem(menu);
+	item = new BMenuItem("Save Debug Report",
+		new BMessage(MSG_GENERATE_DEBUG_REPORT));
+	menu->AddItem(item);
+	item->SetTarget(this);
 	item = new BMenuItem("Inspect Memory",
 		new BMessage(MSG_SHOW_INSPECTOR_WINDOW), 'I');
 	menu->AddItem(item);
