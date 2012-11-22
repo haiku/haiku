@@ -120,8 +120,8 @@ DebugReportGenerator::_DumpLoadedImages(BString& _output)
 			target_addr_t dataBase = info.DataBase();
 
 			data.SetToFormat("\t%s (%" B_PRId32 ", %s) "
-				"Text: 0x%08" B_PRIx64 " - 0x%08" B_PRIx64 ", Data: 0x%08"
-				B_PRIx64 " - 0x%08" B_PRIx64 "\n", info.Name().String(),
+				"Text: %#08" B_PRIx64 " - %#08" B_PRIx64 ", Data: %#08"
+				B_PRIx64 " - %#08" B_PRIx64 "\n", info.Name().String(),
 				info.ImageID(), UiUtils::ImageTypeToString(info.Type(),
 					buffer, sizeof(buffer)), textBase,
 				textBase + info.TextSize(), dataBase,
@@ -183,7 +183,7 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output, Thread* thread)
 	BString data;
 	for (int32 i = 0; StackFrame* frame = trace->FrameAt(i); i++) {
 		char functionName[512];
-		data.SetToFormat("\t\t0x%08" B_PRIx64 "\t0x%08" B_PRIx64 "\t%s\n",
+		data.SetToFormat("\t\t%#08" B_PRIx64 "\t%#08" B_PRIx64 "\t%s\n",
 			frame->FrameAddress(), frame->InstructionPointer(),
 			UiUtils::FunctionNameForFrame(frame, functionName,
 				sizeof(functionName)));

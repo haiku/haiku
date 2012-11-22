@@ -11,9 +11,9 @@
 #include <AutoLocker.h>
 
 #include "CliContext.h"
-#include "FunctionInstance.h"
 #include "StackTrace.h"
 #include "Team.h"
+#include "UiUtils.h"
 
 
 CliStackTraceCommand::CliStackTraceCommand()
@@ -63,24 +63,9 @@ CliStackTraceCommand::Execute(int argc, const char* const* argv,
 		printf("%3" B_PRId32 "  %#" B_PRIx64 "  %#" B_PRIx64, i,
 			(uint64)frame->FrameAddress(), (uint64)frame->InstructionPointer());
 
-		Image* image = frame->GetImage();
-		FunctionInstance* function = frame->Function();
-		if (image == NULL && function == NULL) {
-			printf("  ???\n");
-			continue;
-		}
-
-		BString name;
-		target_addr_t baseAddress;
-		if (function != NULL) {
-			name = function->PrettyName();
-			baseAddress = function->Address();
-		} else {
-			name = image->Name();
-			baseAddress = image->Info().TextBase();
-		}
-
-		printf("  %s + %#" B_PRIx64 "\n", name.String(),
-			uint64(frame->InstructionPointer() - baseAddress));
+		char functionName[512];
+		UiUtils::FunctionNameForFrame(frame, functionName,
+			sizeof(functionName));
+		printf("  %s\n", functionName);
 	}
 }
