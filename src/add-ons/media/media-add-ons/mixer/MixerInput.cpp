@@ -153,7 +153,7 @@ MixerInput::BufferReceived(BBuffer* buffer)
 		start, offset);
 
 	int in_frames = size / bytes_per_frame(fInput.format.u.raw_audio);
-	double frames = double(in_frames * fMixBufferFrameRate)
+	double frames = ((double)in_frames * fMixBufferFrameRate)
 		/ fInput.format.u.raw_audio.frame_rate;
 	int out_frames = int(frames);
 	fFractionalFrames += frames - double(out_frames);
