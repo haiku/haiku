@@ -109,3 +109,28 @@ UiUtils::FunctionNameForFrame(StackFrame* frame, char* buffer,
 
 	return buffer;
 }
+
+
+/*static*/ const char*
+UiUtils::ImageTypeToString(image_type type, char* buffer, size_t bufferSize)
+{
+	switch (type) {
+		case B_APP_IMAGE:
+			snprintf(buffer, bufferSize, "Application");
+			break;
+		case B_LIBRARY_IMAGE:
+			snprintf(buffer, bufferSize, "Library");
+			break;
+		case B_ADD_ON_IMAGE:
+			snprintf(buffer, bufferSize, "Add-on");
+			break;
+		case B_SYSTEM_IMAGE:
+			snprintf(buffer, bufferSize, "System");
+			break;
+		default:
+			snprintf(buffer, bufferSize, "Unknown");
+			break;
+	}
+
+	return buffer;
+}
