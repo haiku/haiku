@@ -26,9 +26,9 @@ class BTextControl;
 namespace BPrivate {
 
 
-class BodyDownloadConfig : public BView {
+class BodyDownloadConfigView : public BView {
 public:
-								BodyDownloadConfig();
+								BodyDownloadConfigView();
 
 			void				SetTo(const BMailProtocolSettings& settings);
 
@@ -96,7 +96,7 @@ private:
 			BMenuField*			fAuthenticationField;
 			BCheckBox*			fLeaveOnServerCheckBox;
 			BCheckBox*			fRemoveFromServerCheckBox;
-			BodyDownloadConfig*	fBodyDownloadConfig;
+			BodyDownloadConfigView* fBodyDownloadConfig;
 };
 
 

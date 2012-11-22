@@ -42,7 +42,7 @@ static const uint32 kMsgNeedPassword = 'some';
 namespace BPrivate {
 
 
-BodyDownloadConfig::BodyDownloadConfig()
+BodyDownloadConfigView::BodyDownloadConfigView()
 	:
 	BView("body_config", 0)
 {
@@ -63,7 +63,7 @@ BodyDownloadConfig::BodyDownloadConfig()
 
 
 void
-BodyDownloadConfig::SetTo(const BMailProtocolSettings& settings)
+BodyDownloadConfigView::SetTo(const BMailProtocolSettings& settings)
 {
 	int32 limit = settings.GetInt32(kPartialDownloadLimit, -1);
 	if (limit < 0) {
@@ -81,7 +81,7 @@ BodyDownloadConfig::SetTo(const BMailProtocolSettings& settings)
 
 
 status_t
-BodyDownloadConfig::SaveInto(BMailAddOnSettings& settings) const
+BodyDownloadConfigView::SaveInto(BMailAddOnSettings& settings) const
 {
 	if (fPartialBox->Value() == B_CONTROL_ON) {
 		settings.SetInt32(kPartialDownloadLimit,
@@ -94,7 +94,7 @@ BodyDownloadConfig::SaveInto(BMailAddOnSettings& settings) const
 
 
 void
-BodyDownloadConfig::MessageReceived(BMessage *msg)
+BodyDownloadConfigView::MessageReceived(BMessage *msg)
 {
 	if (msg->what != 'SIZF')
 		return BView::MessageReceived(msg);
@@ -103,7 +103,7 @@ BodyDownloadConfig::MessageReceived(BMessage *msg)
 
 
 void
-BodyDownloadConfig::AttachedToWindow()
+BodyDownloadConfigView::AttachedToWindow()
 {
 	fPartialBox->SetTarget(this);
 	fPartialBox->ResizeToPreferred();
@@ -166,7 +166,7 @@ MailProtocolConfigView::MailProtocolConfigView(uint32 optionsMask)
 	}
 
 	if ((optionsMask & B_MAIL_PROTOCOL_PARTIAL_DOWNLOAD) != 0) {
-		fBodyDownloadConfig = new BodyDownloadConfig();
+		fBodyDownloadConfig = new BodyDownloadConfigView();
 		layout->AddView(fBodyDownloadConfig, 0, layout->CountRows(), 2);
 	}
 }
