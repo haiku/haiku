@@ -71,7 +71,7 @@ DebugReportGenerator::GenerateReport(const entry_ref& outputPath)
 
 	BString output;
 	result = _GenerateReportHeader(output);
-	if (result != B_OK);
+	if (result != B_OK)
 		return result;
 
 	result = _DumpLoadedImages(output);
