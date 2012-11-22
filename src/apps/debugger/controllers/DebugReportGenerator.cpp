@@ -114,12 +114,18 @@ DebugReportGenerator::_DumpLoadedImages(BString& _output)
 	for (ImageList::ConstIterator it = fTeam->Images().GetIterator();
 		 Image* image = it.Next();) {
 		const ImageInfo& info = image->Info();
+		char buffer[32];
 		try {
-			data.SetToFormat("\t%s, id: %" B_PRId32", type: %" B_PRId32 ", "
-				"Text: 0x%" B_PRIx64 ", %" B_PRIu64 " bytes, Data: 0x%"
-				B_PRIx64 ", %" B_PRIu64 " bytes\n", info.Name().String(),
-				info.ImageID(), info.Type(), info.TextBase(), info.TextSize(),
-				info.DataBase(), info.DataSize());
+			target_addr_t textBase = info.TextBase();
+			target_addr_t dataBase = info.DataBase();
+
+			data.SetToFormat("\t%s (%" B_PRId32 ", %s) "
+				"Text: 0x%08" B_PRIx64 " - 0x%08" B_PRIx64 ", Data: 0x%08"
+				B_PRIx64 " - 0x%08" B_PRIx64 "\n", info.Name().String(),
+				info.ImageID(), UiUtils::ImageTypeToString(info.Type(),
+					buffer, sizeof(buffer)), textBase,
+				textBase + info.TextSize(), dataBase,
+				dataBase + info.DataSize());
 
 			_output << data;
 		} catch (...) {
