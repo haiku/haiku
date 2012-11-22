@@ -15,8 +15,6 @@ public:
 								BMailSettingsView(const char* name);
 	virtual						~BMailSettingsView();
 
-//	virtual BString				DescriptiveName() const = 0;
-
 	virtual status_t			SaveInto(
 									BMailAddOnSettings& settings) const = 0;
 };
