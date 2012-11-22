@@ -193,7 +193,7 @@ private:
 			BSplitView*			fThreadSplitView;
 			InspectorWindow*	fInspectorWindow;
 			GuiTeamUiSettings	fUiSettings;
-			BFilePanel*			fSourceLocatePanel;
+			BFilePanel*			fFilePanel;
 };
 
 

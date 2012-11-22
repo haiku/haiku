@@ -56,6 +56,7 @@ enum {
 
 
 enum {
+	MSG_CHOOSE_DEBUG_REPORT_LOCATION = 'ccrl',
 	MSG_LOCATE_SOURCE_IF_NEEDED = 'lsin'
 };
 
@@ -113,7 +114,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fStepIntoButton(NULL),
 	fStepOutButton(NULL),
 	fInspectorWindow(NULL),
-	fSourceLocatePanel(NULL)
+	fFilePanel(NULL)
 {
 	fTeam->Lock();
 	BString name = fTeam->Name();
@@ -145,7 +146,7 @@ TeamWindow::~TeamWindow()
 	_SetActiveImage(NULL);
 	_SetActiveThread(NULL);
 
-	delete fSourceLocatePanel;
+	delete fFilePanel;
 }
 
 
@@ -217,12 +218,10 @@ void
 TeamWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_GENERATE_DEBUG_REPORT:
+		case MSG_CHOOSE_DEBUG_REPORT_LOCATION:
 		{
 			try {
-				BPath path;
 				BPath teamPath(fTeam->Name());
-				find_directory(B_DESKTOP_DIRECTORY, &path);
 				BDateTime currentTime;
 				currentTime.SetTime_t(time(NULL));
 				BString filename;
@@ -233,13 +232,30 @@ TeamWindow::MessageReceived(BMessage* message)
 					currentTime.Date().Month(), currentTime.Date().Year(),
 					currentTime.Time().Hour(), currentTime.Time().Minute(),
 					currentTime.Time().Second());
-				path.Append(filename);
-				entry_ref ref;
-				status_t result = get_ref_for_path(path.Path(), &ref);
-				if (result == B_OK)
-					fListener->DebugReportRequested(&ref);
+				BMessenger msgr(this);
+				fFilePanel = new BFilePanel(B_SAVE_PANEL, &msgr,
+					NULL, 0, false, new BMessage(MSG_GENERATE_DEBUG_REPORT));
+				fFilePanel->SetSaveText(filename.String());
+				fFilePanel->Show();
 			} catch (...) {
-				// TODO: notify user
+				delete fFilePanel;
+				fFilePanel = NULL;
+			}
+			break;
+		}
+		case MSG_GENERATE_DEBUG_REPORT:
+		{
+			delete fFilePanel;
+			fFilePanel = NULL;
+
+			BPath path;
+			entry_ref ref;
+			if (message->FindRef("directory", &ref) == B_OK
+				&& message->HasString("name")) {
+				path.SetTo(&ref);
+				path.Append(message->FindString("name"));
+				if (get_ref_for_path(path.Path(), &ref) == B_OK)
+					fListener->DebugReportRequested(&ref);
 			}
 			break;
 		}
@@ -312,14 +328,14 @@ TeamWindow::MessageReceived(BMessage* message)
 					->SourceFile() != NULL && fActiveSourceCode != NULL
 				&& fActiveSourceCode->GetSourceFile() == NULL) {
 				try {
-					if (fSourceLocatePanel == NULL) {
-						fSourceLocatePanel = new BFilePanel(B_OPEN_PANEL,
+					if (fFilePanel == NULL) {
+						fFilePanel = new BFilePanel(B_OPEN_PANEL,
 							new BMessenger(this));
 					}
-					fSourceLocatePanel->Show();
+					fFilePanel->Show();
 				} catch (...) {
-					delete fSourceLocatePanel;
-					fSourceLocatePanel = NULL;
+					delete fFilePanel;
+					fFilePanel = NULL;
 				}
 			}
 			break;
@@ -828,7 +844,7 @@ TeamWindow::_Init()
 	menu = new BMenu("Tools");
 	fMenuBar->AddItem(menu);
 	item = new BMenuItem("Save Debug Report",
-		new BMessage(MSG_GENERATE_DEBUG_REPORT));
+		new BMessage(MSG_CHOOSE_DEBUG_REPORT_LOCATION));
 	menu->AddItem(item);
 	item->SetTarget(this);
 	item = new BMenuItem("Inspect Memory",
