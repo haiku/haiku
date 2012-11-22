@@ -14,6 +14,7 @@
 #include <View.h>
 
 #include <MailSettings.h>
+#include <MailSettingsView.h>
 
 
 class BCheckBox;
@@ -29,17 +30,16 @@ class BodyDownloadConfig : public BView {
 public:
 								BodyDownloadConfig();
 
-			void				SetTo(BMailProtocolSettings& settings);
+			void				SetTo(const BMailProtocolSettings& settings);
 
-			void				MessageReceived(BMessage* message);
-			void				AttachedToWindow();
-			void				GetPreferredSize(float* width, float* height);
-			status_t			Archive(BMessage* into, bool deep = true) const;
+			status_t			SaveInto(BMailAddOnSettings& settings) const;
+
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				AttachedToWindow();
 
 private:
-			BTextControl*		fSizeBox;
+			BTextControl*		fSizeControl;
 			BCheckBox*			fPartialBox;
-			BStringView*		fBytesLabel;
 };
 
 
@@ -54,7 +54,7 @@ enum mail_protocol_config_options {
 };
 
 
-class MailProtocolConfigView : public BView {
+class MailProtocolConfigView : public BMailSettingsView {
 public:
 								MailProtocolConfigView(uint32 optionsMask
 										= B_MAIL_PROTOCOL_HAS_FLAVORS
@@ -63,7 +63,7 @@ public:
 											| B_MAIL_PROTOCOL_HAS_HOSTNAME);
 	virtual						~MailProtocolConfigView();
 
-			void				SetTo(BMailProtocolSettings& settings);
+			void				SetTo(const BMailProtocolSettings& settings);
 
 			void				AddFlavor(const char* label);
 			void				AddAuthMethod(const char* label,
@@ -71,7 +71,7 @@ public:
 
 			BGridLayout*		Layout() const;
 
-	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual status_t			SaveInto(BMailAddOnSettings& settings) const;
 
 	virtual	void				AttachedToWindow();
 	virtual void				MessageReceived(BMessage* message);

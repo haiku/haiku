@@ -15,7 +15,9 @@
 
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <GridLayout.h>
+#include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -42,51 +44,52 @@ namespace BPrivate {
 
 BodyDownloadConfig::BodyDownloadConfig()
 	:
-	BView(BRect(0,0,50,50), "body_config", B_FOLLOW_ALL_SIDES, 0)
+	BView("body_config", 0)
 {
-	const char *partial_text = B_TRANSLATE(
-		"Partially download messages larger than");
+	fPartialBox = new BCheckBox("size_if", B_TRANSLATE(
+		"Partially download messages larger than"), new BMessage('SIZF'));
 
-	BRect r(0, 0, 280, 15);
-	fPartialBox = new BCheckBox(r, "size_if", partial_text,
-		new BMessage('SIZF'));
-	fPartialBox->ResizeToPreferred();
+	fSizeControl = new BTextControl("size",
+		B_TRANSLATE_COMMENT("KB", "kilo byte"), "", NULL);
+	fSizeControl->SetExplicitMinSize(BSize(be_plain_font->StringWidth("0000"),
+		B_SIZE_UNSET));
 
-	r = fPartialBox->Frame();
-	r.OffsetBy(17,r.Height() + 1);
-	r.right = r.left + be_plain_font->StringWidth("0000") + 10;
-	fSizeBox = new BTextControl(r, "size", "", "", NULL);
-
-	r.OffsetBy(r.Width() + 5,0);
-	fBytesLabel = new BStringView(r, "kb", B_TRANSLATE("KiB"));
-	AddChild(fBytesLabel);
-	fSizeBox->SetDivider(0);
-
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(fPartialBox);
-	AddChild(fSizeBox);
-	ResizeToPreferred();
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL,
+			be_control_look->DefaultLabelSpacing())
+		.Add(fPartialBox)
+		.Add(fSizeControl->CreateTextViewLayoutItem())
+		.Add(fSizeControl->CreateLabelLayoutItem());
 }
 
 
 void
-BodyDownloadConfig::SetTo(BMailProtocolSettings& settings)
+BodyDownloadConfig::SetTo(const BMailProtocolSettings& settings)
 {
-	int32 limit = 0;
-	if (settings.HasInt32(kPartialDownloadLimit))
-		limit = settings.FindInt32(kPartialDownloadLimit);
+	int32 limit = settings.GetInt32(kPartialDownloadLimit, -1);
 	if (limit < 0) {
 		fPartialBox->SetValue(B_CONTROL_OFF);
-		fSizeBox->SetText("0");
-		fSizeBox->SetEnabled(false);
+		fSizeControl->SetText("0");
+		fSizeControl->SetEnabled(false);
 	} else {
-		limit = int32(limit / 1024);
 		BString kb;
-		kb << limit;
-		fSizeBox->SetText(kb);
+		kb << int32(limit / 1024);
+		fSizeControl->SetText(kb);
 		fPartialBox->SetValue(B_CONTROL_ON);
-		fSizeBox->SetEnabled(true);
+		fSizeControl->SetEnabled(true);
 	}
+}
+
+
+status_t
+BodyDownloadConfig::SaveInto(BMailAddOnSettings& settings) const
+{
+	if (fPartialBox->Value() == B_CONTROL_ON) {
+		settings.SetInt32(kPartialDownloadLimit,
+			atoi(fSizeControl->Text()) * 1024);
+	} else
+		settings.RemoveName(kPartialDownloadLimit);
+
+	return B_OK;
 }
 
 
@@ -95,7 +98,7 @@ BodyDownloadConfig::MessageReceived(BMessage *msg)
 {
 	if (msg->what != 'SIZF')
 		return BView::MessageReceived(msg);
-	fSizeBox->SetEnabled(fPartialBox->Value());
+	fSizeControl->SetEnabled(fPartialBox->Value());
 }
 
 
@@ -107,33 +110,12 @@ BodyDownloadConfig::AttachedToWindow()
 }
 
 
-void
-BodyDownloadConfig::GetPreferredSize(float *width, float *height)
-{
-	*height = fSizeBox->Frame().bottom + 5;
-	*width = 200;
-}
-
-
-status_t
-BodyDownloadConfig::Archive(BMessage* into, bool) const
-{
-	into->RemoveName(kPartialDownloadLimit);
-	if (fPartialBox->Value() == B_CONTROL_ON)
-		into->AddInt32(kPartialDownloadLimit, atoi(fSizeBox->Text()) * 1024);
-	else
-		into->AddInt32(kPartialDownloadLimit, -1);
-
-	return B_OK;
-}
-
-
 // #pragma mark -
 
 
 MailProtocolConfigView::MailProtocolConfigView(uint32 optionsMask)
 	:
-	BView("protocol_config_view", B_WILL_DRAW),
+	BMailSettingsView("protocol_config_view"),
 	fHostControl(NULL),
 	fUserControl(NULL),
 	fPasswordControl(NULL),
@@ -196,7 +178,7 @@ MailProtocolConfigView::~MailProtocolConfigView()
 
 
 void
-MailProtocolConfigView::SetTo(BMailProtocolSettings& settings)
+MailProtocolConfigView::SetTo(const BMailProtocolSettings& settings)
 {
 	BString host = settings.FindString("server");
 	if (settings.HasInt32("port"))
@@ -283,6 +265,56 @@ MailProtocolConfigView::Layout() const
 }
 
 
+status_t
+MailProtocolConfigView::SaveInto(BMailAddOnSettings& settings) const
+{
+	if (fHostControl != NULL) {
+		int32 port = -1;
+		BString hostName = fHostControl->Text();
+		if (hostName.FindFirst(':') > -1) {
+			port = atol(hostName.String() + hostName.FindFirst(':') + 1);
+			hostName.Truncate(hostName.FindFirst(':'));
+		}
+
+		settings.SetString("server", hostName);
+
+		// since there is no need for the port option, remove it here
+		if (port != -1)
+			settings.SetInt32("port", port);
+		else
+			settings.RemoveName("port");
+	} else {
+		settings.RemoveName("server");
+		settings.RemoveName("port");
+	}
+
+	if (fUserControl != NULL)
+		settings.SetString("username", fUserControl->Text());
+	else
+		settings.RemoveName("username");
+
+	// remove old unencrypted passwords
+	settings.RemoveName("password");
+
+	if (fPasswordControl != NULL)
+		set_passwd(&settings, "cpasswd", fPasswordControl->Text());
+	else
+		settings.RemoveName("cpasswd");
+
+	_StoreIndexOfMarked(settings, "flavor", fFlavorField);
+	_StoreIndexOfMarked(settings, "auth_method", fAuthenticationField);
+
+	_StoreCheckBox(settings, "leave_mail_on_server", fLeaveOnServerCheckBox);
+	_StoreCheckBox(settings, "delete_remote_when_local",
+		fRemoveFromServerCheckBox);
+
+	if (fBodyDownloadConfig != NULL)
+		return fBodyDownloadConfig->SaveInto(settings);
+
+	return B_OK;
+}
+
+
 void
 MailProtocolConfigView::AttachedToWindow()
 {
@@ -310,57 +342,6 @@ MailProtocolConfigView::MessageReceived(BMessage* message)
 				message->FindInt32("be:value") == B_CONTROL_ON);
 			break;
 	}
-}
-
-
-status_t
-MailProtocolConfigView::Archive(BMessage* into, bool deep) const
-{
-	if (fHostControl != NULL) {
-		int32 port = -1;
-		BString hostName = fHostControl->Text();
-		if (hostName.FindFirst(':') > -1) {
-			port = atol(hostName.String() + hostName.FindFirst(':') + 1);
-			hostName.Truncate(hostName.FindFirst(':'));
-		}
-
-		if (into->ReplaceString("server", hostName.String()) != B_OK)
-			into->AddString("server", hostName.String());
-
-		// since there is no need for the port option, remove it here
-		into->RemoveName("port");
-		if (port != -1)
-			into->AddInt32("port", port);
-	} else {
-		into->RemoveName("server");
-		into->RemoveName("port");
-	}
-
-	if (fUserControl != NULL) {
-		if (into->ReplaceString("username", fUserControl->Text()) != B_OK)
-			into->AddString("username", fUserControl->Text());
-	} else
-		into->RemoveName("username");
-
-	// remove old unencrypted passwords
-	into->RemoveName("password");
-
-	if (fPasswordControl != NULL)
-		set_passwd(into, "cpasswd", fPasswordControl->Text());
-	else
-		into->RemoveName("cpasswd");
-
-	_StoreIndexOfMarked(*into, "flavor", fFlavorField);
-	_StoreIndexOfMarked(*into, "auth_method", fAuthenticationField);
-
-	_StoreCheckBox(*into, "leave_mail_on_server", fLeaveOnServerCheckBox);
-	_StoreCheckBox(*into, "delete_remote_when_local",
-		fRemoveFromServerCheckBox);
-
-	if (fBodyDownloadConfig != NULL)
-		return fBodyDownloadConfig->Archive(into, deep);
-
-	return B_OK;
 }
 
 
@@ -399,8 +380,7 @@ MailProtocolConfigView::_StoreIndexOfMarked(BMessage& message, const char* name,
 		if (item != NULL)
 			index = field->Menu()->IndexOf(item);
 	}
-	if (message.ReplaceInt32(name, index) != B_OK)
-		message.AddInt32(name, index);
+	message.SetInt32(name, index);
 }
 
 
@@ -409,10 +389,9 @@ MailProtocolConfigView::_StoreCheckBox(BMessage& message, const char* name,
 	BCheckBox* checkBox) const
 {
 	bool value = checkBox != NULL && checkBox->Value() == B_CONTROL_ON;
-	if (value) {
-		if (message.ReplaceBool(name, value) != B_OK)
-			message.AddBool(name, value);
-	} else
+	if (value)
+		message.SetBool(name, value);
+	else
 		message.RemoveName(name);
 }
 

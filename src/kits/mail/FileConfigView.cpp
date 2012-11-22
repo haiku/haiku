@@ -16,6 +16,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <GroupLayout.h>
+#include <MailSettingsView.h>
 #include <Message.h>
 #include <Path.h>
 #include <String.h>
@@ -146,14 +147,10 @@ MailFileConfigView::SetTo(const BMessage* archive, BMessage* meta)
 
 
 status_t
-MailFileConfigView::Archive(BMessage* into, bool /*deep*/) const
+MailFileConfigView::SaveInto(BMailAddOnSettings& settings) const
 {
-	BMessage* archive = fUseMeta ? fMeta : into;
-
-	if (archive->ReplaceString(fName, Text()) != B_OK)
-		archive->AddString(fName, Text());
-
-	return B_OK;
+	BMessage* archive = fUseMeta ? fMeta : &settings;
+	return archive->SetString(fName, Text());
 }
 
 

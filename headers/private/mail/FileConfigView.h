@@ -12,8 +12,9 @@
 #include <FilePanel.h>
 
 
-class BTextControl;
 class BButton;
+class BMailAddOnSettings;
+class BTextControl;
 
 
 namespace BPrivate {
@@ -53,7 +54,7 @@ public:
 
 			void				SetTo(const BMessage* archive,
 									BMessage* metadata);
-	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+			status_t			SaveInto(BMailAddOnSettings& settings) const;
 
 private:
 			BMessage*			fMeta;

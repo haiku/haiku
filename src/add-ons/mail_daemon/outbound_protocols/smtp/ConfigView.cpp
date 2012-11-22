@@ -11,6 +11,7 @@
 #include <GridLayout.h>
 #include <MailFilter.h>
 #include <MenuField.h>
+#include <SpaceLayoutItem.h>
 #include <TextControl.h>
 
 #include <FileConfigView.h>
@@ -27,17 +28,17 @@ using namespace BPrivate;
 
 class SMTPConfigView : public MailProtocolConfigView {
 public:
-								SMTPConfigView(BMailAccountSettings& settings);
+								SMTPConfigView(
+									const BMailAccountSettings& settings);
 
-			status_t			Archive(BMessage* into,
-									bool deep = true) const;
+	virtual status_t			SaveInto(BMailAddOnSettings& settings) const;
 
 private:
 			MailFileConfigView*	fFileView;
 };
 
 
-SMTPConfigView::SMTPConfigView(BMailAccountSettings& settings)
+SMTPConfigView::SMTPConfigView(const BMailAccountSettings& settings)
 	:
 	MailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS
 		| B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_PASSWORD
@@ -72,22 +73,28 @@ SMTPConfigView::SMTPConfigView(BMailAccountSettings& settings)
 
 	Layout()->AddView(fFileView, 0, Layout()->CountRows(),
 		Layout()->CountColumns());
+	Layout()->AddItem(BSpaceLayoutItem::CreateGlue(), 0, Layout()->CountRows());
+	Layout()->SetRowWeight(Layout()->CountRows() - 1, 1.0f);
 }
 
 
 status_t
-SMTPConfigView::Archive(BMessage* into, bool deep) const
+SMTPConfigView::SaveInto(BMailAddOnSettings& settings) const
 {
-	fFileView->Archive(into, deep);
-	return MailProtocolConfigView::Archive(into, deep);
+	status_t status = fFileView->SaveInto(settings);
+	if (status != B_OK)
+		return status;
+
+	return MailProtocolConfigView::SaveInto(settings);
 }
 
 
 // #pragma mark -
 
 
-BView*
-instantiate_protocol_config_panel(BMailAccountSettings& settings)
+BMailSettingsView*
+instantiate_protocol_settings_view(const BMailAccountSettings& accountSettings,
+	const BMailProtocolSettings& settings)
 {
-	return new SMTPConfigView(settings);
+	return new SMTPConfigView(accountSettings);
 }

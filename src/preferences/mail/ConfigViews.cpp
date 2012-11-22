@@ -185,10 +185,10 @@ ProtocolSettingsView::_CreateSettingsView(const entry_ref& ref,
 	if (image < 0)
 		return image;
 
-	if (get_image_symbol(image, "instantiate_protocol_config_panel",
+	if (get_image_symbol(image, "instantiate_protocol_settings_view",
 			B_SYMBOL_TYPE_TEXT, (void**)&instantiateConfig) != B_OK) {
 		unload_add_on(image);
-		return B_BAD_VALUE;
+		return B_MISSING_SYMBOL;
 	}
 
 	fImage = image;
