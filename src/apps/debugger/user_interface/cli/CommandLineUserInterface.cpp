@@ -282,12 +282,12 @@ CommandLineUserInterface::_RegisterCommands()
 		_RegisterCommand("continue", new(std::nothrow) CliContinueCommand) &&
 		_RegisterCommand("help", new(std::nothrow) HelpCommand(this)) &&
 		_RegisterCommand("quit", new(std::nothrow) CliQuitCommand) &&
+		_RegisterCommand("save-report",
+			new(std::nothrow) CliDebugReportCommand) &&
 		_RegisterCommand("sc", stackTraceCommandReference2.Detach()) &&
 		_RegisterCommand("stop", new(std::nothrow) CliStopCommand) &&
 		_RegisterCommand("thread", new(std::nothrow) CliThreadCommand) &&
-		_RegisterCommand("threads", new(std::nothrow) CliThreadsCommand) &&
-		_RegisterCommand("save-report",
-			new(std::nothrow) CliDebugReportCommand)) {
+		_RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)) {
 		return B_OK;
 	}
 
