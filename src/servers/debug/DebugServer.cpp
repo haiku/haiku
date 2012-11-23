@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
@@ -32,6 +32,13 @@
 #include <StringList.h>
 
 #include <util/DoublyLinkedList.h>
+
+
+enum {
+	kActionKillTeam,
+	kActionDebugTeam,
+	kActionSaveReportTeam
+};
 
 
 #define HANDOVER_USE_GDB 1
@@ -118,11 +125,11 @@ public:
 private:
 	status_t _PopMessage(DebugMessage *&message);
 
-	thread_id _EnterDebugger();
+	thread_id _EnterDebugger(bool saveReport);
 	status_t _SetupGDBArguments(BStringList &arguments, bool usingConsoled);
 	void _KillTeam();
 
-	bool _HandleMessage(DebugMessage *message);
+	int32 _HandleMessage(DebugMessage *message);
 
 	void _LookupSymbolAddress(debug_symbol_lookup_context *lookupContext,
 		const void *address, char *buffer, int32 bufferSize);
@@ -512,7 +519,7 @@ TeamDebugHandler::_SetupGDBArguments(BStringList &arguments, bool usingConsoled)
 
 
 thread_id
-TeamDebugHandler::_EnterDebugger()
+TeamDebugHandler::_EnterDebugger(bool saveReport)
 {
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): team %" B_PRId32
 		"\n", fTeam));
@@ -575,6 +582,10 @@ TeamDebugHandler::_EnterDebugger()
 
 		BString debuggerParam;
 		debuggerParam.SetToFormat("%" B_PRId32, fTeam);
+		if (saveReport) {
+			if (!arguments.Add("--save-report"))
+				return B_NO_MEMORY;
+		}
 		if (!arguments.Add("--team") || !arguments.Add(debuggerParam))
 			return B_NO_MEMORY;
 
@@ -610,7 +621,7 @@ TeamDebugHandler::_KillTeam()
 }
 
 
-bool
+int32
 TeamDebugHandler::_HandleMessage(DebugMessage *message)
 {
 	// This method is called only for the first message the debugger gets for
@@ -669,12 +680,12 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 
 	_PrintStackTrace(thread);
 
-	bool kill = true;
+	int32 debugAction = kActionKillTeam;
 
 	// ask the user whether to debug or kill the team
 	if (_IsGUIServer()) {
 		// App server, input server, or registrar. We always debug those.
-		kill = false;
+		debugAction = kActionDebugTeam;
 	} else if (USE_GUI && _AreGUIServersAlive() && _InitGUI() == B_OK) {
 		// normal app -- tell the user
 		_NotifyAppServer(fTeam);
@@ -688,16 +699,24 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 
 		// TODO: It would be nice if the alert would go away automatically
 		// if someone else kills our teams.
+#ifdef HANDOVER_USE_DEBUGGER
 		BAlert *alert = new BAlert(NULL, buffer.String(),
-			B_TRANSLATE("Debug"), B_TRANSLATE("OK"), NULL,
+			B_TRANSLATE("Terminate"), B_TRANSLATE("Debug"),
+			B_TRANSLATE("Save Report"), B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		debugAction = alert->Go();
+		_NotifyRegistrar(fTeam, false, debugAction != kActionKillTeam);
+#else
+		BAlert *alert = new BAlert(NULL, buffer.String(),
+			B_TRANSLATE("Kill"), B_TRANSLATE("Debug"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		int32 result = alert->Go();
-		kill = (result == 1);
-		_NotifyRegistrar(fTeam, false, !kill);
+		debugAction = alert->Go();
+		_NotifyRegistrar(fTeam, false, debugAction != kActionKillTeam);
+#endif
 	}
 
-	return kill;
+	return debugAction;
 }
 
 
@@ -858,26 +877,26 @@ TeamDebugHandler::_HandlerThread()
 
 	DebugMessage *message;
 	status_t error = _PopMessage(message);
-	bool kill;
+	int32 debugAction = kActionKillTeam;
 	if (error == B_OK) {
 		// handle the message
-		kill = _HandleMessage(message);
+		debugAction = _HandleMessage(message);
 		delete message;
 	} else {
 		debug_printf("TeamDebugHandler::_HandlerThread(): Failed to pop "
 			"initial message: %s", strerror(error));
-		kill = true;
 	}
 
 	bool isGuiServer = _IsGUIServer();
 
 	// kill the team or hand it over to the debugger
 	thread_id debuggerThread = -1;
-	if (kill) {
+	if (debugAction == kActionKillTeam) {
 		// The team shall be killed. Since that is also the handling in case
 		// an error occurs while handing over the team to the debugger, we do
 		// nothing here.
-	} else if ((debuggerThread = _EnterDebugger()) >= 0) {
+	} else if ((debuggerThread = _EnterDebugger(
+			debugAction == kActionSaveReportTeam)) >= 0) {
 		// wait for the "handed over" or a "team deleted" message
 		bool terminate = false;
 		do {
@@ -885,7 +904,7 @@ TeamDebugHandler::_HandlerThread()
 			if (error != B_OK) {
 				debug_printf("TeamDebugHandler::_HandlerThread(): Failed to "
 					"pop message: %s", strerror(error));
-				kill = true;
+				debugAction = kActionKillTeam;
 				break;
 			}
 
@@ -907,7 +926,7 @@ TeamDebugHandler::_HandlerThread()
 					debug_printf("debug_server: The debugger for team %"
 						B_PRId32 " seems to be gone.", fTeam);
 
-					kill = true;
+					debugAction = kActionKillTeam;
 					terminate = true;
 				}
 			}
@@ -915,9 +934,9 @@ TeamDebugHandler::_HandlerThread()
 			delete message;
 		} while (!terminate);
 	} else
-		kill = true;
+		debugAction = kActionKillTeam;
 
-	if (kill) {
+	if (debugAction == kActionKillTeam) {
 		// kill the team
 		_KillTeam();
 	}
