@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -17,6 +17,7 @@
 
 #include "CliContext.h"
 #include "CliContinueCommand.h"
+#include "CliDebugReportCommand.h"
 #include "CliQuitCommand.h"
 #include "CliStackTraceCommand.h"
 #include "CliStopCommand.h"
@@ -284,7 +285,9 @@ CommandLineUserInterface::_RegisterCommands()
 		_RegisterCommand("sc", stackTraceCommandReference2.Detach()) &&
 		_RegisterCommand("stop", new(std::nothrow) CliStopCommand) &&
 		_RegisterCommand("thread", new(std::nothrow) CliThreadCommand) &&
-		_RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)) {
+		_RegisterCommand("threads", new(std::nothrow) CliThreadsCommand) &&
+		_RegisterCommand("save-report",
+			new(std::nothrow) CliDebugReportCommand)) {
 		return B_OK;
 	}
 
