@@ -126,10 +126,11 @@ TTimeWindow::_InitWindow()
 	fRevertButton->SetExplicitAlignment(
 		BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 5)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.Add(fBaseView)
 		.Add(fRevertButton)
-		.SetInsets(5, 5, 5, 5);
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 
