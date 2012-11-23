@@ -6,8 +6,12 @@
 
 #include "DebugReportGenerator.h"
 
+#include <cpu_type.h>
+#include <system_revision.h>
+
 #include <AutoLocker.h>
 #include <File.h>
+#include <StringForSize.h>
 
 #include "Architecture.h"
 #include "CpuState.h"
@@ -98,6 +102,29 @@ DebugReportGenerator::_GenerateReportHeader(BString& _output)
 	BString data;
 	data.SetToFormat("Debug information for team %s (%" B_PRId32 "):\n",
 		fTeam->Name(), fTeam->ID());
+	_output << data;
+
+	// TODO: this information should probably be requested via the debugger
+	// interface, since e.g. in the case of a remote team, the report should
+	// include data about the target, not the debugging host
+	system_info info;
+	if (get_system_info(&info) == B_OK) {
+		data.SetToFormat("CPU(s): %" B_PRId32 "x %s %s\n",
+			info.cpu_count, get_cpu_vendor_string(info.cpu_type),
+			get_cpu_model_string(&info));
+		_output << data;
+		char maxSize[32];
+		char usedSize[32];
+
+		data.SetToFormat("Memory: %s total, %s used\n",
+			BPrivate::string_for_size((int64)info.max_pages * B_PAGE_SIZE,
+				maxSize, sizeof(maxSize)),
+			BPrivate::string_for_size((int64)info.used_pages * B_PAGE_SIZE,
+				usedSize, sizeof(usedSize)));
+		_output << data;
+	}
+
+	data.SetToFormat("Haiku revision: %s\n", __get_haiku_revision());
 	_output << data;
 
 	return B_OK;
