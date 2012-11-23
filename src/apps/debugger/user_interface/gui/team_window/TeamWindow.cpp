@@ -10,7 +10,6 @@
 #include <stdio.h>
 
 #include <Button.h>
-#include <DateTime.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
 #include <LayoutBuilder.h>
@@ -44,6 +43,7 @@
 #include "StackTraceView.h"
 #include "Tracing.h"
 #include "TypeComponentPath.h"
+#include "UiUtils.h"
 #include "UserInterface.h"
 #include "Variable.h"
 #include "WatchPromptWindow.h"
@@ -221,21 +221,12 @@ TeamWindow::MessageReceived(BMessage* message)
 		case MSG_CHOOSE_DEBUG_REPORT_LOCATION:
 		{
 			try {
-				BPath teamPath(fTeam->Name());
-				BDateTime currentTime;
-				currentTime.SetTime_t(time(NULL));
-				BString filename;
-				filename.SetToFormat("%s-%" B_PRId32 "-debug-%02"
-					B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 "-%02"
-					B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 ".report",
-					teamPath.Leaf(), fTeam->ID(), currentTime.Date().Day(),
-					currentTime.Date().Month(), currentTime.Date().Year(),
-					currentTime.Time().Hour(), currentTime.Time().Minute(),
-					currentTime.Time().Second());
+				char filename[B_FILE_NAME_LENGTH];
+				UiUtils::ReportNameForTeam(fTeam, filename, sizeof(filename));
 				BMessenger msgr(this);
 				fFilePanel = new BFilePanel(B_SAVE_PANEL, &msgr,
 					NULL, 0, false, new BMessage(MSG_GENERATE_DEBUG_REPORT));
-				fFilePanel->SetSaveText(filename.String());
+				fFilePanel->SetSaveText(filename);
 				fFilePanel->Show();
 			} catch (...) {
 				delete fFilePanel;
