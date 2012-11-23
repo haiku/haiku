@@ -35,6 +35,6 @@ system_time(void)
 {
 	uint64 timeBase = __arm_get_time_base();
 
-	uint32 cv = *sConversionFactor;
+	uint32 cv = sConversionFactor ? *sConversionFactor : 0;
 	return (timeBase >> 32) * cv + (((timeBase & 0xffffffff) * cv) >> 32);
 }

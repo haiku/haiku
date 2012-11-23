@@ -69,7 +69,7 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 HAIKU_ICU_GCC_2_PACKAGE = icu-4.8.1.1-r1a4-x86-gcc2-2012-08-29.zip ;
 HAIKU_ICU_GCC_4_PACKAGE = icu-4.8.1.1-r1a4-x86-gcc4-2012-08-29.zip ;
 HAIKU_ICU_PPC_PACKAGE = icu-4.8.1-ppc-2011-08-20.zip ;
-HAIKU_ICU_ARM_PACKAGE = icu-4.8.1.1-arm-2012-11-16.zip ;
+HAIKU_ICU_ARM_PACKAGE = icu-4.8.1.1-arm-2012-11-21.zip ;
 HAIKU_ICU_X86_64_PACKAGE = icu-4.8.1.1-x86_64-2012-07-30.zip ;
 
 if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = arm || $(TARGET_ARCH) = x86_64 {
@@ -79,7 +79,7 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = arm || $(TAR
 		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1-ppc-2011-12-19.zip ;
 	} else if $(TARGET_ARCH) = arm {
 		icu_package = $(HAIKU_ICU_ARM_PACKAGE) ;
-		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-arm-2012-11-16.zip ;
+		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-arm-2012-11-21.zip ;
 	} else if $(TARGET_ARCH) = x86_64 {
 		icu_package = $(HAIKU_ICU_X86_64_PACKAGE) ;
 		HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.8.1.1-x86_64-2012-07-30.zip ;
@@ -408,8 +408,10 @@ if $(TARGET_ARCH) = x86 {
 
 # Freetype
 local freetypeBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
-	if $(TARGET_ARCH) = ppc {
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+	if $(TARGET_ARCH) = arm {
+		HAIKU_FREETYPE_FILE = freetype-2.4.9-arm-2012-11-21.zip ;
+	} else if $(TARGET_ARCH) = ppc {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-ppc-gcc4-2012-06-26.zip ;
 	} else if $(TARGET_ARCH) = x86_64 {
 		HAIKU_FREETYPE_FILE = freetype-2.4.9-x86_64-2012-08-04.zip ;
@@ -538,8 +540,10 @@ if $(HAIKU_BUILD_FEATURE_WEBKIT) {
 
 # libpng
 local libpngBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
-	if $(TARGET_ARCH) = ppc {
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+	if $(TARGET_ARCH) = arm {
+		HAIKU_LIBPNG_FILE = libpng-1.5.12-arm-2012-11-21.zip ;
+	} else if $(TARGET_ARCH) = ppc {
 		HAIKU_LIBPNG_FILE = libpng-1.5.12-ppc-gcc4-2012-08-27.zip ;
 	} else if $(TARGET_ARCH) = x86_64 {
 		HAIKU_LIBPNG_FILE = libpng-1.5.12-x86_64-2012-11-18.zip ;
@@ -580,8 +584,10 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 
 # jpeg
 local jpegBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
-	if $(TARGET_ARCH) = ppc {
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+	if $(TARGET_ARCH) = arm {
+		HAIKU_JPEG_FILE = jpeg-8d-arm-2012-11-21.zip ;
+	} else if $(TARGET_ARCH) = ppc {
 		HAIKU_JPEG_FILE = jpeg-8d-ppc-gcc4-2012-08-27.zip ;
 	} else if $(TARGET_ARCH) = x86_64 {
 		HAIKU_JPEG_FILE = jpeg-8d-x86_64-2012-11-18.zip ;
@@ -622,8 +628,10 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 
 # zlib
 local zlibBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
-	if $(TARGET_ARCH) = ppc {
+if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+	if $(TARGET_ARCH) = arm {
+		HAIKU_ZLIB_FILE = zlib-1.2.7-arm-2012-11-21.zip ;
+	} else if $(TARGET_ARCH) = ppc {
 		HAIKU_ZLIB_FILE = zlib-1.2.7-ppc-gcc4-2012-10-30.zip ;
 	} else if $(TARGET_ARCH) = x86_64 {
 		HAIKU_ZLIB_FILE = zlib-1.2.7-x86_64-2012-11-18.zip ;

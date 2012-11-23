@@ -869,11 +869,20 @@ hda_hw_init(hda_controller* controller)
 		controller->pci_info.device, controller->pci_info.function,
 		PCI_command, 2);
 	if (!(cmd & PCI_command_master)) {
-		(gPci->write_pci_config)(controller->pci_info.bus,
-			controller->pci_info.device, controller->pci_info.function,
-				PCI_command, 2, cmd | PCI_command_master);
 		dprintf("hda: enabling PCI bus mastering\n");
+		cmd |= PCI_command_master;
 	}
+	if (!(cmd & PCI_command_memory)) {
+		dprintf("hda: enabling PCI memory access\n");
+		cmd |= PCI_command_memory;
+	}
+	if ((cmd & PCI_command_int_disable)) {
+		dprintf("hda: enabling PCI interrupts\n");
+		cmd &= ~PCI_command_int_disable;
+	}
+	(gPci->write_pci_config)(controller->pci_info.bus,
+		controller->pci_info.device, controller->pci_info.function,
+			PCI_command, 2, cmd);
 
 	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
 			!= B_OK)

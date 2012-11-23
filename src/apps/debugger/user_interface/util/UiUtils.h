@@ -7,11 +7,12 @@
 
 #include <size_t.h>
 
-
-class StackFrame;
+#include <image.h>
 
 
 class BVariant;
+class StackFrame;
+class Team;
 
 
 class UiUtils {
@@ -22,6 +23,11 @@ public:
 	static	const char*			VariantToString(const BVariant& value,
 									char* buffer, size_t bufferSize);
 	static	const char*			FunctionNameForFrame(StackFrame* frame,
+									char* buffer, size_t bufferSize);
+	static	const char*			ImageTypeToString(image_type type,
+									char* buffer, size_t bufferSize);
+
+	static	const char*			ReportNameForTeam(::Team* team,
 									char* buffer, size_t bufferSize);
 };
 

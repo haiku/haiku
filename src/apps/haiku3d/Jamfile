@@ -1,4 +1,5 @@
 SubDir HAIKU_TOP src apps haiku3d ;
+SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mesh ] ;

@@ -56,7 +56,7 @@ typedef struct {
 #define DUALHEAD_BITS (3<<6)
 #define DUALHEAD_CAPABLE (1<<8)
 #define TV_BITS (3<<9)
-#define TV_MON (0<<9
+#define TV_MON (0<<9)
 #define TV_PAL (1<<9)
 #define TV_NTSC (2<<9)
 #define TV_CAPABLE (1<<11)

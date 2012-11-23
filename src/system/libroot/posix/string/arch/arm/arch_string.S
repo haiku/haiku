@@ -5,7 +5,6 @@
 
 #include <asm_defs.h>
 
-//#warning M68K: optimize memcpy
 #if 1
 
 /* that should be enough for now */

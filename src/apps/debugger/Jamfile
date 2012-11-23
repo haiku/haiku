@@ -192,6 +192,7 @@ Application Debugger :
 	CliCommand.cpp
 	CliContext.cpp
 	CliContinueCommand.cpp
+	CliDebugReportCommand.cpp
 	CliStackTraceCommand.cpp
 	CliStopCommand.cpp
 	CliThreadCommand.cpp

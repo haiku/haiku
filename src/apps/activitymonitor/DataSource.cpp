@@ -949,7 +949,7 @@ CPUUsageDataSource::_SetCPU(int32 cpu)
 
 	fLabel << " " << B_TRANSLATE("usage");
 
-	const rgb_color kColors[B_MAX_CPU_COUNT] = {
+	const rgb_color kColors[] = {
 		// TODO: find some better defaults...
 		{200, 0, 200},
 		{0, 200, 200},

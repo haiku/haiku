@@ -7,15 +7,16 @@
  */
 
 
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+
 #include <drivers/device_manager.h>
 #include <drivers/KernelExport.h>
 #include <drivers/Drivers.h>
 #include <kernel/OS.h>
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
 
 //#define TRACE_NORFLASH
 #ifdef TRACE_NORFLASH
@@ -24,10 +25,13 @@
 #define TRACE(x...)
 #endif
 
+
 #define NORFLASH_DEVICE_MODULE_NAME	"drivers/disk/norflash/device_v1"
 #define NORFLASH_DRIVER_MODULE_NAME	"drivers/disk/norflash/driver_v1"
 
+
 #define NORFLASH_ADDR	0x00000000
+
 
 struct nor_driver_info {
 	device_node *node;
@@ -38,42 +42,15 @@ struct nor_driver_info {
 	void *mapped;
 };
 
-static device_manager_info* sDeviceManager;
 
-static const char *sTabTab = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
-#define DS "%.*s"
-#define DA depth - 1, sTabTab
-
-static void
-dump_hex(const char *data, int32 len, int depth = 1)
-{
-	char str[128];
-	char astr[32];
-	char *p;
-	int l;
-	int i;
-
-	for (i = 0; i < len; ) {
-		p = str;
-		l = sizeof(str);
-		for (; i < len && (p == str || (i % 16 != 0)); i++) {
-			snprintf(p, l - 1, "%02x ", data[i]);
-			l -= strlen(p);
-			p += strlen(p);
-			astr[i % 16] = isprint(data[i]) ? data[i] : '.';
-			astr[i % 16] = isprint(data[i]) ? data[i] : '.';
-			astr[(i % 16) + 1] = '\0';
-		}
-		dprintf(DS"    %-48.48s	%s\n", DA, str, astr);
-	}
-}
+static device_manager_info *sDeviceManager;
 
 
 static status_t
-nor_init_device(void* _info, void** _cookie)
+nor_init_device(void *_info, void **_cookie)
 {
 	TRACE("init_device\n");
-	nor_driver_info* info = (nor_driver_info*)_info;
+	nor_driver_info *info = (nor_driver_info*)_info;
 
 	info->mapped = NULL;
 	info->blocksize = 128 * 1024;
@@ -89,10 +66,10 @@ nor_init_device(void* _info, void** _cookie)
 
 
 static void
-nor_uninit_device(void* _cookie)
+nor_uninit_device(void *_cookie)
 {
 	TRACE("uninit_device\n");
-	nor_driver_info* info = (nor_driver_info*)_cookie;
+	nor_driver_info *info = (nor_driver_info*)_cookie;
 	if (info)
 		delete_area(info->id);	
 }
@@ -100,7 +77,7 @@ nor_uninit_device(void* _cookie)
 
 static status_t
 nor_open(void *deviceCookie, const char *path, int openMode,
-                                        void **_cookie)
+	void **_cookie)
 {
 	TRACE("open(%s)\n", path);
 	*_cookie = deviceCookie;
@@ -127,11 +104,11 @@ nor_free(void *_cookie)
 static status_t
 nor_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
-	nor_driver_info* info = (nor_driver_info*)cookie;
+	nor_driver_info *info = (nor_driver_info*)cookie;
 	TRACE("ioctl(%ld,%lu)\n", op, length);
 
-	switch(op) {
-	case B_GET_GEOMETRY:
+	switch (op) {
+		case B_GET_GEOMETRY:
 		{
 			device_geometry *deviceGeometry = (device_geometry*)buffer;
 			deviceGeometry->removable = false;
@@ -146,9 +123,10 @@ nor_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			return B_OK;
 		}
 		break;
-	case B_GET_DEVICE_NAME:
-		strlcpy((char*)buffer, "NORFlash", length);
-		break;
+
+		case B_GET_DEVICE_NAME:
+			strlcpy((char*)buffer, "NORFlash", length);
+			break;
 	}
 
 	return B_ERROR;
@@ -158,17 +136,13 @@ nor_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 static status_t
 nor_read(void *_cookie, off_t position, void *data, size_t *numbytes)
 {
-	nor_driver_info* info = (nor_driver_info*)_cookie;
+	nor_driver_info *info = (nor_driver_info*)_cookie;
 	TRACE("read(%Ld,%lu)\n", position, *numbytes);
 
 	if (position + *numbytes > info->totalsize)
 		*numbytes = info->totalsize - (position + *numbytes);
 
 	memcpy(data, info->mapped + position, *numbytes);
-
-#ifdef TRACE_NORFLASH
-	dump_hex((const char*)(info->mapped + position), *numbytes, 1);
-#endif
 
 	return B_OK;
 }
@@ -210,7 +184,7 @@ nor_init_driver(device_node *node, void **cookie)
 {
 	TRACE("init_driver\n");
 
-	nor_driver_info* info = (nor_driver_info*)malloc(sizeof(nor_driver_info));
+	nor_driver_info *info = (nor_driver_info*)malloc(sizeof(nor_driver_info));
 	if (info == NULL)
 		return B_NO_MEMORY;
 
@@ -227,16 +201,16 @@ static void
 nor_uninit_driver(void *_cookie)
 {
 	TRACE("uninit_driver\n");
-	nor_driver_info* info = (nor_driver_info*)_cookie;
+	nor_driver_info *info = (nor_driver_info*)_cookie;
 	free(info);
 }
 
 
 static status_t
-nor_register_child_devices(void* _cookie)
+nor_register_child_devices(void *_cookie)
 {
 	TRACE("register_child_devices\n");
-	nor_driver_info* info = (nor_driver_info*)_cookie;
+	nor_driver_info *info = (nor_driver_info*)_cookie;
 	status_t status;
 
 	status = sDeviceManager->publish_device(info->node, "disk/nor/0/raw",
@@ -244,6 +218,7 @@ nor_register_child_devices(void* _cookie)
 
 	return status;
 }
+
 
 struct device_module_info sNORFlashDiskDevice = {
 	{
@@ -286,12 +261,14 @@ struct driver_module_info sNORFlashDiskDriver = {
 	NULL,	// removed
 };
 
+
 module_dependency module_dependencies[] = {
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager },
 	{ }
 };
 
-module_info* modules[] = {
+
+module_info *modules[] = {
 	(module_info*)&sNORFlashDiskDriver,
 	(module_info*)&sNORFlashDiskDevice,
 	NULL

@@ -46,8 +46,8 @@
 #define	MJUM9BYTES		(9 * 1024)
 #define	MJUM16BYTES		(16 * 1024)
 
-#define ALIGN_BYTES		(sizeof(int) - 1)
-#define ALIGN(x)		((((unsigned)x) + ALIGN_BYTES) & ~ALIGN_BYTES)
+#define ALIGN_BYTES		(sizeof(unsigned long) - 1)
+#define ALIGN(x)		((((unsigned long)x) + ALIGN_BYTES) & ~ALIGN_BYTES)
 
 /* Macros for counting and rounding. */
 #ifndef howmany

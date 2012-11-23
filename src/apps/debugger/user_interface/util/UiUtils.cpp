@@ -1,5 +1,6 @@
 /*
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,11 +9,14 @@
 
 #include <stdio.h>
 
+#include <DateTime.h>
+#include <Path.h>
 #include <Variant.h>
 
 #include "FunctionInstance.h"
 #include "Image.h"
 #include "StackFrame.h"
+#include "Team.h"
 #include "Thread.h"
 
 
@@ -108,4 +112,47 @@ UiUtils::FunctionNameForFrame(StackFrame* frame, char* buffer,
 		name.String(), frame->InstructionPointer() - baseAddress);
 
 	return buffer;
+}
+
+
+/*static*/ const char*
+UiUtils::ImageTypeToString(image_type type, char* buffer, size_t bufferSize)
+{
+	switch (type) {
+		case B_APP_IMAGE:
+			snprintf(buffer, bufferSize, "Application");
+			break;
+		case B_LIBRARY_IMAGE:
+			snprintf(buffer, bufferSize, "Library");
+			break;
+		case B_ADD_ON_IMAGE:
+			snprintf(buffer, bufferSize, "Add-on");
+			break;
+		case B_SYSTEM_IMAGE:
+			snprintf(buffer, bufferSize, "System");
+			break;
+		default:
+			snprintf(buffer, bufferSize, "Unknown");
+			break;
+	}
+
+	return buffer;
+}
+
+
+/*static*/ const char*
+UiUtils::ReportNameForTeam(::Team* team, char* buffer, size_t bufferSize)
+{
+	BPath teamPath(team->Name());
+	BDateTime currentTime;
+	currentTime.SetTime_t(time(NULL));
+	snprintf(buffer, bufferSize, "%s-%" B_PRId32 "-debug-%02" B_PRId32 "-%02"
+		B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 "-%02"
+		B_PRId32 ".report", teamPath.Leaf(), team->ID(),
+		currentTime.Date().Day(), currentTime.Date().Month(),
+		currentTime.Date().Year(), currentTime.Time().Hour(),
+		currentTime.Time().Minute(), currentTime.Time().Second());
+
+	return buffer;
+
 }

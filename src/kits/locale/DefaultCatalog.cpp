@@ -10,7 +10,6 @@
 
 #include <memory>
 #include <new>
-#include <syslog.h>
 
 #include <AppFileInfo.h>
 #include <Application.h>
@@ -118,9 +117,6 @@ DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *langua
 	}
 
 	fInitCheck = status;
-	log_team(LOG_DEBUG,
-		"trying to load default-catalog(sig=%s, lang=%s) results in %s",
-		fSignature.String(), language, strerror(fInitCheck));
 }
 
 
@@ -134,9 +130,6 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	HashMapCatalog("", "", 0)
 {
 	fInitCheck = ReadFromResource(*appOrAddOnRef);
-	log_team(LOG_DEBUG,
-		"trying to load embedded catalog from resources results in %s",
-		strerror(fInitCheck));
 }
 
 
@@ -167,8 +160,6 @@ DefaultCatalog::SetSignature(const entry_ref &catalogOwner)
 	BAppFileInfo objectInfo(&objectFile);
 	char objectSignature[B_MIME_TYPE_LENGTH];
 	if (objectInfo.GetSignature(objectSignature) != B_OK) {
-		log_team(LOG_ERR, "File %s has no mimesignature, so it can't use"
-			" localization.", catalogOwner.name);
 		fSignature = "";
 		return;
 	}
@@ -183,8 +174,6 @@ DefaultCatalog::SetSignature(const entry_ref &catalogOwner)
 	else
 		stripSignature ++;
 
-	log_team(LOG_DEBUG, "Image %s requested catalog with mimetype %s",
-		catalogOwner.name, stripSignature);
 	fSignature = stripSignature;
 }
 
@@ -204,40 +193,25 @@ DefaultCatalog::ReadFromFile(const char *path)
 
 	BFile catalogFile;
 	status_t res = catalogFile.SetTo(path, B_READ_ONLY);
-	if (res != B_OK) {
-		log_team(LOG_DEBUG, "LocaleKit DefaultCatalog: no catalog at %s", path);
+	if (res != B_OK)
 		return B_ENTRY_NOT_FOUND;
-	}
 
 	fPath = path;
-	log_team(LOG_DEBUG, "LocaleKit DefaultCatalog: found catalog at %s", path);
 
 	off_t sz = 0;
 	res = catalogFile.GetSize(&sz);
 	if (res != B_OK) {
-		log_team(LOG_ERR, "LocaleKit DefaultCatalog: couldn't get size for "
-			"catalog-file %s", path);
 		return res;
 	}
 
 	auto_ptr<char> buf(new(std::nothrow) char [sz]);
-	if (buf.get() == NULL) {
-		log_team(LOG_ERR, "LocaleKit DefaultCatalog: couldn't allocate array "
-			"of %d chars", sz);
+	if (buf.get() == NULL)
 		return B_NO_MEMORY;
-	}
 	res = catalogFile.Read(buf.get(), sz);
-	if (res < B_OK) {
-		log_team(LOG_ERR, "LocaleKit DefaultCatalog: couldn't read from "
-			"catalog-file %s", path);
+	if (res < B_OK)
 		return res;
-	}
-	if (res < sz) {
-		log_team(LOG_ERR,
-			"LocaleKit DefaultCatalog: only got %lu instead of %Lu bytes from "
-			"catalog-file %s", res, sz, path);
+	if (res < sz)
 		return res;
-	}
 	BMemoryIO memIO(buf.get(), sz);
 	res = Unflatten(&memIO);
 
@@ -260,43 +234,24 @@ DefaultCatalog::ReadFromAttribute(const entry_ref &appOrAddOnRef)
 {
 	BNode node;
 	status_t res = node.SetTo(&appOrAddOnRef);
-	if (res != B_OK) {
-		log_team(LOG_ERR,
-			"couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
-			appOrAddOnRef.device, appOrAddOnRef.directory,
-			appOrAddOnRef.name);
+	if (res != B_OK)
 		return B_ENTRY_NOT_FOUND;
-	}
-
-	log_team(LOG_DEBUG,
-		"looking for embedded catalog-attribute in app/add-on"
-		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef.device,
-		appOrAddOnRef.directory, appOrAddOnRef.name);
 
 	attr_info attrInfo;
 	res = node.GetAttrInfo(BLocaleRoster::kEmbeddedCatAttr, &attrInfo);
-	if (res != B_OK) {
-		log_team(LOG_DEBUG, "no embedded catalog found");
+	if (res != B_OK)
 		return B_NAME_NOT_FOUND;
-	}
-	if (attrInfo.type != B_MESSAGE_TYPE) {
-		log_team(LOG_ERR, "attribute %s has incorrect type and is ignored!",
-			BLocaleRoster::kEmbeddedCatAttr);
+	if (attrInfo.type != B_MESSAGE_TYPE)
 		return B_BAD_TYPE;
-	}
 
 	size_t size = attrInfo.size;
 	auto_ptr<char> buf(new(std::nothrow) char [size]);
-	if (buf.get() == NULL) {
-		log_team(LOG_ERR, "couldn't allocate array of %d chars", size);
+	if (buf.get() == NULL)
 		return B_NO_MEMORY;
-	}
 	res = node.ReadAttr(BLocaleRoster::kEmbeddedCatAttr, B_MESSAGE_TYPE, 0,
 		buf.get(), size);
-	if (res < (ssize_t)size) {
-		log_team(LOG_ERR, "unable to read embedded catalog from attribute");
+	if (res < (ssize_t)size)
 		return res < B_OK ? res : B_BAD_DATA;
-	}
 
 	BMemoryIO memIO(buf.get(), size);
 	res = Unflatten(&memIO);
@@ -310,35 +265,20 @@ DefaultCatalog::ReadFromResource(const entry_ref &appOrAddOnRef)
 {
 	BFile file;
 	status_t res = file.SetTo(&appOrAddOnRef, B_READ_ONLY);
-	if (res != B_OK) {
-		log_team(LOG_ERR,
-			"couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
-			appOrAddOnRef.device, appOrAddOnRef.directory,
-			appOrAddOnRef.name);
+	if (res != B_OK)
 		return B_ENTRY_NOT_FOUND;
-	}
-
-	log_team(LOG_DEBUG,
-		"looking for embedded catalog-resource in app/add-on"
-		"(dev=%lu, dir=%Lu, name=%s)", appOrAddOnRef.device,
-		appOrAddOnRef.directory, appOrAddOnRef.name);
 
 	BResources rsrc;
 	res = rsrc.SetTo(&file);
-	if (res != B_OK) {
-		log_team(LOG_DEBUG, "file has no resources");
+	if (res != B_OK)
 		return res;
-	}
 
 	int mangledLanguage = CatKey::HashFun(fLanguageName.String(), 0);
 
 	size_t sz;
-	const void *buf = rsrc.LoadResource('CADA',
-		mangledLanguage, &sz);
-	if (!buf) {
-		log_team(LOG_DEBUG, "file has no catalog-resource");
+	const void *buf = rsrc.LoadResource('CADA', mangledLanguage, &sz);
+	if (!buf)
 		return B_NAME_NOT_FOUND;
-	}
 
 	BMemoryIO memIO(buf, sz);
 	res = Unflatten(&memIO);
@@ -540,11 +480,6 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 		// not accept this catalog:
 		if (foundFingerprint != 0 && fFingerprint != 0
 			&& foundFingerprint != fFingerprint) {
-			log_team(LOG_INFO, "default-catalog(sig=%s, lang=%s) "
-				"has mismatching fingerprint (%ld instead of the requested %ld), "
-				"so this catalog is skipped.",
-				fSignature.String(), fLanguageName.String(), foundFingerprint,
-				fFingerprint);
 			res = B_MISMATCHED_VALUES;
 		} else
 			fFingerprint = foundFingerprint;
@@ -580,14 +515,8 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 			}
 		}
 		uint32 checkFP = ComputeFingerprint();
-		if (fFingerprint != checkFP) {
-			log_team(LOG_WARNING, "default-catalog(sig=%s, lang=%s) "
-				"has wrong fingerprint after load (%ld instead of the %ld). "
-				"The catalog data may be corrupted, so this catalog is skipped.",
-				fSignature.String(), fLanguageName.String(), checkFP,
-				fFingerprint);
+		if (fFingerprint != checkFP)
 			return B_BAD_DATA;
-		}
 	}
 	return res;
 }

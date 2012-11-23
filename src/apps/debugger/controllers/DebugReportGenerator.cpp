@@ -71,7 +71,7 @@ DebugReportGenerator::GenerateReport(const entry_ref& outputPath)
 
 	BString output;
 	result = _GenerateReportHeader(output);
-	if (result != B_OK);
+	if (result != B_OK)
 		return result;
 
 	result = _DumpLoadedImages(output);
@@ -96,7 +96,8 @@ DebugReportGenerator::_GenerateReportHeader(BString& _output)
 	AutoLocker<Team> locker(fTeam);
 
 	BString data;
-	data.SetToFormat("Debug information for team %s (%" B_PRId32 "):\n\n");
+	data.SetToFormat("Debug information for team %s (%" B_PRId32 "):\n",
+		fTeam->Name(), fTeam->ID());
 	_output << data;
 
 	return B_OK;
@@ -108,16 +109,23 @@ DebugReportGenerator::_DumpLoadedImages(BString& _output)
 {
 	AutoLocker<Team> locker(fTeam);
 
+	_output << "\nLoaded Images:\n";
 	BString data;
 	for (ImageList::ConstIterator it = fTeam->Images().GetIterator();
 		 Image* image = it.Next();) {
 		const ImageInfo& info = image->Info();
+		char buffer[32];
 		try {
-			data.SetToFormat("\t%s, id: %" B_PRId32", type: %" B_PRId32 ", "
-				"Text: 0x%" B_PRIx64 ", %" B_PRIu64 " bytes, Data: 0x%"
-				B_PRIx64 ", %" B_PRIu64 " bytes\n", info.Name().String(),
-				info.ImageID(), info.Type(), info.TextBase(), info.TextSize(),
-				info.DataBase(), info.DataSize());
+			target_addr_t textBase = info.TextBase();
+			target_addr_t dataBase = info.DataBase();
+
+			data.SetToFormat("\t%s (%" B_PRId32 ", %s) "
+				"Text: %#08" B_PRIx64 " - %#08" B_PRIx64 ", Data: %#08"
+				B_PRIx64 " - %#08" B_PRIx64 "\n", info.Name().String(),
+				info.ImageID(), UiUtils::ImageTypeToString(info.Type(),
+					buffer, sizeof(buffer)), textBase,
+				textBase + info.TextSize(), dataBase,
+				dataBase + info.DataSize());
 
 			_output << data;
 		} catch (...) {
@@ -134,15 +142,17 @@ DebugReportGenerator::_DumpRunningThreads(BString& _output)
 {
 	AutoLocker<Team> locker(fTeam);
 
+	_output << "\nActive Threads:\n";
 	BString data;
 	status_t result = B_OK;
 	for (ThreadList::ConstIterator it = fTeam->Threads().GetIterator();
 		 Thread* thread = it.Next();) {
 		try {
-			data.SetToFormat("\t%s %s, id: %" B_PRId32", state: %" B_PRId32
-				"\n", thread->Name(), thread->IsMainThread()
-					? "(main)" : "", UiUtils::ThreadStateToString(
-					thread->State(), thread->StoppedReason()));
+			data.SetToFormat("\t%s %s, id: %" B_PRId32", state: %s\n",
+					thread->Name(), thread->IsMainThread()
+						? "(main)" : "", thread->ID(),
+					UiUtils::ThreadStateToString(thread->State(),
+							thread->StoppedReason()));
 
 			_output << data;
 
@@ -168,10 +178,12 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output, Thread* thread)
 	if (trace == NULL)
 		return B_OK;
 
+	_output << "\t\tFrame\t\tIP\t\t\tFunction Name\n";
+	_output << "\t\t-----------------------------------------------\n";
 	BString data;
 	for (int32 i = 0; StackFrame* frame = trace->FrameAt(i); i++) {
 		char functionName[512];
-		data.SetToFormat("0x%" B_PRIx64 "\t0x%" B_PRIx64 "\t%s\n",
+		data.SetToFormat("\t\t%#08" B_PRIx64 "\t%#08" B_PRIx64 "\t%s\n",
 			frame->FrameAddress(), frame->InstructionPointer(),
 			UiUtils::FunctionNameForFrame(frame, functionName,
 				sizeof(functionName)));
@@ -179,16 +191,17 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output, Thread* thread)
 		_output << data;
 	}
 
-	_output << "\nRegisters:\n\n";
+	_output << "\n\t\tRegisters:\n";
 
 	CpuState* state = thread->GetCpuState();
 	BVariant value;
+	const Register* reg = NULL;
 	for (int32 i = 0; i < fArchitecture->CountRegisters(); i++) {
-		const Register* reg = fArchitecture->Registers() + i;
+		reg = fArchitecture->Registers() + i;
 		state->GetRegisterValue(reg, value);
 
 		char buffer[64];
-		data.SetToFormat("%s\t%0x%s\n", reg->Name(),
+		data.SetToFormat("\t\t\t%5s:\t%s\n", reg->Name(),
 			UiUtils::VariantToString(value, buffer, sizeof(buffer)));
 		_output << data;
 	}
