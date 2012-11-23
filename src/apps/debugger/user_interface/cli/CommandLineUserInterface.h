@@ -19,7 +19,8 @@ class CliCommand;
 
 class CommandLineUserInterface : public UserInterface {
 public:
-								CommandLineUserInterface();
+								CommandLineUserInterface(bool saveReport,
+									const char* reportPath);
 	virtual						~CommandLineUserInterface();
 
 	virtual	const char*			ID() const;
@@ -70,6 +71,8 @@ private:
 private:
 			CliContext			fContext;
 			CommandList			fCommands;
+			const char*			fReportPath;
+			bool				fSaveReport;
 			sem_id				fShowSemaphore;
 			bool				fShown;
 	volatile bool				fTerminating;

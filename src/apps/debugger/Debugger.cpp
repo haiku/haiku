@@ -56,8 +56,10 @@ static const char* kUsage =
 	"fourth form additionally stops the specified thread.\n"
 	"\n"
 	"Options:\n"
-	"  -h, --help    - Print this usage info and exit.\n"
-	"  -c, --cli     - Use command line user interface\n"
+	"  -h, --help        - Print this usage info and exit.\n"
+	"  -c, --cli         - Use command line user interface\n"
+	"  -s, --save-report - Save crash report for the targetted team and exit.\n"
+	"                      Implies --cli.\n"
 ;
 
 
@@ -76,6 +78,8 @@ struct Options {
 	team_id				team;
 	thread_id			thread;
 	bool				useCLI;
+	bool				saveReport;
+	const char*			reportPath;
 
 	Options()
 		:
@@ -83,7 +87,9 @@ struct Options {
 		commandLineArgv(NULL),
 		team(-1),
 		thread(-1),
-		useCLI(false)
+		useCLI(false),
+		saveReport(false),
+		reportPath(NULL)
 	{
 	}
 };
@@ -105,15 +111,16 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
+			{ "cli", no_argument, 0, 'c' },
+			{ "save-report", optional_argument, 0, 's' },
 			{ "team", required_argument, 0, 't' },
 			{ "thread", required_argument, 0, 'T' },
-			{ "cli", no_argument, 0, 'c' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
 
-		int c = getopt_long(argc, (char**)argv, "+ch", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+chs", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -127,6 +134,14 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 					return false;
 				print_usage_and_exit(false);
 				break;
+
+			case 's':
+			{
+				options.useCLI = true;
+				options.saveReport = true;
+				options.reportPath = optarg;
+				break;
+			}
 
 			case 't':
 			{
@@ -581,7 +596,8 @@ CliDebugger::Run(const Options& options)
 
 	// create the command line UI
 	CommandLineUserInterface* userInterface
-		= new(std::nothrow) CommandLineUserInterface;
+		= new(std::nothrow) CommandLineUserInterface(options.saveReport,
+			options.reportPath);
 	if (userInterface == NULL) {
 		fprintf(stderr, "Error: Out of memory!\n");
 		return false;
