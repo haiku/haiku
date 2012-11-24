@@ -218,6 +218,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(new BButton(B_TRANSLATE("Edit menu" B_UTF8_ELLIPSIS),
 					new BMessage(kEditMenuInTracker)))
 				.End()
+			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
@@ -237,6 +238,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
 				.Add(fAppsIconSizeSlider)
 				.End()
+			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
@@ -247,6 +249,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.Add(fWindowAlwaysOnTop)
 			.Add(fWindowAutoRaise)
 			.Add(fWindowAutoHide)
+			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
