@@ -237,7 +237,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
 				.Add(fAppsIconSizeSlider)
 				.End()
-			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
@@ -248,7 +247,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.Add(fWindowAlwaysOnTop)
 			.Add(fWindowAutoRaise)
 			.Add(fWindowAutoHide)
-			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
@@ -398,7 +396,7 @@ PreferencesWindow::_HandleChangedSettingsView()
 		dynamic_cast<SettingsItem*>
 			(fSettingsTypeListView->ItemAt(currentSelection));
 
-	if (selectedItem) {
+	if (selectedItem != NULL) {
 		fSettingsContainerBox->SetLabel(selectedItem->Text());
 
 		BView* view = selectedItem->View();
