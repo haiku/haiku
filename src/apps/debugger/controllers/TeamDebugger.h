@@ -147,9 +147,6 @@ private:
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
 
-			void				_HandleGenerateDebugReport(
-									const entry_ref& target);
-
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);
 
 			status_t			_AddImage(const ImageInfo& imageInfo,

@@ -207,6 +207,8 @@ TeamDebugger::~TeamDebugger()
 	delete fBreakpointManager;
 	delete fWatchpointManager;
 	delete fMemoryBlockManager;
+	fReportGenerator->Lock();
+	fReportGenerator->Quit();
 	delete fReportGenerator;
 	delete fWorker;
 	delete fTeam;
@@ -550,9 +552,7 @@ TeamDebugger::MessageReceived(BMessage* message)
 
 		case MSG_GENERATE_DEBUG_REPORT:
 		{
-			entry_ref ref;
-			if (message->FindRef("target", &ref) == B_OK)
-				_HandleGenerateDebugReport(ref);
+			fReportGenerator->PostMessage(message);
 			break;
 		}
 
@@ -1529,13 +1529,6 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 	} else
 		memoryBlock->NotifyDataRetrieved();
 
-}
-
-
-void
-TeamDebugger::_HandleGenerateDebugReport(const entry_ref& ref)
-{
-	fReportGenerator->GenerateReport(ref);
 }
 
 

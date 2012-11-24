@@ -38,7 +38,9 @@ enum {
 
 	TEAM_EVENT_WATCHPOINT_ADDED,
 	TEAM_EVENT_WATCHPOINT_REMOVED,
-	TEAM_EVENT_WATCHPOINT_CHANGED
+	TEAM_EVENT_WATCHPOINT_CHANGED,
+
+	TEAM_EVENT_DEBUG_REPORT_CHANGED
 };
 
 
@@ -61,6 +63,7 @@ class Team {
 public:
 			class Event;
 			class BreakpointEvent;
+			class DebugReportEvent;
 			class ImageEvent;
 			class ThreadEvent;
 			class UserBreakpointEvent;
@@ -183,6 +186,10 @@ public:
 			void				NotifyWatchpointChanged(
 									Watchpoint* watchpoint);
 
+			// debug report related service methods
+			void				NotifyDebugReportChanged(
+									const char* reportPath);
+
 private:
 			struct BreakpointByAddressPredicate;
 			struct WatchpointByAddressPredicate;
@@ -261,6 +268,17 @@ protected:
 };
 
 
+class Team::DebugReportEvent : public Event {
+public:
+								DebugReportEvent(uint32 type, Team* team,
+									const char* reportPath);
+
+			const char*			GetReportPath() const	{ return fReportPath; }
+protected:
+			const char*			fReportPath;
+};
+
+
 class Team::WatchpointEvent : public Event {
 public:
 								WatchpointEvent(uint32 type, Team* team,
@@ -318,6 +336,9 @@ public:
 									const Team::WatchpointEvent& event);
 	virtual	void				WatchpointChanged(
 									const Team::WatchpointEvent& event);
+
+	virtual void				DebugReportChanged(
+									const Team::DebugReportEvent& event);
 };
 
 

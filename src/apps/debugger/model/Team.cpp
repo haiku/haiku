@@ -636,6 +636,17 @@ Team::NotifyWatchpointChanged(Watchpoint* watchpoint)
 
 
 void
+Team::NotifyDebugReportChanged(const char* reportPath)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->DebugReportChanged(DebugReportEvent(
+			TEAM_EVENT_DEBUG_REPORT_CHANGED, this, reportPath));
+	}
+}
+
+
+void
 Team::_NotifyThreadAdded(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -716,6 +727,18 @@ Team::BreakpointEvent::BreakpointEvent(uint32 type, Team* team,
 	:
 	Event(type, team),
 	fBreakpoint(breakpoint)
+{
+}
+
+
+// #pragma mark - DebugReportEvent
+
+
+Team::DebugReportEvent::DebugReportEvent(uint32 type, Team* team,
+	const char* reportPath)
+	:
+	Event(type, team),
+	fReportPath(reportPath)
 {
 }
 
@@ -832,5 +855,11 @@ Team::Listener::WatchpointRemoved(const Team::WatchpointEvent& event)
 
 void
 Team::Listener::WatchpointChanged(const Team::WatchpointEvent& event)
+{
+}
+
+
+void
+Team::Listener::DebugReportChanged(const Team::DebugReportEvent& event)
 {
 }

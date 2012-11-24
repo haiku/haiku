@@ -5,7 +5,11 @@
 #ifndef DEBUG_REPORT_GENERATOR_H
 #define DEBUG_GENERATOR_H
 
+
+#include <Looper.h>
 #include <Referenceable.h>
+
+#include "Team.h"
 
 
 class entry_ref;
@@ -15,7 +19,8 @@ class Team;
 class Thread;
 
 
-class DebugReportGenerator : public BReferenceable
+class DebugReportGenerator : public BLooper, public BReferenceable,
+	public Team::Listener
 {
 public:
 								DebugReportGenerator(::Team* team);
@@ -25,18 +30,23 @@ public:
 
 	static	DebugReportGenerator* Create(::Team* team);
 
-			status_t			GenerateReport(const entry_ref& outputPath);
+	virtual void				MessageReceived(BMessage* message);
+
+	virtual	void				ThreadStackTraceChanged(
+									const Team::ThreadEvent& event);
 
 private:
+			status_t			_GenerateReport(const entry_ref& outputPath);
 			status_t			_GenerateReportHeader(BString& output);
 			status_t			_DumpLoadedImages(BString& output);
 			status_t			_DumpRunningThreads(BString& output);
 			status_t			_DumpDebuggedThreadInfo(BString& output,
-									Thread* thread);
+									::Thread* thread);
 
 private:
 			::Team*				fTeam;
 			Architecture*		fArchitecture;
+			sem_id				fTeamDataSem;
 };
 
 #endif // DEBUG_REPORT_GENERATOR_H
