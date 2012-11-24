@@ -724,7 +724,8 @@ MutableLocaleRoster::Default()
 
 
 status_t
-MutableLocaleRoster::SetDefaultFormattingConventions(const BFormattingConventions& newFormattingConventions)
+MutableLocaleRoster::SetDefaultFormattingConventions(
+	const BFormattingConventions& newFormattingConventions)
 {
 	return RosterData::Default()->SetDefaultFormattingConventions(
 		newFormattingConventions);
