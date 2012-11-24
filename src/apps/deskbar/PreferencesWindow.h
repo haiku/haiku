@@ -26,6 +26,7 @@ const uint32 kAutoHide				= 'AtHd';
 class BBox;
 class BButton;
 class BCheckBox;
+class BListView;
 class BRadioButton;
 class BSlider;
 class BStringView;
@@ -44,9 +45,10 @@ public:
 				void		EnableDisableDependentItems();
 
 private:
-			BBox*			fMenuBox;
-			BBox*			fAppsBox;
-			BBox*			fWindowBox;
+				void		_HandleChangedSettingsView();
+
+			BListView*		fSettingsTypeListView;
+			BBox*			fSettingsContainerBox;
 
 			BCheckBox*		fMenuRecentDocuments;
 			BCheckBox*		fMenuRecentApplications;
