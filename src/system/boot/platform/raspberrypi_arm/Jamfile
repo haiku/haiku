@@ -22,7 +22,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 BootMergeObject boot_platform_raspberrypi_arm.o :
 	entry.S
-	start.c
+	start.cpp
 	console.cpp
 	cpu.cpp
 	debug.cpp
