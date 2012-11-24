@@ -85,7 +85,7 @@ BStringItem::DrawItem(BView *owner, BRect frame, bool complete)
 		owner->FillRect(frame);
 	}
 
-	owner->MovePenTo(frame.left, frame.top + fBaselineOffset);
+	owner->MovePenTo(frame.left + 4, frame.top + fBaselineOffset);
 
 	if (!IsEnabled()) {
 		rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
