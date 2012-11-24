@@ -273,10 +273,8 @@ DefaultCatalog::ReadFromResource(const entry_ref &appOrAddOnRef)
 	if (res != B_OK)
 		return res;
 
-	int mangledLanguage = CatKey::HashFun(fLanguageName.String(), 0);
-
 	size_t sz;
-	const void *buf = rsrc.LoadResource('CADA', mangledLanguage, &sz);
+	const void *buf = rsrc.LoadResource('CADA', fLanguageName, &sz);
 	if (!buf)
 		return B_NAME_NOT_FOUND;
 
@@ -370,7 +368,7 @@ DefaultCatalog::WriteToResource(const entry_ref &appOrAddOnRef)
 	if (res == B_OK) {
 		res = rsrc.AddResource('CADA', mangledLanguage,
 			mallocIO.Buffer(), mallocIO.BufferLength(),
-			BString(fLanguageName) << " catalog");
+			BString(fLanguageName));
 	}
 
 	return res;
