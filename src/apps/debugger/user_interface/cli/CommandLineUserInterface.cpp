@@ -130,6 +130,8 @@ CommandLineUserInterface::Init(Team* team, UserInterfaceListener* listener)
 	if (fShowSemaphore < 0)
 		return fShowSemaphore;
 
+	team->AddListener(this);
+
 	return B_OK;
 }
 
@@ -205,9 +207,11 @@ CommandLineUserInterface::Run()
 	if (error != B_OK)
 		return;
 
-	if (!fSaveReport)
+	if (!fSaveReport) {
 		_InputLoop();
-	else {
+		// Release the Show() semaphore to signal Terminate().
+		release_sem(fShowSemaphore);
+	} else {
 		ArgumentVector args;
 		char buffer[256];
 		const char* parseErrorLocation;
@@ -215,11 +219,22 @@ CommandLineUserInterface::Run()
 			fReportPath != NULL ? fReportPath : "");
 		args.Parse(buffer, &parseErrorLocation);
 		_ExecuteCommand(args.ArgumentCount(), args.Arguments());
-		fContext.QuitSession(true);
 	}
+}
 
-	// Release the Show() semaphore to signal Terminate().
-	release_sem(fShowSemaphore);
+
+void
+CommandLineUserInterface::DebugReportChanged(
+	const Team::DebugReportEvent& event)
+{
+	printf("Successfully saved debug report to %s\n",
+		event.GetReportPath());
+
+	if (fSaveReport) {
+		fContext.QuitSession(true);
+		// Release the Show() semaphore to signal Terminate().
+		release_sem(fShowSemaphore);
+	}
 }
 
 
@@ -292,16 +307,16 @@ CommandLineUserInterface::_RegisterCommands()
 	BReference<CliCommand> stackTraceCommandReference2(
 		stackTraceCommandReference.Get());
 
-	if (_RegisterCommand("bt", stackTraceCommandReference.Detach()) &&
-		_RegisterCommand("continue", new(std::nothrow) CliContinueCommand) &&
-		_RegisterCommand("help", new(std::nothrow) HelpCommand(this)) &&
-		_RegisterCommand("quit", new(std::nothrow) CliQuitCommand) &&
-		_RegisterCommand("save-report",
-			new(std::nothrow) CliDebugReportCommand) &&
-		_RegisterCommand("sc", stackTraceCommandReference2.Detach()) &&
-		_RegisterCommand("stop", new(std::nothrow) CliStopCommand) &&
-		_RegisterCommand("thread", new(std::nothrow) CliThreadCommand) &&
-		_RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)) {
+	if (_RegisterCommand("bt", stackTraceCommandReference.Detach())
+		&& _RegisterCommand("continue", new(std::nothrow) CliContinueCommand)
+		&& _RegisterCommand("help", new(std::nothrow) HelpCommand(this))
+		&& _RegisterCommand("quit", new(std::nothrow) CliQuitCommand)
+		&& _RegisterCommand("save-report",
+			new(std::nothrow) CliDebugReportCommand)
+		&& _RegisterCommand("sc", stackTraceCommandReference2.Detach())
+		&& _RegisterCommand("stop", new(std::nothrow) CliStopCommand)
+		&& _RegisterCommand("thread", new(std::nothrow) CliThreadCommand)
+		&& _RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)) {
 		return B_OK;
 	}
 

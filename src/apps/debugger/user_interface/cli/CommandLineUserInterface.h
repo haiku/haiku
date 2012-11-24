@@ -17,7 +17,8 @@
 class CliCommand;
 
 
-class CommandLineUserInterface : public UserInterface {
+class CommandLineUserInterface : public UserInterface,
+	public ::Team::Listener {
 public:
 								CommandLineUserInterface(bool saveReport,
 									const char* reportPath);
@@ -46,6 +47,10 @@ public:
 									// Called by the main thread, when
 									// everything has been set up. Enters the
 									// input loop.
+
+	// Team::Listener
+	virtual	void				DebugReportChanged(
+									const Team::DebugReportEvent& event);
 
 private:
 			struct CommandEntry;
