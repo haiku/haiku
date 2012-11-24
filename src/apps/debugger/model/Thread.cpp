@@ -57,7 +57,7 @@ Thread::SetName(const BString& name)
 void
 Thread::SetState(uint32 state, uint32 reason, const BString& info)
 {
-	if (state == fState)
+	if (state == fState && reason == fStoppedReason)
 		return;
 
 	fState = state;
