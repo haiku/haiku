@@ -252,12 +252,7 @@ TTimeView::Pulse()
 	GetCurrentDate();
 	if (strcmp(fCurrentTimeStr, fLastTimeStr) != 0) {
 		// Update bounds when the size of the strings has changed
-		// For dates, Update() could be called two times in a row,
-		// but that should only happen very rarely
-		if ((fLastTimeStr[1] != fCurrentTimeStr[1]
-			&& (fLastTimeStr[1] == ':' || fCurrentTimeStr[1] == ':'))
-			|| !fLastTimeStr[0])
-			Update();
+		Update();
 
 		strlcpy(fLastTimeStr, fCurrentTimeStr, sizeof(fLastTimeStr));
 		fNeedToUpdate = true;
