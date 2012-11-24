@@ -218,13 +218,19 @@ DebugReportGenerator::_DumpRunningThreads(BString& _output)
 	for (ThreadList::ConstIterator it = fTeam->Threads().GetIterator();
 		 ::Thread* thread = it.Next();) {
 		try {
-			data.SetToFormat("\t%s %s, id: %" B_PRId32", state: %s\n",
+			data.SetToFormat("\t%s %s, id: %" B_PRId32", state: %s",
 					thread->Name(), thread->IsMainThread()
 						? "(main)" : "", thread->ID(),
 					UiUtils::ThreadStateToString(thread->State(),
 							thread->StoppedReason()));
 
-			_output << data;
+			if (thread->State() == THREAD_STATE_STOPPED) {
+				const BString& stoppedInfo = thread->StoppedReasonInfo();
+				if (stoppedInfo.Length() != 0)
+					data << " (" << stoppedInfo << ")";
+			}
+
+			_output << data << "\n";
 
 			if (thread->State() == THREAD_STATE_STOPPED) {
 				// we need to release our lock on the team here
