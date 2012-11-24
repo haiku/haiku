@@ -15,7 +15,7 @@
 #include <KernelExport.h>
 #include <boot/platform.h>
 #include <boot/heap.h>
-#include <boot/stage2.h>
+//#include <boot/stage2.h>
 #include <arch/cpu.h>
 
 #include <string.h>
@@ -103,7 +103,7 @@ platform_exit(void)
 
 
 void
-pi_start(void)
+_start(void)
 {
 	stage2_args args;
 

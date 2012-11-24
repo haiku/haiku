@@ -1,6 +1,6 @@
 .section .init
-.globl _start
-_start:
+.globl _entry
+_entry:
 	b jmp_loader
 
 .section .text
@@ -14,12 +14,12 @@ jmp_loader:
 
 	/* For Thumb code? */
 	/*
-	ldr r12, =pi_start
+	ldr r12, =_start
 	mov lr, pc
 	bx r12
 	*/
 
-	b pi_start
+	b _start
 
 	/* Cause exception if loader returns */
 	swi 0xFFFFFF
