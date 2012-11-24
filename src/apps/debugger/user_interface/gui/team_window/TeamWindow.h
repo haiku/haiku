@@ -127,6 +127,8 @@ private:
 									const Team::UserBreakpointEvent& event);
 	virtual	void				WatchpointChanged(
 									const Team::WatchpointEvent& event);
+	virtual void				DebugReportChanged(
+									const Team::DebugReportEvent& event);
 
 	// Function::Listener
 	virtual	void				FunctionSourceCodeChanged(Function* function);

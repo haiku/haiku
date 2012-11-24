@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Button.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
@@ -57,6 +58,7 @@ enum {
 
 enum {
 	MSG_CHOOSE_DEBUG_REPORT_LOCATION = 'ccrl',
+	MSG_DEBUG_REPORT_SAVED = 'drsa',
 	MSG_LOCATE_SOURCE_IF_NEEDED = 'lsin'
 };
 
@@ -248,6 +250,17 @@ TeamWindow::MessageReceived(BMessage* message)
 				if (get_ref_for_path(path.Path(), &ref) == B_OK)
 					fListener->DebugReportRequested(&ref);
 			}
+			break;
+		}
+		case MSG_DEBUG_REPORT_SAVED:
+		{
+			BString data;
+			data.SetToFormat("Debug report successfully saved to '%s'",
+				message->FindString("path"));
+			BAlert *alert = new BAlert("Report saved", data.String(),
+				"OK");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
 			break;
 		}
 		case MSG_SHOW_INSPECTOR_WINDOW:
@@ -719,6 +732,15 @@ TeamWindow::WatchpointChanged(const Team::WatchpointEvent& event)
 		&& PostMessage(&message) == B_OK) {
 		watchpointReference.Detach();
 	}
+}
+
+
+void
+TeamWindow::DebugReportChanged(const Team::DebugReportEvent& event)
+{
+	BMessage message(MSG_DEBUG_REPORT_SAVED);
+	message.AddString("path", event.GetReportPath());
+	PostMessage(&message);
 }
 
 
