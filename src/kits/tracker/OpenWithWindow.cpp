@@ -955,7 +955,10 @@ OpenWithRefFilter::Filter(const entry_ref* ref, BNode* node, stat_beos* st,
 	const char* filetype)
 {
 	Model *model = new Model(ref, true, true);
-	return fIterator->CanOpenWithFilter(model, fEntryList, fPreferredRef);
+	bool canOpen = fIterator->CanOpenWithFilter(model, fEntryList,
+		fPreferredRef);
+	delete model;
+	return canOpen;
 }
 
 
