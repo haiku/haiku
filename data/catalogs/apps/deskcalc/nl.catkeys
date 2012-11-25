@@ -1,7 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-DeskCalc	1916192649
+1	dutch; flemish	x-vnd.Haiku-DeskCalc	3276968552
 Compact	CalcView		Compact
 Scientific	CalcView		Wetenschappelijk
 DeskCalc	System name		DeskCalc
 Basic	CalcView		Eenvoudig
+Radians	CalcView		Radialen
 Enable Num Lock on startup	CalcView		Opstarten met Num Lock aan
+Degrees	CalcView		Graden
 Audio Feedback	CalcView		Geluidsfeedback

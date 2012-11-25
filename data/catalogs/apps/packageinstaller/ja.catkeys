@@ -42,7 +42,7 @@ Finishing installation	PackageInstall		インストールを終了中
 Installing package	PackageStatus		パッケージをインストール中
 Ask again	PackageView		再び尋ねる
 Abort	PackageView		中断
-Replace all	PackageView		すべて置き換え
+Replace all	PackageView		すべて置換
 Decline	PackageTextViewer		断る
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		ファイル '%s' がすでにパスに存在します。\nファイルをパッケージの物と置き換えますか、またはスキップしますか?
 All existing files will be skipped?	PackageView		既存のファイルをすべてスキップしますか?

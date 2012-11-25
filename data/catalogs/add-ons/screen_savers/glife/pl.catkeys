@@ -1,0 +1,15 @@
+1	polish	x-vnd.Haiku-GLifeScreensaver	1707534289
+Grid Border: %li	GLife ScreenSaver		Granica Siatki: %li
+Grid Width: 	GLife ScreenSaver		Szerokość Siatki:
+none	GLife ScreenSaver		brak
+Grid Height: 	GLife ScreenSaver		Wysokość Siatki:
+%sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
+None	GLife ScreenSaver		Brak
+4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
+Grid Width: %li	GLife ScreenSaver		Szerokość Siatki: %li
+Grid Height: %li	GLife ScreenSaver		Wysokość Siatki: %li
+Grid Life Delay: 	GLife ScreenSaver		Opóźnienie pomiędzy pokoleniami:
+OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Gra w Życie\"
+Grid Life Delay: %s	GLife ScreenSaver		Opóźnienie pomiędzy pokoleniami: %s
+Grid Border: 	GLife ScreenSaver		Granica Siatki:
+by Aaron Hill	GLife ScreenSaver		stworzył Aaron Hill

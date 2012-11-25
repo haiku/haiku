@@ -1,0 +1,15 @@
+1	lithuanian	x-vnd.Haiku-GLifeScreensaver	1707534289
+Grid Border: %li	GLife ScreenSaver		Tinklelio rėmelis: %li
+Grid Width: 	GLife ScreenSaver		Tinklelio plotis: 
+none	GLife ScreenSaver		nėra
+Grid Height: 	GLife ScreenSaver		Tinklelio aukštis: 
+%sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
+None	GLife ScreenSaver		Nėra
+4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
+Grid Width: %li	GLife ScreenSaver		Tinklelio plotis: %li
+Grid Height: %li	GLife ScreenSaver		Tinklelio aukštis: %li
+Grid Life Delay: 	GLife ScreenSaver		Tinklelio kaitos delsa: 
+OpenGL \"Game of Life\"	GLife ScreenSaver		„OpenGL“ „Gyvenimo žaidimas“
+Grid Life Delay: %s	GLife ScreenSaver		Tinklelio kaitos delsa: %s
+Grid Border: 	GLife ScreenSaver		Tinklelio rėmelis: 
+by Aaron Hill	GLife ScreenSaver		Sukurtas Aaron'o Hill'o

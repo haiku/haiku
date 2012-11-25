@@ -11,7 +11,7 @@ Could not unmount disk \"%s\":\n\t%s	AutoMounter		\"%s\" をマウント解除�
 Mounting volume <unnamed volume>\n\n	AutoMounter		<無名> パーティションをマウント中\n\n
 OK	AutoMounter		OK
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		このパーティションは Haiku ファイルシステムを使っていませんので、Haiku の不具合によるデータの破壊を避けるため、読み取り専用モードでマウントするようお勧めします。
-Previous volumes mounted.	AutoMounter		既にマウントされていたパーティション
+Previous volumes mounted.	AutoMounter		すでにマウントされていたパーティション
 Mount error	AutoMounter		マウントエラー
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Haiku の不具合によるデータの破壊を避けるため、残りの Haiku パーティションを読み取り専用モードでマウントするようお勧めします。
 Force unmount	AutoMounter		強制マウント解除

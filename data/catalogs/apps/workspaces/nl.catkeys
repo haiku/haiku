@@ -1,14 +1,12 @@
-1	dutch; flemish	x-vnd.Be-WORK	2548258861
+1	dutch; flemish	x-vnd.Be-WORK	658966565
 Invalid argument: %s\n	Workspaces		Ongeldig argument: %s\n
 Quit	Workspaces		Afsluiten
 Workspaces	System name		Workspaces
 Change workspace count…	Workspaces		Verander het aantal werkplekken...
 Remove replicant	Workspaces		Replicant verwijderen
 About Workspaces…	Workspaces		Over Workspaces...
-Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Werkplekken\ndoor %1 en %2.\n\nCopyright %3, Haiku.\n\nStuur vensters naar de achtergrond door de optie-toets te gebruiken. Verplaats vensters naar de voorgrond door de Control-toets te gebruiken.\n
 Show window border	Workspaces		Toon de vensterrand
 Auto-raise	Workspaces		Automatisch naar boven
-OK	Workspaces		Oké
 Always on top	Workspaces		Altijd op de voorgrond
 Live in the Deskbar	Workspaces		In de Deskbar zetelen
 Show window tab	Workspaces		Venstertab tonen

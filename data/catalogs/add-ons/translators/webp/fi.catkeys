@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-WebPTranslator	2427600890
-Compression method:	ConfigView		Tiivistysmenetelmä
+1	finnish	x-vnd.Haiku-WebPTranslator	3197103165
+Compression method:	ConfigView		Tiivistysmenetelmä:
+WebP image translator	ConfigView		WebP-kuvamuunnin
 Based on libwebp v0.1,	ConfigView		Perustuu kirjastoon libwebp v0.1,
 Preset	ConfigView		Esiasetus
 WebP images	WebPTranslator		WebP-kuvat

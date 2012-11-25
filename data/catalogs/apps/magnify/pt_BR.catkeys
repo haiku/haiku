@@ -1,0 +1,29 @@
+1	portuguese (brazil)	x-vnd.Haiku-Magnify	283320408
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		nenhuma mensagem do clipboard\n
+Make square	Magnify-Main		Criar quadrado
+Copy image	Magnify-Main		Copiar imagem
+Magnify help	Magnify-Help		Ajuda do Ampliar
+usage: magnify [size] (magnify size * size pixels)\n	Console		utilização: magnify [tamanho] (tamanho da ampliação * tamanho em pixels)\n 
+Stick coordinates	Magnify-Main		Coordenadas do ponto de fixação
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Informações:\nocultar/exibir informações - oculta/exibe todas estas novas funcionalidades\nnota: quando exibindo, um quadrado vermelho irá aparecer, o que significa\nque os valores rgb do pixel serão mostrados\nadicionar/remover mira - duas miras podem ser adicionadas (ou removidas)\npara auxiliar no alinhamento e posicionamento de objetos.\nAs miras são representadas por quadrados e linhas azuis.\nocultar/exibir grade - oculta/exibe a grade que separa cada pixel\n
+  freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		congelar - congela/descongela ampliação do que quer que seja que o cursor esteja focalizando no momento\n
+Hide/Show grid	Magnify-Main		Ocultar/Exibir grade
+magnify: size must be a multiple of 4\n	Console		ampliar: tamanho deve ser um múltiplo de 4\n
+General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		32 x 32 - os números no topo à esquerda são o número de pixels\nvisíveis (largura x altura)\n8 pixels/pixel - representa o número de pixels que são\nusados para ampliar um pixel\nR:152 G:52 B:10 -  o valor RGB para um pixel sob\no quadrado vermelho\n
+Help	Magnify-Main		Ajuda
+Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Dimensionamento/Redimensionamento:\nformar quadrado - define a largura e a altura para o mais largo\nde dois quadrados formando uma imagem quadrada\naumentar/diminuir tamanho da janela - cresce ou reduz o tamanho da janela em 4 pixels.\nnota: a janela pode ser também redimensionada para qualquer tamanho através da\nregião de redimensionamento da janela\naumentar/diminuir tamanho do pixel - aumenta ou diminui o número\nde pixels utilizados para ampliar um pixel 'real'. A variação vai de 1 a 16.\n
+Decrease pixel size	Magnify-Main		Diminuir tamanho do pixel
+Magnify	System name		Ampliar
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height  @ %pixelSize pixels/pixel
+Info	Magnify-Main		Informações
+Remove a crosshair	Magnify-Main		Remover uma mira
+Freeze/Unfreeze image	Magnify-Main		Congelar/Descongelar imagem
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Copiar/Salvar:\ncopiar - copia a imagem atual para a área de transferência\nsalvar - avisa o usuário para salvar um arquivo e grava os bits da imagem\n
+Hide/Show info	Magnify-Main		Ocultar/Exibir informações
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navegação:\nteclas de seta - move a seleção atual (indicador rgb ou mira)\nem torno de 1 pixel de cada vez\nalt-tecla de seta - move a localização do mouse 1 pixel de cada vez\nx marca a seleção - a seleção atual tem um 'x' nela\n
+Save image	Magnify-Main		Salvar imagem
+Increase window size	Magnify-Main		Aumentar o tamanho da janela
+Decrease window size	Magnify-Main		Diminuir o tamanho da janela
+Increase pixel size	Magnify-Main		Aumentar tamanho do pixel
+  size must be > 4 and a multiple of 4\n	Console		tamanho deve ser > 4 e um múltiplo de 4\n
+Add a crosshair	Magnify-Main		Adicionar uma mira

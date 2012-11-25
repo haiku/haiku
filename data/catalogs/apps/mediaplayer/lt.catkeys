@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	2346289802
+1	lithuanian	x-vnd.Haiku-MediaPlayer	2969013755
 raw audio	MediaPlayer-InfoWin		neapdorotas garso įrašas
 Location	MediaPlayer-InfoWin		Vieta
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
@@ -69,8 +69,10 @@ Select all	MediaPlayer-PlaylistWindow		Pažymėti viską
 Move Entry	MediaPlayer-MovePLItemsCmd		Perkelti įrašą
 Open	MediaPlayer-PlaylistWindow		Atverti
 Stop playing.	MediaPlayer-Main		Sustabdyti atkūrimą.
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Failo „%filename“ nepavyko atverti.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Klaida:
 Audio	MediaPlayer-InfoWin		Garsas
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Klaida išmetant Šiukšlinėn
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vidinė klaida (netinkamai suformuotas pranešimas). Grojaraščio įrašyti nepavyko.
 Skip to the previous track.	MediaPlayer-Main		Peršokti į ankstesnį takelį.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Vidinė klaida „%app%“ programoje. Failo atverti nepavyko.

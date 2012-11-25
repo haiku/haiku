@@ -1,8 +1,8 @@
-1	belarusian	x-vnd.Haiku-Appearance	2671941221
+1	belarusian	x-vnd.Haiku-Appearance	1428480647
 Plain font:	Font view		Просты шрыфт:
 Control highlight	Colors tab		Выдзяленне кнопак
 Control border	Colors tab		Аблямоўка кнопак
-Antialiasing type:	AntialiasingSettingsView		Тып згладжвання
+Antialiasing type:	AntialiasingSettingsView		Тып згладжвання:
 Shadow	Colors tab		Цень
 On	AntialiasingSettingsView		Укл.
 Defaults	APRWindow		Прадвызначаныя
@@ -52,8 +52,8 @@ LCD subpixel	AntialiasingSettingsView		Субпіксельнае (LCD)
 Selected menu item border	Colors tab		Аблямоўка пазначанага пункту меню
 Strong	AntialiasingSettingsView		Жырны
 Panel text	Colors tab		Тэкст панэлі
-Decorators	APRWindow		Дэкаратары
 Monospaced fonts only	AntialiasingSettingsView		Толькі монашырынныя шрыфты
+Look and feel	APRWindow		Выгляд і паводзіны
 Antialiasing menu	AntialiasingSettingsView		Меню згладжвання
 Fonts	APRWindow		Шрыфты
-Glyph hinting:	AntialiasingSettingsView		Хінтынг сімвалаў
+Glyph hinting:	AntialiasingSettingsView		Хінтынг сімвалаў:

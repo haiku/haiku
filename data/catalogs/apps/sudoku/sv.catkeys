@@ -6,7 +6,7 @@ OK	SudokuWindow		OK
 New	SudokuWindow		Ny
 Abort	ProgressWindow		Avbryt
 Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Kunde inte öppna "\s":\n%s\n
+Could not open \"%s\":\n%s\n	SudokuWindow		Kunde inte öppna \"%s\":\n%s\n
 Easy	SudokuWindow		Lätt
 Open file…	SudokuWindow		Öppna fil...
 Solve single field	SudokuWindow		Lös ett fält

@@ -5,11 +5,11 @@ Idle priority	ProcessController		Прыярытэт спакою
 Restart Deskbar	ProcessController		Перазапусціць Deskbar
 Custom priority	ProcessController		Нестандартны прыярытэт
 Debug thread	ProcessController		Адладжваць паток
-This team is already gone…	ProcessController		Гэтая група ўжо не існуе...
+This team is already gone…	ProcessController		Гэтая група ўжо не існуе…
 Error saving file	ProcessController		Памылка пры захаванні файла
 Real-time priority	ProcessController		Прыярытэт рэальнага часу
 Your setting file could not be saved!\n(%s)	ProcessController		Немагчыма захаваць файл з наладкамі!\n(%s)
-This thread is already gone…	ProcessController		Гэты паток ўжо не існуе...
+This thread is already gone…	ProcessController		Гэты паток ўжо не існуе…
 Cancel	ProcessController		Адмена
 Display priority	ProcessController		Прыярытэт адлюстравання
 Run in window	ProcessController		Запускаць у вакне
@@ -21,7 +21,7 @@ Info	ProcessController		Інфа
 Quit application	ProcessController		Выйсці з праграмы
 Low priority	ProcessController		Нізкі прыярытэт
 What do you want to do with the thread \"%s\"?	ProcessController		Што вы жадаеце зрабіць з патокам \"%s\"?
-Gone teams…	ProcessController		Знішчаныя групы
+Gone teams…	ProcessController		Знішчаныя групы…
 Lowest active priority	ProcessController		Найнізшы актыўны прыярытэт
 Restart Tracker	ProcessController		Перазапусціць Трэкер
 Live in the Deskbar	ProcessController		Прывязаць да Deskbar

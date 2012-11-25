@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-GLTeapot	3688092856
+1	slovak	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Hore v strede
 Lighting	TeapotWindow		Osvetlenie
 Off	TeapotWindow		Vypnuté
@@ -9,6 +9,7 @@ Blue	TeapotWindow		Modrá
 Gouraud shading	TeapotWindow		Goraudovo tieňovanie
 Quit	TeapotWindow		Ukončiť
 Filled polygons	TeapotWindow		Vyplnené polygóny
+Settings	TeapotWindow		Nastavenia
 Fog	TeapotWindow		Dym
 Backface culling	TeapotWindow		Orezávanie zadnej strany
 Z-buffered	TeapotWindow		Z-buffering

@@ -5,5 +5,5 @@ RTF-Translator Settings	ConfigView		Наладкі канвертара RTF
 Rich Text Format (RTF) translator	ConfigView		Канвертар Фарматаванага Тэксту (RTF)
 RTF Settings	main		Наладки RTF
 RichTextFormat file	RTFTranslator		Файл RichTextFormat
-Rich Text Format translator	RTFTranslator		Канвертар Фарматаванага Тэксту (RTF)
-Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Канвертар Багата Фарматаванага Тэксту (RTF) версія %d.%d.%d %s
+Rich Text Format translator	RTFTranslator		Канвертар Фарматаванага Тэксту RTF
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Канвертар Багата Фарматаванага Тэксту RTF версія %d.%d.%d %s

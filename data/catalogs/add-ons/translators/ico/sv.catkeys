@@ -1,8 +1,9 @@
-1	swedish	x-vnd.Haiku-ICOTranslator	1637901496
+1	swedish	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		Markör
 Version %d.%d.%d, %s	ConfigView		Version %d,%d,%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld bitmapbild
 Valid icon sizes are 16, 32, or 48	ConfigView		Korrekta ikonstorlekar är 16, 32, eller 48
+Windows icons	ICOTranslator		Windows-ikon
 Enforce valid icon sizes	ConfigView		Tvinga korrekta ikonstorlekar
 ICO Settings	main		ICO inställningar
 Windows icon translator	ICOTranslator		Fönsterikonsöversättare
@@ -10,3 +11,4 @@ pixels in either direction.	ConfigView		pixlar i båda riktningarna.
 Write 32 bit images on true color input	ConfigView		Write 32 bit images on true color input
 Icon	ICOTranslator		Ikon
 ICOTranslator Settings	ConfigView		ICO bildöversättningsinställningar
+Windows icon translator	ConfigView		Fönsterikonsöversättare

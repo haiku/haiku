@@ -1,8 +1,9 @@
-1	lithuanian	x-vnd.Haiku-ICOTranslator	1637901496
+1	lithuanian	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		Žymeklis
 Version %d.%d.%d, %s	ConfigView		Versija %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		„Windows“ %s %ld bitų paveikslas
 Valid icon sizes are 16, 32, or 48	ConfigView		Piktogramų kraštinės gali būti 16, 32 arba 48 taškų ilgio
+Windows icons	ICOTranslator		„Windows“ piktogramos
 Enforce valid icon sizes	ConfigView		Reikalauti leistino paveikslo dydžio
 ICO Settings	main		ICO nuostatos
 Windows icon translator	ICOTranslator		„Windows“ piktogramų keitiklis
@@ -10,3 +11,4 @@ pixels in either direction.	ConfigView		taškų abiem kryptimis.
 Write 32 bit images on true color input	ConfigView		Rašyti 24 bitų piktogramas kaip 32 bitų
 Icon	ICOTranslator		Piktograma
 ICOTranslator Settings	ConfigView		ICO keitiklio nuostatos
+Windows icon translator	ConfigView		„Windows“ piktogramų keitiklis

@@ -1,14 +1,12 @@
-1	greek, modern (1453-)	x-vnd.Be-WORK	2548258861
+1	greek, modern (1453-)	x-vnd.Be-WORK	658966565
 Invalid argument: %s\n	Workspaces		Μη έγκυρη παράμετρος: %s\n
 Quit	Workspaces		Έξοδος
 Workspaces	System name		Workspaces
 Change workspace count…	Workspaces		Αλλαγή της αρίθμησης του χώρου εργασίας...
 Remove replicant	Workspaces		Αφαίρεση αντίγραφου
 About Workspaces…	Workspaces		Περί Workspaces…
-Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Χώροι Εργασίας\nγράφτηκε από τους %1, και %2.\n\nΠνευματικά δικαιώματα %3, Haiku.\n\nΣτέλνετε τα παράθυρα πίσω χρησιμοποιώντας το πλήκτρο  Option. Μετακινήστε τα παράθυρα μπροστά χρησιμοποιώντας το πλήκτρο Control.\n
 Show window border	Workspaces		Εμφάνιση περιγράμματος παραθύρου
 Auto-raise	Workspaces		Αυτόματη ανύψωση
-OK	Workspaces		Εντάξει
 Always on top	Workspaces		Πάντα στην κορυφή
 Live in the Deskbar	Workspaces		Παραμονή στη Deskbar
 Show window tab	Workspaces		Εμφάνιση καρτέλας παραθύρου

@@ -1,0 +1,48 @@
+1	portuguese (brazil)	x-vnd.Haiku-Pulse	2324471783
+OK	PrefsWindow		OK
+Quit	DeskbarPulseView		Sair
+Mini mode	DeskbarPulseView		Modo miniatura
+Remove replicant	CPUButton		Remover replicante
+Active color	ConfigView		Cor ativa
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Modo de usar: Pulse [--mini] [-w largura] [--width=largura]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Cor da sombra
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nPor David Ramsey e Arve Hjønnevåg\nRevisado por Daniel Switkin\n
+OK	DeskbarPulseView		OK
+Deskbar mode	PrefsWindow		Modo Deskbar
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		Modo normal
+Defaults	PrefsWindow		Padrões
+Normal mode	MiniPulseView		Modo normal
+Error	PulseApp		Erro
+Info	PulseView		Informação
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		Cor da borda
+Mini mode	PrefsWindow		Modo miniatura
+OK	PulseApp		OK
+Bar colors	ConfigView		Cor da barra
+Settings…	PulseView		Configurações...
+You can't disable the last active CPU.	PulseView		Você pode desabilitar a última CPU ativa.
+Info	PulseApp		Informação
+Info	CPUButton		Informação
+OK	PulseView		OK
+Deskbar menu	CPUButton		Menu da Deskbar
+About Pulse…	PulseView		Sobre o Pulso..
+Deskbar mode	MiniPulseView		Modo Deskbar
+Quit	MiniPulseView		Sair
+Pulse	System name		Pulso
+Pulse	NormalPulseView		Pulso
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Modo Deskbar
+Pulse	PulseApp		Pulso
+Width of icon:	ConfigView		Largura do ícone:
+You can't disable the last active CPU.	CPUButton		Você não pode desabilitar o último CPU ativo.
+Normal mode	DeskbarPulseView		Modo normal
+OK	CPUButton		OK
+About Pulse…	CPUButton		Sobre o Pulso...
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Remover da barra da Área de Trabalho falhou.\n
+Mini mode	NormalPulseView		Modo miniatura
+Info	DeskbarPulseView		Informação
+Pulse settings	PulseWindow		Configurações do Pulso
+Idle color	ConfigView		Cor
+Installing in Deskbar failed\n%s	PulseApp		Instalar na barra da Área de Trabalho falhou\n%s
+CPU progress bar	NormalPulseView		Barra de progresso da CPU

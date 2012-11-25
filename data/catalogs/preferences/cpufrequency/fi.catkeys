@@ -11,11 +11,11 @@ Stepping policy	CPU Frequency View		Muutostapa
 Dynamic performance	Status view		Dynaaminen suorituskyky
 Step up by CPU usage	Color Step View		Muuta ylöspäin tämän suorittimen käyttömäärän kohdalla:
 Dynamic stepping	CPU Frequency View		Dynaaminen muutos
-Stepping policy: 	CPU Frequency View		Muutostapa:
-Integration time [ms]: 	CPU Frequency View		Integraatioaika [ms]:
+Stepping policy: 	CPU Frequency View		Muutostapa: 
+Integration time [ms]: 	CPU Frequency View		Integraatioaika [ms]: 
 Open Speedstep preferences…	Status view		Avaa nopeusaskelvalinnat...
 Revert	Pref Window		Palauta
 Low energy	Status view		Matala energiankulutus
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Suoritintaajuuden asetusohjelman käynnistys epäonnistui.\n\nVirhe:
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Suoritintaajuusasetukset\n\ttekijä: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Suoritintaajuuden asetusohjelman käynnistys epäonnistui.\n\nVirhe: 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Suoritintaajuusasetukset\n\t tekijä: Clemens Zeidler\n\t Copyright 2009, Haiku, Inc.\n
 CPUFrequency	System name		Suoritintaajuusasetukset

@@ -1,14 +1,12 @@
-1	ukrainian	x-vnd.Be-WORK	2548258861
+1	ukrainian	x-vnd.Be-WORK	658966565
 Invalid argument: %s\n	Workspaces		Невірний аргумент: %s\n
 Quit	Workspaces		Вийти
 Workspaces	System name		Робочі простори
 Change workspace count…	Workspaces		Змінити кількість робочих просторів…
 Remove replicant	Workspaces		Вилучити реплікант
 About Workspaces…	Workspaces		Про Робочі простори…
-Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Робочі простори\nавтори by %1, and %2.\n\nCopyright %3, Haiku.\n\nВідправляйте вікно у тло кнопкою Option. Рухайте вікна вперед кнопкою CTRL.\n
 Show window border	Workspaces		Показувати рамку вікна
 Auto-raise	Workspaces		Автоматичне спливання
-OK	Workspaces		Гаразд
 Always on top	Workspaces		Завжди поверх усіх
 Live in the Deskbar	Workspaces		Залишити на Панелі завдань
 Show window tab	Workspaces		Показати закладку вікна

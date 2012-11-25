@@ -8,20 +8,20 @@ Could not aquire partitioning information.	MainWindow		Ei voitu hakea osiointiti
 There's no space on the partition where a child partition could be created.	MainWindow		Osiolla ei ole mitään tilaa, johon olisi voitu luoda tytärosio.
 %ld MiB	Support		%ld mebitavua
 <empty>	PartitionList		<tyhjä>
-Unable to find the selected partition by ID.	MainWindow		Ei kyetä löytämään valittua osiota tunnisteen perusteella.
+Unable to find the selected partition by ID.	MainWindow		Valitun osion löytäminen tunnisteen perusteella epäonnistui.
 Select a partition from the list below.	DiskView		Valitse osio alapuolella olevasta luettelosta.
-No disk devices have been recognized.	DiskView		Levyasemia ei  tunnistettu.
+No disk devices have been recognized.	DiskView		Levyasemia ei tunnistettu.
 Failed to initialize the disk %s!\n	MainWindow		Levyn %s alustus epäonnistui!\n
 The selected disk is read-only.	MainWindow		Valittu levy on kirjoitussuojattu.
 Partition name:	CreateParamsPanel		Osionimi:
 Initialize	InitParamsPanel		Alusta
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion \"%s\"? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
-Could not mount partition %s.	MainWindow		Ei voitu liittää osiota %s.
+Could not mount partition %s.	MainWindow		Osion %s liittäminen epäonnistui.
 The partition %s has been successfully formatted.\n	MainWindow		Osion %s alustus onnistui.\n
 The partition %s is already unmounted.	MainWindow		Osio %s on jo liitetty.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Osion poistaminen epäonnistui. Mitään muutoksia ei ole kirjoitettu levylle.
 Partition type:	CreateParamsPanel		Osiotyyppi:
-Could not delete the selected partition.	MainWindow		Ei voitu poistaa valittua osiota.
+Could not delete the selected partition.	MainWindow		Valitun osion poistaminen epäonnistui.
 Initialize	MainWindow		Alusta
 Error: 	MainWindow	in any error alert	Virhe: 
 Partition %ld	DiskView		Osio %ld
@@ -43,7 +43,7 @@ Are you sure you want to delete the selected partition?\n\nAll data on the parti
 Create…	MainWindow		Luo…
 Disk system \"%s\"\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
 The disk has been successfully initialized.\n	MainWindow		Levyn alustus onnistui.\n
-Could not unmount partition %s.	MainWindow		Ei voitu irrottaa osiota %s.
+Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Failed to format the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
 Mount	MainWindow		Liitä
 Create	CreateParamsPanel		Luo
@@ -55,7 +55,7 @@ Device	DiskView		Laite
 Active	PartitionList		Aktiivinen
 Volume name	PartitionList		Taltionimi
 Continue	MainWindow		Jatka
-Cannot delete the selected partition.	MainWindow		Valittua osiota ei voida poistaa.
+Cannot delete the selected partition.	MainWindow		Valitun osion poistaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Cancel	MainWindow		Peru
 Delete partition	MainWindow		Poista osio

@@ -1,0 +1,34 @@
+1	portuguese (brazil)	x-vnd.Haiku-LaunchBox	3016105370
+New	LaunchBox		Novo
+Set description…	LaunchBox		Editar descrição...
+Vertical layout	LaunchBox		Layout vertical
+OK	LaunchBox		OK
+Pad 1	LaunchBox		Barra 1
+last chance	LaunchBox		última chance
+Quit	LaunchBox		Sair
+Clear button	LaunchBox		Botão limpar
+LaunchBox	System name		LaunchBox
+Ignore double-click	LaunchBox		Ignorar clique duplo
+Auto-raise	LaunchBox		Auto sobrepor
+Show on all workspaces	LaunchBox		Mostrar em todos os espaços de trabalho
+Show window border	LaunchBox		Mostrar borda da janela
+Pad	LaunchBox		Barra
+Icon size	LaunchBox		Tamanho do ícone
+Bummer	LaunchBox		Bobão!
+Cancel	LaunchBox		Cancelar
+Remove button	LaunchBox		Remover botão
+Horizontal layout	LaunchBox		Orientação horizontal
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nFalhou ao lançar aplicação com assinatura '%2'.\n\nErro:
+Failed to launch '%1'.\n\nError:	LaunchBox		Falhou ao lançar '%1'.\n\nErro:
+Name Panel	LaunchBox		Nome do painel
+Add button here	LaunchBox		Adicionar botão aqui
+Description for '%3'	LaunchBox		Descrição para '%3'
+Settings	LaunchBox		Configurações
+Failed to launch 'something', error in Pad data.	LaunchBox		Falhou ao lançar 'algo', erro nos dados da Plataforma.
+Pad %1	LaunchBox		Plataforma %1
+Close	LaunchBox		Fechar
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Falha em enviar o comando 'open folder' para o Tracker.\n\nErro:
+You can drag an icon here.	LaunchBox		Você pode arrastar um ícone aqui.
+Clone	LaunchBox		Clonar
+launch popup	LaunchBox		lançar popup
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Deseja fechar esta barra?\n(A barra não será lembrada.)

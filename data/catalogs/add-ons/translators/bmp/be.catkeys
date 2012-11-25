@@ -1,9 +1,9 @@
 1	belarusian	x-vnd.Haiku-BMPTranslator	2497639570
 BMP images	BMPTranslator		Выявы BMP
 BMPTranslator Settings	BMPTranslator		Наладкі канвертара BMP
-BMP image (OS/2 format, %d bits)	BMPTranslator		выява BMP (у фармаце OS/2, %d бітаў)
+BMP image (OS/2 format, %d bits)	BMPTranslator		Выява BMP (у фармаце OS/2, %d бітаў)
 BMP image translator	BMPView		Канвертар выяваў BMP
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	выява BMP (у фармаце MS, %d бітаў
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Выява BMP (у фармаце MS, %d бітаў
 BMP Settings	BMPMain		Наладкі BMP
 Version %d.%d.%d, %s	BMPView		Версія %d.%d.%d, %s
 BMP image translator	BMPTranslator		Канвертар выяваў BMP

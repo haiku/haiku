@@ -1,6 +1,8 @@
-1	finnish	x-vnd.Haiku-HVIFTranslator	2227623652
+1	finnish	x-vnd.Haiku-HVIFTranslator	249304797
+Haiku vector icon translator	HVIFTranslator		Haiku-vektorikuvakemuunnin
 HVIF icons	HVIFTranslator		HVIF-kuvakkeet
 Render size:	HVIFView		Renderöintikoko:
 HVIFTranslator Settings	HVIFTranslator		HVIF-muunninasetukset
+Haiku vector icon translator	HVIFView		Haiku-vektorikuvakemuunnin
 HVIF Settings	HVIFMain		HVIF-asetukset
 Version %d.%d.%d, %s	HVIFView		Versio %d.%d.%d, %s

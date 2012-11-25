@@ -1,7 +1,7 @@
 1	russian	x-vnd.Haiku-Expander	2398100010
 Expand	ExpanderMenu		Распаковать
 Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
-Set destination…	ExpanderMenu		Путь для извлечения…
+Set destination…	ExpanderMenu		Путь назначения для извлечения…
 Use:	ExpanderPreferences		Использовать:
 File expanded	ExpanderWindow		Файл распакован
 The destination is read only.	ExpanderWindow		Путь назначения доступен только для чтения.
@@ -32,7 +32,7 @@ Select	ExpanderPreferences		Выбрать
 Show contents	ExpanderWindow		Показать содержимое
 Automatically show contents listing	ExpanderPreferences		Автоматически отображать содержимое архива
 OK	ExpanderPreferences		ОК
-Leave destination folder path empty	ExpanderPreferences		Оставить путь распаковки пустым
+Leave destination folder path empty	ExpanderPreferences		Оставить путь назначения пустым
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка была перемещена, переименована либо не\nподдерживается.
 The file doesn't exist	ExpanderWindow		Файл не существует
 Stop	ExpanderMenu		Остановить

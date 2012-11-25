@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-GLTeapot	3688092856
+1	finnish	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Ylempi keskikohta
 Lighting	TeapotWindow		Valaistus
 Off	TeapotWindow		Valot pois
@@ -7,8 +7,9 @@ White	TeapotWindow		Valkoinen
 Yellow	TeapotWindow		Keltainen
 Blue	TeapotWindow		Sininen
 Gouraud shading	TeapotWindow		Gouraud-varjostus
-Quit	TeapotWindow		Poistu
+Quit	TeapotWindow		Lopeta
 Filled polygons	TeapotWindow		Täytetyt monikulmiot
+Settings	TeapotWindow		Asetukset
 Fog	TeapotWindow		Sumu
 Backface culling	TeapotWindow		Taustakulman häivytys
 Z-buffered	TeapotWindow		Z-puskuroitu

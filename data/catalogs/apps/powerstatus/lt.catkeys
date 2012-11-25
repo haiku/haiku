@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PowerStatus	3419486861
+1	lithuanian	x-vnd.Haiku-PowerStatus	3224068645
 Design capacity low warning: 	PowerStatus		Numatytasis įspėjimas apie sumažėjusią talpą: 
 Show percent	PowerStatus		Rodyti procentais
 Design capacity: 	PowerStatus		Numatytoji talpa: 
@@ -8,9 +8,7 @@ non-rechargeable	PowerStatus		neįkraunama
 Empty battery slot	PowerStatus		Baterijos lizdas tuščias
  mV	PowerStatus		 mV
 Run in window	PowerStatus		Paleisti lange
-About	PowerStatus		Apie programą
 PowerStatus	System name		Maitinimo būsena
-PowerStatus	PowerStatus		Maitinimo būsena
  mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Baterijos savybės…
 Damaged battery	PowerStatus		Baterija pažeista
@@ -30,10 +28,8 @@ Capacity: 	PowerStatus		Talpa:
 Battery discharging	PowerStatus		Baterija iškraunama
 Serial number: 	PowerStatus		Serijinis numeris: 
 Capacity granularity 1: 	PowerStatus		Talpos detalizavimas 1: 
-OK	PowerStatus		Gerai
 OEM info: 	PowerStatus		OĮG informacija: 
 Design voltage: 	PowerStatus		Numatytoji įtampa: 
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Maitinimo būsena\nautoriai: Axel Dörfler, Clemens Zeidler\n© 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Baterija įkraunama
 Design capacity warning: 	PowerStatus		Numatytasis įspėjimas apie talpą: 
 Battery info	PowerStatus		Baterijos savybės

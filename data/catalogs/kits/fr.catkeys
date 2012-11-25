@@ -1,5 +1,4 @@
-1	french	x-vnd.Haiku-libbe	180647795
-Close	AboutWindow		Fermer
+1	french	x-vnd.Haiku-libbe	864109244
 %3.2f GiB	StringForSize		%3.2f Gio
 Written by:	AboutWindow		Écrit par :
 About %app%	AboutMenuItem		À propos de %app%
@@ -8,7 +7,6 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		I
 Copy	TextView		Copier
 %3.2f KiB	StringForSize		%3.2f Kio
 %d bytes	StringForSize		%d octets
-About…	AboutWindow		À propos…
 Error	PrintJob		Erreur
 No Pages to print!	PrintJob		Aucune page à imprimer !
 OK	Dragger		OK
@@ -18,7 +16,6 @@ Remove replicant	Dragger		Enlever le réplicant
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Le serveur d'impression ne répond pas.
 Paste	TextView		Coller
-Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 %.2f TiB	StringForSize		%.2f Tio
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l'application du réplicant. Aucune signature d'application fournie.\n%error
 Redo	TextView		Refaire

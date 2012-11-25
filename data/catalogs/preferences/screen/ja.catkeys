@@ -8,8 +8,8 @@ Revert	Screen		元に戻す
 Swap displays:	Screen		ディスプレイを交換：
 Combine displays:	Screen		ディスプレイを一体化：
 Done	Screen		完了
-Set background…	Screen		背景を設定...
-Undo	Screen		戻す
+Set background…	Screen		背景を設定…
+Undo	Screen		元に戻す
 if needed	Screen		必要ならば
 Screen preferences by the Haiku team	Screen		Haiku チームによる画面設定
 Screen	System name		画面

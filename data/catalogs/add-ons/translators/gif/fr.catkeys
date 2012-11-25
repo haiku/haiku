@@ -1,9 +1,10 @@
-1	french	x-vnd.Haiku-GIFTranslator	829368084
+1	french	x-vnd.Haiku-GIFTranslator	2708495435
 Websafe	GIFView		Garantie pour le web
 Write interlaced images	GIFView		Enregistrer les images entrelacées
 Optimal	GIFView		Optimale
 Greyscale	GIFView		Nuances de gris
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Format Bitmap Be (Traducteur GIF)
+GIF image translator	GIFView		Traducteur d'images GIF
 GIF image	GIFTranslator		Image GIF
 Write transparent images	GIFView		Enregistrer la transparence des images
 Palette	GIFView		Palette

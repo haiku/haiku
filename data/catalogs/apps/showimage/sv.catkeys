@@ -20,7 +20,7 @@ Browse	Menus		Bläddra
 Edit	Menus		Redigera
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunde inte ladda bilden! Endera finns inte filen eller så saknas en bildöversättare för bildformatet.
 First page	Menus		Första sidan
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har ändrats. Vill du verkligen stänga dokumentet?
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (sida %d) har ändrats. Vill du verkligen stänga dokumentet?
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekunder
 Leave full screen	Menus		Lämna fullskärmsläge
 Close	Menus		Stäng

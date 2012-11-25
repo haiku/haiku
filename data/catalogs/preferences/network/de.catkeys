@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Network	2324385456
+1	german	x-vnd.Haiku-Network	365183238
 Choose automatically	EthernetSettingsView		Automatisch auswählen
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Netzmaske:
@@ -19,3 +19,4 @@ The net_server needs to run for the auto configuration!	EthernetSettingsView		Zu
 Disabled	EthernetSettingsView		Deaktiviert
 Auto-configuring failed: 	EthernetSettingsView		Auto-Konfiguration fehlgeschlagen: 
 Static	EthernetSettingsView		Statisch
+<no adapter>	EthernetSettingsView		<kein Netzwerkgerät>

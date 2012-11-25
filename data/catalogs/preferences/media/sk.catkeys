@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Media	1473363280
+1	slovak	x-vnd.Haiku-Media	1376555819
 Couldn't add volume control in Deskbar: %s\n	Media views		Nepodarilo sa pridať ovládanie hlasitosti do Panela: %s\n
 Ready for use…	Media Window		Pripravený na použitie…
 Video input:	Media views		Video vstup:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Prebieha upratovanie.
 Defaults	Media views		Predvolené
 Stopping media server…	Media Window		Zastavuje sa multimediálny server…
 Quit	Media Window		Ukončiť
-OK	Media Window		OK
 Starting media server…	Media Window		Spúšťa sa multimediálny server…
 Done shutting down.	Media Window		Vypínanie dokončené.
 Video settings	Media Window		Video nastavenia

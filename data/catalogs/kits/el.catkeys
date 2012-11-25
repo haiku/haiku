@@ -1,5 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libbe	180647795
-Close	AboutWindow		Κλείσιμο
+1	greek, modern (1453-)	x-vnd.Haiku-libbe	864109244
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Γράφτηκε από τον:
 About %app%	AboutMenuItem		Περί %app%
@@ -8,7 +7,6 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		�
 Copy	TextView		Αντιγραφή
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d bytes
-About…	AboutWindow		Περί...
 Error	PrintJob		Σφάλμα
 No Pages to print!	PrintJob		Δεν υπάρχουν σελίδες για εκτύπωση!
 OK	Dragger		Εντάξει
@@ -18,7 +16,6 @@ Remove replicant	Dragger		Αφαίρεση αντιγράφου
 OK	ZombieReplicantView		Εντάξει
 Print Server is not responding.	PrintJob		Ο Εξυπηρετητής εκτυπώσεων δεν ανταποκρίνεται.
 Paste	TextView		Επικόλληση
-Copyright © %years% Haiku, Inc.	AboutWindow		Πνευματικά δικαιώματα © %years% Haiku, Inc.
 %.2f TiB	StringForSize		%.2f TiB
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Αδύνατη η εύρεση της εφαρμογής. Δεν δόθηκε η υπογραφή της %error
 Redo	TextView		Ακύρωση αναίρεσης

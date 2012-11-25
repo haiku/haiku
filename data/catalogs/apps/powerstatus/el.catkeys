@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PowerStatus	751886234
+1	greek, modern (1453-)	x-vnd.Haiku-PowerStatus	556468018
 Design capacity low warning: 	PowerStatus		Χαμηλή προειδοποίηση χωριτικότητας σχεδίασης:
 Show percent	PowerStatus		Εμφάνιση ποσοστού
 Design capacity: 	PowerStatus		Σχεδιασμένη χωριτικότητα:
@@ -6,9 +6,7 @@ Type: 	PowerStatus		Τύπος:
 non-rechargeable	PowerStatus		μη-επαναφορτιζόμενο
 Empty battery slot	PowerStatus		Κενή υποδοχή μπαταρίας
 Run in window	PowerStatus		Εκτέλεση σε παράθυρο
-About	PowerStatus		Περί
 PowerStatus	System name		PowerStatus
-PowerStatus	PowerStatus		PowerStatus
 Battery info…	PowerStatus		Πληροφορίες μπαταρίας...
 Damaged battery	PowerStatus		Κατεστραμμένη μπαταρία
 Show time	PowerStatus		Εμφάνιση ώρας
@@ -25,10 +23,8 @@ Capacity: 	PowerStatus		Χωρητικότητα:
 Battery discharging	PowerStatus		Η μπαταρία αποφορτίζεται
 Serial number: 	PowerStatus		Σειριακός αριθμός:
 Capacity granularity 1: 	PowerStatus		Κατάτμηση χωριτικότητας 1:
-OK	PowerStatus		Εντάξει
 OEM info: 	PowerStatus		Πληροφορίες OEM:
 Design voltage: 	PowerStatus		Σχεδιασμένη τάση:
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nδημιουργημένο από τους Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Η μπαταρία φορτίζεται
 Design capacity warning: 	PowerStatus		Προειδοποίηση σχεδιασμένης τάσης:
 Battery info	PowerStatus		Πληροφορίες μπαταρίας

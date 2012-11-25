@@ -1,14 +1,12 @@
-1	slovak	x-vnd.Be-WORK	2548258861
+1	slovak	x-vnd.Be-WORK	658966565
 Invalid argument: %s\n	Workspaces		Neplatný argument: %s\n
 Quit	Workspaces		Ukončiť
 Workspaces	System name		Pracovné plochy
 Change workspace count…	Workspaces		Zmeniť počet pracovných plôch…
 Remove replicant	Workspaces		Odstrániť replikanta
 About Workspaces…	Workspaces		O Pracovných plochách…
-Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Pracovné plochy\nnapísali %1 a %2.\n\nCopyright %3, Haiku.\n\nPosielanie okien do pozadia pomocou klávesu Option. Presúvanie okien do popredia pomocou klávesu Control.\n
 Show window border	Workspaces		Zobraziť okraj okna
 Auto-raise	Workspaces		Automaticky aktivovať
-OK	Workspaces		OK
 Always on top	Workspaces		Vždy na vrchu
 Live in the Deskbar	Workspaces		Prebývať v Paneli
 Show window tab	Workspaces		Zobraziť záložku okna

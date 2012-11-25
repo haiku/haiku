@@ -9,7 +9,7 @@ Central beep	ConfigView		Центральный звуковой сигнал
 Beep	ConfigView		Звуковой сигнал
 Method:	ConfigView		Метод:
 Central alert	ConfigView		Центральное оповещение
-Alert	ConfigView		Оповещение
+Alert	ConfigView		Окно предупрежния
 none	ConfigView		нет
 New messages	filter		Новое сообщение
 New mails notification	ConfigView		Уведомление о новой почте

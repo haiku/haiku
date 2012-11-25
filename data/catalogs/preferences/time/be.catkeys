@@ -2,7 +2,7 @@
 GMT (UNIX compatible)	Time		GMT (як у UNIX)
 OK	Time		ОК
 Asia	Time		Азія
-\nNow: 	Time		\nЗараз:
+\nNow: 	Time		\nЗараз: 
 Africa	Time		Афрыка
 Stop	Time		Спыніць
 Could not contact server	Time		Няма далучэння да сервера
@@ -24,7 +24,7 @@ Europe	Time		Эўропа
 Remove	Time		Выдаліць
 Time	Time		Час
 Indian	Time		Індыя
-Sending request failed	Time		Немагчыма адаслаць запыт.
+Sending request failed	Time		Немагчыма адаслаць запыт
 Arctic	Time		Арктыка
 Time	System name		Дата і Час
 America	Time		Амерыка
@@ -34,11 +34,11 @@ Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhil
 Received invalid time	Time		Атрыманы несапраўдны час
 Antarctica	Time		Антарктыка
 The following error occured while synchronizing:r\n%s: %s	Time		Памылка падчас сінхранізацыі:r\n%s: %s
-<Other>	Time		<іншае>
+<Other>	Time		<Іншае>
 Current time:	Time		Сапраўдны час:
 Try all servers	Time		Паспрабаваць усе серверы
 Time zone	Time		Часавы пояс
-Could not create socket	Time		Немагчыма стварыць сеткавы сокет.
+Could not create socket	Time		Немагчыма стварыць сеткавы сокет
 Synchronize again	Time		Сінхранізаваць ізноў
 Network time	Time		Сеткавы час
 Atlantic	Time		Атлантыка

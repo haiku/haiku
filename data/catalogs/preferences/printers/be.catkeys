@@ -1,5 +1,5 @@
 1	belarusian	x-vnd.Be-PRNT	2674539197
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Прынтэр: %printer_name%\nДрайвер: %driver%\n
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Прынтэр: %printer_name%\nДрайвер:  %driver%\n
 Waiting	JobListView		Чаканне
 Print test page	PrintersWindow		Надрукаваць тэставую старонку
 Test Page	TestPageView		Тэставая старонка
@@ -30,10 +30,10 @@ Blue	TestPageView		Сіні
 1 pending job.	PrinterListView		1 заданне ў чарзе.
 Remove	PrintersWindow		Выдаліць
 <pick one>	AddPrinterDialog		<выберыце адно>
-Add …	PrintersWindow		Дадаць ...
-Print jobs for 	PrintersWindow		Заданні друку для
+Add …	PrintersWindow		Дадаць …
+Print jobs for 	PrintersWindow		Заданні друку для 
 Failed	JobListView		Не ўдалося
-%.2f KB	JobListView		%.2f KB
+%.2f KB	JobListView		%.2f КБ
 Magenta	TestPageView		Пурпурны
 Completed	JobListView		Скончана
 No printer found!	TransportMenu		Прынтэры не знойдзены!

@@ -1,6 +1,7 @@
-1	polish	x-vnd.Haiku-CPUFrequencyPref	3079996868
-Ok	Status view		OK
-CPU frequency status view	CPU Frequency View		Widok częstotliwości taktowania procesora
+1	polish	x-vnd.Haiku-CPUFrequencyPref	1007318924
+Ok	Status view		Ok
+CPU frequency status view	CPU Frequency View		Widok statusu częstotliwości taktowania procesora
+OK	Status view		OK
 Set state	Status view		Ustaw stan
 Defaults	Pref Window		Przywróć ustawienia domyślne
 Install replicant into Deskbar	CPU Frequency View		Zainstaluj replikant na Panelu Pulpitu

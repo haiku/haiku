@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	849531913
+1	polish	x-vnd.Be-MAIL	3337401776
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
@@ -27,6 +27,7 @@ Expert	Mail		Ekspert
 Reply account:	Mail		Konto odpowiedzi:
 Discard	Mail		Odrzuć
 Message	Mail		Wiadomość
+Settings…	Mail		Ustawienia...
 Reply to sender	Mail		Odpowiedz nadawcy
 There is no installed handler for URL links.	Mail		Brak zainstalowanego programu do obsługi skrótów URL.
 Signature	Mail		Sygnatura

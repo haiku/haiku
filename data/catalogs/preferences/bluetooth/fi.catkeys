@@ -9,14 +9,14 @@ Show bluetooth console…	Window		Näytä bluetooth-pääteikkuna…
 Smart phone	Settings view		Älypuhelin
 Server	Settings view		Palvelin
 Stop bluetooth services…	Window		Pysäytä bluetoothpalvelut…
-Identify host as:	Settings view		Tunnista isäntä nimellä :
+Identify host as:	Settings view		Tunnista verkkokone nimellä:
 View	Window		Näytä
 Refresh…	Remote devices		Päivitä…
 Pair…	Remote devices		Parita…
-Incoming connections policy:	Settings view		Saapuvien yhteyksien sääntö :
+Incoming connections policy:	Settings view		Saapuvien yhteyksien sääntö:
 From all devices	Settings view		Kaikista laitteista
 Show name	Extended local device view		Näytä nimi
-Local devices found on system:	Settings view		Järjestelmästä löydetyt paikalliset laitteet :
+Local devices found on system:	Settings view		Järjestelmästä löydetyt paikalliset laitteet:
 Remaining %1 seconds	Inquiry panel		Jäljellä %1 sekuntia
 Server	Window		Palvelin
 Scanning completed.	Inquiry panel		Etsintä valmis.
@@ -29,10 +29,10 @@ Start please	main		Käynnistä
 Start bluetooth services…	Window		Käynnistä bluetoothpalvelut…
 Policy...	Settings view		Sääntö...
 61 secs	Settings view		61 sekuntia
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth-järjestelmä, (ARCE)\n\nLuonut Oliver Ruiz Dorantes\n\nApuna ovat olleet:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nKiitos henkilöille, jotka auttoivat...\n\nLähettäen/lahjoittaen laitteistoa:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nTaloudellisesti:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nKorjauksilla:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestaamalla:\n\t- Petter H. Juliussen\nJotka antoivat minulle kaiken tiedon:\n\t- the yellowTAB team
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Paikallisia Bluetooth laitteita ei löydetty järjestelmästä
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth-järjestelmä, (ARCE)\n\nLuonut Oliver Ruiz Dorantes\n\nApuna ovat olleet:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nKiitos henkilöille, jotka auttoivat...\n\nLähettäen/lahjoittaen laitteistoa:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nTaloudellisesti:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nKorjauksilla:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestaamalla:\n\t- Petter H. Juliussen\nJotka antoivat minulle kaiken tiedon:\n\t- yellowTAB-ryhmä
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Paikallisia Bluetooth laitteita ei löydetty järjestelmästä.
 Identify us as...	Settings view		Tunnista meidät nimellä...
- packets: 	Device View		pakettia:
+ packets: 	Device View		 pakettia: 
 As blocked	Remote devices		Estettynä
 Bluetooth	System name		Bluetooth-asetukset
 Disconnect	Remote devices		Katkaise yhteys
@@ -44,9 +44,9 @@ Revert	Window		Palauta
 Remote devices	Window		Etälaitteet
 Laptop	Settings view		Kannettava
 Discoverable	Extended local device view		Paljastettava
-Work offline	main		Erillistyöskentelyä
-bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server-palvelin ei ollut käynnissä järjestelmässä. Se pitäisi käynnistää tai pysyä erillistyöskentelyssä
-Service classes: 	Device View		Palveluluokat:
+Work offline	main		Työskentele yhteydettömässä tilassa
+bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server-palvelin ei ollut käynnissä järjestelmässä. Se pitäisi käynnistää tai pysyä yhteydettömässä tilassa
+Service classes: 	Device View		Palveluluokat: 
 Connections & channels…	Window		Yhteys- ja kanavalista…
 Refresh LocalDevices…	Window		Päivitä paikallisia laitteita…
 Settings	Window		Asetukset

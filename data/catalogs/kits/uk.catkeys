@@ -1,5 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libbe	180647795
-Close	AboutWindow		Закрити
+1	ukrainian	x-vnd.Haiku-libbe	864109244
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Автор:
 About %app%	AboutMenuItem		Про %app%
@@ -8,7 +7,6 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		�
 Copy	TextView		Копіювати
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d байт
-About…	AboutWindow		Про…
 Error	PrintJob		Помилка
 No Pages to print!	PrintJob		Жодної сторінки для друку!
 OK	Dragger		Гаразд
@@ -18,7 +16,6 @@ Remove replicant	Dragger		Видалити реплікант
 OK	ZombieReplicantView		Гаразд
 Print Server is not responding.	PrintJob		Принт сервер недоступний.
 Paste	TextView		Вставити
-Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 %.2f TiB	StringForSize		%.2f TiB
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити додаток для репліканту. Незнайдено сигнатуру додатку.\n%помилка
 Redo	TextView		Відмінити відміну

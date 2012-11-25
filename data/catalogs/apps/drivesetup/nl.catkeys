@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	2908539543
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	1372142450
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		Verwijderen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de geselecteerde partitie onherroepelijk kwijt zijn als u dit doet!
@@ -11,10 +11,13 @@ There's no space on the partition where a child partition could be created.	Main
 Unable to find the selected partition by ID.	MainWindow		Kan de geselecteerde partitie niet vinden op basis van ID.
 Select a partition from the list below.	DiskView		Selecteer een partitie uit onderstaande lijst.
 No disk devices have been recognized.	DiskView		Er werden geen schijfapparaten herkend.
+Failed to initialize the disk %s!\n	MainWindow		Initialisatie van de schijf %s is mislukt!\n
 The selected disk is read-only.	MainWindow		De geselecteerde schijf is alleen-lezen.
 Partition name:	CreateParamsPanel		Partitienaam:
 Initialize	InitParamsPanel		Initialiseer
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie \"%s\" wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
 Could not mount partition %s.	MainWindow		Kon partitie %s niet betrekken.
+The partition %s has been successfully formatted.\n	MainWindow		De partitie %s werd met succes geformatteerd.\n
 The partition %s is already unmounted.	MainWindow		De partitie %s is al onttrokken.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet verwijderen. Er werden geen veranderingen naar de schijf geschreven.
 Partition type:	CreateParamsPanel		Partitiesoort:
@@ -34,15 +37,20 @@ Offset: %ld MB	Support		Offset: %ld MB
 Write changes	MainWindow		Veranderingen schrijven
 There was an error preparing the disk for modifications.	MainWindow		Fout tijdens het voorbereiden van de schijf voor aanpassingen.
 The partition %s is already mounted.	MainWindow		De partitie %s is al betrokken.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\n&U zult alle gegevens op de %s schijf onherroepelijk kwijt zijn als u dit doet!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de geselecteerde partitie wilt verwijderen?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
 Create…	MainWindow		Maken…
 Disk system \"%s\"\" not found!	MainWindow		Schijf \"%s\"\" systeem niet gevonden!
+The disk has been successfully initialized.\n	MainWindow		De schijf %s werd met succes geïnitialiseerd.\n
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
+Failed to format the partition %s!\n	MainWindow		Formatteren van partitie %s is mislukt!\n
 Mount	MainWindow		Betrekken
 Create	CreateParamsPanel		Maken
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u een ongepartitioneerde schijf wil formatteren? (de meeste mensen zullen eerst een partitiesysteem op de schijf zetten). Het zal u nogmaals gevraagd worden voordat de gegevens naar de schijf geschreven worden.
 Device	PartitionList		Apparaat
 Disk	MainWindow		Schijf
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Weet u zeker at u de geselecteerde schijf wilt initialiseren? Alle gegevens zullen verloren gaan. Het zal u nogmaals gevraagd worden voordat de gegevens naar de schrijf geschreven zullen worden.\n
 Device	DiskView		Apparaat
 Active	PartitionList		Actief
 Volume name	PartitionList		Naam gegevensdrager
@@ -57,6 +65,7 @@ Partition	MainWindow		Partitie
 File system	PartitionList		Bestandssysteem
 Validation of the given creation parameters failed.	MainWindow		Natrekken van de gegeven creatieparameters is mislukt.
 Size	PartitionList		Grootte
+Wipe (not implemented)	MainWindow		Wissen (niet geïmplementeerd)
 Validation of the given initialization parameters failed.	MainWindow		Natrekken van de opgegeven initialisatieparameters is mislukt.
 The selected partition does not contain a partitioning system.	MainWindow		De geselecteerde partitie bevat geen partitioneringssysteem.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de %s partitie onherroepelijk kwijt zijn als u dit doet!
@@ -65,7 +74,9 @@ Partition size	CreateParamsPanel		Partitiegrootte
 Surface test (not implemented)	MainWindow		Oppervlaktetest (niet geïmplementeerd)
 Cancel	InitParamsPanel		Annuleren
 Cancel	CreateParamsPanel		Annuleren
+Format	MainWindow		Formatteren
 Parameters	PartitionList		Parameters
 Creation of the partition has failed.	MainWindow		Creatie van de partitie is mislukt.
 The currently selected partition is not empty.	MainWindow		De nu geselecteerde partitie is niet leeg.
+Failed to format the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet formatteren. Er werden geen veranderingen naar de schijf geschreven.
 Unmount	MainWindow		Onttrekken

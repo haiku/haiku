@@ -1,12 +1,12 @@
 1	finnish	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		Palauta kuvakaappaus
-Could not set Sudoku:\n%s\n	SudokuWindow		Ei voitu asettaa Sudokua:\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Sudokun asettaminen epäonnistui:\n%s\n
 Export as…	SudokuWindow		Vie nimellä...
 OK	SudokuWindow		Valmis
 New	SudokuWindow		Uusi
 Abort	ProgressWindow		Keskeytä
 Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Ei voitu avata kohdetta ”%s”:\n%s\n
+Could not open \"%s\":\n%s\n	SudokuWindow		Kohteen ”%s” avaus epäonnistui:\n%s\n
 Easy	SudokuWindow		Helppo
 Open file…	SudokuWindow		Avaa tiedosto...
 Solve single field	SudokuWindow		Ratkaise yksi kenttä
@@ -31,4 +31,4 @@ Blank	SudokuWindow		Tyhjä
 Help	SudokuWindow		Opaste
 Searching for removable values	SudokuGenerator		Etsitään poistettavia arvoja
 Undo	SudokuWindow		Peru
-Quit	SudokuWindow		Poistu
+Quit	SudokuWindow		Lopeta

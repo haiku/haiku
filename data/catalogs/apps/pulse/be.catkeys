@@ -20,13 +20,13 @@ Frame color	ConfigView		Колер рамкі
 Mini mode	PrefsWindow		Міні-рэжым
 OK	PulseApp		ОК
 Bar colors	ConfigView		Колеры панэлі
-Settings…	PulseView		Наладкі...
+Settings…	PulseView		Наладкі…
 You can't disable the last active CPU.	PulseView		Вы не можаце выключыць апошні актыўны ЦП.
 Info	PulseApp		Інфа
 Info	CPUButton		Інфа
 OK	PulseView		ОК
 Deskbar menu	CPUButton		Меню Deskbar
-About Pulse…	PulseView		Пра Пульс...
+About Pulse…	PulseView		Пра Пульс…
 Deskbar mode	MiniPulseView		Рэжым Deskbar
 Quit	MiniPulseView		Выйсці
 Pulse	System name		Пульс
@@ -38,7 +38,7 @@ Width of icon:	ConfigView		Шырыня іконкі:
 You can't disable the last active CPU.	CPUButton		Вы не можаце выключыць апошні актыўны ЦП.
 Normal mode	DeskbarPulseView		Звычайны рэжым
 OK	CPUButton		ОК
-About Pulse…	CPUButton		Пра Пульс
+About Pulse…	CPUButton		Пра Пульс…
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Немагчыма выдаліць з Deskbar.\n%s
 Mini mode	NormalPulseView		Міні-рэжым
 Info	DeskbarPulseView		Інфа

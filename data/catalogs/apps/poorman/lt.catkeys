@@ -38,7 +38,7 @@ Connections	PoorMan		Ryšiai
 Status: Running	PoorMan		Būsena: veikia
 connections	PoorMan		ryšiai (-ių)
 Controls	PoorMan		Valdymas
-Send file listing if there's no start page	PoorMan		Neradus pradžios tinklalapio, siųsti failų sąrašą
+Send file listing if there's no start page	PoorMan		Neradus pradžios tinklapio, siųsti failų sąrašą
 Error Dir	PoorMan		Aplanko klaida
 Select all	PoorMan		Pažymėti viską
 File	PoorMan		Failas

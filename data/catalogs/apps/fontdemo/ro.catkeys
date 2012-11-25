@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-FontDemo	1769653414
+1	romanian	x-vnd.Haiku-FontDemo	1300625863
 Outline:	ControlView		Contur:
 Size: 50	ControlView		Marime: 50
 Stop cycling	ControlView		Opreşte ciclare
@@ -12,7 +12,6 @@ Cycle fonts	ControlView		Ciclează fonturi
 Font:	ControlView		Font:
 Rotation: 0	ControlView		Rotaţie: 0
 Drawing mode:	ControlView		Mod desenare:
-FontDemo	FontDemo		DemoFonturi
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Controale
 Outline: %d	ControlView		Contur: %d

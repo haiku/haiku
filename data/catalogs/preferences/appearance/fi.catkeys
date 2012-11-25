@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	2671941221
+1	finnish	x-vnd.Haiku-Appearance	1428480647
 Plain font:	Font view		Pelkkä kirjasin:
 Control highlight	Colors tab		Kontrollin korostus
 Control border	Colors tab		Kontrollin reuna
@@ -52,8 +52,8 @@ LCD subpixel	AntialiasingSettingsView		LCD alipikseli
 Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
 Strong	AntialiasingSettingsView		Vahva
 Panel text	Colors tab		Paneelin teksti
-Decorators	APRWindow		Kehykset
 Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
+Look and feel	APRWindow		Ulkoasu ja käyttötuntuma
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
 Fonts	APRWindow		Kirjasimet
 Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:

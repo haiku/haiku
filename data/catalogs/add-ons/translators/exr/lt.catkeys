@@ -1,7 +1,9 @@
-1	lithuanian	x-vnd.Haiku-EXRTranslator	2253035870
+1	lithuanian	x-vnd.Haiku-EXRTranslator	106859695
 Version %d.%d.%d, %s	ConfigView		Versija %d.%d.%d, %s
 EXR image translator	EXRTranslator		EXR paveikslų keitiklis
 Based on OpenEXR (http://www.openexr.com)	ConfigView		Sukurtas „OpenEXR“ (http://www.openexr.com) pagrindu
 EXR Settings	main		EXR nuostatos
+EXR images	EXRTranslator		EXR paveikslai
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		„Lucasfilm Entertainment Company Ltd“ padalinys
 EXR image	EXRTranslator		EXR paveikslas
+EXR image translator	ConfigView		EXR paveikslų keitiklis

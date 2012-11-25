@@ -5,5 +5,5 @@ Genuine below and uncertain above:	SpamFilterConfig		Aito alla ja epävarma yll�
 Spam above:	SpamFilterConfig		Roskaposti yllä:
 Add spam rating to start of subject	SpamFilterConfig		Lisää roskapostiarvosana aiheen alkuun
 Learn from all incoming e-mail	SpamFilterConfig		Opi kaikesta tulevasta sähköpostista
-Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Ei kyetä käynnistämään spamdb-ohjelmaa palvelinasetusten muokkaamiseksi.
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Spamdb-ohjelman käynnistäminen palvelinasetusten muokkaamiseksi epäonnistui.
 Close	SpamFilterConfig		Sulje

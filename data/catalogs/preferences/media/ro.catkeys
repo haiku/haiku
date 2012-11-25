@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Media	850876587
+1	romanian	x-vnd.Haiku-Media	754069126
 Couldn't add volume control in Deskbar: %s\n	Media views		Nu s-a putut adăuga controlul de volum pe bara de desktop: %s\n
 Ready for use…	Media Window		Gata de utilizat...
 Video input:	Media views		Intrare video:
@@ -7,7 +7,6 @@ Cleaning up.	Media Window		Se curăță.
 Defaults	Media views		Implicite
 Stopping media server…	Media Window		Se oprește serverul media...
 Quit	Media Window		Părăsește
-OK	Media Window		OK
 Starting media server…	Media Window		Se pornește serverul media...
 Video settings	Media Window		Configurări video
 Video output:	Media views		Ieșire video:

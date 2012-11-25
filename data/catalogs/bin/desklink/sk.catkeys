@@ -1,9 +1,10 @@
-1	slovak	x-vnd.Haiku-desklink	3053930521
+1	slovak	x-vnd.Haiku-desklink	2797960853
 Control physical output	MediaReplicant		Ovládanie fyzického výstupu
 Couldn't launch 	MediaReplicant		Nepodarilo sa spustiť 
 OK	MediaReplicant		OK
 Sound preferences…	MediaReplicant		Nastavenia zvuku…
 %g dB	MediaReplicant		%g dB
+Open %name	DeskButton	Don't translate variable %name	Otvoriť %name
 No media server running	VolumeControl		Multimediány server nebeží
 Media preferences…	MediaReplicant		Nastavenia multimédií…
 Open MediaPlayer	MediaReplicant		Otvoriť Prehrávač multimédií

@@ -1,6 +1,6 @@
 1	belarusian	x-vnd.Haiku-Sudoku	2463385585
 Restore snapshot	SudokuWindow		Аднавіць здымак
-Could not set Sudoku:\n%s\n	SudokuWindow		Could not set Sudoku:\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Не ўдалося усталяваць Sudoku:\n%s\n
 Export as…	SudokuWindow		Экспратаваць як…
 OK	SudokuWindow		Так
 New	SudokuWindow		Новы

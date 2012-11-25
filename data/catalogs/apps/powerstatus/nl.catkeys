@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PowerStatus	3419486861
+1	dutch; flemish	x-vnd.Haiku-PowerStatus	3224068645
 Design capacity low warning: 	PowerStatus		Waarschuwing lage ontwerpcapaciteit:
 Show percent	PowerStatus		Toon percentage
 Design capacity: 	PowerStatus		Ontwerpcapaciteit
@@ -8,9 +8,7 @@ non-rechargeable	PowerStatus		Niet-oplaadbaar
 Empty battery slot	PowerStatus		Accuvak is leeg
  mV	PowerStatus		mV
 Run in window	PowerStatus		Actief in venster
-About	PowerStatus		over
 PowerStatus	System name		PowerStatus
-PowerStatus	PowerStatus		PowerStatus
  mWh	PowerStatus		mWh
 Battery info…	PowerStatus		Accu-info...
 Damaged battery	PowerStatus		Beschadigde batterij
@@ -30,10 +28,8 @@ Capacity: 	PowerStatus		Capaciteit
 Battery discharging	PowerStatus		Accu bezig met ontladen
 Serial number: 	PowerStatus		Serienummer:
 Capacity granularity 1: 	PowerStatus		Capaciteit van granulariteit 1:
-OK	PowerStatus		Oké
 OEM info: 	PowerStatus		OEM-info:
 Design voltage: 	PowerStatus		Ontwerpvoltage:
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\ndoor Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Accu laadt
 Design capacity warning: 	PowerStatus		Waarschuwing ontwerpcapaciteit:
 Battery info	PowerStatus		Accu-info

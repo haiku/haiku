@@ -1,5 +1,4 @@
-1	german	x-vnd.Haiku-libbe	180647795
-Close	AboutWindow		Schließen
+1	german	x-vnd.Haiku-libbe	864109244
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Von:
 About %app%	AboutMenuItem		Über %app%
@@ -8,7 +7,6 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		R
 Copy	TextView		Kopieren
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d Bytes
-About…	AboutWindow		Über...
 Error	PrintJob		Fehler
 No Pages to print!	PrintJob		Keine Seiten zu drucken!
 OK	Dragger		OK
@@ -18,7 +16,6 @@ Remove replicant	Dragger		Replikant entfernen
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Drucker-Server reagiert nicht.
 Paste	TextView		Einfügen
-Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 %.2f TiB	StringForSize		%.2f TiB
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
 Redo	TextView		Wiederholen

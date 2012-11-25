@@ -11,8 +11,8 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вярнуцца да
 Search backwards	FindandReplaceWindow		Шукаць ў адваротным накірунку
 Size	Menus		Памер
 Save	QuitAlert		Захаваць
-Page setup…	Menus		Наладкі старонкі...
-Print…	Menus		Друкаваць...
+Page setup…	Menus		Наладкі старонкі…
+Print…	Menus		Друкаваць…
 Can't undo	Menus		Немагчыма адмяніць
 Save	Menus		Захаваць
 Replace with:	FindandReplaceWindow		Змяніць на:
@@ -32,7 +32,7 @@ Save changes to the document \"%s\"? 	QuitAlert		Захаваць адрэдаг
 Edit	Menus		Рэдагаваць
 Font	Menus		Шрыфт
 Replace all	FindandReplaceWindow		Замяняць усё
-Statistics…	Menus		Статыстыка...
+Statistics…	Menus		Статыстыка…
 Default	Open_and_SaveAsPanel		Прадвызначаны
 Replace next	Menus		Замяніць наступны
 Cancel	FindandReplaceWindow		Адмена
@@ -69,12 +69,12 @@ Error loading \"%s\":\n\t%s	LoadAlert		Немагчыма загрузіць \"%
 Undo typing	QuitAlert		Адмяніць увод
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Гэты файл пазначаны толькі для чытання. Захаваць змены ў дакумент \"%s\"? 
 Black	Menus		Чорны
-Untitled 	StyledEditWindow		Без назвы
+Untitled 	StyledEditWindow		Без назвы 
 OK	SaveAlert		ОК
 Find	FindandReplaceWindow		Шукаць
 Encoding	Open_and_SaveAsPanel		Кадоўка
 Characters:	Statistics		Знакаў:
-Save as…	Menus		Захаваць як...
+Save as…	Menus		Захаваць як…
 Redo typing	QuitAlert		Паўтарыць увод
 Replace…	Menus		Замяняць…
 Right	Menus		Права

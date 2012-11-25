@@ -6,7 +6,7 @@ Use:	ExpanderPreferences		パスを指定：
 File expanded	ExpanderWindow		ファイル解凍が完了しました
 The destination is read only.	ExpanderWindow		解凍先は読み取り専用です
 Expander: Open	ExpanderWindow		ファイル解凍: 開く
- is not supported	ExpanderWindow		はサポートされてません
+ is not supported	ExpanderWindow		はサポートされていません
 Expander settings	ExpanderPreferences		ファイル解凍設定
 Select current	DirectoryFilePanel		このフォルダーを選択
 Source	ExpanderWindow		書庫ファイル
@@ -21,7 +21,7 @@ The destination folder does not exist.	ExpanderWindow		解凍先フォルダー�
 Other	ExpanderPreferences		その他
 Cancel	ExpanderPreferences		キャンセル
 Expansion	ExpanderPreferences		解凍
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		倉庫ファイルの解凍はまだ完了していません。それでも中止しますか？
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		書庫ファイルの解凍はまだ完了していません。それでも中止しますか？
 Select	DirectoryFilePanel		選択
 Same directory as source (archive) file	ExpanderPreferences		元ファイル (アーカイブ) と同じ
 Expanding '%s'	ExpanderWindow		'%s' を解凍中

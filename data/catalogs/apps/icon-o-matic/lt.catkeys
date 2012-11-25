@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	1840322392
+1	lithuanian	x-vnd.haiku-icon_o_matic	830768065
 Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
 Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
 Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
@@ -65,6 +65,7 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		Pašalinti figūrą
 Reverse	Icon-O-Matic-PathsList		Pakeisti kreivės kryptį
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF pirminis tekstas
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Atšaukti transformacijas
+Settings	Icon-O-Matic-Menus		Nuostatos
 All	Icon-O-Matic-Properties		Viską
 Undo	Icon-O-Matic-Main		Atšaukti:
 Click on a shape above	Empty transformers list - 1st line		Spustelėkite figūrą aukščiau

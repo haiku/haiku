@@ -6,7 +6,7 @@ Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	I
 \nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTyp: '%1' (%2)\nGrupp: '%3' (%4)\nKvalitet: %5\nKapacitet: %6\nMIME-typ: %7\nNamn: %8\n
 Bummer	ImageWindow		Hoppsan
 Last Page	ImageWindow		Sista sidan
-\nInput Formats:	ImageView		\nInformat
+\nInput Formats:	ImageView		\nInformat:
 Sorry, unable to load the image.	ImageView		Tyvärr så kunde inte bilden laddas.
 Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Information
 Active Translators	InspectorApp		Aktiva översättare

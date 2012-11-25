@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-POST	2566871483
+1	swedish	x-vnd.Be-POST	1091177030
 Fetching mail for %name	Notifier		Hämtar e-post för %name
 Check for mails only	DeskbarView		Kontrollera bara e-post
 Send pending mails	DeskbarView		Skicka väntande meddelanden
@@ -18,5 +18,6 @@ Check for mail now	DeskbarView		Kontrollera e-post nu
 No new messages	DeskbarView		inga nya meddelanden
 %num new messages for %name\n	MailDaemon		%num nya meddelanden för %name\n
 Mail daemon status log	MailDaemon		Statuslog för e-postdemon
+Settings…	DeskbarView		Inställningar…
 No new messages.	MailDaemon		inga nya meddelanden.
 Mail status	Notifier		E-post status

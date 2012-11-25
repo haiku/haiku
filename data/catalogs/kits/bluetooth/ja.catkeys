@@ -16,7 +16,7 @@ Wearable	DeviceClass	A wearable computer	ウェアラブル
 Handheld	DeviceClass		ハンドヘルド
 Invalid device class!\n	DeviceClass		無効なデバイスクラスです!\n
 Sensing device	DeviceClass		センサー
-Computer	DeviceClass		コンピュータ
+Computer	DeviceClass		コンピューター
 Cellular	DeviceClass		携帯電話
 Microphone	DeviceClass		マイク
 Unknown (reserved) minor device class	DeviceClass		不明 (予約済) の副デバイスクラス

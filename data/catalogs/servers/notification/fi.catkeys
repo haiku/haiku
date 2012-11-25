@@ -1,8 +1,8 @@
 1	finnish	x-vnd.Haiku-notification_server	906000487
-Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Ei voitu käynnistää suodatinvalvontaa. Ajantasainen suodatin otettiin pois käytöstä.
-Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Ei voitu käynnistää näyttöasetusten valvontaa.\nAjantasainen suodatin otettiin pois käytöstä.
+Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Suodatinvalvonnan käynnistäminen epäonnistui. Ajantasainen suodatin otettiin pois käytöstä.
+Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Näyttöasetusten valvonnan käynnistäminen epäonnistui.\nAjantasainen suodatin otettiin pois käytöstä.
 Darn.	NotificationWindow		Kehveli.
 Warning	NotificationWindow		Varoitus
 OK	NotificationWindow		Valmis
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Ei voitu käynnistää yleisasetusten valvontaa.\nAjantasainen suodatin otettiin pois käytöstä.
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Yleisasetusten valvonnan käynnistäminen epäonnistui.\nAjantasainen suodatin otettiin pois käytöstä.
 Notification	NotificationWindow		Ilmoitus

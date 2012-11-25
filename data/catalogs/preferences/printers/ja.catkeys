@@ -16,7 +16,7 @@ pages	JobListView		ページ
 Printers	System name		プリンター
 Processing	JobListView		処理中
 Red	TestPageView		赤
-Printer name:	AddPrinterDialog		プリンタ名：
+Printer name:	AddPrinterDialog		プリンター名：
 Driver: %driver%	PrinterListView		ドライバー： %driver%
  pending jobs.	PrinterListView		個のジョブが印刷待ちです。
 Black	TestPageView		黒
@@ -36,8 +36,8 @@ Failed	JobListView		エラー
 %.2f KB	JobListView		%.2f KB
 Magenta	TestPageView		マゼンタ
 Completed	JobListView		完了
-No printer found!	TransportMenu		プリンターガ見つかりません。
-Print jobs: No printer selected	PrintersWindow		印刷ジョブ：プリンタが選択されていません
+No printer found!	TransportMenu		プリンターが見つかりません。
+Print jobs: No printer selected	PrintersWindow		印刷ジョブ：プリンターが選択されていません
 Cyan	TestPageView		シアン
 Unknown status	JobListView		状態が不明
 Connected to:	AddPrinterDialog		ポート：

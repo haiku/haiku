@@ -6,7 +6,7 @@ Use:	ExpanderPreferences		Käyttö:
 File expanded	ExpanderWindow		Tiedosto laajennettu
 The destination is read only.	ExpanderWindow		Kohde on kirjoitussuojattu.
 Expander: Open	ExpanderWindow		Laajentaja: Avaa
- is not supported	ExpanderWindow		ei ole tuettu
+ is not supported	ExpanderWindow		 ei ole tuettu
 Expander settings	ExpanderPreferences		Laajentaja-asetukset
 Select current	DirectoryFilePanel		Valitse nykyinen
 Source	ExpanderWindow		Lähde

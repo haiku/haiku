@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	2052381345
+1	japanese	x-vnd.Haiku-WebPositive	1513721873
 Show home button	Settings Window		ホームボタンを表示する
 Username:	Authentication Panel		ユーザー名：
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
@@ -26,11 +26,11 @@ Loading %url	WebPositive Window		読み込み中 %url
 Page source	WebPositive Window		ページのソース
 Next	WebPositive Window		次へ
 Find next	WebPositive Window		次を検索
-Download folder:	Settings Window		ダウンロードフォルダ：
+Download folder:	Settings Window		ダウンロードフォルダー：
 Edit	WebPositive Window		編集
 Over %hours hours left	Download Window		残り %hours 時間以上
 Cancel	Authentication Panel		キャンセル
-Match case	WebPositive Window		大文字小文字を区別
+Match case	WebPositive Window		大文字と小文字を区別する
 Search page:	Settings Window		検索ページ：
 Zoom text only	WebPositive Window		テキストのみ拡大
 Default fixed font size:	Settings Window		規定の固定フォントサイズ：
@@ -107,10 +107,11 @@ New browser window	Download Window		新規ブラウザウィンドウ
 Today	WebPositive Window		今日
 1 second left	Download Window		残り 1 秒
 Remember username and password for this site	Authentication Panel		このサイトのユーザー名とパスワードを記憶する
+Earlier	WebPositive Window		6 日以上前
 Authentication required	Authentication Panel		認証が必要です
 Use proxy server to connect to the internet	Settings Window		インターネット接続にプロキシーサーバーを使用する。
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ダウンロードが進行中です。WebPositive を今終了してもよいですか?
-Auto-hide interface in full screen mode	Settings Window		全画面表示時に自動的にインターフェースを隠す。
+Auto-hide interface in full screen mode	Settings Window		全画面表示時に自動的にインターフェイスを隠す。
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 失敗。
 New tab	WebPositive Window		新規タブ
 Downloads in progress	WebPositive		ダウンロードが進行中です
@@ -123,7 +124,7 @@ Bookmark error	WebPositive Window		ブックマークエラー
 Do you really want to clear the browsing history?	WebPositive Window		本当にブラウズ履歴をクリアしますか?
 Copy	WebPositive Window		コピー
 Open bookmarks confirmation	WebPositive Window		ブックマークを開く確認
-Remove missing	Download Window		見つからない物を削除
+Remove missing	Download Window		Remove missing
 Clone current page	Settings Window		現在のページを複製
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	一度に %addedCount 個のブックマークを開きますか?
 OK	Authentication Panel		OK
@@ -133,4 +134,4 @@ Manage bookmarks	WebPositive Window		ブックマークの管理
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでにあります。
 New windows:	Settings Window		新規ウィンドウ：
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 完了。
-Remove finished	Download Window		完了した物を削除
+Remove finished	Download Window		Remove finished
