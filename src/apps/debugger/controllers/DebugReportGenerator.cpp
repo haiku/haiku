@@ -6,8 +6,9 @@
 
 #include "DebugReportGenerator.h"
 
+#include <sys/utsname.h>
+
 #include <cpu_type.h>
-#include <system_revision.h>
 
 #include <AutoLocker.h>
 #include <Entry.h>
@@ -166,8 +167,9 @@ DebugReportGenerator::_GenerateReportHeader(BString& _output)
 				usedSize, sizeof(usedSize)));
 		_output << data;
 	}
-
-	data.SetToFormat("Haiku revision: %s\n", __get_haiku_revision());
+	utsname name;
+	uname(&name);
+	data.SetToFormat("Haiku revision: %s (%s)\n", name.version, name.machine);
 	_output << data;
 
 	return B_OK;
