@@ -350,6 +350,8 @@ MailProtocolConfigView::_AddTextControl(BGridLayout* layout, const char* name,
 	const char* label)
 {
 	BTextControl* control = new BTextControl(name, label, "", NULL);
+	control->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+
 	int32 row = layout->CountRows();
 	layout->AddItem(control->CreateLabelLayoutItem(), 0, row);
 	layout->AddItem(control->CreateTextViewLayoutItem(), 1, row);
@@ -363,6 +365,8 @@ MailProtocolConfigView::_AddMenuField(BGridLayout* layout, const char* name,
 {
 	BPopUpMenu* menu = new BPopUpMenu("");
 	BMenuField* field = new BMenuField(name, label, menu);
+	field->SetAlignment(B_ALIGN_RIGHT);
+
 	int32 row = layout->CountRows();
 	layout->AddItem(field->CreateLabelLayoutItem(), 0, row);
 	layout->AddItem(field->CreateMenuBarLayoutItem(), 1, row);
