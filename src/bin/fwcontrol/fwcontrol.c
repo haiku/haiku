@@ -823,19 +823,20 @@ main(int argc, char **argv)
 			display_board_only = false;
 			break;
 		case 'c':
-			crom_string = malloc(strlen(optarg)+1);
+			crom_string = malloc(strlen(optarg) + 1);
 			if (crom_string == NULL)
 				err(EX_SOFTWARE, "%s:crom_string malloc", __func__);
-			if ( (strtol(crom_string, NULL, 0) < 0) || strtol(crom_string, NULL, 0) > MAX_BOARDS)
-				errx(EX_USAGE, "%s:Invalid value for node", __func__);
 			strcpy(crom_string, optarg);
+			if (strtol(crom_string, NULL, 0) < 0
+				|| strtol(crom_string, NULL, 0) > MAX_BOARDS)
+				errx(EX_USAGE, "%s:Invalid value for node", __func__);
 			display_crom = 1;
 			open_needed = true;
 			command_set = true;
 			display_board_only = false;
 			break;
 		case 'd':
-			crom_string_hex = malloc(strlen(optarg)+1);
+			crom_string_hex = malloc(strlen(optarg) + 1);
 			if (crom_string_hex == NULL)
 				err(EX_SOFTWARE, "%s:crom_string_hex malloc", __func__);
 			strcpy(crom_string_hex, optarg);
@@ -847,7 +848,7 @@ main(int argc, char **argv)
 		case 'f':
 #define MAX_PHY_CONFIG 0x3f
 			set_root_node = strtol(optarg, NULL, 0);
-			if ( (set_root_node < 0) || (set_root_node > MAX_PHY_CONFIG) )
+			if (set_root_node < 0 || set_root_node > MAX_PHY_CONFIG)
 				errx(EX_USAGE, "%s:set_root_node out of range", __func__);
 			open_needed = true;
 			command_set = true;
@@ -855,7 +856,7 @@ main(int argc, char **argv)
 			break;
 		case 'g':
 			set_gap_count = strtol(optarg, NULL, 0);
-			if ( (set_gap_count < 0) || (set_gap_count > MAX_PHY_CONFIG) )
+			if (set_gap_count < 0 || set_gap_count > MAX_PHY_CONFIG)
 				errx(EX_USAGE, "%s:set_gap_count out of range", __func__);
 			open_needed = true;
 			command_set = true;
