@@ -11,7 +11,6 @@
 #include <GridLayout.h>
 #include <MailFilter.h>
 #include <MenuField.h>
-#include <SpaceLayoutItem.h>
 #include <TextControl.h>
 
 #include <FileConfigView.h>
@@ -73,8 +72,6 @@ SMTPConfigView::SMTPConfigView(const BMailAccountSettings& settings)
 
 	Layout()->AddView(fFileView, 0, Layout()->CountRows(),
 		Layout()->CountColumns());
-	Layout()->AddItem(BSpaceLayoutItem::CreateGlue(), 0, Layout()->CountRows());
-	Layout()->SetRowWeight(Layout()->CountRows() - 1, 1.0f);
 }
 
 

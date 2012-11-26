@@ -147,7 +147,8 @@ ProtocolSettingsView::ProtocolSettingsView(const entry_ref& ref,
 
 	BLayoutBuilder::Group<>(contents, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
-		.Add(view);
+		.Add(view)
+		.AddGlue();
 }
 
 
