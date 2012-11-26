@@ -409,22 +409,12 @@ ConfigWindow::_LoadSettings()
 	// load in general settings
 	BMailSettings settings;
 	status_t status = _SetToGeneralSettings(&settings);
-	if (status == B_OK) {
-		// move own window
-		MoveTo(settings.ConfigWindowFrame().LeftTop());
-	} else {
+	if (status != B_OK) {
 		fprintf(stderr, B_TRANSLATE("Error retrieving general settings: %s\n"),
 			strerror(status));
 	}
 
-	BScreen screen(this);
-	BRect screenFrame(screen.Frame().InsetByCopy(0, 5));
-	if (!screenFrame.Contains(Frame().LeftTop())
-		|| !screenFrame.Contains(Frame().RightBottom()))
-		status = B_ERROR;
-
-	if (status != B_OK)
-		CenterOnScreen();
+	CenterOnScreen();
 }
 
 
@@ -466,9 +456,8 @@ ConfigWindow::_SaveSettings()
 	}
 	fToDeleteAccounts.MakeEmpty();
 
-	/*** save general settings ***/
+	// Apply and save general settings
 
-	// apply and save general settings
 	BMailSettings settings;
 	if (fSaveSettings) {
 		// figure out time interval
@@ -477,21 +466,17 @@ ConfigWindow::_SaveSettings()
 		bigtime_t interval = bigtime_t(60000000L * floatInterval);
 
 		settings.SetAutoCheckInterval(interval);
-		settings.SetDaemonAutoStarts(interval != 0);
+		settings.SetDaemonAutoStarts(!fAccounts.IsEmpty());
 
 		// status mode (alway, fetching/retrieving, ...)
 		int32 index = fStatusModeField->Menu()->IndexOf(
 			fStatusModeField->Menu()->FindMarked());
 		settings.SetShowStatusWindow(index);
-	} else {
-		// restore status window look
-		settings.SetStatusWindowLook(settings.StatusWindowLook());
+
+		settings.Save();
 	}
 
-	settings.SetConfigWindowFrame(Frame());
-	settings.Save();
-
-	/*** save accounts ***/
+	// Save accounts
 
 	if (fSaveSettings) {
 		for (int i = 0; i < fAccounts.CountItems(); i++)
@@ -703,8 +688,7 @@ ConfigWindow::_SetToGeneralSettings(BMailSettings* settings)
 
 	// retrieval frequency
 	uint32 interval = uint32(settings->AutoCheckInterval() / 60000000L);
-	fCheckMailCheckBox->SetValue(settings->DaemonAutoStarts()
-		&& interval != 0 ? B_CONTROL_ON : B_CONTROL_OFF);
+	fCheckMailCheckBox->SetValue(interval != 0 ? B_CONTROL_ON : B_CONTROL_OFF);
 
 	if (interval == 0)
 		interval = 5;
@@ -732,9 +716,6 @@ ConfigWindow::_RevertToLastSettings()
 {
 	// revert general settings
 	BMailSettings settings;
-
-	// restore status window look
-	settings.SetStatusWindowLook(settings.StatusWindowLook());
 
 	status_t status = _SetToGeneralSettings(&settings);
 	if (status != B_OK) {
