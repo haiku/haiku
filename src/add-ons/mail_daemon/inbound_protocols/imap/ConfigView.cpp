@@ -34,10 +34,12 @@ const uint32 kMsgOpenIMAPFolder = '&OIF';
 
 class ConfigView : public MailProtocolConfigView {
 public:
-								ConfigView(BMailAccountSettings& settings);
+								ConfigView(
+									const BMailAccountSettings& accountSettings,
+									const BMailProtocolSettings& settings);
 	virtual						~ConfigView();
 
-	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual status_t			SaveInto(BMailAddOnSettings& settings) const;
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual void				AttachedToWindow();
@@ -45,11 +47,11 @@ public:
 private:
 			MailFileConfigView*	fFileView;
 			BButton*			fFolderButton;
-			BMailProtocolSettings& fSettings;
 };
 
 
-ConfigView::ConfigView(BMailAccountSettings& settings)
+ConfigView::ConfigView(const BMailAccountSettings& accountSettings,
+	const BMailProtocolSettings& settings)
 	:
 	MailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME
 		| B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
@@ -58,15 +60,14 @@ ConfigView::ConfigView(BMailAccountSettings& settings)
 #ifdef USE_SSL
 	 	| B_MAIL_PROTOCOL_HAS_FLAVORS
 #endif
-	 ),
-	 fSettings(settings.InboundSettings())
+	 )
 {
 #ifdef USE_SSL
 	AddFlavor(B_TRANSLATE("No encryption"));
 	AddFlavor(B_TRANSLATE("SSL"));
 #endif
 
-	SetTo(settings.InboundSettings());
+	SetTo(settings);
 
 	((BControl*)(FindView("leave_mail_on_server")))->SetValue(B_CONTROL_ON);
 	((BControl*)(FindView("leave_mail_on_server")))->Hide();
@@ -76,11 +77,11 @@ ConfigView::ConfigView(BMailAccountSettings& settings)
 	Layout()->AddView(fFolderButton, 0, Layout()->CountRows(), 2);
 
 	BPath defaultFolder = BPrivate::default_mail_directory();
-	defaultFolder.Append(settings.Name());
+	defaultFolder.Append(accountSettings.Name());
 
 	fFileView = new MailFileConfigView(B_TRANSLATE("Destination:"),
 		"destination", false, defaultFolder.Path());
-	fFileView->SetTo(&settings.InboundSettings(), NULL);
+	fFileView->SetTo(&settings, NULL);
 
 	Layout()->AddView(fFileView, 0, Layout()->CountRows(),
 		Layout()->CountColumns());
@@ -93,10 +94,13 @@ ConfigView::~ConfigView()
 
 
 status_t
-ConfigView::Archive(BMessage* into, bool deep) const
+ConfigView::SaveInto(BMailAddOnSettings& settings) const
 {
-	fFileView->Archive(into, deep);
-	return MailProtocolConfigView::Archive(into, deep);
+	status_t status = fFileView->SaveInto(settings);
+	if (status != B_OK)
+		return status;
+
+	return MailProtocolConfigView::SaveInto(settings);
 }
 
 
@@ -130,8 +134,9 @@ ConfigView::AttachedToWindow()
 // #pragma mark -
 
 
-BView*
-instantiate_protocol_config_panel(BMailAccountSettings& settings)
+BMailSettingsView*
+instantiate_protocol_settings_view(const BMailAccountSettings& accountSettings,
+	const BMailProtocolSettings& settings)
 {
-	return new ConfigView(settings);
+	return new ConfigView(accountSettings, settings);
 }
