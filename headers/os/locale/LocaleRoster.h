@@ -21,14 +21,19 @@ class BMessage;
 class BTimeZone;
 
 
+namespace BPrivate {
+	class LocaleRosterData;
+}
+
+
 enum {
 	B_LOCALE_CHANGED = '_LCC',
 };
 
 
 class BLocaleRoster {
+
 public:
-								BLocaleRoster();
 								~BLocaleRoster();
 
 	static	BLocaleRoster*		Default();
@@ -70,6 +75,8 @@ public:
 									// Get the catalog for the calling image
 									// (that needs to link with liblocalestub.a)
 
+			const BLocale*		GetDefaultLocale() const;
+
 			bool				IsFilesystemTranslationPreferred() const;
 
 			status_t			GetLocalizedFileName(BString& localizedFileName,
@@ -83,6 +90,12 @@ public:
 	static	const char*			kEmbeddedCatAttr;
 	static	int32				kEmbeddedCatResId;
 
+protected:
+								BLocaleRoster();
+
+protected:
+			BPrivate::LocaleRosterData*	fData;
+
 private:
 	static	BCatalog*			_GetCatalog(BCatalog* catalog,
 									vint32* catalogInitStatus);
@@ -90,6 +103,7 @@ private:
 			status_t			_PrepareCatalogEntry(const entry_ref& ref,
 									BString& signature, BString& context,
 									BString& string, bool traverse);
+
 };
 
 
