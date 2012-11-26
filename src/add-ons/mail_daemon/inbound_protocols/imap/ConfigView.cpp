@@ -73,7 +73,7 @@ ConfigView::ConfigView(const BMailAccountSettings& accountSettings,
 	((BControl*)(FindView("leave_mail_on_server")))->Hide();
 
 	fFolderButton = new BButton("IMAP Folders", B_TRANSLATE(
-		"IMAP Folders"), new BMessage(kMsgOpenIMAPFolder));
+		"Configure IMAP Folders"), new BMessage(kMsgOpenIMAPFolder));
 	Layout()->AddView(fFolderButton, 0, Layout()->CountRows(), 2);
 
 	BPath defaultFolder = BPrivate::default_mail_directory();
