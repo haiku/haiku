@@ -1,5 +1,9 @@
 SubDir HAIKU_TOP src add-ons kernel generic bios ;
 
+# Don't want to compile all of the debugging code even when doing a debug build,
+# it's unnecessary unless you're trying to debug x86emu itself.
+DEBUG = 0 ;
+
 UseHeaders [ LibraryHeaders x86emu ] ;
 UsePrivateKernelHeaders ;
 
