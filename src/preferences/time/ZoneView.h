@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,9 +20,9 @@ class BMessage;
 class BOutlineListView;
 class BPopUpMenu;
 class BRadioButton;
-class BTextToolTip;
 class BTimeZone;
 class TimeZoneListItem;
+class TimeZoneListView;
 class TTZDisplay;
 
 
@@ -36,7 +36,6 @@ public:
 			bool				CheckCanRevert();
 
 protected:
-	virtual	bool				GetToolTipAt(BPoint point, BToolTip** _tip);
 	virtual void				DoLayout();
 
 private:
@@ -58,14 +57,12 @@ private:
 
 			void				_Revert();
 
-			BOutlineListView*	fZoneList;
+			TimeZoneListView*	fZoneList;
 			BButton*			fSetZone;
 			TTZDisplay*			fCurrent;
 			TTZDisplay*			fPreview;
 			BRadioButton*		fLocalTime;
 			BRadioButton*		fGmtTime;
-
-			BTextToolTip*		fToolTip;
 
 			int32				fLastUpdateMinute;
 			bool				fUseGmtTime;

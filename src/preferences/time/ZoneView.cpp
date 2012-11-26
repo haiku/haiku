@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,7 +42,6 @@
 #include <String.h>
 #include <StringView.h>
 #include <TimeZone.h>
-#include <ToolTip.h>
 #include <View.h>
 #include <Window.h>
 
@@ -52,6 +51,7 @@
 
 #include "TimeMessages.h"
 #include "TimeZoneListItem.h"
+#include "TimeZoneListView.h"
 #include "TZDisplay.h"
 
 
@@ -84,7 +84,6 @@ TimeZoneView::TimeZoneView(const char* name)
 	:
 	BGroupView(name, B_HORIZONTAL, B_USE_DEFAULT_SPACING),
 	fGmtTime(NULL),
-	fToolTip(NULL),
 	fUseGmtTime(false),
 	fCurrentZoneItem(NULL),
 	fOldZoneItem(NULL),
@@ -107,8 +106,6 @@ TimeZoneView::CheckCanRevert()
 
 TimeZoneView::~TimeZoneView()
 {
-	if (fToolTip != NULL)
-		fToolTip->ReleaseReference();
 	_WriteRTCSettings();
 }
 
@@ -189,41 +186,6 @@ TimeZoneView::MessageReceived(BMessage* message)
 }
 
 
-bool
-TimeZoneView::GetToolTipAt(BPoint point, BToolTip** _tip)
-{
-	TimeZoneListItem* item = static_cast<TimeZoneListItem*>(
-		fZoneList->ItemAt(fZoneList->IndexOf(point)));
-	if (item == NULL || !item->HasTimeZone())
-		return false;
-
-	BString nowInTimeZone;
-	time_t now = time(NULL);
-	BLocale::Default()->FormatTime(&nowInTimeZone, now, B_SHORT_TIME_FORMAT,
-		&item->TimeZone());
-
-	BString dateInTimeZone;
-	BLocale::Default()->FormatDate(&dateInTimeZone, now, B_SHORT_DATE_FORMAT,
-		&item->TimeZone());
-
-	BString toolTip = item->Text();
-	toolTip << '\n' << item->TimeZone().ShortName() << " / "
-			<< item->TimeZone().ShortDaylightSavingName()
-			<< B_TRANSLATE("\nNow: ") << nowInTimeZone
-			<< " (" << dateInTimeZone << ')';
-
-	if (fToolTip != NULL)
-		fToolTip->ReleaseReference();
-	fToolTip = new (std::nothrow) BTextToolTip(toolTip.String());
-	if (fToolTip == NULL)
-		return false;
-
-	*_tip = fToolTip;
-
-	return true;
-}
-
-
 void
 TimeZoneView::_UpdateDateTime(BMessage* message)
 {
@@ -243,7 +205,7 @@ TimeZoneView::_UpdateDateTime(BMessage* message)
 void
 TimeZoneView::_InitView()
 {
-	fZoneList = new BOutlineListView("cityList", B_SINGLE_SELECTION_LIST);
+	fZoneList = new TimeZoneListView();
 	fZoneList->SetSelectionMessage(new BMessage(H_CITY_CHANGED));
 	fZoneList->SetInvocationMessage(new BMessage(H_SET_TIME_ZONE));
 	_BuildZoneMenu();

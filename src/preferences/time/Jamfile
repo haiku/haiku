@@ -19,6 +19,7 @@ local sources =
 	TimeSettings.cpp
 	TimeWindow.cpp
 	TimeZoneListItem.cpp
+	TimeZoneListView.cpp
 	TZDisplay.cpp
 	ZoneView.cpp
 	;
@@ -44,5 +45,6 @@ DoCatalogs Time :
 	ntp.cpp
 	Time.cpp
 	TimeWindow.cpp
+	TimeZoneListView.cpp
 	ZoneView.cpp
 	;
