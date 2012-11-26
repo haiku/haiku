@@ -24,7 +24,7 @@ using namespace BPrivate;
 
 ConfigView::ConfigView()
 	:
-	BView("fortune_filter", 0)
+	BMailSettingsView("fortune_filter")
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -40,13 +40,12 @@ ConfigView::ConfigView()
 
 
 void
-ConfigView::SetTo(const BMessage* archive)
+ConfigView::SetTo(const BMailAddOnSettings& settings)
 {
-	fFileView->SetTo(archive, NULL);
+	fFileView->SetTo(&settings, NULL);
 
-	BString path = archive->FindString("tag_line");
-	if (!archive->HasString("tag_line"))
-		path = B_TRANSLATE("Fortune cookie says:\n\n");
+	BString path = settings.GetString("tag_line",
+		B_TRANSLATE("Fortune cookie says:\n\n"));
 
 	path.Truncate(path.Length() - 2);
 	fTagControl->SetText(path.String());
@@ -54,15 +53,12 @@ ConfigView::SetTo(const BMessage* archive)
 
 
 status_t
-ConfigView::Archive(BMessage* into, bool /*deep*/) const
+ConfigView::SaveInto(BMailAddOnSettings& settings) const
 {
-	fFileView->Archive(into);
+	fFileView->SaveInto(settings);
 
 	BString line = fTagControl->Text();
 	if (line != B_EMPTY_STRING)
 		line << "\n\n";
-	if (into->ReplaceString("tag_line", line.String()) != B_OK)
-		into->AddString("tag_line", line.String());
-
-	return B_OK;
+	return settings.SetString("tag_line", line.String());
 }

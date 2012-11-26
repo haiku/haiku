@@ -25,15 +25,17 @@ using namespace BPrivate;
 
 class POP3ConfigView : public MailProtocolConfigView {
 public:
-								POP3ConfigView(BMailAccountSettings& settings);
-			status_t			Archive(BMessage* into, bool deep = true) const;
+								POP3ConfigView(
+									const BMailProtocolSettings& settings);
+
+	virtual status_t			SaveInto(BMailAddOnSettings& settings) const;
 
 private:
 			MailFileConfigView*	fFileView;
 };
 
 
-POP3ConfigView::POP3ConfigView(BMailAccountSettings& settings)
+POP3ConfigView::POP3ConfigView(const BMailProtocolSettings& settings)
 	:
 	MailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME
 		| B_MAIL_PROTOCOL_HAS_AUTH_METHODS | B_MAIL_PROTOCOL_HAS_PASSWORD
@@ -53,11 +55,11 @@ POP3ConfigView::POP3ConfigView(BMailAccountSettings& settings)
 	AddFlavor(B_TRANSLATE("SSL"));
 #endif
 
-	SetTo(settings.InboundSettings());
+	SetTo(settings);
 
 	fFileView = new MailFileConfigView(B_TRANSLATE("Destination:"),
 		"destination", false, BPrivate::default_mail_in_directory().Path());
-	fFileView->SetTo(&settings.InboundSettings(), NULL);
+	fFileView->SetTo(&settings, NULL);
 
 	Layout()->AddView(fFileView, 0, Layout()->CountRows(),
 		Layout()->CountColumns());
@@ -65,18 +67,22 @@ POP3ConfigView::POP3ConfigView(BMailAccountSettings& settings)
 
 
 status_t
-POP3ConfigView::Archive(BMessage* into, bool deep) const
+POP3ConfigView::SaveInto(BMailAddOnSettings& settings) const
 {
-	fFileView->Archive(into, deep);
-	return MailProtocolConfigView::Archive(into, deep);
+	status_t status = fFileView->SaveInto(settings);
+	if (status != B_OK)
+		return status;
+
+	return MailProtocolConfigView::SaveInto(settings);
 }
 
 
 // #pragma mark -
 
 
-BView*
-instantiate_protocol_config_panel(BMailAccountSettings& settings)
+BMailSettingsView*
+instantiate_protocol_settings_view(const BMailAccountSettings& accountSettings,
+	const BMailProtocolSettings& settings)
 {
 	return new POP3ConfigView(settings);
 }

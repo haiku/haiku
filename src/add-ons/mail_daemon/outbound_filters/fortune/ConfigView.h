@@ -8,15 +8,18 @@
 #define CONFIG_VIEW_H
 
 
+#include <MailSettingsView.h>
+
 #include <FileConfigView.h>
 
 
-class ConfigView : public BView {
+class ConfigView : public BMailSettingsView {
 public:
 								ConfigView();
-			void				SetTo(const BMessage* archive);
 
-	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+			void				SetTo(const BMailAddOnSettings& settings);
+
+	virtual status_t			SaveInto(BMailAddOnSettings& settings) const;
 
 private:
 			BPrivate::MailFileConfigView* fFileView;

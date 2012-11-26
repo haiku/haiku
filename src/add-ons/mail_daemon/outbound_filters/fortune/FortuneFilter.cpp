@@ -30,9 +30,7 @@
 class FortuneFilter : public BMailFilter {
 public:
 								FortuneFilter(BMailProtocol& protocol,
-									BMailAddOnSettings* settings);
-
-	virtual BString				DescriptiveName() const;
+									const BMailAddOnSettings& settings);
 
 	virtual	void				MessageReadyToSend(const entry_ref& ref,
 									BFile* file);
@@ -40,18 +38,10 @@ public:
 
 
 FortuneFilter::FortuneFilter(BMailProtocol& protocol,
-	BMailAddOnSettings* settings)
+	const BMailAddOnSettings& settings)
 	:
-	BMailFilter(protocol, settings)
+	BMailFilter(protocol, &settings)
 {
-
-}
-
-
-BString
-FortuneFilter::DescriptiveName() const
-{
-	return filter_name();
 }
 
 
@@ -106,24 +96,27 @@ FortuneFilter::MessageReadyToSend(const entry_ref& ref, BFile* file)
 
 
 BString
-filter_name()
+filter_name(const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings* settings)
 {
 	return B_TRANSLATE("Fortune");
 }
 
 
 BMailFilter*
-instantiate_filter(BMailProtocol& protocol, BMailAddOnSettings* settings)
+instantiate_filter(BMailProtocol& protocol,
+	const BMailAddOnSettings& settings)
 {
 	return new FortuneFilter(protocol, settings);
 }
 
 
-BView*
-instantiate_filter_config_panel(BMailAddOnSettings& settings)
+BMailSettingsView*
+instantiate_filter_settings_view(const BMailAccountSettings& accountSettings,
+	const BMailAddOnSettings& settings)
 {
 	ConfigView* view = new ConfigView();
-	view->SetTo(&settings);
+	view->SetTo(settings);
 
 	return view;
 }
