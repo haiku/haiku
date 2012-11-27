@@ -35,7 +35,6 @@ extern uint8 __stack_start;
 extern uint8 __stack_end;
 
 extern int main(stage2_args *args);
-void _start(void);
 
 // Adjusted during mmu_init
 addr_t gPeripheralBase = DEVICE_BASE;
