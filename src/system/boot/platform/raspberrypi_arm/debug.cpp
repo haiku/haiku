@@ -16,6 +16,8 @@
 #include <stdarg.h>
 
 
+extern "C" void platform_video_puts(const char* string);
+
 extern addr_t gPeripheralBase;
 static bool sLedState = true;
 
@@ -88,6 +90,14 @@ debug_assert(bool condition)
 
 
 extern "C" void
+debug_puts(const char* string, int32 length)
+{
+	platform_video_puts(string);
+	serial_puts(string, length);
+}
+
+
+extern "C" void
 panic(const char* format, ...)
 {
 	const char hint[] = "\n*** PANIC ***\n";
@@ -95,7 +105,7 @@ panic(const char* format, ...)
 	va_list list;
 	int length;
 
-	serial_puts(hint, sizeof(hint));
+	debug_puts(hint, sizeof(hint));
 	va_start(list, format);
 	length = vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
@@ -103,10 +113,10 @@ panic(const char* format, ...)
 	if (length >= (int)sizeof(buffer))
 		length = sizeof(buffer) - 1;
 
-	serial_puts(buffer, length);
+	debug_puts(buffer, length);
 	//fprintf(stderr, "%s", buffer);
 
-	serial_puts("\nPress key to reboot.", 21);
+	debug_puts("\nPress key to reboot.", 21);
 
 	platform_exit();
 }
@@ -126,7 +136,7 @@ dprintf(const char* format, ...)
 	if (length >= (int)sizeof(buffer))
 		length = sizeof(buffer) - 1;
 
-	serial_puts(buffer, length);
+	debug_puts(buffer, length);
 
 	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
 		fprintf(stderr, "%s", buffer);
