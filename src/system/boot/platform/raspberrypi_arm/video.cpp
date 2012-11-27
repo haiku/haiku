@@ -6,6 +6,10 @@
 
 #include <SupportDefs.h>
 
+#include "arch_framebuffer.h"
+
+ArchFramebuffer *gFramebuffer = NULL;
+
 
 extern "C" void
 platform_set_palette(const uint8* palette)
@@ -31,7 +35,20 @@ platform_switch_to_text_mode(void)
 extern "C" status_t
 platform_init_video(void)
 {
-#warning IMPLEMENT platform_init_video
-	return B_ERROR;
+	extern ArchFramebuffer* arch_get_framebuffer_arm_bcm2708();
+	gFramebuffer = arch_get_framebuffer_arm_bcm2708();
+
+	if (gFramebuffer == NULL)
+		return B_ERROR;
+
+	status_t result = gFramebuffer->Probe();
+	if (result != B_OK)
+		return result;
+
+	result = gFramebuffer->Init();
+	if (result != B_OK)
+		return result;
+
+	return gFramebuffer->SetDefaultMode();
 }
 
