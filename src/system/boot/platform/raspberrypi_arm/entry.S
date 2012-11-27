@@ -19,6 +19,10 @@ jmp_loader:
 	bx r12
 	*/
 
+	/* Setup initial stack right below our .text section (growing downwards
+		into the space reserved for .init) */
+	mov sp, #0x8000
+
 	b _start
 
 	/* Cause exception if loader returns */
