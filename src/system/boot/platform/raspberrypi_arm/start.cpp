@@ -116,6 +116,9 @@ _start(void)
 	// Flick on "OK" led, use pre-mmu firmware base
 	gpio_write(gPeripheralBase + GPIO_BASE, 16, 0);
 
+	// Set up the framebuffer here to help debug the early boot.
+	platform_init_video();
+
 	// To debug mmu, enable serial_init above me!
 	mmu_init();
 
