@@ -39,12 +39,17 @@ public:
 
 	virtual addr_t			Base() { return fBase; };
 
+			int				Width() { return fCurrentWidth; };
+			int				Height() { return fCurrentHeight; };
+			int				Depth() { return fCurrentDepth; };
+			int				BytesPerRow() { return fCurrentBytesPerRow; };
+
 protected:
 			addr_t			fBase;
-private:
 			int				fCurrentWidth;
 			int				fCurrentHeight;
 			int				fCurrentDepth;
+			int				fCurrentBytesPerRow;
 };
 
 
