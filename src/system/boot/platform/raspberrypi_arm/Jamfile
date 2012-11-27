@@ -29,6 +29,7 @@ BootMergeObject boot_platform_raspberrypi_arm.o :
 	devices.cpp
 	gpio.cpp
 	keyboard.cpp
+	mailbox.cpp
 	menu.cpp
 	serial.cpp
 	video.cpp
