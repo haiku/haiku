@@ -14,6 +14,8 @@ extern "C" {
 #endif
 
 extern void arch_spin(bigtime_t microseconds);
+extern void arch_cpu_memory_read_barrier(void);
+extern void arch_cpu_memory_write_barrier(void);
 extern status_t boot_arch_cpu_init(void);
 extern void cpu_init(void);
 
