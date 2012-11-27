@@ -34,6 +34,8 @@ BootMergeObject boot_platform_raspberrypi_arm.o :
 	serial.cpp
 	video.cpp
 
+	arch_framebuffer_bcm2708.cpp
+
 	$(genericPlatformSources)
 	: -fno-pic
 	: boot_platform_generic.a
