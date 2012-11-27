@@ -8,7 +8,19 @@
 
 #include "arch_framebuffer.h"
 
+#include "blue_screen.h"
+#include "frame_buffer_console.h"
+
 ArchFramebuffer *gFramebuffer = NULL;
+static bool sOnScreenDebugOutputAvailable = false;
+
+
+extern "C" void
+platform_video_puts(const char* string)
+{
+	if (sOnScreenDebugOutputAvailable)
+		blue_screen_puts(string);
+}
 
 
 extern "C" void
@@ -49,6 +61,27 @@ platform_init_video(void)
 	if (result != B_OK)
 		return result;
 
-	return gFramebuffer->SetDefaultMode();
+	result = gFramebuffer->SetDefaultMode();
+	if (result != B_OK)
+		return result;
+
+	result = frame_buffer_update(gFramebuffer->Base(), gFramebuffer->Width(),
+		gFramebuffer->Height(), gFramebuffer->Depth(),
+		gFramebuffer->BytesPerRow());
+	if (result != B_OK)
+		return result;
+
+	result = blue_screen_init();
+	if (result != B_OK)
+		return result;
+
+	result = blue_screen_enter(false);
+	if (result != B_OK)
+		return result;
+
+	blue_screen_clear_screen();
+	blue_screen_puts("Welcome to very early on-screen debug output on rPi!\n");
+	sOnScreenDebugOutputAvailable = true;
+	return B_OK;
 }
 
