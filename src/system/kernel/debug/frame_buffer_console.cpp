@@ -18,9 +18,12 @@
 #include <vm/vm.h>
 #include <fs/devfs.h>
 #include <boot/kernel_args.h>
+
+#ifndef _BOOT_MODE
 #include <vesa_info.h>
 
 #include <edid.h>
+#endif
 
 #include "font.h"
 
@@ -79,8 +82,11 @@ static uint32 sPalette32[] = {
 };
 
 static struct console_info sConsole;
+
+#ifndef _BOOT_MODE
 static struct frame_buffer_boot_info sBootInfo;
 static struct vesa_mode* sVesaModes;
+#endif
 
 
 static inline uint8
@@ -404,6 +410,7 @@ frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth,
 }
 
 
+#ifndef _BOOT_MODE
 status_t
 frame_buffer_console_init(kernel_args* args)
 {
@@ -483,4 +490,5 @@ _user_frame_buffer_update(addr_t baseAddress, int32 width, int32 height,
 
 	return frame_buffer_update(baseAddress, width, height, depth, bytesPerRow);
 }
+#endif
 

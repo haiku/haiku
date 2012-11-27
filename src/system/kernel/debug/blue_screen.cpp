@@ -568,6 +568,7 @@ parse_character(char c)
 }
 
 
+#ifndef _BOOT_MODE
 static int
 set_paging(int argc, char **argv)
 {
@@ -588,6 +589,7 @@ set_paging(int argc, char **argv)
 	kprintf("paging is turned %s now.\n", sScreen.paging ? "on" : "off");
 	return 0;
 }
+#endif // !_BOOT_MODE
 
 
 //	#pragma mark -
@@ -604,11 +606,15 @@ blue_screen_init(void)
 		return B_ERROR;
 
 	sModule = &gFrameBufferConsoleModule;
+#ifdef _BOOT_MODE
+	sScreen.paging = false;
+#else
 	sScreen.paging = !get_safemode_boolean(
 		"disable_onscreen_paging", false);
 	sScreen.paging_timeout = false;
 
 	add_debugger_command("paging", set_paging, "Enable or disable paging");
+#endif
 	return B_OK;
 }
 
@@ -659,6 +665,7 @@ blue_screen_clear_screen(void)
 }
 
 
+#ifndef _BOOT_MODE
 int
 blue_screen_try_getchar(void)
 {
@@ -671,6 +678,7 @@ blue_screen_getchar(void)
 {
 	return arch_debug_blue_screen_getchar();
 }
+#endif
 
 
 void
