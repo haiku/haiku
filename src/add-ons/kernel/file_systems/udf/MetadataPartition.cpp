@@ -48,6 +48,7 @@ MetadataPartition::MetadataPartition(Volume *volume,
 MetadataPartition::~MetadataPartition()
 {
 	delete fMetadataIcb;
+	delete fMetadataMirrorIcb;
 }
 
 /*! \brief Maps the given logical block to a physical block on disc.
