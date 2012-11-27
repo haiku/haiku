@@ -19,6 +19,11 @@ jmp_loader:
 	bx r12
 	*/
 
+	/* Turn on unaligned memory access */
+	mrc p15, #0, r4, c1, c0, #0
+	orr r4, #0x400000
+	mcr p15, #0, r4, c1, c0, #0
+
 	/* Setup initial stack right below our .text section (growing downwards
 		into the space reserved for .init) */
 	mov sp, #0x8000
