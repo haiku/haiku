@@ -340,12 +340,12 @@ SoftwareRenderer::_AllocateBitmap()
 	BAutolock lock(fInfoLocker);
 	delete fBitmap;
 	fBitmap = NULL;
-	if (fWidth <= 1 || fHeight <= 1) {
+	if (fWidth < 1 || fHeight < 1) {
 		TRACE("%s: Can't allocate bitmap of %dx%d\n", __func__,
 			fWidth, fHeight);
 		return;
 	}
-	BRect rect(0.0, 0.0, fWidth - 1, fHeight - 1);
+	BRect rect(0.0, 0.0, fWidth, fHeight);
 	fBitmap = new (std::nothrow) BBitmap(rect, fColorSpace);
 	if (fBitmap == NULL) {
 		TRACE("%s: Can't create bitmap!\n", __func__);
