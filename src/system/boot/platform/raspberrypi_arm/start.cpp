@@ -137,7 +137,6 @@ _start(void)
 	// To debug mmu, enable serial_init above me!
 	mmu_init();
 
-	platform_init_video();
 	// Map in the boot archive loaded into memory by the firmware.
 	args.platform.boot_tgz_size = BOOT_ARCHIVE_SIZE;
 	args.platform.boot_tgz_data = (void*)mmu_map_physical_memory(
