@@ -122,8 +122,6 @@ Architecture::CreateStackTrace(Team* team,
 	while (cpuState != NULL) {
 		// get the instruction pointer
 		target_addr_t instructionPointer = cpuState->InstructionPointer();
-		if (instructionPointer == 0)
-			break;
 
 		// get the image for the instruction pointer
 		AutoLocker<Team> teamLocker(team);
