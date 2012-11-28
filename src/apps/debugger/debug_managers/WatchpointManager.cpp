@@ -47,7 +47,7 @@ WatchpointManager::InstallWatchpoint(Watchpoint* watchpoint,
 {
 	status_t error = B_OK;
 	TRACE_CONTROL("WatchpointManager::InstallUserWatchpoint(%p, %d)\n",
-		userWatchpoint, enabled);
+		watchpoint, enabled);
 
 	AutoLocker<BLocker> installLocker(fLock);
 	AutoLocker<Team> teamLocker(fTeam);
