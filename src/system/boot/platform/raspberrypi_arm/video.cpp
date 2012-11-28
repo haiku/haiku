@@ -6,6 +6,9 @@
 
 #include <SupportDefs.h>
 
+#include <boot/kernel_args.h>
+#include <boot/stage2.h>
+
 #include "arch_framebuffer.h"
 
 #include "blue_screen.h"
@@ -82,6 +85,15 @@ platform_init_video(void)
 	blue_screen_clear_screen();
 	blue_screen_puts("Welcome to very early on-screen debug output on rPi!\n");
 	sOnScreenDebugOutputAvailable = true;
+
+	gKernelArgs.frame_buffer.physical_buffer.start
+		= gFramebuffer->PhysicalBase();
+	gKernelArgs.frame_buffer.physical_buffer.size = gFramebuffer->Size();
+	gKernelArgs.frame_buffer.bytes_per_row = gFramebuffer->BytesPerRow();
+	gKernelArgs.frame_buffer.width = gFramebuffer->Width();
+	gKernelArgs.frame_buffer.height = gFramebuffer->Height();
+	gKernelArgs.frame_buffer.depth = gFramebuffer->Depth();
+	gKernelArgs.frame_buffer.enabled = true;
 	return B_OK;
 }
 
