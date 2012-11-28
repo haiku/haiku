@@ -225,6 +225,23 @@ hook_winsys_displaytarget_destroy(struct sw_winsys* winsys,
 }
 
 
+static int
+hook_stm_get_param(struct st_manager *smapi, enum st_manager_param param)
+{
+	CALLED();
+
+	switch (param) {
+		case ST_MANAGER_BROKEN_INVALIDATE:
+			TRACE("%s: TODO: How should we handle BROKEN_INVALIDATE calls?\n",
+				__func__);
+			// For now we force validation of the framebuffer.
+			return 1;
+	}
+
+	return 0;
+}
+
+
 GalliumContext::GalliumContext(ulong options)
 	:
 	fOptions(options),
@@ -331,6 +348,7 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 		ERROR("%s: Couldn't allocate Mesa state tracker manager!\n", __func__);
 		return -1;
 	}
+	context->manager->get_param = hook_stm_get_param;
 
 	// Calculate visual configuration
 	const GLboolean rgbFlag		= ((fOptions & BGL_INDEX) == 0);
