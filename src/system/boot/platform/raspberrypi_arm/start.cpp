@@ -13,10 +13,14 @@
 #include "serial.h"
 
 #include <KernelExport.h>
+
+#include <arch/cpu.h>
+
 #include <boot/platform.h>
 #include <boot/heap.h>
 #include <boot/stage2.h>
-#include <arch/cpu.h>
+
+#include <platform_arch.h>
 
 #include <string.h>
 
@@ -86,7 +90,21 @@ platform_boot_options(void)
 void
 platform_start_kernel(void)
 {
-	#warning IMPLEMENT platform_start_kernel
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+		gKernelArgs.kernel_image.Pointer());
+
+	addr_t kernelEntry = image->elf_header.e_entry;
+	addr_t stackTop
+		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
+
+	serial_cleanup();
+	mmu_init_for_kernel();
+
+	dprintf("kernel entry at %lx\n", kernelEntry);
+
+	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry,
+		stackTop);
+
 	panic("kernel returned!\n");
 }
 
