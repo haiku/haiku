@@ -75,7 +75,7 @@ SoftwareRenderer::SoftwareRenderer(BGLView *view, ulong options,
 	fHeight = (GLint)b.IntegerHeight();
 	fNewWidth = fWidth;
 	fNewHeight = fHeight;
-	
+
 	_AllocateBitmap();
 
 	// Initialize the first "Haiku Software GL Pipe" context
@@ -116,8 +116,10 @@ SoftwareRenderer::LockGL()
 
 	BAutolock lock(fInfoLocker);
 	if (fDirectModeEnabled && fInfo != NULL) {
-		fNewWidth = fInfo->window_bounds.right - fInfo->window_bounds.left;// + 1;
-		fNewHeight = fInfo->window_bounds.bottom - fInfo->window_bounds.top;// + 1;
+		fNewWidth = fInfo->window_bounds.right - fInfo->window_bounds.left;
+			// + 1;
+		fNewHeight = fInfo->window_bounds.bottom - fInfo->window_bounds.top;
+			// + 1;
 	}
 
 	if (fBitmap && cs == fColorSpace && fNewWidth == fWidth
@@ -153,7 +155,7 @@ SoftwareRenderer::SwapBuffers(bool vsync)
 //	CALLED();
 	if (!fBitmap)
 		return;
-		
+
 	BScreen screen(GLView()->Window());
 
 	fContextObj->SwapBuffers(fContextID);

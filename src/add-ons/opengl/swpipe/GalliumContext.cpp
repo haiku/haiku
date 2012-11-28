@@ -135,6 +135,7 @@ round_up(unsigned n, unsigned multiple)
 	return (n + multiple - 1) & ~(multiple - 1);
 }
 
+
 /* winsys hooks */
 
 
@@ -251,8 +252,7 @@ GalliumContext::GalliumContext(ulong options)
 	CALLED();
 
 	// Make all contexts a known value
-	context_id i;
-	for (i = 0; i < CONTEXT_MAX; i++)
+	for (context_id i = 0; i < CONTEXT_MAX; i++)
 		fContext[i] = NULL;
 
 	CreateScreen();
@@ -267,8 +267,7 @@ GalliumContext::~GalliumContext()
 
 	// Destroy our contexts
 	pipe_mutex_lock(fMutex);
-	uint32 i;
-	for (i = 0; i < CONTEXT_MAX; i++)
+	for (context_id i = 0; i < CONTEXT_MAX; i++)
 		DestroyContext(i);
 	pipe_mutex_unlock(fMutex);
 
@@ -457,8 +456,7 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 	context_id contextNext = -1;
 
 	pipe_mutex_lock(fMutex);
-	context_id i;
-	for (i = 0; i < CONTEXT_MAX; i++) {
+	for (context_id i = 0; i < CONTEXT_MAX; i++) {
 		if (fContext[i] == NULL) {
 			fContext[i] = context;
 			contextNext = i;
@@ -558,7 +556,7 @@ status_t
 GalliumContext::SwapBuffers(context_id contextID)
 {
 	CALLED();
-	
+
 	pipe_mutex_lock(fMutex);
 	struct hgl_context *context = fContext[contextID];
 	pipe_mutex_unlock(fMutex);
