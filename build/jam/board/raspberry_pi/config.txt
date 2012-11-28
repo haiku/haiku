@@ -1,36 +1,23 @@
-##### Overclocking
-# WARNING: Don't adjust unless you know what you are doing!
-#arm_freq=800
-#gpu_freq=350
-#core_freq=250
-#h264_freq=250
-#isp_freq=250
-#v3d_freq=250
-#sdram_freq=250
-#over_voltage=0
-#over_voltage_sdram=0
-#over_voltage_sdram_c=0
-#over_voltage_sdram_i=0
-#over_voltage_sdram_p=0
+##### CPU Speed
+#arm_freq 700
 
+##### Memory layout
+#gpu_mem 64
 
-##### Video
-#sdtv_mode=0
-#sdtv_aspect=1
-#hdmi_mode=19
-#hdmi_drive=
-#test_mode=0
-#disable_overscan=0
-enable_l2cache=1
-
+# Memory based on model.. overrides gpu_mem
+#gpu_mem_256 64
+#gpu_mem_512 64
 
 ##### Low level
+kernel=haiku_loader
+kernel_address=0x0
+ramfsfile=haiku-floppyboot.tgz
+ramfsaddr=0x04000000
+
 # Skip boot tags for non-linux platforms
 disable_commandline_tags=1
-#kernel_address=
 #device_tree=bcm2835.dtb
 #device_tree_address=0x100
-
 
 ##### UART Settings
 # Default is 115200
