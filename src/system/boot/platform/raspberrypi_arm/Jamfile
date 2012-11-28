@@ -12,7 +12,9 @@ UsePrivateHeaders [ FDirName storage ] ;
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 
 {
-	local defines = _BOOT_MODE ;
+	local defines = _BOOT_MODE
+		BOOT_ARCHIVE_BASE=$(HAIKU_BOARD_BOOT_ARCHIVE_BASE)
+		BOOT_ARCHIVE_SIZE=$(HAIKU_BOARD_BOOT_ARCHIVE_SIZE) ;
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;

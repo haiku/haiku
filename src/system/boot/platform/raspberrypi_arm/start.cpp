@@ -120,6 +120,11 @@ _start(void)
 	mmu_init();
 
 	platform_init_video();
+	// Map in the boot archive loaded into memory by the firmware.
+	args.platform.boot_tgz_size = BOOT_ARCHIVE_SIZE;
+	args.platform.boot_tgz_data = (void*)mmu_map_physical_memory(
+		BOOT_ARCHIVE_BASE, args.platform.boot_tgz_size, kDefaultPageFlags);
+
 	serial_init();
 	console_init();
 
