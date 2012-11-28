@@ -48,6 +48,9 @@ BootMergeObject boot_platform_raspberrypi_arm.o :
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
+SEARCH on [ FGristFiles devices.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform u-boot ] ;
+
 
 # Tell the build system to where stage1.bin can be found, so it can be used
 # elsewhere.
