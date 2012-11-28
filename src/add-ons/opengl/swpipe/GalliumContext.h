@@ -5,8 +5,8 @@
  * Authors:
  *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
-#ifndef CALLIUMCONTEXT_H
-#define CALLIUMCONTEXT_H
+#ifndef GALLIUMCONTEXT_H
+#define GALLIUMCONTEXT_H
 
 
 extern "C" {
@@ -72,4 +72,4 @@ private:
 };
 	
 
-#endif /* CALLIUMCONTEXT_H */
+#endif /* GALLIUMCONTEXT_H */
