@@ -250,6 +250,11 @@ GalliumContext::GalliumContext(ulong options)
 {
 	CALLED();
 
+	// Make all contexts a known value
+	context_id i;
+	for (i = 0; i < CONTEXT_MAX; i++)
+		fContext[i] = NULL;
+
 	CreateScreen();
 
 	pipe_mutex_init(fMutex);
@@ -260,16 +265,16 @@ GalliumContext::~GalliumContext()
 {
 	CALLED();
 
+	// Destroy our contexts
 	pipe_mutex_lock(fMutex);
 	uint32 i;
-	for (i = 0; i < CONTEXT_MAX; i++) {
-		// TODO: Delete each context
-		//if (fContext[i])
-		//	hsp_delete_context(i + 1);
-	}
+	for (i = 0; i < CONTEXT_MAX; i++)
+		DestroyContext(i);
 	pipe_mutex_unlock(fMutex);
 
 	pipe_mutex_destroy(fMutex);
+
+	// TODO: Destroy fScreen
 }
 
 
@@ -475,6 +480,27 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 		__func__, contextNext);
 
 	return contextNext;
+}
+
+
+void
+GalliumContext::DestroyContext(context_id contextID)
+{
+	// fMutex should be locked *before* calling DestoryContext
+
+	// See if context is used
+	if (!fContext[contextID])
+		return;
+
+	if (fContext[contextID]->st) {
+		fContext[contextID]->st->flush(fContext[contextID]->st, 0, NULL);
+		fContext[contextID]->st->destroy(fContext[contextID]->st);
+	}
+
+	if (fContext[contextID]->manager)
+		FREE(fContext[contextID]->manager);
+
+	FREE(fContext[contextID]);
 }
 
 

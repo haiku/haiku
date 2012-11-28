@@ -52,6 +52,7 @@ public:
 							~GalliumContext();
 
 		context_id			CreateContext(Bitmap* bitmap);
+		void				DestroyContext(context_id contextID);
 		context_id			GetCurrentContext() { return fCurrentContext; };
 		status_t			SetCurrentContext(Bitmap *bitmap,
 								context_id contextID);
