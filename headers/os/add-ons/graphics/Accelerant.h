@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Copyright 2009-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ACCELERANT_H_
@@ -38,7 +38,7 @@ enum {
 	B_ACCELERANT_MODE_COUNT = 0x100,	/* required */
 	B_GET_MODE_LIST,					/* required */
 	B_PROPOSE_DISPLAY_MODE,				/* optional */
-	B_SET_DISPLAY_MODE,					/* required */	
+	B_SET_DISPLAY_MODE,					/* required */
 	B_GET_DISPLAY_MODE,					/* required */
 	B_GET_FRAME_BUFFER_CONFIG,			/* required */
 	B_GET_PIXEL_CLOCK_LIMITS,			/* required */
@@ -57,6 +57,7 @@ enum {
 	B_MOVE_CURSOR = 0x200,				/* optional */
 	B_SET_CURSOR_SHAPE,					/* optional */
 	B_SHOW_CURSOR,						/* optional */
+	B_SET_CURSOR_BITMAP,				/* optional */
 
 	/* synchronization */
 	B_ACCELERANT_ENGINE_COUNT = 0x300,	/* required */
@@ -72,9 +73,9 @@ enum {
 	B_INVERT_RECTANGLE,					/* optional */
 	B_FILL_SPAN,						/* optional */
 	B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT,	/* optional */
-	B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT,	/* optional. 
+	B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT,	/* optional.
 		NOTE: source and dest may NOT overlap */
-	
+
 	/* 3D acceleration */
 	B_ACCELERANT_PRIVATE_START = (int)0x80000000
 };
@@ -105,6 +106,7 @@ typedef struct {
 	uint32	flags;						/* sync polarity, etc. */
 } display_timing;
 
+
 typedef struct {
 	display_timing	timing;				/* CTRC info */
 	uint32			space;				/* pixel configuration */
@@ -128,6 +130,7 @@ typedef struct {
 										/* not neccesarily the same as */
 										/* virtual_width * byte_per_pixel */
 } frame_buffer_config;
+
 
 typedef struct {
 	uint16	h_res;						/* minimum effective change in */
@@ -286,17 +289,16 @@ typedef uint32 (*accelerant_mode_count)(void);
 typedef status_t (*get_mode_list)(display_mode*);
 typedef status_t (*propose_display_mode)(display_mode* target,
 	display_mode* low, display_mode* high);
-typedef status_t (*set_display_mode)(display_mode* mode_to_set);
-typedef status_t (*get_display_mode)(display_mode* current_mode);
-typedef status_t (*get_frame_buffer_config)(frame_buffer_config*
-	a_frame_buffer);
+typedef status_t (*set_display_mode)(display_mode* modeToSet);
+typedef status_t (*get_display_mode)(display_mode* currentMode);
+typedef status_t (*get_frame_buffer_config)(frame_buffer_config* frameBuffer);
 typedef status_t (*get_pixel_clock_limits)(display_mode* dm, uint32* low,
 	uint32* high);
-typedef status_t (*move_display_area)(uint16 h_display_start,
-	uint16 v_display_start);
+typedef status_t (*move_display_area)(uint16 hDisplayStart,
+	uint16 vDisplayStart);
 typedef status_t (*get_timing_constraints)(display_timing_constraints* dtc);
-typedef void (*set_indexed_colors)(uint count, uint8 first, uint8* color_data,
-	uint32 flags);
+typedef void (*set_indexed_colors)(uint count, uint8 first,
+	const uint8* colorData, uint32 flags);
 typedef uint32 (*dpms_capabilities)(void);
 typedef uint32 (*dpms_mode)(void);
 typedef status_t (*set_dpms_mode)(uint32 dpms_flags);
@@ -306,12 +308,15 @@ typedef status_t (*get_edid_info)(void* info, uint32 size, uint32* _version);
 typedef sem_id (*accelerant_retrace_semaphore)(void);
 
 typedef status_t (*set_cursor_shape)(uint16 width, uint16 height,
-	uint16 hot_x, uint16 hot_y, uint8* andMask, uint8* xorMask);
+	uint16 hotX, uint16 hotY, const uint8* andMask, const uint8* xorMask);
+typedef status_t (*set_cursor_bitmap)(uint16 width, uint16 height,
+	uint16 hotX, uint16 hotY, color_space colorSpace, uint16 bytesPerRow,
+	const uint8* bitmapData);
 typedef void (*move_cursor)(uint16 x, uint16 y);
-typedef void (*show_cursor)(bool is_visible);
+typedef void (*show_cursor)(bool isVisible);
 
 typedef uint32 (*accelerant_engine_count)(void);
-typedef status_t (*acquire_engine)(uint32 capabilities, uint32 max_wait,
+typedef status_t (*acquire_engine)(uint32 capabilities, uint32 maxWait,
 	sync_token* st, engine_token** et);
 typedef status_t (*release_engine)(engine_token* et, sync_token* st);
 typedef void (*wait_engine_idle)(void);
