@@ -26,14 +26,14 @@ static int32 sOverlayChannelUsed;
 
 
 static uint32
-vesa_overlay_count(const display_mode *mode)
+vesa_overlay_count(const display_mode* mode)
 {
 	return 1;
 }
 
 
 static const uint32*
-vesa_overlay_supported_spaces(const display_mode *mode)
+vesa_overlay_supported_spaces(const display_mode* mode)
 {
 	static const uint32 kSupportedSpaces[] = {B_RGB15, B_RGB16, B_RGB32,
 		B_YCbCr422, 0};
@@ -69,14 +69,14 @@ vesa_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	buffer->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
 	buffer->buffer = gInfo->shared_info->frame_buffer;
-	buffer->buffer_dma = (uint8 *)gInfo->shared_info->physical_frame_buffer;
+	buffer->buffer_dma = (uint8*)gInfo->shared_info->physical_frame_buffer;
 
 	return buffer;
 }
 
 
 static status_t
-vesa_release_overlay_buffer(const overlay_buffer *buffer)
+vesa_release_overlay_buffer(const overlay_buffer* buffer)
 {
 	debug_printf("release_overlay_buffer(buffer %p)\n", buffer);
 
@@ -86,8 +86,8 @@ vesa_release_overlay_buffer(const overlay_buffer *buffer)
 
 
 static status_t
-vesa_get_overlay_constraints(const display_mode *mode,
-	const overlay_buffer *buffer, overlay_constraints *constraints)
+vesa_get_overlay_constraints(const display_mode* mode,
+	const overlay_buffer* buffer, overlay_constraints* constraints)
 {
 	debug_printf("get_overlay_constraints(buffer %p)\n", buffer);
 
@@ -125,7 +125,7 @@ vesa_get_overlay_constraints(const display_mode *mode,
 
 
 static overlay_token
-vesa_allocate_overlay(void)
+vesa_allocate_overlay()
 {
 	debug_printf("allocate_overlay()\n");
 
@@ -152,8 +152,8 @@ vesa_release_overlay(overlay_token overlayToken)
 
 
 static status_t
-vesa_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer,
-	const overlay_window *window, const overlay_view *view)
+vesa_configure_overlay(overlay_token overlayToken, const overlay_buffer* buffer,
+	const overlay_window* window, const overlay_view* view)
 {
 	debug_printf("configure_overlay: buffer %p, window %p, view %p\n",
 		buffer, window, view);
@@ -186,14 +186,14 @@ vesa_move_cursor(uint16 x, uint16 y)
 
 
 void
-vesa_show_cursor(bool is_visible)
+vesa_show_cursor(bool isVisible)
 {
 }
 #endif	// # FAKE_HARDWARE_CURSOR_SUPPORT
 
 
-extern "C" void *
-get_accelerant_hook(uint32 feature, void *data)
+extern "C" void*
+get_accelerant_hook(uint32 feature, void* data)
 {
 	switch (feature) {
 		/* general */
