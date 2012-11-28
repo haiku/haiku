@@ -573,6 +573,16 @@ usb_disk_inquiry(device_lun *lun)
 		parameter.product_identification);
 	TRACE_ALWAYS("product_revision_level   \"%.4s\"\n",
 		parameter.product_revision_level);
+
+	memcpy(lun->vendor_name, parameter.vendor_identification,
+		MIN(sizeof(lun->vendor_name), sizeof(parameter.vendor_identification)));
+	memcpy(lun->product_name, parameter.product_identification,
+		MIN(sizeof(lun->product_name),
+			sizeof(parameter.product_identification)));
+	memcpy(lun->product_revision, parameter.product_revision_level,
+		MIN(sizeof(lun->product_revision),
+			sizeof(parameter.product_revision_level)));
+
 	lun->device_type = parameter.peripherial_device_type; /* 1:1 mapping */
 	lun->removable = (parameter.removable_medium == 1);
 	return B_OK;
@@ -774,6 +784,11 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 		lun->should_sync = false;
 		lun->media_present = true;
 		lun->media_changed = true;
+
+		memset(lun->vendor_name, 0, sizeof(lun->vendor_name));
+		memset(lun->product_name, 0, sizeof(lun->product_name));
+		memset(lun->product_revision, 0, sizeof(lun->product_revision));
+
 		usb_disk_reset_capacity(lun);
 
 		// initialize this lun
@@ -1034,6 +1049,27 @@ usb_disk_free(void *cookie)
 }
 
 
+static inline void
+normalize_name(char *name, size_t nameLength)
+{
+	bool wasSpace = false;
+	size_t insertIndex = 0;
+	for (size_t i = 0; i < nameLength; i++) {
+		bool isSpace = name[i] == ' ';
+		if (isSpace && wasSpace)
+			continue;
+
+		name[insertIndex++] = name[i];
+		wasSpace = isSpace;
+	}
+
+	if (insertIndex > 0 && name[insertIndex - 1] == ' ')
+		insertIndex--;
+
+	name[insertIndex] = 0;
+}
+
+
 static status_t
 usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
@@ -1126,6 +1162,25 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 			iconData.icon_size = sizeof(kDeviceIcon);
 			result = user_memcpy(buffer, &iconData, sizeof(device_icon));
+			break;
+		}
+
+		case B_GET_DEVICE_NAME:
+		{
+			size_t nameLength = sizeof(lun->vendor_name)
+				+ sizeof(lun->product_name) + sizeof(lun->product_revision) + 3;
+
+			char name[nameLength];
+			snprintf(name, nameLength, "%.8s %.16s %.4s", lun->vendor_name,
+				lun->product_name, lun->product_revision);
+
+			normalize_name(name, nameLength);
+
+			result = user_strlcpy((char *)buffer, name, length);
+			if (result > 0)
+				result = B_OK;
+
+			TRACE_ALWAYS("got device name: \"%s\" = %s\n", name, strerror(result));
 			break;
 		}
 #endif
