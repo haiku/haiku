@@ -1,0 +1,546 @@
+/*
+ * Copyright 2012, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Artur Wyszynski, harakash@gmail.com
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
+ */
+
+
+#include "GalliumContext.h"
+
+#include "GLView.h"
+
+#include "bitmap_wrapper.h"
+extern "C" {
+#include "glapi/glapi.h"
+#include "main/context.h"
+#include "main/framebuffer.h"
+#include "main/renderbuffer.h"
+#include "pipe/p_format.h"
+#include "state_tracker/st_cb_fbo.h"
+#include "state_tracker/st_cb_flush.h"
+#include "state_tracker/st_context.h"
+#include "state_tracker/st_gl_api.h"
+#include "state_tracker/st_manager.h"
+#include "state_tracker/sw_winsys.h"
+#include "softpipe/sp_context.h"
+#include "softpipe/sp_public.h"
+#include "softpipe/sp_texture.h"
+#ifdef USE_LLVMPIPE
+#include "llvmpipe/lp_context.h"
+#include "llvmpipe/lp_public.h"
+#include "llvmpipe/lp_texture.h"
+#endif
+}
+
+
+#define TRACE_CONTEXT
+#ifdef TRACE_CONTEXT
+#	define TRACE(x...) printf("GalliumContext: " x)
+#	define CALLED() TRACE("CALLED: %s\n", __PRETTY_FUNCTION__)
+#else
+#	define TRACE(x...)
+#	define CALLED()
+#endif
+#define ERROR(x...) printf("GalliumContext: " x)
+
+
+#if 0
+static void
+hgl_viewport(struct gl_context* glctx, GLint x, GLint y,
+	GLsizei width, GLsizei height)
+{
+	TRACE("%s(glctx: %p, x: %d, y: %d, width: %d, height: %d\n",
+		__FUNCTION__, glctx, x, y, width, height);
+	struct hgl_context *context = (struct hgl_context*)glctx->DriverCtx;
+
+	int32 w, h;
+	get_bitmap_size(context->bitmap, &w, &h);
+
+	#if 0
+	// TODO: mesa_resize_framebuffer? Need to investigate where this went
+	if (context->draw)
+		st_resize_framebuffer(context->draw->stfb, w, h);
+	if (context->read)
+		st_resize_framebuffer(context->read->stfb, w, h);
+	#endif
+}
+#endif
+
+
+static void
+hgl_fill_st_visual(st_visual* stVisual, gl_config* glVisual)
+{
+	memset(stVisual, 0, sizeof(*stVisual));
+
+	// Determine color format
+	if (glVisual->redBits == 8) {
+		if (glVisual->alphaBits == 8)
+			stVisual->color_format = PIPE_FORMAT_B8G8R8A8_UNORM;
+		else
+			stVisual->color_format = PIPE_FORMAT_B8G8R8X8_UNORM;
+	} else {
+		stVisual->color_format = PIPE_FORMAT_B5G6R5_UNORM;
+	}
+
+	// Determine depth stencil format
+	switch (glVisual->depthBits) {
+		default:
+		case 0:
+			stVisual->depth_stencil_format = PIPE_FORMAT_NONE;
+			break;
+		case 16:
+			stVisual->depth_stencil_format = PIPE_FORMAT_Z16_UNORM;
+			break;
+		case 24:
+			if (glVisual->stencilBits == 0) {
+				stVisual->depth_stencil_format = PIPE_FORMAT_Z24X8_UNORM;
+				// or PIPE_FORMAT_X8Z24_UNORM?
+			} else {
+				stVisual->depth_stencil_format = PIPE_FORMAT_Z24_UNORM_S8_UINT;
+				// or PIPE_FORMAT_S8_UINT_Z24_UNORM?
+			}
+			break;
+		case 32:
+			stVisual->depth_stencil_format = PIPE_FORMAT_Z32_UNORM;
+			break;
+	}
+
+	stVisual->accum_format = (glVisual->haveAccumBuffer)
+		? PIPE_FORMAT_R16G16B16A16_SNORM : PIPE_FORMAT_NONE;
+
+	stVisual->buffer_mask |= ST_ATTACHMENT_FRONT_LEFT_MASK;
+	stVisual->render_buffer = ST_ATTACHMENT_FRONT_LEFT;
+	if (glVisual->doubleBufferMode) {
+		stVisual->buffer_mask |= ST_ATTACHMENT_BACK_LEFT_MASK;
+		stVisual->render_buffer = ST_ATTACHMENT_BACK_LEFT;
+	}
+
+	if (glVisual->stereoMode) {
+		stVisual->buffer_mask |= ST_ATTACHMENT_FRONT_RIGHT_MASK;
+		if (glVisual->doubleBufferMode)
+			stVisual->buffer_mask |= ST_ATTACHMENT_BACK_RIGHT_MASK;
+	}
+
+	if (glVisual->haveDepthBuffer || glVisual->haveStencilBuffer)
+		stVisual->buffer_mask |= ST_ATTACHMENT_DEPTH_STENCIL_MASK;
+}
+
+
+static INLINE unsigned
+round_up(unsigned n, unsigned multiple)
+{
+	return (n + multiple - 1) & ~(multiple - 1);
+}
+
+/* winsys hooks */
+
+
+static void
+hook_winsys_destroy(struct sw_winsys* winsys)
+{
+	CALLED();
+	FREE(winsys);
+}
+
+
+static boolean
+hook_winsys_is_displaytarget_format_supported(struct sw_winsys* winsys,
+	unsigned tex_usage, enum pipe_format format)
+{
+	CALLED();
+	// TODO STUB
+	return false;
+}
+
+
+static struct sw_displaytarget*
+hook_winsys_displaytarget_create(struct sw_winsys* winsys, unsigned tex_usage,
+	enum pipe_format format, unsigned width, unsigned height,
+	unsigned alignment, unsigned* stride)
+{
+	CALLED();
+	// TODO STUB
+	return NULL;
+}
+
+
+static struct sw_displaytarget*
+hook_winsys_displaytarget_from_handle(struct sw_winsys* winsys,
+	const struct pipe_resource* templat, struct winsys_handle* whandle,
+	unsigned* stride)
+{
+	CALLED();
+	// TODO STUB
+	return NULL;
+}
+
+
+static boolean
+hook_winsys_displaytarget_get_handle(struct sw_winsys* winsys,
+	struct sw_displaytarget* disptarget, struct winsys_handle* whandle)
+{
+	CALLED();
+	// TODO STUB
+	return false;
+}
+
+
+static void*
+hook_winsys_displaytarget_map(struct sw_winsys* winsys,
+	struct sw_displaytarget* disptarget, unsigned flags)
+{
+	CALLED();
+	// TODO STUB
+	return NULL;
+}
+
+
+static void
+hook_winsys_displaytarget_unmap(struct sw_winsys* winsys,
+	struct sw_displaytarget* disptarget)
+{
+	CALLED();
+	// TODO STUB
+}
+
+
+static void
+hook_winsys_displaytarget_display(struct sw_winsys* winsys,
+	struct sw_displaytarget* disptarget, void* context_private)
+{
+	CALLED();
+	// TODO STUB
+}
+
+
+static void
+hook_winsys_displaytarget_destroy(struct sw_winsys* winsys,
+	struct sw_displaytarget* disptarget)
+{
+	CALLED();
+	// TODO STUB
+}
+
+
+GalliumContext::GalliumContext(ulong options)
+	:
+	fOptions(options),
+	fCurrentContext(0),
+	fScreen(NULL)
+{
+	CALLED();
+
+	CreateScreen();
+
+	pipe_mutex_init(fMutex);
+}
+
+
+GalliumContext::~GalliumContext()
+{
+	CALLED();
+
+	pipe_mutex_lock(fMutex);
+	uint32 i;
+	for (i = 0; i < CONTEXT_MAX; i++) {
+		// TODO: Delete each context
+		//if (fContext[i])
+		//	hsp_delete_context(i + 1);
+	}
+	pipe_mutex_unlock(fMutex);
+
+	pipe_mutex_destroy(fMutex);
+}
+
+
+status_t
+GalliumContext::CreateScreen()
+{
+	CALLED();
+
+	struct sw_winsys* winsys = CALLOC_STRUCT(sw_winsys);
+
+	if (!winsys) {
+		ERROR("%s: Couldn't alloc sw_winsys!\n", __FUNCTION__);
+		return B_ERROR;
+	}
+
+	// Attach winsys hooks for Haiku
+	// gdi_create_sw_winsys is a good Mesa example
+	winsys->destroy = hook_winsys_destroy;
+	winsys->is_displaytarget_format_supported
+		= hook_winsys_is_displaytarget_format_supported;
+	winsys->displaytarget_create = hook_winsys_displaytarget_create;
+	winsys->displaytarget_from_handle = hook_winsys_displaytarget_from_handle;
+	winsys->displaytarget_get_handle = hook_winsys_displaytarget_get_handle;
+	winsys->displaytarget_map = hook_winsys_displaytarget_map;
+	winsys->displaytarget_unmap = hook_winsys_displaytarget_unmap;
+	winsys->displaytarget_display = hook_winsys_displaytarget_display;
+	winsys->displaytarget_destroy = hook_winsys_displaytarget_destroy;
+
+	#if USE_LLVMPIPE
+	fScreen = llvmpipe_create_screen(winsys);
+	#endif
+
+	if (fScreen == NULL)
+		fScreen = softpipe_create_screen(winsys);
+
+	if (fScreen == NULL) {
+		ERROR("%s: Couldn't create screen!\n", __FUNCTION__);
+		FREE(winsys);
+		return B_ERROR;
+	}
+
+	const char* driverName = fScreen->get_name(fScreen);
+	TRACE("%s: Using %s driver.\n", __func__, driverName);
+
+	return B_OK;
+}
+
+
+context_id
+GalliumContext::CreateContext(Bitmap *bitmap)
+{
+	CALLED();
+
+	struct hgl_context* context = CALLOC_STRUCT(hgl_context);
+
+	if (!context) {
+		ERROR("%s: Couldn't create pipe context!\n", __FUNCTION__);
+		return 0;
+	}
+
+	// Set up the initial things out context needs
+	context->bitmap = bitmap;
+	context->colorSpace = get_bitmap_color_space(bitmap);
+	context->draw = NULL;
+	context->read = NULL;
+	context->st = NULL;
+
+	context->api = st_gl_api_create();
+	if (!context->api) {
+		ERROR("%s: Couldn't obtain Mesa state tracker API!\n", __func__);
+		return -1;
+	}
+
+	context->manager = CALLOC_STRUCT(st_manager);
+	if (!context->manager) {
+		ERROR("%s: Couldn't allocate Mesa state tracker manager!\n", __func__);
+		return -1;
+	}
+
+	// Calculate visual configuration
+	const GLboolean rgbFlag		= ((fOptions & BGL_INDEX) == 0);
+	const GLboolean alphaFlag	= ((fOptions & BGL_ALPHA) == BGL_ALPHA);
+	const GLboolean dblFlag		= ((fOptions & BGL_DOUBLE) == BGL_DOUBLE);
+	const GLboolean stereoFlag	= false;
+	const GLint depth			= (fOptions & BGL_DEPTH) ? 24 : 0;
+	const GLint stencil			= (fOptions & BGL_STENCIL) ? 8 : 0;
+	const GLint accum			= 0;		// (options & BGL_ACCUM) ? 16 : 0;
+	const GLint red				= rgbFlag ? 8 : 0;
+	const GLint green			= rgbFlag ? 8 : 0;
+	const GLint blue			= rgbFlag ? 8 : 0;
+	const GLint alpha			= alphaFlag ? 8 : 0;
+
+	TRACE("rgb      :\t%d\n", (bool)rgbFlag);
+	TRACE("alpha    :\t%d\n", (bool)alphaFlag);
+	TRACE("dbl      :\t%d\n", (bool)dblFlag);
+	TRACE("stereo   :\t%d\n", (bool)stereoFlag);
+	TRACE("depth    :\t%d\n", depth);
+	TRACE("stencil  :\t%d\n", stencil);
+	TRACE("accum    :\t%d\n", accum);
+	TRACE("red      :\t%d\n", red);
+	TRACE("green    :\t%d\n", green);
+	TRACE("blue     :\t%d\n", blue);
+	TRACE("alpha    :\t%d\n", alpha);
+
+	gl_config* glVisual = _mesa_create_visual(dblFlag, stereoFlag, red, green,
+		blue, alpha, depth, stencil, accum, accum, accum, alpha ? accum : 0, 1);
+
+	if (!glVisual) {
+		ERROR("%s: Couldn't create Mesa visual!\n", __func__);
+		return -1;
+	}
+
+	TRACE("depthBits   :\t%d\n", glVisual->depthBits);
+	TRACE("stencilBits :\t%d\n", glVisual->stencilBits);
+
+	// Convert Mesa calculated visual into state tracker visual
+	struct st_visual stVisual;
+	hgl_fill_st_visual(&stVisual, glVisual);
+
+	// We need to assign the screen *before* calling st_api create_context
+	context->manager->screen = fScreen;
+
+	// Build state tracker attributes
+	struct st_context_attribs attribs;
+	memset(&attribs, 0, sizeof(attribs));
+	attribs.options.force_glsl_extensions_warn = false;
+	attribs.profile = ST_PROFILE_DEFAULT;
+	attribs.visual = stVisual;
+	attribs.major = 1;
+	attribs.minor = 0;
+	//attribs.flags |= ST_CONTEXT_FLAG_DEBUG;
+
+	struct st_api* api = context->api;
+
+	// Create context using state tracker api call
+	enum st_context_error result;
+	context->st = api->create_context(api, context->manager, &attribs,
+		&result, context->st);
+
+	if (!context->st) {
+		ERROR("%s: Couldn't create mesa state tracker context!\n",
+			__func__);
+		switch (result) {
+			case ST_CONTEXT_SUCCESS:
+				ERROR("%s: State tracker error: SUCCESS?\n", __func__);
+				break;
+			case ST_CONTEXT_ERROR_NO_MEMORY:
+				ERROR("%s: State tracker error: NO_MEMORY\n", __func__);
+				break;
+			case ST_CONTEXT_ERROR_BAD_API:
+				ERROR("%s: State tracker error: BAD_API\n", __func__);
+				break;
+			case ST_CONTEXT_ERROR_BAD_VERSION:
+				ERROR("%s: State tracker error: BAD_VERSION\n", __func__);
+				break;
+			case ST_CONTEXT_ERROR_BAD_FLAG:
+				ERROR("%s: State tracker error: BAD_FLAG\n", __func__);
+				break;
+			case ST_CONTEXT_ERROR_UNKNOWN_ATTRIBUTE:
+				ERROR("%s: State tracker error: BAD_ATTRIBUTE\n", __func__);
+				break;
+			case ST_CONTEXT_ERROR_UNKNOWN_FLAG:
+				ERROR("%s: State tracker error: UNKNOWN_FLAG\n", __func__);
+				break;
+		}
+
+		FREE(context);
+		return -1;
+	}
+
+	assert(!context->st->st_manager_private);
+	context->st->st_manager_private = (void*)context;
+
+	// TODO!
+	//context->st->ctx->DriverCtx = context;
+	//context->st->ctx->Driver.Viewport = hgl_viewport;
+
+	// TODO: Closely review this next context logic...
+	context_id contextNext = -1;
+
+	pipe_mutex_lock(fMutex);
+	context_id i;
+	for (i = 0; i < CONTEXT_MAX; i++) {
+		if (fContext[i] == NULL) {
+			fContext[i] = context;
+			contextNext = i;
+			break;
+		}
+	}
+	pipe_mutex_unlock(fMutex);
+
+	if (contextNext < 0) {
+		ERROR("%s: The next context is invalid... something went wrong!\n",
+			__func__);
+		//st_destroy_context(context->st);
+		FREE(context);
+		_mesa_destroy_visual(glVisual);
+		return -1;
+	}
+
+	TRACE("%s: context #%" B_PRIu64 " is the next available context\n",
+		__func__, contextNext);
+
+	return contextNext;
+}
+
+
+status_t
+GalliumContext::SetCurrentContext(Bitmap *bitmap, context_id contextID)
+{
+	CALLED();
+
+	if (contextID < 0 || contextID > CONTEXT_MAX) {
+		ERROR("%s: Invalid context ID range!\n", __func__);
+		return B_ERROR;
+	}
+
+	pipe_mutex_lock(fMutex);
+	context_id oldContextID = fCurrentContext;
+	struct hgl_context* context = fContext[contextID];
+	pipe_mutex_unlock(fMutex);
+
+	if (!context) {
+		ERROR("%s: Invalid context provided (#%" B_PRIu64 ")!\n",
+			__func__, contextID);
+		return B_ERROR;
+	}
+
+	struct st_api* api = context->api;
+
+	if (!bitmap) {
+		ERROR("%s: Invalid bitmap provided!\n", __func__);
+		api->make_current(context->api, NULL, NULL, NULL);
+		return B_ERROR;
+	}
+
+	// Everything seems valid, lets set the new context.
+	fCurrentContext = contextID;
+
+	if (oldContextID > 0 && oldContextID != contextID) {
+		fContext[oldContextID]->st->flush(fContext[oldContextID]->st,
+			0, NULL);
+	}
+
+	// TODO: WinSysDrawBuffer & WinSysReadBuffer?
+	api->make_current(context->api, context->st, context->read, context->draw);
+
+
+	// TODO: Anything else? st_api_make_current
+
+	context->bitmap = bitmap;
+	//context->st->pipe->priv = context;
+
+	return B_OK;
+}
+
+
+status_t
+GalliumContext::SwapBuffers(context_id contextID)
+{
+	CALLED();
+	
+	pipe_mutex_lock(fMutex);
+	struct hgl_context *context = fContext[contextID];
+	pipe_mutex_unlock(fMutex);
+
+	if (!context) {
+		ERROR("%s: context not found\n", __func__);
+		return B_ERROR;
+	}
+
+	//pipe_mutex_lock(context->draw->mutex);
+
+	// TODO: Where did st_notify_swapbuffers go?
+	//st_notify_swapbuffers(context->draw->stfb);
+
+	// TODO: Where did st_get_framebuffer_surface go?
+	//struct pipe_surface *surface;
+	//st_get_framebuffer_surface(context->draw->stfb, ST_SURFACE_BACK_LEFT,
+	//	&surface);
+
+	context->st->flush(context->st, ST_FLUSH_FRONT, NULL);
+
+	// TODO: Flush the frontbuffer!
+	//hsp_dev->hsp_winsys->flush_frontbuffer(hsp_dev->screen, surface,
+	//	context->bitmap);
+
+	//pipe_mutex_unlock(context->draw->mutex);
+
+	return true;
+}
