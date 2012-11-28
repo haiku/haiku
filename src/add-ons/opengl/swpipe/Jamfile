@@ -15,7 +15,7 @@ UsePrivateHeaders interface ;
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
 
-#AddResources Software\ Renderer : SoftwareRenderer.rdef ;
+AddResources Software\ Renderer : SoftwareRenderer.rdef ;
 
 Addon Software\ Renderer :
 	$(sources)
