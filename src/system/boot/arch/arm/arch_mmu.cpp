@@ -248,9 +248,9 @@ mmu_write_DACR(uint32 value)
 static uint32 *
 get_next_page_table(uint32 type)
 {
-	TRACE(("get_next_page_table, sNextPageTableAddress %p, kPageTableRegionEnd "
-		"%p, type 0x" B_PRIX32 "\n", sNextPageTableAddress,
-		kPageTableRegionEnd, type));
+	TRACE(("get_next_page_table, sNextPageTableAddress 0x%" B_PRIxADDR
+		", kPageTableRegionEnd 0x%" B_PRIxADDR ", type 0x%" B_PRIx32 "\n",
+		sNextPageTableAddress, kPageTableRegionEnd, type));
 
 	size_t size = 0;
 	switch(type) {
@@ -408,8 +408,9 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 	uint32 tableEntry = VADDR_TO_PTENT(virtualAddress);
 
-	TRACE(("map_page: inserting pageTable %p, tableEntry %ld, physicalAddress "
-		"%p\n", pageTable, tableEntry, physicalAddress));
+	TRACE(("map_page: inserting pageTable %p, tableEntry 0x%" B_PRIx32
+		", physicalAddress 0x%" B_PRIxADDR "\n", pageTable, tableEntry,
+		physicalAddress));
 
 	pageTable[tableEntry] = physicalAddress | flags;
 
@@ -480,10 +481,11 @@ mmu_allocate(void *virtualAddress, size_t size)
 		// is the address within the valid range?
 		if (address < KERNEL_BASE
 			|| address + size >= KERNEL_BASE + kMaxKernelSize) {
-			TRACE(("mmu_allocate in illegal range\n address: %lx"
-				"  KERNELBASE: %lx KERNEL_BASE + kMaxKernelSize: %lx"
-				"  address + size : %lx \n", (uint32)address, KERNEL_BASE,
-				KERNEL_BASE + kMaxKernelSize, (uint32)(address + size)));
+			TRACE(("mmu_allocate in illegal range\n address: %" B_PRIx32
+				"  KERNELBASE: %" B_PRIx32 " KERNEL_BASE + kMaxKernelSize: %"
+				B_PRIx32 "  address + size : %" B_PRIx32 "\n", (uint32)address,
+				(uint32)KERNEL_BASE, (uint32)KERNEL_BASE + kMaxKernelSize,
+				(uint32)(address + size)));
 			return NULL;
 		}
 		for (uint32 i = 0; i < size; i++) {
@@ -637,7 +639,8 @@ mmu_init(void)
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
 		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 
-	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
+	TRACE(("kernel stack at 0x%" B_PRIx64 " to 0x%" B_PRIx64 "\n",
+		gKernelArgs.cpu_kstack[0].start,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
 }
 
