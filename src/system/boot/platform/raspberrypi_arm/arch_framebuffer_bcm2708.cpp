@@ -154,14 +154,12 @@ ArchFramebufferBCM2708::SetVideoMode(int width, int height, int depth)
 		&& sFramebufferConfig.screen_size >= sFramebufferConfig.bytes_per_row
 			* sFramebufferConfig.height);
 
-#if 1
-	fBase = BCM2708_BUS_TO_PHYSICAL(sFramebufferConfig.frame_buffer_address);
-#else
-	// TODO: Enable when the MMU works.
-	fBase = (addr_t)mmu_map_physical_memory(
-			BCM2708_BUS_TO_PHYSICAL(sFramebufferConfig.frame_buffer_address),
-			sFramebufferConfig.screen_size, MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C);
-#endif
+	fPhysicalBase
+		= BCM2708_BUS_TO_PHYSICAL(sFramebufferConfig.frame_buffer_address);
+	fSize = sFramebufferConfig.screen_size;
+
+	fBase = (addr_t)mmu_map_physical_memory(fPhysicalBase, fSize,
+		kDefaultPageFlags);
 
 	uint8* line = (uint8*)fBase;
 	for (uint32 y = 0; y < sFramebufferConfig.height; y++) {
