@@ -103,7 +103,12 @@ private:
 private:
 	struct ImageHandler;
 	struct ImageHandlerHashDefinition;
+	struct ImageInfoPendingThread;
+	struct ImageInfoPendingThreadHashDefinition;
+
 	typedef BOpenHashTable<ImageHandlerHashDefinition> ImageHandlerTable;
+	typedef BOpenHashTable<ImageInfoPendingThreadHashDefinition>
+		ImageInfoPendingThreadTable;
 
 private:
 	static	status_t			_DebugEventListenerEntry(void* data);
@@ -166,6 +171,7 @@ private:
 			ThreadHandlerTable	fThreadHandlers;
 									// protected by the team lock
 			ImageHandlerTable*	fImageHandlers;
+			ImageInfoPendingThreadTable* fImageInfoPendingThreads;
 			DebuggerInterface*	fDebuggerInterface;
 			TeamDebugInfo*		fTeamDebugInfo;
 			FileManager*		fFileManager;

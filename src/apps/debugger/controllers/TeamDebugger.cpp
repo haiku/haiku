@@ -130,6 +130,70 @@ struct TeamDebugger::ImageHandlerHashDefinition {
 };
 
 
+// #pragma mark - ImageInfoPendingThread
+
+
+struct TeamDebugger::ImageInfoPendingThread {
+public:
+	ImageInfoPendingThread(image_id image, thread_id thread)
+		:
+		fImage(image),
+		fThread(thread)
+	{
+	}
+
+	~ImageInfoPendingThread()
+	{
+	}
+
+	image_id ImageID() const
+	{
+		return fImage;
+	}
+
+	thread_id ThreadID() const
+	{
+		return fThread;
+	}
+
+private:
+	image_id				fImage;
+	thread_id				fThread;
+
+public:
+	ImageInfoPendingThread*	fNext;
+};
+
+
+// #pragma mark - ImageHandlerHashDefinition
+
+
+struct TeamDebugger::ImageInfoPendingThreadHashDefinition {
+	typedef image_id				KeyType;
+	typedef	ImageInfoPendingThread	ValueType;
+
+	size_t HashKey(image_id key) const
+	{
+		return (size_t)key;
+	}
+
+	size_t Hash(const ImageInfoPendingThread* value) const
+	{
+		return HashKey(value->ImageID());
+	}
+
+	bool Compare(image_id key, const ImageInfoPendingThread* value) const
+	{
+		return value->ImageID() == key;
+	}
+
+	ImageInfoPendingThread*& GetLink(ImageInfoPendingThread* value) const
+	{
+		return value->fNext;
+	}
+};
+
+
 // #pragma mark - TeamDebugger
 
 
@@ -142,6 +206,7 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fTeam(NULL),
 	fTeamID(-1),
 	fImageHandlers(NULL),
+	fImageInfoPendingThreads(NULL),
 	fDebuggerInterface(NULL),
 	fFileManager(NULL),
 	fWorker(NULL),
@@ -203,6 +268,16 @@ TeamDebugger::~TeamDebugger()
 	}
 
 	delete fImageHandlers;
+
+	if (fImageInfoPendingThreads != NULL) {
+		ImageInfoPendingThread* thread = fImageInfoPendingThreads->Clear(true);
+		while (thread != NULL) {
+			ImageInfoPendingThread* next = thread->fNext;
+			delete thread;
+			thread = next;
+		}
+	}
+	delete fImageInfoPendingThreads;
 
 	delete fBreakpointManager;
 	delete fWatchpointManager;
@@ -294,6 +369,10 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	error = fImageHandlers->Init();
 	if (error != B_OK)
 		return error;
+
+	fImageInfoPendingThreads = new(std::nothrow) ImageInfoPendingThreadTable;
+	if (fImageInfoPendingThreads == NULL)
+		return B_NO_MEMORY;
 
 	// create our worker
 	fWorker = new(std::nothrow) Worker;
@@ -1209,7 +1288,14 @@ TeamDebugger::_HandleImageCreated(ImageCreatedEvent* event)
 {
 	AutoLocker< ::Team> locker(fTeam);
 	_AddImage(event->GetImageInfo());
-	return false;
+
+	ImageInfoPendingThread* info = new(std::nothrow) ImageInfoPendingThread(
+		event->GetImageInfo().ImageID(), event->Thread());
+	if (info == NULL)
+		return false;
+
+	fImageInfoPendingThreads->Insert(info);
+	return true;
 }
 
 
@@ -1249,8 +1335,20 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 
 	locker.Unlock();
 
-	// update breakpoints in the image
-	fBreakpointManager->UpdateImageBreakpoints(image);
+	image_debug_info_state state = image->ImageDebugInfoState();
+	if (state == IMAGE_DEBUG_INFO_LOADED
+		|| state == IMAGE_DEBUG_INFO_UNAVAILABLE) {
+		// update breakpoints in the image
+		fBreakpointManager->UpdateImageBreakpoints(image);
+
+		ImageInfoPendingThread* thread =  fImageInfoPendingThreads
+			->Lookup(imageID);
+		if (thread != NULL) {
+			fDebuggerInterface->ContinueThread(thread->ThreadID());
+			fImageInfoPendingThreads->Remove(thread);
+			delete thread;
+		}
+	}
 }
 
 
