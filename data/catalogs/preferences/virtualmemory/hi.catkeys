@@ -1,20 +1,12 @@
-1	hindi	x-vnd.Haiku-VirtualMemory	688347876
+1	hindi	x-vnd.Haiku-VirtualMemory	1828586495
 Turn off	SettingsWindow		बंद करे
-GB	SettingsWindow		जीबी
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		आभासी स्मृति अक्षम करने से सिस्टम स्थिरता पर अवांछित प्रभाव होता है जब पुरी स्मृति का उपयोग किया जाता है.\nआभासी स्मृति सिस्टम के प्रदर्शन को प्रभावित नहीं करती जब तक यह बिंदु नही आता.\n\nक्या आपको सच में यकीन है कि तुम इसे बंद करना चाहते हैं?
 Requested swap file size:	SettingsWindow		स्वैप फ़ाइल का आकार अनुरोध करे:
-Physical memory: 	SettingsWindow		भौतिक स्मृति:
-Changes will take effect on restart!	SettingsWindow		परिवर्तनों का पुनरारंभ पर प्रभाव होगा!
 Defaults	SettingsWindow		डिफ़ॉल्ट
-KB	SettingsWindow		के बी
 Use volume:	SettingsWindow		वॉल्यूम का इस्तेमाल करे:
-Insufficient space for a swap file.	SettingsWindow		एक स्वैप फ़ाइल के लिए अपर्याप्त स्थान.
 Keep enabled	SettingsWindow		सक्रिय रखें
 Revert	SettingsWindow		वापस लौटना
 VirtualMemory	System name		VirtualMemory
-Current swap file size: 	SettingsWindow		वर्तमान स्वैप फ़ाइल का आकार:
 OK	VirtualMemoryApp		ठीक है
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		आभासीस्मृति\n\tद्वारा लिखित\n\tकॉपीराइट 2005, हाइकू.\n
 Enable virtual memory	SettingsWindow		आभासी स्मृति समर्थ बनाना
-MB	SettingsWindow		एम बी
-%Ld B	SettingsWindow		%Ld B

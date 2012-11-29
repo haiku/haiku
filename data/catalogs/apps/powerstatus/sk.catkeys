@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-PowerStatus	3419486861
+1	slovak	x-vnd.Haiku-PowerStatus	3224068645
 Design capacity low warning: 	PowerStatus		Upozornenie na nízku navrhnutú kapacitu: 
 Show percent	PowerStatus		Zobrazovať percentá
 Design capacity: 	PowerStatus		Navrhnutá kapacita: 
@@ -8,9 +8,7 @@ non-rechargeable	PowerStatus		nedobíjateľná
 Empty battery slot	PowerStatus		Prázdne miesto na batériu
  mV	PowerStatus		 mV
 Run in window	PowerStatus		Spúšťať v okne
-About	PowerStatus		O aplikácii
 PowerStatus	System name		Stav napájania
-PowerStatus	PowerStatus		Stav napájania
  mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Info o batérii…
 Damaged battery	PowerStatus		Poškodená batéria
@@ -30,10 +28,8 @@ Capacity: 	PowerStatus		Kapacita:
 Battery discharging	PowerStatus		Batéria sa vybíja
 Serial number: 	PowerStatus		Sériové číslo: 
 Capacity granularity 1: 	PowerStatus		Granularita kapacity 1: 
-OK	PowerStatus		OK
 OEM info: 	PowerStatus		Info OEM: 
 Design voltage: 	PowerStatus		Návrhové napätie: 
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Stav napájania\nnapísal Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Batéria sa nabíja
 Design capacity warning: 	PowerStatus		Upozornenie navrhnutej kapacity: 
 Battery info	PowerStatus		Info o batérii

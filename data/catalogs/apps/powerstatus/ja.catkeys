@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PowerStatus	3419486861
+1	japanese	x-vnd.Haiku-PowerStatus	3224068645
 Design capacity low warning: 	PowerStatus		定格容量の低下警告:
 Show percent	PowerStatus		パーセントを表示
 Design capacity: 	PowerStatus		定格容量:
@@ -7,12 +7,10 @@ Type: 	PowerStatus		タイプ:
 non-rechargeable	PowerStatus		再充電不能
 Empty battery slot	PowerStatus		バッテリースロットが空です
  mV	PowerStatus		 mV
-Run in window	PowerStatus		ウインドウモードで起動
-About	PowerStatus		このソフトウェアについて
+Run in window	PowerStatus		ウィンドウモードで起動
 PowerStatus	System name		電源状態
-PowerStatus	PowerStatus		電源状態
  mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		バッテリー情報...
+Battery info…	PowerStatus		バッテリー情報…
 Damaged battery	PowerStatus		損傷したバッテリー
 Show time	PowerStatus		時間を表示
 Last full charge: 	PowerStatus		現在の最大容量
@@ -30,17 +28,15 @@ Capacity: 	PowerStatus		容量:
 Battery discharging	PowerStatus		放電中
 Serial number: 	PowerStatus		シリアルナンバー:
 Capacity granularity 1: 	PowerStatus		容量精度 1: 
-OK	PowerStatus		OK
 OEM info: 	PowerStatus		OEM情報:
 Design voltage: 	PowerStatus		定格電圧:
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nAxel Dörfler, Clemens Zeidler作\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		充電中
 Design capacity warning: 	PowerStatus		定格容量警告:
 Battery info	PowerStatus		バッテリー情報
 Quit	PowerStatus		終了
 rechargeable	PowerStatus		再充電する
 charging	PowerStatus		充電中
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus をウインドウモードで起動するか、または Deskbar 中にインストールできます。
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus をウィンドウモードで起動することや、 Deskbar 中にインストールすることができます。
 Power status box	PowerStatus		電源ステータスボックス
 Show status icon	PowerStatus		状態アイコンを表示
 Capacity granularity 2: 	PowerStatus		容量精度 2:

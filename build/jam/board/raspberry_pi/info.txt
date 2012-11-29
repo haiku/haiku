@@ -1,33 +1,34 @@
 Setting up the Haiku boot partition
 -------------------------------------
-
 partition 1 -- FAT32, bootable flag, type 'c'
 partition 2 -- BeFS, Haiku filesystem, type 'eb'
 
 The boot partition must contain the following files to boot Haiku:
-* bootcode.bin : 2nd stage bootloader, starts with SDRAM disabled
-* loader.bin : 3rd stage bootloader, starts with SDRAM enabled
-* start.elf: The GPU binary firmware image, provided by the foundation.
+* bootcode.bin : 2nd stage bootloader
+* start.elf: The GPU binary firmware image
 * haiku_loader: Haiku Loader
+* haiku-floppyboot.tgz: Compressed image with Haiku kernel
 * config.txt: A configuration file read by the GPU.
 
 Optional files:
 * vlls directory: Additional GPU code, e.g. extra codecs.
 
-Additional GPU firmware images, rename over start.elf to use them:
-* arm128_start.elf : 128M ARM, 128M GPU split
-  - use this for heavy 3D work, possibly also required for some video decoding)
-* arm192_start.elf : 192M ARM, 64M GPU split
-  - this is the default
-* arm224_start.elf : 224M ARM, 32M GPU split
-  - (use this for Linux only with no 3D or video processing.
-	Enough for the 1080p framebuffer, but not much else)
-
 Building
 -------------------------------------
 jam -q -sHAIKU_BOOT_BOARD=raspberry_pi -sHAIKU_BOOT_PLATFORM=raspberrypi_arm haiku_loader
+jam -q -sHAIKU_BOOT_BOARD=raspberry_pi -sHAIKU_BOOT_PLATFORM=raspberrypi_arm haiku-floppyboot.tgz
 
 config.txt options
 -------------------------------------
 kernel=haiku_loader
+kernel_address=0x0
 disable_commandline_tags=1
+ramfsfile=haiku-floppyboot.tgz
+ramfsaddr=0x04000000
+
+Additional information
+-------------------------------------
+* Latest Raspberry Pi firmware:
+	http://github.com/raspberrypi/firmware/tree/master/boot
+* config.txt options:
+	http://www.elinux.org/RPiconfig

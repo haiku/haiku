@@ -17,9 +17,11 @@
 class CliCommand;
 
 
-class CommandLineUserInterface : public UserInterface {
+class CommandLineUserInterface : public UserInterface,
+	public ::Team::Listener {
 public:
-								CommandLineUserInterface();
+								CommandLineUserInterface(bool saveReport,
+									const char* reportPath);
 	virtual						~CommandLineUserInterface();
 
 	virtual	const char*			ID() const;
@@ -46,6 +48,10 @@ public:
 									// everything has been set up. Enters the
 									// input loop.
 
+	// Team::Listener
+	virtual	void				DebugReportChanged(
+									const Team::DebugReportEvent& event);
+
 private:
 			struct CommandEntry;
 			typedef BObjectList<CommandEntry> CommandList;
@@ -70,6 +76,8 @@ private:
 private:
 			CliContext			fContext;
 			CommandList			fCommands;
+			const char*			fReportPath;
+			bool				fSaveReport;
 			sem_id				fShowSemaphore;
 			bool				fShown;
 	volatile bool				fTerminating;

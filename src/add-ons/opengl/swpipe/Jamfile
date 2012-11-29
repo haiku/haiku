@@ -1,0 +1,27 @@
+SubDir HAIKU_TOP src add-ons opengl swpipe ;
+
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium auxiliary ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium drivers ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium include ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
+
+local sources =
+	SoftwareRenderer.cpp
+	SoftwareWinsys.cpp
+	GalliumContext.cpp
+	bitmap_wrapper.cpp ;
+
+UsePrivateHeaders interface ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+AddResources Software\ Renderer : SoftwareRenderer.rdef ;
+
+Addon Software\ Renderer :
+	$(sources)
+	: libGL.so
+	$(HAIKU_MESA_DIR)/lib.haiku/libgallium.a
+	$(HAIKU_MESA_DIR)/lib.haiku/libsoftpipe.a
+	be translation $(TARGET_LIBSUPC++)
+;

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Network	2324385456
+1	finnish	x-vnd.Haiku-Network	365183238
 Choose automatically	EthernetSettingsView		Valitse automaattisesti
 Gateway:	EthernetSettingsView		Yhdyskäytävä:
 Netmask:	EthernetSettingsView		Verkkopeite:
@@ -19,3 +19,4 @@ The net_server needs to run for the auto configuration!	EthernetSettingsView		Au
 Disabled	EthernetSettingsView		Ota pois käytöstä
 Auto-configuring failed: 	EthernetSettingsView		Automaattiasetus epäonnistui: 
 Static	EthernetSettingsView		Staattinen
+<no adapter>	EthernetSettingsView		<ei ajuria>

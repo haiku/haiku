@@ -92,12 +92,18 @@ mkdir -p $installDir/lib/gcc-lib/i586-pc-haiku/$haikuRequiredLegacyGCCVersion
 # force the POSIX locale, as the build (makeinfo) might choke otherwise
 export LC_ALL=POSIX
 
+# drop an multiple job arguments from MAKEFLAGS
+if [ ! -z "$MAKEFLAGS" ]; then
+	export MAKEFLAGS=$(echo $MAKEFLAGS | sed -e 's/-j\s*[0-9][0-9]*//g')
+fi
+
+
 # build binutils
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
 	--prefix=$installDir --target=i586-pc-haiku --disable-nls \
 	--enable-shared=yes --disable-werror || exit 1
-make -j1 $additionalMakeArgs || exit 1
+make $additionalMakeArgs || exit 1
 make $additionalMakeArgs install || exit 1
 
 PATH=$PATH:$installDir/bin
@@ -157,7 +163,7 @@ eval "sed $sedExpr Makefile.bak > Makefile" || exit 1
 rm Makefile.bak
 
 # make gcc
-make -j1 cross || {
+make cross || {
 	echo "ERROR: Building gcc failed." >&2
 	exit 1
 }

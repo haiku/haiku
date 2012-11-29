@@ -7,7 +7,7 @@ Unencrypted	ConfigView		Некрыптаваны
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Далучэнне да сервера…
 Error while opening connection to %serv	smtp		Памылка падчас далучэння да %serv
-POP3 authentication failed. The server said:\n	smtp		Аўтэнтыфікацыя не ўдалася. Паведамленне сервера:\n
+POP3 authentication failed. The server said:\n	smtp		Аўтэнтыфікацыя POP3 не ўдалася. Паведамленне сервера:\n
 Destination:	ConfigView		Прызначэнне:
 : Connection refused or host not found.	smtp		: Адмоўлена ў злучэнні ці сервер не знойдзены.
 None	ConfigView		Няма

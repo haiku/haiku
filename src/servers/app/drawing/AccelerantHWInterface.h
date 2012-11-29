@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku.
+ * Copyright 2005-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,7 @@
 
 #include <image.h>
 #include <video_overlay.h>
+
 
 class AccelerantBuffer;
 class RenderingBuffer;
@@ -147,6 +148,7 @@ private:
 			invert_rectangle		fAccInvertRect;
 			screen_to_screen_blit	fAccScreenBlit;
 			set_cursor_shape		fAccSetCursorShape;
+			set_cursor_bitmap		fAccSetCursorBitmap;
 			move_cursor				fAccMoveCursor;
 			show_cursor				fAccShowCursor;
 

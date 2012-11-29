@@ -34,7 +34,7 @@ Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is sh
 No type editor available	AttributeWindow		Tyyppimuokkainta ei ole käytettävissä
 Double precision floating-point value:	TypeEditors		Kaksoistarkkuuden liukulukuarvo:
 Device: 	ProbeView		Laite: 
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Haluatko todella poistaa attribuutin ”%s” tiedostosta ”%s”?\n\nEt voi perua tätä toimintoa.
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Haluatko todella poistaa attribuutin ”%s” tiedostosta ”%s”?\n\nTätä toimintoa ei voi perua.
 Text	TypeEditors	This is the type of editor	Teksti
 8 bit unsigned value:	TypeEditors		8-bittinen etumerkitön arvo:
 Block	ProbeView		Lohko
@@ -42,7 +42,7 @@ Back	ProbeView		Takaisin
 Device	ProbeView		Laite
 Unknown type	TypeEditors		Tuntematon tyyppi
 Block 0x%Lx	ProbeView		Lohko 0x%Lx
-Quit	FileWindow		Poistu
+Quit	FileWindow		Lopeta
 Undo	ProbeView		Peru
 Close	ProbeView		Sulje
 Number	TypeEditors	This is the type of editor	Numero
@@ -94,7 +94,7 @@ Edit	ProbeView		Muokkaa
 Native: %Ld (0x%0*Lx)	ProbeView		Alkuperäinen: %Ld (0x%0*Lx)
 32 bit unsigned value:	TypeEditors		32-bittinen etumerkitön arvo:
 Message	TypeEditors	This is the type of view	Viesti
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Ei voitu avata puskuria ”%s”:\n%s
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Puskurin ”%s” avaus epäonnistui:\n%s
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Kantaluku
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Kuvanäkymä
 Cancel	AttributeWindow		Peru
@@ -106,7 +106,7 @@ Remove	AttributeWindow		Poista
 Print…	ProbeView		Tulosta…
 Block %Ld (0x%Lx)	ProbeView		Lohko %Ld (0x%Lx)
 Image	TypeEditors	This is the type of view	Kuva
-Could not open file \"%s\": %s\n	DiskProbe		Ei voitu avata tiedostoa ”%s”: %s\n
+Could not open file \"%s\": %s\n	DiskProbe		Tiedoston ”%s” avaus epäonnistui: %s\n
 Select all	ProbeView		Valitse kaikki
 Probe file…	OpenWindow		Koesta tiedostoa…
 Icon view	TypeEditors		Kuvakenäkymä
@@ -114,7 +114,7 @@ Bookmarks	ProbeView		Kirjanmerkit
 Mode:	FindWindow		Tila:
 15 bit	TypeEditors		15-bittinen
 Open device	FileWindow		Avaa laite
-Could not find search string.	ProbeView		Ei voitu löytää hakumerkkijonoa.
+Could not find search string.	ProbeView		Hakumerkkijonon löytäminen epäonnistui.
 16 bit unsigned value:	TypeEditors		16-bittinen etumerkitön arvo:
 Attribute offset: 	ProbeView		Attribuuttisiirros: 
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Näkymä

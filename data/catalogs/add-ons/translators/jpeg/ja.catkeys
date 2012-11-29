@@ -4,7 +4,7 @@ JPEG images	JPEGTranslator		JPEG イメージ
 Prevent colors 'washing out'	JPEGTranslator		色が 'washing out' されないようにする
 JPEG Library Error: %s\n	be_jerror		JPEG ライブラリエラー: %s\n
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		インク使用率 100% のために、CMYK コードを 0 で使用
-About	JPEGTranslator		JPEG Translatorについて
+About	JPEGTranslator		JPEG トランスレーターについて
 ©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nIJGライブラリベース © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\n\Ken Murchison氏による"ロスレス\"変換サポートパッチを追加\n\thttp://www.oceana.com/ftp/ljpeg/\n\nMagnus Hellman氏による色空間変換ルーチンを追加\n\thttp://www.bebits.com/app/802\n
 Low	JPEGTranslator		低い
 Make file smaller (sligthtly worse quality)	JPEGTranslator		ファイルサイズを小さくする (品質は少し悪くなります)

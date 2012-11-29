@@ -32,7 +32,7 @@ Audio/Video	DeviceClass		Аўдыё
 Glasses	DeviceClass		Акуляры
 Keyboard	DeviceClass		Клавіатура
 Camera	DeviceClass		Камера
-Major class: 	DeviceClass		Буйны клас:
+Major class: 	DeviceClass		Буйны клас: 
 50-67% utilized	DeviceClass		50-67% выкарыстана
 Card reader	DeviceClass		Карт-рыдэр
 Set-top box	DeviceClass		Set-top кампутар
@@ -43,7 +43,7 @@ SIM card reader	DeviceClass		Прылада чытання SIM-картак
 Headphones	DeviceClass		Навушнікі
 Information	DeviceClass		Інфармацыя
 Remote control	DeviceClass		Дыстанцыйнае кіраванне
-Service classes: 	DeviceClass		Службовыя классы:
+Service classes: 	DeviceClass		Службовыя классы: 
 Pager	DeviceClass	A small radio device to receive short text messages	Пэйджар
 Object transfer	DeviceClass		Перадача аб'ектаў
 Gaming/Toy	DeviceClass		Гульня/Цацка
@@ -55,7 +55,7 @@ Loudspeaker	DeviceClass		Гучнагаварыцель
 Joystick	DeviceClass		Джойсцік
 LAN access	DeviceClass		Доступ да LAN
 Wrist watch	DeviceClass		Наручны гадзіннік
-Minor class: 	DeviceClass		Дробны клас:
+Minor class: 	DeviceClass		Дробны клас: 
 Networking	DeviceClass		Сеткавыя прылады
 Portable audio	DeviceClass		Партатыўнае аўдыё
 Device conforms to the headset profile	DeviceClass		Прылада адносіцца да профіля гарнітуры
@@ -67,7 +67,7 @@ Video display and loudspeaker	DeviceClass		Відэаэкран і гучнаг�
 Peripheral	DeviceClass		Перыферыя
 #NoOwnerError#Not Valid name	RemoteDevice		#НямаЎладальніка#Няправільнае імя
 Wired modem or voice gateway	DeviceClass		Шнуравы мадэм або лінія перадачы голасу
-Jacket	DeviceClass		Куртка (?)
+Jacket	DeviceClass		Кажух
 Unspecified	DeviceClass		Невызначана
 Fully available	DeviceClass		Поўнасцю даступны
 67-83% utilized	DeviceClass		67-83% выкарыстана

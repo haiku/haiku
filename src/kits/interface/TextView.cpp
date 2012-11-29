@@ -1258,6 +1258,11 @@ void
 BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 					   const text_run_array *inRuns)
 {
+	// pin offset at reasonable values
+	if (startOffset < 0)
+		startOffset = 0;
+	else if (startOffset > fText->Length())
+		startOffset = fText->Length();
 	if (inText != NULL && inLength > 0)
 		_DoInsertText(inText, strnlen(inText, inLength), startOffset, inRuns);
 }
@@ -1280,6 +1285,17 @@ void
 BTextView::Delete(int32 startOffset, int32 endOffset)
 {
 	CALLED();
+
+	// pin offsets at reasonable values
+	if (startOffset < 0)
+		startOffset = 0;
+	else if (startOffset > fText->Length())
+		startOffset = fText->Length();
+	if (endOffset < 0)
+		endOffset = 0;
+	else if (endOffset > fText->Length())
+		endOffset = fText->Length();
+
 	// anything to delete?
 	if (startOffset == endOffset)
 		return;
@@ -1544,17 +1560,19 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 
 	_CancelInputMethod();
 
-	// a negative selection?
-	if (startOffset > endOffset)
-		return;
-
 	// pin offsets at reasonable values
 	if (startOffset < 0)
 		startOffset = 0;
+	else if (startOffset > fText->Length())
+		startOffset = fText->Length();
 	if (endOffset < 0)
 		endOffset = 0;
 	else if (endOffset > fText->Length())
 		endOffset = fText->Length();
+
+	// a negative selection?
+	if (startOffset > endOffset)
+		return;
 
 	// is the new selection any different from the current selection?
 	if (startOffset == fSelStart && endOffset == fSelEnd)
@@ -1733,6 +1751,16 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset,
 		oneRun.runs[0] = inRuns->runs[0];
 		oneRun.runs[0].offset = 0;
 		runs = &oneRun;
+	} else {
+		// pin offsets at reasonable values
+		if (startOffset < 0)
+			startOffset = 0;
+		else if (startOffset > fText->Length())
+			startOffset = fText->Length();
+		if (endOffset < 0)
+			endOffset = 0;
+		else if (endOffset > fText->Length())
+			endOffset = fText->Length();
 	}
 
 	_SetRunArray(startOffset, endOffset, runs);
@@ -1754,6 +1782,16 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset,
 text_run_array *
 BTextView::RunArray(int32 startOffset, int32 endOffset, int32 *outSize) const
 {
+	// pin offsets at reasonable values
+	if (startOffset < 0)
+		startOffset = 0;
+	else if (startOffset > fText->Length())
+		startOffset = fText->Length();
+	if (endOffset < 0)
+		endOffset = 0;
+	else if (endOffset > fText->Length())
+		endOffset = fText->Length();
+
 	STEStyleRange* styleRange = fStyles->GetStyleRange(startOffset,
 		endOffset - 1);
 	if (styleRange == NULL)
@@ -1781,6 +1819,12 @@ BTextView::RunArray(int32 startOffset, int32 endOffset, int32 *outSize) const
 int32
 BTextView::LineAt(int32 offset) const
 {
+	// pin offset at reasonable values
+	if (offset < 0)
+		offset = 0;
+	else if (offset > fText->Length())
+		offset = fText->Length();
+
 	int32 lineNum = _LineAt(offset);
 	if (_IsOnEmptyLastLine(offset))
 		lineNum++;
@@ -1811,6 +1855,12 @@ BTextView::LineAt(BPoint point) const
 BPoint
 BTextView::PointAt(int32 inOffset, float *outHeight) const
 {
+	// pin offset at reasonable values
+	if (inOffset < 0)
+		inOffset = 0;
+	else if (inOffset > fText->Length())
+		inOffset = fText->Length();
+
 	// TODO: Cleanup.
 	int32 lineNum = _LineAt(inOffset);
 	STELine* line = (*fLines)[lineNum];
@@ -1971,6 +2021,21 @@ BTextView::OffsetAt(int32 line) const
 void
 BTextView::FindWord(int32 inOffset, int32 *outFromOffset, int32 *outToOffset)
 {
+	if (inOffset < 0) {
+		if (outFromOffset)
+			*outFromOffset = 0;
+		if (outToOffset)
+			*outToOffset = 0;
+		return;
+	}
+	if (inOffset > fText->Length()) {
+		if (outFromOffset)
+			*outFromOffset = fText->Length();
+		if (outToOffset)
+			*outToOffset = fText->Length();
+		return;
+	}
+
 	if (outFromOffset)
 		*outFromOffset = _PreviousWordBoundary(inOffset);
 
@@ -2100,7 +2165,11 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 	const int32 numLines = fLines->NumLines();
 	if (startLine < 0)
 		startLine = 0;
-	if (endLine > numLines - 1)
+	else if (startLine > numLines - 1)
+		startLine = numLines - 1;
+	if (endLine < 0)
+		endLine = 0;
+	else if (endLine > numLines - 1)
 		endLine = numLines - 1;
 
 	float height = (*fLines)[endLine + 1]->origin
@@ -2122,6 +2191,16 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset,
 		return;
 
 	outRegion->MakeEmpty();
+
+	// pin offsets at reasonable values
+	if (startOffset < 0)
+		startOffset = 0;
+	else if (startOffset > fText->Length())
+		startOffset = fText->Length();
+	if (endOffset < 0)
+		endOffset = 0;
+	else if (endOffset > fText->Length())
+		endOffset = fText->Length();
 
 	// return an empty region if the range is invalid
 	if (startOffset >= endOffset)
@@ -2177,6 +2256,12 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset,
 void
 BTextView::ScrollToOffset(int32 inOffset)
 {
+	// pin offset at reasonable values
+	if (inOffset < 0)
+		inOffset = 0;
+	else if (inOffset > fText->Length())
+		inOffset = fText->Length();
+
 	BRect bounds = Bounds();
 	float lineHeight = 0.0;
 	float xDiff = 0.0;
@@ -2228,7 +2313,16 @@ BTextView::ScrollToSelection()
 void
 BTextView::Highlight(int32 startOffset, int32 endOffset)
 {
-	// get real
+	// pin offsets at reasonable values
+	if (startOffset < 0)
+		startOffset = 0;
+	else if (startOffset > fText->Length())
+		startOffset = fText->Length();
+	if (endOffset < 0)
+		endOffset = 0;
+	else if (endOffset > fText->Length())
+		endOffset = fText->Length();
+
 	if (startOffset >= endOffset)
 		return;
 
@@ -3105,8 +3199,17 @@ void
 BTextView::DeleteText(int32 fromOffset, int32 toOffset)
 {
 	CALLED();
-	// sanity checking
-	if (fromOffset >= toOffset || fromOffset < 0 || toOffset > fText->Length())
+
+	if (fromOffset < 0)
+		fromOffset = 0;
+	else if (fromOffset > fText->Length())
+		fromOffset = fText->Length();
+	if (toOffset < 0)
+		toOffset = 0;
+	else if (toOffset > fText->Length())
+		toOffset = fText->Length();
+
+	if (fromOffset >= toOffset)
 		return;
 
 	// set nullStyle to style at beginning of range
@@ -4023,9 +4126,6 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 int32
 BTextView::_PreviousWordBoundary(int32 offset)
 {
-	if (offset <= 0)
-		return 0;
-
 	uint32 charType = _CharClassification(offset);
 	int32 previous;
 	while (offset > 0) {
@@ -4042,10 +4142,7 @@ BTextView::_PreviousWordBoundary(int32 offset)
 int32
 BTextView::_NextWordBoundary(int32 offset)
 {
-	int32 textLen = TextLength();
-	if (offset >= textLen)
-		return textLen;
-
+	int32 textLen = fText->Length();
 	uint32 charType = _CharClassification(offset);
 	while (offset < textLen) {
 		offset = _NextInitialByte(offset);
@@ -4087,10 +4184,7 @@ BTextView::_PreviousWordStart(int32 offset)
 int32
 BTextView::_NextWordEnd(int32 offset)
 {
-	int32 textLen = TextLength();
-	if (offset >= textLen)
-		return textLen;
-
+	int32 textLen = fText->Length();
 	if (_CharClassification(offset) != CHAR_CLASS_DEFAULT) {
 		// skip non-word characters
 		while (offset < textLen) {
@@ -4497,10 +4591,6 @@ BTextView::_RequestDrawLines(int32 startLine, int32 endLine)
 		return;
 
 	long maxLine = fLines->NumLines() - 1;
-	if (startLine < 0)
-		startLine = 0;
-	if (endLine > maxLine)
-		endLine = maxLine;
 
 	STELine *from = (*fLines)[startLine];
 	STELine *to = endLine == maxLine ? NULL : (*fLines)[endLine + 1];
@@ -5142,22 +5232,6 @@ void
 BTextView::_SetRunArray(int32 startOffset, int32 endOffset,
 	const text_run_array *inRuns)
 {
-	if (startOffset > endOffset)
-		return;
-
-	const int32 textLength = fText->Length();
-
-	// pin offsets at reasonable values
-	if (startOffset < 0)
-		startOffset = 0;
-	else if (startOffset > textLength)
-		startOffset = textLength;
-
-	if (endOffset < 0)
-		endOffset = 0;
-	else if (endOffset > textLength)
-		endOffset = textLength;
-
 	const int32 numStyles = inRuns->count;
 	if (numStyles > 0) {
 		const text_run *theRun = &inRuns->runs[0];
@@ -5255,9 +5329,8 @@ BTextView::_CharClassification(int32 offset) const
 int32
 BTextView::_NextInitialByte(int32 offset) const
 {
-	int32 textLength = TextLength();
-	if (offset >= textLength)
-		return textLength;
+	if (offset >= fText->Length())
+		return offset;
 
 	for (++offset; (ByteAt(offset) & 0xC0) == 0x80; ++offset)
 		;

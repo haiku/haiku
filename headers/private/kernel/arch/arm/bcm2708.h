@@ -40,6 +40,18 @@
 #define BCM2708_SDRAM_BASE		0x00000000
 #define BCM2708_PERIPHERAL_BASE	0x20000000
 
+// Added to physical addresses to select the different cache behaviours
+#define BCM2708_VIDEO_CORE_L1_L2_CACHED		(0 << 30)
+#define BCM2708_VIDEO_CORE_L2_COHERENT		(1 << 30)
+#define BCM2708_VIDEO_CORE_L2_CACHED		(2 << 30)
+#define BCM2708_VIDEO_CORE_UNCACHED			(3 << 30)
+
+// The highest two bits are used to select aliases to the physical memory
+// with different cache semantic. Clearing them converts the address to
+// physical memory as seen by ARM.
+#define BCM2708_BUS_TO_PHYSICAL(x)			(x & ~BCM2708_VIDEO_CORE_UNCACHED)
+
+
 #define ST_BASE			0x3000
 	// System Timer, sec 12.0, page 172
 #define DMA_BASE		0x7000
@@ -121,5 +133,20 @@
 #define UART_MVR    19
 #define UART_SYSC   20
 
+
+/* Mailbox */
+#define ARM_CTRL_0_MAILBOX_BASE				(ARM_CTRL_0_SBM_BASE + 0x80)
+
+#define ARM_MAILBOX_READ					0x00
+#define ARM_MAILBOX_STATUS					0x18
+#define ARM_MAILBOX_WRITE					0x20
+
+#define ARM_MAILBOX_FULL					(1 << 31)
+#define ARM_MAILBOX_EMPTY					(1 << 30)
+
+#define ARM_MAILBOX_DATA_MASK				0xfffffff0
+#define ARM_MAILBOX_CHANNEL_MASK			0x0000000f
+
+#define ARM_MAILBOX_CHANNEL_FRAMEBUFFER		1
 
 #endif /* __PLATFORM_BCM2708_H */

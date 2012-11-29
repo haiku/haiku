@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	2591538723
+1	japanese	x-vnd.haiku-icon_o_matic	1581984396
 Select All	Icon-O-Matic-PathManipulator		すべて選択
 Add Style	Icon-O-Matic-AddStylesCmd		スタイルを追加
 Color (#%02x%02x%02x)	Style name after dropping a color		カラー (#%02x%02x%02x)
@@ -42,7 +42,7 @@ Add Control Point	Icon-O-Matic-AddPointCmd		コントロールポイントを追
 Untitled	Icon-O-Matic-Main		無題
 Multi Set 	Multi Set (property name)		複数セット
 any of the other lists to	Empty property list - 2nd line		他のリストの中の
-Save as…	Icon-O-Matic-Menu-File		別名で保存…
+Save as…	Icon-O-Matic-Menu-File		名前を付けて保存…
 Change Color	Icon-O-Matic-SetColorCmd		カラーを変更
 Style	Icon-O-Matic-Menus		スタイル
 <modify path>	Icon-O-Matic-PathCmd		<パスを修正>
@@ -65,9 +65,10 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		シェイプを削除
 Reverse	Icon-O-Matic-PathsList		反転
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF ソースコード
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		変形をリセット
+Settings	Icon-O-Matic-Menus		設定
 All	Icon-O-Matic-Properties		すべて
 Multi Paste Properties	Icon-O-Matic-Properties		プロパティの複数貼り付け
-Undo	Icon-O-Matic-Main		取り消し
+Undo	Icon-O-Matic-Main		元に戻す
 Click on a shape above	Empty transformers list - 1st line		上のシェイプをクリックして
 Add Shape	Icon-O-Matic-AddShapesCmd		シェイプを追加
 Contour	Transformation		コンター
@@ -116,7 +117,7 @@ Add shape with path & style	Icon-O-Matic-Menu-Shape		パスとスタイル付き
 Gradient	Icon-O-Matic-StyleTypes		グラデーション
 Min LOD	Icon-O-Matic-PropertyNames		Min LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON 属性
-Invert selection	Icon-O-Matic-Properties		選択部を反転
+Invert selection	Icon-O-Matic-Properties		選択範囲を反転
 Export as…	Icon-O-Matic-Menu-File		別形式でエクスポート…
 Transformation	Transformation		変形
 Click on an object in	Empty property list - 1st line		ここでプロパティを編集するために

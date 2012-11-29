@@ -1,7 +1,7 @@
 1	belarusian	x-vnd.Haiku-Backgrounds	3513602073
 Backgrounds	System name		Фон сталоў
 X:	Main View		X:
-Resolution: 	Image Filepanel		Разрашэнне
+Resolution: 	Image Filepanel		Разрашэнне: 
 pick one	Main View		адзначце адзін
 Default	Main View		Прадвызначаныя
 Center	Main View		Цэнтр
@@ -11,11 +11,11 @@ Revert	Main View		Вярнуць
 None	Main View		Няма
 All workspaces	Main View		Усе рабочыя месцы
 Icon label outline	Main View		Контур меткі іконак
-Other…	Main View		Іншы...
+Other…	Main View		Іншы…
 Current workspace	Main View		Цяперашняе рабочае месца
-Folder: 	Main View		Каталёг:
+Folder: 	Main View		Каталёг: 
 Apply	Main View		Прымяніць
-Other folder…	Main View		Іншы каталёг...
+Other folder…	Main View		Іншы каталёг…
 Y:	Main View		Y:
 Tile	Main View		Забрукаваць
 Select	Main View		Выбраць

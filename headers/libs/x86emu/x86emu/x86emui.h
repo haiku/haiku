@@ -41,11 +41,6 @@
 #ifndef __X86EMU_X86EMUI_H
 #define __X86EMU_X86EMUI_H
 
-// Haiku workaround - don't want to compile all of the debugging code even
-// when doing a debug build, it's unnecessary unless you're trying to debug
-// x86emu itself.
-#undef DEBUG
-
 /* If we are compiling in C++ mode, we can compile some functions as
  * inline to increase performance (however the code size increases quite
  * dramatically in this case).

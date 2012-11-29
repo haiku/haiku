@@ -18,7 +18,7 @@ Initialize	InitParamsPanel		初期化
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" を本当にフォーマットして良いですか?  変更をディスクに書き込む直前に再度確認します。
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできませんでした。
 The partition %s has been successfully formatted.\n	MainWindow		%s パーティションは正常にフォーマットされました。\n
-The partition %s is already unmounted.	MainWindow		パーティション %s は既にマウント解除されています。
+The partition %s is already unmounted.	MainWindow		パーティション %s はすでにマウント解除されています。
 Failed to delete the partition. No changes have been written to disk.	MainWindow		パーティションの削除に失敗しました。変更は保存されていません。
 Partition type:	CreateParamsPanel		パーティション種別 :
 Could not delete the selected partition.	MainWindow		選択されたパーティションを削除できませんでした。
@@ -26,7 +26,7 @@ Initialize	MainWindow		初期化
 Error: 	MainWindow	in any error alert	エラー : 
 Partition %ld	DiskView		パーティション %ld
 <empty>	DiskView		<空>
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s パーティションの初期化に失敗しました。（ディスクに何も書き込まれていません）
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s パーティションの初期化に失敗しました (ディスクに何も書き込まれていません)。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、ディスクのすべてのデータが失われますので、ご注意ください。
 Mounted at	PartitionList		マウント先
 There was an error acquiring the partition row.	MainWindow		パーティション情報を取得の際、エラーが発生しました。
@@ -36,9 +36,9 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Offset: %ld MB	Support		オフセット： %ld MB
 Write changes	MainWindow		変更を書き込む
 There was an error preparing the disk for modifications.	MainWindow		ディスクの変更のための準備をする際、エラーが発生しました。
-The partition %s is already mounted.	MainWindow		パーティション %s は既にマウントされています。
+The partition %s is already mounted.	MainWindow		パーティション %s はすでにマウントされています。
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		パーティションを本当にフォーマットして良いですか? 変更をディスクに書き込む直前に再度確認します。
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、ディスク %s のデータが全て失われますので、ご注意ください。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われますので、ご注意ください。
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		選択されたパーティションを本当に削除しますか？\n\nその場合、パーティションのすべてのデータが失われますので、ご注意ください。
 Create…	MainWindow		新規作成…
 Disk system \"%s\"\" not found!	MainWindow		\"%s\"\" ディスクシステムがみつかりません!
@@ -50,7 +50,7 @@ Create	CreateParamsPanel		新規作成
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		本当にディスク全体をフォーマットして良いですか?  (大抵の人はまずパーティショニングシステムでディスクを初期化します) 変更をディスクに書き込む直前に再度確認します。
 Device	PartitionList		デバイス
 Disk	MainWindow		ディスク
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		本当に選択したディスクを初期化しますか? データーはすべて失われます。変更をディスクに書き込む直前に再度確認します。\n
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		本当に選択したディスクを初期化しますか? データはすべて失われます。変更をディスクに書き込む直前に再度確認します。\n
 Device	DiskView		デバイス
 Active	PartitionList		アクティブ
 Volume name	PartitionList		ボリューム名
@@ -71,7 +71,7 @@ The selected partition does not contain a partitioning system.	MainWindow		選�
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか？\n\nその場合、ディスク %s のデータがすべて失われますので、ご注意ください。
 The partition %s is currently mounted.	MainWindow		%s パーティションが現在マウントされています。
 Partition size	CreateParamsPanel		パーティションサイズ
-Surface test (not implemented)	MainWindow		表面チェック（実装されていません）
+Surface test (not implemented)	MainWindow		表面チェック (実装されていません)
 Cancel	InitParamsPanel		中止
 Cancel	CreateParamsPanel		中止
 Format	MainWindow		フォーマット

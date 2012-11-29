@@ -1,27 +1,27 @@
 1	hungarian	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		A bemeneti előerősítés beállításai ezt jelentik:
+Linear interpolation	AudioMixer		Lineáris interpoláció
+Virtual output channels	AudioMixer		Virtuális kimeneti csatornák
+Refuse output format changes	AudioMixer		Kimeneti formátum változtatásainak visszautasítása
+Output mapping	AudioMixer		Kimenet leképezése
 Allow input channel remapping	AudioMixer		Bemeneti csatorna újraképezésének az engedélyezése
-Allow output channel remapping	AudioMixer		Kimeneti csatorna újraképezésének az engedélyezése
+Resampling algorithm	AudioMixer		Újramintavételezési algoritmus
 Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		A keverő kimenetének 3dB-lel való gyengítése (mint a BeOS R5-ben)
 Display balance control for stereo connections	AudioMixer		Sztereó kapcsolatok egyensúlycsúszkáinak megjelenítése
-Drop/repeat samples	AudioMixer		Minták átugrása/ismétlése
-Gain	AudioMixer		Előerősítés
-Gain controls	AudioMixer		Előerősítés beállításai
-Input channel destinations	AudioMixer		Bemeneti csatornák céljai
-Input gain controls represent	AudioMixer		A bemeneti előerősítés beállításai ezt jelentik:
-Input mapping	AudioMixer		Bemenet leképezése
-Linear interpolation	AudioMixer		Lineáris interpoláció
-Master output	AudioMixer		Master kimenet
-Mute	AudioMixer		Elnémítás
-Output channel sources	AudioMixer		Kimeneti csatorna forrásai
-Output mapping	AudioMixer		Kimenet leképezése
-Physical input channels	AudioMixer		Fizikai bemeneti csatornák
-Refuse input format changes	AudioMixer		Bemeneti formátum változtatásainak visszautasítása
-Refuse output format changes	AudioMixer		Kimeneti formátum változtatásainak visszautasítása
-Resampling algorithm	AudioMixer		Újramintavételezési algoritmus
-Setup	AudioMixer		Beállítás
-To master	AudioMixer		Masterre
 To output	AudioMixer		Kimenetre
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Nem lineáris előerősítés csúszkák használata (mint a BeOS R5-ben)
-Virtual output channels	AudioMixer		Virtuális kimeneti csatornák
-dB	AudioMixer		dB
 not connected	AudioMixer		nincs csatlakoztatva
+Refuse input format changes	AudioMixer		Bemeneti formátum változtatásainak visszautasítása
+Drop/repeat samples	AudioMixer		Minták átugrása/ismétlése
+Output channel sources	AudioMixer		Kimeneti csatorna forrásai
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Előerősítés beállításai
+Input mapping	AudioMixer		Bemenet leképezése
+Mute	AudioMixer		Elnémítás
+Input channel destinations	AudioMixer		Bemeneti csatornák céljai
+To master	AudioMixer		Masterre
+Master output	AudioMixer		Master kimenet
+Setup	AudioMixer		Beállítás
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Nem lineáris előerősítés csúszkák használata (mint a BeOS R5-ben)
+Gain	AudioMixer		Előerősítés
+Allow output channel remapping	AudioMixer		Kimeneti csatorna újraképezésének az engedélyezése
+Physical input channels	AudioMixer		Fizikai bemeneti csatornák

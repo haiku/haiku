@@ -6,13 +6,13 @@
 resource app_signature "application/x-vnd.Haiku-swrast";
 
 resource app_version {
-    major  = 8,
-    middle = 1,
+    major  = 9,
+    middle = 0,
     minor  = 0,
     variety = 0,
     internal = 0,
     short_info = "Software Rasterizer",
-    long_info = "Haiku GL Software Rasterizer"
+    long_info = "Haiku Mesa Software GL Rasterizer"
 };
 
 resource vector_icon {

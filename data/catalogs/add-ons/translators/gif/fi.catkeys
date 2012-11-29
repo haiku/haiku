@@ -1,9 +1,10 @@
-1	finnish	x-vnd.Haiku-GIFTranslator	829368084
+1	finnish	x-vnd.Haiku-GIFTranslator	2708495435
 Websafe	GIFView		Websafe
 Write interlaced images	GIFView		Kirjoita lomitettuja kuvia
 Optimal	GIFView		Optimaalinen
 Greyscale	GIFView		Harmaaskaala
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Be-bittikarttamuoto (GIF-muunnin)
+GIF image translator	GIFView		GIF-kuvamuunnin
 GIF image	GIFTranslator		GIF-kuva
 Write transparent images	GIFView		Kirjoita läpinäkyviä kuvia
 Palette	GIFView		Paletti

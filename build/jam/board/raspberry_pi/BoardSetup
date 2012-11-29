@@ -9,6 +9,11 @@ HAIKU_BOOT_PLATFORM = raspberrypi_arm ;
 
 HAIKU_BOARD_LOADER_BASE = 0x0 ;
 
+HAIKU_BOARD_BOOT_ARCHIVE_BASE = 0x04000000 ;
+HAIKU_BOARD_BOOT_ARCHIVE_SIZE = 0x00400000 ;
+	# TODO: needs to be configured in the config.txt
+	#	ramfsfile=haiku-floppyboot.tgz and ramfsaddr=x
+
 #
 # Flash image
 #

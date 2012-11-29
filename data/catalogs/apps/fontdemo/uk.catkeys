@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-FontDemo	1769653414
+1	ukrainian	x-vnd.Haiku-FontDemo	1300625863
 Outline:	ControlView		Контур:
 Size: 50	ControlView		Розмір: 50
 Stop cycling	ControlView		Зупинити цикл
@@ -12,7 +12,6 @@ Cycle fonts	ControlView		Показувати циклічно
 Font:	ControlView		Шрифт:
 Rotation: 0	ControlView		Поворот: 0
 Drawing mode:	ControlView		Режим малювання
-FontDemo	FontDemo		Перегляд шрифтів
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Керування
 Outline: %d	ControlView		Контур: %d

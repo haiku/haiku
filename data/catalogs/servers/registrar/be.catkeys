@@ -3,7 +3,7 @@ Restart system	ShutdownProcess		Перазагрузіць сістэму
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Праграма \"%appName%\" магчыма блакавана мадальным вакном.
 OK	ShutdownProcess		ОК
 System is shut down	ShutdownProcess		Сістэма выключана
-It's now safe to turn off the computer.	ShutdownProcess		зараз вы можаце выключыць кампутар.
+It's now safe to turn off the computer.	ShutdownProcess		Зараз вы можаце выключыць кампутар.
 Cancel	ShutdownProcess		Адмена
 Do you really want to shut down the system?	ShutdownProcess		Насамрэч жадаеце выключыць сістэму?
 Asking other processes to quit.	ShutdownProcess		Іншыя працэссы запрошаны скончыць працу.

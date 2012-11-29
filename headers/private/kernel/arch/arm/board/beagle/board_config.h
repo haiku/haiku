@@ -2,8 +2,8 @@
  * Copyright 2009
  * Distributed under the terms of the MIT License.
  */
-#ifndef _BOARD_OVERO_BOARD_CONFIG_H
-#define _BOARD_OVERO_BOARD_CONFIG_H
+#ifndef _BOARD_BEAGLE_BOARD_CONFIG_H
+#define _BOARD_BEAGLE_BOARD_CONFIG_H
 
 
 #define BOARD_NAME_PRETTY "Beagle Board"
@@ -26,4 +26,4 @@
 	// 48MHz (APLL96/2)
 
 
-#endif /* _BOARD_OVERO_BOARD_CONFIG_H */
+#endif /* _BOARD_BEAGLE_BOARD_CONFIG_H */

@@ -1,11 +1,12 @@
-1	swedish	x-vnd.Haiku-Magnify	2227745383
+1	swedish	x-vnd.Haiku-Magnify	283320408
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		inga urklipp\n
 Make square	Magnify-Main		Skapa rektangel
 Copy image	Magnify-Main		Kopiera bild
 Magnify help	Magnify-Help		Förstoraren hjälp
-usage: magnify [size] (magnify size * size pixels)\n	Console		användning: magnify [storlek] (förstorningsstorlek * storlek i pixlar)
+usage: magnify [size] (magnify size * size pixels)\n	Console		användning: magnify [storlek] (förstorningsstorlek * storlek i pixlar)\n
 Stick coordinates	Magnify-Main		Lås koordinater
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\n göm/visa info - gömmer/visar de här funktionerna\n Notera att den röda punkten anger vilken pixel's rgb-värde som visas.\n lägg visa/göm korshår - 2 korshår can be läggas till (och tas bort)\n för att hjälpa till med uppradning och placering av objekt.\n Korshåren representeras av blå fyrkanter blå linjer.\n visa/göm rutnät - visar/gömmer nätet som skiljer pixlarna åt.\n
+  freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		  frys - frys/rör av det som syns i förstoringen\n
 Hide/Show grid	Magnify-Main		Göm/visa rutmönster
 magnify: size must be a multiple of 4\n	Console		förstoraren: storleken måste vara en multipel av 4\n
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Allmänt:\n 32 x 32 - numret upp till vänster anger antalet synliga pixlar (bredd x höjd)\n 8 pixlar/pixel - anger antalet pixlar som\n används för att förstora en pixell\n R:152 G:52 B:10 - RGB värden för pixeln under\n den röda fyrkanten\n
@@ -24,4 +25,5 @@ Save image	Magnify-Main		Spara bild
 Increase window size	Magnify-Main		Öka fönsterstorlek
 Decrease window size	Magnify-Main		Minska fönsterstorlek
 Increase pixel size	Magnify-Main		Öka pixelstorlek
+  size must be > 4 and a multiple of 4\n	Console		  storleken måste vara > 4 och multipel av 4\n
 Add a crosshair	Magnify-Main		Lägg till ett korshår

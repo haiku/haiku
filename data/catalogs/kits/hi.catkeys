@@ -1,5 +1,4 @@
-1	hindi	x-vnd.Haiku-libbe	180647795
-Close	AboutWindow		बंद
+1	hindi	x-vnd.Haiku-libbe	864109244
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		ने लिखा:
 About %app%	AboutMenuItem		के बारें में %app%
@@ -8,7 +7,6 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		�
 Copy	TextView		कोपी 
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d bytes
-About…	AboutWindow		के बारे में...
 Error	PrintJob		त्रुटि
 No Pages to print!	PrintJob		कोई पन्ने प्रिंट करने के लिए नहीं है!
 OK	Dragger		ठीक है
@@ -18,7 +16,6 @@ Remove replicant	Dragger		अप्प्लिकांट को हटाए�
 OK	ZombieReplicantView		ठीक है 
 Print Server is not responding.	PrintJob		प्रिंट सर्वर काम नहीं कर रहा.
 Paste	TextView		पेस्ट 
-Copyright © %years% Haiku, Inc.	AboutWindow		कॉपीराइट © %साल% हाइकू, इंक.
 %.2f TiB	StringForSize		%.2f TiB
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		रेप्लिच्केंट को अप्प्लिकेशन के लिए खोज नहीं पाए. कोई आप्लिकेशन हस्ताक्षर दिया नहीं गया है.\n%त्रुटि
 Redo	TextView		फिर से करें

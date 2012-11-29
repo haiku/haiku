@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FontDemo	1769653414
+1	greek, modern (1453-)	x-vnd.Haiku-FontDemo	1300625863
 Outline:	ControlView		Εξωτερική γραμμή
 Size: 50	ControlView		Μέγεθος: 50
 Stop cycling	ControlView		Διακοπή γυρίσματος
@@ -12,7 +12,6 @@ Cycle fonts	ControlView		Κυκλικές γραμματοσειρές
 Font:	ControlView		Γραμματοσειρά
 Rotation: 0	ControlView		Κλίση: 0
 Drawing mode:	ControlView		Τρόπος σχεδίασης:
-FontDemo	FontDemo		FontDemo
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Κουμπιά
 Outline: %d	ControlView		Εξωτερική γραμμή: %d

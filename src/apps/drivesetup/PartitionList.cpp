@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 Haiku Inc. All rights reserved.
+ * Copyright 2006-2012 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -202,6 +202,8 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 	BPath path;
 	partition->GetPath(&path);
 
+	// Device icon
+
 	BBitmap* icon = NULL;
 	if (partition->IsDevice()) {
 		icon_size size = B_MINI_ICON;
@@ -214,6 +216,8 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 	SetField(new BBitmapStringField(icon, path.Path()), kDeviceColumn);
 
+	// File system & volume name
+
 	if (partition->ContainsFileSystem()) {
 		SetField(new BStringField(partition->ContentType()), kFilesystemColumn);
 		SetField(new BStringField(partition->ContentName()), kVolumeNameColumn);
@@ -221,22 +225,31 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	} else {
-		if (partition->ContainsFileSystem())
-			SetField(new BStringField(partition->Type()), kFilesystemColumn);
-		else
+		BString partitionType(partition->Type());
+		if (!partitionType.IsEmpty()) {
+			partitionType.Prepend("(");
+			partitionType.Append(")");
+			SetField(new BStringField(partitionType), kFilesystemColumn);
+		} else
 			SetField(new BStringField(kUnavailableString), kFilesystemColumn);
+
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	}
 
-	if (partition->IsMounted() && partition->GetMountPoint(&path) == B_OK) {
+	// Mounted at
+
+	if (partition->IsMounted() && partition->GetMountPoint(&path) == B_OK)
 		SetField(new BStringField(path.Path()), kMountedAtColumn);
-	} else {
+	else
 		SetField(new BStringField(kUnavailableString), kMountedAtColumn);
-	}
+
+	// Size
 
 	char size[1024];
 	SetField(new BStringField(string_for_size(partition->Size(), size,
 		sizeof(size))), kSizeColumn);
+
+	// Additional parameters
 
 	if (partition->Parameters() != NULL) {
 		BString parameters;

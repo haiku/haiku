@@ -12,7 +12,7 @@ resource app_version {
     variety = 0,
     internal = 0,
     short_info = "Legacy Software Rasterizer",
-    long_info = "Haiku Legacy GL Software Rasterizer (gcc2)"
+    long_info = "Haiku Legacy Mesa Software GL Rasterizer (gcc2)"
 };
 
 resource vector_icon {

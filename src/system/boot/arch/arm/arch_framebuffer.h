@@ -38,13 +38,22 @@ public:
 								{ return B_OK; };
 
 	virtual addr_t			Base() { return fBase; };
+			addr_t			PhysicalBase() { return fPhysicalBase; };
+			size_t			Size() { return fSize; };
+
+			int				Width() { return fCurrentWidth; };
+			int				Height() { return fCurrentHeight; };
+			int				Depth() { return fCurrentDepth; };
+			int				BytesPerRow() { return fCurrentBytesPerRow; };
 
 protected:
 			addr_t			fBase;
-private:
+			addr_t			fPhysicalBase;
+			size_t			fSize;
 			int				fCurrentWidth;
 			int				fCurrentHeight;
 			int				fCurrentDepth;
+			int				fCurrentBytesPerRow;
 };
 
 

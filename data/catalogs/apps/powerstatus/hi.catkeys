@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-PowerStatus	3347252226
+1	hindi	x-vnd.Haiku-PowerStatus	3151834010
 Design capacity low warning: 	PowerStatus		डिजाइन क्षमता कम चेतावनी: 
 Show percent	PowerStatus		प्रतिशत दिखाएँ
 Design capacity: 	PowerStatus		डिजाइन की क्षमता: 
@@ -7,9 +7,7 @@ Type: 	PowerStatus		प्रकार:
 non-rechargeable	PowerStatus		जो दोबारा चार्ज ना हो सके
 Empty battery slot	PowerStatus		बैटरी के लिए खाली स्लॉट
 Run in window	PowerStatus		विंडो में चलाएँ
-About	PowerStatus		के बारे में
 PowerStatus	System name		PowerStatus
-PowerStatus	PowerStatus		PowerStatus
  mWh	PowerStatus		 मिल्ली वाट घंटा
 Battery info…	PowerStatus		बैटरी की जानकारी ...
 Damaged battery	PowerStatus		टूटी हुई बेटरी
@@ -27,10 +25,8 @@ Capacity: 	PowerStatus		क्षमता:
 Battery discharging	PowerStatus		बैटरी निर्वहन हो रही है
 Serial number: 	PowerStatus		क्रम संख्या:
 Capacity granularity 1: 	PowerStatus		क्षमता ग्राणुलारिटी 1: 
-OK	PowerStatus		ठीक है
 OEM info: 	PowerStatus		OEM जानकारी:
 Design voltage: 	PowerStatus		बनावट वोल्टेज:
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		बिजली की स्थिति \nAxel Dörfler, Clemens Zeidler ने लिखा है \n2006 कॉपीराइट, हाइकू इंक\n
 Battery charging	PowerStatus		बैटरी चार्ज हो रही हैं
 Design capacity warning: 	PowerStatus		डिजाइन क्षमता की चेतावनी:
 Battery info	PowerStatus		बैटरी की जानकारी

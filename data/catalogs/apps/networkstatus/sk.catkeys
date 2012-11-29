@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-NetworkStatus	2931949650
+1	slovak	x-vnd.Haiku-NetworkStatus	1729819859
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Voľby aplikácie StavSiete:\n\t--deskbar\tautomaticky pridať replikanta na Panel\n\t--help\t\tvypísať tieto informácie a skončiť\n
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		StavSiete môžete spustiť buď v okne alebo ho nainštalovať do Panelu.
 <no wireless networks found>	NetworkStatusView		<nenájdené žiadne bezdrôtové siete>
@@ -6,7 +6,6 @@ Run in window	NetworkStatus		Spustiť v okne
 No link	NetworkStatusView		Bez spojenia
 Install in Deskbar	NetworkStatus		Nainštalovať do Panelu
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Spustenie nastavenia siete zlyhalo.\n\nChyba: 
-NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tnapísali %1 a Hugo Santos\n\t%2, Haiku, Inc.\n
 Netmask	NetworkStatusView		Maska siete
 Broadcast	NetworkStatusView		Broadcast
 Unknown	NetworkStatusView		Neznáme

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PowerStatus	3419486861
+1	russian	x-vnd.Haiku-PowerStatus	3224068645
 Design capacity low warning: 	PowerStatus		Уровень полного разряда: 
 Show percent	PowerStatus		Показать в процентах
 Design capacity: 	PowerStatus		Штатная емкость: 
@@ -8,9 +8,7 @@ non-rechargeable	PowerStatus		неперезаряжаемая
 Empty battery slot	PowerStatus		Пустой слот батареи
  mV	PowerStatus		 мВ
 Run in window	PowerStatus		Запустить в окне
-About	PowerStatus		О программе
 PowerStatus	System name		Электропитание
-PowerStatus	PowerStatus		Электропитание
  mWh	PowerStatus		 мВтч
 Battery info…	PowerStatus		Информация о батарее…
 Damaged battery	PowerStatus		Поврежденная батарея
@@ -30,10 +28,8 @@ Capacity: 	PowerStatus		Емкость:
 Battery discharging	PowerStatus		Батарея разряжается
 Serial number: 	PowerStatus		Серийный номер: 
 Capacity granularity 1: 	PowerStatus		Детализация ёмкости 1: 
-OK	PowerStatus		ОК
 OEM info: 	PowerStatus		Изготовитель: 
 Design voltage: 	PowerStatus		Штатное напряжение: 
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nразработали:\n Axel Dörfler и Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Батарея заряжается
 Design capacity warning: 	PowerStatus		Уровень низкого заряда: 
 Battery info	PowerStatus		Информация о батарее

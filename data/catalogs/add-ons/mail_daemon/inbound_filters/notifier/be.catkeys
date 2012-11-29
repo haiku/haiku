@@ -2,8 +2,8 @@
 %num new message	filter		%num новae паведамленнe
 %num new messages	filter		%num новых паведамленняў
 Keyboard LEDs	ConfigView		Клавіятурныя LED
-You have %num new messages for %name.	filter		Вы маеце %num новых паведамленняў для %name
-You have %num new message for %name.	filter		Вы маеце %num новae паведамленнe для %name
+You have %num new messages for %name.	filter		Вы маеце %num новых паведамленняў для %name.
+You have %num new message for %name.	filter		Вы маеце %num новae паведамленнe для %name.
 Log window	ConfigView		Вакно пратаколу
 Central beep	ConfigView		Цэнтральны гук
 Beep	ConfigView		Біп

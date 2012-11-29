@@ -1,9 +1,11 @@
-1	lithuanian	x-vnd.Be-TSKB	359782181
+1	lithuanian	x-vnd.Be-TSKB	3197510812
 Power off	DeskbarMenu		Išjungti
 Show day of week	PreferencesWindow		Rodyti savaitės dieną
 Edit menu…	PreferencesWindow		Taisyti meniu…
+Suspend	DeskbarMenu		Pristabdyti
 Applications	PreferencesWindow		Programos
 Time preferences…	TimeView		Laiko nuostatos…
+About Haiku	DeskbarMenu		Apie „Haiku“
 Recent documents:	PreferencesWindow		Paskiausi dokumentai:
 Recent applications	DeskbarMenu		Paskiausiai leistos programos
 Sort running applications	PreferencesWindow		Rikiuoti paleistas programas

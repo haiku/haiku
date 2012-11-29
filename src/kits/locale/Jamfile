@@ -19,6 +19,7 @@ local sources =
 	Language.cpp
 	Locale.cpp
 	LocaleRoster.cpp
+	LocaleRosterData.cpp
 	MutableLocaleRoster.cpp
 	TimeZone.cpp
 

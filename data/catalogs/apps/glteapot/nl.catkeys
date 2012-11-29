@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-GLTeapot	3688092856
+1	dutch; flemish	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Middenboven
 Lighting	TeapotWindow		Verlichting
 Off	TeapotWindow		Uit
@@ -9,6 +9,7 @@ Blue	TeapotWindow		Blauw
 Gouraud shading	TeapotWindow		Gouraud-arcering
 Quit	TeapotWindow		Stoppen
 Filled polygons	TeapotWindow		Gevulde polygonen
+Settings	TeapotWindow		Instellingen
 Fog	TeapotWindow		Mist
 Backface culling	TeapotWindow		Backface culling
 Z-buffered	TeapotWindow		Z-gebufferd

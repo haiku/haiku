@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PowerStatus	3419486861
+1	french	x-vnd.Haiku-PowerStatus	3224068645
 Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible : 
 Show percent	PowerStatus		Afficher les pourcentages
 Design capacity: 	PowerStatus		Capacité nominale : 
@@ -8,9 +8,7 @@ non-rechargeable	PowerStatus		non-rechargeable
 Empty battery slot	PowerStatus		Emplacement libre de batterie
  mV	PowerStatus		 mV
 Run in window	PowerStatus		Exécuter en fenêtre
-About	PowerStatus		À propos
 PowerStatus	System name		État d'énergie
-PowerStatus	PowerStatus		État d'énergie
  mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Informations batteries…
 Damaged battery	PowerStatus		Batterie endommagée
@@ -30,10 +28,8 @@ Capacity: 	PowerStatus		Capacité :
 Battery discharging	PowerStatus		Consommation des batteries
 Serial number: 	PowerStatus		Numéro de série : 
 Capacity granularity 1: 	PowerStatus		Granularité de charge 1 : 
-OK	PowerStatus		OK
 OEM info: 	PowerStatus		Informations fabricant : 
 Design voltage: 	PowerStatus		Voltage nominal : 
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		État d'énergie\nÉcrit par Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Batterie en charge
 Design capacity warning: 	PowerStatus		Avertissement de capacité nominale : 
 Battery info	PowerStatus		Informations batteries

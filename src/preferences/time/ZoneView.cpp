@@ -260,8 +260,6 @@ TimeZoneView::_InitView()
 	fSetZone->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 
-	BStringView* text = new BStringView("clockSetTo",
-		B_TRANSLATE("Hardware clock set to:"));
 	fLocalTime = new BRadioButton("localTime",
 		B_TRANSLATE("Local time (Windows compatible)"), new BMessage(kRTCUpdate));
 	fGmtTime = new BRadioButton("greenwichMeanTime",
@@ -274,22 +272,27 @@ TimeZoneView::_InitView()
 	_ShowOrHidePreview();
 	fOldUseGmtTime = fUseGmtTime;
 
-
-	const float kInset = be_control_look->DefaultItemSpacing();
+	const float kIndentSpacing
+		= be_control_look->DefaultItemSpacing() * 2;
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollList)
-		.AddGroup(B_VERTICAL, kInset)
-			.Add(text)
-			.AddGroup(B_VERTICAL, kInset)
+		.AddGroup(B_VERTICAL, 0)
+			.Add(new BStringView("clockSetTo",
+				B_TRANSLATE("Hardware clock set to:")))
+			.AddGroup(B_VERTICAL, 0)
 				.Add(fLocalTime)
 				.Add(fGmtTime)
+				.SetInsets(kIndentSpacing, 0, 0, 0)
 			.End()
 			.AddGlue()
-			.Add(fCurrent)
-			.Add(fPreview)
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+				.Add(fCurrent)
+				.Add(fPreview)
+			.End()
 			.Add(fSetZone)
 		.End()
-		.SetInsets(kInset, kInset, kInset, kInset);
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 
@@ -652,4 +655,3 @@ TimeZoneView::_ShowOrHidePreview()
 		fPreview->Hide();
 	}
 }
-

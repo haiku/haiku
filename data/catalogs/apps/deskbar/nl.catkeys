@@ -1,15 +1,21 @@
-1	dutch; flemish	x-vnd.Be-TSKB	1095421712
+1	dutch; flemish	x-vnd.Be-TSKB	3197510812
 Power off	DeskbarMenu		Uitzetten
+Show day of week	PreferencesWindow		Dag van de week tonen
 Edit menu…	PreferencesWindow		Bewerk menu...
+Suspend	DeskbarMenu		Opschorten
 Applications	PreferencesWindow		Toepassingen
+Time preferences…	TimeView		Tijdsvoorkeuren…
+About Haiku	DeskbarMenu		Over Haiku
 Recent documents:	PreferencesWindow		Recente documenten:
 Recent applications	DeskbarMenu		Recente toepassingen
 Sort running applications	PreferencesWindow		Sorteer lopende toepassingen
+Show time	Tray		Tijd tonen
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Toepassingen
 Find…	DeskbarMenu		Vind...
 Window	PreferencesWindow		Venster
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Recente documenten
+Show seconds	PreferencesWindow		Seconden tonen
 Auto-hide	PreferencesWindow		Automatisch verbergen
 Always on top	PreferencesWindow		Altijd bovenop
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar map is leeg>
@@ -17,6 +23,7 @@ Show all	WindowMenu		Toon alles
 No windows	WindowMenu		Geen vensters
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Systeem herstarten
+Large	PreferencesWindow		Groot
 Auto-raise	PreferencesWindow		Automatisch naar boven
 Hide time	TimeView		Tijd verbergen
 Recent folders:	PreferencesWindow		Recente mappen:
@@ -25,6 +32,7 @@ Restart Tracker	DeskbarMenu		Tracker herstarten
 Close all	WindowMenu		Alles sluiten
 Deskbar preferences	PreferencesWindow		Deskbar-voorkeuren
 Mount	DeskbarMenu		Betrek
+Small	PreferencesWindow		Klein
 Recent applications:	PreferencesWindow		Recente toepassingen:
 Shutdown…	DeskbarMenu		Afsluiten...
 Tracker always first	PreferencesWindow		Tracker altijd eerst
@@ -35,8 +43,10 @@ Show calendar…	TimeView		Toon kalender
 Deskbar preferences…	DeskbarMenu		Deskbar-voorkeuren...
 Expand new applications	PreferencesWindow		Toon nieuwe toepassingen
 Show replicants	DeskbarMenu		Toon replicants
+Hide application names	PreferencesWindow		Programmanamen verbergen
 Clock	PreferencesWindow		Klok
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo's
+Icon size	PreferencesWindow		Pictogramgrootte
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Bureaubladapplets
 Hide all	WindowMenu		Alles verbergen
 Quit application	WindowMenu		Programma afsluiten

@@ -1,0 +1,88 @@
+1	portuguese (brazil)	x-vnd.Haiku-Bluetooth	3550394259
+Display	DeviceClass		Tela
+Capturing	DeviceClass		Capturar
+Printer	DeviceClass		Impressora
+Uncategorized	DeviceClass		Sem categoria
+1-17% utilized	DeviceClass		utilizado 1-17%
+Positioning	DeviceClass		Posicionamento
+Rendering	DeviceClass		Criando
+Phone	DeviceClass		Fone
+17-33% utilized	DeviceClass		utilizado 17-33%
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Não é um Nome válido
+Combo keyboard/pointing device	DeviceClass		Combinação teclado/dispositivo apontador
+Controller	DeviceClass		Controlador
+No service available	DeviceClass		Nenhum serviço disponível
+Wearable	DeviceClass	A wearable computer	Usável
+Handheld	DeviceClass		Handheld
+Invalid device class!\n	DeviceClass		Classe de dispositivo inválida!\n
+Sensing device	DeviceClass		Dispositivo sensor
+Computer	DeviceClass		Computador
+Cellular	DeviceClass		Celular
+Microphone	DeviceClass		Microfone
+Unknown (reserved) minor device class	DeviceClass		Classe menor de dispositivo desconhecida (reservada)
+Cordless	DeviceClass		Sem fio
+Common ISDN access	DeviceClass		Acesso ISDN comum
+83-99% utilized	DeviceClass		83-99% utilizados
+Scanner	DeviceClass		Digitalizador
+Game	DeviceClass		Jogo
+Gamepad	DeviceClass		Controlador de jogo
+(reserved)	DeviceClass		(reservado)
+Desktop workstation	DeviceClass		Desktop
+Audio/Video	DeviceClass		Áudio/Vídeo
+Glasses	DeviceClass		Óculos
+Keyboard	DeviceClass		Teclado
+Camera	DeviceClass		Câmera
+Major class: 	DeviceClass		Classe maior:
+50-67% utilized	DeviceClass		utilizados 50-67%
+Card reader	DeviceClass		Leitor de cartão
+Set-top box	DeviceClass		Set-top box
+Helmet	DeviceClass		Capacete
+Laptop	DeviceClass		Laptop
+Car audio	DeviceClass		áudio veicular
+SIM card reader	DeviceClass		leitor de cartão SIM
+Headphones	DeviceClass		Fones de ouvido
+Information	DeviceClass		Informação
+Remote control	DeviceClass		Controle remoto
+Service classes: 	DeviceClass		Classes de serviço:
+Pager	DeviceClass	A small radio device to receive short text messages	Pager
+Object transfer	DeviceClass		Transferência de objeto
+Gaming/Toy	DeviceClass		Jogos/Brinquedo
+Audio	DeviceClass		Áudio
+Robot	DeviceClass		Robô
+Camcorder	DeviceClass		Camcorder
+Digitizer tablet	DeviceClass		Mesa digitalizadora
+Loudspeaker	DeviceClass		Autofalante
+Joystick	DeviceClass		Joystick
+LAN access	DeviceClass		Acesso local
+Wrist watch	DeviceClass		Relógio de pulso
+Minor class: 	DeviceClass		Classe menor:
+Networking	DeviceClass		Rede
+Portable audio	DeviceClass		Áudio portátil
+Device conforms to the headset profile	DeviceClass		Dispositivo está em conformidade com o perfil do fone de ouvido
+Hands-free	DeviceClass		Mãos livres
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Nao é um nome válido
+Vehicle	DeviceClass		Veículo
+Palm	DeviceClass	A palm-held device	Palm
+Video display and loudspeaker	DeviceClass		Exibição de vídeo e autofalante
+Peripheral	DeviceClass		Periférico
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Não é um nome válido
+Wired modem or voice gateway	DeviceClass		Modem com fio ou dispositivo de voz
+Jacket	DeviceClass		Jaqueta
+Unspecified	DeviceClass		Não especificado
+Fully available	DeviceClass		Totalmente disponível
+67-83% utilized	DeviceClass		utilizados 67-83%
+Not implemented	RemoteDevice		Não implementado
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Não é um nome válido
+Server	DeviceClass		Servidor
+Video conferencing	DeviceClass		Videoconferência
+Video camera	DeviceClass		Câmera de vídeo
+HiFi audio device	DeviceClass		dispositivo de áudio de alta fidelidade
+Smart phone	DeviceClass		Telefone inteligente
+Telephony	DeviceClass		Telefonia
+Doll/Action figure	DeviceClass		Boneca/Boneco
+VCR	DeviceClass		VCR
+Video monitor	DeviceClass		Monitor de vídeo
+Pointing device	DeviceClass		Dispositivo apontador
+Miscellaneous	DeviceClass		Diversos
+33-50% utilized	DeviceClass		utilizados 33-50%
+Imaging	DeviceClass		Imagem

@@ -1,32 +1,32 @@
 1	japanese	x.vnd.OBOS-Inspector	2075781936
-User Translators	ActiveTranslatorsWindow		ユーザートランスレータ
+User Translators	ActiveTranslatorsWindow		ユーザートランスレーター
 No image available to save.	ImageWindow		保存できるイメージがありません。
 Sorry, unable to write the image file.	ImageView		すみませんが、イメージの書き出しができません。
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		ドキュメントの数: %1\n\n使用されたトランスレータ:\n名前: %2\n情報: %3\nバージョン: %4\n
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		ドキュメントの数: %1\n\n使用されたトランスレーター:\n名前: %2\n情報: %3\nバージョン: %4\n
 \nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nタイプ: '%1' (%2)\nグループ: '%3' (%4)\n品質: %5\n機能: %6\nMIME タイプ: %7\n名前: %8\n
 Bummer	ImageWindow		失敗
 Last Page	ImageWindow		最後のページ
 \nInput Formats:	ImageView		\n入力フォーマット:
 Sorry, unable to load the image.	ImageView		すみませんが、イメージを読み込めません。
 Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	情報
-Active Translators	InspectorApp		有効なトランスレータ
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		イメージ: %1\n色空間: %2 (%3)\nサイズ: %4 x %5\n行のバイト数: %6\n総バイト数: %7\n\n識別情報:\nID 文字列: %8\nMIME タイプ: %9\nタイプ: '%10' (%11)\nトランスレータ ID: %12\nグループ: '%13' (%14)\n品質: %15\n機能: %16\n\n拡張情報:\n
+Active Translators	InspectorApp		有効なトランスレーター
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		イメージ: %1\n色空間: %2 (%3)\nサイズ: %4 x %5\n行のバイト数: %6\n総バイト数: %7\n\n識別情報:\nID 文字列: %8\nMIME タイプ: %9\nタイプ: '%10' (%11)\nトランスレーター ID: %12\nグループ: '%13' (%14)\n品質: %15\n機能: %16\n\n拡張情報:\n
 \nOutput Formats:	ImageView		\n出力フォーマット:
 Save feature not implemented yet.	ImageWindow		保存機能はまだ実装されていません。
 First Page	ImageWindow		最初のページ
 Next Page	ImageWindow		次のページ
 Open...	ImageWindow		開く…
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n使用されたトランスレータ:\n名前: %1\n情報: %2\nバージョン: %3\n
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n使用されたトランスレーター:\n名前: %1\n情報: %2\nバージョン: %3\n
 Save...	ImageWindow		保存…
 Info	ImageWindow		情報
 OK	ImageWindow		OK
-Window	ImageWindow		ウインドウ
+Window	ImageWindow		ウィンドウ
 Quit	ImageWindow		終了
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		選択されたドキュメント: %1\n\n使用したトランスレータ:\n名前: %2\n情報: %3\nバージョン: %4\n
-Active Translators	ImageWindow		有効なトランスレータ
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		選択されたドキュメント: %1\n\n使用したトランスレーター:\n名前: %2\n情報: %3\nバージョン: %4\n
+Active Translators	ImageWindow		有効なトランスレーター
 View	ImageWindow		ビュー
 Previous Page	ImageWindow		前のページ
 OK	ImageView		OK
-System Translators	ActiveTranslatorsWindow		システムトランスレータ
+System Translators	ActiveTranslatorsWindow		システムトランスレーター
 Unknown	ImageView		不明
 File	ImageWindow		ファイル

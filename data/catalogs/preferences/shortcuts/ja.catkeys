@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-Shortcuts	621368175
-Error, NULL state description?\n	ShortcutsSpec		エラー, 記述がありません?\n
+Error, NULL state description?\n	ShortcutsSpec		エラー、記述がありません?\n
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
@@ -41,7 +41,7 @@ Application	ShortcutsWindow		アプリケーション
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Beep
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
-Save KeySet as…	ShortcutsWindow		キーセットを名前をつけて保存…
+Save KeySet as…	ShortcutsWindow		キーセットを名前を付けて保存…
 Open	ShortcutsWindow		開く
 Really quit without saving your changes?	ShortcutsWindow		本当に変更を保存せずに終了してよいですか?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できませんでした。

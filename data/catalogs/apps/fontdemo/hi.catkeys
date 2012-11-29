@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-FontDemo	1769653414
+1	hindi	x-vnd.Haiku-FontDemo	1300625863
 Outline:	ControlView		रूपरेखा:
 Size: 50	ControlView		आकार: 50
 Stop cycling	ControlView		साईक्लिंग बंद करें 
@@ -12,7 +12,6 @@ Cycle fonts	ControlView		साइकल फ़ॉन्ट
 Font:	ControlView		फ़ॉन्ट्स:
 Rotation: 0	ControlView		रोटेशन: 0
 Drawing mode:	ControlView		ड्राइंग मोड:
-FontDemo	FontDemo		फ़ॉन्ट डेमो
 Haiku, Inc.	ControlView		हैकू, इंक.
 Controls	FontDemo		नियंत्रण
 Outline: %d	ControlView		रूपरेखा: %d

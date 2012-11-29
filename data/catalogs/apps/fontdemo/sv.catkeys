@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-FontDemo	1769653414
+1	swedish	x-vnd.Haiku-FontDemo	1300625863
 Outline:	ControlView		Kontur:
 Size: 50	ControlView		Storlek: 50
 Stop cycling	ControlView		Sluta rotera
@@ -12,7 +12,6 @@ Cycle fonts	ControlView		Rotera typsnitt
 Font:	ControlView		Typsnitt:
 Rotation: 0	ControlView		Rotation: 0
 Drawing mode:	ControlView		Ritläge:
-FontDemo	FontDemo		TypsnittDemo
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Kontroller
 Outline: %d	ControlView		Kontur: %d

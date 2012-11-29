@@ -8,7 +8,7 @@ Renderer name:	InfoView		Імя адлюстравальніка:
 Vendor name:	InfoView		Імя пастаўшчыка:
 Attributes stack size:	Capabilities		Памер стэку атрыбутаў:
 Name stack size:	Capabilities		Памер стэку імёнаў:
-Auxiliary buffer(s):	Capabilities		Дапаможны(я) буфер(ы)
+Auxiliary buffer(s):	Capabilities		Дапаможны(я) буфер(ы):
 Max. recommended vertex elements:	Capabilities		Макс. рэкамендаваная колькасць вяршынных элементаў:
 GLU version:	InfoView		Версія GLU:
 Model stack size:	Capabilities		Памер стэку мадэляў:

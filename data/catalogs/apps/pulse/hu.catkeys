@@ -1,48 +1,48 @@
 1	hungarian	x-vnd.Haiku-Pulse	2324471783
-%.2f GHz	NormalPulseView		%.2f GHz
-%ld MHz	NormalPulseView		%ld MHz
-%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nÍrta: David Ramsey és Arve Hjønnevåg\nÁtírta: Daniel Switkin\n
-About Pulse…	CPUButton		Pulse névjegye...
-About Pulse…	PulseView		Pulse névjegye...
-Active color	ConfigView		Aktív szín
-Bar colors	ConfigView		Sávok színe
-CPU progress bar	NormalPulseView		CPU folyamatsáv
-Defaults	PrefsWindow		Alapértelmezett
-Deskbar	CPUButton		Deskbar
-Deskbar menu	CPUButton		Deskbar menü
-Deskbar mode	MiniPulseView		Deskbar mód
-Deskbar mode	NormalPulseView		Deskbar mód
-Deskbar mode	PrefsWindow		Deskbar mód
-Error	PulseApp		Hiba
-Fade colors	ConfigView		Színek elhalványítása
-Frame color	ConfigView		Keret színe
-Idle color	ConfigView		Üresjárat színe
-Info	CPUButton		Infó
-Info	DeskbarPulseView		Infó
-Info	PulseApp		Infó
-Info	PulseView		Infó
-Installing in Deskbar failed\n%s	PulseApp		Nem sikerült telepíteni a Deskbarra\n%s
-Mini mode	DeskbarPulseView		Mini mód
-Mini mode	NormalPulseView		Mini mód
-Mini mode	PrefsWindow		Mini mód
-Normal mode	DeskbarPulseView		Normál mód
-Normal mode	MiniPulseView		Normál mód
-Normal mode	PrefsWindow		Normál mód
-OK	CPUButton		OK
-OK	DeskbarPulseView		OK
-OK	PrefsWindow		OK
-OK	PulseApp		OK
-OK	PulseView		OK
-Pulse	NormalPulseView		Pulse
-Pulse	PulseApp		Pulse
-Pulse	System name		Pulse
-Pulse settings	PulseWindow		Pulse beállításai
+OK	PrefsWindow		Rendben
 Quit	DeskbarPulseView		Kilépés
-Quit	MiniPulseView		Kilépés
-Remove replicant	CPUButton		Másolat eltávolítása
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Nem sikerült eltávolítani a Deskbarról.\n%s
-Settings…	PulseView		Beállítások...
+Mini mode	DeskbarPulseView		Mini mód
+Remove replicant	CPUButton		Replikáns eltávolítása
+Active color	ConfigView		Aktív szín
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Használat: Pulse [--mini] [-w szélesség] [--width=szélesség]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Színek elhalványítása
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nÍrta: David Ramsey és Arve Hjønnevåg\nÁtírta: Daniel Switkin\n
+OK	DeskbarPulseView		Rendben
+Deskbar mode	PrefsWindow		Asztalsáv mód
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		Normál mód
+Defaults	PrefsWindow		Alapértelmezett
+Normal mode	MiniPulseView		Normál mód
+Error	PulseApp		Hiba
+Info	PulseView		Infó
+Deskbar	CPUButton		Asztalsáv
+Frame color	ConfigView		Keret színe
+Mini mode	PrefsWindow		Mini mód
+OK	PulseApp		Rendben
+Bar colors	ConfigView		Sávok színe
+Settings…	PulseView		Beállítások…
+You can't disable the last active CPU.	PulseView		Nem lehet letiltani a legutolsó aktív processzort.
+Info	PulseApp		Infó
+Info	CPUButton		Infó
+OK	PulseView		Rendben
+Deskbar menu	CPUButton		Asztalsáv menü
+About Pulse…	PulseView		Pulzus névjegye…
+Deskbar mode	MiniPulseView		Asztalsáv mód
+Quit	MiniPulseView		Kilépés
+Pulse	System name		Pulzus
+Pulse	NormalPulseView		Pulzus
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Asztalsáv mód
+Pulse	PulseApp		Pulzus
 Width of icon:	ConfigView		Ikon szélessége
 You can't disable the last active CPU.	CPUButton		Nem lehet letiltani a legutolsó aktív processzort.
-You can't disable the last active CPU.	PulseView		Nem lehet letiltani a legutolsó aktív processzort.
+Normal mode	DeskbarPulseView		Normál mód
+OK	CPUButton		Rendben
+About Pulse…	CPUButton		Pulzus névjegye…
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Nem sikerült eltávolítani az Asztalsávról.\n%s
+Mini mode	NormalPulseView		Mini mód
+Info	DeskbarPulseView		Infó
+Pulse settings	PulseWindow		Pulzus beállításai
+Idle color	ConfigView		Üresjárat színe
+Installing in Deskbar failed\n%s	PulseApp		Nem sikerült telepíteni az Asztalsávra\n%s
+CPU progress bar	NormalPulseView		CPU folyamatsáv

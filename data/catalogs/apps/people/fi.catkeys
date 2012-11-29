@@ -2,7 +2,7 @@
 Edit	People		Muokkaa
 Error	People		Virhe
 City	People		Kaupunki
-The file '%name%' could not be written.	People		Tiedostoon ’%name%’ ei voitu kirjoittaa.
+The file '%name%' could not be written.	People		Kirjoittaminen tiedostoon ’%name%’ epäonnistui.
 none	Groups list		ei mitään
 Configure attributes	People		Asetusattribuutit
 Company	People		Yritys
@@ -13,12 +13,12 @@ New person	People		Uusi henkilö
 Select all	People		Valitse kaikki
 File	People		Tiedosto
 Unnamed person	People		Nimetön henkilö
-Could not create %s.	People		Ei voitu luoda kohdetta %s.
+Could not create %s.	People		Kohteen %s luominen epäonnistui.
 Country	People		Maa
 Close	People		Sulje
 Group	People		Ryhmä
 Nickname	People		Lempinimi
-Quit	People		Poistu
+Quit	People		Lopeta
 Name	People		Nimi
 Revert	People		Palauta
 Undo	People		Peru
@@ -27,12 +27,12 @@ Save changes before quitting?	People		Tallennetaanko muutokset ennen poistumista
 Load image…	People		Lataa kuva…
 OK	People		Valmis
 Remove image	People		Poista kuva
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Tiedostotyyppi-asetusohjelman käynnistäminen Henkilö-attribuuttien asettamiseksi epäonnistui.\n\nVirhe: 
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Tiedostotyypit-asetusohjelman käynnistäminen Henkilö-attribuuttien asettamiseksi epäonnistui.\n\nVirhe: 
 Home phone	People		Kotipuhelin
 Save as…	People		Tallenna nimellä...
 Redo	People		Tee uudelleen
 Paste	People		Liitä
-Drop an image here,\nor use the contextual menu.	People		Pudota kuva tänne, tai käytä\nlauseyhteydestä riippuvaa valikkoa.
+Drop an image here,\nor use the contextual menu.	People		Pudota kuva tänne, tai käytä\nasiayhteysvalikkoa.
 Save	People		Tallenna
 Person	Short mimetype description		Henkilö
 New person…	People		Uusi henkilö...
@@ -40,7 +40,7 @@ Address	People		Osoite
 URL	People		Verkko-osoite
 Sorry	People		Valitan
 Zip	People		Postinumero
-Contact information for a person.	Long mimetype description		Henkilön yhteystiedot
+Contact information for a person.	Long mimetype description		Henkilön yhteystiedot.
 Fax	People		Faksi
 Contact name	People		Yhteysnimi
 Cut	People		Leikkaa

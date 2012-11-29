@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	2591538723
+1	polish	x-vnd.haiku-icon_o_matic	2079362081
 Select All	Icon-O-Matic-PathManipulator		Zaznacz wszystko
 Add Style	Icon-O-Matic-AddStylesCmd		Dodanie stylu
 Color (#%02x%02x%02x)	Style name after dropping a color		Kolor (#%02x%02x%02x)
@@ -65,6 +65,7 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		Usunięcie kształtu
 Reverse	Icon-O-Matic-PathsList		Odwróć
 HVIF Source Code	Icon-O-Matic-SavePanel		Kod źródłowy HVIF
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Resetowanie transformacji
+Settings	Icon-O-Matic-Menus		Ustawienia
 All	Icon-O-Matic-Properties		Wszystkie
 Multi Paste Properties	Icon-O-Matic-Properties		Wklej wiele właściwości
 Undo	Icon-O-Matic-Main		Cofnij
@@ -117,6 +118,7 @@ Gradient	Icon-O-Matic-StyleTypes		Gradient
 Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atrybut BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Odwróć zaznaczenie
+Drop shapes	Icon-O-Matic-ShapesList		Upuść kształty
 Export as…	Icon-O-Matic-Menu-File		Eksportuj jako…
 Transformation	Transformation		Transformacja
 Click on an object in	Empty property list - 1st line		Wybierz obiekt z innej

@@ -1,0 +1,24 @@
+1	english	x-vnd.Haiku-GLTeapot	1569683445
+Upper center	TeapotWindow		上部中心
+Lighting	TeapotWindow		灯光
+Off	TeapotWindow		关闭
+Lower left	TeapotWindow		左下角
+White	TeapotWindow		白色
+Yellow	TeapotWindow		黄色
+Blue	TeapotWindow		蓝色
+Gouraud shading	TeapotWindow		高氏渲染
+Quit	TeapotWindow		退出
+Filled polygons	TeapotWindow		填充
+Settings	TeapotWindow		设置
+Fog	TeapotWindow		模糊
+Backface culling	TeapotWindow		隐面消除
+Z-buffered	TeapotWindow		Z-缓冲
+File	TeapotWindow		文件
+Perspective	TeapotWindow		透视
+GLTeapot	System name		GL 茶壶
+Green	TeapotWindow		绿色
+Right	TeapotWindow		右边
+FPS display	TeapotWindow		FPS 显示
+Add a teapot	TeapotWindow		添加茶壶
+Red	TeapotWindow		红色
+Lights	TeapotWindow		光源

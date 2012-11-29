@@ -8,7 +8,7 @@ OK	Login View		Valmis
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	virhe %s\n
 Login:	Login View		Kirjaudu:
 Error	Login App		Virhe
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Voit räätälöidä työpöytää, joka näytetään Kirjautumissovelluksen takana pudottamalla replikantin siihen.\n\nKun olet lopettanut poistu vain sovelluksesta (Alt-Q).
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Voit räätälöidä työpöytää, joka näytetään Kirjautumissovelluksen takana pudottamalla kopiot siihen.\n\nKun olet valmis, lopeta vain sovellus (Alt-Q).
 Unimplemented	Login App		Toteuttamaton
 Welcome to Haiku	Login Window		Tervetuloa Haikuun
 Reboot	Login View		Alkulataa uudelleen
@@ -18,4 +18,4 @@ Halt	Login View		Keskeytä
 ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	ValidateLogin: %s\n
 Password:	Login View		Salasana:
 OK	Login App		Valmis
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tÄlä tee ikkunasta modaalista\n
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tÄlä tee ikkunasta välitöntä toimintaa vaativaa\n

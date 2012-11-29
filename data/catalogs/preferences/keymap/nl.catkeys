@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Keymap	247520798
+1	dutch; flemish	x-vnd.Haiku-Keymap	4022885915
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Herstellen
 Tilde trigger	Keymap window		Tilde-activeerder
@@ -13,15 +13,26 @@ Diaeresis trigger	Keymap window		Trema-activeerder
 Disabled	Modifier keys window	Do nothing	Uitgeschakeld
 Open…	Keymap window		Openen...
 System:	Keymap window		Systeem:
+Set modifier keys…	Keymap window		Optietoetsen instellen…
+Option:	Modifier keys window	Option key role name	Optie:
 Switch shortcut keys	Keymap window		Snelkoppelingstoetsen omschakelen
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shifttoets
 User:	Keymap window		Gebruiker:
+Key	Modifier keys window	As in a computer keyboard key	Toets
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-toets
+Control:	Modifier keys window	Control key role name	Besturingselement:
 Sample and clipboard:	Keymap window		Voorbeeld en klembord:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-toets
 Layout	Keymap window		Lay-out
 Switch shortcut keys to Windows/Linux mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Windows/Linux-modus
 Revert	Keymap window		Herstellen
+Command:	Modifier keys window	Command key role name	Command:
 Save as…	Keymap window		Opslaan als...
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-toets
 File	Keymap window		Bestand
 (Current)	Keymap window		(Huidig)
 Font	Keymap window		Lettertype
 Keymap	System name		Toetsenbordindeling
+Set modifier keys	Modifier keys window		Modificatietoetsen instellen
+Modifier keys	Modifier keys window		Modificatietoetsen
 Acute trigger	Keymap window		Accent aigu-activeerder

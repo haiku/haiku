@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ControlLook.h>
 #include <Message.h>
 #include <View.h>
 
@@ -85,7 +86,8 @@ BStringItem::DrawItem(BView *owner, BRect frame, bool complete)
 		owner->FillRect(frame);
 	}
 
-	owner->MovePenTo(frame.left, frame.top + fBaselineOffset);
+	owner->MovePenTo(frame.left + be_control_look->DefaultLabelSpacing(),
+		frame.top + fBaselineOffset);
 
 	if (!IsEnabled()) {
 		rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
@@ -128,8 +130,10 @@ BStringItem::Text() const
 void
 BStringItem::Update(BView *owner, const BFont *font)
 {
-	if (fText)
-		SetWidth(font->StringWidth(fText));
+	if (fText) {
+		SetWidth(font->StringWidth(fText)
+			+ be_control_look->DefaultLabelSpacing());
+	}
 
 	font_height fheight;
 	font->GetHeight(&fheight);

@@ -1,0 +1,164 @@
+1	portuguese (brazil)	x-vnd.Be-MAIL	1599879742
+View	Mail		Visualizar
+%d - Date	Mail		%d - Data
+Attach attributes:	Mail		Anexar Atributos:
+Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Desfazer/Refazer.
+An error occurred trying to save the attachment.	Mail		Ocorreu um erro ao tentar salvar o anexo.
+Copy to new	Mail		Copiar para novo
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixar como 'Novo'
+Edit	Mail		Editar
+Print	Mail		Imprimir
+<none>	Mail		<nenhum>
+New mail message	Mail		Nova mensagem de correio
+Automatic	Mail		Automático
+Automatically mark mail as read:	Mail		Marcar automaticamente correio como lido:
+helpful message	Mail		mensagem útil
+Colored quotes:	Mail		Citações coloridas:
+Subject:	Mail		Assunto:
+Reply to all	Mail		Responder a todos
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Compartimento: %name% (Tipo: %type%)
+Show icons & labels	Mail		Exibir ícones & rótulos
+Remove attachment	Mail		Remover anexo
+Button bar:	Mail		Barra de botões:
+spam	B_USER_DIRECTORY/mail/spam		mensagens não solicitadas
+Beginner	Mail		Iniciante
+Don't save	Mail		Não salvar
+Expert	Mail		Especialista
+Reply account:	Mail		Responder conta:
+Discard	Mail		Descartar
+Message	Mail		Mensagem
+Settings…	Mail		Definições…
+Reply to sender	Mail		Responder ao remetente
+There is no installed handler for URL links.	Mail		Não existe nenhum programa instalado para abrir links URL.
+Signature	Mail		Assinatura
+Find again	Mail		Localizar novamente
+Bcc:	Mail		Cco:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O texto principal contém %ld caracteres não codificáveis. Quem sabe um conjunto de caracteres diferente trabalhe melhor? Clique em Enviar para enviar a mensagem como está (um caractere substituto será usado no lugar dos não codificáveis) ou escolha Cancelar para voltar e tentar consertar isso.
+Signature:	Mail		Assinatura:
+Save changes to this signature?	Mail		Salvar alterações para esta assinatura?
+Cc:	Mail		Cc:
+Off	Mail		Desligar
+Find	Mail		Localizar
+Undo	Mail		Desfazer
+Date:	Mail		Data:
+An error occurred trying to open this signature.	Mail		Ocorreu um erro ao tentar abrir esta assinatura.
+No file attributes, just plain data	Mail		Sem atributos de arquivo, apenas dados simples
+Edit queries…	Mail		Editar consultas…
+queries	B_USER_DIRECTORY/mail/queries		consultas
+Paste	Mail		Colar
+in	B_USER_DIRECTORY/mail/in		em
+Save attachment…	Mail		Salvar anexo…
+Include file attributes in attachments	Mail		Incluir atributos de arquivos em anexos
+OK	Mail		OK
+Send	Mail		Enviar
+Show icons only	Mail		Exibir somente ícones
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Remover anexos de um correio encaminhado não foi ainda implementado!\nAinda não irá funcionar corretamente.
+Hide	Mail		Ocultar
+Forward without attachments	Mail		Encaminhar sem anexos
+Previous	Mail		Anterior
+Redo	Mail		Refazer
+Add enclosure…	Mail		Adicionar compartimento…
+Mail	System name		Correio
+Print…	Mail		Imprimir…
+Warn unencodable:	Mail		Avisar não codificável:
+Quit	Mail		Sair
+%n - Full name	Mail		%n - Nome completo
+ Read 	Mail		  Ler  
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Trash	Mail		Lixeira
+Default account:	Mail		Conta padrão:
+Size:	Mail		Tamanho:
+Account from mail	Mail		Conta de correio
+Edit signatures…	Mail		Editar assinaturas…
+New	Mail		Novo
+Attachments: 	Mail		Anexos:  
+On	Mail		Ligar
+Set to %s	Mail		Definir para %s
+Forward	Mail		Encaminhar
+E-mail draft could not be saved!	Mail		Rascunho do correio não pôde ser salvo!
+%e wrote:\\n	Mail		%e escreveu:\\n
+To:	Mail		Para:
+Only files can be added as attachments.	Mail		Apenas arquivos podem ser adicionados como anexos.
+Previous message	Mail		Mensagem anterior
+Attachments:	Mail		Anexos:
+Title:	Mail		Título:
+<no account found>	Mail		<nenhuma conta encontrada>
+Find…	Mail		Localizar…
+Accounts…	Mail		Contas…
+Mail preferences	Mail		Preferências de correio
+Initial spell check mode:	Mail		Modo de verificação ortográfica inicial:
+Leave same	Mail		Deixar o mesmo
+Page setup…	Mail		Configurar página…
+Text wrapping:	Mail		Quebra de texto:
+Revert	Mail		Reverter
+File	Mail		Arquivo
+mail	B_USER_DIRECTORY/mail		correio
+None	Mail		Nenhum
+(Name unavailable)	Mail		(Nome indisponível)
+Copy link location	Mail		Copiar endereço do vínculo
+out	B_USER_DIRECTORY/mail/out		fora
+Show header	Mail		Exibir cabeçalho
+%e - E-mail address	Mail		%e - Endereço de correio eletrônico
+Resend	Mail		Reenviar
+Show raw message	Mail		Exibir a mensagem bruta
+\\n - Newline	Mail		\\n  - Nova linha
+Start now	Mail		Iniciar agora
+Close	Mail		Fechar
+No matches	Mail		Nenhuma correspondência
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		O mail_daemon não está executando. A mensagem está na fila e será enviada quando o mail_daemon iniciar.
+Really delete this signature? This cannot be undone.	Mail		Excluir realmente esta assinatura? Isto não poderá ser desfeito.
+Open	Mail		Abrir
+draft	B_USER_DIRECTORY/mail/draft		rascunho
+Quote	Mail		Citar
+Add	Mail		Adicionar
+Next message	Mail		Próxima mensagem
+User interface	Mail		Interface de usuário
+Cancel	Mail		Cancelar
+Send message	Mail		Enviar mensagem
+Remove enclosure	Mail		Remover compartimento
+Account:	Mail		Conta:
+Decoding:	Mail		Decodificação:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Desculpe, não foi possível encontrar um aplicativo que suporte o tipo de dados 'Pessoa'.
+Do you wish to send this message before closing?	Mail		Deseja enviar esta mensagem antes de fechar?
+Delete	Mail		Excluir
+Leave as '%s'	Mail		Deixar como '%s'
+Copy	Mail		Copiar
+Mail couldn't find its dictionary.	Mail		O correio não pôde encontrar seu dicionário.
+Reply preamble:	Mail		Responder preâmbulo:
+Signatures	Mail		Assinaturas
+Next	Mail		Próximo
+Set to…	Mail		Definir como…
+Use default account	Mail		Usar conta padrão
+Sorry	Mail		Desculpe
+Encoding:	Mail		Codificação:
+Font:	Mail		Fonte:
+(Address unavailable)	Mail		(Endereço indisponível)
+Save address	Mail		Salvar endereço
+Queries	Mail		Consultas
+Do you wish to save this message as a draft before closing?	Mail		Deseja salvar esta mensagem como um rascunho antes de fechar?
+Save	Mail		Salvar
+Random	Mail		Aleatório
+Close and 	Mail		Fechar e  
+Save as draft	Mail		Salvar como rascunho
+The mail_daemon could not be started:\n\t	Mail		O mail_daemon não pôde ser iniciado:\n\t
+Open attachment	Mail		Abrir anexo
+sent	B_USER_DIRECTORY/mail/sent		enviado
+(Date unavailable)	Mail		(Data indisponível)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Ponha suas consultas de correio e de modelos preferidas nesta pasta.
+Reply	Mail		Resposta
+From:	Mail		De:
+Couldn't open this signature. Sorry.	Mail		Não foi possível abrir esta assinatura. Desculpe.
+Open draft	Mail		Abrir rascunho
+Cut	Mail		Recortar
+Check spelling	Mail		Verificar ortografia
+Set to Saved	Mail		Definir como Salvo
+Open this link	Mail		Abrir este vínculo
+Auto signature:	Mail		Auto assinatura:
+Add signature	Mail		Adicionar assinatura
+Need Tracker to move items to trash	Mail		Necessita do Rastreador (Tracker) para mover itens para a lixeira
+Mailing	Mail		Correspondência
+Unread	Mail		Não lido
+Remove quote	Mail		Remover citação
+Move to trash	Mail		Mover para a lixeira
+Select all	Mail		Selecionar tudo
+An error occurred trying to save this signature.	Mail		Ocorreu um erro ao tentar salvar esta assinatura.

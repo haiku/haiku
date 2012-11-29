@@ -1,7 +1,9 @@
-1	swedish	x-vnd.Haiku-RTFTranslator	3736645044
+1	swedish	x-vnd.Haiku-RTFTranslator	1620328626
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 RTF text files	RTFTranslator		RTF-textfiler
 RTF-Translator Settings	ConfigView		RTF-översättningsinställningar
+Rich Text Format (RTF) translator	ConfigView		Rich Text Format (RTF) översättare
 RTF Settings	main		RTF-inställningar
 RichTextFormat file	RTFTranslator		RichTextFormat-fil
+Rich Text Format translator	RTFTranslator		Rich Text Format översättare
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text Format översättare v%d.%d.%d %s

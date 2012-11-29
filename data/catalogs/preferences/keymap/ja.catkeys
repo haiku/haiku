@@ -27,7 +27,7 @@ Layout	Keymap window		レイアウト
 Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
 Revert	Keymap window		元に戻す
 Command:	Modifier keys window	Command key role name	Command:
-Save as…	Keymap window		名前をつけて保存…
+Save as…	Keymap window		名前を付けて保存…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd キー
 File	Keymap window		ファイル
 (Current)	Keymap window		(使用中キーマップ)

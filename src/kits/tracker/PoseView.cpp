@@ -6445,6 +6445,10 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 
 		case B_DELETE:
 		{
+			if (TargetModel() == NULL) {
+				// Happens if called from within OpenWith window, for example
+				break;
+			}
 			// Make sure user can't trash something already in the trash.
 			if (TargetModel()->IsTrash()) {
 				// Delete without asking from the trash

@@ -1,0 +1,48 @@
+1	portuguese (brazil)	x-vnd.Haiku-ProcessController	2887520383
+Memory usage	ProcessController		Uso de memória
+Do you really want to kill the team \"%s\"?	ProcessController		Deseja realmente matar a equipe \"%s\"?
+Idle priority	ProcessController		Prioridade ociosa
+Restart Deskbar	ProcessController		Reiniciar o Deskbar
+Custom priority	ProcessController		Prioridade personalizada
+Debug thread	ProcessController		Processo de depuração
+This team is already gone…	ProcessController		Esta equipe já se foi…
+Error saving file	ProcessController		Erro ao gravar o arquivo
+Real-time priority	ProcessController		Prioridade em tempo real
+Your setting file could not be saved!\n(%s)	ProcessController		Arquivo de definições não pôde ser salvo!\n(%s)
+This thread is already gone…	ProcessController		Este processo já se foi…
+Cancel	ProcessController		Cancelar
+Display priority	ProcessController		Exibir prioridade
+Run in window	ProcessController		Executar em janela
+Processor %d	ProcessController		Processador %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		Controlador de Processo já está instalado no Deskbar.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Este é o último processador ativo…\nNão é possível desligá-lo!
+Info	ProcessController		Informações
+Quit application	ProcessController		Sair do aplicativo
+Low priority	ProcessController		Prioridade baixa
+What do you want to do with the thread \"%s\"?	ProcessController		O que deseja fazer com o processo \"%s\"?
+Gone teams…	ProcessController		Equipes terminadas…
+Lowest active priority	ProcessController		Prioridade de mais baixa atividade
+Restart Tracker	ProcessController		Reiniciar o Rastreador (Tracker)
+Live in the Deskbar	ProcessController		Ao vivo no Deskbar
+Kill this thread!	ProcessController		Matar este processo!
+Debug this thread!	ProcessController		Depurar este processo!
+Normal priority	ProcessController		Prioridade normal
+New Terminal	ProcessController		Novo Terminal
+Urgent priority	ProcessController		Prioridade urgente
+About ProcessController…	ProcessController		Sobre o Controlador de Processo…
+Ok!	ProcessController		Ok!
+Quit an application	ProcessController		Fechar uma aplicação
+Install in Deskbar	ProcessController		Instalar no Deskbar
+Threads and CPU usage	ProcessController		Processos e utilização de CPU
+Urgent display priority	ProcessController		Exibir prioridade urgente
+OK	ProcessController		OK
+Damned!	ProcessController		Maldição!
+Usage: %s [-deskbar]\n	ProcessController		Utilização: %s [-deskbar]\n
+ProcessController	System name		Controlador de Processo
+Real-time display priority	ProcessController		Exibir prioridade de tempo real
+Please confirm	ProcessController		Favor confirmar
+Yes, kill this team!	ProcessController		Sim, mate esta equipe!
+System resources & caches…	ProcessController		Recursos & caches de sistema…
+That's no Fun!	ProcessController		Isso não é Engraçado!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		É possível executar o Controlador de Processo em uma janela ou instalá-lo no Deskbar.

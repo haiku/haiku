@@ -103,7 +103,12 @@ private:
 private:
 	struct ImageHandler;
 	struct ImageHandlerHashDefinition;
+	struct ImageInfoPendingThread;
+	struct ImageInfoPendingThreadHashDefinition;
+
 	typedef BOpenHashTable<ImageHandlerHashDefinition> ImageHandlerTable;
+	typedef BOpenHashTable<ImageInfoPendingThreadHashDefinition>
+		ImageInfoPendingThreadTable;
 
 private:
 	static	status_t			_DebugEventListenerEntry(void* data);
@@ -147,9 +152,6 @@ private:
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
 
-			void				_HandleGenerateDebugReport(
-									const entry_ref& target);
-
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);
 
 			status_t			_AddImage(const ImageInfo& imageInfo,
@@ -169,6 +171,7 @@ private:
 			ThreadHandlerTable	fThreadHandlers;
 									// protected by the team lock
 			ImageHandlerTable*	fImageHandlers;
+			ImageInfoPendingThreadTable* fImageInfoPendingThreads;
 			DebuggerInterface*	fDebuggerInterface;
 			TeamDebugInfo*		fTeamDebugInfo;
 			FileManager*		fFileManager;

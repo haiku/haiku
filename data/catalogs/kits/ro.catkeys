@@ -1,5 +1,4 @@
-1	romanian	x-vnd.Haiku-libbe	180647795
-Close	AboutWindow		Închide
+1	romanian	x-vnd.Haiku-libbe	864109244
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Scris de:
 About %app%	AboutMenuItem		Despre %app%
@@ -8,7 +7,6 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		N
 Copy	TextView		Copiază
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d octeți
-About…	AboutWindow		Despre...
 Error	PrintJob		Eroare
 No Pages to print!	PrintJob		Nu sunt pagini de imprimat!
 OK	Dragger		OK
@@ -18,7 +16,6 @@ Remove replicant	Dragger		Elimină copie
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Serverul de imprimare nu răspunde.
 Paste	TextView		Lipește
-Copyright © %years% Haiku, Inc.	AboutWindow		Drepturi de autor © %years% Haiku, Inc.
 %.2f TiB	StringForSize		%.2f TiB
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate găsi aplicația pentru copie. Nu a fost furnizată nicio semnătură de aplicație.\n%error
 Redo	TextView		Repetă

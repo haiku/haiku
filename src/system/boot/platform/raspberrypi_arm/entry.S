@@ -1,6 +1,6 @@
 .section .init
-.globl _start
-_start:
+.globl _entry
+_entry:
 	b jmp_loader
 
 .section .text
@@ -14,12 +14,21 @@ jmp_loader:
 
 	/* For Thumb code? */
 	/*
-	ldr r12, =pi_start
+	ldr r12, =_start
 	mov lr, pc
 	bx r12
 	*/
 
-	b pi_start
+	/* Turn on unaligned memory access */
+	mrc p15, #0, r4, c1, c0, #0
+	orr r4, #0x400000
+	mcr p15, #0, r4, c1, c0, #0
+
+	/* Setup initial stack right below our .text section (growing downwards
+		into the space reserved for .init) */
+	mov sp, #0x8000
+
+	b _start
 
 	/* Cause exception if loader returns */
 	swi 0xFFFFFF

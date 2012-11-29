@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PowerStatus	751886234
+1	ukrainian	x-vnd.Haiku-PowerStatus	556468018
 Design capacity low warning: 	PowerStatus		Попередження про зниження проектної ємності:
 Show percent	PowerStatus		Показати процент
 Design capacity: 	PowerStatus		Проектна ємність: 
@@ -6,9 +6,7 @@ Type: 	PowerStatus		Тип:
 non-rechargeable	PowerStatus		той що не може перезаряджатись
 Empty battery slot	PowerStatus		Слот підключення батареї пустий
 Run in window	PowerStatus		Запустити у вікні
-About	PowerStatus		про
 PowerStatus	System name		Стан живлення
-PowerStatus	PowerStatus		Стан живлення
 Battery info…	PowerStatus		Дані батареї…
 Damaged battery	PowerStatus		Батарея знищена
 Show time	PowerStatus		Показати час
@@ -25,10 +23,8 @@ Capacity: 	PowerStatus		Ємність:
 Battery discharging	PowerStatus		Батарея розряджена
 Serial number: 	PowerStatus		Серійний номер:
 Capacity granularity 1: 	PowerStatus		Градація ємності 1:
-OK	PowerStatus		Гаразд
 OEM info: 	PowerStatus		Дані OEM:
 Design voltage: 	PowerStatus		Проектна напруга:
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nавтори Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Батарея заряджається
 Design capacity warning: 	PowerStatus		Попередження про проектну ємність:
 Battery info	PowerStatus		Дані батареї

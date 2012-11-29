@@ -146,8 +146,10 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 			SATGroup* currentGroup = NULL;
 			if (frontWindow)
 				currentGroup = frontWindow->GetGroup();
+			if (currentGroup == NULL)
+				return false;
 			int32 groupSize = currentGroup->CountItems();
-			if (!currentGroup || groupSize <= 1)
+			if (groupSize <= 1)
 				return false;
 
 			for (int32 i = 0; i < groupSize; i++) {

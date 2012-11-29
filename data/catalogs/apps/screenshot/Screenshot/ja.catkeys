@@ -1,26 +1,26 @@
 1	japanese	x-vnd.haiku-screenshot	1721618877
 seconds	ScreenshotWindow		秒
 Desktop	ScreenshotWindow		デスクトップ
-Include window border	ScreenshotWindow		ウインドウ境界線も取り込む
+Include window border	ScreenshotWindow		ウィンドウ境界線も取り込む
 Screenshot	System name		スクリーンショット
 Select	ScreenshotWindow		選択
-Capture active window	ScreenshotWindow		アクティブウインドウのみ
+Capture active window	ScreenshotWindow		アクティブウィンドウのみ
 Cancel	ScreenshotWindow		中止
 Name:	ScreenshotWindow		ファイル名：
-Choose folder	ScreenshotWindow		フォルダを選択
+Choose folder	ScreenshotWindow		フォルダーを選択
 Save	ScreenshotWindow		保存
 Overwrite	ScreenshotWindow		上書き
-Choose folder...	ScreenshotWindow		フォルダを選択...
+Choose folder...	ScreenshotWindow		フォルダーを選択…
 Please select	ScreenshotWindow		選択してください
 Save as:	ScreenshotWindow		ファイル形式：
 Copy to clipboard	ScreenshotWindow		クリップボードにコピー
 Save in:	ScreenshotWindow		保存場所：
 screenshot	Screenshot	Base filename of screenshot files	スクリーンショット
 New screenshot	ScreenshotWindow		新しいスクリーンショット
-Artwork folder	ScreenshotWindow		アートワークフォルダ
-Home folder	ScreenshotWindow		ホームフォルダ
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		同じ名前のファイルは既に存在します。\n上書きしますか？
-Settings…	ScreenshotWindow		設定...
+Artwork folder	ScreenshotWindow		アートワークフォルダー
+Home folder	ScreenshotWindow		ホームフォルダー
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		同じ名前のファイルはすでに存在します。\n本当に上書きしますか?
+Settings…	ScreenshotWindow		設定…
 overwrite	ScreenshotWindow		上書き
 Delay:	ScreenshotWindow		遅延時間
 Include mouse pointer	ScreenshotWindow		マウスポインターも取り込む

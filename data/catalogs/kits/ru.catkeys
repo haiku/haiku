@@ -1,5 +1,4 @@
-1	russian	x-vnd.Haiku-libbe	180647795
-Close	AboutWindow		Закрыть
+1	russian	x-vnd.Haiku-libbe	864109244
 %3.2f GiB	StringForSize		%3.2f ГБ
 Written by:	AboutWindow		Разработан:
 About %app%	AboutMenuItem		О программе…
@@ -8,7 +7,6 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		�
 Copy	TextView		Копировать
 %3.2f KiB	StringForSize		%3.2f КБ
 %d bytes	StringForSize		%d байт
-About…	AboutWindow		О программе…
 Error	PrintJob		Ошибка
 No Pages to print!	PrintJob		Нет страниц для печати
 OK	Dragger		ОК
@@ -18,7 +16,6 @@ Remove replicant	Dragger		Удалить репликант
 OK	ZombieReplicantView		ОК
 Print Server is not responding.	PrintJob		Сервер печати не отвечает.
 Paste	TextView		Вставить
-Copyright © %years% Haiku, Inc.	AboutWindow		Все права защищены © %years% Haiku, Inc.
 %.2f TiB	StringForSize		%.2f ТБ
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
 Redo	TextView		Повторить

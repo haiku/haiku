@@ -35,6 +35,7 @@ All rights reserved.
 
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <ScrollView.h>
@@ -311,10 +312,6 @@ SettingsItem::SettingsItem(const char* label, SettingsView* view)
 void
 SettingsItem::DrawItem(BView* owner, BRect rect, bool drawEverything)
 {
-	const rgb_color kModifiedColor = {0, 0, 255, 0};
-	const rgb_color kBlack = {0, 0, 0, 0};
-	const rgb_color kSelectedColor = {140, 140, 140, 0};
-
 	if (fSettingsView) {
 		bool isRevertable = fSettingsView->IsRevertable();
 		bool isSelected = IsSelected();
@@ -322,7 +319,7 @@ SettingsItem::DrawItem(BView* owner, BRect rect, bool drawEverything)
 		if (isSelected || drawEverything) {
 			rgb_color color;
 			if (isSelected)
-				color = kSelectedColor;
+				color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 			else
 				color = owner->ViewColor();
 
@@ -332,17 +329,23 @@ SettingsItem::DrawItem(BView* owner, BRect rect, bool drawEverything)
 		}
 
 		if (isRevertable)
-			owner->SetHighColor(kModifiedColor);
+			owner->SetFont(be_bold_font);
 		else
-			owner->SetHighColor(kBlack);
+			owner->SetFont(be_plain_font);
+
+		if (isSelected)
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+		else
+			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 
 		font_height fheight;
 		owner->GetFontHeight(&fheight);
 
-		owner->DrawString(Text(), BPoint(rect.left + 4, rect.top
-			+ fheight.ascent + 2 + floorf(fheight.leading / 2)));
+		owner->DrawString(Text(),
+			BPoint(rect.left + be_control_look->DefaultLabelSpacing(),
+				rect.top + fheight.ascent + 2 + floorf(fheight.leading / 2)));
 
-		owner->SetHighColor(kBlack);
+		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 		owner->SetLowColor(owner->ViewColor());
 	}
 }

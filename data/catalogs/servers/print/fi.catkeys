@@ -13,14 +13,14 @@ OK	ConfigWindow		Valmis
 Cancel	ConfigWindow		Peru
 Printer server	ConfigWindow		Tulostinpalvelin
 Page %1 to %2, %3 copies	ConfigWindow		Sivu %1 ... %2, %3 kopiota
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta sen ajuria ei voitu löytää! Korvataanko?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta sen ajurin löytäminen epäonnistui! Korvataanko?
 Yes	PrintServerApp		Kyllä
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger-koko
 Would you like to set one up now?	PrintServerApp		Haluaisitko asettaa yhden nyt?
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Pystysuora
 All pages	ConfigWindow		Kaikki sivut
-There is no default printer set up.	PrintServerApp		Ei ole olemassa tulostimen oletusasetusta.
+There is no default printer set up.	PrintServerApp		Tulostimen oletusasetusta ei ole asetettu.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter-koko

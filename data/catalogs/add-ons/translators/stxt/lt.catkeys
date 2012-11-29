@@ -1,6 +1,8 @@
-1	lithuanian	x-vnd.Haiku-STXTTranslator	3302294301
+1	lithuanian	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		„BeOS“ raiškiojo teksto failas
 Plain text file	STXTTranslator		Grynojo teksto failas
 STXTTranslator Settings	STXTTranslator		STXT keitiklio nuostatos
+StyledEdit file translator	STXTView		Rašyklės failų keitiklis
 StyledEdit files	STXTTranslator		Rašyklės teksto failai
+StyledEdit file translator	STXTTranslator		Rašyklės failų keitiklis
 STXT Settings	STXTMain		STXT nuostatos

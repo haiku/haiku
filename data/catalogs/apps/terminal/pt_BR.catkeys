@@ -1,0 +1,102 @@
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	1294209621
+Not found.	Terminal TermWindow		Não localizado.
+Switch Terminals	Terminal TermWindow		Alternar Terminais
+Change directory	Terminal TermView		Mudar de pasta
+OK	Terminal TermWindow		OK
+New Terminal	Terminal TermWindow		Novo Terminal
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
+Text size	Terminal TermWindow		Tamanho do texto
+Match case	Terminal FindWindow		Diferenciar maiúsculas de minúsculas
+Quit	Terminal TermWindow		Sair
+Use default shell	Terminal Shell		Utilizar shell padrão
+Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar saída se existirem aplicativos em execução
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		O padrão especificando o título da guia atual. Os seguintes espaços reservados\npodem ser usados:\n
+Select all	Terminal TermWindow		Selecionar tudo
+Close tab	Terminal TermWindow		Fechar aba
+Custom	Terminal colors schema		Personalizado
+Save to file…	Terminal PrefWindow		Salvar para arquivo...
+OK	Terminal PrefWindow		OK
+Black on White	Terminal colors schema		Preto sobre Branco
+Window title:	Terminal AppearancePrefView		Título da janela:
+Font:	Terminal AppearancePrefView		Fonte:
+Copy here	Terminal TermView		Copiar aqui
+Really close?	Terminal TermWindow		Deseja realmente fechar?
+Copy	Terminal TermWindow		Copiar
+Window title:	Terminal TermWindow		Título da janela:
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Opção não reconhecida \"%s\"\n
+%app% settings	Terminal PrefWindow	window title	%app% definições
+Cancel	Terminal SetTitleWindow		Cancelar
+Increase	Terminal TermWindow		Aumentar
+Settings	Terminal TermWindow		Configurações
+Window size	Terminal TermWindow		Tamanho da janela
+Selected text	Terminal AppearancePrefView		Texto selecionado
+Find	Terminal FindWindow		Localizar
+Appearance	Terminal PrefWindow		Aparência
+Tab title:	Terminal AppearancePrefView		Título da guia:
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		O padrão especificando os títulos da janela. Os seguintes espaços reservados podem ser utilizados:\n
+Color schema:	Terminal AppearancePrefView		Esquema de cores:
+OK	Terminal SetTitleWindow		OK
+Background	Terminal AppearancePrefView		Plano de fundo
+Use selection	Terminal FindWindow		Usar seleção
+Green on Black	Terminal colors schema		Verde sobre o Preto
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		O processo \"%1\" ainda está executando.\nSe fechar a guia, o processo será morto.
+Size:	Terminal AppearancePrefView		Tamanho:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Não é possível executar \"%command\":\n\t %error
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h,  --help  exibe esta ajuda\n-t,  --title  define o título da janela\n-f,  --fulscreen  inicia tela cheia\n
+Full screen	Terminal TermWindow		Tela inteira
+Window title…	Terminal TermWindow		Título da janela…
+Page setup…	Terminal TermWindow		Configurar página...
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Os seguintes processos ainda estão executando:\n\n\t %1\n\nSe fechar o Terminal, os processos serão mortos.
+Insert path	Terminal TermView		Inserir caminho
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui e Takashi Murai.\n\nUtilização: %s [OPTION] [SHELL]\n
+No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma expressão para localizar.
+Don't save	Terminal PrefWindow		Não salvar
+Set window title	Terminal TermWindow		Definir título da janela
+Terminal	System name		Terminal
+Close other tabs	Terminal TermWindow		Fechar outras guias
+Match word	Terminal FindWindow		Palavra exata
+Nothing is selected.	Terminal TermWindow		Não há nada selecionado.
+Text not found.	Terminal TermWindow		Texto não encontrado.
+Find…	Terminal TermWindow		Localizar…
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		O processo \"%1\" ainda está executando.\nSe fechar o Terminal, o processo será morto.
+Move here	Terminal TermView		Mover aqui
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t %d\t -\t O diretório de trabalho atual do processo ativo na\n\t \t \t guia atual. Opcionalmente o número máximo de componentes do caminho\n\t \t \t pode ser especificado. Por exemplo, '%2d' para o máximo de dois componentes.\n\t %i\t -\t O índice da janela.\n\t %p\t -\t O nome do processo ativo na guia atual.\n\t %t\t -\t O título da guia atual.\n\t %%\t -\t O caractere '%'.
+White on Black	Terminal colors schema		Branco sobre Preto
+Error!	Terminal getString		Erro!
+New tab	Terminal TermWindow		Nova aba
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		O padrão especificando os títulos da guia. Os seguintes espaços reservados podem ser usados:\n
+Selected background	Terminal AppearancePrefView		Plano de fundo selecionado
+Decrease	Terminal TermWindow		Diminuir
+Create link here	Terminal TermView		Criar vínculo aqui
+Close	Terminal TermWindow		Fechar
+Text	Terminal AppearancePrefView		Texto
+Clear all	Terminal TermWindow		Limpar tudo
+Text encoding	Terminal TermWindow		Codificação de texto
+size	Terminal TermView		tamanho
+Close window	Terminal TermWindow		Fechar janela
+Save as default	Terminal TermWindow		Salvar como padrão
+Set tab title	Terminal TermWindow		Definir o título da guia
+Settings…	Terminal TermWindow		Configurações...
+Abort	Terminal Shell		Cancelar
+Edit	Terminal TermWindow		Editar
+Color:	Terminal AppearancePrefView		Cor:
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		O padrão especificando o título da janela. Os seguintes espaços reservados\npodem ser usados:\n
+Print	Terminal TermWindow		Imprimir
+Use text:	Terminal FindWindow		Utilizar texto:
+Cancel	Terminal TermWindow		Cancelar
+OK	Terminal TermApp		OK
+Find failed	Terminal TermWindow		Localizar falhou
+Search forward	Terminal FindWindow		Procurar até o final
+Edit tab title…	Terminal TermWindow		Editar título da guia…
+Find previous	Terminal TermWindow		Localizar anterior
+Tab title:	Terminal TermWindow		Título da guia:
+Find next	Terminal TermWindow		Localizar próximo
+Close active tab	Terminal TermWindow		Fechar a aba ativa
+Paste	Terminal TermWindow		Colar
+Save changes to this settings panel?	Terminal PrefWindow		Salvar as mudanças para este painel de configurações?
+Cancel	Terminal PrefWindow		Cancelar
+Shell 	Terminal TermWindow		Shell
+Save	Terminal PrefWindow		Salvar
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t %d\t -\t O diretório de trabalho atual do processo ativo.\n\t \t \t Opcionalmente o número máximo de componentes do caminho pode ser\n\t \t \t especificado. Por exemplo, '%2d' para, no máximo, dois componentes.\n\t %i\t -\t O índice da guia.\n\t %p\t -\t O nome do processo ativo.\n\t %%\t -\t O caractere '%'.
+Cancel	Terminal TermView		Cancelar
+Use default	Terminal SetTitleWindow		Usar padrão

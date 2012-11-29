@@ -1,14 +1,12 @@
-1	german	x-vnd.Be-WORK	2548258861
+1	german	x-vnd.Be-WORK	658966565
 Invalid argument: %s\n	Workspaces		Ungültiger Parameter: %s\n
 Quit	Workspaces		Beenden
 Workspaces	System name		Arbeitsflächen
 Change workspace count…	Workspaces		Anzahl der Arbeitsflächen ändern...
 Remove replicant	Workspaces		Replikant entfernen
 About Workspaces…	Workspaces		Über Arbeitsflächen...
-Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Arbeitsflächen\nvon %1 und %2.\n\nCopyright %3, Haiku.\n\nDie OPT-Taste schickt Fenster in den Hintergrund. Die STRG-Taste holt sie in den Vordergrund.\n
 Show window border	Workspaces		Fensterrahmen anzeigen
 Auto-raise	Workspaces		Automatisch nach vorn holen
-OK	Workspaces		OK
 Always on top	Workspaces		Immer im Vordergrund
 Live in the Deskbar	Workspaces		In der Deskbar anzeigen
 Show window tab	Workspaces		Fensterreiter anzeigen

@@ -22,6 +22,11 @@ local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
+local kernelDebugSources =
+	blue_screen.cpp
+	frame_buffer_console.cpp
+;
+
 BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	debug_uart_8250.cpp
 	arch_uart_8250.cpp
@@ -33,6 +38,11 @@ BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	arch_cpu.cpp
 	arch_mmu.cpp
 	arch_start_kernel.S
+
+	# Reuse a subset of kernel debugging.
+	kernel_stubs.cpp
+	$(kernelDebugSources)
+
 	$(librootArchObjects)
 	: -fno-pic
 	:
@@ -47,3 +57,6 @@ SEARCH on [ FGristFiles debug_uart_8250.cpp ]
 
 SEARCH on [ FGristFiles $(librootArchObjects) ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;
+
+SEARCH on [ FGristFiles $(kernelDebugSources) ]
+	= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;

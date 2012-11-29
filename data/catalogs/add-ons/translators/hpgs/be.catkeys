@@ -2,11 +2,11 @@
 Based on HPGS (http://hpgs.berlios.de)	ConfigView		Грунтуецца на распрацоўках праекту HPGS (http://hpgs.berlios.de)
 Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
 Error: Cannot process plot data %s\n	HPGSTranslator		Памылка: Немагчыма апрацаваць даныя малюнку %s\n
-HPGS image	HPGSTranslator		выява HPGS
+HPGS image	HPGSTranslator		Выява HPGS
 HPGSTranslator Settings	ConfigView		Наладкі канвертара HPGS
 Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Памылка: Немагчыма далучыць прыладу малявання да чытача: %s\n
-HPGS images	ConfigView		выявы HPGS
-HPGS images	HPGSTranslator		выявы HPGS
+HPGS images	ConfigView		Выявы HPGS
+HPGS images	HPGSTranslator		Выявы HPGS
 no hpgs\n	HPGSTranslator		не hpgs\n
 HPGS image translator	HPGSTranslator		Канвертар выяваў HPGS
 Write error %s\n	HPGSTranslator		Памылка запісу %s\n

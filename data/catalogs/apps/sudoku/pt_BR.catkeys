@@ -1,0 +1,34 @@
+1	portuguese (brazil)	x-vnd.Haiku-Sudoku	2463385585
+Restore snapshot	SudokuWindow		Restaurar instantâneo
+Could not set Sudoku:\n%s\n	SudokuWindow		Não foi possível definir Sudoku:\n%s\n
+Export as…	SudokuWindow		Exportar como…
+OK	SudokuWindow		OK
+New	SudokuWindow		Novo
+Abort	ProgressWindow		Cancelar
+Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		Não foi possível abrir \"%s\":\n%s\n
+Easy	SudokuWindow		Fácil
+Open file…	SudokuWindow		Abrir arquivo…
+Solve single field	SudokuWindow		Resolver único campo
+Solve	SudokuWindow		Resolver
+Redo	SudokuWindow		Refazer
+File	SudokuWindow		Arquivo
+Advanced	SudokuWindow		Avançado
+Start again	SudokuWindow		Iniciar novamente
+HTML	SudokuWindow		HTML
+Sudoku request	SudokuWindow		Solicitação Sudoku
+Copy	SudokuWindow		Copiar
+Mark valid hints	SudokuWindow		Marcar dicas válidas
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku resolvido - parabéns!\n
+Hard	SudokuWindow		Difícil
+Snapshot current	SudokuWindow		Instantâneo atual
+Text	SudokuWindow		Texto
+Creating solvable field	SudokuGenerator		Criando campo solucionável
+View	SudokuWindow		Visualizar
+Progress monitor	ProgressWindow		Monitor de progresso
+Mark invalid values	SudokuWindow		Marcar valores inválidos
+Blank	SudokuWindow		Vazio
+Help	SudokuWindow		Ajuda
+Searching for removable values	SudokuGenerator		Procurando por valores removíveis
+Undo	SudokuWindow		Desfazer
+Quit	SudokuWindow		Sair

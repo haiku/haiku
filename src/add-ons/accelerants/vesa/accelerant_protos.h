@@ -47,6 +47,8 @@ status_t vesa_set_dpms_mode(uint32 dpmsFlags);
 // cursor
 status_t vesa_set_cursor_shape(uint16 width, uint16 height, uint16 hotX,
 	uint16 hotY, uint8 *andMask, uint8 *xorMask);
+status_t vesa_set_cursor_bitmap(uint16 width, uint16 height, uint16 hotX,
+	uint16 hotY, uint32 colorSpace, uint16 bytesPerRow, uint8* bitmapData);
 void vesa_move_cursor(uint16 x, uint16 y);
 void vesa_show_cursor(bool is_visible);
 

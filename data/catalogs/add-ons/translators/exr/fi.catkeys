@@ -1,7 +1,9 @@
-1	finnish	x-vnd.Haiku-EXRTranslator	2253035870
+1	finnish	x-vnd.Haiku-EXRTranslator	106859695
 Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
 EXR image translator	EXRTranslator		EXR-kuvamuunnin
 Based on OpenEXR (http://www.openexr.com)	ConfigView		Perustuu OpenEXR-ohjelmistoon (http://www.openexr.com)
 EXR Settings	main		EXR-asetukset
+EXR images	EXRTranslator		EXR-kuvat
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		Lucasfilm Entertainment Company Ltd -yhtiön osasto
 EXR image	EXRTranslator		EXR-kuva
+EXR image translator	ConfigView		EXR-kuvamuunnin

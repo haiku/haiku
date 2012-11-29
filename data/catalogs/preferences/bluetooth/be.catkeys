@@ -2,17 +2,17 @@
 About Bluetooth…	Window		Пра праграму Bluetooth…
 Handheld	Settings view		Наладоннік
 Default inquiry time:	Settings view		Час стандартнага запыту:
-Manufacturer: 	Device View		Вытворца:
+Manufacturer: 	Device View		Вытворца: 
 Add device to list	Inquiry panel		Дадаць прыладу ў спіс
 Starting scan...	Inquiry panel		Пачаць пошук...
-Show bluetooth console…	Window		Паказаць кансоль Bluetooth
+Show bluetooth console…	Window		Паказаць кансоль Bluetooth…
 Smart phone	Settings view		Смартфон
 Server	Settings view		Сервер
 Stop bluetooth services…	Window		Спыніць службы Bluetooth…
 Identify host as:	Settings view		Ідэнтыфікаваць хост як:
 View	Window		Від
 Refresh…	Remote devices		Абнавіць…
-Pair…	Remote devices		Дадаць сапражэнне
+Pair…	Remote devices		Дадаць сапражэнне…
 Incoming connections policy:	Settings view		Палітыка уваходных падключэнняў:
 From all devices	Settings view		Ад усіх прылад
 Show name	Extended local device view		Паказаць імя
@@ -30,13 +30,13 @@ Start bluetooth services…	Window		Запусціць сервісы Bluetooth�
 Policy...	Settings view		Палітыка...
 61 secs	Settings view		61 сек
 Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Сістэма Bluetooth Haiku, (ARCE)\n\nСтварыў Oliver Ruiz Dorantes\n\nПры падтрымцы:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nПадзякі асобным людзям за дапамогу...\n\nЗабеспячэнне апаратнымі сродкамі:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nЭканамічныя аспекты:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nДаданні і выпраўленні:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nНеабходныя веды атрыманы ад:\n\t- the yellowTAB team
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		У сістэме не зарэгістравана ніякіх прылад (LocalDevice)
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		У сістэме не зарэгістравана ніякіх прылад (LocalDevice).
 Identify us as...	Settings view		Ідэнтыфікаваць сябе як...
  packets: 	Device View		 пакетаў: 
 As blocked	Remote devices		Як блакаваны
 Bluetooth	System name		Bluetooth
 Disconnect	Remote devices		Адключыцца
-Pick LocalDevice...	Settings view		Выбраць прыладу (LocalDevice)
+Pick LocalDevice...	Settings view		Выбраць прыладу (LocalDevice)…
 Defaults	Window		Прадвызначаныя
 Inquiry	Inquiry panel		Запыт
 Desktop	Settings view		Рабочы стол
@@ -46,9 +46,9 @@ Laptop	Settings view		Ноўтбук
 Discoverable	Extended local device view		Бачны для іншых
 Work offline	main		Працаваць непадключаным
 bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server не запушчаны. Запусціць ці застацца непадключаным
-Service classes: 	Device View		Класы сервісу:
+Service classes: 	Device View		Класы сервісу: 
 Connections & channels…	Window		Спіс злучэнняў і каналаў…
-Refresh LocalDevices…	Window		Абнавіць прылады (LocalDevices)
+Refresh LocalDevices…	Window		Абнавіць прылады (LocalDevices)…
 Settings	Window		Налады
 Only from trusted devices	Settings view		Толькі ад надзейных прылад
 Scanning progress	Inquiry panel		Прагрэс пошуку

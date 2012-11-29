@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-GLTeapot	3688092856
+1	swedish	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Övre mitten
 Lighting	TeapotWindow		Ljussättning
 Off	TeapotWindow		Av
@@ -9,6 +9,7 @@ Blue	TeapotWindow		Blå
 Gouraud shading	TeapotWindow		Gouraud skuggning
 Quit	TeapotWindow		Avsluta
 Filled polygons	TeapotWindow		Fyllda polygoner
+Settings	TeapotWindow		Inställningar
 Fog	TeapotWindow		Dimma
 Backface culling	TeapotWindow		Filtrera bort bakåtvända polygoner
 Z-buffered	TeapotWindow		Z-buffrad

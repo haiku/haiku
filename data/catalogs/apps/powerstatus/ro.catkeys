@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PowerStatus	751886234
+1	romanian	x-vnd.Haiku-PowerStatus	556468018
 Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model:
 Show percent	PowerStatus		Afișează procentaj
 Design capacity: 	PowerStatus		Capacitate model:
@@ -6,9 +6,7 @@ Type: 	PowerStatus		Tip:
 non-rechargeable	PowerStatus		nu este reîncărcabilă
 Empty battery slot	PowerStatus		Fantă liberă de baterie
 Run in window	PowerStatus		Rulează în fereastră
-About	PowerStatus		despre
 PowerStatus	System name		StareConsum
-PowerStatus	PowerStatus		StareConsum
 Battery info…	PowerStatus		Info baterie...
 Damaged battery	PowerStatus		Baterie deteriorată
 Show time	PowerStatus		Afișează oră
@@ -25,10 +23,8 @@ Capacity: 	PowerStatus		Capacitate:
 Battery discharging	PowerStatus		Se descarcă bateria
 Serial number: 	PowerStatus		Număr de serie:
 Capacity granularity 1: 	PowerStatus		Capacitate de granulozitate 1:
-OK	PowerStatus		OK
 OEM info: 	PowerStatus		Info OEM:
 Design voltage: 	PowerStatus		Voltaj model:
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		StareConsum\nscris de AxelDörfler, Clemens Zeidler\nDrepturi de autor 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Se încarcă bateria
 Design capacity warning: 	PowerStatus		Avertisment capacitate model:
 Battery info	PowerStatus		Info baterie

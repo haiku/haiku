@@ -1,0 +1,48 @@
+1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	3704566709
+P-faults	DataSource		P-falhas
+Media nodes	DataSource		Nós de mídia
+Threads	DataSource		Processos
+MB	DataSource		Mb
+Add graph	ActivityWindow		Adicionar grafo
+Teams	DataSource		Equipes
+Hide legend	ActivityView		Ocultar legenda
+Network send	DataSource		Rede enviados
+CPU usage (combined)	DataSource		Utilização da CPU (combinado)
+CPU	DataSource		CPU
+Used memory	DataSource		Memória utilizada
+Cached memory	DataSource		Memória em cache
+Apps	DataSource		Aplicativos
+Show legend	ActivityView		Exibir legendas
+Text clipboard	DataSource		Área de transferência de texto
+Settings	ActivityWindow		Configurações
+Receiving	DataSource		Recebendo
+Settings…	ActivityWindow		Configurações...
+Ports	DataSource		Portas
+Page faults	DataSource		Falha de página
+Sending	DataSource		Enviando
+Cache	DataSource		Cache
+%.1f faults/s	DataSource		%.1f falhas/s
+Update time interval:	SettingsWindow		Intervalo entre atualizações
+TX	DataSource	Shorter version for Sending	TX
+Quit	ActivityWindow		Sair
+Block cache memory	DataSource		Bloquear memória em cache
+Remove graph	ActivityView		Remover grafo
+%.1f MB	DataSource		%.1f MB
+%lld sec.	SettingsWindow		%lld seg.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		Utilização da CPU
+Raw clipboard	DataSource		Área de transferência bruta
+Sems	DataSource		Sems
+ActivityMonitor	System name		Monitor Ativo
+Running applications	DataSource		Aplicativos em utilização
+Semaphores	DataSource		Semáforos
+Block cache	DataSource		Bloquear cache
+Swap space	DataSource		Espaço Swap
+Swap	DataSource		Swap
+File	ActivityWindow		Arquivo
+usage	DataSource		uso
+Additional items	ActivityView		Itens adicionais
+Network receive	DataSource		Recebimento de rede
+%.1f KB/s	DataSource		%.1f Kb/s
+Memory	DataSource		Memória
+RX	DataSource	Shorter version for Receiving.	RX

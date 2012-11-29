@@ -10,20 +10,20 @@ OK	GeneralView		Valmis
 Events are not notified	GeneralView		Tapahtumia ei ole ilmoitettu
 Save	PrefletWin		Tallenna
 Type	NotificationView		Tyyppi
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoituksia ei voi pysäyttää, koska palvelinta ei tavoiteta.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Ei voida ottaa käyttöön ilmoituksia, koska palvelinta ei löydy.\nTämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoitusten pysäyttäminen epäonnistui, koska palvelinta ei tavoiteta.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoitusten käyttöönotto epäonnistui, koska palvelinta ei löydy.\nTämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
 OK	NotificationView		Valmis
 Important	NotificationView		Tärkeä
-Cannot disable notifications because the server can't be reached.	GeneralView		Ei voi ottaa pois käytöstä ilmoituksia, koska palvelinta ei tavoiteta.
+Cannot disable notifications because the server can't be reached.	GeneralView		Ilmoitusten ottaminen pois käytöstä epäonnistui, koska palvelinta ei tavoiteta.
 Progress	NotificationView		Edistyminen
 Last Received	NotificationView		Viimeksi vastaanotettu
 General	PrefletView		Yleistä
 Display	PrefletView		Näyttö
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Et voi ottaa käyttöön ilmoituksia käynnistysaikana. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Ilmoitusten ottaminen käyttöön käynnistysaikana epäonnistui. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
 Search:	NotificationView		Etsintä:
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Ilmoituspalvelinta ei löytynyt.\nMahdollinen syy on, että asennusta ei ole tehty oikein
 Allowed	NotificationView		Sallittu
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Et voi tallentaa asetuksia. Sinulla ei luultavasti ole kirjoitusoikeutta asetushakemistoon tai levyasema on täynnä.
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Asetusten tallentaminen epäonnistui. Sinulla ei luultavasti ole kirjoitusoikeutta asetushakemistoon tai levyasema on täynnä.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
 Yes	NotificationView		Kyllä
 Large icon	DisplayView		Suuri kuvake
@@ -40,7 +40,7 @@ Application	NotificationView		Sovellus
 Enabled	NotificationView		Otettu käyttöön
 OK	DisplayView		Valmis
 Unknown	NotificationView		Tuntematon
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Ei voi tallentaa asetuksia. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Asetusten tallentaminen epäonnistui. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
 Enable notifications at startup	GeneralView		Ota käyttöön ilmoitukset käynnistymisen yhteydessä

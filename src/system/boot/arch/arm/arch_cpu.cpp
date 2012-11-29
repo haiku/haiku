@@ -87,6 +87,20 @@ check_cpu_features()
 }
 
 
+void
+arch_cpu_memory_read_barrier(void)
+{
+	asm volatile ("" : : : "memory");
+}
+
+
+void
+arch_cpu_memory_write_barrier(void)
+{
+	asm volatile ("" : : : "memory");
+}
+
+
 extern "C" void
 arch_spin(bigtime_t microseconds)
 {

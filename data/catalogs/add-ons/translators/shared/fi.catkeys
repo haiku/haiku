@@ -2,4 +2,4 @@
 Error	TranslatorWindow		Virhe
 OK	TranslatorWindow		Valmis
 Be Bitmap Format	BaseTranslator		Be Bitmap -muoto
-Unable to create the view.	TranslatorWindow		Näkymää ei kyetä luomaan.
+Unable to create the view.	TranslatorWindow		Näkymän luominen epäonnistui.

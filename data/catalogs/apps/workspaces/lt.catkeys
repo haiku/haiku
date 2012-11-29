@@ -1,14 +1,12 @@
-1	lithuanian	x-vnd.Be-WORK	2548258861
+1	lithuanian	x-vnd.Be-WORK	658966565
 Invalid argument: %s\n	Workspaces		Netinkamas argumentas: %s\n
 Quit	Workspaces		Baigti darbą
 Workspaces	System name		Darbalaukiai
 Change workspace count…	Workspaces		Keisti darbalaukių skaičių…
 Remove replicant	Workspaces		Pašalinti replikantą
 About Workspaces…	Workspaces		Apie Darbalaukių keitiklį…
-Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Darbalaukiai\nparašė %1 ir %2.\n\n© %3, Haiku.\n\nNuleisti langus žemiau galite, juos spustelėdami, laikydami nuspaustą Alt klavišą.\nIškelti langus aukščiau galite, juos spustelėdami, laikydami nuspaustą Vald klavišą.\n
 Show window border	Workspaces		Rodyti lango rėmelį
 Auto-raise	Workspaces		Automatiškai iškelti
-OK	Workspaces		Gerai
 Always on top	Workspaces		Visuomet viršuje
 Live in the Deskbar	Workspaces		Patalpinti pranešimų srityje
 Show window tab	Workspaces		Rodyti lango antraštę

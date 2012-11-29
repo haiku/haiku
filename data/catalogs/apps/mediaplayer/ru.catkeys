@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	442582160
+1	russian	x-vnd.Haiku-MediaPlayer	2969013755
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -112,7 +112,7 @@ Error: 	MediaPlayer-Main		Ошибка:
 Large	MediaPlayer-SettingsWindow		крупный
 Bottom of video	MediaPlayer-SettingsWindow		нижняя часть видео
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
-Stop	MediaPlayer-Main		Стоп
+Stop	MediaPlayer-Main		Остановить
 <unnamed media>	MediaPlayer-InfoWin		<безымянное медиа>
 raw video	MediaPlayer-InfoWin		необработанное видео
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
@@ -124,6 +124,7 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Переместить в кор�
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Выключить звук
 Toggle pause/play.	MediaPlayer-Main		Переключить паузу/проигрывание.
+Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
 min	MediaPlayer-InfoWin	Minutes	мин
 Small	MediaPlayer-SettingsWindow		маленький
 Randomize	MediaPlayer-PlaylistWindow		Перемешать

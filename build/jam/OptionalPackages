@@ -1749,9 +1749,7 @@ if [ IsOptionalHaikuImagePackageAdded Puri ] {
 
 # Python
 if [ IsOptionalHaikuImagePackageAdded Python ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Python available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				python-2.6.8-r1a4-x86-gcc4-2012-09-03.zip
@@ -1763,6 +1761,13 @@ if [ IsOptionalHaikuImagePackageAdded Python ] {
 				: $(baseURL)/python-2.6.8-r1a4-x86-gcc2-2012-08-30.zip
 				: : true ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			python-2.6.8-x86_64-2012-11-28.zip
+			: $(baseURL)/python-2.6.8-x86_64-2012-11-28.zip
+			: : true ;
+	} else {
+		Echo "No optional package Python available for $(TARGET_ARCH)" ;
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2012, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -121,6 +121,7 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fAccInvertRect(NULL),
 	fAccScreenBlit(NULL),
 	fAccSetCursorShape(NULL),
+	fAccSetCursorBitmap(NULL),
 	fAccMoveCursor(NULL),
 	fAccShowCursor(NULL),
 
@@ -372,6 +373,8 @@ AccelerantHWInterface::_SetupDefaultHooks()
 	// cursor
 	fAccSetCursorShape
 		= (set_cursor_shape)fAccelerantHook(B_SET_CURSOR_SHAPE, NULL);
+	fAccSetCursorBitmap
+		= (set_cursor_bitmap)fAccelerantHook(B_SET_CURSOR_BITMAP, NULL);
 	fAccMoveCursor = (move_cursor)fAccelerantHook(B_MOVE_CURSOR, NULL);
 	fAccShowCursor = (show_cursor)fAccelerantHook(B_SHOW_CURSOR, NULL);
 
@@ -1328,19 +1331,45 @@ AccelerantHWInterface::HideOverlay(Overlay* overlay)
 // #pragma mark - cursor
 
 
-
 void
 AccelerantHWInterface::SetCursor(ServerCursor* cursor)
 {
 	HWInterface::SetCursor(cursor);
-//	if (LockExclusiveAccess()) {
-		// TODO: implement setting the hard ware cursor
-		// NOTE: cursor should be always B_RGBA32
-		// NOTE: The HWInterface implementation should
-		// still be called, since it takes ownership of
-		// the cursor.
-//		UnlockExclusiveAccess();
-//	}
+		// HWInterface claims ownership of cursor.
+
+	// cursor should never be NULL, but let us be safe!!
+	if (cursor == NULL || LockExclusiveAccess() == false)
+		return;
+
+	if (cursor->CursorData() != NULL && fAccSetCursorShape != NULL) {
+		// BeOS BCursor, 16x16 monochrome
+		uint8 size = cursor->CursorData()[0];
+		// CursorData()[1] is color depth (always monochrome)
+		uint8 xHotSpot = cursor->CursorData()[2];
+		uint8 yHotSpot = cursor->CursorData()[3];
+
+		// Create pointers to the cursor and/xor bit arrays
+		const uint8* andMask = cursor->CursorData() + 4;
+		const uint8* xorMask = cursor->CursorData() + 36;
+
+		// Time to talk to the accelerant!
+		fHardwareCursorEnabled = fAccSetCursorShape(size, size, xHotSpot,
+			yHotSpot, andMask, xorMask) == B_OK;
+	} else if (fAccSetCursorBitmap != NULL) {
+		// Bitmap cursor
+		uint16 xHotSpot = (uint16)cursor->GetHotSpot().x;
+		uint16 yHotSpot = (uint16)cursor->GetHotSpot().y;
+
+		uint16 width = (uint16)cursor->Bounds().Width();
+		uint16 height = (uint16)cursor->Bounds().Height();
+
+		// Time to talk to the accelerant!
+		fHardwareCursorEnabled = fAccSetCursorBitmap(width, height, xHotSpot,
+			yHotSpot, cursor->ColorSpace(), (uint16)cursor->BytesPerRow(),
+			cursor->Bits()) == B_OK;
+	}
+
+	UnlockExclusiveAccess();
 }
 
 
@@ -1348,10 +1377,15 @@ void
 AccelerantHWInterface::SetCursorVisible(bool visible)
 {
 	HWInterface::SetCursorVisible(visible);
-//	if (LockExclusiveAccess()) {
-		// TODO: update graphics hardware
-//		UnlockExclusiveAccess();
-//	}
+
+	if (fHardwareCursorEnabled && LockExclusiveAccess()) {
+		if (fAccShowCursor != NULL)
+				fAccShowCursor(visible);
+		else
+			fHardwareCursorEnabled = false;
+
+		UnlockExclusiveAccess();
+	}
 }
 
 
@@ -1359,10 +1393,15 @@ void
 AccelerantHWInterface::MoveCursorTo(float x, float y)
 {
 	HWInterface::MoveCursorTo(x, y);
-//	if (LockExclusiveAccess()) {
-		// TODO: update graphics hardware
-//		UnlockExclusiveAccess();
-//	}
+
+	if (fHardwareCursorEnabled && LockExclusiveAccess()) {
+		if (fAccMoveCursor != NULL)
+				fAccMoveCursor((uint16)x, (uint16)y);
+		else
+			fHardwareCursorEnabled = false;
+
+		UnlockExclusiveAccess();
+	}
 }
 
 
@@ -1420,11 +1459,8 @@ AccelerantHWInterface::_CopyBackToFront(/*const*/ BRegion& region)
 void
 AccelerantHWInterface::_DrawCursor(IntRect area) const
 {
-	// use the default implementation for now,
-	// until we have a hardware cursor
-	HWInterface::_DrawCursor(area);
-	// TODO: this would only be called, if we don't have
-	// a hardware cursor for some reason
+	if (!fHardwareCursorEnabled)
+		HWInterface::_DrawCursor(area);
 }
 
 

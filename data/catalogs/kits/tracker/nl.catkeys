@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	344678808
+1	dutch; flemish	x-vnd.Haiku-libtracker	1301055003
 common	B_COMMON_DIRECTORY		algemeen
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
@@ -15,11 +15,14 @@ Decrease size	ContainerWindow		Grootte verminderen
 Mini icon view	VolumeWindow		Mini-icoonweergave
 You must have at least one attribute showing.	PoseView		Er moet minstens één eigenschap weergegeven worden.
 Permissions	InfoWindow		Machtigingen
+128 x 128	DeskWindow		128 x 128
 Invert selection	VolumeWindow		Selectie omkeren
+128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Recente documenten
 Modified	QueryPoseView		Gewijzigd
 Created	ContainerWindow		Gemaakt
 Error %error loading add-On %name.	ContainerWindow		Fout %error bij het laden van invoegtoepassing %name.
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Als u %ifYouDoAction op de instellingenmap, kan %osName niet correct functioneren!\n\nWeet u zeker dat u dit wilt doen?
 contains	SelectionWindow		bevat
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Sorry, u kunt geen zaken opslaan in de root van uw systeem.
 Show shared volumes on Desktop	SettingsView		Toon gedeelde gegevensdragers op het bureaublad
@@ -39,6 +42,7 @@ Make active printer	ContainerWindow		Actieve printer maken
 Create link here	ContainerWindow		Maak hier een koppeling
 Moving: 	StatusWindow		Verplaatsen:
 before	FindPanel		voor
+Error emptying Trash	FSUtils		Fout bij het leegmaken van de prullenbak
 On	FindPanel		Naar
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		groter dan
@@ -47,6 +51,7 @@ Select all	ContainerWindow		Alles selecteren
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Sorry, de 'Karakter' attribuut kan geen glyph van meerdere bytes opslaan.
 Clean up	DeskWindow		Opruimen
 You cannot copy or move the root directory.	FSUtils		U kunt de rootmap niet kopiëren of verplaatsen.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed van %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Selectie omkeren
 Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Naam wijzigen
 save text	FilePanelPriv		sla tekst op
@@ -76,6 +81,7 @@ Decrease size	DeskWindow		Grootte verminderen
 Size	ContainerWindow		Grootte
 All disks	AutoMounterSettings		Alle schijven
 Would you like to find some other suitable application?	FSUtils		Wilt u een andere geschikte toepassing zoeken?
+Finish: %time - %finishtime left	StatusWindow		Einde: %time - %finishtime resterend
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		\"%document\" kon niet geopend worden met toepassing \"%app\" (Ontbrekende bibliotheken: %library).\n
 no items	CountView		geen items
 Ignore case	SelectionWindow		Niet hoofd-/kleine lettergevoelig
@@ -87,7 +93,9 @@ Cut	FilePanelPriv		Knippen
 Replace	FilePanelPriv		Vervangen
 Select all	VolumeWindow		Alles selecteren
 Opens with:	InfoWindow		Wordt geopend met:
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Als u %ifYouDoAction op de mime-instellingen, kan het zijn dat %osName niet goed  kan functioneren!\n\nWeet u zeker dat u dit wilt doen?
 Open	ContainerWindow		Openen
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Fout bij het berekenen van de mapgrootte
 New folder	FilePanelPriv		Nieuwe map
 %name info	InfoWindow	InfoWindow Title	%name info
@@ -115,6 +123,7 @@ Move to Trash	ContainerWindow		Verplaatsen naar prullenbak
 Move to	ContainerWindow		Verplaatsen naar
 Create %s clipping	PoseView		Maak %s clipping
 Set new link target	InfoWindow		Nieuw linkdoel instellen
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Als u %ifYouDoAction de systeemmap of de inhoud, dan kunt u %osName niet langer opstarten!\n\nWeet u zeker dat u dit wilt doen?\n\nOm toch %toDoAction de systeemmap of de inhoud te doen, houd de Shift-toets vast en klik \"%toConfirmAction\".
 Save as Query template:	FindPanel		Opslaan als zoekopdracht-sjabloon:
 preferences	B_PREFERENCES_DIRECTORY		voorkeuren
 Cancel	FSUtils		Annuleren
@@ -131,12 +140,14 @@ OK	TrackerInitialState		Oké
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" kon niet geopend worden. Het bestand is ten onrechte aangeduid als uitvoerbaar.
 Add-ons	ContainerWindow		Invoegtoepassingen
 Edit templates…	TemplatesMenu		Wijzig sjablonen...
+Finish: %time - Over %finishtime left	StatusWindow		Einde: %time - Meer dan %finishtime resterend
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Er bestaat al een item \"%name\" in deze map. Wilt u het vervangen door het gelinkte bestand dat u aan het maken bent?
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Sorry, er is niet genoeg vrije ruimte op het bestemmingsvolume om de selectie te kopiëren.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" kon niet met \"%app\" geopend worden (%error).
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Sorry, meer dan één item opslaan is niet toegestaan.
 Searching for disks to mount…	StatusWindow		Bezig met het zoeken naar schijven om te betrekken...
 New folder	FSUtils		Nieuwe map
+If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Als u %ifYouDoAction de common map, dan kan %osName wellicht niet meer correct functioneren\n\nWeet u zeker dat u dit wilt doen?\n\nOm toch %toDoAction de common map, houd de Shift-toets ingedrukt en klik \"%toConfirmAction\".
 Free space color	SettingsView		Kleur voor vrije ruimte
 Cut	ContainerWindow		Knippen
 Remove	FindPanel		Verwijderen
@@ -246,9 +257,11 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 Cancel	ContainerWindow		Annuleren
 Only the boot disk	AutoMounterSettings		Alleen de opstartschijf
 Trash	TrackerSettingsWindow		Prullenbak
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Als u %ifYouDoAction de config map, dan kan %osName wellicht niet meer correct functioneren!\n\nWeet u zeker dat u dit wilt doen?
 Unmount	ContainerWindow		Onttrekken
 Copy layout	ContainerWindow		Indeling kopiëren
 label too long	PoseView		label te lang
+Finish: %time	StatusWindow		Voltooid: %time
 Cancel	Tracker		Annuleren
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Sorry, je kunt dit attribuut niet wijzigen.
 Name	ContainerWindow		Naam
@@ -305,6 +318,7 @@ The Tracker must be running to see Info windows.	PoseView		Tracker moet actief z
 Other	FilePermissionsView		Andere
 Query name:	FindPanel		Zoekopdracht-naam:
 Permissions	ContainerWindow		Machtigingen
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		bezig met verplaatsen
 Identify	InfoWindow		Identificeer
 Recent folders	ContainerWindow		Recente mappen
@@ -330,6 +344,7 @@ Handles any file	OpenWithWindow		Behandelt elk bestand
 Get info	FilePanelPriv		Informatie ophalen
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Annuleren
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		De toepassing \"%appname\" ondersteunt niet het type document dat u zodadelijk gaat openen.\nWeet u zeker dat u door wilt gaan?n\nAls u zeker weet dat de toepassing dit bestandstype ondersteunt, dan zou u contact met de ontwikkelaar op kunnen nemen om hen te vragen de lijst van ondersteunde bestanden voor hun toepassing bij te werken.
 Disks	DirMenu		Schijven
 New folder %ld	FSUtils		Nieuwe map %ld
 All BeOS disks	AutoMounterSettings		Alle BeOS-schijven
@@ -363,9 +378,11 @@ Modified	FindPanel		Gewijzigd
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fout bij het verplaatsen van \"%name\" naar de prullenbak. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		U kunt een map niet vervangen door een van zijn submappen.
 <No recent items>	FavoritesMenu		<Geen recente items>
+Preferences…	ContainerWindow		Voorkeuren…
 Move	PoseView		Verplaatsen
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Bent u zeker dat u het/de geselecteerde item(s) wilt verwijderen? Deze actie kan niet ongedaan gemaakt worden.
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Als u %ifYouDoAction de home map, kan %osName wellicht niet correct functioneren!\n\nWeet u zeker dat u dit wilt doen?\n\nOm toch %toDoAction de home map, houd de Shift-toets ingedrukt en klik op \"%toConfirmAction\".
 Add-ons	DeskWindow		Invoegtoepassingen
 Name	FindPanel		Naam
 And	FindPanel		En

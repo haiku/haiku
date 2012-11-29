@@ -1,13 +1,13 @@
 1	german	x-vnd.Haiku-WebPositive	1513721873
 Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
-Copy URL to clipboard	Download Window		Adresse in Zwischenablage kopieren
+Copy URL to clipboard	Download Window		Adresse kopieren
 Cancel	Settings Window		Abbrechen
 Close window	WebPositive Window		Fenster schließen
 Quit	WebPositive		Beenden
 The download could not be opened.	Download Window		Die heruntergeladene Datei kann nicht geöffnet werden.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Der Download-Ordner kann nicht geöffnet werden.\n\nFehler: %error
-Open location	WebPositive Window		Speicherort öffnen
+Open location	WebPositive Window		URL öffnen
 Clear history	WebPositive Window		Verlauf leeren
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Gestern
@@ -24,7 +24,7 @@ Decrease size	WebPositive Window		Verkleinern
 Serif font:	Settings Window		Serifenschrift:
 Loading %url	WebPositive Window		%url wird geladen
 Page source	WebPositive Window		Quelltext der Seite
-Next	WebPositive Window		Weiter
+Next	WebPositive Window		Vorwärts
 Find next	WebPositive Window		Nächster Treffer
 Download folder:	Settings Window		Download-Ordner:
 Edit	WebPositive Window		Bearbeiten

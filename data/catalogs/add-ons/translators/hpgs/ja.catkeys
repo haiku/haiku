@@ -8,5 +8,5 @@ Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		エラー: リ�
 HPGS images	ConfigView		HPGS イメージ
 HPGS images	HPGSTranslator		HPGS イメージ
 no hpgs\n	HPGSTranslator		hpgs がありません\n
-HPGS image translator	HPGSTranslator		HPGS イメージトランスレータ
+HPGS image translator	HPGSTranslator		HPGS イメージトランスレーター
 Write error %s\n	HPGSTranslator		書き込みエラー %s\n

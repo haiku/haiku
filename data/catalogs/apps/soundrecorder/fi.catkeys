@@ -1,10 +1,10 @@
 1	finnish	x-vnd.Haiku-SoundRecorder	2149017672
 Loop	RecorderWindow		Silmukka
-Cannot find default audio hardware	RecorderWindow		Ei kyetä löytämään oletusäänilaitetta
+Cannot find default audio hardware	RecorderWindow		Oletusäänilaitteen löytäminen epäonnistui
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Ei kyetä löytämään tilapäistä tiedostoa, joka luotiin säilyttämään uusi äänitys.
 Sample size:	RecorderWindow		Näytekoko:
 Nothing to play	RecorderWindow		Ei mitään soitettavaa
-Duration: 	RecorderWindow		Kesto:
+Duration: 	RecorderWindow		Kesto: 
 Some of the files don't appear to be audio files	RecorderWindow		Jotkut tiedostot eivät tunnu olevan äänitiedostoja
 File info	RecorderWindow		Tiedostotiedot
 Drop files here	SoundListView		Pudota tiedostot tänne
@@ -12,7 +12,7 @@ Input	RecorderWindow		Syöte
 Stop	RecorderWindow		Pysäytä
 Format:	RecorderWindow		Muoto:
 Sound List	RecorderWindow		Ääniluettelo
-Compression: 	RecorderWindow		Tiivistys:
+Compression: 	RecorderWindow		Tiivistys: 
 Rewind	RecorderWindow		Takaisinkelaus
 Sample rate:	RecorderWindow		Näytetaajuus:
 Invalid audio files	RecorderWindow		Virheelliset äänitiedostot
@@ -24,22 +24,22 @@ Input:	RecorderWindow		Syöte:
 Forward	RecorderWindow		Eteenpäin
 Play	RecorderWindow		Soita
 SoundRecorder	System name		Äänitalletin
-Channels:	RecorderWindow		Kanavat;
- bits	RecorderWindow		bittiä
+Channels:	RecorderWindow		Kanavat:
+ bits	RecorderWindow		 bittiä
 None	RecorderWindow		Ei mitään
 Record	RecorderWindow		Äänitä
-Sample size: 	RecorderWindow		Näytekoko:
-Cannot recognize this file as a media file	RecorderWindow		Ei kyetä tunnistamaan tätä tiedostoa mediatiedostoksi
-Format: 	RecorderWindow		Muoto:
-File name: 	RecorderWindow		Tiedostonimi:
-Cannot connect to the selected sound input	RecorderWindow		Ei kyetä yhdistämään valittuun äänisyötteeseen
-Cannot get the file to play	RecorderWindow		Ei kyetä hakemaan tiedostoa soitettavaksi
+Sample size: 	RecorderWindow		Näytekoko: 
+Cannot recognize this file as a media file	RecorderWindow		Tämän tiedoston tunnistaminen mediatiedostoksi epäonnistui
+Format: 	RecorderWindow		Muoto: 
+File name: 	RecorderWindow		Tiedostonimi: 
+Cannot connect to the selected sound input	RecorderWindow		Valittuun äänisyötteeseen yhdistäminen epäonnistui
+Cannot get the file to play	RecorderWindow		Tiedoston hakeminen soitettavaksi epäonnistui
 Cannot record a sound that long	RecorderWindow		Ei voida äänittää niin pitkää äänitystä
 Duration:	RecorderWindow		Kesto:
 Compression:	RecorderWindow		Tiivistys:
-Cannot find an unused name to use for the new recording	RecorderWindow		Ei kyetä löytämää käyttämätöntä nimeä käytettäväksi uuteen äänitykseen
-Channels: 	RecorderWindow		Kanavat
+Cannot find an unused name to use for the new recording	RecorderWindow		Uuteen äänitykseen käytettävän käyttämättömän nimen löytäminen epäonnistui
+Channels: 	RecorderWindow		Kanavat: 
 Save	RecorderWindow		Tallenna
-Sample rate: 	RecorderWindow		Näytetaajuus:
-Cannot connect to media server	RecorderWindow		Ei voi yhdistää mediapalvelimeen
+Sample rate: 	RecorderWindow		Näytetaajuus: 
+Cannot connect to media server	RecorderWindow		Mediapalvelimeen yhdistäminen epäonnistui
 File name:	RecorderWindow		Tiedostonimi:

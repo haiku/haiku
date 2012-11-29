@@ -599,12 +599,6 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	scsiData.write_bus16 = true;
 	scsiData.write_bus32 = false;
 	scsiData.relative_address = false;
-	memcpy(scsiData.vendor_ident, ataData.model_number,
-		sizeof(scsiData.vendor_ident));
-	memcpy(scsiData.product_ident, ataData.model_number + 8,
-		sizeof(scsiData.product_ident));
-	memcpy(scsiData.product_rev, ataData.serial_number,
-		sizeof(scsiData.product_rev));
 
 	if (!fIsATAPI) {
 		bool lba = ataData.dma_supported != 0;
@@ -644,6 +638,17 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	TRACE("serial number: %s\n", serialNumber);
 	TRACE("firmware rev.: %s\n", firmwareRev);
 	TRACE("trim support: %s\n", fTrim ? "yes" : "no");
+
+	// There's not enough space to fit all of the data in. ATA has 40 bytes for
+	// the model number, 20 for the serial number and another 8 for the
+	// firmware revision. SCSI has room for 8 for vendor ident, 16 for product
+	// ident and another 4 for product revision. We just try and fit in as much
+	// as possible of the model number into the vendor and product ident fields
+	// and put a little of the serial number into the product revision field.
+	memcpy(scsiData.vendor_ident, modelNumber, sizeof(scsiData.vendor_ident));
+	memcpy(scsiData.product_ident, modelNumber + 8,
+		sizeof(scsiData.product_ident));
+	memcpy(scsiData.product_rev, serialNumber, sizeof(scsiData.product_rev));
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData,
 			sizeof(scsiData)) < B_OK) {

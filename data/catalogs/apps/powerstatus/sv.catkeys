@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PowerStatus	3419486861
+1	swedish	x-vnd.Haiku-PowerStatus	3224068645
 Design capacity low warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
 Show percent	PowerStatus		Visa procent
 Design capacity: 	PowerStatus		Tillverkningskapacitet:
@@ -8,9 +8,7 @@ non-rechargeable	PowerStatus		Ej uppladdningsbar
 Empty battery slot	PowerStatus		Tomt batterifack
  mV	PowerStatus		 mV
 Run in window	PowerStatus		Kör i fönster
-About	PowerStatus		Om
 PowerStatus	System name		BatteriStatus
-PowerStatus	PowerStatus		BatteriStatus
  mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Batteriinformation...
 Damaged battery	PowerStatus		Skadat batteri
@@ -30,10 +28,8 @@ Capacity: 	PowerStatus		Kapacitet:
 Battery discharging	PowerStatus		Laddar ur batteriet
 Serial number: 	PowerStatus		Serienummer:
 Capacity granularity 1: 	PowerStatus		Kapacitetskornighet 1:
-OK	PowerStatus		OK
 OEM info: 	PowerStatus		OEM information:
 Design voltage: 	PowerStatus		Tillverkningsspänning:
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		BatteriStatus\nskrivet av Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Battery charging	PowerStatus		Laddar batteri
 Design capacity warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
 Battery info	PowerStatus		Batteriinformation

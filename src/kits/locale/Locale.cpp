@@ -14,7 +14,6 @@
 #include <LanguagePrivate.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
-#include <MutableLocaleRoster.h>
 #include <TimeZone.h>
 
 #include <ICUWrapper.h>
@@ -59,7 +58,7 @@ BLocale::BLocale(const BLocale& other)
 /*static*/ const BLocale*
 BLocale::Default()
 {
-	return &BPrivate::RosterData::Default()->fDefaultLocale;
+	return BLocaleRoster::Default()->GetDefaultLocale();
 }
 
 

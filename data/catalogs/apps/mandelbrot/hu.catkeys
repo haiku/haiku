@@ -1,10 +1,10 @@
 1	hungarian	x-vnd.Haiku-Mandelbrot	3766380907
 File	Mandelbrot		Fájl
-Iterations	Mandelbrot		Iterációk
-Mandelbrot	System name		Mandelbrot
-Palette	Mandelbrot		Paletta
-Palette 1	Mandelbrot		1. paletta
-Palette 2	Mandelbrot		2. paletta
 Palette 3	Mandelbrot		3. paletta
-Palette 4	Mandelbrot		4. paletta
 Quit	Mandelbrot		Kilépés
+Palette 2	Mandelbrot		2. paletta
+Palette 4	Mandelbrot		4. paletta
+Palette	Mandelbrot		Paletta
+Mandelbrot	System name		Mandelbrot
+Palette 1	Mandelbrot		1. paletta
+Iterations	Mandelbrot		Iterációk
