@@ -13,6 +13,7 @@
 #include "GLView.h"
 
 #include "bitmap_wrapper.h"
+#include "SoftwareWinsys.h"
 extern "C" {
 #include "glapi/glapi.h"
 #include "main/context.h"
@@ -136,96 +137,6 @@ round_up(unsigned n, unsigned multiple)
 }
 
 
-/* winsys hooks */
-
-
-static void
-hook_winsys_destroy(struct sw_winsys* winsys)
-{
-	CALLED();
-	FREE(winsys);
-}
-
-
-static boolean
-hook_winsys_is_displaytarget_format_supported(struct sw_winsys* winsys,
-	unsigned tex_usage, enum pipe_format format)
-{
-	CALLED();
-	// TODO STUB
-	return false;
-}
-
-
-static struct sw_displaytarget*
-hook_winsys_displaytarget_create(struct sw_winsys* winsys, unsigned tex_usage,
-	enum pipe_format format, unsigned width, unsigned height,
-	unsigned alignment, unsigned* stride)
-{
-	CALLED();
-	// TODO STUB
-	return NULL;
-}
-
-
-static struct sw_displaytarget*
-hook_winsys_displaytarget_from_handle(struct sw_winsys* winsys,
-	const struct pipe_resource* templat, struct winsys_handle* whandle,
-	unsigned* stride)
-{
-	CALLED();
-	// TODO STUB
-	return NULL;
-}
-
-
-static boolean
-hook_winsys_displaytarget_get_handle(struct sw_winsys* winsys,
-	struct sw_displaytarget* disptarget, struct winsys_handle* whandle)
-{
-	CALLED();
-	// TODO STUB
-	return false;
-}
-
-
-static void*
-hook_winsys_displaytarget_map(struct sw_winsys* winsys,
-	struct sw_displaytarget* disptarget, unsigned flags)
-{
-	CALLED();
-	// TODO STUB
-	return NULL;
-}
-
-
-static void
-hook_winsys_displaytarget_unmap(struct sw_winsys* winsys,
-	struct sw_displaytarget* disptarget)
-{
-	CALLED();
-	// TODO STUB
-}
-
-
-static void
-hook_winsys_displaytarget_display(struct sw_winsys* winsys,
-	struct sw_displaytarget* disptarget, void* context_private)
-{
-	CALLED();
-	// TODO STUB
-}
-
-
-static void
-hook_winsys_displaytarget_destroy(struct sw_winsys* winsys,
-	struct sw_displaytarget* disptarget)
-{
-	CALLED();
-	// TODO STUB
-}
-
-
 static int
 hook_stm_get_param(struct st_manager *smapi, enum st_manager_param param)
 {
@@ -282,25 +193,13 @@ GalliumContext::CreateScreen()
 {
 	CALLED();
 
-	struct sw_winsys* winsys = CALLOC_STRUCT(sw_winsys);
+	// Allocate winsys and attach callback hooks
+	struct sw_winsys* winsys = winsys_connect_hooks();
 
 	if (!winsys) {
-		ERROR("%s: Couldn't alloc sw_winsys!\n", __FUNCTION__);
+		ERROR("%s: Couldn't allocate sw_winsys!\n", __func__);
 		return B_ERROR;
 	}
-
-	// Attach winsys hooks for Haiku
-	// gdi_create_sw_winsys is a good Mesa example
-	winsys->destroy = hook_winsys_destroy;
-	winsys->is_displaytarget_format_supported
-		= hook_winsys_is_displaytarget_format_supported;
-	winsys->displaytarget_create = hook_winsys_displaytarget_create;
-	winsys->displaytarget_from_handle = hook_winsys_displaytarget_from_handle;
-	winsys->displaytarget_get_handle = hook_winsys_displaytarget_get_handle;
-	winsys->displaytarget_map = hook_winsys_displaytarget_map;
-	winsys->displaytarget_unmap = hook_winsys_displaytarget_unmap;
-	winsys->displaytarget_display = hook_winsys_displaytarget_display;
-	winsys->displaytarget_destroy = hook_winsys_displaytarget_destroy;
 
 	#if USE_LLVMPIPE
 	fScreen = llvmpipe_create_screen(winsys);

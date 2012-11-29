@@ -7,7 +7,8 @@ UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
 UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
 
 local sources =
-	SoftwareRenderer.cpp 
+	SoftwareRenderer.cpp
+	SoftwareWinsys.cpp
 	GalliumContext.cpp
 	bitmap_wrapper.cpp ;
 
