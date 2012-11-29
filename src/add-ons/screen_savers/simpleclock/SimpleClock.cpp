@@ -1,12 +1,7 @@
 /*
-**
-** A simple analog clock screensaver.
-**
-** Version: 0.1
-**
-** Copyright (c) 2008-2009 Gerasim Troeglazov (3dEyes**). All Rights Reserved.
-** This file may be used under the terms of the MIT License.
-*/
+ * Copyright (c) 2008-2009 Gerasim Troeglazov (3dEyes**). All Rights Reserved.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include <stdio.h>
@@ -27,20 +22,19 @@ class Clock : public BScreenSaver
 public:
 					Clock(BMessage *message, image_id id);
 	void			StartConfig(BView *view);
-	status_t		StartSaver(BView *v, bool preview);
-	void			Draw(BView *v, int32 frame);
-	BStringView		*tview;
+	status_t		StartSaver(BView *view, bool preview);
+	void			Draw(BView *view, int32 frame);	
 private:
-	void 			DrawBlock(BView *view, float x, float y, float a, float size);
-	void 			DrawArrow(BView *view, float xc, float yc, float a, float len, float k,float width);
-	time_t			tmptodaytime;
-	float			todaysecond , todayminute , todayhour;
-	struct tm		*TodayTime;
-	BRect r;
+	void 			_drawBlock(BView *view, float x, float y, float alpha,
+						float size);
+	void 			_drawArrow(BView *view, float x0, float y0, float angle,
+						float length, float coeff, float width);
+	float 			centerX, centerY;
 };
 
 
-extern "C" _EXPORT BScreenSaver *instantiate_screen_saver(BMessage *message, image_id image)
+extern "C" _EXPORT BScreenSaver *instantiate_screen_saver(BMessage *message,
+	image_id image)
 {
 	return new Clock(message, image);
 }
@@ -54,104 +48,133 @@ Clock::Clock(BMessage *message, image_id image)
 }
 
 
-void Clock::StartConfig(BView *view)
+void
+Clock::StartConfig(BView *view)
 {
-	tview = new BStringView(BRect(10, 10, 200, 35), B_EMPTY_STRING, "Simple Clock");
-	tview->SetFont(be_bold_font);
-	tview->SetFontSize(15);
-	view->AddChild(tview);
-	view->AddChild(new BStringView(BRect(10, 40, 200, 65), B_EMPTY_STRING, " Ver 0.1, ©3dEyes**"));
+	BStringView	*aboutView = new BStringView(BRect(10, 10, 200, 35),
+		B_EMPTY_STRING, "Simple Clock");
+	aboutView->SetFont(be_bold_font);
+	aboutView->SetFontSize(15);
+	view->AddChild(aboutView);
+	aboutView = new BStringView(BRect(10, 40, 200, 65),
+		B_EMPTY_STRING, " Ver 1.0, ©3dEyes**");
+	view->AddChild(aboutView);
 }
 
-status_t Clock::StartSaver(BView *view, bool preview)
+
+status_t
+Clock::StartSaver(BView *view, bool)
 {
 	SetTickSize(1000000);
 	return B_OK;
 }
 
-void Clock::DrawBlock(BView *view, float x, float y, float a, float size)
+
+void
+Clock::Draw(BView *view, int32)
 {
-	float angles[4]={a-(M_PI/12),a+(M_PI/12),a+(M_PI)-(M_PI/12),a+(M_PI)+(M_PI/12)};
-	BPoint points[4];
-	for(int i=0;i<4;i++) {
-		points[i].x= x+size*cos(angles[i]);
-		points[i].y= y+size*sin(angles[i]);
-	}
-	view->FillPolygon(&points[0],4);
+	BScreen screenView;
+	BBitmap bufferBitmap(view->Bounds(), screenView.ColorSpace(), true);
+	BView offscreenView(view->Bounds(), NULL, 0, 0);
+	bufferBitmap.AddChild(&offscreenView);
+	bufferBitmap.Lock();
 
-}
-
-void Clock::DrawArrow(BView *view, float xc, float yc, float a, float len, float k, float width)
-{
-	float g = width/len;
-
-	float x = xc+(len)*cos(a);
-	float y = yc+(len)*sin(a);
-
-	float size = len*k;
-
-	float angles[4]={a-g,a+g,a+(M_PI)-g,a+(M_PI)+g};
-
-	BPoint points[4];
-	for(int i=0;i<4;i++) {
-		points[i].x= x+size*cos(angles[i]);
-		points[i].y= y+size*sin(angles[i]);
-	}
-	view->FillPolygon(&points[0],4);
-}
-
-void Clock::Draw(BView *view, int32)
-{
-	BScreen screen;
-	BBitmap buffer(view->Bounds(), screen.ColorSpace(), true);
-	BView offscreen(view->Bounds(), NULL, 0, 0);
-	buffer.AddChild(&offscreen);
-	buffer.Lock();
-
-	int n;
-	float a,R;
 	float width = view->Bounds().Width();
 	float height = view->Bounds().Height();
-	float zoom = (height/1024) * 0.85;
+	float zoom = (height / 1024.0) * 0.65;
+	
+	time_t timeInfo;
+	time(&timeInfo);
+	struct tm *nowTime = localtime(&timeInfo);
 
-	time(&tmptodaytime);
-	TodayTime = localtime(&tmptodaytime);
+	float secondVal = nowTime->tm_sec;
+	float minuteVal = nowTime->tm_min + (secondVal / 60.0);
+	float hourVal = nowTime->tm_hour + (minuteVal / 60.0);
 
-	todaysecond = TodayTime->tm_sec;
-	todayminute = TodayTime->tm_min + (todaysecond/60.0);
-	todayhour   = TodayTime->tm_hour + (todayminute/60.0);
+	offscreenView.SetHighColor(0, 0, 0);
+	offscreenView.SetLowColor(0, 0, 0);
+	offscreenView.FillRect(offscreenView.Bounds());
 
-	rgb_color bg_color = {0,0,0};
-	offscreen.SetHighColor(bg_color);
-	offscreen.SetLowColor(bg_color);
-	offscreen.FillRect(offscreen.Bounds());
+	offscreenView.SetHighColor(200, 200, 200);
+	
+	centerX = width / 2.0;
+	centerY = height / 2.0;
 
-	offscreen.SetHighColor(200,200,200);
+	float markAngle = 0;
+	float markRadius = 510.0 * zoom;
 
-	for(n=0,a=0,R=510*zoom;n<60;n++,a+=(2*M_PI)/60) {
-		float x = width/2 + R * cos(a);
-		float y = height/2 + R * sin(a);
-		DrawBlock(&offscreen,x,y,a,14*zoom);
+	for(int mark = 0; mark < 60; mark++, markAngle += (2 * M_PI) / 60) {
+		float x = centerX + markRadius * cos(markAngle);
+		float y = centerY + markRadius * sin(markAngle);
+		_drawBlock(&offscreenView, x, y, markAngle, 14.0 * zoom);
 	}
 
-	offscreen.SetHighColor(255,255,255);
+	offscreenView.SetHighColor(255, 255, 255);
 
-	for(n=0,a=0,R=500*zoom;n<12;n++,a+=(2*M_PI)/12) {
-		float x = width/2 + R * cos(a);
-		float y = height/2 + R * sin(a);
-		DrawBlock(&offscreen,x,y,a,32*zoom);
+	markAngle = 0;
+	markRadius = 500.0 * zoom;
+	
+	for (int mark = 0; mark < 12; mark++, markAngle += (2 * M_PI) / 12) {
+		float x = centerX + markRadius * cos(markAngle);
+		float y = centerY + markRadius * sin(markAngle);
+		_drawBlock(&offscreenView, x, y, markAngle, 32 * zoom);
 	}
 
-	offscreen.SetHighColor(255,255,255);
-	DrawArrow(&offscreen, width/2,height/2, ( ((2*M_PI)/60) * todayminute) - (M_PI/2), 220*zoom, 1, 8*zoom);
-	DrawArrow(&offscreen, width/2,height/2, ( ((2*M_PI)/12) * todayhour) - (M_PI/2), 140*zoom, 1, 14*zoom);
-	offscreen.FillEllipse(BPoint(width/2,height/2),24*zoom,24*zoom);
-	offscreen.SetHighColor(250,20,20);
-	DrawArrow(&offscreen, width/2,height/2, ( ((2*M_PI)/60) * todaysecond) - (M_PI/2), 240*zoom, 1, 4*zoom);
-	offscreen.FillEllipse(BPoint(width/2,height/2),20*zoom,20*zoom);
+	offscreenView.SetHighColor(255, 255, 255);
+	_drawArrow(&offscreenView, centerX, centerY,
+		((2 * M_PI / 60) * minuteVal) - (M_PI / 2), 220 * zoom, 1, 8 * zoom);
 
-	offscreen.Sync();
-	buffer.Unlock();
-	view->DrawBitmap(&buffer);
-	buffer.RemoveChild(&offscreen);
+	_drawArrow(&offscreenView, centerX, centerY,
+		((2 * M_PI / 12) * hourVal) - (M_PI / 2), 140 * zoom, 1, 14 * zoom);
+	offscreenView.FillEllipse(BPoint(centerX, centerY),
+		24 * zoom, 24 * zoom);
+	
+	offscreenView.SetHighColor(250, 20, 20);
+	_drawArrow(&offscreenView, centerX, centerY,
+		((2 * M_PI / 60) * secondVal) - (M_PI / 2), 240 * zoom, 1, 4 * zoom);
+	offscreenView.FillEllipse(BPoint(centerX, centerY),
+		20 * zoom, 20 * zoom);
+
+	offscreenView.Sync();
+	bufferBitmap.Unlock();
+	view->DrawBitmap(&bufferBitmap);
+	bufferBitmap.RemoveChild(&offscreenView);
+}
+
+
+void
+Clock::_drawBlock(BView *view, float x, float y, float alpha, float size)
+{
+	float blockAngles[4] = {alpha - (M_PI / 12), alpha + (M_PI / 12),
+		alpha + M_PI - (M_PI / 12), alpha + M_PI + (M_PI / 12)};
+	
+	BPoint blockPoints[4];
+	for (int index = 0; index < 4; index++) {
+		blockPoints[index].x = x + size * cos(blockAngles[index]);
+		blockPoints[index].y = y + size * sin(blockAngles[index]);
+	}
+	view->FillPolygon(&blockPoints[0], 4);
+}
+
+
+void
+Clock::_drawArrow(BView *view, float x0, float y0, float angle, float length,
+	float coeff, float width)
+{
+	float alpha = width / length;
+
+	float x = x0 + length * cos(angle);
+	float y = y0 + length * sin(angle);
+
+	float size = length * coeff;
+
+	float blockAngles[4] = {angle - alpha, angle + alpha,
+		angle + M_PI - alpha, angle + M_PI + alpha};
+
+	BPoint blockPoints[4];
+	for(int index = 0; index < 4; index++) {
+		blockPoints[index].x = x + size * cos(blockAngles[index]);
+		blockPoints[index].y = y + size * sin(blockAngles[index]);
+	}
+	view->FillPolygon(&blockPoints[0], 4);
 }
