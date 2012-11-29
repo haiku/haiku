@@ -425,7 +425,6 @@ GalliumContext::SetCurrentContext(Bitmap *bitmap, context_id contextID)
 	struct st_api* api = context->api;
 
 	if (!bitmap) {
-		ERROR("%s: Invalid bitmap provided!\n", __func__);
 		api->make_current(context->api, NULL, NULL, NULL);
 		return B_ERROR;
 	}
@@ -435,7 +434,7 @@ GalliumContext::SetCurrentContext(Bitmap *bitmap, context_id contextID)
 
 	if (oldContextID > 0 && oldContextID != contextID) {
 		fContext[oldContextID]->st->flush(fContext[oldContextID]->st,
-			0, NULL);
+			ST_FLUSH_FRONT, NULL);
 	}
 
 	// TODO: WinSysDrawBuffer & WinSysReadBuffer?

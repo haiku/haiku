@@ -28,6 +28,7 @@ struct haiku_displaytarget
 	void* data;
 };
 
+
 struct sw_winsys* winsys_connect_hooks();
 
 
