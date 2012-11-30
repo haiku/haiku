@@ -235,7 +235,7 @@ ARMVMTranslationMap32Bit::Unmap(addr_t start, addr_t end)
 		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 			pd[index] & ARM_PDE_ADDRESS_MASK);
 
-		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
+		for (index = VADDR_TO_PTENT(start); (index < 256) && (start < end);
 				index++, start += B_PAGE_SIZE) {
 			if ((pt[index] & ARM_PTE_TYPE_MASK) == 0) {
 				// page mapping not valid
@@ -364,7 +364,7 @@ ARMVMTranslationMap32Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 			pd[index] & ARM_PDE_ADDRESS_MASK);
 
-		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
+		for (index = VADDR_TO_PTENT(start); (index < 256) && (start < end);
 				index++, start += B_PAGE_SIZE) {
 			page_table_entry oldEntry
 				= ARMPagingMethod32Bit::ClearPageTableEntry(&pt[index]);
@@ -680,7 +680,7 @@ ARMVMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 			pd[index] & ARM_PDE_ADDRESS_MASK);
 
-		for (index = VADDR_TO_PTENT(start); index < 1024 && start < end;
+		for (index = VADDR_TO_PTENT(start); index < 256 && start < end;
 				index++, start += B_PAGE_SIZE) {
 			page_table_entry entry = pt[index];
 			if ((entry & ARM_PTE_PRESENT) == 0) {
