@@ -17,6 +17,7 @@
 
 #include <boot/kernel_args.h>
 #include <cpu.h>
+#include <int.h>
 #include <tls.h>
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
