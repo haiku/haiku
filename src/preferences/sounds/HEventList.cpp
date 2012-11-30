@@ -57,7 +57,7 @@ HEventRow::Remove(const char* type)
 
 HEventList::HEventList(const char* name)
 	:
-	BColumnListView(name, 0, B_PLAIN_BORDER, true),
+	BColumnListView(name, B_NAVIGABLE, B_PLAIN_BORDER, true),
 	fType(NULL)
 {
 	AddColumn(new BStringColumn(B_TRANSLATE("Event"), 180, 50, 500,
