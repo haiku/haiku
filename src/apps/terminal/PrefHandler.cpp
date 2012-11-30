@@ -45,7 +45,7 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_TEXT_FORE_COLOR,		"  0,   0,   0" },
 	{ PREF_TEXT_BACK_COLOR,		"255, 255, 255" },
 	{ PREF_CURSOR_FORE_COLOR,	"  0,   0,   0" },
-	{ PREF_CURSOR_BACK_COLOR,	"255, 200,   0" },
+	{ PREF_CURSOR_BACK_COLOR,	"  0,   0,   0" },
 	{ PREF_SELECT_FORE_COLOR,	"255, 255, 255" },
 	{ PREF_SELECT_BACK_COLOR,	"  0,   0,   0" },
 
