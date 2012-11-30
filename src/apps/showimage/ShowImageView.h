@@ -52,7 +52,8 @@ public:
 			void				SetTrackerMessenger(
 									const BMessenger& trackerMessenger);
 			status_t			SetImage(const BMessage* message);
-			status_t			SetImage(const entry_ref* ref, BBitmap* bitmap);
+			status_t			SetImage(const entry_ref* ref, BBitmap* bitmap,
+									BitmapOwner* bitmapOwner);
 			const entry_ref*	Image() const { return &fCurrentRef; }
 			BBitmap*			Bitmap();
 
