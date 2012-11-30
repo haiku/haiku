@@ -221,6 +221,12 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 	if (partition->ContainsFileSystem()) {
 		SetField(new BStringField(partition->ContentType()), kFilesystemColumn);
 		SetField(new BStringField(partition->ContentName()), kVolumeNameColumn);
+	} else if (partition->IsDevice()) {
+		if (partition->Name() != NULL && partition->Name()[0])
+			SetField(new BStringField(partition->Name()), kVolumeNameColumn);
+		else
+			SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
+		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 	} else if (partition->CountChildren() > 0) {
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);

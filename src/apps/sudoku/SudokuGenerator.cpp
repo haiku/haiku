@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -161,7 +161,7 @@ SudokuGenerator::Generate(SudokuField* target, uint32 fieldsLeft,
 			if (removeCount <= 0 || *quit)
 				break;
 		}
-		printf("  remove count = %ld\n", removeCount);
+		printf("  remove count = %" B_PRId32 "\n", removeCount);
 	}
 
 	// set the remaining values to be initial values

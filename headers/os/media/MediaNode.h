@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Copyright 2009-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MEDIA_NODE_H
@@ -92,7 +92,7 @@ struct media_request_info {
 			what_code			what;
 			int32				change_tag;
 			status_t			status;
-			int32				cookie;
+			void*				cookie;
 			void*				user_data;
 			media_source		source;
 			media_destination	destination;
@@ -115,11 +115,13 @@ struct media_node_attribute {
 };
 
 
-namespace BPrivate { namespace media {
-	class TimeSourceObject;
-	class SystemTimeSourceObject;
-	class BMediaRosterEx;
-} } // BPrivate::media
+namespace BPrivate {
+	namespace media {
+		class TimeSourceObject;
+		class SystemTimeSourceObject;
+		class BMediaRosterEx;
+	}
+} // BPrivate::media
 
 
 /*!	BMediaNode is the indirect base class for all Media Kit participants.
@@ -337,5 +339,6 @@ private:
 	static	int32 _m_changeTag;
 		// not to be confused with _mChangeCount
 };
+
 
 #endif // _MEDIA_NODE_H

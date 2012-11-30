@@ -85,8 +85,8 @@ DormantNodeManager::~DormantNodeManager()
 	for (; iterator != fAddOnMap.end(); iterator++) {
 		loaded_add_on_info& info = iterator->second;
 
-		ERROR("Forcing unload of add-on id %ld with usecount %ld\n",
-			info.add_on->AddonID(), info.use_count);
+		ERROR("Forcing unload of add-on id %" B_PRId32 " with usecount %"
+			B_PRId32 "\n", info.add_on->AddonID(), info.use_count);
 		_UnloadAddOn(info.add_on, info.image);
 	}
 }
@@ -95,7 +95,7 @@ DormantNodeManager::~DormantNodeManager()
 BMediaAddOn*
 DormantNodeManager::GetAddOn(media_addon_id id)
 {
-	TRACE("DormantNodeManager::GetAddon, id %ld\n", id);
+	TRACE("DormantNodeManager::GetAddon, id %" B_PRId32 "\n", id);
 
 	// first try to use a already loaded add-on
 	BMediaAddOn* addOn = _LookupAddOn(id);
@@ -107,8 +107,8 @@ DormantNodeManager::GetAddOn(media_addon_id id)
 	// ok, it's not loaded, try to get the path
 	BPath path;
 	if (FindAddOnPath(&path, id) != B_OK) {
-		ERROR("DormantNodeManager::GetAddon: can't find path for add-on "
-			"%ld\n", id);
+		ERROR("DormantNodeManager::GetAddon: can't find path for add-on %"
+			B_PRId32 "\n", id);
 		return NULL;
 	}
 
@@ -116,8 +116,8 @@ DormantNodeManager::GetAddOn(media_addon_id id)
 	BMediaAddOn* newAddOn;
 	image_id image;
 	if (_LoadAddOn(path.Path(), id, &newAddOn, &image) != B_OK) {
-		ERROR("DormantNodeManager::GetAddon: can't load add-on %ld from path "
-			"%s\n",id, path.Path());
+		ERROR("DormantNodeManager::GetAddon: can't load add-on %" B_PRId32
+			" from path %s\n",id, path.Path());
 		return NULL;
 	}
 
@@ -154,13 +154,14 @@ DormantNodeManager::GetAddOn(media_addon_id id)
 void
 DormantNodeManager::PutAddOn(media_addon_id id)
 {
-	TRACE("DormantNodeManager::PutAddon, id %ld\n", id);
+	TRACE("DormantNodeManager::PutAddon, id %" B_PRId32 "\n", id);
 
 	BAutolock locker(fLock);
 
 	AddOnMap::iterator found = fAddOnMap.find(id);
 	if (found == fAddOnMap.end()) {
-		ERROR("DormantNodeManager::PutAddon: failed to find add-on %ld\n", id);
+		ERROR("DormantNodeManager::PutAddon: failed to find add-on %" B_PRId32
+			"\n", id);
 		return;
 	}
 
@@ -194,7 +195,7 @@ DormantNodeManager::PutAddOnDelayed(media_addon_id id)
 media_addon_id
 DormantNodeManager::RegisterAddOn(const char* path)
 {
-	TRACE("DormantNodeManager::RegisterAddon, path %s\n",path);
+	TRACE("DormantNodeManager::RegisterAddon, path %s\n", path);
 
 	entry_ref ref;
 	status_t status = get_ref_for_path(path, &ref);
@@ -222,7 +223,7 @@ DormantNodeManager::RegisterAddOn(const char* path)
 		return 0;
 	}
 
-	TRACE("DormantNodeManager::RegisterAddon finished with id %ld\n",
+	TRACE("DormantNodeManager::RegisterAddon finished with id %" B_PRId32 "\n",
 		reply.add_on_id);
 
 	return reply.add_on_id;
@@ -233,7 +234,7 @@ DormantNodeManager::RegisterAddOn(const char* path)
 void
 DormantNodeManager::UnregisterAddOn(media_addon_id id)
 {
-	TRACE("DormantNodeManager::UnregisterAddon id %ld\n",id);
+	TRACE("DormantNodeManager::UnregisterAddon id %" B_PRId32 "\n", id);
 	ASSERT(id > 0);
 
 	port_id port = find_port(MEDIA_SERVER_PORT_NAME);

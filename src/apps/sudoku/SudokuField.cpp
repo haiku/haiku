@@ -216,7 +216,7 @@ SudokuField::Dump()
 		for (uint32 x = 0; x < fSize; x++) {
 			if (x != 0 && x % fBlockSize == 0)
 				putchar(' ');
-			printf("%lu", ValueAt(x, y));
+			printf("%" B_PRIu32, ValueAt(x, y));
 		}
 		putchar('\n');
 	}

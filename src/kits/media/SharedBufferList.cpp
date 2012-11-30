@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2012, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Marcus Overhagen. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -80,7 +80,7 @@ SharedBufferList::Get()
 	sArea = clone_area("shared buffer list clone", (void**)&sList,
 		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, areaReply.area);
 	if (sArea < 0) {
-		ERROR("SharedBufferList::Get() clone area %ld: %s\n",
+		ERROR("SharedBufferList::Get() clone area %" B_PRId32 ": %s\n",
 			areaReply.area, strerror(sArea));
 		return NULL;
 	}
@@ -303,8 +303,8 @@ SharedBufferList::RecycleBuffer(BBuffer* buffer)
 		if (fInfos[i].id == id) {
 			reclaimedCount++;
 			if (fInfos[i].reclaimed) {
-				ERROR("SharedBufferList::RecycleBuffer, BBuffer %p, id = %ld "
-					"already reclaimed\n", buffer, id);
+				ERROR("SharedBufferList::RecycleBuffer, BBuffer %p, id = %"
+					B_PRId32 " already reclaimed\n", buffer, id);
 				DEBUG_ONLY(debugger("buffer already reclaimed"));
 				continue;
 			}
@@ -317,8 +317,8 @@ SharedBufferList::RecycleBuffer(BBuffer* buffer)
 		return B_ERROR;
 
 	if (reclaimedCount == 0) {
-		ERROR("shared_buffer_list::RecycleBuffer, BBuffer %p, id = %ld NOT "
-			"reclaimed\n", buffer, id);
+		ERROR("shared_buffer_list::RecycleBuffer, BBuffer %p, id = %" B_PRId32
+			" NOT reclaimed\n", buffer, id);
 		return B_ERROR;
 	}
 
@@ -397,7 +397,7 @@ SharedBufferList::_RequestBufferInOtherGroups(sem_id groupReclaimSem,
 
 			if (fInfos[i].reclaimed == false) {
 				ERROR("SharedBufferList:: RequestBufferInOtherGroups BBuffer "
-					"%p, id = %ld not reclaimed while requesting\n",
+					"%p, id = %" B_PRId32 " not reclaimed while requesting\n",
 					fInfos[i].buffer, id);
 				continue;
 			}

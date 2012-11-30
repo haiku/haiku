@@ -156,7 +156,8 @@ SoundConsumer::SetHooks(SoundProcessFunc recordFunc, SoundNotifyFunc notifyFunc,
 			//	Wait for acknowledge from the service thread.
 			err = read_port_etc(cmd.reply, &code, 0, 0, B_TIMEOUT, 6000000LL);
 			if (err > 0) err = 0;
-			NODE(stderr, "SoundConsumer::SetHooks read reply: %#010lx\n", err);
+			NODE(stderr, "SoundConsumer::SetHooks read reply: %#" B_PRIx32
+				"\n", err);
 		}
 		//	Clean up.
 		delete_port(cmd.reply);
@@ -591,8 +592,8 @@ SoundConsumer::ServiceThread()
 		int32 code = 0;
 		status_t err = read_port_etc(m_port, &code, msg, B_MEDIA_MESSAGE_SIZE,
 			B_TIMEOUT, timeout);
-		MESSAGE(stderr, "SoundConsumer::ServiceThread() port %ld message "
-			"%#010lx\n", m_port, code);
+		MESSAGE(stderr, "SoundConsumer::ServiceThread() port %" B_PRId32
+			" message %#" B_PRIx32 "\n", m_port, code);
 		//	If we received a message, err will be the size of the message
 		//	(including 0).
 		if (err >= B_OK) {
@@ -625,7 +626,7 @@ SoundConsumer::ServiceThread()
 				Notify(B_OP_TIMED_OUT, timeout);
 		} else {
 			//	Other errors are bad.
-			MESSAGE(stderr, "SoundConsumer: error %#010lx\n", err);
+			MESSAGE(stderr, "SoundConsumer: error %#" B_PRIx32 "\n", err);
 			bad++;
 			//	If we receive three bad reads with no good messages inbetween,
 			//	things are probably not going to improve (like the port
@@ -663,7 +664,7 @@ SoundConsumer::ProcessingLatency()
 {
 	//	We're saying it takes us 500 us to process each buffer. If all we do is
 	//	copy the data, it probably takes much less than that, but it doesn't
-	//	hurt to be slightly conservative. 
+	//	hurt to be slightly conservative.
 	return 500LL;
 }
 

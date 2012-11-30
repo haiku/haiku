@@ -464,8 +464,10 @@ SoundPlayNode::Disconnect(const media_source& what,
 		delete fBufferGroup;
 		fBufferGroup = NULL;
 	} else {
-		fprintf(stderr, "\tDisconnect() called with wrong source/destination (%ld/%ld), ours is (%ld/%ld)\n",
-			what.id, where.id, fOutput.source.id, fOutput.destination.id);
+		fprintf(stderr, "\tDisconnect() called with wrong source/destination "
+			"(%" B_PRId32 "/%" B_PRId32 "), ours is (%" B_PRId32 "/%" B_PRId32
+			")\n", what.id, where.id, fOutput.source.id,
+			fOutput.destination.id);
 	}
 }
 
@@ -476,8 +478,8 @@ SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 {
 	CALLED();
 
-	TRACE("SoundPlayNode::LateNoticeReceived, %Ld too late at %Ld\n", howMuch,
-		performanceTime);
+	TRACE("SoundPlayNode::LateNoticeReceived, %" B_PRId64 " too late at %"
+		B_PRId64 "\n", howMuch, performanceTime);
 
 	// is this our output?
 	if (what != fOutput.source) {
@@ -498,7 +500,8 @@ SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 			fInternalLatency = 30000;
 
 		SetEventLatency(fLatency + fInternalLatency);
-		TRACE("SoundPlayNode::LateNoticeReceived: increasing latency to %Ld\n", fLatency + fInternalLatency);
+		TRACE("SoundPlayNode::LateNoticeReceived: increasing latency to %"
+			B_PRId64 "\n", fLatency + fInternalLatency);
 	} else {
 		// The other run modes dictate various strategies for sacrificing data quality
 		// in the interests of timely data delivery.  The way *we* do this is to skip
@@ -554,7 +557,8 @@ SoundPlayNode::LatencyChanged(const media_source& source,
 {
 	CALLED();
 
-	TRACE("SoundPlayNode::LatencyChanged: new_latency %Ld\n", newLatency);
+	TRACE("SoundPlayNode::LatencyChanged: new_latency %" B_PRId64 "\n",
+		newLatency);
 
 	// something downstream changed latency, so we need to start producing
 	// buffers earlier (or later) than we were previously.  Make sure that the
@@ -604,7 +608,7 @@ SoundPlayNode::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 			HandleParameter(event,lateness,realTimeEvent);
 			break;
 		default:
-			fprintf(stderr,"  unknown event type: %li\n", event->type);
+			fprintf(stderr," unknown event type: %" B_PRId32 "\n", event->type);
 			break;
 	}
 }
@@ -635,7 +639,7 @@ SoundPlayNode::SendNewBuffer(const media_timed_event* event,
 
 	if (lateness > (BufferDuration() / 3) ) {
 		printf("SoundPlayNode::SendNewBuffer, event scheduled much too late, "
-			"lateness is %Ld\n", lateness);
+			"lateness is %" B_PRId64 "\n", lateness);
 	}
 
 	// skip buffer creation if output not enabled
@@ -698,8 +702,8 @@ status_t
 SoundPlayNode::HandleDataStatus(const media_timed_event* event,
 	bigtime_t lateness, bool realTimeEvent)
 {
-	TRACE("SoundPlayNode::HandleDataStatus status: %li, lateness: %Li\n",
-		event->data, lateness);
+	TRACE("SoundPlayNode::HandleDataStatus status: %" B_PRId32 ", lateness: %"
+		B_PRId64 "\n", event->data, lateness);
 
 	switch (event->data) {
 		case B_DATA_NOT_AVAILABLE:
@@ -746,8 +750,8 @@ SoundPlayNode::HandleSeek(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
 	CALLED();
-	TRACE("SoundPlayNode::HandleSeek(t=%lld, d=%li, bd=%lld)\n",
-		event->event_time, event->data, event->bigdata);
+	TRACE("SoundPlayNode::HandleSeek(t=%" B_PRId64 ", d=%" B_PRId32 ", bd=%"
+		B_PRId64 ")\n", event->event_time, event->data, event->bigdata);
 	return B_OK;
 }
 
@@ -792,14 +796,15 @@ SoundPlayNode::AllocateBuffers()
 	size_t size = fOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32(fLatency / BufferDuration() + 1 + 1);
 
-	TRACE("SoundPlayNode::AllocateBuffers: latency = %Ld, buffer duration "
-		"= %Ld, count %ld\n", fLatency, BufferDuration(), count);
+	TRACE("SoundPlayNode::AllocateBuffers: latency = %" B_PRId64 ", buffer "
+		"duration = %" B_PRId64 ", count %" B_PRId32 "\n", fLatency,
+		BufferDuration(), count);
 
 	if (count < 3)
 		count = 3;
 
-	TRACE("SoundPlayNode::AllocateBuffers: creating group of %ld buffers, "
-		"size = %lu\n", count, size);
+	TRACE("SoundPlayNode::AllocateBuffers: creating group of %" B_PRId32
+		" buffers, size = %" B_PRIuSIZE "\n", count, size);
 
 	fBufferGroup = new BBufferGroup(size, count);
 	if (fBufferGroup->InitCheck() != B_OK) {

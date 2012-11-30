@@ -340,8 +340,8 @@ BMediaTrack::ReadFrames(void* buffer, int64* _frameCount,
 //fflush(stdout);
 //}
 	} else {
-		ERROR("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n",
-			result, strerror(result));
+		ERROR("BMediaTrack::ReadFrames: decoder returned error %#" B_PRIx32
+			" (%s)\n", result, strerror(result));
 		*_frameCount = 0;
 	}
 

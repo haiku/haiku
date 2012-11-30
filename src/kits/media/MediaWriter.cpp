@@ -125,7 +125,7 @@ MediaWriter::CreateEncoder(Encoder** _encoder,
 	if (!fStreamInfos.Insert(info)) {
 		gPluginManager.DestroyEncoder(encoder);
 		ERROR("MediaWriter::CreateEncoder can't create StreamInfo "
-			"for stream %ld\n", streamIndex);
+			"for stream %" B_PRId32 "\n", streamIndex);
 		return B_NO_MEMORY;
 	}
 
@@ -134,7 +134,7 @@ MediaWriter::CreateEncoder(Encoder** _encoder,
 	if (chunkWriter == NULL) {
 		gPluginManager.DestroyEncoder(encoder);
 		ERROR("MediaWriter::CreateEncoder can't create ChunkWriter "
-			"for stream %ld\n", streamIndex);
+			"for stream %" B_PRId32 "\n", streamIndex);
 		return B_NO_MEMORY;
 	}
 

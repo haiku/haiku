@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku. All Rights Reserved.
+ * Copyright 2002-2012, Haiku. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
  *
  * Author: Zousar Shaker
@@ -7,10 +7,12 @@
  *         Marcus Overhagen
  */
 
+
 /*! Implements the following classes:
 	BParameterWeb, BParameterGroup, BParameter, BNullParameter,
 	BContinuousParameter, BDiscreteParameter
 */
+
 
 #include <ParameterWeb.h>
 
@@ -282,9 +284,34 @@ swap32(Type value, bool doSwap)
 
 
 template<class Type> Type
+swap64(Type value, bool doSwap)
+{
+	STATIC_ASSERT(sizeof(Type) == 8);
+
+	if (doSwap)
+		return (Type)B_SWAP_INT64((int64)value);
+
+	return value;
+}
+
+
+template<class Type> Type
 read_from_buffer_swap32(const void **_buffer, bool doSwap)
 {
 	return swap32<Type>(read_from_buffer<Type>(_buffer), doSwap);
+}
+
+
+template<class Type> Type
+read_pointer_from_buffer_swap(const void **_buffer, bool doSwap)
+{
+#if B_HAIKU_32_BIT
+	return swap32<Type>(read_from_buffer<Type>(_buffer), doSwap);
+#elif B_HAIKU_64_BIT
+	return swap64<Type>(read_from_buffer<Type>(_buffer), doSwap);
+#else
+#	error Interesting
+#endif
 }
 
 
@@ -568,8 +595,8 @@ BParameterWeb::Unflatten(type_code code, const void* buffer, ssize_t size)
 	// information - but it doesn't seem to have another purpose
 	int32 version = read_from_buffer_swap32<int32>(&buffer, isSwapped);
 	if (version != kCurrentParameterWebVersion) {
-		ERROR("BParameterWeb::Unflatten(): wrong version %ld (%lx)?!\n",
-			version, version);
+		ERROR("BParameterWeb::Unflatten(): wrong version %" B_PRId32 " (%"
+			B_PRIx32 ")?!\n", version, version);
 		return B_ERROR;
 	}
 
@@ -1052,8 +1079,8 @@ BParameterGroup::Unflatten(type_code code, const void* buffer, ssize_t size)
 		if (size_left(size, bufferStart, buffer) < 12)
 			return B_BAD_VALUE;
 
-		BParameter* oldPointer = read_from_buffer_swap32<BParameter*>(&buffer,
-			isSwapped);
+		BParameter* oldPointer = read_pointer_from_buffer_swap<BParameter*>(
+			&buffer, isSwapped);
 		BParameter::media_parameter_type mediaType
 			= read_from_buffer_swap32<BParameter::media_parameter_type>(&buffer,
 				isSwapped);
@@ -1101,8 +1128,8 @@ BParameterGroup::Unflatten(type_code code, const void* buffer, ssize_t size)
 		if (size_left(size, bufferStart, buffer) < 12)
 			return B_BAD_VALUE;
 
-		BParameterGroup* oldPointer
-			= read_from_buffer_swap32<BParameterGroup*>(&buffer, isSwapped);
+		BParameterGroup* oldPointer = read_pointer_from_buffer_swap<
+			BParameterGroup*>(&buffer, isSwapped);
 		type_code type = read_from_buffer_swap32<type_code>(&buffer, isSwapped);
 
 		ssize_t groupSize
@@ -1161,7 +1188,8 @@ BParameterGroup::MakeControl(int32 type)
 			return new BTextParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL, 0);
 
 		default:
-			ERROR("BParameterGroup::MakeControl unknown type %ld\n", type);
+			ERROR("BParameterGroup::MakeControl unknown type %" B_PRId32 "\n",
+				type);
 			return NULL;
 	}
 }
@@ -1656,8 +1684,8 @@ BParameter::Unflatten(type_code code, const void* buffer, ssize_t size)
 
 	fInputs->MakeEmpty();
 	for (int32 i = 0; i < count; i++) {
-		fInputs->AddItem(read_from_buffer_swap32<BParameter * const>(&buffer,
-			fSwapDetected));
+		fInputs->AddItem(read_pointer_from_buffer_swap<BParameter * const>(
+			&buffer, fSwapDetected));
 	}
 
 	// read the list of outputs
@@ -1666,8 +1694,8 @@ BParameter::Unflatten(type_code code, const void* buffer, ssize_t size)
 
 	fOutputs->MakeEmpty();
 	for (int32 i = 0; i < count; i++) {
-		fOutputs->AddItem(read_from_buffer_swap32<BParameter * const>(&buffer,
-			fSwapDetected));
+		fOutputs->AddItem(read_pointer_from_buffer_swap<BParameter * const>(
+			&buffer, fSwapDetected));
 	}
 
 	fMediaType = read_from_buffer_swap32<media_type>(&buffer, fSwapDetected);

@@ -1,6 +1,6 @@
 /*
  * Copyright 2008 Maurice Kalinowski, haiku@kaldience.com
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2012, Axel Dörfler, axeld@pinc-software.de.
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -132,8 +132,8 @@ BMediaRosterEx::SaveNodeConfiguration(BMediaNode* node)
 		// NOTE: This node could have been created by an application,
 		// it does not mean there is an error.
 		// TODO: this check incorrectly triggers on BeOS R5 BT848 node
-		TRACE("BMediaRosterEx::SaveNodeConfiguration node %ld not instantiated "
-			"from BMediaAddOn!\n", node->ID());
+		TRACE("BMediaRosterEx::SaveNodeConfiguration node %" B_PRId32 " not "
+			"instantiated from BMediaAddOn!\n", node->ID());
 		return B_ERROR;
 	}
 
@@ -141,7 +141,8 @@ BMediaRosterEx::SaveNodeConfiguration(BMediaNode* node)
 
 	// TODO: fix this
 	printf("### BMediaRosterEx::SaveNodeConfiguration should save addon-id "
-		"%ld, flavor-id %ld config NOW!\n", addonID, flavorID);
+		"%" B_PRId32 ", flavor-id %" B_PRId32 " config NOW!\n", addonID,
+		flavorID);
 	return B_OK;
 }
 
@@ -153,7 +154,8 @@ BMediaRosterEx::LoadNodeConfiguration(media_addon_id addonID, int32 flavorID,
 	// TODO: fix this
 	_msg->MakeEmpty(); // to be fully R5 compliant
 	printf("### BMediaRosterEx::LoadNodeConfiguration should load addon-id "
-		"%ld, flavor-id %ld config NOW!\n", addonID, flavorID);
+		"%" B_PRId32 ", flavor-id %" B_PRId32 " config NOW!\n", addonID,
+		flavorID);
 	return B_OK;
 }
 
@@ -199,7 +201,8 @@ BMediaRosterEx::ReleaseNodeAll(const media_node& node)
 
 	if (node.kind & NODE_KIND_NO_REFCOUNTING) {
 		printf("BMediaRoster::ReleaseNodeAll, trying to release reference "
-			"counting disabled timesource, node %ld, port %ld, team %ld\n",
+			"counting disabled timesource, node %" B_PRId32 ", port %" B_PRId32
+			", team %" B_PRId32 "\n",
 			node.node, node.port, BPrivate::current_team());
 		return B_OK;
 	}
@@ -211,14 +214,16 @@ BMediaRosterEx::ReleaseNodeAll(const media_node& node)
 	request.node = node;
 	request.team = BPrivate::current_team();
 
-	TRACE("BMediaRoster::ReleaseNodeAll, node %ld, port %ld, team %ld\n",
+	TRACE("BMediaRoster::ReleaseNodeAll, node %" B_PRId32 ", port %" B_PRId32
+		", team %" B_PRId32 "\n",
 		node.node, node.port, BPrivate::current_team());
 
 	rv = QueryServer(SERVER_RELEASE_NODE_ALL, &request, sizeof(request), &reply,
 		sizeof(reply));
 	if (rv != B_OK) {
-		ERROR("BMediaRoster::ReleaseNodeAll FAILED, node %ld, port %ld, team "
-			"%ld!\n", node.node, node.port, BPrivate::current_team());
+		ERROR("BMediaRoster::ReleaseNodeAll FAILED, node %" B_PRId32 ", port %"
+			B_PRId32 ", team %" B_PRId32 "!\n", node.node, node.port,
+			BPrivate::current_team());
 	}
 	return rv;
 }
@@ -294,11 +299,11 @@ BMediaRosterEx::GetAllOutputs(const media_node& node, List<media_output>* list)
 	status_t rv;
 	status_t result;
 
-	PRINT(4, "BMediaRosterEx::GetAllOutputs() node %ld, port %ld\n", node.node,
-		node.port);
+	PRINT(4, "BMediaRosterEx::GetAllOutputs() node %" B_PRId32 ", port %"
+		B_PRId32 "\n", node.node, node.port);
 
 	if (!(node.kind & B_BUFFER_PRODUCER)) {
-		ERROR("BMediaRosterEx::GetAllOutputs: node %ld is not a "
+		ERROR("BMediaRosterEx::GetAllOutputs: node %" B_PRId32 " is not a "
 			"B_BUFFER_PRODUCER\n", node.node);
 		return B_MEDIA_BAD_NODE;
 	}
@@ -320,7 +325,7 @@ BMediaRosterEx::GetAllOutputs(const media_node& node, List<media_output>* list)
 			result = B_ERROR;
 		}
 		#if DEBUG >= 3
-			PRINT(3," next cookie %ld, ", cookie);
+			PRINT(3," next cookie %" B_PRId32 ", ", cookie);
 			PRINT_OUTPUT("output ", reply.output);
 		#endif
 	}
@@ -340,7 +345,8 @@ BMediaRosterEx::GetAllOutputs(BBufferProducer* node, List<media_output>* list)
 	int32 cookie;
 	status_t result;
 
-	PRINT(4, "BMediaRosterEx::GetAllOutputs() (by pointer) node %ld, port %ld\n", node->ID(), node->ControlPort());
+	PRINT(4, "BMediaRosterEx::GetAllOutputs() (by pointer) node %" B_PRId32
+		", port %" B_PRId32 "\n", node->ID(), node->ControlPort());
 
 	result = B_OK;
 	cookie = 0;
@@ -354,7 +360,7 @@ BMediaRosterEx::GetAllOutputs(BBufferProducer* node, List<media_output>* list)
 			result = B_ERROR;
 		}
 		#if DEBUG >= 3
-			PRINT(3," next cookie %ld, ", cookie);
+			PRINT(3," next cookie %" B_PRId32 ", ", cookie);
 			PRINT_OUTPUT("output ", output);
 		#endif
 	}
@@ -370,11 +376,11 @@ BMediaRosterEx::GetAllInputs(const media_node& node, List<media_input>* list)
 	status_t rv;
 	status_t result;
 
-	PRINT(4, "BMediaRosterEx::GetAllInputs() node %ld, port %ld\n", node.node,
-		node.port);
+	PRINT(4, "BMediaRosterEx::GetAllInputs() node %" B_PRId32 ", port %"
+		B_PRId32 "\n", node.node, node.port);
 
 	if (!(node.kind & B_BUFFER_CONSUMER)) {
-		ERROR("BMediaRosterEx::GetAllInputs: node %ld is not a "
+		ERROR("BMediaRosterEx::GetAllInputs: node %" B_PRId32 " is not a "
 			"B_BUFFER_CONSUMER\n", node.node);
 		return B_MEDIA_BAD_NODE;
 	}
@@ -396,7 +402,7 @@ BMediaRosterEx::GetAllInputs(const media_node& node, List<media_input>* list)
 			result = B_ERROR;
 		}
 		#if DEBUG >= 3
-			PRINT(3," next cookie %ld, ", cookie);
+			PRINT(3," next cookie %" B_PRId32 ", ", cookie);
 			PRINT_OUTPUT("input ", reply.input);
 		#endif
 	}
@@ -416,7 +422,8 @@ BMediaRosterEx::GetAllInputs(BBufferConsumer* node, List<media_input>* list)
 	int32 cookie;
 	status_t result;
 
-	PRINT(4, "BMediaRosterEx::GetAllInputs() (by pointer) node %ld, port %ld\n", node->ID(), node->ControlPort());
+	PRINT(4, "BMediaRosterEx::GetAllInputs() (by pointer) node %" B_PRId32
+		", port %" B_PRId32 "\n", node->ID(), node->ControlPort());
 
 	result = B_OK;
 	cookie = 0;
@@ -430,7 +437,7 @@ BMediaRosterEx::GetAllInputs(BBufferConsumer* node, List<media_input>* list)
 			result = B_ERROR;
 		}
 		#if DEBUG >= 3
-			PRINT(3," next cookie %ld, ", cookie);
+			PRINT(3," next cookie %" B_PRId32 ", ", cookie);
 			PRINT_INPUT("input ", input);
 		#endif
 	}
@@ -450,7 +457,7 @@ BMediaRosterEx::PublishOutputs(const media_node& node, List<media_output>* list)
 	status_t rv;
 
 	count = list->CountItems();
-	TRACE("PublishOutputs: publishing %ld\n", count);
+	TRACE("PublishOutputs: publishing %" B_PRId32 "\n", count);
 
 	request.node = node;
 	request.count = count;
@@ -461,7 +468,7 @@ BMediaRosterEx::PublishOutputs(const media_node& node, List<media_output>* list)
 		request.area = create_area("publish outputs", &start_addr,
 			B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (request.area < B_OK) {
-			ERROR("PublishOutputs: failed to create area, %#lx\n",
+			ERROR("PublishOutputs: failed to create area, %#" B_PRIx32 "\n",
 				request.area);
 			return (status_t)request.area;
 		}
@@ -470,7 +477,7 @@ BMediaRosterEx::PublishOutputs(const media_node& node, List<media_output>* list)
 		request.area = -1;
 		outputs = request.outputs;
 	}
-	TRACE("PublishOutputs: area %ld\n", request.area);
+	TRACE("PublishOutputs: area %" B_PRId32 "\n", request.area);
 
 	int i;
 	for (i = 0, list->Rewind(); list->GetNext(&output); i++) {
@@ -499,7 +506,7 @@ BMediaRosterEx::PublishInputs(const media_node& node, List<media_input>* list)
 	status_t rv;
 
 	count = list->CountItems();
-	TRACE("PublishInputs: publishing %ld\n", count);
+	TRACE("PublishInputs: publishing %" B_PRId32 "\n", count);
 
 	request.node = node;
 	request.count = count;
@@ -510,7 +517,8 @@ BMediaRosterEx::PublishInputs(const media_node& node, List<media_input>* list)
 		request.area = create_area("publish inputs", &start_addr,
 			B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (request.area < B_OK) {
-			ERROR("PublishInputs: failed to create area, %#lx\n", request.area);
+			ERROR("PublishInputs: failed to create area, %#" B_PRIx32 "\n",
+				request.area);
 			return (status_t)request.area;
 		}
 		inputs = static_cast<media_input *>(start_addr);
@@ -518,7 +526,7 @@ BMediaRosterEx::PublishInputs(const media_node& node, List<media_input>* list)
 		request.area = -1;
 		inputs = request.inputs;
 	}
-	TRACE("PublishInputs: area %ld\n", request.area);
+	TRACE("PublishInputs: area %" B_PRId32 "\n", request.area);
 
 	int i;
 	for (i = 0, list->Rewind(); list->GetNext(&input); i++) {
@@ -766,8 +774,9 @@ BMediaRoster::ReleaseNode(const media_node& node)
 
 	if (node.kind & NODE_KIND_NO_REFCOUNTING) {
 		printf("BMediaRoster::ReleaseNode, trying to release reference "
-			"counting disabled timesource, node %ld, port %ld, team %ld\n",
-			node.node, node.port, BPrivate::current_team());
+			"counting disabled timesource, node %" B_PRId32 ", port %" B_PRId32
+			", team %" B_PRId32 "\n", node.node, node.port,
+			BPrivate::current_team());
 		return B_OK;
 	}
 
@@ -778,14 +787,16 @@ BMediaRoster::ReleaseNode(const media_node& node)
 	request.node = node;
 	request.team = BPrivate::current_team();
 
-	TRACE("BMediaRoster::ReleaseNode, node %ld, port %ld, team %ld\n",
-		node.node, node.port, BPrivate::current_team());
+	TRACE("BMediaRoster::ReleaseNode, node %" B_PRId32 ", port %" B_PRId32
+		", team %" B_PRId32 "\n", node.node, node.port,
+		BPrivate::current_team());
 
 	rv = QueryServer(SERVER_RELEASE_NODE, &request, sizeof(request), &reply,
 		sizeof(reply));
 	if (rv != B_OK) {
-		ERROR("BMediaRoster::ReleaseNode FAILED, node %ld, port %ld, team "
-			"%ld!\n", node.node, node.port, BPrivate::current_team());
+		ERROR("BMediaRoster::ReleaseNode FAILED, node %" B_PRId32 ", port %"
+			B_PRId32 ", team %" B_PRId32 "!\n", node.node, node.port,
+			BPrivate::current_team());
 	}
 	return rv;
 }
@@ -808,13 +819,14 @@ BMediaRoster::MakeTimeSourceFor(const media_node& forNode)
 	}
 
 	if (IS_INVALID_NODE(forNode)) {
-		ERROR("BMediaRoster::MakeTimeSourceFor: for_node invalid, node %ld, "
-			"port %ld, kinds 0x%lx\n", forNode.node, forNode.port,
-			forNode.kind);
+		ERROR("BMediaRoster::MakeTimeSourceFor: for_node invalid, node %"
+			B_PRId32 ", port %" B_PRId32 ", kinds 0x%" B_PRIx32 "\n",
+			forNode.node, forNode.port, forNode.kind);
 		return NULL;
 	}
 
-	TRACE("BMediaRoster::MakeTimeSourceFor: node %ld enter\n", forNode.node);
+	TRACE("BMediaRoster::MakeTimeSourceFor: node %" B_PRId32 " enter\n",
+		forNode.node);
 
 	node_get_timesource_request request;
 	node_get_timesource_reply reply;
@@ -831,7 +843,8 @@ BMediaRoster::MakeTimeSourceFor(const media_node& forNode)
 
 	source = MediaRosterEx(this)->MakeTimeSourceObject(reply.timesource_id);
 
-	TRACE("BMediaRoster::MakeTimeSourceFor: node %ld leave\n", forNode.node);
+	TRACE("BMediaRoster::MakeTimeSourceFor: node %" B_PRId32 " leave\n",
+		forNode.node);
 
 	return source;
 }
@@ -870,26 +883,26 @@ BMediaRoster::Connect(const media_source& from, const media_destination& to,
 	media_node destnode;
 	rv = GetNodeFor(NodeIDFor(from.port), &sourcenode);
 	if (rv != B_OK) {
-		ERROR("BMediaRoster::Connect: Can't find source node for port %ld\n",
-			from.port);
+		ERROR("BMediaRoster::Connect: Can't find source node for port %"
+			B_PRId32 "\n", from.port);
 		return B_MEDIA_BAD_SOURCE;
 	}
 	ReleaseNode(sourcenode);
 	rv = GetNodeFor(NodeIDFor(to.port), &destnode);
 	if (rv != B_OK) {
 		ERROR("BMediaRoster::Connect: Can't find destination node for port "
-			"%ld\n", to.port);
+			"%" B_PRId32 "\n", to.port);
 		return B_MEDIA_BAD_DESTINATION;
 	}
 	ReleaseNode(destnode);
 
 	if (!(sourcenode.kind & B_BUFFER_PRODUCER)) {
-		ERROR("BMediaRoster::Connect: source node %ld is not a "
+		ERROR("BMediaRoster::Connect: source node %" B_PRId32 " is not a "
 			"B_BUFFER_PRODUCER\n", sourcenode.node);
 		return B_MEDIA_BAD_SOURCE;
 	}
 	if (!(destnode.kind & B_BUFFER_CONSUMER)) {
-		ERROR("BMediaRoster::Connect: destination node %ld is not a "
+		ERROR("BMediaRoster::Connect: destination node %" B_PRId32 " is not a "
 			"B_BUFFER_CONSUMER\n", destnode.node);
 		return B_MEDIA_BAD_DESTINATION;
 	}
@@ -907,7 +920,7 @@ BMediaRoster::Connect(const media_source& from, const media_destination& to,
 		sizeof(request1), &reply1, sizeof(reply1));
 	if (rv != B_OK) {
 		ERROR("BMediaRoster::Connect: aborted after "
-			"BBufferProducer::FormatProposal, status = %#lx\n",rv);
+			"BBufferProducer::FormatProposal, status = %#" B_PRIx32 "\n",rv);
 		return rv;
 	}
 	// reply1.format now contains the format proposed by the producer
@@ -925,7 +938,7 @@ BMediaRoster::Connect(const media_source& from, const media_destination& to,
 		sizeof(request2), &reply2, sizeof(reply2));
 	if (rv != B_OK) {
 		ERROR("BMediaRoster::Connect: aborted after "
-			"BBufferConsumer::AcceptFormat, status = %#lx\n",rv);
+			"BBufferConsumer::AcceptFormat, status = %#" B_PRIx32 "\n",rv);
 		return rv;
 	}
 	// reply2.format now contains the format accepted by the consumer
@@ -945,7 +958,7 @@ BMediaRoster::Connect(const media_source& from, const media_destination& to,
 		sizeof(request3), &reply3, sizeof(reply3));
 	if (rv != B_OK) {
 		ERROR("BMediaRoster::Connect: aborted after "
-			"BBufferProducer::PrepareToConnect, status = %#lx\n",rv);
+			"BBufferProducer::PrepareToConnect, status = %#" B_PRIx32 "\n", rv);
 		return rv;
 	}
 	// reply3.format is still our pretty media format
@@ -971,7 +984,8 @@ BMediaRoster::Connect(const media_source& from, const media_destination& to,
 		sizeof(request4), &reply4, sizeof(reply4));
 	if (con_status != B_OK) {
 		ERROR("BMediaRoster::Connect: aborting after "
-			"BBufferConsumer::Connected, status = %#lx\n",con_status);
+			"BBufferConsumer::Connected, status = %#" B_PRIx32 "\n",
+			con_status);
 		// we do NOT return here!
 	}
 	// con_status contains the status code to be supplied to
@@ -999,7 +1013,7 @@ BMediaRoster::Connect(const media_source& from, const media_destination& to,
 	}
 	if (rv != B_OK) {
 		ERROR("BMediaRoster::Connect: aborted after BBufferProducer::Connect()"
-			", status = %#lx\n",rv);
+			", status = %#" B_PRIx32 "\n", rv);
 		return rv;
 	}
 	// reply5.name contains the name assigned to the connection by the producer
@@ -1091,26 +1105,27 @@ BMediaRoster::Disconnect(media_node_id source_nodeid,
 	media_node destnode;
 	if (GetNodeFor(source_nodeid, &sourcenode) == B_OK) {
 		if (!(sourcenode.kind & B_BUFFER_PRODUCER)) {
-			ERROR("BMediaRoster::Disconnect: source_nodeid %ld is not a "
-				"B_BUFFER_PRODUCER\n", source_nodeid);
+			ERROR("BMediaRoster::Disconnect: source_nodeid %" B_PRId32
+				" is not a B_BUFFER_PRODUCER\n", source_nodeid);
 		}
 		if (MediaRosterEx(this)->GetAllOutputs(sourcenode , &outlist) == B_OK)
 			MediaRosterEx(this)->PublishOutputs(sourcenode , &outlist);
 		ReleaseNode(sourcenode);
 	} else {
-		ERROR("BMediaRoster::Disconnect: GetNodeFor source_nodeid %ld failed\n", source_nodeid);
+		ERROR("BMediaRoster::Disconnect: GetNodeFor source_nodeid %" B_PRId32
+			" failed\n", source_nodeid);
 	}
 	if (GetNodeFor(destination_nodeid, &destnode) == B_OK) {
 		if (!(destnode.kind & B_BUFFER_CONSUMER)) {
-			ERROR("BMediaRoster::Disconnect: destination_nodeid %ld is not a "
-				"B_BUFFER_CONSUMER\n", destination_nodeid);
+			ERROR("BMediaRoster::Disconnect: destination_nodeid %" B_PRId32
+				" is not a B_BUFFER_CONSUMER\n", destination_nodeid);
 		}
 		if (MediaRosterEx(this)->GetAllInputs(destnode , &inlist) == B_OK)
 			MediaRosterEx(this)->PublishInputs(destnode, &inlist);
 		ReleaseNode(destnode);
 	} else {
-		ERROR("BMediaRoster::Disconnect: GetNodeFor destination_nodeid %ld "
-			"failed\n", destination_nodeid);
+		ERROR("BMediaRoster::Disconnect: GetNodeFor destination_nodeid %"
+			B_PRId32 " failed\n", destination_nodeid);
 	}
 
 	// send a notification
@@ -1124,45 +1139,47 @@ status_t
 BMediaRoster::Disconnect(const media_output& output, const media_input& input)
 {
 	if (IS_INVALID_NODEID(output.node.node)) {
-		printf("BMediaRoster::Disconnect: output.node.node %ld invalid\n",
-			output.node.node);
+		printf("BMediaRoster::Disconnect: output.node.node %" B_PRId32
+			" invalid\n", output.node.node);
 		return B_MEDIA_BAD_SOURCE;
 	}
 	if (IS_INVALID_NODEID(input.node.node)) {
-		printf("BMediaRoster::Disconnect: input.node.node %ld invalid\n",
-			input.node.node);
+		printf("BMediaRoster::Disconnect: input.node.node %" B_PRId32
+			" invalid\n", input.node.node);
 		return B_MEDIA_BAD_DESTINATION;
 	}
 	if (!(output.node.kind & B_BUFFER_PRODUCER)) {
-		printf("BMediaRoster::Disconnect: output.node.kind 0x%lx is no "
-			"B_BUFFER_PRODUCER\n", output.node.kind);
+		printf("BMediaRoster::Disconnect: output.node.kind 0x%" B_PRIx32
+			" is no B_BUFFER_PRODUCER\n", output.node.kind);
 		return B_MEDIA_BAD_SOURCE;
 	}
 	if (!(input.node.kind & B_BUFFER_CONSUMER)) {
-		printf("BMediaRoster::Disconnect: input.node.kind 0x%lx is no "
-			"B_BUFFER_PRODUCER\n", input.node.kind);
+		printf("BMediaRoster::Disconnect: input.node.kind 0x%" B_PRIx32
+			" is no B_BUFFER_PRODUCER\n", input.node.kind);
 		return B_MEDIA_BAD_DESTINATION;
 	}
 	if (input.source.port != output.source.port) {
-		printf("BMediaRoster::Disconnect: input.source.port %ld doesn't match "
-			"output.source.port %ld\n", input.source.port, output.source.port);
+		printf("BMediaRoster::Disconnect: input.source.port %" B_PRId32
+			" doesn't match output.source.port %" B_PRId32 "\n",
+			input.source.port, output.source.port);
 		return B_MEDIA_BAD_SOURCE;
 	}
 	if (input.source.id != output.source.id) {
-		printf("BMediaRoster::Disconnect: input.source.id %ld doesn't match "
-			"output.source.id %ld\n", input.source.id, output.source.id);
+		printf("BMediaRoster::Disconnect: input.source.id %" B_PRId32
+			" doesn't match output.source.id %" B_PRId32 "\n", input.source.id,
+			output.source.id);
 		return B_MEDIA_BAD_SOURCE;
 	}
 	if (input.destination.port != output.destination.port) {
-		printf("BMediaRoster::Disconnect: input.destination.port %ld doesn't "
-			"match output.destination.port %ld\n", input.destination.port,
-			output.destination.port);
+		printf("BMediaRoster::Disconnect: input.destination.port %" B_PRId32
+			" doesn't match output.destination.port %" B_PRId32 "\n",
+			input.destination.port, output.destination.port);
 		return B_MEDIA_BAD_DESTINATION;
 	}
 	if (input.destination.id != output.destination.id) {
-		printf("BMediaRoster::Disconnect: input.destination.id %ld doesn't "
-			"match output.destination.id %ld\n", input.destination.id,
-			output.destination.id);
+		printf("BMediaRoster::Disconnect: input.destination.id %" B_PRId32
+			" doesn't match output.destination.id %" B_PRId32 "\n",
+			input.destination.id, output.destination.id);
 		return B_MEDIA_BAD_DESTINATION;
 	}
 
@@ -1178,8 +1195,8 @@ BMediaRoster::StartNode(const media_node& node, bigtime_t atPerformanceTime)
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
-	TRACE("BMediaRoster::StartNode, node %ld, at perf %Ld\n", node.node,
-		atPerformanceTime);
+	TRACE("BMediaRoster::StartNode, node %" B_PRId32 ", at perf %" B_PRId64
+		"\n", node.node, atPerformanceTime);
 
 	node_start_command command;
 	command.performance_time = atPerformanceTime;
@@ -1196,8 +1213,8 @@ BMediaRoster::StopNode(const media_node& node, bigtime_t atPerformanceTime,
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
-	TRACE("BMediaRoster::StopNode, node %ld, at perf %Ld %s\n", node.node,
-		atPerformanceTime, immediate ? "NOW" : "");
+	TRACE("BMediaRoster::StopNode, node %" B_PRId32 ", at perf %" B_PRId64
+		" %s\n", node.node, atPerformanceTime, immediate ? "NOW" : "");
 
 	node_stop_command command;
 	command.performance_time = atPerformanceTime;
@@ -1215,8 +1232,8 @@ BMediaRoster::SeekNode(const media_node& node, bigtime_t toMediaTime,
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
-	TRACE("BMediaRoster::SeekNode, node %ld, at perf %Ld, to perf %Ld\n",
-		node.node, atPerformanceTime, toMediaTime);
+	TRACE("BMediaRoster::SeekNode, node %" B_PRId32 ", at perf %" B_PRId64
+		", to perf %" B_PRId64 "\n", node.node, atPerformanceTime, toMediaTime);
 
 	node_seek_command command;
 	command.media_time = toMediaTime;
@@ -1232,26 +1249,27 @@ BMediaRoster::StartTimeSource(const media_node& node, bigtime_t atRealTime)
 	CALLED();
 	if (IS_SYSTEM_TIMESOURCE(node)) {
 		// TODO: debug this
-		//ERROR("BMediaRoster::StartTimeSource node %ld is system timesource\n", node.node);
+		//ERROR("BMediaRoster::StartTimeSource node %" B_PRId32 " is system timesource\n", node.node);
 		return B_OK;
 	}
 //	if (IS_SHADOW_TIMESOURCE(node)) {
 //		// TODO: debug this
-//		ERROR("BMediaRoster::StartTimeSource node %ld is shadow timesource\n", node.node);
+//		ERROR("BMediaRoster::StartTimeSource node %" B_PRId32 " is shadow timesource\n", node.node);
 //		return B_OK;
 //	}
 	if (IS_INVALID_NODE(node)) {
-		ERROR("BMediaRoster::StartTimeSource node %ld invalid\n", node.node);
-		return B_MEDIA_BAD_NODE;
-	}
-	if ((node.kind & B_TIME_SOURCE) == 0) {
-		ERROR("BMediaRoster::StartTimeSource node %ld is no timesource\n",
+		ERROR("BMediaRoster::StartTimeSource node %" B_PRId32 " invalid\n",
 			node.node);
 		return B_MEDIA_BAD_NODE;
 	}
+	if ((node.kind & B_TIME_SOURCE) == 0) {
+		ERROR("BMediaRoster::StartTimeSource node %" B_PRId32
+			" is no timesource\n", node.node);
+		return B_MEDIA_BAD_NODE;
+	}
 
-	TRACE("BMediaRoster::StartTimeSource, node %ld, at real %Ld\n", node.node,
-		atRealTime);
+	TRACE("BMediaRoster::StartTimeSource, node %" B_PRId32 ", at real %"
+		B_PRId64 "\n", node.node, atRealTime);
 
 	BTimeSource::time_source_op_info msg;
 	msg.op = BTimeSource::B_TIMESOURCE_START;
@@ -1277,17 +1295,18 @@ BMediaRoster::StopTimeSource(const media_node& node, bigtime_t atRealTime,
 //		return B_OK;
 //	}
 	if (IS_INVALID_NODE(node)) {
-		ERROR("BMediaRoster::StopTimeSource node %ld invalid\n", node.node);
-		return B_MEDIA_BAD_NODE;
-	}
-	if ((node.kind & B_TIME_SOURCE) == 0) {
-		ERROR("BMediaRoster::StopTimeSource node %ld is no timesource\n",
+		ERROR("BMediaRoster::StopTimeSource node %" B_PRId32 " invalid\n",
 			node.node);
 		return B_MEDIA_BAD_NODE;
 	}
+	if ((node.kind & B_TIME_SOURCE) == 0) {
+		ERROR("BMediaRoster::StopTimeSource node %" B_PRId32 " is no "
+			"timesource\n", node.node);
+		return B_MEDIA_BAD_NODE;
+	}
 
-	TRACE("BMediaRoster::StopTimeSource, node %ld, at real %Ld %s\n",
-		node.node, atRealTime, immediate ? "NOW" : "");
+	TRACE("BMediaRoster::StopTimeSource, node %" B_PRId32 ", at real %" B_PRId64
+		" %s\n", node.node, atRealTime, immediate ? "NOW" : "");
 
 	BTimeSource::time_source_op_info msg;
 	msg.op = immediate ? BTimeSource::B_TIMESOURCE_STOP_IMMEDIATELY
@@ -1316,17 +1335,18 @@ BMediaRoster::SeekTimeSource(const media_node& node,
 //		return B_OK;
 //	}
 	if (IS_INVALID_NODE(node)) {
-		ERROR("BMediaRoster::SeekTimeSource node %ld invalid\n", node.node);
-		return B_MEDIA_BAD_NODE;
-	}
-	if ((node.kind & B_TIME_SOURCE) == 0) {
-		ERROR("BMediaRoster::SeekTimeSource node %ld is no timesource\n",
+		ERROR("BMediaRoster::SeekTimeSource node %" B_PRId32 " invalid\n",
 			node.node);
 		return B_MEDIA_BAD_NODE;
 	}
+	if ((node.kind & B_TIME_SOURCE) == 0) {
+		ERROR("BMediaRoster::SeekTimeSource node %" B_PRId32
+			" is no timesource\n", node.node);
+		return B_MEDIA_BAD_NODE;
+	}
 
-	TRACE("BMediaRoster::SeekTimeSource, node %ld, at real %Ld, to perf %Ld\n",
-		node.node, atRealTime, toPerformanceTime);
+	TRACE("BMediaRoster::SeekTimeSource, node %" B_PRId32 ", at real %" B_PRId64
+		", to perf %" B_PRId64 "\n", node.node, atRealTime, toPerformanceTime);
 
 	BTimeSource::time_source_op_info msg;
 	msg.op = BTimeSource::B_TIMESOURCE_SEEK;
@@ -1349,7 +1369,8 @@ BMediaRoster::SyncToNode(const media_node& node, bigtime_t atTime,
 status_t
 BMediaRoster::SetRunModeNode(const media_node& node, BMediaNode::run_mode mode)
 {
-	TRACE("BMediaRoster::SetRunModeNode, node %ld, mode %d\n", node.node, mode);
+	TRACE("BMediaRoster::SetRunModeNode, node %" B_PRId32 ", mode %d\n",
+		node.node, mode);
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
@@ -1385,8 +1406,8 @@ status_t
 BMediaRoster::SetProducerRunModeDelay(const media_node& node,
 	bigtime_t delay, BMediaNode::run_mode mode)
 {
-	TRACE("BMediaRoster::SetProducerRunModeDelay, node %ld, delay %Ld, "
-		"mode %d\n", node.node, delay, mode);
+	TRACE("BMediaRoster::SetProducerRunModeDelay, node %" B_PRId32 ", delay %"
+		B_PRId64 ", mode %d\n", node.node, delay, mode);
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 	if ((node.kind & B_BUFFER_PRODUCER) == 0)
@@ -1522,13 +1543,13 @@ BMediaRoster::GetFreeInputsFor(const media_node& node,
 {
 	CALLED();
 	if (IS_INVALID_NODE(node)) {
-		ERROR("BMediaRoster::GetFreeInputsFor: node %ld, port %ld invalid\n",
-			node.node, node.port);
+		ERROR("BMediaRoster::GetFreeInputsFor: node %" B_PRId32 ", port %"
+			B_PRId32 " invalid\n", node.node, node.port);
 		return B_MEDIA_BAD_NODE;
 	}
 	if ((node.kind & B_BUFFER_CONSUMER) == 0) {
-		ERROR("BMediaRoster::GetFreeInputsFor: node %ld, port %ld is not a "
-			"consumer\n", node.node, node.port);
+		ERROR("BMediaRoster::GetFreeInputsFor: node %" B_PRId32 ", port %"
+			B_PRId32 " is not a consumer\n", node.node, node.port);
 		return B_MEDIA_BAD_NODE;
 	}
 	if (out_free_inputs == NULL || out_total_count == NULL)
@@ -1544,8 +1565,9 @@ BMediaRoster::GetFreeInputsFor(const media_node& node,
 	if (B_OK != rv)
 		return rv;
 
-	PRINT(4, "BMediaRoster::GetFreeInputsFor node %ld, max %ld, filter-type "
-		"%ld\n", node.node, buf_num_inputs, filter_type);
+	PRINT(4, "BMediaRoster::GetFreeInputsFor node %" B_PRId32 ", max %" B_PRId32
+		", filter-type %" B_PRId32 "\n", node.node, buf_num_inputs,
+		filter_type);
 
 	int32 i;
 	for (i = 0, list.Rewind(); list.GetNext(&input);) {
@@ -1596,8 +1618,8 @@ BMediaRoster::GetConnectedInputsFor(const media_node& node,
 	if (B_OK != rv)
 		return rv;
 
-	PRINT(4, "BMediaRoster::GetConnectedInputsFor node %ld, max %ld\n",
-		node.node, buf_num_inputs);
+	PRINT(4, "BMediaRoster::GetConnectedInputsFor node %" B_PRId32 ", max %"
+		B_PRId32 "\n", node.node, buf_num_inputs);
 
 	int32 i;
 	for (i = 0, list.Rewind(); list.GetNext(&input);) {
@@ -1639,8 +1661,8 @@ BMediaRoster::GetAllInputsFor(const media_node& node, media_input* out_inputs,
 	if (B_OK != rv)
 		return rv;
 
-	PRINT(4, "BMediaRoster::GetAllInputsFor node %ld, max %ld\n", node.node,
-		buf_num_inputs);
+	PRINT(4, "BMediaRoster::GetAllInputsFor node %" B_PRId32 ", max %" B_PRId32
+		"\n", node.node, buf_num_inputs);
 
 	int32 i;
 	for (i = 0, list.Rewind(); list.GetNext(&input); i++) {
@@ -1680,8 +1702,9 @@ BMediaRoster::GetFreeOutputsFor(const media_node& node,
 	if (B_OK != rv)
 		return rv;
 
-	PRINT(4, "BMediaRoster::GetFreeOutputsFor node %ld, max %ld, filter-type "
-		"%ld\n", node.node, buf_num_outputs, filter_type);
+	PRINT(4, "BMediaRoster::GetFreeOutputsFor node %" B_PRId32 ", max %"
+		B_PRId32 ", filter-type %" B_PRId32 "\n", node.node, buf_num_outputs,
+		filter_type);
 
 	int32 i;
 	for (i = 0, list.Rewind(); list.GetNext(&output);) {
@@ -1732,8 +1755,8 @@ BMediaRoster::GetConnectedOutputsFor(const media_node& node,
 	if (B_OK != rv)
 		return rv;
 
-	PRINT(4, "BMediaRoster::GetConnectedOutputsFor node %ld, max %ld\n",
-		node.node, buf_num_outputs);
+	PRINT(4, "BMediaRoster::GetConnectedOutputsFor node %" B_PRId32 ", max %"
+		B_PRId32 "\n", node.node, buf_num_outputs);
 
 	int32 i;
 	for (i = 0, list.Rewind(); list.GetNext(&output);) {
@@ -1777,8 +1800,8 @@ BMediaRoster::GetAllOutputsFor(const media_node& node,
 	if (B_OK != rv)
 		return rv;
 
-	PRINT(4, "BMediaRoster::GetAllOutputsFor node %ld, max %ld\n", node.node,
-		buf_num_outputs);
+	PRINT(4, "BMediaRoster::GetAllOutputsFor node %" B_PRId32 ", max %" B_PRId32
+		"\n", node.node, buf_num_outputs);
 
 	int32 i;
 	for (i = 0, list.Rewind(); list.GetNext(&output); i++) {
@@ -1935,8 +1958,8 @@ BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addOnID,
 	request.team = BPrivate::current_team();
 
 	TRACE("BMediaRoster::RegisterNode: sending SERVER_REGISTER_NODE: port "
-		"%ld, kinds 0x%Lx, team %ld, name '%s'\n", request.port, request.kinds,
-		request.team, request.name);
+		"%" B_PRId32 ", kinds 0x%" B_PRIx64 ", team %" B_PRId32 ", name '%s'\n",
+		request.port, request.kinds, request.team, request.name);
 
 	status_t status = QueryServer(SERVER_REGISTER_NODE, &request,
 		sizeof(request), &reply, sizeof(reply));
@@ -2059,8 +2082,9 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 	status_t status = QueryServer(SERVER_UNREGISTER_NODE, &request,
 		sizeof(request), &reply, sizeof(reply));
 	if (status != B_OK) {
-		ERROR("BMediaRoster::UnregisterNode: failed to unregister node id %ld, "
-			"name '%s': %s\n", node->ID(), node->Name(), strerror(status));
+		ERROR("BMediaRoster::UnregisterNode: failed to unregister node id %"
+			B_PRId32 ", name '%s': %s\n", node->ID(), node->Name(),
+			strerror(status));
 		return status;
 	}
 
@@ -2135,16 +2159,16 @@ BMediaRoster::SetTimeSourceFor(media_node_id node, media_node_id time_source)
 	media_node clone;
 	status_t rv, result;
 
-	TRACE("BMediaRoster::SetTimeSourceFor: node %ld will be assigned time "
-		"source %ld\n", node, time_source);
-	TRACE("BMediaRoster::SetTimeSourceFor: node %ld time source %ld enter\n",
-		node, time_source);
+	TRACE("BMediaRoster::SetTimeSourceFor: node %" B_PRId32 " will be assigned "
+		"time source %" B_PRId32 "\n", node, time_source);
+	TRACE("BMediaRoster::SetTimeSourceFor: node %" B_PRId32 " time source %"
+		B_PRId32 " enter\n", node, time_source);
 
 	// we need to get a clone of the node to have a port id
 	rv = GetNodeFor(node, &clone);
 	if (rv != B_OK) {
-		ERROR("BMediaRoster::SetTimeSourceFor, GetNodeFor failed, node id "
-			"%ld\n", node);
+		ERROR("BMediaRoster::SetTimeSourceFor, GetNodeFor failed, node id %"
+			B_PRId32 "\n", node);
 		return B_ERROR;
 	}
 
@@ -2156,20 +2180,20 @@ BMediaRoster::SetTimeSourceFor(media_node_id node, media_node_id time_source)
 	rv = SendToPort(clone.port, NODE_SET_TIMESOURCE, &cmd, sizeof(cmd));
 	if (rv != B_OK) {
 		ERROR("BMediaRoster::SetTimeSourceFor, sending NODE_SET_TIMESOURCE "
-			"failed, node id %ld\n", node);
+			"failed, node id %" B_PRId32 "\n", node);
 		result = B_ERROR;
 	}
 
 	// we release the clone
 	rv = ReleaseNode(clone);
 	if (rv != B_OK) {
-		ERROR("BMediaRoster::SetTimeSourceFor, ReleaseNode failed, node id "
-			"%ld\n", node);
+		ERROR("BMediaRoster::SetTimeSourceFor, ReleaseNode failed, node id %"
+			B_PRId32 "\n", node);
 		result = B_ERROR;
 	}
 
-	TRACE("BMediaRoster::SetTimeSourceFor: node %ld time source %ld leave\n",
-		node, time_source);
+	TRACE("BMediaRoster::SetTimeSourceFor: node %" B_PRId32 " time source %"
+		B_PRId32 " leave\n", node, time_source);
 
 	return result;
 }
@@ -2202,7 +2226,7 @@ BMediaRoster::GetParameterWebFor(const media_node& node, BParameterWeb** _web)
 			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (area < B_OK) {
 			ERROR("BMediaRoster::GetParameterWebFor couldn't create area of "
-				"size %ld\n", size);
+				"size %" B_PRId32 "\n", size);
 			return B_ERROR;
 		}
 		request.max_size = size;
@@ -2218,8 +2242,8 @@ BMediaRoster::GetParameterWebFor(const media_node& node, BParameterWeb** _web)
 		if (reply.size == 0) {
 			// no parameter web available
 			// TODO: should we return an error?
-			ERROR("BMediaRoster::GetParameterWebFor node %ld has no parameter "
-				"web\n", node.node);
+			ERROR("BMediaRoster::GetParameterWebFor node %" B_PRId32
+				" has no parameter web\n", node.node);
 			*_web = new (std::nothrow) BParameterWeb();
 			delete_area(area);
 			return *_web != NULL ? B_OK : B_NO_MEMORY;
@@ -2230,10 +2254,11 @@ BMediaRoster::GetParameterWebFor(const media_node& node, BParameterWeb** _web)
 			if (*_web == NULL)
 				rv = B_NO_MEMORY;
 			else {
-				printf("BMediaRoster::GetParameterWebFor Unflattening %ld "
-					"bytes, 0x%08lx, 0x%08lx, 0x%08lx, 0x%08lx\n",
-					reply.size, ((uint32*)data)[0], ((uint32*)data)[1],
-					((uint32*)data)[2], ((uint32*)data)[3]);
+				printf("BMediaRoster::GetParameterWebFor Unflattening %"
+					B_PRId32 " bytes, %#" B_PRIx32 ", %#" B_PRIx32 ", %#"
+					B_PRIx32 ", %#" B_PRIx32 "\n", reply.size,
+					((uint32*)data)[0], ((uint32*)data)[1], ((uint32*)data)[2],
+					((uint32*)data)[3]);
 
 				rv = (*_web)->Unflatten(reply.code, data, reply.size);
 			}
@@ -2250,8 +2275,8 @@ BMediaRoster::GetParameterWebFor(const media_node& node, BParameterWeb** _web)
 		// parameter web data was too large
 		// loop and try a larger size
 	}
-	ERROR("BMediaRoster::GetParameterWebFor node %ld has no parameter web "
-		"larger than %ld\n", node.node, size);
+	ERROR("BMediaRoster::GetParameterWebFor node %" B_PRId32 " has no "
+		"parameter web larger than %" B_PRId32 "\n", node.node, size);
 	return B_ERROR;
 }
 
@@ -2359,8 +2384,8 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 	//				media_addon_server context) the team-id of the team that
 	//				requested the instantiation.
 
-	TRACE("BMediaRosterEx::InstantiateDormantNode: addonID %ld, flavorID "
-		"%ld\n", addonID, flavorID);
+	TRACE("BMediaRosterEx::InstantiateDormantNode: addonID %" B_PRId32
+		", flavorID %" B_PRId32 "\n", addonID, flavorID);
 
 	// Get flavor_info from the server
 	dormant_flavor_info info;
@@ -2368,8 +2393,8 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 	rv = GetDormantFlavorInfo(addonID, flavorID, &info);
 	if (rv != B_OK) {
 		ERROR("BMediaRosterEx::InstantiateDormantNode error: failed to get "
-			"dormant_flavor_info for addon-id %ld, flavor-id %ld\n", addonID,
-			flavorID);
+			"dormant_flavor_info for addon-id %" B_PRId32 ", flavor-id %"
+			B_PRId32 "\n", addonID, flavorID);
 		return B_ERROR;
 	}
 
@@ -2388,7 +2413,8 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 	rv = IncrementAddonFlavorInstancesCount(addonID, flavorID);
 	if (rv != B_OK) {
 		ERROR("BMediaRosterEx::InstantiateDormantNode error: can't create "
-			"more nodes for addon-id %ld, flavor-id %ld\n", addonID, flavorID);
+			"more nodes for addon-id %" B_PRId32 ", flavor-id %" B_PRId32 "\n",
+			addonID, flavorID);
 		// Put the addon back into the pool
 		gDormantNodeManager->PutAddOn(addonID);
 		return B_ERROR;
@@ -2398,8 +2424,8 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 	rv = LoadNodeConfiguration(addonID, flavorID, &config);
 	if (rv != B_OK) {
 		ERROR("BMediaRosterEx::InstantiateDormantNode: couldn't load "
-			"configuration for addon-id %ld, flavor-id %ld\n", addonID,
-			flavorID);
+			"configuration for addon-id %" B_PRId32 ", flavor-id %" B_PRId32
+			"\n", addonID, flavorID);
 		// do not return, this is a minor problem, not a reason to fail
 	}
 
@@ -2441,13 +2467,15 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 	if (creator != -1) {
 		// send a message to the server to assign team "creator" as creator
 		// of node "node->ID()"
-		printf("!!! BMediaRosterEx::InstantiateDormantNode assigning team "
-			"%ld as creator of node %ld\n", creator, node->ID());
+		printf("!!! BMediaRosterEx::InstantiateDormantNode assigning team %"
+			B_PRId32 " as creator of node %" B_PRId32 "\n", creator,
+			node->ID());
 
 		rv = MediaRosterEx(this)->SetNodeCreator(node->ID(), creator);
 		if (rv != B_OK) {
 			ERROR("BMediaRosterEx::InstantiateDormantNode failed to assign "
-				"team %ld as creator of node %ld\n", creator, node->ID());
+				"team %" B_PRId32 " as creator of node %" B_PRId32 "\n",
+				creator, node->ID());
 			// do not return, this is a minor problem, not a reason to fail
 		}
 	}
@@ -2458,9 +2486,10 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 
 	*_node = node->Node();
 
-	TRACE("BMediaRosterEx::InstantiateDormantNode: addon-id %ld, flavor_id "
-		"%ld instanciated as node %ld, port %ld in team %ld\n", addonID,
-		flavorID, _node->node, _node->port, BPrivate::current_team());
+	TRACE("BMediaRosterEx::InstantiateDormantNode: addon-id %" B_PRId32
+		", flavor_id %" B_PRId32 " instanciated as node %" B_PRId32 ", port %"
+		B_PRId32 " in team %" B_PRId32 "\n", addonID, flavorID, _node->node,
+		_node->port, BPrivate::current_team());
 
 	return B_OK;
 }
@@ -2474,13 +2503,14 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info& info,
 	if (_node == NULL)
 		return B_BAD_VALUE;
 	if (info.addon <= B_OK) {
-		ERROR("BMediaRoster::InstantiateDormantNode error: addon-id %ld "
-			"invalid.\n", info.addon);
+		ERROR("BMediaRoster::InstantiateDormantNode error: addon-id %" B_PRId32
+			" invalid.\n", info.addon);
 		return B_BAD_VALUE;
 	}
 
-	printf("BMediaRoster::InstantiateDormantNode: addon-id %ld, flavor_id "
-		"%ld, flags 0x%lX\n", info.addon, info.flavor_id, flags);
+	printf("BMediaRoster::InstantiateDormantNode: addon-id %" B_PRId32
+		", flavor_id %" B_PRId32 ", flags 0x%" B_PRIx32 "\n", info.addon,
+		info.flavor_id, flags);
 
 	// Get flavor_info from the server
 	// TODO: this is a little overhead, as we get the full blown
@@ -2492,8 +2522,8 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info& info,
 		&flavorInfo);
 	if (rv != B_OK) {
 		ERROR("BMediaRoster::InstantiateDormantNode: failed to get "
-			"dormant_flavor_info for addon-id %ld, flavor-id %ld\n",
-			info.addon, info.flavor_id);
+			"dormant_flavor_info for addon-id %" B_PRId32 ", flavor-id %"
+			B_PRId32 "\n", info.addon, info.flavor_id);
 		return B_NAME_NOT_FOUND;
 	}
 
@@ -2501,9 +2531,10 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info& info,
 
 #if DEBUG
 	printf("BMediaRoster::InstantiateDormantNode: name \"%s\", info \"%s\", "
-		"flavor_flags 0x%lX, internal_id %ld, possible_count %ld\n",
-		flavorInfo.name, flavorInfo.info, flavorInfo.flavor_flags,
-		flavorInfo.internal_id, flavorInfo.possible_count);
+		"flavor_flags 0x%" B_PRIx32 ", internal_id %" B_PRId32
+		", possible_count %" B_PRId32 "\n", flavorInfo.name, flavorInfo.info,
+		flavorInfo.flavor_flags, flavorInfo.internal_id,
+		flavorInfo.possible_count);
 
 	if ((flags & B_FLAVOR_IS_LOCAL) != 0) {
 		printf("BMediaRoster::InstantiateDormantNode: caller requested "
@@ -2702,8 +2733,8 @@ BMediaRoster::GetInitialLatencyFor(const media_node& producer,
 	if (_flags != NULL)
 		*_flags = reply.flags;
 
-	TRACE("BMediaRoster::GetInitialLatencyFor producer %ld has maximum "
-		"initial latency %Ld\n", producer.node, *_latency);
+	TRACE("BMediaRoster::GetInitialLatencyFor producer %" B_PRId32 " has "
+		"maximum initial latency %" B_PRId64 "\n", producer.node, *_latency);
 	return B_OK;
 }
 
@@ -2730,8 +2761,8 @@ BMediaRoster::GetStartLatencyFor(const media_node& timeSource,
 
 	*_latency = reply.start_latency;
 
-	TRACE("BMediaRoster::GetStartLatencyFor timesource %ld has maximum "
-		"initial latency %Ld\n", timeSource.node, *_latency);
+	TRACE("BMediaRoster::GetStartLatencyFor timesource %" B_PRId32 " has "
+		"maximum initial latency %" B_PRId64 "\n", timeSource.node, *_latency);
 	return B_OK;
 }
 
@@ -2838,7 +2869,8 @@ BMediaRoster::SniffRef(const entry_ref& file, uint64 requireNodeKinds,
 {
 	CALLED();
 
-	TRACE("BMediaRoster::SniffRef looking for a node to handle %s : %Ld\n",file.name, requireNodeKinds);
+	TRACE("BMediaRoster::SniffRef looking for a node to handle %s: 0x%" B_PRIx64
+		"\n", file.name, requireNodeKinds);
 
 	if (_node == NULL)
 		return B_BAD_VALUE;
@@ -2873,8 +2905,10 @@ BMediaRoster::SniffRef(const entry_ref& file, uint64 requireNodeKinds,
 		if (highestCapability != -1) {
 			*_node = nodes[highestCapability];
 
-			TRACE("BMediaRoster::SniffRef: found a node %s addon-id %ld, flavor_id %ld\n",
-			nodes[highestCapability].name, nodes[highestCapability].addon, nodes[highestCapability].flavor_id);
+			TRACE("BMediaRoster::SniffRef: found a node %s addon-id %" B_PRId32
+				", flavor_id %" B_PRId32 "\n",
+			nodes[highestCapability].name, nodes[highestCapability].addon,
+				nodes[highestCapability].flavor_id);
 
 			if (mimeType != NULL) {
 				//*mimeType = aMimeType; -- need a copy constructor
@@ -3013,7 +3047,7 @@ BMediaRoster::NodeIDFor(port_id port)
 	rv = QueryServer(SERVER_NODE_ID_FOR, &request, sizeof(request), &reply,
 		sizeof(reply));
 	if (rv != B_OK) {
-		ERROR("BMediaRoster::NodeIDFor: failed (error %#lx)\n", rv);
+		ERROR("BMediaRoster::NodeIDFor: failed (error %#" B_PRIx32 ")\n", rv);
 		return -1;
 	}
 
@@ -3101,8 +3135,8 @@ BMediaRoster::AudioBufferSizeFor(int32 channelCount, uint32 sampleFormat,
 	bufferSize = (sampleFormat & 0xf) * channelCount
 		* (ssize_t)((frameRate * bufferDuration) / 1000000.0);
 
-	printf("Suggested buffer duration %Ld, size %ld\n", bufferDuration,
-		bufferSize);
+	printf("Suggested buffer duration %" B_PRId64 ", size %" B_PRIdSSIZE "\n",
+		bufferDuration, bufferSize);
 
 	return bufferSize;
 }
@@ -3148,10 +3182,12 @@ BMediaRoster::MessageReceived(BMessage* message)
 			BMediaNode *node;
 			message->FindPointer("node", reinterpret_cast<void **>(&node));
 
-			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE saving node %ld configuration\n", node->ID());
+			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE saving "
+				"node %" B_PRId32 " configuration\n", node->ID());
 			MediaRosterEx(BMediaRoster::Roster())->SaveNodeConfiguration(node);
 
-			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE releasing node %ld\n", node->ID());
+			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE releasing "
+				"node %" B_PRId32 "\n", node->ID());
 			node->DeleteHook(node); // we don't call Release(), see above!
 			return;
 		}

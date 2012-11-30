@@ -48,14 +48,17 @@ TimeSourceObject::TimeSourceObject(const media_node& node)
 		if (BMediaRoster::Roster()->GetLiveNodeInfo(node, &liveNodeInfo)
 				== B_OK)
 			strlcpy(fName, liveNodeInfo.name, B_MEDIA_NAME_LENGTH);
-		else
-			snprintf(fName, B_MEDIA_NAME_LENGTH, "timesource %ld", node.node);
+		else {
+			snprintf(fName, B_MEDIA_NAME_LENGTH, "timesource %" B_PRId32,
+				node.node);
+		}
 	}
 
 	AddNodeKind(NODE_KIND_SHADOW_TIMESOURCE);
 	AddNodeKind(NODE_KIND_NO_REFCOUNTING);
 
-	TRACE("TimeSourceObject::TimeSourceObject leave, node id %ld\n", fNodeID);
+	TRACE("TimeSourceObject::TimeSourceObject leave, node id %" B_PRId32 "\n",
+		fNodeID);
 }
 
 
