@@ -202,7 +202,13 @@ public:
 
 	virtual bool Visit(BDiskDevice* device)
 	{
-		PartitionView* view = new PartitionView(B_TRANSLATE("Device"), 1.0,
+		const char* name;
+		if (device->Name() != NULL && device->Name()[0] != '\0')
+			name = device->Name();
+		else
+			name = B_TRANSLATE("Device");
+
+		PartitionView* view = new PartitionView(name, 1.0,
 			device->Offset(), 0, device->ID());
 		fViewMap.Put(device->ID(), view);
 		fView->GetLayout()->AddView(view);
