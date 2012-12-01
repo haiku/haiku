@@ -438,7 +438,7 @@ GalliumContext::SetCurrentContext(Bitmap *bitmap, context_id contextID)
 	}
 
 	// TODO: WinSysDrawBuffer & WinSysReadBuffer?
-	api->make_current(context->api, context->st, context->read, context->draw);
+	api->make_current(context->api, context->st, context->draw, context->read);
 
 
 	// TODO: Anything else? st_api_make_current
