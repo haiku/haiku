@@ -1033,12 +1033,13 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 	// in the case of an address node with a hidden child,
 	// we want to send removal notifications for the children
 	// instead.
+	BReference<ModelNode> hiddenChild;
 	if (modelNode->CountChildren() == 1
 		&& modelNode->ChildAt(0)->IsHidden()) {
-		ModelNode* tempNode = modelNode->ChildAt(0);
-		modelNode->RemoveChild(tempNode);
-		modelNode = tempNode;
-		fNodeTable.Remove(tempNode);
+		hiddenChild.SetTo(modelNode->ChildAt(0), true);
+		modelNode->RemoveChild(hiddenChild);
+		modelNode = hiddenChild;
+		fNodeTable.Remove(hiddenChild);
 	}
 
 	for (int32 i = 0; i < modelNode->CountChildren(); i++) {
