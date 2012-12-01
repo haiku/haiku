@@ -34,6 +34,7 @@ local genericSources =
 	e_j1.c e_j1f.c
 	e_jn.c e_jnf.c
 	e_hypotl.c
+	e_ilogbl.c
 	e_lgamma_r.c e_lgammaf_r.c e_lgammal_r.c
 	k_cos.c k_cosf.c
 	k_sin.c k_sinf.c
@@ -84,6 +85,7 @@ local genericSources =
 	w_exp2.c w_exp2f.c w_exp2l.c
 	w_fmod.c w_fmodf.c w_fmodl.c
 	w_hypot.c w_hypotf.c w_hypotl.c
+	w_ilogbl.c
 	w_j0.c w_j0f.c
 	w_j1.c w_j1f.c
 	w_jn.c w_jnf.c
