@@ -309,25 +309,37 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 		// If the function is not frameless and we're at the top frame we need
 		// to check whether the prologue has not been executed (completely) or
 		// we're already after the epilogue.
-		if (hasPrologue && isTopFrame) {
+		if (isTopFrame) {
 			uint32 stack = 0;
-			if (eip < function->Address() + 3) {
-				// The prologue has not been executed yet, i.e. there's no
-				// stack frame yet. Get the return address from the stack.
-				stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
-				if (eip > function->Address()) {
-					// The "push %ebp" has already been executed.
-					stack += 4;
+			if (hasPrologue) {
+				if (eip < function->Address() + 3) {
+					// The prologue has not been executed yet, i.e. there's no
+					// stack frame yet. Get the return address from the stack.
+					stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
+					if (eip > function->Address()) {
+						// The "push %ebp" has already been executed.
+						stack += 4;
+					}
+				} else {
+					// Not in the function prologue, but maybe after the
+					// epilogue. The epilogue is a single "pop %ebp", so we
+					// check whether the current instruction is already a
+					// "ret".
+					uint8 code[1];
+					if (fTeamMemory->ReadMemory(eip, &code, 1) == 1
+						&& code[0] == 0xc3) {
+						stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
+					}
 				}
 			} else {
-				// Not in the function prologue, but maybe after the epilogue.
-				// The epilogue is a single "pop %ebp", so we check whether the
-				// current instruction is already a "ret".
-				uint8 code[1];
-				if (fTeamMemory->ReadMemory(eip, &code, 1) == 1
-					&& code[0] == 0xc3) {
+				// Check if the instruction pointer is at a readable location.
+				// If it isn't, then chances are we got here via a bogus
+				// function pointer, and the prologue hasn't actually been
+				// executed. In such a case, what we need is right at the top
+				// of the stack.
+				uint8 data[1];
+				if (fTeamMemory->ReadMemory(eip, &data, 1) != 1)
 					stack = cpuState->IntRegisterValue(X86_REGISTER_ESP);
-				}
 			}
 
 			if (stack != 0) {
