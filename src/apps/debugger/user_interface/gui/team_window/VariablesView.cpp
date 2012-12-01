@@ -1030,6 +1030,17 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 	if (modelNode == NULL)
 		return;
 
+	// in the case of an address node with a hidden child,
+	// we want to send removal notifications for the children
+	// instead.
+	if (modelNode->CountChildren() == 1
+		&& modelNode->ChildAt(0)->IsHidden()) {
+		ModelNode* tempNode = modelNode->ChildAt(0);
+		modelNode->RemoveChild(tempNode);
+		modelNode = tempNode;
+		fNodeTable.Remove(tempNode);
+	}
+
 	for (int32 i = 0; i < modelNode->CountChildren(); i++) {
 		BReference<ModelNode> childNode = modelNode->ChildAt(i);
 		TreeTablePath treePath;
