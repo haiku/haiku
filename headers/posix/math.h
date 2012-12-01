@@ -5,6 +5,24 @@
 #ifndef _MATH_H_
 #define _MATH_H_
 
+/* (float|double)_t typedefs */
+
+#ifdef __FLT_EVAL_METHOD__
+	#define FLT_EVAL_METHOD __FLT_EVAL_METHOD__
+#else
+	#define FLT_EVAL_METHOD 0
+#endif
+
+#if FLT_EVAL_METHOD == 1
+	typedef double float_t;
+	typedef double double_t;
+#elif FLT_EVAL_METHOD == 2
+	typedef long double float_t;
+	typedef long double double_t;
+#else
+	typedef float float_t;
+	typedef double double_t;
+#endif
 
 #define M_E				2.7182818284590452354	/* e */
 #define M_LOG2E			1.4426950408889634074	/* log 2e */
@@ -50,12 +68,34 @@
 #	define INFINITY			HUGE_VALF
 #endif
 
+#include <limits.h>
+#define MAXFLOAT FLT_MAX
+
 /* floating-point categories */
 #define FP_NAN			0
 #define FP_INFINITE		1
 #define FP_ZERO			2
 #define FP_SUBNORMAL	3
 #define FP_NORMAL		4
+
+#ifdef __FP_FAST_FMA
+	#define FP_FAST_FMA		__FP_FAST_FMA
+#else
+	#define FP_FAST_FMA		0
+#endif
+#ifdef __FP_FAST_FMAF
+	#define FP_FAST_FMAF	__FP_FAST_FMAF
+#else
+	#define FP_FAST_FMAF	0
+#endif
+#ifdef __FP_FAST_FMAL
+	#define FP_FAST_FMAL 	__FP_FAST_FMAL
+#else
+	#define FP_FAST_FMAL	0
+#endif
+
+#define FP_ILOGB0		INT_MAX
+#define FP_ILOGBNAN		INT_MAX
 
 #ifdef __cplusplus
 struct __exception;
@@ -72,6 +112,10 @@ struct exception {
 	double	arg2;
 	double	retval;
 };
+
+#define MATH_ERRNO			1
+#define MATH_ERREXCEPT		2
+#define math_errhandling	0
 
 #define DOMAIN		1
 #define SING		2
@@ -347,6 +391,33 @@ extern int			__isinf(double value);
 	(sizeof(value) == sizeof(float) ? __isinff(value)			\
 		: sizeof(value) == sizeof(double) ? __isinf(value)		\
 		: __isinfl(value))
+
+#if __GNUC__ >= 4
+	#define isgreater(x, y)			__builtin_isgreater((x), (y))
+	#define isgreaterequal(x, y)	__builtin_isgreaterequal((x), (y))
+	#define isless(x, y)			__builtin_isless((x), (y))
+	#define islessequal(x, y)		__builtin_islessequal((x), (y))
+	#define islessgreater(x, y)		__builtin_islessgreater((x), (y))
+	#define isunordered(x, y)		__builtin_isunordered((x), (y))
+#else
+	/* these are only for GCC2, and require GNUC statement expressions */
+	#define _wrap_expr_typeof(x, y, body) ({	\
+		__typeof(x) X = (x);					\
+		__typeof(y) Y = (y);					\
+		body;})
+	#define isgreater(x, y)	\
+		_wrap_expr_typeof(x, y, !isnan(X) && !isnan(Y) && X > Y)
+	#define isgreaterequal(x, y) \
+		_wrap_expr_typeof(x, y, !isnan(X) && !isnan(Y) && X >= Y)
+	#define isless(x, y) \
+		_wrap_expr_typeof(x, y, !isnan(X) && !isnan(Y) && X < Y)
+	#define islessequal(x, y) \
+		_wrap_expr_typeof(x, y, !isnan(X) && !isnan(Y) && X <= Y)
+	#define islessgreater(x, y)	\
+		_wrap_expr_typeof(x, y, X < Y || Y < X)
+	#define isunordered(x, y) \
+		_wrap_expr_typeof(x, y, isnan(X) || isnan(Y))
+#endif
 
 #ifdef __cplusplus
 }
