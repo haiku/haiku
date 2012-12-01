@@ -60,7 +60,7 @@ local genericSources =
 	s_fpclassify.c s_fpclassifyf.c # s_fpclassifyl.c
 	s_isinf.c s_isinff.c
 	s_isnan.c s_isnanf.c
-	s_ldexp.c s_ldexpf.c #s_ldexpl.c
+	s_ldexp.c s_ldexpf.c s_ldexpl.c
 	s_llround.c s_llroundf.c s_llroundl.c
 	s_lround.c s_lroundf.c s_lroundl.c
 	s_matherr.c
