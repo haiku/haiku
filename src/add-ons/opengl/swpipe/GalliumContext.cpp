@@ -464,23 +464,36 @@ GalliumContext::SwapBuffers(context_id contextID)
 		return B_ERROR;
 	}
 
-	//pipe_mutex_lock(context->draw->mutex);
-
 	// TODO: Where did st_notify_swapbuffers go?
 	//st_notify_swapbuffers(context->draw->stfb);
 
-	// TODO: Where did st_get_framebuffer_surface go?
-	//struct pipe_surface *surface;
-	//st_get_framebuffer_surface(context->draw->stfb, ST_SURFACE_BACK_LEFT,
-	//	&surface);
-
 	context->st->flush(context->st, ST_FLUSH_FRONT, NULL);
 
-	// TODO: Flush the frontbuffer!
-	//hsp_dev->hsp_winsys->flush_frontbuffer(hsp_dev->screen, surface,
-	//	context->bitmap);
+	// I'm not 100% sold on this... but Gallium does it quite often.
+	struct st_context *stContext = (struct st_context*)context->st;
 
-	//pipe_mutex_unlock(context->draw->mutex);
+	unsigned nColorBuffers = stContext->state.framebuffer.nr_cbufs;
+	for (unsigned i = 0; i < nColorBuffers; i++) {
+		pipe_surface* surface = stContext->state.framebuffer.cbufs[i];
+		if (!surface) {
+			ERROR("%s: color buffer %d invalid!\n", __func__, i);
+			continue;
+		}
+
+		TRACE("%s: Flushing color buffer #%d\n", __func__, i);
+
+		// We pass our destination bitmap to flush_fronbuffer which passes it
+		// to the private winsys display call.
+		fScreen->flush_frontbuffer(fScreen, surface->texture, 0, 0,
+			context->bitmap);
+	}
+
+	#if 0
+	// TODO... should we flush the z stencil buffer?
+	pipe_surface* zSurface = stContext->state.framebuffer.zsbuf;
+	fScreen->flush_frontbuffer(fScreen, surface->texture, 0, 0,
+		context->bitmap);
+	#endif
 
 	return true;
 }
