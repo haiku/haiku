@@ -35,16 +35,8 @@ spin(bigtime_t microseconds)
 	#warning U-Boot:TODO!!
 	// TODO: use API if available
 
-	for(bigtime_t i=0;i<microseconds;i=i+1)
-	{
-		/*
-		asm volatile ("mov r0,r0");
-		asm volatile ("mov r0,r0");
-		*/
-	}
-
 	// fallback to arch-specific code
-	//arch_spin(microseconds);
+	arch_spin(microseconds);
 }
 
 
