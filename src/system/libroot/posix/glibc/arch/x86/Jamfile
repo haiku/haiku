@@ -71,7 +71,7 @@ local genericSources =
 	s_signbit.c s_signbitf.c s_signbitl.c
 	s_round.c s_roundf.c s_roundl.c
 	s_signgam.c
-	s_tanh.c s_tanhf.c
+	s_tanh.c s_tanhf.c s_tanhl.c
 
 	w_acos.c w_acosf.c w_acosl.c
 	w_acosh.c w_acoshf.c w_acoshl.c
