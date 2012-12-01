@@ -1036,7 +1036,7 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 	BReference<ModelNode> hiddenChild;
 	if (modelNode->CountChildren() == 1
 		&& modelNode->ChildAt(0)->IsHidden()) {
-		hiddenChild.SetTo(modelNode->ChildAt(0), true);
+		hiddenChild.SetTo(modelNode->ChildAt(0));
 		modelNode->RemoveChild(hiddenChild);
 		modelNode = hiddenChild;
 		fNodeTable.Remove(hiddenChild);
@@ -1788,8 +1788,10 @@ VariablesView::MessageReceived(BMessage* message)
 		case MSG_MODEL_NODE_HIDDEN:
 		{
 			ModelNode* node;
-			if (message->FindPointer("node", (void**)&node) == B_OK)
+			if (message->FindPointer("node", (void**)&node) == B_OK) {
+				BReference<ModelNode> modelNodeReference(node, true);
 				_RequestNodeValue(node);
+			}
 
 			break;
 		}
