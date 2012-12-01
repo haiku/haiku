@@ -1,9 +1,10 @@
-1	swedish	x-vnd.Haiku-desklink	3053930521
+1	swedish	x-vnd.Haiku-desklink	2797960853
 Control physical output	MediaReplicant		Kontrollera fysisk utsignal
 Couldn't launch 	MediaReplicant		Kunde inte starta
 OK	MediaReplicant		OK
 Sound preferences…	MediaReplicant		Ljudinställningar...
 %g dB	MediaReplicant		%g dB
+Open %name	DeskButton	Don't translate variable %name	Öppna %name
 No media server running	VolumeControl		Ingen aktiv mediaserver
 Media preferences…	MediaReplicant		Mediainställningar...
 Open MediaPlayer	MediaReplicant		Öppna MediaSpelare

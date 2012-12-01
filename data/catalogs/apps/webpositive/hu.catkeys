@@ -21,7 +21,7 @@ Settings	Settings Window		Beállítások
 Confirmation	WebPositive Window		Megerősítés
 Window	WebPositive Window		Ablak
 Decrease size	WebPositive Window		Méret csökkentése
-Serif font:	Settings Window		Serif betűtípus:
+Serif font:	Settings Window		Talpas betűtípus:
 Loading %url	WebPositive Window		%url betöltése
 Page source	WebPositive Window		Oldal forrása
 Next	WebPositive Window		Következő
@@ -48,7 +48,7 @@ New window	WebPositive Window		Új ablak
 Open	Download Window		Megnyitás
 Reload	WebPositive Window		Újratöltés
 Downloads	Download Window		Letöltések
-Sans serif font:	Settings Window		Sans serif betűtípus:
+Sans serif font:	Settings Window		Talpatlan betűtípus:
 Over %days days left	Download Window		Több, mint %days nap van hátra
 Forward	WebPositive Window		Következő
 of	Download Window	...as in '12kB of 256kB'	/

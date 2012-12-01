@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1301055003
+1	swedish	x-vnd.Haiku-libtracker	3955647850
 common	B_COMMON_DIRECTORY		gemensam
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
@@ -452,6 +452,7 @@ Mount	DeskWindow		Montera
 Mount	ContainerWindow		Montera
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used använt -- %free ledigt)
 Cancel	FSClipBoard		Avbryt
+Restart Deskbar	DeskWindow		Starta om Deskbaren
 Cut more	ContainerWindow		Klipp ut mer
 Deleting: 	StatusWindow		Tar bort:
 Empty Trash	InfoWindow		Töm papperskorg

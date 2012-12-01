@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DiskUsage	1726021626
+1	swedish	x-vnd.Haiku-DiskUsage	3848101922
 Scanning %refName%	Scanner		Skannar %refName%
 Size	Info Window		Storlek
 Rescan	Pie View		Skanna om
@@ -9,6 +9,7 @@ no supporting apps	Pie View		applikationsstöd saknas
 Path	Info Window		Sökväg
 Scan	Status View		Skanna
 9999.99 GB	Status View		9999.99 GB
+Rescan	Status View		Skanna om
 file unavailable	Status View		fil ej tillgänglig
 Get Info	Pie View		Visa information
 DiskUsage	System name		DiskAnvändning
@@ -16,6 +17,7 @@ DiskUsage	System name		DiskAnvändning
 %d files	Status View		%d filer
 Created	Info Window		Skapad
 Modified	Info Window		Modifierad
+Abort	Status View		Avbryt
 Open	Pie View		Öppna
 Open With	Pie View		Öppna med
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r

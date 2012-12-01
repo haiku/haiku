@@ -1,9 +1,10 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	1294209621
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	3929743651
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Novo Terminal
+Cursor text	Terminal AppearancePrefView		Texto do cursor
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
 Text size	Terminal TermWindow		Tamanho do texto
 Match case	Terminal FindWindow		Diferenciar maiúsculas de minúsculas
@@ -50,6 +51,7 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		Inserir caminho
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui e Takashi Murai.\n\nUtilização: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma expressão para localizar.
+Blinking cursor	Terminal AppearancePrefView		Cursor piscante
 Don't save	Terminal PrefWindow		Não salvar
 Set window title	Terminal TermWindow		Definir título da janela
 Terminal	System name		Terminal
@@ -79,6 +81,7 @@ Set tab title	Terminal TermWindow		Definir o título da guia
 Settings…	Terminal TermWindow		Configurações...
 Abort	Terminal Shell		Cancelar
 Edit	Terminal TermWindow		Editar
+Cursor background	Terminal AppearancePrefView		Plano de fundo do cursor
 Color:	Terminal AppearancePrefView		Cor:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		O padrão especificando o título da janela. Os seguintes espaços reservados\npodem ser usados:\n
 Print	Terminal TermWindow		Imprimir

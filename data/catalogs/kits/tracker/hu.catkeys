@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1301055003
+1	hungarian	x-vnd.Haiku-libtracker	3955647850
 common	B_COMMON_DIRECTORY		Közös
 OK	WidgetAttributeText		Rendben
 Icon view	VolumeWindow		Ikon nézet
@@ -452,6 +452,7 @@ Mount	DeskWindow		Csatolás
 Mount	ContainerWindow		Csatolás
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used használt -- %free szabad)
 Cancel	FSClipBoard		Mégse
+Restart Deskbar	DeskWindow		Asztalsáv újraindítása
 Cut more	ContainerWindow		Több kivágása
 Deleting: 	StatusWindow		Törlés:
 Empty Trash	InfoWindow		Szemetes ürítése

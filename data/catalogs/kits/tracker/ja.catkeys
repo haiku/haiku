@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1680698556
+1	japanese	x-vnd.Haiku-libtracker	40324107
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -447,6 +447,7 @@ Mount	DeskWindow		マウント
 Mount	ContainerWindow		マウント
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 使用中 -- %free 使用可能)
 Cancel	FSClipBoard		中止
+Restart Deskbar	DeskWindow		Deskbar を再起動
 Cut more	ContainerWindow		さらに切り取る
 Deleting: 	StatusWindow		削除中：
 Empty Trash	InfoWindow		ごみ箱を空にする
