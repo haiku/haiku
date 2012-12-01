@@ -12,6 +12,13 @@ local sources =
 	GalliumContext.cpp
 	bitmap_wrapper.cpp ;
 
+if $(HAIKU_LLVM_PRESENT) {
+	# TODO: Add LLVM OptionalBuildPackage
+	SubDirC++Flags [ FDefines USE_LLVMPIPE ] ;
+	SubDirSysHdrs $(HAIKU_LLVM_HEADERS) ;
+}
+
+
 UsePrivateHeaders interface ;
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
