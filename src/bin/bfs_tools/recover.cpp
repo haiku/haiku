@@ -5,6 +5,8 @@
 //!	recovers corrupt BFS disks
 
 
+#include <set>
+
 #include "Disk.h"
 #include "Inode.h"
 #include "Hashtable.h"
@@ -28,6 +30,10 @@ bool gCreateIndices = false;
 bool gDumpMissingInodes = false;
 bool gRawMode = false;
 bool gVerbose = false;
+
+
+// TODO: add a cache for all inodes
+typedef std::set<block_run> RunSet;
 
 
 class InodeHashtable {
@@ -113,7 +119,7 @@ class InodeHashtable {
 
 		static uint32 BlockRunHash(const block_run *run)
 		{
-			return run->allocation_group << 16 | run->start;
+			return (run->allocation_group << 16) | run->start;
 		}
 
 		static bool BlockRunCompare(const block_run *runA, const block_run *runB)
@@ -127,11 +133,14 @@ class InodeHashtable {
 		uint32		fPercentUsed;
 };
 
+
 class InodeGetter {
 	public:
-		InodeGetter(InodeHashtable& hashtable, block_run run)
+		InodeGetter(Disk& disk, block_run run)
 		{
-			fInode = hashtable.Get(run);
+			fInode = Inode::Factory(&disk, run);
+			if (fInode != NULL)
+				fInode->AcquireBuffer();
 		}
 
 		~InodeGetter()
@@ -140,14 +149,22 @@ class InodeGetter {
 				fInode->ReleaseBuffer();
 		}
 
-		Inode* Node() { return fInode; }
+		Inode* Node() const
+		{
+			return fInode;
+		}
+
+		void Detach()
+		{
+			fInode = NULL;
+		}
 
 	private:
 		Inode*	fInode;
 };
 
 
-InodeHashtable gHashtable(1000);
+RunSet gMainInodes;
 	// contains all inodes found on disk in the general data area
 InodeHashtable gLogged(50);
 	// contains all inodes found in the log area
@@ -156,32 +173,56 @@ InodeHashtable gMissingEmpty(25);
 
 
 class HashtableInodeSource : public Inode::Source {
-	public:
-		virtual Inode *InodeAt(block_run run)
-		{
-			Inode *inode;
-			if ((inode = gHashtable.Get(run)) != NULL)
-				return inode;
+public:
+	HashtableInodeSource(Disk& disk)
+		:
+		fDisk(disk)
+	{
+	}
 
-			if ((inode = gLogged.Get(run)) != NULL)
-				return inode;
+	virtual Inode *InodeAt(block_run run)
+	{
+		Inode *inode;
+		if ((inode = gLogged.Get(run)) != NULL)
+			return inode;
 
-			if ((inode = gMissing.Get(run)) != NULL)
-				return inode;
+		if ((inode = gMissing.Get(run)) != NULL)
+			return inode;
 
+		if (gMainInodes.find(run) == gMainInodes.end())
 			return NULL;
-		}
+
+		return Inode::Factory(&fDisk, run);
+	}
+
+private:
+	Disk&	fDisk;
 };
 
 
+bool
+operator<(const block_run& a, const block_run& b)
+{
+	return a.allocation_group < b.allocation_group
+		|| (a.allocation_group == b.allocation_group && a.start < b.start);
+}
+
+
 void
-collectInodes(Disk &disk, InodeHashtable &hashtable, off_t start, off_t end)
+collectInodes(Disk& disk, RunSet* set, InodeHashtable* hashTable, off_t start,
+	off_t end)
 {
 	char buffer[8192];
 	Inode inode(&disk, (bfs_inode *)buffer, false);
-	off_t count = 0LL;
-	off_t position = start;
 
+	off_t directories = 0LL;
+	off_t directorySize = 0LL;
+	off_t files = 0LL;
+	off_t fileSize = 0LL;
+	off_t symlinks = 0LL;
+	off_t count = 0LL;
+
+	off_t position = start;
 	bigtime_t lastUpdate = system_time();
 
 	for (off_t offset = start; offset < end; offset += sizeof(buffer)) {
@@ -203,7 +244,21 @@ collectInodes(Disk &disk, InodeHashtable &hashtable, off_t start, off_t end)
 				if (node != NULL) {
 					if (gVerbose)
 						printf("  node: %Ld \"%s\"\n", position, node->Name());
-					hashtable.Insert(node);
+
+					if (set != NULL)
+						set->insert(node->BlockRun());
+					else
+						hashTable->Insert(node);
+
+					if (node->IsDirectory()) {
+						directories++;
+						directorySize += node->Size();
+					} else if (node->IsFile()) {
+						files++;
+						fileSize += node->Size();
+					} else if (node->IsSymlink()) {
+						symlinks++;
+					}
 					count++;
 				} else if (gVerbose) {
 					printf("\nunrecognized inode:");
@@ -213,40 +268,18 @@ collectInodes(Disk &disk, InodeHashtable &hashtable, off_t start, off_t end)
 			position += disk.BlockSize();
 		}
 		if (system_time() - lastUpdate > 500000) {
-			printf("  block %Ld (%Ld%%), %Ld inodes\33[1A\n", offset, 100 * (offset - start) / (end - start), count);
+			printf("  block %Ld (%Ld%%), %Ld inodes\33[1A\n", offset,
+				100 * (offset - start) / (end - start), count);
 			lastUpdate = system_time();
 		}
 	}
 	printf("\n%Ld inodes found.\n", count);
 
-	Inode *node;
-	off_t directories = 0LL;
-	off_t directorySize = 0LL;
-	off_t files = 0LL;
-	off_t fileSize = 0LL;
-	off_t symlinks = 0LL;
-	count = 0LL;
-
-	hashtable.Rewind();
-	while (hashtable.GetNextEntry(&node) == B_OK) {
-		if (node->IsDirectory()) {
-			directories++;
-			directorySize += node->Size();
-		} else if (node->IsFile()) {
-			files++;
-			fileSize += node->Size();
-		} else if (node->IsSymlink()) {
-			symlinks++;
-		}
-		count++;
-		hashtable.Release(node);
-	}
-
 	printf("\n%20Ld directories found (total of %Ld bytes)\n"
 	   "%20Ld files found (total of %Ld bytes)\n"
 	   "%20Ld symlinks found\n"
 	   "--------------------\n"
-	   "%20Ld inodes total found in hashtable.\n",
+	   "%20Ld inodes total found.\n",
 	   directories, directorySize, files, fileSize, symlinks, count);
 }
 
@@ -259,8 +292,8 @@ collectLogInodes(Disk &disk)
 	off_t end = offset + (disk.Log().length << disk.BlockShift());
 
 	printf("\nsearching from %Ld to %Ld (log area)\n",offset,end);
-	
-	collectInodes(disk, gLogged, offset, end);
+
+	collectInodes(disk, NULL, &gLogged, offset, end);
 }
 
 
@@ -270,39 +303,41 @@ collectRealInodes(Disk &disk)
 	// first block after bootblock, bitmap, and log
 	off_t offset = disk.ToOffset(disk.Log()) + (disk.Log().length
 		<< disk.BlockShift());
-	off_t end = /*(17LL << disk.SuperBlock()->ag_shift);
-	if (end > disk.NumBlocks())
-		end = */disk.NumBlocks();
-	end *= disk.BlockSize();
+	off_t end = (off_t)disk.NumBlocks() << disk.BlockShift();
 
 	printf("\nsearching from %Ld to %Ld (main area)\n", offset, end);
 
-	collectInodes(disk, gHashtable, offset, end);
+	collectInodes(disk, &gMainInodes, NULL, offset, end);
 }
 
 
 Directory *
 getNameIndex(Disk &disk)
 {
-	InodeGetter getter(gHashtable, disk.Indices());
+	InodeGetter getter(disk, disk.Indices());
 	Directory *indices = dynamic_cast<Directory *>(getter.Node());
 
 	block_run run;
-	if (indices && indices->FindEntry("name", &run) == B_OK)
-		return dynamic_cast<Directory *>(gHashtable.Get(run));
+	if (indices != NULL && indices->FindEntry("name", &run) == B_OK) {
+		InodeGetter getter(disk, run);
+		Inode* node = getter.Node();
+		getter.Detach();
+		return dynamic_cast<Directory *>(node);
+	}
 
 	// search name index
 
-	Inode *node;
+	RunSet::iterator iterator = gMainInodes.begin();
+	for (; iterator != gMainInodes.end(); iterator++) {
+		InodeGetter getter(disk, *iterator);
+		Inode* node = getter.Node();
 
-	gHashtable.Rewind();
-	for (; gHashtable.GetNextEntry(&node) == B_OK; gHashtable.Release(node)) {
 		if (!node->IsIndex() || node->Name() == NULL)
 			continue;
-		if (!strcmp(node->Name(), "name") && node->Mode() & S_STR_INDEX) {
+		if (!strcmp(node->Name(), "name") && node->Mode() & S_STR_INDEX)
 			return dynamic_cast<Directory *>(node);
-		}
 	}
+
 	return NULL;
 }
 
@@ -317,7 +352,7 @@ checkDirectoryContents(Disk& disk, Directory *dir)
 
 	while (dir->GetNextEntry(name, &run) == B_OK) {
 		if (run == dir->BlockRun() || run == dir->Parent()
-			|| gHashtable.Contains(&run))
+			|| gMainInodes.find(run) != gMainInodes.end())
 			continue;
 
 		Inode *missing = gMissing.Get(run);
@@ -385,8 +420,12 @@ checkStructure(Disk &disk)
 	Inode *node;
 
 	off_t count = 0;
-	gHashtable.Rewind();
-	while (gHashtable.GetNextEntry(&node) == B_OK) {
+
+	RunSet::iterator iterator = gMainInodes.begin();
+	for (; iterator != gMainInodes.end(); iterator++) {
+		InodeGetter getter(disk, *iterator);
+		Inode* node = getter.Node();
+
 		count++;
 		if ((count % 50) == 0)
 			fprintf(stderr, "%Ld inodes processed...\33[1A\n", count);
@@ -399,7 +438,7 @@ checkStructure(Disk &disk)
 		// check for the parent directory
 
 		block_run run = node->Parent();
-		InodeGetter parentGetter(gHashtable, run);
+		InodeGetter parentGetter(disk, run);
 		Inode *parentNode = parentGetter.Node();
 
 		Directory *dir = dynamic_cast<Directory *>(parentNode);
@@ -503,13 +542,13 @@ checkStructure(Disk &disk)
 //					printf("node \"%s\": parent directory \"%s\" error: %s\n",node->Name(),dir->Name(),strerror(status));
 //			}
 
-		// check for attributes	
+		// check for attributes
 
 		run = node->Attributes();
 		if (!run.IsZero()) {
 			//printf("node \"%s\" (%ld, %d, mode = %010lo): has attribute dir!\n",node->Name(),node->BlockRun().allocation_group,node->BlockRun().start,node->Mode());
 
-			if (!gHashtable.Contains(&run)) {
+			if (gMainInodes.find(run) == gMainInodes.end()) {
 				if (gVerbose) {
 					printf("node \"%s\": attributes are missing (%ld, %d, %d)\n",
 						node->Name(), run.allocation_group, run.start, run.length);
@@ -602,7 +641,7 @@ checkStructure(Disk &disk)
 			block_run run;
 			while (dir->GetNextEntry(name, &run) == B_OK) {
 				printf("\t\"%s\" (%ld, %d, %d)\n", name,
-					run.allocation_group, run.start, run.length);	
+					run.allocation_group, run.start, run.length);
 			}
 
 			BPlusTree *tree;
@@ -631,33 +670,34 @@ checkStructure(Disk &disk)
 
 
 void
-copyInodes(const char *copyTo)
+copyInodes(Disk& disk, const char* copyTo)
 {
-	if (!copyTo)
+	if (copyTo == NULL)
 		return;
 
-	Inode::Source *source = new HashtableInodeSource;
+	HashtableInodeSource source(disk);
 	Inode *node;
 
 	int32 count = 0;
 
-	gHashtable.Rewind();
-	while (gHashtable.GetNextEntry(&node) == B_OK) {
+	RunSet::iterator iterator = gMainInodes.begin();
+	for (; iterator != gMainInodes.end(); iterator++) {
+		InodeGetter getter(disk, *iterator);
+		Inode* node = getter.Node();
+
 		if (!node->IsIndex() && !node->IsAttributeDirectory())
-			node->CopyTo(copyTo, source);
+			node->CopyTo(copyTo, &source);
 
 		if ((++count % 500) == 0)
 			fprintf(stderr, "copied %ld files...\n", count);
-
-		gHashtable.Release(node);
 	}
 
 	gMissing.Rewind();
 	while (gMissing.GetNextEntry(&node) == B_OK) {
 		if (!node->IsIndex() && !node->IsAttributeDirectory())
-			node->CopyTo(copyTo, source);
+			node->CopyTo(copyTo, &source);
 
-		gHashtable.Release(node);
+		gMissing.Release(node);
 	}
 }
 
@@ -802,12 +842,11 @@ main(int argc, char **argv)
 	checkStructure(disk);
 
 	if (argv[1])
-		copyInodes(argv[1]);
+		copyInodes(disk, argv[1]);
 
 	//disk.WriteBootBlock();
 	//disk.BlockBitmap()->CompareWithBackup();
 
-	gHashtable.MakeEmpty();
 	gMissing.MakeEmpty();
 	gLogged.MakeEmpty();
 
