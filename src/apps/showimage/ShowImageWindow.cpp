@@ -210,6 +210,8 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	else
 		fToolBarView->Hide();
 
+	fToolBarVisible = fShowToolBar;
+
 	viewFrame.bottom = contentView->Bounds().bottom;
 	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
@@ -1051,12 +1053,9 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			if (message->FindFloat("offset", &offset) == B_OK
 				&& message->FindBool("show", &show) == B_OK) {
 				// Compensate rounding errors with the final placement
-				if (show)
-					fToolBarView->MoveTo(fToolBarView->Frame().left, 0);
-				else {
-					fToolBarView->MoveTo(fToolBarView->Frame().left, offset);
+				fToolBarView->MoveTo(fToolBarView->Frame().left, offset);
+				if (!show)
 					fToolBarView->Hide();
-				}
 				BRect frame = fToolBarView->Parent()->Bounds();
 				frame.top = fToolBarView->Frame().bottom + 1;
 				fScrollView->MoveTo(fScrollView->Frame().left, frame.top);
@@ -1519,9 +1518,10 @@ ShowImageWindow::_UpdateRatingMenu()
 void
 ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 {
-	if (visible == !fToolBarView->IsHidden())
+	if (visible == fToolBarVisible)
 		return;
 
+	fToolBarVisible = visible;
 	float diff = fToolBarView->Bounds().Height() + 2;
 	if (!visible)
 		diff = -diff;
@@ -1533,14 +1533,13 @@ ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 		// not to block the window thread.
 		const float kAnimationOffsets[] = { 0.05, 0.2, 0.5, 0.2, 0.05 };
 		const int32 steps = sizeof(kAnimationOffsets) / sizeof(float);
-		float originalY = fToolBarView->Frame().top;
 		for (int32 i = 0; i < steps; i++) {
 			BMessage message(kMsgSlideToolBar);
 			message.AddFloat("offset", floorf(diff * kAnimationOffsets[i]));
 			PostMessage(&message, this);
 		}
 		BMessage finalMessage(kMsgFinishSlidingToolBar);
-		finalMessage.AddFloat("offset", originalY + diff);
+		finalMessage.AddFloat("offset", visible ? 0 : diff);
 		finalMessage.AddBool("show", visible);
 		PostMessage(&finalMessage, this);
 	} else {
