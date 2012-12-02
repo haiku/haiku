@@ -677,9 +677,7 @@ AboutView::AboutView()
 	} else
 		buildTimeDate.SetTo(kernelTimeDate);
 
-	snprintf(string, sizeof(string), buildTimeDate);
-
-	BStringView* kernelView = new BStringView("kerneltext", string);
+	BStringView* kernelView = new BStringView("kerneltext", buildTimeDate);
 	kernelView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
