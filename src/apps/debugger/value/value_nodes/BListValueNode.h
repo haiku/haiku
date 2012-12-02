@@ -38,6 +38,10 @@ public:
 
 private:
 			class BListElementNodeChild;
+
+			// for GCC2
+			friend class BListElementNodeChild;
+
 			typedef BObjectList<ValueNodeChild> ChildNodeList;
 
 private:
