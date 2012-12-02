@@ -4617,8 +4617,8 @@ status_t
 vfs_get_file_map(struct vnode* vnode, off_t offset, size_t size,
 	file_io_vec* vecs, size_t* _count)
 {
-	FUNCTION(("vfs_get_file_map: vnode %p, vecs %p, offset %Ld, size = %lu\n",
-		vnode, vecs, offset, size));
+	FUNCTION(("vfs_get_file_map: vnode %p, vecs %p, offset %" B_PRIdOFF
+		", size = %" B_PRIuSIZE "\n", vnode, vecs, offset, size));
 
 	return FS_CALL(vnode, get_file_map, offset, size, vecs, _count);
 }
