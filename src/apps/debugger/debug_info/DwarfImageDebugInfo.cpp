@@ -1080,8 +1080,8 @@ DwarfImageDebugInfo::_EvaluateBaseTypeConstraints(DIEType* type,
 		if (baseTypeOwnerEntry != NULL) {
 			DwarfUtils::GetFullyQualifiedDIEName(baseTypeOwnerEntry,
 				baseEntryName);
-			if (!baseEntryName.IsEmpty() && baseEntryName
-				!= constraints.BaseTypeName())
+
+			if (baseEntryName != constraints.BaseTypeName())
 				return false;
 		}
 	}
