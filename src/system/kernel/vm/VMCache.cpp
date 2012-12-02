@@ -670,8 +670,8 @@ VMCache::Delete()
 	// free all of the pages in the cache
 	while (vm_page* page = pages.Root()) {
 		if (!page->mappings.IsEmpty() || page->WiredCount() != 0) {
-			panic("remove page %p from cache %p: page still has mappings!\n",
-				page, this);
+			panic("remove page %p from cache %p: page still has mappings!\n"
+				"@!page %p; cache %p", page, this, page, this);
 		}
 
 		// remove it
