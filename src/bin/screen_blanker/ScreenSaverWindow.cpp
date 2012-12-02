@@ -79,7 +79,7 @@ ScreenSaverFilter::SetEnabled(bool enabled)
 ScreenSaverWindow::ScreenSaverWindow(BRect frame)
 	: BDirectWindow(frame, "ScreenSaver Window",
 		B_NO_BORDER_WINDOW_LOOK, kWindowScreenFeel,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
+		B_NOT_RESIZABLE | B_NOT_MOVABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
 	fSaver(NULL)
 {
 	frame.OffsetTo(0, 0);
