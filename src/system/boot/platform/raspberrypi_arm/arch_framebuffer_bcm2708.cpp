@@ -161,15 +161,6 @@ ArchFramebufferBCM2708::SetVideoMode(int width, int height, int depth)
 	fBase = (addr_t)mmu_map_physical_memory(fPhysicalBase, fSize,
 		kDefaultPageFlags);
 
-	uint8* line = (uint8*)fBase;
-	for (uint32 y = 0; y < sFramebufferConfig.height; y++) {
-		volatile uint16* pixel = (volatile uint16*)line;
-		for (uint32 x = 0; x < sFramebufferConfig.width; x++)
-			*(pixel++) = y % 2 == 0 ? 0xffff : 0x0000;
-
-		line += sFramebufferConfig.bytes_per_row;
-	}
-
 	fCurrentWidth = width;
 	fCurrentHeight = height;
 	fCurrentDepth = depth;
