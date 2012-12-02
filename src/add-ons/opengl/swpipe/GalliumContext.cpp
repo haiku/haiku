@@ -48,27 +48,29 @@ extern "C" {
 #define ERROR(x...) printf("GalliumContext: " x)
 
 
-#if 0
 static void
-hgl_viewport(struct gl_context* glctx, GLint x, GLint y,
+hgl_viewport(struct gl_context* glContext, GLint x, GLint y,
 	GLsizei width, GLsizei height)
 {
-	TRACE("%s(glctx: %p, x: %d, y: %d, width: %d, height: %d\n",
-		__FUNCTION__, glctx, x, y, width, height);
-	struct hgl_context *context = (struct hgl_context*)glctx->DriverCtx;
+	TRACE("%s(glContext: %p, x: %d, y: %d, width: %d, height: %d\n", __func__,
+		glContext, x, y, width, height);
+	struct hgl_context *context = (struct hgl_context*)glContext->DriverCtx;
 
-	int32 w, h;
-	get_bitmap_size(context->bitmap, &w, &h);
+	int32 bitmapWidth;
+	int32 bitmapHeight;
 
-	#if 0
-	// TODO: mesa_resize_framebuffer? Need to investigate where this went
-	if (context->draw)
-		st_resize_framebuffer(context->draw->stfb, w, h);
-	if (context->read)
-		st_resize_framebuffer(context->read->stfb, w, h);
-	#endif
+	get_bitmap_size(context->bitmap, &bitmapWidth, &bitmapHeight);
+
+	if (width != bitmapWidth || height != bitmapHeight) {
+		struct gl_framebuffer *draw = glContext->WinSysDrawBuffer;
+		struct gl_framebuffer *read = glContext->WinSysReadBuffer;
+
+		if (draw)
+			_mesa_resize_framebuffer(glContext, draw, bitmapWidth, bitmapHeight);
+		if (read)
+			_mesa_resize_framebuffer(glContext, read, bitmapWidth, bitmapHeight);
+	}
 }
-#endif
 
 
 static void
@@ -347,9 +349,11 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 	assert(!context->st->st_manager_private);
 	context->st->st_manager_private = (void*)context;
 
-	// TODO!
-	//context->st->ctx->DriverCtx = context;
-	//context->st->ctx->Driver.Viewport = hgl_viewport;
+	struct st_context *stContext = (struct st_context*)context->st;
+	
+	stContext->ctx->DriverCtx = context;
+	stContext->ctx->Driver.Viewport = hgl_viewport;
+
 
 	// TODO: Closely review this next context logic...
 	context_id contextNext = -1;
@@ -469,7 +473,6 @@ GalliumContext::SwapBuffers(context_id contextID)
 
 	context->st->flush(context->st, ST_FLUSH_FRONT, NULL);
 
-	// I'm not 100% sold on this... but Gallium does it quite often.
 	struct st_context *stContext = (struct st_context*)context->st;
 
 	unsigned nColorBuffers = stContext->state.framebuffer.nr_cbufs;
