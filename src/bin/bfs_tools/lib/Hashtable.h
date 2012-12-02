@@ -33,7 +33,8 @@ class Hashtable
 		void	Rewind();
 
 		void	MakeEmpty(int8 keyMode = HASH_EMPTY_NONE,int8 valueMode = HASH_EMPTY_NONE);
-		
+		size_t	Size() const;
+
 	protected:
 		class Entry
 		{
