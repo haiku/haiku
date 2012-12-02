@@ -150,19 +150,40 @@ ExpanderWindow::ValidateDest()
 	BVolume volume;
 	if (!entry.Exists()) {
 		BAlert* alert = new BAlert("destAlert",
-			B_TRANSLATE("The destination folder does not exist."),
-			B_TRANSLATE("Cancel"), NULL, NULL,
+			B_TRANSLATE("Destination folder doesn't exist, create?"),
+			B_TRANSLATE("Yes"), B_TRANSLATE("No"), NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		alert->Go();
-		return false;
+		alert->SetShortcut(0, B_ESCAPE);
+		if (alert->Go() == 0) {
+			if (create_directory(fDestText->Text(), 0755) == B_OK) {
+				BEntry newEntry(fDestText->Text(), true);
+				newEntry.GetRef(&fDestRef);
+				return true;
+			} else {
+				BAlert* alert = new BAlert("stopAlert",
+					B_TRANSLATE("Failed to create the destination folder."),
+					B_TRANSLATE("Cancel"), NULL, NULL,
+					B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				alert->Go();
+				return false;
+			}
+		} else {
+			BAlert* alert = new BAlert("stopAlert",
+				B_TRANSLATE("The extraction operation aborted."),
+				B_TRANSLATE("Cancel"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+			return false;
+		}
 	} else if (!entry.IsDirectory()) {
 		BAlert* alert = new BAlert("destAlert",
 			B_TRANSLATE("The destination is not a folder."),
 			B_TRANSLATE("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		alert->Go();	
+		alert->Go();
 		return false;
 	} else if (entry.GetVolume(&volume) != B_OK || volume.IsReadOnly()) {
 		BAlert* alert = new BAlert("destAlert",
