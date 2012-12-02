@@ -82,8 +82,7 @@ platform_init_video(void)
 	if (result != B_OK)
 		return result;
 
-	blue_screen_clear_screen();
-	blue_screen_puts("Welcome to very early on-screen debug output on rPi!\n");
+	blue_screen_puts("Welcome to early on-screen debug output on rPi!\n");
 	sOnScreenDebugOutputAvailable = true;
 
 	gKernelArgs.frame_buffer.physical_buffer.start
