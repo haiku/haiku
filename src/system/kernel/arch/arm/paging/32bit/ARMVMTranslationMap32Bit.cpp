@@ -574,7 +574,8 @@ ARMVMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
 		pd[index] & ARM_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
-	*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
+	if ((entry & ARM_PTE_TYPE_MASK) != 0)
+		*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
 
 #if 0 //IRA
 	// read in the page state flags
@@ -621,7 +622,8 @@ ARMVMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 			pd[index] & ARM_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
-	*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
+	if ((entry & ARM_PTE_TYPE_MASK) != 0)
+		*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
 
 #if 0
 	// read in the page state flags
@@ -636,7 +638,9 @@ ARMVMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 		| ((entry & ARM_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
 		| ((entry & ARM_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 #else
-	*_flags = B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA | PAGE_PRESENT;
+	*_flags = B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA;
+	if (*_physical != 0)
+		*_flags |= PAGE_PRESENT;
 #endif
 	return B_OK;
 }
