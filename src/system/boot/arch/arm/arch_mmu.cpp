@@ -277,6 +277,33 @@ get_next_page_table(uint32 type)
 }
 
 
+static uint32 *
+get_or_create_page_table(addr_t address, uint32 type)
+{
+	uint32 *pageTable = NULL;
+	uint32 pageDirectoryIndex = VADDR_TO_PDENT(address);
+	uint32 pageDirectoryEntry = sPageDirectory[pageDirectoryIndex];
+
+	uint32 entryType = pageDirectoryEntry & ARM_PDE_TYPE_MASK;
+	if (entryType == ARM_MMU_L1_TYPE_FAULT) {
+		// This page directory entry has not been set yet, allocate it.
+		pageTable = get_next_page_table(type);
+		sPageDirectory[pageDirectoryIndex] = (uint32)pageTable | type;
+		return pageTable;
+	}
+
+	if (entryType != type) {
+		// This entry has been allocated with a different type!
+		panic("tried to reuse page directory entry %" B_PRIu32
+			" with different type (entry: %#" B_PRIx32 ", new type: %#" B_PRIx32
+			")\n", pageDirectoryIndex, pageDirectoryEntry, type);
+		return NULL;
+	}
+
+	return (uint32 *)(pageDirectoryEntry & ARM_PDE_ADDRESS_MASK);
+}
+
+
 void
 init_page_directory()
 {
@@ -295,33 +322,28 @@ init_page_directory()
 	for (uint32 i = 0; i < ARM_MMU_L1_TABLE_ENTRY_COUNT; i++)
 		sPageDirectory[i] = 0;
 
-	uint32 *pageTable = NULL;
 	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
 
-		pageTable = get_next_page_table(ARM_MMU_L1_TYPE_COARSE);
 		TRACE(("BLOCK: %s START: %lx END %lx\n", LOADER_MEMORYMAP[i].name,
 			LOADER_MEMORYMAP[i].start, LOADER_MEMORYMAP[i].end));
-		addr_t pos = LOADER_MEMORYMAP[i].start;
 
-		int c = 0;
-		while (pos < LOADER_MEMORYMAP[i].end) {
-			pageTable[c] = pos | LOADER_MEMORYMAP[i].flags | smallType;
+		addr_t address = LOADER_MEMORYMAP[i].start;
+		ASSERT((address & ~ARM_PTE_ADDRESS_MASK) == 0);
 
-			c++;
-			if (c > 255) { // we filled a pagetable => we need a new one
-				// there is 1MB per pagetable so:
-				sPageDirectory[VADDR_TO_PDENT(pos)]
-					= (uint32)pageTable | ARM_MMU_L1_TYPE_COARSE;
-				pageTable = get_next_page_table(ARM_MMU_L1_TYPE_COARSE);
-				c = 0;
+		uint32 *pageTable = NULL;
+		uint32 pageTableIndex = 0;
+
+		while (address < LOADER_MEMORYMAP[i].end) {
+			if (pageTable == NULL
+				|| pageTableIndex >= ARM_MMU_L2_COARSE_ENTRY_COUNT) {
+				pageTable = get_or_create_page_table(address,
+					ARM_MMU_L1_TYPE_COARSE);
+				pageTableIndex = VADDR_TO_PTENT(address);
 			}
 
-			pos += B_PAGE_SIZE;
-		}
-
-		if (c > 0) {
-			sPageDirectory[VADDR_TO_PDENT(pos)]
-				= (uint32)pageTable | ARM_MMU_L1_TYPE_COARSE;
+			pageTable[pageTableIndex++]
+				= address | LOADER_MEMORYMAP[i].flags | smallType;
+			address += B_PAGE_SIZE;
 		}
 	}
 
