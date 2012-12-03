@@ -78,37 +78,37 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		"devices",
 		DEVICE_BASE,
 		DEVICE_BASE + DEVICE_SIZE - 1,
-		MMU_L2_FLAG_B,
+		ARM_MMU_L2_FLAG_B,
 	},
 	{
 		"RAM_loader", // 1MB loader
 		SDRAM_BASE + 0,
 		SDRAM_BASE + 0x0fffff,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_pt", // Page Table 1MB
 		SDRAM_BASE + 0x100000,
 		SDRAM_BASE + 0x1FFFFF,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_free", // 16MB free RAM (more but we don't map it automaticaly)
 		SDRAM_BASE + 0x0200000,
 		SDRAM_BASE + 0x11FFFFF,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_stack", // stack
 		SDRAM_BASE + 0x1200000,
 		SDRAM_BASE + 0x2000000,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_initrd", // stack
 		SDRAM_BASE + 0x2000000,
 		SDRAM_BASE + 0x2500000,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 
 #ifdef FB_BASE
@@ -116,7 +116,7 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		"framebuffer", // 2MB framebuffer ram
 		FB_BASE,
 		FB_BASE + FB_SIZE - 1,
-		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_AP_RW | ARM_MMU_L2_FLAG_C,
 	},
 #endif
 };
@@ -254,14 +254,14 @@ get_next_page_table(uint32 type)
 
 	size_t size = 0;
 	switch (type) {
-		case MMU_L1_TYPE_COARSE:
+		case ARM_MMU_L1_TYPE_COARSE:
 		default:
-			size = 1024;
+			size = ARM_MMU_L2_COARSE_TABLE_SIZE;
 			break;
-		case MMU_L1_TYPE_FINE:
-			size = 4096;
+		case ARM_MMU_L1_TYPE_FINE:
+			size = ARM_MMU_L2_FINE_TABLE_SIZE;
 			break;
-		case MMU_L1_TYPE_SECTION:
+		case ARM_MMU_L1_TYPE_SECTION:
 			size = 16384;
 			break;
 	}
@@ -285,20 +285,20 @@ init_page_directory()
 
 	// see if subpages are disabled
 	if (mmu_read_C1() & (1 << 23))
-		smallType = MMU_L2_TYPE_SMALLNEW;
+		smallType = ARM_MMU_L2_TYPE_SMALLNEW;
 	else
-		smallType = MMU_L2_TYPE_SMALLEXT;
+		smallType = ARM_MMU_L2_TYPE_SMALLEXT;
 
 	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
 
 	// clear out the page directory
-	for (uint32 i = 0; i < 4096; i++)
+	for (uint32 i = 0; i < ARM_MMU_L1_TABLE_ENTRY_COUNT; i++)
 		sPageDirectory[i] = 0;
 
 	uint32 *pageTable = NULL;
 	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
 
-		pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
+		pageTable = get_next_page_table(ARM_MMU_L1_TYPE_COARSE);
 		TRACE(("BLOCK: %s START: %lx END %lx\n", LOADER_MEMORYMAP[i].name,
 			LOADER_MEMORYMAP[i].start, LOADER_MEMORYMAP[i].end));
 		addr_t pos = LOADER_MEMORYMAP[i].start;
@@ -311,8 +311,8 @@ init_page_directory()
 			if (c > 255) { // we filled a pagetable => we need a new one
 				// there is 1MB per pagetable so:
 				sPageDirectory[VADDR_TO_PDENT(pos)]
-					= (uint32)pageTable | MMU_L1_TYPE_COARSE;
-				pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
+					= (uint32)pageTable | ARM_MMU_L1_TYPE_COARSE;
+				pageTable = get_next_page_table(ARM_MMU_L1_TYPE_COARSE);
 				c = 0;
 			}
 
@@ -321,7 +321,7 @@ init_page_directory()
 
 		if (c > 0) {
 			sPageDirectory[VADDR_TO_PDENT(pos)]
-				= (uint32)pageTable | MMU_L1_TYPE_COARSE;
+				= (uint32)pageTable | ARM_MMU_L1_TYPE_COARSE;
 		}
 	}
 
@@ -355,7 +355,7 @@ add_page_table(addr_t base)
 	TRACE(("add_page_table(base = %p)\n", (void *)base));
 
 	// Get new page table and clear it out
-	uint32 *pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
+	uint32 *pageTable = get_next_page_table(ARM_MMU_L1_TYPE_COARSE);
 /*
 	if (pageTable > (uint32 *)(8 * 1024 * 1024)) {
 		panic("tried to add page table beyond the indentity mapped 8 MB "
@@ -367,7 +367,7 @@ add_page_table(addr_t base)
 
 	// put the new page table into the page directory
 	sPageDirectory[VADDR_TO_PDENT(base)]
-		= (uint32)pageTable | MMU_L1_TYPE_COARSE;
+		= (uint32)pageTable | ARM_MMU_L1_TYPE_COARSE;
 }
 
 
@@ -615,7 +615,7 @@ mmu_init(void)
 
 		if (strcmp("RAM_pt", LOADER_MEMORYMAP[i].name) == 0) {
 			sNextPageTableAddress = LOADER_MEMORYMAP[i].start
-				+ MMU_L1_TABLE_SIZE;
+				+ ARM_MMU_L1_TABLE_SIZE;
 			kPageTableRegionEnd = LOADER_MEMORYMAP[i].end;
 			sPageDirectory = (uint32 *)LOADER_MEMORYMAP[i].start;
 		}

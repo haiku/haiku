@@ -314,8 +314,9 @@ ARMPagingMethod32Bit::InitPostArea(kernel_args* args)
 	area_id area;
 
 	temp = (void*)fKernelVirtualPageDirectory;
-	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, MMU_L1_TABLE_SIZE,
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS,
+		ARM_MMU_L1_TABLE_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA
+			| B_KERNEL_WRITE_AREA);
 	if (area < B_OK)
 		return area;
 
