@@ -158,6 +158,13 @@ public:
 	virtual	int32				CountDataMembers() const = 0;
 	virtual	DataMember*			DataMemberAt(int32 index) const = 0;
 
+	virtual int32				CountTemplateTypeParameters() const = 0;
+	virtual Type*				TemplateTypeParameterAt(int32 index) const = 0;
+
+	virtual int32				CountTemplateValueParameters() const = 0;
+	virtual Type*				TemplateValueParameterAt(int32 index) const
+									= 0;
+
 	virtual	status_t			ResolveBaseTypeLocation(BaseType* baseType,
 									const ValueLocation& parentLocation,
 									ValueLocation*& _location) = 0;

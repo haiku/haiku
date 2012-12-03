@@ -271,6 +271,12 @@ public:
 	virtual	int32				CountDataMembers() const;
 	virtual	DataMember*			DataMemberAt(int32 index) const;
 
+	virtual int32				CountTemplateTypeParameters() const;
+	virtual Type*				TemplateTypeParameterAt(int32 index) const;
+
+	virtual int32				CountTemplateValueParameters() const;
+	virtual Type*				TemplateValueParameterAt(int32 index) const;
+
 	virtual	status_t			ResolveBaseTypeLocation(BaseType* _baseType,
 									const ValueLocation& parentLocation,
 									ValueLocation*& _location);
@@ -285,10 +291,12 @@ public:
 
 			bool				AddInheritance(DwarfInheritance* inheritance);
 			bool				AddDataMember(DwarfDataMember* member);
+			bool				AddTemplateTypeParameter(DwarfType* type);
 
 private:
 			typedef BObjectList<DwarfDataMember> DataMemberList;
 			typedef BObjectList<DwarfInheritance> InheritanceList;
+			typedef BObjectList<DwarfType> TemplateTypeList;
 
 private:
 			status_t			_ResolveDataMemberLocation(
@@ -302,6 +310,7 @@ private:
 			DIECompoundType*	fEntry;
 			InheritanceList		fInheritances;
 			DataMemberList		fDataMembers;
+			TemplateTypeList	fTemplateTypeParameters;
 };
 
 

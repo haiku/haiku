@@ -567,6 +567,9 @@ DwarfCompoundType::~DwarfCompoundType()
 	}
 	for (int32 i = 0; DwarfDataMember* member = fDataMembers.ItemAt(i); i++)
 		member->ReleaseReference();
+
+	for (int32 i = 0; DwarfType* type = fTemplateTypeParameters.ItemAt(i); i++)
+		type->ReleaseReference();
 }
 
 
@@ -602,6 +605,36 @@ DataMember*
 DwarfCompoundType::DataMemberAt(int32 index) const
 {
 	return fDataMembers.ItemAt(index);
+}
+
+
+int32
+DwarfCompoundType::CountTemplateTypeParameters() const
+{
+	return fTemplateTypeParameters.CountItems();
+}
+
+
+Type*
+DwarfCompoundType::TemplateTypeParameterAt(int32 index) const
+{
+	return fTemplateTypeParameters.ItemAt(index);
+}
+
+
+int32
+DwarfCompoundType::CountTemplateValueParameters() const
+{
+	// TODO: implement
+	return 0;
+}
+
+
+Type*
+DwarfCompoundType::TemplateValueParameterAt(int32 index) const
+{
+	// TODO: implement
+	return NULL;
 }
 
 
@@ -732,6 +765,17 @@ DwarfCompoundType::AddDataMember(DwarfDataMember* member)
 		return false;
 
 	member->AcquireReference();
+	return true;
+}
+
+
+bool
+DwarfCompoundType::AddTemplateTypeParameter(DwarfType* type)
+{
+	if (!fTemplateTypeParameters.AddItem(type))
+		return false;
+
+	type->AcquireReference();
 	return true;
 }
 
