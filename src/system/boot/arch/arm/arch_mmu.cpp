@@ -381,29 +381,6 @@ init_page_directory()
 }
 
 
-/*!     Adds a new page table for the specified base address */
-static void
-add_page_table(addr_t base)
-{
-	TRACE(("add_page_table(base = %p)\n", (void *)base));
-
-	// Get new page table and clear it out
-	uint32 *pageTable = get_next_page_table(ARM_MMU_L1_TYPE_COARSE);
-/*
-	if (pageTable > (uint32 *)(8 * 1024 * 1024)) {
-		panic("tried to add page table beyond the indentity mapped 8 MB "
-			"region\n");
-	}
-*/
-	for (int32 i = 0; i < 256; i++)
-		pageTable[i] = 0;
-
-	// put the new page table into the page directory
-	sPageDirectory[VADDR_TO_PDENT(base)]
-		= (uint32)pageTable | ARM_MMU_L1_TYPE_COARSE;
-}
-
-
 /*!	Creates an entry to map the specified virtualAddress to the given
 	physicalAddress.
 	If the mapping goes beyond the current page table, it will allocate
@@ -434,26 +411,15 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
 
 	// map the page to the correct page table
-	uint32 *pageTable
-		= (uint32 *)(sPageDirectory[VADDR_TO_PDENT(virtualAddress)]
-			& ARM_PDE_ADDRESS_MASK);
+	uint32 *pageTable = get_or_create_page_table(virtualAddress,
+		ARM_MMU_L1_TYPE_COARSE);
 
-	TRACE(("map_page: pageTable 0x%lx\n",
-		sPageDirectory[VADDR_TO_PDENT(virtualAddress)] & ARM_PDE_ADDRESS_MASK));
-
-	if (pageTable == NULL) {
-		add_page_table(virtualAddress);
-		pageTable = (uint32 *)(sPageDirectory[VADDR_TO_PDENT(virtualAddress)]
-			& ARM_PDE_ADDRESS_MASK);
-	}
-
-	uint32 tableEntry = VADDR_TO_PTENT(virtualAddress);
-
+	uint32 pageTableIndex = VADDR_TO_PTENT(virtualAddress);
 	TRACE(("map_page: inserting pageTable %p, tableEntry 0x%" B_PRIx32
-		", physicalAddress 0x%" B_PRIxADDR "\n", pageTable, tableEntry,
+		", physicalAddress 0x%" B_PRIxADDR "\n", pageTable, pageTableIndex,
 		physicalAddress));
 
-	pageTable[tableEntry] = physicalAddress | flags;
+	pageTable[pageTableIndex] = physicalAddress | flags;
 
 	mmu_flush_TLB();
 
