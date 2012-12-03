@@ -116,7 +116,7 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		"framebuffer", // 2MB framebuffer ram
 		FB_BASE,
 		FB_BASE + FB_SIZE - 1,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
+		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C,
 	},
 #endif
 };
@@ -151,7 +151,7 @@ get_next_virtual_address(size_t size)
 
 
 static addr_t
-get_next_virtual_address_alligned (size_t size, uint32 mask)
+get_next_virtual_address_alligned(size_t size, uint32 mask)
 {
 	addr_t address = (sNextVirtualAddress) & mask;
 	sNextVirtualAddress = address + size;
@@ -253,7 +253,7 @@ get_next_page_table(uint32 type)
 		sNextPageTableAddress, kPageTableRegionEnd, type));
 
 	size_t size = 0;
-	switch(type) {
+	switch (type) {
 		case MMU_L1_TYPE_COARSE:
 		default:
 			size = 1024;
@@ -281,22 +281,22 @@ void
 init_page_directory()
 {
 	TRACE(("init_page_directory\n"));
-	uint32 smalltype;
+	uint32 smallType;
 
-	// see if subpages disabled
-	if (mmu_read_C1() & (1<<23))
-		smalltype = MMU_L2_TYPE_SMALLNEW;
+	// see if subpages are disabled
+	if (mmu_read_C1() & (1 << 23))
+		smallType = MMU_L2_TYPE_SMALLNEW;
 	else
-		smalltype = MMU_L2_TYPE_SMALLEXT;
+		smallType = MMU_L2_TYPE_SMALLEXT;
 
 	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
 
-	// clear out the pgdir
+	// clear out the page directory
 	for (uint32 i = 0; i < 4096; i++)
-	sPageDirectory[i] = 0;
+		sPageDirectory[i] = 0;
 
 	uint32 *pageTable = NULL;
-	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP);i++) {
+	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
 
 		pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
 		TRACE(("BLOCK: %s START: %lx END %lx\n", LOADER_MEMORYMAP[i].name,
@@ -305,7 +305,7 @@ init_page_directory()
 
 		int c = 0;
 		while (pos < LOADER_MEMORYMAP[i].end) {
-			pageTable[c] = pos |  LOADER_MEMORYMAP[i].flags | smalltype;
+			pageTable[c] = pos | LOADER_MEMORYMAP[i].flags | smallType;
 
 			c++;
 			if (c > 255) { // we filled a pagetable => we need a new one
@@ -595,7 +595,7 @@ mmu_init(void)
 {
 	TRACE(("mmu_init\n"));
 
-	mmu_write_C1(mmu_read_C1() & ~((1<<29)|(1<<28)|(1<<0)));
+	mmu_write_C1(mmu_read_C1() & ~((1 << 29) | (1 << 28) | (1 << 0)));
 		// access flag disabled, TEX remap disabled, mmu disabled
 
 	uint32 highestRAMAddress = SDRAM_BASE;
@@ -609,7 +609,7 @@ mmu_init(void)
 			sNextPageTableAddress = LOADER_MEMORYMAP[i].start
 				+ MMU_L1_TABLE_SIZE;
 			kPageTableRegionEnd = LOADER_MEMORYMAP[i].end;
-			sPageDirectory = (uint32 *) LOADER_MEMORYMAP[i].start;
+			sPageDirectory = (uint32 *)LOADER_MEMORYMAP[i].start;
 		}
 
 		if (strncmp("RAM_", LOADER_MEMORYMAP[i].name, 4) == 0) {
