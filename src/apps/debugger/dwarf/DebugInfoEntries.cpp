@@ -477,7 +477,12 @@ DIEClassBaseType::AddChild(DebugInfoEntry* child)
 		case DW_TAG_subprogram:
 			fMemberFunctions.Add(child);
 			return B_OK;
-// TODO: Templates!
+		case DW_TAG_template_type_parameter:
+			fTemplateTypeParameters.Add(child);
+			return B_OK;
+		case DW_TAG_template_value_parameter:
+			fTemplateValueParameters.Add(child);
+			return B_OK;
 // TODO: Variants!
 		default:
 		{
