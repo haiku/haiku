@@ -62,6 +62,9 @@ WorkQueue::EnqueueJob(JobType type, void* args)
 
 	entry->fType = type;
 	entry->fArguments = args;
+	if (type == IORequest)
+		reinterpret_cast<IORequestArgs*>(args)->fInode->BeginAIOOp();
+
 	MutexLocker locker(fQueueLock);
 	fQueue.InsertAfter(fQueue.Tail(), entry);
 	locker.Unlock();
@@ -152,6 +155,7 @@ WorkQueue::JobIO(IORequestArgs* args)
 	char* buffer = reinterpret_cast<char*>(malloc(length));
 	if (buffer == NULL) {
 		notify_io_request(args->fRequest, B_NO_MEMORY);
+		args->fInode->EndAIOOp();
 		return;
 	}
 
@@ -188,5 +192,6 @@ WorkQueue::JobIO(IORequestArgs* args)
 	free(buffer);
 
 	notify_io_request(args->fRequest, result);
+	args->fInode->EndAIOOp();
 }
 

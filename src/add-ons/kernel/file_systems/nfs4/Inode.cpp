@@ -30,11 +30,14 @@ Inode::Inode()
 	fFileCache(NULL),
 	fMaxFileSize(0),
 	fOpenState(NULL),
-	fWriteDirty(false)
+	fWriteDirty(false),
+	fAIOWait(create_sem(1, NULL)),
+	fAIOCount(0)
 {
 	rw_lock_init(&fDelegationLock, NULL);
 	mutex_init(&fStateLock, NULL);
 	mutex_init(&fFileCacheLock, NULL);
+	mutex_init(&fAIOLock, NULL);
 }
 
 
@@ -139,9 +142,13 @@ Inode::~Inode()
 	delete fCache;
 	delete fAttrCache;
 
+	delete_sem(fAIOWait);
+	mutex_destroy(&fAIOLock);
 	mutex_destroy(&fStateLock);
 	mutex_destroy(&fFileCacheLock);
 	rw_lock_destroy(&fDelegationLock);
+
+	ASSERT(fAIOCount == 0);
 }
 
 
@@ -944,6 +951,28 @@ Inode::SyncAndCommit(bool force)
 		return B_OK;
 
 	file_cache_sync(fFileCache);
+	WaitAIOComplete();
 	return Commit();
+}
+
+
+void
+Inode::BeginAIOOp()
+{
+	MutexLocker _(fAIOLock);
+	fAIOCount++;
+	if (fAIOCount == 1)
+		acquire_sem(fAIOWait);
+}
+
+
+void
+Inode::EndAIOOp()
+{
+	MutexLocker _(fAIOLock);
+	ASSERT(fAIOCount > 0);
+	fAIOCount--;
+	if (fAIOCount == 0)
+		release_sem(fAIOWait);
 }
 

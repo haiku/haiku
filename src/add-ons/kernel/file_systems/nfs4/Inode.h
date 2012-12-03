@@ -112,6 +112,10 @@ public:
 					status_t	LoadAttrDirHandle();
 
 	static inline	ino_t		FileIdToInoT(uint64 fileid);
+
+					void		BeginAIOOp();
+					void		EndAIOOp();
+	inline			void		WaitAIOComplete();
 protected:
 								Inode();
 
@@ -157,7 +161,19 @@ private:
 					mutex		fStateLock;
 
 					bool		fWriteDirty;
+
+					sem_id		fAIOWait;
+					uint32		fAIOCount;
+					mutex		fAIOLock;
 };
+
+
+inline void
+Inode::WaitAIOComplete()
+{
+	acquire_sem(fAIOWait);
+	release_sem(fAIOWait);
+}
 
 
 inline ino_t
