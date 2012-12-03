@@ -346,6 +346,9 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 		return -1;
 	}
 
+	// Init Gallium3D Post Processing
+	context->postProcess = pp_init(fScreen, context->postProcessEnable);
+
 	assert(!context->st->st_manager_private);
 	context->st->st_manager_private = (void*)context;
 
@@ -353,7 +356,6 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 	
 	stContext->ctx->DriverCtx = context;
 	stContext->ctx->Driver.Viewport = hgl_viewport;
-
 
 	// TODO: Closely review this next context logic...
 	context_id contextNext = -1;
@@ -398,6 +400,9 @@ GalliumContext::DestroyContext(context_id contextID)
 		fContext[contextID]->st->destroy(fContext[contextID]->st);
 	}
 
+	if (fContext[contextID]->postProcess)
+		pp_free(fContext[contextID]->postProcess);
+
 	if (fContext[contextID]->manager)
 		FREE(fContext[contextID]->manager);
 
@@ -441,11 +446,14 @@ GalliumContext::SetCurrentContext(Bitmap *bitmap, context_id contextID)
 			ST_FLUSH_FRONT, NULL);
 	}
 
-	// TODO: WinSysDrawBuffer & WinSysReadBuffer?
 	api->make_current(context->api, context->st, context->draw, context->read);
 
-
-	// TODO: Anything else? st_api_make_current
+	// TODO: Init textures before post-processing them
+	#if 0
+	pp_init_fbos(context->postProcess,
+		context->textures[ST_ATTACHMENT_BACK_LEFT]->width0,
+		context->textures[ST_ATTACHMENT_BACK_LEFT]->height0);
+	#endif
 
 	context->bitmap = bitmap;
 	//context->st->pipe->priv = context;
@@ -479,7 +487,7 @@ GalliumContext::SwapBuffers(context_id contextID)
 	for (unsigned i = 0; i < nColorBuffers; i++) {
 		pipe_surface* surface = stContext->state.framebuffer.cbufs[i];
 		if (!surface) {
-			ERROR("%s: color buffer %d invalid!\n", __func__, i);
+			ERROR("%s: Color buffer %d invalid!\n", __func__, i);
 			continue;
 		}
 
@@ -498,5 +506,5 @@ GalliumContext::SwapBuffers(context_id contextID)
 		context->bitmap);
 	#endif
 
-	return true;
+	return B_OK;
 }
