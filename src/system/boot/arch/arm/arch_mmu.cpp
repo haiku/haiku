@@ -325,6 +325,10 @@ init_page_directory()
 		}
 	}
 
+	// Map the page directory itself.
+	addr_t virtualPageDirectory = mmu_map_physical_memory(
+		(addr_t)sPageDirectory, ARM_MMU_L1_TABLE_SIZE, kDefaultPageFlags);
+
 	mmu_flush_TLB();
 
 	/* set up the translation table base */
@@ -337,6 +341,10 @@ init_page_directory()
 
 	/* turn on the mmu */
 	mmu_write_C1(mmu_read_C1() | 0x1);
+
+	// Use the mapped page directory from now on.
+	sPageDirectory = (uint32 *)virtualPageDirectory;
+	gKernelArgs.arch_args.vir_pgdir = virtualPageDirectory;
 }
 
 
@@ -628,10 +636,6 @@ mmu_init(void)
 		// remember the start of the allocated physical pages
 
 	init_page_directory();
-
-	// map the page directory on the next vpage
-	gKernelArgs.arch_args.vir_pgdir = mmu_map_physical_memory(
-		(addr_t)sPageDirectory, MMU_L1_TABLE_SIZE, kDefaultPageFlags);
 
 	// map in a kernel stack
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
