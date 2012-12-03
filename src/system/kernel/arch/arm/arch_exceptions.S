@@ -173,6 +173,7 @@ FUNCTION(arm_data_abort):
 	bl	arch_arm_data_abort
 
 	PULLFRAMEFROMSVCANDEXIT
+FUNCTION_END(arm_data_abort)
 
 
 FUNCTION(arm_reserved):
