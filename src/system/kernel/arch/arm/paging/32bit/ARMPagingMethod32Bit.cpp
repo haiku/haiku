@@ -22,7 +22,6 @@
 #include <thread.h>
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
-#include <arm_mmu.h>
 
 #include "paging/32bit/ARMPagingStructures32Bit.h"
 #include "paging/32bit/ARMVMTranslationMap32Bit.h"
@@ -172,7 +171,7 @@ ARMPagingMethod32Bit::PhysicalPageSlotPool::Map(phys_addr_t physicalAddress,
 	page_table_entry& pte = fPageTable[
 		(virtualAddress - fVirtualBase) / B_PAGE_SIZE];
 	pte = (physicalAddress & ARM_PTE_ADDRESS_MASK)
-		| ARM_PTE_TYPE_SMALL_PAGE;
+		| ARM_MMU_L2_TYPE_SMALLEXT;
 
 	arch_cpu_invalidate_TLB_range(virtualAddress, virtualAddress + B_PAGE_SIZE);
 //	invalidate_TLB(virtualAddress);
@@ -462,8 +461,7 @@ ARMPagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 ARMPagingMethod32Bit::PutPageTableInPageDir(page_directory_entry* entry,
 	phys_addr_t pgtablePhysical, uint32 attributes)
 {
-	*entry = (pgtablePhysical & ARM_PDE_ADDRESS_MASK)
-		| ARM_PDE_TYPE_COARSE_L2_PAGE_TABLE;
+	*entry = (pgtablePhysical & ARM_PDE_ADDRESS_MASK) | ARM_MMU_L1_TYPE_COARSE;
 		// TODO: we ignore the attributes of the page table - for compatibility
 		// with BeOS we allow having user accessible areas in the kernel address
 		// space. This is currently being used by some drivers, mainly for the
@@ -480,7 +478,7 @@ ARMPagingMethod32Bit::PutPageTableEntryInTable(page_table_entry* entry,
 	bool globalPage)
 {
 	page_table_entry page = (physicalAddress & ARM_PTE_ADDRESS_MASK)
-		| ARM_PTE_TYPE_SMALL_PAGE;
+		| ARM_MMU_L2_TYPE_SMALLEXT;
 #if 0 //IRA
 		| ARM_PTE_PRESENT | (globalPage ? ARM_PTE_GLOBAL : 0)
 		| MemoryTypeToPageTableEntryFlags(memoryType);

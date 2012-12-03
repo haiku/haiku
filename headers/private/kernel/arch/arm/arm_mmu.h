@@ -52,6 +52,7 @@
  * I will use the old format...
  */
 
+#define ARM_MMU_L2_TYPE_LARGE			0x1
 #define ARM_MMU_L2_TYPE_SMALLEXT		0x3
 
 /* for new format entries (cortex-a8) */

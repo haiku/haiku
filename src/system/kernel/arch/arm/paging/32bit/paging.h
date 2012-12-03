@@ -16,25 +16,8 @@
 #include <int.h>
 #include <kernel.h>
 
-#define VADDR_TO_PDENT(va)					((va) >> 20)
-#define VADDR_TO_PTENT(va)					(((va) & 0xff000) >> 12)
-#define VADDR_TO_PGOFF(va)					((va) & 0x0fff)
+#include <arm_mmu.h>
 
-// page directory entry bits
-#define ARM_PDE_TYPE_MASK					0x00000003
-#define ARM_PDE_TYPE_COARSE_L2_PAGE_TABLE	0x00000001
-#define ARM_PDE_TYPE_SECTION				0x00000002
-#define ARM_PDE_TYPE_FINE_L2_PAGE_TABLE		0x00000003
-
-#define ARM_PDE_ADDRESS_MASK				0xfffffc00
-
-// page table entry bits
-#define ARM_PTE_TYPE_MASK					0x00000003
-#define ARM_PTE_TYPE_LARGE_PAGE				0x00000001
-#define ARM_PTE_TYPE_SMALL_PAGE				0x00000002
-#define ARM_PTE_TYPE_EXT_SMALL_PAGE			0x00000003
-
-#define ARM_PTE_ADDRESS_MASK				0xfffff000
 
 #define FIRST_USER_PGDIR_ENT				(VADDR_TO_PDENT(USER_BASE))
 #define NUM_USER_PGDIR_ENTS					(VADDR_TO_PDENT(ROUNDUP(USER_SIZE, \
