@@ -128,7 +128,6 @@ static const size_t kMaxKernelSize = 0x200000;		// 2 MB for the kernel
 
 static addr_t sNextPhysicalAddress = 0; //will be set by mmu_init
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
-static addr_t sMaxVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 
 static addr_t sNextPageTableAddress = 0;
 //the page directory is in front of the pagetable
@@ -395,17 +394,6 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	if (virtualAddress < KERNEL_BASE) {
 		panic("map_page: asked to map invalid page %p!\n",
 			(void *)virtualAddress);
-	}
-
-	if (virtualAddress >= sMaxVirtualAddress) {
-		// we need to add a new page table
-		add_page_table(sMaxVirtualAddress);
-		sMaxVirtualAddress += B_PAGE_SIZE * 256;
-
-		if (virtualAddress >= sMaxVirtualAddress) {
-			panic("map_page: asked to map a page to %p\n",
-				(void *)virtualAddress);
-		}
 	}
 
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
