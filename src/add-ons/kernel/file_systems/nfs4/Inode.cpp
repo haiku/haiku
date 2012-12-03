@@ -184,11 +184,6 @@ Inode::LookUp(const char* name, ino_t* id)
 	if (fType != NF4DIR)
 		return B_NOT_A_DIRECTORY;
 
-	if (!strcmp(name, ".")) {
-		*id = ID();
-		return B_OK;
-	}
-
 	uint64 change;
 	uint64 fileID;
 	FileHandle handle;
@@ -281,8 +276,6 @@ Inode::Remove(const char* name, FileType type, ino_t* id)
 	status_t result = NFS4Inode::RemoveObject(name, type, &changeInfo, &fileID);
 	if (result != B_OK)
 		return result;
-	if (type != NF4NAMEDATTR)
-		fFileSystem->InoIdMap()->MarkRemoved(fileID);
 
 	DirectoryCache* cache = type != NF4NAMEDATTR ? fCache : fAttrCache;
 	cache->Lock();
@@ -395,14 +388,15 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 
 
 status_t
-Inode::CreateLink(const char* name, const char* path, int mode)
+Inode::CreateLink(const char* name, const char* path, int mode, ino_t* id)
 {
-	return CreateObject(name, path, mode, NF4LNK);
+	return CreateObject(name, path, mode, NF4LNK, id);
 }
 
 
 status_t
-Inode::CreateObject(const char* name, const char* path, int mode, FileType type)
+Inode::CreateObject(const char* name, const char* path, int mode, FileType type,
+	ino_t* id)
 {
 	ASSERT(name != NULL);
 	ASSERT(type != NF4LNK || path != NULL);
@@ -435,6 +429,7 @@ Inode::CreateObject(const char* name, const char* path, int mode, FileType type)
 	notify_entry_created(fFileSystem->DevId(), ID(), name,
 		FileIdToInoT(fileID));
 
+	*id = FileIdToInoT(fileID);
 	return B_OK;
 }
 

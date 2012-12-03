@@ -62,7 +62,7 @@ InodeIdMap::AddEntry(const FileInfo& fi, ino_t id, bool weak)
 	InodeIdMapEntry entry;
 
 	MutexLocker _(fLock);
-	if (weak || _IsEntryRemoved(id))
+	if (!weak || _IsEntryRemoved(id))
 		fMap.Remove(id);
 
 	entry.fFileInfo = fi;

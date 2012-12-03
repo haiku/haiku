@@ -51,10 +51,10 @@ public:
 					status_t	SyncAndCommit(bool force = false);
 
 					status_t	CreateObject(const char* name, const char* path,
-									int mode, FileType type);
+									int mode, FileType type, ino_t* id);
 
 					status_t	CreateLink(const char* name, const char* path,
-									int mode);
+									int mode, ino_t* id);
 
 					status_t	Link(Inode* dir, const char* name);
 					status_t	Remove(const char* name, FileType type,
@@ -89,7 +89,8 @@ public:
 					status_t	WriteDirect(OpenStateCookie* cookie, off_t pos,
 									const void* buffer, size_t* _length);
 
-					status_t	CreateDir(const char* name, int mode);
+					status_t	CreateDir(const char* name, int mode,
+									ino_t* id);
 					status_t	OpenDir(OpenDirCookie* cookie);
 					status_t	ReadDir(void* buffer, uint32 size,
 									uint32* count, OpenDirCookie* cookie);

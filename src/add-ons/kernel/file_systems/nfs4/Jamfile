@@ -35,6 +35,7 @@ KernelAddon nfs4 :
 	RPCCallbackServer.cpp
 	RPCReply.cpp
 	RPCServer.cpp
+	VnodeToInode.cpp
 	WorkQueue.cpp
 	XDR.cpp
 ;

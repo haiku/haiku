@@ -18,9 +18,9 @@
 
 
 status_t
-Inode::CreateDir(const char* name, int mode)
+Inode::CreateDir(const char* name, int mode, ino_t* id)
 {
-	return CreateObject(name, NULL, mode, NF4DIR);
+	return CreateObject(name, NULL, mode, NF4DIR, id);
 }
 
 

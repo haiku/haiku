@@ -41,7 +41,6 @@ FileSystem::FileSystem(const MountConfiguration& configuration)
 	mutex_init(&fOpenOwnerLock, NULL);
 	mutex_init(&fOpenLock, NULL);
 	mutex_init(&fDelegationLock, NULL);
-	rw_lock_init(&fRemoveNodeLock, NULL);
 }
 
 
@@ -49,7 +48,6 @@ FileSystem::~FileSystem()
 {
 	NFSServer()->RemoveFileSystem(this);
 
-	rw_lock_destroy(&fRemoveNodeLock);
 	mutex_destroy(&fDelegationLock);
 	mutex_destroy(&fOpenLock);
 	mutex_destroy(&fOpenOwnerLock);
