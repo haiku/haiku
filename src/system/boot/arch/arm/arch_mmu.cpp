@@ -253,27 +253,38 @@ get_next_page_table(uint32 type)
 		sNextPageTableAddress, kPageTableRegionEnd, type));
 
 	size_t size = 0;
+	size_t entryCount = 0;
 	switch (type) {
 		case ARM_MMU_L1_TYPE_COARSE:
-		default:
 			size = ARM_MMU_L2_COARSE_TABLE_SIZE;
+			entryCount = ARM_MMU_L2_COARSE_ENTRY_COUNT;
 			break;
 		case ARM_MMU_L1_TYPE_FINE:
 			size = ARM_MMU_L2_FINE_TABLE_SIZE;
+			entryCount = ARM_MMU_L2_FINE_ENTRY_COUNT;
 			break;
 		case ARM_MMU_L1_TYPE_SECTION:
+			// TODO: Figure out parameters for section types.
 			size = 16384;
 			break;
+		default:
+			panic("asked for unknown page table type: %#" B_PRIx32 "\n", type);
+			return NULL;
 	}
 
 	addr_t address = sNextPageTableAddress;
-	if (address >= kPageTableRegionEnd) {
-		TRACE(("outside of pagetableregion!\n"));
-		return (uint32 *)get_next_physical_address_alligned(size, 0xffffffc0);
+	if (address < kPageTableRegionEnd)
+		sNextPageTableAddress += size;
+	else {
+		TRACE(("page table allocation outside of pagetable region!\n"));
+		address = get_next_physical_address_alligned(size, 0xffffffc0);
 	}
 
-	sNextPageTableAddress += size;
-	return (uint32 *)address;
+	uint32 *pageTable = (uint32 *)address;
+	for (size_t i = 0; i < entryCount; i++)
+		pageTable[i] = 0;
+
+	return pageTable;
 }
 
 
