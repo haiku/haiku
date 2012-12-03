@@ -574,8 +574,7 @@ ARMVMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
 		pd[index] & ARM_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
-	*_physical = (entry & ARM_PDE_ADDRESS_MASK)
-		| VADDR_TO_PGOFF(va);
+	*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
 
 #if 0 //IRA
 	// read in the page state flags
@@ -622,8 +621,8 @@ ARMVMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 			pd[index] & ARM_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
-	*_physical = (entry & ARM_PDE_ADDRESS_MASK)
-		| VADDR_TO_PGOFF(va);
+	*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
+
 #if 0
 	// read in the page state flags
 	if ((entry & ARM_PTE_USER) != 0) {
