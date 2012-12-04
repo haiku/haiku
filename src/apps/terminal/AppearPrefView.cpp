@@ -374,6 +374,8 @@ AppearancePrefView::_ChangeColorSchema(color_schema* schema)
 	pref->setRGB(PREF_TEXT_BACK_COLOR, schema->text_back_color);
 	pref->setRGB(PREF_SELECT_FORE_COLOR, schema->select_fore_color);
 	pref->setRGB(PREF_SELECT_BACK_COLOR, schema->select_back_color);
+	pref->setRGB(PREF_CURSOR_FORE_COLOR, schema->cursor_fore_color);
+	pref->setRGB(PREF_CURSOR_BACK_COLOR, schema->cursor_back_color);
 }
 
 
@@ -386,6 +388,8 @@ AppearancePrefView::_SetCurrentColorSchema(BMenuField* field)
 	gCustomSchema.text_back_color = pref->getRGB(PREF_TEXT_BACK_COLOR);
 	gCustomSchema.select_fore_color = pref->getRGB(PREF_SELECT_FORE_COLOR);
 	gCustomSchema.select_back_color = pref->getRGB(PREF_SELECT_BACK_COLOR);
+	gCustomSchema.cursor_fore_color = pref->getRGB(PREF_CURSOR_FORE_COLOR);
+	gCustomSchema.cursor_back_color = pref->getRGB(PREF_CURSOR_BACK_COLOR);
 
 	const char* currentSchemaName = NULL;
 
