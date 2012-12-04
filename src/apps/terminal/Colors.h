@@ -1,9 +1,10 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _COLORS_H
 #define _COLORS_H
+
 
 #include <InterfaceDefs.h>
 

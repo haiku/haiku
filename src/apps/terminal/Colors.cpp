@@ -1,7 +1,8 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "Colors.h"
 
@@ -12,12 +13,15 @@
 #define B_TRANSLATION_CONTEXT "Terminal colors schema"
 
 
+// Standard colors
 const rgb_color kBlack= { 0, 0, 0, 255 };
-const rgb_color kWhite = { 255, 255, 255, 255 };
 const rgb_color kGreen = { 0, 255, 0, 255 };
+const rgb_color kWhite = { 255, 255, 255, 255 };
+const rgb_color kYellow = { 255, 255, 0, 255 };
 
-const struct color_schema kBlackOnWhite = {
-	B_TRANSLATE("Black on White"),
+
+const struct color_schema kColorDefault = {
+	B_TRANSLATE("Default"),
 	kBlack,
 	kWhite,
 	kWhite,
@@ -26,9 +30,18 @@ const struct color_schema kBlackOnWhite = {
 	kBlack
 };
 
+const struct color_schema kColorBlue = {
+	B_TRANSLATE("Blue"),
+	kYellow,
+	{ 0, 0, 139, 255 },
+	kBlack,
+	kWhite,
+	kBlack,
+	{ 0, 139, 139, 255 },
+};
 
-const struct color_schema kWhiteOnBlack = {
-	B_TRANSLATE("White on Black"),
+const struct color_schema kColorMidnight = {
+	B_TRANSLATE("Midnight"),
 	kWhite,
 	kBlack,
 	kBlack,
@@ -37,8 +50,18 @@ const struct color_schema kWhiteOnBlack = {
 	kWhite
 };
 
-const struct color_schema kGreenOnBlack = {
-	B_TRANSLATE("Green on Black"),
+const struct color_schema kColorProfessional = {
+	B_TRANSLATE("Professional"),
+	kWhite,
+	{ 8, 8, 8, 255 },
+	{ 50, 50, 50, 255 },
+	kWhite,
+	kWhite,
+	{ 50, 50, 50, 255 },
+};
+
+const struct color_schema kColorRetroTerminal = {
+	B_TRANSLATE("Retro Terminal"),
 	kGreen,
 	kBlack,
 	kBlack,
@@ -47,14 +70,27 @@ const struct color_schema kGreenOnBlack = {
 	kGreen
 };
 
+const struct color_schema kColorSlate = {
+	B_TRANSLATE("Slate"),
+	kWhite,
+	{ 20, 20, 28, 255 },
+	{ 70, 70, 70, 255 },
+	{ 255, 200, 0, 255 },
+	kWhite,
+	{ 70, 70, 70, 255 },
+};
+
 struct color_schema gCustomSchema = {
 	B_TRANSLATE("Custom")
 };
 
 const color_schema* gPredefinedSchemas[] = {
-		&kBlackOnWhite,
-		&kWhiteOnBlack,
-		&kGreenOnBlack,
+		&kColorDefault,
+		&kColorBlue,
+		&kColorMidnight,
+		&kColorProfessional,
+		&kColorRetroTerminal,
+		&kColorSlate,
 		&gCustomSchema,
 		NULL
 };
