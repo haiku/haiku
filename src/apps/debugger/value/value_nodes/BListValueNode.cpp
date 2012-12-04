@@ -101,7 +101,8 @@ BListValueNode::BListValueNode(ValueNodeChild* nodeChild,
 	:
 	ValueNode(nodeChild),
 	fType(type),
-	fLoader(NULL)
+	fLoader(NULL),
+	fItemCount(0)
 {
 	fType->AcquireReference();
 }
@@ -152,6 +153,21 @@ BListValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 
 	ValueLocation* memberLocation = NULL;
 	CompoundType* baseType = dynamic_cast<CompoundType*>(fType);
+
+	if (baseType->CountTemplateParameters()) {
+		// for BObjectList we need to walk up
+		// the hierarchy: BObjectList -> _PointerList_ -> BList
+		baseType = dynamic_cast<CompoundType*>(baseType->BaseTypeAt(0)
+			->GetType());
+		if (baseType == NULL || baseType->Name() != "_PointerList_")
+			return B_BAD_DATA;
+
+		baseType = dynamic_cast<CompoundType*>(baseType->BaseTypeAt(0)
+			->GetType());
+		if (baseType == NULL || baseType->Name() != "BList")
+			return B_BAD_DATA;
+
+	}
 
 	for (int32 i = 0; i < baseType->CountDataMembers(); i++) {
 		DataMember* member = baseType->DataMemberAt(i);
@@ -213,14 +229,30 @@ BListValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 status_t
 BListValueNode::CreateChildren()
 {
-	BString typeName;
-	TypeLookupConstraints constraints;
-	constraints.SetTypeKind(TYPE_ADDRESS);
-	constraints.SetBaseTypeName("void");
+	if (fItemCount == 0 || fChildrenCreated) {
+		fChildrenCreated = true;
+		return B_OK;
+	}
+
 	Type* type = NULL;
-	status_t result = fLoader->LookupTypeByName(typeName, constraints, type);
-	if (result != B_OK)
-		return result;
+	CompoundType* objectType = dynamic_cast<CompoundType*>(fType);
+	if (objectType->CountTemplateParameters() != 0) {
+		AddressType* addressType = NULL;
+		status_t result = objectType->TemplateParameterAt(0)->GetType()
+			->CreateDerivedAddressType(DERIVED_TYPE_POINTER, addressType);
+		if (result != B_OK)
+			return result;
+
+		type = addressType;
+	} else {
+		BString typeName;
+		TypeLookupConstraints constraints;
+		constraints.SetTypeKind(TYPE_ADDRESS);
+		constraints.SetBaseTypeName("void");
+		status_t result = fLoader->LookupTypeByName(typeName, constraints, type);
+		if (result != B_OK)
+			return result;
+	}
 
 	for (int32 i = 0; i < fItemCount && i < kMaxArrayElementCount; i++)
 	{

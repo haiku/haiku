@@ -21,7 +21,8 @@ float
 BListTypeHandler::SupportsType(Type* type)
 {
 	if (dynamic_cast<CompoundType*>(type) != NULL
-		&& type->Name() == "BList")
+		&& (type->Name() == "BList"
+			|| type->Name().Compare("BObjectList", 11) == 0))
 		return 1.0f;
 
 	return 0.0f;
