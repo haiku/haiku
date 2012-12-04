@@ -533,8 +533,12 @@ nfs4_create_symlink(fs_volume* volume, fs_vnode* dir, const char* name,
 		return result;
 
 	result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
-	if (result == B_OK)
+	if (result == B_OK) {
+		unremove_vnode(volume, id);
 		vti->Clear();
+		put_vnode(volume, id);
+	}
+
 	return B_OK;
 }
 
@@ -580,14 +584,17 @@ nfs4_unlink(fs_volume* volume, fs_vnode* dir, const char* name)
 		return result;
 	locker.Unlock();
 
-	void* ptr;
-	result = get_vnode(volume, id, &ptr);
-	if (result == B_OK)  {
-		vti = reinterpret_cast<VnodeToInode*>(ptr);
+	result = acquire_vnode(volume, id);
+	if (result == B_OK) {
+		ASSERT(get_vnode(volume, id, reinterpret_cast<void**>(&vti)) == B_OK);
 		vti->Remove();
+		put_vnode(volume, id);
+		remove_vnode(volume, id);
+
+		put_vnode(volume, id);
 	}
 
-	return remove_vnode(volume, id);
+	return B_OK;
 }
 
 
@@ -626,6 +633,7 @@ nfs4_rename(fs_volume* volume, fs_vnode* fromDir, const char* fromName,
 
 		child->fInfo.fParent = toInode->fInfo.fHandle;
 		child->fInfo.CreateName(toInode->fInfo.fPath, toName);
+		put_vnode(volume, id);
 	}
 
 	return B_OK;
@@ -686,43 +694,29 @@ get_new_vnode(fs_volume* volume, ino_t id, VnodeToInode** _vti)
 	Inode* inode;
 	VnodeToInode* vti;
 
-	status_t result = get_vnode(volume, id, reinterpret_cast<void**>(_vti));
+	status_t result = acquire_vnode(volume, id);
 	if (result == B_OK) {
+		ASSERT(get_vnode(volume, id, reinterpret_cast<void**>(_vti)) == B_OK);
+		unremove_vnode(volume, id);
+
+		// Release after acquire
+		put_vnode(volume, id);
+
 		vti = *_vti;
 
-		// FIXME: race condition vti->Get() == NULL and vti->Replace(inode)
 		if (vti->Get() == NULL) {
 			result = fs->GetInode(id, &inode);
-			if (result != B_OK)
+			if (result != B_OK) {
+				put_vnode(volume, id);
 				return result;
+			}
 
 			vti->Replace(inode);
-			unremove_vnode(volume, id);
 		}
-
 		return B_OK;
 	}
 
-	vti = new VnodeToInode(id, fs);
-	if (vti == NULL)
-		return B_NO_MEMORY;
-	*_vti = vti;
-
-	result = fs->GetInode(id, &inode);
-	if (result != B_OK) {
-		delete vti;
-		return result;
-	}
-
-	vti->Replace(inode);
-
-	result = new_vnode(volume, id, vti, &gNFSv4VnodeOps);
-	if (result != B_OK) {
-		delete vti;
-		delete inode;
-	}
-
-	return B_OK;
+	return get_vnode(volume, id, reinterpret_cast<void**>(_vti)); //_OK;
 }
 
 
@@ -762,6 +756,7 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	Inode* child = vti->Get();
 	if (child == NULL) {
 		delete cookie;
+		put_vnode(volume, *_newVnodeID);
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -930,8 +925,12 @@ nfs4_create_dir(fs_volume* volume, fs_vnode* parent, const char* name,
 		return result;
 
 	result = get_vnode(volume, id, reinterpret_cast<void**>(&vti));
-	if (result == B_OK)
+	if (result == B_OK) {
+		unremove_vnode(volume, id);
 		vti->Clear();
+		put_vnode(volume, id);
+	}
+
 	return B_OK;
 }
 
@@ -951,7 +950,18 @@ nfs4_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
 	status_t result = inode->Remove(name, NF4DIR, &id);
 	if (result != B_OK)
 		return result;
-	return remove_vnode(volume, id);
+
+	result = acquire_vnode(volume, id);
+	if (result == B_OK) {
+		ASSERT(get_vnode(volume, id, reinterpret_cast<void**>(&vti)) == B_OK);
+		vti->Remove();
+		put_vnode(volume, id);
+		remove_vnode(volume, id);
+
+		put_vnode(volume, id);
+	}
+
+	return B_OK;
 }
 
 
