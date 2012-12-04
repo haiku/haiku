@@ -17,6 +17,7 @@
 
 class Architecture;
 class CompilationUnit;
+class DebugInfoEntry;
 class DIEAddressingType;
 class DIEArrayType;
 class DIEBaseType;
@@ -237,6 +238,25 @@ private:
 };
 
 
+class DwarfTemplateParameter : public TemplateParameter {
+public:
+								DwarfTemplateParameter(
+									DebugInfoEntry* entry,
+									DwarfType* type);
+								~DwarfTemplateParameter();
+
+	virtual	template_type_kind	Kind() const { return fTemplateKind; }
+	virtual	Type*				GetType() const { return fType; }
+	virtual BVariant			Value() const { return fValue; }
+
+private:
+			DebugInfoEntry*		fEntry;
+			template_type_kind	fTemplateKind;
+			Type*				fType;
+			BVariant			fValue;
+};
+
+
 class DwarfPrimitiveType : public PrimitiveType, public DwarfType {
 public:
 								DwarfPrimitiveType(
@@ -271,11 +291,8 @@ public:
 	virtual	int32				CountDataMembers() const;
 	virtual	DataMember*			DataMemberAt(int32 index) const;
 
-	virtual int32				CountTemplateTypeParameters() const;
-	virtual Type*				TemplateTypeParameterAt(int32 index) const;
-
-	virtual int32				CountTemplateValueParameters() const;
-	virtual Type*				TemplateValueParameterAt(int32 index) const;
+	virtual int32				CountTemplateParameters() const;
+	virtual TemplateParameter*	TemplateParameterAt(int32 index) const;
 
 	virtual	status_t			ResolveBaseTypeLocation(BaseType* _baseType,
 									const ValueLocation& parentLocation,
@@ -291,12 +308,13 @@ public:
 
 			bool				AddInheritance(DwarfInheritance* inheritance);
 			bool				AddDataMember(DwarfDataMember* member);
-			bool				AddTemplateTypeParameter(DwarfType* type);
+			bool				AddTemplateParameter(
+									DwarfTemplateParameter* parameter);
 
 private:
 			typedef BObjectList<DwarfDataMember> DataMemberList;
 			typedef BObjectList<DwarfInheritance> InheritanceList;
-			typedef BObjectList<DwarfType> TemplateTypeList;
+			typedef BObjectList<DwarfTemplateParameter> TemplateParameterList;
 
 private:
 			status_t			_ResolveDataMemberLocation(
@@ -310,7 +328,7 @@ private:
 			DIECompoundType*	fEntry;
 			InheritanceList		fInheritances;
 			DataMemberList		fDataMembers;
-			TemplateTypeList	fTemplateTypeParameters;
+			TemplateParameterList fTemplateParameters;
 };
 
 

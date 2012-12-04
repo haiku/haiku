@@ -102,13 +102,13 @@ struct HasBaseTypesPredicate {
 };
 
 
-// #pragma mark - HasTemplateTypeParametersPredicate
+// #pragma mark - HasTemplateParametersPredicate
 
 
-struct HasTemplateTypeParametersPredicate {
+struct HasTemplateParametersPredicate {
 	inline bool operator()(DIEClassBaseType* entry) const
 	{
-		return !entry->TemplateTypeParameters().IsEmpty();
+		return !entry->TemplateParameters().IsEmpty();
 	}
 };
 
@@ -565,23 +565,41 @@ printf("  -> failed to add type to cache\n");
 		// parameters
 		classTypeEntry = DwarfUtils::GetDIEByPredicate(
 			dynamic_cast<DIEClassBaseType*>(typeEntry),
-			HasTemplateTypeParametersPredicate());
+			HasTemplateParametersPredicate());
 
 		if (classTypeEntry != NULL) {
 			for (DebugInfoEntryList::ConstIterator it
-						= classTypeEntry->TemplateTypeParameters()
+						= classTypeEntry->TemplateParameters()
 							.GetIterator();
 					DebugInfoEntry* _typeEntry = it.Next();) {
-				DIETemplateTypeParameter* templateTypeEntry =
-					dynamic_cast<DIETemplateTypeParameter*>(_typeEntry);
+				DIETemplateTypeParameter* templateTypeEntry
+					= dynamic_cast<DIETemplateTypeParameter*>(_typeEntry);
 				DwarfType* templateType;
-				if (CreateType(templateTypeEntry->GetType(), templateType)
-					!= B_OK) {
-					continue;
+				if (templateTypeEntry != NULL) {
+					if (CreateType(templateTypeEntry->GetType(), templateType)
+						!= B_OK) {
+						continue;
+					}
+				} else {
+					DIETemplateValueParameter* templateValueEntry
+						= dynamic_cast<DIETemplateValueParameter*>(_typeEntry);
+					if (CreateType(templateValueEntry->GetType(), templateType)
+						!= B_OK) {
+						continue;
+					}
 				}
 				BReference<DwarfType> templateTypeReference(templateType,
 					true);
-				if (!type->AddTemplateTypeParameter(templateType)) {
+				DwarfTemplateParameter* parameter
+					= new(std::nothrow) DwarfTemplateParameter(_typeEntry,
+						templateType);
+				if (parameter == NULL) {
+					cacheLocker.Lock();
+					fTypeCache->RemoveType(type);
+					return B_NO_MEMORY;
+				}
+
+				if (!type->AddTemplateParameter(parameter)) {
 					cacheLocker.Lock();
 					fTypeCache->RemoveType(type);
 					return B_NO_MEMORY;

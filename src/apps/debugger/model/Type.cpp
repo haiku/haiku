@@ -72,6 +72,14 @@ FunctionParameter::~FunctionParameter()
 }
 
 
+// #pragma mark - TemplateParameter
+
+
+TemplateParameter::~TemplateParameter()
+{
+}
+
+
 // #pragma mark - Type
 
 
