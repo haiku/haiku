@@ -117,7 +117,7 @@ ARMPagingMethod32Bit::PhysicalPageSlotPool::InitInitialPostArea(
 	area_id area = create_area("physical page pool", &temp,
 		B_EXACT_ADDRESS, areaSize, B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < B_OK) {
+	if (area < 0) {
 		panic("LargeMemoryPhysicalPageMapper::InitPostArea(): Failed to "
 			"create area for physical page pool.");
 		return area;
@@ -372,7 +372,7 @@ ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 		memset((void*)pgtable, 0, B_PAGE_SIZE);
 	}
 
-	page_table_entry *ptEntry = (page_table_entry*)
+	page_table_entry* ptEntry = (page_table_entry*)
 		(fKernelVirtualPageDirectory[index] & ARM_PDE_ADDRESS_MASK);
 	ptEntry += VADDR_TO_PTENT(virtualAddress);
 
