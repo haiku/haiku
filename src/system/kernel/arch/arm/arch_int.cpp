@@ -150,16 +150,16 @@ arch_int_init_post_vm(kernel_args *args)
 	arm_vector_init();
 
 	// see if high vectors are enabled
-	if (mmu_read_c1() & (1<<13))
+	if ((mmu_read_c1() & (1 << 13)) != 0)
 		dprintf("High vectors already enabled\n");
 	else {
-		mmu_write_c1(mmu_read_c1() | (1<<13));
+		mmu_write_c1(mmu_read_c1() | (1 << 13));
 
-		if (!(mmu_read_c1() & (1<<13)))
+		if ((mmu_read_c1() & (1 << 13)) == 0)
 			dprintf("Unable to enable high vectors!\n");
 		else
 			dprintf("Enabled high vectors\n");
-       }
+	}
 
 	sPxaInterruptArea = map_physical_memory("pxa_intc", PXA_INTERRUPT_PHYS_BASE,
 		PXA_INTERRUPT_SIZE, 0, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&sPxaInterruptBase);
@@ -188,18 +188,23 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 }
 
 
-extern "C" void arch_arm_undefined(struct iframe *iframe)
+extern "C" void
+arch_arm_undefined(struct iframe *iframe)
 {
 	print_iframe("Undefined Instruction", iframe);
 	panic("not handled!");
 }
 
-extern "C" void arch_arm_syscall(struct iframe *iframe)
+
+extern "C" void
+arch_arm_syscall(struct iframe *iframe)
 {
 	print_iframe("Software interrupt", iframe);
 }
 
-extern "C" void arch_arm_data_abort(struct iframe *frame)
+
+extern "C" void
+arch_arm_data_abort(struct iframe *frame)
 {
 	Thread *thread = thread_get_current_thread();
 	bool isUser = (frame->spsr & 0x1f) == 0x10;
@@ -281,22 +286,32 @@ extern "C" void arch_arm_data_abort(struct iframe *frame)
 	}
 }
 
-extern "C" void arch_arm_prefetch_abort(struct iframe *iframe)
+
+extern "C" void
+arch_arm_prefetch_abort(struct iframe *iframe)
 {
 	print_iframe("Prefetch Abort", iframe);
 	panic("not handled!");
 }
 
-extern "C" void arch_arm_irq(struct iframe *iframe)
+
+extern "C" void
+arch_arm_irq(struct iframe *iframe)
 {
-	for (int i=0; i < 32; i++)
+	for (int i=0; i < 32; i++) {
 		if (sPxaInterruptBase[PXA_ICIP] & (1 << i))
 			int_io_interrupt_handler(i, true);
+	}
 }
 
-extern "C" void arch_arm_fiq(struct iframe *iframe)
+
+extern "C" void
+arch_arm_fiq(struct iframe *iframe)
 {
-	for (int i=0; i < 32; i++)
-		if (sPxaInterruptBase[PXA_ICIP] & (1 << i))
-			dprintf("arch_arm_fiq: help me, FIQ %d was triggered but no FIQ support!\n", i);
+	for (int i=0; i < 32; i++) {
+		if (sPxaInterruptBase[PXA_ICIP] & (1 << i)) {
+			dprintf("arch_arm_fiq: help me, FIQ %d was triggered but no "
+				"FIQ support!\n", i);
+		}
+	}
 }
