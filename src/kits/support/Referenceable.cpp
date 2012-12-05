@@ -6,6 +6,7 @@
 
 #include <Referenceable.h>
 
+#include <debugger.h>
 
 //#define TRACE_REFERENCEABLE
 #ifdef TRACE_REFERENCEABLE
@@ -25,6 +26,10 @@ BReferenceable::BReferenceable()
 
 BReferenceable::~BReferenceable()
 {
+#ifdef DEBUG
+	if (fReferenceCount > 1)
+		debugger("Deleted object which still had references.\n");
+#endif
 }
 
 
