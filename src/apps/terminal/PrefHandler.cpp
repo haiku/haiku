@@ -242,7 +242,7 @@ PrefHandler::getBool(const char *key)
 	if (value == NULL)
 		return false;
 
-	return !strcmp(value, PREF_TRUE);
+	return strcmp(value, PREF_TRUE) == 0;
 }
 
 
@@ -352,7 +352,7 @@ PrefHandler::_ConfirmFont(const char *key, const BFont *fallback)
 		if (get_font_family(i, &family) != B_OK)
 			continue;
 
-		if (!strcmp(family, font)) {
+		if (strcmp(family, font) == 0) {
 			// found font family: we can safely use this font
 			return;
 		}

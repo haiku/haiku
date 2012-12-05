@@ -225,8 +225,8 @@ AppearancePrefView::AttachedToWindow()
 
   	_SetCurrentColorScheme(fColorSchemeField);
   	bool enableCustomColors =
-		!strcmp(fColorSchemeField->Menu()->FindMarked()->Label(),
-			gCustomColorScheme.name);
+		strcmp(fColorSchemeField->Menu()->FindMarked()->Label(),
+			gCustomColorScheme.name) == 0;
 
   	_EnableCustomColors(enableCustomColors);
 }
@@ -250,18 +250,18 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 				= pref->getString(PREF_HALF_FONT_FAMILY);
 			const char* currentStyle
 				= pref->getString(PREF_HALF_FONT_STYLE);
-			if (currentFamily == NULL || strcmp(currentFamily, family)
-				|| currentStyle == NULL || strcmp(currentStyle, style)) {
+			if (currentFamily == NULL || strcmp(currentFamily, family) != 0
+				|| currentStyle == NULL || strcmp(currentStyle, style) != 0) {
 				pref->setString(PREF_HALF_FONT_FAMILY, family);
 				pref->setString(PREF_HALF_FONT_STYLE, style);
 				modified = true;
 			}
 			break;
 		}
+
 		case MSG_HALF_SIZE_CHANGED:
 			if (strcmp(PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE),
-					fFontSize->Menu()->FindMarked()->Label())) {
-
+					fFontSize->Menu()->FindMarked()->Label()) != 0) {
 				PrefHandler::Default()->setString(PREF_HALF_FONT_SIZE,
 					fFontSize->Menu()->FindMarked()->Label());
 				modified = true;
@@ -405,7 +405,7 @@ AppearancePrefView::_SetCurrentColorScheme(BMenuField* field)
 
 	for (int32 i = 0; i < fColorSchemeField->Menu()->CountItems(); i++) {
 		BMenuItem* item = fColorSchemeField->Menu()->ItemAt(i);
-		if (!strcmp(item->Label(), currentSchemeName)) {
+		if (strcmp(item->Label(), currentSchemeName) == 0) {
 			item->SetMarked(true);
 			break;
 		}
@@ -440,8 +440,8 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 						BMenuItem* item = new BMenuItem(itemLabel,
 							message);
 						menu->AddItem(item);
-						if (!strcmp(defaultFamily, family)
-							&& !strcmp(defaultStyle, style))
+						if (strcmp(defaultFamily, family) == 0
+							&& strcmp(defaultStyle, style) == 0)
 							item->SetMarked(true);
 					}
 				}
@@ -502,7 +502,7 @@ AppearancePrefView::_MakeMenu(uint32 msg, const char** items,
 
 	int32 i = 0;
 	while (*items) {
-		if (!strcmp((*items), ""))
+		if (strcmp((*items), "") == 0)
 			menu->AddSeparatorItem();
 		else {
 			BMessage* message = new BMessage(msg);
@@ -529,7 +529,7 @@ AppearancePrefView::_MakeColorSchemeMenu(uint32 msg, const color_scheme** items,
 
 	int32 i = 0;
 	while (*items) {
-		if (!strcmp((*items)->name, ""))
+		if (strcmp((*items)->name, "") == 0)
 			menu->AddSeparatorItem();
 		else {
 			BMessage* message = new BMessage(msg);

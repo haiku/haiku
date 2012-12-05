@@ -200,7 +200,7 @@ TermApp::RefsReceived(BMessage* message)
 	info.GetType(mimetype);
 
 	// if App opened by Pref file
-	if (!strcmp(mimetype, PREFFILE_MIMETYPE)) {
+	if (strcmp(mimetype, PREFFILE_MIMETYPE) == 0) {
 
 		BEntry ent(&ref);
 		BPath path(&ent);
@@ -209,7 +209,7 @@ TermApp::RefsReceived(BMessage* message)
 	}
 
 	// if App opened by Shell Script
-	if (!strcmp(mimetype, "text/x-haiku-shscript")){
+	if (strcmp(mimetype, "text/x-haiku-shscript") == 0) {
 		// Not implemented.
 		//    beep();
 		return;

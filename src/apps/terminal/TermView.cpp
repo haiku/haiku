@@ -1862,7 +1862,8 @@ TermView::MessageReceived(BMessage *msg)
 			int32 encodingID;
 			BMessage specifier;
 			if (msg->GetCurrentSpecifier(&i, &specifier) == B_OK
-				&& !strcmp("encoding", specifier.FindString("property", i))) {
+				&& !strcmp("encoding",
+					specifier.FindString("property", i)) == 0) {
 				msg->FindInt32 ("data", &encodingID);
 				SetEncoding(encodingID);
 				msg->SendReply(B_REPLY);
@@ -1877,11 +1878,13 @@ TermView::MessageReceived(BMessage *msg)
 			int32 i;
 			BMessage specifier;
 			if (msg->GetCurrentSpecifier(&i, &specifier) == B_OK
-				&& !strcmp("encoding", specifier.FindString("property", i))) {
+				&& strcmp("encoding",
+					specifier.FindString("property", i)) == 0) {
 				BMessage reply(B_REPLY);
 				reply.AddInt32("result", Encoding());
 				msg->SendReply(&reply);
-			} else if (!strcmp("tty", specifier.FindString("property", i))) {
+			} else if (strcmp("tty",
+					specifier.FindString("property", i)) == 0) {
 				BMessage reply(B_REPLY);
 				reply.AddString("result", TerminalName());
 				msg->SendReply(&reply);
