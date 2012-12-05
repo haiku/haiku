@@ -223,9 +223,15 @@ BListValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	if (baseType->CountTemplateParameters() != 0) {
 		// for BObjectList we need to walk up
 		// the hierarchy: BObjectList -> _PointerList_ -> BList
+		if (baseType->CountBaseTypes() == 0)
+			return B_BAD_DATA;
+
 		baseType = dynamic_cast<CompoundType*>(baseType->BaseTypeAt(0)
 			->GetType());
 		if (baseType == NULL || baseType->Name() != "_PointerList_")
+			return B_BAD_DATA;
+
+		if (baseType->CountBaseTypes() == 0)
 			return B_BAD_DATA;
 
 		baseType = dynamic_cast<CompoundType*>(baseType->BaseTypeAt(0)
@@ -303,14 +309,16 @@ BListValueNode::CreateChildren()
 	if (fChildrenCreated)
 		return B_OK;
 
-	BListItemCountNodeChild* countChild = new(std::nothrow)
-		BListItemCountNodeChild(fItemCountLocation, this, fItemCountType);
+	if (fItemCountType != NULL) {
+		BListItemCountNodeChild* countChild = new(std::nothrow)
+			BListItemCountNodeChild(fItemCountLocation, this, fItemCountType);
 
-	if (countChild == NULL)
-		return B_NO_MEMORY;
+		if (countChild == NULL)
+			return B_NO_MEMORY;
 
-	countChild->SetContainer(fContainer);
-	fChildren.AddItem(countChild);
+		countChild->SetContainer(fContainer);
+		fChildren.AddItem(countChild);
+	}
 
 	BReference<Type> addressTypeRef;
 	Type* type = NULL;
