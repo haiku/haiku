@@ -1,21 +1,29 @@
-1	swedish	x-vnd.Haiku-libbe	864109244
+1	swedish	x-vnd.Haiku-libbe	672385853
+gamma	AboutWindow		gamma
+beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Skrivet av:
 About %app%	AboutMenuItem		Om %app%
 Cut	TextView		Klippa ut
+Version	AboutWindow		Version
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kan inte skapa replikanten för "%description".\n%error
+About	AboutWindow		Om
 Copy	TextView		Kopiera
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d byte
+alpha	AboutWindow		alfa
 Error	PrintJob		Fel
 No Pages to print!	PrintJob		Inga sidor att skriva ut!
+All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Grön:
+Version history:	AboutWindow		Versionshistorik:
 Remove replicant	Dragger		Ta bort replikant
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Utskriftservern svarar inte.
 Paste	TextView		Klistra in
+Special Thanks:	AboutWindow		Särskilt tack till:
 %.2f TiB	StringForSize		%.2f TiB
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan inte hitta programmet för replikanten. Ingen programsignatur är angiven.\n%error
 Redo	TextView		Gör om
@@ -26,6 +34,8 @@ Undo	TextView		Ångra
 Red:	ColorControl		Röd:
 %3.2f MiB	StringForSize		%3.2f MiB
 About %app…	Dragger		Om %app...
+development	AboutWindow		utveckling
 Error	ZombieReplicantView		Fel
 Blue:	ColorControl		Blå:
+gold master	AboutWindow		guld mästare
 Can't delete this replicant from its original application. Life goes on.	Dragger		Kan inte ta bort replikanten från dess program. Livet fortsätter som vanligt.

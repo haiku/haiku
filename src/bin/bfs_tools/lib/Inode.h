@@ -114,7 +114,7 @@ class DataStream : public Inode, public BPositionIO {
 		virtual off_t		Position() const;
 
 		virtual status_t	SetSize(off_t size);
-	
+
 	private:
 		int32		fCurrent;
 		int32		fLevel;
@@ -156,7 +156,7 @@ class Directory : public DataStream {
 		Directory(Disk *disk, bfs_inode *inode, bool ownBuffer = true);
 		Directory(const Inode &inode);
 		~Directory();
-		
+
 		virtual status_t	InitCheck();
 		virtual status_t	CopyTo(const char *path, bool fullPath = true,
 								Inode::Source *source = NULL);

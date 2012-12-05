@@ -45,7 +45,7 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_TEXT_FORE_COLOR,		"  0,   0,   0" },
 	{ PREF_TEXT_BACK_COLOR,		"255, 255, 255" },
 	{ PREF_CURSOR_FORE_COLOR,	"  0,   0,   0" },
-	{ PREF_CURSOR_BACK_COLOR,	"255, 200,   0" },
+	{ PREF_CURSOR_BACK_COLOR,	"  0,   0,   0" },
 	{ PREF_SELECT_FORE_COLOR,	"255, 255, 255" },
 	{ PREF_SELECT_BACK_COLOR,	"  0,   0,   0" },
 
@@ -242,7 +242,7 @@ PrefHandler::getBool(const char *key)
 	if (value == NULL)
 		return false;
 
-	return !strcmp(value, PREF_TRUE);
+	return strcmp(value, PREF_TRUE) == 0;
 }
 
 
@@ -352,7 +352,7 @@ PrefHandler::_ConfirmFont(const char *key, const BFont *fallback)
 		if (get_font_family(i, &family) != B_OK)
 			continue;
 
-		if (!strcmp(family, font)) {
+		if (strcmp(family, font) == 0) {
 			// found font family: we can safely use this font
 			return;
 		}

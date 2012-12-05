@@ -353,6 +353,8 @@ public:
 
 			const DebugInfoEntryList& BaseTypes() const
 									{ return fBaseTypes; }
+			const DebugInfoEntryList& TemplateParameters() const
+									{ return fTemplateParameters; }
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -362,6 +364,7 @@ protected:
 			DebugInfoEntryList	fAccessDeclarations;
 			DebugInfoEntryList	fMemberFunctions;
 			DebugInfoEntryList	fInnerTypes;
+			DebugInfoEntryList	fTemplateParameters;
 };
 
 

@@ -66,18 +66,18 @@ _event_queue_imp::~_event_queue_imp()
 	delete fLock;
 }
 
-	
+
 status_t
 _event_queue_imp::AddEvent(const media_timed_event &event)
 {
 	BAutolock lock(fLock);
 
 //	printf("        adding      %12Ld  at %12Ld\n", event.event_time, system_time());
-	
+
 	if (event.type <= 0) {
 		 return B_BAD_VALUE;
 	}
-	
+
 	*(bigtime_t *)&event.queued_time = BTimeSource::RealTime();
 
 	//create a new queue
@@ -91,7 +91,7 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 		fEventCount++;
 		return B_OK;
 	}
-	
+
 	//insert at queue begin
 	if (fFirstEntry->event.event_time >= event.event_time) {
 		event_queue_entry *newentry = new event_queue_entry;
@@ -115,7 +115,7 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 		fEventCount++;
 		return B_OK;
 	}
-	
+
 	//insert into the queue
 	for (event_queue_entry *entry = fLastEntry; entry; entry = entry->prev) {
 		if (entry->event.event_time <= event.event_time) {
@@ -130,7 +130,7 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 			return B_OK;
 		}
 	}
-	
+
 	debugger("_event_queue_imp::AddEvent failed, should not be here\n");
 	return B_OK;
 }
@@ -157,10 +157,10 @@ status_t
 _event_queue_imp::RemoveFirstEvent(media_timed_event * outEvent)
 {
 	BAutolock lock(fLock);
-	
+
 	if (fFirstEntry == 0)
 		return B_ERROR;
-	
+
 	if (outEvent != 0) {
 		// No cleanup here
 		*outEvent = fFirstEntry->event;
@@ -173,7 +173,7 @@ _event_queue_imp::RemoveFirstEvent(media_timed_event * outEvent)
 	return B_OK;
 }
 
-		
+
 bool
 _event_queue_imp::HasEvents() const
 {
@@ -191,31 +191,31 @@ _event_queue_imp::EventCount() const
 }
 
 
-const media_timed_event *	
+const media_timed_event *
 _event_queue_imp::FirstEvent() const
-{ 
-	return fFirstEntry ? &fFirstEntry->event : NULL; 
+{
+	return fFirstEntry ? &fFirstEntry->event : NULL;
 }
-			
+
 
 bigtime_t
 _event_queue_imp::FirstEventTime() const
-{ 
-	return fFirstEntry ? fFirstEntry->event.event_time : B_INFINITE_TIMEOUT; 
+{
+	return fFirstEntry ? fFirstEntry->event.event_time : B_INFINITE_TIMEOUT;
 }
 
 
-const media_timed_event *	
+const media_timed_event *
 _event_queue_imp::LastEvent() const
-{ 
-	return fLastEntry ? &fLastEntry->event : NULL; 
+{
+	return fLastEntry ? &fLastEntry->event : NULL;
 }
 
 
-bigtime_t	
+bigtime_t
 _event_queue_imp::LastEventTime() const
 {
-	return fLastEntry ? fLastEntry->event.event_time : B_INFINITE_TIMEOUT; 
+	return fLastEntry ? fLastEntry->event.event_time : B_INFINITE_TIMEOUT;
 }
 
 
@@ -298,7 +298,7 @@ _event_queue_imp::DoForEach(BTimedEventQueue::for_each_hook hook,
 				if (eventType == BTimedEventQueue::B_ANY_EVENT || eventType == entry->event.type) {
 					action = (*hook)(&entry->event, context);
 					switch (action) {
-						case BTimedEventQueue::B_DONE: 
+						case BTimedEventQueue::B_DONE:
 							return B_OK;
 						case BTimedEventQueue::B_REMOVE_EVENT:
 							CleanupEvent(&entry->event);
@@ -327,7 +327,7 @@ _event_queue_imp::DoForEach(BTimedEventQueue::for_each_hook hook,
 				if (eventType == BTimedEventQueue::B_ANY_EVENT || eventType == entry->event.type) {
 					action = (*hook)(&entry->event, context);
 					switch (action) {
-						case BTimedEventQueue::B_DONE: 
+						case BTimedEventQueue::B_DONE:
 							return B_OK;
 						case BTimedEventQueue::B_REMOVE_EVENT:
 							CleanupEvent(&entry->event);
@@ -356,7 +356,7 @@ _event_queue_imp::DoForEach(BTimedEventQueue::for_each_hook hook,
 						if (eventType == BTimedEventQueue::B_ANY_EVENT || eventType == entry->event.type) {
 							action = (*hook)(&entry->event, context);
 							switch (action) {
-								case BTimedEventQueue::B_DONE: 
+								case BTimedEventQueue::B_DONE:
 									return B_OK;
 								case BTimedEventQueue::B_REMOVE_EVENT:
 									CleanupEvent(&entry->event);
@@ -387,7 +387,7 @@ _event_queue_imp::DoForEach(BTimedEventQueue::for_each_hook hook,
 				if (eventType == BTimedEventQueue::B_ANY_EVENT || eventType == entry->event.type) {
 					action = (*hook)(&entry->event, context);
 					switch (action) {
-						case BTimedEventQueue::B_DONE: 
+						case BTimedEventQueue::B_DONE:
 							return B_OK;
 						case BTimedEventQueue::B_REMOVE_EVENT:
 							CleanupEvent(&entry->event);
@@ -411,7 +411,7 @@ _event_queue_imp::DoForEach(BTimedEventQueue::for_each_hook hook,
 	return B_ERROR;
 }
 
-		
+
 status_t
 _event_queue_imp::FlushEvents(bigtime_t eventTime,
 							  BTimedEventQueue::time_direction direction,
@@ -505,7 +505,7 @@ _event_queue_imp::SetCleanupHook(BTimedEventQueue::cleanup_hook hook, void *cont
 }
 
 
-void 
+void
 _event_queue_imp::RemoveEntry(event_queue_entry *entry)
 {
 	//remove the entry from double-linked list
@@ -531,30 +531,30 @@ _event_queue_imp::RemoveEntry(event_queue_entry *entry)
 }
 
 
-void 
+void
 _event_queue_imp::CleanupEvent(media_timed_event *event)
 {
 	//perform the cleanup action required
 	//when deleting an event from the queue
 
 	//BeBook says:
-	//	Each event has a cleanup flag associated with it that indicates 
-	//  what sort of special action needs to be performed when the event is 
-	//  removed from the queue. If this value is B_NO_CLEANUP, nothing is done. 
+	//	Each event has a cleanup flag associated with it that indicates
+	//  what sort of special action needs to be performed when the event is
+	//  removed from the queue. If this value is B_NO_CLEANUP, nothing is done.
 	//  If it's B_RECYCLE, and the event is a B_HANDLE_BUFFER event, BTimedEventQueue
-	//  will automatically recycle the buffer associated with the event. 
-	//  If the cleanup flag is B_DELETE or is B_USER_CLEANUP or greater, 
-	//  the cleanup hook function will be called. 
+	//  will automatically recycle the buffer associated with the event.
+	//  If the cleanup flag is B_DELETE or is B_USER_CLEANUP or greater,
+	//  the cleanup hook function will be called.
 	//and:
 	//  cleanup hook function specified by hook to be called for events
-	//  as they're removed from the queue. The hook will be called only 
-	//  for events with cleanup_flag values of B_DELETE or B_USER_CLEANUP or greater. 
+	//  as they're removed from the queue. The hook will be called only
+	//  for events with cleanup_flag values of B_DELETE or B_USER_CLEANUP or greater.
 	//and:
-	//  These values define how BTimedEventQueue should handle removing 
-	//  events from the queue. If the flag is B_USER_CLEANUP or greater, 
-	//  the cleanup hook function is called when the event is removed. 
+	//  These values define how BTimedEventQueue should handle removing
+	//  events from the queue. If the flag is B_USER_CLEANUP or greater,
+	//  the cleanup hook function is called when the event is removed.
 	//Problems:
-	//  B_DELETE is a keyboard code! (seems to have existed in early 
+	//  B_DELETE is a keyboard code! (seems to have existed in early
 	//  sample code as a cleanup flag)
 	//
 	//  exiting cleanup flags are:
@@ -562,8 +562,8 @@ _event_queue_imp::CleanupEvent(media_timed_event *event)
 	//		B_RECYCLE_BUFFER,		// recycle buffers handled by BTimedEventQueue
 	//		B_EXPIRE_TIMER,			// call TimerExpired() on the event->data
 	//		B_USER_CLEANUP = 0x4000	// others go to the cleanup func
-	//	
-	
+	//
+
 	if (event->cleanup == BTimedEventQueue::B_NO_CLEANUP) {
 		// do nothing
 	} else if (event->type == BTimedEventQueue::B_HANDLE_BUFFER && event->cleanup == BTimedEventQueue::B_RECYCLE_BUFFER) {
@@ -576,7 +576,8 @@ _event_queue_imp::CleanupEvent(media_timed_event *event)
 		if (fCleanupHook)
 			(*fCleanupHook)(event,fCleanupHookContext);
 	} else {
-		ERROR("BTimedEventQueue cleanup unhandled! type = %ld, cleanup = %ld\n", event->type, event->cleanup);
+		ERROR("BTimedEventQueue cleanup unhandled! type = %" B_PRId32
+			", cleanup = %" B_PRId32 "\n", event->type, event->cleanup);
 	}
 }
 
@@ -585,7 +586,7 @@ _event_queue_imp::event_queue_entry *
 _event_queue_imp::GetEnd_BeforeTime(bigtime_t eventTime, bool inclusive)
 {
 	event_queue_entry *entry;
-	
+
 	entry = fLastEntry;
 	while (entry) {
 		if ((entry->event.event_time > eventTime) || (!inclusive && entry->event.event_time == eventTime))
@@ -601,7 +602,7 @@ _event_queue_imp::event_queue_entry *
 _event_queue_imp::GetStart_AfterTime(bigtime_t eventTime, bool inclusive)
 {
 	event_queue_entry *entry;
-	
+
 	entry = fFirstEntry;
 	while (entry) {
 		if ((entry->event.event_time < eventTime) || (!inclusive && entry->event.event_time == eventTime))

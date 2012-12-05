@@ -48,7 +48,7 @@ public:
 		interval /= 1000;
 
 		// Find closest index
-		int32 bestDiff = LONG_MAX;
+		int32 bestDiff = INT32_MAX;
 		uint32 bestIndex = 0;
 		for (uint32 i = 0; i < kNumUpdateIntervals; i++) {
 			int32 diff = abs(kUpdateIntervals[i] - interval);

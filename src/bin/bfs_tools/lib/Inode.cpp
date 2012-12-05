@@ -91,7 +91,7 @@ Inode::_Unset()
 	free(fPath);
 	fPath = NULL;
 
-	delete fAttributes; 
+	delete fAttributes;
 	fAttributes = NULL;
 }
 
@@ -522,7 +522,7 @@ Inode::CopyAttributesTo(BNode *node)
 				strerror(written));
 		} else if ((size_t)written < size) {
 			printf("could only write %ld bytes (from %ld) at attribute \"%s\"\n",
-				written, size, name); 
+				written, size, name);
 		}
 	}
 
@@ -1075,7 +1075,7 @@ Directory::CopyTo(const char *root, bool fullPath, Inode::Source *source)
 	BPath path(root);
 	if (fullPath && Path(source))
 		path.Append(Path(source));
-	
+
 	char *name = (char *)Name();
 	if (name != NULL) {
 		// changes the filename in the inode buffer (for deleted entries)
@@ -1094,7 +1094,7 @@ Directory::CopyTo(const char *root, bool fullPath, Inode::Source *source)
 	BDirectory directory;
 	if ((status = entry.GetParent(&directory)) < B_OK)
 		return status;
-	
+
 	status = directory.CreateDirectory(path.Leaf(), NULL);
 	if (status < B_OK && status != B_FILE_EXISTS)
 		return status;

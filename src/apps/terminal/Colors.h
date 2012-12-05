@@ -1,13 +1,15 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010-2012, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _COLORS_H
 #define _COLORS_H
 
+
 #include <InterfaceDefs.h>
 
-struct color_schema {
+
+struct color_scheme {
 	const char* name;
 	rgb_color text_fore_color;
 	rgb_color text_back_color;
@@ -15,12 +17,11 @@ struct color_schema {
 	rgb_color cursor_back_color;
 	rgb_color select_fore_color;
 	rgb_color select_back_color;
-	bool operator==(const color_schema& color);
+	bool operator==(const color_scheme& color);
 };
 
-
-extern color_schema gCustomSchema;
-extern const color_schema* gPredefinedSchemas[];
+extern color_scheme gCustomColorScheme;
+extern const color_scheme* gPredefinedColorSchemes[];
 
 
 #endif // _COLORS_H

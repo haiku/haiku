@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DiskUsage	1726021626
+1	german	x-vnd.Haiku-DiskUsage	3848101922
 Scanning %refName%	Scanner		Analysiere %refName%
 Size	Info Window		Größe
 Rescan	Pie View		Erneut analysieren
@@ -9,6 +9,7 @@ no supporting apps	Pie View		keine geeigneten Anwendungen
 Path	Info Window		Pfad
 Scan	Status View		Analyse
 9999.99 GB	Status View		9999,99 GiB
+Rescan	Status View		Erneut analysieren
 file unavailable	Status View		Datei nicht verfügbar
 Get Info	Pie View		Datei-Info
 DiskUsage	System name		Datenträgerbelegung
@@ -16,6 +17,7 @@ DiskUsage	System name		Datenträgerbelegung
 %d files	Status View		%d Dateien
 Created	Info Window		Erstellt
 Modified	Info Window		Geändert
+Abort	Status View		Abbrechen
 Open	Pie View		Öffnen
 Open With	Pie View		Öffnen mit
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r

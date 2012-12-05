@@ -265,6 +265,7 @@ Application Debugger :
 	ValueNodeContainer.cpp
 
 	# value/type_handlers
+	BListTypeHandler.cpp
 	BMessageTypeHandler.cpp
 	CStringTypeHandler.cpp
 
@@ -279,6 +280,7 @@ Application Debugger :
 	# value/value_nodes
 	AddressValueNode.cpp
 	ArrayValueNode.cpp
+	BListValueNode.cpp
 	BMessageValueNode.cpp
 	CompoundValueNode.cpp
 	CStringValueNode.cpp

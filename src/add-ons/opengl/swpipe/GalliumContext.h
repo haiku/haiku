@@ -13,10 +13,11 @@ extern "C" {
 #include "state_tracker/st_api.h"
 #include "pipe/p_compiler.h"
 #include "pipe/p_screen.h"
+#include "postprocess/filters.h"
 #include "os/os_thread.h"
 }
-
 #include "bitmap_wrapper.h"
+#include "GalliumFramebuffer.h"
 
 
 #define CONTEXT_MAX 32
@@ -37,12 +38,20 @@ struct hgl_context
 		// State Tracker Manager
 	struct st_context_iface* st;
 		// State Tracker Interface Object
+	struct st_visual* stVisual;
+		// State Tracker Visual
+
+	struct pipe_resource* textures[ST_ATTACHMENT_COUNT];
+
+	// Post processing
+	struct pp_queue_t* postProcess;
+	unsigned int postProcessEnable[PP_FILTERS];
 
 	Bitmap* bitmap;
 	color_space colorSpace;
 
-	struct st_framebuffer_iface* draw;
-	struct st_framebuffer_iface* read;
+	GalliumFramebuffer* draw;
+	GalliumFramebuffer* read;
 };
 
 

@@ -150,21 +150,42 @@ ExpanderWindow::ValidateDest()
 	BVolume volume;
 	if (!entry.Exists()) {
 		BAlert* alert = new BAlert("destAlert",
-			B_TRANSLATE("The destination folder does not exist."),
-			B_TRANSLATE("Cancel"), NULL, NULL,
+			B_TRANSLATE("Destination folder doesn't exist. "
+				"Would you like to create it?"),
+			B_TRANSLATE("Create"), B_TRANSLATE("Cancel"), NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		alert->Go();
-		return false;
-	} else if (!entry.IsDirectory()) {
+		alert->SetShortcut(0, B_ESCAPE);
+
+		if (alert->Go() != 0)
+			return false;
+
+		if (create_directory(fDestText->Text(), 0755) != B_OK) {
+			BAlert* alert = new BAlert("stopAlert",
+				B_TRANSLATE("Failed to create the destination folder."),
+				B_TRANSLATE("Cancel"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go();
+			return false;
+		}
+
+		BEntry newEntry(fDestText->Text(), true);
+		newEntry.GetRef(&fDestRef);
+		return true;
+
+	}
+
+	if (!entry.IsDirectory()) {
 		BAlert* alert = new BAlert("destAlert",
 			B_TRANSLATE("The destination is not a folder."),
 			B_TRANSLATE("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		alert->Go();	
+		alert->Go();
 		return false;
-	} else if (entry.GetVolume(&volume) != B_OK || volume.IsReadOnly()) {
+	}
+
+	if (entry.GetVolume(&volume) != B_OK || volume.IsReadOnly()) {
 		BAlert* alert = new BAlert("destAlert",
 			B_TRANSLATE("The destination is read only."),
 			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
@@ -172,10 +193,10 @@ ExpanderWindow::ValidateDest()
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return false;
-	} else {
-		entry.GetRef(&fDestRef);
-		return true;
 	}
+
+	entry.GetRef(&fDestRef);
+	return true;
 }
 
 

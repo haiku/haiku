@@ -110,10 +110,10 @@ void
 SudokuView::InitObject(const BMessage* archive)
 {
 	fField = NULL;
-	fShowHintX = ~0UL;
-	fValueHintValue = ~0UL;
-	fLastHintValue = ~0UL;
-	fLastField = ~0UL;
+	fShowHintX = UINT32_MAX;
+	fValueHintValue = UINT32_MAX;
+	fLastHintValue = UINT32_MAX;
+	fLastField = UINT32_MAX;
 	fKeyboardX = 0;
 	fKeyboardY = 0;
 	fShowKeyboardFocus = false;
@@ -220,7 +220,7 @@ SudokuView::SetTo(entry_ref& ref)
 
 	_PushUndo();
 	status = fField->SetTo(_BaseCharacter(), buffer);
-	fValueHintValue = ~0UL;
+	fValueHintValue = UINT32_MAX;
 	Invalidate();
 	fclose(file);
 	return status;
@@ -243,7 +243,7 @@ SudokuView::SetTo(const char* data)
 
 	_PushUndo();
 	status = fField->SetTo(_BaseCharacter(), buffer);
-	fValueHintValue = ~0UL;
+	fValueHintValue = UINT32_MAX;
 	Invalidate();
 	return status;
 }
@@ -260,7 +260,7 @@ SudokuView::SetTo(SudokuField* field)
 	fField = field;
 
 	fBlockSize = fField->BlockSize();
-	fValueHintValue = ~0UL;
+	fValueHintValue = UINT32_MAX;
 	FrameResized(0, 0);
 	Invalidate();
 	return B_OK;
@@ -757,12 +757,12 @@ SudokuView::_SetValueHintValue(uint32 value)
 	if (value == fValueHintValue)
 		return;
 
-	if (fValueHintValue != ~0UL)
+	if (fValueHintValue != UINT32_MAX)
 		_InvalidateValue(fValueHintValue, true);
 
 	fValueHintValue = value;
 
-	if (fValueHintValue != ~0UL)
+	if (fValueHintValue != UINT32_MAX)
 		_InvalidateValue(fValueHintValue, true);
 }
 
@@ -770,13 +770,13 @@ SudokuView::_SetValueHintValue(uint32 value)
 void
 SudokuView::_RemoveHint()
 {
-	if (fShowHintX == ~0UL)
+	if (fShowHintX == UINT32_MAX)
 		return;
 
 	uint32 x = fShowHintX;
 	uint32 y = fShowHintY;
-	fShowHintX = ~0;
-	fShowHintY = ~0;
+	fShowHintX = UINT32_MAX;
+	fShowHintY = UINT32_MAX;
 
 	_InvalidateField(x, y);
 }
@@ -912,7 +912,7 @@ SudokuView::MouseDown(BPoint where)
 	fField->SetHintMaskAt(x, y, hintMask);
 
 	if (value + 1 != fValueHintValue) {
-		_SetValueHintValue(~0UL);
+		_SetValueHintValue(UINT32_MAX);
 		_InvalidateHintField(x, y, hintX, hintY);
 	} else
 		_InvalidateField(x, y);
@@ -1107,7 +1107,7 @@ SudokuView::MessageReceived(BMessage* message)
 			solver.SetTo(fField);
 			bigtime_t start = system_time();
 			solver.ComputeSolutions();
-			printf("found %ld solutions in %g msecs\n",
+			printf("found %" B_PRIu32 " solutions in %g msecs\n",
 				solver.CountSolutions(), (system_time() - start) / 1000.0);
 			if (solver.CountSolutions() > 0) {
 				_PushUndo();
@@ -1129,7 +1129,7 @@ SudokuView::MessageReceived(BMessage* message)
 			solver.SetTo(fField);
 			bigtime_t start = system_time();
 			solver.ComputeSolutions();
-			printf("found %ld solutions in %g msecs\n",
+			printf("found %" B_PRIu32 " solutions in %g msecs\n",
 				solver.CountSolutions(), (system_time() - start) / 1000.0);
 			if (solver.CountSolutions() > 0) {
 				_PushUndo();

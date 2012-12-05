@@ -1,9 +1,10 @@
-1	japanese	x-vnd.Haiku-Terminal	1294209621
+1	japanese	x-vnd.Haiku-Terminal	3929743651
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		新しいターミナルを開く
+Cursor text	Terminal AppearancePrefView		カーソル
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できませんでした。
 Text size	Terminal TermWindow		テキストサイズ
 Match case	Terminal FindWindow		大文字と小文字を区別する
@@ -50,6 +51,7 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		パスを挿入
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		検索テキストが入力されていません。
+Blinking cursor	Terminal AppearancePrefView		カーソルを点滅させる
 Don't save	Terminal PrefWindow		保存しない
 Set window title	Terminal TermWindow		ウィンドウタイトルを設定
 Terminal	System name		ターミナル
@@ -79,6 +81,7 @@ Set tab title	Terminal TermWindow		タブのタイトルを設定
 Settings…	Terminal TermWindow		設定…
 Abort	Terminal Shell		中断
 Edit	Terminal TermWindow		編集
+Cursor background	Terminal AppearancePrefView		カーソルの背景
 Color:	Terminal AppearancePrefView		色:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンはウィンドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
 Print	Terminal TermWindow		印刷

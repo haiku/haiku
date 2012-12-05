@@ -96,7 +96,8 @@ private:
 			void				_InvalidateField(uint32 x, uint32 y);
 			void				_InvalidateValue(uint32 value,
 									bool invalidateHint = false,
-									uint32 x = ~0UL, uint32 y = ~0UL);
+									uint32 x = UINT32_MAX,
+									uint32 y = UINT32_MAX);
 			void				_InvalidateKeyboardFocus(uint32 x, uint32 y);
 			void				_InsertKey(char rawKey, int32 modifiers);
 			void				_SetValueHintValue(uint32 value);

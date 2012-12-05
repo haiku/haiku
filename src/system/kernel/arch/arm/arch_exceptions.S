@@ -19,75 +19,84 @@
 
 /* The following two macros are taken from FreeBSD... */
 
-	.macro PUSHFRAMEINSVC
-	stmdb   sp, {r0-r3}		/* Save 4 registers */
-	mov     r0, lr			/* Save xxx32 r14 */
-	mov     r1, sp			/* Save xxx32 sp */
-	mrs     r3, spsr		/* Save xxx32 spsr */
-	mrs     r2, cpsr		/* Get the CPSR */
-	bic     r2, r2, #(CPSR_MODE_MASK)/* Fix for SVC mode */
-	orr     r2, r2, #(CPSR_MODE_SVC)
-	msr     cpsr_c, r2		/* Punch into SVC mode */
-	mov     r2, sp			/* Save SVC sp */
-	str     r0, [sp, #-4]!		/* Push return address */
-	str     lr, [sp, #-4]!		/* Push SVC lr */
-	str     r2, [sp, #-4]!		/* Push SVC sp */
-	msr     spsr_all, r3		/* Restore correct spsr */
-	ldmdb   r1, {r0-r3}		/* Restore 4 regs from xxx mode */
-	sub     sp, sp, #(4*15)		/* Adjust the stack pointer */
-	stmia   sp, {r0-r12}		/* Push the user mode registers */
-	add     r0, sp, #(4*13)		/* Adjust the stack pointer */
-	stmia   r0, {r13-r14}^		/* Push the user mode registers */
-	mov     r0, r0			/* NOP for previous instruction */
-	mrs     r0, spsr_all
-	str     r0, [sp, #-4]!		/* Save spsr */
-	.endm
+.macro PUSHFRAMEINSVC
+	stmdb	sp, {r0-r3}					/* Save 4 registers */
+	mov		r0, lr						/* Save xxx32 r14 */
+	mov		r1, sp						/* Save xxx32 sp */
+	mrs		r3, spsr					/* Save xxx32 spsr */
+	mrs		r2, cpsr					/* Get the CPSR */
+	bic		r2, r2, #(CPSR_MODE_MASK)	/* Fix for SVC mode */
+	orr		r2, r2, #(CPSR_MODE_SVC)
+	msr		cpsr_c, r2					/* Punch into SVC mode */
+	mov		r2, sp						/* Save SVC sp */
+	str		r0, [sp, #-4]!				/* Push return address */
+	str		lr, [sp, #-4]!				/* Push SVC lr */
+	str		r2, [sp, #-4]!				/* Push SVC sp */
+	msr		spsr_all, r3				/* Restore correct spsr */
+	ldmdb	r1, {r0-r3}					/* Restore 4 regs from xxx mode */
+	sub		sp, sp, #(4*15)				/* Adjust the stack pointer */
+	stmia	sp, {r0-r12}				/* Push the user mode registers */
+	add		r0, sp, #(4*13)				/* Adjust the stack pointer */
+	stmia	r0, {r13-r14}^				/* Push the user mode registers */
+	mov		r0, r0						/* NOP for previous instruction */
+	mrs		r0, spsr_all
+	str		r0, [sp, #-4]!				/* Save spsr */
+.endm
 
-	.macro PULLFRAMEFROMSVCANDEXIT
-	ldr     r0, [sp], #0x0004	/* Get the SPSR from stack */
-	msr     spsr_all, r0		/* restore SPSR */
-	ldmia   sp, {r0-r14}^		/* Restore registers (usr mode) */
-	mov     r0, r0			/* NOP for previous instruction */
-	add     sp, sp, #(4*15)		/* Adjust the stack pointer */
-	ldmia   sp, {sp, lr, pc}^	/* Restore lr and exit */
-	.endm
+.macro PULLFRAMEFROMSVCANDEXIT
+	ldr		r0, [sp], #0x0004			/* Get the SPSR from stack */
+	msr		spsr_all, r0				/* restore SPSR */
+	ldmia	sp, {r0-r14}^				/* Restore registers (usr mode) */
+	mov		r0, r0						/* NOP for previous instruction */
+	add		sp, sp, #(4*15)				/* Adjust the stack pointer */
+	ldmia	sp, {sp, lr, pc}^			/* Restore lr and exit */
+.endm
 
-	.text
+.text
 
 .globl _vectors_start
 _vectors_start:
-        ldr		pc, _arm_reset  
-        ldr             pc, _arm_undefined
-        ldr             pc, _arm_syscall
-        ldr             pc, _arm_prefetch_abort
-        ldr             pc, _arm_data_abort
-        ldr             pc, _arm_reserved
-        ldr             pc, _arm_irq
-        ldr             pc, _arm_fiq
+	ldr		pc, _arm_reset
+	ldr		pc, _arm_undefined
+	ldr		pc, _arm_syscall
+	ldr		pc, _arm_prefetch_abort
+	ldr		pc, _arm_data_abort
+	ldr		pc, _arm_reserved
+	ldr		pc, _arm_irq
+	ldr		pc, _arm_fiq
+
 
 _arm_reset:
-	.word		arm_reserved // actually reset, but not used when mapped
-_arm_undefined: 
-	.word		arm_undefined
+	.word	arm_reserved // actually reset, but not used when mapped
+
+_arm_undefined:
+	.word	arm_undefined
+
 _arm_syscall:
-	.word		arm_syscall
+	.word	arm_syscall
+
 _arm_prefetch_abort:
-	.word		arm_prefetch_abort
+	.word	arm_prefetch_abort
+
 _arm_data_abort:
-	.word		arm_data_abort
+	.word	arm_data_abort
+
 _arm_reserved:
-	.word		arm_reserved
-_arm_irq:       
-	.word		arm_irq
-_arm_fiq:       
-	.word		arm_fiq 
+	.word	arm_reserved
+
+_arm_irq:
+	.word	arm_irq
+
+_arm_fiq:
+	.word	arm_fiq
+
+
 .globl _vectors_end
 _vectors_end:
-
-
 	.rept	64
 	.word	0xdeadbeef
 	.endr
+
 abort_stack:
 	.word	. - 4
 	.word	0xdeadbeef
@@ -95,6 +104,7 @@ abort_stack:
 	.rept	64
 	.word	0xcafebabe
 	.endr
+
 irq_stack:
 	.word	. - 4
 	.word	0xcafebabe
@@ -102,6 +112,7 @@ irq_stack:
 	.rept	64
 	.word	0xaaaabbbb
 	.endr
+
 fiq_stack:
 	.word	. - 4
 	.word	0xaaaabbbb
@@ -109,6 +120,7 @@ fiq_stack:
 	.rept	64
 	.word	0xccccdddd
 	.endr
+
 und_stack:
 	.word	. - 4
 	.word	0xccccdddd
@@ -136,8 +148,8 @@ FUNCTION_END(arm_syscall)
 
 FUNCTION(arm_prefetch_abort):
 #ifdef __XSCALE__
-	nop				/* Make absolutely sure any pending */
-	nop				/* imprecise aborts have occurred. */
+	nop					/* Make absolutely sure any pending */
+	nop					/* imprecise aborts have occurred. */
 #endif
  	add	lr, lr, #4
 	PUSHFRAMEINSVC
@@ -151,8 +163,8 @@ FUNCTION_END(arm_prefetch_abort)
 
 FUNCTION(arm_data_abort):
 #ifdef __XSCALE__
-	nop                             /* Make absolutely sure any pending */
-	nop                             /* imprecise aborts have occurred. */
+	nop					/* Make absolutely sure any pending */
+	nop					/* imprecise aborts have occurred. */
 #endif
 	sub	lr, lr, #8		/* Adjust the lr */
 	PUSHFRAMEINSVC
@@ -161,17 +173,19 @@ FUNCTION(arm_data_abort):
 	bl	arch_arm_data_abort
 
 	PULLFRAMEFROMSVCANDEXIT
+FUNCTION_END(arm_data_abort)
 
 
 FUNCTION(arm_reserved):
 	b	.
 FUNCTION_END(arm_reserved)
 
+
 FUNCTION(arm_irq):
 	sub	lr, lr, #4
 	PUSHFRAMEINSVC
 
-	mov	r0, sp /* iframe */
+	mov	r0, sp			/* iframe */
 	bl	arch_arm_irq
 
 	PULLFRAMEFROMSVCANDEXIT
@@ -182,7 +196,7 @@ FUNCTION(arm_fiq):
 	sub	lr, lr, #4
 	PUSHFRAMEINSVC
 
-	mov	r0, sp /* iframe */
+	mov	r0, sp			/* iframe */
 	bl	arch_arm_fiq
 	
 	PULLFRAMEFROMSVCANDEXIT

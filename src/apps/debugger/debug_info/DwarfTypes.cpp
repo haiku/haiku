@@ -518,6 +518,45 @@ DwarfFunctionParameter::GetType() const
 }
 
 
+// #pragma mark - DwarfTemplateParameter
+
+
+DwarfTemplateParameter::DwarfTemplateParameter(DebugInfoEntry* entry,
+	DwarfType* type)
+	:
+	fEntry(entry),
+	fType(type)
+{
+	fType->AcquireReference();
+	DIETemplateTypeParameter* typeParameter
+		= dynamic_cast<DIETemplateTypeParameter *>(entry);
+	if (typeParameter != NULL)
+		fTemplateKind = TEMPLATE_TYPE_TYPE;
+	else {
+		DIETemplateValueParameter* valueParameter
+			= dynamic_cast<DIETemplateValueParameter *>(entry);
+		fTemplateKind = TEMPLATE_TYPE_VALUE;
+		const ConstantAttributeValue* constValue = valueParameter
+			->ConstValue();
+		switch (constValue->attributeClass) {
+			case ATTRIBUTE_CLASS_CONSTANT:
+				fValue.SetTo(constValue->constant);
+				break;
+			case ATTRIBUTE_CLASS_STRING:
+				fValue.SetTo(constValue->string);
+				break;
+			// TODO: ATTRIBUTE_CLASS_BLOCK_DATA
+		}
+	}
+}
+
+
+DwarfTemplateParameter::~DwarfTemplateParameter()
+{
+	fType->ReleaseReference();
+}
+
+
 // #pragma mark - DwarfPrimitiveType
 
 
@@ -567,6 +606,11 @@ DwarfCompoundType::~DwarfCompoundType()
 	}
 	for (int32 i = 0; DwarfDataMember* member = fDataMembers.ItemAt(i); i++)
 		member->ReleaseReference();
+
+	for (int32 i = 0; DwarfTemplateParameter* parameter
+		= fTemplateParameters.ItemAt(i); i++) {
+		parameter->ReleaseReference();
+	}
 }
 
 
@@ -602,6 +646,20 @@ DataMember*
 DwarfCompoundType::DataMemberAt(int32 index) const
 {
 	return fDataMembers.ItemAt(index);
+}
+
+
+int32
+DwarfCompoundType::CountTemplateParameters() const
+{
+	return fTemplateParameters.CountItems();
+}
+
+
+TemplateParameter*
+DwarfCompoundType::TemplateParameterAt(int32 index) const
+{
+	return fTemplateParameters.ItemAt(index);
 }
 
 
@@ -732,6 +790,17 @@ DwarfCompoundType::AddDataMember(DwarfDataMember* member)
 		return false;
 
 	member->AcquireReference();
+	return true;
+}
+
+
+bool
+DwarfCompoundType::AddTemplateParameter(DwarfTemplateParameter* parameter)
+{
+	if (!fTemplateParameters.AddItem(parameter))
+		return false;
+
+	parameter->AcquireReference();
 	return true;
 }
 

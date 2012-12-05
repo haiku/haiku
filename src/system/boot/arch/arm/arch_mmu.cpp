@@ -78,37 +78,37 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		"devices",
 		DEVICE_BASE,
 		DEVICE_BASE + DEVICE_SIZE - 1,
-		MMU_L2_FLAG_B,
+		ARM_MMU_L2_FLAG_B,
 	},
 	{
 		"RAM_loader", // 1MB loader
 		SDRAM_BASE + 0,
 		SDRAM_BASE + 0x0fffff,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_pt", // Page Table 1MB
 		SDRAM_BASE + 0x100000,
 		SDRAM_BASE + 0x1FFFFF,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_free", // 16MB free RAM (more but we don't map it automaticaly)
 		SDRAM_BASE + 0x0200000,
 		SDRAM_BASE + 0x11FFFFF,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_stack", // stack
 		SDRAM_BASE + 0x1200000,
 		SDRAM_BASE + 0x2000000,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_initrd", // stack
 		SDRAM_BASE + 0x2000000,
 		SDRAM_BASE + 0x2500000,
-		MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_C,
 	},
 
 #ifdef FB_BASE
@@ -116,7 +116,7 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		"framebuffer", // 2MB framebuffer ram
 		FB_BASE,
 		FB_BASE + FB_SIZE - 1,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
+		ARM_MMU_L2_FLAG_AP_RW | ARM_MMU_L2_FLAG_C,
 	},
 #endif
 };
@@ -128,7 +128,6 @@ static const size_t kMaxKernelSize = 0x200000;		// 2 MB for the kernel
 
 static addr_t sNextPhysicalAddress = 0; //will be set by mmu_init
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
-static addr_t sMaxVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 
 static addr_t sNextPageTableAddress = 0;
 //the page directory is in front of the pagetable
@@ -151,7 +150,7 @@ get_next_virtual_address(size_t size)
 
 
 static addr_t
-get_next_virtual_address_alligned (size_t size, uint32 mask)
+get_next_virtual_address_alligned(size_t size, uint32 mask)
 {
 	addr_t address = (sNextVirtualAddress) & mask;
 	sNextVirtualAddress = address + size;
@@ -253,27 +252,65 @@ get_next_page_table(uint32 type)
 		sNextPageTableAddress, kPageTableRegionEnd, type));
 
 	size_t size = 0;
-	switch(type) {
-		case MMU_L1_TYPE_COARSE:
-		default:
-			size = 1024;
+	size_t entryCount = 0;
+	switch (type) {
+		case ARM_MMU_L1_TYPE_COARSE:
+			size = ARM_MMU_L2_COARSE_TABLE_SIZE;
+			entryCount = ARM_MMU_L2_COARSE_ENTRY_COUNT;
 			break;
-		case MMU_L1_TYPE_FINE:
-			size = 4096;
+		case ARM_MMU_L1_TYPE_FINE:
+			size = ARM_MMU_L2_FINE_TABLE_SIZE;
+			entryCount = ARM_MMU_L2_FINE_ENTRY_COUNT;
 			break;
-		case MMU_L1_TYPE_SECTION:
+		case ARM_MMU_L1_TYPE_SECTION:
+			// TODO: Figure out parameters for section types.
 			size = 16384;
 			break;
+		default:
+			panic("asked for unknown page table type: %#" B_PRIx32 "\n", type);
+			return NULL;
 	}
 
 	addr_t address = sNextPageTableAddress;
-	if (address >= kPageTableRegionEnd) {
-		TRACE(("outside of pagetableregion!\n"));
-		return (uint32 *)get_next_physical_address_alligned(size, 0xffffffc0);
+	if (address < kPageTableRegionEnd)
+		sNextPageTableAddress += size;
+	else {
+		TRACE(("page table allocation outside of pagetable region!\n"));
+		address = get_next_physical_address_alligned(size, 0xffffffc0);
 	}
 
-	sNextPageTableAddress += size;
-	return (uint32 *)address;
+	uint32 *pageTable = (uint32 *)address;
+	for (size_t i = 0; i < entryCount; i++)
+		pageTable[i] = 0;
+
+	return pageTable;
+}
+
+
+static uint32 *
+get_or_create_page_table(addr_t address, uint32 type)
+{
+	uint32 *pageTable = NULL;
+	uint32 pageDirectoryIndex = VADDR_TO_PDENT(address);
+	uint32 pageDirectoryEntry = sPageDirectory[pageDirectoryIndex];
+
+	uint32 entryType = pageDirectoryEntry & ARM_PDE_TYPE_MASK;
+	if (entryType == ARM_MMU_L1_TYPE_FAULT) {
+		// This page directory entry has not been set yet, allocate it.
+		pageTable = get_next_page_table(type);
+		sPageDirectory[pageDirectoryIndex] = (uint32)pageTable | type;
+		return pageTable;
+	}
+
+	if (entryType != type) {
+		// This entry has been allocated with a different type!
+		panic("tried to reuse page directory entry %" B_PRIu32
+			" with different type (entry: %#" B_PRIx32 ", new type: %#" B_PRIx32
+			")\n", pageDirectoryIndex, pageDirectoryEntry, type);
+		return NULL;
+	}
+
+	return (uint32 *)(pageDirectoryEntry & ARM_PDE_ADDRESS_MASK);
 }
 
 
@@ -281,49 +318,48 @@ void
 init_page_directory()
 {
 	TRACE(("init_page_directory\n"));
-	uint32 smalltype;
+	uint32 smallType;
 
-	// see if subpages disabled
-	if (mmu_read_C1() & (1<<23))
-		smalltype = MMU_L2_TYPE_SMALLNEW;
+	// see if subpages are disabled
+	if (mmu_read_C1() & (1 << 23))
+		smallType = ARM_MMU_L2_TYPE_SMALLNEW;
 	else
-		smalltype = MMU_L2_TYPE_SMALLEXT;
+		smallType = ARM_MMU_L2_TYPE_SMALLEXT;
 
 	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
 
-	// clear out the pgdir
-	for (uint32 i = 0; i < 4096; i++)
-	sPageDirectory[i] = 0;
+	// clear out the page directory
+	for (uint32 i = 0; i < ARM_MMU_L1_TABLE_ENTRY_COUNT; i++)
+		sPageDirectory[i] = 0;
 
-	uint32 *pageTable = NULL;
-	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP);i++) {
+	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
 
-		pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
 		TRACE(("BLOCK: %s START: %lx END %lx\n", LOADER_MEMORYMAP[i].name,
 			LOADER_MEMORYMAP[i].start, LOADER_MEMORYMAP[i].end));
-		addr_t pos = LOADER_MEMORYMAP[i].start;
 
-		int c = 0;
-		while (pos < LOADER_MEMORYMAP[i].end) {
-			pageTable[c] = pos |  LOADER_MEMORYMAP[i].flags | smalltype;
+		addr_t address = LOADER_MEMORYMAP[i].start;
+		ASSERT((address & ~ARM_PTE_ADDRESS_MASK) == 0);
 
-			c++;
-			if (c > 255) { // we filled a pagetable => we need a new one
-				// there is 1MB per pagetable so:
-				sPageDirectory[VADDR_TO_PDENT(pos)]
-					= (uint32)pageTable | MMU_L1_TYPE_COARSE;
-				pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
-				c = 0;
+		uint32 *pageTable = NULL;
+		uint32 pageTableIndex = 0;
+
+		while (address < LOADER_MEMORYMAP[i].end) {
+			if (pageTable == NULL
+				|| pageTableIndex >= ARM_MMU_L2_COARSE_ENTRY_COUNT) {
+				pageTable = get_or_create_page_table(address,
+					ARM_MMU_L1_TYPE_COARSE);
+				pageTableIndex = VADDR_TO_PTENT(address);
 			}
 
-			pos += B_PAGE_SIZE;
-		}
-
-		if (c > 0) {
-			sPageDirectory[VADDR_TO_PDENT(pos)]
-				= (uint32)pageTable | MMU_L1_TYPE_COARSE;
+			pageTable[pageTableIndex++]
+				= address | LOADER_MEMORYMAP[i].flags | smallType;
+			address += B_PAGE_SIZE;
 		}
 	}
+
+	// Map the page directory itself.
+	addr_t virtualPageDirectory = mmu_map_physical_memory(
+		(addr_t)sPageDirectory, ARM_MMU_L1_TABLE_SIZE, kDefaultPageFlags);
 
 	mmu_flush_TLB();
 
@@ -337,29 +373,10 @@ init_page_directory()
 
 	/* turn on the mmu */
 	mmu_write_C1(mmu_read_C1() | 0x1);
-}
 
-
-/*!     Adds a new page table for the specified base address */
-static void
-add_page_table(addr_t base)
-{
-	TRACE(("add_page_table(base = %p)\n", (void *)base));
-
-	// Get new page table and clear it out
-	uint32 *pageTable = get_next_page_table(MMU_L1_TYPE_COARSE);
-/*
-	if (pageTable > (uint32 *)(8 * 1024 * 1024)) {
-		panic("tried to add page table beyond the indentity mapped 8 MB "
-			"region\n");
-	}
-*/
-	for (int32 i = 0; i < 256; i++)
-		pageTable[i] = 0;
-
-	// put the new page table into the page directory
-	sPageDirectory[VADDR_TO_PDENT(base)]
-		= (uint32)pageTable | MMU_L1_TYPE_COARSE;
+	// Use the mapped page directory from now on.
+	sPageDirectory = (uint32 *)virtualPageDirectory;
+	gKernelArgs.arch_args.vir_pgdir = virtualPageDirectory;
 }
 
 
@@ -379,40 +396,18 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 			(void *)virtualAddress);
 	}
 
-	if (virtualAddress >= sMaxVirtualAddress) {
-		// we need to add a new page table
-		add_page_table(sMaxVirtualAddress);
-		sMaxVirtualAddress += B_PAGE_SIZE * 256;
-
-		if (virtualAddress >= sMaxVirtualAddress) {
-			panic("map_page: asked to map a page to %p\n",
-				(void *)virtualAddress);
-		}
-	}
-
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
 
 	// map the page to the correct page table
-	uint32 *pageTable
-		= (uint32 *)(sPageDirectory[VADDR_TO_PDENT(virtualAddress)]
-			& ARM_PDE_ADDRESS_MASK);
+	uint32 *pageTable = get_or_create_page_table(virtualAddress,
+		ARM_MMU_L1_TYPE_COARSE);
 
-	TRACE(("map_page: pageTable 0x%lx\n",
-		sPageDirectory[VADDR_TO_PDENT(virtualAddress)] & ARM_PDE_ADDRESS_MASK));
-
-	if (pageTable == NULL) {
-		add_page_table(virtualAddress);
-		pageTable = (uint32 *)(sPageDirectory[VADDR_TO_PDENT(virtualAddress)]
-			& ARM_PDE_ADDRESS_MASK);
-	}
-
-	uint32 tableEntry = VADDR_TO_PTENT(virtualAddress);
-
+	uint32 pageTableIndex = VADDR_TO_PTENT(virtualAddress);
 	TRACE(("map_page: inserting pageTable %p, tableEntry 0x%" B_PRIx32
-		", physicalAddress 0x%" B_PRIxADDR "\n", pageTable, tableEntry,
+		", physicalAddress 0x%" B_PRIxADDR "\n", pageTable, pageTableIndex,
 		physicalAddress));
 
-	pageTable[tableEntry] = physicalAddress | flags;
+	pageTable[pageTableIndex] = physicalAddress | flags;
 
 	mmu_flush_TLB();
 
@@ -595,7 +590,7 @@ mmu_init(void)
 {
 	TRACE(("mmu_init\n"));
 
-	mmu_write_C1(mmu_read_C1() & ~((1<<29)|(1<<28)|(1<<0)));
+	mmu_write_C1(mmu_read_C1() & ~((1 << 29) | (1 << 28) | (1 << 0)));
 		// access flag disabled, TEX remap disabled, mmu disabled
 
 	uint32 highestRAMAddress = SDRAM_BASE;
@@ -607,9 +602,9 @@ mmu_init(void)
 
 		if (strcmp("RAM_pt", LOADER_MEMORYMAP[i].name) == 0) {
 			sNextPageTableAddress = LOADER_MEMORYMAP[i].start
-				+ MMU_L1_TABLE_SIZE;
+				+ ARM_MMU_L1_TABLE_SIZE;
 			kPageTableRegionEnd = LOADER_MEMORYMAP[i].end;
-			sPageDirectory = (uint32 *) LOADER_MEMORYMAP[i].start;
+			sPageDirectory = (uint32 *)LOADER_MEMORYMAP[i].start;
 		}
 
 		if (strncmp("RAM_", LOADER_MEMORYMAP[i].name, 4) == 0) {
@@ -629,15 +624,11 @@ mmu_init(void)
 
 	init_page_directory();
 
-	// map the page directory on the next vpage
-	gKernelArgs.arch_args.vir_pgdir = mmu_map_physical_memory(
-		(addr_t)sPageDirectory, MMU_L1_TABLE_SIZE, kDefaultPageFlags);
-
 	// map in a kernel stack
-	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL,
-		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
 		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
+	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL,
+		gKernelArgs.cpu_kstack[0].size);
 
 	TRACE(("kernel stack at 0x%" B_PRIx64 " to 0x%" B_PRIx64 "\n",
 		gKernelArgs.cpu_kstack[0].start,

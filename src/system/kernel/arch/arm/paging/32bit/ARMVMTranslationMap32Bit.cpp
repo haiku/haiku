@@ -235,7 +235,7 @@ ARMVMTranslationMap32Bit::Unmap(addr_t start, addr_t end)
 		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 			pd[index] & ARM_PDE_ADDRESS_MASK);
 
-		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
+		for (index = VADDR_TO_PTENT(start); (index < 256) && (start < end);
 				index++, start += B_PAGE_SIZE) {
 			if ((pt[index] & ARM_PTE_TYPE_MASK) == 0) {
 				// page mapping not valid
@@ -364,7 +364,7 @@ ARMVMTranslationMap32Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 			pd[index] & ARM_PDE_ADDRESS_MASK);
 
-		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
+		for (index = VADDR_TO_PTENT(start); (index < 256) && (start < end);
 				index++, start += B_PAGE_SIZE) {
 			page_table_entry oldEntry
 				= ARMPagingMethod32Bit::ClearPageTableEntry(&pt[index]);
@@ -574,8 +574,8 @@ ARMVMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
 		pd[index] & ARM_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
-	*_physical = (entry & ARM_PDE_ADDRESS_MASK)
-		| VADDR_TO_PGOFF(va);
+	if ((entry & ARM_PTE_TYPE_MASK) != 0)
+		*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
 
 #if 0 //IRA
 	// read in the page state flags
@@ -622,8 +622,9 @@ ARMVMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 			pd[index] & ARM_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
-	*_physical = (entry & ARM_PDE_ADDRESS_MASK)
-		| VADDR_TO_PGOFF(va);
+	if ((entry & ARM_PTE_TYPE_MASK) != 0)
+		*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
+
 #if 0
 	// read in the page state flags
 	if ((entry & ARM_PTE_USER) != 0) {
@@ -637,7 +638,9 @@ ARMVMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 		| ((entry & ARM_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
 		| ((entry & ARM_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 #else
-	*_flags = B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA | PAGE_PRESENT;
+	*_flags = B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA;
+	if (*_physical != 0)
+		*_flags |= PAGE_PRESENT;
 #endif
 	return B_OK;
 }
@@ -680,7 +683,7 @@ ARMVMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 			pd[index] & ARM_PDE_ADDRESS_MASK);
 
-		for (index = VADDR_TO_PTENT(start); index < 1024 && start < end;
+		for (index = VADDR_TO_PTENT(start); index < 256 && start < end;
 				index++, start += B_PAGE_SIZE) {
 			page_table_entry entry = pt[index];
 			if ((entry & ARM_PTE_PRESENT) == 0) {

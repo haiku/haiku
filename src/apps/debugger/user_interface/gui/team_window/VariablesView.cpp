@@ -1030,6 +1030,18 @@ VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
 	if (modelNode == NULL)
 		return;
 
+	// in the case of an address node with a hidden child,
+	// we want to send removal notifications for the children
+	// instead.
+	BReference<ModelNode> hiddenChild;
+	if (modelNode->CountChildren() == 1
+		&& modelNode->ChildAt(0)->IsHidden()) {
+		hiddenChild.SetTo(modelNode->ChildAt(0));
+		modelNode->RemoveChild(hiddenChild);
+		modelNode = hiddenChild;
+		fNodeTable.Remove(hiddenChild);
+	}
+
 	for (int32 i = 0; i < modelNode->CountChildren(); i++) {
 		BReference<ModelNode> childNode = modelNode->ChildAt(i);
 		TreeTablePath treePath;
@@ -1776,8 +1788,10 @@ VariablesView::MessageReceived(BMessage* message)
 		case MSG_MODEL_NODE_HIDDEN:
 		{
 			ModelNode* node;
-			if (message->FindPointer("node", (void**)&node) == B_OK)
+			if (message->FindPointer("node", (void**)&node) == B_OK) {
+				BReference<ModelNode> modelNodeReference(node, true);
 				_RequestNodeValue(node);
+			}
 
 			break;
 		}

@@ -169,12 +169,18 @@ hook_winsys_displaytarget_display(struct sw_winsys* winsys,
 {
 	CALLED();
 
-	//struct haiku_displaytarget* haikuDisplayTarget
-	//	= cast_haiku_displaytarget(displayTarget);
+	if (!contextPrivate) {
+		ERROR("%s: Passed invalid private pointer!\n", __func__);
+		return;
+	}
 
-	// GDI copies data from haikuDisplayTarget->data into
-	// a Bitmap casted from contextPrivate.. need to investigate
-	// this.
+	Bitmap* bitmap = (Bitmap*)contextPrivate;
+
+	struct haiku_displaytarget* haikuDisplayTarget
+		= cast_haiku_displaytarget(displayTarget);
+
+	copy_bitmap_bits(bitmap, haikuDisplayTarget->data,
+		haikuDisplayTarget->size);
 
 	return;
 }

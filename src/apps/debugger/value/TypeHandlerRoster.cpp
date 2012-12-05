@@ -14,6 +14,7 @@
 #include "AddressValueNode.h"
 #include "ArrayValueNode.h"
 #include "CompoundValueNode.h"
+#include "BListTypeHandler.h"
 #include "BMessageTypeHandler.h"
 #include "CStringTypeHandler.h"
 #include "EnumerationValueNode.h"
@@ -152,6 +153,7 @@ TypeHandlerRoster::RegisterDefaultHandlers()
 
 	REGISTER_SPECIALIZED_HANDLER(CString);
 	REGISTER_SPECIALIZED_HANDLER(BMessage);
+	REGISTER_SPECIALIZED_HANDLER(BList);
 
 	return B_OK;
 }

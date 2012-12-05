@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1301055003
+1	german	x-vnd.Haiku-libtracker	3955647850
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -452,6 +452,7 @@ Mount	DeskWindow		Einhängen
 Mount	ContainerWindow		Einhängen
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used benutzt -- %free frei)
 Cancel	FSClipBoard		Abbrechen
+Restart Deskbar	DeskWindow		Deskbar neu starten
 Cut more	ContainerWindow		Mehr ausschneiden
 Deleting: 	StatusWindow		Löschen:
 Empty Trash	InfoWindow		Papierkorb leeren

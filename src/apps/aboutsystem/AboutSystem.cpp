@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2011, Haiku, Inc.
+ * Copyright 2005-2012, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -46,6 +46,7 @@
 #include <AppMisc.h>
 #include <AutoDeleter.h>
 #include <cpu_type.h>
+#include <parsedate.h>
 #include <system_revision.h>
 
 #include <Catalog.h>
@@ -662,10 +663,21 @@ AboutView::AboutView()
 		B_ALIGN_VERTICAL_UNSET));
 
 	// Kernel build time/date
-	snprintf(string, sizeof(string), "%s %s",
-		systemInfo.kernel_build_date, systemInfo.kernel_build_time);
+	BString kernelTimeDate;
+	kernelTimeDate << systemInfo.kernel_build_date
+		<< " " << systemInfo.kernel_build_time;
+	BString buildTimeDate;
+	const BLocale* locale = BLocale::Default();
 
-	BStringView* kernelView = new BStringView("kerneltext", string);
+	time_t buildTimeDateStamp = parsedate(kernelTimeDate, -1);
+	if (buildTimeDateStamp > 0) {
+		if (locale->FormatDateTime(&buildTimeDate, buildTimeDateStamp,
+			B_LONG_DATE_FORMAT, B_MEDIUM_TIME_FORMAT) != B_OK)
+			buildTimeDate.SetTo(kernelTimeDate);
+	} else
+		buildTimeDate.SetTo(kernelTimeDate);
+
+	BStringView* kernelView = new BStringView("kerneltext", buildTimeDate);
 	kernelView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 

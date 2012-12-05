@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2012, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT license.
  */
 
@@ -367,7 +367,8 @@ BControllable::StartControlPanel(BMessenger* _messenger)
 		ERROR("BControllable::StartControlPanel Error launching application\n");
 		return B_BAD_VALUE;
 	}
-	printf("BControllable::StartControlPanel done with id: %ld\n", team);
+	printf("BControllable::StartControlPanel done with id: %" B_PRId32 "\n",
+		team);
 
 	if (_messenger)
 		*_messenger = BMessenger(NULL, team);

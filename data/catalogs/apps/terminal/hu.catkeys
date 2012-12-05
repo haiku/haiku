@@ -1,9 +1,10 @@
-1	hungarian	x-vnd.Haiku-Terminal	1294209621
+1	hungarian	x-vnd.Haiku-Terminal	3929743651
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
 OK	Terminal TermWindow		Rendben
 New Terminal	Terminal TermWindow		Új terminál
+Cursor text	Terminal AppearancePrefView		Kurzor szöveg
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Sajnos, a terminálnak nem sikerült elindítani a shellt.
 Text size	Terminal TermWindow		Betűméret
 Match case	Terminal FindWindow		Betűérzékeny
@@ -50,6 +51,7 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		Útvonal beszúrása
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\nMinden jog fenntartva 2001-2009 Haiku, Inc.\nMinden jog fenntartva(C) 1999 Kazuho Okui és Takashi Murai.\n\nHasználata: %s [OPCIÓ] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Nincs beírva keresendő szöveg
+Blinking cursor	Terminal AppearancePrefView		Villogó kurzor
 Don't save	Terminal PrefWindow		Nincs mentés
 Set window title	Terminal TermWindow		Ablak címének beállítása
 Terminal	System name		Terminál
@@ -79,6 +81,7 @@ Set tab title	Terminal TermWindow		Lap címének beállítása
 Settings…	Terminal TermWindow		Beállítások…
 Abort	Terminal Shell		Megszakítás
 Edit	Terminal TermWindow		Szerkesztés
+Cursor background	Terminal AppearancePrefView		Kurzor háttere
 Color:	Terminal AppearancePrefView		Szín:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Az ablak címét meghatározó minta. A következő kódok használhatóak:
 Print	Terminal TermWindow		Nyomtatás

@@ -102,6 +102,17 @@ struct HasBaseTypesPredicate {
 };
 
 
+// #pragma mark - HasTemplateParametersPredicate
+
+
+struct HasTemplateParametersPredicate {
+	inline bool operator()(DIEClassBaseType* entry) const
+	{
+		return !entry->TemplateParameters().IsEmpty();
+	}
+};
+
+
 // #pragma mark - HasParametersPredicate
 
 
@@ -516,7 +527,7 @@ printf("  -> failed to add type to cache\n");
 	}
 
 	// If the type is a class/struct/interface type, we also need to add its
-	// base types.
+	// base types, and possibly template parameters.
 	if (DIEClassBaseType* classTypeEntry
 			= dynamic_cast<DIEClassBaseType*>(typeEntry)) {
 		// find the abstract origin or specification that defines the base types
@@ -543,6 +554,52 @@ printf("  -> failed to add type to cache\n");
 				BReference<DwarfInheritance> inheritanceReference(inheritance,
 					true);
 				if (inheritance == NULL || !type->AddInheritance(inheritance)) {
+					cacheLocker.Lock();
+					fTypeCache->RemoveType(type);
+					return B_NO_MEMORY;
+				}
+			}
+		}
+
+		// find the abstract origin or specification that defines the template
+		// parameters
+		classTypeEntry = DwarfUtils::GetDIEByPredicate(
+			dynamic_cast<DIEClassBaseType*>(typeEntry),
+			HasTemplateParametersPredicate());
+
+		if (classTypeEntry != NULL) {
+			for (DebugInfoEntryList::ConstIterator it
+						= classTypeEntry->TemplateParameters()
+							.GetIterator();
+					DebugInfoEntry* _typeEntry = it.Next();) {
+				DIETemplateTypeParameter* templateTypeEntry
+					= dynamic_cast<DIETemplateTypeParameter*>(_typeEntry);
+				DwarfType* templateType;
+				if (templateTypeEntry != NULL) {
+					if (CreateType(templateTypeEntry->GetType(), templateType)
+						!= B_OK) {
+						continue;
+					}
+				} else {
+					DIETemplateValueParameter* templateValueEntry
+						= dynamic_cast<DIETemplateValueParameter*>(_typeEntry);
+					if (CreateType(templateValueEntry->GetType(), templateType)
+						!= B_OK) {
+						continue;
+					}
+				}
+				BReference<DwarfType> templateTypeReference(templateType,
+					true);
+				DwarfTemplateParameter* parameter
+					= new(std::nothrow) DwarfTemplateParameter(_typeEntry,
+						templateType);
+				if (parameter == NULL) {
+					cacheLocker.Lock();
+					fTypeCache->RemoveType(type);
+					return B_NO_MEMORY;
+				}
+
+				if (!type->AddTemplateParameter(parameter)) {
 					cacheLocker.Lock();
 					fTypeCache->RemoveType(type);
 					return B_NO_MEMORY;

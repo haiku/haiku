@@ -19,7 +19,7 @@ static const uint32 MSG_FULL_FONT_CHANGED				= 'mcff';
 static const uint32 MSG_FULL_SIZE_CHANGED				= 'mcfs';
 static const uint32 MSG_COLOR_FIELD_CHANGED				= 'mccf';
 static const uint32 MSG_COLOR_CHANGED					= 'mcbc';
-static const uint32 MSG_COLOR_SCHEMA_CHANGED			= 'mccs';
+static const uint32 MSG_COLOR_SCHEME_CHANGED			= 'mccs';
 
 static const uint32 MSG_TAB_TITLE_SETTING_CHANGED		= 'mtts';
 static const uint32 MSG_WINDOW_TITLE_SETTING_CHANGED	= 'mwts';
@@ -32,7 +32,7 @@ static const uint32 MSG_HISTORY_CHANGED					= 'mhst';
 static const uint32 MSG_PREF_MODIFIED					= 'mpmo';
 
 
-struct color_schema;
+struct color_scheme;
 class BCheckBox;
 class BColorControl;
 class BMenu;
@@ -56,8 +56,8 @@ public:
 private:
 			void				_EnableCustomColors(bool enable);
 
-			void				_ChangeColorSchema(color_schema* schema);
-			void				_SetCurrentColorSchema(BMenuField* field);
+			void				_ChangeColorScheme(color_scheme* scheme);
+			void				_SetCurrentColorScheme(BMenuField* field);
 
 	static	BMenu*				_MakeFontMenu(uint32 command,
 									const char* defaultFamily,
@@ -68,16 +68,16 @@ private:
 	static	BPopUpMenu*			_MakeMenu(uint32 msg, const char** items,
 										const char* defaultItem);
 
-	static	BPopUpMenu*			_MakeColorSchemaMenu(uint32 msg,
-									const color_schema** schemas,
-									const color_schema* defaultItemName);
+	static	BPopUpMenu*			_MakeColorSchemeMenu(uint32 msg,
+									const color_scheme** schemes,
+									const color_scheme* defaultItemName);
 
 			BCheckBox*			fBlinkCursor;
 			BCheckBox*			fWarnOnExit;
 			BMenuField*			fFont;
 			BMenuField*			fFontSize;
 
-			BMenuField*			fColorSchemaField;
+			BMenuField*			fColorSchemeField;
 			BMenuField*			fColorField;
 			BColorControl*		fColorControl;
 

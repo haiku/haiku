@@ -417,8 +417,15 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 	BReference<RegisterMap> fromDwarfMapReference(fromDwarfMap, true);
 
 	// create the target interface
-	BasicTargetInterface inputInterface(registers, registerCount, fromDwarfMap,
-		fArchitecture, fTeamMemory);
+	BasicTargetInterface *inputInterface
+		= new(std::nothrow) BasicTargetInterface(registers, registerCount,
+			fromDwarfMap, fArchitecture, fTeamMemory);
+
+	if (inputInterface == NULL)
+		return B_NO_MEMORY;
+
+	BReference<BasicTargetInterface> inputInterfaceReference(inputInterface,
+		true);
 
 	// iterate through all compilation units
 	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
@@ -458,7 +465,7 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 			if (typeContext == NULL) {
 				typeContext = new(std::nothrow)
 					DwarfTypeContext(fArchitecture, fImageInfo.ImageID(), fFile,
-					unit, NULL, 0, 0, fRelocationDelta, &inputInterface,
+					unit, NULL, 0, 0, fRelocationDelta, inputInterface,
 					fromDwarfMap);
 				if (typeContext == NULL)
 					return B_NO_MEMORY;
@@ -1080,8 +1087,8 @@ DwarfImageDebugInfo::_EvaluateBaseTypeConstraints(DIEType* type,
 		if (baseTypeOwnerEntry != NULL) {
 			DwarfUtils::GetFullyQualifiedDIEName(baseTypeOwnerEntry,
 				baseEntryName);
-			if (!baseEntryName.IsEmpty() && baseEntryName
-				!= constraints.BaseTypeName())
+
+			if (baseEntryName != constraints.BaseTypeName())
 				return false;
 		}
 	}

@@ -36,8 +36,8 @@ SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr checkfs
 	zmore znew
 ;
 
-SYSTEM_APPS = AboutSystem DriveSetup Installer NetworkStatus ProcessController
-	StyledEdit Terminal
+SYSTEM_APPS = AboutSystem ActivityMonitor DriveSetup Installer NetworkStatus
+	ProcessController StyledEdit Terminal
 ;
 
 SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
@@ -45,9 +45,9 @@ SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
 	<preference>Tracker VirtualMemory
 ;
 
-SYSTEM_DEMOS = ;
+SYSTEM_DEMOS = Sudoku ;
 
-SYSTEM_LIBS = libbe.so libbnetapi.so libdebug.so libnetwork.so
+SYSTEM_LIBS = libbe.so libbnetapi.so libdebug.so libmedia.so libnetwork.so
 	<revisioned>libroot.so libroot-addon-icu.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
@@ -56,7 +56,7 @@ SYSTEM_LIBS = libbe.so libbnetapi.so libdebug.so libnetwork.so
 PRIVATE_SYSTEM_LIBS =
 	$(HAIKU_JPEG_CURRENT_LIB)
 	$(HAIKU_LIBPNG_CURRENT_LIB)
-	$(HAIKU_ZLIB_CURRENT_LIB) 
+	$(HAIKU_ZLIB_CURRENT_LIB)
 	$(HAIKU_FREETYPE_CURRENT_LIB)
 	libilmimf.so
 ;
@@ -195,7 +195,8 @@ AddDirectoryToHaikuImage home mail out ;
 AddSymlinkToHaikuImage home config : settings/deskbar : be ;
 # Deskbar Application links
 AddDirectoryToHaikuImage home config settings deskbar Applications ;
-DESKBAR_APPLICATIONS = DriveSetup Installer StyledEdit Terminal ;
+DESKBAR_APPLICATIONS = ActivityMonitor DriveSetup Installer StyledEdit
+	Terminal ;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
 	AddSymlinkToHaikuImage home config settings deskbar Applications
@@ -217,6 +218,13 @@ for linkTarget in $(DESKBAR_PREFERENCES) {
 	AddSymlinkToHaikuImage home config settings deskbar Preferences
 		: /boot/system/preferences/$(linkTarget)
 		: $(linkTarget) ;
+}
+
+# Deskbar Demo links
+AddDirectoryToHaikuImage home config settings deskbar Demos ;
+for linkTarget in $(SYSTEM_DEMOS) {
+	AddSymlinkToHaikuImage home config settings deskbar Demos
+		: /boot/system/demos/$(linkTarget) : $(linkTarget) ;
 }
 
 AddSymlinkToHaikuImage system bin : less : more ;

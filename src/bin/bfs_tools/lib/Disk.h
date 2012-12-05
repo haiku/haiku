@@ -6,6 +6,7 @@
 */
 
 
+#include <BufferIO.h>
 #include <File.h>
 #include <Path.h>
 
@@ -23,9 +24,9 @@ class BlockRunCache : public Cache<block_run>
 	public:
 		BlockRunCache(Disk *disk);
 //		~BlockRunCache();
-		
+
 		virtual Cacheable *NewCacheable(block_run run);
-	
+
 	protected:
 		Disk	*fDisk;
 };
@@ -91,7 +92,9 @@ class Disk : public BPositionIO
 
 		status_t			LoadBootBlock();
 
+	protected:
 		BFile				fFile;
+		BBufferIO*			fBufferedFile;
 		BPath				fPath;
 		off_t				fRawDiskOffset;
 		off_t				fSize;
@@ -101,7 +104,7 @@ class Disk : public BPositionIO
 		block_run			fValidBlockRun;
 		off_t				fValidOffset;
 		off_t				fLogStart;
-		
+
 		BlockRunCache		fCache;
 
 		bool				fRawMode;

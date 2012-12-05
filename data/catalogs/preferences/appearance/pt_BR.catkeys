@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Appearance	1428480647
+1	portuguese (brazil)	x-vnd.Haiku-Appearance	2950529393
 Plain font:	Font view		Fonte plana:
 Control highlight	Colors tab		Realce do controle
 Control border	Colors tab		Borda do controle
@@ -23,27 +23,33 @@ Tooltip background	Colors tab		Plano de fundo das dicas
 Selected menu item background	Colors tab		Plano de fundo do item de menu selecionado
 Antialiasing	APRWindow		Suavização de serrilhado
 Navigation base	Colors tab		Base de navegação
+Selected list item text	Colors tab		Texto do item da lista selecionado
 Window border	Colors tab		Margem da janela
+Double:	DecorSettingsView		Duplo:
 Window tab text	Colors tab		Texto da aba da Janela
 Document text	Colors tab		Texto do documento
 Navigation pulse	Colors tab		Navegação de pulso
 Window decorator:	DecorSettingsView		Decorador de janela:
 Selected menu item text	Colors tab		Texto do item do menu selecionado
 Menu background	Colors tab		Plano de fundo de menu
+List background	Colors tab		Plano de fundo da lista
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Marca de controle
 Size:	Font Selection view		Tamanho:
+Selected list item background	Colors tab		Plano de fundo do item de lista selecionado
 Panel background	Colors tab		Plano de fundo do painel
 Menu font:	Font view		Fonte de menu:
 Colors	APRWindow		Cores
 Control background	Colors tab		Plano de fundo do controle
 Inactive window tab	Colors tab		Aba da janela inativa
+List item text	Colors tab		Texto do item da lista
 Appearance	System name		Aparência
 Fixed font:	Font view		Fonte de largura fixa:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Yuri viu um pequeno jabuti xereta e dez cegonhas felizes comendo kiwi.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reduzir a força do filtro de bordas coloridas:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		A possibilidade de usar o antiserrilhamento baseado em Subpíxeis juntamente com o alisamento de glifos não está disponível nesta versão do Haiku para evitar possíveis problemas com patentes. Para habilitar esta funcionalidade, você terá que compilar o Haiku e ativar certas opções no cabeçalho de configuração da libfreetype.
 Control text	Colors tab		Texto do controle
+Single:	DecorSettingsView		Único:
 Tooltip text	Colors tab		Texto da dica
 Bold font:	Font view		Negrito:
 Inactive window border	Colors tab		Margem inativa de janela
@@ -52,6 +58,7 @@ LCD subpixel	AntialiasingSettingsView		Subpixel LCD
 Selected menu item border	Colors tab		Borda do item de menu selecionado
 Strong	AntialiasingSettingsView		Forte
 Panel text	Colors tab		Texto de janela de diálogo
+Arrow style	DecorSettingsView		Estilo da seta
 Monospaced fonts only	AntialiasingSettingsView		Apenas fontes monoespaçadas
 Look and feel	APRWindow		Olhar e sentir
 Antialiasing menu	AntialiasingSettingsView		Menu de suavização de serrilhado

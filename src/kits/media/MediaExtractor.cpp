@@ -1,7 +1,7 @@
 /*
  * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
  * Copyright 2008, Maurice Kalinowski. All rights reserved.
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2012, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -103,8 +103,8 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 			fStreamInfo[i].cookie = 0;
 			fStreamInfo[i].hasCookie = false;
 			fStreamInfo[i].status = B_ERROR;
-			ERROR("MediaExtractor::MediaExtractor: AllocateCookie for stream "
-				"%ld failed\n", i);
+			ERROR("MediaExtractor::MediaExtractor: AllocateCookie for stream %"
+				B_PRId32 " failed\n", i);
 		} else
 			fStreamInfo[i].hasCookie = true;
 	}
@@ -122,7 +122,7 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 					!= B_OK) {
 			fStreamInfo[i].status = B_ERROR;
 			ERROR("MediaExtractor::MediaExtractor: GetStreamInfo for "
-				"stream %ld failed\n", i);
+				"stream %" B_PRId32 " failed\n", i);
 		}
 	}
 
@@ -330,7 +330,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 	status_t status = fStreamInfo[stream].status;
 	if (status != B_OK) {
 		ERROR("MediaExtractor::CreateDecoder can't create decoder for "
-			"stream %ld: %s\n", stream, strerror(status));
+			"stream %" B_PRId32 ": %s\n", stream, strerror(status));
 		return status;
 	}
 
@@ -346,8 +346,8 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 			sizeof(formatString));
 
 		ERROR("MediaExtractor::CreateDecoder gPluginManager.CreateDecoder "
-			"failed for stream %ld, format: %s: %s\n", stream, formatString,
-			strerror(status));
+			"failed for stream %" B_PRId32 ", format: %s: %s\n", stream,
+			formatString, strerror(status));
 #endif
 		return status;
 	}
@@ -357,7 +357,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 	if (chunkProvider == NULL) {
 		gPluginManager.DestroyDecoder(decoder);
 		ERROR("MediaExtractor::CreateDecoder can't create chunk provider "
-			"for stream %ld\n", stream);
+			"for stream %" B_PRId32 "\n", stream);
 		return B_NO_MEMORY;
 	}
 
@@ -367,16 +367,16 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 		fStreamInfo[stream].infoBuffer, fStreamInfo[stream].infoBufferSize);
 	if (status != B_OK) {
 		gPluginManager.DestroyDecoder(decoder);
-		ERROR("MediaExtractor::CreateDecoder Setup failed for stream %ld: %s\n",
-			stream, strerror(status));
+		ERROR("MediaExtractor::CreateDecoder Setup failed for stream %" B_PRId32
+			": %s\n", stream, strerror(status));
 		return status;
 	}
 
 	status = gPluginManager.GetDecoderInfo(decoder, codecInfo);
 	if (status != B_OK) {
 		gPluginManager.DestroyDecoder(decoder);
-		ERROR("MediaExtractor::CreateDecoder GetCodecInfo failed for stream "
-			"%ld: %s\n", stream, strerror(status));
+		ERROR("MediaExtractor::CreateDecoder GetCodecInfo failed for stream %"
+			B_PRId32 ": %s\n", stream, strerror(status));
 		return status;
 	}
 

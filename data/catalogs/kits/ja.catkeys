@@ -1,9 +1,11 @@
-1	japanese	x-vnd.Haiku-libbe	864109244
+1	japanese	x-vnd.Haiku-libbe	2804831005
 %3.2f GiB	StringForSize		%3.2f GiB
-Written by:	AboutWindow		作者：
-About %app%	AboutMenuItem		%app%について
+Written by:	AboutWindow		作者:
+About %app%	AboutMenuItem		%app% について
 Cut	TextView		切り取り
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\"用のレプリカントを作成できません。\n%error
+Version	AboutWindow		バージョン
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\" 用のレプリカントを作成できません。\n%error
+About	AboutWindow		このソフトウェアについて…
 Copy	TextView		コピー
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d バイト
@@ -12,6 +14,7 @@ No Pages to print!	PrintJob		印刷するページがありません。
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		緑：
+Version history:	AboutWindow		改訂履歴:
 Remove replicant	Dragger		レプリカントを削除
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		プリントサーバーが応答しません。

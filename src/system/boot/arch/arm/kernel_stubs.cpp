@@ -33,12 +33,6 @@ kgetc()
 }
 
 
-extern "C" void
-spin(bigtime_t time)
-{
-}
-
-
 extern "C" status_t
 _mutex_lock(mutex*, bool)
 {
