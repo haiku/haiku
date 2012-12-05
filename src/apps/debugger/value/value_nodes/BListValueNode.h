@@ -38,9 +38,11 @@ public:
 
 private:
 			class BListElementNodeChild;
+			class BListItemCountNodeChild;
 
 			// for GCC2
 			friend class BListElementNodeChild;
+			friend class BListItemCountNodeChild;
 
 			typedef BObjectList<ValueNodeChild> ChildNodeList;
 
@@ -50,6 +52,8 @@ private:
 			ChildNodeList			fChildren;
 			ValueLoader*			fLoader;
 			BVariant				fDataLocation;
+			BVariant				fItemCountLocation;
+			Type*					fItemCountType;
 			int32					fItemCount;
 };
 
