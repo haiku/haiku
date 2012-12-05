@@ -16,8 +16,8 @@ extern "C" {
 #include "postprocess/filters.h"
 #include "os/os_thread.h"
 }
-
 #include "bitmap_wrapper.h"
+#include "GalliumFramebuffer.h"
 
 
 #define CONTEXT_MAX 32
@@ -38,6 +38,8 @@ struct hgl_context
 		// State Tracker Manager
 	struct st_context_iface* st;
 		// State Tracker Interface Object
+	struct st_visual* stVisual;
+		// State Tracker Visual
 
 	struct pipe_resource* textures[ST_ATTACHMENT_COUNT];
 
@@ -48,8 +50,8 @@ struct hgl_context
 	Bitmap* bitmap;
 	color_space colorSpace;
 
-	struct st_framebuffer_iface* draw;
-	struct st_framebuffer_iface* read;
+	GalliumFramebuffer* draw;
+	GalliumFramebuffer* read;
 };
 
 

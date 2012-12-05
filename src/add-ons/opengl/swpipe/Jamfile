@@ -10,6 +10,7 @@ local sources =
 	SoftwareRenderer.cpp
 	SoftwareWinsys.cpp
 	GalliumContext.cpp
+	GalliumFramebuffer.cpp
 	bitmap_wrapper.cpp ;
 
 if $(HAIKU_LLVM_PRESENT) {

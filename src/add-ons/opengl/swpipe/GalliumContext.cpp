@@ -235,7 +235,7 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 		return 0;
 	}
 
-	// Set up the initial things out context needs
+	// Set up the initial things our context needs
 	context->bitmap = bitmap;
 	context->colorSpace = get_bitmap_color_space(bitmap);
 	context->draw = NULL;
@@ -294,6 +294,15 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 	// Convert Mesa calculated visual into state tracker visual
 	struct st_visual stVisual;
 	hgl_fill_st_visual(&stVisual, glVisual);
+
+	context->draw = new GalliumFramebuffer(&stVisual);
+	context->read = new GalliumFramebuffer(&stVisual);
+
+	if (!context->draw || !context->read) {
+		ERROR("%s: Problem allocating framebuffer!\n", __func__);
+		_mesa_destroy_visual(glVisual);
+		return -1;
+	}
 
 	// We need to assign the screen *before* calling st_api create_context
 	context->manager->screen = fScreen;
@@ -403,6 +412,12 @@ GalliumContext::DestroyContext(context_id contextID)
 	if (fContext[contextID]->postProcess)
 		pp_free(fContext[contextID]->postProcess);
 
+	// Delete framebuffer objects
+	if (fContext[contextID]->read)
+		delete fContext[contextID]->read;
+	if (fContext[contextID]->draw)
+		delete fContext[contextID]->draw;
+
 	if (fContext[contextID]->manager)
 		FREE(fContext[contextID]->manager);
 
@@ -446,7 +461,13 @@ GalliumContext::SetCurrentContext(Bitmap *bitmap, context_id contextID)
 			ST_FLUSH_FRONT, NULL);
 	}
 
-	api->make_current(context->api, context->st, context->draw, context->read);
+	// We need to lock and unlock framebuffers before accessing them
+	context->draw->Lock();
+	context->read->Lock();
+	api->make_current(context->api, context->st, context->draw->fBuffer,
+		context->read->fBuffer);
+	context->draw->Unlock();
+	context->read->Unlock();
 
 	// TODO: Init textures before post-processing them
 	#if 0
