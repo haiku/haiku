@@ -32,8 +32,6 @@
 DebugReportGenerator::DebugReportGenerator(::Team* team)
 	:
 	BLooper("DebugReportGenerator"),
-	BReferenceable(),
-
 	fTeam(team),
 	fArchitecture(team->GetArchitecture()),
 	fTeamDataSem(-1)
