@@ -27,7 +27,8 @@ BReferenceable::BReferenceable()
 BReferenceable::~BReferenceable()
 {
 #ifdef DEBUG
-	if (fReferenceCount != 0) {
+	bool enterDebugger = false;
+	if (fReferenceCount == 1) {
 		// Simple heuristic to test if this object was allocated
 		// on the stack: check if this is within 1KB in either
 		// direction of the current stack address, and the reference
@@ -35,10 +36,22 @@ BReferenceable::~BReferenceable()
 		// imply the object was allocated/destroyed on the stack
 		// without any references being acquired or released.
 		char test;
-		int64 testOffset = (int64)this - (int64)&test;
-		if (testOffset < -1024 || testOffset > 1024 || fReferenceCount != 1)
-			debugger("Deleted referenceable object with non-zero ref count.");
-	}
+		size_t testOffset = (addr_t)this - (addr_t)&test;
+		if (testOffset > 1024 || -testOffset > 1024) {
+			// might still be a stack object, check the thread's
+			// stack range to be sure.
+			thread_info info;
+			status_t result = get_thread_info(find_thread(NULL), &info);
+			if (result != B_OK || this < info.stack_base
+				|| this > info.stack_end) {
+				enterDebugger = true;
+			}
+		}
+	} else if (fReferenceCount != 0)
+		enterDebugger = true;
+
+	if (enterDebugger)
+		debugger("Deleted referenceable object with non-zero ref count.");
 #endif
 }
 
