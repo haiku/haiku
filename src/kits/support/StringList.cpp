@@ -17,16 +17,16 @@
 static int
 compare_private_data(const void* a, const void* b)
 {
-	return BString::Private::StringFromData((char*)a).Compare(
-		BString::Private::StringFromData((char*)b));
+	return BString::Private::StringFromData(*(char**)a).Compare(
+		BString::Private::StringFromData(*(char**)b));
 }
 
 
 static int
 compare_private_data_ignore_case(const void* a, const void* b)
 {
-	return BString::Private::StringFromData((char*)a).ICompare(
-		BString::Private::StringFromData((char*)b));
+	return BString::Private::StringFromData(*(char**)a).ICompare(
+		BString::Private::StringFromData(*(char**)b));
 }
 
 
@@ -367,7 +367,7 @@ BStringList::Flatten(void* buf, ssize_t size) const
 
 	if (size < FlattenedSize())
 		return B_NO_MEMORY;
-		
+
 	int32 count = CountStrings();
 	for (int32 i = 0; i < count; i++) {
 		BString item = StringAt(i);
@@ -403,7 +403,7 @@ BStringList::Unflatten(type_code code, const void* buffer, ssize_t size)
 	}
 
 	return B_OK;
-}	
+}
 
 
 void
