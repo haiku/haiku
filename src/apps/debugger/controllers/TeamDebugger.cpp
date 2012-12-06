@@ -284,7 +284,6 @@ TeamDebugger::~TeamDebugger()
 	delete fMemoryBlockManager;
 	fReportGenerator->Lock();
 	fReportGenerator->Quit();
-	delete fReportGenerator;
 	delete fWorker;
 	delete fTeam;
 	delete fFileManager;
