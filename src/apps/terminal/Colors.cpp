@@ -24,7 +24,7 @@ const struct color_scheme kColorSchemeDefault = {
 	B_TRANSLATE("Default"),
 	kBlack,
 	kWhite,
-	kBlack,
+	kWhite,
 	kBlack,
 	kWhite,
 	kBlack
