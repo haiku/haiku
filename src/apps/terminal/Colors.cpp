@@ -14,7 +14,7 @@
 
 
 // Standard colors
-const rgb_color kBlack= { 0, 0, 0, 255 };
+const rgb_color kBlack = { 0, 0, 0, 255 };
 const rgb_color kGreen = { 0, 255, 0, 255 };
 const rgb_color kWhite = { 255, 255, 255, 255 };
 const rgb_color kYellow = { 255, 255, 0, 255 };
