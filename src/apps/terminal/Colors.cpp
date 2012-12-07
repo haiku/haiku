@@ -35,7 +35,7 @@ const struct color_scheme kColorSchemeBlue = {
 	kYellow,
 	{ 0, 0, 139, 255 },
 	kBlack,
-	kWhite,
+	kYellow,
 	kBlack,
 	{ 0, 139, 139, 255 },
 };
