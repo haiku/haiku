@@ -394,8 +394,7 @@ AppearancePrefView::_SetCurrentColorScheme(BMenuField* field)
 
 	const char* currentSchemeName = NULL;
 
-	for (color_scheme** schemes
-				= const_cast<color_scheme**>(gPredefinedColorSchemes);
+	for (const color_scheme** schemes = gPredefinedColorSchemes;
 			*schemes != NULL; schemes++) {
 		if (gCustomColorScheme == **schemes) {
 			currentSchemeName = (*schemes)->name;
