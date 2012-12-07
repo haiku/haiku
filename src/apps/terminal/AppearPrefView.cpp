@@ -108,8 +108,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	BPopUpMenu* colorsPopUp = _MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
 		kColorTable[0]);
 
-	fColorField = new BMenuField(B_TRANSLATE("Color:"),
-			colorsPopUp);
+	fColorField = new BMenuField(B_TRANSLATE("Color:"), colorsPopUp);
 	fColorField->SetEnabled(false);
 
 	fTabTitle = new BTextControl("tabTitle", B_TRANSLATE("Tab title:"), "",
@@ -264,6 +263,8 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 					fFontSize->Menu()->FindMarked()->Label()) != 0) {
 				PrefHandler::Default()->setString(PREF_HALF_FONT_SIZE,
 					fFontSize->Menu()->FindMarked()->Label());
+				msg->AddInt32("font size",
+					atoi(fFontSize->Menu()->FindMarked()->Label()));
 				modified = true;
 			}
 			break;
@@ -272,21 +273,20 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 		{
 			rgb_color oldColor = PrefHandler::Default()->getRGB(
 				fColorField->Menu()->FindMarked()->Label());
-				if (oldColor != fColorControl->ValueAsColor()) {
-					PrefHandler::Default()->setRGB(
-						fColorField->Menu()->FindMarked()->Label(),
-						fColorControl->ValueAsColor());
-					modified = true;
-				}
+			if (oldColor != fColorControl->ValueAsColor()) {
+				PrefHandler::Default()->setRGB(
+					fColorField->Menu()->FindMarked()->Label(),
+					fColorControl->ValueAsColor());
+				modified = true;
 			}
 			break;
+		}
 
 		case MSG_COLOR_SCHEME_CHANGED:
 		{
 			color_scheme* newScheme = NULL;
 			if (msg->FindPointer("color_scheme",
-				(void**)&newScheme) == B_OK) {
-
+					(void**)&newScheme) == B_OK) {
 				if (newScheme == &gCustomColorScheme)
 					_EnableCustomColors(true);
 				else
