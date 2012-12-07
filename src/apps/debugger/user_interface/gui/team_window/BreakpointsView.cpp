@@ -28,6 +28,7 @@ BreakpointsView::BreakpointsView(Team* team, Listener* listener)
 	BGroupView(B_HORIZONTAL, 4.0f),
 	fTeam(team),
 	fBreakpoint(NULL),
+	fWatchpoint(NULL),
 	fListView(NULL),
 	fToggleBreakpointButton(NULL),
 	fRemoveBreakpointButton(NULL),
