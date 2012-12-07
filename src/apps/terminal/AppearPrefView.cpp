@@ -94,11 +94,11 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),
 		PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE));
 
-	BMenu* sizeMenu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
+	BMenu* fontSizeMenu = _MakeFontSizeMenu(MSG_HALF_SIZE_CHANGED,
 		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
 
 	fFont = new BMenuField(B_TRANSLATE("Font:"), fontMenu);
-	fFontSize = new BMenuField(B_TRANSLATE("Size:"), sizeMenu);
+	fFontSize = new BMenuField(B_TRANSLATE("Font size:"), fontSizeMenu);
 
 	BPopUpMenu* schemesPopUp = _MakeColorSchemeMenu(MSG_COLOR_SCHEME_CHANGED,
 		gPredefinedColorSchemes, gPredefinedColorSchemes[0]);
@@ -456,7 +456,7 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 
 
 /*static*/ BMenu*
-AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
+AppearancePrefView::_MakeFontSizeMenu(uint32 command, uint8 defaultSize)
 {
 	BPopUpMenu* menu = new BPopUpMenu("size");
 	int32 sizes[] = {9, 10, 11, 12, 14, 16, 18, 0};
@@ -467,7 +467,8 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 		BString string;
 		string << sizes[i];
 
-		BMenuItem* item = new BMenuItem(string.String(), new BMessage(command));
+		BMenuItem* item = new BMenuItem(string.String(),
+			new BMessage(command));
 		menu->AddItem(item);
 
 		if (sizes[i] == defaultSize) {
@@ -475,6 +476,7 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 			found = true;
 		}
 	}
+
 	if (!found) {
 		for (uint32 i = 0; sizes[i]; i++) {
 			if (sizes[i] > defaultSize) {

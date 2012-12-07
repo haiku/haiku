@@ -945,8 +945,8 @@ TermView::SetTermFont(const BFont *font)
 	fHalfFont.SetSpacing(B_FIXED_SPACING);
 
 	// calculate half font's max width
-	// Not Bounding, check only A-Z(For case of fHalfFont is KanjiFont. )
-	for (int c = 0x20 ; c <= 0x7e; c++){
+	// Not Bounding, check only A-Z (For case of fHalfFont is KanjiFont.)
+	for (int c = 0x20; c <= 0x7e; c++) {
 		char buf[4];
 		sprintf(buf, "%c", c);
 		int tmpWidth = (int)fHalfFont.StringWidth(buf);

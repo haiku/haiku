@@ -62,7 +62,7 @@ private:
 	static	BMenu*				_MakeFontMenu(uint32 command,
 									const char* defaultFamily,
 									const char* defaultStyle);
-	static	BMenu*				_MakeSizeMenu(uint32 command,
+	static	BMenu*				_MakeFontSizeMenu(uint32 command,
 									uint8 defaultSize);
 
 	static	BPopUpMenu*			_MakeMenu(uint32 msg, const char** items,
