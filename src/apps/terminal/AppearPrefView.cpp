@@ -291,6 +291,7 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 					_EnableCustomColors(true);
 				else
 					_EnableCustomColors(false);
+
 				_ChangeColorScheme(newScheme);
 				modified = true;
 			}
@@ -393,14 +394,12 @@ AppearancePrefView::_SetCurrentColorScheme(BMenuField* field)
 
 	const char* currentSchemeName = NULL;
 
-	color_scheme** schemes
-		= const_cast<color_scheme**>(gPredefinedColorSchemes);
-	while (*schemes) {
+	for (const color_scheme** schemes = gPredefinedColorSchemes;
+			*schemes != NULL; schemes++) {
 		if (gCustomColorScheme == **schemes) {
 			currentSchemeName = (*schemes)->name;
 			break;
 		}
-		schemes++;
 	}
 
 	for (int32 i = 0; i < fColorSchemeField->Menu()->CountItems(); i++) {

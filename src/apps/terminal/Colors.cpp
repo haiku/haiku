@@ -14,7 +14,7 @@
 
 
 // Standard colors
-const rgb_color kBlack= { 0, 0, 0, 255 };
+const rgb_color kBlack = { 0, 0, 0, 255 };
 const rgb_color kGreen = { 0, 255, 0, 255 };
 const rgb_color kWhite = { 255, 255, 255, 255 };
 const rgb_color kYellow = { 255, 255, 0, 255 };
@@ -35,7 +35,7 @@ const struct color_scheme kColorSchemeBlue = {
 	kYellow,
 	{ 0, 0, 139, 255 },
 	kBlack,
-	kWhite,
+	kYellow,
 	kBlack,
 	{ 0, 139, 139, 255 },
 };
@@ -85,27 +85,24 @@ struct color_scheme gCustomColorScheme = {
 };
 
 const color_scheme* gPredefinedColorSchemes[] = {
-		&kColorSchemeDefault,
-		&kColorSchemeBlue,
-		&kColorSchemeMidnight,
-		&kColorSchemeProfessional,
-		&kColorSchemeRetro,
-		&kColorSchemeSlate,
-		&gCustomColorScheme,
-		NULL
+	&kColorSchemeDefault,
+	&kColorSchemeBlue,
+	&kColorSchemeMidnight,
+	&kColorSchemeProfessional,
+	&kColorSchemeRetro,
+	&kColorSchemeSlate,
+	&gCustomColorScheme,
+	NULL
 };
 
 
 bool
 color_scheme::operator==(const color_scheme& scheme)
 {
-	if (text_fore_color == scheme.text_fore_color
+	return text_fore_color == scheme.text_fore_color
 		&& text_back_color == scheme.text_back_color
 		&& cursor_fore_color == scheme.cursor_fore_color
 		&& cursor_back_color == scheme.cursor_back_color
 		&& select_fore_color == scheme.select_fore_color
-		&& select_back_color == scheme.select_back_color)
-		return true;
-
-	return false;
+		&& select_back_color == scheme.select_back_color;
 }

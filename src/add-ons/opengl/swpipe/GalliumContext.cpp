@@ -73,10 +73,14 @@ hgl_viewport(struct gl_context* glContext, GLint x, GLint y,
 }
 
 
-static void
-hgl_fill_st_visual(st_visual* stVisual, gl_config* glVisual)
+static st_visual*
+hgl_fill_st_visual(gl_config* glVisual)
 {
-	memset(stVisual, 0, sizeof(*stVisual));
+	struct st_visual* stVisual = CALLOC_STRUCT(st_visual);
+	if (!stVisual) {
+		ERROR("%s: Couldn't allocate st_visual\n", __func__);
+		return NULL;
+	}
 
 	// Determine color format
 	if (glVisual->redBits == 8) {
@@ -129,6 +133,8 @@ hgl_fill_st_visual(st_visual* stVisual, gl_config* glVisual)
 
 	if (glVisual->haveDepthBuffer || glVisual->haveStencilBuffer)
 		stVisual->buffer_mask |= ST_ATTACHMENT_DEPTH_STENCIL_MASK;
+
+	return stVisual;
 }
 
 
@@ -292,11 +298,10 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 	TRACE("stencilBits :\t%d\n", glVisual->stencilBits);
 
 	// Convert Mesa calculated visual into state tracker visual
-	struct st_visual stVisual;
-	hgl_fill_st_visual(&stVisual, glVisual);
+	context->stVisual = hgl_fill_st_visual(glVisual);
 
-	context->draw = new GalliumFramebuffer(&stVisual);
-	context->read = new GalliumFramebuffer(&stVisual);
+	context->draw = new GalliumFramebuffer(context->stVisual);
+	context->read = new GalliumFramebuffer(context->stVisual);
 
 	if (!context->draw || !context->read) {
 		ERROR("%s: Problem allocating framebuffer!\n", __func__);
@@ -312,7 +317,7 @@ GalliumContext::CreateContext(Bitmap *bitmap)
 	memset(&attribs, 0, sizeof(attribs));
 	attribs.options.force_glsl_extensions_warn = false;
 	attribs.profile = ST_PROFILE_DEFAULT;
-	attribs.visual = stVisual;
+	attribs.visual = *context->stVisual;
 	attribs.major = 1;
 	attribs.minor = 0;
 	//attribs.flags |= ST_CONTEXT_FLAG_DEBUG;
@@ -417,6 +422,9 @@ GalliumContext::DestroyContext(context_id contextID)
 		delete fContext[contextID]->read;
 	if (fContext[contextID]->draw)
 		delete fContext[contextID]->draw;
+
+	if (fContext[contextID]->stVisual)
+		FREE(fContext[contextID]->stVisual);
 
 	if (fContext[contextID]->manager)
 		FREE(fContext[contextID]->manager);

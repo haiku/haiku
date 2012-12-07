@@ -7,7 +7,6 @@
 
 
 #include <Looper.h>
-#include <Referenceable.h>
 
 #include "Team.h"
 
@@ -19,9 +18,7 @@ class Team;
 class Thread;
 
 
-class DebugReportGenerator : public BLooper, public BReferenceable,
-	public Team::Listener
-{
+class DebugReportGenerator : public BLooper, public Team::Listener {
 public:
 								DebugReportGenerator(::Team* team);
 								~DebugReportGenerator();
