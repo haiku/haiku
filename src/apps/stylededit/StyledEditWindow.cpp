@@ -1599,20 +1599,7 @@ StyledEditWindow::_SetFontStyle(const char* fontFamily, const char* fontStyle)
 
 	font.SetFace(face);
 
-	int32 start = 0, finish = 0;
-	fTextView->GetSelection(&start, &finish);
-
-	if (start != finish) {
-		text_run_array* runArray = fTextView->RunArray(start, finish);;
-
-		for (int i = 0; i < runArray->count; i++) {
-			runArray->runs[i].font.SetFamilyAndStyle(fontFamily, fontStyle);
-			runArray->runs[i].font.SetFace(face);
-		}
-
-		fTextView->SetRunArray(start, finish, runArray);
-	} else
-		fTextView->SetFontAndColor(&font);
+	fTextView->SetFontAndColor(&font, B_FONT_FAMILY_AND_STYLE);
 
 	BMenuItem* superItem;
 	superItem = fFontMenu->FindItem(fontFamily);
