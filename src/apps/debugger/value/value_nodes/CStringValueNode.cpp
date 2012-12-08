@@ -84,6 +84,12 @@ CStringValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	ValuePieceLocation piece;
 	piece.SetToMemory(addressData.ToUInt64());
 
+	error = valueLoader->LoadStringValue(addressData, maxSize, valueData);
+	if (error != B_OK)
+		return error;
+
+	piece.size = valueData.Length();
+
 	ValueLocation* stringLocation = new(std::nothrow) ValueLocation(
 		valueLoader->GetArchitecture()->IsBigEndian(), piece);
 
