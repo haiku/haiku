@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Expander	2398100010
+1	lithuanian	x-vnd.Haiku-Expander	282517174
 Expand	ExpanderMenu		Išskleisti
 Close window when done expanding	ExpanderPreferences		Viską išskleidus, užverti langą
 Set destination…	ExpanderMenu		Paskirties vieta…
@@ -17,7 +17,6 @@ Automatically expand files	ExpanderPreferences		Automatiškai išskleisti failus
 Creating listing for '%s'	ExpanderWindow		Generuojamas „%s“ turinio sąrašas
 Continue	ExpanderWindow		Tęsti
 Destination folder	ExpanderPreferences		Paskirties aplankas
-The destination folder does not exist.	ExpanderWindow		Paskirties aplankas neegzistuoja.
 Other	ExpanderPreferences		Kita
 Cancel	ExpanderPreferences		Atsisakyti
 Expansion	ExpanderPreferences		Išskleidimas

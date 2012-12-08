@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Expander	386826896
+1	hindi	x-vnd.Haiku-Expander	2566211356
 Expand	ExpanderMenu		विस्तार
 Close window when done expanding	ExpanderPreferences		विस्तार करने के बाद विंडो बंद करें
 Set destination…	ExpanderMenu		गंतव्य सेट कीजिए...
@@ -15,7 +15,6 @@ Cancel	ExpanderWindow		रद्द
 Automatically expand files	ExpanderPreferences		अपने आप फाइलें विस्तार करें
 Creating listing for '%s'	ExpanderWindow		'%s' के लिए सूचीकरण बना रहा है
 Continue	ExpanderWindow		जारी रखें
-The destination folder does not exist.	ExpanderWindow		गंतव्य फ़ोल्डर मौजूद नहीं है.
 Cancel	ExpanderPreferences		रद्द करे
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		आप सुनिश्चित हैं कि आप इस आरकाइव के विस्तार को बंद करना चाहते हैं?\nविस्तारित आइटम सम्भव्तीय पूरे नहीं हो
 Select	DirectoryFilePanel		चुनें

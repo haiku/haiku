@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Expander	2398100010
+1	swedish	x-vnd.Haiku-Expander	282517174
 Expand	ExpanderMenu		Expandera
 Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
 Set destination…	ExpanderMenu		Ange mål…
@@ -17,7 +17,6 @@ Automatically expand files	ExpanderPreferences		Expandera filer automatiskt
 Creating listing for '%s'	ExpanderWindow		Skapar innehållslista för '%s'
 Continue	ExpanderWindow		Fortsätt
 Destination folder	ExpanderPreferences		Målmapp
-The destination folder does not exist.	ExpanderWindow		Målmappen existerar inte.
 Other	ExpanderPreferences		Andra
 Cancel	ExpanderPreferences		Avbryt
 Expansion	ExpanderPreferences		Expansion

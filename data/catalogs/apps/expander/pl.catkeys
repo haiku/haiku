@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Expander	2398100010
+1	polish	x-vnd.Haiku-Expander	282517174
 Expand	ExpanderMenu		Rozpakuj
 Close window when done expanding	ExpanderPreferences		Zamknij okno po zakończeniu rozpakowywania
 Set destination…	ExpanderMenu		Wybierz miejsce docelowe…
@@ -17,7 +17,6 @@ Automatically expand files	ExpanderPreferences		Automatycznie rozpakuj pliki
 Creating listing for '%s'	ExpanderWindow		Tworzenie listy dla '%s'
 Continue	ExpanderWindow		Kontynuuj
 Destination folder	ExpanderPreferences		Katalog docelowy
-The destination folder does not exist.	ExpanderWindow		Folder docelowy nie istnieje.
 Other	ExpanderPreferences		Inne
 Cancel	ExpanderPreferences		Anuluj
 Expansion	ExpanderPreferences		Rozpakowywanie

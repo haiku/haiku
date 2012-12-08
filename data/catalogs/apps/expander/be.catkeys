@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Expander	2398100010
+1	belarusian	x-vnd.Haiku-Expander	282517174
 Expand	ExpanderMenu		Распакаваць
 Close window when done expanding	ExpanderPreferences		Закрыць вакно пасля распакоўкі
 Set destination…	ExpanderMenu		Задаць прызначэнне…
@@ -17,7 +17,6 @@ Automatically expand files	ExpanderPreferences		Распакоўваць фай�
 Creating listing for '%s'	ExpanderWindow		Стварэнне спіса для '%s'
 Continue	ExpanderWindow		Працягваць
 Destination folder	ExpanderPreferences		Тэчка прызначэння
-The destination folder does not exist.	ExpanderWindow		Тэчка прызначэння не існуе.
 Other	ExpanderPreferences		Іншы
 Cancel	ExpanderPreferences		Адмена
 Expansion	ExpanderPreferences		Пашырэньне

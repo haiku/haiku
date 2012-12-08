@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Expander	2398100010
+1	slovak	x-vnd.Haiku-Expander	282517174
 Expand	ExpanderMenu		Rozbaliť
 Close window when done expanding	ExpanderPreferences		Zatvoriť okno po dokončení rozbaľovania
 Set destination…	ExpanderMenu		Nastaviť cieľ…
@@ -17,7 +17,6 @@ Automatically expand files	ExpanderPreferences		Automaticky rozbaľovať súbory
 Creating listing for '%s'	ExpanderWindow		Vytvára sa zoznam pre „%s“
 Continue	ExpanderWindow		Pokračovať
 Destination folder	ExpanderPreferences		Cieľový priečinok
-The destination folder does not exist.	ExpanderWindow		Cieľový priečinok neexistuje.
 Other	ExpanderPreferences		Ďalšie
 Cancel	ExpanderPreferences		Zrušiť
 Expansion	ExpanderPreferences		Rozpínanie
