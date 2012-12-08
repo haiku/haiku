@@ -785,12 +785,16 @@ TermWindow::MessageReceived(BMessage *message)
 		case MSG_COLS_CHANGED:
 		{
 			int32 columns, rows;
-			message->FindInt32("columns", &columns);
-			message->FindInt32("rows", &rows);
+			if (message->FindInt32("columns", &columns) != B_OK
+				|| message->FindInt32("rows", &rows) != B_OK) {
+				break;
+			}
 
-			_ActiveTermView()->SetTermSize(rows, columns);
-
-			_ResizeView(_ActiveTermView());
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				view->SetTermSize(rows, columns);
+				_ResizeView(view);
+			}
 			break;
 		}
 
@@ -799,19 +803,17 @@ TermWindow::MessageReceived(BMessage *message)
 		{
 			BFont font;
 			_GetPreferredFont(font);
-			_ActiveTermView()->SetTermFont(&font);
-
-			_ResizeView(_ActiveTermView());
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				view->SetTermFont(&font);
+				_ResizeView(view);
+			}
 			break;
 		}
 
 		case MSG_HALF_SIZE_CHANGED:
 		case MSG_FULL_SIZE_CHANGED:
 		{
-			TermView* view = _ActiveTermView();
-			BFont font;
-			view->GetTermFont(&font);
-
 			const char* size = NULL;
 			if (message->FindString("font_size", &size) != B_OK)
 				break;
@@ -827,11 +829,16 @@ TermWindow::MessageReceived(BMessage *message)
 					item->SetMarked(true);
 			}
 
+			BFont font;
+			_ActiveTermView()->GetTermFont(&font);
 			font.SetSize(atoi(size));
-			view->SetTermFont(&font);
-			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE, (int32)atoi(size));
-
-			_ResizeView(view);
+			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE,
+				(int32)atoi(size));
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				_TermViewAt(i)->SetTermFont(&font);
+				_ResizeView(view);
+			}
 			break;
 		}
 
@@ -1000,9 +1007,8 @@ TermWindow::MessageReceived(BMessage *message)
 		case kIncreaseFontSize:
 		case kDecreaseFontSize:
 		{
-			TermView* view = _ActiveTermView();
 			BFont font;
-			view->GetTermFont(&font);
+			_ActiveTermView()->GetTermFont(&font);
 			float size = font.Size();
 
 			if (message->what == kIncreaseFontSize)
@@ -1028,10 +1034,12 @@ TermWindow::MessageReceived(BMessage *message)
 			}
 
 			font.SetSize(size);
-			view->SetTermFont(&font);
 			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE, (int32)size);
-
-			_ResizeView(view);
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				_TermViewAt(i)->SetTermFont(&font);
+				_ResizeView(view);
+			}
 			break;
 		}
 
@@ -1198,10 +1206,12 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 		view->GetFontSize(&width, &height);
 
 		float minimumHeight = -1;
-		if (fMenuBar)
+		if (fMenuBar != NULL)
 			minimumHeight += fMenuBar->Bounds().Height() + 1;
-		if (fTabView && fTabView->CountTabs() > 0)
+
+		if (fTabView != NULL && fTabView->CountTabs() > 0)
 			minimumHeight += fTabView->TabHeight() + 1;
+
 		SetSizeLimits(MIN_COLS * width - 1, MAX_COLS * width - 1,
 			minimumHeight + MIN_ROWS * height - 1,
 			minimumHeight + MAX_ROWS * height - 1);
@@ -1209,7 +1219,7 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 			// the terminal can be resized smaller than MIN_ROWS/MIN_COLS!
 
 		// If it's the first time we're called, setup the window
-		if (fTabView->CountTabs() == 0) {
+		if (fTabView != NULL && fTabView->CountTabs() == 0) {
 			float viewWidth, viewHeight;
 			containerView->GetPreferredSize(&viewWidth, &viewHeight);
 
@@ -1577,9 +1587,10 @@ TermWindow::_ResizeView(TermView *view)
 	view->GetFontSize(&fontWidth, &fontHeight);
 
 	float minimumHeight = -1;
-	if (fMenuBar)
+	if (fMenuBar != NULL)
 		minimumHeight += fMenuBar->Bounds().Height() + 1;
-	if (fTabView && fTabView->CountTabs() > 1)
+
+	if (fTabView != NULL && fTabView->CountTabs() > 1)
 		minimumHeight += fTabView->TabHeight() + 1;
 
 	SetSizeLimits(MIN_COLS * fontWidth - 1, MAX_COLS * fontWidth - 1,
@@ -1589,13 +1600,16 @@ TermWindow::_ResizeView(TermView *view)
 	float width;
 	float height;
 	view->Parent()->GetPreferredSize(&width, &height);
+
 	width += B_V_SCROLL_BAR_WIDTH;
 		// NOTE: Width is one pixel too small, since the scroll view
 		// is one pixel wider than its parent.
-	height += fMenuBar->Bounds().Height() + 1;
+	if (fMenuBar != NULL)
+		height += fMenuBar->Bounds().Height() + 1;
+	if (fTabView != NULL && fTabView->CountTabs() > 1)
+		height += fTabView->TabHeight() + 1;
 
 	ResizeTo(width, height);
-
 	view->Invalidate();
 }
 
