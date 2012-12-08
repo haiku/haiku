@@ -1139,7 +1139,7 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 					if (piece.type != VALUE_PIECE_LOCATION_MEMORY)
 						return false;
 
-					data.SetToFormat("[@ 0x%llx]", piece.address);
+					data.SetToFormat("[@ %#" B_PRIx64 "]", piece.address);
 					_value.SetTo(data);
 					return true;
 				}
@@ -1212,13 +1212,13 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 		BString pieceData;
 		switch (piece.type) {
 			case VALUE_PIECE_LOCATION_MEMORY:
-				pieceData.SetToFormat("(%ld): Address: 0x%llx, Size: "
-					"%lld bytes", i, piece.address, piece.size);
+				pieceData.SetToFormat("(%" B_PRId32 "): Address: %#" B_PRIx64
+					", Size: %" B_PRId64 " bytes", i, piece.address, piece.size);
 				break;
 			case VALUE_PIECE_LOCATION_REGISTER:
 			{
 				Architecture* architecture = fThread->GetTeam()->GetArchitecture();
-				pieceData.SetToFormat("(%ld): Register (%s)",
+				pieceData.SetToFormat("(%" B_PRId32 "): Register (%s)",
 					i, architecture->Registers()[piece.reg].Name());
 
 				break;
