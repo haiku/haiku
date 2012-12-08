@@ -21,6 +21,8 @@ public:
 	virtual	Type*				GetType() const;
 	virtual	ValueNode*			Parent() const;
 
+	Variable*					GetVariable() const { return fVariable; };
+
 	virtual	status_t			ResolveLocation(ValueLoader* valueLoader,
 									ValueLocation*& _location);
 
