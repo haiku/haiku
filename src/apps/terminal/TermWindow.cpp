@@ -617,15 +617,25 @@ TermWindow::_GetPreferredFont(BFont& font)
 	// Default to be_fixed_font
 	font = be_fixed_font;
 
-	const char* family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
-	const char* style = PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE);
+	const char* family
+		= PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
+	const char* style
+		= PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE);
+	const char* size = PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE);
 
 	font.SetFamilyAndStyle(family, style);
+	font.SetSize(atoi(size));
 
-	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
-	if (size < 6.0f)
-		size = 6.0f;
-	font.SetSize(size);
+	// mark the font size menu item
+	for (int32 i = 0; i < fFontSizeMenu->CountItems(); i++) {
+		BMenuItem* item = fFontSizeMenu->ItemAt(i);
+		if (item == NULL)
+			continue;
+
+		item->SetMarked(false);
+		if (strcmp(item->Label(), size) == 0)
+			item->SetMarked(true);
+	}
 }
 
 
@@ -802,8 +812,8 @@ TermWindow::MessageReceived(BMessage *message)
 			BFont font;
 			view->GetTermFont(&font);
 
-			int32 size;
-			if (message->FindInt32("font_size", &size) != B_OK)
+			const char* size = NULL;
+			if (message->FindString("font_size", &size) != B_OK)
 				break;
 
 			// mark the font size menu item
@@ -813,13 +823,13 @@ TermWindow::MessageReceived(BMessage *message)
 					continue;
 
 				item->SetMarked(false);
-				if (atoi(item->Label()) == size)
+				if (strcmp(item->Label(), size) == 0)
 					item->SetMarked(true);
 			}
 
-			font.SetSize(size);
+			font.SetSize(atoi(size));
 			view->SetTermFont(&font);
-			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE, (int32)size);
+			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE, (int32)atoi(size));
 
 			_ResizeView(view);
 			break;
@@ -1639,7 +1649,7 @@ TermWindow::_MakeFontSizeMenu(uint32 command, uint8 defaultSize)
 		BString string;
 		string << sizes[i];
 		BMessage* message = new BMessage(command);
-		message->AddInt32("font_size", sizes[i]);
+		message->AddString("font_size", string);
 		BMenuItem* item = new BMenuItem(string.String(), message);
 		menu->AddItem(item);
 		if (sizes[i] == defaultSize) {
@@ -1654,7 +1664,7 @@ TermWindow::_MakeFontSizeMenu(uint32 command, uint8 defaultSize)
 				BString string;
 				string << defaultSize;
 				BMessage* message = new BMessage(command);
-				message->AddInt32("font_size", sizes[i]);
+				message->AddString("font_size", string);
 				BMenuItem* item = new BMenuItem(string.String(), message);
 				item->SetMarked(true);
 				menu->AddItem(item, i);
