@@ -62,8 +62,11 @@ private:
 	static	BMenu*				_MakeFontMenu(uint32 command,
 									const char* defaultFamily,
 									const char* defaultStyle);
-	static	BMenu*				_MakeFontSizeMenu(uint32 command,
-									uint8 defaultSize);
+	static	BMenu*				_MakeFontSizeMenu(const char* label,
+									uint32 command,
+									const char* family,
+									const char* style,
+									const char* size);
 
 	static	BPopUpMenu*			_MakeMenu(uint32 msg, const char** items,
 										const char* defaultItem);
@@ -72,10 +75,12 @@ private:
 									const color_scheme** schemes,
 									const color_scheme* defaultItemName);
 
+			void				_MarkSelectedFont(const char* family,
+									const char* style, const char* size);
+
 			BCheckBox*			fBlinkCursor;
 			BCheckBox*			fWarnOnExit;
-			BMenuField*			fFont;
-			BMenuField*			fFontSize;
+			BMenuField*			fFontField;
 
 			BMenuField*			fColorSchemeField;
 			BMenuField*			fColorField;

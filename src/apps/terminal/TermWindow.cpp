@@ -803,7 +803,7 @@ TermWindow::MessageReceived(BMessage *message)
 			view->GetTermFont(&font);
 
 			int32 size;
-			if (message->FindInt32("font size", &size) != B_OK)
+			if (message->FindInt32("font_size", &size) != B_OK)
 				break;
 
 			// mark the font size menu item
@@ -1639,7 +1639,7 @@ TermWindow::_MakeFontSizeMenu(uint32 command, uint8 defaultSize)
 		BString string;
 		string << sizes[i];
 		BMessage* message = new BMessage(command);
-		message->AddInt32("font size", sizes[i]);
+		message->AddInt32("font_size", sizes[i]);
 		BMenuItem* item = new BMenuItem(string.String(), message);
 		menu->AddItem(item);
 		if (sizes[i] == defaultSize) {
@@ -1654,7 +1654,7 @@ TermWindow::_MakeFontSizeMenu(uint32 command, uint8 defaultSize)
 				BString string;
 				string << defaultSize;
 				BMessage* message = new BMessage(command);
-				message->AddInt32("font size", sizes[i]);
+				message->AddInt32("font_size", sizes[i]);
 				BMenuItem* item = new BMenuItem(string.String(), message);
 				item->SetMarked(true);
 				menu->AddItem(item, i);
