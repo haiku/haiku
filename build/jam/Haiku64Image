@@ -47,8 +47,8 @@ SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
 
 SYSTEM_DEMOS = Sudoku ;
 
-SYSTEM_LIBS = libbe.so libbnetapi.so libdebug.so libmedia.so libnetwork.so
-	<revisioned>libroot.so libroot-addon-icu.so
+SYSTEM_LIBS = libbe.so libbsd.so libbnetapi.so libdebug.so libmedia.so
+	libnetwork.so <revisioned>libroot.so libroot-addon-icu.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ;
