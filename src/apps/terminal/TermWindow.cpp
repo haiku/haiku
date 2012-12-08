@@ -59,6 +59,9 @@
 const static int32 kMaxTabs = 6;
 const static int32 kTermViewOffset = 3;
 
+const static int32 kMinimumFontSize = 8;
+const static int32 kMaximumFontSize = 36;
+
 // messages constants
 static const uint32 kNewTab = 'NTab';
 static const uint32 kCloseView = 'ClVw';
@@ -403,8 +406,8 @@ TermWindow::MenusBeginning()
 
 	float size = font.Size();
 
-	fDecreaseFontSizeMenuItem->SetEnabled(size > 9);
-	fIncreaseFontSizeMenuItem->SetEnabled(size < 18);
+	fDecreaseFontSizeMenuItem->SetEnabled(size > kMinimumFontSize);
+	fIncreaseFontSizeMenuItem->SetEnabled(size < kMaximumFontSize);
 
 	BWindow::MenusBeginning();
 }
@@ -1011,16 +1014,27 @@ TermWindow::MessageReceived(BMessage *message)
 			_ActiveTermView()->GetTermFont(&font);
 			float size = font.Size();
 
-			if (message->what == kIncreaseFontSize)
-				size < 12 ? size += 1 : size += 2;
-			else
-				size < 14 ? size -= 1 : size -= 2;
+			if (message->what == kIncreaseFontSize) {
+				if (size < 12)
+					size += 1;
+				else if (size < 24)
+					size += 2;
+				else
+					size += 4;
+			} else {
+				if (size <= 12)
+					size -= 1;
+				else if (size <= 24)
+					size -= 2;
+				else
+					size -= 4;
+			}
 
 			// constrain the font size
-			if (size < 9)
-				size = 9;
-			if (size > 18)
-				size = 18;
+			if (size < kMinimumFontSize)
+				size = kMinimumFontSize;
+			if (size > kMaximumFontSize)
+				size = kMaximumFontSize;
 
 			// mark the font size menu item
 			for (int32 i = 0; i < fFontSizeMenu->CountItems(); i++) {
@@ -1655,7 +1669,9 @@ TermWindow::_MakeFontSizeMenu(uint32 command, uint8 defaultSize)
 	if (menu == NULL)
 		return NULL;
 
-	int32 sizes[] = {9, 10, 11, 12, 14, 16, 18, 0};
+	int32 sizes[] = {
+		8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 0
+	};
 
 	bool found = false;
 
