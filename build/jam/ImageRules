@@ -160,6 +160,8 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 		: $(directoryTokens) ] ;
 	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
 
+	targets = [ FFilterByBuildFeatures $(targets) ] ;
+
 	# If the image shall only be updated, we filter out all targets not marked
 	# accordingly.
 	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
@@ -303,6 +305,8 @@ rule AddDriversToContainer container : relativeDirectoryTokens : targets
 	local directoryTokens = system add-ons kernel drivers dev
 		$(relativeDirectoryTokens) ;
 
+	targets = [ FFilterByBuildFeatures $(targets) ] ;
+
 	AddFilesToContainer $(container) : system add-ons kernel drivers bin
 		: $(targets) ;
 
@@ -335,6 +339,8 @@ rule AddNewDriversToContainer container : relativeDirectoryTokens
 	local directoryTokens = system add-ons kernel drivers
 		$(relativeDirectoryTokens) ;
 
+	targets = [ FFilterByBuildFeatures $(targets) ] ;
+
 	AddFilesToContainer $(container) : $(directoryTokens)
 		: $(targets) ;
 }
@@ -349,6 +355,8 @@ rule AddBootModuleSymlinksToContainer container : targets
 		&& ! [ IncludeAllTargetsInContainer $(container) ] {
 		return ;
 	}
+
+	targets = [ FFilterByBuildFeatures $(targets) ] ;
 
 	# add the symlinks
 	local installTargetsVar
@@ -1271,6 +1279,8 @@ rule AddLibrariesToHaikuHybridImage directory : libs
 	#
 	# Installs libraries with the appropriate links onto the image.
 	#
+
+	libs = [ FFilterByBuildFeatures $(libs) ] ;
 
 	local lib ;
 	for lib in $(libs) {
