@@ -1,8 +1,8 @@
 /*
   This file contains the code that will create a file system, mount
   a file system and unmount a file system.
-  
-  THIS CODE COPYRIGHT DOMINIC GIAMPAOLO.  NO WARRANTY IS EXPRESSED 
+
+  THIS CODE COPYRIGHT DOMINIC GIAMPAOLO.  NO WARRANTY IS EXPRESSED
   OR IMPLIED.  YOU MAY USE THIS CODE AND FREELY DISTRIBUTE IT FOR
   NON-COMMERCIAL USE AS LONG AS THIS NOTICE REMAINS ATTACHED.
 
@@ -62,7 +62,7 @@ myfs_create_fs(char *device, char *name, int block_size, char *opts)
         printf("block_size %d is not a power of two!\n", block_size);
         return NULL;
     }
-        
+
 
     myfs = (myfs_info *)calloc(1, sizeof(myfs_info));
     if (myfs == NULL) {
@@ -73,7 +73,7 @@ myfs_create_fs(char *device, char *name, int block_size, char *opts)
     myfs->fd = -1;
 
     myfs->nsid = (nspace_id)myfs;   /* we can only do this when creating */
-    
+
     myfs->dsb.magic1 = SUPER_BLOCK_MAGIC1;
     myfs->dsb.magic2 = SUPER_BLOCK_MAGIC2;
     myfs->dsb.magic3 = SUPER_BLOCK_MAGIC3;
@@ -84,7 +84,7 @@ myfs_create_fs(char *device, char *name, int block_size, char *opts)
         printf("can't create semaphore!\n");
         goto cleanup;
     }
-        
+
 
     myfs->fd = open(device, O_RDWR);
     if (myfs->fd < 0) {
@@ -126,7 +126,7 @@ myfs_create_fs(char *device, char *name, int block_size, char *opts)
         printf("create storage map failed\n");
         goto cleanup;
     }
-    
+
     if (myfs_create_inodes(myfs) != 0) {
         printf("create inodes failed\n");
         goto cleanup;
@@ -150,7 +150,7 @@ myfs_create_fs(char *device, char *name, int block_size, char *opts)
         printf("creating superblock failed\n");
         goto cleanup;
     }
-    
+
     return myfs;
 
 
@@ -174,7 +174,7 @@ cleanup:
         delete_sem(myfs->sem);
 
         free(myfs);
-    }   
+    }
 
     return NULL;
 
@@ -191,13 +191,13 @@ super_block_is_sane(myfs_info *myfs)
         myfs->dsb.magic2 != SUPER_BLOCK_MAGIC2 ||
         myfs->dsb.magic3 != SUPER_BLOCK_MAGIC3) {
 
-        printf("warning: super block magic numbers are wrong:\n");
+        printf("warning: superblock magic numbers are wrong:\n");
         printf("0x%x (0x%x) 0x%x (0x%x) 0x%x (0x%x)\n",
                myfs->dsb.magic1, SUPER_BLOCK_MAGIC1,
                myfs->dsb.magic2, SUPER_BLOCK_MAGIC2,
                myfs->dsb.magic3, SUPER_BLOCK_MAGIC3);
         return 0;
-        
+
     }
 
     if ((myfs->dsb.block_size % myfs->dev_block_size) != 0) {
@@ -214,7 +214,7 @@ super_block_is_sane(myfs_info *myfs)
         return 0;
     }
 
-    /* make sure that the partition is as big as the super block
+    /* make sure that the partition is as big as the superblock
        says it is */
     num_dev_blocks = get_num_device_blocks(myfs->fd);
     if (myfs->dsb.num_blocks * myfs->dsb.block_size >
@@ -227,7 +227,7 @@ super_block_is_sane(myfs_info *myfs)
 
     if (myfs->dsb.block_size != (1 << myfs->dsb.block_shift)) {
         int i;
-        
+
         printf("warning: block_shift %d does not match block size %d\n",
                myfs->dsb.block_shift, myfs->dsb.block_size);
 
@@ -279,7 +279,7 @@ myfs_mount(nspace_id nsid, const char *device, ulong flags,
         ret = ENOMEM;
         goto error0;
     }
-    
+
     myfs->fd = open(device, oflags);
     if (myfs->fd < 0) {
         printf("could not open %s to try and mount a myfs\n", device);
@@ -288,13 +288,13 @@ myfs_mount(nspace_id nsid, const char *device, ulong flags,
     }
 
     if (read_super_block(myfs) != 0) {
-        printf("could not read super block on device %s\n", device);
+        printf("could not read superblock on device %s\n", device);
         ret = EBADF;
         goto error2;
     }
-        
+
     if (super_block_is_sane(myfs) == 0) {
-        printf("bad super block\n");
+        printf("bad superblock\n");
         ret = EBADF;
         goto error2;
     }
@@ -377,15 +377,15 @@ myfs_mount(nspace_id nsid, const char *device, ulong flags,
 /*
    note that the order in which things are done here is *very*
    important. don't mess with it unless you know what you're doing
-*/   
+*/
 int
 myfs_unmount(void *ns)
 {
     myfs_info *myfs = (myfs_info *)ns;
-    
+
     if (myfs == NULL)
         return EINVAL;
-    
+
     sync_journal(myfs);
 
     myfs_shutdown_storage_map(myfs);
@@ -405,7 +405,7 @@ myfs_unmount(void *ns)
     shutdown_tmp_blocks(myfs);
 
     close(myfs->fd);
-    
+
     if (myfs->sem > 0)
         delete_sem(myfs->sem);
 

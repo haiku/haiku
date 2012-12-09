@@ -3,7 +3,7 @@
  * This file may be used under the terms of the MIT License.
  */
 
-//! super block, mounting, etc.
+//! superblock, mounting, etc.
 
 
 #include "Debug.h"
@@ -73,7 +73,7 @@ DeviceOpener::~DeviceOpener()
 }
 
 
-int 
+int
 DeviceOpener::Open(const char *device, int mode)
 {
 	fDevice = open(device, mode);
@@ -93,7 +93,7 @@ DeviceOpener::InitCache(off_t numBlocks)
 }
 
 
-void 
+void
 DeviceOpener::RemoveCache(int mode)
 {
 	if (!fCached)
@@ -104,7 +104,7 @@ DeviceOpener::RemoveCache(int mode)
 }
 
 
-void 
+void
 DeviceOpener::Keep()
 {
 	fDevice = -1;
@@ -115,7 +115,7 @@ DeviceOpener::Keep()
  *	to compute the size, or fstat() if that failed.
  */
 
-status_t 
+status_t
 DeviceOpener::GetSize(off_t *_size, uint32 *_blockSize)
 {
 	device_geometry geometry;
@@ -257,7 +257,7 @@ Volume::IsValidSuperBlock()
 }
 
 
-void 
+void
 Volume::Panic()
 {
 	FATAL(("we have to panic... switch to read-only mode!\n"));
@@ -313,13 +313,13 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	}
 #endif
 
-	// read the super block
+	// read the superblock
 	if (Identify(fDevice, &fSuperBlock) != B_OK) {
-		FATAL(("invalid super block!\n"));
+		FATAL(("invalid superblock!\n"));
 		return B_BAD_VALUE;
 	}
 
-	// initialize short hands to the super block (to save byte swapping)
+	// initialize short hands to the superblock (to save byte swapping)
 	fBlockSize = fSuperBlock.BlockSize();
 	fBlockShift = fSuperBlock.BlockShift();
 	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();
@@ -409,7 +409,7 @@ Volume::Unmount()
 }
 
 
-status_t 
+status_t
 Volume::Sync()
 {
 	return fJournal->FlushLogAndBlocks();
@@ -431,7 +431,7 @@ Volume::ValidateBlockRun(block_run run)
 }
 
 
-block_run 
+block_run
 Volume::ToBlockRun(off_t block) const
 {
 	block_run run;
@@ -456,14 +456,14 @@ Volume::CreateIndicesRoot(Transaction *transaction)
 }
 
 
-status_t 
+status_t
 Volume::AllocateForInode(Transaction *transaction, const Inode *parent, mode_t type, block_run &run)
 {
 	return fBlockAllocator.AllocateForInode(transaction, &parent->BlockRun(), type, run);
 }
 
 
-status_t 
+status_t
 Volume::WriteSuperBlock()
 {
 	if (write_pos(fDevice, 512, &fSuperBlock, sizeof(disk_super_block)) != sizeof(disk_super_block))
@@ -494,7 +494,7 @@ Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type, const
  *	the queries - it wouldn't safe you anything in this case.
  */
 
-bool 
+bool
 Volume::CheckForLiveQuery(const char *attribute)
 {
 	// ToDo: check for a live query that depends on the specified attribute
@@ -502,7 +502,7 @@ Volume::CheckForLiveQuery(const char *attribute)
 }
 
 
-void 
+void
 Volume::AddQuery(Query *query)
 {
 	if (fQueryLock.Lock() < B_OK)
@@ -514,7 +514,7 @@ Volume::AddQuery(Query *query)
 }
 
 
-void 
+void
 Volume::RemoveQuery(Query *query)
 {
 	if (fQueryLock.Lock() < B_OK)
@@ -537,7 +537,7 @@ Volume::Identify(int fd, disk_super_block *superBlock)
 	if (read_pos(fd, 0, buffer, sizeof(buffer)) != sizeof(buffer))
 		return B_IO_ERROR;
 
-	// Note: that does work only for x86, for PowerPC, the super block
+	// Note: that does work only for x86, for PowerPC, the superblock
 	// may be located at offset 0!
 	memcpy(superBlock, buffer + 512, sizeof(disk_super_block));
 	if (!superBlock->IsValid()) {
@@ -583,11 +583,11 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 
 	off_t numBlocks = deviceSize / blockSize;
 
-	// create valid super block
+	// create valid superblock
 
 	fSuperBlock.Initialize(name, numBlocks, blockSize);
-	
-	// initialize short hands to the super block (to save byte swapping)
+
+	// initialize short hands to the superblock (to save byte swapping)
 	fBlockSize = fSuperBlock.BlockSize();
 	fBlockShift = fSuperBlock.BlockShift();
 	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();

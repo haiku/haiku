@@ -2,7 +2,7 @@
  * Copyright (c) 2001-2008 pinc Software. All Rights Reserved.
  */
 
-//!	Handles BFS super block, disk access etc.
+//!	Handles BFS superblock, disk access etc.
 
 #include "Disk.h"
 #include "dump.h"
@@ -157,7 +157,7 @@ Disk::Disk(const char *deviceName, bool rawMode, off_t start, off_t stop)
 
 	if (fBufferedFile->ReadAt(512 + fRawDiskOffset, &fSuperBlock,
 			sizeof(disk_super_block)) < 1)
-		fprintf(stderr,"Disk: Could not read super block\n");
+		fprintf(stderr,"Disk: Could not read superblock\n");
 
 	//dump_super_block(&fSuperBlock);
 }
@@ -277,21 +277,21 @@ Disk::ScanForSuperBlock(off_t start, off_t stop)
 				printf("\n(%ld) *** BFS superblock found at: %Ld\n",superBlocks.CountItems() + 1,offset);
 				dump_super_block(super);
 
-				// add a copy of the super block to the list
+				// add a copy of the superblock to the list
 				bfs_disk_info *info = (bfs_disk_info *)malloc(sizeof(bfs_disk_info));
 				if (info == NULL)
 					return B_NO_MEMORY;
 
 				memcpy(&info->super_block, super, sizeof(disk_super_block));
 				info->offset = offset + i - 512;
-					/* location off the BFS super block is 512 bytes after the partition start */
+					/* location off the BFS superblock is 512 bytes after the partition start */
 				superBlocks.AddItem(info);
 			}
 		}
 	}
 
 	if (superBlocks.CountItems() == 0) {
-		puts("\nCouldn't find any BFS super blocks!");
+		puts("\nCouldn't find any BFS superblocks!");
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -411,7 +411,7 @@ Disk::RecreateSuperBlock()
 	bfs_inode indexDir;
 	bfs_inode rootDir;
 	if (ScanForIndexAndRoot(&indexDir,&rootDir) < B_OK) {
-		fprintf(stderr,"ERROR: Could not find root directory! Trying to recreate the super block will have no effect!\n\tSetting standard values for the root dir.\n");
+		fprintf(stderr,"ERROR: Could not find root directory! Trying to recreate the superblock will have no effect!\n\tSetting standard values for the root dir.\n");
 		rootDir.inode_num.allocation_group = 8;
 		rootDir.inode_num.start = 0;
 		rootDir.inode_num.length = 1;

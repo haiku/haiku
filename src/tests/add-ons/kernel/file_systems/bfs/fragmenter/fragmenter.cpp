@@ -90,7 +90,7 @@ count_bits(int value)
 			count++;
 		value >>= 1;
 	}
-	
+
 	return count;
 }
 
@@ -102,7 +102,7 @@ main(int argc, const char *const *argv)
 		exit(1);
 	}
 
-	const char *fileName = argv[1];	
+	const char *fileName = argv[1];
 	const char *patternString = (argc >= 3 ? argv[2] : "0f");
 
 	// skip leading "0x" in the pattern string
@@ -151,12 +151,12 @@ main(int argc, const char *const *argv)
 		exit(1);
 	}
 
-	// read super block
+	// read superblock
 	disk_super_block superBlock;
 	read_from(fd, 512, &superBlock, sizeof(superBlock));
 
 	if (superBlock.magic1 != SUPER_BLOCK_MAGIC1) {
-		fprintf(stderr, "Error: Bad super block magic. This is probably not a "
+		fprintf(stderr, "Error: Bad superblock magic. This is probably not a "
 			"BFS image.\n");
 		exit(1);
 	}
@@ -172,12 +172,12 @@ main(int argc, const char *const *argv)
 	int64 blockCount = st.st_size / blockSize;
 	if (blockCount != superBlock.num_blocks) {
 		fprintf(stderr, "Error: Number of blocks in image and the number in "
-			"the super block differ: %lld vs. %lld\n", blockCount,
+			"the superblock differ: %lld vs. %lld\n", blockCount,
 			superBlock.num_blocks);
 		exit(1);
 	}
-	
-	
+
+
 	// iterate through the block bitmap blocks and or the bytes with 0x0f
 	uint8 *block = new uint8[blockSize];
 	int64 occupiedBlocks = 0;
@@ -206,10 +206,10 @@ main(int argc, const char *const *argv)
 
 	printf("bfs_fragmenter: marked %lld blocks used\n", occupiedBlocks);
 
-	// write back the super block
+	// write back the superblock
 	superBlock.used_blocks += occupiedBlocks;
 	write_to(fd, 512, &superBlock, sizeof(superBlock));
-		
+
 	return 0;
 }
 

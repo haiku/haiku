@@ -52,10 +52,10 @@ class BlockRunHashtable : public Hashtable
 				return false;
 
 			memcpy(value,&run,sizeof(block_run));
-			
+
 			if (Hashtable::Put(value,value))
 				return true;
-			
+
 			free(value);
 			return false;
 		}
@@ -133,7 +133,7 @@ collectFiles(Disk &disk)
 		return;
 	}
 	collectFiles(disk,root);
-	
+
 	printf("  %7Ld files found.\n",gCount);
 
 	delete root;
@@ -201,7 +201,7 @@ checkFiles(Disk &disk,BPlusTree &tree,char *attribute)
 	{
 		runs[index++] = *run;
 	}
-	
+
 	// sort array to speed up disk access
 	qsort(runs,index,sizeof(block_run),(int (*)(const void *,const void *))compareBlockRuns);
 
@@ -227,7 +227,7 @@ checkFiles(Disk &disk,BPlusTree &tree,char *attribute)
 			delete inode;
 			continue;
 		}
-		
+
 		// check indices not based on standard attributes
 		if (sizeIndex)
 		{
@@ -422,7 +422,7 @@ main(int argc,char **argv)
 		printUsage(toolName);
 		return -1;
 	}
-	
+
 	while (*++argv)
 	{
 		char *arg = *argv;
@@ -447,7 +447,7 @@ main(int argc,char **argv)
 		else
 			break;
 	}
-	
+
 	char *attribute = argv[0];
 	if (!gCheckAll && attribute == NULL)
 	{
@@ -476,13 +476,13 @@ main(int argc,char **argv)
 		fprintf(stderr,"Could not open device or file \"%s\": %s\n",info.device_name,strerror(status));
 		return -1;
 	}
-	
+
 	if (disk.ValidateSuperBlock() < B_OK)
 	{
-		fprintf(stderr,"The disk's super block is corrupt!\n");
+		fprintf(stderr,"The disk's superblock is corrupt!\n");
 		return -1;
 	}
-	
+
 	Directory *indices = (Directory *)Inode::Factory(&disk,disk.Indices());
 	if (indices == NULL || (status = indices->InitCheck()) < B_OK)
 	{
@@ -497,7 +497,7 @@ main(int argc,char **argv)
 		delete indices;
 		return -1;
 	}
-	
+
 	block_run run;
 
 	if (gCheckAll)
@@ -515,7 +515,7 @@ main(int argc,char **argv)
 		fprintf(stderr,"  Could not find index directory for \"%s\"!\n",attribute);
 
 	delete indices;
-	
+
 	gHashtable.MakeEmpty(HASH_EMPTY_NONE,HASH_EMPTY_FREE);
 
 	return 0;
