@@ -417,3 +417,166 @@ rule DefineBuildProfile name : type : path {
 
 	return 1 ;
 }
+
+
+# pragma mark - Build Features
+
+
+rule FIsBuildFeatureEnabled feature
+{
+	# FIsBuildFeatureEnabled <feature> ;
+	# Returns whether the given build feature <feature> is enabled (if so: "1",
+	# if not: empty list).
+	#
+	# <feature> - The name of the build feature (all lower case).
+
+	if $(feature) in $(HAIKU_BUILD_FEATURES) {
+		return 1 ;
+	}
+
+	return ;
+}
+
+
+rule FMatchesBuildFeatures specification
+{
+	# FMatchesBuildFeatures <specification> ;
+	# Returns whether the given build feature specification <specification>
+	# holds. <specification> consists of positive and negative build feature
+	# conditions. Conditions can be individual list elements and multiple
+	# conditions can be joined, separated by ",", in a single list element. The
+	# effect is the same; they are considered as single set of conditions.
+	# A positive condition does not start with a "!". It holds when the build
+	# feature named by the element is enabled.
+	# A negative condition starts with a "!". It holds when the build feature
+	# named by the string resulting from removing the leading "!" is not
+	# enabled.
+	# <specification> holds when it is not empty and
+	# * none of the negative conditions it contains hold and
+	# * if it contains any positive conditions, at least one one of them holds.
+	#
+	# <specification> - The build feature specification. A list of individual
+	#	conditions or conditions joined by ",".
+
+	local splitSpecification ;
+	local element ;
+	for element in $(specification) {
+		splitSpecification += [ FSplitString $(element) : "," ] ;
+	}
+	return [ FSetConditionsHold $(splitSpecification)
+		: $(HAIKU_BUILD_FEATURES) ] ;
+}
+
+
+rule FFilterByBuildFeatures list
+{
+	# FFilterByBuildFeatures <list> ;
+	# Filters the list annotated by build feature specifications and returns the
+	# resulting list. The list can be annotated in two different ways:
+	# * A single list element can be annotated by appending "@<specification>"
+	#   to it, with <specification> being a build feature specification (a
+	#   single comma-separated string). The element appears in the resulting
+	#   list, only if <specification> holds.
+	# * A sublist can be annotated by enclosing it in "<specification> @{" (two
+	#   separate list elements) and "}@", with <specification> being a build
+	#   feature specification (a single comma-separated string). The enclosed
+	#   sublist appears in the resulting list, only if <specification> holds.
+	# The sublist annotations can be nested. The annotations themselves don't
+	# appear in the resulting list.
+	#
+	# <list> - A list annotated with build feature specifications.
+
+	local filteredList ;
+
+	# Since we must look ahead one element to be able to decide whether an
+	# element is a regular list element or a features specification for a
+	# subsequent "@{". Hence we always process an element other than "@{" and
+	# "}@" in the next iteration. We append a dummy element to the list so we
+	# don't need special handling for the last element.
+	local evaluationStack = 1 ;
+	local previousElement ;
+	local element ;
+	for element in $(list) dummy {
+		local stackTop = $(evaluationStack[1]) ;
+		local processElement = $(previousElement) ;
+		switch $(element) {
+			case }@ :
+			{
+				# Pop the topmost specificaton off the stack.
+				evaluationStack = $(evaluationStack[2-]) ;
+				if ! $(evaluationStack) {
+					Exit "FFilterByBuildFeatures: Unbalanced @( in: " $(list) ;
+				}
+
+				processElement = $(previousElement) ;
+				previousElement = ;
+			}
+			case @{ :
+			{
+				if ! $(previousElement) {
+					Exit "FFilterByBuildFeatures: No feature specification"
+						"after )@ in: " $(list) ;
+				}
+
+				if $(evaluationStack[1]) = 1
+					&& [ FMatchesBuildFeatures $(previousElement) ] {
+					evaluationStack = 1 $(evaluationStack) ;
+				} else {
+					evaluationStack = 0 $(evaluationStack) ;
+				}
+
+				processElement = ;
+				previousElement = ;
+			}
+			case * :
+			{
+				processElement = $(previousElement) ;
+				previousElement = $(element) ;
+			}
+		}
+
+		if $(processElement) && $(stackTop) = 1 {
+			local splitElement = [ Match "(.*)@([^@]*)" : $(processElement) ] ;
+			if $(splitElement) {
+				if [ FMatchesBuildFeatures $(splitElement[2]) ] {
+					filteredList += $(splitElement[1]) ;
+				}
+			} else {
+				filteredList += $(processElement) ;
+			}
+		}
+	}
+
+	if $(evaluationStack[2-]) {
+		Exit "FFilterByBuildFeatures: Unbalanced )@ in: " $(list) ;
+	}
+
+	return $(filteredList) ;
+}
+
+
+rule EnableBuildFeatures features : specification
+{
+	# EnableBuildFeatures <features> : <specification> ;
+	# Enables the build features <features>, if the build features specification
+	# <specification> holds. If <specification> is omitted, the features are
+	# enabled unconditionally.
+	# The rule enables a build feature by adding its given lower case name to
+	# the build variable HAIKU_BUILD_FEATURES and defining a build variable
+	# HAIKU_BUILD_FEATURE_<FEATURE>_ENABLED (<FEATURE> being the upper case name
+	# of the build feature) to "1".
+	#
+	# <features> - A list of build feature names (lower case).
+	# <specification> - An optional build features specification (cf.
+	#	FMatchesBuildFeatures).
+
+	if ! $(specification)
+		|| [ FMatchesBuildFeatures $(specification)
+			: $(HAIKU_BUILD_FEATURES) ] {
+		local feature ;
+		for feature in $(features) {
+			HAIKU_BUILD_FEATURES += $(feature) ;
+			HAIKU_BUILD_FEATURE_$(feature:U)_ENABLED = 1 ;
+		}
+	}
+}
