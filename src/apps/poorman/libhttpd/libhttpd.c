@@ -2713,6 +2713,7 @@ ls( httpd_conn* hc )
 	send_mime(
 	    hc, 200, ok200title, "", "", "text/html; charset=%s", (off_t) -1,
 	    hc->sb.st_mtime );
+	free(de);
 	}
     else if ( hc->method == METHOD_GET )
 	{
@@ -2947,7 +2948,6 @@ ls( httpd_conn* hc )
 	free(de);
 	return -1;
 	}
-	free(de);
 	return 0;
     }
 
