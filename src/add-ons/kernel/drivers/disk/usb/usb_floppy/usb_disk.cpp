@@ -484,14 +484,30 @@ usb_disk_inquiry(device_lun *lun)
 		return result;
 	}
 
-	TRACE("peripherial_device_type  0x%02x\n", parameter.peripherial_device_type);
-	TRACE("peripherial_qualifier    0x%02x\n", parameter.peripherial_qualifier);
-	TRACE("removable_medium         %s\n", parameter.removable_medium ? "yes" : "no");
+	TRACE("peripherial_device_type  0x%02x\n",
+		parameter.peripherial_device_type);
+	TRACE("peripherial_qualifier    0x%02x\n",
+		parameter.peripherial_qualifier);
+	TRACE("removable_medium         %s\n",
+		parameter.removable_medium ? "yes" : "no");
 	TRACE("version                  0x%02x\n", parameter.version);
 	TRACE("response_data_format     0x%02x\n", parameter.response_data_format);
-	TRACE_ALWAYS("vendor_identification    \"%.8s\"\n", parameter.vendor_identification);
-	TRACE_ALWAYS("product_identification   \"%.16s\"\n", parameter.product_identification);
-	TRACE_ALWAYS("product_revision_level   \"%.4s\"\n", parameter.product_revision_level);
+	TRACE_ALWAYS("vendor_identification    \"%.8s\"\n",
+		parameter.vendor_identification);
+	TRACE_ALWAYS("product_identification   \"%.16s\"\n",
+		parameter.product_identification);
+	TRACE_ALWAYS("product_revision_level   \"%.4s\"\n",
+		parameter.product_revision_level);
+
+	memcpy(lun->vendor_name, parameter.vendor_identification,
+		MIN(sizeof(lun->vendor_name), sizeof(parameter.vendor_identification)));
+	memcpy(lun->product_name, parameter.product_identification,
+		MIN(sizeof(lun->product_name),
+			sizeof(parameter.product_identification)));
+	memcpy(lun->product_revision, parameter.product_revision_level,
+		MIN(sizeof(lun->product_revision),
+			sizeof(parameter.product_revision_level)));
+
 	lun->device_type = parameter.peripherial_device_type; /* 1:1 mapping */
 	lun->removable = (parameter.removable_medium == 1);
 	return B_OK;
@@ -992,6 +1008,27 @@ usb_disk_free(void *cookie)
 }
 
 
+static inline void
+normalize_name(char *name, size_t nameLength)
+{
+	bool wasSpace = false;
+	size_t insertIndex = 0;
+	for (size_t i = 0; i < nameLength; i++) {
+		bool isSpace = name[i] == ' ';
+		if (isSpace && wasSpace)
+			continue;
+
+		name[insertIndex++] = name[i];
+		wasSpace = isSpace;
+	}
+
+	if (insertIndex > 0 && name[insertIndex - 1] == ' ')
+		insertIndex--;
+
+	name[insertIndex] = 0;
+}
+
+
 static status_t
 usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
@@ -1005,6 +1042,19 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 	status_t result = B_DEV_INVALID_IOCTL;
 	switch (op) {
+		case B_GET_DEVICE_SIZE: {
+			if (lun->media_changed) {
+				result = usb_disk_update_capacity(lun);
+				if (result != B_OK)
+					break;
+			}
+
+			size_t size = lun->block_size * lun->block_count;
+			result = user_memcpy(buffer, &size, sizeof(size));
+
+			break;
+		}
+		
 		case B_GET_MEDIA_STATUS: {
 			*(status_t *)buffer = usb_disk_test_unit_ready(lun);
 			TRACE("B_GET_MEDIA_STATUS: 0x%08lx\n", *(status_t *)buffer);
@@ -1098,6 +1148,25 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 			iconData.icon_size = sizeof(kDeviceIcon);
 			result = user_memcpy(buffer, &iconData, sizeof(device_icon));
+			break;
+		}
+
+		case B_GET_DEVICE_NAME:
+		{
+			size_t nameLength = sizeof(lun->vendor_name)
+				+ sizeof(lun->product_name) + sizeof(lun->product_revision) + 3;
+
+			char name[nameLength];
+			snprintf(name, nameLength, "%.8s %.16s %.4s", lun->vendor_name,
+				lun->product_name, lun->product_revision);
+
+			normalize_name(name, nameLength);
+
+			result = user_strlcpy((char *)buffer, name, length);
+			if (result > 0)
+				result = B_OK;
+
+			TRACE_ALWAYS("got device name: \"%s\" = %s\n", name, strerror(result));
 			break;
 		}
 #endif

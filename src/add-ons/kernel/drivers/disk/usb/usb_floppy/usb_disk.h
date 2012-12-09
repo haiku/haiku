@@ -78,6 +78,10 @@ struct device_lun_s {
 	uint8		device_type;
 	bool		removable;
 	bool		write_protected;
+
+	char		vendor_name[8];
+	char		product_name[16];
+	char		product_revision[4];
 };
 
 
