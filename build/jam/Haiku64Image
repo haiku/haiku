@@ -5,19 +5,6 @@
 # This is only temporary while x86_64 is still a work in progress, so I can
 # easily add things to the image as I port them.
 
-local GPL_ONLY = ;
-if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
-	GPL_ONLY = "" ;
-}
-
-#HACK: remove when old ide code is removed!
-local ATA_ONLY = ;
-local IDE_ONLY = ;
-if $(HAIKU_ATA_STACK) = 1 {
-	ATA_ONLY = "" ;
-} else {
-	IDE_ONLY = "" ;
-}
 
 SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr checkfs
 	chgrp chmod chown chroot cksum clear clockconfig cmp collectcatkeys comm
@@ -85,8 +72,9 @@ SYSTEM_ADD_ONS_DRIVERS_NET = 3com atheros813x ar81xx attansic_l1 attansic_l2
 	via_rhine wb840
 ;
 
-SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci ps2 isa scsi config_manager
-	usb ;
+SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
+	ata@ata pci ps2 isa scsi config_manager usb
+] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 
 # modules
@@ -107,7 +95,7 @@ AddFilesToHaikuImage system add-ons kernel debugger
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
-	: $(ATA_ONLY)ata_adapter bios dpc locked_pool scsi_periph <module>tty ;
+	: ata_adapter@ata bios dpc locked_pool scsi_periph <module>tty ;
 AddFilesToHaikuImage system add-ons kernel partitioning_systems
 	: intel session ;
 
@@ -174,7 +162,7 @@ AddFilesToHaikuImage system bin			: install-wifi-firmwares.sh ;
 
 # Add the files to be used by installoptionalpackage.
 AddDirectoryToHaikuImage common data optional-packages ;
-local optional-pkg-files = OptionalBuildFeatures OptionalPackageDependencies
+local optional-pkg-files = BuildFeatures OptionalPackageDependencies
 	OptionalPackages OptionalLibPackages ;
 for name in $(optional-pkg-files) {
 	local file = [ FDirName $(HAIKU_TOP) build jam $(name) ] ;
@@ -358,7 +346,7 @@ AddFilesToHaikuImage system : haiku_loader ;
 
 # boot module links
 AddBootModuleSymlinksToHaikuImage
-	$(ATA_ONLY)ata pci config_manager dpc scsi usb $(ATA_ONLY)ata_adapter
+	ata@ata pci config_manager dpc scsi usb ata_adapter@ata
 	locked_pool scsi_periph ahci generic_ide_pci legacy_sata
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk

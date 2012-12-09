@@ -1,43 +1,28 @@
 # This file defines what ends up in the network boot archive and it executes the
 # rules building the archive.
 
-local X86_ONLY = ;
-local PPC_ONLY = ;
-if $(TARGET_ARCH) = x86 {
-	X86_ONLY = "" ;
-} else if $(TARGET_ARCH) = ppc {
-	X86_ONLY = ;
-}
-
-local GPL_ONLY = ;
-if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
-	GPL_ONLY = "" ;
-}
-
-#HACK: remove when old ide code is removed!
-local ATA_ONLY = ;
-local IDE_ONLY = ;
-if $(HAIKU_ATA_STACK) = 1 {
-	ATA_ONLY = "" ;
-} else {
-	IDE_ONLY = "" ;
-}
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
 SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame ;
 SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix ;
 
-SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
-	$(X86_ONLY)broadcom440x $(X86_ONLY)broadcom570x etherpci $(X86_ONLY)ipro1000
-	pegasus $(X86_ONLY)rtl8139 rtl8169 $(X86_ONLY)rtl81xx sis900
-	$(X86_ONLY)via_rhine wb840 $(X86_ONLY)ipro100 $(X86_ONLY)nforce
+SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
+	x86 @{
+		3com atheros813x
+		broadcom440x broadcom570x ipro1000
+		rtl8139 rtl81xx
+		via_rhine ipro100 nforce
+		marvell_yukon syskonnect
+		attansic_l2 ar81xx
+	}@ # x86
+
+	etherpci pegasus rtl8169 sis900 usb_ecm wb840
 	#vlance
-	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect
-	$(X86_ONLY)attansic_l2 $(X86_ONLY)ar81xx usb_ecm
-;
-SYSTEM_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa $(IDE_ONLY)ide $(ATA_ONLY)ata
+] ;
+SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
+	pci isa@x86 ide@ide ata@ata
 	scsi config_manager agp_gart
-;
+] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs fat iso9660 ;
 
 
@@ -45,20 +30,20 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs fat iso9660 ;
 AddFilesToNetBootArchive system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToNetBootArchive system add-ons kernel busses agp_gart
-	: $(X86_ONLY)<agp_gart>intel ;
+	: <agp_gart>intel@x86 ;
 AddFilesToNetBootArchive system add-ons kernel busses ide
-	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 ;
+	: generic_ide_pci ide_isa@x86 silicon_image_3112 ;
 AddFilesToNetBootArchive system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToNetBootArchive system add-ons kernel console : vga_text ;
 AddFilesToNetBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToNetBootArchive system add-ons kernel generic
-	: $(IDE_ONLY)ide_adapter $(ATA_ONLY)ata_adapter locked_pool scsi_periph ;
+	: ide_adapter@ide ata_adapter@ata locked_pool scsi_periph ;
 AddFilesToNetBootArchive system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToNetBootArchive system add-ons kernel interrupt_controllers
-	: $(PPC_ONLY)openpic ;
+	: openpic@ppc ;
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToNetBootArchive system add-ons kernel cpu : generic_x86 ;
@@ -96,12 +81,12 @@ AddFilesToNetBootArchive system add-ons kernel network protocols
 # boot module links
 AddBootModuleSymlinksToNetBootArchive
 	$(SYSTEM_ADD_ONS_BUS_MANAGERS)
-	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112
+	ahci generic_ide_pci ide_isa@x86 silicon_image_3112
 	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
-	$(IDE_ONLY)ide_adapter $(ATA_ONLY)ata_adapter locked_pool scsi_periph
+	ide_adapter@ide ata_adapter@ata locked_pool scsi_periph
 	intel session
-	$(PPC_ONLY)openpic
-	$(X86_ONLY)generic_x86
+	openpic@ppc
+	generic_x86@x86
 #	nbd
 	remote_disk
 	$(SYSTEM_ADD_ONS_DRIVERS_NET)

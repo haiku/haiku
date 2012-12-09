@@ -135,13 +135,13 @@ if $(HAIKU_ADD_OPTIONAL_PACKAGES) {
 }
 
 # Prepare the optional build features before parsing the Jamfile tree.
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalBuildFeatures ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatures ] ;
 
 # Include packages that are required by all images.
 AddOptionalHaikuImagePackages MandatoryPackages ;
 
 # If enabled, make sure that OpenSSL is added to the image.
-if $(HAIKU_OPENSSL_ENABLED) {
+if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
 	AddOptionalHaikuImagePackages OpenSSL ;
 }
 

@@ -1,6 +1,12 @@
-# This file contains setup for features that can optionally be used for the
-# build. For features that require downloading a zip file from somewhere it is
-# likely the same file use for an optional package.
+# This file contains setup for build features that are not available for all
+# architectures/setups or that are optional for the build. For features that
+# require downloading a zip file from somewhere it is likely the same file used
+# for an optional package.
+
+
+# Add the target architecture as a build feature.
+EnableBuildFeatures $(HAIKU_ARCH) ;
+
 
 # Detect a hybrid GCC2/GCC4 image and disable the checks for unavailable GCC4
 # packages. (It does not matter if a package was built with either compiler,
@@ -56,9 +62,10 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 			: extracted-openssl
 		] ;
 
-		HAIKU_OPENSSL_ENABLED = 1 ;
 		HAIKU_OPENSSL_HEADERS
 			= [ FDirName $(HAIKU_OPENSSL_DIR) common include ] ;
+
+		EnableBuildFeatures openssl ;
 	}
 }
 
@@ -72,7 +79,7 @@ HAIKU_ICU_PPC_PACKAGE = icu-4.8.1-ppc-2011-08-20.zip ;
 HAIKU_ICU_ARM_PACKAGE = icu-4.8.1.1-arm-2012-11-21.zip ;
 HAIKU_ICU_X86_64_PACKAGE = icu-4.8.1.1-x86_64-2012-07-30.zip ;
 
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = arm || $(TARGET_ARCH) = x86_64 {
+if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	local icu_package ;
 	if $(TARGET_ARCH) = ppc {
 		icu_package = $(HAIKU_ICU_PPC_PACKAGE) ;
@@ -140,6 +147,8 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = arm || $(TAR
 
 	HAIKU_ICU_HEADERS
 		= [ FDirName $(HAIKU_ICU_DEVEL_DIR) develop headers 3rdparty ] ;
+
+	EnableBuildFeatures icu ;
 } else  {
 	Echo "ICU not available for $(TARGET_ARCH)" ;
 }
@@ -184,6 +193,8 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 
 		HAIKU_CLUCENE_HEADERS
 			= [ FDirName $(HAIKU_CLUCENE_DIR) common include ] ;
+
+		EnableBuildFeatures clucene ;
 	}
 }
 
@@ -206,6 +217,8 @@ if $(TARGET_ARCH) = x86 {
 	HAIKU_GLU_LIBS = [ ExtractArchive $(HAIKU_GLU_DIR)
 		: system/lib/libGLU.a : $(zipFile) : extracted-glu ] ;
 	HAIKU_GLU_HEADERS = [ FDirName $(HAIKU_GLU_DIR) develop headers os opengl ] ;
+
+	EnableBuildFeatures glu ;
 } else {
 	Echo "GLU not yet available on $(TARGET_ARCH)" ;
 }
@@ -247,6 +260,7 @@ if $(TARGET_ARCH) = x86 {
 	Depends $(HAIKU_MESA_HEADERS_DEPENDENCY) : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
 	Depends $(HAIKU_MESA_LIBS) : $(HAIKU_GLU_LIBS) ;
 
+	EnableBuildFeatures mesa ;
 } else {
 	Echo "Mesa 3D rendering support not available on $(TARGET_ARCH)" ;
 }
@@ -369,6 +383,7 @@ if $(TARGET_ARCH) = x86 {
 	HAIKU_LIBOGG_HEADERS = [ FDirName $(HAIKU_LIBOGG_DIR) common include ] ;
 	HAIKU_LIBVPX_HEADERS = [ FDirName $(HAIKU_LIBVPX_DIR) common include ] ;
 
+	EnableBuildFeatures ffmpeg ;
 } else {
 	Echo "FFMpeg support not available on $(TARGET_ARCH)" ;
 }
@@ -401,6 +416,7 @@ if $(TARGET_ARCH) = x86 {
 
 	HAIKU_MIKMOD_HEADERS = [ FDirName $(HAIKU_MIKMOD_DIR) common include ] ;
 
+	EnableBuildFeatures mikmod ;
 } else {
 	Echo "MikMod support not available on $(TARGET_ARCH)" ;
 }
@@ -448,6 +464,8 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(
 	HAIKU_FREETYPE_HEADERS = [ FDirName $(HAIKU_FREETYPE_DIR) develop
 		headers 3rdparty ] [ FDirName $(HAIKU_FREETYPE_DIR) develop
 		headers 3rdparty freetype2 ] ;
+
+	EnableBuildFeatures freetype ;
 } else {
 	Echo "Freetype support not available on $(TARGET_ARCH)" ;
 }
@@ -492,6 +510,8 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 
 		HAIKU_TAGLIB_HEADERS
 			= [ FDirName $(HAIKU_TAGLIB_DIR) common include taglib ] ;
+
+		EnableBuildFeatures taglib ;
 	}
 }
 
@@ -535,6 +555,8 @@ if $(HAIKU_BUILD_FEATURE_WEBKIT) {
 		] ;
 
 		HAIKU_WEBKIT_HEADERS = [ FDirName $(HAIKU_WEBKIT_DIR) include ] ;
+
+		EnableBuildFeatures webkit ;
 	}
 }
 
@@ -578,13 +600,15 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(
 	HAIKU_LIBPNG_CURRENT_LINK = libpng15.so.15 ;
 
 	HAIKU_LIBPNG_HEADERS = [ FDirName $(HAIKU_LIBPNG_DIR) common include ] ;
+
+	EnableBuildFeatures libpng ;
 } else {
 	Echo "libpng support not available on $(TARGET_ARCH)" ;
 }
 
 # jpeg
 local jpegBaseURL = $(baseURL)/lib ;
-if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(TARGET_ARCH) = arm {
+if $(TARGET_ARCH) in arm ppc x86 x86_64 {
 	if $(TARGET_ARCH) = arm {
 		HAIKU_JPEG_FILE = jpeg-8d-arm-2012-11-21.zip ;
 	} else if $(TARGET_ARCH) = ppc {
@@ -622,6 +646,8 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(
 	HAIKU_JPEG_CURRENT_LINK = libjpeg.so.8 ;
 
 	HAIKU_JPEG_HEADERS = [ FDirName $(HAIKU_JPEG_DIR) common include ] ;
+
+	EnableBuildFeatures libjpeg ;
 } else {
 	Echo "jpeg support not available on $(TARGET_ARCH)" ;
 }
@@ -666,6 +692,23 @@ if $(TARGET_ARCH) = ppc || $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 || $(
 	HAIKU_ZLIB_CURRENT_LINK = libz.so.1 ;
 
 	HAIKU_ZLIB_HEADERS = [ FDirName $(HAIKU_ZLIB_DIR) common include ] ;
+
+	EnableBuildFeatures zlib ;
 } else {
 	Echo "zlib support not available on $(TARGET_ARCH)" ;
+}
+
+
+# GPL add-ons
+if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
+	EnableBuildFeatures gpl ;
+}
+
+
+# ATA vs. IDE
+#HACK: remove when old ide code is removed!
+if $(HAIKU_ATA_STACK) = 1 {
+	EnableBuildFeatures ata ;
+} else {
+	EnableBuildFeatures ide ;
 }

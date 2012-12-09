@@ -7,7 +7,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 
 local sslSources ;
-if $(HAIKU_OPENSSL_ENABLED) {
+if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
 	SubDirC++Flags -DOPENSSL_ENABLED ;
 	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
 	sslSources = SSL.cpp ;
