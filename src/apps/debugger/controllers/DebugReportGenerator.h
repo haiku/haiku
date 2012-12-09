@@ -14,8 +14,13 @@
 class entry_ref;
 class Architecture;
 class BString;
+class StackFrame;
 class Team;
 class Thread;
+class Value;
+class ValueNode;
+class ValueNodeChild;
+class ValueNodeManager;
 
 
 class DebugReportGenerator : public BLooper, public Team::Listener {
@@ -39,11 +44,20 @@ private:
 			status_t			_DumpRunningThreads(BString& output);
 			status_t			_DumpDebuggedThreadInfo(BString& output,
 									::Thread* thread);
+			status_t			_DumpValueNode(BString& output,
+									StackFrame* frame, ValueNodeChild* child,
+									bool recurse = true);
+
+			status_t			_ResolveLocationIfNeeded(ValueNodeChild* child,
+									StackFrame* frame);
+			status_t			_ResolveValueIfNeeded(ValueNode* node,
+									StackFrame* frame);
 
 private:
 			::Team*				fTeam;
 			Architecture*		fArchitecture;
 			sem_id				fTeamDataSem;
+			ValueNodeManager*	fNodeManager;
 };
 
 #endif // DEBUG_REPORT_GENERATOR_H

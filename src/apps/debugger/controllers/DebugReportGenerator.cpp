@@ -26,7 +26,13 @@
 #include "StringUtils.h"
 #include "Team.h"
 #include "Thread.h"
+#include "Type.h"
 #include "UiUtils.h"
+#include "Value.h"
+#include "ValueLoader.h"
+#include "ValueLocation.h"
+#include "ValueNode.h"
+#include "ValueNodeManager.h"
 
 
 DebugReportGenerator::DebugReportGenerator(::Team* team)
@@ -34,7 +40,8 @@ DebugReportGenerator::DebugReportGenerator(::Team* team)
 	BLooper("DebugReportGenerator"),
 	fTeam(team),
 	fArchitecture(team->GetArchitecture()),
-	fTeamDataSem(-1)
+	fTeamDataSem(-1),
+	fNodeManager(NULL)
 {
 	fTeam->AddListener(this);
 	fArchitecture->AcquireReference();
@@ -45,6 +52,8 @@ DebugReportGenerator::~DebugReportGenerator()
 {
 	fTeam->RemoveListener(this);
 	fArchitecture->ReleaseReference();
+	if (fNodeManager != NULL)
+		fNodeManager->ReleaseReference();
 }
 
 
@@ -54,6 +63,10 @@ DebugReportGenerator::Init()
 	fTeamDataSem = create_sem(0, "debug_controller_data_wait");
 	if (fTeamDataSem < B_OK)
 		return fTeamDataSem;
+
+	fNodeManager = new(std::nothrow) ValueNodeManager();
+	if (fNodeManager == NULL)
+		return B_NO_MEMORY;
 
 	Run();
 
@@ -285,6 +298,23 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 				sizeof(functionName)));
 
 		_output << data;
+		if (frame->CountParameters() == 0
+			&& frame->CountLocalVariables() == 0) {
+			continue;
+		}
+
+		_output << "\t\t\tVariables:\n";
+		status_t result = fNodeManager->SetStackFrame(thread, frame);
+		if (result != B_OK)
+			continue;
+
+		ValueNodeContainer* container = fNodeManager->GetContainer();
+		AutoLocker<ValueNodeContainer> containerLocker(container);
+		for (int32 i = 0; i < container->CountChildren(); i++) {
+			ValueNodeChild* child = container->ChildAt(i);
+			_DumpValueNode(_output, frame, child);
+		}
+		_output << "\n";
 	}
 
 	_output << "\n\t\tRegisters:\n";
@@ -303,4 +333,109 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 	}
 
 	return B_OK;
+}
+
+
+status_t
+DebugReportGenerator::_DumpValueNode(BString& _output, StackFrame* frame,
+	ValueNodeChild* child, bool recurse)
+{
+	status_t result = _ResolveLocationIfNeeded(child, frame);
+	if (result != B_OK)
+		return result;
+
+	_output << "\t\t\t";
+	if (!recurse)
+		_output << "\t";
+	_output << child->Name() << ": ";
+
+	ValueNode* node = child->Node();
+	if (node->LocationAndValueResolutionState() == VALUE_NODE_UNRESOLVED) {
+		if (_ResolveValueIfNeeded(node, frame) == B_OK) {
+			Value* value = node->GetValue();
+			if (value != NULL) {
+				BString valueData;
+				value->ToString(valueData);
+				_output << valueData;
+			} else
+				_output << "Unavailable";
+		} else
+			_output << "Unknown";
+	}
+	if (recurse && node->CountChildren() != 0)
+		_output << " {";
+
+	_output << "\n";
+
+	if (recurse) {
+		if (node->CountChildren() == 0)
+			return B_OK;
+
+		if (node->CountChildren() == 1
+			&& node->GetType()->Kind() == TYPE_ADDRESS
+			&& node->ChildAt(0)->GetType()->Kind() == TYPE_COMPOUND) {
+			// for the case of a pointer to a compound type,
+			// we want to hide the intervening compound node and print
+			// the children directly.
+			status_t result = fNodeManager->AddChildNodes(node->ChildAt(0));
+			if (result == B_OK) {
+				result = _ResolveLocationIfNeeded(node->ChildAt(0), frame);
+				if (result == B_OK) {
+					node = node->ChildAt(0)->Node();
+					// attempt to resolve the value here since the node's
+					// representation may requires its value to be resolved
+					// before its children can be created
+					result = _ResolveValueIfNeeded(node, frame);
+				}
+			}
+		}
+
+		for (int32 i = 0; i < node->CountChildren(); i++) {
+			if (fNodeManager->AddChildNodes(node->ChildAt(i)) != B_OK)
+				continue;
+
+			// don't dump compound nodes since we won't traverse into
+			// them anyways and their top level node has no interesting
+			// information.
+			if (node->ChildAt(i)->GetType()->Kind() != TYPE_COMPOUND)
+				_DumpValueNode(_output, frame, node->ChildAt(i), false);
+		}
+		_output << "\t\t\t}\n";
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame)
+{
+	ValueLocation* location = NULL;
+	Value* value = NULL;
+	ValueLoader loader(fTeam->GetArchitecture(), fTeam->GetTeamMemory(),
+		fTeam->GetTeamTypeInformation(), frame->GetCpuState());
+	status_t result = node->ResolvedLocationAndValue(&loader, location,
+		value);
+	node->SetLocationAndValue(location, value, result);
+	if (location != NULL)
+		location->ReleaseReference();
+	if (value != NULL)
+		value->ReleaseReference();
+
+	return result;
+}
+
+
+status_t
+DebugReportGenerator::_ResolveLocationIfNeeded(ValueNodeChild* child,
+	StackFrame* frame)
+{
+	ValueLocation* location = NULL;
+	ValueLoader loader(fTeam->GetArchitecture(), fTeam->GetTeamMemory(),
+		fTeam->GetTeamTypeInformation(), frame->GetCpuState());
+	status_t result = child->ResolveLocation(&loader, location);
+	child->SetLocation(location, result);
+	if (location != NULL)
+		location->ReleaseReference();
+	return result;
 }
