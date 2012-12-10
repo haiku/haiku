@@ -174,9 +174,10 @@ SoftwareRenderer::SwapBuffers(bool vsync)
 
 	// check the bitmap size still matches the size
 	if (fInfo->window_bounds.bottom - fInfo->window_bounds.top
-			!= fBitmap->Bounds().IntegerHeight() + 1
+			!= fBitmap->Bounds().IntegerHeight()
 			|| fInfo->window_bounds.right - fInfo->window_bounds.left
-			!= fBitmap->Bounds().IntegerWidth() + 1) {
+			!= fBitmap->Bounds().IntegerWidth()) {
+		ERROR("%s: Bitmap size doesn't match size!\n", __func__);
 		return;
 	}
 	uint8 bytesPerPixel = fInfo->bits_per_pixel / 8;
