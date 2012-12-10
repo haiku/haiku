@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2012, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,8 @@
  *		Philippe Saint-Pierre
  *		Jonas Sundström
  *		Ryan Leavengood
+ *		Vlad Slepukhin
+ *		Sarzhuk Zharski
  */
 
 
@@ -33,6 +35,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <NodeMonitor.h>
 #include <Path.h>
 #include <PrintJob.h>
 #include <Rect.h>
@@ -107,6 +110,8 @@ StyledEditWindow::~StyledEditWindow()
 void
 StyledEditWindow::Quit()
 {
+	_SwitchNodeMonitor(false);
+
 	_SaveAttrs();
 	if (StyledEditApp* app = dynamic_cast<StyledEditApp*>(be_app))
 		app->CloseDocument();
@@ -122,6 +127,9 @@ bool
 StyledEditWindow::QuitRequested()
 {
 	if (fClean)
+		return true;
+
+	if (fTextView->TextLength() == 0 && fSaveMessage == NULL)
 		return true;
 
 	BString alertText;
@@ -179,8 +187,8 @@ StyledEditWindow::MessageReceived(BMessage* message)
 				Quit();
 			break;
 
-		case MENU_REVERT:
-			_RevertToSaved();
+		case MENU_RELOAD:
+			_ReloadDocument(message);
 			break;
 
 		case MENU_CLOSE:
@@ -293,6 +301,10 @@ StyledEditWindow::MessageReceived(BMessage* message)
 				_ReplaceAll(fStringToFind, fReplaceString, fCaseSensitive);
 			break;
 		}
+
+		case B_NODE_MONITOR:
+			_HandleNodeMonitorEvent(message);
+			break;
 
 		// Font menu
 
@@ -485,12 +497,12 @@ StyledEditWindow::MessageReceived(BMessage* message)
 				fRedoFlag = false;
 			}
 			if (fClean) {
-				fRevertItem->SetEnabled(false);
 				fSaveItem->SetEnabled(fSaveMessage == NULL);
 			} else {
-				fRevertItem->SetEnabled(fSaveMessage != NULL);
 				fSaveItem->SetEnabled(true);
 			}
+			fReloadItem->SetEnabled(fSaveMessage != NULL);
+			fEncodingItem->SetEnabled(fSaveMessage != NULL);
 			break;
 
 		case SAVE_AS_ENCODING:
@@ -646,6 +658,21 @@ StyledEditWindow::MenusBeginning()
 			fAlignRight->SetMarked(true);
 			break;
 	}
+
+	// text encoding
+	const BCharacterSet* charset
+		= BCharacterSetRoster::GetCharacterSetByFontID(fTextView->GetEncoding());
+	BMenu* encodingMenu = fEncodingItem->Submenu();
+	if (charset != NULL && encodingMenu != NULL) {
+		const char* mime = charset->GetMIMEName();
+		BString name(charset->GetPrintName());
+		if (mime)
+			name << " (" << mime << ")";
+
+		BMenuItem* item = encodingMenu->FindItem(name);
+		if (item != NULL)
+			item->SetMarked(true);
+	}
 }
 
 
@@ -656,6 +683,8 @@ StyledEditWindow::MenusBeginning()
 status_t
 StyledEditWindow::Save(BMessage* message)
 {
+	_NodeMonitorSuspender nodeMonitorSuspender(this);
+
 	if (!message)
 		message = fSaveMessage;
 
@@ -722,10 +751,11 @@ StyledEditWindow::Save(BMessage* message)
 
 	// clear clean modes
 	fSaveItem->SetEnabled(false);
-	fRevertItem->SetEnabled(false);
 	fUndoCleans = false;
 	fRedoCleans = false;
 	fClean = true;
+	fNagOnNodeChange = true;
+
 	return status;
 }
 
@@ -811,6 +841,11 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 
 		_LoadAttrs();
 	}
+
+	_SwitchNodeMonitor(true, ref);
+
+	fReloadItem->SetEnabled(fSaveMessage != NULL);
+	fEncodingItem->SetEnabled(fSaveMessage != NULL);
 	fTextView->Select(0, 0);
 }
 
@@ -841,7 +876,7 @@ StyledEditWindow::Print(const char* documentName)
 		printJob.SetSettings(new BMessage(*fPrintSettings));
 
 	if (printJob.ConfigJob() != B_OK)
- 		return;
+		return;
 
 	delete fPrintSettings;
 	fPrintSettings = printJob.Settings();
@@ -890,7 +925,9 @@ StyledEditWindow::Print(const char* documentName)
 		while (printLine <= lastLine) {
 			float currentHeight = 0;
 			int32 firstLineOnPage = printLine;
-			while (currentHeight < printableRect.Height() && printLine <= lastLine) {
+			while (currentHeight < printableRect.Height()
+				&& printLine <= lastLine)
+			{
 				currentHeight += fTextView->LineHeight(printLine);
 				if (currentHeight < printableRect.Height())
 					printLine++;
@@ -993,6 +1030,8 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fWrapAround = false;
 	fBackSearch = false;
 
+	fNagOnNodeChange = true;
+
 	// add menubar
 	fMenuBar = new BMenuBar(BRect(0, 0, 0, 0), "menubar");
 	AddChild(fMenuBar);
@@ -1043,10 +1082,11 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	menuItem->SetShortcut('S', B_SHIFT_KEY);
 	menuItem->SetEnabled(true);
 
-	menu->AddItem(fRevertItem
-		= new BMenuItem(B_TRANSLATE("Revert to saved" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_REVERT)));
-	fRevertItem->SetEnabled(false);
+	menu->AddItem(fReloadItem
+		= new BMenuItem(B_TRANSLATE("Reload" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_RELOAD), 'L'));
+	fReloadItem->SetEnabled(false);
+
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
 		new BMessage(MENU_CLOSE), 'W'));
 
@@ -1107,7 +1147,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fFontMenu = new BMenu(B_TRANSLATE("Font"));
 	fMenuBar->AddItem(fFontMenu);
 
-	//"Size"-subMenu
+	// "Size"-subMenu
 	fFontSizeMenu = new BMenu(B_TRANSLATE("Size"));
 	fFontSizeMenu->SetRadioMode(true);
 	fFontMenu->AddItem(fFontSizeMenu);
@@ -1210,6 +1250,9 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fWrapItem->SetMarked(true);
 	fWrapItem->SetShortcut('W', B_OPTION_KEY);
 
+	menu->AddItem(fEncodingItem = _MakeEncodingMenuItem());
+	fEncodingItem->SetEnabled(false);
+
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS),
 		new BMessage(SHOW_STATISTICS)));
@@ -1286,7 +1329,7 @@ StyledEditWindow::_SaveAttrs()
 
 
 status_t
-StyledEditWindow::_LoadFile(entry_ref* ref)
+StyledEditWindow::_LoadFile(entry_ref* ref, const char* forceEncoding)
 {
 	BEntry entry(ref, true);
 		// traverse an eventual link
@@ -1299,7 +1342,7 @@ StyledEditWindow::_LoadFile(entry_ref* ref)
 	if (status == B_OK)
 		status = file.SetTo(&entry, B_READ_ONLY);
 	if (status == B_OK)
-		status = fTextView->GetStyledText(&file);
+		status = fTextView->GetStyledText(&file, forceEncoding);
 
 	if (status == B_ENTRY_NOT_FOUND) {
 		// Treat non-existing files consideratley; we just want to get an
@@ -1351,10 +1394,13 @@ StyledEditWindow::_LoadFile(entry_ref* ref)
 
 
 void
-StyledEditWindow::_RevertToSaved()
+StyledEditWindow::_ReloadDocument(BMessage* message)
 {
 	entry_ref ref;
 	const char* name;
+
+	if (fSaveMessage == NULL || message == NULL)
+		return;
 
 	fSaveMessage->FindRef("directory", &ref);
 	fSaveMessage->FindString("name", &name);
@@ -1376,15 +1422,40 @@ StyledEditWindow::_RevertToSaved()
 		return;
 	}
 
-	BString alertText;
-	bs_printf(&alertText,
-		B_TRANSLATE("Revert to the last version of \"%s\"? "), Title());
-	if (_ShowAlert(alertText, B_TRANSLATE("Cancel"), B_TRANSLATE("OK"),
-		"", B_WARNING_ALERT) != 1)
-		return;
+	if (!fClean) {
+		BString alertText;
+		bs_printf(&alertText,
+			B_TRANSLATE("\"%s\" has unsaved changes.\n"
+				"Revert it to the last saved version? "), Title());
+		if (_ShowAlert(alertText, B_TRANSLATE("Cancel"), B_TRANSLATE("OK"),
+			"", B_WARNING_ALERT) != 1)
+			return;
+	}
+
+	const char* forceEncoding = NULL;
+	if (message->FindString("encoding", &forceEncoding) != B_OK) {
+		const BCharacterSet* charset
+			= BCharacterSetRoster::GetCharacterSetByFontID(
+					fTextView->GetEncoding());
+		if (charset != NULL)
+			forceEncoding = charset->GetName();
+	}
+
+	BScrollBar* vertBar = fScrollView->ScrollBar(B_VERTICAL);
+	float vertPos = vertBar != NULL ? vertBar->Value() : 0.f;
+
+	DisableUpdates();
 
 	fTextView->Reset();
-	if (_LoadFile(&ref) != B_OK)
+
+	status = _LoadFile(&ref, forceEncoding);
+
+	if (vertBar != NULL)
+		vertBar->SetValue(vertPos);
+
+	EnableUpdates();
+
+	if (status != B_OK)
 		return;
 
 #undef B_TRANSLATION_CONTEXT
@@ -1400,10 +1471,12 @@ StyledEditWindow::_RevertToSaved()
 
 	// clear clean modes
 	fSaveItem->SetEnabled(false);
-	fRevertItem->SetEnabled(false);
+
 	fUndoCleans = false;
 	fRedoCleans = false;
 	fClean = true;
+
+	fNagOnNodeChange = true;
 }
 
 
@@ -1656,7 +1729,8 @@ StyledEditWindow::_UpdateCleanUndoRedoSaveRevert()
 	fClean = false;
 	fUndoCleans = false;
 	fRedoCleans = false;
-	fRevertItem->SetEnabled(fSaveMessage != NULL);
+	fReloadItem->SetEnabled(fSaveMessage != NULL);
+	fEncodingItem->SetEnabled(fSaveMessage != NULL);
 	fSaveItem->SetEnabled(true);
 	fUndoItem->SetLabel(B_TRANSLATE("Can't undo"));
 	fUndoItem->SetEnabled(false);
@@ -1685,4 +1759,235 @@ StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
 	alert->SetShortcut(0, B_ESCAPE);
 
 	return alert->Go();
+}
+
+
+BMenuItem*
+StyledEditWindow::_MakeEncodingMenuItem()
+{
+	BMenu* menu = new BMenu(B_TRANSLATE("Text encoding"));
+
+	BCharacterSetRoster roster;
+	BCharacterSet charset;
+	while (roster.GetNextCharacterSet(&charset) == B_OK) {
+		const char* mime = charset.GetMIMEName();
+		BString name(charset.GetPrintName());
+
+		if (mime)
+			name << " (" << mime << ")";
+
+		BMessage *message = new BMessage(MENU_RELOAD);
+		if (message != NULL) {
+			message->AddString("encoding", charset.GetName());
+			menu->AddItem(new BMenuItem(name, message));
+		}
+	}
+
+	menu->AddSeparatorItem();
+	BMessage *message = new BMessage(MENU_RELOAD);
+	message->AddString("encoding", "auto");
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Autodetect"), message));
+
+	menu->SetRadioMode(true);
+
+	return new BMenuItem(menu, new BMessage(MENU_RELOAD));
+}
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NodeMonitorAlerts"
+
+
+void
+StyledEditWindow::_ShowNodeChangeAlert(const char* name, bool removed)
+{
+	if (!fNagOnNodeChange)
+		return;
+
+	BString alertText(removed ? B_TRANSLATE("File \"%file%\" was removed by "
+		"another application, recover it?")
+		: B_TRANSLATE("File \"%file%\" was modified by "
+		"another application, reload it?"));
+	alertText.ReplaceAll("%file%", name);
+
+	if (_ShowAlert(alertText, removed ? B_TRANSLATE("Recover")
+			: B_TRANSLATE("Reload"), B_TRANSLATE("Ignore"), "",
+			B_WARNING_ALERT) == 0)
+	{
+		if (!removed) {
+			// supress the warning - user has already agreed
+			fClean = true;
+			BMessage msg(MENU_RELOAD);
+			_ReloadDocument(&msg);
+		} else
+			Save();
+	} else
+		fNagOnNodeChange = false;
+
+	fSaveItem->SetEnabled(!fClean);
+}
+
+
+void
+StyledEditWindow::_HandleNodeMonitorEvent(BMessage *message)
+{
+	int32 opcode = 0;
+	if (message->FindInt32("opcode", &opcode) != B_OK)
+		return;
+
+	if (opcode != B_ENTRY_CREATED
+		&& message->FindInt64("node") != fNodeRef.node)
+		// bypass foreign nodes' event
+		return;
+
+	switch (opcode) {
+		case B_STAT_CHANGED:
+			{
+				int32 fields = 0;
+				if (message->FindInt32("fields", &fields) == B_OK
+					&& (fields & (B_STAT_SIZE | B_STAT_MODIFICATION_TIME)) == 0)
+					break;
+
+				const char* name = NULL;
+				if (fSaveMessage->FindString("name", &name) != B_OK)
+					break;
+
+				_ShowNodeChangeAlert(name, false);
+			}
+			break;
+
+		case B_ENTRY_MOVED:
+			{
+				int32 device = 0;
+				int64 srcFolder = 0;
+				int64 dstFolder = 0;
+				const char* name = NULL;
+				if (message->FindInt32("device", &device) != B_OK
+					|| message->FindInt64("to directory", &dstFolder) != B_OK
+					|| message->FindInt64("from directory", &srcFolder) != B_OK
+					|| message->FindString("name", &name) != B_OK)
+						break;
+
+				entry_ref newRef(device, dstFolder, name);
+				BEntry entry(&newRef);
+
+				BEntry dirEntry;
+				entry.GetParent(&dirEntry);
+
+				entry_ref ref;
+				dirEntry.GetRef(&ref);
+				fSaveMessage->ReplaceRef("directory", &ref);
+				fSaveMessage->ReplaceString("name", name);
+
+				// store previous name - it may be useful in case
+				// we have just moved to temporary copy of file (vim case)
+				const char* sourceName = NULL;
+				if (message->FindString("from name", &sourceName) == B_OK) {
+					fSaveMessage->RemoveName("org.name");
+					fSaveMessage->AddString("org.name", sourceName);
+					fSaveMessage->RemoveName("move time");
+					fSaveMessage->AddInt64("move time", system_time());
+				}
+
+				SetTitle(name);
+				be_roster->AddToRecentDocuments(&newRef, APP_SIGNATURE);
+
+				if (srcFolder != dstFolder) {
+					_SwitchNodeMonitor(false);
+					_SwitchNodeMonitor(true);
+				}
+			}
+			break;
+
+		case B_ENTRY_REMOVED:
+			{
+				_SwitchNodeMonitor(false);
+
+				fClean = false;
+
+				// some editors like vim save files in following way:
+				// 1) move t.txt -> t.txt~
+				// 2) re-create t.txt and write data to it
+				// 3) remove t.txt~
+				// go to catch this case
+				int32 device = 0;
+				int64 directory = 0;
+				BString orgName;
+				if (fSaveMessage->FindString("org.name", &orgName) == B_OK
+					&& message->FindInt32("device", &device) == B_OK
+					&& message->FindInt64("directory", &directory) == B_OK)
+				{
+					// reuse the source name if it is not too old
+					bigtime_t time = fSaveMessage->FindInt64("move time");
+					if ((system_time() - time) < 1000000) {
+						entry_ref ref(device, directory, orgName);
+						BEntry entry(&ref);
+						if (entry.InitCheck() == B_OK) {
+							_SwitchNodeMonitor(true, &ref);
+						}
+
+						fSaveMessage->ReplaceString("name", orgName);
+						fSaveMessage->RemoveName("org.name");
+						fSaveMessage->RemoveName("move time");
+
+						SetTitle(orgName);
+						_ShowNodeChangeAlert(orgName, false);
+						break;
+					}
+				}
+
+				const char* name = NULL;
+				if (message->FindString("name", &name) != B_OK
+					&& fSaveMessage->FindString("name", &name) != B_OK)
+					name = "Unknown";
+
+				_ShowNodeChangeAlert(name, true);
+			}
+			break;
+
+		default:
+			break;
+	}
+}
+
+
+void
+StyledEditWindow::_SwitchNodeMonitor(bool on, entry_ref* ref)
+{
+	if (!on) {
+		watch_node(&fNodeRef, B_STOP_WATCHING, this);
+		watch_node(&fFolderNodeRef, B_STOP_WATCHING, this);
+		fNodeRef = node_ref();
+		fFolderNodeRef = node_ref();
+		return;
+	}
+
+	BEntry entry, folderEntry;
+
+	if (ref != NULL) {
+		entry.SetTo(ref, true);
+		entry.GetParent(&folderEntry);
+
+	} else if (fSaveMessage != NULL) {
+		entry_ref ref;
+		const char* name = NULL;
+		if (fSaveMessage->FindRef("directory", &ref) != B_OK
+			|| fSaveMessage->FindString("name", &name) != B_OK)
+			return;
+
+		BDirectory dir(&ref);
+		entry.SetTo(&dir, name);
+		folderEntry.SetTo(&ref);
+
+	} else
+		return;
+
+	if (entry.InitCheck() != B_OK || folderEntry.InitCheck() != B_OK)
+		return;
+
+	entry.GetNodeRef(&fNodeRef);
+	folderEntry.GetNodeRef(&fFolderNodeRef);
+
+	watch_node(&fNodeRef, B_WATCH_STAT, this);
+	watch_node(&fFolderNodeRef, B_WATCH_DIRECTORY, this);
 }

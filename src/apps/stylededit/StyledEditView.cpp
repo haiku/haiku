@@ -73,8 +73,11 @@ StyledEditView::SetSuppressChanges(bool suppressChanges)
 
 
 status_t
-StyledEditView::GetStyledText(BPositionIO* stream)
+StyledEditView::GetStyledText(BPositionIO* stream, const char* forceEncoding)
 {
+	if (forceEncoding != NULL)
+		fEncoding = strcmp(forceEncoding, "auto") != 0 ? forceEncoding : "";
+
 	fSuppressChanges = true;
 	status_t result = BTranslationUtils::GetStyledText(stream, this,
 		fEncoding.String());
@@ -85,24 +88,25 @@ StyledEditView::GetStyledText(BPositionIO* stream)
 
 	BNode* node = dynamic_cast<BNode*>(stream);
 	if (node != NULL) {
-		// get encoding
-		if (node->ReadAttrString("be:encoding", &fEncoding) != B_OK) {
-			// try to read as "int32"
-			int32 encoding;
-			ssize_t bytesRead = node->ReadAttr("be:encoding", B_INT32_TYPE, 0,
-				&encoding, sizeof(encoding));
-			if (bytesRead == (ssize_t)sizeof(encoding)) {
-				if (encoding == 65535) {
-					fEncoding = "UTF-8";
-				} else {
-					const BCharacterSet* characterSet
-						= BCharacterSetRoster::GetCharacterSetByConversionID(encoding);
-					if (characterSet != NULL)
-						fEncoding = characterSet->GetName();
+		if (forceEncoding == NULL) {
+			// get encoding
+			if (node->ReadAttrString("be:encoding", &fEncoding) != B_OK) {
+				// try to read as "int32"
+				int32 encoding;
+				ssize_t bytesRead = node->ReadAttr("be:encoding", B_INT32_TYPE, 0,
+					&encoding, sizeof(encoding));
+				if (bytesRead == (ssize_t)sizeof(encoding)) {
+					if (encoding == 65535) {
+						fEncoding = "UTF-8";
+					} else {
+						const BCharacterSet* characterSet
+							= BCharacterSetRoster::GetCharacterSetByConversionID(encoding);
+						if (characterSet != NULL)
+							fEncoding = characterSet->GetName();
+					}
 				}
 			}
 		}
-
 		// TODO: move those into BTranslationUtils::GetStyledText() as well?
 
 		// restore alignment

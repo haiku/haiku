@@ -34,7 +34,8 @@ class StyledEditView : public BTextView {
 
 		void		Reset();
 		void		SetSuppressChanges(bool suppressChanges);
-		status_t	GetStyledText(BPositionIO* stream);
+		status_t	GetStyledText(BPositionIO* stream,
+							const char* forceEncoding = NULL);
 		status_t	WriteStyledEditFile(BFile* file);
 
 		void 		SetEncoding(uint32 encoding);
