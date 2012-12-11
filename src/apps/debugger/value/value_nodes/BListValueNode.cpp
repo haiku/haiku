@@ -307,6 +307,9 @@ BListValueNode::CreateChildren()
 	if (fChildrenCreated)
 		return B_OK;
 
+	if (fLocationResolutionState != B_OK)
+		return fLocationResolutionState;
+
 	if (fItemCountType != NULL) {
 		BListItemCountNodeChild* countChild = new(std::nothrow)
 			BListItemCountNodeChild(fItemCountLocation, this, fItemCountType);
