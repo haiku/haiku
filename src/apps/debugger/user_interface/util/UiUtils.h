@@ -10,10 +10,11 @@
 #include <image.h>
 
 
+class BString;
 class BVariant;
 class StackFrame;
 class Team;
-
+class ValueNodeChild;
 
 class UiUtils {
 public:
@@ -29,6 +30,13 @@ public:
 
 	static	const char*			ReportNameForTeam(::Team* team,
 									char* buffer, size_t bufferSize);
+
+	// this function assumes the value nodes have already been resolved
+	// (if possible).
+	static	void				PrintValueNodeGraph(BString& _output,
+									StackFrame* frame,
+									ValueNodeChild* child,
+									int32 indentLevel, int32 maxDepth);
 };
 
 
