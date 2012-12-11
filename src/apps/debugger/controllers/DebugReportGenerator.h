@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUG_REPORT_GENERATOR_H
-#define DEBUG_GENERATOR_H
+#define DEBUG_REPORT_GENERATOR_H
 
 
 #include <Looper.h>
@@ -44,14 +44,11 @@ private:
 			status_t			_DumpRunningThreads(BString& output);
 			status_t			_DumpDebuggedThreadInfo(BString& output,
 									::Thread* thread);
-			status_t			_DumpValueNode(BString& output,
-									StackFrame* frame, ValueNodeChild* child,
-									bool recurse = true);
 
 			status_t			_ResolveLocationIfNeeded(ValueNodeChild* child,
 									StackFrame* frame);
 			status_t			_ResolveValueIfNeeded(ValueNode* node,
-									StackFrame* frame);
+									StackFrame* frame, int32 maxDepth);
 
 private:
 			::Team*				fTeam;

@@ -312,7 +312,9 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 		AutoLocker<ValueNodeContainer> containerLocker(container);
 		for (int32 i = 0; i < container->CountChildren(); i++) {
 			ValueNodeChild* child = container->ChildAt(i);
-			_DumpValueNode(_output, frame, child);
+			_ResolveLocationIfNeeded(child, frame);
+			_ResolveValueIfNeeded(child->Node(), frame, 4);
+			UiUtils::PrintValueNodeGraph(_output, frame, child, 3, 2);
 		}
 		_output << "\n";
 	}
@@ -337,78 +339,8 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 
 
 status_t
-DebugReportGenerator::_DumpValueNode(BString& _output, StackFrame* frame,
-	ValueNodeChild* child, bool recurse)
-{
-	status_t result = _ResolveLocationIfNeeded(child, frame);
-	if (result != B_OK)
-		return result;
-
-	_output << "\t\t\t";
-	if (!recurse)
-		_output << "\t";
-	_output << child->Name() << ": ";
-
-	ValueNode* node = child->Node();
-	if (node->LocationAndValueResolutionState() == VALUE_NODE_UNRESOLVED) {
-		if (_ResolveValueIfNeeded(node, frame) == B_OK) {
-			Value* value = node->GetValue();
-			if (value != NULL) {
-				BString valueData;
-				value->ToString(valueData);
-				_output << valueData;
-			} else
-				_output << "Unavailable";
-		} else
-			_output << "Unknown";
-	}
-	if (recurse && node->CountChildren() != 0)
-		_output << " {";
-
-	_output << "\n";
-
-	if (recurse) {
-		if (node->CountChildren() == 0)
-			return B_OK;
-
-		if (node->CountChildren() == 1
-			&& node->GetType()->Kind() == TYPE_ADDRESS
-			&& node->ChildAt(0)->GetType()->Kind() == TYPE_COMPOUND) {
-			// for the case of a pointer to a compound type,
-			// we want to hide the intervening compound node and print
-			// the children directly.
-			status_t result = fNodeManager->AddChildNodes(node->ChildAt(0));
-			if (result == B_OK) {
-				result = _ResolveLocationIfNeeded(node->ChildAt(0), frame);
-				if (result == B_OK) {
-					node = node->ChildAt(0)->Node();
-					// attempt to resolve the value here since the node's
-					// representation may requires its value to be resolved
-					// before its children can be created
-					result = _ResolveValueIfNeeded(node, frame);
-				}
-			}
-		}
-
-		for (int32 i = 0; i < node->CountChildren(); i++) {
-			if (fNodeManager->AddChildNodes(node->ChildAt(i)) != B_OK)
-				continue;
-
-			// don't dump compound nodes since we won't traverse into
-			// them anyways and their top level node has no interesting
-			// information.
-			if (node->ChildAt(i)->GetType()->Kind() != TYPE_COMPOUND)
-				_DumpValueNode(_output, frame, node->ChildAt(i), false);
-		}
-		_output << "\t\t\t}\n";
-	}
-
-	return B_OK;
-}
-
-
-status_t
-DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame)
+DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame,
+	int32 maxDepth)
 {
 	ValueLocation* location = NULL;
 	Value* value = NULL;
@@ -421,6 +353,21 @@ DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame)
 		location->ReleaseReference();
 	if (value != NULL)
 		value->ReleaseReference();
+
+	if (result == B_OK && maxDepth > 0) {
+		for (int32 i = 0; i < node->CountChildren(); i++) {
+			ValueNodeChild* child = node->ChildAt(i);
+			result = _ResolveLocationIfNeeded(child, frame);
+			if (result != B_OK)
+				continue;
+
+			result = fNodeManager->AddChildNodes(child);
+			if (result != B_OK)
+				continue;
+
+			_ResolveValueIfNeeded(child->Node(), frame, maxDepth - 1);
+		}
+	}
 
 	return result;
 }
