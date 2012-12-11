@@ -112,8 +112,8 @@ sem_post(sem_t* semaphore)
 int
 sem_timedwait(sem_t* semaphore, const struct timespec* timeout)
 {
-	if (timeout != NULL && (timeout->tv_nsec < 0 ||
-           timeout->tv_nsec >= 1000000000)) {
+	if (timeout != NULL
+		&& (timeout->tv_nsec < 0 || timeout->tv_nsec >= 1000000000)) {
 		status_t err = _kern_realtime_sem_wait(semaphore->id, 0);
 		if (err == B_WOULD_BLOCK)
 			err = EINVAL;
