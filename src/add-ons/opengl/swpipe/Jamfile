@@ -15,8 +15,10 @@ local sources =
 
 if $(HAIKU_LLVM_PRESENT) {
 	# TODO: Add LLVM OptionalBuildPackage
-	SubDirC++Flags [ FDefines USE_LLVMPIPE ] ;
-	SubDirSysHdrs $(HAIKU_LLVM_HEADERS) ;
+	SubDirC++Flags [ FDefines HAVE_LLVM=0x0302 ] ;
+
+	# TODO: This is a hack for now
+	SubDirSysHdrs /boot/common/include ;
 }
 
 
