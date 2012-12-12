@@ -197,8 +197,6 @@ UiUtils::PrintValueNodeGraph(BString& _output, StackFrame* frame,
 		return;
 	}
 
-	_output << " {\n";
-
 	if (node->CountChildren() == 1
 		&& node->GetType()->Kind() == TYPE_ADDRESS
 		&& node->ChildAt(0)->GetType()->Kind() == TYPE_COMPOUND) {
@@ -208,18 +206,22 @@ UiUtils::PrintValueNodeGraph(BString& _output, StackFrame* frame,
 		node = node->ChildAt(0)->Node();
 	}
 
-	for (int32 i = 0; i < node->CountChildren(); i++) {
-		// don't dump compound nodes if our depth limit won't allow
-		// us to traverse into their children anyways, and the top
-		// level node contains no data of intereest.
-		if (node->ChildAt(i)->GetType()->Kind() != TYPE_COMPOUND
-			|| maxDepth > 1) {
-			PrintValueNodeGraph(_output, frame, node->ChildAt(i),
-				indentLevel + 1, maxDepth - 1);
+	if (node != NULL) {
+		_output << " {\n";
+
+		for (int32 i = 0; i < node->CountChildren(); i++) {
+			// don't dump compound nodes if our depth limit won't allow
+			// us to traverse into their children anyways, and the top
+			// level node contains no data of intereest.
+			if (node->ChildAt(i)->GetType()->Kind() != TYPE_COMPOUND
+				|| maxDepth > 1) {
+				PrintValueNodeGraph(_output, frame, node->ChildAt(i),
+					indentLevel + 1, maxDepth - 1);
+			}
 		}
+		_output.Append('\t', indentLevel);
+		_output << "}\n";
 	}
-	_output.Append('\t', indentLevel);
-	_output << "}\n";
 
 	return;
 }
