@@ -103,8 +103,8 @@ static const char* const PREF_HALF_FONT_SIZE = "Half Font Size";
 
 static const char* const PREF_TEXT_FORE_COLOR = "Text";
 static const char* const PREF_TEXT_BACK_COLOR = "Background";
-static const char* const PREF_CURSOR_FORE_COLOR = "Cursor text";
-static const char* const PREF_CURSOR_BACK_COLOR = "Cursor background";
+static const char* const PREF_CURSOR_FORE_COLOR = "Text under cursor";
+static const char* const PREF_CURSOR_BACK_COLOR = "Cursor";
 static const char* const PREF_SELECT_FORE_COLOR = "Selected text";
 static const char* const PREF_SELECT_BACK_COLOR = "Selected background";
 
