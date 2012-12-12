@@ -110,8 +110,8 @@ HWindow::InitGUI()
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
 		new BMessage(M_OTHER_MESSAGE)));
 	BMenuField* menuField = new BMenuField("filemenu",
-		B_TRANSLATE("Sound File:"), menu);
-	menuField->SetDivider(menuField->StringWidth(B_TRANSLATE("Sound File:"))
+		B_TRANSLATE("Sound file:"), menu);
+	menuField->SetDivider(menuField->StringWidth(B_TRANSLATE("Sound file:"))
 		+ 10);
 
 	BButton* stopbutton = new BButton("stop", B_TRANSLATE("Stop"),
