@@ -149,13 +149,12 @@ ValueNodeManager::ValueNodeValueChanged(ValueNode* valueNode)
 	if (valueNode->ChildCreationNeedsValue()
 		&& !valueNode->ChildrenCreated()) {
 		status_t error = valueNode->CreateChildren();
-		if (error != B_OK)
-			return;
-
-		for (int32 i = 0; i < valueNode->CountChildren(); i++) {
-			ValueNodeChild* child = valueNode->ChildAt(i);
-			_CreateValueNode(child);
-			AddChildNodes(child);
+		if (error == B_OK) {
+			for (int32 i = 0; i < valueNode->CountChildren(); i++) {
+				ValueNodeChild* child = valueNode->ChildAt(i);
+				_CreateValueNode(child);
+				AddChildNodes(child);
+			}
 		}
 	}
 
