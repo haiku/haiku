@@ -158,12 +158,8 @@ ProtocolSettingsView::DetachedFromWindow()
 	if (fSettingsView == NULL)
 		return;
 
-	BMessage settings;
-	if (fSettingsView->Archive(&settings) != B_OK)
+	if (fSettingsView->SaveInto(fSettings) != B_OK)
 		return;
-
-	fSettings.MakeEmpty();
-	fSettings.Append(settings);
 
 	// We need to remove the settings view before unloading its add-on
 	fSettingsView->RemoveSelf();
