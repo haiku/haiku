@@ -84,8 +84,7 @@ AccountItem::AccountItem(const char* label, BMailAccountSettings* account,
 	:
 	BStringItem(label),
 	fAccount(account),
-	fType(type),
-	fConfigPanel(NULL)
+	fType(type)
 {
 }
 
@@ -96,7 +95,7 @@ AccountItem::Update(BView* owner, const BFont* font)
 	if (fType == ACCOUNT_ITEM)
 		font = be_bold_font;
 
-	BStringItem::Update(owner,font);
+	BStringItem::Update(owner, font);
 }
 
 
@@ -109,20 +108,6 @@ AccountItem::DrawItem(BView* owner, BRect rect, bool complete)
 
 	BStringItem::DrawItem(owner, rect, complete);
 	owner->PopState();
-}
-
-
-void
-AccountItem::SetConfigPanel(BView* panel)
-{
-	fConfigPanel = panel;
-}
-
-
-BView*
-AccountItem::ConfigPanel()
-{
-	return fConfigPanel;
 }
 
 
@@ -523,7 +508,7 @@ ConfigWindow::MessageReceived(BMessage *msg)
 			int32 index = msg->FindInt32("index");
 			AccountItem* clickedItem = dynamic_cast<AccountItem*>(
 				fAccountsListView->ItemAt(index));
-			if (clickedItem == NULL || clickedItem->GetType() != ACCOUNT_ITEM)
+			if (clickedItem == NULL || clickedItem->Type() != ACCOUNT_ITEM)
 				break;
 
 			BPopUpMenu rightClickMenu("accounts", false, false);
@@ -535,7 +520,7 @@ ConfigWindow::MessageReceived(BMessage *msg)
 			rightClickMenu.AddItem(inMenuItem);
 			rightClickMenu.AddItem(outMenuItem);
 
-			BMailAccountSettings* settings = clickedItem->GetAccount();
+			BMailAccountSettings* settings = clickedItem->Account();
 			if (settings->IsInboundEnabled())
 				inMenuItem->SetMarked(true);
 			if (settings->IsOutboundEnabled())
@@ -603,7 +588,7 @@ ConfigWindow::MessageReceived(BMessage *msg)
 				AccountItem *item = (AccountItem *)fAccountsListView->ItemAt(
 					index);
 				if (item != NULL) {
-					_RemoveAccount(item->GetAccount());
+					_RemoveAccount(item->Account());
 					_ReplaceConfigView(_BuildHowToView());
 				}
 			}
@@ -666,8 +651,8 @@ ConfigWindow::AccountUpdated(BMailAccountSettings* account)
 
 	for (int i = 0; i < fAccountsListView->CountItems(); i++) {
 		AccountItem* item = (AccountItem*)fAccountsListView->ItemAt(i);
-		if (item->GetAccount() == account) {
-			if (item->GetType() == ACCOUNT_ITEM) {
+		if (item->Account() == account) {
+			if (item->Type() == ACCOUNT_ITEM) {
 				item->SetText(account->Name());
 				fAccountsListView->Invalidate();
 			}
@@ -785,13 +770,16 @@ ConfigWindow::_RemoveAccount(BMailAccountSettings* account)
 void
 ConfigWindow::_RemoveAccountFromListView(BMailAccountSettings* account)
 {
-	for (int i = 0; i < fAccountsListView->CountItems(); i++) {
+	if (fLastSelectedAccount == account) {
+		_ReplaceConfigView(_BuildHowToView());
+		fLastSelectedAccount = NULL;
+	}
+
+	for (int i = fAccountsListView->CountItems(); i-- > 0;) {
 		AccountItem* item = (AccountItem*)fAccountsListView->ItemAt(i);
-		if (item->GetAccount() == account) {
+		if (item->Account() == account) {
 			fAccountsListView->RemoveItem(i);
-			fConfigView->RemoveChild(item->ConfigPanel());
 			delete item;
-			i--;
 		}
 	}
 }
@@ -802,11 +790,11 @@ ConfigWindow::_AccountSelected(AccountItem* item)
 {
 	AccountUpdated(fLastSelectedAccount);
 
-	BMailAccountSettings* account = item->GetAccount();
+	BMailAccountSettings* account = item->Account();
 	fLastSelectedAccount = account;
 
 	BView* view = NULL;
-	switch (item->GetType()) {
+	switch (item->Type()) {
 		case ACCOUNT_ITEM:
 			view = new AccountConfigView(account);
 			break;
@@ -825,8 +813,6 @@ ConfigWindow::_AccountSelected(AccountItem* item)
 			view = new FiltersConfigView(*account);
 			break;
 	}
-	if (view != NULL)
-		item->SetConfigPanel(view);
 
 	_ReplaceConfigView(view);
 }

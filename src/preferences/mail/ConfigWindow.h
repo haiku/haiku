@@ -43,15 +43,12 @@ public:
 			void				Update(BView* owner, const BFont* font);
 			void				DrawItem(BView* owner, BRect rect,
 									bool complete);
-			BMailAccountSettings*	GetAccount() { return fAccount; }
-			item_types			GetType() { return fType; }
+			BMailAccountSettings* Account() { return fAccount; }
+			item_types			Type() { return fType; }
 
-			void				SetConfigPanel(BView* panel);
-			BView*				ConfigPanel();
 private:
-			BMailAccountSettings*	fAccount;
+			BMailAccountSettings* fAccount;
 			item_types			fType;
-			BView*				fConfigPanel;
 };
 
 
