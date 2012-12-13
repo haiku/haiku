@@ -2548,14 +2548,10 @@ TMailWindow::SaveAsDraft()
 					return status;
 			case B_OK:
 			{
-				char fileName[512], *eofn;
-				int32 i;
-
+				char fileName[B_FILE_NAME_LENGTH], *eofn;
 				// save as some version of the message's subject
-				strncpy(fileName, fHeaderView->fSubject->Text(),
-					sizeof(fileName)-10);
-				fileName[sizeof(fileName)-10]='\0';
-					// terminate like strncpy doesn't
+				strlcpy(fileName, fHeaderView->fSubject->Text(),
+					sizeof(fileName));
 				eofn = fileName + strlen(fileName);
 
 				// convert /, \ and : to -
@@ -2568,7 +2564,7 @@ TMailWindow::SaveAsDraft()
 
 				// Create the file; if the name exists, find a unique name
 				flags = B_WRITE_ONLY | B_CREATE_FILE | B_FAIL_IF_EXISTS;
-				for (i = 1; (status = draft.SetTo(&dir, fileName, flags))
+				for (int32 i = 1; (status = draft.SetTo(&dir, fileName, flags))
 					!= B_OK; i++) {
 					if (status != B_FILE_EXISTS)
 						return status;
