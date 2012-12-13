@@ -119,6 +119,8 @@ MailProtocolConfigView::MailProtocolConfigView(uint32 optionsMask)
 	fHostControl(NULL),
 	fUserControl(NULL),
 	fPasswordControl(NULL),
+	fFlavorField(NULL),
+	fAuthenticationField(NULL),
 	fLeaveOnServerCheckBox(NULL),
 	fRemoveFromServerCheckBox(NULL),
 	fBodyDownloadConfig(NULL)
