@@ -1691,6 +1691,8 @@ TMailWindow::QuitRequested()
 			|| strlen(fHeaderView->fSubject->Text())
 			|| (fHeaderView->fCc && strlen(fHeaderView->fCc->Text()))
 			|| (fHeaderView->fBcc && strlen(fHeaderView->fBcc->Text()))
+			|| (fContentView->fTextView
+				&& strlen(fContentView->fTextView->Text()))
 			|| (fEnclosuresView != NULL
 				&& fEnclosuresView->fList->CountItems()))) {
 		if (fResending) {
@@ -2550,8 +2552,13 @@ TMailWindow::SaveAsDraft()
 			{
 				char fileName[B_FILE_NAME_LENGTH];
 				// save as some version of the message's subject
-				strlcpy(fileName, fHeaderView->fSubject->Text(),
-					sizeof(fileName));
+				if (strlen(fHeaderView->fSubject->Text()) == 0)
+					strlcpy(fileName, B_TRANSLATE("Untitled"),
+						sizeof(fileName));
+				else
+					strlcpy(fileName, fHeaderView->fSubject->Text(),
+						sizeof(fileName));
+			
 				uint32 originalLength = strlen(fileName);
 
 				// convert /, \ and : to -
@@ -2647,6 +2654,8 @@ TMailWindow::SaveAsDraft()
 
 	fDraft = true;
 	fChanged = false;
+
+	fSaveButton->SetEnabled(false);
 
 	return B_OK;
 }
