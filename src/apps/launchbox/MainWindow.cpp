@@ -91,20 +91,18 @@ MainWindow::QuitRequested()
 			padWindowCount++;
 	}
 	bool canClose = true;
-	if (Lock()) {
-		if (padWindowCount == 1) {
-			be_app->PostMessage(B_QUIT_REQUESTED);
+	
+	if (padWindowCount == 1) {
+		be_app->PostMessage(B_QUIT_REQUESTED);
+		canClose = false;
+	} else {
+		BAlert* alert = new BAlert(B_TRANSLATE("last chance"),
+			B_TRANSLATE("Really close this pad?\n"
+							"(The pad will not be remembered.)"),
+			B_TRANSLATE("Close"), B_TRANSLATE("Cancel"), NULL);
+		alert->SetShortcut(1, B_ESCAPE);
+		if (alert->Go() == 1)
 			canClose = false;
-		} else {
-			BAlert* alert = new BAlert(B_TRANSLATE("last chance"),
-				B_TRANSLATE("Really close this pad?\n"
-								"(The pad will not be remembered.)"),
-				B_TRANSLATE("Close"), B_TRANSLATE("Cancel"), NULL);
-			alert->SetShortcut(1, B_ESCAPE);
-			if (alert->Go() == 1)
-				canClose = false;
-		}
-		Unlock();
 	}
 	return canClose;
 }
