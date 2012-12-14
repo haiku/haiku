@@ -191,6 +191,7 @@ private:
 
 			BString				_NewTabURL(bool isNewWindow) const;
 
+			BString				_EncodeURIComponent(const BString& search);
 			void				_VisitURL(const BString& url);
 			void				_VisitSearchEngine(const BString& search);
 	inline 	bool				_IsValidDomainChar(char ch);

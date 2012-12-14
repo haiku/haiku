@@ -2147,6 +2147,25 @@ BrowserWindow::_NewTabURL(bool isNewWindow) const
 	return url;
 }
 
+BString
+BrowserWindow::_EncodeURIComponent(const BString& search)
+{
+	const BString escCharList = " $&`:<>[]{}\"+#%@/;=?\\^|~\',";
+	BString result = search;
+	char hexcode[4];
+
+	for (int32 i = 0; i < result.Length(); i++) {
+		if (escCharList.FindFirst(result[i]) != B_ERROR) {
+			sprintf(hexcode, "%02X", (unsigned int)result[i]);
+			result[i] = '%';
+			result.Insert(hexcode, i + 1);
+			i += 2;
+		}
+	}
+
+	return result;
+}
+
 
 void
 BrowserWindow::_VisitURL(const BString& url)
@@ -2163,8 +2182,10 @@ BrowserWindow::_VisitSearchEngine(const BString& search)
 	//			engine modifiable from Settings? :)
 
 	BString engine = "http://www.google.com/search?q=";
-	engine += search;
-		// WebKit takes care of URL encoding here.
+	engine += _EncodeURIComponent(search);
+		// We have to take care of some of the escaping before
+		// we hand over the string to WebKit, if we want queries
+		// like "4+3" to not be searched as "4 3".
 
 	_VisitURL(engine);
 }
