@@ -236,8 +236,8 @@ struct acpi_module_info {
 
 	/* Control method execution and data acquisition */
 
-	status_t	(*evaluate_object)(const char* object,
-					acpi_object_type *returnValue, size_t bufferLength);
+	status_t	(*evaluate_object)(acpi_handle handle, const char* object,
+					acpi_objects *args, acpi_object_type *returnValue, size_t bufferLength);
 	status_t	(*evaluate_method)(acpi_handle handle, const char *method,
 					acpi_objects *args, acpi_data *returnValue);
 

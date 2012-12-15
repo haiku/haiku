@@ -115,8 +115,9 @@ typedef struct acpi_root_info {
 
 	/* Control method execution and data acquisition */
 
-	status_t	(*evaluate_object)(const char* object,
-					acpi_object_type *returnValue, size_t bufferLength);
+	status_t	(*evaluate_object)(acpi_handle handle, const char* object,
+					acpi_objects *args, acpi_object_type *returnValue,
+					size_t bufferLength);
 	status_t	(*evaluate_method)(acpi_handle handle, const char *method,
 					acpi_objects *args, acpi_data *returnValue);
 
@@ -203,8 +204,8 @@ status_t get_object_typed(const char* path, acpi_object_type** _returnValue,
 	uint32 object_type);
 status_t ns_handle_to_pathname(acpi_handle targetHandle, acpi_data* buffer);
 
-status_t evaluate_object(const char* object, acpi_object_type* returnValue,
-	size_t bufferLength);
+status_t evaluate_object(acpi_handle handle, const char* object,
+	acpi_objects* args, acpi_object_type* returnValue, size_t bufferLength);
 status_t evaluate_method(acpi_handle handle, const char* method,
 	acpi_objects* args, acpi_data* returnValue);
 

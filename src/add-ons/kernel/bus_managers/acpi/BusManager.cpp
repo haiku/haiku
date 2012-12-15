@@ -554,8 +554,8 @@ ns_handle_to_pathname(acpi_handle targetHandle, acpi_data *buffer)
 
 
 status_t
-evaluate_object(const char* object, acpi_object_type* returnValue,
-	size_t bufferLength)
+evaluate_object(acpi_handle handle, const char* object, acpi_objects *args,
+	acpi_object_type* returnValue, size_t bufferLength)
 {
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
@@ -563,8 +563,8 @@ evaluate_object(const char* object, acpi_object_type* returnValue,
 	buffer.Pointer = returnValue;
 	buffer.Length = bufferLength;
 
-	status = AcpiEvaluateObject(NULL, (ACPI_STRING)object, NULL,
-		returnValue != NULL ? &buffer : NULL);
+	status = AcpiEvaluateObject(handle, (ACPI_STRING)object,
+		(ACPI_OBJECT_LIST*)args, returnValue != NULL ? &buffer : NULL);
 	if (status == AE_BUFFER_OVERFLOW)
 		dprintf("evaluate_object: the passed buffer is too small!\n");
 
