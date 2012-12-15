@@ -1,11 +1,10 @@
-1	romanian	x-vnd.Haiku-Terminal	1054657081
+1	romanian	x-vnd.Haiku-Terminal	2672618809
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Terminal nou
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalul nu a putut porni shell. Îmi pare rău.
-Text size	Terminal TermWindow		Dimensiune text
 Match case	Terminal FindWindow		Potrivire caz
 Quit	Terminal TermWindow		Părăsește
 Use default shell	Terminal Shell		Utilizează shell implicit
@@ -13,10 +12,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmă ie�
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Tiparul care specifică titlul tabului curent. Următoarele marcaje\npot fi utilizate:\n
 Select all	Terminal TermWindow		Selectează tot
 Close tab	Terminal TermWindow		Închide tab
-Custom	Terminal colors schema		Personalizat
 Save to file…	Terminal PrefWindow		Salvează în fișier...
 OK	Terminal PrefWindow		OK
-Black on White	Terminal colors schema		Negru pe alb
 Window title:	Terminal AppearancePrefView		Titlu fereastră:
 Font:	Terminal AppearancePrefView		Font:
 Copy here	Terminal TermView		Copiază aici
@@ -34,13 +31,10 @@ Find	Terminal FindWindow		Găsește
 Appearance	Terminal PrefWindow		Aspect
 Tab title:	Terminal AppearancePrefView		Titlu tab:
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Tiparul care specifică titlurile ferestrei curente. Următoarele marcaje\npot fi utilizate:\n
-Color schema:	Terminal AppearancePrefView		Schemă de culoare:
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Fundal
 Use selection	Terminal FindWindow		Utilizează selecție
-Green on Black	Terminal colors schema		Verde pe Negru
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Procesul „%1” încă rulează.\nDacă închideți tabul, procesul va fi oprit.
-Size:	Terminal AppearancePrefView		Dimensiune:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nu se poate executa „%command”:\n\t%error
 Full screen	Terminal TermWindow		Pe tot ecranul
 Window title…	Terminal TermWindow		Titlu fereastră...
@@ -60,7 +54,6 @@ Find…	Terminal TermWindow		Caută...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Procesul „%1” încă rulează.\nDacă închideți Terminalul, procesul va fi oprit.
 Move here	Terminal TermView		Mută aici
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDosarul curent al procesuui activ în\n\t\t\ttabul curent. Poate fi specificat numărul maxim de componente ale căii. Ex: „%2d” pentru cel mult două componente.\n\t%i\t-\tIndicele de fereastră.\n\t%p\t-\tNumele procesului activ din tabul curent.\n\t%t\t-\tTitlul tabului curent.\n\t%%\t-\tCaracterul „%”.
-White on Black	Terminal colors schema		Alb pe negru
 Error!	Terminal getString		Eroare!
 New tab	Terminal TermWindow		Tab nou
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Tiparul care specifică titlurile tabului curent. Următoarele marcaje\npot fi utilizate:\n

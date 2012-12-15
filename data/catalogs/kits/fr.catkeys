@@ -1,21 +1,29 @@
-1	french	x-vnd.Haiku-libbe	864109244
+1	french	x-vnd.Haiku-libbe	1916257017
+gamma	AboutWindow		gamma
+beta	AboutWindow		bêta
 %3.2f GiB	StringForSize		%3.2f Gio
 Written by:	AboutWindow		Écrit par :
 About %app%	AboutMenuItem		À propos de %app%
 Cut	TextView		Couper
+Version	AboutWindow		Version
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Impossible de créer le réplicant pour « %description ».\n%error
+About	AboutWindow		À propos
 Copy	TextView		Copier
 %3.2f KiB	StringForSize		%3.2f Kio
 %d bytes	StringForSize		%d octets
+alpha	AboutWindow		alpha
 Error	PrintJob		Erreur
 No Pages to print!	PrintJob		Aucune page à imprimer !
+All Rights Reserved.	AboutWindow		Tous droits réservés.
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Vert :
+Version history:	AboutWindow		Historique des versions :
 Remove replicant	Dragger		Enlever le réplicant
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Le serveur d'impression ne répond pas.
 Paste	TextView		Coller
+Special Thanks:	AboutWindow		Remerciements particuliers :
 %.2f TiB	StringForSize		%.2f Tio
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l'application du réplicant. Aucune signature d'application fournie.\n%error
 Redo	TextView		Refaire
@@ -26,6 +34,7 @@ Undo	TextView		Annuler
 Red:	ColorControl		Rouge :
 %3.2f MiB	StringForSize		%3.2f Mio
 About %app…	Dragger		À propos de %app…
+development	AboutWindow		développement
 Error	ZombieReplicantView		Erreur
 Blue:	ColorControl		Bleu :
 Can't delete this replicant from its original application. Life goes on.	Dragger		Impossible de supprimer ce réplicant à partir de son application d'origine. La vie continue.

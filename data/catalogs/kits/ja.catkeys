@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	2804831005
+1	japanese	x-vnd.Haiku-libbe	1560959841
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		作者:
 About %app%	AboutMenuItem		%app% について
@@ -31,4 +31,5 @@ Red:	ColorControl		赤：
 About %app…	Dragger		%appについて…
 Error	ZombieReplicantView		エラー
 Blue:	ColorControl		青：
+gold master	AboutWindow		ゴールデンマスター
 Can't delete this replicant from its original application. Life goes on.	Dragger		このレプリカントを元々のアプリケーションから削除することはできません。現状を維持します。

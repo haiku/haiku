@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	3929743651
+1	japanese	x-vnd.Haiku-Terminal	1252738083
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -6,7 +6,6 @@ OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		新しいターミナルを開く
 Cursor text	Terminal AppearancePrefView		カーソル
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できませんでした。
-Text size	Terminal TermWindow		テキストサイズ
 Match case	Terminal FindWindow		大文字と小文字を区別する
 Quit	Terminal TermWindow		終了
 Use default shell	Terminal Shell		デフォルトシェルを使用
@@ -14,10 +13,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		実行中の�
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンは現在のタブタイトルを指定します。次のプレースホルダーが\n使用できます:\n
 Select all	Terminal TermWindow		すべて選択
 Close tab	Terminal TermWindow		タブを閉じる
-Custom	Terminal colors schema		カスタム
 Save to file…	Terminal PrefWindow		ファイルに保存…
 OK	Terminal PrefWindow		OK
-Black on White	Terminal colors schema		白地に黒文字
 Window title:	Terminal AppearancePrefView		ウィンドウタイトル:
 Font:	Terminal AppearancePrefView		フォント:
 Copy here	Terminal TermView		カレントディレクトリへコピー
@@ -35,13 +32,10 @@ Find	Terminal FindWindow		検索
 Appearance	Terminal PrefWindow		外観
 Tab title:	Terminal AppearancePrefView		タブタイトル:
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		パターンは現在のウィンドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
-Color schema:	Terminal AppearancePrefView		配色:
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		背景
 Use selection	Terminal FindWindow		選択部で検索
-Green on Black	Terminal colors schema		黒地に緑文字
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nタブを閉じると強制終了されます。
-Size:	Terminal AppearancePrefView		サイズ:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" を実行できません:\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n
 Full screen	Terminal TermWindow		全画面表示
@@ -63,7 +57,6 @@ Find…	Terminal TermWindow		検索…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nTerminalを閉じると強制終了されます。
 Move here	Terminal TermView		カレントディレクトリへ移動
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t現在のタブへの実行中プロセスのカレントワーキングディレクトリ\n\t\t\tの表示。オプションでパス要素の最大値を\n\t\t\t指定できます。 例. '%2d' 最大 2 要素。\n\t%i\t-\tThe index of the window.\n\t%p\t-\t実行中プロセス名の現在のタプへの表示。\n\t%t\t-\t現在のタブのタイトル。\n\t%%\t-\t文字 '%' 。
-White on Black	Terminal colors schema		黒地に白文字
 Error!	Terminal getString		エラー!
 New tab	Terminal TermWindow		新しいタブ
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		パターンはタブタイトルを指定します。次のプレースホルダーが\n使用できます:\n

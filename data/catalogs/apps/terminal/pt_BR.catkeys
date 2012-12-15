@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	3929743651
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	1252738083
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
@@ -6,7 +6,6 @@ OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Novo Terminal
 Cursor text	Terminal AppearancePrefView		Texto do cursor
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
-Text size	Terminal TermWindow		Tamanho do texto
 Match case	Terminal FindWindow		Diferenciar maiúsculas de minúsculas
 Quit	Terminal TermWindow		Sair
 Use default shell	Terminal Shell		Utilizar shell padrão
@@ -14,10 +13,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar sa�
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		O padrão especificando o título da guia atual. Os seguintes espaços reservados\npodem ser usados:\n
 Select all	Terminal TermWindow		Selecionar tudo
 Close tab	Terminal TermWindow		Fechar aba
-Custom	Terminal colors schema		Personalizado
 Save to file…	Terminal PrefWindow		Salvar para arquivo...
 OK	Terminal PrefWindow		OK
-Black on White	Terminal colors schema		Preto sobre Branco
 Window title:	Terminal AppearancePrefView		Título da janela:
 Font:	Terminal AppearancePrefView		Fonte:
 Copy here	Terminal TermView		Copiar aqui
@@ -35,13 +32,10 @@ Find	Terminal FindWindow		Localizar
 Appearance	Terminal PrefWindow		Aparência
 Tab title:	Terminal AppearancePrefView		Título da guia:
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		O padrão especificando os títulos da janela. Os seguintes espaços reservados podem ser utilizados:\n
-Color schema:	Terminal AppearancePrefView		Esquema de cores:
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Plano de fundo
 Use selection	Terminal FindWindow		Usar seleção
-Green on Black	Terminal colors schema		Verde sobre o Preto
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		O processo \"%1\" ainda está executando.\nSe fechar a guia, o processo será morto.
-Size:	Terminal AppearancePrefView		Tamanho:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Não é possível executar \"%command\":\n\t %error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h,  --help  exibe esta ajuda\n-t,  --title  define o título da janela\n-f,  --fulscreen  inicia tela cheia\n
 Full screen	Terminal TermWindow		Tela inteira
@@ -63,7 +57,6 @@ Find…	Terminal TermWindow		Localizar…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		O processo \"%1\" ainda está executando.\nSe fechar o Terminal, o processo será morto.
 Move here	Terminal TermView		Mover aqui
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t %d\t -\t O diretório de trabalho atual do processo ativo na\n\t \t \t guia atual. Opcionalmente o número máximo de componentes do caminho\n\t \t \t pode ser especificado. Por exemplo, '%2d' para o máximo de dois componentes.\n\t %i\t -\t O índice da janela.\n\t %p\t -\t O nome do processo ativo na guia atual.\n\t %t\t -\t O título da guia atual.\n\t %%\t -\t O caractere '%'.
-White on Black	Terminal colors schema		Branco sobre Preto
 Error!	Terminal getString		Erro!
 New tab	Terminal TermWindow		Nova aba
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		O padrão especificando os títulos da guia. Os seguintes espaços reservados podem ser usados:\n

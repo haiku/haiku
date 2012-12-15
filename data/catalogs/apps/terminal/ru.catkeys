@@ -1,11 +1,10 @@
-1	russian	x-vnd.Haiku-Terminal	1294209621
+1	russian	x-vnd.Haiku-Terminal	2912171349
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
 OK	Terminal TermWindow		ОК
 New Terminal	Terminal TermWindow		Новый терминал
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
-Text size	Terminal TermWindow		Размер шрифта
 Match case	Terminal FindWindow		Учитывать регистр
 Quit	Terminal TermWindow		Выход
 Use default shell	Terminal Shell		Использовать оболочку по умолчанию
@@ -13,10 +12,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Подтве�
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок текущей вкладки.\nВозможно использовать следующие переменные:\n
 Select all	Terminal TermWindow		Выделить всё
 Close tab	Terminal TermWindow		Закрыть вкладку
-Custom	Terminal colors schema		Настроена вручную
 Save to file…	Terminal PrefWindow		Сохранить в файл…
 OK	Terminal PrefWindow		ОК
-Black on White	Terminal colors schema		Черный текст на белом фоне
 Window title:	Terminal AppearancePrefView		Заголовок окна:
 Font:	Terminal AppearancePrefView		Шрифт:
 Copy here	Terminal TermView		Копировать сюда
@@ -34,13 +31,10 @@ Find	Terminal FindWindow		Найти
 Appearance	Terminal PrefWindow		Внешний вид
 Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
-Color schema:	Terminal AppearancePrefView		Цветовая схема:
 OK	Terminal SetTitleWindow		ОК
 Background	Terminal AppearancePrefView		Фона
 Use selection	Terminal FindWindow		Использовать выделенный текст
-Green on Black	Terminal colors schema		Зелёный на чёрном
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете вкладку, то этот процесс будет уничтожен.
-Size:	Terminal AppearancePrefView		Размер:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \"%command\":\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               вывести эту справку\n  -t,     --title              задать заголовок окна\n  -f,     --fullscreen         запустить во весь экран\n
 Full screen	Terminal TermWindow		На весь экран
@@ -61,7 +55,6 @@ Find…	Terminal TermWindow		Найти…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете Терминал, то этот процесс будет уничтожен.
 Move here	Terminal TermView		Переместить сюда
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n\t%%\t-\tСимвол процента - '%'.
-White on Black	Terminal colors schema		Белый текст на черном фоне
 Error!	Terminal getString		Ошибка!
 New tab	Terminal TermWindow		Новая вкладка
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:\n

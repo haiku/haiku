@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	3929743651
+1	hungarian	x-vnd.Haiku-Terminal	1252738083
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -6,7 +6,6 @@ OK	Terminal TermWindow		Rendben
 New Terminal	Terminal TermWindow		Új terminál
 Cursor text	Terminal AppearancePrefView		Kurzor szöveg
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Sajnos, a terminálnak nem sikerült elindítani a shellt.
-Text size	Terminal TermWindow		Betűméret
 Match case	Terminal FindWindow		Betűérzékeny
 Quit	Terminal TermWindow		Kilépés
 Use default shell	Terminal Shell		Alapértelmezett shell használata
@@ -14,10 +13,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Kilépés meg
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		A jelenlegi lap címét meghatározó minta. A következő kódok használhatóak:\n
 Select all	Terminal TermWindow		Összes kijelölése
 Close tab	Terminal TermWindow		Lap bezárása
-Custom	Terminal colors schema		Egyéni
 Save to file…	Terminal PrefWindow		Mentés fájlba…
 OK	Terminal PrefWindow		Rendben
-Black on White	Terminal colors schema		Fehér alapon fekete
 Window title:	Terminal AppearancePrefView		Ablak címe:
 Font:	Terminal AppearancePrefView		Betűtípus:
 Copy here	Terminal TermView		Másolás
@@ -35,13 +32,10 @@ Find	Terminal FindWindow		Keresés
 Appearance	Terminal PrefWindow		Megjelenés
 Tab title:	Terminal AppearancePrefView		Lap címe:
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Az ablakok címét meghatározó minta. A következő kódok használhatóak:\n
-Color schema:	Terminal AppearancePrefView		Színösszeállítás:
 OK	Terminal SetTitleWindow		Rendben
 Background	Terminal AppearancePrefView		Háttér
 Use selection	Terminal FindWindow		Kijelölés használata
-Green on Black	Terminal colors schema		Fekete alapon zöld
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		A folyamat (%1) még fut.\nHa bezárja a lapot, a folyamat megszakad.
-Size:	Terminal AppearancePrefView		Méret:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nem sikerült lefuttatni: %command\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h     --help                ez a leírás megjelenítése\n  -t     --title                 ablak címének megadása\n  -f     -fullscreen         indítás teljes képernyőben\n
 Full screen	Terminal TermWindow		Teljes képernyő
@@ -63,7 +57,6 @@ Find…	Terminal TermWindow		Keresés…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		A folyamat (%1) még fut.\nHa bezárja a Terminált, a folyamat megszakad.
 Move here	Terminal TermView		Mozgatás
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAz a mappa amiben a jelenlegi fül az aktív folyamata\n\t\t\tfut épp.Meg lehet adni az elérési út\n\t\t\tkomponenseinek számát. Pl. '%2d' maximum két komponenshez.\n\t%i\t-\tAz ablak indexe.\n\t%p\t-\tA jelenlegi fülben futó folyamat neve.\n\t%t\t-\tA jelenlegi fül címe.\n\t%%\t-\tEgy '%' karakter.
-White on Black	Terminal colors schema		Fekete alapon fehér
 Error!	Terminal getString		Hiba!
 New tab	Terminal TermWindow		Új lap
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		A fülek címét meghatározó minta. A következő kódok használhatóak:
