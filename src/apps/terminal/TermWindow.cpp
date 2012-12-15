@@ -11,6 +11,7 @@
 
 #include <new>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -57,6 +58,9 @@
 
 const static int32 kMaxTabs = 6;
 const static int32 kTermViewOffset = 3;
+
+const static int32 kMinimumFontSize = 8;
+const static int32 kMaximumFontSize = 36;
 
 // messages constants
 static const uint32 kNewTab = 'NTab';
@@ -402,8 +406,8 @@ TermWindow::MenusBeginning()
 
 	float size = font.Size();
 
-	fDecreaseFontSizeMenuItem->SetEnabled(size > 9);
-	fIncreaseFontSizeMenuItem->SetEnabled(size < 18);
+	fDecreaseFontSizeMenuItem->SetEnabled(size > kMinimumFontSize);
+	fIncreaseFontSizeMenuItem->SetEnabled(size < kMaximumFontSize);
 
 	BWindow::MenusBeginning();
 }
@@ -449,6 +453,16 @@ TermWindow::_MakeEncodingMenu()
 void
 TermWindow::_SetupMenu()
 {
+	fFontSizeMenu = _MakeFontSizeMenu(MSG_HALF_SIZE_CHANGED,
+		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
+	fIncreaseFontSizeMenuItem = new BMenuItem(B_TRANSLATE("Increase"),
+		new BMessage(kIncreaseFontSize), '+', B_COMMAND_KEY);
+	fDecreaseFontSizeMenuItem = new BMenuItem(B_TRANSLATE("Decrease"),
+		new BMessage(kDecreaseFontSize), '-', B_COMMAND_KEY);
+	fFontSizeMenu->AddSeparatorItem();
+	fFontSizeMenu->AddItem(fIncreaseFontSizeMenuItem);
+	fFontSizeMenu->AddItem(fDecreaseFontSizeMenuItem);
+
 	BLayoutBuilder::Menu<>(fMenuBar = new BMenuBar(Bounds(), "mbar"))
 		// Terminal
 		.AddMenu(B_TRANSLATE_SYSTEM_NAME("Terminal"))
@@ -491,14 +505,7 @@ TermWindow::_SetupMenu()
 		.AddMenu(B_TRANSLATE("Settings"))
 			.AddItem(_MakeWindowSizeMenu())
 			.AddItem(fEncodingMenu = _MakeEncodingMenu())
-			.AddMenu(B_TRANSLATE("Text size"))
-				.AddItem(B_TRANSLATE("Increase"), kIncreaseFontSize, '+',
-						B_COMMAND_KEY)
-					.GetItem(fIncreaseFontSizeMenuItem)
-				.AddItem(B_TRANSLATE("Decrease"), kDecreaseFontSize, '-',
-						B_COMMAND_KEY)
-					.GetItem(fDecreaseFontSizeMenuItem)
-			.End()
+			.AddItem(fFontSizeMenu)
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), MENU_PREF_OPEN)
 			.AddSeparator()
@@ -613,15 +620,25 @@ TermWindow::_GetPreferredFont(BFont& font)
 	// Default to be_fixed_font
 	font = be_fixed_font;
 
-	const char* family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
-	const char* style = PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE);
+	const char* family
+		= PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
+	const char* style
+		= PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE);
+	const char* size = PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE);
 
 	font.SetFamilyAndStyle(family, style);
+	font.SetSize(atoi(size));
 
-	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
-	if (size < 6.0f)
-		size = 6.0f;
-	font.SetSize(size);
+	// mark the font size menu item
+	for (int32 i = 0; i < fFontSizeMenu->CountItems(); i++) {
+		BMenuItem* item = fFontSizeMenu->ItemAt(i);
+		if (item == NULL)
+			continue;
+
+		item->SetMarked(false);
+		if (strcmp(item->Label(), size) == 0)
+			item->SetMarked(true);
+	}
 }
 
 
@@ -771,24 +788,60 @@ TermWindow::MessageReceived(BMessage *message)
 		case MSG_COLS_CHANGED:
 		{
 			int32 columns, rows;
-			message->FindInt32("columns", &columns);
-			message->FindInt32("rows", &rows);
+			if (message->FindInt32("columns", &columns) != B_OK
+				|| message->FindInt32("rows", &rows) != B_OK) {
+				break;
+			}
 
-			_ActiveTermView()->SetTermSize(rows, columns);
-
-			_ResizeView(_ActiveTermView());
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				view->SetTermSize(rows, columns);
+				_ResizeView(view);
+			}
 			break;
 		}
+
 		case MSG_HALF_FONT_CHANGED:
 		case MSG_FULL_FONT_CHANGED:
-		case MSG_HALF_SIZE_CHANGED:
-		case MSG_FULL_SIZE_CHANGED:
 		{
 			BFont font;
 			_GetPreferredFont(font);
-			_ActiveTermView()->SetTermFont(&font);
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				view->SetTermFont(&font);
+				_ResizeView(view);
+			}
+			break;
+		}
 
-			_ResizeView(_ActiveTermView());
+		case MSG_HALF_SIZE_CHANGED:
+		case MSG_FULL_SIZE_CHANGED:
+		{
+			const char* size = NULL;
+			if (message->FindString("font_size", &size) != B_OK)
+				break;
+
+			// mark the font size menu item
+			for (int32 i = 0; i < fFontSizeMenu->CountItems(); i++) {
+				BMenuItem* item = fFontSizeMenu->ItemAt(i);
+				if (item == NULL)
+					continue;
+
+				item->SetMarked(false);
+				if (strcmp(item->Label(), size) == 0)
+					item->SetMarked(true);
+			}
+
+			BFont font;
+			_ActiveTermView()->GetTermFont(&font);
+			font.SetSize(atoi(size));
+			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE,
+				(int32)atoi(size));
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				_TermViewAt(i)->SetTermFont(&font);
+				_ResizeView(view);
+			}
 			break;
 		}
 
@@ -957,27 +1010,50 @@ TermWindow::MessageReceived(BMessage *message)
 		case kIncreaseFontSize:
 		case kDecreaseFontSize:
 		{
-			TermView* view = _ActiveTermView();
 			BFont font;
-			view->GetTermFont(&font);
-
+			_ActiveTermView()->GetTermFont(&font);
 			float size = font.Size();
-			if (message->what == kIncreaseFontSize)
-				size += 1;
-			else
-				size -= 1;
 
-			// limit the font size
-			if (size < 9)
-				size = 9;
-			if (size > 18)
-				size = 18;
+			if (message->what == kIncreaseFontSize) {
+				if (size < 12)
+					size += 1;
+				else if (size < 24)
+					size += 2;
+				else
+					size += 4;
+			} else {
+				if (size <= 12)
+					size -= 1;
+				else if (size <= 24)
+					size -= 2;
+				else
+					size -= 4;
+			}
+
+			// constrain the font size
+			if (size < kMinimumFontSize)
+				size = kMinimumFontSize;
+			if (size > kMaximumFontSize)
+				size = kMaximumFontSize;
+
+			// mark the font size menu item
+			for (int32 i = 0; i < fFontSizeMenu->CountItems(); i++) {
+				BMenuItem* item = fFontSizeMenu->ItemAt(i);
+				if (item == NULL)
+					continue;
+
+				item->SetMarked(false);
+				if (atoi(item->Label()) == size)
+					item->SetMarked(true);
+			}
 
 			font.SetSize(size);
-			view->SetTermFont(&font);
 			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE, (int32)size);
-
-			_ResizeView(view);
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				_TermViewAt(i)->SetTermFont(&font);
+				_ResizeView(view);
+			}
 			break;
 		}
 
@@ -1144,10 +1220,12 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 		view->GetFontSize(&width, &height);
 
 		float minimumHeight = -1;
-		if (fMenuBar)
+		if (fMenuBar != NULL)
 			minimumHeight += fMenuBar->Bounds().Height() + 1;
-		if (fTabView && fTabView->CountTabs() > 0)
+
+		if (fTabView != NULL && fTabView->CountTabs() > 0)
 			minimumHeight += fTabView->TabHeight() + 1;
+
 		SetSizeLimits(MIN_COLS * width - 1, MAX_COLS * width - 1,
 			minimumHeight + MIN_ROWS * height - 1,
 			minimumHeight + MAX_ROWS * height - 1);
@@ -1155,7 +1233,7 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 			// the terminal can be resized smaller than MIN_ROWS/MIN_COLS!
 
 		// If it's the first time we're called, setup the window
-		if (fTabView->CountTabs() == 0) {
+		if (fTabView != NULL && fTabView->CountTabs() == 0) {
 			float viewWidth, viewHeight;
 			containerView->GetPreferredSize(&viewWidth, &viewHeight);
 
@@ -1523,9 +1601,10 @@ TermWindow::_ResizeView(TermView *view)
 	view->GetFontSize(&fontWidth, &fontHeight);
 
 	float minimumHeight = -1;
-	if (fMenuBar)
+	if (fMenuBar != NULL)
 		minimumHeight += fMenuBar->Bounds().Height() + 1;
-	if (fTabView && fTabView->CountTabs() > 1)
+
+	if (fTabView != NULL && fTabView->CountTabs() > 1)
 		minimumHeight += fTabView->TabHeight() + 1;
 
 	SetSizeLimits(MIN_COLS * fontWidth - 1, MAX_COLS * fontWidth - 1,
@@ -1535,19 +1614,21 @@ TermWindow::_ResizeView(TermView *view)
 	float width;
 	float height;
 	view->Parent()->GetPreferredSize(&width, &height);
+
 	width += B_V_SCROLL_BAR_WIDTH;
 		// NOTE: Width is one pixel too small, since the scroll view
 		// is one pixel wider than its parent.
-	height += fMenuBar->Bounds().Height() + 1;
+	if (fMenuBar != NULL)
+		height += fMenuBar->Bounds().Height() + 1;
+	if (fTabView != NULL && fTabView->CountTabs() > 1)
+		height += fTabView->TabHeight() + 1;
 
 	ResizeTo(width, height);
-
 	view->Invalidate();
 }
 
 
-/* static */
-BMenu*
+/* static */ BMenu*
 TermWindow::_MakeWindowSizeMenu()
 {
 	BMenu* menu = new (std::nothrow) BMenu(B_TRANSLATE("Window size"));
@@ -1576,6 +1657,51 @@ TermWindow::_MakeWindowSizeMenu()
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Full screen"),
 		new BMessage(FULLSCREEN), B_ENTER));
+
+	return menu;
+}
+
+
+/*static*/ BMenu*
+TermWindow::_MakeFontSizeMenu(uint32 command, uint8 defaultSize)
+{
+	BMenu* menu = new (std::nothrow) BMenu(B_TRANSLATE("Font size"));
+	if (menu == NULL)
+		return NULL;
+
+	int32 sizes[] = {
+		8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 0
+	};
+
+	bool found = false;
+
+	for (uint32 i = 0; sizes[i]; i++) {
+		BString string;
+		string << sizes[i];
+		BMessage* message = new BMessage(command);
+		message->AddString("font_size", string);
+		BMenuItem* item = new BMenuItem(string.String(), message);
+		menu->AddItem(item);
+		if (sizes[i] == defaultSize) {
+			item->SetMarked(true);
+			found = true;
+		}
+	}
+
+	if (!found) {
+		for (uint32 i = 0; sizes[i]; i++) {
+			if (sizes[i] > defaultSize) {
+				BString string;
+				string << defaultSize;
+				BMessage* message = new BMessage(command);
+				message->AddString("font_size", string);
+				BMenuItem* item = new BMenuItem(string.String(), message);
+				item->SetMarked(true);
+				menu->AddItem(item, i);
+				break;
+			}
+		}
+	}
 
 	return menu;
 }

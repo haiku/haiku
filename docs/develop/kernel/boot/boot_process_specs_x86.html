@@ -28,11 +28,11 @@
 		</p>
 		<p>
 		It resides in the first first 1024 bytes of a BFS disk which usually refers to the
-		first two sectors of the partition in question. Since the BFS super block is located
+		first two sectors of the partition in question. Since the BFS superblock is located
 		at byte offset 512, and about 170 bytes large, this section is already reserved,
 		and thus cannot be used by the loader itself.<br>
 		The MBR only loads the first sector of a partition into memory, so it has to load
-		the super block (and the rest of its implementation) by itself.
+		the superblock (and the rest of its implementation) by itself.
 		</p>
 		<p>
 		The loader must be able to load the real boot loader from a certain path, and

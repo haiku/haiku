@@ -26,15 +26,27 @@
 #include "StringUtils.h"
 #include "Team.h"
 #include "Thread.h"
+#include "Type.h"
 #include "UiUtils.h"
+#include "UserInterface.h"
+#include "Value.h"
+#include "ValueLoader.h"
+#include "ValueLocation.h"
+#include "ValueNode.h"
+#include "ValueNodeManager.h"
 
 
-DebugReportGenerator::DebugReportGenerator(::Team* team)
+DebugReportGenerator::DebugReportGenerator(::Team* team,
+	UserInterfaceListener* listener)
 	:
 	BLooper("DebugReportGenerator"),
 	fTeam(team),
 	fArchitecture(team->GetArchitecture()),
-	fTeamDataSem(-1)
+	fTeamDataSem(-1),
+	fNodeManager(NULL),
+	fListener(listener),
+	fWaitingNode(NULL),
+	fTraceWaitingThread(NULL)
 {
 	fTeam->AddListener(this);
 	fArchitecture->AcquireReference();
@@ -45,6 +57,10 @@ DebugReportGenerator::~DebugReportGenerator()
 {
 	fTeam->RemoveListener(this);
 	fArchitecture->ReleaseReference();
+	if (fNodeManager != NULL) {
+		fNodeManager->RemoveListener(this);
+		fNodeManager->ReleaseReference();
+	}
 }
 
 
@@ -55,6 +71,12 @@ DebugReportGenerator::Init()
 	if (fTeamDataSem < B_OK)
 		return fTeamDataSem;
 
+	fNodeManager = new(std::nothrow) ValueNodeManager();
+	if (fNodeManager == NULL)
+		return B_NO_MEMORY;
+
+	fNodeManager->AddListener(this);
+
 	Run();
 
 	return B_OK;
@@ -62,9 +84,9 @@ DebugReportGenerator::Init()
 
 
 DebugReportGenerator*
-DebugReportGenerator::Create(::Team* team)
+DebugReportGenerator::Create(::Team* team, UserInterfaceListener* listener)
 {
-	DebugReportGenerator* self = new DebugReportGenerator(team);
+	DebugReportGenerator* self = new DebugReportGenerator(team, listener);
 
 	try {
 		self->Init();
@@ -132,7 +154,20 @@ DebugReportGenerator::MessageReceived(BMessage* message)
 void
 DebugReportGenerator::ThreadStackTraceChanged(const ::Team::ThreadEvent& event)
 {
-	release_sem(fTeamDataSem);
+	if (fTraceWaitingThread == event.GetThread()) {
+		fTraceWaitingThread = NULL;
+		release_sem(fTeamDataSem);
+	}
+}
+
+
+void
+DebugReportGenerator::ValueNodeValueChanged(ValueNode* node)
+{
+	if (node == fWaitingNode) {
+		fWaitingNode = NULL;
+		release_sem(fTeamDataSem);
+	}
 }
 
 
@@ -267,6 +302,7 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 			break;
 
 		locker.Unlock();
+		fTraceWaitingThread = thread;
 		status_t result = acquire_sem(fTeamDataSem);
 		if (result != B_OK)
 			return result;
@@ -285,6 +321,26 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 				sizeof(functionName)));
 
 		_output << data;
+		if (frame->CountParameters() == 0
+			&& frame->CountLocalVariables() == 0) {
+			continue;
+		}
+
+		_output << "\t\t\tVariables:\n";
+		status_t result = fNodeManager->SetStackFrame(thread, frame);
+		if (result != B_OK)
+			continue;
+
+		ValueNodeContainer* container = fNodeManager->GetContainer();
+		AutoLocker<ValueNodeContainer> containerLocker(container);
+		for (int32 i = 0; i < container->CountChildren(); i++) {
+			ValueNodeChild* child = container->ChildAt(i);
+			containerLocker.Unlock();
+			_ResolveValueIfNeeded(child->Node(), frame, 1);
+			containerLocker.Lock();
+			UiUtils::PrintValueNodeGraph(_output, frame, child, 3, 1);
+		}
+		_output << "\n";
 	}
 
 	_output << "\n\t\tRegisters:\n";
@@ -303,4 +359,61 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 	}
 
 	return B_OK;
+}
+
+
+status_t
+DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame,
+	int32 maxDepth)
+{
+	status_t result = B_OK;
+	if (node->LocationAndValueResolutionState() == VALUE_NODE_UNRESOLVED) {
+		fWaitingNode = node;
+		fListener->ValueNodeValueRequested(frame->GetCpuState(),
+			fNodeManager->GetContainer(), node);
+		result = acquire_sem(fTeamDataSem);
+	}
+
+	if (node->LocationAndValueResolutionState() == B_OK && maxDepth > 0) {
+		AutoLocker<ValueNodeContainer> containerLocker(
+			fNodeManager->GetContainer());
+		for (int32 i = 0; i < node->CountChildren(); i++) {
+			ValueNodeChild* child = node->ChildAt(i);
+			containerLocker.Unlock();
+			result = _ResolveLocationIfNeeded(child, frame);
+			if (result != B_OK)
+				continue;
+
+			result = fNodeManager->AddChildNodes(child);
+			if (result != B_OK)
+				continue;
+
+			// since in the case of a pointer to a compound we hide
+			// the intervening compound, don't consider the hidden node
+			// a level for the purposes of depth traversal
+			if (node->GetType()->Kind() == TYPE_ADDRESS
+				&& child->GetType()->Kind() == TYPE_COMPOUND) {
+				_ResolveValueIfNeeded(child->Node(), frame, maxDepth);
+			} else
+				_ResolveValueIfNeeded(child->Node(), frame, maxDepth - 1);
+			containerLocker.Lock();
+		}
+	}
+
+	return result;
+}
+
+
+status_t
+DebugReportGenerator::_ResolveLocationIfNeeded(ValueNodeChild* child,
+	StackFrame* frame)
+{
+	ValueLocation* location = NULL;
+	ValueLoader loader(fTeam->GetArchitecture(), fTeam->GetTeamMemory(),
+		fTeam->GetTeamTypeInformation(), frame->GetCpuState());
+	status_t result = child->ResolveLocation(&loader, location);
+	child->SetLocation(location, result);
+	if (location != NULL)
+		location->ReleaseReference();
+	return result;
 }

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Expander	2398100010
+1	english	x-vnd.Haiku-Expander	282517174
 Expand	ExpanderMenu		解压缩
 Close window when done expanding	ExpanderPreferences		完成解压后，关闭窗口。
 Set destination…	ExpanderMenu		目标文件…
@@ -17,7 +17,6 @@ Automatically expand files	ExpanderPreferences		自动解压文件
 Creating listing for '%s'	ExpanderWindow		为 '%s' 创建列表
 Continue	ExpanderWindow		继续
 Destination folder	ExpanderPreferences		目标目录
-The destination folder does not exist.	ExpanderWindow		目标文件夹不存在。
 Other	ExpanderPreferences		其他
 Cancel	ExpanderPreferences		取消
 Expansion	ExpanderPreferences		展开

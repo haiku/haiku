@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Expander	2398100010
+1	french	x-vnd.Haiku-Expander	282517174
 Expand	ExpanderMenu		Décompresser
 Close window when done expanding	ExpanderPreferences		Fermer la fenêtre après l'extraction
 Set destination…	ExpanderMenu		Choisir la destination…
@@ -17,7 +17,6 @@ Automatically expand files	ExpanderPreferences		Décompresser les fichiers autom
 Creating listing for '%s'	ExpanderWindow		Créer un inventaire pour « %s »
 Continue	ExpanderWindow		Continuer
 Destination folder	ExpanderPreferences		Dossier de destination
-The destination folder does not exist.	ExpanderWindow		Le dossier de destination n'existe pas.
 Other	ExpanderPreferences		Autre
 Cancel	ExpanderPreferences		Annuler
 Expansion	ExpanderPreferences		Décompression

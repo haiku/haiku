@@ -56,8 +56,10 @@ This is the Haiku project's development tracker.
 {OpenGrok
 ---------
 http://haiku.it.su.se:8180/source
+http://grok.bikemonkey.org/source
+http://code.metager.de/source/xref/haiku
 
-Graciously provided by <name>.
+Graciously provided by Janne Johansson, Landon Fuller and MetaGer respectively.
 This allows you to quickly and easily search Haiku's source code.
 
 

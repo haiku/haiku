@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Expander	2398100010
+1	portuguese (brazil)	x-vnd.Haiku-Expander	282517174
 Expand	ExpanderMenu		Expandir
 Close window when done expanding	ExpanderPreferences		Fechar a janela quando concluída a expansão
 Set destination…	ExpanderMenu		Selecionar destino…
@@ -17,7 +17,6 @@ Automatically expand files	ExpanderPreferences		Expandir arquivos automaticament
 Creating listing for '%s'	ExpanderWindow		Criando lista para '%s'
 Continue	ExpanderWindow		Continuar
 Destination folder	ExpanderPreferences		Pasta de destino
-The destination folder does not exist.	ExpanderWindow		A pasta de destino não existe.
 Other	ExpanderPreferences		Outro
 Cancel	ExpanderPreferences		Cancelar
 Expansion	ExpanderPreferences		Expansão

@@ -33,6 +33,8 @@
 #include <Catalog.h>
 #include <Rect.h>
 
+
+class BAboutWindow;
 class BNetworkCookieJar;
 class DownloadWindow;
 class BrowserWindow;
@@ -77,6 +79,8 @@ private:
 
 			DownloadWindow*		fDownloadWindow;
 			SettingsWindow*		fSettingsWindow;
+
+			BAboutWindow*		fAboutWindow;
 };
 
 

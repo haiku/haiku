@@ -112,11 +112,25 @@ sem_post(sem_t* semaphore)
 int
 sem_timedwait(sem_t* semaphore, const struct timespec* timeout)
 {
-	bigtime_t timeoutMicros = ((bigtime_t)timeout->tv_sec) * 1000000
-		+ timeout->tv_nsec / 1000;
+	if (timeout != NULL
+		&& (timeout->tv_nsec < 0 || timeout->tv_nsec >= 1000000000)) {
+		status_t err = _kern_realtime_sem_wait(semaphore->id, 0);
+		if (err == B_WOULD_BLOCK)
+			err = EINVAL;
+		// do nothing, return err as it is.
+		RETURN_AND_SET_ERRNO_TEST_CANCEL(err);
+	}
 
-	RETURN_AND_SET_ERRNO_TEST_CANCEL(
-		_kern_realtime_sem_wait(semaphore->id, timeoutMicros));
+	bigtime_t timeoutMicros = B_INFINITE_TIMEOUT;
+	if (timeout != NULL) {
+		timeoutMicros = ((bigtime_t)timeout->tv_sec) * 1000000
+			+ timeout->tv_nsec / 1000;
+	}
+	status_t err = _kern_realtime_sem_wait(semaphore->id, timeoutMicros);
+	if (err == B_WOULD_BLOCK)
+		err = ETIMEDOUT;
+	
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(err);
 }
 
 

@@ -11,6 +11,7 @@
 
 #include <DateTime.h>
 #include <Path.h>
+#include <String.h>
 #include <Variant.h>
 
 #include "FunctionInstance.h"
@@ -18,6 +19,9 @@
 #include "StackFrame.h"
 #include "Team.h"
 #include "Thread.h"
+#include "Type.h"
+#include "Value.h"
+#include "ValueNode.h"
 
 
 /*static*/ const char*
@@ -155,4 +159,69 @@ UiUtils::ReportNameForTeam(::Team* team, char* buffer, size_t bufferSize)
 
 	return buffer;
 
+}
+
+
+/*static*/ void
+UiUtils::PrintValueNodeGraph(BString& _output, StackFrame* frame,
+	ValueNodeChild* child, int32 indentLevel, int32 maxDepth)
+{
+	_output.Append('\t', indentLevel);
+	_output << child->Name();
+
+	ValueNode* node = child->Node();
+	if (node == NULL) {
+		_output << ": Unavailable\n";
+		return;
+	}
+
+	if (node->GetType()->Kind() != TYPE_COMPOUND) {
+		_output << ": ";
+		status_t resolutionState = node->LocationAndValueResolutionState();
+		if (resolutionState == VALUE_NODE_UNRESOLVED)
+			_output << "Unresolved";
+		else if (resolutionState == B_OK) {
+			Value* value = node->GetValue();
+			if (value != NULL) {
+				BString valueData;
+				value->ToString(valueData);
+				_output << valueData;
+			} else
+				_output << "Unavailable";
+		} else
+			_output << strerror(resolutionState);
+	}
+
+	if (maxDepth == 0 || node->CountChildren() == 0) {
+		_output << "\n";
+		return;
+	}
+
+	if (node->CountChildren() == 1
+		&& node->GetType()->Kind() == TYPE_ADDRESS
+		&& node->ChildAt(0)->GetType()->Kind() == TYPE_COMPOUND) {
+		// for the case of a pointer to a compound type,
+		// we want to hide the intervening compound node and print
+		// the children directly.
+		node = node->ChildAt(0)->Node();
+	}
+
+	if (node != NULL) {
+		_output << " {\n";
+
+		for (int32 i = 0; i < node->CountChildren(); i++) {
+			// don't dump compound nodes if our depth limit won't allow
+			// us to traverse into their children anyways, and the top
+			// level node contains no data of intereest.
+			if (node->ChildAt(i)->GetType()->Kind() != TYPE_COMPOUND
+				|| maxDepth > 1) {
+				PrintValueNodeGraph(_output, frame, node->ChildAt(i),
+					indentLevel + 1, maxDepth - 1);
+			}
+		}
+		_output.Append('\t', indentLevel);
+		_output << "}\n";
+	}
+
+	return;
 }

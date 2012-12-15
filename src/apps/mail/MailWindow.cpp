@@ -1691,6 +1691,8 @@ TMailWindow::QuitRequested()
 			|| strlen(fHeaderView->fSubject->Text())
 			|| (fHeaderView->fCc && strlen(fHeaderView->fCc->Text()))
 			|| (fHeaderView->fBcc && strlen(fHeaderView->fBcc->Text()))
+			|| (fContentView->fTextView
+				&& strlen(fContentView->fTextView->Text()))
 			|| (fEnclosuresView != NULL
 				&& fEnclosuresView->fList->CountItems()))) {
 		if (fResending) {
@@ -2548,15 +2550,16 @@ TMailWindow::SaveAsDraft()
 					return status;
 			case B_OK:
 			{
-				char fileName[512], *eofn;
-				int32 i;
-
+				char fileName[B_FILE_NAME_LENGTH];
 				// save as some version of the message's subject
-				strncpy(fileName, fHeaderView->fSubject->Text(),
-					sizeof(fileName)-10);
-				fileName[sizeof(fileName)-10]='\0';
-					// terminate like strncpy doesn't
-				eofn = fileName + strlen(fileName);
+				if (strlen(fHeaderView->fSubject->Text()) == 0)
+					strlcpy(fileName, B_TRANSLATE("Untitled"),
+						sizeof(fileName));
+				else
+					strlcpy(fileName, fHeaderView->fSubject->Text(),
+						sizeof(fileName));
+			
+				uint32 originalLength = strlen(fileName);
 
 				// convert /, \ and : to -
 				for (char *bad = fileName; (bad = strchr(bad, '/')) != NULL;
@@ -2568,12 +2571,19 @@ TMailWindow::SaveAsDraft()
 
 				// Create the file; if the name exists, find a unique name
 				flags = B_WRITE_ONLY | B_CREATE_FILE | B_FAIL_IF_EXISTS;
-				for (i = 1; (status = draft.SetTo(&dir, fileName, flags))
-					!= B_OK; i++) {
-					if (status != B_FILE_EXISTS)
-						return status;
-					sprintf(eofn, "%ld", i);
-				}
+				int32 i = 1;
+				do {
+					status = draft.SetTo(&dir, fileName, flags);
+					if (status == B_OK)
+						break;
+					char appendix[B_FILE_NAME_LENGTH];
+					sprintf(appendix, " %ld", i++);
+					int32 pos = min_c(sizeof(fileName) - strlen(appendix), 
+						originalLength);
+					sprintf(fileName + pos, "%s", appendix);
+				} while (status == B_FILE_EXISTS);
+				if (status != B_OK)
+					return status;
 
 				// Cache the ref
 				if (fRef == NULL)
@@ -2644,6 +2654,8 @@ TMailWindow::SaveAsDraft()
 
 	fDraft = true;
 	fChanged = false;
+
+	fSaveButton->SetEnabled(false);
 
 	return B_OK;
 }

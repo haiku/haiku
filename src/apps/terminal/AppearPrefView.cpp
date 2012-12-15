@@ -75,8 +75,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	const char* kColorTable[] = {
 		B_TRANSLATE("Text"),
 		B_TRANSLATE("Background"),
-		B_TRANSLATE("Cursor text"),
-		B_TRANSLATE("Cursor background"),
+		B_TRANSLATE("Cursor"),
+		B_TRANSLATE("Text under cursor"),
 		B_TRANSLATE("Selected text"),
 		B_TRANSLATE("Selected background"),
 		NULL
@@ -93,12 +93,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	BMenu* fontMenu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),
 		PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE));
-
-	BMenu* sizeMenu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
-		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
-
-	fFont = new BMenuField(B_TRANSLATE("Font:"), fontMenu);
-	fFontSize = new BMenuField(B_TRANSLATE("Size:"), sizeMenu);
+	fFontField = new BMenuField(B_TRANSLATE("Font:"), fontMenu);
 
 	BPopUpMenu* schemesPopUp = _MakeColorSchemeMenu(MSG_COLOR_SCHEME_CHANGED,
 		gPredefinedColorSchemes, gPredefinedColorSchemes[0]);
@@ -108,8 +103,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	BPopUpMenu* colorsPopUp = _MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
 		kColorTable[0]);
 
-	fColorField = new BMenuField(B_TRANSLATE("Color:"),
-			colorsPopUp);
+	fColorField = new BMenuField(B_TRANSLATE("Color:"), colorsPopUp);
 	fColorField->SetEnabled(false);
 
 	fTabTitle = new BTextControl("tabTitle", B_TRANSLATE("Tab title:"), "",
@@ -135,14 +129,12 @@ AppearancePrefView::AppearancePrefView(const char* name,
 			.Add(fTabTitle->CreateTextViewLayoutItem(), 1, 0)
 			.Add(fWindowTitle->CreateLabelLayoutItem(), 0, 1)
 			.Add(fWindowTitle->CreateTextViewLayoutItem(), 1, 1)
-			.Add(fFont->CreateLabelLayoutItem(), 0, 2)
-			.Add(fFont->CreateMenuBarLayoutItem(), 1, 2)
-			.Add(fFontSize->CreateLabelLayoutItem(), 0, 3)
-			.Add(fFontSize->CreateMenuBarLayoutItem(), 1, 3)
-			.Add(fColorSchemeField->CreateLabelLayoutItem(), 0, 4)
-			.Add(fColorSchemeField->CreateMenuBarLayoutItem(), 1, 4)
-			.Add(fColorField->CreateLabelLayoutItem(), 0, 5)
-			.Add(fColorField->CreateMenuBarLayoutItem(), 1, 5)
+			.Add(fFontField->CreateLabelLayoutItem(), 0, 2)
+			.Add(fFontField->CreateMenuBarLayoutItem(), 1, 2)
+			.Add(fColorSchemeField->CreateLabelLayoutItem(), 0, 3)
+			.Add(fColorSchemeField->CreateMenuBarLayoutItem(), 1, 3)
+			.Add(fColorField->CreateLabelLayoutItem(), 0, 4)
+			.Add(fColorField->CreateMenuBarLayoutItem(), 1, 4)
 			.End()
 		.AddGlue()
 		.Add(fColorControl = new BColorControl(BPoint(10, 10),
@@ -152,8 +144,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 
 	fTabTitle->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fWindowTitle->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	fFont->SetAlignment(B_ALIGN_RIGHT);
-	fFontSize->SetAlignment(B_ALIGN_RIGHT);
+	fFontField->SetAlignment(B_ALIGN_RIGHT);
 	fColorField->SetAlignment(B_ALIGN_RIGHT);
 	fColorSchemeField->SetAlignment(B_ALIGN_RIGHT);
 
@@ -191,20 +182,23 @@ AppearancePrefView::GetPreferredSize(float* _width, float* _height)
 void
 AppearancePrefView::Revert()
 {
-	fTabTitle->SetText(PrefHandler::Default()->getString(PREF_TAB_TITLE));
-	fWindowTitle->SetText(PrefHandler::Default()->getString(PREF_WINDOW_TITLE));
+	PrefHandler* pref = PrefHandler::Default();
 
-	fWarnOnExit->SetValue(PrefHandler::Default()->getBool(
+	fTabTitle->SetText(pref->getString(PREF_TAB_TITLE));
+	fWindowTitle->SetText(pref->getString(PREF_WINDOW_TITLE));
+
+	fWarnOnExit->SetValue(pref->getBool(
 		PREF_WARN_ON_EXIT));
 
 	fColorSchemeField->Menu()->ItemAt(0)->SetMarked(true);
-	fColorControl->SetValue(PrefHandler::Default()->
+	fColorControl->SetValue(pref->
 		getRGB(PREF_TEXT_FORE_COLOR));
 
-	fFont->Menu()->FindItem(PrefHandler::Default()->getString(
-		PREF_HALF_FONT_FAMILY))->SetMarked(true);
-	fFontSize->Menu()->FindItem(PrefHandler::Default()->getString(
-		PREF_HALF_FONT_FAMILY))->SetMarked(true);
+	const char* family = pref->getString(PREF_HALF_FONT_FAMILY);
+	const char* style = pref->getString(PREF_HALF_FONT_STYLE);
+	const char* size = pref->getString(PREF_HALF_FONT_SIZE);
+
+	_MarkSelectedFont(family, style, size);
 }
 
 
@@ -216,8 +210,14 @@ AppearancePrefView::AttachedToWindow()
 	fBlinkCursor->SetTarget(this);
 	fWarnOnExit->SetTarget(this);
 
-	fFontSize->Menu()->SetTargetForItems(this);
-	fFont->Menu()->SetTargetForItems(this);
+	fFontField->Menu()->SetTargetForItems(this);
+	for (int32 i = 0; i < fFontField->Menu()->CountItems(); i++) {
+		BMenu* fontSizeMenu = fFontField->Menu()->SubmenuAt(i);
+		if (fontSizeMenu == NULL)
+			continue;
+
+		fontSizeMenu->SetTargetForItems(this);
+	}
 
   	fColorControl->SetTarget(this);
   	fColorField->Menu()->SetTargetForItems(this);
@@ -233,6 +233,7 @@ AppearancePrefView::AttachedToWindow()
 
 
 void
+
 AppearancePrefView::MessageReceived(BMessage* msg)
 {
 	bool modified = false;
@@ -242,51 +243,51 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 		{
 			const char* family = NULL;
 			const char* style = NULL;
-			msg->FindString("font_family", &family);
-			msg->FindString("font_style", &style);
+			const char* size = NULL;
+			if (msg->FindString("font_family", &family) != B_OK
+				|| msg->FindString("font_style", &style) != B_OK
+				|| msg->FindString("font_size", &size) != B_OK) {
+				break;
+			}
 
 			PrefHandler* pref = PrefHandler::Default();
 			const char* currentFamily
 				= pref->getString(PREF_HALF_FONT_FAMILY);
 			const char* currentStyle
 				= pref->getString(PREF_HALF_FONT_STYLE);
+			const char* currentSize
+				= pref->getString(PREF_HALF_FONT_SIZE);
+
 			if (currentFamily == NULL || strcmp(currentFamily, family) != 0
-				|| currentStyle == NULL || strcmp(currentStyle, style) != 0) {
+				|| currentStyle == NULL || strcmp(currentStyle, style) != 0
+				|| currentSize == NULL || strcmp(currentSize, size) != 0) {
 				pref->setString(PREF_HALF_FONT_FAMILY, family);
 				pref->setString(PREF_HALF_FONT_STYLE, style);
+				pref->setString(PREF_HALF_FONT_SIZE, size);
+				_MarkSelectedFont(family, style, size);
 				modified = true;
 			}
 			break;
 		}
 
-		case MSG_HALF_SIZE_CHANGED:
-			if (strcmp(PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE),
-					fFontSize->Menu()->FindMarked()->Label()) != 0) {
-				PrefHandler::Default()->setString(PREF_HALF_FONT_SIZE,
-					fFontSize->Menu()->FindMarked()->Label());
-				modified = true;
-			}
-			break;
-
 		case MSG_COLOR_CHANGED:
 		{
 			rgb_color oldColor = PrefHandler::Default()->getRGB(
 				fColorField->Menu()->FindMarked()->Label());
-				if (oldColor != fColorControl->ValueAsColor()) {
-					PrefHandler::Default()->setRGB(
-						fColorField->Menu()->FindMarked()->Label(),
-						fColorControl->ValueAsColor());
-					modified = true;
-				}
+			if (oldColor != fColorControl->ValueAsColor()) {
+				PrefHandler::Default()->setRGB(
+					fColorField->Menu()->FindMarked()->Label(),
+					fColorControl->ValueAsColor());
+				modified = true;
 			}
 			break;
+		}
 
 		case MSG_COLOR_SCHEME_CHANGED:
 		{
 			color_scheme* newScheme = NULL;
 			if (msg->FindPointer("color_scheme",
-				(void**)&newScheme) == B_OK) {
-
+					(void**)&newScheme) == B_OK) {
 				if (newScheme == &gCustomColorScheme)
 					_EnableCustomColors(true);
 				else
@@ -431,13 +432,17 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 					font.SetFamilyAndStyle(family, style);
 					if (IsFontUsable(font)) {
 						BMessage* message = new BMessage(command);
+						const char* size
+							= PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE);
 						message->AddString("font_family", family);
 						message->AddString("font_style", style);
-						char itemLabel[134];
-						snprintf(itemLabel, sizeof(itemLabel),
+						message->AddString("font_size", size);
+						char fontMenuLabel[134];
+						snprintf(fontMenuLabel, sizeof(fontMenuLabel),
 							"%s - %s", family, style);
-						BMenuItem* item = new BMenuItem(itemLabel,
-							message);
+						BMenu* fontSizeMenu = _MakeFontSizeMenu(fontMenuLabel,
+							MSG_HALF_FONT_CHANGED, family, style, size);
+						BMenuItem* item = new BMenuItem(fontSizeMenu, message);
 						menu->AddItem(item);
 						if (strcmp(defaultFamily, family) == 0
 							&& strcmp(defaultStyle, style) == 0)
@@ -456,32 +461,42 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 
 
 /*static*/ BMenu*
-AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
+AppearancePrefView::_MakeFontSizeMenu(const char* label, uint32 command,
+	const char* family, const char* style, const char* size)
 {
-	BPopUpMenu* menu = new BPopUpMenu("size");
-	int32 sizes[] = {9, 10, 11, 12, 14, 16, 18, 0};
+	BMenu* menu = new BMenu(label);
+	menu->SetRadioMode(true);
+	menu->SetLabelFromMarked(false);
+
+	int32 sizes[] = {
+		8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 0
+	};
 
 	bool found = false;
 
 	for (uint32 i = 0; sizes[i]; i++) {
-		BString string;
-		string << sizes[i];
-
-		BMenuItem* item = new BMenuItem(string.String(), new BMessage(command));
+		BString fontSize;
+		fontSize << sizes[i];
+		BMessage* message = new BMessage(command);
+		message->AddString("font_family", family);
+		message->AddString("font_style", style);
+		message->AddString("font_size", fontSize.String());
+		BMenuItem* item = new BMenuItem(fontSize.String(), message);
 		menu->AddItem(item);
-
-		if (sizes[i] == defaultSize) {
+		if (sizes[i] == atoi(size)) {
 			item->SetMarked(true);
 			found = true;
 		}
 	}
+
 	if (!found) {
 		for (uint32 i = 0; sizes[i]; i++) {
-			if (sizes[i] > defaultSize) {
-				BString string;
-				string << defaultSize;
-				BMenuItem* item = new BMenuItem(string.String(),
-					new BMessage(command));
+			if (sizes[i] > atoi(size)) {
+				BMessage* message = new BMessage(command);
+				message->AddString("font_family", family);
+				message->AddString("font_style", style);
+				message->AddString("font_size", size);
+				BMenuItem* item = new BMenuItem(size, message);
 				item->SetMarked(true);
 				menu->AddItem(item, i);
 				break;
@@ -540,4 +555,29 @@ AppearancePrefView::_MakeColorSchemeMenu(uint32 msg, const color_scheme** items,
 		i++;
 	}
 	return menu;
+}
+
+
+void
+AppearancePrefView::_MarkSelectedFont(const char* family, const char* style,
+	const char* size)
+{
+	char fontMenuLabel[134];
+	snprintf(fontMenuLabel, sizeof(fontMenuLabel), "%s - %s", family, style);
+
+	// mark the selected font
+	BMenuItem* selectedFont = fFontField->Menu()->FindItem(fontMenuLabel);
+	if (selectedFont != NULL)
+		selectedFont->SetMarked(true);
+
+	// mark the selected font size on all font menus
+	for (int32 i = 0; i < fFontField->Menu()->CountItems(); i++) {
+		BMenu* fontSizeMenu = fFontField->Menu()->SubmenuAt(i);
+		if (fontSizeMenu == NULL)
+			continue;
+
+		BMenuItem* item = fontSizeMenu->FindItem(size);
+		if (item != NULL)
+			item->SetMarked(true);
+	}
 }

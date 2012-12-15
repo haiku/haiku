@@ -3259,7 +3259,7 @@ OutlineView::Draw(BRect invalidBounds)
 		tintedLine = !tintedLine;
 		float rowHeight = row->Height();
 
-		if (line > invalidBounds.top - rowHeight) {
+		if (line >= invalidBounds.top - rowHeight) {
 			bool isFirstColumn = true;
 			float fieldLeftEdge = MAX(kLeftMargin, fMasterView->LatchWidth());
 

@@ -22,15 +22,15 @@ extern "C" {
 }
 
 
-#define TRACE_CONTEXT
-#ifdef TRACE_CONTEXT
-#	define TRACE(x...) printf("GalliumContext: " x)
+#define TRACE_WINSYS
+#ifdef TRACE_WINSYS
+#	define TRACE(x...) printf("GalliumWinsys: " x)
 #	define CALLED() TRACE("CALLED: %s\n", __PRETTY_FUNCTION__)
 #else
 #	define TRACE(x...)
 #	define CALLED()
 #endif
-#define ERROR(x...) printf("GalliumContext: " x)
+#define ERROR(x...) printf("GalliumWinsys: " x)
 
 
 // Cast

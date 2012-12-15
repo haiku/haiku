@@ -1,32 +1,8 @@
 # This file defines what ends up in the floppy boot image and it executes the
 # rules building the image.
 
-local X86_ONLY = ;
-local PPC_ONLY = ;
-local ARM_ONLY = ;
-if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
-	X86_ONLY = "" ;
-} else if $(TARGET_ARCH) = ppc {
-	X86_ONLY = ;
-} else if $(TARGET_ARCH) = m68k {
-	X86_ONLY = ;
-} else if $(TARGET_ARCH) = arm {
-	ARM_ONLY = "" ;
-}
-
-local GPL_ONLY = ;
-if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
-	GPL_ONLY = "" ;
-}
 
 #HACK: remove when old ide code is removed!
-local ATA_ONLY = ;
-local IDE_ONLY = ;
-if $(HAIKU_ATA_STACK) = 1 {
-	ATA_ONLY = "" ;
-} else {
-	IDE_ONLY = "" ;
-}
 
 local NET_BOOT = 0 ;
 local USB_BOOT = 1 ;
@@ -49,9 +25,10 @@ if $(NET_BOOT) = 1 {
 	;
 }
 
-SYSTEM_ADD_ONS_BUS_MANAGERS = $(X86_ONLY)acpi $(ATA_ONLY)ata config_manager dpc pci
-	$(IDE_ONLY)ide $(X86_ONLY)isa scsi $(USB_ONLY)usb
-;
+SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
+	acpi@x86 ata@ata config_manager dpc pci
+	ide@ide isa@x86 scsi $(USB_ONLY)usb
+] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
 
 
@@ -87,11 +64,11 @@ if $(TARGET_ARCH) = x86_64 {
 
 	if $(HAIKU_ATA_STACK) = 1 {
 		AddFilesToFloppyBootArchive system add-ons kernel busses ata
-			: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+			: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
 				it8211 ;
 	} else {
 		AddFilesToFloppyBootArchive system add-ons kernel busses ide
-			: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+			: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
 				it8211 ;
 	}
 
@@ -101,11 +78,11 @@ if $(TARGET_ARCH) = x86_64 {
 	AddFilesToFloppyBootArchive system add-ons kernel file_systems
 		: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 	AddFilesToFloppyBootArchive system add-ons kernel generic
-		: $(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph ;
+		: ata_adapter@ata ide_adapter@ide locked_pool scsi_periph ;
 	AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
 		: intel session ;
 	AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
-		: $(PPC_ONLY)openpic ;
+		: openpic@ppc ;
 
 	if $(USB_BOOT) = 1 {
 		AddFilesToFloppyBootArchive system add-ons kernel busses usb
@@ -118,7 +95,7 @@ if $(TARGET_ARCH) = x86_64 {
 
 	# drivers
 	AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
-	AddNewDriversToFloppyBootArchive disk : $(ARM_ONLY)norflash ;
+	AddNewDriversToFloppyBootArchive disk : norflash@arm ;
 	if $(USB_BOOT) = 1 {
 		AddDriversToFloppyBootArchive disk usb : usb_disk ;
 	}
@@ -166,13 +143,13 @@ if $(TARGET_ARCH) = x86_64 {
 } else {
 	AddBootModuleSymlinksToFloppyBootArchive
 		$(SYSTEM_ADD_ONS_BUS_MANAGERS)
-		$(PPC_ONLY)openpic
-		$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
-		$(X86_ONLY)generic_x86
-		ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+		openpic@ppc
+		ata_adapter@ata ide_adapter@ide locked_pool scsi_periph
+		generic_x86@x86
+		ahci generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
 		it8211
 		$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci
-		scsi_cd scsi_disk $(USB_ONLY)usb_disk $(ARM_ONLY)norflash
+		scsi_cd scsi_disk $(USB_ONLY)usb_disk norflash@arm
 		intel session
 		$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
 		$(BOOT_ADD_ONS_NET)

@@ -2,35 +2,9 @@
 # installation directory) and it executes the rules building the image
 # (respectively installing the files in the installation directory).
 
-local X86_ONLY = ;
-local PPC_ONLY = ;
-local M68K_ONLY = ;
-local ARM_ONLY = ;
-if $(TARGET_ARCH) = x86 {
-	X86_ONLY = "" ;
-} else if $(TARGET_ARCH) = ppc {
-	PPC_ONLY = "" ;
-} else if $(TARGET_ARCH) = m68k {
-	M68K_ONLY = "" ;
-} else if $(TARGET_ARCH) = arm {
-	ARM_ONLY = "" ;
-}
 
-local GPL_ONLY = ;
-if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
-	GPL_ONLY = "" ;
-}
-
-#HACK: remove when old ide code is removed!
-local ATA_ONLY = ;
-local IDE_ONLY = ;
-if $(HAIKU_ATA_STACK) = 1 {
-	ATA_ONLY = "" ;
-} else {
-	IDE_ONLY = "" ;
-}
-
-SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bfsinfo
+SYSTEM_BIN = [ FFilterByBuildFeatures
+	"[" addattr alert arp base64 basename bash bc beep bfsinfo
 	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
 	csplit cut date dc dd desklink df diff diff3 dircolors dirname
@@ -38,10 +12,10 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bfsinfo
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
 	ftp ftpd funzip fwcontrol
-	gawk $(X86_ONLY)gdb getlimits grep groups gzip gzexe
+	gawk gdb@x86 getlimits grep groups gzip gzexe
 	hd head hey hostname
 	id ident ifconfig <bin>install installsound iroster isvolume
-	$(IDE_ONLY)ideinfo $(IDE_ONLY)idestatus
+	ideinfo@ide idestatus@ide
 	join kernel_debugger keymap kill
 	less lessecho lesskey link linkcatkeys listarea listattr listimage listdev
 	listport listres listsem listusb ln locale locate logger login logname ls
@@ -64,38 +38,41 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bfsinfo
 	uname unchop unexpand unmount uniq unlink unrar unshar unzip unzipsfx
 	<bin>updatedb uptime urlwrapper useradd uudecode uuencode
 	vdir version vmstat
-	waitfor watch wc wget whoami $(X86_ONLY)writembr xargs xres yes
+	waitfor watch wc wget whoami writembr@x86 xargs xres yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
-;
+] ;
 
-SYSTEM_APPS = AboutSystem ActivityMonitor $(X86_ONLY)BootManager CharacterMap
+SYSTEM_APPS = [ FFilterByBuildFeatures
+	AboutSystem ActivityMonitor BootManager@x86 CharacterMap
 	CodyCam DeskCalc Devices DiskProbe DiskUsage DriveSetup CDPlayer Expander
-	$(X86_ONLY)GLInfo Icon-O-Matic Installer LaunchBox Magnify Mail
+	GLInfo@x86 Icon-O-Matic Installer LaunchBox Magnify Mail
 	MediaConverter MediaPlayer MidiPlayer NetworkStatus PackageInstaller People
 	PoorMan PowerStatus ProcessController Screenshot ShowImage SoundRecorder
 	StyledEdit Terminal TextSearch TV WebWatch Workspaces
-;
-SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
+] ;
+SYSTEM_PREFERENCES = [ FFilterByBuildFeatures
+	Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Keyboard Keymap Locale Media
 	Mouse Network Notifications Printers Screen ScreenSaver
 	Shortcuts Sounds Time Touchpad <preference>Tracker VirtualMemory
-;
-SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo $(X86_ONLY)GLTeapot
-	$(HAIKU_INCLUDE_TRADEMARKS)$(X86_ONLY)Haiku3d Mandelbrot OverlayImage Pairs
+] ;
+SYSTEM_DEMOS = [ FFilterByBuildFeatures
+	BSnow Chart Clock Cortex FontDemo GLTeapot@x86
+	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d@x86 Mandelbrot OverlayImage Pairs
 	Playground Pulse Sudoku
-;
-SYSTEM_LIBS =
+] ;
+SYSTEM_LIBS = [ FFilterByBuildFeatures
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
-	libgame.so $(X86_ONLY)libGL.so $(X86_ONLY)libglut.so
+	libgame.so libGL.so@x86 libglut.so@x86
 	libgnu.so libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
 	<revisioned>libroot.so libroot-addon-icu.so
 	libscreensaver.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
-;
-PRIVATE_SYSTEM_LIBS =
+] ;
+PRIVATE_SYSTEM_LIBS = [ FFilterByBuildFeatures
 	$(HAIKU_JPEG_CURRENT_LIB)
 	$(HAIKU_LIBPNG_CURRENT_LIB)
 	$(HAIKU_ZLIB_CURRENT_LIB) 
@@ -103,11 +80,13 @@ PRIVATE_SYSTEM_LIBS =
 	libalm.so
 	libfluidsynth.so
 	libilmimf.so
-;
-SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
+] ;
+SYSTEM_SERVERS = [ FFilterByBuildFeatures
+	app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server
-	notification_server power_daemon print_server print_addon_server registrar syslog_daemon
-;
+	notification_server power_daemon print_server print_addon_server registrar
+	syslog_daemon
+] ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
 SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
@@ -115,17 +94,14 @@ SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
 #SYSTEM_NETWORK_PPP = ipcp modem pap pppoe ;
 SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix icmp6 ipv6 ;
 
-SYSTEM_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant
-	$(X86_ONLY)nvidia.accelerant $(X86_ONLY)matrox.accelerant
-	$(X86_ONLY)neomagic.accelerant $(X86_ONLY)intel_extreme.accelerant
-	$(X86_ONLY)s3.accelerant $(X86_ONLY)vesa.accelerant
-	$(X86_ONLY)ati.accelerant
-	$(X86_ONLY)3dfx.accelerant
-	$(X86_ONLY)radeon_hd.accelerant
-	$(X86_ONLY)intel_810.accelerant
-	#$(X86_ONLY)via.accelerant
-	#$(X86_ONLY)vmware.accelerant
-;
+SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
+	x86 @{
+		3dfx.accelerant ati.accelerant matrox.accelerant neomagic.accelerant
+		nvidia.accelerant intel_810.accelerant intel_extreme.accelerant
+		radeon.accelerant radeon_hd.accelerant s3.accelerant vesa.accelerant
+		#via.accelerant vmware.accelerant
+	}@ # x86
+] ;
 SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
 	PCXTranslator PNGTranslator PPMTranslator
@@ -133,9 +109,10 @@ SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	TIFFTranslator WebPTranslator WonderBrushTranslator ICNSTranslator
 ;
 SYSTEM_ADD_ONS_LOCALE_CATALOGS = <catalog-addon>plaintext ;
-SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
+SYSTEM_ADD_ONS_MEDIA = [ FFilterByBuildFeatures
+	cortex_audioadapter.media_addon
 	cortex_flanger.media_addon
-	$(X86_ONLY)dvb.media_addon
+	dvb.media_addon@x86
 	hmulti_audio.media_addon
 	mixer.media_addon
 	opensound.media_addon
@@ -147,8 +124,10 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
 	#legacy.media_addon
 	equalizer.media_addon
 	vst_host.media_addon
-;
-SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(X86_ONLY)ffmpeg raw_decoder ;
+] ;
+SYSTEM_ADD_ONS_MEDIA_PLUGINS = [ FFilterByBuildFeatures
+	ffmpeg@ffmpeg raw_decoder
+] ;
 SYSTEM_ADD_ONS_PRINT =
 	Canon\ LIPS3\ Compatible
 	Canon\ LIPS4\ Compatible
@@ -163,40 +142,45 @@ SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR
 	# Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
-SYSTEM_ADD_ONS_SCREENSAVERS = Butterfly DebugNow $(X86_ONLY)Flurry
-	$(X86_ONLY)GLife $(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Leaves
-	Message Spider ;
+SYSTEM_ADD_ONS_SCREENSAVERS = [ FFilterByBuildFeatures
+	Butterfly DebugNow Flurry@x86
+	GLife@x86 $(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Leaves
+	Message Spider
+] ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
-SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
-	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme
-	$(X86_ONLY)s3 $(X86_ONLY)vesa #$(X86_ONLY)via #$(X86_ONLY)vmware
-	$(X86_ONLY)ati $(X86_ONLY)3dfx $(X86_ONLY)radeon_hd
-	$(X86_ONLY)intel_810
-;
+SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
+	x86 @{
+		ati 3dfx intel_810 intel_extreme matrox neomagic nvidia radeon radeon_hd
+		s3 vesa  #via vmware
+	}@ # x86
+] ;
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ice1712 usb_midi ;
-SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
-	$(X86_ONLY)ar81xx $(X86_ONLY)attansic_l1 $(X86_ONLY)attansic_l2
-	$(X86_ONLY)broadcom440x $(X86_ONLY)broadcom570x $(X86_ONLY)dec21xxx etherpci
-	$(X86_ONLY)ipro100 $(X86_ONLY)ipro1000 $(X86_ONLY)jmicron2x0
-	$(X86_ONLY)marvell_yukon $(X86_ONLY)nforce $(X86_ONLY)pcnet pegasus
-	$(X86_ONLY)rtl8139 $(X86_ONLY)rtl81xx $(X86_ONLY)sis19x sis900
-	$(X86_ONLY)syskonnect usb_davicom usb_asix usb_ecm $(X86_ONLY)via_rhine
-	$(X86_ONLY)vt612x wb840
+SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
+	x86 @{
+		3com atheros813x ar81xx attansic_l1 attansic_l2 broadcom440x
+		broadcom570x dec21xxx ipro100 ipro1000 jmicron2x0 marvell_yukon nforce
+		pcnet rtl8139 rtl81xx sis19x syskonnect via_rhine vt612x
+	}@ # x86
+
+	etherpci pegasus sis900 usb_davicom usb_asix usb_ecm wb840
 
 	# WLAN drivers
-	$(X86_ONLY)aironetwifi $(X86_ONLY)atheroswifi $(X86_ONLY)broadcom43xx
-	$(X86_ONLY)iprowifi2100 $(X86_ONLY)iprowifi2200 $(X86_ONLY)iprowifi3945
-	$(X86_ONLY)iprowifi4965 $(X86_ONLY)marvell88w8363 $(X86_ONLY)marvell88w8335
-	$(X86_ONLY)ralink2860 $(X86_ONLY)ralinkwifi $(X86_ONLY)wavelanwifi
+	x86 @{
+		aironetwifi atheroswifi broadcom43xx
+		iprowifi2100 iprowifi2200 iprowifi3945
+		iprowifi4965 marvell88w8363 marvell88w8335
+		ralink2860 ralinkwifi wavelanwifi
+	}@ # x86
 
 	# WWAN drivers
-	#$(GPL_ONLY)usb_beceemwmx
-;
-SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
-SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
-	$(IDE_ONLY)ide scsi config_manager agp_gart usb firewire $(X86_ONLY)acpi
-;
+	#usb_beceemwmx@gpl
+] ;
+SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures acpi_button@x86 ] ;
+SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
+	ata@ata pci ps2@x86 isa@x86
+	ide@ide scsi config_manager agp_gart usb firewire acpi@x86
+] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda exfat ext2 fat iso9660 nfs
 	attribute_overlay write_overlay ntfs reiserfs udf googlefs ;
 
@@ -223,16 +207,14 @@ for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 AddFilesToHaikuImage system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToHaikuImage system add-ons kernel busses agp_gart
-	: $(X86_ONLY)<agp_gart>intel ;
+	: <agp_gart>intel@x86 ;
 
 if $(HAIKU_ATA_STACK) = 1 {
 	AddFilesToHaikuImage system add-ons kernel busses ata
-		: generic_ide_pci it8211 legacy_sata silicon_image_3112
-			$(X86_ONLY)ide_isa ;
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
 } else {
 	AddFilesToHaikuImage system add-ons kernel busses ide
-		: generic_ide_pci it8211 legacy_sata silicon_image_3112
-			$(X86_ONLY)ide_isa ;
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
 }
 
 AddFilesToHaikuImage system add-ons kernel busses scsi
@@ -241,18 +223,18 @@ AddFilesToHaikuImage system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage system add-ons kernel debugger
-	: <kdebug>demangle $(X86_ONLY)<kdebug>disasm <kdebug>hangman
+	: <kdebug>demangle <kdebug>disasm@x86 <kdebug>hangman
 	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>qrencode
 	  <kdebug>run_on_exit ;
 AddFilesToHaikuImage system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage system add-ons kernel generic
-	: $(ATA_ONLY)ata_adapter $(X86_ONLY)bios dpc $(IDE_ONLY)ide_adapter
-		locked_pool mpu401 scsi_periph <module>tty ; #$(X86_ONLY)cpuidle ;
+	: ata_adapter@ata bios@x86 dpc ide_adapter@ide
+		locked_pool mpu401 scsi_periph <module>tty ; #cpuidle@x86 ;
 AddFilesToHaikuImage system add-ons kernel partitioning_systems
 	: amiga_rdb apple efi_gpt intel session ;
 AddFilesToHaikuImage system add-ons kernel interrupt_controllers
-	: $(PPC_ONLY)openpic ;
+	: openpic@ppc ;
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToHaikuImage system add-ons kernel cpu : generic_x86 ;
@@ -260,9 +242,9 @@ if $(TARGET_ARCH) = x86 {
 
 # drivers
 AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
-AddNewDriversToHaikuImage power : $(X86_ONLY)enhanced_speedstep ;
-AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_battery ;
-#AddNewDriversToHaikuImage power : $(X86_ONLY)x86_cpuidle ;
+AddNewDriversToHaikuImage power : enhanced_speedstep@x86 ;
+AddNewDriversToHaikuImage power : acpi_battery@x86 ;
+#AddNewDriversToHaikuImage power : x86_cpuidle@x86 ;
 
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf null
@@ -271,7 +253,7 @@ AddDriversToHaikuImage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage audio old	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToHaikuImage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToHaikuImage bus			: usb_raw fw_raw ;
-AddDriversToHaikuImage disk floppy	: $(X86_ONLY)pc_floppy ;
+AddDriversToHaikuImage disk floppy	: pc_floppy@x86 ;
 AddDriversToHaikuImage disk usb		: usb_disk ;
 AddDriversToHaikuImage disk usb		: usb_floppy ;
 AddDriversToHaikuImage printer usb	: usb_printer ;
@@ -393,7 +375,7 @@ AddSymlinkToHaikuImage home Desktop
 
 # Add the files to be used by installoptionalpackage.
 AddDirectoryToHaikuImage common data optional-packages ;
-local optional-pkg-files = OptionalBuildFeatures OptionalPackageDependencies
+local optional-pkg-files = BuildFeatures OptionalPackageDependencies
 	OptionalPackages OptionalLibPackages ;
 for name in $(optional-pkg-files) {
 	local file = [ FDirName $(HAIKU_TOP) build jam $(name) ] ;
@@ -622,12 +604,12 @@ AddFilesToHaikuImage system : haiku_loader ;
 
 # boot module links
 AddBootModuleSymlinksToHaikuImage
-	$(X86_ONLY)acpi $(ATA_ONLY)ata pci $(X86_ONLY)isa config_manager dpc
-	$(IDE_ONLY)ide scsi usb
-	$(PPC_ONLY)openpic
-	$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
+	acpi@x86 ata@ata pci isa@x86 config_manager dpc
+	ide@ide scsi usb
+	openpic@ppc
+	ata_adapter@ata ide_adapter@ide locked_pool scsi_periph
 	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
-	$(X86_ONLY)ide_isa
+	ide_isa@x86
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
 	efi_gpt

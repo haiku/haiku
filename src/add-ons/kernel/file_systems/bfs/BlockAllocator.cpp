@@ -597,7 +597,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction& transaction)
 	memset(buffer, 0, numBits >> 3);
 
 	off_t offset = 1;
-		// the bitmap starts directly after the super block
+		// the bitmap starts directly after the superblock
 
 	// initialize the AllocationGroup objects and clear the on-disk bitmap
 
@@ -926,7 +926,7 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 
 	fVolume->SuperBlock().used_blocks
 		= HOST_ENDIAN_TO_BFS_INT64(fVolume->UsedBlocks() + bestLength);
-		// We are not writing back the disk's super block - it's
+		// We are not writing back the disk's superblock - it's
 		// either done by the journaling code, or when the disk
 		// is unmounted.
 		// If the value is not correct at mount time, it will be

@@ -368,7 +368,7 @@ fill_disk_identifier_v2(disk_identifier &disk, const drive_parameters &parameter
 static off_t
 get_next_check_sum_offset(int32 index, off_t maxSize)
 {
-	// The boot block often contains the disk super block, and should be
+	// The boot block often contains the disk superblock, and should be
 	// unique enough for most cases
 	if (index < 2)
 		return index * 512;

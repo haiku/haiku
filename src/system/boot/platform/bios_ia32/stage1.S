@@ -130,7 +130,7 @@ struc	BlockRun
 	.length				resw	1
 endstruc
 
-; BFS super block
+; BFS superblock
 struc	SuperBlock
 	.name			resb	32
 	.magic1			resd	1
@@ -665,7 +665,7 @@ kBootBlockSignature			dw	0xaa55
 
 second_boot_block:
 
-; first comes the BFS super block
+; first comes the BFS superblock
 superblock:
 				%rep sizeof(SuperBlock)
 					db	0

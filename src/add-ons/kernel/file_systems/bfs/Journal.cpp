@@ -499,10 +499,10 @@ Journal::_ReplayRunArray(int32* _start)
 			// TODO: eventually check other well known offsets, like the
 			// root and index dirs
 			if (offset == 0) {
-				// This log entry writes over the super block - check if
+				// This log entry writes over the superblock - check if
 				// it's valid!
 				if (Volume::CheckSuperBlock(data) != B_OK) {
-					FATAL(("Log contains invalid super block!\n"));
+					FATAL(("Log contains invalid superblock!\n"));
 					RETURN_ERROR(B_BAD_DATA);
 				}
 			}
@@ -663,7 +663,7 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void* _logEntry)
 
 	delete logEntry;
 
-	// update the super block, and change the disk's state, if necessary
+	// update the superblock, and change the disk's state, if necessary
 
 	if (update) {
 		if (superBlock.log_start == superBlock.log_end)
@@ -671,7 +671,7 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void* _logEntry)
 
 		status_t status = journal->fVolume->WriteSuperBlock();
 		if (status != B_OK) {
-			FATAL(("_TransactionWritten: could not write back super block: %s\n",
+			FATAL(("_TransactionWritten: could not write back superblock: %s\n",
 				strerror(status)));
 		}
 
@@ -864,7 +864,7 @@ Journal::_WriteTransactionToLog()
 	logEntry->SetTransactionID(fTransactionID);
 #endif
 
-	// Update the log end pointer in the super block
+	// Update the log end pointer in the superblock
 
 	fVolume->SuperBlock().flags = SUPER_BLOCK_DISK_DIRTY;
 	fVolume->SuperBlock().log_end = HOST_ENDIAN_TO_BFS_INT64(logPosition);

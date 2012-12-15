@@ -263,6 +263,7 @@ Application Debugger :
 	ValueLoader.cpp
 	ValueNode.cpp
 	ValueNodeContainer.cpp
+	ValueNodeManager.cpp
 
 	# value/type_handlers
 	BListTypeHandler.cpp

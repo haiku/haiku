@@ -2556,7 +2556,7 @@ Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	adds the created inode to that parent directory. If an attribute directory
 	is created, it will also automatically  be added to the \a parent inode as
 	such. However, the indices root node, and the regular root node won't be
-	added to the super block.
+	added to the superblock.
 	It will also create the initial B+tree for the inode if it's a directory
 	of any kind.
 	\a name may be \c NULL, but only if no \a parent is given.

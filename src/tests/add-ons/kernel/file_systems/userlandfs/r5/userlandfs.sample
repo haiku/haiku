@@ -39,7 +39,7 @@ file_system obfs {
 		is_buffer			false
 	}
 
-	# dump super block
+	# dump superblock
 	ioctl 56743 {
 		buffer_size			0
 		write_buffer_size	0

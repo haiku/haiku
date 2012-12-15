@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Expander	386826896
+1	ukrainian	x-vnd.Haiku-Expander	2566211356
 Expand	ExpanderMenu		Розпакувати
 Close window when done expanding	ExpanderPreferences		Закрити вікно після розпаковки
 Set destination…	ExpanderMenu		Встановити ціль…
@@ -15,7 +15,6 @@ Cancel	ExpanderWindow		Відмінити
 Automatically expand files	ExpanderPreferences		Автоматично розпакувати файли
 Creating listing for '%s'	ExpanderWindow		Створення списку для '%s'
 Continue	ExpanderWindow		Продовжити
-The destination folder does not exist.	ExpanderWindow		Цільова папка відсутня.
 Cancel	ExpanderPreferences		Відміна
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього архіва? Розпаковка елементів може бути неповною.
 Select	DirectoryFilePanel		Вибрати

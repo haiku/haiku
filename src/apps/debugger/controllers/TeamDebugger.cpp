@@ -277,13 +277,17 @@ TeamDebugger::~TeamDebugger()
 			thread = next;
 		}
 	}
+
+	if (fReportGenerator != NULL) {
+		fReportGenerator->Lock();
+		fReportGenerator->Quit();
+	}
+
 	delete fImageInfoPendingThreads;
 
 	delete fBreakpointManager;
 	delete fWatchpointManager;
 	delete fMemoryBlockManager;
-	fReportGenerator->Lock();
-	fReportGenerator->Quit();
 	delete fWorker;
 	delete fTeam;
 	delete fFileManager;
@@ -412,7 +416,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return error;
 
 	// create the debug report generator
-	fReportGenerator = new(std::nothrow) DebugReportGenerator(fTeam);
+	fReportGenerator = new(std::nothrow) DebugReportGenerator(fTeam, this);
 	if (fReportGenerator == NULL)
 		return B_NO_MEMORY;
 

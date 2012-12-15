@@ -145,11 +145,13 @@ App::_StoreSettingsIfNeeded()
 	BMessage settings('sett');
 	for (int32 i = 0; BWindow* window = WindowAt(i); i++) {
 		if (MainWindow* padWindow = dynamic_cast<MainWindow*>(window)) {
-			BMessage* windowSettings = padWindow->Settings();
-			if (windowSettings && padWindow->Lock()) {
-				padWindow->SaveSettings(windowSettings);
+			if (padWindow->Lock()) {
+				BMessage* windowSettings = padWindow->Settings();
+				if (windowSettings) {
+					padWindow->SaveSettings(windowSettings);
+					settings.AddMessage("window", windowSettings);
+				}
 				padWindow->Unlock();
-				settings.AddMessage("window", windowSettings);
 			}
 		}
 	}

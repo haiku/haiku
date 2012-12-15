@@ -1,37 +1,37 @@
 1	hungarian	x-vnd.Haiku-PowerStatus	3224068645
-Design capacity low warning: 	PowerStatus		Figyelmeztetés alacsony tervezett kapacitásnál:
+Design capacity low warning: 	PowerStatus		Figyelmeztetés alacsony tervezett kapacitásnál: 
 Show percent	PowerStatus		Százalék megjelenítése
-Design capacity: 	PowerStatus		Tervezett kapacitás:
- mW	PowerStatus		mW
-Type: 	PowerStatus		Típus:
+Design capacity: 	PowerStatus		Tervezett kapacitás: 
+ mW	PowerStatus		 mW
+Type: 	PowerStatus		Típus: 
 non-rechargeable	PowerStatus		Nem újratölthető
 Empty battery slot	PowerStatus		Nincs akku behelyezve
- mV	PowerStatus		mV
+ mV	PowerStatus		 mV
 Run in window	PowerStatus		Futtatás ablakban
 PowerStatus	System name		Energiaállapot
- mWh	PowerStatus		mWh
+ mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Akku infó…
 Damaged battery	PowerStatus		Sérült akku
 Show time	PowerStatus		Idő kijelzése
-Last full charge: 	PowerStatus		Utolsó teljes feltöltés:
+Last full charge: 	PowerStatus		Utolsó teljes feltöltés: 
 Battery unused	PowerStatus		Használatlan akku
 Extended battery info	PowerStatus		Bővebb akku információ
- mA	PowerStatus		mA
-Current rate: 	PowerStatus		Jelenlegi gyakoriság:
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Jelenlegi gyakoriság: 
 discharging	PowerStatus		használatban
 Show text label	PowerStatus		Szöveges címke megjelenítése
 About…	PowerStatus		Névjegy…
-Model number: 	PowerStatus		Típusszám:
+Model number: 	PowerStatus		Típusszám: 
 Install in Deskbar	PowerStatus		Telepítés az Asztalsávra
- mAh	PowerStatus		mAh
-Capacity: 	PowerStatus		Kapacitás:
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Kapacitás: 
 Battery discharging	PowerStatus		Akku használatban
-Serial number: 	PowerStatus		Szériaszám:
-Capacity granularity 1: 	PowerStatus		Kapacitás granularitás 1:
-OEM info: 	PowerStatus		OEM információk:
-Design voltage: 	PowerStatus		Tervezett feszültség:
+Serial number: 	PowerStatus		Szériaszám: 
+Capacity granularity 1: 	PowerStatus		Kapacitás granularitás 1: 
+OEM info: 	PowerStatus		OEM információk: 
+Design voltage: 	PowerStatus		Tervezett feszültség: 
 Battery charging	PowerStatus		Akku töltődik
-Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés:
+Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés: 
 Battery info	PowerStatus		Akku infó
 Quit	PowerStatus		Kilépés
 rechargeable	PowerStatus		újratölthető
@@ -39,6 +39,6 @@ charging	PowerStatus		töltődik
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futatthatja az Energiaállapotot egy ablakban, vagy az Asztalsávra telepítheti azt.
 Power status box	PowerStatus		Energiaállapot doboza
 Show status icon	PowerStatus		Állapotikon megjelenítése
-Capacity granularity 2: 	PowerStatus		Kapacitás granularitás 2:
+Capacity granularity 2: 	PowerStatus		Kapacitás granularitás 2: 
 Technology: 	PowerStatus		Technológia:
 no battery	PowerStatus		nincs akku

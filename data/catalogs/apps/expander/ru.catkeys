@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	2398100010
+1	russian	x-vnd.Haiku-Expander	282517174
 Expand	ExpanderMenu		Распаковать
 Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
 Set destination…	ExpanderMenu		Путь назначения для извлечения…
@@ -17,7 +17,6 @@ Automatically expand files	ExpanderPreferences		Автоматически ра�
 Creating listing for '%s'	ExpanderWindow		Создается список файлов для '%s'
 Continue	ExpanderWindow		Продолжить
 Destination folder	ExpanderPreferences		Путь для извлечения
-The destination folder does not exist.	ExpanderWindow		Папка назначения не существует.
 Other	ExpanderPreferences		Другое
 Cancel	ExpanderPreferences		Отмена
 Expansion	ExpanderPreferences		Извлечение

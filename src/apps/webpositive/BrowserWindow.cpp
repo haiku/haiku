@@ -652,11 +652,10 @@ BrowserWindow::MessageReceived(BMessage* message)
 			BString url;
 			if (message->FindString("url", &url) != B_OK)
 				url = fURLInputGroup->Text();
+
 			_SetPageIcon(CurrentWebView(), NULL);
-			BString newUrl = _SmartURLHandler(url);
-			if (newUrl != url)
-				fURLInputGroup->TextView()->SetText(newUrl);
-			CurrentWebView()->LoadURL(newUrl.String());
+			_SmartURLHandler(url);
+
 			break;
 		}
 		case GO_BACK:
@@ -2148,19 +2147,115 @@ BrowserWindow::_NewTabURL(bool isNewWindow) const
 	return url;
 }
 
-
 BString
-BrowserWindow::_SmartURLHandler(const BString& url) const
+BrowserWindow::_EncodeURIComponent(const BString& search)
 {
-	BString result = url;
+	const BString escCharList = " $&`:<>[]{}\"+#%@/;=?\\^|~\',";
+	BString result = search;
+	char hexcode[4];
 
+	for (int32 i = 0; i < result.Length(); i++) {
+		if (escCharList.FindFirst(result[i]) != B_ERROR) {
+			sprintf(hexcode, "%02X", (unsigned int)result[i]);
+			result[i] = '%';
+			result.Insert(hexcode, i + 1);
+			i += 2;
+		}
+	}
+
+	return result;
+}
+
+
+void
+BrowserWindow::_VisitURL(const BString& url)
+{
+	//fURLInputGroup->TextView()->SetText(url);
+	CurrentWebView()->LoadURL(url.String());
+}
+
+
+void
+BrowserWindow::_VisitSearchEngine(const BString& search)
+{
+	// TODO: Google Code-In Task to make default search
+	//			engine modifiable from Settings? :)
+
+	BString engine = "http://www.google.com/search?q=";
+	engine += _EncodeURIComponent(search);
+		// We have to take care of some of the escaping before
+		// we hand over the string to WebKit, if we want queries
+		// like "4+3" to not be searched as "4 3".
+
+	_VisitURL(engine);
+}
+
+
+inline bool
+BrowserWindow::_IsValidDomainChar(char ch)
+{
+	// TODO: Currenlty, only a whitespace character
+	//			breaks a domain name. It might be
+	//			a good idea (or a bad one) to make
+	//			character filtering based on the
+	//			IDNA 2008 standard.
+
+	return ch != ' ';
+}
+
+
+void
+BrowserWindow::_SmartURLHandler(const BString& url)
+{
 	// Only process if this doesn't look like a full URL (http:// or
 	// file://, etc.)
-	if (url.FindFirst("://") == B_ERROR) {
-		if (url.FindFirst(".") == B_ERROR || url.FindFirst(" ") != B_ERROR)
-			result.Prepend("http://www.google.com/search?q=");
+
+	BString temp;
+	int32 at = url.FindFirst(":");
+
+	if (at != B_ERROR) {
+		BString proto;
+		url.CopyInto(proto, 0, at);
+
+		if (proto == "http" || 	proto == "https" ||	proto == "file")
+			_VisitURL(url);
+		else {
+			temp = "application/x-vnd.Be.URL.";
+			temp += proto;
+
+			char* argv[1] = { (char*)url.String() };
+
+			if (be_roster->Launch(temp.String(), 1, argv) != B_OK)
+				_VisitSearchEngine(url);
+		}
+	} else if (url == "localhost")
+		_VisitURL("http://localhost/");
+	else {
+		const char* localhostPrefix = "localhost/";
+
+		if(url.Compare(localhostPrefix, strlen(localhostPrefix)) == 0)
+			_VisitURL(url);
+		else {
+			bool isURL = false;
+
+			for (int32 i = 0; i < url.CountChars(); i++) {
+				if (url[i] == '.')
+					isURL = true;
+				else if (url[i] == '/')
+					break;
+				else if (!_IsValidDomainChar(url[i])) {
+					isURL = false;
+
+					break;
+				}
+			}
+
+			if (isURL)
+				_VisitURL(url);
+			else
+				_VisitSearchEngine(url);
+		}
 	}
-	return result;
 }
 
 

@@ -307,7 +307,7 @@ Journal::blockNotify(off_t blockNumber, size_t numBlocks, void *arg)
 
 	free(logEntry);
 
-	// update the super block, and change the disk's state, if necessary
+	// update the superblock, and change the disk's state, if necessary
 
 	if (update) {
 		journal->fVolume->LogStart() = superBlock.log_start;
@@ -317,7 +317,7 @@ Journal::blockNotify(off_t blockNumber, size_t numBlocks, void *arg)
 
 		status_t status = journal->fVolume->WriteSuperBlock();
 		if (status != B_OK)
-			FATAL(("blockNotify: could not write back super block: %s\n", strerror(status)));
+			FATAL(("blockNotify: could not write back superblock: %s\n", strerror(status)));
 	}
 }
 
@@ -421,7 +421,7 @@ Journal::WriteLogEntry()
 
 	fUsed += array->CountItems();
 
-	// Update the log end pointer in the super block
+	// Update the log end pointer in the superblock
 	fVolume->SuperBlock().flags = HOST_ENDIAN_TO_BFS_INT32(SUPER_BLOCK_DISK_DIRTY);
 	fVolume->SuperBlock().log_end = HOST_ENDIAN_TO_BFS_INT64(logPosition);
 	fVolume->LogEnd() = logPosition;
