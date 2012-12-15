@@ -50,7 +50,6 @@ local sources =
 	URLInputGroup.cpp
 ;
 
-
 Includes [ FGristFiles $(sources) ] : $(HAIKU_WEBKIT_HEADERS_DEPENDENCY) ;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
@@ -60,12 +59,14 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_WEBKIT_HEADERS_DEPENDENCY) ;
 #MakeLocate $(svnRevisionFile) : $(LOCATE_TARGET) ;
 #CreateSVNRevisionFile $(svnRevisionFile) ;
 
+UsePrivateHeaders shared ;
+
 Application WebPositive :
 	$(sources)
 	:
 	$(HAIKU_WEBKIT_LIBS)
 	$(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
-	be network tracker translation
+	be libshared.a network tracker translation
 	:
 	WebPositive.rdef
 ;
