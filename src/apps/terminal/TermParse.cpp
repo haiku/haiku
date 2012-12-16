@@ -488,42 +488,83 @@ TermParse::EscParse()
 				case CASE_PRINT_GRA:
 					/* "Special characters and line drawing" enabled by \E(0 */
 					switch (c) {
-						case 'a':
+						case '`': // ACS_DIAMOND
+							fBuffer->InsertChar("\xE2\x97\x86", 3);
+							break;
+						case 'a': // ACS_CKBOARD
 							fBuffer->InsertChar("\xE2\x96\x92", 3);
 							break;
-						case 'j':
+						case 'f': // ACS_DEGREE
+							fBuffer->InsertChar("\xC2\xB0", 2);
+							break;
+						case 'g': // ACS_PLMINUS
+							fBuffer->InsertChar("\xC2\xB1", 2);
+							break;
+						case 'i': // ACS_LANTERN
+							fBuffer->InsertChar("\xE2\x98\x83", 3);
+							break;
+						case 'j': // ACS_LRCORNER
 							fBuffer->InsertChar("\xE2\x94\x98", 3);
 							break;
-						case 'k':
+						case 'k': // ACS_URCORNER
 							fBuffer->InsertChar("\xE2\x94\x90", 3);
 							break;
-						case 'l':
+						case 'l': // ACS_ULCORNER
 							fBuffer->InsertChar("\xE2\x94\x8C", 3);
 							break;
-						case 'm':
+						case 'm': // ACS_LLCORNER
 							fBuffer->InsertChar("\xE2\x94\x94", 3);
 							break;
-						case 'n':
+						case 'n': // ACS_PLUS
 							fBuffer->InsertChar("\xE2\x94\xBC", 3);
 							break;
-						case 'q':
+						case 'o': // ACS_S1
+							fBuffer->InsertChar("\xE2\x8E\xBA", 3);
+							break;
+						case 'p': // ACS_S3
+							fBuffer->InsertChar("\xE2\x8E\xBB", 3);
+							break;
+						case 'r': // ACS_S7
+							fBuffer->InsertChar("\xE2\x8E\xBC", 3);
+							break;
+						case 's': // ACS_S9
+							fBuffer->InsertChar("\xE2\x8E\xBD", 3);
+							break;
+						case 'q': // ACS_HLINE
 							fBuffer->InsertChar("\xE2\x94\x80", 3);
 							break;
-						case 't':
+						case 't': // ACS_LTEE
 							fBuffer->InsertChar("\xE2\x94\x9C", 3);
 							break;
-						case 'u':
+						case 'u': // ACS_RTEE
 							fBuffer->InsertChar("\xE2\x94\xA4", 3);
 							break;
-						case 'v':
+						case 'v': // ACS_BTEE
 							fBuffer->InsertChar("\xE2\x94\xB4", 3);
 							break;
-						case 'w':
+						case 'w': // ACS_TTEE
 							fBuffer->InsertChar("\xE2\x94\xAC", 3);
 							break;
-						case 'x':
+						case 'x': // ACS_VLINE
 							fBuffer->InsertChar("\xE2\x94\x82", 3);
 							break;
+						case 'y': // ACS_LEQUAL
+							fBuffer->InsertChar("\xE2\x89\xA4", 3);
+							break;
+						case 'z': // ACS_GEQUAL
+							fBuffer->InsertChar("\xE2\x89\xA5", 3);
+							break;
+						case '{': // ACS_PI
+							fBuffer->InsertChar("\xCF\x80", 2);
+							break;
+						case '|': // ACS_NEQUAL
+							fBuffer->InsertChar("\xE2\x89\xA0", 3);
+							break;
+						case '}': // ACS_STERLING
+							fBuffer->InsertChar("\xC2\xA3", 2);
+							break;
+						case '~': // ACS_BULLET
+							fBuffer->InsertChar("\xC2\xB7", 2);
 						default:
 							fBuffer->InsertChar((char)c);
 					}
