@@ -83,6 +83,11 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 	if (ActiveLocalDevice != NULL) {
 		fExtDeviceView->SetLocalDevice(ActiveLocalDevice);
 		fExtDeviceView->SetEnabled(true);
+
+		DeviceClass rememberedClass = ActiveLocalDevice->GetDeviceClass();
+
+		if (!rememberedClass.IsUnknownDeviceClass())
+			fSettings.Data.LocalDeviceClass = rememberedClass;
 	}
 
 	// hinting menu
@@ -200,10 +205,10 @@ BluetoothSettingsView::_SetDeviceClass(uint8 major, uint8 minor,
 {
 	bool haveRun = true;
 
-	DeviceClass devClass(major, minor, service);
+	fSettings.Data.LocalDeviceClass.SetRecord(major, minor, service);
 
 	if (ActiveLocalDevice != NULL)
-		ActiveLocalDevice->SetDeviceClass(devClass);
+		ActiveLocalDevice->SetDeviceClass(fSettings.Data.LocalDeviceClass);
 	else
 		haveRun = false;
 
@@ -240,11 +245,6 @@ BluetoothSettingsView::_BuildClassMenu()
 {
 	BMessage* message = NULL;
 	BMenuItem* item = NULL;
-	DeviceClass devClass;
-
-	if (ActiveLocalDevice != NULL) {
-		devClass = ActiveLocalDevice->GetDeviceClass();
-	}
 
 	fClassMenu = new BPopUpMenu(B_TRANSLATE("Identify us as..."));
 
@@ -253,8 +253,8 @@ BluetoothSettingsView::_BuildClassMenu()
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kDesktopLabel), message);
 	fClassMenu->AddItem(item);
 
-	if (devClass.MajorDeviceClass() == 1 &&
-		devClass.MinorDeviceClass() == 1)
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 1)
 			item->SetMarked(true);
 
 	message = new BMessage(kMsgSetDeviceClass);
@@ -262,8 +262,8 @@ BluetoothSettingsView::_BuildClassMenu()
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kServerLabel), message);
 	fClassMenu->AddItem(item);
 
-	if (devClass.MajorDeviceClass() == 1 &&
-		devClass.MinorDeviceClass() == 2)
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 2)
 			item->SetMarked(true);
 
 	message = new BMessage(kMsgSetDeviceClass);
@@ -271,8 +271,8 @@ BluetoothSettingsView::_BuildClassMenu()
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kLaptopLabel), message);
 	fClassMenu->AddItem(item);
 
-	if (devClass.MajorDeviceClass() == 1 &&
-		devClass.MinorDeviceClass() == 3)
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 3)
 			item->SetMarked(true);
 
 	message = new BMessage(kMsgSetDeviceClass);
@@ -280,8 +280,8 @@ BluetoothSettingsView::_BuildClassMenu()
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kHandheldLabel), message);
 	fClassMenu->AddItem(item);
 
-	if (devClass.MajorDeviceClass() == 1 &&
-		devClass.MinorDeviceClass() == 4)
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 4)
 			item->SetMarked(true);
 
 	message = new BMessage(kMsgSetDeviceClass);
@@ -289,8 +289,8 @@ BluetoothSettingsView::_BuildClassMenu()
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kPhoneLabel), message);
 	fClassMenu->AddItem(item);
 
-	if (devClass.MajorDeviceClass() == 2 &&
-		devClass.MinorDeviceClass() == 3)
+	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 2 &&
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 3)
 			item->SetMarked(true);
 }
 

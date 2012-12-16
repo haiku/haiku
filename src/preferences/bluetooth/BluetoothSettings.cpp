@@ -24,6 +24,7 @@ void
 BluetoothSettings::Defaults()
 {
 	Data.PickedDevice = bdaddrUtils::NullAddress();
+	Data.LocalDeviceClass = DeviceClass();
 }
 
 

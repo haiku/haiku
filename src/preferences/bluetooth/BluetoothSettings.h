@@ -20,6 +20,7 @@ class BluetoothSettings
 public:
 	struct {
 		bdaddr_t 			PickedDevice;
+		DeviceClass			LocalDeviceClass;
 	} Data;
 
 							BluetoothSettings();
