@@ -386,9 +386,15 @@ DwarfFile::Load(const char* fileName)
 	// .eh_frame doesn't appear to get copied into separate debug
 	// info files properly, therefore always use it off the main
 	// executable image
-	fEHFrameSection = fElfFile->GetSection(".eh_frame");
+	if (fEHFrameSection == NULL)
+		fEHFrameSection = fElfFile->GetSection(".eh_frame");
 	fDebugLocationSection = debugInfoFile->GetSection(".debug_loc");
 	fDebugPublicTypesSection = debugInfoFile->GetSection(".debug_pubtypes");
+
+	if (fDebugInfoSection == NULL) {
+		fFinished = true;
+		return B_OK;
+	}
 
 	// iterate through the debug info section
 	DataReader dataReader(fDebugInfoSection->Data(),
@@ -570,7 +576,7 @@ DwarfFile::ResolveRangeList(CompilationUnit* unit, uint64 offset) const
 
 
 status_t
-DwarfFile::UnwindCallFrame(CompilationUnit* unit,
+DwarfFile::UnwindCallFrame(CompilationUnit* unit, uint8 addressSize,
 	DIESubprogram* subprogramEntry, target_addr_t location,
 	const DwarfTargetInterface* inputInterface,
 	DwarfTargetInterface* outputInterface, target_addr_t& _framePointer)
@@ -579,15 +585,15 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 
 	// first try to find the FDE in .debug_frame
 	if (fDebugFrameSection != NULL) {
-		result = _UnwindCallFrame(false, unit, subprogramEntry, location,
-			inputInterface, outputInterface, _framePointer);
+		result = _UnwindCallFrame(false, unit, addressSize, subprogramEntry,
+			location, inputInterface, outputInterface, _framePointer);
 	}
 
 	// if .debug_frame isn't present, or if the FDE wasn't found there,
 	// try .eh_frame
 	if (result == B_ENTRY_NOT_FOUND && fEHFrameSection != NULL) {
-		result = _UnwindCallFrame(true, unit, subprogramEntry, location,
-			inputInterface, outputInterface, _framePointer);
+		result = _UnwindCallFrame(true, unit, addressSize, subprogramEntry,
+			location, inputInterface, outputInterface, _framePointer);
 	}
 
 	return result;
@@ -1329,7 +1335,7 @@ DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 
 status_t
 DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
-	DIESubprogram* subprogramEntry, target_addr_t location,
+	uint8 addressSize, DIESubprogram* subprogramEntry, target_addr_t location,
 	const DwarfTargetInterface* inputInterface,
 	DwarfTargetInterface* outputInterface, target_addr_t& _framePointer)
 {
@@ -1350,7 +1356,8 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 	TRACE_CFI("DwarfFile::_UnwindCallFrame(%#" B_PRIx64 ")\n", location);
 
 	DataReader dataReader((uint8*)currentFrameSection->Data(),
-		currentFrameSection->Size(), unit->AddressSize());
+		currentFrameSection->Size(), unit != NULL
+			? unit->AddressSize() : addressSize);
 
 	while (dataReader.BytesRemaining() > 0) {
 		// length
@@ -1448,7 +1455,7 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 				// process the CIE
 				CIEAugmentation cieAugmentation;
 				error = _ParseCIE(currentFrameSection, usingEHFrameSection,
-					unit, context, cieID, cieAugmentation);
+					unit, addressSize, context, cieID, cieAugmentation);
 				if (error != B_OK)
 					return error;
 
@@ -1618,20 +1625,22 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 
 status_t
 DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
-	CompilationUnit* unit, CfaContext& context,	off_t cieOffset,
-	CIEAugmentation& cieAugmentation)
+	CompilationUnit* unit, uint8 addressSize, CfaContext& context,
+	off_t cieOffset, CIEAugmentation& cieAugmentation)
 {
 	if (cieOffset < 0 || cieOffset >= debugFrameSection->Size())
 		return B_BAD_DATA;
 
 	DataReader dataReader((uint8*)debugFrameSection->Data() + cieOffset,
-		debugFrameSection->Size() - cieOffset, unit->AddressSize());
+		debugFrameSection->Size() - cieOffset, unit != NULL
+			? unit->AddressSize() : addressSize);
 
 	// length
 	bool dwarf64;
 	uint64 length = dataReader.ReadInitialLength(dwarf64);
 	if (length > (uint64)dataReader.BytesRemaining())
 		return B_BAD_DATA;
+
 	off_t lengthOffset = dataReader.Offset();
 
 	// CIE ID/CIE pointer
@@ -2328,7 +2337,12 @@ DwarfFile::_LocateDebugInfo()
 	if (fDebugInfoSection == NULL || fDebugAbbrevSection == NULL) {
 		WARNING("DwarfManager::File::Load(\"%s\"): no "
 			".debug_info or .debug_abbrev.\n", fName);
-		return B_ERROR;
+
+		// if we at least have an EH frame, use that for stack unwinding
+		// if nothing else.
+		fEHFrameSection = fElfFile->GetSection(".eh_frame");
+		if (fEHFrameSection == NULL)
+			return B_ERROR;
 	}
 
 	return B_OK;

@@ -23,11 +23,13 @@ class FunctionDebugInfo;
 class FunctionInstance;
 class GlobalTypeCache;
 class Image;
+class ImageInfo;
 class LocatableFile;
 class SourceLanguage;
 class SourceLocation;
 class StackFrame;
 class Statement;
+class SymbolInfo;
 class Type;
 class TypeLookupConstraints;
 class ValueLocation;
@@ -76,6 +78,17 @@ public:
 
 	virtual	status_t			AddSourceCodeInfo(LocatableFile* file,
 									FileSourceCode* sourceCode) = 0;
+
+protected:
+	static	status_t			GetFunctionsFromSymbols(
+									BObjectList<FunctionDebugInfo>& functions,
+									DebuggerInterface* interface,
+									const ImageInfo& imageInfo,
+									SpecificImageDebugInfo* info);
+
+private:
+	static	int					_CompareSymbols(const SymbolInfo* a,
+									const SymbolInfo* b);
 };
 
 

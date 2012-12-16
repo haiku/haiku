@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2012, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_IMAGE_DEBUG_INFO_H
@@ -19,6 +19,7 @@
 
 class Architecture;
 class CompilationUnit;
+class DebuggerInterface;
 class DIEType;
 class DwarfStackFrameDebugInfo;
 class DwarfFile;
@@ -30,14 +31,13 @@ class GlobalTypeCache;
 class GlobalTypeLookup;
 class LocatableFile;
 class SourceCode;
-class TeamMemory;
 
 
 class DwarfImageDebugInfo : public SpecificImageDebugInfo {
 public:
 								DwarfImageDebugInfo(const ImageInfo& imageInfo,
+									DebuggerInterface* interface,
 									Architecture* architecture,
-									TeamMemory* teamMemory,
 									FileManager* fileManager,
 									GlobalTypeLookup* typeLookup,
 									GlobalTypeCache* typeCache,
@@ -106,8 +106,8 @@ private:
 private:
 			BLocker				fLock;
 			ImageInfo			fImageInfo;
+			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
-			TeamMemory*			fTeamMemory;
 			FileManager*		fFileManager;
 			GlobalTypeLookup*	fTypeLookup;
 			GlobalTypeCache*	fTypeCache;
