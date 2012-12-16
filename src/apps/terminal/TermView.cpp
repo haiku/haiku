@@ -1144,10 +1144,7 @@ TermView::AttachedToWindow()
 	// update the terminal size because it may have changed while the TermView
 	// was detached from the window. On such conditions FrameResized was not
 	// called when the resize occured
-	int rows;
-	int columns;
-	GetTermSizeFromRect(Bounds(), &rows, &columns);
-	SetTermSize(rows, columns);
+	SetTermSize(Bounds());
 	MakeFocus(true);
 	if (fScrollBar) {
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
