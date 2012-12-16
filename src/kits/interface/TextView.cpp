@@ -4063,7 +4063,9 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 
 		delta = max_c(delta, 1);
 
-		deltaWidth = _TabExpandedStyledWidth(offset, delta, &ascent, &descent);
+		// do not include B_ENTER-terminator into width & height calculations
+		deltaWidth = _TabExpandedStyledWidth(offset,
+								done ? delta - 1 : delta, &ascent, &descent);
 		strWidth += deltaWidth;
 
 		if (strWidth >= *inOutWidth) {
