@@ -8,6 +8,7 @@ AddResources Bluetooth : bluetooth-pref.rdef ;
 Preference Bluetooth :
 	BluetoothDeviceView.cpp
 	BluetoothMain.cpp
+	BluetoothSettings.cpp
 	BluetoothSettingsView.cpp
 	BluetoothWindow.cpp
 	DeviceListItem.cpp

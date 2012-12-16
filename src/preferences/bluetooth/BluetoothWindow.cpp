@@ -89,7 +89,6 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 //	tabView->AddTab(fConnChan);
 	tabView->AddTab(fSettingsView);
 
-
 	fRevertButton->SetEnabled(false);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
