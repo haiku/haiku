@@ -930,8 +930,10 @@ VariablesView::VariableTableModel::ValueNodeChanged(ValueNodeChild* nodeChild,
 	if (modelNode == NULL)
 		return;
 
-	if (oldNode != NULL)
+	if (oldNode != NULL) {
+		ValueNodeChildrenDeleted(oldNode);
 		NotifyNodeChanged(modelNode);
+	}
 }
 
 
