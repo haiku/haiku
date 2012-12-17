@@ -19,10 +19,12 @@
 #include "CliContinueCommand.h"
 #include "CliDebugReportCommand.h"
 #include "CliQuitCommand.h"
+#include "CliStackFrameCommand.h"
 #include "CliStackTraceCommand.h"
 #include "CliStopCommand.h"
 #include "CliThreadCommand.h"
 #include "CliThreadsCommand.h"
+#include "CliVariablesCommand.h"
 
 
 static const char* kDebuggerPrompt = "debugger> ";
@@ -309,6 +311,7 @@ CommandLineUserInterface::_RegisterCommands()
 
 	if (_RegisterCommand("bt", stackTraceCommandReference.Detach())
 		&& _RegisterCommand("continue", new(std::nothrow) CliContinueCommand)
+		&& _RegisterCommand("frame", new(std::nothrow) CliStackFrameCommand)
 		&& _RegisterCommand("help", new(std::nothrow) HelpCommand(this))
 		&& _RegisterCommand("quit", new(std::nothrow) CliQuitCommand)
 		&& _RegisterCommand("save-report",
@@ -316,7 +319,9 @@ CommandLineUserInterface::_RegisterCommands()
 		&& _RegisterCommand("sc", stackTraceCommandReference2.Detach())
 		&& _RegisterCommand("stop", new(std::nothrow) CliStopCommand)
 		&& _RegisterCommand("thread", new(std::nothrow) CliThreadCommand)
-		&& _RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)) {
+		&& _RegisterCommand("threads", new(std::nothrow) CliThreadsCommand)
+		&& _RegisterCommand("variables",
+			new(std::nothrow) CliVariablesCommand)) {
 		return B_OK;
 	}
 
