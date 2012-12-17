@@ -139,7 +139,7 @@ NetworkStatusView::NetworkStatusView(BMessage* archive)
 
 NetworkStatusView::~NetworkStatusView()
 {
-	if (fAboutWindow != NULL)
+	if (fAboutWindow != NULL && fAboutWindow->Lock())
 		fAboutWindow->Quit();
 }
 
