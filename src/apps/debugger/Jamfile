@@ -193,11 +193,13 @@ Application Debugger :
 	CliContext.cpp
 	CliContinueCommand.cpp
 	CliDebugReportCommand.cpp
+	CliStackFrameCommand.cpp
 	CliStackTraceCommand.cpp
 	CliStopCommand.cpp
 	CliThreadCommand.cpp
 	CliThreadsCommand.cpp
 	CliQuitCommand.cpp
+	CliVariablesCommand.cpp
 	CommandLineUserInterface.cpp
 
 	# user_interface/gui

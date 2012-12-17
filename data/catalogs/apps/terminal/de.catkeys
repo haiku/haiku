@@ -1,11 +1,11 @@
-1	german	x-vnd.Haiku-Terminal	211651840
+1	german	x-vnd.Haiku-Terminal	1252738083
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Neues Terminal
+Cursor text	Terminal AppearancePrefView		Text unter Cursor
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Das Terminal konnte die Konsole leider nicht starten.
-Text size	Terminal TermWindow		Textgröße
 Match case	Terminal FindWindow		Groß-/Kleinschreibung beachten
 Quit	Terminal TermWindow		Beenden
 Use default shell	Terminal Shell		Verwende Standard-Konsole
@@ -13,10 +13,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Beenden best�
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für diesen Reitertitel. Folgende Variablen\nstehen zur Verfügung:\n
 Select all	Terminal TermWindow		Alles auswählen
 Close tab	Terminal TermWindow		Reiter schließen
-Custom	Terminal colors schema		Benutzerdefiniert
 Save to file…	Terminal PrefWindow		In Datei speichern…
 OK	Terminal PrefWindow		OK
-Black on White	Terminal colors schema		Schwarz auf Weiß
 Window title:	Terminal AppearancePrefView		Fenstertitel:
 Font:	Terminal AppearancePrefView		Schriftart:
 Copy here	Terminal TermView		Hierher kopieren
@@ -34,13 +32,10 @@ Find	Terminal FindWindow		Suchen
 Appearance	Terminal PrefWindow		Darstellung
 Tab title:	Terminal AppearancePrefView		Reitertitel:
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Die Formel für Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
-Color schema:	Terminal AppearancePrefView		Farbschema:
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Hintergrund
 Use selection	Terminal FindWindow		Verwende Auswahl
-Green on Black	Terminal colors schema		Grün auf Schwarz
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird der Reiter geschlossen, wird auch dieser Prozess abgebrochen.
-Size:	Terminal AppearancePrefView		Größe:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" kann nicht ausgeführt werden:\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               diesen Hilfetext ausgeben\n  -t,     --title              Fenstertitel setzen\n  -f,     --fullscreen         im Vollbildmodus starten\n
 Full screen	Terminal TermWindow		Vollbild
@@ -62,7 +57,6 @@ Find…	Terminal TermWindow		Suchen...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird das Terminal geschlossen, wird auch dieser Prozess abgebrochen.
 Move here	Terminal TermView		Hierher verschieben
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDas aktuelle Arbeitsverzeichnis des aktiven Prozesses\n\t\t\t in diesem Reiter. Optional kann die maximale Anzahl von Pfad-Komponenten\n\t\t\t angegeben werden, z.B. '%2d' für maximal zwei Komponenten.\n\t%i\t-\tDer Index des Fensters.\n\t%p\t-\tDer Titel dieses Reiters.\n\t%%\t-\tDas %-Zeichen.
-White on Black	Terminal colors schema		Weiß auf Schwarz
 Error!	Terminal getString		Fehler!
 New tab	Terminal TermWindow		Neuer Reiter
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Die Formel für Reitertitel. Folgende Variablen\nstehen zur Verfügung:\n
@@ -80,6 +74,7 @@ Set tab title	Terminal TermWindow		Reiter umbenennen
 Settings…	Terminal TermWindow		Einstellungen...
 Abort	Terminal Shell		Abbrechen
 Edit	Terminal TermWindow		Bearbeiten
+Cursor background	Terminal AppearancePrefView		Cursor
 Color:	Terminal AppearancePrefView		Farbe:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für den Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
 Print	Terminal TermWindow		Drucken

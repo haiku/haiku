@@ -8,9 +8,6 @@ UsePrivateHeaders
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 
-Includes [ FGristFiles ZlibCompressionBase.cpp ]
-	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
-
 HPKG_SOURCES =
 	AttributeDataReader.cpp
 	BlockBufferCache.cpp
@@ -43,6 +40,9 @@ HPKG_SOURCES =
 	ZlibCompressor.cpp
 	ZlibDecompressor.cpp
 	;
+
+Includes [ FGristFiles $(HPKG_SOURCES) ]
+	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
 
 SharedLibrary libpackage.so
 	:

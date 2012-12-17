@@ -18,11 +18,14 @@
 #include <AutoLocker.h>
 
 #include "Architecture.h"
+#include "BasicFunctionDebugInfo.h"
 #include "CLanguage.h"
 #include "CompilationUnit.h"
 #include "CppLanguage.h"
 #include "CpuState.h"
+#include "DebuggerInterface.h"
 #include "DebugInfoEntries.h"
+#include "Demangler.h"
 #include "Dwarf.h"
 #include "DwarfFile.h"
 #include "DwarfFunctionDebugInfo.h"
@@ -44,6 +47,7 @@
 #include "StackFrame.h"
 #include "Statement.h"
 #include "StringUtils.h"
+#include "SymbolInfo.h"
 #include "TargetAddressRangeList.h"
 #include "TeamMemory.h"
 #include "Tracing.h"
@@ -226,14 +230,14 @@ struct DwarfImageDebugInfo::EntryListWrapper {
 
 
 DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
-	Architecture* architecture, TeamMemory* teamMemory,
+	DebuggerInterface* interface, Architecture* architecture,
 	FileManager* fileManager, GlobalTypeLookup* typeLookup,
 	GlobalTypeCache* typeCache, DwarfFile* file)
 	:
 	fLock("dwarf image debug info"),
 	fImageInfo(imageInfo),
+	fDebuggerInterface(interface),
 	fArchitecture(architecture),
-	fTeamMemory(teamMemory),
 	fFileManager(fileManager),
 	fTypeLookup(typeLookup),
 	fTypeCache(typeCache),
@@ -245,6 +249,7 @@ DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
 	fPLTSectionStart(0),
 	fPLTSectionEnd(0)
 {
+	fDebuggerInterface->AcquireReference();
 	fFile->AcquireReference();
 	fTypeCache->AcquireReference();
 }
@@ -252,6 +257,7 @@ DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
 
 DwarfImageDebugInfo::~DwarfImageDebugInfo()
 {
+	fDebuggerInterface->ReleaseReference();
 	fFile->ReleaseReference();
 	fTypeCache->ReleaseReference();
 }
@@ -397,7 +403,13 @@ DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 		}
 	}
 
-	return B_OK;
+	if (fFile->CountCompilationUnits() != 0)
+		return B_OK;
+
+	// if we had no compilation units, fall back to providing basic
+	// debug infos with DWARF-supported call frame unwinding
+	return SpecificImageDebugInfo::GetFunctionsFromSymbols(functions,
+		fDebuggerInterface, fImageInfo, this);
 }
 
 
@@ -419,7 +431,7 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 	// create the target interface
 	BasicTargetInterface *inputInterface
 		= new(std::nothrow) BasicTargetInterface(registers, registerCount,
-			fromDwarfMap, fArchitecture, fTeamMemory);
+			fromDwarfMap, fArchitecture, fDebuggerInterface);
 
 	if (inputInterface == NULL)
 		return B_NO_MEMORY;
@@ -508,16 +520,17 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 {
 	DwarfFunctionDebugInfo* function = dynamic_cast<DwarfFunctionDebugInfo*>(
 		functionInstance->GetFunctionDebugInfo());
-	if (function == NULL)
-		return B_BAD_VALUE;
 
 	FunctionID* functionID = functionInstance->GetFunctionID();
-	if (functionID == NULL)
-		return B_NO_MEMORY;
-	BReference<FunctionID> functionIDReference(functionID, true);
+	BReference<FunctionID> functionIDReference;
+	if (functionID != NULL)
+		functionIDReference.SetTo(functionID, true);
+
+	DIESubprogram* entry = function != NULL
+		? function->SubprogramEntry() : NULL;
 
 	TRACE_CFI("DwarfImageDebugInfo::CreateFrame(): subprogram DIE: %p, "
-		"function: %s\n", function->SubprogramEntry(),
+		"function: %s\n", entry,
 		functionID->FunctionName().String());
 
 	int32 registerCount = fArchitecture->CountRegisters();
@@ -543,7 +556,8 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	// create the target interfaces
 	UnwindTargetInterface* inputInterface
 		= new(std::nothrow) UnwindTargetInterface(registers, registerCount,
-			fromDwarfMap, toDwarfMap, cpuState, fArchitecture, fTeamMemory);
+			fromDwarfMap, toDwarfMap, cpuState, fArchitecture,
+			fDebuggerInterface);
 	if (inputInterface == NULL)
 		return B_NO_MEMORY;
 	BReference<UnwindTargetInterface> inputInterfaceReference(inputInterface,
@@ -552,7 +566,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	UnwindTargetInterface* outputInterface
 		= new(std::nothrow) UnwindTargetInterface(registers, registerCount,
 			fromDwarfMap, toDwarfMap, previousCpuState, fArchitecture,
-			fTeamMemory);
+			fDebuggerInterface);
 	if (outputInterface == NULL)
 		return B_NO_MEMORY;
 	BReference<UnwindTargetInterface> outputInterfaceReference(outputInterface,
@@ -562,8 +576,9 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	target_addr_t instructionPointer
 		= cpuState->InstructionPointer() - fRelocationDelta;
 	target_addr_t framePointer;
-	CompilationUnit* unit = function->GetCompilationUnit();
-	error = fFile->UnwindCallFrame(unit, function->SubprogramEntry(),
+	CompilationUnit* unit = function != NULL ? function->GetCompilationUnit()
+			: NULL;
+	error = fFile->UnwindCallFrame(unit, fArchitecture->AddressSize(), entry,
 		instructionPointer, inputInterface, outputInterface, framePointer);
 
 	if (error != B_OK) {
@@ -585,7 +600,8 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	)
 
 	// create the stack frame debug info
-	DIESubprogram* subprogramEntry = function->SubprogramEntry();
+	DIESubprogram* subprogramEntry = function != NULL ?
+		function->SubprogramEntry() : NULL;
 	DwarfStackFrameDebugInfo* stackFrameDebugInfo
 		= new(std::nothrow) DwarfStackFrameDebugInfo(fArchitecture,
 			fImageInfo.ImageID(), fFile, unit, subprogramEntry, fTypeLookup,
@@ -616,34 +632,40 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		// Note, this is correct, since we actually retrieved the return
 		// address. Our caller will fix the IP for us.
 
-	// create function parameter objects
-	for (DebugInfoEntryList::ConstIterator it = subprogramEntry->Parameters()
-			.GetIterator(); DebugInfoEntry* entry = it.Next();) {
-		if (entry->Tag() != DW_TAG_formal_parameter)
-			continue;
+	// The subprogram entry may not be available since this may be a case
+	// where .eh_frame was used to unwind the stack without other DWARF
+	// info being available.
+	if (subprogramEntry != NULL) {
+		// create function parameter objects
+		for (DebugInfoEntryList::ConstIterator it
+			= subprogramEntry->Parameters().GetIterator();
+			DebugInfoEntry* entry = it.Next();) {
+			if (entry->Tag() != DW_TAG_formal_parameter)
+				continue;
 
-		BString parameterName;
-		DwarfUtils::GetDIEName(entry, parameterName);
-		if (parameterName.Length() == 0)
-			continue;
+			BString parameterName;
+			DwarfUtils::GetDIEName(entry, parameterName);
+			if (parameterName.Length() == 0)
+				continue;
 
-		DIEFormalParameter* parameterEntry
-			= dynamic_cast<DIEFormalParameter*>(entry);
-		Variable* parameter;
-		if (stackFrameDebugInfo->CreateParameter(functionID, parameterEntry,
-				parameter) != B_OK) {
-			continue;
+			DIEFormalParameter* parameterEntry
+				= dynamic_cast<DIEFormalParameter*>(entry);
+			Variable* parameter;
+			if (stackFrameDebugInfo->CreateParameter(functionID,
+				parameterEntry, parameter) != B_OK) {
+				continue;
+			}
+			BReference<Variable> parameterReference(parameter, true);
+
+			if (!frame->AddParameter(parameter))
+				return B_NO_MEMORY;
 		}
-		BReference<Variable> parameterReference(parameter, true);
 
-		if (!frame->AddParameter(parameter))
-			return B_NO_MEMORY;
+		// create objects for the local variables
+		_CreateLocalVariables(unit, frame, functionID, *stackFrameDebugInfo,
+			instructionPointer, functionInstance->Address() - fRelocationDelta,
+			subprogramEntry->Variables(), subprogramEntry->Blocks());
 	}
-
-	// create objects for the local variables
-	_CreateLocalVariables(unit, frame, functionID, *stackFrameDebugInfo,
-		instructionPointer, functionInstance->Address() - fRelocationDelta,
-		subprogramEntry->Variables(), subprogramEntry->Blocks());
 
 	_frame = frameReference.Detach();
 	_previousCpuState = previousCpuStateReference.Detach();

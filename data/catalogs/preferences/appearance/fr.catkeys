@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	1428480647
+1	french	x-vnd.Haiku-Appearance	963769669
 Plain font:	Font view		Police simple :
 Control highlight	Colors tab		Mise en valeur de contrôle
 Control border	Colors tab		Bordure des contrôles
@@ -23,27 +23,33 @@ Tooltip background	Colors tab		Arrière plan des bulles d'aide
 Selected menu item background	Colors tab		Arrière plan de l'élément sélectionnée dans le menu
 Antialiasing	APRWindow		Lissage
 Navigation base	Colors tab		Base de navigation
+Selected list item text	Colors tab		Texte de l'élément sélectionné dans la liste
 Window border	Colors tab		Bordure de fenêtre
+Double:	DecorSettingsView		Double :
 Window tab text	Colors tab		Texte des titres de fenêtres
 Document text	Colors tab		Texte du document
 Navigation pulse	Colors tab		Pulsation de navigation
 Window decorator:	DecorSettingsView		Décorateur de fenêtre :
 Selected menu item text	Colors tab		Texte de l'élément sélectionné dans le menu
 Menu background	Colors tab		Arrière plan de menu
+List background	Colors tab		Arrière-plan de la liste
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Point de contrôle
 Size:	Font Selection view		Taille :
+Selected list item background	Colors tab		Arrière plan de l'élément sélectionnée dans la liste
 Panel background	Colors tab		Arrière plan des panneaux
 Menu font:	Font view		Police des menus :
 Colors	APRWindow		Couleurs
 Control background	Colors tab		Arrière plan des contrôles
 Inactive window tab	Colors tab		Titres des fenêtres inactives
+List item text	Colors tab		Texte de l’élément de la liste
 Appearance	System name		Apparence
 Fixed font:	Font view		Police à chasse fixe :
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwis . 0123456789
 Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n'est pas disponible en même temps que les consignes de glyphes dans cette version d'Haiku afin d'éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l'en-tête de configuration de libfreetype.
 Control text	Colors tab		Texte des contrôles
+Single:	DecorSettingsView		Simple :
 Tooltip text	Colors tab		Texte des bulles d'aide
 Bold font:	Font view		Caractères gras :
 Inactive window border	Colors tab		Bordure de fenêtre inactive

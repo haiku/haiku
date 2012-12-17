@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Expander	282517174
+1	portuguese (brazil)	x-vnd.Haiku-Expander	2603318510
 Expand	ExpanderMenu		Expandir
 Close window when done expanding	ExpanderPreferences		Fechar a janela quando concluída a expansão
 Set destination…	ExpanderMenu		Selecionar destino…
@@ -22,6 +22,7 @@ Cancel	ExpanderPreferences		Cancelar
 Expansion	ExpanderPreferences		Expansão
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Tem certeza que deseja parar de expandir este \narquivo? Os itens expandidos podem não estar completos.
 Select	DirectoryFilePanel		Selecionar
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A pasta de destino não existe. Deseja criá-la?
 Same directory as source (archive) file	ExpanderPreferences		Mesmo diretório como arquivo fonte (conjunto de arquivos)
 Expanding '%s'	ExpanderWindow		Expandindo '%s'
 Settings	ExpanderMenu		Configurações
@@ -32,6 +33,8 @@ Show contents	ExpanderWindow		Mostrar o conteúdo
 Automatically show contents listing	ExpanderPreferences		Exibir automaticamente lista do conteúdo
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		Deixar caminho da pasta de destino vazio
+Failed to create the destination folder.	ExpanderWindow		Falha ao criar a pasta de destino.
+Create	ExpanderWindow		Criar
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		A pasta foi movida, renomeada ou não\é suportada.
 The file doesn't exist	ExpanderWindow		O arquivo não existe
 Stop	ExpanderMenu		Parar

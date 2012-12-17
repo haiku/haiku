@@ -103,11 +103,12 @@ ValueNodeManager::ValueNodeChanged(ValueNodeChild* nodeChild,
 
 	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
 
+	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--)
+		fListeners.ItemAt(i)->ValueNodeChanged(nodeChild, oldNode, newNode);
+
 	if (oldNode != NULL)
 		newNode->CreateChildren();
 
-	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--)
-		fListeners.ItemAt(i)->ValueNodeChanged(nodeChild, oldNode, newNode);
 }
 
 

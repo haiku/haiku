@@ -9,6 +9,7 @@
 
 
 class Architecture;
+class DebuggerInterface;
 class DwarfManager;
 class FileManager;
 class ImageInfo;
@@ -20,7 +21,7 @@ class TeamMemory;
 class DwarfTeamDebugInfo : public SpecificTeamDebugInfo {
 public:
 								DwarfTeamDebugInfo(Architecture* architecture,
-									TeamMemory* teamMemory,
+									DebuggerInterface* interface,
 									FileManager* fileManager,
 									GlobalTypeLookup* typeLookup,
 									GlobalTypeCache* typeCache);
@@ -34,7 +35,7 @@ public:
 
 private:
 			Architecture*		fArchitecture;
-			TeamMemory*			fTeamMemory;
+			DebuggerInterface*	fDebuggerInterface;
 			FileManager*		fFileManager;
 			DwarfManager*		fManager;
 			GlobalTypeLookup*	fTypeLookup;

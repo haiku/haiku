@@ -1,11 +1,10 @@
-1	polish	x-vnd.Haiku-Terminal	1294209621
+1	polish	x-vnd.Haiku-Terminal	2912171349
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz Terminal
 Change directory	Terminal TermView		Zmień folder
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Nowy Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić shella. Przepraszamy.
-Text size	Terminal TermWindow		Rozmiar tekstu
 Match case	Terminal FindWindow		Dopasuj wielkość liter
 Quit	Terminal TermWindow		Wyjdź
 Use default shell	Terminal Shell		Użyj domyślnego shella
@@ -13,10 +12,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Potwierdź wy
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Wzór ustalający tytuł aktywnej karty. Następujące wyznaczniki\nmogą zostać użyte:\n
 Select all	Terminal TermWindow		Zaznacz wszystko
 Close tab	Terminal TermWindow		Zamknij kartę
-Custom	Terminal colors schema		Niestandardowe
 Save to file…	Terminal PrefWindow		Zapisz w pliku…
 OK	Terminal PrefWindow		OK
-Black on White	Terminal colors schema		Czarny na Białym
 Window title:	Terminal AppearancePrefView		Tytuł okna:
 Font:	Terminal AppearancePrefView		Czcionka:
 Copy here	Terminal TermView		Kopiuj tutaj
@@ -34,13 +31,10 @@ Find	Terminal FindWindow		Znajdź
 Appearance	Terminal PrefWindow		Wygląd
 Tab title:	Terminal AppearancePrefView		Tytuł karty:
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Wzór ustalający tytuł aktywnego okna. Następujące wyznaczniki\nmogą zostać użyte:\n
-Color schema:	Terminal AppearancePrefView		Motyw kolorów:
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Tło
 Use selection	Terminal FindWindow		Użyj zaznaczenia
-Green on Black	Terminal colors schema		Zielony na czarnym
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces \"%1\" jest wciąż w użyciu.\nJeśli zamkniesz kartę, proces zostanie zatrzymany.
-Size:	Terminal AppearancePrefView		Rozmiar:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie można wykonać \"%command\":\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               wyświetlenie tego tekstu pomocy\n  -t,     --title              zmiana tytułu okna\n  -f,     --fullscreen         tryb pełnoekranowy\n
 Full screen	Terminal TermWindow		Pełny ekran
@@ -61,7 +55,6 @@ Find…	Terminal TermWindow		Znajdź…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" jest wciąż w użyciu.\nJeśli zamkniesz terminal, proces zostanie zatrzymany.
 Move here	Terminal TermView		Przenieś tutaj
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tŚcieżka dostępu do aktywnych procesów w\n\t\t\taktywnej karcie. Opcjonalnie maksymalna liczba komponentów ścieżek która\n\t\t\tmoże zostać ustalona. Np. '%2d' dla maksymalnie dwóch komponentów.\n\t%i\t-\tIndeks okna.\n\t%p\t-\tNazwa aktywnego procesu w aktywnej karcie.\n\t%t\t-\tNazwa aktywnej karty.\n\t%%\t-\tZnak '%'.
-White on Black	Terminal colors schema		Biały na Czarnym
 Error!	Terminal getString		Błąd!
 New tab	Terminal TermWindow		Nowa karta
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Wzór ustalający tytuły kart. Następujące wyznaczniki\nmogą zostać użyte:\n

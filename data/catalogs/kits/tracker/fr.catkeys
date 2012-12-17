@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1301055003
+1	french	x-vnd.Haiku-libtracker	3955647850
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -452,6 +452,7 @@ Mount	DeskWindow		Monter
 Mount	ContainerWindow		Monter
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilisés -- %free libres)
 Cancel	FSClipBoard		Annuler
+Restart Deskbar	DeskWindow		Redémarrer la Deskbar
 Cut more	ContainerWindow		Couper plus
 Deleting: 	StatusWindow		Suppression : 
 Empty Trash	InfoWindow		Vider la corbeille

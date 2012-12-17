@@ -3505,8 +3505,17 @@ BTextView::_HandleArrowKey(uint32 inArrowKey, bool commandKeyDown)
 			else {
 				float height;
 				BPoint point = PointAt(fCaretOffset, &height);
-				point.y -= height;
-				fCaretOffset = OffsetAt(point);
+				// find the caret position on the previous
+				// line by gently stepping onto this line
+				for (int i = 1; i <= height; i++) {
+					point.y--;
+					int32 offset = OffsetAt(point);
+					if (offset < fCaretOffset || i == height) {
+						fCaretOffset = offset;
+						break;
+					}
+				}
+
 				if (shiftDown && fCaretOffset != lastClickOffset) {
 					if (fCaretOffset < fSelStart) {
 						// extend selection to the top
@@ -4063,7 +4072,9 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 
 		delta = max_c(delta, 1);
 
-		deltaWidth = _TabExpandedStyledWidth(offset, delta, &ascent, &descent);
+		// do not include B_ENTER-terminator into width & height calculations
+		deltaWidth = _TabExpandedStyledWidth(offset,
+								done ? delta - 1 : delta, &ascent, &descent);
 		strWidth += deltaWidth;
 
 		if (strWidth >= *inOutWidth) {

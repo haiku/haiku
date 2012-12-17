@@ -245,6 +245,7 @@ AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToHaikuImage power : enhanced_speedstep@x86 ;
 AddNewDriversToHaikuImage power : acpi_battery@x86 ;
 #AddNewDriversToHaikuImage power : x86_cpuidle@x86 ;
+#AddNewDriversToHaikuImage display : display_controls@x86 ;
 
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf null

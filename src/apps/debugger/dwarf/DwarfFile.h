@@ -48,6 +48,7 @@ public:
 									uint64 offset) const;
 
 			status_t			UnwindCallFrame(CompilationUnit* unit,
+									uint8 addressSize,
 									DIESubprogram* subprogramEntry,
 									target_addr_t location,
 									const DwarfTargetInterface* inputInterface,
@@ -115,6 +116,7 @@ private:
 
 			status_t			_UnwindCallFrame(bool usingEHFrameSection,
 									CompilationUnit* unit,
+									uint8 addressSize,
 									DIESubprogram* subprogramEntry,
 									target_addr_t location,
 									const DwarfTargetInterface* inputInterface,
@@ -124,6 +126,7 @@ private:
 			status_t			_ParseCIE(ElfSection* debugFrameSection,
 									bool usingEHFrameSection,
 									CompilationUnit* unit,
+									uint8 addressSize,
 									CfaContext& context, off_t cieOffset,
 									CIEAugmentation& cieAugmentation);
 			status_t			_ParseFrameInfoInstructions(

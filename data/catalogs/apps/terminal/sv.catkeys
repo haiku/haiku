@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	3929743651
+1	swedish	x-vnd.Haiku-Terminal	1252738083
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -6,7 +6,6 @@ OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Ny terminal
 Cursor text	Terminal AppearancePrefView		Markörtext
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalen kunde inte starta skalet.
-Text size	Terminal TermWindow		Teckenstorlek
 Match case	Terminal FindWindow		Matcha gemener/versaler
 Quit	Terminal TermWindow		Avsluta
 Use default shell	Terminal Shell		Använd standardskal
@@ -14,10 +13,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Bekräfta avs
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mönstret bestämmer namn på den aktiva fliken. Följande alternativ finns:\n
 Select all	Terminal TermWindow		Markera allt
 Close tab	Terminal TermWindow		Stäng flik
-Custom	Terminal colors schema		Anpassad
 Save to file…	Terminal PrefWindow		Spara till fil...
 OK	Terminal PrefWindow		OK
-Black on White	Terminal colors schema		Svart på vitt
 Window title:	Terminal AppearancePrefView		Fönstertitel:
 Font:	Terminal AppearancePrefView		Typsnitt:
 Copy here	Terminal TermView		Kopiera hit
@@ -35,13 +32,10 @@ Find	Terminal FindWindow		Sök
 Appearance	Terminal PrefWindow		Utseende
 Tab title:	Terminal AppearancePrefView		Fliktitel:
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mönstret bestämmer namn på fönster. Följande alternativ finns:\n
-Color schema:	Terminal AppearancePrefView		Färgschema:
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Bakgrund
 Use selection	Terminal FindWindow		Använd markering
-Green on Black	Terminal colors schema		Grönt på svart
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger fliken kommer processen att termineras.
-Size:	Terminal AppearancePrefView		Storlek:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan inte utföra "%command":\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               visa denna hjälp\n  -t,     --title             sätt tittel på fönstret\n  -f,     --fullscreen         starta i fullskärm\n
 Full screen	Terminal TermWindow		Helskärm
@@ -63,7 +57,6 @@ Find…	Terminal TermWindow		Sök...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger Terminalen kommer processen att termineras.
 Move here	Terminal TermView		Flytta hit
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDen valda flikens aktiva process arbetskatalog.\n\t\t\tEtt maximalt antal sökvägsdelar kan anges\n\t\t\tT.ex. '%2d' för som mest två delar.\n\t%i\t-\tFönstrets indexnummer.\n\t%p\t-\tDen valda flikens aktiva process namn.\n\t%t\t-\tDen valda flikens namn.\n\t%%\t-\tTecknet '%'.
-White on Black	Terminal colors schema		Vitt på svart
 Error!	Terminal getString		Fel!
 New tab	Terminal TermWindow		Ny flik
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mönstret bestämmer namn på flikar. Följande alternativ finns:\n

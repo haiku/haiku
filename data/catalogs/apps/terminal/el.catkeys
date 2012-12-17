@@ -1,11 +1,10 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	1054657081
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	2672618809
 Not found.	Terminal TermWindow		Δε βρέθηκε.
 Switch Terminals	Terminal TermWindow		Εναλλαγή Τερματικών
 Change directory	Terminal TermView		Αλλαγή καταλόγου
 OK	Terminal TermWindow		Εντάξει
 New Terminal	Terminal TermWindow		Νέο Τερματικό
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Το Τερματικό δε μπορεί να ξεκινήσει το κέλυφος. Λυπούμαστε.
-Text size	Terminal TermWindow		Μέγεθος κειμένου
 Match case	Terminal FindWindow		Ταίριασμα πεζών/κεφαλαίων
 Quit	Terminal TermWindow		Έξοδος
 Use default shell	Terminal Shell		Χρήση προεπιλεγμένου κέλυφους
@@ -13,10 +12,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Επιβεβ�
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Το σχέδιο που προσδιορίζει τον τρέχοντα τίτλο καρτέλας. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n
 Select all	Terminal TermWindow		Επιλογή όλων
 Close tab	Terminal TermWindow		Κλείσιμο καρτέλας
-Custom	Terminal colors schema		Προσαρμοσμένο
 Save to file…	Terminal PrefWindow		Αποθήκευση στο αρχείο...
 OK	Terminal PrefWindow		Εντάξει
-Black on White	Terminal colors schema		Μάυρο πάνω σε Άσπρο
 Window title:	Terminal AppearancePrefView		Τίτλος παραθύρου:
 Font:	Terminal AppearancePrefView		Γραμματοσειρά:
 Copy here	Terminal TermView		Αντιγραφή εδώ
@@ -34,13 +31,10 @@ Find	Terminal FindWindow		Εύρεση
 Appearance	Terminal PrefWindow		Εμφάνιση
 Tab title:	Terminal AppearancePrefView		Τίτλος καρτέλας
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Το μοτίβο που προσδιορίζει τους τίτλους παραθύρου. Οι παρακάτω placeholder\n μπορούν να χρησιμοποιηθούν:\n 
-Color schema:	Terminal AppearancePrefView		Σχήμα χρωμάτων:
 OK	Terminal SetTitleWindow		Εντάξει
 Background	Terminal AppearancePrefView		Παρασκήνιο
 Use selection	Terminal FindWindow		Χρήση επιλεγμένου
-Green on Black	Terminal colors schema		Πράσινο πάνω σε Μαύρο
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Η διεργασία \"%1\" ακόμη εκτελείται.\nΕαν κλείσετε την καρτέλα, η διεργασία θα τερματιστεί.
-Size:	Terminal AppearancePrefView		Μέγεθος:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Δεν μπορεί να εκτελεστεί \"%command\":\n\t%error
 Full screen	Terminal TermWindow		Πλήρης οθόνη
 Window title…	Terminal TermWindow		Τίτλος παραθύρου...
@@ -60,7 +54,6 @@ Find…	Terminal TermWindow		Εύρεση...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Η διεργασία \"%1\" ακόμη εκτελείται.\nΕαν κλείσετε τοτερματικό, η διεργασία θα τερματιστεί.
 Move here	Terminal TermView		Μετακίνηση εδώ
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tΟ τρέχων κατάλογος της ενεργού διεργασίας.\n\t\t\tΠροαιρετικά ο μέγιστος αριθμός στοιχείων της διαδρομής μπορεί να\n\t\t\tπροσδιοριστεί. Π.χ. '%2d' για το πολύ δύο τμήματα.\n\t%i\t-\tΟ κατάλογος περιεχομένων του παραθύρου.\n\t%p\t-\tΤο όνομα της ενεργού διεργασίας στην τρέχουσα καρτέλα..\n\t%t\t-\tΟ τίτλος της τρέχουσας καρτέλας.\t%%\t-\tΟ χαρακτήρας '%'.
-White on Black	Terminal colors schema		Άσπρο πάνω σε Μαύρο
 Error!	Terminal getString		Σφάλμα!
 New tab	Terminal TermWindow		Νέα καρτέλα
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Το σχέδιο που προσδιορίζει τους τρέχοντες τίτλους καρτέλας. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n

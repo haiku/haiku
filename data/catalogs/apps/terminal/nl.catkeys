@@ -1,11 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	1294209621
+1	dutch; flemish	x-vnd.Haiku-Terminal	2912171349
 Not found.	Terminal TermWindow		Niet gevonden.
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
 Change directory	Terminal TermView		Directory veranderen
 OK	Terminal TermWindow		Oké
 New Terminal	Terminal TermWindow		Nieuwe Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kon de shell niet starten. Sorry.
-Text size	Terminal TermWindow		Tekstgrootte
 Match case	Terminal FindWindow		Hoofd-/kleine-lettergevoelig
 Quit	Terminal TermWindow		Afsluiten
 Use default shell	Terminal Shell		Standaard shell gebruiken
@@ -13,10 +12,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Afsluiten bev
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de titel van de huidige tab bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
 Select all	Terminal TermWindow		Alles selecteren
 Close tab	Terminal TermWindow		De tab sluiten
-Custom	Terminal colors schema		Aangepast
 Save to file…	Terminal PrefWindow		Opslaan naar bestand...
 OK	Terminal PrefWindow		Oké
-Black on White	Terminal colors schema		Zwart op Wit
 Window title:	Terminal AppearancePrefView		Venstertitel:
 Font:	Terminal AppearancePrefView		Lettertype:
 Copy here	Terminal TermView		Hierheen kopiëren
@@ -34,13 +31,10 @@ Find	Terminal FindWindow		Zoeken
 Appearance	Terminal PrefWindow		Uiterlijk
 Tab title:	Terminal AppearancePrefView		Tabtitel:
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Het model dat de venstertitels bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
-Color schema:	Terminal AppearancePrefView		Kleurschema:
 OK	Terminal SetTitleWindow		Oké
 Background	Terminal AppearancePrefView		Achtergrond
 Use selection	Terminal FindWindow		Gebruik selectie
-Green on Black	Terminal colors schema		Groen op zwart
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Het proces \"%1\" is nog gaande.\nAls u de tab sluit, zal het proces afgebroken worden.
-Size:	Terminal AppearancePrefView		Grootte:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan \"%command\" niet uitvoeren:\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h,   --help   toon deze hulp\n-t,   --title   stel de venstertitel in\n-f,   --fullscreen   start in volledig scherm\n
 Full screen	Terminal TermWindow		Volledig scherm
@@ -61,7 +55,6 @@ Find…	Terminal TermWindow		Zoeken...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Het proces \"%1\" is nog gaande.\nAls u Terminal sluit, zal het proces afgebroken worden.
 Move here	Terminal TermView		Hierheen verplaatsen
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDe huidige werkmap van het actieve proces in de \n\t\thuidige tab. Optioneel kan het maximale aantal padonderdelen\n\t\tworden opgegeven. Bijvoorbeeld '%2d' voor maximaal 2 onderdelen.\n\t%i\t-\tDe index van het venster.\n\t%p\t-\tDe naam van het actieve proces in de huidige tab.\n\t%t\t-\tDe titel van de huidige tab.\n\t%%\t-\tHet karakter '%'.
-White on Black	Terminal colors schema		Wit op Zwart
 Error!	Terminal getString		Fout!
 New tab	Terminal TermWindow		Nieuwe tab
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Het model dat de tabtitels bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n

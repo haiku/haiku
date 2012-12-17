@@ -1,21 +1,18 @@
-1	hindi	x-vnd.Haiku-Terminal	3000435316
+1	hindi	x-vnd.Haiku-Terminal	323429748
 Not found.	Terminal TermWindow		नहीं मिला.
 Switch Terminals	Terminal TermWindow		स्विच टर्मिनल्स
 Change directory	Terminal TermView		निर्देशिका बदलें
 OK	Terminal TermWindow		ठीक है
 New Terminal	Terminal TermWindow		नया टर्मिनल
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		टर्मिनल शेल नहीं शुरू कर सकता है. माफ़ कीजिए.
-Text size	Terminal TermWindow		टेक्स्ट का आकार
 Match case	Terminal FindWindow		केस मिलाएँ
 Quit	Terminal TermWindow		छोड़ना
 Use default shell	Terminal Shell		डिफ़ॉल्ट शेल का प्रयोग करें
 Confirm exit if active programs exist	Terminal AppearancePrefView		निकास की पुष्टि करें अगर सक्रिय प्रोग्राम मौजूद है
 Select all	Terminal TermWindow		सभी का चयन करें
 Close tab	Terminal TermWindow		टैब बंद करें
-Custom	Terminal colors schema		कस्टम
 Save to file…	Terminal PrefWindow		फ़ाइल सहेजें...
 OK	Terminal PrefWindow		ठीक है
-Black on White	Terminal colors schema		सफेद पर काला
 Window title:	Terminal AppearancePrefView		विंडो शीर्षक:
 Font:	Terminal AppearancePrefView		फ़ॉन्ट:
 Copy here	Terminal TermView		यहाँ प्रतिलिपि बनाएँ
@@ -32,12 +29,9 @@ Selected text	Terminal AppearancePrefView		चयनित टेक्स्ट
 Find	Terminal FindWindow		खोजें
 Appearance	Terminal PrefWindow		दिखावट
 Tab title:	Terminal AppearancePrefView		टैब शीर्षक:
-Color schema:	Terminal AppearancePrefView		रंग स्कीमा:
 OK	Terminal SetTitleWindow		ठीक है
 Background	Terminal AppearancePrefView		पृष्ठभूमि
 Use selection	Terminal FindWindow		चयन का प्रयोग करें
-Green on Black	Terminal colors schema		काले पर हरा
-Size:	Terminal AppearancePrefView		आकार:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		अमल नहीं कर सकते \"%command\" को:\n\t%error
 Full screen	Terminal TermWindow		पूर्ण स्क्रीन
 Window title…	Terminal TermWindow		विंडो शीर्षक...
@@ -53,7 +47,6 @@ Nothing is selected.	Terminal TermWindow		कुछ भी नहीं चु�
 Text not found.	Terminal TermWindow		टेक्स्ट नहीं मिला.
 Find…	Terminal TermWindow		खोजें...
 Move here	Terminal TermView		यहाँ ले जाएँ
-White on Black	Terminal colors schema		काले पर सफेद
 Error!	Terminal getString		त्रुटि!
 New tab	Terminal TermWindow		नया टैब
 Selected background	Terminal AppearancePrefView		पृष्ठभूमि चयनित

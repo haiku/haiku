@@ -9,6 +9,7 @@
 
 #include <string.h>
 
+#include "DebuggerInterface.h"
 #include "DwarfFile.h"
 #include "DwarfImageDebugInfo.h"
 #include "DwarfManager.h"
@@ -17,22 +18,24 @@
 
 
 DwarfTeamDebugInfo::DwarfTeamDebugInfo(Architecture* architecture,
-	TeamMemory* teamMemory, FileManager* fileManager,
+	DebuggerInterface* interface, FileManager* fileManager,
 	GlobalTypeLookup* typeLookup, GlobalTypeCache* typeCache)
 	:
 	fArchitecture(architecture),
-	fTeamMemory(teamMemory),
+	fDebuggerInterface(interface),
 	fFileManager(fileManager),
 	fManager(NULL),
 	fTypeLookup(typeLookup),
 	fTypeCache(typeCache)
 {
+	fDebuggerInterface->AcquireReference();
 	fTypeCache->AcquireReference();
 }
 
 
 DwarfTeamDebugInfo::~DwarfTeamDebugInfo()
 {
+	fDebuggerInterface->ReleaseReference();
 	fTypeCache->ReleaseReference();
 	delete fManager;
 }
@@ -75,8 +78,8 @@ DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
 
 	// create the image debug info
 	DwarfImageDebugInfo* debugInfo = new(std::nothrow) DwarfImageDebugInfo(
-		imageInfo, fArchitecture, fTeamMemory, fFileManager, fTypeLookup,
-		fTypeCache, file);
+		imageInfo, fDebuggerInterface, fArchitecture, fFileManager,
+		fTypeLookup, fTypeCache, file);
 	if (debugInfo == NULL)
 		return B_NO_MEMORY;
 

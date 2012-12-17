@@ -1,11 +1,10 @@
-1	english	x-vnd.Haiku-Terminal	1294209621
+1	english	x-vnd.Haiku-Terminal	2912171349
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
 OK	Terminal TermWindow		确定
 New Terminal	Terminal TermWindow		新建窗口
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		终端无法启动shell，非常抱歉。
-Text size	Terminal TermWindow		文本大小  
 Match case	Terminal FindWindow		匹配大小写  
 Quit	Terminal TermWindow		退出
 Use default shell	Terminal Shell		使用默认shell  
@@ -13,10 +12,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		如果存在�
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了当前标签标题。可以使用下述的\n占位符：\n
 Select all	Terminal TermWindow		全选
 Close tab	Terminal TermWindow		关闭标签
-Custom	Terminal colors schema		自定义
 Save to file…	Terminal PrefWindow		保存为…
 OK	Terminal PrefWindow		确定
-Black on White	Terminal colors schema		白底黑字
 Window title:	Terminal AppearancePrefView		窗口标题：
 Font:	Terminal AppearancePrefView		字体：
 Copy here	Terminal TermView		复制到此  
@@ -34,13 +31,10 @@ Find	Terminal FindWindow		查找
 Appearance	Terminal PrefWindow		外观
 Tab title:	Terminal AppearancePrefView		标签标题：
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		该图案指定了窗口标题。可以使用下述的\n占位符：\n
-Color schema:	Terminal AppearancePrefView		色彩模式：
 OK	Terminal SetTitleWindow		确定
 Background	Terminal AppearancePrefView		背景
 Use selection	Terminal FindWindow		使用选择
-Green on Black	Terminal colors schema		黑底绿字
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭该标签，该进程将被杀死。
-Size:	Terminal AppearancePrefView		大小：
 Cannot execute \"%command\":\n\t%error	Terminal Shell		无法运行\"%command\":\n\t%错误
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help 打印帮助内容\n-t, --title 设置窗口标题\n-f, --fullscreen 全屏启动\n
 Full screen	Terminal TermWindow		全屏
@@ -61,7 +55,6 @@ Find…	Terminal TermWindow		查找…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭终端，该进程将被杀死。
 Move here	Terminal TermView		移动到此
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t当前标签中，活动进程的当前工作目录。\n\t\t组件可以指定的最大路径数量。例如，'%2d'，可以指定至多两个组件。\n\t%i\t-\t窗口的索引。\n\t%p\t-\t当前标签中的活动进程。\n\t%t\t-\t当前标签的标题。\n\t%%\t-\t字符 '%'。
-White on Black	Terminal colors schema		黑底白字
 Error!	Terminal getString		错误！
 New tab	Terminal TermWindow		新建标签
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		该图案指定了标签标题。可以使用下述的\n占位符：\n

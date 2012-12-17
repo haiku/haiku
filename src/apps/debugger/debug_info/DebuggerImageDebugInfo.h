@@ -55,10 +55,6 @@ public:
 									FileSourceCode* sourceCode);
 
 private:
-	static	int					_CompareSymbols(const SymbolInfo* a,
-									const SymbolInfo* b);
-
-private:
 			ImageInfo			fImageInfo;
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
