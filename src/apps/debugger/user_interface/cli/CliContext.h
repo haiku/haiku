@@ -15,18 +15,22 @@
 #include "Team.h"
 
 
+class StackFrame;
+class StackTrace;
 class Team;
 class UserInterfaceListener;
+class ValueNodeManager;
 
 
 class CliContext : private Team::Listener {
 public:
 			enum {
-				EVENT_QUIT					= 0x01,
-				EVENT_USER_INTERRUPT		= 0x02,
-				EVENT_THREAD_ADDED			= 0x04,
-				EVENT_THREAD_REMOVED		= 0x08,
-				EVENT_THREAD_STOPPED		= 0x10,
+				EVENT_QUIT							= 0x01,
+				EVENT_USER_INTERRUPT				= 0x02,
+				EVENT_THREAD_ADDED					= 0x04,
+				EVENT_THREAD_REMOVED				= 0x08,
+				EVENT_THREAD_STOPPED				= 0x10,
+				EVENT_THREAD_STACK_TRACE_CHANGED	= 0x20
 			};
 
 public:
@@ -46,11 +50,19 @@ public:
 			Team*				GetTeam() const	{ return fTeam; }
 			UserInterfaceListener* GetUserInterfaceListener() const
 									{ return fListener; }
+			ValueNodeManager*	GetValueNodeManager() const
+									{ return fNodeManager; }
+			StackTrace*			GetStackTrace() const
+									{ return fCurrentStackTrace; }
 
 			Thread*				CurrentThread() const { return fCurrentThread; }
 			thread_id			CurrentThreadID() const;
 			void				SetCurrentThread(Thread* thread);
 			void				PrintCurrentThread();
+
+			int32				CurrentStackFrameIndex() const
+									{ return fCurrentStackFrameIndex; }
+			void				SetCurrentStackFrameIndex(int32 index);
 
 			const char*			PromptUser(const char* prompt);
 			void				AddLineToInputHistory(const char* line);
@@ -72,6 +84,8 @@ private:
 
 	virtual	void				ThreadStateChanged(
 									const Team::ThreadEvent& event);
+	virtual	void				ThreadStackTraceChanged(
+									const Team::ThreadEvent& event);
 
 private:
 			void				_QueueEvent(Event* event);
@@ -86,6 +100,7 @@ private:
 			BLocker				fLock;
 			Team*				fTeam;
 			UserInterfaceListener* fListener;
+			ValueNodeManager*	fNodeManager;
 			EditLine*			fEditLine;
 			History*			fHistory;
 			const char*			fPrompt;
@@ -96,6 +111,8 @@ private:
 	volatile bool				fTerminating;
 
 			Thread*				fCurrentThread;
+			StackTrace*			fCurrentStackTrace;
+			int32				fCurrentStackFrameIndex;
 
 			EventList			fPendingEvents;
 };
