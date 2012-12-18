@@ -24,9 +24,6 @@ public:
 private:
 			status_t			_ResolveValueIfNeeded(ValueNode* node,
 									CliContext& context, int32 maxDepth);
-
-			status_t			_ResolveLocationIfNeeded(ValueNodeChild* child,
-									StackFrame* frame, ::Team* team);
 };
 
 

@@ -133,10 +133,6 @@ CliPrintVariableCommand::_ResolveValueIfNeeded(ValueNode* node,
 		for (int32 i = 0; i < node->CountChildren(); i++) {
 			ValueNodeChild* child = node->ChildAt(i);
 			containerLocker.Unlock();
-			result = _ResolveLocationIfNeeded(child, frame, context.GetTeam());
-			if (result != B_OK)
-				continue;
-
 			result = manager->AddChildNodes(child);
 			if (result != B_OK)
 				continue;
@@ -153,20 +149,5 @@ CliPrintVariableCommand::_ResolveValueIfNeeded(ValueNode* node,
 		}
 	}
 
-	return result;
-}
-
-
-status_t
-CliPrintVariableCommand::_ResolveLocationIfNeeded(ValueNodeChild* child,
-	StackFrame* frame, ::Team* team)
-{
-	ValueLocation* location = NULL;
-	ValueLoader loader(team->GetArchitecture(), team->GetTeamMemory(),
-		team->GetTeamTypeInformation(), frame->GetCpuState());
-	status_t result = child->ResolveLocation(&loader, location);
-	child->SetLocation(location, result);
-	if (location != NULL)
-		location->ReleaseReference();
 	return result;
 }

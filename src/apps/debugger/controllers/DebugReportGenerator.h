@@ -52,8 +52,6 @@ private:
 			status_t			_DumpDebuggedThreadInfo(BString& output,
 									::Thread* thread);
 
-			status_t			_ResolveLocationIfNeeded(ValueNodeChild* child,
-									StackFrame* frame);
 			status_t			_ResolveValueIfNeeded(ValueNode* node,
 									StackFrame* frame, int32 maxDepth);
 

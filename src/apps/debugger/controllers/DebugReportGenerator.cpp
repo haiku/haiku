@@ -336,9 +336,9 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 		for (int32 i = 0; i < container->CountChildren(); i++) {
 			ValueNodeChild* child = container->ChildAt(i);
 			containerLocker.Unlock();
-			_ResolveValueIfNeeded(child->Node(), frame, 1);
+			_ResolveValueIfNeeded(child->Node(), frame, 2);
 			containerLocker.Lock();
-			UiUtils::PrintValueNodeGraph(_output, child, 3, 1);
+			UiUtils::PrintValueNodeGraph(_output, child, 3, 2);
 		}
 		_output << "\n";
 	}
@@ -380,10 +380,6 @@ DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame,
 		for (int32 i = 0; i < node->CountChildren(); i++) {
 			ValueNodeChild* child = node->ChildAt(i);
 			containerLocker.Unlock();
-			result = _ResolveLocationIfNeeded(child, frame);
-			if (result != B_OK)
-				continue;
-
 			result = fNodeManager->AddChildNodes(child);
 			if (result != B_OK)
 				continue;
@@ -400,20 +396,5 @@ DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame,
 		}
 	}
 
-	return result;
-}
-
-
-status_t
-DebugReportGenerator::_ResolveLocationIfNeeded(ValueNodeChild* child,
-	StackFrame* frame)
-{
-	ValueLocation* location = NULL;
-	ValueLoader loader(fTeam->GetArchitecture(), fTeam->GetTeamMemory(),
-		fTeam->GetTeamTypeInformation(), frame->GetCpuState());
-	status_t result = child->ResolveLocation(&loader, location);
-	child->SetLocation(location, result);
-	if (location != NULL)
-		location->ReleaseReference();
 	return result;
 }
