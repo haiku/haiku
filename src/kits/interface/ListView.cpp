@@ -732,7 +732,7 @@ BListView::AddList(BList* list, int32 index)
 	if (!fList.AddList(list, index))
 		return false;
 
-	int32 count = fList.CountItems();
+	int32 count = list->CountItems();
 
 	if (fFirstSelected != -1 && index < fFirstSelected)
 		fFirstSelected += count;
@@ -744,12 +744,12 @@ BListView::AddList(BList* list, int32 index)
 		BFont font;
 		GetFont(&font);
 
-		for (int32 i = index; i <= (index + list->CountItems() - 1); i++) {
+		for (int32 i = index; i <= (index + count - 1); i++) {
 			ItemAt(i)->SetTop((i > 0) ? ItemAt(i - 1)->Bottom() + 1.0 : 0.0);
 			ItemAt(i)->Update(this, &font);
 		}
 
-		_RecalcItemTops(index + list->CountItems() - 1);
+		_RecalcItemTops(index + count - 1);
 
 		_FixupScrollBar();
 		Invalidate(); // TODO
