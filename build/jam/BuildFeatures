@@ -29,7 +29,11 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 }
 
 if $(HAIKU_GCC_VERSION[1]) >= 4 {
-	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-r1a4-x86-gcc4-2012-08-29.zip ;
+	if $(TARGET_ARCH) = x86_64 {
+		HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-x86_64-2012-12-18.zip ;
+	} else {
+		HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-r1a4-x86-gcc4-2012-08-29.zip ;
+	}
 } else {
 	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0j-r1a4-x86-gcc2-2012-08-26.zip ;
 }
@@ -37,9 +41,7 @@ if $(HAIKU_GCC_VERSION[1]) >= 4 {
 HAIKU_OPENSSL_URL = $(baseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_SSL) {
-	if $(TARGET_ARCH) != x86 {
-		Echo "SSL build feature not available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 		# Download the zip archive.
 		local zipFile = [ DownloadFile $(HAIKU_OPENSSL_PACKAGE)
 			: $(HAIKU_OPENSSL_URL) ] ;
@@ -66,6 +68,8 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 			= [ FDirName $(HAIKU_OPENSSL_DIR) common include ] ;
 
 		EnableBuildFeatures openssl ;
+	} else {
+		Echo "SSL build feature not available for $(TARGET_ARCH)" ;
 	}
 }
 

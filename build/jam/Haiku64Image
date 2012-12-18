@@ -119,6 +119,13 @@ AddFilesToHaikuImage system : <revisioned>kernel_$(TARGET_ARCH) ;
 AddLibrariesToHaikuHybridImage system lib
 	: $(SYSTEM_LIBS) $(PRIVATE_SYSTEM_LIBS) ;
 
+OPTIONAL_LIBS_ALIASES =
+        libfreetype.so
+        libjpeg.so
+        libpng.so
+        libz.so
+;
+
 # libfreetype.so links to the current freetype lib
 AddSymlinkToHaikuHybridImage system lib : $(HAIKU_FREETYPE_CURRENT_LIB:BS)
 	: $(HAIKU_FREETYPE_CURRENT_LINK) : : true ;
