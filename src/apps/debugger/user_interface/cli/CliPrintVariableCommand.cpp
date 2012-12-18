@@ -116,16 +116,14 @@ CliPrintVariableCommand::_ResolveValueIfNeeded(ValueNode* node,
 		context.GetUserInterfaceListener()->ValueNodeValueRequested(
 			context.CurrentThread()->GetCpuState(), container, node);
 
-		// TODO: implement proper waiting
-		while (!context.IsTerminating()) {
-			context.ProcessPendingEvents();
-			if (node->LocationAndValueResolutionState()
-				!= VALUE_NODE_UNRESOLVED) {
-				break;
-			}
+
+		while (node->LocationAndValueResolutionState()
+			== VALUE_NODE_UNRESOLVED) {
 			containerLocker.Unlock();
-			snooze(20000);
+			context.WaitForEvents(CliContext::EVENT_VALUE_NODE_CHANGED);
 			containerLocker.Lock();
+			if (context.IsTerminating())
+				return B_ERROR;
 		}
 	}
 

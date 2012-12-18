@@ -45,11 +45,11 @@ CliStackTraceCommand::Execute(int argc, const char* const* argv,
 
 	// get its stack trace
 	StackTrace* stackTrace = thread->GetStackTrace();
-	if (stackTrace == NULL) {
-		// TODO: Wait for stack trace!
-		printf("Current thread doesn't have a stack trace. Waiting not "
-			"implemented yet\n");
-		return;
+	while (stackTrace == NULL) {
+		context.WaitForEvents(CliContext::EVENT_THREAD_STACK_TRACE_CHANGED);
+		if (context.IsTerminating())
+			return;
+		stackTrace = thread->GetStackTrace();
 	}
 	BReference<StackTrace> stackTraceReference(stackTrace);
 		// hold a reference until we're done

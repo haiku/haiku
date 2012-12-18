@@ -13,6 +13,7 @@
 #include <Locker.h>
 
 #include "Team.h"
+#include "ValueNodeContainer.h"
 
 
 class StackFrame;
@@ -22,7 +23,8 @@ class UserInterfaceListener;
 class ValueNodeManager;
 
 
-class CliContext : private Team::Listener {
+class CliContext : private Team::Listener,
+	private ValueNodeContainer::Listener {
 public:
 			enum {
 				EVENT_QUIT							= 0x01,
@@ -30,7 +32,8 @@ public:
 				EVENT_THREAD_ADDED					= 0x04,
 				EVENT_THREAD_REMOVED				= 0x08,
 				EVENT_THREAD_STOPPED				= 0x10,
-				EVENT_THREAD_STACK_TRACE_CHANGED	= 0x20
+				EVENT_THREAD_STACK_TRACE_CHANGED	= 0x20,
+				EVENT_VALUE_NODE_CHANGED			= 0x40
 			};
 
 public:
@@ -70,6 +73,7 @@ public:
 			void				QuitSession(bool killTeam);
 
 			void				WaitForThreadOrUser();
+			void				WaitForEvents(int32 eventMask);
 			void				ProcessPendingEvents();
 
 private:
@@ -86,6 +90,13 @@ private:
 									const Team::ThreadEvent& event);
 	virtual	void				ThreadStackTraceChanged(
 									const Team::ThreadEvent& event);
+
+	// ValueNodeContainer::Listener
+	virtual	void				ValueNodeChanged(ValueNodeChild* nodeChild,
+									ValueNode* oldNode, ValueNode* newNode);
+	virtual	void				ValueNodeChildrenCreated(ValueNode* node);
+	virtual	void				ValueNodeChildrenDeleted(ValueNode* node);
+	virtual	void				ValueNodeValueChanged(ValueNode* node);
 
 private:
 			void				_QueueEvent(Event* event);
