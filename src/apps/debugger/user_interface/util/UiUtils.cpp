@@ -221,7 +221,8 @@ UiUtils::PrintValueNodeGraph(BString& _output, ValueNodeChild* child,
 		}
 		_output.Append('\t', indentLevel);
 		_output << "}\n";
-	}
+	} else
+		_output << "\n";
 
 	return;
 }
