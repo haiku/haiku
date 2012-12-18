@@ -336,9 +336,9 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 		for (int32 i = 0; i < container->CountChildren(); i++) {
 			ValueNodeChild* child = container->ChildAt(i);
 			containerLocker.Unlock();
-			_ResolveValueIfNeeded(child->Node(), frame, 2);
+			_ResolveValueIfNeeded(child->Node(), frame, 1);
 			containerLocker.Lock();
-			UiUtils::PrintValueNodeGraph(_output, child, 3, 2);
+			UiUtils::PrintValueNodeGraph(_output, child, 3, 1);
 		}
 		_output << "\n";
 	}
