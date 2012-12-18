@@ -163,8 +163,8 @@ UiUtils::ReportNameForTeam(::Team* team, char* buffer, size_t bufferSize)
 
 
 /*static*/ void
-UiUtils::PrintValueNodeGraph(BString& _output, StackFrame* frame,
-	ValueNodeChild* child, int32 indentLevel, int32 maxDepth)
+UiUtils::PrintValueNodeGraph(BString& _output, ValueNodeChild* child,
+	int32 indentLevel, int32 maxDepth)
 {
 	_output.Append('\t', indentLevel);
 	_output << child->Name();
@@ -215,7 +215,7 @@ UiUtils::PrintValueNodeGraph(BString& _output, StackFrame* frame,
 			// level node contains no data of intereest.
 			if (node->ChildAt(i)->GetType()->Kind() != TYPE_COMPOUND
 				|| maxDepth > 1) {
-				PrintValueNodeGraph(_output, frame, node->ChildAt(i),
+				PrintValueNodeGraph(_output, node->ChildAt(i),
 					indentLevel + 1, maxDepth - 1);
 			}
 		}

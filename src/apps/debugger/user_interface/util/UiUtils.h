@@ -34,7 +34,6 @@ public:
 	// this function assumes the value nodes have already been resolved
 	// (if possible).
 	static	void				PrintValueNodeGraph(BString& _output,
-									StackFrame* frame,
 									ValueNodeChild* child,
 									int32 indentLevel, int32 maxDepth);
 };
