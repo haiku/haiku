@@ -18,6 +18,7 @@
 #include "CliContext.h"
 #include "CliContinueCommand.h"
 #include "CliDebugReportCommand.h"
+#include "CliPrintVariableCommand.h"
 #include "CliQuitCommand.h"
 #include "CliStackFrameCommand.h"
 #include "CliStackTraceCommand.h"
@@ -313,6 +314,7 @@ CommandLineUserInterface::_RegisterCommands()
 		&& _RegisterCommand("continue", new(std::nothrow) CliContinueCommand)
 		&& _RegisterCommand("frame", new(std::nothrow) CliStackFrameCommand)
 		&& _RegisterCommand("help", new(std::nothrow) HelpCommand(this))
+		&& _RegisterCommand("print", new(std::nothrow) CliPrintVariableCommand)
 		&& _RegisterCommand("quit", new(std::nothrow) CliQuitCommand)
 		&& _RegisterCommand("save-report",
 			new(std::nothrow) CliDebugReportCommand)
