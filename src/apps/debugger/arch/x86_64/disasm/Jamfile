@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps debugger arch x86_64 disasm ;
+
+CCFLAGS +=  -Werror ;
+C++FLAGS += -Werror ;
+
+UseHeaders [ LibraryHeaders udis86 ] ;
+UseHeaders [ LibraryHeaders [ FDirName udis86 libudis86 ] ] ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) types ] ;
+
+
+MergeObject Debugger_disasm_x86_64.o
+	:
+	DisassemblerX8664.cpp
+;

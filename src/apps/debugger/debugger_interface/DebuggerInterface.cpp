@@ -22,6 +22,7 @@
 #include "debug_utils.h"
 
 #include "ArchitectureX86.h"
+#include "ArchitectureX8664.h"
 #include "CpuState.h"
 #include "DebugEvent.h"
 #include "ImageInfo.h"
@@ -255,8 +256,10 @@ DebuggerInterface::Init()
 	// TODO: this probably needs to be rethought a bit,
 	// since especially when we eventually support remote debugging,
 	// the architecture will depend on the target machine, not the host
-#ifdef ARCH_x86
+#if defined(ARCH_x86)
 	fArchitecture = new(std::nothrow) ArchitectureX86(this);
+#elif defined(ARCH_x86_64)
+	fArchitecture = new(std::nothrow) ArchitectureX8664(this);
 #else
 	return B_UNSUPPORTED;
 #endif

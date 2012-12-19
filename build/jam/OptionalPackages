@@ -682,6 +682,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 				: : true ;
 		}
 	} else if $(TARGET_ARCH) = x86_64 {
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/system/apps/Debugger : Debugger ;
 		InstallOptionalHaikuImagePackage
 			autoconf-2.69-x86_64-2012-08-17.zip
 			: $(baseURL)/autoconf-2.69-x86_64-2012-08-17.zip
