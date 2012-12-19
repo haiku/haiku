@@ -374,7 +374,7 @@ WorkspacesView::WorkspacesView(BMessage* archive)
 
 WorkspacesView::~WorkspacesView()
 {
-	if (fAboutWindow != NULL)
+	if (fAboutWindow != NULL && fAboutWindow->Lock())
 		fAboutWindow->Quit();
 }
 

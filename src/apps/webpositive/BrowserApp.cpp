@@ -89,7 +89,7 @@ BrowserApp::~BrowserApp()
 	delete fCookies;
 	delete fCookieJar;
 
-	if (fAboutWindow != NULL)
+	if (fAboutWindow != NULL && fAboutWindow->Lock())
 		fAboutWindow->Quit();
 }
 

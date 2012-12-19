@@ -891,7 +891,7 @@ dump_mutex_info(int argc, char** argv)
 #if KDEBUG
 	kprintf("  holder:          %" B_PRId32 "\n", lock->holder);
 #else
-	kprintf("  count:           %ld\n", lock->count);
+	kprintf("  count:           %" B_PRId32 "\n", lock->count);
 #endif
 
 	kprintf("  waiting threads:");

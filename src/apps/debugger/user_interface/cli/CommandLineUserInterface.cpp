@@ -18,6 +18,8 @@
 #include "CliContext.h"
 #include "CliContinueCommand.h"
 #include "CliDebugReportCommand.h"
+#include "CliDumpMemoryCommand.h"
+#include "CliPrintVariableCommand.h"
 #include "CliQuitCommand.h"
 #include "CliStackFrameCommand.h"
 #include "CliStackTraceCommand.h"
@@ -309,10 +311,29 @@ CommandLineUserInterface::_RegisterCommands()
 	BReference<CliCommand> stackTraceCommandReference2(
 		stackTraceCommandReference.Get());
 
+	BReference<CliCommand> dumpCommandReference(
+		new(std::nothrow) CliDumpMemoryCommand, true);
+	BReference<CliCommand> dumpCommandReference2(
+		dumpCommandReference.Get());
+	if (!_RegisterCommand("db", dumpCommandReference.Detach()))
+		return B_NO_MEMORY;
+	dumpCommandReference = dumpCommandReference2.Get();
+	if (!_RegisterCommand("ds", dumpCommandReference.Detach()))
+		return B_NO_MEMORY;
+	dumpCommandReference = dumpCommandReference2.Get();
+	if (!_RegisterCommand("dw", dumpCommandReference.Detach()))
+		return B_NO_MEMORY;
+	dumpCommandReference = dumpCommandReference2.Get();
+	if (!_RegisterCommand("dl", dumpCommandReference.Detach()))
+		return B_NO_MEMORY;
+	if (!_RegisterCommand("string", dumpCommandReference2.Detach()))
+		return B_NO_MEMORY;
+
 	if (_RegisterCommand("bt", stackTraceCommandReference.Detach())
 		&& _RegisterCommand("continue", new(std::nothrow) CliContinueCommand)
 		&& _RegisterCommand("frame", new(std::nothrow) CliStackFrameCommand)
 		&& _RegisterCommand("help", new(std::nothrow) HelpCommand(this))
+		&& _RegisterCommand("print", new(std::nothrow) CliPrintVariableCommand)
 		&& _RegisterCommand("quit", new(std::nothrow) CliQuitCommand)
 		&& _RegisterCommand("save-report",
 			new(std::nothrow) CliDebugReportCommand)

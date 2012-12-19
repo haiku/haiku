@@ -209,7 +209,7 @@ dump_sem(struct sem_entry* sem)
 		else
 			unset_debug_variable("_releaser");
 #else
-		kprintf("last acquired by: %ld\n", sem->u.used.last_acquirer);
+		kprintf("last acquired by: %" B_PRId32 "\n", sem->u.used.last_acquirer);
 #endif
 
 		if (sem->u.used.last_acquirer != 0)

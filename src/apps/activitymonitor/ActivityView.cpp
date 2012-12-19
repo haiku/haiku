@@ -602,7 +602,7 @@ ActivityView::~ActivityView()
 	delete fSystemInfoHandler;
 
 	// replicant deleted, destroy the about window
-	if (fAboutWindow != NULL)
+	if (fAboutWindow != NULL && fAboutWindow->Lock())
 		fAboutWindow->Quit();
 }
 

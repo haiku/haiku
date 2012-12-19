@@ -7,6 +7,7 @@
 
 #include "UiUtils.h"
 
+#include <ctype.h>
 #include <stdio.h>
 
 #include <DateTime.h>
@@ -18,6 +19,7 @@
 #include "Image.h"
 #include "StackFrame.h"
 #include "Team.h"
+#include "TeamMemoryBlock.h"
 #include "Thread.h"
 #include "Type.h"
 #include "Value.h"
@@ -163,8 +165,8 @@ UiUtils::ReportNameForTeam(::Team* team, char* buffer, size_t bufferSize)
 
 
 /*static*/ void
-UiUtils::PrintValueNodeGraph(BString& _output, StackFrame* frame,
-	ValueNodeChild* child, int32 indentLevel, int32 maxDepth)
+UiUtils::PrintValueNodeGraph(BString& _output, ValueNodeChild* child,
+	int32 indentLevel, int32 maxDepth)
 {
 	_output.Append('\t', indentLevel);
 	_output << child->Name();
@@ -215,13 +217,78 @@ UiUtils::PrintValueNodeGraph(BString& _output, StackFrame* frame,
 			// level node contains no data of intereest.
 			if (node->ChildAt(i)->GetType()->Kind() != TYPE_COMPOUND
 				|| maxDepth > 1) {
-				PrintValueNodeGraph(_output, frame, node->ChildAt(i),
+				PrintValueNodeGraph(_output, node->ChildAt(i),
 					indentLevel + 1, maxDepth - 1);
 			}
 		}
 		_output.Append('\t', indentLevel);
 		_output << "}\n";
-	}
+	} else
+		_output << "\n";
 
 	return;
+}
+
+
+/*static*/ void UiUtils::DumpMemory(BString& _output, int32 indentLevel,
+	TeamMemoryBlock* block, target_addr_t address, int32 itemSize,
+	int32 displayWidth, int32 count)
+{
+	BString data;
+
+	int32 j;
+	_output.Append('\t', indentLevel);
+	for (int32 i = 0; i < count; i++) {
+		uint8* value;
+
+		if ((i % displayWidth) == 0) {
+			int32 displayed = min_c(displayWidth, (count-i)) * itemSize;
+			if (i != 0) {
+				_output.Append("\n");
+				_output.Append('\t', indentLevel);
+			}
+
+			data.SetToFormat("[%#" B_PRIx64 "]  ", address + i * itemSize);
+			_output += data;
+			char c;
+			for (j = 0; j < displayed; j++) {
+				if (!block->Contains(address + displayed))
+					break;
+				c = *(block->Data() + address - block->BaseAddress()
+					+ (i * itemSize) + j);
+				if (!isprint(c))
+					c = '.';
+
+				_output += c;
+			}
+			if (count > displayWidth) {
+				// make sure the spacing in the last line is correct
+				for (j = displayed; j < displayWidth * itemSize; j++)
+					_output += ' ';
+			}
+			_output.Append("  ");
+		}
+
+		value = block->Data() + address - block->BaseAddress()
+			+ i * itemSize;
+
+		switch (itemSize) {
+			case 1:
+				data.SetToFormat(" %02" B_PRIx8, *(uint8*)value);
+				break;
+			case 2:
+				data.SetToFormat(" %04" B_PRIx16, *(uint16*)value);
+				break;
+			case 4:
+				data.SetToFormat(" %08" B_PRIx32, *(uint32*)value);
+				break;
+			case 8:
+				data.SetToFormat(" %016" B_PRIx64, *(uint64*)value);
+				break;
+		}
+
+		_output += data;
+	}
+
+	_output.Append("\n");
 }

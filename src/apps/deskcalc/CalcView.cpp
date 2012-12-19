@@ -185,7 +185,7 @@ CalcView::~CalcView()
 	free(fKeypadDescription);
 
 	// replicant deleted, destroy the about window
-	if (fAboutWindow != NULL)
+	if (fAboutWindow != NULL && fAboutWindow->Lock())
 		fAboutWindow->Quit();
 }
 
