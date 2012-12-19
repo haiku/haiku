@@ -230,19 +230,23 @@ UiUtils::PrintValueNodeGraph(BString& _output, ValueNodeChild* child,
 }
 
 
-/*static*/ void UiUtils::DumpMemory(BString& _output, TeamMemoryBlock* block,
-	target_addr_t address, int32 itemSize, int32 displayWidth, int32 count)
+/*static*/ void UiUtils::DumpMemory(BString& _output, int32 indentLevel,
+	TeamMemoryBlock* block, target_addr_t address, int32 itemSize,
+	int32 displayWidth, int32 count)
 {
 	BString data;
 
 	int32 j;
+	_output.Append('\t', indentLevel);
 	for (int32 i = 0; i < count; i++) {
 		uint8* value;
 
 		if ((i % displayWidth) == 0) {
 			int32 displayed = min_c(displayWidth, (count-i)) * itemSize;
-			if (i != 0)
+			if (i != 0) {
 				_output.Append("\n");
+				_output.Append('\t', indentLevel);
+			}
 
 			data.SetToFormat("[%#" B_PRIx64 "]  ", address + i * itemSize);
 			_output += data;

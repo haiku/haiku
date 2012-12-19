@@ -42,6 +42,7 @@ public:
 									int32 indentLevel, int32 maxDepth);
 
 	static	void				DumpMemory(BString& _output,
+									int32 indentLevel,
 									TeamMemoryBlock* block,
 									target_addr_t address, int32 itemSize,
 									int32 displayWidth, int32 count);

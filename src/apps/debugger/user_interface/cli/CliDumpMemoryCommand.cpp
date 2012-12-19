@@ -120,7 +120,7 @@ CliDumpMemoryCommand::Execute(int argc, const char* const* argv,
 		printf("\"\n");
 	} else {
 		BString output;
-		UiUtils::DumpMemory(output, block, address, itemSize, displayWidth,
+		UiUtils::DumpMemory(output, 0, block, address, itemSize, displayWidth,
 			num);
 		printf("%s\n", output.String());
 	}
