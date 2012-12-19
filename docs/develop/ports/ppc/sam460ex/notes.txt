@@ -38,6 +38,7 @@ http://www.linux-kvm.org/page/PowerPC_Book_E_MMU
 http://wiki.freebsd.org/powerpc/BookE
 http://en.wikipedia.org/wiki/Memory_management_unit#PowerPC
 ** 440
+http://elinux.org/Book_E_and_PPC_440
 *** amcc 4x0
 http://c0ff33.net/drop/PPC440_UM2013.pdf
 http://www.embeddeddeveloper.com/assets/processors/amcc/datasheets/PP460EX_DS2063.pdf
