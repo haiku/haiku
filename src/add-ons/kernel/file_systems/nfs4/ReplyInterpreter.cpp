@@ -421,10 +421,7 @@ ReplyInterpreter::ReadDir(uint64* cookie, uint64* cookieVerf,
 
 		isNext = fReply->Stream().GetBoolean();
 	}
-	if (!isNext)
-		*eof = fReply->Stream().GetBoolean();
-	else
-		*eof = false;
+	*eof = fReply->Stream().GetBoolean();
 
 	*_count = count;
 	*dirents = entries;

@@ -24,15 +24,18 @@ struct NameCacheEntry :
 			const char*		fName;
 
 							NameCacheEntry(const char* name, ino_t node);
+							NameCacheEntry(const NameCacheEntry& entry);
 							~NameCacheEntry();
 };
 
 struct DirectoryCacheSnapshot : public KernelReferenceable {
-	SinglyLinkedList<NameCacheEntry>	fEntries;
-	mutex								fLock;
+			SinglyLinkedList<NameCacheEntry>	fEntries;
+	mutable	mutex			fLock;
 
-										DirectoryCacheSnapshot();
-										~DirectoryCacheSnapshot();
+							DirectoryCacheSnapshot();
+							DirectoryCacheSnapshot(
+								const DirectoryCacheSnapshot& snapshot);
+							~DirectoryCacheSnapshot();
 };
 
 class DirectoryCache : public DoublyLinkedListLinkImpl<DirectoryCache> {

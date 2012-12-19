@@ -25,6 +25,14 @@ NameCacheEntry::NameCacheEntry(const char* name, ino_t node)
 }
 
 
+NameCacheEntry::NameCacheEntry(const NameCacheEntry& entry)
+	:
+	fNode(entry.fNode),
+	fName(strdup(entry.fName))
+{
+}
+
+
 NameCacheEntry::~NameCacheEntry()
 {
 	free(const_cast<char*>(fName));
@@ -34,6 +42,26 @@ NameCacheEntry::~NameCacheEntry()
 DirectoryCacheSnapshot::DirectoryCacheSnapshot()
 {
 	mutex_init(&fLock, NULL);
+}
+
+
+DirectoryCacheSnapshot::DirectoryCacheSnapshot(
+	const DirectoryCacheSnapshot& snapshot)
+{
+	mutex_init(&fLock, NULL);
+
+	MutexLocker _(snapshot.fLock);
+	NameCacheEntry* entry = snapshot.fEntries.Head();
+	NameCacheEntry* new_entry;
+	while (entry) {
+		new_entry = new NameCacheEntry(*entry);
+		if (new_entry == NULL)
+			break;
+
+		fEntries.Add(new_entry);
+
+		entry = snapshot.fEntries.GetNext(entry);
+	}
 }
 
 

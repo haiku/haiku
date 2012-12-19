@@ -1039,6 +1039,9 @@ nfs4_rewind_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 
 	OpenDirCookie* cookie = reinterpret_cast<OpenDirCookie*>(_cookie);
 	cookie->fSpecial = 0;
+	if (cookie->fSnapshot != NULL)
+		cookie->fSnapshot->ReleaseReference();
+	cookie->fSnapshot = NULL;
 	cookie->fCurrent = NULL;
 	cookie->fEOF = false;
 

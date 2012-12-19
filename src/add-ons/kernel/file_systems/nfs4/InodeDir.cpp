@@ -123,7 +123,7 @@ Inode::FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 	ASSERT(de != NULL);
 	ASSERT(name != NULL);
 
-	uint32 nameSize = strlen(name);
+	uint32 nameSize = strlen(name) + 1;
 	const uint32 entSize = sizeof(struct dirent);
 
 	if (pos + entSize + nameSize > size)
@@ -282,7 +282,7 @@ Inode::GetDirSnapshot(DirectoryCacheSnapshot** _snapshot,
 				free(const_cast<char*>(name));
 
 			if (entry == NULL || entry->fName == NULL) {
-				if (entry->fName == NULL)
+				if (entry != NULL)
 					delete entry;
 				delete snapshot;
 				delete[] dirents;
@@ -324,10 +324,10 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 		else
 			fFileSystem->Revalidator().RemoveDirectory(cache);
 
-		cookie->fSnapshot = cache->GetSnapshot();
-		if (cookie->fSnapshot == NULL) {
+		DirectoryCacheSnapshot* snapshot = cache->GetSnapshot();
+		if (snapshot == NULL) {
 			uint64 change;
-			result = GetDirSnapshot(&cookie->fSnapshot, cookie, &change,
+			result = GetDirSnapshot(&snapshot, cookie, &change,
 				cookie->fAttrDir);
 			if (result != B_OK) {
 				cache->Unlock();
@@ -335,9 +335,9 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 				return result;
 			}
 			cache->ValidateChangeInfo(change);
-			cache->SetSnapshot(cookie->fSnapshot);
+			cache->SetSnapshot(snapshot);
 		}
-		cookie->fSnapshot->AcquireReference();
+		cookie->fSnapshot = new DirectoryCacheSnapshot(*snapshot);
 		fFileSystem->Revalidator().AddDirectory(cache);
 		cache->Unlock();
 		fFileSystem->Revalidator().Unlock();
@@ -387,6 +387,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 	MutexLocker _(cookie->fSnapshot->fLock);
 	for (; !overflow && i < *_count; i++) {
 		struct dirent* de = reinterpret_cast<dirent*>(buffer + pos);
+		NameCacheEntry* temp = cookie->fCurrent;
 
 		if (cookie->fCurrent == NULL)
 			cookie->fCurrent = cookie->fSnapshot->fEntries.Head();
@@ -402,6 +403,7 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 
 		if (FillDirEntry(de, cookie->fCurrent->fNode, cookie->fCurrent->fName,
 			pos, size) == B_BUFFER_OVERFLOW) {
+			cookie->fCurrent = temp;
 			overflow = true;
 			break;
 		}

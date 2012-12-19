@@ -250,7 +250,7 @@ Inode::Link(Inode* dir, const char* name)
 			&& dir->fCache->ChangeInfo() == changeInfo.fBefore) {
 			dir->fCache->AddEntry(name, fInfo.fFileId, true);
 			dir->fCache->SetChangeInfo(changeInfo.fAfter);
-		} else if (dir->fCache->ChangeInfo() != changeInfo.fBefore)
+		} else
 			dir->fCache->Trash();
 	}
 	dir->fCache->Unlock();
@@ -428,7 +428,7 @@ Inode::CreateObject(const char* name, const char* path, int mode, FileType type,
 		if (changeInfo.fAtomic && fCache->ChangeInfo() == changeInfo.fBefore) {
 			fCache->AddEntry(name, fileID, true);
 			fCache->SetChangeInfo(changeInfo.fAfter);
-		} else if (fCache->ChangeInfo() != changeInfo.fBefore)
+		} else
 			fCache->Trash();
 	}
 	fCache->Unlock();

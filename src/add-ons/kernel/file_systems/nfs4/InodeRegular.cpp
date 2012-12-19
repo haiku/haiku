@@ -52,7 +52,7 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 			&& fCache->ChangeInfo() == changeInfo.fBefore) {
 			fCache->AddEntry(name, fileID, true);
 			fCache->SetChangeInfo(changeInfo.fAfter);
-		} else if (fCache->ChangeInfo() != changeInfo.fBefore)
+		} else
 			fCache->Trash();
 	}
 	fCache->Unlock();
