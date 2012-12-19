@@ -9,12 +9,16 @@
 
 #include <image.h>
 
+#include "Types.h"
+
 
 class BString;
 class BVariant;
 class StackFrame;
 class Team;
+class TeamMemoryBlock;
 class ValueNodeChild;
+
 
 class UiUtils {
 public:
@@ -36,6 +40,11 @@ public:
 	static	void				PrintValueNodeGraph(BString& _output,
 									ValueNodeChild* child,
 									int32 indentLevel, int32 maxDepth);
+
+	static	void				DumpMemory(BString& _output,
+									TeamMemoryBlock* block,
+									target_addr_t address, int32 itemSize,
+									int32 displayWidth, int32 count);
 };
 
 
