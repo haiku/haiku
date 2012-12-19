@@ -26,10 +26,11 @@ static CliContext* sCurrentContext;
 
 
 struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
-	Event(int type, Thread* thread = NULL)
+	Event(int type, Thread* thread = NULL, TeamMemoryBlock* block = NULL)
 		:
 		fType(type),
-		fThreadReference(thread)
+		fThreadReference(thread),
+		fMemoryBlockReference(block)
 	{
 	}
 
@@ -43,9 +44,15 @@ struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
 		return fThreadReference.Get();
 	}
 
+	TeamMemoryBlock* GetMemoryBlock() const
+	{
+		return fMemoryBlockReference.Get();
+	}
+
 private:
 	int					fType;
 	BReference<Thread>	fThreadReference;
+	BReference<TeamMemoryBlock> fMemoryBlockReference;
 };
 
 
@@ -68,7 +75,8 @@ CliContext::CliContext()
 	fTerminating(false),
 	fCurrentThread(NULL),
 	fCurrentStackTrace(NULL),
-	fCurrentStackFrameIndex(-1)
+	fCurrentStackFrameIndex(-1),
+	fCurrentBlock(NULL)
 {
 	sCurrentContext = this;
 }
@@ -150,6 +158,11 @@ CliContext::Cleanup()
 	if (fNodeManager != NULL) {
 		fNodeManager->ReleaseReference();
 		fNodeManager = NULL;
+	}
+
+	if (fCurrentBlock != NULL) {
+		fCurrentBlock->ReleaseReference();
+		fCurrentBlock = NULL;
 	}
 }
 
@@ -376,6 +389,13 @@ CliContext::ProcessPendingEvents()
 					SetCurrentStackFrameIndex(0);
 				}
 				break;
+			case EVENT_TEAM_MEMORY_BLOCK_RETRIEVED:
+				if (fCurrentBlock != NULL) {
+					fCurrentBlock->ReleaseReference();
+					fCurrentBlock = NULL;
+				}
+				fCurrentBlock = event->GetMemoryBlock();
+				break;
 		}
 	}
 }
@@ -421,6 +441,16 @@ CliContext::ThreadStackTraceChanged(const Team::ThreadEvent& threadEvent)
 		new(std::nothrow) Event(EVENT_THREAD_STACK_TRACE_CHANGED,
 			threadEvent.GetThread()));
 	_SignalInputLoop(EVENT_THREAD_STACK_TRACE_CHANGED);
+}
+
+
+void
+CliContext::MemoryBlockRetrieved(TeamMemoryBlock* block)
+{
+	_QueueEvent(
+		new(std::nothrow) Event(EVENT_TEAM_MEMORY_BLOCK_RETRIEVED,
+			NULL, block));
+	_SignalInputLoop(EVENT_TEAM_MEMORY_BLOCK_RETRIEVED);
 }
 
 
