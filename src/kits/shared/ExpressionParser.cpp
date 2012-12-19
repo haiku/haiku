@@ -47,7 +47,7 @@ enum {
 	TOKEN_END_OF_LINE
 };
 
-struct Token {
+struct ExpressionParser::Token {
 	Token()
 		: string(""),
 		  type(TOKEN_NONE),
@@ -89,7 +89,7 @@ struct Token {
 };
 
 
-class Tokenizer {
+class ExpressionParser::Tokenizer {
  public:
 	Tokenizer()
 		: fString(""),
@@ -594,7 +594,7 @@ ExpressionParser::_ParseFunction(const Token& token)
 	if (strcmp("e", token.string.String()) == 0)
 		return _ParseFactorial(MAPM(MM_E));
 	else if (strcasecmp("pi", token.string.String()) == 0
-		|| ((unsigned char)token.string.String()[0] == 0xCF 
+		|| ((unsigned char)token.string.String()[0] == 0xCF
 			&& (unsigned char)token.string.String()[1] == 0x80)) {
 		// UTF-8 small greek letter PI
 		return _ParseFactorial(MAPM(MM_PI));

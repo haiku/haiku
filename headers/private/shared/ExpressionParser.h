@@ -14,8 +14,6 @@
 #include <String.h>
 
 
-class Tokenizer;
-
 class ParseException {
  public:
 	ParseException(const char* message, int32 position)
@@ -35,10 +33,10 @@ class ParseException {
 };
 
 struct Function;
-struct Token;
 class MAPM;
 
 class ExpressionParser {
+
  public:
 								ExpressionParser();
 								~ExpressionParser();
@@ -51,6 +49,10 @@ class ExpressionParser {
 			BString				Evaluate(const char* expressionString);
 			int64				EvaluateToInt64(const char* expressionString);
 			double				EvaluateToDouble(const char* expressionString);
+
+ private:
+			struct Token;
+			class Tokenizer;
 
  private:
 			MAPM				_ParseBinary();
