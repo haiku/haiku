@@ -46,6 +46,7 @@ DebugReportGenerator::DebugReportGenerator(::Team* team,
 	fNodeManager(NULL),
 	fListener(listener),
 	fWaitingNode(NULL),
+	fCurrentBlock(NULL),
 	fTraceWaitingThread(NULL)
 {
 	fTeam->AddListener(this);
@@ -61,6 +62,9 @@ DebugReportGenerator::~DebugReportGenerator()
 		fNodeManager->RemoveListener(this);
 		fNodeManager->ReleaseReference();
 	}
+
+	if (fCurrentBlock != NULL)
+		fCurrentBlock->ReleaseReference();
 }
 
 
@@ -158,6 +162,19 @@ DebugReportGenerator::ThreadStackTraceChanged(const ::Team::ThreadEvent& event)
 		fTraceWaitingThread = NULL;
 		release_sem(fTeamDataSem);
 	}
+}
+
+
+void
+DebugReportGenerator::MemoryBlockRetrieved(TeamMemoryBlock* block)
+{
+	if (fCurrentBlock != NULL) {
+		fCurrentBlock->ReleaseReference();
+		fCurrentBlock = NULL;
+	}
+
+	fCurrentBlock = block;
+	release_sem(fTeamDataSem);
 }
 
 
@@ -323,6 +340,9 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 		_output << data;
 		if (frame->CountParameters() == 0
 			&& frame->CountLocalVariables() == 0) {
+			// only dump the topmost frame
+			if (i == 0)
+				_DumpStackFrameMemory(_output, thread->GetCpuState());
 			continue;
 		}
 
@@ -362,6 +382,24 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 }
 
 
+void
+DebugReportGenerator::_DumpStackFrameMemory(BString& _output,
+	CpuState* state)
+{
+	target_addr_t address = state->StackPointer();
+	if (fCurrentBlock == NULL || !fCurrentBlock->Contains(address)) {
+		fListener->InspectRequested(address, this);
+		status_t result = B_OK;
+		do {
+			result = acquire_sem(fTeamDataSem);
+		} while (result == B_INTERRUPTED);
+	}
+	_output << "\t\t\tFrame memory:\n";
+	UiUtils::DumpMemory(_output, 3, fCurrentBlock, address, 1, 16,
+		fCurrentBlock->BaseAddress() + fCurrentBlock->Size() - address);
+}
+
+
 status_t
 DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame,
 	int32 maxDepth)
@@ -371,7 +409,9 @@ DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame,
 		fWaitingNode = node;
 		fListener->ValueNodeValueRequested(frame->GetCpuState(),
 			fNodeManager->GetContainer(), node);
-		result = acquire_sem(fTeamDataSem);
+		do {
+			result = acquire_sem(fTeamDataSem);
+		} while (result == B_INTERRUPTED);
 	}
 
 	if (node->LocationAndValueResolutionState() == B_OK && maxDepth > 0) {
