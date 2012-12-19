@@ -46,8 +46,8 @@ SharedLibrary libGL.so : $(sources) :
 	# GLU
 	$(HAIKU_GLU_LIBS)
 
-	# Mesa libraries (from Mesa optional package):
-	$(HAIKU_MESA_LIBS)
+	# GLAPI Dispatch code (from Mesa buildpackage)
+	$(HAIKU_GLAPI_LIBS)
 
 	# External libraries:
 	game			# BWindowScreen needed by BGLScreen stub class

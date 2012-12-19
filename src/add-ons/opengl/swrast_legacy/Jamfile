@@ -48,5 +48,7 @@ AddResources Legacy\ Software\ Rasterizer : MesaSoftwareRenderer.rdef ;
 
 Addon Legacy\ Software\ Rasterizer :
 	MesaSoftwareRenderer.cpp
-	: libGL.so be $(TARGET_LIBSUPC++)
+	:
+	$(HAIKU_MESA_DIR)/lib.haiku/lib.haiku/libmesa.a
+	libGL.so be $(TARGET_LIBSUPC++)
 ;

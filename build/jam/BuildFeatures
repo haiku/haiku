@@ -250,12 +250,9 @@ if $(TARGET_ARCH) = x86 {
 	HAIKU_MESA_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_MESA_DIR)
 		: include/ : $(zipFile) : extracted-mesa ] ;
 
-	HAIKU_MESA_LIBS = [ ExtractArchive $(HAIKU_MESA_DIR)
+	HAIKU_GLAPI_LIBS = [ ExtractArchive $(HAIKU_MESA_DIR)
 		:
-		$(galliumObjects)
 		lib.haiku/libglapi.a
-		$(glslObject)
-		lib.haiku/libmesa.a
 		: $(zipFile)
 		: extracted-mesa ] ;
 
