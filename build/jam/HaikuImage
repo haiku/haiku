@@ -44,8 +44,8 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 
 SYSTEM_APPS = [ FFilterByBuildFeatures
 	AboutSystem ActivityMonitor BootManager@x86 CharacterMap
-	CodyCam DeskCalc Devices DiskProbe DiskUsage DriveSetup CDPlayer Expander
-	GLInfo@x86 Icon-O-Matic Installer LaunchBox Magnify Mail
+	CodyCam DeskCalc Devices DiskProbe DiskUsage DriveSetup CDPlayer Debugger
+	Expander GLInfo@x86 Icon-O-Matic Installer LaunchBox Magnify Mail
 	MediaConverter MediaPlayer MidiPlayer NetworkStatus PackageInstaller People
 	PoorMan PowerStatus ProcessController Screenshot ShowImage SoundRecorder
 	StyledEdit Terminal TextSearch TV WebWatch Workspaces
@@ -75,7 +75,7 @@ SYSTEM_LIBS = [ FFilterByBuildFeatures
 PRIVATE_SYSTEM_LIBS = [ FFilterByBuildFeatures
 	$(HAIKU_JPEG_CURRENT_LIB)
 	$(HAIKU_LIBPNG_CURRENT_LIB)
-	$(HAIKU_ZLIB_CURRENT_LIB) 
+	$(HAIKU_ZLIB_CURRENT_LIB)
 	$(HAIKU_FREETYPE_CURRENT_LIB)
 	libalm.so
 	libfluidsynth.so

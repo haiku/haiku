@@ -41,8 +41,8 @@ enum {
 };
 
 
-#define HANDOVER_USE_GDB 1
-//#define HANDOVER_USE_DEBUGGER 1
+//#define HANDOVER_USE_GDB 1
+#define HANDOVER_USE_DEBUGGER 1
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DebugServer"
@@ -555,44 +555,57 @@ TeamDebugHandler::_EnterDebugger(bool saveReport)
 		"terminal (debugger) for team %" B_PRId32 "...\n", fTeam));
 
 #elif defined(HANDOVER_USE_DEBUGGER)
+	// prepare the argument vector
+	BPath debuggerPath;
 	if (debugInConsoled) {
-		error = _SetupGDBArguments(arguments, debugInConsoled);
+		error = find_directory(B_SYSTEM_BIN_DIRECTORY, &debuggerPath);
 		if (error != B_OK) {
-			debug_printf("debug_server: Failed to set up gdb arguments: %s\n",
+			debug_printf("debug_server: can't find system-bin directory: %s\n",
 				strerror(error));
 			return error;
 		}
-	} else {
-		// prepare the argument vector
-		BPath debuggerPath;
-		error = find_directory(B_SYSTEM_APPS_DIRECTORY, &debuggerPath);
+		error = debuggerPath.Append("consoled");
 		if (error != B_OK) {
-			debug_printf("debug_server: can't find system-apps directory: %s\n",
+			debug_printf("debug_server: can't append to system-bin path: %s\n",
 				strerror(error));
 			return error;
 		}
-		error = debuggerPath.Append("Debugger");
-		if (error != B_OK) {
-			debug_printf("debug_server: can't append to system-apps path: %s\n",
-				strerror(error));
-			return error;
-		}
+
 		if (!arguments.Add(debuggerPath.Path()))
 			return B_NO_MEMORY;
-
-		BString debuggerParam;
-		debuggerParam.SetToFormat("%" B_PRId32, fTeam);
-		if (saveReport) {
-			if (!arguments.Add("--save-report"))
-				return B_NO_MEMORY;
-		}
-		if (!arguments.Add("--team") || !arguments.Add(debuggerParam))
-			return B_NO_MEMORY;
-
-		// start the debugger
-		TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
-			"graphical debugger for team %" B_PRId32 "...\n", fTeam));
 	}
+
+	error = find_directory(B_SYSTEM_APPS_DIRECTORY, &debuggerPath);
+	if (error != B_OK) {
+		debug_printf("debug_server: can't find system-apps directory: %s\n",
+			strerror(error));
+		return error;
+	}
+	error = debuggerPath.Append("Debugger");
+	if (error != B_OK) {
+		debug_printf("debug_server: can't append to system-apps path: %s\n",
+			strerror(error));
+		return error;
+	}
+	if (!arguments.Add(debuggerPath.Path()))
+		return B_NO_MEMORY;
+
+	if (debugInConsoled && !arguments.Add("--cli"))
+		return B_NO_MEMORY;
+
+	BString debuggerParam;
+	debuggerParam.SetToFormat("%" B_PRId32, fTeam);
+	if (saveReport) {
+		if (!arguments.Add("--save-report"))
+			return B_NO_MEMORY;
+	}
+	if (!arguments.Add("--team") || !arguments.Add(debuggerParam))
+		return B_NO_MEMORY;
+
+	// start the debugger
+	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
+		"%s debugger for team %" B_PRId32 "...\n",
+			debugInConsoled ? "command line" : "graphical", fTeam));
 #endif
 
 	for (int32 i = 0; i < arguments.CountStrings(); i++)
