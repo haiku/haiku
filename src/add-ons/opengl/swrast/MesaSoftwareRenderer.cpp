@@ -469,22 +469,11 @@ MesaSoftwareRenderer::_Error(gl_context* ctx)
 const GLubyte*
 MesaSoftwareRenderer::_GetString(gl_context* ctx, GLenum name)
 {
-
 	switch (name) {
 		case GL_VENDOR:
 			return (const GLubyte*) "Mesa Project";
-		case GL_RENDERER: {
-			_mesa_get_cpu_features();
-			static char buffer[256] = { '\0' };
-
-			if (!buffer[0]) {
-				char* cpuInfo = _mesa_get_cpu_string();
-				// Let's build an renderer string
-				sprintf(buffer, "Software Rasterizer for %s", cpuInfo);
-				free(cpuInfo);
-			}
-			return (const GLubyte*) buffer;
-		}
+		case GL_RENDERER:
+			return (const GLubyte*) "Software Rasterizer";
 		default:
 			// Let core library handle all other cases
 			return NULL;
