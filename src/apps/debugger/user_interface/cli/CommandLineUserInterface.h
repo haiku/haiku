@@ -72,6 +72,9 @@ private:
 									const char* const* argv);
 			CommandEntry*		_FindCommand(const char* commandName);
 			void				_PrintHelp(const char* commandName);
+	static	int					_CompareCommandEntries(
+									const CommandEntry* command1,
+									const CommandEntry* command2);
 
 private:
 			CliContext			fContext;
