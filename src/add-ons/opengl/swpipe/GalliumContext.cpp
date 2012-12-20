@@ -52,6 +52,11 @@ hgl_viewport(struct gl_context* glContext, GLint x, GLint y,
 		glContext, x, y, width, height);
 	struct hgl_context *context = (struct hgl_context*)glContext->DriverCtx;
 
+	if (!context) {
+		ERROR("%s: No context yet. bailing.\n", __func__);
+		return;
+	}
+
 	int32 bitmapWidth;
 	int32 bitmapHeight;
 
