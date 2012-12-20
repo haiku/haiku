@@ -230,13 +230,9 @@ if $(TARGET_ARCH) = x86 {
 
 # Mesa
 if $(TARGET_ARCH) = x86 {
-	local glslObject ;
-	local galliumObjects ;
 	local zipFile ;
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		HAIKU_MESA_FILE = mesa-9.0-x86-gcc4-2012-11-17.zip ;
-		glslObject = lib.haiku/libglsl.a ;
-		galliumObjects = lib.haiku/libgallium.a ;
+		HAIKU_MESA_FILE = mesa-9.0.1-x86-gcc4-2012-12-19.zip ;
 	} else {
 		HAIKU_MESA_FILE = mesa-7.8.2-x86-gcc2-2012-01-17.zip ;
 	}
@@ -256,10 +252,14 @@ if $(TARGET_ARCH) = x86 {
 		: $(zipFile)
 		: extracted-mesa ] ;
 
+	HAIKU_MESA_LIBS = 
+		$(HAIKU_MESA_DIR)/lib.haiku/libmesa.a
+		$(HAIKU_MESA_DIR)/lib.haiku/libglsl.a ;
+
 	HAIKU_MESA_HEADERS = [ FDirName $(HAIKU_MESA_DIR) include ] ;
 
 	Depends $(HAIKU_MESA_HEADERS_DEPENDENCY) : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
-	Depends $(HAIKU_MESA_LIBS) : $(HAIKU_GLU_LIBS) ;
+	Depends $(HAIKU_GLAPI_LIBS) : $(HAIKU_GLU_LIBS) ;
 
 	EnableBuildFeatures mesa ;
 } else {
