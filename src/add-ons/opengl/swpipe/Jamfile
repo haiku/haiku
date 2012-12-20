@@ -24,7 +24,7 @@ if $(HAIKU_LLVM_DIR) {
 	SubDirSysHdrs /boot/common/include ;
 	HAIKU_LLVM_DIR = /boot/common/lib ;
 
-	HAIKU_SWPIPE_DRIVER +=
+	HAIKU_SWPIPE_DRIVER =
 		$(HAIKU_MESA_DIR)/lib.haiku/libllvmpipe.a ;
 
 	llvmLibraries =
