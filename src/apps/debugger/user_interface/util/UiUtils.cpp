@@ -230,7 +230,8 @@ UiUtils::PrintValueNodeGraph(BString& _output, ValueNodeChild* child,
 }
 
 
-/*static*/ void UiUtils::DumpMemory(BString& _output, int32 indentLevel,
+/*static*/ void
+UiUtils::DumpMemory(BString& _output, int32 indentLevel,
 	TeamMemoryBlock* block, target_addr_t address, int32 itemSize,
 	int32 displayWidth, int32 count)
 {
