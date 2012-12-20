@@ -46,7 +46,7 @@ static const int32 kFromDwarfRegisters[] = {
 	X86_64_REGISTER_R13,
 	X86_64_REGISTER_R14,
 	X86_64_REGISTER_R15,
-	-1
+	X86_64_REGISTER_RIP,
 	-1, -1, -1, -1, -1, -1, -1, -1,	// xmm0-xmm7
 	-1, -1, -1, -1, -1, -1, -1, -1,	// xmm8-xmm15
 	-1, -1, -1, -1, -1, -1, -1, -1,	// st0-st7
@@ -59,6 +59,7 @@ static const int32 kFromDwarfRegisters[] = {
 	X86_64_REGISTER_FS,
 	X86_64_REGISTER_GS,
 };
+
 static const int32 kFromDwarfRegisterCount = sizeof(kFromDwarfRegisters) / 4;
 
 
@@ -157,18 +158,18 @@ ArchitectureX8664::Init()
 			REGISTER_TYPE_GENERAL_PURPOSE, false);
 
 		_AddIntegerRegister(X86_64_REGISTER_RSI, "rsi", B_UINT64_TYPE,
-			REGISTER_TYPE_GENERAL_PURPOSE, true);
+			REGISTER_TYPE_GENERAL_PURPOSE, false);
 		_AddIntegerRegister(X86_64_REGISTER_RDI, "rdi", B_UINT64_TYPE,
-			REGISTER_TYPE_GENERAL_PURPOSE, true);
+			REGISTER_TYPE_GENERAL_PURPOSE, false);
 
 		_AddIntegerRegister(X86_64_REGISTER_R8, "r8", B_UINT64_TYPE,
-			REGISTER_TYPE_GENERAL_PURPOSE, true);
+			REGISTER_TYPE_GENERAL_PURPOSE, false);
 		_AddIntegerRegister(X86_64_REGISTER_R9, "r9", B_UINT64_TYPE,
-			REGISTER_TYPE_GENERAL_PURPOSE, true);
+			REGISTER_TYPE_GENERAL_PURPOSE, false);
 		_AddIntegerRegister(X86_64_REGISTER_R10, "r10", B_UINT64_TYPE,
-			REGISTER_TYPE_GENERAL_PURPOSE, true);
+			REGISTER_TYPE_GENERAL_PURPOSE, false);
 		_AddIntegerRegister(X86_64_REGISTER_R11, "r11", B_UINT64_TYPE,
-			REGISTER_TYPE_GENERAL_PURPOSE, true);
+			REGISTER_TYPE_GENERAL_PURPOSE, false);
 		_AddIntegerRegister(X86_64_REGISTER_R12, "r12", B_UINT64_TYPE,
 			REGISTER_TYPE_GENERAL_PURPOSE, true);
 		_AddIntegerRegister(X86_64_REGISTER_R13, "r13", B_UINT64_TYPE,
@@ -232,14 +233,13 @@ ArchitectureX8664::InitRegisterRules(CfaContext& context) const
 	if (error != B_OK)
 		return error;
 
-	// set up rule for EIP register
-	// FIXME: Huh? x86_64's DWARF spec doesn't seem to include RIP in the
-	// register mapping? Does this matter?
-	//context.RegisterRule(fToDwarfRegisterMap->MapRegisterIndex(
-	//	X86_REGISTER_EIP))->SetToLocationOffset(-4);
+	// set up rule for RIP register
+	context.RegisterRule(fToDwarfRegisterMap->MapRegisterIndex(
+		X86_64_REGISTER_RIP))->SetToLocationOffset(0);
 
 	return B_OK;
 }
+
 
 status_t
 ArchitectureX8664::GetDwarfRegisterMaps(RegisterMap** _toDwarf,

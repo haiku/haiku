@@ -53,6 +53,7 @@ static const int32 kFromDwarfRegisters[] = {
 	-1, -1, -1, -1, -1, -1, -1, -1,	// SSE
 	-1, -1, -1, -1, -1, -1, -1, -1	// MMX
 };
+
 static const int32 kFromDwarfRegisterCount = sizeof(kFromDwarfRegisters) / 4;
 
 
@@ -215,6 +216,7 @@ ArchitectureX86::InitRegisterRules(CfaContext& context) const
 
 	return B_OK;
 }
+
 
 status_t
 ArchitectureX86::GetDwarfRegisterMaps(RegisterMap** _toDwarf,
