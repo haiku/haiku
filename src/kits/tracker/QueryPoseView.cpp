@@ -299,7 +299,7 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		timeData.tm_min = 0;
 		nextHour = mktime(&timeData);
 
-		PRINT(("%ld minutes, %ld seconds till next hour\n",
+		PRINT(("%" B_PRId32 " minutes, %" B_PRId32 " seconds till next hour\n",
 			(nextHour - now) / 60, (nextHour - now) % 60));
 
 		time_t nextMinute = now + 60;
@@ -308,7 +308,7 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		timeData.tm_sec = 0;
 		nextMinute = mktime(&timeData);
 
-		PRINT(("%ld seconds till next minute\n", nextMinute - now));
+		PRINT(("%" B_PRId32 " seconds till next minute\n", nextMinute - now));
 
 		bigtime_t delta;
 		if (fQueryListContainer->DynamicDateRefreshEveryMinute())
@@ -325,16 +325,18 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		int32 hoursTillMidnight = minutesTillMidnight/60;
 		minutesTillMidnight %= 60;
 
-		PRINT(("%ld hours, %ld minutes, %ld seconds till midnight\n",
-			hoursTillMidnight, minutesTillMidnight, secondsTillMidnight));
+		PRINT(("%" B_PRId32 " hours, %" B_PRId32 " minutes, %" B_PRId32
+			" seconds till midnight\n", hoursTillMidnight, minutesTillMidnight,
+			secondsTillMidnight));
 		
 		int32 refreshInSeconds = delta % 60;
 		int32 refreshInMinutes = delta / 60;
 		int32 refreshInHours = refreshInMinutes / 60;
 		refreshInMinutes %= 60;
 
-		PRINT(("next refresh in %ld hours, %ld minutes, %ld seconds\n",
-			refreshInHours, refreshInMinutes, refreshInSeconds));
+		PRINT(("next refresh in %" B_PRId32 " hours, %" B_PRId32 "minutes, %"
+			B_PRId32 " seconds\n", refreshInHours, refreshInMinutes,
+			refreshInSeconds));
 #endif
 
 		// bump up to microseconds
