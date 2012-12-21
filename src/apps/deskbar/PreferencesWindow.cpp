@@ -392,7 +392,7 @@ PreferencesWindow::_HandleChangedSettingsView()
 
 	BView* oldView = fSettingsContainerBox->ChildAt(0);
 
-	if (oldView)
+	if (oldView != NULL)
 		oldView->RemoveSelf();
 
 	SettingsItem* selectedItem =

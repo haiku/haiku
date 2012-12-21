@@ -279,14 +279,14 @@ TrackerSettingsWindow::_HandleChangedSettingsView()
 
 	BView* oldView = fSettingsContainerBox->ChildAt(0);
 
-	if (oldView)
+	if (oldView != NULL)
 		oldView->RemoveSelf();
 
 	SettingsItem* selectedItem =
 		dynamic_cast<SettingsItem*>
 			(fSettingsTypeListView->ItemAt(currentSelection));
 
-	if (selectedItem) {
+	if (selectedItem != NULL) {
 		fSettingsContainerBox->SetLabel(selectedItem->Text());
 
 		BView* view = selectedItem->View();
