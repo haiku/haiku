@@ -39,6 +39,7 @@ public:
 							~PreferencesWindow();
 
 		virtual	void		MessageReceived(BMessage* message);
+		virtual	bool		QuitRequested();
 		virtual	void		WindowActivated(bool active);
 
 				void		UpdateRecentCounts();

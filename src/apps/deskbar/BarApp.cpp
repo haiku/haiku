@@ -887,11 +887,18 @@ TBarApp::IconSize()
 void
 TBarApp::ShowPreferencesWindow()
 {
-	if (fPreferencesWindow)
-		fPreferencesWindow->Activate();
-	else {
+	if (fPreferencesWindow == NULL) {
 		fPreferencesWindow = new PreferencesWindow(BRect(0, 0, 320, 240));
 		fPreferencesWindow->Show();
+	} else {
+		if (fPreferencesWindow->Lock()) {
+			if (fPreferencesWindow->IsHidden())
+				fPreferencesWindow->Show();
+			else
+				fPreferencesWindow->Activate();
+
+			fPreferencesWindow->Unlock();
+		}
 	}
 }
 

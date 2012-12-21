@@ -324,6 +324,26 @@ PreferencesWindow::MessageReceived(BMessage* message)
 }
 
 
+bool
+PreferencesWindow::QuitRequested()
+{
+	bool isHidden = false;
+
+	if (Lock()) {
+		isHidden = IsHidden();
+		Unlock();
+	} else
+		return true;
+
+	if (isHidden)
+		return true;
+
+	Hide();
+
+	return false;
+}
+
+
 void
 PreferencesWindow::WindowActivated(bool active)
 {
