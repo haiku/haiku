@@ -10,7 +10,6 @@
 
 
 const uint32 kConfigShow			= 'show';
-const uint32 kConfigClose			= 'canc';
 const uint32 kUpdateRecentCounts	= 'upct';
 const uint32 kEditMenuInTracker		= 'mtrk';
 

@@ -184,6 +184,7 @@ TBarApp::QuitRequested()
 						fPreferencesWindow->PostMessage(B_QUIT_REQUESTED);
 					fPreferencesWindow->Unlock();
 				}
+				delete fPreferencesWindow;
 				break;
 			}
 		}
@@ -478,10 +479,6 @@ TBarApp::MessageReceived(BMessage* message)
 				fSettings.recentDocsCount = count;
 			if (message->FindBool("documentsEnabled", &enabled) == B_OK)
 				fSettings.recentDocsEnabled = enabled && count > 0;
-			break;
-
-		case kConfigClose:
-			fPreferencesWindow = NULL;
 			break;
 
 		case B_SOME_APP_LAUNCHED:

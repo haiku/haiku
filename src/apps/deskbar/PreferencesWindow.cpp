@@ -288,7 +288,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 PreferencesWindow::~PreferencesWindow()
 {
 	UpdateRecentCounts();
-	be_app->PostMessage(kConfigClose);
 }
 
 
@@ -327,19 +326,10 @@ PreferencesWindow::MessageReceived(BMessage* message)
 bool
 PreferencesWindow::QuitRequested()
 {
-	bool isHidden = false;
-
-	if (Lock()) {
-		isHidden = IsHidden();
-		Unlock();
-	} else
-		return true;
-
-	if (isHidden)
+	if (IsHidden())
 		return true;
 
 	Hide();
-
 	return false;
 }
 
