@@ -184,7 +184,6 @@ TBarApp::QuitRequested()
 						fPreferencesWindow->PostMessage(B_QUIT_REQUESTED);
 					fPreferencesWindow->Unlock();
 				}
-				delete fPreferencesWindow;
 				break;
 			}
 		}
