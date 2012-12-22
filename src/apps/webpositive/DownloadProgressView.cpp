@@ -776,7 +776,7 @@ DownloadProgressView::_UpdateStatusText()
 		// TODO: Localization of time string...
 		if (now < finishTime - secondsPerDay) {
 			// process is going to take more than a day!
-			sprintf(timeText, "%0*d:%0*d %0*d/%0*d/%ld",
+			sprintf(timeText, "%0*d:%0*d %0*d/%0*d/%" B_PRId32,
 				2, time->tm_hour, 2, time->tm_min,
 				2, time->tm_mon + 1, 2, time->tm_mday, year);
 		} else {
