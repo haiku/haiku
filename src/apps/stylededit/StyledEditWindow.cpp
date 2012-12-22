@@ -13,10 +13,11 @@
  */
 
 
-#include "Constants.h"
 #include "ColorMenuItem.h"
+#include "Constants.h"
 #include "FindWindow.h"
 #include "ReplaceWindow.h"
+#include "StatusView.h"
 #include "StyledEditApp.h"
 #include "StyledEditView.h"
 #include "StyledEditWindow.h"
@@ -513,6 +514,26 @@ StyledEditWindow::MessageReceived(BMessage* message)
 					(uint32)fSavePanelEncodingMenu->IndexOf((BMenuItem*)ptr));
 			}
 			break;
+
+		case UPDATE_STATUS:
+			message->AddBool("modified", !fClean);
+			message->AddBool("readOnly", !fTextView->IsEditable());
+			fStatusView->SetStatus(message);
+			break;
+
+		case UNLOCK_FILE:
+		{
+			status_t status = _UnlockFile();
+			if (status != B_OK) {
+				BString text;
+				bs_printf(&text,
+					B_TRANSLATE("Unable to unlock file\n\t%s"),
+					strerror(status));
+				_ShowAlert(text, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
+			}
+			PostMessage(UPDATE_STATUS);
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -1058,6 +1079,9 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	AddChild(fScrollView);
 	fTextView->MakeFocus(true);
 
+	fStatusView = new StatusView(fScrollView);
+	fScrollView->AddChild(fStatusView);
+
 	// Add "File"-menu:
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 	fMenuBar->AddItem(menu);
@@ -1137,7 +1161,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Find selection"),
 		new BMessage(MENU_FIND_SELECTION), 'H'));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
+	menu->AddItem(fReplaceItem = new BMenuItem(B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_REPLACE), 'R'));
 	menu->AddItem(fReplaceSameItem = new BMenuItem(B_TRANSLATE("Replace next"),
 		new BMessage(MENU_REPLACE_SAME), 'T'));
@@ -1369,6 +1393,14 @@ StyledEditWindow::_LoadFile(entry_ref* ref, const char* forceEncoding)
 		return status;
 	}
 
+	struct stat st;
+	if (file.InitCheck() == B_OK && file.GetStat(&st) == B_OK) {
+		bool editable = (getuid() == st.st_uid && S_IWUSR & st.st_mode)
+					|| (getgid() == st.st_gid && S_IWGRP & st.st_mode)
+					|| (S_IWOTH & st.st_mode);
+		_SetReadOnly(!editable);
+	}
+
 	// update alignment
 	switch (fTextView->Alignment()) {
 		case B_ALIGN_LEFT:
@@ -1477,6 +1509,50 @@ StyledEditWindow::_ReloadDocument(BMessage* message)
 	fClean = true;
 
 	fNagOnNodeChange = true;
+}
+
+
+status_t
+StyledEditWindow::_UnlockFile()
+{
+	_NodeMonitorSuspender nodeMonitorSuspender(this);
+
+	if (!fSaveMessage)
+		return B_ERROR;
+
+	entry_ref dirRef;
+	const char* name;
+	if (fSaveMessage->FindRef("directory", &dirRef) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
+		return B_BAD_VALUE;
+
+	BDirectory dir(&dirRef);
+	BEntry entry(&dir, name);
+
+	status_t status = dir.InitCheck();
+	if (status != B_OK)
+		return status;
+	
+	status = entry.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	struct stat st;
+	BFile file(&entry, B_READ_WRITE);
+	status = file.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	status = file.GetStat(&st);
+	if (status != B_OK)
+		return status;
+	
+	st.st_mode |= S_IWUSR;
+	status = file.SetPermissions(st.st_mode);
+	if (status == B_OK)
+		_SetReadOnly(false);
+
+	return status;
 }
 
 
@@ -1719,6 +1795,18 @@ StyledEditWindow::_ShowStatistics()
 }
 
 
+void
+StyledEditWindow::_SetReadOnly(bool readOnly)
+{
+	fReplaceItem->SetEnabled(!readOnly);
+	fReplaceSameItem->SetEnabled(!readOnly);
+	fFontMenu->SetEnabled(!readOnly);
+	fAlignLeft->Menu()->SetEnabled(!readOnly);
+	fWrapItem->SetEnabled(!readOnly);
+	fTextView->MakeEditable(!readOnly);
+}
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Menus"
 
@@ -1845,7 +1933,8 @@ StyledEditWindow::_HandleNodeMonitorEvent(BMessage *message)
 			{
 				int32 fields = 0;
 				if (message->FindInt32("fields", &fields) == B_OK
-					&& (fields & (B_STAT_SIZE | B_STAT_MODIFICATION_TIME)) == 0)
+					&& (fields & (B_STAT_SIZE | B_STAT_MODIFICATION_TIME
+							| B_STAT_MODE)) == 0)
 					break;
 
 				const char* name = NULL;

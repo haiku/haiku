@@ -50,8 +50,8 @@ void
 StyledEditView::Select(int32 start, int32 finish)
 {
 	fMessenger->SendMessage(start == finish ? DISABLE_ITEMS : ENABLE_ITEMS);
-	fMessenger->SendMessage(UPDATE_LINE);
-	BTextView::Select(start, finish);	
+	BTextView::Select(start, finish);
+	_UpdateStatus();
 }
 
 
@@ -181,7 +181,7 @@ StyledEditView::DeleteText(int32 start, int32 finish)
 		fMessenger-> SendMessage(TEXT_CHANGED);
 
 	BTextView::DeleteText(start, finish);
-	fMessenger->SendMessage(UPDATE_LINE);
+	_UpdateStatus();
 }
 
 
@@ -193,7 +193,7 @@ StyledEditView::InsertText(const char* text, int32 length, int32 offset,
 		fMessenger->SendMessage(TEXT_CHANGED);
 
 	BTextView::InsertText(text, length, offset, runs);
-	fMessenger->SendMessage(UPDATE_LINE);
+	_UpdateStatus();
 }
 
 
@@ -209,5 +209,34 @@ StyledEditView::FrameResized(float width, float height)
 		textRect.InsetBy(TEXT_INSET, TEXT_INSET);
 		SetTextRect(textRect);
 	}
-}				
+}
+
+
+void
+StyledEditView::_UpdateStatus()
+{
+	int32 selStart, selFinish;
+	GetSelection(&selStart, &selFinish);
+
+	int32 line = CurrentLine();
+	int32 lineStart = OffsetAt(line);
+
+	int32 column = 1;
+	int32 tabSize = (int32)ceilf(TabWidth() / StringWidth("s"));
+	for (int i = lineStart; i < selStart; i++) {
+		unsigned char ch = ByteAt(i);
+		if ((ch & 0xC0) != 0x80) {
+			if (ch == '\t')
+				while (column % tabSize)
+					column++;
+			column++;
+		}
+	}
+
+	BMessage* message = new BMessage(UPDATE_STATUS);
+	message->AddInt32("line", line + 1);
+	message->AddInt32("column", column);
+	message->AddString("encoding", fEncoding.String());
+	fMessenger->SendMessage(message);
+}
 
