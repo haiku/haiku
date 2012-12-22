@@ -1,21 +1,17 @@
-1	russian	x-vnd.Be-TSKB	3197510812
+1	russian	x-vnd.Be-TSKB	3155357024
 Power off	DeskbarMenu		Выключить компьютер
-Show day of week	PreferencesWindow		Отображать день недели
 Edit menu…	PreferencesWindow		Изменить меню…
 Suspend	DeskbarMenu		Приостановить
-Applications	PreferencesWindow		Приложения
 Time preferences…	TimeView		Настроить часы…
 About Haiku	DeskbarMenu		О системе Haiku
 Recent documents:	PreferencesWindow		Недавние документы:
 Recent applications	DeskbarMenu		Недавние приложения
 Sort running applications	PreferencesWindow		Сортировать запущенные приложения
-Show time	Tray		Отображать время
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения
 Find…	DeskbarMenu		Найти…
 Window	PreferencesWindow		Окно
 Menu	PreferencesWindow		Меню
 Recent documents	DeskbarMenu		Недавние документы
-Show seconds	PreferencesWindow		Отображать секунды
 Auto-hide	PreferencesWindow		Скрывать автоматически
 Always on top	PreferencesWindow		Всегда сверху
 <Deskbar folder is empty>	DeskbarMenu		<Папка Deskbar пуста>
@@ -25,7 +21,6 @@ Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Перезагрузить компьютер
 Large	PreferencesWindow		Крупные
 Auto-raise	PreferencesWindow		Всплывать при наведении
-Hide time	TimeView		Скрыть часы
 Recent folders:	PreferencesWindow		Недавние папки:
 Show application expander	PreferencesWindow		Отображать список окон приложений
 Restart Tracker	DeskbarMenu		Перезапустить Tracker
@@ -44,7 +39,6 @@ Deskbar preferences…	DeskbarMenu		Настроить Deskbar…
 Expand new applications	PreferencesWindow		Раскрывать список окон при запуске
 Show replicants	DeskbarMenu		Отображать репликанты
 Hide application names	PreferencesWindow		Скрыть имена приложений
-Clock	PreferencesWindow		Часы
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
 Icon size	PreferencesWindow		Размер значков
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Апплеты

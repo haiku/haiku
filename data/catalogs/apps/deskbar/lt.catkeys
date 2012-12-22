@@ -1,21 +1,17 @@
-1	lithuanian	x-vnd.Be-TSKB	3197510812
+1	lithuanian	x-vnd.Be-TSKB	3155357024
 Power off	DeskbarMenu		Išjungti
-Show day of week	PreferencesWindow		Rodyti savaitės dieną
 Edit menu…	PreferencesWindow		Taisyti meniu…
 Suspend	DeskbarMenu		Pristabdyti
-Applications	PreferencesWindow		Programos
 Time preferences…	TimeView		Laiko nuostatos…
 About Haiku	DeskbarMenu		Apie „Haiku“
 Recent documents:	PreferencesWindow		Paskiausi dokumentai:
 Recent applications	DeskbarMenu		Paskiausiai leistos programos
 Sort running applications	PreferencesWindow		Rikiuoti paleistas programas
-Show time	Tray		Rodyti laiką
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programos
 Find…	DeskbarMenu		Ieškoti…
 Window	PreferencesWindow		Langas
 Menu	PreferencesWindow		Meniu
 Recent documents	DeskbarMenu		Paskiausiai atverti dokumentai
-Show seconds	PreferencesWindow		Rodyti sekundes
 Auto-hide	PreferencesWindow		Automatiškai slėpti
 Always on top	PreferencesWindow		Visuomet viršuje
 <Deskbar folder is empty>	DeskbarMenu		<Meniu aplankas tuščias>
@@ -25,7 +21,6 @@ Deskbar	System name		Užduočių juosta
 Restart system	DeskbarMenu		Paleisti iš naujo
 Large	PreferencesWindow		Didelės
 Auto-raise	PreferencesWindow		Automatiškai iškilti
-Hide time	TimeView		Nerodyti laikrodžio
 Recent folders:	PreferencesWindow		Paskiausi aplankai:
 Show application expander	PreferencesWindow		Rodyti programų skleistuką
 Restart Tracker	DeskbarMenu		Perleisti Pėdsekį
@@ -44,7 +39,6 @@ Deskbar preferences…	DeskbarMenu		Užduočių juostos nuostatos…
 Expand new applications	PreferencesWindow		Išskleisti paleidžiamas programas
 Show replicants	DeskbarMenu		Rodyti replikavimo rankenėles
 Hide application names	PreferencesWindow		Nerodyti programų vardų
-Clock	PreferencesWindow		Laikrodis
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Pavyzdžiai
 Icon size	PreferencesWindow		Piktogramų dydis
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Pagalbinės programėlės

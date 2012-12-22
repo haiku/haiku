@@ -1,7 +1,8 @@
-1	finnish	x-vnd.Haiku-Terminal	2912171349
+1	finnish	x-vnd.Haiku-Terminal	4226482962
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
+Professional	Terminal colors scheme		Ammattilaistaso
 OK	Terminal TermWindow		Valmis
 New Terminal	Terminal TermWindow		Uusi Pääteikkuna
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Komentotulkin käynnistäminen Pääteikkunassa epäonnistui.
@@ -19,8 +20,11 @@ Font:	Terminal AppearancePrefView		Kirjasintyyppi:
 Copy here	Terminal TermView		Kopioi tänne
 Really close?	Terminal TermWindow		Suljetaanko todella?
 Copy	Terminal TermWindow		Kopioi
+Color scheme:	Terminal AppearancePrefView		Väriteema:
 Window title:	Terminal TermWindow		Ikkunaotsikko:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Tunnistamaton valitsin ”%s”\n
+Blue	Terminal colors scheme		Sininen
+Custom	Terminal colors scheme		Räätälöity
 %app% settings	Terminal PrefWindow	window title	%app%-asetukset
 Cancel	Terminal SetTitleWindow		Peru
 Increase	Terminal TermWindow		Kasvata
@@ -44,6 +48,8 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		Lisää polku
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Pääteikkuna\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ja Takashi Murai.\n\nKäyttö: %s [VALITSIN] [KOMENTOTULKKI]\n
 No search string was entered.	Terminal TermWindow		Hakumerkkijono ei kirjoitettu.
+Font size	Terminal TermWindow		Kirjasinkoko
+Blinking cursor	Terminal AppearancePrefView		Vilkkuva kohdistin
 Don't save	Terminal PrefWindow		Älä tallenna
 Set window title	Terminal TermWindow		Aseta ikkunaotsikko
 Terminal	System name		Pääteikkuna
@@ -55,11 +61,15 @@ Find…	Terminal TermWindow		Etsi...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet Pääteikkunan, prosessi tapetaan.
 Move here	Terminal TermView		Siirrä tänne
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tKäynnissä olevan prosessin nykyinen työhakemisto\n\t\t\tnykyisessä välilehdessä. Valinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: ’%2d’ kahdelle yleisimmälle komponentille.\n\t%i\t-\tIkkunan indeksi.\n\t%p\t-\tKäynnissä olevan prosessin nimi nykyisessä välilehdessä.\n\t%t\t-\tNykyisen välilehden otsikko.\n\t%%\t-\tMerkki ’%’.
+Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Virhe!
 New tab	Terminal TermWindow		Uusi välilehti
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Välilehtiotsikot määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
 Selected background	Terminal AppearancePrefView		Valitse tausta
+Slate	Terminal colors scheme		Laatta
+Midnight	Terminal colors scheme		Keskiyö
 Decrease	Terminal TermWindow		Vähennä
+Default	Terminal colors scheme		Oletus
 Create link here	Terminal TermView		Luo linkki tänne
 Close	Terminal TermWindow		Sulje
 Text	Terminal AppearancePrefView		Teksti

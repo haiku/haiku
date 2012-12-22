@@ -1,21 +1,29 @@
-1	finnish	x-vnd.Haiku-libbe	864109244
+1	finnish	x-vnd.Haiku-libbe	672385853
+gamma	AboutWindow		gamma
+beta	AboutWindow		beeta
 %3.2f GiB	StringForSize		%3.2f gibitavua
 Written by:	AboutWindow		Tekijä:
 About %app%	AboutMenuItem		Ohjelmasta %app%
 Cut	TextView		Leikkaa
+Version	AboutWindow		Versio
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Ei voida luoda replikanttia kohteelle ”%description”.\n%error
+About	AboutWindow		Ohjelmasta
 Copy	TextView		Kopioi
 %3.2f KiB	StringForSize		%3.2f kibitavua
 %d bytes	StringForSize		%d tavua
+alpha	AboutWindow		alfa
 Error	PrintJob		Virhe
 No Pages to print!	PrintJob		Ei ole tulostettavia sivuja!
+All Rights Reserved.	AboutWindow		All Rights Reserved.
 OK	Dragger		Valmis
 OK	PrintJob		Valmis
 Green:	ColorControl		Vihreä:
+Version history:	AboutWindow		Versiohistoria:
 Remove replicant	Dragger		Poista replikantti
 OK	ZombieReplicantView		Valmis
 Print Server is not responding.	PrintJob		Tulostuspalvelin ei vastaa.
 Paste	TextView		Liitä
+Special Thanks:	AboutWindow		Erityiskiitokset:
 %.2f TiB	StringForSize		%.2f tebitavua
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Ei voi paikallistaa sovellusta replikantille. Sovellusallekirjoitusta ei ole tarjottu.\n%error
 Redo	TextView		Tee uudelleen
@@ -26,6 +34,8 @@ Undo	TextView		Peru
 Red:	ColorControl		Punainen:
 %3.2f MiB	StringForSize		%3.2f mebitavua
 About %app…	Dragger		Ohjelmasta %app...
+development	AboutWindow		ohjelmakehitys
 Error	ZombieReplicantView		Virhe
 Blue:	ColorControl		Sininen:
+gold master	AboutWindow		gold master
 Can't delete this replicant from its original application. Life goes on.	Dragger		Ei voida poistaa tätä replikanttia sen alkuperäisestä sovelluksesta. Elämä jatkuu.

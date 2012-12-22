@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	1508367857
+1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		Estilo de Edição
 Paste	Menus		Colar
 OK	LoadAlert		OK
@@ -7,7 +7,6 @@ File	Menus		Arquivo
 Lines:	Statistics		Linhas:
 Italic	Menus		Itálico
 Left	Menus		Esquerda
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Reverter para a última versão de \"%s\"?
 Search backwards	FindandReplaceWindow		Pesquisar para trás
 Size	Menus		Tamanho
 Save	QuitAlert		Salvar
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Cancelar
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
 Case-sensitive	FindandReplaceWindow		Diferenciar maiúsculas/minúsculas
 Green	Menus		Verde
-Revert to saved…	Menus		Reverter para arquivo salvo...
 Yellow	Menus		Amarelo
 Replace in all windows	FindandReplaceWindow		Substituir em todas as janelas
 Wrap lines	Menus		Quebrar linhas

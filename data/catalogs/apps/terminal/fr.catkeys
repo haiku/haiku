@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	680179617
+1	french	x-vnd.Haiku-Terminal	1829613568
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -73,7 +73,6 @@ Set tab title	Terminal TermWindow		Changer le titre de l'onglet
 Settings…	Terminal TermWindow		Réglages…
 Abort	Terminal Shell		Abandonner
 Edit	Terminal TermWindow		Éditer
-Cursor background	Terminal AppearancePrefView		Arrière-plan du curseur
 Color:	Terminal AppearancePrefView		Couleur :
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
 Print	Terminal TermWindow		Imprimer

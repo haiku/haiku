@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	1508367857
+1	ukrainian	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		Редактор тексту StyledEdit
 Paste	Menus		Вставити
 OK	LoadAlert		Гаразд
@@ -7,7 +7,6 @@ File	Menus		Файл
 Lines:	Statistics		Стрічка:
 Italic	Menus		Italic
 Left	Menus		Вліво
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Повернутись до останньої версії \"%s\" ?
 Search backwards	FindandReplaceWindow		Повторний пошук
 Size	Menus		Розмір
 Save	QuitAlert		Зберегти
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Відмінити
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо повернути, файл не знайдено: \"%s\".
 Case-sensitive	FindandReplaceWindow		Чутливий до регістра
 Green	Menus		Зелений
-Revert to saved…	Menus		Повернутись до збереження…
 Yellow	Menus		Жовтий
 Replace in all windows	FindandReplaceWindow		Замінити  у всіх вікнах
 Wrap lines	Menus		Перенос по словах

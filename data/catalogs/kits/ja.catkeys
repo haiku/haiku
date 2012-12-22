@@ -1,4 +1,6 @@
-1	japanese	x-vnd.Haiku-libbe	1560959841
+1	japanese	x-vnd.Haiku-libbe	672385853
+gamma	AboutWindow		 γ
+beta	AboutWindow		β
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		作者:
 About %app%	AboutMenuItem		%app% について
@@ -9,8 +11,10 @@ About	AboutWindow		このソフトウェアについて…
 Copy	TextView		コピー
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d バイト
+alpha	AboutWindow		α
 Error	PrintJob		エラー
 No Pages to print!	PrintJob		印刷するページがありません。
+All Rights Reserved.	AboutWindow		All Rights Reserved.
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		緑：
@@ -19,6 +23,7 @@ Remove replicant	Dragger		レプリカントを削除
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		プリントサーバーが応答しません。
 Paste	TextView		貼り付け
+Special Thanks:	AboutWindow		Special Thanks:
 %.2f TiB	StringForSize		%.2f TiB
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error
 Redo	TextView		やり直し
@@ -29,6 +34,7 @@ Undo	TextView		元に戻す
 Red:	ColorControl		赤：
 %3.2f MiB	StringForSize		%3.2f MiB
 About %app…	Dragger		%appについて…
+development	AboutWindow		開発版
 Error	ZombieReplicantView		エラー
 Blue:	ColorControl		青：
 gold master	AboutWindow		ゴールデンマスター

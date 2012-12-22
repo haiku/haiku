@@ -1,10 +1,9 @@
-1	swedish	x-vnd.Haiku-Terminal	1252738083
+1	swedish	x-vnd.Haiku-Terminal	1829613568
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Ny terminal
-Cursor text	Terminal AppearancePrefView		Markörtext
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalen kunde inte starta skalet.
 Match case	Terminal FindWindow		Matcha gemener/versaler
 Quit	Terminal TermWindow		Avsluta
@@ -74,7 +73,6 @@ Set tab title	Terminal TermWindow		Ange fliktitel
 Settings…	Terminal TermWindow		Inställningar...
 Abort	Terminal Shell		Avbryt
 Edit	Terminal TermWindow		Redigera
-Cursor background	Terminal AppearancePrefView		Markörbakgrund
 Color:	Terminal AppearancePrefView		Färg:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mönstret bestämmer fönstrets namn. Följande alternativ finns:\n
 Print	Terminal TermWindow		Skriv ut

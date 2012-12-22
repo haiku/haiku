@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-StyledEdit	1508367857
+1	polish	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		StyledEdit
 Paste	Menus		Wklej
 OK	LoadAlert		OK
@@ -7,7 +7,6 @@ File	Menus		Plik
 Lines:	Statistics		Linie:
 Italic	Menus		Kursywa
 Left	Menus		Lewo
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Przywrócić ostatnią wersję \"%s\"? 
 Search backwards	FindandReplaceWindow		Szukaj wstecz
 Size	Menus		Rozmiar
 Save	QuitAlert		Zapisz
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Anuluj
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: \"%s\".
 Case-sensitive	FindandReplaceWindow		Wielkość liter brana pod uwagę
 Green	Menus		Zielony
-Revert to saved…	Menus		Przywróć zapisane…
 Yellow	Menus		Żółty
 Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
 Wrap lines	Menus		Zawijaj wiersze

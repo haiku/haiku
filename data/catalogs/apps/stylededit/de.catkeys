@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	1508367857
+1	german	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		Texteditor
 Paste	Menus		Einfügen
 OK	LoadAlert		OK
@@ -7,7 +7,6 @@ File	Menus		Datei
 Lines:	Statistics		Zeilen:
 Italic	Menus		Kursiv
 Left	Menus		Links
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Letzte Version von \"%s\" wiederherstellen? 
 Search backwards	FindandReplaceWindow		Rückwärts suchen
 Size	Menus		Größe
 Save	QuitAlert		Speichern
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Abbrechen
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
 Green	Menus		Grün
-Revert to saved…	Menus		Gespeicherte Version herstellen…
 Yellow	Menus		Gelb
 Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
 Wrap lines	Menus		Zeilenumbruch

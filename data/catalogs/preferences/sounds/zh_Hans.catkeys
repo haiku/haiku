@@ -1,8 +1,7 @@
-1	english	x-vnd.Haiku-Sounds	3924145958
+1	english	x-vnd.Haiku-Sounds	150798324
 Sounds	System name		声音
 No such file or directory	HEventList		该文件或者目录不存在。
 OK	SoundsHApp		确定
-Sound File:	HWindow		声音文件：
 OK	HEventList		确定
 OK	HWindow		确定
 This is not an audio file.	HWindow		该文件不是音频文件。  

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-StyledEdit	1508367857
+1	slovak	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		StyledEdit
 Paste	Menus		Vložiť
 OK	LoadAlert		OK
@@ -7,7 +7,6 @@ File	Menus		Súbor
 Lines:	Statistics		Riadkov:
 Italic	Menus		Kurzíva
 Left	Menus		Vľavo
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Vrátiť späť poslednú verziu „%s“? 
 Search backwards	FindandReplaceWindow		Hľadať dozadu
 Size	Menus		Veľkosť
 Save	QuitAlert		Uložiť
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Zrušiť
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie je možné vrátiť späť, súbor nebol nájdený: „%s“.
 Case-sensitive	FindandReplaceWindow		Rozlišovať veľkosť písmen
 Green	Menus		Zelená
-Revert to saved…	Menus		Vrátiť späť uložené…
 Yellow	Menus		Žltá
 Replace in all windows	FindandReplaceWindow		Nahradiť vo všetkých oknách
 Wrap lines	Menus		Zalamovať riadky

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	1508367857
+1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		StyledEdit
 Paste	Menus		Επικόλληση
 OK	LoadAlert		Εντάξει
@@ -7,7 +7,6 @@ File	Menus		Αρχείο
 Lines:	Statistics		Γραμμές:
 Italic	Menus		Πλάγια
 Left	Menus		Αριστερά
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Επαναφορά στην τελευταία έκδοση του \"%s\";
 Search backwards	FindandReplaceWindow		Αναζήτηση προς τα πίσω
 Size	Menus		Μέγεθος
 Save	QuitAlert		Αποθήκευση
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Άκυρο
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Δεν μπορεί να γίνει επαναφορά, το αρχείο δεν βρέθηκε: \"%s\".
 Case-sensitive	FindandReplaceWindow		Ταίριασμα πεζών/κεφαλαίων
 Green	Menus		Πράσινο
-Revert to saved…	Menus		Επαναφορά στο αποθηκευμένο...
 Yellow	Menus		Κίτρινο
 Replace in all windows	FindandReplaceWindow		Αντικατάσταση σε όλα τα παράθυρα
 Wrap lines	Menus		Αναδίπλωση γραμμών

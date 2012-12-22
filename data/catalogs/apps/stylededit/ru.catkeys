@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	1508367857
+1	russian	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		Стильный редактор
 Paste	Menus		Вставить
 OK	LoadAlert		ОК
@@ -7,7 +7,6 @@ File	Menus		Файл
 Lines:	Statistics		Строк:
 Italic	Menus		Наклонный
 Left	Menus		По левому краю
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вернуться к последней сохраненной версии \"%s\"? 
 Search backwards	FindandReplaceWindow		Искать снизу вверх
 Size	Menus		Размер
 Save	QuitAlert		Сохранить
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Отмена
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
 Case-sensitive	FindandReplaceWindow		Учитывать регистр
 Green	Menus		Зеленый
-Revert to saved…	Menus		Вернуться к сохраненному…
 Yellow	Menus		Желтый
 Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
 Wrap lines	Menus		Перенос строк

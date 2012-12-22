@@ -1,21 +1,17 @@
-1	polish	x-vnd.Be-TSKB	3197510812
+1	polish	x-vnd.Be-TSKB	3155357024
 Power off	DeskbarMenu		Wyłącz komputer
-Show day of week	PreferencesWindow		Pokaż dzień tygodnia
 Edit menu…	PreferencesWindow		Edytuj zawartość menu…
 Suspend	DeskbarMenu		Wstrzymaj
-Applications	PreferencesWindow		Lista aplikacji
 Time preferences…	TimeView		Ustawienia czasu...
 About Haiku	DeskbarMenu		O Haiku
 Recent documents:	PreferencesWindow		Ostatnio przeglądane dokumenty:
 Recent applications	DeskbarMenu		Ostatnio uruchomione aplikacje
 Sort running applications	PreferencesWindow		Sortuj uruchomione aplikacje alfabetycznie
-Show time	Tray		Pokaż czas
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikacje
 Find…	DeskbarMenu		Wyszukaj…
 Window	PreferencesWindow		Położenie
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Ostatnio otwarte dokumenty
-Show seconds	PreferencesWindow		Pokaż sekundy
 Auto-hide	PreferencesWindow		Autoukrywanie
 Always on top	PreferencesWindow		Zawsze na wierzchu
 <Deskbar folder is empty>	DeskbarMenu		Folder Paska Pulpitu jest pusty
@@ -25,7 +21,6 @@ Deskbar	System name		Pasek Pulpitu
 Restart system	DeskbarMenu		Uruchom ponownie
 Large	PreferencesWindow		Duże
 Auto-raise	PreferencesWindow		Automatyczne rozszerzanie
-Hide time	TimeView		Ukryj czas
 Recent folders:	PreferencesWindow		Ostatnio przeglądane foldery:
 Show application expander	PreferencesWindow		Aplikacje jako lista rozwijalna
 Restart Tracker	DeskbarMenu		Uruchom ponownie Trackera
@@ -44,7 +39,6 @@ Deskbar preferences…	DeskbarMenu		Preferencje Deskbara…
 Expand new applications	PreferencesWindow		Uruchamiaj aplikacje rozwinięte
 Show replicants	DeskbarMenu		Pokaż replikanty
 Hide application names	PreferencesWindow		Ukryj nazwy aplikacji
-Clock	PreferencesWindow		Zegar
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dema
 Icon size	PreferencesWindow		Rozmiar ikon
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety pulpitu

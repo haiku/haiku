@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1301055003
+1	finnish	x-vnd.Haiku-libtracker	3955647850
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -452,6 +452,7 @@ Mount	DeskWindow		Liitä
 Mount	ContainerWindow		Liitä
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used käytetty -- %free vapaana)
 Cancel	FSClipBoard		Peru
+Restart Deskbar	DeskWindow		Käynnistä Työpöytäpalkki uudelleen
 Cut more	ContainerWindow		Leikkaa lisää
 Deleting: 	StatusWindow		Poistetaan:
 Empty Trash	InfoWindow		Tyhjennä roskakori

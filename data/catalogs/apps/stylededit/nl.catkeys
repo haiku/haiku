@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-StyledEdit	1508367857
+1	dutch; flemish	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		StyledEdit
 Paste	Menus		Plakken
 OK	LoadAlert		Oké
@@ -7,7 +7,6 @@ File	Menus		Bestand
 Lines:	Statistics		Regels:
 Italic	Menus		Cursief
 Left	Menus		Links
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Herstellen naar laatste versie van \"%s\"? 
 Search backwards	FindandReplaceWindow		Achteruit zoeken
 Size	Menus		Grootte
 Save	QuitAlert		Opslaan
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Annuleren
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, het bestand \"%s\" werd niet gevonden.
 Case-sensitive	FindandReplaceWindow		Hoofdlettergevoelig
 Green	Menus		Groen
-Revert to saved…	Menus		Herstel naar opgeslagen...
 Yellow	Menus		Geel
 Replace in all windows	FindandReplaceWindow		Vervang in alle vensters
 Wrap lines	Menus		Regels afbreken
