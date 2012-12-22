@@ -200,11 +200,41 @@ enum {
 };
 
 
+// encodings for CFI_AUGMENTATION_ADDRESS_POINTER_FORMAT
+enum {
+	CFI_ADDRESS_FORMAT_ABSOLUTE			= 0x00,
+	CFI_ADDRESS_FORMAT_UNSIGNED_LEB128	= 0x01,
+	CFI_ADDRESS_FORMAT_UNSIGNED_16		= 0x02,
+	CFI_ADDRESS_FORMAT_UNSIGNED_32		= 0x03,
+	CFI_ADDRESS_FORMAT_UNSIGNED_64		= 0x04,
+	CFI_ADDRESS_FORMAT_SIGNED			= 0x08,
+	CFI_ADDRESS_FORMAT_SIGNED_LEB128	=
+		CFI_ADDRESS_FORMAT_UNSIGNED_LEB128 | CFI_ADDRESS_FORMAT_SIGNED,
+	CFI_ADDRESS_FORMAT_SIGNED_16		=
+		CFI_ADDRESS_FORMAT_UNSIGNED_16 | CFI_ADDRESS_FORMAT_SIGNED,
+	CFI_ADDRESS_FORMAT_SIGNED_32		=
+		CFI_ADDRESS_FORMAT_UNSIGNED_32 | CFI_ADDRESS_FORMAT_SIGNED,
+	CFI_ADDRESS_FORMAT_SIGNED_64		=
+		CFI_ADDRESS_FORMAT_UNSIGNED_64 | CFI_ADDRESS_FORMAT_SIGNED
+};
+
+
+enum {
+	CFI_ADDRESS_TYPE_PC_RELATIVE		= 0x10,
+	CFI_ADDRESS_TYPE_TEXT_RELATIVE		= 0x20,
+	CFI_ADDRESS_TYPE_DATA_RELATIVE		= 0x30,
+	CFI_ADDRESS_TYPE_FUNCTION_RELATIVE	= 0x40,
+	CFI_ADDRESS_TYPE_ALIGNED			= 0x50,
+	CFI_ADDRESS_TYPE_INDIRECT			= 0x80
+};
+
+
 struct DwarfFile::CIEAugmentation {
 	CIEAugmentation()
 		:
 		fString(NULL),
-		fFlags(0)
+		fFlags(0),
+		fAddressEncoding(0)
 	{
 	}
 
@@ -224,17 +254,25 @@ struct DwarfFile::CIEAugmentation {
 			fFlags |= CFI_AUGMENTATION_DATA;
 			const char* string = fString + 1;
 
+			uint64 length = dataReader.ReadUnsignedLEB128(0);
+			uint64 remaining = length;
 			// let's see what data we have to expect
 			while (*string != '\0') {
 				switch (*string) {
 					case 'L':
 						fFlags |= CFI_AUGMENTATION_LANGUAGE_SPECIFIC_DATA;
+						dataReader.Read<char>(0);
+						--remaining;
 						break;
 					case 'P':
 						fFlags |= CFI_AUGMENTATION_PERSONALITY;
+						dataReader.Read<char>(0);
+						--remaining;
 						break;
 					case 'R':
 						fFlags |= CFI_AUGMENTATION_ADDRESS_POINTER_FORMAT;
+						fAddressEncoding = dataReader.Read<char>(0);
+						--remaining;
 						break;
 					default:
 						return B_UNSUPPORTED;
@@ -244,11 +282,7 @@ struct DwarfFile::CIEAugmentation {
 
 			// read the augmentation data block -- it is preceeded by an
 			// LEB128 indicating the length of the data block
-			uint64 length = dataReader.ReadUnsignedLEB128(0);
-			dataReader.Skip(length);
-				// TODO: Actually read what is interesting for us! The
-				// CFI_AUGMENTATION_ADDRESS_POINTER_FORMAT might be. The
-				// specs are not saying much about it.
+			dataReader.Skip(remaining);
 
 			TRACE_CFI("    %" B_PRIu64 " bytes of augmentation data\n", length);
 
@@ -296,9 +330,101 @@ struct DwarfFile::CIEAugmentation {
 		return (fFlags & CFI_AUGMENTATION_DATA) != 0;
 	}
 
+	bool HasFDEAddressFormat() const
+	{
+		return (fFlags & CFI_AUGMENTATION_ADDRESS_POINTER_FORMAT) != 0;
+	}
+
+	target_addr_t FDEAddressOffset(CompilationUnit* unit,
+		ElfFile* file) const
+	{
+		switch (FDEAddressType()) {
+			// function relative is currently equivalent to absolute
+			// in all the cases in which it gets generated
+			case CFI_ADDRESS_FORMAT_ABSOLUTE:
+			case CFI_ADDRESS_TYPE_FUNCTION_RELATIVE:
+				return 0;
+			case CFI_ADDRESS_TYPE_PC_RELATIVE:
+				return unit->AddressRangeBase();
+			case CFI_ADDRESS_TYPE_TEXT_RELATIVE:
+				return file->TextSegment()->LoadAddress();
+			case CFI_ADDRESS_TYPE_DATA_RELATIVE:
+				return file->DataSegment()->LoadAddress();
+			case CFI_ADDRESS_TYPE_ALIGNED:
+			case CFI_ADDRESS_TYPE_INDIRECT:
+				// TODO: implement
+				// -- note: type indirect is currently not generated
+				return 0;
+		}
+
+		return 0;
+	}
+
+	int8 FDEAddressSize(CompilationUnit* unit) const
+	{
+		switch (fAddressEncoding & 0x07) {
+			case CFI_ADDRESS_FORMAT_ABSOLUTE:
+				return unit->AddressSize();
+			case CFI_ADDRESS_FORMAT_UNSIGNED_16:
+				return 2;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_32:
+				return 4;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_64:
+				return 8;
+		}
+
+		// TODO: gcc doesn't (currently) actually generate LEB128-formatted
+		// addresses. If that changes, we'll need to handle them accordingly
+		return 0;
+	}
+
+	uint8 FDEAddressType() const
+	{
+		return fAddressEncoding & 0x70;
+	}
+
+	target_addr_t ReadEncodedAddress(DataReader &reader,
+		CompilationUnit* unit, ElfFile* file) const
+	{
+		target_addr_t address = FDEAddressOffset(unit, file);
+		switch (fAddressEncoding & 0x0f) {
+			case CFI_ADDRESS_FORMAT_ABSOLUTE:
+				address += reader.ReadAddress(0);
+				break;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_LEB128:
+				address += reader.ReadUnsignedLEB128(0);
+				break;
+			case CFI_ADDRESS_FORMAT_SIGNED_LEB128:
+				address += reader.ReadSignedLEB128(0);
+				break;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_16:
+				address += reader.Read<uint16>(0);
+				break;
+			case CFI_ADDRESS_FORMAT_SIGNED_16:
+				address += reader.Read<int16>(0);
+				break;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_32:
+				address += reader.Read<uint32>(0);
+				break;
+			case CFI_ADDRESS_FORMAT_SIGNED_32:
+				address += reader.Read<int32>(0);
+				break;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_64:
+				address += reader.Read<uint64>(0);
+				break;
+			case CFI_ADDRESS_FORMAT_SIGNED_64:
+				address += reader.Read<int64>(0);
+				break;
+		}
+
+		return address;
+	}
+
+
 private:
 	const char*	fString;
 	uint32		fFlags;
+	int8		fAddressEncoding;
 };
 
 
