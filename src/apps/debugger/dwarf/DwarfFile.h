@@ -123,22 +123,14 @@ private:
 									DwarfTargetInterface* outputInterface,
 									target_addr_t& _framePointer);
 
-			status_t			_ParseCIEAugmentation(
-									ElfSection* debugFrameSection,
+			status_t			_ParseCIEHeader(ElfSection* debugFrameSection,
 									bool usingEHFrameSection,
 									CompilationUnit* unit,
 									uint8 addressSize,
 									CfaContext& context, off_t cieOffset,
 									CIEAugmentation& cieAugmentation,
 									DataReader& reader,
-									off_t* length = NULL,
-									off_t* lengthOffset = NULL);
-			status_t			_ParseCIE(ElfSection* debugFrameSection,
-									bool usingEHFrameSection,
-									CompilationUnit* unit,
-									uint8 addressSize,
-									CfaContext& context, off_t cieOffset,
-									CIEAugmentation& cieAugmentation);
+									off_t& _cieRemaining);
 			status_t			_ParseFrameInfoInstructions(
 									CompilationUnit* unit, CfaContext& context,
 									DataReader& dataReader);

@@ -1527,22 +1527,17 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 			// when using .eh_frame format, we need to parse the CIE's
 			// augmentation up front in order to know how the FDE's addresses
 			//  will be represented
-			if (usingEHFrameSection) {
-				// TODO: this isn't so ideal since it means we parse
-				// the CIE twice, once here in order to get the augmentation
-				// data for address parsing, and again later when we perform
-				// the full CIE parse to get its initial Cfa ruleset. In the
-				// long term, we should probably
-				// shift to parsing the CIEs as we hit them and caching
-				// their information so it can simply be retrieved directly
-				// later.
-				DataReader cieReader;
-				status_t error = _ParseCIEAugmentation(currentFrameSection,
-					usingEHFrameSection, unit, addressSize, context, cieID,
-					cieAugmentation, cieReader);
-				if (error != B_OK)
-					return error;
-			}
+			DataReader cieReader;
+			off_t cieRemaining;
+			status_t error = _ParseCIEHeader(currentFrameSection,
+				usingEHFrameSection, unit, addressSize, context, cieID,
+				cieAugmentation, cieReader, cieRemaining);
+			if (error != B_OK)
+				return error;
+			if (cieReader.HasOverflow())
+				return B_BAD_DATA;
+			if (cieRemaining < 0)
+				return B_BAD_DATA;
 
 			target_addr_t initialLocation = cieAugmentation.ReadEncodedAddress(
 				dataReader,	fElfFile);
@@ -1593,7 +1588,7 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 
 				context.SetLocation(location, initialLocation);
 				uint32 registerCount = outputInterface->CountRegisters();
-				status_t error = context.Init(registerCount);
+				error = context.Init(registerCount);
 				if (error != B_OK)
 					return error;
 
@@ -1601,9 +1596,10 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 				if (error != B_OK)
 					return error;
 
-				// process the CIE
-				error = _ParseCIE(currentFrameSection, usingEHFrameSection,
-					unit, addressSize, context, cieID, cieAugmentation);
+				// process the CIE's frame info instructions
+				cieReader = cieReader.RestrictedReader(cieRemaining);
+				error = _ParseFrameInfoInstructions(unit, context,
+					cieReader);
 				if (error != B_OK)
 					return error;
 
@@ -1772,10 +1768,10 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 
 
 status_t
-DwarfFile::_ParseCIEAugmentation(ElfSection* debugFrameSection,
+DwarfFile::_ParseCIEHeader(ElfSection* debugFrameSection,
 	bool usingEHFrameSection, CompilationUnit* unit, uint8 addressSize,
 	CfaContext& context, off_t cieOffset, CIEAugmentation& cieAugmentation,
-	DataReader& dataReader, off_t* _length, off_t* _lengthOffset)
+	DataReader& dataReader, off_t& _cieRemaining)
 {
 	if (cieOffset < 0 || cieOffset >= debugFrameSection->Size())
 		return B_BAD_DATA;
@@ -1786,15 +1782,11 @@ DwarfFile::_ParseCIEAugmentation(ElfSection* debugFrameSection,
 
 	// length
 	bool dwarf64;
-	uint64 length = dataReader.ReadInitialLength(dwarf64);
+	off_t length = dataReader.ReadInitialLength(dwarf64);
 	if (length > (uint64)dataReader.BytesRemaining())
 		return B_BAD_DATA;
 
-	if (_length != NULL)
-		*_length = length;
-
-	if (_lengthOffset != NULL)
-		*_lengthOffset = dataReader.Offset();
+	off_t lengthOffset = dataReader.Offset();
 
 	// CIE ID/CIE pointer
 	uint64 cieID = dwarf64
@@ -1842,32 +1834,14 @@ DwarfFile::_ParseCIEAugmentation(ElfSection* debugFrameSection,
 		return error;
 	}
 
-	return B_OK;
-}
-
-
-status_t
-DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
-	CompilationUnit* unit, uint8 addressSize, CfaContext& context,
-	off_t cieOffset, CIEAugmentation& cieAugmentation)
-{
-	DataReader dataReader;
-	off_t length;
-	off_t lengthOffset;
-	status_t result = _ParseCIEAugmentation(debugFrameSection,
-		usingEHFrameSection, unit, addressSize, context, cieOffset,
-		cieAugmentation, dataReader, &length, &lengthOffset);
-	if (result != B_OK)
-		return result;
 	if (dataReader.HasOverflow())
 		return B_BAD_DATA;
-	off_t remaining = (off_t)length
-		- (dataReader.Offset() - lengthOffset);
-	if (remaining < 0)
+
+	_cieRemaining = length -(dataReader.Offset() - lengthOffset);
+	if (_cieRemaining < 0)
 		return B_BAD_DATA;
 
-	DataReader restrictedReader = dataReader.RestrictedReader(remaining);
-	return _ParseFrameInfoInstructions(unit, context, restrictedReader);
+	return B_OK;
 }
 
 
