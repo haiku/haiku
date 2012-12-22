@@ -28,6 +28,7 @@ AddResources Software\ Rasterizer : MesaSoftwareRenderer.rdef ;
 Addon Software\ Rasterizer :
 	MesaSoftwareRenderer.cpp
 	:
-	$(HAIKU_MESA_LIBS)
+	$(HAIKU_MESA_LIB)
+	$(HAIKU_GLSL_LIB)
 	libGL.so be $(TARGET_LIBSUPC++)
 ;

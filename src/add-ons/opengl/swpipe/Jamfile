@@ -13,7 +13,7 @@ local sources =
 	GalliumFramebuffer.cpp
 	bitmap_wrapper.cpp ;
 
-local HAIKU_SWPIPE_DRIVER = $(HAIKU_MESA_DIR)/lib.haiku/libsoftpipe.a ;
+local HAIKU_SWPIPE_DRIVER = $(HAIKU_GALLIUM_SOFTPIPE_LIB) ;
 
 local llvmLibraries = ;
 if $(HAIKU_LLVM_DIR) {
@@ -24,8 +24,7 @@ if $(HAIKU_LLVM_DIR) {
 	SubDirSysHdrs /boot/common/include ;
 	HAIKU_LLVM_DIR = /boot/common/lib ;
 
-	HAIKU_SWPIPE_DRIVER =
-		$(HAIKU_MESA_DIR)/lib.haiku/libllvmpipe.a ;
+	HAIKU_SWPIPE_DRIVER = $(HAIKU_GALLIUM_LLVMPIPE_LIB) ;
 
 	llvmLibraries =
 		$(HAIKU_LLVM_DIR)/libLLVMAsmParser.a
@@ -122,8 +121,9 @@ Addon Software\ Renderer :
 	$(sources)
 	: libGL.so
 	$(HAIKU_SWPIPE_DRIVER)
-	$(HAIKU_MESA_LIBS)
-	$(HAIKU_MESA_DIR)/lib.haiku/libgallium.a
+	$(HAIKU_MESA_LIB)
+	$(HAIKU_GLSL_LIB)
+	$(HAIKU_GALLIUM_LIB)
 	$(llvmLibraries)
 	be translation stdc++ $(TARGET_LIBSUPC++)
 ;

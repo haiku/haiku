@@ -18,7 +18,6 @@ if $(TARGET_PLATFORM) != haiku {
 		# We need our public GL headers also when not compiling for Haiku.
 }
 
-
 SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 Includes [ FGristFiles $(sources) ] : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
@@ -47,7 +46,7 @@ SharedLibrary libGL.so : $(sources) :
 	$(HAIKU_GLU_LIBS)
 
 	# GLAPI Dispatch code (from Mesa buildpackage)
-	$(HAIKU_GLAPI_LIBS)
+	$(HAIKU_GLAPI_LIB)
 
 	# External libraries:
 	game			# BWindowScreen needed by BGLScreen stub class
