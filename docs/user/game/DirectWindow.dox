@@ -19,19 +19,19 @@
 
 /*!
 	\enum direct_buffer_state
-	\brief Direct buffer state constants
+	Direct buffer state constants
 */
 
 
 /*!
 	\enum direct_driver_state
-	\brief Direct driver state constants
+	Direct driver state constants
 */
 
 
 /*!
 	\struct direct_buffer_info
-	\brief Direct butter info struct
+	Direct butter info struct
 */
 
 
@@ -140,7 +140,7 @@
 
 
 /*!
-	\class DirectWindow
+	\class BDirectWindow
 	\ingroup game
 	\ingroup libbe
 	\brief Provides direct access to the video card graphics frame buffer.
@@ -150,27 +150,27 @@
 /*!
 	\fn BDirectWindow::BDirectWindow(BRect frame, const char *title,
 		window_type type, uint32 flags, uint32 workspace)
-	\brief Creates and initializes a BDirectWindow.
+	\brief Creates and initializes a BDirectWindow object.
 
-	\param frame The initial frame coordinates of the window.
-	\param title Window title
-	\param type Window type (see BWindow)
-	\param flags Window flags (see BWindow)
-	\param workspace Workspace (see BWindow)
+	\param frame The initial frame rectangle of the window.
+	\param title The title of the Window.
+	\param type Window type (see BWindow).
+	\param flags Window flags (see BWindow).
+	\param workspace Workspace of the direct window (see BWindow).
 */
 
 
 /*!
 	\fn BDirectWindow::BDirectWindow(BRect frame, const char *title,
 		window_look look, window_feel feel, uint32 flags, uint32 workspace)
-	\brief Creates and initializes a BDirectWindow.
+	\brief Creates and initializes a BDirectWindow object.
 
-	\param frame The initial frame coordinates of the window.
-	\param title Window title
-	\param look window look (see BWindow)
-	\param feel window feel (see BWindow)
-	\param flags window flags (see BWindow)
-	\param workspace workspace (see BWindow)
+	\param frame The initial frame rectangle of the window.
+	\param title The title of the Window.
+	\param look Window look (see BWindow).
+	\param feel Window feel (see BWindow).
+	\param flags Window flags (see BWindow).
+	\param workspace Workspace of the direct window (see BWindow).
 */
 
 
@@ -180,11 +180,16 @@
 
 	Do not delete a BDirectWindow object directly, call Quit() instead.
 
+	Destroying a BDirectWindow involves a few steps to make sure that it
+	is disconnected and cleaned up.
+
 	Set the fConnectionDisabled flag to \c true to prevent DirectConnected()
 	from attempting to reconnect while it's being destroyed.
 
 	next call Hide() and finally Sync() to force the direct window to
 	disconnect from direct access.
+
+	Once these steps are complete you may do your usual destructor work.
 */
 
 
@@ -250,7 +255,7 @@
 	\retval B_ERROR An error occurred while trying to switch between full screen
 		and windowed mode.
 
-	\sa BDirectWindow::SupportsWindowMode()
+	\see BDirectWindow::SupportsWindowMode()
 */
 
 
