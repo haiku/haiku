@@ -545,10 +545,13 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 	HAIKU_BUILD_FEATURE_WEBKIT = 1 ;
 }
 
-HAIKU_WEBKIT_FILE = haikuwebkit-1.1.3-x86-gcc4-2012-08-31a.zip ;
-
+if $(TARGET_ARCH) = x86 {
+	HAIKU_WEBKIT_FILE = haikuwebkit-1.1.3-x86-gcc4-2012-08-31a.zip ;
+} else if $(TARGET_ARCH) = x86_64 {
+	HAIKU_WEBKIT_FILE = haikuwebkit-1.1.3-x86_64-gcc4-2012-12-22.zip ;
+}
 if $(HAIKU_BUILD_FEATURE_WEBKIT) {
-	if $(TARGET_ARCH) != x86 {
+	if $(TARGET_ARCH) != x86 && $(TARGET_ARCH) != x86_64 {
 		Echo "WebKit support not available on $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) < 4 {
 		if ! $(isHybridBuild) {
