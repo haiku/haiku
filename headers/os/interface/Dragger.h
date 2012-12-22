@@ -23,7 +23,7 @@ namespace BPrivate {
 
 class BDragger : public BView {
 public:
-								BDragger(BRect bounds, BView* target,
+								BDragger(BRect frame, BView* target,
 									uint32 resizingMode = B_FOLLOW_NONE,
 									uint32 flags = B_WILL_DRAW);
 								BDragger(BMessage* data);
