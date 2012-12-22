@@ -335,17 +335,15 @@ struct DwarfFile::CIEAugmentation {
 		return (fFlags & CFI_AUGMENTATION_ADDRESS_POINTER_FORMAT) != 0;
 	}
 
-	target_addr_t FDEAddressOffset(CompilationUnit* unit,
-		ElfFile* file) const
+	target_addr_t FDEAddressOffset(ElfFile* file) const
 	{
 		switch (FDEAddressType()) {
 			// function relative is currently equivalent to absolute
 			// in all the cases in which it gets generated
 			case CFI_ADDRESS_FORMAT_ABSOLUTE:
+			case CFI_ADDRESS_TYPE_PC_RELATIVE:
 			case CFI_ADDRESS_TYPE_FUNCTION_RELATIVE:
 				return 0;
-			case CFI_ADDRESS_TYPE_PC_RELATIVE:
-				return unit->AddressRangeBase();
 			case CFI_ADDRESS_TYPE_TEXT_RELATIVE:
 				return file->TextSegment()->LoadAddress();
 			case CFI_ADDRESS_TYPE_DATA_RELATIVE:
@@ -384,9 +382,9 @@ struct DwarfFile::CIEAugmentation {
 	}
 
 	target_addr_t ReadEncodedAddress(DataReader &reader,
-		CompilationUnit* unit, ElfFile* file) const
+		ElfFile* file) const
 	{
-		target_addr_t address = FDEAddressOffset(unit, file);
+		target_addr_t address = FDEAddressOffset(file);
 		switch (fAddressEncoding & 0x0f) {
 			case CFI_ADDRESS_FORMAT_ABSOLUTE:
 				address += reader.ReadAddress(0);
@@ -1512,8 +1510,44 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 		} else {
 			// this is a FDE
 			uint64 initialLocationOffset = dataReader.Offset();
-			target_addr_t initialLocation = dataReader.ReadAddress(0);
-			target_size_t addressRange = dataReader.ReadAddress(0);
+			// In .eh_frame the CIE offset is a relative back offset.
+			if (usingEHFrameSection) {
+				if (cieID > (uint64)lengthOffset) {
+					TRACE_CFI("Invalid CIE offset: %" B_PRIu64 ", max "
+						"possible: %" B_PRIu64 "\n", cieID, lengthOffset);
+					break;
+				}
+				// convert to a section relative offset
+				cieID = lengthOffset - cieID;
+			}
+
+
+			CfaContext context;
+			CIEAugmentation cieAugmentation;
+			// when using .eh_frame format, we need to parse the CIE's
+			// augmentation up front in order to know how the FDE's addresses
+			//  will be represented
+			if (usingEHFrameSection) {
+				// TODO: this isn't so ideal since it means we parse
+				// the CIE twice, once here in order to get the augmentation
+				// data for address parsing, and again later when we perform
+				// the full CIE parse to get its initial Cfa ruleset. In the
+				// long term, we should probably
+				// shift to parsing the CIEs as we hit them and caching
+				// their information so it can simply be retrieved directly
+				// later.
+				DataReader cieReader;
+				status_t error = _ParseCIEAugmentation(currentFrameSection,
+					usingEHFrameSection, unit, addressSize, context, cieID,
+					cieAugmentation, cieReader);
+				if (error != B_OK)
+					return error;
+			}
+
+			target_addr_t initialLocation = cieAugmentation.ReadEncodedAddress(
+				dataReader,	fElfFile);
+			target_size_t addressRange = cieAugmentation.ReadEncodedAddress(
+				dataReader,	fElfFile);
 
 			if (dataReader.HasOverflow())
 				return B_BAD_DATA;
@@ -1552,23 +1586,12 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 				if (remaining < 0)
 					return B_BAD_DATA;
 
-				// In .eh_frame the CIE offset is a relative back offset.
-				if (usingEHFrameSection) {
-					if (cieID > (uint64)lengthOffset) {
-						TRACE_CFI("Invalid CIE offset: %" B_PRIu64 ", max "
-							"possible: %" B_PRIu64 "\n", cieID, lengthOffset);
-						break;
-					}
-					// convert to a section relative offset
-					cieID = lengthOffset - cieID;
-				}
-
 				TRACE_CFI("  found fde: length: %" B_PRIu64 " (%" B_PRIdOFF
 					"), CIE offset: %#" B_PRIx64 ", location: %#" B_PRIx64 ", "
 					"range: %#" B_PRIx64 "\n", length, remaining, cieID,
 					initialLocation, addressRange);
 
-				CfaContext context(location, initialLocation);
+				context.SetLocation(location, initialLocation);
 				uint32 registerCount = outputInterface->CountRegisters();
 				status_t error = context.Init(registerCount);
 				if (error != B_OK)
@@ -1579,7 +1602,6 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 					return error;
 
 				// process the CIE
-				CIEAugmentation cieAugmentation;
 				error = _ParseCIE(currentFrameSection, usingEHFrameSection,
 					unit, addressSize, context, cieID, cieAugmentation);
 				if (error != B_OK)
@@ -1750,14 +1772,15 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 
 
 status_t
-DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
-	CompilationUnit* unit, uint8 addressSize, CfaContext& context,
-	off_t cieOffset, CIEAugmentation& cieAugmentation)
+DwarfFile::_ParseCIEAugmentation(ElfSection* debugFrameSection,
+	bool usingEHFrameSection, CompilationUnit* unit, uint8 addressSize,
+	CfaContext& context, off_t cieOffset, CIEAugmentation& cieAugmentation,
+	DataReader& dataReader, off_t* _length, off_t* _lengthOffset)
 {
 	if (cieOffset < 0 || cieOffset >= debugFrameSection->Size())
 		return B_BAD_DATA;
 
-	DataReader dataReader((uint8*)debugFrameSection->Data() + cieOffset,
+	dataReader.SetTo((uint8*)debugFrameSection->Data() + cieOffset,
 		debugFrameSection->Size() - cieOffset, unit != NULL
 			? unit->AddressSize() : addressSize);
 
@@ -1767,7 +1790,11 @@ DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
 	if (length > (uint64)dataReader.BytesRemaining())
 		return B_BAD_DATA;
 
-	off_t lengthOffset = dataReader.Offset();
+	if (_length != NULL)
+		*_length = length;
+
+	if (_lengthOffset != NULL)
+		*_lengthOffset = dataReader.Offset();
 
 	// CIE ID/CIE pointer
 	uint64 cieID = dwarf64
@@ -1815,6 +1842,23 @@ DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
 		return error;
 	}
 
+	return B_OK;
+}
+
+
+status_t
+DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
+	CompilationUnit* unit, uint8 addressSize, CfaContext& context,
+	off_t cieOffset, CIEAugmentation& cieAugmentation)
+{
+	DataReader dataReader;
+	off_t length;
+	off_t lengthOffset;
+	status_t result = _ParseCIEAugmentation(debugFrameSection,
+		usingEHFrameSection, unit, addressSize, context, cieOffset,
+		cieAugmentation, dataReader, &length, &lengthOffset);
+	if (result != B_OK)
+		return result;
 	if (dataReader.HasOverflow())
 		return B_BAD_DATA;
 	off_t remaining = (off_t)length
