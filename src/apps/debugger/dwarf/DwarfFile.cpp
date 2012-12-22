@@ -1782,7 +1782,7 @@ DwarfFile::_ParseCIEHeader(ElfSection* debugFrameSection,
 
 	// length
 	bool dwarf64;
-	off_t length = dataReader.ReadInitialLength(dwarf64);
+	uint64 length = dataReader.ReadInitialLength(dwarf64);
 	if (length > (uint64)dataReader.BytesRemaining())
 		return B_BAD_DATA;
 
