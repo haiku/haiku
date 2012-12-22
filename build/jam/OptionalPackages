@@ -446,16 +446,22 @@ if [ IsOptionalHaikuImagePackageAdded CCache ] {
 
 # CDRecord
 if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package CDRecord available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) = x86 {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				cdrtools-3.01a07-r1a4-x86-gcc4-2012-08-30.zip
+				: $(baseURL)/cdrtools-3.01a07-r1a4-x86-gcc4-2012-08-30.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				cdrtools-3.01a07-r1a4-x86-gcc2-2012-08-28.zip
+				: $(baseURL)/cdrtools-3.01a07-r1a4-x86-gcc2-2012-08-28.zip ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
 		InstallOptionalHaikuImagePackage
-			cdrtools-3.01a07-r1a4-x86-gcc4-2012-08-30.zip
-			: $(baseURL)/cdrtools-3.01a07-r1a4-x86-gcc4-2012-08-30.zip ;
+			cdrtools-3.01a07-x86_64-2012-12-17.zip
+			: $(baseURL)/cdrtools-3.01a07-x86_64-2012-12-17.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage
-			cdrtools-3.01a07-r1a4-x86-gcc2-2012-08-28.zip
-			: $(baseURL)/cdrtools-3.01a07-r1a4-x86-gcc2-2012-08-28.zip ;
+		Echo "No optional package CDRecord available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -576,23 +582,29 @@ if [ IsOptionalHaikuImagePackageAdded Ctags ] {
 
 # Curl
 if [ IsOptionalHaikuImagePackageAdded Curl ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Curl available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage curl-7.26.0-r1a4-x86-gcc4-2012-08-29.zip
-			: $(baseURL)/curl-7.26.0-r1a4-x86-gcc4-2012-08-29.zip ;
+	if $(TARGET_ARCH) = x86 {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				curl-7.26.0-r1a4-x86-gcc4-2012-08-29.zip
+				: $(baseURL)/curl-7.26.0-r1a4-x86-gcc4-2012-08-29.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				curl-7.26.0-r1a4-x86-gcc2-2012-08-28.zip
+				: $(baseURL)/curl-7.26.0-r1a4-x86-gcc2-2012-08-28.zip ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			curl-7.28.1-x86_64-2012-12-18.zip
+			: $(baseURL)/curl-7.28.1-x86_64-2012-12-18.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage curl-7.26.0-r1a4-x86-gcc2-2012-08-28.zip
-			: $(baseURL)/curl-7.26.0-r1a4-x86-gcc2-2012-08-28.zip ;
+		Echo "No optional package Curl available for $(TARGET_ARCH)" ;
 	}
 }
 
 
 # CVS
 if [ IsOptionalHaikuImagePackageAdded CVS ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package CVS available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				cvs-1.12.13.1-r1a4-x86-gcc4-2012-08-30.zip
@@ -604,6 +616,13 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 				: $(baseURL)/cvs-1.12.13.1-r1a4-x86-gcc2-2012-08-28.zip
 				: : true ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			cvs-1.12.13.1-x86_64-2012-12-18.zip
+			: $(baseURL)/cvs-1.12.13.1-x86_64-2012-12-18.zip
+			: : true ;
+	} else {
+		Echo "No optional package CVS available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1134,9 +1153,7 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 
 # GitDoc
 if [ IsOptionalHaikuImagePackageAdded GitDoc ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package GitDoc available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				gitdoc-1.7.10.2-r1a4-x86-gcc4-2012-09-03.zip
@@ -1148,6 +1165,13 @@ if [ IsOptionalHaikuImagePackageAdded GitDoc ] {
 				: $(baseURL)/gitdoc-1.7.10.2-r1a4-x86-gcc2-2012-08-28.zip
 				: : true ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			gitdoc-1.8.0-x86_64-2012-12-18.zip
+			: $(baseURL)/gitdoc-1.8.0-x86_64-2012-12-18.zip
+			: : true ;
+	} else {
+		Echo "No optional package GitDoc available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1338,9 +1362,7 @@ if [ IsOptionalHaikuImagePackageAdded LibEvent ] {
 
 # LibIconv
 if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package LibIconv available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				libiconv-1.13.1-r1a4-x86-gcc4-2012-08-30.zip
@@ -1350,6 +1372,12 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 				libiconv-1.13.1-r1a4-x86-gcc2-2012-08-28.zip
 				: $(baseURL)/libiconv-1.13.1-r1a4-x86-gcc2-2012-08-28.zip ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			libiconv-1.13.1-x86_64-2012-12-18.zip
+			: $(baseURL)/libiconv-1.13.1-x86_64-2012-12-18.zip ;
+	} else {
+		Echo "No optional package LibIconv available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1487,9 +1515,7 @@ if [ IsOptionalHaikuImagePackageAdded MandatoryPackages ] {
 
 # Mercurial
 if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Mercurial available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				mercurial-2.2.2-r1a4-x86-gcc4-2012-08-30.zip
@@ -1501,6 +1527,13 @@ if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 				: $(baseURL)/mercurial-2.2.2-r1a4-x86-gcc2-2012-08-27.zip
 				: : true ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			mercurial-2.4-x86_64-2012-12-18.zip
+			: $(baseURL)/mercurial-2.4-x86_64-2012-12-18.zip
+			: : true ;
+	} else {
+		Echo "No optional package Mercurial available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1537,9 +1570,7 @@ if [ IsOptionalHaikuImagePackageAdded Nanumfont ] {
 
 # Neon
 if [ IsOptionalHaikuImagePackageAdded Neon ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Neon available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				neon-0.29.6-r1a4-x86-gcc4-2012-08-29.zip
@@ -1549,6 +1580,12 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 				neon-0.29.6-r1a4-x86-gcc2-2012-08-28.zip
 				: $(baseURL)/neon-0.29.6-r1a4-x86-gcc2-2012-08-28.zip ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			neon-0.29.6-x86_64-2012-12-18.zip
+			: $(baseURL)/neon-0.29.6-x86_64-2012-12-18.zip ;
+	} else {
+		Echo "No optional package Neon available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1725,9 +1762,7 @@ if [ IsOptionalHaikuImagePackageAdded Paladin ] {
 
 # PCRE regex engine
 if [ IsOptionalHaikuImagePackageAdded PCRE ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package PCRE available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				libpcre-8.21-r1a4-x86-gcc4-2012-09-03.zip
@@ -1737,6 +1772,12 @@ if [ IsOptionalHaikuImagePackageAdded PCRE ] {
 				libpcre-8.21-r1a4-x86-gcc2-2012-08-28.zip
 				: $(baseURL)/libpcre-8.21-r1a4-x86-gcc2-2012-08-28.zip ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			libpcre-8.21-x86_64-2012-12-18.zip
+			: $(baseURL)/libpcre-8.21-x86_64-2012-12-18.zip ;
+	} else {
+		Echo "No optional package PCRE available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -1911,9 +1952,7 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 
 # Subversion
 if [ IsOptionalHaikuImagePackageAdded Subversion ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Subversion available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				subversion-1.6.18-r1a4-x86-gcc4-2012-08-30.zip
@@ -1925,6 +1964,13 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 				: $(baseURL)/subversion-1.6.18-r1a4-x86-gcc2-2012-08-28.zip
 				: : true ;
 		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			subversion-1.6.18-x86_64-2012-12-18.zip
+			: $(baseURL)/subversion-1.6.18-x86_64-2012-12-18.zip
+			: : true ;
+	} else {
+		Echo "No optional package Subversion available for $(TARGET_ARCH)" ;
 	}
 }
 
