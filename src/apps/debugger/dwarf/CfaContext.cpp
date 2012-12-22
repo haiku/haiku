@@ -9,11 +9,10 @@
 #include "CfaContext.h"
 
 
-CfaContext::CfaContext(target_addr_t targetLocation,
-	target_addr_t initialLocation)
+CfaContext::CfaContext()
 	:
-	fTargetLocation(targetLocation),
-	fLocation(initialLocation),
+	fTargetLocation(0),
+	fLocation(0),
 	fCodeAlignment(0),
 	fDataAlignment(0),
 	fReturnAddressRegister(0),
@@ -28,6 +27,15 @@ CfaContext::~CfaContext()
 {
 	delete fRuleSet;
 	delete fInitialRuleSet;
+}
+
+
+void
+CfaContext::SetLocation(target_addr_t targetLocation,
+	target_addr_t initialLocation)
+{
+	fTargetLocation = targetLocation;
+	fLocation = initialLocation;
 }
 
 
