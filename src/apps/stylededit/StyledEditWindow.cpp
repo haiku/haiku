@@ -535,6 +535,24 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case UPDATE_LINE_SEL:
+		{
+			int32 line;
+			if (message->FindInt32("be:line", &line) == B_OK) {
+				fTextView->GoToLine(line);
+				fTextView->ScrollToSelection();
+			}
+
+			int32 start, length;
+			if (message->FindInt32("be:selection_offset", &start) == B_OK) {
+				if (message->FindInt32("be:selection_length", &length) != B_OK)
+					length = 0;
+
+				fTextView->Select(start, start + length);
+				fTextView->ScrollToOffset(start);
+			}
+			break;
+		}
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -867,7 +885,6 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 
 	fReloadItem->SetEnabled(fSaveMessage != NULL);
 	fEncodingItem->SetEnabled(fSaveMessage != NULL);
-	fTextView->Select(0, 0);
 }
 
 
@@ -1318,6 +1335,33 @@ StyledEditWindow::_LoadAttrs()
 		MoveTo(newFrame.left, newFrame.top);
 		ResizeTo(newFrame.Width(), newFrame.Height());
 	}
+
+	// info about position of caret may live in the file attributes
+	int32 line = 0;
+	int32 lineMax = fTextView->CountLines();
+	if (documentNode.ReadAttr("be:line",
+			B_INT32_TYPE, 0, &line, sizeof(line)) == sizeof(line))
+		line = min_c(max_c(0, line), lineMax);
+	else
+		line = 0;
+
+	int32 start = 0, length = 0, finish = 0;
+	int32 offsetMax = fTextView->OffsetAt(lineMax);
+	if (documentNode.ReadAttr("be:selection_offset",
+			B_INT32_TYPE, 0, &start, sizeof(start)) == sizeof(start)
+		&& documentNode.ReadAttr("be:selection_length",
+			B_INT32_TYPE, 0, &length, sizeof(length)) == sizeof(length))
+	{
+		finish = start + length;
+		start = min_c(max_c(0, start), offsetMax);
+		finish = min_c(max_c(0, finish), offsetMax);
+	} else {
+		start = fTextView->OffsetAt(line);
+		finish = start;
+	}
+
+	fTextView->Select(start, finish);
+	fTextView->ScrollToOffset(start);
 }
 
 
@@ -1345,6 +1389,18 @@ StyledEditWindow::_SaveAttrs()
 
 	documentNode.WriteAttr(kInfoAttributeName, B_RECT_TYPE, 0, &frame,
 		sizeof(BRect));
+
+	// preserve current line and selection too
+	int32 line = fTextView->CurrentLine();
+	documentNode.WriteAttr("be:line", B_INT32_TYPE, 0, &line, sizeof(line));
+
+	int32 start, end;
+	fTextView->GetSelection(&start, &end);
+	int32 length = end - start;
+	documentNode.WriteAttr("be:selection_offset",
+			B_INT32_TYPE, 0, &start, sizeof(start));
+	documentNode.WriteAttr("be:selection_length",
+			B_INT32_TYPE, 0, &length, sizeof(length));
 }
 
 
