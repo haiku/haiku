@@ -739,6 +739,12 @@ PCI::_EnumerateBus(int domain, uint8 bus, uint8 *subordinateBus)
 			if (baseClass != PCI_bridge || subClass != PCI_pci)
 				continue;
 
+			// skip incorrectly configured devices
+			uint8 headerType = ReadConfig(domain, bus, dev, function,
+				PCI_header_type, 1) & PCI_header_type_mask;
+			if (headerType != PCI_header_type_PCI_to_PCI_bridge)
+				continue;
+
 			TRACE(("PCI: found PCI-PCI bridge: domain %u, bus %u, dev %u, func %u\n",
 				domain, bus, dev, function));
 			TRACE(("PCI: original settings: pcicmd %04" B_PRIx32 ", primary-bus "
@@ -791,6 +797,12 @@ PCI::_EnumerateBus(int domain, uint8 bus, uint8 *subordinateBus)
 			uint8 subClass = ReadConfig(domain, bus, dev, function,
 				PCI_class_sub, 1);
 			if (baseClass != PCI_bridge || subClass != PCI_pci)
+				continue;
+
+			// skip incorrectly configured devices
+			uint8 headerType = ReadConfig(domain, bus, dev, function,
+				PCI_header_type, 1) & PCI_header_type_mask;
+			if (headerType != PCI_header_type_PCI_to_PCI_bridge)
 				continue;
 
 			TRACE(("PCI: configuring PCI-PCI bridge: domain %u, bus %u, dev %u, func %u\n",
@@ -877,6 +889,18 @@ PCI::_FixupDevices(int domain, uint8 bus)
 			if (subClass != PCI_pci)
 				continue;
 
+			// some FIC motherboards have a buggy BIOS...
+			// make sure the header type is correct for a bridge,
+			uint8 headerType = ReadConfig(domain, bus, dev, function,
+				PCI_header_type, 1) & PCI_header_type_mask;
+			if (headerType != PCI_header_type_PCI_to_PCI_bridge) {
+				dprintf("PCI: dom %u, bus %u, dev %2u, func %u, PCI bridge"
+					" class but wrong header type 0x%02x, ignoring.\n",
+					domain, bus, dev, function, headerType);
+				continue;
+			}
+
+
 			int busBehindBridge = ReadConfig(domain, bus, dev, function,
 				PCI_secondary_bus, 1);
 
@@ -894,7 +918,9 @@ PCI::_ConfigureBridges(PCIBus *bus)
 {
 	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
 		if (dev->info.class_base == PCI_bridge
-			&& dev->info.class_sub == PCI_pci) {
+			&& dev->info.class_sub == PCI_pci
+			&& (dev->info.header_type & PCI_header_type_mask)
+			== PCI_header_type_PCI_to_PCI_bridge) {
 			uint16 bridgeControlOld = ReadConfig(dev->domain, dev->bus,
 				dev->device, dev->function, PCI_bridge_control, 2);
 			uint16 bridgeControlNew = bridgeControlOld;
@@ -1058,7 +1084,10 @@ PCI::_DiscoverDevice(PCIBus *bus, uint8 dev, uint8 function)
 		PCI_class_base, 1);
 	uint8 subClass = ReadConfig(bus->domain, bus->bus, dev, function,
 		PCI_class_sub, 1);
-	if (baseClass == PCI_bridge && subClass == PCI_pci) {
+	uint8 headerType = ReadConfig(bus->domain, bus->bus, dev, function,
+		PCI_header_type, 1) & PCI_header_type_mask;
+	if (baseClass == PCI_bridge && subClass == PCI_pci
+		&& headerType == PCI_header_type_PCI_to_PCI_bridge) {
 		uint8 secondaryBus = ReadConfig(bus->domain, bus->bus, dev, function,
 			PCI_secondary_bus, 1);
 		PCIBus *newBus = _CreateBus(newDev, bus->domain, secondaryBus);
