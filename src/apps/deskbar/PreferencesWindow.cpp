@@ -224,7 +224,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.End()
 		.View();
 
-	BView* applicationSettingsView = BLayoutBuilder::Group<>()
+	BView* applicationsSettingsView = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
 			.Add(fAppsSort)
 			.Add(fAppsSortTrackerFirst)
@@ -265,8 +265,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Menu"),
 		menuSettingsView));
-	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Application"),
-		applicationSettingsView));
+	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Applications"),
+		applicationsSettingsView));
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Window"),
 		windowSettingsView));
 
