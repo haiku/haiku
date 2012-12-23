@@ -689,15 +689,17 @@ function ConvertJamToBash()
 	#icuDevelPkgLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	#ConvertVariableDeclarationLines "$regExp" 'icuDevelPkgLine'
 
+	# TODO : fix the regex
 	local regExp="/^\s*HAIKU_OPENSSL_PACKAGE = .*-gcc${HAIKU_GCC_VERSION[1]}-/p"
 	sslPkgLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	ConvertVariableDeclarationLines "$regExp" 'sslPkgLine'
 
+	# TODO : fix the regex
 	local regExp='/^HAIKU_OPENSSL_URL/p'
 	sslUrlLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	ConvertVariableDeclarationLines "$regExp" 'sslUrlLine'
 
-	# TODO
+	# TODO : fix the regex
 	local regExp='/^HAIKU_WEBKIT_FILE/p'
 	webkitFileLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	ConvertVariableDeclarationLines "$regExp" 'webkitFileLine'
