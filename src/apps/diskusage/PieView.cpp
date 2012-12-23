@@ -139,7 +139,7 @@ PieView::PieView(BVolume* volume)
 	fUpdateFileAt(false)
 {
 	fMouseOverMenu = new BPopUpMenu(kEmptyStr, false, false);
-	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Get Info"), NULL),
+	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Get info"), NULL),
 		kIdxGetInfo);
 	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Open"), NULL),
 		kIdxOpen);
@@ -661,7 +661,7 @@ PieView::_BuildOpenWithMenu(FileInfo* info)
 
 	delete type;
 
-	BMenu* openWith = new BMenu(B_TRANSLATE("Open With"));
+	BMenu* openWith = new BMenu(B_TRANSLATE("Open with"));
 
 	if (appList.size() == 0) {
 		BMenuItem* item = new BMenuItem(B_TRANSLATE("no supporting apps"),
