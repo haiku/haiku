@@ -121,7 +121,18 @@
 		   take to complete in microseconds. Set to 0 for an instantaneous
 		   change.
 
-	\returns A status code indicating the current playback status.
-	\retval B_OK The operating was successful.
+	\returns A status code.
+	\retval B_OK The playback state was updated.
 	\retval EALREADY Already in the requested playback state.
+*/
+
+
+/*!
+	\fn int32 BFileGameSound::IsPaused()
+	\brief Returns the current playback status.
+
+	\returns An integer indicating the current playback status.
+	\retval B_NOT_PAUSED Sound is playing.
+	\retval B_PAUSE_IN_PROGRESS The sound is transitioning to or from a paused state.
+	\retval B_PAUSED Sound is paused.
 */
