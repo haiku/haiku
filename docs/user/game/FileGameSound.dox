@@ -13,7 +13,7 @@
 
 /*!
 	\file FileGameSound.h
-	\brief Provides the FileGameSound class.
+	\brief Provides the BFileGameSound class.
 */
 
 
@@ -21,7 +21,7 @@
 	\class BFileGameSound
 	\ingroup game
 	\ingroup libbe
-	\brief Provides the ability to playback audio from a sound file on disk.
+	\brief Playback audio from a sound file on disk.
 */
 
 
