@@ -562,14 +562,16 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 #if DEBUG
 		numOps++;
 #if DEBUG > 1
-		fprintf(file, "executed in %lld usecs\n", system_time() - startOpTime);
+		fprintf(file, "executed in %" B_PRId64 " usecs\n", system_time()
+			- startOpTime);
 #endif
 #endif
 		// TODO: what if too much was read, should we return B_ERROR?
 	}
 
 #if DEBUG
-	fprintf(file, "Done! %ld ops, rendering completed in %lld usecs.\n", numOps, system_time() - startTime);
+	fprintf(file, "Done! %" B_PRId32 " ops, rendering completed in %"
+		B_PRId64 " usecs.\n", numOps, system_time() - startTime);
 	fclose(file);
 #endif
 	return B_OK;

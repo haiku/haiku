@@ -1,7 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Be-TSKB	1095421712
+1	greek, modern (1453-)	x-vnd.Be-TSKB	1782938413
 Power off	DeskbarMenu		Απενεργοποίηση
 Edit menu…	PreferencesWindow		Επεξεργασία μενού...
-Applications	PreferencesWindow		Εφαρμογές
 Recent documents:	PreferencesWindow		Πρόσφατα έγγραφα:
 Recent applications	DeskbarMenu		Πρόσφατες εφαρμογές
 Sort running applications	PreferencesWindow		Ταξινόμησε τις τρέχουσες εφαρμογές
@@ -18,7 +17,6 @@ No windows	WindowMenu		Χωρίς παράθυρα
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Επανεκκίνηση συστήματος
 Auto-raise	PreferencesWindow		Αυτόματη-ανύψωση
-Hide time	TimeView		Απόκρυψη ώρας
 Recent folders:	PreferencesWindow		Πρόσφατοι φάκελοι:
 Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Επεκτατής
 Restart Tracker	DeskbarMenu		Επανεκκίνηση Tracker
@@ -35,7 +33,6 @@ Show calendar…	TimeView		Εμφάνιση ημερολογίου…
 Deskbar preferences…	DeskbarMenu		Προτιμήσεις Deskbar…
 Expand new applications	PreferencesWindow		Επέκταση νέων εφαρμογών
 Show replicants	DeskbarMenu		Εμφάνιση αντιγράφων
-Clock	PreferencesWindow		Ρολόϊ
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Επιδείξεις
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applets επιφάνειας εργασίας
 Hide all	WindowMenu		Απόκρυψη όλων

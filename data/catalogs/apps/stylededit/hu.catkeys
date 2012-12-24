@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	1508367857
+1	hungarian	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		StyledEdit
 Paste	Menus		Beillesztés
 OK	LoadAlert		Rendben
@@ -7,7 +7,6 @@ File	Menus		Fájl
 Lines:	Statistics		Sor:
 Italic	Menus		Dőlt
 Left	Menus		Balra
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Visszaállítja legutolsó verzióját: %s?
 Search backwards	FindandReplaceWindow		Keresés visszafelé
 Size	Menus		Méret
 Save	QuitAlert		Mentés
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Mégse
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl (%s) nem található.
 Case-sensitive	FindandReplaceWindow		Betűérzékeny
 Green	Menus		Zöld
-Revert to saved…	Menus		Vissza a mentett állapotra…
 Yellow	Menus		Sárga
 Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
 Wrap lines	Menus		Sortörés

@@ -1,10 +1,10 @@
-1	japanese	x-vnd.Haiku-Terminal	1252738083
+1	japanese	x-vnd.Haiku-Terminal	4226482962
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
+Professional	Terminal colors scheme		プロフェッショナル
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		新しいターミナルを開く
-Cursor text	Terminal AppearancePrefView		カーソル
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できませんでした。
 Match case	Terminal FindWindow		大文字と小文字を区別する
 Quit	Terminal TermWindow		終了
@@ -20,8 +20,11 @@ Font:	Terminal AppearancePrefView		フォント:
 Copy here	Terminal TermView		カレントディレクトリへコピー
 Really close?	Terminal TermWindow		本当に閉じますか?
 Copy	Terminal TermWindow		コピー
+Color scheme:	Terminal AppearancePrefView		配色:
 Window title:	Terminal TermWindow		ウィンドウタイトル:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Unrecognized option \"%s\"\n
+Blue	Terminal colors scheme		ブルー
+Custom	Terminal colors scheme		カスタム
 %app% settings	Terminal PrefWindow	window title	%app% 設定
 Cancel	Terminal SetTitleWindow		中止
 Increase	Terminal TermWindow		大きく
@@ -45,6 +48,7 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		パスを挿入
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		検索テキストが入力されていません。
+Font size	Terminal TermWindow		フォントのサイズ
 Blinking cursor	Terminal AppearancePrefView		カーソルを点滅させる
 Don't save	Terminal PrefWindow		保存しない
 Set window title	Terminal TermWindow		ウィンドウタイトルを設定
@@ -57,11 +61,15 @@ Find…	Terminal TermWindow		検索…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nTerminalを閉じると強制終了されます。
 Move here	Terminal TermView		カレントディレクトリへ移動
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t現在のタブへの実行中プロセスのカレントワーキングディレクトリ\n\t\t\tの表示。オプションでパス要素の最大値を\n\t\t\t指定できます。 例. '%2d' 最大 2 要素。\n\t%i\t-\tThe index of the window.\n\t%p\t-\t実行中プロセス名の現在のタプへの表示。\n\t%t\t-\t現在のタブのタイトル。\n\t%%\t-\t文字 '%' 。
+Retro	Terminal colors scheme		レトロ
 Error!	Terminal getString		エラー!
 New tab	Terminal TermWindow		新しいタブ
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		パターンはタブタイトルを指定します。次のプレースホルダーが\n使用できます:\n
 Selected background	Terminal AppearancePrefView		選択されたテキストの背景
+Slate	Terminal colors scheme		スレート
+Midnight	Terminal colors scheme		ミッドナイト
 Decrease	Terminal TermWindow		小さく
+Default	Terminal colors scheme		デフォルト
 Create link here	Terminal TermView		カレントディレクトリにリンク作成
 Close	Terminal TermWindow		閉じる
 Text	Terminal AppearancePrefView		テキスト
@@ -74,7 +82,6 @@ Set tab title	Terminal TermWindow		タブのタイトルを設定
 Settings…	Terminal TermWindow		設定…
 Abort	Terminal Shell		中断
 Edit	Terminal TermWindow		編集
-Cursor background	Terminal AppearancePrefView		カーソルの背景
 Color:	Terminal AppearancePrefView		色:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンはウィンドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
 Print	Terminal TermWindow		印刷

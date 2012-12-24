@@ -383,8 +383,8 @@ function DownloadAllBuildFiles()
 {
 	# DownloadAllBuildFiles
 	# Retreive the necessary jam files from svn.
-	local buildFiles="OptionalPackages OptionalPackageDependencies \
-		OptionalBuildFeatures OptionalLibPackages"
+	local buildFiles="BuildFeatures OptionalPackageDependencies \
+		OptionalPackages OptionalLibPackages"
 	for file in ${buildFiles} ; do
 		GetBuildFile ${file}
 	done
@@ -676,29 +676,32 @@ function ConvertJamToBash()
 	# TODO : add these following variables to the CreateInstallerScript
 	# TODO : parse HAIKU_ICU_GCC_2_PACKAGE
 	#local regExp='/^HAIKU_ICU_GCC_2_PACKAGE/p'
-	#icuGcc2PkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	#icuGcc2PkgLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	#ConvertVariableDeclarationLines "$regExp" 'icuGcc2PkgLine'
 
 	# TODO : parse HAIKU_ICU_GCC_4_PACKAGE
 	#local regExp='/^HAIKU_ICU_GCC_4_PACKAGE/p'
-	#icuGcc4PkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	#icuGcc4PkgLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	#ConvertVariableDeclarationLines "$regExp" 'icuGcc4PkgLine'
 
 	# TODO : parse HAIKU_ICU_DEVEL_PACKAGE
 	#local regExp='/^HAIKU_ICU_DEVEL_PACKAGE/p'
-	#icuDevelPkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	#icuDevelPkgLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	#ConvertVariableDeclarationLines "$regExp" 'icuDevelPkgLine'
 
+	# TODO : fix the regex
 	local regExp="/^\s*HAIKU_OPENSSL_PACKAGE = .*-gcc${HAIKU_GCC_VERSION[1]}-/p"
-	sslPkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	sslPkgLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	ConvertVariableDeclarationLines "$regExp" 'sslPkgLine'
 
+	# TODO : fix the regex
 	local regExp='/^HAIKU_OPENSSL_URL/p'
-	sslUrlLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	sslUrlLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	ConvertVariableDeclarationLines "$regExp" 'sslUrlLine'
 
+	# TODO : fix the regex
 	local regExp='/^HAIKU_WEBKIT_FILE/p'
-	webkitFileLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	webkitFileLine=`sed -n -e "$regExp" ${baseDir}/BuildFeatures`
 	ConvertVariableDeclarationLines "$regExp" 'webkitFileLine'
 
 	local regExp='/^local\ baseURL/p'

@@ -592,8 +592,8 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 			const Register* reg = registers + i;
 			BVariant value;
 			if (previousCpuState->GetRegisterValue(reg, value)) {
-				TRACE_CFI("  %3s: %#" B_PRIx32 "\n", reg->Name(),
-					value.ToUInt32());
+				TRACE_CFI("  %3s: %#" B_PRIx64 "\n", reg->Name(),
+					value.ToUInt64());
 			} else
 				TRACE_CFI("  %3s: undefined\n", reg->Name());
 		}

@@ -49,5 +49,23 @@ const uint32 kMsgChange = 'chng';
 // change time finished
 const uint32 kChangeTimeFinished = 'tcfi';
 
+// show or hide Deskbar clock
+const uint32 kShowHideTime = 'ShTm';
+
+// show seconds
+const uint32 kShowSeconds = 'SwSc';
+
+// show day of week
+const uint32 kShowDayOfWeek = 'SwDw';
+
+// show time zone
+const uint32 kShowTimeZone = 'SwTz';
+
+// get clock settings from Deskbar
+const uint32 kGetClockSettings = 'GCkS';
+
+// bring the clock tab to front
+const uint32 kSelectClockTab = 'SlCk';
+
 #endif	// _TIME_MESSAGES_H
 

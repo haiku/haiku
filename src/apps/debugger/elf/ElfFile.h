@@ -10,6 +10,7 @@
 #include <SupportDefs.h>
 
 #include <elf32.h>
+#include <elf64.h>
 #include <util/DoublyLinkedList.h>
 
 #include "Types.h"
@@ -90,13 +91,16 @@ private:
 			typedef DoublyLinkedList<ElfSegment> SegmentList;
 
 private:
+			template<typename Ehdr, typename Phdr, typename Shdr>
+			status_t			_LoadFile(const char* fileName);
+
 			bool				_CheckRange(off_t offset, off_t size) const;
-			bool				_CheckElfHeader() const;
+			static bool			_CheckElfHeader(Elf32_Ehdr& elfHeader);
+			static bool			_CheckElfHeader(Elf64_Ehdr& elfHeader);
 
 private:
 			off_t				fFileSize;
 			int					fFD;
-			Elf32_Ehdr*			fElfHeader;
 			SectionList			fSections;
 			SegmentList			fSegments;
 };

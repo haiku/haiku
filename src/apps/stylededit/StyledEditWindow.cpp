@@ -13,10 +13,11 @@
  */
 
 
-#include "Constants.h"
 #include "ColorMenuItem.h"
+#include "Constants.h"
 #include "FindWindow.h"
 #include "ReplaceWindow.h"
+#include "StatusView.h"
 #include "StyledEditApp.h"
 #include "StyledEditView.h"
 #include "StyledEditWindow.h"
@@ -514,6 +515,44 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			}
 			break;
 
+		case UPDATE_STATUS:
+			message->AddBool("modified", !fClean);
+			message->AddBool("readOnly", !fTextView->IsEditable());
+			fStatusView->SetStatus(message);
+			break;
+
+		case UNLOCK_FILE:
+		{
+			status_t status = _UnlockFile();
+			if (status != B_OK) {
+				BString text;
+				bs_printf(&text,
+					B_TRANSLATE("Unable to unlock file\n\t%s"),
+					strerror(status));
+				_ShowAlert(text, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
+			}
+			PostMessage(UPDATE_STATUS);
+			break;
+		}
+
+		case UPDATE_LINE_SEL:
+		{
+			int32 line;
+			if (message->FindInt32("be:line", &line) == B_OK) {
+				fTextView->GoToLine(line);
+				fTextView->ScrollToSelection();
+			}
+
+			int32 start, length;
+			if (message->FindInt32("be:selection_offset", &start) == B_OK) {
+				if (message->FindInt32("be:selection_length", &length) != B_OK)
+					length = 0;
+
+				fTextView->Select(start, start + length);
+				fTextView->ScrollToOffset(start);
+			}
+			break;
+		}
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -846,7 +885,6 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 
 	fReloadItem->SetEnabled(fSaveMessage != NULL);
 	fEncodingItem->SetEnabled(fSaveMessage != NULL);
-	fTextView->Select(0, 0);
 }
 
 
@@ -1058,6 +1096,9 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	AddChild(fScrollView);
 	fTextView->MakeFocus(true);
 
+	fStatusView = new StatusView(fScrollView);
+	fScrollView->AddChild(fStatusView);
+
 	// Add "File"-menu:
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 	fMenuBar->AddItem(menu);
@@ -1137,7 +1178,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Find selection"),
 		new BMessage(MENU_FIND_SELECTION), 'H'));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
+	menu->AddItem(fReplaceItem = new BMenuItem(B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_REPLACE), 'R'));
 	menu->AddItem(fReplaceSameItem = new BMenuItem(B_TRANSLATE("Replace next"),
 		new BMessage(MENU_REPLACE_SAME), 'T'));
@@ -1294,6 +1335,33 @@ StyledEditWindow::_LoadAttrs()
 		MoveTo(newFrame.left, newFrame.top);
 		ResizeTo(newFrame.Width(), newFrame.Height());
 	}
+
+	// info about position of caret may live in the file attributes
+	int32 line = 0;
+	int32 lineMax = fTextView->CountLines();
+	if (documentNode.ReadAttr("be:line",
+			B_INT32_TYPE, 0, &line, sizeof(line)) == sizeof(line))
+		line = min_c(max_c(0, line), lineMax);
+	else
+		line = 0;
+
+	int32 start = 0, length = 0, finish = 0;
+	int32 offsetMax = fTextView->OffsetAt(lineMax);
+	if (documentNode.ReadAttr("be:selection_offset",
+			B_INT32_TYPE, 0, &start, sizeof(start)) == sizeof(start)
+		&& documentNode.ReadAttr("be:selection_length",
+			B_INT32_TYPE, 0, &length, sizeof(length)) == sizeof(length))
+	{
+		finish = start + length;
+		start = min_c(max_c(0, start), offsetMax);
+		finish = min_c(max_c(0, finish), offsetMax);
+	} else {
+		start = fTextView->OffsetAt(line);
+		finish = start;
+	}
+
+	fTextView->Select(start, finish);
+	fTextView->ScrollToOffset(start);
 }
 
 
@@ -1321,6 +1389,18 @@ StyledEditWindow::_SaveAttrs()
 
 	documentNode.WriteAttr(kInfoAttributeName, B_RECT_TYPE, 0, &frame,
 		sizeof(BRect));
+
+	// preserve current line and selection too
+	int32 line = fTextView->CurrentLine();
+	documentNode.WriteAttr("be:line", B_INT32_TYPE, 0, &line, sizeof(line));
+
+	int32 start, end;
+	fTextView->GetSelection(&start, &end);
+	int32 length = end - start;
+	documentNode.WriteAttr("be:selection_offset",
+			B_INT32_TYPE, 0, &start, sizeof(start));
+	documentNode.WriteAttr("be:selection_length",
+			B_INT32_TYPE, 0, &length, sizeof(length));
 }
 
 
@@ -1367,6 +1447,14 @@ StyledEditWindow::_LoadFile(entry_ref* ref, const char* forceEncoding)
 
 		_ShowAlert(text, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
 		return status;
+	}
+
+	struct stat st;
+	if (file.InitCheck() == B_OK && file.GetStat(&st) == B_OK) {
+		bool editable = (getuid() == st.st_uid && S_IWUSR & st.st_mode)
+					|| (getgid() == st.st_gid && S_IWGRP & st.st_mode)
+					|| (S_IWOTH & st.st_mode);
+		_SetReadOnly(!editable);
 	}
 
 	// update alignment
@@ -1477,6 +1565,50 @@ StyledEditWindow::_ReloadDocument(BMessage* message)
 	fClean = true;
 
 	fNagOnNodeChange = true;
+}
+
+
+status_t
+StyledEditWindow::_UnlockFile()
+{
+	_NodeMonitorSuspender nodeMonitorSuspender(this);
+
+	if (!fSaveMessage)
+		return B_ERROR;
+
+	entry_ref dirRef;
+	const char* name;
+	if (fSaveMessage->FindRef("directory", &dirRef) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
+		return B_BAD_VALUE;
+
+	BDirectory dir(&dirRef);
+	BEntry entry(&dir, name);
+
+	status_t status = dir.InitCheck();
+	if (status != B_OK)
+		return status;
+	
+	status = entry.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	struct stat st;
+	BFile file(&entry, B_READ_WRITE);
+	status = file.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	status = file.GetStat(&st);
+	if (status != B_OK)
+		return status;
+	
+	st.st_mode |= S_IWUSR;
+	status = file.SetPermissions(st.st_mode);
+	if (status == B_OK)
+		_SetReadOnly(false);
+
+	return status;
 }
 
 
@@ -1719,6 +1851,18 @@ StyledEditWindow::_ShowStatistics()
 }
 
 
+void
+StyledEditWindow::_SetReadOnly(bool readOnly)
+{
+	fReplaceItem->SetEnabled(!readOnly);
+	fReplaceSameItem->SetEnabled(!readOnly);
+	fFontMenu->SetEnabled(!readOnly);
+	fAlignLeft->Menu()->SetEnabled(!readOnly);
+	fWrapItem->SetEnabled(!readOnly);
+	fTextView->MakeEditable(!readOnly);
+}
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Menus"
 
@@ -1845,7 +1989,8 @@ StyledEditWindow::_HandleNodeMonitorEvent(BMessage *message)
 			{
 				int32 fields = 0;
 				if (message->FindInt32("fields", &fields) == B_OK
-					&& (fields & (B_STAT_SIZE | B_STAT_MODIFICATION_TIME)) == 0)
+					&& (fields & (B_STAT_SIZE | B_STAT_MODIFICATION_TIME
+							| B_STAT_MODE)) == 0)
 					break;
 
 				const char* name = NULL;

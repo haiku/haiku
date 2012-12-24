@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	1508367857
+1	swedish	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		SkrivStiligt
 Paste	Menus		Klistra in
 OK	LoadAlert		OK
@@ -7,7 +7,6 @@ File	Menus		Arkiv
 Lines:	Statistics		Rader:
 Italic	Menus		Kursiv
 Left	Menus		Vänster
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Återgå till den senast använda versionen av "%s"? 
 Search backwards	FindandReplaceWindow		Sök bakåt
 Size	Menus		Storlek
 Save	QuitAlert		Spara
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Avbryt
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: "%s".
 Case-sensitive	FindandReplaceWindow		Skiftlägeskänslig
 Green	Menus		Grön
-Revert to saved…	Menus		Återgå till sparad…
 Yellow	Menus		Gul
 Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
 Wrap lines	Menus		Bryt rader

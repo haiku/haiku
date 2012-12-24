@@ -261,7 +261,7 @@ PoseInfo::EndianSwap(void* castToThis)
 void
 PoseInfo::PrintToStream()
 {
-	PRINT(("%s, inode:%Lx, location %f %f\n",
+	PRINT(("%s, inode:%" B_PRIx64 ", location %f %f\n",
 		fInvisible ? "hidden" : "visible",
 		fInitedDirectory, fLocation.x, fLocation.y));
 }

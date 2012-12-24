@@ -258,12 +258,27 @@ void
 FormatSettingsView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_LOCALE_CHANGED:
+		{
+			// Time updated 12/24 hour clock
+			BFormattingConventions conventions;
+			BLocale::Default()->GetFormattingConventions(&conventions);
+			if (conventions.Use24HourClock())
+				f24HourRadioButton->SetValue(B_CONTROL_ON);
+			else
+				f12HourRadioButton->SetValue(B_CONTROL_ON);
+
+			_UpdateExamples();
+			Window()->PostMessage(kMsgSettingsChanged);
+			break;
+		}
+
 		case kClockFormatChange:
 		{
 			BFormattingConventions conventions;
 			BLocale::Default()->GetFormattingConventions(&conventions);
 			conventions.SetExplicitUse24HourClock(
-				f24HourRadioButton->Value() ? true : false);
+				f24HourRadioButton->Value() == B_CONTROL_ON);
 			MutableLocaleRoster::Default()->SetDefaultFormattingConventions(
 				conventions);
 

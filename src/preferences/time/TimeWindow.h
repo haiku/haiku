@@ -14,10 +14,12 @@
 
 
 class BMessage;
+class BTabView;
+class ClockView;
 class DateTimeView;
-class TTimeBaseView;
-class TimeZoneView;
 class NetworkTimeView;
+class TimeZoneView;
+class TTimeBaseView;
 
 
 class TTimeWindow : public BWindow {
@@ -35,9 +37,13 @@ private:
 			void				_SetRevertStatus();
 
 			TTimeBaseView*		fBaseView;
+
+			BTabView*			fTabView;
 			DateTimeView*		fDateTimeView;
 			TimeZoneView*		fTimeZoneView;
 			NetworkTimeView*	fNetworkTimeView;
+			ClockView*			fClockView;
+
 			BButton*			fRevertButton;
 };
 

@@ -8,20 +8,8 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 
-{
-	local defines ;
-	defines = BEOS_THREADS GNU_ASSEMBLER ;
-
-	if $(TARGET_ARCH) = x86 {
-		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM USE_SSE_ASM ;
-	} else if $(TARGET_ARCH) = ppc {
-		# Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
-		# defines += USE_PPC_ASM ;
-	} else if $(TARGET_ARCH) = sparc {
-		defines += USE_SPARC_ASM ;
-	}
-}
-
+local defines = BEOS_THREADS GNU_ASSEMBLER ;
+SubDirC++Flags [ FDefines $(defines) ] ;
 
 local sources = MesaSoftwareRenderer.cpp ;
 
@@ -35,15 +23,12 @@ UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa main ] ;
 UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
 UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
 
-# For older versions of Mesa
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa glapi ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa tnl ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa x86 ] ;
-
-
 AddResources Software\ Rasterizer : MesaSoftwareRenderer.rdef ;
 
 Addon Software\ Rasterizer :
 	MesaSoftwareRenderer.cpp
-	: libGL.so be $(TARGET_LIBSUPC++)
+	:
+	$(HAIKU_MESA_LIB)
+	$(HAIKU_GLSL_LIB)
+	libGL.so be $(TARGET_LIBSUPC++)
 ;

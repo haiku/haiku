@@ -1,10 +1,10 @@
-1	hungarian	x-vnd.Haiku-Terminal	1252738083
+1	hungarian	x-vnd.Haiku-Terminal	4226482962
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
+Professional	Terminal colors scheme		Professzionális
 OK	Terminal TermWindow		Rendben
 New Terminal	Terminal TermWindow		Új terminál
-Cursor text	Terminal AppearancePrefView		Kurzor szöveg
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Sajnos, a terminálnak nem sikerült elindítani a shellt.
 Match case	Terminal FindWindow		Betűérzékeny
 Quit	Terminal TermWindow		Kilépés
@@ -20,8 +20,11 @@ Font:	Terminal AppearancePrefView		Betűtípus:
 Copy here	Terminal TermView		Másolás
 Really close?	Terminal TermWindow		Biztos bezárja?
 Copy	Terminal TermWindow		Másolás
+Color scheme:	Terminal AppearancePrefView		Színösszeállítás:
 Window title:	Terminal TermWindow		Ablak címe:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Ismeretlen beállítás: %s\n
+Blue	Terminal colors scheme		Kék
+Custom	Terminal colors scheme		Egyéni
 %app% settings	Terminal PrefWindow	window title	%app% beállítások
 Cancel	Terminal SetTitleWindow		Mégse
 Increase	Terminal TermWindow		Növelés
@@ -45,6 +48,7 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		Útvonal beszúrása
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\nMinden jog fenntartva 2001-2009 Haiku, Inc.\nMinden jog fenntartva(C) 1999 Kazuho Okui és Takashi Murai.\n\nHasználata: %s [OPCIÓ] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Nincs beírva keresendő szöveg
+Font size	Terminal TermWindow		Betűméret
 Blinking cursor	Terminal AppearancePrefView		Villogó kurzor
 Don't save	Terminal PrefWindow		Nincs mentés
 Set window title	Terminal TermWindow		Ablak címének beállítása
@@ -57,11 +61,15 @@ Find…	Terminal TermWindow		Keresés…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		A folyamat (%1) még fut.\nHa bezárja a Terminált, a folyamat megszakad.
 Move here	Terminal TermView		Mozgatás
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAz a mappa amiben a jelenlegi fül az aktív folyamata\n\t\t\tfut épp.Meg lehet adni az elérési út\n\t\t\tkomponenseinek számát. Pl. '%2d' maximum két komponenshez.\n\t%i\t-\tAz ablak indexe.\n\t%p\t-\tA jelenlegi fülben futó folyamat neve.\n\t%t\t-\tA jelenlegi fül címe.\n\t%%\t-\tEgy '%' karakter.
+Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Hiba!
 New tab	Terminal TermWindow		Új lap
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		A fülek címét meghatározó minta. A következő kódok használhatóak:
 Selected background	Terminal AppearancePrefView		Kijelölés háttere
+Slate	Terminal colors scheme		Pala
+Midnight	Terminal colors scheme		Éjfél
 Decrease	Terminal TermWindow		Csökkentés
+Default	Terminal colors scheme		Eredeti
 Create link here	Terminal TermView		Hivatkozás létrehozása
 Close	Terminal TermWindow		Bezárás
 Text	Terminal AppearancePrefView		Szöveg
@@ -74,7 +82,6 @@ Set tab title	Terminal TermWindow		Lap címének beállítása
 Settings…	Terminal TermWindow		Beállítások…
 Abort	Terminal Shell		Megszakítás
 Edit	Terminal TermWindow		Szerkesztés
-Cursor background	Terminal AppearancePrefView		Kurzor háttere
 Color:	Terminal AppearancePrefView		Szín:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Az ablak címét meghatározó minta. A következő kódok használhatóak:
 Print	Terminal TermWindow		Nyomtatás

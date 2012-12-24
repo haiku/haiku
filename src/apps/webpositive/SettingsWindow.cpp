@@ -499,7 +499,7 @@ SettingsWindow::_BuildSizesMenu(BMenu* menu, uint32 messageWhat)
 			continue;
 
 		char label[32];
-		snprintf(label, sizeof(label), "%ld", size);
+		snprintf(label, sizeof(label), "%" B_PRId32, size);
 
 		BMessage* message = new BMessage(messageWhat);
 		message->AddInt32("size", size);

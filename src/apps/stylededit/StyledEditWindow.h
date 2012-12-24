@@ -12,10 +12,8 @@
 
 
 #include <Alert.h>
-#include <Window.h>
-#include <String.h>
-#include <Message.h>
 #include <Node.h>
+#include <Window.h>
 
 struct entry_ref;
 
@@ -25,6 +23,7 @@ class BMenuBar;
 class BMenuItem;
 class BMessage;
 class BScrollView;
+class StatusView;
 class StyledEditView;
 
 
@@ -58,6 +57,7 @@ private:
 			status_t			_LoadFile(entry_ref* ref,
 									const char* forceEncoding = NULL);
 			void				_ReloadDocument(BMessage *message);
+			status_t			_UnlockFile();
 			bool				_Search(BString searchFor, bool caseSensitive,
 									bool wrap, bool backSearch,
 									bool scrollToOccurence = true);
@@ -72,6 +72,7 @@ private:
 			void				_SetFontStyle(const char* fontFamily,
 									const char* fontStyle);
 			int32				_ShowStatistics();
+			void				_SetReadOnly(bool editable);
 			void				_UpdateCleanUndoRedoSaveRevert();
 			int32				_ShowAlert(const BString& text,
 									const BString& label, const BString& label2,
@@ -119,6 +120,7 @@ private:
 			BMenuItem*			fCopyItem;
 
 			BMenuItem*			fFindAgainItem;
+			BMenuItem*			fReplaceItem;
 			BMenuItem*			fReplaceSameItem;
 
 			BMenuItem*			fBlackItem;
@@ -160,6 +162,7 @@ private:
 
 			StyledEditView*		fTextView;
 			BScrollView*		fScrollView;
+			StatusView*			fStatusView;
 
 			BFilePanel*			fSavePanel;
 			BMenu*				fSavePanelEncodingMenu;

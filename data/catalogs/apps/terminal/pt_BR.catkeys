@@ -1,10 +1,9 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	1252738083
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	1829613568
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Novo Terminal
-Cursor text	Terminal AppearancePrefView		Texto do cursor
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
 Match case	Terminal FindWindow		Diferenciar maiúsculas de minúsculas
 Quit	Terminal TermWindow		Sair
@@ -74,7 +73,6 @@ Set tab title	Terminal TermWindow		Definir o título da guia
 Settings…	Terminal TermWindow		Configurações...
 Abort	Terminal Shell		Cancelar
 Edit	Terminal TermWindow		Editar
-Cursor background	Terminal AppearancePrefView		Plano de fundo do cursor
 Color:	Terminal AppearancePrefView		Cor:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		O padrão especificando o título da janela. Os seguintes espaços reservados\npodem ser usados:\n
 Print	Terminal TermWindow		Imprimir

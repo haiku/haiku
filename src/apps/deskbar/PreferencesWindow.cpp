@@ -19,14 +19,16 @@
 #include <ControlLook.h>
 #include <FormattingConventions.h>
 #include <GroupLayout.h>
+#include <ListView.h>
 #include <Locale.h>
 #include <LayoutBuilder.h>
 #include <OpenWithTracker.h>
 #include <RadioButton.h>
 #include <Roster.h>
+#include <ScrollView.h>
 #include <SeparatorView.h>
 #include <Slider.h>
-#include <StringView.h>
+#include <StringItem.h>
 #include <TextControl.h>
 #include <View.h>
 
@@ -34,8 +36,32 @@
 #include "StatusView.h"
 
 
+namespace BPrivate {
+
+class SettingsItem : public BStringItem {
+ public:
+	SettingsItem(const char* label, BView* view)
+		:
+		BStringItem(label),
+		fSettingsView(view)
+	{
+	}
+
+	BView* View()
+	{
+		return fSettingsView;
+	}
+
+ private:
+	BView* fSettingsView;
+};
+
+}	// namespace BPrivate
+
+
 static const float kIndentSpacing
 	= be_control_look->DefaultItemSpacing() * 2.3;
+static const uint32 kSettingsViewChanged = 'Svch';
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -47,6 +73,15 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	BWindow(frame, B_TRANSLATE("Deskbar preferences"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
+	// Main view controls
+	fSettingsTypeListView = new BListView("List View",
+		B_SINGLE_SELECTION_LIST);
+
+	BScrollView* scrollView = new BScrollView("scrollview",
+		fSettingsTypeListView, 0, false, true);
+
+	fSettingsContainerBox = new BBox("SettingsContainerBox");
+
 	// Menu controls
 	fMenuRecentDocuments = new BCheckBox(B_TRANSLATE("Recent documents:"),
 		new BMessage(kUpdateRecentCounts));
@@ -90,12 +125,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kAutoRaise));
 	fWindowAutoHide = new BCheckBox(B_TRANSLATE("Auto-hide"),
 		new BMessage(kAutoHide));
-
-	// Clock controls
-	fShowSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
-		new BMessage(kShowSeconds));
-	fShowDayOfWeek = new BCheckBox(B_TRANSLATE("Show day of week"),
-		new BMessage(kShowDayOfWeek));
 
 	// Get settings from BarApp
 	TBarApp* barApp = static_cast<TBarApp*>(be_app);
@@ -156,16 +185,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoRaise->SetValue(settings->autoRaise);
 	fWindowAutoHide->SetValue(settings->autoHide);
 
-	// Clock settings
-	TReplicantTray* replicantTray = barApp->BarView()->ReplicantTray();
-	if (replicantTray->Time() != NULL) {
-		fShowSeconds->SetValue(replicantTray->Time()->ShowSeconds());
-		fShowDayOfWeek->SetValue(replicantTray->Time()->ShowDayOfWeek());
-	} else {
-		fShowSeconds->SetValue(settings->showSeconds);
-		fShowDayOfWeek->SetValue(settings->showDayOfWeek);
-	}
-
 	EnableDisableDependentItems();
 
 	// Targets
@@ -179,22 +198,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fWindowAutoRaise->SetTarget(be_app);
 	fWindowAutoHide->SetTarget(be_app);
 
-	fShowSeconds->SetTarget(replicantTray);
-	fShowDayOfWeek->SetTarget(replicantTray);
-
 	// Layout
-	fMenuBox = new BBox("fMenuBox");
-	fAppsBox = new BBox("fAppsBox");
-	fWindowBox = new BBox("fWindowBox");
-	fClockBox = new BBox("fClockBox");
-
-	fMenuBox->SetLabel(B_TRANSLATE("Menu"));
-	fAppsBox->SetLabel(B_TRANSLATE("Applications"));
-	fWindowBox->SetLabel(B_TRANSLATE("Window"));
-	fClockBox->SetLabel(B_TRANSLATE("Clock"));
-
-	BView* view;
-	view = BLayoutBuilder::Group<>()
+	BView* menuSettingsView = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
 			.AddGroup(B_HORIZONTAL, 0)
 				.AddGroup(B_VERTICAL, 0)
@@ -213,13 +218,13 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(new BButton(B_TRANSLATE("Edit menu" B_UTF8_ELLIPSIS),
 					new BMessage(kEditMenuInTracker)))
 				.End()
+			.AddGlue()
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
-	fMenuBox->AddChild(view);
 
-	view = BLayoutBuilder::Group<>()
+	BView* applicationsSettingsView = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
 			.Add(fAppsSort)
 			.Add(fAppsSortTrackerFirst)
@@ -238,9 +243,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
-	fAppsBox->AddChild(view);
 
-	view = BLayoutBuilder::Group<>()
+	BView* windowSettingsView = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
 			.Add(fWindowAlwaysOnTop)
 			.Add(fWindowAutoRaise)
@@ -250,29 +254,32 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
-	fWindowBox->AddChild(view);
-
-	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 0)
-			.Add(fShowSeconds)
-			.Add(fShowDayOfWeek)
-			.AddGlue()
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-			.End()
-		.View();
-	fClockBox->AddChild(view);
 
 	BLayoutBuilder::Group<>(this)
-		.AddGrid(5, 5)
-			.Add(fMenuBox, 0, 0)
-			.Add(fWindowBox, 1, 0)
-			.Add(fAppsBox, 0, 1)
-			.Add(fClockBox, 1, 1)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+			.Add(scrollView)
+			.Add(fSettingsContainerBox)
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-			.End()
 		.End();
+
+	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Menu"),
+		menuSettingsView));
+	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Applications"),
+		applicationsSettingsView));
+	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Window"),
+		windowSettingsView));
+
+	// constraint the listview width so that the longest item fits
+	float width = 0;
+	fSettingsTypeListView->GetPreferredSize(&width, NULL);
+	width += B_V_SCROLL_BAR_WIDTH;
+	fSettingsTypeListView->SetExplicitMinSize(BSize(width, 0));
+	fSettingsTypeListView->SetExplicitMaxSize(BSize(width, B_SIZE_UNLIMITED));
+
+	fSettingsTypeListView->SetSelectionMessage(
+		new BMessage(kSettingsViewChanged));
+	fSettingsTypeListView->Select(0);
 
 	CenterOnScreen();
 }
@@ -281,7 +288,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 PreferencesWindow::~PreferencesWindow()
 {
 	UpdateRecentCounts();
-	be_app->PostMessage(kConfigClose);
 }
 
 
@@ -306,10 +312,25 @@ PreferencesWindow::MessageReceived(BMessage* message)
 			EnableDisableDependentItems();
 			break;
 
+		case kSettingsViewChanged:
+			_HandleChangedSettingsView();
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+bool
+PreferencesWindow::QuitRequested()
+{
+	if (IsHidden())
+		return true;
+
+	Hide();
+	return false;
 }
 
 
@@ -366,4 +387,36 @@ PreferencesWindow::EnableDisableDependentItems()
 
 	fWindowAutoRaise->SetEnabled(
 		fWindowAlwaysOnTop->Value() == B_CONTROL_OFF);
+}
+
+
+//	#pragma mark -
+
+
+void
+PreferencesWindow::_HandleChangedSettingsView()
+{
+	int32 currentSelection = fSettingsTypeListView->CurrentSelection();
+	if (currentSelection < 0)
+		return;
+
+	BView* oldView = fSettingsContainerBox->ChildAt(0);
+
+	if (oldView != NULL)
+		oldView->RemoveSelf();
+
+	SettingsItem* selectedItem =
+		dynamic_cast<SettingsItem*>
+			(fSettingsTypeListView->ItemAt(currentSelection));
+
+	if (selectedItem != NULL) {
+		fSettingsContainerBox->SetLabel(selectedItem->Text());
+
+		BView* view = selectedItem->View();
+		view->SetViewColor(fSettingsContainerBox->ViewColor());
+		view->Hide();
+		fSettingsContainerBox->AddChild(view);
+
+		view->Show();
+	}
 }

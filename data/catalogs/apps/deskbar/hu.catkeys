@@ -1,21 +1,17 @@
-1	hungarian	x-vnd.Be-TSKB	3197510812
+1	hungarian	x-vnd.Be-TSKB	3155357024
 Power off	DeskbarMenu		Kikapcsolás
-Show day of week	PreferencesWindow		A hét napjának mutatása
 Edit menu…	PreferencesWindow		Menü szerkesztése…
 Suspend	DeskbarMenu		Felfüggesztés
-Applications	PreferencesWindow		Programok
 Time preferences…	TimeView		Idő beállítása…
 About Haiku	DeskbarMenu		Haiku névjegye
 Recent documents:	PreferencesWindow		Utolsó dokumentumok:
 Recent applications	DeskbarMenu		Legutóbbi programok
 Sort running applications	PreferencesWindow		Futó programok rendezése
-Show time	Tray		Idő megjelenítése
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programok
 Find…	DeskbarMenu		Keresés…
 Window	PreferencesWindow		Ablak
 Menu	PreferencesWindow		Menü
 Recent documents	DeskbarMenu		Legutóbbi dokumentumok
-Show seconds	PreferencesWindow		Másodpercek megjelenítése
 Auto-hide	PreferencesWindow		Automatikus elrejtés
 Always on top	PreferencesWindow		Mindig felül
 <Deskbar folder is empty>	DeskbarMenu		<Az Asztalsáv mappa üres>
@@ -25,7 +21,6 @@ Deskbar	System name		Asztalsáv
 Restart system	DeskbarMenu		Rendszer újraindítása
 Large	PreferencesWindow		Nagy
 Auto-raise	PreferencesWindow		Automatikus előrehozás
-Hide time	TimeView		Idő elrejtése
 Recent folders:	PreferencesWindow		Utolsó mappák:
 Show application expander	PreferencesWindow		Programkiterjesztő mutatása
 Restart Tracker	DeskbarMenu		Nyomkövető újraindítása
@@ -44,7 +39,6 @@ Deskbar preferences…	DeskbarMenu		Asztalsáv-beállítások…
 Expand new applications	PreferencesWindow		Új programok kicsomagolása
 Show replicants	DeskbarMenu		Replikánsok megjelenítése
 Hide application names	PreferencesWindow		Programnevek elrejtése
-Clock	PreferencesWindow		Óra
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Bemutatók
 Icon size	PreferencesWindow		Ikon mérete
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Asztali kisalkalmazások

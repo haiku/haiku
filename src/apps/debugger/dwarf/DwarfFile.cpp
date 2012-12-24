@@ -61,13 +61,13 @@ struct DwarfFile::ExpressionEvaluationContext
 	: DwarfExpressionEvaluationContext {
 public:
 	ExpressionEvaluationContext(DwarfFile* file, CompilationUnit* unit,
-		DIESubprogram* subprogramEntry,
+		uint8 addressSize, DIESubprogram* subprogramEntry,
 		const DwarfTargetInterface* targetInterface,
 		target_addr_t instructionPointer, target_addr_t objectPointer,
 		bool hasObjectPointer, target_addr_t framePointer,
 		target_addr_t relocationDelta)
 		:
-		DwarfExpressionEvaluationContext(targetInterface, unit->AddressSize(),
+		DwarfExpressionEvaluationContext(targetInterface, addressSize,
 			relocationDelta),
 		fFile(file),
 		fUnit(unit),
@@ -200,11 +200,41 @@ enum {
 };
 
 
+// encodings for CFI_AUGMENTATION_ADDRESS_POINTER_FORMAT
+enum {
+	CFI_ADDRESS_FORMAT_ABSOLUTE			= 0x00,
+	CFI_ADDRESS_FORMAT_UNSIGNED_LEB128	= 0x01,
+	CFI_ADDRESS_FORMAT_UNSIGNED_16		= 0x02,
+	CFI_ADDRESS_FORMAT_UNSIGNED_32		= 0x03,
+	CFI_ADDRESS_FORMAT_UNSIGNED_64		= 0x04,
+	CFI_ADDRESS_FORMAT_SIGNED			= 0x08,
+	CFI_ADDRESS_FORMAT_SIGNED_LEB128	=
+		CFI_ADDRESS_FORMAT_UNSIGNED_LEB128 | CFI_ADDRESS_FORMAT_SIGNED,
+	CFI_ADDRESS_FORMAT_SIGNED_16		=
+		CFI_ADDRESS_FORMAT_UNSIGNED_16 | CFI_ADDRESS_FORMAT_SIGNED,
+	CFI_ADDRESS_FORMAT_SIGNED_32		=
+		CFI_ADDRESS_FORMAT_UNSIGNED_32 | CFI_ADDRESS_FORMAT_SIGNED,
+	CFI_ADDRESS_FORMAT_SIGNED_64		=
+		CFI_ADDRESS_FORMAT_UNSIGNED_64 | CFI_ADDRESS_FORMAT_SIGNED
+};
+
+
+enum {
+	CFI_ADDRESS_TYPE_PC_RELATIVE		= 0x10,
+	CFI_ADDRESS_TYPE_TEXT_RELATIVE		= 0x20,
+	CFI_ADDRESS_TYPE_DATA_RELATIVE		= 0x30,
+	CFI_ADDRESS_TYPE_FUNCTION_RELATIVE	= 0x40,
+	CFI_ADDRESS_TYPE_ALIGNED			= 0x50,
+	CFI_ADDRESS_TYPE_INDIRECT			= 0x80
+};
+
+
 struct DwarfFile::CIEAugmentation {
 	CIEAugmentation()
 		:
 		fString(NULL),
-		fFlags(0)
+		fFlags(0),
+		fAddressEncoding(0)
 	{
 	}
 
@@ -224,17 +254,33 @@ struct DwarfFile::CIEAugmentation {
 			fFlags |= CFI_AUGMENTATION_DATA;
 			const char* string = fString + 1;
 
+			// read the augmentation data block -- it is preceeded by an
+			// LEB128 indicating the length of the data block
+			uint64 length = dataReader.ReadUnsignedLEB128(0);
+			uint64 remaining = length;
 			// let's see what data we have to expect
+
+			TRACE_CFI("    %" B_PRIu64 " bytes of augmentation data\n", length);
 			while (*string != '\0') {
 				switch (*string) {
 					case 'L':
 						fFlags |= CFI_AUGMENTATION_LANGUAGE_SPECIFIC_DATA;
+						dataReader.Read<char>(0);
+						--remaining;
 						break;
 					case 'P':
-						fFlags |= CFI_AUGMENTATION_PERSONALITY;
-						break;
+					{
+						char personalityEncoding = dataReader.Read<char>(0);
+						uint8 addressSize = EncodedAddressSize(
+							personalityEncoding, NULL);
+						dataReader.Skip(addressSize);
+						remaining -= addressSize + 1;
+ 						break;
+					}
 					case 'R':
 						fFlags |= CFI_AUGMENTATION_ADDRESS_POINTER_FORMAT;
+						fAddressEncoding = dataReader.Read<char>(0);
+						--remaining;
 						break;
 					default:
 						return B_UNSUPPORTED;
@@ -242,18 +288,11 @@ struct DwarfFile::CIEAugmentation {
 				string++;
 			}
 
-			// read the augmentation data block -- it is preceeded by an
-			// LEB128 indicating the length of the data block
-			uint64 length = dataReader.ReadUnsignedLEB128(0);
-			dataReader.Skip(length);
-				// TODO: Actually read what is interesting for us! The
-				// CFI_AUGMENTATION_ADDRESS_POINTER_FORMAT might be. The
-				// specs are not saying much about it.
-
-			TRACE_CFI("    %" B_PRIu64 " bytes of augmentation data\n", length);
-
-			if (dataReader.HasOverflow())
+			dataReader.Skip(remaining);
+			if (remaining != 0 || dataReader.HasOverflow()) {
+				WARNING("Error while reading CIE Augmentation\n");
 				return B_BAD_DATA;
+			}
 
 			return B_OK;
 		}
@@ -296,9 +335,117 @@ struct DwarfFile::CIEAugmentation {
 		return (fFlags & CFI_AUGMENTATION_DATA) != 0;
 	}
 
+	bool HasFDEAddressFormat() const
+	{
+		return (fFlags & CFI_AUGMENTATION_ADDRESS_POINTER_FORMAT) != 0;
+	}
+
+	target_addr_t FDEAddressOffset(ElfFile* file,
+		ElfSection* debugFrameSection) const
+	{
+		switch (FDEAddressType()) {
+			case CFI_ADDRESS_FORMAT_ABSOLUTE:
+				TRACE_CFI("FDE address format: absolute, ");
+				return 0;
+			case CFI_ADDRESS_TYPE_PC_RELATIVE:
+				TRACE_CFI("FDE address format: PC relative, ");
+				return debugFrameSection->LoadAddress();
+			case CFI_ADDRESS_TYPE_FUNCTION_RELATIVE:
+				TRACE_CFI("FDE address format: function relative, ");
+				return 0;
+			case CFI_ADDRESS_TYPE_TEXT_RELATIVE:
+				TRACE_CFI("FDE address format: text relative, ");
+				return file->TextSegment()->LoadAddress();
+			case CFI_ADDRESS_TYPE_DATA_RELATIVE:
+				TRACE_CFI("FDE address format: data relative, ");
+				return file->DataSegment()->LoadAddress();
+			case CFI_ADDRESS_TYPE_ALIGNED:
+			case CFI_ADDRESS_TYPE_INDIRECT:
+				TRACE_CFI("FDE address format: UNIMPLEMENTED, ");
+				// TODO: implement
+				// -- note: type indirect is currently not generated
+				return 0;
+		}
+
+		return 0;
+	}
+
+	int8 EncodedAddressSize(char encoding, CompilationUnit* unit) const
+	{
+		switch (encoding & 0x07) {
+			case CFI_ADDRESS_FORMAT_ABSOLUTE:
+				return unit->AddressSize();
+			case CFI_ADDRESS_FORMAT_UNSIGNED_16:
+				return 2;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_32:
+				return 4;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_64:
+				return 8;
+		}
+
+		// TODO: gcc doesn't (currently) actually generate LEB128-formatted
+		// addresses. If that changes, we'll need to handle them accordingly
+		return 0;
+	}
+
+	uint8 FDEAddressType() const
+	{
+		return fAddressEncoding & 0x70;
+	}
+
+	target_addr_t ReadEncodedAddress(DataReader &reader,
+		ElfFile* file, ElfSection* debugFrameSection,
+		bool valueOnly = false) const
+	{
+		target_addr_t address = valueOnly ? 0 : FDEAddressOffset(file,
+			debugFrameSection);
+		switch (fAddressEncoding & 0x0f) {
+			case CFI_ADDRESS_FORMAT_ABSOLUTE:
+				address += reader.ReadAddress(0);
+				TRACE_CFI(" target address: %" B_PRId64 "\n", address);
+				break;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_LEB128:
+				address += reader.ReadUnsignedLEB128(0);
+				TRACE_CFI(" unsigned LEB128: %" B_PRId64 "\n", address);
+				break;
+			case CFI_ADDRESS_FORMAT_SIGNED_LEB128:
+				address += reader.ReadSignedLEB128(0);
+				TRACE_CFI(" signed LEB128: %" B_PRId64 "\n", address);
+				break;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_16:
+				address += reader.Read<uint16>(0);
+				TRACE_CFI(" unsigned 16-bit: %" B_PRId64 "\n", address);
+				break;
+			case CFI_ADDRESS_FORMAT_SIGNED_16:
+				address += reader.Read<int16>(0);
+				TRACE_CFI(" signed 16-bit: %" B_PRId64 "\n", address);
+				break;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_32:
+				address += reader.Read<uint32>(0);
+				TRACE_CFI(" unsigned 32-bit: %" B_PRId64 "\n", address);
+				break;
+			case CFI_ADDRESS_FORMAT_SIGNED_32:
+				address += reader.Read<int32>(0);
+				TRACE_CFI(" signed 32-bit: %" B_PRId64 "\n", address);
+				break;
+			case CFI_ADDRESS_FORMAT_UNSIGNED_64:
+				address += reader.Read<uint64>(0);
+				TRACE_CFI(" unsigned 64-bit: %" B_PRId64 "\n", address);
+				break;
+			case CFI_ADDRESS_FORMAT_SIGNED_64:
+				address += reader.Read<int64>(0);
+				TRACE_CFI(" signed 64-bit: %" B_PRId64 "\n", address);
+				break;
+		}
+
+		return address;
+	}
+
+
 private:
 	const char*	fString;
 	uint32		fFlags;
+	int8		fAddressEncoding;
 };
 
 
@@ -601,14 +748,15 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit, uint8 addressSize,
 
 
 status_t
-DwarfFile::EvaluateExpression(CompilationUnit* unit,
+DwarfFile::EvaluateExpression(CompilationUnit* unit, uint8 addressSize,
 	DIESubprogram* subprogramEntry, const void* expression,
 	off_t expressionLength, const DwarfTargetInterface* targetInterface,
 	target_addr_t instructionPointer, target_addr_t framePointer,
 	target_addr_t valueToPush, bool pushValue, target_addr_t& _result)
 {
-	ExpressionEvaluationContext context(this, unit, subprogramEntry,
-		targetInterface, instructionPointer, 0, false, framePointer, 0);
+	ExpressionEvaluationContext context(this, unit, addressSize,
+		subprogramEntry, targetInterface, instructionPointer, 0, false,
+		framePointer, 0);
 	DwarfExpressionEvaluator evaluator(&context);
 
 	if (pushValue && evaluator.Push(valueToPush) != B_OK)
@@ -619,7 +767,7 @@ DwarfFile::EvaluateExpression(CompilationUnit* unit,
 
 
 status_t
-DwarfFile::ResolveLocation(CompilationUnit* unit,
+DwarfFile::ResolveLocation(CompilationUnit* unit, uint8 addressSize,
 	DIESubprogram* subprogramEntry, const LocationDescription* location,
 	const DwarfTargetInterface* targetInterface,
 	target_addr_t instructionPointer, target_addr_t objectPointer,
@@ -635,9 +783,9 @@ DwarfFile::ResolveLocation(CompilationUnit* unit,
 		return error;
 
 	// evaluate it
-	ExpressionEvaluationContext context(this, unit, subprogramEntry,
-		targetInterface, instructionPointer, objectPointer, hasObjectPointer,
-		framePointer, relocationDelta);
+	ExpressionEvaluationContext context(this, unit, addressSize,
+		subprogramEntry, targetInterface, instructionPointer, objectPointer,
+		hasObjectPointer, framePointer, relocationDelta);
 	DwarfExpressionEvaluator evaluator(&context);
 	return evaluator.EvaluateLocation(expression, expressionLength,
 		_result);
@@ -645,7 +793,7 @@ DwarfFile::ResolveLocation(CompilationUnit* unit,
 
 
 status_t
-DwarfFile::EvaluateConstantValue(CompilationUnit* unit,
+DwarfFile::EvaluateConstantValue(CompilationUnit* unit, uint8 addressSize,
 	DIESubprogram* subprogramEntry, const ConstantAttributeValue* value,
 	const DwarfTargetInterface* targetInterface,
 	target_addr_t instructionPointer, target_addr_t framePointer,
@@ -664,9 +812,10 @@ DwarfFile::EvaluateConstantValue(CompilationUnit* unit,
 		case ATTRIBUTE_CLASS_BLOCK:
 		{
 			target_addr_t result;
-			status_t error = EvaluateExpression(unit, subprogramEntry,
-				value->block.data, value->block.length, targetInterface,
-				instructionPointer, framePointer, 0, false, result);
+			status_t error = EvaluateExpression(unit, addressSize,
+				subprogramEntry, value->block.data, value->block.length,
+				targetInterface, instructionPointer, framePointer, 0, false,
+				result);
 			if (error != B_OK)
 				return error;
 
@@ -680,7 +829,7 @@ DwarfFile::EvaluateConstantValue(CompilationUnit* unit,
 
 
 status_t
-DwarfFile::EvaluateDynamicValue(CompilationUnit* unit,
+DwarfFile::EvaluateDynamicValue(CompilationUnit* unit, uint8 addressSize,
 	DIESubprogram* subprogramEntry, const DynamicAttributeValue* value,
 	const DwarfTargetInterface* targetInterface,
 	target_addr_t instructionPointer, target_addr_t framePointer,
@@ -763,9 +912,9 @@ DwarfFile::EvaluateDynamicValue(CompilationUnit* unit,
 			if (constantValue == NULL || !constantValue->IsValid())
 				return B_BAD_VALUE;
 
-			status_t error = EvaluateConstantValue(unit, subprogramEntry,
-				constantValue, targetInterface, instructionPointer,
-				framePointer, _result);
+			status_t error = EvaluateConstantValue(unit, addressSize,
+				subprogramEntry, constantValue, targetInterface,
+				instructionPointer, framePointer, _result);
 			if (error != B_OK)
 				return error;
 
@@ -776,9 +925,10 @@ DwarfFile::EvaluateDynamicValue(CompilationUnit* unit,
 		case ATTRIBUTE_CLASS_BLOCK:
 		{
 			target_addr_t result;
-			status_t error = EvaluateExpression(unit, subprogramEntry,
-				value->block.data, value->block.length, targetInterface,
-				instructionPointer, framePointer, 0, false, result);
+			status_t error = EvaluateExpression(unit, addressSize,
+				subprogramEntry, value->block.data, value->block.length,
+				targetInterface, instructionPointer, framePointer, 0, false,
+				result);
 			if (error != B_OK)
 				return error;
 
@@ -1386,27 +1536,48 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 		} else {
 			// this is a FDE
 			uint64 initialLocationOffset = dataReader.Offset();
-			target_addr_t initialLocation = dataReader.ReadAddress(0);
-			target_size_t addressRange = dataReader.ReadAddress(0);
+			// In .eh_frame the CIE offset is a relative back offset.
+			if (usingEHFrameSection) {
+				if (cieID > (uint64)lengthOffset) {
+					TRACE_CFI("Invalid CIE offset: %" B_PRIu64 ", max "
+						"possible: %" B_PRIu64 "\n", cieID, lengthOffset);
+					break;
+				}
+				// convert to a section relative offset
+				cieID = lengthOffset - cieID;
+			}
+
+
+			CfaContext context;
+			CIEAugmentation cieAugmentation;
+			// when using .eh_frame format, we need to parse the CIE's
+			// augmentation up front in order to know how the FDE's addresses
+			//  will be represented
+			DataReader cieReader;
+			off_t cieRemaining;
+			status_t error = _ParseCIEHeader(currentFrameSection,
+				usingEHFrameSection, unit, addressSize, context, cieID,
+				cieAugmentation, cieReader, cieRemaining);
+			if (error != B_OK)
+				return error;
+			if (cieReader.HasOverflow())
+				return B_BAD_DATA;
+			if (cieRemaining < 0)
+				return B_BAD_DATA;
+
+			target_addr_t initialLocation = cieAugmentation.ReadEncodedAddress(
+				dataReader, fElfFile, currentFrameSection);
+			target_addr_t addressRange = cieAugmentation.ReadEncodedAddress(
+				dataReader, fElfFile, currentFrameSection, true);
 
 			if (dataReader.HasOverflow())
 				return B_BAD_DATA;
 
-			// In the GCC 4 .eh_frame initialLocation is relative to the offset
-			// of the address.
-			if (usingEHFrameSection && gcc4EHFrameSection) {
-				// Note: We need to cast to the exact address width, since the
-				// initialLocation value can be (and likely is) negative.
-				if (dwarf64) {
-					initialLocation = (uint64)currentFrameSection
-						->LoadAddress()	+ (uint64)initialLocationOffset
-						+ (uint64)initialLocation;
-				} else {
-					initialLocation = (uint32)currentFrameSection
-						->LoadAddress()	+ (uint32)initialLocationOffset
-						+ (uint32)initialLocation;
-				}
+			if ((cieAugmentation.FDEAddressType()
+					& CFI_ADDRESS_TYPE_PC_RELATIVE) != 0) {
+				initialLocation += initialLocationOffset;
 			}
+
 			// TODO: For GCC 2 .eh_frame sections things work differently: The
 			// initial locations are relocated by the runtime loader and
 			// afterwards point to the absolute addresses. Fortunately the
@@ -1426,25 +1597,14 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 				if (remaining < 0)
 					return B_BAD_DATA;
 
-				// In .eh_frame the CIE offset is a relative back offset.
-				if (usingEHFrameSection) {
-					if (cieID > (uint64)lengthOffset) {
-						TRACE_CFI("Invalid CIE offset: %" B_PRIu64 ", max "
-							"possible: %" B_PRIu64 "\n", cieID, lengthOffset);
-						break;
-					}
-					// convert to a section relative offset
-					cieID = lengthOffset - cieID;
-				}
-
 				TRACE_CFI("  found fde: length: %" B_PRIu64 " (%" B_PRIdOFF
 					"), CIE offset: %#" B_PRIx64 ", location: %#" B_PRIx64 ", "
 					"range: %#" B_PRIx64 "\n", length, remaining, cieID,
 					initialLocation, addressRange);
 
-				CfaContext context(location, initialLocation);
+				context.SetLocation(location, initialLocation);
 				uint32 registerCount = outputInterface->CountRegisters();
-				status_t error = context.Init(registerCount);
+				error = context.Init(registerCount);
 				if (error != B_OK)
 					return error;
 
@@ -1452,10 +1612,10 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 				if (error != B_OK)
 					return error;
 
-				// process the CIE
-				CIEAugmentation cieAugmentation;
-				error = _ParseCIE(currentFrameSection, usingEHFrameSection,
-					unit, addressSize, context, cieID, cieAugmentation);
+				// process the CIE's frame info instructions
+				cieReader = cieReader.RestrictedReader(cieRemaining);
+				error = _ParseFrameInfoInstructions(unit, context,
+					cieReader, cieAugmentation);
 				if (error != B_OK)
 					return error;
 
@@ -1479,7 +1639,7 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 				DataReader restrictedReader =
 					dataReader.RestrictedReader(remaining);
 				error = _ParseFrameInfoInstructions(unit, context,
-					restrictedReader);
+					restrictedReader, cieAugmentation);
 				if (error != B_OK)
 					return error;
 
@@ -1503,7 +1663,8 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 					}
 					case CFA_CFA_RULE_EXPRESSION:
 					{
-						error = EvaluateExpression(unit, subprogramEntry,
+						error = EvaluateExpression(unit, addressSize,
+							subprogramEntry,
 							cfaCfaRule->Expression().block,
 							cfaCfaRule->Expression().size,
 							inputInterface, location, 0, 0, false,
@@ -1577,7 +1738,8 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 							TRACE_CFI("  -> CFA_RULE_LOCATION_EXPRESSION\n");
 
 							target_addr_t address;
-							error = EvaluateExpression(unit, subprogramEntry,
+							error = EvaluateExpression(unit, addressSize,
+								subprogramEntry,
 								rule->Expression().block,
 								rule->Expression().size,
 								inputInterface, location, frameAddress,
@@ -1595,7 +1757,8 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 							TRACE_CFI("  -> CFA_RULE_VALUE_EXPRESSION\n");
 
 							target_addr_t value;
-							error = EvaluateExpression(unit, subprogramEntry,
+							error = EvaluateExpression(unit, addressSize,
+								subprogramEntry,
 								rule->Expression().block,
 								rule->Expression().size,
 								inputInterface, location, frameAddress,
@@ -1624,14 +1787,15 @@ DwarfFile::_UnwindCallFrame(bool usingEHFrameSection, CompilationUnit* unit,
 
 
 status_t
-DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
-	CompilationUnit* unit, uint8 addressSize, CfaContext& context,
-	off_t cieOffset, CIEAugmentation& cieAugmentation)
+DwarfFile::_ParseCIEHeader(ElfSection* debugFrameSection,
+	bool usingEHFrameSection, CompilationUnit* unit, uint8 addressSize,
+	CfaContext& context, off_t cieOffset, CIEAugmentation& cieAugmentation,
+	DataReader& dataReader, off_t& _cieRemaining)
 {
 	if (cieOffset < 0 || cieOffset >= debugFrameSection->Size())
 		return B_BAD_DATA;
 
-	DataReader dataReader((uint8*)debugFrameSection->Data() + cieOffset,
+	dataReader.SetTo((uint8*)debugFrameSection->Data() + cieOffset,
 		debugFrameSection->Size() - cieOffset, unit != NULL
 			? unit->AddressSize() : addressSize);
 
@@ -1691,19 +1855,18 @@ DwarfFile::_ParseCIE(ElfSection* debugFrameSection, bool usingEHFrameSection,
 
 	if (dataReader.HasOverflow())
 		return B_BAD_DATA;
-	off_t remaining = (off_t)length
-		- (dataReader.Offset() - lengthOffset);
-	if (remaining < 0)
+
+	_cieRemaining = length -(dataReader.Offset() - lengthOffset);
+	if (_cieRemaining < 0)
 		return B_BAD_DATA;
 
-	DataReader restrictedReader = dataReader.RestrictedReader(remaining);
-	return _ParseFrameInfoInstructions(unit, context, restrictedReader);
+	return B_OK;
 }
 
 
 status_t
 DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
-	CfaContext& context, DataReader& dataReader)
+	CfaContext& context, DataReader& dataReader, CIEAugmentation& augmentation)
 {
 	while (dataReader.BytesRemaining() > 0) {
 		TRACE_CFI("    [%2" B_PRId64 "]", dataReader.BytesRemaining());
@@ -1754,7 +1917,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				}
 				case DW_CFA_set_loc:
 				{
-					target_addr_t location = dataReader.ReadAddress(0);
+					target_addr_t location = augmentation.ReadEncodedAddress(
+							dataReader, fElfFile, fDebugFrameSection);
 
 					TRACE_CFI("    DW_CFA_set_loc: %#" B_PRIx64 "\n", location);
 

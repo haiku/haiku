@@ -601,7 +601,7 @@ WARN_LOGFILE           =
 INPUT                  = . \
                          app \
                          drivers \
-						 game \
+                         game \
                          interface \
                          keyboard \
                          locale \
@@ -614,6 +614,7 @@ INPUT                  = . \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/USB3.h \
                          ../../headers/os/drivers/USB_spec.h \
+                         ../../headers/os/game \
                          ../../headers/os/interface \
                          ../../headers/os/locale \
                          ../../headers/os/media \

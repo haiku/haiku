@@ -104,7 +104,7 @@ MemoryView::Draw(BRect rect)
 {
 	rect = Bounds();
 
-	float divider = 9 * fCharWidth;
+	float divider = (fTargetAddressSize + 1) * fCharWidth;
 	StrokeLine(BPoint(divider, rect.top),
 				BPoint(divider, rect.bottom));
 

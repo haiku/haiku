@@ -81,6 +81,7 @@ public:
 									{ return fTargetInterface; }
 			RegisterMap*		FromDwarfRegisterMap() const
 									{ return fFromDwarfRegisterMap; }
+			uint8			AddressSize() const;
 
 private:
 			Architecture*		fArchitecture;

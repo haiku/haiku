@@ -42,6 +42,8 @@ class StyledEditView : public BTextView {
 		uint32 		GetEncoding() const;
 
 	private:
+		void		_UpdateStatus();
+
 		BMessenger 	*fMessenger;
 		bool		fSuppressChanges;
 		BString		fEncoding;

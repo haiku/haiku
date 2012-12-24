@@ -1488,7 +1488,7 @@ TTracker::CloseParent(node_ref parent)
 void
 TTracker::ShowSettingsWindow()
 {
-	if (!fSettingsWindow) {
+	if (fSettingsWindow == NULL) {
 		fSettingsWindow = new TrackerSettingsWindow();
 		fSettingsWindow->Show();
 	} else {

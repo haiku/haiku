@@ -1,7 +1,6 @@
-1	ukrainian	x-vnd.Be-TSKB	1095421712
+1	ukrainian	x-vnd.Be-TSKB	1782938413
 Power off	DeskbarMenu		Вимкнути
 Edit menu…	PreferencesWindow		Редагувати меню…
-Applications	PreferencesWindow		Додатки
 Recent documents:	PreferencesWindow		Недавні документи:
 Recent applications	DeskbarMenu		Останні програми
 Sort running applications	PreferencesWindow		Сортувати додатки, що запущені
@@ -18,7 +17,6 @@ No windows	WindowMenu		Немає вікон
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Перезавантажити систему
 Auto-raise	PreferencesWindow		Автоспливання
-Hide time	TimeView		Сховати час
 Recent folders:	PreferencesWindow		Недавні папки:
 Show application expander	PreferencesWindow		Показувати додаток expander
 Restart Tracker	DeskbarMenu		Перезавантажити Tracker
@@ -35,7 +33,6 @@ Show calendar…	TimeView		Показати календар…
 Deskbar preferences…	DeskbarMenu		Налаштування Deskbar...
 Expand new applications	PreferencesWindow		Розпакувати нові додатки
 Show replicants	DeskbarMenu		Показати репліканти
-Clock	PreferencesWindow		Годинник
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Аплети екрану
 Hide all	WindowMenu		Сховати все

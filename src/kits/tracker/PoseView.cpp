@@ -6956,6 +6956,7 @@ BPoseView::_EndSelectionRect()
 		SetDrawingMode(B_OP_INVERT);
 		StrokeRect(fSelectionRectInfo.rect, B_MIXED_COLORS);
 		SetDrawingMode(B_OP_COPY);
+		fSelectionRectInfo.rect.Set(0, 0, -1, -1);
 	} else {
 		Invalidate(fSelectionRectInfo.rect);
 		fSelectionRectInfo.rect.Set(0, 0, -1, -1);

@@ -23,8 +23,8 @@ SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr checkfs
 	zmore znew
 ;
 
-SYSTEM_APPS = AboutSystem ActivityMonitor DriveSetup Installer NetworkStatus
-	ProcessController StyledEdit Terminal
+SYSTEM_APPS = AboutSystem ActivityMonitor Debugger DriveSetup Installer
+	NetworkStatus ProcessController StyledEdit Terminal
 ;
 
 SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes

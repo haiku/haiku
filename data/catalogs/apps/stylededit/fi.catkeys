@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-StyledEdit	1508367857
+1	finnish	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		Tyylitetty editori
 Paste	Menus		Liitä
 OK	LoadAlert		Valmis
@@ -7,7 +7,6 @@ File	Menus		Tiedosto
 Lines:	Statistics		Rivejä:
 Italic	Menus		Kursivointi
 Left	Menus		Vasen
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Palauta viimeinen ”%s”-versio? 
 Search backwards	FindandReplaceWindow		Etsi taaksepäin
 Size	Menus		Koko
 Save	QuitAlert		Tallenna
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Peru
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: ”%s”.
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
 Green	Menus		Vihreä
-Revert to saved…	Menus		Palauta tallennettuun…
 Yellow	Menus		Keltainen
 Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
 Wrap lines	Menus		Rivitä

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	1508367857
+1	japanese	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		StyledEdit
 Paste	Menus		貼り付け
 OK	LoadAlert		OK
@@ -7,7 +7,6 @@ File	Menus		ファイル
 Lines:	Statistics		行数:
 Italic	Menus		イタリック
 Left	Menus		左揃え
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		\"%s\" を最後に保存した内容へ戻しますか？
 Search backwards	FindandReplaceWindow		逆方向検索
 Size	Menus		サイズ
 Save	QuitAlert		保存
@@ -20,7 +19,6 @@ Cancel	SaveAlert		中止
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
 Case-sensitive	FindandReplaceWindow		大文字と小文字を区別する
 Green	Menus		緑
-Revert to saved…	Menus		最新保存版に戻す…
 Yellow	Menus		黄
 Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
 Wrap lines	Menus		ワードラップ

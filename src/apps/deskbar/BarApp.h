@@ -75,8 +75,6 @@ struct desk_settings {
 	bool vertical;
 	bool left;
 	bool top;
-	bool showSeconds;
-	bool showDayOfWeek;
 	uint32 state;
 	float width;
 	BPoint switcherLoc;
@@ -97,6 +95,12 @@ struct desk_settings {
 	bool recentAppsEnabled;
 	bool recentDocsEnabled;
 	bool recentFoldersEnabled;
+};
+
+struct clock_settings {
+	bool showSeconds;
+	bool showDayOfWeek;
+	bool showTimeZone;
 };
 
 class BFile;
@@ -132,6 +136,7 @@ class TBarApp : public BApplication {
 		virtual void RefsReceived(BMessage* refs);
 
 		desk_settings* Settings() { return &fSettings; }
+		clock_settings* ClockSettings() { return &fClockSettings; }
 		TBarView* BarView() const { return fBarView; }
 		TBarWindow* BarWindow() const { return fBarWindow; }
 
@@ -156,7 +161,9 @@ class TBarApp : public BApplication {
 		BMessenger fSwitcherMessenger;
 		BMessenger fStatusViewMessenger;
 		BFile* fSettingsFile;
+		BFile* fClockSettingsFile;
 		desk_settings fSettings;
+		clock_settings fClockSettings;
 
 		PreferencesWindow* fPreferencesWindow;
 

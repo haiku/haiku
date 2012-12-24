@@ -56,6 +56,7 @@ public:
 									target_addr_t& _framePointer);
 
 			status_t			EvaluateExpression(CompilationUnit* unit,
+									uint8 addressSize,
 									DIESubprogram* subprogramEntry,
 									const void* expression,
 									off_t expressionLength,
@@ -65,6 +66,7 @@ public:
 									target_addr_t valueToPush, bool pushValue,
 									target_addr_t& _result);
 			status_t			ResolveLocation(CompilationUnit* unit,
+									uint8 addressSize,
 									DIESubprogram* subprogramEntry,
 									const LocationDescription* location,
 									const DwarfTargetInterface* targetInterface,
@@ -79,13 +81,14 @@ public:
 									// bit offsets/sizes (cf. bit pieces).
 
 			status_t			EvaluateConstantValue(CompilationUnit* unit,
+									uint8 addressSize,
 									DIESubprogram* subprogramEntry,
 									const ConstantAttributeValue* value,
 									const DwarfTargetInterface* targetInterface,
 									target_addr_t instructionPointer,
 									target_addr_t framePointer,
 									BVariant& _result);
-			status_t			EvaluateDynamicValue(CompilationUnit* unit,
+			status_t			EvaluateDynamicValue(CompilationUnit* unit, uint8 addressSize,
 									DIESubprogram* subprogramEntry,
 									const DynamicAttributeValue* value,
 									const DwarfTargetInterface* targetInterface,
@@ -123,15 +126,18 @@ private:
 									DwarfTargetInterface* outputInterface,
 									target_addr_t& _framePointer);
 
-			status_t			_ParseCIE(ElfSection* debugFrameSection,
+			status_t			_ParseCIEHeader(ElfSection* debugFrameSection,
 									bool usingEHFrameSection,
 									CompilationUnit* unit,
 									uint8 addressSize,
 									CfaContext& context, off_t cieOffset,
-									CIEAugmentation& cieAugmentation);
+									CIEAugmentation& cieAugmentation,
+									DataReader& reader,
+									off_t& _cieRemaining);
 			status_t			_ParseFrameInfoInstructions(
 									CompilationUnit* unit, CfaContext& context,
-									DataReader& dataReader);
+									DataReader& dataReader,
+									CIEAugmentation& cieAugmentation);
 
 			status_t			_ParsePublicTypesInfo();
 			status_t			_ParsePublicTypesInfo(DataReader& dataReader,

@@ -182,6 +182,7 @@ allocate_device_interface(net_device* device, net_device_module_info* module)
 	interface->device = device;
 	interface->up_count = 0;
 	interface->ref_count = 1;
+	interface->monitor_count = 0;
 	interface->deframe_func = NULL;
 	interface->deframe_ref_count = 0;
 

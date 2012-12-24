@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-StyledEdit	1799001682
+1	romanian	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		EditorText
 Paste	Menus		Lipește
 OK	LoadAlert		OK
@@ -19,7 +19,6 @@ Cancel	SaveAlert		Anulează
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, nu s-a găsit fișierul: „%s”.
 Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
 Green	Menus		Verde
-Revert to saved…	Menus		Revenire la salvat...
 Yellow	Menus		Galben
 Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
 Wrap lines	Menus		Încadrează linii

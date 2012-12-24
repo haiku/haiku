@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-StyledEdit	1508367857
+1	lithuanian	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		Rašyklė
 Paste	Menus		Įdėti
 OK	LoadAlert		Gerai
@@ -7,7 +7,6 @@ File	Menus		Failas
 Lines:	Statistics		Eilučių:
 Italic	Menus		Kursyvas
 Left	Menus		Kairinė
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Grįžti prie paskutinės „%s“ versijos? 
 Search backwards	FindandReplaceWindow		Ieškoti viršun
 Size	Menus		Dydis
 Save	QuitAlert		Įrašyti
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Atsisakyti
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, failas nerastas: „%s“.
 Case-sensitive	FindandReplaceWindow		Paisyti raidžių registro
 Green	Menus		Žalia
-Revert to saved…	Menus		Grįžti prie įrašyto…
 Yellow	Menus		Geltona
 Replace in all windows	FindandReplaceWindow		Keisti visuose languose
 Wrap lines	Menus		Laužyti eilutes

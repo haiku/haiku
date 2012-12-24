@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	1508367857
+1	french	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		Éditeur stylé
 Paste	Menus		Coller
 OK	LoadAlert		OK
@@ -7,7 +7,6 @@ File	Menus		Fichier
 Lines:	Statistics		Lignes :
 Italic	Menus		Italique
 Left	Menus		À gauche
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Retourner à la dernière version de « %s » ? 
 Search backwards	FindandReplaceWindow		Chercher en arrière
 Size	Menus		Taille
 Save	QuitAlert		Sauvegarder
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Annuler
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rétablissement impossible, fichier non trouvé : « %s ».
 Case-sensitive	FindandReplaceWindow		Sensible à la casse
 Green	Menus		Vert
-Revert to saved…	Menus		Revenir à la dernière version enregistrée…
 Yellow	Menus		Jaune
 Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
 Wrap lines	Menus		Retour à la ligne

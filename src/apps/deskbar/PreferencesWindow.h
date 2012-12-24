@@ -10,7 +10,6 @@
 
 
 const uint32 kConfigShow			= 'show';
-const uint32 kConfigClose			= 'canc';
 const uint32 kUpdateRecentCounts	= 'upct';
 const uint32 kEditMenuInTracker		= 'mtrk';
 
@@ -23,14 +22,10 @@ const uint32 kResizeTeamIcons		= 'RTIs';
 const uint32 kAutoRaise				= 'AtRs';
 const uint32 kAutoHide				= 'AtHd';
 
-const uint32 kShowHideTime			= 'ShTm';
-const uint32 kShowSeconds			= 'SwSc';
-const uint32 kShowDayOfWeek			= 'SwDw';
-
-
 class BBox;
 class BButton;
 class BCheckBox;
+class BListView;
 class BRadioButton;
 class BSlider;
 class BStringView;
@@ -43,16 +38,17 @@ public:
 							~PreferencesWindow();
 
 		virtual	void		MessageReceived(BMessage* message);
+		virtual	bool		QuitRequested();
 		virtual	void		WindowActivated(bool active);
 
 				void		UpdateRecentCounts();
 				void		EnableDisableDependentItems();
 
 private:
-			BBox*			fMenuBox;
-			BBox*			fAppsBox;
-			BBox*			fClockBox;
-			BBox*			fWindowBox;
+				void		_HandleChangedSettingsView();
+
+			BListView*		fSettingsTypeListView;
+			BBox*			fSettingsContainerBox;
 
 			BCheckBox*		fMenuRecentDocuments;
 			BCheckBox*		fMenuRecentApplications;
@@ -72,9 +68,6 @@ private:
 			BCheckBox*		fWindowAlwaysOnTop;
 			BCheckBox*		fWindowAutoRaise;
 			BCheckBox*		fWindowAutoHide;
-
-			BCheckBox*		fShowSeconds;
-			BCheckBox*		fShowDayOfWeek;
 };
 
 

@@ -1,21 +1,17 @@
-1	english	x-vnd.Be-TSKB	3197510812
+1	english	x-vnd.Be-TSKB	3155357024
 Power off	DeskbarMenu		关闭电源
-Show day of week	PreferencesWindow		显示星期
 Edit menu…	PreferencesWindow		编辑菜单
 Suspend	DeskbarMenu		挂起
-Applications	PreferencesWindow		应用程序
 Time preferences…	TimeView		时间设置...
 About Haiku	DeskbarMenu		关于Haiku
 Recent documents:	PreferencesWindow		最近文档：
 Recent applications	DeskbarMenu		最近程序
 Sort running applications	PreferencesWindow		运行程序排序
-Show time	Tray		显示时间
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		应用程序
 Find…	DeskbarMenu		查找...
 Window	PreferencesWindow		窗口
 Menu	PreferencesWindow		菜单
 Recent documents	DeskbarMenu		最近文档：
-Show seconds	PreferencesWindow		显示秒
 Auto-hide	PreferencesWindow		自动隐藏
 Always on top	PreferencesWindow		置顶
 <Deskbar folder is empty>	DeskbarMenu		<桌面栏目录为空>
@@ -25,7 +21,6 @@ Deskbar	System name		桌面栏
 Restart system	DeskbarMenu		重启系统
 Large	PreferencesWindow		大
 Auto-raise	PreferencesWindow		自动
-Hide time	TimeView		隐藏时间
 Recent folders:	PreferencesWindow		最近文件夹：
 Show application expander	PreferencesWindow		显示程序扩展
 Restart Tracker	DeskbarMenu		重启Tracker
@@ -44,7 +39,6 @@ Deskbar preferences…	DeskbarMenu		桌面栏首选项...
 Expand new applications	PreferencesWindow		展开新程序
 Show replicants	DeskbarMenu		显示 replicants
 Hide application names	PreferencesWindow		隐藏应用名称
-Clock	PreferencesWindow		时钟
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		演示程序
 Icon size	PreferencesWindow		图标尺寸
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		桌面插件

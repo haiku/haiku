@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-StyledEdit	1508367857
+1	hindi	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		StyledEdit
 Paste	Menus		पेस्ट
 OK	LoadAlert		ठीक है
@@ -7,7 +7,6 @@ File	Menus		फ़ाइल
 Lines:	Statistics		लाइनें:
 Italic	Menus		तिरछे अक्षर
 Left	Menus		बाएं
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		पिछले संस्करण \"%s\" पर जाए? 
 Search backwards	FindandReplaceWindow		पीछे ढूँढें
 Size	Menus		आकार
 Save	QuitAlert		सहेजें
@@ -20,7 +19,6 @@ Cancel	SaveAlert		रद्द
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		वापस नहीं कर सकते, फ़ाइल नहीं मिली : \"%s\".
 Case-sensitive	FindandReplaceWindow		केस संवेदी
 Green	Menus		हरा
-Revert to saved…	Menus		सहेजी स्थिति पर लौटे
 Yellow	Menus		पीला
 Replace in all windows	FindandReplaceWindow		सभी विंडो में बदलें
 Wrap lines	Menus		रेखाएं लपेटें

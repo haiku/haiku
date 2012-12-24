@@ -361,7 +361,7 @@
 
 
 /*!
-	\fn status_tBMimeType::GetFileExtensions(BMessage *extensions) const
+	\fn status_t BMimeType::GetFileExtensions(BMessage *extensions) const
 	\brief Fetches the MIME type's associated filename extensions from the
 		MIME database.
 
@@ -525,9 +525,8 @@
 */
 
 
-// 
 /*!
-	\fn status_t BMimeType::SetP0referredApp(const char *signature,
+	\fn status_t BMimeType::SetPreferredApp(const char *signature,
 		app_verb verb)
 	\brief Sets the preferred application for the MIME type.
 
@@ -832,12 +831,12 @@
 	mini icon. Additionally, the bitmap must be in the \c B_CMAP8 color space
 	(8-bit color).
 
-	\param type Pointer to a pre-allocated string containing the MIME type whose
-	            custom icon you wish to fetch.
+	\param type Pointer to a pre-allocated string containing the MIME type
+		whose custom icon you wish to fetch.
 	\param icon Pointer to a pre-allocated \c BBitmap of proper size and
-				colorspace into which the icon is copied.
-	\param icon_size Value that specifies which icon to return. Currently
-					 \c B_LARGE_ICON and \c B_MINI_ICON are supported.
+		colorspace into which the icon is copied.
+	\param which Value that specifies which icon to return. Currently
+		\c B_LARGE_ICON and \c B_MINI_ICON are supported.
 
 	\returns A status code.
 	\retval B_OK Success

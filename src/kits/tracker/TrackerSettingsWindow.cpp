@@ -135,19 +135,10 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 bool
 TrackerSettingsWindow::QuitRequested()
 {
-	bool isHidden = false;
-
-	if (Lock()) {
-		isHidden = IsHidden();
-		Unlock();
-	} else
-		return true;
-
-	if (isHidden)
+	if (IsHidden())
 		return true;
 
 	Hide();
-
 	return false;
 }
 
@@ -279,14 +270,14 @@ TrackerSettingsWindow::_HandleChangedSettingsView()
 
 	BView* oldView = fSettingsContainerBox->ChildAt(0);
 
-	if (oldView)
+	if (oldView != NULL)
 		oldView->RemoveSelf();
 
 	SettingsItem* selectedItem =
 		dynamic_cast<SettingsItem*>
 			(fSettingsTypeListView->ItemAt(currentSelection));
 
-	if (selectedItem) {
+	if (selectedItem != NULL) {
 		fSettingsContainerBox->SetLabel(selectedItem->Text());
 
 		BView* view = selectedItem->View();

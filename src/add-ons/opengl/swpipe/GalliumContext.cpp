@@ -26,9 +26,10 @@ extern "C" {
 #include "state_tracker/st_gl_api.h"
 #include "state_tracker/st_manager.h"
 #include "state_tracker/sw_winsys.h"
-#include "softpipe/sp_public.h"
 #ifdef HAVE_LLVM
 #include "llvmpipe/lp_public.h"
+#else
+#include "softpipe/sp_public.h"
 #endif
 }
 
@@ -51,6 +52,11 @@ hgl_viewport(struct gl_context* glContext, GLint x, GLint y,
 	TRACE("%s(glContext: %p, x: %d, y: %d, width: %d, height: %d\n", __func__,
 		glContext, x, y, width, height);
 	struct hgl_context *context = (struct hgl_context*)glContext->DriverCtx;
+
+	if (!context) {
+		ERROR("%s: No context yet. bailing.\n", __func__);
+		return;
+	}
 
 	int32 bitmapWidth;
 	int32 bitmapHeight;
@@ -207,10 +213,9 @@ GalliumContext::CreateScreen()
 
 	#ifdef HAVE_LLVM
 	fScreen = llvmpipe_create_screen(winsys);
+	#else
+	fScreen = softpipe_create_screen(winsys);
 	#endif
-
-	if (fScreen == NULL)
-		fScreen = softpipe_create_screen(winsys);
 
 	if (fScreen == NULL) {
 		ERROR("%s: Couldn't create screen!\n", __FUNCTION__);

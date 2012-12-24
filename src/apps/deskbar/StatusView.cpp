@@ -147,14 +147,8 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 		fMinimumTrayWidth = sMinimumWindowWidth - kGutter - kDragRegionWidth;
 	}
 
-	BFormattingConventions conventions;
-	BLocale::Default()->GetFormattingConventions(&conventions);
-	bool use24HourClock = conventions.Use24HourClock();
-	desk_settings* settings = ((TBarApp*)be_app)->Settings();
-
 	// Create the time view
-	fTime = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0,
-		use24HourClock, settings->showSeconds, settings->showDayOfWeek);
+	fTime = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0);
 }
 
 
@@ -179,6 +173,12 @@ TReplicantTray::AttachedToWindow()
 	SetDrawingMode(B_OP_COPY);
 
 	Window()->SetPulseRate(1000000);
+
+	// Set clock settings
+	clock_settings* settings = ((TBarApp*)be_app)->ClockSettings();
+	fTime->SetShowSeconds(settings->showSeconds);
+	fTime->SetShowDayOfWeek(settings->showDayOfWeek);
+	fTime->SetShowTimeZone(settings->showTimeZone);
 
 	AddChild(fTime);
 	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - 1, 2);
@@ -279,10 +279,7 @@ TReplicantTray::MessageReceived(BMessage* message)
 			if (fTime == NULL)
 				return;
 
-			// Locale may have updated 12/24 hour clock
-			BFormattingConventions conventions;
-			BLocale::Default()->GetFormattingConventions(&conventions);
-			fTime->SetUse24HourClock(conventions.Use24HourClock());
+			fTime->Update();
 
 			// time string reformat -> realign
 			RealignReplicants();
@@ -316,6 +313,36 @@ TReplicantTray::MessageReceived(BMessage* message)
 			RealignReplicants();
 			AdjustPlacement();
 			break;
+
+		case kShowTimeZone:
+			if (fTime == NULL)
+				return;
+
+			fTime->SetShowTimeZone(!fTime->ShowTimeZone());
+
+			// time string reformat -> realign
+			RealignReplicants();
+			AdjustPlacement();
+			break;
+
+		case kGetClockSettings:
+		{
+			if (fTime == NULL)
+				return;
+
+			bool showClock = !fTime->IsHidden();
+			bool showSeconds = fTime->ShowSeconds();
+			bool showDayOfWeek = fTime->ShowDayOfWeek();
+			bool showTimeZone = fTime->ShowTimeZone();
+
+			BMessage* reply = new BMessage(kGetClockSettings);
+			reply->AddBool("showClock", showClock);
+			reply->AddBool("showSeconds", showSeconds);
+			reply->AddBool("showDayOfWeek", showDayOfWeek);
+			reply->AddBool("showTimeZone", showTimeZone);
+			message->SendReply(reply);
+			break;
+		}
 
 #ifdef DB_ADDONS
 		case B_NODE_MONITOR:
@@ -375,12 +402,12 @@ TReplicantTray::ShowReplicantMenu(BPoint point)
 	BPopUpMenu* menu = new BPopUpMenu("", false, false);
 	menu->SetFont(be_plain_font);
 
-	// If clock is visible show the extended menu, otherwise show "Show time"
+	// If clock is visible show the extended menu, otherwise show "Show clock"
 
 	if (!fTime->IsHidden())
 		fTime->ShowTimeOptions(ConvertToScreen(point));
 	else {
-		BMenuItem* item = new BMenuItem(B_TRANSLATE("Show time"),
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("Show clock"),
 			new BMessage(kShowHideTime));
 		menu->AddItem(item);
 		menu->SetTargetForItems(this);
@@ -411,6 +438,12 @@ TReplicantTray::ShowHideTime()
 
 	RealignReplicants();
 	AdjustPlacement();
+
+	// message Time preferences to update it's show time setting
+	BMessenger messenger("application/x-vnd.Haiku-Time");
+	BMessage* message = new BMessage(kShowHideTime);
+	message->AddBool("showClock", !fTime->IsHidden());
+	messenger.SendMessage(message);
 }
 
 
@@ -1235,9 +1268,10 @@ TReplicantTray::SaveTimeSettings()
 	if (fTime == NULL)
 		return;
 
-	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	clock_settings* settings = ((TBarApp*)be_app)->ClockSettings();
 	settings->showSeconds = fTime->ShowSeconds();
 	settings->showDayOfWeek = fTime->ShowDayOfWeek();
+	settings->showTimeZone = fTime->ShowTimeZone();
 }
 
 

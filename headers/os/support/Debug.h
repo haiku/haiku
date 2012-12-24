@@ -47,11 +47,13 @@ extern "C" {
 										PRINT(("%s\t", #OBJ));	\
 										(OBJ).PrintToStream(); 	\
 									} ((void)0)
-	#define TRACE()					_debugPrintf("File: %s, Line: %d, Thread: %ld\n", \
-										__FILE__, __LINE__, find_thread(NULL))
+	#define TRACE()					_debugPrintf("File: %s, Line: %d, Thread: %" \
+										B_PRId32 "\n", __FILE__, __LINE__, \
+										find_thread(NULL))
 
-	#define SERIAL_TRACE()			_sPrintf("File: %s, Line: %d, Thread: %ld\n", \
-										__FILE__, __LINE__, find_thread(NULL))
+	#define SERIAL_TRACE()			_sPrintf("File: %s, Line: %d, Thread: %" \
+										B_PRId32 "\n", __FILE__, __LINE__, \
+										find_thread(NULL))
 
 	#define DEBUGGER(MSG)			if (_rtDebugFlag) debugger(MSG)
 	#if !defined(ASSERT)

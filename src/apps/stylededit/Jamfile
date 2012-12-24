@@ -13,6 +13,7 @@ Application StyledEdit :
 	ColorMenuItem.cpp
 	FindWindow.cpp
 	ReplaceWindow.cpp
+	StatusView.cpp
 	StyledEditApp.cpp
 	StyledEditView.cpp
 	StyledEditWindow.cpp
@@ -26,6 +27,7 @@ DoCatalogs StyledEdit :
 	:
 	FindWindow.cpp
 	ReplaceWindow.cpp
+	StatusView.cpp
 	StyledEditApp.cpp
 	StyledEditWindow.cpp
 ;

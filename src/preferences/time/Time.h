@@ -14,6 +14,7 @@
 #include <Application.h>
 
 
+class BMessage;
 class TTimeWindow;
 
 
@@ -24,6 +25,8 @@ public:
 
 	virtual void				ReadyToRun();
 	virtual void				AboutRequested();
+
+	virtual void				MessageReceived(BMessage* message);
 
 private:
 			TTimeWindow*		fWindow;

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-StyledEdit	1508367857
+1	belarusian	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		Стыльны Рэдактар
 Paste	Menus		Уставіць
 OK	LoadAlert		Так
@@ -7,7 +7,6 @@ File	Menus		Файл
 Lines:	Statistics		Радкоў:
 Italic	Menus		Нахілены
 Left	Menus		Левы
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вярнуцца да апошняй версіі \"%s\"? 
 Search backwards	FindandReplaceWindow		Шукаць ў адваротным накірунку
 Size	Menus		Памер
 Save	QuitAlert		Захаваць
@@ -20,7 +19,6 @@ Cancel	SaveAlert		Адмена
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Немагчыма вярнуцца, файл \"%s\" ня знойдзены.
 Case-sensitive	FindandReplaceWindow		З улікам рэгістру
 Green	Menus		Зялёны
-Revert to saved…	Menus		Вярнуцца да захаванага…
 Yellow	Menus		Жоўты
 Replace in all windows	FindandReplaceWindow		Замяняць ва ўсіх вокнах
 Wrap lines	Menus		Пераносіць радкі

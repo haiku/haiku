@@ -903,7 +903,7 @@ OpenWithPoseView::HandleMessageDropped(BMessage* DEBUG_ONLY(message))
 #if DEBUG
 	// in debug mode allow tweaking the colors
 	const rgb_color* color;
-	int32 size;
+	ssize_t size;
 	// handle roColour-style color drops
 	if (message->FindData("RGBColor", 'RGBC', (const void**)&color, &size) == B_OK) {
 		SetViewColor(*color);

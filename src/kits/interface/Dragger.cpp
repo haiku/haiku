@@ -113,9 +113,10 @@ DraggerManager* DraggerManager::sDefaultInstance = NULL;
 }	// unnamed namespace
 
 
-BDragger::BDragger(BRect bounds, BView* target, uint32 resizeMask, uint32 flags)
+BDragger::BDragger(BRect frame, BView* target, uint32 resizingMode,
+	uint32 flags)
 	:
-	BView(bounds, "_dragger_", resizeMask, flags),
+	BView(frame, "_dragger_", resizingMode, flags),
 	fTarget(target),
 	fRelation(TARGET_UNKNOWN),
 	fShelf(NULL),

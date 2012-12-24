@@ -9,6 +9,7 @@ UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86_64 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) controllers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_managers ] ;
@@ -70,6 +71,10 @@ Application Debugger :
 	# arch/x86
 	ArchitectureX86.cpp
 	CpuStateX86.cpp
+
+	# arch/x86_64
+	ArchitectureX8664.cpp
+	CpuStateX8664.cpp
 
 	# controllers
 	DebugReportGenerator.cpp
@@ -305,6 +310,7 @@ Application Debugger :
 	:
 	<nogrist>Debugger_demangler.o
 	<nogrist>Debugger_disasm_x86.o
+	<nogrist>Debugger_disasm_x86_64.o
 	<nogrist>Debugger_dwarf.o
 	<nogrist>DebugAnalyzer_gui_table.o
 
@@ -325,5 +331,6 @@ Application Debugger :
 ;
 
 HaikuSubInclude arch x86 disasm ;
+HaikuSubInclude arch x86_64 disasm ;
 HaikuSubInclude demangler ;
 HaikuSubInclude dwarf ;

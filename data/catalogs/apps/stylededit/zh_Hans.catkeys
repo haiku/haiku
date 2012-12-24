@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-StyledEdit	1508367857
+1	english	x-vnd.Haiku-StyledEdit	3417936913
 StyledEdit	System name		StyledEdit
 Paste	Menus		粘贴
 OK	LoadAlert		确定
@@ -7,7 +7,6 @@ File	Menus		文件
 Lines:	Statistics		行数：
 Italic	Menus		斜体
 Left	Menus		居左
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		恢复到最后一个\"%s\"版本？
 Search backwards	FindandReplaceWindow		后台搜索
 Size	Menus		大小
 Save	QuitAlert		保存
@@ -20,7 +19,6 @@ Cancel	SaveAlert		取消
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		无法恢复，文件未找到：\"%s\"。
 Case-sensitive	FindandReplaceWindow		区分大小写
 Green	Menus		绿
-Revert to saved…	Menus		恢复保存为...
 Yellow	Menus		黄
 Replace in all windows	FindandReplaceWindow		在所有窗口进行替换
 Wrap lines	Menus		收起

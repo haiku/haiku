@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	1428480647
+1	finnish	x-vnd.Haiku-Appearance	2950529393
 Plain font:	Font view		Pelkkä kirjasin:
 Control highlight	Colors tab		Kontrollin korostus
 Control border	Colors tab		Kontrollin reuna
@@ -23,27 +23,33 @@ Tooltip background	Colors tab		Työkaluvinkin tausta
 Selected menu item background	Colors tab		Valitun valikkovalinnan tausta
 Antialiasing	APRWindow		Reunanpehmennys
 Navigation base	Colors tab		Navigoinnin pohja
+Selected list item text	Colors tab		Valitun luettelorivin teksti
 Window border	Colors tab		Ikkunaraja
+Double:	DecorSettingsView		Kaksikko:
 Window tab text	Colors tab		Ikkunakahvan teksti
 Document text	Colors tab		Dokumentin teksti
 Navigation pulse	Colors tab		Navigoinnin välke
 Window decorator:	DecorSettingsView		Ikkunan kehystäjä:
 Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
 Menu background	Colors tab		Valikon tausta
+List background	Colors tab		Luettelotausta
 OK	DecorSettingsView		Valmis
 Control mark	Colors tab		Ohjausmerkki
 Size:	Font Selection view		Koko:
+Selected list item background	Colors tab		Valitun luettelorivin tausta
 Panel background	Colors tab		Paneelin tausta
 Menu font:	Font view		Valikkokirjasin:
 Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
 Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
+List item text	Colors tab		Luettelorivin teksti
 Appearance	System name		Ulkoasuasetukset
 Fixed font:	Font view		Tasalevyinen kirjasin:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Vähennä värillisten reunojen suodatuksen vahvuutta:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Alipikselipohjainen reunanpehmennys yhdistettynä kirjoitusmerkkiviimeistelyyn ei ole saatavilla tässä Haiku-versiossa patenttisyiden takia. Ominaisuuden saaminen käyttöön vaatii Haikun uudelleenkääntämistä ja eräiden optioiden aktivoimista libfreetype:n määrittelytiedostoissa.
 Control text	Colors tab		Kontrollin teksti
+Single:	DecorSettingsView		Yksikkö:
 Tooltip text	Colors tab		Työkaluvinkin teksti
 Bold font:	Font view		Lihavoitu kirjasin:
 Inactive window border	Colors tab		Ei-aktiivinen ikkunaraja
@@ -52,6 +58,7 @@ LCD subpixel	AntialiasingSettingsView		LCD alipikseli
 Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
 Strong	AntialiasingSettingsView		Vahva
 Panel text	Colors tab		Paneelin teksti
+Arrow style	DecorSettingsView		Nuolityyli
 Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
 Look and feel	APRWindow		Ulkoasu ja käyttötuntuma
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko

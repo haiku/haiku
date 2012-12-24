@@ -20,6 +20,7 @@
 #include <Catalog.h>
 
 #include "NetworkTimeView.h"
+#include "TimeMessages.h"
 #include "TimeWindow.h"
 
 
@@ -61,6 +62,22 @@ TimeApplication::AboutRequested()
 		B_TRANSLATE("OK"));
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
+}
+
+
+void
+TimeApplication::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kSelectClockTab:
+		case kShowHideTime:
+			fWindow->PostMessage(message);
+			break;
+
+		default:
+			BApplication::MessageReceived(message);
+			break;
+	}
 }
 
 
