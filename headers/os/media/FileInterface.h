@@ -23,16 +23,17 @@ protected:
 									size_t size);
 
 	virtual	status_t			GetNextFileFormat(int32* cookie,
-									media_file_format* _format) = 0;
+									media_file_format* outFormat) = 0;
 	virtual	void				DisposeFileFormatCookie(int32 cookie) = 0;
 
-	virtual	status_t			GetDuration(bigtime_t* _time) = 0;
+	virtual	status_t			GetDuration(bigtime_t* outDuration) = 0;
 	virtual	status_t			SniffRef(const entry_ref& file,
-									char* _mimeType, // 256 bytes
-									float* _quality) = 0;
-	virtual	status_t			SetRef(const entry_ref& file,
-									bool create, bigtime_t* _time) = 0;
-	virtual	status_t			GetRef(entry_ref* _ref, char* _mimeType) = 0;
+									char* outMimeType, // 256 bytes
+									float* outQuality) = 0;
+	virtual	status_t			SetRef(const entry_ref& file, bool create,
+									bigtime_t* outDuration) = 0;
+	virtual	status_t			GetRef(entry_ref* outRef,
+									char* outMimeType) = 0;
 
 	// TODO: Needs a Perform() virtual method!
 
