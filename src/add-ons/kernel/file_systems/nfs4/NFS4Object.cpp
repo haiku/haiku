@@ -20,6 +20,15 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 {
 	uint32 leaseTime;
 
+	// No request send by the client should cause any of the following errors.
+	ASSERT(nfs4Error != NFS4ERR_CLID_INUSE);
+	ASSERT(nfs4Error != NFS4ERR_NOFILEHANDLE);
+	ASSERT(nfs4Error != NFS4ERR_BAD_STATEID);
+	ASSERT(nfs4Error != NFS4ERR_BAD_SEQID);
+	ASSERT(nfs4Error != NFS4ERR_RESTOREFH);
+	ASSERT(nfs4Error != NFS4ERR_LOCK_HELD);
+	ASSERT(nfs4Error != NFS4ERR_OP_ILLEGAL);
+
 	if (cookie != NULL)
 		state = cookie->fOpenState;
 
