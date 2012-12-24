@@ -331,26 +331,27 @@ BFileGameSound::Perform(int32 selector,
 status_t
 BFileGameSound::SetPaused(bool isPaused, bigtime_t rampTime)
 {
-	if (fPaused != isPaused) {
-		Lock();
+	if (fPaused == isPaused)
+		return EALREADY;
 
-		// Clear any old ramping
-		delete fPausing;
-		fPausing = NULL;
+	Lock();
 
-		if (rampTime > 100000) {
-			// Setup for ramping
-			if (isPaused)
-				fPausing = InitRamp(&fPauseGain, 0.0,
-									Format().frame_rate, rampTime);
-			else
-				fPausing = InitRamp(&fPauseGain, 1.0,
-									Format().frame_rate, rampTime);
-		}
+	// Clear any old ramping
+	delete fPausing;
+	fPausing = NULL;
 
-		fPaused = isPaused;
-		Unlock();
+	if (rampTime > 100000) {
+		// Setup for ramping
+		if (isPaused)
+			fPausing = InitRamp(&fPauseGain, 0.0,
+								Format().frame_rate, rampTime);
+		else
+			fPausing = InitRamp(&fPauseGain, 1.0,
+								Format().frame_rate, rampTime);
 	}
+
+	fPaused = isPaused;
+	Unlock();
 
 	return B_OK;
 }
