@@ -284,7 +284,7 @@ class BPoseView : public BView {
 		void OpenInfoWindows();
 		void SetDefaultPrinter();
 
-		void IdentifySelection();
+		void IdentifySelection(bool force = false);
 		void UnmountSelectedVolumes();
 		virtual void OpenParent();
 
