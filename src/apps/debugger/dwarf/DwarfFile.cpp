@@ -287,14 +287,20 @@ struct DwarfFile::CIEAugmentation {
 						--remaining;
 						break;
 					default:
+						WARNING("Encountered unsupported augmentation '%c' "
+							" while parsing CIE augmentation string %s\n",
+							*string, fString);
 						return B_UNSUPPORTED;
 				}
 				string++;
 			}
 
-			dataReader.Skip(remaining);
+			// we should have read through all of the augmentation data
+			// at this point, if not, something is wrong.
 			if (remaining != 0 || dataReader.HasOverflow()) {
-				WARNING("Error while reading CIE Augmentation\n");
+				WARNING("Error while reading CIE Augmentation, expected "
+					"%" B_PRIu64 " bytes of augmentation data, but read "
+					"%" B_PRIu64 " bytes.\n", length, length - remaining);
 				return B_BAD_DATA;
 			}
 
