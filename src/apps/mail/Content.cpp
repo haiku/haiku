@@ -3291,9 +3291,6 @@ TTextView::Undo(BClipboard */*clipboard*/)
 	char *text;
 	status_t status;
 
-	printf("UNDO------\n");
-	fUndoBuffer.PrintToStream();
-
 	status = fUndoBuffer.Undo(&text, &length, &offset, &history, &cursorPos);
 	if (status == B_OK) {
 		fUndoBuffer.Off();
@@ -3343,9 +3340,6 @@ TTextView::Redo()
 	char *text;
 	status_t status;
 	bool replaced;
-
-	printf("REDO------\n");
-	fUndoBuffer.PrintToStream();
 
 	status = fUndoBuffer.Redo(&text, &length, &offset, &history, &cursorPos, &replaced);
 	if (status == B_OK) {
