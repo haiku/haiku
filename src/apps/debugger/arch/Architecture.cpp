@@ -185,7 +185,7 @@ Architecture::CreateStackTrace(Team* team,
 			return B_NO_MEMORY;
 		}
 
-		frame = nextFrame;
+		nextFrame = frame;
 		cpuState = previousCpuState;
 		if (--maxStackDepth == 0)
 			break;
