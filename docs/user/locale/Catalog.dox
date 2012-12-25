@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		Oliver Tappe, zooey@hirschkaefer.de
  * 
  * Corresponds to:
- *		/trunk/headers/os/locale/Catalog.h	 rev 43095
- *		/trunk/src/kits/locale/Catalog.cpp	 rev 43095
+ *		/trunk/headers/os/locale/Catalog.h	 hrev45083
+ *		/trunk/src/kits/locale/Catalog.cpp	 hrev45083
  */
 
 
@@ -22,7 +22,8 @@
 /*!
 	\class BCatalog
 	\ingroup locale
-	\brief Class handling string localization.
+	\ingroup libbe
+	\brief String localization handling.
 
 	BCatalog is the class that allows you to perform string localization. This
 	means you give it a string in english, and it automatically returns the
@@ -31,13 +32,13 @@
 	Most of the time, you don't have to deal with BCatalog directly. You use
 	the translation macros instead. However, there are some cases where you
 	will have to use catalogs directly. These include :
-		\li Tools for managing catalogs : if you want to add, remove or edit
-			entries in a catalog, you need to do it using the BCatalog class.
-		\li Accessing catalogs other than your own : the macros only grant you
-			access to the catalog linked with your application. To access
-			other catalogs (for example if you create a script interpreter and
-			want to localize the scripts), you will have to open a catalog
-			associated with your script.
+	- Tools for managing catalogs : if you want to add, remove or edit
+	  entries in a catalog, you need to do it using the BCatalog class.
+	- Accessing catalogs other than your own : the macros only grant you
+	  access to the catalog linked with your application. To access
+	  other catalogs (for example if you create a script interpreter and
+	  want to localize the scripts), you will have to open a catalog
+	  associated with your script.
 
 	\section macros Using the macros
 	You don't have to do much in your program to handle catalogs. You must
@@ -58,13 +59,13 @@
 
 	For example, if the user sets his language preferences as french(France),
 	spanish, english, when an application loads a catalog, the following rules
-	are used :
-		\li Try to load a french(France) catalog. If it is found, this catalog
-			will automatically include strings from the generic french catalog.
-		\li Try to load a generic french catalog.
-		\li Try to load a generic spanish catalog.
-		\li Try to load a generic english catalog.
-		\li If all of them failed, use the strings that are in the source code.
+	are used:
+	- Try to load a french(France) catalog. If it is found, this catalog
+	  will automatically include strings from the generic french catalog.
+	- Try to load a generic french catalog.
+	- Try to load a generic spanish catalog.
+	- Try to load a generic english catalog.
+	- If all of them failed, use the strings that are in the source code.
 
 	Note that french(France) will failback to french, but then directly to the
 	language in the source code. This avoids mixing 3 or more languages in the
@@ -73,9 +74,17 @@
 
 
 /*!
-	\fn BCatalog::Catalog(const entry_ref& catalogOwner,
-		const char* language = NULL, uint32 fingerprint = 0);
-	\brief Construct a catalog for the given \a catalogOwner.
+	\fn BCatalog::BCatalog()
+	\brief Construct an empty BCatalog object.
+
+	Should be followed by SetTo() method to set the catalog.
+*/
+
+
+/*!
+	\fn BCatalog::BCatalog(const entry_ref& catalogOwner, const char* language,
+		uint32 fingerprint)
+	\brief Construct a BCatalog object for the given \a catalogOwner.
 
 	If you don't specify a language, the system default list will be used.
 	The language is passed here as a 2 letter ISO code.
@@ -98,8 +107,14 @@
 
 
 /*!
+	\fn BCatalog::~BCatalog()
+	\brief Destroys the BCatalog object freeing memory used by it.
+*/
+
+
+/*!
 	\fn const char* BCatalog::GetString(const char* string,
-		const char* context = NULL, const char* comment = NULL)
+		const char* context, const char* comment)
 	\brief Get a string from the catalog.
 
 	This method access the data of the catalog and reeturns you the translated
@@ -133,6 +148,7 @@
 	all the catalog files under control.
 
 	\param id The identifier of the string.
+
 	\returns The translated string if found, or an empty string.
 */
 
@@ -150,7 +166,12 @@
 	\param name The name of the data to retrieve.
 	\param msg The BMessage to fill in with the data.
 
-	\returns An error code.
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to get an exclusive lock on data.
+	\retval B_NO_INIT Catalog is \c NULL.
+	\retval B_NAME_NOT_FOUND catalog with the specified \a name could not be
+		found.
 */
 
 
@@ -189,6 +210,10 @@
 	\param lang The string where to copy the language.
 
 	\returns An error code.
+	\retval B_OK Everything went as expected.
+	\retval B_ERROR Could not get exclusive lock on catalog.
+	\retval B_BAD_VALUE \a lang is \c NULL.
+	\retval B_NO_INIT Catalog data is \c NULL.
 */
 
 
@@ -202,43 +227,43 @@
 	\param fp The integer to set to the fingerprint value.
 
 	\returns An error code.
+	\retval B_OK Everything went as expected.
+	\retval B_ERROR Could not get exclusive lock on catalog.
+	\retval B_BAD_VALUE \a fp is \c NULL.
+	\retval B_NO_INIT Catalog data is \c NULL.
 */
 
 
 /*!
-	\fn status_t BCatalog::SetCatalog(const entry_ref& catalogOwner,
-	    uint32 fingerprint)
+	\fn status_t BCatalog::SetTo(const entry_ref& catalogOwner,
+		const char* language, uint32 fingerprint)
 	\brief Reload the string data.
 
 	This method reloads the data for the given signature and fingerprint.
 
-	\param catalogOwner The entry_ref of the catalog that you want to load.
+	\param catalogOwner The \c entry_ref of the catalog that you want to load.
+	\param language The language of the catalog to load. If \c NULL, the user
+		settings will be used.
 	\param fingerprint The fingerprint of the catalog you want to load.
 
-	\returns An error code.
+	\returns A status code, \c B_OK on success, \c B_ERROR on error.
 */
 
 
 /*!
 	\fn status_t BCatalog::InitCheck() const
-	\brief Check if the catalog is in an useable state.
+	\brief Check if the catalog is in a valid and usable state.
 
-	\returns \c B_OK if the catalog is initialized properly.
+	\returns A status code.
+	\retval B_OK The catalog is initialized properly.
+	\retval B_ERROR Could not get exclusive lock on catalog.
+	\retval B_NO_INIT Catalog data is \c NULL.
 */
 
 
 /*!
 	\fn int32 BCatalog::CountItems()
-	\brief Returns the number of items in the catalog.
+	\brief Gets the number of items in the catalog.
 
-	\returns the number of strings in the catalog.
-*/
-
-
-/*!
-	\fn BCatalogaddOn* BCatalog::CatalogAddOn()
-	\brief Returns the internal storage for this catalog.
-
-	\returns the internal storage class used by this catalog. You should
-	not have to use it.
+	\returns the number of strings in the catalog or 0 on error.
 */
