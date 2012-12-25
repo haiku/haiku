@@ -4,38 +4,37 @@
 #include "KUndoBuffer.h"
 
 
-KUndoItem::KUndoItem(const char* redo_text,
-					int32 length,
-					int32 offset,
-					undo_type history,
-					int32 cursor_pos)
+KUndoItem::KUndoItem(const char* redo_text, int32 length, int32 offset,
+	undo_type history, int32 cursor_pos)
 {
 	Offset = offset;
 	Length = length;
 	History = history;
 	CursorPos = cursor_pos;
 
-	if (redo_text!=NULL) {
+	if (redo_text != NULL) {
 		RedoText = (char*)malloc(length);
 		memcpy(RedoText, redo_text, length);
-		if (RedoText!=NULL) {
+		if (RedoText != NULL)
 			fStatus = B_OK;
-		} else {
+		else
 			fStatus = B_ERROR;
-		}
 	}
 }
+
 
 KUndoItem::~KUndoItem()
 {
 	free(RedoText);
 }
 
+
 status_t
 KUndoItem::InitCheck()
 {
 	return fStatus;
 }
+
 
 void
 KUndoItem::Merge(const char* text, int32 length)
@@ -53,6 +52,7 @@ KUndoBuffer::KUndoBuffer():BList(1024)
 	fNewItem = true;
 }
 
+
 KUndoBuffer::~KUndoBuffer()
 {
 	MakeEmpty();
@@ -62,11 +62,12 @@ KUndoBuffer::~KUndoBuffer()
 bool
 KUndoBuffer::AddItem(KUndoItem* item, int32 index)
 {
-	for (int32 i=CountItems()-1; i>=index; i--) {
+	for (int32 i = CountItems() - 1; i >= index; i--)
 		RemoveItem(i);
-	}
+
 	return AddItem(item);
 }
+
 
 bool
 KUndoBuffer::AddItem(KUndoItem* item)
@@ -74,21 +75,24 @@ KUndoBuffer::AddItem(KUndoItem* item)
 	return BList::AddItem(item);
 }
 
+
 void
 KUndoBuffer::MakeEmpty(void)
 {
-	for(int32 i=CountItems()-1; i>=0;i--) {
+	for (int32 i = CountItems() - 1; i >= 0; i--)
 		RemoveItem(i);
-	}
 }
+
 
 KUndoItem*
 KUndoBuffer::RemoveItem(int32 index)
 {
-	if (fIndex>=CountItems()) fIndex--;
+	if (fIndex >= CountItems())
+		fIndex--;
 	delete this->ItemAt(index);
 	return (KUndoItem*)BList::RemoveItem(index);
 }
+
 
 KUndoItem*
 KUndoBuffer::ItemAt(int32 index) const
@@ -103,11 +107,13 @@ KUndoBuffer::On()
 	fNoTouch = false;
 }
 
+
 void
 KUndoBuffer::Off()
 {
 	fNoTouch = true;
 }
+
 
 status_t
 KUndoBuffer::NewUndo(const char* text, int32 length, int32 offset,
@@ -117,9 +123,9 @@ KUndoBuffer::NewUndo(const char* text, int32 length, int32 offset,
 		cursor_pos);
 
 	status_t status = NewUndoItem->InitCheck();
-	if ( status != B_OK) {
+	if (status != B_OK) {
 		delete NewUndoItem;
-		return status; 
+		return status;
 	}
 	AddItem(NewUndoItem, fIndex);
 	fIndex++;
@@ -136,13 +142,13 @@ KUndoBuffer::AddUndo(const char* text, int32 length, int32 offset,
 
 	status_t status = B_OK;
 
-	if (fNewItem || (fIndex < CountItems()) || (CountItems()==0)) {
+	if (fNewItem || fIndex < CountItems() || CountItems() == 0) {
 		status = NewUndo(text, length, offset, history, cursor_pos);
 		fNewItem = false;
 	} else {
 		KUndoItem* CurrentUndoItem;
-		CurrentUndoItem = ItemAt(fIndex-1);
-		if (CurrentUndoItem!=NULL) {
+		CurrentUndoItem = ItemAt(fIndex - 1);
+		if (CurrentUndoItem != NULL) {
 			int32 c_length = CurrentUndoItem->Length;
 			int32 c_offset = CurrentUndoItem->Offset;
 			undo_type c_history = CurrentUndoItem->History;
@@ -150,9 +156,9 @@ KUndoBuffer::AddUndo(const char* text, int32 length, int32 offset,
 				switch(c_history) {
 					case K_INSERTED:
 					case K_REPLACED:
-						if ((c_offset + c_length) == offset) {
+						if ((c_offset + c_length) == offset)
 							CurrentUndoItem->Merge(text, length);
-						} else {
+						else {
 							status = NewUndo(text, length, offset, history,
 								cursor_pos);
 						}
@@ -162,9 +168,8 @@ KUndoBuffer::AddUndo(const char* text, int32 length, int32 offset,
 							cursor_pos);
 						break;
 				}
-			} else {
+			} else
 				status = NewUndo(text, length, offset, history, cursor_pos);
-			}
 		}
 	}
 
@@ -184,65 +189,50 @@ KUndoBuffer::MakeNewUndoItem()
 
 
 status_t
-KUndoBuffer::Undo(char** text,
-				int32* length,
-				int32* offset,
-				undo_type* history,
-				int32* cursor_pos)
+KUndoBuffer::Undo(char** text, int32* length, int32* offset,
+	undo_type* history, int32* cursor_pos)
 {
 	KUndoItem* undoItem;
-	status_t status;
+	status_t status = B_ERROR;
 
-	if (fIndex>0) {
-		undoItem = ItemAt(fIndex-1);
-		if (undoItem!=NULL) {
+	if (fIndex > 0) {
+		undoItem = ItemAt(fIndex - 1);
+		if (undoItem != NULL) {
 			*text = undoItem->RedoText;
 			*length = undoItem->Length;
 			*offset = undoItem->Offset;
 			*history = undoItem->History;
 			*cursor_pos = undoItem->CursorPos + undoItem->Length;
 			status = B_OK;
-		} else {
-			status = B_ERROR;
 		}
 		fIndex--;
-	} else {
-		status = B_ERROR;
 	}
 	return status;
 }
 
+
 status_t
-KUndoBuffer::Redo(char** text,
-				int32* length,
-				int32* offset,
-				undo_type* history,
-				int32* cursor_pos,
-				bool* replaced)
+KUndoBuffer::Redo(char** text, int32* length, int32* offset,
+	undo_type* history, int32* cursor_pos, bool* replaced)
 {
 	KUndoItem* undoItem;
-	status_t status;
+	status_t status = B_ERROR;
 	
 	if (fIndex < CountItems()) {
 		undoItem = ItemAt(fIndex);
-		if (undoItem!=NULL) {
+		if (undoItem != NULL) {
 			*text = undoItem->RedoText;
 			*length = undoItem->Length;
 			*offset = undoItem->Offset;
 			*history = undoItem->History;
 			*cursor_pos = undoItem->CursorPos;
-			if ((fIndex+1) < CountItems()) {
-				*replaced = ItemAt(fIndex+1)->History==K_REPLACED;
-			} else {
+			if (fIndex + 1 < CountItems())
+				*replaced = ItemAt(fIndex + 1)->History == K_REPLACED;
+			else
 				*replaced = false;
-			}
 			status = B_OK;
-		} else {
-			status = B_ERROR;
 		}
 		fIndex++;
-	} else {
-		status = B_ERROR;
 	}
 	return status;
 }
@@ -251,10 +241,10 @@ KUndoBuffer::Redo(char** text,
 void
 KUndoBuffer::PrintToStream()
 {
-	for(int32 i=0; i<CountItems(); i++) {
+	for (int32 i = 0; i < CountItems(); i++) {
 		KUndoItem* item = ItemAt(i);
 		printf("%3.3d   ", (int)i);
-		switch(item->History) {
+		switch (item->History) {
 			case K_INSERTED:
 				printf("INSERTED  ");
 				break;
@@ -269,13 +259,12 @@ KUndoBuffer::PrintToStream()
 		printf("Length = %d  ", (int)item->Length);
 		printf("CursorPos = %d  ", (int)item->CursorPos);
 		printf("RedoText = '");
-		for(int32 j=0;j<item->Length;j++) {
+		for (int32 j = 0; j < item->Length; j++) {
 			uchar c = (uchar)item->RedoText[j];
-			if (c >= 0x20) {
+			if (c >= 0x20)
 				printf("%c", c);
-			} else {
+			else
 				printf("?");
-			}
 		}
 		printf("'\n");
 	}
