@@ -516,7 +516,7 @@ DwarfImageDebugInfo::GetAddressSectionType(target_addr_t address)
 status_t
 DwarfImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
-	StackFrame*& _frame, CpuState*& _previousCpuState)
+	bool getFullFrameInfo, StackFrame*& _frame, CpuState*& _previousCpuState)
 {
 	DwarfFunctionDebugInfo* function = dynamic_cast<DwarfFunctionDebugInfo*>(
 		functionInstance->GetFunctionDebugInfo());
@@ -635,7 +635,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	// The subprogram entry may not be available since this may be a case
 	// where .eh_frame was used to unwind the stack without other DWARF
 	// info being available.
-	if (subprogramEntry != NULL) {
+	if (subprogramEntry != NULL && getFullFrameInfo) {
 		// create function parameter objects
 		for (DebugInfoEntryList::ConstIterator it
 			= subprogramEntry->Parameters().GetIterator();

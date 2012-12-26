@@ -55,11 +55,15 @@ public:
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
+									bool getFullFrameInfo,
 									StackFrame*& _Frame,
 									CpuState*& _previousCpuState) = 0;
 										// returns reference to previous frame
 										// and CPU state; returned CPU state
 										// can be NULL; can return B_UNSUPPORTED
+										// getFullFrameInfo: try to retrieve
+										// variables/parameters if true
+										// (and supported)
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
 									target_addr_t address,
 									Statement*& _statement) = 0;

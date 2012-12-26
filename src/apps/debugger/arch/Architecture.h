@@ -109,7 +109,8 @@ public:
 									CpuState* cpuState,
 									StackTrace*& _stackTrace,
 									int32 maxStackDepth = -1,
-									bool useExistingTrace = false);
+									bool useExistingTrace = false,
+									bool getFullFrameInfo = true);
 										// team is not locked
 
 	virtual	status_t			GetWatchpointDebugCapabilities(

@@ -35,6 +35,7 @@ public:
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
+									bool getFullFrameInfo,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState);
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
