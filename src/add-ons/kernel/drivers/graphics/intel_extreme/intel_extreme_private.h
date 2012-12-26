@@ -60,7 +60,7 @@ find_reg(const intel_info& info, uint32 target)
 		RETURN_REG(INTERRUPT_STATUS)
 	}
 
-	#undef RETURN_REG;
+	#undef RETURN_REG
 
 	panic("find_reg didn't have any matching register\n");
 	return target;
