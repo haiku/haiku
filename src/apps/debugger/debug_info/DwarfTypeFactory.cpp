@@ -576,8 +576,9 @@ printf("  -> failed to add type to cache\n");
 					= dynamic_cast<DIETemplateTypeParameter*>(_typeEntry);
 				DwarfType* templateType;
 				if (templateTypeEntry != NULL) {
-					if (CreateType(templateTypeEntry->GetType(), templateType)
-						!= B_OK) {
+					if (templateTypeEntry->GetType() == NULL
+						|| CreateType(templateTypeEntry->GetType(),
+							templateType) != B_OK) {
 						continue;
 					}
 				} else {

@@ -21,12 +21,14 @@ class Architecture;
 class CompilationUnit;
 class DebuggerInterface;
 class DIEType;
+class DwarfFunctionDebugInfo;
 class DwarfStackFrameDebugInfo;
 class DwarfFile;
 class ElfSegment;
 class FileManager;
 class FileSourceCode;
 class FunctionID;
+class FunctionInstance;
 class GlobalTypeCache;
 class GlobalTypeLookup;
 class LocatableFile;
@@ -61,6 +63,7 @@ public:
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
+									bool getFullFrameInfo,
 									StackFrame*& _frame,
 									CpuState*& _previousCpuState);
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
@@ -99,6 +102,12 @@ private:
 									target_addr_t lowPC,
 									const EntryListWrapper& variableEntries,
 									const EntryListWrapper& blockEntries);
+
+			status_t			_CreateReturnValue(FunctionInstance* instance,
+									DwarfFunctionDebugInfo* info,
+									StackFrame* frame,
+									DwarfStackFrameDebugInfo& factory,
+									target_addr_t instructionPointer);
 
 			bool				_EvaluateBaseTypeConstraints(DIEType* type,
 									const TypeLookupConstraints& constraints);

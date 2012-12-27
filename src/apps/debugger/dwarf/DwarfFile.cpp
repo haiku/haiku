@@ -234,8 +234,11 @@ struct DwarfFile::CIEAugmentation {
 		:
 		fString(NULL),
 		fFlags(0),
-		fAddressEncoding(0)
+		fAddressEncoding(CFI_ADDRESS_FORMAT_ABSOLUTE)
 	{
+		// we default to absolute address format since that corresponds
+		// to the DWARF standard for .debug_frame. In gcc's case, however,
+		// .eh_frame will generally override that via augmentation 'R'
 	}
 
 	void Init(DataReader& dataReader)
@@ -270,11 +273,12 @@ struct DwarfFile::CIEAugmentation {
 						break;
 					case 'P':
 					{
-						char personalityEncoding = dataReader.Read<char>(0);
-						uint8 addressSize = EncodedAddressSize(
-							personalityEncoding, NULL);
-						dataReader.Skip(addressSize);
-						remaining -= addressSize + 1;
+						char tempEncoding = fAddressEncoding;
+						fAddressEncoding = dataReader.Read<char>(0);
+						off_t offset = dataReader.Offset();
+						ReadEncodedAddress(dataReader, NULL, NULL, true);
+						fAddressEncoding = tempEncoding;
+						remaining -= dataReader.Offset() - offset + 1;
  						break;
 					}
 					case 'R':
@@ -283,14 +287,20 @@ struct DwarfFile::CIEAugmentation {
 						--remaining;
 						break;
 					default:
+						WARNING("Encountered unsupported augmentation '%c' "
+							" while parsing CIE augmentation string %s\n",
+							*string, fString);
 						return B_UNSUPPORTED;
 				}
 				string++;
 			}
 
-			dataReader.Skip(remaining);
+			// we should have read through all of the augmentation data
+			// at this point, if not, something is wrong.
 			if (remaining != 0 || dataReader.HasOverflow()) {
-				WARNING("Error while reading CIE Augmentation\n");
+				WARNING("Error while reading CIE Augmentation, expected "
+					"%" B_PRIu64 " bytes of augmentation data, but read "
+					"%" B_PRIu64 " bytes.\n", length, length - remaining);
 				return B_BAD_DATA;
 			}
 
@@ -367,24 +377,6 @@ struct DwarfFile::CIEAugmentation {
 				return 0;
 		}
 
-		return 0;
-	}
-
-	int8 EncodedAddressSize(char encoding, CompilationUnit* unit) const
-	{
-		switch (encoding & 0x07) {
-			case CFI_ADDRESS_FORMAT_ABSOLUTE:
-				return unit->AddressSize();
-			case CFI_ADDRESS_FORMAT_UNSIGNED_16:
-				return 2;
-			case CFI_ADDRESS_FORMAT_UNSIGNED_32:
-				return 4;
-			case CFI_ADDRESS_FORMAT_UNSIGNED_64:
-				return 8;
-		}
-
-		// TODO: gcc doesn't (currently) actually generate LEB128-formatted
-		// addresses. If that changes, we'll need to handle them accordingly
 		return 0;
 	}
 

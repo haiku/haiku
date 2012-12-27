@@ -303,7 +303,39 @@ ArchitectureX8664::UpdateStackFrameCpuState(const StackFrame* frame,
 	Image* previousImage, FunctionDebugInfo* previousFunction,
 	CpuState* previousCpuState)
 {
-	fprintf(stderr, "ArchitectureX8664::UpdateStackFrameCpuState: TODO\n");
+	// This is not a top frame, so we want to offset rip to the previous
+	// (calling) instruction.
+	CpuStateX8664* cpuState = dynamic_cast<CpuStateX8664*>(previousCpuState);
+
+	// get rip
+	uint64 rip = cpuState->IntRegisterValue(X86_64_REGISTER_RIP);
+	if (previousFunction == NULL || rip <= previousFunction->Address())
+		return;
+	target_addr_t functionAddress = previousFunction->Address();
+
+	// allocate a buffer for the function code to disassemble
+	size_t bufferSize = rip - functionAddress;
+	void* buffer = malloc(bufferSize);
+	if (buffer == NULL)
+		return;
+	MemoryDeleter bufferDeleter(buffer);
+
+	// read the code
+	ssize_t bytesRead = fTeamMemory->ReadMemory(functionAddress, buffer,
+		bufferSize);
+	if (bytesRead != (ssize_t)bufferSize)
+		return;
+
+	// disassemble to get the previous instruction
+	DisassemblerX8664 disassembler;
+	target_addr_t instructionAddress;
+	target_size_t instructionSize;
+	if (disassembler.Init(functionAddress, buffer, bufferSize) == B_OK
+		&& disassembler.GetPreviousInstruction(rip, instructionAddress,
+			instructionSize) == B_OK) {
+		rip -= instructionSize;
+		cpuState->SetIntRegister(X86_64_REGISTER_RIP, rip);
+	}
 }
 
 

@@ -26,6 +26,7 @@
 #include "DebuggerInterface.h"
 #include "DebugInfoEntries.h"
 #include "Demangler.h"
+#include "DisassembledCode.h"
 #include "Dwarf.h"
 #include "DwarfFile.h"
 #include "DwarfFunctionDebugInfo.h"
@@ -40,6 +41,7 @@
 #include "FunctionID.h"
 #include "FunctionInstance.h"
 #include "GlobalTypeLookup.h"
+#include "InstructionInfo.h"
 #include "LocatableFile.h"
 #include "Register.h"
 #include "RegisterMap.h"
@@ -516,7 +518,7 @@ DwarfImageDebugInfo::GetAddressSectionType(target_addr_t address)
 status_t
 DwarfImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
-	StackFrame*& _frame, CpuState*& _previousCpuState)
+	bool getFullFrameInfo, StackFrame*& _frame, CpuState*& _previousCpuState)
 {
 	DwarfFunctionDebugInfo* function = dynamic_cast<DwarfFunctionDebugInfo*>(
 		functionInstance->GetFunctionDebugInfo());
@@ -635,7 +637,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	// The subprogram entry may not be available since this may be a case
 	// where .eh_frame was used to unwind the stack without other DWARF
 	// info being available.
-	if (subprogramEntry != NULL) {
+	if (subprogramEntry != NULL && getFullFrameInfo) {
 		// create function parameter objects
 		for (DebugInfoEntryList::ConstIterator it
 			= subprogramEntry->Parameters().GetIterator();
@@ -665,6 +667,14 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		_CreateLocalVariables(unit, frame, functionID, *stackFrameDebugInfo,
 			instructionPointer, functionInstance->Address() - fRelocationDelta,
 			subprogramEntry->Variables(), subprogramEntry->Blocks());
+
+		// determine if the previously executed instruction was a function
+		// call to see if we need to potentially retrieve a return value
+		// as well
+		if (instructionPointer > functionInstance->Address() - fRelocationDelta) {
+			_CreateReturnValue(functionInstance, function, frame,
+				*stackFrameDebugInfo, instructionPointer);
+		}
 	}
 
 	_frame = frameReference.Detach();
@@ -1067,6 +1077,50 @@ DwarfImageDebugInfo::_CreateLocalVariables(CompilationUnit* unit,
 		// found a block -- recurse
 		return _CreateLocalVariables(unit, frame, functionID, factory,
 			instructionPointer, lowPC, block->Variables(), block->Blocks());
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DwarfImageDebugInfo::_CreateReturnValue(FunctionInstance* functionInstance,
+	DwarfFunctionDebugInfo* function, StackFrame* frame,
+	DwarfStackFrameDebugInfo& factory, target_addr_t instructionPointer)
+{
+	DisassembledCode* sourceCode = NULL;
+	target_size_t bufferSize = std::min(functionInstance->Size(),
+		(target_size_t)64 * 1024);
+	void* buffer = malloc(bufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter bufferDeleter(buffer);
+	ssize_t bytesRead = function->GetSpecificImageDebugInfo()
+		->ReadCode(functionInstance->Address(), buffer, bufferSize);
+	if (bytesRead < 0)
+		return bytesRead;
+
+	status_t result = fArchitecture->DisassembleCode(function, buffer,
+		bytesRead, sourceCode);
+	if (result != B_OK)
+		return result;
+
+	BReference<DisassembledCode> sourceCodeReference(sourceCode, true);
+	target_addr_t previousStatementAddress = instructionPointer + fRelocationDelta - 1;
+	Statement* statement = sourceCode->StatementAtAddress(
+		previousStatementAddress);
+	if (statement == NULL)
+		return B_BAD_VALUE;
+
+	TargetAddressRange range = statement->CoveringAddressRange();
+	InstructionInfo info;
+	if (fArchitecture->GetInstructionInfo(range.Start(), info) == B_OK
+		&& info.Type() == INSTRUCTION_TYPE_SUBROUTINE_CALL) {
+		// TODO: determine where the previous instruction actually jumps to,
+		// retrieve that function (could potentially be in another image),
+		// and use its return type to retrieve the return value (will need
+		// architecture support since function return value passing convention
+		// is arch-dependent).
 	}
 
 	return B_OK;

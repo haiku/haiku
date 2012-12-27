@@ -419,8 +419,8 @@ DraggableContainerIcon::MouseMoved(BPoint point, uint32 /*transit*/,
 
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
-	float height = fontHeight.ascent + fontHeight.descent + fontHeight.leading
-		+ 2 + Bounds().Height() + 8;
+	float height = ceil(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading + 2 + Bounds().Height() + 8);
 
 	BRect rect(0, 0, max_c(Bounds().Width(),
 		font.StringWidth(model->Name()) + 4), height);
@@ -2554,10 +2554,13 @@ BContainerWindow::SetupMoveCopyMenus(const entry_ref* item_ref, BMenu* parent)
 	// Set the "Identify" item label
 	BMenuItem* identifyItem = parent->FindItem(kIdentifyEntry);
 	if (identifyItem != NULL) {
-		if (modifierKeys & B_SHIFT_KEY)
+		if (modifierKeys & B_SHIFT_KEY) {
 			identifyItem->SetLabel(B_TRANSLATE("Force identify"));
-		else
+			identifyItem->Message()->ReplaceBool("force", true);
+		} else {
 			identifyItem->SetLabel(B_TRANSLATE("Identify"));
+			identifyItem->Message()->ReplaceBool("force", false);
+		}
 	}
 }
 
@@ -2778,8 +2781,9 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 #endif
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Identify"),
-		new BMessage(kIdentifyEntry)));
+	BMessage* message = new BMessage(kIdentifyEntry);
+	message->AddBool("force", false);
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Identify"), message));
 	BMenu* addOnMenuItem = new BMenu(B_TRANSLATE("Add-ons"));
 	addOnMenuItem->SetFont(be_plain_font);
 	menu->AddItem(addOnMenuItem);

@@ -1515,7 +1515,7 @@ StyledEditWindow::_ReloadDocument(BMessage* message)
 		bs_printf(&alertText,
 			B_TRANSLATE("\"%s\" has unsaved changes.\n"
 				"Revert it to the last saved version? "), Title());
-		if (_ShowAlert(alertText, B_TRANSLATE("Cancel"), B_TRANSLATE("OK"),
+		if (_ShowAlert(alertText, B_TRANSLATE("Cancel"), B_TRANSLATE("Revert"),
 			"", B_WARNING_ALERT) != 1)
 			return;
 	}

@@ -247,15 +247,15 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 		
 		// Add relevant attributes. We consider an error here as non-fatal.
 		BNode node(&entry);
-		node.WriteAttr("Audio:Title", B_STRING_TYPE, 0, (data->title).String(),
+		node.WriteAttr("Media:Title", B_STRING_TYPE, 0, (data->title).String(),
 			(data->title).Length());
 		node.WriteAttr("Audio:Album", B_STRING_TYPE, 0,
 			(readResponse->title).String(),
 			(readResponse->title).Length());
-		node.WriteAttr("Audio:Genre", B_STRING_TYPE, 0,
+		node.WriteAttr("Media:Genre", B_STRING_TYPE, 0,
 			(readResponse->genre).String(),
 			(readResponse->genre).Length());
-		node.WriteAttr("Audio:Year", B_INT32_TYPE, 0, &(readResponse->year),
+		node.WriteAttr("Media:Year", B_INT32_TYPE, 0, &(readResponse->year),
 			sizeof(int32));
 
 		if (data->artist == "") {
