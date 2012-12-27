@@ -53,6 +53,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Git						- the distributed version control system
 #	GitDoc					- documentation for the distributed version control system
 #	GPerf					- the perfect hash function generator.
+#	Grep					- program to search for strings inside a file
 #	Groff					- text formatter used for man pages
 #	HGrep					- header grep tool
 #	ICU-devel				- the headers and lib-links for ICU (for development)
@@ -1225,6 +1226,27 @@ if [ IsOptionalHaikuImagePackageAdded Groff ] {
 	}
 }
 
+# Grep
+if [ IsOptionalHaikuImagePackageAdded Grep ] {
+	if $(TARGET_ARCH) = x86 {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				grep-2.14-x86-gcc4-2012-12-28.zip
+				: $(baseURL)/grep-2.14-x86-gcc4-2012-12-28.zip ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				grep-2.14-x86-gcc2-2012-12-28.zip
+				: $(baseURL)/grep-2.14-x86-gcc2-2012-12-28.zip ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			grep-2.14-x86_64-2012-12-28.zip
+			: $(baseURL)/grep-2.14-x86_64-2012-12-28.zip
+			: : true ;
+	} else {
+		Echo "No optional package Grep available for $(TARGET_ARCH)" ;
+	}
+}
 
 # HGgrep
 if [ IsOptionalHaikuImagePackageAdded HGrep ] {

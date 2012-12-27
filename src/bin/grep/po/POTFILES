@@ -1,9 +1,0 @@
-     ../src/dfa.c \
-     ../src/kwset.c \
-     ../src/grep.c \
-     ../src/search.c \
-     ../lib/error.c \
-     ../lib/getopt.c \
-     ../lib/getopt1.c \
-     ../lib/obstack.c \
-     ../lib/quotearg.c
