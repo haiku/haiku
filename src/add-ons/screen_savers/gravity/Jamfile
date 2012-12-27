@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons screen_savers gravityhole ;
+SubDir HAIKU_TOP src add-ons screen_savers gravity ;
 SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
