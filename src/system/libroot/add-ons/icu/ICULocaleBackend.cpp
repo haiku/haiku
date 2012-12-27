@@ -450,7 +450,8 @@ ICULocaleBackend::_CreateThreadLocalStorageKey()
 }
 
 
-void ICULocaleBackend::_DestroyThreadLocalStorageValue(void* value)
+void
+ICULocaleBackend::_DestroyThreadLocalStorageValue(void* value)
 {
 	ICUThreadLocalStorageValue* tlsValue
 		= static_cast<ICUThreadLocalStorageValue*>(value);
