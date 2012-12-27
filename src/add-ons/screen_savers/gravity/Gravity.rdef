@@ -1,0 +1,14 @@
+resource app_signature "application/x-vnd.Haiku-GravityScreenSaver";
+
+resource app_name_catalog_entry "x-vnd.Haiku-GravityScreenSaver:System name:Gravity";
+
+resource app_version 
+{
+    major  = 1,
+    middle = 0,
+    minor  = 0,
+    variety = 0,
+    internal = 0,
+    short_info = "1.0",
+    long_info = "The screensaver simulates a gravity hole effect with particles, utilizing the OpenGL interface for Haiku."
+};
