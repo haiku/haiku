@@ -92,7 +92,14 @@ const struct supported_device {
 	{0x0104, 0x0106, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT1"},
 	{0x0104, 0x0116, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2"},
 	{0x0104, 0x0126, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2+"},
-	{0x0108, 0x010a, INTEL_TYPE_SNBGS, "SandyBridge Server"}
+	{0x0108, 0x010a, INTEL_TYPE_SNBGS, "SandyBridge Server"},
+
+	{0x0150, 0x0152, INTEL_TYPE_IVBG, "IvyBridge Desktop GT1"},
+	{0x0150, 0x0162, INTEL_TYPE_IVBG, "IvyBridge Desktop GT2"},
+	{0x0154, 0x0156, INTEL_TYPE_IVBGM, "IvyBridge Mobile GT1"},
+	{0x0154, 0x0166, INTEL_TYPE_IVBGM, "IvyBridge Mobile GT2"},
+	{0x0158, 0x015a, INTEL_TYPE_IVBGS, "IvyBridge Server GT1"},
+	{0x0158, 0x016a, INTEL_TYPE_IVBGS, "IvyBridge Server GT2"}
 };
 
 struct intel_info {
