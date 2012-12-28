@@ -305,6 +305,9 @@ intel_extreme_init(intel_info &info)
 	} else if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
 		TRACE("SandyBridge clock gating\n");
 		write32(info, 0x42020, (1L << 28) | (1L << 7) | (1L << 5));
+	} else if (info.device_type.InGroup(INTEL_TYPE_IVB)) {
+		TRACE("IvyBridge clock gating\n");
+		write32(info, 0x42020, (1L << 28));
 	} else if (info.device_type.InGroup(INTEL_TYPE_ILK)) {
 		TRACE("IronLake clock gating\n");
 		write32(info, 0x42020, (1L << 7) | (1L << 5));

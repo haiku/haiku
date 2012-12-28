@@ -138,7 +138,8 @@ set_frame_buffer_base()
 	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_ILK)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)) {
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_IVB)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
@@ -241,7 +242,8 @@ get_pll_limits(pll_limits &limits)
 	// tested
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_ILK)
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)) {
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IVB)) {
 		// TODO: support LVDS output limits as well
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
