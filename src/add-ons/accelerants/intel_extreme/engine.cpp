@@ -15,13 +15,15 @@
 
 
 #undef TRACE
-
 //#define TRACE_ENGINE
 #ifdef TRACE_ENGINE
-#	define TRACE(x) _sPrintf x
+#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...)
 #endif
+
+#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 static engine_token sEngineToken = {1, 0 /*B_2D_ACCELERATION*/, NULL};
@@ -127,7 +129,7 @@ QueueCommands::MakeSpace(uint32 size)
 
 		if (fRingBuffer.space_left < size) {
 			if (system_time() > start + 1000000LL) {
-				TRACE(("intel_extreme: engine stalled, head %lx\n", head));
+				ERROR("engine stalled, head %lx\n", head);
 				break;
 			}
 			spin(10);
@@ -163,8 +165,8 @@ uninit_ring_buffer(ring_buffer &ringBuffer)
 void
 setup_ring_buffer(ring_buffer &ringBuffer, const char* name)
 {
-	TRACE(("Setup ring buffer %s, offset %lx, size %lx\n", name,
-		ringBuffer.offset, ringBuffer.size));
+	TRACE("Setup ring buffer %s, offset %lx, size %lx\n", name,
+		ringBuffer.offset, ringBuffer.size);
 
 	if (init_lock(&ringBuffer.lock, name) < B_OK) {
 		// disable ring buffer
@@ -191,7 +193,7 @@ setup_ring_buffer(ring_buffer &ringBuffer, const char* name)
 uint32
 intel_accelerant_engine_count(void) 
 {
-	TRACE(("intel_accelerant_engine_count()\n"));
+	CALLED();
 	return 1;
 }
 
@@ -200,7 +202,7 @@ status_t
 intel_acquire_engine(uint32 capabilities, uint32 maxWait, sync_token* syncToken,
 	engine_token** _engineToken)
 {
-	TRACE(("intel_acquire_engine()\n"));
+	CALLED();
 	*_engineToken = &sEngineToken;
 
 	if (acquire_lock(&gInfo->shared_info->engine_lock) != B_OK)
@@ -216,7 +218,7 @@ intel_acquire_engine(uint32 capabilities, uint32 maxWait, sync_token* syncToken,
 status_t
 intel_release_engine(engine_token* engineToken, sync_token* syncToken)
 {
-	TRACE(("intel_release_engine()\n"));
+	CALLED();
 	if (syncToken != NULL)
 		syncToken->engine_id = engineToken->engine_id;
 
@@ -228,7 +230,7 @@ intel_release_engine(engine_token* engineToken, sync_token* syncToken)
 void
 intel_wait_engine_idle(void)
 {
-	TRACE(("intel_wait_engine_idle()\n"));
+	CALLED();
 
 	{
 		QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
@@ -254,7 +256,7 @@ intel_wait_engine_idle(void)
 
 		if (system_time() > start + 1000000LL) {
 			// the engine seems to be locked up!
-			TRACE(("intel_extreme: engine locked up, head %lx!\n", head));
+			ERROR("engine locked up, head %lx!\n", head);
 			break;
 		}
 
@@ -266,7 +268,7 @@ intel_wait_engine_idle(void)
 status_t
 intel_get_sync_token(engine_token* engineToken, sync_token* syncToken)
 {
-	TRACE(("intel_get_sync_token()\n"));
+	CALLED();
 	return B_OK;
 }
 
@@ -274,7 +276,7 @@ intel_get_sync_token(engine_token* engineToken, sync_token* syncToken)
 status_t
 intel_sync_to_token(sync_token* syncToken)
 {
-	TRACE(("intel_sync_to_token()\n"));
+	CALLED();
 	intel_wait_engine_idle();
 	return B_OK;
 }

@@ -14,13 +14,16 @@
 #include <unistd.h>
 
 
+#undef TRACE
 //#define TRACE_MEMORY
 #ifdef TRACE_MEMORY
-extern "C" void _sPrintf(const char* format, ...);
-#	define TRACE(x) _sPrintf x
+#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...)
 #endif
+
+#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 void

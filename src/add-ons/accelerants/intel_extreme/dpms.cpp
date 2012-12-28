@@ -11,13 +11,16 @@
 #include "accelerant.h"
 
 
+#undef TRACE
 //#define TRACE_DPMS
 #ifdef TRACE_DPMS
-extern "C" void _sPrintf(const char* format, ...);
-#	define TRACE(x) _sPrintf x
+#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...)
 #endif
+
+#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 void
@@ -231,7 +234,7 @@ set_display_power_mode(uint32 mode)
 uint32
 intel_dpms_capabilities(void)
 {
-	TRACE(("intel_dpms_capabilities()\n"));
+	CALLED();
 	return B_DPMS_ON | B_DPMS_SUSPEND | B_DPMS_STAND_BY | B_DPMS_OFF;
 }
 
@@ -239,7 +242,7 @@ intel_dpms_capabilities(void)
 uint32
 intel_dpms_mode(void)
 {
-	TRACE(("intel_dpms_mode()\n"));
+	CALLED();
 	return gInfo->shared_info->dpms_mode;
 }
 
@@ -247,7 +250,7 @@ intel_dpms_mode(void)
 status_t
 intel_set_dpms_mode(uint32 mode)
 {
-	TRACE(("intel_set_dpms_mode()\n"));
+	CALLED();
 	gInfo->shared_info->dpms_mode = mode;
 	set_display_power_mode(mode);
 

@@ -12,6 +12,7 @@
 
 #include "utility.h"
 
+#include <Debug.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,13 +22,16 @@
 #include <AGP.h>
 
 
+#undef TRACE
 #define TRACE_ACCELERANT
 #ifdef TRACE_ACCELERANT
-extern "C" void _sPrintf(const char* format, ...);
-#	define TRACE(x) _sPrintf x
+#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...)
 #endif
+
+#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 struct accelerant_info* gInfo;
@@ -180,7 +184,7 @@ uninit_common(void)
 status_t
 intel_init_accelerant(int device)
 {
-	TRACE(("intel_init_accelerant()\n"));
+	CALLED();
 
 	status_t status = init_common(device, false);
 	if (status != B_OK)
@@ -216,11 +220,12 @@ intel_init_accelerant(int device)
 		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
 	}
 
-	TRACE(("head detected: %#x\n", gInfo->head_mode));
-	TRACE(("adpa: %08lx, dova: %08lx, dovb: %08lx, lvds: %08lx\n",
+	TRACE("head detected: %#x\n", gInfo->head_mode);
+	TRACE("adpa: %08lx, dova: %08lx, dovb: %08lx, lvds: %08lx\n",
 		read32(INTEL_DISPLAY_A_ANALOG_PORT),
 		read32(INTEL_DISPLAY_A_DIGITAL_PORT),
-		read32(INTEL_DISPLAY_B_DIGITAL_PORT), read32(INTEL_DISPLAY_LVDS_PORT)));
+		read32(INTEL_DISPLAY_B_DIGITAL_PORT),
+		read32(INTEL_DISPLAY_LVDS_PORT));
 
 	status = create_mode_list();
 	if (status != B_OK) {
@@ -235,7 +240,7 @@ intel_init_accelerant(int device)
 ssize_t
 intel_accelerant_clone_info_size(void)
 {
-	TRACE(("intel_accelerant_clone_info_size()\n"));
+	CALLED();
 	// clone info is device name, so return its maximum size
 	return B_PATH_NAME_LENGTH;
 }
@@ -244,7 +249,7 @@ intel_accelerant_clone_info_size(void)
 void
 intel_get_accelerant_clone_info(void* info)
 {
-	TRACE(("intel_get_accelerant_clone_info()\n"));
+	CALLED();
 	ioctl(gInfo->device, INTEL_GET_DEVICE_NAME, info, B_PATH_NAME_LENGTH);
 }
 
@@ -252,7 +257,7 @@ intel_get_accelerant_clone_info(void* info)
 status_t
 intel_clone_accelerant(void* info)
 {
-	TRACE(("intel_clone_accelerant()\n"));
+	CALLED();
 
 	// create full device name
 	char path[B_PATH_NAME_LENGTH];
@@ -294,7 +299,7 @@ err1:
 void
 intel_uninit_accelerant(void)
 {
-	TRACE(("intel_uninit_accelerant()\n"));
+	CALLED();
 
 	// delete accelerant instance data
 	delete_area(gInfo->mode_list_area);
@@ -314,7 +319,7 @@ intel_uninit_accelerant(void)
 status_t
 intel_get_accelerant_device_info(accelerant_device_info* info)
 {
-	TRACE(("intel_get_accelerant_device_info()\n"));
+	CALLED();
 
 	info->version = B_ACCELERANT_VERSION;
 	strcpy(info->name, gInfo->shared_info->device_type.InFamily(INTEL_TYPE_7xx)
@@ -332,7 +337,7 @@ intel_get_accelerant_device_info(accelerant_device_info* info)
 sem_id
 intel_accelerant_retrace_semaphore()
 {
-	TRACE(("intel_accelerant_retrace_semaphore()\n"));
+	CALLED();
 	return gInfo->shared_info->vblank_sem;
 }
 
