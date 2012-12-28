@@ -13,6 +13,7 @@
 
 
 typedef uint32_t socklen_t;
+typedef uint8_t sa_family_t;
 
 /* Address families */
 #define AF_UNSPEC		0
@@ -86,13 +87,13 @@ struct linger {
 
 struct sockaddr {
 	uint8_t		sa_len;
-	uint8_t		sa_family;
+	sa_family_t	sa_family;
 	uint8_t		sa_data[30];
 };
 
 struct sockaddr_storage {
 	uint8_t		ss_len;			/* total length */
-	uint8_t		ss_family;		/* address family */
+	sa_family_t	ss_family;		/* address family */
 	uint8_t		__ss_pad1[6];	/* align to quad */
 	uint64_t	__ss_pad2;		/* force alignment to 64 bit */
 	uint8_t		__ss_pad3[112];	/* pad to a total of 128 bytes */
