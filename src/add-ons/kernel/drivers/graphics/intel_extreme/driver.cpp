@@ -22,8 +22,8 @@
 #include <SupportDefs.h>
 
 
-#define TRACE_DEVICE
-#ifdef TRACE_DEVICE
+#define TRACE_DRIVER
+#ifdef TRACE_DRIVER
 #	define TRACE(x...) dprintf("intel_extreme: " x)
 #else
 #	define TRACE(x) ;

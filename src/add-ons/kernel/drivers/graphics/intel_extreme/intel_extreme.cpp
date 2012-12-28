@@ -22,8 +22,8 @@
 #include <util/kernel_cpp.h>
 
 
-#define TRACE_DEVICE
-#ifdef TRACE_DEVICE
+#define TRACE_INTELEXTREME
+#ifdef TRACE_INTELEXTREME
 #	define TRACE(x...) dprintf("intel_extreme: " x)
 #else
 #	define TRACE(x) ;
