@@ -105,6 +105,13 @@ NotificationWindow::WorkspaceActivated(int32 /*workspace*/, bool active)
 
 
 void
+NotificationWindow::FrameResized(float width, float height)
+{
+	SetPosition();
+}
+
+
+void
 NotificationWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
