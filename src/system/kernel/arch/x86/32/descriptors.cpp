@@ -552,7 +552,7 @@ x86_descriptors_init_post_vm(kernel_args* args)
 		physical_address_restrictions physicalRestrictions = {};
 		area = create_area_etc(B_SYSTEM_TEAM, "idt", areaSize, B_CONTIGUOUS,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
-			&virtualRestrictions, &physicalRestrictions, (void**)&idt);
+			0, &virtualRestrictions, &physicalRestrictions, (void**)&idt);
 		if (area < 0)
 			return area;
 

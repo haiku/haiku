@@ -41,4 +41,4 @@ OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite WebKit WebPositive
 OptionalPackageDependencies wpa_supplicant : OpenSSL ;
 OptionalPackageDependencies XZ-Utils : Tar ;
 
-OptionalPackageDependencies MandatoryPackages : Bzip Ctags ICU Sed Tar ;
+OptionalPackageDependencies MandatoryPackages : Bzip Ctags Grep ICU Sed Tar ;

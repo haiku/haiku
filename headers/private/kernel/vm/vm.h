@@ -77,7 +77,7 @@ void forbid_page_faults(void);
 
 // private kernel only extension (should be moved somewhere else):
 area_id create_area_etc(team_id team, const char *name, uint32 size,
-			uint32 lock, uint32 protection, uint32 flags,
+			uint32 lock, uint32 protection, uint32 flags, uint32 guardSize,
 			const virtual_address_restrictions* virtualAddressRestrictions,
 			const physical_address_restrictions* physicalAddressRestrictions,
 			void **_address);
@@ -95,7 +95,7 @@ status_t vm_unreserve_address_range(team_id team, void *address, addr_t size);
 status_t vm_reserve_address_range(team_id team, void **_address,
 			uint32 addressSpec, addr_t size, uint32 flags);
 area_id vm_create_anonymous_area(team_id team, const char* name, addr_t size,
-			uint32 wiring, uint32 protection, uint32 flags,
+			uint32 wiring, uint32 protection, uint32 flags, addr_t guardSize,
 			const virtual_address_restrictions* virtualAddressRestrictions,
 			const physical_address_restrictions* physicalAddressRestrictions,
 			bool kernel, void** _address);

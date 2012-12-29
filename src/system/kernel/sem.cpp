@@ -432,7 +432,7 @@ haiku_sem_init(kernel_args *args)
 	physical_address_restrictions physicalRestrictions = {};
 	area = create_area_etc(B_SYSTEM_TEAM, "sem_table",
 		sizeof(struct sem_entry) * sMaxSems, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT, 0,
 		&virtualRestrictions, &physicalRestrictions, (void**)&sSems);
 	if (area < 0)
 		panic("unable to allocate semaphore table!\n");

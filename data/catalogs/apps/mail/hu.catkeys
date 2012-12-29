@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	1599879742
+1	hungarian	x-vnd.Be-MAIL	2319898213
 View	Mail		Nézet
 %d - Date	Mail		%d - dátum
 Attach attributes:	Mail		Jellemzők csatolása:
@@ -10,6 +10,7 @@ Edit	Mail		Szerkesztés
 Print	Mail		Nyomtatás
 <none>	Mail		<nincs>
 New mail message	Mail		Új levél írása
+Untitled	Mail		Névtelen
 Automatic	Mail		Automatikus
 Automatically mark mail as read:	Mail		Automatikusan olvasottként jelölés:
 helpful message	Mail		segítőkész üzenet

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	3417936913
+1	japanese	x-vnd.Haiku-StyledEdit	1195515839
 StyledEdit	System name		StyledEdit
 Paste	Menus		貼り付け
 OK	LoadAlert		OK
@@ -19,12 +19,15 @@ Cancel	SaveAlert		中止
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
 Case-sensitive	FindandReplaceWindow		大文字と小文字を区別する
 Green	Menus		緑
+Reload	NodeMonitorAlerts		再読み込み
 Yellow	Menus		黄
 Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
 Wrap lines	Menus		ワードラップ
 Quit	Menus		終了
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		ファイル \"%file%\" はほかのアプリケーションにより削除されました。回復しますか?
 Document statistics	Statistics		ドキュメント統計
 Cancel	RevertToSavedAlert		中止
+Autodetect	Menus		自動判別
 Document	Menus		ドキュメント
 Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
 Edit	Menus		編集
@@ -33,7 +36,9 @@ Replace all	FindandReplaceWindow		すべて置換
 Statistics…	Menus		統計…
 Default	Open_and_SaveAsPanel		デフォルト
 Replace next	Menus		次を置換
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" に保存されていない変更があります。\n保存された版まで戻しますか? 
 Cancel	FindandReplaceWindow		中止
+Text encoding	Menus		テキストのエンコーディング
 Close	Menus		閉じる
 Save	SaveAlert		保存
 Words:	Statistics		単語数:
@@ -57,13 +62,16 @@ Find:	FindandReplaceWindow		検索：
 Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中エラーが発生しました：\n%s
 Copy	Menus		コピー
 Cut	Menus		切り取り
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		ファイル \"%file%\" はほかのアプリケーションにより変更されています。再読み込みしますか?
 Replace	FindandReplaceWindow		置換
 Find again	Menus		次を検索
 Cancel	QuitAlert		中止
 Find…	Menus		検索…
 Select all	Menus		すべて選択
 Don't save	SaveAlert		保存しない
+Recover	NodeMonitorAlerts		回復
 Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラー発生：\n\t%s
+Ignore	NodeMonitorAlerts		無視
 Undo typing	QuitAlert		元に戻す
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？
 Black	Menus		黒
@@ -74,5 +82,6 @@ Encoding	Open_and_SaveAsPanel		文字コード
 Characters:	Statistics		文字数:
 Save as…	Menus		名前を付けて保存…
 Redo typing	QuitAlert		やり直し
+Reload…	Menus		再読み込み…
 Replace…	Menus		置換…
 Right	Menus		右揃え

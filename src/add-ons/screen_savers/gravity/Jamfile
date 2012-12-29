@@ -1,0 +1,29 @@
+SubDir HAIKU_TOP src add-ons screen_savers gravity ;
+SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+
+AddResources Leaves : Gravity.rdef ;
+
+local sources =
+	Gravity.cpp
+	GravityConfigView.cpp
+	GravityHole.cpp
+	GravityScreenSaver.cpp
+	GravityView.cpp
+	Particle.cpp
+;
+
+Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+    # Dependency needed to trigger downloading/unzipping the package before
+    # compiling the files.
+
+ScreenSaver Gravity :
+	$(sources)
+	: be screensaver GL $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+;
+
+DoCatalogs Gravity :
+	x-vnd.Haiku-GravityScreensaver
+	:
+	$(sources)
+;

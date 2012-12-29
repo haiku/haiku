@@ -24,10 +24,14 @@
 
 #define TRACE_DRIVER
 #ifdef TRACE_DRIVER
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf("intel_extreme: " x)
 #else
 #	define TRACE(x) ;
 #endif
+
+#define ERROR(x...) dprintf("intel_extreme: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
+
 
 #define MAX_CARDS 4
 
@@ -90,7 +94,8 @@ const struct supported_device {
 	{0x0162, INTEL_TYPE_IVBG, "IvyBridge Desktop GT2"},
 	{0x0156, INTEL_TYPE_IVBGM, "IvyBridge Mobile GT1"},
 	{0x0166, INTEL_TYPE_IVBGM, "IvyBridge Mobile GT2"},
-	{0x015a, INTEL_TYPE_IVBGS, "IvyBridge Server GT1"}
+	{0x015a, INTEL_TYPE_IVBGS, "IvyBridge Server GT1"},
+	{0x016a, INTEL_TYPE_IVBGS, "IvyBridge Server GT2"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -134,7 +139,7 @@ get_next_intel_extreme(int32* _cookie, pci_info &info, uint32 &type)
 extern "C" const char**
 publish_devices(void)
 {
-	TRACE((DEVICE_NAME ": publish_devices()\n"));
+	CALLED();
 	return (const char**)gDeviceNames;
 }
 
@@ -142,11 +147,11 @@ publish_devices(void)
 extern "C" status_t
 init_hardware(void)
 {
-	TRACE((DEVICE_NAME ": init_hardware()\n"));
+	CALLED();
 
 	status_t status = get_module(B_PCI_MODULE_NAME,(module_info**)&gPCI);
 	if (status != B_OK) {
-		TRACE((DEVICE_NAME ": pci module unavailable\n"));
+		ERROR("pci module unavailable\n");
 		return status;
 	}
 
@@ -163,17 +168,17 @@ init_hardware(void)
 extern "C" status_t
 init_driver(void)
 {
-	TRACE((DEVICE_NAME ": init_driver()\n"));
+	CALLED();
 
 	status_t status = get_module(B_PCI_MODULE_NAME, (module_info**)&gPCI);
 	if (status != B_OK) {
-		TRACE((DEVICE_NAME ": pci module unavailable\n"));
+		ERROR("pci module unavailable\n");
 		return status;
 	}
 
 	status = get_module(B_AGP_GART_MODULE_NAME, (module_info**)&gGART);
 	if (status != B_OK) {
-		TRACE((DEVICE_NAME ": AGP GART module unavailable\n"));
+		ERROR("AGP GART module unavailable\n");
 		put_module(B_PCI_MODULE_NAME);
 		return status;
 	}
@@ -245,7 +250,7 @@ init_driver(void)
 extern "C" void
 uninit_driver(void)
 {
-	TRACE((DEVICE_NAME ": uninit_driver()\n"));
+	CALLED();
 
 	mutex_destroy(&gLock);
 
@@ -264,10 +269,9 @@ uninit_driver(void)
 extern "C" device_hooks*
 find_device(const char* name)
 {
+	CALLED();
+
 	int index;
-
-	TRACE((DEVICE_NAME ": find_device()\n"));
-
 	for (index = 0; gDeviceNames[index] != NULL; index++) {
 		if (!strcmp(name, gDeviceNames[index]))
 			return &gDeviceHooks;

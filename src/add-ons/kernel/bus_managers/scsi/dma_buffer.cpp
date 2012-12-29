@@ -195,7 +195,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			// TODO: Use 64 bit addresses, if possible!
 #endif
 		buffer->area = create_area_etc(B_SYSTEM_TEAM, "DMA buffer", size,
-			B_CONTIGUOUS, 0, 0, &virtualRestrictions, &physicalRestrictions,
+			B_CONTIGUOUS, 0, 0, 0, &virtualRestrictions, &physicalRestrictions,
 			(void**)&buffer->address);
 
 		if (buffer->area < 0) {

@@ -43,6 +43,9 @@ typedef struct fd_set {
 #define _FD_BITSINDEX(fd) ((fd) / NFDBITS)
 #define _FD_BIT(fd) (1L << ((fd) % NFDBITS))
 
+// FD_ZERO uses memset
+#include <string.h>
+
 #define FD_ZERO(set) memset((set), 0, sizeof(fd_set))
 #define FD_SET(fd, set) ((set)->bits[_FD_BITSINDEX(fd)] |= _FD_BIT(fd))
 #define FD_CLR(fd, set) ((set)->bits[_FD_BITSINDEX(fd)] &= ~_FD_BIT(fd))

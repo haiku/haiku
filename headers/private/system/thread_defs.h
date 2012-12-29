@@ -12,14 +12,11 @@
 
 
 /** Size of the stack given to teams in user space */
-#define USER_STACK_GUARD_PAGES		4								// 16 kB
-#define USER_MAIN_THREAD_STACK_SIZE	(16 * 1024 * 1024 \
-						- USER_STACK_GUARD_PAGES * B_PAGE_SIZE)		// 16 MB
-#define USER_STACK_SIZE				(256 * 1024	\
-						- USER_STACK_GUARD_PAGES * B_PAGE_SIZE)		// 256 kB
-#define MIN_USER_STACK_SIZE			(4 * 1024)						// 4 KB
-#define MAX_USER_STACK_SIZE			(16 * 1024 * 1024 \
-						- USER_STACK_GUARD_PAGES * B_PAGE_SIZE)		// 16 MB
+#define USER_STACK_GUARD_SIZE		(4 * B_PAGE_SIZE)		// 16 kB
+#define USER_MAIN_THREAD_STACK_SIZE	(16 * 1024 * 1024)		// 16 MB
+#define USER_STACK_SIZE				(256 * 1024)			// 256 kB
+#define MIN_USER_STACK_SIZE			(4 * 1024)				// 4 KB
+#define MAX_USER_STACK_SIZE			(16 * 1024 * 1024)		// 16 MB
 
 
 // The type of object a thread blocks on (thread::wait::type, set by
@@ -50,6 +47,7 @@ struct thread_creation_attributes {
 	void*		args2;
 	void*		stack_address;
 	size_t		stack_size;
+	size_t		guard_size;
 	pthread_t	pthread;
 	uint32		flags;
 };

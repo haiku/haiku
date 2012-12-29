@@ -73,3 +73,17 @@ WRAPPER_FUNCTION(int, pthread_attr_getschedparam,
 	return B_TO_POSITIVE_ERROR(sReal_pthread_attr_getschedparam(attr,
 		param));
 )
+
+
+WRAPPER_FUNCTION(int, pthread_attr_getguardsize,
+		(const pthread_attr_t *attr, size_t *guardsize),
+	return B_TO_POSITIVE_ERROR(sReal_pthread_attr_getguardsize(attr,
+		guardsize));
+)
+
+
+WRAPPER_FUNCTION(int, pthread_attr_setguardsize,
+		(pthread_attr_t *attr, size_t guardsize),
+	return B_TO_POSITIVE_ERROR(sReal_pthread_attr_setguardsize(attr,
+		guardsize));
+)

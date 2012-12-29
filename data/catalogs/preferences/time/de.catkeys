@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Time	3249243267
+1	german	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		GMT (Unix-kompatibel)
 OK	Time		OK
 Asia	Time		Asien
@@ -40,5 +40,6 @@ Try all servers	Time		Alle Server abfragen
 Time zone	Time		Zeitzone
 Could not create socket	Time		Socket konnte nicht erzeugt werden
 Synchronize again	Time		Nochmal synchronisieren
+Clock	Time		Uhr
 Network time	Time		Netzwerkzeit
 Atlantic	Time		Atlantik

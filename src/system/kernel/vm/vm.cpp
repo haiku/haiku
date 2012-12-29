@@ -817,10 +817,10 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 		VMCache* newCache;
 
 		// create an anonymous cache
-		bool isStack = (protection & B_STACK_AREA) != 0;
 		status = VMCacheFactory::CreateAnonymousCache(newCache,
-			isStack || (protection & B_OVERCOMMITTING_AREA) != 0, 0,
-			isStack ? USER_STACK_GUARD_PAGES : 0, true, VM_PRIORITY_USER);
+			(protection & B_STACK_AREA) != 0
+				|| (protection & B_OVERCOMMITTING_AREA) != 0, 0,
+			cache->GuardSize() / B_PAGE_SIZE, true, VM_PRIORITY_USER);
 		if (status != B_OK)
 			goto err1;
 
@@ -1178,7 +1178,7 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 
 area_id
 vm_create_anonymous_area(team_id team, const char *name, addr_t size,
-	uint32 wiring, uint32 protection, uint32 flags,
+	uint32 wiring, uint32 protection, uint32 flags, addr_t guardSize,
 	const virtual_address_restrictions* virtualAddressRestrictions,
 	const physical_address_restrictions* physicalAddressRestrictions,
 	bool kernel, void** _address)
@@ -1196,8 +1196,10 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 		team, name, size));
 
 	size = PAGE_ALIGN(size);
+	guardSize = PAGE_ALIGN(guardSize);
+	guardPages = guardSize / B_PAGE_SIZE;
 
-	if (size == 0)
+	if (size == 0 || size < guardSize)
 		return B_BAD_VALUE;
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
@@ -1373,8 +1375,6 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 
 	// create an anonymous cache
 	// if it's a stack, make sure that two pages are available at least
-	guardPages = isStack ? ((protection & B_USER_PROTECTION) != 0
-		? USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0;
 	status = VMCacheFactory::CreateAnonymousCache(cache, canOvercommit,
 		isStack ? (min_c(2, size / B_PAGE_SIZE - guardPages)) : 0, guardPages,
 		wiring == B_NO_LOCK, priority);
@@ -1879,7 +1879,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 		virtualRestrictions.address_specification = addressSpec;
 		physical_address_restrictions physicalRestrictions = {};
 		return vm_create_anonymous_area(team, name, size, B_NO_LOCK, protection,
-			flags, &virtualRestrictions, &physicalRestrictions, kernel,
+			flags, 0, &virtualRestrictions, &physicalRestrictions, kernel,
 			_address);
 	}
 
@@ -2305,7 +2305,8 @@ vm_copy_on_write_area(VMCache* lowerCache,
 
 	// create an anonymous cache
 	status_t status = VMCacheFactory::CreateAnonymousCache(upperCache, false, 0,
-		0, dynamic_cast<VMAnonymousNoSwapCache*>(lowerCache) == NULL,
+		lowerCache->GuardSize() / B_PAGE_SIZE,
+		dynamic_cast<VMAnonymousNoSwapCache*>(lowerCache) == NULL,
 		VM_PRIORITY_USER);
 	if (status != B_OK)
 		return status;
@@ -3893,8 +3894,8 @@ vm_init(kernel_args* args)
 		create_area_etc(VMAddressSpace::KernelID(), "cache info table",
 			ROUNDUP(kCacheInfoTableCount * sizeof(cache_info), B_PAGE_SIZE),
 			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-			CREATE_AREA_DONT_WAIT, &virtualRestrictions, &physicalRestrictions,
-			(void**)&sCacheInfoTable);
+			CREATE_AREA_DONT_WAIT, 0, &virtualRestrictions,
+			&physicalRestrictions, (void**)&sCacheInfoTable);
 	}
 #endif	// DEBUG_CACHE_LIST
 
@@ -5863,7 +5864,7 @@ clone_area(const char* name, void** _address, uint32 addressSpec,
 
 area_id
 create_area_etc(team_id team, const char* name, uint32 size, uint32 lock,
-	uint32 protection, uint32 flags,
+	uint32 protection, uint32 flags, uint32 guardSize,
 	const virtual_address_restrictions* virtualAddressRestrictions,
 	const physical_address_restrictions* physicalAddressRestrictions,
 	void** _address)
@@ -5871,8 +5872,8 @@ create_area_etc(team_id team, const char* name, uint32 size, uint32 lock,
 	fix_protection(&protection);
 
 	return vm_create_anonymous_area(team, name, size, lock, protection, flags,
-		virtualAddressRestrictions, physicalAddressRestrictions, true,
-		_address);
+		guardSize, virtualAddressRestrictions, physicalAddressRestrictions,
+		true, _address);
 }
 
 
@@ -5887,8 +5888,8 @@ __create_area_haiku(const char* name, void** _address, uint32 addressSpec,
 	virtualRestrictions.address_specification = addressSpec;
 	physical_address_restrictions physicalRestrictions = {};
 	return vm_create_anonymous_area(VMAddressSpace::KernelID(), name, size,
-		lock, protection, 0, &virtualRestrictions, &physicalRestrictions, true,
-		_address);
+		lock, protection, 0, 0, &virtualRestrictions, &physicalRestrictions,
+		true, _address);
 }
 
 
@@ -6131,8 +6132,8 @@ _user_create_area(const char* userName, void** userAddress, uint32 addressSpec,
 	virtualRestrictions.address_specification = addressSpec;
 	physical_address_restrictions physicalRestrictions = {};
 	area_id area = vm_create_anonymous_area(VMAddressSpace::CurrentID(), name,
-		size, lock, protection, 0, &virtualRestrictions, &physicalRestrictions,
-		false, &address);
+		size, lock, protection, 0, 0, &virtualRestrictions,
+		&physicalRestrictions, false, &address);
 
 	if (area >= B_OK
 		&& user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {

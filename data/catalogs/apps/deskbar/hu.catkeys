@@ -1,7 +1,8 @@
-1	hungarian	x-vnd.Be-TSKB	3155357024
+1	hungarian	x-vnd.Be-TSKB	1566009467
 Power off	DeskbarMenu		Kikapcsolás
 Edit menu…	PreferencesWindow		Menü szerkesztése…
 Suspend	DeskbarMenu		Felfüggesztés
+Hide clock	TimeView		Óra elrejtése
 Time preferences…	TimeView		Idő beállítása…
 About Haiku	DeskbarMenu		Haiku névjegye
 Recent documents:	PreferencesWindow		Utolsó dokumentumok:
@@ -9,6 +10,7 @@ Recent applications	DeskbarMenu		Legutóbbi programok
 Sort running applications	PreferencesWindow		Futó programok rendezése
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programok
 Find…	DeskbarMenu		Keresés…
+Show clock	Tray		Óra megjelenítése
 Window	PreferencesWindow		Ablak
 Menu	PreferencesWindow		Menü
 Recent documents	DeskbarMenu		Legutóbbi dokumentumok

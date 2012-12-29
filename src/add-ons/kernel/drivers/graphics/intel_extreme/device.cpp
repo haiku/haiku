@@ -28,10 +28,13 @@
 
 #define TRACE_DEVICE
 #ifdef TRACE_DEVICE
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf("intel_extreme: " x)
 #else
 #	define TRACE(x) ;
 #endif
+
+#define ERROR(x...) dprintf("intel_extreme: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 /* device hooks prototypes */
@@ -101,7 +104,7 @@ getset_register(int argc, char** argv)
 static status_t
 device_open(const char* name, uint32 /*flags*/, void** _cookie)
 {
-	TRACE((DEVICE_NAME ": open(name = %s)\n", name));
+	CALLED();
 	int32 id;
 
 	// find accessed device
@@ -147,7 +150,7 @@ device_open(const char* name, uint32 /*flags*/, void** _cookie)
 static status_t
 device_close(void* /*data*/)
 {
-	TRACE((DEVICE_NAME ": close\n"));
+	CALLED();
 	return B_OK;
 }
 
@@ -183,7 +186,7 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 	switch (op) {
 		case B_GET_ACCELERANT_SIGNATURE:
 			strcpy((char*)buffer, INTEL_ACCELERANT_NAME);
-			TRACE((DEVICE_NAME ": accelerant: %s\n", INTEL_ACCELERANT_NAME));
+			TRACE("accelerant: %s\n", INTEL_ACCELERANT_NAME);
 			return B_OK;
 
 		// needed to share data between kernel and accelerant
@@ -260,8 +263,8 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 		}
 
 		default:
-			TRACE((DEVICE_NAME ": ioctl() unknown message %ld (length = %ld)\n",
-				op, bufferLength));
+			ERROR("ioctl() unknown message %ld (length = %ld)\n", op,
+				bufferLength);
 			break;
 	}
 

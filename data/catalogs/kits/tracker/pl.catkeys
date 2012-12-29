@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	1934301215
+1	polish	x-vnd.Haiku-libtracker	75125649
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -120,6 +120,7 @@ Move to Trash	ContainerWindow		Przenieś do Kosza
 Move to	ContainerWindow		Przenieś do
 Create %s clipping	PoseView		Stwórz %s wycinek
 Set new link target	InfoWindow		Ustaw nowy cel dla skrótu
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli dokonasz %ifYouDoAction katalog systemowy lub jego zawartość, to nie uda się uruchomić %osName!\n\nCzy jesteś pewien/pewna, że chcesz to zrobić?\n\nŻeby rzeczywiście %toDoAction katalog systemowy lub jego zawartość, przytrzymaj przycisk Shift i kliknij \"%toConfirmAction\".
 Save as Query template:	FindPanel		Zapisz jako szablon Zapytania:
 preferences	B_PREFERENCES_DIRECTORY		ustawienia
 Cancel	FSUtils		Anuluj
@@ -443,6 +444,7 @@ Mount	DeskWindow		Zamontuj
 Mount	ContainerWindow		Zamontuj
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used zajęte -- %free wolne)
 Cancel	FSClipBoard		Anuluj
+Restart Deskbar	DeskWindow		Uruchom ponownie Deskbar
 Cut more	ContainerWindow		Wytnij więcej
 Deleting: 	StatusWindow		Usuwanie: 
 Empty Trash	InfoWindow		Opróżnij kosz

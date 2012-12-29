@@ -309,7 +309,7 @@ debug_heap_init()
 	physical_address_restrictions physicalRestrictions = {};
 	area_id area = create_area_etc(B_SYSTEM_TEAM, "kdebug heap", KDEBUG_HEAP,
 		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-		CREATE_AREA_DONT_WAIT, &virtualRestrictions, &physicalRestrictions,
+		CREATE_AREA_DONT_WAIT, 0, &virtualRestrictions, &physicalRestrictions,
 		(void**)&base);
 	if (area < 0)
 		return;

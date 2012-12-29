@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Time	3249243267
+1	japanese	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		GMT (UNIX 互換)
 OK	Time		OK
 Asia	Time		アジア
@@ -40,5 +40,6 @@ Try all servers	Time		すべてのサーバーを試す
 Time zone	Time		タイムゾーン
 Could not create socket	Time		ソケットを作成できませんでした。
 Synchronize again	Time		再同期
+Clock	Time		時計
 Network time	Time		ネットワークタイム
 Atlantic	Time		大西洋

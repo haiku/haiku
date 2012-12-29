@@ -12,7 +12,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
 	ftp ftpd funzip fwcontrol
-	gawk gdb@x86 getlimits grep groups gzip gzexe
+	gawk gdb@x86 getlimits groups gzip gzexe
 	hd head hey hostname
 	id ident ifconfig <bin>install installsound iroster isvolume
 	ideinfo@ide idestatus@ide
@@ -440,8 +440,6 @@ AddSymlinkToHaikuImage system bin : gzip : zcat ;
 AddSymlinkToHaikuImage system bin : zdiff : zcmp ;
 AddSymlinkToHaikuImage system bin : unzip : zipinfo ;
 AddSymlinkToHaikuImage system bin : gawk : awk ;
-AddSymlinkToHaikuImage system bin : grep : egrep ;
-AddSymlinkToHaikuImage system bin : grep : fgrep ;
 
 
 # scripts and data files

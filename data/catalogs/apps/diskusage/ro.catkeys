@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DiskUsage	1960660144
+1	romanian	x-vnd.Haiku-DiskUsage	2682355634
 Scanning %refName%	Scanner		Se scanează %refName%
 Size	Info Window		Dimensiune
 Rescan	Pie View		Rescanează
@@ -10,12 +10,10 @@ Path	Info Window		Cale
 Scan	Status View		Scanează
 9999.99 GB	Status View		9999.99 GB
 file unavailable	Status View		fișier indisponibil
-Get Info	Pie View		Obține informații
 DiskUsage	System name		UtilizareDisc
 %d files	Status View		%d fișiere
 Created	Info Window		Creat
 Modified	Info Window		Modificat
 Open	Pie View		Deschide
-Open With	Pie View		Deschide cu
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Liber pe %refName%

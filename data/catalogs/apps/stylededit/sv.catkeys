@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	3417936913
+1	swedish	x-vnd.Haiku-StyledEdit	1195515839
 StyledEdit	System name		SkrivStiligt
 Paste	Menus		Klistra in
 OK	LoadAlert		OK
@@ -19,12 +19,15 @@ Cancel	SaveAlert		Avbryt
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: "%s".
 Case-sensitive	FindandReplaceWindow		Skiftlägeskänslig
 Green	Menus		Grön
+Reload	NodeMonitorAlerts		Uppdatera
 Yellow	Menus		Gul
 Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
 Wrap lines	Menus		Bryt rader
 Quit	Menus		Avsluta
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Filen \"%file%\" blev bortplockad av ett annat program. Vill du plocka tillbaka den?
 Document statistics	Statistics		Dokumentstatistik
 Cancel	RevertToSavedAlert		Avbryt
+Autodetect	Menus		Identifiera automatiskt
 Document	Menus		Dokument
 Save changes to the document \"%s\"? 	QuitAlert		Spara ändringar till dokumentet "%s"? 
 Edit	Menus		Redigera
@@ -33,7 +36,9 @@ Replace all	FindandReplaceWindow		Ersätt alla
 Statistics…	Menus		Statistik...
 Default	Open_and_SaveAsPanel		Standard
 Replace next	Menus		Ersätt nästa
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" har osparade ändringar.\nVill du ångra och återgå till senast sparade versionen?
 Cancel	FindandReplaceWindow		Avbryt
+Text encoding	Menus		Textkodning
 Close	Menus		Stäng
 Save	SaveAlert		Spara
 Words:	Statistics		Ord:
@@ -57,13 +62,16 @@ Find:	FindandReplaceWindow		Sök:
 Error saving \"%s\":\n%s	SaveAlert		Kunde inte spara "%s":\n%s
 Copy	Menus		Kopiera
 Cut	Menus		Klipp ut
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Filen \"%file%\" blev modifierad av ett annat program. Vill du laddaom programmet?
 Replace	FindandReplaceWindow		Ersätt
 Find again	Menus		Sök igen
 Cancel	QuitAlert		Avbryt
 Find…	Menus		Sök…
 Select all	Menus		Markera allt
 Don't save	SaveAlert		Spara inte
+Recover	NodeMonitorAlerts		Återskapa
 Error loading \"%s\":\n\t%s	LoadAlert		Fel vid inläsning "%s":\n\t%s
+Ignore	NodeMonitorAlerts		Ignorera
 Undo typing	QuitAlert		Ångra inmatning
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Denna fil är markerad som endast läsbar. Vill du spara ändringarna till dokumentet "%s"?
 Black	Menus		Svart
@@ -74,5 +82,6 @@ Encoding	Open_and_SaveAsPanel		Kodning
 Characters:	Statistics		Tecken:
 Save as…	Menus		Spara som...
 Redo typing	QuitAlert		Gör om inmatning
+Reload…	Menus		Uppdatera
 Replace…	Menus		Ersätt…
 Right	Menus		Höger

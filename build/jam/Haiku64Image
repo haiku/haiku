@@ -10,7 +10,7 @@ SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr checkfs
 	chgrp chmod chown chroot cksum clear clockconfig cmp collectcatkeys comm
 	compress copyattr cp csplit cut date dd diff diff3 dircolors dirname df du
 	dumpcatalog echo eject env error expand expr factor false find finddir
-	fmt fold fortune ftp gawk gdb gzip gzexe getlimits grep groups head hostname
+	fmt fold fortune ftp gawk gdb gzip gzexe getlimits groups head hostname
 	id ifconfig <bin>install isvolume join kernel_debugger kill less lessecho
 	lesskey link linkcatkeys listdev ln locale locate logger logname ls
 	makebootable md5sum mimeset mkdir mkfifo mkfs mktemp mount mountvolume
@@ -228,8 +228,6 @@ AddSymlinkToHaikuImage system bin : gzip : zcat ;
 AddSymlinkToHaikuImage system bin : zdiff : zcmp ;
 AddSymlinkToHaikuImage system bin : unzip : zipinfo ;
 AddSymlinkToHaikuImage system bin : gawk : awk ;
-AddSymlinkToHaikuImage system bin : grep : egrep ;
-AddSymlinkToHaikuImage system bin : grep : fgrep ;
 
 
 # scripts and data files

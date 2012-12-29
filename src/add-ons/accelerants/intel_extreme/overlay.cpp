@@ -14,6 +14,7 @@
 #include "accelerant_protos.h"
 #include "commands.h"
 
+#include <Debug.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,13 +22,16 @@
 #include <AGP.h>
 
 
+#undef TRACE
 //#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
-extern "C" void _sPrintf(const char* format, ...);
-#	define TRACE(x) _sPrintf x
+#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...)
 #endif
+
+#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 #define NUM_HORIZONTAL_TAPS		5
@@ -243,11 +247,11 @@ update_overlay(bool updateCoefficients)
 	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
 	queue.PutFlush();
 
-	TRACE(("update overlay: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), "
-		"ERR: %lx\n", read32(INTEL_OVERLAY_UPDATE), read32(INtEL_OVERLAY_TEST),
-		read32(INTEL_OVERLAY_STATUS),
+	TRACE("%s: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), ERR: %lx\n",
+		__func__, read32(INTEL_OVERLAY_UPDATE),
+		read32(INTEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
 		*(((uint32*)gInfo->overlay_registers) + 0x68/4), read32(0x30168),
-		read32(0x2024)));
+		read32(0x2024));
 }
 
 
@@ -265,11 +269,11 @@ show_overlay(void)
 	queue.PutOverlayFlip(COMMAND_OVERLAY_ON, true);
 	queue.PutFlush();
 
-	TRACE(("show overlay: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), "
-		"ERR: %lx\n", read32(INTEL_OVERLAY_UPDATE), read32(INTEL_OVERLAY_TEST),
-		read32(INTEL_OVERLAY_STATUS),
-		*(((uint32*)gInfo->overlay_registers) + 0x68/4), read32(0x30168),
-		read32(0x2024)));
+	TRACE("%s: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), ERR: %lx\n",
+		__func__, read32(INTEL_OVERLAY_UPDATE),
+		read32(INTEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
+		*(((uint32*)gInfo->overlay_registers) + 0x68/4),
+		read32(0x30168), read32(0x2024));
 }
 
 
@@ -344,8 +348,8 @@ const overlay_buffer*
 intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	uint16 height)
 {
-	TRACE(("intel_allocate_overlay_buffer(width %u, height %u, "
-		"colorSpace %lu)\n", width, height, colorSpace));
+	TRACE("%s(width %u, height %u, colorSpace %lu)\n", __func__, width,
+		height, colorSpace);
 
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	uint32 bytesPerPixel;
@@ -412,9 +416,9 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	buffer->buffer_dma = (uint8*)gInfo->shared_info->physical_graphics_memory
 		+ overlay->buffer_offset;
 
-	TRACE(("allocated overlay buffer: base=%x, offset=%x, address=%x, "
-		"physical address=%x\n", overlay->buffer_base, overlay->buffer_offset,
-		buffer->buffer, buffer->buffer_dma));
+	TRACE("%s: base=%x, offset=%x, address=%x, physical address=%x\n",
+		__func__, overlay->buffer_base, overlay->buffer_offset,
+		buffer->buffer, buffer->buffer_dma);
 
 	return buffer;
 }
@@ -423,7 +427,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 status_t
 intel_release_overlay_buffer(const overlay_buffer* buffer)
 {
-	TRACE(("intel_release_overlay_buffer(buffer %p)\n", buffer));
+	CALLED();
 
 	struct overlay* overlay = (struct overlay*)buffer;
 
@@ -445,7 +449,7 @@ status_t
 intel_get_overlay_constraints(const display_mode* mode,
 	const overlay_buffer* buffer, overlay_constraints* constraints)
 {
-	TRACE(("intel_get_overlay_constraints(buffer %p)\n", buffer));
+	CALLED();
 
 	// taken from the Radeon driver...
 
@@ -507,7 +511,7 @@ intel_get_overlay_constraints(const display_mode* mode,
 overlay_token
 intel_allocate_overlay(void)
 {
-	TRACE(("intel_allocate_overlay()\n"));
+	CALLED();
 
 	// we only have a single overlay channel
 	if (atomic_or(&gInfo->shared_info->overlay_channel_used, 1) != 0)
@@ -520,7 +524,7 @@ intel_allocate_overlay(void)
 status_t
 intel_release_overlay(overlay_token overlayToken)
 {
-	TRACE(("intel_allocate_overlay(token %ld)\n", (uint32)overlayToken));
+	CALLED();
 
 	// we only have a single token, which simplifies this
 	if (overlayToken != (overlay_token)gInfo->shared_info->overlay_token)
@@ -537,8 +541,7 @@ intel_configure_overlay(overlay_token overlayToken,
 	const overlay_buffer* buffer, const overlay_window* window,
 	const overlay_view* view)
 {
-	TRACE(("intel_configure_overlay: buffer %p, window %p, view %p\n",
-		buffer, window, view));
+	CALLED();
 
 	if (overlayToken != (overlay_token)gInfo->shared_info->overlay_token)
 		return B_BAD_VALUE;
@@ -653,9 +656,9 @@ intel_configure_overlay(overlay_token overlayToken,
 		registers->vertical_scale_rgb = verticalScale >> 12;
 		registers->vertical_scale_uv = verticalScaleUV >> 12;
 
-		TRACE(("scale: h = %ld.%ld, v = %ld.%ld\n", horizontalScale >> 12,
+		TRACE("scale: h = %ld.%ld, v = %ld.%ld\n", horizontalScale >> 12,
 			horizontalScale & 0xfff, verticalScale >> 12,
-			verticalScale & 0xfff));
+			verticalScale & 0xfff);
 
 		if (verticalScale != gInfo->last_vertical_overlay_scale
 			|| horizontalScale != gInfo->last_horizontal_overlay_scale) {

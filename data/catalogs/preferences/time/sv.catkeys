@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Time	3249243267
+1	swedish	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		GMT (UNIX kompatibel)
 OK	Time		OK
 Asia	Time		Asien
@@ -40,5 +40,6 @@ Try all servers	Time		Prova alla servrarna
 Time zone	Time		Tidzon
 Could not create socket	Time		Kunde inte skapa en socket
 Synchronize again	Time		Synkronisera igen
+Clock	Time		Klockan
 Network time	Time		Internettid
 Atlantic	Time		Atlanten

@@ -1,7 +1,8 @@
-1	german	x-vnd.Be-TSKB	3155357024
+1	german	x-vnd.Be-TSKB	1566009467
 Power off	DeskbarMenu		Ausschalten
 Edit menu…	PreferencesWindow		Menü bearbeiten…
 Suspend	DeskbarMenu		Ruhezustand
+Hide clock	TimeView		Uhr ausblenden
 Time preferences…	TimeView		Datum & Zeit Einstellungen…
 About Haiku	DeskbarMenu		Über Haiku
 Recent documents:	PreferencesWindow		Letzte Dokumente:
@@ -9,6 +10,7 @@ Recent applications	DeskbarMenu		Letzte Anwendungen
 Sort running applications	PreferencesWindow		Laufende Anwendungen sortieren
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Anwendungen
 Find…	DeskbarMenu		Suchen…
+Show clock	Tray		Uhr anzeigen
 Window	PreferencesWindow		Fenster
 Menu	PreferencesWindow		Menü
 Recent documents	DeskbarMenu		Letzte Dokumente

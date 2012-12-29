@@ -1943,7 +1943,7 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 				virtualRestrictions.address_specification = B_EXACT_ADDRESS;
 				physical_address_restrictions physicalRestrictions = {};
 				id = create_area_etc(team->id, regionName, bssSize, B_NO_LOCK,
-					B_READ_AREA | B_WRITE_AREA, 0, &virtualRestrictions,
+					B_READ_AREA | B_WRITE_AREA, 0, 0, &virtualRestrictions,
 					&physicalRestrictions, (void**)&regionAddress);
 				if (id < B_OK) {
 					dprintf("error allocating bss area: %s!\n", strerror(id));

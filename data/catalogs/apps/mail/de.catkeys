@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	1599879742
+1	german	x-vnd.Be-MAIL	2319898213
 View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attribute von Anhängen:
@@ -10,6 +10,7 @@ Edit	Mail		Bearbeiten
 Print	Mail		Drucken
 <none>	Mail		<kein>
 New mail message	Mail		Nachricht verfassen
+Untitled	Mail		Unbenannt
 Automatic	Mail		Automatisch
 Automatically mark mail as read:	Mail		Nachrichten automatisch als gelesen markieren:
 helpful message	Mail		Tipp

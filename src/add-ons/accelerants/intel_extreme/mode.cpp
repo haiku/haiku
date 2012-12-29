@@ -14,6 +14,7 @@
 #include "accelerant.h"
 #include "utility.h"
 
+#include <Debug.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -24,13 +25,16 @@
 #include <validate_display_mode.h>
 
 
+#undef TRACE
 #define TRACE_MODE
 #ifdef TRACE_MODE
-extern "C" void _sPrintf(const char* format, ...);
-#	define TRACE(x) _sPrintf x
+#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...)
 #endif
+
+#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 struct display_registers {
@@ -138,7 +142,8 @@ set_frame_buffer_base()
 	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_ILK)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)) {
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_IVB)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
@@ -170,16 +175,16 @@ create_mode_list(void)
 		edid_dump(&gInfo->edid_info);
 		gInfo->has_edid = true;
 	} else {
-		TRACE(("intel_extreme: getting EDID on port A (analog) failed : %s. "
-			"Trying on port C (lvds)\n", strerror(error)));
+		TRACE("getting EDID on port A (analog) failed : %s. "
+			"Trying on port C (lvds)\n", strerror(error));
 		bus.cookie = (void*)INTEL_I2C_IO_C;
 		error = ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL);
 		if (error == B_OK) {
 			edid_dump(&gInfo->edid_info);
 			gInfo->has_edid = true;
 		} else {
-			TRACE(("intel_extreme: getting EDID on port C failed : %s\n",
-				strerror(error)));
+			TRACE("getting EDID on port C failed : %s\n",
+				strerror(error));
 
 			// We could not read any EDID info. Fallback to creating a list with
 			// only the mode set up by the BIOS.
@@ -241,7 +246,8 @@ get_pll_limits(pll_limits &limits)
 	// tested
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_ILK)
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)) {
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IVB)) {
 		// TODO: support LVDS output limits as well
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
@@ -291,14 +297,14 @@ get_pll_limits(pll_limits &limits)
 		limits = kLimits;
 	}
 
-	TRACE(("PLL limits, min: p %lu (p1 %lu, p2 %lu), n %lu, m %lu "
+	TRACE("PLL limits, min: p %lu (p1 %lu, p2 %lu), n %lu, m %lu "
 		"(m1 %lu, m2 %lu)\n", limits.min.post, limits.min.post1,
 		limits.min.post2, limits.min.n, limits.min.m, limits.min.m1,
-		limits.min.m2));
-	TRACE(("PLL limits, max: p %lu (p1 %lu, p2 %lu), n %lu, m %lu "
+		limits.min.m2);
+	TRACE("PLL limits, max: p %lu (p1 %lu, p2 %lu), n %lu, m %lu "
 		"(m1 %lu, m2 %lu)\n", limits.max.post, limits.max.post1,
 		limits.max.post2, limits.max.n, limits.max.m, limits.max.m1,
-		limits.max.m2));
+		limits.max.m2);
 }
 
 
@@ -329,7 +335,7 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 	pll_limits limits;
 	get_pll_limits(limits);
 
-	TRACE(("required MHz: %g\n", requestedPixelClock));
+	TRACE("%s: required MHz: %g\n", __func__, requestedPixelClock);
 
 	if (isLVDS) {
 		if ((read32(INTEL_DISPLAY_LVDS_PORT) & LVDS_CLKB_POWER_MASK)
@@ -384,11 +390,11 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 
 	divisors = bestDivisors;
 
-	TRACE(("found: %g MHz, p = %lu (p1 = %lu, p2 = %lu), n = %lu, m = %lu "
-		"(m1 = %lu, m2 = %lu)\n",
+	TRACE("%s: found: %g MHz, p = %lu (p1 = %lu, p2 = %lu), n = %lu, m = %lu "
+		"(m1 = %lu, m2 = %lu)\n", __func__,
 		((referenceClock * divisors.m) / divisors.n) / divisors.post,
 		divisors.post, divisors.post1, divisors.post2, divisors.n,
-		divisors.m, divisors.m1, divisors.m2));
+		divisors.m, divisors.m1, divisors.m2);
 }
 
 
@@ -633,7 +639,7 @@ sanitize_display_mode(display_mode& mode)
 uint32
 intel_accelerant_mode_count(void)
 {
-	TRACE(("intel_accelerant_mode_count()\n"));
+	CALLED();
 	return gInfo->shared_info->mode_count;
 }
 
@@ -641,7 +647,7 @@ intel_accelerant_mode_count(void)
 status_t
 intel_get_mode_list(display_mode* modeList)
 {
-	TRACE(("intel_get_mode_info()\n"));
+	CALLED();
 	memcpy(modeList, gInfo->mode_list,
 		gInfo->shared_info->mode_count * sizeof(display_mode));
 	return B_OK;
@@ -652,7 +658,7 @@ status_t
 intel_propose_display_mode(display_mode* target, const display_mode* low,
 	const display_mode* high)
 {
-	TRACE(("intel_propose_display_mode()\n"));
+	CALLED();
 
 	// first search for the specified mode in the list, if no mode is found
 	// try to fix the target mode in sanitize_display_mode
@@ -683,8 +689,8 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 status_t
 intel_set_display_mode(display_mode* mode)
 {
-	TRACE(("intel_set_display_mode(%ldx%ld)\n", mode->virtual_width,
-		mode->virtual_height));
+	TRACE("%s(%" B_PRIu16 "x%" B_PRIu16 ")\n", __func__,
+		mode->virtual_width, mode->virtual_height);
 
 	if (mode == NULL)
 		return B_BAD_VALUE;
@@ -695,7 +701,7 @@ intel_set_display_mode(display_mode* mode)
 	// centering, since the data from propose_display_mode will not actually be
 	// used as is in this case.
 	if (sanitize_display_mode(target)) {
-		TRACE(("intel_extreme: invalid mode set!\n"));
+		TRACE("%s: invalid mode set!\n", __func__);
 		return B_BAD_VALUE;
 	}
 
@@ -747,7 +753,7 @@ if (first) {
 			set_frame_buffer_base();
 		}
 
-		TRACE(("intel_extreme : Failed to allocate framebuffer !\n"));
+		TRACE("%s: Failed to allocate framebuffer !\n", __func__);
 		return B_NO_MEMORY;
 	}
 
@@ -783,8 +789,8 @@ if (first) {
 					break;
 				}
 			}
-			TRACE(("intel_extreme : hardware mode will actually be %dx%d\n",
-				hardwareTarget.virtual_width, hardwareTarget.virtual_height));
+			TRACE("%s: hardware mode will actually be %dx%d\n", __func__,
+				hardwareTarget.virtual_width, hardwareTarget.virtual_height);
 			if ((hardwareTarget.virtual_width <= target.virtual_width
 					&& hardwareTarget.virtual_height <= target.virtual_height
 					&& hardwareTarget.space <= target.space)
@@ -1147,7 +1153,7 @@ if (first) {
 status_t
 intel_get_display_mode(display_mode* _currentMode)
 {
-	TRACE(("intel_get_display_mode()\n"));
+	CALLED();
 
 	retrieve_current_mode(*_currentMode, INTEL_DISPLAY_A_PLL);
 	return B_OK;
@@ -1157,7 +1163,7 @@ intel_get_display_mode(display_mode* _currentMode)
 status_t
 intel_get_edid_info(void* info, size_t size, uint32* _version)
 {
-	TRACE(("intel_get_edid_info()\n"));
+	CALLED();
 
 	if (!gInfo->has_edid)
 		return B_ERROR;
@@ -1173,7 +1179,7 @@ intel_get_edid_info(void* info, size_t size, uint32* _version)
 status_t
 intel_get_frame_buffer_config(frame_buffer_config* config)
 {
-	TRACE(("intel_get_frame_buffer_config()\n"));
+	CALLED();
 
 	uint32 offset = gInfo->shared_info->frame_buffer_offset;
 
@@ -1189,7 +1195,7 @@ intel_get_frame_buffer_config(frame_buffer_config* config)
 status_t
 intel_get_pixel_clock_limits(display_mode* mode, uint32* _low, uint32* _high)
 {
-	TRACE(("intel_get_pixel_clock_limits()\n"));
+	CALLED();
 
 	if (_low != NULL) {
 		// lower limit of about 48Hz vertical refresh
@@ -1214,7 +1220,7 @@ intel_get_pixel_clock_limits(display_mode* mode, uint32* _low, uint32* _high)
 status_t
 intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 {
-	TRACE(("intel_move_display()\n"));
+	CALLED();
 
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
@@ -1237,7 +1243,7 @@ intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 status_t
 intel_get_timing_constraints(display_timing_constraints* constraints)
 {
-	TRACE(("intel_get_timing_contraints()\n"));
+	CALLED();
 	return B_ERROR;
 }
 
@@ -1245,8 +1251,7 @@ intel_get_timing_constraints(display_timing_constraints* constraints)
 void
 intel_set_indexed_colors(uint count, uint8 first, uint8* colors, uint32 flags)
 {
-	TRACE(("intel_set_indexed_colors(colors = %p, first = %u)\n", colors,
-		first));
+	TRACE("%s(colors = %p, first = %u)\n", __func__, colors, first);
 
 	if (colors == NULL)
 		return;
