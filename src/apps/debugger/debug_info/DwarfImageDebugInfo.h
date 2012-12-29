@@ -104,6 +104,7 @@ private:
 									const EntryListWrapper& blockEntries);
 
 			status_t			_CreateReturnValue(FunctionInstance* instance,
+									Image* image,
 									DwarfFunctionDebugInfo* info,
 									StackFrame* frame,
 									DwarfStackFrameDebugInfo& factory,

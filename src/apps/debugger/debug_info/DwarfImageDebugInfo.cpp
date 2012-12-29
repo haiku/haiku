@@ -41,6 +41,8 @@
 #include "FunctionID.h"
 #include "FunctionInstance.h"
 #include "GlobalTypeLookup.h"
+#include "Image.h"
+#include "ImageDebugInfo.h"
 #include "InstructionInfo.h"
 #include "LocatableFile.h"
 #include "Register.h"
@@ -56,6 +58,7 @@
 #include "TypeLookupConstraints.h"
 #include "UnsupportedLanguage.h"
 #include "Variable.h"
+#include "ValueLocation.h"
 
 
 namespace {
@@ -672,7 +675,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		// call to see if we need to potentially retrieve a return value
 		// as well
 		if (instructionPointer > functionInstance->Address() - fRelocationDelta) {
-			_CreateReturnValue(functionInstance, function, frame,
+			_CreateReturnValue(functionInstance, image, function, frame,
 				*stackFrameDebugInfo, instructionPointer);
 		}
 	}
@@ -1085,7 +1088,7 @@ DwarfImageDebugInfo::_CreateLocalVariables(CompilationUnit* unit,
 
 status_t
 DwarfImageDebugInfo::_CreateReturnValue(FunctionInstance* functionInstance,
-	DwarfFunctionDebugInfo* function, StackFrame* frame,
+	Image* image, DwarfFunctionDebugInfo* function, StackFrame* frame,
 	DwarfStackFrameDebugInfo& factory, target_addr_t instructionPointer)
 {
 	DisassembledCode* sourceCode = NULL;
@@ -1111,16 +1114,60 @@ DwarfImageDebugInfo::_CreateReturnValue(FunctionInstance* functionInstance,
 		previousStatementAddress);
 	if (statement == NULL)
 		return B_BAD_VALUE;
+	previousStatementAddress = statement->CoveringAddressRange().Start() - 1;
+	statement = sourceCode->StatementAtAddress(
+		previousStatementAddress);
+	if (statement == NULL)
+		return B_BAD_VALUE;
 
 	TargetAddressRange range = statement->CoveringAddressRange();
 	InstructionInfo info;
 	if (fArchitecture->GetInstructionInfo(range.Start(), info) == B_OK
 		&& info.Type() == INSTRUCTION_TYPE_SUBROUTINE_CALL) {
-		// TODO: determine where the previous instruction actually jumps to,
-		// retrieve that function (could potentially be in another image),
-		// and use its return type to retrieve the return value (will need
-		// architecture support since function return value passing convention
-		// is arch-dependent).
+		target_addr_t targetAddress = info.TargetAddress();
+		if (targetAddress == 0)
+			return B_BAD_VALUE;
+
+		if (image->ContainsAddress(targetAddress)) {
+			FunctionInstance* targetFunction;
+			if (targetAddress >= fPLTSectionStart && targetAddress < fPLTSectionEnd) {
+				// TODO: resolve actual target address in the PIC case
+				// and adjust targetAddress accordingly
+			}
+			ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
+			targetFunction = imageInfo->FunctionAtAddress(targetAddress);
+			if (targetFunction != NULL) {
+				DwarfFunctionDebugInfo* targetInfo =
+					dynamic_cast<DwarfFunctionDebugInfo*>(
+						targetFunction->GetFunctionDebugInfo());
+				if (targetInfo != NULL) {
+					DIESubprogram* subProgram = targetInfo->SubprogramEntry();
+					DIEType* returnType = subProgram->ReturnType();
+					if (returnType == NULL) {
+						// function doesn't return a value, we're done.
+						return B_OK;
+					}
+
+					ValueLocation* location;
+					result = fArchitecture->GetReturnAddressLocation(frame,
+						returnType->ByteSize()->constant, location);
+					if (result != B_OK)
+						return result;
+					BReference<ValueLocation> locationReference(location,
+						true);
+					Variable* variable = NULL;
+					BReference<FunctionID> idReference(
+						targetFunction->GetFunctionID(), true);
+					result = factory.CreateReturnValue(idReference,
+						returnType, location, variable);
+					if (result != B_OK)
+						return result;
+					BReference<Variable> variableReference(variable, true);
+					if (!frame->AddLocalVariable(variable))
+						return B_NO_MEMORY;
+				}
+			}
+		}
 	}
 
 	return B_OK;
