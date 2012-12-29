@@ -14,6 +14,7 @@
 #include <Autolock.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
+#include <Catalog.h>
 #include <ParameterWeb.h>
 #include <String.h>
 
@@ -26,6 +27,8 @@
 #include "debug.h"
 #include "Resampler.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MultiAudio"
 
 #define PARAMETER_ID_INPUT_FREQUENCY	1
 #define PARAMETER_ID_OUTPUT_FREQUENCY	2
@@ -103,10 +106,18 @@ static const sample_rate_info kSampleRateInfos[] = {
 
 const char* kMultiControlString[] = {
 	"NAME IS ATTACHED",
-	"Output", "Input", "Setup", "Tone Control", "Extended Setup", "Enhanced Setup", "Master",
-	"Beep", "Phone", "Mic", "Line", "CD", "Video", "Aux", "Wave", "Gain", "Level", "Volume",
-	"Mute", "Enable", "Stereo Mix", "Mono Mix", "Output Stereo Mix", "Output Mono Mix", "Output Bass",
-	"Output Treble", "Output 3D Center", "Output 3D Depth", "Headphones", "SPDIF"
+	B_TRANSLATE("Output"), B_TRANSLATE("Input"), B_TRANSLATE("Setup"),
+	B_TRANSLATE("Tone control"), B_TRANSLATE("Extended Setup"),
+	B_TRANSLATE("Enhanced Setup"), B_TRANSLATE("Master"), B_TRANSLATE("Beep"),
+	B_TRANSLATE("Phone"), B_TRANSLATE("Mic"), B_TRANSLATE("Line"),
+	B_TRANSLATE("CD"), B_TRANSLATE("Video"), B_TRANSLATE("Aux"),
+	B_TRANSLATE("Wave"), B_TRANSLATE("Gain"), B_TRANSLATE("Level"),
+	B_TRANSLATE("Volume"), B_TRANSLATE("Mute"), B_TRANSLATE("Enable"),
+	B_TRANSLATE("Stereo mix"), B_TRANSLATE("Mono mix"),
+	B_TRANSLATE("Output stereo mix"), B_TRANSLATE("Output mono mix"),
+	B_TRANSLATE("Output bass"), B_TRANSLATE("Output treble"),
+	B_TRANSLATE("Output 3D center"), B_TRANSLATE("Output 3D depth"),
+	B_TRANSLATE("Headphones"), B_TRANSLATE("SPDIF")
 };
 
 
@@ -1579,17 +1590,17 @@ MultiAudioNode::MakeParameterWeb()
 	PRINT(("MixControlInfo().control_count : %li\n",
 		fDevice->MixControlInfo().control_count));
 
-	BParameterGroup* generalGroup = web->MakeGroup("General");
+	BParameterGroup* generalGroup = web->MakeGroup(B_TRANSLATE("General"));
 
 	const multi_description& description = fDevice->Description();
 
 	if (description.output_rates & B_SR_SAME_AS_INPUT) {
-		_CreateFrequencyParameterGroup(generalGroup, "Input & Output",
+		_CreateFrequencyParameterGroup(generalGroup, B_TRANSLATE("Input & Output"),
 			PARAMETER_ID_INPUT_FREQUENCY, description.input_rates);
 	} else {
-		_CreateFrequencyParameterGroup(generalGroup, "Input",
+		_CreateFrequencyParameterGroup(generalGroup, B_TRANSLATE("Input"),
 			PARAMETER_ID_INPUT_FREQUENCY, description.input_rates);
-		_CreateFrequencyParameterGroup(generalGroup, "Output",
+		_CreateFrequencyParameterGroup(generalGroup, B_TRANSLATE("Output"),
 			PARAMETER_ID_OUTPUT_FREQUENCY, description.output_rates);
 	}
 
@@ -1719,7 +1730,7 @@ MultiAudioNode::_CreateFrequencyParameterGroup(BParameterGroup* parentGroup,
 {
 	BParameterGroup* group = parentGroup->MakeGroup(name);
 	BDiscreteParameter* frequencyParam = group->MakeDiscreteParameter(
-		parameterID, B_MEDIA_NO_TYPE, BString(name) << " Frequency:",
+		parameterID, B_MEDIA_NO_TYPE, BString(name) << B_TRANSLATE(" frequency:"),
 		B_GENERIC);
 
 	for (int32 i = 0; kSampleRateInfos[i].name != NULL; i++) {
