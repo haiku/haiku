@@ -90,14 +90,12 @@ const struct supported_device {
 	{0x0126, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2+"},
 	{0x010a, INTEL_TYPE_SNBGS, "SandyBridge Server"},
 
-	#if 0
 	{0x0152, INTEL_TYPE_IVBG, "IvyBridge Desktop GT1"},
 	{0x0162, INTEL_TYPE_IVBG, "IvyBridge Desktop GT2"},
 	{0x0156, INTEL_TYPE_IVBGM, "IvyBridge Mobile GT1"},
 	{0x0166, INTEL_TYPE_IVBGM, "IvyBridge Mobile GT2"},
 	{0x015a, INTEL_TYPE_IVBGS, "IvyBridge Server GT1"},
 	{0x016a, INTEL_TYPE_IVBGS, "IvyBridge Server GT2"},
-	#endif
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
