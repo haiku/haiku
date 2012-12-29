@@ -9,6 +9,7 @@
 InstructionInfo::InstructionInfo()
 	:
 	fAddress(0),
+	fTargetAddress(0),
 	fSize(0),
 	fType(INSTRUCTION_TYPE_OTHER),
 	fBreakpointAllowed(false),
@@ -17,11 +18,13 @@ InstructionInfo::InstructionInfo()
 }
 
 
-InstructionInfo::InstructionInfo(target_addr_t address, target_size_t size,
+InstructionInfo::InstructionInfo(target_addr_t address,
+	target_addr_t targetAddress, target_size_t size,
 	instruction_type type, bool breakpointAllowed,
 	const BString& disassembledLine)
 	:
 	fAddress(address),
+	fTargetAddress(targetAddress),
 	fSize(size),
 	fType(type),
 	fBreakpointAllowed(breakpointAllowed),
@@ -31,11 +34,12 @@ InstructionInfo::InstructionInfo(target_addr_t address, target_size_t size,
 
 
 bool
-InstructionInfo::SetTo(target_addr_t address, target_size_t size,
-	instruction_type type, bool breakpointAllowed,
+InstructionInfo::SetTo(target_addr_t address, target_addr_t targetAddress,
+	target_size_t size, instruction_type type, bool breakpointAllowed,
 	const BString& disassembledLine)
 {
 	fAddress = address;
+	fTargetAddress = targetAddress;
 	fSize = size;
 	fType = type;
 	fBreakpointAllowed = breakpointAllowed;

@@ -596,6 +596,7 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 	// disassemble the instruction
 	BString line;
 	target_addr_t instructionAddress;
+	target_addr_t targetAddress = 0;
 	target_size_t instructionSize;
 	bool breakpointAllowed;
 	error = disassembler.GetNextInstruction(line, instructionAddress,
@@ -607,17 +608,21 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 	if (buffer[0] == 0xff && (buffer[1] & 0x34) == 0x10) {
 		// absolute call with r/m32
 		instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
+		// TODO: retrieve target address (might be in a register)
 	} else if (buffer[0] == 0xe8 && instructionSize == 5) {
 		// relative call with rel32 -- don't categorize the call with 0 as
 		// subroutine call, since it is only used to get the address of the GOT
 		if (buffer[1] != 0 || buffer[2] != 0 || buffer[3] != 0
 			|| buffer[4] != 0) {
 			instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
+			int32 offset;
+			memcpy(&offset, &buffer[1], 4);
+			targetAddress = instructionAddress + instructionSize + offset;
 		}
 	}
 
-	if (!_info.SetTo(instructionAddress, instructionSize, instructionType,
-			breakpointAllowed, line)) {
+	if (!_info.SetTo(instructionAddress, targetAddress, instructionSize,
+			instructionType, breakpointAllowed, line)) {
 		return B_NO_MEMORY;
 	}
 

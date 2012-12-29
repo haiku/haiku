@@ -487,6 +487,7 @@ ArchitectureX8664::GetInstructionInfo(target_addr_t address,
 	// disassemble the instruction
 	BString line;
 	target_addr_t instructionAddress;
+	target_addr_t targetAddress = 0;
 	target_size_t instructionSize;
 	bool breakpointAllowed;
 	error = disassembler.GetNextInstruction(line, instructionAddress,
@@ -508,8 +509,8 @@ ArchitectureX8664::GetInstructionInfo(target_addr_t address,
 		}
 	}
 
-	if (!_info.SetTo(instructionAddress, instructionSize, instructionType,
-			breakpointAllowed, line)) {
+	if (!_info.SetTo(instructionAddress, targetAddress, instructionSize,
+			instructionType, breakpointAllowed, line)) {
 		return B_NO_MEMORY;
 	}
 

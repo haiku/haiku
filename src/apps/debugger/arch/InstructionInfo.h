@@ -20,16 +20,21 @@ class InstructionInfo {
 public:
 								InstructionInfo();
 								InstructionInfo(target_addr_t address,
+									target_addr_t targetAddress,
 									target_size_t size, instruction_type type,
 									bool breakpointAllowed,
 									const BString& disassembledLine);
 
-			bool				SetTo(target_addr_t address, target_size_t size,
+			bool				SetTo(target_addr_t address,
+									target_addr_t targetAddress,
+									target_size_t size,
 									instruction_type type,
 									bool breakpointAllowed,
 									const BString& disassembledLine);
 
 			target_addr_t		Address() const		{ return fAddress; }
+			target_addr_t		TargetAddress() const
+									{ return fTargetAddress; }
 			target_size_t		Size() const		{ return fSize; }
 			instruction_type	Type() const		{ return fType; }
 			bool				IsBreakpointAllowed() const
@@ -40,6 +45,7 @@ public:
 
 private:
 			target_addr_t		fAddress;
+			target_addr_t		fTargetAddress;
 			target_size_t		fSize;
 			instruction_type	fType;
 			bool				fBreakpointAllowed;
