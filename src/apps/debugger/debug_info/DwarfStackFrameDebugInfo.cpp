@@ -1,4 +1,5 @@
 /*
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -23,6 +24,7 @@
 #include "LocalVariableID.h"
 #include "Register.h"
 #include "RegisterMap.h"
+#include "ReturnValueID.h"
 #include "StringUtils.h"
 #include "Tracing.h"
 #include "ValueLocation.h"
@@ -114,6 +116,47 @@ private:
 	const BString	fName;
 	int32			fLine;
 	int32			fColumn;
+};
+
+
+// #pragma mark - DwarfReturnValueID
+
+
+struct DwarfStackFrameDebugInfo::DwarfReturnValueID
+	: public ReturnValueID {
+
+	DwarfReturnValueID(FunctionID* functionID)
+		:
+		fFunctionID(functionID),
+		fName("(returned)")
+	{
+		fFunctionID->AcquireReference();
+	}
+
+	virtual ~DwarfReturnValueID()
+	{
+		fFunctionID->ReleaseReference();
+	}
+
+	virtual bool operator==(const ObjectID& other) const
+	{
+		const DwarfReturnValueID* returnValueID
+			= dynamic_cast<const DwarfReturnValueID*>(&other);
+		return returnValueID != NULL
+			&& *fFunctionID == *returnValueID->fFunctionID
+			&& fName == returnValueID->fName;
+	}
+
+protected:
+	virtual uint32 ComputeHashValue() const
+	{
+		uint32 hash = fFunctionID->HashValue();
+		return hash * 25 + StringUtils::HashValue(fName);
+	}
+
+private:
+	FunctionID*		fFunctionID;
+	const BString	fName;
 };
 
 
@@ -231,6 +274,39 @@ DwarfStackFrameDebugInfo::CreateLocalVariable(FunctionID* functionID,
 	// create the variable
 	return _CreateVariable(id, name, _GetDIEType(variableEntry),
 		variableEntry->GetLocationDescription(), _variable);
+}
+
+
+status_t
+DwarfStackFrameDebugInfo::CreateReturnValue(FunctionID* functionID,
+	DIEType* returnType, ValueLocation* location, Variable*& _variable)
+{
+	if (returnType == NULL)
+		return B_BAD_VALUE;
+
+	// create the type
+	DwarfType* type;
+	status_t error = fTypeFactory->CreateType(returnType, type);
+	if (error != B_OK)
+		return error;
+	BReference<DwarfType> typeReference(type, true);
+
+	DwarfReturnValueID* id = new(std::nothrow) DwarfReturnValueID(
+		functionID);
+	if (id == NULL)
+		return B_NO_MEMORY;
+
+	BString name;
+	name.SetToFormat("%s returned", functionID->FunctionName().String());
+
+	Variable* variable = new(std::nothrow) Variable(id, name,
+		type, location);
+	if (variable == NULL)
+		return B_NO_MEMORY;
+
+	_variable = variable;
+
+	return B_OK;
 }
 
 
