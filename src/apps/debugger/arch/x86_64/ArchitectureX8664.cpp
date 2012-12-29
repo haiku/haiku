@@ -535,6 +535,13 @@ ArchitectureX8664::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
 }
 
 
+status_t
+ArchitectureX8664::GetReturnAddressLocation(StackFrame* frame,
+	target_size_t valueSize, ValueLocation*& _location) {
+	return B_NOT_SUPPORTED;
+}
+
+
 void
 ArchitectureX8664::_AddRegister(int32 index, const char* name,
 	uint32 bitSize, uint32 valueType, register_type type, bool calleePreserved)

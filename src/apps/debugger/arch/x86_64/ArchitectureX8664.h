@@ -67,6 +67,10 @@ public:
 									int32& _maxBytesPerRegister,
 									uint8& _watchpointCapabilityFlags);
 
+	virtual	status_t			GetReturnAddressLocation(
+									StackFrame* frame, target_size_t valueSize,
+									ValueLocation*& _location);
+
 private:
 			struct ToDwarfRegisterMap;
 			struct FromDwarfRegisterMap;

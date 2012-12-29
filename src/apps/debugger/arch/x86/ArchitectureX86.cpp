@@ -23,6 +23,7 @@
 #include "StackFrame.h"
 #include "Statement.h"
 #include "TeamMemory.h"
+#include "ValueLocation.h"
 #include "X86AssemblyLanguage.h"
 
 #include "disasm/DisassemblerX86.h"
@@ -579,9 +580,8 @@ status_t
 ArchitectureX86::GetInstructionInfo(target_addr_t address,
 	InstructionInfo& _info)
 {
-	// read the code
+	// read the code - maximum x86{-64} instruction size = 15 bytes
 	uint8 buffer[16];
-		// TODO: What's the maximum instruction size?
 	ssize_t bytesRead = fTeamMemory->ReadMemory(address, buffer,
 		sizeof(buffer));
 	if (bytesRead < 0)
@@ -644,6 +644,52 @@ ArchitectureX86::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
 	_watchpointCapabilityFlags = WATCHPOINT_CAPABILITY_FLAG_WRITE
 		| WATCHPOINT_CAPABILITY_FLAG_READ_WRITE;
 
+	return B_OK;
+}
+
+
+status_t
+ArchitectureX86::GetReturnAddressLocation(StackFrame* frame,
+	target_size_t valueSize, ValueLocation*& _location)
+{
+	// for the calling conventions currently in use on Haiku,
+	// the x86 rules for how values are returned are as follows:
+	//
+	// - 32 bits or smaller values are returned directly in EAX.
+	// - 32-64 bit values are returned across EAX:EDX.
+	// - > 64 bit values are returned on the stack.
+	ValueLocation* location = new(std::nothrow) ValueLocation(
+		IsBigEndian());
+	if (location == NULL)
+		return B_NO_MEMORY;
+	BReference<ValueLocation> locationReference(location,
+		true);
+
+	if (valueSize <= 4) {
+		ValuePieceLocation piece;
+		piece.SetSize(valueSize);
+		piece.SetToRegister(X86_REGISTER_EAX);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+	} else if (valueSize <= 8) {
+		ValuePieceLocation piece;
+		piece.SetSize(4);
+		piece.SetToRegister(X86_REGISTER_EAX);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+		piece.SetToRegister(X86_REGISTER_EDX);
+		piece.SetSize(valueSize - 4);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+	} else {
+		ValuePieceLocation piece;
+		piece.SetToMemory(frame->GetCpuState()->StackPointer());
+		piece.SetSize(valueSize);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+	}
+
+	_location = locationReference.Detach();
 	return B_OK;
 }
 
