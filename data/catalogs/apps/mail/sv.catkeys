@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	3771627078
+1	swedish	x-vnd.Be-MAIL	196678253
 View	Mail		Visa
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Bifoga attribut:
@@ -10,6 +10,7 @@ Edit	Mail		Redigera
 Print	Mail		Skriv ut
 <none>	Mail		<ingen>
 New mail message	Mail		Nytt e-post-meddelande
+Untitled	Mail		Namnlös
 Automatic	Mail		Automatiskt
 Automatically mark mail as read:	Mail		Markera brev som lästa:
 helpful message	Mail		hjälpsamt meddelande

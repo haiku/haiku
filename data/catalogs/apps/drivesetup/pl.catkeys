@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	3746427159
+1	polish	x-vnd.Haiku-DriveSetup	1372142450
 DriveSetup	System name		DriveSetup
 Delete	MainWindow		Usuń
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranej partycji bedą bezpowrotnie utracone!
@@ -65,6 +65,7 @@ Partition	MainWindow		Partycja
 File system	PartitionList		System plików
 Validation of the given creation parameters failed.	MainWindow		Sprawdzenie poprawności parametrów tworzenia partycji nie powiodło się.
 Size	PartitionList		Rozmiar
+Wipe (not implemented)	MainWindow		Wyczyść (nie zaimplementowane)
 Validation of the given initialization parameters failed.	MainWindow		Sprawdzenie poprawności parametrów inicjalizacji nie powiodło się.
 The selected partition does not contain a partitioning system.	MainWindow		Wybrana partycja nie posiada systemu partycjonowania.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Czy na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na partycji %s zostaną utracone!

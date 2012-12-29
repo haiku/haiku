@@ -1,7 +1,8 @@
-1	hungarian	x-vnd.Haiku-Terminal	4226482962
+1	hungarian	x-vnd.Haiku-Terminal	3561344903
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
+Cursor	Terminal AppearancePrefView		Kurzor
 Professional	Terminal colors scheme		Professzionális
 OK	Terminal TermWindow		Rendben
 New Terminal	Terminal TermWindow		Új terminál
@@ -67,6 +68,7 @@ New tab	Terminal TermWindow		Új lap
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		A fülek címét meghatározó minta. A következő kódok használhatóak:
 Selected background	Terminal AppearancePrefView		Kijelölés háttere
 Slate	Terminal colors scheme		Pala
+Text under cursor	Terminal AppearancePrefView		Kurzor alatti szöveg
 Midnight	Terminal colors scheme		Éjfél
 Decrease	Terminal TermWindow		Csökkentés
 Default	Terminal colors scheme		Eredeti

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	3337401776
+1	polish	x-vnd.Be-MAIL	4057420247
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
@@ -10,6 +10,7 @@ Edit	Mail		Edycja
 Print	Mail		Drukuj
 <none>	Mail		<brak>
 New mail message	Mail		Nowa wiadomość
+Untitled	Mail		Bez tytułu
 Automatic	Mail		Automatyczne
 Automatically mark mail as read:	Mail		Automatycznie oznacz wiadomość jako przeczytaną:
 helpful message	Mail		pomocna wiadomość

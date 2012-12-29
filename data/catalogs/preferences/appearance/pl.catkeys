@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	1933110481
+1	polish	x-vnd.Haiku-Appearance	3956654572
 Plain font:	Font view		Zwykła czcionka:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
@@ -23,6 +23,7 @@ Tooltip background	Colors tab		Tło podpowiedzi
 Selected menu item background	Colors tab		Tło zaznaczonego elementu menu
 Antialiasing	APRWindow		Antyaliasing
 Navigation base	Colors tab		Nawigacja
+Selected list item text	Colors tab		Tekst zaznaczonego elementu listy
 Window border	Colors tab		Obramowanie okna
 Window tab text	Colors tab		Tekst zakładki okna
 Document text	Colors tab		Tekst dokumentu
@@ -32,6 +33,7 @@ Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
 Menu background	Colors tab		Tło menu
 OK	DecorSettingsView		OK
 Size:	Font Selection view		Rozmiar:
+Selected list item background	Colors tab		Tło zaznaczonego elementu listy
 Panel background	Colors tab		Tło panelu
 Menu font:	Font view		Czcionka menu:
 Colors	APRWindow		Kolory
@@ -51,7 +53,9 @@ LCD subpixel	AntialiasingSettingsView		Podpikselowe LCD
 Selected menu item border	Colors tab		Obramowanie zaznaczonego elementu menu
 Strong	AntialiasingSettingsView		Silny
 Panel text	Colors tab		Tekst panelu
+Arrow style	DecorSettingsView		Wygląd strzałek
 Monospaced fonts only	AntialiasingSettingsView		Tylko czcionki o stałej szerokości
+Look and feel	APRWindow		Look and feel
 Antialiasing menu	AntialiasingSettingsView		Menu antyaliasingu
 Fonts	APRWindow		Czcionki
 Glyph hinting:	AntialiasingSettingsView		Hintowanie czcionek:

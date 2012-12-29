@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-DiskUsage	1726021626
+1	lithuanian	x-vnd.Haiku-DiskUsage	2447717116
 Scanning %refName%	Scanner		Žvalgomas skirsnis „%refName%“
 Size	Info Window		Dydis
 Rescan	Pie View		Peržvalgyti
@@ -10,13 +10,11 @@ Path	Info Window		Kelias
 Scan	Status View		Žvalgyti
 9999.99 GB	Status View		9999,99 GB
 file unavailable	Status View		failas nepasiekiamas
-Get Info	Pie View		Savybės
 DiskUsage	System name		Disko naudojimas
  in %d files	Info Window		%d failuose (-ų)
 %d files	Status View		%d failai (-ų)
 Created	Info Window		Sukurtas
 Modified	Info Window		Modifikuotas
 Open	Pie View		Atverti
-Open With	Pie View		Atverti naudojant
 %a, %d %b %Y, %r	Info Window		%a, %Y %b %d, %T
 Free on %refName%	Scanner		Laisva vieta skirsnyje „%refName%“

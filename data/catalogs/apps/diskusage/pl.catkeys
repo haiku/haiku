@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DiskUsage	1726021626
+1	polish	x-vnd.Haiku-DiskUsage	274830116
 Scanning %refName%	Scanner		Skanowanie %refName%
 Size	Info Window		Rozmiar
 Rescan	Pie View		Przeskanuj
@@ -9,14 +9,14 @@ no supporting apps	Pie View		brak wspierających aplikacji
 Path	Info Window		Ścieżka
 Scan	Status View		Skanowanie
 9999.99 GB	Status View		9999.99 GB
+Rescan	Status View		Przeskanuj
 file unavailable	Status View		plik niedostępny
-Get Info	Pie View		Pobierz Informacje
 DiskUsage	System name		Wykorzystanie Dysku
  in %d files	Info Window		 w %d plikach
 %d files	Status View		%d plików
 Created	Info Window		Stworzony
 Modified	Info Window		Zmodyfikowany
+Abort	Status View		Przerwij
 Open	Pie View		Otwórz
-Open With	Pie View		Otwórz z
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Wolne na %refName%

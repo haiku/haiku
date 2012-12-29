@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	1599879742
+1	japanese	x-vnd.Be-MAIL	2319898213
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
@@ -10,6 +10,7 @@ Edit	Mail		編集
 Print	Mail		印刷
 <none>	Mail		<無し>
 New mail message	Mail		新規メッセージ
+Untitled	Mail		無題
 Automatic	Mail		自動
 Automatically mark mail as read:	Mail		メールを自動的に既読に設定：
 helpful message	Mail		有益なメッセージ

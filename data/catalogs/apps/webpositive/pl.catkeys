@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	3016944326
+1	polish	x-vnd.Haiku-WebPositive	3680831920
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -11,6 +11,7 @@ Open location	WebPositive Window		Otwarcie położenia
 Clear history	WebPositive Window		Wyczyść historię
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Wczoraj
+Default standard font size:	Settings Window		Domyślny standardowy rozmiar czcionki:
 Start page:	Settings Window		Strona startowa:
 History	WebPositive Window		Historia
 Error opening downloads folder	Download Window		Błąd podczas otwierania folderu pobierania
@@ -20,6 +21,7 @@ Settings	Settings Window		Ustawienia
 Confirmation	WebPositive Window		Potwierdzenie
 Window	WebPositive Window		Okno
 Decrease size	WebPositive Window		Zmniejsz wielkość
+Serif font:	Settings Window		Czcionka szeryfowa:
 Loading %url	WebPositive Window		Ładowanie %url
 Page source	WebPositive Window		Źródło strony
 Next	WebPositive Window		Następna
@@ -39,6 +41,7 @@ Full screen	WebPositive Window		Pełny ekran
 Open download error	Download Window		Otwórz błąd pobierania
 Standard font:	Settings Window		Czcionka standardowa:
 Restart	Download Window		Uruchom ponownie
+Proxy server	Settings Window		Serwer proxy
 Open containing folder	Download Window		Otwórz folder zawierający
 New window	WebPositive Window		Nowe okno
 Open	Download Window		Otwórz
@@ -84,6 +87,8 @@ Remove	Download Window		Usuń
 Find	WebPositive Window		Znajdź
 Find previous	WebPositive Window		Znajdź poprzednie
 Settings	WebPositive Window		Ustawienia
+Proxy server address:	Settings Window		Adres serwera proxy:
+Proxy server port:	Settings Window		Port serwera proxy:
 Bookmarks	WebPositive Window		Zakładki
 %minutes minutes	Download Window		%minutes minut
 Paste	URL Bar		Wklej
@@ -103,6 +108,7 @@ Today	WebPositive Window		Dzisiaj
 Remember username and password for this site	Authentication Panel		Pamiętaj nazwę użytkownika i hasło dla tej strony
 Earlier	WebPositive Window		Wcześniej
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie
+Use proxy server to connect to the internet	Settings Window		Użyj serwera proxy, żeby połączyć się z internetem
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		W toku jest pobieranie, czy na pewno chcesz teraz zamknąć WebPositive?
 Auto-hide interface in full screen mode	Settings Window		Automatyczne ukrywanie interfejsu w trybie pełnoekranowym 
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url nie załadował się

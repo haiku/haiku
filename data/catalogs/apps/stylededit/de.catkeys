@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	3417936913
+1	german	x-vnd.Haiku-StyledEdit	1195515839
 StyledEdit	System name		Texteditor
 Paste	Menus		Einfügen
 OK	LoadAlert		OK
@@ -19,12 +19,15 @@ Cancel	SaveAlert		Abbrechen
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
 Green	Menus		Grün
+Reload	NodeMonitorAlerts		Neu laden
 Yellow	Menus		Gelb
 Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
 Wrap lines	Menus		Zeilenumbruch
 Quit	Menus		Beenden
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung entfernt. Soll sie wiederhergestellt werden?
 Document statistics	Statistics		Dokument-Statistik
 Cancel	RevertToSavedAlert		Abbrechen
+Autodetect	Menus		Automatisch
 Document	Menus		Dokument
 Save changes to the document \"%s\"? 	QuitAlert		Änderungen an Dokument \"%s\" speichern? 
 Edit	Menus		Bearbeiten
@@ -33,7 +36,9 @@ Replace all	FindandReplaceWindow		Alle ersetzen
 Statistics…	Menus		Statistik…
 Default	Open_and_SaveAsPanel		Standard
 Replace next	Menus		Weiter ersetzen
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" enthält ungespeicherte Änderungen.\nZuletzt gespeicherte Version wiederherstellen?
 Cancel	FindandReplaceWindow		Abbrechen
+Text encoding	Menus		Zeichenkodierung
 Close	Menus		Schließen
 Save	SaveAlert		Speichern
 Words:	Statistics		Wörter:
@@ -57,13 +62,16 @@ Find:	FindandReplaceWindow		Suche:
 Error saving \"%s\":\n%s	SaveAlert		Fehler beim Speichern von "%s":\n%s
 Copy	Menus		Kopieren
 Cut	Menus		Ausschneiden
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung verändert.\nSoll sie neu geladen werden?
 Replace	FindandReplaceWindow		Ersetzen
 Find again	Menus		Weitersuchen
 Cancel	QuitAlert		Abbrechen
 Find…	Menus		Suchen…
 Select all	Menus		Alles auswählen
 Don't save	SaveAlert		Verwerfen
+Recover	NodeMonitorAlerts		Wiederherstellen
 Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von "%s":\n\t%s
+Ignore	NodeMonitorAlerts		Ignorieren
 Undo typing	QuitAlert		Rückgängig: Eingabe
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
 Black	Menus		Schwarz
@@ -74,5 +82,6 @@ Encoding	Open_and_SaveAsPanel		Kodierung
 Characters:	Statistics		Zeichen:
 Save as…	Menus		Speichern unter…
 Redo typing	QuitAlert		Wiederholen: Eingabe
+Reload…	Menus		Neu laden…
 Replace…	Menus		Ersetzen…
 Right	Menus		Rechts

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	3417936913
+1	hungarian	x-vnd.Haiku-StyledEdit	1195515839
 StyledEdit	System name		StyledEdit
 Paste	Menus		Beillesztés
 OK	LoadAlert		Rendben
@@ -19,12 +19,15 @@ Cancel	SaveAlert		Mégse
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl (%s) nem található.
 Case-sensitive	FindandReplaceWindow		Betűérzékeny
 Green	Menus		Zöld
+Reload	NodeMonitorAlerts		Újratöltés
 Yellow	Menus		Sárga
 Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
 Wrap lines	Menus		Sortörés
 Quit	Menus		Kilépés
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		A fájlt (%file%) egy másik program törölte. Helyre szeretné állítani?
 Document statistics	Statistics		Dokumentum statisztika
 Cancel	RevertToSavedAlert		Mégse
+Autodetect	Menus		Automatikus felismerés
 Document	Menus		Dokumentum
 Save changes to the document \"%s\"? 	QuitAlert		Menti a dokumentum (%s) változtatásait? 
 Edit	Menus		Szerkesztés
@@ -33,7 +36,9 @@ Replace all	FindandReplaceWindow		Mindet cseréli
 Statistics…	Menus		Statisztika…
 Default	Open_and_SaveAsPanel		Alapértelmett
 Replace next	Menus		Következő cseréje
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		A fájlban (%s) történt módosítások még nincsenek mentve.\nVissza szeretné állítani a legutóbbi mentett verziót?
 Cancel	FindandReplaceWindow		Mégse
+Text encoding	Menus		Szöveg kódolása
 Close	Menus		Bezárás
 Save	SaveAlert		Mentés
 Words:	Statistics		Szó:
@@ -57,13 +62,16 @@ Find:	FindandReplaceWindow		Keresés:
 Error saving \"%s\":\n%s	SaveAlert		Hiba történt a mentés (%s) közben:\n\t%s
 Copy	Menus		Másolás
 Cut	Menus		Kivágás
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		A fájlt (%file") egy másik program módosította. Újratöltsem?
 Replace	FindandReplaceWindow		Cserél
 Find again	Menus		Keresés újra
 Cancel	QuitAlert		Mégse
 Find…	Menus		Keresés…
 Select all	Menus		Összes kijelölése
 Don't save	SaveAlert		Ne mentsen
+Recover	NodeMonitorAlerts		Helyreállítás
 Error loading \"%s\":\n\t%s	LoadAlert		Hiba történt a betöltés (%s) közben:\n\t%s
+Ignore	NodeMonitorAlerts		Mellőzés
 Undo typing	QuitAlert		Gépelés visszavonása
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti dokumentum (%s) változtatásait? 
 Black	Menus		Fekete
@@ -74,5 +82,6 @@ Encoding	Open_and_SaveAsPanel		Kódolás
 Characters:	Statistics		Karakter:
 Save as…	Menus		Mentés másként…
 Redo typing	QuitAlert		Újragépelés
+Reload…	Menus		Újratöltés…
 Replace…	Menus		Csere…
 Right	Menus		Jobbra

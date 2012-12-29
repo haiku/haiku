@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Time	3249243267
+1	polish	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		GMT (kompatybilne z UNIX'em)
 OK	Time		OK
 Asia	Time		Azja
@@ -40,5 +40,6 @@ Try all servers	Time		Wypróbuj wszystkie serwery
 Time zone	Time		Strefa czasowa
 Could not create socket	Time		Nie można utworzyć gniazda
 Synchronize again	Time		Synchronizuj ponownie
+Clock	Time		Zegar
 Network time	Time		Czas z sieci
 Atlantic	Time		Atlantyk

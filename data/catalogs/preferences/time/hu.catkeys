@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Time	3249243267
+1	hungarian	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		GMT (UNIX kompatibilis)
 OK	Time		Rendben
 Asia	Time		Ázsia
@@ -40,5 +40,6 @@ Try all servers	Time		Összes kiszolgáló kipróbálása
 Time zone	Time		Időzóna
 Could not create socket	Time		Socket készítése sikertelen
 Synchronize again	Time		Szinkronizálás újra
+Clock	Time		Óra
 Network time	Time		Hálózati idő
 Atlantic	Time		Atlanti-óceán

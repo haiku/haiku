@@ -1,7 +1,9 @@
-1	swedish	x-vnd.Haiku-Terminal	1829613568
+1	swedish	x-vnd.Haiku-Terminal	2178478404
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
+Cursor	Terminal AppearancePrefView		Markör
+Professional	Terminal colors scheme		Professionell
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Ny terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalen kunde inte starta skalet.
@@ -19,8 +21,11 @@ Font:	Terminal AppearancePrefView		Typsnitt:
 Copy here	Terminal TermView		Kopiera hit
 Really close?	Terminal TermWindow		Vill du stänga?
 Copy	Terminal TermWindow		Kopiera
+Color scheme:	Terminal AppearancePrefView		Färgschema:
 Window title:	Terminal TermWindow		Fönstertitel:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Okänt alternativ \"%s\"\n
+Blue	Terminal colors scheme		Blå
+Custom	Terminal colors scheme		Anpassad
 %app% settings	Terminal PrefWindow	window title	%app% inställningar
 Cancel	Terminal SetTitleWindow		Avbryt
 Increase	Terminal TermWindow		Öka
@@ -44,6 +49,7 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		Lägg till sökväg
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nUpphovsrätt 2001-2009 Haiku, Inc.\nUpphovsrätt (C) 1999 Kazuho Okui and Takashi Murai.\n\nHantering: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Ingen söksträng angiven.
+Font size	Terminal TermWindow		Typsnittsstorlek
 Blinking cursor	Terminal AppearancePrefView		Blinkande markör
 Don't save	Terminal PrefWindow		Spara inte
 Set window title	Terminal TermWindow		Ange fönstertitel
@@ -56,11 +62,15 @@ Find…	Terminal TermWindow		Sök...
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger Terminalen kommer processen att termineras.
 Move here	Terminal TermView		Flytta hit
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDen valda flikens aktiva process arbetskatalog.\n\t\t\tEtt maximalt antal sökvägsdelar kan anges\n\t\t\tT.ex. '%2d' för som mest två delar.\n\t%i\t-\tFönstrets indexnummer.\n\t%p\t-\tDen valda flikens aktiva process namn.\n\t%t\t-\tDen valda flikens namn.\n\t%%\t-\tTecknet '%'.
+Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Fel!
 New tab	Terminal TermWindow		Ny flik
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mönstret bestämmer namn på flikar. Följande alternativ finns:\n
 Selected background	Terminal AppearancePrefView		Vald bakgrund
+Text under cursor	Terminal AppearancePrefView		Text under markören
+Midnight	Terminal colors scheme		Midnatt
 Decrease	Terminal TermWindow		Minska
+Default	Terminal colors scheme		Standard
 Create link here	Terminal TermView		Skapa länk här
 Close	Terminal TermWindow		Stäng
 Text	Terminal AppearancePrefView		Text

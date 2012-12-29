@@ -1,7 +1,9 @@
-1	polish	x-vnd.Haiku-Terminal	2912171349
+1	polish	x-vnd.Haiku-Terminal	1935314925
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz Terminal
 Change directory	Terminal TermView		Zmień folder
+Cursor	Terminal AppearancePrefView		Kursor
+Professional	Terminal colors scheme		Profesjonalny
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Nowy Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić shella. Przepraszamy.
@@ -19,8 +21,11 @@ Font:	Terminal AppearancePrefView		Czcionka:
 Copy here	Terminal TermView		Kopiuj tutaj
 Really close?	Terminal TermWindow		Na pewno zamknąć?
 Copy	Terminal TermWindow		Kopiuj
+Color scheme:	Terminal AppearancePrefView		Schemat kolorów:
 Window title:	Terminal TermWindow		Tytuł okna:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nieznana opcja \"%s\"\n
+Blue	Terminal colors scheme		Niebieski
+Custom	Terminal colors scheme		Niestandardowe
 %app% settings	Terminal PrefWindow	window title	Ustawienia %app%
 Cancel	Terminal SetTitleWindow		Anuluj
 Increase	Terminal TermWindow		Powiększ
@@ -44,6 +49,8 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		Wstaw ścieżkę
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui i Takashi Murai.\n\nUżycie: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Nie podano ciągu znaków do wyszukania.
+Font size	Terminal TermWindow		Rozmiar czcionki
+Blinking cursor	Terminal AppearancePrefView		Migający kursor
 Don't save	Terminal PrefWindow		Nie zapisuj
 Set window title	Terminal TermWindow		Ustaw tytuł okna
 Terminal	System name		Terminal
@@ -55,11 +62,15 @@ Find…	Terminal TermWindow		Znajdź…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" jest wciąż w użyciu.\nJeśli zamkniesz terminal, proces zostanie zatrzymany.
 Move here	Terminal TermView		Przenieś tutaj
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tŚcieżka dostępu do aktywnych procesów w\n\t\t\taktywnej karcie. Opcjonalnie maksymalna liczba komponentów ścieżek która\n\t\t\tmoże zostać ustalona. Np. '%2d' dla maksymalnie dwóch komponentów.\n\t%i\t-\tIndeks okna.\n\t%p\t-\tNazwa aktywnego procesu w aktywnej karcie.\n\t%t\t-\tNazwa aktywnej karty.\n\t%%\t-\tZnak '%'.
+Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Błąd!
 New tab	Terminal TermWindow		Nowa karta
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Wzór ustalający tytuły kart. Następujące wyznaczniki\nmogą zostać użyte:\n
 Selected background	Terminal AppearancePrefView		Wybrane tło
+Slate	Terminal colors scheme		Ciemnopopielaty
+Text under cursor	Terminal AppearancePrefView		Tekst pod kursorem
 Decrease	Terminal TermWindow		Zmniejsz
+Default	Terminal colors scheme		Domyślny
 Create link here	Terminal TermView		Utwórz link tutaj
 Close	Terminal TermWindow		Zamknij
 Text	Terminal AppearancePrefView		Tekst

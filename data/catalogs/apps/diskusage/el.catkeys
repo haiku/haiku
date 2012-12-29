@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DiskUsage	1960660144
+1	greek, modern (1453-)	x-vnd.Haiku-DiskUsage	2682355634
 Scanning %refName%	Scanner		Σάρωση %refName%
 Size	Info Window		Μέγεθος
 Rescan	Pie View		Σάρωσε Ξανά
@@ -10,12 +10,10 @@ Path	Info Window		Διαδρομή
 Scan	Status View		Σάρωση
 9999.99 GB	Status View		9999.99 GB
 file unavailable	Status View		μη διαθέσιμο αρχείο
-Get Info	Pie View		Πάρε Πληροφορίες
 DiskUsage	System name		Χρήση Δίσκου
 %d files	Status View		%d αρχεία
 Created	Info Window		Δημιουργήθηκε
 Modified	Info Window		Τροποποιήθηκε
 Open	Pie View		Άνοιγμα
-Open With	Pie View		Άνοιγμα Με
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Ελεύθερα στο %refName%
