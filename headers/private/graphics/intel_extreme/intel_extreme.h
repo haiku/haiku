@@ -128,7 +128,8 @@ struct DeviceType {
 
 	bool HasPlatformControlHub() const
 	{
-		return InGroup(INTEL_TYPE_ILK) || InGroup(INTEL_TYPE_SNB);
+		return InGroup(INTEL_TYPE_ILK) || InGroup(INTEL_TYPE_SNB)
+			|| InGroup(INTEL_TYPE_IVB);
 	}
 };
 
