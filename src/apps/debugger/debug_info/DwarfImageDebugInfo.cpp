@@ -53,6 +53,7 @@
 #include "StringUtils.h"
 #include "SymbolInfo.h"
 #include "TargetAddressRangeList.h"
+#include "Team.h"
 #include "TeamMemory.h"
 #include "Tracing.h"
 #include "TypeLookupConstraints.h"
@@ -521,7 +522,8 @@ DwarfImageDebugInfo::GetAddressSectionType(target_addr_t address)
 status_t
 DwarfImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
-	bool getFullFrameInfo, StackFrame*& _frame, CpuState*& _previousCpuState)
+	bool getFullFrameInfo, bool getReturnValue, StackFrame*& _frame,
+	CpuState*& _previousCpuState)
 {
 	DwarfFunctionDebugInfo* function = dynamic_cast<DwarfFunctionDebugInfo*>(
 		functionInstance->GetFunctionDebugInfo());
@@ -671,10 +673,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 			instructionPointer, functionInstance->Address() - fRelocationDelta,
 			subprogramEntry->Variables(), subprogramEntry->Blocks());
 
-		// determine if the previously executed instruction was a function
-		// call to see if we need to potentially retrieve a return value
-		// as well
-		if (instructionPointer > functionInstance->Address() - fRelocationDelta) {
+		if (getReturnValue) {
 			_CreateReturnValue(functionInstance, image, function, frame,
 				*stackFrameDebugInfo, instructionPointer);
 		}
@@ -1091,6 +1090,8 @@ DwarfImageDebugInfo::_CreateReturnValue(FunctionInstance* functionInstance,
 	Image* image, DwarfFunctionDebugInfo* function, StackFrame* frame,
 	DwarfStackFrameDebugInfo& factory, target_addr_t instructionPointer)
 {
+	// the thread just executed a subroutine, look for the last call
+	// instruction.
 	DisassembledCode* sourceCode = NULL;
 	target_size_t bufferSize = std::min(functionInstance->Size(),
 		(target_size_t)64 * 1024);
@@ -1114,59 +1115,74 @@ DwarfImageDebugInfo::_CreateReturnValue(FunctionInstance* functionInstance,
 		previousStatementAddress);
 	if (statement == NULL)
 		return B_BAD_VALUE;
-	previousStatementAddress = statement->CoveringAddressRange().Start() - 1;
-	statement = sourceCode->StatementAtAddress(
-		previousStatementAddress);
-	if (statement == NULL)
+
+	InstructionInfo info;
+	do {
+		TargetAddressRange range = statement->CoveringAddressRange();
+		result = fArchitecture->GetInstructionInfo(range.Start(), info);
+		if (result != B_OK)
+			return result;
+
+		if (info.Type() == INSTRUCTION_TYPE_SUBROUTINE_CALL)
+			break;
+
+		previousStatementAddress = statement->CoveringAddressRange().Start() - 1;
+		statement = sourceCode->StatementAtAddress(
+			previousStatementAddress);
+	} while (statement != NULL);
+
+	// we weren't able to find a subroutine call by stepping back
+	// so we can't retrieve a return value
+	if (info.Type() != INSTRUCTION_TYPE_SUBROUTINE_CALL)
+		return B_OK;
+
+	target_addr_t targetAddress = info.TargetAddress();
+	if (targetAddress == 0)
 		return B_BAD_VALUE;
 
-	TargetAddressRange range = statement->CoveringAddressRange();
-	InstructionInfo info;
-	if (fArchitecture->GetInstructionInfo(range.Start(), info) == B_OK
-		&& info.Type() == INSTRUCTION_TYPE_SUBROUTINE_CALL) {
-		target_addr_t targetAddress = info.TargetAddress();
-		if (targetAddress == 0)
+	if (!image->ContainsAddress(targetAddress)) {
+		// our current image doesn't contain the target function,
+		// locate the one which does.
+		image = image->GetTeam()->ImageByAddress(targetAddress);
+		if (image == NULL)
 			return B_BAD_VALUE;
+	}
 
-		if (image->ContainsAddress(targetAddress)) {
-			FunctionInstance* targetFunction;
-			if (targetAddress >= fPLTSectionStart && targetAddress < fPLTSectionEnd) {
-				// TODO: resolve actual target address in the PIC case
-				// and adjust targetAddress accordingly
+	FunctionInstance* targetFunction;
+	if (targetAddress >= fPLTSectionStart && targetAddress < fPLTSectionEnd) {
+		// TODO: resolve actual target address in the PIC case
+		// and adjust targetAddress accordingly
+	}
+	ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
+	targetFunction = imageInfo->FunctionAtAddress(targetAddress);
+	if (targetFunction != NULL) {
+		DwarfFunctionDebugInfo* targetInfo =
+			dynamic_cast<DwarfFunctionDebugInfo*>(
+				targetFunction->GetFunctionDebugInfo());
+		if (targetInfo != NULL) {
+			DIESubprogram* subProgram = targetInfo->SubprogramEntry();
+			DIEType* returnType = subProgram->ReturnType();
+			if (returnType == NULL) {
+				// function doesn't return a value, we're done.
+				return B_OK;
 			}
-			ImageDebugInfo* imageInfo = image->GetImageDebugInfo();
-			targetFunction = imageInfo->FunctionAtAddress(targetAddress);
-			if (targetFunction != NULL) {
-				DwarfFunctionDebugInfo* targetInfo =
-					dynamic_cast<DwarfFunctionDebugInfo*>(
-						targetFunction->GetFunctionDebugInfo());
-				if (targetInfo != NULL) {
-					DIESubprogram* subProgram = targetInfo->SubprogramEntry();
-					DIEType* returnType = subProgram->ReturnType();
-					if (returnType == NULL) {
-						// function doesn't return a value, we're done.
-						return B_OK;
-					}
 
-					ValueLocation* location;
-					result = fArchitecture->GetReturnAddressLocation(frame,
-						returnType->ByteSize()->constant, location);
-					if (result != B_OK)
-						return result;
-					BReference<ValueLocation> locationReference(location,
-						true);
-					Variable* variable = NULL;
-					BReference<FunctionID> idReference(
-						targetFunction->GetFunctionID(), true);
-					result = factory.CreateReturnValue(idReference,
-						returnType, location, variable);
-					if (result != B_OK)
-						return result;
-					BReference<Variable> variableReference(variable, true);
-					if (!frame->AddLocalVariable(variable))
-						return B_NO_MEMORY;
-				}
-			}
+			ValueLocation* location;
+			result = fArchitecture->GetReturnAddressLocation(frame,
+				returnType->ByteSize()->constant, location);
+			if (result != B_OK)
+				return result;
+			BReference<ValueLocation> locationReference(location, true);
+			Variable* variable = NULL;
+			BReference<FunctionID> idReference(
+				targetFunction->GetFunctionID(), true);
+			result = factory.CreateReturnValue(idReference, returnType,
+				location, variable);
+			if (result != B_OK)
+				return result;
+			BReference<Variable> variableReference(variable, true);
+			if (!frame->AddLocalVariable(variable))
+				return B_NO_MEMORY;
 		}
 	}
 

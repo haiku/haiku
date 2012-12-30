@@ -67,11 +67,16 @@ public:
 			StackTrace*			GetStackTrace() const	{ return fStackTrace; }
 			void				SetStackTrace(StackTrace* trace);
 
+			bool				ExecutedSubroutine() const
+									{ return fExecutedSubroutine; }
+			void				SetExecutedSubroutine();
+
 private:
 			Team*				fTeam;
 			thread_id			fID;
 			BString				fName;
 			uint32				fState;
+			bool				fExecutedSubroutine;
 			uint32				fStoppedReason;
 			BString				fStoppedReasonInfo;
 			CpuState*			fCpuState;

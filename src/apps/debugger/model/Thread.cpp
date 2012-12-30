@@ -17,6 +17,7 @@ Thread::Thread(Team* team, thread_id threadID)
 	fTeam(team),
 	fID(threadID),
 	fState(THREAD_STATE_UNKNOWN),
+	fExecutedSubroutine(false),
 	fStoppedReason(THREAD_STOPPED_UNKNOWN),
 	fCpuState(NULL),
 	fStackTrace(NULL)
@@ -68,6 +69,7 @@ Thread::SetState(uint32 state, uint32 reason, const BString& info)
 	if (fState != THREAD_STATE_STOPPED) {
 		SetCpuState(NULL);
 		SetStackTrace(NULL);
+		fExecutedSubroutine = false;
 	}
 
 	fTeam->NotifyThreadStateChanged(this);
@@ -108,3 +110,11 @@ Thread::SetStackTrace(StackTrace* trace)
 
 	fTeam->NotifyThreadStackTraceChanged(this);
 }
+
+
+void
+Thread::SetExecutedSubroutine()
+{
+	fExecutedSubroutine = true;
+}
+

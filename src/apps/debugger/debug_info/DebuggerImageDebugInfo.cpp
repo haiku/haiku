@@ -68,7 +68,7 @@ DebuggerImageDebugInfo::GetAddressSectionType(target_addr_t address)
 status_t
 DebuggerImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
-	bool getFullFrameInfo, StackFrame*& _previousFrame,
+	bool getFullFrameInfo, bool getReturnValue, StackFrame*& _previousFrame,
 	CpuState*& _previousCpuState)
 {
 	return B_UNSUPPORTED;

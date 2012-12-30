@@ -109,6 +109,7 @@ public:
 									ImageDebugInfoProvider* imageInfoProvider,
 									CpuState* cpuState,
 									StackTrace*& _stackTrace,
+									bool getReturnValue,
 									int32 maxStackDepth = -1,
 									bool useExistingTrace = false,
 									bool getFullFrameInfo = true);
