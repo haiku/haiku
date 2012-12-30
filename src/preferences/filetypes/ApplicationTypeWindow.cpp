@@ -1022,17 +1022,20 @@ ApplicationTypeWindow::QuitRequested()
 {
 	if (_NeedsSaving(CHECK_ALL) != 0) {
 		BAlert* alert = new BAlert(B_TRANSLATE("Save request"),
-			B_TRANSLATE("Do you want to save the changes?"),
-			B_TRANSLATE("Quit, don't save"), B_TRANSLATE("Cancel"),
-			B_TRANSLATE("Save"), B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(1, B_ESCAPE);
+			B_TRANSLATE("Save changes before closing?"),
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Don't save"),
+			B_TRANSLATE("Save"), B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
+			B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetShortcut(1, 'd');
+		alert->SetShortcut(2, 's');
 
 		int32 choice = alert->Go();
 		switch (choice) {
 			case 0:
-				break;
-			case 1:
 				return false;
+			case 1:
+				break;
 			case 2:
 				_Save();
 				break;
