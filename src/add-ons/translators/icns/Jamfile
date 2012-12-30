@@ -80,6 +80,7 @@ Translator ICNSTranslator :
 DoCatalogs ICNSTranslator :
 	x-vnd.Haiku-ICNSTranslator
 	:
+	ConfigView.cpp
 	ICNSTranslator.h
 	ICNSTranslator.cpp
 ;
