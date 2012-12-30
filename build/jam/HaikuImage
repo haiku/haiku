@@ -145,7 +145,7 @@ SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR
 SYSTEM_ADD_ONS_SCREENSAVERS = [ FFilterByBuildFeatures
 	Butterfly DebugNow Flurry@x86
 	GLife@x86 $(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Leaves
-	Message Spider
+	Message Spider Gravity@x86
 ] ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
