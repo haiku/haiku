@@ -302,6 +302,8 @@ TBarApp::InitSettings()
 				theDir.CreateFile(settingsFileName, fSettingsFile);
 		}
 
+		filePath = dirPath;
+		filePath.Append(clockSettingsFileName);
 		fClockSettingsFile = new BFile(filePath.Path(), O_RDWR);
 		if (fClockSettingsFile->InitCheck() != B_OK) {
 			BDirectory theDir(dirPath.Path());
