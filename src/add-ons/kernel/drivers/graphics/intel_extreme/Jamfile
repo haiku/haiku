@@ -11,9 +11,9 @@ KernelAddon intel_extreme :
 	driver.cpp
 	device.cpp
 	intel_extreme.cpp
+	power.cpp
 
 	kernel_cpp.cpp
-
 	: libgraphicscommon.a
 ;
 

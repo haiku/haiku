@@ -10,16 +10,16 @@
 #include "intel_extreme.h"
 
 #include "AreaKeeper.h"
-#include "driver.h"
-#include "utility.h"
-
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-
 #include <driver_settings.h>
 #include <util/kernel_cpp.h>
+#include "utility.h"
+
+#include "driver.h"
+#include "power.h"
 
 
 #define TRACE_INTELEXTREME
@@ -296,38 +296,11 @@ intel_extreme_init(intel_info &info)
 		primary.offset = (addr_t)primary.base - info.aperture_base;
 	}
 
-	// Clock gating
-	// Fix some problems on certain chips (taken from X driver)
-	// TODO: clean this up
-	if (info.pci->device_id == 0x2a02 || info.pci->device_id == 0x2a12) {
-		TRACE("i965GM/i965GME quirk\n");
-		write32(info, 0x6204, (1L << 29));
-	} else if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
-		TRACE("SandyBridge clock gating\n");
-		write32(info, 0x42020, (1L << 28) | (1L << 7) | (1L << 5));
-	} else if (info.device_type.InGroup(INTEL_TYPE_IVB)) {
-		TRACE("IvyBridge clock gating\n");
-		write32(info, 0x42020, (1L << 28));
-	} else if (info.device_type.InGroup(INTEL_TYPE_ILK)) {
-		TRACE("IronLake clock gating\n");
-		write32(info, 0x42020, (1L << 7) | (1L << 5));
-	} else if (info.device_type.InGroup(INTEL_TYPE_G4x)) {
-		TRACE("G4x clock gating\n");
-		write32(info, 0x6204, 0);
-		write32(info, 0x6208, (1L << 9) | (1L << 7) | (1L << 6));
-		write32(info, 0x6210, 0);
+	// Enable clock gating
+	intel_en_gating(info);
 
-		uint32 gateValue = (1L << 28) | (1L << 3) | (1L << 2);
-		if ((info.device_type.type & INTEL_TYPE_MOBILE) == INTEL_TYPE_MOBILE) {
-			TRACE("G4x mobile clock gating\n");
-		    gateValue |= 1L << 18;
-		}
-		write32(info, 0x6200, gateValue);
-	} else {
-		TRACE("i965 quirk\n");
-		write32(info, 0x6204, (1L << 29) | (1L << 23));
-	}
-	write32(info, 0x7408, 0x10);
+	// Enable automatic gpu downclocking if we can to save power
+	intel_en_downclock(info);
 
 	// no errors, so keep areas and mappings
 	sharedCreator.Detach();
