@@ -751,7 +751,7 @@ StyledEditWindow::Save(BMessage* message)
 				|| (S_IWOTH & st.st_mode))) {
 				BString alertText;
 				bs_printf(&alertText, B_TRANSLATE("This file is marked "
-					"Read-Only. Save changes to the document \"%s\"? "), name);
+					"read-only. Save changes to the document \"%s\"? "), name);
 				switch (_ShowAlert(alertText, B_TRANSLATE("Cancel"),
 						B_TRANSLATE("Don't save"),
 						B_TRANSLATE("Save"), B_WARNING_ALERT)) {

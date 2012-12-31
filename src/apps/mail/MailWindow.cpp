@@ -1697,40 +1697,41 @@ TMailWindow::QuitRequested()
 				&& fEnclosuresView->fList->CountItems()))) {
 		if (fResending) {
 			BAlert *alert = new BAlert("", B_TRANSLATE(
-					"Do you wish to send this message before closing?"),
-				B_TRANSLATE("Discard"),
+					"Send this message before closing?"),
 				B_TRANSLATE("Cancel"),
+				B_TRANSLATE("Don't send"),
 				B_TRANSLATE("Send"),
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
-			alert->SetShortcut(0, 'd');
-			alert->SetShortcut(1, B_ESCAPE);
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetShortcut(1, 'd');
+			alert->SetShortcut(2, 's');
 			result = alert->Go();
 
 			switch (result) {
-				case 0:	// Discard
-					break;
-				case 1:	// Cancel
+				case 0:	// Cancel
 					return false;
+				case 1:	// Don't send
+					break;
 				case 2:	// Send
 					Send(true);
 					break;
 			}
 		} else {
 			BAlert *alert = new BAlert("",
-				B_TRANSLATE("Do you wish to save this message as a draft "
-					"before closing?"),
-				B_TRANSLATE("Don't save"),
+				B_TRANSLATE("Save this message as a draft before closing?"),
 				B_TRANSLATE("Cancel"),
+				B_TRANSLATE("Don't save"),
 				B_TRANSLATE("Save"),
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
-			alert->SetShortcut(0, 'd');
-			alert->SetShortcut(1, B_ESCAPE);
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->SetShortcut(1, 'd');
+			alert->SetShortcut(2, 's');
 			result = alert->Go();
 			switch (result) {
-				case 0:	// Don't Save
-					break;
-				case 1:	// Cancel
+				case 0:	// Cancel
 					return false;
+				case 1:	// Don't Save
+					break;
 				case 2:	// Save
 					Send(false);
 					break;

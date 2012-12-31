@@ -34,10 +34,13 @@ bool
 ResWindow::QuitRequested(void)
 {
 	if (fView->GetSaveStatus() == FILE_DIRTY) {
-		BAlert *alert = new BAlert("ResEdit", "Save your changes?", "Cancel",
-			"Don't Save", "Save");
+		BAlert *alert = new BAlert("ResEdit", "Save changes before closing?",
+			"Cancel", "Don't save", "Save",
+			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
-		
+		alert->SetShortcut(1, 'd');
+		alert->SetShortcut(2, 's');
+
 		switch (alert->Go()) {
 			case 0:
 				return false;

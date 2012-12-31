@@ -34,10 +34,9 @@ Transport*
 Transport::Find(const BString& name)
 {
 		// Look in list to find printer definition
-	for (int32 idx=0; idx < sTransports.CountItems(); idx++) {
-		if (name == sTransports.ItemAt(idx)->Name()) {
-			return sTransports.ItemAt(idx);
-		}
+	for (int32 index = 0; index < sTransports.CountItems(); index++) {
+		if (name == sTransports.ItemAt(index)->Name())
+			return sTransports.ItemAt(index);
 	}
 	
 		// None found, so return NULL
@@ -46,9 +45,9 @@ Transport::Find(const BString& name)
 
 
 Transport* 
-Transport::At(int32 idx)
+Transport::At(int32 index)
 {
-	return sTransports.ItemAt(idx);
+	return sTransports.ItemAt(index);
 }
 
 
@@ -69,19 +68,19 @@ Transport::CountTransports()
 status_t 
 Transport::Scan(directory_which which)
 {
-	BDirectory dir;
-	status_t rc;
+	status_t result;
 	BPath path;
 
 	// Try to find specified transport addon directory
-	if ((rc=find_directory(which,&path)) != B_OK)
-		return rc;
+	if ((result = find_directory(which, &path)) != B_OK)
+		return result;
 
-	if ((rc=path.Append("Print/transport")) != B_OK)
-		return rc;
+	if ((result = path.Append("Print/transport")) != B_OK)
+		return result;
 
-	if ((rc=dir.SetTo(path.Path())) != B_OK)
-		return rc;
+	BDirectory dir;
+	if ((result = dir.SetTo(path.Path())) != B_OK)
+		return result;
 
 	// Walk over all entries in directory
 	BEntry entry;
@@ -101,7 +100,6 @@ Transport::Scan(directory_which which)
 	}
 
 	return B_OK;
-
 }
 
 
@@ -130,19 +128,20 @@ Transport::Transport(const BPath& path)
 
 	// Find transport_features symbol, to determine if we need to keep 
 	// this transport loaded
-	int* transport_features_ptr;
+	int* transportFeaturesPointer;
 	if (get_image_symbol(id, B_TRANSPORT_FEATURES_SYMBOL, 
-			B_SYMBOL_TYPE_DATA, (void**)&transport_features_ptr) != B_OK) {
+			B_SYMBOL_TYPE_DATA, (void**)&transportFeaturesPointer) != B_OK) {
 		unload_add_on(id);
 	} else {
-		fFeatures = *transport_features_ptr;
+		fFeatures = *transportFeaturesPointer;
 
-		if (*transport_features_ptr & B_TRANSPORT_IS_HOTPLUG) {
+		if (fFeatures & B_TRANSPORT_IS_HOTPLUG) {
 			// We are hotpluggable; so keep us loaded!
 			fImageID = id;
-		}
-		else // No extended Transport support; so no need to keep loaded
+		} else {
+			// No extended Transport support; so no need to keep loaded
 			::unload_add_on(id);
+		}
 	}
 
 	sTransports.AddItem(this);
@@ -163,11 +162,11 @@ Transport::ListAvailablePorts(BMessage* msg)
 	status_t rc = B_OK;
 
 	// Load image if not loaded yet
-	if (id == -1 && (id=load_add_on(fPath.Path())) < 0)
+	if (id == -1 && (id = load_add_on(fPath.Path())) < 0)
 		return id;
 
 	// Get pointer to addon function
-	if ((rc=get_image_symbol(id, B_TRANSPORT_LIST_PORTS_SYMBOL, 
+	if ((rc = get_image_symbol(id, B_TRANSPORT_LIST_PORTS_SYMBOL,
 			B_SYMBOL_TYPE_TEXT, (void**)&list_ports)) != B_OK)
 		goto done;
 

@@ -283,13 +283,19 @@ ShortcutsWindow::QuitRequested()
 
 	if (fKeySetModified) {
 		BAlert* alert = new BAlert(WARNING, 
-			B_TRANSLATE("Really quit without saving your changes?"),
-			B_TRANSLATE("Don't save"), B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Save changes before closing?"),
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Don't save"),
 			B_TRANSLATE("Save"));
-		alert->SetShortcut(1, B_ESCAPE);
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetShortcut(1, 'd');
+		alert->SetShortcut(2, 's');
 		switch(alert->Go()) {
-			case 1:
+			case 0:
 				ret = false;
+				break;
+
+			case 1:
+				ret = true;
 				break;
 
 			case 2:
@@ -309,9 +315,6 @@ ShortcutsWindow::QuitRequested()
 					PostMessage(SAVE_KEYSET);
 					ret = false;
 				}
-				break;
-			default:
-				ret = true;
 				break;
 		}
 	}

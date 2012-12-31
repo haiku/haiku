@@ -13,6 +13,11 @@
 #include "ConfigView.h"
 #include "ICNSLoader.h"
 
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ICNSTranslator"
+
 extern "C" {
 #include "icns.h"
 }
@@ -78,8 +83,8 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings)
 
 
 ICNSTranslator::ICNSTranslator()
-	: BaseTranslator("Apple icons", 
-		"Apple icon translator",
+	: BaseTranslator(B_TRANSLATE("Apple icons"), 
+		B_TRANSLATE("Apple icon translator"),
 		ICNS_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

@@ -6,11 +6,15 @@
 #include "ConfigView.h"
 #include "ICNSTranslator.h"
 
+#include <Catalog.h>
 #include <StringView.h>
 #include <SpaceLayoutItem.h>
 #include <ControlLook.h>
 
 #include <stdio.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ICNSConfig"
 
 extern "C" {
 #include <openjpeg.h>
@@ -23,7 +27,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	fSettings = settings;
 	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
 
-	BStringView *stringView = new BStringView("title", "Apple icon translator");
+	BStringView *stringView = new BStringView("title", B_TRANSLATE("Apple icon translator"));
 	stringView->SetFont(be_bold_font);
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
@@ -32,7 +36,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 
 	char version[256];
-	sprintf(version, "Version %d.%d.%d, %s",
+	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(ICNS_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(ICNS_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(ICNS_TRANSLATOR_VERSION)),
