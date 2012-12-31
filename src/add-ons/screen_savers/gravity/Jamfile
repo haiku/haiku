@@ -3,19 +3,19 @@ SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
 SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
 # For GCC2
-if $(HAIKU_GCC_VERSION[1]) < 3 { 
+if $(HAIKU_GCC_VERSION[1]) < 3 {
     SubDirC++Flags --no-warnings ;
 }
 
 AddResources Gravity : Gravity.rdef ;
 
 local sources =
+	ConfigView.cpp
 	Gravity.cpp
-	GravityConfigView.cpp
-	GravityHole.cpp
-	GravityScreenSaver.cpp
+	GravitySource.cpp
 	GravityView.cpp
 	Particle.cpp
+	main.cpp
 ;
 
 Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
