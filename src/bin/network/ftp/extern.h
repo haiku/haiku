@@ -100,10 +100,6 @@ struct sockaddr;
 struct tm;
 struct addrinfo;
 
-#ifndef __HAIKU__
-typedef int sa_family_t;
-#endif
-
 void	abort_remote(FILE *);
 void	abort_squared(int);
 void	abortpt(int);
