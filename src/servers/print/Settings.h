@@ -55,7 +55,7 @@ private:
 	BRect                        fConfigWindowFrame;
 	BString                      fDefaultPrinter;
 	
-	static Settings* fSingleton;
+	static Settings* sSingleton;
 	Settings();
 	
 public:

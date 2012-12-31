@@ -29,14 +29,16 @@
 #include <SupportDefs.h>
 
 
-SpoolFolder::SpoolFolder(BLocker*locker, BLooper* looper, const BDirectory& spoolDir)
+SpoolFolder::SpoolFolder(BLocker* locker, BLooper* looper,
+		const BDirectory& spoolDir)
 	: Folder(locker, looper, spoolDir)
 {
 }
 
 
 // Notify print_server that there is a job file waiting for printing
-void SpoolFolder::Notify(Job* job, int kind)
+void
+SpoolFolder::Notify(Job* job, int kind)
 {
 	if ((kind == kJobAdded || kind == kJobAttrChanged)
 		&& job->IsValid() && job->IsWaiting()) {
@@ -61,10 +63,11 @@ BObjectList<Printer> Printer::sPrinters;
 // Returns:
 //    Pointer to Printer object, or NULL if not found.
 // ---------------------------------------------------------------
-Printer* Printer::Find(const BString& name)
+Printer*
+Printer::Find(const BString& name)
 {
-		// Look in list to find printer definition
-	for (int32 idx=0; idx < sPrinters.CountItems(); idx++) {
+	// Look in list to find printer definition
+	for (int32 idx = 0; idx < sPrinters.CountItems(); idx++) {
 		if (name == sPrinters.ItemAt(idx)->Name())
 			return sPrinters.ItemAt(idx);
 	}
@@ -72,10 +75,11 @@ Printer* Printer::Find(const BString& name)
 }
 
 
-Printer* Printer::Find(node_ref* node)
+Printer*
+Printer::Find(node_ref* node)
 {
 	node_ref n;
-		// Look in list to find printer definition
+	// Look in list to find printer definition
 	for (int32 idx = 0; idx < sPrinters.CountItems(); idx++) {
 		Printer* printer = sPrinters.ItemAt(idx);
 		printer->SpoolDir()->GetNodeRef(&n);
@@ -83,23 +87,27 @@ Printer* Printer::Find(node_ref* node)
 			return printer;
 	}
 
-		// None found, so return NULL
+	// None found, so return NULL
 	return NULL;
 }
 
 
-Printer* Printer::At(int32 idx)
+Printer*
+Printer::At(int32 idx)
 {
 	return sPrinters.ItemAt(idx);
 }
 
 
-void Printer::Remove(Printer* printer)
+void
+Printer::Remove(Printer* printer)
 {
 	sPrinters.RemoveItem(printer);
 }
 
-int32 Printer::CountPrinters()
+
+int32
+Printer::CountPrinters()
 {
 	return sPrinters.CountItems();
 }
@@ -144,7 +152,8 @@ Printer::~Printer()
 }
 
 
-void Printer::MessageReceived(BMessage* msg)
+void
+Printer::MessageReceived(BMessage* msg)
 {
 	switch(msg->what) {
 		case B_GET_PROPERTY:
@@ -163,12 +172,13 @@ void Printer::MessageReceived(BMessage* msg)
 
 
 // Remove printer spooler directory
-status_t Printer::Remove()
+status_t
+Printer::Remove()
 {
 	status_t rc = B_OK;
 	BPath path;
 
-	if ((rc=::find_directory(B_USER_PRINTERS_DIRECTORY, &path)) == B_OK) {
+	if ((rc = ::find_directory(B_USER_PRINTERS_DIRECTORY, &path)) == B_OK) {
 		path.Append(Name());
 		rc = rmdir(path.Path());
 	}
@@ -196,7 +206,8 @@ Printer::FindPathToDriver(const char* driverName, BPath* path)
 // Returns:
 //    B_OK if successful or errorcode otherwise.
 // ---------------------------------------------------------------
-status_t Printer::ConfigurePrinter(const char* driverName,
+status_t
+Printer::ConfigurePrinter(const char* driverName,
 	const char* printerName)
 {
 	PrintAddOnServer addOn(driverName);
@@ -257,9 +268,9 @@ Printer::ConfigureJob(BMessage& settings)
 
 	PrintAddOnServer addOn(driver.String());
 	result = addOn.ConfigJob(SpoolDir(), &settings);
-	if (result == B_OK) {
+	if (result == B_OK)
 		AddCurrentPrinter(settings);
-	}
+
 	return result;
 }
 
@@ -301,9 +312,9 @@ Printer::GetDefaultSettings(BMessage& settings)
 
 	PrintAddOnServer addOn(driver.String());
 	result = addOn.DefaultSettings(SpoolDir(), &settings);
-	if (result == B_OK) {
+	if (result == B_OK)
 		AddCurrentPrinter(settings);
-	}
+
 	return result;
 }
 
