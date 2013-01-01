@@ -11,6 +11,8 @@
 #include <Referenceable.h>
 #include <util/DoublyLinkedList.h>
 
+#include "types/Types.h"
+
 
 class CpuState;
 class StackTrace;
@@ -69,7 +71,9 @@ public:
 
 			bool				ExecutedSubroutine() const
 									{ return fExecutedSubroutine; }
-			void				SetExecutedSubroutine();
+			target_addr_t		SubroutineAddress() const
+									{ return fSubroutineAddress; }
+			void				SetExecutedSubroutine(target_addr_t address);
 
 private:
 			Team*				fTeam;
@@ -77,6 +81,7 @@ private:
 			BString				fName;
 			uint32				fState;
 			bool				fExecutedSubroutine;
+			target_addr_t		fSubroutineAddress;
 			uint32				fStoppedReason;
 			BString				fStoppedReasonInfo;
 			CpuState*			fCpuState;
