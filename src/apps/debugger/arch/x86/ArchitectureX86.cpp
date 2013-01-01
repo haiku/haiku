@@ -561,7 +561,7 @@ ArchitectureX86::GetStatement(FunctionDebugInfo* function,
 // TODO: This is not architecture dependent anymore!
 	// get the instruction info
 	InstructionInfo info;
-	status_t error = GetInstructionInfo(address, info);
+	status_t error = GetInstructionInfo(address, info, NULL);
 	if (error != B_OK)
 		return error;
 
@@ -578,7 +578,7 @@ ArchitectureX86::GetStatement(FunctionDebugInfo* function,
 
 status_t
 ArchitectureX86::GetInstructionInfo(target_addr_t address,
-	InstructionInfo& _info)
+	InstructionInfo& _info, CpuState* state)
 {
 	// read the code - maximum x86{-64} instruction size = 15 bytes
 	uint8 buffer[16];
@@ -593,40 +593,7 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 	if (error != B_OK)
 		return error;
 
-	// disassemble the instruction
-	BString line;
-	target_addr_t instructionAddress;
-	target_addr_t targetAddress = 0;
-	target_size_t instructionSize;
-	bool breakpointAllowed;
-	error = disassembler.GetNextInstruction(line, instructionAddress,
-		instructionSize, breakpointAllowed);
-	if (error != B_OK)
-		return error;
-
-	instruction_type instructionType = INSTRUCTION_TYPE_OTHER;
-	if (buffer[0] == 0xff && (buffer[1] & 0x34) == 0x10) {
-		// absolute call with r/m32
-		instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
-		// TODO: retrieve target address (might be in a register)
-	} else if (buffer[0] == 0xe8 && instructionSize == 5) {
-		// relative call with rel32 -- don't categorize the call with 0 as
-		// subroutine call, since it is only used to get the address of the GOT
-		if (buffer[1] != 0 || buffer[2] != 0 || buffer[3] != 0
-			|| buffer[4] != 0) {
-			instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
-			int32 offset;
-			memcpy(&offset, &buffer[1], 4);
-			targetAddress = instructionAddress + instructionSize + offset;
-		}
-	}
-
-	if (!_info.SetTo(instructionAddress, targetAddress, instructionSize,
-			instructionType, breakpointAllowed, line)) {
-		return B_NO_MEMORY;
-	}
-
-	return B_OK;
+	return disassembler.GetNextInstructionInfo(_info, state);
 }
 
 

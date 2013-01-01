@@ -103,13 +103,14 @@ public:
 									target_addr_t address,
 									Statement*& _statement) = 0;
 	virtual	status_t			GetInstructionInfo(target_addr_t address,
-									InstructionInfo& _info) = 0;
+									InstructionInfo& _info,
+									CpuState* state) = 0;
 
 			status_t			CreateStackTrace(Team* team,
 									ImageDebugInfoProvider* imageInfoProvider,
 									CpuState* cpuState,
 									StackTrace*& _stackTrace,
-									bool getReturnValue,
+									target_addr_t returnFunctionAddress,
 									int32 maxStackDepth = -1,
 									bool useExistingTrace = false,
 									bool getFullFrameInfo = true);

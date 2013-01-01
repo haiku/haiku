@@ -58,7 +58,8 @@ GetStackTraceJob::Do()
 	// get the stack trace
 	StackTrace* stackTrace;
 	status_t error = fArchitecture->CreateStackTrace(fThread->GetTeam(), this,
-		fCpuState, stackTrace, fThread->ExecutedSubroutine());
+		fCpuState, stackTrace, fThread->ExecutedSubroutine()
+			? fThread->SubroutineAddress() : 0);
 	if (error != B_OK)
 		return error;
 	BReference<StackTrace> stackTraceReference(stackTrace, true);

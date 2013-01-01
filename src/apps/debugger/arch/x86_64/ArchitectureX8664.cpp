@@ -451,7 +451,7 @@ ArchitectureX8664::GetStatement(FunctionDebugInfo* function,
 // TODO: This is not architecture dependent anymore!
 	// get the instruction info
 	InstructionInfo info;
-	status_t error = GetInstructionInfo(address, info);
+	status_t error = GetInstructionInfo(address, info, NULL);
 	if (error != B_OK)
 		return error;
 
@@ -468,7 +468,7 @@ ArchitectureX8664::GetStatement(FunctionDebugInfo* function,
 
 status_t
 ArchitectureX8664::GetInstructionInfo(target_addr_t address,
-	InstructionInfo& _info)
+	InstructionInfo& _info, CpuState* state)
 {
 	// read the code
 	uint8 buffer[16];

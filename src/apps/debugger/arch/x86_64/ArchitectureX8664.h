@@ -60,7 +60,7 @@ public:
 									target_addr_t address,
 									Statement*& _statement);
 	virtual	status_t			GetInstructionInfo(target_addr_t address,
-									InstructionInfo& _info);
+									InstructionInfo& _info, CpuState* state);
 
 	virtual	status_t			GetWatchpointDebugCapabilities(
 									int32& _maxRegisterCount,
