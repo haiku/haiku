@@ -157,7 +157,7 @@ InstallerWindow::InstallerWindow()
 	:
 	BWindow(BRect(-2000, -2000, -1800, -1800),
 		B_TRANSLATE_SYSTEM_NAME("Installer"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES),
 	fEncouragedToSetupPartitions(false),
 	fDriveSetupLaunched(false),
 	fBootManagerLaunched(false),
