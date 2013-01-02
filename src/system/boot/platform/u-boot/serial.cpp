@@ -165,9 +165,13 @@ serial_init_fdt(const void *fdt)
 		|| fdt_node_check_compatible(fdt, node, "ns16550") == 1) {
 		gUART = arch_get_uart_8250(regs, clock);
 		//dprintf("serial: using 8250\n");
+		// XXX:assume speed is already set
+		(void)speed;
 		return;
 	}
 
+	// for when we can use U-Boot's console
+	panic("Unknown UART type %s", type);
 }
 
 

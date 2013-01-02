@@ -115,7 +115,7 @@ platform_start_kernel(void)
 	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry,
 		stackTop);
 
-	panic("kernel returned!\n");
+	panic("kernel returned %lx!\n", error);
 }
 
 
