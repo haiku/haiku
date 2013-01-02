@@ -60,17 +60,19 @@ FileSystem::~FileSystem()
 static const char*
 GetPath(const char* root, const char* path)
 {
-	ASSERT(root != NULL);
 	ASSERT(path != NULL);
 
 	int slash = 0;
 	int i;
 	for (i = 0; path[i] != '\0'; i++) {
-		if (path[i] != root[i] || root[i] == '\0')
-			break;
-
 		if (path[i] == '/')
 			slash = i;
+
+		if (root == NULL)
+			break;
+
+		if (path[i] != root[i] || root[i] == '\0')
+			break;
 	}
 
 	if (path[i] == '\0')
