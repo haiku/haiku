@@ -451,7 +451,7 @@ ArchitectureX8664::GetStatement(FunctionDebugInfo* function,
 // TODO: This is not architecture dependent anymore!
 	// get the instruction info
 	InstructionInfo info;
-	status_t error = GetInstructionInfo(address, info);
+	status_t error = GetInstructionInfo(address, info, NULL);
 	if (error != B_OK)
 		return error;
 
@@ -468,7 +468,7 @@ ArchitectureX8664::GetStatement(FunctionDebugInfo* function,
 
 status_t
 ArchitectureX8664::GetInstructionInfo(target_addr_t address,
-	InstructionInfo& _info)
+	InstructionInfo& _info, CpuState* state)
 {
 	// read the code
 	uint8 buffer[16];
@@ -487,6 +487,7 @@ ArchitectureX8664::GetInstructionInfo(target_addr_t address,
 	// disassemble the instruction
 	BString line;
 	target_addr_t instructionAddress;
+	target_addr_t targetAddress = 0;
 	target_size_t instructionSize;
 	bool breakpointAllowed;
 	error = disassembler.GetNextInstruction(line, instructionAddress,
@@ -508,8 +509,8 @@ ArchitectureX8664::GetInstructionInfo(target_addr_t address,
 		}
 	}
 
-	if (!_info.SetTo(instructionAddress, instructionSize, instructionType,
-			breakpointAllowed, line)) {
+	if (!_info.SetTo(instructionAddress, targetAddress, instructionSize,
+			instructionType, breakpointAllowed, line)) {
 		return B_NO_MEMORY;
 	}
 
@@ -531,6 +532,13 @@ ArchitectureX8664::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
 		| WATCHPOINT_CAPABILITY_FLAG_READ_WRITE;
 
 	return B_OK;
+}
+
+
+status_t
+ArchitectureX8664::GetReturnAddressLocation(StackFrame* frame,
+	target_size_t valueSize, ValueLocation*& _location) {
+	return B_NOT_SUPPORTED;
 }
 
 

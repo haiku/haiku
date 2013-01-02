@@ -64,6 +64,7 @@ public:
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
 									bool getFullFrameInfo,
+									target_addr_t returnFunctionAddress,
 									StackFrame*& _frame,
 									CpuState*& _previousCpuState);
 	virtual	status_t			GetStatement(FunctionDebugInfo* function,
@@ -103,11 +104,11 @@ private:
 									const EntryListWrapper& variableEntries,
 									const EntryListWrapper& blockEntries);
 
-			status_t			_CreateReturnValue(FunctionInstance* instance,
-									DwarfFunctionDebugInfo* info,
+			status_t			_CreateReturnValue(
+									target_addr_t returnFunctionAddress,
+									Image* image,
 									StackFrame* frame,
-									DwarfStackFrameDebugInfo& factory,
-									target_addr_t instructionPointer);
+									DwarfStackFrameDebugInfo& factory);
 
 			bool				_EvaluateBaseTypeConstraints(DIEType* type,
 									const TypeLookupConstraints& constraints);

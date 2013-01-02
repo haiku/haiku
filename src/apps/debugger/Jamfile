@@ -124,9 +124,10 @@ Application Debugger :
 
 	# ids
 	FunctionID.cpp
+	FunctionParameterID.cpp
 	LocalVariableID.cpp
 	ObjectID.cpp
-	FunctionParameterID.cpp
+	ReturnValueID.cpp
 
 	# jobs
 	GetCPUStateJob.cpp

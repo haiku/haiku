@@ -56,6 +56,7 @@ public:
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
 									bool getFullFrameInfo,
+									target_addr_t returnFunctionAddress,
 									StackFrame*& _Frame,
 									CpuState*& _previousCpuState) = 0;
 										// returns reference to previous frame

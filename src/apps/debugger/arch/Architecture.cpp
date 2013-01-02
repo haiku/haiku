@@ -94,8 +94,8 @@ Architecture::InitRegisterRules(CfaContext& context) const
 status_t
 Architecture::CreateStackTrace(Team* team,
 	ImageDebugInfoProvider* imageInfoProvider, CpuState* cpuState,
-	StackTrace*& _stackTrace, int32 maxStackDepth, bool useExistingTrace,
-	bool getFullFrameInfo)
+	StackTrace*& _stackTrace, target_addr_t returnFunctionAddress,
+	int32 maxStackDepth, bool useExistingTrace, bool getFullFrameInfo)
 {
 	BReference<CpuState> cpuStateReference(cpuState);
 
@@ -163,7 +163,8 @@ Architecture::CreateStackTrace(Team* team,
 		if (function != NULL) {
 			status_t error = functionDebugInfo->GetSpecificImageDebugInfo()
 				->CreateFrame(image, function, cpuState, getFullFrameInfo,
-					frame, previousCpuState);
+					nextFrame == NULL ? returnFunctionAddress : 0, frame,
+					previousCpuState);
 			if (error != B_OK && error != B_UNSUPPORTED)
 				break;
 		}

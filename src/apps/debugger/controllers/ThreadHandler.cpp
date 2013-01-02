@@ -253,8 +253,8 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	if (stackTrace == NULL && cpuState != NULL) {
 		if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
-				fThread->GetTeam(), this, cpuState, stackTrace, 1, false,
-				false) == B_OK) {
+				fThread->GetTeam(), this, cpuState, stackTrace, 0, 1,
+				false, false) == B_OK) {
 			stackTraceReference.SetTo(stackTrace, true);
 		}
 	}
@@ -469,7 +469,7 @@ ThreadHandler::_DoStepOver(CpuState* cpuState)
 	// just single-step, otherwise we set a breakpoint after the instruction.
 	InstructionInfo info;
 	if (fDebuggerInterface->GetArchitecture()->GetInstructionInfo(
-			cpuState->InstructionPointer(), info) != B_OK) {
+			cpuState->InstructionPointer(), info, cpuState) != B_OK) {
 		TRACE_CONTROL("  failed to get instruction info\n");
 		return false;
 	}
@@ -484,6 +484,7 @@ ThreadHandler::_DoStepOver(CpuState* cpuState)
 	TRACE_CONTROL("  subroutine call -- installing breakpoint at address "
 		"%#" B_PRIx64 "\n", info.Address() + info.Size());
 
+	fThread->SetExecutedSubroutine(info.TargetAddress());
 	if (_InstallTemporaryBreakpoint(info.Address() + info.Size()) != B_OK)
 		return false;
 
@@ -565,9 +566,8 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 
 			if (stackTrace == NULL && cpuState != NULL) {
 				if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
-						fThread->GetTeam(), this, cpuState, stackTrace, 1,
-						false, false)
-						== B_OK) {
+						fThread->GetTeam(), this, cpuState, stackTrace, 0, 1,
+						false, false) == B_OK) {
 					stackTraceReference.SetTo(stackTrace, true);
 				}
 			}
@@ -576,7 +576,7 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 				// If we're not in the same frame we started in,
 				// keep executing.
 				if (frame != NULL && fPreviousFrameAddress
-						!= stackTrace->FrameAt(0)->FrameAddress()) {
+						!= frame->FrameAddress()) {
 					status_t error = _InstallTemporaryBreakpoint(
 						cpuState->InstructionPointer());
 					if (error != B_OK)
@@ -608,6 +608,7 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 			// That's the return address, so we're done in theory,
 			// unless we're a recursive function. Check if we've actually
 			// exited the previous stack frame or not.
+			fThread->SetExecutedSubroutine(cpuState->InstructionPointer());
 			target_addr_t framePointer = cpuState->StackFramePointer();
 			bool hasExitedFrame = fDebuggerInterface->GetArchitecture()
 				->StackGrowthDirection() == STACK_GROWTH_DIRECTION_POSITIVE
@@ -652,9 +653,8 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 
 			if (stackTrace == NULL && cpuState != NULL) {
 				if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
-						fThread->GetTeam(), this, cpuState, stackTrace, 1,
-						false, false)
-						== B_OK) {
+						fThread->GetTeam(), this, cpuState, stackTrace, 0, 1,
+						false, false) == B_OK) {
 					stackTraceReference.SetTo(stackTrace, true);
 				}
 			}
@@ -680,8 +680,25 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 		case STEP_OVER:
 		{
 			// If we have stepped out of the statement, we're done.
-			if (!fStepStatement->ContainsAddress(cpuState->InstructionPointer()))
+			if (!fStepStatement->ContainsAddress(cpuState->InstructionPointer())) {
+				StackTrace* stackTrace = fThread->GetStackTrace();
+				BReference<StackTrace> stackTraceReference(stackTrace);
+				if (stackTrace == NULL && cpuState != NULL) {
+					if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
+							fThread->GetTeam(), this, cpuState, stackTrace, 0,
+							1, false, false) == B_OK) {
+						stackTraceReference.SetTo(stackTrace, true);
+					}
+				}
+
+				if (stackTrace != NULL && stackTrace->FrameAt(0)
+						->FrameAddress() != fPreviousFrameAddress) {
+					fThread->SetExecutedSubroutine(
+						cpuState->InstructionPointer());
+				}
+
 				return false;
+			}
 			return _DoStepOver(cpuState);
 		}
 

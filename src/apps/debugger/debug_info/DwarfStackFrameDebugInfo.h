@@ -1,4 +1,5 @@
 /*
+ * Copyright 2012, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -56,10 +57,16 @@ public:
 									DIEVariable* variableEntry,
 									Variable*& _variable);
 									// returns reference
+			status_t			CreateReturnValue(FunctionID* functionID,
+									DIEType* returnType,
+									ValueLocation* location,
+									Variable*& _variable);
+									// returns reference
 
 private:
 			struct DwarfFunctionParameterID;
 			struct DwarfLocalVariableID;
+			struct DwarfReturnValueID;
 
 private:
 			status_t			_CreateVariable(ObjectID* id,

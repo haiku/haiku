@@ -30,6 +30,7 @@ class StackTrace;
 class Statement;
 class Team;
 class TeamMemory;
+class ValueLocation;
 
 
 enum {
@@ -102,12 +103,14 @@ public:
 									target_addr_t address,
 									Statement*& _statement) = 0;
 	virtual	status_t			GetInstructionInfo(target_addr_t address,
-									InstructionInfo& _info) = 0;
+									InstructionInfo& _info,
+									CpuState* state) = 0;
 
 			status_t			CreateStackTrace(Team* team,
 									ImageDebugInfoProvider* imageInfoProvider,
 									CpuState* cpuState,
 									StackTrace*& _stackTrace,
+									target_addr_t returnFunctionAddress,
 									int32 maxStackDepth = -1,
 									bool useExistingTrace = false,
 									bool getFullFrameInfo = true);
@@ -117,6 +120,10 @@ public:
 									int32& _maxRegisterCount,
 									int32& _maxBytesPerRegister,
 									uint8& _watchpointCapabilityFlags) = 0;
+
+	virtual	status_t			GetReturnAddressLocation(
+									StackFrame* frame, target_size_t valueSize,
+									ValueLocation*& _location) = 0;
 
 
 protected:
