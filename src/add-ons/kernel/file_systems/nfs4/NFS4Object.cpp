@@ -26,7 +26,7 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 	ASSERT(nfs4Error != NFS4ERR_BAD_STATEID);
 	ASSERT(nfs4Error != NFS4ERR_BAD_SEQID);
 	ASSERT(nfs4Error != NFS4ERR_RESTOREFH);
-	ASSERT(nfs4Error != NFS4ERR_LOCK_HELD);
+	ASSERT(nfs4Error != NFS4ERR_LOCKS_HELD);
 	ASSERT(nfs4Error != NFS4ERR_OP_ILLEGAL);
 
 	if (cookie != NULL)
