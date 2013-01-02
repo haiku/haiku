@@ -172,7 +172,7 @@ BTrashWatcher::UpdateTrashIcons()
 			const void* vectorData = GetTrackerResources()->LoadResource(
 				B_VECTOR_ICON_TYPE,
 				fTrashFull ? R_TrashFullIcon : R_TrashIcon, &vectorSize);
-	
+
 			if (vectorData) {
 				trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,
 					vectorData, vectorSize);
@@ -185,7 +185,7 @@ BTrashWatcher::UpdateTrashIcons()
 					largeData, largeSize);
 			} else
 				TRESPASS();
-	
+
 			if (smallData) {
 				trashDir.WriteAttr(kAttrMiniIcon, 'MICN', 0,
 					smallData, smallSize);

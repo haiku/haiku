@@ -240,7 +240,7 @@ public:
 			p3(p3)
 		{
 		}
-	
+
 	virtual void operator()() { (function)(p1.Pass(), p2.Pass(), p3.Pass()); }
 
 private:

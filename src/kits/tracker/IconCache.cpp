@@ -526,7 +526,7 @@ IconCache::GetIconFromFileTypes(ModelNodeLazyOpener* modelOpener,
 				(SharedCacheEntry*)entry);
 				// OK to cast here, have a runtime check
 			source = kPreferredAppForNode;
-				// set source as preferred for node, so that next time we 
+				// set source as preferred for node, so that next time we
 				// get a hit in the initial find that uses
 				// GetIconForPreferredApp
 		} else

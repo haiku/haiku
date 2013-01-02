@@ -103,7 +103,7 @@ public:
 		const char* ofType = NULL, const char* openedByAppSig = NULL);
 	BRecentFilesList(int32 maxItems, bool navMenuFolders,
 		const char* ofTypeList[], int32 ofTypeListCount,
-		const char* openedByAppSig = NULL);	
+		const char* openedByAppSig = NULL);
 	virtual ~BRecentFilesList();
 
 	// use one of the two NewFileListMenu calls to get an entire menu

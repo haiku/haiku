@@ -195,12 +195,12 @@ TrackerSettingsWindow::_ViewAt(int32 i)
 {
 	if (!Lock())
 		return NULL;
-		
+
 	SettingsItem* item = dynamic_cast<SettingsItem*>
 		(fSettingsTypeListView->ItemAt(i));
-	
+
 	Unlock();
-	
+
 	return item->View();
 }
 
@@ -227,7 +227,7 @@ TrackerSettingsWindow::_UpdateButtons()
 		defaultable |= _ViewAt(i)->IsDefaultable();
 		revertable |= _ViewAt(i)->IsRevertable();
 	}
-	
+
 	fDefaultsButton->SetEnabled(defaultable);
 	fRevertButton->SetEnabled(revertable);
 }
@@ -237,7 +237,7 @@ void
 TrackerSettingsWindow::_HandlePressedDefaultsButton()
 {
 	int32 itemCount = fSettingsTypeListView->CountItems();
-	
+
 	for (int32 i = 0; i < itemCount; i++) {
 		if (_ViewAt(i)->IsDefaultable())
 			_ViewAt(i)->SetDefaults();

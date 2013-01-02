@@ -70,7 +70,7 @@ public:
 	bool MatchesRegExp(const char*, bool caseSensitivity = true) const;
 	bool MatchesRegExp(const RegExp&) const;
 	bool MatchesRegExp(const RegExp*) const;
-	
+
 	bool MatchesGlob(const char*, bool caseSensitivity = false) const;
 	bool EndsWith(const char*, bool caseSensitivity = false) const;
 	bool StartsWith(const char*, bool caseSensitivity = false) const;
@@ -106,13 +106,13 @@ private:
 		// Not counting start!
 	bool IsStartOfGlyph(char) const;
 	const char* MoveToEndOfGlyph(const char*) const;
-	
+
 	// Functions for Glob matching:
 	bool MatchesBracketExpression(const char* string, const char* pattern,
 		bool caseSensitivity) const;
 	bool StringMatchesPattern(const char* string, const char* pattern,
 		bool caseSensitivity) const;
-		
+
 	char ConditionalToLower(char c, bool toLower) const;
 	bool CharsAreEqual(char char1, char char2, bool toLower) const;
 	bool UTF8CharsAreEqual(const char* string1, const char* string2) const;
@@ -124,7 +124,7 @@ TrackerString::MatchesRegExp(const RegExp* expression) const
 {
 	if (expression == NULL || expression->InitCheck() != B_OK)
 		return false;
-				
+
 	return expression->Matches(*this);
 }
 
@@ -134,7 +134,7 @@ TrackerString::MatchesRegExp(const RegExp &expression) const
 {
 	if (expression.InitCheck() != B_OK)
 		return false;
-				
+
 	return expression.Matches(*this);
 }
 

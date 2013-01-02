@@ -100,14 +100,14 @@ MiniMenuField::Draw(BRect)
 	BRect rect(bounds);
 	rect.right--;
 	rect.bottom--;
-	
+
 	rgb_color darkest = tint_color(kBlack, 0.6f);
 	rgb_color dark = tint_color(kBlack, 0.4f);
 	rgb_color medium = dark;
 	rgb_color light = tint_color(kBlack, 0.03f);
-	
+
 	SetHighColor(medium);
-	
+
 	// draw frame and shadow
 	BeginLineArray(10);
 	AddLine(rect.RightTop(), rect.RightBottom(), darkest);
@@ -123,7 +123,7 @@ MiniMenuField::Draw(BRect)
 	AddLine(rect.LeftTop(), rect.RightTop(), light);
 
 	EndLineArray();
-	
+
 	// draw triangle
 	rect = BRect(5, 5, 15, 15);
 	const rgb_color outlineColor = kBlack;

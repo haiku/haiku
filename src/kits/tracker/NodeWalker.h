@@ -57,7 +57,7 @@ class TWalker : public BEntryList {
 
 public:
 	virtual ~TWalker();
-	
+
 	virtual	status_t GetNextEntry(BEntry*, bool traverse = false) = 0;
 	virtual	status_t GetNextRef(entry_ref*) = 0;
 	virtual	int32 GetNextDirents(struct dirent*, size_t,
@@ -83,7 +83,7 @@ public:
 	TNodeWalker(const char* path);
 	TNodeWalker(const entry_ref* ref);
 	TNodeWalker(const BDirectory* dir);
-						
+
 	virtual	status_t GetNextEntry(BEntry*, bool traverse = false);
 	virtual	status_t GetNextRef(entry_ref*);
 	virtual	int32 GetNextDirents(struct dirent*, size_t,
@@ -126,7 +126,7 @@ public:
 	virtual int32 GetNextDirents(struct dirent*, size_t,
 		int32 count = INT_MAX);
 	virtual status_t Rewind();
-	
+
 	virtual status_t NextVolume();
 		// skips to the next volume
 		// Note: it would be cool to return const BVolume*
@@ -150,13 +150,13 @@ class TQueryWalker : public TWalker {
 public:
 	TQueryWalker(const char* predicate);
 	virtual ~TQueryWalker();
-	
+
 	// Does an in-fix walk of all entries
 	virtual status_t GetNextEntry(BEntry*, bool traverse = false);
 	virtual status_t GetNextRef(entry_ref*);
 	virtual int32 GetNextDirents(struct dirent*, size_t,
 		int32 count = INT_MAX);
-	
+
 	virtual	status_t NextVolume();
 	// skips to the next volume
 	virtual	status_t Rewind();
@@ -164,7 +164,7 @@ public:
 private:
 	virtual int32 CountEntries();
 	// can't count
-	
+
 	BQuery fQuery;
 	BVolumeRoster fVolRoster;
 	BVolume fVol;

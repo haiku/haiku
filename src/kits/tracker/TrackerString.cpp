@@ -73,13 +73,13 @@ TrackerString::Matches(const char* string, bool caseSensitivity,
 		default:
 		case kNone:
 			return false;
-	
+
 		case kStartsWith:
 			return StartsWith(string, caseSensitivity);
-			
+
 		case kEndsWith:
 			return EndsWith(string, caseSensitivity);
-	
+
 		case kContains:
 			return Contains(string, caseSensitivity);
 
@@ -97,14 +97,14 @@ TrackerString::MatchesRegExp(const char* pattern, bool caseSensitivity) const
 {
 	BString patternString(pattern);
 	BString textString(String());
-	
+
 	if (caseSensitivity == false) {
 		patternString.ToLower();
 		textString.ToLower();
 	}
-	
+
 	RegExp expression(patternString);
-	
+
 	if (expression.InitCheck() != B_OK)
 		return false;
 
@@ -127,7 +127,7 @@ TrackerString::EndsWith(const char* string, bool caseSensitivity) const
 	int32 position = Length() - (int32)strlen(string);
 	if (position < 0)
 		return false;
-		
+
 	if (caseSensitivity)
 		return FindLast(string) == position;
 	else
@@ -442,7 +442,7 @@ TrackerString::MatchesBracketExpression(const char* string,
 
 	bool inverse = *pattern == '^' || *pattern == '!';
 		// We allow both ^ and ! as a initial inverting character.
-	
+
 	if (inverse)
 		pattern++;
 
@@ -533,7 +533,7 @@ TrackerString::StringMatchesPattern(const char* string, const char* pattern,
 							string = MoveToEndOfGlyph(string);
 					}
 				}
-				
+
 				if (*pattern == '\0') {
 					// An ending * matches all strings.
 					return true;
@@ -588,7 +588,7 @@ TrackerString::StringMatchesPattern(const char* string, const char* pattern,
 				}
 				break;
 			}
-	
+
 			case '[':
 				pattern++;
 
@@ -603,7 +603,7 @@ TrackerString::StringMatchesPattern(const char* string, const char* pattern,
 					// Skip the rest of the bracket:
 					while (*pattern != ']' && *pattern != '\0')
 						pattern++;
-	
+
 					// Failure if no closing bracket;
 					if (*pattern == '\0')
 						return false;

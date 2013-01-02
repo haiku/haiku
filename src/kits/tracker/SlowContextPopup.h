@@ -50,9 +50,9 @@ public:
 	virtual	void DetachedFromWindow();
 
 	void SetNavDir(const entry_ref*);
-	
+
 	void ClearMenu();
-	
+
 	void ForceRebuild();
 	bool NeedsToRebuild() const;
 		// will cause menu to get rebuilt next time it is shown

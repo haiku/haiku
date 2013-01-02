@@ -97,7 +97,7 @@ StringValueSetting::Handle(const char* const* argv)
 {
 	if (!*++argv)
 		return fValueExpectedErrorString;
-	
+
 	ValueChanged(*argv);
 	return 0;
 }
