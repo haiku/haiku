@@ -183,7 +183,7 @@ InstallerApp::ReadyToRun()
 	infoText << B_TRANSLATE(
 		"NOTE: While the naming strategy for hard disks is still as described "
 		"under 2.1) the naming scheme for partitions has changed.\n\n");
-	infoText << B_TRANSLATE(		
+	infoText << B_TRANSLATE(
 		"GRUB's naming scheme is still: (hdN,n)\n\n");
 	infoText << B_TRANSLATE(
 		"All hard disks start with \"hd\".\n");
