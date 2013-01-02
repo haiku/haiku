@@ -46,7 +46,9 @@ FileSystem::FileSystem(const MountConfiguration& configuration)
 
 FileSystem::~FileSystem()
 {
-	NFSServer()->RemoveFileSystem(this);
+	NFS4Server* server = reinterpret_cast<NFS4Server*>(fServer->PrivateData());
+	if (server != NULL)
+		server->RemoveFileSystem(this);
 
 	mutex_destroy(&fDelegationLock);
 	mutex_destroy(&fOpenLock);
