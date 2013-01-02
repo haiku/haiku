@@ -23,13 +23,14 @@ public:
 	inline	void		Lock();
 	inline	void		Unlock();
 
+	inline	Inode*		GetPointer() const;
 			Inode*		Get();
 			void		Replace(Inode* newInode);
 
 	inline	void		Remove();
 	inline	void		Clear();
 
-	inline	ino_t		ID();
+	inline	ino_t		ID() const;
 private:
 			ino_t		fID;
 			rw_lock		fLock;
@@ -105,8 +106,15 @@ VnodeToInode::Clear()
 }
 
 
+inline Inode*
+VnodeToInode::GetPointer() const
+{
+	return fInode;
+}
+
+
 inline ino_t
-VnodeToInode::ID()
+VnodeToInode::ID() const
 {
 	return fID;
 }

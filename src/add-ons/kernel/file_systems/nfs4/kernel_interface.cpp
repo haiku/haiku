@@ -339,10 +339,10 @@ nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 	TRACE("volume = %p, vnode = %llu", volume, vti->ID());
 
-	if (fs->Root() == vti->Get())
+	if (fs->Root() == vti->GetPointer())
 		return B_OK;
 
-	ASSERT(vti->Get() == NULL);
+	ASSERT(vti->GetPointer() == NULL);
 	delete vti;
 
 	return B_OK;
