@@ -81,12 +81,14 @@ Server::Server(Connection* connection, PeerAddress* address)
 	fAddress(address),
 	fPrivateData(NULL),
 	fCallback(NULL),
+	fRepairCount(0),
 	fXID(rand() << 1)
 {
 	ASSERT(connection != NULL);
 	ASSERT(address != NULL);
 
 	mutex_init(&fCallbackLock, NULL);
+	mutex_init(&fRepairLock, NULL);
 
 	_StartListening();
 }
@@ -98,6 +100,7 @@ Server::~Server()
 		gRPCCallbackServer->UnregisterCallback(fCallback);
 	delete fCallback;
 	mutex_destroy(&fCallbackLock);
+	mutex_destroy(&fRepairLock);
 
 	delete fPrivateData;
 
@@ -229,6 +232,12 @@ Server::WakeCall(Request* request)
 status_t
 Server::Repair()
 {
+	uint32 thisRepair = fRepairCount;
+
+	MutexLocker _(fRepairLock);
+	if (fRepairCount == thisRepair)
+		return B_OK;
+
 	fThreadCancel = true;
 
 	status_t result = fConnection->Reconnect();
@@ -236,7 +245,12 @@ Server::Repair()
 		return result;
 
 	wait_for_thread(fThread, &result);
-	return _StartListening();
+	result = _StartListening();
+
+	if (result == B_OK)
+		fRepairCount++;
+
+	return result;
 }
 
 

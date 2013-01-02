@@ -103,6 +103,9 @@ private:
 			mutex					fCallbackLock;
 			Callback*				fCallback;
 
+			uint32					fRepairCount;
+			mutex					fRepairLock;
+
 			vint32					fXID;
 	static	const bigtime_t			kWaitTime	= 1000000;
 };
