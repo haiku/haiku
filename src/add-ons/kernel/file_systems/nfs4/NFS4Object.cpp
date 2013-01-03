@@ -24,7 +24,6 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 	ASSERT(nfs4Error != NFS4ERR_CLID_INUSE);
 	ASSERT(nfs4Error != NFS4ERR_NOFILEHANDLE);
 	ASSERT(nfs4Error != NFS4ERR_BAD_STATEID);
-	ASSERT(nfs4Error != NFS4ERR_BAD_SEQID);
 	ASSERT(nfs4Error != NFS4ERR_RESTOREFH);
 	ASSERT(nfs4Error != NFS4ERR_LOCKS_HELD);
 	ASSERT(nfs4Error != NFS4ERR_OP_ILLEGAL);
@@ -35,6 +34,12 @@ NFS4Object::HandleErrors(uint32 nfs4Error, RPC::Server* serv,
 	switch (nfs4Error) {
 		case NFS4_OK:
 			return false;
+
+		// retransmission of CLOSE caused seqid to fall back
+		case NFS4ERR_BAD_SEQID:
+			ASSERT(sequence != NULL);
+			(*sequence)++;
+			return true;
 
 		// server needs more time, we need to wait
 		case NFS4ERR_LOCKED:

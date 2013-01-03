@@ -290,6 +290,14 @@ OpenState::Close()
 
 		sequence += IncrementSequence(reply.NFS4Error());
 
+		// RFC 3530 8.10.1. Some servers does not do anything to help client
+		// recognize retried CLOSE requests so we just assume that BAD_STATEID
+		// on CLOSE request is just a result of retransmission.
+		if (reply.NFS4Error() == NFS4ERR_BAD_STATEID) {
+	 		fFileSystem->OpenOwnerSequenceUnlock(sequence);
+			return B_OK;
+		}
+
 		if (HandleErrors(reply.NFS4Error(), serv, NULL, this, &sequence))
 			continue;
  		fFileSystem->OpenOwnerSequenceUnlock(sequence);
