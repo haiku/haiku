@@ -14,6 +14,7 @@
 
 #include "Inode.h"
 #include "InodeIdMap.h"
+#include "RootInode.h"
 
 class VnodeToInode {
 public:
@@ -31,6 +32,8 @@ public:
 	inline	void		Clear();
 
 	inline	ino_t		ID() const;
+
+	inline	bool		IsRoot() const;
 private:
 			ino_t		fID;
 			rw_lock		fLock;
@@ -70,7 +73,7 @@ inline
 VnodeToInode::~VnodeToInode()
 {
 	Remove();
-	if (fFileSystem != NULL)
+	if (fFileSystem != NULL && !IsRoot())
 		fFileSystem->InoIdMap()->RemoveEntry(fID);
 	rw_lock_destroy(&fLock);
 }
@@ -101,8 +104,16 @@ inline void
 VnodeToInode::Clear()
 {
 	WriteLocker _(fLock);
-	delete fInode;
+	if (!IsRoot())
+		delete fInode;
 	fInode = NULL;
+}
+
+
+inline bool
+VnodeToInode::IsRoot() const
+{
+	return fInode && fFileSystem && fInode->ID() == fFileSystem->Root()->ID();
 }
 
 
