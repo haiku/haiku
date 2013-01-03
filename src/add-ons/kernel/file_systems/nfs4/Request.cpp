@@ -125,6 +125,9 @@ Request::_SendTCP(Cookie* cookie)
 		}
 	} while (result != B_OK && (hard || attempts++ < retryLimit));
 
+	if (result != B_OK)
+		return result;
+
 	if (cookie != NULL)
 		cookie->UnregisterRequest(rpc);
 
@@ -133,11 +136,11 @@ Request::_SendTCP(Cookie* cookie)
 		result = rpc->fError;
 		delete rpc;
 		return result;
-	} else {
-		fReply.SetTo(rpl);
-		delete rpc;
-		return B_OK;
-	};
+	} 
+
+	fReply.SetTo(rpl);
+	delete rpc;
+	return B_OK;
 }
 
 
