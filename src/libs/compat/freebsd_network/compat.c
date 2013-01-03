@@ -175,6 +175,14 @@ device_get_parent(device_t dev)
 }
 
 
+devclass_t
+device_get_devclass(device_t dev)
+{
+	// TODO find out what to do
+	return 0;
+}
+
+
 int
 device_get_children(device_t dev, device_t **devlistp, int *devcountp)
 {
@@ -641,3 +649,4 @@ pmap_kextract(vm_offset_t virtualAddress)
 
 	return (vm_paddr_t)entry.address;
 }
+

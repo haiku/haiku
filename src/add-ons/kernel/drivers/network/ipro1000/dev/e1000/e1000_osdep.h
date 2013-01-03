@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/e1000_osdep.h,v 1.2.2.3.2.1 2010/12/21 17:09:25 kensmith Exp $*/
+/*$FreeBSD$*/
 
 
 #ifndef _FREEBSD_OS_H_
@@ -72,14 +72,11 @@
 #define DEBUGOUT7(S,A,B,C,D,E,F,G)	do {} while (0)
 
 #define STATIC			static
-#ifndef __HAIKU__
 #define FALSE			0
-#define false			FALSE 
 #define TRUE			1
+#ifndef __bool_true_false_are_defined
+#define false			FALSE
 #define true			TRUE
-#else
-#define FALSE			0
-#define TRUE			1
 #endif
 #define CMD_MEM_WRT_INVALIDATE	0x0010  /* BIT_4 */
 #define PCI_COMMAND_REGISTER	PCIR_COMMAND
@@ -87,7 +84,8 @@
 /* Mutex used in the shared code */
 #define E1000_MUTEX                     struct mtx
 #define E1000_MUTEX_INIT(mutex)         mtx_init((mutex), #mutex, \
-                                            MTX_NETWORK_LOCK, MTX_DEF)
+                                            MTX_NETWORK_LOCK, \
+                                            MTX_DEF | MTX_DUPOK)
 #define E1000_MUTEX_DESTROY(mutex)      mtx_destroy(mutex)
 #define E1000_MUTEX_LOCK(mutex)         mtx_lock(mutex)
 #define E1000_MUTEX_TRYLOCK(mutex)      mtx_trylock(mutex)
@@ -101,7 +99,7 @@ typedef int64_t		s64;
 typedef int32_t		s32;
 typedef int16_t		s16;
 typedef int8_t		s8;
-#ifndef __HAIKU__
+#ifndef __bool_true_false_are_defined
 typedef boolean_t	bool;
 #endif
 

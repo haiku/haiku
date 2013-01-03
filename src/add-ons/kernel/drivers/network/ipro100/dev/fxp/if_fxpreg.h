@@ -25,7 +25,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/dev/fxp/if_fxpreg.h,v 1.43.2.3.2.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #define FXP_VENDORID_INTEL	0x8086
@@ -446,6 +446,24 @@ struct fxp_stats {
 #define FXP_EEPROM_OPC_ERASE	0x4
 #define FXP_EEPROM_OPC_WRITE	0x5
 #define FXP_EEPROM_OPC_READ	0x6
+
+/*
+ * EEPROM map
+ */
+#define	FXP_EEPROM_MAP_IA0	0x00		/* Station address */
+#define	FXP_EEPROM_MAP_IA1	0x01
+#define	FXP_EEPROM_MAP_IA2	0x02
+#define	FXP_EEPROM_MAP_COMPAT	0x03		/* Compatibility */
+#define	FXP_EEPROM_MAP_CNTR	0x05		/* Controller/connector type */
+#define	FXP_EEPROM_MAP_PRI_PHY	0x06		/* Primary PHY record */
+#define	FXP_EEPROM_MAP_SEC_PHY	0x07		/* Secondary PHY record */
+#define	FXP_EEPROM_MAP_PWA0	0x08		/* Printed wire assembly num. */
+#define	FXP_EEPROM_MAP_PWA1	0x09		/* Printed wire assembly num. */
+#define	FXP_EEPROM_MAP_ID	0x0A		/* EEPROM ID */
+#define	FXP_EEPROM_MAP_SUBSYS	0x0B		/* Subsystem ID */
+#define	FXP_EEPROM_MAP_SUBVEN	0x0C		/* Subsystem vendor ID */
+#define	FXP_EEPROM_MAP_CKSUM64	0x3F		/* 64-word EEPROM checksum */
+#define	FXP_EEPROM_MAP_CKSUM256	0xFF		/* 256-word EEPROM checksum */
 
 /*
  * Management Data Interface opcodes

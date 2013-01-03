@@ -36,7 +36,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/de/if_de.c,v 1.186.2.3.4.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #define	TULIP_HDR_DATA
 
@@ -4496,7 +4496,8 @@ tulip_busdma_allocring(device_t dev, tulip_softc_t * const sc, size_t count,
     /* First, setup a tag. */
     ri->ri_max = count;
     size = count * sizeof(tulip_desc_t);
-    error = bus_dma_tag_create(NULL, 32, 0, BUS_SPACE_MAXADDR_32BIT,
+    error = bus_dma_tag_create(bus_get_dma_tag(dev),
+	32, 0, BUS_SPACE_MAXADDR_32BIT,
 	BUS_SPACE_MAXADDR, NULL, NULL, size, 1, size, 0, NULL, NULL,
 	&ri->ri_ring_tag);
     if (error) {
@@ -4524,7 +4525,7 @@ tulip_busdma_allocring(device_t dev, tulip_softc_t * const sc, size_t count,
     }
 
     /* Allocate a tag for the data buffers. */
-    error = bus_dma_tag_create(NULL, align, 0,
+    error = bus_dma_tag_create(bus_get_dma_tag(dev), align, 0,
 	BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 	MCLBYTES * nsegs, nsegs, MCLBYTES, 0, NULL, NULL, &ri->ri_data_tag);
     if (error) {
@@ -4604,7 +4605,7 @@ tulip_busdma_init(device_t dev, tulip_softc_t * const sc)
     /*
      * Allocate a DMA tag, memory, and map for setup descriptor
      */
-    error = bus_dma_tag_create(NULL, 32, 0,
+    error = bus_dma_tag_create(bus_get_dma_tag(dev), 32, 0,
 	BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 	sizeof(sc->tulip_setupdata), 1, sizeof(sc->tulip_setupdata), 0,
 	NULL, NULL, &sc->tulip_setup_tag);
@@ -4710,7 +4711,7 @@ tulip_pci_probe(device_t dev)
 	else
 	    name = "Digital 21140 Fast Ethernet";
 	break;
-#ifndef __HAIKU__	
+#ifndef __HAIKU__
 	/*
 	 * The card with the same id is supported by if_dc - screen it to
 	 * prevent duplicated dev entries.
@@ -4721,7 +4722,7 @@ tulip_pci_probe(device_t dev)
 	else
 	    name = "Digital 21142 Fast Ethernet";
 	break;
-#endif	
+#endif
     }
     if (name) {
 	device_set_desc(dev, name);

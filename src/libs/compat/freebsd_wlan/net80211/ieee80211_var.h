@@ -232,7 +232,7 @@ struct ieee80211com {
 	/* virtual ap create/delete */
 	struct ieee80211vap*	(*ic_vap_create)(struct ieee80211com *,
 				    const char name[IFNAMSIZ], int unit,
-				    int opmode, int flags,
+				    enum ieee80211_opmode opmode, int flags,
 				    const uint8_t bssid[IEEE80211_ADDR_LEN],
 				    const uint8_t macaddr[IEEE80211_ADDR_LEN]);
 	void			(*ic_vap_delete)(struct ieee80211vap *);

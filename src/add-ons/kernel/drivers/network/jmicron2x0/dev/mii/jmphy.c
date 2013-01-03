@@ -26,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/mii/jmphy.c,v 1.1.6.5.2.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * Driver for the JMicron JMP211 10/100/1000, JMP202 10/100 PHY.
@@ -62,7 +62,7 @@ static device_method_t jmphy_methods[] = {
 	DEVMETHOD(device_attach,	jmphy_attach),
 	DEVMETHOD(device_detach,	mii_phy_detach),
 	DEVMETHOD(device_shutdown,	bus_generic_shutdown),
-	{ NULL, NULL }
+	DEVMETHOD_END
 };
 
 static devclass_t jmphy_devclass;

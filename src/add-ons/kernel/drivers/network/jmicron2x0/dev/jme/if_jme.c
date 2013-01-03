@@ -26,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/jme/if_jme.c,v 1.11.2.8.2.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -1661,7 +1661,7 @@ jme_resume(device_t dev)
 	sc = device_get_softc(dev);
 
 	JME_LOCK(sc);
-	if (pci_find_cap(sc->jme_dev, PCIY_PMG, &pmc) != 0) {
+	if (pci_find_cap(sc->jme_dev, PCIY_PMG, &pmc) == 0) {
 		pmstat = pci_read_config(sc->jme_dev,
 		    pmc + PCIR_POWER_STATUS, 2);
 		/* Disable PME clear PME status. */

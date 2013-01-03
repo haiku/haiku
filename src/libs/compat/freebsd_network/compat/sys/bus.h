@@ -115,6 +115,7 @@ void device_set_desc_copy(device_t dev, const char *desc);
 const char *device_get_desc(device_t dev);
 device_t device_get_parent(device_t dev);
 u_int32_t device_get_flags(device_t dev);
+devclass_t device_get_devclass(device_t dev);
 int device_get_children(device_t dev, device_t **devlistp, int *devcountp);
 
 void device_set_ivars(device_t dev, void *);

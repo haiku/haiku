@@ -31,7 +31,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/xl/if_xl.c,v 1.8.2.7.2.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * 3Com 3c90x Etherlink XL PCI NIC driver
@@ -310,17 +310,13 @@ static device_method_t xl_methods[] = {
 	DEVMETHOD(device_suspend,	xl_suspend),
 	DEVMETHOD(device_resume,	xl_resume),
 
-	/* bus interface */
-	DEVMETHOD(bus_print_child,	bus_generic_print_child),
-	DEVMETHOD(bus_driver_added,	bus_generic_driver_added),
-
 	/* MII interface */
 	DEVMETHOD(miibus_readreg,	xl_miibus_readreg),
 	DEVMETHOD(miibus_writereg,	xl_miibus_writereg),
 	DEVMETHOD(miibus_statchg,	xl_miibus_statchg),
 	DEVMETHOD(miibus_mediainit,	xl_miibus_mediainit),
 
-	{ 0, 0 }
+	DEVMETHOD_END
 };
 
 static driver_t xl_driver = {
@@ -331,8 +327,9 @@ static driver_t xl_driver = {
 
 static devclass_t xl_devclass;
 
-DRIVER_MODULE(xl, pci, xl_driver, xl_devclass, 0, 0);
-DRIVER_MODULE(miibus, xl, miibus_driver, miibus_devclass, 0, 0);
+DRIVER_MODULE_ORDERED(xl, pci, xl_driver, xl_devclass, NULL, NULL,
+    SI_ORDER_ANY);
+DRIVER_MODULE(miibus, xl, miibus_driver, miibus_devclass, NULL, NULL);
 
 static void
 xl_dma_map_addr(void *arg, bus_dma_segment_t *segs, int nseg, int error)
@@ -2185,12 +2182,9 @@ xl_intr(void *arg)
 #endif
 		if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0)
 			break;
-		if (status & XL_STAT_UP_COMPLETE) {
-			int	curpkts;
 
-			curpkts = ifp->if_ipackets;
-			xl_rxeof(sc);
-			if (curpkts == ifp->if_ipackets) {
+		if (status & XL_STAT_UP_COMPLETE) {
+			if (xl_rxeof(sc) == 0) {
 				while (xl_rx_resync(sc))
 					xl_rxeof(sc);
 			}
@@ -2226,7 +2220,7 @@ xl_intr(void *arg)
 	}
 
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd) &&
-		ifp->if_drv_flags & IFF_DRV_RUNNING) {
+	    ifp->if_drv_flags & IFF_DRV_RUNNING) {
 		if (sc->xl_type == XL_TYPE_905B)
 			xl_start_90xB_locked(ifp);
 		else
