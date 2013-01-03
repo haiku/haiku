@@ -58,7 +58,7 @@ class FavoritesMenu : public BSlowMenu {
 			BMessage* openFileMessage, const BMessenger &,
 			bool isSavePanel, BRefFilter* filter = NULL);
 		virtual ~FavoritesMenu();
-		
+
 		void SetRefFilter(BRefFilter* filter);
 
 	private:
@@ -67,9 +67,9 @@ class FavoritesMenu : public BSlowMenu {
 		virtual bool AddNextItem();
 		virtual void DoneBuildingItemList();
 		virtual void ClearMenuBuildingState();
-				
+
 		bool ShouldShowModel(const Model* model);
-		
+
 		BMessage* fOpenFolderMessage;
 		BMessage* fOpenFileMessage;
 		BMessenger fTarget;

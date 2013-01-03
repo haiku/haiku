@@ -673,10 +673,14 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 			instructionPointer, functionInstance->Address() - fRelocationDelta,
 			subprogramEntry->Variables(), subprogramEntry->Blocks());
 
+		// TODO: re-enable once PIC and false positive issues
+		// are properly dealt with
+#if 0
 		if (returnFunctionAddress != 0) {
 			_CreateReturnValue(returnFunctionAddress, image, frame,
 				*stackFrameDebugInfo);
 		}
+#endif
 	}
 
 	_frame = frameReference.Detach();

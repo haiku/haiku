@@ -69,7 +69,7 @@ class OneShotDelayedTask : public DelayedTask {
 public:
 	OneShotDelayedTask(FunctionObject* functor, bigtime_t delay);
 	virtual ~OneShotDelayedTask();
-	
+
 	virtual bool RunIfNeeded(bigtime_t currentTime);
 
 protected:
@@ -196,7 +196,7 @@ protected:
 	bool Pulse();
 		// return true if quitting
 	bigtime_t LatestRunTime() const;
-	
+
 	virtual bool KeepPulsingWhenEmpty() const = 0;
 	virtual void StartPulsingIfNeeded() = 0;
 
@@ -226,7 +226,7 @@ private:
 	volatile bool fNeedToQuit;
 	volatile thread_id fScanThread;
 	bool fKeepThread;
-	
+
 	typedef TaskLoop _inherited;
 };
 
@@ -243,7 +243,7 @@ public:
 private:
 	virtual bool KeepPulsingWhenEmpty() const;
 	virtual void StartPulsingIfNeeded();
-	
+
 	bigtime_t fNextHeartBeatTime;
 	bool fPulseMe;
 };

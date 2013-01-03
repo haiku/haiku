@@ -106,7 +106,7 @@ void
 NodePreloader::MessageReceived(BMessage* message)
 {
 	// respond to node monitor notifications
-	
+
 	node_ref itemNode;
 	switch (message->what) {
 		case B_NODE_MONITOR:
@@ -173,7 +173,7 @@ NodePreloader::PreloadOne(const char* dirPath)
 		entry_ref ref;
 		if (dir.GetNextRef(&ref) != B_OK)
 			break;
-		
+
 		BEntry entry(&ref);
 		if (!entry.IsFile())
 			// only interrested in files

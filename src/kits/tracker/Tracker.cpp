@@ -233,7 +233,7 @@ TTracker::TTracker()
 	setrlimit(RLIMIT_NOFILE, &rl);
 
 	fNodeMonitorCount = DEFAULT_MON_NUM;
-	
+
 	gLocalizedNamePreferred
 		= BLocaleRoster::Default()->IsFilesystemTranslationPreferred();
 

@@ -137,7 +137,8 @@ compare_void_list_items(const void* _a, const void* _b)
 BootPromptWindow::BootPromptWindow()
 	:
 	BWindow(BRect(0, 0, 530, 400), "",
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE),
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE,
+		B_ALL_WORKSPACES),
 	fDefaultKeymapItem(NULL)
 {
 	SetSizeLimits(450, 16384, 350, 16384);

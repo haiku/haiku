@@ -237,7 +237,7 @@ TTracker::DeleteProperty(BMessage* /*specifier*/, int32 form,
 		if (form != B_DIRECT_SPECIFIER)
 			// only support direct specifier
 			return false;
-		
+
 		// empty the trash
 		FSEmptyTrash();
 		return true;
@@ -293,11 +293,11 @@ bool
 TTracker::ExecuteProperty(BMessage*, int32 form, const char* property, BMessage*)
 {
 	if (strcmp(property, kPropertyPreferences) == 0) {
-		
+
 		if (form != B_DIRECT_SPECIFIER)
 			// only support direct specifier
 			return false;
-		
+
 		ShowSettingsWindow();
 		return true;
 

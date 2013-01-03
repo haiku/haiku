@@ -266,7 +266,7 @@ FSClipboardAddPoses(const node_ref* directory, PoseList* list,
 						refsAdded++;
 					} else {
 						clip->RemoveName(modeName);
-						
+
 						clipNode.node = *node;
 						clipNode.moveMode = kDelete;	// note removing node
 						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE,
@@ -280,7 +280,7 @@ FSClipboardAddPoses(const node_ref* directory, PoseList* list,
 					if (clip->AddRef(refName, model->EntryRef()) == B_OK
 						&& clip->AddInt32(modeName, (int32)moveMode) == B_OK) {
 						pose->SetClipboardMode(moveMode);
-						
+
 						clipNode.node = *node;
 						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE,
 							&clipNode, sizeof(TClipboardNodeRef), true,
@@ -422,7 +422,7 @@ FSClipboardPaste(Model* model, uint32 linksMode)
 				uint32 newMoveMode = 0;
 				bool sameDirectory = destNodeRef->device == ref.device
 					&& destNodeRef->node == ref.directory;
-				
+
 				if (!entry.Exists()) {
 					// The entry doesn't exist anymore, so we'll remove
 					// that entry from the clipboard as well
@@ -567,7 +567,7 @@ FSClipboardFindNodeMode(Model* model, bool autoLock, bool updateRefIfNeeded)
 	}
 	if (change)
 		be_clipboard->Commit();
-	
+
 	if (autoLock)
 		be_clipboard->Unlock();
 
@@ -744,7 +744,7 @@ BClipboardRefsWatcher::UpdateNode(node_ref* node, entry_ref* ref)
 			clip->RemoveName(name);
 			MakeModeName(name);
 			clip->RemoveName(name);
-			
+
 			RemoveNode(node);
 		}
 		be_clipboard->Commit();

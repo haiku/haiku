@@ -85,7 +85,7 @@ private:
 	FILE* fFile;
 	char* fBuffer;
 	int32 fPos;
-	
+
 	int fArgc;
 	char** fCurrentArgv;
 
@@ -108,7 +108,7 @@ public:
 	virtual ~SettingsArgvDispatcher() {};
 
 	void SaveSettings(Settings* settings, bool onlyIfNonDefault);
-	
+
 	const char* Name() const { return name; }
 		// name as it appears in the settings file
 

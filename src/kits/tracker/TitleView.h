@@ -85,7 +85,7 @@ public:
 
 protected:
 	void MouseMoved(BPoint, uint32, const BMessage*);
-	
+
 private:
 	BColumnTitle* FindColumnTitle(BPoint) const;
 	BColumnTitle* InColumnResizeArea(BPoint) const;
@@ -100,7 +100,7 @@ private:
 	ColumnTrackState* fTrackingState;
 
 	static OffscreenBitmap* sOffscreen;
-	
+
 	typedef BView _inherited;
 
 	friend class ColumnTrackState;
@@ -112,7 +112,7 @@ class BColumnTitle {
 public:
 	BColumnTitle(BTitleView*, BColumn*);
 	virtual ~BColumnTitle() {}
-	
+
 	virtual void Draw(BView*, bool pressed = false);
 
 	BColumn* Column() const;

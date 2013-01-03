@@ -67,9 +67,9 @@ public:
 
 	void UpdateDesktopBackgroundImages();
 		// Desktop window has special background image handling
-		
+
 	void SaveDesktopPoseLocations();
-	
+
 protected:
 	virtual	void AddWindowContextMenus(BMenu*);
 	virtual BPoseView* NewPoseView(Model*, BRect, uint32);
@@ -84,7 +84,7 @@ private:
 	BPopUpMenu* fTrashContextMenu;
 
 	BRect fOldFrame;
-	
+
 	// in the desktop window addon shortcuts have to be added by AddShortcut
 	// and we don't always get the MenusBeginning call to check for new
 	// addons/update the shortcuts -- instead we need to node monitor the
@@ -93,7 +93,7 @@ private:
 	bool fShouldUpdateAddonShortcuts;
 	std::set<uint32> fCurrentAddonShortcuts;
 		// keeps track of which shortcuts are installed for Tracker addons
-	
+
 	typedef BContainerWindow _inherited;
 };
 

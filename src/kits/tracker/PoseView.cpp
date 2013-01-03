@@ -8366,7 +8366,7 @@ BPoseView::OpenParent()
 
 void
 BPoseView::IdentifySelection(bool force)
-{	
+{
 	int32 count = fSelectionList->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		BPose* pose = fSelectionList->ItemAt(index);

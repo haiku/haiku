@@ -151,10 +151,10 @@ class BViewState {
 		uint32	fPrimarySortType;
 		uint32	fSecondarySortType;
 		bool	fReverseSort;
-		
+
 		void _Init();
 		void _StorePreviousState();
-		
+
 		uint32	fPreviousViewMode;
 		uint32	fPreviousLastIconMode;
 		uint32	fPreviousIconSize;

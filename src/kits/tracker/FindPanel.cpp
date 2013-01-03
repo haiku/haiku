@@ -219,7 +219,7 @@ FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 
 	fFromTemplate = IsQueryTemplate(fFile);
 
-	fBackground = new FindPanel(Bounds(), fFile, this, fFromTemplate, 
+	fBackground = new FindPanel(Bounds(), fFile, this, fFromTemplate,
 		fEditTemplateOnly);
 	AddChild(fBackground);
 }

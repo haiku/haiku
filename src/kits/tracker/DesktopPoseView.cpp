@@ -271,11 +271,11 @@ DesktopPoseView::AdaptToDesktopIntegrationChange(BMessage* message)
 {
 	bool mountVolumesOnDesktop = true;
 	bool mountSharedVolumesOntoDesktop = true;
-	
+
 	message->FindBool("MountVolumesOntoDesktop", &mountVolumesOnDesktop);
 	message->FindBool("MountSharedVolumesOntoDesktop",
 		&mountSharedVolumesOntoDesktop);
-	
+
 	ShowVolumes(false, mountSharedVolumesOntoDesktop);
 	ShowVolumes(mountVolumesOnDesktop, mountSharedVolumesOntoDesktop);
 }

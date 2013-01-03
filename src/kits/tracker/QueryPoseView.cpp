@@ -264,20 +264,20 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 	fQueryListContainer = new QueryEntryListCollection(&sourceModel, this,
 		oldPoseList);
 	fCreateOldPoseList = false;
-	
+
 	if (fQueryListContainer->InitCheck() != B_OK) {
 		delete fQueryListContainer;
 		fQueryListContainer = NULL;
 		return NULL;
 	}
-	
+
 	fShowResultsFromTrash = fQueryListContainer->ShowResultsFromTrash();
 
 	TTracker::WatchNode(sourceModel.NodeRef(), B_WATCH_NAME | B_WATCH_STAT
 		| B_WATCH_ATTR, this);
 
 	fQueryList = fQueryListContainer->QueryList();
-	
+
 	if (fQueryListContainer->DynamicDateQuery()) {
 
 		// calculate the time to trigger the query refresh - next midnight
@@ -328,7 +328,7 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		PRINT(("%" B_PRId32 " hours, %" B_PRId32 " minutes, %" B_PRId32
 			" seconds till midnight\n", hoursTillMidnight, minutesTillMidnight,
 			secondsTillMidnight));
-		
+
 		int32 refreshInSeconds = delta % 60;
 		int32 refreshInMinutes = delta / 60;
 		int32 refreshInHours = refreshInMinutes / 60;
@@ -348,7 +348,7 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 			NewLockingMemberFunctionObject(&BQueryPoseView::Refresh, this),
 			delta);
 	}
-	
+
 	return fQueryListContainer->Clone();
 }
 
@@ -603,7 +603,7 @@ status_t
 QueryEntryListCollection::GetNextEntry(BEntry* entry, bool traverse)
 {
 	status_t result = B_ERROR;
-	
+
 	for (int32 count = fQueryListRep->fQueryList->CountItems();
 		fQueryListRep->fQueryListIndex < count;
 		fQueryListRep->fQueryListIndex++) {
@@ -641,7 +641,7 @@ status_t
 QueryEntryListCollection::GetNextRef(entry_ref* ref)
 {
 	status_t result = B_ERROR;
-	
+
 	for (int32 count = fQueryListRep->fQueryList->CountItems();
 		fQueryListRep->fQueryListIndex < count;
 		fQueryListRep->fQueryListIndex++) {
@@ -660,7 +660,7 @@ status_t
 QueryEntryListCollection::Rewind()
 {
 	fQueryListRep->fQueryListIndex = 0;
-	
+
 	return B_OK;
 }
 

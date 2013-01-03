@@ -79,7 +79,7 @@ public:
 	AttributeInfo(const AttributeInfo &);
 	AttributeInfo(const char*, attr_info);
 	AttributeInfo(const char*, uint32, off_t);
-	
+
 	void SetTo(const AttributeInfo &);
 	void SetTo(const char*, attr_info);
 	void SetTo(const char*, uint32, off_t);
@@ -186,7 +186,7 @@ protected:
 private:
 	AttributeInfo fCurrentAttr;
 	BNode* fNode;
-	
+
 	typedef AttributeStreamNode _inherited;
 };
 
@@ -224,7 +224,7 @@ protected:
 			{
 				delete [] fData;
 			}
-			
+
 		AttributeInfo fAttr;
 		char* fData;
 	};

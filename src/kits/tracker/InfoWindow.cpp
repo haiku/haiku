@@ -2129,7 +2129,7 @@ AttributeView::BuildContextMenu(BMenu* parent)
 		parent->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
 			new BMessage(kEditItem), 'E'));
 		parent->AddSeparatorItem();
-	
+
 		if (fModel->IsVolume()) {
 			BMenuItem* item = new BMenuItem(B_TRANSLATE("Unmount"),
 				new BMessage(kUnmountVolume), 'U');

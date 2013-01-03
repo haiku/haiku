@@ -126,7 +126,7 @@ PoseList::FindAllPoses(const node_ref* node) const
 			result->AddItem(pose, 0);
 			continue;
 		}
-		
+
 		if (!model->IsSymLink())
 			continue;
 
@@ -135,7 +135,7 @@ PoseList::FindAllPoses(const node_ref* node) const
 			result->AddItem(pose);
 			continue;
 		}
-		
+
 		if (model == NULL) {
 			Model model(pose->TargetModel()->EntryRef(), true);
 			if (*model.NodeRef() == *node)

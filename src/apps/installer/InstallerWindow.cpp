@@ -165,6 +165,9 @@ InstallerWindow::InstallerWindow()
 	fWorkerThread(new WorkerThread(this)),
 	fCopyEngineCancelSemaphore(-1)
 {
+	if (!be_roster->IsRunning(kTrackerSignature))
+		SetWorkspaces(B_ALL_WORKSPACES);
+
 	LogoView* logoView = new LogoView();
 
 	fStatusView = new BTextView("statusView", be_plain_font, NULL,
