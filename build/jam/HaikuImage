@@ -751,10 +751,12 @@ CopyDirectoryToHaikuImage develop sample-code
 	: [ FDirName $(HAIKU_TOP) src libs pdflib bind pdflib ]
 	: pdflib ;
 
-# Copy Mesa3D GL headers into image
+# Copy OpenGL kit headers into image
 if $(TARGET_ARCH) = x86 {
 	CopyDirectoryToHaikuImage develop headers os opengl
 		: [ FDirName $(HAIKU_MESA_HEADERS) GL ] ;
+	CopyDirectoryToHaikuImage develop headers os opengl
+		: [ FDirName $(HAIKU_GLU_HEADERS) GL ] ;
 }
 
 #pragma mark - Optional Packages
