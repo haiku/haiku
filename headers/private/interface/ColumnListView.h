@@ -133,6 +133,7 @@ public:
 
 			float 				Height() const;
 			bool 				IsExpanded() const;
+			bool				IsSelected() const;
 
 private:
 	// Blows up into the debugger if the validation fails.
@@ -326,8 +327,9 @@ public:
 	// Does not delete row or children at this time.
 	// todo: Make delete row and children
 			void				RemoveRow(BRow* row);
-
 			void				UpdateRow(BRow* row);
+			bool				SwapRows(int32 index1, int32 index2, BRow*
+									parentRow1 = NULL, BRow* parentRow2 = NULL);
 			void				Clear();
 
 	// Appearance (DEPRECATED)

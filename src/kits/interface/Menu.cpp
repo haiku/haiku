@@ -1107,11 +1107,26 @@ BMenu::FindMarked()
 {
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		BMenuItem* item = ItemAt(i);
+
 		if (item->IsMarked())
 			return item;
 	}
 
 	return NULL;
+}
+
+
+int32
+BMenu::FindMarkedIndex()
+{
+	for (int32 i = 0; i < fItems.CountItems(); i++) {
+		BMenuItem* item = ItemAt(i);
+
+		if (item->IsMarked())
+			return i;
+	}
+
+	return -1;
 }
 
 

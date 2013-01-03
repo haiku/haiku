@@ -122,6 +122,7 @@ public:
 			float				MaxContentWidth() const;
 
 			BMenuItem*			FindMarked();
+			int32				FindMarkedIndex();
 
 			BMenu*				Supermenu() const;
 			BMenuItem*			Superitem() const;

@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src apps resourceedit ;
+
+UsePrivateHeaders interface shared ;
+
+Application ResourceEdit
+	:
+		DefaultTypes.cpp
+		ImageButton.cpp
+		MainWindow.cpp
+		ResourceEdit.cpp
+		ResourceListView.cpp
+		ResourceRow.cpp
+		main.cpp
+	:
+		be
+		tracker
+		translation
+		libcolumnlistview.a
+		$(TARGET_LIBSTDC++)
+
+	:
+		ResourceEdit.rdef
+;

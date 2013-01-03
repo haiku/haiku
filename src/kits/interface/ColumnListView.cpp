@@ -523,6 +523,13 @@ BRow::IsExpanded() const
 }
 
 
+bool
+BRow::IsSelected() const
+{
+	return fPrevSelected != NULL;
+}
+
+
 void
 BRow::ValidateFields() const
 {
@@ -1255,6 +1262,60 @@ void
 BColumnListView::UpdateRow(BRow* row)
 {
 	fOutlineView->UpdateRow(row);
+}
+
+
+bool
+BColumnListView::SwapRows(int32 index1, int32 index2, BRow* parentRow1,
+	BRow* parentRow2)
+{
+	BRow* row1 = NULL;
+	BRow* row2 = NULL;
+
+	BRowContainer* container1 = NULL;
+	BRowContainer* container2 = NULL;
+
+	if (parentRow1 == NULL)
+		container1 = fOutlineView->RowList();
+	else
+		container1 = parentRow1->fChildList;
+
+	if (container1 == NULL)
+		return false;
+
+	if (parentRow2 == NULL)
+		container2 = fOutlineView->RowList();
+	else
+		container2 = parentRow1->fChildList;
+
+	if (container2 == NULL)
+		return false;
+
+	row1 = container1->ItemAt(index1);
+
+	if (row1 == NULL)
+		return false;
+
+	row2 = container2->ItemAt(index2);
+
+	if (row2 == NULL)
+		return false;
+
+	container1->ReplaceItem(index2, row1);
+	container2->ReplaceItem(index1, row2);
+
+	BRect rect1;
+	BRect rect2;
+	BRect rect;
+
+	fOutlineView->FindRect(row1, &rect1);
+	fOutlineView->FindRect(row2, &rect2);
+
+	rect = rect1 | rect2;
+
+	fOutlineView->Invalidate(rect);
+
+	return true;
 }
 
 
@@ -4195,7 +4256,7 @@ OutlineView::AddRow(BRow* row, int32 Index, BRow* parentRow)
 
 	row->fParent = parentRow;
 
-	if (fMasterView->SortingEnabled()) {
+	if (fMasterView->SortingEnabled() && !fSortColumns->IsEmpty()) {
 		// Ignore index here.
 		if (parentRow) {
 			if (parentRow->fChildList == NULL)
