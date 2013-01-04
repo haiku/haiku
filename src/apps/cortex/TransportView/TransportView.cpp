@@ -528,7 +528,7 @@ void TransportView::_selectGroup(
 	err = m_manager->findGroup(groupID, &m_group);
 	if(err < B_OK) {
 		PRINT((
-			"* TransportView::_selectGroup(%ld): findGroup() failed:\n"
+			"* TransportView::_selectGroup(%" B_PRId32 "): findGroup() failed:\n"
 			"  %s\n",
 			groupID,
 			strerror(err)));
@@ -784,7 +784,7 @@ void TransportView::_populateTimeSourceMenu(
 			B_RAW_TYPE,
 			&r->node(),
 			sizeof(media_node));
-		sprintf(nameBuffer, "%s: %ld",
+		sprintf(nameBuffer, "%s: %" B_PRId32,
 			r->name(),
 			r->id());
 		i = new BMenuItem(
@@ -1088,12 +1088,12 @@ void TransportView::_timeSourceCreated(
 	if(err < B_OK)
 		return;
 		
-//	PRINT(("### _timeSourceCreated(): %ld\n", id));
+//	PRINT(("### _timeSourceCreated(): %" B_PRId32 "\n", id));
 	NodeRef* ref;
 	err = m_manager->getNodeRef(id, &ref);
 	if(err < B_OK) {
 		PRINT((
-			"!!! TransportView::_timeSourceCreated(): node %ld doesn't exist\n",
+			"!!! TransportView::_timeSourceCreated(): node %" B_PRId32 " doesn't exist\n",
 			id));
 		return; 
 	}
@@ -1105,7 +1105,7 @@ void TransportView::_timeSourceCreated(
 		B_RAW_TYPE,
 		&ref->node(),
 		sizeof(media_node));
-	sprintf(nameBuffer, "%s: %ld",
+	sprintf(nameBuffer, "%s: %" B_PRId32,
 		ref->name(),
 		ref->id());
 	BMenuItem* i = new BMenuItem(
@@ -1126,7 +1126,7 @@ void TransportView::_timeSourceDeleted(
 	if(err < B_OK)
 		return;
 		
-//	PRINT(("### _timeSourceDeleted(): %ld\n", id));
+//	PRINT(("### _timeSourceDeleted(): %" B_PRId32 "\n", id));
 
 	BMenu* menu = m_timeSourceView->Menu();
 	ASSERT(menu);

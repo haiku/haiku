@@ -245,7 +245,7 @@ CDDBData::Load(const entry_ref &ref)
 					time->SetMinutes(0);
 					time->SetSeconds(0);
 
-					STRACE(("CDDBData::Load: Adding Track %s (%ld:%ld)\n", newTrack->String(),
+					STRACE(("CDDBData::Load: Adding Track %s (%" B_PRId32 ":%" B_PRId32 ")\n", newTrack->String(),
 							time->minutes, time->seconds));
 
 					fTrackList.AddItem(newTrack);
@@ -332,7 +332,8 @@ CDDBData::Save(const char *filename)
 	BString entry;
 	char timestring[10];
 
-	sprintf(timestring,"%.2ld:%.2ld", fDiscTime.GetMinutes(), fDiscTime.GetSeconds());
+	sprintf(timestring,"%.2" B_PRId32 ":%.2" B_PRId32 "", fDiscTime.GetMinutes(),
+		fDiscTime.GetSeconds());
 
 	entry << fArtist << " - " << fAlbum << "\t" << timestring << "\n";
 	file.Write(entry.String(), entry.Length());
@@ -351,7 +352,8 @@ CDDBData::Save(const char *filename)
 
 		entry = *trackstr;
 
-		sprintf(timestring,"%.2ld:%.2ld", time->GetMinutes(), time->GetSeconds());
+		sprintf(timestring,"%.2" B_PRId32 ":%.2" B_PRId32 "", time->GetMinutes(),
+			time->GetSeconds());
 
 		entry << "\t" << timestring << "\n";
 		file.Write(entry.String(), entry.Length());
@@ -361,7 +363,8 @@ CDDBData::Save(const char *filename)
 	}
 
 	file.WriteAttr("CD:key", B_INT32_TYPE, 0, &fDiscID, sizeof(int32));
-	STRACE(("CDDBData::Save: Wrote CD identifier: %ld(%lx)\n", fDiscID, fDiscID));
+	STRACE(("CDDBData::Save: Wrote CD identifier: %" B_PRId32 "(%" B_PRIx32 ")\n",
+		fDiscID, fDiscID));
 	file.WriteAttr("CD:tracks", B_STRING_TYPE, 0, tracksattr.String(), tracksattr.Length() + 1);
 
 	if (fGenre.CountChars() > 0)
@@ -391,7 +394,7 @@ CDDBData::RenameTrack(const int32 &index, const char *newName)
 
 	BString *name = (BString*)fTrackList.ItemAt(index);
 	if (name) {
-		STRACE(("CDDBData::RenameTrack(%ld,%s)\n", index, newName));
+		STRACE(("CDDBData::RenameTrack(%" B_PRId32 ",%s)\n", index, newName));
 		name->SetTo(newName);
 		return true;
 	}
@@ -409,7 +412,8 @@ CDDBData::AddTrack(const char *track, const CDAudioTime &time,
 		STRACE(("CDDBData::AddTrack failed - NULL name\n"));
 		return;
 	}
-	STRACE(("CDDBData::AddTrack(%s, %ld:%.2ld,%d)\n", track, time.minutes, time.seconds, index));
+	STRACE(("CDDBData::AddTrack(%s, %" B_PRId32 ":%.2" B_PRId32 ",%d)\n", track,
+		time.minutes, time.seconds, index));
 
 	fTrackList.AddItem(new BString(track));
 	fTimeList.AddItem(new CDAudioTime(time));
@@ -691,7 +695,7 @@ CDDBQuery::_ReadFromServer(BString &data)
 
 	// Query for the existence of the disc in the database
 	char idString[10];
-	sprintf(idString, "%08lx", fCDData.DiscID());
+	sprintf(idString, "%08" B_PRIx32, fCDData.DiscID());
 	BString query;
 
 	int32 trackCount = GetTrackCount(&fSCSIData);

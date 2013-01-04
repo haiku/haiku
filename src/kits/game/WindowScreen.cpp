@@ -536,7 +536,7 @@ BWindowScreen::Suspend(char* label)
 	CALLED();
 	if (fDebugState) {
 		fprintf(stderr, "## Debugger(\"%s\").", label);
-		fprintf(stderr, " Press Alt-F%ld or Cmd-F%ld to resume.\n",
+		fprintf(stderr, " Press Alt-F%" B_PRId32 " or Cmd-F%" B_PRId32 " to resume.\n",
 			fWorkspaceIndex + 1, fWorkspaceIndex + 1);
 
 		if (IsLocked())

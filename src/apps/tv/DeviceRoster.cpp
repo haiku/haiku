@@ -41,7 +41,7 @@ DeviceRoster::DeviceRoster()
 	err = MediaRoster()->GetLiveNodes(info, &info_count, NULL, NULL, "DVB*", 
 		B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
 	if (err != B_OK || info_count < 1) { 
-		printf("Can't find live DVB node. Found %ld nodes, error %08lx (%s)\n",
+		printf("Can't find live DVB node. Found %" B_PRId32 " nodes, error %08" B_PRIx32 " (%s)\n",
 			info_count, err, strerror(err));
 		fDeviceCount = 0;
 	} else {

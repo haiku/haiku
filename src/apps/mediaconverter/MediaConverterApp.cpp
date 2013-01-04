@@ -525,10 +525,10 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 		for (int64 i = start; (i <= end) && !fCancel; i += framesRead) {
 			if ((ret = inVidTrack->ReadFrames(videoBuffer, &framesRead,
 					&mh)) != B_OK) {
-				fprintf(stderr, "Error reading video frame %Ld: %s\n", i,
+				fprintf(stderr, "Error reading video frame %" B_PRId64 ": %s\n", i,
 						strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
-						B_TRANSLATE("Error read video frame %Ld"), i);
+						B_TRANSLATE("Error read video frame %" B_PRId64), i);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
 
@@ -537,10 +537,10 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 
 			if ((ret = outVidTrack->WriteFrames(videoBuffer, framesRead,
 					mh.u.encoded_video.field_flags)) != B_OK) {
-				fprintf(stderr, "Error writing video frame %Ld: %s\n", i,
+				fprintf(stderr, "Error writing video frame %" B_PRId64 ": %s\n", i,
 						strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
-						B_TRANSLATE("Error writing video frame %Ld"), i);
+						B_TRANSLATE("Error writing video frame %" B_PRId64), i);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
 
@@ -551,7 +551,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 			if (currPercent > lastPercent) {
 				lastPercent = currPercent;
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Writing video track: %ld%% complete"),
+					B_TRANSLATE("Writing video track: %" B_PRId32 "%% complete"),
 					currPercent);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
@@ -587,7 +587,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				&mh)) != B_OK) {
 				fprintf(stderr, "Error reading audio frames: %s\n", strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Error read audio frame %Ld"), i);
+					B_TRANSLATE("Error read audio frame %" B_PRId64), i);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
 
@@ -598,7 +598,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				framesRead)) != B_OK) {
 				fprintf(stderr, "Error writing audio frames: %s\n",	strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Error writing audio frame %Ld"), i);
+					B_TRANSLATE("Error writing audio frame %" B_PRId64), i);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
 
@@ -609,7 +609,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 			if (currPercent > lastPercent) {
 				lastPercent = currPercent;
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Writing audio track: %ld%% complete"),
+					B_TRANSLATE("Writing audio track: %" B_PRId32 "%% complete"),
 					currPercent);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());

@@ -182,7 +182,7 @@ MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
 		int32 styleIndex;
 		if (shapeArchive.FindInt32("style ref", &styleIndex) < B_OK) {
 			printf("MessageImporter::_ImportShapes() - "
-				   "Shape %ld doesn't reference a Style!", i);
+				   "Shape %" B_PRId32 " doesn't reference a Style!", i);
 			continue;
 		}
 #ifdef ICON_O_MATIC
@@ -192,7 +192,7 @@ MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
 #endif
 		if (!style) {
 			printf("MessageImporter::_ImportShapes() - "
-				   "Shape %ld wants Style %ld, which does not exist\n",
+				   "Shape %" B_PRId32 " wants Style %" B_PRId32 ", which does not exist\n",
 				i, styleIndex);
 			continue;
 		}
@@ -218,7 +218,7 @@ MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
 #endif
 			if (!path) {
 				printf("MessageImporter::_ImportShapes() - "
-					   "Shape %ld referenced path %ld, "
+					   "Shape %" B_PRId32 " referenced path %" B_PRId32 ", "
 					   "which does not exist\n", i, pathIndex);
 				continue;
 			}

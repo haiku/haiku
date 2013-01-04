@@ -425,7 +425,7 @@ void
 DocInfoWindow::_EmptyKeyList()
 {
 	while (fKeyList->CountItems() > 0L)
-		delete fKeyList->RemoveItem(0L);
+		delete fKeyList->RemoveItem((int32)0);
 }
 
 

@@ -373,7 +373,7 @@ ExpressionTextView::AddExpressionToHistory(const char* expression)
 		return;
 	}
 	while (fPreviousExpressions.CountItems() > kMaxPreviousExpressions)
-		delete (BString*)fPreviousExpressions.RemoveItem(0L);
+		delete (BString*)fPreviousExpressions.RemoveItem((int32)0);
 
 	fHistoryPos = fPreviousExpressions.CountItems();
 }

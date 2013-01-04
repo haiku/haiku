@@ -2921,7 +2921,7 @@ ls( httpd_conn* hc )
 
 		/* And print. */
 		(void)  fprintf( fp,
-		   "%10lld  %s  <A HREF=\"/%.500s%s\">%.80s</A>%s%s%s\n",
+		   "%10" B_PRId64 "  %s  <A HREF=\"/%.500s%s\">%.80s</A>%s%s%s\n",
 		    (int64_t) lsb.st_size,
 		    timestr, encrname, S_ISDIR(sb.st_mode) ? "/" : "",
 		    nameptrs[i], linkprefix, link, fileclass );

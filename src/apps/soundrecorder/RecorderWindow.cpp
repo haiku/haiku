@@ -457,7 +457,7 @@ RecorderWindow::InitWindow()
 		error = fRoster->GetDormantNodes(dni, &real_count, 0, &output_format,
 			0, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
 		if (real_count > maxInputCount) {
-			WINDOW((stderr, "dropped %ld inputs\n", real_count - maxInputCount));
+			WINDOW((stderr, "dropped %" B_PRId32 " inputs\n", real_count - maxInputCount));
 			real_count = maxInputCount;
 		}
 		char selected_name[B_MEDIA_NAME_LENGTH] = "Default input";
@@ -1172,7 +1172,7 @@ RecorderWindow::ErrorAlert(const char * action, status_t err)
 {
 	char msg[300];
 	if (err != B_OK)
-		sprintf(msg, "%s: %s. [%lx]", action, strerror(err), (int32) err);
+		sprintf(msg, "%s: %s. [%" B_PRIx32 "]", action, strerror(err), (int32) err);
 	else
 		sprintf(msg, "%s.", action);
 	BAlert* alert = new BAlert("", msg, B_TRANSLATE("Stop"));

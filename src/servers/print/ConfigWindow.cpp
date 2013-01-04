@@ -414,7 +414,7 @@ ConfigWindow::SetupPrintersMenu(BMenu* menu)
 {
 	// clear menu
 	while (menu->CountItems() != 0)
-		delete menu->RemoveItem(0L);
+		delete menu->RemoveItem((int32)0);
 
 	// fill menu with printer names
 	BAutolock lock(gLock);

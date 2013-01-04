@@ -45,7 +45,7 @@ PrinterListView::PrinterListView(BRect frame)
 PrinterListView::~PrinterListView()
 {
 	while (!IsEmpty())
-		delete RemoveItem(0L);
+		delete RemoveItem((int32)0);
 }
 
 
@@ -54,7 +54,7 @@ PrinterListView::BuildPrinterList()
 {
 	// clear list
 	while (!IsEmpty())
-		delete RemoveItem(0L);
+		delete RemoveItem((int32)0);
 
 	// Find directory containing printer definition nodes
 	BPath path;

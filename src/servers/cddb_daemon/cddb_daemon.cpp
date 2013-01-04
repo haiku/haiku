@@ -84,11 +84,11 @@ CDDBDaemon::_Lookup(const dev_t device)
 	uint32 cddbId;
 	if (!_CanLookup(device, &cddbId, toc)) {
 		free(toc);
-		printf("Skipping device with id %ld.\n", device);
+		printf("Skipping device with id %" B_PRId32 ".\n", device);
 		return B_BAD_TYPE;
 	}
 		
-	printf("Looking up CD with CDDB Id %08lx.\n", cddbId);
+	printf("Looking up CD with CDDB Id %08" B_PRIx32 ".\n", cddbId);
 
 	CDDBServer cddb_server("freedb.freedb.org:80");
 
@@ -123,7 +123,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 	// Delete itens in the query response BList;
 	int32 count = queryResponse.CountItems();
 	for (int32 i = 0; i < count; ++i) {
-		delete (QueryResponseData*)queryResponse.RemoveItem(0L);
+		delete (QueryResponseData*)queryResponse.RemoveItem((int32)0);
 	}
 						
 	queryResponse.MakeEmpty();
@@ -131,7 +131,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 	// Delete itens in the track data BList in the read response data;
 	count = readResponse.tracks.CountItems();
 	for (int32 i = 0; i < count; ++i) {
-		delete (TrackData*)readResponse.tracks.RemoveItem(0L);
+		delete (TrackData*)readResponse.tracks.RemoveItem((int32)0);
 	}
 						
 	readResponse.tracks.MakeEmpty();

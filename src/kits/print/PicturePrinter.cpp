@@ -399,7 +399,7 @@ void PicturePrinter::SetFontFlags(int32 flags) {
 	if (flags == 0) Print("none set");
 	PRINT_FLAG(B_DISABLE_ANTIALIASING);
 	PRINT_FLAG(B_FORCE_ANTIALIASING);
-	if (flags != f) printf("Unknown Additional Flags %ld", flags & ~f);
+	if (flags != f) printf("Unknown Additional Flags %" B_PRId32 "", flags & ~f);
 	Cr();
 }
 
@@ -420,7 +420,7 @@ void PicturePrinter::SetFontFace(int32 flags) {
 	PRINT_FLAG(B_OUTLINED_FACE);
 	PRINT_FLAG(B_UNDERSCORE_FACE);
 	PRINT_FLAG(B_STRIKEOUT_FACE);
-	if (flags != f) printf("Unknown Additional Flags %ld", flags & ~f);
+	if (flags != f) printf("Unknown Additional Flags %" B_PRId32 "", flags & ~f);
 	Cr();
 }
 

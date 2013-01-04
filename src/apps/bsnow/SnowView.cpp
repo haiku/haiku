@@ -169,7 +169,7 @@ void SnowView::AttachedToWindow()
 		fFallenReg = new BRegion;
 		fInvalidator = spawn_thread(SnowMakerThread, INVALIDATOR_THREAD_NAME, B_LOW_PRIORITY, (void *)this);
 		resume_thread(fInvalidator);
-		printf("BSnow: OK: ws = %ld x %ld\n", fCachedWsWidth, fCachedWsHeight);
+		printf("BSnow: OK: ws = %" B_PRId32 " x %" B_PRId32 "\n", fCachedWsWidth, fCachedWsHeight);
 #ifdef DEBUG
 		Window()->AddCommonFilter(new BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, msgfilter));
 #endif
@@ -326,7 +326,7 @@ void SnowView::Calc()
 	if (fCachedWsWidth != pFrame.Width() || fCachedWsHeight != pFrame.Height()) {
 		fCachedWsWidth = pFrame.IntegerWidth();
 		fCachedWsHeight = pFrame.IntegerHeight();
-		printf("BSnow: Parent resized to %ld %ld\n", fCachedWsWidth, fCachedWsHeight);
+		printf("BSnow: Parent resized to %" B_PRId32 " %" B_PRId32 "\n", fCachedWsWidth, fCachedWsHeight);
 		fFallenReg->MakeEmpty(); /* remove all the fallen snow */
 		ResizeTo(pFrame.IntegerWidth(), pFrame.IntegerHeight());
 		fDragger->MoveTo(pFrame.IntegerWidth()-7, pFrame.IntegerHeight()-7);

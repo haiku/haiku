@@ -23,7 +23,7 @@ StatusSlider::StatusSlider(const char* name, const char* label,
 const char*
 StatusSlider::UpdateText() const
 {
-	sprintf(fTemp, "%ld %s", Value(), fStatusPrefix);
+	sprintf(fTemp, "%" B_PRId32 " %s", Value(), fStatusPrefix);
 
 	return fTemp;
 }

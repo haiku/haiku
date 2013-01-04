@@ -183,7 +183,7 @@ PairsView::_ReadRandomIcons()
 	}
 
 	// delete the remaining bitmaps from the list
-	while (BBitmap* bitmap = (BBitmap*)bitmaps.RemoveItem(0L))
+	while (BBitmap* bitmap = (BBitmap*)bitmaps.RemoveItem((int32)0))
 		delete bitmap;
 }
 

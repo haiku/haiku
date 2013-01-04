@@ -380,7 +380,7 @@ ControlView::MessageReceived(BMessage* msg)
 		 				printf("Failed to add style or family to the message\n");
 		 				return;
 		 			}
-		 			printf("InstalledStyles(%ld), Font(%s), Style(%s)\n",
+					printf("InstalledStyles(%" B_PRId32 "), Font(%s), Style(%s)\n",
 		 				installedStyles, newFontFamilyItem->Label(),
 		 				newstyleitem->Label());
 					_UpdateAndSendStyle(msg);
