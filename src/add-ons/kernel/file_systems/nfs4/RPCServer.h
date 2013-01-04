@@ -60,15 +60,13 @@ public:
 										PeerAddress* address);
 	virtual							~Server();
 
-			status_t				SendCall(Call* call, Reply** reply);
-
 			status_t				SendCallAsync(Call* call, Reply** reply,
 										Request** request);
 			status_t				ResendCallAsync(Call* call,
 										Request* request);
 
 	inline	status_t				WaitCall(Request* request,
-										bigtime_t time = kWaitTime);
+										bigtime_t time);
 	inline	status_t				CancelCall(Request* request);
 			status_t				WakeCall(Request* request);
 
@@ -107,7 +105,6 @@ private:
 			mutex					fRepairLock;
 
 			vint32					fXID;
-	static	const bigtime_t			kWaitTime	= 1000000;
 };
 
 

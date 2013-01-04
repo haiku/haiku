@@ -63,6 +63,7 @@ CreateNFS4Server(RPC::Server* serv)
 // Available options:
 //	hard		- retry requests until success
 //	soft		- retry requests no more than retrans times (default)
+//  timeo=X		- request time limit before next retransmission (default: 60s)
 //	retrans=X	- retry requests X times (default: 5)
 //	ac			- use metadata cache (default)
 //	noac		- do not use metadata cache
@@ -101,6 +102,7 @@ ParseArguments(const char* _args, PeerAddress* address, char** _path,
 
 	conf->fHard = false;
 	conf->fRetryLimit = 5;
+	conf->fRequestTimeout = sSecToBigTime(60);
 	conf->fEmulateNamedAttrs = false;
 	conf->fCacheMetadata = true;
 
@@ -116,6 +118,9 @@ ParseArguments(const char* _args, PeerAddress* address, char** _path,
 		else if (strncmp(options, "retrans=", 8) == 0) {
 			options += strlen("retrans=");
 			conf->fRetryLimit = atoi(options);
+		} else if (strncmp(options, "timeo=", 6) == 0) {
+			options += strlen("timeo=");
+			conf->fRequestTimeout = atoi(options);
 		} else if (strcmp(options, "noac") == 0)
 			conf->fCacheMetadata = false;
 		else if (strcmp(options, "xattr-emu") == 0)

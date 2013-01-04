@@ -19,11 +19,12 @@ class Inode;
 class RootInode;
 
 struct MountConfiguration {
-	bool	fHard;
-	int		fRetryLimit;
+	bool		fHard;
+	int			fRetryLimit;
+	bigtime_t	fRequestTimeout;
 
-	bool	fEmulateNamedAttrs;
-	bool	fCacheMetadata;
+	bool		fEmulateNamedAttrs;
+	bool		fCacheMetadata;
 };
 
 class FileSystem : public DoublyLinkedListLinkImpl<FileSystem> {

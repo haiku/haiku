@@ -135,29 +135,6 @@ Server::_StartListening()
 
 
 status_t
-Server::SendCall(Call* call, Reply** reply)
-{
-	ASSERT(call != NULL);
-	ASSERT(reply != NULL);
-
-	Request* req;
-	status_t result = SendCallAsync(call, reply, &req);
-	if (result != B_OK)
-		return result;
-
-	result = WaitCall(req);
-	if (result != B_OK) {
-		CancelCall(req);
-		delete req;
-		return result;
-	}
-
-	delete req;
-	return B_OK;
-}
-
-
-status_t
 Server::SendCallAsync(Call* call, Reply** reply, Request** request)
 {
 	ASSERT(call != NULL);
