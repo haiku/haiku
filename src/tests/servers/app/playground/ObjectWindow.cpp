@@ -26,6 +26,11 @@
 #include <TabView.h>
 #include <TextControl.h>
 #include <TextView.h>
+// Locale Kit
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Playground"
 
 #include "ObjectView.h"
 #include "States.h"
@@ -126,12 +131,12 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	BMenuBar* menuBar = new BMenuBar(b, "menu bar");
 	AddChild(menuBar);
 
-	BMenu* menu = new BMenu("File");
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 	menuBar->AddItem(menu);
 
-	menu->AddItem(new BMenu("Submenu"));
+	menu->AddItem(new BMenu(B_TRANSLATE("Submenu")));
 
-	BMenuItem* menuItem = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED),
+	BMenuItem* menuItem = new BMenuItem(B_TRANSLATE("Quit"), new BMessage(B_QUIT_REQUESTED),
 										'Q');
 	menu->AddItem(menuItem);
 
@@ -170,7 +175,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	BBox* controlGroup = new BBox(b, "controls box",
 		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW, B_FANCY_BORDER);
 
-	controlGroup->SetLabel("Controls");
+	controlGroup->SetLabel(B_TRANSLATE("Controls"));
 	bg->AddChild(controlGroup);
 
 	b = controlGroup->Bounds();
@@ -180,14 +185,14 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b.right = b.left + b.Width() / 2.0 - 5.0;
 
 	// new button
-	fNewB = new BButton(b, "new button", "New Object",
+	fNewB = new BButton(b, "new button", B_TRANSLATE("New Object"),
 		new BMessage(MSG_NEW_OBJECT));
 	controlGroup->AddChild(fNewB);
 	SetDefaultButton(fNewB);
 
 	// clear button
 	b.OffsetBy(0, fNewB->Bounds().Height() + 5.0);
-	fClearB = new BButton(b, "clear button", "Clear", new BMessage(MSG_CLEAR));
+	fClearB = new BButton(b, "clear button", B_TRANSLATE("Clear"), new BMessage(MSG_CLEAR));
 	controlGroup->AddChild(fClearB);
 
 	// object type radio buttons
@@ -197,7 +202,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b.OffsetBy(0, fClearB->Bounds().Height() + 5.0);
 	message = new BMessage(MSG_SET_OBJECT_TYPE);
 	message->AddInt32("type", OBJECT_LINE);
-	radioButton = new BRadioButton(b, "radio 1", "Line", message);
+	radioButton = new BRadioButton(b, "radio 1", B_TRANSLATE("Line"), message);
 	controlGroup->AddChild(radioButton);
 
 	radioButton->SetValue(B_CONTROL_ON);
@@ -205,72 +210,72 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
 	message = new BMessage(MSG_SET_OBJECT_TYPE);
 	message->AddInt32("type", OBJECT_RECT);
-	radioButton = new BRadioButton(b, "radio 2", "Rect", message);
+	radioButton = new BRadioButton(b, "radio 2", B_TRANSLATE("Rect"), message);
 	controlGroup->AddChild(radioButton);
 
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
 	message = new BMessage(MSG_SET_OBJECT_TYPE);
 	message->AddInt32("type", OBJECT_ROUND_RECT);
-	radioButton = new BRadioButton(b, "radio 3", "Round Rect", message);
+	radioButton = new BRadioButton(b, "radio 3", B_TRANSLATE("Round Rect"), message);
 	controlGroup->AddChild(radioButton);
 
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
 	message = new BMessage(MSG_SET_OBJECT_TYPE);
 	message->AddInt32("type", OBJECT_ELLIPSE);
-	radioButton = new BRadioButton(b, "radio 4", "Ellipse", message);
+	radioButton = new BRadioButton(b, "radio 4", B_TRANSLATE("Ellipse"), message);
 	controlGroup->AddChild(radioButton);
 
 	// drawing mode
-	BPopUpMenu* popupMenu = new BPopUpMenu("<pick>");
+	BPopUpMenu* popupMenu = new BPopUpMenu(B_TRANSLATE("<pick>"));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_COPY);
-	popupMenu->AddItem(new BMenuItem("Copy", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Copy"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_OVER);
-	popupMenu->AddItem(new BMenuItem("Over", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Over"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_INVERT);
-	popupMenu->AddItem(new BMenuItem("Invert", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Invert"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_BLEND);
-	popupMenu->AddItem(new BMenuItem("Blend", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Blend"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_SELECT);
-	popupMenu->AddItem(new BMenuItem("Select", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Select"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_ERASE);
-	popupMenu->AddItem(new BMenuItem("Erase", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Erase"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_ADD);
-	popupMenu->AddItem(new BMenuItem("Add", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Add"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_SUBTRACT);
-	popupMenu->AddItem(new BMenuItem("Subtract", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Subtract"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_MIN);
-	popupMenu->AddItem(new BMenuItem("Min", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Min"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_MAX);
-	popupMenu->AddItem(new BMenuItem("Max", message));
+	popupMenu->AddItem(new BMenuItem(B_TRANSLATE("Max"), message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_ALPHA);
-	BMenuItem* item = new BMenuItem("Alpha", message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("Alpha"), message);
 	item->SetMarked(true);
 	popupMenu->AddItem(item);
 
 	b.OffsetBy(0, radioButton->Bounds().Height() + 10.0);
-	fDrawingModeMF = new BMenuField(b, "drawing mode field", "Mode:",
+	fDrawingModeMF = new BMenuField(b, "drawing mode field", B_TRANSLATE("Mode:"),
 		popupMenu);
 
 	controlGroup->AddChild(fDrawingModeMF);
@@ -286,7 +291,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	
 	// alpha text control
 	b.OffsetBy(0, fColorControl-> Bounds().Height() + 5.0);
-	fAlphaTC = new BTextControl(b, "alpha text control", "Alpha:", "",
+	fAlphaTC = new BTextControl(b, "alpha text control", B_TRANSLATE("Alpha:"), "",
 		new BMessage(MSG_SET_COLOR));
 	controlGroup->AddChild(fAlphaTC);
 
@@ -300,14 +305,14 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 
 	// fill check box
 	b.OffsetBy(0, fAlphaTC->Bounds().Height() + 5.0);
-	fFillCB = new BCheckBox(b, "fill check box", "Fill",
+	fFillCB = new BCheckBox(b, "fill check box", B_TRANSLATE("Fill"),
 		new BMessage(MSG_SET_FILL_OR_STROKE));
 	controlGroup->AddChild(fFillCB);
 
 	// pen size text control
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
 	b.bottom = b.top + 10.0;//35;
-	fPenSizeS = new BSlider(b, "width slider", "Width:", NULL, 1, 100,
+	fPenSizeS = new BSlider(b, "width slider", B_TRANSLATE("Width:"), NULL, 1, 100,
 		B_TRIANGLE_THUMB);
 	fPenSizeS->SetLimitLabels("1", "100");
 	fPenSizeS->SetModificationMessage(new BMessage(MSG_SET_PEN_SIZE));
@@ -417,8 +422,8 @@ ObjectWindow::MessageReceived(BMessage* message)
 			break;
 		case MSG_CLEAR: {
 			BAlert *alert = new BAlert("Playground",
-									   "Do you really want to clear all drawing objects?",
-									   "No", "Yes");
+									   B_TRANSLATE("Do you really want to clear all drawing objects?"),
+									   B_TRANSLATE("No"), B_TRANSLATE("Yes"));
 			if (alert->Go() == 1) {
 				fObjectView->MakeEmpty();
 				fObjectLV->MakeEmpty();

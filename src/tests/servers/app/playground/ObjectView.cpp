@@ -11,6 +11,11 @@
 #include <Shape.h>
 #include <String.h>
 #include <Window.h>
+// Locale Kit
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Playground"
 
 #include "States.h"
 
@@ -157,7 +162,7 @@ ObjectView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(255, 0, 0, 128);
 
-	const char* message = "Click and drag to draw an object";
+	const char* message = B_TRANSLATE("Click and drag to draw an object");
 	float width = StringWidth(message);
 
 	BPoint p((r.Width() - width) / 2.0, r.Height() / 2.0);
@@ -341,7 +346,7 @@ if (dragMessage) {
 				helper->FillRect(r);
 
 				helper->SetHighColor(0, 0, 0, 255);
-				const char* text = "Test";
+				const char* text = B_TRANSLATE("Test");
 				float pos = (r.Width() - helper->StringWidth(text)) / 2;
 				helper->DrawString(text, BPoint(pos, 25));
 				helper->Sync();
