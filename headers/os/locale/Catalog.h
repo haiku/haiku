@@ -98,29 +98,32 @@ private:
 
 #else
 
+#ifndef B_CATALOG
+#define B_CATALOG BLocaleRoster::Default()->GetCatalog()
+#endif
+
 // Translation macros which may be used to shorten translation requests:
 #undef B_TRANSLATE
 #define B_TRANSLATE(string) \
-	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
-		B_TRANSLATION_CONTEXT)
+	B_CATALOG->GetString((string), B_TRANSLATION_CONTEXT)
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT(string, context) \
-	BLocaleRoster::Default()->GetCatalog()->GetString((string), (context))
+	B_CATALOG->GetString((string), (context))
 
 #undef B_TRANSLATE_COMMENT
 #define B_TRANSLATE_COMMENT(string, comment) \
-	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
+	B_CATALOG->GetString((string), \
 		B_TRANSLATION_CONTEXT, (comment))
 
 #undef B_TRANSLATE_ALL
 #define B_TRANSLATE_ALL(string, context, comment) \
-	BLocaleRoster::Default()->GetCatalog()->GetString((string), (context), \
+	B_CATALOG->GetString((string), (context), \
 		(comment))
 
 #undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
-	BLocaleRoster::Default()->GetCatalog()->GetString((id))
+	B_CATALOG->GetString((id))
 
 #undef B_TRANSLATE_SYSTEM_NAME
 #define B_TRANSLATE_SYSTEM_NAME(string) \

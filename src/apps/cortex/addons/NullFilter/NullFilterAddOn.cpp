@@ -38,8 +38,12 @@
 
 #include <Entry.h>
 #include <Debug.h>
+#include <Catalog.h>
 #include <cstring>
 #include <cstdlib>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsNullFilter"
 
 // -------------------------------------------------------- //
 // _NullFilterNode
@@ -119,10 +123,10 @@ status_t NullFilterAddOn::GetFlavorAt(
 	
 	flavor_info* pInfo = new flavor_info;
 	pInfo->internal_id = n;
-	pInfo->name = "NullFilter";
+	pInfo->name = B_TRANSLATE("NullFilter");
 	pInfo->info =
-		"NullFilter (empty test filter).\n"
-		"by Eric Moon (8 September 1999)";
+		B_TRANSLATE("NullFilter (empty test filter).\n"
+		"by Eric Moon (8 September 1999)");
 	pInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_CONTROLLABLE;
 	pInfo->flavor_flags = 0;
 	pInfo->possible_count = 0;

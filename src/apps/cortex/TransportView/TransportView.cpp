@@ -52,14 +52,25 @@
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <String.h>
+#include <StringFormat.h>
 #include <TextControl.h>
 
 #include <algorithm>
 #include <functional>
 
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TransportView"
+
 using namespace std;
 
 __USE_CORTEX_NAMESPACE
+
+static BCatalog sCatalog("application/x-vnd.Cortex.TransportView");
 
 // -------------------------------------------------------- //
 // _GroupInfoView
@@ -136,7 +147,7 @@ public:												// BView
 		// background +++++
 
 		// name
-		BString name = g ? g->name() : "(no group)";
+		BString name = g ? g->name() : B_TRANSLATE("(no group)");
 		// +++++ constrain width
 		SetFont(&m_boldFont);
 		DrawString(name.String(), m_namePosition);
@@ -144,17 +155,22 @@ public:												// BView
 		SetFont(&m_plainFont);
 
 		// node count
-		BString nodeCount;
-		if(g)
-			nodeCount << g->countNodes();
+		uint32 count;
+		if (g != NULL)
+			count = g->countNodes();
 		else
-			nodeCount << '0';
-		nodeCount << ((nodeCount == "1") ? " node." : " nodes.");
+			count = 0;
+
+		BString nodeCount = "";
+		static BStringFormat format(
+			B_TRANSLATE("{0, plural, one{# node} other{# nodes}}"));
+		format.Format(nodeCount, count);
+
 		// +++++ constrain width
 		DrawString(nodeCount.String(), m_nodeCountPosition);
 
 		// status
-		BString status = "No errors.";
+		BString status = B_TRANSLATE("No errors.");
 		// +++++ constrain width
 		DrawString(status.String(), m_statusPosition);
 	}
@@ -555,11 +571,11 @@ void TransportView::_releaseGroup() {
 // -------------------------------------------------------- //
 
 const char _run_mode_strings[][20] = {
-	"Offline",
-	"Decrease precision",
-	"Increase latency",
-	"Drop data",
-	"Recording"
+	B_TRANSLATE_MARK("Offline"),
+	B_TRANSLATE_MARK("Decrease precision"),
+	B_TRANSLATE_MARK("Increase latency"),
+	B_TRANSLATE_MARK("Drop data"),
+	B_TRANSLATE_MARK("Recording")
 };
 const int _run_modes = 5;
 
@@ -569,8 +585,8 @@ const int _run_modes = 5;
 //};
 //const int _time_sources = 2;
 
-const char* _region_start_label = "From:";
-const char* _region_end_label = "To:";
+const char* _region_start_label = B_TRANSLATE("From:");
+const char* _region_end_label = B_TRANSLATE("To:");
 
 void TransportView::_constructControls() {
 
@@ -595,7 +611,7 @@ void TransportView::_constructControls() {
 	m_runModeView = new BMenuField(
 		BRect(),
 		"runModeView",
-		"Run mode:",
+		B_TRANSLATE("Run mode:"),
 		new BPopUpMenu("runModeMenu"));
 	_populateRunModeMenu(
 		m_runModeView->Menu());
@@ -604,14 +620,14 @@ void TransportView::_constructControls() {
 	m_timeSourceView = new BMenuField(
 		BRect(),
 		"timeSourceView",
-		"Time source:",
+		B_TRANSLATE("Time source:"),
 		new BPopUpMenu("timeSourceMenu"));
 	_populateTimeSourceMenu(
 		m_timeSourceView->Menu());
 	AddChild(m_timeSourceView);
 
 
-	m_fromLabel = new BStringView(BRect(), 0, "Roll from");
+	m_fromLabel = new BStringView(BRect(), 0, B_TRANSLATE("Roll from"));
 	AddChild(m_fromLabel);
 
 
@@ -628,7 +644,7 @@ void TransportView::_constructControls() {
 	_addLocalTarget(m_regionStartView);
 	AddChild(m_regionStartView);
 
-	m_toLabel = new BStringView(BRect(), 0, "to");
+	m_toLabel = new BStringView(BRect(), 0, B_TRANSLATE("to"));
 	AddChild(m_toLabel);
 
 	m = new BMessage(NodeGroup::M_SET_END_POSITION);
@@ -673,7 +689,7 @@ void TransportView::_constructControls() {
 	m_startButton = new BButton(
 		BRect(),
 		"startButton",
-		"Start",
+		B_TRANSLATE("Start"),
 		m);
 	_addGroupTarget(m_startButton);
 	AddChild(m_startButton);
@@ -682,7 +698,7 @@ void TransportView::_constructControls() {
 	m_stopButton = new BButton(
 		BRect(),
 		"stopButton",
-		"Stop",
+		B_TRANSLATE("Stop"),
 		m);
 	_addGroupTarget(m_stopButton);
 	AddChild(m_stopButton);
@@ -691,7 +707,7 @@ void TransportView::_constructControls() {
 	m_prerollButton = new BButton(
 		BRect(),
 		"prerollButton",
-		"Preroll",
+		B_TRANSLATE("Preroll"),
 		m);
 	_addGroupTarget(m_prerollButton);
 	AddChild(m_prerollButton);
@@ -714,7 +730,7 @@ void TransportView::_populateRunModeMenu(
 		m->AddInt32("runMode", n+1);
 
 		BMenuItem* i = new BMenuItem(
-			_run_mode_strings[n], m);
+			B_TRANSLATE(_run_mode_strings[n]), m);
 		menu->AddItem(i);
 		_addGroupTarget(i);
 	}
@@ -737,7 +753,7 @@ void TransportView::_populateTimeSourceMenu(
 			&dacTimeSource,
 			sizeof(media_node));
 		i = new BMenuItem(
-			"DAC time source",
+			B_TRANSLATE("DAC time source"),
 			m);
 		menu->AddItem(i);
 		_addGroupTarget(i);
@@ -752,7 +768,7 @@ void TransportView::_populateTimeSourceMenu(
 			&systemTimeSource,
 			sizeof(media_node));
 		i = new BMenuItem(
-			"System clock",
+			B_TRANSLATE("System clock"),
 			m);
 		menu->AddItem(i);
 		_addGroupTarget(i);
@@ -851,10 +867,10 @@ void TransportView::_disableControls() {
 	m_infoView->Invalidate();
 
 	m_runModeView->SetEnabled(false);
-	m_runModeView->Menu()->Superitem()->SetLabel("(none)");
+	m_runModeView->Menu()->Superitem()->SetLabel(B_TRANSLATE("(none)"));
 
 	m_timeSourceView->SetEnabled(false);
-	m_timeSourceView->Menu()->Superitem()->SetLabel("(none)");
+	m_timeSourceView->Menu()->Superitem()->SetLabel(B_TRANSLATE("(none)"));
 
 	m_regionStartView->SetEnabled(false);
 	m_regionStartView->setValue(0);
@@ -980,11 +996,11 @@ void TransportView::_updateTransportButtons() {
 		(runMode == BMediaNode::B_OFFLINE ||
 			!m_group->canCycle())) {
 
-		m_startButton->SetLabel("Roll");
+		m_startButton->SetLabel(B_TRANSLATE("Roll"));
 		m_startButton->Message()->what = NodeGroup::M_ROLL;
 
 	} else {
-		m_startButton->SetLabel("Start");
+		m_startButton->SetLabel(B_TRANSLATE("Start"));
 		m_startButton->Message()->what = NodeGroup::M_START;
 	}
 }
@@ -1005,7 +1021,7 @@ void TransportView::_updateTimeSource() {
 	BMenu* menu = m_timeSourceView->Menu();
 	ASSERT(menu);
 	if(tsNode == media_node::null) {
-		menu->Superitem()->SetLabel("(none)");
+		menu->Superitem()->SetLabel(B_TRANSLATE("(none)"));
 		return;
 	}
 
@@ -1049,7 +1065,7 @@ void TransportView::_updateTimeSource() {
 //		}
 //	}
 	if(n < 0)
-		menu->Superitem()->SetLabel("(???)");
+		menu->Superitem()->SetLabel(B_TRANSLATE("(???)"));
 
 }
 void TransportView::_updateRunMode() {

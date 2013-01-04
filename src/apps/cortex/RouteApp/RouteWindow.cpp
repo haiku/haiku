@@ -63,15 +63,21 @@
 #define D_HOOK(x) //PRINT (x)
 #define D_INTERNAL(x) //PRINT (x)
 
+// Locale Kit
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexRouteApp"
+
 __USE_CORTEX_NAMESPACE
 
 
-const char* const RouteWindow::s_windowName = "Cortex";
+const char* const RouteWindow::s_windowName = B_TRANSLATE("Cortex");
 
 const BRect RouteWindow::s_initFrame(100,100,700,550);
 
 const char* const g_aboutText =
-	"Cortex/Route 2.1.2\n\n"
+	B_TRANSLATE("Cortex/Route 2.1.2\n\n"
 	"Copyright 1999-2000 Eric Moon\n"
 	"All rights reserved.\n\n"
 	"The Cortex Team:\n\n"
@@ -79,7 +85,7 @@ const char* const g_aboutText =
 	"Eric Moon: UI, back-end\n\n"
 	"Thanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\n"
 	"Certain icons used herein are the property of\n"
-	"Be, Inc. and are used by permission.";
+	"Be, Inc. and are used by permission.");
 
 
 RouteWindow::~RouteWindow()
@@ -102,21 +108,23 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager)
 
 	// initialize the menu bar: add all menus that target this window
 	BMenuBar* pMenuBar = new BMenuBar(b, "menuBar");
-	BMenu* pFileMenu = new BMenu("File");
-	BMenuItem* item = new BMenuItem("Open" B_UTF8_ELLIPSIS,
+	BMenu* pFileMenu = new BMenu(B_TRANSLATE("File"));
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS),
 		new BMessage(RouteApp::M_SHOW_OPEN_PANEL), 'O');
 	item->SetTarget(be_app);
 	pFileMenu->AddItem(item);
 	pFileMenu->AddItem(new BSeparatorItem());
-	item = new BMenuItem("Save nodes" B_UTF8_ELLIPSIS,
+	item = new BMenuItem(B_TRANSLATE("Save nodes" B_UTF8_ELLIPSIS),
 		new BMessage(RouteApp::M_SHOW_SAVE_PANEL), 'S');
 	item->SetTarget(be_app);
 	pFileMenu->AddItem(item);
 	pFileMenu->AddItem(new BSeparatorItem());
-	pFileMenu->AddItem(new BMenuItem("About Cortex/Route" B_UTF8_ELLIPSIS,
+	pFileMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("About Cortex/Route" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
 	pFileMenu->AddItem(new BSeparatorItem());
-	pFileMenu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
+	pFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+		new BMessage(B_QUIT_REQUESTED)));
 	pMenuBar->AddItem(pFileMenu);
 	AddChild(pMenuBar);
 
@@ -165,21 +173,21 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager)
 	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 	// construct the Window menu
-	BMenu* windowMenu = new BMenu("Window");
+	BMenu* windowMenu = new BMenu(B_TRANSLATE("Window"));
 	m_transportWindowItem = new BMenuItem(
-		"Show transport",
+		B_TRANSLATE("Show transport"),
 		new BMessage(M_TOGGLE_TRANSPORT_WINDOW));
 	windowMenu->AddItem(m_transportWindowItem);
 
 	m_dormantNodeWindowItem = new BMenuItem(
-		"Show add-ons",
+		B_TRANSLATE("Show add-ons"),
 		new BMessage(M_TOGGLE_DORMANT_NODE_WINDOW));
 	windowMenu->AddItem(m_dormantNodeWindowItem);
 
 	windowMenu->AddItem(new BSeparatorItem());
 
 	m_pullPalettesItem = new BMenuItem(
-		"Pull palettes",
+		B_TRANSLATE("Pull palettes"),
 		new BMessage(M_TOGGLE_PULLING_PALETTES));
 	windowMenu->AddItem(m_pullPalettesItem);
 
@@ -372,7 +380,7 @@ RouteWindow::MessageReceived(BMessage* pMsg)
 	switch (pMsg->what) {
 		case B_ABOUT_REQUESTED:
 		{
-			BAlert* alert = new BAlert("About", g_aboutText, "OK");
+			BAlert* alert = new BAlert("About", g_aboutText, B_TRANSLATE("OK"));
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			break;
@@ -582,7 +590,7 @@ RouteWindow::_toggleTransportWindow()
 		m_transportWindowItem->SetMarked(false);
 	} else {
 		m_transportWindow = new TransportWindow(m_routingView->manager,
-			this, "Transport");
+			this, B_TRANSLATE("Transport"));
 
 		// ask for a selection update
 		BMessenger(m_routingView).SendMessage(

@@ -40,10 +40,16 @@
 #include <ParameterWeb.h>
 #include <String.h>
 #include <Alert.h>
+#include <Catalog.h>
 
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsCommonMediaNodeControlApp"
+
 
 // -------------------------------------------------------- //
 // ctor/dtor
@@ -82,9 +88,10 @@ MediaNodeControlApp::MediaNodeControlApp(
 	if(err < B_OK) {
 		char buffer[512];
 		sprintf(buffer,
-			"MediaNodeControlApp: couldn't find node (%" B_PRId32 "):\n%s\n",
+			B_TRANSLATE("MediaNodeControlApp: couldn't find node (%"
+				B_PRId32 "):\n%s\n"),
 			nodeID, strerror(err));
-		BAlert* alert = new BAlert("error", buffer, "OK");
+		BAlert* alert = new BAlert("error", buffer, B_TRANSLATE("OK"));
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return;
@@ -96,16 +103,17 @@ MediaNodeControlApp::MediaNodeControlApp(
 	if(err < B_OK) {
 		char buffer[512];
 		sprintf(buffer,
-			"MediaNodeControlApp: couldn't get node info (%" B_PRId32
-			"):\n%s\n", nodeID, strerror(err));
-		BAlert* alert = new BAlert("error", buffer, "OK");
+			B_TRANSLATE("MediaNodeControlApp: couldn't get node info (%"
+				B_PRId32 "):\n%s\n"), nodeID, strerror(err));
+		BAlert* alert = new BAlert("error", buffer, B_TRANSLATE("OK"));
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return;
 	}
 	
 	BString windowTitle;
-	windowTitle << nInfo.name << '(' << nodeID << ") controls";		
+	windowTitle << nInfo.name << '(' << nodeID << ") "
+		<< B_TRANSLATE("controls");
 	
 	// get parameter web
 	BParameterWeb* pWeb;
@@ -113,9 +121,9 @@ MediaNodeControlApp::MediaNodeControlApp(
 	if(err < B_OK) {
 		char buffer[512];
 		sprintf(buffer,
-			"MediaNodeControlApp: no parameters for node (%" B_PRId32
-			"):\n%s\n", nodeID, strerror(err));
-		BAlert* alert = new BAlert("error", buffer, "OK");
+			B_TRANSLATE("MediaNodeControlApp: no parameters for node (%"
+				B_PRId32 "):\n%s\n"), nodeID, strerror(err));
+		BAlert* alert = new BAlert("error", buffer, B_TRANSLATE("OK"));
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return;

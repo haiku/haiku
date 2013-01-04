@@ -51,6 +51,13 @@
 #include <Bitmap.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+// Locale Kit
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaJack"
 
 __USE_CORTEX_NAMESPACE
 
@@ -58,6 +65,8 @@ __USE_CORTEX_NAMESPACE
 #define D_METHOD(x) //PRINT (x)
 #define D_DRAW(x) //PRINT (x)
 #define D_MOUSE(x) //PRINT (x)
+
+static BCatalog sCatalog("application/x-vnd.Cortex.MediaRoutingView");
 
 // -------------------------------------------------------- //
 // constants
@@ -88,7 +97,7 @@ MediaJack::MediaJack(
 	D_METHOD(("MediaJack::MediaJack()\n"));
 	makeSelectable(false);
 	if (m_label == "")
-		m_label = "Input";
+		m_label = B_TRANSLATE("Input");
 	_updateAbbreviation();
 }
 
@@ -108,7 +117,7 @@ MediaJack::MediaJack(
 	D_METHOD(("MediaJack::MediaJack()\n"));
 	makeSelectable(false);
 	if (m_label == "")
-		m_label = "Output";
+		m_label = B_TRANSLATE("Output");
 	_updateAbbreviation();
 }
 
@@ -748,7 +757,7 @@ void MediaJack::showContextMenu(
 		BMessage *message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
 		message->AddData("input", B_RAW_TYPE,
 						 reinterpret_cast<const void *>(&input), sizeof(input));
-		menu->AddItem(new BMenuItem("Get info", message));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"), message));
 	}
 	else if (isOutput())
 	{
@@ -757,7 +766,7 @@ void MediaJack::showContextMenu(
 		BMessage *message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
 		message->AddData("output", B_RAW_TYPE,
 						 reinterpret_cast<const void *>(&output), sizeof(output));
-		menu->AddItem(new BMenuItem("Get info", message));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"), message));
 	}
 
 	menu->SetTargetForItems(view());

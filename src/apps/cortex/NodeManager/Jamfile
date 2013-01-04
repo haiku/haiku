@@ -14,3 +14,9 @@ StaticLibrary cortex_node_manager.a :
 	NodeRef.cpp
 	NodeSyncThread.cpp
 ;
+
+DoCatalogs cortex_node_manager.a :
+	application/x-vnd.Cortex.NodeManager
+	:
+	NodeManager.cpp
+;

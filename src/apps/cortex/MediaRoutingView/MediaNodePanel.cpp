@@ -62,6 +62,13 @@
 // Media Kit
 #include <MediaDefs.h>
 #include <MediaRoster.h>
+// Locale Kit
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaNodePanel"
 
 using namespace std;
 
@@ -71,6 +78,8 @@ __USE_CORTEX_NAMESPACE
 #define D_METHOD(x) //PRINT (x)
 #define D_MESSAGE(x) //PRINT (x)
 #define D_DRAW(x) //PRINT (x)
+
+static BCatalog sCatalog("application/x-vnd.Cortex.MediaRoutingView");
 
 // -------------------------------------------------------- //
 // constants
@@ -562,7 +571,8 @@ void MediaNodePanel::showContextMenu(
 
 	// add the "Tweak Parameters" item
 	message = new BMessage(MediaRoutingView::M_NODE_TWEAK_PARAMETERS);
-	menu->AddItem(item = new BMenuItem("Tweak parameters", message, 'P'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Tweak parameters"),
+		message, 'P'));
 	if (!(ref->kind() & B_CONTROLLABLE))
 	{
 		item->SetEnabled(false);
@@ -570,10 +580,11 @@ void MediaNodePanel::showContextMenu(
 
 	message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
 	message->AddInt32("nodeID", ref->id());
-	menu->AddItem(new BMenuItem("Get info", message, 'I'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"), message, 'I'));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(item = new BMenuItem("Release", new BMessage(MediaRoutingView::M_DELETE_SELECTION), 'T'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Release"),
+		new BMessage(MediaRoutingView::M_DELETE_SELECTION), 'T'));
 	if (!ref->isInternal())
 	{
 		item->SetEnabled(false);
@@ -583,7 +594,7 @@ void MediaNodePanel::showContextMenu(
 	// add the "Cycle" item
 	message = new BMessage(MediaRoutingView::M_NODE_CHANGE_CYCLING);
 	message->AddBool("cycle", !ref->isCycling());
-	menu->AddItem(item = new BMenuItem("Cycle", message));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Cycle"), message));
 	item->SetMarked(ref->isCycling());
 	if (ref->flags() & NodeRef::NO_SEEK)
 	{
@@ -591,7 +602,7 @@ void MediaNodePanel::showContextMenu(
 	}
 
 	// add the "Run Mode" sub menu
-	BMenu *subMenu = new BMenu("Run mode");
+	BMenu *subMenu = new BMenu(B_TRANSLATE("Run mode"));
 	subMenu->SetFont(be_plain_font);
 	for (uint32 runMode = 1; runMode <= BMediaNode::B_RECORDING; runMode++)
 	{
@@ -613,7 +624,8 @@ void MediaNodePanel::showContextMenu(
 	subMenu->AddSeparatorItem();
 	message = new BMessage(MediaRoutingView::M_NODE_CHANGE_RUN_MODE);
 	message->AddInt32("run_mode", 0);
-	subMenu->AddItem(item = new BMenuItem("(same as group)", message));
+	subMenu->AddItem(
+		item = new BMenuItem(B_TRANSLATE("(same as group)"), message));
 	if (ref->group() == 0)
 	{
 		item->SetEnabled(false);
@@ -626,19 +638,19 @@ void MediaNodePanel::showContextMenu(
 	subMenu->SetTargetForItems(view());
 	
 	// [c.lenz 24dec99] hide rarely used commands in a 'Advanced' submenu
-	subMenu = new BMenu("Advanced");
+	subMenu = new BMenu(B_TRANSLATE("Advanced"));
 	subMenu->SetFont(be_plain_font);
 	// [e.moon 5dec99] ad-hoc timesource support
 	if(ref->kind() & B_TIME_SOURCE) {
 		message = new BMessage(MediaRoutingView::M_NODE_START_TIME_SOURCE);
 		message->AddInt32("nodeID", ref->id());
 		subMenu->AddItem(new BMenuItem(
-			"Start time source",
+			B_TRANSLATE("Start time source"),
 			message));
 		message = new BMessage(MediaRoutingView::M_NODE_START_TIME_SOURCE);
 		message->AddInt32("nodeID", ref->id());
 		subMenu->AddItem(new BMenuItem(
-			"Stop time source",
+			B_TRANSLATE("Stop time source"),
 			message));
 	}
 	// [c.lenz 24dec99] support for BControllable::StartControlPanel()
@@ -646,8 +658,8 @@ void MediaNodePanel::showContextMenu(
 		if (subMenu->CountItems() > 0)
 			subMenu->AddSeparatorItem();
 		message = new BMessage(MediaRoutingView::M_NODE_START_CONTROL_PANEL);
-		subMenu->AddItem(new BMenuItem("Start Control Panel", message,
-									   'P', B_COMMAND_KEY | B_SHIFT_KEY));
+		subMenu->AddItem(new BMenuItem(B_TRANSLATE("Start control panel"),
+			message, 'P', B_COMMAND_KEY | B_SHIFT_KEY));
 	}
 	// [em 1feb00] group tweaks
 	if(ref->group())
@@ -660,7 +672,8 @@ void MediaNodePanel::showContextMenu(
 			subMenu->AddSeparatorItem();
 		subMenu->AddItem(
 			new BMenuItem(
-				isLocked ? "Unlock group" : "Lock group", message));
+				isLocked ? B_TRANSLATE("Unlock group")
+						 : B_TRANSLATE("Lock group"), message));
 	}
 	
 	if (subMenu->CountItems() > 0)
@@ -797,8 +810,8 @@ void MediaNodePanel::_prepareLabel()
 		status_t error = BMediaRoster::Roster()->GetRefFor(ref->node(),	&nodeFile);
 		if (error)
 		{
-			m_fullLabel = ref->name();
-			m_fullLabel += " (no file)";
+			m_fullLabel = B_TRANSLATE("%refname% (no file)");
+			m_fullLabel.ReplaceFirst("%refname%", ref->name());
 		}
 		else
 		{

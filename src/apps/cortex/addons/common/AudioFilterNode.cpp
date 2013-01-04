@@ -42,6 +42,7 @@
 #include <Buffer.h>
 #include <BufferGroup.h>
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <ParameterWeb.h>
 #include <String.h>
 #include <TimeSource.h>
@@ -51,6 +52,9 @@
 #include <cstdlib>
 #include <cstring>
 //#include <cmath>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsCommon"
 
 // -------------------------------------------------------- //
 // constants 
@@ -394,7 +398,7 @@ void AudioFilterNode::NodeRegistered() {
 	err = getRequiredInputFormat(m_input.format);
 	ASSERT(err == B_OK);
 
-	strncpy(m_input.name, "Audio Input", B_MEDIA_NAME_LENGTH);
+	strlcpy(m_input.name, B_TRANSLATE("Audio input"), B_MEDIA_NAME_LENGTH);
 	
 	// init output
 	m_output.source.port = ControlPort();
@@ -406,7 +410,7 @@ void AudioFilterNode::NodeRegistered() {
 	err = getRequiredOutputFormat(m_output.format);
 	ASSERT(err == B_OK);
 
-	strncpy(m_output.name, "Audio Output", B_MEDIA_NAME_LENGTH);
+	strlcpy(m_output.name, B_TRANSLATE("Audio output"), B_MEDIA_NAME_LENGTH);
 
 	// init parameters
 	initParameterWeb();
@@ -1324,8 +1328,8 @@ void AudioFilterNode::initParameterWeb() {
 	ASSERT(m_parameterSet);
 	
 	BParameterWeb* web = new BParameterWeb();
-	BString groupName = Name();
-	groupName << " Parameters";
+	BString groupName = B_TRANSLATE("%groupname% parameters");
+	groupName.ReplaceFirst("%groupname%", Name());
 	BParameterGroup* group = web->MakeGroup(groupName.String());
 	m_parameterSet->populateGroup(group);
 	
