@@ -716,7 +716,7 @@ get_new_vnode(fs_volume* volume, ino_t id, VnodeToInode** _vti)
 		return B_OK;
 	}
 
-	return get_vnode(volume, id, reinterpret_cast<void**>(_vti)); //_OK;
+	return get_vnode(volume, id, reinterpret_cast<void**>(_vti));
 }
 
 

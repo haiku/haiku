@@ -51,6 +51,7 @@ IdMap::InitStatus()
 	return fInitStatus;
 }
 
+
 extern IdMap*	gIdMapper;
 extern mutex	gIdMapperLock;
 

@@ -59,8 +59,8 @@ FileInfo::CreateName(const char* dirPath, const char* name)
 		return B_NO_MEMORY;
 
 	if (dirPath != NULL) {
-		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2 +
-			strlen(dirPath)));
+		char* path = reinterpret_cast<char*>(malloc(strlen(name) + 2
+			+ strlen(dirPath)));
 		if (path == NULL)
 			return B_NO_MEMORY;
 

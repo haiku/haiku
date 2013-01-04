@@ -563,8 +563,8 @@ Connection::SetTo(Connection **_connection, int socket,
 status_t
 Connection::Connect()
 {
-	const sockaddr& address =
-		*reinterpret_cast<const sockaddr*>(&fPeerAddress);
+	const sockaddr& address
+		= *reinterpret_cast<const sockaddr*>(&fPeerAddress);
 
 	switch (fPeerAddress.fProtocol) {
 		case IPPROTO_TCP:

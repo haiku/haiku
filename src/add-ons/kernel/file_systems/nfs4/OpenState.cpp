@@ -294,7 +294,7 @@ OpenState::Close()
 		// recognize retried CLOSE requests so we just assume that BAD_STATEID
 		// on CLOSE request is just a result of retransmission.
 		if (reply.NFS4Error() == NFS4ERR_BAD_STATEID) {
-	 		fFileSystem->OpenOwnerSequenceUnlock(sequence);
+			fFileSystem->OpenOwnerSequenceUnlock(sequence);
 			return B_OK;
 		}
 
