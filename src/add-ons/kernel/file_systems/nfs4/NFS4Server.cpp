@@ -21,7 +21,6 @@ NFS4Server::NFS4Server(RPC::Server* serv)
 	fLeaseTime(0),
 	fClientIdLastUse(0),
 	fUseCount(0),
-	fFileSystems(NULL),
 	fServer(serv)
 {
 	ASSERT(serv != NULL);
@@ -58,7 +57,7 @@ NFS4Server::ServerRebooted(uint64 clientId)
 
 	// reclaim all opened files and held locks from all filesystems
 	MutexLocker _(fFSLock);
-	FileSystem* fs = fFileSystems;
+	FileSystem* fs = fFileSystems.Head();
 	while (fs != NULL) {
 		DoublyLinkedList<OpenState>::Iterator iterator
 			= fs->OpenFilesLock().GetIterator();
@@ -70,7 +69,7 @@ NFS4Server::ServerRebooted(uint64 clientId)
 		}
 		fs->OpenFilesUnlock();
 
-		fs = fs->fNext;
+		fs = fFileSystems.GetNext(fs);
 	}
 
 	return fClientId;
@@ -83,11 +82,8 @@ NFS4Server::AddFileSystem(FileSystem* fs)
 	ASSERT(fs != NULL);
 
 	MutexLocker _(fFSLock);
-	fs->fPrev = NULL;
-	fs->fNext = fFileSystems;
-	if (fFileSystems != NULL)
-		fFileSystems->fPrev = fs;
-	fFileSystems = fs;
+	fFileSystems.Add(fs);
+
 	fUseCount += fs->OpenFilesCount();
 	if (fs->OpenFilesCount() > 0)
 		_StartRenewing();
@@ -100,13 +96,7 @@ NFS4Server::RemoveFileSystem(FileSystem* fs)
 	ASSERT(fs != NULL);
 
 	MutexLocker _(fFSLock);
-	if (fs == fFileSystems)
-		fFileSystems = fs->fNext;
-
-	if (fs->fNext)
-		fs->fNext->fPrev = fs->fPrev;
-	if (fs->fPrev)
-		fs->fPrev->fNext = fs->fNext;
+	fFileSystems.Remove(fs);
 	fUseCount -= fs->OpenFilesCount();
 }
 
@@ -152,10 +142,10 @@ NFS4Server::FileSystemMigrated()
 {
 	// reclaim all opened files and held locks from all filesystems
 	MutexLocker _(fFSLock);
-	FileSystem* fs = fFileSystems;
+	FileSystem* fs = fFileSystems.Head();
 	while (fs != NULL) {
 		fs->Migrate(fServer);
-		fs = fs->fNext;
+		fs = fFileSystems.GetNext(fs);
 	}
 
 	return B_OK;
@@ -336,13 +326,13 @@ NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
 	MutexLocker locker(fFSLock);
 
 	Delegation* delegation = NULL;
-	FileSystem* current = fFileSystems;
+	FileSystem* current = fFileSystems.Head();
 	while (current != NULL) {
 		delegation = current->GetDelegation(handle);
 		if (delegation != NULL)
 			break;
 
-		current = current->fNext;
+		current = fFileSystems.GetNext(current);
 	}
 	locker.Unlock();
 
@@ -379,13 +369,13 @@ NFS4Server::CallbackGetAttr(RequestInterpreter* request, ReplyBuilder* reply)
 	MutexLocker locker(fFSLock);
 
 	Delegation* delegation = NULL;
-	FileSystem* current = fFileSystems;
+	FileSystem* current = fFileSystems.Head();
 	while (current != NULL) {
 		delegation = current->GetDelegation(handle);
 		if (delegation != NULL)
 			break;
 
-		current = current->fNext;
+		current = fFileSystems.GetNext(current);
 	}
 	locker.Unlock();
 
@@ -411,7 +401,7 @@ status_t
 NFS4Server::RecallAll()
 {
 	MutexLocker _(fFSLock);
-	FileSystem* fs = fFileSystems;
+	FileSystem* fs = fFileSystems.Head();
 	while (fs != NULL) {
 		DoublyLinkedList<Delegation>& list = fs->DelegationsLock();
 		DoublyLinkedList<Delegation>::Iterator iterator = list.GetIterator();
@@ -427,7 +417,7 @@ NFS4Server::RecallAll()
 		}	
 		fs->DelegationsUnlock();
 
-		fs = fs->fNext;
+		fs = fFileSystems.GetNext(fs);
 	}
 
 	return B_OK;

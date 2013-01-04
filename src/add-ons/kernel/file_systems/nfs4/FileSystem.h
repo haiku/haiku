@@ -27,7 +27,7 @@ struct MountConfiguration {
 	bool	fCacheMetadata;
 };
 
-class FileSystem {
+class FileSystem : public DoublyLinkedListLinkImpl<FileSystem> {
 public:
 	static	status_t			Mount(FileSystem** pfs, RPC::Server* serv,
 									const char* path, dev_t id,
@@ -76,8 +76,6 @@ public:
 
 	inline	const MountConfiguration&	GetConfiguration();
 
-			FileSystem*			fNext;
-			FileSystem*			fPrev;
 private:
 								FileSystem(const MountConfiguration& config);
 

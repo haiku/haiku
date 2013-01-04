@@ -24,8 +24,6 @@ extern RPC::ProgramData* CreateNFS4Server(RPC::Server* serv);
 
 FileSystem::FileSystem(const MountConfiguration& configuration)
 	:
-	fNext(NULL),
-	fPrev(NULL),
 	fOpenCount(0),
 	fOpenOwnerSequence(0),
 	fNamedAttrs(true),

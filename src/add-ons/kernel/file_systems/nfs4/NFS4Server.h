@@ -66,7 +66,7 @@ private:
 			mutex			fClientIdLock;
 
 			uint32			fUseCount;
-			FileSystem*		fFileSystems;
+			DoublyLinkedList<FileSystem>	fFileSystems;
 			mutex			fFSLock;
 
 			RPC::Server*	fServer;
