@@ -4,7 +4,6 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 
 KernelAddon nfs4 :
-	CacheRevalidator.cpp
 	Cookie.cpp
 	Connection.cpp
 	Delegation.cpp

@@ -317,30 +317,21 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 	status_t result;
 	DirectoryCache* cache = cookie->fAttrDir ? fAttrCache : fCache;
 	if (cookie->fSnapshot == NULL) {
-		fFileSystem->Revalidator().Lock();
 		cache->Lock();
-		if (!cache->Valid())
-			cache->Reset();
-		else
-			fFileSystem->Revalidator().RemoveDirectory(cache);
+		result = cache->Revalidate();
+		if (result != B_OK) {
+			cache->Unlock();
+			return result;
+		}
 
 		DirectoryCacheSnapshot* snapshot = cache->GetSnapshot();
-		if (snapshot == NULL) {
-			uint64 change;
-			result = GetDirSnapshot(&snapshot, cookie, &change,
-				cookie->fAttrDir);
-			if (result != B_OK) {
-				cache->Unlock();
-				fFileSystem->Revalidator().Unlock();
-				return result;
-			}
-			cache->ValidateChangeInfo(change);
-			cache->SetSnapshot(snapshot);
-		}
+		ASSERT(snapshot != NULL);
+
 		cookie->fSnapshot = new DirectoryCacheSnapshot(*snapshot);
-		fFileSystem->Revalidator().AddDirectory(cache);
 		cache->Unlock();
-		fFileSystem->Revalidator().Unlock();
+
+		if (cookie->fSnapshot == NULL)
+			return B_NO_MEMORY;
 	}
 
 	char* buffer = reinterpret_cast<char*>(_buffer);

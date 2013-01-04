@@ -11,6 +11,7 @@
 
 #include <SupportDefs.h>
 
+#include "DirectoryCache.h"
 #include "FileSystem.h"
 
 

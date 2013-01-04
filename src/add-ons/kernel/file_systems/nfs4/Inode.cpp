@@ -204,20 +204,15 @@ Inode::LookUp(const char* name, ino_t* id)
 	if (result != B_OK)
 		return result;
 
-	fFileSystem->Revalidator().Lock();
 	fCache->Lock();
 	if (!fCache->Valid()) {
 		fCache->Reset();
 		fCache->SetChangeInfo(change);
-	} else {
-		fFileSystem->Revalidator().RemoveDirectory(fCache);
+	} else
 		fCache->ValidateChangeInfo(change);
-	}
 
 	fCache->AddEntry(name, *id);
-	fFileSystem->Revalidator().AddDirectory(fCache);
 	fCache->Unlock();
-	fFileSystem->Revalidator().Unlock();
 
 	return B_OK;
 }

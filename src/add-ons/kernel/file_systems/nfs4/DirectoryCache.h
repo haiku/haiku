@@ -38,7 +38,7 @@ struct DirectoryCacheSnapshot : public KernelReferenceable {
 							~DirectoryCacheSnapshot();
 };
 
-class DirectoryCache : public DoublyLinkedListLinkImpl<DirectoryCache> {
+class DirectoryCache {
 public:
 							DirectoryCache(Inode* inode, bool attr = false);
 							~DirectoryCache();
@@ -54,7 +54,6 @@ public:
 								bool created = false);
 			void			RemoveEntry(const char* name);
 
-			void			SetSnapshot(DirectoryCacheSnapshot* snapshot);
 	inline	DirectoryCacheSnapshot* GetSnapshot();
 
 	inline	SinglyLinkedList<NameCacheEntry>&	EntriesList();
@@ -66,7 +65,6 @@ public:
 	inline	uint64			ChangeInfo();
 
 	inline	Inode*			GetInode();
-	inline	time_t			ExpireTime();
 
 	static	const bigtime_t	kExpirationTime		= 15000000;
 
@@ -76,6 +74,9 @@ protected:
 								DirectoryCacheSnapshot* newSnapshot);
 
 private:
+			void			_SetSnapshot(DirectoryCacheSnapshot* snapshot);
+			status_t		_LoadSnapshot(bool trash);
+
 			SinglyLinkedList<NameCacheEntry>	fNameCache;
 
 			DirectoryCacheSnapshot*	fDirectoryCache;
@@ -115,6 +116,8 @@ DirectoryCache::Valid()
 inline DirectoryCacheSnapshot*
 DirectoryCache::GetSnapshot()
 {
+	if (fDirectoryCache == NULL)
+		_LoadSnapshot(false);
 	return fDirectoryCache;
 }
 
@@ -161,13 +164,6 @@ inline Inode*
 DirectoryCache::GetInode()
 {
 	return fInode;
-}
-
-
-inline time_t
-DirectoryCache::ExpireTime()
-{
-	return fExpireTime;
 }
 
 

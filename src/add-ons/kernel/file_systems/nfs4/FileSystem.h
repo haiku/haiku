@@ -9,7 +9,6 @@
 #define FILESYSTEM_H
 
 
-#include "CacheRevalidator.h"
 #include "Delegation.h"
 #include "InodeIdMap.h"
 #include "NFS4Defs.h"
@@ -51,8 +50,6 @@ public:
 			void				RemoveDelegation(Delegation* delegation);
 			Delegation*			GetDelegation(const FileHandle& handle);
 
-	inline	CacheRevalidator&	Revalidator();
-
 	inline	bool				IsAttrSupported(Attribute attr) const;
 	inline	uint32				ExpireType() const;
 
@@ -78,8 +75,6 @@ public:
 
 private:
 								FileSystem(const MountConfiguration& config);
-
-			CacheRevalidator	fCacheRevalidator;
 
 			mutex				fDelegationLock;
 			DoublyLinkedList<Delegation>	fDelegationList;
@@ -111,13 +106,6 @@ private:
 
 			MountConfiguration	fConfiguration;
 };
-
-
-inline CacheRevalidator&
-FileSystem::Revalidator()
-{
-	return fCacheRevalidator;
-}
 
 
 inline RootInode*

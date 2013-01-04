@@ -92,10 +92,6 @@ DirectoryCache::DirectoryCache(Inode* inode, bool attr)
 
 DirectoryCache::~DirectoryCache()
 {
-	fInode->GetFileSystem()->Revalidator().Lock();
-	fInode->GetFileSystem()->Revalidator().RemoveDirectory(this);
-	fInode->GetFileSystem()->Revalidator().Unlock();
-
 	mutex_destroy(&fLock);
 }
 
@@ -119,7 +115,7 @@ DirectoryCache::Trash()
 		delete current;
 	}
 
-	SetSnapshot(NULL);
+	_SetSnapshot(NULL);
 
 	fTrashed = true;
 }
@@ -207,7 +203,7 @@ DirectoryCache::RemoveEntry(const char* name)
 
 
 void
-DirectoryCache::SetSnapshot(DirectoryCacheSnapshot* snapshot)
+DirectoryCache::_SetSnapshot(DirectoryCacheSnapshot* snapshot)
 {
 	if (fDirectoryCache != NULL)
 		fDirectoryCache->ReleaseReference();
@@ -216,8 +212,47 @@ DirectoryCache::SetSnapshot(DirectoryCacheSnapshot* snapshot)
 
 
 status_t
+DirectoryCache::_LoadSnapshot(bool trash)
+{
+	DirectoryCacheSnapshot* oldSnapshot = fDirectoryCache;
+	if (oldSnapshot != NULL)
+		oldSnapshot->AcquireReference();
+
+	if (trash)
+		Trash();
+
+	DirectoryCacheSnapshot* newSnapshot;
+	status_t result = fInode->GetDirSnapshot(&newSnapshot, NULL, &fChange,
+		fAttrDir);
+	if (result != B_OK) {
+		if (oldSnapshot != NULL)
+			oldSnapshot->ReleaseReference();
+		return result;
+	}
+	newSnapshot->AcquireReference();
+
+	_SetSnapshot(newSnapshot);
+	fExpireTime = system_time() + kExpirationTime;
+
+	fTrashed = false;
+
+	if (oldSnapshot != NULL)
+		NotifyChanges(oldSnapshot, newSnapshot);
+
+	if (oldSnapshot != NULL)
+		oldSnapshot->ReleaseReference();
+
+	newSnapshot->ReleaseReference();
+	return B_OK;
+}
+
+
+status_t
 DirectoryCache::Revalidate()
 {
+	if (fExpireTime < system_time())
+		return B_OK;
+
 	uint64 change;
 	if (fInode->GetChangeInfo(&change, fAttrDir) != B_OK) {
 		Trash();
@@ -229,34 +264,7 @@ DirectoryCache::Revalidate()
 		return B_OK;
 	}
 
-	DirectoryCacheSnapshot* oldSnapshot = fDirectoryCache;
-	if (oldSnapshot == NULL) {
-		Trash();
-		return B_ERROR;
-	}
-
-	oldSnapshot->AcquireReference();
-
-	Trash();
-
-	DirectoryCacheSnapshot* newSnapshot;
-	status_t result = fInode->GetDirSnapshot(&newSnapshot, NULL, &fChange,
-		fAttrDir);
-	if (result != B_OK) {
-		oldSnapshot->ReleaseReference();
-		return B_ERROR;
-	}
-	newSnapshot->AcquireReference();
-
-	SetSnapshot(newSnapshot);
-	fExpireTime = system_time() + kExpirationTime;
-	fTrashed = false;
-
-	NotifyChanges(oldSnapshot, newSnapshot);
-	oldSnapshot->ReleaseReference();
-	newSnapshot->ReleaseReference();
-
-	return B_OK;
+	return _LoadSnapshot(true);
 }
 
 

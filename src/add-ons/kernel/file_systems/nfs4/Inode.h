@@ -9,6 +9,7 @@
 #define INODE_H
 
 
+#include "DirectoryCache.h"
 #include "MetadataCache.h"
 #include "NFS4Inode.h"
 #include "OpenState.h"
