@@ -31,7 +31,7 @@ main()
 }
 
 
-ChartApp::ChartApp() : BApplication("application/x-vnd.Be.ChartDemo")
+ChartApp::ChartApp() : BApplication("application/x-vnd.Haiku-ChartDemo")
 {
 	fWindow = new ChartWindow(BRect(120, 150, 965, 591),
 		B_TRANSLATE_SYSTEM_NAME("Chart"));
