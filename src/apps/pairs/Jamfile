@@ -16,8 +16,3 @@ DoCatalogs Pairs :
 	PairsView.cpp
 	PairsWindow.cpp
 ;
-
-AddCatalogEntryAttribute Pairs
-	:
-	x-vnd.Haiku-Pairs:PairsWindow:Pairs
-;
