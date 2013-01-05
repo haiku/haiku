@@ -1,13 +1,15 @@
-1	german	x-vnd.Haiku-StyledEdit	1195515839
+1	german	x-vnd.Haiku-StyledEdit	2574742746
 StyledEdit	System name		Texteditor
 Paste	Menus		Einfügen
 OK	LoadAlert		OK
 File	Menus		Datei
 ???	LoadAlert		???
+Modified	StatusView		Geändert
 Lines:	Statistics		Zeilen:
 Italic	Menus		Kursiv
 Left	Menus		Links
 Search backwards	FindandReplaceWindow		Rückwärts suchen
+Unlock file	StatusView		Datei entsperren
 Size	Menus		Größe
 Save	QuitAlert		Speichern
 Page setup…	Menus		Seite einrichten…
@@ -31,6 +33,7 @@ Autodetect	Menus		Automatisch
 Document	Menus		Dokument
 Save changes to the document \"%s\"? 	QuitAlert		Änderungen an Dokument \"%s\" speichern? 
 Edit	Menus		Bearbeiten
+Revert	RevertToSavedAlert		Wiederherstellen
 Font	Menus		Schrift
 Replace all	FindandReplaceWindow		Alle ersetzen
 Statistics…	Menus		Statistik…
@@ -48,10 +51,13 @@ Don't save	QuitAlert		Verwerfen
 Align	Menus		Ausrichtung
 Color	Menus		Farbe
 Red	Menus		Rot
+OK	QuitAlert		OK
 Open…	Menus		Öffnen…
 Center	Menus		Zentriert
 Blue	Menus		Blau
+Unable to unlock file\n\t%s	QuitAlert		Die Datei '%s' konnte nicht entsperrt werden.
 Cyan	Menus		Türkis
+line %d, column %d	StatusView		Zeile %d, Spalte %d
 OK	Statistics		OK
 Magenta	Menus		Magenta
 New	Menus		Neu
@@ -72,8 +78,8 @@ Don't save	SaveAlert		Verwerfen
 Recover	NodeMonitorAlerts		Wiederherstellen
 Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von "%s":\n\t%s
 Ignore	NodeMonitorAlerts		Ignorieren
+Read-only	StatusView		Schreibgeschützt
 Undo typing	QuitAlert		Rückgängig: Eingabe
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
 Black	Menus		Schwarz
 Untitled 	StyledEditWindow		Unbenannt
 OK	SaveAlert		OK

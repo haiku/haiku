@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	1599879742
+1	english	x-vnd.Be-MAIL	2646020355
 View	Mail		查看
 %d - Date	Mail		%d - 日期
 Attach attributes:	Mail		附加属性：
@@ -25,7 +25,6 @@ Beginner	Mail		新手
 Don't save	Mail		不保存
 Expert	Mail		专家
 Reply account:	Mail		回复：
-Discard	Mail		忽略
 Message	Mail		邮件
 Settings…	Mail		设置…
 Reply to sender	Mail		回复发件人
@@ -119,7 +118,6 @@ Remove enclosure	Mail		删除格式
 Account:	Mail		账户：
 Decoding:	Mail		解码：
 Sorry, could not find an application that supports the 'Person' data type.	Mail		对不起，无法找到支持‘个人’数据类型的程序。
-Do you wish to send this message before closing?	Mail		关闭之前，是否发送邮件?
 Delete	Mail		删除
 Leave as '%s'	Mail		标记为 '%s'
 Copy	Mail		复制
@@ -135,7 +133,6 @@ Font:	Mail		字体：
 (Address unavailable)	Mail		（地址不可用）
 Save address	Mail		保存地址
 Queries	Mail		查询
-Do you wish to save this message as a draft before closing?	Mail		关闭之前，是否把邮件保存为草稿?
 Save	Mail		保存
 Random	Mail		随机
 Close and 	Mail		关闭并且

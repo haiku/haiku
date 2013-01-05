@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	621368175
+1	german	x-vnd.Haiku-Shortcuts	1741147146
 Error, NULL state description?\n	ShortcutsSpec		Fehler, NULL Status Beschreibung?\n
 MoveMouse	ShortcutsSpec		Bewege Maus
 OK	ShortcutsWindow		OK
@@ -43,7 +43,6 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Maus zur Bildschirmmitte bewegen
 Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter…
 Open	ShortcutsWindow		Öffnen
-Really quit without saving your changes?	ShortcutsWindow		Beenden ohne die Änderungen zu speichern?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
 Select	ShortcutsWindow		Auswählen
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.

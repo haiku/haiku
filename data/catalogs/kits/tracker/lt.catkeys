@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1301055003
+1	lithuanian	x-vnd.Haiku-libtracker	3955647850
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -452,6 +452,7 @@ Mount	DeskWindow		Prijungti
 Mount	ContainerWindow		Prijungti
 %capacity (%used used -- %free free)	InfoWindow		%capacity (užpildyta %used, laisva %free)
 Cancel	FSClipBoard		Atsisakyti
+Restart Deskbar	DeskWindow		Perleisti Užduočių juostą
 Cut more	ContainerWindow		Iškirpti dar
 Deleting: 	StatusWindow		Šalinama:
 Empty Trash	InfoWindow		Ištuštinti šiukšlinę

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	1182041310
+1	romanian	x-vnd.haiku-icon_o_matic	2172106000
 Select All	Icon-O-Matic-PathManipulator		Selectează tot
 Add Style	Icon-O-Matic-AddStylesCmd		Adaugă stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Culoare (#%02x%02x%02x)
@@ -98,7 +98,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Alegeți o culoare
 Quit	Icon-O-Matic-Menu-File		Părăsește
 Export	Icon-O-Matic-Menu-File		Exportă
 No	Icon-O-Matic-StyledTextImport		Nu
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Se salvează modificările la pictograma curentă?
 Rotate indices forwards	Icon-O-Matic-PathsList		Rotește indicii înainte
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Înlătură atribuire cale
 load error	Icon-O-Matic-SVGImport		eroare de încărcare
@@ -145,7 +144,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Adaugă transformatori
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Path	Icon-O-Matic-PropertyNames		Cale
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		A eșuat deschiderea fișierului „%s” ca document SVG.\n\nEroare: %s
-Discard	Icon-O-Matic-Menu-Settings		Ignoră
 Swatches	Icon-O-Matic-Menus		Eșantioane
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponibil>
 Rotation	Icon-O-Matic-PropertyNames		Rotație

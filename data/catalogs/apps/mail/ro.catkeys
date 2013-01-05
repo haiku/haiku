@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-MAIL	4080240987
+1	romanian	x-vnd.Be-MAIL	831414304
 View	Mail		Vizualizare
 %d - Date	Mail		%d - Dată
 Attach attributes:	Mail		Atașează atribute:
@@ -23,7 +23,6 @@ Beginner	Mail		Începător
 Don't save	Mail		Nu salva
 Expert	Mail		Expert
 Reply account:	Mail		Cont de răspuns:
-Discard	Mail		Ignoră
 Message	Mail		Mesaj
 Reply to sender	Mail		Răspunde la expeditor
 There is no installed handler for URL links.	Mail		Nu există un operator instalat pentru legături URL.
@@ -112,7 +111,6 @@ Remove enclosure	Mail		Elimină contur
 Account:	Mail		Cont:
 Decoding:	Mail		Decodare:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Îmi pare rău, nu s-a putut găsi o aplicație care suportă tipul de date „Persoană”.
-Do you wish to send this message before closing?	Mail		Doriți să trimiteți acest mesaj înainte de închidere?
 Delete	Mail		Șterge
 Leave as '%s'	Mail		Menține ca „%s”
 Copy	Mail		Copiază
@@ -128,7 +126,6 @@ Font:	Mail		Font:
 (Address unavailable)	Mail		(Adresă indisponibilă)
 Save address	Mail		Salvează adresa
 Queries	Mail		Interogări
-Do you wish to save this message as a draft before closing?	Mail		Doriți să salvați acest mesaj ca o ciornă înainte de închidere?
 Save	Mail		Salvează
 Random	Mail		Aleator
 Close and 	Mail		Închide și

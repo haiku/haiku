@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	2079362081
+1	hungarian	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		Mind kijelölése
 Add Style	Icon-O-Matic-AddStylesCmd		Stílus hozzáadása
 Color (#%02x%02x%02x)	Style name after dropping a color		Szín (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		Névtelen
 Multi Set 	Multi Set (property name)		Többszörös beállítás
 any of the other lists to	Empty property list - 2nd line		a többi listában
 Save as…	Icon-O-Matic-Menu-File		Mentés másként…
+Don't save	Icon-O-Matic-Menu-Settings		Ne mentse
 Change Color	Icon-O-Matic-SetColorCmd		Szín váltása
 Style	Icon-O-Matic-Menus		Stílus
 <modify path>	Icon-O-Matic-PathCmd		<útvonal módosítása>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Visszavonás
 Click on a shape above	Empty transformers list - 1st line		Kattintson egy alakzatra
 Add Shape	Icon-O-Matic-AddShapesCmd		Alakzat hozzáadása
 Contour	Transformation		Körvonal
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Menti a változtatásokat a jelenlegi ikonba bezárás előtt?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nincs mit újra végrehajtani>
 Perspective	Transformation		Perspektíva
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Átalakító áthelyezése
@@ -99,7 +101,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Szín kiválasztása
 Quit	Icon-O-Matic-Menu-File		Kilépés
 Export	Icon-O-Matic-Menu-File		Exportálás
 No	Icon-O-Matic-StyledTextImport		Nem
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Mentsük a jelenlegi ikon változtatásait?
 Rotate indices forwards	Icon-O-Matic-PathsList		Forgatás jobbra
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Útvonal hozzárendelésének törlése
 load error	Icon-O-Matic-SVGImport		betöltési hiba
@@ -147,7 +148,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Átalakítók hozzáadása
 Diamond	Icon-O-Matic-StyleTypes		Rombusz
 Path	Icon-O-Matic-PropertyNames		Útvonal
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nem sikerült SVG dokumentumként megnyitni ezt: '%s'.\n\nHiba: %s
-Discard	Icon-O-Matic-Menu-Settings		Elvetés
 Swatches	Icon-O-Matic-Menus		Paletta
 <unavailable>	Icon-O-Matic-StyleTypes		<nem elérhető>
 Rotation	Icon-O-Matic-PropertyNames		Elforgatás

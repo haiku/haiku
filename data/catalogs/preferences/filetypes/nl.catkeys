@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-FileTypes	2496450458
+1	dutch; flemish	x-vnd.Haiku-FileTypes	1059171929
 Application types…	FileTypes Window		Toepassingstypes...
 Description:	Application Types Window		Beschrijving:
 Args only	Application Type Window		Alleen argumenten
@@ -16,7 +16,6 @@ New file type	New File Type Window		Nieuw bestandstype
 Rule:	FileTypes Window		Regel:
 Add icon…	Icon View		Icoon toevoegen…
 Multiple files from \"%s\" file type	FileType Window		Meerdere bestanden van \"%s\" bestandstype
-Do you want to save the changes?	Application Type Window		Wilt u de veranderingen opslaan?
 File type	FileType Window		Bestandstype
 Could not change attributes	Attribute Window		Kon attributen niet veranderen
 Could not retrieve preferred application of this file	Preferred App Menu		Kon de voorkeurstoepassing van dit bestand niet verkrijgen
@@ -72,7 +71,6 @@ Special:	Attribute Window		Speciaal:
 Alpha	Application Type Window		Alfa
 Add…	FileTypes Window		Toevoegen...
 Signature:	Application Type Window		Onderschrift:
-Quit, don't save	Application Type Window		Afsluiten zonder opslaan
 Add…	Application Type Window		Toevoegen…
 [Multiple files] file types	FileType Window		[Meerdere bestanden] Bestandstypen
 Information	Application Types Window		Informatie

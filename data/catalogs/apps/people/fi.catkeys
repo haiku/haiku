@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PEPL	2993050801
+1	finnish	x-vnd.Be-PEPL	3273435274
 Edit	People		Muokkaa
 Error	People		Virhe
 City	People		Kaupunki
@@ -23,7 +23,6 @@ Name	People		Nimi
 Revert	People		Palauta
 Undo	People		Peru
 E-mail	People		Sähköposti
-Save changes before quitting?	People		Tallennetaanko muutokset ennen poistumista?
 Load image…	People		Lataa kuva…
 OK	People		Valmis
 Remove image	People		Poista kuva

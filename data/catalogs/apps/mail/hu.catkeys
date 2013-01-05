@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	2319898213
+1	hungarian	x-vnd.Be-MAIL	233997769
 View	Mail		Nézet
 %d - Date	Mail		%d - dátum
 Attach attributes:	Mail		Jellemzők csatolása:
@@ -26,7 +26,6 @@ Beginner	Mail		Kezdő
 Don't save	Mail		Ne mentse
 Expert	Mail		Haladó
 Reply account:	Mail		Válaszcím:
-Discard	Mail		Elvet
 Message	Mail		Levél
 Settings…	Mail		Beállítások…
 Reply to sender	Mail		Válasz a feladónak
@@ -108,6 +107,7 @@ Close	Mail		Bezárás
 No matches	Mail		Nincs találat
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		A mail_daemon nem fut.  A levelek akkor lesznek fogadva/küldve ha majd a mail_daemon elindul.
 Really delete this signature? This cannot be undone.	Mail		Biztosan törli az aláírást? Ez nem vonható vissza.
+Save this message as a draft before closing?	Mail		Menti ezt az üzenetet piszkozatként bezárás előtt?
 Open	Mail		Megnyitás
 draft	B_USER_DIRECTORY/mail/draft		piszkozat
 Quote	Mail		Idézet
@@ -120,8 +120,8 @@ Remove enclosure	Mail		Melléklet eltávolítása
 Account:	Mail		Felhasználói fiók:
 Decoding:	Mail		Kódolás:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Sajnálom, de nem található olyan program, ami támogatja a 'Névjegy' formátumot.
-Do you wish to send this message before closing?	Mail		Elküldi az levelet bezárás előtt?
 Delete	Mail		Törlés
+Don't send	Mail		Ne küldje
 Leave as '%s'	Mail		Hagyja „%s”-ként
 Copy	Mail		Másolás
 Mail couldn't find its dictionary.	Mail		Nem található a szótár.
@@ -136,7 +136,7 @@ Font:	Mail		Betűtípus:
 (Address unavailable)	Mail		(A cím nem elérhető)
 Save address	Mail		Cím mentése
 Queries	Mail		Lekérdezések
-Do you wish to save this message as a draft before closing?	Mail		Biztosan menti piszkozatként bezárás előtt?
+Send this message before closing?	Mail		Elküldi ezt az üzenetet bezárás előtt?
 Save	Mail		Mentés
 Random	Mail		Véletlen
 Close and 	Mail		Bezárás és …

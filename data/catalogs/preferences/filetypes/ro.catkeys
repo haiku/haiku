@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-FileTypes	2037267651
+1	romanian	x-vnd.Haiku-FileTypes	599989122
 Application types…	FileTypes Window		Tipuri de aplicații...
 Description:	Application Types Window		Descriere:
 Args only	Application Type Window		Doar arg
@@ -16,7 +16,6 @@ New file type	New File Type Window		Tip de fișier nou:
 Rule:	FileTypes Window		Regulă:
 Add icon…	Icon View		Adaugă pictogramă...
 Multiple files from \"%s\" file type	FileType Window		Fișiere multiple de la tipul de fișier \„%s\”
-Do you want to save the changes?	Application Type Window		Doriți să salvați modificările?
 File type	FileType Window		Tip de fișier
 Could not change attributes	Attribute Window		Nu s-au putut modifica atributele
 Could not retrieve preferred application of this file	Preferred App Menu		Nu s-a putut obține aplicația preferată a acestui fișier
@@ -71,7 +70,6 @@ Special:	Attribute Window		Special:
 Alpha	Application Type Window		Alfa
 Add…	FileTypes Window		Adaugă...
 Signature:	Application Type Window		Semnătură:
-Quit, don't save	Application Type Window		Părăsește, nu salva
 Add…	Application Type Window		Adaugă...
 [Multiple files] file types	FileType Window		[Fișiere multiple] tipuri de fișiere
 Information	Application Types Window		Infomație

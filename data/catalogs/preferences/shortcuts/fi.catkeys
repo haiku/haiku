@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Shortcuts	621368175
+1	finnish	x-vnd.Haiku-Shortcuts	1741147146
 Error, NULL state description?\n	ShortcutsSpec		Virhe, NULL-tilakuvaus?\n
 MoveMouse	ShortcutsSpec		SiirräHiirtä
 OK	ShortcutsWindow		Valmis
@@ -43,7 +43,6 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihto-painike
 *MoveMouseTo 50% 50%	ShortcutsWindow		*SiirräHiiriKohteeseen 50% 50%
 Save KeySet as…	ShortcutsWindow		Tallenna KeySet-tiedosto nimellä…
 Open	ShortcutsWindow		Avaa
-Really quit without saving your changes?	ShortcutsWindow		Poistutko todella tallentamatta muutoksia?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
 Select	ShortcutsWindow		Valitse
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyennyt tallentamaan KeySet-tiedostoa!

@@ -1,13 +1,16 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	1195515839
+1	hungarian	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		StyledEdit
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti dokumentum (%s) változtatásait? 
 Paste	Menus		Beillesztés
 OK	LoadAlert		Rendben
 File	Menus		Fájl
 ???	LoadAlert		???
+Modified	StatusView		Módosítva
 Lines:	Statistics		Sor:
 Italic	Menus		Dőlt
 Left	Menus		Balra
 Search backwards	FindandReplaceWindow		Keresés visszafelé
+Unlock file	StatusView		Fájl feloldása
 Size	Menus		Méret
 Save	QuitAlert		Mentés
 Page setup…	Menus		Oldalbeállítás…
@@ -31,6 +34,7 @@ Autodetect	Menus		Automatikus felismerés
 Document	Menus		Dokumentum
 Save changes to the document \"%s\"? 	QuitAlert		Menti a dokumentum (%s) változtatásait? 
 Edit	Menus		Szerkesztés
+Revert	RevertToSavedAlert		Visszaállítás
 Font	Menus		Betűtípus
 Replace all	FindandReplaceWindow		Mindet cseréli
 Statistics…	Menus		Statisztika…
@@ -48,10 +52,13 @@ Don't save	QuitAlert		Ne mentse
 Align	Menus		Igazítás
 Color	Menus		Szín
 Red	Menus		Vörös
+OK	QuitAlert		Rendben
 Open…	Menus		Megnyitás…
 Center	Menus		Középre
 Blue	Menus		Kék
+Unable to unlock file\n\t%s	QuitAlert		Nem tudom feloldani a fájlt:\n\t %s
 Cyan	Menus		Cián
+line %d, column %d	StatusView		%d. sor, %d. oszlop
 OK	Statistics		Rendben
 Magenta	Menus		Bíbor
 New	Menus		Új
@@ -72,8 +79,8 @@ Don't save	SaveAlert		Ne mentsen
 Recover	NodeMonitorAlerts		Helyreállítás
 Error loading \"%s\":\n\t%s	LoadAlert		Hiba történt a betöltés (%s) közben:\n\t%s
 Ignore	NodeMonitorAlerts		Mellőzés
+Read-only	StatusView		Csak olvasható
 Undo typing	QuitAlert		Gépelés visszavonása
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti dokumentum (%s) változtatásait? 
 Black	Menus		Fekete
 Untitled 	StyledEditWindow		Névtelen
 OK	SaveAlert		Rendben

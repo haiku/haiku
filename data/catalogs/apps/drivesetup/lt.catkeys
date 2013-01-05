@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-DriveSetup	3746427159
+1	lithuanian	x-vnd.Haiku-DriveSetup	1372142450
 DriveSetup	System name		Diskų ženklintuvas
 Delete	MainWindow		Šalinti
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skaidinyje, bus negrįžtamai prarasti!
@@ -65,6 +65,7 @@ Partition	MainWindow		Skaidinys
 File system	PartitionList		Failų sistema
 Validation of the given creation parameters failed.	MainWindow		Nurodyti netinkami kūrimo parametrai.
 Size	PartitionList		Dydis
+Wipe (not implemented)	MainWindow		Ištrinti (dar nerealizuota)
 Validation of the given initialization parameters failed.	MainWindow		Nurodyti netinkami ženklinimo parametrai.
 The selected partition does not contain a partitioning system.	MainWindow		Pasirinktame skaidinyje nėra skaidinių lentelės.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys skaidinyje „%s“, bus negrįžtamai prarasti!

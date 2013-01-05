@@ -1,13 +1,15 @@
-1	slovak	x-vnd.Haiku-StyledEdit	3417936913
+1	slovak	x-vnd.Haiku-StyledEdit	2574742746
 StyledEdit	System name		StyledEdit
 Paste	Menus		Vložiť
 OK	LoadAlert		OK
 File	Menus		Súbor
 ???	LoadAlert		???
+Modified	StatusView		Zmenený
 Lines:	Statistics		Riadkov:
 Italic	Menus		Kurzíva
 Left	Menus		Vľavo
 Search backwards	FindandReplaceWindow		Hľadať dozadu
+Unlock file	StatusView		Odomknúť súbor
 Size	Menus		Veľkosť
 Save	QuitAlert		Uložiť
 Page setup…	Menus		Nastavenie stránky…
@@ -19,21 +21,27 @@ Cancel	SaveAlert		Zrušiť
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie je možné vrátiť späť, súbor nebol nájdený: „%s“.
 Case-sensitive	FindandReplaceWindow		Rozlišovať veľkosť písmen
 Green	Menus		Zelená
+Reload	NodeMonitorAlerts		Obnoviť
 Yellow	Menus		Žltá
 Replace in all windows	FindandReplaceWindow		Nahradiť vo všetkých oknách
 Wrap lines	Menus		Zalamovať riadky
 Quit	Menus		Ukončiť
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Súbor „%file%“ odstránila iná aplikácia. Chcete ho obnoviť?
 Document statistics	Statistics		Štatistika dokumentu
 Cancel	RevertToSavedAlert		Zrušiť
+Autodetect	Menus		Zistiť automaticky
 Document	Menus		Dokument
 Save changes to the document \"%s\"? 	QuitAlert		Uložiť zmeny v dokumente „%s“? 
 Edit	Menus		Upraviť
+Revert	RevertToSavedAlert		Vrátiť späť
 Font	Menus		Písmo
 Replace all	FindandReplaceWindow		Nahradiť všetky
 Statistics…	Menus		Štatistika…
 Default	Open_and_SaveAsPanel		Predvolené
 Replace next	Menus		Nahradiť ďalší
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		„%s“ má neuložené zmeny.\nChcete vrátiť späť jeho poslednú uloženú verziu?
 Cancel	FindandReplaceWindow		Zrušiť
+Text encoding	Menus		Kódovanie textu
 Close	Menus		Zatvoriť
 Save	SaveAlert		Uložiť
 Words:	Statistics		Slov:
@@ -43,10 +51,13 @@ Don't save	QuitAlert		Neukladať
 Align	Menus		Zarovnať
 Color	Menus		Farba
 Red	Menus		Červená
+OK	QuitAlert		OK
 Open…	Menus		Otvoriť…
 Center	Menus		Stred
 Blue	Menus		Modrá
+Unable to unlock file\n\t%s	QuitAlert		Nebolo možné odomknúť súbor\n\t%s
 Cyan	Menus		Azúrová
+line %d, column %d	StatusView		riadok %d, stĺpec %d
 OK	Statistics		OK
 Magenta	Menus		Purpurová
 New	Menus		Nový
@@ -57,15 +68,18 @@ Find:	FindandReplaceWindow		Nájsť:
 Error saving \"%s\":\n%s	SaveAlert		Chyba pri ukladaní „%s“:\n%s
 Copy	Menus		Kopírovať
 Cut	Menus		Vystrihnúť
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Súbor „%file%“ zmenila iná aplikácia. Chcete ho znovu načítať?
 Replace	FindandReplaceWindow		Nahradiť
 Find again	Menus		Nájsť znova
 Cancel	QuitAlert		Zrušiť
 Find…	Menus		Nájsť…
 Select all	Menus		Vybrať všetky
 Don't save	SaveAlert		Neukladať
+Recover	NodeMonitorAlerts		Obnoviť
 Error loading \"%s\":\n\t%s	LoadAlert		Chyba pri načítaní „%s“:\n\t%s
+Ignore	NodeMonitorAlerts		Ignorovať
+Read-only	StatusView		Iba na čítanie
 Undo typing	QuitAlert		Vrátiť späť písanie
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tetnto súbor je označený ako len na čítanie. Uložiť zmeny do dokumentu „%s“? 
 Black	Menus		Čierna
 Untitled 	StyledEditWindow		Bez názvu 
 OK	SaveAlert		OK
@@ -74,5 +88,6 @@ Encoding	Open_and_SaveAsPanel		Kódovanie
 Characters:	Statistics		Znakov:
 Save as…	Menus		Uložiť ako…
 Redo typing	QuitAlert		Opakovať písanie
+Reload…	Menus		Znovu načítať...
 Replace…	Menus		Nahradiť…
 Right	Menus		Vpravo

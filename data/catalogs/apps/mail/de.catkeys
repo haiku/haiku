@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	2319898213
+1	german	x-vnd.Be-MAIL	3366038826
 View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attribute von Anhängen:
@@ -26,7 +26,6 @@ Beginner	Mail		Anfänger
 Don't save	Mail		Verwerfen
 Expert	Mail		Experte
 Reply account:	Mail		Konto zum Beantworten:
-Discard	Mail		Verwerfen
 Message	Mail		Nachricht
 Settings…	Mail		Einstellungen…
 Reply to sender	Mail		Antwort an Absender
@@ -120,7 +119,6 @@ Remove enclosure	Mail		Anhang entfernen
 Account:	Mail		Konto:
 Decoding:	Mail		Kodierung:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Es konnte leider keine Anwendung gefunden werden, die den Datentyp 'Person' unterstützt.
-Do you wish to send this message before closing?	Mail		Soll diese Nachricht gesendet werden, bevor sie geschlossen wird?
 Delete	Mail		Löschen
 Leave as '%s'	Mail		Status '%s' belassen
 Copy	Mail		Kopieren
@@ -136,7 +134,6 @@ Font:	Mail		Schriftart:
 (Address unavailable)	Mail		(Adresse nicht verfügbar)
 Save address	Mail		Adresse speichern
 Queries	Mail		Queries
-Do you wish to save this message as a draft before closing?	Mail		Soll die Nachricht als Entwurf gespeichert werden, bevor sie geschlossen wird?
 Save	Mail		Speichern
 Random	Mail		Zufällig
 Close and 	Mail		Schließen und

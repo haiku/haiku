@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Shortcuts	621368175
+1	romanian	x-vnd.Haiku-Shortcuts	1741147146
 Error, NULL state description?\n	ShortcutsSpec		Eroare, descriere stare NULL?\n
 MoveMouse	ShortcutsSpec		MutăMaus
 OK	ShortcutsWindow		OK
@@ -43,7 +43,6 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MutăMausLa 50% 50%
 Save KeySet as…	ShortcutsWindow		Salvează set de taste ca...
 Open	ShortcutsWindow		Deschide
-Really quit without saving your changes?	ShortcutsWindow		Sigur doriți să închideți fără a salva modificările?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Scurtături nu a putut analiza fișierul dumneavoastră set de taste!
 Select	ShortcutsWindow		Selectează
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Scurtături nu a putut salva fișierul dumneavoastră set de taste!

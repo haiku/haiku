@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	3417936913
+1	french	x-vnd.Haiku-StyledEdit	3117187160
 StyledEdit	System name		Éditeur stylé
 Paste	Menus		Coller
 OK	LoadAlert		OK
@@ -65,7 +65,6 @@ Select all	Menus		Selectionner tout
 Don't save	SaveAlert		Ne pas enregistrer
 Error loading \"%s\":\n\t%s	LoadAlert		Erreur au de chargement de « %s » :\n\t%s
 Undo typing	QuitAlert		Annuler la saisie
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ?
 Black	Menus		Noir
 Untitled 	StyledEditWindow		Sans titre
 OK	SaveAlert		OK

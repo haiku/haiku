@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	1599879742
+1	french	x-vnd.Be-MAIL	2646020355
 View	Mail		Vue
 %d - Date	Mail		%d - Date
 Attach attributes:	Mail		Attributs du fichier joint :
@@ -25,7 +25,6 @@ Beginner	Mail		Débutant
 Don't save	Mail		Ne pas enregistrer
 Expert	Mail		Expert
 Reply account:	Mail		Compte de réponse :
-Discard	Mail		Ignorer
 Message	Mail		Message
 Settings…	Mail		Réglages…
 Reply to sender	Mail		Répondre à l'expéditeur
@@ -119,7 +118,6 @@ Remove enclosure	Mail		Enlever la pièce jointe
 Account:	Mail		Compte :
 Decoding:	Mail		Décodage :
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Désolé, aucune application ne peut ouvrir les données de type « Person ».
-Do you wish to send this message before closing?	Mail		Voulez-vous fermer ce message avant de l'envoyer ?
 Delete	Mail		Effacer
 Leave as '%s'	Mail		Laisser « %s »
 Copy	Mail		Copier
@@ -135,7 +133,6 @@ Font:	Mail		Police :
 (Address unavailable)	Mail		(Adresse non disponible)
 Save address	Mail		Enregistrer l'adresse
 Queries	Mail		Requêtes
-Do you wish to save this message as a draft before closing?	Mail		Voulez-vous sauvegarder ce message en tant que brouillon avant de le fermer ?
 Save	Mail		Sauvegarder
 Random	Mail		Aléatoire
 Close and 	Mail		Fermer et 

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	1195515839
+1	swedish	x-vnd.Haiku-StyledEdit	894766086
 StyledEdit	System name		SkrivStiligt
 Paste	Menus		Klistra in
 OK	LoadAlert		OK
@@ -73,7 +73,6 @@ Recover	NodeMonitorAlerts		Återskapa
 Error loading \"%s\":\n\t%s	LoadAlert		Fel vid inläsning "%s":\n\t%s
 Ignore	NodeMonitorAlerts		Ignorera
 Undo typing	QuitAlert		Ångra inmatning
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Denna fil är markerad som endast läsbar. Vill du spara ändringarna till dokumentet "%s"?
 Black	Menus		Svart
 Untitled 	StyledEditWindow		Namnlös 
 OK	SaveAlert		OK

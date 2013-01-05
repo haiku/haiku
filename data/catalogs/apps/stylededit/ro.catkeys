@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-StyledEdit	3417936913
+1	romanian	x-vnd.Haiku-StyledEdit	3117187160
 StyledEdit	System name		EditorText
 Paste	Menus		Lipește
 OK	LoadAlert		OK
@@ -65,7 +65,6 @@ Select all	Menus		Selectează tot
 Don't save	SaveAlert		Nu salva
 Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui „%s”:\n\t%s
 Undo typing	QuitAlert		Refă tastarea
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Acest fișier este marcat ca fiind protejat la scriere. Salvați modificările la documentul „%s”?
 Black	Menus		Negru
 Untitled 	StyledEditWindow		Fără titlu
 OK	SaveAlert		OK

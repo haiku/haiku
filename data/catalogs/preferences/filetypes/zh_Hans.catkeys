@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-FileTypes	2496450458
+1	english	x-vnd.Haiku-FileTypes	1059171929
 Application types…	FileTypes Window		应用程序类型...
 Description:	Application Types Window		描述：
 Args only	Application Type Window		仅含参数
@@ -16,7 +16,6 @@ New file type	New File Type Window		新建文件类型
 Rule:	FileTypes Window		规则：
 Add icon…	Icon View		增加图标…
 Multiple files from \"%s\" file type	FileType Window		\"%s\"文件类型的复合文件
-Do you want to save the changes?	Application Type Window		是否保留配置?
 File type	FileType Window		文件类型
 Could not change attributes	Attribute Window		无法改变属性
 Could not retrieve preferred application of this file	Preferred App Menu		未检索到该文件的首选程序
@@ -72,7 +71,6 @@ Special:	Attribute Window		特性:
 Alpha	Application Type Window		内测版
 Add…	FileTypes Window		添加...
 Signature:	Application Type Window		署名：
-Quit, don't save	Application Type Window		不保存，退出
 Add…	Application Type Window		添加…
 [Multiple files] file types	FileType Window		[复合文件]类型
 Information	Application Types Window		信息

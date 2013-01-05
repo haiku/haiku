@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1574172506
+1	slovak	x-vnd.Haiku-libtracker	4228765353
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -451,6 +451,7 @@ Mount	DeskWindow		Pripojiť
 Mount	ContainerWindow		Pripojiť
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used využité -- %free voľné)
 Cancel	FSClipBoard		Zrušiť
+Restart Deskbar	DeskWindow		Reštartovať Panel
 Cut more	ContainerWindow		Vystrihnúť viac
 Deleting: 	StatusWindow		Maže sa: 
 Empty Trash	InfoWindow		Vyprázdniť Kôš

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-FileTypes	2496450458
+1	japanese	x-vnd.Haiku-FileTypes	1059171929
 Application types…	FileTypes Window		アプリケーションタイプ…
 Description:	Application Types Window		説明：
 Args only	Application Type Window		引数のみ
@@ -16,7 +16,6 @@ New file type	New File Type Window		新規ファイルタイプ
 Rule:	FileTypes Window		ルール：
 Add icon…	Icon View		アイコンを追加…
 Multiple files from \"%s\" file type	FileType Window		\"%s\"というファイルタイプで始まる複数ファイル
-Do you want to save the changes?	Application Type Window		変更を保存しますか？
 File type	FileType Window		ファイルタイプ
 Could not change attributes	Attribute Window		属性を変更できません
 Could not retrieve preferred application of this file	Preferred App Menu		このファイルの優先アプリケーションを検索できませんでした。
@@ -72,7 +71,6 @@ Special:	Attribute Window		特別：
 Alpha	Application Type Window		アルファ版
 Add…	FileTypes Window		追加…
 Signature:	Application Type Window		署名:
-Quit, don't save	Application Type Window		保存せずに終了する
 Add…	Application Type Window		追加…
 [Multiple files] file types	FileType Window		[複数ファイル] ファイルタイプ
 Information	Application Types Window		情報

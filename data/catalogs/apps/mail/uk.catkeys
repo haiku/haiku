@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	2794882281
+1	ukrainian	x-vnd.Be-MAIL	3841022894
 View	Mail		Вигляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Додати атрибути:
@@ -25,7 +25,6 @@ Beginner	Mail		Початківець
 Don't save	Mail		Не зберігати
 Expert	Mail		Експерт
 Reply account:	Mail		Аккаунт для відповіді:
-Discard	Mail		Завершити
 Message	Mail		Повідомлення
 Reply to sender	Mail		Відповісти відправникові
 There is no installed handler for URL links.	Mail		Не встановлено обробник посилань URL
@@ -113,7 +112,6 @@ Remove enclosure	Mail		Видалити вкладення
 Account:	Mail		Аккаунт:
 Decoding:	Mail		Розкодування:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Вибачте не знайдено жодного додатка що підтримує дані типу 'Person'.
-Do you wish to send this message before closing?	Mail		Бажаєте відправити лист до закриття?
 Delete	Mail		Видалити
 Leave as '%s'	Mail		Зберегти як '%s'
 Copy	Mail		Копіювати
@@ -129,7 +127,6 @@ Font:	Mail		Шрифт:
 (Address unavailable)	Mail		(Адреса недоступна)
 Save address	Mail		Зберегти адресу
 Queries	Mail		Запити
-Do you wish to save this message as a draft before closing?	Mail		Бажаєте зберегти цей лист як чорновик перед закриттям?
 Save	Mail		Зберегти
 Random	Mail		Випадковий
 Close and 	Mail		Закрити і

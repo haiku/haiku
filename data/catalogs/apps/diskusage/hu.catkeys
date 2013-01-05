@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DiskUsage	274830116
+1	hungarian	x-vnd.Haiku-DiskUsage	3631077986
 Scanning %refName%	Scanner		%refName% elemzése
 Size	Info Window		Méret
 Rescan	Pie View		Újraelemzés
@@ -11,12 +11,14 @@ Scan	Status View		Elemzés
 9999.99 GB	Status View		9999,99 GB
 Rescan	Status View		Újraelemzés
 file unavailable	Status View		fájl nem elérhető
+Get info	Pie View		Információ
 DiskUsage	System name		Lemezhasználat
  in %d files	Info Window		%d fájlban.
 %d files	Status View		%d fájl
 Created	Info Window		Létrehozva
 Modified	Info Window		Módosítva
 Abort	Status View		Megszakítás
+Open with	Pie View		Megnyitás ezzel
 Open	Pie View		Megnyitás
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		%refName% szabad területe

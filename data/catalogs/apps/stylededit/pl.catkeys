@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-StyledEdit	1195515839
+1	polish	x-vnd.Haiku-StyledEdit	894766086
 StyledEdit	System name		StyledEdit
 Paste	Menus		Wklej
 OK	LoadAlert		OK
@@ -73,7 +73,6 @@ Recover	NodeMonitorAlerts		Odzyskaj
 Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania \"%s\":\n\t%s
 Ignore	NodeMonitorAlerts		Ignoruj
 Undo typing	QuitAlert		Cofnij pisanie
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Zapisać zmiany w dokumencie \"%s\"? 
 Black	Menus		Czarny
 Untitled 	StyledEditWindow		Bez tytułu 
 OK	SaveAlert		OK

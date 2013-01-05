@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	830768065
+1	lithuanian	x-vnd.haiku-icon_o_matic	1820832755
 Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
 Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
 Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
@@ -98,7 +98,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Parinkite spalvą
 Quit	Icon-O-Matic-Menu-File		Baigti darbą
 Export	Icon-O-Matic-Menu-File		Eksportuoti
 No	Icon-O-Matic-StyledTextImport		Ne
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Ar norite įrašyti šios piktogramos pakeitimus?
 Rotate indices forwards	Icon-O-Matic-PathsList		Perkelti galus pirmyn
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Pašalinti kreivės priskyrimą
 load error	Icon-O-Matic-SVGImport		įkėlimo klaida
@@ -145,7 +144,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Pridėti transformatorius
 Diamond	Icon-O-Matic-StyleTypes		Rombinis
 Path	Icon-O-Matic-PropertyNames		Kreivė
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nepavyko atverti failo „%s“ kaip SVG dokumento.\n\nKlaida: %s
-Discard	Icon-O-Matic-Menu-Settings		Neįrašyti
 Swatches	Icon-O-Matic-Menus		Paletė
 <unavailable>	Icon-O-Matic-StyleTypes		<nepasiekiamas>
 Rotation	Icon-O-Matic-PropertyNames		Pasukimas

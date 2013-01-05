@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	2079362081
+1	russian	x-vnd.haiku-icon_o_matic	3069426771
 Select All	Icon-O-Matic-PathManipulator		Выделить всё
 Add Style	Icon-O-Matic-AddStylesCmd		Добавить стиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Цвет (#%02x%02x%02x)
@@ -99,7 +99,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Выберите цвет
 Quit	Icon-O-Matic-Menu-File		Выход
 Export	Icon-O-Matic-Menu-File		Экспортировать
 No	Icon-O-Matic-StyledTextImport		Нет
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Сохранить изменения в текущем значке?
 Rotate indices forwards	Icon-O-Matic-PathsList		Переместить начало контура вперед
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Непринятый контур
 load error	Icon-O-Matic-SVGImport		ошибка загрузки
@@ -147,7 +146,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Добавить трансф�
 Diamond	Icon-O-Matic-StyleTypes		Ромбовидный
 Path	Icon-O-Matic-PropertyNames		Контур
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Не удалось открыть файл '%s' как SVG документ.\n\nError: %s
-Discard	Icon-O-Matic-Menu-Settings		Не сохранять
 Swatches	Icon-O-Matic-Menus		Палитра
 <unavailable>	Icon-O-Matic-StyleTypes		<недоступно>
 Rotation	Icon-O-Matic-PropertyNames		Поворот

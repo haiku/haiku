@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Shortcuts	621368175
+1	english	x-vnd.Haiku-Shortcuts	1741147146
 Error, NULL state description?\n	ShortcutsSpec		错误，无效状态描述？\n
 MoveMouse	ShortcutsSpec		鼠标移动
 OK	ShortcutsWindow		确定
@@ -43,7 +43,6 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 5o%
 Save KeySet as…	ShortcutsWindow		保存按键设置…
 Open	ShortcutsWindow		打开
-Really quit without saving your changes?	ShortcutsWindow		退出，不保存您的修改
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		无法解析您的按键设置文件！
 Select	ShortcutsWindow		选择
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		无法保存您的按键设置文件！

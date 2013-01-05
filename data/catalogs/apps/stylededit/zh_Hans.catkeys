@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-StyledEdit	3417936913
+1	english	x-vnd.Haiku-StyledEdit	3117187160
 StyledEdit	System name		StyledEdit
 Paste	Menus		粘贴
 OK	LoadAlert		确定
@@ -65,7 +65,6 @@ Select all	Menus		全选
 Don't save	SaveAlert		不保存
 Error loading \"%s\":\n\t%s	LoadAlert		加载错误 \"%s\"\n\t%s
 Undo typing	QuitAlert		取消输入
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		文件为只读。将所做更改保存到文档\"%s\"吗?
 Black	Menus		黑色
 Untitled 	StyledEditWindow		未命名
 OK	SaveAlert		确定

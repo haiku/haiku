@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	3417936913
+1	russian	x-vnd.Haiku-StyledEdit	3117187160
 StyledEdit	System name		Стильный редактор
 Paste	Menus		Вставить
 OK	LoadAlert		ОК
@@ -65,7 +65,6 @@ Select all	Menus		Выделить всё
 Don't save	SaveAlert		Не сохранять
 Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
 Undo typing	QuitAlert		Отменить ввод
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
 Black	Menus		Черный
 Untitled 	StyledEditWindow		Новый документ 
 OK	SaveAlert		ОК

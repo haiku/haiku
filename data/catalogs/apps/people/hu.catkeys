@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-PEPL	2993050801
+1	hungarian	x-vnd.Be-PEPL	2332202134
 Edit	People		Szerkesztés
 Error	People		Hiba
 City	People		Város
@@ -21,9 +21,9 @@ Nickname	People		Becenév
 Quit	People		Kilépés
 Name	People		Név
 Revert	People		Visszaállít
+Don't save	People		Ne mentse
 Undo	People		Visszavonás
 E-mail	People		E-mail
-Save changes before quitting?	People		Kilépés előtt mentsük a változtatásokat?
 Load image…	People		Kép betöltése…
 OK	People		Rendben
 Remove image	People		Kép eltávolítása
@@ -31,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Otthoni telefon
 Save as…	People		Mentés másként…
 Redo	People		Újra
+Save changes before closing?	People		Menti a változtatásokat kilépés előtt?
 Paste	People		Beillesztés
 Drop an image here,\nor use the contextual menu.	People		Húzzon ide egy képet,\nvagy válasszon a menüben.
 Save	People		Mentés

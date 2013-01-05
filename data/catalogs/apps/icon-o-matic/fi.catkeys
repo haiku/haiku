@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	2079362081
+1	finnish	x-vnd.haiku-icon_o_matic	3069426771
 Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
 Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
@@ -99,7 +99,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Poimi väri
 Quit	Icon-O-Matic-Menu-File		Poistu
 Export	Icon-O-Matic-Menu-File		Vie
 No	Icon-O-Matic-StyledTextImport		Ei
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Tallenna muutokset nykyiseen kuvakkeeseen?
 Rotate indices forwards	Icon-O-Matic-PathsList		Pyöritä osoittimia eteenpäin
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Liittämätön polku
 load error	Icon-O-Matic-SVGImport		lataa virhe
@@ -147,7 +146,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Lisää muuntimet
 Diamond	Icon-O-Matic-StyleTypes		Vinoneliö
 Path	Icon-O-Matic-PropertyNames		Polku
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Tiedoston ’%s’ avaaminen SVG-asiakirjana epäonnistui.\n\nVirhe: %s
-Discard	Icon-O-Matic-Menu-Settings		Hylkää
 Swatches	Icon-O-Matic-Menus		Palaset
 <unavailable>	Icon-O-Matic-StyleTypes		<ei ole käytettävissä>
 Rotation	Icon-O-Matic-PropertyNames		Kierto

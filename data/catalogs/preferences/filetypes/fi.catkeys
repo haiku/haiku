@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-FileTypes	2496450458
+1	finnish	x-vnd.Haiku-FileTypes	1059171929
 Application types…	FileTypes Window		Sovellustyypit…
 Description:	Application Types Window		Kuvaus:
 Args only	Application Type Window		Vain argumentit
@@ -16,7 +16,6 @@ New file type	New File Type Window		Uusi tiedostotyyppi
 Rule:	FileTypes Window		Sääntö:
 Add icon…	Icon View		Lisää kuvake…
 Multiple files from \"%s\" file type	FileType Window		Useita tiedostoja ”%s”-tiedostotyypistä
-Do you want to save the changes?	Application Type Window		Haluatko tallentaa muutokset?
 File type	FileType Window		Tiedostotyyppi
 Could not change attributes	Attribute Window		Ei voitu muuttaa attribuutteja
 Could not retrieve preferred application of this file	Preferred App Menu		Ei voitu noutaa tämän tiedoston ensisijaista sovellusta
@@ -72,7 +71,6 @@ Special:	Attribute Window		Erityinen:
 Alpha	Application Type Window		Alfa
 Add…	FileTypes Window		Lisää…
 Signature:	Application Type Window		Allekirjoitus:
-Quit, don't save	Application Type Window		Poistu, älä tallenna
 Add…	Application Type Window		Lisää…
 [Multiple files] file types	FileType Window		[Useita tiedostoja] tiedostotyypit
 Information	Application Types Window		Tiedot

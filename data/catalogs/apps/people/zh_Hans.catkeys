@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-PEPL	2993050801
+1	english	x-vnd.Be-PEPL	3273435274
 Edit	People		编辑
 Error	People		错误
 City	People		城市
@@ -23,7 +23,6 @@ Name	People		名字
 Revert	People		恢复
 Undo	People		取消
 E-mail	People		电子邮箱
-Save changes before quitting?	People		退出前保存更改？
 Load image…	People		载入图像...
 OK	People		确定
 Remove image	People		删除图像

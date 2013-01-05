@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PEPL	2993050801
+1	japanese	x-vnd.Be-PEPL	3273435274
 Edit	People		編集
 Error	People		エラー
 City	People		市町村
@@ -23,7 +23,6 @@ Name	People		名前
 Revert	People		元に戻す
 Undo	People		元に戻す
 E-mail	People		E-mail
-Save changes before quitting?	People		終了前に保存しますか?
 Load image…	People		イメージを読み込む…
 OK	People		OK
 Remove image	People		イメージを削除する

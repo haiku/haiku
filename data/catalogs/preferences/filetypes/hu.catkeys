@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-FileTypes	2496450458
+1	hungarian	x-vnd.Haiku-FileTypes	133192727
 Application types…	FileTypes Window		Programtípusok…
 Description:	Application Types Window		Leírás:
 Args only	Application Type Window		Csak paraméterek
@@ -16,7 +16,6 @@ New file type	New File Type Window		Új fájltípus
 Rule:	FileTypes Window		Szabály:
 Add icon…	Icon View		Ikon hozzáadása…
 Multiple files from \"%s\" file type	FileType Window		Több \"%s\" típusú fájl
-Do you want to save the changes?	Application Type Window		Elmenti a változtatásokat?
 File type	FileType Window		Fájltípus
 Could not change attributes	Attribute Window		Nem lehetett módosítani a jellemzőket
 Could not retrieve preferred application of this file	Preferred App Menu		Nem található az ehhez a fájlhoz használandó program
@@ -50,6 +49,8 @@ Group name:	New File Type Window		Csoport neve:
 Preferred application	FileType Window		Előnyben részesített program
 Progress	Application Types Window		Folyamat
 Set preferred application	Preferred App Menu		Előnyben részesített program megadása
+Don't save	Application Type Window		Ne mentse
+Save changes before closing?	Application Type Window		Menti a változtatásokat kilépés előtt?
 File	Application Type Window		Fájl
 Version:	Application Type Window		Verzió:
 Select…	FileTypes Window		Kiválasztás…
@@ -72,7 +73,6 @@ Special:	Attribute Window		Különleges:
 Alpha	Application Type Window		Alfa
 Add…	FileTypes Window		Hozzáadás…
 Signature:	Application Type Window		Aláírás:
-Quit, don't save	Application Type Window		Kilépés mentés nélkül
 Add…	Application Type Window		Hozzáadás…
 [Multiple files] file types	FileType Window		[Többféle fájl] fájltípusai
 Information	Application Types Window		Információ

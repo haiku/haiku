@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	621368175
+1	swedish	x-vnd.Haiku-Shortcuts	1741147146
 Error, NULL state description?\n	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?\n
 MoveMouse	ShortcutsSpec		FlyttaMus
 OK	ShortcutsWindow		OK
@@ -43,7 +43,6 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Skift
 *MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttaMuspekareTill 50% 50%
 Save KeySet as…	ShortcutsWindow		Spara som...
 Open	ShortcutsWindow		Öppna
-Really quit without saving your changes?	ShortcutsWindow		Vill du verkligen avsluta utan att spara ändringarna?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genvägar kunde inte läsa dina inställningar!
 Select	ShortcutsWindow		Välj
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genvägar kunde inte spara dina inställningar!

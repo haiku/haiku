@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-PEPL	2993050801
+1	german	x-vnd.Be-PEPL	3273435274
 Edit	People		Bearbeiten
 Error	People		Fehler
 City	People		Stadt
@@ -23,7 +23,6 @@ Name	People		Name
 Revert	People		Anfangswerte
 Undo	People		Rückgängig
 E-mail	People		E-mail
-Save changes before quitting?	People		Änderungen vor dem Beenden speichern?
 Load image…	People		Bild laden…
 OK	People		OK
 Remove image	People		Bild löschen

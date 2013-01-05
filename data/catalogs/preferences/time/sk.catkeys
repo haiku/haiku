@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Time	3249243267
+1	slovak	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		GMT (kompatibilné s Unixom)
 OK	Time		OK
 Asia	Time		Ázia
@@ -40,5 +40,6 @@ Try all servers	Time		Skúsiť všetky servery
 Time zone	Time		Časové pásmo
 Could not create socket	Time		Nepodarilo sa vytvoriť socket
 Synchronize again	Time		Synchronizovať znova
+Clock	Time		Hodiny
 Network time	Time		Čas v sieti
 Atlantic	Time		Atlantik

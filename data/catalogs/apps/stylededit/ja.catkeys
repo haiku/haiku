@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	1195515839
+1	japanese	x-vnd.Haiku-StyledEdit	1800388735
 StyledEdit	System name		StyledEdit
 Paste	Menus		貼り付け
 OK	LoadAlert		OK
@@ -8,6 +8,7 @@ Lines:	Statistics		行数:
 Italic	Menus		イタリック
 Left	Menus		左揃え
 Search backwards	FindandReplaceWindow		逆方向検索
+Unlock file	StatusView		ロック解除
 Size	Menus		サイズ
 Save	QuitAlert		保存
 Page setup…	Menus		ページ設定…
@@ -31,6 +32,7 @@ Autodetect	Menus		自動判別
 Document	Menus		ドキュメント
 Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
 Edit	Menus		編集
+Revert	RevertToSavedAlert		取り消し
 Font	Menus		フォント
 Replace all	FindandReplaceWindow		すべて置換
 Statistics…	Menus		統計…
@@ -48,10 +50,13 @@ Don't save	QuitAlert		保存しない
 Align	Menus		配置
 Color	Menus		色
 Red	Menus		赤
+OK	QuitAlert		OK
 Open…	Menus		開く…
 Center	Menus		中央揃え
 Blue	Menus		青
+Unable to unlock file\n\t%s	QuitAlert		以下のファイルのロック解除が出来ません\n\t%s
 Cyan	Menus		水色
+line %d, column %d	StatusView		%d 行, %d 列
 OK	Statistics		OK
 Magenta	Menus		紫
 New	Menus		新規作成
@@ -72,8 +77,8 @@ Don't save	SaveAlert		保存しない
 Recover	NodeMonitorAlerts		回復
 Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラー発生：\n\t%s
 Ignore	NodeMonitorAlerts		無視
+Read-only	StatusView		読み込み専用
 Undo typing	QuitAlert		元に戻す
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？
 Black	Menus		黒
 Untitled 	StyledEditWindow		無題
 OK	SaveAlert		Ok

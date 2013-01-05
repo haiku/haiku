@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-FileTypes	2496450458
+1	polish	x-vnd.Haiku-FileTypes	1059171929
 Application types…	FileTypes Window		Typy aplikacji…
 Description:	Application Types Window		Opis:
 Args only	Application Type Window		Tylko argumenty
@@ -16,7 +16,6 @@ New file type	New File Type Window		Nowy typ pliku
 Rule:	FileTypes Window		Zasada:
 Add icon…	Icon View		Dodaj ikonę…
 Multiple files from \"%s\" file type	FileType Window		Wiele plików z typu pliku \"%s\"
-Do you want to save the changes?	Application Type Window		Czy chcesz zapisać zmiany?
 File type	FileType Window		Typ pliku
 Could not change attributes	Attribute Window		Nie można zmienić atrybutów
 Could not retrieve preferred application of this file	Preferred App Menu		Nie można odnaleźć preferowanej aplikacji dla tego typu pliku
@@ -72,7 +71,6 @@ Special:	Attribute Window		Specjalne:
 Alpha	Application Type Window		Alpha
 Add…	FileTypes Window		Dodaj…
 Signature:	Application Type Window		Sygnatura:
-Quit, don't save	Application Type Window		Wyjdź i nie zapisuj
 Add…	Application Type Window		Dodaj…
 [Multiple files] file types	FileType Window		[Wiele plików] typów plików
 Information	Application Types Window		Informacje

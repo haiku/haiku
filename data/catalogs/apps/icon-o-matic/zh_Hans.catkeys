@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	2079362081
+1	english	x-vnd.haiku-icon_o_matic	3069426771
 Select All	Icon-O-Matic-PathManipulator		全选
 Add Style	Icon-O-Matic-AddStylesCmd		添加样式
 Color (#%02x%02x%02x)	Style name after dropping a color		颜色(#%02x%02x%02x)
@@ -99,7 +99,6 @@ Pick a color	Icon-O-Matic-ColorPicker		选择颜色
 Quit	Icon-O-Matic-Menu-File		退出
 Export	Icon-O-Matic-Menu-File		导出
 No	Icon-O-Matic-StyledTextImport		否
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		保存修改到当前图标？
 Rotate indices forwards	Icon-O-Matic-PathsList		顺时针旋转
 Unassign Path	Icon-O-Matic-UnassignPathCmd		取消路径
 load error	Icon-O-Matic-SVGImport		加载错误
@@ -147,7 +146,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		添加转换器
 Diamond	Icon-O-Matic-StyleTypes		菱形
 Path	Icon-O-Matic-PropertyNames		路径
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		无法以 SVG 格式打开 '%s' 。\n\n错误：%s
-Discard	Icon-O-Matic-Menu-Settings		放弃
 Swatches	Icon-O-Matic-Menus		调色板
 <unavailable>	Icon-O-Matic-StyleTypes		<不可用>
 Rotation	Icon-O-Matic-PropertyNames		旋转

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	2037267651
+1	ukrainian	x-vnd.Haiku-FileTypes	599989122
 Application types…	FileTypes Window		Типи додатків…
 Description:	Application Types Window		Опис:
 Args only	Application Type Window		Тільки аргументи
@@ -16,7 +16,6 @@ New file type	New File Type Window		Новий тип файлу
 Rule:	FileTypes Window		Правило:
 Add icon…	Icon View		Додати іконку…
 Multiple files from \"%s\" file type	FileType Window		Багаточисельні файли з\"%s\" типу файлу
-Do you want to save the changes?	Application Type Window		Бажаєте зберегти зміни?
 File type	FileType Window		Тип файлу
 Could not change attributes	Attribute Window		Неможливо змінити атрибути
 Could not retrieve preferred application of this file	Preferred App Menu		Неможливо виправити бажаний додаток для цього файлу
@@ -71,7 +70,6 @@ Special:	Attribute Window		Особливий:
 Alpha	Application Type Window		Альфа
 Add…	FileTypes Window		Додати…
 Signature:	Application Type Window		Підпис
-Quit, don't save	Application Type Window		Вийти без збереження
 Add…	Application Type Window		Додати…
 [Multiple files] file types	FileType Window		[Множинні файли] типи файлів
 Information	Application Types Window		Інформація

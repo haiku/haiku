@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.haiku-icon_o_matic	2079362081
+1	portuguese (brazil)	x-vnd.haiku-icon_o_matic	3069426771
 Select All	Icon-O-Matic-PathManipulator		Selecionar Tudo
 Add Style	Icon-O-Matic-AddStylesCmd		Adicionar Estilo
 Color (#%02x%02x%02x)	Style name after dropping a color		Cor (#%02x%02x%02x)
@@ -99,7 +99,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Selecionar uma cor
 Quit	Icon-O-Matic-Menu-File		Sair
 Export	Icon-O-Matic-Menu-File		Exportar
 No	Icon-O-Matic-StyledTextImport		Não
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Salvar alterações no ícone atual?
 Rotate indices forwards	Icon-O-Matic-PathsList		Girar índices para a frente
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Desatribuir Caminho
 load error	Icon-O-Matic-SVGImport		erro ao carregar
@@ -147,7 +146,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Adicionar Transformadores
 Diamond	Icon-O-Matic-StyleTypes		Diamante
 Path	Icon-O-Matic-PropertyNames		Caminho
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Falha ao abrir o arquivo '%s' como um documento SVG.\n\nErro: %s
-Discard	Icon-O-Matic-Menu-Settings		Descartar
 Swatches	Icon-O-Matic-Menus		Amostras
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponível>
 Rotation	Icon-O-Matic-PropertyNames		Rotação

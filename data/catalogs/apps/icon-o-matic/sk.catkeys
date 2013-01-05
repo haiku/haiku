@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	2079362081
+1	slovak	x-vnd.haiku-icon_o_matic	3069426771
 Select All	Icon-O-Matic-PathManipulator		Vybrať všetky
 Add Style	Icon-O-Matic-AddStylesCmd		Pridať štýl
 Color (#%02x%02x%02x)	Style name after dropping a color		Farba (#%02x%02x%02x)
@@ -99,7 +99,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Vybrať farbu
 Quit	Icon-O-Matic-Menu-File		Ukončiť
 Export	Icon-O-Matic-Menu-File		Exportovať
 No	Icon-O-Matic-StyledTextImport		Nie
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Uložiť zmeny aktuálnej ikony?
 Rotate indices forwards	Icon-O-Matic-PathsList		Otočiť indexy vpred
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Zrušiť priradenie cesty
 load error	Icon-O-Matic-SVGImport		chyba načítania
@@ -147,7 +146,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Pridať transformátory
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Path	Icon-O-Matic-PropertyNames		Cesta
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nepodarilo sa otvoriť súbor „%s“ ako dokument SVG.\n\nChyba: %s
-Discard	Icon-O-Matic-Menu-Settings		Zahodiť
 Swatches	Icon-O-Matic-Menus		Paleta
 <unavailable>	Icon-O-Matic-StyleTypes		<nedostupné>
 Rotation	Icon-O-Matic-PropertyNames		Otočenie

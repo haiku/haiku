@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Shortcuts	843427514
+1	lithuanian	x-vnd.Haiku-Shortcuts	1963206485
 Error, NULL state description?\n	ShortcutsSpec		Klaida. Neapibrėžta būsena?\n
 OK	ShortcutsWindow		Gerai
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko.
@@ -25,7 +25,6 @@ Application	ShortcutsWindow		Programa
 Shift	ShortcutsSpec	Name for modifier on keyboard	Lyg2
 Save KeySet as…	ShortcutsWindow		Įrašyti sparčiųjų klavišų rinkinį kaip…
 Open	ShortcutsWindow		Atverti
-Really quit without saving your changes?	ShortcutsWindow		Ar tikrai baigti programos darbą neįrašius pakeitimų?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio išanalizuoti nepavyko!
 Select	ShortcutsWindow		Pažymėti
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko!

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-icon_o_matic	2079362081
+1	swedish	x-vnd.haiku-icon_o_matic	3069426771
 Select All	Icon-O-Matic-PathManipulator		Markera allt
 Add Style	Icon-O-Matic-AddStylesCmd		Lägg till stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Färg (#%02x%02x%02x)
@@ -99,7 +99,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Välj en färg
 Quit	Icon-O-Matic-Menu-File		Avsluta
 Export	Icon-O-Matic-Menu-File		Exportera
 No	Icon-O-Matic-StyledTextImport		Nej
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Spara ändringarna för aktuell ikon?
 Rotate indices forwards	Icon-O-Matic-PathsList		Rotera indexpunkter medurs
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Avtilldela bana
 load error	Icon-O-Matic-SVGImport		laddningsfel
@@ -147,7 +146,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Lägg till omvandlare
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Path	Icon-O-Matic-PropertyNames		Bana
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Misslyckades att öppna filen '%s' som ett SVG dokument.\n\n Fel: %s
-Discard	Icon-O-Matic-Menu-Settings		Förkasta
 Swatches	Icon-O-Matic-Menus		Penslar
 <unavailable>	Icon-O-Matic-StyleTypes		<ej tillgänglig>
 Rotation	Icon-O-Matic-PropertyNames		Rotation

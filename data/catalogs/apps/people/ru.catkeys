@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PEPL	2993050801
+1	russian	x-vnd.Be-PEPL	3273435274
 Edit	People		Изменить
 Error	People		Ошибка
 City	People		Город
@@ -23,7 +23,6 @@ Name	People		Имя
 Revert	People		Вернуть
 Undo	People		Отменить
 E-mail	People		E-mail
-Save changes before quitting?	People		Сохранить изменения перед выходом?
 Load image…	People		Выбрать рисунок…
 OK	People		ОК
 Remove image	People		Удалить рисунок

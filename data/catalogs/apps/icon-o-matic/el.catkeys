@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	2591538723
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3581603413
 Select All	Icon-O-Matic-PathManipulator		Επιλογή όλων
 Add Style	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
 Color (#%02x%02x%02x)	Style name after dropping a color		Χρώμα (#%02x%02x%02x)
@@ -98,7 +98,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Διάλεξε ένα χρώμα
 Quit	Icon-O-Matic-Menu-File		Έξοδος
 Export	Icon-O-Matic-Menu-File		Εξαγωγή
 No	Icon-O-Matic-StyledTextImport		Όχι
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Αποθήκευση ρυθμίσεων στο υπάρχον εικονίδιο;
 Rotate indices forwards	Icon-O-Matic-PathsList		Περιστροφή δεικτών προς τα εμπρός
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Αφαίρεση μονοπατιού
 load error	Icon-O-Matic-SVGImport		σφάλμα φόρτωσης
@@ -145,7 +144,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Προσθήκη μεταμο�
 Diamond	Icon-O-Matic-StyleTypes		Διαμάντι
 Path	Icon-O-Matic-PropertyNames		Μονοπάτι
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Αδύνατο το άνοιγμα του αρχείου '%s' ως SVG.\n\nΣφάλμα: %s
-Discard	Icon-O-Matic-Menu-Settings		Απόρριψη
 Swatches	Icon-O-Matic-Menus		Δείγματα
 <unavailable>	Icon-O-Matic-StyleTypes		<μη διαθέσιμο>
 Rotation	Icon-O-Matic-PropertyNames		Περιστροφή

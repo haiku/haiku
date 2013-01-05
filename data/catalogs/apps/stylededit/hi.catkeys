@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-StyledEdit	3417936913
+1	hindi	x-vnd.Haiku-StyledEdit	3117187160
 StyledEdit	System name		StyledEdit
 Paste	Menus		पेस्ट
 OK	LoadAlert		ठीक है
@@ -65,7 +65,6 @@ Select all	Menus		सभी का चयन करें
 Don't save	SaveAlert		मत सहेजें
 Error loading \"%s\":\n\t%s	LoadAlert		लोड करने में त्रुटि \"%s\":\n\t%s
 Undo typing	QuitAlert		पूर्ववत टाइपिंग
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		इस फ़ाइल को केवल पढ़ने के लिए चिह्नित किया है. दस्तावेज़ में परिवर्तन सहेजें\"%s\"? 
 Black	Menus		काला
 Untitled 	StyledEditWindow		शीर्षकहीन 
 OK	SaveAlert		ठीक है

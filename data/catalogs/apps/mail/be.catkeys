@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	3337401776
+1	belarusian	x-vnd.Be-MAIL	88575093
 View	Mail		Агляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Атрыбуты ўкладання:
@@ -25,7 +25,6 @@ Beginner	Mail		Спрошчаны
 Don't save	Mail		Не захоўваць
 Expert	Mail		Поўны
 Reply account:	Mail		Акаунт для адказаў:
-Discard	Mail		Адхіліць
 Message	Mail		Паведамленне
 Settings…	Mail		Наладкі…
 Reply to sender	Mail		Адказаць адпраўніку
@@ -118,7 +117,6 @@ Remove enclosure	Mail		Выдаліць укладанне
 Account:	Mail		Акаунт:
 Decoding:	Mail		Кадаванне:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Выбачайце, але мне не ўдалося знайсці праграму якая можа працаваць с дадзенымі тыпу 'Person'.
-Do you wish to send this message before closing?	Mail		Жадаеце даслаць гэтае паведамленне да таго як закрыеце яго?
 Delete	Mail		Выдаліць
 Leave as '%s'	Mail		Пакінуць як '%s'
 Copy	Mail		Капіяваць
@@ -134,7 +132,6 @@ Font:	Mail		Шрыфт:
 (Address unavailable)	Mail		(Адрэс невядомы)
 Save address	Mail		Захаваць адрас
 Queries	Mail		Запыты
-Do you wish to save this message as a draft before closing?	Mail		Жадаеце захаваць паведамленне ў чарнавіках да таго як закрыеце яго?
 Save	Mail		Захаваць
 Random	Mail		Выпадковы
 Close and 	Mail		Закрыць ды 

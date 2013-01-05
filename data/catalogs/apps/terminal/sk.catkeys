@@ -1,7 +1,9 @@
-1	slovak	x-vnd.Haiku-Terminal	2912171349
+1	slovak	x-vnd.Haiku-Terminal	3561344903
 Not found.	Terminal TermWindow		Nenájdené.
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Change directory	Terminal TermView		Zmeniť adresár
+Cursor	Terminal AppearancePrefView		Kurzor
+Professional	Terminal colors scheme		Profesionálna
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Nový terminál
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminálu sa nepodarilo spustiť shell. Ľutujeme.
@@ -19,8 +21,11 @@ Font:	Terminal AppearancePrefView		Písmo:
 Copy here	Terminal TermView		Skopírovať sem
 Really close?	Terminal TermWindow		Skutočne zatvoriť?
 Copy	Terminal TermWindow		Skopírovať
+Color scheme:	Terminal AppearancePrefView		Schéma farieb:
 Window title:	Terminal TermWindow		Titulok okna:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná voľba „%s“\n
+Blue	Terminal colors scheme		Modrá
+Custom	Terminal colors scheme		Vlastné
 %app% settings	Terminal PrefWindow	window title	%app% - nastavenia
 Cancel	Terminal SetTitleWindow		Zrušiť
 Increase	Terminal TermWindow		Zväčšiť
@@ -44,6 +49,8 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		Vložiť cestu
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminál Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a Takashi Murai.\n\nPoužitie: %s [VOĽBA] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Nebol zadaný vyhľadávací reťazec.
+Font size	Terminal TermWindow		Veľkosť písma
+Blinking cursor	Terminal AppearancePrefView		Blikajúci kurzor
 Don't save	Terminal PrefWindow		Neukladať
 Set window title	Terminal TermWindow		Nastaviť titulok okna
 Terminal	System name		Terminál
@@ -55,11 +62,16 @@ Find…	Terminal TermWindow		Nájsť…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces „%1“ ešte stále beží.\nAk zatvoríte Terminál, proces bude zabitý.
 Move here	Terminal TermView		Presunúť sem
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktuálny adresár aktívneho procesu\n\t\t\tv aktuálnej karte. Nepovinne je možné určiť maximálny počet\n\t\t\tzložiek cesty. Napr. „%2d“ pre najviac dve zložky.\n\t%i\t-\tIndex okna.\n\t%p\t-\tNázov aktívneho procesu v aktuálnej karte.\n\t%t\t-\tTitulok aktuálnej karty.\n\t%%\t-\tZnak „%“.
+Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Chyba!
 New tab	Terminal TermWindow		Nová karta
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Vzor určujúci titulky kariet. Možno použiť\nnasledovné zástupné symboly:\n
 Selected background	Terminal AppearancePrefView		Vybrané pozadie
+Slate	Terminal colors scheme		Bridlica
+Text under cursor	Terminal AppearancePrefView		Text pod kurzorom
+Midnight	Terminal colors scheme		Polnoc
 Decrease	Terminal TermWindow		Zmenšiť
+Default	Terminal colors scheme		Predvolená
 Create link here	Terminal TermView		Vytvoriť tu odkaz
 Close	Terminal TermWindow		Zatvoriť
 Text	Terminal AppearancePrefView		Text
