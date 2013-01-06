@@ -2842,9 +2842,9 @@ status_t
 _DeleteTask(BObjectList<entry_ref>* list, bool confirm)
 {
 	if (confirm) {
-		bool dontMoveToTrash = TrackerSettings().DontMoveFilesToTrash();
+		bool MoveToTrash = TrackerSettings().MoveFilesToTrash();
 
-		if (!dontMoveToTrash) {
+		if (MoveToTrash) {
 			BAlert* alert = new BAlert("",
 				B_TRANSLATE_NOCOLLECT(kDeleteConfirmationStr),
 				B_TRANSLATE("Cancel"), B_TRANSLATE("Move to Trash"),

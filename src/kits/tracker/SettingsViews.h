@@ -181,10 +181,10 @@ class TrashSettingsView : public SettingsView {
 	private:
 		void _SendNotices();
 
-		BCheckBox* fDontMoveFilesToTrashCheckBox;
+		BCheckBox* fMoveFilesToTrashCheckBox;
 		BCheckBox* fAskBeforeDeleteFileCheckBox;
 
-		bool fDontMoveFilesToTrash;
+		bool fMoveFilesToTrash;
 		bool fAskBeforeDeleteFile;
 
 		typedef SettingsView _inherited;

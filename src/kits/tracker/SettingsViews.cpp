@@ -956,12 +956,12 @@ TrashSettingsView::TrashSettingsView()
 	:
 	SettingsView("TrashSettingsView")
 {
-	fDontMoveFilesToTrashCheckBox = new BCheckBox("",
-		B_TRANSLATE("Don't move files to Trash"),
-			new BMessage(kDontMoveFilesToTrashChanged));
+	fMoveFilesToTrashCheckBox = new BCheckBox("",
+		B_TRANSLATE("Move deleted files to Trash first"),
+			new BMessage(kMoveFilesToTrashChanged));
 
 	fAskBeforeDeleteFileCheckBox = new BCheckBox("",
-		B_TRANSLATE("Ask before delete"),
+		B_TRANSLATE("Ask before deleting for good"),
 			new BMessage(kAskBeforeDeleteFileChanged));
 
 	const float spacing = be_control_look->DefaultItemSpacing();
@@ -970,7 +970,7 @@ TrashSettingsView::TrashSettingsView()
 	layout->SetOrientation(B_VERTICAL);
 	layout->SetSpacing(0);
 	BGroupLayoutBuilder(layout)
-		.Add(fDontMoveFilesToTrashCheckBox)
+		.Add(fMoveFilesToTrashCheckBox)
 		.Add(fAskBeforeDeleteFileCheckBox)
 		.AddGlue()
 		.SetInsets(spacing, spacing, spacing, spacing);
@@ -981,7 +981,7 @@ TrashSettingsView::TrashSettingsView()
 void
 TrashSettingsView::AttachedToWindow()
 {
-	fDontMoveFilesToTrashCheckBox->SetTarget(this);
+	fMoveFilesToTrashCheckBox->SetTarget(this);
 	fAskBeforeDeleteFileCheckBox->SetTarget(this);
 }
 
@@ -995,11 +995,11 @@ TrashSettingsView::MessageReceived(BMessage* message)
 	TrackerSettings settings;
 
 	switch (message->what) {
-		case kDontMoveFilesToTrashChanged:
-			settings.SetDontMoveFilesToTrash(
-				fDontMoveFilesToTrashCheckBox->Value() == 1);
+		case kMoveFilesToTrashChanged:
+			settings.SetMoveFilesToTrash(
+				fMoveFilesToTrashCheckBox->Value() == 1);
 
-			tracker->SendNotices(kDontMoveFilesToTrashChanged);
+			tracker->SendNotices(kMoveFilesToTrashChanged);
 			Window()->PostMessage(kSettingsContentsModified);
 			break;
 
@@ -1023,7 +1023,7 @@ TrashSettingsView::SetDefaults()
 {
 	TrackerSettings settings;
 
-	settings.SetDontMoveFilesToTrash(false);
+	settings.SetMoveFilesToTrash(true);
 	settings.SetAskBeforeDeleteFile(true);
 
 	ShowCurrentSettings();
@@ -1036,7 +1036,7 @@ TrashSettingsView::IsDefaultable() const
 {
 	TrackerSettings settings;
 
-	return settings.DontMoveFilesToTrash() != false
+	return settings.MoveFilesToTrash() != true
 		|| settings.AskBeforeDeleteFile() != true;
 }
 
@@ -1046,7 +1046,7 @@ TrashSettingsView::Revert()
 {
 	TrackerSettings settings;
 
-	settings.SetDontMoveFilesToTrash(fDontMoveFilesToTrash);
+	settings.SetMoveFilesToTrash(fMoveFilesToTrash);
 	settings.SetAskBeforeDeleteFile(fAskBeforeDeleteFile);
 
 	ShowCurrentSettings();
@@ -1061,7 +1061,7 @@ TrashSettingsView::_SendNotices()
 	if (!tracker)
 		return;
 
-	tracker->SendNotices(kDontMoveFilesToTrashChanged);
+	tracker->SendNotices(kMoveFilesToTrashChanged);
 	tracker->SendNotices(kAskBeforeDeleteFileChanged);
 }
 
@@ -1071,7 +1071,7 @@ TrashSettingsView::ShowCurrentSettings()
 {
 	TrackerSettings settings;
 
-	fDontMoveFilesToTrashCheckBox->SetValue(settings.DontMoveFilesToTrash());
+	fMoveFilesToTrashCheckBox->SetValue(settings.MoveFilesToTrash());
 	fAskBeforeDeleteFileCheckBox->SetValue(settings.AskBeforeDeleteFile());
 }
 
@@ -1081,7 +1081,7 @@ TrashSettingsView::RecordRevertSettings()
 {
 	TrackerSettings settings;
 
-	fDontMoveFilesToTrash = settings.DontMoveFilesToTrash();
+	fMoveFilesToTrash = settings.MoveFilesToTrash();
 	fAskBeforeDeleteFile = settings.AskBeforeDeleteFile();
 }
 
@@ -1089,8 +1089,8 @@ TrashSettingsView::RecordRevertSettings()
 bool
 TrashSettingsView::IsRevertable() const
 {
-	return fDontMoveFilesToTrash
-			!= (fDontMoveFilesToTrashCheckBox->Value() > 0)
+	return fMoveFilesToTrash
+			!= (fMoveFilesToTrashCheckBox->Value() > 0)
 		|| fAskBeforeDeleteFile
 			!= (fAskBeforeDeleteFileCheckBox->Value() > 0);
 }
