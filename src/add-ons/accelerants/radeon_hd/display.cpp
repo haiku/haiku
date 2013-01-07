@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,6 +21,7 @@
 #include "accelerant_protos.h"
 #include "bios.h"
 #include "connector.h"
+#include "displayport.h"
 #include "encoder.h"
 
 
@@ -225,8 +226,7 @@ detect_crt_ranges(uint32 crtid)
 		edid1_detailed_monitor* monitor
 			= &edid->detailed_monitor[index];
 
-		if (monitor->monitor_desc_type
-			== EDID1_MONITOR_RANGES) {
+		if (monitor->monitor_desc_type == EDID1_MONITOR_RANGES) {
 			edid1_monitor_range range = monitor->data.monitor_range;
 			gDisplay[crtid]->vfreqMin = range.min_v;   /* in Hz */
 			gDisplay[crtid]->vfreqMax = range.max_v;
@@ -258,9 +258,22 @@ detect_displays()
 			continue;
 
 		if (gConnector[id]->type == VIDEO_CONNECTOR_9DIN) {
-			TRACE("%s: Skipping 9DIN connector (not yet supported)\n",
-				__func__);
+			TRACE("%s: connector(%" B_PRIu32 "): Skipping 9DIN connector "
+				"(not yet supported)\n", __func__, id);
 			continue;
+		}
+
+		if (gConnector[id]->type == VIDEO_CONNECTOR_DP) {
+			edid1_info* edid = &gDisplay[displayIndex]->edidData;
+
+			TRACE("%s: connector(%" B_PRIu32 "): Checking DP.\n", __func__, id);
+			status_t dpHasEDID = ddc2_dp_read_edid1(id, edid);
+			gDisplay[displayIndex]->attached
+				= (dpHasEDID == B_OK ? true : false);
+			if (gDisplay[displayIndex]->attached) {
+				TRACE("%s: connector(%" B_PRIu32 "): Found DisplayPort EDID!\n",
+					__func__);
+			}
 		}
 
 		// TODO: As DP aux transactions don't work yet, just use LVDS as a hack
@@ -276,17 +289,22 @@ detect_displays()
 			// TODO: DDC Router switching for DisplayPort (and others?)
 		} else if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
 		#endif
-		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
+
+		if (gDisplay[displayIndex]->attached == false
+			&& gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
 			// If plain (non-DP) laptop LVDS, read mode info from AtomBIOS
 			//TRACE("%s: non-DP laptop LVDS detected\n", __func__);
-			gDisplay[displayIndex]->attached
-				= connector_read_mode_lvds(id,
-					&gDisplay[displayIndex]->preferredMode);
+			gDisplay[displayIndex]->attached = connector_read_mode_lvds(id,
+				&gDisplay[displayIndex]->preferredMode);
+			if (gDisplay[displayIndex]->attached) {
+				TRACE("%s: connector(%" B_PRIu32 "): found LVDS preferred "
+					"mode\n", __func__, id);
+			}
 		}
 
 		// If no display found yet, try more standard detection methods
 		if (gDisplay[displayIndex]->attached == false) {
-			TRACE("%s: bit-banging ddc for EDID on connector %" B_PRIu32 "\n",
+			TRACE("%s: connector(%" B_PRIu32 "): bit-banging ddc for EDID.\n",
 				__func__, id);
 
 			// Lets try bit-banging edid from connector
@@ -299,7 +317,7 @@ detect_displays()
 
 			// Found EDID data?
 			if (gDisplay[displayIndex]->attached) {
-				TRACE("%s: found EDID data on connector %" B_PRIu32 "\n",
+				TRACE("%s: connector(%" B_PRIu32 "): found EDID data.\n",
 					__func__, id);
 
 				bool analogEncoder
@@ -309,20 +327,20 @@ detect_displays()
 				edid1_info* edid = &gDisplay[displayIndex]->edidData;
 				if (!edid->display.input_type && analogEncoder) {
 					// If non-digital EDID + the encoder is analog...
-					TRACE("%s: connector %" B_PRIu32 " has non-digital EDID "
+					TRACE("%s: connector(%" B_PRIu32 "): has non-digital EDID "
 						"and a analog encoder.\n", __func__, id);
 					gDisplay[displayIndex]->attached
 						= encoder_analog_load_detect(id);
 				} else if (edid->display.input_type && !analogEncoder) {
 					// If EDID is digital, we make an assumption here.
-					TRACE("%s: connector %" B_PRIu32 " has digital EDID "
+					TRACE("%s: connector(%" B_PRIu32 "): has digital EDID "
 						"and is not a analog encoder.\n", __func__, id);
 				} else {
 					// This generally means the monitor is of poor design
 					// Since we *know* there is no load on the analog encoder
 					// we assume that it is a digital display.
-					TRACE("%s: Warning: monitor on connector %" B_PRIu32 " has "
-						"false digital EDID flag and unloaded analog encoder!\n",
+					TRACE("%s: connector(%" B_PRIu32 "): Warning: monitor has "
+						"false digital EDID flag + unloaded analog encoder!\n",
 						__func__, id);
 				}
 			}
