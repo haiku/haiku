@@ -2,14 +2,14 @@
 #include <string.h>
 
 #include <Application.h>
-#include <Message.h>
-// Locale Kit
 #include <Catalog.h>
+#include <Message.h>
+
+#include "ObjectWindow.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Playground"
 
-#include "ObjectWindow.h"
 
 // main
 int

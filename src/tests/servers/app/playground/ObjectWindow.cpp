@@ -8,6 +8,7 @@
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <ColorControl.h>
 #include <ListItem.h>
@@ -26,17 +27,15 @@
 #include <TabView.h>
 #include <TextControl.h>
 #include <TextView.h>
-// Locale Kit
-#include <Catalog.h>
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "Playground"
 
 #include "ObjectView.h"
+#include "ObjectWindow.h"
 #include "States.h"
 //#include "StatusView.h"
 
-#include "ObjectWindow.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Playground"
 
 enum {
 	MSG_SET_OBJECT_TYPE		= 'stot',

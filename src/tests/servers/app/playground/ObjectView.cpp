@@ -4,6 +4,7 @@
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Cursor.h>
 #include <Message.h>
 #include <MessageQueue.h>
@@ -11,15 +12,13 @@
 #include <Shape.h>
 #include <String.h>
 #include <Window.h>
-// Locale Kit
-#include <Catalog.h>
+
+#include "ObjectView.h"
+#include "States.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Playground"
 
-#include "States.h"
-
-#include "ObjectView.h"
 
 const unsigned char kMoveCursor[] = { 16, 1, 8, 8,
 	0x01, 0x80, 0x02, 0x40, 0x04, 0x20, 0x08, 0x10,
