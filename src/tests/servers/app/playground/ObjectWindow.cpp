@@ -185,7 +185,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b.right = b.left + b.Width() / 2.0 - 5.0;
 
 	// new button
-	fNewB = new BButton(b, "new button", B_TRANSLATE("New Object"),
+	fNewB = new BButton(b, "new button", B_TRANSLATE("New object"),
 		new BMessage(MSG_NEW_OBJECT));
 	controlGroup->AddChild(fNewB);
 	SetDefaultButton(fNewB);
@@ -216,7 +216,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
 	message = new BMessage(MSG_SET_OBJECT_TYPE);
 	message->AddInt32("type", OBJECT_ROUND_RECT);
-	radioButton = new BRadioButton(b, "radio 3", B_TRANSLATE("Round Rect"), message);
+	radioButton = new BRadioButton(b, "radio 3", B_TRANSLATE("Round rect"), message);
 	controlGroup->AddChild(radioButton);
 
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
@@ -422,8 +422,9 @@ ObjectWindow::MessageReceived(BMessage* message)
 			break;
 		case MSG_CLEAR: {
 			BAlert *alert = new BAlert("Playground",
-									   B_TRANSLATE("Do you really want to clear all drawing objects?"),
-									   B_TRANSLATE("No"), B_TRANSLATE("Yes"));
+				B_TRANSLATE("Clear all drawing objects?"),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Clear"));
+			alert->SetShortcut(0, B_ESCAPE);
 			if (alert->Go() == 1) {
 				fObjectView->MakeEmpty();
 				fObjectLV->MakeEmpty();
