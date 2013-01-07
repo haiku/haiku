@@ -217,8 +217,10 @@
 #define EM_BAR_MEM_TYPE_64BIT	0x00000004
 #define EM_MSIX_BAR		3	/* On 82575 */
 
+#ifndef __HAIKU__
 #if __FreeBSD_version < 900000
 #define SYSCTL_ADD_UQUAD SYSCTL_ADD_QUAD
+#endif
 #endif
 
 /* Defines for printing debug information */

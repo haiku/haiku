@@ -75,7 +75,9 @@
 #include <netinet/udp.h>
 
 #include <machine/in_cksum.h>
+#ifndef __HAIKU__
 #include <dev/led/led.h>
+#endif
 #include <dev/pci/pcivar.h>
 #include <dev/pci/pcireg.h>
 
@@ -268,12 +270,21 @@ static device_method_t lem_methods[] = {
 	{0, 0}
 };
 
+#ifndef __HAIKU__
 static driver_t lem_driver = {
 	"em", lem_methods, sizeof(struct adapter),
 };
 
 extern devclass_t em_devclass;
 DRIVER_MODULE(lem, pci, lem_driver, em_devclass, 0, 0);
+#else
+static driver_t lem_driver = {
+	"lem", lem_methods, sizeof(struct adapter),
+};
+
+devclass_t lem_devclass;
+DRIVER_MODULE(lem, pci, lem_driver, lem_devclass, 0, 0);
+#endif
 MODULE_DEPEND(lem, pci, 1, 1, 1);
 MODULE_DEPEND(lem, ether, 1, 1, 1);
 
@@ -391,10 +402,12 @@ lem_attach(device_t dev)
 
 	INIT_DEBUGOUT("lem_attach: begin");
 
+#ifndef __HAIKU__
 	if (resource_disabled("lem", device_get_unit(dev))) {
 		device_printf(dev, "Disabled by device hint\n");
 		return (ENXIO);
 	}
+#endif
 
 	adapter = device_get_softc(dev);
 	adapter->dev = adapter->osdep.dev = dev;
@@ -653,8 +666,10 @@ lem_attach(device_t dev)
 	/* Tell the stack that the interface is not active */
 	adapter->ifp->if_drv_flags &= ~(IFF_DRV_RUNNING | IFF_DRV_OACTIVE);
 
+#ifndef __HAIKU__
 	adapter->led_dev = led_create(lem_led_func, adapter,
 	    device_get_nameunit(dev));
+#endif
 
 #ifdef DEV_NETMAP
 	lem_netmap_attach(adapter);
@@ -713,8 +728,10 @@ lem_detach(device_t dev)
 		ether_poll_deregister(ifp);
 #endif
 
+#ifndef __HAIKU__
 	if (adapter->led_dev != NULL)
 		led_destroy(adapter->led_dev);
+#endif
 
 	EM_CORE_LOCK(adapter);
 	EM_TX_LOCK(adapter);
@@ -2591,6 +2608,7 @@ lem_dma_free(struct adapter *adapter, struct em_dma_alloc *dma)
 static int
 lem_allocate_transmit_structures(struct adapter *adapter)
 {
+	int i;
 	device_t dev = adapter->dev;
 	struct em_buffer *tx_buffer;
 	int error;
@@ -2623,7 +2641,7 @@ lem_allocate_transmit_structures(struct adapter *adapter)
 	}
 
 	/* Create the descriptor buffer dma maps */
-	for (int i = 0; i < adapter->num_tx_desc; i++) {
+	for (i = 0; i < adapter->num_tx_desc; i++) {
 		tx_buffer = &adapter->tx_buffer_area[i];
 		error = bus_dmamap_create(adapter->txtag, 0, &tx_buffer->map);
 		if (error != 0) {
@@ -2647,6 +2665,7 @@ fail:
 static void
 lem_setup_transmit_structures(struct adapter *adapter)
 {
+	int i;
 	struct em_buffer *tx_buffer;
 #ifdef DEV_NETMAP
 	/* we are already locked */
@@ -2659,7 +2678,7 @@ lem_setup_transmit_structures(struct adapter *adapter)
 	    (sizeof(struct e1000_tx_desc)) * adapter->num_tx_desc);
 
 	/* Free any existing TX buffers */
-	for (int i = 0; i < adapter->num_tx_desc; i++, tx_buffer++) {
+	for (i = 0; i < adapter->num_tx_desc; i++, tx_buffer++) {
 		tx_buffer = &adapter->tx_buffer_area[i];
 		bus_dmamap_sync(adapter->txtag, tx_buffer->map,
 		    BUS_DMASYNC_POSTWRITE);
@@ -2775,7 +2794,8 @@ lem_free_transmit_structures(struct adapter *adapter)
 	INIT_DEBUGOUT("free_transmit_structures: begin");
 
 	if (adapter->tx_buffer_area != NULL) {
-		for (int i = 0; i < adapter->num_tx_desc; i++) {
+		int i;
+		for (i = 0; i < adapter->num_tx_desc; i++) {
 			tx_buffer = &adapter->tx_buffer_area[i];
 			if (tx_buffer->m_head != NULL) {
 				bus_dmamap_sync(adapter->txtag, tx_buffer->map,
@@ -2802,9 +2822,11 @@ lem_free_transmit_structures(struct adapter *adapter)
 		bus_dma_tag_destroy(adapter->txtag);
 		adapter->txtag = NULL;
 	}
+#ifndef __HAIKU__
 #if __FreeBSD_version >= 800000
 	if (adapter->br != NULL)
         	buf_ring_free(adapter->br, M_DEVBUF);
+#endif
 #endif
 }
 
@@ -3278,6 +3300,7 @@ lem_setup_receive_structures(struct adapter *adapter)
 static void
 lem_initialize_receive_unit(struct adapter *adapter)
 {
+	int i; 
 	struct ifnet	*ifp = adapter->ifp;
 	u64	bus_addr;
 	u32	rctl, rxcsum;
@@ -3306,7 +3329,7 @@ lem_initialize_receive_unit(struct adapter *adapter)
 	** using the EITR register (82574 only)
 	*/
 	if (adapter->msix)
-		for (int i = 0; i < 4; i++)
+		for (i = 0; i < 4; i++)
 			E1000_WRITE_REG(&adapter->hw,
 			    E1000_EITR_82574(i), DEFAULT_ITR);
 
@@ -3460,7 +3483,7 @@ lem_free_receive_structures(struct adapter *adapter)
 static bool
 lem_rxeof(struct adapter *adapter, int count, int *done)
 {
-	struct ifnet	*ifp = adapter->ifp;;
+	struct ifnet	*ifp = adapter->ifp;
 	struct mbuf	*mp;
 	u8		status = 0, accept_frame = 0, eop = 0;
 	u16 		len, desc_len, prev_len_adj;
@@ -3792,6 +3815,7 @@ lem_unregister_vlan(void *arg, struct ifnet *ifp, u16 vtag)
 static void
 lem_setup_vlan_hw_support(struct adapter *adapter)
 {
+	int i;
 	struct e1000_hw *hw = &adapter->hw;
 	u32             reg;
 
@@ -3808,7 +3832,7 @@ lem_setup_vlan_hw_support(struct adapter *adapter)
 	** A soft reset zero's out the VFTA, so
 	** we need to repopulate it now.
 	*/
-	for (int i = 0; i < EM_VFTA_SIZE; i++)
+	for (i = 0; i < EM_VFTA_SIZE; i++)
                 if (adapter->shadow_vfta[i] != 0)
 			E1000_WRITE_REG_ARRAY(hw, E1000_VFTA,
                             i, adapter->shadow_vfta[i]);
@@ -4073,12 +4097,13 @@ lem_enable_wakeup(device_t dev)
 static int
 lem_enable_phy_wakeup(struct adapter *adapter)
 {
+	int i;
 	struct e1000_hw *hw = &adapter->hw;
 	u32 mreg, ret = 0;
 	u16 preg;
 
 	/* copy MAC RARs to PHY RARs */
-	for (int i = 0; i < adapter->hw.mac.rar_entry_count; i++) {
+	for (i = 0; i < adapter->hw.mac.rar_entry_count; i++) {
 		mreg = E1000_READ_REG(hw, E1000_RAL(i));
 		e1000_write_phy_reg(hw, BM_RAR_L(i), (u16)(mreg & 0xFFFF));
 		e1000_write_phy_reg(hw, BM_RAR_M(i),
@@ -4090,7 +4115,7 @@ lem_enable_phy_wakeup(struct adapter *adapter)
 	}
 
 	/* copy MAC MTA to PHY MTA */
-	for (int i = 0; i < adapter->hw.mac.mta_reg_count; i++) {
+	for (i = 0; i < adapter->hw.mac.mta_reg_count; i++) {
 		mreg = E1000_READ_REG_ARRAY(hw, E1000_MTA, i);
 		e1000_write_phy_reg(hw, BM_MTA(i), (u16)(mreg & 0xFFFF));
 		e1000_write_phy_reg(hw, BM_MTA(i) + 1,
@@ -4325,8 +4350,10 @@ lem_sysctl_reg_handler(SYSCTL_HANDLER_ARGS)
 	struct adapter *adapter;
 	u_int val;
 
+#ifndef __HAIKU__
 	adapter = oidp->oid_arg1;
 	val = E1000_READ_REG(&adapter->hw, oidp->oid_arg2);
+#endif
 	return (sysctl_handle_int(oidp, &val, 0, req));
 }
 

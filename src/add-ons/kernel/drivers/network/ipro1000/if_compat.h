@@ -122,12 +122,6 @@ struct ifmedia
 	uint32 	ifm_media;
 };
 
-struct ifmediareq
-{
-	uint32	ifm_status;
-	uint32	ifm_active;
-};
-
 struct if_queue
 {
 	volatile struct mbuf *	ifq_head;

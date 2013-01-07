@@ -40,8 +40,10 @@
 
 #include <sys/param.h>
 #include <sys/systm.h>
+#ifndef __HAIKU__
 #if __FreeBSD_version >= 800000
 #include <sys/buf_ring.h>
+#endif
 #endif
 #include <sys/bus.h>
 #include <sys/endian.h>
@@ -78,7 +80,9 @@
 #include <netinet/udp.h>
 
 #include <machine/in_cksum.h>
+#ifndef __HAIKU__
 #include <dev/led/led.h>
+#endif
 #include <dev/pci/pcivar.h>
 #include <dev/pci/pcireg.h>
 
@@ -472,10 +476,12 @@ em_attach(device_t dev)
 
 	INIT_DEBUGOUT("em_attach: begin");
 
+#ifndef __HAIKU__
 	if (resource_disabled("em", device_get_unit(dev))) {
 		device_printf(dev, "Disabled by device hint\n");
 		return (ENXIO);
 	}
+#endif
 
 	adapter = device_get_softc(dev);
 	adapter->dev = adapter->osdep.dev = dev;
@@ -724,8 +730,10 @@ em_attach(device_t dev)
 	adapter->ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 	adapter->ifp->if_drv_flags |= IFF_DRV_OACTIVE;
 
+#ifndef __HAIKU__
 	adapter->led_dev = led_create(em_led_func, adapter,
 	    device_get_nameunit(dev));
+#endif
 #ifdef DEV_NETMAP
 	em_netmap_attach(adapter);
 #endif /* DEV_NETMAP */
@@ -776,9 +784,10 @@ em_detach(device_t dev)
 	if (ifp->if_capenable & IFCAP_POLLING)
 		ether_poll_deregister(ifp);
 #endif
-
+#ifndef __HAIKU__
 	if (adapter->led_dev != NULL)
 		led_destroy(adapter->led_dev);
+#endif
 
 	EM_CORE_LOCK(adapter);
 	adapter->in_detach = 1;
@@ -863,7 +872,8 @@ em_resume(device_t dev)
 
 	if ((ifp->if_flags & IFF_UP) &&
 	    (ifp->if_drv_flags & IFF_DRV_RUNNING) && adapter->link_active) {
-		for (int i = 0; i < adapter->num_queues; i++, txr++) {
+		int i;
+		for (i = 0; i < adapter->num_queues; i++, txr++) {
 			EM_TX_LOCK(txr);
 #ifdef EM_MULTIQUEUE
 			if (!drbr_empty(ifp, txr->br))
@@ -967,11 +977,12 @@ em_mq_start(struct ifnet *ifp, struct mbuf *m)
 static void
 em_qflush(struct ifnet *ifp)
 {
+	int i;
 	struct adapter  *adapter = ifp->if_softc;
 	struct tx_ring  *txr = adapter->tx_rings;
 	struct mbuf     *m;
 
-	for (int i = 0; i < adapter->num_queues; i++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++) {
 		EM_TX_LOCK(txr);
 		while ((m = buf_ring_dequeue_sc(txr->br)) != NULL)
 			m_freem(m);
@@ -1654,7 +1665,8 @@ em_handle_link(void *context, int pending)
 	E1000_WRITE_REG(&adapter->hw, E1000_IMS,
 	    EM_MSIX_LINK | E1000_IMS_LSC);
 	if (adapter->link_active) {
-		for (int i = 0; i < adapter->num_queues; i++, txr++) {
+		int i;
+		for (i = 0; i < adapter->num_queues; i++, txr++) {
 			EM_TX_LOCK(txr);
 #ifdef EM_MULTIQUEUE
 			if (!drbr_empty(ifp, txr->br))
@@ -2214,6 +2226,7 @@ em_set_multi(struct adapter *adapter)
 static void
 em_local_timer(void *arg)
 {
+	int i;
 	struct adapter	*adapter = arg;
 	struct ifnet	*ifp = adapter->ifp;
 	struct tx_ring	*txr = adapter->tx_rings;
@@ -2241,7 +2254,7 @@ em_local_timer(void *arg)
 	** can be done without the lock because its RO
 	** and the HUNG state will be static if set.
 	*/
-	for (int i = 0; i < adapter->num_queues; i++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++) {
 		if ((txr->queue_status == EM_QUEUE_HUNG) &&
 		    (adapter->pause_frames == 0))
 			goto hung;
@@ -2332,13 +2345,14 @@ em_update_link_status(struct adapter *adapter)
 		ifp->if_baudrate = adapter->link_speed * 1000000;
 		if_link_state_change(ifp, LINK_STATE_UP);
 	} else if (!link_check && (adapter->link_active == 1)) {
+		int i;
 		ifp->if_baudrate = adapter->link_speed = 0;
 		adapter->link_duplex = 0;
 		if (bootverbose)
 			device_printf(dev, "Link is Down\n");
 		adapter->link_active = 0;
 		/* Link down, disable watchdog */
-		for (int i = 0; i < adapter->num_queues; i++, txr++)
+		for (i = 0; i < adapter->num_queues; i++, txr++)
 			txr->queue_status = EM_QUEUE_IDLE;
 		if_link_state_change(ifp, LINK_STATE_DOWN);
 	}
@@ -2356,6 +2370,7 @@ em_update_link_status(struct adapter *adapter)
 static void
 em_stop(void *arg)
 {
+	int i;
 	struct adapter	*adapter = arg;
 	struct ifnet	*ifp = adapter->ifp;
 	struct tx_ring	*txr = adapter->tx_rings;
@@ -2372,7 +2387,7 @@ em_stop(void *arg)
 	ifp->if_drv_flags |= IFF_DRV_OACTIVE;
 
         /* Unarm watchdog timer. */
-	for (int i = 0; i < adapter->num_queues; i++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++) {
 		EM_TX_LOCK(txr);
 		txr->queue_status = EM_QUEUE_IDLE;
 		EM_TX_UNLOCK(txr);
@@ -2521,6 +2536,7 @@ em_allocate_legacy(struct adapter *adapter)
 int
 em_allocate_msix(struct adapter *adapter)
 {
+	int i;
 	device_t	dev = adapter->dev;
 	struct		tx_ring *txr = adapter->tx_rings;
 	struct		rx_ring *rxr = adapter->rx_rings;
@@ -2531,7 +2547,7 @@ em_allocate_msix(struct adapter *adapter)
 	E1000_WRITE_REG(&adapter->hw, E1000_IMC, 0xffffffff);
 
 	/* First set up ring resources */
-	for (int i = 0; i < adapter->num_queues; i++, txr++, rxr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++, rxr++) {
 
 		/* RX ring */
 		rid = vector + 1;
@@ -2635,6 +2651,7 @@ em_allocate_msix(struct adapter *adapter)
 static void
 em_free_pci_resources(struct adapter *adapter)
 {
+	int i;
 	device_t	dev = adapter->dev;
 	struct tx_ring	*txr;
 	struct rx_ring	*rxr;
@@ -2644,7 +2661,7 @@ em_free_pci_resources(struct adapter *adapter)
 	/*
 	** Release all the queue interrupt resources:
 	*/
-	for (int i = 0; i < adapter->num_queues; i++) {
+	for (i = 0; i < adapter->num_queues; i++) {
 		txr = &adapter->tx_rings[i];
 		rxr = &adapter->rx_rings[i];
 		/* an early abort? */
@@ -3115,6 +3132,7 @@ em_dma_free(struct adapter *adapter, struct em_dma_alloc *dma)
 static int
 em_allocate_queues(struct adapter *adapter)
 {
+	int i;
 	device_t		dev = adapter->dev;
 	struct tx_ring		*txr = NULL;
 	struct rx_ring		*rxr = NULL;
@@ -3147,7 +3165,7 @@ em_allocate_queues(struct adapter *adapter)
 	 * possibility that things fail midcourse and we need to
 	 * undo memory gracefully
 	 */ 
-	for (int i = 0; i < adapter->num_queues; i++, txconf++) {
+	for (i = 0; i < adapter->num_queues; i++, txconf++) {
 		/* Set up some basics */
 		txr = &adapter->tx_rings[i];
 		txr->adapter = adapter;
@@ -3174,10 +3192,12 @@ em_allocate_queues(struct adapter *adapter)
 			error = ENOMEM;
 			goto err_tx_desc;
         	}
+#ifndef __HAIKU__
 #if __FreeBSD_version >= 800000
 		/* Allocate a buf ring */
 		txr->br = buf_ring_alloc(4096, M_DEVBUF,
 		    M_WAITOK, &txr->tx_mtx);
+#endif
 #endif
 	}
 
@@ -3186,7 +3206,7 @@ em_allocate_queues(struct adapter *adapter)
 	 */ 
 	rsize = roundup2(adapter->num_rx_desc *
 	    sizeof(struct e1000_rx_desc), EM_DBA_ALIGN);
-	for (int i = 0; i < adapter->num_queues; i++, rxconf++) {
+	for (i = 0; i < adapter->num_queues; i++, rxconf++) {
 		rxr = &adapter->rx_rings[i];
 		rxr->adapter = adapter;
 		rxr->me = i;
@@ -3225,8 +3245,10 @@ err_tx_desc:
 		em_dma_free(adapter, &txr->txdma);
 	free(adapter->rx_rings, M_DEVBUF);
 rx_fail:
+#ifndef __HAIKU__
 #if __FreeBSD_version >= 800000
 	buf_ring_free(txr->br, M_DEVBUF);
+#endif
 #endif
 	free(adapter->tx_rings, M_DEVBUF);
 fail:
@@ -3372,9 +3394,10 @@ em_setup_transmit_ring(struct tx_ring *txr)
 static void
 em_setup_transmit_structures(struct adapter *adapter)
 {
+	int i;
 	struct tx_ring *txr = adapter->tx_rings;
 
-	for (int i = 0; i < adapter->num_queues; i++, txr++)
+	for (i = 0; i < adapter->num_queues; i++, txr++)
 		em_setup_transmit_ring(txr);
 
 	return;
@@ -3388,13 +3411,14 @@ em_setup_transmit_structures(struct adapter *adapter)
 static void
 em_initialize_transmit_unit(struct adapter *adapter)
 {
+	int i;
 	struct tx_ring	*txr = adapter->tx_rings;
 	struct e1000_hw	*hw = &adapter->hw;
 	u32	tctl, tarc, tipg = 0;
 
 	 INIT_DEBUGOUT("em_initialize_transmit_unit: begin");
 
-	for (int i = 0; i < adapter->num_queues; i++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++) {
 		u64 bus_addr = txr->txdma.dma_paddr;
 		/* Base and Len of TX Ring */
 		E1000_WRITE_REG(hw, E1000_TDLEN(i),
@@ -3480,9 +3504,10 @@ em_initialize_transmit_unit(struct adapter *adapter)
 static void
 em_free_transmit_structures(struct adapter *adapter)
 {
+	int i;
 	struct tx_ring *txr = adapter->tx_rings;
 
-	for (int i = 0; i < adapter->num_queues; i++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++) {
 		EM_TX_LOCK(txr);
 		em_free_transmit_buffers(txr);
 		em_dma_free(adapter, &txr->txdma);
@@ -3501,6 +3526,7 @@ em_free_transmit_structures(struct adapter *adapter)
 static void
 em_free_transmit_buffers(struct tx_ring *txr)
 {
+	int i;
 	struct adapter		*adapter = txr->adapter;
 	struct em_buffer	*txbuf;
 
@@ -3509,7 +3535,7 @@ em_free_transmit_buffers(struct tx_ring *txr)
 	if (txr->tx_buffers == NULL)
 		return;
 
-	for (int i = 0; i < adapter->num_tx_desc; i++) {
+	for (i = 0; i < adapter->num_tx_desc; i++) {
 		txbuf = &txr->tx_buffers[i];
 		if (txbuf->m_head != NULL) {
 			bus_dmamap_sync(txr->txtag, txbuf->map,
@@ -3531,9 +3557,11 @@ em_free_transmit_buffers(struct tx_ring *txr)
 			txbuf->map = NULL;
 		}
 	}
+#ifndef __HAIKU__
 #if __FreeBSD_version >= 800000
 	if (txr->br != NULL)
 		buf_ring_free(txr->br, M_DEVBUF);
+#endif
 #endif
 	if (txr->tx_buffers != NULL) {
 		free(txr->tx_buffers, M_DEVBUF);
@@ -3989,6 +4017,7 @@ update:
 static int
 em_allocate_receive_buffers(struct rx_ring *rxr)
 {
+	int i;
 	struct adapter		*adapter = rxr->adapter;
 	device_t		dev = adapter->dev;
 	struct em_buffer	*rxbuf;
@@ -4020,7 +4049,7 @@ em_allocate_receive_buffers(struct rx_ring *rxr)
 	}
 
 	rxbuf = rxr->rx_buffers;
-	for (int i = 0; i < adapter->num_rx_desc; i++, rxbuf++) {
+	for (i = 0; i < adapter->num_rx_desc; i++, rxbuf++) {
 		rxbuf = &rxr->rx_buffers[i];
 		error = bus_dmamap_create(rxr->rxtag, BUS_DMA_NOWAIT,
 		    &rxbuf->map);
@@ -4047,6 +4076,7 @@ fail:
 static int
 em_setup_receive_ring(struct rx_ring *rxr)
 {
+	int i, j;
 	struct	adapter 	*adapter = rxr->adapter;
 	struct em_buffer	*rxbuf;
 	bus_dma_segment_t	seg[1];
@@ -4069,7 +4099,7 @@ em_setup_receive_ring(struct rx_ring *rxr)
 	/*
 	** Free current RX buffer structs and their mbufs
 	*/
-	for (int i = 0; i < adapter->num_rx_desc; i++) {
+	for (i = 0; i < adapter->num_rx_desc; i++) {
 		rxbuf = &rxr->rx_buffers[i];
 		if (rxbuf->m_head != NULL) {
 			bus_dmamap_sync(rxr->rxtag, rxbuf->map,
@@ -4081,7 +4111,7 @@ em_setup_receive_ring(struct rx_ring *rxr)
 	}
 
 	/* Now replenish the mbufs */
-        for (int j = 0; j != adapter->num_rx_desc; ++j) {
+        for (j = 0; j != adapter->num_rx_desc; ++j) {
 		rxbuf = &rxr->rx_buffers[j];
 #ifdef DEV_NETMAP
 		if (slot) {
@@ -4139,6 +4169,7 @@ fail:
 static int
 em_setup_receive_structures(struct adapter *adapter)
 {
+	int i, n;
 	struct rx_ring *rxr = adapter->rx_rings;
 	int q;
 
@@ -4153,9 +4184,9 @@ fail:
 	 * the rings that completed, the failing case will have
 	 * cleaned up for itself. 'q' failed, so its the terminus.
 	 */
-	for (int i = 0; i < q; ++i) {
+	for (i = 0; i < q; ++i) {
 		rxr = &adapter->rx_rings[i];
-		for (int n = 0; n < adapter->num_rx_desc; n++) {
+		for (n = 0; n < adapter->num_rx_desc; n++) {
 			struct em_buffer *rxbuf;
 			rxbuf = &rxr->rx_buffers[n];
 			if (rxbuf->m_head != NULL) {
@@ -4181,9 +4212,10 @@ fail:
 static void
 em_free_receive_structures(struct adapter *adapter)
 {
+	int i;
 	struct rx_ring *rxr = adapter->rx_rings;
 
-	for (int i = 0; i < adapter->num_queues; i++, rxr++) {
+	for (i = 0; i < adapter->num_queues; i++, rxr++) {
 		em_free_receive_buffers(rxr);
 		/* Free the ring memory as well */
 		em_dma_free(adapter, &rxr->rxdma);
@@ -4208,7 +4240,8 @@ em_free_receive_buffers(struct rx_ring *rxr)
 	INIT_DEBUGOUT("free_receive_buffers: begin");
 
 	if (rxr->rx_buffers != NULL) {
-		for (int i = 0; i < adapter->num_rx_desc; i++) {
+		int i;
+		for (i = 0; i < adapter->num_rx_desc; i++) {
 			rxbuf = &rxr->rx_buffers[i];
 			if (rxbuf->map != NULL) {
 				bus_dmamap_sync(rxr->rxtag, rxbuf->map,
@@ -4247,6 +4280,7 @@ em_free_receive_buffers(struct rx_ring *rxr)
 static void
 em_initialize_receive_unit(struct adapter *adapter)
 {
+	int i;
 	struct rx_ring	*rxr = adapter->rx_rings;
 	struct ifnet	*ifp = adapter->ifp;
 	struct e1000_hw	*hw = &adapter->hw;
@@ -4277,7 +4311,8 @@ em_initialize_receive_unit(struct adapter *adapter)
 	** using the EITR register (82574 only)
 	*/
 	if (hw->mac.type == e1000_82574) {
-		for (int i = 0; i < 4; i++)
+		int i;
+		for (i = 0; i < 4; i++)
 			E1000_WRITE_REG(hw, E1000_EITR_82574(i),
 			    DEFAULT_ITR);
 		/* Disable accelerated acknowledge */
@@ -4300,7 +4335,7 @@ em_initialize_receive_unit(struct adapter *adapter)
 	if (hw->mac.type == e1000_82573)
 		E1000_WRITE_REG(hw, E1000_RDTR, 0x20);
 
-	for (int i = 0; i < adapter->num_queues; i++, rxr++) {
+	for (i = 0; i < adapter->num_queues; i++, rxr++) {
 		/* Setup the Base and Length of the Rx Descriptor Ring */
 		bus_addr = rxr->rxdma.dma_paddr;
 		E1000_WRITE_REG(hw, E1000_RDLEN(i),
@@ -4691,6 +4726,7 @@ em_unregister_vlan(void *arg, struct ifnet *ifp, u16 vtag)
 static void
 em_setup_vlan_hw_support(struct adapter *adapter)
 {
+	int i;
 	struct e1000_hw *hw = &adapter->hw;
 	u32             reg;
 
@@ -4707,7 +4743,7 @@ em_setup_vlan_hw_support(struct adapter *adapter)
 	** A soft reset zero's out the VFTA, so
 	** we need to repopulate it now.
 	*/
-	for (int i = 0; i < EM_VFTA_SIZE; i++)
+	for (i = 0; i < EM_VFTA_SIZE; i++)
                 if (adapter->shadow_vfta[i] != 0)
 			E1000_WRITE_REG_ARRAY(hw, E1000_VFTA,
                             i, adapter->shadow_vfta[i]);
@@ -5008,6 +5044,7 @@ em_enable_wakeup(device_t dev)
 static int
 em_enable_phy_wakeup(struct adapter *adapter)
 {
+	int i;
 	struct e1000_hw *hw = &adapter->hw;
 	u32 mreg, ret = 0;
 	u16 preg;
@@ -5016,7 +5053,7 @@ em_enable_phy_wakeup(struct adapter *adapter)
 	e1000_copy_rx_addrs_to_phy_ich8lan(hw);
 
 	/* copy MAC MTA to PHY MTA */
-	for (int i = 0; i < adapter->hw.mac.mta_reg_count; i++) {
+	for (i = 0; i < adapter->hw.mac.mta_reg_count; i++) {
 		mreg = E1000_READ_REG_ARRAY(hw, E1000_MTA, i);
 		e1000_write_phy_reg(hw, BM_MTA(i), (u16)(mreg & 0xFFFF));
 		e1000_write_phy_reg(hw, BM_MTA(i) + 1,
@@ -5244,8 +5281,10 @@ em_sysctl_reg_handler(SYSCTL_HANDLER_ARGS)
 	struct adapter *adapter;
 	u_int val;
 
+#ifndef __HAIKU__
 	adapter = oidp->oid_arg1;
 	val = E1000_READ_REG(&adapter->hw, oidp->oid_arg2);
+#endif
 	return (sysctl_handle_int(oidp, &val, 0, req));
 }
 
@@ -5255,6 +5294,7 @@ em_sysctl_reg_handler(SYSCTL_HANDLER_ARGS)
 static void
 em_add_hw_stats(struct adapter *adapter)
 {
+	int i;
 	device_t dev = adapter->dev;
 
 	struct tx_ring *txr = adapter->tx_rings;
@@ -5309,7 +5349,7 @@ em_add_hw_stats(struct adapter *adapter)
 			CTLFLAG_RD, &adapter->hw.fc.low_water, 0,
 			"Flow Control Low Watermark");
 
-	for (int i = 0; i < adapter->num_queues; i++, rxr++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, rxr++, txr++) {
 		snprintf(namebuf, QUEUE_NAME_LEN, "queue%d", i);
 		queue_node = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, namebuf,
 					    CTLFLAG_RD, NULL, "Queue Name");
