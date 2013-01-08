@@ -141,7 +141,7 @@ Server::SendCallAsync(Call* call, Reply** reply, Request** request)
 	ASSERT(reply != NULL);
 	ASSERT(request != NULL);
 
-	if (fThreadError != B_OK)
+	if (fThreadError != B_OK && Repair() != B_OK)
 		return fThreadError;
 
 	Request* req = new(std::nothrow) Request;
@@ -170,7 +170,7 @@ Server::ResendCallAsync(Call* call, Request* request)
 	ASSERT(call != NULL);
 	ASSERT(request != NULL);
 
-	if (fThreadError != B_OK) {
+	if (fThreadError != B_OK && Repair() != B_OK) {
 		fRequests.FindRequest(request->fXID);
 		delete request;
 		return fThreadError;
@@ -212,7 +212,7 @@ Server::Repair()
 	uint32 thisRepair = fRepairCount;
 
 	MutexLocker _(fRepairLock);
-	if (fRepairCount == thisRepair)
+	if (fRepairCount != thisRepair)
 		return B_OK;
 
 	fThreadCancel = true;

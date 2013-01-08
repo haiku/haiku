@@ -243,7 +243,7 @@ NFS4Server::_Renewal()
 		}
 
 		Request request(fServer, NULL);
-		request.Builder().Renew(fClientId);
+		request.Builder().Renew(clientId);
 		request.Send();
 
 		switch (request.Reply().NFS4Error()) {
