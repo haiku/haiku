@@ -186,8 +186,10 @@ OpenState::_ReclaimOpen(uint64 newClientID)
 
 		sequence += IncrementSequence(reply.NFS4Error());
 
-		if (HandleErrors(reply.NFS4Error(), server, NULL, NULL, &sequence))
+		if (reply.NFS4Error() != NFS4ERR_STALE_CLIENTID
+			&& HandleErrors(reply.NFS4Error(), server, NULL, NULL, &sequence)) {
 			continue;
+		}
 
 		reply.PutFH();
 
@@ -250,8 +252,12 @@ OpenState::_ReclaimLocks(uint64 newClientID)
 
 			sequence += IncrementSequence(reply.NFS4Error());
 
-			if (HandleErrors(reply.NFS4Error(), server, NULL, NULL, &sequence))
+			if (reply.NFS4Error() != NFS4ERR_STALE_CLIENTID
+				&& reply.NFS4Error() !=  NFS4ERR_STALE_STATEID
+				&& HandleErrors(reply.NFS4Error(), server, NULL, NULL,
+					&sequence)) {
 				continue;
+			}
 
 			reply.PutFH();
 			reply.Lock(linfo);
