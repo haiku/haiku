@@ -38,7 +38,7 @@ void
 RequestBuilder::_InitHeader()
 {
 	fRequest = RPC::Call::Create(fProcedure, RPC::Auth::CreateSys(),
-					RPC::Auth::CreateNone());
+		RPC::Auth::CreateNone());
 
 	if (fRequest == NULL)
 		return;
@@ -63,8 +63,7 @@ RequestBuilder::Access()
 
 	fRequest->Stream().AddUInt(OpAccess);
 	fRequest->Stream().AddUInt(ACCESS4_READ | ACCESS4_LOOKUP | ACCESS4_MODIFY
-								| ACCESS4_EXTEND | ACCESS4_DELETE
-								| ACCESS4_EXECUTE);
+		| ACCESS4_EXTEND | ACCESS4_DELETE | ACCESS4_EXECUTE);
 	fOpCount++;
 
 	return B_OK;
