@@ -9,6 +9,7 @@
 
 #include "IdMap.h"
 
+#include <AutoDeleter.h>
 #include <FindDirectory.h>
 #include <team.h>
 #include <util/AutoLock.h>
@@ -122,21 +123,19 @@ IdMap::_GetBuffer(T value, int32 code)
 		void* buffer = malloc(size);
 		if (buffer == NULL)
 			return NULL;
+		MemoryDeleter bufferDeleter(buffer);
 
 		size = read_port(fReplyPort, &code, buffer, size);
 		if (size < B_OK) {
-			free(buffer);
-
 			if (_Repair() != B_OK)
 				return 0;
 			continue;
 		}
 
-		if (code != MsgReply) {
-			free(buffer);
+		if (code != MsgReply)
 			return NULL;
-		}
 
+		bufferDeleter.Detach();
 		return buffer;
 	} while (true);
 }

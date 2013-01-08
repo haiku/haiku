@@ -411,6 +411,7 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 			return B_NO_MEMORY;
 		} else
 			buffer = ptr;
+		MemoryDeleter bufferDeleter(buffer);
 
 		received = 0;
 		do {
@@ -418,15 +419,12 @@ ConnectionStream::Receive(void** _buffer, uint32* _size)
 							record_size - received, 0);
 			received += result;
 		} while (result > 0 && received < record_size);
-		if (result < 0) {
-			result = errno;
-			free(buffer);
-			return result;
-		} else if (result == 0) {
-			free(buffer);
+		if (result < 0)
+			return errno;
+		else if (result == 0)
 			return ECONNABORTED;
-		}
 
+		bufferDeleter.Detach();
 		size += record_size;
 	} while (!last_one);
 
