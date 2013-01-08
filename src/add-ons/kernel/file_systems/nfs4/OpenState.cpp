@@ -231,26 +231,32 @@ OpenState::_ReclaimLocks(uint64 newClientID)
 			linfo->fOwner->fClientId = newClientID;
 		}
 
+		uint32 sequence = fFileSystem->OpenOwnerSequenceLock();
 		do {
 			RPC::Server* server = fFileSystem->Server();
 			Request request(server, fFileSystem);
 			RequestBuilder& req = request.Builder();
 
 			req.PutFH(fInfo.fHandle);
-			req.Lock(this, linfo, true);
+			req.Lock(this, linfo, &sequence, true);
 
 			status_t result = request.Send();
-			if (result != B_OK)
+			if (result != B_OK) {
+				fFileSystem->OpenOwnerSequenceUnlock(sequence);
 				break;
+			}
 
 			ReplyInterpreter& reply = request.Reply();
 
-			if (HandleErrors(reply.NFS4Error(), server))
+			sequence += IncrementSequence(reply.NFS4Error());
+
+			if (HandleErrors(reply.NFS4Error(), server, NULL, NULL, &sequence))
 				continue;
 
 			reply.PutFH();
 			reply.Lock(linfo);
 
+			fFileSystem->OpenOwnerSequenceUnlock(sequence);
 			break;
 		} while (true);
 		locker.Unlock();

@@ -205,7 +205,7 @@ RequestBuilder::_GenerateLockOwner(XDR::WriteStream& stream,
 
 
 status_t
-RequestBuilder::Lock(OpenState* state, LockInfo* lock, uint32 sequence,
+RequestBuilder::Lock(OpenState* state, LockInfo* lock, uint32* sequence,
 	bool reclaim)
 {
 	if (fProcedure != ProcCompound)
@@ -227,7 +227,7 @@ RequestBuilder::Lock(OpenState* state, LockInfo* lock, uint32 sequence,
 		fRequest->Stream().AddBoolean(true);			// new lock owner
 
 		// open seq stateid
-		fRequest->Stream().AddUInt(sequence);
+		fRequest->Stream().AddUInt(*sequence);
 		fRequest->Stream().AddUInt(state->fStateSeq);
 		fRequest->Stream().AddUInt(state->fStateID[0]);
 		fRequest->Stream().AddUInt(state->fStateID[1]);
@@ -239,6 +239,7 @@ RequestBuilder::Lock(OpenState* state, LockInfo* lock, uint32 sequence,
 
 	} else {
 		fRequest->Stream().AddBoolean(false);			// old lock owner
+		(*sequence)--;
 
 		// lock stateid seq
 		fRequest->Stream().AddUInt(lock->fOwner->fStateSeq);

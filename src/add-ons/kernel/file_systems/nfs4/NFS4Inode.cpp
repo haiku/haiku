@@ -1105,7 +1105,7 @@ NFS4Inode::AcquireLock(OpenFileCookie* cookie, LockInfo* lockInfo, bool wait)
 		RequestBuilder& req = request.Builder();
 
 		req.PutFH(fInfo.fHandle);
-		req.Lock(cookie->fOpenState, lockInfo, sequence);
+		req.Lock(cookie->fOpenState, lockInfo, &sequence);
 
 		status_t result = request.Send();
 		if (result != B_OK) {
