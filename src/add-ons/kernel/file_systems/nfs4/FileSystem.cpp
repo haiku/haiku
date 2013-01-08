@@ -190,8 +190,16 @@ FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* fsPath,
 	if (name != NULL) {
 		name++;
 		reinterpret_cast<RootInode*>(inode)->SetName(name);
-	} else
+	} else if (fsPath[0] != '\0')
 		reinterpret_cast<RootInode*>(inode)->SetName(fsPath);
+	else {
+		char* address = serv->ID().UniversalAddress();
+		if (address != NULL)
+			reinterpret_cast<RootInode*>(inode)->SetName(address);
+		else
+			reinterpret_cast<RootInode*>(inode)->SetName("NFS4 Share");
+		free(address);
+	}
 
 	fs->fRoot = reinterpret_cast<RootInode*>(inode);
 
