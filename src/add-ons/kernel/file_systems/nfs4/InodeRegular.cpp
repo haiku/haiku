@@ -59,6 +59,7 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 
 	state->fFileSystem = fFileSystem;
 	state->fInfo = fi;
+	state->fMode = mode & O_RWMASK;
 
 	return B_OK;
 }
@@ -117,6 +118,7 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 		state->fInfo = fInfo;
 		state->fFileSystem = fFileSystem;
+		state->fMode = mode & O_RWMASK;
 		status_t result = OpenFile(state, mode, &data);
 		if (result != B_OK)
 			return result;
