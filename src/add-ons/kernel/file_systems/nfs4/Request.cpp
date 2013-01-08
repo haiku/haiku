@@ -38,15 +38,17 @@ Request::_SendUDP(Cookie* cookie)
 	if (cookie != NULL)
 		cookie->RegisterRequest(rpc);
 
+	int requestTimeout = sSecToBigTime(60);
 	int retryLimit = 0;
 	bool hard = true;
+
 	if (fFileSystem != NULL) {
+		requestTimeout = fFileSystem->GetConfiguration().fRequestTimeout;
 		retryLimit = fFileSystem->GetConfiguration().fRetryLimit;
 		hard = fFileSystem->GetConfiguration().fHard;
 	}
 
-	result = fServer->WaitCall(rpc,
-		fFileSystem->GetConfiguration().fRequestTimeout);
+	result = fServer->WaitCall(rpc, requestTimeout);
 	if (result != B_OK) {
 		int attempts = 1;
 		while (result != B_OK && (hard || attempts++ < retryLimit)) {
@@ -57,8 +59,7 @@ Request::_SendUDP(Cookie* cookie)
 				return result;
 			}
 
-			result = fServer->WaitCall(rpc,
-				fFileSystem->GetConfiguration().fRequestTimeout);
+			result = fServer->WaitCall(rpc, requestTimeout);
 		}
 
 		if (result != B_OK) {
@@ -95,10 +96,12 @@ Request::_SendTCP(Cookie* cookie)
 	status_t result;
 	int attempts = 0;
 
+	int requestTimeout = sSecToBigTime(60);
 	int retryLimit = 0;
 	bool hard = true;
 
 	if (fFileSystem != NULL) {
+		requestTimeout = fFileSystem->GetConfiguration().fRequestTimeout;
 		retryLimit = fFileSystem->GetConfiguration().fRetryLimit;
 		hard = fFileSystem->GetConfiguration().fHard;
 	}
@@ -115,8 +118,7 @@ Request::_SendTCP(Cookie* cookie)
 		if (cookie != NULL)
 			cookie->RegisterRequest(rpc);
 
-		result = fServer->WaitCall(rpc,
-			fFileSystem->GetConfiguration().fRequestTimeout);
+		result = fServer->WaitCall(rpc, requestTimeout);
 		if (result != B_OK) {
 			if (cookie != NULL)
 				cookie->UnregisterRequest(rpc);
