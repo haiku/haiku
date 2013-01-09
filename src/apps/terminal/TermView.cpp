@@ -296,6 +296,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	fFontWidth = 0;
 	fFontHeight = 0;
 	fFontAscent = 0;
+	fEmulateBold = false;
 	fFrameResized = false;
 	fResizeViewDisableCount = 0;
 	fLastActivityTime = 0;
@@ -722,6 +723,9 @@ TermView::SetTermFont(const BFont *font)
 	int halfWidth = 0;
 
 	fHalfFont = font;
+	fBoldFont = font;
+	uint16 face = fBoldFont.Face();
+	fBoldFont.SetFace(B_BOLD_FACE | (face & ~B_REGULAR_FACE));
 
 	fHalfFont.SetSpacing(B_FIXED_SPACING);
 
@@ -753,6 +757,9 @@ TermView::SetTermFont(const BFont *font)
 	fCursorStyle = PrefHandler::Default() == NULL ? BLOCK_CURSOR
 		: PrefHandler::Default()->getCursor(PREF_CURSOR_STYLE);
 	fCursorBlinking = PrefHandler::Default()->getBool(PREF_BLINK_CURSOR);
+
+	fEmulateBold = PrefHandler::Default() == NULL ? false
+		: PrefHandler::Default()->getBool(PREF_EMULATE_BOLD);
 
 	_ScrollTo(0, false);
 	if (fScrollBar != NULL)
@@ -930,7 +937,7 @@ void
 TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	int32 width, bool mouse, bool cursor, BView *inView)
 {
-	inView->SetFont(&fHalfFont);
+	inView->SetFont(IS_BOLD(attr) && !fEmulateBold ? &fBoldFont : &fHalfFont);
 
 	// Set pen point
 	int x2 = x1 + fFontWidth * width;
@@ -971,21 +978,18 @@ TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	inView->SetHighColor(rgb_back);
 	inView->FillRect(BRect(x1, y1, x2 - 1, y2 - 1));
 	inView->SetLowColor(rgb_back);
-
 	inView->SetHighColor(rgb_fore);
 
 	// Draw character.
-	inView->MovePenTo(x1, y1 + fFontAscent);
-	inView->DrawString((char *) buf);
-
-	// bold attribute.
-	if (IS_BOLD(attr)) {
-		inView->MovePenTo(x1 + 1, y1 + fFontAscent);
-
-		inView->SetDrawingMode(B_OP_OVER);
+	if (IS_BOLD(attr) && fEmulateBold) {
+		inView->MovePenTo(x1 - 1, y1 + fFontAscent - 1);
 		inView->DrawString((char *)buf);
-		inView->SetDrawingMode(B_OP_COPY);
+		inView->SetDrawingMode(B_OP_BLEND);
 	}
+
+	inView->MovePenTo(x1, y1 + fFontAscent);
+	inView->DrawString((char *)buf);
+	inView->SetDrawingMode(B_OP_COPY);
 
 	// underline attribute
 	if (IS_UNDER(attr)) {

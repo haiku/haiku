@@ -81,6 +81,7 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_BLINK_CURSOR,		PREF_TRUE },
 	{ PREF_WARN_ON_EXIT,		PREF_TRUE },
 	{ PREF_CURSOR_STYLE,		PREF_BLOCK_CURSOR },
+	{ PREF_EMULATE_BOLD,		PREF_FALSE },
 
 	{ NULL, NULL},
 };

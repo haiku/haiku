@@ -230,10 +230,12 @@ private:
 
 			// Font and Width
 			BFont				fHalfFont;
+			BFont				fBoldFont;
 			int					fFontWidth;
 			int					fFontHeight;
 			int					fFontAscent;
 			struct escapement_delta fEscapement;
+			bool				fEmulateBold;
 
 			// frame resized flag.
 			bool				fFrameResized;
