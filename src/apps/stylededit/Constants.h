@@ -81,7 +81,7 @@ const uint32 SAVE_THEN_QUIT				= 'FPsq';
 // Update StatusView
 const uint32 UPDATE_STATUS				= 'UPSt';
 const uint32 UNLOCK_FILE				= 'UNLk';
-const uint32 UPDATE_LINE_SEL			= 'UPls';
+const uint32 UPDATE_LINE_SELECTION		= 'UPls';
 
 #endif	// CONSTANTS_H
 
