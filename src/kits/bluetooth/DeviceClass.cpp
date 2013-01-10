@@ -4,6 +4,7 @@
  */
 
 #include <bluetooth/DeviceClass.h>
+#include <bluetooth/debug.h>
 
 #include <Catalog.h>
 #include <Locale.h>
@@ -18,6 +19,7 @@ namespace Bluetooth {
 void
 DeviceClass::GetServiceClass(BString& serviceClass)
 {
+	CALLED();
 	static const char *services[] = { B_TRANSLATE_MARK("Positioning"), 
 		B_TRANSLATE_MARK("Networking"), B_TRANSLATE_MARK("Rendering"), 
 		B_TRANSLATE_MARK("Capturing"), B_TRANSLATE_MARK("Object transfer"),
@@ -41,13 +43,13 @@ DeviceClass::GetServiceClass(BString& serviceClass)
 
 	} else
 		serviceClass << B_TRANSLATE("Unspecified");
-
 }
 
 
 void
 DeviceClass::GetMajorDeviceClass(BString& majorClass)
 {
+	CALLED();
 	static const char *major_devices[] = { B_TRANSLATE_MARK("Miscellaneous"), 
 		B_TRANSLATE_MARK("Computer"), B_TRANSLATE_MARK("Phone"), 
 		B_TRANSLATE_MARK("LAN access"), B_TRANSLATE_MARK("Audio/Video"), 
@@ -65,6 +67,7 @@ DeviceClass::GetMajorDeviceClass(BString& majorClass)
 void
 DeviceClass::GetMinorDeviceClass(BString& minorClass)
 {
+	CALLED();
 	uint major = MajorDeviceClass();
 	uint minor = MinorDeviceClass();
 	
@@ -322,6 +325,7 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 void
 DeviceClass::DumpDeviceClass(BString& string)
 {
+	CALLED();
 	string << B_TRANSLATE("Service classes: ");
 	GetServiceClass(string);
 	string << " | ";
@@ -337,6 +341,7 @@ DeviceClass::DumpDeviceClass(BString& string)
 void
 DeviceClass::Draw(BView* view, const BPoint& point)
 {
+	CALLED();
 	rgb_color	kBlack = { 0,0,0,0 };
 	rgb_color	kBlue = { 28,110,157,0 };
 	rgb_color	kWhite = { 255,255,255,0 };
@@ -414,10 +419,8 @@ DeviceClass::Draw(BView* view, const BPoint& point)
 			view->StrokeLine(BPoint(point.x + IconInsets + uint(PixelsForIcon/4), 
 				point.y + IconInsets + uint(PixelsForIcon/4)));
 			break;
-	}
-	
+	}	
 	view->SetHighColor(kBlack);
 }
-
 
 }

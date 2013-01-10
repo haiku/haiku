@@ -6,6 +6,7 @@
  */
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/DiscoveryAgent.h>
+#include <bluetooth/debug.h>
 
 #include <bluetoothserver_p.h>
 
@@ -13,6 +14,7 @@
 
 BMessenger* _RetrieveBluetoothMessenger(void)
 {
+	CALLED();
 	// Fix/review: leaking memory here
 	BMessenger* fMessenger = new BMessenger(BLUETOOTH_SIGNATURE);
 
@@ -26,12 +28,13 @@ BMessenger* _RetrieveBluetoothMessenger(void)
 
 uint8 GetInquiryTime()
 {
+	CALLED();
 	return BT_DEFAULT_INQUIRY_TIME;
 }
 
 
 void SetInquiryTime(uint8 time)
 {
+	CALLED();
 	((void)(time));
 }
-
