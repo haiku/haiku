@@ -170,7 +170,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		aironetwifi atheroswifi broadcom43xx
 		iprowifi2100 iprowifi2200 iprowifi3945
 		iprowifi4965 marvell88w8363 marvell88w8335
-		ralink2860 ralinkwifi wavelanwifi
+		ralinkwifi wavelanwifi
 	}@ # x86
 
 	# WWAN drivers

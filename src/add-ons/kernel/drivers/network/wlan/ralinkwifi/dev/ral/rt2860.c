@@ -1414,6 +1414,7 @@ rt2860_intr(void *arg)
 
 	RAL_LOCK(sc);
 
+#ifndef __HAIKU__
 	r = RAL_READ(sc, RT2860_INT_STATUS);
 	if (__predict_false(r == 0xffffffff)) {
 		RAL_UNLOCK(sc);
@@ -1423,6 +1424,9 @@ rt2860_intr(void *arg)
 		RAL_UNLOCK(sc);
 		return;	/* not for us */
 	}
+#else
+	r = atomic_get((int32 *)&sc->sc_intr_status);
+#endif
 
 	/* acknowledge interrupts */
 	RAL_WRITE(sc, RT2860_INT_STATUS, r);
