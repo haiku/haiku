@@ -378,22 +378,26 @@ if $(TARGET_ARCH) = x86 {
 		lib.haiku/libgallium.a
 		: $(zipFile)
 		: extracted-mesa ] ;
-	HAIKU_GALLIUM_SOFTPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-		:
-		lib.haiku/libsoftpipe.a
-		: $(zipFile)
-		: extracted-mesa ] ;
-	HAIKU_GALLIUM_LLVMPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-		:
-		lib.haiku/libllvmpipe.a
-		: $(zipFile)
-		: extracted-mesa ] ;
+
+	if FIsBuildFeatureEnabled(llvm) {
+		HAIKU_GALLIUM_LLVMPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+			:
+			lib.haiku/libllvmpipe.a
+			: $(zipFile)
+			: extracted-mesa ] ;
+		Depends $(HAIKU_GALLIUM_LLVMPIPE_LIB) : $(HAIKU_LLVM_LIBS) ;
+	} else {
+		HAIKU_GALLIUM_SOFTPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+			:
+			lib.haiku/libsoftpipe.a
+			: $(zipFile)
+			: extracted-mesa ] ;
+	}
 
 	HAIKU_MESA_HEADERS = [ FDirName $(HAIKU_MESA_DIR) include ] ;
 
 	Depends $(HAIKU_MESA_HEADERS_DEPENDENCY) : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
 	Depends $(HAIKU_GLAPI_LIBS) : $(HAIKU_GLU_LIBS) ;
-	Depends $(HAIKU_GALLIUM_LLVMPIPE_LIB) : $(HAIKU_LLVM_LIBS) ;
 
 	EnableBuildFeatures mesa ;
 } else {
