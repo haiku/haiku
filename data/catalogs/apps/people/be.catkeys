@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PEPL	3273435274
+1	belarusian	x-vnd.Be-PEPL	2332202134
 Edit	People		Правіць
 Error	People		Памылка
 City	People		Горад
@@ -21,6 +21,7 @@ Nickname	People		Нік
 Quit	People		Выйсці
 Name	People		Імя
 Revert	People		Вярнуць
+Don't save	People		Не захоўваць
 Undo	People		Адмяніць
 E-mail	People		Эл. пошта
 Load image…	People		Загрузіць выяву…
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Хатні тэлефон
 Save as…	People		Захаваць як…
 Redo	People		Перарабіць
+Save changes before closing?	People		Захаваць змены перад закрыццём?
 Paste	People		Уставіць
 Drop an image here,\nor use the contextual menu.	People		Перацягніце выяву сюды,\nці выкарыстайце кантэкстнае меню.
 Save	People		Захаваць

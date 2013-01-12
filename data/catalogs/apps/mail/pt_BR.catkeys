@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-MAIL	3366038826
+1	portuguese (brazil)	x-vnd.Be-MAIL	233997769
 View	Mail		Visualizar
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Anexar Atributos:
@@ -107,6 +107,7 @@ Close	Mail		Fechar
 No matches	Mail		Nenhuma correspondência
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		O mail_daemon não está executando. A mensagem está na fila e será enviada quando o mail_daemon iniciar.
 Really delete this signature? This cannot be undone.	Mail		Excluir realmente esta assinatura? Isto não poderá ser desfeito.
+Save this message as a draft before closing?	Mail		Salvar esta mensagem como um rascunho antes de fechar?
 Open	Mail		Abrir
 draft	B_USER_DIRECTORY/mail/draft		rascunho
 Quote	Mail		Citar
@@ -120,6 +121,7 @@ Account:	Mail		Conta:
 Decoding:	Mail		Decodificação:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Desculpe, não foi possível encontrar um aplicativo que suporte o tipo de dados 'Pessoa'.
 Delete	Mail		Excluir
+Don't send	Mail		Não enviar
 Leave as '%s'	Mail		Deixar como '%s'
 Copy	Mail		Copiar
 Mail couldn't find its dictionary.	Mail		O correio não pôde encontrar seu dicionário.
@@ -134,6 +136,7 @@ Font:	Mail		Fonte:
 (Address unavailable)	Mail		(Endereço indisponível)
 Save address	Mail		Salvar endereço
 Queries	Mail		Consultas
+Send this message before closing?	Mail		Enviar esta mensagem antes de fechar?
 Save	Mail		Salvar
 Random	Mail		Aleatório
 Close and 	Mail		Fechar e  

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1301055003
+1	russian	x-vnd.Haiku-libtracker	1125041885
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -411,7 +411,6 @@ Paste layout	ContainerWindow		Вставить вид папки
 Select	InfoWindow		Выделить
 Could not update permissions of file \"%name\". %error	FSUtils		Невозможно обновить права файла \"%name\". %error
 Select…	FilePanelPriv		Выделить…
-Don't move files to Trash	SettingsView		Не помещать файлы в корзину
 There was an error resolving the link.	Tracker		Возникла ошибка при открытии ссылки.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/с
 You can't move or copy the trash.	FSUtils		Вы не можете перемещать или копировать корзину.
@@ -442,7 +441,6 @@ Automatic disk mounting	AutoMounterSettings		Автоматическое под
 Original name	ContainerWindow		Оригинальное имя
 Find	FSUtils		Найти
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании файла \"%name\":\n\t%error\n\nВы хотите продолжить?
-Ask before delete	SettingsView		Спрашивать перед удалением
 Single window navigation	SettingsView		Открывать папки в одном окне
 parent folder	NavMenu		родительский каталог
 contains	FindPanel		содержит

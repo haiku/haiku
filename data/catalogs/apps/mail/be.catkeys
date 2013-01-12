@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	88575093
+1	belarusian	x-vnd.Be-MAIL	233997769
 View	Mail		Агляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Атрыбуты ўкладання:
@@ -10,6 +10,7 @@ Edit	Mail		Правіць
 Print	Mail		Друкаваць
 <none>	Mail		<няма>
 New mail message	Mail		Новае паведамленне
+Untitled	Mail		Без назвы
 Automatic	Mail		Аўтаматычна
 Automatically mark mail as read:	Mail		Аўтаматычна пазначаць паведамленні як прачытаныя:
 helpful message	Mail		карыснае паведамленне
@@ -81,6 +82,7 @@ Only files can be added as attachments.	Mail		Можна ўкладаць тол
 Previous message	Mail		Папярэдняе паведамленне
 Attachments:	Mail		Укладанні:
 Title:	Mail		Загаловак:
+<no account found>	Mail		<рахунак ня знойдзены>
 Find…	Mail		Знайсці…
 Accounts…	Mail		Акаунты…
 Mail preferences	Mail		Наладкі Пошты
@@ -105,6 +107,7 @@ Close	Mail		Закрыць
 No matches	Mail		Няма супадзенняў
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Сервіс mail_daemon не актыўны. Паведамленне будзе пастаўлена ў чаргу і дасланае пасля таго як гэты сервіс будзе запушчаны наноў.
 Really delete this signature? This cannot be undone.	Mail		Сапраўды жадаеце знішчыць подпіс? Гэтую аперацыю немагчыма адмяніць.
+Save this message as a draft before closing?	Mail		Захаваць гэты ліст як чарнавік?
 Open	Mail		Адкрыць
 draft	B_USER_DIRECTORY/mail/draft		чарнавік
 Quote	Mail		Цытата
@@ -118,6 +121,7 @@ Account:	Mail		Акаунт:
 Decoding:	Mail		Кадаванне:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Выбачайце, але мне не ўдалося знайсці праграму якая можа працаваць с дадзенымі тыпу 'Person'.
 Delete	Mail		Выдаліць
+Don't send	Mail		Не дасылаць
 Leave as '%s'	Mail		Пакінуць як '%s'
 Copy	Mail		Капіяваць
 Mail couldn't find its dictionary.	Mail		Немагчыма знайсці слоўнік.
@@ -132,6 +136,7 @@ Font:	Mail		Шрыфт:
 (Address unavailable)	Mail		(Адрэс невядомы)
 Save address	Mail		Захаваць адрас
 Queries	Mail		Запыты
+Send this message before closing?	Mail		Даслаць гэты ліст зараз?
 Save	Mail		Захаваць
 Random	Mail		Выпадковы
 Close and 	Mail		Закрыць ды 

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-PEPL	3273435274
+1	portuguese (brazil)	x-vnd.Be-PEPL	2332202134
 Edit	People		Editar
 Error	People		Erro
 City	People		Cidade
@@ -21,6 +21,7 @@ Nickname	People		Apelido
 Quit	People		Sair
 Name	People		Nome
 Revert	People		Reverter
+Don't save	People		Não salvar
 Undo	People		Desfazer
 E-mail	People		E-mail
 Load image…	People		Carregar imagem…
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Fone residencial
 Save as…	People		Salvar como...
 Redo	People		Refazer
+Save changes before closing?	People		Salvar mudanças antes de fechar?
 Paste	People		Colar
 Drop an image here,\nor use the contextual menu.	People		Solte uma imagem aqui,\nou use o menu de contexto.
 Save	People		Salvar

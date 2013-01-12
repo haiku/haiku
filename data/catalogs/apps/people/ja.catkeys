@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PEPL	3273435274
+1	japanese	x-vnd.Be-PEPL	2332202134
 Edit	People		編集
 Error	People		エラー
 City	People		市町村
@@ -21,6 +21,7 @@ Nickname	People		ニックネーム
 Quit	People		終了
 Name	People		名前
 Revert	People		元に戻す
+Don't save	People		保存しない
 Undo	People		元に戻す
 E-mail	People		E-mail
 Load image…	People		イメージを読み込む…
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		自宅の電話番号
 Save as…	People		名前を付けて保存…
 Redo	People		やり直し
+Save changes before closing?	People		閉じる前に保存しますか?
 Paste	People		貼り付け
 Drop an image here,\nor use the contextual menu.	People		画像をここにドロップしてください。\nまたは、コンテクストメニューを使ってください。
 Save	People		保存

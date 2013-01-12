@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Time	3249243267
+1	english	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		GMT（UNIX 兼容）
 OK	Time		确定
 Asia	Time		亚洲
@@ -40,5 +40,6 @@ Try all servers	Time		尝试所有服务器
 Time zone	Time		时区
 Could not create socket	Time		无法创建套接字
 Synchronize again	Time		再次同步
+Clock	Time		时钟
 Network time	Time		网络时间
 Atlantic	Time		大西洋

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaConverter	296071315
+1	hungarian	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		Videó a beállítások paramétereivel
 Video encoding:	MediaConverter		Videó kódolása:
 No audio	Audio codecs list		Nincs hang
@@ -15,7 +15,6 @@ MediaConverter	System name		Médiaátalakító
 No video	Video codecs list		Nincs videó
 Duration:	MediaConverter-FileInfo		Időtartam:
 OK	MediaConverter		Rendben
-Error writing audio frame %Ld	MediaConverter		Hiba történt a %Ld. hang írása közben
 Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl átalakítása közben
 Low	MediaConverter		Alacsony
 Conversion completed	MediaConverter		Átalakítás kész
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Mégse
 None available	Video codecs		Nincs elérhető
 Conversion cancelled	MediaConverter		Konvertálás megszakítva
 No file selected	MediaConverter-FileInfo		Nincs fájl kiválasztva
-Error writing video frame %Ld	MediaConverter		Hiba történt a %Ld. képkocka írása közben
 Select this folder	MediaConverter		E mappa kijelölése
 Continue	MediaConverter		Folytatás
 Encoder parameters	MediaConverter-EncoderWindow		Kódoló paraméterei
@@ -48,7 +46,6 @@ Preview	MediaConverter		Előnézet
 File format:	MediaConverter		Fájlformátum:
 None available	Audio codecs		Nincs elérhető
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
-Error read audio frame %Ld	MediaConverter		Hiba történt a %Ld. hang olvasása közben
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld csatorna / %lld képkocka
 Error launching: %strError%	MediaConverter		Hiba történt a %strError% indítása közben
 High	MediaConverter		Magas
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
 Output folder	MediaConverter		Kimeneti mappa
 Audio quality: %3d%%	MediaConverter		Audió minősége: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Hiba történt a fájl beolvasása közben.\n\nHiba:
-Error read video frame %Ld	MediaConverter		Hiba történt a %Ld. képkocka olvasása közben
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles fájl típusa nem támogatott:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld képkocka

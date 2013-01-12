@@ -12,7 +12,7 @@ New	Icon-O-Matic-Menu-File		Nouveau
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic peut ne pas avoir interprété toutes les données du fichier SVG lors de son importation. En sauvegardant par-dessus le fichier original, ces informations seront perdues.
 Paste Properties	Icon-O-Matic-Properties		Coller les propriétés
 Stroke	Transformation		Barré
-Save Icon	Dialog title		Enregistrer icône
+Save Icon	Dialog title		Enregistrer l'icône
 Closed	Icon-O-Matic-PropertyNames		Fermé
 Remove Path	Icon-O-Matic-RemovePathsCmd		Enlever le chemin
 Add shape with path	Icon-O-Matic-Menu-Shape		Ajouter une forme avec un chemin

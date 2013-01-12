@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-VirtualMemory	1952476689
+1	finnish	x-vnd.Haiku-VirtualMemory	4238590117
 Quit	SettingsWindow		Lopeta
 Turn off	SettingsWindow		Käännä pois päältä
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Virtuaalimuistin ottamisella pois käytöstä on odottamattomia vaikutuksia järjestelmän stabiilisuuteen silloin kun muisti on kerran käytetty loppuun.\nVirtuaalimuisti ei vaikuta järjestelmän suorituskykyyn jos tätä pistettä ei ole saavutettu.\n\nOletko todella varma, että haluat ottaa sen pois päältä?
@@ -10,7 +10,6 @@ Use volume:	SettingsWindow		Käytä taltiota:
 Keep enabled	SettingsWindow		Pidä käytössä
 Revert	SettingsWindow		Palauta
 VirtualMemory	System name		Virtuaalimuistiasetukset
-Choose swap size automatically	SettingsWindow		Valitse virtuaalimuistin koko automaattisesti
 Use boot volume	SettingsWindow		Käytä alkulataustaltiota
 Load defaults	SettingsWindow		Lataa oletusasetukset
 OK	VirtualMemoryApp		Valmis

@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-PEPL	3273435274
+1	french	x-vnd.Be-PEPL	2332202134
 Edit	People		Éditer
 Error	People		Erreur
 City	People		Ville
@@ -21,6 +21,7 @@ Nickname	People		Surnom
 Quit	People		Quitter
 Name	People		Nom
 Revert	People		Rétablir
+Don't save	People		Ne pas sauvegarder
 Undo	People		Annuler
 E-mail	People		E-mail
 Load image…	People		Charger une image…
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Téléphone du domicile
 Save as…	People		Enregistrer sous…
 Redo	People		Rétablir
+Save changes before closing?	People		Voulez-vous enregistrer les modifications avant de fermer ?
 Paste	People		Coller
 Drop an image here,\nor use the contextual menu.	People		Déposez une image ici,\nou utilisez le menu contextuel.
 Save	People		Enregistrer

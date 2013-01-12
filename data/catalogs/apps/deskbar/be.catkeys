@@ -1,7 +1,9 @@
-1	belarusian	x-vnd.Be-TSKB	3155357024
+1	belarusian	x-vnd.Be-TSKB	1210725923
 Power off	DeskbarMenu		Выключыць
 Edit menu…	PreferencesWindow		Змяніць меню…
 Suspend	DeskbarMenu		Прыпыніць
+Hide clock	TimeView		Схаваць гадзіннік
+Applications	PreferencesWindow		Праграмы
 Time preferences…	TimeView		Наладкі Часу…
 About Haiku	DeskbarMenu		Пра Haiku
 Recent documents:	PreferencesWindow		Нядаўнія дакументы:
@@ -9,6 +11,7 @@ Recent applications	DeskbarMenu		Нядаўнія праграмы
 Sort running applications	PreferencesWindow		Сартыравать запушчаныя праграмы
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Праграмы
 Find…	DeskbarMenu		Знайсці…
+Show clock	Tray		Паказаць гадзіннік
 Window	PreferencesWindow		Акно
 Menu	PreferencesWindow		Меню
 Recent documents	DeskbarMenu		Нядаўнія дакументы

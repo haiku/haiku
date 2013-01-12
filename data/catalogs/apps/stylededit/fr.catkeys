@@ -1,13 +1,16 @@
-1	french	x-vnd.Haiku-StyledEdit	3117187160
+1	french	x-vnd.Haiku-StyledEdit	94944799
 StyledEdit	System name		Éditeur stylé
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ? 
 Paste	Menus		Coller
 OK	LoadAlert		OK
 File	Menus		Fichier
 ???	LoadAlert		???
+Modified	StatusView		Modifié
 Lines:	Statistics		Lignes :
 Italic	Menus		Italique
 Left	Menus		À gauche
 Search backwards	FindandReplaceWindow		Chercher en arrière
+Unlock file	StatusView		Déverrouiller le fichier
 Size	Menus		Taille
 Save	QuitAlert		Sauvegarder
 Page setup…	Menus		Mise en page…
@@ -19,20 +22,25 @@ Cancel	SaveAlert		Annuler
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rétablissement impossible, fichier non trouvé : « %s ».
 Case-sensitive	FindandReplaceWindow		Sensible à la casse
 Green	Menus		Vert
+Reload	NodeMonitorAlerts		Recharger
 Yellow	Menus		Jaune
 Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
 Wrap lines	Menus		Retour à la ligne
 Quit	Menus		Quitter
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Le fichier « %file% » a été supprimé par une autre application, voulez-vous le restaurer ?
 Document statistics	Statistics		Statistiques du document
 Cancel	RevertToSavedAlert		Annuler
+Autodetect	Menus		Détection automatique
 Document	Menus		Document
 Save changes to the document \"%s\"? 	QuitAlert		Enregistrer les modifications du document « %s » ? 
 Edit	Menus		Édition
+Revert	RevertToSavedAlert		Rétablir
 Font	Menus		Police
 Replace all	FindandReplaceWindow		Tout remplacer
 Statistics…	Menus		Statistiques…
 Default	Open_and_SaveAsPanel		Défaut
 Replace next	Menus		Remplacer le suivant
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		« %s » a des modifications en suspens.\nVoulez-vous rétablir la dernière version sauvegardée ? 
 Cancel	FindandReplaceWindow		Annuler
 Close	Menus		Fermer
 Save	SaveAlert		Sauvegarder
@@ -43,10 +51,12 @@ Don't save	QuitAlert		Ne pas enregistrer
 Align	Menus		Aligner
 Color	Menus		Couleur
 Red	Menus		Rouge
+OK	QuitAlert		OK
 Open…	Menus		Ouvrir…
 Center	Menus		Centré
 Blue	Menus		Bleu
 Cyan	Menus		Cyan
+line %d, column %d	StatusView		ligne %d, colonne %d
 OK	Statistics		OK
 Magenta	Menus		Magenta
 New	Menus		Nouveau

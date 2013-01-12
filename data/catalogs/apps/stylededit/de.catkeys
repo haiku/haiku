@@ -1,5 +1,6 @@
-1	german	x-vnd.Haiku-StyledEdit	2574742746
+1	german	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		Texteditor
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
 Paste	Menus		Einfügen
 OK	LoadAlert		OK
 File	Menus		Datei

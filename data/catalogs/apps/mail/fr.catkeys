@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	2646020355
+1	french	x-vnd.Be-MAIL	233997769
 View	Mail		Vue
 %d - Date	Mail		%d - Date
 Attach attributes:	Mail		Attributs du fichier joint :
@@ -10,6 +10,7 @@ Edit	Mail		Modifier
 Print	Mail		Imprimer
 <none>	Mail		<aucun>
 New mail message	Mail		Nouveau courriel
+Untitled	Mail		Sans titre
 Automatic	Mail		Automatique
 Automatically mark mail as read:	Mail		Marquer automatiquement les courriels lus :
 helpful message	Mail		message utile
@@ -106,6 +107,7 @@ Close	Mail		Fermer
 No matches	Mail		Pas de correspondances
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon n'est pas démarré. Ce message a été placé en file d'attente et sera envoyé quand mail_daemon sera démarré.
 Really delete this signature? This cannot be undone.	Mail		Voulez-vous vraiment effacer cette signature ? Ça ne pourra pas être annulé.
+Save this message as a draft before closing?	Mail		Voulez-vous sauvegarder ce brouillon avant de fermer ?
 Open	Mail		Ouvrir
 draft	B_USER_DIRECTORY/mail/draft		brouillons
 Quote	Mail		Citer
@@ -119,6 +121,7 @@ Account:	Mail		Compte :
 Decoding:	Mail		Décodage :
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Désolé, aucune application ne peut ouvrir les données de type « Person ».
 Delete	Mail		Effacer
+Don't send	Mail		Ne pas envoyer
 Leave as '%s'	Mail		Laisser « %s »
 Copy	Mail		Copier
 Mail couldn't find its dictionary.	Mail		Mail n'a pas trouvé son dictionaire.
@@ -133,6 +136,7 @@ Font:	Mail		Police :
 (Address unavailable)	Mail		(Adresse non disponible)
 Save address	Mail		Enregistrer l'adresse
 Queries	Mail		Requêtes
+Send this message before closing?	Mail		Voulez-vous envoyer ce message avant de fermer ?
 Save	Mail		Sauvegarder
 Random	Mail		Aléatoire
 Close and 	Mail		Fermer et 

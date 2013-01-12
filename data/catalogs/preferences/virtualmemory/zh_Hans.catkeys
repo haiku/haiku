@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-VirtualMemory	1952476689
+1	english	x-vnd.Haiku-VirtualMemory	4238590117
 Quit	SettingsWindow		退出
 Turn off	SettingsWindow		关闭
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		当物理内存不足时，禁用虚拟内存，会影响系统的稳定性。\n除非物理内存已用完，使用虚拟内存不会对您的系统性能造成任何影响。\n\n您确定禁用虚拟内存吗？
@@ -10,7 +10,6 @@ Use volume:	SettingsWindow		已用磁卷：
 Keep enabled	SettingsWindow		保持启用
 Revert	SettingsWindow		取消
 VirtualMemory	System name		虚拟内存
-Choose swap size automatically	SettingsWindow		自动选择交换分区大小
 Use boot volume	SettingsWindow		使用引导卷
 Load defaults	SettingsWindow		载入默认设置
 OK	VirtualMemoryApp		确定

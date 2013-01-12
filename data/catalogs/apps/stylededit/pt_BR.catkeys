@@ -1,5 +1,6 @@
-1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	2574742746
+1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		Estilo de Edição
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações para o documento \"%s\"?
 Paste	Menus		Colar
 OK	LoadAlert		OK
 File	Menus		Arquivo

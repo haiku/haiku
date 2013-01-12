@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	4228765353
+1	slovak	x-vnd.Haiku-libtracker	4052752235
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -410,7 +410,6 @@ Paste layout	ContainerWindow		Vložiť rozloženie
 Select	InfoWindow		Vybrať
 Could not update permissions of file \"%name\". %error	FSUtils		Nepodarilo sa aktualizovať oprávnenia súboru „%name“. %error
 Select…	FilePanelPriv		Vybrať…
-Don't move files to Trash	SettingsView		Nepresúvať súbory do Koša
 There was an error resolving the link.	Tracker		Vyskytla sa chyba pri preklade odkazu.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Nemôžete presunúť alebo skopírovať Kôš.
@@ -441,7 +440,6 @@ Automatic disk mounting	AutoMounterSettings		Automatické pripájanie diskov
 Original name	ContainerWindow		Pôvodný názov
 Find	FSUtils		Nájsť
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Chyba pri kopírovaní súboru „%name“:\n\t%error\n\nChcete pokračovať?
-Ask before delete	SettingsView		Pýtať sa pred zmazaním
 Single window navigation	SettingsView		Navigácia v jednom okne
 parent folder	NavMenu		nadradený priečinok
 contains	FindPanel		obsahuje

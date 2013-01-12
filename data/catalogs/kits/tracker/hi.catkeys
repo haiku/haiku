@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	2038664208
+1	hindi	x-vnd.Haiku-libtracker	1862651090
 common	B_COMMON_DIRECTORY		सामान्य
 OK	WidgetAttributeText		ठीक है
 Icon view	VolumeWindow		चिह्न दृश्य
@@ -391,7 +391,6 @@ Paste layout	ContainerWindow		लेआउट चिपकाएँ
 Select	InfoWindow		चुनें
 Could not update permissions of file \"%name\". %error	FSUtils		फ़ाइल की अनुमतियाँ अद्यतन नहीं कि जा सकती \"%name\". %error
 Select…	FilePanelPriv		चुनें ...
-Don't move files to Trash	SettingsView		रद्दी में फाइलों मत डालें
 There was an error resolving the link.	Tracker		एक कड़ी को हल करने में त्रुटि हुई.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		आप रद्दी को कॉपी या स्थानांतरित नहीं कर सकते हैं.
@@ -422,7 +421,6 @@ Automatic disk mounting	AutoMounterSettings		स्वचालित डिस�
 Original name	ContainerWindow		मूल नाम
 Find	FSUtils		खोजें
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		फ़ाइल की प्रतिलिपि में त्रुटि \"%name\":\n\t%error\n\nक्या आप जारी रखना चाहेंगे?
-Ask before delete	SettingsView		हटाने से पहले पूछें 
 Single window navigation	SettingsView		एक खिड़की मे नैवगेशन
 parent folder	NavMenu		मूल फ़ोल्डर
 contains	FindPanel		शामिल हैं

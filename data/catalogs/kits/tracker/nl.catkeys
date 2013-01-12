@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	1301055003
+1	dutch; flemish	x-vnd.Haiku-libtracker	1125041885
 common	B_COMMON_DIRECTORY		algemeen
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
@@ -411,7 +411,6 @@ Paste layout	ContainerWindow		Lay-out plakken
 Select	InfoWindow		Selecteren
 Could not update permissions of file \"%name\". %error	FSUtils		De machtigingen voor het bestand \"%name\" konden niet bijgewerkt worden. %error
 Select…	FilePanelPriv		Selecteren...
-Don't move files to Trash	SettingsView		Verplaats geen bestanden naar de prullenbak
 There was an error resolving the link.	Tracker		Er is een fout opgetreden bij het toekennen van de link.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		U kunt de prullenbak niet verplaatsen of kopiëren.
@@ -442,7 +441,6 @@ Automatic disk mounting	AutoMounterSettings		Automatische schijfbetrekking
 Original name	ContainerWindow		Oorspronkelijke naam
 Find	FSUtils		Zoeken
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fout bij het kopiëren van het bestand \"%name\":\n\t%error\n\nWilt u doorgaan?
-Ask before delete	SettingsView		Vraag voor verwijderen
 Single window navigation	SettingsView		Enkel-venster-navigatie
 parent folder	NavMenu		bovenliggende map
 contains	FindPanel		bevat

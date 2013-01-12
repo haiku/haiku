@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DiskUsage	2447717116
+1	russian	x-vnd.Haiku-DiskUsage	3631077986
 Scanning %refName%	Scanner		Сканируется раздел %refName%
 Size	Info Window		Размер
 Rescan	Pie View		Пересканировать
@@ -9,12 +9,16 @@ no supporting apps	Pie View		нет поддерживающих програм�
 Path	Info Window		Путь
 Scan	Status View		Сканировать
 9999.99 GB	Status View		9999.99 ГБ
+Rescan	Status View		Пересканировать
 file unavailable	Status View		файл недоступен
+Get info	Pie View		Информация
 DiskUsage	System name		Использование диска
  in %d files	Info Window		 в %d файлах
 %d files	Status View		%d файлов
 Created	Info Window		Создан
 Modified	Info Window		Изменен
+Abort	Status View		Прервать
+Open with	Pie View		Открыть в
 Open	Pie View		Открыть
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Свободно на разделе %refName%

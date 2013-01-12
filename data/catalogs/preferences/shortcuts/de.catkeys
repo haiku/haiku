@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	1741147146
+1	german	x-vnd.Haiku-Shortcuts	3661393357
 Error, NULL state description?\n	ShortcutsSpec		Fehler, NULL Status Beschreibung?\n
 MoveMouse	ShortcutsSpec		Bewege Maus
 OK	ShortcutsWindow		OK
@@ -25,6 +25,7 @@ Save	ShortcutsWindow		Speichern
 *MouseButton 1	ShortcutsWindow		*Maustaste 1 drücken
 *MoveMouse +20 +0	ShortcutsWindow		*Maus 20 Pixel nach rechts bewegen
 MouseDown	ShortcutsSpec		Maustaste gedrückt
+Save changes before closing?	ShortcutsWindow		Änderungen vor dem Schließen speichern?
 Remove selected shortcut	ShortcutsWindow		Markierten Eintrag entfernen
 MouseButton	ShortcutsSpec		Maustaste
 Add new shortcut	ShortcutsWindow		Neue Tasten-Kombi

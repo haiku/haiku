@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-FileTypes	1059171929
+1	belarusian	x-vnd.Haiku-FileTypes	133192727
 Application types…	FileTypes Window		Тыпы праграм…
 Description:	Application Types Window		Апісанне:
 Args only	Application Type Window		Толькі аргументы
@@ -49,6 +49,8 @@ Group name:	New File Type Window		Імя групы:
 Preferred application	FileType Window		Пажаданая праграма
 Progress	Application Types Window		Прагрэс
 Set preferred application	Preferred App Menu		Прызначыць пажаданую праграму
+Don't save	Application Type Window		Не захоўваць
+Save changes before closing?	Application Type Window		Захаваць змены перад зачыненнем?
 File	Application Type Window		Файл
 Version:	Application Type Window		Версія:
 Select…	FileTypes Window		Выбраць…

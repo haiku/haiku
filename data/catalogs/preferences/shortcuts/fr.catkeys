@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	1741147146
+1	french	x-vnd.Haiku-Shortcuts	3661393357
 Error, NULL state description?\n	ShortcutsSpec		Erreur : description d'état NULL ?\n
 MoveMouse	ShortcutsSpec		BougerSouris
 OK	ShortcutsWindow		OK
@@ -25,6 +25,7 @@ Save	ShortcutsWindow		Enregistrer
 *MouseButton 1	ShortcutsWindow		*BoutonSouris 1
 *MoveMouse +20 +0	ShortcutsWindow		*BougeSouris +20 +0
 MouseDown	ShortcutsSpec		SourisEnBas
+Save changes before closing?	ShortcutsWindow		Voulez-vous enregistrer les modifications avant de fermer ?
 Remove selected shortcut	ShortcutsWindow		Supprimer le raccourci sélectionné
 MouseButton	ShortcutsSpec		BoutonSouris
 Add new shortcut	ShortcutsWindow		Ajouter un nouveau raccourci

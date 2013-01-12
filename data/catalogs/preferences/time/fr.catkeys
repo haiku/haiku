@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Time	3249243267
+1	french	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		GMT (compatible UNIX)
 OK	Time		OK
 Asia	Time		Asie
@@ -40,5 +40,6 @@ Try all servers	Time		Essayer tous les serveurs
 Time zone	Time		Fuseau horaire
 Could not create socket	Time		Impossible de créer le socket
 Synchronize again	Time		Synchroniser à nouveau
+Clock	Time		Horloge
 Network time	Time		Heure réseau
 Atlantic	Time		Atlantique

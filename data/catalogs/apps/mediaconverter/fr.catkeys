@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaConverter	296071315
+1	french	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		La vidéo utilise les paramètres de réglages
 Video encoding:	MediaConverter		Encodage vidéo :
 No audio	Audio codecs list		Pas de son
@@ -15,7 +15,6 @@ MediaConverter	System name		MédiaConvertisseur
 No video	Video codecs list		Pas de vidéo
 Duration:	MediaConverter-FileInfo		Durée :
 OK	MediaConverter		OK
-Error writing audio frame %Ld	MediaConverter		Erreur d'écriture de l'échantillons audio %Ld
 Error converting '%filename'	MediaConverter		Erreur à la conversion de « %filename »
 Low	MediaConverter		Basse
 Conversion completed	MediaConverter		Conversion achevée
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Annuler
 None available	Video codecs		Aucun disponible
 Conversion cancelled	MediaConverter		Conversion annulée
 No file selected	MediaConverter-FileInfo		Aucun fichier sélectionné
-Error writing video frame %Ld	MediaConverter		Erreur d'écriture de la trame vidéo %Ld
 Select this folder	MediaConverter		Sélectionner ce dossier
 Continue	MediaConverter		Continuer
 Encoder parameters	MediaConverter-EncoderWindow		Paramètres d'encodage
@@ -48,7 +46,6 @@ Preview	MediaConverter		Aperçu
 File format:	MediaConverter		Format de fichier :
 None available	Audio codecs		Aucun disponible
 MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur+ : Dossier d'enregistrement
-Error read audio frame %Ld	MediaConverter		Erreur de lecture de l'échantillons audio %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canaux / %Ld échantillons
 Error launching: %strError%	MediaConverter		Erreur de lancement : %strError%
 High	MediaConverter		Haute
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Qualité vidéo : %3d%%
 Output folder	MediaConverter		Dossier de sortie
 Audio quality: %3d%%	MediaConverter		Qualité audio : %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Une erreur est survenue lors de la lecture des informations du fichier.\n\nErreur : 
-Error read video frame %Ld	MediaConverter		Erreur de lecture de l'image vidéo %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles fichiers ne sont pas des médias reconnus pour être pris en charge :
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %Ld échantillons

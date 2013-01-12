@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaConverter	296071315
+1	slovak	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		Video používajúce parametre z nastavení
 Video encoding:	MediaConverter		Kódovanie videa:
 No audio	Audio codecs list		Bez zvuku
@@ -15,7 +15,6 @@ MediaConverter	System name		Konvertor multimédií
 No video	Video codecs list		Bez videa
 Duration:	MediaConverter-FileInfo		Trvanie:
 OK	MediaConverter		OK
-Error writing audio frame %Ld	MediaConverter		Chyba pri zápise zvukového rámca %Ld
 Error converting '%filename'	MediaConverter		Chyba pri konverzii „%filename“
 Low	MediaConverter		Nízka
 Conversion completed	MediaConverter		Konverzia dokončená
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Zrušiť
 None available	Video codecs		Žiadny nie je dostupný
 Conversion cancelled	MediaConverter		Konverzia zrušená
 No file selected	MediaConverter-FileInfo		Žiadny súbor nie je vybraný
-Error writing video frame %Ld	MediaConverter		Chyba pri zápise video rámca %Ld
 Select this folder	MediaConverter		Vybrať tento priečinok
 Continue	MediaConverter		Poračovať
 Encoder parameters	MediaConverter-EncoderWindow		Parametre kódovania
@@ -48,7 +46,6 @@ Preview	MediaConverter		Náhľad
 File format:	MediaConverter		Formát súboru:
 None available	Audio codecs		Žiadne nie sú dostupné
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:AdresárNaUloženie
-Error read audio frame %Ld	MediaConverter		Chyba pri čítaní zvukového rámca %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanál / %lld rámcov
 Error launching: %strError%	MediaConverter		Chyba pri spúšťaní: %strError%
 High	MediaConverter		Vysoká
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
 Output folder	MediaConverter		Výstupný priečinok
 Audio quality: %3d%%	MediaConverter		Kvalita zvuku: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Vyskytla sa chyba pri čítaní informácií súboru.\n\nChyba: 
-Error read video frame %Ld	MediaConverter		Chyba pri čítaní video rámca %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles súborov nebolo rozpoznaných ako podporovaný typ multimédia:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rámcov

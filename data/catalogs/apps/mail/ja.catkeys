@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	3366038826
+1	japanese	x-vnd.Be-MAIL	233997769
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
@@ -107,6 +107,7 @@ Close	Mail		閉じる
 No matches	Mail		一致しません
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		メールサービスが起動されていないため、このメッセージは処理待ちとなりメールサービス起動後に処理されます。
 Really delete this signature? This cannot be undone.	Mail		署名を削除しますか？削除した書名は復元できませんので、ご注意ください。
+Save this message as a draft before closing?	Mail		閉じる前にドラフトとして保存しますか?
 Open	Mail		開く
 draft	B_USER_DIRECTORY/mail/draft		下書き
 Quote	Mail		引用符を付ける
@@ -120,6 +121,7 @@ Account:	Mail		アカウント：
 Decoding:	Mail		文字コード：
 Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つかりませんでした。
 Delete	Mail		削除
+Don't send	Mail		送信しない
 Leave as '%s'	Mail		「%s」のままにする
 Copy	Mail		コピー
 Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。
@@ -134,6 +136,7 @@ Font:	Mail		フォント：
 (Address unavailable)	Mail		(アドレスは利用できません)
 Save address	Mail		アドレスを保存
 Queries	Mail		クエリ
+Send this message before closing?	Mail		閉じる前にこのメッセージを送信しますか?
 Save	Mail		保存
 Random	Mail		ランダム
 Close and 	Mail		閉じる

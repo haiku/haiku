@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	2646020355
+1	english	x-vnd.Be-MAIL	233997769
 View	Mail		查看
 %d - Date	Mail		%d - 日期
 Attach attributes:	Mail		附加属性：
@@ -10,6 +10,7 @@ Edit	Mail		编辑
 Print	Mail		打印
 <none>	Mail		<无>
 New mail message	Mail		新建邮件
+Untitled	Mail		未命名
 Automatic	Mail		自动
 Automatically mark mail as read:	Mail		邮件自动标记为“已读”：
 helpful message	Mail		帮助消息
@@ -106,6 +107,7 @@ Close	Mail		关闭
 No matches	Mail		无匹配项
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon 没有运行。邮件将会被打包，在mail_daemon启动时将会发送。
 Really delete this signature? This cannot be undone.	Mail		确定删除标识? 删除的标识将无法被恢复。
+Save this message as a draft before closing?	Mail		关闭前是否将消息保存为草稿？
 Open	Mail		打开
 draft	B_USER_DIRECTORY/mail/draft		草稿箱
 Quote	Mail		转发
@@ -119,6 +121,7 @@ Account:	Mail		账户：
 Decoding:	Mail		解码：
 Sorry, could not find an application that supports the 'Person' data type.	Mail		对不起，无法找到支持‘个人’数据类型的程序。
 Delete	Mail		删除
+Don't send	Mail		不发送
 Leave as '%s'	Mail		标记为 '%s'
 Copy	Mail		复制
 Mail couldn't find its dictionary.	Mail		电子邮件无法找到字典。
@@ -133,6 +136,7 @@ Font:	Mail		字体：
 (Address unavailable)	Mail		（地址不可用）
 Save address	Mail		保存地址
 Queries	Mail		查询
+Send this message before closing?	Mail		关闭前是否发送消息？
 Save	Mail		保存
 Random	Mail		随机
 Close and 	Mail		关闭并且

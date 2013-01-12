@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	3069426771
+1	english	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		全选
 Add Style	Icon-O-Matic-AddStylesCmd		添加样式
 Color (#%02x%02x%02x)	Style name after dropping a color		颜色(#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		未命名
 Multi Set 	Multi Set (property name)		批量设置
 any of the other lists to	Empty property list - 2nd line		任何其他列表为
 Save as…	Icon-O-Matic-Menu-File		保存为...
+Don't save	Icon-O-Matic-Menu-Settings		不保存
 Change Color	Icon-O-Matic-SetColorCmd		修改颜色
 Style	Icon-O-Matic-Menus		样式
 <modify path>	Icon-O-Matic-PathCmd		<修改路径>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		撤销
 Click on a shape above	Empty transformers list - 1st line		点击上述模型
 Add Shape	Icon-O-Matic-AddShapesCmd		添加模型
 Contour	Transformation		轮廓
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		关闭前是否保存当前图标修改？
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<无恢复内容>
 Perspective	Transformation		透视
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		移动转换

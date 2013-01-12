@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Shortcuts	1741147146
+1	japanese	x-vnd.Haiku-Shortcuts	3661393357
 Error, NULL state description?\n	ShortcutsSpec		エラー、記述がありません?\n
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		OK
@@ -25,6 +25,7 @@ Save	ShortcutsWindow		保存
 *MouseButton 1	ShortcutsWindow		*MouseButton 1
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 MouseDown	ShortcutsSpec		MouseDown
+Save changes before closing?	ShortcutsWindow		閉じる前に変更を保存しますか?
 Remove selected shortcut	ShortcutsWindow		選択部を削除
 MouseButton	ShortcutsSpec		MouseButton
 Add new shortcut	ShortcutsWindow		新規作成

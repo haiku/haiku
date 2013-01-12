@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-PEPL	3273435274
+1	english	x-vnd.Be-PEPL	2332202134
 Edit	People		编辑
 Error	People		错误
 City	People		城市
@@ -21,6 +21,7 @@ Nickname	People		昵称
 Quit	People		退出
 Name	People		名字
 Revert	People		恢复
+Don't save	People		不保存
 Undo	People		取消
 E-mail	People		电子邮箱
 Load image…	People		载入图像...
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		家庭电话
 Save as…	People		保存为...
 Redo	People		重复
+Save changes before closing?	People		关闭前是否保存修改？
 Paste	People		粘贴
 Drop an image here,\nor use the contextual menu.	People		向这里拖动图像，\n或者使用上下文菜单。
 Save	People		保存

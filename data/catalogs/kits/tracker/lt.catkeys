@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3955647850
+1	lithuanian	x-vnd.Haiku-libtracker	3779634732
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -411,7 +411,6 @@ Paste layout	ContainerWindow		Pritaikyti nukopijuotą išdėstymą
 Select	InfoWindow		Pažymėti
 Could not update permissions of file \"%name\". %error	FSUtils		Nepavyko atnaujinti failo „%name“ leidimų. %error
 Select…	FilePanelPriv		Pažymėti…
-Don't move files to Trash	SettingsView		Šiukšlinėn objektų nemesti
 There was an error resolving the link.	Tracker		Nustatant nuorodos tikslą, įvyko klaida.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Šiukšlinės negalima nei perkelti, nei nukopijuoti.
@@ -442,7 +441,6 @@ Automatic disk mounting	AutoMounterSettings		Automatiškai prijungti tomus:
 Original name	ContainerWindow		Tikras vardas
 Find	FSUtils		Ieškoti
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Klaida kopijuojant failą „%name“:\n\t%error\n\nAr norite tęsti?
-Ask before delete	SettingsView		Atsiklausti prieš šalinant
 Single window navigation	SettingsView		Naršyti viename lange
 parent folder	NavMenu		Viršaplankis
 contains	FindPanel		savyje turi

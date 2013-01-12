@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	3564609505
+1	ukrainian	x-vnd.Haiku-MediaConverter	1928642235
 Video using parameters form settings	MediaConverter		Настройки форми використання параметрів відео
 Video encoding:	MediaConverter		Кодування відео:
 No audio	Audio codecs list		без звуку
@@ -15,7 +15,6 @@ MediaConverter	System name		MediaConverter
 No video	Video codecs list		Немає відео
 Duration:	MediaConverter-FileInfo		Тривалість:
 OK	MediaConverter		Гаразд
-Error writing audio frame %Ld	MediaConverter		Помилка запису аудіо фрагменту %Ld
 Error converting '%filename'	MediaConverter		Помилка перетворення '%filename'
 Low	MediaConverter		Низька
 Conversion completed	MediaConverter		Конверсія завершена
@@ -29,7 +28,6 @@ Cancel	MediaConverter		Відмінити
 None available	Video codecs		Недоступний
 Conversion cancelled	MediaConverter		Конверсію відмінено
 No file selected	MediaConverter-FileInfo		Файлу не вибрано
-Error writing video frame %Ld	MediaConverter		Помилка запису відео фрейму %Ld
 Select this folder	MediaConverter		Вибрати цю папку
 Continue	MediaConverter		Продовжити
 Encoder parameters	MediaConverter-EncoderWindow		Параметри декодера
@@ -47,7 +45,6 @@ Preview	MediaConverter		Попередній перегляд
 File format:	MediaConverter		Формат файлу:
 None available	Audio codecs		Не доступний жоден
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
-Error read audio frame %Ld	MediaConverter		Помилка читання аудіо фрейму %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld каналу / %lld фреймів
 Error launching: %strError%	MediaConverter		Помилка підключення: %strError%
 High	MediaConverter		Висока
@@ -62,6 +59,5 @@ Video quality: %3d%%	MediaConverter		Якість відео: %3d%%
 Output folder	MediaConverter		Вихідна папка
 Audio quality: %3d%%	MediaConverter		Якість звуку: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Сталася помилка при зчитуванні даних про файл.\n\nПомилка :
-Error read video frame %Ld	MediaConverter		Помилка при читанні відео фрейму %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles файлів не було розпізнано як підтримувані медіа файли:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz моно / %lld фреймів

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-VirtualMemory	1952476689
+1	polish	x-vnd.Haiku-VirtualMemory	4238590117
 Quit	SettingsWindow		Wyjdź
 Turn off	SettingsWindow		Wyłącz
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Wyłączenie pamięci wirtualnej może mieć niepożądany wpływ na stabilność systemu, gdy cała dostępna pamięć zostanie zużyta.\nPamięć wirtualna nie wpływa na wydajność systemu, aż do tego momentu.\n\nNa pewno chcesz ją wyłączyc?
@@ -10,7 +10,6 @@ Use volume:	SettingsWindow		Użyj woluminu:
 Keep enabled	SettingsWindow		Pozostaw włączoną
 Revert	SettingsWindow		Przywróć
 VirtualMemory	System name		PamięćWirtualna
-Choose swap size automatically	SettingsWindow		Ustaw rozmiar pliku wymiany automatycznie
 Use boot volume	SettingsWindow		Użyj woluminu rozruchowego
 Load defaults	SettingsWindow		Załaduj domyślne ustawienia
 OK	VirtualMemoryApp		OK

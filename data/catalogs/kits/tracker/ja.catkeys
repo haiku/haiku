@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	40324107
+1	japanese	x-vnd.Haiku-libtracker	4159278285
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -406,7 +406,6 @@ Paste layout	ContainerWindow		レイアウトを貼り付ける
 Select	InfoWindow		選択
 Could not update permissions of file \"%name\". %error	FSUtils		\"%name\"の権限を更新できませんでした。%error
 Select…	FilePanelPriv		選択…
-Don't move files to Trash	SettingsView		ごみ箱を経由せずに削除する
 There was an error resolving the link.	Tracker		リンクの解釈に失敗しました。
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/秒
 You can't move or copy the trash.	FSUtils		ごみ箱の移動やコピーはできません。
@@ -437,7 +436,6 @@ Automatic disk mounting	AutoMounterSettings		ディスクの自動マウント
 Original name	ContainerWindow		元の名前
 Find	FSUtils		検索
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" をコピー中にエラーが発生しました：\n\t%error\n\nそれでも続けますか？
-Ask before delete	SettingsView		削除前に確認する
 Single window navigation	SettingsView		シングルウィンドウナビゲーション
 parent folder	NavMenu		親フォルダー
 contains	FindPanel		含む

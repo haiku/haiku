@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.haiku-icon_o_matic	3069426771
+1	portuguese (brazil)	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		Selecionar Tudo
 Add Style	Icon-O-Matic-AddStylesCmd		Adicionar Estilo
 Color (#%02x%02x%02x)	Style name after dropping a color		Cor (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		Sem título
 Multi Set 	Multi Set (property name)		Conjunto Múltiplo
 any of the other lists to	Empty property list - 2nd line		qualquer das outras listas para
 Save as…	Icon-O-Matic-Menu-File		Salvar como…
+Don't save	Icon-O-Matic-Menu-Settings		Não salvar
 Change Color	Icon-O-Matic-SetColorCmd		Alterar Cor
 Style	Icon-O-Matic-Menus		Estilo
 <modify path>	Icon-O-Matic-PathCmd		<caminho de modificação>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Desfazer
 Click on a shape above	Empty transformers list - 1st line		Clique em uma forma acima
 Add Shape	Icon-O-Matic-AddShapesCmd		Adicionar Forma
 Contour	Transformation		Contorno
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salvar as alterações para o ícone atual antes de fechar?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nada para refazer>
 Perspective	Transformation		Perspectiva
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mover Transformador

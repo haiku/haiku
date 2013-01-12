@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	3564609505
+1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	1928642235
 Video using parameters form settings	MediaConverter		Βίντεο χρησιμοποιόντας τις ρυθμίσεις
 Video encoding:	MediaConverter		Κωδικοποίηση βίντεο:
 No audio	Audio codecs list		Χωρίς ήχο
@@ -15,7 +15,6 @@ MediaConverter	System name		Μετατροπέας Μέσων
 No video	Video codecs list		Χωρίς βίντεο
 Duration:	MediaConverter-FileInfo		Διάρκεια:
 OK	MediaConverter		Εντάξει
-Error writing audio frame %Ld	MediaConverter		Σφάλμα κατά την εγγραφή του καρέ ήχου %Ld
 Error converting '%filename'	MediaConverter		Σφάλμα κατά τη μετατροπή του '%filename'
 Low	MediaConverter		Χαμηλή
 Conversion completed	MediaConverter		Η μετατροπή ολοκληρώθηκε
@@ -29,7 +28,6 @@ Cancel	MediaConverter		Άκυρο
 None available	Video codecs		Κανένα διαθέσιμο
 Conversion cancelled	MediaConverter		Η μετατροπή ακυρώθηκε
 No file selected	MediaConverter-FileInfo		Δεν επιλέχτηκε αρχείο
-Error writing video frame %Ld	MediaConverter		Σφάλμα κατά την εγγραφή του καρε βίντεο %Ld
 Select this folder	MediaConverter		Επιλέξτε αυτό τον φάκελο
 Continue	MediaConverter		Συνέχεια
 Encoder parameters	MediaConverter-EncoderWindow		Encoder parameters
@@ -47,7 +45,6 @@ Preview	MediaConverter		Προεπισκόπηση
 File format:	MediaConverter		Μορφή αρχείου:
 None available	Audio codecs		Κανένα διαθέσιμο
 MediaConverter+:SaveDirectory	MediaConverter		ΜετατροπέαςΠολυμέσων+:ΑποθήκευσηΚαταλόγου
-Error read audio frame %Ld	MediaConverter		Σφάλμα κατά την ανάγνωση του καρέ ήχου %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld κανάλι/ %lld καρέ
 Error launching: %strError%	MediaConverter		Σφάλμα κατά την εκτέλεση του: %strError%
 High	MediaConverter		Υψηλή
@@ -62,6 +59,5 @@ Video quality: %3d%%	MediaConverter		Ποιότητα βίντεο: %3d%%
 Output folder	MediaConverter		Φάκελος εξαγωγής
 Audio quality: %3d%%	MediaConverter		Ποιότητα ήχου: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Προέκυψε ένα σφάλμα κατά την ανάγνωση των πληροφοριών του αρχείου.\n\nΣφάλμα:
-Error read video frame %Ld	MediaConverter		Σφάλμα κατά την ανάγνωση του καρέ βίντεο %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		Τα %amountOfFiles αρχεία δεν αναγνωρίστηκαν ως υποστηριζόμενα αρχεία πολυμέσων:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld καρέ

@@ -1,5 +1,6 @@
-1	polish	x-vnd.Haiku-StyledEdit	894766086
+1	polish	x-vnd.Haiku-StyledEdit	1430674159
 StyledEdit	System name		StyledEdit
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie \"%s\"? 
 Paste	Menus		Wklej
 OK	LoadAlert		OK
 File	Menus		Plik
@@ -48,6 +49,7 @@ Don't save	QuitAlert		Nie zapisuj
 Align	Menus		Wyrównaj
 Color	Menus		Kolor
 Red	Menus		Czerwony
+OK	QuitAlert		OK
 Open…	Menus		Otwórz…
 Center	Menus		Wyśrodkuj
 Blue	Menus		Niebieski

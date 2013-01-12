@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	3069426771
+1	belarusian	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		Выбраць Усё
 Add Style	Icon-O-Matic-AddStylesCmd		Дадаць Стыль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колер (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		Неназваны
 Multi Set 	Multi Set (property name)		Прызначыць некалькі 
 any of the other lists to	Empty property list - 2nd line		любым з іншых спісаў каб
 Save as…	Icon-O-Matic-Menu-File		Захаваць як…
+Don't save	Icon-O-Matic-Menu-Settings		Не захоўваць
 Change Color	Icon-O-Matic-SetColorCmd		Змяніць колер
 Style	Icon-O-Matic-Menus		Стыль
 <modify path>	Icon-O-Matic-PathCmd		<змяніць пуць>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Вярнуць
 Click on a shape above	Empty transformers list - 1st line		Клікніце па фігуры вышэй
 Add Shape	Icon-O-Matic-AddShapesCmd		Дадаць Фігуру
 Contour	Transformation		Контур
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Захаваць зьмены ў значак перад тым як выйсьці?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<няма чаго перарабляць>
 Perspective	Transformation		Перспэктыва
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Перамясціць Трансформер

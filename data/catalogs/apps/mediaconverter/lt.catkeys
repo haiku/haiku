@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaConverter	296071315
+1	lithuanian	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		Vaizdo įrašui naudojami nurodyti parametrai
 Video encoding:	MediaConverter		Vaizdo kodavimas:
 No audio	Audio codecs list		Be garso takelio
@@ -15,7 +15,6 @@ MediaConverter	System name		Medijos keitiklis
 No video	Video codecs list		Be vaizdo takelio
 Duration:	MediaConverter-FileInfo		Trukmė:
 OK	MediaConverter		Gerai
-Error writing audio frame %Ld	MediaConverter		Klaida rašant %Ld–ąjį garso takelio kadrą
 Error converting '%filename'	MediaConverter		Klaida konvertuojant „%filename“
 Low	MediaConverter		Žema
 Conversion completed	MediaConverter		Konvertavimas baigtas
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Atsisakyti
 None available	Video codecs		Nepasiekiama
 Conversion cancelled	MediaConverter		Konvertavimas nutrauktas
 No file selected	MediaConverter-FileInfo		Nepažymėtas joks failas
-Error writing video frame %Ld	MediaConverter		Klaida rašant %Ld-ąjį vaizdo takelio kadrą
 Select this folder	MediaConverter		Rinktis šį aplanką
 Continue	MediaConverter		Tęsti
 Encoder parameters	MediaConverter-EncoderWindow		Kodavimo parametrai
@@ -48,7 +46,6 @@ Preview	MediaConverter		Peržiūrėti
 File format:	MediaConverter		Failo formatas:
 None available	Audio codecs		Nepasiekiama
 MediaConverter+:SaveDirectory	MediaConverter		Medijos keitiklis: parinkite paskirties aplanką
-Error read audio frame %Ld	MediaConverter		Klaida skaitant %Ld–ąjį garso takelio kadrą
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz, %ld kanalai (-ų), %lld kadrai (-ų)
 Error launching: %strError%	MediaConverter		Klaida paleidžiant: %strError%
 High	MediaConverter		Aukšta
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Vaizdo takelio kokybė: %3d%%
 Output folder	MediaConverter		Paskirties aplankas
 Audio quality: %3d%%	MediaConverter		Garso takelio kokybė: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Skaitant failo informaciją įvyko klaida.\n\nKlaida:
-Error read video frame %Ld	MediaConverter		Klaida skaitant %Ld–ąjį vaizdo takelio kadrą
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		Šie %amountOfFiles failai (-ų) nebuvo atpažinti kaip palaikomo formato failai:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz, mono, %lld kadrai (-ų)

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	963769669
+1	french	x-vnd.Haiku-Appearance	2950529393
 Plain font:	Font view		Police simple :
 Control highlight	Colors tab		Mise en valeur de contrôle
 Control border	Colors tab		Bordure des contrôles
@@ -58,6 +58,7 @@ LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
 Selected menu item border	Colors tab		Bordure de l'élément sélectionné dans le menu
 Strong	AntialiasingSettingsView		Épais
 Panel text	Colors tab		Texte des panneaux
+Arrow style	DecorSettingsView		Style de flèche
 Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
 Look and feel	APRWindow		Aspect et comportement
 Antialiasing menu	AntialiasingSettingsView		Menu lissage

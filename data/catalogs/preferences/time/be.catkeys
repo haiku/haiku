@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Time	3249243267
+1	belarusian	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		GMT (як у UNIX)
 OK	Time		ОК
 Asia	Time		Азія
@@ -40,5 +40,6 @@ Try all servers	Time		Паспрабаваць усе серверы
 Time zone	Time		Часавы пояс
 Could not create socket	Time		Немагчыма стварыць сеткавы сокет
 Synchronize again	Time		Сінхранізаваць ізноў
+Clock	Time		Гадзіннік
 Network time	Time		Сеткавы час
 Atlantic	Time		Атлантыка

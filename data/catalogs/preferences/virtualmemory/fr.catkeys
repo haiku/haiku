@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-VirtualMemory	1952476689
+1	french	x-vnd.Haiku-VirtualMemory	4238590117
 Quit	SettingsWindow		Quitter
 Turn off	SettingsWindow		Désactiver
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Désactiver la mémoire virtuelle perturbe le système quand la mémoire est pleine.\nLa mémoire virtuelle n'affecte pas les performances avant que ce point soit atteint.\n\nÊtes-vous vraiment sur de vouloir la désactiver ?
@@ -10,7 +10,6 @@ Use volume:	SettingsWindow		Utiliser le volume :
 Keep enabled	SettingsWindow		Laisser actif
 Revert	SettingsWindow		Défaire
 VirtualMemory	System name		Mémoire Virtuelle
-Choose swap size automatically	SettingsWindow		Choisir la taille du fichier d'échange automatiquement
 Use boot volume	SettingsWindow		Utiliser le volume d'amorçage
 Load defaults	SettingsWindow		Charger les valeurs par défaut
 OK	VirtualMemoryApp		OK

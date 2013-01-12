@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaConverter	296071315
+1	swedish	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		Video med parametrar från inställningar
 Video encoding:	MediaConverter		Videokodning:
 No audio	Audio codecs list		Inget ljud
@@ -15,7 +15,6 @@ MediaConverter	System name		MediaKonverterare
 No video	Video codecs list		Inga filmer
 Duration:	MediaConverter-FileInfo		Speltid:
 OK	MediaConverter		OK
-Error writing audio frame %Ld	MediaConverter		Fel vid skrivning av ljudstycke %Ld
 Error converting '%filename'	MediaConverter		Fel vid konvertering av '%filename'
 Low	MediaConverter		Låg
 Conversion completed	MediaConverter		Konverteringen klar
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Avbryt
 None available	Video codecs		Inga tillgängliga
 Conversion cancelled	MediaConverter		Konverteringen avbröts
 No file selected	MediaConverter-FileInfo		Ingen fil vald
-Error writing video frame %Ld	MediaConverter		Fel vid skrivande av bildruta %Ld
 Select this folder	MediaConverter		Välj denna mapp
 Continue	MediaConverter		Fortsätt
 Encoder parameters	MediaConverter-EncoderWindow		Kodningsparametrar
@@ -48,7 +46,6 @@ Preview	MediaConverter		Förhandsvisa
 File format:	MediaConverter		Filformat:
 None available	Audio codecs		Inte tillgängliga
 MediaConverter+:SaveDirectory	MediaConverter		MediaKonverterare+:SaveDirectory
-Error read audio frame %Ld	MediaConverter		Fel vid inläsning av ljudstycke %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanal / %lld rutor
 Error launching: %strError%	MediaConverter		Fel vid start: %strError%
 High	MediaConverter		Hög
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Videokvalité: %3d%%
 Output folder	MediaConverter		Utmapp
 Audio quality: %3d%%	MediaConverter		Ljudkvalité: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ett fel uppstod vid inläsning av filinformationen.\n\nFel:
-Error read video frame %Ld	MediaConverter		Fel vid inläsning av bildruta %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles kändes inte igen som mediafiler:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rutor

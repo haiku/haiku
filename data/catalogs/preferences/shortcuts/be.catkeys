@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Shortcuts	1741147146
+1	belarusian	x-vnd.Haiku-Shortcuts	3661393357
 Error, NULL state description?\n	ShortcutsSpec		Памылка, апісанне стану NULL?\n
 MoveMouse	ShortcutsSpec		РухацьМыш
 OK	ShortcutsWindow		ОК
@@ -25,6 +25,7 @@ Save	ShortcutsWindow		Захаваць
 *MouseButton 1	ShortcutsWindow		*КнопкаМышы 1
 *MoveMouse +20 +0	ShortcutsWindow		*РухацьМыш +20 +0
 MouseDown	ShortcutsSpec		МышУніз
+Save changes before closing?	ShortcutsWindow		Захаваць змены перад зачыненнем?
 Remove selected shortcut	ShortcutsWindow		Выдаліць выбраную гарачую клавішу
 MouseButton	ShortcutsSpec		КнопкаМышы
 Add new shortcut	ShortcutsWindow		Дадаць новую гарачую клавішу

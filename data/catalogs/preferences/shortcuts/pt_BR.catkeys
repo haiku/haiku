@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	1741147146
+1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	3661393357
 Error, NULL state description?\n	ShortcutsSpec		Erro, descrição de estado em branco?\n
 MoveMouse	ShortcutsSpec		Mover o Mouse
 OK	ShortcutsWindow		OK
@@ -25,6 +25,7 @@ Save	ShortcutsWindow		Salvar
 *MouseButton 1	ShortcutsWindow		*Botão do Mouse 1
 *MoveMouse +20 +0	ShortcutsWindow		*Mover Mouse +20 +0
 MouseDown	ShortcutsSpec		Mouse para baixo
+Save changes before closing?	ShortcutsWindow		Salvar alterações antes de fechar?
 Remove selected shortcut	ShortcutsWindow		Remover atalho selecionado
 MouseButton	ShortcutsSpec		Botão do Mouse
 Add new shortcut	ShortcutsWindow		Adicionar novo atalho

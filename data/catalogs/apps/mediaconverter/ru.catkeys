@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaConverter	296071315
+1	russian	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		Видео использует параметры из настроек
 Video encoding:	MediaConverter		Кодирование видео:
 No audio	Audio codecs list		Без аудио
@@ -15,7 +15,6 @@ MediaConverter	System name		Медиаконвертер
 No video	Video codecs list		Без видео
 Duration:	MediaConverter-FileInfo		Длительность:
 OK	MediaConverter		ОК
-Error writing audio frame %Ld	MediaConverter		Ошибка записи аудио кадра %Ld
 Error converting '%filename'	MediaConverter		Ошибка конвертации '%filename'
 Low	MediaConverter		Низкое
 Conversion completed	MediaConverter		Конвертация завершена
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Отмена
 None available	Video codecs		Не доступно
 Conversion cancelled	MediaConverter		Конвертация отменена
 No file selected	MediaConverter-FileInfo		Файл не выбран
-Error writing video frame %Ld	MediaConverter		Ошибка записи видеокадра %Ld
 Select this folder	MediaConverter		Выбрать эту папку
 Continue	MediaConverter		Продолжить
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кодирования
@@ -48,7 +46,6 @@ Preview	MediaConverter		Предпросмотр
 File format:	MediaConverter		Формат файла:
 None available	Audio codecs		Недоступно
 MediaConverter+:SaveDirectory	MediaConverter		Медиаконвертер: выбор папки сохранения
-Error read audio frame %Ld	MediaConverter		Ошибка чтения аудио кадра %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f кГц каналов: %ld / кадров: %lld
 Error launching: %strError%	MediaConverter		Ошибка запуска: %strError%
 High	MediaConverter		Высокое
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Качество видео: %3d%%
 Output folder	MediaConverter		Сохранять в папку
 Audio quality: %3d%%	MediaConverter		Качество аудио: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Произошла ошибка при чтении информации о файле.\n\nОшибка: 
-Error read video frame %Ld	MediaConverter		Ошибка чтения видеокадра %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles файлов не были распознаны как поддерживаемые медиа файлы:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / кадров: %lld
