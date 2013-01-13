@@ -165,13 +165,13 @@ public:
 	~Image();
 
 	void UnloadBitmap();
-	const char* GetName() {return name.String();}
+	const char* GetName() { return fName.String(); }
 	BBitmap* GetBitmap();
-	BPath GetPath() {return fPath;}
+	BPath GetPath() { return fPath; }
 private:
 	BBitmap* fBitmap;
 	BPath fPath;
-	BString name;
+	BString fName;
 };
 
 #endif
