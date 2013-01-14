@@ -455,6 +455,8 @@ private:
 			int32				fLastClickOffset;
 			bool				fInstalledNavigateWordwiseShortcuts;
 			bool				fInstalledNavigateToTopOrBottomShortcuts;
+			bool				fInstalledSelectWordwiseShortcuts;
+			bool				fInstalledSelectToTopOrBottomShortcuts;
 
 			uint32				_reserved[6];
 };
