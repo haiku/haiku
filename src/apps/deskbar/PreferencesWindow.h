@@ -45,11 +45,6 @@ public:
 				void		EnableDisableDependentItems();
 
 private:
-				void		_HandleChangedSettingsView();
-
-			BListView*		fSettingsTypeListView;
-			BBox*			fSettingsContainerBox;
-
 			BCheckBox*		fMenuRecentDocuments;
 			BCheckBox*		fMenuRecentApplications;
 			BCheckBox*		fMenuRecentFolders;
