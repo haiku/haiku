@@ -10,6 +10,8 @@
 
 
 class MainWindow;
+class SettingsFile;
+class SettingsWindow;
 
 class BEntry;
 class BFilePanel;
@@ -29,6 +31,9 @@ private:
 	BList			fWindowList;
 
 	BFilePanel*		fOpenPanel;
+
+	SettingsFile*	fSettings;
+	SettingsWindow*	fSettingsWindow;
 
 	void			ArgvReceived(int32 argc, char* argv[]);
 	void			ReadyToRun();

@@ -16,6 +16,7 @@ public:
 				bool showHorizontalScrollbar = true);
 			~ResourceListView();
 
+	void	MouseDown(BPoint point);
 	void	MessageReceived(BMessage* msg);
 
 private:

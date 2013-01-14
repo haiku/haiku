@@ -9,14 +9,17 @@
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
 
+#include <stdlib.h>
+
 
 ResourceRow::ResourceRow()
 	:
 	BRow()
 {
-	fRawData = NULL;
+	Parent = NULL;
+	ActionIndex = -1;
 
-	SetField(new BIntegerField(0), 0);
+	SetField(new BStringField(""), 0);
 	SetField(new BStringField(""), 1);
 	SetField(new BStringField(""), 2);
 	SetField(new BStringField(""), 3);
@@ -34,7 +37,14 @@ ResourceRow::~ResourceRow()
 void
 ResourceRow::SetResourceID(int32 id)
 {
-	((BIntegerField*)GetField(0))->SetValue(id);
+	((BStringField*)GetField(0))->SetString((BString() << id).String());
+}
+
+
+void
+ResourceRow::SetResourceStringID(const char* id)
+{
+	((BStringField*)GetField(0))->SetString(id);
 }
 
 
@@ -53,11 +63,19 @@ ResourceRow::SetResourceType(const char* type)
 
 
 void
-ResourceRow::SetResourceTypeCode(type_code code)
+ResourceRow::SetResourceCode(type_code code)
 {
-	fTypeCode = code;
-	TypeCodeToString(code, fTypeString);
+	fCode = code;
+	ResourceType::CodeToString(code, fTypeString);
 	((BStringField*)GetField(3))->SetString(fTypeString);
+}
+
+
+void
+ResourceRow::SetResourceStringCode(const char* code)
+{
+	fCode = ResourceType::StringToCode(code);
+	((BStringField*)GetField(3))->SetString(code);
 }
 
 
@@ -65,23 +83,6 @@ void
 ResourceRow::SetResourceData(const char* data)
 {
 	((BStringField*)GetField(4))->SetString(data);
-}
-
-
-void
-ResourceRow::SetResourceRawData(const void* data)
-{
-	if (data == NULL)
-		data = kDefaultData;
-
-	fRawData = data;
-
-	int32 ix = FindTypeCodeIndex(ResourceTypeCode());
-
-	if (ix == -1)
-		SetResourceData("[Unknown Data]");
-	else
-		SetResourceData(kDefaultTypes[ix].toString(fRawData));
 }
 
 
@@ -95,7 +96,18 @@ ResourceRow::SetResourceSize(off_t size)
 int32
 ResourceRow::ResourceID()
 {
-	return ((BIntegerField*)GetField(0))->Value();
+	const char* strID = ResourceStringID();
+
+	// TODO: Check whether is numeric and resolve if not.
+
+	return atoi(strID);
+}
+
+
+const char*
+ResourceRow::ResourceStringID()
+{
+	return ((BStringField*)GetField(0))->String();
 }
 
 
@@ -114,9 +126,16 @@ ResourceRow::ResourceType()
 
 
 type_code
-ResourceRow::ResourceTypeCode()
+ResourceRow::ResourceCode()
 {
-	return fTypeCode;
+	return fCode;
+}
+
+
+const char*
+ResourceRow::ResourceStringCode()
+{
+	return 	((BStringField*)GetField(3))->String();
 }
 
 
@@ -124,13 +143,6 @@ const char*
 ResourceRow::ResourceData()
 {
 	return ((BStringField*)GetField(4))->String();
-}
-
-
-const void*
-ResourceRow::ResourceRawData()
-{
-	return fRawData;
 }
 
 

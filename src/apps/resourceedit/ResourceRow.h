@@ -17,24 +17,27 @@ public:
 					~ResourceRow();
 
 	void			SetResourceID(int32 id);
+	void			SetResourceStringID(const char* id);
 	void			SetResourceName(const char* name);
 	void			SetResourceType(const char* type);
-	void			SetResourceTypeCode(type_code code);
+	void			SetResourceCode(type_code code);
+	void			SetResourceStringCode(const char* code);
 	void			SetResourceData(const char* data);
-	void			SetResourceRawData(const void*);
 	void			SetResourceSize(off_t size);
 
 	int32			ResourceID();
+	const char*		ResourceStringID();
 	const char*		ResourceName();
 	const char*		ResourceType();
-	type_code		ResourceTypeCode();
+	type_code		ResourceCode();
+	const char*		ResourceStringCode();
 	const char*		ResourceData();
-	const void*		ResourceRawData();
 	off_t			ResourceSize();
 
+	ResourceRow*	Parent;
+	int32			ActionIndex;
 private:
-	const void*		fRawData;
-	type_code		fTypeCode;
+	type_code		fCode;
 	char			fTypeString[8];
 
 };

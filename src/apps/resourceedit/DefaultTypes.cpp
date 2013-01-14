@@ -9,84 +9,22 @@
 #include <ByteOrder.h>
 
 
-BString
-toStringBOOL(const void* data)
+int32
+ResourceType::FindIndex(type_code code)
 {
-	if (*(bool*)data)
-		return "✔ true";
-	else
-		return "✖ false";
-}
+	for (int32 i = 0; kDefaultTypes[i].type != NULL; i++)
+		if (StringToCode(kDefaultTypes[i].code) == code)
+			return i;
 
-
-BString
-toStringBYTE(const void* data)
-{
-	return (BString() << *(int8*)data);
-}
-
-
-BString
-toStringSHRT(const void* data)
-{
-	return (BString() << *(int16*)data);
-}
-
-
-BString
-toStringLONG(const  void* data)
-{
-	return (BString() << *(int32*)data);
-}
-
-
-BString
-toStringLLNG(const void* data)
-{
-	return (BString() << *(int64*)data);
-}
-
-
-BString
-toStringUBYT(const void* data)
-{
-	return (BString() << *(uint8*)data);
-}
-
-
-BString
-toStringUSHT(const void* data)
-{
-	return (BString() << *(uint16*)data);
-}
-
-
-BString
-toStringULNG(const void* data)
-{
-	return (BString() << *(uint32*)data);
-}
-
-
-BString
-toStringULLG(const void* data)
-{
-	return (BString() << *(uint64*)data);
-}
-
-
-BString
-toStringRAWT(const void* data)
-{
-	return "[Raw Data]";
+	return -1;
 }
 
 
 int32
-FindTypeCodeIndex(type_code code)
+ResourceType::FindIndex(const char* type)
 {
 	for (int32 i = 0; kDefaultTypes[i].type != NULL; i++)
-		if (kDefaultTypes[i].typeCode == code)
+		if (strcmp(kDefaultTypes[i].type, type) == 0)
 			return i;
 
 	return -1;
@@ -94,8 +32,16 @@ FindTypeCodeIndex(type_code code)
 
 
 void
-TypeCodeToString(type_code code, char* str)
+ResourceType::CodeToString(type_code code, char* str)
 {
 	*(type_code*)str = B_HOST_TO_BENDIAN_INT32(code);
 	str[4] = '\0';
+}
+
+
+type_code
+ResourceType::StringToCode(const char* code)
+{
+	// TODO: Code may be in other formats, too! Ex.: 0x4C4F4E47
+	return B_BENDIAN_TO_HOST_INT32(*(int32*)code);
 }

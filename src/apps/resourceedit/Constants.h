@@ -25,13 +25,24 @@
 #define MSG_CLEAR			'm015'
 #define MSG_SELECTALL		'm016'
 
-#define MSG_ADD				'm020'
-#define	MSG_REMOVE			'm021'
-#define MSG_MOVEUP			'm022'
-#define MSG_MOVEDOWN		'm023'
+#define MSG_ADDAPPRES		'm020'
+#define MSG_SETTINGS		'm021'
 
-#define MSG_SELECTION		'm030'
+#define MSG_ADD				'm030'
+#define	MSG_REMOVE			'm031'
+#define MSG_MOVEUP			'm032'
+#define MSG_MOVEDOWN		'm033'
 
+#define MSG_SELECTION		'm040'
+#define MSG_INVOCATION		'm041'
+
+#define MSG_ACCEPT			'm050'
+#define MSG_CANCEL			'm051'
+#define MSG_IGNORE			'm052'
+
+#define MSG_SETTINGS_APPLY	'm022'
+#define MSG_SETTINGS_REVERT	'm023'
+#define MSG_SETTINGS_CLOSED	'm024'
 
 // TODO: Remove prior to release.
 #define DEBUG 1

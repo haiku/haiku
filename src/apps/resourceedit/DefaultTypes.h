@@ -6,61 +6,64 @@
 #define DEFAULT_TYPES_H
 
 
+#include "AppFlagsEdit.h"
+#include "BooleanEdit.h"
+#include "EditView.h"
+#include "NormalEdit.h"
+#include "ResourceRow.h"
+
 #include <String.h>
 
 
-struct ResourceDataType	{
-	const char* type;
-	type_code	typeCode;
-	uint32		size;
-	BString (*toString)(const void*);
+struct ResourceType {
+			const char* 	type;
+			const char*		code;
+			const char* 	data;
+			uint32			size;
+			EditView*		edit;
+
+	static	int32			FindIndex(const char* type);
+	static	int32			FindIndex(type_code code);
+
+	static	void			CodeToString(type_code code, char* str);
+	static	type_code		StringToCode(const char* code);
 };
 
-// TODO: Rework design of this. This one sucks.
 
-BString toStringBOOL(const void* data);
-BString toStringBYTE(const void* data);
-BString toStringSHRT(const void* data);
-BString toStringLONG(const void* data);
-BString toStringLLNG(const void* data);
-BString toStringUBYT(const void* data);
-BString toStringUSHT(const void* data);
-BString toStringULNG(const void* data);
-BString toStringULLG(const void* data);
-BString toStringRAWT(const void* data);
+#define LINE	"", "", "", ~0, NULL
+#define END		NULL, NULL, NULL, 0, NULL
 
-char * const kDefaultData[] = {
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-
-#define LINE	"", 0, ~0
-#define END		NULL, 0, 0
-
-const ResourceDataType kDefaultTypes[] = {
-	{ "bool",	'BOOL', 1, toStringBOOL },
+const ResourceType kDefaultTypes[] = {
+	{ "app_signature",			"",		"application/MyApp",		18, new NormalEdit() 	},
+	{ "app_name_catalog_entry", "",		"MyApp:System name:MyApp",	24, new NormalEdit()	},
+	//{ "app_flags",				"",		"None",						4,	NULL },
 	{ LINE },
-	{ "int8",	'BYTE', 1, toStringBYTE },
-	{ "int16",	'SHRT', 2, toStringSHRT },
-	{ "int32",	'LONG', 4, toStringLONG },
-	{ "int64",	'LLNG', 8, toStringLLNG },
+	{ "bool",					"BOOL", "false",					1, 	new BooleanEdit()	},
 	{ LINE },
-	{ "uint8",	'UBYT', 1, toStringUBYT },
-	{ "uint16",	'USHT', 2, toStringUSHT },
-	{ "uint32",	'ULNG', 4, toStringULNG },
-	{ "uint64",	'ULLG', 8, toStringULLG },
+	{ "int8",					"BYTE", "0", 						1, 	new NormalEdit() 	},
+	{ "int16",					"SHRT", "0", 						2, 	new NormalEdit() 	},
+	{ "int32",					"LONG", "0", 						4, 	new NormalEdit() 	},
+	{ "int64",					"LLNG", "0", 						8, 	new NormalEdit() 	},
 	{ LINE },
-	{ "raw",	'RAWT', 0, toStringRAWT },
+	{ "uint8",					"UBYT", "0", 						1, 	new NormalEdit() 	},
+	{ "uint16",					"USHT", "0",						2, 	new NormalEdit() 	},
+	{ "uint32",					"ULNG", "0",						4, 	new NormalEdit()	},
+	{ "uint64",					"ULLG", "0",						8, 	new NormalEdit()	},
+	{ LINE },
+	{ "string",					"CSTR", "\"\"",						0,	NULL },
+	{ "raw",					"RAWT", "",							0, 	NULL },
+	{ LINE },
+	{ "array",					"",		"", 						0, 	NULL },
+	{ "message",				"",		"", 						0, 	NULL },
+	{ "import", 				"",		"", 						0, 	NULL },
 	{ END }
 };
 
-const int32 kDefaultTypeSelected = 4;
+const int32 kDefaultTypeSelected = 8;
 	// int32
 
 #undef LINE
 #undef END
-
-int32 FindTypeCodeIndex(type_code code);
-void TypeCodeToString(type_code code, char* str);
 
 
 #endif

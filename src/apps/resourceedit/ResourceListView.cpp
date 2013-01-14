@@ -19,7 +19,7 @@ ResourceListView::ResourceListView(BRect rect, const char* name,
 	BColumnListView(rect, name, resizingMode, drawFlags, border,
 		showHorizontalScrollbar)
 {
-
+	//SetMouseTrackingEnabled(true);
 }
 
 
@@ -30,10 +30,18 @@ ResourceListView::~ResourceListView()
 
 
 void
+ResourceListView::MouseDown(BPoint point)
+{
+	PRINT(("MouseDown()"));
+}
+
+
+void
 ResourceListView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case B_SIMPLE_DATA: {
+		case B_SIMPLE_DATA:
+		{
 			entry_ref ref;
 			int32 n = 0;
 

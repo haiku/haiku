@@ -7,11 +7,17 @@
 #include "MainWindow.h"
 
 #include "Constants.h"
+#include "EditWindow.h"
 #include "ImageButton.h"
 #include "ResourceListView.h"
 #include "ResourceRow.h"
+#include "SettingsFile.h"
+#include "SettingsWindow.h"
+#include "UndoContext.h"
 
+#include <Alert.h>
 #include <Application.h>
+#include <Box.h>
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
 #include <Entry.h>
@@ -23,8 +29,8 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Resources.h>
-#include <StatusBar.h>
 #include <String.h>
+#include <StringView.h>
 #include <TextControl.h>
 #include <TranslationUtils.h>
 
@@ -39,13 +45,19 @@
 using namespace std;
 
 
-MainWindow::MainWindow(BRect frame, BEntry* assocEntry)
+MainWindow::MainWindow(BRect frame, BEntry* assocEntry, SettingsFile* settings)
 	:
-	BWindow(frame, NULL, B_DOCUMENT_WINDOW, 0)
+	BWindow(frame, NULL, B_DOCUMENT_WINDOW, B_OUTLINE_RESIZE)
 {
 	fAssocEntry = assocEntry;
+	fSettings = settings;
+
+	fUndoContext = new UndoContext();
+
+	AdaptSettings();
 
 	fSavePanel = NULL;
+	fUnsavedChanges = false;
 
 	fMenuBar = new BMenuBar(BRect(0, 0, 600, 1), "fMenuBar");
 
@@ -64,13 +76,23 @@ MainWindow::MainWindow(BRect frame, BEntry* assocEntry)
 
 	fEditMenu = new BMenu("Edit", B_ITEMS_IN_COLUMN);
 	fUndoItem = new BMenuItem("Undo", new BMessage(MSG_UNDO), 'Z');
+	fUndoItem->SetEnabled(false);
 	fRedoItem = new BMenuItem("Redo", new BMessage(MSG_REDO), 'Y');
+	fRedoItem->SetEnabled(false);
 	fCutItem = new BMenuItem("Cut", new BMessage(MSG_CUT), 'X');
+	fCutItem->SetEnabled(false);
 	fCopyItem = new BMenuItem("Copy", new BMessage(MSG_COPY), 'C');
+	fCopyItem->SetEnabled(false);
 	fPasteItem = new BMenuItem("Paste", new BMessage(MSG_PASTE), 'V');
+	fPasteItem->SetEnabled(false);
 	fClearItem = new BMenuItem("Clear", new BMessage(MSG_CLEAR));
 	fSelectAllItem = new BMenuItem("Select All",
 		new BMessage(MSG_SELECTALL), 'A');
+
+	fToolsMenu = new BMenu("Tools", B_ITEMS_IN_COLUMN);
+	fAddAppResourcesItem = new BMenuItem("Add app resources",
+		new BMessage(MSG_ADDAPPRES));
+	fSettingsItem = new BMenuItem("Settings", new BMessage(MSG_SETTINGS));
 
 	fHelpMenu = new BMenu("Help", B_ITEMS_IN_COLUMN);
 
@@ -127,8 +149,8 @@ MainWindow::MainWindow(BRect frame, BEntry* assocEntry)
 	fResourceList = new ResourceListView(listRect, "fResourceList",
 		B_FOLLOW_ALL, 0);
 
-	fResourceList->AddColumn(new BIntegerColumn("ID", 48, 1, 999,
-		B_ALIGN_RIGHT), 0);
+	fResourceList->AddColumn(new BStringColumn("ID", 48, 1, 999,
+		B_ALIGN_LEFT), 0);
 	fResourceList->AddColumn(new BStringColumn("Name", 156, 1, 999,
 		B_TRUNCATE_END, B_ALIGN_LEFT), 1);
 	fResourceList->AddColumn(new BStringColumn("Type", 56, 1, 999,
@@ -140,10 +162,17 @@ MainWindow::MainWindow(BRect frame, BEntry* assocEntry)
 	fResourceList->AddColumn(new BSizeColumn("Size", 74, 1, 999,
 		B_ALIGN_RIGHT), 5);
 
-	fResourceList->SetLatchWidth(0);
+	//fResourceList->SetLatchWidth(0);
 
 	fResourceList->SetTarget(this);
 	fResourceList->SetSelectionMessage(new BMessage(MSG_SELECTION));
+	fResourceList->SetInvocationMessage(new BMessage(MSG_INVOCATION));
+
+	fStatsString = new BStringView(BRect(3, 2, 150, 13), "fStatsString", "");
+	fStatsString->SetFontSize(11.0f);
+
+	fStatsBox = new BBox(BRect(0, 0, 150, 16), "fStatsBox");
+	fStatsBox->SetBorder(B_PLAIN_BORDER);
 
 	AddChild(fMenuBar);
 
@@ -170,6 +199,11 @@ MainWindow::MainWindow(BRect frame, BEntry* assocEntry)
 		fEditMenu->AddSeparatorItem();
 		fEditMenu->AddItem(fSelectAllItem);
 
+	fMenuBar->AddItem(fToolsMenu);
+		fToolsMenu->AddItem(fAddAppResourcesItem);
+		fToolsMenu->AddSeparatorItem();
+		fToolsMenu->AddItem(fSettingsItem);
+
 	fMenuBar->AddItem(fHelpMenu);
 
 	fToolbarView->AddChild(fResourceIDText);
@@ -183,6 +217,8 @@ MainWindow::MainWindow(BRect frame, BEntry* assocEntry)
 	AddChild(fToolbarView);
 
 	AddChild(fResourceList);
+	fResourceList->AddStatusView(fStatsBox);
+	fStatsBox->AddChild(fStatsString);
 
 	if (assocEntry != NULL) {
 		_SetTitleFromEntry();
@@ -195,15 +231,57 @@ MainWindow::MainWindow(BRect frame, BEntry* assocEntry)
 
 MainWindow::~MainWindow()
 {
-
+	delete fUndoContext;
 }
 
 
 bool
 MainWindow::QuitRequested()
 {
-	// TODO: Check if file is saved.
+	// CAUTION:	Do not read the body of this function if you
+	//			are known to suffer from gotophobia.
 
+	if (fUnsavedChanges) {
+		Activate();
+
+		char nameBuffer[B_FILE_NAME_LENGTH];
+
+		if (fAssocEntry != NULL)
+			fAssocEntry->GetName(nameBuffer);
+		else
+			strcpy(nameBuffer, "Untitled");
+
+		BString warning = "";
+		warning << "Save changse to'";
+		warning << nameBuffer;
+		warning << "' before closing?";
+
+		BAlert* alert = new BAlert("Save", warning.String(),
+			"Cancel", "Don't save", "Save",
+			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
+
+		alert->SetShortcut(0, B_ESCAPE);
+
+		int32 result = alert->Go();
+
+		switch (result) {
+			case 0:
+				return false;
+			case 1:
+				goto quit;
+			case 2:
+			{
+				_Save();
+
+				if (fUnsavedChanges)
+					return false;
+				else
+					goto quit;
+			}
+		}
+	}
+
+	quit:
 	BMessage* msg = new BMessage(MSG_CLOSE);
 	msg->AddPointer("window", (void*)this);
 	be_app->PostMessage(msg);
@@ -218,12 +296,25 @@ MainWindow::SelectionChanged()
 		fMoveUpButton->SetEnabled(false);
 		fMoveDownButton->SetEnabled(false);
 		fRemoveButton->SetEnabled(false);
+
+		fCutItem->SetEnabled(false);
+		fCopyItem->SetEnabled(false);
 	} else {
 		fRemoveButton->SetEnabled(true);
 		fMoveUpButton->SetEnabled(!fResourceList->RowAt(0)->IsSelected());
 		fMoveDownButton->SetEnabled(!fResourceList->RowAt(
 			fResourceList->CountRows() - 1)->IsSelected());
+
+		fCutItem->SetEnabled(true);
+		fCopyItem->SetEnabled(true);
 	}
+}
+
+
+void
+MainWindow::MouseDown(BPoint point)
+{
+
 }
 
 
@@ -282,13 +373,13 @@ MainWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case MSG_UNDO:
-			// TODO: Implement.
-			PRINT(("[MSG_UNDO]: Not yet implemented."));
+			fUndoContext->Undo();
+			_RefreshUndoRedo();
 			break;
 
 		case MSG_REDO:
-			// TODO: Implement.
-			PRINT(("[MSG_REDO]: Not yet implemented."));
+			fUndoContext->Redo();
+			_RefreshUndoRedo();
 			break;
 
 		case MSG_CUT:
@@ -307,10 +398,20 @@ MainWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case MSG_CLEAR:
-			fResourceList->Clear();
+		{
+			BList* rows = new BList();
+
+			for (int32 i = 0; i < fResourceList->CountRows(); i++) {
+				ResourceRow* row = (ResourceRow*)fResourceList->RowAt(i);
+				row->ActionIndex = i;
+				rows->AddItem(row);
+			}
+
+			_Do(new RemoveAction("Clear", fResourceList, rows));
+
 			SelectionChanged();
 			break;
-
+		}
 		case MSG_SELECTALL:
 		{
 			for (int32 i = 0; i < fResourceList->CountRows(); i++)
@@ -319,6 +420,10 @@ MainWindow::MessageReceived(BMessage* msg)
 			SelectionChanged();
 			break;
 		}
+		case MSG_SETTINGS:
+			be_app->PostMessage(MSG_SETTINGS);
+			break;
+
 		case MSG_ADD:
 		{
 			// Thank you, François Claus :D Merry Christmas!
@@ -326,64 +431,105 @@ MainWindow::MessageReceived(BMessage* msg)
 			int32 ix = fResourceTypePopUp->FindMarkedIndex();
 
 			if (ix != -1) {
+				BList* rows = new BList();
+
 				ResourceRow* row = new ResourceRow();
 				row->SetResourceID(_NextResourceID());
 				row->SetResourceType(kDefaultTypes[ix].type);
-				row->SetResourceTypeCode(kDefaultTypes[ix].typeCode);
-				row->SetResourceRawData(kDefaultData);
+				row->SetResourceStringCode(kDefaultTypes[ix].code);
+				row->SetResourceData(kDefaultTypes[ix].data);
 				row->SetResourceSize(kDefaultTypes[ix].size);
-				fResourceList->AddRow(row);
+				row->ActionIndex = fResourceList->CountRows(NULL);
+
+				rows->AddItem(row);
+
+				_Do(new AddAction("Add", fResourceList, rows));
 			}
 
 			break;
 		}
 		case MSG_REMOVE:
 		{
+			BList* rows = new BList();
+
 			for (int i = 0; i < fResourceList->CountRows(); i++) {
-				BRow* row = fResourceList->RowAt(i);
+				ResourceRow* row = (ResourceRow*)fResourceList->RowAt(i);
 
 				if (row->IsSelected()) {
-					fResourceList->RemoveRow(row);
-					i--;
+					row->ActionIndex = i;
+					rows->AddItem(row);
 				}
 			}
+
+			if (!rows->IsEmpty())
+				_Do(new RemoveAction("Remove", fResourceList, rows));
+			else
+				delete rows;
 
 			break;
 		}
 		case MSG_MOVEUP:
 		{
+			BList* rows = new BList();
+
 			for (int i = 1; i < fResourceList->CountRows(); i++) {
-				BRow* row = fResourceList->RowAt(i);
+				ResourceRow* row = (ResourceRow*)fResourceList->RowAt(i);
 
-				if (row->IsSelected())
-					fResourceList->SwapRows(i, i - 1);
-
+				if (row->IsSelected()) {
+					row->ActionIndex = i;
+					rows->AddItem(row);
+				}
 			}
 
-			fResourceList->ClearSortColumns();
-			SelectionChanged();
+			_Do(new MoveUpAction("Move Up", fResourceList, rows));
+
 			break;
 		}
 		case MSG_MOVEDOWN:
 		{
-			for (int i = fResourceList->CountRows() - 1 - 1; i >= 0; i--) {
-				BRow* row = fResourceList->RowAt(i);
+			BList* rows = new BList();
 
-				if (row->IsSelected())
-					fResourceList->SwapRows(i, i + 1);
+			for (int i = 0; i < fResourceList->CountRows() - 1; i++) {
+				ResourceRow* row = (ResourceRow*)fResourceList->RowAt(i);
+
+				if (row->IsSelected()) {
+					row->ActionIndex = i;
+					rows->AddItem(row);
+				}
 			}
 
-			fResourceList->ClearSortColumns();
-			SelectionChanged();
+			_Do(new MoveDownAction("Move Down", fResourceList, rows));
+
 			break;
 		}
 		case MSG_SELECTION:
 			SelectionChanged();
 			break;
 
+		case MSG_INVOCATION:
+		{
+			BRect frame = Frame();
+
+			new EditWindow(BRect(frame.left + 50, frame.top + 50,
+				frame.left + 300, frame.top + 350),
+				(ResourceRow*)fResourceList->CurrentSelection());
+
+			break;
+		}
+		case MSG_SETTINGS_APPLY:
+			AdaptSettings();
+			break;
+
 		default:
 			BWindow::MessageReceived(msg);
 	}
+}
+
+
+void
+MainWindow::AdaptSettings()
+{
+	fUndoContext->SetLimit(fSettings->UndoLimit);
 }
 
 
@@ -429,7 +575,7 @@ MainWindow::_Save(BEntry* entry)
 		}
 	}
 
-	/*BPath path;
+	BPath path;
 	entry->GetPath(&path);
 
 	// I wouldn't use std:: if BFile had cooler stuff.
@@ -440,10 +586,10 @@ MainWindow::_Save(BEntry* entry)
 	time_t timeNow = time(0);
 
 
-	out << "/-" << endl;
-	out << " - This file is auto-generated by Haiku ResourceEdit." << endl;
-	out << " - Time: " << ctime((const time_t*)&timeNow);
-	out << " -\" << endl;
+	out << "/*" << endl;
+	out << " * This file is auto-generated by Haiku ResourceEdit." << endl;
+	out << " * Time: " << ctime((const time_t*)&timeNow);
+	out << " */" << endl;
 
 	for (int32 i = 0; i < fResourceList->CountRows(); i++) {
 		ResourceRow* row = (ResourceRow*)fResourceList->RowAt(i);
@@ -451,20 +597,22 @@ MainWindow::_Save(BEntry* entry)
 		out << endl;
 		out << "resource";
 
-		if (true) {
-			// TODO: Implement no-ID cases.
-
+		if (row->ResourceStringID()[0] != '\0') {
 			out << "(" << row->ResourceID();
 
-			if (row->ResourceName()[0] != '\0') {
-				out << ", \"" << row->ResourceName() << "\"" << endl;
-			}
+			if (row->ResourceName()[0] != '\0')
+				out << ", \"" << row->ResourceName() << "\"";
 
-			out << ") ";
+			out << ")";
+		} else {
+			if (row->ResourceName()[0] != '\0')
+				out << "(\"" << row->ResourceName() << "\")";
 		}
 
-		if (row->ResourceTypeCode()[0] != '\0')
-			out << "#\'" << row->ResourceTypeCode() << "\' ";
+		out << " ";
+
+		if (row->ResourceStringCode()[0] != '\0')
+			out << "#\'" << row->ResourceStringCode() << "\' ";
 
 		if (strcmp(row->ResourceType(), "raw") != 0)
 			out << row->ResourceType() << ' ' << row->ResourceData();
@@ -475,56 +623,306 @@ MainWindow::_Save(BEntry* entry)
 			out << "}";
 		}
 
-		out << endl;
+		out << ";" << endl;
 	}
 
-	out.close();*/
+	out.close();
 
-	// Commented out whole output section. Switching to .rsrc files to
-	// close Part 1 of GCI task.
+	// Killed code: Export to .rsrc
 
-	// TODO: Implement exporting to .rdef and/or other formats.
-
-
-	BFile* file = new BFile(entry, B_READ_WRITE | B_CREATE_FILE);
+	/*BFile* file = new BFile(entry, B_READ_WRITE | B_CREATE_FILE);
 	BResources output(file, true);
 	delete file;
 
 	for (int32 i = 0; i < fResourceList->CountRows(); i++) {
 		ResourceRow* row = (ResourceRow*)fResourceList->RowAt(i);
-		output.AddResource(row->ResourceTypeCode(), row->ResourceID(),
+
+		output.AddResource(row->ResourceCode(), row->ResourceID(),
 			row->ResourceRawData(), row->ResourceSize(), row->ResourceName());
 	}
 
-	output.Sync();
+	output.Sync();*/
+
+	fUnsavedChanges = false;
 }
 
 
 void
 MainWindow::_Load()
 {
-	/*BPath path;
+	// CAUTION: Here be dragons.
+
+	// [Initialization phase]
+
+	BPath path;
 	struct stat st;
 
 	fAssocEntry->GetPath(&path);
 	fAssocEntry->GetStat(&st);
 
 	int fd = open(path.Path(), 0);
+
 	const char* in = (const char*)mmap(NULL, st.st_size, PROT_READ,
 		MAP_SHARED, fd, 0);
 
-	// TODO: Fix stucking bug.
-	// TODO: Parse data.
+	// [Setup phase]
+
+	enum {
+		T_STATE_NORMAL,
+		T_STATE_COMMENT,
+		T_STATE_MULTILINE_COMMENT,
+		T_STATE_STRING,
+	} t_state = T_STATE_NORMAL;
+
+	char quoteType = '\0';
+
+	char escChars[256];
+
+	for (int32 i = 0; i < 256; i++)
+		escChars[i] = ~(char)0;
+
+	escChars['n'] = '\n';
+	escChars['t'] = '\t';
+	escChars['r'] = '\r';
+	escChars['0'] = '\0';
+	escChars['"'] = '\"';
+	escChars['\'']= '\'';
+
+	// TODO: Add other escape sequences?
+	// Multichar escape sequences cannot be resolved with this.
+
+	BString buffer = "";
+	BList* tokens = new BList();
+
+	BList* errors = new BList();
+		// Multiple errors are allowed, but currently unused.
+
+	BList* rows = new BList();
+
+	// [Tokenization phase]
 
 	for (int32 i = 0; i < st.st_size - 1; i++) {
-		//...
-	}*/
+		if (t_state == T_STATE_NORMAL) {
+			if (in[i] == ' ' || in[i] == '\t' || in[i] == '\n'
+				 || in[i] == '\r') {
 
-	// Commented out input section. Same reason as above.
+				if (buffer != "") {
+					tokens->AddItem(new BString(buffer));
+					buffer = "";
+				}
 
-	// TODO: Implement importing from .rdef and/or other formats.
+				continue;
+			}
 
-	BFile* file = new BFile(fAssocEntry, B_READ_ONLY);
+			if (in[i] == ',' || in[i] == ';' || in[i] == '{' || in[i] == '}'
+				|| in[i] == '(' || in[i] == ')') {
+				if (buffer != "") {
+					tokens->AddItem(new BString(buffer));
+					buffer = in[i];
+					tokens->AddItem(new BString(buffer));
+					buffer = "";
+				}
+
+				continue;
+			}
+
+			if (in[i] == '"' || in[i] == '\'') {
+				t_state = T_STATE_STRING;
+				quoteType = in[i];
+				buffer += in[i];
+				continue;
+			}
+
+			if (in[i] == '/') {
+				if (in[i + 1] == '/') {
+					t_state = T_STATE_COMMENT;
+					continue;
+				}
+
+				if (in[i + 1] == '*') {
+					t_state = T_STATE_MULTILINE_COMMENT;
+					continue;
+				}
+			}
+
+			buffer += in[i];
+
+		} else if (t_state == T_STATE_COMMENT) {
+			if (in[i] == '\n') {
+				t_state = T_STATE_NORMAL;
+				continue;
+			}
+		} else if (t_state == T_STATE_MULTILINE_COMMENT) {
+			if (in[i] == '*' && in[i + 1] == '/') {
+				t_state = T_STATE_NORMAL;
+				i++;
+				continue;
+			}
+		} else if (t_state == T_STATE_STRING) {
+			if (in[i] == '\\' && escChars[in[i]] != ~(char)0) {
+				buffer += escChars[in[i]];
+				i++;
+				continue;
+			}
+
+			if (in[i] == quoteType) {
+				buffer += in[i];
+				tokens->AddItem(new BString(buffer));
+				buffer = "";
+				t_state = T_STATE_NORMAL;
+				continue;
+			}
+
+			buffer += in[i];
+		} else {
+			// This can't even happen.
+		}
+	}
+
+	if (t_state == T_STATE_MULTILINE_COMMENT)
+		errors->AddItem(new BString(
+			"Multi-line comment not closed by end of file."));
+	else if (t_state == T_STATE_STRING)
+		errors->AddItem(new BString("String not closed by end of file."));
+	else {
+		// [Parsing phase]
+
+		for (int32 i = 0; i < tokens->CountItems(); i++) {
+			BString& token = *(BString*)tokens->ItemAt(i);
+
+			if (token == "resource") {
+				ResourceRow* row = new ResourceRow();
+
+				token = *(BString*)tokens->ItemAt(++i);
+
+				if (token[0] == '(') {
+					BList args;
+					bool wantComma = false;
+
+					while (true) {
+						token = *(BString*)tokens->ItemAt(++i);
+
+						if (token[0] == ')')
+							break;
+
+						if (wantComma) {
+							if (token[0] != ',') {
+								errors->AddItem(new BString("Expected ','."));
+								break;
+							}
+
+							wantComma = false;
+						} else {
+							args.AddItem(tokens->ItemAt(i));
+							wantComma = true;
+						}
+					}
+
+					if (errors->CountItems() > 0)
+						break;
+
+					token = *(BString*)tokens->ItemAt(++i);
+
+					if (args.CountItems() > 2) {
+						errors->AddItem(new BString(
+							"Too many arguments for resource identifier."));
+						break;
+					}
+
+					if (args.CountItems() >= 1) {
+						BString& arg = *(BString*)args.ItemAt(0);
+
+						if (arg[0] == '"') {
+							errors->AddItem(new BString(
+								"Resource ID cannot be a string."));
+							break;
+						}
+
+						row->SetResourceStringID(arg);
+					}
+
+					if (args.CountItems() == 2) {
+						BString& arg = *(BString*)args.ItemAt(1);
+
+						if (arg[0] != '"') {
+							errors->AddItem(new BString(
+								"Resource name must be a string."));
+							break;
+						}
+
+						row->SetResourceName(arg);
+					}
+				}
+
+				if (token[0] == '#') {
+					if (token.Length() != 7
+						|| token[1] != '\'' || token[6] != '\'') {
+						errors->AddItem(new BString(
+							"Invalid syntax for resource type-code."));
+						break;
+					}
+
+					BString code;
+					token.CopyInto(code, 2, 4);
+					row->SetResourceStringCode(code);
+
+					token = *(BString*)tokens->ItemAt(++i);
+				}
+
+				if (token[0] == '(') {
+					BString& type = *(BString*)tokens->ItemAt(++i);
+					token = *(BString*)tokens->ItemAt(++i);
+
+					if (token[0] != ')') {
+						errors->AddItem(new BString(
+							"Expected ')'."));
+						break;
+					}
+
+					row->SetResourceType(type);
+				}
+
+			} else if (token == "type") {
+				// TODO: Implement.
+			} else if (token == "enum") {
+				// TODO: Implement.
+			}
+		}
+	}
+
+	// [Result phase]
+
+	if (errors->CountItems() > 0) {
+		for (int32 i = 0; i < errors->CountItems(); i++) {
+			BString& error = *(BString*)errors->ItemAt(i);
+			PRINT(("ERROR: %s\n", error.String()));
+			delete (BString*)tokens->ItemAt(i);
+		}
+
+		delete errors;
+	} else {
+		for (int32 i = 0; i < rows->CountItems(); i++) {
+			ResourceRow* row = (ResourceRow*)rows->ItemAt(i);
+			PRINT(("[Resource]\n"));
+			PRINT(("id   = %s\n", row->ResourceStringID()));
+			PRINT(("name = %s\n", row->ResourceName()));
+			// ...
+			PRINT(("\n"));
+		}
+	}
+
+	// [Cleanup phase]
+
+	for (int32 i = 0; i < tokens->CountItems(); i++)
+		delete (BString*)tokens->ItemAt(i);
+
+	delete tokens;
+
+	munmap((void*)in, st.st_size);
+
+	// Killed code: Import from .rsrc
+
+	/*BFile* file = new BFile(fAssocEntry, B_READ_ONLY);
 	BResources input(file);
 	delete file;
 
@@ -538,10 +936,10 @@ MainWindow::_Load()
 		row->SetResourceID(id);
 		row->SetResourceName(name);
 		row->SetResourceSize(size);
-		row->SetResourceTypeCode(code);
+		row->SetResourceCode(code);
 		row->SetResourceRawData(input.LoadResource(code, id, &size));
 		fResourceList->AddRow(row);
-	}
+	}*/
 }
 
 
@@ -560,3 +958,255 @@ MainWindow::_NextResourceID()
 
 	return currentID;
 }
+
+
+void
+MainWindow::_RefreshStats()
+{
+	const size_t kB = 1024;
+	const size_t MB = 1024 * 1024;
+	const size_t GB = 1024 * 1024 * 1024;
+
+	size_t size = 0;
+
+	BString text = "";
+
+	text << fResourceList->CountRows();
+	text << " resources, ";
+
+	for (int32 i = 0; i < fResourceList->CountRows(); i++) {
+		ResourceRow* row = (ResourceRow*)fResourceList->RowAt(i);
+		size += row->ResourceSize();
+	}
+
+	if (size >= GB) {
+		text << (double)size / GB;
+		text << " GB";
+	} else if (size >= MB) {
+		text << (double)size / MB;
+		text << " MB";
+	} else if (size >= kB) {
+		text << (double)size / kB;
+		text << " kB";
+	} else {
+		text << size;
+		text << " bytes";
+	}
+
+	fStatsString->SetText(text);
+}
+
+
+void
+MainWindow::_RefreshUndoRedo()
+{
+	if (fUndoContext->CanUndo()) {
+		fUndoItem->SetEnabled(true);
+		fUndoItem->SetLabel(fUndoContext->UndoLabel().Prepend("Undo "));
+	} else {
+		fUndoItem->SetEnabled(false);
+		fUndoItem->SetLabel("Undo");
+	}
+
+	if (fUndoContext->CanRedo()) {
+		fRedoItem->SetEnabled(true);
+		fRedoItem->SetLabel(fUndoContext->RedoLabel().Prepend("Redo "));
+	} else {
+		fRedoItem->SetEnabled(false);
+		fRedoItem->SetLabel("Redo");
+	}
+}
+
+
+void
+MainWindow::_Do(UndoContext::Action* action)
+{
+	fUnsavedChanges = true;
+	fUndoContext->Do(action);
+	_RefreshStats();
+	_RefreshUndoRedo();
+}
+
+
+MainWindow::AddAction::AddAction(const BString& label,
+	ResourceListView* list, BList* rows)
+	:
+	UndoContext::Action(label)
+{
+	fList = list;
+	fRows = rows;
+	fAdded = false;
+}
+
+
+MainWindow::AddAction::~AddAction()
+{
+	if (!fAdded)
+		for (int32 i = 0; i < fRows->CountItems(); i++)
+			delete (ResourceRow*)fRows->ItemAt(i);
+
+	delete fRows;
+}
+
+
+void
+MainWindow::AddAction::Do()
+{
+	for (int32 i = 0; i < fRows->CountItems(); i++) {
+		ResourceRow* row = (ResourceRow*)fRows->ItemAt(i);
+		fList->AddRow(row, row->ActionIndex, row->Parent);
+	}
+
+	fAdded = true;
+}
+
+
+void
+MainWindow::AddAction::Undo()
+{
+	for (int32 i = 0; i < fRows->CountItems(); i++)
+			fList->RemoveRow((ResourceRow*)fRows->ItemAt(i));
+
+	fAdded = false;
+}
+
+
+MainWindow::RemoveAction::RemoveAction(const BString& label,
+	ResourceListView* list, BList* rows)
+	:
+	UndoContext::Action(label)
+{
+	fList = list;
+	fRows = rows;
+	fRemoved = false;
+}
+
+
+MainWindow::RemoveAction::~RemoveAction()
+{
+	if (fRemoved)
+		for (int32 i = 0; i < fRows->CountItems(); i++)
+			delete (ResourceRow*)fRows->ItemAt(i);
+
+	delete fRows;
+}
+
+
+void
+MainWindow::RemoveAction::Do()
+{
+	for (int32 i = 0; i < fRows->CountItems(); i++)
+		fList->RemoveRow((ResourceRow*)fRows->ItemAt(i));
+
+	fRemoved = true;
+}
+
+
+void
+MainWindow::RemoveAction::Undo()
+{
+	for (int32 i = 0; i < fRows->CountItems(); i++) {
+		ResourceRow* row = (ResourceRow*)fRows->ItemAt(i);
+
+		fList->AddRow(row, row->ActionIndex, row->Parent);
+	}
+
+	fRemoved = false;
+}
+
+// TODO: Implement EditAction
+
+MainWindow::MoveUpAction::MoveUpAction(const BString& label,
+	ResourceListView* list, BList* rows)
+	:
+	UndoContext::Action(label)
+{
+	fList = list;
+	fRows = rows;
+}
+
+
+MainWindow::MoveUpAction::~MoveUpAction()
+{
+	delete fRows;
+}
+
+
+void
+MainWindow::MoveUpAction::Do()
+{
+	for (int32 i = 0; i < fRows->CountItems(); i++) {
+		ResourceRow* row = (ResourceRow*)fRows->ItemAt(i);
+
+		fList->SwapRows(row->ActionIndex, row->ActionIndex - 1,
+			row->Parent, row->Parent);
+
+		row->ActionIndex--;
+	}
+
+	fList->SelectionChanged();
+}
+
+
+void
+MainWindow::MoveUpAction::Undo()
+{
+	for (int32 i = fRows->CountItems() - 1; i >= 0; i--) {
+		ResourceRow* row = (ResourceRow*)fRows->ItemAt(i);
+
+		fList->SwapRows(row->ActionIndex, row->ActionIndex + 1,
+			row->Parent, row->Parent);
+
+		row->ActionIndex++;
+	}
+
+	fList->SelectionChanged();
+}
+
+MainWindow::MoveDownAction::MoveDownAction(const BString& label,
+	ResourceListView* list, BList* rows)
+	:
+	UndoContext::Action(label)
+{
+	fList = list;
+	fRows = rows;
+}
+
+
+MainWindow::MoveDownAction::~MoveDownAction()
+{
+	delete fRows;
+}
+
+
+void
+MainWindow::MoveDownAction::Do()
+{
+	for (int32 i = fRows->CountItems() - 1; i >= 0; i--) {
+		ResourceRow* row = (ResourceRow*)fRows->ItemAt(i);
+
+		fList->SwapRows(row->ActionIndex, row->ActionIndex + 1,
+			row->Parent, row->Parent);
+
+		row->ActionIndex++;
+	}
+
+	fList->SelectionChanged();
+}
+
+
+void
+MainWindow::MoveDownAction::Undo()
+{
+	for (int32 i = 0; i < fRows->CountItems(); i++) {
+		ResourceRow* row = (ResourceRow*)fRows->ItemAt(i);
+
+		fList->SwapRows(row->ActionIndex, row->ActionIndex - 1,
+			row->Parent, row->Parent);
+
+		row->ActionIndex--;
+	}
+
+	fList->SelectionChanged();
+}
+

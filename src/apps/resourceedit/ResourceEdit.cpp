@@ -9,6 +9,8 @@
 #include "AboutWindow.h"
 #include "Constants.h"
 #include "MainWindow.h"
+#include "SettingsFile.h"
+#include "SettingsWindow.h"
 
 #include <Entry.h>
 #include <FilePanel.h>
@@ -23,6 +25,11 @@ ResourceEdit::ResourceEdit()
 
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &be_app_messenger, NULL, 0, true,
 		new BMessage(MSG_OPEN_DONE));
+
+	fSettings = new SettingsFile("resourceedit_settings");
+	fSettings->Load();
+
+	fSettingsWindow = NULL;
 }
 
 
@@ -68,11 +75,35 @@ ResourceEdit::MessageReceived(BMessage* msg)
 		}
 		case MSG_SAVEALL:
 		{
-			for (int32 i = 0; i < fWindowList.CountItems(); i++)
-				((MainWindow*)fWindowList.ItemAt(i))->PostMessage(MSG_SAVE);
+			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+				MainWindow* window = ((MainWindow*)fWindowList.ItemAt(i));
+				window->PostMessage(MSG_SAVE);
+			}
 
 			break;
 		}
+		case MSG_SETTINGS:
+		{
+			if (fSettingsWindow != NULL)
+				fSettingsWindow->Activate();
+			else
+				fSettingsWindow = new SettingsWindow(fSettings);
+
+			break;
+		}
+		case MSG_SETTINGS_APPLY:
+		{
+			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+				MainWindow* window = ((MainWindow*)fWindowList.ItemAt(i));
+				window->PostMessage(MSG_SETTINGS_APPLY);
+			}
+
+			break;
+		}
+		case MSG_SETTINGS_CLOSED:
+			fSettingsWindow = NULL;
+			break;
+
 		default:
 			BApplication::MessageReceived(msg);
 	}
@@ -98,7 +129,7 @@ ResourceEdit::ReadyToRun()
 void
 ResourceEdit::_CreateWindow(BEntry* assocEntry)
 {
-	MainWindow* window = new MainWindow(_Cascade(), assocEntry);
+	MainWindow* window = new MainWindow(_Cascade(), assocEntry, fSettings);
 
 	fWindowList.AddItem(window);
 
