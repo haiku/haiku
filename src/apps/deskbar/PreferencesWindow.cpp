@@ -231,8 +231,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	BLayoutBuilder::Group<>(this)
 		.Add(tabView)
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.End();
 
 	CenterOnScreen();
