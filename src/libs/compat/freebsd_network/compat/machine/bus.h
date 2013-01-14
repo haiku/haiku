@@ -227,14 +227,6 @@ bus_space_set_region_4(bus_space_tag_t tag, bus_space_handle_t bsh,
 
 
 static inline void
-bus_read_region_1(struct resource *res, bus_size_t offset, 
-	const u_int8_t *addr, size_t count)
-{
-	/* TODO implement */
-}
-
-
-static inline void
 bus_space_barrier(bus_space_tag_t tag, bus_space_handle_t handle,
 	bus_size_t offset, bus_size_t len, int flags)
 {

@@ -33,6 +33,9 @@
 #define bus_barrier(r, o, l, f) \
 	bus_space_barrier((r)->r_bustag, (r)->r_bushandle, (o), (l), (f))
 
+#define bus_read_region_1(r, o, d, c) \
+	bus_space_read_region_1((r)->r_bustag, (r)->r_bushandle, (o), (d), (c))
+
 #define	FILTER_STRAY			B_UNHANDLED_INTERRUPT
 #define	FILTER_HANDLED			B_HANDLED_INTERRUPT
 #define	FILTER_SCHEDULE_THREAD	B_INVOKE_SCHEDULER
