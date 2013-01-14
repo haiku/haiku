@@ -1141,6 +1141,8 @@ ipv6_setsockopt(net_protocol* _protocol, int level, int option,
 
 			delete protocol->multicast_address;
 			protocol->multicast_address = (struct sockaddr*)address;
+
+			sDatalinkModule->put_interface(interface);
 			return B_OK;
 		}
 		if (option == IPV6_MULTICAST_HOPS) {
