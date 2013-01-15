@@ -10,8 +10,9 @@
  */
 
 
-/*!	\file GroupLayout.h
-	Describes the BGroupLayout class
+/*!
+	\file GroupLayout.h
+	\brief Describes the BGroupLayout class.
 */
 
 

@@ -15,7 +15,7 @@
 
 /*!
 	\file File.h
-	Provides the BFile class.
+	\brief Provides the BFile class.
 */
 
 

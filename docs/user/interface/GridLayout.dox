@@ -12,7 +12,7 @@
 
 /*!
 	\file GridLayout.h
-	Provides the BGridLayout class.
+	\brief Provides the BGridLayout class.
 */
 
 
