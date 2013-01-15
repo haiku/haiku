@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Shortcuts	621368175
+1	ukrainian	x-vnd.Haiku-Shortcuts	1741147146
 Error, NULL state description?\n	ShortcutsSpec		Помилка, NULL опису стану?\n
 MoveMouse	ShortcutsSpec		Переміщення мишки
 OK	ShortcutsWindow		Гаразд
@@ -43,7 +43,6 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Переміщення мишки в 50% 50%
 Save KeySet as…	ShortcutsWindow		Зберегти список як…
 Open	ShortcutsWindow		Відкрити
-Really quit without saving your changes?	ShortcutsWindow		Насправді вийди без збереження ваших змін?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Ярлику невдалось розібрати ваш файл Ключів!
 Select	ShortcutsWindow		Вибрати
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не вдалося зберегти ваш файл список горячих клавіш!

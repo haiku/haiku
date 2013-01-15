@@ -134,7 +134,7 @@ BSlowContextMenu::SetNavDir(const entry_ref* ref)
 {
 	ForceRebuild();
 		// reset the slow menu building mechanism so we can add more stuff
-	
+
 	fNavDir = *ref;
 }
 
@@ -188,7 +188,7 @@ BSlowContextMenu::AddDynamicItem(add_state state)
 {
 	if (fMenuBuilt)
 		return false;
-	
+
 	if (state == B_ABORT) {
 		ClearMenuBuildingState();
 		return false;
@@ -229,7 +229,7 @@ BSlowContextMenu::StartBuildingItemList()
 	}
 
 	fIteratingDesktop = false;
-	
+
 	BDirectory parent;
 	status_t err = entry.GetParent(&parent);
 	fItemList = new BObjectList<BMenuItem>(50);
@@ -308,7 +308,7 @@ BSlowContextMenu::AddNextItem()
 		BuildVolumeMenu();
 		return false;
 	}
-	
+
 	// limit nav menus to 500 items only
 	if (fItemList->CountItems() > 500)
 		return false;
@@ -332,7 +332,7 @@ BSlowContextMenu::AddNextItem()
 	}
 
 	model.CloseNode();
-	
+
 	if (!BPoseView::PoseVisible(&model, &poseInfo)) {
 		return true;
 	}
@@ -367,7 +367,7 @@ BSlowContextMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 	entry_ref ref;
 	bool container = false;
 	if (model->IsSymLink()) {
-	
+
 		Model* newResolvedModel = NULL;
 		Model* result = model->LinkTo();
 
@@ -379,21 +379,21 @@ BSlowContextMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 				delete newResolvedModel;
 				newResolvedModel = NULL;
 			}
-			
+
 			result = newResolvedModel;
 		}
 
 		if (result) {
 			BModelOpener opener(result);
 				// open the model, if it ain't open already
-					
+
 			PoseInfo poseInfo;
-			
+
 			if (result->Node()) {
 				result->Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
 					&poseInfo, sizeof(poseInfo));
 			}
-	
+
 			result->CloseNode();
 
 			ref = *result->EntryRef();
@@ -421,7 +421,7 @@ BSlowContextMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 	} else {
 		BNavMenu* menu = new BNavMenu(truncatedString.String(),
 			invokeMessage->what, target, parentWindow, typeslist);
-		
+
 		menu->SetNavDir(&ref);
 		if (hook)
 			menu->InitTrackingHook(hook->fTrackingHook, &(hook->fTarget),
@@ -443,10 +443,10 @@ BSlowContextMenu::BuildVolumeMenu()
 
 	roster.Rewind();
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		
+
 		if (!volume.IsPersistent())
 			continue;
-		
+
 		BDirectory startDir;
 		if (volume.GetRootDirectory(&startDir) == B_OK) {
 			BEntry entry;
@@ -457,7 +457,7 @@ BSlowContextMenu::BuildVolumeMenu()
 				delete model;
 				continue;
 			}
-			
+
 			BNavMenu* menu = new BNavMenu(model->Name(), fMessage.what,
 				fMessenger, fParentWindow, fTypesList);
 

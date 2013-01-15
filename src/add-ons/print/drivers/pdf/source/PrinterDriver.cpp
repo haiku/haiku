@@ -201,7 +201,7 @@ PrinterDriver::PrintPage(int32 pageNumber, int32 pageCount)
 {
 	char text[128];
 
-	sprintf(text, "Faking print of page %ld/%ld...", pageNumber, pageCount);
+	sprintf(text, "Faking print of page %" B_PRId32 "/%" B_PRId32 "...", pageNumber, pageCount);
 	BAlert *alert = new BAlert("PrinterDriver::PrintPage()", text, "Hmm?");
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();

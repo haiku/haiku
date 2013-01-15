@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Shortcuts	621368175
+1	dutch; flemish	x-vnd.Haiku-Shortcuts	1741147146
 Error, NULL state description?\n	ShortcutsSpec		Fout, NULL-statusbeschrijving?\n
 MoveMouse	ShortcutsSpec		VerplaatsMuis
 OK	ShortcutsWindow		Oké
@@ -43,7 +43,6 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *MoveMouseTo 50% 50%	ShortcutsWindow		*VerplaatsMuisNaar 50% 50%
 Save KeySet as…	ShortcutsWindow		Toetsencombinatie opslaan als...
 Open	ShortcutsWindow		Openen
-Really quit without saving your changes?	ShortcutsWindow		Wilt u echt afsluiten zonder uw veranderingen op te slaan?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand te lezen!
 Select	ShortcutsWindow		Selecteren
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand op te slaan!

@@ -229,7 +229,7 @@ BTextWidget::CheckExpiration()
 		get_click_speed(&doubleClickSpeed);
 
 		bigtime_t delta = system_time() - fLastClickedTime;
-	
+
 		if (delta > doubleClickSpeed) {
 			// at least 'doubleClickSpeed' microseconds ellapsed and no click
 			// was registered since.
@@ -278,7 +278,7 @@ BTextWidget::MouseUp(BRect bounds, BPoseView* view, BPose* pose, BPoint)
 
 		fParams.pose = pose;
 		fParams.bounds = bounds;
-		fParams.poseView = view;		
+		fParams.poseView = view;
 	} else
 		fLastClickedTime = 0;
 }

@@ -363,11 +363,12 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	// Init I/O context with buffer and hook functions, pass ourself as
-	// cookie.
-	if (init_put_byte(fIOContext, buffer, kIOBufferSize, 1, this,
-			0, _Write, _Seek) != 0) {
-		TRACE("  init_put_byte() failed!\n");
+	// Allocate I/O context and initialize it with buffer
+	// and hook functions, pass ourself as cookie.
+	fIOContext = av_alloc_put_byte(buffer, kIOBufferSize, 1, this,
+			0, _Write, _Seek);
+	if (fIOContext == NULL) {
+		TRACE("av_alloc_put_byte() failed!\n");
 		return B_ERROR;
 	}
 

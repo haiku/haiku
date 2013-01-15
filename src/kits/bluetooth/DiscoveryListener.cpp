@@ -10,6 +10,7 @@
 #include <bluetooth/RemoteDevice.h>
 #include <bluetooth/DeviceClass.h>
 #include <bluetooth/bdaddrUtils.h>
+#include <bluetooth/debug.h>
 
 #include <bluetooth/HCI/btHCI_event.h>
 
@@ -24,21 +25,21 @@ namespace Bluetooth {
 void
 DiscoveryListener::DeviceDiscovered(RemoteDevice* btDevice, DeviceClass cod)
 {
-
+	CALLED();
 }
 
 
 void
 DiscoveryListener::InquiryStarted(status_t status)
 {
-
+	CALLED();
 }
 
 
 void
 DiscoveryListener::InquiryCompleted(int discType)
 {
-
+	CALLED();
 }
 
 
@@ -50,6 +51,7 @@ DiscoveryListener::InquiryCompleted(int discType)
 void
 DiscoveryListener::SetLocalDeviceOwner(LocalDevice* ld)
 {
+	CALLED();
 	fLocalDevice = ld;
 }
 
@@ -57,6 +59,7 @@ DiscoveryListener::SetLocalDeviceOwner(LocalDevice* ld)
 RemoteDevicesList
 DiscoveryListener::GetRemoteDevicesList(void)
 {
+	CALLED();
 	return fRemoteDevicesList;
 }
 
@@ -64,6 +67,7 @@ DiscoveryListener::GetRemoteDevicesList(void)
 void
 DiscoveryListener::MessageReceived(BMessage* message)
 {
+	CALLED();
 	int8 status;
 
 	switch (message->what) {
@@ -147,9 +151,9 @@ DiscoveryListener::DiscoveryListener()
 	BLooper(),
 	fRemoteDevicesList(BT_MAX_RESPONSES)
 {
+	CALLED();
 	// TODO: Make a better handling of the running not running state
 	Run();
 }
-
 
 }

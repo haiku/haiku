@@ -1,7 +1,7 @@
 
 # package dependencies
 #
-# For transitive dependencies dependants should be listed before their
+# For transitive dependencies dependents should be listed before their
 # dependencies.
 
 OptionalPackageDependencies APR-util : APR Expat ;
@@ -31,7 +31,7 @@ OptionalPackageDependencies NetFS : UserlandFS ;
 OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv Libmng ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
 OptionalPackageDependencies OpenSSL : CARootCertificates ;
-OptionalPackageDependencies Paladin : CCache Fastdep ;
+OptionalPackageDependencies Paladin : CCache Fastdep PCRE ;
 OptionalPackageDependencies Pe : PCRE ;
 OptionalPackageDependencies SDLLibs : XiphLibs libmad libmikmod Libmng libmodplug physfs ;
 OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;

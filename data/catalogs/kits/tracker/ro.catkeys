@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3411026851
+1	romanian	x-vnd.Haiku-libtracker	3235013733
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vizualizare pictogramă
 Add-ons	FilePanelPriv		Module
@@ -326,7 +326,6 @@ OK	FSUtils		OK
 Paste layout	ContainerWindow		Lipește aranjament
 Select	InfoWindow		Selectează
 Select…	FilePanelPriv		Selectează...
-Don't move files to Trash	SettingsView		Nu muta fișierele la gunoi
 There was an error resolving the link.	Tracker		A apărut o eroare la rezolvarea legăturii.
 You can't move or copy the trash.	FSUtils		Nu puteți să mutați sau să copiați gunoiul.
 ends with	SelectionWindow		se termină cu
@@ -352,7 +351,6 @@ Move to Trash	FSUtils		Mută la gunoi
 Automatic disk mounting	AutoMounterSettings		Montare de disc automată
 Original name	ContainerWindow		Nume original
 Find	FSUtils		Găsește
-Ask before delete	SettingsView		Întreabă înainte de a șterge
 Single window navigation	SettingsView		Navigare cu o singură fereastră
 parent folder	NavMenu		dosar superior
 contains	FindPanel		conține

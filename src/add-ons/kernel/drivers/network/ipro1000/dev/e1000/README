@@ -1,4 +1,4 @@
-$FreeBSD: src/sys/dev/e1000/README,v 1.1.4.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+$FreeBSD$
 FreeBSD* Driver for Intel Network Connection
 =============================================
 
@@ -354,6 +354,7 @@ Known Limitations
   include:
         Planex FXG-08TE
         I-O Data ETG-SH8
+        Netgear GS105v3
 
   The driver can be compiled with the following changes:
 

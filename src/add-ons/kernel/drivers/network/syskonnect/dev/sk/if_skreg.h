@@ -1,6 +1,6 @@
 /*	$OpenBSD: if_skreg.h,v 1.10 2003/08/12 05:23:06 nate Exp $	*/
 
-/*-f
+/*-
  * Copyright (c) 1997, 1998, 1999, 2000
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -31,7 +31,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/dev/sk/if_skreg.h,v 1.41 2007/04/02 04:43:41 yongari Exp $
+ * $FreeBSD$
  */
 
 /*-
@@ -379,8 +379,8 @@
 #define SK_IMCTL_STOP	0x02
 #define SK_IMCTL_START	0x04
 
-#define SK_IMTIMER_TICKS_GENESIS	177 /* FBSD ticks are 1/100, Haiku 3? secs 53 */
-#define SK_IMTIMER_TICKS_YUKON		260 /* FBSD ticks are 1/100, Haiku 3? secs 78 */
+#define SK_IMTIMER_TICKS_GENESIS	53
+#define SK_IMTIMER_TICKS_YUKON		78
 #define SK_IM_USECS(x, t)		((x) * (t))
 
 #define	SK_IM_MIN	10

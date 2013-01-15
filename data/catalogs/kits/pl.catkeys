@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libbe	1921499696
+1	polish	x-vnd.Haiku-libbe	1916257017
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -7,6 +7,7 @@ About %app%	AboutMenuItem		O %app%
 Cut	TextView		Wytnij
 Version	AboutWindow		Wersja
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nie można stworzyć replikanta dla \"%description\".\n%error
+About	AboutWindow		O…
 Copy	TextView		Skopiuj
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d bajtów

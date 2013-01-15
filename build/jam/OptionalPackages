@@ -297,8 +297,8 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 				: $(baseURL)/bepdf-1.1.1b4-x86-gcc4-2012-08-11.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				bepdf-1.1.1b4-r1a4-x86-gcc2-2012-08-30.zip
-				: $(baseURL)/bepdf-1.1.1b4-r1a4-x86-gcc2-2012-08-30.zip ;
+				bepdf-1.1.1b4-r1a4-x86-gcc2-2013-01-02.zip
+				: $(baseURL)/bepdf-1.1.1b4-r1a4-x86-gcc2-2013-01-02.zip ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/BePDF/BePDF ;
@@ -2282,8 +2282,8 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package WonderBrush available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage WonderBrush-2.1.2.zip
-			: $(baseURL)/WonderBrush-2.1.2-x86-gcc2-2008-11-08.zip
+		InstallOptionalHaikuImagePackage WonderBrush-2.1.2-a.zip
+			: $(baseURL)/WonderBrush-2.1.2-x86-gcc2-2013-01-02.zip
 			: apps ;
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/apps/WonderBrush/WonderBrush ;

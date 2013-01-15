@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	4057420247
+1	polish	x-vnd.Be-MAIL	808593564
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
@@ -26,7 +26,6 @@ Beginner	Mail		Początkujący
 Don't save	Mail		Nie zapisuj
 Expert	Mail		Ekspert
 Reply account:	Mail		Konto odpowiedzi:
-Discard	Mail		Odrzuć
 Message	Mail		Wiadomość
 Settings…	Mail		Ustawienia...
 Reply to sender	Mail		Odpowiedz nadawcy
@@ -119,7 +118,6 @@ Remove enclosure	Mail		Usuń załącznik
 Account:	Mail		Konto:
 Decoding:	Mail		Dekodowanie:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Przepraszamy, nie można znaleźć aplikacji która wspiera typ danych "Osoba".
-Do you wish to send this message before closing?	Mail		Czy chcesz wysłać tę wiadomość przed zamknięciem?
 Delete	Mail		Usuń
 Leave as '%s'	Mail		Pozostaw jako '%s'
 Copy	Mail		Skopiuj
@@ -135,7 +133,6 @@ Font:	Mail		Czcionka:
 (Address unavailable)	Mail		(Adres niedostępny)
 Save address	Mail		Zapisz adres
 Queries	Mail		Zapytania
-Do you wish to save this message as a draft before closing?	Mail		Czy chcesz zapisać wiadomość jako szkic przed zamknięciem?
 Save	Mail		Zapisz
 Random	Mail		Losowe
 Close and 	Mail		Zamknij i

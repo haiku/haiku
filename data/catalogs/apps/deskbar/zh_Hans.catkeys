@@ -1,7 +1,9 @@
-1	english	x-vnd.Be-TSKB	3155357024
+1	english	x-vnd.Be-TSKB	1210725923
 Power off	DeskbarMenu		关闭电源
 Edit menu…	PreferencesWindow		编辑菜单
 Suspend	DeskbarMenu		挂起
+Hide clock	TimeView		隐藏时钟
+Applications	PreferencesWindow		应用程序
 Time preferences…	TimeView		时间设置...
 About Haiku	DeskbarMenu		关于Haiku
 Recent documents:	PreferencesWindow		最近文档：
@@ -9,6 +11,7 @@ Recent applications	DeskbarMenu		最近程序
 Sort running applications	PreferencesWindow		运行程序排序
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		应用程序
 Find…	DeskbarMenu		查找...
+Show clock	Tray		显示时钟
 Window	PreferencesWindow		窗口
 Menu	PreferencesWindow		菜单
 Recent documents	DeskbarMenu		最近文档：

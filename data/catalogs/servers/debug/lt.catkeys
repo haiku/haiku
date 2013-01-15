@@ -1,3 +1,5 @@
-1	lithuanian	x-vnd.Haiku-debug_server	3203333611
+1	lithuanian	x-vnd.Haiku-debug_server	1440673937
+Terminate	DebugServer		Nutraukti darbą
 Debug	DebugServer		Derinti
+Save report	DebugServer		Įrašyti ataskaitą
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Programa:\n\n%app\n\nsusidūrė su tęsti darbo neleidžiančia klaida. „Haiku“ nutrauks programos darbą ir apsitvarkys.

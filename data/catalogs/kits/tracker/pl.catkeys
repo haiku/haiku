@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	75125649
+1	polish	x-vnd.Haiku-libtracker	628096147
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
@@ -93,6 +93,7 @@ Replace	FilePanelPriv		Zastąp
 Select all	VolumeWindow		Zaznacz wszystko
 Opens with:	InfoWindow		Otwórz za pomocą:
 Open	ContainerWindow		Otwórz
+96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Błąd przy obliczaniu rozmiaru folderu.
 New folder	FilePanelPriv		Nowy folder
 %name info	InfoWindow	InfoWindow Title	%name informacje
@@ -313,6 +314,7 @@ The Tracker must be running to see Info windows.	PoseView		Tracker musi być wł
 Other	FilePermissionsView		Inne
 Query name:	FindPanel		Nazwa zapytania:
 Permissions	ContainerWindow		Uprawnienia
+96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		przenoszenie
 Identify	InfoWindow		Zidentyfikuj
 Recent folders	ContainerWindow		Ostatnio otwierane foldery
@@ -403,7 +405,6 @@ Paste layout	ContainerWindow		Wklej motyw
 Select	InfoWindow		Wybierz
 Could not update permissions of file \"%name\". %error	FSUtils		Nie można zauktualizować uprawnień dla pliku \"%name\". %error
 Select…	FilePanelPriv		Wybierz…
-Don't move files to Trash	SettingsView		Nie przenoś plików do kosza
 There was an error resolving the link.	Tracker		Pojawił się problem przy przetwarzaniu skrótu.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		nie możesz przenieść ani skopiować kosza.
@@ -434,7 +435,6 @@ Automatic disk mounting	AutoMounterSettings		Automatyczne montowanie dysku
 Original name	ContainerWindow		Nazwa orygialna
 Find	FSUtils		Znajdź
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Błąd przy kopiowaniu pliku \"%name\":\n\t%error\n\nCzy chcesz kontynuować?
-Ask before delete	SettingsView		Potwierdzaj przed usunięciem
 Single window navigation	SettingsView		Nawigacja pojedyńczym oknem
 parent folder	NavMenu		folder główny
 contains	FindPanel		zawiera

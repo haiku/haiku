@@ -1,21 +1,29 @@
-1	belarusian	x-vnd.Haiku-libbe	864109244
+1	belarusian	x-vnd.Haiku-libbe	672385853
+gamma	AboutWindow		гамма
+beta	AboutWindow		бэта
 %3.2f GiB	StringForSize		%3.2f ГіБ
 Written by:	AboutWindow		Аўтар(ы):
 About %app%	AboutMenuItem		Пра %app%
 Cut	TextView		Выразаць
+Version	AboutWindow		Версія
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Немагчыма стварыць рэплікант \"%description\".\n%error
+About	AboutWindow		Пра праграму
 Copy	TextView		Капіяваць
 %3.2f KiB	StringForSize		%3.2f КіБ
 %d bytes	StringForSize		%d байтаў
+alpha	AboutWindow		альфа
 Error	PrintJob		Памылка
 No Pages to print!	PrintJob		Няма старонак для друку!
+All Rights Reserved.	AboutWindow		Усе правы захаваныя.
 OK	Dragger		ОК
 OK	PrintJob		ОК
 Green:	ColorControl		Зялёны:
+Version history:	AboutWindow		Гісторыя версій:
 Remove replicant	Dragger		Выдаліць рэпліканта
 OK	ZombieReplicantView		ОК
 Print Server is not responding.	PrintJob		Сервер друку не адказвае.
 Paste	TextView		Уставіць
+Special Thanks:	AboutWindow		Адмысловыя падзякі:
 %.2f TiB	StringForSize		%.2f ТіБ
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Праграма рэпліканата не знойдзена. Подпис праграмы не зададзены.\n%error
 Redo	TextView		Зрабіць наноў
@@ -26,6 +34,8 @@ Undo	TextView		Адвярнуць
 Red:	ColorControl		Чырвоны:
 %3.2f MiB	StringForSize		%3.2f МіБ
 About %app…	Dragger		Пра праграму %app…
+development	AboutWindow		распрацоўны
 Error	ZombieReplicantView		Памылка
 Blue:	ColorControl		Сіні:
+gold master	AboutWindow		залатая
 Can't delete this replicant from its original application. Life goes on.	Dragger		Не ўдалося выдаліць рэплікант з яго праграмы. Але жыццё працягваецца.

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	1599879742
+1	russian	x-vnd.Be-MAIL	2646020355
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
@@ -25,7 +25,6 @@ Beginner	Mail		Новичок
 Don't save	Mail		Не сохранять
 Expert	Mail		Эксперт
 Reply account:	Mail		Ответить, используя акканут:
-Discard	Mail		Сбросить
 Message	Mail		Сообщение
 Settings…	Mail		Настройки…
 Reply to sender	Mail		Ответить отправителю
@@ -119,7 +118,6 @@ Remove enclosure	Mail		Удалить вложения
 Account:	Mail		Аккаунт:
 Decoding:	Mail		Кодировка:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Извините, не удалось найти приложение поддерживающее тип файлов 'Персона'.
-Do you wish to send this message before closing?	Mail		Хотите отправить это сообщение перед закрытием?
 Delete	Mail		Удалить
 Leave as '%s'	Mail		Оставить как '%s'
 Copy	Mail		Копия
@@ -135,7 +133,6 @@ Font:	Mail		Шрифт:
 (Address unavailable)	Mail		(Адрес недоступен)
 Save address	Mail		Сохранить адрес
 Queries	Mail		Запросы
-Do you wish to save this message as a draft before closing?	Mail		Сохранить это сообщение как черновик?
 Save	Mail		Сохранить
 Random	Mail		Случайная
 Close and 	Mail		Закрыть и 

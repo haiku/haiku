@@ -266,18 +266,18 @@ StyledEditApp::RefsReceived(BMessage* message)
 			length = -1;
 		}
 
-		BMessage* selMessage = NULL;
+		BMessage* selection = NULL;
 		if (line >= 0 || (start >= 0 && length >= 0)) {
-			selMessage = new BMessage(UPDATE_LINE_SEL);
+			selection = new BMessage(UPDATE_LINE_SELECTION);
 			if (line >= 0)
-				selMessage->AddInt32("be:line", line);
+				selection->AddInt32("be:line", line);
 			if (start >= 0) {
-				selMessage->AddInt32("be:selection_offset", start);
-				selMessage->AddInt32("be:selection_length", max_c(0, length));
+				selection->AddInt32("be:selection_offset", start);
+				selection->AddInt32("be:selection_length", max_c(0, length));
 			}
 		}
 
-		OpenDocument(&ref, selMessage);
+		OpenDocument(&ref, selection);
 		index++;
 	}
 }

@@ -535,7 +535,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case UPDATE_LINE_SEL:
+		case UPDATE_LINE_SELECTION:
 		{
 			int32 line;
 			if (message->FindInt32("be:line", &line) == B_OK) {
@@ -1337,31 +1337,13 @@ StyledEditWindow::_LoadAttrs()
 	}
 
 	// info about position of caret may live in the file attributes
-	int32 line = 0;
-	int32 lineMax = fTextView->CountLines();
-	if (documentNode.ReadAttr("be:line",
-			B_INT32_TYPE, 0, &line, sizeof(line)) == sizeof(line))
-		line = min_c(max_c(0, line), lineMax);
-	else
-		line = 0;
+	int32 position = 0;
+	if (documentNode.ReadAttr("be:caret_position", B_INT32_TYPE, 0,
+			&position, sizeof(position)) != sizeof(position))
+		position = 0;
 
-	int32 start = 0, length = 0, finish = 0;
-	int32 offsetMax = fTextView->OffsetAt(lineMax);
-	if (documentNode.ReadAttr("be:selection_offset",
-			B_INT32_TYPE, 0, &start, sizeof(start)) == sizeof(start)
-		&& documentNode.ReadAttr("be:selection_length",
-			B_INT32_TYPE, 0, &length, sizeof(length)) == sizeof(length))
-	{
-		finish = start + length;
-		start = min_c(max_c(0, start), offsetMax);
-		finish = min_c(max_c(0, finish), offsetMax);
-	} else {
-		start = fTextView->OffsetAt(line);
-		finish = start;
-	}
-
-	fTextView->Select(start, finish);
-	fTextView->ScrollToOffset(start);
+	fTextView->Select(position, position);
+	fTextView->ScrollToOffset(position);
 }
 
 
@@ -1390,17 +1372,11 @@ StyledEditWindow::_SaveAttrs()
 	documentNode.WriteAttr(kInfoAttributeName, B_RECT_TYPE, 0, &frame,
 		sizeof(BRect));
 
-	// preserve current line and selection too
-	int32 line = fTextView->CurrentLine();
-	documentNode.WriteAttr("be:line", B_INT32_TYPE, 0, &line, sizeof(line));
-
+	// preserve caret line and position
 	int32 start, end;
 	fTextView->GetSelection(&start, &end);
-	int32 length = end - start;
-	documentNode.WriteAttr("be:selection_offset",
+	documentNode.WriteAttr("be:caret_position",
 			B_INT32_TYPE, 0, &start, sizeof(start));
-	documentNode.WriteAttr("be:selection_length",
-			B_INT32_TYPE, 0, &length, sizeof(length));
 }
 
 

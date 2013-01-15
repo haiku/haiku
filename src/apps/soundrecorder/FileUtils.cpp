@@ -27,7 +27,7 @@ CopyFileData(BFile& dst, BFile& src)
 	struct stat src_stat;
 	status_t err = src.GetStat(&src_stat);
 	if (err != B_OK) {
-		printf("couldn't get stat: %#010lx\n", err);
+		printf("couldn't get stat: %#010" B_PRIx32 "\n", err);
 		return err;
 	}
 		

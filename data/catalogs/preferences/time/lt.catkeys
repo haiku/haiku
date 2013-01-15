@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Time	3249243267
+1	lithuanian	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		Pasaulinis (Grinvičo) laikas (suderinama su UNIX)
 OK	Time		Gerai
 Asia	Time		Azija
@@ -40,5 +40,6 @@ Try all servers	Time		Bandyti visus serverius
 Time zone	Time		Laiko zona
 Could not create socket	Time		Nepavyko sukurti lizdo
 Synchronize again	Time		Sinchronizuoti vėl
+Clock	Time		Laikrodis
 Network time	Time		Sinchronizavimas
 Atlantic	Time		Atlanto vandenynas

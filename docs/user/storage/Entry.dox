@@ -14,7 +14,7 @@
 
 /*!
 	\file Entry.h
-	Provides the BEntry class and entry_ref implementations.
+	\brief Provides the BEntry class and entry_ref implementations.
 */
 
 

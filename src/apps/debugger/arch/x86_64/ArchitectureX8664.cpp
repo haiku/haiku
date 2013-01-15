@@ -470,9 +470,8 @@ status_t
 ArchitectureX8664::GetInstructionInfo(target_addr_t address,
 	InstructionInfo& _info, CpuState* state)
 {
-	// read the code
+	// read the code - maximum x86{-64} instruction size = 15 bytes
 	uint8 buffer[16];
-		// TODO: What's the maximum instruction size?
 	ssize_t bytesRead = fTeamMemory->ReadMemory(address, buffer,
 		sizeof(buffer));
 	if (bytesRead < 0)
@@ -484,37 +483,7 @@ ArchitectureX8664::GetInstructionInfo(target_addr_t address,
 	if (error != B_OK)
 		return error;
 
-	// disassemble the instruction
-	BString line;
-	target_addr_t instructionAddress;
-	target_addr_t targetAddress = 0;
-	target_size_t instructionSize;
-	bool breakpointAllowed;
-	error = disassembler.GetNextInstruction(line, instructionAddress,
-		instructionSize, breakpointAllowed);
-	if (error != B_OK)
-		return error;
-
-	// FIXME: Is this correct for x86_64? I'm not entirely sure.
-	instruction_type instructionType = INSTRUCTION_TYPE_OTHER;
-	if (buffer[0] == 0xff && (buffer[1] & 0x34) == 0x10) {
-		// absolute call with r/m32
-		instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
-	} else if (buffer[0] == 0xe8 && instructionSize == 5) {
-		// relative call with rel32 -- don't categorize the call with 0 as
-		// subroutine call, since it is only used to get the address of the GOT
-		if (buffer[1] != 0 || buffer[2] != 0 || buffer[3] != 0
-			|| buffer[4] != 0) {
-			instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
-		}
-	}
-
-	if (!_info.SetTo(instructionAddress, targetAddress, instructionSize,
-			instructionType, breakpointAllowed, line)) {
-		return B_NO_MEMORY;
-	}
-
-	return B_OK;
+	return disassembler.GetNextInstructionInfo(_info, state);
 }
 
 

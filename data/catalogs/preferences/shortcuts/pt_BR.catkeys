@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	621368175
+1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	3661393357
 Error, NULL state description?\n	ShortcutsSpec		Erro, descrição de estado em branco?\n
 MoveMouse	ShortcutsSpec		Mover o Mouse
 OK	ShortcutsWindow		OK
@@ -25,6 +25,7 @@ Save	ShortcutsWindow		Salvar
 *MouseButton 1	ShortcutsWindow		*Botão do Mouse 1
 *MoveMouse +20 +0	ShortcutsWindow		*Mover Mouse +20 +0
 MouseDown	ShortcutsSpec		Mouse para baixo
+Save changes before closing?	ShortcutsWindow		Salvar alterações antes de fechar?
 Remove selected shortcut	ShortcutsWindow		Remover atalho selecionado
 MouseButton	ShortcutsSpec		Botão do Mouse
 Add new shortcut	ShortcutsWindow		Adicionar novo atalho
@@ -43,7 +44,6 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Mover Mouse Para 50% 50%
 Save KeySet as…	ShortcutsWindow		Salvar combinação de teclas como...
 Open	ShortcutsWindow		Abrir
-Really quit without saving your changes?	ShortcutsWindow		Você deseja sair sem salvar as mudanças?
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		O Atalhos não pode analisar seu arquivo de combinação de teclas!
 Select	ShortcutsWindow		Selecionar
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		O Atalhos não pode salvar seu arquivo combinação de teclas!

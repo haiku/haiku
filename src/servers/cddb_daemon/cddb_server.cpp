@@ -56,7 +56,7 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 
 	// Convert CDDB id to hexadecimal format.
 	char hexCddbId[9];
-	sprintf(hexCddbId, "%08lx", cddbId);
+	sprintf(hexCddbId, "%08" B_PRIx32 "", cddbId);
 	
 	// Assemble the Query command.
 	int32 numTracks = toc->last_track + 1 - toc->first_track;

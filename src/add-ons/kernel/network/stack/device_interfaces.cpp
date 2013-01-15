@@ -464,6 +464,8 @@ get_device_interface(const char* name, bool create)
 		}
 	}
 
+	close_module_list(cookie);
+
 	return NULL;
 }
 

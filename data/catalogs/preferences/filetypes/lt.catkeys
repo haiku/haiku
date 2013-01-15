@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-FileTypes	2496450458
+1	lithuanian	x-vnd.Haiku-FileTypes	1059171929
 Application types…	FileTypes Window		Programų tipai…
 Description:	Application Types Window		Aprašas:
 Args only	Application Type Window		Tik argumentai
@@ -16,7 +16,6 @@ New file type	New File Type Window		Naujas failų tipas
 Rule:	FileTypes Window		Taisyklė:
 Add icon…	Icon View		Pridėti piktogramą…
 Multiple files from \"%s\" file type	FileType Window		Keleto aplanke „%s“ esančių failų tipas
-Do you want to save the changes?	Application Type Window		Ar norite įrašyti pakeitimus?
 File type	FileType Window		Failo (-ų) tipas
 Could not change attributes	Attribute Window		Požymių pakeisti nepavyko
 Could not retrieve preferred application of this file	Preferred App Menu		Pageidautina programa šiam failui nerasta
@@ -72,7 +71,6 @@ Special:	Attribute Window		Ypatingas:
 Alpha	Application Type Window		Alfa
 Add…	FileTypes Window		Pridėti…
 Signature:	Application Type Window		Identifikatorius:
-Quit, don't save	Application Type Window		Baigti neišsaugant
 Add…	Application Type Window		Pridėti…
 [Multiple files] file types	FileType Window		(Keleto) failų tipas
 Information	Application Types Window		Informacija

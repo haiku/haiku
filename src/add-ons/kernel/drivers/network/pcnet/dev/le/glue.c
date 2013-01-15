@@ -1,5 +1,6 @@
 #include <sys/bus.h>
 #include <sys/mutex.h>
+#include <sys/rman.h>
 
 #include <net/ethernet.h>
 #include <net/if.h>
@@ -24,12 +25,8 @@ NO_HAIKU_REENABLE_INTERRUPTS();
 struct le_pci_softc {
 	struct am79900_softc	sc_am79900;	/* glue to MI code */
 
-	int			sc_rrid;
 	struct resource		*sc_rres;
-	bus_space_tag_t		sc_regt;
-	bus_space_handle_t	sc_regh;
 
-	int			sc_irid;
 	struct resource		*sc_ires;
 	void			*sc_ih;
 
@@ -41,28 +38,29 @@ struct le_pci_softc {
 int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) {
 	struct le_pci_softc *lesc = (struct le_pci_softc *)device_get_softc(dev);
 	HAIKU_INTR_REGISTER_STATE;
-	uint16_t value;
+	uint16_t isr;
 
 	HAIKU_INTR_REGISTER_ENTER();
 
 	/* get current flags */
-	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, LE_CSR0);
-	bus_space_barrier(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, 2,
-	    BUS_SPACE_BARRIER_WRITE);
-	value = bus_space_read_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RDP);
+	bus_write_2(lesc->sc_rres, PCNET_PCI_RAP, LE_CSR0);
+	bus_barrier(lesc->sc_rres, PCNET_PCI_RAP, 2, BUS_SPACE_BARRIER_WRITE);
+	isr = (bus_read_2(lesc->sc_rres, PCNET_PCI_RDP));
 
 	/* is there a pending interrupt? */
-	if (value & LE_C0_INTR) {
-		/* set the new flags, disable interrupts */
-		bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, LE_CSR0);
-		bus_space_barrier(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, 2,
-			BUS_SPACE_BARRIER_WRITE);
-		bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RDP,
-			value & ~LE_C0_INEA);
-		lesc->sc_am79900.lsc.sc_lastisr |= value;
+	if ((isr & LE_C0_INTR) == 0) {
+		HAIKU_INTR_REGISTER_LEAVE();
+		return 0;
 	}
 
+	/* set the new flags, disable interrupts */
+	bus_write_2(lesc->sc_rres, PCNET_PCI_RAP, LE_CSR0);
+	bus_barrier(lesc->sc_rres, PCNET_PCI_RAP, 2, BUS_SPACE_BARRIER_WRITE);
+	bus_write_2(lesc->sc_rres, PCNET_PCI_RDP, isr & ~(LE_C0_INEA));
+		
+	lesc->sc_am79900.lsc.sc_lastisr |= isr;
+	
 	HAIKU_INTR_REGISTER_LEAVE();
 
-	return value & LE_C0_INTR;
+	return 1;
 }

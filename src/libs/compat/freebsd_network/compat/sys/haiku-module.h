@@ -36,6 +36,7 @@ struct device_method {
 typedef struct device_method device_method_t;
 
 #define DEVMETHOD(name, func)	{ #name, (device_method_signature_t)&func }
+#define DEVMETHOD_END	{ 0, 0 }
 
 typedef struct {
 	const char *name;
@@ -255,5 +256,9 @@ extern const char* __haiku_firmware_name_map[][2];
 	driver_t *DRIVER_MODULE_NAME(name, busname) = &(driver); \
 	devclass_t *__class_ ## name ## _ ## busname ## _ ## devclass = &(devclass)
 
+#define DRIVER_MODULE_ORDERED(name, busname, driver, devclass, evh, arg, order) \
+	DRIVER_MODULE(name, busname, driver, devclass, evh, arg)
+
+#define nitems(_a)     (sizeof((_a)) / sizeof((_a)[0]))
 
 #endif	/* _FBSD_COMPAT_SYS_HAIKU_MODULE_H_ */

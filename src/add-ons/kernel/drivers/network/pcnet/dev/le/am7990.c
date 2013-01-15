@@ -72,7 +72,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/le/am7990.c,v 1.1.2.3 2006/06/18 15:43:18 marius Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/bus.h>
@@ -385,7 +385,7 @@ am7990_tint(struct lance_softc *sc)
 
 	sc->sc_first_td = bix;
 
-	ifp->if_timer = sc->sc_no_td > 0 ? 5 : 0;
+	sc->sc_wdog_timer = sc->sc_no_td > 0 ? 5 : 0;
 }
 
 /*
@@ -421,10 +421,9 @@ am7990_intr(void *arg)
 	 * Clear interrupt source flags and turn off interrupts. If we
 	 * don't clear these flags before processing their sources we
 	 * could completely miss some interrupt events as the NIC can
-	 * change these flags while we're in this handler. We turn off
-	 * interrupts so we don't get another RX interrupt while still
-	 * processing the previous one in ifp->if_input() with the
-	 * driver lock dropped.
+	 * change these flags while we're in this handler. We toggle
+	 * the interrupt enable bit in order to keep receiving them
+	 * (some chips work without this, some don't).
 	 */
 	(*sc->sc_wrcsr)(sc, LE_CSR0, isr & ~(LE_C0_INEA | LE_C0_TDMD |
 	    LE_C0_STOP | LE_C0_STRT | LE_C0_INIT));
@@ -575,7 +574,7 @@ am7990_start_locked(struct lance_softc *sc)
 	sc->sc_last_td = bix;
 
 	if (enq > 0)
-		ifp->if_timer = 5;
+		sc->sc_wdog_timer = 5;
 }
 
 #ifdef LEDEBUG

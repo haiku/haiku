@@ -12,7 +12,6 @@
 
 #include <ctype.h>
 
-#include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
@@ -25,38 +24,14 @@
 #include <OpenWithTracker.h>
 #include <RadioButton.h>
 #include <Roster.h>
-#include <ScrollView.h>
 #include <SeparatorView.h>
 #include <Slider.h>
-#include <StringItem.h>
+#include <TabView.h>
 #include <TextControl.h>
 #include <View.h>
 
 #include "BarApp.h"
 #include "StatusView.h"
-
-
-namespace BPrivate {
-
-class SettingsItem : public BStringItem {
- public:
-	SettingsItem(const char* label, BView* view)
-		:
-		BStringItem(label),
-		fSettingsView(view)
-	{
-	}
-
-	BView* View()
-	{
-		return fSettingsView;
-	}
-
- private:
-	BView* fSettingsView;
-};
-
-}	// namespace BPrivate
 
 
 static const float kIndentSpacing
@@ -73,15 +48,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	BWindow(frame, B_TRANSLATE("Deskbar preferences"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
-	// Main view controls
-	fSettingsTypeListView = new BListView("List View",
-		B_SINGLE_SELECTION_LIST);
-
-	BScrollView* scrollView = new BScrollView("scrollview",
-		fSettingsTypeListView, 0, false, true);
-
-	fSettingsContainerBox = new BBox("SettingsContainerBox");
-
 	// Menu controls
 	fMenuRecentDocuments = new BCheckBox(B_TRANSLATE("Recent documents:"),
 		new BMessage(kUpdateRecentCounts));
@@ -223,6 +189,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
+	menuSettingsView->SetName(B_TRANSLATE("Menu"));
 
 	BView* applicationsSettingsView = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
@@ -243,6 +210,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
+	applicationsSettingsView->SetName(B_TRANSLATE("Applications"));
 
 	BView* windowSettingsView = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 0)
@@ -254,32 +222,17 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.End()
 		.View();
+	windowSettingsView->SetName(B_TRANSLATE("Window"));
+
+	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
+	tabView->AddTab(menuSettingsView);
+	tabView->AddTab(applicationsSettingsView);
+	tabView->AddTab(windowSettingsView);
 
 	BLayoutBuilder::Group<>(this)
-		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-			.Add(scrollView)
-			.Add(fSettingsContainerBox)
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+		.Add(tabView)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.End();
-
-	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Menu"),
-		menuSettingsView));
-	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Applications"),
-		applicationsSettingsView));
-	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Window"),
-		windowSettingsView));
-
-	// constraint the listview width so that the longest item fits
-	float width = 0;
-	fSettingsTypeListView->GetPreferredSize(&width, NULL);
-	width += B_V_SCROLL_BAR_WIDTH;
-	fSettingsTypeListView->SetExplicitMinSize(BSize(width, 0));
-	fSettingsTypeListView->SetExplicitMaxSize(BSize(width, B_SIZE_UNLIMITED));
-
-	fSettingsTypeListView->SetSelectionMessage(
-		new BMessage(kSettingsViewChanged));
-	fSettingsTypeListView->Select(0);
 
 	CenterOnScreen();
 }
@@ -310,10 +263,6 @@ PreferencesWindow::MessageReceived(BMessage* message)
 
 		case kStateChanged:
 			EnableDisableDependentItems();
-			break;
-
-		case kSettingsViewChanged:
-			_HandleChangedSettingsView();
 			break;
 
 		default:
@@ -387,36 +336,4 @@ PreferencesWindow::EnableDisableDependentItems()
 
 	fWindowAutoRaise->SetEnabled(
 		fWindowAlwaysOnTop->Value() == B_CONTROL_OFF);
-}
-
-
-//	#pragma mark -
-
-
-void
-PreferencesWindow::_HandleChangedSettingsView()
-{
-	int32 currentSelection = fSettingsTypeListView->CurrentSelection();
-	if (currentSelection < 0)
-		return;
-
-	BView* oldView = fSettingsContainerBox->ChildAt(0);
-
-	if (oldView != NULL)
-		oldView->RemoveSelf();
-
-	SettingsItem* selectedItem =
-		dynamic_cast<SettingsItem*>
-			(fSettingsTypeListView->ItemAt(currentSelection));
-
-	if (selectedItem != NULL) {
-		fSettingsContainerBox->SetLabel(selectedItem->Text());
-
-		BView* view = selectedItem->View();
-		view->SetViewColor(fSettingsContainerBox->ViewColor());
-		view->Hide();
-		fSettingsContainerBox->AddChild(view);
-
-		view->Show();
-	}
 }

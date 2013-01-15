@@ -11,6 +11,10 @@
 #include "Types.h"
 
 
+class CpuState;
+class InstructionInfo;
+
+
 class DisassemblerX8664 {
 public:
 								DisassemblerX8664();
@@ -27,7 +31,13 @@ public:
 									target_addr_t nextAddress,
 									target_addr_t& _address,
 									target_size_t& _size);
+	virtual	status_t			GetNextInstructionInfo(
+									InstructionInfo& _info,
+									CpuState* state);
 
+private:
+			target_addr_t		GetInstructionTargetAddress(
+									CpuState* state) const;
 private:
 			struct UdisData;
 

@@ -974,7 +974,7 @@ MainWin::KeyDown(BMessage *msg)
 	uint32 raw_char  = msg->FindInt32("raw_char");
 	uint32 modifiers = msg->FindInt32("modifiers");
 
-	printf("key 0x%lx, raw_char 0x%lx, modifiers 0x%lx\n", key, raw_char,
+	printf("key 0x%" B_PRIx32 ", raw_char 0x%" B_PRIx32 ", modifiers 0x%" B_PRIx32 "\n", key, raw_char,
 		modifiers);
 
 	switch (raw_char) {

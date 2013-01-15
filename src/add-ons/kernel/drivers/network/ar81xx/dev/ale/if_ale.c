@@ -91,11 +91,11 @@ TUNABLE_INT("hw.ale.msix_disable", &msix_disable);
 /*
  * Devices supported by this driver.
  */
-static struct ale_dev {
+static const struct ale_dev {
 	uint16_t	ale_vendorid;
 	uint16_t	ale_deviceid;
 	const char	*ale_name;
-} ale_devs[] = {
+} const ale_devs[] = {
     { VENDORID_ATHEROS, DEVICEID_ATHEROS_AR81XX,
     "Atheros AR8121/AR8113/AR8114 PCIe Ethernet" },
 };
@@ -115,7 +115,6 @@ static void	ale_init_tx_ring(struct ale_softc *);
 static void	ale_int_task(void *, int);
 static int	ale_intr(void *);
 static int	ale_ioctl(struct ifnet *, u_long, caddr_t);
-static void	ale_link_task(void *, int);
 static void	ale_mac_config(struct ale_softc *);
 static int	ale_miibus_readreg(device_t, int, int);
 static void	ale_miibus_statchg(device_t);
@@ -164,7 +163,7 @@ static device_method_t ale_methods[] = {
 	DEVMETHOD(miibus_writereg,	ale_miibus_writereg),
 	DEVMETHOD(miibus_statchg,	ale_miibus_statchg),
 
-	{ NULL, NULL }
+	DEVMETHOD_END
 };
 
 static driver_t ale_driver = {
@@ -175,8 +174,8 @@ static driver_t ale_driver = {
 
 static devclass_t ale_devclass;
 
-DRIVER_MODULE(ale, pci, ale_driver, ale_devclass, 0, 0);
-DRIVER_MODULE(miibus, ale, miibus_driver, miibus_devclass, 0, 0);
+DRIVER_MODULE(ale, pci, ale_driver, ale_devclass, NULL, NULL);
+DRIVER_MODULE(miibus, ale, miibus_driver, miibus_devclass, NULL, NULL);
 
 static struct resource_spec ale_res_spec_mem[] = {
 	{ SYS_RES_MEMORY,	PCIR_BAR(0),	RF_ACTIVE },
@@ -253,10 +252,45 @@ static void
 ale_miibus_statchg(device_t dev)
 {
 	struct ale_softc *sc;
+	struct mii_data *mii;
+	struct ifnet *ifp;
+	uint32_t reg;
 
 	sc = device_get_softc(dev);
+	mii = device_get_softc(sc->ale_miibus);
+	ifp = sc->ale_ifp;
+	if (mii == NULL || ifp == NULL ||
+	    (ifp->if_drv_flags & IFF_DRV_RUNNING) == 0)
+		return;
 
-	taskqueue_enqueue(taskqueue_swi, &sc->ale_link_task);
+	sc->ale_flags &= ~ALE_FLAG_LINK;
+	if ((mii->mii_media_status & (IFM_ACTIVE | IFM_AVALID)) ==
+	    (IFM_ACTIVE | IFM_AVALID)) {
+		switch (IFM_SUBTYPE(mii->mii_media_active)) {
+		case IFM_10_T:
+		case IFM_100_TX:
+			sc->ale_flags |= ALE_FLAG_LINK;
+			break;
+		case IFM_1000_T:
+			if ((sc->ale_flags & ALE_FLAG_FASTETHER) == 0)
+				sc->ale_flags |= ALE_FLAG_LINK;
+			break;
+		default:
+			break;
+		}
+	}
+
+	/* Stop Rx/Tx MACs. */
+	ale_stop_mac(sc);
+
+	/* Program MACs with resolved speed/duplex/flow-control. */
+	if ((sc->ale_flags & ALE_FLAG_LINK) != 0) {
+		ale_mac_config(sc);
+		/* Reenable Tx/Rx MACs. */
+		reg = CSR_READ_4(sc, ALE_MAC_CFG);
+		reg |= MAC_CFG_TX_ENB | MAC_CFG_RX_ENB;
+		CSR_WRITE_4(sc, ALE_MAC_CFG, reg);
+	}
 }
 
 static void
@@ -267,12 +301,16 @@ ale_mediastatus(struct ifnet *ifp, struct ifmediareq *ifmr)
 
 	sc = ifp->if_softc;
 	ALE_LOCK(sc);
+	if ((ifp->if_flags & IFF_UP) == 0) {
+		ALE_UNLOCK(sc);
+		return;
+	}
 	mii = device_get_softc(sc->ale_miibus);
 
 	mii_pollstat(mii);
-	ALE_UNLOCK(sc);
 	ifmr->ifm_status = mii->mii_media_status;
 	ifmr->ifm_active = mii->mii_media_active;
+	ALE_UNLOCK(sc);
 }
 
 static int
@@ -297,7 +335,7 @@ ale_mediachange(struct ifnet *ifp)
 static int
 ale_probe(device_t dev)
 {
-	struct ale_dev *sp;
+	const struct ale_dev *sp;
 	int i;
 	uint16_t vendor, devid;
 
@@ -414,7 +452,7 @@ ale_attach(device_t dev)
 	struct ale_softc *sc;
 	struct ifnet *ifp;
 	uint16_t burst;
-	int error, i, msic, msixc;
+	int error, i, msic, msixc, pmc;
 	uint32_t rxf_len, txf_len;
 
 	error = 0;
@@ -425,7 +463,6 @@ ale_attach(device_t dev)
 	    MTX_DEF);
 	callout_init_mtx(&sc->ale_tick_ch, &sc->ale_mtx, 0);
 	TASK_INIT(&sc->ale_int_task, 0, ale_int_task, sc);
-	TASK_INIT(&sc->ale_link_task, 0, ale_link_task, sc);
 
 	/* Map the device. */
 	pci_enable_busmaster(dev);
@@ -589,18 +626,16 @@ ale_attach(device_t dev)
 	IFQ_SET_READY(&ifp->if_snd);
 	ifp->if_capabilities = IFCAP_RXCSUM | IFCAP_TXCSUM | IFCAP_TSO4;
 	ifp->if_hwassist = ALE_CSUM_FEATURES | CSUM_TSO;
-#ifdef ENABLE_WOL
 	if (pci_find_cap(dev, PCIY_PMG, &pmc) == 0) {
 		sc->ale_flags |= ALE_FLAG_PMCAP;
 		ifp->if_capabilities |= IFCAP_WOL_MAGIC | IFCAP_WOL_MCAST;
 	}
-#endif
 	ifp->if_capenable = ifp->if_capabilities;
 
 	/* Set up MII bus. */
 	error = mii_attach(dev, &sc->ale_miibus, ifp, ale_mediachange,
 	    ale_mediastatus, BMSR_DEFCAPMASK, sc->ale_phyaddr, MII_OFFSET_ANY,
-	    0);
+	    MIIF_DOPAUSE);
 	if (error != 0) {
 		device_printf(dev, "attaching PHYs failed\n");
 		goto fail;
@@ -681,7 +716,6 @@ ale_detach(device_t dev)
 		ALE_UNLOCK(sc);
 		callout_drain(&sc->ale_tick_ch);
 		taskqueue_drain(sc->ale_tq, &sc->ale_int_task);
-		taskqueue_drain(taskqueue_swi, &sc->ale_link_task);
 	}
 
 	if (sc->ale_tq != NULL) {
@@ -1399,7 +1433,6 @@ ale_shutdown(device_t dev)
 static void
 ale_setlinkspeed(struct ale_softc *sc)
 {
-#ifdef ENABLE_WOL
 	struct mii_data *mii;
 	int aneg, i;
 
@@ -1458,13 +1491,11 @@ ale_setlinkspeed(struct ale_softc *sc)
 	mii->mii_media_status = IFM_AVALID | IFM_ACTIVE;
 	mii->mii_media_active = IFM_ETHER | IFM_100_TX | IFM_FDX;
 	ale_mac_config(sc);
-#endif
 }
 
 static void
 ale_setwol(struct ale_softc *sc)
 {
-#ifdef ENABLE_WOL
 	struct ifnet *ifp;
 	uint32_t reg, pmcs;
 	uint16_t pmstat;
@@ -1523,7 +1554,6 @@ ale_setwol(struct ale_softc *sc)
 	if ((ifp->if_capenable & IFCAP_WOL) != 0)
 		pmstat |= PCIM_PSTAT_PME | PCIM_PSTAT_PMEENABLE;
 	pci_write_config(sc->ale_dev, pmc + PCIR_POWER_STATUS, pmstat, 2);
-#endif
 }
 
 static int
@@ -2017,14 +2047,12 @@ ale_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 				ifp->if_hwassist &= ~CSUM_TSO;
 		}
 
-#ifdef ENABLE_WOL
 		if ((mask & IFCAP_WOL_MCAST) != 0 &&
 		    (ifp->if_capabilities & IFCAP_WOL_MCAST) != 0)
 			ifp->if_capenable ^= IFCAP_WOL_MCAST;
 		if ((mask & IFCAP_WOL_MAGIC) != 0 &&
 		    (ifp->if_capabilities & IFCAP_WOL_MAGIC) != 0)
 			ifp->if_capenable ^= IFCAP_WOL_MAGIC;
-#endif
 		if ((mask & IFCAP_VLAN_HWCSUM) != 0 &&
 		    (ifp->if_capabilities & IFCAP_VLAN_HWCSUM) != 0)
 			ifp->if_capenable ^= IFCAP_VLAN_HWCSUM;
@@ -2073,65 +2101,12 @@ ale_mac_config(struct ale_softc *sc)
 	}
 	if ((IFM_OPTIONS(mii->mii_media_active) & IFM_FDX) != 0) {
 		reg |= MAC_CFG_FULL_DUPLEX;
-#ifdef notyet
 		if ((IFM_OPTIONS(mii->mii_media_active) & IFM_ETH_TXPAUSE) != 0)
 			reg |= MAC_CFG_TX_FC;
 		if ((IFM_OPTIONS(mii->mii_media_active) & IFM_ETH_RXPAUSE) != 0)
 			reg |= MAC_CFG_RX_FC;
-#endif
 	}
 	CSR_WRITE_4(sc, ALE_MAC_CFG, reg);
-}
-
-static void
-ale_link_task(void *arg, int pending)
-{
-	struct ale_softc *sc;
-	struct mii_data *mii;
-	struct ifnet *ifp;
-	uint32_t reg;
-
-	sc = (struct ale_softc *)arg;
-
-	ALE_LOCK(sc);
-	mii = device_get_softc(sc->ale_miibus);
-	ifp = sc->ale_ifp;
-	if (mii == NULL || ifp == NULL ||
-	    (ifp->if_drv_flags & IFF_DRV_RUNNING) == 0) {
-		ALE_UNLOCK(sc);
-		return;
-	}
-
-	sc->ale_flags &= ~ALE_FLAG_LINK;
-	if ((mii->mii_media_status & (IFM_ACTIVE | IFM_AVALID)) ==
-	    (IFM_ACTIVE | IFM_AVALID)) {
-		switch (IFM_SUBTYPE(mii->mii_media_active)) {
-		case IFM_10_T:
-		case IFM_100_TX:
-			sc->ale_flags |= ALE_FLAG_LINK;
-			break;
-		case IFM_1000_T:
-			if ((sc->ale_flags & ALE_FLAG_FASTETHER) == 0)
-				sc->ale_flags |= ALE_FLAG_LINK;
-			break;
-		default:
-			break;
-		}
-	}
-
-	/* Stop Rx/Tx MACs. */
-	ale_stop_mac(sc);
-
-	/* Program MACs with resolved speed/duplex/flow-control. */
-	if ((sc->ale_flags & ALE_FLAG_LINK) != 0) {
-		ale_mac_config(sc);
-		/* Reenable Tx/Rx MACs. */
-		reg = CSR_READ_4(sc, ALE_MAC_CFG);
-		reg |= MAC_CFG_TX_ENB | MAC_CFG_RX_ENB;
-		CSR_WRITE_4(sc, ALE_MAC_CFG, reg);
-	}
-
-	ALE_UNLOCK(sc);
 }
 
 static void
@@ -2821,7 +2796,7 @@ ale_init_locked(struct ale_softc *sc)
 		    ((rxf_lo << RX_FIFO_PAUSE_THRESH_LO_SHIFT) &
 		    RX_FIFO_PAUSE_THRESH_LO_MASK) |
 		    ((rxf_hi << RX_FIFO_PAUSE_THRESH_HI_SHIFT) &
-		     RX_FIFO_PAUSE_THRESH_HI_MASK));
+		    RX_FIFO_PAUSE_THRESH_HI_MASK));
 	}
 
 	/* Disable RSS. */
@@ -2884,14 +2859,14 @@ ale_init_locked(struct ale_softc *sc)
 	CSR_WRITE_4(sc, ALE_INTR_STATUS, 0xFFFFFFFF);
 	CSR_WRITE_4(sc, ALE_INTR_STATUS, 0);
 
+	ifp->if_drv_flags |= IFF_DRV_RUNNING;
+	ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
+
 	sc->ale_flags &= ~ALE_FLAG_LINK;
 	/* Switch to the current media. */
 	mii_mediachg(mii);
 
 	callout_reset(&sc->ale_tick_ch, hz, ale_tick, sc);
-
-	ifp->if_drv_flags |= IFF_DRV_RUNNING;
-	ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
 }
 
 static void

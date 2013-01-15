@@ -18,9 +18,12 @@ MergeObject posix_main.o :
  	errno.c
 	fcntl.cpp
  	fnmatch.c
+    fts.c
+    ftw.c
  	glob.c
  	inttypes.c
 	libgen.cpp
+    nftw.c
  	poll.c
  	$(PWD_BACKEND)
  	scheduler.cpp

@@ -164,7 +164,7 @@ TemplatesMenu::BuildMenu(bool addItems)
 
 				entry_ref ref;
 				entry.GetRef(&ref);
-	
+
 				BMessage* message = new BMessage(kNewEntryFromTemplate);
 				message->AddRef("refs_template", &ref);
 				message->AddString("name", fileName);

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Appearance	1933110481
+1	lithuanian	x-vnd.Haiku-Appearance	3654950032
 Plain font:	Font view		Paprastas šriftas:
 Control highlight	Colors tab		Valdiklių paryškinimas
 Control border	Colors tab		Valdiklių rėmeliai
@@ -24,25 +24,30 @@ Selected menu item background	Colors tab		Veikiamojo meniu elemento fonas
 Antialiasing	APRWindow		Glodinimas
 Navigation base	Colors tab		Veikiamojo elemento (židinio) rėmelis
 Window border	Colors tab		Veikiamojo lango rėmelis
+Double:	DecorSettingsView		Dvigubas:
 Window tab text	Colors tab		Veikiamojo lango antraštės tekstas
 Document text	Colors tab		Dokumento tekstas
 Navigation pulse	Colors tab		Veikiamojo elemento (židinio) žybsniai
 Window decorator:	DecorSettingsView		Langų dekoruoklis:
 Selected menu item text	Colors tab		Veikiamojo meniu elemento tekstas
 Menu background	Colors tab		Meniu fonas
+List background	Colors tab		Sąrašo fonas
 OK	DecorSettingsView		Gerai
 Size:	Font Selection view		Dydis:
+Selected list item background	Colors tab		Pasirinktojo sąrašo elemento fonas
 Panel background	Colors tab		Skydelių fonas
 Menu font:	Font view		Meniu šriftas:
 Colors	APRWindow		Spalvos
 Control background	Colors tab		Valdiklių fonas
 Inactive window tab	Colors tab		Foninių lango antraštės
+List item text	Colors tab		Sąrašo elemento tekstas
 Appearance	System name		Išvaizda
 Fixed font:	Font view		Lygiaplotis šriftas:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro intensyvumas:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpikselinis glodinimas kartu su taškine korekcija šioje „Haiku“ versijoje yra neprieinamas, dėl galimų patentinių problemų. Norėdami įjungti šią galimybę, turite savarankiškai sukompiliuoti „Haiku“, įjungdami atitinkamas savybes „FreeType“ bibliotekos (libfreetype) antraštiniame derinimo faile.
 Control text	Colors tab		Valdiklių tekstas
+Single:	DecorSettingsView		Viengubas:
 Tooltip text	Colors tab		Iškylančiųjų paaiškinimų tekstas
 Bold font:	Font view		Pastorintas šriftas:
 Inactive window border	Colors tab		Foninių langų rėmeliai
@@ -51,7 +56,9 @@ LCD subpixel	AntialiasingSettingsView		subpikselinis LCD
 Selected menu item border	Colors tab		Veikiamojo meniu elemento rėmelis
 Strong	AntialiasingSettingsView		Intensyvus
 Panel text	Colors tab		Skydelių tekstas
+Arrow style	DecorSettingsView		Rodyklės stilius
 Monospaced fonts only	AntialiasingSettingsView		tik lygiapločių šriftų
+Look and feel	APRWindow		Išvaizda ir jausena
 Antialiasing menu	AntialiasingSettingsView		Glodinimo meniu
 Fonts	APRWindow		Šriftai
 Glyph hinting:	AntialiasingSettingsView		Rašmenų taškinė korekcija:

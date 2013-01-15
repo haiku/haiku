@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	296071315
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		Vídeo utilizando definições de forma de parâmetros
 Video encoding:	MediaConverter		Codificação de vídeo:
 No audio	Audio codecs list		Sem áudio
@@ -15,7 +15,6 @@ MediaConverter	System name		Conversor de Mídia
 No video	Video codecs list		Nenhum vídeo
 Duration:	MediaConverter-FileInfo		Duração:
 OK	MediaConverter		OK
-Error writing audio frame %Ld	MediaConverter		Erro gravando quadro de áudio %Ld
 Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
 Low	MediaConverter		Baixo
 Conversion completed	MediaConverter		Conversão concluída
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Cancelar
 None available	Video codecs		Nenhum disponível
 Conversion cancelled	MediaConverter		Conversão cancelada
 No file selected	MediaConverter-FileInfo		Nenhum arquivo selecionado
-Error writing video frame %Ld	MediaConverter		Erro gravando quadro de vídeo %Ld
 Select this folder	MediaConverter		Selecionar esta pasta
 Continue	MediaConverter		Continuar
 Encoder parameters	MediaConverter-EncoderWindow		Parâmetros do codificador
@@ -48,7 +46,6 @@ Preview	MediaConverter		Pré-visualização
 File format:	MediaConverter		Formato de arquivo:
 None available	Audio codecs		Nenhum disponível
 MediaConverter+:SaveDirectory	MediaConverter		Conversor de Mídia+:Salvar Diretório
-Error read audio frame %Ld	MediaConverter		Erro ao ler quadro de áudio %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canal / %lld quadros
 Error launching: %strError%	MediaConverter		Erro ao lançar: %strError%
 High	MediaConverter		Alto
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
 Output folder	MediaConverter		Pasta de saída
 Audio quality: %3d%%	MediaConverter		Qualidade de áudio: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Um erro ocorreu lendo as informações do arquivo.\n\nErro :
-Error read video frame %Ld	MediaConverter		Erro ao ler quadro de vídeo %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles arquivos não foram reconhecidos como arquivos de mídia suportados:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld quadros

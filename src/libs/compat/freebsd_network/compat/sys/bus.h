@@ -33,6 +33,9 @@
 #define bus_barrier(r, o, l, f) \
 	bus_space_barrier((r)->r_bustag, (r)->r_bushandle, (o), (l), (f))
 
+#define bus_read_region_1(r, o, d, c) \
+	bus_space_read_region_1((r)->r_bustag, (r)->r_bushandle, (o), (d), (c))
+
 #define	FILTER_STRAY			B_UNHANDLED_INTERRUPT
 #define	FILTER_HANDLED			B_HANDLED_INTERRUPT
 #define	FILTER_SCHEDULE_THREAD	B_INVOKE_SCHEDULER
@@ -115,6 +118,7 @@ void device_set_desc_copy(device_t dev, const char *desc);
 const char *device_get_desc(device_t dev);
 device_t device_get_parent(device_t dev);
 u_int32_t device_get_flags(device_t dev);
+devclass_t device_get_devclass(device_t dev);
 int device_get_children(device_t dev, device_t **devlistp, int *devcountp);
 
 void device_set_ivars(device_t dev, void *);

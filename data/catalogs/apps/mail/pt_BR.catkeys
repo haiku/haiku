@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-MAIL	1599879742
+1	portuguese (brazil)	x-vnd.Be-MAIL	233997769
 View	Mail		Visualizar
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Anexar Atributos:
@@ -10,6 +10,7 @@ Edit	Mail		Editar
 Print	Mail		Imprimir
 <none>	Mail		<nenhum>
 New mail message	Mail		Nova mensagem de correio
+Untitled	Mail		Sem título
 Automatic	Mail		Automático
 Automatically mark mail as read:	Mail		Marcar automaticamente correio como lido:
 helpful message	Mail		mensagem útil
@@ -25,7 +26,6 @@ Beginner	Mail		Iniciante
 Don't save	Mail		Não salvar
 Expert	Mail		Especialista
 Reply account:	Mail		Responder conta:
-Discard	Mail		Descartar
 Message	Mail		Mensagem
 Settings…	Mail		Definições…
 Reply to sender	Mail		Responder ao remetente
@@ -107,6 +107,7 @@ Close	Mail		Fechar
 No matches	Mail		Nenhuma correspondência
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		O mail_daemon não está executando. A mensagem está na fila e será enviada quando o mail_daemon iniciar.
 Really delete this signature? This cannot be undone.	Mail		Excluir realmente esta assinatura? Isto não poderá ser desfeito.
+Save this message as a draft before closing?	Mail		Salvar esta mensagem como um rascunho antes de fechar?
 Open	Mail		Abrir
 draft	B_USER_DIRECTORY/mail/draft		rascunho
 Quote	Mail		Citar
@@ -119,8 +120,8 @@ Remove enclosure	Mail		Remover compartimento
 Account:	Mail		Conta:
 Decoding:	Mail		Decodificação:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Desculpe, não foi possível encontrar um aplicativo que suporte o tipo de dados 'Pessoa'.
-Do you wish to send this message before closing?	Mail		Deseja enviar esta mensagem antes de fechar?
 Delete	Mail		Excluir
+Don't send	Mail		Não enviar
 Leave as '%s'	Mail		Deixar como '%s'
 Copy	Mail		Copiar
 Mail couldn't find its dictionary.	Mail		O correio não pôde encontrar seu dicionário.
@@ -135,7 +136,7 @@ Font:	Mail		Fonte:
 (Address unavailable)	Mail		(Endereço indisponível)
 Save address	Mail		Salvar endereço
 Queries	Mail		Consultas
-Do you wish to save this message as a draft before closing?	Mail		Deseja salvar esta mensagem como um rascunho antes de fechar?
+Send this message before closing?	Mail		Enviar esta mensagem antes de fechar?
 Save	Mail		Salvar
 Random	Mail		Aleatório
 Close and 	Mail		Fechar e  

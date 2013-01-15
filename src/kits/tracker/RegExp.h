@@ -108,12 +108,12 @@ public:
 	RegExp(const char*);
 	RegExp(const BString&);
 	~RegExp();
-	
+
 	status_t InitCheck() const;
-	
+
 	status_t SetTo(const char*);
 	status_t SetTo(const BString &);
-	
+
 	bool Matches(const char* string) const;
 	bool Matches(const BString &) const;
 

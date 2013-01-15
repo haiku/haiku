@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	1581984396
+1	japanese	x-vnd.haiku-icon_o_matic	3436142351
 Select All	Icon-O-Matic-PathManipulator		すべて選択
 Add Style	Icon-O-Matic-AddStylesCmd		スタイルを追加
 Color (#%02x%02x%02x)	Style name after dropping a color		カラー (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		無題
 Multi Set 	Multi Set (property name)		複数セット
 any of the other lists to	Empty property list - 2nd line		他のリストの中の
 Save as…	Icon-O-Matic-Menu-File		名前を付けて保存…
+Don't save	Icon-O-Matic-Menu-Settings		保存しない
 Change Color	Icon-O-Matic-SetColorCmd		カラーを変更
 Style	Icon-O-Matic-Menus		スタイル
 <modify path>	Icon-O-Matic-PathCmd		<パスを修正>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		元に戻す
 Click on a shape above	Empty transformers list - 1st line		上のシェイプをクリックして
 Add Shape	Icon-O-Matic-AddShapesCmd		シェイプを追加
 Contour	Transformation		コンター
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		閉じる前に作業中のアイコンへの変更を保存しますか?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<やり直しできるものはありません>
 Perspective	Transformation		パースペクティブ
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformerを移動
@@ -99,7 +101,6 @@ Pick a color	Icon-O-Matic-ColorPicker		カラーを選択
 Quit	Icon-O-Matic-Menu-File		終了
 Export	Icon-O-Matic-Menu-File		エクスポート
 No	Icon-O-Matic-StyledTextImport		いいえ
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		現在のアイコンの変更を保存しますか?
 Rotate indices forwards	Icon-O-Matic-PathsList		インデックスを順に辿る
 Unassign Path	Icon-O-Matic-UnassignPathCmd		パスの割り当て解除
 load error	Icon-O-Matic-SVGImport		読み込みエラー
@@ -146,7 +147,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Transformerを追加
 Diamond	Icon-O-Matic-StyleTypes		ダイヤモンド
 Path	Icon-O-Matic-PropertyNames		パス
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		ファイル'%s'をSVGドキュメントとして開けませんでした.\n\nエラー: %s
-Discard	Icon-O-Matic-Menu-Settings		破棄
 Swatches	Icon-O-Matic-Menus		見本
 <unavailable>	Icon-O-Matic-StyleTypes		<利用できません>
 Rotation	Icon-O-Matic-PropertyNames		回転

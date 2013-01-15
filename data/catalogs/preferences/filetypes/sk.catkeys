@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-FileTypes	2496450458
+1	slovak	x-vnd.Haiku-FileTypes	1059171929
 Application types…	FileTypes Window		Typy aplikácií…
 Description:	Application Types Window		Popis:
 Args only	Application Type Window		Iba argumenty
@@ -16,7 +16,6 @@ New file type	New File Type Window		Nový typ súboru
 Rule:	FileTypes Window		Pravidlo:
 Add icon…	Icon View		Pridať ikonu…
 Multiple files from \"%s\" file type	FileType Window		Viaceré súbory z typu „%s“
-Do you want to save the changes?	Application Type Window		Chcete uložiť zmeny?
 File type	FileType Window		Typ súboru
 Could not change attributes	Attribute Window		Nepodarilo sa zmeniť atribúty
 Could not retrieve preferred application of this file	Preferred App Menu		Nepodarilo sa získať preferovanú aplikáciu pre tento typ súboru
@@ -72,7 +71,6 @@ Special:	Attribute Window		Špeciálne:
 Alpha	Application Type Window		Alfa
 Add…	FileTypes Window		Pridať…
 Signature:	Application Type Window		Podpis:
-Quit, don't save	Application Type Window		Ukončiť, neukladať
 Add…	Application Type Window		Pridať…
 [Multiple files] file types	FileType Window		[Viaceré súbory] typy súborov
 Information	Application Types Window		Informácie

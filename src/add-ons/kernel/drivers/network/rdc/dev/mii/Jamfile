@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network rdc dev mii ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+UsePrivateHeaders net ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+KernelStaticLibrary rdc_mii.a
+	:
+	rdcphy.c
+	;
+
+ObjectHdrs [ FGristFiles rdcphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
+Includes [ FGristFiles rdcphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1301055003
+1	english	x-vnd.Haiku-libtracker	3779634732
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -411,7 +411,6 @@ Paste layout	ContainerWindow		粘贴布局
 Select	InfoWindow		选择
 Could not update permissions of file \"%name\". %error	FSUtils		无法更新 \"%name\" 的文件权限。错误：%error
 Select…	FilePanelPriv		选择...
-Don't move files to Trash	SettingsView		无法移动文件到垃圾箱
 There was an error resolving the link.	Tracker		恢复链接出错。
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		您无法移动或复制垃圾箱。
@@ -442,7 +441,6 @@ Automatic disk mounting	AutoMounterSettings		磁盘自动挂载
 Original name	ContainerWindow		原始名称
 Find	FSUtils		搜索
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		复制文件 \"%name\" 出错：\n\t%error\n\n是否继续？
-Ask before delete	SettingsView		删除之前询问
 Single window navigation	SettingsView		单个窗口导航
 parent folder	NavMenu		上级目录
 contains	FindPanel		包含
@@ -452,6 +450,7 @@ Mount	DeskWindow		挂载
 Mount	ContainerWindow		挂载
 %capacity (%used used -- %free free)	InfoWindow		%capacity（已用 %used -- 空闲 %free）
 Cancel	FSClipBoard		取消
+Restart Deskbar	DeskWindow		重启桌面栏
 Cut more	ContainerWindow		更多剪切
 Deleting: 	StatusWindow		删除：
 Empty Trash	InfoWindow		清空垃圾箱

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-FileTypes	2496450458
+1	german	x-vnd.Haiku-FileTypes	133192727
 Application types…	FileTypes Window		Anwendungstypen…
 Description:	Application Types Window		Beschreibung:
 Args only	Application Type Window		Nur Argumente
@@ -16,7 +16,6 @@ New file type	New File Type Window		Neuer Dateityp
 Rule:	FileTypes Window		Regel:
 Add icon…	Icon View		Icon hinzufügen…
 Multiple files from \"%s\" file type	FileType Window		Mehrere Dateien vom Typ \"%s\"
-Do you want to save the changes?	Application Type Window		Sollen die Änderungen gespeichert werden?
 File type	FileType Window		Dateityp
 Could not change attributes	Attribute Window		Attribute konnten nicht verändert werden
 Could not retrieve preferred application of this file	Preferred App Menu		Die bevorzugte Anwendung für diese Datei konnte nicht gefunden werden
@@ -50,6 +49,8 @@ Group name:	New File Type Window		Gruppenname:
 Preferred application	FileType Window		Bevorzugte Anwendung
 Progress	Application Types Window		Fortschritt
 Set preferred application	Preferred App Menu		Bevorzugte Anwendung wählen
+Don't save	Application Type Window		Nicht speichern
+Save changes before closing?	Application Type Window		Änderungen vor dem Schließen speichern?
 File	Application Type Window		Datei
 Version:	Application Type Window		Version:
 Select…	FileTypes Window		Auswählen…
@@ -72,7 +73,6 @@ Special:	Attribute Window		Spezial:
 Alpha	Application Type Window		Alpha
 Add…	FileTypes Window		Hinzu…
 Signature:	Application Type Window		Signatur:
-Quit, don't save	Application Type Window		Beenden, nicht speichern
 Add…	Application Type Window		Hinzu…
 [Multiple files] file types	FileType Window		[Mehrere Dateien] Dateitypen
 Information	Application Types Window		Information

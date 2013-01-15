@@ -166,7 +166,7 @@ FavoritesMenu::AddNextItem()
 			BMenuItem* item = BNavMenu::NewModelItem(&model,
 				model.IsDirectory() ? fOpenFolderMessage : fOpenFileMessage,
 				fTarget);
-				
+
 			if (item == NULL)
 				return true;
 
@@ -314,7 +314,7 @@ FavoritesMenu::ShouldShowModel(const Model* model)
 
 	if (!fRefFilter || model->Node() == NULL)
 		return true;
-	
+
 	struct stat_beos statBeOS;
 	convert_to_stat_beos(model->StatBuf(), &statBeOS);
 

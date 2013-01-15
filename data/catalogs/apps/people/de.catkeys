@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-PEPL	2993050801
+1	german	x-vnd.Be-PEPL	2332202134
 Edit	People		Bearbeiten
 Error	People		Fehler
 City	People		Stadt
@@ -21,9 +21,9 @@ Nickname	People		Spitzname
 Quit	People		Beenden
 Name	People		Name
 Revert	People		Anfangswerte
+Don't save	People		Nicht speichern
 Undo	People		Rückgängig
 E-mail	People		E-mail
-Save changes before quitting?	People		Änderungen vor dem Beenden speichern?
 Load image…	People		Bild laden…
 OK	People		OK
 Remove image	People		Bild löschen
@@ -31,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Telefon (Privat)
 Save as…	People		Speichern als…
 Redo	People		Wiederholen
+Save changes before closing?	People		Änderungen vor dem Schließen speichern?
 Paste	People		Einfügen
 Drop an image here,\nor use the contextual menu.	People		Bild hier fallen lassen,\noder Kontextmenü nutzen.
 Save	People		Speichern

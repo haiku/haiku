@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaConverter	296071315
+1	english	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		视频参数表使用设置
 Video encoding:	MediaConverter		视频编码：
 No audio	Audio codecs list		无音频
@@ -15,7 +15,6 @@ MediaConverter	System name		媒体转换器
 No video	Video codecs list		无视频
 Duration:	MediaConverter-FileInfo		持续时间：
 OK	MediaConverter		确定
-Error writing audio frame %Ld	MediaConverter		写入音频框架 %LD 错误
 Error converting '%filename'	MediaConverter		转换 '%filename' 错误
 Low	MediaConverter		低
 Conversion completed	MediaConverter		转换结束
@@ -30,7 +29,6 @@ Cancel	MediaConverter		取消
 None available	Video codecs		无可用
 Conversion cancelled	MediaConverter		转换取消
 No file selected	MediaConverter-FileInfo		无选中文件
-Error writing video frame %Ld	MediaConverter		写入视频框架 %Ld 错误
 Select this folder	MediaConverter		选中该文件件
 Continue	MediaConverter		继续
 Encoder parameters	MediaConverter-EncoderWindow		编码器参数
@@ -48,7 +46,6 @@ Preview	MediaConverter		预览
 File format:	MediaConverter		文件格式：
 None available	Audio codecs		无可用
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
-Error read audio frame %Ld	MediaConverter		读取音频帧 %Ld 错误
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld 通道 / %lld 帧
 Error launching: %strError%	MediaConverter		启动错误：%strError%
 High	MediaConverter		高
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		视频质量：%3d%%
 Output folder	MediaConverter		输出目录
 Audio quality: %3d%%	MediaConverter		音频质量：%3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		读取文件信息错误。\n\n错误：
-Error read video frame %Ld	MediaConverter		读取视频帧 %Ld 错误
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles 文件为不支持的媒体类型：
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz 单声道 / %lld 帧

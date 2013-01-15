@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-DiskUsage	274830116
+1	portuguese (brazil)	x-vnd.Haiku-DiskUsage	3631077986
 Scanning %refName%	Scanner		Analisando %refName%
 Size	Info Window		Tamanho
 Rescan	Pie View		ReAnalisar
@@ -11,12 +11,14 @@ Scan	Status View		Analisar
 9999.99 GB	Status View		9999.99 Gb
 Rescan	Status View		ReAnalisar
 file unavailable	Status View		arquivo não disponível
+Get info	Pie View		Obter informação
 DiskUsage	System name		Uso de Disco
  in %d files	Info Window		 em %d arquivos
 %d files	Status View		%d arquivos
 Created	Info Window		Criado
 Modified	Info Window		Modificado
 Abort	Status View		Cancelar
+Open with	Pie View		Abrir com
 Open	Pie View		Abrir
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Livre em %refName%

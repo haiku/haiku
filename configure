@@ -90,6 +90,7 @@ environment variables:
   HAIKU_OBJCOPY               The objcopy to be used. Defaults to "objcopy".
   HAIKU_RANLIB                The static library indexer. Defaults to "ranlib".
   HAIKU_YASM                  The yasm assembler (x86 only).
+  HAIKU_STRIP                 The strip command. Defaults to "strip".
   HAIKU_CPPFLAGS              The preprocessor flags. Defaults to "".
   HAIKU_CCFLAGS               The C flags. Defaults to "".
   HAIKU_CXXFLAGS              The C++ flags. Defaults to "".
@@ -364,6 +365,7 @@ set_default_value HAIKU_OBJCOPY		objcopy
 set_default_value HAIKU_RANLIB		ranlib
 set_default_value HAIKU_ELFEDIT		elfedit
 set_default_value HAIKU_YASM		yasm
+set_default_value HAIKU_STRIP		strip
 set_default_value HAIKU_CPPFLAGS	""
 set_default_value HAIKU_CCFLAGS		""
 set_default_value HAIKU_CXXFLAGS	""
@@ -529,6 +531,7 @@ if [ -n "$crossToolsPrefix" ]; then
 	get_build_tool_path LD ld
 	get_build_tool_path OBJCOPY objcopy
 	get_build_tool_path RANLIB ranlib
+	get_build_tool_path STRIP strip
 fi
 
 # prepare gcc settings
@@ -602,6 +605,7 @@ HAIKU_OBJCOPY				?= ${HAIKU_OBJCOPY} ;
 HAIKU_RANLIB				?= ${HAIKU_RANLIB} ;
 HAIKU_ELFEDIT				?= ${HAIKU_ELFEDIT} ;
 HAIKU_YASM					?= ${HAIKU_YASM} ;
+HAIKU_STRIP					?= ${HAIKU_STRIP} ;
 HAIKU_CPPFLAGS				?= ${HAIKU_CPPFLAGS} ;
 HAIKU_CCFLAGS				?= ${HAIKU_CCFLAGS} ;
 HAIKU_C++FLAGS				?= ${HAIKU_CXXFLAGS} ;

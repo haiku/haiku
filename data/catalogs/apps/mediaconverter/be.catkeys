@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaConverter	296071315
+1	belarusian	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		Відэа карыстае параметры з наладак
 Video encoding:	MediaConverter		Кадаванне відэа:
 No audio	Audio codecs list		Няма аўдыё
@@ -15,7 +15,6 @@ MediaConverter	System name		Канвертар медыя
 No video	Video codecs list		Няма відэа
 Duration:	MediaConverter-FileInfo		Працягласць:
 OK	MediaConverter		ОК
-Error writing audio frame %Ld	MediaConverter		Немагчыма запісаць кард %Ld аўдыёпатоку
 Error converting '%filename'	MediaConverter		Немагчыма канвертаваць '%filename'
 Low	MediaConverter		Нізкая
 Conversion completed	MediaConverter		Апрацоўка завершана
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Адмена
 None available	Video codecs		Не даступна
 Conversion cancelled	MediaConverter		Канвертаванне адменена
 No file selected	MediaConverter-FileInfo		Не абрана ні воднага файла
-Error writing video frame %Ld	MediaConverter		Немагчыма запісаць кард %Ld відэапатоку
 Select this folder	MediaConverter		Абраць гэтую папку
 Continue	MediaConverter		Працяг
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кадыроўшчыка
@@ -48,7 +46,6 @@ Preview	MediaConverter		Прагляд
 File format:	MediaConverter		Фармат файла:
 None available	Audio codecs		Не даступны
 MediaConverter+:SaveDirectory	MediaConverter		КанвертарМедыя+:Захаваць папку
-Error read audio frame %Ld	MediaConverter		Немагчыма прачытаць фрэйм %Ld у аўдыёпатоку
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f кГц %ld каналаў / %lld фрэймаў
 Error launching: %strError%	MediaConverter		Немагчыма запусціць: %strError%
 High	MediaConverter		Найвышэйшая
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Якасць відэа: %3d%%
 Output folder	MediaConverter		Папка для выходных файлаў
 Audio quality: %3d%%	MediaConverter		Якасць аўдыё: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Не ўдалося прачытаць інфармацыю пра файл.\n\nПамылка : 
-Error read video frame %Ld	MediaConverter		Немагчыма прачытаць фрэйм %Ld у відэапатоку
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles файлаў не былі прызнаныя як медыя, іх немагчыма апрацаваць:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / %lld фрэймаў

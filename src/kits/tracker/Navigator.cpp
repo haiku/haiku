@@ -85,7 +85,7 @@ BNavigatorButton::AttachedToWindow()
 		&bmpOn);
 	SetPicture(bmpOn, true, true);
 	delete bmpOn;
-	
+
 	BBitmap* bmpOff = 0;
 	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, fResIDOff,
 		&bmpOff);
@@ -139,7 +139,7 @@ BNavigator::BNavigator(const Model* model, BRect rect, uint32 resizeMask)
 {
 	// Get initial path
 	model->GetPath(&fPath);
-	
+
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	float top = 2 + (be_plain_font->Size() - 8) / 2;
@@ -298,14 +298,14 @@ BNavigator::SendNavigationMessage(NavigationAction action, BEntry* entry,
 		BMessage message;
 		message.AddRef("refs", &ref);
 		message.AddInt32("action", action);
-		
+
 		// get the node of this folder for selecting it in the new location
 		const node_ref* nodeRef;
 		if (Window() && Window()->TargetModel())
 			nodeRef = Window()->TargetModel()->NodeRef();
 		else
 			nodeRef = NULL;
-		
+
 		// if the option key was held down, open in new window (send message
 		// to be_app) otherwise send message to this window. TTracker
 		// (be_app) understands nodeRefToSlection, BContainerWindow doesn't,
@@ -361,7 +361,7 @@ BNavigator::GoTo()
 		Window()->PostMessage(&message);
 	} else {
 		BPath path;
-		
+
 		if (Window() && Window()->TargetModel()) {
 			Window()->TargetModel()->GetPath(&path);
 			fLocation->SetText(path.Path());

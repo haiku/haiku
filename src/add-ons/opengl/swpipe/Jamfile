@@ -1,10 +1,7 @@
 SubDir HAIKU_TOP src add-ons opengl swpipe ;
+SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium auxiliary ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium drivers ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium include ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
+UsePrivateHeaders interface ;
 
 local sources =
 	SoftwareRenderer.cpp
@@ -13,117 +10,36 @@ local sources =
 	GalliumFramebuffer.cpp
 	bitmap_wrapper.cpp ;
 
-local HAIKU_SWPIPE_DRIVER = $(HAIKU_GALLIUM_SOFTPIPE_LIB) ;
-
-local llvmLibraries = ;
-if $(HAIKU_LLVM_DIR) {
-	# TODO: Add LLVM OptionalBuildPackage
-	SubDirC++Flags [ FDefines HAVE_LLVM=0x0302 ] ;
-
-	# TODO: This is a hack for now
-	SubDirSysHdrs /boot/common/include ;
-	HAIKU_LLVM_DIR = /boot/common/lib ;
-
-	HAIKU_SWPIPE_DRIVER = $(HAIKU_GALLIUM_LLVMPIPE_LIB) ;
-
-	llvmLibraries =
-		$(HAIKU_LLVM_DIR)/libLLVMAsmParser.a
-		$(HAIKU_LLVM_DIR)/libLLVMInstrumentation.a
-		$(HAIKU_LLVM_DIR)/libLLVMLinker.a
-		$(HAIKU_LLVM_DIR)/libLLVMArchive.a
-		$(HAIKU_LLVM_DIR)/libLLVMBitReader.a
-		$(HAIKU_LLVM_DIR)/libLLVMDebugInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMJIT.a
-		$(HAIKU_LLVM_DIR)/libLLVMipo.a
-		$(HAIKU_LLVM_DIR)/libLLVMVectorize.a
-		$(HAIKU_LLVM_DIR)/libLLVMBitWriter.a
-		$(HAIKU_LLVM_DIR)/libLLVMTableGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMHexagonCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMHexagonAsmPrinter.a
-		$(HAIKU_LLVM_DIR)/libLLVMHexagonDesc.a
-		$(HAIKU_LLVM_DIR)/libLLVMHexagonInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMNVPTXCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMNVPTXDesc.a
-		$(HAIKU_LLVM_DIR)/libLLVMNVPTXInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMNVPTXAsmPrinter.a
-		$(HAIKU_LLVM_DIR)/libLLVMMBlazeCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMMBlazeAsmParser.a
-		$(HAIKU_LLVM_DIR)/libLLVMMBlazeDisassembler.a
-		$(HAIKU_LLVM_DIR)/libLLVMMBlazeDesc.a
-		$(HAIKU_LLVM_DIR)/libLLVMMBlazeInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMMBlazeAsmPrinter.a
-		$(HAIKU_LLVM_DIR)/libLLVMCppBackendCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMCppBackendInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMMSP430CodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMMSP430Desc.a
-		$(HAIKU_LLVM_DIR)/libLLVMMSP430AsmPrinter.a
-		$(HAIKU_LLVM_DIR)/libLLVMMSP430Info.a
-		$(HAIKU_LLVM_DIR)/libLLVMXCoreCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMXCoreDesc.a
-		$(HAIKU_LLVM_DIR)/libLLVMXCoreInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMCellSPUCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMCellSPUDesc.a
-		$(HAIKU_LLVM_DIR)/libLLVMCellSPUInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMMipsAsmParser.a
-		$(HAIKU_LLVM_DIR)/libLLVMMipsCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMMipsDesc.a
-		$(HAIKU_LLVM_DIR)/libLLVMMipsAsmPrinter.a
-		$(HAIKU_LLVM_DIR)/libLLVMMipsDisassembler.a
-		$(HAIKU_LLVM_DIR)/libLLVMMipsInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMARMAsmParser.a
-		$(HAIKU_LLVM_DIR)/libLLVMARMCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMARMDisassembler.a
-		$(HAIKU_LLVM_DIR)/libLLVMARMDesc.a
-		$(HAIKU_LLVM_DIR)/libLLVMARMInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMARMAsmPrinter.a
-		$(HAIKU_LLVM_DIR)/libLLVMPowerPCCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMPowerPCDesc.a
-		$(HAIKU_LLVM_DIR)/libLLVMPowerPCInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMPowerPCAsmPrinter.a
-		$(HAIKU_LLVM_DIR)/libLLVMSparcCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMSparcDesc.a
-		$(HAIKU_LLVM_DIR)/libLLVMSparcInfo.a
-		$(HAIKU_LLVM_DIR)/libLLVMX86AsmParser.a
-		$(HAIKU_LLVM_DIR)/libLLVMX86CodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMSelectionDAG.a
-		$(HAIKU_LLVM_DIR)/libLLVMAsmPrinter.a
-		$(HAIKU_LLVM_DIR)/libLLVMX86Disassembler.a
-		$(HAIKU_LLVM_DIR)/libLLVMX86Desc.a
-		$(HAIKU_LLVM_DIR)/libLLVMX86Info.a
-		$(HAIKU_LLVM_DIR)/libLLVMX86AsmPrinter.a
-		$(HAIKU_LLVM_DIR)/libLLVMX86Utils.a
-		$(HAIKU_LLVM_DIR)/libLLVMMCDisassembler.a
-		$(HAIKU_LLVM_DIR)/libLLVMMCParser.a
-		$(HAIKU_LLVM_DIR)/libLLVMInterpreter.a
-		$(HAIKU_LLVM_DIR)/libLLVMCodeGen.a
-		$(HAIKU_LLVM_DIR)/libLLVMScalarOpts.a
-		$(HAIKU_LLVM_DIR)/libLLVMInstCombine.a
-		$(HAIKU_LLVM_DIR)/libLLVMTransformUtils.a
-		$(HAIKU_LLVM_DIR)/libLLVMipa.a
-		$(HAIKU_LLVM_DIR)/libLLVMAnalysis.a
-		$(HAIKU_LLVM_DIR)/libLLVMMCJIT.a
-		$(HAIKU_LLVM_DIR)/libLLVMRuntimeDyld.a
-		$(HAIKU_LLVM_DIR)/libLLVMExecutionEngine.a
-		$(HAIKU_LLVM_DIR)/libLLVMTarget.a
-		$(HAIKU_LLVM_DIR)/libLLVMMC.a
-		$(HAIKU_LLVM_DIR)/libLLVMObject.a
-		$(HAIKU_LLVM_DIR)/libLLVMCore.a
-		$(HAIKU_LLVM_DIR)/libLLVMSupport.a ;
-}
-
-UsePrivateHeaders interface ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
 Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium auxiliary ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium drivers ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src gallium include ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
+UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
 
 AddResources Software\ Renderer : SoftwareRenderer.rdef ;
 
+if FIsBuildFeatureEnabled(llvm) {
+	SubDirC++Flags [ FDefines HAVE_LLVM=0x0302 ] ;
+}
+
+# LLVM Pipe enabled Gallium Software Renderer
+#   Requires:
+#     - LLVM optional package
+#     - Mesa optional package compiled with LLVM installed
+# SoftPipe enabled Gallium Software Renderer
+#    Requires:
+#     - Mesa optional package compiled *without* LLVM installed
 Addon Software\ Renderer :
 	$(sources)
-	: libGL.so
-	$(HAIKU_SWPIPE_DRIVER)
+	:
+	libGL.so
+	$(HAIKU_GALLIUM_SOFTPIPE_LIB)
+	$(HAIKU_GALLIUM_LLVMPIPE_LIB)
 	$(HAIKU_MESA_LIB)
 	$(HAIKU_GLSL_LIB)
 	$(HAIKU_GALLIUM_LIB)
-	$(llvmLibraries)
+	$(HAIKU_LLVM_LIBS)
 	be translation stdc++ $(TARGET_LIBSUPC++)
 ;

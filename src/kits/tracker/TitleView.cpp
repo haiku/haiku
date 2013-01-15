@@ -235,7 +235,7 @@ BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 		// fill background with light gray background
 		if (!updateOnly)
 			view->FillRect(bounds, B_SOLID_LOW);
-	
+
 		view->BeginLineArray(4);
 		view->AddLine(bounds.LeftTop(), bounds.RightTop(), sShadowColor);
 		view->AddLine(bounds.LeftBottom(), bounds.RightBottom(),
@@ -399,7 +399,7 @@ BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			else
 				SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 			break;
-			
+
 		case B_EXITED_VIEW:
 			SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 			break;
@@ -546,10 +546,10 @@ BColumnTitle::Draw(BView* view, bool pressed)
 			triangle[1] = center + BPoint(3.5, -1.5);
 			triangle[2] = center + BPoint(0.0, 2.0);
 		}
-	
+
 		uint32 flags = view->Flags();
 		view->SetFlags(flags | B_SUBPIXEL_PRECISE);
-	
+
 		if (secondary) {
 			view->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 				1.3));
@@ -559,7 +559,7 @@ BColumnTitle::Draw(BView* view, bool pressed)
 				1.6));
 			view->FillTriangle(triangle[0], triangle[1], triangle[2]);
 		}
-	
+
 		view->SetFlags(flags);
 	}
 
@@ -579,7 +579,7 @@ BColumnTitle::Draw(BView* view, bool pressed)
 			pressed ? sLightShadowColor : sLightShadowColor);
 		view->AddLine(rect.LeftTop(), rect.RightTop(),
 			pressed ? sDarkShadowColor : sShineColor);
-	
+
 		view->AddLine(rect.LeftTop(), rect.LeftBottom(),
 			pressed ? sDarkShadowColor : sShineColor);
 		view->AddLine(rect.RightTop(), rect.RightBottom(),
@@ -820,7 +820,7 @@ ColumnDragState::Moved(BPoint where, uint32)
 		} else
 			drawOutline = true;
 	}
-	
+
 	if (drawOutline)
 		DrawOutline(where.x - fInitialMouseTrackOffset);
 	else if (undrawOutline)
@@ -845,7 +845,7 @@ ColumnDragState::Clicked(BPoint /*where*/)
 	uint32 primarySort = poseView->PrimarySort();
 	uint32 secondarySort = poseView->SecondarySort();
 	bool shift = (modifiers() & B_SHIFT_KEY) != 0;
-	
+
 	// For now:
 	// if we hit the primary sort field again
 	// then if shift key was down, switch primary and secondary

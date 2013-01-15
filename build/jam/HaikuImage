@@ -170,7 +170,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		aironetwifi atheroswifi broadcom43xx
 		iprowifi2100 iprowifi2200 iprowifi3945
 		iprowifi4965 marvell88w8363 marvell88w8335
-		ralink2860 ralinkwifi wavelanwifi
+		ralinkwifi wavelanwifi
 	}@ # x86
 
 	# WWAN drivers
@@ -751,10 +751,12 @@ CopyDirectoryToHaikuImage develop sample-code
 	: [ FDirName $(HAIKU_TOP) src libs pdflib bind pdflib ]
 	: pdflib ;
 
-# Copy Mesa3D GL headers into image
+# Copy OpenGL kit headers into image
 if $(TARGET_ARCH) = x86 {
 	CopyDirectoryToHaikuImage develop headers os opengl
 		: [ FDirName $(HAIKU_MESA_HEADERS) GL ] ;
+	CopyDirectoryToHaikuImage develop headers os opengl
+		: [ FDirName $(HAIKU_GLU_HEADERS) GL ] ;
 }
 
 #pragma mark - Optional Packages
@@ -911,6 +913,7 @@ AddTargetVariableToScript $(script) : <build>rc ;
 AddTargetVariableToScript $(script) : <build>resattr ;
 AddTargetVariableToScript $(script) : <build>unzip ;
 AddTargetVariableToScript $(script) : <build>vmdkimage ;
+AddTargetVariableToScript $(script) : $(HAIKU_STRIP) : stripCommand ;
 if $(HOST_RM_ATTRS_TARGET) {
 	AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET) : rmAttrs ;
 } else {

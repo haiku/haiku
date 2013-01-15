@@ -561,7 +561,17 @@ Image::Image(BPath path)
 	fBitmap(NULL),
 	fPath(path)
 {
-	name = path.Leaf();
+	const int32 kMaxWidth = 40;
+	fName = path.Leaf();
+	int extra = fName.Length() - kMaxWidth;
+	if (extra > 0) {
+		int offset = fName.FindLast('.');
+		if (offset > 0) {
+			offset++;
+			fName.Truncate(offset - extra) << B_UTF8_ELLIPSIS;
+			fName.Append(path.Leaf() + offset);
+		}
+	}
 }
 
 

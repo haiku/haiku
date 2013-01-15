@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Appearance	1428480647
+1	belarusian	x-vnd.Haiku-Appearance	2950529393
 Plain font:	Font view		Просты шрыфт:
 Control highlight	Colors tab		Выдзяленне кнопак
 Control border	Colors tab		Аблямоўка кнопак
@@ -23,27 +23,33 @@ Tooltip background	Colors tab		Фон падказкі
 Selected menu item background	Colors tab		Фон пазначанага пункту меню
 Antialiasing	APRWindow		Згладжванне
 Navigation base	Colors tab		Базавы колер навігацыі
+Selected list item text	Colors tab		Тэкст пазначанага пункту меню
 Window border	Colors tab		Мяжа вакна
+Double:	DecorSettingsView		Падвойны:
 Window tab text	Colors tab		Тэкст загалоўку акна
 Document text	Colors tab		Тэкст дакументу
 Navigation pulse	Colors tab		Колер падсветкі навігацыі
 Window decorator:	DecorSettingsView		Дэкаратар вокнаў:
 Selected menu item text	Colors tab		Тэкст пазначанага пункту меню
 Menu background	Colors tab		Фон меню
+List background	Colors tab		Фон радкоў
 OK	DecorSettingsView		Так
 Control mark	Colors tab		Адзнакі кнопак
 Size:	Font Selection view		Памер:
+Selected list item background	Colors tab		Фон пазначанага радку спіса
 Panel background	Colors tab		Фон панэлі
 Menu font:	Font view		Шрыфт меню:
 Colors	APRWindow		Колеры
 Control background	Colors tab		Фон кнопак
 Inactive window tab	Colors tab		Неактыўная ўкладка
+List item text	Colors tab		Тэкст радку спіса
 Appearance	System name		Афармленне
 Fixed font:	Font view		Роўнашырокі шрыфт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	У рудога вераб’я ў сховішчы пад фатэлем ляжаць нейкія гаючыя зёлкі.
 Reduce colored edges filter strength:	AntialiasingSettingsView		Паменьшыць інтэнсіўнасць фільтру каляровых краёў:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпіксельнае згладжванне ў камбінацыі з хінтынгам сімвалаў недаступнае ў гэтай зборцы Haiku з-за магчымых канфліктаў з патэнтамі. Каб уключыць гэтую функцыю, вы павінны сабрать Haiku самастойна і уключыць канкрэтныя опцыі ў канфігурацыйным загалоўку libfreetype.
 Control text	Colors tab		Тэкст кнопак
+Single:	DecorSettingsView		Адзіночны:
 Tooltip text	Colors tab		Тэкст падказак
 Bold font:	Font view		Тлусты шрыфт:
 Inactive window border	Colors tab		Неактыўная мяжа вакна
@@ -52,6 +58,7 @@ LCD subpixel	AntialiasingSettingsView		Субпіксельнае (LCD)
 Selected menu item border	Colors tab		Аблямоўка пазначанага пункту меню
 Strong	AntialiasingSettingsView		Жырны
 Panel text	Colors tab		Тэкст панэлі
+Arrow style	DecorSettingsView		Стыль стрэлкі
 Monospaced fonts only	AntialiasingSettingsView		Толькі монашырынныя шрыфты
 Look and feel	APRWindow		Выгляд і паводзіны
 Antialiasing menu	AntialiasingSettingsView		Меню згладжвання

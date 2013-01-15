@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	2319898213
+1	german	x-vnd.Be-MAIL	233997769
 View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attribute von Anhängen:
@@ -26,7 +26,6 @@ Beginner	Mail		Anfänger
 Don't save	Mail		Verwerfen
 Expert	Mail		Experte
 Reply account:	Mail		Konto zum Beantworten:
-Discard	Mail		Verwerfen
 Message	Mail		Nachricht
 Settings…	Mail		Einstellungen…
 Reply to sender	Mail		Antwort an Absender
@@ -108,6 +107,7 @@ Close	Mail		Schließen
 No matches	Mail		Keine Treffer
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der Nachrichtendienst (mail_daemon) läuft nicht. Die Nachricht wird versendet, sobald der Dienst wieder läuft.
 Really delete this signature? This cannot be undone.	Mail		Diese Signatur tatsächlich löschen? Das kann nicht rückgängig gemacht werden.
+Save this message as a draft before closing?	Mail		Nachricht vor dem Schließen als Entwurf speichern?
 Open	Mail		Öffnen
 draft	B_USER_DIRECTORY/mail/draft		Entwürfe
 Quote	Mail		Zitieren
@@ -120,8 +120,8 @@ Remove enclosure	Mail		Anhang entfernen
 Account:	Mail		Konto:
 Decoding:	Mail		Kodierung:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Es konnte leider keine Anwendung gefunden werden, die den Datentyp 'Person' unterstützt.
-Do you wish to send this message before closing?	Mail		Soll diese Nachricht gesendet werden, bevor sie geschlossen wird?
 Delete	Mail		Löschen
+Don't send	Mail		Nicht senden
 Leave as '%s'	Mail		Status '%s' belassen
 Copy	Mail		Kopieren
 Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
@@ -136,7 +136,7 @@ Font:	Mail		Schriftart:
 (Address unavailable)	Mail		(Adresse nicht verfügbar)
 Save address	Mail		Adresse speichern
 Queries	Mail		Queries
-Do you wish to save this message as a draft before closing?	Mail		Soll die Nachricht als Entwurf gespeichert werden, bevor sie geschlossen wird?
+Send this message before closing?	Mail		Nachricht vor dem Schließen senden?
 Save	Mail		Speichern
 Random	Mail		Zufällig
 Close and 	Mail		Schließen und

@@ -16,10 +16,10 @@ Output channel sources	AudioMixer		Kimeneti csatorna forrásai
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Előerősítés beállításai
 Input mapping	AudioMixer		Bemenet leképezése
-Mute	AudioMixer		Elnémítás
+Mute	AudioMixer		Némítás
 Input channel destinations	AudioMixer		Bemeneti csatornák céljai
-To master	AudioMixer		Masterre
-Master output	AudioMixer		Master kimenet
+To master	AudioMixer		Az elsődlegesre
+Master output	AudioMixer		Elsődleges kimenet
 Setup	AudioMixer		Beállítás
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Nem lineáris előerősítés csúszkák használata (mint a BeOS R5-ben)
 Gain	AudioMixer		Előerősítés

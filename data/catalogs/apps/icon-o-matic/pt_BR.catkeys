@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.haiku-icon_o_matic	2079362081
+1	portuguese (brazil)	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		Selecionar Tudo
 Add Style	Icon-O-Matic-AddStylesCmd		Adicionar Estilo
 Color (#%02x%02x%02x)	Style name after dropping a color		Cor (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		Sem título
 Multi Set 	Multi Set (property name)		Conjunto Múltiplo
 any of the other lists to	Empty property list - 2nd line		qualquer das outras listas para
 Save as…	Icon-O-Matic-Menu-File		Salvar como…
+Don't save	Icon-O-Matic-Menu-Settings		Não salvar
 Change Color	Icon-O-Matic-SetColorCmd		Alterar Cor
 Style	Icon-O-Matic-Menus		Estilo
 <modify path>	Icon-O-Matic-PathCmd		<caminho de modificação>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Desfazer
 Click on a shape above	Empty transformers list - 1st line		Clique em uma forma acima
 Add Shape	Icon-O-Matic-AddShapesCmd		Adicionar Forma
 Contour	Transformation		Contorno
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salvar as alterações para o ícone atual antes de fechar?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nada para refazer>
 Perspective	Transformation		Perspectiva
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mover Transformador
@@ -99,7 +101,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Selecionar uma cor
 Quit	Icon-O-Matic-Menu-File		Sair
 Export	Icon-O-Matic-Menu-File		Exportar
 No	Icon-O-Matic-StyledTextImport		Não
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Salvar alterações no ícone atual?
 Rotate indices forwards	Icon-O-Matic-PathsList		Girar índices para a frente
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Desatribuir Caminho
 load error	Icon-O-Matic-SVGImport		erro ao carregar
@@ -147,7 +148,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Adicionar Transformadores
 Diamond	Icon-O-Matic-StyleTypes		Diamante
 Path	Icon-O-Matic-PropertyNames		Caminho
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Falha ao abrir o arquivo '%s' como um documento SVG.\n\nErro: %s
-Discard	Icon-O-Matic-Menu-Settings		Descartar
 Swatches	Icon-O-Matic-Menus		Amostras
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponível>
 Rotation	Icon-O-Matic-PropertyNames		Rotação

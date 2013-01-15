@@ -31,6 +31,7 @@ set -o errexit
 # The following is only for cd types:
 # generate_attribute_stores
 # isCD
+# stripCommand
 #
 if [ $# -gt 0 ]; then
 	. $1
@@ -151,7 +152,7 @@ stripDebugInfo()
 	if [ "$elfMarker" = 'ELF' ]; then
 		# make user-writable first -- some files aren't
 		chmod u+w "$file"
-		strip --strip-debug "$file"
+		"$stripCommand" --strip-debug "$file"
 	fi
 }
 

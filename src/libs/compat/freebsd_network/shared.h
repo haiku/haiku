@@ -21,7 +21,7 @@ struct device {
 	driver_t		*driver;
 	struct list		children;
 
-	int32			flags;
+	uint32			flags;
 
 	char			device_name[128];
 	int				unit;

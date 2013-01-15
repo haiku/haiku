@@ -28,7 +28,7 @@ ScreenSaver Flurry :
 ;
 
 DoCatalogs Flurry :
-	x-vnd.Haiku-Flurry
+	x-vnd.Haiku-FlurryScreensaver
 	:
 	$(sources)
 ;

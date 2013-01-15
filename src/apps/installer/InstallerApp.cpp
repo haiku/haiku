@@ -10,8 +10,11 @@
 #include <Button.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
+#include <Roster.h>
 #include <ScrollView.h>
 #include <TextView.h>
+
+#include "tracker_private.h"
 
 
 static const uint32 kMsgAgree = 'agre';
@@ -183,7 +186,7 @@ InstallerApp::ReadyToRun()
 	infoText << B_TRANSLATE(
 		"NOTE: While the naming strategy for hard disks is still as described "
 		"under 2.1) the naming scheme for partitions has changed.\n\n");
-	infoText << B_TRANSLATE(		
+	infoText << B_TRANSLATE(
 		"GRUB's naming scheme is still: (hdN,n)\n\n");
 	infoText << B_TRANSLATE(
 		"All hard disks start with \"hd\".\n");
@@ -250,8 +253,11 @@ InstallerApp::ReadyToRun()
 
 	BRect eulaFrame = BRect(0, 0, 600, 450);
 	fEULAWindow = new BWindow(eulaFrame, B_TRANSLATE("README"),
-		B_MODAL_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS);
+		B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE
+			| B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS);
+
+	if (!be_roster->IsRunning(kTrackerSignature))
+		fEULAWindow->SetWorkspaces(B_ALL_WORKSPACES);
 
 	BLayoutBuilder::Group<>(fEULAWindow, B_VERTICAL, 10)
 		.SetInsets(10)

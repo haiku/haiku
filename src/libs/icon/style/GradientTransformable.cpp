@@ -591,7 +591,7 @@ Gradient::PrintToStream() const
 		   string_for_interpolation(fInterpolation),
 		   fInheritTransformation);
 	for (int32 i = 0; BGradient::ColorStop* step = ColorAt(i); i++) {
-		printf("  %ld: offset: %.1f -> color(%d, %d, %d, %d)\n",
+		printf("  %" B_PRId32 ": offset: %.1f -> color(%d, %d, %d, %d)\n",
 			   i, step->offset,
 			   step->color.red,
 			   step->color.green,

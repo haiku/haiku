@@ -30,7 +30,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: src/sys/dev/e1000/if_em.h,v 1.5.2.5.2.1 2010/12/21 17:09:25 kensmith Exp $*/
+/*$FreeBSD$*/
 
 
 #ifndef _EM_H_DEFINED_
@@ -212,8 +212,11 @@
 #define EM_BAR_MEM_TYPE_64BIT	0x00000004
 #define EM_MSIX_BAR		3	/* On 82575 */
 
-#if !defined(SYSCTL_ADD_UQUAD)
+/* More backward compatibility */
+#ifndef __HAIKU__
+#if __FreeBSD_version < 900000
 #define SYSCTL_ADD_UQUAD SYSCTL_ADD_QUAD
+#endif
 #endif
 
 /* Defines for printing debug information */
@@ -418,11 +421,11 @@ struct adapter {
 	u32		shadow_vfta[EM_VFTA_SIZE];
 
 	/* Info about the interface */
-	u8		link_active;
+	u16		link_active;
+	u16		fc;
 	u16		link_speed;
 	u16		link_duplex;
 	u32		smartspeed;
-	u32		fc_setting;
 
 	struct em_int_delay_info tx_int_delay;
 	struct em_int_delay_info tx_abs_int_delay;

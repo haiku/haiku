@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaConverter	296071315
+1	dutch; flemish	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		Video gebruik makend van de gespecifieerde instellingen
 Video encoding:	MediaConverter		Videocodering:
 No audio	Audio codecs list		Geen audio
@@ -15,7 +15,6 @@ MediaConverter	System name		MediaConverter
 No video	Video codecs list		Geen video
 Duration:	MediaConverter-FileInfo		Duur:
 OK	MediaConverter		OK
-Error writing audio frame %Ld	MediaConverter		Fout bij het schrijven van audioframe %Ld
 Error converting '%filename'	MediaConverter		Fout bij het omzetten van '%filename'
 Low	MediaConverter		Laag
 Conversion completed	MediaConverter		Conversie voltooid
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Annuleren
 None available	Video codecs		Geen beschikbaar
 Conversion cancelled	MediaConverter		Omzetting geannuleerd
 No file selected	MediaConverter-FileInfo		Geen bestand geselecteerd
-Error writing video frame %Ld	MediaConverter		Fout bij het schrijven van videoframe %Ld
 Select this folder	MediaConverter		Deze map selecteren
 Continue	MediaConverter		Voortzetten
 Encoder parameters	MediaConverter-EncoderWindow		Parameters van de encoder
@@ -48,7 +46,6 @@ Preview	MediaConverter		Voorbeeld
 File format:	MediaConverter		Bestandsformaat:
 None available	Audio codecs		Geen beschikbaar
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:OpslagMap
-Error read audio frame %Ld	MediaConverter		Fout bij het lezen van audioframe %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanaal / %lld frames
 Error launching: %strError%	MediaConverter		Fout bij het starten: %strError%
 High	MediaConverter		Hoog
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Videokwaliteit: %3d%%
 Output folder	MediaConverter		Uitvoermap
 Audio quality: %3d%%	MediaConverter		Audiokwaliteit: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Er is een fout opgetreden bij het lezen van de bestandsinformatie.\n\nFout:
-Error read video frame %Ld	MediaConverter		Fout bij het lezen van videoframe %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles bestanden werden niet herkend als ondersteunde mediabestanden:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld frames

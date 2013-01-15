@@ -13,7 +13,7 @@ Application Chart :
 	;
 
 DoCatalogs Chart :
-    x-vnd.Be.ChartDemo
+    x-vnd.Haiku-ChartDemo
     :
 	Chart.cpp
 	ChartWindow.cpp

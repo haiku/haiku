@@ -1,13 +1,15 @@
-1	finnish	x-vnd.Haiku-StyledEdit	3417936913
+1	finnish	x-vnd.Haiku-StyledEdit	2574742746
 StyledEdit	System name		Tyylitetty editori
 Paste	Menus		Liitä
 OK	LoadAlert		Valmis
 File	Menus		Tiedosto
 ???	LoadAlert		???
+Modified	StatusView		Muokattu
 Lines:	Statistics		Rivejä:
 Italic	Menus		Kursivointi
 Left	Menus		Vasen
 Search backwards	FindandReplaceWindow		Etsi taaksepäin
+Unlock file	StatusView		Poista tiedoston lukitus
 Size	Menus		Koko
 Save	QuitAlert		Tallenna
 Page setup…	Menus		Sivuasetus...
@@ -19,21 +21,27 @@ Cancel	SaveAlert		Peru
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: ”%s”.
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
 Green	Menus		Vihreä
+Reload	NodeMonitorAlerts		Lataa uudelleen
 Yellow	Menus		Keltainen
 Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
 Wrap lines	Menus		Rivitä
 Quit	Menus		Lopeta
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Jokin muu sovellus poisti tiedoston \”%file%\”, palautetaanko se?
 Document statistics	Statistics		Asiakirjan tilastot
 Cancel	RevertToSavedAlert		Peru
+Autodetect	Menus		Automaattinen tunnistus
 Document	Menus		Asiakirja
 Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan ”%s”? 
 Edit	Menus		Muokkaa
+Revert	RevertToSavedAlert		Palauta
 Font	Menus		Kirjasin
 Replace all	FindandReplaceWindow		Korvaa kaikki
 Statistics…	Menus		Tilastot...
 Default	Open_and_SaveAsPanel		Oletus
 Replace next	Menus		Korvaa seuraava
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		tiedostossa \”%s\” tallentamattomia muutoksia.\nPalautetaanko se viimeiseen tallennettuun versioon? 
 Cancel	FindandReplaceWindow		Peru
+Text encoding	Menus		Tekstikoodaus
 Close	Menus		Sulje
 Save	SaveAlert		Tallenna
 Words:	Statistics		Sanoja:
@@ -43,10 +51,13 @@ Don't save	QuitAlert		Älä tallenna
 Align	Menus		Tasaa
 Color	Menus		Väri
 Red	Menus		Punainen
+OK	QuitAlert		Valmis
 Open…	Menus		Avaa…
 Center	Menus		Keskitä
 Blue	Menus		Sininen
+Unable to unlock file\n\t%s	QuitAlert		Tiedoston lukituksen poisto epäonnistui\n\t%s
 Cyan	Menus		Turkoosi
+line %d, column %d	StatusView		rivi %d, sarake %d
 OK	Statistics		Valmis
 Magenta	Menus		Punasininen
 New	Menus		Uusi
@@ -57,15 +68,18 @@ Find:	FindandReplaceWindow		Haku:
 Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa ”%s”:\n%s
 Copy	Menus		Kopioi
 Cut	Menus		Leikkaa
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Jokin toinen sovellus muokkasi tiedostoa \”%file%\”, ladataanko se uudelleen?
 Replace	FindandReplaceWindow		Korvaa
 Find again	Menus		Hae uudelleen
 Cancel	QuitAlert		Peru
 Find…	Menus		Hae…
 Select all	Menus		Valitse kaikki
 Don't save	SaveAlert		Älä tallenna
+Recover	NodeMonitorAlerts		Palauta
 Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa ”%s”:\n\t%s
+Ignore	NodeMonitorAlerts		Ohita
+Read-only	StatusView		Kirjoitussuojattu
 Undo typing	QuitAlert		Peru kirjoitus
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
 Black	Menus		Musta
 Untitled 	StyledEditWindow		Otsikoton 
 OK	SaveAlert		Valmis
@@ -74,5 +88,6 @@ Encoding	Open_and_SaveAsPanel		Koodaus
 Characters:	Statistics		Merkkejä:
 Save as…	Menus		Tallenna nimellä...
 Redo typing	QuitAlert		Toista kirjoitus
+Reload…	Menus		Lataa uudelleen…
 Replace…	Menus		Korvaa…
 Right	Menus		Oikea

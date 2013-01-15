@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	3955647850
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	3779634732
 common	B_COMMON_DIRECTORY		comum
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Em ícones
@@ -411,7 +411,6 @@ Paste layout	ContainerWindow		Colar disposição
 Select	InfoWindow		Selecionar
 Could not update permissions of file \"%name\". %error	FSUtils		Não foi possível atualizar permissões do arquivo \"%name\". %error
 Select…	FilePanelPriv		Selecionar…
-Don't move files to Trash	SettingsView		Não mover arquivos para a Lixeira
 There was an error resolving the link.	Tracker		Ocorreu um erro resolvendo um vínculo.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Não é possível mover ou copiar a lixeira.
@@ -442,7 +441,6 @@ Automatic disk mounting	AutoMounterSettings		Montagem automática de disco
 Original name	ContainerWindow		Nome original
 Find	FSUtils		Localizar
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erro ao copiar o arquivo \"%name\":\n\t %error\n\nGostaria de continuar?
-Ask before delete	SettingsView		Perguntar antes de excluir
 Single window navigation	SettingsView		Navegação em janela única
 parent folder	NavMenu		pasta de origem
 contains	FindPanel		contém

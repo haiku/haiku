@@ -72,7 +72,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/le/if_le_pci.c,v 1.1.2.2 2006/06/18 15:43:18 marius Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -111,12 +111,8 @@ __FBSDID("$FreeBSD: src/sys/dev/le/if_le_pci.c,v 1.1.2.2 2006/06/18 15:43:18 mar
 struct le_pci_softc {
 	struct am79900_softc	sc_am79900;	/* glue to MI code */
 
-	int			sc_rrid;
 	struct resource		*sc_rres;
-	bus_space_tag_t		sc_regt;
-	bus_space_handle_t	sc_regh;
 
-	int			sc_irid;
 	struct resource		*sc_ires;
 	void			*sc_ih;
 
@@ -174,10 +170,9 @@ le_pci_wrbcr(struct lance_softc *sc, uint16_t port, uint16_t val)
 {
 	struct le_pci_softc *lesc = (struct le_pci_softc *)sc;
 
-	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, port);
-	bus_space_barrier(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, 2,
-	    BUS_SPACE_BARRIER_WRITE);
-	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_BDP, val);
+	bus_write_2(lesc->sc_rres, PCNET_PCI_RAP, port);
+	bus_barrier(lesc->sc_rres, PCNET_PCI_RAP, 2, BUS_SPACE_BARRIER_WRITE);
+	bus_write_2(lesc->sc_rres, PCNET_PCI_BDP, val);
 }
 
 static uint16_t
@@ -185,45 +180,51 @@ le_pci_rdbcr(struct lance_softc *sc, uint16_t port)
 {
 	struct le_pci_softc *lesc = (struct le_pci_softc *)sc;
 
-	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, port);
-	bus_space_barrier(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, 2,
-	    BUS_SPACE_BARRIER_WRITE);
-	return (bus_space_read_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_BDP));
+	bus_write_2(lesc->sc_rres, PCNET_PCI_RAP, port);
+	bus_barrier(lesc->sc_rres, PCNET_PCI_RAP, 2, BUS_SPACE_BARRIER_WRITE);
+	return (bus_read_2(lesc->sc_rres, PCNET_PCI_BDP));
 }
 
 static void
 le_pci_wrcsr(struct lance_softc *sc, uint16_t port, uint16_t val)
 {
 	struct le_pci_softc *lesc = (struct le_pci_softc *)sc;
-	HAIKU_INTR_REGISTER_STATE;
 
+#ifdef __HAIKU__
+	HAIKU_INTR_REGISTER_STATE;
 	if (port == LE_CSR0)
 		HAIKU_INTR_REGISTER_ENTER();
-	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, port);
-	bus_space_barrier(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, 2,
-	    BUS_SPACE_BARRIER_WRITE);
-	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RDP, val);
+#endif
+	bus_write_2(lesc->sc_rres, PCNET_PCI_RAP, port);
+	bus_barrier(lesc->sc_rres, PCNET_PCI_RAP, 2, BUS_SPACE_BARRIER_WRITE);
+	bus_write_2(lesc->sc_rres, PCNET_PCI_RDP, val);
+#ifdef __HAIKU__
 	if (port == LE_CSR0)
 		HAIKU_INTR_REGISTER_LEAVE();
+#endif
 }
 
 static uint16_t
 le_pci_rdcsr(struct lance_softc *sc, uint16_t port)
 {
 	struct le_pci_softc *lesc = (struct le_pci_softc *)sc;
+
+#ifdef __HAIKU__
 	HAIKU_INTR_REGISTER_STATE;
 	uint16_t value;
-
 	if (port == LE_CSR0)
 		HAIKU_INTR_REGISTER_ENTER();
-	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, port);
-	bus_space_barrier(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, 2,
-	    BUS_SPACE_BARRIER_WRITE);
-	value = bus_space_read_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RDP);
+#endif
+	bus_write_2(lesc->sc_rres, PCNET_PCI_RAP, port);
+	bus_barrier(lesc->sc_rres, PCNET_PCI_RAP, 2, BUS_SPACE_BARRIER_WRITE);
+#ifndef __HAIKU__
+	return (bus_read_2(lesc->sc_rres, PCNET_PCI_RDP));
+#else
+	value = bus_read_2(lesc->sc_rres, PCNET_PCI_RDP);
 	if (port == LE_CSR0)
 		HAIKU_INTR_REGISTER_LEAVE();
-
 	return value;
+#endif
 }
 
 static int
@@ -309,11 +310,11 @@ le_pci_probe(device_t dev)
 	switch (pci_get_device(dev)) {
 	case AMD_PCNET_PCI:
 		device_set_desc(dev, "AMD PCnet-PCI");
-		/* Let lnc(4) and pcn(4) win. */
+		/* Let pcn(4) win. */
 		return (BUS_PROBE_LOW_PRIORITY);
 	case AMD_PCNET_HOME:
 		device_set_desc(dev, "AMD PCnet-Home");
-		/* Let lnc(4) and pcn(4) win. */
+		/* Let pcn(4) win. */
 		return (BUS_PROBE_LOW_PRIORITY);
 	default:
 		return (ENXIO);
@@ -333,29 +334,26 @@ le_pci_attach(device_t dev)
 	LE_LOCK_INIT(sc, device_get_nameunit(dev));
 
 	pci_enable_busmaster(dev);
-	pci_enable_io(dev, PCIM_CMD_PORTEN);
 
-	lesc->sc_rrid = PCIR_BAR(0);
+	i = PCIR_BAR(0);
 	lesc->sc_rres = bus_alloc_resource_any(dev, SYS_RES_IOPORT,
-	    &lesc->sc_rrid, RF_ACTIVE);
+	    &i, RF_ACTIVE);
 	if (lesc->sc_rres == NULL) {
 		device_printf(dev, "cannot allocate registers\n");
 		error = ENXIO;
 		goto fail_mtx;
 	}
-	lesc->sc_regt = rman_get_bustag(lesc->sc_rres);
-	lesc->sc_regh = rman_get_bushandle(lesc->sc_rres);
 
-	lesc->sc_irid = 0;
+	i = 0;
 	if ((lesc->sc_ires = bus_alloc_resource_any(dev, SYS_RES_IRQ,
-	    &lesc->sc_irid, RF_SHAREABLE | RF_ACTIVE)) == NULL) {
+	    &i, RF_SHAREABLE | RF_ACTIVE)) == NULL) {
 		device_printf(dev, "cannot allocate interrupt\n");
 		error = ENXIO;
 		goto fail_rres;
 	}
 
 	error = bus_dma_tag_create(
-	    NULL,			/* parent */
+	    bus_get_dma_tag(dev),	/* parent */
 	    1, 0,			/* alignment, boundary */
 	    BUS_SPACE_MAXADDR_32BIT,	/* lowaddr */
 	    BUS_SPACE_MAXADDR,		/* highaddr */
@@ -363,7 +361,7 @@ le_pci_attach(device_t dev)
 	    BUS_SPACE_MAXSIZE_32BIT,	/* maxsize */
 	    0,				/* nsegments */
 	    BUS_SPACE_MAXSIZE_32BIT,	/* maxsegsize */
-	    BUS_DMA_WAITOK,		/* flags */
+	    0,				/* flags */
 	    NULL, NULL,			/* lockfunc, lockarg */
 	    &lesc->sc_pdmat);
 	if (error != 0) {
@@ -386,7 +384,7 @@ le_pci_attach(device_t dev)
 	    sc->sc_memsize,		/* maxsize */
 	    1,				/* nsegments */
 	    sc->sc_memsize,		/* maxsegsize */
-	    BUS_DMA_WAITOK,		/* flags */
+	    0,				/* flags */
 	    NULL, NULL,			/* lockfunc, lockarg */
 	    &lesc->sc_dmat);
 	if (error != 0) {
@@ -405,7 +403,7 @@ le_pci_attach(device_t dev)
 	error = bus_dmamap_load(lesc->sc_dmat, lesc->sc_dmam, sc->sc_mem,
 	    sc->sc_memsize, le_pci_dma_callback, sc, 0);
 	if (error != 0 || sc->sc_addr == 0) {
-                device_printf(dev, "cannot load DMA buffer map\n");
+		device_printf(dev, "cannot load DMA buffer map\n");
 		goto fail_dmem;
 	}
 
@@ -430,9 +428,8 @@ le_pci_attach(device_t dev)
 	/*
 	 * Extract the physical MAC address from the ROM.
 	 */
-	for (i = 0; i < sizeof(sc->sc_enaddr); i++)
-		sc->sc_enaddr[i] =
-		    bus_space_read_1(lesc->sc_regt, lesc->sc_regh, i);
+	bus_read_region_1(lesc->sc_rres, 0, sc->sc_enaddr,
+	    sizeof(sc->sc_enaddr));
 
 	sc->sc_copytodesc = lance_copytobuf_contig;
 	sc->sc_copyfromdesc = lance_copyfrombuf_contig;
@@ -474,9 +471,11 @@ le_pci_attach(device_t dev)
  fail_pdtag:
 	bus_dma_tag_destroy(lesc->sc_pdmat);
  fail_ires:
-	bus_release_resource(dev, SYS_RES_IRQ, lesc->sc_irid, lesc->sc_ires);
+	bus_release_resource(dev, SYS_RES_IRQ,
+	    rman_get_rid(lesc->sc_ires), lesc->sc_ires);
  fail_rres:
-	bus_release_resource(dev, SYS_RES_IOPORT, lesc->sc_rrid, lesc->sc_rres);
+	bus_release_resource(dev, SYS_RES_IOPORT,
+	    rman_get_rid(lesc->sc_rres), lesc->sc_rres);
  fail_mtx:
 	LE_LOCK_DESTROY(sc);
 	return (error);
@@ -497,8 +496,10 @@ le_pci_detach(device_t dev)
 	bus_dmamem_free(lesc->sc_dmat, sc->sc_mem, lesc->sc_dmam);
 	bus_dma_tag_destroy(lesc->sc_dmat);
 	bus_dma_tag_destroy(lesc->sc_pdmat);
-	bus_release_resource(dev, SYS_RES_IRQ, lesc->sc_irid, lesc->sc_ires);
-	bus_release_resource(dev, SYS_RES_IOPORT, lesc->sc_rrid, lesc->sc_rres);
+	bus_release_resource(dev, SYS_RES_IRQ,
+	    rman_get_rid(lesc->sc_ires), lesc->sc_ires);
+	bus_release_resource(dev, SYS_RES_IOPORT,
+	    rman_get_rid(lesc->sc_rres), lesc->sc_rres);
 	LE_LOCK_DESTROY(sc);
 
 	return (0);

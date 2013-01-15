@@ -1,7 +1,9 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	1829613568
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	3561344903
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
+Cursor	Terminal AppearancePrefView		Cursor
+Professional	Terminal colors scheme		Profissional
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Novo Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
@@ -19,8 +21,11 @@ Font:	Terminal AppearancePrefView		Fonte:
 Copy here	Terminal TermView		Copiar aqui
 Really close?	Terminal TermWindow		Deseja realmente fechar?
 Copy	Terminal TermWindow		Copiar
+Color scheme:	Terminal AppearancePrefView		Esquema de cores:
 Window title:	Terminal TermWindow		Título da janela:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opção não reconhecida \"%s\"\n
+Blue	Terminal colors scheme		Azul
+Custom	Terminal colors scheme		Personalizado
 %app% settings	Terminal PrefWindow	window title	%app% definições
 Cancel	Terminal SetTitleWindow		Cancelar
 Increase	Terminal TermWindow		Aumentar
@@ -44,6 +49,7 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Insert path	Terminal TermView		Inserir caminho
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui e Takashi Murai.\n\nUtilização: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma expressão para localizar.
+Font size	Terminal TermWindow		Tamanho da fonte
 Blinking cursor	Terminal AppearancePrefView		Cursor piscante
 Don't save	Terminal PrefWindow		Não salvar
 Set window title	Terminal TermWindow		Definir título da janela
@@ -56,11 +62,16 @@ Find…	Terminal TermWindow		Localizar…
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		O processo \"%1\" ainda está executando.\nSe fechar o Terminal, o processo será morto.
 Move here	Terminal TermView		Mover aqui
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t %d\t -\t O diretório de trabalho atual do processo ativo na\n\t \t \t guia atual. Opcionalmente o número máximo de componentes do caminho\n\t \t \t pode ser especificado. Por exemplo, '%2d' para o máximo de dois componentes.\n\t %i\t -\t O índice da janela.\n\t %p\t -\t O nome do processo ativo na guia atual.\n\t %t\t -\t O título da guia atual.\n\t %%\t -\t O caractere '%'.
+Retro	Terminal colors scheme		Retrô
 Error!	Terminal getString		Erro!
 New tab	Terminal TermWindow		Nova aba
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		O padrão especificando os títulos da guia. Os seguintes espaços reservados podem ser usados:\n
 Selected background	Terminal AppearancePrefView		Plano de fundo selecionado
+Slate	Terminal colors scheme		Ardósia
+Text under cursor	Terminal AppearancePrefView		Texto sob cursor
+Midnight	Terminal colors scheme		Meia-noite
 Decrease	Terminal TermWindow		Diminuir
+Default	Terminal colors scheme		Padrão
 Create link here	Terminal TermView		Criar vínculo aqui
 Close	Terminal TermWindow		Fechar
 Text	Terminal AppearancePrefView		Texto

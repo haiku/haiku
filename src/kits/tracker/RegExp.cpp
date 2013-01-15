@@ -108,7 +108,7 @@ const uint8 kRegExpMagic = 0234;
 // of node is a literal string; for others, it is a node leading into a
 // sub-FSM. In particular, the operand of a kRegExpBranch node is the first
 // node of the branch. (NB this is* not* a tree structure:  the tail of the
-// branch connects to the thing following the set of kRegExpBranches). 
+// branch connects to the thing following the set of kRegExpBranches).
 // The opcodes are:
 //
 

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaConverter	296071315
+1	polish	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		Wideo używa parametrów z ustawień
 Video encoding:	MediaConverter		Kodowanie wideo:
 No audio	Audio codecs list		Brak dźwięku
@@ -15,7 +15,6 @@ MediaConverter	System name		MediaConverter
 No video	Video codecs list		Brak wideo
 Duration:	MediaConverter-FileInfo		Długość:
 OK	MediaConverter		OK
-Error writing audio frame %Ld	MediaConverter		Błąd  zapisu ramki dźwięku %Ld
 Error converting '%filename'	MediaConverter		Błąd konwersji '%filename'
 Low	MediaConverter		Niska
 Conversion completed	MediaConverter		Konwersja ukończona
@@ -30,7 +29,6 @@ Cancel	MediaConverter		Anuluj
 None available	Video codecs		Brak
 Conversion cancelled	MediaConverter		Konwersja anulowana
 No file selected	MediaConverter-FileInfo		Nie wybrano pliku
-Error writing video frame %Ld	MediaConverter		Błąd zapisywania ramki wideo %Ld
 Select this folder	MediaConverter		Wybierz ten katalog
 Continue	MediaConverter		Kontynuuj
 Encoder parameters	MediaConverter-EncoderWindow		Parametry kodeka
@@ -48,7 +46,6 @@ Preview	MediaConverter		Podgląd
 File format:	MediaConverter		Format pliku:
 None available	Audio codecs		Brak
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
-Error read audio frame %Ld	MediaConverter		Błąd odczytu ramki dźwięku %Ld
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanał/ %lld ramek
 Error launching: %strError%	MediaConverter		Błąd uruchamiania: %strError%
 High	MediaConverter		Wysoka
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		Jakość wideo: %3d%%
 Output folder	MediaConverter		Katalog wynikowy
 Audio quality: %3d%%	MediaConverter		Jakość dźwięku: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Wystąpił błąd podczas odczytu informacji o pliku.\n\nBłąd : 
-Error read video frame %Ld	MediaConverter		Błąd odczytu ramki  wideo %Ld
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles plików nie zostało rozpoznanych jako wspierane pliki multimedialne:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld ramek

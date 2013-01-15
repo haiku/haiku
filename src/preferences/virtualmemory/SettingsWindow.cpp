@@ -162,7 +162,7 @@ SettingsWindow::SettingsWindow()
 	fSwapEnabledCheckBox->SetExplicitAlignment(align);
 
 	fSwapAutomaticCheckBox = new BCheckBox("auto swap",
-		B_TRANSLATE("Choose swap size automatically"),
+		B_TRANSLATE("Automatic swap management"),
 		new BMessage(kMsgSwapAutomaticUpdate));
 	fSwapEnabledCheckBox->SetExplicitAlignment(align);
 

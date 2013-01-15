@@ -22,13 +22,9 @@ const uint32 kResizeTeamIcons		= 'RTIs';
 const uint32 kAutoRaise				= 'AtRs';
 const uint32 kAutoHide				= 'AtHd';
 
-class BBox;
-class BButton;
 class BCheckBox;
-class BListView;
 class BRadioButton;
 class BSlider;
-class BStringView;
 class BTextControl;
 
 class PreferencesWindow : public BWindow
@@ -37,19 +33,14 @@ public:
 							PreferencesWindow(BRect frame);
 							~PreferencesWindow();
 
-		virtual	void		MessageReceived(BMessage* message);
-		virtual	bool		QuitRequested();
-		virtual	void		WindowActivated(bool active);
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	bool			QuitRequested();
+	virtual	void			WindowActivated(bool active);
 
-				void		UpdateRecentCounts();
-				void		EnableDisableDependentItems();
+			void			UpdateRecentCounts();
+			void			EnableDisableDependentItems();
 
 private:
-				void		_HandleChangedSettingsView();
-
-			BListView*		fSettingsTypeListView;
-			BBox*			fSettingsContainerBox;
-
 			BCheckBox*		fMenuRecentDocuments;
 			BCheckBox*		fMenuRecentApplications;
 			BCheckBox*		fMenuRecentFolders;

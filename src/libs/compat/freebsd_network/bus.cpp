@@ -256,6 +256,13 @@ rman_get_bustag(struct resource *res)
 }
 
 
+int
+rman_get_rid(struct resource *res)
+{
+	return 0;
+}
+
+
 //	#pragma mark - Interrupt handling
 
 

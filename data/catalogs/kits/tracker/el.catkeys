@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3595866216
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3419853098
 common	B_COMMON_DIRECTORY		κοινό
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
@@ -388,7 +388,6 @@ Paste layout	ContainerWindow		Επικόλληση διάταξης
 Select	InfoWindow		Επιλογή
 Could not update permissions of file \"%name\". %error	FSUtils		Αδυναμία αναθεώρησης των δικαιωμάτων του αρχείου \"%name\". %error
 Select…	FilePanelPriv		Επιλογή...
-Don't move files to Trash	SettingsView		Να μη μετακινόυνται αρχεία στα απορρίματα
 There was an error resolving the link.	Tracker		Υπήρξε κάποιο σφάλμα κατά την επίλυση του συνδέσμου.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στο καλάθι αχρήστων.
@@ -419,7 +418,6 @@ Automatic disk mounting	AutoMounterSettings		Αυτόματη προσάρτησ
 Original name	ContainerWindow		Πρωτότυπο όνομα
 Find	FSUtils		Εύρεση
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Σφάλμα αντιγραφής του αρχείου\"%name\":\n\t%error\n\nΘέλετε να συνεχίσετε;
-Ask before delete	SettingsView		Ερώτηση πριν τη διαγραφή
 Single window navigation	SettingsView		Πλοήγηση απλού παράθυρου
 parent folder	NavMenu		φάκελος γονέα
 contains	FindPanel		περιέχει

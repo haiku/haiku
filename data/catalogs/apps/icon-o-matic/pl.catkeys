@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	2079362081
+1	polish	x-vnd.haiku-icon_o_matic	3069426771
 Select All	Icon-O-Matic-PathManipulator		Zaznacz wszystko
 Add Style	Icon-O-Matic-AddStylesCmd		Dodanie stylu
 Color (#%02x%02x%02x)	Style name after dropping a color		Kolor (#%02x%02x%02x)
@@ -99,7 +99,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Wybierz kolor
 Quit	Icon-O-Matic-Menu-File		Wyjdź
 Export	Icon-O-Matic-Menu-File		Eksportuj
 No	Icon-O-Matic-StyledTextImport		Nie
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Zapisać zmiany do obecnej ikony?
 Rotate indices forwards	Icon-O-Matic-PathsList		Obróć indeksy do przodu
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Usunięcie przypisania ścieżki
 load error	Icon-O-Matic-SVGImport		błąd ładowania
@@ -147,7 +146,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Dodanie transformatorów
 Diamond	Icon-O-Matic-StyleTypes		Diament
 Path	Icon-O-Matic-PropertyNames		Ścieżka
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nie udało się otworzyć pliku '%s' jako dokument SVG.\n\nBłąd: %s
-Discard	Icon-O-Matic-Menu-Settings		Odrzuć
 Swatches	Icon-O-Matic-Menus		Próbki
 <unavailable>	Icon-O-Matic-StyleTypes		<niedostępny>
 Rotation	Icon-O-Matic-PropertyNames		Obrót

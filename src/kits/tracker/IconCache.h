@@ -126,15 +126,15 @@ class IconCacheEntry {
 public:
 	IconCacheEntry();
 	~IconCacheEntry();
-	
+
 	void SetAliasFor(const SharedIconCache*, const SharedCacheEntry*);
 	static IconCacheEntry* ResolveIfAlias(const SharedIconCache*,
 		IconCacheEntry*);
 	IconCacheEntry* ResolveIfAlias(const SharedIconCache*);
-	
+
 	void SetIcon(BBitmap* bitmap, IconDrawMode mode, icon_size size,
 		bool create = false);
-	
+
 	bool HaveIconBitmap(IconDrawMode mode, icon_size size) const;
 	bool CanConstructBitmap(IconDrawMode mode, icon_size size) const;
 	static bool AlternateModeForIconConstructing(IconDrawMode requestedMode,
@@ -169,9 +169,9 @@ protected:
 	BBitmap* fHilitedLargeIcon;
 	BBitmap* fHilitedMiniIcon;
 	int32 fAliasForIndex;
-	
+
 	// list of other icon kinds would be added here
-	
+
 	friend class SharedIconCache;
 	friend class NodeIconCache;
 };
@@ -191,7 +191,7 @@ public:
 	bool Lock();
 	void Unlock();
 	bool IsLocked() const;
-	
+
 private:
 	Benaphore fLock;
 };
@@ -210,7 +210,7 @@ public:
 
 	const char* FileType() const;
 	const char* AppSignature() const;
-	
+
 	// hash table support
 	uint32 Hash() const;
 	static uint32 Hash(const char* fileType, const char* appSignature = 0);
@@ -277,19 +277,19 @@ public:
 	NodeCacheEntry(const node_ref*, bool permanent = false);
 	void Draw(BView*, BPoint, IconDrawMode mode, icon_size size,
 		bool async = false);
-	
+
 	void Draw(BView*, BPoint, IconDrawMode, icon_size,
 		void (*)(BView*, BPoint, BBitmap*, void*), void* = NULL);
 
 	const node_ref* Node() const;
-	
+
 	uint32 Hash() const;
 	static uint32 Hash(const node_ref*);
 	bool operator==(const NodeCacheEntry&) const;
 	void SetTo(const node_ref*);
 	void MakePermanent();
 	bool Permanent() const;
-	
+
 	int32 fNext;
 private:
 	node_ref fRef;
@@ -348,7 +348,7 @@ const int32 kColorTransformTableSize = 256;
 class IconCache {
 public:
 	IconCache();
-	
+
 	void Draw(Model*, BView*, BPoint where, IconDrawMode mode,
 		icon_size size, bool async = false);
 		// draw an icon for a model, load the icon from the appropriate
@@ -376,13 +376,13 @@ public:
 	void Deleting(const BView*);
 		// hook to manage deleting draw view caches for views that are
 		// going away
-	
+
 	// icon changed calls, used when a node or a file type has an icon changed
 	// the icons for the node/file type will be flushed and re-cached during
 	// the next draw
 	void IconChanged(Model*);
 	void IconChanged(const char* mimeType, const char* appSignature);
-	
+
 	bool IsIconFrom(const Model*, const char* mimeType,
 		const char* appSignature) const;
 		// called when metamime database changed to figure out which models
@@ -510,7 +510,7 @@ SharedIconCache::ResolveIfAlias(IconCacheEntry* entry) const
 {
 	if (entry->fAliasForIndex < 0)
 		return entry;
-	
+
 	return fHashTable.ElementAt(entry->fAliasForIndex);
 }
 

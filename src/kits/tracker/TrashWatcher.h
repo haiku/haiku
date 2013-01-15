@@ -53,7 +53,7 @@ public:
 
 protected:
 	virtual	void MessageReceived(BMessage*);
-	
+
 private:
 	void WatchTrashDirs();
 	void UpdateTrashIcons();

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	2037267651
+1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	599989122
 Application types…	FileTypes Window		Τύποι εφαρμογής...
 Description:	Application Types Window		Περιγραφή:
 Args only	Application Type Window		Μόνο παράμετροι
@@ -16,7 +16,6 @@ New file type	New File Type Window		Νέος τύπος αρχείου
 Rule:	FileTypes Window		Κανόνας:
 Add icon…	Icon View		Προσθήκη εικονίδιου...
 Multiple files from \"%s\" file type	FileType Window		Πολλαπλά αρχεία από \"%s\" τύπος αρχείου
-Do you want to save the changes?	Application Type Window		Θέλετε να αποθηκεύσετε τις αλλαγές;
 File type	FileType Window		Τύπος αρχείου
 Could not change attributes	Attribute Window		Δεν ήταν δυνατή η αλλαγή των ιδιοτήτων
 Could not retrieve preferred application of this file	Preferred App Menu		Αδυναμία ανάκτησης προτεινόμενης εφαρμογής του αρχείου
@@ -71,7 +70,6 @@ Special:	Attribute Window		Ειδικό:
 Alpha	Application Type Window		Άλφα
 Add…	FileTypes Window		Προσθήκη...
 Signature:	Application Type Window		Υπογραφή:
-Quit, don't save	Application Type Window		Έξοδος, χωρίς αποθήκευση
 Add…	Application Type Window		Προσθήκη...
 [Multiple files] file types	FileType Window		[Πολλαπλά αρχεία] τύποι αρχείων
 Information	Application Types Window		Πληροφορίες

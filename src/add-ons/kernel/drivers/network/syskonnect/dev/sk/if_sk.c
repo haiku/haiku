@@ -48,7 +48,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/sk/if_sk.c,v 1.138 2007/11/22 02:44:59 yongari Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * SysKonnect SK-NET gigabit ethernet driver for FreeBSD. Supports
@@ -140,7 +140,7 @@ MODULE_DEPEND(sk, miibus, 1, 1, 1);
 
 #ifndef lint
 static const char rcsid[] =
-  "$FreeBSD: src/sys/dev/sk/if_sk.c,v 1.138 2007/11/22 02:44:59 yongari Exp $";
+  "$FreeBSD$";
 #endif
 
 static struct sk_type sk_devs[] = {
@@ -234,10 +234,10 @@ static int sk_init_rx_ring(struct sk_if_softc *);
 static int sk_init_jumbo_rx_ring(struct sk_if_softc *);
 static void sk_init_tx_ring(struct sk_if_softc *);
 static u_int32_t sk_win_read_4(struct sk_softc *, int);
-u_int16_t sk_win_read_2(struct sk_softc *, int);
+static u_int16_t sk_win_read_2(struct sk_softc *, int);
 static u_int8_t sk_win_read_1(struct sk_softc *, int);
 static void sk_win_write_4(struct sk_softc *, int, u_int32_t);
-void sk_win_write_2(struct sk_softc *, int, u_int32_t);
+static void sk_win_write_2(struct sk_softc *, int, u_int32_t);
 static void sk_win_write_1(struct sk_softc *, int, u_int32_t);
 
 static int sk_miibus_readreg(device_t, int, int);
@@ -300,11 +300,7 @@ static device_method_t skc_methods[] = {
 	DEVMETHOD(device_resume,	skc_resume),
 	DEVMETHOD(device_shutdown,	skc_shutdown),
 
-	/* bus interface */
-	DEVMETHOD(bus_print_child,	bus_generic_print_child),
-	DEVMETHOD(bus_driver_added,	bus_generic_driver_added),
-
-	{ 0, 0 }
+	DEVMETHOD_END
 };
 
 static driver_t skc_driver = {
@@ -322,16 +318,12 @@ static device_method_t sk_methods[] = {
 	DEVMETHOD(device_detach,	sk_detach),
 	DEVMETHOD(device_shutdown,	bus_generic_shutdown),
 
-	/* bus interface */
-	DEVMETHOD(bus_print_child,	bus_generic_print_child),
-	DEVMETHOD(bus_driver_added,	bus_generic_driver_added),
-
 	/* MII interface */
 	DEVMETHOD(miibus_readreg,	sk_miibus_readreg),
 	DEVMETHOD(miibus_writereg,	sk_miibus_writereg),
 	DEVMETHOD(miibus_statchg,	sk_miibus_statchg),
 
-	{ 0, 0 }
+	DEVMETHOD_END
 };
 
 static driver_t sk_driver = {
@@ -389,7 +381,7 @@ sk_win_read_4(sc, reg)
 #endif
 }
 
-u_int16_t
+static u_int16_t
 sk_win_read_2(sc, reg)
 	struct sk_softc		*sc;
 	int			reg;
@@ -430,7 +422,7 @@ sk_win_write_4(sc, reg, val)
 	return;
 }
 
-void
+static void
 sk_win_write_2(sc, reg, val)
 	struct sk_softc		*sc;
 	int			reg;
@@ -1213,7 +1205,6 @@ skc_probe(dev)
 {
 	struct sk_type		*t = sk_devs;
 
-
 	while(t->sk_name != NULL) {
 		if ((pci_get_vendor(dev) == t->sk_vid) &&
 		    (pci_get_device(dev) == t->sk_did)) {
@@ -1819,7 +1810,8 @@ skc_attach(dev)
 		goto fail;
 	}
 
-	error = bus_setup_intr(dev, sc->sk_res[1], INTR_TYPE_NET|INTR_MPSAFE/*|INTR_FAST*/,
+	/* Hook interrupt last to avoid having to lock softc */
+	error = bus_setup_intr(dev, sc->sk_res[1], INTR_TYPE_NET|INTR_MPSAFE,
 	    NULL, sk_intr, sc, &sc->sk_intrhand);
 
 	if (error) {
@@ -3127,9 +3119,7 @@ sk_intr(xsc)
 #ifndef __HAIKU__
 	status = CSR_READ_4(sc, SK_ISSR);
 	if (status == 0 || status == 0xffffffff || sc->sk_suspended)
-	{
 		goto done_locked;
-	}
 #endif
 
 	sc_if0 = sc->sk_if[SK_PORT_A];
@@ -3148,9 +3138,7 @@ sk_intr(xsc)
 	while (true) {
 
 		if (status == 0 || status == 0xffffffff || sc->sk_suspended)
-		{
 			goto done_locked;
-		}
 #endif
 
 		/* Handle receive interrupts first. */
@@ -3206,8 +3194,8 @@ sk_intr(xsc)
 			    sc_if1->sk_phytype == SK_PHYTYPE_BCOM)
 				sk_intr_bcom(sc_if1);
 		}
-#ifdef __HAIKU__
 		status = CSR_READ_4(sc, SK_ISSR);
+#ifdef __HAIKU__
 		if (((status & sc->sk_intrmask) == 0) || status == 0xffffffff || 
 			sc->sk_suspended) {
 			break;

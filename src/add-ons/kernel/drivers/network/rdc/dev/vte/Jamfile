@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network rdc dev vte ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+KernelAddon rdc :
+	if_vte.c
+	glue.c
+	: libfreebsd_network.a rdc_mii.a
+	;

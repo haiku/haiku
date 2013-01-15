@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3955647850
+1	finnish	x-vnd.Haiku-libtracker	3779634732
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -411,7 +411,6 @@ Paste layout	ContainerWindow		Liitä sijoittelu
 Select	InfoWindow		Valitse
 Could not update permissions of file \"%name\". %error	FSUtils		Ei voitu päivittää tiedoston ”%name” käyttöoikeuksia. %error
 Select…	FilePanelPriv		Valitse...
-Don't move files to Trash	SettingsView		Älä siirrä tiedostoja roskakoriin
 There was an error resolving the link.	Tracker		Virhe linkin ratkaisemisessa.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Et voi siirtää tai kopioida roskakoriin.
@@ -442,7 +441,6 @@ Automatic disk mounting	AutoMounterSettings		Automaattinen levyliittäminen
 Original name	ContainerWindow		Alkuperäinen nimi
 Find	FSUtils		Etsi
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa tiedostoa ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
-Ask before delete	SettingsView		Kysy ennen poistoa
 Single window navigation	SettingsView		Yksittäisikkunanavigointi
 parent folder	NavMenu		Ylemmän tason kansio
 contains	FindPanel		sisältää

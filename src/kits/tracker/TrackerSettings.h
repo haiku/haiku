@@ -76,7 +76,7 @@ class TrackerSettings {
 		void SetMountSharedVolumesOntoDesktop(bool);
 		bool EjectWhenUnmounting();
 		void SetEjectWhenUnmounting(bool);
-	
+
 		bool ShowVolumeSpaceBar();
 		void SetShowVolumeSpaceBar(bool);
 	 	rgb_color UsedSpaceColor();
@@ -85,7 +85,7 @@ class TrackerSettings {
 		void SetFreeSpaceColor(rgb_color color);
 	 	rgb_color WarningSpaceColor();
 		void SetWarningSpaceColor(rgb_color color);
-	
+
 		bool ShowFullPathInTitleBar();
 		void SetShowFullPathInTitleBar(bool);
 		bool SortFolderNamesFirst();
@@ -118,8 +118,8 @@ class TrackerSettings {
 		bool ClockIs24Hr();
 		void SetClockTo24Hr(bool);
 
-		bool DontMoveFilesToTrash();
-		void SetDontMoveFilesToTrash(bool);
+		bool MoveFilesToTrash();
+		void SetMoveFilesToTrash(bool);
 		bool AskBeforeDeleteFile();
 		void SetAskBeforeDeleteFile(bool);
 

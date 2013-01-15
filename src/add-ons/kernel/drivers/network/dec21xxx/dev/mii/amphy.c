@@ -31,7 +31,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/mii/amphy.c,v 1.24.2.5.2.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * driver for AMD AM79c873 PHYs
@@ -66,7 +66,7 @@ static device_method_t amphy_methods[] = {
 	DEVMETHOD(device_attach,	amphy_attach),
 	DEVMETHOD(device_detach,	mii_phy_detach),
 	DEVMETHOD(device_shutdown,	bus_generic_shutdown),
-	{ 0, 0 }
+	DEVMETHOD_END
 };
 
 static devclass_t amphy_devclass;

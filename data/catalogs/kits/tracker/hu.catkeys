@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3955647850
+1	hungarian	x-vnd.Haiku-libtracker	3779634732
 common	B_COMMON_DIRECTORY		Közös
 OK	WidgetAttributeText		Rendben
 Icon view	VolumeWindow		Ikon nézet
@@ -411,7 +411,6 @@ Paste layout	ContainerWindow		Elrendezés beillesztése
 Select	InfoWindow		Kijelölés
 Could not update permissions of file \"%name\". %error	FSUtils		Nem sikerült módosítani a fájl (%name) jogosultságait.\n\t%error
 Select…	FilePanelPriv		Kijelölés…
-Don't move files to Trash	SettingsView		Ne mozgassa a fájlokat a Szemetesbe
 There was an error resolving the link.	Tracker		Hiba történt a hivatkozás feloldása során.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/mp
 You can't move or copy the trash.	FSUtils		A Szemetest nem lehet mozgatni vagy másolni.
@@ -442,7 +441,6 @@ Automatic disk mounting	AutoMounterSettings		Automatikus lemezcsatolás
 Original name	ContainerWindow		Eredeti név
 Find	FSUtils		Keresés
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hiba történt a másolás közben: %name\n\t%error\n\nSzeretné folytatni?
-Ask before delete	SettingsView		Kérdezzen törlés előtt
 Single window navigation	SettingsView		Egyablakos navigáció
 parent folder	NavMenu		szülőmappa
 contains	FindPanel		tartalmazza

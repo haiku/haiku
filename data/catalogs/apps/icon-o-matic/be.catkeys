@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	2079362081
+1	belarusian	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		Выбраць Усё
 Add Style	Icon-O-Matic-AddStylesCmd		Дадаць Стыль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колер (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		Неназваны
 Multi Set 	Multi Set (property name)		Прызначыць некалькі 
 any of the other lists to	Empty property list - 2nd line		любым з іншых спісаў каб
 Save as…	Icon-O-Matic-Menu-File		Захаваць як…
+Don't save	Icon-O-Matic-Menu-Settings		Не захоўваць
 Change Color	Icon-O-Matic-SetColorCmd		Змяніць колер
 Style	Icon-O-Matic-Menus		Стыль
 <modify path>	Icon-O-Matic-PathCmd		<змяніць пуць>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Вярнуць
 Click on a shape above	Empty transformers list - 1st line		Клікніце па фігуры вышэй
 Add Shape	Icon-O-Matic-AddShapesCmd		Дадаць Фігуру
 Contour	Transformation		Контур
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Захаваць зьмены ў значак перад тым як выйсьці?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<няма чаго перарабляць>
 Perspective	Transformation		Перспэктыва
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Перамясціць Трансформер
@@ -99,7 +101,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Падабраць колер
 Quit	Icon-O-Matic-Menu-File		Выйсці
 Export	Icon-O-Matic-Menu-File		Экспарт
 No	Icon-O-Matic-StyledTextImport		Не
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Захаваць змены ў цякучы значак?
 Rotate indices forwards	Icon-O-Matic-PathsList		Павярнуць індэксы наперад
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Адвязаць шлях
 load error	Icon-O-Matic-SVGImport		памылка загрузкі
@@ -147,7 +148,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Дадаць Трансфор�
 Diamond	Icon-O-Matic-StyleTypes		Ромб
 Path	Icon-O-Matic-PropertyNames		Шлях
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Не ўдалося адкрыць '%s' як дакумент SVG.\n\nПамылка: %s
-Discard	Icon-O-Matic-Menu-Settings		Адкінуць
 Swatches	Icon-O-Matic-Menus		Узоры
 <unavailable>	Icon-O-Matic-StyleTypes		<недаступны>
 Rotation	Icon-O-Matic-PropertyNames		Паварот

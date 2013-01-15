@@ -14,6 +14,7 @@
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/HCI/btHCI_event.h>
 
+#include <bluetooth/debug.h>
 #include <bluetooth/bluetooth_error.h>
 
 #include <Catalog.h>
@@ -35,6 +36,7 @@ static const uint16 invalidConnectionHandle = 0xF000;
 bool
 RemoteDevice::IsTrustedDevice(void)
 {
+	CALLED();
 	return true;
 }
 
@@ -42,6 +44,7 @@ RemoteDevice::IsTrustedDevice(void)
 BString
 RemoteDevice::GetFriendlyName(bool alwaysAsk)
 {
+	CALLED();
 	if (!alwaysAsk) {
 		// Check if the name is already retrieved
 		// TODO: Check if It is known from a KnownDevicesList
@@ -101,6 +104,7 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 BString
 RemoteDevice::GetFriendlyName()
 {
+	CALLED();
 	return GetFriendlyName(true);
 }
 
@@ -108,6 +112,7 @@ RemoteDevice::GetFriendlyName()
 bdaddr_t
 RemoteDevice::GetBluetoothAddress()
 {
+	CALLED();
 	return fBdaddr;
 }
 
@@ -115,6 +120,7 @@ RemoteDevice::GetBluetoothAddress()
 bool
 RemoteDevice::Equals(RemoteDevice* obj)
 {
+	CALLED();
 	return bdaddrUtils::Compare(fBdaddr, obj->GetBluetoothAddress());
 }
 
@@ -125,6 +131,7 @@ RemoteDevice::Equals(RemoteDevice* obj)
 bool
 RemoteDevice::Authenticate()
 {
+	CALLED();
 	int8 btStatus = BT_ERROR;
 
 	if (fMessenger == NULL || fDiscovererLocalDevice == NULL)
@@ -200,6 +207,7 @@ RemoteDevice::Authenticate()
 status_t
 RemoteDevice::Disconnect(int8 reason)
 {
+	CALLED();
 	if (fHandle != invalidConnectionHandle) {
 
 		int8 btStatus = BT_ERROR;
@@ -248,6 +256,7 @@ RemoteDevice::Disconnect(int8 reason)
 bool
 RemoteDevice::IsAuthenticated()
 {
+	CALLED();
 	return true;
 }
 
@@ -258,6 +267,7 @@ RemoteDevice::IsAuthenticated()
 bool
 RemoteDevice::IsEncrypted()
 {
+	CALLED();
 	return true;
 }
 
@@ -265,6 +275,7 @@ RemoteDevice::IsEncrypted()
 LocalDevice*
 RemoteDevice::GetLocalDeviceOwner()
 {
+	CALLED();
 	return fDiscovererLocalDevice;
 }
 
@@ -273,6 +284,7 @@ RemoteDevice::GetLocalDeviceOwner()
 void
 RemoteDevice::SetLocalDeviceOwner(LocalDevice* ld)
 {
+	CALLED();
 	fDiscovererLocalDevice = ld;
 }
 
@@ -284,6 +296,7 @@ RemoteDevice::RemoteDevice(const bdaddr_t address, uint8 record[3])
 	fDiscovererLocalDevice(NULL),
 	fHandle(invalidConnectionHandle)
 {
+	CALLED();
 	fBdaddr = address;
 	fDeviceClass.SetRecord(record);
 	fMessenger = _RetrieveBluetoothMessenger();
@@ -296,6 +309,7 @@ RemoteDevice::RemoteDevice(const BString& address)
 	fDiscovererLocalDevice(NULL),
 	fHandle(invalidConnectionHandle)
 {
+	CALLED();
 	fBdaddr = bdaddrUtils::FromString((const char*)address.String());
 	fMessenger = _RetrieveBluetoothMessenger();
 }
@@ -303,6 +317,7 @@ RemoteDevice::RemoteDevice(const BString& address)
 
 RemoteDevice::~RemoteDevice()
 {
+	CALLED();
 	delete fMessenger;
 }
 
@@ -317,6 +332,7 @@ RemoteDevice::GetProperty(const char* property) /* Throwing */
 status_t
 RemoteDevice::GetProperty(const char* property, uint32* value) /* Throwing */
 {
+	CALLED();
 	return B_ERROR;
 }
 
@@ -324,8 +340,8 @@ RemoteDevice::GetProperty(const char* property, uint32* value) /* Throwing */
 DeviceClass
 RemoteDevice::GetDeviceClass()
 {
+	CALLED();
 	return fDeviceClass;
 }
-
 
 }

@@ -60,7 +60,7 @@ public:
 protected:
 	const char* UpdateText() const
 	{
-		snprintf(fText, sizeof(fText), "%ldpt", Value());
+		snprintf(fText, sizeof(fText), "%" B_PRId32 "pt", Value());
 		return fText;
 	}
 
@@ -310,7 +310,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 				sizeof(utf8Hex));
 
 			char text[128];
-			snprintf(text, sizeof(text), " %s: %#lx (%ld), UTF-8: %s",
+			snprintf(text, sizeof(text), " %s: %#" B_PRIx32 " (%" B_PRId32 "), UTF-8: %s",
 				B_TRANSLATE("Code"), character, character, utf8Hex);
 
 			char glyph[20];

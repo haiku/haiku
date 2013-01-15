@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaConverter	296071315
+1	japanese	x-vnd.Haiku-MediaConverter	2955071341
 Video using parameters form settings	MediaConverter		設定のパラメーターを使ったビデオ
 Video encoding:	MediaConverter		ビデオエンコーディング：
 No audio	Audio codecs list		オーディオ無し
@@ -15,7 +15,6 @@ MediaConverter	System name		メディアコンバーター
 No video	Video codecs list		ビデオ無し
 Duration:	MediaConverter-FileInfo		継続時間：
 OK	MediaConverter		OK
-Error writing audio frame %Ld	MediaConverter		オーディオフレーム%Ldの書き出し中にエラーが発生しました
 Error converting '%filename'	MediaConverter		'%filename'の変換中にエラーが発生しました
 Low	MediaConverter		低い
 Conversion completed	MediaConverter		変換が終了しました
@@ -30,7 +29,6 @@ Cancel	MediaConverter		キャンセル
 None available	Video codecs		利用できません
 Conversion cancelled	MediaConverter		変換はキャンセルされました
 No file selected	MediaConverter-FileInfo		ファイルが選択されていません
-Error writing video frame %Ld	MediaConverter		ビデオフレーム %Ld の書き込み時にエラーが発生しました
 Select this folder	MediaConverter		このフォルダーを選択
 Continue	MediaConverter		続ける
 Encoder parameters	MediaConverter-EncoderWindow		エンコーターパラメーター
@@ -48,7 +46,6 @@ Preview	MediaConverter		プレビュー
 File format:	MediaConverter		ファイルフォーマット：
 None available	Audio codecs		利用できません
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:保存先フォルダー
-Error read audio frame %Ld	MediaConverter		オーディオフレーム %Ld の読み取り時にエラーが発生しました
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld チャンネル / %lld フレーム
 Error launching: %strError%	MediaConverter		起動時にエラーが発生しました： %strError%
 High	MediaConverter		高い
@@ -63,6 +60,5 @@ Video quality: %3d%%	MediaConverter		映像品質： %3d%%
 Output folder	MediaConverter		出力先フォルダー
 Audio quality: %3d%%	MediaConverter		音声品質：%3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		ファイル情報を読み取る際にエラーが発生しました。\n\nError : 
-Error read video frame %Ld	MediaConverter		ビデオフレーム %Ld の読み取り時にエラーが発生しました
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles 個のファイルがサポートされるメディアファイルとして認識できませんでした:
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz モノラル / %lld フレーム

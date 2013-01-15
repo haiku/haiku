@@ -1,5 +1,6 @@
 /*!
 \file Midi2Defs.h
+\brief Some definitions to define raw MIDI events.
 \ingroup midi2
 */
 

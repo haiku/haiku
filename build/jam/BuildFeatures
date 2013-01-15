@@ -203,6 +203,118 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 }
 
 
+# LLVM
+if $(TARGET_ARCH) = x86 {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		HAIKU_LLVM_FILE = llvm-3.2-x86-gcc4-2012-12-21.zip ;
+		local zipFile = [ DownloadFile $(HAIKU_LLVM_FILE)
+			: $(baseURL)/$(HAIKU_LLVM_FILE) ] ;
+
+		HAIKU_LLVM_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+			$(HAIKU_LLVM_FILE:B) ] ;
+
+		HAIKU_LLVM_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_LLVM_DIR)
+			: common/include/ : $(zipFile) : extracted-llvm ] ;
+		HAIKU_LLVM_HEADERS = [ FDirName $(HAIKU_LLVM_DIR) common include ] ;
+
+		# We can't Glob these because they aren't extracted yet.
+		HAIKU_LLVM_LIBS = [ ExtractArchive $(HAIKU_LLVM_DIR)
+			:
+			common/lib/libLLVMAsmParser.a
+			common/lib/libLLVMInstrumentation.a
+			common/lib/libLLVMLinker.a
+			common/lib/libLLVMArchive.a
+			common/lib/libLLVMBitReader.a
+			common/lib/libLLVMDebugInfo.a
+			common/lib/libLLVMJIT.a
+			common/lib/libLLVMipo.a
+			common/lib/libLLVMVectorize.a
+			common/lib/libLLVMBitWriter.a
+			common/lib/libLLVMTableGen.a
+			#common/lib/libLLVMHexagonCodeGen.a
+			#common/lib/libLLVMHexagonAsmPrinter.a
+			#common/lib/libLLVMHexagonDesc.a
+			#common/lib/libLLVMHexagonInfo.a
+			#common/lib/libLLVMNVPTXCodeGen.a
+			#common/lib/libLLVMNVPTXDesc.a
+			#common/lib/libLLVMNVPTXInfo.a
+			#common/lib/libLLVMNVPTXAsmPrinter.a
+			#common/lib/libLLVMMBlazeCodeGen.a
+			#common/lib/libLLVMMBlazeAsmParser.a
+			#common/lib/libLLVMMBlazeDisassembler.a
+			#common/lib/libLLVMMBlazeDesc.a
+			#common/lib/libLLVMMBlazeInfo.a
+			#common/lib/libLLVMMBlazeAsmPrinter.a
+			common/lib/libLLVMCppBackendCodeGen.a
+			common/lib/libLLVMCppBackendInfo.a
+			#common/lib/libLLVMMSP430CodeGen.a
+			#common/lib/libLLVMMSP430Desc.a
+			#common/lib/libLLVMMSP430AsmPrinter.a
+			#common/lib/libLLVMMSP430Info.a
+			#common/lib/libLLVMXCoreCodeGen.a
+			#common/lib/libLLVMXCoreDesc.a
+			#common/lib/libLLVMXCoreInfo.a
+			#common/lib/libLLVMCellSPUCodeGen.a
+			#common/lib/libLLVMCellSPUDesc.a
+			#common/lib/libLLVMCellSPUInfo.a
+			#common/lib/libLLVMMipsAsmParser.a
+			#common/lib/libLLVMMipsCodeGen.a
+			#common/lib/libLLVMMipsDesc.a
+			#common/lib/libLLVMMipsAsmPrinter.a
+			#common/lib/libLLVMMipsDisassembler.a
+			#common/lib/libLLVMMipsInfo.a
+			#common/lib/libLLVMARMAsmParser.a
+			#common/lib/libLLVMARMCodeGen.a
+			#common/lib/libLLVMARMDisassembler.a
+			#common/lib/libLLVMARMDesc.a
+			#common/lib/libLLVMARMInfo.a
+			#common/lib/libLLVMARMAsmPrinter.a
+			#common/lib/libLLVMPowerPCCodeGen.a
+			#common/lib/libLLVMPowerPCDesc.a
+			#common/lib/libLLVMPowerPCInfo.a
+			#common/lib/libLLVMPowerPCAsmPrinter.a
+			#common/lib/libLLVMSparcCodeGen.a
+			#common/lib/libLLVMSparcDesc.a
+			#common/lib/libLLVMSparcInfo.a
+			common/lib/libLLVMX86AsmParser.a
+			common/lib/libLLVMX86CodeGen.a
+			common/lib/libLLVMSelectionDAG.a
+			common/lib/libLLVMAsmPrinter.a
+			common/lib/libLLVMX86Disassembler.a
+			common/lib/libLLVMX86Desc.a
+			common/lib/libLLVMX86Info.a
+			common/lib/libLLVMX86AsmPrinter.a
+			common/lib/libLLVMX86Utils.a
+			common/lib/libLLVMMCDisassembler.a
+			common/lib/libLLVMMCParser.a
+			common/lib/libLLVMInterpreter.a
+			common/lib/libLLVMCodeGen.a
+			common/lib/libLLVMScalarOpts.a
+			common/lib/libLLVMInstCombine.a
+			common/lib/libLLVMTransformUtils.a
+			common/lib/libLLVMipa.a
+			common/lib/libLLVMAnalysis.a
+			common/lib/libLLVMMCJIT.a
+			common/lib/libLLVMRuntimeDyld.a
+			common/lib/libLLVMExecutionEngine.a
+			common/lib/libLLVMTarget.a
+			common/lib/libLLVMMC.a
+			common/lib/libLLVMObject.a
+			common/lib/libLLVMCore.a
+			common/lib/libLLVMSupport.a
+			: $(zipFile) : extracted-llvm ]
+		;
+
+		EnableBuildFeatures llvm ;
+	} else {
+		# Nor will it ever be
+		Echo "LLVM not available on GCC2" ;
+	}
+} else {
+	Echo "LLVM not yet available on $(TARGET_ARCH)" ;
+}
+
+
 # GLU (GL Utilities)
 if $(TARGET_ARCH) = x86 {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
@@ -266,16 +378,21 @@ if $(TARGET_ARCH) = x86 {
 		lib.haiku/libgallium.a
 		: $(zipFile)
 		: extracted-mesa ] ;
-	HAIKU_GALLIUM_SOFTPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-		:
-		lib.haiku/libsoftpipe.a
-		: $(zipFile)
-		: extracted-mesa ] ;
-	HAIKU_GALLIUM_LLVMPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
-		:
-		lib.haiku/libllvmpipe.a
-		: $(zipFile)
-		: extracted-mesa ] ;
+
+	if FIsBuildFeatureEnabled(llvm) {
+		HAIKU_GALLIUM_LLVMPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+			:
+			lib.haiku/libllvmpipe.a
+			: $(zipFile)
+			: extracted-mesa ] ;
+		Depends $(HAIKU_GALLIUM_LLVMPIPE_LIB) : $(HAIKU_LLVM_LIBS) ;
+	} else {
+		HAIKU_GALLIUM_SOFTPIPE_LIB = [ ExtractArchive $(HAIKU_MESA_DIR)
+			:
+			lib.haiku/libsoftpipe.a
+			: $(zipFile)
+			: extracted-mesa ] ;
+	}
 
 	HAIKU_MESA_HEADERS = [ FDirName $(HAIKU_MESA_DIR) include ] ;
 

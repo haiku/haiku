@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	3417936913
+1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	3117187160
 StyledEdit	System name		StyledEdit
 Paste	Menus		Επικόλληση
 OK	LoadAlert		Εντάξει
@@ -65,7 +65,6 @@ Select all	Menus		Επιλογή όλων
 Don't save	SaveAlert		Χωρίς αποθήκευση
 Error loading \"%s\":\n\t%s	LoadAlert		Σφάλμα φόρτωσης \"%s\":\n\t%s
 Undo typing	QuitAlert		Αναίρεση πληκτρολόγησης
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Το αρχείο είναι μόνο για ανάγνωση. Να αποθηκευτούν οι αλλαγές στο έγγραφο \"%s\";
 Black	Menus		Μαύρο
 Untitled 	StyledEditWindow		Χωρίς τίτλο
 OK	SaveAlert		Εντάξει

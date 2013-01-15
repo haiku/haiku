@@ -539,7 +539,7 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		/*
 		 * setenv TERM and TTY.
 		 */
-		setenv("TERM", "xterm", true);
+		setenv("TERM", "xterm-color", true);
 		setenv("TTY", ttyName, true);
 		setenv("TTYPE", parameters.Encoding(), true);
 

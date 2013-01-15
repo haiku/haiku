@@ -6,36 +6,39 @@
 # easily add things to the image as I port them.
 
 
-SYSTEM_BIN = "[" addattr base64 basename bash beep cal cat catattr checkfs
-	chgrp chmod chown chroot cksum clear clockconfig cmp collectcatkeys comm
-	compress copyattr cp csplit cut date dd diff diff3 dircolors dirname df du
-	dumpcatalog echo eject env error expand expr factor false find finddir
-	fmt fold fortune ftp gawk gdb gzip gzexe getlimits groups head hostname
-	id ifconfig <bin>install isvolume join kernel_debugger kill less lessecho
-	lesskey link linkcatkeys listdev ln locale locate logger logname ls
-	makebootable md5sum mimeset mkdir mkfifo mkfs mktemp mount mountvolume
-	mv nl nohup notify nproc od open paste patch pathchk ping pr printenv printf
-	ps ptx pwd query rc readlink ReadOnlyBootPrompt rm rmattr rmdir safemode
-	sdiff seq sha1sum shred shuf shutdown sleep sort split stat strace stty su sum sync
-	sysinfo tac tail tee test timeout touch tr true truncate tsort tty unexpand
-	uname uniq unlink unmount unzip <bin>updatedb waitfor wc wget whoami xargs
-	xres yes zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit
-	zmore znew
+SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep cal cat catattr
+	checkfs	chgrp chmod chown chroot cksum clear clockconfig cmp
+	collectcatkeys comm compress copyattr CortexAddOnHost cp csplit cut date
+	dd diff diff3 dircolors dirname df du dumpcatalog echo eject env error
+	expand expr factor false find finddir fmt fold fortune ftp gawk gdb gzip
+	gzexe getlimits groups head hostname id ifconfig <bin>install isvolume
+	join kernel_debugger kill less lessecho	lesskey link linkcatkeys listdev
+	ln locale locate logger logname ls makebootable md5sum mimeset mkdir
+	mkfifo mkfs mktemp mount mountvolume mv nl nohup notify nproc od open
+	paste patch pathchk ping pr printenv printf ps ptx pwd query rc readlink
+	ReadOnlyBootPrompt rm rmattr rmdir safemode sdiff seq sha1sum shred shuf
+	shutdown sleep sort split stat strace stty su sum sync sysinfo tac tail
+	tee test timeout touch tr true truncate tsort tty unexpand uname uniq
+	unlink unmount unzip <bin>updatedb waitfor wc wget whoami xargs xres yes
+	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
-SYSTEM_APPS = AboutSystem ActivityMonitor Debugger DriveSetup Installer
-	NetworkStatus ProcessController StyledEdit Terminal
+SYSTEM_APPS = AboutSystem ActivityMonitor CDPlayer CharacterMap Debugger DeskCalc
+	Devices DiskUsage DriveSetup Expander Installer LaunchBox MediaConverter
+	NetworkStatus PoorMan Pulse ProcessController Screenshot ShowImage
+	SoundRecorder StyledEdit Terminal TV Workspaces
 ;
 
-SYSTEM_PREFERENCES = Appearance Backgrounds <preference>Deskbar FileTypes
-	Keyboard Keymap Locale Mouse Network Notifications Screen Time Touchpad
-	<preference>Tracker VirtualMemory
+SYSTEM_PREFERENCES = Appearance Backgrounds DataTranslations <preference>Deskbar
+	FileTypes Keyboard Keymap Locale Media Mouse Network Notifications
+	Printers Screen ScreenSaver Time Touchpad <preference>Tracker
+	VirtualMemory
 ;
 
-SYSTEM_DEMOS = Sudoku ;
+SYSTEM_DEMOS = BSnow Cortex FontDemo OverlayImage Pairs Sudoku ;
 
-SYSTEM_LIBS = libbe.so libbsd.so libbnetapi.so libdebug.so libmedia.so
-	libnetwork.so <revisioned>libroot.so libroot-addon-icu.so
+SYSTEM_LIBS = libbe.so libbsd.so libbnetapi.so libgame.so libdebug.so libmedia.so
+	libmidi2.so libnetwork.so <revisioned>libroot.so libroot-addon-icu.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ;
@@ -48,8 +51,9 @@ PRIVATE_SYSTEM_LIBS =
 	libilmimf.so
 ;
 
-SYSTEM_SERVERS = app_server debug_server input_server mount_server
-	net_server notification_server registrar syslog_daemon
+SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server midi_server
+	mount_server net_server notification_server power_daemon print_server
+	print_addon_server registrar syslog_daemon
 ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
@@ -63,6 +67,17 @@ SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	PCXTranslator PNGTranslator PPMTranslator
 	RAWTranslator RTFTranslator SGITranslator STXTTranslator TGATranslator
 	TIFFTranslator WebPTranslator WonderBrushTranslator
+;
+
+SYSTEM_ADD_ONS_PRINT =
+	Canon\ LIPS3\ Compatible
+	Canon\ LIPS4\ Compatible
+	Gutenprint
+	PCL5\ Compatible
+	PCL6\ Compatible
+	PDF\ Writer
+	PS\ Compatible
+
 ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = vesa ;
@@ -519,6 +534,7 @@ AddTargetVariableToScript $(script) : <build>rc ;
 AddTargetVariableToScript $(script) : <build>resattr ;
 AddTargetVariableToScript $(script) : <build>unzip ;
 AddTargetVariableToScript $(script) : <build>vmdkimage ;
+AddTargetVariableToScript $(script) : $(HAIKU_STRIP) : stripCommand ;
 if $(HOST_RM_ATTRS_TARGET) {
 	AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET) : rmAttrs ;
 } else {

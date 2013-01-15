@@ -91,7 +91,7 @@ ArgvParser::MakeArgvEmpty()
 	// done with current argv, free it up
 	for (int32 index = 0; index < fArgc; index++)
 		delete[] fCurrentArgv[index];
-	
+
 	fArgc = 0;
 }
 
@@ -125,7 +125,7 @@ ArgvParser::NextArgv()
 	}
 	fCurrentArgs[++fCurrentArgsPos] = '\0';
 	// terminate current arg pos
-	
+
 	// copy it as a string to the current argv slot
 	fCurrentArgv[fArgc] = new char [strlen(fCurrentArgs) + 1];
 	strcpy(fCurrentArgv[fArgc], fCurrentArgs);
@@ -409,7 +409,7 @@ Settings::MakeSettingsDirectory(BDirectory* resultingSettingsDir)
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
 		return;
-	
+
 	// make sure there is a directory
 	// mkdir() will only make one leaf at a time, unfortunately
 	path.Append(fSettingsDir);

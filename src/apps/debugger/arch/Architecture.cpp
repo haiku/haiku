@@ -194,6 +194,9 @@ Architecture::CreateStackTrace(Team* team,
 			break;
 	}
 
+	if (stackTrace->CountFrames() == 0)
+		return B_ERROR;
+
 	stackTraceDeleter.Detach();
 	_stackTrace = stackTrace;
 	return B_OK;

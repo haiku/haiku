@@ -17,8 +17,3 @@ DoCatalogs FontDemo :
 	ControlView.cpp
 	FontDemoView.cpp
 ;
-
-AddCatalogEntryAttribute FontDemo
-	:
-	x-vnd.Haiku-FontDemo:FontDemo:FontDemo
-;

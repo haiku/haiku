@@ -143,7 +143,7 @@ BPose::AddWidget(BPoseView* poseView, BColumn* column)
 	BModelOpener opener(fModel);
 	if (fModel->InitCheck() != B_OK)
 		return NULL;
-		
+
 	BTextWidget* widget = new BTextWidget(fModel, column, poseView);
 	fWidgetList.AddItem(widget);
 	return widget;
@@ -157,7 +157,7 @@ BPose::AddWidget(BPoseView* poseView, BColumn* column,
 	opener.OpenNode();
 	if (fModel->InitCheck() != B_OK)
 		return NULL;
-	
+
 	BTextWidget* widget = new BTextWidget(fModel, column, poseView);
 	fWidgetList.AddItem(widget);
 	return widget;
@@ -494,7 +494,7 @@ BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 
 		return rect.Contains(where);
 	}
-	
+
 	// MINI_ICON_MODE rect calc
 	BRect rect(location, location);
 	rect.right += B_MINI_ICON + kMiniIconSeparator;
@@ -502,7 +502,7 @@ BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 	BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 	if (widget)
 		rect.right += ceil(widget->TextWidth(poseView) + 1);
-	
+
 	return rect.Contains(where);
 }
 
@@ -552,14 +552,14 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 		return;
 	} else
 		fBackgroundClean = false;
-		
+
 	bool directDraw = (drawView == poseView);
 	bool windowActive = poseView->Window()->IsActive();
 	bool showSelectionWhenInactive = poseView->fShowSelectionWhenInactive;
 	bool isDrawingSelectionRect = poseView->fIsDrawingSelectionRect;
-	
+
 	ModelNodeLazyOpener modelOpener(fModel);
-	
+
 	if (poseView->ViewMode() == kListMode) {
 		uint32 size = poseView->IconSizeInt();
 		BRect iconRect(rect);
@@ -571,37 +571,37 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 			DrawIcon(iconRect.LeftTop(), drawView, poseView->IconSize(),
 				directDraw, !windowActive && !showSelectionWhenInactive);
 		}
-		
+
 		// draw text
 		int32 columnsToDraw = 1;
 		if (fullDraw)
 			columnsToDraw = poseView->CountColumns();
-		
+
 		for (int32 index = 0; index < columnsToDraw; index++) {
 			BColumn* column = poseView->ColumnAt(index);
 			if (!column)
 				break;
-			
+
 			// if widget doesn't exist, create it
 			BTextWidget* widget = WidgetFor(column, poseView, modelOpener);
-			
+
 			if (widget && widget->IsVisible()) {
 				BRect widgetRect(widget->ColumnRect(rect.LeftTop(), column,
 					poseView));
-				
+
 				if (updateRect.Intersects(widgetRect)) {
 					BRect widgetTextRect(widget->CalcRect(rect.LeftTop(),
 						column, poseView));
-					
+
 					bool selectDuringDraw = directDraw && selected
 						&& windowActive;
-					
+
 					if (index == 0 && selectDuringDraw) {
 						//draw with dark background to select text
 						drawView->PushState();
 						drawView->SetLowColor(0, 0, 0);
 					}
-					
+
 					if (index == 0) {
 						widget->Draw(widgetRect, widgetTextRect,
 							column->Width(), poseView, drawView, selected,
@@ -611,7 +611,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 							poseView, drawView, false, fClipboardMode,
 							offset, directDraw);
 					}
-					
+
 					if (index == 0 && selectDuringDraw)
 						drawView->PopState();
 					else if (index == 0 && selected) {
@@ -640,11 +640,11 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 
 		DrawIcon(iconOrigin, drawView, poseView->IconSize(), directDraw,
 			!windowActive && !showSelectionWhenInactive);
-		
+
 		BColumn* column = poseView->FirstColumn();
 		if (!column)
 			return;
-		
+
 		BTextWidget* widget = WidgetFor(column, poseView, modelOpener);
 		if (!widget || !widget->IsVisible())
 			return;
@@ -653,7 +653,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 
 		bool selectDuringDraw = directDraw && selected
 			&& (poseView->IsDesktopWindow() || windowActive);
-			
+
 		if (selectDuringDraw) {
 			// draw with dark background to select text
 			drawView->PushState();
@@ -698,7 +698,7 @@ BPose::DeselectWithoutErasingBackground(BRect, BPoseView* poseView)
 	BColumn* column = poseView->FirstColumn();
 	if (!column)
 		return;
-	
+
 	BTextWidget* widget = WidgetFor(column->AttrHash());
 	if (!widget || !widget->IsVisible())
 		return;

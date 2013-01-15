@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-FileTypes	2037267651
+1	hindi	x-vnd.Haiku-FileTypes	599989122
 Application types…	FileTypes Window		आवेदन के प्रकार...
 Description:	Application Types Window		विवरण
 Args only	Application Type Window		केवल अर्ग्स
@@ -16,7 +16,6 @@ New file type	New File Type Window		नए फ़ाइल के प्रक�
 Rule:	FileTypes Window		नियम:
 Add icon…	Icon View		चिह्न जोड़...
 Multiple files from \"%s\" file type	FileType Window		\"%s\" प्रकार के फ़ाइल में से एकाधिक फाइल
-Do you want to save the changes?	Application Type Window		क्या आप परिवर्तनों को सेव चाहते हैं
 File type	FileType Window		फ़ाइल के प्रकार
 Could not change attributes	Attribute Window		गुणों को बदलने नहीं जा सका
 Could not retrieve preferred application of this file	Preferred App Menu		इस फाइल के वरीय अनुप्रयोग पुनर्प्राप्त नहीं कर सके
@@ -71,7 +70,6 @@ Special:	Attribute Window		विशेष:
 Alpha	Application Type Window		अल्फा
 Add…	FileTypes Window		जोड़ें...
 Signature:	Application Type Window		हस्ताक्षर:
-Quit, don't save	Application Type Window		छोड़ो, जमा मत करो
 Add…	Application Type Window		जोड़ें...
 [Multiple files] file types	FileType Window		फ़ाइल प्रकार [एकाधिक फाइलें]
 Information	Application Types Window		जानकारी

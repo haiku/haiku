@@ -1,14 +1,16 @@
-1	lithuanian	x-vnd.Be-MAIL	596741059
+1	lithuanian	x-vnd.Be-MAIL	3366038826
 View	Mail		Rodymas
 %d - Date	Mail		%d – data
 Attach attributes:	Mail		Pridedamų failų požymių įtraukimas:
 Inconsistency occurred in the undo/redo buffer.	Mail		Nesutapimas atšaukti/grąžinti buferyje.
 An error occurred trying to save the attachment.	Mail		Bandant įrašyti laiško priedą, įvyko klaida.
 Copy to new	Mail		Kopijuoti į naujus
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Palikti kaip „New“
 Edit	Mail		Taisa
 Print	Mail		Spausdinti
 <none>	Mail		<nieko>
 New mail message	Mail		Naujas laiškas
+Untitled	Mail		Be pavadinimo
 Automatic	Mail		Nustatyti automatiškai
 Automatically mark mail as read:	Mail		Automatiškai žymėti laiškus kaip skaitytus:
 helpful message	Mail		naudingas pranešimas
@@ -24,7 +26,6 @@ Beginner	Mail		Naujokas
 Don't save	Mail		Neįrašyti
 Expert	Mail		Žinovas
 Reply account:	Mail		Paskyra rašant atsakymą:
-Discard	Mail		Atmesti
 Message	Mail		Laiškas
 Settings…	Mail		Nuostatos…
 Reply to sender	Mail		Atsakyti siuntėjui
@@ -118,7 +119,6 @@ Remove enclosure	Mail		Pašalinti priedą
 Account:	Mail		Paskyra:
 Decoding:	Mail		Koduotė:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Apgailestaujame, tačiau nepavyko rasti programos, palaikančios „Person“ tipo failus.
-Do you wish to send this message before closing?	Mail		Ar norite prieš užverami šį laišką išsiųsti?
 Delete	Mail		Šalinti
 Leave as '%s'	Mail		Palikti kaip „%s“
 Copy	Mail		Kopijuoti
@@ -134,7 +134,6 @@ Font:	Mail		Šriftas:
 (Address unavailable)	Mail		(Adresas nenurodytas)
 Save address	Mail		Įrašyti adresą
 Queries	Mail		Užklausos
-Do you wish to save this message as a draft before closing?	Mail		Ar norite prieš užverdami įrašyti šį laišką kaip juodraštį?
 Save	Mail		Įrašyti
 Random	Mail		Atsitiktinį
 Close and 	Mail		Užverti ir

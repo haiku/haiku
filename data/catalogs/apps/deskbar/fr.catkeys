@@ -1,7 +1,9 @@
-1	french	x-vnd.Be-TSKB	3155357024
+1	french	x-vnd.Be-TSKB	1210725923
 Power off	DeskbarMenu		Éteindre
 Edit menu…	PreferencesWindow		Éditer le menu…
 Suspend	DeskbarMenu		Mettre en veille
+Hide clock	TimeView		Masquer l'horloge
+Applications	PreferencesWindow		Applications
 Time preferences…	TimeView		Préférences de l'heure…
 About Haiku	DeskbarMenu		À propos de Haiku
 Recent documents:	PreferencesWindow		Documents récents :
@@ -9,6 +11,7 @@ Recent applications	DeskbarMenu		Applications récentes
 Sort running applications	PreferencesWindow		Trier les applications lancées
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applications
 Find…	DeskbarMenu		Rechercher…
+Show clock	Tray		Afficher l'horloge
 Window	PreferencesWindow		Fenêtre
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Documents récents

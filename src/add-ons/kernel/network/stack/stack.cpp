@@ -759,6 +759,8 @@ scan_modules(const char* path)
 			put_module(name);
 		}
 	}
+
+	close_module_list(cookie);
 }
 
 

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Time	3249243267
+1	finnish	x-vnd.Haiku-Time	3544635877
 GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
 OK	Time		Valmis
 Asia	Time		Aasia
@@ -40,5 +40,6 @@ Try all servers	Time		Yritä kaikkia palvelimia
 Time zone	Time		Aikavyöhyke
 Could not create socket	Time		Pistokkeen luominen epäonnistui
 Synchronize again	Time		Synkronoi uudelleen
+Clock	Time		Kello
 Network time	Time		Verkkoaika
 Atlantic	Time		Atlantin valtameri

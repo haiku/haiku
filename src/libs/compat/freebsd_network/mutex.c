@@ -21,14 +21,13 @@ void
 mtx_init(struct mtx *mutex, const char *name, const char *type,
 	int options)
 {
-	if (options == MTX_DEF) {
-		mutex_init_etc(&mutex->u.mutex.lock, name, MUTEX_FLAG_CLONE_NAME);
-		mutex->u.mutex.owner = -1;
-	} else if (options == MTX_RECURSE) {
+	if (options & MTX_RECURSE) {
 		recursive_lock_init_etc(&mutex->u.recursive, name,
 			MUTEX_FLAG_CLONE_NAME);
-	} else
-		panic("fbsd: unsupported mutex type");
+	} else {
+		mutex_init_etc(&mutex->u.mutex.lock, name, MUTEX_FLAG_CLONE_NAME);
+		mutex->u.mutex.owner = -1;
+	}
 
 	mutex->type = options;
 }
@@ -37,10 +36,10 @@ mtx_init(struct mtx *mutex, const char *name, const char *type,
 void
 mtx_destroy(struct mtx *mutex)
 {
-	if (mutex->type == MTX_DEF)
-		mutex_destroy(&mutex->u.mutex.lock);
-	else if (mutex->type == MTX_RECURSE)
+	if (mutex->type & MTX_RECURSE)
 		recursive_lock_destroy(&mutex->u.recursive);
+	else
+		mutex_destroy(&mutex->u.mutex.lock);
 }
 
 

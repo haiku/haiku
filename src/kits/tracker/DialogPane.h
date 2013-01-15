@@ -68,15 +68,15 @@ public:
 									uint32 flags = B_WILL_DRAW);
 
 	virtual						~DialogPane();
-	
+
 			BRect				FrameForMode(int32);
 			BRect				BoundsForMode(int32);
-	
+
 			int32				Mode() const;
 	virtual	void				SetMode(int32, bool initialSetup = false);
-	
+
 			void				AddItem(BView*, int32 toMode);
-	
+
 			void				SetSwitch(BControl*);
 
 	virtual	void				AttachedToWindow();
@@ -87,18 +87,18 @@ protected:
 		// called only by the constructor
 
 	virtual	void				MessageReceived(BMessage* message);
-	
+
 private:
 			int32				fMode;
 
 			BRect				fMode1Frame;
 			BRect				fMode2Frame;
 			BRect				fMode3Frame;
-	
+
 			ViewList			fMode2Items;
 			ViewList			fMode3Items;
 			BControl*			fLatch;
-	
+
 	typedef BView _inherited;
 };
 

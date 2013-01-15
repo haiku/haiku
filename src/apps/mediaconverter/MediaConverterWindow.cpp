@@ -501,7 +501,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	BMenu* menu = fAudioMenu->Menu();
 	BMenuItem* item;
 	// clear out old audio codec menu items
-	while ((item = menu->RemoveItem(0L)) != NULL)
+	while ((item = menu->RemoveItem((int32)0)) != NULL)
 		delete item;
 
 	bool separator = true;
@@ -558,7 +558,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 
 	// clear out old video codec menu items
 	menu = fVideoMenu->Menu();
-	while ((item = menu->RemoveItem(0L)) != NULL)
+	while ((item = menu->RemoveItem((int32)0)) != NULL)
 		delete item;
 
 	separator = true;

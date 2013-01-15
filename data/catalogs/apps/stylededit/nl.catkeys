@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-StyledEdit	3417936913
+1	dutch; flemish	x-vnd.Haiku-StyledEdit	3117187160
 StyledEdit	System name		StyledEdit
 Paste	Menus		Plakken
 OK	LoadAlert		Oké
@@ -65,7 +65,6 @@ Select all	Menus		Alles selecteren
 Don't save	SaveAlert		Niet opslaan
 Error loading \"%s\":\n\t%s	LoadAlert		Fout bij het laden van \"%s\":\n\t%s
 Undo typing	QuitAlert		Typen ongedaan maken
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Dit bestand is Alleen-Lezen. Wijzigingen aan het document opslaan \"%s\"? 
 Black	Menus		Zwart
 Untitled 	StyledEditWindow		Naamloos
 OK	SaveAlert		Oké

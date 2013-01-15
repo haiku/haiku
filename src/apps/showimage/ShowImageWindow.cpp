@@ -711,7 +711,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 				while (fGoToPageMenu->CountItems() > 0) {
 					// Remove all page numbers
-					delete fGoToPageMenu->RemoveItem(0L);
+					delete fGoToPageMenu->RemoveItem((int32)0);
 				}
 
 				for (int32 i = 1; i <= pages; i++) {

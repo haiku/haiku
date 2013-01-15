@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3955647850
+1	swedish	x-vnd.Haiku-libtracker	3779634732
 common	B_COMMON_DIRECTORY		gemensam
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
@@ -411,7 +411,6 @@ Paste layout	ContainerWindow		Klistra in layout
 Select	InfoWindow		Markera
 Could not update permissions of file \"%name\". %error	FSUtils		Kunde inte uppdatera rättigheterna i filen "%name". %error
 Select…	FilePanelPriv		Markera...
-Don't move files to Trash	SettingsView		Flytta inte filerna till Papperskorgen
 There was an error resolving the link.	Tracker		Det uppstod ett fel vid uppslag av länk.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Du kan inte flytta eller kopiera Papperskorgen.
@@ -442,7 +441,6 @@ Automatic disk mounting	AutoMounterSettings		Montera volymer automatiskt
 Original name	ContainerWindow		Originalnamn
 Find	FSUtils		Sök
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av filen "%name".\n\t%error\n\nVill du fortsätta?
-Ask before delete	SettingsView		Fråga innan borttagning
 Single window navigation	SettingsView		Enfönsternavigation
 parent folder	NavMenu		föräldrakatalog
 contains	FindPanel		innehåller

@@ -24,7 +24,7 @@ TMenuItemGroup::TMenuItemGroup(const char* name)
 TMenuItemGroup::~TMenuItemGroup()
 {
 	free((char*)fName);
-	
+
 	if (fMenu == NULL) {
 		BMenuItem* item;
 		while ((item = RemoveItem((int32)0)) != NULL)

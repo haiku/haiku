@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Be-PEPL	2993050801
+1	greek, modern (1453-)	x-vnd.Be-PEPL	3273435274
 Edit	People		Επεξεργασία
 Error	People		Σφάλμα
 City	People		Πόλη
@@ -23,7 +23,6 @@ Name	People		Όνομα
 Revert	People		Επαναφόρα
 Undo	People		Αναίρεση
 E-mail	People		E-Mail
-Save changes before quitting?	People		Αποθήκευση των αλλαγών πριν το κλείσιμο;
 Load image…	People		Φόρτωση εικόνας...
 OK	People		Εντάξει
 Remove image	People		Αφαίρεση εικόνας

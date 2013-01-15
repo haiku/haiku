@@ -82,7 +82,7 @@ class TTrackerState : public Settings {
 		HexScalarValueSetting* fFreeSpaceColor;
 		HexScalarValueSetting* fWarningSpaceColor;
 
-		BooleanValueSetting* fDontMoveFilesToTrash;
+		BooleanValueSetting* fMoveFilesToTrash;
 		BooleanValueSetting* fAskBeforeDeleteFile;
 
 		Benaphore fInitLock;
@@ -202,8 +202,8 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fWarningSpaceColor
 		= new HexScalarValueSetting("WarningSpaceColor", 0xc0cb0000, "", ""));
 
-	Add(fDontMoveFilesToTrash
-		= new BooleanValueSetting("DontMoveFilesToTrash", false));
+	Add(fMoveFilesToTrash
+		= new BooleanValueSetting("MoveFilesToTrash", true));
 	Add(fAskBeforeDeleteFile
 		= new BooleanValueSetting("AskBeforeDeleteFile", true));
 
@@ -509,16 +509,16 @@ TrackerSettings::SetRecentFoldersCount(int32 count)
 
 
 bool
-TrackerSettings::DontMoveFilesToTrash()
+TrackerSettings::MoveFilesToTrash()
 {
-	return gTrackerState.fDontMoveFilesToTrash->Value();
+	return gTrackerState.fMoveFilesToTrash->Value();
 }
 
 
 void
-TrackerSettings::SetDontMoveFilesToTrash(bool enabled)
+TrackerSettings::SetMoveFilesToTrash(bool enabled)
 {
-	gTrackerState.fDontMoveFilesToTrash->SetValue(enabled);
+	gTrackerState.fMoveFilesToTrash->SetValue(enabled);
 }
 
 

@@ -52,7 +52,7 @@ BSlowMenu::AddDynamicItem(add_state state)
 {
 	if (fMenuBuilt)
 		return false;
-	
+
 	if (state == B_ABORT) {
 		ClearMenuBuildingState();
 		return false;

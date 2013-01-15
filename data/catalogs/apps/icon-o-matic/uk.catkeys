@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	2591538723
+1	ukrainian	x-vnd.haiku-icon_o_matic	3581603413
 Select All	Icon-O-Matic-PathManipulator		Вибрати все
 Add Style	Icon-O-Matic-AddStylesCmd		Додати cтиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колір (#%02x%02x%02x)
@@ -98,7 +98,6 @@ Pick a color	Icon-O-Matic-ColorPicker		Вибрати колір
 Quit	Icon-O-Matic-Menu-File		Вийти
 Export	Icon-O-Matic-Menu-File		Експорт
 No	Icon-O-Matic-StyledTextImport		Ні
-Save changes to current icon?	Icon-O-Matic-Menu-Settings		Зберегти зміни для біжучої іконки?
 Rotate indices forwards	Icon-O-Matic-PathsList		обертати за годинниковою стрілкою
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Відв'язати шлях
 load error	Icon-O-Matic-SVGImport		помилка загрузки
@@ -145,7 +144,6 @@ Add Transformers	Icon-O-Matic-AddTransformersCmd		Додати перетвор�
 Diamond	Icon-O-Matic-StyleTypes		Ромб
 Path	Icon-O-Matic-PropertyNames		Шлях
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Не вдалося відкрити файл '%s' Як документ SVG.\n\nПомилка: %s
-Discard	Icon-O-Matic-Menu-Settings		Витягнути
 Swatches	Icon-O-Matic-Menus		Узори
 <unavailable>	Icon-O-Matic-StyleTypes		<недоступний>
 Rotation	Icon-O-Matic-PropertyNames		Обертання

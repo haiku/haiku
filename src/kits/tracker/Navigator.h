@@ -68,9 +68,9 @@ class BNavigatorButton : public BPictureButton {
 public:
 	BNavigatorButton(BRect rect, const char* name, BMessage* message, int32 resIDon,
 		int32 resIDoff, int32 resIDdisabled);
-					 
+
 	~BNavigatorButton();
-	
+
 	virtual	void AttachedToWindow();
 
 	void SetPicture(BBitmap*, bool enabled, bool on);

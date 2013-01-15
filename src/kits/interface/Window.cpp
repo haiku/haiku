@@ -2139,13 +2139,13 @@ BWindow::DecoratorFrame() const
 		// else use fall-back values from above
 	}
 
-	if (fLook & kLeftTitledWindowLook) {
+	if (fLook == kLeftTitledWindowLook) {
 		decoratorFrame.top -= borderWidth;
-		decoratorFrame.left -= tabRect.Width();
+		decoratorFrame.left -= borderWidth + tabRect.Width();
 		decoratorFrame.right += borderWidth;
 		decoratorFrame.bottom += borderWidth;
 	} else {
-		decoratorFrame.top -= tabRect.Height();
+		decoratorFrame.top -= borderWidth + tabRect.Height();
 		decoratorFrame.left -= borderWidth;
 		decoratorFrame.right += borderWidth;
 		decoratorFrame.bottom += borderWidth;

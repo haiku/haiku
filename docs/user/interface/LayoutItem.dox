@@ -12,7 +12,7 @@
 
 /*!
 	\file LayoutItem.h
-	Describes the BLayoutItem class
+	\brief Describes the BLayoutItem class
 */
 
 

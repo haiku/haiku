@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-VirtualMemory	1952476689
+1	german	x-vnd.Haiku-VirtualMemory	4238590117
 Quit	SettingsWindow		Beenden
 Turn off	SettingsWindow		Ausschalten
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Wird der virtuelle Speicher ausgeschaltet, kann es zu unerwünschten Effekten und Einschränkungen der Systemstabilität kommen, sobald der physische Speicher nahezu aufgebraucht ist.\nVirtueller Speicher hat keine Auswirkungen auf die Systemleistung, bis dieser Punkt erreicht ist.\n\nSoll er trotzdem ausgeschaltet werden?
@@ -10,7 +10,6 @@ Use volume:	SettingsWindow		Auf Laufwerk:
 Keep enabled	SettingsWindow		Aktiviert lassen
 Revert	SettingsWindow		Anfangswerte
 VirtualMemory	System name		Virtueller Speicher
-Choose swap size automatically	SettingsWindow		Größe automatisch festlegen
 Use boot volume	SettingsWindow		Boot-Laufwerk verwenden
 Load defaults	SettingsWindow		Standardwerte laden
 OK	VirtualMemoryApp		OK

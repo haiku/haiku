@@ -145,6 +145,6 @@ SetPanelDirectory__10BFilePanelFP9entry_ref
 {
 	self->SetPanelDirectory(r);
 }
-	
+
 }
 #endif

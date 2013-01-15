@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-VirtualMemory	1952476689
+1	swedish	x-vnd.Haiku-VirtualMemory	4238590117
 Quit	SettingsWindow		Avsluta
 Turn off	SettingsWindow		Stäng av
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Om du stänger av det virtuella minnet så kommer det att orsaka instabilitet i systemet när minnet är fullt.\nVirtuellt minne påverkar inte systemets prestanda när det inte används.\n\nÄr du säker på att du vill inaktivera virtuellt minne?
@@ -10,7 +10,6 @@ Use volume:	SettingsWindow		Använd volym:
 Keep enabled	SettingsWindow		Behåll aktiverad
 Revert	SettingsWindow		Återgå
 VirtualMemory	System name		VirtuelltMinne
-Choose swap size automatically	SettingsWindow		Välj swap storlek automatiskt
 Use boot volume	SettingsWindow		Använd boot volym
 Load defaults	SettingsWindow		Läs in standardvärden
 OK	VirtualMemoryApp		OK

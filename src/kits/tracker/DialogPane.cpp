@@ -505,7 +505,7 @@ PaneSwitch::DrawInState(PaneSwitch::State state)
 	switch (state) {
 		case kCollapsed:
 			BeginLineArray(6);
-			
+
 			if (fLeftAligned) {
 				AddLine(BPoint(rect.left + 3, rect.top + 1),
 					BPoint(rect.left + 3, rect.bottom - 1), outlineColor);

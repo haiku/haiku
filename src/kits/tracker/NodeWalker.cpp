@@ -258,7 +258,7 @@ status_t
 TNodeWalker::PopDirCommon()
 {
 	ASSERT(fTopIndex >= 0);
-	
+
 	// done with the old dir, pop it
 	fDirs.RemoveItemAt(fTopIndex);
 	fTopIndex--;
@@ -303,7 +303,7 @@ TNodeWalker::GetNextEntry(BEntry* entry, bool traverse)
 		fIncludeTopDir = false;
 		return fTopDir->GetEntry(entry);
 	}
-	
+
 	// Get the next entry.
 	status_t err = fTopDir->GetNextEntry(entry, traverse);
 
@@ -346,7 +346,7 @@ TNodeWalker::GetNextRef(entry_ref* ref)
 			err = entry.GetRef(ref);
 		return err;
 	}
-	
+
 	// Get the next entry.
 	status_t err = fTopDir->GetNextRef(ref);
 	if (err != B_OK) {
@@ -370,7 +370,7 @@ build_dirent(const BEntry* source, struct dirent* ent,
 {
 	entry_ref ref;
 	source->GetRef(&ref);
-		
+
 	size_t recordLength = strlen(ref.name) + sizeof(dirent);
 	if (recordLength > size || count <= 0)
 		// can't fit in buffer, bail
@@ -424,7 +424,7 @@ TNodeWalker::GetNextDirents(struct dirent* ent, size_t size, int32 count)
 
 		return build_dirent(fJustFile, ent, size, count);
 	}
-	
+
 	// Get the next entry.
 	int32 result = fTopDir->GetNextDirents(ent, size, count);
 
