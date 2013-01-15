@@ -1,7 +1,7 @@
 
 # package dependencies
 #
-# For transitive dependencies dependants should be listed before their
+# For transitive dependencies dependents should be listed before their
 # dependencies.
 
 OptionalPackageDependencies APR-util : APR Expat ;
