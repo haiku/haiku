@@ -917,6 +917,8 @@ Inode::RecallReadDelegation()
 void
 Inode::ReturnDelegation(bool truncate)
 {
+	ASSERT(fDelegation != NULL);
+
 	fDelegation->GiveUp(truncate);
 
 	fMetaCache.UnlockValid();
@@ -934,6 +936,8 @@ Inode::ReturnDelegation(bool truncate)
 void
 Inode::ReleaseOpenState()
 {
+	ASSERT(fOpenState != NULL);
+
 	if (fOpenState->ReleaseReference() == 1)
 		fOpenState = NULL;
 }
