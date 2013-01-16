@@ -243,7 +243,7 @@ StatusView::_ValidatePreferredSize()
 		float width = ceilf(StringWidth(fCellText[i]));
 		if (width > 0)
 			width += kHorzSpacing * 2;
-		if (width > fCellWidth[i])
+		if (width > fCellWidth[i] || i != kPositionCell)
 			fCellWidth[i] = width;
 		fPreferredSize.width += fCellWidth[i];
 	}
