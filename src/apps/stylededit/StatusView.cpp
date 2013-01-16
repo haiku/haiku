@@ -26,6 +26,7 @@
 #include <Window.h>
 
 #include "Constants.h"
+#include "StyledEditWindow.h"
 
 
 const float kHorzSpacing = 5.f;
@@ -158,16 +159,18 @@ StatusView::MouseDown(BPoint where)
 	if (!fReadOnly)
 		return;
 
-	float left = fCellWidth[kPositionCell] + fCellWidth[kEncodingCell];
-	if (where.x < left)
+	if (where.x < fCellWidth[kPositionCell])
 		return;
 
+	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	float left = fCellWidth[kPositionCell] + fCellWidth[kEncodingCell];
+	if (where.x < left)
+		StyledEditWindow::PopulateEncodingMenu(menu, fEncoding);
+	else
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Unlock file"),
+					new BMessage(UNLOCK_FILE)));
 	where.x = left;
 	where.y = Bounds().bottom;
-
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Unlock file"),
-			new BMessage(UNLOCK_FILE)));
 
 	ConvertToScreen(&where);
 	menu->SetTargetForItems(this);
@@ -188,20 +191,21 @@ StatusView::SetStatus(BMessage* message)
 		fCellText[kPositionCell].SetTo(info);
 	}
 
-	BString encoding;
-	if (B_OK == message->FindString("encoding", &encoding)) {
+	if (B_OK == message->FindString("encoding", &fEncoding)) {
 		// sometime corresponding Int-32 "encoding" attrib is read as string :(
-		if (encoding.Length() == 0
-			|| encoding.Compare("\xff\xff") == 0
-			|| encoding.Compare("UTF-8") == 0)
+		if (fEncoding.Length() == 0
+			|| fEncoding.Compare("\xff\xff") == 0
+			|| fEncoding.Compare("UTF-8") == 0)
 		{
 			fCellText[kEncodingCell] = "UTF-8";
+			fEncoding.Truncate(0);
 		} else {
 			const BCharacterSet* charset
-				= BCharacterSetRoster::FindCharacterSetByName(encoding);
+				= BCharacterSetRoster::FindCharacterSetByName(fEncoding);
 			fCellText[kEncodingCell]
 				= charset != NULL ? charset->GetPrintName() : "";
 		}
+		fCellText[kEncodingCell] << " " UTF8_EXPAND_ARROW;
 	}
 
 	bool modified = false;
