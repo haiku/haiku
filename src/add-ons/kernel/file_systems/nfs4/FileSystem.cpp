@@ -39,6 +39,7 @@ FileSystem::FileSystem(const MountConfiguration& configuration)
 	mutex_init(&fOpenOwnerLock, NULL);
 	mutex_init(&fOpenLock, NULL);
 	mutex_init(&fDelegationLock, NULL);
+	mutex_init(&fCreateFileLock, NULL);
 }
 
 
@@ -51,6 +52,7 @@ FileSystem::~FileSystem()
 	mutex_destroy(&fDelegationLock);
 	mutex_destroy(&fOpenLock);
 	mutex_destroy(&fOpenOwnerLock);
+	mutex_destroy(&fCreateFileLock);
 
 	free(const_cast<char*>(fPath));
 	delete fRoot;

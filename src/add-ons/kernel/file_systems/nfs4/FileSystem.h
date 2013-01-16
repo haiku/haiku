@@ -74,8 +74,11 @@ public:
 
 	inline	const MountConfiguration&	GetConfiguration();
 
+	inline	mutex&				CreateFileLock();
 private:
 								FileSystem(const MountConfiguration& config);
+
+			mutex				fCreateFileLock;
 
 			mutex				fDelegationLock;
 			DoublyLinkedList<Delegation>	fDelegationList;
@@ -230,6 +233,13 @@ inline const MountConfiguration&
 FileSystem::GetConfiguration()
 {
 	return fConfiguration;
+}
+
+
+inline mutex&
+FileSystem::CreateFileLock()
+{
+	return fCreateFileLock;
 }
 
 

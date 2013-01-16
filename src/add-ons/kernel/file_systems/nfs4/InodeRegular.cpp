@@ -76,20 +76,15 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	cookie->fMode = mode;
 	cookie->fLocks = NULL;
 
-	MutexLocker _(fStateLock);
-
 	OpenState* state = new OpenState;
 	status_t result = CreateState(name, mode, perms, state, data);
 	if (result != B_OK)
 		return result;
 
 	cookie->fOpenState = state;
-	fOpenState = state;
+	cookie->fFileSystem = fFileSystem;
 
 	*id = FileIdToInoT(state->fInfo.fFileId);
-	cookie->fOpenState = fOpenState;
-
-	cookie->fFileSystem = fFileSystem;
 
 	fFileSystem->AddOpenFile(state);
 	fFileSystem->Root()->MakeInfoInvalid();
@@ -125,9 +120,11 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 
 		fFileSystem->AddOpenFile(state);
 		fOpenState = state;
+		cookie->fOpenState = state;
 		locker.Unlock();
 	} else {
 		fOpenState->AcquireReference();
+		cookie->fOpenState = fOpenState;
 		locker.Unlock();
 
 		int newMode = mode & O_RWMASK;
@@ -166,8 +163,6 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		WriteStat(&st, B_STAT_SIZE);
 		file_cache_set_size(fFileCache, 0);
 	}
-
-	cookie->fOpenState = fOpenState;
 
 	cookie->fFileSystem = fFileSystem;
 	cookie->fMode = mode;

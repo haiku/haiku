@@ -743,6 +743,9 @@ nfs4_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode,
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
+	FileSystem* fs = reinterpret_cast<FileSystem*>(volume->private_volume);
+	MutexLocker createLocker(fs->CreateFileLock());
+
 	OpenDelegationData data;
 	status_t result = inode->Create(name, openMode, perms, cookie, &data,
 		_newVnodeID);
