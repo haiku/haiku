@@ -54,7 +54,7 @@ public:
 								bool created = false);
 			void			RemoveEntry(const char* name);
 
-	inline	DirectoryCacheSnapshot* GetSnapshot();
+	inline	status_t		GetSnapshot(DirectoryCacheSnapshot** snapshot);
 
 	inline	SinglyLinkedList<NameCacheEntry>&	EntriesList();
 
@@ -113,12 +113,16 @@ DirectoryCache::Valid()
 }
 
 
-inline DirectoryCacheSnapshot*
-DirectoryCache::GetSnapshot()
+inline status_t
+DirectoryCache::GetSnapshot(DirectoryCacheSnapshot** snapshot)
 {
+	ASSERT(snapshot != NULL);
+
+	status_t result = B_OK;
 	if (fDirectoryCache == NULL)
-		_LoadSnapshot(false);
-	return fDirectoryCache;
+		result = _LoadSnapshot(false);
+	*snapshot = fDirectoryCache;
+	return result;
 }
 
 

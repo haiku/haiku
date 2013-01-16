@@ -324,8 +324,12 @@ Inode::ReadDir(void* _buffer, uint32 size, uint32* _count,
 			return result;
 		}
 
-		DirectoryCacheSnapshot* snapshot = cache->GetSnapshot();
-		ASSERT(snapshot != NULL);
+		DirectoryCacheSnapshot* snapshot;
+		result = cache->GetSnapshot(&snapshot);
+		if (result != B_OK) {
+			cache->Unlock();
+			return result;
+		}
 
 		cookie->fSnapshot = new DirectoryCacheSnapshot(*snapshot);
 		cache->Unlock();
