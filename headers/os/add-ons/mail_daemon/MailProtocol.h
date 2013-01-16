@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2013, Haiku, Inc. All Rights Reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011 Clemens Zeidler. All rights reserved.
  *
@@ -37,7 +37,7 @@ public:
 
 	virtual void				SetTotalItems(uint32 items) = 0;
 	virtual void				SetTotalItemsSize(uint64 size) = 0;
-	virtual	void				ReportProgress(uint32 messages, uint64 bytes,
+	virtual	void				ReportProgress(uint32 items, uint64 bytes,
 									const char* message = NULL) = 0;
 	virtual void				ResetProgress(const char* message = NULL) = 0;
 };
@@ -85,7 +85,7 @@ public:
 protected:
 		 	void				SetTotalItems(uint32 items);
 			void				SetTotalItemsSize(uint64 size);
-			void				ReportProgress(uint32 messages, uint64 bytes,
+			void				ReportProgress(uint32 items, uint64 bytes,
 									const char* message = NULL);
 			void				ResetProgress(const char* message = NULL);
 
