@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2013, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -59,7 +59,7 @@ protected:
 									int32 message, BPositionIO *writeTo,
 									bool showProgress);
 
-			int32				ReceiveLine(BString &line);
+			ssize_t				ReceiveLine(BString& line);
 			status_t			SendCommand(const char* cmd);
 			void				MD5Digest(unsigned char *in, char *out);
 
@@ -73,6 +73,7 @@ private:
 			int32				fNumMessages;
 			size_t				fMailDropSize;
 			BList				fSizes;
+			off_t				fTotalSize;
 			BMessage			fSettings;
 
 			BStringList			fManifest;

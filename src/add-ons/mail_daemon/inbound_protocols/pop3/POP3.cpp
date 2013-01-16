@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -144,15 +144,16 @@ POP3Protocol::SyncMessages()
 	_ReadManifest();
 
 	SetTotalItems(2);
-	ReportProgress(0, 1, B_TRANSLATE("Connect to server" B_UTF8_ELLIPSIS));
+	ReportProgress(1, 0, B_TRANSLATE("Connect to server" B_UTF8_ELLIPSIS));
 
 	status_t error = Connect();
 	if (error != B_OK) {
+		printf("POP3 could not connect: %s\n", strerror(error));
 		ResetProgress();
 		return error;
 	}
 
-	ReportProgress(0, 1, B_TRANSLATE("Getting UniqueIDs" B_UTF8_ELLIPSIS));
+	ReportProgress(1, 0, B_TRANSLATE("Getting UniqueIDs" B_UTF8_ELLIPSIS));
 
 	error = _RetrieveUniqueIDs();
 	if (error < B_OK) {
@@ -174,6 +175,7 @@ POP3Protocol::SyncMessages()
 
 	ResetProgress();
 	SetTotalItems(toDownload.CountStrings());
+	SetTotalItemsSize(fTotalSize);
 
 	printf("POP3: Messages to download: %i\n", (int)toDownload.CountStrings());
 	for (int32 i = 0; i < toDownload.CountStrings(); i++) {
@@ -230,7 +232,7 @@ POP3Protocol::SyncMessages()
 			}
 			NotifyHeaderFetched(ref, &file);
 		}
-		ReportProgress(0, 1);
+		ReportProgress(1, 0);
 
 		if (file.WriteAttr("MAIL:unique_id", B_STRING_TYPE, 0, uid,
 				strlen(uid)) < 0)
@@ -305,7 +307,7 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 	if (!leaveOnServer)
 		Delete(toRetrieve);
 
-	ReportProgress(0, 1);
+	ReportProgress(1, 0);
 	ResetProgress();
 
 	Disconnect();
@@ -361,43 +363,31 @@ POP3Protocol::Open(const char* server, int port, int)
 	if (port != 110)
 		errorMessage << ":" << port;
 
-	uint32 hostIP = inet_addr(server);
-		// first see if we can parse it as a numeric address
-	if (hostIP == 0 || hostIP == ~0UL) {
-		struct hostent * he = gethostbyname(server);
-		hostIP = he ? *((uint32*)he->h_addr) : 0;
-	}
-
-	if (hostIP == 0) {
-		errorMessage << B_TRANSLATE(": Connection refused or host not found");
-		ShowError(errorMessage.String());
-
-		return B_NAME_NOT_FOUND;
-	}
-
 	delete fServerConnection;
 	fServerConnection = NULL;
-	if (fUseSSL) {
-		fServerConnection = new(std::nothrow) BSecureSocket(
-			BNetworkAddress(server, port));
-	} else {
-		fServerConnection = new(std::nothrow) BSocket(BNetworkAddress(
-			server, port));
-	}
 
-	if (fServerConnection == NULL)
-		return B_NO_MEMORY;
-	if (fServerConnection->InitCheck() != B_OK)
-		return fServerConnection->InitCheck();
+	BNetworkAddress address(server, port);
+	if (fUseSSL)
+		fServerConnection = new(std::nothrow) BSecureSocket(address);
+	else
+		fServerConnection = new(std::nothrow) BSocket(address);
+
+	status_t status = B_NO_MEMORY;
+	if (fServerConnection != NULL)
+		status = fServerConnection->InitCheck();
 
 	BString line;
-	status_t err = ReceiveLine(line);
+	if (status == B_OK) {
+		ssize_t length = ReceiveLine(line);
+		if (length < 0)
+			status = length;
+	}
 
-	if (err < 0) {
+	if (status != B_OK) {
 		fServerConnection->Disconnect();
-		errorMessage << ": " << strerror(err);
+		errorMessage << ": " << strerror(status);
 		ShowError(errorMessage.String());
-		return B_ERROR;
+		return status;
 	}
 
 	if (strncmp(line.String(), "+OK", 3) != 0) {
@@ -585,7 +575,7 @@ POP3Protocol::Retrieve(int32 message, BPositionIO* to)
 	BString cmd;
 	cmd << "RETR " << message + 1 << CRLF;
 	status_t status = RetrieveInternal(cmd.String(), message, to, true);
-	ReportProgress(0, 1);
+	ReportProgress(1, 0);
 
 	if (status == B_OK) {
 		// Check if the actual message size matches the expected one
@@ -624,7 +614,7 @@ POP3Protocol::RetrieveInternal(const char* command, int32 message,
 	// after the message.  Of course, if we get it wrong (or it is a huge
 	// message or has lines starting with escaped periods), it will then switch
 	// back to receiving full buffers until the message is done.
-	int amountToReceive = MessageSize (message) + 3;
+	int amountToReceive = MessageSize(message) + 3;
 	if (amountToReceive >= bufSize || amountToReceive <= 0)
 		amountToReceive = bufSize - 1;
 
@@ -721,7 +711,7 @@ POP3Protocol::RetrieveInternal(const char* command, int32 message,
 			if (amountInBuffer > 4) {
 				to->Write(buf, amountInBuffer - 4);
 				if (postProgress)
-					ReportProgress(amountInBuffer - 4, 0);
+					ReportProgress(0, amountInBuffer - 4);
 				memmove (buf, buf + amountInBuffer - 4, 4);
 				amountInBuffer = 4;
 			}
@@ -729,7 +719,7 @@ POP3Protocol::RetrieveInternal(const char* command, int32 message,
 			// Dump everything - end of message or flushing the whole buffer.
 			to->Write(buf, amountInBuffer);
 			if (postProgress)
-				ReportProgress(amountInBuffer, 0);
+				ReportProgress(0, amountInBuffer);
 			amountInBuffer = 0;
 		}
 	}
@@ -761,10 +751,10 @@ POP3Protocol::MessageSize(int32 index)
 }
 
 
-int32
+ssize_t
 POP3Protocol::ReceiveLine(BString& line)
 {
-	int32 len = 0;
+	int32 length = 0;
 	bool flag = false;
 
 	line = "";
@@ -790,16 +780,16 @@ POP3Protocol::ReceiveLine(BString& line)
 			flag = true;
 		} else {
 			if (flag) {
-				len++;
+				length++;
 				line += '\r';
 				flag = false;
 			}
-			len++;
+			length++;
 			line += (char)c;
 		}
 	}
 
-	return len;
+	return length;
 }
 
 
@@ -874,6 +864,8 @@ status_t
 POP3Protocol::_RetrieveUniqueIDs()
 {
 	fUniqueIDs.MakeEmpty();
+	fSizes.MakeEmpty();
+	fTotalSize = 0;
 
 	status_t status = SendCommand("UIDL" CRLF);
 	if (status != B_OK)
@@ -903,6 +895,8 @@ POP3Protocol::_RetrieveUniqueIDs()
 			size = atol(&result.String()[index]);
 		else
 			size = 0;
+
+		fTotalSize += size;
 		fSizes.AddItem((void*)size);
 	}
 
