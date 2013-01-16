@@ -162,6 +162,12 @@ StatusView::MouseDown(BPoint where)
 	if (where.x < fCellWidth[kPositionCell])
 		return;
 
+	int32 clicks = 0;
+	BMessage* message = Window()->CurrentMessage();
+	if (message != NULL
+		&& message->FindInt32("clicks", &clicks) == B_OK && clicks > 1)
+			return;
+
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	float left = fCellWidth[kPositionCell] + fCellWidth[kEncodingCell];
 	if (where.x < left)
