@@ -38,15 +38,15 @@ public:
 			status_t			FetchBody(const entry_ref& ref);
 			status_t			DeleteMessage(const entry_ref& ref);
 
-			status_t			Retrieve(int32 message, BPositionIO *write_to);
-			status_t			GetHeader(int32 message, BPositionIO *write_to);
-			void				Delete(int32 num);
+			status_t			Retrieve(int32 message, BPositionIO* to);
+			status_t			GetHeader(int32 message, BPositionIO* to);
+			void				Delete(int32 index);
 
 protected:
 			// pop3 methods
-			status_t			Open(const char *server, int port,
+			status_t			Open(const char* server, int port,
 									int protocol);
-			status_t			Login(const char *uid, const char *password,
+			status_t			Login(const char* uid, const char* password,
 									int method);
 
 			size_t				MessageSize(int32 index);
@@ -55,13 +55,13 @@ protected:
 			size_t				MailDropSize(void);
 			void				CheckForDeletedMessages();
 
-			status_t			RetrieveInternal(const char *command,
-									int32 message, BPositionIO *writeTo,
+			status_t			RetrieveInternal(const char* command,
+									int32 message, BPositionIO* to,
 									bool showProgress);
 
 			ssize_t				ReceiveLine(BString& line);
 			status_t			SendCommand(const char* cmd);
-			void				MD5Digest(unsigned char *in, char *out);
+			void				MD5Digest(unsigned char* in, char* out);
 
 private:
 			status_t			_RetrieveUniqueIDs();
