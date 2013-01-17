@@ -681,11 +681,10 @@ div.memproto {
 	padding: 4px;
 	background-color: #f3f3f3; /* concrete */
 	border: 1px solid #c0c0c0; /* silver */
-	font-size: 13px;
 }
 
 div.memproto table {
-	font-size: 13px;
+	font-size: 14.4px;
 }
 
 /* member table */
