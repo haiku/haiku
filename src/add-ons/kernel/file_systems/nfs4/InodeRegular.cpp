@@ -36,8 +36,6 @@ Inode::CreateState(const char* name, int mode, int perms, OpenState* state,
 	if (result != B_OK)
 		return result;
 
-	RevalidateFileCache();
-
 	FileInfo fi;
 	fi.fFileId = fileID;
 	fi.fHandle = handle;
@@ -186,6 +184,7 @@ status_t
 Inode::Close(OpenFileCookie* cookie)
 {
 	ASSERT(cookie != NULL);
+	ASSERT(fOpenState == cookie->fOpenState);
 
 	SyncAndCommit();
 
@@ -371,8 +370,10 @@ Inode::WriteDirect(OpenStateCookie* cookie, off_t pos, const void* _buffer,
 		state = cookie->fOpenState;
 	}
 
-	if (!attribute)
+	if (!attribute) {
+		ReadLocker _(fWriteLock);
 		fWriteDirty = true;
+	}
 
 	while (size < *_length) {
 		uint32 len = *_length - size;
@@ -432,6 +433,8 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 status_t
 Inode::Commit()
 {
+	WriteLocker _(fWriteLock);
+
 	if (!fWriteDirty)
 		return B_OK;
 	status_t result = CommitWrites();

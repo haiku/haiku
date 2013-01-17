@@ -161,6 +161,7 @@ private:
 					OpenState*	fOpenState;
 					mutex		fStateLock;
 
+					rw_lock		fWriteLock;
 					bool		fWriteDirty;
 
 					sem_id		fAIOWait;

@@ -37,6 +37,7 @@ Inode::Inode()
 	rw_lock_init(&fDelegationLock, NULL);
 	mutex_init(&fStateLock, NULL);
 	mutex_init(&fFileCacheLock, NULL);
+	rw_lock_init(&fWriteLock, NULL);
 	mutex_init(&fAIOLock, NULL);
 }
 
@@ -147,6 +148,7 @@ Inode::~Inode()
 	mutex_destroy(&fStateLock);
 	mutex_destroy(&fFileCacheLock);
 	rw_lock_destroy(&fDelegationLock);
+	rw_lock_destroy(&fWriteLock);
 
 	ASSERT(fAIOCount == 0);
 }
@@ -938,8 +940,10 @@ Inode::ReleaseOpenState()
 {
 	ASSERT(fOpenState != NULL);
 
-	if (fOpenState->ReleaseReference() == 1)
+	if (fOpenState->ReleaseReference() == 1) {
+		ASSERT(fAIOCount == 0);
 		fOpenState = NULL;
+	}
 }
 
 
