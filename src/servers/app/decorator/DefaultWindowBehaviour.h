@@ -87,18 +87,22 @@ private:
 			friend struct ManageWindowState;
 
 private:
+			bool				_IsControlModifier(int32 modifiers) const;
 			bool				_IsWindowModifier(int32 modifiers) const;
 			Decorator::Region	_RegionFor(const BMessage* message,
 									int32& tab) const;
 
-			void				_SetBorderHighlights(int8 horizontal,
-									int8 vertical, bool active);
-
 			ServerCursor*		_ResizeCursorFor(int8 horizontal,
 									int8 vertical);
+
+			void				_SetMoveCursor();
+			void				_SetNowAllowedCursor();
 			void				_SetResizeCursor(int8 horizontal,
 									int8 vertical);
-			void				_ResetResizeCursor();
+			void				_SetBorderResizeCursor(BPoint where);
+			void				_ResetCursor();
+
+			void				_UpdateResizeArrows(BPoint where);
 	static	void				_ComputeResizeDirection(float x, float y,
 									int8& _horizontal, int8& _vertical);
 

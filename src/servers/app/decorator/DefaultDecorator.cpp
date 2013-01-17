@@ -218,7 +218,33 @@ DefaultDecorator::RegionAt(BPoint where, int32& tab) const
 	if (region != REGION_NONE)
 		return region;
 
-	// check the resize corner
+	// check the left top corner
+	BRect leftTopLeft(fLeftBorder.left, fLeftBorder.top,
+		fLeftBorder.right, fLeftBorder.top + kBorderResizeLength);
+	BRect leftTopTop(fTopBorder.left, fTopBorder.top,
+		fTopBorder.left + kBorderResizeLength, fTopBorder.bottom);
+	if (leftTopLeft.Contains(where) || leftTopTop.Contains(where))
+		return REGION_LEFT_TOP_CORNER;
+
+	// check the left bottom corner
+	BRect leftBottomLeft(fLeftBorder.left,
+		fLeftBorder.bottom - kBorderResizeLength,
+		fLeftBorder.right, fLeftBorder.bottom);
+	BRect leftBottomBottom(fBottomBorder.left,
+		fBottomBorder.top, fBottomBorder.left + kBorderResizeLength,
+		fBottomBorder.bottom);
+	if (leftBottomLeft.Contains(where) || leftBottomBottom.Contains(where))
+		return REGION_LEFT_BOTTOM_CORNER;
+
+	// check the right top corner
+	BRect rightTopRight(fRightBorder.left, fRightBorder.top,
+		fRightBorder.right, fRightBorder.top + kBorderResizeLength);
+	BRect rightTopTop(fTopBorder.right - kBorderResizeLength, fTopBorder.top,
+		fTopBorder.right, fTopBorder.bottom);
+	if (rightTopRight.Contains(where) || rightTopTop.Contains(where))
+		return REGION_RIGHT_TOP_CORNER;
+
+	// check the right bottom resize corner
 	if (fTopTab->look == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(where))
 		return REGION_RIGHT_BOTTOM_CORNER;
 
