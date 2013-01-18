@@ -127,7 +127,7 @@ public:
 	virtual	status_t			SyncMessages() = 0;
 	virtual status_t			FetchBody(const entry_ref& ref) = 0;
 	virtual	status_t			MarkMessageAsRead(const entry_ref& ref,
-									read_flags flag = B_READ);
+									read_flags flags = B_READ);
 	virtual	status_t			DeleteMessage(const entry_ref& ref) = 0;
 	virtual	status_t			AppendMessage(const entry_ref& ref);
 
