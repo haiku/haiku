@@ -1291,9 +1291,11 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fWrapItem->SetMarked(true);
 	fWrapItem->SetShortcut('W', B_OPTION_KEY);
 
+	BMessage *message = new BMessage(MENU_RELOAD);
+	message->AddString("encoding", "auto");
 	menu->AddItem(fEncodingItem = new BMenuItem(PopulateEncodingMenu(
 		new BMenu(B_TRANSLATE("Text encoding")), "UTF-8"),
-		new BMessage(MENU_RELOAD)));
+		message));
 	fEncodingItem->SetEnabled(false);
 
 	menu->AddSeparatorItem();
