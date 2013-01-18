@@ -25,12 +25,12 @@ struct MessageToken {
 class FolderListener {
 public:
 	virtual	uint32				MessageAdded(const MessageToken& fromToken,
-									const entry_ref& ref);
-	virtual void				MessageDeleted(const MessageToken& token);
+									const entry_ref& ref) = 0;
+	virtual void				MessageDeleted(const MessageToken& token) = 0;
 
 	virtual void				MessageFlagsChanged(const MessageToken& token,
 									const entry_ref& ref, uint32 oldFlags,
-									uint32 newFlags);
+									uint32 newFlags) = 0;
 };
 
 
