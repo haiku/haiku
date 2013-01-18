@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2013, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -7,6 +7,7 @@
 
 #include "FolderConfigWindow.h"
 
+#include <Alert.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -202,7 +203,6 @@ EditListView::EditListView(const char* name, list_view_type type, uint32 flags)
 	BListView(name, type, flags),
 	fLastMouseDown(NULL)
 {
-
 }
 
 
@@ -315,7 +315,19 @@ FolderConfigWindow::_LoadFolders()
 	status_t status = fProtocol.Connect(fSettings.ServerAddress(),
 		fSettings.Username(), fSettings.Password(), fSettings.UseSSL());
 	if (status != B_OK) {
-		// TODO: show error message
+		statusWindow->PostMessage(B_QUIT_REQUESTED);
+
+		// Show error message on screen
+		BString message = B_TRANSLATE("Could not connect to server "
+			"\"%server%\":\n%error%");
+		message.ReplaceFirst("%server%", fSettings.Server());
+		message.ReplaceFirst("%error%", strerror(status));
+		BAlert* alert = new BAlert("IMAP error", message.String(),
+			B_TRANSLATE("Ok"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->Go();
+
+		PostMessage(B_QUIT_REQUESTED);
+		return;
 	}
 
 	// TODO: don't get all of them at once, but retrieve them level by level
