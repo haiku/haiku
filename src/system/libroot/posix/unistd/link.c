@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -76,7 +76,12 @@ unlinkat(int fd, const char *path, int flag)
 int
 link(const char *toPath, const char *linkPath)
 {
-	RETURN_AND_SET_ERRNO(_kern_create_link(-1, linkPath, -1, toPath, true));
+	int status = _kern_create_link(-1, linkPath, -1, toPath, true);
+	// Haiku -> POSIX error mapping
+	if (status == B_UNSUPPORTED)
+		status = EPERM;
+
+	RETURN_AND_SET_ERRNO(status);
 }
 
 
