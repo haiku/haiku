@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -110,8 +110,10 @@ ConfigView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgOpenIMAPFolder:
 		{
-			BMessage settings;
-			Archive(&settings);
+			// Retrieve current settings
+			BMailAddOnSettings settings;
+			SaveInto(settings);
+
 			BWindow* window = new FolderConfigWindow(Window()->Frame(),
 				settings);
 			window->Show();
