@@ -504,6 +504,9 @@ pci_uninit(void)
 	remove_debugger_command("inb", &display_io);
 	remove_debugger_command("in8", &display_io);
 
+	remove_debugger_command("pcistatus", &pcistatus);
+	remove_debugger_command("pcirefresh", &pcirefresh);
+
 	delete gPCI;
 }
 
