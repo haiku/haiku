@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -84,4 +84,15 @@ Settings::Password() const
 	}
 
 	return "";
+}
+
+
+BPath
+Settings::Destination() const
+{
+	BString destination;
+	if (fMessage.FindString("destination", &destination) == B_OK)
+		return BPath(destination);
+
+	return "/boot/home/mail/in";
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SETTINGS_H
@@ -8,6 +8,7 @@
 
 #include <Message.h>
 #include <NetworkAddress.h>
+#include <Path.h>
 
 
 class Settings {
@@ -23,6 +24,8 @@ public:
 
 			BString				Username() const;
 			BString				Password() const;
+
+			BPath				Destination() const;
 
 private:
 			const BMessage		fMessage;

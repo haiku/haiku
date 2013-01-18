@@ -18,6 +18,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 local sources =
 #	IMAPInboundProtocol.cpp
 #	IMAPRootInboundProtocol.cpp
+	IMAPProtocol.cpp
 	ConfigView.cpp
 	FolderConfigWindow.cpp
 	IMAPFolder.cpp
