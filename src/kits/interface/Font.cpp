@@ -558,7 +558,7 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 
 // Sets the font's family and style all at once
 void
-BFont::SetFamilyAndStyle(uint32 fontcode)
+BFont::SetFamilyAndStyle(uint32 code)
 {
 	// R5 has a bug here: the face is not updated even though the IDs are set.
 	// This is a problem because the face flag includes Regular/Bold/Italic
@@ -567,8 +567,8 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	// than R5's in order to be correct
 
 	uint16 family, style;
-	style = fontcode & 0xFFFF;
-	family = (fontcode & 0xFFFF0000) >> 16;
+	style = code & 0xFFFF;
+	family = (code & 0xFFFF0000) >> 16;
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_FAMILY_AND_STYLE_IDS);
@@ -578,8 +578,8 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	link.Attach<uint16>(style);
 	link.Attach<uint16>(fFace);
 
-	int32 code;
-	if (link.FlushWithReply(code) != B_OK || code != B_OK)
+	int32 fontcode;
+	if (link.FlushWithReply(fontcode) != B_OK || fontcode != B_OK)
 		return;
 
 	link.Read<uint16>(&fFamilyID);
