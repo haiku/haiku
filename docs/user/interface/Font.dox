@@ -853,8 +853,7 @@
 	- \c B_STRIKEOUT_FACE A horizontal line is drawn through their middle.
 	- \c B_BOLD_FACE Characters are bold.
 	- \c B_REGULAR_FACE Characters are drawn normally.
-	- \c B_CONDENSED_FACE Characters are drawn squished together. Not in
-		BeOS 5.
+	- \c B_CONDENSED_FACE Characters are drawn condensed. Not in BeOS 5.
  	- \c B_LIGHT_FACE Characters are drawn thiner than normal. Not in BeOS 5.
 	- \c B_HEAVY_FACE Characters are drawn heavier than normal. Not in BeOS 5.
 
