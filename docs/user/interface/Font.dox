@@ -1,0 +1,602 @@
+/*
+ * Copyright 2013 Haiku inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *		John Scipione <jscipione@gmail.com>
+ * Corresponds to:
+ *		/trunk/headers/os/interface/Font.h	 hrev45178
+ *		/trunk/src/kits/interface/Font.cpp	 hrev45178
+ */
+
+
+/*!
+	\file Font.h
+	\brief BFont class definition and support structs and enums.
+*/
+
+
+/*!
+	\var B_FONT_FAMILY_LENGTH
+	\var B_FONT_STYLE_LENGTH
+	\typedef char font_family[B_FONT_FAMILY_LENGTH + 1];
+	\typedef char font_style[B_FONT_STYLE_LENGTH + 1];
+*/
+
+
+/*!
+	\var B_CHAR_SPACING
+	Character spacing
+*/
+
+
+/*!
+	\var B_STRING_SPACING
+	String spacing
+*/
+
+
+/*!
+	\var B_BITMAP_SPACING
+	Bitmap spacing
+*/
+
+
+/*!
+	\var B_FIXED_SPACING
+	Fixed width spacing
+*/
+
+
+/*!
+	\enum font_direction
+	Determines the direction of the font left-to-right or right-to-left.
+*/
+
+/*!
+	\var font_direction B_FONT_LEFT_TO_RIGHT
+	Left to right.
+*/
+
+/*!
+	\var font_direction B_FONT_RIGHT_TO_LEFT
+	Right to left.
+*/
+
+
+/*!
+	\var B_DISABLE_ANTIALIASING
+	Disable antialiasing.
+*/
+
+
+/*!
+	\var B_FORCE_ANTIALIASING
+	Force antialiasing.
+*/
+
+
+/*!
+	\var B_TRUNCATE_END
+	Truncate at end of the string.
+*/
+
+
+/*!
+	\var B_TRUNCATE_BEGINNING
+	Truncate at beginning of the string.
+*/
+
+
+/*!
+	\var B_TRUNCATE_MIDDLE
+	Truncate in the middle of the string.
+*/
+
+
+/*!
+	\var B_TRUNCATE_SMART
+	Perform a smart truncation of the string.
+*/
+
+
+/*!
+	\var B_UNICODE_UTF8
+	UTF-8 font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_1
+	ISO 8859-1 aka Latin 1 font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_2
+	ISO 8859-2 aka Latin 2 font encoding. It is generally intended for Eastern
+	European languages that are written in the Latin script.
+*/
+
+
+/*!
+	\var B_ISO_8859_3
+	ISO 8859-3 "South European" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_4
+	ISO 8859-4 "North European" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_5
+	ISO 8859-5 "Latin/Cyrillic" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_6
+	ISO 8859-6 "Latin/Arabic" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_7
+	ISO 8859-7 "Latin/Greek" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_8
+	ISO 8859-8 "Latin/Hebrew" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_9
+	ISO 8859-9 "Latin/Turkish" font encoding.
+*/
+
+
+/*!
+	\var B_ISO_8859_10
+	ISO 8859-10 font encoding.
+*/
+
+
+/*!
+	\var B_MACINTOSH_ROMAN
+	Macintosh Roman font encoding.
+*/
+
+
+/*!
+	\var B_HAS_TUNED_FONT
+	flags for get_font_family() and get_font_style()
+*/
+
+
+/*!
+	\var B_IS_FIXED
+	flags for get_font_family() and get_font_style()
+*/
+
+
+/*!
+	\var B_ITALIC_FACE
+	Italic font face flag.
+*/
+
+
+/*!
+	\var B_UNDERSCORE_FACE
+	Underscore font face flag.
+*/
+
+
+/*!
+	\var B_NEGATIVE_FACE
+	Negative font face flag.
+*/
+
+
+/*!
+	\var B_OUTLINED_FACE
+	Outline font face flag.
+*/
+
+
+/*!
+	\var B_STRIKEOUT_FACE
+	Strikeout font face flag.
+*/
+
+
+/*!
+	\var B_BOLD_FACE
+	Bold font face flag.
+*/
+
+
+/*!
+	\var B_REGULAR_FACE
+	Regular font face flag.
+*/
+
+
+/*!
+	\var B_CONDENSED_FACE
+	Condensed font face flag. Not in BeOS 5.
+*/
+
+
+/*!
+	\var B_LIGHT_FACE
+	Light font face flag. Not in BeOS 5.
+*/
+
+
+/*!
+	\var B_HEAVY_FACE
+	Heavy font face flag. Not in BeOS 5.
+*/
+
+
+/*!
+	\enum font_metric_mode
+	Font metric mode, screen or printing.
+*/
+
+/*!
+	\var font_metric_mode B_SCREEN_METRIC
+	Screen font metric mode.
+*/
+
+/*!
+	\var font_metric_mode B_PRINTING_METRIC
+	Print font metric mode.
+*/
+
+
+/*!
+	\enum font_file_format
+	Font file format, truetype or type1.
+*/
+
+/*!
+	\var font_file_format B_TRUETYPE_WINDOWS
+	Truetype font file format.
+*/
+
+/*!
+	\var font_file_format B_POSTSCRIPT_TYPE1_WINDOWS
+	Type1 font file format.
+*/
+
+
+/*!
+	\class unicode_block
+	\brief Unicode block class.
+*/
+
+
+/*!
+	\struct edge_info
+	\brief Edge info parameters: left or right. Both \c float type.
+*/
+
+
+/*!
+	\struct font_height
+	\brief Font height parameters: ascent, descent or leading. All \c float type.
+*/
+
+
+/*!
+	\struct escapement_delta
+	\brief Escapement delta parameters: nonspace or space. Both \c float type.
+*/
+
+
+/*!
+	\struct font_cache_info
+	\brief Font cache parameters.
+*/
+
+
+/*!
+	\var font_cache_info sheared_font_penalty
+	Sheared font penalty. Type \c int32.
+*/
+
+
+/*!
+	\var font_cache_info rotated_font_penalty
+	Rotated font penalty. Type \c int32.
+*/
+
+
+/*!
+	\var font_cache_info oversize_threshold
+	Oversize threshold. Type \c float.
+*/
+
+
+/*!
+	\var font_cache_info oversize_penalty
+	Oversize penalty. Type \c int32.
+*/
+
+/*!
+	\var font_cache_info cache_size
+	Cache size. Type \c int32.
+*/
+
+
+/*!
+	\var font_cache_info spacing_size_threshold
+	Spacing size threshold. Type \c float.
+*/
+
+
+/*!
+	\struct tuned_font_info
+	\brief Tuned font information.
+*/
+
+
+/*!
+	\var tuned_font_info size
+	Font size. Type \c float.
+*/
+
+
+/*!
+	\var tuned_font_info shear
+	Font shear. Type \c float.
+*/
+
+
+/*!
+	\var tuned_font_info rotation
+	Font rotation. Type \c float.
+*/
+
+
+/*!
+	\var tuned_font_info flags
+	Font flags. Type \c uint32.
+*/
+
+/*!
+	\var tuned_font_info face
+	Font face. Type \c uint16.
+*/
+
+
+/*!
+	\fn void _set_system_font_(const char *which, font_family family,
+		font_style style, float size)
+	\brief Private function used to replace the R5 hack which sets a
+		system font.
+
+	\param which String denoting which font to set.
+	\param family The new family for the system font.
+	\param style The new style for the system font.
+	\param size The size for the system font to have.
+
+	BeOS R5 used a global area offset table to set the system fonts in the
+	Font preferences panel.
+*/
+
+
+/*!
+	\fn int32 count_font_families()
+	\brief Gets the number of installed font families
+
+	\return The number of installed font families
+*/
+
+
+/*!
+	\fn int32 count_font_styles(font_family family)
+	\brief Gets the number of styles available for a font family.
+
+	\return The number of styles available for a font family.
+*/
+
+
+/*!
+	\fn status_t get_font_family(int32 index, font_family *_name,
+		uint32 *_flags)
+	\brief Retrieves the family name at the specified index.
+
+	\param index Unique font identifier code.
+	\param _name font_family String to receive the name of the family.
+	\param _flags if non-<tt>NULL</tt>, the values of the flags \c IS_FIXED
+		and \c B_HAS_TUNED_FONT are returned.
+
+	\return A status code, \c B_OK on success or an error code.
+	\retval B_BAD_VALUE \a _name is \c NULL.
+	\retval B_ERROR \a index does not correspond to a font family.
+*/
+
+
+/*!
+	\fn status_t get_font_style(font_family family, int32 index,
+		font_style *_name, uint32 *_flags)
+	\brief Retrieves the family name at the specified index.
+
+	\param family The font family.
+	\param index Unique font identifier code.
+	\param _name string to receive the name of the family.
+	\param _flags if non-<tt>NULL</tt>, the values of the flags \c IS_FIXED
+		and \c B_HAS_TUNED_FONT are returned
+
+	\return A status code, \c B_OK on success or an error code.
+	\retval B_ERROR \a index does not correspond to a font style.
+*/
+
+
+/*!
+	\fn status_t get_font_style(font_family family, int32 index,
+		font_style *_name, uint16 *_face, uint32 *_flags)
+	\brief Retrieves the family name at the specified index.
+
+	The face value returned by this function is not very reliable. At the same
+	time, the value returned should be fairly reliable, returning the proper
+	flag for 90%-99% of font names.
+
+	\param family The font family.
+	\param index Unique font identifier code.
+	\param _name String to receive the name of the family.
+	\param _face recipient of font face value, such as \c B_REGULAR_FACE.
+	\param _flags if non-<tt>NULL</tt>, the values of the flags \c IS_FIXED
+		and \c B_HAS_TUNED_FONT are returned.
+
+	\return A status code, \c B_OK on success or an error code.
+	\retval B_ERROR \a index does not correspond to a font style.
+*/
+
+
+/*!
+	\fn bool update_font_families(bool checkOnly)
+	\brief Updates the font family list.
+
+	\param checkOnly Parameter is ignored.
+
+	\return \c true if the font list has changed, \c false if not.
+*/
+
+
+/*!
+	\class BFont
+	\ingroup interface
+	\ingroup libbe
+	\brief A class representing a typeface including the family, style and size.
+*/
+
+
+/*!
+	\fn BFont::BFont()
+	\brief Creates and initializes a BFont object to \c be_plain_font.
+
+	\see BView::SetFont()
+*/
+
+
+/*!
+	\fn BFont::BFont(const BFont &font)
+	\brief Creates and initializes a BFont object from another BFont object.
+
+	\param font The BFont object to initialize from.
+*/
+
+
+/*!
+	\fn BFont::BFont(const BFont *font)
+	\brief Creates and initializes a BFont object from a pointer to a BFont
+		object.
+
+	\param font The pointer to a BFont object to initialize from.
+*/
+
+
+/*!
+	\fn BFont::BFont(const BFont *font)
+	\brief Creates and initializes a BFont object from a pointer to a BFont
+		object.
+
+	\param font The pointer to a BFont object to initialize from.
+*/
+
+
+/*!
+	\fn status_t BFont::SetFamilyAndStyle(const font_family family,
+		const font_style style)
+	\brief Sets the font's family and style all at once.
+
+	\param family Font family to set.
+	\param style Font style to set.
+
+	\returns A status code, \c B_OK on success or an error code.
+	\retval B_BAD_VALUE \a family is \c NULL and \a style is \c NULL.
+	\retval B_NAME_NOT_FOUND Family or style do not exist.
+*/
+
+
+/*!
+	\fn void BFont::SetFamilyAndStyle(uint32 fontcode)
+	\brief Sets the font's family and style from a font identifier.
+
+	\param code Unique font identifier obtained from the server.
+*/
+
+
+/*!
+	\fn status_t BFont::SetFamilyAndFace(const font_family family, uint16 face)
+	\brief Sets the font's family and face all at once.
+
+	\param family Font family to set.
+	\param face Font face to set.
+
+	\note To comply with the BeBook, this function will only set valid values,
+		i.e. passing a nonexistent family will cause only the face to be set.
+		Additionally, if a particular face does not exist in a family, the
+		closest match will be chosen.
+
+	\returns A status code, B_OK on success or an error code.
+	\retval B_ERROR Family does not exists or face has an invalid value.
+*/
+
+
+/*!
+	\fn void BFont::SetSize(float size)
+	\brief Set the font size.
+
+	\param size The point size to set the font to.
+*/
+
+
+/*!
+	\fn void BFont::SetShear(float shear)
+	\brief Set the angle in degrees relative to the baseline.
+
+	The default shear is 90.0° measured counterclockwise. The shear
+	range is from 45.0° to 135.0°.
+
+	\param size The shear in degrees to set the font to.
+*/
+
+
+/*!
+	\fn void BFont::SetRotation(float rotation)
+	\brief Set the font rotation from the baseline in degrees.
+
+	The default baseline is 0° and rotates counterclockwise. Rotation is not
+	supported by BTextView.
+
+	\param size The rotation in degrees to set the font to.
+*/
+
+
+/*!
+	\fn void BFont::SetFalseBoldWidth(float width)
+	\brief Set the false bold width.
+
+	\param width The false bold width to set.
+*/
+
+
+/*!
+	\fn bool BFont::IsFullAndHalfFixed() const
+	\brief Returns whether or not the font is fixed-width and contains both
+		full and half-width characters.
+
+	\note This was left unimplemented as of R5. It is a way to work with both
+		Kanji and Roman characters in the same fixed-width font.
+*/
+
