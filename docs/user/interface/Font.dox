@@ -743,7 +743,7 @@
 		Additionally, if a particular face does not exist in a family, the
 		closest match will be chosen.
 
-	\returns A status code, B_OK on success or an error code.
+	\returns A status code, \c B_OK on success or an error code.
 	\retval B_ERROR Family does not exists or face has an invalid value.
 */
 
