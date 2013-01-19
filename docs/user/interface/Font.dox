@@ -18,14 +18,6 @@
 
 
 /*!
-	\var B_FONT_FAMILY_LENGTH
-	\var B_FONT_STYLE_LENGTH
-	\typedef char font_family[B_FONT_FAMILY_LENGTH + 1];
-	\typedef char font_style[B_FONT_STYLE_LENGTH + 1];
-*/
-
-
-/*!
 	\var B_CHAR_SPACING
 	Position each character without adjustment. Best mode for printing.
 */
@@ -83,7 +75,7 @@
 
 /*!
 	\var B_TRUNCATE_END
-	Truncate at end of the string.
+	Truncate from the end of the string.
 */
 
 
@@ -261,7 +253,7 @@
 
 /*!
 	\var font_metric_mode B_PRINTING_METRIC
-	Print font metric mode.
+	Printing font metric mode.
 */
 
 
@@ -285,7 +277,7 @@
 
 /*!
 	\class unicode_block
-	\brief Provides the blocks of unicode characters supported by a font.
+	\brief Describes the blocks of Unicode characters supported by a font.
 
 	\see BFont::Blocks()
 */
@@ -293,7 +285,7 @@
 
 /*!
 	\fn unicode_block::unicode_block()
-	\brief Construct a \c unicode_block and set block data to 0LL.
+	\brief Construct a \c unicode_block and set block data to 0.
 
 	You must initialize the block data before before using this object.
 */
@@ -313,12 +305,12 @@
 	\fn bool unicode_block::Includes(const unicode_block& block) const
 	\brief Determines if \a block is a subset of the \c unicode_block object.
 
-	\param block The Unicode block to compare.
+	\param block The Unicode block to check.
 
 	\returns Whether or not \a block is a subset of the \c unicode_block
 		object.
-	\retval true \a block is a subset.
-	\retval false \a block is NOT a subset.
+	\retval true \a block is a subset of the current \c unicode_block.
+	\retval false \a block is NOT a subset of the current \c unicode_block.
 */
 
 
@@ -555,22 +547,6 @@
 
 
 /*!
-	\fn void _set_system_font_(const char *which, font_family family,
-		font_style style, float size)
-	\brief Private function used to replace the R5 hack which sets a
-		system font.
-
-	\param which String denoting which font to set.
-	\param family The new family for the system font.
-	\param style The new style for the system font.
-	\param size The size for the system font to have.
-
-	BeOS R5 used a global area offset table to set the system fonts in the
-	Font preferences panel.
-*/
-
-
-/*!
 	\fn int32 count_font_families()
 	\brief Gets the number of installed font families
 
@@ -641,7 +617,7 @@
 
 /*!
 	\fn bool update_font_families(bool checkOnly)
-	\brief Updates the font family list.
+	\brief Updates the font families list.
 
 	\param checkOnly Parameter is ignored.
 
@@ -654,14 +630,56 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief Represents a typeface including it's family, style and size.
+
+	The Interface Kit provides three prebuilt BFont objects which can be used
+	but not modified.
+	- \c const BFont* \c be_plain_font A plain font used by many controls.
+	- \c const BFont* \c be_bold_font A bold font used by titles.
+	- \c const BFont* \c be_fixed_font A fixed-width font.
+
+	A BFont object does nothing on it's own but is used in combination with
+	a view or control. Here is an example of creating a BFont object from a
+	system font and assigning it to a view:
+
+\code
+	BFont font(be_plain_font);
+	font.SetSize(12.0);
+	font.SetEncoding(B_ISO_8859_1);
+	view->SetFont(&font);
+\endcode
+
+	You may also create a BFont object from a view, modify it and reassign it
+	back to the view like this:
+
+\code
+	BFont font;
+	view->GetFont(&font);
+	font.SetFace(B_ITALIC_FACE);
+	font.SetSpacing(B_CHAR_SPACING);
+	myView->SetFont(&font);
+\endcode
+
+	You can change the way a font renders with the SetFamilyAndStyle(),
+	SetFamilyAndFace(), SetSize(), SetShear(), SetRotation(), 
+	SetFalseBoldWidth(), SetSpacing(), SetEncoding(), SetFace(), and
+	SetFlags() methods.
+
+	More information about the space taken up by a font can be determined
+	by querying a BFont object using the following methods:
+	StringWidth(), GetStringWidths() GetEscapements(), GetEdges(),
+	GetHeight(), BoundingBox() GetBoundingBoxesAsGlyphs(),
+	GetBoundingBoxesAsString(), and GetBoundingBoxesForStrings().
+
+	You can also perform intelligent string truncation with the
+	TruncateString() and GetTruncatedStrings() methods.
 */
 
 
 /*!
 	\fn BFont::BFont()
-	\brief Creates and initializes a BFont object to \c be_plain_font.
+	\brief Creates a BFont object initialized to \c be_plain_font.
 
-	\see BView::SetFont()
+	\see BView::GetFont()
 */
 
 
@@ -801,7 +819,8 @@
 
 /*!
 	\fn void BFont::SetEncoding(uint8 encoding)
-	\brief Sets the character encoding of the font.
+	\brief Sets the character encoding of the font for example
+		\c B_UNICODE_UTF8 or \c B_ISO_8859_1.
 
 	The following character encodings are supported:
 	- \c B_UNICODE_UTF8
@@ -817,7 +836,7 @@
 	- \c B_ISO_8859_10 aka Latin 6 aka "Nordic".
 	- \c B_MACINTOSH_ROMAN
 
-	\param encoding The character encoding to set.
+	\param encoding The character encoding to set the font to.
 */
 
 
@@ -839,7 +858,7 @@
  	- \c B_LIGHT_FACE Characters are drawn thiner than normal. Not in BeOS 5.
 	- \c B_HEAVY_FACE Characters are drawn heavier than normal. Not in BeOS 5.
 
-	\param face The mask of font face flags to set.
+	\param face The bitmap of font face flags to set.
 */
 
 
@@ -851,7 +870,7 @@
 	- B_DISABLE_ANTIALIASING Disable antialiasing.
 	- B_FORCE_ANTIALIASING Force antialiasing.
 
-	\param flags The mask of flags to set.
+	\param flags The bitmap of flags to set.
 */
 
 
@@ -873,6 +892,8 @@
 	\brief Gets the code of the font family and style combination.
 
 	\returns The family and style combination encoded as a unique integer.
+
+	\see SetFamilyAndStyle(uint32 code)
 */
 
 
@@ -881,14 +902,18 @@
 	\brief Gets the font size.
 
 	\returns The font size in points.
+
+	\see SetSize()
 */
 
 
 /*!
-	\fn float BFont::Size() const
+	\fn float BFont::Shear() const
 	\brief Gets the font shear.
 
 	\returns The font shear as an angle from 45.0° to 135.0°.
+
+	\see SetShear()
 */
 
 
@@ -897,6 +922,8 @@
 	\brief Gets the font rotation.
 
 	\returns The font rotation as an angle in degrees.
+
+	\see SetRotation()
 */
 
 
@@ -905,6 +932,8 @@
 	\brief Gets the width of the font as if it were bold.
 
 	\returns The font width of the bold font variety.
+
+	\see SetFalseBoldWidth()
 */
 
 
@@ -913,6 +942,8 @@
 	\brief Gets the spacing constant.
 
 	\returns The spacing constant.
+
+	\see SetSpacing()
 */
 
 
@@ -921,14 +952,18 @@
 	\brief Gets the character encoding constant.
 
 	\returns The character encoding constant.
+
+	\see SetEncoding()
 */
 
 
 /*!
 	\fn uint16 BFont::Face() const
-	\brief Gets the font face flags mask.
+	\brief Gets the font face flags bitmap.
 
-	\returns The font face flags mask.
+	\returns The font face flags bitmap.
+
+	\see SetFace()
 */
 
 
@@ -937,6 +972,8 @@
 	\brief Gets the antialiasing flags.
 
 	\returns The antialiasing flags.
+
+	\see SetFlags()
 */
 
 
@@ -976,19 +1013,19 @@
 
 /*!
 	\fn unicode_block BFont::Blocks() const
-	\brief Gets a \c unicode_block object identifying the Unicode blocks
-		supported by the font.
+	\brief Gets a \c unicode_block object that identifies the Unicode blocks
+		supported by this font face and family.
 
 	\attention Currently unimplemented, returns an empty \a unicode_block
 		object.
 
-	\returns A \c unicode_block object.
+	\returns A \c unicode_block object containing supported Unicode blocks.
 */
 
 
 /*!
 	\fn font_file_format BFont::FileFormat() const
-	\brief Gets whether the font is TrueType™ or Type1 font.
+	\brief Gets whether the font is a TrueType™ or PostScript™ Type1 font.
 
 	\returns A \c font_file_format struct containing the font file format.
 */
@@ -1010,7 +1047,7 @@
 	style only.
 
 	\param index The index of desired tuned font.
-	\param info The \a turned_font_info struct to fill out.
+	\param info The \a turned_font_info struct to be filled out.
 */
 
 
@@ -1266,6 +1303,10 @@
 	- \c B_SCREEN_METRIC The bounding boxes should use the screen metric.
 	- \c B_PRINTING_METRIC The bounding boxes should use the print metric.
 
+	Escapement deltas are applied as part of the bounding box calculations.
+	This lets you specify a character spacing is looser or tighter than
+	normal.
+
 	The \c escapement_delta structure contains the following values:
 	- \c nonspace The amount of space surrounding a character with a visible
 		glyph.
@@ -1277,37 +1318,6 @@
 	\param mode The \c font_metric_mode to use, screen or printing.
 	\param delta The \c escapement_delta structure to use.
 	\param boundingBoxArray The destination array of BRect bounding boxes.
-*/
-
-
-/*!
-	\fn void BFont::_GetBoundingBoxes(const char charArray[], int32 numChars,
-		font_metric_mode mode, bool string_escapement, escapement_delta *delta,
-		BRect boundingBoxArray[], bool asString) const
-	\brief Writes an array of BRect objects to \a boundingBoxArray
-		representing the bounding rectangles of each character in
-		\a charArray with consideration to the provided escapement
-		\a delta and \a string_escapement.
-
-	Each BRect object corresponds to the glyph of one character.
-
-	The \c font_metric_mode should contain one of the following values:
-	- \c B_SCREEN_METRIC The bounding boxes should use the screen metric.
-	- \c B_PRINTING_METRIC The bounding boxes should use the print metric.
-
-	The \c escapement_delta structure contains the following values:
-	- \c nonspace The amount of space surrounding a character with a visible
-		glyph.
-	- \c space The amount of space surrounding a whitespace character, for
-		example \c B_TAB and \c B_SPACE.
-
-	\param charArray The source character array.
-	\param numChars The number of characters to consider in \a charArray.
-	\param mode The \c font_metric_mode to use, screen or printing.
-	\param string_escapement ???
-	\param delta The \c escapement_delta structure to use.
-	\param boundingBoxArray The destination array of BRect bounding boxes.
-	\param asString ???
 */
 
 
@@ -1326,7 +1336,11 @@
 	- \c B_SCREEN_METRIC The bounding boxes should use the screen metric.
 	- \c B_PRINTING_METRIC The bounding boxes should use the print metric.
 
-	The \c escapement_delta structure contains the following values:
+	Escapement deltas are applied as part of the bounding box calculations.
+	This lets you specify a character spacing is looser or tighter than
+	normal.
+
+	The \c escapement_delta structures should contain the following values:
 	- \c nonspace The amount of space surrounding a character with a visible
 		glyph.
 	- \c space The amount of space surrounding a whitespace character, for
