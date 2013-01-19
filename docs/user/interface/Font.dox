@@ -1178,7 +1178,7 @@
 		the result in \a escapementArray with consideration to the provided
 		escapement \a delta.
 
-	The \c escapement_delta structure contains the following values:
+	The escapement_delta structure contains the following values:
 	- \c nonspace The amount of space surrounding a character with a visible
 		glyph.
 	- \c space The amount of space surrounding a whitespace character, for
@@ -1186,7 +1186,7 @@
 
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
-	\param delta The \c escapement_delta structure to use.
+	\param delta The escapement_delta structure to use.
 	\param escapementArray The destination array to put the escapements.
 */
 
@@ -1198,7 +1198,7 @@
 		the result in \a escapementArray as an array of BPoint objects
 		with consideration to the provided escapement \a delta.
 
-	The \c escapement_delta structure contains the following values:
+	The escapement_delta structure contains the following values:
 	- \c nonspace The amount of space surrounding a character with a visible
 		glyph.
 	- \c space The amount of space surrounding a whitespace character, for
@@ -1206,7 +1206,7 @@
 
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
-	\param delta The \c escapement_delta structure to use.
+	\param delta The escapement_delta structure to use.
 	\param escapementArray The destination array of escapements as BPoint
 		objects.
 */
@@ -1221,7 +1221,7 @@
 		with consideration to the provided escapement \a delta
 		and writes offsets to \a offsetArray.
 
-	The \c escapement_delta structure contains the following values:
+	The escapement_delta structure contains the following values:
 	- \c nonspace The amount of space surrounding a character with a visible
 		glyph.
 	- \c space The amount of space surrounding a whitespace character, for
@@ -1229,7 +1229,7 @@
 
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
-	\param delta The \c escapement_delta structure to use.
+	\param delta The escapement_delta structure to use.
 	\param escapementArray The destination array of escapements as BPoint
 		objects.
 	\param offsetArray The destination array of offsets as BPoint objects.
@@ -1307,7 +1307,7 @@
 	This lets you specify a character spacing is looser or tighter than
 	normal.
 
-	The \c escapement_delta structure contains the following values:
+	The escapement_delta structure contains the following values:
 	- \c nonspace The amount of space surrounding a character with a visible
 		glyph.
 	- \c space The amount of space surrounding a whitespace character, for
@@ -1316,7 +1316,7 @@
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
 	\param mode The \c font_metric_mode to use, screen or printing.
-	\param delta The \c escapement_delta structure to use.
+	\param delta The escapement_delta structure to use.
 	\param boundingBoxArray The destination array of BRect bounding boxes.
 */
 
@@ -1340,7 +1340,7 @@
 	This lets you specify a character spacing is looser or tighter than
 	normal.
 
-	The \c escapement_delta structures should contain the following values:
+	The escapement_delta structures should contain the following values:
 	- \c nonspace The amount of space surrounding a character with a visible
 		glyph.
 	- \c space The amount of space surrounding a whitespace character, for
@@ -1349,7 +1349,7 @@
 	\param stringArray The source string array.
 	\param numStrings The number of strings to consider in \a stringArray.
 	\param mode The \c font_metric_mode to use, screen or printing.
-	\param deltas The array of \c escapement_delta structures to use.
+	\param deltas The array of escapement_delta structures to use.
 	\param boundingBoxArray The destination array of BRect bounding boxes.
 */
 
