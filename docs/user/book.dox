@@ -52,6 +52,8 @@
 			retrieving information from disk.
 		- The \ref support contains support classes to use in your application
 			including resources for thread safety, IO, and serialization.
+		- The \ref translation provides a framework for converting data streams
+			between media formats.
 
 	\section special_topics Special Topics
 
@@ -541,6 +543,11 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 			- \ref support_globals "Global functions"
 			- \ref TypeConstants.h "Common types and constants"
 			- Error codes for all kits
+
+
+	\defgroup translation Translation Kit
+	\brief Provides a framework for converting data streams between media
+		formats.
 
 
 	\defgroup libbe (libbe.so)

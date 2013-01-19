@@ -641,6 +641,7 @@ INPUT                  = . \
                          midi2 \
                          storage \
                          support \
+                         translation \
                          ../../headers/os/app \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/USB3.h \
@@ -652,6 +653,7 @@ INPUT                  = . \
                          ../../headers/os/midi2 \
                          ../../headers/os/storage \
                          ../../headers/os/support \
+                         ../../headers/os/translation \
                          ../../headers/posix/syslog.h \
                          ../../src/kits/game/GameProducer.h
 
