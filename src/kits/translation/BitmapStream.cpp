@@ -18,13 +18,9 @@
 #include <Debug.h>
 
 
-/*!	Initializes this object to either use the BBitmap passed to
-	it as the object to read/write to or to create a BBitmap
-	when data is written to this object.
-
-	\param bitmap the bitmap used to read from/write to, if it is NULL, a
-		bitmap is created when this object is written to.
-*/
+// Initializes this object to either use the BBitmap passed to
+// it as the object to read/write to or to create a BBitmap
+// when data is written to this object.
 BBitmapStream::BBitmapStream(BBitmap* bitmap)
 {
 	fBitmap = bitmap;
@@ -65,16 +61,7 @@ BBitmapStream::~BBitmapStream()
 }
 
 
-/*!	Reads data from the stream at a specific position and for a
-	specific amount. The first sizeof(TranslatorBitmap) bytes
-	are the bitmap header. The header is always written out
-	and read in as Big Endian byte order.
-
-	\param pos, the position in the stream to read from buffer, where the data
-		will be read into size, the amount of data to read
-	\return B_ERROR if there is no bitmap stored by the stream, B_BAD_VALUE if
-		buffer is NULL or pos is invalid or the amount read if the result >= 0
-*/
+// Reads data from the stream at a specific position and size.
 ssize_t
 BBitmapStream::ReadAt(off_t pos, void* buffer, size_t size)
 {
@@ -104,19 +91,7 @@ BBitmapStream::ReadAt(off_t pos, void* buffer, size_t size)
 }
 
 
-/*!	Writes data to the bitmap from data, starting at position pos
-	of size, size. The first sizeof(TranslatorBitmap) bytes
-	of data must be the TranslatorBitmap header in the Big
-	Endian byte order, otherwise, the data will fail to be
-	successfully written.
-
-	\param pos, the position in the stream to write to data, the data to write
-		to the stream size, the size of the data to write to the stream
-	\return B_BAD_VALUE if size is bad or data is NULL or pos is invalid,
-		B_MISMATCHED_VALUES if the bitmap header is bad,
-		B_ERROR if error allocating memory or setting up big endian header,
-		or the amount written if the result is >= 0
-*/
+// Writes data to the bitmap starting at a specific position and size.
 ssize_t
 BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 {
@@ -198,16 +173,7 @@ BBitmapStream::WriteAt(off_t pos, const void* data, size_t size)
 }
 
 
-/*!	Changes the current stream position.
-
-	\param position the position offset
-	\param seekMode decides how the position offset is used:
-		SEEK_CUR, position is added to current stream position
-		SEEK_END, position is added to the end stream position
-		SEEK_SET, the stream position is set to position
-	\return B_BAD_VALUE if the position is bad or the new position value if the
-		result >= 0
-*/
+// Changes the current stream position.
 off_t
 BBitmapStream::Seek(off_t position, uint32 seekMode)
 {
@@ -226,8 +192,7 @@ BBitmapStream::Seek(off_t position, uint32 seekMode)
 }
 
 
-/*! Returns the current stream position
-*/
+// Returns the current stream position
 off_t
 BBitmapStream::Position() const
 {
@@ -236,8 +201,7 @@ BBitmapStream::Position() const
 
 
 
-/*! Returns the curren stream size
-*/
+// Returns the current stream size
 off_t
 BBitmapStream::Size() const
 {
@@ -245,13 +209,8 @@ BBitmapStream::Size() const
 }
 
 
-/*!	Sets the size of the data, but I'm not sure if this function has any real
-	purpose.
-
-	\param size the size to set the stream size to.
-	\return B_BAD_VALUE, if size is a bad value, B_NO_ERROR, if size is a
-		valid value
-*/
+// Sets the size of the data.
+// I'm not sure if this method has any real purpose.
 status_t
 BBitmapStream::SetSize(off_t size)
 {
@@ -272,16 +231,7 @@ BBitmapStream::SetSize(off_t size)
 }
 
 
-/*!	Returns the internal bitmap through outBitmap so the user
-	can do whatever they want to it. It means that when the
-	BBitmapStream is deleted, the bitmap is not deleted. After
-	the bitmap has been detached, it is still used by the stream,
-	but it is never deleted by the stream.
-
-	\param _bitmap where the bitmap is detached to
-	\return B_BAD_VALUE, if outBitmap is NULL, B_ERROR, if the bitmap is NULL or
-		has already been detached, B_OK, if the bitmap was successfully detached
-*/
+// Sets _bitmap to point to the internal bitmap object.
 status_t
 BBitmapStream::DetachBitmap(BBitmap** _bitmap)
 {
@@ -297,12 +247,8 @@ BBitmapStream::DetachBitmap(BBitmap** _bitmap)
 }
 
 
-/*!	Swaps the byte order of source, no matter what the
-	byte order, and copies the result to destination
-
-	\param source data to be swapped
-	\param destination where the swapped data will be copied to
-*/
+// Swaps the byte order of source, no matter the byte order, and
+// copies the result to destination.
 void
 BBitmapStream::SwapHeader(const TranslatorBitmap* source,
 	TranslatorBitmap* destination)
