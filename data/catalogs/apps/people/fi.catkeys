@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PEPL	3273435274
+1	finnish	x-vnd.Be-PEPL	2332202134
 Edit	People		Muokkaa
 Error	People		Virhe
 City	People		Kaupunki
@@ -21,6 +21,7 @@ Nickname	People		Lempinimi
 Quit	People		Lopeta
 Name	People		Nimi
 Revert	People		Palauta
+Don't save	People		Älä tallenna
 Undo	People		Peru
 E-mail	People		Sähköposti
 Load image…	People		Lataa kuva…
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Kotipuhelin
 Save as…	People		Tallenna nimellä...
 Redo	People		Tee uudelleen
+Save changes before closing?	People		Tallennetaanko muutokset ennen sulkemista?
 Paste	People		Liitä
 Drop an image here,\nor use the contextual menu.	People		Pudota kuva tänne, tai käytä\nasiayhteysvalikkoa.
 Save	People		Tallenna

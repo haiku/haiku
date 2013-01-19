@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	3779634732
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	2580969822
 common	B_COMMON_DIRECTORY		comum
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Em ícones
@@ -81,6 +81,7 @@ Decrease size	DeskWindow		Diminuir tamanho
 Size	ContainerWindow		Tamanho
 All disks	AutoMounterSettings		Todos os discos
 Would you like to find some other suitable application?	FSUtils		Você gostaria de encontrar outro aplicativo que possa servir?
+Ask before deleting for good	SettingsView		Perguntar antes de eliminar para sempre
 Finish: %time - %finishtime left	StatusWindow		Término: %time - %finishtime restante
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Bibliotecas faltantes: %library). \n
 no items	CountView		sem itens
@@ -101,6 +102,7 @@ New folder	FilePanelPriv		Nova pasta
 %name info	InfoWindow	InfoWindow Title	Informações de %name
 Favorites	FavoritesMenu		Favoritos
 Add-ons	VolumeWindow		Adicionais
+Move deleted files to Trash first	SettingsView		Mover arquivos eliminados para a Lixeira primeiro
 Sorry, you can't copy items to the Trash.	PoseView		Desculpe, você não pode copiar itens para a Lixeira.
 List view	VolumeWindow		Em lista
 matches wildcard expression	SelectionWindow		encaixa na expressão coringa

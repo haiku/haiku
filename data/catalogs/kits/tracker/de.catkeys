@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3779634732
+1	german	x-vnd.Haiku-libtracker	2580969822
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -81,6 +81,7 @@ Decrease size	DeskWindow		Verkleinern
 Size	ContainerWindow		Größe
 All disks	AutoMounterSettings		Alle Datenträger
 Would you like to find some other suitable application?	FSUtils		Soll eine andere passende Anwendung gesucht werden?
+Ask before deleting for good	SettingsView		Vor dem endgültigen Löschen nachfragen
 Finish: %time - %finishtime left	StatusWindow		Fertig: %time - Noch %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (fehlende Bibliothek: %library.). \n
 no items	CountView		keine
@@ -101,6 +102,7 @@ New folder	FilePanelPriv		Neuer Ordner
 %name info	InfoWindow	InfoWindow Title	%name Info
 Favorites	FavoritesMenu		Favoriten
 Add-ons	VolumeWindow		Add-ons
+Move deleted files to Trash first	SettingsView		Gelöschte Dateien erst in den Papierkorb verschieben
 Sorry, you can't copy items to the Trash.	PoseView		Objekte können leider nicht in den Papierkorb kopiert werden.
 List view	VolumeWindow		Listenansicht
 matches wildcard expression	SelectionWindow		entspricht Platzhalter-Ausdruck

@@ -1,9 +1,11 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	2955071341
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	2722282283
 Video using parameters form settings	MediaConverter		Vídeo utilizando definições de forma de parâmetros
 Video encoding:	MediaConverter		Codificação de vídeo:
+Error read audio frame %lld	MediaConverter		Erro ao ler quadro de áudio %lld
 No audio	Audio codecs list		Sem áudio
 Error	MediaConverter		Erro
 Error loading a file	MediaConverter		Erro ao carregar um arquivo
+Error read video frame %lld	MediaConverter		Erro ao ler quadro de vídeo %lld
 File Error	MediaConverter-FileInfo		Erro no Arquivo
 Open…	Menu		Abrir…
 Start [ms]: 	MediaConverter		Início [ms]:
@@ -22,6 +24,8 @@ Audio:	MediaConverter-FileInfo		Áudio:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 segundos
 Source files	MediaConverter		Arquivos fonte
+Error writing video frame %lld	MediaConverter		Erro gravando quadro de vídeo %lld
+Error writing audio frame %lld	MediaConverter		Erro gravando quadro de áudio %lld
 Cancelling	MediaConverter		Cancelando
 %d byte 	MediaFileInfo		%d byte
 Error loading files	MediaConverter		Erro ao carregar arquivos

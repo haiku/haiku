@@ -1,9 +1,11 @@
-1	hungarian	x-vnd.Haiku-MediaConverter	2955071341
+1	hungarian	x-vnd.Haiku-MediaConverter	2722282283
 Video using parameters form settings	MediaConverter		Videó a beállítások paramétereivel
 Video encoding:	MediaConverter		Videó kódolása:
+Error read audio frame %lld	MediaConverter		Hiba történt a %lld. hang olvasása közben
 No audio	Audio codecs list		Nincs hang
 Error	MediaConverter		Hiba
 Error loading a file	MediaConverter		Hiba történt a fájl betöltése során
+Error read video frame %lld	MediaConverter		Hiba történt a %lld. képkocka olvasása közben
 File Error	MediaConverter-FileInfo		Fájlhiba
 Open…	Menu		Megnyitás…
 Start [ms]: 	MediaConverter		Kezdet [ms]:
@@ -22,6 +24,8 @@ Audio:	MediaConverter-FileInfo		Hang:
 OK	MediaConverter-FileInfo		Rendben
  seconds	MediaFileInfo		 másodperc
 Source files	MediaConverter		Forrásfájlok
+Error writing video frame %lld	MediaConverter		Hiba történt a %lld. képkocka írása közben
+Error writing audio frame %lld	MediaConverter		Hiba történt a %lld. hang írása közben
 Cancelling	MediaConverter		Megszakítás folyamatban
 %d byte 	MediaFileInfo		%d byte
 Error loading files	MediaConverter		Hiba történt a fájlok betöltése során

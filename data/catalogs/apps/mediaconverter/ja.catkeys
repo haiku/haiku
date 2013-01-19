@@ -1,9 +1,11 @@
-1	japanese	x-vnd.Haiku-MediaConverter	2955071341
+1	japanese	x-vnd.Haiku-MediaConverter	2722282283
 Video using parameters form settings	MediaConverter		設定のパラメーターを使ったビデオ
 Video encoding:	MediaConverter		ビデオエンコーディング：
+Error read audio frame %lld	MediaConverter		オーディオフレーム %lld の読み取り時にエラーが発生しました
 No audio	Audio codecs list		オーディオ無し
 Error	MediaConverter		エラー
 Error loading a file	MediaConverter		ファイルのロード中にエラーが発生しました
+Error read video frame %lld	MediaConverter		ビデオフレーム %lld の読み取り時にエラーが発生しました
 File Error	MediaConverter-FileInfo		ファイルエラー
 Open…	Menu		開く…
 Start [ms]: 	MediaConverter		開始 [ms]：
@@ -22,6 +24,8 @@ Audio:	MediaConverter-FileInfo		オーディオ：
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		秒
 Source files	MediaConverter		ソースファイル
+Error writing video frame %lld	MediaConverter		ビデオフレーム %lld の書き込み時にエラーが発生しました
+Error writing audio frame %lld	MediaConverter		オーディオフレーム %lld の書き出し中にエラーが発生しました
 Cancelling	MediaConverter		キャンセル中
 %d byte 	MediaFileInfo		%d バイト
 Error loading files	MediaConverter		ファイルのロード中にエラーが発生しました

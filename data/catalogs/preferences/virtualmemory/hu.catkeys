@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-VirtualMemory	4238590117
+1	hungarian	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		Kilépés
+Automatic swap management	SettingsWindow		Automatikus memória-kezelés
 Turn off	SettingsWindow		Kikapcsol
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		A virtuális memória kikapcsolása egyes esetekkor nem kívánt hatással lehet a rendszer stabilitására.\nAmíg a rendszermemória el nem fogy, addig a virtuális memória használatára nincs szükség.\n\nBiztosan ki szeretné kapcsolni ezt a funkciót?
 Requested swap file size:	SettingsWindow		Az igényelt fájl mérete:

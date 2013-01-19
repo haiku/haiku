@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	4159278285
+1	japanese	x-vnd.Haiku-libtracker	2960613375
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -78,6 +78,7 @@ Decrease size	DeskWindow		サイズを小さく
 Size	ContainerWindow		サイズ
 All disks	AutoMounterSettings		全パーティション
 Would you like to find some other suitable application?	FSUtils		他に適切なアプリケーションを検索しますか？
+Ask before deleting for good	SettingsView		完全に削除する前に尋ねる
 Finish: %time - %finishtime left	StatusWindow		終了: %time - 残り %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		%libraryライブラリーがインストールされてないため、\"%app\" を使って \"%document\" を開くことはできませんでした。
 no items	CountView		0 項目
@@ -98,6 +99,7 @@ New folder	FilePanelPriv		新規フォルダー
 %name info	InfoWindow	InfoWindow Title	%name の情報
 Favorites	FavoritesMenu		お気に入り
 Add-ons	VolumeWindow		アドオン
+Move deleted files to Trash first	SettingsView		削除されたファイルを最初にごみ箱に移動する
 Sorry, you can't copy items to the Trash.	PoseView		ごみ箱にコピーすることはできません。
 List view	VolumeWindow		一覧表示
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
