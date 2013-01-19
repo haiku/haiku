@@ -385,12 +385,12 @@ status_t set_font_cache_info(uint32 id, void *set)
 
 
 // Private function used to replace the R5 hack which sets a system font
-// R5 used a global area offset table to set the system fonts in the Font
-// preferences panel. Bleah.
 void
 _set_system_font_(const char *which, font_family family, font_style style,
 	float size)
 {
+	// R5 used a global area offset table to set the system fonts in the Font
+	// preferences panel. Bleah.
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_SET_SYSTEM_FONT);
@@ -460,13 +460,14 @@ get_font_style(font_family family, int32 index, font_style *_name,
 
 
 // Retrieves the family name at the specified index
-// The face value returned by this function is not very reliable. At the same
-// time, the value returned should be fairly reliable, returning the proper
-// flag for 90%-99% of font names.
 status_t
 get_font_style(font_family family, int32 index, font_style *_name,
 	uint16 *_face, uint32 *_flags)
 {
+	// The face value returned by this function is not very reliable. At the
+	// same time, the value returned should be fairly reliable, returning the
+	// proper flag for 90%-99% of font names.
+
 	if (_name == NULL)
 		return B_BAD_VALUE;
 
@@ -590,13 +591,14 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 
 
 // Sets the font's family and face all at once
-// To comply with the BeBook, this function will only set valid values - i.e.
-// passing a nonexistent family will cause only the face to be set.
-// Additionally, if a particular  face does not exist in a family, the closest
-// match will be chosen.
 status_t
 BFont::SetFamilyAndFace(const font_family family, uint16 face)
 {
+	// To comply with the BeBook, this function will only set valid values
+	// i.e. passing a nonexistent family will cause only the face to be set.
+	// Additionally, if a particular  face does not exist in a family, the
+	// closest match will be chosen.
+
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_FAMILY_AND_STYLE_IDS);
 	link.AttachString(family, sizeof(font_family));
@@ -796,11 +798,12 @@ BFont::IsFixed() const
 
 // Returns whether or not the font is fixed-width and contains both
 // full and half-width characters.
-// This was left unimplemented as of R5. It is a way to work with both
-// Kanji and Roman characters in the same fixed-width font.
 bool
 BFont::IsFullAndHalfFixed() const
 {
+	// This was left unimplemented as of R5. It is a way to work with both
+	// Kanji and Roman characters in the same fixed-width font.
+
 	_GetExtraFlags();
 	return (fExtraFlags & B_PRIVATE_FONT_IS_FULL_AND_HALF_FIXED) != 0;
 }
@@ -993,8 +996,8 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	link.Attach<int32>(numStrings);
 
 	// TODO: all strings into a single array???
-	//	we do have a maximum message length, and it could be easily touched
-	//	here...
+	// we do have a maximum message length, and it could be easily touched
+	// here...
 	for (int32 i = 0; i < numStrings; i++)
 		link.AttachString(stringArray[i], lengthArray[i]);
 
