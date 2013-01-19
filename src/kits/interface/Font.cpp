@@ -1021,7 +1021,7 @@ void
 BFont::GetEscapements(const char charArray[], int32 numChars,
 	escapement_delta *delta, float escapementArray[]) const
 {
-	if (charArray = NULL || numChars < 1 || escapementArray = NULL)
+	if (charArray == NULL || numChars < 1 || escapementArray == NULL)
 		return;
 
 	BPrivate::AppServerLink link;
@@ -1063,7 +1063,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars,
 	escapement_delta *delta, BPoint escapementArray[],
 	BPoint offsetArray[]) const
 {
-	if (charArray = NULL || numChars < 1 || escapementArray = NULL)
+	if (charArray == NULL || numChars < 1 || escapementArray == NULL)
 		return;
 
 	BPrivate::AppServerLink link;
