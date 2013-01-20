@@ -45,6 +45,7 @@ private:
 			BString			fCellText[kStatusCellCount];
 			float			fCellWidth[kStatusCellCount];
 			bool			fReadOnly;
+			BString			fEncoding;
 };
 
 #endif  // STATUS_VIEW_H

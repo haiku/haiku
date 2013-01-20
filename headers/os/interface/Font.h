@@ -9,6 +9,7 @@
 #include <SupportDefs.h>
 #include <InterfaceDefs.h>
 
+
 class BPoint;
 
 
@@ -138,8 +139,8 @@ struct escapement_delta {
 
 
 struct font_cache_info {
-    int32    sheared_font_penalty;
-    int32    rotated_font_penalty;
+	int32    sheared_font_penalty;
+	int32    rotated_font_penalty;
 	float    oversize_threshold;
 	int32    oversize_penalty;
 	int32    cache_size;
@@ -352,7 +353,7 @@ unicode_block::operator&(const unicode_block& block) const
 	return result;
 }
 
-		
+
 unicode_block
 unicode_block::operator|(const unicode_block& block) const
 {
@@ -363,7 +364,7 @@ unicode_block::operator|(const unicode_block& block) const
 	return result;
 }
 
-		
+
 unicode_block&
 unicode_block::operator=(const unicode_block& block)
 {
@@ -385,5 +386,6 @@ unicode_block::operator!=(const unicode_block& block) const
 {
 	return fData[0] != block.fData[0] || fData[1] != block.fData[1];
 }
+
 
 #endif // _FONT_H_

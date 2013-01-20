@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Shortcuts	1741147146
+1	finnish	x-vnd.Haiku-Shortcuts	3661393357
 Error, NULL state description?\n	ShortcutsSpec		Virhe, NULL-tilakuvaus?\n
 MoveMouse	ShortcutsSpec		SiirräHiirtä
 OK	ShortcutsWindow		Valmis
@@ -25,6 +25,7 @@ Save	ShortcutsWindow		Tallenna
 *MouseButton 1	ShortcutsWindow		*Hiiripainike 1
 *MoveMouse +20 +0	ShortcutsWindow		*SiirräHiiri +20 +0
 MouseDown	ShortcutsSpec		HiiriAlas
+Save changes before closing?	ShortcutsWindow		Tallennetaanko muutokset ennen sulkemista?
 Remove selected shortcut	ShortcutsWindow		Poista valittu pikanäppäin
 MouseButton	ShortcutsSpec		HiiriPainike
 Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin

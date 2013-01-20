@@ -49,9 +49,10 @@ public:
 									bool caseSensitive);
 			bool				IsDocumentEntryRef(const entry_ref* ref);
 
+	static	BMenu*				PopulateEncodingMenu(BMenu* menu,
+									const char* encoding);
 private:
 			void				_InitWindow(uint32 encoding = 0);
-			BMenuItem*			_MakeEncodingMenuItem();
 			void				_LoadAttrs();
 			void				_SaveAttrs();
 			status_t			_LoadFile(entry_ref* ref,

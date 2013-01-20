@@ -44,7 +44,8 @@ public:
 
 	virtual	bool					QuitRequested();
 	virtual	void					MessageReceived(BMessage*);
-	virtual	void 					WorkspaceActivated(int32, bool);
+	virtual	void					WorkspaceActivated(int32, bool);
+	virtual	void					FrameResized(float width, float height);
 	virtual	BHandler*				ResolveSpecifier(BMessage*, int32, BMessage*,
 										int32, const char*);
 										

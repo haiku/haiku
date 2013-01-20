@@ -287,8 +287,8 @@ StyledEditWindow::MessageReceived(BMessage* message)
 		case MSG_REPLACE_ALL:
 		{
 			message->FindBool("casesens", &fCaseSensitive);
-			message->FindString("FindText",&fStringToFind);
-			message->FindString("ReplaceText",&fReplaceString);
+			message->FindString("FindText", &fStringToFind);
+			message->FindString("ReplaceText", &fReplaceString);
 
 			bool allWindows;
 			message->FindBool("allwindows", &allWindows);
@@ -1291,7 +1291,11 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fWrapItem->SetMarked(true);
 	fWrapItem->SetShortcut('W', B_OPTION_KEY);
 
-	menu->AddItem(fEncodingItem = _MakeEncodingMenuItem());
+	BMessage *message = new BMessage(MENU_RELOAD);
+	message->AddString("encoding", "auto");
+	menu->AddItem(fEncodingItem = new BMenuItem(PopulateEncodingMenu(
+		new BMenu(B_TRANSLATE("Text encoding")), "UTF-8"),
+		message));
 	fEncodingItem->SetEnabled(false);
 
 	menu->AddSeparatorItem();
@@ -1564,7 +1568,7 @@ StyledEditWindow::_UnlockFile()
 	status_t status = dir.InitCheck();
 	if (status != B_OK)
 		return status;
-	
+
 	status = entry.InitCheck();
 	if (status != B_OK)
 		return status;
@@ -1578,7 +1582,7 @@ StyledEditWindow::_UnlockFile()
 	status = file.GetStat(&st);
 	if (status != B_OK)
 		return status;
-	
+
 	st.st_mode |= S_IWUSR;
 	status = file.SetPermissions(st.st_mode);
 	if (status == B_OK)
@@ -1882,10 +1886,13 @@ StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
 }
 
 
-BMenuItem*
-StyledEditWindow::_MakeEncodingMenuItem()
+BMenu*
+StyledEditWindow::PopulateEncodingMenu(BMenu* menu, const char* currentEncoding)
 {
-	BMenu* menu = new BMenu(B_TRANSLATE("Text encoding"));
+	menu->SetRadioMode(true);
+	BString encoding(currentEncoding);
+	if (encoding.Length() == 0)
+		encoding.SetTo("UTF-8");
 
 	BCharacterSetRoster roster;
 	BCharacterSet charset;
@@ -1899,7 +1906,10 @@ StyledEditWindow::_MakeEncodingMenuItem()
 		BMessage *message = new BMessage(MENU_RELOAD);
 		if (message != NULL) {
 			message->AddString("encoding", charset.GetName());
-			menu->AddItem(new BMenuItem(name, message));
+			BMenuItem* item = new BMenuItem(name, message);
+			if (encoding.Compare(charset.GetName()) == 0)
+				item->SetMarked(true);
+			menu->AddItem(item);
 		}
 	}
 
@@ -1908,9 +1918,7 @@ StyledEditWindow::_MakeEncodingMenuItem()
 	message->AddString("encoding", "auto");
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Autodetect"), message));
 
-	menu->SetRadioMode(true);
-
-	return new BMenuItem(menu, new BMessage(MENU_RELOAD));
+	return menu;
 }
 
 

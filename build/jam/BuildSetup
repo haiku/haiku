@@ -300,6 +300,11 @@ switch $(HAIKU_CPU) {
 		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
 }
 
+# strip is required
+if ! $(HAIKU_STRIP) {
+	Exit "HAIKU_STRIP not set. Please re-run configure." ;
+}
+
 # Include embedded board-specific file.
 if $(HAIKU_BOOT_BOARD) {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)

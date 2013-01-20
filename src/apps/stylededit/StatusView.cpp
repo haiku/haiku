@@ -26,6 +26,7 @@
 #include <Window.h>
 
 #include "Constants.h"
+#include "StyledEditWindow.h"
 
 
 const float kHorzSpacing = 5.f;
@@ -158,16 +159,24 @@ StatusView::MouseDown(BPoint where)
 	if (!fReadOnly)
 		return;
 
-	float left = fCellWidth[kPositionCell] + fCellWidth[kEncodingCell];
-	if (where.x < left)
+	if (where.x < fCellWidth[kPositionCell])
 		return;
 
-	where.x = left;
-	where.y = Bounds().bottom;
+	int32 clicks = 0;
+	BMessage* message = Window()->CurrentMessage();
+	if (message != NULL
+		&& message->FindInt32("clicks", &clicks) == B_OK && clicks > 1)
+			return;
 
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Unlock file"),
-			new BMessage(UNLOCK_FILE)));
+	float left = fCellWidth[kPositionCell] + fCellWidth[kEncodingCell];
+	if (where.x < left)
+		StyledEditWindow::PopulateEncodingMenu(menu, fEncoding);
+	else
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Unlock file"),
+					new BMessage(UNLOCK_FILE)));
+	where.x = left;
+	where.y = Bounds().bottom;
 
 	ConvertToScreen(&where);
 	menu->SetTargetForItems(this);
@@ -188,20 +197,21 @@ StatusView::SetStatus(BMessage* message)
 		fCellText[kPositionCell].SetTo(info);
 	}
 
-	BString encoding;
-	if (B_OK == message->FindString("encoding", &encoding)) {
+	if (B_OK == message->FindString("encoding", &fEncoding)) {
 		// sometime corresponding Int-32 "encoding" attrib is read as string :(
-		if (encoding.Length() == 0
-			|| encoding.Compare("\xff\xff") == 0
-			|| encoding.Compare("UTF-8") == 0)
+		if (fEncoding.Length() == 0
+			|| fEncoding.Compare("\xff\xff") == 0
+			|| fEncoding.Compare("UTF-8") == 0)
 		{
 			fCellText[kEncodingCell] = "UTF-8";
+			fEncoding.Truncate(0);
 		} else {
 			const BCharacterSet* charset
-				= BCharacterSetRoster::FindCharacterSetByName(encoding);
+				= BCharacterSetRoster::FindCharacterSetByName(fEncoding);
 			fCellText[kEncodingCell]
 				= charset != NULL ? charset->GetPrintName() : "";
 		}
+		fCellText[kEncodingCell] << " " UTF8_EXPAND_ARROW;
 	}
 
 	bool modified = false;
@@ -233,7 +243,7 @@ StatusView::_ValidatePreferredSize()
 		float width = ceilf(StringWidth(fCellText[i]));
 		if (width > 0)
 			width += kHorzSpacing * 2;
-		if (width > fCellWidth[i])
+		if (width > fCellWidth[i] || i != kPositionCell)
 			fCellWidth[i] = width;
 		fPreferredSize.width += fCellWidth[i];
 	}

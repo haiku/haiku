@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3779634732
+1	hungarian	x-vnd.Haiku-libtracker	2580969822
 common	B_COMMON_DIRECTORY		Közös
 OK	WidgetAttributeText		Rendben
 Icon view	VolumeWindow		Ikon nézet
@@ -81,6 +81,7 @@ Decrease size	DeskWindow		Méret csökkentése
 Size	ContainerWindow		Méret
 All disks	AutoMounterSettings		Összes lemez
 Would you like to find some other suitable application?	FSUtils		Szeretne keresni egy másik megfelelő programot?
+Ask before deleting for good	SettingsView		Törlés előtt kérdezzen
 Finish: %time - %finishtime left	StatusWindow		Befejezés: %time - %finishtime maradt
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nem sikerült megnyitni a dokumentumot (%document) a programmal (%app).\n\tHiányzó funkciótár: %library. \n
 no items	CountView		nincs elem
@@ -101,6 +102,7 @@ New folder	FilePanelPriv		Új mappa
 %name info	InfoWindow	InfoWindow Title	%name
 Favorites	FavoritesMenu		Kedvencek
 Add-ons	VolumeWindow		Kiegészítők
+Move deleted files to Trash first	SettingsView		A törölt fájlok először a Szemetesbe kerüljenek
 Sorry, you can't copy items to the Trash.	PoseView		Sajnáljuk, de nem lehet a Szemetesbe másolni.
 List view	VolumeWindow		Lista nézet
 matches wildcard expression	SelectionWindow		megfelel a helyettesítő kifejezésnek
@@ -309,7 +311,7 @@ move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verscho
 Show Disks icon	SettingsView		„Lemezek” ikon megjelenítése
 Mount	VolumeWindow		Csatolás
 Cancel	PoseView		Mégse
-\n\t(%Ld bytes, 	FSUtils		n\t(%Ld bájt,
+\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld bájt,
 You can't move or copy items to read-only volumes.	FSUtils		Írásvédett lemezre nem lehet mozgatni vagy átmásolni elemeket.
 Unknown	FilePermissionsView		Ismeretlen
 All files and folders	FindPanel		Minden fájl és mappa

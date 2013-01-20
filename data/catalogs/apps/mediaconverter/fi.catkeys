@@ -1,9 +1,11 @@
-1	finnish	x-vnd.Haiku-MediaConverter	2955071341
+1	finnish	x-vnd.Haiku-MediaConverter	2722282283
 Video using parameters form settings	MediaConverter		Video käyttäen parametreja muotoasetuksiin
 Video encoding:	MediaConverter		Videokoodaus:
+Error read audio frame %lld	MediaConverter		Virhe luettaessa äänikehystä %lld
 No audio	Audio codecs list		Ei ääntä
 Error	MediaConverter		Virhe
 Error loading a file	MediaConverter		Virhe ladattaessa tiedostoa
+Error read video frame %lld	MediaConverter		Virheellisesti luettu videokehys %lld
 File Error	MediaConverter-FileInfo		Tiedostovirhe
 Open…	Menu		Avaa...
 Start [ms]: 	MediaConverter		Alku [ms]:
@@ -22,6 +24,8 @@ Audio:	MediaConverter-FileInfo		Ääni:
 OK	MediaConverter-FileInfo		Valmis
  seconds	MediaFileInfo		 sekuntia
 Source files	MediaConverter		Lähdetiedostot
+Error writing video frame %lld	MediaConverter		Virhe kirjoitettaessa videokehystä %lld
+Error writing audio frame %lld	MediaConverter		Virhe kirjoitettaessa äänikehystä %lld
 Cancelling	MediaConverter		Perutaan
 %d byte 	MediaFileInfo		%d tavu 
 Error loading files	MediaConverter		Virhe ladattaessa tiedostoja

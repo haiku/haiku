@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	3366038826
+1	finnish	x-vnd.Be-MAIL	233997769
 View	Mail		Näkymä
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
@@ -107,6 +107,7 @@ Close	Mail		Sulje
 No matches	Mail		Ei täsmäyksiä
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Taustaprosessi mail_daemon ei ole käynnissä. Viesti laitetaan jonoon ja lähetetään, kun mail_daemon käynnistyy.
 Really delete this signature? This cannot be undone.	Mail		Poistetaanko tämä allekirjoitus todella? Tätä ei voida perua.
+Save this message as a draft before closing?	Mail		Tallennetaanko tämä viesti luonnoksena ennen sulkemista?
 Open	Mail		Avaa
 draft	B_USER_DIRECTORY/mail/draft		luonnos
 Quote	Mail		Lainaus
@@ -120,6 +121,7 @@ Account:	Mail		Tili:
 Decoding:	Mail		Purkaminen:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		’Person’-tietotyyppiä tukevan sovelluksen löytäminen epäonnistui.
 Delete	Mail		Poista
+Don't send	Mail		Älä lähetä
 Leave as '%s'	Mail		Jätä arvoksi ’%s’
 Copy	Mail		Kopioi
 Mail couldn't find its dictionary.	Mail		Sähköpostisovellus ei löytänyt sanakirjaansa.
@@ -134,6 +136,7 @@ Font:	Mail		Kirjasin:
 (Address unavailable)	Mail		(Osoite ei ole saatavilla)
 Save address	Mail		Tallenna osoite
 Queries	Mail		Kyselyt
+Send this message before closing?	Mail		Lähetetäänkö viesti ennen sulkemista?
 Save	Mail		Tallenna
 Random	Mail		Satunnainen
 Close and 	Mail		Sulje ja 

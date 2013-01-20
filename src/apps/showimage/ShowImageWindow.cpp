@@ -1107,7 +1107,7 @@ ShowImageWindow::_LoadError(const entry_ref& ref)
 			"file or an image translator for it does not exist.",
 			"LoadAlerts"),
 		B_TRANSLATE_CONTEXT("OK", "Alerts"), NULL, NULL,
-		B_WIDTH_AS_USUAL, B_INFO_ALERT);
+		B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }

@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Haiku-VirtualMemory	4238590117
+1	japanese	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		終了
+Automatic swap management	SettingsWindow		自動仮想メモリ管理
 Turn off	SettingsWindow		無効にする
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		仮想メモリを無効にすると、使用可能な物理メモリが少なくなったときにシステムが不安定になることもあります。\n物理メモリが少なくなるまでは仮想メモリがシステムパフォーマンスに影響を与えることはありません。\n\n仮想メモリを本当に無効にしますか？
 Requested swap file size:	SettingsWindow		指定されたスワップサイズ：

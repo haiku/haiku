@@ -1,6 +1,6 @@
 1	finnish	x-vnd.Haiku-ProcessController	2887520383
 Memory usage	ProcessController		Muistikäyttö
-Do you really want to kill the team \"%s\"?	ProcessController		Haluatko todella tappaa ryhmän ”%s”?
+Do you really want to kill the team \"%s\"?	ProcessController		Haluatko todella lopettaa ryhmän ”%s”?
 Idle priority	ProcessController		Joutokäyntiprioriteetti
 Restart Deskbar	ProcessController		Käynnistä Työpöytäpalkki uudelleen
 Custom priority	ProcessController		Räätälöity prioriteetti
@@ -42,7 +42,7 @@ Usage: %s [-deskbar]\n	ProcessController		Käyttö: %s [-deskbar]\n
 ProcessController	System name		Prosessiohjain
 Real-time display priority	ProcessController		Ajantasanäyttöprioriteetti
 Please confirm	ProcessController		Vahvista
-Yes, kill this team!	ProcessController		Kyllä, tapa tämä ryhmä!
+Yes, kill this team!	ProcessController		Kyllä, lopeta tämä ryhmä!
 System resources & caches…	ProcessController		Järjestelmäresurssit ja välimuistit…
 That's no Fun!	ProcessController		Se ei ole hauskaa!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Voit suorittaa Prosessiohjaimen ikkunassa tai asentaa sen Työpöytäpalkkiin.

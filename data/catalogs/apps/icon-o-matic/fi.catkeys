@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	3069426771
+1	finnish	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
 Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		Otsikoton
 Multi Set 	Multi Set (property name)		Useita asetuksia
 any of the other lists to	Empty property list - 2nd line		mikä tahansa toisista luetteloista kohteeseen
 Save as…	Icon-O-Matic-Menu-File		Tallenna nimellä...
+Don't save	Icon-O-Matic-Menu-Settings		Älä tallenna
 Change Color	Icon-O-Matic-SetColorCmd		Vaihda väriä
 Style	Icon-O-Matic-Menus		Tyyli
 <modify path>	Icon-O-Matic-PathCmd		<muokkaa polkua>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Peru
 Click on a shape above	Empty transformers list - 1st line		Napsauta yllä olevaa hahmoa
 Add Shape	Icon-O-Matic-AddShapesCmd		Lisää hahmo
 Contour	Transformation		Ääriviiva
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Tallennetaanko muutokset nykyiseen kuvakkeeseen ennen sulkemista?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<ei tehdä mitään uudelleen>
 Perspective	Transformation		Perspektiivi
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Siirrä muunnin

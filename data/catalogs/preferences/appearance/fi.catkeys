@@ -12,13 +12,13 @@ About	DecorSettingsView		Ohjelmasta
 Off	AntialiasingSettingsView		Pois päältä
 Choose Decorator	DecorSettingsView		Valitse koristelu
 Success	Colors tab		Onnistuminen
-Inactive window tab text	Colors tab		Epäaktiivisen ikkunakahvan tekstin väri
+Inactive window tab text	Colors tab		Epäaktiivisen ikkunavälilehden tekstin väri
 About Decorator	DecorSettingsView		Koristeluohjelmasta
 Failure	Colors tab		Epäonnistuminen
 Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
 Document background	Colors tab		Dokumentin tausta
 Revert	APRWindow		Palauta
-Window tab	Colors tab		Ikkunakahva
+Window tab	Colors tab		Ikkunan välilehti
 Tooltip background	Colors tab		Työkaluvinkin tausta
 Selected menu item background	Colors tab		Valitun valikkovalinnan tausta
 Antialiasing	APRWindow		Reunanpehmennys
@@ -26,7 +26,7 @@ Navigation base	Colors tab		Navigoinnin pohja
 Selected list item text	Colors tab		Valitun luettelorivin teksti
 Window border	Colors tab		Ikkunaraja
 Double:	DecorSettingsView		Kaksikko:
-Window tab text	Colors tab		Ikkunakahvan teksti
+Window tab text	Colors tab		Ikkunavälilehden teksti
 Document text	Colors tab		Dokumentin teksti
 Navigation pulse	Colors tab		Navigoinnin välke
 Window decorator:	DecorSettingsView		Ikkunan kehystäjä:
@@ -41,7 +41,7 @@ Panel background	Colors tab		Paneelin tausta
 Menu font:	Font view		Valikkokirjasin:
 Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
-Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
+Inactive window tab	Colors tab		Epäaktiivisen ikkunavälilehden väri
 List item text	Colors tab		Luettelorivin teksti
 Appearance	System name		Ulkoasuasetukset
 Fixed font:	Font view		Tasalevyinen kirjasin:

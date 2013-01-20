@@ -1,5 +1,6 @@
-1	portuguese (brazil)	x-vnd.Haiku-VirtualMemory	4238590117
+1	portuguese (brazil)	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		Sair
+Automatic swap management	SettingsWindow		Gerenciamento automático de limpeza
 Turn off	SettingsWindow		Desligar
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desabilitar a memória virtual irá trazer efeitos indesejados na estabilidade do sistema assim que a memória estiver cheia.\nA memória virtual não irá afetar a performance do sistema até que isso aconteça.\n\nTem certeza que deseja desligá-la?
 Requested swap file size:	SettingsWindow		Tamanho necessário do arquivo de troca:

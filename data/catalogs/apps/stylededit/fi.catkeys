@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-StyledEdit	2574742746
+1	finnish	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		Tyylitetty editori
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan \”%s\”? 
 Paste	Menus		Liitä
 OK	LoadAlert		Valmis
 File	Menus		Tiedosto

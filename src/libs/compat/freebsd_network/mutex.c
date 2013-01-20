@@ -21,7 +21,7 @@ void
 mtx_init(struct mtx *mutex, const char *name, const char *type,
 	int options)
 {
-	if (options & MTX_RECURSE) {
+	if ((options & MTX_RECURSE) != 0) {
 		recursive_lock_init_etc(&mutex->u.recursive, name,
 			MUTEX_FLAG_CLONE_NAME);
 	} else {
@@ -36,7 +36,7 @@ mtx_init(struct mtx *mutex, const char *name, const char *type,
 void
 mtx_destroy(struct mtx *mutex)
 {
-	if (mutex->type & MTX_RECURSE)
+	if ((mutex->type & MTX_RECURSE) != 0)
 		recursive_lock_destroy(&mutex->u.recursive);
 	else
 		mutex_destroy(&mutex->u.mutex.lock);
