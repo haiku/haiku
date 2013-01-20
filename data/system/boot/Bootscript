@@ -117,7 +117,8 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Now ask the user if he wants to run the Installer or continue to the Desktop.
-if [ "$isReadOnly" = "yes" ]; then
+freshInstallIndicator=/boot/common/settings/fresh_install
+if [ "$isReadOnly" = "yes" -o -e $freshInstallIndicator ]; then
 	# Create Installer link (using the write overlay)
 	ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
 
@@ -190,7 +191,6 @@ fi
 
 # Check for fresh install and run post install scripts.
 postInstallDir=/boot/common/boot/post_install
-freshInstallIndicator=/boot/common/settings/fresh_install
 if [ -e $freshInstallIndicator ]; then
 	# wait a moment for things to calm down a bit
 	sleep 3
