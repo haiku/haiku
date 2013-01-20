@@ -1,23 +1,23 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 /** handling SCSI data-buffer (both usual "plain" and scatter/gather ones) */
 
 #include <string.h>
 
-#include "usb_scsi.h" 
+#include "usb_scsi.h"
 
 #include <malloc.h>
-#include "tracing.h" 
+#include "tracing.h"
 #include "sg_buffer.h"
 
 /**
@@ -77,7 +77,7 @@ realloc_sg_buffer(sg_buffer *sgb, size_t size)
 status_t
 sg_access_byte(sg_buffer *sgb, off_t offset, uchar *byte, bool b_set)
 {
-	status_t status = B_ERROR; 
+	status_t status = B_ERROR;
 	int i = 0;
 	for(; i < sgb->count; i++){
 		if(offset >= sgb->piov[i].iov_len){
@@ -101,7 +101,7 @@ sg_memcpy(sg_buffer *d_sgb, off_t d_offset,
 					sg_buffer *s_sgb, off_t s_offset, size_t size)
 {
 	status_t status = B_NO_INIT;
-	while(0 != d_sgb && 0 != s_sgb){ 
+	while(0 != d_sgb && 0 != s_sgb){
 		uchar *d_ptr = 0;
 		uchar *s_ptr = 0;
 		status = B_ERROR;
@@ -166,7 +166,7 @@ sg_buffer_len(sg_buffer *sgb, size_t *size)
 {
 	status_t status = B_NO_INIT;
 	if(0!=sgb && 0!=size){
-		int i = 0; 
+		int i = 0;
 		*size = 0;
 		for(; i < sgb->count; i++){
 			*size += sgb->piov[i].iov_len;

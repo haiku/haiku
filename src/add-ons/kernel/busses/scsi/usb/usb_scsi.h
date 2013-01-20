@@ -1,16 +1,16 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
-#ifndef _USB_SCSI_H_ 
+#ifndef _USB_SCSI_H_
 	#define _USB_SCSI_H_
 
 #ifndef _OS_H
@@ -26,7 +26,7 @@
 #endif /*_CAM_H*/
 
 #define MODULE_NAME "usb_scsi"
-	
+
 #define CONTROLLER_SCSI_BUS 0x00 /* Narrow SCSI bus. Use PI_* to alter this*/
 #define MAX_DEVICES_COUNT	0x07 /* simulate Narrow SCSI bus - 8 devices*/
 #define CONTROLLER_SCSI_ID	0x07 /* "controller" SCSI ID */
@@ -42,7 +42,7 @@
 #define PROTO_MASK		0x0000000f
 
 #define PROTO(__value) ((__value) & PROTO_MASK)
-					
+
 /* command set definitions	- are not bitmasks */
 #define CMDSET_NONE		0x00000000
 #define CMDSET_SCSI		0x00000010
@@ -59,7 +59,7 @@
 #define HAS_SET(__mask, __flag) \
 					(((__mask) & __flag) == (__flag))
 
-/* fixes - bitmasked */ 
+/* fixes - bitmasked */
 #define FIX_NO_GETMAXLUN		0x00000100
 #define FIX_FORCE_RW_TO_6		0x00000200
 #define FIX_NO_TEST_UNIT		0x00000400

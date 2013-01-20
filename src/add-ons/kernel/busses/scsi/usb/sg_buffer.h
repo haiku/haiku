@@ -1,18 +1,18 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 /** handling SCSI data-buffer (both usual "plain" and scatter/gather ones) */
- 
-#ifndef _SG_BUFFER_H_ 
+
+#ifndef _SG_BUFFER_H_
 	#define _SG_BUFFER_H_
 
 #ifndef _IOVEC_H
@@ -40,5 +40,5 @@ status_t sg_memcpy(sg_buffer *dest_sgb, off_t dest_offset,
 									 sg_buffer *src_sgb,	off_t src_offset, size_t size);
 void free_sg_buffer(sg_buffer *sgb);
 
-#endif /*_SG_BUFFER_H_*/ 
+#endif /*_SG_BUFFER_H_*/
 
