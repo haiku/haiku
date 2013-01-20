@@ -141,7 +141,7 @@ BSecureSocket::Read(void* buffer, size_t size)
 		return B_ERROR;
 
 	int bytesRead = SSL_read(fPrivate->fSSL, buffer, size);
-	if (bytesRead > 0)
+	if (bytesRead >= 0)
 		return bytesRead;
 
 	// TODO: translate SSL error codes!
@@ -156,7 +156,7 @@ BSecureSocket::Write(const void* buffer, size_t size)
 		return B_ERROR;
 
 	int bytesWritten = SSL_write(fPrivate->fSSL, buffer, size);
-	if (bytesWritten > 0)
+	if (bytesWritten >= 0)
 		return bytesWritten;
 
 	// TODO: translate SSL error codes!
