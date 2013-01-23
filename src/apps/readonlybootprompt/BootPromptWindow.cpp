@@ -289,7 +289,7 @@ BootPromptWindow::_UpdateStrings()
 		"strings, but if you like, you can join in the work at "
 		"<www.haiku-os.org>.\""));
 
-	fDesktopButton->SetLabel(B_TRANSLATE("Desktop (Live-CD)"));
+	fDesktopButton->SetLabel(B_TRANSLATE("Boot to Desktop"));
 	fInstallerButton->SetLabel(B_TRANSLATE("Run Installer"));
 
 	fLanguagesLabelView->SetText(B_TRANSLATE("Language"));
