@@ -90,8 +90,10 @@ PartitionMapAddOn::CreatePartitionHandle(BMutablePartition* partition,
 bool
 PartitionMapAddOn::CanInitialize(const BMutablePartition* partition)
 {
-	// If it's big enough, we can initialize it.
-	return partition->Size() >= 2 * partition->BlockSize();
+	// If it's big enough, but not too big (ie. larger than 2^32 blocks) we can
+	// initialize it.
+	return partition->Size() >= 2 * partition->BlockSize()
+		&& partition->Size() / partition->BlockSize() < UINT32_MAX;
 }
 
 
