@@ -459,7 +459,7 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 	EFI::Header *header = (EFI::Header *)_cookie;
 
 	partition->status = B_PARTITION_VALID;
-	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM | B_PARTITION_READ_ONLY;
+	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM;
 	partition->content_size = partition->size;
 	partition->content_cookie = header;
 
