@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 Haiku Inc. All rights reserved.
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -170,59 +170,60 @@ MainWindow::MainWindow(BRect frame)
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "root menu");
 
 	// create all the menu items
-	fWipeMI = new BMenuItem(B_TRANSLATE("Wipe (not implemented)"),
+	fWipeMenuItem = new BMenuItem(B_TRANSLATE("Wipe (not implemented)"),
 		new BMessage(MSG_FORMAT));
-	fEjectMI = new BMenuItem(B_TRANSLATE("Eject"),
+	fEjectMenuItem = new BMenuItem(B_TRANSLATE("Eject"),
 		new BMessage(MSG_EJECT), 'E');
-	fSurfaceTestMI = new BMenuItem(
+	fSurfaceTestMenuItem = new BMenuItem(
 		B_TRANSLATE("Surface test (not implemented)"),
 		new BMessage(MSG_SURFACE_TEST));
-	fRescanMI = new BMenuItem(B_TRANSLATE("Rescan"), new BMessage(MSG_RESCAN));
+	fRescanMenuItem = new BMenuItem(B_TRANSLATE("Rescan"),
+		new BMessage(MSG_RESCAN));
 
-	fCreateMI = new BMenuItem(B_TRANSLATE("Create" B_UTF8_ELLIPSIS),
+	fCreateMenuItem = new BMenuItem(B_TRANSLATE("Create" B_UTF8_ELLIPSIS),
 		new BMessage(MSG_CREATE), 'C');
-	fDeleteMI = new BMenuItem(B_TRANSLATE("Delete"),
+	fDeleteMenuItem = new BMenuItem(B_TRANSLATE("Delete"),
 		new BMessage(MSG_DELETE), 'D');
 
-	fMountMI = new BMenuItem(B_TRANSLATE("Mount"),
+	fMountMenuItem = new BMenuItem(B_TRANSLATE("Mount"),
 		new BMessage(MSG_MOUNT), 'M');
-	fUnmountMI = new BMenuItem(B_TRANSLATE("Unmount"),
+	fUnmountMenuItem = new BMenuItem(B_TRANSLATE("Unmount"),
 		new BMessage(MSG_UNMOUNT), 'U');
-	fMountAllMI = new BMenuItem(B_TRANSLATE("Mount all"),
+	fMountAllMenuItem = new BMenuItem(B_TRANSLATE("Mount all"),
 		new BMessage(MSG_MOUNT_ALL), 'M', B_SHIFT_KEY);
 
 	// Disk menu
 	fDiskMenu = new BMenu(B_TRANSLATE("Disk"));
 
-	// fDiskMenu->AddItem(fWipeMI);
+	// fDiskMenu->AddItem(fWipeMenuItem);
 	fDiskInitMenu = new BMenu(B_TRANSLATE("Initialize"));
 	fDiskMenu->AddItem(fDiskInitMenu);
 
 	fDiskMenu->AddSeparatorItem();
 
-	fDiskMenu->AddItem(fEjectMI);
-	// fDiskMenu->AddItem(fSurfaceTestMI);
-	fDiskMenu->AddItem(fRescanMI);
+	fDiskMenu->AddItem(fEjectMenuItem);
+	// fDiskMenu->AddItem(fSurfaceTestMenuItem);
+	fDiskMenu->AddItem(fRescanMenuItem);
 
 	menuBar->AddItem(fDiskMenu);
 
 	// Parition menu
 	fPartitionMenu = new BMenu(B_TRANSLATE("Partition"));
-	fPartitionMenu->AddItem(fCreateMI);
+	fPartitionMenu->AddItem(fCreateMenuItem);
 
 	fFormatMenu = new BMenu(B_TRANSLATE("Format"));
 	fPartitionMenu->AddItem(fFormatMenu);
 
-	fPartitionMenu->AddItem(fDeleteMI);
+	fPartitionMenu->AddItem(fDeleteMenuItem);
 
 	fPartitionMenu->AddSeparatorItem();
 
-	fPartitionMenu->AddItem(fMountMI);
-	fPartitionMenu->AddItem(fUnmountMI);
+	fPartitionMenu->AddItem(fMountMenuItem);
+	fPartitionMenu->AddItem(fUnmountMenuItem);
 
 	fPartitionMenu->AddSeparatorItem();
 
-	fPartitionMenu->AddItem(fMountAllMI);
+	fPartitionMenu->AddItem(fMountAllMenuItem);
 	menuBar->AddItem(fPartitionMenu);
 
 	AddChild(menuBar);
@@ -523,21 +524,21 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 	while (BMenuItem* item = fDiskInitMenu->RemoveItem((int32)0))
 		delete item;
 
-	fCreateMI->SetEnabled(false);
-	fUnmountMI->SetEnabled(false);
+	fCreateMenuItem->SetEnabled(false);
+	fUnmountMenuItem->SetEnabled(false);
 	fDiskInitMenu->SetEnabled(false);
 	fFormatMenu->SetEnabled(false);
 
 	if (!disk) {
-		fWipeMI->SetEnabled(false);
-		fEjectMI->SetEnabled(false);
-		fSurfaceTestMI->SetEnabled(false);
+		fWipeMenuItem->SetEnabled(false);
+		fEjectMenuItem->SetEnabled(false);
+		fSurfaceTestMenuItem->SetEnabled(false);
 	} else {
-//		fWipeMI->SetEnabled(true);
-		fWipeMI->SetEnabled(false);
-		fEjectMI->SetEnabled(disk->IsRemovableMedia());
-//		fSurfaceTestMI->SetEnabled(true);
-		fSurfaceTestMI->SetEnabled(false);
+//		fWipeMenuItem->SetEnabled(true);
+		fWipeMenuItem->SetEnabled(false);
+		fEjectMenuItem->SetEnabled(disk->IsRemovableMedia());
+//		fSurfaceTestMenuItem->SetEnabled(true);
+		fSurfaceTestMenuItem->SetEnabled(false);
 
 		// Create menu and items
 		BPartition* parentPartition = NULL;
@@ -547,11 +548,11 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		}
 
 		if (parentPartition && parentPartition->ContainsPartitioningSystem())
-			fCreateMI->SetEnabled(true);
+			fCreateMenuItem->SetEnabled(true);
 
 		bool prepared = disk->PrepareModifications() == B_OK;
 		fFormatMenu->SetEnabled(prepared);
-		fDeleteMI->SetEnabled(prepared);
+		fDeleteMenuItem->SetEnabled(prepared);
 
 		BPartition* partition = disk->FindDescendant(selectedPartition);
 
@@ -584,7 +585,7 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		}
 
 		// Mount items
-		if (partition) {
+		if (partition != NULL) {
 			fFormatMenu->SetEnabled(!partition->IsMounted()
 				&& !partition->IsReadOnly()
 				&& partition->Device()->HasMedia()
@@ -596,10 +597,10 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 				&& partition->IsDevice()
 				&& fDiskInitMenu->CountItems() > 0);
 
-			fDeleteMI->SetEnabled(!partition->IsMounted()
+			fDeleteMenuItem->SetEnabled(!partition->IsMounted()
 				&& !partition->IsDevice());
 
-			fMountMI->SetEnabled(!partition->IsMounted());
+			fMountMenuItem->SetEnabled(!partition->IsMounted());
 
 			bool unMountable = false;
 			if (partition->IsMounted()) {
@@ -612,10 +613,10 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 				} else
 					unMountable = true;
 			}
-			fUnmountMI->SetEnabled(unMountable);
+			fUnmountMenuItem->SetEnabled(unMountable);
 		} else {
-			fDeleteMI->SetEnabled(false);
-			fMountMI->SetEnabled(false);
+			fDeleteMenuItem->SetEnabled(false);
+			fMountMenuItem->SetEnabled(false);
 			fFormatMenu->SetEnabled(false);
 			fDiskInitMenu->SetEnabled(false);
 		}
@@ -623,11 +624,11 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		if (prepared)
 			disk->CancelModifications();
 
-		fMountAllMI->SetEnabled(true);
+		fMountAllMenuItem->SetEnabled(true);
 	}
 	if (selectedPartition < 0) {
-		fDeleteMI->SetEnabled(false);
-		fMountMI->SetEnabled(false);
+		fDeleteMenuItem->SetEnabled(false);
+		fMountMenuItem->SetEnabled(false);
 	}
 }
 

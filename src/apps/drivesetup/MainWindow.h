@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 Haiku Inc. All rights reserved.
+ * Copyright 2002-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -88,16 +88,16 @@ private:
 			BMenu*				fPartitionMenu;
 			BMenu*				fFormatMenu;
 
-			BMenuItem*			fWipeMI;
-			BMenuItem*			fEjectMI;
-			BMenuItem*			fSurfaceTestMI;
-			BMenuItem*			fRescanMI;
+			BMenuItem*			fWipeMenuItem;
+			BMenuItem*			fEjectMenuItem;
+			BMenuItem*			fSurfaceTestMenuItem;
+			BMenuItem*			fRescanMenuItem;
 
-			BMenuItem*			fCreateMI;
-			BMenuItem*			fDeleteMI;
-			BMenuItem*			fMountMI;
-			BMenuItem*			fUnmountMI;
-			BMenuItem*			fMountAllMI;
+			BMenuItem*			fCreateMenuItem;
+			BMenuItem*			fDeleteMenuItem;
+			BMenuItem*			fMountMenuItem;
+			BMenuItem*			fUnmountMenuItem;
+			BMenuItem*			fMountAllMenuItem;
 };
 
 
