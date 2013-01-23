@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel partitioning_systems efi ;
+SubDir HAIKU_TOP src add-ons kernel partitioning_systems gpt ;
 
 UsePrivateHeaders interface kernel storage ;
 UsePrivateSystemHeaders ;

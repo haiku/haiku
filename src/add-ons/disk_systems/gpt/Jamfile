@@ -4,7 +4,7 @@ UsePrivateHeaders shared storage ;
 UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE
-	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ] ;
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ] ;
 
 AddResources <disk_system>gpt : GPTDiskAddOn.rdef ;
 

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system boot loader ;
 
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
@@ -115,7 +115,7 @@ SEARCH on [ FGristFiles apple.cpp ]
     = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ] ;
 
 SEARCH on [ FGristFiles efi_gpt.cpp ]
-    = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ] ;
+    = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ] ;
 
 SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
     = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
