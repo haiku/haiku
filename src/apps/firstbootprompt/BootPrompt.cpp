@@ -28,7 +28,7 @@ main(int, char **)
 // #pragma mark -
 
 
-const char* kAppSignature = "application/x-vnd.Haiku-ReadOnlyBootPrompt";
+const char* kAppSignature = "application/x-vnd.Haiku-FirstBootPrompt";
 
 
 BootPromptApp::BootPromptApp()

@@ -69,7 +69,7 @@ country_code_for_language(const BLanguage& language)
 		return language.CountryCode();
 
 	// TODO: implement for real! For now, we just map some well known
-	// languages to countries to make ReadOnlyBootPrompt happy.
+	// languages to countries to make FirstBootPrompt happy.
 	switch ((tolower(language.Code()[0]) << 8) | tolower(language.Code()[1])) {
 		case 'be':	// Belarus
 			return "BY";

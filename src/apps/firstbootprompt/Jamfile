@@ -1,10 +1,10 @@
-SubDir HAIKU_TOP src apps readonlybootprompt ;
+SubDir HAIKU_TOP src apps firstbootprompt ;
 
 UsePrivateHeaders interface locale shared ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src preferences keymap ] ;
 
-Application ReadOnlyBootPrompt :
+Application FirstBootPrompt :
 	BootPrompt.cpp
 	BootPromptWindow.cpp
 	Keymap.cpp
@@ -13,8 +13,8 @@ Application ReadOnlyBootPrompt :
 	: BootPrompt.rdef
 ;
 
-DoCatalogs ReadOnlyBootPrompt :
-	x-vnd.Haiku-ReadOnlyBootPrompt
+DoCatalogs FirstBootPrompt :
+	x-vnd.Haiku-FirstBootPrompt
 	:
 	BootPrompt.cpp
 	BootPromptWindow.cpp

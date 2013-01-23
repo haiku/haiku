@@ -30,7 +30,7 @@ local sources =
 	TimeFormat.cpp
 	TimeUnitFormat.cpp
 	Format.cpp # Used by some of the above.
-	UnicodeChar.cpp # Already used in ReadOnlyBootPrompt.
+	UnicodeChar.cpp # Already used in FirstBootPrompt.
 
 	# old, needs investigation
 	# Currency.cpp

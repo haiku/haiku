@@ -119,7 +119,7 @@ fi
 # Now ask the user if he wants to run the Installer or continue to the Desktop.
 freshInstallIndicator=/boot/common/settings/fresh_install
 if [ "$isReadOnly" = "yes" -o -e $freshInstallIndicator ]; then
-	/bin/ReadOnlyBootPrompt
+	/bin/FirstBootPrompt
 	if [ $? -eq 0 ]; then
 		launchscript $SCRIPTS/Bootscript.cd
 		exit 0 # and return
