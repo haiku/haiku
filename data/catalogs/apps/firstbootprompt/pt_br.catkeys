@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-ReadOnlyBootPrompt	988630706
+1	brazilian_portuguese	x-vnd.Haiku-FirstBootPrompt	988630706
 Custom	BootPromptWindow		Personalizado
 Keymap	BootPromptWindow		Mapa de Teclas
 Language	BootPromptWindow		Linguagem
