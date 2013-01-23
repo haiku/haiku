@@ -31,11 +31,7 @@ Settings::ServerAddress() const
 BString
 Settings::Server() const
 {
-	BString server;
-	if (fMessage.FindString("server", &server) == B_OK)
-		return server;
-
-	return "";
+	return fMessage.GetString("server", "");
 }
 
 
@@ -53,22 +49,14 @@ Settings::Port() const
 bool
 Settings::UseSSL() const
 {
-	int32 flavor;
-	if (fMessage.FindInt32("flavor", &flavor) == B_OK)
-		return flavor == 1;
-
-	return false;
+	return fMessage.GetInt32("flavor", 1) == 1;
 }
 
 
 BString
 Settings::Username() const
 {
-	BString username;
-	if (fMessage.FindString("username", &username) == B_OK)
-		return username;
-
-	return "";
+	return fMessage.GetString("username", "");
 }
 
 
@@ -90,9 +78,19 @@ Settings::Password() const
 BPath
 Settings::Destination() const
 {
-	BString destination;
-	if (fMessage.FindString("destination", &destination) == B_OK)
-		return BPath(destination);
+	return BPath(fMessage.GetString("destination", "/boot/home/mail/in"));
+}
 
-	return "/boot/home/mail/in";
+
+int32
+Settings::MaxConnections() const
+{
+	return fMessage.GetInt32("max connections", 1);
+}
+
+
+bool
+Settings::IdleMode() const
+{
+	return fMessage.GetBool("idle", true);
 }

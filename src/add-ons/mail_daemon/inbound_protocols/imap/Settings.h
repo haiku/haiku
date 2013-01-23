@@ -27,6 +27,9 @@ public:
 
 			BPath				Destination() const;
 
+			int32				MaxConnections() const;
+			bool				IdleMode() const;
+
 private:
 			const BMessage		fMessage;
 };
