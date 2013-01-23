@@ -341,8 +341,11 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 		if (frame->CountParameters() == 0
 			&& frame->CountLocalVariables() == 0) {
 			// only dump the topmost frame
-			if (i == 0)
-				_DumpStackFrameMemory(_output, thread->GetCpuState());
+			if (i == 0) {
+				_DumpStackFrameMemory(_output, thread->GetCpuState(),
+					frame->FrameAddress(), thread->GetTeam()->GetArchitecture()
+						->StackGrowthDirection());
+			}
 			continue;
 		}
 
@@ -384,19 +387,29 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 
 void
 DebugReportGenerator::_DumpStackFrameMemory(BString& _output,
-	CpuState* state)
+	CpuState* state, target_addr_t framePointer, uint8 stackDirection)
 {
-	target_addr_t address = state->StackPointer();
-	if (fCurrentBlock == NULL || !fCurrentBlock->Contains(address)) {
-		fListener->InspectRequested(address, this);
+	target_addr_t startAddress;
+	target_addr_t endAddress;
+	if (stackDirection == STACK_GROWTH_DIRECTION_POSITIVE) {
+		startAddress = framePointer;
+		endAddress = state->StackPointer();
+	} else {
+		startAddress = state->StackPointer();
+		endAddress = framePointer;
+	}
+
+	if (fCurrentBlock == NULL || !fCurrentBlock->Contains(startAddress)) {
+		fListener->InspectRequested(startAddress, this);
 		status_t result = B_OK;
 		do {
 			result = acquire_sem(fTeamDataSem);
 		} while (result == B_INTERRUPTED);
 	}
+
 	_output << "\t\t\tFrame memory:\n";
-	UiUtils::DumpMemory(_output, 3, fCurrentBlock, address, 1, 16,
-		fCurrentBlock->BaseAddress() + fCurrentBlock->Size() - address);
+	UiUtils::DumpMemory(_output, 3, fCurrentBlock, startAddress, 1, 16,
+		endAddress - startAddress);
 }
 
 
