@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons disk_systems gpt ;
+
+UsePrivateHeaders shared storage ;
+UsePrivateSystemHeaders ;
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ] ;
+
+AddResources <disk_system>gpt : GPTDiskAddOn.rdef ;
+
+Addon <disk_system>gpt :
+	GPTDiskSystem.cpp
+	GPTDiskAddOn.cpp
+	GPTPartitionHandle.cpp
+
+	: be $(TARGET_LIBSUPC++)
+;
