@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 Haiku Inc. All rights reserved.
+ * Copyright 2006-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -222,11 +222,11 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		SetField(new BStringField(partition->ContentType()), kFilesystemColumn);
 		SetField(new BStringField(partition->ContentName()), kVolumeNameColumn);
 	} else if (partition->IsDevice()) {
+		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		if (partition->Name() != NULL && partition->Name()[0])
 			SetField(new BStringField(partition->Name()), kVolumeNameColumn);
 		else
 			SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
-		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 	} else if (partition->CountChildren() > 0) {
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
@@ -251,9 +251,13 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 	// Size
 
-	char size[1024];
-	SetField(new BStringField(string_for_size(partition->Size(), size,
-		sizeof(size))), kSizeColumn);
+	if (fSize > 0) {
+		char size[1024];
+		SetField(new BStringField(string_for_size(partition->Size(), size,
+			sizeof(size))), kSizeColumn);
+	} else {
+		SetField(new BStringField(kUnavailableString), kSizeColumn);
+	}
 
 	// Additional parameters
 
