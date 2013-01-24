@@ -1145,7 +1145,7 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 	ret = parent->DeleteChild(partition->Index());
 	if (ret != B_OK) {
 		_DisplayPartitionError(
-			B_TRANSLATE("Could not delete the selected partition."));
+			B_TRANSLATE("Could not delete the selected partition."), NULL, ret);
 		return;
 	}
 
@@ -1153,7 +1153,7 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 
 	if (ret != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("Failed to delete the partition. "
-			"No changes have been written to disk."));
+			"No changes have been written to disk."), NULL, ret);
 		return;
 	}
 
