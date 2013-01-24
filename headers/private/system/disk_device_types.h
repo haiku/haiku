@@ -25,7 +25,7 @@
 
 #define AMIGA_PARTITION_NAME			"Amiga Partition Map"
 #define APPLE_PARTITION_NAME			"Apple Partition Map"
-#define EFI_PARTITION_NAME				"EFI GUID Partition Map"
+#define EFI_PARTITION_NAME				"GUID Partition Map"
 #define INTEL_PARTITION_NAME			"Intel Partition Map"
 #define INTEL_EXTENDED_PARTITION_NAME	"Intel Extended Partition"
 #define VMDK_PARTITION_NAME				"VMDK Partition"
