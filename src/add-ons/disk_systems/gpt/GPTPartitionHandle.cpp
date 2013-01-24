@@ -102,12 +102,19 @@ GPTPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 {
 	// init to the full size (minus the first sector)
 	off_t size = Partition()->ContentSize();
-	status_t error = info->SetTo(Partition()->BlockSize(),
+	status_t status = info->SetTo(Partition()->BlockSize(),
 		size - Partition()->BlockSize());
-	if (error != B_OK)
-		return error;
+	if (status != B_OK)
+		return status;
 
-	// TODO: exclude the space of the existing partitions
+	// Exclude the space of the existing partitions
+	size_t count = Partition()->CountChildren();
+	for (size_t index = 0; index < count; index++) {
+		BMutablePartition* child = Partition()->ChildAt(index);
+		status = info->ExcludeOccupiedSpace(child->Offset(), child->Size());
+		if (status != B_OK)
+			return status;
+	}
 
 	return B_OK;
 }
