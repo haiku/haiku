@@ -6,20 +6,34 @@
 # easily add things to the image as I port them.
 
 
-SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep cal cat catattr
-	checkfs	chgrp chmod chown chroot cksum clear clockconfig cmp
-	collectcatkeys comm compress copyattr CortexAddOnHost cp csplit cut date
-	dd diff diff3 dircolors dirname df du dumpcatalog echo eject env error
-	expand expr factor false find finddir fmt fold fortune ftp gawk gdb gzip
-	gzexe getlimits groups head hostname id ifconfig <bin>install isvolume
-	join kernel_debugger kill less lessecho	lesskey link linkcatkeys listdev
-	ln locale locate logger logname ls makebootable md5sum mimeset mkdir
-	mkfifo mkfs mktemp mount mountvolume mv nl nohup notify nproc od open
-	paste patch pathchk ping pr printenv printf ps ptx pwd query rc readlink
-	ReadOnlyBootPrompt rm rmattr rmdir safemode sdiff seq sha1sum shred shuf
-	shutdown sleep sort split stat strace stty su sum sync sysinfo tac tail
-	tee test timeout touch tr true truncate tsort tty unexpand uname uniq
-	unlink unmount unzip <bin>updatedb waitfor wc wget whoami xargs xres yes
+SYSTEM_BIN = "["
+	addattr alert arp
+	base64 basename bash bc beep
+	cal cat catattr checkfs chgrp chmod chown chroot cksum clear clockconfig
+	cmp collectcatkeys comm compress copyattr CortexAddOnHost cp csplit cut
+	date dd diff diff3 dircolors dirname df du dumpcatalog
+	echo eject env error expand expr
+	factor false find finddir FirstBootPrompt fmt fold fortune ftp
+	gawk gdb gzip gzexe getlimits groups
+	head hostname
+	id ifconfig <bin>install isvolume
+	join
+	kernel_debugger kill
+	less lessecho lesskey link linkcatkeys listdev ln locale locate logger
+	logname ls
+	makebootable md5sum mimeset mkdir mkfifo mkfs mktemp mount mountvolume mv
+	nl nohup notify nproc
+	od open
+	paste patch pathchk ping pr printenv printf ps ptx pwd
+	query
+	rc readlink rm rmattr rmdir
+	safemode sdiff seq sha1sum shred shuf shutdown sleep sort split stat
+	strace stty su sum sync sysinfo
+	tac tail tee test timeout touch tr true truncate tsort tty
+	unexpand uname uniq unlink unmount unzip <bin>updatedb
+	waitfor wc wget whoami
+	xargs xres
+	yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
