@@ -702,8 +702,10 @@ DefaultWindowBehaviour::ManageWindowState::EnterState(State* previousState)
 	// Update the mouse cursor
 	if ((fWindow->Flags() & B_NOT_MOVABLE) == 0)
 		fBehavior._SetMoveCursor();
+	else if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
+		fBehavior._ResetCursor();
 	else
-		fBehavior._SetNowAllowedCursor();
+		fBehavior._SetNotAllowedCursor();
 
 	_UpdateResizeArrows(fLastMousePosition);
 }
@@ -730,8 +732,10 @@ DefaultWindowBehaviour::ManageWindowState::MouseDown(BMessage* message,
 		if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0) {
 			fBehavior._NextState(new (std::nothrow) ResizeBorderState(
 				fBehavior, where, fHorizontal, fVertical));
-		} else
-			fBehavior._SetNowAllowedCursor();
+		} else if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
+			fBehavior._ResetCursor();
+		else
+			fBehavior._SetNotAllowedCursor();
 	}
 
 	return true;
@@ -745,11 +749,13 @@ DefaultWindowBehaviour::ManageWindowState::MouseMoved(BMessage* message,
 	// Update the mouse cursor
 	if ((fDesktop->WindowAt(where)->Flags() & B_NOT_RESIZABLE) != 0
 		&& (message->FindInt32("buttons") & B_SECONDARY_MOUSE_BUTTON) != 0) {
-		fBehavior._SetNowAllowedCursor();
+		fBehavior._SetNotAllowedCursor();
 	} else if ((fDesktop->WindowAt(where)->Flags() & B_NOT_MOVABLE) == 0)
 		fBehavior._SetMoveCursor();
+	else if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
+		fBehavior._ResetCursor();
 	else
-		fBehavior._SetNowAllowedCursor();
+		fBehavior._SetNotAllowedCursor();
 
 	// If the cursor is still over our window, update the borders.
 	// Otherwise leave the state.
@@ -1182,7 +1188,7 @@ DefaultWindowBehaviour::_SetMoveCursor()
 
 
 void
-DefaultWindowBehaviour::_SetNowAllowedCursor()
+DefaultWindowBehaviour::_SetNotAllowedCursor()
 {
 	fDesktop->SetManagementCursor(
 		fDesktop->GetCursorManager().GetCursor(B_CURSOR_ID_NOT_ALLOWED));

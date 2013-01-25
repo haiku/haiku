@@ -96,7 +96,7 @@ private:
 									int8 vertical);
 
 			void				_SetMoveCursor();
-			void				_SetNowAllowedCursor();
+			void				_SetNotAllowedCursor();
 			void				_SetResizeCursor(int8 horizontal,
 									int8 vertical);
 			void				_SetBorderResizeCursor(BPoint where);
