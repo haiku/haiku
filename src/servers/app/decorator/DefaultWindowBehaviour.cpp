@@ -843,8 +843,8 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 		uint32 flags = fWindow->Flags();
 
 		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0
-			|| _IsControlModifier(fLastModifiers)
-				&& (buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+			|| (_IsControlModifier(fLastModifiers)
+				&& (buttons & B_PRIMARY_MOUSE_BUTTON) != 0)) {
 			// right mouse button or control + left mouse button
 			switch (hitRegion) {
 				case Decorator::REGION_TAB:
