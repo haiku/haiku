@@ -1149,6 +1149,15 @@ DefaultWindowBehaviour::_SetNowAllowedCursor()
 void
 DefaultWindowBehaviour::_SetResizeCursor(int8 horizontal, int8 vertical)
 {
+	if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0)
+		horizontal = vertical = NONE;
+	else {
+		if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
+			horizontal = NONE;
+		if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
+			vertical = NONE;
+	}
+
 	fDesktop->SetManagementCursor(_ResizeCursorFor(horizontal, vertical));
 }
 
@@ -1212,11 +1221,6 @@ DefaultWindowBehaviour::_SetBorderResizeCursor(BPoint where)
 		default:
 			break;
 	}
-
-	if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
-		horizontal = NONE;
-	if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
-		vertical = NONE;
 
 	_SetResizeCursor(horizontal, vertical);
 }
