@@ -700,10 +700,10 @@ void
 DefaultWindowBehaviour::ManageWindowState::EnterState(State* previousState)
 {
 	// Update the mouse cursor
-	if ((fWindow->Flags() & B_NOT_MOVABLE) != 0)
-		fBehavior._SetNotAllowedCursor();
-	else if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
+	if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
 		fBehavior._ResetCursor();
+	else if ((fWindow->Flags() & B_NOT_MOVABLE) != 0)
+		fBehavior._SetNotAllowedCursor();
 	else
 		fBehavior._SetMoveCursor();
 
@@ -729,12 +729,12 @@ DefaultWindowBehaviour::ManageWindowState::MouseDown(BMessage* message,
 				where, false, false));
 		}
 	} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
-		if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0) {
+		if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
+			fBehavior._ResetCursor();
+		else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0) {
 			fBehavior._NextState(new (std::nothrow) ResizeBorderState(
 				fBehavior, where, fHorizontal, fVertical));
-		} else if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
-			fBehavior._ResetCursor();
-		else
+		} else
 			fBehavior._SetNotAllowedCursor();
 	}
 
@@ -747,13 +747,13 @@ DefaultWindowBehaviour::ManageWindowState::MouseMoved(BMessage* message,
 	BPoint where, bool isFake)
 {
 	// Update the mouse cursor
-	if ((fDesktop->WindowAt(where)->Flags() & B_NOT_MOVABLE) != 0
+	if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
+		fBehavior._ResetCursor();
+	else if ((fDesktop->WindowAt(where)->Flags() & B_NOT_MOVABLE) != 0
 		|| ((fDesktop->WindowAt(where)->Flags() & B_NOT_RESIZABLE) != 0
 		&& (message->FindInt32("buttons") & B_SECONDARY_MOUSE_BUTTON) != 0)) {
 		fBehavior._SetNotAllowedCursor();
-	} else if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
-		fBehavior._ResetCursor();
-	else
+	} else
 		fBehavior._SetMoveCursor();
 
 	// If the cursor is still over our window, update the borders.
