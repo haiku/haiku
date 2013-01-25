@@ -265,21 +265,37 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 
 	virtual void MouseUp(BMessage* message, BPoint where)
 	{
-		if (fBehavior._IsWindowModifier(message->FindInt32("modifiers"))) {
+		int32 modifiers = message->FindInt32("modifiers");
+
+		if (fBehavior._IsWindowModifier(modifiers)) {
 			// If the window modifiers are held return to the window
 			// management state.
 			fBehavior._NextState(new(std::nothrow) ManageWindowState(
 				fBehavior, where));
-		} else
+		} else {
+			if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
+				&& fBehavior._IsControlModifier(modifiers)) {
+				fBehavior._SetBorderResizeCursor(where);
+			} else
+				fBehavior._ResetCursor();
+
 			fBehavior._NextState(NULL);
+		}
 	}
 
 	virtual void ModifiersChanged(BPoint where, int32 modifiers)
 	{
 		// Exit if user lifted window management modifiers
 		fBehavior.fLastModifiers = modifiers;
-		if (!fBehavior._IsWindowModifier(modifiers))
+		if (!fBehavior._IsWindowModifier(modifiers)) {
+			if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
+				&& fBehavior._IsControlModifier(modifiers)) {
+				fBehavior._SetBorderResizeCursor(where);
+			} else
+				fBehavior._ResetCursor();
+
 			fBehavior._NextState(NULL);
+		}
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
@@ -465,21 +481,36 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 
 	virtual void MouseUp(BMessage* message, BPoint where)
 	{
-		if (fBehavior._IsWindowModifier(message->FindInt32("modifiers"))) {
+		int32 modifiers = message->FindInt32("modifiers");
+		if (fBehavior._IsWindowModifier(modifiers)) {
 			// If the window modifiers are still held return to window
 			// management state.
 			fBehavior._NextState(new(std::nothrow) ManageWindowState(
 				fBehavior, where, fHorizontal, fVertical));
-		} else
+		} else {
+			if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
+				&& fBehavior._IsControlModifier(modifiers)) {
+				fBehavior._SetBorderResizeCursor(where);
+			} else
+				fBehavior._ResetCursor();
+		
 			fBehavior._NextState(NULL);
+		}
 	}
 
 	virtual void ModifiersChanged(BPoint where, int32 modifiers)
 	{
 		// Exit if user lifted window management modifiers
 		fBehavior.fLastModifiers = modifiers;
-		if (!fBehavior._IsWindowModifier(modifiers))
+		if (!fBehavior._IsWindowModifier(modifiers)) {
+			if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
+				&& fBehavior._IsControlModifier(modifiers)) {
+				fBehavior._SetBorderResizeCursor(where);
+			} else
+				fBehavior._ResetCursor();
+
 			fBehavior._NextState(NULL);
+		}
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
@@ -1006,11 +1037,12 @@ DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where,
 	if (fState != NULL) {
 		fState->MouseMoved(message, where, isFake);
 	} else {
-		if (_IsWindowModifier(message->FindInt32("modifiers"))) {
+		int32 modifiers = message->FindInt32("modifiers");
+		if (_IsWindowModifier(modifiers)) {
 			// Enter the window management state.
 			_NextState(new(std::nothrow) ManageWindowState(*this, where));
 		} else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-			&& _IsControlModifier(message->FindInt32("modifiers"))) {
+			&& _IsControlModifier(modifiers)) {
 			_SetBorderResizeCursor(where);
 		} else
 			_ResetCursor();
@@ -1033,6 +1065,17 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 {
 	if (fState != NULL)
 		fState->MouseUp(message, where);
+	else {
+		int32 modifiers = message->FindInt32("modifiers");
+		if (_IsWindowModifier(modifiers)) {
+			// Enter the window management state.
+			_NextState(new(std::nothrow) ManageWindowState(*this, where));
+		} else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
+			&& _IsControlModifier(modifiers)) {
+			_SetBorderResizeCursor(where);
+		} else
+			_ResetCursor();
+	}
 }
 
 
