@@ -700,12 +700,12 @@ void
 DefaultWindowBehaviour::ManageWindowState::EnterState(State* previousState)
 {
 	// Update the mouse cursor
-	if ((fWindow->Flags() & B_NOT_MOVABLE) == 0)
-		fBehavior._SetMoveCursor();
+	if ((fWindow->Flags() & B_NOT_MOVABLE) != 0)
+		fBehavior._SetNotAllowedCursor();
 	else if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
 		fBehavior._ResetCursor();
 	else
-		fBehavior._SetNotAllowedCursor();
+		fBehavior._SetMoveCursor();
 
 	_UpdateResizeArrows(fLastMousePosition);
 }
@@ -747,15 +747,14 @@ DefaultWindowBehaviour::ManageWindowState::MouseMoved(BMessage* message,
 	BPoint where, bool isFake)
 {
 	// Update the mouse cursor
-	if ((fDesktop->WindowAt(where)->Flags() & B_NOT_RESIZABLE) != 0
-		&& (message->FindInt32("buttons") & B_SECONDARY_MOUSE_BUTTON) != 0) {
+	if ((fDesktop->WindowAt(where)->Flags() & B_NOT_MOVABLE) != 0
+		|| ((fDesktop->WindowAt(where)->Flags() & B_NOT_RESIZABLE) != 0
+		&& (message->FindInt32("buttons") & B_SECONDARY_MOUSE_BUTTON) != 0)) {
 		fBehavior._SetNotAllowedCursor();
-	} else if ((fDesktop->WindowAt(where)->Flags() & B_NOT_MOVABLE) == 0)
-		fBehavior._SetMoveCursor();
-	else if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
+	} else if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
 		fBehavior._ResetCursor();
 	else
-		fBehavior._SetNotAllowedCursor();
+		fBehavior._SetMoveCursor();
 
 	// If the cursor is still over our window, update the borders.
 	// Otherwise leave the state.
@@ -772,15 +771,13 @@ DefaultWindowBehaviour::ManageWindowState::ModifiersChanged(BPoint where,
 	int32 modifiers)
 {
 	fBehavior.fLastModifiers = modifiers;
-	if (!fBehavior._IsWindowModifier(modifiers)) {
-		if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-			&& fBehavior._IsControlModifier(modifiers)) {
-			fBehavior._SetBorderResizeCursor(where);
-		} else
-			fBehavior._ResetCursor();
+	if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
+		&& fBehavior._IsControlModifier(modifiers)) {
+		fBehavior._SetBorderResizeCursor(where);
+	} else
+		fBehavior._ResetCursor();
 
-		fBehavior._NextState(NULL);
-	}
+	fBehavior._NextState(NULL);
 }
 
 
@@ -1043,12 +1040,12 @@ DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where,
 	if (fState != NULL) {
 		fState->MouseMoved(message, where, isFake);
 	} else {
-		int32 modifiers = message->FindInt32("modifiers");
-		if (_IsWindowModifier(modifiers)) {
+		fLastModifiers = message->FindInt32("modifiers");
+		if (_IsWindowModifier(fLastModifiers)) {
 			// Enter the window management state.
 			_NextState(new(std::nothrow) ManageWindowState(*this, where));
 		} else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-			&& _IsControlModifier(modifiers)) {
+			&& _IsControlModifier(fLastModifiers)) {
 			_SetBorderResizeCursor(where);
 		} else
 			_ResetCursor();
@@ -1072,12 +1069,12 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 	if (fState != NULL)
 		fState->MouseUp(message, where);
 	else {
-		int32 modifiers = message->FindInt32("modifiers");
-		if (_IsWindowModifier(modifiers)) {
+		fLastModifiers = message->FindInt32("modifiers");
+		if (_IsWindowModifier(fLastModifiers)) {
 			// Enter the window management state.
 			_NextState(new(std::nothrow) ManageWindowState(*this, where));
 		} else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-			&& _IsControlModifier(modifiers)) {
+			&& _IsControlModifier(fLastModifiers)) {
 			_SetBorderResizeCursor(where);
 		} else
 			_ResetCursor();
@@ -1095,11 +1092,12 @@ DefaultWindowBehaviour::ModifiersChanged(int32 modifiers)
 	if (fState != NULL) {
 		fState->ModifiersChanged(where, modifiers);
 	} else {
-		if (_IsWindowModifier(modifiers)) {
+		fLastModifiers = modifiers;
+		if (_IsWindowModifier(fLastModifiers)) {
 			// Enter the window management state.
 			_NextState(new(std::nothrow) ManageWindowState(*this, where));
 		} else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-			&& _IsControlModifier(modifiers)) {
+			&& _IsControlModifier(fLastModifiers)) {
 			_SetBorderResizeCursor(where);
 		} else
 			_ResetCursor();
