@@ -379,7 +379,7 @@ BScrollBar::SetValue(float value)
 		value = fMax;
 	else if (value < fMin)
 		value = fMin;
-	else if(isnan(value))
+	else if (isnan(value))
 		return;
 
 	value = roundf(value);
@@ -410,7 +410,7 @@ BScrollBar::ValueChanged(float newValue)
 {
 	TRACE("BScrollBar(%s)::ValueChanged(%.1f)\n", Name(), newValue);
 
-	if (fTarget && newValue) {
+	if (fTarget) {
 		// cache target bounds
 		BRect targetBounds = fTarget->Bounds();
 		// if vertical, check bounds top and scroll if different from newValue
