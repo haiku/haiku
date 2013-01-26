@@ -174,8 +174,8 @@ GPTPartitionHandle::CreateChild(off_t offset, off_t size,
 	// create the child
 	BMutablePartition* partition = Partition();
 	BMutablePartition* child;
-	status_t status = partition->CreateChild(0, typeString, name,
-		parameters, &child);
+	status_t status = partition->CreateChild(partition->CountChildren(),
+		typeString, name, parameters, &child);
 	if (status != B_OK)
 		return status;
 
