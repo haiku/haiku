@@ -24,7 +24,7 @@ const char* get_partition_type(const guid_t& guid);
 #ifndef _BOOT_MODE
 void to_ucs2(const char* from, size_t fromLength, uint16* to,
 	size_t maxToLength);
-const static_guid* guid_for_partition_type(const char* type);
+bool get_guid_for_partition_type(const char* type, guid_t& guid);
 #endif // !_BOOT_MODE
 
 

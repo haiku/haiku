@@ -38,9 +38,8 @@
 namespace EFI {
 
 
-Header::Header(int fd, off_t block, uint32 blockSize)
+Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 	:
-	fBlock(block),
 	fBlockSize(blockSize),
 	fStatus(B_NO_INIT),
 	fEntries(NULL)
@@ -49,8 +48,8 @@ Header::Header(int fd, off_t block, uint32 blockSize)
 
 	// read and check the partition table header
 
-	ssize_t bytesRead = read_pos(fd, block * blockSize, &fHeader,
-		sizeof(efi_table_header));
+	ssize_t bytesRead = read_pos(fd, (uint64)EFI_HEADER_LOCATION * blockSize,
+		&fHeader, sizeof(efi_table_header));
 	if (bytesRead != (ssize_t)sizeof(efi_table_header)) {
 		if (bytesRead < B_OK)
 			fStatus = bytesRead;
@@ -62,7 +61,7 @@ Header::Header(int fd, off_t block, uint32 blockSize)
 
 	if (memcmp(fHeader.header, EFI_PARTITION_HEADER, sizeof(fHeader.header))
 		|| !_ValidateHeaderCRC()
-		|| fHeader.AbsoluteBlock() != fBlock) {
+		|| fHeader.AbsoluteBlock() != EFI_HEADER_LOCATION) {
 		// TODO: check that partition counts are in valid bounds
 		fStatus = B_BAD_DATA;
 		return;
@@ -105,19 +104,21 @@ Header::Header(int fd, off_t block, uint32 blockSize)
 
 
 #ifndef _BOOT_MODE
-Header::Header(off_t block, off_t lastBlock, uint32 blockSize)
+Header::Header(uint64 lastBlock, uint32 blockSize)
 	:
-	fBlock(block),
 	fBlockSize(blockSize),
 	fStatus(B_NO_INIT),
 	fEntries(NULL)
 {
-	// initialize to an empty header
+	TRACE(("EFI::Header: Initialize GPT, block size %" B_PRIu32 "\n",
+		blockSize));
+
+	// Initialize to an empty header
 	memcpy(fHeader.header, EFI_PARTITION_HEADER, sizeof(fHeader.header));
 	fHeader.SetRevision(EFI_TABLE_REVISION);
 	fHeader.SetHeaderSize(sizeof(fHeader));
 	fHeader.SetHeaderCRC(0);
-	fHeader.SetAbsoluteBlock(fBlock);
+	fHeader.SetAbsoluteBlock(EFI_HEADER_LOCATION);
 	fHeader.SetAlternateBlock(0); // TODO
 	// TODO: set disk guid
 	fHeader.SetEntriesBlock(EFI_PARTITION_ENTRIES_BLOCK);
@@ -142,9 +143,6 @@ Header::Header(off_t block, off_t lastBlock, uint32 blockSize)
 #ifdef TRACE_EFI_GPT
 	_Dump();
 	_DumpPartitions();
-	dprintf("GPT: HERE I AM!\n");
-#else
-	dprintf("GPT: Nope!\n");
 #endif
 
 	fStatus = B_OK;
@@ -182,12 +180,26 @@ Header::WriteEntry(int fd, uint32 entryIndex)
 	// TODO: write mirror at the end
 
 	// Update header, too -- the entries CRC changed
-	return Write(fd);
+	return _WriteHeader(fd);
 }
 
 
 status_t
 Header::Write(int fd)
+{
+	status_t status = _Write(fd, fHeader.EntriesBlock() * fBlockSize, fEntries,
+		_EntryArraySize());
+	if (status != B_OK)
+		return status;
+
+	// TODO: write mirror at the end
+
+	return _WriteHeader(fd);
+}
+
+
+status_t
+Header::_WriteHeader(int fd)
 {
 	_UpdateCRC();
 
@@ -200,7 +212,6 @@ Header::Write(int fd)
 
 	return B_OK;
 }
-#endif // !_BOOT_MODE
 
 
 status_t
@@ -223,6 +234,7 @@ Header::_UpdateCRC()
 	fHeader.SetHeaderCRC(0);
 	fHeader.SetHeaderCRC(crc32((uint8*)&fHeader, sizeof(efi_table_header)));
 }
+#endif // !_BOOT_MODE
 
 
 bool
@@ -233,7 +245,6 @@ Header::_ValidateHeaderCRC()
 
 	bool matches = originalCRC == crc32((const uint8*)&fHeader,
 		sizeof(efi_table_header));
-dprintf("GPT: MATCHES %d!\n", matches);
 
 	fHeader.SetHeaderCRC(originalCRC);
 	return matches;
@@ -266,7 +277,7 @@ void
 Header::_Dump()
 {
 	dprintf("EFI header: %.8s\n", fHeader.header);
-	dprintf("EFI revision: %ld\n", fHeader.Revision());
+	dprintf("EFI revision: %" B_PRIx32 "\n", fHeader.Revision());
 	dprintf("header size: %ld\n", fHeader.HeaderSize());
 	dprintf("header CRC: %ld\n", fHeader.HeaderCRC());
 	dprintf("absolute block: %Ld\n", fHeader.AbsoluteBlock());

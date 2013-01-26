@@ -22,24 +22,39 @@ struct static_guid {
 	uint16	data3;
 	uint64	data4;
 
-	inline bool operator==(const guid &other) const;
+	inline bool operator==(const guid& other) const;
+	inline operator guid_t() const;
 } _PACKED;
 
 
 inline bool
-static_guid::operator==(const guid_t &other) const
+static_guid::operator==(const guid_t& other) const
 {
 	return B_HOST_TO_LENDIAN_INT32(data1) == other.data1
 		&& B_HOST_TO_LENDIAN_INT16(data2) == other.data2
 		&& B_HOST_TO_LENDIAN_INT16(data3) == other.data3
-		&& B_HOST_TO_BENDIAN_INT64(*(uint64 *)&data4) == *(uint64 *)other.data4;
+		&& B_HOST_TO_BENDIAN_INT64(*(uint64*)&data4) == *(uint64*)other.data4;
 			// the last 8 bytes are in big-endian order
+}
+
+
+inline
+static_guid::operator guid_t() const
+{
+	guid_t guid;
+	guid.data1 = B_HOST_TO_LENDIAN_INT32(data1);
+	guid.data2 = B_HOST_TO_LENDIAN_INT16(data2);
+	guid.data3 = B_HOST_TO_LENDIAN_INT16(data3);
+	uint64 last = B_HOST_TO_BENDIAN_INT64(*(uint64*)&data4);
+	memcpy(guid.data4, &last, sizeof(uint64));
+
+	return guid;
 }
 
 
 const static struct type_map {
 	static_guid	guid;
-	const char	*type;
+	const char*	type;
 } kTypeMap[] = {
 	{{0xC12A7328, 0xF81F, 0x11D2, 0xBA4B00A0C93EC93BLL}, "EFI System Data"},
 	{{0x21686148, 0x6449, 0x6E6F, 0x744E656564454649LL}, "BIOS Boot Data"},

@@ -21,7 +21,7 @@ const guid_t kEmptyGUID = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 
 
 static void
-put_utf8_byte(char *&to, size_t &left, char c)
+put_utf8_byte(char*& to, size_t& left, char c)
 {
 	if (left <= 1)
 		return;
@@ -35,7 +35,7 @@ put_utf8_byte(char *&to, size_t &left, char c)
 
 
 void
-to_utf8(const uint16 *from, size_t maxFromLength, char *to, size_t toSize)
+to_utf8(const uint16* from, size_t maxFromLength, char* to, size_t toSize)
 {
 	for (uint32 i = 0; i < maxFromLength; i++) {
 		uint16 c = B_LENDIAN_TO_HOST_INT16(from[i]);
@@ -66,10 +66,10 @@ to_utf8(const uint16 *from, size_t maxFromLength, char *to, size_t toSize)
 
 #ifndef _BOOT_MODE
 void
-to_ucs2(const char *from, size_t fromLength, uint16 *to, size_t maxToLength)
+to_ucs2(const char* from, size_t fromLength, uint16* to, size_t maxToLength)
 {
 	size_t index = 0;
-	while (from[0] && index < maxToLength) {
+	while (from[0] != '\0' && index < maxToLength) {
 		// TODO: handle characters that are not representable in UCS-2 better
 		uint32 code = UTF8ToCharCode(&from);
 		if (code < 0x10000)
@@ -82,8 +82,8 @@ to_ucs2(const char *from, size_t fromLength, uint16 *to, size_t maxToLength)
 #endif // !_BOOT_MODE
 
 
-const char *
-get_partition_type(const guid_t &guid)
+const char*
+get_partition_type(const guid_t& guid)
 {
 	for (uint32 i = 0; i < sizeof(kTypeMap) / sizeof(kTypeMap[0]); i++) {
 		if (kTypeMap[i].guid == guid)
@@ -95,14 +95,16 @@ get_partition_type(const guid_t &guid)
 
 
 #ifndef _BOOT_MODE
-const static_guid *
-guid_for_partition_type(const char *type)
+bool
+get_guid_for_partition_type(const char* type, guid_t& guid)
 {
 	for (uint32 i = 0; i < sizeof(kTypeMap) / sizeof(kTypeMap[0]); i++) {
-		if (strcmp(kTypeMap[i].type, type) == 0)
-			return &kTypeMap[i].guid;
+		if (strcmp(kTypeMap[i].type, type) == 0) {
+			guid = kTypeMap[i].guid;
+			return true;
+		}
 	}
 
-	return NULL;
+	return false;
 }
 #endif // !_BOOT_MODE

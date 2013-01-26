@@ -16,17 +16,15 @@ namespace EFI {
 
 class Header {
 public:
-								Header(int fd, off_t block, uint32 blockSize);
+								Header(int fd, uint64 lastBlock,
+									uint32 blockSize);
 #ifndef _BOOT_MODE
 								// constructor for empty header
-								Header(off_t block, off_t lastBlock,
-									uint32 blockSize);
+								Header(uint64 lastBlock, uint32 blockSize);
 #endif
 								~Header();
 
 			status_t			InitCheck() const;
-			bool				IsPrimary() const
-									{ return fBlock == EFI_HEADER_LOCATION; }
 
 			uint64				FirstUsableBlock() const
 									{ return fHeader.FirstUsableBlock(); }
@@ -49,9 +47,13 @@ private:
 			void				_Dump();
 			void				_DumpPartitions();
 
+#ifndef _BOOT_MODE
+			status_t			_WriteHeader(int fd);
 			status_t			_Write(int fd, off_t offset, const void* data,
 									size_t size) const;
 			void				_UpdateCRC();
+#endif
+
 			bool				_ValidateHeaderCRC();
 			bool				_ValidateEntriesCRC() const;
 			size_t				_EntryArraySize() const
@@ -59,7 +61,6 @@ private:
 										* fHeader.EntryCount(); }
 
 private:
-			uint64				fBlock;
 			uint32				fBlockSize;
 			status_t			fStatus;
 			efi_table_header	fHeader;
