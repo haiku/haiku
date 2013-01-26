@@ -678,7 +678,7 @@ AddFilesToHaikuImage system add-ons Screen\ Savers
 	: $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
 
 AddFilesToHaikuImage system add-ons disk_systems
-	: <disk_system>intel <disk_system>bfs <disk_system>ntfs ;
+	: <disk_system>intel <disk_system>gpt <disk_system>bfs <disk_system>ntfs ;
 
 # decorators
 AddDirectoryToHaikuImage home config add-ons decorators ;

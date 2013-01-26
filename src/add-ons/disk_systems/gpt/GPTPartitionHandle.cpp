@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +14,7 @@
 #include <MutablePartition.h>
 #include <PartitioningInfo.h>
 #include <PartitionParameterEditor.h>
+#include <Path.h>
 
 #include <AutoDeleter.h>
 
@@ -43,6 +45,23 @@ GPTPartitionHandle::~GPTPartitionHandle()
 status_t
 GPTPartitionHandle::Init()
 {
+	// TODO: how to get the path of a BMutablePartition?
+	//BPath path;
+	//status_t status = Partition()->GetPath(&path);
+	//if (status != B_OK)
+		//return status;
+
+	//fd = open(path.Path(), O_RDONLY);
+	//if (fd < 0)
+		//return errno;
+
+	//fHeader = new EFI::Header(fd, Partition()->BlockSize(),
+		//Partition()->BlockSize());
+	//status = fHeader->InitCheck();
+	//if (status != B_OK)
+		//return status;
+
+	//close(fd);
 	return B_OK;
 }
 
@@ -100,10 +119,12 @@ GPTPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 status_t
 GPTPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 {
-	// init to the full size (minus the first sector)
+	// init to the full size (minus the GPT table header and entries)
 	off_t size = Partition()->ContentSize();
-	status_t status = info->SetTo(Partition()->BlockSize(),
-		size - Partition()->BlockSize());
+	// TODO: use fHeader
+	size_t headerSize = Partition()->BlockSize() + 16384;
+	status_t status = info->SetTo(Partition()->BlockSize() + headerSize,
+		size - Partition()->BlockSize() - 2 * headerSize);
 	if (status != B_OK)
 		return status;
 
@@ -141,7 +162,7 @@ status_t
 GPTPartitionHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	const char* typeString, BString* name, const char* parameters)
 {
-	return B_BAD_VALUE;
+	return B_OK;
 }
 
 
@@ -150,7 +171,21 @@ GPTPartitionHandle::CreateChild(off_t offset, off_t size,
 	const char* typeString, const char* name, const char* parameters,
 	BMutablePartition** _child)
 {
-	return B_BAD_VALUE;
+	// create the child
+	BMutablePartition* partition = Partition();
+	BMutablePartition* child;
+	status_t status = partition->CreateChild(0, typeString, name,
+		parameters, &child);
+	if (status != B_OK)
+		return status;
+
+	// init the child
+	child->SetOffset(offset);
+	child->SetSize(size);
+	child->SetBlockSize(partition->BlockSize());
+
+	*_child = child;
+	return B_OK;
 }
 
 

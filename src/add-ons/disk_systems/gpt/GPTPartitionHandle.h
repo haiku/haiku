@@ -8,6 +8,8 @@
 
 #include <DiskSystemAddOn.h>
 
+#include "Header.h"
+
 
 class GPTPartitionHandle : public BPartitionHandle {
 public:
@@ -39,6 +41,9 @@ public:
 									const char* parameters,
 									BMutablePartition** child);
 	virtual status_t			DeleteChild(BMutablePartition* child);
+
+private:
+			EFI::Header*		fHeader;
 };
 
 
