@@ -1,12 +1,14 @@
 /*
  * Copyright 2009, Michael Lotz, mmlr@mlotz.ch. All rights reserved.
- * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2013, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT License.
  */
 #ifndef GPT_KNOWN_GUIDS_H
 #define GPT_KNOWN_GUIDS_H
 
+
+#include <ByteOrder.h>
 
 #include <disk_device_types.h>
 
@@ -22,6 +24,17 @@ struct static_guid {
 
 	inline bool operator==(const guid &other) const;
 } _PACKED;
+
+
+inline bool
+static_guid::operator==(const guid_t &other) const
+{
+	return B_HOST_TO_LENDIAN_INT32(data1) == other.data1
+		&& B_HOST_TO_LENDIAN_INT16(data2) == other.data2
+		&& B_HOST_TO_LENDIAN_INT16(data3) == other.data3
+		&& B_HOST_TO_BENDIAN_INT64(*(uint64 *)&data4) == *(uint64 *)other.data4;
+			// the last 8 bytes are in big-endian order
+}
 
 
 const static struct type_map {

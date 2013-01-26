@@ -5,5 +5,8 @@ UsePrivateSystemHeaders ;
 
 KernelAddon efi_gpt :
 	efi_gpt.cpp
+	Header.cpp
+	crc32.cpp
+	utility.cpp
 	PartitionLocker.cpp
 ;
