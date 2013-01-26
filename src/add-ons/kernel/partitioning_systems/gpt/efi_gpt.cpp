@@ -40,7 +40,7 @@
 
 #ifndef _BOOT_MODE
 static off_t
-block_align(partition_data *partition, off_t offset, bool upwards)
+block_align(partition_data* partition, off_t offset, bool upwards)
 {
 	if (upwards) {
 		return ((offset + partition->block_size - 1) / partition->block_size)
@@ -69,7 +69,7 @@ efi_gpt_std_ops(int32 op, ...)
 
 
 static float
-efi_gpt_identify_partition(int fd, partition_data *partition, void **_cookie)
+efi_gpt_identify_partition(int fd, partition_data* partition, void** _cookie)
 {
 	EFI::Header* header = new (std::nothrow) EFI::Header(fd,
 		partition->size / partition->block_size, partition->block_size);
@@ -87,10 +87,10 @@ efi_gpt_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 
 static status_t
-efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
+efi_gpt_scan_partition(int fd, partition_data* partition, void* _cookie)
 {
 	TRACE(("efi_gpt_scan_partition(cookie = %p)\n", _cookie));
-	EFI::Header *header = (EFI::Header *)_cookie;
+	EFI::Header* header = (EFI::Header*)_cookie;
 
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM;
@@ -102,7 +102,7 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 	uint32 index = 0;
 
 	for (uint32 i = 0; i < header->EntryCount(); i++) {
-		const efi_partition_entry &entry = header->EntryAt(i);
+		const efi_partition_entry& entry = header->EntryAt(i);
 
 		if (entry.partition_type == kEmptyGUID)
 			continue;
@@ -115,7 +115,7 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 			continue;
 		}
 
-		partition_data *child = create_child_partition(partition->id, index++,
+		partition_data* child = create_child_partition(partition->id, index++,
 			partition->offset + entry.StartBlock() * partition->block_size,
 			entry.BlockCount() * partition->block_size, -1);
 		if (child == NULL) {
@@ -128,7 +128,7 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 		child->name = strdup(name);
 		child->type = strdup(get_partition_type(entry.partition_type));
 		child->block_size = partition->block_size;
-		child->cookie = (void *)i;
+		child->cookie = (void*)i;
 	}
 
 	return B_OK;
@@ -136,22 +136,22 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 
 static void
-efi_gpt_free_identify_partition_cookie(partition_data *partition, void *_cookie)
+efi_gpt_free_identify_partition_cookie(partition_data* partition, void* _cookie)
 {
 	// Cookie is freed in efi_gpt_free_partition_content_cookie().
 }
 
 
 static void
-efi_gpt_free_partition_content_cookie(partition_data *partition)
+efi_gpt_free_partition_content_cookie(partition_data* partition)
 {
-	delete (EFI::Header *)partition->content_cookie;
+	delete (EFI::Header*)partition->content_cookie;
 }
 
 
 #ifndef _BOOT_MODE
 static uint32
-efi_gpt_get_supported_operations(partition_data *partition, uint32 mask)
+efi_gpt_get_supported_operations(partition_data* partition, uint32 mask)
 {
 	uint32 flags = B_DISK_SYSTEM_SUPPORTS_INITIALIZING
 		| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME
@@ -166,8 +166,8 @@ efi_gpt_get_supported_operations(partition_data *partition, uint32 mask)
 
 
 static uint32
-efi_gpt_get_supported_child_operations(partition_data *partition,
-	partition_data *child, uint32 mask)
+efi_gpt_get_supported_child_operations(partition_data* partition,
+	partition_data* child, uint32 mask)
 {
 	return B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
 		| B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
@@ -177,7 +177,7 @@ efi_gpt_get_supported_child_operations(partition_data *partition,
 
 
 static bool
-efi_gpt_is_sub_system_for(partition_data *partition)
+efi_gpt_is_sub_system_for(partition_data* partition)
 {
 	// a GUID Partition Table doesn't usually live inside another partition
 	return false;
@@ -185,7 +185,7 @@ efi_gpt_is_sub_system_for(partition_data *partition)
 
 
 static bool
-efi_gpt_validate_resize(partition_data *partition, off_t *size)
+efi_gpt_validate_resize(partition_data* partition, off_t* size)
 {
 	off_t newSize = *size;
 	if (newSize == partition->size)
@@ -205,7 +205,7 @@ efi_gpt_validate_resize(partition_data *partition, off_t *size)
 	// shrinking, only so that no child would be truncated
 	off_t newEnd = partition->offset + newSize;
 	for (int32 i = 0; i < partition->child_count; i++) {
-		partition_data *child = get_child_partition(partition->id, i);
+		partition_data* child = get_child_partition(partition->id, i);
 		if (child == NULL)
 			continue;
 
@@ -220,8 +220,8 @@ efi_gpt_validate_resize(partition_data *partition, off_t *size)
 
 
 static bool
-efi_gpt_validate_resize_child(partition_data *partition, partition_data *child,
-	off_t *size)
+efi_gpt_validate_resize_child(partition_data* partition, partition_data* child,
+	off_t* size)
 {
 	off_t newSize = *size;
 	if (newSize == child->size)
@@ -244,7 +244,7 @@ efi_gpt_validate_resize_child(partition_data *partition, partition_data *child,
 	// make sure that the child doesn't overlap any sibling partitions
 	off_t newEnd = child->offset + newSize;
 	for (int32 i = 0; i < partition->child_count; i++) {
-		partition_data *other = get_child_partition(partition->id, i);
+		partition_data* other = get_child_partition(partition->id, i);
 		if (other == NULL || other->id == child->id
 			|| other->offset < child->offset)
 			continue;
@@ -259,7 +259,7 @@ efi_gpt_validate_resize_child(partition_data *partition, partition_data *child,
 
 
 static bool
-efi_gpt_validate_move(partition_data *partition, off_t *start)
+efi_gpt_validate_move(partition_data* partition, off_t* start)
 {
 	// nothing to do
 	return true;
@@ -267,8 +267,8 @@ efi_gpt_validate_move(partition_data *partition, off_t *start)
 
 
 static bool
-efi_gpt_validate_move_child(partition_data *partition, partition_data *child,
-	off_t *start)
+efi_gpt_validate_move_child(partition_data* partition, partition_data* child,
+	off_t* start)
 {
 	off_t newStart = *start;
 	if (newStart < 0)
@@ -280,7 +280,7 @@ efi_gpt_validate_move_child(partition_data *partition, partition_data *child,
 	newStart = block_align(partition, newStart, false);
 	if (newStart > child->offset) {
 		for (int32 i = 0; i < partition->child_count; i++) {
-			partition_data *other = get_child_partition(partition->id, i);
+			partition_data* other = get_child_partition(partition->id, i);
 			if (other == NULL || other->id == child->id
 				|| other->offset < child->offset)
 				continue;
@@ -292,7 +292,7 @@ efi_gpt_validate_move_child(partition_data *partition, partition_data *child,
 		newStart = block_align(partition, newStart, false);
 	} else {
 		for (int32 i = 0; i < partition->child_count; i++) {
-			partition_data *other = get_child_partition(partition->id, i);
+			partition_data* other = get_child_partition(partition->id, i);
 			if (other == NULL || other->id == child->id
 				|| other->offset > child->offset)
 				continue;
@@ -310,7 +310,7 @@ efi_gpt_validate_move_child(partition_data *partition, partition_data *child,
 
 
 static bool
-efi_gpt_validate_set_content_name(partition_data *partition, char *name)
+efi_gpt_validate_set_content_name(partition_data* partition, char* name)
 {
 	// TODO: should validate that the utf-8 -> ucs-2 is valid
 	// TODO: should count actual utf-8 chars
@@ -321,7 +321,7 @@ efi_gpt_validate_set_content_name(partition_data *partition, char *name)
 
 
 static bool
-efi_gpt_validate_set_type(partition_data *partition, const char *type)
+efi_gpt_validate_set_type(partition_data* partition, const char* type)
 {
 	guid_t typeGUID;
 	return get_guid_for_partition_type(type, typeGUID);
@@ -329,8 +329,8 @@ efi_gpt_validate_set_type(partition_data *partition, const char *type)
 
 
 static bool
-efi_gpt_validate_initialize(partition_data *partition, char *name,
-	const char *parameters)
+efi_gpt_validate_initialize(partition_data* partition, char* name,
+	const char* parameters)
 {
 	if ((efi_gpt_get_supported_operations(partition, ~0)
 		& B_DISK_SYSTEM_SUPPORTS_INITIALIZING) == 0)
@@ -345,9 +345,9 @@ efi_gpt_validate_initialize(partition_data *partition, char *name,
 
 
 static bool
-efi_gpt_validate_create_child(partition_data *partition, off_t *start,
-	off_t *size, const char *type, const char *name, const char *parameters,
-	int32 *index)
+efi_gpt_validate_create_child(partition_data* partition, off_t* start,
+	off_t* size, const char* type, const char* name, const char* parameters,
+	int32* index)
 {
 	if ((efi_gpt_get_supported_operations(partition, ~0)
 			& B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD) == 0)
@@ -356,10 +356,10 @@ efi_gpt_validate_create_child(partition_data *partition, off_t *start,
 	if (!efi_gpt_validate_set_type(partition, type))
 		return false;
 
-	EFI::Header *header = (EFI::Header *)partition->content_cookie;
+	EFI::Header* header = (EFI::Header*)partition->content_cookie;
 	int32 entryIndex = -1;
 	for (uint32 i = 0; i < header->EntryCount(); i++) {
-		const efi_partition_entry &entry = header->EntryAt(i);
+		const efi_partition_entry& entry = header->EntryAt(i);
 		if (entry.partition_type == kEmptyGUID) {
 			entryIndex = i;
 			break;
@@ -386,7 +386,7 @@ efi_gpt_validate_create_child(partition_data *partition, off_t *start,
 
 	// ensure that we don't overlap any siblings
 	for (int32 i = 0; i < partition->child_count; i++) {
-		partition_data *other = get_child_partition(partition->id, i);
+		partition_data* other = get_child_partition(partition->id, i);
 		if (other == NULL)
 			continue;
 
@@ -406,8 +406,8 @@ efi_gpt_validate_create_child(partition_data *partition, off_t *start,
 
 
 static status_t
-efi_gpt_get_partitionable_spaces(partition_data *partition,
-	partitionable_space_data *buffer, int32 count, int32 *actualCount)
+efi_gpt_get_partitionable_spaces(partition_data* partition,
+	partitionable_space_data* buffer, int32 count, int32* actualCount)
 {
 	// TODO: implement
 	return B_ERROR;
@@ -415,8 +415,8 @@ efi_gpt_get_partitionable_spaces(partition_data *partition,
 
 
 static status_t
-efi_gpt_get_next_supported_type(partition_data *partition, int32 *cookie,
-	char *type)
+efi_gpt_get_next_supported_type(partition_data* partition, int32* cookie,
+	char* type)
 {
 	// TODO: implement
 	return B_ERROR;
@@ -424,7 +424,7 @@ efi_gpt_get_next_supported_type(partition_data *partition, int32 *cookie,
 
 
 static status_t
-efi_gpt_shadow_changed(partition_data *partition, partition_data *child,
+efi_gpt_shadow_changed(partition_data* partition, partition_data* child,
 	uint32 operation)
 {
 	// TODO: implement
@@ -450,7 +450,7 @@ efi_gpt_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	if (!locker.IsLocked())
 		return B_ERROR;
 
-	partition_data *partition = get_partition(partitionID);
+	partition_data* partition = get_partition(partitionID);
 	if (partition == NULL)
 		return B_BAD_VALUE;
 
@@ -480,15 +480,15 @@ efi_gpt_resize_child(int fd, partition_id partitionID, off_t size,
 	if (!locker.IsLocked())
 		return B_ERROR;
 
-	partition_data *child = get_partition(partitionID);
+	partition_data* child = get_partition(partitionID);
 	if (child == NULL)
 		return B_BAD_VALUE;
 
-	partition_data *partition = get_parent_partition(partitionID);
+	partition_data* partition = get_parent_partition(partitionID);
 	if (partition == NULL)
 		return B_BAD_VALUE;
 
-	EFI::Header *header = (EFI::Header *)partition->content_cookie;
+	EFI::Header* header = (EFI::Header*)partition->content_cookie;
 	if (header == NULL)
 		return B_BAD_VALUE;
 
@@ -505,7 +505,7 @@ efi_gpt_resize_child(int fd, partition_id partitionID, off_t size,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	efi_partition_entry &entry = header->EntryAt(entryIndex);
+	efi_partition_entry& entry = header->EntryAt(entryIndex);
 	entry.SetBlockCount(validatedSize / partition->block_size);
 
 	status_t result = header->WriteEntry(fd, entryIndex);
@@ -541,15 +541,15 @@ efi_gpt_move_child(int fd, partition_id partitionID, partition_id childID,
 	if (!locker.IsLocked())
 		return B_ERROR;
 
-	partition_data *partition = get_partition(partitionID);
+	partition_data* partition = get_partition(partitionID);
 	if (partition == NULL)
 		return B_BAD_VALUE;
 
-	partition_data *child = get_partition(childID);
+	partition_data* child = get_partition(childID);
 	if (child == NULL)
 		return B_BAD_VALUE;
 
-	EFI::Header *header = (EFI::Header *)partition->content_cookie;
+	EFI::Header* header = (EFI::Header*)partition->content_cookie;
 	if (header == NULL)
 		return B_BAD_VALUE;
 
@@ -570,7 +570,7 @@ efi_gpt_move_child(int fd, partition_id partitionID, partition_id childID,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	efi_partition_entry &entry = header->EntryAt(entryIndex);
+	efi_partition_entry& entry = header->EntryAt(entryIndex);
 	uint64 blockCount = entry.BlockCount();
 	entry.SetStartBlock((validatedOffset - partition->offset)
 		/ partition->block_size);
@@ -592,7 +592,7 @@ efi_gpt_move_child(int fd, partition_id partitionID, partition_id childID,
 
 
 static status_t
-efi_gpt_set_content_name(int fd, partition_id partitionID, const char *name,
+efi_gpt_set_content_name(int fd, partition_id partitionID, const char* name,
 	disk_job_id job)
 {
 	if (fd < 0)
@@ -602,15 +602,15 @@ efi_gpt_set_content_name(int fd, partition_id partitionID, const char *name,
 	if (!locker.IsLocked())
 		return B_ERROR;
 
-	partition_data *child = get_partition(partitionID);
+	partition_data* child = get_partition(partitionID);
 	if (child == NULL)
 		return B_BAD_VALUE;
 
-	partition_data *partition = get_parent_partition(partitionID);
+	partition_data* partition = get_parent_partition(partitionID);
 	if (partition == NULL)
 		return B_BAD_VALUE;
 
-	EFI::Header *header = (EFI::Header *)partition->content_cookie;
+	EFI::Header* header = (EFI::Header*)partition->content_cookie;
 	if (header == NULL)
 		return B_BAD_VALUE;
 
@@ -620,7 +620,7 @@ efi_gpt_set_content_name(int fd, partition_id partitionID, const char *name,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	efi_partition_entry &entry = header->EntryAt(entryIndex);
+	efi_partition_entry& entry = header->EntryAt(entryIndex);
 	to_ucs2(name, strlen(name), entry.name, EFI_PARTITION_NAME_LENGTH);
 
 	status_t result = header->WriteEntry(fd, entryIndex);
@@ -638,7 +638,7 @@ efi_gpt_set_content_name(int fd, partition_id partitionID, const char *name,
 
 
 static status_t
-efi_gpt_set_type(int fd, partition_id partitionID, const char *type,
+efi_gpt_set_type(int fd, partition_id partitionID, const char* type,
 	disk_job_id job)
 {
 	if (fd < 0)
@@ -648,15 +648,15 @@ efi_gpt_set_type(int fd, partition_id partitionID, const char *type,
 	if (!locker.IsLocked())
 		return B_ERROR;
 
-	partition_data *child = get_partition(partitionID);
+	partition_data* child = get_partition(partitionID);
 	if (child == NULL)
 		return B_BAD_VALUE;
 
-	partition_data *partition = get_parent_partition(partitionID);
+	partition_data* partition = get_parent_partition(partitionID);
 	if (partition == NULL)
 		return B_BAD_VALUE;
 
-	EFI::Header *header = (EFI::Header *)partition->content_cookie;
+	EFI::Header* header = (EFI::Header*)partition->content_cookie;
 	if (header == NULL)
 		return B_BAD_VALUE;
 
@@ -670,7 +670,7 @@ efi_gpt_set_type(int fd, partition_id partitionID, const char *type,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	efi_partition_entry &entry = header->EntryAt(entryIndex);
+	efi_partition_entry& entry = header->EntryAt(entryIndex);
 	entry.partition_type = typeGUID;
 
 	status_t result = header->WriteEntry(fd, entryIndex);
@@ -686,13 +686,13 @@ efi_gpt_set_type(int fd, partition_id partitionID, const char *type,
 
 
 static status_t
-efi_gpt_initialize(int fd, partition_id partitionID, const char *name,
-	const char *parameters, off_t partitionSize, disk_job_id job)
+efi_gpt_initialize(int fd, partition_id partitionID, const char* name,
+	const char* parameters, off_t partitionSize, disk_job_id job)
 {
 	if (fd < 0)
 		return B_ERROR;
 
-	partition_data *partition = get_partition(partitionID);
+	partition_data* partition = get_partition(partitionID);
 	if (partition == NULL)
 		return B_BAD_VALUE;
 
@@ -720,8 +720,8 @@ efi_gpt_initialize(int fd, partition_id partitionID, const char *name,
 
 static status_t
 efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
-	off_t size, const char *type, const char *name, const char *parameters,
-	disk_job_id job, partition_id *childID)
+	off_t size, const char* type, const char* name, const char* parameters,
+	disk_job_id job, partition_id* childID)
 {
 	if (fd < 0)
 		return B_ERROR;
@@ -730,11 +730,11 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 	if (!locker.IsLocked())
 		return B_ERROR;
 
-	partition_data *partition = get_partition(partitionID);
+	partition_data* partition = get_partition(partitionID);
 	if (partition == NULL)
 		return B_BAD_VALUE;
 
-	EFI::Header *header = (EFI::Header *)partition->content_cookie;
+	EFI::Header* header = (EFI::Header*)partition->content_cookie;
 	if (header == NULL)
 		return B_BAD_VALUE;
 
@@ -743,7 +743,7 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 	uint32 entryIndex = 0;
 
 	if (!efi_gpt_validate_create_child(partition, &validatedOffset,
-			&validatedSize, type, name, parameters, (int32 *)&entryIndex))
+			&validatedSize, type, name, parameters, (int32*)&entryIndex))
 		return B_BAD_VALUE;
 
 	guid_t typeGUID;
@@ -752,12 +752,12 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	partition_data *child = create_child_partition(partition->id, entryIndex,
+	partition_data* child = create_child_partition(partition->id, entryIndex,
 		validatedOffset, validatedSize, *childID);
 	if (child == NULL)
 		return B_ERROR;
 
-	efi_partition_entry &entry = header->EntryAt(entryIndex);
+	efi_partition_entry& entry = header->EntryAt(entryIndex);
 	entry.partition_type = typeGUID;
 	// TODO: set unique partition ID
 	to_ucs2(name, strlen(name), entry.name, EFI_PARTITION_NAME_LENGTH);
@@ -777,7 +777,7 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 	child->name = strdup(name);
 	child->type = strdup(type);
 	child->parameters = strdup(parameters);
-	child->cookie = (void *)entryIndex;
+	child->cookie = (void*)entryIndex;
 
 	if (child->type == NULL || child->parameters == NULL) {
 		delete_partition(child->id);
@@ -801,15 +801,15 @@ efi_gpt_delete_child(int fd, partition_id partitionID, partition_id childID,
 	if (!locker.IsLocked())
 		return B_ERROR;
 
-	partition_data *partition = get_partition(partitionID);
+	partition_data* partition = get_partition(partitionID);
 	if (partition == NULL)
 		return B_BAD_VALUE;
 
-	partition_data *child = get_partition(childID);
+	partition_data* child = get_partition(childID);
 	if (child == NULL)
 		return B_BAD_VALUE;
 
-	EFI::Header *header = (EFI::Header *)partition->content_cookie;
+	EFI::Header* header = (EFI::Header*)partition->content_cookie;
 	if (header == NULL)
 		return B_BAD_VALUE;
 
@@ -822,7 +822,7 @@ efi_gpt_delete_child(int fd, partition_id partitionID, partition_id childID,
 	if (!delete_partition(childID))
 		return B_ERROR;
 
-	efi_partition_entry &entry = header->EntryAt(entryIndex);
+	efi_partition_entry& entry = header->EntryAt(entryIndex);
 	entry.partition_type = kEmptyGUID;
 
 	status_t result = header->WriteEntry(fd, entryIndex);
@@ -914,7 +914,7 @@ partition_module_info gEFIPartitionModule = {
 };
 
 #ifndef _BOOT_MODE
-partition_module_info *modules[] = {
+partition_module_info* modules[] = {
 	&sEFIPartitionModule,
 	NULL
 };
