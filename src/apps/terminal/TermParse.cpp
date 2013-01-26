@@ -833,30 +833,23 @@ TermParse::EscParse()
 								fAttr = FORECOLORED(7);
 								break;
 
-							case 1: /* Bright / Bold     */
-								fAttr |= FORECOLORED(8);
-								fAttr |= FORESET;
+							case 1: /* Bold     */
+							case 5:
+								fAttr |= BOLD;
 								break;
 
 							case 4:	/* Underline	*/
 								fAttr |= UNDERLINE;
 								break;
 
-							case 5:
-								fAttr |= BOLD;
-								break;
-
 							case 7:	/* Inverse	*/
 								fAttr |= INVERSE;
 								break;
 
-							case 2:	/* Faint: decreased intensity */
-							case 21:	/* Bright/Bold: off or Underline: Double */
-							case 22:	/* Not Bold, not bright, not faint	*/
-								fAttr &= ~(FORECOLORED(8) | BOLD);
-								fAttr |= FORESET;
+							case 22:	/* Not Bold	*/
+								fAttr &= ~BOLD;
 								break;
-								
+
 							case 24:	/* Not Underline	*/
 								fAttr &= ~UNDERLINE;
 								break;
@@ -873,7 +866,7 @@ TermParse::EscParse()
 							case 35:
 							case 36:
 							case 37:
-								fAttr &= ~FORECOLORED(7);
+								fAttr &= ~FORECOLOR;
 								fAttr |= FORECOLORED(param[row] - 30);
 								fAttr |= FORESET;
 								break;
@@ -882,7 +875,7 @@ TermParse::EscParse()
 							{
 								if (nparam != 3 || param[1] != 5)
 									break;
-								fAttr &= ~FORECOLORED(255 - 8);
+								fAttr &= ~FORECOLOR;
 								fAttr |= FORECOLORED(param[2]);
 								fAttr |= FORESET;
 
