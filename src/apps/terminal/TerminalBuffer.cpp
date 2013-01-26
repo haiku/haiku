@@ -128,7 +128,7 @@ void
 TerminalBuffer::SetTitle(const char* title)
 {
 	if (fListenerValid) {
-		BMessage message(MSG_SET_TERMNAL_TITLE);
+		BMessage message(MSG_SET_TERMINAL_TITLE);
 		message.AddString("title", title);
 		fListener.SendMessage(&message);
 	}

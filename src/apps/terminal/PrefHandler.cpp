@@ -53,12 +53,10 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_IM_BACK_COLOR,		"152, 203, 255" },
 	{ PREF_IM_SELECT_COLOR,		"255, 152, 152" },
 
-	{ PREF_SHELL,				"/bin/sh -login" },
 	{ PREF_HISTORY_SIZE,		"10000" },
 
 	{ PREF_TEXT_ENCODING,		"UTF-8" },
 
-	{ PREF_GUI_LANGUAGE,		"English"},
 	{ PREF_IM_AWARE,			"0"},
 
 	{ PREF_TAB_TITLE,			"%1d: %p" },

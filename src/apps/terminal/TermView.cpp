@@ -2002,7 +2002,7 @@ TermView::MessageReceived(BMessage *msg)
 			_SynchronizeWithTextBuffer(0, -1);
 			break;
 		}
-		case MSG_SET_TERMNAL_TITLE:
+		case MSG_SET_TERMINAL_TITLE:
 		{
 			const char* title;
 			if (msg->FindString("title", &title) == B_OK) {

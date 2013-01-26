@@ -87,7 +87,7 @@ static const uint32 SAVE_AS_DEFAULT 					= 'sadf';
 static const uint32 MSG_CHECK_CHILDREN					= 'ckch';
 static const uint32 MSG_REMOVE_RESIZE_VIEW_IF_NEEDED	= 'rmrv';
 static const uint32 MSG_TERMINAL_BUFFER_CHANGED			= 'bufc';
-static const uint32 MSG_SET_TERMNAL_TITLE				= 'sett';
+static const uint32 MSG_SET_TERMINAL_TITLE				= 'sett';
 static const uint32 MSG_QUIT_TERMNAL					= 'qutt';
 static const uint32 MSG_REPORT_MOUSE_EVENT				= 'mous';
 static const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
@@ -128,10 +128,8 @@ static const char* const PREF_IM_AWARE = "Input method aware";
 
 static const char* const PREF_COLS = "Cols";
 static const char* const PREF_ROWS = "Rows";
-static const char* const PREF_SHELL = "Shell";
 
 static const char* const PREF_TEXT_ENCODING = "Text encoding";
-static const char* const PREF_GUI_LANGUAGE = "Language";
 
 static const char* const PREF_BLINK_CURSOR = "Blinking cursor";
 static const char* const PREF_WARN_ON_EXIT = "Warn on exit";
