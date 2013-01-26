@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Shortcuts	1741147146
+1	russian	x-vnd.Haiku-Shortcuts	1477375596
 Error, NULL state description?\n	ShortcutsSpec		Ошибка, состояние описания NULL?\n
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		ОК
@@ -15,7 +15,6 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Ваш текст\"
 *MouseUp	ShortcutsWindow		*MouseUp
 (Choose application with file requester)	ShortcutsWindow		(Выбрать программу)
-Window	ShortcutsSpec	Name for modifier on keyboard	Window
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не удалось открыть список горячих клавиш!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"

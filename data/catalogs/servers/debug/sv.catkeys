@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Haiku-debug_server	857491333
+1	swedish	x-vnd.Haiku-debug_server	1440673937
 Terminate	DebugServer		Avsluta
 Debug	DebugServer		Felsök
+Save report	DebugServer		Spara rapport
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Programmet:\n\n %app\n\nhar stött på ett fel som förhindrar den från att fortsätta. Haiku kommer att avsluta programmet och stöda upp.

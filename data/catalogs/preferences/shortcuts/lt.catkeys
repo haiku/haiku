@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Shortcuts	1963206485
+1	lithuanian	x-vnd.Haiku-Shortcuts	1699434935
 Error, NULL state description?\n	ShortcutsSpec		Klaida. Neapibrėžta būsena?\n
 OK	ShortcutsWindow		Gerai
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko.
@@ -10,7 +10,6 @@ Open KeySet…	ShortcutsWindow		Atverti sparčiųjų klavišų rinkinį…
 Revert to saved	ShortcutsWindow		Grįžti prie įrašyto
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 (Choose application with file requester)	ShortcutsWindow		(Atverti programos parinkimo langą)
-Window	ShortcutsSpec	Name for modifier on keyboard	Win
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio atverti nepavyko!
 Save	ShortcutsWindow		Įrašyti
 Remove selected shortcut	ShortcutsWindow		Pašalinti pažymėtąjį klavišų derinį

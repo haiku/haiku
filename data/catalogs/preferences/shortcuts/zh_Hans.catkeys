@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Shortcuts	3661393357
+1	english	x-vnd.Haiku-Shortcuts	3397621807
 Error, NULL state description?\n	ShortcutsSpec		错误，无效状态描述？\n
 MoveMouse	ShortcutsSpec		鼠标移动
 OK	ShortcutsWindow		确定
@@ -15,7 +15,6 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*插入字符串 \"在此处写入文本\"
 *MouseUp	ShortcutsWindow		*MouseUp
 (Choose application with file requester)	ShortcutsWindow		（使用文件查询选取应用程序）
-Window	ShortcutsSpec	Name for modifier on keyboard	Window
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		无法打开您的按键设置文件！
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \'*MoveMouseTo 100% 0\" \"*MouseButton 1\"

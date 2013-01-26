@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Shortcuts	1741147146
+1	greek, modern (1453-)	x-vnd.Haiku-Shortcuts	1477375596
 Error, NULL state description?\n	ShortcutsSpec		Σφάλμα, ΚΕΝΗ αναφορά περιγραφής;\n
 MoveMouse	ShortcutsSpec		Μετακίνηση Ποντικιού
 OK	ShortcutsWindow		Εντάξει
@@ -15,7 +15,6 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Εισάγετε συμβολοσεια \"Το Κείμενο σας Εδώ\"
 *MouseUp	ShortcutsWindow		*Ποντίκι Επάνω
 (Choose application with file requester)	ShortcutsWindow		(Επιλέξτε εφαρμογή με τον file requester)
-Window	ShortcutsSpec	Name for modifier on keyboard	Παράθυρο
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Το Shortcuts δε μπόρεσε να ανοίξει το αρχείο του σετ πλήκτρων!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Πολλαπλό \"*Μετακίνηση ποντικιού σε 100% 0\" \"*Πλήκτρο ποντικιού 1\"

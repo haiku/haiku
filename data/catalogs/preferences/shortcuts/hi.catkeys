@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Shortcuts	1741147146
+1	hindi	x-vnd.Haiku-Shortcuts	1477375596
 Error, NULL state description?\n	ShortcutsSpec		त्रुटि, नल स्थिति का विवरण?\n
 MoveMouse	ShortcutsSpec		माउस को हिलाएँ
 OK	ShortcutsWindow		ठीक है
@@ -15,7 +15,6 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	ऑल्ट
 *InsertString \"Your Text Here\"	ShortcutsWindow		*स्ट्रिंग डालें \"Your Text Here\"
 *MouseUp	ShortcutsWindow		*माउसअप
 (Choose application with file requester)	ShortcutsWindow		(फ़ाइल रिक्वेस्टर साथ आवेदन चुनें)
-Window	ShortcutsSpec	Name for modifier on keyboard	विंडों
 *LaunchHandler text/html	ShortcutsWindow		*लांचहैंडलर टेक्स्ट/एचटीएमएल
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		शॉर्टकट्स आपके कीसेट फ़ाइल नहीं खोल सकता था!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*बहु\"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
