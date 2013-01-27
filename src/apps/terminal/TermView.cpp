@@ -373,7 +373,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	if (error < B_OK)
 		return error;
 
-	SetLowColor(fTermColorTable[8]);
+	SetLowColor(fTextBackColor);
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
 	return B_OK;
@@ -626,10 +626,10 @@ TermView::GetTermSizeFromRect(const BRect &rect, int *_rows,
 void
 TermView::SetTextColor(rgb_color fore, rgb_color back)
 {
-	fTermColorTable[0] = back;
-	fTermColorTable[7] = fore;
+	fTextBackColor = back;
+	fTextForeColor = fore;
 
-	SetLowColor(back);
+	SetLowColor(fTextBackColor);
 }
 
 
@@ -660,20 +660,20 @@ TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
 	
 	switch (index) {
 		case 10:
-			fTermColorTable[7] = color;
+			fTextForeColor = color;
 			break;
 		case 11:
-			fTermColorTable[0] = color;
-			SetLowColor(fTermColorTable[0]);
+			fTextBackColor = color;
+			SetLowColor(fTextBackColor);
 			break;
 		case 110:
-			fTermColorTable[7] =
+			fTextForeColor =
 				PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR);
 			break;
 		case 111:
-			fTermColorTable[0] =
+			fTextBackColor =
 				PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR);
-			SetLowColor(fTermColorTable[0]);
+			SetLowColor(fTextBackColor);
 			break;
 		default:
 			break;
@@ -914,19 +914,26 @@ void
 TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	int32 width, bool mouse, bool cursor, BView *inView)
 {
-	rgb_color rgb_fore, rgb_back;
-
 	inView->SetFont(&fHalfFont);
 
 	// Set pen point
 	int x2 = x1 + fFontWidth * width;
 	int y2 = y1 + fFontHeight;
 
+	rgb_color rgb_fore = fTextForeColor;
+	rgb_color rgb_back = fTextBackColor;
+
 	// color attribute
 	int forecolor = IS_FORECOLOR(attr);
 	int backcolor = IS_BACKCOLOR(attr);
-	rgb_fore = fTermColorTable[forecolor];
-	rgb_back = fTermColorTable[backcolor];
+	
+	if (IS_FORESET(attr))
+		rgb_fore = fTermColorTable[forecolor];
+	if (IS_BACKSET(attr))
+		rgb_back = fTermColorTable[backcolor];
+
+//	printf("DLP:[%03x %03x %03x]; [%03x %03x %03x];\n",
+//			rgb_fore.red, rgb_fore.green, rgb_fore.blue, rgb_back.red, rgb_back.green, rgb_back.blue);
 
 	// Selection check.
 	if (cursor) {
@@ -1011,7 +1018,7 @@ TermView::_DrawCursor()
 			if (cursorVisible)
 				SetHighColor(fCursorBackColor);
 			else
-				SetHighColor(fTermColorTable[IS_BACKCOLOR(attr)]);
+				SetHighColor(cursorVisible ? fCursorBackColor : fTextBackColor);
 		}
 
 		FillRect(rect);
@@ -1163,7 +1170,7 @@ TermView::Draw(BRect updateRect)
 		if (clearLeft <= updateRect.right) {
 			BRect rect(clearLeft, updateRect.top, updateRect.right,
 				updateRect.bottom);
-			SetHighColor(fTermColorTable[0]);
+			SetHighColor(fTextBackColor);
 			FillRect(rect);
 		}
 	}
@@ -1174,7 +1181,7 @@ TermView::Draw(BRect updateRect)
 		if (clearTop <= updateRect.bottom) {
 			BRect rect(updateRect.left, clearTop, updateRect.right,
 				updateRect.bottom);
-			SetHighColor(fTermColorTable[0]);
+			SetHighColor(fTextBackColor);
 			FillRect(rect);
 		}
 	}
@@ -1221,6 +1228,7 @@ TermView::Draw(BRect updateRect)
 						uint32 backcolor = IS_BACKCOLOR(fVisibleTextBuffer->GetLineColor(
 							lineIndexInHistory));
 						rgb_color rgb_back = fTermColorTable[backcolor];
+					//	/* rgb_color*/ rgb_back = fTextBackColor;
 						SetHighColor(rgb_back);
 						FillRect(rect);
 					}
@@ -3002,15 +3010,15 @@ TermView::_DrawInlineMethodString()
 	BRect eraseRect(startPoint, endPoint);
 
 	PushState();
-	SetHighColor(fTermColorTable[7]);
+	SetHighColor(fTextForeColor);
 	FillRect(eraseRect);
 	PopState();
 
 	BPoint loc = _ConvertFromTerminal(fCursor);
 	loc.y += fFontHeight;
 	SetFont(&fHalfFont);
-	SetHighColor(fTermColorTable[0]);
-	SetLowColor(fTermColorTable[7]);
+	SetHighColor(fTextBackColor);
+	SetLowColor(fTextForeColor);
 	DrawString(fInline->String(), loc);
 }
 
