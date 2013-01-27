@@ -1,0 +1,120 @@
+Haiku OpenGL kit developers introduction
+
+The Haiku OpenGL kit is made up of the folwing pieces:
+
+* The "OpenGL Kit" aka libGL.so and supporting libraries.
+  This is what the user applications interact with.
+
+* The "OpenGL Add-ons" (which do the real work)
+  These are chosen by the OpenGL kit and utilized
+
+In the traditional BeOS sense, the OpenGL Add-ons are the
+vendor provided OpenGL drivers. This actually doesn't
+mesh well with the current open source OpenGL stack.
+
+Our "OpenGL Add-ons" are really wrappers around Mesa
+and Gallium code.  We gain greater OS control of OpenGL
+rendering with the drawback of increased work overall.
+The OpenGL Add-ons call private Mesa functions, thus
+we get no compatibility saftey net between Mesa versions.
+
+Our Gallium connecting Add-ons could actually fit into
+the upstream Mesa / Gallium project, however this would
+cause complications in the build process (linking in
+OpenGL and all of it's libraries into a small number of
+shared libraries is not really what the Mesa project
+designs it's stack for. Several symbol collisions exist
+when trying to link libmesa and libgallium together for
+example)
+
+Mesa drivers are the classical Mesa software rasterizers
+Gallium drivers are the new-school software drivers.
+
+
+**********
+Mesa versions
+
+The Haiku project uses two different versions of Mesa.
+
+ * Mesa 7.8.2 for gcc2 OpenGL Add-ons
+ * Mesa 9.0.1+ for gcc4 OpenGL Add-ons.
+
+The reasoning behind this is that any version of Mesa
+above 7.8.2 will require a *massive* porting effort to
+make it compile under gcc2.  Given this fact, it makes
+sense to bump the gcc2 version of Mesa as far as it will
+go and set it there statically.  Think of Mesa 7.8.2
+as the "stable" version Haiku R1 will use :)
+
+Hardware 3D rendering and llvm-based software rendering
+will never work for legacy gcc2 applications. Period.
+
+However!  If you're running a gcc2 hybrid version of
+Haiku, llvm or hardware based rendering should be possible
+on gcc4 applications.
+
+It is *essential* to upgrade our build Mesa packages
+with the latest release Mesa versions.  If we fall too
+far behind the update gets extremely tricky as functions
+inside Mesa and Gallium change at a fast pace.
+
+
+**********
+gcc2 OpenGL kit
+
+The following process occurs in order to generate the
+gcc2  (Mesa 7.8.2) OpenGL kit:
+
+* Some kind soul compiles a Mesa optional package on a
+  gcc2 Haiku system with the bep on haikuports.  This
+  gets uploaded to Haiku-files and the package name
+  / version gets updated as in the BuildFeatures jam
+  build script.
+
+  - The bep generally applies a few minimal patches to
+    Mesa 7.8.2 and compiles it. Then it rounds up all of
+    the headers and static libraries and throws them into
+    a .zip for the build
+
+* Someone starts a gcc2 Haiku build.  The build process pulls
+  down the Mesa optional package above and links the needed
+  parts into libGL and the swrast_legacy OpenGL add-on
+
+
+**********
+gcc4 OpenGL kit
+
+The following process occurs in order to generate the
+gcc4  (Mesa 9.0.1+) OpenGL kit:
+
+* Some kind soul compiles a Mesa optional package on a
+  gcc4 Haiku system with the bep on haikuports.  This
+  gets uploaded to Haiku-files and the package name
+  / version gets updated as in the BuildFeatures jam
+  build script.
+
+  - The kind soul also needs to install the LLVM Optional
+    build package on his build machine *before* compiling
+    the Mesa bep. (unless he or she doesn't want llvmpipe
+    rendering)
+
+  - The bep for Mesa 9.0.1+ doesn't apply too many patches as
+    Haiku build fixes are accepted upstream.
+
+  - The bep rounds up all of the headers and static
+    libraries and throws them into a .zip for the build
+
+* Someone starts a gcc4 Haiku build.  The build process pulls
+  down the Mesa optional package above and links the needed
+  parts into libGL and OpenGL add-ons.
+
+  - If the user didn't link in LLVM, he can disable the LLVM
+    dependencies in the OpenGL kit Jamfile. swpipe will
+    automagically fall back to softpipe rendering
+
+  - The build system will download the LLVM optional package
+    and link it into any OpenGL add-ons that need it.
+
+    !! The LLVM optional package needs to match the LLVM
+       binaries on the machine which compiled Mesa
+    !!
