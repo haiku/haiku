@@ -43,27 +43,33 @@ public:
 #endif
 
 private:
-			const char*			_PrintGUID(const guid_t& id);
-			void				_Dump();
-			void				_DumpPartitions();
-
 #ifndef _BOOT_MODE
 			status_t			_WriteHeader(int fd);
 			status_t			_Write(int fd, off_t offset, const void* data,
 									size_t size) const;
+			status_t			_Read(int fd, off_t offset, void* data,
+									size_t size) const;
 			void				_UpdateCRC();
 #endif
 
+			bool				_IsHeaderValid(const efi_table_header& header,
+									uint64 block);
 			bool				_ValidateHeaderCRC();
 			bool				_ValidateEntriesCRC() const;
+			void				_SetBackupHeaderFromPrimary(uint64 lastBlock);
 			size_t				_EntryArraySize() const
 									{ return fHeader.EntrySize()
 										* fHeader.EntryCount(); }
+
+			const char*			_PrintGUID(const guid_t& id);
+			void				_Dump();
+			void				_DumpPartitions();
 
 private:
 			uint32				fBlockSize;
 			status_t			fStatus;
 			efi_table_header	fHeader;
+			efi_table_header	fBackupHeader;
 			uint8*				fEntries;
 };
 

@@ -44,27 +44,37 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 	fStatus(B_NO_INIT),
 	fEntries(NULL)
 {
-	// TODO: check the correctness of the protective MBR
+	// TODO: check the correctness of the protective MBR and warn if invalid
 
-	// read and check the partition table header
+	// Read and check the partition table header
 
-	ssize_t bytesRead = read_pos(fd, (uint64)EFI_HEADER_LOCATION * blockSize,
+	fStatus = _Read(fd, (uint64)EFI_HEADER_LOCATION * blockSize,
 		&fHeader, sizeof(efi_table_header));
-	if (bytesRead != (ssize_t)sizeof(efi_table_header)) {
-		if (bytesRead < B_OK)
-			fStatus = bytesRead;
-		else
-			fStatus = B_IO_ERROR;
-
-		return;
+	if (fStatus == B_OK) {
+		if (!_IsHeaderValid(fHeader, EFI_HEADER_LOCATION))
+			fStatus = B_BAD_DATA;
 	}
 
-	if (memcmp(fHeader.header, EFI_PARTITION_HEADER, sizeof(fHeader.header))
-		|| !_ValidateHeaderCRC()
-		|| fHeader.AbsoluteBlock() != EFI_HEADER_LOCATION) {
-		// TODO: check that partition counts are in valid bounds
-		fStatus = B_BAD_DATA;
+	// Read backup header, too
+	status_t status = _Read(fd, lastBlock * blockSize, &fBackupHeader,
+		sizeof(efi_table_header));
+	if (status == B_OK) {
+		if (!_IsHeaderValid(fBackupHeader, lastBlock))
+			status = B_BAD_DATA;
+	}
+
+	// If both headers are invalid, bail out -- this is probably not a GPT disk
+	if (status != B_OK && fStatus != B_OK)
 		return;
+
+	if (fStatus != B_OK) {
+		// Recreate primary header from the backup
+		fHeader = fBackupHeader;
+		fHeader.SetAbsoluteBlock(EFI_HEADER_LOCATION);
+		fHeader.SetEntriesBlock(EFI_PARTITION_ENTRIES_BLOCK);
+	} else if (status != B_OK) {
+		// Recreate backup header from primary
+		_SetBackupHeaderFromPrimary(lastBlock);
 	}
 
 	// allocate, read, and check partition entry array
@@ -77,22 +87,22 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 		return;
 	}
 
-	bytesRead = read_pos(fd, fHeader.EntriesBlock() * blockSize,
+	fStatus = _Read(fd, fHeader.EntriesBlock() * blockSize,
 		fEntries, _EntryArraySize());
-	if (bytesRead != (ssize_t)_EntryArraySize()) {
-		if (bytesRead < B_OK)
-			fStatus = bytesRead;
-		else
-			fStatus = B_IO_ERROR;
+	if (fStatus != B_OK || !_ValidateEntriesCRC()) {
+		// Read backup entries instead
+		fStatus = _Read(fd, fBackupHeader.EntriesBlock() * blockSize,
+			fEntries, _EntryArraySize());
+		if (fStatus != B_OK)
+			return;
 
-		return;
+		if (!_ValidateEntriesCRC()) {
+			fStatus = B_BAD_DATA;
+			return;
+		}
 	}
 
-	if (!_ValidateEntriesCRC()) {
-		// TODO: check overlapping or out of range partitions
-		fStatus = B_BAD_DATA;
-		return;
-	}
+	// TODO: check overlapping or out of range partitions
 
 #ifdef TRACE_EFI_GPT
 	_Dump();
@@ -140,6 +150,8 @@ Header::Header(uint64 lastBlock, uint32 blockSize)
 	fHeader.SetFirstUsableBlock(EFI_PARTITION_ENTRIES_BLOCK + entryBlocks);
 	fHeader.SetLastUsableBlock(lastBlock - 1 - entryBlocks);
 
+	_SetBackupHeaderFromPrimary(lastBlock);
+
 #ifdef TRACE_EFI_GPT
 	_Dump();
 	_DumpPartitions();
@@ -168,19 +180,25 @@ status_t
 Header::WriteEntry(int fd, uint32 entryIndex)
 {
 	// Determine block to write
-	off_t block = fHeader.EntriesBlock()
+	off_t blockOffset =
 		+ entryIndex * fHeader.EntrySize() / fBlockSize;
 	uint32 entryOffset = entryIndex * fHeader.EntrySize() % fBlockSize;
 
-	status_t status = _Write(fd, block * fBlockSize, fEntries + entryOffset,
-		fBlockSize);
+	status_t status = _Write(fd,
+		(fHeader.EntriesBlock() + blockOffset) * fBlockSize,
+		fEntries + entryOffset, fBlockSize);
 	if (status != B_OK)
 		return status;
 
-	// TODO: write mirror at the end
-
 	// Update header, too -- the entries CRC changed
-	return _WriteHeader(fd);
+	status = _WriteHeader(fd);
+
+	// Write backup
+	status_t backupStatus = _Write(fd,
+		(fBackupHeader.EntriesBlock() + blockOffset) * fBlockSize,
+		fEntries + entryOffset, fBlockSize);
+
+	return status == B_OK ? backupStatus : status;
 }
 
 
@@ -192,9 +210,15 @@ Header::Write(int fd)
 	if (status != B_OK)
 		return status;
 
-	// TODO: write mirror at the end
+	// First write the header, so that we have at least one completely correct
+	// data set
+	status = _WriteHeader(fd);
 
-	return _WriteHeader(fd);
+	// Write backup entries
+	status_t backupStatus = _Write(fd,
+		fBackupHeader.EntriesBlock() * fBlockSize, fEntries, _EntryArraySize());
+
+	return status == B_OK ? backupStatus : status;
 }
 
 
@@ -208,9 +232,8 @@ Header::_WriteHeader(int fd)
 	if (status != B_OK)
 		return status;
 
-	// TODO: write mirror at the end
-
-	return B_OK;
+	return _Write(fd, fBackupHeader.AbsoluteBlock() * fBlockSize,
+		&fBackupHeader, sizeof(efi_table_header));
 }
 
 
@@ -227,6 +250,19 @@ Header::_Write(int fd, off_t offset, const void* data, size_t size) const
 }
 
 
+status_t
+Header::_Read(int fd, off_t offset, void* data, size_t size) const
+{
+	ssize_t bytesRead = read_pos(fd, offset, data, size);
+	if (bytesRead < 0)
+		return bytesRead;
+	if (bytesRead != (ssize_t)size)
+		return B_IO_ERROR;
+
+	return B_OK;
+}
+
+
 void
 Header::_UpdateCRC()
 {
@@ -235,6 +271,15 @@ Header::_UpdateCRC()
 	fHeader.SetHeaderCRC(crc32((uint8*)&fHeader, sizeof(efi_table_header)));
 }
 #endif // !_BOOT_MODE
+
+
+bool
+Header::_IsHeaderValid(const efi_table_header& header, uint64 block)
+{
+	return !memcmp(fHeader.header, EFI_PARTITION_HEADER, sizeof(fHeader.header))
+		&& _ValidateHeaderCRC()
+		&& fHeader.AbsoluteBlock() == block;
+}
 
 
 bool
@@ -255,6 +300,16 @@ bool
 Header::_ValidateEntriesCRC() const
 {
 	return fHeader.EntriesCRC() == crc32(fEntries, _EntryArraySize());
+}
+
+
+void
+Header::_SetBackupHeaderFromPrimary(uint64 lastBlock)
+{
+	fBackupHeader = fHeader;
+	fBackupHeader.SetAbsoluteBlock(lastBlock);
+	fBackupHeader.SetEntriesBlock(
+		lastBlock - _EntryArraySize() / fBlockSize);
 }
 
 
