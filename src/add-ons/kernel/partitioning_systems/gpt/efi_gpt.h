@@ -31,8 +31,8 @@ struct efi_table_header {
 
 	// the rest of the block is reserved
 
-	void SetRevision(uint32 revision)
-		{ revision = B_HOST_TO_LENDIAN_INT32(revision); }
+	void SetRevision(uint32 newRevision)
+		{ revision = B_HOST_TO_LENDIAN_INT32(newRevision); }
 	uint32 Revision() const
 		{ return B_LENDIAN_TO_HOST_INT32(revision); }
 	void SetHeaderSize(uint32 size)
