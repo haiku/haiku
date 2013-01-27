@@ -5,6 +5,7 @@
 #ifndef TERMINAL_BUFFER_H
 #define TERMINAL_BUFFER_H
 
+#include <GraphicsDefs.h>
 #include <Locker.h>
 #include <Messenger.h>
 
@@ -26,6 +27,10 @@ public:
 			void				SetEncoding(int encoding);
 
 			void				SetTitle(const char* title);
+			void				SetColors(uint8* indexes, rgb_color* colors,
+									int32 count = 1, bool dynamic = false);
+			void				ResetColors(uint8* indexes,
+									int32 count = 1, bool dynamic = false);
 			void				NotifyQuit(int32 reason);
 
 	virtual	status_t			ResizeTo(int32 width, int32 height);

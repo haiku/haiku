@@ -53,6 +53,24 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_IM_BACK_COLOR,		"152, 203, 255" },
 	{ PREF_IM_SELECT_COLOR,		"255, 152, 152" },
 
+	{ PREF_ANSI_BLACK_COLOR,	" 40,  40,  40" },
+	{ PREF_ANSI_RED_COLOR,		"204,   0,   0" },
+	{ PREF_ANSI_GREEN_COLOR,	" 78, 154,   6" },
+	{ PREF_ANSI_YELLOW_COLOR,	"218, 168,   0" },
+	{ PREF_ANSI_BLUE_COLOR,		" 51, 102, 152" },
+	{ PREF_ANSI_MAGENTA_COLOR,	"115,  68, 123" },
+	{ PREF_ANSI_CYAN_COLOR,		"  6, 152, 154" },
+	{ PREF_ANSI_WHITE_COLOR,	"245, 245, 245" },
+                                                  
+	{ PREF_ANSI_BLACK_HCOLOR,	"128, 128, 128" },
+	{ PREF_ANSI_RED_HCOLOR,		"255,   0,   0" },
+	{ PREF_ANSI_GREEN_HCOLOR,	"  0, 255,   0" },
+	{ PREF_ANSI_YELLOW_HCOLOR,	"255, 255,   0" },
+	{ PREF_ANSI_BLUE_HCOLOR,	"  0,   0, 255" },
+	{ PREF_ANSI_MAGENTA_HCOLOR,	"255,   0, 255" },
+	{ PREF_ANSI_CYAN_HCOLOR,	"  0, 255, 255" },
+	{ PREF_ANSI_WHITE_HCOLOR,	"255, 255, 255" },
+
 	{ PREF_HISTORY_SIZE,		"10000" },
 
 	{ PREF_TEXT_ENCODING,		"UTF-8" },

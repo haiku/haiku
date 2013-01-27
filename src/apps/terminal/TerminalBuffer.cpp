@@ -136,6 +136,48 @@ TerminalBuffer::SetTitle(const char* title)
 
 
 void
+TerminalBuffer::SetColors(uint8* indexes, rgb_color* colors,
+		int32 count, bool dynamic)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_SET_TERMINAL_COLORS);
+		message.AddInt32("count", count);
+		message.AddBool("dynamic", dynamic);
+		message.AddData("index", B_UINT8_TYPE,
+					indexes, sizeof(uint8), true, count);
+		message.AddData("color", B_RGB_COLOR_TYPE,
+					colors, sizeof(rgb_color), true, count);
+
+		for (int i = 1; i < count; i++) {
+			message.AddData("index", B_UINT8_TYPE, &indexes[i], sizeof(uint8));
+			message.AddData("color", B_RGB_COLOR_TYPE, &colors[i],
+					sizeof(rgb_color));
+		}
+
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::ResetColors(uint8* indexes, int32 count, bool dynamic)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_RESET_TERMINAL_COLORS);
+		message.AddInt32("count", count);
+		message.AddBool("dynamic", dynamic);
+		message.AddData("index", B_UINT8_TYPE,
+					indexes, sizeof(uint8), true, count);
+
+		for (int i = 1; i < count; i++)
+			message.AddData("index", B_UINT8_TYPE, &indexes[i], sizeof(uint8));
+
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
 TerminalBuffer::NotifyQuit(int32 reason)
 {
 	if (fListenerValid) {

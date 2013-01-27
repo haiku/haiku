@@ -38,7 +38,7 @@ Application Terminal :
 	VTKeyTbl.c
 	VTPrsTbl.c
 	: be $(HAIKU_LOCALE_LIBS) tracker textencoding $(TARGET_LIBSUPC++)
-	: Terminal.rdef
+	: Terminal.rdef XColors.rdef
 ;
 
 DoCatalogs Terminal :

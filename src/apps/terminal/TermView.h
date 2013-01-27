@@ -79,6 +79,8 @@ public:
 			void				SetTextColor(rgb_color fore, rgb_color back);
 			void				SetCursorColor(rgb_color fore, rgb_color back);
 			void				SetSelectColor(rgb_color fore, rgb_color back);
+			void				SetTermColor(uint index, rgb_color color,
+									bool dynamic = false);
 
 			int					Encoding() const;
 			void				SetEncoding(int encoding);
@@ -148,6 +150,7 @@ private:
 
 			status_t			_InitObject(
 									const ShellParameters& shellParameters);
+			status_t			_InitColorTable();
 
 			status_t			_AttachShell(Shell* shell);
 			void				_DetachShell();
@@ -260,6 +263,8 @@ private:
 			rgb_color			fCursorBackColor;
 			rgb_color			fSelectForeColor;
 			rgb_color			fSelectBackColor;
+
+			rgb_color*			fTermColorTable;
 
 			// Scroll Region
 			float				fScrollOffset;

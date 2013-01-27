@@ -88,6 +88,8 @@ static const uint32 MSG_CHECK_CHILDREN					= 'ckch';
 static const uint32 MSG_REMOVE_RESIZE_VIEW_IF_NEEDED	= 'rmrv';
 static const uint32 MSG_TERMINAL_BUFFER_CHANGED			= 'bufc';
 static const uint32 MSG_SET_TERMINAL_TITLE				= 'sett';
+static const uint32 MSG_SET_TERMINAL_COLORS				= 'setc';
+static const uint32 MSG_RESET_TERMINAL_COLORS			= 'rstc';
 static const uint32 MSG_QUIT_TERMNAL					= 'qutt';
 static const uint32 MSG_REPORT_MOUSE_EVENT				= 'mous';
 static const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
@@ -120,6 +122,15 @@ static const char* const PREF_ANSI_BLUE_COLOR = "ANSI blue color";
 static const char* const PREF_ANSI_MAGENTA_COLOR = "ANSI magenta color";
 static const char* const PREF_ANSI_CYAN_COLOR = "ANSI cyan color";
 static const char* const PREF_ANSI_WHITE_COLOR = "ANSI white color";
+
+static const char* const PREF_ANSI_BLACK_HCOLOR = "ANSI bright black color";
+static const char* const PREF_ANSI_RED_HCOLOR = "ANSI bright red color";
+static const char* const PREF_ANSI_GREEN_HCOLOR = "ANSI bright green color";
+static const char* const PREF_ANSI_YELLOW_HCOLOR = "ANSI bright yellow color";
+static const char* const PREF_ANSI_BLUE_HCOLOR = "ANSI bright blue color";
+static const char* const PREF_ANSI_MAGENTA_HCOLOR = "ANSI bright magenta color";
+static const char* const PREF_ANSI_CYAN_HCOLOR = "ANSI bright cyan color";
+static const char* const PREF_ANSI_WHITE_HCOLOR = "ANSI bright white color";
 
 static const char* const PREF_HISTORY_SIZE = "History size";
 static const char* const PREF_CURSOR_BLINKING = "Cursor blinking rate";

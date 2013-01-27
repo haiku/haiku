@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
@@ -25,6 +26,7 @@
 #include <Message.h>
 #include <UTF8.h>
 
+#include "Colors.h"
 #include "TermConst.h"
 #include "TerminalBuffer.h"
 #include "VTparse.h"
@@ -1045,33 +1047,39 @@ TermParse::EscParse()
 				case CASE_OSC:
 					{
 						/* Operating System Command: ESC ] */
-						char string[512];
-						uint32 len = 0;
-						uchar mode_char = _NextParseChar();
-						if (mode_char != '0'
-								&& mode_char != '1'
-								&& mode_char != '2') {
-							parsestate = groundtable;
-							break;
-						}
-						uchar currentChar = _NextParseChar();
-						while ((currentChar = _NextParseChar()) != 0x7) {
-							if (!isprint(currentChar & 0x7f)
-									|| len+2 >= sizeof(string))
-								break;
-							string[len++] = currentChar;
-						}
-						if (currentChar == 0x7) {
-							string[len] = '\0';
-							switch (mode_char) {
-								case '0':
-								case '2':
-									fBuffer->SetTitle(string);
+						uchar params[512];
+						// fill the buffer until BEL, ST or something else.
+						bool isParsed = false;
+						for (uint i = 0; !isParsed && i < sizeof(params); i++) {
+							params[i] = _NextParseChar();
+							switch (params[i]) {
+								// BEL
+								case 0x07:
+									isParsed = true;
 									break;
-								case '1':
+								// 8-bit ST
+								case 0x9c:
+									isParsed = true;
 									break;
+								// 7-bit ST is "ESC \"
+								case '\\':
+								// hm... Was \x1b replaced by 0 during parsing?
+									if (i > 0 && params[i - 1] == 0) {
+										isParsed = true;
+										break;
+									}
+								default:
+									if (!isprint(params[i] & 0x7f)) {
+										break;
+									}
+									continue;
 							}
+							params[i] = '\0';
 						}
+						
+						if (isParsed)
+							_ProcessOperatingSystemControls(params);
+
 						parsestate = groundtable;
 						break;
 					}
@@ -1444,3 +1452,98 @@ TermParse::_DecRestoreCursor()
 	fBuffer->RestoreOriginMode();
 	fAttr = fSavedAttr;
 }
+
+
+void
+TermParse::_ProcessOperatingSystemControls(uchar* params)
+{
+	int mode = 0;
+	for (uchar c = *params; c != ';' && c != '\0'; c = *(++params)) {
+		mode *= 10;
+		mode += c - '0';
+	}
+
+	// eat the separator
+	if (*params == ';')
+		params++;
+
+	static uint8 indexes[kTermColorCount];
+	static rgb_color colors[kTermColorCount];
+
+	switch (mode) {
+		case 0: // icon name and window title
+		case 2: // window title
+			fBuffer->SetTitle((const char*)params);
+			break;
+		case 4: // set colors (0 - 255)
+		case 104: // reset colors (0 - 255)
+			{
+				bool reset = (mode / 100) == 1;
+				
+				// colors can be in "idx1:name1;...;idxN:nameN;" sequence too!
+				uint32 count = 0;
+				char* p = strtok((char*)params, ";");
+				do {
+					indexes[count] = atoi(p);
+
+					if (!reset) {
+						p = strtok(NULL, ";");
+						if (p == NULL)
+							break;
+
+						if (gXColorsTable.LookUpColor(p, &colors[count]) == B_OK) {
+							count++;
+						}
+					} else {
+						count++;
+					}
+
+					p = strtok(NULL, ";");
+				} while(p != NULL && count < kTermColorCount);
+				
+				if (count > 0) {
+					if (!reset)
+						fBuffer->SetColors(indexes, colors, count);
+					else
+						fBuffer->ResetColors(indexes, count);
+				}
+			}
+			break;
+		// set dynamic colors (10 - 19)
+		case 10: // text foreground
+		case 11: // text background
+			{
+				int32 offset = mode - 10;
+				int32 count = 0;
+				char* p = strtok((char*)params, ";");
+				do {
+					if (gXColorsTable.LookUpColor(p, &colors[count]) != B_OK) {
+						// dyna-colors are pos-sensitive - no chance to continue
+						break;
+					}
+				   
+					indexes[count] = 10 + offset + count;
+					count++;
+					
+					p = strtok(NULL, ";");
+				} while(p != NULL && (offset + count) < 10);
+			
+				if (count > 0) {
+					fBuffer->SetColors(indexes, colors, count, true);
+				}
+			}
+			break;
+		// reset dynamic colors (10 - 19)
+		case 110: // text foreground
+		case 111: // text background
+			{
+				indexes[0] = mode;
+				fBuffer->ResetColors(indexes, 1, true);
+			}
+			break;
+		default:
+			printf("%d -> %s\n", mode, params);
+			break;
+	}
+}
+

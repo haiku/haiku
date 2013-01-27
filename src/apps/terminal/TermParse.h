@@ -82,6 +82,7 @@ private:
 	void _DecSaveCursor();
 	void _DecRestoreCursor();
 	int* _GuessGroundTable(int encoding);
+	void _ProcessOperatingSystemControls(uchar* params);
 
 	int fFd;
 

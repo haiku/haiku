@@ -24,7 +24,6 @@
 #include <algorithm>
 #include <new>
 
-#include "ActiveProcessInfo.h"
 #include <Alert.h>
 #include <Application.h>
 #include <Beep.h>
@@ -53,6 +52,8 @@
 #include <UTF8.h>
 #include <Window.h>
 
+#include "ActiveProcessInfo.h"
+#include "Colors.h"
 #include "InlineInput.h"
 #include "PrefHandler.h"
 #include "Shell.h"
@@ -68,268 +69,6 @@ using namespace BPrivate ; // BCharacterSet stuff
 // defined in VTKeyTbl.c
 extern int function_keycode_table[];
 extern char *function_key_char_table[];
-
-static rgb_color kTermColorTable[256] = {
-	{ 40,  40,  40, 0},	// black
-	{204,   0,   0, 0},	// red
-	{ 78, 154,   6, 0},	// green
-	{218, 168,   0, 0},	// yellow
-	{ 51, 102, 152, 0},	// blue
-	{115,  68, 123, 0},	// magenta
-	{  6, 152, 154, 0},	// cyan
-	{245, 245, 245, 0},	// white
-
-	{128, 128, 128, 0},	// black
-	{255,   0,   0, 0},	// red
-	{  0, 255,   0, 0},	// green
-	{255, 255,   0, 0},	// yellow
-	{  0,   0, 255, 0},	// blue
-	{255,   0, 255, 0},	// magenta
-	{  0, 255, 255, 0},	// cyan
-	{255, 255, 255, 0},	// white
-
-	{  0,   0,   0, 0},
-	{  0,   0,  51, 0},
-	{  0,   0, 102, 0},
-	{  0,   0, 153, 0},
-	{  0,   0, 204, 0},
-	{  0,   0, 255, 0},
-	{  0,  51,   0, 0},
-	{  0,  51,  51, 0},
-	{  0,  51, 102, 0},
-	{  0,  51, 153, 0},
-	{  0,  51, 204, 0},
-	{  0,  51, 255, 0},
-	{  0, 102,   0, 0},
-	{  0, 102,  51, 0},
-	{  0, 102, 102, 0},
-	{  0, 102, 153, 0},
-	{  0, 102, 204, 0},
-	{  0, 102, 255, 0},
-	{  0, 153,   0, 0},
-	{  0, 153,  51, 0},
-	{  0, 153, 102, 0},
-	{  0, 153, 153, 0},
-	{  0, 153, 204, 0},
-	{  0, 153, 255, 0},
-	{  0, 204,   0, 0},
-	{  0, 204,  51, 0},
-	{  0, 204, 102, 0},
-	{  0, 204, 153, 0},
-	{  0, 204, 204, 0},
-	{  0, 204, 255, 0},
-	{  0, 255,   0, 0},
-	{  0, 255,  51, 0},
-	{  0, 255, 102, 0},
-	{  0, 255, 153, 0},
-	{  0, 255, 204, 0},
-	{  0, 255, 255, 0},
-	{ 51,   0,   0, 0},
-	{ 51,   0,  51, 0},
-	{ 51,   0, 102, 0},
-	{ 51,   0, 153, 0},
-	{ 51,   0, 204, 0},
-	{ 51,   0, 255, 0},
-	{ 51,  51,   0, 0},
-	{ 51,  51,  51, 0},
-	{ 51,  51, 102, 0},
-	{ 51,  51, 153, 0},
-	{ 51,  51, 204, 0},
-	{ 51,  51, 255, 0},
-	{ 51, 102,   0, 0},
-	{ 51, 102,  51, 0},
-	{ 51, 102, 102, 0},
-	{ 51, 102, 153, 0},
-	{ 51, 102, 204, 0},
-	{ 51, 102, 255, 0},
-	{ 51, 153,   0, 0},
-	{ 51, 153,  51, 0},
-	{ 51, 153, 102, 0},
-	{ 51, 153, 153, 0},
-	{ 51, 153, 204, 0},
-	{ 51, 153, 255, 0},
-	{ 51, 204,   0, 0},
-	{ 51, 204,  51, 0},
-	{ 51, 204, 102, 0},
-	{ 51, 204, 153, 0},
-	{ 51, 204, 204, 0},
-	{ 51, 204, 255, 0},
-	{ 51, 255,   0, 0},
-	{ 51, 255,  51, 0},
-	{ 51, 255, 102, 0},
-	{ 51, 255, 153, 0},
-	{ 51, 255, 204, 0},
-	{ 51, 255, 255, 0},
-	{102,   0,   0, 0},
-	{102,   0,  51, 0},
-	{102,   0, 102, 0},
-	{102,   0, 153, 0},
-	{102,   0, 204, 0},
-	{102,   0, 255, 0},
-	{102,  51,   0, 0},
-	{102,  51,  51, 0},
-	{102,  51, 102, 0},
-	{102,  51, 153, 0},
-	{102,  51, 204, 0},
-	{102,  51, 255, 0},
-	{102, 102,   0, 0},
-	{102, 102,  51, 0},
-	{102, 102, 102, 0},
-	{102, 102, 153, 0},
-	{102, 102, 204, 0},
-	{102, 102, 255, 0},
-	{102, 153,   0, 0},
-	{102, 153,  51, 0},
-	{102, 153, 102, 0},
-	{102, 153, 153, 0},
-	{102, 153, 204, 0},
-	{102, 153, 255, 0},
-	{102, 204,   0, 0},
-	{102, 204,  51, 0},
-	{102, 204, 102, 0},
-	{102, 204, 153, 0},
-	{102, 204, 204, 0},
-	{102, 204, 255, 0},
-	{102, 255,   0, 0},
-	{102, 255,  51, 0},
-	{102, 255, 102, 0},
-	{102, 255, 153, 0},
-	{102, 255, 204, 0},
-	{102, 255, 255, 0},
-	{153,   0,   0, 0},
-	{153,   0,  51, 0},
-	{153,   0, 102, 0},
-	{153,   0, 153, 0},
-	{153,   0, 204, 0},
-	{153,   0, 255, 0},
-	{153,  51,   0, 0},
-	{153,  51,  51, 0},
-	{153,  51, 102, 0},
-	{153,  51, 153, 0},
-	{153,  51, 204, 0},
-	{153,  51, 255, 0},
-	{153, 102,   0, 0},
-	{153, 102,  51, 0},
-	{153, 102, 102, 0},
-	{153, 102, 153, 0},
-	{153, 102, 204, 0},
-	{153, 102, 255, 0},
-	{153, 153,   0, 0},
-	{153, 153,  51, 0},
-	{153, 153, 102, 0},
-	{153, 153, 153, 0},
-	{153, 153, 204, 0},
-	{153, 153, 255, 0},
-	{153, 204,   0, 0},
-	{153, 204,  51, 0},
-	{153, 204, 102, 0},
-	{153, 204, 153, 0},
-	{153, 204, 204, 0},
-	{153, 204, 255, 0},
-	{153, 255,   0, 0},
-	{153, 255,  51, 0},
-	{153, 255, 102, 0},
-	{153, 255, 153, 0},
-	{153, 255, 204, 0},
-	{153, 255, 255, 0},
-	{204,   0,   0, 0},
-	{204,   0,  51, 0},
-	{204,   0, 102, 0},
-	{204,   0, 153, 0},
-	{204,   0, 204, 0},
-	{204,   0, 255, 0},
-	{204,  51,   0, 0},
-	{204,  51,  51, 0},
-	{204,  51, 102, 0},
-	{204,  51, 153, 0},
-	{204,  51, 204, 0},
-	{204,  51, 255, 0},
-	{204, 102,   0, 0},
-	{204, 102,  51, 0},
-	{204, 102, 102, 0},
-	{204, 102, 153, 0},
-	{204, 102, 204, 0},
-	{204, 102, 255, 0},
-	{204, 153,   0, 0},
-	{204, 153,  51, 0},
-	{204, 153, 102, 0},
-	{204, 153, 153, 0},
-	{204, 153, 204, 0},
-	{204, 153, 255, 0},
-	{204, 204,   0, 0},
-	{204, 204,  51, 0},
-	{204, 204, 102, 0},
-	{204, 204, 153, 0},
-	{204, 204, 204, 0},
-	{204, 204, 255, 0},
-	{204, 255,   0, 0},
-	{204, 255,  51, 0},
-	{204, 255, 102, 0},
-	{204, 255, 153, 0},
-	{204, 255, 204, 0},
-	{204, 255, 255, 0},
-	{255,   0,   0, 0},
-	{255,   0,  51, 0},
-	{255,   0, 102, 0},
-	{255,   0, 153, 0},
-	{255,   0, 204, 0},
-	{255,   0, 255, 0},
-	{255,  51,   0, 0},
-	{255,  51,  51, 0},
-	{255,  51, 102, 0},
-	{255,  51, 153, 0},
-	{255,  51, 204, 0},
-	{255,  51, 255, 0},
-	{255, 102,   0, 0},
-	{255, 102,  51, 0},
-	{255, 102, 102, 0},
-	{255, 102, 153, 0},
-	{255, 102, 204, 0},
-	{255, 102, 255, 0},
-	{255, 153,   0, 0},
-	{255, 153,  51, 0},
-	{255, 153, 102, 0},
-	{255, 153, 153, 0},
-	{255, 153, 204, 0},
-	{255, 153, 255, 0},
-	{255, 204,   0, 0},
-	{255, 204,  51, 0},
-	{255, 204, 102, 0},
-	{255, 204, 153, 0},
-	{255, 204, 204, 0},
-	{255, 204, 255, 0},
-	{255, 255,   0, 0},
-	{255, 255,  51, 0},
-	{255, 255, 102, 0},
-	{255, 255, 153, 0},
-	{255, 255, 204, 0},
-	{255, 255, 255, 0},
-
-	{ 10,  10,  10, 0},
-	{ 20,  20,  20, 0},
-	{ 30,  30,  30, 0},
-	{ 40,  40,  40, 0},
-	{ 50,  50,  50, 0},
-	{ 60,  60,  60, 0},
-	{ 70,  70,  70, 0},
-	{ 80,  80,  80, 0},
-	{ 90,  90,  90, 0},
-	{100, 100, 100, 0},
-	{110, 110, 110, 0},
-	{120, 120, 120, 0},
-	{130, 130, 130, 0},
-	{140, 140, 140, 0},
-	{150, 150, 150, 0},
-	{160, 160, 160, 0},
-	{170, 170, 170, 0},
-	{180, 180, 180, 0},
-	{190, 190, 190, 0},
-	{200, 200, 200, 0},
-	{210, 210, 210, 0},
-	{220, 220, 220, 0},
-	{230, 230, 230, 0},
-	{240, 240, 240, 0},
-};
 
 #define ROWS_DEFAULT 25
 #define COLUMNS_DEFAULT 80
@@ -441,6 +180,7 @@ TermView::TermView(BRect frame, const ShellParameters& shellParameters,
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
 	fActive(false),
+	fTermColorTable(NULL),
 	fScrBufSize(historySize),
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
@@ -464,6 +204,7 @@ TermView::TermView(int rows, int columns,
 	fRows(rows),
 	fEncoding(M_UTF8),
 	fActive(false),
+	fTermColorTable(NULL),
 	fScrBufSize(historySize),
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
@@ -497,6 +238,7 @@ TermView::TermView(BMessage* archive)
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
 	fActive(false),
+	fTermColorTable(NULL),
 	fScrBufSize(1000),
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
@@ -589,6 +331,10 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	fVisibleTextBuffer = new(std::nothrow) BasicTerminalBuffer;
 	if (fVisibleTextBuffer == NULL)
 		return B_NO_MEMORY;
+	
+	status_t error = _InitColorTable();
+	if (error != B_OK)
+		return error;
 
 	// TODO: Make the special word chars user-settable!
 	fCharClassifier = new(std::nothrow) CharClassifier(
@@ -596,7 +342,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	if (fCharClassifier == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = fTextBuffer->Init(fColumns, fRows, fScrBufSize);
+	error = fTextBuffer->Init(fColumns, fRows, fScrBufSize);
 	if (error != B_OK)
 		return error;
 	fTextBuffer->SetEncoding(fEncoding);
@@ -627,7 +373,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	if (error < B_OK)
 		return error;
 
-	SetLowColor(kTermColorTable[8]);
+	SetLowColor(fTermColorTable[8]);
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
 	return B_OK;
@@ -645,6 +391,7 @@ TermView::~TermView()
 	delete fAutoScrollRunner;
 	delete fCharClassifier;
 	delete fVisibleTextBuffer;
+	delete[] fTermColorTable;
 	delete fTextBuffer;
 	delete shell;
 }
@@ -879,8 +626,8 @@ TermView::GetTermSizeFromRect(const BRect &rect, int *_rows,
 void
 TermView::SetTextColor(rgb_color fore, rgb_color back)
 {
-	kTermColorTable[0] = back;
-	kTermColorTable[7] = fore;
+	fTermColorTable[0] = back;
+	fTermColorTable[7] = fore;
 
 	SetLowColor(back);
 }
@@ -899,6 +646,38 @@ TermView::SetSelectColor(rgb_color fore, rgb_color back)
 {
 	fSelectForeColor = fore;
 	fSelectBackColor = back;
+}
+
+
+void
+TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
+{
+	if (!dynamic) {
+		if (index < kTermColorCount)
+			fTermColorTable[index] = color;
+		return;
+	}
+	
+	switch (index) {
+		case 10:
+			fTermColorTable[7] = color;
+			break;
+		case 11:
+			fTermColorTable[0] = color;
+			SetLowColor(fTermColorTable[0]);
+			break;
+		case 110:
+			fTermColorTable[7] =
+				PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR);
+			break;
+		case 111:
+			fTermColorTable[0] =
+				PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR);
+			SetLowColor(fTermColorTable[0]);
+			break;
+		default:
+			break;
+	}
 }
 
 
@@ -1146,8 +925,8 @@ TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	// color attribute
 	int forecolor = IS_FORECOLOR(attr);
 	int backcolor = IS_BACKCOLOR(attr);
-	rgb_fore = kTermColorTable[forecolor];
-	rgb_back = kTermColorTable[backcolor];
+	rgb_fore = fTermColorTable[forecolor];
+	rgb_back = fTermColorTable[backcolor];
 
 	// Selection check.
 	if (cursor) {
@@ -1232,7 +1011,7 @@ TermView::_DrawCursor()
 			if (cursorVisible)
 				SetHighColor(fCursorBackColor);
 			else
-				SetHighColor(kTermColorTable[IS_BACKCOLOR(attr)]);
+				SetHighColor(fTermColorTable[IS_BACKCOLOR(attr)]);
 		}
 
 		FillRect(rect);
@@ -1384,7 +1163,7 @@ TermView::Draw(BRect updateRect)
 		if (clearLeft <= updateRect.right) {
 			BRect rect(clearLeft, updateRect.top, updateRect.right,
 				updateRect.bottom);
-			SetHighColor(kTermColorTable[0]);
+			SetHighColor(fTermColorTable[0]);
 			FillRect(rect);
 		}
 	}
@@ -1395,7 +1174,7 @@ TermView::Draw(BRect updateRect)
 		if (clearTop <= updateRect.bottom) {
 			BRect rect(updateRect.left, clearTop, updateRect.right,
 				updateRect.bottom);
-			SetHighColor(kTermColorTable[0]);
+			SetHighColor(fTermColorTable[0]);
 			FillRect(rect);
 		}
 	}
@@ -1441,7 +1220,7 @@ TermView::Draw(BRect updateRect)
 						int lineIndexInHistory = j + fTextBuffer->HistorySize();
 						uint32 backcolor = IS_BACKCOLOR(fVisibleTextBuffer->GetLineColor(
 							lineIndexInHistory));
-						rgb_color rgb_back = kTermColorTable[backcolor];
+						rgb_color rgb_back = fTermColorTable[backcolor];
 						SetHighColor(rgb_back);
 						FillRect(rect);
 					}
@@ -2009,6 +1788,53 @@ TermView::MessageReceived(BMessage *msg)
 				if (fListener != NULL)
 					fListener->SetTermViewTitle(this, title);
 			}
+			break;
+		}
+		case MSG_SET_TERMINAL_COLORS:
+		{
+			int32 count  = 0;
+			if (msg->FindInt32("count", &count) != B_OK)
+				break;
+			
+			bool dynamic  = false;
+			if (msg->FindBool("dynamic", &dynamic) != B_OK)
+				break;
+			
+			for (int i = 0; i < count; i++) {
+				uint8 index = 0;
+				if (msg->FindUInt8("index", i, &index) != B_OK)
+					break;
+
+				ssize_t bytes = 0;
+				rgb_color* color = 0;
+				if (msg->FindData("color", B_RGB_COLOR_TYPE,
+							i, (const void**)&color, &bytes) != B_OK)
+					break;
+				
+				SetTermColor(index, *color, dynamic);
+			}
+			
+			break;
+		}
+		case MSG_RESET_TERMINAL_COLORS:
+		{
+			int32 count  = 0;
+			if (msg->FindInt32("count", &count) != B_OK)
+				break;
+			
+			bool dynamic  = false;
+			if (msg->FindBool("dynamic", &dynamic) != B_OK)
+				break;
+			
+			for (int i = 0; i < count; i++) {
+				uint8 index = 0;
+				if (msg->FindUInt8("index", i, &index) != B_OK)
+					break;
+
+				if (index < kTermColorCount)
+					SetTermColor(index, fTermColorTable[index], dynamic);
+			}
+			
 			break;
 		}
 		case MSG_REPORT_MOUSE_EVENT:
@@ -3176,15 +3002,15 @@ TermView::_DrawInlineMethodString()
 	BRect eraseRect(startPoint, endPoint);
 
 	PushState();
-	SetHighColor(kTermColorTable[7]);
+	SetHighColor(fTermColorTable[7]);
 	FillRect(eraseRect);
 	PopState();
 
 	BPoint loc = _ConvertFromTerminal(fCursor);
 	loc.y += fFontHeight;
 	SetFont(&fHalfFont);
-	SetHighColor(kTermColorTable[0]);
-	SetLowColor(kTermColorTable[7]);
+	SetHighColor(fTermColorTable[0]);
+	SetLowColor(fTermColorTable[7]);
 	DrawString(fInline->String(), loc);
 }
 
@@ -3325,6 +3151,51 @@ TermView::_CancelInputMethod()
 	delete inlineInput;
 }
 
+
+status_t
+TermView::_InitColorTable()
+{
+	fTermColorTable = new(std::nothrow) rgb_color[kTermColorCount];
+	if (fTermColorTable == NULL)
+		return B_NO_MEMORY;
+
+	// 0 - 15 are system ANSI colors
+	const char * keys[kANSIColorCount] = {
+		PREF_ANSI_BLACK_COLOR,
+		PREF_ANSI_RED_COLOR,
+		PREF_ANSI_GREEN_COLOR,
+		PREF_ANSI_YELLOW_COLOR,
+		PREF_ANSI_BLUE_COLOR,
+		PREF_ANSI_MAGENTA_COLOR,
+		PREF_ANSI_CYAN_COLOR,
+		PREF_ANSI_WHITE_COLOR,
+		PREF_ANSI_BLACK_HCOLOR,
+		PREF_ANSI_RED_HCOLOR,
+		PREF_ANSI_GREEN_HCOLOR,
+		PREF_ANSI_YELLOW_HCOLOR,
+		PREF_ANSI_BLUE_HCOLOR,
+		PREF_ANSI_MAGENTA_HCOLOR,
+		PREF_ANSI_CYAN_HCOLOR,
+		PREF_ANSI_WHITE_HCOLOR
+	};
+
+	rgb_color* color = fTermColorTable;
+	PrefHandler* handler = PrefHandler::Default();
+	for (uint i = 0; i < kANSIColorCount; i++)	
+		*color++ = handler->getRGB(keys[i]);
+
+	// 16 - 231 are 6x6x6 color "cubes" in xterm color model
+	for (uint red = 0; red < 256; red += (red == 0) ? 95 : 40)
+		for (uint green = 0; green < 256; green += (green == 0) ? 95 : 40)
+			for (uint blue = 0; blue < 256; blue += (blue == 0) ? 95 : 40)
+				(*color++).set_to(red, green, blue);
+
+	// 232 - 255 are grayscale ramp in xterm color model
+	for (uint gray = 8; gray < 240; gray += 10)
+		(*color++).set_to(gray, gray, gray);
+
+	return B_OK;
+}
 
 // #pragma mark - Listener
 
