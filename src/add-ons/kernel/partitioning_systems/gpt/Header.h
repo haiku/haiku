@@ -47,11 +47,11 @@ private:
 			status_t			_WriteHeader(int fd);
 			status_t			_Write(int fd, off_t offset, const void* data,
 									size_t size) const;
-			status_t			_Read(int fd, off_t offset, void* data,
-									size_t size) const;
 			void				_UpdateCRC();
 #endif
 
+			status_t			_Read(int fd, off_t offset, void* data,
+									size_t size) const;
 			bool				_IsHeaderValid(const efi_table_header& header,
 									uint64 block);
 			bool				_ValidateHeaderCRC();

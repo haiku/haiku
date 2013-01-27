@@ -250,6 +250,16 @@ Header::_Write(int fd, off_t offset, const void* data, size_t size) const
 }
 
 
+void
+Header::_UpdateCRC()
+{
+	fHeader.SetEntriesCRC(crc32(fEntries, _EntryArraySize()));
+	fHeader.SetHeaderCRC(0);
+	fHeader.SetHeaderCRC(crc32((uint8*)&fHeader, sizeof(efi_table_header)));
+}
+#endif // !_BOOT_MODE
+
+
 status_t
 Header::_Read(int fd, off_t offset, void* data, size_t size) const
 {
@@ -261,16 +271,6 @@ Header::_Read(int fd, off_t offset, void* data, size_t size) const
 
 	return B_OK;
 }
-
-
-void
-Header::_UpdateCRC()
-{
-	fHeader.SetEntriesCRC(crc32(fEntries, _EntryArraySize()));
-	fHeader.SetHeaderCRC(0);
-	fHeader.SetHeaderCRC(crc32((uint8*)&fHeader, sizeof(efi_table_header)));
-}
-#endif // !_BOOT_MODE
 
 
 bool
