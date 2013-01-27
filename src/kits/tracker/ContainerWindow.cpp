@@ -419,7 +419,7 @@ DraggableContainerIcon::MouseMoved(BPoint point, uint32 /*transit*/,
 
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
-	float height = ceil(fontHeight.ascent + fontHeight.descent
+	float height = ceilf(fontHeight.ascent + fontHeight.descent
 		+ fontHeight.leading + 2 + Bounds().Height() + 8);
 
 	BRect rect(0, 0, max_c(Bounds().Width(),
