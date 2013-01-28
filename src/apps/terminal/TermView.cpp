@@ -1224,11 +1224,14 @@ TermView::Draw(BRect updateRect)
 						SetHighColor(fSelectBackColor);
 						FillRect(rect);
 					} else {
+						rgb_color rgb_back = fTextBackColor;
+
 						int lineIndexInHistory = j + fTextBuffer->HistorySize();
-						uint32 backcolor = IS_BACKCOLOR(fVisibleTextBuffer->GetLineColor(
-							lineIndexInHistory));
-						rgb_color rgb_back = fTermColorTable[backcolor];
-					//	/* rgb_color*/ rgb_back = fTextBackColor;
+						uint32 attr = fVisibleTextBuffer->GetLineColor(
+								lineIndexInHistory);
+
+						if (IS_BACKSET(attr))
+							rgb_back = fTermColorTable[IS_BACKCOLOR(attr)];
 						SetHighColor(rgb_back);
 						FillRect(rect);
 					}
