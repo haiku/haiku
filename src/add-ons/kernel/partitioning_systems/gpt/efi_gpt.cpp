@@ -73,7 +73,7 @@ static float
 efi_gpt_identify_partition(int fd, partition_data* partition, void** _cookie)
 {
 	EFI::Header* header = new (std::nothrow) EFI::Header(fd,
-		partition->size / partition->block_size, partition->block_size);
+		(partition->size - 1) / partition->block_size, partition->block_size);
 	status_t status = header->InitCheck();
 	if (status != B_OK) {
 		delete header;
@@ -110,9 +110,8 @@ efi_gpt_scan_partition(int fd, partition_data* partition, void* _cookie)
 
 		if (entry.EndBlock() * partition->block_size
 				> (uint64)partition->size) {
-			TRACE(("efi_gpt: child partition exceeds existing space (%Ld MB)\n",
-				(entry.EndBlock() - entry.StartBlock()) * partition->block_size
-				/ 1024 / 1024));
+			TRACE(("efi_gpt: child partition exceeds existing space (ends at "
+				"block %" B_PRIu64 ")\n", entry.EndBlock()));
 			continue;
 		}
 
@@ -699,7 +698,7 @@ efi_gpt_initialize(int fd, partition_id partitionID, const char* name,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	EFI::Header header(partitionSize / partition->block_size,
+	EFI::Header header((partitionSize - 1) / partition->block_size,
 		partition->block_size);
 	status_t result = header.InitCheck();
 	if (result != B_OK)
