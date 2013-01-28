@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
@@ -364,6 +364,51 @@ typedef struct ata_device_infoblock {
 		signature								: 8,
 		checksum								: 8
 	);
+
+	uint64 SectorCount(bool& use48Bits, bool force)
+	{
+		if (lba48_supported && lba48_sector_count >= lba_sector_count) {
+			use48Bits = true;
+			return lba48_sector_count;
+		}
+
+		use48Bits = force ? lba48_supported : false;
+		return lba_sector_count;
+	}
+
+	uint32 PhysicalSectorSize()
+	{
+		uint32 blockSize = 512;
+		if (word_106_bit_14_one && !word_106_bit_15_zero) {
+			// contains a valid block size configuration
+			if (logical_sector_not_512_bytes)
+				blockSize = logical_sector_size * 2;
+
+			if (multiple_logical_per_physical_sectors)
+				return blockSize << logical_sectors_per_physical_sector;
+		}
+		return blockSize;
+	}
+
+	uint32 SectorSize()
+	{
+		if (word_106_bit_14_one && !word_106_bit_15_zero) {
+			// contains a valid block size configuration
+			if (logical_sector_not_512_bytes)
+				return logical_sector_size * 2;
+		}
+		return 512;
+	}
+
+	uint32 BlockOffset()
+	{
+		if (word_209_bit_14_one && !word_209_bit_15_zero) {
+			// contains a valid logical block offset configuration
+			return logical_sector_offset;
+		}
+		return 0;
+	}
 } _PACKED ata_device_infoblock;
+
 
 #endif // ATA_INFOBLOCK_H
