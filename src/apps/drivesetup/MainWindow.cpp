@@ -1066,7 +1066,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 
 	if (ret != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("Creation of the partition has "
-			"failed."));
+			"failed."), NULL, ret);
 		return;
 	}
 
@@ -1075,7 +1075,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 
 	if (ret != B_OK) {
 		_DisplayPartitionError(B_TRANSLATE("Failed to format the "
-			"partition. No changes have been written to disk."));
+			"partition. No changes have been written to disk."), NULL, ret);
 		return;
 	}
 
