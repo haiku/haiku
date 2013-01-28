@@ -109,7 +109,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/net_server				# launch net_server
 fi
 
-launch $SERVERS/app_server picasso		# launch app_server
+launch $SERVERS/app_server picasso			# launch app_server
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/syslog_daemon
