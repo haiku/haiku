@@ -55,6 +55,12 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 			fStatus = B_BAD_DATA;
 	}
 
+	if (fStatus == B_OK && lastBlock != fHeader.AlternateBlock()) {
+		dprintf("gpt: alternate header not in last block (%" B_PRIu64 " vs. %"
+			B_PRIu64 ")\n", fHeader.AlternateBlock(), lastBlock);
+		lastBlock = fHeader.AlternateBlock();
+	}
+
 	// Read backup header, too
 	status_t status = _Read(fd, lastBlock * blockSize, &fBackupHeader,
 		sizeof(efi_table_header));
@@ -72,6 +78,7 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 		fHeader = fBackupHeader;
 		fHeader.SetAbsoluteBlock(EFI_HEADER_LOCATION);
 		fHeader.SetEntriesBlock(EFI_PARTITION_ENTRIES_BLOCK);
+		fHeader.SetAlternateBlock(lastBlock);
 	} else if (status != B_OK) {
 		// Recreate backup header from primary
 		_SetBackupHeaderFromPrimary(lastBlock);
@@ -105,7 +112,8 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 	// TODO: check overlapping or out of range partitions
 
 #ifdef TRACE_EFI_GPT
-	_Dump();
+	_Dump(fHeader);
+	_Dump(fBackupHeader);
 	_DumpPartitions();
 #endif
 
@@ -153,7 +161,7 @@ Header::Header(uint64 lastBlock, uint32 blockSize)
 	_SetBackupHeaderFromPrimary(lastBlock);
 
 #ifdef TRACE_EFI_GPT
-	_Dump();
+	_Dump(fHeader);
 	_DumpPartitions();
 #endif
 
@@ -253,9 +261,17 @@ Header::_Write(int fd, off_t offset, const void* data, size_t size) const
 void
 Header::_UpdateCRC()
 {
-	fHeader.SetEntriesCRC(crc32(fEntries, _EntryArraySize()));
-	fHeader.SetHeaderCRC(0);
-	fHeader.SetHeaderCRC(crc32((uint8*)&fHeader, sizeof(efi_table_header)));
+	_UpdateCRC(fHeader);
+	_UpdateCRC(fBackupHeader);
+}
+
+
+void
+Header::_UpdateCRC(efi_table_header& header)
+{
+	header.SetEntriesCRC(crc32(fEntries, _EntryArraySize()));
+	header.SetHeaderCRC(0);
+	header.SetHeaderCRC(crc32((uint8*)&header, sizeof(efi_table_header)));
 }
 #endif // !_BOOT_MODE
 
@@ -310,6 +326,7 @@ Header::_SetBackupHeaderFromPrimary(uint64 lastBlock)
 	fBackupHeader.SetAbsoluteBlock(lastBlock);
 	fBackupHeader.SetEntriesBlock(
 		lastBlock - _EntryArraySize() / fBlockSize);
+	fBackupHeader.SetAlternateBlock(1);
 }
 
 
@@ -329,21 +346,21 @@ Header::_PrintGUID(const guid_t &id)
 
 
 void
-Header::_Dump()
+Header::_Dump(const efi_table_header& header)
 {
-	dprintf("EFI header: %.8s\n", fHeader.header);
-	dprintf("EFI revision: %" B_PRIx32 "\n", fHeader.Revision());
-	dprintf("header size: %ld\n", fHeader.HeaderSize());
-	dprintf("header CRC: %ld\n", fHeader.HeaderCRC());
-	dprintf("absolute block: %Ld\n", fHeader.AbsoluteBlock());
-	dprintf("alternate block: %Ld\n", fHeader.AlternateBlock());
-	dprintf("first usable block: %Ld\n", fHeader.FirstUsableBlock());
-	dprintf("last usable block: %Ld\n", fHeader.LastUsableBlock());
-	dprintf("disk GUID: %s\n", _PrintGUID(fHeader.disk_guid));
-	dprintf("entries block: %Ld\n", fHeader.EntriesBlock());
-	dprintf("entry size:  %ld\n", fHeader.EntrySize());
-	dprintf("entry count: %ld\n", fHeader.EntryCount());
-	dprintf("entries CRC: %ld\n", fHeader.EntriesCRC());
+	dprintf("EFI header: %.8s\n", header.header);
+	dprintf("EFI revision: %" B_PRIx32 "\n", header.Revision());
+	dprintf("header size: %ld\n", header.HeaderSize());
+	dprintf("header CRC: %ld\n", header.HeaderCRC());
+	dprintf("absolute block: %Ld\n", header.AbsoluteBlock());
+	dprintf("alternate block: %Ld\n", header.AlternateBlock());
+	dprintf("first usable block: %Ld\n", header.FirstUsableBlock());
+	dprintf("last usable block: %Ld\n", header.LastUsableBlock());
+	dprintf("disk GUID: %s\n", _PrintGUID(header.disk_guid));
+	dprintf("entries block: %Ld\n", header.EntriesBlock());
+	dprintf("entry size:  %ld\n", header.EntrySize());
+	dprintf("entry count: %ld\n", header.EntryCount());
+	dprintf("entries CRC: %ld\n", header.EntriesCRC());
 }
 
 

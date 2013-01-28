@@ -48,6 +48,7 @@ private:
 			status_t			_Write(int fd, off_t offset, const void* data,
 									size_t size) const;
 			void				_UpdateCRC();
+			void				_UpdateCRC(efi_table_header& header);
 #endif
 
 			status_t			_Read(int fd, off_t offset, void* data,
@@ -62,7 +63,7 @@ private:
 										* fHeader.EntryCount(); }
 
 			const char*			_PrintGUID(const guid_t& id);
-			void				_Dump();
+			void				_Dump(const efi_table_header& header);
 			void				_DumpPartitions();
 
 private:
