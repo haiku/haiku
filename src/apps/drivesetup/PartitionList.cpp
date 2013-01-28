@@ -1,12 +1,14 @@
 /*
- * Copyright 2006-2013 Haiku Inc. All rights reserved.
+ * Copyright 2006-2013, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Ithamar R. Adema <ithamar@unet.nl>
  *		James Urquhart
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
+
 
 #include "PartitionList.h"
 
@@ -22,6 +24,19 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PartitionList"
+
+
+static const char* kUnavailableString = "";
+
+enum {
+	kDeviceColumn,
+	kFilesystemColumn,
+	kVolumeNameColumn,
+	kMountedAtColumn,
+	kSizeColumn,
+	kParametersColumn,
+	kPartitionTypeColumn,
+};
 
 
 // #pragma mark - BBitmapStringField
@@ -179,18 +194,6 @@ PartitionColumn::InitTextMargin(BView* parent)
 // #pragma mark - PartitionListRow
 
 
-static const char* kUnavailableString = "";
-
-enum {
-	kDeviceColumn,
-	kFilesystemColumn,
-	kVolumeNameColumn,
-	kMountedAtColumn,
-	kSizeColumn,
-	kParametersColumn
-};
-
-
 PartitionListRow::PartitionListRow(BPartition* partition)
 	:
 	Inherited(),
@@ -218,6 +221,8 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 	// File system & volume name
 
+	BString partitionType(partition->Type());
+
 	if (partition->ContainsFileSystem()) {
 		SetField(new BStringField(partition->ContentType()), kFilesystemColumn);
 		SetField(new BStringField(partition->ContentName()), kVolumeNameColumn);
@@ -231,7 +236,6 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	} else {
-		BString partitionType(partition->Type());
 		if (!partitionType.IsEmpty()) {
 			partitionType.Prepend("(");
 			partitionType.Append(")");
@@ -278,6 +282,10 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 	} else {
 		SetField(new BStringField(kUnavailableString), kParametersColumn);
 	}
+
+	// Partition type
+
+	SetField(new BStringField(partitionType), kPartitionTypeColumn);
 }
 
 
@@ -333,8 +341,10 @@ PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 		B_TRUNCATE_MIDDLE), kMountedAtColumn);
 	AddColumn(new PartitionColumn(B_TRANSLATE("Size"), 100, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
-	AddColumn(new PartitionColumn(B_TRANSLATE("Parameters"), 150, 50, 500,
-		B_TRUNCATE_MIDDLE), kParametersColumn);
+	AddColumn(new PartitionColumn(B_TRANSLATE("Parameters"), 200, 50, 500,
+		B_TRUNCATE_END), kParametersColumn);
+	AddColumn(new PartitionColumn(B_TRANSLATE("Partition type"), 100, 50, 500,
+		B_TRUNCATE_END), kPartitionTypeColumn);
 
 	SetSortingEnabled(false);
 }
