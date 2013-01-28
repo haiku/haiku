@@ -86,31 +86,6 @@ protected:
 };
 
 
-// #pragma mark - ManageWindowState Definition
-
-
-struct DefaultWindowBehaviour::ManageWindowState : State {
-					ManageWindowState(DefaultWindowBehaviour& behavior,
-						BPoint where);
-					ManageWindowState(DefaultWindowBehaviour& behavior,
-						BPoint where, int8 horizontal, int8 vertical);
-	virtual	void	EnterState(State* previousState);
-	virtual	void	ExitState(State* nextState);
-	virtual	bool	MouseDown(BMessage* message, BPoint where,
-						bool& _unhandled);
-	virtual	void	MouseMoved(BMessage* message, BPoint where, bool isFake);
-	virtual	void	ModifiersChanged(BPoint where, int32 modifiers);
-
-private:
-			void	_UpdateResizeArrows(BPoint where);
-
-private:
-			BPoint	fLastMousePosition;
-			int8	fHorizontal;
-			int8	fVertical;
-};
-
-
 // #pragma mark - MouseTrackingState
 
 
@@ -240,14 +215,6 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 	{
 	}
 
-	virtual void EnterState(State* previousState)
-	{
-	}
-
-	virtual void ExitState(State* nextState)
-	{
-	}
-
 	virtual bool MouseDown(BMessage* message, BPoint where, bool& _unhandled)
 	{
 		// right-click while dragging shall bring the window to front
@@ -261,41 +228,6 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 		}
 
 		return MouseTrackingState::MouseDown(message, where, _unhandled);
-	}
-
-	virtual void MouseUp(BMessage* message, BPoint where)
-	{
-		int32 modifiers = message->FindInt32("modifiers");
-
-		if (fBehavior._IsWindowModifier(modifiers)) {
-			// If the window modifiers are held return to the window
-			// management state.
-			fBehavior._NextState(new(std::nothrow) ManageWindowState(
-				fBehavior, where));
-		} else {
-			if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-				&& fBehavior._IsControlModifier(modifiers)) {
-				fBehavior._SetBorderResizeCursor(where);
-			} else
-				fBehavior._ResetCursor();
-
-			fBehavior._NextState(NULL);
-		}
-	}
-
-	virtual void ModifiersChanged(BPoint where, int32 modifiers)
-	{
-		// Exit if user lifted window management modifiers
-		fBehavior.fLastModifiers = modifiers;
-		if (!fBehavior._IsWindowModifier(modifiers)) {
-			if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-				&& fBehavior._IsControlModifier(modifiers)) {
-				fBehavior._SetBorderResizeCursor(where);
-			} else
-				fBehavior._ResetCursor();
-
-			fBehavior._NextState(NULL);
-		}
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
@@ -424,8 +356,7 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 	{
 		switch (region) {
 			case Decorator::REGION_TAB:
-				fHorizontal = NONE;
-				fVertical = NONE;
+				// TODO: Handle like the border it is attached to (top/left)?
 				break;
 			case Decorator::REGION_LEFT_BORDER:
 				fHorizontal = LEFT;
@@ -472,45 +403,21 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 
 	virtual void EnterState(State* previousState)
 	{
+		if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0)
+			fHorizontal = fVertical = NONE;
+		else {
+			if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
+				fHorizontal = NONE;
+
+			if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
+				fVertical = NONE;
+		}
 		fBehavior._SetResizeCursor(fHorizontal, fVertical);
 	}
 
 	virtual void ExitState(State* nextState)
 	{
-	}
-
-	virtual void MouseUp(BMessage* message, BPoint where)
-	{
-		int32 modifiers = message->FindInt32("modifiers");
-		if (fBehavior._IsWindowModifier(modifiers)) {
-			// If the window modifiers are still held return to window
-			// management state.
-			fBehavior._NextState(new(std::nothrow) ManageWindowState(
-				fBehavior, where, fHorizontal, fVertical));
-		} else {
-			if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-				&& fBehavior._IsControlModifier(modifiers)) {
-				fBehavior._SetBorderResizeCursor(where);
-			} else
-				fBehavior._ResetCursor();
-		
-			fBehavior._NextState(NULL);
-		}
-	}
-
-	virtual void ModifiersChanged(BPoint where, int32 modifiers)
-	{
-		// Exit if user lifted window management modifiers
-		fBehavior.fLastModifiers = modifiers;
-		if (!fBehavior._IsWindowModifier(modifiers)) {
-			if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-				&& fBehavior._IsControlModifier(modifiers)) {
-				fBehavior._SetBorderResizeCursor(where);
-			} else
-				fBehavior._ResetCursor();
-
-			fBehavior._NextState(NULL);
-		}
+		fBehavior._ResetResizeCursor();
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
@@ -673,141 +580,100 @@ protected:
 // #pragma mark - ManageWindowState
 
 
-DefaultWindowBehaviour::ManageWindowState::ManageWindowState(
-	DefaultWindowBehaviour& behavior, BPoint where)
-	:
-	State(behavior),
-	fLastMousePosition(where),
-	fHorizontal(NONE),
-	fVertical(NONE)
-{
-}
-
-
-DefaultWindowBehaviour::ManageWindowState::ManageWindowState(
-	DefaultWindowBehaviour& behavior, BPoint where, int8 horizontal,
-	int8 vertical)
-	:
-	State(behavior),
-	fLastMousePosition(where),
-	fHorizontal(horizontal),
-	fVertical(vertical)
-{
-}
-
-
-void
-DefaultWindowBehaviour::ManageWindowState::EnterState(State* previousState)
-{
-	// Update the mouse cursor
-	if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
-		fBehavior._ResetCursor();
-	else if ((fWindow->Flags() & B_NOT_MOVABLE) != 0)
-		fBehavior._SetNotAllowedCursor();
-	else
-		fBehavior._SetMoveCursor();
-
-	_UpdateResizeArrows(fLastMousePosition);
-}
-
-
-void
-DefaultWindowBehaviour::ManageWindowState::ExitState(State* nextState)
-{
-}
-
-
-bool
-DefaultWindowBehaviour::ManageWindowState::MouseDown(BMessage* message,
-	BPoint where, bool& _unhandled)
-{
-	int32 buttons = message->FindInt32("buttons");
-	if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
-		if ((fWindow->Flags() & B_NOT_MOVABLE) == 0) {
-			fBehavior._SetMoveCursor();
-			fBehavior._NextState(new (std::nothrow) DragState(fBehavior,
-				where, false, false));
-		}
-	} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
-		if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
-			fBehavior._ResetCursor();
-		else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0) {
-			fBehavior._NextState(new (std::nothrow) ResizeBorderState(
-				fBehavior, where, fHorizontal, fVertical));
-		} else
-			fBehavior._SetNotAllowedCursor();
+struct DefaultWindowBehaviour::ManageWindowState : State {
+	ManageWindowState(DefaultWindowBehaviour& behavior, BPoint where)
+		:
+		State(behavior),
+		fLastMousePosition(where),
+		fHorizontal(NONE),
+		fVertical(NONE)
+	{
 	}
 
-	return true;
-}
+	virtual void EnterState(State* previousState)
+	{
+		_UpdateBorders(fLastMousePosition);
+	}
 
+	virtual void ExitState(State* nextState)
+	{
+		fBehavior._SetBorderHighlights(fHorizontal, fVertical, false);
+	}
 
-void
-DefaultWindowBehaviour::ManageWindowState::MouseMoved(BMessage* message,
-	BPoint where, bool isFake)
-{
-	// Update the mouse cursor
-	if ((fWindow->Flags() & kAcceptKeyboardFocusFlag) != 0)
-		fBehavior._ResetCursor();
-	else if ((fDesktop->WindowAt(where)->Flags() & B_NOT_MOVABLE) != 0
-		|| ((fDesktop->WindowAt(where)->Flags() & B_NOT_RESIZABLE) != 0
-		&& (message->FindInt32("buttons") & B_SECONDARY_MOUSE_BUTTON) != 0)) {
-		fBehavior._SetNotAllowedCursor();
-	} else
-		fBehavior._SetMoveCursor();
+	virtual bool MouseDown(BMessage* message, BPoint where, bool& _unhandled)
+	{
+		// We're only interested, if the secondary mouse button was pressed.
+		// Othewise let the our caller handle the event.
+		int32 buttons = message->FindInt32("buttons");
+		if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0) {
+			_unhandled = true;
+			return true;
+		}
 
-	// If the cursor is still over our window, update the borders.
-	// Otherwise leave the state.
-	if (fDesktop->WindowAt(where) == fWindow) {
-		fLastMousePosition = where;
-		_UpdateResizeArrows(fLastMousePosition);
-	} else
-		fBehavior._NextState(NULL);
-}
+		fBehavior._NextState(new (std::nothrow) ResizeBorderState(fBehavior,
+			where, fHorizontal, fVertical));
+		return true;
+	}
 
+	virtual void MouseMoved(BMessage* message, BPoint where, bool isFake)
+	{
+		// If the mouse is still over our window, update the borders. Otherwise
+		// leave the state.
+		if (fDesktop->WindowAt(where) == fWindow) {
+			fLastMousePosition = where;
+			_UpdateBorders(fLastMousePosition);
+		} else
+			fBehavior._NextState(NULL);
+	}
 
-void
-DefaultWindowBehaviour::ManageWindowState::ModifiersChanged(BPoint where,
-	int32 modifiers)
-{
-	fBehavior.fLastModifiers = modifiers;
-	if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-		&& fBehavior._IsControlModifier(modifiers)) {
-		fBehavior._SetBorderResizeCursor(where);
-	} else
-		fBehavior._ResetCursor();
+	virtual void ModifiersChanged(BPoint where, int32 modifiers)
+	{
+		if (!fBehavior._IsWindowModifier(modifiers))
+			fBehavior._NextState(NULL);
+	}
 
-	fBehavior._NextState(NULL);
-}
+private:
+	void _UpdateBorders(BPoint where)
+	{
+		if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0)
+			return;
 
+		// Compute the window center relative location of where. We divide by
+		// the width respective the height, so we compensate for the window's
+		// aspect ratio.
+		BRect frame(fWindow->Frame());
+		if (frame.Width() + 1 == 0 || frame.Height() + 1 == 0)
+			return;
 
-void
-DefaultWindowBehaviour::ManageWindowState::_UpdateResizeArrows(BPoint where)
-{
-	if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0)
-		return;
+		float x = (where.x - (frame.left + frame.right) / 2)
+			/ (frame.Width() + 1);
+		float y = (where.y - (frame.top + frame.bottom) / 2)
+			/ (frame.Height() + 1);
 
-	// Compute the window center relative location of where. We divide by
-	// the width respective the height, so we compensate for the window's
-	// aspect ratio.
-	BRect frame(fWindow->Frame());
-	if (frame.Width() + 1 == 0 || frame.Height() + 1 == 0)
-		return;
+		// compute the resize direction
+		int8 horizontal;
+		int8 vertical;
+		_ComputeResizeDirection(x, y, horizontal, vertical);
 
-	float x = (where.x - (frame.left + frame.right) / 2)
-		/ (frame.Width() + 1);
-	float y = (where.y - (frame.top + frame.bottom) / 2)
-		/ (frame.Height() + 1);
+		if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
+			horizontal = NONE;
+		if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
+			vertical = NONE;
 
-	// compute the resize direction
-	_ComputeResizeDirection(x, y, fHorizontal, fVertical);
+		// update the highlight, if necessary
+		if (horizontal != fHorizontal || vertical != fVertical) {
+			fBehavior._SetBorderHighlights(fHorizontal, fVertical, false);
+			fHorizontal = horizontal;
+			fVertical = vertical;
+			fBehavior._SetBorderHighlights(fHorizontal, fVertical, true);
+		}
+	}
 
-	// set resize direction to NONE if not resizable
-	if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
-		fHorizontal = NONE;
-	if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
-		fVertical = NONE;
-}
+private:
+	BPoint	fLastMousePosition;
+	int8	fHorizontal;
+	int8	fVertical;
+};
 
 
 // #pragma mark - DefaultWindowBehaviour
@@ -876,34 +742,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 		// translate the region into an action
 		uint32 flags = fWindow->Flags();
 
-		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0
-			|| (_IsControlModifier(fLastModifiers)
-				&& (buttons & B_PRIMARY_MOUSE_BUTTON) != 0)) {
-			// right mouse button or control + left mouse button
-			switch (hitRegion) {
-				case Decorator::REGION_TAB:
-				case Decorator::REGION_CLOSE_BUTTON:
-				case Decorator::REGION_ZOOM_BUTTON:
-				case Decorator::REGION_MINIMIZE_BUTTON:
-					// Right clicking on the window tab sends it behind
-					fDesktop->SendWindowBehind(fWindow);
-					break;
-				case Decorator::REGION_LEFT_BORDER:
-				case Decorator::REGION_RIGHT_BORDER:
-				case Decorator::REGION_TOP_BORDER:
-				case Decorator::REGION_BOTTOM_BORDER:
-				case Decorator::REGION_LEFT_TOP_CORNER:
-				case Decorator::REGION_LEFT_BOTTOM_CORNER:
-				case Decorator::REGION_RIGHT_TOP_CORNER:
-				case Decorator::REGION_RIGHT_BOTTOM_CORNER:
-					action = (flags & B_NOT_RESIZABLE) == 0
-						? ACTION_RESIZE_BORDER : ACTION_DRAG;
-					break;
-
-				default:
-					break;
-			}
-		} else if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+		if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
 			// left mouse button
 			switch (hitRegion) {
 				case Decorator::REGION_TAB: {
@@ -951,6 +790,27 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 				case Decorator::REGION_RIGHT_BOTTOM_CORNER:
 					action = (flags & B_NOT_RESIZABLE) == 0
 						? ACTION_RESIZE : ACTION_DRAG;
+					break;
+
+				default:
+					break;
+			}
+		} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+			// right mouse button
+			switch (hitRegion) {
+				case Decorator::REGION_TAB:
+				case Decorator::REGION_LEFT_BORDER:
+				case Decorator::REGION_RIGHT_BORDER:
+				case Decorator::REGION_TOP_BORDER:
+				case Decorator::REGION_BOTTOM_BORDER:
+				case Decorator::REGION_CLOSE_BUTTON:
+				case Decorator::REGION_ZOOM_BUTTON:
+				case Decorator::REGION_MINIMIZE_BUTTON:
+				case Decorator::REGION_LEFT_TOP_CORNER:
+				case Decorator::REGION_LEFT_BOTTOM_CORNER:
+				case Decorator::REGION_RIGHT_TOP_CORNER:
+				case Decorator::REGION_RIGHT_BOTTOM_CORNER:
+					action = ACTION_RESIZE_BORDER;
 					break;
 
 				default:
@@ -1034,21 +894,22 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 
 
 void
-DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where,
-	bool isFake)
+DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
+{
+	if (fState != NULL)
+		fState->MouseUp(message, where);
+}
+
+
+void
+DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where, bool isFake)
 {
 	if (fState != NULL) {
 		fState->MouseMoved(message, where, isFake);
 	} else {
-		fLastModifiers = message->FindInt32("modifiers");
-		if (_IsWindowModifier(fLastModifiers)) {
-			// Enter the window management state.
+		// If the window modifiers are hold, enter the window management state.
+		if (_IsWindowModifier(message->FindInt32("modifiers")))
 			_NextState(new(std::nothrow) ManageWindowState(*this, where));
-		} else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-			&& _IsControlModifier(fLastModifiers)) {
-			_SetBorderResizeCursor(where);
-		} else
-			_ResetCursor();
 	}
 
 	// change focus in FFM mode
@@ -1064,25 +925,6 @@ DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where,
 
 
 void
-DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
-{
-	if (fState != NULL)
-		fState->MouseUp(message, where);
-	else {
-		fLastModifiers = message->FindInt32("modifiers");
-		if (_IsWindowModifier(fLastModifiers)) {
-			// Enter the window management state.
-			_NextState(new(std::nothrow) ManageWindowState(*this, where));
-		} else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-			&& _IsControlModifier(fLastModifiers)) {
-			_SetBorderResizeCursor(where);
-		} else
-			_ResetCursor();
-	}
-}
-
-
-void
 DefaultWindowBehaviour::ModifiersChanged(int32 modifiers)
 {
 	BPoint where;
@@ -1092,15 +934,9 @@ DefaultWindowBehaviour::ModifiersChanged(int32 modifiers)
 	if (fState != NULL) {
 		fState->ModifiersChanged(where, modifiers);
 	} else {
-		fLastModifiers = modifiers;
-		if (_IsWindowModifier(fLastModifiers)) {
-			// Enter the window management state.
+		// If the window modifiers are hold, enter the window management state.
+		if (_IsWindowModifier(modifiers))
 			_NextState(new(std::nothrow) ManageWindowState(*this, where));
-		} else if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0
-			&& _IsControlModifier(fLastModifiers)) {
-			_SetBorderResizeCursor(where);
-		} else
-			_ResetCursor();
 	}
 }
 
@@ -1118,16 +954,7 @@ DefaultWindowBehaviour::_IsWindowModifier(int32 modifiers) const
 {
 	return (fWindow->Flags() & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
 		&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
-			| B_SHIFT_KEY)) == (B_COMMAND_KEY | B_CONTROL_KEY);
-}
-
-
-bool
-DefaultWindowBehaviour::_IsControlModifier(int32 modifiers) const
-{
-	return (fWindow->Flags() & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
-		&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
-			| B_SHIFT_KEY)) == B_CONTROL_KEY;
+				| B_SHIFT_KEY)) == (B_COMMAND_KEY | B_CONTROL_KEY);
 }
 
 
@@ -1146,6 +973,72 @@ DefaultWindowBehaviour::_RegionFor(const BMessage* message, int32& tab) const
 }
 
 
+void
+DefaultWindowBehaviour::_SetBorderHighlights(int8 horizontal, int8 vertical,
+	bool active)
+{
+	if (Decorator* decorator = fWindow->Decorator()) {
+		uint8 highlight = active
+			? Decorator::HIGHLIGHT_RESIZE_BORDER
+			: Decorator::HIGHLIGHT_NONE;
+
+		// set the highlights for the borders
+		BRegion dirtyRegion;
+		switch (horizontal) {
+			case LEFT:
+				decorator->SetRegionHighlight(Decorator::REGION_LEFT_BORDER,
+					highlight, &dirtyRegion);
+				break;
+			case RIGHT:
+				decorator->SetRegionHighlight(
+					Decorator::REGION_RIGHT_BORDER, highlight,
+					&dirtyRegion);
+				break;
+		}
+
+		switch (vertical) {
+			case TOP:
+				decorator->SetRegionHighlight(Decorator::REGION_TOP_BORDER,
+					highlight, &dirtyRegion);
+				break;
+			case BOTTOM:
+				decorator->SetRegionHighlight(
+					Decorator::REGION_BOTTOM_BORDER, highlight,
+					&dirtyRegion);
+				break;
+		}
+
+		// set the highlights for the corners
+		if (horizontal != NONE && vertical != NONE) {
+			if (horizontal == LEFT) {
+				if (vertical == TOP) {
+					decorator->SetRegionHighlight(
+						Decorator::REGION_LEFT_TOP_CORNER, highlight,
+						&dirtyRegion);
+				} else {
+					decorator->SetRegionHighlight(
+						Decorator::REGION_LEFT_BOTTOM_CORNER, highlight,
+						&dirtyRegion);
+				}
+			} else {
+				if (vertical == TOP) {
+					decorator->SetRegionHighlight(
+						Decorator::REGION_RIGHT_TOP_CORNER, highlight,
+						&dirtyRegion);
+				} else {
+					decorator->SetRegionHighlight(
+						Decorator::REGION_RIGHT_BOTTOM_CORNER, highlight,
+						&dirtyRegion);
+				}
+			}
+		}
+
+		// invalidate the affected regions
+		fWindow->ProcessDirtyRegion(dirtyRegion);
+	}
+}
+
+
 ServerCursor*
 DefaultWindowBehaviour::_ResizeCursorFor(int8 horizontal, int8 vertical)
 {
@@ -1154,23 +1047,23 @@ DefaultWindowBehaviour::_ResizeCursorFor(int8 horizontal, int8 vertical)
 
 	if (horizontal == LEFT) {
 		if (vertical == TOP)
-			cursorID = B_CURSOR_ID_RESIZE_NORTH_WEST_SOUTH_EAST;
+			cursorID = B_CURSOR_ID_RESIZE_NORTH_WEST;
 		else if (vertical == BOTTOM)
-			cursorID = B_CURSOR_ID_RESIZE_NORTH_EAST_SOUTH_WEST;
+			cursorID = B_CURSOR_ID_RESIZE_SOUTH_WEST;
 		else
-			cursorID = B_CURSOR_ID_RESIZE_EAST_WEST;
+			cursorID = B_CURSOR_ID_RESIZE_WEST;
 	} else if (horizontal == RIGHT) {
 		if (vertical == TOP)
-			cursorID = B_CURSOR_ID_RESIZE_NORTH_EAST_SOUTH_WEST;
+			cursorID = B_CURSOR_ID_RESIZE_NORTH_EAST;
 		else if (vertical == BOTTOM)
-			cursorID = B_CURSOR_ID_RESIZE_NORTH_WEST_SOUTH_EAST;
+			cursorID = B_CURSOR_ID_RESIZE_SOUTH_EAST;
 		else
-			cursorID = B_CURSOR_ID_RESIZE_EAST_WEST;
+			cursorID = B_CURSOR_ID_RESIZE_EAST;
 	} else {
 		if (vertical == TOP)
-			cursorID = B_CURSOR_ID_RESIZE_NORTH_SOUTH;
+			cursorID = B_CURSOR_ID_RESIZE_NORTH;
 		else if (vertical == BOTTOM)
-			cursorID = B_CURSOR_ID_RESIZE_NORTH_SOUTH;
+			cursorID = B_CURSOR_ID_RESIZE_SOUTH;
 	}
 
 	return fDesktop->GetCursorManager().GetCursor(cursorID);
@@ -1178,103 +1071,14 @@ DefaultWindowBehaviour::_ResizeCursorFor(int8 horizontal, int8 vertical)
 
 
 void
-DefaultWindowBehaviour::_SetMoveCursor()
-{
-	fDesktop->SetManagementCursor(
-		fDesktop->GetCursorManager().GetCursor(B_CURSOR_ID_MOVE));
-}
-
-
-void
-DefaultWindowBehaviour::_SetNotAllowedCursor()
-{
-	fDesktop->SetManagementCursor(
-		fDesktop->GetCursorManager().GetCursor(B_CURSOR_ID_NOT_ALLOWED));
-}
-
-
-void
 DefaultWindowBehaviour::_SetResizeCursor(int8 horizontal, int8 vertical)
 {
-	if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0)
-		horizontal = vertical = NONE;
-	else {
-		if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
-			horizontal = NONE;
-		if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
-			vertical = NONE;
-	}
-
 	fDesktop->SetManagementCursor(_ResizeCursorFor(horizontal, vertical));
 }
 
 
 void
-DefaultWindowBehaviour::_SetBorderResizeCursor(BPoint where)
-{
-	Decorator* decorator = fWindow->Decorator();
-	if (!decorator->GetFootprint().Contains(where)) {
-		// not over window
-		_ResetCursor();
-		return;
-	}
-
-	Decorator::Region hitRegion = Decorator::REGION_NONE;
-	int32 tab = -1;
-
-	BMessage* message = new BMessage();
-	message->AddPoint("where", where);
-	hitRegion = _RegionFor(message, tab);
-	delete message;
-
-	int8 horizontal = NONE;
-	int8 vertical = NONE;
-
-	switch (hitRegion) {
-		case Decorator::REGION_TAB:
-			break;
-		case Decorator::REGION_LEFT_BORDER:
-			horizontal = LEFT;
-			break;
-		case Decorator::REGION_RIGHT_BORDER:
-			horizontal = RIGHT;
-			break;
-		case Decorator::REGION_TOP_BORDER:
-			vertical = TOP;
-			break;
-		case Decorator::REGION_BOTTOM_BORDER:
-			vertical = BOTTOM;
-			break;
-		case Decorator::REGION_CLOSE_BUTTON:
-		case Decorator::REGION_ZOOM_BUTTON:
-		case Decorator::REGION_MINIMIZE_BUTTON:
-			break;
-		case Decorator::REGION_LEFT_TOP_CORNER:
-			horizontal = LEFT;
-			vertical = TOP;
-			break;
-		case Decorator::REGION_LEFT_BOTTOM_CORNER:
-			horizontal = LEFT;
-			vertical = BOTTOM;
-			break;
-		case Decorator::REGION_RIGHT_TOP_CORNER:
-			horizontal = RIGHT;
-			vertical = TOP;
-			break;
-		case Decorator::REGION_RIGHT_BOTTOM_CORNER:
-			horizontal = RIGHT;
-			vertical = BOTTOM;
-			break;
-		default:
-			break;
-	}
-
-	_SetResizeCursor(horizontal, vertical);
-}
-
-
-void
-DefaultWindowBehaviour::_ResetCursor()
+DefaultWindowBehaviour::_ResetResizeCursor()
 {
 	fDesktop->SetManagementCursor(NULL);
 }
