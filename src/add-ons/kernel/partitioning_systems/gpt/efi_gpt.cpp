@@ -42,12 +42,13 @@
 static off_t
 block_align(partition_data* partition, off_t offset, bool upwards)
 {
-	if (upwards) {
-		return ((offset + partition->block_size - 1) / partition->block_size)
-			* partition->block_size;
-	}
+	// Take HDs into account that hide the fact they are using a
+	// block size of 4096 bytes, and round to that.
+	uint32 blockSize = max_c(partition->block_size, 4096);
+	if (upwards)
+		return ((offset + blockSize - 1) / blockSize) * blockSize;
 
-	return (offset / partition->block_size) * partition->block_size;
+	return (offset / blockSize) * blockSize;
 }
 #endif // !_BOOT_MODE
 
