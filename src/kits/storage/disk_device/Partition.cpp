@@ -1177,6 +1177,8 @@ BPartition::BPartition::IsSubSystem(const char* diskSystem) const
 bool
 BPartition::CanInitialize(const char* diskSystem) const
 {
+	if (Size() == 0 || BlockSize() == 0)
+		return false;
 	return fDelegate && fDelegate->CanInitialize(diskSystem);
 }
 
