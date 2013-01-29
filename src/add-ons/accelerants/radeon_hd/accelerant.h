@@ -172,6 +172,7 @@ typedef struct {
 	uint32			hfreqMin;
 	edid1_info		edidData;
 	display_mode	preferredMode;
+	display_mode	currentMode;
 } display_info;
 
 

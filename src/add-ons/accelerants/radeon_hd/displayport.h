@@ -40,7 +40,7 @@ uint32 dp_get_lane_count(uint32 connectorIndex, display_mode* mode);
 
 void dp_setup_connectors();
 
-status_t dp_link_train(uint32 connectorIndex, display_mode* mode);
+status_t dp_link_train(uint8 crtcID);
 status_t dp_link_train_cr(uint32 connectorIndex);
 status_t dp_link_train_ce(uint32 connectorIndex);
 
@@ -48,7 +48,8 @@ void debug_dp_info();
 
 status_t dp_get_pixel_size_for(color_space space, size_t *pixelChunk,
 	size_t *rowAlignment, size_t *pixelsPerChunk);
-status_t ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info *edid);
+
+bool ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info *edid);
 
 
 #endif /* RADEON_HD_DISPLAYPORT_H */

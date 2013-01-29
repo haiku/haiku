@@ -301,7 +301,7 @@ pll_compute_post_divider(pll_info* pll)
 		if ((pll->flags & PLL_IS_LCD) != 0)
 			vco = pll->lcdPllOutMin;
 		else
-			vco = pll->pllOutMin;
+			vco = pll->pllOutMax;
 	} else {
 		if ((pll->flags & PLL_IS_LCD) != 0)
 			vco = pll->lcdPllOutMax;
@@ -311,8 +311,8 @@ pll_compute_post_divider(pll_info* pll)
 
 	TRACE("%s: vco = %" B_PRIu32 "\n", __func__, vco);
 
-	uint32 postDivider = vco / pll->pixelClock;
-	uint32 tmp = vco % pll->pixelClock;
+	uint32 postDivider = vco / pll->adjustedClock;
+	uint32 tmp = vco % pll->adjustedClock;
 
 	if ((pll->flags & PLL_PREFER_MINM_OVER_MAXP) != 0) {
 		if (tmp)
@@ -337,7 +337,7 @@ pll_compute(pll_info* pll)
 {
 	pll_compute_post_divider(pll);
 
-	uint32 targetClock = pll->pixelClock;
+	uint32 targetClock = pll->adjustedClock;
 
 	pll->feedbackDiv = 0;
 	pll->feedbackDivFrac = 0;
@@ -364,7 +364,7 @@ pll_compute(pll_info* pll)
 			pll->feedbackDiv = pll->minFeedbackDiv;
 
 		pll->feedbackDivFrac
-			= (100 * pll->feedbackDivFrac) / pll->referenceFreq;
+			= (1000 * pll->feedbackDivFrac) / pll->referenceFreq;
 
 		if (pll->feedbackDivFrac >= 5) {
 			pll->feedbackDivFrac -= 5;
@@ -436,12 +436,12 @@ pll_compute(pll_info* pll)
 	TRACE("%s: pixel clock: %" B_PRIu32 " gives:"
 		" feedbackDivider = %" B_PRIu32 ".%" B_PRIu32
 		"; referenceDivider = %" B_PRIu32 "; postDivider = %" B_PRIu32 "\n",
-		__func__, pll->pixelClock, pll->feedbackDiv, pll->feedbackDivFrac,
+		__func__, pll->adjustedClock, pll->feedbackDiv, pll->feedbackDivFrac,
 		pll->referenceDiv, pll->postDiv);
 
-	if (pll->pixelClock != calculatedClock) {
+	if (pll->adjustedClock != calculatedClock) {
 		TRACE("%s: pixel clock %" B_PRIu32 " was changed to %" B_PRIu32 "\n",
-			__func__, pll->pixelClock, calculatedClock);
+			__func__, pll->adjustedClock, calculatedClock);
 		pll->pixelClock = calculatedClock;
 	}
 
@@ -515,6 +515,7 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 	uint32 encoderFlags = connector->encoder.flags;
 
 	uint32 externalEncoderID = 0;
+	pll->adjustedClock = pll->pixelClock;
 	if (connector->encoderExternal.isDPBridge)
 		externalEncoderID = connector->encoderExternal.objectID;
 
@@ -557,9 +558,9 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
 						// get returned adjusted clock
-						pll->pixelClock
+						pll->adjustedClock
 							= B_LENDIAN_TO_HOST_INT16(args.v1.usPixelClock);
-						pll->pixelClock *= 10;
+						pll->adjustedClock *= 10;
 						break;
 					case 3:
 						args.v3.sInput.usPixelClock
@@ -607,10 +608,10 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
 
 						// get returned adjusted clock
-						pll->pixelClock
+						pll->adjustedClock
 							= B_LENDIAN_TO_HOST_INT32(
 								args.v3.sOutput.ulDispPllFreq);
-						pll->pixelClock *= 10;
+						pll->adjustedClock *= 10;
 							// convert to kHz for storage
 
 						if (args.v3.sOutput.ucRefDiv) {
@@ -638,7 +639,7 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 	}
 
 	TRACE("%s: was: %" B_PRIu32 ", now: %" B_PRIu32 "\n", __func__,
-		pixelClock, pll->pixelClock);
+		pixelClock, pll->adjustedClock);
 
 	return B_OK;
 }
@@ -649,6 +650,8 @@ pll_set(display_mode* mode, uint8 crtcID)
 {
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
+	uint32 dp_clock = gConnector[connectorIndex]->dpInfo.linkRate / 10;
+	bool ssEnabled = false;
 
 	pll->pixelClock = mode->timing.pixel_clock;
 
@@ -668,23 +671,28 @@ pll_set(display_mode* mode, uint8 crtcID)
 			if (info.dceMajor >= 4)
 				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_DP);
 			else {
-				// TODO: DP Clock == 1.62Ghz?
-				pll_ppll_ss_probe(pll, ATOM_DP_SS_ID1);
+				if (dp_clock == 16200) {
+					ssEnabled = pll_ppll_ss_probe(pll, ATOM_DP_SS_ID2);
+					if (!ssEnabled)
+						// id2 failed, try id1
+						ssEnabled = pll_ppll_ss_probe(pll, ATOM_DP_SS_ID1);
+				} else
+					ssEnabled = pll_ppll_ss_probe(pll, ATOM_DP_SS_ID1);
 			}
 			break;
 		case ATOM_ENCODER_MODE_LVDS:
 			if (info.dceMajor >= 4)
-				pll_asic_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
+				ssEnabled = pll_asic_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
 			else
-				pll_ppll_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
+				ssEnabled = pll_ppll_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
 			break;
 		case ATOM_ENCODER_MODE_DVI:
 			if (info.dceMajor >= 4)
-				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_TMDS);
+				ssEnabled = pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_TMDS);
 			break;
 		case ATOM_ENCODER_MODE_HDMI:
 			if (info.dceMajor >= 4)
-				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_HDMI);
+				ssEnabled = pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_HDMI);
 			break;
 	}
 
@@ -836,7 +844,8 @@ pll_set(display_mode* mode, uint8 crtcID)
 
 	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-	display_crtc_ss(pll, ATOM_ENABLE);
+	if (ssEnabled)
+		display_crtc_ss(pll, ATOM_ENABLE);
 
 	return result;
 }

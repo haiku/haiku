@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Support for i915 chipset and up based on the X driver,
@@ -69,6 +69,7 @@ uint32
 radeon_accelerant_mode_count(void)
 {
 	TRACE("%s\n", __func__);
+	// TODO: multi-monitor?  we need crtcid here
 
 	return gInfo->shared_info->mode_count;
 }
@@ -78,6 +79,7 @@ status_t
 radeon_get_mode_list(display_mode* modeList)
 {
 	TRACE("%s\n", __func__);
+	// TODO: multi-monitor?  we need crtcid here
 	memcpy(modeList, gInfo->mode_list,
 		gInfo->shared_info->mode_count * sizeof(display_mode));
 	return B_OK;
@@ -88,8 +90,8 @@ status_t
 radeon_get_preferred_mode(display_mode* preferredMode)
 {
 	TRACE("%s\n", __func__);
+	// TODO: multi-monitor?  we need crtcid here
 
-	// TODO: Argh!  Which display? :)
 	uint8_t crtc = 0;
 
 	if (gDisplay[crtc]->preferredMode.virtual_width > 0
@@ -119,7 +121,7 @@ radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 	memcpy(info, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
 		// VESA
 	//memcpy(info, &gDisplay[0]->edidData, sizeof(struct edid1_info));
-		// BitBanged display 0
+		// Display 0
 
 	*edid_version = EDID_VERSION_1;
 
@@ -145,26 +147,45 @@ radeon_dpms_mode(void)
 
 
 void
-radeon_dpms_set(int mode)
+radeon_dpms_set(uint8 id, int mode)
 {
-	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+	if (mode == B_DPMS_ON) {
+		display_crtc_dpms(id, mode);
+		encoder_dpms_set(id, mode);
+	} else {
 		encoder_dpms_set(id, mode);
 		display_crtc_dpms(id, mode);
 	}
-
 	gInfo->dpms_mode = mode;
+}
+
+
+void
+radeon_dpms_set_hook(int mode)
+{
+	// TODO: multi-monitor?  for now we use VESA edid
+
+	// As the accelerant hook doesn't pass crtc id
+	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+		radeon_dpms_set(id, mode);
+	}
 }
 
 
 status_t
 radeon_set_display_mode(display_mode* mode)
 {
-	radeon_shared_info &info = *gInfo->shared_info;
+	// TODO: multi-monitor? For now we set the mode on
+	// all displays (this is very incorrect). This also
+	// causes a lot of problems on DisplayPort devices
 
 	// Set mode on each display
 	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
 		if (gDisplay[id]->attached == false)
 			continue;
+
+		// Copy this display mode into the "current mode" for the display
+		memcpy(&gDisplay[id]->currentMode, mode, sizeof(display_mode));
 
 		uint32 connectorIndex = gDisplay[id]->connectorIndex;
 
@@ -177,9 +198,8 @@ radeon_set_display_mode(display_mode* mode)
 
 		// *** crtc and encoder prep
 		encoder_output_lock(true);
-		encoder_dpms_set(id, B_DPMS_OFF);
 		display_crtc_lock(id, ATOM_ENABLE);
-		display_crtc_dpms(id, B_DPMS_OFF);
+		radeon_dpms_set(id, B_DPMS_OFF);
 
 		// *** Set up encoder -> crtc routing
 		encoder_assign_crtc(id);
@@ -201,31 +221,15 @@ radeon_set_display_mode(display_mode* mode)
 		// *** encoder mode set
 		encoder_mode_set(id);
 
-		// *** CRT controler commit
-		display_crtc_dpms(id, B_DPMS_ON);
+		// *** encoder and CRT controller commit
+		radeon_dpms_set(id, B_DPMS_ON);
 		display_crtc_lock(id, ATOM_DISABLE);
-
-		// *** encoder commit
-
-		// handle DisplayPort link training
-		if (connector_is_dp(connectorIndex)) {
-			if (info.dceMajor >= 4)
-				encoder_dig_setup(connectorIndex,
-					ATOM_ENCODER_CMD_DP_VIDEO_OFF, 0);
-
-			dp_link_train(connectorIndex, mode);
-
-			if (info.dceMajor >= 4)
-				encoder_dig_setup(connectorIndex,
-					ATOM_ENCODER_CMD_DP_VIDEO_ON, 0);
-		}
-
-		encoder_dpms_set(id, B_DPMS_ON);
 		encoder_output_lock(false);
 	}
 
+	#ifdef TRACE_MODE
 	// for debugging
-	// debug_dp_info();
+	debug_dp_info();
 
 	TRACE("D1CRTC_STATUS        Value: 0x%X\n",
 		Read32(CRT, AVIVO_D1CRTC_STATUS));
@@ -247,6 +251,7 @@ radeon_set_display_mode(display_mode* mode)
 		Read32(CRT, AVIVO_D1CRTC_BLANK_CONTROL));
 	TRACE("D2CRTC_BLANK_CONTROL Value: 0x%X\n",
 		Read32(CRT, AVIVO_D1CRTC_BLANK_CONTROL));
+	#endif
 
 	return B_OK;
 }
@@ -258,6 +263,7 @@ radeon_get_display_mode(display_mode* _currentMode)
 	TRACE("%s\n", __func__);
 
 	*_currentMode = gInfo->shared_info->current_mode;
+	//*_currentMode = gDisplay[X]->currentMode;
 	return B_OK;
 }
 
