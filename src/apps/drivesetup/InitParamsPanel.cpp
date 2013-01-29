@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 Haiku Inc. All rights reserved.
+ * Copyright 2008-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -104,15 +104,16 @@ InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
 		// put the add-on
 		manager->PutAddOn(addOn);
 
-		status_t err = addOn->GetParameterEditor(B_INITIALIZE_PARAMETER_EDITOR, &fEditor);
-		if (err != B_OK) {
+		status_t err = addOn->GetParameterEditor(B_INITIALIZE_PARAMETER_EDITOR,
+			&fEditor);
+		if (err != B_OK)
 			fEditor = NULL;
-		}
 	} else {
 		fEditor = NULL;
 	}
+	if (fEditor == NULL)
+		return;
 
-	// TODO: fEditor should be checked for NULL before adding.
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	const float spacing = be_control_look->DefaultItemSpacing();
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
@@ -188,6 +189,10 @@ InitParamsPanel::MessageReceived(BMessage* message)
 int32
 InitParamsPanel::Go(BString& name, BString& parameters)
 {
+	// Without an editor, we cannot change anything, anyway
+	if (fEditor == NULL)
+		return GO_SUCCESS;
+
 	// run the window thread, to get an initial layout of the controls
 	Hide();
 	Show();

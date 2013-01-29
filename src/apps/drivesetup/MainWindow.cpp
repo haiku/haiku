@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -7,7 +7,9 @@
  *		Ithamar R. Adema <ithamar@unet.nl>
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de.
  */
+
 
 #include "MainWindow.h"
 
@@ -137,6 +139,38 @@ public:
 
 private:
 	PartitionListView* fPartitionList;
+};
+
+
+class ModificationPreparer {
+public:
+	ModificationPreparer(BDiskDevice* disk)
+		:
+		fDisk(disk),
+		fModificationStatus(fDisk->PrepareModifications())
+	{
+	}
+	~ModificationPreparer()
+	{
+		if (fModificationStatus == B_OK)
+			fDisk->CancelModifications();
+	}
+	status_t ModificationStatus() const
+	{
+		return fModificationStatus;
+	}
+	status_t CommitModifications()
+	{
+		status_t ret = fDisk->CommitModifications();
+		if (ret == B_OK)
+			fModificationStatus = B_ERROR;
+
+		return ret;
+	}
+
+private:
+	BDiskDevice*	fDisk;
+	status_t		fModificationStatus;
 };
 
 
@@ -747,38 +781,6 @@ MainWindow::_MountAll()
 // #pragma mark -
 
 
-class ModificationPreparer {
-public:
-	ModificationPreparer(BDiskDevice* disk)
-		:
-		fDisk(disk),
-		fModificationStatus(fDisk->PrepareModifications())
-	{
-	}
-	~ModificationPreparer()
-	{
-		if (fModificationStatus == B_OK)
-			fDisk->CancelModifications();
-	}
-	status_t ModificationStatus() const
-	{
-		return fModificationStatus;
-	}
-	status_t CommitModifications()
-	{
-		status_t ret = fDisk->CommitModifications();
-		if (ret == B_OK)
-			fModificationStatus = B_ERROR;
-
-		return ret;
-	}
-
-private:
-	BDiskDevice*	fDisk;
-	status_t		fModificationStatus;
-};
-
-
 void
 MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	const BString& diskSystemName)
@@ -871,19 +873,10 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 
 	BString name;
 	BString parameters;
-
-	// TODO: diskSystem.IsFileSystem() seems like a better fit here?
-	if (diskSystemName == "Be File System"
-		|| diskSystemName == "NT File System") {
-		InitParamsPanel* panel = new InitParamsPanel(this, diskSystemName,
-			partition);
-		if (panel->Go(name, parameters) == GO_CANCELED)
-			return;
-	} else if (diskSystemName == "Intel Partition Map") {
-		// TODO: parameters?
-	} else if (diskSystemName == "Intel Extended Partition") {
-		// TODO: parameters?
-	}
+	InitParamsPanel* panel = new InitParamsPanel(this, diskSystemName,
+		partition);
+	if (panel->Go(name, parameters) == GO_CANCELED)
+		return;
 
 	bool supportsName = diskSystem.SupportsContentName();
 	BString validatedName(name);
