@@ -104,6 +104,12 @@ public:
 									bool matchWord, TermPos& matchStart,
 									TermPos& matchEnd) const;
 
+			// snapshots and data capture for debugging
+			void				MakeLinesSnapshots(time_t timeStamp,
+									const char* fileName);
+			void				RestartDebugCapture();
+	/*inline*/	void				CaptureChar(char ch);
+
 			// insert chars/lines
 	inline	void				InsertChar(UTF8Char c, uint32 attributes);
 			void				InsertChar(UTF8Char c, uint32 width,
@@ -220,6 +226,7 @@ protected:
 			bool*				fTabStops;
 
 			int					fEncoding;
+			int					fCaptureFile;
 
 			// listener/dirty region management
 			TerminalBufferDirtyInfo fDirtyInfo;

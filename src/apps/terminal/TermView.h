@@ -90,6 +90,9 @@ public:
 
 			void				SetMouseClipboard(BClipboard *);
 
+			void				MakeDebugSnapshots();
+			void				RestartDebugCapture();
+
 			// edit functions
 			void				Copy(BClipboard* clipboard);
 			void				Paste(BClipboard* clipboard);

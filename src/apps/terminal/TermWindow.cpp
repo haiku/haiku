@@ -517,6 +517,13 @@ TermWindow::_SetupMenu()
 	AddChild(fMenuBar);
 
 	_UpdateSwitchTerminalsMenuItem();
+
+#ifdef USE_DEBUG_SNAPSHOTS
+	AddShortcut('S', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(SHORTCUT_DEBUG_SNAPSHOTS));
+	AddShortcut('C', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(SHORTCUT_DEBUG_CAPTURE));
+#endif
 }
 
 
@@ -657,6 +664,16 @@ TermWindow::MessageReceived(BMessage *message)
 		case B_PASTE:
 			_ActiveTermView()->Paste(be_clipboard);
 			break;
+
+#ifdef USE_DEBUG_SNAPSHOTS
+		case SHORTCUT_DEBUG_SNAPSHOTS:
+			_ActiveTermView()->MakeDebugSnapshots();
+			break;
+
+		case SHORTCUT_DEBUG_CAPTURE:
+			_ActiveTermView()->RestartDebugCapture();
+			break;
+#endif
 
 		case B_SELECT_ALL:
 			_ActiveTermView()->SelectAll();

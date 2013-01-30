@@ -3238,3 +3238,25 @@ void
 TermView::Listener::NextTermView(TermView* view)
 {
 }
+
+
+#ifdef USE_DEBUG_SNAPSHOTS
+
+void
+TermView::MakeDebugSnapshots()
+{
+	BAutolock _(fTextBuffer);
+	time_t timeStamp = time(NULL);
+	fTextBuffer->MakeLinesSnapshots(timeStamp, ".TextBuffer.log");
+	fVisibleTextBuffer->MakeLinesSnapshots(timeStamp, ".VisualTextBuffer.log");
+}
+
+
+void
+TermView::RestartDebugCapture()
+{
+	BAutolock _(fTextBuffer);
+	fTextBuffer->RestartDebugCapture();
+}
+
+#endif

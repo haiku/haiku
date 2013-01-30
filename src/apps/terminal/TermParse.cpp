@@ -409,6 +409,11 @@ TermParse::EscParse()
 			}
 
 	//debug_printf("TermParse: char: '%c' (%d), parse state: %d\n", c, c, parsestate[c]);
+
+#ifdef USE_DEBUG_SNAPSHOTS
+			fBuffer->CaptureChar(c);
+#endif
+
 			switch (parsestate[c]) {
 				case CASE_PRINT:
 					fBuffer->InsertChar((char)c, fAttr);

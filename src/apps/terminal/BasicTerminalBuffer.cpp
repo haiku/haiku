@@ -7,6 +7,7 @@
 
 #include <alloca.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <string.h>
 
 #include <algorithm>
@@ -111,7 +112,8 @@ BasicTerminalBuffer::BasicTerminalBuffer()
 	fOriginMode(false),
 	fSavedOriginMode(false),
 	fTabStops(NULL),
-	fEncoding(M_UTF8)
+	fEncoding(M_UTF8),
+	fCaptureFile(-1)
 {
 }
 
@@ -121,6 +123,9 @@ BasicTerminalBuffer::~BasicTerminalBuffer()
 	delete fHistory;
 	_FreeLines(fScreen, fHeight);
 	delete[] fTabStops;
+
+	if (fCaptureFile >= 0)
+		close(fCaptureFile);
 }
 
 
@@ -255,7 +260,8 @@ BasicTerminalBuffer::SynchronizeWith(const BasicTerminalBuffer* other,
 				destLine->softBreak = sourceLine->softBreak;
 				if (destLine->length > 0) {
 					memcpy(destLine->cells, sourceLine->cells,
-						destLine->length * sizeof(TerminalCell));
+//						destLine->length * sizeof(TerminalCell));
+						fWidth * sizeof(TerminalCell));
 				}
 			} else {
 				// The source line was a history line and has been copied
@@ -1631,3 +1637,90 @@ BasicTerminalBuffer::_NextChar(TermPos& pos, UTF8Char& c) const
 
 	return true;
 }
+
+
+#ifdef USE_DEBUG_SNAPSHOTS
+
+void
+BasicTerminalBuffer::MakeLinesSnapshots(time_t timeStamp, const char* fileName)
+{
+	BString str("/var/log/");
+	struct tm* ts = gmtime(&timeStamp);
+	str << ts->tm_hour << ts->tm_min << ts->tm_sec;
+	str << fileName;
+	FILE* fileOut = fopen(str.String(), "w");
+
+	bool dumpHistory = false;
+	do {
+		if (dumpHistory && fHistory == NULL) {
+			fprintf(fileOut, "> History is empty <\n");
+			break;
+		}
+
+		size_t countLines = dumpHistory ? fHistory->Size() : fHeight;
+		fprintf(fileOut, "> %s lines dump begin <\n",
+					dumpHistory ? "History" : "Terminal");
+
+		TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+		for (int i = 0; i < countLines; i++) {
+			TerminalLine* line = dumpHistory
+				? fHistory->GetTerminalLineAt(i, lineBuffer)
+					: fScreen[_LineIndex(i)];
+
+			if (line == NULL) {
+				fprintf(fileOut, "line: %ld is NULL!!!\n", i);
+				continue;
+			}
+
+			fprintf(fileOut, "%02d:%02d:%08lx:\n",
+					i, line->length, line->attributes);
+			for (int j = 0; j < line->length; j++)
+				fprintf(fileOut, "%c", line->cells[j].character.bytes[0]);
+
+			fprintf(fileOut, "\n");
+			for (int s = 28; s >= 0; s -= 4) {
+				for (int j = 0; j < fWidth; j++)
+					fprintf(fileOut, "%01lx",
+						(line->cells[j].attributes >> s) & 0x0F);
+
+				fprintf(fileOut, "\n");
+			}
+
+			fprintf(fileOut, "\n");
+		}
+
+		fprintf(fileOut, "> %s lines dump finished <\n",
+					dumpHistory ? "History" : "Terminal");
+
+	} while (dumpHistory = !dumpHistory);
+
+	fclose(fileOut);
+}
+
+
+void
+BasicTerminalBuffer::RestartDebugCapture()
+{
+	if (fCaptureFile >= 0) {
+		close(fCaptureFile);
+		fCaptureFile = -1;
+		return;
+	}
+
+	time_t timeStamp = time(NULL);
+	BString str("/var/log/");
+	struct tm* ts = gmtime(&timeStamp);
+	str << ts->tm_hour << ts->tm_min << ts->tm_sec;
+	str << ".Capture.log";
+	fCaptureFile = open(str.String(), O_CREAT | O_WRONLY);
+}
+
+
+void
+BasicTerminalBuffer::CaptureChar(char ch)
+{
+	if (fCaptureFile >= 0)
+		write(fCaptureFile, &ch, 1);
+}
+
+#endif

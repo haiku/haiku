@@ -46,6 +46,15 @@
 #include <SupportDefs.h>
 
 
+// define to get Ctrl-Cmd-S / Ctrl-Cmd-C shortcuts
+// to get the debug buffers snapshots and control
+// sequences capture logging
+#define USE_DEBUG_SNAPSHOTS
+#ifdef USE_DEBUG_SNAPSHOTS
+const uint32 SHORTCUT_DEBUG_SNAPSHOTS	= 'sdbs';
+const uint32 SHORTCUT_DEBUG_CAPTURE		= 'srdc';
+#endif
+
 // Menu Message
 static const uint32 MENU_SWITCH_TERM	= 'MSWT';
 static const uint32 MENU_NEW_TERM		= 'MNTE';
