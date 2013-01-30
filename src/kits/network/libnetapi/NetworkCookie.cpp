@@ -7,35 +7,30 @@
  */
 
 
-#include <cstdlib>
-#include <ctime>
 #include <new>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include <HttpTime.h>
 #include <NetworkCookie.h>
 
-#include <cstdio>
 #define PRINT(x) printf x;
 
 using BPrivate::BHttpTime;
 
-static const char* 	kArchivedCookieComment 			= "be:cookie.comment";
-static const char* 	kArchivedCookieCommentUrl		= "be:cookie.commenturl";
-static const char* 	kArchivedCookieDiscard			= "be:cookie.discard";
-static const char* 	kArchivedCookieDomain 			= "be:cookie.domain";
-static const char* 	kArchivedCookieExpirationDate	= "be:cookie.expiredate";
-static const char* 	kArchivedCookiePath 			= "be:cookie.path";
-static const char* 	kArchivedCookieSecure 			= "be:cookie.secure";
-static const char* 	kArchivedCookieVersion 			= "be:cookie.version";
-static const char* 	kArchivedCookieName 			= "be:cookie.name";
-static const char* 	kArchivedCookieValue 			= "be:cookie.value";
+static const char* kArchivedCookieName = "be:cookie.name";
+static const char* kArchivedCookieValue = "be:cookie.value";
+static const char* kArchivedCookieDomain = "be:cookie.domain";
+static const char* kArchivedCookiePath = "be:cookie.path";
+static const char* kArchivedCookieExpirationDate = "be:cookie.expirationdate";
+static const char* kArchivedCookieSecure = "be:cookie.secure";
+static const char* kArchivedCookieHttpOnly = "be:cookie.httponly";
 
 
 BNetworkCookie::BNetworkCookie(const char* name, const char* value)
 	:
-	fDiscard(false),
-	fExpiration(BDateTime::CurrentDateTime(B_GMT_TIME)),
-	fVersion(0),
 	fName(name),
 	fValue(value),
 	fSessionCookie(true)
@@ -45,12 +40,6 @@ BNetworkCookie::BNetworkCookie(const char* name, const char* value)
 
 
 BNetworkCookie::BNetworkCookie(const BNetworkCookie& other)
-	:
-	BArchivable(),
-	fDiscard(false),
-	fExpiration(BDateTime::CurrentDateTime(B_GMT_TIME)),
-	fVersion(0),
-	fSessionCookie(true)
 {
 	_Reset();
 	*this = other;
@@ -58,11 +47,6 @@ BNetworkCookie::BNetworkCookie(const BNetworkCookie& other)
 
 
 BNetworkCookie::BNetworkCookie(const BString& cookieString)
-	:
-	fDiscard(false),
-	fExpiration(BDateTime::CurrentDateTime(B_GMT_TIME)),
-	fVersion(0),
-	fSessionCookie(true)
 {
 	_Reset();
 	ParseCookieString(cookieString);
@@ -71,11 +55,6 @@ BNetworkCookie::BNetworkCookie(const BString& cookieString)
 
 BNetworkCookie::BNetworkCookie(const BString& cookieString,
 	const BUrl& url)
-	:
-	fDiscard(false),
-	fExpiration(BDateTime::CurrentDateTime(B_GMT_TIME)),
-	fVersion(0),
-	fSessionCookie(true)
 {
 	_Reset();
 	ParseCookieStringFromUrl(cookieString, url);
@@ -84,9 +63,6 @@ BNetworkCookie::BNetworkCookie(const BString& cookieString,
 
 BNetworkCookie::BNetworkCookie(BMessage* archive)
 	:
-	fDiscard(false),
-	fExpiration(BDateTime::CurrentDateTime(B_GMT_TIME)),
-	fVersion(0),
 	fSessionCookie(true)
 {
 	_Reset();
@@ -94,17 +70,10 @@ BNetworkCookie::BNetworkCookie(BMessage* archive)
 	archive->FindString(kArchivedCookieName, &fName);
 	archive->FindString(kArchivedCookieValue, &fValue);
 
-	archive->FindString(kArchivedCookieComment, &fComment);
-	archive->FindString(kArchivedCookieCommentUrl, &fCommentUrl);
 	archive->FindString(kArchivedCookieDomain, &fDomain);
 	archive->FindString(kArchivedCookiePath, &fPath);
 	archive->FindBool(kArchivedCookieSecure, &fSecure);
-
-	if (archive->FindBool(kArchivedCookieDiscard, &fDiscard) == B_OK)
-		fHasDiscard = true;
-
-	if (archive->FindInt8(kArchivedCookieVersion, &fVersion) == B_OK)
-		fHasVersion = true;
+	archive->FindBool(kArchivedCookieHttpOnly, &fHttpOnly);
 
 	int32 expiration;
 	if (archive->FindInt32(kArchivedCookieExpirationDate, &expiration)
@@ -115,12 +84,6 @@ BNetworkCookie::BNetworkCookie(BMessage* archive)
 
 
 BNetworkCookie::BNetworkCookie()
-	:
-	fDiscard(false),
-	fExpiration(BDateTime::CurrentDateTime(B_GMT_TIME)),
-	fPath("/"),
-	fVersion(0),
-	fSessionCookie(true)
 {
 	_Reset();
 }
@@ -169,28 +132,29 @@ BNetworkCookie::ParseCookieString(const BString& string)
 
 
 BNetworkCookie&
-BNetworkCookie::SetComment(const BString& comment)
+BNetworkCookie::SetName(const BString& name)
 {
-	fComment = comment;
+	fName = name;
 	fRawFullCookieValid = false;
+	fRawCookieValid = false;
 	return *this;
 }
 
 
 BNetworkCookie&
-BNetworkCookie::SetCommentUrl(const BString& commentUrl)
+BNetworkCookie::SetValue(const BString& value)
 {
-	fCommentUrl = commentUrl;
+	fValue = value;
 	fRawFullCookieValid = false;
+	fRawCookieValid = false;
 	return *this;
 }
 
 
 BNetworkCookie&
-BNetworkCookie::SetDiscard(bool discard)
+BNetworkCookie::SetPath(const BString& path)
 {
-	fDiscard = discard;
-	fHasDiscard = true;
+	fPath = path;
 	fRawFullCookieValid = false;
 	return *this;
 }
@@ -250,15 +214,6 @@ BNetworkCookie::SetExpirationDate(BDateTime& expireDate)
 
 
 BNetworkCookie&
-BNetworkCookie::SetPath(const BString& path)
-{
-	fPath = path;
-	fRawFullCookieValid = false;
-	return *this;
-}
-
-
-BNetworkCookie&
 BNetworkCookie::SetSecure(bool secure)
 {
 	fSecure = secure;
@@ -268,31 +223,10 @@ BNetworkCookie::SetSecure(bool secure)
 
 
 BNetworkCookie&
-BNetworkCookie::SetVersion(int8 version)
+BNetworkCookie::SetHttpOnly(bool httpOnly)
 {
-	fVersion = version;
-	fHasVersion = true;
-	fRawCookieValid = false;
-	return *this;
-}
-
-
-BNetworkCookie&
-BNetworkCookie::SetName(const BString& name)
-{
-	fName = name;
+	fHttpOnly = httpOnly;
 	fRawFullCookieValid = false;
-	fRawCookieValid = false;
-	return *this;
-}
-
-
-BNetworkCookie&
-BNetworkCookie::SetValue(const BString& value)
-{
-	fValue = value;
-	fRawFullCookieValid = false;
-	fRawCookieValid = false;
 	return *this;
 }
 
@@ -301,23 +235,16 @@ BNetworkCookie::SetValue(const BString& value)
 
 
 const BString&
-BNetworkCookie::Comment() const
+BNetworkCookie::Name() const
 {
-	return fComment;
+	return fName;
 }
 
 
 const BString&
-BNetworkCookie::CommentUrl() const
+BNetworkCookie::Value() const
 {
-	return fCommentUrl;
-}
-
-
-bool
-BNetworkCookie::Discard() const
-{
-	return fDiscard;
+	return fValue;
 }
 
 
@@ -328,10 +255,10 @@ BNetworkCookie::Domain() const
 }
 
 
-int32
-BNetworkCookie::MaxAge() const
+const BString&
+BNetworkCookie::Path() const
 {
-	return fExpiration.Time_t() - BDateTime::CurrentDateTime(B_GMT_TIME).Time_t();
+	return fPath;
 }
 
 
@@ -356,13 +283,6 @@ BNetworkCookie::ExpirationString() const
 }
 
 
-const BString&
-BNetworkCookie::Path() const
-{
-	return fPath;
-}
-
-
 bool
 BNetworkCookie::Secure() const
 {
@@ -370,24 +290,10 @@ BNetworkCookie::Secure() const
 }
 
 
-int8
-BNetworkCookie::Version() const
+bool
+BNetworkCookie::HttpOnly() const
 {
-	return fVersion;
-}
-
-
-const BString&
-BNetworkCookie::Name() const
-{
-	return fName;
-}
-
-
-const BString&
-BNetworkCookie::Value() const
-{
-	return fValue;
+	return fHttpOnly;
 }
 
 
@@ -400,23 +306,16 @@ BNetworkCookie::RawCookie(bool full) const
 
 		fRawFullCookie << fName << "=" << fValue;
 
-		if (HasCommentUrl())
-			fRawFullCookie << "; Comment-Url=" << fCommentUrl;
-		if (HasComment())
-			fRawFullCookie << "; Comment=" << fComment;
-		if (HasDiscard())
-			fRawFullCookie << "; Discard=" << (fDiscard?"true":"false");
 		if (HasDomain())
 			fRawFullCookie << "; Domain=" << fDomain;
 		if (HasExpirationDate())
-			fRawFullCookie << "; Max-Age=" << MaxAge();
-//			fRawFullCookie << "; Expires=" << ExpirationString();
+			fRawFullCookie << "; Expires=" << ExpirationString();
 		if (HasPath())
 			fRawFullCookie << "; Path=" << fPath;
-		if (Secure() && fSecure)
-			fRawFullCookie << "; Secure=" << (fSecure?"true":"false");
-		if (HasVersion())
-			fRawFullCookie << ", Version=" << fVersion;
+		if (Secure())
+			fRawFullCookie << "; Secure";
+		if (HttpOnly())
+			fRawFullCookie << "; HttpOnly";
 
 	} else if (!full && !fRawCookieValid) {
 		fRawCookie.Truncate(0);
@@ -425,7 +324,7 @@ BNetworkCookie::RawCookie(bool full) const
 		fRawCookie << fName << "=" << fValue;
 	}
 
-	return full?fRawFullCookie:fRawCookie;
+	return full ? fRawFullCookie : fRawCookie;
 }
 
 
@@ -442,13 +341,14 @@ BNetworkCookie::IsSessionCookie() const
 bool
 BNetworkCookie::IsValid(bool strict) const
 {
-	return HasName() && HasValue() && (!strict || HasVersion());
+	return HasName() && HasValue();
 }
 
 
 bool
 BNetworkCookie::IsValidForUrl(const BUrl& url) const
 {
+	// TODO: Take secure attribute into account
 	BString urlHost = url.Host();
 	BString urlPath = url.Path();
 
@@ -480,23 +380,16 @@ BNetworkCookie::IsValidForPath(const BString& path) const
 
 
 bool
-BNetworkCookie::HasCommentUrl() const
+BNetworkCookie::HasName() const
 {
-	return fCommentUrl.Length() > 0;
+	return fName.Length() > 0;
 }
 
 
 bool
-BNetworkCookie::HasComment() const
+BNetworkCookie::HasValue() const
 {
-	return fComment.Length() > 0;
-}
-
-
-bool
-BNetworkCookie::HasDiscard() const
-{
-	return fHasDiscard;
+	return fValue.Length() > 0;
 }
 
 
@@ -515,27 +408,6 @@ BNetworkCookie::HasPath() const
 
 
 bool
-BNetworkCookie::HasVersion() const
-{
-	return fHasVersion;
-}
-
-
-bool
-BNetworkCookie::HasName() const
-{
-	return fName.Length() > 0;
-}
-
-
-bool
-BNetworkCookie::HasValue() const
-{
-	return fValue.Length() > 0;
-}
-
-
-bool
 BNetworkCookie::HasExpirationDate() const
 {
 	return fHasExpirationDate;
@@ -548,16 +420,14 @@ BNetworkCookie::HasExpirationDate() const
 bool
 BNetworkCookie::ShouldDeleteAtExit() const
 {
-	return (HasDiscard() && Discard())
-		|| (!IsSessionCookie() && ShouldDeleteNow())
-		|| IsSessionCookie();
+	return IsSessionCookie() || ShouldDeleteNow();
 }
 
 
 bool
 BNetworkCookie::ShouldDeleteNow() const
 {
-	if (!IsSessionCookie() && HasExpirationDate())
+	if (HasExpirationDate())
 		return (BDateTime::CurrentDateTime(B_GMT_TIME) > fExpiration);
 
 	return false;
@@ -585,24 +455,6 @@ BNetworkCookie::Archive(BMessage* into, bool deep) const
 
 
 	// We add optional fields only if they're defined
-	if (HasComment()) {
-		error = into->AddString(kArchivedCookieComment, fComment);
-		if (error != B_OK)
-			return error;
-	}
-
-	if (HasCommentUrl()) {
-		error = into->AddString(kArchivedCookieCommentUrl, fCommentUrl);
-		if (error != B_OK)
-			return error;
-	}
-
-	if (HasDiscard()) {
-		error = into->AddBool(kArchivedCookieDiscard, fDiscard);
-		if (error != B_OK)
-			return error;
-	}
-
 	if (HasDomain()) {
 		error = into->AddString(kArchivedCookieDomain, fDomain);
 		if (error != B_OK)
@@ -628,8 +480,8 @@ BNetworkCookie::Archive(BMessage* into, bool deep) const
 			return error;
 	}
 
-	if (HasVersion()) {
-		error = into->AddInt8(kArchivedCookieVersion, fVersion);
+	if (HttpOnly()) {
+		error = into->AddBool(kArchivedCookieHttpOnly, fHttpOnly);
 		if (error != B_OK)
 			return error;
 	}
@@ -663,21 +515,16 @@ BNetworkCookie::operator=(const BNetworkCookie& other)
 	fExpirationString			= other.fExpirationString;
 	fExpirationStringValid		= other.fExpirationStringValid;
 
-	fComment					= other.fComment;
-	fCommentUrl					= other.fCommentUrl;
-	fDiscard					= other.fDiscard;
-	fDomain						= other.fDomain;
-	fExpiration					= other.fExpiration;
-	fPath						= other.fPath;
-	fSecure						= other.fSecure;
-	fVersion					= other.fVersion;
 	fName						= other.fName;
 	fValue						= other.fValue;
+	fDomain						= other.fDomain;
+	fPath						= other.fPath;
+	fExpiration					= other.fExpiration;
+	fSecure						= other.fSecure;
+	fHttpOnly					= other.fHttpOnly;
 
-	fHasDiscard					= other.fHasDiscard;
 	fHasExpirationDate			= other.fHasExpirationDate;
 	fSessionCookie				= other.fSessionCookie;
-	fHasVersion					= other.fHasVersion;
 
 	return *this;
 }
@@ -708,21 +555,16 @@ BNetworkCookie::operator!=(const BNetworkCookie& other)
 void
 BNetworkCookie::_Reset()
 {
-	fComment.Truncate(0);
-	fCommentUrl.Truncate(0);
 	fDomain.Truncate(0);
 	fPath.Truncate(0);
 	fName.Truncate(0);
 	fValue.Truncate(0);
-	fDiscard 				= false;
 	fSecure 				= false;
-	fVersion 				= 0;
-	fExpiration 			= 0;
+	fHttpOnly				= false;
+	fExpiration 			= BDateTime();
 
-	fHasDiscard 			= false;
 	fHasExpirationDate 		= false;
 	fSessionCookie 			= true;
-	fHasVersion 			= false;
 
 	fRawCookieValid 		= false;
 	fRawFullCookieValid 	= false;
@@ -782,17 +624,8 @@ BNetworkCookie::_ExtractNameValuePair(const BString& cookieString,
 	name.Trim();
 	value.Trim();
 
-	// Cookie comment
-	if (name == "comment")
-		SetComment(value);
-	// Cookie comment URL
-	else if (name == "comment-url")
-		SetCommentUrl(value);
-	// Cookie discard flag
-	else if (name == "discard")
-		SetDiscard(value.Length() == 0 || value.ToLower() == "true");
 	// Cookie max-age
-	else if (name == "maxage")
+	if (name == "maxage")
 		SetMaxAge(atoi(value.String()));
 	// Cookie expiration date
 	else if (name == "expires") {
@@ -807,9 +640,6 @@ BNetworkCookie::_ExtractNameValuePair(const BString& cookieString,
 	// Cookie secure flag
 	else if (name == "secure")
 		SetSecure(value.Length() == 0 || value.ToLower() == "true");
-	// Cookie version
-	else if (name == "version")
-		SetVersion(atoi(value.String()));
 }
 
 
