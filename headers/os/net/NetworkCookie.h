@@ -24,13 +24,13 @@ public:
 								BNetworkCookie(BMessage* archive);
 								BNetworkCookie();
 	virtual						~BNetworkCookie();
-							
+
 	// Parse a "SetCookie" string, or "name=value"
-	
-			BNetworkCookie&		ParseCookieStringFromUrl(const BString& string, 
+
+			BNetworkCookie&		ParseCookieStringFromUrl(const BString& string,
 									const BUrl& url);
 			BNetworkCookie& 	ParseCookieString(const BString& cookieString);
-	
+
 	// Modify the cookie fields
 			BNetworkCookie&		SetComment(const BString& comment);
 			BNetworkCookie&		SetCommentUrl(const BString& commentUrl);
@@ -44,7 +44,7 @@ public:
 			BNetworkCookie&		SetVersion(int8 version);
 			BNetworkCookie&		SetName(const BString& name);
 			BNetworkCookie&		SetValue(const BString& value);
-			
+
 	// Access the cookie fields
 			const BString&		CommentUrl() const;
 			const BString&		Comment() const;
@@ -64,7 +64,7 @@ public:
 			bool				IsValidForUrl(const BUrl& url) const;
 			bool				IsValidForDomain(const BString& domain) const;
 			bool				IsValidForPath(const BString& path) const;
-			
+
 	// Test if cookie fields are defined
 			bool				HasCommentUrl() const;
 			bool				HasComment() const;
@@ -76,16 +76,16 @@ public:
 			bool				HasVersion() const;
 			bool				HasName() const;
 			bool				HasValue() const;
-			
+
 	// Test if cookie could be deleted
 			bool				ShouldDeleteAtExit() const;
 			bool				ShouldDeleteNow() const;
-			
+
 	// BArchivable members
 	virtual	status_t			Archive(BMessage* into,
 									bool deep = true) const;
 	static	BArchivable*		Instantiate(BMessage* archive);
-	
+
 	// Overloaded operators
 			BNetworkCookie&		operator=(const BNetworkCookie& other);
 			BNetworkCookie&		operator=(const char* string);
@@ -94,15 +94,16 @@ public:
 private:
 			void				_Reset();
 			void				_ExtractNameValuePair(
-									const BString& cookieString, int16* index, 
+									const BString& cookieString, int16* index,
 									bool parseField = false);
-			
+			void				_SetDefaultPathForUrl(const BUrl& url);
+
 private:
 	mutable	BString				fRawCookie;
 	mutable	bool				fRawCookieValid;
 	mutable	BString				fRawFullCookie;
 	mutable	bool				fRawFullCookieValid;
-	
+
 			BString				fComment;
 			BString				fCommentUrl;
 			bool				fDiscard;
@@ -115,7 +116,7 @@ private:
 			int8				fVersion;
 			BString				fName;
 			BString				fValue;
-			
+
 			bool				fHasDiscard;
 			bool				fHasExpirationDate;
 			bool				fSessionCookie;
