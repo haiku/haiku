@@ -259,6 +259,10 @@ div.contents em, div.contents code {
 	font-style: normal;
 }
 
+div.contents em {
+	color: #dc3c01; /* grenadier */
+}
+
 div.contents code {
 	color: blue;
 }
