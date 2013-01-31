@@ -215,7 +215,7 @@ get_alps_movment(alps_cookie *cookie, mouse_movement *movement)
 	}
 
 	event.buttons = event_buffer[3] & 7;
- 	event.zPressure = event_buffer[5];
+	event.zPressure = event_buffer[5];
 
 	// finger on touchpad
 	if (event_buffer[2] & 0x2) {
@@ -236,8 +236,8 @@ get_alps_movment(alps_cookie *cookie, mouse_movement *movement)
 
 	cookie->previousZ = event.zPressure;
 
- 	event.xPosition = event_buffer[1] | ((event_buffer[2] & 0x78) << 4);
- 	event.yPosition = event_buffer[4] | ((event_buffer[3] & 0x70) << 3);
+	event.xPosition = event_buffer[1] | ((event_buffer[2] & 0x78) << 4);
+	event.yPosition = event_buffer[4] | ((event_buffer[3] & 0x70) << 3);
 
 	// check for trackpoint even (z pressure 127)
 	if (sFoundModel->flags & ALPS_DUALPOINT && event.zPressure == 127) {
@@ -248,9 +248,11 @@ get_alps_movment(alps_cookie *cookie, mouse_movement *movement)
 		movement->wheel_xdelta = 0;
 		movement->wheel_ydelta = 0;
 		movement->buttons = event.buttons;
+		movement->timestamp = system_time();
+		cookie->movementMaker.UpdateButtons(movement);
 	} else {
 		event.yPosition = AREA_END_Y - (event.yPosition - AREA_START_Y);
- 		status = cookie->movementMaker.EventToMovement(&event, movement);
+		status = cookie->movementMaker.EventToMovement(&event, movement);
 	}
 
 	if (cookie->movementMaker.WasEdgeMotion()
