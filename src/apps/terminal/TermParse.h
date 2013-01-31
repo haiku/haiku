@@ -86,9 +86,6 @@ private:
 
 	int fFd;
 
-	uint32 fAttr;
-	uint32 fSavedAttr;
-
 	thread_id fParseThread;
 	thread_id fReaderThread;
 	sem_id fReaderSem;

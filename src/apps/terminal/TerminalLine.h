@@ -24,11 +24,13 @@ struct TerminalLine {
 	uint32			attributes;
 	TerminalCell	cells[1];
 
-	inline void Clear()
+	inline void Clear(uint32 attr = 0, size_t count = 0)
 	{
 		length = 0;
-		attributes = 0;
+		attributes = attr;
 		softBreak = false;
+		for (size_t i = 0; i < count; i++)
+			cells[i].attributes = attr;
 	}
 };
 

@@ -86,6 +86,8 @@ public:
 			int					GetChar(int32 row, int32 column,
 									UTF8Char& character,
 									uint32& attributes) const;
+			void				GetCellAttributes(int32 row, int32 column,
+									uint32& attributes, uint32& count) const;
 			int32				GetString(int32 row, int32 firstColumn,
 									int32 lastColumn, char* buffer,
 									uint32& attributes) const;
@@ -104,6 +106,10 @@ public:
 									bool matchWord, TermPos& matchStart,
 									TermPos& matchEnd) const;
 
+	inline	uint32				GetAttributes();
+	inline	void				SetAttributes(uint32 attributes);
+	inline	void				PreserveAttributes(bool store);
+
 			// snapshots and data capture for debugging
 			void				MakeLinesSnapshots(time_t timeStamp,
 									const char* fileName);
@@ -111,19 +117,17 @@ public:
 	/*inline*/	void				CaptureChar(char ch);
 
 			// insert chars/lines
-	inline	void				InsertChar(UTF8Char c, uint32 attributes);
-			void				InsertChar(UTF8Char c, uint32 width,
-									uint32 attributes);
+	inline	void				InsertChar(UTF8Char c);
+			void				InsertChar(UTF8Char c, uint32 width);
+	inline	void				InsertChar(const char* c, int32 length);
 	inline	void				InsertChar(const char* c, int32 length,
-									uint32 attributes);
-	inline	void				InsertChar(const char* c, int32 length,
-									uint32 width, uint32 attributes);
+									uint32 width);
 			void				FillScreen(UTF8Char c, uint32 width, uint32 attr);
 
-			void				InsertCR(uint32 attrs);
+			void				InsertCR();
 			void				InsertLF();
 			void				InsertRI();
-			void				InsertTab(uint32 attr);
+			void				InsertTab();
 			void				SetInsertMode(int flag);
 			void				InsertSpace(int32 num);
 			void				InsertLines(int32 numLines);
@@ -178,7 +182,7 @@ protected:
 
 	static	TerminalLine**		_AllocateLines(int32 width, int32 count);
 	static	void				_FreeLines(TerminalLine** lines, int32 count);
-			void				_ClearLines(int32 first, int32 last);
+			void				_ClearLines(int32 first, int32 last/*, uint32 attr = 0*/); //TODO attr
 
 			status_t			_ResizeHistory(int32 width,
 									int32 historyCapacity);
@@ -214,6 +218,9 @@ protected:
 			int32				fScreenOffset;	// index of screen line 0
 			HistoryBuffer*		fHistory;
 
+			uint32				fAttributes;
+			uint32				fSavedAttributes;
+
 			// cursor position (origin: (0, 0))
 			TermPos				fCursor;
 			TermPos				fSavedCursor;
@@ -247,24 +254,48 @@ BasicTerminalBuffer::HistoryCapacity() const
 }
 
 
-void
-BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 attributes)
+uint32
+BasicTerminalBuffer::GetAttributes()
 {
-	return InsertChar(c, 1, attributes);
+	return fAttributes;
 }
 
 
 void
-BasicTerminalBuffer::InsertChar(const char* c, int32 length, uint32 attributes)
+BasicTerminalBuffer::SetAttributes(uint32 attributes)
 {
-	return InsertChar(UTF8Char(c, length), 1, attributes);
+	fAttributes = attributes;
 }
 
 
 void
-BasicTerminalBuffer::InsertChar(const char* c, int32 length, uint32 width, uint32 attributes)
+BasicTerminalBuffer::PreserveAttributes(bool store)
 {
-	return InsertChar(UTF8Char(c, length), width, attributes);
+	if (store) 
+		fSavedAttributes = fAttributes;
+	else
+		fAttributes = fSavedAttributes;
+}
+
+
+void
+BasicTerminalBuffer::InsertChar(UTF8Char c)
+{
+	return InsertChar(c, 1);
+}
+
+
+void
+BasicTerminalBuffer::InsertChar(const char* c, int32 length)
+{
+	return InsertChar(UTF8Char(c, length), 1);
+}
+
+
+void
+BasicTerminalBuffer::InsertChar(const char* c, int32 length, uint32 width)
+{
+	return InsertChar(UTF8Char(c, length), width);
 }
 
 

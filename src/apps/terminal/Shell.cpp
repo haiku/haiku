@@ -68,7 +68,10 @@
 #define CSWTCH 0
 #endif
 
+// TODO: should extract from /etc/passwd instead???
 const char *kDefaultShell = "/bin/sh";
+const char *kTerminalType = "xterm-256color";
+//const char *kTerminalType = "xterm";
 
 /*
  * Set environment variable.
@@ -539,7 +542,7 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		/*
 		 * setenv TERM and TTY.
 		 */
-		setenv("TERM", "xterm", true);
+		setenv("TERM", kTerminalType, true);
 		setenv("TTY", ttyName, true);
 		setenv("TTYPE", parameters.Encoding(), true);
 

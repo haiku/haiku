@@ -72,8 +72,6 @@ TermParse::_NextParseChar()
 TermParse::TermParse(int fd)
 	:
 	fFd(fd),
-	fAttr(BACKCOLOR),
-	fSavedAttr(BACKCOLOR),
 	fParseThread(-1),
 	fReaderThread(-1),
 	fReaderSem(-1),
@@ -393,8 +391,6 @@ TermParse::EscParse()
 	int width = 1;
 	BAutolock locker(fBuffer);
 
-	fAttr = fSavedAttr = BACKCOLOR;
-
 	while (!fQuitting) {
 		try {
 			uchar c = _NextParseChar();
@@ -416,7 +412,7 @@ TermParse::EscParse()
 
 			switch (parsestate[c]) {
 				case CASE_PRINT:
-					fBuffer->InsertChar((char)c, fAttr);
+					fBuffer->InsertChar((char)c);
 					break;
 
 				case CASE_PRINT_GR:
@@ -470,7 +466,7 @@ TermParse::EscParse()
 								dstbuf, &dstLen, &dummyState, '?');
 					}
 
-					fBuffer->InsertChar(dstbuf, dstLen, width, fAttr);
+					fBuffer->InsertChar(dstbuf, dstLen, width);
 					break;
 
 				case CASE_PRINT_CS96:
@@ -482,50 +478,50 @@ TermParse::EscParse()
 					dstLen = sizeof(dstbuf);
 					convert_to_utf8(B_EUC_CONVERSION, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(dstbuf, dstLen, fAttr);
+					fBuffer->InsertChar(dstbuf, dstLen);
 					break;
 
 				case CASE_PRINT_GRA:
 					/* "Special characters and line drawing" enabled by \E(0 */
 					switch (c) {
 						case 'a':
-							fBuffer->InsertChar("\xE2\x96\x92",3,fAttr);
+							fBuffer->InsertChar("\xE2\x96\x92",3);
 							break;
 						case 'j':
-							fBuffer->InsertChar("\xE2\x94\x98",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\x98",3);
 							break;
 						case 'k':
-							fBuffer->InsertChar("\xE2\x94\x90",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\x90",3);
 							break;
 						case 'l':
-							fBuffer->InsertChar("\xE2\x94\x8C",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\x8C",3);
 							break;
 						case 'm':
-							fBuffer->InsertChar("\xE2\x94\x94",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\x94",3);
 							break;
 						case 'n':
-							fBuffer->InsertChar("\xE2\x94\xBC",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\xBC",3);
 							break;
 						case 'q':
-							fBuffer->InsertChar("\xE2\x94\x80",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\x80",3);
 							break;
 						case 't':
-							fBuffer->InsertChar("\xE2\x94\x9C",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\x9C",3);
 							break;
 						case 'u':
-							fBuffer->InsertChar("\xE2\x94\xA4",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\xA4",3);
 							break;
 						case 'v':
-							fBuffer->InsertChar("\xE2\x94\xB4",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\xB4",3);
 							break;
 						case 'w':
-							fBuffer->InsertChar("\xE2\x94\xAC",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\xAC",3);
 							break;
 						case 'x':
-							fBuffer->InsertChar("\xE2\x94\x82",3,fAttr);
+							fBuffer->InsertChar("\xE2\x94\x82",3);
 							break;
 						default:
-							fBuffer->InsertChar((char)c, fAttr);
+							fBuffer->InsertChar((char)c);
 					}
 					break;
 
@@ -534,7 +530,7 @@ TermParse::EscParse()
 					break;
 
 				case CASE_CR:
-					fBuffer->InsertCR(fAttr);
+					fBuffer->InsertCR();
 					break;
 
 				case CASE_SJIS_KANA:
@@ -544,7 +540,7 @@ TermParse::EscParse()
 					dstLen = sizeof(dstbuf);
 					convert_to_utf8(currentEncoding, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(dstbuf, dstLen, fAttr);
+					fBuffer->InsertChar(dstbuf, dstLen);
 					break;
 
 				case CASE_SJIS_INSTRING:
@@ -556,7 +552,7 @@ TermParse::EscParse()
 					dstLen = sizeof(dstbuf);
 					convert_to_utf8(currentEncoding, cbuf, &srcLen,
 							dstbuf, &dstLen, &dummyState, '?');
-					fBuffer->InsertChar(dstbuf, dstLen, fAttr);
+					fBuffer->InsertChar(dstbuf, dstLen);
 					break;
 
 				case CASE_UTF8_2BYTE:
@@ -567,7 +563,7 @@ TermParse::EscParse()
 					cbuf[1] = c;
 					cbuf[2] = '\0';
 
-					fBuffer->InsertChar(cbuf, 2, fAttr);
+					fBuffer->InsertChar(cbuf, 2);
 					break;
 
 				case CASE_UTF8_3BYTE:
@@ -582,7 +578,7 @@ TermParse::EscParse()
 						break;
 					cbuf[2] = c;
 					cbuf[3] = '\0';
-					fBuffer->InsertChar(cbuf, 3, fAttr);
+					fBuffer->InsertChar(cbuf, 3);
 					break;
 
 				case CASE_MBCS:
@@ -635,7 +631,7 @@ TermParse::EscParse()
 					break;
 
 				case CASE_TAB:
-					fBuffer->InsertTab(fAttr);
+					fBuffer->InsertTab();
 					break;
 
 				case CASE_ESC:
@@ -833,38 +829,48 @@ TermParse::EscParse()
 				case CASE_SGR:
 				{
 					/* SGR */
+					uint32 attributes = fBuffer->GetAttributes();
 					for (row = 0; row < nparam; ++row) {
 						switch (param[row]) {
 							case DEFAULT:
 							case 0: /* Reset attribute */
-								fAttr = 0;
+								attributes = 0;
 								break;
 
 							case 1: /* Bold     */
 							case 5:
-								fAttr |= BOLD;
+								attributes |= BOLD;
 								break;
 
 							case 4:	/* Underline	*/
-								fAttr |= UNDERLINE;
+								attributes |= UNDERLINE;
 								break;
 
 							case 7:	/* Inverse	*/
-								fAttr |= INVERSE;
+								attributes |= INVERSE;
 								break;
 
 							case 22:	/* Not Bold	*/
-								fAttr &= ~BOLD;
+								attributes &= ~BOLD;
 								break;
 
 							case 24:	/* Not Underline	*/
-								fAttr &= ~UNDERLINE;
+								attributes &= ~UNDERLINE;
 								break;
 
 							case 27:	/* Not Inverse	*/
-								fAttr &= ~INVERSE;
+								attributes &= ~INVERSE;
 								break;
 
+							case 90:
+							case 91:
+							case 92:
+							case 93:
+							case 94:
+							case 95:
+							case 96:
+							case 97:
+								param[row] -= 60;
 							case 30:
 							case 31:
 							case 32:
@@ -873,18 +879,21 @@ TermParse::EscParse()
 							case 35:
 							case 36:
 							case 37:
-								fAttr &= ~FORECOLOR;
-								fAttr |= FORECOLORED(param[row] - 30);
-								fAttr |= FORESET;
+								attributes &= ~FORECOLOR;
+								attributes |= FORECOLORED(param[row] - 30);
+								attributes |= FORESET;
 								break;
 
 							case 38:
 							{
-								if (nparam != 3 || param[1] != 5)
-									break;
-								fAttr &= ~FORECOLOR;
-								fAttr |= FORECOLORED(param[2]);
-								fAttr |= FORESET;
+								if (nparam == 3 && param[1] == 5) {
+									attributes &= ~FORECOLOR;
+									attributes |= FORECOLORED(param[2]);
+									attributes |= FORESET;
+
+								} else if (nparam == 5) {
+									// TODO lookup
+								}
 
 								row = nparam; // force exit of the parsing
 
@@ -892,9 +901,18 @@ TermParse::EscParse()
 							}
 
 							case 39:
-								fAttr &= ~FORESET;
+								attributes &= ~FORESET;
 								break;
 
+							case 100:
+							case 101:
+							case 102:
+							case 103:
+							case 104:
+							case 105:
+							case 106:
+							case 107:
+								param[row] -= 60;
 							case 40:
 							case 41:
 							case 42:
@@ -903,18 +921,21 @@ TermParse::EscParse()
 							case 45:
 							case 46:
 							case 47:
-								fAttr &= ~BACKCOLOR;
-								fAttr |= BACKCOLORED(param[row] - 40);
-								fAttr |= BACKSET;
+								attributes &= ~BACKCOLOR;
+								attributes |= BACKCOLORED(param[row] - 40);
+								attributes |= BACKSET;
 								break;
 
 							case 48:
 							{
-								if (nparam != 3 || param[1] != 5)
-									break;
-								fAttr &= ~BACKCOLOR;
-								fAttr |= BACKCOLORED(param[2]);
-								fAttr |= BACKSET;
+								if (nparam == 3 && param[1] == 5) {
+									attributes &= ~BACKCOLOR;
+									attributes |= BACKCOLORED(param[2]);
+									attributes |= BACKSET;
+
+								} else if (nparam == 5) {
+									// TODO lookup
+								}
 
 								row = nparam; // force exit of the parsing
 
@@ -922,10 +943,11 @@ TermParse::EscParse()
 							}
 
 							case 49:
-								fAttr &= ~BACKSET;
+								attributes &= ~BACKSET;
 								break;
 						}
 					}
+					fBuffer->SetAttributes(attributes);
 					parsestate = groundtable;
 					break;
 				}
@@ -1446,7 +1468,7 @@ TermParse::_DecSaveCursor()
 {
 	fBuffer->SaveCursor();
 	fBuffer->SaveOriginMode();
-	fSavedAttr = fAttr;
+	fBuffer->PreserveAttributes(true);
 }
 
 
@@ -1455,7 +1477,7 @@ TermParse::_DecRestoreCursor()
 {
 	fBuffer->RestoreCursor();
 	fBuffer->RestoreOriginMode();
-	fAttr = fSavedAttr;
+	fBuffer->PreserveAttributes(false);
 }
 
 

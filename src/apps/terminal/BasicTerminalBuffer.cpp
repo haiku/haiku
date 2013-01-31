@@ -6,6 +6,7 @@
 #include "BasicTerminalBuffer.h"
 
 #include <alloca.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
@@ -106,6 +107,8 @@ BasicTerminalBuffer::BasicTerminalBuffer()
 	fScreen(NULL),
 	fScreenOffset(0),
 	fHistory(NULL),
+	fAttributes(0),
+	fSavedAttributes(0),
 	fSoftWrappedCursor(false),
 	fOverwriteMode(false),
 	fAlternateScreenActive(false),
@@ -268,7 +271,7 @@ BasicTerminalBuffer::SynchronizeWith(const BasicTerminalBuffer* other,
 				// directly into destLine.
 			}
 		} else
-			destLine->Clear();
+			destLine->Clear(fAttributes, fWidth);
 	}
 }
 
@@ -302,6 +305,28 @@ BasicTerminalBuffer::GetChar(int32 row, int32 column, UTF8Char& character,
 	character = cell.character;
 	attributes = cell.attributes;
 	return A_CHAR;
+}
+
+void
+BasicTerminalBuffer::GetCellAttributes(int32 row, int32 column,
+	uint32& attributes, uint32& count) const
+{
+	count = 0;
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(row, lineBuffer);
+	if (line == NULL || column < 0)
+		return;
+
+	uint32 c = column;
+	for (; c < fWidth; c++) {
+		TerminalCell& cell = line->cells[c];
+		if (c > column && attributes != cell.attributes) {
+			break;
+		}
+		attributes = cell.attributes;
+	}
+	count = c - column;
+//	printf("r:%d c:%d count:%d a:%x\n", row, column, count, attributes);
 }
 
 
@@ -578,12 +603,12 @@ BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
 
 
 void
-BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width, uint32 attributes)
+BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width)
 {
 //debug_printf("BasicTerminalBuffer::InsertChar('%.*s' (%d), %#lx)\n",
 //(int)c.ByteCount(), c.bytes, c.bytes[0], attributes);
 	if ((int32)width == FULL_WIDTH)
-		attributes |= A_WIDTH;
+		fAttributes |= A_WIDTH;
 
 	if (fSoftWrappedCursor || fCursor.x + (int32)width > fWidth)
 		_SoftBreakLine();
@@ -597,7 +622,7 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width, uint32 attributes)
 
 	TerminalLine* line = _LineAt(fCursor.y);
 	line->cells[fCursor.x].character = c;
-	line->cells[fCursor.x].attributes = attributes;
+	line->cells[fCursor.x].attributes = fAttributes;
 
 	if (line->length < fCursor.x + width)
 		line->length = fCursor.x + width;
@@ -638,14 +663,15 @@ BasicTerminalBuffer::FillScreen(UTF8Char c, uint32 width, uint32 attributes)
 
 
 void
-BasicTerminalBuffer::InsertCR(uint32 attributes)
+BasicTerminalBuffer::InsertCR()
 {
 	TerminalLine* line = _LineAt(fCursor.y);
 
-	line->attributes = attributes;
+	line->attributes = fAttributes;
 	line->softBreak = false;
 	fSoftWrappedCursor = false;
 	fCursor.x = 0;
+	_Invalidate(fCursor.y, fCursor.y);
 	_CursorChanged();
 }
 
@@ -685,7 +711,7 @@ BasicTerminalBuffer::InsertRI()
 
 
 void
-BasicTerminalBuffer::InsertTab(uint32 attributes)
+BasicTerminalBuffer::InsertTab()
 {
 	int32 x;
 
@@ -701,7 +727,7 @@ BasicTerminalBuffer::InsertTab(uint32 attributes)
 		TerminalLine* line = _LineAt(fCursor.y);
 		for (int32 i = fCursor.x; i <= x; i++) {
 			line->cells[i].character = ' ';		
-			line->cells[i].attributes = attributes;
+			line->cells[i].attributes = fAttributes;
 		}
 		fCursor.x = x;
 		if (line->length < fCursor.x)
@@ -745,6 +771,7 @@ BasicTerminalBuffer::InsertSpace(int32 num)
 			line->cells[i].character = kSpaceChar;
 			line->cells[i].attributes = line->cells[fCursor.x - 1].attributes;
 		}
+		line->attributes = fAttributes;
 
 		_Invalidate(fCursor.y, fCursor.y);
 	}
@@ -755,23 +782,35 @@ void
 BasicTerminalBuffer::EraseCharsFrom(int32 first, int32 numChars)
 {
 	TerminalLine* line = _LineAt(fCursor.y);
-	if (fCursor.y >= line->length)
-		return;
+	
+/*	if (IsAlternateScreenActive())*/ {
+		int32 end = min_c(first + numChars, fWidth);
+		for (int32 i = first; i < end; i++)
+			line->cells[i].attributes = fAttributes;
+	}
+	
+	line->attributes = fAttributes;
+
+	_Invalidate(fCursor.y, fCursor.y);
+
+//	if (fCursor.x >= line->length)
+//		return;
 
 	fSoftWrappedCursor = false;
 
 	int32 end = min_c(first + numChars, line->length);
+//	printf("%d:%d - %d|", fCursor.y, first, end);
 	if (first > 0 && IS_WIDTH(line->cells[first - 1].attributes))
 		first--;
 	if (end > 0 && IS_WIDTH(line->cells[end - 1].attributes))
 		end++;
 
+//	printf("%d - %d\n", first, end);
 	for (int32 i = first; i < end; i++) {
 		line->cells[i].character = kSpaceChar;
-		line->cells[i].attributes = 0;
+		line->cells[i].attributes = fAttributes;
 	}
 
-	_Invalidate(fCursor.y, fCursor.y);
 }
 
 
@@ -791,11 +830,11 @@ BasicTerminalBuffer::EraseAbove()
 		if (IS_WIDTH(line->cells[fCursor.x].attributes))
 			to++;
 		for (int32 i = 0; i <= to; i++) {
-			line->cells[i].attributes = 0;
+			line->cells[i].attributes = fAttributes;
 			line->cells[i].character = kSpaceChar;
 		}
 	} else
-		line->Clear();
+		line->Clear(fAttributes, fWidth);
 
 	_Invalidate(fCursor.y, fCursor.y);
 }
@@ -835,10 +874,18 @@ BasicTerminalBuffer::DeleteChars(int32 numChars)
 			memmove(line->cells + fCursor.x, line->cells + fCursor.x + numChars,
 				left * sizeof(TerminalCell));
 			line->length = fCursor.x + left;
+			// process BCE on freed tail cells
+			for (int i = 0; i < numChars; i++)
+				line->cells[fCursor.x + left + i].attributes = fAttributes;
 		} else {
+			// process BCE on freed tail cells
+			for (int i = 0; i < line->length - fCursor.x; i++)
+				line->cells[fCursor.x + i].attributes = fAttributes;
 			// remove all remaining chars
 			line->length = fCursor.x;
 		}
+
+//		line->attributes = fAttributes;
 
 		_Invalidate(fCursor.y, fCursor.y);
 	}
@@ -851,10 +898,15 @@ BasicTerminalBuffer::DeleteColumnsFrom(int32 first)
 	fSoftWrappedCursor = false;
 
 	TerminalLine* line = _LineAt(fCursor.y);
-	if (first < line->length) {
+
+	for (int32 i = first; i < fWidth; i++)
+		line->cells[i].attributes = fAttributes;
+
+	if (first <= line->length) {
 		line->length = first;
-		_Invalidate(fCursor.y, fCursor.y);
+		line->attributes = fAttributes;
 	}
+	_Invalidate(fCursor.y, fCursor.y);
 }
 
 
@@ -991,12 +1043,14 @@ BasicTerminalBuffer::_AllocateLines(int32 width, int32 count)
 		return NULL;
 
 	for (int32 i = 0; i < count; i++) {
-		lines[i] = (TerminalLine*)malloc(sizeof(TerminalLine)
-			+ sizeof(TerminalCell) * (width - 1));
+		const int32 size = sizeof(TerminalLine)
+			+ sizeof(TerminalCell) * (width - 1);
+		lines[i] = (TerminalLine*)malloc(size);
 		if (lines[i] == NULL) {
 			_FreeLines(lines, i);
 			return NULL;
 		}
+		memset(lines[i], 0, size);
 	}
 
 	return lines;
@@ -1029,7 +1083,7 @@ BasicTerminalBuffer::_ClearLines(int32 first, int32 last)
 			lastCleared = i;
 		}
 
-		line->Clear();
+		line->Clear(fAttributes, fWidth);
 	}
 
 	if (firstCleared >= 0)
@@ -1133,7 +1187,7 @@ BasicTerminalBuffer::_ResizeSimple(int32 width, int32 height,
 
 	// clear the remaining lines
 	for (int32 i = endLine - firstLine; i < height; i++)
-		lines[i]->Clear();
+		lines[i]->Clear(fAttributes, width);
 
 	_FreeLines(fScreen, fHeight);
 	fScreen = lines;
@@ -1223,7 +1277,7 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 			// history first, though.
 			if (history != NULL && destTotalLines >= height)
 				history->AddLine(screen[destIndex]);
-			destLine->Clear();
+			destLine->Clear(fAttributes, width);
 			newDestLine = false;
 		}
 
@@ -1273,6 +1327,8 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 				sourceLine->cells + sourceX, toCopy * sizeof(TerminalCell));
 			destLine->length += toCopy;
 		}
+		
+		destLine->attributes = sourceLine->attributes;
 
 		bool nextDestLine = false;
 		if (toCopy == sourceLeft) {
@@ -1319,7 +1375,7 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 		TerminalLine* line = screen[i % height];
 		if (history != NULL && i >= height)
 			history->AddLine(line);
-		line->Clear();
+		line->Clear(fAttributes, width);
 	}
 
 	// Update the values
@@ -1401,7 +1457,7 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 				// lines
 				fScreenOffset = (fScreenOffset + numLines) % fHeight;
 				for (int32 i = bottom - numLines + 1; i <= bottom; i++)
-					_LineAt(i)->Clear();
+					_LineAt(i)->Clear(fAttributes, fWidth);
 			} else {
 				// Partial screen scroll. We move the screen offset anyway, but
 				// have to move the unscrolled lines to their new location.
@@ -1416,7 +1472,7 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 				// update the screen offset and clear the new lines
 				fScreenOffset = (fScreenOffset + numLines) % fHeight;
 				for (int32 i = bottom - numLines + 1; i <= bottom; i++)
-					_LineAt(i)->Clear();
+					_LineAt(i)->Clear(fAttributes, fWidth);
 			}
 
 			// scroll/extend dirty range
@@ -1456,12 +1512,12 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 			for (int32 i = top + numLines; i <= bottom; i++) {
 				int32 lineToDrop = _LineIndex(i - numLines);
 				int32 lineToKeep = _LineIndex(i);
-				fScreen[lineToDrop]->Clear();
+				fScreen[lineToDrop]->Clear(fAttributes, fWidth);
 				std::swap(fScreen[lineToDrop], fScreen[lineToKeep]);
 			}
 			// clear any lines between the two swapped ranges above
 			for (int32 i = bottom - numLines + 1; i < top + numLines; i++)
-				_LineAt(i)->Clear();
+				_LineAt(i)->Clear(fAttributes, fWidth);
 
 			_Invalidate(top, bottom);
 		}
@@ -1481,12 +1537,12 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 			for (int32 i = bottom - numLines; i >= top; i--) {
 				int32 lineToKeep = _LineIndex(i);
 				int32 lineToDrop = _LineIndex(i + numLines);
-				fScreen[lineToDrop]->Clear();
+				fScreen[lineToDrop]->Clear(fAttributes, fWidth);
 				std::swap(fScreen[lineToDrop], fScreen[lineToKeep]);
 			}
 			// clear any lines between the two swapped ranges above
 			for (int32 i = bottom - numLines + 1; i < top + numLines; i++)
-				_LineAt(i)->Clear();
+				_LineAt(i)->Clear(fAttributes, fWidth);
 
 			_Invalidate(top, bottom);
 		}
@@ -1515,8 +1571,7 @@ BasicTerminalBuffer::_PadLineToCursor()
 	if (line->length < fCursor.x) {
 		for (int32 i = line->length; i < fCursor.x; i++) {
 			line->cells[i].character = kSpaceChar;
-			line->cells[i].attributes = 0;
-				// TODO: Other attributes?
+//			line->cells[i].attributes = line->attributes;
 		}
 	}
 }

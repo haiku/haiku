@@ -1012,17 +1012,30 @@ TermView::_DrawCursor()
 		_DrawLinePart(fCursor.x * fFontWidth, (int32)rect.top, attr, buffer,
 			width, selected, cursorVisible, this);
 	} else {
+	
 		if (selected)
 			SetHighColor(fSelectBackColor);
+		else if (cursorVisible )
+			SetHighColor(fCursorBackColor );
 		else {
-			if (cursorVisible)
-				SetHighColor(fCursorBackColor);
+			uint32 count = 0;
+			rgb_color rgb_back = fTextBackColor;
+			if (fTextBuffer->IsAlternateScreenActive())
+				// alternate screen uses cell attributes beyond the line ends
+				fTextBuffer->GetCellAttributes(
+						fCursor.y, fCursor.x, attr, count);
 			else
-				SetHighColor(cursorVisible ? fCursorBackColor : fTextBackColor);
+				attr = fVisibleTextBuffer->GetLineColor(
+						fCursor.y - firstVisible);
+
+			if (IS_BACKSET(attr))
+				rgb_back = fTermColorTable[IS_BACKCOLOR(attr)];
+			SetHighColor(rgb_back);
 		}
 
 		FillRect(rect);
 	}
+
 }
 
 
@@ -1215,29 +1228,31 @@ TermView::Draw(BRect updateRect)
 				if (count == 0) {
 					// No chars to draw : we just fill the rectangle with the
 					// back color of the last char at the left
+					int nextColumn = lastColumn + 1;
 					BRect rect(fFontWidth * i, _LineOffset(j),
-						fFontWidth * (lastColumn + 1) - 1, 0);
+						fFontWidth * nextColumn - 1, 0);
 					rect.bottom = rect.top + fFontHeight - 1;
 
-					if (insideSelection) {
-						// This area is selected, fill it with the select color
-						SetHighColor(fSelectBackColor);
-						FillRect(rect);
-					} else {
-						rgb_color rgb_back = fTextBackColor;
+					rgb_color rgb_back = insideSelection
+						? fSelectBackColor : fTextBackColor;
 
-						int lineIndexInHistory = j + fTextBuffer->HistorySize();
-						uint32 attr = fVisibleTextBuffer->GetLineColor(
-								lineIndexInHistory);
+					if (fTextBuffer->IsAlternateScreenActive()) {
+						// alternate screen uses cell attributes beyond the line ends
+						uint32 count = 0;
+						fTextBuffer->GetCellAttributes(j, i, attr, count);
+						rect.right = rect.left + fFontWidth * count - 1;
+						nextColumn = i + count;
+					} else
+						attr = fVisibleTextBuffer->GetLineColor(j - firstVisible);
 
-						if (IS_BACKSET(attr))
-							rgb_back = fTermColorTable[IS_BACKCOLOR(attr)];
-						SetHighColor(rgb_back);
-						FillRect(rect);
-					}
+					if (IS_BACKSET(attr))
+						rgb_back = fTermColorTable[IS_BACKCOLOR(attr)];
+					SetHighColor(rgb_back);
+					rgb_back = HighColor();
+					FillRect(rect);
 
 					// Go on to the next block
-					i = lastColumn + 1;
+					i = nextColumn;
 					continue;
 				}
 
