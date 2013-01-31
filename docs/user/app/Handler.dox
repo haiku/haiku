@@ -119,7 +119,7 @@
 
 
 /*!
-	\fn BHandler::BHandler(const char* name = NULL)
+	\fn BHandler::BHandler(const char *name)
 	\brief Construct a new handler with a \a name.
 
 	The newly constructed handler is not associated with a looper until you
