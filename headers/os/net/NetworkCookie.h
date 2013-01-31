@@ -17,7 +17,6 @@ class BNetworkCookie : public BArchivable {
 public:
 								BNetworkCookie(const char* name,
 									const char* value);
-								BNetworkCookie(const BNetworkCookie& other);
 								BNetworkCookie(const BString& cookieString);
 								BNetworkCookie(const BString& cookieString,
 									const BUrl& url);
@@ -25,7 +24,7 @@ public:
 								BNetworkCookie();
 	virtual						~BNetworkCookie();
 
-	// Parse a "SetCookie" string, or "name=value"
+	// Parse a "SetCookie" string
 
 			BNetworkCookie&		ParseCookieStringFromUrl(const BString& string,
 									const BUrl& url);
@@ -53,6 +52,7 @@ public:
 			bool				HttpOnly() const;
 			const BString&		RawCookie(bool full) const;
 
+			bool				IsHostOnly() const;
 			bool				IsSessionCookie() const;
 			bool				IsValid(bool strict = false) const;
 			bool				IsValidForUrl(const BUrl& url) const;
@@ -76,34 +76,36 @@ public:
 	static	BArchivable*		Instantiate(BMessage* archive);
 
 	// Overloaded operators
-			BNetworkCookie&		operator=(const BNetworkCookie& other);
 			BNetworkCookie&		operator=(const char* string);
 			bool				operator==(const BNetworkCookie& other);
 			bool				operator!=(const BNetworkCookie& other);
 private:
 			void				_Reset();
-			void				_ExtractNameValuePair(
-									const BString& cookieString, int16* index,
-									bool parseField = false);
-			void				_SetDefaultPathForUrl(const BUrl& url);
+			int32				_ExtractNameValuePair(const BString& string,
+									BString& name, BString& value,
+									int32 index);
+			int32				_ExtractAttributeValuePair(
+									const BString& string, BString& name,
+									BString& value,	int32 index);
+			BString				_DefaultPathForUrl(const BUrl& url);
 
 private:
 	mutable	BString				fRawCookie;
 	mutable	bool				fRawCookieValid;
 	mutable	BString				fRawFullCookie;
 	mutable	bool				fRawFullCookieValid;
-
-			BString				fDomain;
-			BDateTime			fExpiration;
 	mutable	BString				fExpirationString;
 	mutable	bool				fExpirationStringValid;
-			BString				fPath;
-			bool				fSecure;
-			bool				fHttpOnly;
+
 			BString				fName;
 			BString				fValue;
+			BString				fDomain;
+			BString				fPath;
+			BDateTime			fExpiration;
+			bool				fSecure;
+			bool				fHttpOnly;
 
-			bool				fHasExpirationDate;
+			bool				fHostOnly;
 			bool				fSessionCookie;
 };
 

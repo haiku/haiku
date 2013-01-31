@@ -1,9 +1,10 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
+ *		Hamish Morrison, hamishm53@gmail.com
  */
 
 
@@ -13,10 +14,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <Debug.h>
 #include <HttpTime.h>
 #include <NetworkCookie.h>
-
-#define PRINT(x) printf x;
 
 using BPrivate::BHttpTime;
 
@@ -27,22 +27,14 @@ static const char* kArchivedCookiePath = "be:cookie.path";
 static const char* kArchivedCookieExpirationDate = "be:cookie.expirationdate";
 static const char* kArchivedCookieSecure = "be:cookie.secure";
 static const char* kArchivedCookieHttpOnly = "be:cookie.httponly";
+static const char* kArchivedCookieHostOnly = "be:cookie.hostonly";
 
 
 BNetworkCookie::BNetworkCookie(const char* name, const char* value)
-	:
-	fName(name),
-	fValue(value),
-	fSessionCookie(true)
 {
 	_Reset();
-}
-
-
-BNetworkCookie::BNetworkCookie(const BNetworkCookie& other)
-{
-	_Reset();
-	*this = other;
+	fName = name;
+	fValue = value;
 }
 
 
@@ -62,8 +54,6 @@ BNetworkCookie::BNetworkCookie(const BString& cookieString,
 
 
 BNetworkCookie::BNetworkCookie(BMessage* archive)
-	:
-	fSessionCookie(true)
 {
 	_Reset();
 
@@ -74,6 +64,7 @@ BNetworkCookie::BNetworkCookie(BMessage* archive)
 	archive->FindString(kArchivedCookiePath, &fPath);
 	archive->FindBool(kArchivedCookieSecure, &fSecure);
 	archive->FindBool(kArchivedCookieHttpOnly, &fHttpOnly);
+	archive->FindBool(kArchivedCookieHostOnly, &fHostOnly);
 
 	int32 expiration;
 	if (archive->FindInt32(kArchivedCookieExpirationDate, &expiration)
@@ -101,19 +92,61 @@ BNetworkCookie&
 BNetworkCookie::ParseCookieStringFromUrl(const BString& string,
 	const BUrl& url)
 {
-	BString cookieString(string);
-	int16 index = 0;
-
 	_Reset();
 
-	// Default values from url
-	SetDomain(url.Host());
-	_SetDefaultPathForUrl(url);
+	BString name;
+	BString value;
+	int32 index = 0;
 
-	_ExtractNameValuePair(cookieString, &index);
+	// Parse the name and value of the cookie
+	index = _ExtractNameValuePair(string, name, value, index);
+	// The set-cookie-string is not valid
+	if (index == -1)
+		return *this;
 
-	while (index < cookieString.Length())
-		_ExtractNameValuePair(cookieString, &index, true);
+	SetName(name);
+	SetValue(value);
+
+	// Parse the remaining cookie attributes
+	while (index < string.Length()) {
+		ASSERT(string[index] == ';');
+		index++;
+
+		index = _ExtractAttributeValuePair(string, name, value, index);
+
+		if (name.ICompare("secure") == 0)
+			SetSecure(true);
+		else if (name.ICompare("httponly") == 0)
+			SetHttpOnly(true);
+
+		// The following attributes require a value
+		if (value.IsEmpty())
+			continue;
+
+		if (name.ICompare("max-age") == 0) {
+			// Validate the max-age value
+			char* end = NULL;
+			long maxAge = strtol(value.String(), &end, 10);
+			if (*end == '\0')
+				SetMaxAge((int)maxAge);
+		} else if (name.ICompare("expires") == 0) {
+			BHttpTime date(value);
+			SetExpirationDate(date.Parse());
+		} else if (name.ICompare("domain") == 0)
+			SetDomain(value);
+		else if (name.ICompare("path") == 0)
+			SetPath(value);
+	}
+
+	// If no domain was specified, we set a host-only domain from the URL
+	if (!HasDomain()) {
+		SetDomain(url.Host());
+		fHostOnly = true;
+	}
+
+	// If no path was specified we compute the default path from the URL
+	if (!HasPath())
+		SetPath(_DefaultPathForUrl(url));
 
 	return *this;
 }
@@ -164,6 +197,7 @@ BNetworkCookie&
 BNetworkCookie::SetDomain(const BString& domain)
 {
 	fDomain = domain;
+	fHostOnly = false;
 
 	//  We always use pre-dotted domains for tail matching
 	if (fDomain.ByteAt(0) != '.')
@@ -200,13 +234,11 @@ BNetworkCookie::SetExpirationDate(BDateTime& expireDate)
 		fSessionCookie = true;
 		fExpirationStringValid = false;
 		fRawFullCookieValid = false;
-		fHasExpirationDate = false;
 	} else {
 		fExpiration = expireDate;
 		fSessionCookie = false;
 		fExpirationStringValid = false;
 		fRawFullCookieValid = false;
-		fHasExpirationDate = true;
 	}
 
 	return *this;
@@ -332,6 +364,13 @@ BNetworkCookie::RawCookie(bool full) const
 
 
 bool
+BNetworkCookie::IsHostOnly() const
+{
+	return fHostOnly;
+}
+
+
+bool
 BNetworkCookie::IsSessionCookie() const
 {
 	return fSessionCookie;
@@ -410,7 +449,7 @@ BNetworkCookie::HasPath() const
 bool
 BNetworkCookie::HasExpirationDate() const
 {
-	return fHasExpirationDate;
+	return !IsSessionCookie();
 }
 
 
@@ -461,7 +500,7 @@ BNetworkCookie::Archive(BMessage* into, bool deep) const
 			return error;
 	}
 
-	if (fHasExpirationDate) {
+	if (HasExpirationDate()) {
 		error = into->AddInt32(kArchivedCookieExpirationDate,
 			fExpiration.Time_t());
 		if (error != B_OK)
@@ -486,6 +525,12 @@ BNetworkCookie::Archive(BMessage* into, bool deep) const
 			return error;
 	}
 
+	if (IsHostOnly()) {
+		error = into->AddBool(kArchivedCookieHostOnly, true);
+		if (error != B_OK)
+			return error;
+	}
+
 	return B_OK;
 }
 
@@ -502,32 +547,6 @@ BNetworkCookie::Instantiate(BMessage* archive)
 
 
 // #pragma mark Overloaded operators
-
-
-BNetworkCookie&
-BNetworkCookie::operator=(const BNetworkCookie& other)
-{
-	// Should we prefer to discard the cache ?
-	fRawCookie					= other.fRawCookie;
-	fRawCookieValid				= other.fRawCookieValid;
-	fRawFullCookie				= other.fRawFullCookie;
-	fRawFullCookieValid			= other.fRawFullCookieValid;
-	fExpirationString			= other.fExpirationString;
-	fExpirationStringValid		= other.fExpirationStringValid;
-
-	fName						= other.fName;
-	fValue						= other.fValue;
-	fDomain						= other.fDomain;
-	fPath						= other.fPath;
-	fExpiration					= other.fExpiration;
-	fSecure						= other.fSecure;
-	fHttpOnly					= other.fHttpOnly;
-
-	fHasExpirationDate			= other.fHasExpirationDate;
-	fSessionCookie				= other.fSessionCookie;
-
-	return *this;
-}
 
 
 BNetworkCookie&
@@ -555,109 +574,133 @@ BNetworkCookie::operator!=(const BNetworkCookie& other)
 void
 BNetworkCookie::_Reset()
 {
-	fDomain.Truncate(0);
-	fPath.Truncate(0);
 	fName.Truncate(0);
 	fValue.Truncate(0);
-	fSecure 				= false;
-	fHttpOnly				= false;
-	fExpiration 			= BDateTime();
+	fDomain.Truncate(0);
+	fPath.Truncate(0);
+	fExpiration = BDateTime();
+	fSecure = false;
+	fHttpOnly = false;
 
-	fHasExpirationDate 		= false;
-	fSessionCookie 			= true;
+	fSessionCookie = true;
+	fHostOnly = true;
 
-	fRawCookieValid 		= false;
-	fRawFullCookieValid 	= false;
-	fExpirationStringValid 	= false;
+	fRawCookieValid = false;
+	fRawFullCookieValid = false;
+	fExpirationStringValid = false;
 }
 
 
-void
-BNetworkCookie::_ExtractNameValuePair(const BString& cookieString,
-	int16* index, bool parseField)
+int32
+skip_whitespace_forward(const BString& string, int32 index)
 {
-	// Skip whitespaces
-	while (cookieString.ByteAt(*index) == ' '
-		&& *index < cookieString.Length())
-		(*index)++;
-
-	if (*index >= cookieString.Length())
-		return;
-
-
-	// Look for a name=value pair
-	int16 firstSemiColon = cookieString.FindFirst(";", *index);
-	int16 firstEqual = cookieString.FindFirst("=", *index);
-
-	BString name;
-	BString value;
-
-	if (firstSemiColon == -1) {
-		if (firstEqual != -1) {
-			cookieString.CopyInto(name, *index, firstEqual - *index);
-			cookieString.CopyInto(value, firstEqual + 1,
-				cookieString.Length() - firstEqual - 1);
-		} else
-			cookieString.CopyInto(value, *index,
-				cookieString.Length() - *index);
-
-		*index = cookieString.Length() + 1;
-	} else {
-		if (firstEqual != -1 && firstEqual < firstSemiColon) {
-			cookieString.CopyInto(name, *index, firstEqual - *index);
-			cookieString.CopyInto(value, firstEqual + 1,
-				firstSemiColon - firstEqual - 1);
-		} else
-			cookieString.CopyInto(value, *index, firstSemiColon - *index);
-
-		*index = firstSemiColon + 1;
-	}
-
-	// Cookie name/value pair
-	if (!parseField) {
-		SetName(name);
-		SetValue(value);
-		return;
-	}
-
-	name.ToLower();
-	name.Trim();
-	value.Trim();
-
-	// Cookie max-age
-	if (name == "maxage")
-		SetMaxAge(atoi(value.String()));
-	// Cookie expiration date
-	else if (name == "expires") {
-		BHttpTime date(value);
-		SetExpirationDate(date.Parse());
-	// Cookie valid domain
-	} else if (name == "domain")
-		SetDomain(value);
-	// Cookie valid path
-	else if (name == "path")
-		SetPath(value);
-	// Cookie secure flag
-	else if (name == "secure")
-		SetSecure(value.Length() == 0 || value.ToLower() == "true");
+	while (index < string.Length() && (string[index] == ' '
+			|| string[index] == '\t'))
+		index++;
+	return index;
 }
 
 
-void
-BNetworkCookie::_SetDefaultPathForUrl(const BUrl& url)
+int32
+skip_whitespace_backward(const BString& string, int32 index)
+{
+	while (index >= 0 && (string[index] == ' ' || string[index] == '\t'))
+		index--;
+	return index;
+}
+
+
+int32
+BNetworkCookie::_ExtractNameValuePair(const BString& cookieString,
+	BString& name, BString& value, int32 index)
+{
+	// Find our name-value-pair and the delimiter.
+	int32 firstEquals = cookieString.FindFirst('=', index);
+	int32 nameValueEnd = cookieString.FindFirst(';', index);
+
+	// If the set-cookie-string lacks a semicolon, the name-value-pair
+	// is the whole string.
+	if (nameValueEnd == -1)
+		nameValueEnd = cookieString.Length();
+
+	// If the name-value-pair lacks an equals, the parse should fail.
+	if (firstEquals == -1 || firstEquals > nameValueEnd)
+		return -1;
+
+	int32 first = skip_whitespace_forward(cookieString, index);
+	int32 last = skip_whitespace_backward(cookieString, firstEquals - 1);
+
+	// If we lack a name, fail to parse.
+	if (first > last)
+		return -1;
+
+	cookieString.CopyInto(name, first, last - first + 1);
+
+	first = skip_whitespace_forward(cookieString, firstEquals + 1);
+	last = skip_whitespace_backward(cookieString, nameValueEnd - 1);
+	if (first <= last)
+		cookieString.CopyInto(value, first, last - first + 1);
+	else
+		value.SetTo("");
+
+	return nameValueEnd;
+}
+
+
+int32
+BNetworkCookie::_ExtractAttributeValuePair(const BString& cookieString,
+	BString& attribute, BString& value, int32 index)
+{
+	// Find the end of our cookie-av.
+	int32 cookieAVEnd = cookieString.FindFirst(';', index);
+
+	// If the unparsed-attributes lacks a semicolon, then the cookie-av is the
+	// whole string.
+	if (cookieAVEnd == -1)
+		cookieAVEnd = cookieString.Length();
+
+	int32 attributeNameEnd = cookieString.FindFirst('=', index);
+	// If the cookie-av has no equals, the attribute-name is the entire
+	// cookie-av and the attribute-value is empty.
+	if (attributeNameEnd == -1 || attributeNameEnd > cookieAVEnd)
+		attributeNameEnd = cookieAVEnd;
+
+	int32 first = skip_whitespace_forward(cookieString, index);
+	int32 last = skip_whitespace_backward(cookieString, attributeNameEnd - 1);
+
+	if (first <= last)
+		cookieString.CopyInto(attribute, first, last - first + 1);
+	else
+		attribute.SetTo("");
+
+	if (attributeNameEnd == cookieAVEnd) {
+		value.SetTo("");
+		return cookieAVEnd;
+	}
+
+	first = skip_whitespace_forward(cookieString, attributeNameEnd + 1);
+	last = skip_whitespace_backward(cookieString, cookieAVEnd - 1);
+	if (first <= last)
+		cookieString.CopyInto(value, first, last - first + 1);
+	else
+		value.SetTo("");
+
+	return cookieAVEnd;
+}
+
+
+BString
+BNetworkCookie::_DefaultPathForUrl(const BUrl& url)
 {
 	const BString& path = url.Path();
-	if (path.IsEmpty() || path.ByteAt(0) != '/') {
-		SetPath("/");
-		return;
-	}
+	if (path.IsEmpty() || path.ByteAt(0) != '/')
+		return "";
 
 	int32 index = path.FindLast('/');
-	if (index == 0) {
-		SetPath("/");
-		return;
-	}
+	if (index == 0)
+		return "";
 
 	BString newPath = path;
-	SetPath(newPath.Truncate(index));
+	newPath.Truncate(index);
+	return newPath;
 }
