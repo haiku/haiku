@@ -207,13 +207,13 @@
 
 /*!
 	\fn void BHandler::MessageReceived(BMessage *message)
-	\brief Handle a message that has been received by the associated looper.
+	\brief Handle \a message that has been received by the associated looper.
 
 	This method is reimplemented by subclasses. If the messages that have
 	been received by a looper pass through the filters, then they end up in
 	the MessageReceived() methods.
 
-	The example below shows a very common way to handle message. Usually,
+	The example below shows a very common way to handle \a message. Usually,
 	this involves parsing the BMessage::what constant and then perform an
 	action based on that. 
 
@@ -240,13 +240,13 @@ ShowImageApp::MessageReceived(BMessage *message)
 }
 \endcode
 
-	If your handler cannot process this message, you should pass it on
+	If your handler cannot process this \a message, you should pass it on
 	to the base class. Eventually, it will reach the base implementation,
 	which will reply with \c B_MESSAGE_NOT_UNDERSTOOD.
 
 	\attention If you want to keep or manipulate the \a message, have a
 		look at BLooper::DetachCurrentMessage() to receive ownership of
-		the message.
+		the \a message.
 
 	\param message The message that needs to be handled.
 */
@@ -321,13 +321,13 @@ ShowImageApp::MessageReceived(BMessage *message)
 
 /*!
 	\fn void BHandler::AddFilter(BMessageFilter *filter)
-	\brief Add a filter as a prerequisite to this handler.
+	\brief Add \a filter as a prerequisite to this handler.
 
 	If the handler is associated with a looper, this looper needs to be locked
 	in order for this operation to succeed.
 
-	Note that the filter is not copied, rather a pointer to the filter is
-	stored. As such, you need to make sure that the filter object exists as
+	Note that the filter is not copied, rather a pointer to the \a filter is
+	stored. As such, you need to make sure that the \a filter object exists as
 	long as it is added to this handler.
 
 	\see RemoveFilter(), SetFilterList()
@@ -336,16 +336,16 @@ ShowImageApp::MessageReceived(BMessage *message)
 
 /*!
 	\fn bool BHandler::RemoveFilter(BMessageFilter *filter)
-	\brief Remove a filter from the filter list.
+	\brief Remove \a filter from the filter list.
 
 	If the handler is associated with a looper, this looper needs to be locked
 	in order for this operation to succeed.
 
-	Note that the filter is not deleted, merely removed from the list. You need
-	to take care of the memory yourself.
+	Note that the \a filter is not deleted, merely removed from the list. You
+	need to take care of the memory yourself.
 
-	\retval true The filter was in the filter list and is removed.
-	\retval false The filter was not found in the filter list.
+	\retval true The \a filter was in the filter list and is removed.
+	\retval false The \a filter was not found in the filter list.
 
 	\see AddFilter(), FilterList()
 */
