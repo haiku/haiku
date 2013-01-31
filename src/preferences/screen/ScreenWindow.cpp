@@ -713,11 +713,11 @@ ScreenWindow::_UpdateControls()
 	_UpdateWorkspaceButtons();
 
 	BMenuItem* item = fSwapDisplaysMenu->ItemAt((int32)fSelected.swap_displays);
-	if (item && !item->IsMarked())
+	if (item != NULL && !item->IsMarked())
 		item->SetMarked(true);
 
 	item = fUseLaptopPanelMenu->ItemAt((int32)fSelected.use_laptop_panel);
-	if (item && !item->IsMarked())
+	if (item != NULL && !item->IsMarked())
 		item->SetMarked(true);
 
 	for (int32 i = 0; i < fTVStandardMenu->CountItems(); i++) {
@@ -768,7 +768,7 @@ ScreenWindow::_UpdateControls()
 	for (int32 i = 0; i < kCombineModeCount; i++) {
 		if (kCombineModes[i].mode == fSelected.combine) {
 			item = fCombineMenu->ItemAt(i);
-			if (item && !item->IsMarked())
+			if (item != NULL && !item->IsMarked())
 				item->SetMarked(true);
 			break;
 		}
@@ -788,7 +788,7 @@ ScreenWindow::_UpdateControls()
 		index++;
 	}
 
-	if (item && !item->IsMarked())
+	if (item != NULL && !item->IsMarked())
 		item->SetMarked(true);
 
 	_UpdateColorLabel();
@@ -1320,4 +1320,3 @@ ScreenWindow::_Apply()
 		alert->Go();
 	}
 }
-

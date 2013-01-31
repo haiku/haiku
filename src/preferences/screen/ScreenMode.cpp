@@ -677,4 +677,3 @@ ScreenMode::_GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 
 	return true;
 }
-
