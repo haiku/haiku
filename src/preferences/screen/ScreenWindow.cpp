@@ -803,15 +803,24 @@ ScreenWindow::_UpdateControls()
 void
 ScreenWindow::_UpdateActiveMode()
 {
+	_UpdateActiveMode(current_workspace());
+}
+
+
+void
+ScreenWindow::_UpdateActiveMode(int32 workspace)
+{
 	// Usually, this function gets called after a mode
 	// has been set manually; still, as the graphics driver
 	// is free to fiddle with mode passed, we better ask
 	// what kind of mode we actually got
-	fScreenMode.Get(fActive);
-	fSelected = fActive;
+	if (fScreenMode.Get(fActive, workspace) == B_OK) {
+		fSelected = fActive;
 
-	_UpdateMonitor();
-	_UpdateControls();
+		_UpdateMonitor();
+		_BuildSupportedColorSpaces();
+		_UpdateControls();
+	}
 }
 
 
@@ -851,11 +860,12 @@ ScreenWindow::ScreenChanged(BRect frame, color_space mode)
 void
 ScreenWindow::WorkspaceActivated(int32 workspace, bool state)
 {
-	fScreenMode.GetOriginalMode(fOriginal, workspace);
-	_UpdateActiveMode();
+	if (fScreenMode.GetOriginalMode(fOriginal, workspace) == B_OK) {
+		_UpdateActiveMode(workspace);
 
-	BMessage message(UPDATE_DESKTOP_COLOR_MSG);
-	PostMessage(&message, fMonitorView);
+		BMessage message(UPDATE_DESKTOP_COLOR_MSG);
+		PostMessage(&message, fMonitorView);
+	}
 }
 
 
