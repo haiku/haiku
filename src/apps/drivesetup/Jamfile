@@ -5,6 +5,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 UsePrivateHeaders interface shared storage tracker ;
 
 Preference DriveSetup :
+	AbstractParametersPanel.cpp
 	CreateParamsPanel.cpp
 	DiskView.cpp
 	DriveSetup.cpp

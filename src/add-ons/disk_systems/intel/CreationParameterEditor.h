@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009, Bryce Groff, brycegroff@gmail.com.
  * Distributed under the terms of the MIT License.
  */
@@ -18,17 +19,17 @@ public:
 								PrimaryPartitionEditor();
 	virtual						~PrimaryPartitionEditor();
 
-	virtual		bool			FinishedEditing();
 	virtual		BView*			View();
-	virtual		status_t		GetParameters(BString* parameters);
 
-	virtual		status_t		PartitionTypeChanged(const char* type);
+	virtual		status_t		ParameterChanged(const char* name,
+									const BVariant& variant);
+
+	virtual		status_t		GetParameters(BString& parameters);
 
 private:
 				BView*			fView;
 				BCheckBox*		fActiveCheckBox;
-				BString			fParameters;
 };
 
 
-#endif //_CREATION_PARAMETER_EDITOR
+#endif // _CREATION_PARAMETER_EDITOR

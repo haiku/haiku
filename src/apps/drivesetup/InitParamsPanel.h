@@ -1,45 +1,27 @@
 /*
- * Copyright 2008 Haiku Inc. All rights reserved.
+ * Copyright 2008-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de.
  */
-#ifndef INIT_PARAMS_PANEL_H
-#define INIT_PARAMS_PANEL_H
-
-#include "Support.h"
-
-#include <Partition.h>
-#include <PartitionParameterEditor.h>
-#include <Window.h>
-
-class BMenuField;
-class BTextControl;
+#ifndef INIT_PARAMETERS_PANEL_H
+#define INIT_PARAMETERS_PANEL_H
 
 
-class InitParamsPanel : public BWindow {
+#include "AbstractParametersPanel.h"
+
+
+class InitParametersPanel : public AbstractParametersPanel {
 public:
-								InitParamsPanel(BWindow* window,
+								InitParametersPanel(BWindow* window,
 									const BString& diskSystem,
 									BPartition* partition);
-	virtual						~InitParamsPanel();
+	virtual						~InitParametersPanel();
 
-	virtual	bool				QuitRequested();
-	virtual	void				MessageReceived(BMessage* message);
-
-			int32				Go(BString& name, BString& parameters);
-			void				Cancel();
-
-private:
-	class EscapeFilter;
-			EscapeFilter*		fEscapeFilter;
-			sem_id				fExitSemaphore;
-			BWindow*			fWindow;
-			BButton*			fOkButton;
-			int32				fReturnValue;
-
-			BPartitionParameterEditor*	fEditor;
+			status_t			Go(BString& name, BString& parameters);
 };
 
-#endif // INIT_PARAMS_PANEL_H
+
+#endif // INIT_PARAMETERS_PANEL_H

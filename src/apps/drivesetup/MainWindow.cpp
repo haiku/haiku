@@ -882,9 +882,9 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 
 	BString name;
 	BString parameters;
-	InitParamsPanel* panel = new InitParamsPanel(this, diskSystemName,
+	InitParametersPanel* panel = new InitParametersPanel(this, diskSystemName,
 		partition);
-	if (panel->Go(name, parameters) == GO_CANCELED)
+	if (panel->Go(name, parameters) != B_OK)
 		return;
 
 	bool supportsName = diskSystem.SupportsContentName();
@@ -1037,9 +1037,9 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	off_t offset = currentSelection->Offset();
 	off_t size = currentSelection->Size();
 
-	CreateParamsPanel* panel = new CreateParamsPanel(this, parent, offset,
-		size);
-	if (panel->Go(offset, size, name, type, parameters) == GO_CANCELED)
+	CreateParametersPanel* panel = new CreateParametersPanel(this, parent,
+		offset, size);
+	if (panel->Go(offset, size, name, type, parameters) != B_OK)
 		return;
 
 	ret = parent->ValidateCreateChild(&offset, &size, type.String(),
