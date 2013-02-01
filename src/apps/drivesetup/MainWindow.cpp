@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Erik Jaesler <ejakowatz@users.sourceforge.net>
  *		Ithamar R. Adema <ithamar@unet.nl>
- *		Ingo Weinhold <ingo_weinhold@gmx.de>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de.
+ *		Erik Jaesler <ejakowatz@users.sourceforge.net>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
 
@@ -193,10 +193,10 @@ enum {
 // #pragma mark -
 
 
-MainWindow::MainWindow(BRect frame)
+MainWindow::MainWindow()
 	:
-	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("DriveSetup"), B_DOCUMENT_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
+	BWindow(BRect(50, 50, 600, 500), B_TRANSLATE_SYSTEM_NAME("DriveSetup"),
+		B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
 	fCurrentDisk(NULL),
 	fCurrentPartitionID(-1),
 	fSpaceIDMap()
@@ -440,17 +440,26 @@ MainWindow::ApplyDefaultSettings()
 	fListView->ResizeAllColumnsToPreferred();
 
 	// Adjust window size for convenience
-	float enlargeBy = fListView->PreferredSize().width
+	BScreen screen(this);
+	float windowWidth = Frame().Width();
+	float windowHeight = Frame().Height();
+
+	float enlargeWidthBy = fListView->PreferredSize().width
 		- fListView->Bounds().Width();
-	if (enlargeBy > 0.0f) {
-		BScreen screen(this);
-		float windowWidth = Frame().Width() + enlargeBy;
-		if (windowWidth > screen.Frame().Width() - 20.0f)
-			windowWidth = screen.Frame().Width() - 20.0f;
+	float enlargeHeightBy = fListView->PreferredSize().height
+		- fListView->Bounds().Height();
 
-		ResizeTo(windowWidth, Frame().Height());
-	}
+	if (enlargeWidthBy > 0.0f)
+		windowWidth += enlargeWidthBy;
+	if (enlargeHeightBy > 0.0f)
+		windowHeight += enlargeHeightBy;
 
+	if (windowWidth > screen.Frame().Width() - 20.0f)
+		windowWidth = screen.Frame().Width() - 20.0f;
+	if (windowHeight > screen.Frame().Height() - 20.0f)
+		windowHeight = screen.Frame().Height() - 20.0f;
+
+	ResizeTo(windowWidth, windowHeight);
 	CenterOnScreen();
 
 	Unlock();

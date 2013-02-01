@@ -341,9 +341,9 @@ PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 		B_TRUNCATE_MIDDLE), kMountedAtColumn);
 	AddColumn(new PartitionColumn(B_TRANSLATE("Size"), 100, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
-	AddColumn(new PartitionColumn(B_TRANSLATE("Parameters"), 200, 50, 500,
+	AddColumn(new PartitionColumn(B_TRANSLATE("Parameters"), 100, 50, 500,
 		B_TRUNCATE_END), kParametersColumn);
-	AddColumn(new PartitionColumn(B_TRANSLATE("Partition type"), 100, 50, 500,
+	AddColumn(new PartitionColumn(B_TRANSLATE("Partition type"), 200, 50, 500,
 		B_TRUNCATE_END), kPartitionTypeColumn);
 
 	SetSortingEnabled(false);
@@ -463,6 +463,17 @@ PartitionListView::AddSpace(partition_id parentID, partition_id id,
 	ExpandOrCollapse(partitionrow, true);
 
 	return partitionrow;
+}
+
+
+BSize
+PartitionListView::PreferredSize()
+{
+	// Remove default size for parameters + partition type column
+	BSize size = BColumnListView::PreferredSize();
+	size.width -= ColumnAt(kParametersColumn)->Width()
+		+ ColumnAt(kPartitionTypeColumn)->Width();
+	return size;
 }
 
 

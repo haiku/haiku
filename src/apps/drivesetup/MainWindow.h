@@ -31,7 +31,7 @@ enum {
 
 class MainWindow : public BWindow {
 public:
-								MainWindow(BRect frame);
+								MainWindow();
 	virtual						~MainWindow();
 
 	// BWindow interface

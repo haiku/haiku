@@ -104,6 +104,8 @@ public:
 			PartitionListRow*	AddSpace(partition_id parent,
 									partition_id id, off_t offset, off_t size);
 
+	virtual BSize				PreferredSize();
+
 private:
 			int32				_InsertIndexForOffset(PartitionListRow* parent,
 									off_t offset) const;
