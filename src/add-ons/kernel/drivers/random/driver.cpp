@@ -189,6 +189,8 @@ reseed(ch_randgen *prandgen, const uint32 initTimes)
 {
 	volatile uint32 i, j;
 	OCTET x, y;
+	
+	x.Q[0] = 0;
 
 	for (j = initTimes; j; j--) {
 		for (i = NK * initTimes; i; i--) {
@@ -402,7 +404,7 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 	int32 *buffer = (int32 *)_buffer;
 	uint8 *buffer8 = (uint8 *)_buffer;
 	uint32 i, j;
-	TRACE((DRIVER_NAME ": read(%Ld,, %d)\n", position, *_numBytes));
+	TRACE((DRIVER_NAME ": read(%Ld,, %ld)\n", position, *_numBytes));
 
 	mutex_lock(&sRandomLock);
 	sRandomCount += *_numBytes;
@@ -430,16 +432,22 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 static status_t 
 random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes)
 {
-	TRACE((DRIVER_NAME ": write(%Ld,, %d)\n", position, *_numBytes));
-	*_numBytes = 0;
-	return EINVAL;
+	TRACE((DRIVER_NAME ": write(%Ld,, %ld)\n", position, *_numBytes));
+	mutex_lock(&sRandomLock);
+	OCTET* data = (OCTET*)buffer;
+	for (size_t i = 0; i < *_numBytes / sizeof(OCTET); i++) {
+		chseed(sRandomEnv, data->Q[0]);
+		data++;
+	}
+	mutex_unlock(&sRandomLock);
+	return B_OK;
 }
 
 
 static status_t
 random_control(void *cookie, uint32 op, void *arg, size_t length)
 {
-	TRACE((DRIVER_NAME ": ioctl(%d)\n", op));
+	TRACE((DRIVER_NAME ": ioctl(%ld)\n", op));
 	return B_ERROR;
 }
 
@@ -473,10 +481,13 @@ random_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 		notify_select_event(sync, event);
 #endif
 	} else if (event == B_SELECT_WRITE) {
-		/* we're not writable */
-		return EINVAL;
+		/* we're now writable */
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+		notify_select_event(sync, ref);
+#else
+		notify_select_event(sync, event);
+#endif
 	}
-
 	return B_OK;
 }
 
