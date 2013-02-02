@@ -95,6 +95,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	TimGMSoundFont			- a good quality General MIDI Sound Font
 #	TrackerNewTemplates		- template files for Tracker's New menu
 #	Transmission			- a fast, easy, and free BitTorrent Client
+#	UnRAR					- utility to list, test and extract RAR archives
 #	UserlandFS				- aids native file system development (like FUSE)
 #	Vim						- Vi IMproved. Highly configurable text editor
 #	Vision					- powerful native IRC client
@@ -1330,22 +1331,29 @@ if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
 
 # KeymapSwitcher
 if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package KeymapSwitcher available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.7-r1a4-x86-gcc4-2012-11-01.zip
-				: $(baseURL)/KeymapSwitcher-1.2.7-r1a4-x86-gcc4-2012-11-01.zip
+				KeymapSwitcher-1.2.7-x86-gcc4-2013-01-08.zip
+				: $(baseURL)/KeymapSwitcher-1.2.7-x86-gcc4-2013-01-08.zip
 				: : : false ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				KeymapSwitcher-1.2.7-r1a4-x86-gcc2-2012-11-01.zip
-				: $(baseURL)/KeymapSwitcher-1.2.7-r1a4-x86-gcc2-2012-11-01.zip
+				KeymapSwitcher-1.2.7-x86-gcc2-2013-01-08.zip
+				: $(baseURL)/KeymapSwitcher-1.2.7-x86-gcc2-2013-01-08.zip
 				: : : false ;
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Preferences
 			: /boot/common/bin/KeymapSwitcher ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			KeymapSwitcher-1.2.7-x86_64-2013-01-08.zip
+			: $(baseURL)/KeymapSwitcher-1.2.7-x86_64-2013-01-08.zip
+			: : true ;
+		AddSymlinkToHaikuImage home config settings deskbar Preferences
+			: /boot/common/bin/KeymapSwitcher ;
+	} else {
+		Echo "No optional package KeymapSwitcher available for $(TARGET_ARCH)" ;
 	}
 }
 
@@ -2080,6 +2088,31 @@ if [ IsOptionalHaikuImagePackageAdded Transmission ] {
 }
 
 
+# UnRAR
+if [ IsOptionalHaikuImagePackageAdded UnRAR ] {
+	if $(TARGET_ARCH) = x86 {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				UnRAR-4.2.4-x86-gcc4-2013-01-21.zip
+				: $(baseURL)/UnRAR-4.2.4-x86-gcc4-2013-01-21.zip
+				: : true ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				UnRAR-4.2.4-x86-gcc2-2013-01-21.zip
+				: $(baseURL)/UnRAR-4.2.4-x86-gcc2-2013-01-21.zip
+				: : true ;
+		}
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage
+			UnRAR-4.2.4-x86_64-2013-01-21.zip
+			: $(baseURL)/UnRAR-4.2.4-x86_64-2013-01-21.zip
+			: : true ;
+	} else {
+		Echo "No optional package UnRAR available for $(TARGET_ARCH)" ;
+	}
+}
+
+
 # UserlandFS
 if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 	local arch = $(TARGET_ARCH) ;
@@ -2135,9 +2168,7 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 
 # Vim
 if [ IsOptionalHaikuImagePackageAdded Vim ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
-	} else {
+	if $(TARGET_ARCH) = x86 {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage vim-7.3-r1a4-x86-gcc4-2012-09-26.zip
 				:  $(baseURL)/vim-7.3-r1a4-x86-gcc4-2012-09-26.zip
@@ -2149,6 +2180,14 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 		}
 		AddSymlinkToHaikuImage home config settings deskbar Applications
 			: /boot/common/bin/gvim ;
+	} else if $(TARGET_ARCH) = x86_64 {
+		InstallOptionalHaikuImagePackage vim-7.3-x86_64-2013-01-19.zip
+			:  $(baseURL)/vim-7.3-x86_64-2013-01-19.zip
+			: : true ;
+		AddSymlinkToHaikuImage home config settings deskbar Applications
+			: /boot/common/bin/gvim ;
+	} else {
+		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
 	}
 }
 

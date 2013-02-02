@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Shortcuts	3661393357
+1	belarusian	x-vnd.Haiku-Shortcuts	341885426
 Error, NULL state description?\n	ShortcutsSpec		Памылка, апісанне стану NULL?\n
 MoveMouse	ShortcutsSpec		РухацьМыш
 OK	ShortcutsWindow		ОК
@@ -15,12 +15,12 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*УставіцьСтраку \"Ваш Тэкст\"
 *MouseUp	ShortcutsWindow		*МышУверх
 (Choose application with file requester)	ShortcutsWindow		(Выберыце праграму, якая патрабуе выбара файлу)
-Window	ShortcutsSpec	Name for modifier on keyboard	Window
 *LaunchHandler text/html	ShortcutsWindow		*АпрацоўшчыкЗапуску text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог адкрыць ваш файл KeySet!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Множнае \"*РухацьМышДа 100% 0\" \"*КнопкаМышы 1\"
 SendMessage	ShortcutsSpec		АдаслацьПаведамленне
 MoveMouseTo	ShortcutsSpec		РухацьМышДа
+Option	ShortcutsSpec	Name for modifier on keyboard	Параметр
 Save	ShortcutsWindow		Захаваць
 *MouseButton 1	ShortcutsWindow		*КнопкаМышы 1
 *MoveMouse +20 +0	ShortcutsWindow		*РухацьМыш +20 +0

@@ -303,6 +303,8 @@
 
 #define AVIVO_DDIA_BIT_DEPTH_CONTROL						0x7214
 
+#define AVIVO_DP_VID_STREAM_CNTL							0x770C
+
 #define AVIVO_DACA_ENABLE									0x7800
 #define 	AVIVO_DAC_ENABLE								(1 << 0)
 #define AVIVO_DACA_SOURCE_SELECT							0x7804

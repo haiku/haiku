@@ -209,25 +209,13 @@ InterfaceListItem::_Init()
 
 	const char* mediaTypeName = NULL;
 
-	int media = fInterface.Media();
+	BNetworkDevice device(Name());
+	if (device.IsWireless())
+		mediaTypeName = "wifi";
+	else if (device.IsEthernet())
+		mediaTypeName = "ether";
 
-	printf("%s media = 0x%x\n", Name(), media);
-	switch (IFM_TYPE(media)) {
-		case IFM_ETHER:
-			mediaTypeName = "ether";
-			break;
-		case IFM_IEEE80211:
-			mediaTypeName = "wifi";
-			break;
-		default: {
-			BNetworkDevice device(Name());
-			if (device.IsWireless())
-				mediaTypeName = "wifi";
-			else if (device.IsEthernet())
-				mediaTypeName = "ether";
-			break;
-		}
-	}
+	printf("%s is a %s device\n", Name(), mediaTypeName);
 
 	_PopulateBitmaps(mediaTypeName);
 		// Load the interface icons

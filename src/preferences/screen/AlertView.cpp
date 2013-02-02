@@ -168,4 +168,3 @@ AlertView::InitIcon()
 
 	return icon;
 }
-

@@ -21,6 +21,7 @@ UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
 AddResources Software\ Renderer : SoftwareRenderer.rdef ;
 
 if FIsBuildFeatureEnabled(llvm) {
+	Depends Software\ Renderer : $(HAIKU_LLVM_HEADERS_DEPENDENCY) ;
 	SubDirC++Flags [ FDefines HAVE_LLVM=0x0302 ] ;
 }
 

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2009, Bryce Groff, brycegroff@gmail.com.
  * Distributed under the terms of the MIT License.
@@ -9,6 +10,7 @@
 
 #include <PartitionParameterEditor.h>
 #include <String.h>
+
 
 class BCheckBox;
 class BMenuField;
@@ -21,21 +23,24 @@ public:
 								InitializeBFSEditor();
 	virtual						~InitializeBFSEditor();
 
-	virtual		bool			FinishedEditing();
-	virtual		BView*			View();
-	virtual		status_t		GetParameters(BString* parameters);
+	virtual		void			SetTo(BPartition* partition);
 
-	virtual		status_t		PartitionNameChanged(const char* name);
+	virtual		bool			ValidateParameters() const;
+	virtual		status_t		ParameterChanged(const char* name,
+									const BVariant& variant);
+
+	virtual		BView*			View();
+
+	virtual		status_t		GetParameters(BString& parameters);
 
 private:
 				void			_CreateViewControls();
 
+private:
 				BView*			fView;
-				BTextControl*	fNameTC;
-				BMenuField*		fBlockSizeMF;
-				BCheckBox*		fUseIndicesCB;
-
-				BString			fParameters;
+				BTextControl*	fNameControl;
+				BMenuField*		fBlockSizeMenuField;
+				BCheckBox*		fUseIndicesCheckBox;
 };
 
 

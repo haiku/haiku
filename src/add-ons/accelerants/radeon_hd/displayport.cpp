@@ -15,6 +15,7 @@
 #include "accelerant_protos.h"
 #include "connector.h"
 #include "mode.h"
+#include "edid.h"
 
 
 #undef TRACE
@@ -341,8 +342,8 @@ dp_get_lane_count(uint32 connectorIndex, display_mode* mode)
 
 	size_t pixelChunk;
 	size_t pixelsPerChunk;
-	status_t result = dp_get_pixel_size_for((color_space)mode->space, &pixelChunk,
-		NULL, &pixelsPerChunk);
+	status_t result = dp_get_pixel_size_for((color_space)mode->space,
+		&pixelChunk, NULL, &pixelsPerChunk);
 
 	if (result != B_OK) {
 		TRACE("%s: Invalid color space!\n", __func__);
@@ -355,7 +356,8 @@ dp_get_lane_count(uint32 connectorIndex, display_mode* mode)
 	uint32 dpMaxLaneCount = dp_get_lane_count_max(dpInfo);
 
 	uint32 lane;
-	for (lane = 1; lane < dpMaxLaneCount; lane <<= 1) {
+	// don't go below 2 lanes or display is jittery
+	for (lane = 2; lane < dpMaxLaneCount; lane <<= 1) {
 		uint32 maxPixelClock = dp_get_pixel_clock_max(dpMaxLinkRate, lane,
 			bitsPerPixel);
 		if (mode->timing.pixel_clock <= maxPixelClock)
@@ -380,8 +382,8 @@ dp_get_link_rate(uint32 connectorIndex, display_mode* mode)
 
 	size_t pixelChunk;
 	size_t pixelsPerChunk;
-	status_t result = dp_get_pixel_size_for((color_space)mode->space, &pixelChunk,
-		NULL, &pixelsPerChunk);
+	status_t result = dp_get_pixel_size_for((color_space)mode->space,
+		&pixelChunk, NULL, &pixelsPerChunk);
 
 	if (result != B_OK) {
 		TRACE("%s: Invalid color space!\n", __func__);
@@ -430,6 +432,8 @@ dp_setup_connectors()
 			continue;
 		}
 
+		TRACE("%s: found dp connector on index %" B_PRIu32 "\n",
+			__func__, index);
 		uint32 gpioID = gConnector[index]->gpioID;
 
 		uint32 auxPin = gGPIOInfo[gpioID]->hwPin;
@@ -655,6 +659,7 @@ dp_link_train_cr(uint32 connectorIndex)
 	dp_set_tp(connectorIndex, DP_TRAIN_PATTERN_1);
 	memset(dp->trainingSet, 0, 4);
 	dp_update_vs_emph(connectorIndex);
+	snooze(400);
 
 	while (1) {
 		if (dp->trainingReadInterval == 0)
@@ -763,11 +768,13 @@ dp_link_train_ce(uint32 connectorIndex)
 
 
 status_t
-dp_link_train(uint32 connectorIndex, display_mode* mode)
+dp_link_train(uint8 crtcID)
 {
 	TRACE("%s\n", __func__);
 
+        uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
+	display_mode* mode = &gDisplay[crtcID]->currentMode;
 
 	if (dp->valid != true) {
 		ERROR("%s: started on invalid DisplayPort connector #%" B_PRIu32 "\n",
@@ -830,7 +837,10 @@ dp_link_train(uint32 connectorIndex, display_mode* mode)
 	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 		ATOM_ENCODER_CMD_SETUP_PANEL_MODE);
 
-	if (dp->config[0] >= DP_DPCD_REV_11)
+	// TODO: Doesn't this overwrite important dpcd info?
+	sandbox = dp->laneCount;
+	if ((dp->config[0] >= DP_DPCD_REV_11)
+		&& (dp->config[2] & DP_ENHANCED_FRAME_CAP_EN))
 		sandbox |= DP_ENHANCED_FRAME_EN;
 	dpcd_reg_write(hwPin, DP_LANE_COUNT, sandbox);
 
@@ -872,7 +882,7 @@ dp_link_train(uint32 connectorIndex, display_mode* mode)
 }
 
 
-status_t
+bool
 ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 {
 	TRACE("%s\n", __func__);
@@ -880,15 +890,16 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
 
 	if (!dpInfo->valid)
-		return B_ERROR;
-
-	edid1_raw raw;
-	uint8* rdata = (uint8_t*)&raw;
-	uint8 sdata = 0;
+		return false;
 
 	// The following sequence is from a trace of the Linux kernel
 	// radeon code; not sure if the initial writes to address 0 are
 	// requried.
+
+	// TODO: This surely cane be cleaned up
+	edid1_raw raw;
+	uint8* rdata = (uint8*)&raw;
+	uint8 sdata = 0;
 	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x00, &sdata, true, false);
 	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x00, &sdata, false, true);
 
@@ -902,25 +913,25 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 	dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, rdata, true, false);
 
 	for (uint32 i = 0; i < sizeof(raw); i++) {
-		status_t result = dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, rdata++,
-			false, false);
-		if (result) {
-			ERROR("%s: error reading EDID data at index %" B_PRIu32 "\n",
-				__func__, i);
+		status_t ret = dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50,
+			rdata++, false, false);
+		if (ret) {
+			TRACE("%s: error reading EDID data at index %d, ret = %d\n",
+					__func__, i, ret);
 			dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, &sdata, false, true);
-			return B_ERROR;
+			return false;
 		}
 	}
 	dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, &sdata, false, true);
 
 	if (raw.version.version != 1 || raw.version.revision > 4) {
 		ERROR("%s: EDID version or revision out of range\n", __func__);
-		return B_ERROR;
+		return false;
 	}
 
 	edid_decode(edid, &raw);
 
-	return B_OK;
+	return true;
 }
 
 

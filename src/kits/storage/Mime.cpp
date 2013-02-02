@@ -38,14 +38,15 @@
 #include <Roster.h>
 #include <RosterPrivate.h>
 
+
 using namespace BPrivate;
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };
 
-// do_mime_update
-//! Helper function that contacts the registrar for mime update calls
+
+// Helper function that contacts the registrar for mime update calls
 status_t
 do_mime_update(int32 what, const char *path, int recursive,
 	int synchronous, int force)
@@ -82,32 +83,8 @@ do_mime_update(int32 what, const char *path, int recursive,
 	return err;
 }
 
-// update_mime_info
-/*!	\brief Updates the MIME information (i.e MIME type) for one or more files.
-	If \a path points to a file, the MIME information for this file are
-	updated only. If it points to a directory and \a recursive is non-null,
-	the information for all the files in the given directory tree are updated.
-	If path is \c NULL all files are considered; \a recursive is ignored in
-	this case.
-	\param path The path to a file or directory, or \c NULL.
-	\param recursive Non-null to trigger recursive behavior.
-	\param synchronous If non-null update_mime_info() waits until the
-		   operation is finished, otherwise it returns immediately and the
-		   update is done asynchronously.
-	\param force Specifies how to handle files that already have MIME
-		   information:
-			- \c B_UPDATE_MIME_INFO_NO_FORCE: Files that already have a
-			  \c BEOS:TYPE attribute won't be updated.
-			- \c B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE: Files that already have a
-			  \c BEOS:TYPE attribute will be updated too, but \c BEOS:TYPE
-			  itself will remain untouched.
-			- \c B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL: Similar to
-			  \c B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE, but the \c BEOS:TYPE
-			  attribute will be updated too.
-	\return
-	- \c B_OK: Everything went fine.
-	- An error code otherwise.
-*/
+
+// Updates the MIME information (i.e MIME type) for one or more files.
 int
 update_mime_info(const char *path, int recursive, int synchronous, int force)
 {
@@ -119,24 +96,8 @@ update_mime_info(const char *path, int recursive, int synchronous, int force)
 		synchronous, force);
 }
 
-// create_app_meta_mime
-/*!	Creates a MIME database entry for one or more applications.
-	If \a path points to an application file, a MIME DB entry is create for the
-	application. If it points to a directory and \a recursive is non-null,
-	entries are created for all application files in the given directory
-	tree. If path is \c NULL all files are considered; \a recursive is
-	ignored in this case.
-	\param path The path to an application file, a directory, or \c NULL.
-	\param recursive Non-null to trigger recursive behavior.
-	\param synchronous If non-null create_app_meta_mime() waits until the
-		   operation is finished, otherwise it returns immediately and the
-		   operation is done asynchronously.
-	\param force If non-null, entries are created even if they do already
-		   exist.
-	\return
-	- \c B_OK: Everything went fine.
-	- An error code otherwise.
-*/
+
+// Creates a MIME database entry for one or more applications.
 status_t
 create_app_meta_mime(const char *path, int recursive, int synchronous,
 	int force)
@@ -150,21 +111,7 @@ create_app_meta_mime(const char *path, int recursive, int synchronous,
 }
 
 
-/*!	Retrieves an icon associated with a given device.
-	\param dev The path to the device.
-	\param icon A pointer to a buffer the icon data shall be written to.
-	\param size The size of the icon. Currently the sizes 16 (small, i.e
-	            \c B_MINI_ICON) and 32 (large, 	i.e. \c B_LARGE_ICON) are
-	            supported.
-
-	\todo The mounted directories for volumes can also have META:X:STD_ICON
-		  attributes. Should those attributes override the icon returned
-		  by ioctl(,B_GET_ICON,)?
-
-	\return
-	- \c B_OK: Everything went fine.
-	- An error code otherwise.
-*/
+// Retrieves an icon associated with a given device.
 status_t
 get_device_icon(const char *device, void *icon, int32 size)
 {
@@ -176,6 +123,9 @@ get_device_icon(const char *device, void *icon, int32 size)
 	if (fd < 0)
 		return errno;
 
+	// ToDo: The mounted directories for volumes can also have META:X:STD_ICON
+	// attributes. Should those attributes override the icon returned by
+	// ioctl(,B_GET_ICON,)?
 	device_icon iconData = {size, icon};
 	if (ioctl(fd, B_GET_ICON, &iconData) != 0) {
 		// legacy icon was not available, try vector icon
@@ -218,22 +168,7 @@ get_device_icon(const char *device, void *icon, int32 size)
 }
 
 
-/*!	Retrieves an icon associated with a given device.
-	\param dev The path to the device.
-	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
-		   to store the requested icon (16x16 for the mini and 32x32 for the
-		   large icon).
-	\param which Specifies the size of the icon to be retrieved:
-		   \c B_MINI_ICON for the mini and \c B_LARGE_ICON for the large icon.
-
-	\todo The mounted directories for volumes can also have META:X:STD_ICON
-		  attributes. Should those attributes override the icon returned
-		  by ioctl(,B_GET_ICON,)?
-
-	\return
-	- \c B_OK: Everything went fine.
-	- An error code otherwise.
-*/
+// Retrieves an icon associated with a given device.
 status_t
 get_device_icon(const char *device, BBitmap *icon, icon_size which)
 {

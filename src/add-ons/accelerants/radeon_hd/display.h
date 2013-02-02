@@ -31,6 +31,8 @@ void display_crtc_set(uint8 crtcID, display_mode* mode);
 void display_crtc_set_dtd(uint8 crtcID, display_mode* mode);
 void display_crtc_power(uint8 crtcID, int command);
 void display_crtc_memreq(uint8 crtcID, int command);
+void display_avivo_crtc_load_lut(uint8 crtcID);
+void display_dce45_crtc_load_lut(uint8 crtcID);
 
 
 #endif /* RADEON_HD_DISPLAY_H */

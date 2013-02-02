@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2009, Bryce Groff, brycegroff@gmail.com.
  * Distributed under the terms of the MIT License.
@@ -16,10 +17,11 @@
 #include <GridLayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
-#include <PartitionParameterEditor.h>
+#include <Partition.h>
 #include <PopUpMenu.h>
 #include <SpaceLayoutItem.h>
 #include <TextControl.h>
+#include <Variant.h>
 #include <View.h>
 #include <Window.h>
 
@@ -36,10 +38,9 @@ InitializeBFSEditor::InitializeBFSEditor()
 	:
 	BPartitionParameterEditor(),
 	fView(NULL),
-	fNameTC(NULL),
-	fBlockSizeMF(NULL),
-	fUseIndicesCB(NULL),
-	fParameters(NULL)
+	fNameControl(NULL),
+	fBlockSizeMenuField(NULL),
+	fUseIndicesCheckBox(NULL)
 {
 	_CreateViewControls();
 }
@@ -47,6 +48,15 @@ InitializeBFSEditor::InitializeBFSEditor()
 
 InitializeBFSEditor::~InitializeBFSEditor()
 {
+}
+
+
+void
+InitializeBFSEditor::SetTo(BPartition* partition)
+{
+	BString name = partition->ContentName();
+	if (!name.IsEmpty())
+		fNameControl->SetText(name.String());
 }
 
 
@@ -58,41 +68,39 @@ InitializeBFSEditor::View()
 
 
 bool
-InitializeBFSEditor::FinishedEditing()
+InitializeBFSEditor::ValidateParameters() const
 {
-	fParameters = "";
-	if (BMenuItem* item = fBlockSizeMF->Menu()->FindMarked()) {
-		const char* size;
-		BMessage* message = item->Message();
-		if (!message || message->FindString("size", &size) < B_OK)
-			size = "2048";
-		// TODO: use libroot driver settings API
-		fParameters << "block_size " << size << ";\n";
-	}
-	if (fUseIndicesCB->Value() == B_CONTROL_OFF)
-		fParameters << "noindex;\n";
-
-	fParameters << "name \"" << fNameTC->Text() << "\";\n";
-
-	return true;
+	// The name must be set
+	return fNameControl->TextView()->TextLength() > 0;
 }
 
 
 status_t
-InitializeBFSEditor::GetParameters(BString* parameters)
+InitializeBFSEditor::ParameterChanged(const char* name, const BVariant& variant)
 {
-	if (parameters == NULL)
-		return B_BAD_VALUE;
-
-	*parameters = fParameters;
+	if (!strcmp(name, "name"))
+		fNameControl->SetText(variant.ToString());
 	return B_OK;
 }
 
 
 status_t
-InitializeBFSEditor::PartitionNameChanged(const char* name)
+InitializeBFSEditor::GetParameters(BString& parameters)
 {
-	fNameTC->SetText(name);
+	parameters = "";
+
+	if (BMenuItem* item = fBlockSizeMenuField->Menu()->FindMarked()) {
+		const char* size;
+		BMessage* message = item->Message();
+		if (!message || message->FindString("size", &size) < B_OK)
+			size = "2048";
+		// TODO: use libroot driver settings API
+		parameters << "block_size " << size << ";\n";
+	}
+	if (fUseIndicesCheckBox->Value() == B_CONTROL_OFF)
+		parameters << "noindex;\n";
+
+	parameters << "name \"" << fNameControl->Text() << "\";\n";
 	return B_OK;
 }
 
@@ -100,10 +108,9 @@ InitializeBFSEditor::PartitionNameChanged(const char* name)
 void
 InitializeBFSEditor::_CreateViewControls()
 {
-	fNameTC = new BTextControl(B_TRANSLATE("Name:"), "Haiku", NULL);
-	fNameTC->SetModificationMessage(new BMessage(MSG_NAME_CHANGED));
-	// TODO find out what is the max length for this specific FS partition name
-	fNameTC->TextView()->SetMaxBytes(31);
+	fNameControl = new BTextControl(B_TRANSLATE("Name:"), "Haiku", NULL);
+	fNameControl->SetModificationMessage(new BMessage(MSG_NAME_CHANGED));
+	fNameControl->TextView()->SetMaxBytes(31);
 
 	BPopUpMenu* blocksizeMenu = new BPopUpMenu("blocksize");
 	BMessage* message = new BMessage(MSG_BLOCK_SIZE);
@@ -123,13 +130,15 @@ InitializeBFSEditor::_CreateViewControls()
 	blocksizeMenu->AddItem(new BMenuItem(
 		B_TRANSLATE("8192 (Mostly large files)"), message));
 
-	fBlockSizeMF = new BMenuField(B_TRANSLATE("Blocksize:"), blocksizeMenu);
+	fBlockSizeMenuField = new BMenuField(B_TRANSLATE("Blocksize:"),
+		blocksizeMenu);
 	defaultItem->SetMarked(true);
 
-	fUseIndicesCB = new BCheckBox(B_TRANSLATE("Enable query support"), NULL);
-	fUseIndicesCB->SetValue(true);
-	fUseIndicesCB->SetToolTip(B_TRANSLATE("Disabling query support may speed "
-		"up certain file system operations, but should only be used "
+	fUseIndicesCheckBox = new BCheckBox(B_TRANSLATE("Enable query support"),
+		NULL);
+	fUseIndicesCheckBox->SetValue(true);
+	fUseIndicesCheckBox->SetToolTip(B_TRANSLATE("Disabling query support may "
+		"speed up certain file system operations, but should only be used "
 		"if one is absolutely certain that one will not need queries.\n"
 		"Any volume that is intended for booting Haiku must have query "
 		"support enabled."));
@@ -138,14 +147,14 @@ InitializeBFSEditor::_CreateViewControls()
 
 	fView = BGridLayoutBuilder(spacing, spacing)
 		// row 1
-		.Add(fNameTC->CreateLabelLayoutItem(), 0, 0)
-		.Add(fNameTC->CreateTextViewLayoutItem(), 1, 0)
+		.Add(fNameControl->CreateLabelLayoutItem(), 0, 0)
+		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 0)
 
 		// row 2
-		.Add(fBlockSizeMF->CreateLabelLayoutItem(), 0, 1)
-		.Add(fBlockSizeMF->CreateMenuBarLayoutItem(), 1, 1)
+		.Add(fBlockSizeMenuField->CreateLabelLayoutItem(), 0, 1)
+		.Add(fBlockSizeMenuField->CreateMenuBarLayoutItem(), 1, 1)
 
 		// row 3
-		.Add(fUseIndicesCB, 0, 2, 2).View()
+		.Add(fUseIndicesCheckBox, 0, 2, 2).View()
 	;
 }

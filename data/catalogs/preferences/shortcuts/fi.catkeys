@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Shortcuts	3661393357
+1	finnish	x-vnd.Haiku-Shortcuts	3397621807
 Error, NULL state description?\n	ShortcutsSpec		Virhe, NULL-tilakuvaus?\n
 MoveMouse	ShortcutsSpec		SiirräHiirtä
 OK	ShortcutsWindow		Valmis
@@ -15,7 +15,6 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt-painike
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
 *MouseUp	ShortcutsWindow		*HiiriYlös
 (Choose application with file requester)	ShortcutsWindow		(Valitse sovellus tiedostohakijalla)
-Window	ShortcutsSpec	Name for modifier on keyboard	Ikkuna
 *LaunchHandler text/html	ShortcutsWindow		*Käynnistyskäsittelijä text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt avaamaan KeySet-tiedostoa!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni ”*SiirräHiiriKohteeseen 100% 0” ”*Hiiripainike 1”

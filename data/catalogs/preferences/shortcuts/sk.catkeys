@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Shortcuts	1741147146
+1	slovak	x-vnd.Haiku-Shortcuts	1477375596
 Error, NULL state description?\n	ShortcutsSpec		Chyba, NULL popis stavu?\n
 MoveMouse	ShortcutsSpec		PosunúťMyš
 OK	ShortcutsWindow		OK
@@ -15,7 +15,6 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*VložiťReťazec \"Váš text sem\"
 *MouseUp	ShortcutsWindow		*MyšHore
 (Choose application with file requester)	ShortcutsWindow		(Vyberte aplikáciu pomocou žiadača súboru)
-Window	ShortcutsSpec	Name for modifier on keyboard	Okno
 *LaunchHandler text/html	ShortcutsWindow		*SpustiťObsluhu text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Aplikácia Skratky nedokázala otvoriť váš súbor SadaKláves!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*PresunúťMyšNa 100% 0\" \"*TlačidloMyši 1\"

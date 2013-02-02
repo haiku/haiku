@@ -32,7 +32,8 @@ bool is_mode_supported(display_mode* mode);
 status_t is_mode_sane(display_mode* mode);
 uint32 radeon_dpms_capabilities(void);
 uint32 radeon_dpms_mode(void);
-void radeon_dpms_set(int mode);
+void radeon_dpms_set(uint8 id, int mode);
+void radeon_dpms_set_hook(int mode);
 uint32 get_mode_bpp(display_mode* mode);
 
 

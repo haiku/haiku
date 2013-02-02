@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Shortcuts	3661393357
+1	hungarian	x-vnd.Haiku-Shortcuts	341885426
 Error, NULL state description?\n	ShortcutsSpec		Hiba, NULL állapotleírás?\n
 MoveMouse	ShortcutsSpec		EgérMozgatás
 OK	ShortcutsWindow		Rendben
@@ -15,12 +15,12 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*KarakterekBeszúrása \"Ide írja a szöveget\"
 *MouseUp	ShortcutsWindow		*EgérFel
 (Choose application with file requester)	ShortcutsWindow		(A fájlkérővel válasszon programot)
-Window	ShortcutsSpec	Name for modifier on keyboard	Win
 *LaunchHandler text/html	ShortcutsWindow		*Indítás text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta megnyitni a beállításfájlját!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*EgérMozgatásIde 100% 0\" \"*EgérGomb 1\"
 SendMessage	ShortcutsSpec		ÜzenetKüldés
 MoveMouseTo	ShortcutsSpec		EgérMozgatásIde
+Option	ShortcutsSpec	Name for modifier on keyboard	Opció
 Save	ShortcutsWindow		Mentés
 *MouseButton 1	ShortcutsWindow		*EgérGomb 1
 *MoveMouse +20 +0	ShortcutsWindow		*EgérMozgatás +20 +0

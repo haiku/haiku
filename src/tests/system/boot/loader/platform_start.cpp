@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -25,7 +25,11 @@ platform_exit(void)
 void
 platform_start_kernel(void)
 {
-	printf("*** jump to kernel at %p ***\n*** program exits.\n", (void *)gKernelArgs.kernel_image.elf_header.e_entry);
+	preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+		gKernelArgs.kernel_image.Pointer());
+
+	printf("*** jump to kernel at %p ***\n*** program exits.\n",
+		(void *)image->elf_header.e_entry);
 	exit(0);
 }
 
@@ -40,4 +44,3 @@ main(int argc, char **argv)
 
 	return 0;
 }
-

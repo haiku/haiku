@@ -3,7 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *      Alexander von Gluck, kallisti5@unixzen.com
+ *	Alexander von Gluck, kallisti5@unixzen.com
+ *	Bill Randle, billr@neocat.org
  */
 
 /*
@@ -240,6 +241,29 @@ detect_crt_ranges(uint32 crtid)
 }
 
 
+static void
+remove_dup_displays(uint32 displayIndex, uint32 id)
+{
+	/* hack for both digital and analog interfaces active */
+	if ((displayIndex > 0) && gDisplay[displayIndex]->attached) {
+		if (gConnector[id-1]->encoder.type == VIDEO_ENCODER_TMDS) {
+			int gpioID1 = gConnector[id-1]->gpioID;
+			int gpioID2 = gConnector[id]->gpioID;
+			edid1_info* edid = &gDisplay[displayIndex-1]->edidData;
+
+			if ((gGPIOInfo[gpioID1]->hwPin == gGPIOInfo[gpioID2]->hwPin) &&
+					edid->display.input_type)
+				// give preference to digital display when both are present
+				// and other display indicates it is digital
+				TRACE("%s: skipping connector %" B_PRIu32
+						": giving preference to digital "
+						"connector %d\n", __func__, id, id-1);
+				gDisplay[displayIndex]->attached = 0;
+		}
+	}
+}
+
+
 status_t
 detect_displays()
 {
@@ -264,19 +288,18 @@ detect_displays()
 		}
 
 		if (gConnector[id]->type == VIDEO_CONNECTOR_DP) {
-			edid1_info* edid = &gDisplay[displayIndex]->edidData;
-
 			TRACE("%s: connector(%" B_PRIu32 "): Checking DP.\n", __func__, id);
-			status_t dpHasEDID = ddc2_dp_read_edid1(id, edid);
+
+			edid1_info* edid = &gDisplay[displayIndex]->edidData;
 			gDisplay[displayIndex]->attached
-				= (dpHasEDID == B_OK ? true : false);
+				= ddc2_dp_read_edid1(id, edid);
+				
 			if (gDisplay[displayIndex]->attached) {
 				TRACE("%s: connector(%" B_PRIu32 "): Found DisplayPort EDID!\n",
 					__func__);
 			}
 		}
-
-		// TODO: As DP aux transactions don't work yet, just use LVDS as a hack
+		// TODO: Handle external DP brides - ??
 		#if 0
 		if (gConnector[id]->encoderExternal.isDPBridge == true) {
 			// If this is a DisplayPort Bridge, setup ddc on bus
@@ -287,11 +310,9 @@ detect_displays()
 			gDisplay[displayIndex]->attached = true;
 
 			// TODO: DDC Router switching for DisplayPort (and others?)
-		} else if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
+		}
 		#endif
-
-		if (gDisplay[displayIndex]->attached == false
-			&& gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
+		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
 			// If plain (non-DP) laptop LVDS, read mode info from AtomBIOS
 			//TRACE("%s: non-DP laptop LVDS detected\n", __func__);
 			gDisplay[displayIndex]->attached = connector_read_mode_lvds(id,
@@ -313,7 +334,7 @@ detect_displays()
 
 			// Since DVI-I shows up as two connectors, and there is only one
 			// edid channel, we have to make *sure* the edid data received is
-			// valid for te connector.
+			// valid for the connector.
 
 			// Found EDID data?
 			if (gDisplay[displayIndex]->attached) {
@@ -331,6 +352,7 @@ detect_displays()
 						"and a analog encoder.\n", __func__, id);
 					gDisplay[displayIndex]->attached
 						= encoder_analog_load_detect(id);
+					remove_dup_displays(displayIndex, id);
 				} else if (edid->display.input_type && !analogEncoder) {
 					// If EDID is digital, we make an assumption here.
 					TRACE("%s: connector(%" B_PRIu32 "): has digital EDID "
@@ -339,9 +361,16 @@ detect_displays()
 					// This generally means the monitor is of poor design
 					// Since we *know* there is no load on the analog encoder
 					// we assume that it is a digital display.
+					// This can also occur when a display has both DVI and VGA
+					// inputs and the graphics board has a DVI-I connector
+					// (reported as both digital and analog connectors) and the
+					// analog connection is the one in use. In that case, we
+					// get here when checking the digital connector and want
+					// to disable that display in favor of the analog one.
 					TRACE("%s: connector(%" B_PRIu32 "): Warning: monitor has "
 						"false digital EDID flag + unloaded analog encoder!\n",
 						__func__, id);
+					gDisplay[displayIndex]->attached = false;
 				}
 			}
 		}
@@ -558,7 +587,6 @@ display_crtc_scale(uint8 crtcID, display_mode* mode)
 void
 display_crtc_dpms(uint8 crtcID, int mode)
 {
-
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	switch (mode) {
@@ -566,8 +594,8 @@ display_crtc_dpms(uint8 crtcID, int mode)
 			TRACE("%s: crtc %" B_PRIu8 " dpms powerup\n", __func__, crtcID);
 			if (gDisplay[crtcID]->attached == false)
 				return;
-			gDisplay[crtcID]->powered = true;
 			display_crtc_power(crtcID, ATOM_ENABLE);
+			gDisplay[crtcID]->powered = true;
 			if (info.dceMajor >= 3)
 				display_crtc_memreq(crtcID, ATOM_ENABLE);
 			display_crtc_blank(crtcID, ATOM_BLANKING_OFF);
@@ -589,10 +617,119 @@ display_crtc_dpms(uint8 crtcID, int mode)
 
 
 void
+display_dce45_crtc_load_lut(uint8 crtcID)
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+	register_info* regs = gDisplay[crtcID]->regs;
+
+	TRACE("%s: crtcID %" B_PRIu8 "\n", __func__, crtcID);
+
+	uint16* r = info.color_data;
+	uint16* g = r + 256;
+	uint16* b = r + 512;
+
+	if (info.dceMajor >= 5) {
+		Write32(OUT, NI_INPUT_CSC_CONTROL + regs->crtcOffset,
+		   (NI_INPUT_CSC_GRPH_MODE(NI_INPUT_CSC_BYPASS) |
+		   NI_INPUT_CSC_OVL_MODE(NI_INPUT_CSC_BYPASS)));
+		Write32(OUT, NI_PRESCALE_GRPH_CONTROL + regs->crtcOffset,
+			NI_GRPH_PRESCALE_BYPASS);
+		Write32(OUT, NI_PRESCALE_OVL_CONTROL + regs->crtcOffset,
+			NI_OVL_PRESCALE_BYPASS);
+		Write32(OUT, NI_INPUT_GAMMA_CONTROL + regs->crtcOffset,
+			(NI_GRPH_INPUT_GAMMA_MODE(NI_INPUT_GAMMA_USE_LUT) |
+			NI_OVL_INPUT_GAMMA_MODE(NI_INPUT_GAMMA_USE_LUT)));
+	}
+
+	Write32(OUT, EVERGREEN_DC_LUT_CONTROL + regs->crtcOffset, 0);
+
+	Write32(OUT, EVERGREEN_DC_LUT_BLACK_OFFSET_BLUE + regs->crtcOffset, 0);
+	Write32(OUT, EVERGREEN_DC_LUT_BLACK_OFFSET_GREEN + regs->crtcOffset, 0);
+	Write32(OUT, EVERGREEN_DC_LUT_BLACK_OFFSET_RED + regs->crtcOffset, 0);
+
+	Write32(OUT, EVERGREEN_DC_LUT_WHITE_OFFSET_BLUE + regs->crtcOffset, 0xffff);
+	Write32(OUT, EVERGREEN_DC_LUT_WHITE_OFFSET_GREEN + regs->crtcOffset, 0xffff);
+	Write32(OUT, EVERGREEN_DC_LUT_WHITE_OFFSET_RED + regs->crtcOffset, 0xffff);
+
+	Write32(OUT, EVERGREEN_DC_LUT_RW_MODE, 0);
+	Write32(OUT, EVERGREEN_DC_LUT_WRITE_EN_MASK, 0x00000007);
+
+	Write32(OUT, EVERGREEN_DC_LUT_RW_INDEX, 0);
+	for (int i = 0; i < 256; i++) {
+		Write32(OUT, EVERGREEN_DC_LUT_30_COLOR + regs->crtcOffset,
+			 (r[i] << 20) |
+			 (g[i] << 10) |
+			 (b[i] << 0));
+	}
+
+	if (info.dceMajor >= 5) {
+		Write32(OUT, NI_DEGAMMA_CONTROL + regs->crtcOffset,
+		   (NI_GRPH_DEGAMMA_MODE(NI_DEGAMMA_BYPASS) |
+		   NI_OVL_DEGAMMA_MODE(NI_DEGAMMA_BYPASS) |
+		   NI_ICON_DEGAMMA_MODE(NI_DEGAMMA_BYPASS) |
+		   NI_CURSOR_DEGAMMA_MODE(NI_DEGAMMA_BYPASS)));
+		Write32(OUT, NI_GAMUT_REMAP_CONTROL + regs->crtcOffset,
+			(NI_GRPH_GAMUT_REMAP_MODE(NI_GAMUT_REMAP_BYPASS) |
+			NI_OVL_GAMUT_REMAP_MODE(NI_GAMUT_REMAP_BYPASS)));
+		Write32(OUT, NI_REGAMMA_CONTROL + regs->crtcOffset,
+			(NI_GRPH_REGAMMA_MODE(NI_REGAMMA_BYPASS) |
+			NI_OVL_REGAMMA_MODE(NI_REGAMMA_BYPASS)));
+		Write32(OUT, NI_OUTPUT_CSC_CONTROL + regs->crtcOffset,
+			(NI_OUTPUT_CSC_GRPH_MODE(NI_OUTPUT_CSC_BYPASS) |
+			NI_OUTPUT_CSC_OVL_MODE(NI_OUTPUT_CSC_BYPASS)));
+		/* XXX match this to the depth of the crtc fmt block, move to modeset? */
+		Write32(OUT, 0x6940 + regs->crtcOffset, 0);
+	}
+}
+
+
+void
+display_avivo_crtc_load_lut(uint8 crtcID)
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+	register_info* regs = gDisplay[crtcID]->regs;
+
+	TRACE("%s: crtcID %" B_PRIu8 "\n", __func__, crtcID);
+
+	uint16* r = info.color_data;
+	uint16* g = r + 256;
+	uint16* b = r + 512;
+
+	Write32(OUT, AVIVO_DC_LUTA_CONTROL + regs->crtcOffset, 0);
+
+	Write32(OUT, AVIVO_DC_LUTA_BLACK_OFFSET_BLUE + regs->crtcOffset, 0);
+	Write32(OUT, AVIVO_DC_LUTA_BLACK_OFFSET_GREEN + regs->crtcOffset, 0);
+	Write32(OUT, AVIVO_DC_LUTA_BLACK_OFFSET_RED + regs->crtcOffset, 0);
+
+	Write32(OUT, AVIVO_DC_LUTA_WHITE_OFFSET_BLUE + regs->crtcOffset, 0xffff);
+	Write32(OUT, AVIVO_DC_LUTA_WHITE_OFFSET_GREEN + regs->crtcOffset, 0xffff);
+	Write32(OUT, AVIVO_DC_LUTA_WHITE_OFFSET_RED + regs->crtcOffset, 0xffff);
+
+	Write32(OUT, AVIVO_DC_LUT_RW_SELECT, crtcID);
+	Write32(OUT, AVIVO_DC_LUT_RW_MODE, 0);
+	Write32(OUT, AVIVO_DC_LUT_WRITE_EN_MASK, 0x0000003f);
+
+	Write32(OUT, AVIVO_DC_LUT_RW_INDEX, 0);
+	for (int i = 0; i < 256; i++) {
+		Write32(OUT, AVIVO_DC_LUT_30_COLOR,
+			 (r[i] << 20) |
+			 (g[i] << 10) |
+			 (b[i] << 0));
+	}
+
+	Write32(OUT, AVIVO_D1GRPH_LUT_SEL + regs->crtcOffset, crtcID);
+}
+
+
+void
 display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 	register_info* regs = gDisplay[crtcID]->regs;
+
+	uint16* r = info.color_data;
+	uint16* g = r + 256;
+	uint16* b = r + 512;
 
 	uint32 fbSwap;
 	if (info.dceMajor >= 4)
@@ -616,6 +753,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 				fbFormat = AVIVO_D1GRPH_CONTROL_DEPTH_8BPP
 					| AVIVO_D1GRPH_CONTROL_8BPP_INDEXED;
 			}
+			// TODO: copy system color map into shared info
 			break;
 		case B_RGB15_LITTLE:
 			bytesPerPixel = 2;
@@ -646,6 +784,17 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 				fbSwap = R600_D1GRPH_SWAP_ENDIAN_16BIT;
 				#endif
 			}
+
+			{
+				// default gamma table
+				uint16 gamma = 0;
+				for (int i = 0; i < 256; i++) {
+					r[i] = gamma;
+					g[i] = gamma;
+					b[i] = gamma;
+					gamma += 4;
+				}
+			}
 			break;
 		case B_RGB24_LITTLE:
 		case B_RGB32_LITTLE:
@@ -666,6 +815,17 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 				fbSwap = R600_D1GRPH_SWAP_ENDIAN_32BIT;
 				#endif
 			}
+
+			{
+				// default gamma table
+				uint16 gamma = 0;
+				for (int i = 0; i < 256; i++) {
+					r[i] = gamma;
+					g[i] = gamma;
+					b[i] = gamma;
+					gamma += 4;
+				}
+			}
 			break;
 	}
 
@@ -685,7 +845,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 			(fbAddress >> 32) & 0xf);
 	}
 
-	TRACE("%s: Set SurfaceAddress: 0x%" B_PRIX32 "\n",
+	TRACE("%s: Set SurfaceAddress: 0x%" B_PRIX64 "\n",
 		__func__, (fbAddress & 0xFFFFFFFF));
 
 	Write32(OUT, regs->grphPrimarySurfaceAddr, (fbAddress & 0xFFFFFFFF));
@@ -700,16 +860,17 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 	uint32 widthAligned = mode->virtual_width;
 	uint32 pitchMask = 0;
 
+	// assume micro-linear/macro-linear mode (i.e., not tiled)
 	switch (bytesPerPixel) {
 		case 1:
-			pitchMask = 255;
+			pitchMask = 63;
 			break;
 		case 2:
-			pitchMask = 127;
+			pitchMask = 31;
 			break;
 		case 3:
 		case 4:
-			pitchMask = 63;
+			pitchMask = 31;
 			break;
 	}
 	widthAligned += pitchMask;
@@ -718,7 +879,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 	TRACE("%s: fb: %" B_PRIu32 "x%" B_PRIu32 " (%" B_PRIu32 " bpp)\n", __func__,
 		mode->virtual_width, mode->virtual_height, bitsPerPixel);
 	TRACE("%s: fb pitch: %" B_PRIu32 " \n", __func__,
-		widthAligned * bytesPerPixel / 4);
+		widthAligned);
 	TRACE("%s: fb width aligned: %" B_PRIu32 "\n", __func__,
 		widthAligned);
 
@@ -728,7 +889,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 	Write32(CRT, regs->grphYStart, 0);
 	Write32(CRT, regs->grphXEnd, mode->virtual_width);
 	Write32(CRT, regs->grphYEnd, mode->virtual_height);
-	Write32(CRT, regs->grphPitch, widthAligned * bytesPerPixel / 4);
+	Write32(CRT, regs->grphPitch, widthAligned);
 
 	Write32(CRT, regs->grphEnable, 1);
 		// Enable Frame buffer
@@ -751,7 +912,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 
 		Write32(OUT, EVERGREEN_MASTER_UPDATE_MODE + regs->crtcOffset, 0);
 			// Pageflip to happen anywhere in vblank
-
+		display_dce45_crtc_load_lut(crtcID);
 	} else {
 		uint32 tmp = Read32(OUT, AVIVO_D1GRPH_FLIP_CONTROL + regs->crtcOffset);
 		tmp &= ~AVIVO_D1GRPH_SURFACE_UPDATE_H_RETRACE_EN;
@@ -759,6 +920,7 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 
 		Write32(OUT, AVIVO_D1MODE_MASTER_UPDATE_MODE + regs->crtcOffset, 0);
 			// Pageflip to happen anywhere in vblank
+		display_avivo_crtc_load_lut(crtcID);
 	}
 
 	// update shared info
@@ -816,8 +978,8 @@ display_crtc_set_dtd(uint8 crtcID, display_mode* mode)
 {
 	display_timing& displayTiming = mode->timing;
 
-	TRACE("%s called to do %dx%d\n",
-		__func__, displayTiming.h_display, displayTiming.v_display);
+	TRACE("%s called to do %dx%d\n", __func__,
+		displayTiming.h_display, displayTiming.v_display);
 
 	SET_CRTC_USING_DTD_TIMING_PARAMETERS args;
 	int index = GetIndexIntoMasterTable(COMMAND, SetCRTC_UsingDTDTiming);
@@ -825,6 +987,7 @@ display_crtc_set_dtd(uint8 crtcID, display_mode* mode)
 
 	memset(&args, 0, sizeof(args));
 
+	// Note: the code below assumes H & V borders are both zero
 	uint16 blankStart
 		= MIN(displayTiming.h_sync_start, displayTiming.h_display);
 	uint16 blankEnd

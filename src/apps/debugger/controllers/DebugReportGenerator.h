@@ -60,7 +60,9 @@ private:
 			status_t			_DumpDebuggedThreadInfo(BString& _output,
 									::Thread* thread);
 			void				_DumpStackFrameMemory(BString& _output,
-									CpuState* state);
+									CpuState* state,
+									target_addr_t framePointer,
+									uint8 stackDirection);
 
 			status_t			_ResolveValueIfNeeded(ValueNode* node,
 									StackFrame* frame, int32 maxDepth);

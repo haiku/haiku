@@ -1,14 +1,14 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 /** bulk-only protocol specific implementation */
 
@@ -17,15 +17,15 @@
  * http://www.usb.org/developers/data/devclass/usbmassover_11.pdf	[1]
  * http://www.usb.org/developers/data/devclass/usbmassbulk_10.pdf	[2]
  */
-#include "usb_scsi.h" 
+#include "usb_scsi.h"
 
-#include "device_info.h" 
+#include "device_info.h"
 
-#include "proto_module.h" 
-#include "proto_common.h" 
-#include "proto_bulk.h" 
+#include "proto_module.h"
+#include "proto_common.h"
+#include "proto_bulk.h"
 
-#include "usb_defs.h" 
+#include "usb_defs.h"
 
 #include <string.h>	/* strncpy */
 
@@ -83,7 +83,7 @@ void trace_CBW(usb_device_info *udi, const usb_mass_CBW *cbw)
 	PTRACE(udi, "\nCBW:{'%s'; tag:%d; data_len:%d; flags:0x%02x; lun:%d; cdb_len:%d;}\n",
 		buf, cbw->tag, cbw->data_transfer_len,
 		cbw->flags,	cbw->lun, cbw->cdb_len);
-	udi->trace_bytes("CDB:\n", cbw->CDB, CBW_CDB_LENGTH);		 	
+	udi->trace_bytes("CDB:\n", cbw->CDB, CBW_CDB_LENGTH);
 }
 
 void trace_CSW(usb_device_info *udi, const usb_mass_CSW *csw)
@@ -97,8 +97,8 @@ void trace_CSW(usb_device_info *udi, const usb_mass_CSW *csw)
 /**
 	\fn:get_max_luns
 	\param udi: device for wich max LUN info is requested
-	\return:always B_OK - if info was not retrieved max LUN is defaulted to 0	
-	
+	\return:always B_OK - if info was not retrieved max LUN is defaulted to 0
+
 	tries to retrieve the maximal Logical Unit Number supported by
 	this device. If device doesn't support GET_MAX_LUN request - single LUN is
 	assumed. ([2] 3.2)
@@ -123,7 +123,7 @@ get_max_luns(usb_device_info *udi)
 							"Assuming single LUN available.\n", udi->dev_num, status);
 			}
 			udi->max_lun = 0;
-			status = B_OK; 
+			status = B_OK;
 		} /* else - all is OK - max luns info readed */
 	}
 	return status;
@@ -135,7 +135,7 @@ get_max_luns(usb_device_info *udi)
 	\param len: length of data buffer
 	\param b_in: is "true" if input (device->host) data transfer, "false" otherwise
 	\return: status of operation.
-	
+
 	performs queue_bulk USB request for corresponding pipe and handle timeout of this
 	operation.
 */
@@ -159,10 +159,10 @@ queue_bulk(usb_device_info *udi, void* buffer, size_t len, bool b_in)
 /**
 	\fn:check_CSW
 	\param udi:corresponding device info
-	\param csw: CSW to be checked for validity and meaningfullness 
+	\param csw: CSW to be checked for validity and meaningfullness
 	\param transfer_len: data transferred during operation, which is checked for status
 	\return: "true" if CSW valid and meanigfull, "false" otherwise
-	
+
 	checks CSW for validity and meaningfullness as required by USB mass strorge
 	BulkOnly specification ([2] 6.3)
 */
@@ -199,7 +199,7 @@ check_CSW(usb_device_info *udi,	usb_mass_CSW* csw, int transfer_len)
 			break;/* failed */
 		}
 		is_valid = true;
-	}while(false); 
+	}while(false);
 	return is_valid;
 }
 /**
@@ -208,7 +208,7 @@ check_CSW(usb_device_info *udi,	usb_mass_CSW* csw, int transfer_len)
 	\param csw: buffer for CSW data
 	\param transfer_len: data transferred during operation, which is checked for status
 	\return: success status code
-	
+
 	reads CSW from device as proposed in ([2] 5.3.3; Figure 2.).
 */
 static status_t
@@ -216,8 +216,8 @@ read_status(usb_device_info *udi, usb_mass_CSW* csw, int transfer_len)
 {
 	status_t status = B_ERROR;
 	int try = 0;
-	do{	
-		status = queue_bulk(udi, csw, CSW_LENGTH, true); 
+	do{
+		status = queue_bulk(udi, csw, CSW_LENGTH, true);
 		if(0 == try){
 			if(B_OK != status || B_OK != udi->status){
 				status = (*udi->usb_m->clear_feature)(udi->pipe_in, USB_FEATURE_ENDPOINT_HALT);
@@ -243,7 +243,7 @@ read_status(usb_device_info *udi, usb_mass_CSW* csw, int transfer_len)
 			(*udi->protocol_m->reset)(udi);
 			status = B_ERROR;
 			break;
-		}	 
+		}
 		trace_CSW(udi, csw);
 		break; /* CSW was read successfully */
 	}while(try++ < 2);
@@ -256,7 +256,7 @@ read_status(usb_device_info *udi, usb_mass_CSW* csw, int transfer_len)
 	\fn:bulk_only_initialize
 	\param udi: device on wich we should perform initialization
 	\return:error code if initialization failed or B_OK if it passed
-	
+
 	initialize procedure for bulk only protocol devices.
 */
 status_t
@@ -270,7 +270,7 @@ bulk_only_initialize(usb_device_info *udi)
 	\fn:bulk_only_reset
 	\param udi: device on wich we should perform reset
 	\return:error code if reset failed or B_OK if it passed
-	
+
 	reset procedure for bulk only protocol devices. Tries to send
 	BulkOnlyReset USB request and clear USB_FEATURE_ENDPOINT_HALT features on
 	input and output pipes. ([2] 3.1)
@@ -295,13 +295,13 @@ bulk_only_reset(usb_device_info *udi)
 										 USB_FEATURE_ENDPOINT_HALT)))
 	{
 		PTRACE_ALWAYS(udi, "bulk_only_reset: clear_feature on pipe_out failed: %08x\n", status);
-	}	
+	}
 	PTRACE(udi, "bulk_only_reset:%08x\n", status);
 	return status;
 }
 /**
 	\fn:bulk_only_transfer
-	\param udi: corresponding device 
+	\param udi: corresponding device
 	\param cmd: SCSI command to be performed on USB device
 	\param cmdlen: length of SCSI command
 	\param data_sg: io vectors array with data to transfer
@@ -311,7 +311,7 @@ bulk_only_reset(usb_device_info *udi)
 	\param ccbio: CCB_SCSIIO struct for original SCSI command
 	\param cb: callback to handle of final stage of command performing (autosense \
 						 request etc.)
-		
+
 	transfer procedure for bulk-only protocol. Performs	SCSI command on USB device
 	[2]
 */
@@ -352,7 +352,7 @@ bulk_only_transfer(usb_device_info *udi, uint8 *cmd, uint8	cmdlen,	 //sg_buffer 
 				command_status = B_CMD_WIRE_FAILED;
 				break;
 			}
-		}	
+		}
 		/* get status of command */
 		status = read_status(udi, &csw, transfer_len);
 		if(B_OK != status){

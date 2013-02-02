@@ -379,6 +379,8 @@ BScrollBar::SetValue(float value)
 		value = fMax;
 	else if (value < fMin)
 		value = fMin;
+	else if (isnan(value))
+		return;
 
 	value = roundf(value);
 

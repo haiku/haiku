@@ -1132,6 +1132,7 @@ AboutView::_CreateCreditsView()
 		"Pier Luigi Fiorini\n"
 		"Marc Flerackers\n"
 		"Michele Frau - zuMi\n"
+		"Landon Fuller\n"
 		"Deyan Genovski\n"
 		"Pete Goodeve\n"
 		"Lucian Adrian Grijincu\n"

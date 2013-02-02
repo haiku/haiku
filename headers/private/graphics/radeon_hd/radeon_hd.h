@@ -20,6 +20,7 @@
 #include "r700_reg.h"
 #include "evergreen_reg.h"
 #include "si_reg.h"
+#include "ni_reg.h"
 
 #include <Accelerant.h>
 #include <Drivers.h>
@@ -170,6 +171,8 @@ struct radeon_shared_info {
 	uint32			chipsetFlags;
 	uint8			dceMajor;
 	uint8			dceMinor;
+
+	uint16			color_data[3 * 256];    // colour lookup table
 };
 
 //----------------- ioctl() interface ----------------

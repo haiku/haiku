@@ -21,7 +21,7 @@ Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %
 Show icons & labels	Mail		Ikonok és feliratok
 Remove attachment	Mail		Eltávolítás
 Button bar:	Mail		Gombsor:
-spam	B_USER_DIRECTORY/mail/spam		spam
+spam	B_USER_DIRECTORY/mail/spam		Levélszemét
 Beginner	Mail		Kezdő
 Don't save	Mail		Ne mentse
 Expert	Mail		Haladó
@@ -109,7 +109,7 @@ The mail_daemon is not running. The message is queued and will be sent when the 
 Really delete this signature? This cannot be undone.	Mail		Biztosan törli az aláírást? Ez nem vonható vissza.
 Save this message as a draft before closing?	Mail		Menti ezt az üzenetet piszkozatként bezárás előtt?
 Open	Mail		Megnyitás
-draft	B_USER_DIRECTORY/mail/draft		piszkozat
+draft	B_USER_DIRECTORY/mail/draft		Piszkozat
 Quote	Mail		Idézet
 Add	Mail		Hozzáadás
 Next message	Mail		Következő levél

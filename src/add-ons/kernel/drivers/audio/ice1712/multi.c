@@ -145,7 +145,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			break;
 	}
 
-	strncpy(data->vendor_info, "Haiku OS", 32);
+	strncpy(data->vendor_info, "Haiku", 32);
 
 	data->output_channel_count = card->total_output_channels;
 	data->input_channel_count = card->total_input_channels;

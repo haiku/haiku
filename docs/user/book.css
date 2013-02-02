@@ -259,6 +259,10 @@ div.contents em, div.contents code {
 	font-style: normal;
 }
 
+div.contents em {
+	color: #dc3c01; /* grenadier */
+}
+
 div.contents code {
 	color: blue;
 }
@@ -309,10 +313,6 @@ div.contents li {
 	margin-left: 20px;
 }
 
-div.contents dd {
-	font-size: 12px;
-}
-
 div.contents dt {
 	margin-top: 16px;
 	margin-bottom: 8px;
@@ -326,6 +326,10 @@ dl.note, dl.remark, dl.warning, dl.attention {
 	margin-bottom: 24px;
 	padding: 4px;
 	min-height: 48px;
+}
+
+dl.note dd, dl.remark dd, dl.warning dd, dl.attention dd {
+	font-size: 12px;
 }
 
 dl.note {
@@ -764,6 +768,7 @@ div.memdoc dl dd table.params td.paramname {
 	vertical-align: top;
 	font-weight: normal;
 	font-style: normal;
+	color: #dc3c01; /* grenadier */
 	width: 157px;
 }
 

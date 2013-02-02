@@ -1,26 +1,26 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 /** definitions that should be in system headers but ... */
 
-#ifndef _USB_DEFS_H_ 
+#ifndef _USB_DEFS_H_
 	#define _USB_DEFS_H_
 
 // TODO: Shouldn't it be declared in system USB headers?
 #define USB_EP_ATTR_CONTROL		0x00
 #define USB_EP_ATTR_ISOCHRONOUS	0x01
-#define USB_EP_ATTR_BULK		0x02 
-#define USB_EP_ATTR_INTERRUPT	0x03 
-#define USB_EP_ATTR_MASK		0x03 
+#define USB_EP_ATTR_BULK		0x02
+#define USB_EP_ATTR_INTERRUPT	0x03
+#define USB_EP_ATTR_MASK		0x03
 
 #define USB_EP_ADDR_DIR_IN	 	0x80
 #define USB_EP_ADDR_DIR_OUT		0x00
@@ -42,5 +42,5 @@
 //TODO: And this was in old v3 stack what now ???
 #define B_DEV_STALLED 0x8000a015 /* some "forgotten" error */
 
-#endif /*_USB_DEFS_H_*/ 
+#endif /*_USB_DEFS_H_*/
 

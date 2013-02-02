@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-icon_o_matic	3069426771
+1	swedish	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		Markera allt
 Add Style	Icon-O-Matic-AddStylesCmd		Lägg till stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Färg (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		Namnlös
 Multi Set 	Multi Set (property name)		Mängduppsättning
 any of the other lists to	Empty property list - 2nd line		någon av dom andra listorna till
 Save as…	Icon-O-Matic-Menu-File		Spara som...
+Don't save	Icon-O-Matic-Menu-Settings		Spara inte
 Change Color	Icon-O-Matic-SetColorCmd		Byt färg
 Style	Icon-O-Matic-Menus		Stil
 <modify path>	Icon-O-Matic-PathCmd		<modifiera bana>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Ångra
 Click on a shape above	Empty transformers list - 1st line		Klicka på en figur ovan
 Add Shape	Icon-O-Matic-AddShapesCmd		Lägg till figur
 Contour	Transformation		Kontur
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Spara ändringarna till ikonen "%s" innan det stängs?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<inget att göra om>
 Perspective	Transformation		Perspektiv
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Förflyttningsomvandlare

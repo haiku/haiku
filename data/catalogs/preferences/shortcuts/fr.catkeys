@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	3661393357
+1	french	x-vnd.Haiku-Shortcuts	3397621807
 Error, NULL state description?\n	ShortcutsSpec		Erreur : description d'état NULL ?\n
 MoveMouse	ShortcutsSpec		BougerSouris
 OK	ShortcutsWindow		OK
@@ -15,7 +15,6 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsérerTexte « votre texte ici »
 *MouseUp	ShortcutsWindow		*SourisEnHaut
 (Choose application with file requester)	ShortcutsWindow		(Choisissez une application avec une requête de fichier)
-Window	ShortcutsSpec	Name for modifier on keyboard	Fenêtre
 *LaunchHandler text/html	ShortcutsWindow		*GestionnaireDeLancement text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu ouvrir le fichier de jeu de touches !
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi « *BougerSourisEn 100% 0 » « *BoutonSouris 1 »

@@ -1,18 +1,18 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 /** driver settings support definitions */
 
-#ifndef _USB_SCSI_SETTINGS_H_ 
+#ifndef _USB_SCSI_SETTINGS_H_
 	#define _USB_SCSI_SETTINGS_H_
 
 void load_module_settings(void);
@@ -31,8 +31,8 @@ bool lookup_device_settings(const usb_device_descriptor *udd,
 
 extern int	reserved_devices;
 extern int	reserved_luns;
-extern bool b_reservation_on; 
+extern bool b_reservation_on;
 extern bool b_ignore_sysinit2;
 
-#endif /*_USB_SCSI_SETTINGS_H_*/ 
+#endif /*_USB_SCSI_SETTINGS_H_*/
 

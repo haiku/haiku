@@ -13,3 +13,9 @@ Addon <disk_system>ntfs :
 
 	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) libshared.a
 ;
+
+DoCatalogs <disk_system>ntfs :
+	x-vnd.Haiku-NTFSDiskAddOn
+	:
+	InitializeParameterEditor.cpp
+;

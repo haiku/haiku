@@ -4,14 +4,16 @@
 
 
 SYSTEM_BIN = [ FFilterByBuildFeatures
-	"[" addattr alert arp base64 basename bash bc beep bfsinfo
+	"["
+	addattr alert arp
+	base64 basename bash bc beep bfsinfo
 	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
 	csplit cut date dc dd desklink df diff diff3 dircolors dirname
 	diskimage draggers driveinfo dstcheck du dumpcatalog
 	echo eject env error expand expr
-	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
-	ftp ftpd funzip fwcontrol
+	factor false fdinfo ffm filepanel find finddir FirstBootPrompt fmt fold
+	fortune frcode ftp ftpd funzip fwcontrol
 	gawk gdb@x86 getlimits groups gzip gzexe
 	hd head hey hostname
 	id ident ifconfig <bin>install installsound iroster isvolume
@@ -27,18 +29,18 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	passwd paste patch pathchk pc ping ping6 play playfile playsound playwav
 	pr prio printenv printf profile ps ptx pwd
 	query quit
-	rc readlink ReadOnlyBootPrompt reindex release renice rlog rm rmattr
-	rmindex rmdir roster route
+	rc readlink reindex release renice rlog rm rmattr rmindex rmdir roster
+	route
 	safemode screen_blanker screenmode screenshot sdiff setdecor setmime settype
 	setversion setvolume seq sha1sum shar shred shuf shutdown sleep sort
-	spamdbm
-	split stat strace stty su sum sync sysinfo
+	spamdbm split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
 	tput tr traceroute translate trash true truncate tsort tty
-	uname unchop unexpand unmount uniq unlink unrar unshar unzip unzipsfx
+	uname unchop unexpand unmount uniq unlink unshar unzip unzipsfx
 	<bin>updatedb uptime urlwrapper useradd uudecode uuencode
 	vdir version vmstat
-	waitfor watch wc wget whoami writembr@x86 xargs xres yes
+	waitfor watch wc wget whoami writembr@x86 xargs xres
+	yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ] ;
 
@@ -676,7 +678,7 @@ AddFilesToHaikuImage system add-ons Screen\ Savers
 	: $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
 
 AddFilesToHaikuImage system add-ons disk_systems
-	: <disk_system>intel <disk_system>bfs <disk_system>ntfs ;
+	: <disk_system>intel <disk_system>gpt <disk_system>bfs <disk_system>ntfs ;
 
 # decorators
 AddDirectoryToHaikuImage home config add-ons decorators ;

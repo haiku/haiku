@@ -1,14 +1,14 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 /** tracing support implementation */
 
@@ -18,15 +18,15 @@
 #include <stdio.h>
 #include <unistd.h> /* posix file i/o - create, write, close */
 #include <malloc.h>
-#include <string.h> 
-#include <driver_settings.h> 
+#include <string.h>
+#include <driver_settings.h>
 
 /** private log path name */
 static const char *private_log_path = "/var/log/"MODULE_NAME".log";
 
 static const char *log_port_name	= MODULE_NAME"-logging";
 
-#ifdef BUILD_LOG_DAEMON 
+#ifdef BUILD_LOG_DAEMON
 
 int main(int argc, char**argv)
 {
@@ -45,10 +45,10 @@ int main(int argc, char**argv)
 					FILE *f = fopen(private_log_path, "a");
 					fwrite(buffer, sz, 1, f);
 					fclose(f);
-				}	 
+				}
 			}
 		}
-	}	
+	}
 	return 0;
 }
 
@@ -56,7 +56,7 @@ int main(int argc, char**argv)
 
 /** is activity logging on or off? */
 #if DEBUG
-bool b_log = true; 
+bool b_log = true;
 #else
 bool b_log = false;
 #endif
@@ -79,7 +79,7 @@ static bool b_log_time	   = false;
 /** log thread id from wich logging performed */
 static bool b_log_thid	   = false;
 /** log thread name from wich logging performed */
-static bool b_log_thname   = false; 
+static bool b_log_thname   = false;
 /** semaphore id used to synchronizing logging requests */
 //static sem_id loglock;
 /** log result of READ_CAPACITY command */
@@ -118,11 +118,11 @@ load_log_settings(void *sh)
 		b_log_data_processing =
 						get_driver_boolean_parameter(sh, "debug_trace_data_io",
 										b_log_data_processing, false);
-		b_log_sense_data =																								
+		b_log_sense_data =
 						get_driver_boolean_parameter(sh, "debug_trace_sense_data",
 										b_log_sense_data, false);
 		b_log_capacity	= get_driver_boolean_parameter(sh, "debug_trace_capacity",
-										b_log_capacity, false); 
+										b_log_capacity, false);
 		if(!b_log_file){ /* some information is already in system log entries */
 			b_log_thid	 = false;
 			b_log_thname = false;
@@ -144,7 +144,7 @@ create_log(void)
 
 /**
 	\fn: usb_scsi_trace
-	\param b_force: if true - output message ignoring current logging state 
+	\param b_force: if true - output message ignoring current logging state
 	\param fmt: format string used in message formatting
 	\param ...: variable argument used in message formatting
 	formats and traces messages to current debug output target.
@@ -267,13 +267,13 @@ usb_scsi_trace_CCB_SCSIIO(const CCB_SCSIIO *ccbio)
 	ccbio->cam_vu_flags,
 	ccbio->cam_tag_action);
 
-	usb_scsi_trace_bytes("CDB_UN:\n", ccbio->cam_cdb_io.cam_cdb_bytes, IOCDBLEN);		 	
+	usb_scsi_trace_bytes("CDB_UN:\n", ccbio->cam_cdb_io.cam_cdb_bytes, IOCDBLEN);
 }
 /**
 	\fn: usb_scsi_command_trace
 	\param b_hlight: highlight command and prefix it with spec. charachter
 	\param cmd: array of bytes to be traced. typically pointer SCSI command buffer
-	\param cmdlen: size of buffer in cmd parameter 
+	\param cmdlen: size of buffer in cmd parameter
 	traces SCSI commands into debug output target.can highlight and prefix the
 	text with special charachter and color for two different types
 	of commands.
@@ -294,7 +294,7 @@ usb_scsi_trace_command(bool b_hlight, const uint8 *cmd, size_t cmdlen)
 /**
 	\fn:usb_scsi_bytes_trace
 	\param bytes:array of bytes to be traced.
-	\param bytes_len: size of buffer in bytes parameter 
+	\param bytes_len: size of buffer in bytes parameter
 	traces buffer bytes one by one into debug output target.
 */
 void
@@ -319,7 +319,7 @@ usb_scsi_trace_bytes(const char *prefix, const uint8 *bytes, size_t bytes_len)
 	} else {
 		TRACE_ALWAYS("usb_scsi_trace_bytes:error allocate "
 																			"memory for tracing %d bytes\n", len);
-	}	
+	}
 }
 
 void usb_scsi_trace_sgb(const char *prefix, sg_buffer *sgb)
@@ -360,8 +360,8 @@ void usb_scsi_trace_SG(iovec *sg, int count)
 	char sg_mask[] = "SG:{%s}\n";
 	char truncTail[] = "<TRUNC>";
 	size_t trunc_count = min(count, 0x20); /* length watchdog */
-	size_t len = sizeof(sg_mask) + sizeof(truncTail) + trunc_count * 16; 
-	char *pbuf = (char *)malloc(len + 1); 
+	size_t len = sizeof(sg_mask) + sizeof(truncTail) + trunc_count * 16;
+	char *pbuf = (char *)malloc(len + 1);
 	if(pbuf){
 		int i = 0;
 		char *p = pbuf;
@@ -372,13 +372,13 @@ void usb_scsi_trace_SG(iovec *sg, int count)
 		/* user should be informed about truncation too*/
 		if(trunc_count < count)
 			strcpy(p, truncTail);
-		
+
 		TRACE(sg_mask, pbuf);
 		free(pbuf);
 	} else {
 		TRACE_ALWAYS("usb_scsi_trace_SG:error allocate "
 																		"memory for tracing %d SG entries\n", trunc_count);
-	}	
+	}
 }
 
 #endif /* BUILD_LOG_DAEMON */

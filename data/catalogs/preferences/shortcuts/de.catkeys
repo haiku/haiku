@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	3661393357
+1	german	x-vnd.Haiku-Shortcuts	341885426
 Error, NULL state description?\n	ShortcutsSpec		Fehler, NULL Status Beschreibung?\n
 MoveMouse	ShortcutsSpec		Bewege Maus
 OK	ShortcutsWindow		OK
@@ -15,12 +15,12 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Zeichen einfügen \"Hier der Text\"
 *MouseUp	ShortcutsWindow		*Maustaste losgelassen
 (Choose application with file requester)	ShortcutsWindow		(Eine Anwendung per Datei-Dialog wählen)
-Window	ShortcutsSpec	Name for modifier on keyboard	Windows
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht geladen werden.
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Maus nach oben ins linke Eck und Maustaste 1 drücken
 SendMessage	ShortcutsSpec		Nachricht senden
 MoveMouseTo	ShortcutsSpec		Bewege Maus nach
+Option	ShortcutsSpec	Name for modifier on keyboard	Option
 Save	ShortcutsWindow		Speichern
 *MouseButton 1	ShortcutsWindow		*Maustaste 1 drücken
 *MoveMouse +20 +0	ShortcutsWindow		*Maus 20 Pixel nach rechts bewegen

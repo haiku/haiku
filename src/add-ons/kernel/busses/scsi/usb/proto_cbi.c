@@ -1,14 +1,14 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 /* References:
  * USB Mass Storage Class specifications:
@@ -19,17 +19,17 @@
 
 #include <string.h>
 
-#include "usb_scsi.h" 
+#include "usb_scsi.h"
 
-#include "device_info.h" 
+#include "device_info.h"
 
-#include "proto_module.h" 
+#include "proto_module.h"
 #include "proto_common.h"
-#include "proto_cbi.h" 
+#include "proto_cbi.h"
 
-#include "usb_defs.h" 
+#include "usb_defs.h"
 
-#define USB_REQ_CBI_ADSC 0x00 
+#define USB_REQ_CBI_ADSC 0x00
 
 
 typedef struct _usb_mass_CBI_CB{
@@ -38,8 +38,8 @@ typedef struct _usb_mass_CBI_CB{
 	uint8 padding[14];
 } usb_mass_CBI_CB;
 
-#define CDB_LEN 16 
-#define CDB_RESET_LEN 12 
+#define CDB_LEN 16
+#define CDB_RESET_LEN 12
 
 //typedef uint8 usb_mass_CDB[CDB_LEN];
 
@@ -81,7 +81,7 @@ static void cbi_transfer(usb_device_info *udi, uint8 *cmd, uint8 cmdlen, //sg_bu
 void trace_CDB(usb_device_info *udi, const usb_mass_CBI_CB *cb, int len)
 {
 	PTRACE(udi, "CB:{op:0x%02x; op2:0x%02x;}\n", cb->op, cb->op2);
-	udi->trace_bytes(" padding:", cb->padding, len - 2);		 	
+	udi->trace_bytes(" padding:", cb->padding, len - 2);
 }
 
 static status_t
@@ -143,7 +143,7 @@ parse_status(usb_device_info *udi, usb_mass_CBI_IDB *idb)
 				break;
 			}
 		} /* else ?? */
-	}		
+	}
 	return command_status;
 }
 
@@ -153,14 +153,14 @@ parse_status(usb_device_info *udi, usb_mass_CBI_IDB *idb)
 	\fn:
 	\param udi: ???
 	\return:??
-	
+
 	??
 */
 status_t
 cbi_reset(usb_device_info *udi)
 {
 	status_t status = B_ERROR;
-	//usb_mass_CBI_CB *cb = CB_BUFFER(udi->proto_buf);	
+	//usb_mass_CBI_CB *cb = CB_BUFFER(udi->proto_buf);
 	//usb_mass_CDB cdb = {0x1d, 0x04, 0x00};
 	//memset(cdb + 2, 0xff, CDB_RESET_LEN - 2);
 	usb_mass_CBI_CB cb = {
@@ -171,7 +171,7 @@ cbi_reset(usb_device_info *udi)
 	status = send_request_adsc(udi, &cb, CDB_RESET_LEN);
 	if(status != B_OK)
 		PTRACE_ALWAYS(udi, "command_block_reset: reset request failed: %08x\n", status);
-	
+
 	if(B_OK != (status = (*udi->usb_m->clear_feature)(udi->pipe_in,
 										 USB_FEATURE_ENDPOINT_HALT)))
 		PTRACE_ALWAYS(udi, "command_block_reset: clear_feature on pipe_in failed: %08x\n", status);
@@ -201,7 +201,7 @@ cbi_initialize(usb_device_info *udi)
 	\param cmd: ???
 	\param cmdlen: ???
 	\return:???
-	
+
 	???
 */
 void
@@ -225,7 +225,7 @@ cbi_transfer(usb_device_info *udi, uint8 *cmd, uint8	cmdlen,
 				(*udi->protocol_m->reset)(udi);
 			}
 			break;
-		} 
+		}
 		if(transfer_len != 0){
 			status = process_data_io(udi, sg_data, sg_count, dir);
 			if(status != B_OK){
@@ -233,8 +233,8 @@ cbi_transfer(usb_device_info *udi, uint8 *cmd, uint8	cmdlen,
 				break;
 			}
 		}
-		
-		if(PROTO(udi->properties) == PROTO_CBI){		
+
+		if(PROTO(udi->properties) == PROTO_CBI){
 			status = request_interrupt(udi, &idb);
 			PTRACE(udi, "cbi_transfer:request interrupt: %08x(%08x)\n", status, udi->status);
 			if(status != B_OK){
@@ -246,9 +246,9 @@ cbi_transfer(usb_device_info *udi, uint8 *cmd, uint8	cmdlen,
 			command_status = parse_status(udi, &idb);
 		} else { /* PROP_CB ???*/
 			command_status = B_CMD_UNKNOWN;
-		}	
+		}
 		residue = 0; /* DEBUG!!!!!!!!!*/
-	}while(false);	
+	}while(false);
 	cb(udi, ccbio, residue, command_status);
 }
 

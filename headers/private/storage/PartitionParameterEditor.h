@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009, Bryce Groff, brycegroff@gmail.com.
  * Distributed under the terms of the MIT License.
  */
@@ -9,26 +10,32 @@
 #include <View.h>
 
 
-// BPartitionParameterEditor
+class BMessage;
+class BPartition;
+class BVariant;
+
+
 class BPartitionParameterEditor {
 public:
 								BPartitionParameterEditor();
 	virtual						~BPartitionParameterEditor();
 
-	virtual		bool			FinishedEditing();
+	virtual		void			SetTo(BPartition* partition);
+
+				void			SetModificationMessage(BMessage* message);
+				BMessage*		ModificationMessage() const;
 
 	virtual		BView*			View();
 
-	virtual		status_t		GetParameters(BString* parameters);
+	virtual		bool			ValidateParameters() const;
+	virtual		status_t		ParameterChanged(const char* name,
+									const BVariant& variant);
 
-	// TODO: Those are child creation specific and shouldn't be in a generic
-	// interface. Something like a
-	// GenericPartitionParameterChanged(partition_parameter_type,
-	//		const BVariant&)
-	// would be better.
-	virtual		status_t		PartitionTypeChanged(const char* type);
-	virtual		status_t		PartitionNameChanged(const char* name);
+	virtual		status_t		GetParameters(BString& parameters);
+
+private:
+				BMessage*		fModificationMessage;
 };
 
 
-#endif //_PARTITION_PARAMETER_EDITOR_H
+#endif // _PARTITION_PARAMETER_EDITOR_H

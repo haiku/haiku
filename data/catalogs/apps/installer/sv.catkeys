@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	3015727137
+1	swedish	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Efter de andra menyposterna mot slutet av filen, lägg till något som liknar dessa rader:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet
 \t}\n\n	InstallerApp		\t}\n\n
@@ -109,12 +109,14 @@ NOTE: While the naming strategy for hard disks is still as described under 2.1) 
 Cancel	InstallProgress		Avbryt
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Kör Boot Manager och DriveSetup…\n\nStäng båda programmen för att fortsätta med installationen.
 Try installing anyway	InstallProgress		Försök installera iallafall
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Under rubriken ska inte ändras. Lägg till något liknande till dessa rader:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
 Onto:	InstallerWindow		På:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Stäng Boot Manager fönstret före du stänger installatione fönstret.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   När du har startat Haiku första gången. Läs gärna våra dokument \"Välkommen\" och \"Användarguid\". Det finns länkar på skrivbordet och i WebPositive's bokmärken.\n\n
 Tools	InstallerWindow		Verktyg
 The mount point could not be retrieved.	InstallProgress		Monteringspunkt kunde inte läsas av.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		volymen du vill installera till är inte tom. Vill du installera ändå?\n\nNotera: System foldern kommer att tömmas och vara en 'ren' kopia från käll katalogen. Övriga mappar kommer att mergas och de filer och länkar som finns både i källmappen och destinations mappen kommer att skrivas över med källmappen.
 You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Du kan se de rätta partionerna i tex GParted.\n\n\n
 \ttitle\t\t\t\tHaiku\n	InstallerApp		\t titel\t \t \t \t Haiku\n
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\t sudo <valfri textredigerare> /etc/grub.d/40_custom\n\n

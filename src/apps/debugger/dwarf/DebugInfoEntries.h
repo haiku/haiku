@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUG_INFO_ENTRIES_H
@@ -1593,6 +1594,50 @@ public:
 private:
 			DynamicAttributeValue fBlockSize;
 			DeclarationLocation	fDeclarationLocation;
+};
+
+
+class DIETemplateTypeParameterPack : public DIEDeclaredBase {
+public:
+								DIETemplateTypeParameterPack();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			const char*			fName;
+			DebugInfoEntryList	fChildren;
+};
+
+
+class DIETemplateValueParameterPack : public DIEDeclaredBase {
+public:
+								DIETemplateValueParameterPack();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			const char*			fName;
+			DebugInfoEntryList	fChildren;
 };
 
 

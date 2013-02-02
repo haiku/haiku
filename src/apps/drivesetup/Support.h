@@ -21,11 +21,6 @@ void dump_partition_info(const BPartition* partition);
 
 bool is_valid_partitionable_space(size_t size);
 
-enum {
-	GO_CANCELED	= 0,
-	GO_SUCCESS
-};
-
 
 static const uint32 kMegaByte = 0x100000;
 

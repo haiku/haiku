@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-FileTypes	1059171929
+1	swedish	x-vnd.Haiku-FileTypes	133192727
 Application types…	FileTypes Window		Programtyper...
 Description:	Application Types Window		Beskrivning:
 Args only	Application Type Window		Endast argument
@@ -49,6 +49,8 @@ Group name:	New File Type Window		Gruppnamn:
 Preferred application	FileType Window		Förvalt program
 Progress	Application Types Window		Fortskridning:
 Set preferred application	Preferred App Menu		Välj förinställt program
+Don't save	Application Type Window		Spara inte
+Save changes before closing?	Application Type Window		Spara ändringar innan programmet avslutas?
 File	Application Type Window		Arkiv
 Version:	Application Type Window		Version:
 Select…	FileTypes Window		Välj...

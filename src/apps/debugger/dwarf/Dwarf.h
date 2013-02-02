@@ -65,6 +65,10 @@ enum {
 	DW_TAG_condition				= 0x3f,
 	DW_TAG_shared_type				= 0x40,
 	DW_TAG_lo_user					= 0x4080,
+	DW_TAG_GNU_template_parameter_pack
+									= 0x4107,
+	DW_TAG_GNU_formal_parameter_pack
+									= 0x4108,
 	DW_TAG_hi_user					= 0xffff
 };
 

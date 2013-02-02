@@ -1,7 +1,0 @@
-1	brazilian_portuguese	x-vnd.Haiku-ReadOnlyBootPrompt	988630706
-Custom	BootPromptWindow		Personalizado
-Keymap	BootPromptWindow		Mapa de Teclas
-Language	BootPromptWindow		Linguagem
-Run Installer	BootPromptWindow		Executar Instalador
-Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Obrigado por experimentar o Haiku! Nós esperamos que você se divirta!!\n\nVocê pode escolher sua língua e o layout do teclado da lista na esquerda da qual serão usadas instantaneamente. Você pode facilmente mudar ambas as configurações no Desktop depois.\n\nVocê deseja abrir o Instalar ou continuar a carregar o Desktop?\n
-Welcome to Haiku!	BootPromptWindow		Bem vindo ao Haiku!

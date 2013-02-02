@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3779634732
+1	swedish	x-vnd.Haiku-libtracker	2580969822
 common	B_COMMON_DIRECTORY		gemensam
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
@@ -81,6 +81,7 @@ Decrease size	DeskWindow		Minska storleken
 Size	ContainerWindow		Storlek
 All disks	AutoMounterSettings		Alla diskar
 Would you like to find some other suitable application?	FSUtils		Vill du söka efter ett annat program?
+Ask before deleting for good	SettingsView		Fråga innan det tasbort permanent
 Finish: %time - %finishtime left	StatusWindow		Klar: %time - %finishtime kvar
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Kunde inte öppna "%document" med programmet "%app" (Saknar bibliotek: %library). \n
 no items	CountView		inga objekt
@@ -101,6 +102,7 @@ New folder	FilePanelPriv		Ny mapp
 %name info	InfoWindow	InfoWindow Title	%name information
 Favorites	FavoritesMenu		Favoriter
 Add-ons	VolumeWindow		Tillägg
+Move deleted files to Trash first	SettingsView		Flytta borttagna filer till papperskorgen först
 Sorry, you can't copy items to the Trash.	PoseView		Du kan inte kopiera filer till Papperskorgen.
 List view	VolumeWindow		Listvy
 matches wildcard expression	SelectionWindow		matchar jokeruttryck

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-PEPL	3273435274
+1	swedish	x-vnd.Be-PEPL	2332202134
 Edit	People		Redigera
 Error	People		Fel
 City	People		Stad
@@ -21,6 +21,7 @@ Nickname	People		Smeknamn
 Quit	People		Avsluta
 Name	People		Namn
 Revert	People		Återställ
+Don't save	People		Spara inte
 Undo	People		Ångra
 E-mail	People		E-post
 Load image…	People		Välj bild...
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Hemtelefon
 Save as…	People		Spara som...
 Redo	People		Gör om
+Save changes before closing?	People		Spara ändringar innan avslut?
 Paste	People		Klistra in
 Drop an image here,\nor use the contextual menu.	People		Släpp en bild här,\neller använd högerklicksmenyn.
 Save	People		Spara

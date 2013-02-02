@@ -1915,8 +1915,8 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 
 		if (dir == trash_dir || dir.Contains(&trashEntry)) {
 			BAlert* alert = new BAlert("",
-				B_TRANSLATE("You cannot put the Trash, home or Desktop "
-					"directory into the trash."),
+				B_TRANSLATE("You cannot put the selected item(s) "
+					"into the trash."),
 				B_TRANSLATE("OK"),
 				0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

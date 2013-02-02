@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Shortcuts	1741147146
+1	romanian	x-vnd.Haiku-Shortcuts	1477375596
 Error, NULL state description?\n	ShortcutsSpec		Eroare, descriere stare NULL?\n
 MoveMouse	ShortcutsSpec		MutăMaus
 OK	ShortcutsWindow		OK
@@ -15,7 +15,6 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsereazăȘir "Textul dumneavoastră aici"
 *MouseUp	ShortcutsWindow		*MauSus
 (Choose application with file requester)	ShortcutsWindow		(Selectează aplicație cu solicitantul de fișier)
-Window	ShortcutsSpec	Name for modifier on keyboard	Fereastră
 *LaunchHandler text/html	ShortcutsWindow		*OperatorLansare text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Scurtături nu a putut deschide fișierul dumneavoastră set de taste!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi "*MutăMausLa 100% 0" "*ButonMaus 1"

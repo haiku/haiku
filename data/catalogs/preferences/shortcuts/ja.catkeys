@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Shortcuts	3661393357
+1	japanese	x-vnd.Haiku-Shortcuts	341885426
 Error, NULL state description?\n	ShortcutsSpec		エラー、記述がありません?\n
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		OK
@@ -15,12 +15,12 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
 *MouseUp	ShortcutsWindow		*MouseUp
 (Choose application with file requester)	ShortcutsWindow		(ファイルリクエスタと共にアプリケーションを選択)
-Window	ShortcutsSpec	Name for modifier on keyboard	Window
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした！
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 SendMessage	ShortcutsSpec		SendMessage
 MoveMouseTo	ShortcutsSpec		MoveMouseTo
+Option	ShortcutsSpec	Name for modifier on keyboard	オプション
 Save	ShortcutsWindow		保存
 *MouseButton 1	ShortcutsWindow		*MouseButton 1
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0

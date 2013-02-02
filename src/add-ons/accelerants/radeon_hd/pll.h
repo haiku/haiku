@@ -93,6 +93,9 @@ struct pll_info {
 	/* asic spread spectrum */
 	uint16 ssRate;
 	uint16 ssAmount;
+
+	/* pixel clock to be used in pll calculations (kHz) */
+	uint32 adjustedClock;
 };
 
 

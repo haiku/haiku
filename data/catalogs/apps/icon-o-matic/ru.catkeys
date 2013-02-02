@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	3069426771
+1	russian	x-vnd.haiku-icon_o_matic	3933520036
 Select All	Icon-O-Matic-PathManipulator		Выделить всё
 Add Style	Icon-O-Matic-AddStylesCmd		Добавить стиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Цвет (#%02x%02x%02x)
@@ -43,6 +43,7 @@ Untitled	Icon-O-Matic-Main		Новый значок
 Multi Set 	Multi Set (property name)		Множество 
 any of the other lists to	Empty property list - 2nd line		любом другом списке для того,
 Save as…	Icon-O-Matic-Menu-File		Сохранить как…
+Don't save	Icon-O-Matic-Menu-Settings		Не сохранять
 Change Color	Icon-O-Matic-SetColorCmd		Изменить цвет
 Style	Icon-O-Matic-Menus		Стиль
 <modify path>	Icon-O-Matic-PathCmd		<изменить путь>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Отменить
 Click on a shape above	Empty transformers list - 1st line		Нажмите на форму выше
 Add Shape	Icon-O-Matic-AddShapesCmd		Добавить форму
 Contour	Transformation		Обводка
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Сохранить изменения теущего значка перед закрытием?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<нечего возвращать>
 Perspective	Transformation		Перспектива
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Переместить трансформатор

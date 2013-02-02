@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -2514,6 +2514,96 @@ DIESharedType::AddAttribute_decl_column(uint16 attributeName,
 }
 
 
+// #pragma mark - DIETemplateTypeParameterPack
+
+
+DIETemplateTypeParameterPack::DIETemplateTypeParameterPack()
+	:
+	fName(NULL)
+{
+}
+
+
+uint16
+DIETemplateTypeParameterPack::Tag() const
+{
+	return DW_TAG_GNU_template_parameter_pack;
+}
+
+
+const char*
+DIETemplateTypeParameterPack::Name() const
+{
+	return fName;
+}
+
+
+status_t
+DIETemplateTypeParameterPack::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
+status_t
+DIETemplateTypeParameterPack::AddChild(DebugInfoEntry* child)
+{
+	if (child->Tag() == DW_TAG_template_type_parameter) {
+		fChildren.Add(child);
+		return B_OK;
+	}
+
+	return DIEDeclaredBase::AddChild(child);
+}
+
+
+// #pragma mark - DIETemplateValueParameterPack
+
+
+DIETemplateValueParameterPack::DIETemplateValueParameterPack()
+	:
+	fName(NULL)
+{
+}
+
+
+uint16
+DIETemplateValueParameterPack::Tag() const
+{
+	return DW_TAG_GNU_formal_parameter_pack;
+}
+
+
+const char*
+DIETemplateValueParameterPack::Name() const
+{
+	return fName;
+}
+
+
+status_t
+DIETemplateValueParameterPack::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
+status_t
+DIETemplateValueParameterPack::AddChild(DebugInfoEntry* child)
+{
+	if (child->Tag() == DW_TAG_formal_parameter) {
+		fChildren.Add(child);
+		return B_OK;
+	}
+
+	return DIEDeclaredBase::AddChild(child);
+}
+
+
 // #pragma mark - DebugInfoEntryFactory
 
 
@@ -2698,6 +2788,12 @@ DebugInfoEntryFactory::CreateDebugInfoEntry(uint16 tag, DebugInfoEntry*& _entry)
 			break;
 		case DW_TAG_shared_type:
 			entry = new(std::nothrow) DIESharedType;
+			break;
+		case DW_TAG_GNU_template_parameter_pack:
+			entry = new(std::nothrow) DIETemplateTypeParameterPack;
+			break;
+		case DW_TAG_GNU_formal_parameter_pack:
+			entry = new(std::nothrow) DIETemplateValueParameterPack;
 			break;
 		default:
 			return B_ENTRY_NOT_FOUND;

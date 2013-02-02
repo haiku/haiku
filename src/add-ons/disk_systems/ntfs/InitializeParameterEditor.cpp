@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2009, Bryce Groff, brycegroff@gmail.com.
  * Distributed under the terms of the MIT License.
@@ -11,17 +12,18 @@
 
 #include <Button.h>
 #include <Catalog.h>
-#include <CheckBox.h>
 #include <ControlLook.h>
 #include <GridLayoutBuilder.h>
-#include <MenuField.h>
-#include <MenuItem.h>
-#include <PartitionParameterEditor.h>
-#include <PopUpMenu.h>
+#include <Partition.h>
 #include <SpaceLayoutItem.h>
 #include <TextControl.h>
+#include <Variant.h>
 #include <View.h>
 #include <Window.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NTFS_Initialize_Parameter"
 
 
 static uint32 MSG_NAME_CHANGED = 'nmch';
@@ -31,7 +33,7 @@ InitializeNTFSEditor::InitializeNTFSEditor()
 	:
 	BPartitionParameterEditor(),
 	fView(NULL),
-	fNameTC(NULL),
+	fNameControl(NULL),
 	fParameters(NULL)
 {
 	_CreateViewControls();
@@ -43,6 +45,15 @@ InitializeNTFSEditor::~InitializeNTFSEditor()
 }
 
 
+void
+InitializeNTFSEditor::SetTo(BPartition* partition)
+{
+	BString name = partition->ContentName();
+	if (!name.IsEmpty())
+		fNameControl->SetText(name.String());
+}
+
+
 BView*
 InitializeNTFSEditor::View()
 {
@@ -51,30 +62,28 @@ InitializeNTFSEditor::View()
 
 
 bool
-InitializeNTFSEditor::FinishedEditing()
+InitializeNTFSEditor::ValidateParameters() const
 {
-	fParameters = "";
-	fParameters << "name \"" << fNameTC->Text() << "\";\n";
-
-	return true;
+	// The name must be set
+	return fNameControl->TextView()->TextLength() > 0;
 }
 
 
 status_t
-InitializeNTFSEditor::GetParameters(BString* parameters)
+InitializeNTFSEditor::ParameterChanged(const char* name,
+	const BVariant& variant)
 {
-	if (parameters == NULL)
-		return B_BAD_VALUE;
-
-	*parameters = fParameters;
+	if (!strcmp(name, "name"))
+		fNameControl->SetText(variant.ToString());
 	return B_OK;
 }
 
 
 status_t
-InitializeNTFSEditor::PartitionNameChanged(const char* name)
+InitializeNTFSEditor::GetParameters(BString& parameters)
 {
-	fNameTC->SetText(name);
+	parameters = "name \"";
+	parameters << fNameControl->Text() << "\";\n";
 	return B_OK;
 }
 
@@ -82,16 +91,15 @@ InitializeNTFSEditor::PartitionNameChanged(const char* name)
 void
 InitializeNTFSEditor::_CreateViewControls()
 {
-	fNameTC = new BTextControl("Name:", "New NTFS Volume", NULL);
-	fNameTC->SetModificationMessage(new BMessage(MSG_NAME_CHANGED));
-	// TODO find out what is the max length for this specific FS partition name
-	fNameTC->TextView()->SetMaxBytes(31);
+	fNameControl = new BTextControl(B_TRANSLATE("Name:"), "New NTFS Volume",
+		NULL);
+	fNameControl->SetModificationMessage(new BMessage(MSG_NAME_CHANGED));
+	fNameControl->TextView()->SetMaxBytes(127);
 
 	float spacing = be_control_look->DefaultItemSpacing();
 
 	fView = BGridLayoutBuilder(spacing, spacing)
-		// row 1
-		.Add(fNameTC->CreateLabelLayoutItem(), 0, 0)
-		.Add(fNameTC->CreateTextViewLayoutItem(), 1, 0).View()
+		.Add(fNameControl->CreateLabelLayoutItem(), 0, 0)
+		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 0).View()
 	;
 }

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Shortcuts	1741147146
+1	dutch; flemish	x-vnd.Haiku-Shortcuts	1477375596
 Error, NULL state description?\n	ShortcutsSpec		Fout, NULL-statusbeschrijving?\n
 MoveMouse	ShortcutsSpec		VerplaatsMuis
 OK	ShortcutsWindow		Oké
@@ -15,7 +15,6 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*VoegTekstIn \"Uw Tekst Hier\"
 *MouseUp	ShortcutsWindow		*MuisOmhoog
 (Choose application with file requester)	ShortcutsWindow		(Kies een toepassing met een bestandskiezer)
-Window	ShortcutsSpec	Name for modifier on keyboard	Windows-toets
 *LaunchHandler text/html	ShortcutsWindow		*StartAfhandelaar text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sneltoetsen kon uw toetsencombinatiebestand niet openen!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Meerdere \"*VerplaatsMuisNaar 100% 0\" \"*MuisKnop 1\"

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	1741147146
+1	swedish	x-vnd.Haiku-Shortcuts	341885426
 Error, NULL state description?\n	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?\n
 MoveMouse	ShortcutsSpec		FlyttaMus
 OK	ShortcutsWindow		OK
@@ -15,16 +15,17 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InfogaSträng \"Din text\"
 *MouseUp	ShortcutsWindow		*MusnappUpp
 (Choose application with file requester)	ShortcutsWindow		(Välj applikation i filväljarfönstret)
-Window	ShortcutsSpec	Name for modifier on keyboard	Start
 *LaunchHandler text/html	ShortcutsWindow		*StartHanterare text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Genvägar kunde inte öppna din tagentuppsättning!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Flera \"*FlyttaMusTill 100% 0\" \"*Musknapp 1\"
 SendMessage	ShortcutsSpec		SkickaMeddelande
 MoveMouseTo	ShortcutsSpec		FlyttaMusenTill
+Option	ShortcutsSpec	Name for modifier on keyboard	Alternativ
 Save	ShortcutsWindow		Spara
 *MouseButton 1	ShortcutsWindow		*Musknapp 1
 *MoveMouse +20 +0	ShortcutsWindow		*FlyttaMusenTill +20 +0
 MouseDown	ShortcutsSpec		MusknappNer
+Save changes before closing?	ShortcutsWindow		Spara ändringar innan programmet avslutas?
 Remove selected shortcut	ShortcutsWindow		Ta bort
 MouseButton	ShortcutsSpec		Musknapp
 Add new shortcut	ShortcutsWindow		Lägg till

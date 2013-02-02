@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	2178478404
+1	swedish	x-vnd.Haiku-Terminal	3561344903
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -67,6 +67,7 @@ Error!	Terminal getString		Fel!
 New tab	Terminal TermWindow		Ny flik
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Mönstret bestämmer namn på flikar. Följande alternativ finns:\n
 Selected background	Terminal AppearancePrefView		Vald bakgrund
+Slate	Terminal colors scheme		Slate
 Text under cursor	Terminal AppearancePrefView		Text under markören
 Midnight	Terminal colors scheme		Midnatt
 Decrease	Terminal TermWindow		Minska

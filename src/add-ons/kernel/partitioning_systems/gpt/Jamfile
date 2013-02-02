@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src add-ons kernel partitioning_systems gpt ;
+
+UsePrivateHeaders interface kernel storage ;
+UsePrivateSystemHeaders ;
+
+KernelAddon efi_gpt :
+	efi_gpt.cpp
+	Header.cpp
+	crc32.cpp
+	utility.cpp
+	PartitionLocker.cpp
+;

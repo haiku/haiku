@@ -50,8 +50,7 @@
 
 
 /*!
-	\fn BDurationFormat&
-		BDurationFormat::operator=(const BDurationFormat& other)
+	\fn BDurationFormat& BDurationFormat::operator=(const BDurationFormat& other)
 	\brief Assignment overload.
 
 	\param other The BDurationFormat object to copy from.

@@ -1,6 +1,13 @@
 /*
  * Copyright 2003, Thomas Kurschel. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2006-2013 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *	Thomas Kurschel
+ *	Bill Randle, billr@neocat.org
  */
 #ifndef _EDID_RAW_H
 #define _EDID_RAW_H
@@ -224,12 +231,13 @@ typedef struct _PACKED {
 	);
 	uint8 h_border;
 	uint8 v_border;
-	BBITFIELD8_4 (
+	BBITFIELD8_5 (
 		interlaced : 1,
 		stereo : 2,		// upper bit set - left on sync
 						// lower bit set - right on sync
 		sync : 2,
-		misc : 2
+		misc : 2,
+		stereo_il : 1
 	);
 } edid1_detailed_timing_raw;
 

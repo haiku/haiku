@@ -259,7 +259,7 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 			path.Append(search_path + 3);
 		} else {
 			path.SetTo(search_path);
-			path.Append("network_setup");
+			path.Append("Network Setup");
 		}
 
 		search_path = strtok_r(NULL, ":", &next_path_token);

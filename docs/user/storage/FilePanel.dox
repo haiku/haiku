@@ -62,7 +62,7 @@
 
 
 /*!
-	\fn virtual bool Filter(const entry_ref* ref, BNode* node,
+	\fn virtual bool BRefFilter::Filter(const entry_ref* ref, BNode* node,
 		struct stat_beos* stat, const char* mimeType)
 	\brief Hook method that's called on each file in the target directory
 		displayed by a file panel.

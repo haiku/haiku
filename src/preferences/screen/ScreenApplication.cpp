@@ -51,11 +51,11 @@ ScreenApplication::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case SET_CUSTOM_REFRESH_MSG:
 		case MAKE_INITIAL_MSG:
-			fScreenWindow->PostMessage(message);	
+			fScreenWindow->PostMessage(message);
 			break;
 
 		default:
-			BApplication::MessageReceived(message);			
+			BApplication::MessageReceived(message);
 			break;
 	}
 }

@@ -109,7 +109,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/net_server				# launch net_server
 fi
 
-launch $SERVERS/app_server picasso		# launch app_server
+launch $SERVERS/app_server picasso			# launch app_server
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/syslog_daemon
@@ -117,14 +117,15 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Now ask the user if he wants to run the Installer or continue to the Desktop.
-if [ "$isReadOnly" = "yes" ]; then
-	# Create Installer link (using the write overlay)
-	ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
-
-	/bin/ReadOnlyBootPrompt
+freshInstallIndicator=/boot/common/settings/fresh_install
+if [ "$isReadOnly" = "yes" -o -e $freshInstallIndicator ]; then
+	/bin/FirstBootPrompt
 	if [ $? -eq 0 ]; then
 		launchscript $SCRIPTS/Bootscript.cd
 		exit 0 # and return
+	elif [ "$isReadOnly" = "yes" ] ; then
+		# Create Installer link (using the write overlay)
+		ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
 	fi
 fi
 
@@ -190,7 +191,6 @@ fi
 
 # Check for fresh install and run post install scripts.
 postInstallDir=/boot/common/boot/post_install
-freshInstallIndicator=/boot/common/settings/fresh_install
 if [ -e $freshInstallIndicator ]; then
 	# wait a moment for things to calm down a bit
 	sleep 3

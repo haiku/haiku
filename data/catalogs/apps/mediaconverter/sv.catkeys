@@ -1,9 +1,11 @@
-1	swedish	x-vnd.Haiku-MediaConverter	2955071341
+1	swedish	x-vnd.Haiku-MediaConverter	2722282283
 Video using parameters form settings	MediaConverter		Video med parametrar från inställningar
 Video encoding:	MediaConverter		Videokodning:
+Error read audio frame %lld	MediaConverter		Fel vid inläsning av ljudstycke %lld
 No audio	Audio codecs list		Inget ljud
 Error	MediaConverter		Fel
 Error loading a file	MediaConverter		Fel vid inläsning av en fil
+Error read video frame %lld	MediaConverter		Fel vid inläsning av bildruta %lld
 File Error	MediaConverter-FileInfo		Filfel
 Open…	Menu		Öppna...
 Start [ms]: 	MediaConverter		Start [ms]:
@@ -22,6 +24,8 @@ Audio:	MediaConverter-FileInfo		Ljud:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 sekunder
 Source files	MediaConverter		Källfiler
+Error writing video frame %lld	MediaConverter		Fel vid skrivande av bildruta %lld
+Error writing audio frame %lld	MediaConverter		Fel vid skrivning av ljudstycke %lld
 Cancelling	MediaConverter		Avbryter
 %d byte 	MediaFileInfo		%d bytes
 Error loading files	MediaConverter		Fel vid inläsning av filer

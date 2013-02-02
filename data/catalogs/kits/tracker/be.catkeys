@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	3779634732
+1	belarusian	x-vnd.Haiku-libtracker	2580969822
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -81,6 +81,7 @@ Decrease size	DeskWindow		Паменшыць памер
 Size	ContainerWindow		Памер
 All disks	AutoMounterSettings		Усе дыскі
 Would you like to find some other suitable application?	FSUtils		Жадаеце пашукаць іншую падыходзячую праграму?
+Ask before deleting for good	SettingsView		Спытаць перад выдаленнем
 Finish: %time - %finishtime left	StatusWindow		Завяршэнне: %time - засталося %finishtime
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Немагчыма адкрыць \"%document\" праграмай \"%app\" (Не хапае: %library). \n
 no items	CountView		няма элементаў
@@ -101,6 +102,7 @@ New folder	FilePanelPriv		Новы каталог
 %name info	InfoWindow	InfoWindow Title	%name інфа
 Favorites	FavoritesMenu		Выбранае
 Add-ons	VolumeWindow		Дапаўненні
+Move deleted files to Trash first	SettingsView		Перасунуць выдаленыя файлы спярша ў Сметніцу
 Sorry, you can't copy items to the Trash.	PoseView		Прабачце, вы не можаце капіяваць элементы ў Сметніцу.
 List view	VolumeWindow		Від спісу
 matches wildcard expression	SelectionWindow		супадае з падстановачнымі выразамі

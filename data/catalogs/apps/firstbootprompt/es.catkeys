@@ -1,0 +1,6 @@
+1	spanish	x-vnd.Haiku-FirstBootPrompt	1972532432
+Desktop (Live-CD)	BootPromptWindow		Escritorio (Live-CD)
+Keymap	BootPromptWindow		Distribución de teclado
+Language	BootPromptWindow		Idioma
+Run Installer	BootPromptWindow		Ejecutar instalador
+Welcome to Haiku!	BootPromptWindow		¡Bienvenido a Haiku!

@@ -1,20 +1,20 @@
 /**
  *
  * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
+ *
+ * This file is a part of USB SCSI CAM for Haiku.
  * May be used under terms of the MIT License
  *
  * Author(s):
  * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ *
+ *
  */
 /** driver settings support implementation */
 
 #include "usb_scsi.h"
 #include "settings.h"
-//#include "proto_common.h" 
+//#include "proto_common.h"
 
 #include <stdlib.h>	/* strtoul */
 #include <strings.h> /* strncpy */
@@ -37,46 +37,46 @@ bool b_ignore_sysinit2 = false;
 	settings_keys array.
 */
 enum SKKeys{
- skkVendor = 0,	
- skkDevice,	 
-// skkName,		 
-// skkTransport, 
- skkProtocol, 
- skkCommandSet, 
- skkFakeInq, 
- skk6ByteCmd, 
+ skkVendor = 0,
+ skkDevice,
+// skkName,
+// skkTransport,
+ skkProtocol,
+ skkCommandSet,
+ skkFakeInq,
+ skk6ByteCmd,
  skkTransTU,
  skkNoTU,
- skkNoGetMaxLUN, 
- skkNoPreventMedia, 
- skkUseModeSense10, 
- skkForceReadOnly, 
- skkProtoBulk,	
- skkProtoCB,	
+ skkNoGetMaxLUN,
+ skkNoPreventMedia,
+ skkUseModeSense10,
+ skkForceReadOnly,
+ skkProtoBulk,
+ skkProtoCB,
  skkProtoCBI,
 // skkProtoFreecom,
- skkCmdSetSCSI,	
- skkCmdSetUFI,	
- skkCmdSetATAPI,	
- skkCmdSetRBC,	
- skkCmdSetQIC157,	
- 
+ skkCmdSetSCSI,
+ skkCmdSetUFI,
+ skkCmdSetATAPI,
+ skkCmdSetRBC,
+ skkCmdSetQIC157,
+
  skkKeysCount,
-// skkTransportBase = skkSubClassSCSI, 
- skkProtoBegin = skkProtoBulk, 
- skkProtoEnd	 = skkProtoCBI, 
- skkCmdSetBegin = skkCmdSetSCSI, 
- skkCmdSetEnd	 = skkCmdSetQIC157, 
+// skkTransportBase = skkSubClassSCSI,
+ skkProtoBegin = skkProtoBulk,
+ skkProtoEnd	 = skkProtoCBI,
+ skkCmdSetBegin = skkCmdSetSCSI,
+ skkCmdSetEnd	 = skkCmdSetQIC157,
 };
 /**
-	helper struct, used in our "quick" search algorithm 
+	helper struct, used in our "quick" search algorithm
 */
 struct _settings_key{
 	union _hash{
 		char name[32];
 		uint16 key;
 	}hash;
-	uint32 property;	
+	uint32 property;
 }settings_keys[] = {	/**< array of keys, used in our settings files */
 	{{"vendor"	 }, 0}, /* MUST BE SYNCHRONISED WITH skk*** indexes!!! */
 	{{"device"	 }, 0},
@@ -105,7 +105,7 @@ struct _settings_key{
 /**
 	\define:SK_EQUAL
 	checks is the __name parameter correspond to value, pointed by __id index
-	in settings_keys array. The magic of our "quick" search algorithm =-))	 
+	in settings_keys array. The magic of our "quick" search algorithm =-))
 */
 #define CAST_SK(__name) (*(uint16 *)(__name))
 #define SK_EQUAL(__name, __id) ((CAST_SK(__name) == (settings_keys[__id].hash.key)) && \
@@ -114,7 +114,7 @@ struct _settings_key{
 	\fn:load_module_settings
 	loads driver settings from extarnal settings file through BeOS driver
 	settings API. Called on initialization of the module
-*/	
+*/
 void load_module_settings(void)
 {
 	void *sh = load_driver_settings(MODULE_NAME);
@@ -128,25 +128,25 @@ void load_module_settings(void)
 		b_ignore_sysinit2 = get_driver_boolean_parameter(sh, "ignore_sysinit2",
 								b_ignore_sysinit2, false);
 		if(reserved_devices > MAX_DEVICES_COUNT)
-			reserved_devices = MAX_DEVICES_COUNT; 
+			reserved_devices = MAX_DEVICES_COUNT;
 		if(reserved_luns > MAX_LUNS_COUNT)
 			reserved_luns = MAX_LUNS_COUNT;
 		b_reservation_on = (reserved_devices != 0);
-		
+
 		unload_driver_settings(sh);
 	} else {
 		TRACE("settings:load:file '%s' was not found. Using default setting...\n",
 												 MODULE_NAME);
-	}	
+	}
 }
 /**
 	\fn:strncpy_value
 	\param to: buffer for copied string
 	\param dp: driver_parameter, from wich copied string come
-	\param size: maximal size of copied string 
+	\param size: maximal size of copied string
 	copies a string, containing value[0] of this parameter, from driver_parameter,
 	pointed by dp, to buffer pointed by to. Semantic of this function is similar
-	to standard strncpy() one.		
+	to standard strncpy() one.
 */
 /*static void
 strncpy_value(char *to, driver_parameter *dp, size_t size)
@@ -162,7 +162,7 @@ strncpy_value(char *to, driver_parameter *dp, size_t size)
 	\return: a bitmasked value from PROP_-defined flags for USB subclass and \
 					 protocol
 	parse the transport driver_parameter for known USB subclasses, protocols and
-	compose a bitmasked value from those settings	 
+	compose a bitmasked value from those settings
 */
 static uint32
 parse_transport(driver_parameter *dp, int skkBase, int skkEnd,
@@ -185,14 +185,14 @@ parse_transport(driver_parameter *dp, int skkBase, int skkEnd,
 		if(dp->value_count > 1){
 			TRACE("settings:parse_transport:accept '%s', ignore extra...\n", value);
 		}
-	}	 
+	}
 	return ret;
 }
 /**
 	\fn:lookup_device_info
 	\param product_id: product id of device to be checked for private settings
 	\param dp: driver_parameter, containing device information
-	\param udd: on return contains name,protocol etc. information about device 
+	\param udd: on return contains name,protocol etc. information about device
 	\return: "true" if private settings for device found - "false" otherwise
 	looks through device parameter, pointed by dp, obtains the name and other
 	parameters of private device settings if available
@@ -218,12 +218,12 @@ lookup_device_info(uint16 product_id, driver_parameter *dp,
 					} else*/
 					if(SK_EQUAL(dp->parameters[prm].name, skkProtocol)){
 						uds->properties |= parse_transport(&dp->parameters[prm],
-							 skkProtoBegin, skkProtoEnd, 
+							 skkProtoBegin, skkProtoEnd,
 							 PROTO_VENDOR, uds->vendor_protocol);
 					} else
 					if(SK_EQUAL(dp->parameters[prm].name, skkCommandSet)){
 						uds->properties |= parse_transport(&dp->parameters[prm],
-							 skkCmdSetBegin, skkCmdSetEnd, 
+							 skkCmdSetBegin, skkCmdSetEnd,
 							 CMDSET_VENDOR, uds->vendor_commandset);
 					} else
 					if(SK_EQUAL(dp->parameters[prm].name, skkFakeInq)){
@@ -234,10 +234,10 @@ lookup_device_info(uint16 product_id, driver_parameter *dp,
 					} else
 					if(SK_EQUAL(dp->parameters[prm].name, skkTransTU)){
 						uds->properties |= FIX_TRANS_TEST_UNIT;
-					} else 
+					} else
 					if(SK_EQUAL(dp->parameters[prm].name, skkNoTU)){
 						uds->properties |= FIX_NO_TEST_UNIT;
-					} else 
+					} else
 					if(SK_EQUAL(dp->parameters[prm].name, skkNoPreventMedia)){
 						uds->properties |= FIX_NO_PREVENT_MEDIA;
 					} else
@@ -276,7 +276,7 @@ lookup_vendor_info(uint16 vendor_id, uint16 product_id,
 				 driver_parameter *dp, usb_device_settings *uds)
 {
 	bool b_found = false;
-	if(dp && dp->value_count > 0 && dp->values[0]){ 
+	if(dp && dp->value_count > 0 && dp->values[0]){
 		uint16 id = strtoul(dp->values[0], NULL, 0) & 0xffff;
 		if(vendor_id == id){
 			int i = 0;
@@ -302,7 +302,7 @@ lookup_vendor_info(uint16 vendor_id, uint16 product_id,
 	\param udd: on return contains name,protocol etc. information about device
 	\return: "true" if private settings for device found - "false" otherwise
 	looks through driver settings file for private device description and load it
-	if available into struct pointed by udd	 
+	if available into struct pointed by udd
 */
 bool lookup_device_settings(const usb_device_descriptor *udd,
 								usb_device_settings *uds)
@@ -322,10 +322,10 @@ bool lookup_device_settings(const usb_device_descriptor *udd,
 						if(b_found){
 							uds->vendor_id = udd->vendor_id;
 							break; //we've got it - stop enumeration.
-						}	
+						}
 					}
 				} /*for(...) - enumerate "root" parameters*/
-			} /* if(ds) */ 
+			} /* if(ds) */
 			unload_driver_settings(sh);
 		} /* if(sh) */
 		if(b_found){

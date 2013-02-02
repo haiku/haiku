@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Haiku-VirtualMemory	4238590117
+1	swedish	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		Avsluta
+Automatic swap management	SettingsWindow		Automatisk swap hantering
 Turn off	SettingsWindow		Stäng av
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Om du stänger av det virtuella minnet så kommer det att orsaka instabilitet i systemet när minnet är fullt.\nVirtuellt minne påverkar inte systemets prestanda när det inte används.\n\nÄr du säker på att du vill inaktivera virtuellt minne?
 Requested swap file size:	SettingsWindow		Begärd växlingsfils storlek:
