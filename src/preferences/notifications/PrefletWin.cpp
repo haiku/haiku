@@ -22,7 +22,7 @@
 
 
 const int32 kRevert = '_RVT';
-const int32 kSave = '_SAV';
+const int32 kApply = '_APY';
 
 
 PrefletWin::PrefletWin()
@@ -34,12 +34,12 @@ PrefletWin::PrefletWin()
 	// Preflet container view
 	fMainView = new PrefletView(this);
 
-	// Save and revert buttons
+	// Apply and revert buttons
 	fRevert = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kRevert));
 	fRevert->SetEnabled(false);
-	fSave = new BButton("save", B_TRANSLATE("Save"), new BMessage(kSave));
-	fSave->SetEnabled(false);
+	fApply = new BButton("apply", B_TRANSLATE("Apply"), new BMessage(kApply));
+	fApply->SetEnabled(false);
 
 	// Calculate inset
 	float inset = ceilf(be_plain_font->Size() * 0.7f);
@@ -54,7 +54,7 @@ PrefletWin::PrefletWin()
 		.AddGroup(B_HORIZONTAL, inset)
 			.AddGlue()
 			.Add(fRevert)
-			.Add(fSave)
+			.Add(fApply)
 		.End()
 
 		.SetInsets(inset, inset, inset, inset)
@@ -70,13 +70,13 @@ void
 PrefletWin::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case kSave:
+		case kApply:
 			for (int32 i = 0; i < fMainView->CountPages(); i++) {
 				SettingsPane* pane =
 					dynamic_cast<SettingsPane*>(fMainView->PageAt(i));
 				if (pane) {
 					if (pane->Save() == B_OK) {
-						fSave->SetEnabled(false);
+						fApply->SetEnabled(false);
 						fRevert->SetEnabled(true);
 					} else
 						break;
@@ -110,5 +110,5 @@ PrefletWin::QuitRequested()
 void
 PrefletWin::SettingChanged()
 {
-	fSave->SetEnabled(true);
+	fApply->SetEnabled(true);
 }

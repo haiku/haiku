@@ -25,7 +25,7 @@ public:
 
 private:
 			PrefletView*	fMainView;
-			BButton*		fSave;
+			BButton*		fApply;
 			BButton*		fRevert;
 };
 
