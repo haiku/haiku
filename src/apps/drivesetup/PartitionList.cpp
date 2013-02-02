@@ -285,6 +285,8 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 	// Partition type
 
+	if (partitionType.IsEmpty())
+		partitionType = partition->ContentType();
 	SetField(new BStringField(partitionType), kPartitionTypeColumn);
 }
 
