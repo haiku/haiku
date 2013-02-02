@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	1428480647
+1	russian	x-vnd.Haiku-Appearance	3266657197
 Plain font:	Font view		Простой шрифт:
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
@@ -23,7 +23,9 @@ Tooltip background	Colors tab		Фон подсказки
 Selected menu item background	Colors tab		Фон выбранного пункта меню
 Antialiasing	APRWindow		Сглаживание
 Navigation base	Colors tab		Основа навигации
+Selected list item text	Colors tab		Текст выделенного пункта меню
 Window border	Colors tab		Рамка окна
+Double:	DecorSettingsView		Двойной:
 Window tab text	Colors tab		Текст заголовка окна
 Document text	Colors tab		Текст документа
 Navigation pulse	Colors tab		Навигационная пульсация

@@ -22,6 +22,6 @@ To master	AudioMixer		Az elsődlegesre
 Master output	AudioMixer		Elsődleges kimenet
 Setup	AudioMixer		Beállítás
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Nem lineáris előerősítés csúszkák használata (mint a BeOS R5-ben)
-Gain	AudioMixer		Előerősítés
+Gain	AudioMixer		Erősítés
 Allow output channel remapping	AudioMixer		Kimeneti csatorna újraképezésének az engedélyezése
 Physical input channels	AudioMixer		Fizikai bemeneti csatornák

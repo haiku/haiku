@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Shortcuts	3397621807
+1	hungarian	x-vnd.Haiku-Shortcuts	341885426
 Error, NULL state description?\n	ShortcutsSpec		Hiba, NULL állapotleírás?\n
 MoveMouse	ShortcutsSpec		EgérMozgatás
 OK	ShortcutsWindow		Rendben
@@ -20,6 +20,7 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		A Parancsgombok n
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*EgérMozgatásIde 100% 0\" \"*EgérGomb 1\"
 SendMessage	ShortcutsSpec		ÜzenetKüldés
 MoveMouseTo	ShortcutsSpec		EgérMozgatásIde
+Option	ShortcutsSpec	Name for modifier on keyboard	Opció
 Save	ShortcutsWindow		Mentés
 *MouseButton 1	ShortcutsWindow		*EgérGomb 1
 *MoveMouse +20 +0	ShortcutsWindow		*EgérMozgatás +20 +0

@@ -1,10 +1,11 @@
-1	japanese	x-vnd.Haiku-StyledEdit	2434449144
+1	japanese	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか?
 Paste	Menus		貼り付け
 OK	LoadAlert		OK
 File	Menus		ファイル
 ???	LoadAlert		???
+Modified	StatusView		変更あり
 Lines:	Statistics		行数:
 Italic	Menus		イタリック
 Left	Menus		左揃え

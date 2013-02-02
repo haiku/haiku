@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	2646020355
+1	russian	x-vnd.Be-MAIL	233997769
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
@@ -10,6 +10,7 @@ Edit	Mail		Изменить
 Print	Mail		Печать
 <none>	Mail		<пусто>
 New mail message	Mail		Новое сообщение
+Untitled	Mail		Безымянный
 Automatic	Mail		Автоматическая
 Automatically mark mail as read:	Mail		Автоматически помечать письмо как прочитанное:
 helpful message	Mail		полезное сообщение
@@ -106,6 +107,7 @@ Close	Mail		Закрыть
 No matches	Mail		Нет совпадений
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Не запущен mail_daemon. Сообщение поставлено в очередь и будет отправлено как только mail_daemon будет запущен.
 Really delete this signature? This cannot be undone.	Mail		Действительно удалить эту подпись? Эту операцию будет невозможно отменить.
+Save this message as a draft before closing?	Mail		Сохранитьэто сообщение в черновики перед закрытием?
 Open	Mail		Открыть
 draft	B_USER_DIRECTORY/mail/draft		Черновики
 Quote	Mail		Цитата
@@ -119,6 +121,7 @@ Account:	Mail		Аккаунт:
 Decoding:	Mail		Кодировка:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Извините, не удалось найти приложение поддерживающее тип файлов 'Персона'.
 Delete	Mail		Удалить
+Don't send	Mail		Не отправлять
 Leave as '%s'	Mail		Оставить как '%s'
 Copy	Mail		Копия
 Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
@@ -133,6 +136,7 @@ Font:	Mail		Шрифт:
 (Address unavailable)	Mail		(Адрес недоступен)
 Save address	Mail		Сохранить адрес
 Queries	Mail		Запросы
+Send this message before closing?	Mail		Отправить это сообщение перед закрытием?
 Save	Mail		Сохранить
 Random	Mail		Случайная
 Close and 	Mail		Закрыть и 

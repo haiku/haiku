@@ -1,13 +1,16 @@
-1	russian	x-vnd.Haiku-StyledEdit	3117187160
+1	russian	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		Стильный редактор
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
 Paste	Menus		Вставить
 OK	LoadAlert		ОК
 File	Menus		Файл
 ???	LoadAlert		???
+Modified	StatusView		Изменён
 Lines:	Statistics		Строк:
 Italic	Menus		Наклонный
 Left	Menus		По левому краю
 Search backwards	FindandReplaceWindow		Искать снизу вверх
+Unlock file	StatusView		Разблокировать
 Size	Menus		Размер
 Save	QuitAlert		Сохранить
 Page setup…	Menus		Настройка печати…
@@ -19,21 +22,27 @@ Cancel	SaveAlert		Отмена
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
 Case-sensitive	FindandReplaceWindow		Учитывать регистр
 Green	Menus		Зеленый
+Reload	NodeMonitorAlerts		Перезагрузить
 Yellow	Menus		Желтый
 Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
 Wrap lines	Menus		Перенос строк
 Quit	Menus		Выход
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" был удален другой программой, восстановить его?
 Document statistics	Statistics		Статистика документа
 Cancel	RevertToSavedAlert		Отмена
+Autodetect	Menus		Автоопределение
 Document	Menus		Документ
 Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
 Edit	Menus		Изменить
+Revert	RevertToSavedAlert		Вернуть
 Font	Menus		Шрифт
 Replace all	FindandReplaceWindow		Заменить все
 Statistics…	Menus		Статистика…
 Default	Open_and_SaveAsPanel		По умолчанию
 Replace next	Menus		Заменить далее
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" имеет несохраненные изменения.\nВернуться его до последней сохраненной версии?
 Cancel	FindandReplaceWindow		Отмена
+Text encoding	Menus		Кодировка
 Close	Menus		Закрыть
 Save	SaveAlert		Сохранить
 Words:	Statistics		Слов:
@@ -43,10 +52,13 @@ Don't save	QuitAlert		Не сохранять
 Align	Menus		Выровнять
 Color	Menus		Цвет
 Red	Menus		Красный
+OK	QuitAlert		ОК
 Open…	Menus		Открыть…
 Center	Menus		По центру
 Blue	Menus		Синий
+Unable to unlock file\n\t%s	QuitAlert		Невозможно разблокировать файл\n\t%s
 Cyan	Menus		Бирюзовый
+line %d, column %d	StatusView		линия %d, позиция %d
 OK	Statistics		ОК
 Magenta	Menus		Пурпурный
 New	Menus		Новый
@@ -57,13 +69,17 @@ Find:	FindandReplaceWindow		Найти:
 Error saving \"%s\":\n%s	SaveAlert		Ошибка сохранения \"%s\":\n%s
 Copy	Menus		Копировать
 Cut	Menus		Вырезать
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" был изменен другой программой, перезагрузить его?
 Replace	FindandReplaceWindow		Заменить
 Find again	Menus		Найти далее
 Cancel	QuitAlert		Отмена
 Find…	Menus		Найти…
 Select all	Menus		Выделить всё
 Don't save	SaveAlert		Не сохранять
+Recover	NodeMonitorAlerts		Восстановить
 Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
+Ignore	NodeMonitorAlerts		Игнорировать
+Read-only	StatusView		Только чтение
 Undo typing	QuitAlert		Отменить ввод
 Black	Menus		Черный
 Untitled 	StyledEditWindow		Новый документ 
@@ -73,5 +89,6 @@ Encoding	Open_and_SaveAsPanel		Кодировка
 Characters:	Statistics		Символов:
 Save as…	Menus		Сохранить как…
 Redo typing	QuitAlert		Повторить ввод
+Reload…	Menus		Перезагрузить…
 Replace…	Menus		Заменить…
 Right	Menus		По правому краю

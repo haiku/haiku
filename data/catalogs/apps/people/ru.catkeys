@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PEPL	3273435274
+1	russian	x-vnd.Be-PEPL	2332202134
 Edit	People		Изменить
 Error	People		Ошибка
 City	People		Город
@@ -21,6 +21,7 @@ Nickname	People		Прозвище
 Quit	People		Выход
 Name	People		Имя
 Revert	People		Вернуть
+Don't save	People		Не сохранять
 Undo	People		Отменить
 E-mail	People		E-mail
 Load image…	People		Выбрать рисунок…
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Домашний телефон
 Save as…	People		Сохранить как…
 Redo	People		Отменить
+Save changes before closing?	People		Сохранить изменения перед выходом?
 Paste	People		Вставить
 Drop an image here,\nor use the contextual menu.	People		Перенесите сюда фотографию\nили используйте контекстное меню.
 Save	People		Сохранить

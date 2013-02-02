@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	3397621807
+1	swedish	x-vnd.Haiku-Shortcuts	341885426
 Error, NULL state description?\n	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?\n
 MoveMouse	ShortcutsSpec		FlyttaMus
 OK	ShortcutsWindow		OK
@@ -20,6 +20,7 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Genvägar kunde i
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Flera \"*FlyttaMusTill 100% 0\" \"*Musknapp 1\"
 SendMessage	ShortcutsSpec		SkickaMeddelande
 MoveMouseTo	ShortcutsSpec		FlyttaMusenTill
+Option	ShortcutsSpec	Name for modifier on keyboard	Alternativ
 Save	ShortcutsWindow		Spara
 *MouseButton 1	ShortcutsWindow		*Musknapp 1
 *MoveMouse +20 +0	ShortcutsWindow		*FlyttaMusenTill +20 +0

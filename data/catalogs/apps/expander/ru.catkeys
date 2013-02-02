@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	1269216169
+1	russian	x-vnd.Haiku-Expander	2603318510
 Expand	ExpanderMenu		Распаковать
 Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
 Set destination…	ExpanderMenu		Путь назначения для извлечения…
@@ -33,6 +33,8 @@ Show contents	ExpanderWindow		Показать содержимое
 Automatically show contents listing	ExpanderPreferences		Автоматически отображать содержимое архива
 OK	ExpanderPreferences		ОК
 Leave destination folder path empty	ExpanderPreferences		Оставить путь назначения пустым
+Failed to create the destination folder.	ExpanderWindow		Не удалось создать папку назначения.
+Create	ExpanderWindow		Создать
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка была перемещена, переименована либо не\nподдерживается.
 The file doesn't exist	ExpanderWindow		Файл не существует
 Stop	ExpanderMenu		Остановить

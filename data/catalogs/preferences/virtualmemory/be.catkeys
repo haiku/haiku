@@ -1,5 +1,6 @@
-1	belarusian	x-vnd.Haiku-VirtualMemory	4238590117
+1	belarusian	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		Выйсці
+Automatic swap management	SettingsWindow		Вызначаць аўтаматычна
 Turn off	SettingsWindow		Адключыць
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Адмова ад ужывання уяўнай памяці можа спарадзіць нечаканыя праблемы ў функцыянаванні праграмаў падчас працы сістэмы ў рэжыме скарыстання усёй фізічнай памяці. Але майце на ўвазе, што да таго моманту як сістэма вычарпае ўсю фізічную памяць, наладкі ўяўнай памяці ніяк ня будуць ўплываць на агульную прадукцыйнасьць сістэмы.\n\nВы упэўнены у тым, што сістэма не павінна карыстацца уяўнаю памяццю?
 Requested swap file size:	SettingsWindow		Запатрабаваны памер уяўнай памяці:
