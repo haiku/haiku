@@ -10,7 +10,7 @@
  */
 
 
-#include "CreateParamsPanel.h"
+#include "CreateParametersPanel.h"
 
 #include <Button.h>
 #include <Catalog.h>

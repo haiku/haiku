@@ -38,12 +38,13 @@
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include "CreateParamsPanel.h"
+#include <tracker_private.h>
+
+#include "CreateParametersPanel.h"
 #include "DiskView.h"
-#include "InitParamsPanel.h"
+#include "InitParametersPanel.h"
 #include "PartitionList.h"
 #include "Support.h"
-#include "tracker_private.h"
 
 
 #undef B_TRANSLATION_CONTEXT

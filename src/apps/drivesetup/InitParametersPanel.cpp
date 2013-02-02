@@ -9,7 +9,7 @@
  */
 
 
-#include "InitParamsPanel.h"
+#include "InitParametersPanel.h"
 
 #include <driver_settings.h>
 #include <stdio.h>
