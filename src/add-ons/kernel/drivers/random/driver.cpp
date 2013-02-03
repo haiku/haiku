@@ -17,6 +17,8 @@
 #include <lock.h>
 #include <thread.h>
 
+#include <util/AutoLock.h>
+
 
 //#define TRACE_DRIVER
 #ifdef TRACE_DRIVER
@@ -374,11 +376,9 @@ publish_devices(void)
 device_hooks *
 find_device(const char* name)
 {
-	int	i;
-
 	TRACE((DRIVER_NAME ": find_device(\"%s\")\n", name));
 
-	for (i = 0; sRandomNames[i] != NULL; i++)
+	for (int i = 0; sRandomNames[i] != NULL; i++)
 		if (strcmp(name, sRandomNames[i]) == 0)
 			return &sRandomHooks;
 
@@ -401,12 +401,9 @@ random_open(const char *name, uint32 flags, void **cookie)
 static status_t
 random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 {
-	int32 *buffer = (int32 *)_buffer;
-	uint8 *buffer8 = (uint8 *)_buffer;
-	uint32 i, j;
 	TRACE((DRIVER_NAME ": read(%Ld,, %ld)\n", position, *_numBytes));
 
-	mutex_lock(&sRandomLock);
+	MutexLocker locker(&sRandomLock);
 	sRandomCount += *_numBytes;
 
 	/* Reseed if we have or are gonna use up > 1/16th the entropy around */
@@ -418,12 +415,13 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 	/* ToDo: Yes, i know this is not the way we should do it. What we really should do is
 	 * take the md5 or sha1 hash of the state of the pool, and return that. Someday.
 	 */
-	for (i = 0; i < (*_numBytes) / 4; i++)
+	int32 *buffer = (int32 *)_buffer;
+	uint32 i;
+	for (i = 0; i < *_numBytes / 4; i++)
 		buffer[i] = chrand32(sRandomEnv);
-	for (j = 0; j < (*_numBytes) % 4; j++)
-		buffer8[(i*4) + j] = chrand8(sRandomEnv);
-
-	mutex_unlock(&sRandomLock);
+	uint8 *buffer8 = (uint8 *)_buffer;
+	for (uint32 j = 0; j < *_numBytes % 4; j++)
+		buffer8[(i * 4) + j] = chrand8(sRandomEnv);
 
 	return B_OK;
 }
@@ -433,13 +431,12 @@ static status_t
 random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes)
 {
 	TRACE((DRIVER_NAME ": write(%Ld,, %ld)\n", position, *_numBytes));
-	mutex_lock(&sRandomLock);
+	MutexLocker locker(&sRandomLock);
 	OCTET* data = (OCTET*)buffer;
 	for (size_t i = 0; i < *_numBytes / sizeof(OCTET); i++) {
 		chseed(sRandomEnv, data->Q[0]);
 		data++;
 	}
-	mutex_unlock(&sRandomLock);
 	return B_OK;
 }
 
