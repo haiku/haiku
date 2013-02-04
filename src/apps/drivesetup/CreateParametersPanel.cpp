@@ -85,6 +85,38 @@ CreateParametersPanel::Go(off_t& offset, off_t& size, BString& name,
 
 
 void
+CreateParametersPanel::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_PARTITION_TYPE:
+			if (fEditor != NULL) {
+				const char* type;
+				if (message->FindString("type", &type) == B_OK)
+					fEditor->ParameterChanged("type", BVariant(type));
+			}
+			break;
+
+		case MSG_SIZE_SLIDER:
+			_UpdateSizeTextControl();
+			break;
+
+		case MSG_SIZE_TEXTCONTROL:
+		{
+			int32 size = atoi(fSizeTextControl->Text());
+			if (size >= 0 && size <= fSizeSlider->MaxPartitionSize())
+				fSizeSlider->SetValue(size + fSizeSlider->Offset());
+			else
+				_UpdateSizeTextControl();
+			break;
+		}
+
+		default:
+			AbstractParametersPanel::MessageReceived(message);
+	}
+}
+
+
+void
 CreateParametersPanel::AddControls(BLayoutBuilder::Group<>& builder,
 	BView* editorView)
 {
@@ -143,38 +175,6 @@ CreateParametersPanel::_CreateViewControls(BPartition* parent, off_t offset,
 		fTypePopUpMenu);
 
 	fOkButton->SetLabel(B_TRANSLATE("Create"));
-}
-
-
-void
-CreateParametersPanel::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case MSG_PARTITION_TYPE:
-			if (fEditor != NULL) {
-				const char* type;
-				if (message->FindString("type", &type) == B_OK)
-					fEditor->ParameterChanged("type", BVariant(type));
-			}
-			break;
-
-		case MSG_SIZE_SLIDER:
-			_UpdateSizeTextControl();
-			break;
-
-		case MSG_SIZE_TEXTCONTROL:
-		{
-			int32 size = atoi(fSizeTextControl->Text());
-			if (size >= 0 && size <= fSizeSlider->MaxPartitionSize())
-				fSizeSlider->SetValue(size + fSizeSlider->Offset());
-			else
-				_UpdateSizeTextControl();
-			break;
-		}
-
-		default:
-			AbstractParametersPanel::MessageReceived(message);
-	}
 }
 
 
