@@ -48,6 +48,8 @@ private:
 			BTextControl*		fNameTextControl;
 			SizeSlider*			fSizeSlider;
 			BTextControl*		fSizeTextControl;
+			bool				fSupportsName;
+			bool				fSupportsType;
 };
 
 

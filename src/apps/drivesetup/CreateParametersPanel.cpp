@@ -43,13 +43,13 @@ CreateParametersPanel::CreateParametersPanel(BWindow* window,
 	:
 	AbstractParametersPanel(window)
 {
-	Init(B_CREATE_PARAMETER_EDITOR, "", partition);
-
 	// Scale offset, and size from bytes to megabytes (2^20)
 	// so that we do not run over a signed int32.
 	offset /= kMegaByte;
 	size /= kMegaByte;
 	_CreateViewControls(partition, offset, size);
+
+	Init(B_CREATE_PARAMETER_EDITOR, "", partition);
 }
 
 
@@ -122,14 +122,23 @@ CreateParametersPanel::AddControls(BLayoutBuilder::Group<>& builder,
 {
 	builder
 		.Add(fSizeSlider)
-		.Add(fSizeTextControl)
-		.AddGrid(0.0, 5.0)
-			.Add(fNameTextControl->CreateLabelLayoutItem(), 0, 0)
-			.Add(fNameTextControl->CreateTextViewLayoutItem(), 1, 0)
-			.Add(fTypeMenuField->CreateLabelLayoutItem(), 0, 1)
-			.Add(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1)
-		.End()
-		.Add(editorView);
+		.Add(fSizeTextControl);
+
+	if (fSupportsName || fSupportsType) {
+		BLayoutBuilder::Group<>::GridBuilder gridBuilder
+			= builder.AddGrid(0.0, B_USE_DEFAULT_SPACING);
+
+		if (fSupportsName) {
+			gridBuilder.Add(fNameTextControl->CreateLabelLayoutItem(), 0, 0)
+				.Add(fNameTextControl->CreateTextViewLayoutItem(), 1, 0);
+		}
+		if (fSupportsType) {
+			gridBuilder.Add(fTypeMenuField->CreateLabelLayoutItem(), 0, 1)
+				.Add(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1);
+		}
+	}
+
+	builder.Add(editorView);
 }
 
 
@@ -154,8 +163,7 @@ CreateParametersPanel::_CreateViewControls(BPartition* parent, off_t offset,
 
 	fNameTextControl = new BTextControl("Name Control",
 		B_TRANSLATE("Partition name:"),	"", NULL);
-	if (!parent->SupportsChildName())
-		fNameTextControl->SetEnabled(false);
+	fSupportsName = parent->SupportsChildName();
 
 	fTypePopUpMenu = new BPopUpMenu("Partition Type");
 
@@ -173,6 +181,7 @@ CreateParametersPanel::_CreateViewControls(BPartition* parent, off_t offset,
 
 	fTypeMenuField = new BMenuField(B_TRANSLATE("Partition type:"),
 		fTypePopUpMenu);
+	fSupportsType = fTypePopUpMenu->CountItems() != 0;
 
 	fOkButton->SetLabel(B_TRANSLATE("Create"));
 }
