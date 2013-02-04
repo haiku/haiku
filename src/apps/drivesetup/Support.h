@@ -42,7 +42,7 @@ public:
 									off_t size, uint32 minGranularity);
 	virtual						~SizeSlider();
 
-	virtual	void				SetValue(int32);
+	virtual	void				SetValue(int32 value);
 	virtual const char*			UpdateText() const;
 
 			off_t				Size() const;
